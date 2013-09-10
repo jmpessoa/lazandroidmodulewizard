@@ -16,6 +16,7 @@ Acknowledgements: Eny and Phil for the Project wizard hints...
 
                   Lazarus forum community! 
 
+::revision 0.1 - 09 September - 2013 - Bugs fixs!
 
 version 0.1 - August 2013
 

@@ -159,7 +159,6 @@ end;
 function TFormAndroidProject.GetJTypeSignature(jType: string): string;
 var
   i: integer;
-  auxList: TStringList;
 begin
   if jType <> '' then
   begin
@@ -209,16 +208,15 @@ begin
 
     if Result = '' then
     begin
-        auxList:= TStringList.Create;
         for i:= 0 to FImportsList.Count-1 do
         begin
-          auxList.Delimiter:='/';
-          auxList.DelimitedText:= FImportsList.Strings[i];
-          if CompareStr(jType, auxList.Strings[auxList.Count-1]) = 0 then
+          if Pos(jType+';', FImportsList.Strings[i]) > 0 then   //fix here 09-september-2013
+          begin
              Result:= FImportsList.Strings[i];
+          end;
         end;
-        auxList.Free;
     end;
+
     if Result = '' then Result:= 'UNKNOWN';
   end;
 end;
@@ -538,11 +536,14 @@ begin
      for i:= 0 to SynMemo1.Lines.Count-1 do
      begin
         auxStr:= SynMemo1.Lines.Strings[i];
-        if Pos('import ', auxStr) > 0 then
+        if auxStr <> '' then   //minor fix... 08-september-2013
         begin
-           SplitStr(auxStr,' ');
-           auxStr:= ReplaceChar(auxStr,'.','/');
-           FImportsList.Add('L'+trim(auxStr));
+          if Pos('import ', auxStr) > 0 then
+          begin
+             SplitStr(auxStr,' ');
+             auxStr:= ReplaceChar(auxStr,'.','/');
+             FImportsList.Add('L'+trim(auxStr));
+          end;
         end;
      end;
      pathList.Free;
