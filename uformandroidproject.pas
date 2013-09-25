@@ -159,6 +159,7 @@ end;
 function TFormAndroidProject.GetJTypeSignature(jType: string): string;
 var
   i: integer;
+  auxList: TStringList;
 begin
   if jType <> '' then
   begin
@@ -210,9 +211,16 @@ begin
     begin
         for i:= 0 to FImportsList.Count-1 do
         begin
-          if Pos(jType+';', FImportsList.Strings[i]) > 0 then   //fix here 09-september-2013
-          begin
-             Result:= FImportsList.Strings[i];
+          if Pos(jType+';',FImportsList.Strings[i]) > 0 then   //fix here 09-september-2013
+          begin                                                //again fix here 21-sept-2013
+             auxList:= TStringList.Create;
+             auxList.Delimiter:='/';
+             auxList.DelimitedText:= FImportsList.Strings[i];
+             if CompareText(jType+';', auxList.Strings[auxList.Count-1]) = 0 then
+             begin
+                Result:= FImportsList.Strings[i];
+             end;
+             auxList.Free;
           end;
         end;
     end;
