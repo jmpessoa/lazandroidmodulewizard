@@ -1,7 +1,7 @@
 object FormAndroidProject: TFormAndroidProject
-  Left = 269
+  Left = 308
   Height = 570
-  Top = 114
+  Top = 5
   Width = 1040
   BorderIcons = []
   BorderStyle = bsSingle
@@ -74,7 +74,7 @@ object FormAndroidProject: TFormAndroidProject
   OnCreate = FormCreate
   OnShow = FormShow
   Position = poScreenCenter
-  LCLVersion = '1.1'
+  LCLVersion = '1.0.8.0'
   object Panel1: TPanel
     Left = 0
     Height = 28
@@ -91,6 +91,7 @@ object FormAndroidProject: TFormAndroidProject
       Top = 1
       Width = 1038
       Caption = 'ToolBar1'
+      EdgeBorders = [ebTop]
       Images = ImageList1
       TabOrder = 0
       object ToolButton1: TToolButton
@@ -121,7 +122,6 @@ object FormAndroidProject: TFormAndroidProject
       FileSortType = fstAlphabet
       HideSelection = False
       ReadOnly = True
-      Root = 'C:\adt32\eclipse\workspace'
       TabOrder = 0
       Options = [tvoAutoItemHeight, tvoKeepCollapsedNodes, tvoReadOnly, tvoShowButtons, tvoShowLines, tvoShowRoot, tvoToolTips, tvoThemedDraw]
       ObjectTypes = [otFolders]
@@ -1180,9 +1180,9 @@ object FormAndroidProject: TFormAndroidProject
           ShowColumnHeaders = False
           SortType = stText
           TabOrder = 0
+          ViewStyle = vsReport
           OnDblClick = ShellListView1DblClick
           ObjectTypes = [otNonFolders]
-          Root = 'C:\adt32\eclipse\workspace\'
           ShellTreeView = ShellTreeView1
         end
       end
