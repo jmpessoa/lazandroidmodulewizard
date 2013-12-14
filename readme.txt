@@ -170,7 +170,7 @@ III. BUILD and RUN ANDROID APPLICATION
 	1.2.  right click your recent created project -> Run as -> Android Application
 
 
-IV. SPECIAL GUIDE FOR ANDROID BRIDGES COMPONENTS USE   - NEW
+IV. SPECIAL GUIDE FOR ANDROID BRIDGES COMPONENTS USE   - NEW! Simon Controls remake and plus!
 
 	1. From Eclipse IDE: 
 
@@ -271,7 +271,144 @@ VI. Download Demos [Eclipse Projects]
     AppDemo1 - ref1. https://www.opendrive.com/files?Ml8zNjMwNTE0N18xVUZ2ag
     AppDemo2 - ref2. https://www.opendrive.com/files?Ml8zNjMwNTMxN19YTHgxWg
 
-VII. Ref. Lazarus forum: http://forum.lazarus.freepascal.org/index.php/topic,21919.0.html
+
+VII. About Package, Components and LCL  and NDK libs(.so) dependency on laz4android1.1-41139 IDE cross compiler
+
+
+1. Package creation: just LCLBase is permitted! not LCL at all! 
+   
+   - You will nedd  LCLBase Required Package for register procedure.
+   - yes, other No GUI stuff is permitted.
+
+2. Component creation
+   
+    2.1. If you will use custom icon then you will need two files: the first to compoment(s) code
+        and the second for Register procedure code.
+
+        example:
+
+    2.1.1. File 1 - foo.pas - component code - here no LCL dependency at all!
+
+	unit foo;
+
+	{$mode objfpc}{$H+}
+
+	interface	
+
+	uses
+		Classes, SysUtils;
+
+	type
+
+	TFoo = class(TComponent)
+  	private
+	{ Private declarations }
+	protected
+	{ Protected declarations }
+	public
+	{ Public declarations }
+	published
+	{ Published declarations }
+	end;
+
+
+	implementation
+
+  
+	end.
+
+        
+  2.1.2.//file 2 regtfoo.pas - register code -  here you will nedd LCLBase for LResources unit
+
+        unit regtfoo;
+
+	{$mode objfpc}{$H+}
+
+	interface
+
+	uses
+  		Classes, SysUtils, LResources{ here is the LCLBase dependency!}; 
+
+	Procedure Register;
+
+	implementation
+
+	Procedure Register;
+	begin
+
+	  {$I tfoo_icon.lrs}  //you custom icon
+
+	  RegisterComponents('Android Bridges',[TFoo);
+
+	end;
+
+	initialization
+
+	end.   
+
+
+3. NDK libs (.so) dependency on laz4android1.1-41139 IDE cross compiler
+     
+
+3.1.  You will two files: the first to NDK *.so lib interface and the second for you component/unit code.
+
+	Example:
+
+
+	3.1.1. File 1 - "And_log_h.pas" the header interface file
+ 
+	unit And_log_h;
+
+	 {$mode delphi}
+
+	interface
+
+	const libname='liblog.so';
+
+  	ANDROID_LOG_UNKNOWN=0;
+      	ANDROID_LOG_DEFAULT=1;
+      	ANDROID_LOG_VERBOSE=2;
+      	ANDROID_LOG_DEBUG=3;
+      	ANDROID_LOG_INFO=4;
+      	ANDROID_LOG_WARN=5;
+      	ANDROID_LOG_ERROR=6;
+      	ANDROID_LOG_FATAL=7;
+      	ANDROID_LOG_SILENT=8;
+
+	type
+
+	  android_LogPriority=integer;
+
+	  function __android_log_write(prio:longint; tag,text: pchar):longint; cdecl; external libname name '__android_log_write';
+
+	  function LOGI(prio:longint;tag,text:pchar):longint; cdecl; varargs; external libname name '__android_log_print';
+
+
+	implementation
+
+	end.
+
+	3.1.2. File 2 - "And_log.pas" component/unit code
+
+	unit And_log;
+
+	interface
+
+	uses
+	   And_log_h;  // <-- here is the link to NDK lib
+
+	procedure log(msg: pchar); 
+
+	implementation
+
+	procedure log(msg: pchar);
+	begin
+     	    __android_log_write(ANDROID_LOG_FATAL,'crap',msg);
+	end;
+
+	end.
+
+VIII. Ref. Lazarus forum: http://forum.lazarus.freepascal.org/index.php/topic,21919.0.html
 
      -Help and Hints
      -Bugs
@@ -281,4 +418,4 @@ VII. Ref. Lazarus forum: http://forum.lazarus.freepascal.org/index.php/topic,219
      -Roadmap
      -etc..
 
-VIII. The work is just beginning!
+IX. The work is just beginning!
