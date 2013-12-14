@@ -546,7 +546,7 @@ begin
   begin
 
     if FPathToJavaTemplates <> '' then
-       FListJNIBridge.LoadFromFile(FPathToJavaTemplates + '\' + 'ControlsEvents.txt');
+       FListJNIBridge.LoadFromFile(FPathToJavaTemplates + DirectorySeparator + 'ControlsEvents.txt');
 
      Memo2List.Clear;
      SynMemo2.Lines.Clear;
@@ -557,7 +557,7 @@ begin
      //FPathToJavaClass:= FLabelPath;
      StatusBar1.SimpleText:= FPathToJavaClass;
 
-     pathList.Delimiter:='\';
+     pathList.Delimiter:=DirectorySeparator;
      pathList.DelimitedText:= FPathToJavaClass;
      fileName:= pathList.Strings[pathList.Count-1];
     // LabelJClass.Caption:= fileName;
@@ -644,7 +644,7 @@ begin
 
     auxList.Clear;
 
-    auxList.LoadFromFile(FPathToJavaTemplates + '\' + 'App.java');
+    auxList.LoadFromFile(FPathToJavaTemplates + DirectorySeparator + 'App.java');
 
     auxList.Strings[0]:= strPack;
 
@@ -652,7 +652,7 @@ begin
 
     auxList.Clear;
 
-    auxList.LoadFromFile(FPathToJavaTemplates + '\' + 'Controls.java');
+    auxList.LoadFromFile(FPathToJavaTemplates + DirectorySeparator + 'Controls.java');
     auxList.Strings[0]:= strPack;
     auxList.SaveToFile(auxPath + 'Controls.java');
     auxList.Free;
@@ -667,21 +667,21 @@ begin
 
     ListManifest:= TStringList.Create;
 
-    ListManifest.LoadFromFile(FPathToJavaTemplates + '\' + 'AndroidManifest.txt');
+    ListManifest.LoadFromFile(FPathToJavaTemplates + DirectorySeparator + 'AndroidManifest.txt');
     strAfterReplace  := StringReplace(ListManifest.Text, 'dummy1',strPack, [rfReplaceAll, rfIgnoreCase]);
     strPack:= strPack+'.App';
     strAfterReplace  := StringReplace(strAfterReplace, 'dummy2',strPack, [rfReplaceAll, rfIgnoreCase]);
 
     ListManifest.Clear;
     ListManifest.Text:= strAfterReplace;
-    ListManifest.SaveToFile(FAndroidProjectName+'\'+'AndroidManifest.xml');
+    ListManifest.SaveToFile(FAndroidProjectName+DirectorySeparator+'AndroidManifest.xml');
     ListManifest.Free;
   end;
 end;
 
 procedure TFormAndroidProject.PopupMenu1Popup(Sender: TObject);
 begin
-  //FListJNIBridge.LoadFromFile(FPathToJavaTemplates + '\' + 'ControlsEvents.txt');
+  //FListJNIBridge.LoadFromFile(FPathToJavaTemplates + DirectorySeparator + 'ControlsEvents.txt');
 end;
 
 procedure TFormAndroidProject.ShellTreeView1Click(Sender: TObject);

@@ -98,8 +98,8 @@ var
   i, j, k: integer;
 begin
   pathList:= TStringList.Create;
-  pathList.Delimiter:='\';
-  pathList.DelimitedText:= TrimChar(fullPath,'\');
+  pathList.Delimiter:=DirectorySeparator;
+  pathList.DelimitedText:= TrimChar(fullPath,DirectorySeparator);
 
   for i:=0 to pathList.Count-1 do
   begin
@@ -108,9 +108,9 @@ begin
   Result:= '';
   for j:= 0 to k-1 do
   begin
-      Result:= Result + pathList.Strings[j]+'\';
+      Result:= Result + pathList.Strings[j]+DirectorySeparator;
   end;
-  Result:= TrimChar(Result, '\');;
+  Result:= TrimChar(Result, DirectorySeparator);;
   pathList.Free;
 end;
 
@@ -142,23 +142,23 @@ begin
     FPascalJNIIterfaceCode:= frm.PascalJNIInterfaceCode;
 
     {$I-}
-    ChDir(FPathToJNIFolder+'\'+ 'jni');
-    if IOResult <> 0 then MkDir(FPathToJNIFolder+ '\' + 'jni');
+    ChDir(FPathToJNIFolder+DirectorySeparator+ 'jni');
+    if IOResult <> 0 then MkDir(FPathToJNIFolder+ DirectorySeparator + 'jni');
 
-    ChDir(FPathToJNIFolder+'\'+ 'libs');
-    if IOResult <> 0 then MkDir(FPathToJNIFolder+ '\' + 'libs');
+    ChDir(FPathToJNIFolder+DirectorySeparator+ 'libs');
+    if IOResult <> 0 then MkDir(FPathToJNIFolder+ DirectorySeparator + 'libs');
 
-    ChDir(FPathToJNIFolder+'\'+ 'obj');
-    if IOResult <> 0 then MkDir(FPathToJNIFolder+ '\' + 'obj');
+    ChDir(FPathToJNIFolder+DirectorySeparator+ 'obj');
+    if IOResult <> 0 then MkDir(FPathToJNIFolder+ DirectorySeparator + 'obj');
 
-    ChDir(FPathToJNIFolder+'\'+ 'obj\'+FJavaClassName);
-    if IOResult <> 0 then MkDir(FPathToJNIFolder+ '\' + 'obj\'+LowerCase(FJavaClassName));
+    ChDir(FPathToJNIFolder+DirectorySeparator+ 'obj'+DirectorySeparator+FJavaClassName);
+    if IOResult <> 0 then MkDir(FPathToJNIFolder+ DirectorySeparator + 'obj'+DirectorySeparator+LowerCase(FJavaClassName));
 
     auxStr:='armeabi';
     if FInstructionSet = 'ArmV7' then auxStr:='armeabi-v7a';
 
-    ChDir(FPathToJNIFolder+'\'+ 'libs\'+auxStr);
-    if IOResult <> 0 then MkDir(FPathToJNIFolder+ '\' + 'libs\'+auxStr);
+    ChDir(FPathToJNIFolder+DirectorySeparator+ 'libs'+DirectorySeparator+auxStr);
+    if IOResult <> 0 then MkDir(FPathToJNIFolder+ DirectorySeparator + 'libs'+DirectorySeparator+auxStr);
 
   end;
   frm.Free;
@@ -248,7 +248,7 @@ begin
   if FModuleType = 0 then  //GUI controls
      AProject.AddPackageDependency('tfpandroidbridge_pack');
 
-  sourceList.Add('{hint: save all files to location: ' +FPathToJNIFolder+'\'+'jni }');
+  sourceList.Add('{hint: save all files to location: ' +FPathToJNIFolder+DirectorySeparator+'jni }');
   sourceList.Add('library '+ LowerCase(FJavaClassName) +';');
   sourceList.Add(' ');
   sourceList.Add('{$mode delphi}');
@@ -363,9 +363,9 @@ begin
    {Others}
   AProject.LazCompilerOptions.CustomOptions:=
                         '-dANDROID -Xd -Cp'+FInstructionSet+ ' -Cf'+FFPUSet+
-                        ' -FL'+FPathToNdkPlataformsAndroidArcharmUsrLib+'\libdl.so' +  {as dynamic linker}
-                        ' -FU'+FPathToJNIFolder+'\obj\'+FJavaClassName +
-                        ' -o'+FPathToJNIFolder+'\libs\'+auxStr+'\'+'lib'+LowerCase(FJavaClassName)+'.so';  {-o}
+                        ' -FL'+FPathToNdkPlataformsAndroidArcharmUsrLib+DirectorySeparator+'libdl.so' +  {as dynamic linker}
+                        ' -FU'+FPathToJNIFolder+DirectorySeparator+'obj'+DirectorySeparator+FJavaClassName +
+                        ' -o'+FPathToJNIFolder+DirectorySeparator+'libs'+DirectorySeparator+'lib'+LowerCase(FJavaClassName)+'.so';  {-o}
 
   sourceList.Free;
   Result := mrOK;
@@ -407,7 +407,7 @@ begin
    unitName:= FileName;
    unitName:= SplitStr(unitName,'.');
    sourceList:= TStringList.Create;
-   sourceList.Add('{Hint: save all files to location: ' +PathToJNIFolder+'\'+'jni }');
+   sourceList.Add('{Hint: save all files to location: ' +PathToJNIFolder+DirectorySeparator+'jni }');
    sourceList.Add('unit '+unitName+';');
    sourceList.Add(' ');
    if SyntaxMode = smDelphi then
@@ -425,7 +425,7 @@ begin
    sourceList.Add(GetImplementationSource(Filename, SourceName, ResourceName));
    sourceList.Add('end.');
    Result:= sourceList.Text;
-   //sourceList.SaveToFile(BasePathToJNIFolder+'\'+'jni'+'\'+'u'+ResourceName+'.pas');
+   //sourceList.SaveToFile(BasePathToJNIFolder+DirectorySeparator+'jni'+DirectorySeparator+'u'+ResourceName+'.pas');
    sourceList.Free;
 end;
 
