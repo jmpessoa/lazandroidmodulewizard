@@ -15,27 +15,36 @@ type
   TFormWorkspace  = class(TForm)
     bbOK: TBitBtn;
     Bevel1: TBevel;
+    Bevel2: TBevel;
     BitBtn2: TBitBtn;
+    ComboBox1: TComboBox;
     Edit1: TEdit;
     Edit2: TEdit;
     Edit3: TEdit;
+    Edit4: TEdit;
     edProjectName: TEdit;
     Label1: TLabel;
     Label2: TLabel;
+    Label3: TLabel;
     Label4: TLabel;
+    Label6: TLabel;
     RadioGroup1: TRadioGroup;
     RadioGroup2: TRadioGroup;
     SelectDirectoryDialog1: TSelectDirectoryDialog;
     SelectDirectoryDialog2: TSelectDirectoryDialog;
     SelectDirectoryDialog3: TSelectDirectoryDialog;
+    SelectDirectoryDialog4: TSelectDirectoryDialog;
     SpeedButton1: TSpeedButton;
     SpeedButton2: TSpeedButton;
     SpeedButton3: TSpeedButton;
+    SpeedButton4: TSpeedButton;
+    procedure ComboBox1Change(Sender: TObject);
     procedure FormClose(Sender: TObject; var CloseAction: TCloseAction);
     procedure FormShow(Sender: TObject);
     procedure SpeedButton1Click(Sender: TObject);
     procedure SpeedButton2Click(Sender: TObject);
     procedure SpeedButton3Click(Sender: TObject);
+    procedure SpeedButton4Click(Sender: TObject);
   private
     { private declarations }
     FFilename: string;
@@ -44,8 +53,11 @@ type
     FPathToNdkToolchains: string; {C:\adt32\ndk\toolchains\arm-linux-androideabi-4.4.3\prebuilt\windows\... }
     FInstructionSet: string;      {ArmV6}
     FFPUSet: string;              {Soft}
+    FPathToJavaTemplates: string;
+    FAndroidProjectName: string;
   public
     { public declarations }
+    procedure GetSubDirectories(const directory : string; list : TStrings) ;
     procedure LoadSettings(const pFilename: string);
     procedure SaveSettings(const pFilename: string);
     property PathToWorkspace: string read FPathToWorkspace write FPathToWorkspace;
@@ -55,6 +67,8 @@ type
     property PathToNdkToolchains: string read FPathToNdkToolchains write FPathToNdkToolchains;
     property InstructionSet: string read FInstructionSet write FInstructionSet;
     property FPUSet: string  read FFPUSet write FFPUSet;
+    property PathToJavaTemplates: string read FPathToJavaTemplates write FPathToJavaTemplates;
+    property AndroidProjectName: string read FAndroidProjectName write FAndroidProjectName;
   end;
 
 var
@@ -74,6 +88,12 @@ end;
 procedure TFormWorkspace.FormClose(Sender: TObject; var CloseAction: TCloseAction);
 begin
   if ModalResult = mrOk then SaveSettings(FFileName);
+end;
+
+procedure TFormWorkspace.ComboBox1Change(Sender: TObject);
+begin
+  FPathToWorkspace:= ComboBox1.Text; //SelectDirectoryDialog1.FileName;
+  FAndroidProjectName:= ComboBox1.Text;
 end;
 
 procedure TFormWorkspace.SpeedButton1Click(Sender: TObject);
@@ -103,6 +123,35 @@ begin
   end;
 end;
 
+procedure TFormWorkspace.SpeedButton4Click(Sender: TObject);
+begin
+  if SelectDirectoryDialog4.Execute then
+  begin
+    Edit4.Text := SelectDirectoryDialog4.FileName;
+    FPathToJavaTemplates:= SelectDirectoryDialog4.FileName;
+  end;
+end;
+
+
+//http://delphi.about.com/od/delphitips2008/qt/subdirectories.htm
+//fils the "list" TStrings with the subdirectories of the "directory" directory
+procedure TFormWorkspace.GetSubDirectories(const directory : string; list : TStrings) ;
+var
+   sr : TSearchRec;
+begin
+   try
+     if FindFirst(IncludeTrailingPathDelimiter(directory) + '*.*', faDirectory, sr) < 0 then
+       Exit
+     else
+     repeat
+       if ((sr.Attr and faDirectory <> 0) AND (sr.Name <> '.') AND (sr.Name <> '..')) then
+         List.Add(IncludeTrailingPathDelimiter(directory) + sr.Name) ;
+     until FindNext(sr) <> 0;
+   finally
+     SysUtils.FindClose(sr) ;
+   end;
+end;
+
 procedure TFormWorkspace.LoadSettings(const pFilename: string);
 var
    i1, i2: integer;
@@ -114,6 +163,8 @@ begin
     FPathToNdkPlataformsAndroidArcharmUsrLib:= ReadString('NewProject','PathToNdkPlataformsAndroidArcharmUsrLib', '');
     FPathToNdkToolchains:= ReadString('NewProject','PathToNdkToolchains', '');
 
+    FPathToJavaTemplates:= ReadString('NewProject','PathToJavaTemplates', '');
+
     if ReadString('NewProject','InstructionSet', '') <> '' then
        i1:= strToInt(ReadString('NewProject','InstructionSet', ''))
     else i1:= 0;
@@ -124,11 +175,14 @@ begin
 
     FInstructionSet:= RadioGroup1.Items[i1] ;
     FFPUSet:= RadioGroup2.Items[i2] ;
+
+    GetSubDirectories(FPathToWorkspace, ComboBox1.Items);
     Free;
   end;
   Edit1.Text := FPathToWorkspace;
   Edit2.Text := FPathToNdkPlataformsAndroidArcharmUsrLib;
   Edit3.Text := FPathToNdkToolchains;
+  Edit4.Text := FPathToJavaTemplates;
   RadioGroup1.ItemIndex:= i1;
   RadioGroup2.ItemIndex:= i2;
 end;
@@ -140,6 +194,7 @@ begin
       WriteString('NewProject', 'PathToWorkspace', Edit1.Text);
       WriteString('NewProject', 'PathToNdkPlataformsAndroidArcharmUsrLib', Edit2.Text);
       WriteString('NewProject', 'PathToNdkToolchains', Edit3.Text);
+      WriteString('NewProject', 'PathToJavaTemplates', Edit4.Text);
       WriteString('NewProject', 'InstructionSet', IntToStr(RadioGroup1.ItemIndex));
       WriteString('NewProject', 'FPUSet', IntToStr(RadioGroup2.ItemIndex));
       Free;

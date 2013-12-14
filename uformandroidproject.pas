@@ -6,10 +6,12 @@ interface
 
 uses
   Classes, SysUtils, FileUtil, SynMemo, SynHighlighterJava, SynHighlighterPas,
-  Forms, Controls, Graphics, Dialogs, StdCtrls, Buttons, ExtCtrls, ComCtrls,
-  EditBtn, ShellCtrls, Menus, types;
+  Forms, Controls, Graphics, Dialogs, Buttons, ExtCtrls, ComCtrls,
+  EditBtn, ShellCtrls, Menus;
 
 type
+
+  TSyntaxMode = (smDelphi, smObjFpc);
 
   { TFormAndroidProject }
 
@@ -40,6 +42,8 @@ type
     ToolButton1: TToolButton;
     procedure FormShow(Sender: TObject);
     procedure PopupMenu1Close(Sender: TObject);
+    procedure PopupMenu1Popup(Sender: TObject);
+    procedure ShellTreeView1Click(Sender: TObject);
     procedure TabSheet3Clicked;
     procedure FormCloseQuery(Sender: TObject; var CanClose: boolean);
     procedure FormCreate(Sender: TObject);
@@ -53,6 +57,14 @@ type
     FPascalJNIInterfaceCode: string;
     FPathToJavaClass: string;
     FImportsList: TStringLIst;
+    FModuleType: integer;
+    FSyntaxMode: TSyntaxMode;
+    FPathToClassName: string;
+
+    FPathToJavaTemplates: string;
+    FAndroidProjectName: string;
+
+    FListJNIBridge: TStringList;
     Memo2List: TStringList;
 
     function GetPascalCode(funcName, funcParam, funcResult: string): string;
@@ -66,10 +78,15 @@ type
     function GetResultSignature(funcResult: string): string;
   public
     { public declarations }
+    property PathToClassName: string read FPathToClassName write FPathToClassName;
+    property ModuleType: integer read FModuleType write FModuleType;
+    property SyntaxMode: TSyntaxMode read FSyntaxMode write FSyntaxMode;
     property JavaClassName: string read FJavaClassName write FJavaClassName;
     property PascalJNIInterfaceCode: string read FPascalJNIInterfaceCode write FPascalJNIInterfaceCode;
     property PathToJavaClass: string read FPathToJavaClass  write FPathToJavaClass;
     property JNIDecoratedMethodName: string read FJNIDecoratedMethodName write FJNIDecoratedMethodName;
+    property PathToJavaTemplates: string read FPathToJavaTemplates write FPathToJavaTemplates;
+    property AndroidProjectName: string read FAndroidProjectName write FAndroidProjectName;
   end;
 
 var
@@ -197,7 +214,7 @@ begin
     end
     else if Pos('byte', jType) > 0 then
     begin
-       Result := 'Byte';
+       Result := 'B';  //<--- fix here 12/12/2013! thanks to Roberto Federiconi
        if Pos('[', jType) > 0 then Result := '[B';
     end
     else if Pos('long', jType) > 0 then
@@ -206,7 +223,6 @@ begin
        if Pos('[', jType) > 0 then Result := '[J';
     end
     else if Pos('void', jType) > 0 then Result := 'V';
-
     if Result = '' then
     begin
         for i:= 0 to FImportsList.Count-1 do
@@ -224,7 +240,6 @@ begin
           end;
         end;
     end;
-
     if Result = '' then Result:= 'UNKNOWN';
   end;
 end;
@@ -270,8 +285,7 @@ end;
 function TFormAndroidProject.GetPascalCode(funcName, funcParam, funcResult: string): string;
 var
   strList: TStringList;
-  signature: string;
-  auxFuncParam: string;
+  strAux, signature, auxFuncParam: string;
 begin
   strList:= TStringList.Create;
   auxFuncParam:= Trim(funcParam);
@@ -290,7 +304,15 @@ begin
     signature:= 'procedure '+funcName+auxFuncParam+'; cdecl;';
     strList.Add(signature);
     strList.Add('begin');
-    strList.Add('  {your code....}');
+    if FModuleType = 0 then  //controls
+    begin
+        strAux:= FListJNIBridge.Values[funcName];
+        strList.Add('  '+strAux);
+    end
+    else
+    begin
+       strList.Add('  {your code....}');
+    end;
     strList.Add('end;');
   end
   else
@@ -298,8 +320,16 @@ begin
     signature:= 'function '+funcName+auxFuncParam+': '+ GetFuncResult(funcResult);
     strList.Add(signature);
     strList.Add('begin');
-    strList.Add('  {your code....}');
-    strList.Add('  {Result:=;}');
+    if FModuleType = 0 then  //controls
+    begin
+        strAux:= FListJNIBridge.Values[funcName];
+        strList.Add('  Result:='+strAux);
+    end
+    else
+    begin
+      strList.Add('  {your code....}');
+      strList.Add('  {Result:=;}');
+    end;
     strList.Add('end;');
   end;
   Result:= strList.Text;
@@ -340,7 +370,7 @@ var
   i, p1, p2: integer;
   strList, Memo3List, Memo4List, Memo5List, Memo6List: TStringList;
   auxStr, auxName, auxParam, strPascalCode, auxSignature, auxPathJNI,
-  strNativeMethodsHeader, strNativeMethodsBody, methSignature, methName, pathToClassName: string;
+  strNativeMethodsHeader, strNativeMethodsBody, methSignature, methName: string;
   strOnLoadList: TStringList;
 begin
   if ShellListView1.Selected <> nil then
@@ -453,10 +483,10 @@ begin
     strOnLoadList.Add('  end;');
     strOnLoadList.Add('end;');
     strOnLoadList.Add(' ');
-    pathToClassName:= ReplaceChar(auxPathJNI, '_', '/');
+    PathToClassName:= ReplaceChar(auxPathJNI, '_', '/');
     strOnLoadList.Add('function RegisterNativeMethods(PEnv: PJNIEnv): integer;');
     strOnLoadList.Add('begin');
-    strOnLoadList.Add('  curClassPathName:= '''+pathToClassName+''';');
+    strOnLoadList.Add('  curClassPathName:= '''+PathToClassName+''';');
     strOnLoadList.Add('  Result:= RegisterNativeMethodsArray(PEnv, PChar(curClassPathName), @NativeMethods[0], Length(NativeMethods));');
     strOnLoadList.Add('end;');
     strOnLoadList.Add(' ');
@@ -469,6 +499,7 @@ begin
     strOnLoadList.Add('  (VM^).GetEnv(VM, @PEnv, Result);');
     strOnLoadList.Add('  if PEnv <> nil then RegisterNativeMethods(PJNIEnv(PEnv));');
     strOnLoadList.Add('  curVM:= VM {PJavaVM};');
+    if FModuleType = 0 then strOnLoadList.Add('  gVM:= VM {And_jni_Bridge};');
     strOnLoadList.Add('  curEnv:= PJNIEnv(PEnv);');
     strOnLoadList.Add('end;');
     strOnLoadList.Add(' ');
@@ -478,8 +509,9 @@ begin
     strOnLoadList.Add('  curClass:= nil;');
     strOnLoadList.Add('  curEnv:= nil;');
     strOnLoadList.Add('  curVM:= nil;');
-    strOnLoadList.Add('  Application.Terminate;');
-    strOnLoadList.Add('  FreeAndNil(Application);');
+    if FModuleType = 0 then strOnLoadList.Add('  gVM:= nil;');
+    strOnLoadList.Add('  App.Terminate;');
+    strOnLoadList.Add('  FreeAndNil(App);');
     strOnLoadList.Add('end;');
 
     auxStr:= Memo6List.Strings[Memo6List.Count-1];
@@ -512,7 +544,9 @@ var
 begin
   if ShellListView1.Selected <> nil then
   begin
-    // LabelJClass.Caption:= ShellListView1.GetPathFromItem(ShellListView1.Selected);
+
+    if FPathToJavaTemplates <> '' then
+       FListJNIBridge.LoadFromFile(FPathToJavaTemplates + '\' + 'ControlsEvents.txt');
 
      Memo2List.Clear;
      SynMemo2.Lines.Clear;
@@ -529,6 +563,8 @@ begin
     // LabelJClass.Caption:= fileName;
 
      FJavaClassName:= SplitStr(fileName, '.');
+     if CompareText(FJavaClassName, 'Controls') = 0 then
+        FModuleType:= 0;  //Controls.java
      for i:= 0 to pathList.Count-2 do
      begin
         if Pos('src',pathList.Strings[i]) > 0  then k:= i;
@@ -561,7 +597,9 @@ end;
 
 procedure TFormAndroidProject.ToolButton1Click(Sender: TObject);
 begin
-   ShowMessage('LazAndroidModuleWizard 0.1 by jmpessoa');
+  //02-december-2013 Add support to simonsayz's controls
+  //http://blog.naver.com/simonsayz
+   ShowMessage('LazAndroidModuleWizard 0.2 by jmpessoa');
 end;
 
 procedure TFormAndroidProject.FormCloseQuery(Sender: TObject;
@@ -572,6 +610,8 @@ begin
    if FPathToJavaClass <> '' then SynMemo1.Lines.SaveToFile(FPathToJavaClass);
    FImportsList.Free;
    Memo2List.Free;
+   FListJNIBridge.Free;
+   CanClose:= True;
 end;
 
 procedure TFormAndroidProject.FormShow(Sender: TObject);
@@ -583,17 +623,79 @@ end;
 
 procedure TFormAndroidProject.PopupMenu1Close(Sender: TObject);
 var
-  str: string;
+  pathPlusFileName: string;
+  auxPath: string;
+  strPack: string;
+  auxList: TStringList;
+  NodeSelected:  TTreeNode;
+  ListManifest: TStringList;
+  strAfterReplace: string;
 begin
-  str:='{var jstr: JString; str:string}'+ LineEnding;
-  str:= str + 'jstr:= (PEnv^).NewStringUTF(PEnv,PChar(str));';
-  SynMemo2.InsertTextAtCaret(str);
+  NodeSelected:= ShellTreeView1.Selected;
+  pathPlusFileName:= ShellListView1.GetPathFromItem(ShellListView1.Selected);
+  auxPath:= ExtractFilePath(pathPlusFileName);
+  if Pos('App.java', pathPlusFileName) > 0 then  //GUI controls
+  begin
+    auxList:= TStringList.Create;
+
+    auxList.LoadFromFile(pathPlusFileName);
+
+    strPack:= Trim(auxList.Strings[0]); // ex: package com.template.appdummy;
+
+    auxList.Clear;
+
+    auxList.LoadFromFile(FPathToJavaTemplates + '\' + 'App.java');
+
+    auxList.Strings[0]:= strPack;
+
+    auxList.SaveToFile(auxPath + 'App.java' );
+
+    auxList.Clear;
+
+    auxList.LoadFromFile(FPathToJavaTemplates + '\' + 'Controls.java');
+    auxList.Strings[0]:= strPack;
+    auxList.SaveToFile(auxPath + 'Controls.java');
+    auxList.Free;
+
+    ShellTreeView1.Selected:= nil;
+    ShellTreeView1.Selected:= NodeSelected;
+    ShellListView1.Update;
+
+    strPack:= TrimChar(strPack,';');
+    SplitStr(strPack, ' ');
+    strPack:= Trim(strPack);
+
+    ListManifest:= TStringList.Create;
+
+    ListManifest.LoadFromFile(FPathToJavaTemplates + '\' + 'AndroidManifest.txt');
+    strAfterReplace  := StringReplace(ListManifest.Text, 'dummy1',strPack, [rfReplaceAll, rfIgnoreCase]);
+    strPack:= strPack+'.App';
+    strAfterReplace  := StringReplace(strAfterReplace, 'dummy2',strPack, [rfReplaceAll, rfIgnoreCase]);
+
+    ListManifest.Clear;
+    ListManifest.Text:= strAfterReplace;
+    ListManifest.SaveToFile(FAndroidProjectName+'\'+'AndroidManifest.xml');
+    ListManifest.Free;
+  end;
+end;
+
+procedure TFormAndroidProject.PopupMenu1Popup(Sender: TObject);
+begin
+  //FListJNIBridge.LoadFromFile(FPathToJavaTemplates + '\' + 'ControlsEvents.txt');
+end;
+
+procedure TFormAndroidProject.ShellTreeView1Click(Sender: TObject);
+begin
+  StatusBar1.Panels.Items[0].Text:= ShellTreeView1.GetPathFromNode(ShellTreeView1.Selected);
 end;
 
 procedure TFormAndroidProject.FormCreate(Sender: TObject);
 begin
+  FModuleType:= 1; // generic...
+  FSyntaxMode:= smDelphi;
   FImportsList:= TStringLIst.Create;
   Memo2List:= TStringList.Create;
+  FListJNIBridge:= TStringList.Create;
 end;
 
    {...........generics.............}

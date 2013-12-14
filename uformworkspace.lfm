@@ -1,12 +1,12 @@
 object FormWorkspace: TFormWorkspace
-  Left = 372
-  Height = 271
-  Top = 268
+  Left = 400
+  Height = 411
+  Top = 182
   Width = 657
   BorderIcons = [biSystemMenu]
   BorderStyle = bsSingle
-  Caption = 'Adroid Project Paths:'
-  ClientHeight = 271
+  Caption = 'Android Module Wizard: Configure Paths'
+  ClientHeight = 411
   ClientWidth = 657
   Icon.Data = {
     5E07000000000100010018180000010018004807000016000000280000001800
@@ -86,8 +86,8 @@ object FormWorkspace: TFormWorkspace
     Left = 8
     Height = 15
     Top = 15
-    Width = 141
-    Caption = 'Path to Eclipse Workspace:'
+    Width = 149
+    Caption = 'Path to [Eclipse] Workspace:'
     ParentColor = False
   end
   object SpeedButton1: TSpeedButton
@@ -101,9 +101,9 @@ object FormWorkspace: TFormWorkspace
     OnClick = SpeedButton1Click
   end
   object bbOK: TBitBtn
-    Left = 571
+    Left = 570
     Height = 30
-    Top = 192
+    Top = 328
     Width = 75
     Anchors = [akTop, akRight]
     Caption = '&OK'
@@ -115,7 +115,7 @@ object FormWorkspace: TFormWorkspace
   object BitBtn2: TBitBtn
     Left = 570
     Height = 30
-    Top = 224
+    Top = 362
     Width = 75
     Anchors = [akTop, akRight]
     Cancel = True
@@ -171,15 +171,15 @@ object FormWorkspace: TFormWorkspace
     OnClick = SpeedButton3Click
   end
   object Bevel1: TBevel
-    Left = -4
+    Left = 0
     Height = 2
-    Top = 168
-    Width = 484
+    Top = 296
+    Width = 660
   end
   object RadioGroup1: TRadioGroup
     Left = 8
     Height = 80
-    Top = 176
+    Top = 312
     Width = 96
     AutoFill = True
     Caption = 'Instruction Set:'
@@ -201,9 +201,9 @@ object FormWorkspace: TFormWorkspace
     TabOrder = 5
   end
   object RadioGroup2: TRadioGroup
-    Left = 168
+    Left = 128
     Height = 82
-    Top = 176
+    Top = 312
     Width = 113
     AutoFill = True
     Caption = 'FPU Instruction Set:'
@@ -225,15 +225,65 @@ object FormWorkspace: TFormWorkspace
     )
     TabOrder = 6
   end
+  object Edit4: TEdit
+    Left = 8
+    Height = 23
+    Top = 200
+    Width = 607
+    TabOrder = 7
+  end
+  object Label3: TLabel
+    Left = 8
+    Height = 15
+    Top = 184
+    Width = 341
+    Caption = 'Path to  Simonsayz''s  code  templates (App.java + Controls.java):'
+    ParentColor = False
+  end
+  object SpeedButton4: TSpeedButton
+    Left = 622
+    Height = 22
+    Top = 200
+    Width = 23
+    Caption = '...'
+    OnClick = SpeedButton4Click
+  end
+  object Bevel2: TBevel
+    Left = -15
+    Height = 2
+    Top = 168
+    Width = 672
+  end
+  object Label6: TLabel
+    Left = 8
+    Height = 15
+    Top = 232
+    Width = 156
+    Caption = 'Select [Eclipse] Project Name:'
+    ParentColor = False
+  end
+  object ComboBox1: TComboBox
+    Left = 8
+    Height = 23
+    Top = 256
+    Width = 607
+    ItemHeight = 15
+    OnChange = ComboBox1Change
+    TabOrder = 8
+  end
   object SelectDirectoryDialog1: TSelectDirectoryDialog
-    left = 352
+    left = 480
   end
   object SelectDirectoryDialog2: TSelectDirectoryDialog
-    left = 352
+    left = 480
     top = 64
   end
   object SelectDirectoryDialog3: TSelectDirectoryDialog
-    left = 352
-    top = 136
+    left = 480
+    top = 120
+  end
+  object SelectDirectoryDialog4: TSelectDirectoryDialog
+    left = 480
+    top = 182
   end
 end

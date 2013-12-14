@@ -6,17 +6,18 @@ interface
 
 uses
  Classes, SysUtils, FileUtil, Controls, Forms, Dialogs,
- LazIDEIntf, ProjectIntf, FormEditingIntf, uFormAndroidProject, uformworkspace;
+ LazIDEIntf, ProjectIntf, FormEditingIntf, uFormAndroidProject, uformworkspace, Laz_And_Controls;
 
 type
 
-  TAndroidModule = class(TDataModule)
+  TAndroidModule = class(jForm)
   end;
 
   TAndroidProjectDescriptor = class(TProjectDescriptor)
    private
      FPascalJNIIterfaceCode: string;
-     FJavaClassName: String;
+     FJavaClassName: string;
+     FPathToClassName: string;
      FPathToJavaClass: string;
      FPathToJNIFolder: string;
      FPathToNdkPlataformsAndroidArcharmUsrLib: string; {C:\adt32\ndk\platforms\android-14\arch-arm\usr\lib}
@@ -24,10 +25,15 @@ type
      {C:\adt32\ndk7\toolchains\arm-linux-androideabi-4.4.3\prebuilt\windows\lib\gcc\arm-linux-androideabi\4.4.3}
      FInstructionSet: string;    {ArmV6}
      FFPUSet: string;            {Soft}
+     FPathToJavaTemplates: string;
+     FAndroidProjectName: string;
+     FModuleType: integer;
+     FSyntaxMode: TSyntaxMode;   {}
      function SettingsFilename: string;
      function TryNewJNIAndroidInterfaceCode: boolean;
      function GetPathToJNIFolder(fullPath: string): string;
      function GetWorkSpaceFromForm: boolean;
+     function GetAppName(className: string): string;
    public
      constructor Create; override;
      function GetLocalizedName: string; override;
@@ -41,7 +47,9 @@ type
   private
     //
   public
+    SyntaxMode: TSyntaxMode; {mdDelphi, mdObjFpc}
     PathToJNIFolder: string;
+    ModuleType: integer;
     constructor Create; override;
     function CreateSource(const Filename     : string;
                           const SourceName   : string;
@@ -62,6 +70,9 @@ var
   AndroidFileDescriptor: TAndroidFileDescPascalUnitWithResource;
 
 procedure Register;
+
+function ReplaceChar(query: string; oldchar, newchar: char):string;
+function SplitStr(var theString: string; delimiter: string): string;
 
 implementation
 
@@ -111,13 +122,23 @@ begin
   Result := False;
   frm := TFormAndroidProject.Create(nil);
   frm.ShellTreeView1.Root:= FPathToJNIFolder;
+  frm.PathToJavaTemplates:= FPathToJavaTemplates;
+  frm.AndroidProjectName:= FAndroidProjectName;
   if frm.ShowModal = mrOK then
   begin
     Result := True;
+
+    FModuleType:= frm.ModuleType; //1=generic module; 0: GUI controls module
+    FSyntaxMode:= frm.SyntaxMode;
     FPathToJavaClass:= frm.PathToJavaClass;
     FPathToJNIFolder:=GetPathToJNIFolder(FPathToJavaClass);
+
     AndroidFileDescriptor.PathToJNIFolder:= FPathToJNIFolder;
+    AndroidFileDescriptor.ModuleType:= FModuleType;
+    AndroidFileDescriptor.SyntaxMode:= FSyntaxMode;
+
     FJavaClassName:= frm.JavaClassName;
+    FPathToClassName:= frm.PathToClassName;
     FPascalJNIIterfaceCode:= frm.PascalJNIInterfaceCode;
 
     {$I-}
@@ -177,6 +198,8 @@ begin
     FInstructionSet:= frm.InstructionSet;    {ArmV6}
     FFPUSet:= frm.FPUSet;            {Soft}
     frm.SaveSettings(SettingsFilename);
+    FPathToJavaTemplates:= frm.PathToJavaTemplates;
+    FAndroidProjectName:= frm.AndroidProjectName;
   end;
   frm.Free;
 end;
@@ -194,6 +217,20 @@ begin
    else Result := mrAbort;
 end;
 
+function TAndroidProjectDescriptor.GetAppName(className: string): string;
+var
+  listAux: TStringList;
+  lastIndex: integer;
+begin
+  listAux:= TStringList.Create;
+  listAux.Delimiter:= '.';
+  listAux.StrictDelimiter:= True;
+  listAux.DelimitedText:= ReplaceChar(className,'/','.');
+  lastIndex:= listAux.Count-1;
+  listAux.Delete(lastIndex);
+  Result:= listAux.DelimitedText;
+end;
+
 function TAndroidProjectDescriptor.InitProject(AProject: TLazProject): TModalResult;
 var
   MainFile: TLazProjectFile;
@@ -207,14 +244,22 @@ begin
   MainFile.IsPartOfProject := True;
   AProject.AddFile(MainFile, False);
   AProject.MainFileID := 0;
-  //AProject.AddPackageDependency('...');
+
+  if FModuleType = 0 then  //GUI controls
+     AProject.AddPackageDependency('tfpandroidbridge_pack');
+
   sourceList.Add('{hint: save all files to location: ' +FPathToJNIFolder+'\'+'jni }');
   sourceList.Add('library '+ LowerCase(FJavaClassName) +';');
   sourceList.Add(' ');
   sourceList.Add('{$mode delphi}');
   sourceList.Add(' ');
   sourceList.Add('uses');
-  sourceList.Add('  Classes, SysUtils, CustApp, jni;');
+
+  if FModuleType = 0 then  //GUI controls
+    sourceList.Add('  Classes, SysUtils, And_jni, And_jni_Bridge, Laz_And_Controls;')
+  else //generic module
+    sourceList.Add('  Classes, SysUtils, CustApp, And_jni;');
+
   sourceList.Add(' ');
   sourceList.Add('const');
   sourceList.Add('  curClassPathName: string='''';');
@@ -222,47 +267,64 @@ begin
   sourceList.Add('  curVM: PJavaVM=nil;');
   sourceList.Add('  curEnv: PJNIEnv=nil;');
   sourceList.Add(' ');
-  sourceList.Add('type');
-  sourceList.Add(' ');
-  sourceList.Add('  TAndroidApplication = class(TCustomApplication)');
-  sourceList.Add('   public');
-  sourceList.Add('     procedure CreateForm(InstanceClass: TComponentClass; out Reference);');
-  sourceList.Add('     constructor Create(TheOwner: TComponent); override;');
-  sourceList.Add('     destructor Destroy; override;');
-  sourceList.Add('  end;');
-  sourceList.Add(' ');
-  sourceList.Add('procedure TAndroidApplication.CreateForm(InstanceClass: TComponentClass; out Reference);');
-  sourceList.Add('var');
-  sourceList.Add('  Instance: TComponent;');
-  sourceList.Add('begin');
-  sourceList.Add('  Instance := TComponent(InstanceClass.NewInstance);');
-  sourceList.Add('  TComponent(Reference):= Instance;');
-  sourceList.Add('  Instance.Create(Self);');
-  sourceList.Add('end;');
-  sourceList.Add(' ');
-  sourceList.Add('constructor TAndroidApplication.Create(TheOwner: TComponent);');
-  sourceList.Add('begin');
-  sourceList.Add('  inherited Create(TheOwner);');
-  sourceList.Add('  StopOnException:=True;');
-  sourceList.Add('end;');
-  sourceList.Add(' ');
-  sourceList.Add('destructor TAndroidApplication.Destroy;');
-  sourceList.Add('begin');
-  sourceList.Add('  inherited Destroy;');
-  sourceList.Add('end;');
-  sourceList.Add(' ');
-  sourceList.Add('var');
-  sourceList.Add('  Application: TAndroidApplication;');
-  sourceList.Add(' ');
+  if FModuleType = 1 then   //generic module
+  begin
+      sourceList.Add('type');
+      sourceList.Add(' ');
+      sourceList.Add('  TApp = class(TCustomApplication)');
+      sourceList.Add('   public');
+      sourceList.Add('     procedure CreateForm(InstanceClass: TComponentClass; out Reference);');
+      sourceList.Add('     constructor Create(TheOwner: TComponent); override;');
+      sourceList.Add('     destructor Destroy; override;');
+      sourceList.Add('  end;');
+      sourceList.Add(' ');
+      sourceList.Add('procedure TApp.CreateForm(InstanceClass: TComponentClass; out Reference);');
+      sourceList.Add('var');
+      sourceList.Add('  Instance: TComponent;');
+      sourceList.Add('begin');
+      sourceList.Add('  Instance := TComponent(InstanceClass.NewInstance);');
+      sourceList.Add('  TComponent(Reference):= Instance;');
+      sourceList.Add('  Instance.Create(Self);');
+      sourceList.Add('end;');
+      sourceList.Add(' ');
+      sourceList.Add('constructor TApp.Create(TheOwner: TComponent);');
+      sourceList.Add('begin');
+      sourceList.Add('  inherited Create(TheOwner);');
+      sourceList.Add('  StopOnException:=True;');
+      sourceList.Add('end;');
+      sourceList.Add(' ');
+      sourceList.Add('destructor TApp.Destroy;');
+      sourceList.Add('begin');
+      sourceList.Add('  inherited Destroy;');
+      sourceList.Add('end;');
+      sourceList.Add(' ');
+      sourceList.Add('var');
+      sourceList.Add('  App: TApp;');
+      sourceList.Add(' ');
+  end;
   sourceList.Add(Trim(FPascalJNIIterfaceCode));  {from form...}
   sourceList.Add(' ');
   sourceList.Add('begin');
-  sourceList.Add('  Application:= TAndroidApplication.Create(nil);');
-  sourceList.Add('  Application.Title:= ''My Android Library'';');
-  sourceList.Add('  Application.Initialize;');
-  sourceList.Add('  Application.CreateForm(TAndroidModule1, AndroidModule1);');
+  if FModuleType = 0 then  //GUI controls...
+  begin
+    sourceList.Add('  App:= jApp.Create(nil);{Laz_And_Controls}');
+    sourceList.Add('  App.Title:= ''My Android GUI Library'';');
+    sourceList.Add('  gjAppName:= '''+GetAppName(FPathToClassName)+''';{And_jni_Bridge}');
+    sourceList.Add('  gjClassName:= '''+FPathToClassName+''';{And_jni_Bridge}');
+    sourceList.Add('  App.AppName:=gjAppName;');
+    sourceList.Add('  App.ClassName:=gjClassName;');
+    sourceList.Add('  App.Initialize;');
+    sourceList.Add('  App.CreateForm(TAndroidModule1, AndroidModule1);');
+  end
+  else
+  begin
+     sourceList.Add('  App:= TApp.Create(nil);');
+     sourceList.Add('  App.Title:= ''My Android NoGUI Library'';');
+     sourceList.Add('  App.Initialize;');
+     sourceList.Add('  App.CreateForm(TAndroidModule1, AndroidModule1);');
+  end;
   sourceList.Add('end.');
-  //sourceList.SaveToFile(FBasePathToJNIFolder+'\'+'jni'+'\'+FJWrapperClassName+'.lpr');
+
   AProject.MainFile.SetSourceText(sourceList.Text);
   AProject.Flags := AProject.Flags - [pfMainUnitHasCreateFormStatements,
                                       pfMainUnitHasTitleStatement,
@@ -281,7 +343,7 @@ begin
   AProject.LazCompilerOptions.TargetFilename:=FPathToJNIFolder+'\libs\'+auxStr;{-o}
 
   {Parsing}
-  //AProject.LazCompilerOptions.SyntaxMode:= 'delphi';  {-M}
+  AProject.LazCompilerOptions.SyntaxMode:= 'delphi';  {-M}
   AProject.LazCompilerOptions.CStyleOperators:= True;
   AProject.LazCompilerOptions.AllowLabel:= True;
   AProject.LazCompilerOptions.CPPInline:= True;
@@ -304,29 +366,30 @@ begin
                         ' -FL'+FPathToNdkPlataformsAndroidArcharmUsrLib+'\libdl.so' +  {as dynamic linker}
                         ' -FU'+FPathToJNIFolder+'\obj\'+FJavaClassName +
                         ' -o'+FPathToJNIFolder+'\libs\'+auxStr+'\'+'lib'+LowerCase(FJavaClassName)+'.so';  {-o}
+
   sourceList.Free;
   Result := mrOK;
 end;
 
 function TAndroidProjectDescriptor.CreateStartFiles(AProject: TLazProject): TModalResult;
 begin
-   LazarusIDE.DoNewEditorFile(AndroidFileDescriptor, '', '',
+  LazarusIDE.DoNewEditorFile(AndroidFileDescriptor, '', '',
                              [nfIsPartOfProject,nfOpenInEditor,nfCreateDefaultSrc]);
-   Result := mrOK;
+  Result := mrOK;
 end;
 
 { TAndroidFileDescriptor}
 
 constructor TAndroidFileDescPascalUnitWithResource.Create;
 begin
-   inherited Create;
-   Name := 'Android DataModule';
-   ResourceClass := TAndroidModule;
+  inherited Create;
+  Name := 'Android DataModule';
+  ResourceClass := TAndroidModule;
 end;
 
 function TAndroidFileDescPascalUnitWithResource.GetLocalizedName: string;
 begin
-   Result := 'Android DataModule';
+   Result := 'Android DataModule'
 end;
 
 function TAndroidFileDescPascalUnitWithResource.GetLocalizedDescription: string;
@@ -339,12 +402,18 @@ function TAndroidFileDescPascalUnitWithResource.CreateSource(const Filename     
                                                        const ResourceName : string): string;
 var
    sourceList: TStringList;
+   unitName:  string;
 begin
+   unitName:= FileName;
+   unitName:= SplitStr(unitName,'.');
    sourceList:= TStringList.Create;
    sourceList.Add('{Hint: save all files to location: ' +PathToJNIFolder+'\'+'jni }');
-   sourceList.Add('unit unit1;');
+   sourceList.Add('unit '+unitName+';');
    sourceList.Add(' ');
-   sourceList.Add('{$mode objfpc}{$H+}');
+   if SyntaxMode = smDelphi then
+      sourceList.Add('{$mode delphi}');
+   if SyntaxMode = smObjFpc then
+     sourceList.Add('{$mode objfpc}{$H+}');
    sourceList.Add(' ');
    sourceList.Add('interface');
    sourceList.Add(' ');
@@ -362,19 +431,25 @@ end;
 
 function TAndroidFileDescPascalUnitWithResource.GetInterfaceUsesSection: string;
 begin
-  Result := 'Classes, SysUtils;'
+  if ModuleType = 1 then //generic module
+    Result := 'Classes, SysUtils, And_jni;'
+  else  //GUI controls module
+    Result := 'Classes, SysUtils, And_jni, And_jni_Bridge, Laz_And_Controls;';
 end;
 
 function TAndroidFileDescPascalUnitWithResource.GetInterfaceSource(const Filename     : string;
                                                              const SourceName   : string;
-                                                             const ResourceName : string): string;
+                                                           const ResourceName : string): string;
 var
   strList: TStringList;
 begin
   strList:= TStringList.Create;
   strList.Add(' ');
   strList.Add('type');
-  strList.Add('  T' + ResourceName + ' = class(TDataModule)');
+  if ModuleType = 0 then //GUI controls module
+    strList.Add('  T' + ResourceName + ' = class(jForm)')
+  else //generic module
+    strList.Add('  T' + ResourceName + ' = class(TDataModule)');
   strList.Add('   private');
   strList.Add('     {private declarations}');
   strList.Add('   public');
@@ -396,9 +471,40 @@ var
 begin
   sttList:= TStringList.Create;
   sttList.Add('{$R *.lfm}');
-  sttList.Add(' ');
+ // sttList.Add(' ');
   Result:= sttList.Text;
   sttList.Free;
+end;
+
+//helper...
+function ReplaceChar(query: string; oldchar, newchar: char):string;
+begin
+  if query <> '' then
+  begin
+     while Pos(oldchar,query) > 0 do query[pos(oldchar,query)]:= newchar;
+     Result:= query;
+  end;
+end;
+
+function SplitStr(var theString: string; delimiter: string): string;
+var
+  i: integer;
+begin
+  Result:= '';
+  if theString <> '' then
+  begin
+    i:= Pos(delimiter, theString);
+    if i > 0 then
+    begin
+       Result:= Copy(theString, 1, i-1);
+       theString:= Copy(theString, i+Length(delimiter), maxLongInt);
+    end
+    else
+    begin
+       Result := theString;
+       theString := '';
+    end;
+  end;
 end;
 
 end.

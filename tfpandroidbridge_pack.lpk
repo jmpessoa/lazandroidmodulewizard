@@ -1,0 +1,93 @@
+<?xml version="1.0"?>
+<CONFIG>
+  <Package Version="4">
+    <PathDelim Value="\"/>
+    <Name Value="tfpandroidbridge_pack"/>
+    <CompilerOptions>
+      <Version Value="11"/>
+      <PathDelim Value="\"/>
+      <SearchPaths>
+        <UnitOutputDirectory Value="lib\$(TargetCPU)-$(TargetOS)"/>
+      </SearchPaths>
+      <Other>
+        <CompilerMessages>
+          <MsgFileName Value=""/>
+        </CompilerMessages>
+        <CompilerPath Value="$(CompPath)"/>
+      </Other>
+    </CompilerOptions>
+    <Files Count="13">
+      <Item1>
+        <Filename Value="regandroidbridge.pas"/>
+        <HasRegisterProc Value="True"/>
+        <UnitName Value="regandroidbridge"/>
+      </Item1>
+      <Item2>
+        <Filename Value="And_jni.pas"/>
+        <UnitName Value="And_jni"/>
+      </Item2>
+      <Item3>
+        <Filename Value="And_jni_Bridge.pas"/>
+        <UnitName Value="And_jni_Bridge"/>
+      </Item3>
+      <Item4>
+        <Filename Value="And_lib_Unzip.pas"/>
+        <UnitName Value="And_lib_Unzip"/>
+      </Item4>
+      <Item5>
+        <Filename Value="And_lib_Image.pas"/>
+        <UnitName Value="And_lib_Image"/>
+      </Item5>
+      <Item6>
+        <Filename Value="Laz_And_Controls.pas"/>
+        <UnitName Value="Laz_And_Controls"/>
+      </Item6>
+      <Item7>
+        <Filename Value="Laz_And_GLESv2_Canvas_h.pas"/>
+        <UnitName Value="Laz_And_GLESv2_Canvas_h"/>
+      </Item7>
+      <Item8>
+        <Filename Value="Laz_And_GLESv1_Canvas_h.pas"/>
+        <UnitName Value="Laz_And_GLESv1_Canvas_h"/>
+      </Item8>
+      <Item9>
+        <Filename Value="Laz_And_GLESv1_Canvas.pas"/>
+        <UnitName Value="Laz_And_GLESv1_Canvas"/>
+      </Item9>
+      <Item10>
+        <Filename Value="Laz_And_GLESv2_Canvas.pas"/>
+        <UnitName Value="Laz_And_GLESv2_Canvas"/>
+      </Item10>
+      <Item11>
+        <Filename Value="And_log.pas"/>
+        <UnitName Value="And_log"/>
+      </Item11>
+      <Item12>
+        <Filename Value="And_bitmap_h.pas"/>
+        <UnitName Value="And_bitmap_h"/>
+      </Item12>
+      <Item13>
+        <Filename Value="And_log_h.pas"/>
+        <UnitName Value="And_log_h"/>
+      </Item13>
+    </Files>
+    <Type Value="RunAndDesignTime"/>
+    <RequiredPkgs Count="2">
+      <Item1>
+        <PackageName Value="LCLBase"/>
+      </Item1>
+      <Item2>
+        <PackageName Value="FCL"/>
+      </Item2>
+    </RequiredPkgs>
+    <UsageOptions>
+      <UnitPath Value="$(PkgOutDir)"/>
+    </UsageOptions>
+    <PublishOptions>
+      <Version Value="2"/>
+    </PublishOptions>
+    <CustomOptions Items="ExternHelp" Version="2">
+      <_ExternHelp Items="Count"/>
+    </CustomOptions>
+  </Package>
+</CONFIG>

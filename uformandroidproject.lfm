@@ -1,11 +1,11 @@
 object FormAndroidProject: TFormAndroidProject
-  Left = 308
+  Left = 293
   Height = 570
-  Top = 5
+  Top = 120
   Width = 1040
   BorderIcons = []
   BorderStyle = bsSingle
-  Caption = 'JNI Android Module/Library Wizard'
+  Caption = 'Android Module Wizard: Select Java Source for JNI/Native Methods'
   ClientHeight = 570
   ClientWidth = 1040
   Icon.Data = {
@@ -74,7 +74,7 @@ object FormAndroidProject: TFormAndroidProject
   OnCreate = FormCreate
   OnShow = FormShow
   Position = poScreenCenter
-  LCLVersion = '1.0.8.0'
+  LCLVersion = '1.1'
   object Panel1: TPanel
     Left = 0
     Height = 28
@@ -91,7 +91,6 @@ object FormAndroidProject: TFormAndroidProject
       Top = 1
       Width = 1038
       Caption = 'ToolBar1'
-      EdgeBorders = [ebTop]
       Images = ImageList1
       TabOrder = 0
       object ToolButton1: TToolButton
@@ -123,6 +122,7 @@ object FormAndroidProject: TFormAndroidProject
       HideSelection = False
       ReadOnly = True
       TabOrder = 0
+      OnClick = ShellTreeView1Click
       Options = [tvoAutoItemHeight, tvoKeepCollapsedNodes, tvoReadOnly, tvoShowButtons, tvoShowLines, tvoShowRoot, tvoToolTips, tvoThemedDraw]
       ObjectTypes = [otFolders]
       ShellListView = ShellListView1
@@ -133,7 +133,11 @@ object FormAndroidProject: TFormAndroidProject
     Height = 23
     Top = 547
     Width = 1040
-    Panels = <>
+    Panels = <    
+      item
+        Width = 50
+      end>
+    SimplePanel = False
   end
   object Panel3: TPanel
     Left = 218
@@ -169,13 +173,13 @@ object FormAndroidProject: TFormAndroidProject
           Height = 359
           Top = 1
           Width = 708
-          ActivePage = TabSheet1
+          ActivePage = TabSheet3
           Align = alClient
-          TabIndex = 0
+          TabIndex = 1
           TabOrder = 0
           OnChange = PageControl1Change
           object TabSheet1: TTabSheet
-            Caption = 'Java Source'
+            Caption = 'Java JNI Source'
             ClientHeight = 331
             ClientWidth = 700
             inline SynMemo1: TSynMemo
@@ -1175,12 +1179,12 @@ object FormAndroidProject: TFormAndroidProject
           Width = 708
           Color = clDefault
           HideSelection = False
+          PopupMenu = PopupMenu1
           ReadOnly = True
           RowSelect = True
           ShowColumnHeaders = False
           SortType = stText
           TabOrder = 0
-          ViewStyle = vsReport
           OnDblClick = ShellListView1DblClick
           ObjectTypes = [otNonFolders]
           ShellTreeView = ShellTreeView1
@@ -1237,7 +1241,7 @@ object FormAndroidProject: TFormAndroidProject
     StringAttri.FrameEdges = sfeAround
     SymbolAttri.Foreground = clRed
     SymbolAttri.FrameEdges = sfeAround
-    left = 296
+    left = 392
     top = 256
   end
   object SynFreePascalSyn1: TSynFreePascalSyn
@@ -1265,8 +1269,8 @@ object FormAndroidProject: TFormAndroidProject
     top = 256
   end
   object ImageList1: TImageList
-    left = 174
-    top = 68
+    left = 32
+    top = 48
     Bitmap = {
       4C69010000001000000010000000F0F0F000F0F0F000F0F0F000F0F0F000F0F0
       F000F0F0F000F0F0F000F1F1F1FFF5F5F5FFF5F5F5FFF8F8F8FFFAFAFAFFF6F6
@@ -1304,10 +1308,11 @@ object FormAndroidProject: TFormAndroidProject
     }
   end
   object PopupMenu1: TPopupMenu
-    left = 656
-    top = 256
+    OnPopup = PopupMenu1Popup
+    left = 344
+    top = 56
     object MenuItem1: TMenuItem
-      Caption = 'Insert...'
+      Caption = 'Get Simonsayz''s Templates'
       OnClick = PopupMenu1Close
     end
   end
