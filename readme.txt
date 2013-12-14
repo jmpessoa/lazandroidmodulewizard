@@ -275,7 +275,7 @@ VI. Download Demos [Eclipse Projects]
 VII. About Package, Components and LCL  and NDK libs(.so) dependency on laz4android1.1-41139 IDE cross compiler
 
 
-1. Package creation: just LCLBase is permitted! not LCL at all! 
+1. Package creation: just LCLBase is permitted! not "LCL"! 
    
    - You will nedd  LCLBase Required Package for register procedure.
    - yes, other No GUI stuff is permitted.
