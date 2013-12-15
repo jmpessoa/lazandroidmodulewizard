@@ -46,6 +46,9 @@ I. INSTALL Laz4Android (https://skydrive.live.com/?cid=89ae6b50650182c6&id=89AE6
 
       warning: the original laz4android1.1-41139 is win32 and just for Android NDK-7c 
 
+      HINT: To install a package open a "dummy" windows project.... you MUST close the cross compile project! 
+  
+
    1. From lazarus IDE - Install Wizard Packages
 
       1.1 Package -> Open Package -> "tfpandroidbridge_pack.lpk"
