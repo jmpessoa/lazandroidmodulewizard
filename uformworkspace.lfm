@@ -198,6 +198,7 @@ object FormWorkspace: TFormWorkspace
       'ArmV6'
       'ArmV7'
     )
+    OnClick = RadioGroup1Click
     TabOrder = 5
   end
   object RadioGroup2: TRadioGroup
@@ -223,6 +224,7 @@ object FormWorkspace: TFormWorkspace
       'VfpV2'
       'VfpV3'
     )
+    OnClick = RadioGroup2Click
     TabOrder = 6
   end
   object Edit4: TEdit

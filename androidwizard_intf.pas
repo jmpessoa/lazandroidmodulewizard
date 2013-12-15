@@ -365,7 +365,7 @@ begin
                         '-dANDROID -Xd -Cp'+FInstructionSet+ ' -Cf'+FFPUSet+
                         ' -FL'+FPathToNdkPlataformsAndroidArcharmUsrLib+DirectorySeparator+'libdl.so' +  {as dynamic linker}
                         ' -FU'+FPathToJNIFolder+DirectorySeparator+'obj'+DirectorySeparator+FJavaClassName +
-                        ' -o'+FPathToJNIFolder+DirectorySeparator+'libs'+DirectorySeparator+'lib'+LowerCase(FJavaClassName)+'.so';  {-o}
+                        ' -o'+FPathToJNIFolder+DirectorySeparator+'libs'+DirectorySeparator+auxStr+DirectorySeparator+'lib'+ LowerCase(FJavaClassName)+'.so';  {-o}
 
   sourceList.Free;
   Result := mrOK;

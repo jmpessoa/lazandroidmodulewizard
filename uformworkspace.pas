@@ -41,6 +41,8 @@ type
     procedure ComboBox1Change(Sender: TObject);
     procedure FormClose(Sender: TObject; var CloseAction: TCloseAction);
     procedure FormShow(Sender: TObject);
+    procedure RadioGroup1Click(Sender: TObject);
+    procedure RadioGroup2Click(Sender: TObject);
     procedure SpeedButton1Click(Sender: TObject);
     procedure SpeedButton2Click(Sender: TObject);
     procedure SpeedButton3Click(Sender: TObject);
@@ -83,6 +85,16 @@ implementation
 procedure TFormWorkspace.FormShow(Sender: TObject);
 begin
   Edit1.SetFocus;
+end;
+
+procedure TFormWorkspace.RadioGroup1Click(Sender: TObject);
+begin
+  FFPUSet:= RadioGroup1.Items[RadioGroup1.ItemIndex];  //fix 15-december-2013
+end;
+
+procedure TFormWorkspace.RadioGroup2Click(Sender: TObject);
+begin
+  FInstructionSet:= RadioGroup2.Items[RadioGroup2.ItemIndex];  //fix 15-december-2013
 end;
 
 procedure TFormWorkspace.FormClose(Sender: TObject; var CloseAction: TCloseAction);
