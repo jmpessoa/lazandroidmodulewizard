@@ -356,167 +356,212 @@ begin
         strList.Add('     //dummy app');
         strList.Add('}');
         strList.SaveToFile(FPathToJavaSrc+DirectorySeparator+'App.java');
+      end;
 
-        strList.Clear;
-        strList.Add('set path='+FPathToAntBin);        //set path=C:\adt32\ant\bin
-        strList.Add('set JAVA_HOME='+FPathToJavaJDK);  //set JAVA_HOME=C:\Program Files (x86)\Java\jdk1.7.0_21
-        strList.Add('cd '+FAndroidProjectName);
-        if FAntBuildMode = 'debug' then
-        begin
-           if FTouchtestEnabled='' then
-              strList.Add('ant debug')
-           else
-             strList.Add('ant -Dtouchtest.enabled=true debug');
-        end
-        else
-        begin
-          strList.Add('ant release');
-        end;
-        strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'build.bat');
+      strList.Clear;
+      strList.Add('set path='+FPathToAntBin);        //set path=C:\adt32\ant\bin
+      strList.Add('set JAVA_HOME='+FPathToJavaJDK);  //set JAVA_HOME=C:\Program Files (x86)\Java\jdk1.7.0_21
+      strList.Add('cd '+FAndroidProjectName);
+      if FAntBuildMode = 'debug' then
+      begin
+         if FTouchtestEnabled='' then
+            strList.Add('ant debug')
+         else
+           strList.Add('ant -Dtouchtest.enabled=true debug');
+      end
+      else
+      begin
+        strList.Add('ant release');
+      end;
+      strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'build.bat');
 
-        {"android list targets" to see the available targets...}
-        strList.Clear;
-        strList.Add('cd '+FPathToAndroidSDK+DirectorySeparator+'tools');
-        strList.Add('android list targets');
-        strList.Add('cd '+FAndroidProjectName);
-        strList.Add('pause');
-        strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'utils'+DirectorySeparator+'list_target.bat');
+      {"android list targets" to see the available targets...}
+      strList.Clear;
+      strList.Add('cd '+FPathToAndroidSDK+DirectorySeparator+'tools');
+      strList.Add('android list targets');
+      strList.Add('cd '+FAndroidProjectName);
+      strList.Add('pause');
+      strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'utils'+DirectorySeparator+'list_target.bat');
 
-        //need to pause on double-click use...
-        strList.Clear;
-        strList.Add('cmd /K list_target.bat');
-        strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'utils'+DirectorySeparator+'paused_list_target.bat');
+      //need to pause on double-click use...
+      strList.Clear;
+      strList.Add('cmd /K list_target.bat');
+      strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'utils'+DirectorySeparator+'paused_list_target.bat');
 
-        strList.Clear;
-        strList.Add('cd '+FPathToAndroidSDK+DirectorySeparator+'tools');
-        strList.Add('android create avd -n avd_api_'+FTargetApi+' -t '+
-                     GetIdFromApi(StrToInt(FTargetApi)) + ' -c 32M'); //avd -n avd17 -t 17
-        strList.Add('cd '+FAndroidProjectName);
-        strList.Add('pause');
-        strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'utils'+DirectorySeparator+'create_avd_'+FTargetApi+'.bat');
+      strList.Clear;
+      strList.Add('cd '+FPathToAndroidSDK+DirectorySeparator+'tools');
+      strList.Add('android create avd -n avd_api_'+FTargetApi+' -t '+
+                   GetIdFromApi(StrToInt(FTargetApi)) + ' -c 32M'); //avd -n avd17 -t 17
+      strList.Add('cd '+FAndroidProjectName);
+      strList.Add('pause');
+      strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'utils'+DirectorySeparator+'create_avd_'+FTargetApi+'.bat');
 
-        //need to pause on double-click use...
-        strList.Clear;
-        strList.Add('cmd /K create_avd_'+FTargetApi+'.bat');
-        strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'utils'+DirectorySeparator+'paused_create_avd_'+FTargetApi+'.bat');
+      //need to pause on double-click use...
+      strList.Clear;
+      strList.Add('cmd /K create_avd_'+FTargetApi+'.bat');
+      strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'utils'+DirectorySeparator+'paused_create_avd_'+FTargetApi+'.bat');
 
-        strList.Clear;
-        strList.Add('cd '+FPathToAndroidSDK+DirectorySeparator+'tools');
-        if StrToInt(FTargetApi) >= 15 then
-           strList.Add('emulator -avd avd_api_'+FTargetApi + ' -gpu on &')  //gpu: api >= 15,,,
-        else
-           strList.Add('tools emulator -avd avd_api_'+FTargetApi + ' &');
-        strList.Add('cd '+FAndroidProjectName);
-        //strList.Add('pause');
-        strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'launch_avd_api_'+FTargetApi+'.bat');
+      strList.Clear;
+      strList.Add('cd '+FPathToAndroidSDK+DirectorySeparator+'tools');
+      if StrToInt(FTargetApi) >= 15 then
+         strList.Add('emulator -avd avd_api_'+FTargetApi + ' -gpu on &')  //gpu: api >= 15,,,
+      else
+         strList.Add('tools emulator -avd avd_api_'+FTargetApi + ' &');
+      strList.Add('cd '+FAndroidProjectName);
+      //strList.Add('pause');
+      strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'launch_avd_api_'+FTargetApi+'.bat');
 
-        strList.Clear;
-        strList.Add('cd '+FAndroidProjectName+DirectorySeparator+'bin');
-        strList.Add(FPathToAndroidSDK+DirectorySeparator+'platform-tools'+
-                    DirectorySeparator+'adb install -r '+projName+'-'+FAntBuildMode+'.apk');
-        strList.Add('cd ..');
-        strList.Add('pause');
-        strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'install.bat');
+      strList.Clear;
+      strList.Add('cd '+FAndroidProjectName+DirectorySeparator+'bin');
+      strList.Add(FPathToAndroidSDK+DirectorySeparator+'platform-tools'+
+                  DirectorySeparator+'adb install -r '+projName+'-'+FAntBuildMode+'.apk');
+      strList.Add('cd ..');
+      strList.Add('pause');
+      strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'install.bat');
 
-        strList.Clear;
-        strList.Add('cd '+FAndroidProjectName+DirectorySeparator+'bin');
-        strList.Add(FPathToAndroidSDK+DirectorySeparator+'platform-tools'+
-                    DirectorySeparator+'adb uninstall '+FAntPackageName+'.'+LowerCase(projName));
-        strList.Add('cd ..');
-        strList.Add('pause');
-        strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'uninstall.bat');
+      strList.Clear;
+      strList.Add('cd '+FAndroidProjectName+DirectorySeparator+'bin');
+      strList.Add(FPathToAndroidSDK+DirectorySeparator+'platform-tools'+
+                  DirectorySeparator+'adb uninstall '+FAntPackageName+'.'+LowerCase(projName));
+      strList.Add('cd ..');
+      strList.Add('pause');
+      strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'uninstall.bat');
 
-        strList.Clear;
-        strList.Add('cd '+FAndroidProjectName+DirectorySeparator+'bin');
-        strList.Add(FPathToAndroidSDK+DirectorySeparator+'platform-tools'+
-                    DirectorySeparator+'adb logcat');
-        strList.Add('cd ..');
-        strList.Add('pause');
-        strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'utils'+DirectorySeparator+'logcat.bat');
+      strList.Clear;
+      strList.Add('cd '+FAndroidProjectName+DirectorySeparator+'bin');
+      strList.Add(FPathToAndroidSDK+DirectorySeparator+'platform-tools'+
+                  DirectorySeparator+'adb logcat');
+      strList.Add('cd ..');
+      strList.Add('pause');
+      strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'utils'+DirectorySeparator+'logcat.bat');
 
-        strList.Clear;
-        strList.Add('cd '+FAndroidProjectName+DirectorySeparator+'bin');
-        strList.Add(FPathToAndroidSDK+DirectorySeparator+'platform-tools'+
-                    DirectorySeparator+'adb logcat AndroidRuntime:E *:S');
-        strList.Add('cd ..');
-        strList.Add('pause');
-        strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'utils'+DirectorySeparator+'logcat_error.bat');
+      strList.Clear;
+      strList.Add('cd '+FAndroidProjectName+DirectorySeparator+'bin');
+      strList.Add(FPathToAndroidSDK+DirectorySeparator+'platform-tools'+
+                  DirectorySeparator+'adb logcat AndroidRuntime:E *:S');
+      strList.Add('cd ..');
+      strList.Add('pause');
+      strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'utils'+DirectorySeparator+'logcat_error.bat');
 
-        strList.Clear;
-        strList.Add('cd '+FAndroidProjectName+DirectorySeparator+'bin');
-        strList.Add(FPathToAndroidSDK+DirectorySeparator+'platform-tools'+DirectorySeparator+
-                    'adb logcat ActivityManager:I '+projName+'-'+FAntBuildMode+'.apk:D *:S');
-        strList.Add('cd ..');
-        strList.Add('pause');
-        strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'utils'+DirectorySeparator+'logcat_app_perform.bat');
+      strList.Clear;
+      strList.Add('cd '+FAndroidProjectName+DirectorySeparator+'bin');
+      strList.Add(FPathToAndroidSDK+DirectorySeparator+'platform-tools'+DirectorySeparator+
+                  'adb logcat ActivityManager:I '+projName+'-'+FAntBuildMode+'.apk:D *:S');
+      strList.Add('cd ..');
+      strList.Add('pause');
+      strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'utils'+DirectorySeparator+'logcat_app_perform.bat');
 
-        (* //causes instability in the simulator! why ?
-        strList.Clear;
-        strList.Add('cd '+FAndroidProjectName+DirectorySeparator+'bin');
-        strList.Add(FPathToAndroidSDK+DirectorySeparator+'platform-tools'+DirectorySeparator+
-                    'adb shell am start -a android.intent.action.MAIN -n '+
-                     FAntPackageName+'.'+LowerCase(projName)+'/.'+FMainActivity);
-        strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'launch_apk.bat');
-        *)
+      (* //causes instability in the simulator! why ?
+      strList.Clear;
+      strList.Add('cd '+FAndroidProjectName+DirectorySeparator+'bin');
+      strList.Add(FPathToAndroidSDK+DirectorySeparator+'platform-tools'+DirectorySeparator+
+                  'adb shell am start -a android.intent.action.MAIN -n '+
+                   FAntPackageName+'.'+LowerCase(projName)+'/.'+FMainActivity);
+      strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'launch_apk.bat');
+      *)
 
-        strList.Clear;
-        strList.Add('cd '+FAndroidProjectName+DirectorySeparator+'bin');
-        strList.Add(FPathToAndroidSDK+DirectorySeparator+
-                    'build-tools'+DirectorySeparator+ GetFolderFromApi(StrToInt(FTargetApi))+
-                    DirectorySeparator + 'aapt list '+projName+'-'+FAntBuildMode+'.apk');
-        strList.Add('cd ..');
-        strList.Add('pause');
-        strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'utils'+DirectorySeparator+'aapt.bat'); //Android Asset Packaging Tool
+      strList.Clear;
+      strList.Add('cd '+FAndroidProjectName+DirectorySeparator+'bin');
+      strList.Add(FPathToAndroidSDK+DirectorySeparator+
+                  'build-tools'+DirectorySeparator+ GetFolderFromApi(StrToInt(FTargetApi))+
+                  DirectorySeparator + 'aapt list '+projName+'-'+FAntBuildMode+'.apk');
+      strList.Add('cd ..');
+      strList.Add('pause');
+      strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'utils'+DirectorySeparator+'aapt.bat'); //Android Asset Packaging Tool
 
-        strList.Clear;
-        strList.Add('<?xml version="1.0" encoding="UTF-8"?>');
-        strList.Add('<project name="'+projName+'" default="help">');
-        strList.Add('<property name="sdk.dir" location="'+FPathToAndroidSDK+'"/>');
-        strList.Add('<property name="target"  value="android-'+FTargetApi+'"/>');
-        strList.Add('<property file="ant.properties"/>');
-        strList.Add('<fail message="sdk.dir is missing." unless="sdk.dir"/>');
-        strList.Add('<import file="${sdk.dir}/tools/ant/build.xml"/>');
-        strList.Add('</project>');
-        strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'build.xml');
+      strList.Clear;
+      strList.Add('<?xml version="1.0" encoding="UTF-8"?>');
+      strList.Add('<project name="'+projName+'" default="help">');
+      strList.Add('<property name="sdk.dir" location="'+FPathToAndroidSDK+'"/>');
+      strList.Add('<property name="target"  value="android-'+FTargetApi+'"/>');
+      strList.Add('<property file="ant.properties"/>');
+      strList.Add('<fail message="sdk.dir is missing." unless="sdk.dir"/>');
+      strList.Add('<import file="${sdk.dir}/tools/ant/build.xml"/>');
+      strList.Add('</project>');
+      strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'build.xml');
 
-        strList.Clear;
-        strList.Add('Tutorial: How to get your Android Application [Apk]:');
-        strList.Add(' ');
-        strList.Add('1. Double click "build.bat" to build Apk');
-        strList.Add(' ');
-        strList.Add('2. If Android Virtual Device[AVD]/Emulator is running then:');
-        strList.Add('   2.1 double click "install.bat" to install the Apk on the Emulator');
-        strList.Add('   2.2 look for the App '+projName+' on the Emulator and click it!');
-        strList.Add(' ');
-        strList.Add('3. If AVD/Emulator target Api['+FTargetApi+'] is NOT running:');
-        strList.Add('   3.1 If AVD/Emulator target Api['+FTargetApi+'] NOT exist:');
-        strList.Add('        3.1.1 double click "paused_create_avd*.bat" to create the AVD ['+DirectorySeparator+'utils folder]');
-        strList.Add('   3.2 double click "launch_avd*.bat" to launch the Emulator ['+DirectorySeparator+'utils  folder]');
-        strList.Add('   3.3 look for the App '+projName+' on  the Emulator and click it!');
-        strList.Add(' ');
-        strList.Add('4. Log/Debug');
-        strList.Add('   4.1 double click "logcat*.bat" to read Emulator logs and bugs! ['+DirectorySeparator+'utils folder]');
-        strList.Add(' ');
-        strList.Add('5. Uninstall Apk');
-        strList.Add('   5.1 double click "uninstall.bat" to remove Apk from the Emulator!');
-        strList.Add(' ');
-        strList.Add('6. Look for the Android '+projName+'-'+FAntBuildMode+'.apk in '+DirectorySeparator+'bin folder!');
-        strList.Add(' ');
-        strList.Add('7. Android Asset Packaging Tool: to know which files were packed in '+projName+'-'+FAntBuildMode+'.apk');
-        strList.Add('   7.1 double click "aapt.bat" ['+DirectorySeparator+'utils folder]' );
-        strList.Add(' ');
-        strList.Add('8. To see all available Android targets Api ['+DirectorySeparator+'utils folder]');
-        strList.Add('   8.1 double click "paused_list_target.bat" ');
-        strList.Add(' ');
-        strList.Add('9. Hint: you can edit "*.bat" to extend/modify some command or to fix some incorrect path!');
-        strList.Add(' ');
-        strList.Add('10. Warning: After Lazarus run->build do not forget to run again: "build.bat" and "install.bat" !');
-        strList.Add(' ');
-        strList.Add('....  Thank you!');
-        strList.Add(' ');
-        strList.Add('....  by jmpessoa_hotmail_com');
-        strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'readme.txt'); //Android Asset Packaging Tool
+      strList.Clear;
+      strList.Add('Tutorial: How to get your Android Application [Apk]:');
+      strList.Add(' ');
+      strList.Add('1. Double click "build.bat" to build Apk');
+      strList.Add(' ');
+      strList.Add('2. If Android Virtual Device[AVD]/Emulator is running then:');
+      strList.Add('   2.1 double click "install.bat" to install the Apk on the Emulator');
+      strList.Add('   2.2 look for the App '+projName+' on the Emulator and click it!');
+      strList.Add(' ');
+      strList.Add('3. If AVD/Emulator target Api['+FTargetApi+'] is NOT running:');
+      strList.Add('   3.1 If AVD/Emulator target Api['+FTargetApi+'] NOT exist:');
+      strList.Add('        3.1.1 double click "paused_create_avd*.bat" to create the AVD ['+DirectorySeparator+'utils folder]');
+      strList.Add('   3.2 double click "launch_avd*.bat" to launch the Emulator ['+DirectorySeparator+'utils  folder]');
+      strList.Add('   3.3 look for the App '+projName+' on  the Emulator and click it!');
+      strList.Add(' ');
+      strList.Add('4. Log/Debug');
+      strList.Add('   4.1 double click "logcat*.bat" to read Emulator logs and bugs! ['+DirectorySeparator+'utils folder]');
+      strList.Add(' ');
+      strList.Add('5. Uninstall Apk');
+      strList.Add('   5.1 double click "uninstall.bat" to remove Apk from the Emulator!');
+      strList.Add(' ');
+      strList.Add('6. Look for the Android '+projName+'-'+FAntBuildMode+'.apk in '+DirectorySeparator+'bin folder!');
+      strList.Add(' ');
+      strList.Add('7. Android Asset Packaging Tool: to know which files were packed in '+projName+'-'+FAntBuildMode+'.apk');
+      strList.Add('   7.1 double click "aapt.bat" ['+DirectorySeparator+'utils folder]' );
+      strList.Add(' ');
+      strList.Add('8. To see all available Android targets Api ['+DirectorySeparator+'utils folder]');
+      strList.Add('   8.1 double click "paused_list_target.bat" ');
+      strList.Add(' ');
+      strList.Add('9. Hint: you can edit "*.bat" to extend/modify some command or to fix some incorrect path!');
+      strList.Add(' ');
+      strList.Add('10. Warning: After Lazarus run->build do not forget to run again: "build.bat" and "install.bat" !');
+      strList.Add(' ');
+      strList.Add('....  Thank you!');
+      strList.Add(' ');
+      strList.Add('....  by jmpessoa_hotmail_com');
+      strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'readme.txt'); //Android Asset Packaging Tool
+      if FModuleType = 1 then     //No GUI Android Controls...
+      begin
+         strList.Clear;    //dummy App.java - will be replaced with simonsayz's "App.java" template!
+         strList.Add('package '+FAntPackageName+'.'+LowerCase(projName)+';');
+         strList.Add(' ');
+         strList.Add('import android.os.Bundle;');
+         strList.Add('import android.app.Activity;');
+         strList.Add('import android.view.LayoutInflater;');
+         strList.Add('import android.view.View;');
+         strList.Add('import android.widget.Toast;');
+         strList.Add(' ');
+         strList.Add('public class App extends Activity {');
+         strList.Add('  ');
+         strList.Add('   JNIHello myHello;  //just for demo...');
+         strList.Add('  ');
+         strList.Add('   @Override');
+         strList.Add('   protected void onCreate(Bundle savedInstanceState) {');
+         strList.Add('       super.onCreate(savedInstanceState);');
+         strList.Add('       setContentView(R.layout.activity_app);');
+         strList.Add(' ');
+         strList.Add('       JNIHello jniHello = new  JNIHello(); //just for demo...');
+         strList.Add(' ');
+         strList.Add('       int sum = jniHello.getSum(2,3); //just for demo...');
+         strList.Add('       String  = jniHello.getString(1); //just for demo...');
+         strList.Add('   }');
+         strList.Add('}');
+         strList.SaveToFile(FPathToJavaSrc+DirectorySeparator+'App.java');
 
+         strList.Clear;
+         strList.Add('package '+FAntPackageName+'.'+LowerCase(projName)+';');
+         strList.Add('public class JNIHello { //just for demo...');
+         strList.Add(' ');
+	 strList.Add('  public native String getString(int flag);');
+	 strList.Add('  public native int getSum(int x, int y);');
+         strList.Add(' ');
+         strList.Add('  static {');
+	 strList.Add('	  try {');
+     	 strList.Add('	      System.loadLibrary("jnihello");');
+	 strList.Add('	  } catch(UnsatisfiedLinkError ule) {');
+ 	 strList.Add('	      ule.printStackTrace();');
+ 	 strList.Add('	  }');
+         strList.Add('  }');
+         strList.Add(' ');
+         strList.Add('}');
+         strList.SaveToFile(FPathToJavaSrc+DirectorySeparator+'JNIHello.java');
       end;
       strList.Free;
     end;
@@ -580,7 +625,7 @@ begin
   if FModuleType = 0 then  //GUI controls
     sourceList.Add('  Classes, SysUtils, And_jni, And_jni_Bridge, Laz_And_Controls;')
   else //generic module :  No GUI Controls
-    sourceList.Add('  Classes, SysUtils, CustApp, And_jni;');
+    sourceList.Add('  Classes, SysUtils, CustApp, jni;');
 
   sourceList.Add(' ');
   sourceList.Add('const');
@@ -755,8 +800,8 @@ end;
 
 function TAndroidFileDescPascalUnitWithResource.GetInterfaceUsesSection: string;
 begin
-  if ModuleType = 1 then //generic module
-    Result := 'Classes, SysUtils, And_jni;'
+  if ModuleType = 1 then //generic module: No GUI Controls
+    Result := 'Classes, SysUtils, jni;'
   else  //GUI controls module
     Result := 'Classes, SysUtils, And_jni, And_jni_Bridge, Laz_And_Controls;';
 end;
