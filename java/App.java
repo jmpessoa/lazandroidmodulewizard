@@ -1,8 +1,9 @@
-package com.template.appdummy; //warning by jmpessoa: please do not edit ou change the place of this line!!! 
+package com.template.appdummy; //warning for TEMPLATE: by jmpessoa: please do not edit ou change the place of this line!!! 
 
 
 //Android Java Interface for Pascal/Delphi XE5 (and Lazarus by jmpessoa)
-/Developer
+
+//Developers
 //          Simon,Choi / Choi,Won-sik
 //                       simonsayz@naver.com
 //                       http://blog.naver.com/simonsayz

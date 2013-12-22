@@ -497,7 +497,7 @@ Procedure jScrollView_addLParamsAnchorRule(env:PJNIEnv;this:jobject; ScrollView 
 Procedure jScrollView_setLayoutAll(env:PJNIEnv;this:jobject; ScrollView : jObject;  idAnchor: DWord);
 //---------------
 
-// Panel
+// jPanel by jmpessoa
 Function  jPanel_Create           (env:PJNIEnv;this:jobject;
                                         context : jObject; SelfObj : TObject) : jObject;
 Procedure jPanel_Free             (env:PJNIEnv;this:jobject; Panel : jObject);
@@ -863,7 +863,7 @@ Procedure jClassMethod(FuncName, FuncSig : PChar;
   if Class_  = nil then
   begin
      Class_   := env^.FindClass(env, gjClassName);  //jmpessoa fix 1:  change Manifest to targetSdkVersion="11"
-     //Class_ := jClass (env^.NewGlobalRef(env, tmp)); //jmpessoa try fix: why not ?
+     //Class_ := jClass (env^.NewGlobalRef(env, tmp)); //jmpessoa try fix 2: why not ?
   end;
   if Method_ = nil then
   begin
@@ -4691,10 +4691,9 @@ begin
  env^.CallVoidMethodA(env,this,_jMethod,@_jParams);
 end;
 
-//Panel
 //----------------------------------------
-
-//
+//jPanel by jmpessoa
+//----------------------------------------
 Function  jPanel_Create  (env:PJNIEnv;this:jobject;
                                context : jObject; SelfObj : TObject) : jObject;
  Const
@@ -4711,7 +4710,7 @@ Function  jPanel_Create  (env:PJNIEnv;this:jobject;
   Result := env^.NewGlobalRef(env,Result);
  end;
 
-//
+////by jmpessoa
 Procedure jPanel_Free   (env:PJNIEnv;this:jobject; Panel : jObject);
   Const
    _cFuncName = 'jPanel_Free';
@@ -4726,7 +4725,7 @@ Procedure jPanel_Free   (env:PJNIEnv;this:jobject; Panel : jObject);
    env^.DeleteGlobalRef(env,Panel);
   end;
 
-//
+////by jmpessoa
 Procedure jPanel_setXYWH(env:PJNIEnv;this:jobject;
                               Panel : jObject;x,y,w,h : integer);
  Const
@@ -4745,6 +4744,7 @@ Procedure jPanel_setXYWH(env:PJNIEnv;this:jobject;
   env^.CallVoidMethodA(env,this,_jMethod,@_jParams);
  end;
 
+//by jmpessoa
 Procedure jPanel_setLeftTopRightBottomWidthHeight(env:PJNIEnv;this:jobject;
                                         Panel : jObject; ml,mt,mr,mb,w,h: integer);
 Const
@@ -4766,7 +4766,7 @@ begin
 end;
 
 
-//
+////by jmpessoa
 Procedure jPanel_setParent(env:PJNIEnv;this:jobject;
                                 Panel : jObject;ViewGroup : jObject);
  Const
@@ -4782,7 +4782,7 @@ Procedure jPanel_setParent(env:PJNIEnv;this:jobject;
   env^.CallVoidMethodA(env,this,_jMethod,@_jParams);
  end;
 
-//
+//by jmpessoa
 Function jPanel_getView(env:PJNIEnv;this:jobject;
                              Panel : jObject) : jObject;
  Const
@@ -4812,6 +4812,7 @@ begin
  env^.CallVoidMethodA(env,this,_jMethod,@_jParams);
 end;
 
+//by jmpessoa
 Procedure jPanel_setMarginLeft(env:PJNIEnv;this:jobject; Panel : jObject; x: DWord);
 Const
  _cFuncName = 'jPanel_setMarginLeft';
@@ -4841,7 +4842,7 @@ begin
  env^.CallVoidMethodA(env,this,_jMethod,@_jParams);
 end;
 
-
+//by jmpessoa
 Procedure jPanel_setMarginRight(env:PJNIEnv;this:jobject; Panel : jObject; x: DWord);
 Const
  _cFuncName = 'jPanel_setMarginRight';
@@ -4915,6 +4916,7 @@ begin
  Result     := env^.CallIntMethodA(env,this,_jMethod,@_jParams);
 end;
 
+//by jmpessoa
 function jPanel_getLParamWidth(env:PJNIEnv;this:jobject; Panel : jObject): integer;
 Const
  _cFuncName = 'jPanel_getLParamWidth';
@@ -4928,6 +4930,7 @@ begin
  Result     := env^.CallIntMethodA(env,this,_jMethod,@_jParams);
 end;
 
+//by jmpessoa
 Procedure jPanel_resetLParamsRules(env:PJNIEnv;this:jobject; Panel : jObject);
 Const
  _cFuncName = 'jPanel_resetLParamsRules';

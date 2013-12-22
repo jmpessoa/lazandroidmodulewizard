@@ -42,7 +42,6 @@ type
     ToolButton1: TToolButton;
     procedure FormShow(Sender: TObject);
     procedure PopupMenu1Close(Sender: TObject);
-    procedure PopupMenu1Popup(Sender: TObject);
     procedure ShellTreeView1Click(Sender: TObject);
     procedure TabSheet3Clicked;
     procedure FormCloseQuery(Sender: TObject; var CanClose: boolean);
@@ -63,8 +62,9 @@ type
 
     FPathToJavaTemplates: string;
     FAndroidProjectName: string;
-
+    FMainActivity: string;
     FListJNIBridge: TStringList;
+
     Memo2List: TStringList;
 
     function GetPascalCode(funcName, funcParam, funcResult: string): string;
@@ -87,6 +87,7 @@ type
     property JNIDecoratedMethodName: string read FJNIDecoratedMethodName write FJNIDecoratedMethodName;
     property PathToJavaTemplates: string read FPathToJavaTemplates write FPathToJavaTemplates;
     property AndroidProjectName: string read FAndroidProjectName write FAndroidProjectName;
+    property MainActivity: string read FMainActivity write FMainActivity;
   end;
 
 var
@@ -304,7 +305,7 @@ begin
     signature:= 'procedure '+funcName+auxFuncParam+'; cdecl;';
     strList.Add(signature);
     strList.Add('begin');
-    if FModuleType = 0 then  //controls
+    if FModuleType = 0 then  //GUI controls
     begin
         strAux:= FListJNIBridge.Values[funcName];
         strList.Add('  '+strAux);
@@ -320,7 +321,7 @@ begin
     signature:= 'function '+funcName+auxFuncParam+': '+ GetFuncResult(funcResult);
     strList.Add(signature);
     strList.Add('begin');
-    if FModuleType = 0 then  //controls
+    if FModuleType = 0 then  //GUI controls
     begin
         strAux:= FListJNIBridge.Values[funcName];
         strList.Add('  Result:='+strAux);
@@ -462,7 +463,6 @@ begin
        else
          strNativeMethodsBody:= strNativeMethodsBody+LineEnding;
 
-
       strPascalCode:= auxSignature+GetPascalCode(Trim(strList.Strings[strList.Count-1]) {funct},
                       Trim(auxParam),Trim(strList.Strings[strList.Count-2]){result});
 
@@ -515,7 +515,6 @@ begin
     strOnLoadList.Add('end;');
 
     auxStr:= Memo6List.Strings[Memo6List.Count-1];
-
     Memo6List.Strings[Memo6List.Count-1]:= ReplaceChar(auxStr,',',';');
     FPascalJNIInterfaceCode:= Memo5List.Text + strNativeMethodsHeader + LineEnding+
                               strOnLoadList.Text + LineEnding+Memo6List.Text;
@@ -554,6 +553,7 @@ begin
      pathList:= TStringList.Create;
 
      FPathToJavaClass:= ShellListView1.GetPathFromItem(ShellListView1.Selected);
+
      //FPathToJavaClass:= FLabelPath;
      StatusBar1.SimpleText:= FPathToJavaClass;
 
@@ -563,17 +563,21 @@ begin
     // LabelJClass.Caption:= fileName;
 
      FJavaClassName:= SplitStr(fileName, '.');
+
      if CompareText(FJavaClassName, 'Controls') = 0 then
         FModuleType:= 0;  //Controls.java
+
      for i:= 0 to pathList.Count-2 do
      begin
         if Pos('src',pathList.Strings[i]) > 0  then k:= i;
      end;
+
      pathPack:='';
      for j:= k+1 to pathList.Count-2 do
      begin
         pathPack:= pathPack + '_'+ pathList.Strings[j];
      end;
+
      FJNIDecoratedMethodName:= 'Java'+pathPack+'_'+ FJavaClassName;
      SynMemo1.Lines.LoadFromFile(ShellListView1.GetPathFromItem(ShellListView1.Selected));
      FImportsList.Clear;
@@ -634,24 +638,20 @@ begin
   NodeSelected:= ShellTreeView1.Selected;
   pathPlusFileName:= ShellListView1.GetPathFromItem(ShellListView1.Selected);
   auxPath:= ExtractFilePath(pathPlusFileName);
-  if Pos('App.java', pathPlusFileName) > 0 then  //GUI controls
+  if Pos(FMainActivity+'.java', pathPlusFileName) > 0 then  //GUI controls
   begin
     auxList:= TStringList.Create;
-
     auxList.LoadFromFile(pathPlusFileName);
-
     strPack:= Trim(auxList.Strings[0]); // ex: package com.template.appdummy;
 
+    //ShowMessage(strPack); ok
+
     auxList.Clear;
-
-    auxList.LoadFromFile(FPathToJavaTemplates + DirectorySeparator + 'App.java');
-
+    auxList.LoadFromFile(FPathToJavaTemplates + DirectorySeparator + FMainActivity+'.java'); //App.Java
     auxList.Strings[0]:= strPack;
-
-    auxList.SaveToFile(auxPath + 'App.java' );
+    auxList.SaveToFile(auxPath + FMainActivity+'.java' );
 
     auxList.Clear;
-
     auxList.LoadFromFile(FPathToJavaTemplates + DirectorySeparator + 'Controls.java');
     auxList.Strings[0]:= strPack;
     auxList.SaveToFile(auxPath + 'Controls.java');
@@ -669,7 +669,7 @@ begin
 
     ListManifest.LoadFromFile(FPathToJavaTemplates + DirectorySeparator + 'AndroidManifest.txt');
     strAfterReplace  := StringReplace(ListManifest.Text, 'dummy1',strPack, [rfReplaceAll, rfIgnoreCase]);
-    strPack:= strPack+'.App';
+    strPack:= strPack+'.'+FMainActivity; //App;
     strAfterReplace  := StringReplace(strAfterReplace, 'dummy2',strPack, [rfReplaceAll, rfIgnoreCase]);
 
     ListManifest.Clear;
@@ -677,11 +677,6 @@ begin
     ListManifest.SaveToFile(FAndroidProjectName+DirectorySeparator+'AndroidManifest.xml');
     ListManifest.Free;
   end;
-end;
-
-procedure TFormAndroidProject.PopupMenu1Popup(Sender: TObject);
-begin
-  //FListJNIBridge.LoadFromFile(FPathToJavaTemplates + DirectorySeparator + 'ControlsEvents.txt');
 end;
 
 procedure TFormAndroidProject.ShellTreeView1Click(Sender: TObject);
