@@ -668,7 +668,7 @@ type
   protected
     Procedure GenEvent_OnClick(Obj: TObject);
   public
-    FFormState     : TjFormState;
+    FormState     : TjFormState;
 
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -2247,14 +2247,14 @@ end;
 // Event : OnBackPressed -> Form OnClose
 Procedure Java_Event_pAppOnBackPressed(env: PJNIEnv; this: jobject);
 var
-  Form : jForm;
+  AForm : jForm;
 begin
-  Form := App.Forms.Stack[App.Forms.Index-1].Form;
-  if not(Assigned(Form))           then Exit;
-  if not(Form.FBackButton)         then Exit;
-  if Form.FFormState <> fsFormWork then Exit;
+  AForm := App.Forms.Stack[App.Forms.Index-1].Form;
+  if not(Assigned(AForm))           then Exit;
+  if not(AForm.BackButton)         then Exit;
+  if AForm.FormState <> fsFormWork then Exit;
   //
-  Form.Close;
+  AForm.Close;
 end;
 
 // Event : OnRotate -> Form OnRotate
@@ -2342,7 +2342,7 @@ begin
 
   If not (Timer.Enabled)   then Exit;
 
-  If Timer.Parent.FFormState = fsFormClose then Exit;
+  If Timer.Parent.FormState = fsFormClose then Exit;
 
   If not (Assigned(Timer.OnTimer)) then Exit;
   Timer.OnTimer(Timer);
@@ -2509,10 +2509,10 @@ begin
   //FForm               := nil; //Owner;
   FColor                := colbrBlack;
   FFormName             := 'jForm';
-  FFormState            := fsFormCreate;
+  FormState            := fsFormCreate;
   FCloseCallBack.Event  := nil;
   FCloseCallBack.Sender := nil;
-  FBackButton           := False;        // Back Button Press Event Enabled
+  FBackButton           := True;//False;        // Back Button Press Event Enabled
   FOnActive             := nil;
   FOnClose              := nil;
   FOnCloseQuery         := nil;
@@ -2634,7 +2634,7 @@ Procedure jForm.Show;
   App.Forms.Stack[App.Forms.Index].CloseCB := FCloseCallBack;
   Inc(App.Forms.Index);
   jForm_Show(App.Jni.jEnv,App.Jni.jThis,FjObject,FAnimation.In_);
-  FFormState := fsFormWork;
+  FormState := fsFormWork;
   if Assigned(FOnActive) then FOnActive(Self);
 end;
 
@@ -2669,7 +2669,7 @@ begin
     end;
   end;
   //
-  FFormState := fsFormClose;
+  FormState := fsFormClose;
   //FVisible:= False;
   //jForm_SetVisibility(App.Jni.jEnv, App.Jni.jThis, FjObject ,FVisible);
   jForm_Close(App.Jni.jEnv, App.Jni.jThis, FjObject,FAnimation.Out_);
@@ -3407,7 +3407,7 @@ Procedure jEditText.GenEvent_OnChange(Obj: TObject; EventType : Integer);
 begin
   if not FInitialized then Exit;
   if not(Assigned(FOnChange)) then Exit;
-  if jForm(Owner).FFormState = fsFormClose then Exit;
+  if jForm(Owner).FormState = fsFormClose then Exit;
   case EventType of
    0 : FOnChange(Obj,ctChangeBefore);
    1 : FOnChange(Obj,ctChange      );

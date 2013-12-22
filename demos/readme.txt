@@ -1,9 +1,18 @@
-AppDemo1 and AppDemo2
+[Eclipse Projects]
 
-Are Eclipse Projects!
+   AppDemo1 
 
-Please, see /jni folder for lazarus [.so] project...
+   AppDemo2
+
+[Ant Projects]
+
+  AppAntDemo1  - New - 22-december-2013
+
+ 
+-------------------------------------------------
+Please, see /jni folder for lazarus project...
 
 Thank you!
 
-::: by jmpessoa - jmpessoa_hotmail_com
+by jmpessoa - jmpessoa_hotmail_com
+
