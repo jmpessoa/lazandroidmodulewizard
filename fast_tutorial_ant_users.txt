@@ -1,0 +1,141 @@
+
+**Tutorial: Lazarus Android Module Wizard for "Ant" users ** 
+				
+
+"A wizard for create JNI Android loadable module (.so) in Lazarus/Free Pascal using DataModules" 
+
+
+      Author: Jose Marques Pessoa : jmpessoa__hotmail_com
+     
+      Please, for complete reference read "readme.txt"
+
+
+I. INSTALL Laz4Android (https://skydrive.live.com/?cid=89ae6b50650182c6&id=89AE6B50650182C6%21149)
+
+      
+      warning: the original laz4android1.1-41139 is win32 and just for Android NDK-7c 
+
+      HINT: To install/reinstall a package open a "dummy" windows project.... you always MUST close the cross compile project! 
+  
+
+   1. From Laz4Android IDE (laz4android1.1-41139)  - Install Wizard Packages
+
+      1.1 Package -> Open Package -> "tfpandroidbridge_pack.lpk"
+
+	  Ref. image: https://www.opendrive.com/files?Ml8zNjMwNDQ3NF83SzhsZg
+
+      1.1.1 From Package Wizard
+
+            - Compile
+            - Use -> Install
+ 
+      1.2 Package -> Open Package -> "lazandroidwizardpack.lpk"
+   
+      1.2.1 From Package Wizard
+
+            - Compile
+            - Use -> Install
+
+
+
+II. [GUI Support] Android Components Bridges - NEW! Simon's Controls remake with many extensions!
+        
+       
+  1. From Lazarus IDE
+	
+	1.1. Project -> New Project 
+        
+	1.2. On "Create a new project" Dialog select: <JNI Android Module> 
+
+	     ref. Image: https://www.opendrive.com/files?Ml8zNjMwMTY4MF9HMVRHRg
+        
+
+        1.3. From "Android Module Wizard: Configure Paths"
+
+             ref. Image: https://www.opendrive.com/files?Ml8zNjg3MDU0MV9nTXZsdA
+                         
+
+            -Path to Ndk Plataforms
+
+             ex. C:\adt32\ndk7\platforms\android-8\arch-arm\usr\lib
+ 
+
+            -Path to Ndk Toolchain  
+        
+             ex. C:\adt32\ndk7\toolchains\arm-linux-androideabi-4.4.3\prebuilt\windows\lib\gcc\arm-linux-androideabi\4.4.3 
+     
+
+            -Path to  Simonsayz's  code  templates (App.java + Controls.java):  
+     
+             ex. C:\laz4android\components\LazAndroidWizard\java
+
+
+            -Path to Workspace
+
+             ex. C:\adt32\Ant\workspace
+
+
+            -Ant Project Name:		 Ant Preface Package Name:                                             
+ 
+             ex. AppAntDemo1	         ex. org.jmpessoa  - warning: final package name will be: "org.jmpessoa.appantdemo1" 
+
+                                                  
+            -Select other Options [Instructions; FPU; Project; GUI Controls; Target Api] 
+
+
+        1.4. OK!
+
+                         
+        1.5. From "Android Module Wizard: Select Java Source for JNI..."
+
+		-From left panel/tree Select "your recent created project" -> src
+
+                -From top panel/View right click "App.java" file 
+
+		-On Popup menu select/click <Get Simonsayz's Templates> 
+            
+		 	ref. Image: https://www.opendrive.com/files?Ml8zNjMwMjI1Ml9kOXNRag 
+
+                -Double Click "Control.java" file...
+ 
+		 	ref. Image: https://www.opendrive.com/files?Ml8zNjMwMjkyM183ZVd2MA
+
+	1.6. OK  
+
+	      - Pascal JNI Interface was created! 	
+
+
+	1.7. follow the hint on code: "save all files to location....."  { \jni folder }
+
+
+	1.8. From Component Palette select page <Android Bridges>
+        
+        	 ref. Image: https://www.opendrive.com/files?Ml8zNjMwNDQ3NF83SzhsZg
+                            
+		-Put e configure some component on DataModule form... etc...
+
+	1.9. From Lazarus IDE
+
+		-Run -> Build
+
+        2.0. Read the "readme.txt" in your project folder to buidl Android Application [Apk]
+
+                        	
+III. Yes! Lazarus/Free Pascal does RAD on Android!
+
+
+IV. Download Demos 
+
+    [Eclipse Projects]
+
+      AppDemo1 - ref1. https://www.opendrive.com/files?Ml8zNjMwNTE0N18xVUZ2ag  
+      AppDemo2 - ref2. https://www.opendrive.com/files?Ml8zNjMwNTMxN19YTHgxWg
+
+    [Ant Projects]
+      
+      AppAntDemo1 - ref3. https://www.opendrive.com/files?Ml8zNjk2NDU4NF94ck5Fdw
+
+
+Thank you!
+
+    _____jmpessoa_hotmail_com_____

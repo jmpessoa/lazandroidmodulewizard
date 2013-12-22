@@ -1,0 +1,280 @@
+
+** Tutorial: Lazarus Android Module Wizard For "Eclipse' Users ** 
+				
+
+"A wizard for create JNI Android loadable module (.so) in Lazarus/Free Pascal using DataModules" 
+
+
+      Author: Jose Marques Pessoa : jmpessoa__hotmail_com
+
+
+      Please, for complete reference read "readme.txt"
+
+
+I. INSTALL Laz4Android (https://skydrive.live.com/?cid=89ae6b50650182c6&id=89AE6B50650182C6%21149)
+
+      
+      warning: the original laz4android1.1-41139 is win32 and just for Android NDK-7c 
+
+      HINT: To install/reinstall a package open a "dummy" windows project.... you always MUST close the cross compile project! 
+  
+
+   1. From Laz4Android IDE (laz4android1.1-41139)  - Install Wizard Packages
+
+      1.1 Package -> Open Package -> "tfpandroidbridge_pack.lpk"
+
+	  Ref. image: https://www.opendrive.com/files?Ml8zNjMwNDQ3NF83SzhsZg
+
+      1.1.1 From Package Wizard
+
+            - Compile
+            - Use -> Install
+ 
+      1.2 Package -> Open Package -> "lazandroidwizardpack.lpk"
+   
+      1.2.1 From Package Wizard
+
+            - Compile
+            - Use -> Install
+
+
+II. [GUI Support] Android Components Bridges - Ver. 0.2 - NEW! Simon's Controls remake with many extensions!
+        
+     
+  1. From Eclipse IDE: 
+
+        1.1. File -> New -> Android Application Project
+        
+	1.2. [Next]
+	1.3. [Next]
+	1.4. [Next]
+	
+	1.5. On "Create Activity" Dialog select: <Blank Activity>   [Next]
+             
+             ref. Image: https://www.opendrive.com/files?Ml8zNjMwMDUwOF9pZm4xMQ
+
+
+        1.6. On "Activity Name" Dialog enter: App  [Finish] //"App" name is mandatory!
+                 
+             ref. Image: https://www.opendrive.com/files?Ml8zNjMwMDE0M19aZ2dkeA
+        
+       	1.7  Right click your recent created project -> Close  
+    
+  
+  2. From Lazarus IDE
+	
+	2.1. Project -> New Project 
+        
+	2.2. On "Create a new project" Dialog select: <JNI Android Module> 
+
+	     ref. Image: https://www.opendrive.com/files?Ml8zNjMwMTY4MF9HMVRHRg
+
+
+        2.2. From "Android Module Wizard: Configure Paths"
+
+             ref. Image: https://www.opendrive.com/files?Ml8zNjg3MDU0MV9nTXZsdA
+                         
+
+            -Path to Ndk Plataforms
+
+             ex. C:\adt32\ndk7\platforms\android-8\arch-arm\usr\lib
+ 
+
+            -Path to Ndk Toolchain  
+        
+             ex. C:\adt32\ndk7\toolchains\arm-linux-androideabi-4.4.3\prebuilt\windows\lib\gcc\arm-linux-androideabi\4.4.3 
+     
+
+            -Path to  Simonsayz's  code  templates (App.java + Controls.java):   //**
+     
+             ex. C:\laz4android\components\LazAndroidWizard\java
+
+
+            -Path to Workspace
+
+             ex. C:\adt32\eclipse\workspace
+
+
+            -Eclipse Project:		                                             
+ 
+             ex.C:\adt32\eclipse\workspace\AppDemo1	  
+
+                                                  
+            -Select other Options [Instructions; FPU; Project; GUI Controls; Target Api] 
+
+             ** needed only for Android Components Bridges [GUI Controls support]...       
+
+        2.3. OK!
+
+                         
+        2.4. From "Android Module Wizard: Select Java Source for JNI..."
+
+		-From left panel/tree Select "your recent created project" -> src
+
+                -From top panel/View right click "App.java" file 
+
+		-On Popup menu select/click <Get Simonsayz's Templates> 
+            
+		 	ref. Image: https://www.opendrive.com/files?Ml8zNjMwMjI1Ml9kOXNRag 
+
+                -Double Click "Control.java" file...
+ 
+		 	ref. Image: https://www.opendrive.com/files?Ml8zNjMwMjkyM183ZVd2MA
+
+	2.5. OK  
+
+	      - Pascal JNI Interface was created! 	
+
+
+	2.6. follow the hint on code: "save all files to location....."  { \jni folder }
+
+
+	2.7. From Component Palette select page <Android Bridges>
+
+        
+        	 ref. Image: https://www.opendrive.com/files?Ml8zNjMwNDQ3NF83SzhsZg
+                            
+		-Put e configure some component on DataModule form... etc...
+
+
+	2.8. From Lazarus IDE
+
+		-Run -> Build
+
+    3. Build and Run Android Application
+
+
+        3.1.From Eclipse IDE
+
+          -double click your project //that is: open the project...
+
+          -right click your  project: -> Refresh
+	
+          -right click your  project: -> Run as -> Android Application
+	  
+
+III. [No GUI Project support]
+
+  
+1. From Eclipse IDE:
+
+      - File -> New -> Android Application Project ...[Next], [Next]...[Finish]!
+
+      - From Package Explore -> src
+    
+        :Right click your recent created package -> new -> class  
+    
+        :Enter new class name... (ex. JNIHello) 
+   
+        :Edit your class code for wrapper native methods....
+
+        ex code:
+
+   	public class JNIHello {
+
+	   public native String getString(int flag); 
+	   public native int getSum(int x, int y);
+
+           static {
+		try {
+     		    System.loadLibrary("jnihello");  //*	     	   
+		} catch(UnsatisfiedLinkError ule) {
+		    ule.printStackTrace();
+		}
+           }
+
+         }  
+
+   
+       * warning: System.loadLibrary("...") must match class Name "lowercase"...
+         ex. JNIHello -> "jnihello"
+      
+2. From Laz4Android IDE 
+
+   2.1. On "Create a new project" Dialog select: <JNI Android Module> 
+
+       ref. Image: https://www.opendrive.com/files?Ml8zNjg3MDU0MV9nTXZsdA
+
+
+   2.2. From "Android Module Wizard: Configure Paths"
+
+       ref. Image: https://www.opendrive.com/files?Ml8zNjg3MDU0MV9nTXZsdA
+                         
+
+     -Path to Ndk Plataforms
+
+         ex. C:\adt32\ndk7\platforms\android-8\arch-arm\usr\lib
+ 
+     -Path to Ndk Toolchain  
+        
+	ex. C:\adt32\ndk7\toolchains\arm-linux-androideabi-4.4.3\prebuilt\windows\lib\gcc\arm-linux-androideabi\4.4.3 
+     
+    -Path to Workspace
+
+         ex. C:\adt32\eclipse\workspace
+
+    -Eclipse Project:		                                             
+ 
+	ex. C:\adt32\eclipse\workspace\AppDemo1	  
+                                                  
+    -Select other Options [Instructions; FPU; Project; GUI Controls; Target Api] 
+
+
+   2.3. OK!
+
+
+   2.4. From "Android Module Wizard: Select Java Source for JNI..."
+
+     -From left panel/tree Select "your recent created project" -> src
+ 
+     -From top panel/View double Click the Java wrapper class for native methods....
+ 
+      ex. "JNIHello.java" 
+
+   2.5. OK!  
+
+      - Pascal JNI Interface was created! 	
+
+   2.6. follow the code hint: "save all files to location....." {save all in \jni folder ...}
+
+     
+   2.7. Implement the Pascal JNI Interface methods.....
+
+
+   2.8. From Lazarus4Android IDE
+
+       -Run -> Build         
+
+
+   2.9. Yes! You got it! ".so" was created! see \libs folder...
+
+
+3. Build and Run Android Application
+
+        3.1. From Eclipse IDE
+
+          -double click your project //that is: open the project...
+
+          -right click your  project: -> Refresh
+	
+          -right click your  project: -> Run as -> Android Application
+
+                            	
+IV. Yes! Lazarus/Free Pascal does RAD on Android!
+
+
+V. Download Demos 
+
+    [Eclipse Projects]
+
+      AppDemo1 - ref1. https://www.opendrive.com/files?Ml8zNjMwNTE0N18xVUZ2ag  
+      AppDemo2 - ref2. https://www.opendrive.com/files?Ml8zNjMwNTMxN19YTHgxWg
+
+    [Ant Projects]
+      
+      AppAntDemo1 - ref3. https://www.opendrive.com/files?Ml8zNjk2NDU4NF94ck5Fdw
+
+
+  Thank you!
+
+  _____jmpessoa_hotmail_com_____
