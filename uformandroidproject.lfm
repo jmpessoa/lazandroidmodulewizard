@@ -1,11 +1,11 @@
 object FormAndroidProject: TFormAndroidProject
-  Left = 272
+  Left = 293
   Height = 570
-  Top = 14
+  Top = 120
   Width = 1040
   BorderIcons = []
   BorderStyle = bsSingle
-  Caption = 'Android Module Wizard: Select Java Source [JNI/Native Methods]'
+  Caption = 'Android Module Wizard: Select Java Source for JNI/Native Methods'
   ClientHeight = 570
   ClientWidth = 1040
   Icon.Data = {
@@ -173,9 +173,9 @@ object FormAndroidProject: TFormAndroidProject
           Height = 359
           Top = 1
           Width = 708
-          ActivePage = TabSheet1
+          ActivePage = TabSheet3
           Align = alClient
-          TabIndex = 0
+          TabIndex = 1
           TabOrder = 0
           OnChange = PageControl1Change
           object TabSheet1: TTabSheet
@@ -1308,6 +1308,7 @@ object FormAndroidProject: TFormAndroidProject
     }
   end
   object PopupMenu1: TPopupMenu
+    OnPopup = PopupMenu1Popup
     left = 344
     top = 56
     object MenuItem1: TMenuItem
