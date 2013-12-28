@@ -1,5 +1,8 @@
 
 **Tutorial: Lazarus Android Module Wizard for "Ant" users ** 
+
+
+	Version 0.3 - revision 0.1 - 28 december 2013 -
 				
 
 "A wizard for create JNI Android loadable module (.so) in Lazarus/Free Pascal using DataModules" 
@@ -10,19 +13,30 @@
       Please, for complete reference read "readme.txt"
 
 
-I. INSTALL Laz4Android (https://skydrive.live.com/?cid=89ae6b50650182c6&id=89AE6B50650182C6%21149)
+I. INSTALL Laz4Android
 
+
+      https://skydrive.live.com/?cid=89ae6b50650182c6&id=89AE6B50650182C6%21149
+
+      Warning: original laz4android1.1-41139 --> win32/Android NDK-7c/ARM
+ 
       
-      warning: the original laz4android1.1-41139 is win32 and just for Android NDK-7c 
+      NEW! win32/Android NDK-9/{ARM and x86 !} :: Thanks to TrueTom!
 
-      HINT: To install/reinstall a package open a "dummy" windows project.... you always MUST close the cross compile project! 
-  
+      https://sourceforge.net/projects/laz4android/files/?source=navbar 
+       
 
-   1. From Laz4Android IDE (laz4android1.1-41139)  - Install Wizard Packages
+   1. From Laz4Android IDE  - Install Packages
+
+
+      HINT: to compile/install/reinstall a package in Laz4Android, please, open a "dummy" windows project.... 
+            you always MUST close the cross compile project!  
+ 
 
       1.1 Package -> Open Package -> "tfpandroidbridge_pack.lpk"
 
-	  Ref. image: https://www.opendrive.com/files?Ml8zNjMwNDQ3NF83SzhsZg
+	  Ref. image: http://www.opendrive.com/files?Ml8zNjMwNDQ3NF83SzhsZg
+
 
       1.1.1 From Package Wizard
 
@@ -37,7 +51,6 @@ I. INSTALL Laz4Android (https://skydrive.live.com/?cid=89ae6b50650182c6&id=89AE6
             - Use -> Install
 
 
-
 II. [GUI Support] Android Components Bridges - NEW! Simon's Controls remake with many extensions!
         
        
@@ -47,40 +60,48 @@ II. [GUI Support] Android Components Bridges - NEW! Simon's Controls remake with
         
 	1.2. On "Create a new project" Dialog select: <JNI Android Module> 
 
-	     ref. Image: https://www.opendrive.com/files?Ml8zNjMwMTY4MF9HMVRHRg
+	     ref. Image: http://www.opendrive.com/files?Ml8zNjMwMTY4MF9HMVRHRg
         
 
         1.3. From "Android Module Wizard: Configure Paths"
 
-             ref. Image: https://www.opendrive.com/files?Ml8zNjg3MDU0MV9nTXZsdA
+             ref. Image: http://jmpessoa.opendrive.com/files?Ml8zNzM2NzE1OV9YdHJXaw
+                        
                          
-
-            -Path to Ndk Plataforms
-
-             ex. C:\adt32\ndk7\platforms\android-8\arch-arm\usr\lib
- 
-
-            -Path to Ndk Toolchain  
-        
-             ex. C:\adt32\ndk7\toolchains\arm-linux-androideabi-4.4.3\prebuilt\windows\lib\gcc\arm-linux-androideabi\4.4.3 
-     
-
-            -Path to  Simonsayz's  code  templates (App.java + Controls.java):  
-     
-             ex. C:\laz4android\components\LazAndroidWizard\java
+   		-Path to Java JDK
+     	
+	          ex. C:\Program Files (x86)\Java\jdk1.7.0_21    {java win32}
 
 
-            -Path to Workspace
+       		-Path to Android SDK
 
-             ex. C:\adt32\Ant\workspace
+                  ex. C:\adt32\sdk
 
 
-            -Ant Project Name:		 Ant Preface Package Name:                                             
- 
-             ex. AppAntDemo1	         ex. org.jmpessoa  - warning: final package name will be: "org.jmpessoa.appantdemo1" 
+		-Select Ndk version: [7c or 9]
+
+
+	     	-Path to Ndk 
+
+	          ex.  C:\adt32\ndk7       
+
+
+		-Path to Java Resources  [Simonsayz's Controls.java,  *.xml and default Icons]:
+     	
+		  ex. C:\laz4android\components\LazAndroidWizard\java
+
+
+          	-Path to Workspace
+
+         	  ex. C:\adt32\ant\workspace
+
+
+ 	        -Ant Project Name:	-Ant Package Preface Name	                                             
+   
+	          ex.AppAntDemo1        ex. org.jmpessoa   ::warning: final package name = "org.jmpessoa.appantdemo1"	  
 
                                                   
-            -Select other Options [Instructions; FPU; Project; GUI Controls; Target Api] 
+	        -Select others Options [Instructions; FPU; Project "Ant"; GUI Controls "Yes"; Target Api, etc...] 
 
 
         1.4. OK!
@@ -88,54 +109,155 @@ II. [GUI Support] Android Components Bridges - NEW! Simon's Controls remake with
                          
         1.5. From "Android Module Wizard: Select Java Source for JNI..."
 
-		-From left panel/tree Select "your recent created project" -> src
+		-From left panel/tree Select Project by name -> src
 
                 -From top panel/View right click "App.java" file 
 
-		-On Popup menu select/click <Get Simonsayz's Templates> 
+		    --> On Popup menu select/click <Get Simonsayz's Templates> 
             
-		 	ref. Image: https://www.opendrive.com/files?Ml8zNjMwMjI1Ml9kOXNRag 
+		 	ref. Image: http://www.opendrive.com/files?Ml8zNjMwMjI1Ml9kOXNRag 
+
 
                 -Double Click "Control.java" file...
  
-		 	ref. Image: https://www.opendrive.com/files?Ml8zNjMwMjkyM183ZVd2MA
+		 	ref. Image: http://www.opendrive.com/files?Ml8zNjMwMjkyM183ZVd2MA
 
 	1.6. OK  
 
-	      - Pascal JNI Interface was created! 	
+	        - Pascal JNI Interface was created! 	
 
 
 	1.7. follow the hint on code: "save all files to location....."  { \jni folder }
 
 
 	1.8. From Component Palette select page <Android Bridges>
+
         
-        	 ref. Image: https://www.opendrive.com/files?Ml8zNjMwNDQ3NF83SzhsZg
+        	ref. Image: http://www.opendrive.com/files?Ml8zNjMwNDQ3NF83SzhsZg
                             
 		-Put e configure some component on DataModule form... etc...
+
 
 	1.9. From Lazarus IDE
 
 		-Run -> Build
 
-        2.0. Read the "readme.txt" in your project folder to buidl Android Application [Apk]
 
-                        	
-III. Yes! Lazarus/Free Pascal does RAD on Android!
+        2.0. Yes! You got it! ".so" was created! see \libs folder...
 
+
+        2.1. NEW! For multi build modes, please, read "readme.txt" in ..\jni\build-modes folder 
+
+
+        2.2. Please, read the "readme.txt" in your project folder to learn how to buidl Android Application [Apk]
+
+  
+III. [No GUI Support] 
+
+      
+1. From Laz4Android IDE 
+
+
+   1.1. On "Create a new project" Dialog select: <JNI Android Module> 
+
+       ref. Image: http://www.opendrive.com/files?Ml8zNjg3MDU0MV9nTXZsdA
+
+
+   1.2. From "Android Module Wizard: Configure Paths"
+
+  
+             ref. Image: http://jmpessoa.opendrive.com/files?Ml8zNzM2NzE1OV9YdHJXaw
+                        
+                         
+   		-Path to Java JDK
+     	
+	          ex. C:\Program Files (x86)\Java\jdk1.7.0_21    {win32}
+
+
+       		-Path to Android SDK
+
+                  ex. C:\adt32\sdk
+
+
+		-Select Ndk version: [7c or 9]
+
+
+	     	-Path to Ndk 
+
+	          ex.  C:\adt32\ndk7       
+
+
+		-Path to Java Resources  [Simonsayz's Controls.java,  *.xml and default Icons]:
+     	         
+                 ex. C:\laz4android\components\LazAndroidWizard\java    [... need for "*.xml", icons, and etc...] 
+
+
+          	-Path to Workspace
+
+         	  ex. C:\adt32\ant\workspace
+
+
+	        -Ant Project Name:	-Ant Package Preface Name	                                             
+   
+	         ex.AppAntNoGUIDemo1     ex. org.jmpessoa   ::warning: final package name = "org.jmpessoa.appantnoguidemo1"	  
+
+                                                  
+	        -Select others Options [Instructions; FPU; Project "Ant" ; GUI Controls "No"; Target Api, etc...] 
+
+
+   2.3. OK!
+
+
+   2.4. From "Android Module Wizard: Select Java Source for JNI..."
+
+     -From left panel/tree Select Project by Name [AppAntNoGUIDemo1] -> src
+ 
+     -From top panel/View double Click the Java wrapper class for native methods....
+ 
+      ex. "JNIHello.java" 
+
+
+   2.5. OK!  
+
+      - Pascal JNI Interface was created! 	
+
+
+   2.6. follow the code hint: "save all files to location....." {save all in \jni folder ...}
+
+     
+   2.7. Implement the Pascal JNI Interface methods.....
+
+
+   2.8. From Lazarus4Android IDE
+
+       -Run -> Build         
+
+
+   2.9. Yes! You got it! ".so" was created! see \libs folder...
+
+   
+   3.0. NEW! For multi build modes, please, read "readme.txt" in ..\jni\build-modes folder 
+
+
+   3.1. Please, read the "readme.txt" in your project folder to learn how to buidl Android Application [Apk]
+                      	
 
 IV. Download Demos 
 
-    [Eclipse Projects]
-
-      AppDemo1 - ref1. https://www.opendrive.com/files?Ml8zNjMwNTE0N18xVUZ2ag  
-      AppDemo2 - ref2. https://www.opendrive.com/files?Ml8zNjMwNTMxN19YTHgxWg
-
-    [Ant Projects]
+    [Ant GUI Projects]
       
-      AppAntDemo1 - ref3. https://www.opendrive.com/files?Ml8zNjk2NDU4NF94ck5Fdw
+    AppAntDemo1 - ref. http://www.opendrive.com/files?Ml8zNjk2NDU4NF94ck5Fdw
 
 
-Thank you!
+    [Ant NO GUI Projects]
+
+    AppAntNoGUIDemo1 - ref.  http://jmpessoa.opendrive.com/files?Ml8zNzQ1MjAxN195ZDBUZA
+
+
+V. Yes! Lazarus/Free Pascal does RAD on Android!
+
+
+
+    Thank you!
 
     _____jmpessoa_hotmail_com_____

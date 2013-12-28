@@ -15,25 +15,23 @@ type
   TFormWorkspace  = class(TForm)
     bbOK: TBitBtn;
     Bevel3: TBevel;
+    Bevel4: TBevel;
+    Bevel5: TBevel;
     BitBtn2: TBitBtn;
-    CheckBox1: TCheckBox;
-    CheckBox2: TCheckBox;
+    CheckGroup1: TCheckGroup;
     ComboBox1: TComboBox;
     Edit1: TEdit;
     Edit2: TEdit;
-    Edit3: TEdit;
     Edit4: TEdit;
     Edit5: TEdit;
     Edit6: TEdit;
     Edit7: TEdit;
     Edit8: TEdit;
     edProjectName: TEdit;
-    GroupBox1: TGroupBox;
     Label1: TLabel;
     Label10: TLabel;
     Label2: TLabel;
     Label3: TLabel;
-    Label4: TLabel;
     Label5: TLabel;
     Label6: TLabel;
     Label7: TLabel;
@@ -44,34 +42,36 @@ type
     RadioGroup2: TRadioGroup;
     RadioGroup3: TRadioGroup;
     RadioGroup4: TRadioGroup;
+    RadioGroup5: TRadioGroup;
     SelectDirectoryDialog1: TSelectDirectoryDialog;
     SelectDirectoryDialog2: TSelectDirectoryDialog;
-    SelectDirectoryDialog3: TSelectDirectoryDialog;
     SelectDirectoryDialog4: TSelectDirectoryDialog;
     SelectDirectoryDialog5: TSelectDirectoryDialog;
     SelectDirectoryDialog6: TSelectDirectoryDialog;
     SelectDirectoryDialog7: TSelectDirectoryDialog;
     SpeedButton1: TSpeedButton;
     SpeedButton2: TSpeedButton;
-    SpeedButton3: TSpeedButton;
     SpeedButton4: TSpeedButton;
     SpeedButton5: TSpeedButton;
     SpeedButton6: TSpeedButton;
     SpeedButton7: TSpeedButton;
-    procedure CheckBox1Click(Sender: TObject);
-    procedure CheckBox2Click(Sender: TObject);
+  //  procedure CheckBox1Click(Sender: TObject);
+  //  procedure CheckBox2Click(Sender: TObject);
+    procedure CheckGroup1Click(Sender: TObject);
     procedure ComboBox1Exit(Sender: TObject);
     procedure FormActivate(Sender: TObject);
     procedure FormClose(Sender: TObject; var CloseAction: TCloseAction);
+    procedure FormCreate(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure ListBox1Click(Sender: TObject);
     procedure RadioGroup1Click(Sender: TObject);
     procedure RadioGroup2Click(Sender: TObject);
     procedure RadioGroup3Click(Sender: TObject);
     procedure RadioGroup4Click(Sender: TObject);
+    procedure RadioGroup5Click(Sender: TObject);
     procedure SpeedButton1Click(Sender: TObject);
     procedure SpeedButton2Click(Sender: TObject);
-    procedure SpeedButton3Click(Sender: TObject);
+  //  procedure SpeedButton3Click(Sender: TObject);
     procedure SpeedButton4Click(Sender: TObject);
     procedure SpeedButton5Click(Sender: TObject);
     procedure SpeedButton6Click(Sender: TObject);
@@ -80,8 +80,8 @@ type
     { private declarations }
     FFilename: string;
     FPathToWorkspace: string; {C:\adt32\eclipse\workspace}
-    FPathToNdkPlataformsAndroidArcharmUsrLib: string; {C:\adt32\ndk\platforms\android-14\arch-arm\usr\lib}
-    FPathToNdkToolchains: string; {C:\adt32\ndk\toolchains\arm-linux-androideabi-4.4.3\prebuilt\windows\... }
+    FPathToNdkPlataforms: string; {C:\adt32\ndk\platforms\android-14\arch-arm\usr\lib}
+   // FPathToNdkToolchains: string; {C:\adt32\ndk\toolchains\arm-linux-androideabi-4.4.3\prebuilt\windows\... }
     FInstructionSet: string;      {ArmV6}
     FFPUSet: string;              {Soft}
     FPathToJavaTemplates: string;
@@ -89,6 +89,7 @@ type
 
     FPathToJavaJDK: string;
     FPathToAndroidSDK: string;
+    FPathToAndroidNDK: string;
     FPathToAntBin: string;
     FProjectModel: string;
     FGUIControls: string;
@@ -97,16 +98,17 @@ type
     FTouchtestEnabled: string;
     FAntBuildMode: string;
     FMainActivity: string;   //Simon "App"
+    FNDK: string;
   public
     { public declarations }
     procedure GetSubDirectories(const directory : string; list : TStrings) ;
     procedure LoadSettings(const pFilename: string);
     procedure SaveSettings(const pFilename: string);
     property PathToWorkspace: string read FPathToWorkspace write FPathToWorkspace;
-    property PathToNdkPlataformsAndroidArcharmUsrLib: string
-                                                      read FPathToNdkPlataformsAndroidArcharmUsrLib
-                                                      write FPathToNdkPlataformsAndroidArcharmUsrLib;
-    property PathToNdkToolchains: string read FPathToNdkToolchains write FPathToNdkToolchains;
+    property PathToNdkPlataforms: string
+                                                      read FPathToNdkPlataforms
+                                                      write FPathToNdkPlataforms;
+    //property PathToNdkToolchains: string read FPathToNdkToolchains write FPathToNdkToolchains;
     property InstructionSet: string read FInstructionSet write FInstructionSet;
     property FPUSet: string  read FFPUSet write FFPUSet;
     property PathToJavaTemplates: string read FPathToJavaTemplates write FPathToJavaTemplates;
@@ -114,6 +116,7 @@ type
 
     property PathToJavaJDK: string read FPathToJavaJDK write FPathToJavaJDK;
     property PathToAndroidSDK: string read FPathToAndroidSDK write FPathToAndroidSDK;
+    property PathToAndroidNDK: string read FPathToAndroidNDK write FPathToAndroidNDK;
     property PathToAntBin: string read FPathToAntBin write FPathToAntBin;
     property ProjectModel: string read FProjectModel write FProjectModel; {eclipse/any}
     property GUIControls: string read FGUIControls write FGUIControls;
@@ -122,6 +125,7 @@ type
     property TouchtestEnabled: string read FTouchtestEnabled write FTouchtestEnabled;
     property AntBuildMode: string read FAntBuildMode write FAntBuildMode;
     property MainActivity: string read FMainActivity write FMainActivity;
+    property NDK: string read FNDK write FNDK;
   end;
 
   function ReplaceChar(query: string; oldchar, newchar: char):string;
@@ -165,6 +169,12 @@ begin
   FGUIControls:= RadioGroup4.Items[RadioGroup4.ItemIndex];  //fix 15-december-2013
 end;
 
+procedure TFormWorkspace.RadioGroup5Click(Sender: TObject);
+begin
+  if RadioGroup5.ItemIndex = 0 then FNDK:= '7c'
+  else FNDK:= '9';
+end;
+
 procedure TFormWorkspace.FormClose(Sender: TObject; var CloseAction: TCloseAction);
 var
   saveName, auxStr: string;
@@ -178,7 +188,7 @@ begin
      FProjectModel:= 'Ant';
      if (Pos(DirectorySeparator, ComboBox1.Text) <= 0) then  //just "name", not path+name
      begin
-         FAndroidProjectName:= FPathToWorkspace + DirectorySeparator + ComboBox1.Text;
+         FAndroidProjectName:= FPathToWorkspace + DirectorySeparator + ComboBox1.Text; //get full name: path+name
          {$I-}
          ChDir(FPathToWorkspace+DirectorySeparator+ComboBox1.Text);
          if IOResult <> 0 then MkDir(FPathToWorkspace+DirectorySeparator+ComboBox1.Text);
@@ -187,6 +197,11 @@ begin
   if ModalResult = mrOk then SaveSettings(FFileName);
 end;
 
+procedure TFormWorkspace.FormCreate(Sender: TObject);
+begin
+
+end;
+  {
 procedure TFormWorkspace.CheckBox1Click(Sender: TObject);
 begin
    if CheckBox1.Checked then FTouchtestEnabled:= 'True'
@@ -196,6 +211,13 @@ end;
 procedure TFormWorkspace.CheckBox2Click(Sender: TObject);
 begin
   if CheckBox2.Checked then FAntBuildMode:= 'debug'
+  else  FAntBuildMode:= 'release';
+end;
+   }
+
+procedure TFormWorkspace.CheckGroup1Click(Sender: TObject);
+begin
+  If CheckGroup1.Checked[0] then FAntBuildMode:= 'debug'
   else  FAntBuildMode:= 'release';
 end;
 
@@ -211,6 +233,8 @@ end;
 procedure TFormWorkspace.FormActivate(Sender: TObject);
 begin
   ComboBox1.SetFocus;
+  if (not CheckGroup1.Checked[0]) and (not CheckGroup1.Checked[1]) then
+     CheckGroup1.Checked[0]:= True;
 end;
 
 procedure TFormWorkspace.SpeedButton1Click(Sender: TObject);
@@ -229,18 +253,18 @@ begin
   if SelectDirectoryDialog2.Execute then
   begin
     Edit2.Text := SelectDirectoryDialog2.FileName;
-    FPathToNdkPlataformsAndroidArcharmUsrLib:= SelectDirectoryDialog2.FileName;
+    FPathToAndroidNDK:= SelectDirectoryDialog2.FileName;
   end;
 end;
-
+   (*
 procedure TFormWorkspace.SpeedButton3Click(Sender: TObject);
 begin
-  if SelectDirectoryDialog3.Execute then
+{  if SelectDirectoryDialog3.Execute then
   begin
     Edit3.Text := SelectDirectoryDialog3.FileName;
     FPathToNdkToolchains:= SelectDirectoryDialog3.FileName;
-  end;
-end;
+  end; }
+end;  *)
 
 procedure TFormWorkspace.SpeedButton4Click(Sender: TObject);
 begin
@@ -299,29 +323,34 @@ end;
 
 procedure TFormWorkspace.LoadSettings(const pFilename: string);
 var
-  i1, i2, i3, i4, i5: integer;
+  i1, i2, i3, i4, i5, j1: integer;
 begin
   FFileName:= pFilename;
   with TIniFile.Create(pFilename) do
   begin
     FPathToWorkspace:= ReadString('NewProject','PathToWorkspace', '');
-    FPathToNdkPlataformsAndroidArcharmUsrLib:= ReadString('NewProject','PathToNdkPlataformsAndroidArcharmUsrLib', '');
-    FPathToNdkToolchains:= ReadString('NewProject','PathToNdkToolchains', '');
+    FPathToNdkPlataforms:= ReadString('NewProject','PathToNdkPlataforms', '');
 
     FPathToJavaTemplates:= ReadString('NewProject','PathToJavaTemplates', '');
 
     FPathToJavaJDK:= ReadString('NewProject','PathToJavaJDK', '');
     FPathToAndroidSDK:= ReadString('NewProject','PathToAndroidSDK', '');
+    FPathToAndroidNDK:= ReadString('NewProject','PathToAndroidNDK', '');
     FPathToAntBin:= ReadString('NewProject','PathToAntBin', '');
     FAntPackageName:= ReadString('NewProject','AntPackageName', '');
+
     FTouchtestEnabled:= ReadString('NewProject','TouchtestEnabled', '');
-    if  FTouchtestEnabled = '' then FTouchtestEnabled:= 'False';
+    if FTouchtestEnabled = '' then FTouchtestEnabled:= 'False';
 
     FAntBuildMode:= ReadString('NewProject','AntBuildMode', '');
     if FAntBuildMode = '' then FAntBuildMode:= 'debug'; //debug
 
     FMainActivity:= ReadString('NewProject','MainActivity', '');  //dummy
-    if FMainActivity ='' then FMainActivity:= 'App';
+    if FMainActivity = '' then FMainActivity:= 'App';
+
+    if ReadString('NewProject','NDK', '') <> '' then
+      i5:= strToInt(ReadString('NewProject','NDK', ''))
+    else i5:= 0;  //ndk 7
 
     if ReadString('NewProject','InstructionSet', '') <> '' then
        i1:= strToInt(ReadString('NewProject','InstructionSet', ''))
@@ -340,8 +369,8 @@ begin
     else i4:= 0;
 
     if ReadString('NewProject','TargetApi', '') <> '' then
-       i5:= strToInt(ReadString('NewProject','TargetApi', ''))
-    else i5:= 7; // Api 17
+       j1:= strToInt(ReadString('NewProject','TargetApi', ''))
+    else j1:= 7; // Api 17
 
     ComboBox1.Items.Clear;
     GetSubDirectories(FPathToWorkspace, ComboBox1.Items);
@@ -353,17 +382,18 @@ begin
   RadioGroup2.ItemIndex:= i2;
   RadioGroup3.ItemIndex:= i3;
   RadioGroup4.ItemIndex:= i4;
-  ListBox1.ItemIndex:= i5;;
+  RadioGroup5.ItemIndex:= i5;
+  ListBox1.ItemIndex:= j1;;
 
   if FTouchtestEnabled = 'True' then
-     self.CheckBox1.Checked:= True
+     CheckGroup1.Checked[1]:= True
   else
-     self.CheckBox1.Checked:= False;
+     CheckGroup1.Checked[1]:= False;
 
- if FAntBuildMode = 'debug' then
-    self.CheckBox2.Checked:= True
- else
-    self.CheckBox2.Checked:= False;
+  if FAntBuildMode = 'debug' then
+     CheckGroup1.Checked[0]:= True
+  else
+     CheckGroup1.Checked[0]:= False;
 
   FInstructionSet:= RadioGroup1.Items[RadioGroup1.ItemIndex];
   FFPUSet:= RadioGroup2.Items[RadioGroup2.ItemIndex];
@@ -371,9 +401,10 @@ begin
   FGUIControls:=  RadioGroup4.Items[RadioGroup4.ItemIndex];
   FTargetApi:= ListBox1.Items[ListBox1.ItemIndex];
 
+  FNDK:= RadioGroup5.Items[RadioGroup5.ItemIndex];
+
   Edit1.Text := FPathToWorkspace;
-  Edit2.Text := FPathToNdkPlataformsAndroidArcharmUsrLib;
-  Edit3.Text := FPathToNdkToolchains;
+  Edit2.Text := FPathToAndroidNDK;
   Edit4.Text := FPathToJavaTemplates;
 
   Edit5.Text := FPathToJavaJDK;
@@ -387,13 +418,16 @@ begin
    with TInifile.Create(pFilename) do
    begin
       WriteString('NewProject', 'PathToWorkspace', Edit1.Text);
-      WriteString('NewProject', 'PathToNdkPlataformsAndroidArcharmUsrLib', Edit2.Text);
-      WriteString('NewProject', 'PathToNdkToolchains', Edit3.Text);
+      WriteString('NewProject', 'PathToNdkPlataforms', Edit2.Text);
+
+      WriteString('NewProject', 'NDK', IntToStr(RadioGroup5.ItemIndex));
+
       WriteString('NewProject', 'PathToJavaTemplates', Edit4.Text);
       WriteString('NewProject', 'InstructionSet', IntToStr(RadioGroup1.ItemIndex));
       WriteString('NewProject', 'FPUSet', IntToStr(RadioGroup2.ItemIndex));
 
       WriteString('NewProject', 'PathToJavaJDK', Edit5.Text);
+      WriteString('NewProject', 'PathToAndroidNDK', Edit2.Text);
       WriteString('NewProject', 'PathToAndroidSDK', Edit6.Text);
       WriteString('NewProject', 'PathToAntBin', Edit7.Text);
 
@@ -404,12 +438,12 @@ begin
 
       WriteString('NewProject', 'TargetApi', IntToStr(ListBox1.ItemIndex));
 
-      if CheckBox1.Checked then
+      if CheckGroup1.Checked[1] then
          WriteString('NewProject', 'TouchtestEnabled', 'True')
       else
          WriteString('NewProject', 'TouchtestEnabled', 'False');
 
-      if CheckBox2.Checked then
+      if CheckGroup1.Checked[0] then
          WriteString('NewProject', 'AntBuildMode', 'debug')
       else
          WriteString('NewProject', 'AntBuildMode', 'release');

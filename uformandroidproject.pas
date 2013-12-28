@@ -64,6 +64,7 @@ type
     FAndroidProjectName: string;
     FMainActivity: string;
     FListJNIBridge: TStringList;
+    FTargetApi: string;
 
     Memo2List: TStringList;
 
@@ -88,6 +89,7 @@ type
     property PathToJavaTemplates: string read FPathToJavaTemplates write FPathToJavaTemplates;
     property AndroidProjectName: string read FAndroidProjectName write FAndroidProjectName;
     property MainActivity: string read FMainActivity write FMainActivity;
+    property TargetApi: string  read FTargetApi write FTargetApi;
   end;
 
 var
@@ -603,7 +605,8 @@ procedure TFormAndroidProject.ToolButton1Click(Sender: TObject);
 begin
   //02-december-2013 Add support to simonsayz's controls
   //http://blog.naver.com/simonsayz
-   ShowMessage('LazAndroidModuleWizard 0.2 by jmpessoa');
+
+   ShowMessage('LazAndroidModuleWizard ver. 0.3 - revision 0.1 - 28 dec. 2013 - by jmpessoa');
 end;
 
 procedure TFormAndroidProject.FormCloseQuery(Sender: TObject;
@@ -668,9 +671,12 @@ begin
     ListManifest:= TStringList.Create;
 
     ListManifest.LoadFromFile(FPathToJavaTemplates + DirectorySeparator + 'AndroidManifest.txt');
-    strAfterReplace  := StringReplace(ListManifest.Text, 'dummy1',strPack, [rfReplaceAll, rfIgnoreCase]);
+    strAfterReplace  := StringReplace(ListManifest.Text, 'dummyPackage',strPack, [rfReplaceAll, rfIgnoreCase]);
+
     strPack:= strPack+'.'+FMainActivity; //App;
-    strAfterReplace  := StringReplace(strAfterReplace, 'dummy2',strPack, [rfReplaceAll, rfIgnoreCase]);
+    strAfterReplace  := StringReplace(strAfterReplace, 'dummyAppName',strPack, [rfReplaceAll, rfIgnoreCase]);
+
+    strAfterReplace  := StringReplace(ListManifest.Text, 'dummyTargetApi', FTargetApi, [rfReplaceAll, rfIgnoreCase]);
 
     ListManifest.Clear;
     ListManifest.Text:= strAfterReplace;

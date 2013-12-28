@@ -10,7 +10,10 @@ uses
 
 type
 
-  TAndroidModule = class(jForm)
+  TAndroidModule = class(jForm)  //GUI Module
+  end;
+
+  TNoGUIAndroidModule = class(TDataModule)
   end;
 
   TAndroidProjectDescriptor = class(TProjectDescriptor)
@@ -20,18 +23,21 @@ type
      FPathToClassName: string;
      FPathToJavaClass: string;
      FPathToJNIFolder: string;
-     FPathToNdkPlataformsAndroidArcharmUsrLib: string; {C:\adt32\ndk\platforms\android-14\arch-arm\usr\lib}
+     FPathToNdkPlataforms: string; {C:\adt32\ndk\platforms\android-14\arch-arm\usr\lib}
      FPathToNdkToolchains: string;
      {C:\adt32\ndk7\toolchains\arm-linux-androideabi-4.4.3\prebuilt\windows\lib\gcc\arm-linux-androideabi\4.4.3}
      FInstructionSet: string;    {ArmV6}
      FFPUSet: string;            {Soft}
      FPathToJavaTemplates: string;
      FAndroidProjectName: string;
-     FModuleType: integer;
+     FModuleType: integer;     {0: GUI; 1: NoGUI}
      FSyntaxMode: TSyntaxMode;   {}
 
      FPathToJavaJDK: string;
      FPathToAndroidSDK: string;
+     FPathToAndroidNDK: string;
+     FNDK: string;
+
      FPathToAntBin: string;
      FProjectModel: string; {"Eclipse Project"/"Ant Project"}
      FAntPackageName: string;
@@ -63,12 +69,15 @@ type
   public
     SyntaxMode: TSyntaxMode; {mdDelphi, mdObjFpc}
     PathToJNIFolder: string;
-    ModuleType: integer;
+    ModuleType: integer;   //0: GUI; 1: No GUI
     constructor Create; override;
+
     function CreateSource(const Filename     : string;
                           const SourceName   : string;
                           const ResourceName : string): string; override;
+
     function GetInterfaceUsesSection: string; override;
+
     function GetInterfaceSource(const Filename     : string;
                                 const SourceName   : string;
                                 const ResourceName : string): string; override;
@@ -94,9 +103,12 @@ procedure Register;
 begin
   AndroidFileDescriptor := TAndroidFileDescPascalUnitWithResource.Create;
   RegisterProjectFileDescriptor(AndroidFileDescriptor);
+
   AndroidProjectDescriptor:= TAndroidProjectDescriptor.Create;
   RegisterProjectDescriptor(AndroidProjectDescriptor);
+
   FormEditingHook.RegisterDesignerBaseClass(TAndroidModule);
+  FormEditingHook.RegisterDesignerBaseClass(TNoGUIAndroidModule);
 end;
 
 {TAndroidProjectDescriptor}
@@ -117,13 +129,15 @@ begin
 
   for i:=0 to pathList.Count-1 do
   begin
-     if Pos('src', pathList.Strings[i])>0 then k:= i;
+     if Pos('src', pathList.Strings[i]) > 0 then k:= i;
   end;
+
   Result:= '';
   for j:= 0 to k-1 do
   begin
       Result:= Result + pathList.Strings[j]+DirectorySeparator;
   end;
+
   Result:= TrimChar(Result, DirectorySeparator);;
   pathList.Free;
 end;
@@ -131,7 +145,7 @@ end;
 function TAndroidProjectDescriptor.TryNewJNIAndroidInterfaceCode: boolean;
 var
   frm: TFormAndroidProject;
-  auxStr: string;
+  //auxStr: string;
 begin
   Result := False;
   frm:= TFormAndroidProject.Create(nil);
@@ -140,6 +154,7 @@ begin
   frm.AndroidProjectName:= FAndroidProjectName;
   frm.ModuleType:= FModuleType;
   frm.MainActivity:= FMainActivity;
+  frm.TargetApi:= FTargetApi;
   if frm.ShowModal = mrOK then
   begin
     Result := True;
@@ -158,23 +173,36 @@ begin
     FPascalJNIIterfaceCode:= frm.PascalJNIInterfaceCode;
 
     {$I-}
-    ChDir(FPathToJNIFolder+DirectorySeparator+ 'jni');
-    if IOResult <> 0 then MkDir(FPathToJNIFolder+ DirectorySeparator + 'jni');
+    ChDir(FAndroidProjectName+DirectorySeparator+ 'jni');
+    if IOResult <> 0 then MkDir(FAndroidProjectName+ DirectorySeparator + 'jni');
 
-    ChDir(FPathToJNIFolder+DirectorySeparator+ 'libs');
-    if IOResult <> 0 then MkDir(FPathToJNIFolder+ DirectorySeparator + 'libs');
+    ChDir(FAndroidProjectName+DirectorySeparator+ 'jni'+DirectorySeparator+'build-modes');
+    if IOResult <> 0 then MkDir(FAndroidProjectName+DirectorySeparator+ 'jni'+DirectorySeparator+'build-modes');
 
-    ChDir(FPathToJNIFolder+DirectorySeparator+ 'obj');
-    if IOResult <> 0 then MkDir(FPathToJNIFolder+ DirectorySeparator + 'obj');
+    ChDir(FAndroidProjectName+DirectorySeparator+ 'libs');
+    if IOResult <> 0 then MkDir(FAndroidProjectName+ DirectorySeparator + 'libs');
+
+    ChDir(FAndroidProjectName+DirectorySeparator+ 'obj');
+    if IOResult <> 0 then MkDir(FAndroidProjectName+ DirectorySeparator + 'obj');
 
     ChDir(FPathToJNIFolder+DirectorySeparator+ 'obj'+DirectorySeparator+FJavaClassName);
     if IOResult <> 0 then MkDir(FPathToJNIFolder+ DirectorySeparator + 'obj'+DirectorySeparator+LowerCase(FJavaClassName));
 
+    {
     auxStr:='armeabi';
     if FInstructionSet = 'ArmV7' then auxStr:='armeabi-v7a';
+      ChDir(FPathToJNIFolder+DirectorySeparator+ 'libs'+DirectorySeparator+auxStr);
+      if IOResult <> 0 then MkDir(FPathToJNIFolder+ DirectorySeparator + 'libs'+DirectorySeparator+auxStr);
+    }
 
-    ChDir(FPathToJNIFolder+DirectorySeparator+ 'libs'+DirectorySeparator+auxStr);
-    if IOResult <> 0 then MkDir(FPathToJNIFolder+ DirectorySeparator + 'libs'+DirectorySeparator+auxStr);
+    ChDir(FPathToJNIFolder+DirectorySeparator+ 'libs'+DirectorySeparator+'x86');
+    if IOResult <> 0 then MkDir(FPathToJNIFolder+ DirectorySeparator + 'libs'+DirectorySeparator+'x86');
+
+    ChDir(FPathToJNIFolder+DirectorySeparator+ 'libs'+DirectorySeparator+'armeabi');
+    if IOResult <> 0 then MkDir(FPathToJNIFolder+ DirectorySeparator + 'libs'+DirectorySeparator+'armeabi');
+
+    ChDir(FPathToJNIFolder+DirectorySeparator+ 'libs'+DirectorySeparator+'armeabi-v7a');
+    if IOResult <> 0 then MkDir(FPathToJNIFolder+ DirectorySeparator + 'libs'+DirectorySeparator+'armeabi-v7a');
 
   end;
 
@@ -199,6 +227,7 @@ begin
             'The library file is maintained by Lazarus.'
 end;
 
+     //just for test! not realistic!
 function TAndroidProjectDescriptor.GetIdFromApi(api: integer): string;
 begin
   case api of
@@ -207,7 +236,7 @@ begin
      19: result:= '3';
   end;
 end;
-
+     //just for test!  not realistic!
 function TAndroidProjectDescriptor.GetFolderFromApi(api: integer): string;
 begin
   case api of
@@ -231,18 +260,21 @@ begin
   begin
     frm.SaveSettings(SettingsFilename);
 
-    FPathToJNIFolder:= frm.PathToWorkspace;      {ex. C:\adt32\ndk\platforms\android-14\arch-arm\usr\lib}
-    FPathToNdkPlataformsAndroidArcharmUsrLib:= frm.PathToNdkPlataformsAndroidArcharmUsrLib;
-    FPathToNdkToolchains:= frm.PathToNdkToolchains;
+    FPathToJNIFolder:= frm.PathToWorkspace;
+    FPathToNdkPlataforms:= frm.PathToNdkPlataforms;
 
     FInstructionSet:= frm.InstructionSet;{ ex. ArmV6}
     FFPUSet:= frm.FPUSet; {ex. Soft}
 
     FPathToJavaTemplates:= frm.PathToJavaTemplates;
-    FAndroidProjectName:= frm.AndroidProjectName;    //full project name
+    FAndroidProjectName:= frm.AndroidProjectName;    //warning: full project name = path + name !
 
     FPathToJavaJDK:= frm.PathToJavaJDK;
+
     FPathToAndroidSDK:= frm.PathToAndroidSDK;
+    FPathToAndroidNDK:= frm.PathToAndroidNDK;
+    FNDK:= frm.NDK;
+
     FPathToAntBin:= frm.PathToAntBin;
 
     FTargetApi:= frm.TargetApi;
@@ -324,11 +356,8 @@ begin
       strList.Strings[2]:='<string name="app_name">'+projName+'</string>';
       strList.SaveToFile(FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'values'+DirectorySeparator+'strings.xml');
 
-      //ChDir(FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'values');
-      //if IOResult <> 0 then MkDir(FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'values');
       CopyFile(FPathToJavaTemplates+DirectorySeparator+'values'+DirectorySeparator+'styles.xml',
                    FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'values'+DirectorySeparator+'styles.xml');
-
 
       ChDir(FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'layout');
       if IOResult <> 0 then MkDir(FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'layout');
@@ -516,7 +545,8 @@ begin
       strList.Add('....  Thank you!');
       strList.Add(' ');
       strList.Add('....  by jmpessoa_hotmail_com');
-      strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'readme.txt'); //Android Asset Packaging Tool
+      strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'readme.txt');
+
       if FModuleType = 1 then     //No GUI Android Controls...
       begin
          strList.Clear;    //dummy App.java - will be replaced with simonsayz's "App.java" template!
@@ -524,8 +554,6 @@ begin
          strList.Add(' ');
          strList.Add('import android.os.Bundle;');
          strList.Add('import android.app.Activity;');
-         strList.Add('import android.view.LayoutInflater;');
-         strList.Add('import android.view.View;');
          strList.Add('import android.widget.Toast;');
          strList.Add(' ');
          strList.Add('public class App extends Activity {');
@@ -537,16 +565,21 @@ begin
          strList.Add('       super.onCreate(savedInstanceState);');
          strList.Add('       setContentView(R.layout.activity_app);');
          strList.Add(' ');
-         strList.Add('       JNIHello jniHello = new  JNIHello(); //just for demo...');
+         strList.Add('       myHello = new JNIHello(); //just for demo...');
          strList.Add(' ');
-         strList.Add('       int sum = jniHello.getSum(2,3); //just for demo...');
-         strList.Add('       String  = jniHello.getString(1); //just for demo...');
+         strList.Add('       int sum = myHello.getSum(2,3); //just for demo...');
+         strList.Add(' ');
+         strList.Add('       String mens = myHello.getString(1); //just for demo...');
+         strList.Add(' ');
+         strList.Add('       Toast.makeText(getApplicationContext(), mens, Toast.LENGTH_SHORT).show();');
+         strList.Add('       Toast.makeText(getApplicationContext(), "Total = " + sum, Toast.LENGTH_SHORT).show();');
          strList.Add('   }');
          strList.Add('}');
          strList.SaveToFile(FPathToJavaSrc+DirectorySeparator+'App.java');
 
          strList.Clear;
          strList.Add('package '+FAntPackageName+'.'+LowerCase(projName)+';');
+         strList.Add(' ');
          strList.Add('public class JNIHello { //just for demo...');
          strList.Add(' ');
 	 strList.Add('  public native String getString(int flag);');
@@ -562,6 +595,33 @@ begin
          strList.Add(' ');
          strList.Add('}');
          strList.SaveToFile(FPathToJavaSrc+DirectorySeparator+'JNIHello.java');
+
+         strList.Clear;
+         strList.Add('<?xml version="1.0" encoding="utf-8"?>');
+         strList.Add('<manifest xmlns:android="http://schemas.android.com/apk/res/android"');
+         strList.Add('    package="'+FAntPackageName+'.'+LowerCase(projName)+'"');
+         strList.Add('    android:versionCode="1"');
+         strList.Add('    android:versionName="1.0" >');
+         strList.Add('    <uses-sdk');
+         strList.Add('        android:minSdkVersion="10"');
+         strList.Add('        android:targetSdkVersion="'+FTargetApi+'" />');
+         strList.Add('    <application');
+         strList.Add('        android:allowBackup="true"');
+         strList.Add('        android:icon="@drawable/ic_launcher"');
+         strList.Add('        android:label="@string/app_name"');
+         strList.Add('        android:theme="@style/AppTheme" >');
+         strList.Add('        <activity');
+         strList.Add('            android:name="'+FAntPackageName+'.'+LowerCase(projName)+'.App"');
+         strList.Add('            android:label="@string/app_name" >');
+         strList.Add('            <intent-filter>');
+         strList.Add('                <action android:name="android.intent.action.MAIN" />');
+         strList.Add('                <category android:name="android.intent.category.LAUNCHER" />');
+         strList.Add('            </intent-filter>');
+         strList.Add('        </activity>');
+         strList.Add('    </application>');
+         strList.Add('</manifest>');
+         strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'AndroidManifest.xml');
+
       end;
       strList.Free;
     end;
@@ -582,6 +642,7 @@ begin
         Result := mrAbort;
    end
    else Result := mrAbort;
+
 end;
 
 function TAndroidProjectDescriptor.GetAppName(className: string): string;
@@ -603,8 +664,31 @@ var
   MainFile: TLazProjectFile;
   projName, auxStr: string;
   sourceList: TStringList;
+  auxList: TStringList;
+  extInstructionSet: string;
+
+  libraries_x86: string;
+  libraries_arm: string;
+
+  customOptions_x86: string;
+
+  customOptions_armV6_soft: string;
+  customOptions_armV6_vfpv2: string;
+  customOptions_armV6_vfpv3: string;
+
+  customOptions_armV7a_soft: string;
+  customOptions_armV7a_vfpv2: string;
+  customOptions_armV7a_vfpv3: string;
+
+  pathToNdkPlataformsArm: string;
+  pathToNdkPlataformsX86: string;
+  pathToNdkToolchainsX86: string;
+  pathToNdkToolchainsArm: string;
+  osys: string;      {windows or linux-x86}
 begin
+
   inherited InitProject(AProject);
+
   sourceList:= TStringList.Create;
   projName:= LowerCase(FJavaClassName) + '.lpr';
   MainFile := AProject.CreateProjectFile(projName);
@@ -688,7 +772,7 @@ begin
      sourceList.Add('  App:= TApp.Create(nil);');
      sourceList.Add('  App.Title:= ''My Android NoGUI Library'';');
      sourceList.Add('  App.Initialize;');
-     sourceList.Add('  App.CreateForm(TAndroidModule1, AndroidModule1);');
+     sourceList.Add('  App.CreateForm(TNoGUIAndroidModule1, NoGUIAndroidModule1);');
   end;
   sourceList.Add('end.');
 
@@ -699,17 +783,61 @@ begin
   AProject.UseManifest:= False;
   AProject.UseAppBundle:= False;
 
-  {Set compiler options for Android requirements...}
+  if Pos('\', FPathToAndroidNDK) > 0 then osys:= 'windows'
+  else osys:= 'linux-x86';
 
-  {Paths}
-  AProject.LazCompilerOptions.Libraries:= FPathToNdkPlataformsAndroidArcharmUsrLib + ';' +
-                                          FPathToNdkToolchains;
-  auxStr:= 'armeabi';
-  if FInstructionSet = 'ARMv7a' then auxStr:='armeabi-v7a';
+   {Set compiler options for Android requirements}
+  pathToNdkPlataformsArm:= FPathToAndroidNDK+DirectorySeparator+'platforms'+DirectorySeparator+
+                                                'android-14'+DirectorySeparator+'arch-arm'+DirectorySeparator+
+                                                'usr'+DirectorySeparator+'lib';
 
-  AProject.LazCompilerOptions.TargetFilename:=FPathToJNIFolder+'\libs\'+auxStr;{-o}
+  if FNdk = '7c' then
+      pathToNdkToolchainsArm:= FPathToAndroidNDK+DirectorySeparator+'toolchains'+DirectorySeparator+
+                                                 'arm-linux-androideabi-4.4.3'+DirectorySeparator+
+                                                 'prebuilt'+DirectorySeparator+osys+DirectorySeparator+
+                                                 'lib'+DirectorySeparator+'gcc'+DirectorySeparator+
+                                                 'arm-linux-androideabi'+DirectorySeparator+'4.4.3';
+  if FNDK = '9' then
+      pathToNdkToolchainsArm:= FPathToAndroidNDK+DirectorySeparator+'toolchains'+DirectorySeparator+
+                                                 'arm-linux-androideabi-4.6'+DirectorySeparator+
+                                                 'prebuilt'+DirectorySeparator+osys+DirectorySeparator+
+                                                 'lib'+DirectorySeparator+'gcc'+DirectorySeparator+
+                                                 'arm-linux-androideabi'+DirectorySeparator+'4.6';
 
-  {Parsing}
+  libraries_arm:= pathToNdkPlataformsArm+';'+pathToNdkToolchainsArm;
+
+  pathToNdkPlataformsX86:= FPathToAndroidNDK+DirectorySeparator+'platforms'+DirectorySeparator+
+                                             'android-14'+DirectorySeparator+'arch-x86'+DirectorySeparator+
+                                             'usr'+DirectorySeparator+'lib';
+  if FNdk = '7c' then
+      pathToNdkToolchainsX86:= FPathToAndroidNDK+DirectorySeparator+'toolchains'+DirectorySeparator+
+                                                 'x86-4.4.3'+DirectorySeparator+'prebuilt'+DirectorySeparator+
+                                                 osys+DirectorySeparator+'lib'+DirectorySeparator+
+                                                 'gcc'+DirectorySeparator+'i686-android-linux'+DirectorySeparator+'4.4.3';
+  if FNDK = '9' then
+      pathToNdkToolchainsX86:= FPathToAndroidNDK+DirectorySeparator+'toolchains'+DirectorySeparator+
+                                                 'x86-4.6'+DirectorySeparator+'prebuilt'+DirectorySeparator+
+                                                 osys+DirectorySeparator+'lib'+DirectorySeparator+'gcc'+DirectorySeparator+
+                                                 'i686-android-linux'+DirectorySeparator+'4.6';
+
+  libraries_x86:= pathToNdkPlataformsX86+';'+pathToNdkToolchainsX86;
+
+  if Pos('x86', FInstructionSet) > 0 then
+  begin
+     AProject.LazCompilerOptions.TargetCPU:= 'i386';    {-P}
+     AProject.LazCompilerOptions.Libraries:= libraries_x86;
+     FPathToNdkPlataforms:= pathToNdkPlataformsX86;
+     FPathToNdkToolchains:= pathToNdkToolchainsX86;
+  end
+  else
+  begin
+     AProject.LazCompilerOptions.TargetCPU:= 'arm';    {-P}
+     AProject.LazCompilerOptions.Libraries:= libraries_arm;
+     FPathToNdkPlataforms:= pathToNdkPlataformsArm;
+     FPathToNdkToolchains:= pathToNdkToolchainsArm
+  end;
+
+   {Parsing}
   AProject.LazCompilerOptions.SyntaxMode:= 'delphi';  {-M}
   AProject.LazCompilerOptions.CStyleOperators:= True;
   AProject.LazCompilerOptions.AllowLabel:= True;
@@ -719,29 +847,160 @@ begin
   AProject.LazCompilerOptions.UseLineInfoUnit:= True;
    {Code Generation}
   AProject.LazCompilerOptions.TargetOS:= 'android'; {-T}
-  AProject.LazCompilerOptions.TargetCPU:= 'arm';    {-P}
+
   AProject.LazCompilerOptions.OptimizationLevel:= 1;
   AProject.LazCompilerOptions.Win32GraphicApp:= False;
-   {Link}
+
+  {Link}
   AProject.LazCompilerOptions.StripSymbols:= True; {-Xs}
   AProject.LazCompilerOptions.LinkSmart:= True {-XX};
   AProject.LazCompilerOptions.GenerateDebugInfo:= False;
-   {Verbose}
-   {Others}
+
+  {Verbose}
+      //.....................
+  auxList:= TStringList.Create;
+  customOptions_x86:= '-dANDROID -Xd'+
+                      ' -FL'+pathToNdkPlataformsX86+DirectorySeparator+'libdl.so' +  {as dynamic linker}
+                      ' -FU'+FPathToJNIFolder+DirectorySeparator+'obj'+ DirectorySeparator+ FJavaClassName +
+                      ' -o'+FPathToJNIFolder+DirectorySeparator+'libs'+DirectorySeparator+'x86'+DirectorySeparator+'lib'+ LowerCase(FJavaClassName)+'.so';  {-o}
+
+  auxList.Clear;
+  auxList.Add('<Libraries Value="'+libraries_x86+'"/>');
+  auxList.Add('<TargetCPU Value="i386"/>');
+  auxList.Add('<CustomOptions Value="'+customOptions_x86+'"/>');
+  auxList.SaveToFile(FPathToJNIFolder+DirectorySeparator+'jni'+DirectorySeparator+'build-modes'+DirectorySeparator+'build_x86.txt');
+
+  customOptions_armV6_soft:= '-dANDROID -Xd -CpArmV6 -CfSoft'+
+                             ' -FL'+pathToNdkPlataformsArm+DirectorySeparator+'libdl.so' +  {as dynamic linker}
+                             ' -FU'+FPathToJNIFolder+DirectorySeparator+'obj'+ DirectorySeparator+ FJavaClassName +
+                             ' -o'+FPathToJNIFolder+DirectorySeparator+'libs'+DirectorySeparator+'armeabi'+DirectorySeparator+'lib'+ LowerCase(FJavaClassName)+'.so';  {-o}
+  auxList.Clear;
+  auxList.Add('<Libraries Value="'+libraries_arm+'"/>');
+  auxList.Add('<TargetCPU Value="arm"/>');
+  auxList.Add('<CustomOptions Value="'+customOptions_armV6_soft+'"/>');
+  auxList.SaveToFile(FPathToJNIFolder+DirectorySeparator+'jni'+DirectorySeparator+'build-modes'+DirectorySeparator+'build_armV6_soft.txt');
+
+  customOptions_armV6_vfpV2:= '-dANDROID -Xd -CpArmV6 -CfVfpV2'+
+                              ' -FL'+pathToNdkPlataformsArm+DirectorySeparator+'libdl.so' +  {as dynamic linker}
+                              ' -FU'+FPathToJNIFolder+DirectorySeparator+'obj'+ DirectorySeparator+ FJavaClassName +
+                              ' -o'+FPathToJNIFolder+DirectorySeparator+'libs'+DirectorySeparator+'armeabi'+DirectorySeparator+'lib'+ LowerCase(FJavaClassName)+'.so';  {-o}
+  auxList.Clear;
+  auxList.Add('<Libraries Value="'+libraries_arm+'"/>');
+  auxList.Add('<TargetCPU Value="arm"/>');
+  auxList.Add('<CustomOptions Value="'+customOptions_armV6_vfpV2+'"/>');
+  auxList.SaveToFile(FPathToJNIFolder+DirectorySeparator+'jni'+DirectorySeparator+'build-modes'+DirectorySeparator+'build_armV6_vfpV2.txt');
+
+  customOptions_armV6_vfpV3:= '-dANDROID -Xd -CpArmV6 -CfVfpV3'+
+                              ' -FL'+pathToNdkPlataformsArm+DirectorySeparator+'libdl.so' +  {as dynamic linker}
+                              ' -FU'+FPathToJNIFolder+DirectorySeparator+'obj'+ DirectorySeparator+ FJavaClassName +
+                              ' -o'+FPathToJNIFolder+DirectorySeparator+'libs'+DirectorySeparator+'armeabi'+DirectorySeparator+'lib'+ LowerCase(FJavaClassName)+'.so';  {-o}
+  auxList.Clear;
+  auxList.Add('<Libraries Value="'+libraries_arm+'"/>');
+  auxList.Add('<TargetCPU Value="arm"/>');
+  auxList.Add('<CustomOptions Value="'+customOptions_armV6_vfpV3+'"/>');
+  auxList.SaveToFile(FPathToJNIFolder+DirectorySeparator+'jni'+DirectorySeparator+'build-modes'+DirectorySeparator+'build_armV6_vfpV3.txt');
+
+  customOptions_armV7a_soft:= '-dANDROID -Xd -CpArmV7a -CfSoft'+
+                              ' -FL'+pathToNdkPlataformsArm+DirectorySeparator+'libdl.so' +  {as dynamic linker}
+                              ' -FU'+FPathToJNIFolder+DirectorySeparator+'obj'+ DirectorySeparator+ FJavaClassName +
+                              ' -o'+FPathToJNIFolder+DirectorySeparator+'libs'+DirectorySeparator+'armeabi-v7a'+DirectorySeparator+'lib'+ LowerCase(FJavaClassName)+'.so';  {-o}
+  auxList.Clear;
+  auxList.Add('<Libraries Value="'+libraries_arm+'"/>');
+  auxList.Add('<TargetCPU Value="arm"/>');
+  auxList.Add('<CustomOptions Value="'+customOptions_armV7a_soft+'"/>');
+  auxList.SaveToFile(FPathToJNIFolder+DirectorySeparator+'jni'+DirectorySeparator+'build-modes'+DirectorySeparator+'build_armV7a_soft.txt');
+
+  customOptions_armV7a_vfpV2:= '-dANDROID -Xd -CpArmV7a -CfVfpV2'+
+                               ' -FL'+pathToNdkPlataformsArm+DirectorySeparator+'libdl.so' +  {as dynamic linker}
+                               ' -FU'+FPathToJNIFolder+DirectorySeparator+'obj'+ DirectorySeparator+ FJavaClassName +
+                               ' -o'+FPathToJNIFolder+DirectorySeparator+'libs'+DirectorySeparator+'armeabi-v7a'+DirectorySeparator+'lib'+ LowerCase(FJavaClassName)+'.so';  {-o}
+  auxList.Clear;
+  auxList.Add('<Libraries Value="'+libraries_arm+'"/>');
+  auxList.Add('<TargetCPU Value="arm"/>');
+  auxList.Add('<CustomOptions Value="'+customOptions_armV7a_vfpV2+'"/>');
+  auxList.SaveToFile(FPathToJNIFolder+DirectorySeparator+'jni'+DirectorySeparator+'build-modes'+DirectorySeparator+'build_armV7a_vfpV2.txt');
+
+  customOptions_armV7a_vfpV3:= '-dANDROID -Xd -CpArmV7a -CfVfpV3'+
+                               ' -FL'+pathToNdkPlataformsArm+DirectorySeparator+'libdl.so' +  {as dynamic linker}
+                               ' -FU'+FPathToJNIFolder+DirectorySeparator+'obj'+ DirectorySeparator+ FJavaClassName +
+                               ' -o'+FPathToJNIFolder+DirectorySeparator+'libs'+DirectorySeparator+'armeabi-v7a'+DirectorySeparator+'lib'+ LowerCase(FJavaClassName)+'.so';  {-o}
+  auxList.Clear;
+  auxList.Add('<Libraries Value="'+libraries_arm+'"/>');
+  auxList.Add('<TargetCPU Value="arm"/>');
+  auxList.Add('<CustomOptions Value="'+customOptions_armV7a_vfpV3+'"/>');
+  auxList.SaveToFile(FPathToJNIFolder+DirectorySeparator+'jni'+DirectorySeparator+'build-modes'+DirectorySeparator+'build_armV7a_vfpV3.txt');
+
+  auxList.Clear;
+  auxList.Add('How To Get More Builds:');
+  auxList.Add(' ');
+  auxList.Add('   :: Warning: Your system [Laz4Android] needs to be prepared for the various builds!');
+  auxList.Add(' ');
+  auxList.Add('1. Edit Lazarus project file "*.lpi": [use notepad like editor]');
+  auxList.Add(' ');
+  auxList.Add('   > Open the "*.lpi" project file');
+  auxList.Add(' ');
+  auxList.Add('       -If needed replace the line <Libraries ..... /> in the "*.lpi" by line from "build_*.txt"');
+  auxList.Add('       -If needed replace the line <TargetCPU ..... /> in the "*.lpi" by line from "build_*.txt"');
+  auxList.Add('       -If needed replace the line <CustomOptions ..... /> in the "*.lpi" by line from "build_*.txt"');
+  auxList.Add(' ');
+  auxList.Add('   > Save the "*.lpi" project file ');
+  auxList.Add(' ');
+  auxList.Add('2. From Laz4Android IDE');
+  auxList.Add(' ');
+  auxList.Add('   >Reopen the Project');
+  auxList.Add(' ');
+  auxList.Add('   > Run -> Build');
+  auxList.Add(' ');
+  auxList.Add('4. Repeat for others "build_*.txt" if needed...');
+  auxList.Add(' ');
+  if FProjectModel = 'Ant' then
+    auxList.Add('4. Execute [double click] the "build.bat" file to get the Apk !')
+  else
+  begin
+    auxList.Add('4. From Eclipse IDE:');
+    auxList.Add(' ');
+    auxList.Add('   -right click your  project: -> Refresh');
+    auxList.Add(' ');
+    auxList.Add('   -right click your  project: -> Run as -> Android Application');
+  end;
+  auxList.Add(' ');
+  auxList.Add(' ');
+  auxList.Add(' ');
+  auxList.Add('      Thank you!');
+  auxList.Add('      By  ___jmpessoa_hotmail.com_____');
+  auxList.SaveToFile(FPathToJNIFolder+DirectorySeparator+'jni'+DirectorySeparator+'build-modes'+DirectorySeparator+'readme.txt');
+
+  auxList.Free;
+  extInstructionSet:='';
+  if FInstructionSet <> 'x86' then extInstructionSet:= ' -Cp'+FInstructionSet + ' -Cf'+ FFPUSet;
+
+  auxStr:= 'armeabi';
+  if FInstructionSet = 'ARMv7a' then auxStr:='armeabi-v7a';
+  if FInstructionSet = 'x86' then auxStr:='x86';
+
+  AProject.LazCompilerOptions.TargetFilename:=
+                              FPathToJNIFolder+DirectorySeparator+'libs'+DirectorySeparator+auxStr+DirectorySeparator+'lib'+LowerCase(FJavaClassName)+'.so';{-o}
+
+  {Others}
   AProject.LazCompilerOptions.CustomOptions:=
-                        '-dANDROID -Xd -Cp'+FInstructionSet+ ' -Cf'+ FFPUSet+
-                        ' -FL'+FPathToNdkPlataformsAndroidArcharmUsrLib+DirectorySeparator+'libdl.so' +  {as dynamic linker}
+                        '-dANDROID -Xd'+extInstructionSet+
+                        ' -FL'+FPathToNdkPlataforms+DirectorySeparator+'libdl.so' +  {as dynamic linker}
                         ' -FU'+FPathToJNIFolder+DirectorySeparator+'obj'+ DirectorySeparator+ FJavaClassName +
-                        ' -o'+FPathToJNIFolder+DirectorySeparator+'libs'+DirectorySeparator+auxStr+DirectorySeparator+'lib'+ LowerCase(FJavaClassName)+'.so';  {-o}
-
-                         //-o'+FPathToJNIFolder+'\libs\'+auxStr+'\'+'lib'+LowerCase(FJavaClassName)+'.so'
-
+                        ' -o'+FPathToJNIFolder+DirectorySeparator+'libs'+DirectorySeparator+auxStr+DirectorySeparator+'lib'+LowerCase(FJavaClassName)+'.so';  {-o}
   sourceList.Free;
   Result := mrOK;
 end;
 
 function TAndroidProjectDescriptor.CreateStartFiles(AProject: TLazProject): TModalResult;
 begin
+  if FModuleType = 0 then  //GUI Controls
+  begin
+    AndroidFileDescriptor.ResourceClass:= TAndroidModule;
+  end
+  else // =1 -> No GUI Controls
+  begin
+    AndroidFileDescriptor.ResourceClass:= TNoGUIAndroidModule;
+  end;
   LazarusIDE.DoNewEditorFile(AndroidFileDescriptor, '', '',
                              [nfIsPartOfProject,nfOpenInEditor,nfCreateDefaultSrc]);
   Result := mrOK;
@@ -753,7 +1012,6 @@ constructor TAndroidFileDescPascalUnitWithResource.Create;
 begin
   inherited Create;
   Name := 'Android DataModule';
-  ResourceClass := TAndroidModule;
 end;
 
 function TAndroidFileDescPascalUnitWithResource.GetLocalizedName: string;
@@ -815,10 +1073,12 @@ begin
   strList:= TStringList.Create;
   strList.Add(' ');
   strList.Add('type');
+
   if ModuleType = 0 then //GUI controls module
     strList.Add('  T' + ResourceName + ' = class(jForm)')
   else //generic module
     strList.Add('  T' + ResourceName + ' = class(TDataModule)');
+
   strList.Add('   private');
   strList.Add('     {private declarations}');
   strList.Add('   public');

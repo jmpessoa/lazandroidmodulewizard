@@ -478,7 +478,7 @@ type
                    lpTwoThirdOfParent ,lpOneThirdOfParent, lpOneEighthOfParent,
                    lpOneFifthOfParent, lpTwoFifthOfParent, lpThreeFifthOfParent, lpFourFifthOfParent,
                    lp16px, lp24px, lp32px, lp40px, lp48px, lp72px, lp96px);
-  //TLayoutParamsEx = (lpMatchParent, lpWrapContent, lpTwoThirdParent, lpHalfParent,  lpThirdParent, lpQuarterParent);
+
   TSide = (sdW, sdH);
 
   TScreenStyle   = (ssSensor,       // by Device Status
@@ -489,11 +489,13 @@ type
                     wvOnBefore,
                     wvOnFinish,
                     wvOnError);
+
   TEffect        = DWord;
   TAnimation     = Record
                     In_  : TEffect;
                     Out_ : TEffect;
                    end;
+
   TChangeType    = (ctChangeBefore,
                     ctChange,
                     ctChangeAfter);
@@ -562,6 +564,7 @@ type
            {
            The folder Digital Camera Image (DCIM) stored photographs from our digital camera
            }
+  //by jmpessoa
   TEnvPath    = record
                  App         : string;    // /data/app/com.kredix-1.apk
                  Dat         : string;    // /data/data/com.kredix/files
@@ -669,11 +672,10 @@ type
     Procedure GenEvent_OnClick(Obj: TObject);
   public
     FormState     : TjFormState;
-
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
-    procedure Init(App: jApp);
 
+    procedure Init(App: jApp);
     Procedure Show;
     Procedure Close;
     Procedure Refresh;
@@ -703,7 +705,7 @@ type
     property OnJNIPrompt: TOnNotify read FOnJNIPrompt write FOnJNIPrompt;
   end;
 
-  {jControl - new by jmpessoa}
+  {jControl - NEW by jmpessoa}
 
   jControl = class(TComponent)
   protected
@@ -720,7 +722,7 @@ type
     property App: jApp read FApp write FApp;
   end;
 
-   //new by jmpessoa
+   //NEW by jmpessoa
   jImageList = class(jControl)
   private
     FImages : TStrings;
@@ -738,7 +740,7 @@ type
     property Images: TStrings read FImages write SetImages;
   end;
 
-  //new by jmpessoa
+  //NEW by jmpessoa
   jHttpClient = class(jControl)
   private
    FUrl : string;
@@ -760,7 +762,7 @@ type
     property Urls: TStrings read FUrls write SetUrls;
   end;
 
-  //new by jmpessoa
+  //NEW by jmpessoa
   //warning: not for emualtor!
   jSMTPClient = class(jControl)
   private
@@ -789,7 +791,7 @@ type
    property MailMessage: TStrings read FMailMessage write SetMailMessage;
   end;
 
-  //new by jmpessoa
+  //NEW by jmpessoa
   //warning: not for emualtor!
   jSMS = class(jControl)
   private
@@ -817,7 +819,7 @@ type
    property ContactListDelimiter: char read FContactListDelimiter write FContactListDelimiter;
   end;
 
-  //new by jmpessoa
+  //NEW by jmpessoa
   jCamera = class(jControl)
   private
    FFilename : string;
@@ -980,7 +982,7 @@ type
   jVisualControl = class;
   jPanel = class;
 
-  {jVisualControl - new by jmpessoa}
+  {jVisualControl - NEW by jmpessoa}
   jVisualControl = class(jControl)
   protected
     // Java
@@ -1000,7 +1002,7 @@ type
     FPositionRelativeToAnchor: TPositionRelativeToAnchorIDSet;
     FPositionRelativeToParent: TPositionRelativeToParentSet;
 
-    //FGravity      : TGravitySet;    TODO  - java "setGravity"
+    //FGravity      : TGravitySet;    TODO: by jmpessoa  - java "setGravity"
 
     FLParamWidth: TLayoutParams;
     FLParamHeight: TLayoutParams;
@@ -1028,7 +1030,7 @@ type
   published
     property Id: DWord read FId write SetId;
     property Anchor  : jVisualControl read FAnchor write SetAnchor;
-    //property Gravity      : TGravitySet read FGravity write FGravity;   TODO!
+    //property Gravity      : TGravitySet read FGravity write FGravity;   TODO: by jmpessoa
     property PosRelativeToAnchor: TPositionRelativeToAnchorIDSet read FPositionRelativeToAnchor
                                                                        write FPositionRelativeToAnchor;
     property PosRelativeToParent: TPositionRelativeToParentSet read FPositionRelativeToParent
@@ -1207,7 +1209,6 @@ type
     procedure Init(App: jApp); override;
     Procedure Refresh;
     Procedure UpdateLayout; override;
-
     //Property
     property Parent: jObject  read  FjPRLayout write SetParent; // Java : Parent Relative Layout
   published
@@ -1260,7 +1261,6 @@ type
     //FText      : string;
     FChecked   : Boolean;
     //FOnClick   : TOnNotify;
-
     Procedure SetVisible  (Value : Boolean);
     Procedure SetColor    (Value : TARGBColorBridge);
     Function  GetText            : string;
@@ -1302,10 +1302,10 @@ type
     Procedure SetVisible  (Value : Boolean);
     Procedure SetColor    (Value : TARGBColorBridge);
 
-    Function  GetProgress: integer;
+    function  GetProgress: integer;
     Procedure SetProgress (Value : integer);
-    Function  GetMax: integer;   //by jmpessoa
-    Procedure SetMax (Value : integer);  //by jmpessoa
+    function  GetMax: integer;   //by jmpessoa
+    procedure SetMax (Value : integer);  //by jmpessoa
 
     Procedure SetStyle(Value : TProgressBarStyle);
     procedure SetParent(Value: jObject);
@@ -2597,7 +2597,7 @@ end;
 
 function jForm.GetOrientation: integer;
 begin
-   Result:= App.Orientation; //jSystem_GetOrientation(App.Jni.jEnv, App.Jni.jThis, App.Jni.jActivity{context});
+  Result:= App.Orientation; //jSystem_GetOrientation(App.Jni.jEnv, App.Jni.jThis, App.Jni.jActivity{context});
 end;
 
 Procedure jForm.setEnabled(Value: Boolean);
@@ -2611,7 +2611,7 @@ Procedure jForm.SetVisible(Value: Boolean);
 begin
  FVisible := Value;
  if FInitialized then
-    jForm_SetVisibility(App.Jni.jEnv, App.Jni.jThis, FjObject ,FVisible);
+   jForm_SetVisibility(App.Jni.jEnv, App.Jni.jThis, FjObject ,FVisible);
 end;
 
 Procedure jForm.SetColor(Value: TARGBColorBridge);
