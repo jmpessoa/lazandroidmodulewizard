@@ -673,15 +673,16 @@ begin
     ListManifest.LoadFromFile(FPathToJavaTemplates + DirectorySeparator + 'AndroidManifest.txt');
     strAfterReplace  := StringReplace(ListManifest.Text, 'dummyPackage',strPack, [rfReplaceAll, rfIgnoreCase]);
 
-    strPack:= strPack+'.'+FMainActivity; //App;
+    strPack:= strPack+'.'+FMainActivity; {App}
     strAfterReplace  := StringReplace(strAfterReplace, 'dummyAppName',strPack, [rfReplaceAll, rfIgnoreCase]);
 
-    strAfterReplace  := StringReplace(ListManifest.Text, 'dummyTargetApi', FTargetApi, [rfReplaceAll, rfIgnoreCase]);
+    strAfterReplace  := StringReplace(strAfterReplace, 'dummyTargetApi', FTargetApi, [rfReplaceAll, rfIgnoreCase]);
 
     ListManifest.Clear;
     ListManifest.Text:= strAfterReplace;
     ListManifest.SaveToFile(FAndroidProjectName+DirectorySeparator+'AndroidManifest.xml');
     ListManifest.Free;
+
   end;
 end;
 
