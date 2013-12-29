@@ -1,0 +1,214 @@
+object AndroidModule6: TAndroidModule6
+  OnCreate = DataModuleCreate
+  OldCreateOrder = False
+  BackButton = True
+  Title = 'jForm'
+  BackgroundColor = colbrBlack
+  OnCloseQuery = DataModuleCloseQuery
+  OnRotate = DataModuleRotate
+  OnJNIPrompt = DataModuleJNIPrompt
+  Height = 443
+  HorizontalOffset = 319
+  VerticalOffset = 145
+  Width = 224
+  object jTextView1: jTextView
+    Id = 26515
+    PosRelativeToAnchor = []
+    PosRelativeToParent = [rpCenterHorizontal]
+    LayoutParamWidth = lpWrapContent
+    LayoutParamHeight = lpWrapContent
+    MarginLeft = 10
+    MarginTop = 10
+    MarginRight = 10
+    MarginBottom = 10
+    Alignment = taLeft
+    Visible = True
+    Enabled = True
+    BackgroundColor = colbrDefault
+    FontColor = colbrYellow
+    FontSize = 0
+    Text = 'List View Demo'
+    left = 104
+    top = 24
+  end
+  object jTextView2: jTextView
+    Id = 36024
+    Anchor = jTextView1
+    PosRelativeToAnchor = [raBelow]
+    PosRelativeToParent = [rpLeft]
+    LayoutParamWidth = lpWrapContent
+    LayoutParamHeight = lpWrapContent
+    MarginLeft = 10
+    MarginTop = 10
+    MarginRight = 10
+    MarginBottom = 10
+    Alignment = taLeft
+    Visible = True
+    Enabled = True
+    BackgroundColor = colbrDefault
+    FontColor = colbrSilver
+    FontSize = 0
+    Text = 'Enter New Item:'
+    left = 48
+    top = 96
+  end
+  object jEditText1: jEditText
+    Id = 53166
+    Anchor = jTextView2
+    PosRelativeToAnchor = [raBelow]
+    PosRelativeToParent = [rpLeft]
+    LayoutParamWidth = lpTwoThirdOfParent
+    LayoutParamHeight = lpWrapContent
+    MarginLeft = 10
+    MarginTop = 10
+    MarginRight = 10
+    MarginBottom = 10
+    Alignment = taLeft
+    InputTypeEx = itxText
+    LineMaxLength = 360
+    Visible = True
+    BackgroundColor = colbrWhite
+    FontColor = colbrDefault
+    FontSize = 0
+    SingleLine = True
+    ScrollBarStyle = scrNone
+    MaxLines = 1
+    HorScrollBar = False
+    VerScrollBar = False
+    WrappingLine = True
+    left = 48
+    top = 152
+  end
+  object jButton1: jButton
+    Id = 0
+    Anchor = jEditText1
+    PosRelativeToAnchor = [raToRightOf, raAlignBaseline]
+    PosRelativeToParent = []
+    LayoutParamWidth = lpOneThirdOfParent
+    LayoutParamHeight = lpWrapContent
+    MarginLeft = 5
+    MarginTop = 5
+    MarginRight = 5
+    MarginBottom = 5
+    Visible = True
+    BackgroundColor = colbrDefault
+    Text = 'Add'
+    FontColor = colbrLightSteelBlue
+    FontSize = 0
+    OnClick = jButton1Click
+    left = 144
+    top = 152
+  end
+  object jEditText2: jEditText
+    Id = 80017
+    Anchor = jTextView3
+    PosRelativeToAnchor = [raBelow]
+    PosRelativeToParent = [rpLeft]
+    LayoutParamWidth = lpOneThirdOfParent
+    LayoutParamHeight = lpWrapContent
+    MarginLeft = 10
+    MarginTop = 10
+    MarginRight = 10
+    MarginBottom = 10
+    Alignment = taLeft
+    InputTypeEx = itxText
+    LineMaxLength = 360
+    Visible = True
+    BackgroundColor = colbrWhite
+    FontColor = colbrDefault
+    FontSize = 0
+    SingleLine = True
+    ScrollBarStyle = scrNone
+    MaxLines = 1
+    HorScrollBar = False
+    VerScrollBar = False
+    WrappingLine = True
+    left = 48
+    top = 320
+  end
+  object jTextView3: jTextView
+    Id = 5036
+    Anchor = jListView1
+    PosRelativeToAnchor = [raBelow]
+    PosRelativeToParent = [rpLeft]
+    LayoutParamWidth = lpWrapContent
+    LayoutParamHeight = lpWrapContent
+    MarginLeft = 10
+    MarginTop = 10
+    MarginRight = 10
+    MarginBottom = 10
+    Alignment = taLeft
+    Visible = True
+    Enabled = True
+    BackgroundColor = colbrDefault
+    FontColor = colbrSilver
+    FontSize = 0
+    Text = 'Enter Item Index:'
+    left = 48
+    top = 264
+  end
+  object jButton2: jButton
+    Id = 63804
+    Anchor = jEditText2
+    PosRelativeToAnchor = [raToRightOf, raAlignBaseline]
+    PosRelativeToParent = []
+    LayoutParamWidth = lpTwoThirdOfParent
+    LayoutParamHeight = lpWrapContent
+    MarginLeft = 5
+    MarginTop = 5
+    MarginRight = 5
+    MarginBottom = 5
+    Visible = True
+    BackgroundColor = colbrDefault
+    Text = 'Delete'
+    FontColor = colbrLightSteelBlue
+    FontSize = 0
+    OnClick = jButton2Click
+    left = 144
+    top = 320
+  end
+  object jListView1: jListView
+    Id = 8951
+    Anchor = jEditText1
+    PosRelativeToAnchor = [raBelow]
+    PosRelativeToParent = []
+    LayoutParamWidth = lpMatchParent
+    LayoutParamHeight = lpOneThirdOfParent
+    MarginLeft = 10
+    MarginTop = 0
+    MarginRight = 10
+    MarginBottom = 0
+    Items.Strings = (
+      'Lazarus'
+      'Pascal'
+      'Android'
+    )
+    Visible = True
+    BackgroundColor = colbrLightSteelBlue
+    FontColor = colbrRed
+    FontSize = 0
+    OnClickItem = jListView1ClickItem
+    left = 96
+    top = 208
+  end
+  object jButton3: jButton
+    Id = 0
+    Anchor = jEditText2
+    PosRelativeToAnchor = [raBelow]
+    PosRelativeToParent = []
+    LayoutParamWidth = lpMatchParent
+    LayoutParamHeight = lpWrapContent
+    MarginLeft = 5
+    MarginTop = 5
+    MarginRight = 5
+    MarginBottom = 5
+    Visible = True
+    BackgroundColor = colbrDefault
+    Text = 'ListView Items Clear '
+    FontColor = colbrLightSteelBlue
+    FontSize = 0
+    OnClick = jButton3Click
+    left = 96
+    top = 376
+  end
+end

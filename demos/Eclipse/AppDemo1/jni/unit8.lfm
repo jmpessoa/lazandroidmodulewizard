@@ -1,0 +1,87 @@
+object AndroidModule8: TAndroidModule8
+  OnCreate = DataModuleCreate
+  OldCreateOrder = False
+  BackButton = True
+  Title = 'jForm'
+  BackgroundColor = colbrBlack
+  OnCloseQuery = DataModuleCloseQuery
+  OnRotate = DataModuleRotate
+  OnJNIPrompt = DataModuleJNIPrompt
+  Height = 239
+  HorizontalOffset = 319
+  VerticalOffset = 145
+  Width = 293
+  object jTextView1: jTextView
+    Id = 22765
+    PosRelativeToAnchor = []
+    PosRelativeToParent = [rpCenterHorizontal]
+    LayoutParamWidth = lpWrapContent
+    LayoutParamHeight = lpWrapContent
+    MarginLeft = 10
+    MarginTop = 10
+    MarginRight = 10
+    MarginBottom = 10
+    Alignment = taLeft
+    Visible = True
+    Enabled = True
+    BackgroundColor = colbrDefault
+    FontColor = colbrMediumSpringGreen
+    FontSize = 0
+    Text = 'Custom View Demo: Drag the cube'
+    left = 93
+    top = 25
+  end
+  object jButton1: jButton
+    Id = 0
+    Anchor = jView1
+    PosRelativeToAnchor = [raBelow]
+    PosRelativeToParent = []
+    LayoutParamWidth = lpMatchParent
+    LayoutParamHeight = lpWrapContent
+    MarginLeft = 5
+    MarginTop = 5
+    MarginRight = 5
+    MarginBottom = 5
+    Visible = True
+    BackgroundColor = colbrDefault
+    Text = 'Save Image'
+    FontColor = colbrMediumSpringGreen
+    FontSize = 0
+    OnClick = jButton1Click
+    left = 93
+    top = 152
+  end
+  object jView1: jView
+    Id = 75225
+    Anchor = jTextView1
+    PosRelativeToAnchor = [raBelow]
+    PosRelativeToParent = []
+    LayoutParamWidth = lpMatchParent
+    LayoutParamHeight = lpHalfOfParent
+    MarginLeft = 10
+    MarginTop = 10
+    MarginRight = 10
+    MarginBottom = 10
+    Visible = True
+    BackgroundColor = colbrLightSteelBlue
+    OnDraw = jView1Draw
+    OnTouchMove = jView1TouchMove
+    left = 96
+    top = 88
+  end
+  object jBitmap1: jBitmap
+    ImageIndex = 0
+    Images = jImageList1
+    Width = 0
+    Height = 0
+    left = 152
+    top = 88
+  end
+  object jImageList1: jImageList
+    Images.Strings = (
+      'image01.png'
+    )
+    left = 216
+    top = 88
+  end
+end

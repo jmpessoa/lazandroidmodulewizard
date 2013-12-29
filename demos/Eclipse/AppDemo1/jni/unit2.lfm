@@ -1,0 +1,320 @@
+object AndroidModule2: TAndroidModule2
+  OnCreate = DataModuleCreate
+  OldCreateOrder = False
+  BackButton = False
+  Title = 'jForm'
+  BackgroundColor = colbrBlack
+  OnCloseQuery = DataModuleCloseQuery
+  OnRotate = DataModuleRotate
+  OnJNIPrompt = DataModuleJNIPrompt
+  Height = 565
+  HorizontalOffset = 324
+  VerticalOffset = 19
+  Width = 356
+  object jTextView1: jTextView
+    Id = 41266
+    PosRelativeToAnchor = []
+    PosRelativeToParent = [rpCenterHorizontal]
+    LayoutParamWidth = lpWrapContent
+    LayoutParamHeight = lpWrapContent
+    MarginLeft = 10
+    MarginTop = 10
+    MarginRight = 10
+    MarginBottom = 10
+    Alignment = taLeft
+    Visible = True
+    Enabled = True
+    BackgroundColor = colbrDefault
+    FontColor = colbrBlue
+    FontSize = 0
+    Text = 'Android Components Demo'
+    left = 136
+    top = 24
+  end
+  object jButton1: jButton
+    Id = 35128
+    Anchor = jTextView2
+    PosRelativeToAnchor = [raBelow]
+    PosRelativeToParent = []
+    LayoutParamWidth = lpHalfOfParent
+    LayoutParamHeight = lpWrapContent
+    MarginLeft = 5
+    MarginTop = 5
+    MarginRight = 5
+    MarginBottom = 5
+    Visible = True
+    BackgroundColor = colbrDefault
+    Text = 'Base Controls'
+    FontColor = colbrDefault
+    FontSize = 0
+    OnClick = jButton1Click
+    left = 104
+    top = 144
+  end
+  object jButton2: jButton
+    Id = 0
+    Anchor = jButton1
+    PosRelativeToAnchor = [raToRightOf, raAlignBaseline]
+    PosRelativeToParent = []
+    LayoutParamWidth = lpHalfOfParent
+    LayoutParamHeight = lpWrapContent
+    MarginLeft = 5
+    MarginTop = 5
+    MarginRight = 5
+    MarginBottom = 5
+    Visible = True
+    BackgroundColor = colbrDefault
+    Text = 'System Info'
+    FontColor = colbrDefault
+    FontSize = 0
+    OnClick = jButton2Click
+    left = 168
+    top = 144
+  end
+  object jTextView2: jTextView
+    Id = 93524
+    Anchor = jTextView1
+    PosRelativeToAnchor = [raBelow]
+    PosRelativeToParent = [rpCenterHorizontal]
+    LayoutParamWidth = lpWrapContent
+    LayoutParamHeight = lpWrapContent
+    MarginLeft = 10
+    MarginTop = 0
+    MarginRight = 10
+    MarginBottom = 10
+    Alignment = taLeft
+    Visible = True
+    Enabled = True
+    BackgroundColor = colbrDefault
+    FontColor = colbrBlue
+    FontSize = 0
+    Text = 'Simonsayz''s Control for Lazarus by jmpessoa '
+    left = 136
+    top = 88
+  end
+  object jImageView1: jImageView
+    Id = 0
+    PosRelativeToAnchor = []
+    PosRelativeToParent = []
+    LayoutParamWidth = lpMatchParent
+    LayoutParamHeight = lpMatchParent
+    MarginLeft = 0
+    MarginTop = 0
+    MarginRight = 0
+    MarginBottom = 0
+    ImageIndex = 0
+    Images = jImageList1
+    Visible = True
+    BackgroundColor = colbrNone
+    IsBackgroundImage = True
+    left = 24
+    top = 8
+  end
+  object jImageList1: jImageList
+    Images.Strings = (
+      'bg_gr.png'
+    )
+    left = 24
+    top = 80
+  end
+  object jButton3: jButton
+    Id = 2770
+    Anchor = jButton1
+    PosRelativeToAnchor = [raBelow]
+    PosRelativeToParent = []
+    LayoutParamWidth = lpHalfOfParent
+    LayoutParamHeight = lpWrapContent
+    MarginLeft = 5
+    MarginTop = 5
+    MarginRight = 5
+    MarginBottom = 5
+    Visible = True
+    BackgroundColor = colbrDefault
+    Text = 'Web Control'
+    FontColor = colbrDefault
+    FontSize = 0
+    OnClick = jButton3Click
+    left = 104
+    top = 208
+  end
+  object jButton4: jButton
+    Id = 0
+    Anchor = jButton3
+    PosRelativeToAnchor = [raToRightOf, raAlignBaseline]
+    PosRelativeToParent = []
+    LayoutParamWidth = lpHalfOfParent
+    LayoutParamHeight = lpWrapContent
+    MarginLeft = 5
+    MarginTop = 5
+    MarginRight = 5
+    MarginBottom = 5
+    Visible = True
+    BackgroundColor = colbrDefault
+    Text = 'ListView'
+    FontColor = colbrDefault
+    FontSize = 0
+    OnClick = jButton4Click
+    left = 168
+    top = 208
+  end
+  object jButton5: jButton
+    Id = 51074
+    Anchor = jButton3
+    PosRelativeToAnchor = [raBelow]
+    PosRelativeToParent = []
+    LayoutParamWidth = lpHalfOfParent
+    LayoutParamHeight = lpWrapContent
+    MarginLeft = 5
+    MarginTop = 5
+    MarginRight = 5
+    MarginBottom = 5
+    Visible = True
+    BackgroundColor = colbrDefault
+    Text = 'Ext. Controls'
+    FontColor = colbrDefault
+    FontSize = 0
+    OnClick = jButton5Click
+    left = 104
+    top = 271
+  end
+  object jButton6: jButton
+    Id = 0
+    Anchor = jButton5
+    PosRelativeToAnchor = [raToRightOf, raAlignBaseline]
+    PosRelativeToParent = []
+    LayoutParamWidth = lpMatchParent
+    LayoutParamHeight = lpWrapContent
+    MarginLeft = 5
+    MarginTop = 5
+    MarginRight = 5
+    MarginBottom = 5
+    Visible = True
+    BackgroundColor = colbrDefault
+    Text = 'Cust View'
+    FontColor = colbrDefault
+    FontSize = 0
+    OnClick = jButton6Click
+    left = 168
+    top = 272
+  end
+  object jButton7: jButton
+    Id = 71909
+    Anchor = jButton5
+    PosRelativeToAnchor = [raBelow]
+    PosRelativeToParent = []
+    LayoutParamWidth = lpHalfOfParent
+    LayoutParamHeight = lpWrapContent
+    MarginLeft = 5
+    MarginTop = 5
+    MarginRight = 5
+    MarginBottom = 5
+    Visible = True
+    BackgroundColor = colbrDefault
+    Text = 'Bitmap'
+    FontColor = colbrDefault
+    FontSize = 0
+    OnClick = jButton7Click
+    left = 104
+    top = 332
+  end
+  object jButton8: jButton
+    Id = 0
+    Anchor = jButton7
+    PosRelativeToAnchor = [raToRightOf, raAlignBaseline]
+    PosRelativeToParent = []
+    LayoutParamWidth = lpHalfOfParent
+    LayoutParamHeight = lpWrapContent
+    MarginLeft = 5
+    MarginTop = 5
+    MarginRight = 5
+    MarginBottom = 5
+    Visible = True
+    BackgroundColor = colbrDefault
+    Text = 'OpenGL1 2D'
+    FontColor = colbrDefault
+    FontSize = 0
+    OnClick = jButton8Click
+    left = 168
+    top = 332
+  end
+  object jButton9: jButton
+    Id = 34150
+    Anchor = jButton7
+    PosRelativeToAnchor = [raBelow]
+    PosRelativeToParent = []
+    LayoutParamWidth = lpHalfOfParent
+    LayoutParamHeight = lpWrapContent
+    MarginLeft = 5
+    MarginTop = 5
+    MarginRight = 5
+    MarginBottom = 5
+    Visible = True
+    BackgroundColor = colbrDefault
+    Text = 'OpenGL2 2D'
+    FontColor = colbrDefault
+    FontSize = 0
+    OnClick = jButton9Click
+    left = 104
+    top = 389
+  end
+  object jButton10: jButton
+    Id = 0
+    Anchor = jButton9
+    PosRelativeToAnchor = [raToRightOf, raAlignBaseline]
+    PosRelativeToParent = []
+    LayoutParamWidth = lpHalfOfParent
+    LayoutParamHeight = lpWrapContent
+    MarginLeft = 5
+    MarginTop = 5
+    MarginRight = 5
+    MarginBottom = 5
+    Visible = True
+    BackgroundColor = colbrDefault
+    Text = 'OpenGL1 3D'
+    FontColor = colbrDefault
+    FontSize = 0
+    OnClick = jButton10Click
+    left = 168
+    top = 389
+  end
+  object jButton11: jButton
+    Id = 59567
+    Anchor = jButton9
+    PosRelativeToAnchor = [raBelow]
+    PosRelativeToParent = []
+    LayoutParamWidth = lpHalfOfParent
+    LayoutParamHeight = lpWrapContent
+    MarginLeft = 5
+    MarginTop = 5
+    MarginRight = 5
+    MarginBottom = 5
+    Visible = True
+    BackgroundColor = colbrDefault
+    Text = 'OpenGL2 3D'
+    FontColor = colbrDefault
+    FontSize = 0
+    OnClick = jButton11Click
+    left = 104
+    top = 448
+  end
+  object jButton12: jButton
+    Id = 0
+    Anchor = jButton11
+    PosRelativeToAnchor = [raToRightOf, raAlignBaseline]
+    PosRelativeToParent = []
+    LayoutParamWidth = lpHalfOfParent
+    LayoutParamHeight = lpWrapContent
+    MarginLeft = 5
+    MarginTop = 5
+    MarginRight = 5
+    MarginBottom = 5
+    Visible = True
+    BackgroundColor = colbrDefault
+    Text = 'Async Task'
+    FontColor = colbrDefault
+    FontSize = 0
+    OnClick = jButton12Click
+    left = 168
+    top = 448
+  end
+end

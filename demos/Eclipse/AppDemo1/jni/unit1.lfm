@@ -1,0 +1,75 @@
+object AndroidModule1: TAndroidModule1
+  OnCreate = DataModuleCreate
+  OldCreateOrder = False
+  BackButton = False
+  Title = 'jForm'
+  BackgroundColor = colbrWhite
+  OnCloseQuery = DataModuleCloseQuery
+  OnRotate = DataModuleRotate
+  OnJNIPrompt = DataModuleJNIPrompt
+  Height = 278
+  HorizontalOffset = 343
+  VerticalOffset = 178
+  Width = 230
+  object jTimer1: jTimer
+    Enabled = False
+    Interval = 20
+    OnTimer = jTimer1Timer
+    left = 176
+    top = 8
+  end
+  object jTextView1: jTextView
+    Id = 0
+    Anchor = jImageView1
+    PosRelativeToAnchor = [raBelow]
+    PosRelativeToParent = [rpCenterHorizontal]
+    LayoutParamWidth = lpWrapContent
+    LayoutParamHeight = lpWrapContent
+    MarginLeft = 40
+    MarginTop = 40
+    MarginRight = 5
+    MarginBottom = 5
+    Alignment = taLeft
+    Visible = True
+    Enabled = True
+    BackgroundColor = colbrDefault
+    FontColor = colbrMidnightBlue
+    FontSize = 0
+    Text = 'Powered by FPC/Lazarus!'
+    left = 104
+    top = 152
+  end
+  object jImageList1: jImageList
+    Images.Strings = (
+      't1.png'
+      't2.png'
+      't3.png'
+      't4.png'
+      't5.png'
+      't6.png'
+      't7.png'
+      't8.png'
+      ''
+    )
+    left = 176
+    top = 80
+  end
+  object jImageView1: jImageView
+    Id = 11952
+    PosRelativeToAnchor = []
+    PosRelativeToParent = [rpCenterInParent]
+    LayoutParamWidth = lpWrapContent
+    LayoutParamHeight = lpWrapContent
+    MarginLeft = 0
+    MarginTop = 0
+    MarginRight = 0
+    MarginBottom = 0
+    ImageIndex = 0
+    Images = jImageList1
+    Visible = True
+    BackgroundColor = colbrDefault
+    IsBackgroundImage = False
+    left = 104
+    top = 80
+  end
+end

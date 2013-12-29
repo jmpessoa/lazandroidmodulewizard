@@ -1,0 +1,227 @@
+object AndroidModule7: TAndroidModule7
+  OnCreate = DataModuleCreate
+  OldCreateOrder = False
+  BackButton = True
+  Title = 'jForm'
+  BackgroundColor = colbrBlack
+  OnCloseQuery = DataModuleCloseQuery
+  OnRotate = DataModuleRotate
+  OnJNIPrompt = DataModuleJNIPrompt
+  Height = 520
+  HorizontalOffset = 316
+  VerticalOffset = 74
+  Width = 311
+  object jTextView1: jTextView
+    Id = 69181
+    PosRelativeToAnchor = []
+    PosRelativeToParent = [rpCenterHorizontal]
+    LayoutParamWidth = lpWrapContent
+    LayoutParamHeight = lpWrapContent
+    MarginLeft = 10
+    MarginTop = 10
+    MarginRight = 10
+    MarginBottom = 10
+    Alignment = taLeft
+    Visible = True
+    Enabled = True
+    BackgroundColor = colbrDefault
+    FontColor = colbrSilver
+    FontSize = 0
+    Text = 'Extends Controls Demo'
+    left = 104
+    top = 16
+  end
+  object jScrollView1: jScrollView
+    Id = 23460
+    Anchor = jTextView1
+    PosRelativeToAnchor = [raBelow]
+    PosRelativeToParent = [rpCenterHorizontal]
+    LayoutParamWidth = lpMatchParent
+    LayoutParamHeight = lpOneThirdOfParent
+    MarginLeft = 10
+    MarginTop = 10
+    MarginRight = 10
+    MarginBottom = 10
+    ScrollSize = 800
+    Visible = True
+    BackgroundColor = colbrLightSlateBlue
+    left = 104
+    top = 88
+  end
+  object jImageList1: jImageList
+    Images.Strings = (
+      'image01.png'
+      'image02.png'
+      'btn1_1.png'
+      'Lazarus_Logo_new.png'
+      'btn1_2.png'
+    )
+    left = 256
+    top = 88
+  end
+  object jImageView1: jImageView
+    Id = 27721
+    PosRelativeToAnchor = []
+    PosRelativeToParent = [rpCenterHorizontal]
+    LayoutParamWidth = lpWrapContent
+    LayoutParamHeight = lpWrapContent
+    MarginLeft = 0
+    MarginTop = 0
+    MarginRight = 0
+    MarginBottom = 0
+    ImageIndex = 0
+    Images = jImageList1
+    Visible = True
+    BackgroundColor = colbrDefault
+    IsBackgroundImage = False
+    left = 176
+    top = 88
+  end
+  object jImageView2: jImageView
+    Id = 95281
+    Anchor = jImageView1
+    PosRelativeToAnchor = [raBelow]
+    PosRelativeToParent = [rpCenterHorizontal]
+    LayoutParamWidth = lpWrapContent
+    LayoutParamHeight = lpWrapContent
+    MarginLeft = 0
+    MarginTop = 0
+    MarginRight = 0
+    MarginBottom = 0
+    ImageIndex = 1
+    Images = jImageList1
+    Visible = True
+    BackgroundColor = colbrDefault
+    IsBackgroundImage = False
+    left = 176
+    top = 152
+  end
+  object jImageView3: jImageView
+    Id = 86169
+    Anchor = jImageView2
+    PosRelativeToAnchor = [raBelow]
+    PosRelativeToParent = [rpCenterHorizontal]
+    LayoutParamWidth = lpWrapContent
+    LayoutParamHeight = lpWrapContent
+    MarginLeft = 0
+    MarginTop = 0
+    MarginRight = 0
+    MarginBottom = 0
+    ImageIndex = 2
+    Images = jImageList1
+    Visible = True
+    BackgroundColor = colbrDefault
+    IsBackgroundImage = False
+    left = 176
+    top = 216
+  end
+  object jImageView4: jImageView
+    Id = 64680
+    Anchor = jImageView3
+    PosRelativeToAnchor = [raBelow]
+    PosRelativeToParent = [rpCenterHorizontal]
+    LayoutParamWidth = lpWrapContent
+    LayoutParamHeight = lpWrapContent
+    MarginLeft = 0
+    MarginTop = 0
+    MarginRight = 0
+    MarginBottom = 0
+    ImageIndex = 3
+    Images = jImageList1
+    Visible = True
+    BackgroundColor = colbrDefault
+    IsBackgroundImage = False
+    left = 176
+    top = 280
+  end
+  object jImageView5: jImageView
+    Id = 0
+    Anchor = jImageView4
+    PosRelativeToAnchor = [raBelow]
+    PosRelativeToParent = [rpCenterHorizontal]
+    LayoutParamWidth = lpWrapContent
+    LayoutParamHeight = lpWrapContent
+    MarginLeft = 0
+    MarginTop = 0
+    MarginRight = 0
+    MarginBottom = 0
+    ImageIndex = 4
+    Images = jImageList1
+    Visible = True
+    BackgroundColor = colbrDefault
+    IsBackgroundImage = False
+    left = 176
+    top = 336
+  end
+  object jTextView2: jTextView
+    Id = 10102
+    Anchor = jScrollView1
+    PosRelativeToAnchor = [raBelow]
+    PosRelativeToParent = [rpCenterHorizontal]
+    LayoutParamWidth = lpWrapContent
+    LayoutParamHeight = lpWrapContent
+    MarginLeft = 10
+    MarginTop = 10
+    MarginRight = 10
+    MarginBottom = 10
+    Alignment = taLeft
+    Visible = True
+    Enabled = True
+    BackgroundColor = colbrDefault
+    FontColor = colbrSilver
+    FontSize = 0
+    Text = 'hint: Scroll to see more images!'
+    left = 104
+    top = 376
+  end
+  object jImageBtn1: jImageBtn
+    Id = 49944
+    Anchor = jTextView2
+    PosRelativeToAnchor = [raBelow]
+    PosRelativeToParent = [rpCenterHorizontal]
+    LayoutParamWidth = lp48px
+    LayoutParamHeight = lp48px
+    MarginLeft = 10
+    MarginTop = 40
+    MarginRight = 10
+    MarginBottom = 10
+    Visible = True
+    BackgroundColor = colbrDefault
+    Enabled = True
+    Images = jImageList2
+    IndexImageUp = 0
+    IndexImageDown = 1
+    OnClick = jImageBtn1Click
+    left = 104
+    top = 448
+  end
+  object jImageList2: jImageList
+    Images.Strings = (
+      'Graphic_tools1.png'
+      'Graphic_tools2.png'
+    )
+    left = 24
+    top = 448
+  end
+  object jTextView3: jTextView
+    Id = 0
+    Anchor = jImageBtn1
+    PosRelativeToAnchor = [raToRightOf, raAlignBottom]
+    PosRelativeToParent = []
+    LayoutParamWidth = lpWrapContent
+    LayoutParamHeight = lpWrapContent
+    MarginLeft = 10
+    MarginTop = 10
+    MarginRight = 10
+    MarginBottom = 10
+    Alignment = taLeft
+    Visible = True
+    Enabled = True
+    BackgroundColor = colbrDefault
+    FontColor = colbrSilver
+    FontSize = 0
+    Text = '<<---- Click it!'
+    left = 184
+    top = 448
+  end
+end

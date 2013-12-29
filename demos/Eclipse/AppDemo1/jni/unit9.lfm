@@ -1,0 +1,67 @@
+object AndroidModule9: TAndroidModule9
+  OnCreate = DataModuleCreate
+  OldCreateOrder = False
+  BackButton = True
+  Title = 'jForm'
+  BackgroundColor = colbrBlack
+  OnCloseQuery = DataModuleCloseQuery
+  OnRotate = DataModuleRotate
+  OnJNIPrompt = DataModuleJNIPrompt
+  Height = 235
+  HorizontalOffset = 319
+  VerticalOffset = 145
+  Width = 281
+  object jBitmap1: jBitmap
+    ImageIndex = 0
+    Images = jImageList1
+    Width = 0
+    Height = 0
+    left = 136
+    top = 96
+  end
+  object jImageList1: jImageList
+    Images.Strings = (
+      'Lazarus_Logo_new.png'
+    )
+    left = 216
+    top = 96
+  end
+  object jView1: jView
+    Id = 0
+    Anchor = jTextView1
+    PosRelativeToAnchor = [raBelow]
+    PosRelativeToParent = [rpCenterHorizontal]
+    LayoutParamWidth = lpWrapContent
+    LayoutParamHeight = lpWrapContent
+    MarginLeft = 0
+    MarginTop = 0
+    MarginRight = 0
+    MarginBottom = 0
+    Visible = True
+    BackgroundColor = colbrDefault
+    OnDraw = jView1Draw
+    OnTouchMove = jView1TouchMove
+    left = 72
+    top = 96
+  end
+  object jTextView1: jTextView
+    Id = 35711
+    PosRelativeToAnchor = []
+    PosRelativeToParent = [rpCenterHorizontal]
+    LayoutParamWidth = lpWrapContent
+    LayoutParamHeight = lpWrapContent
+    MarginLeft = 10
+    MarginTop = 10
+    MarginRight = 10
+    MarginBottom = 10
+    Alignment = taLeft
+    Visible = True
+    Enabled = True
+    BackgroundColor = colbrDefault
+    FontColor = colbrSilver
+    FontSize = 0
+    Text = 'Direct Bitmap Pixel Access Demo'
+    left = 72
+    top = 24
+  end
+end

@@ -1,0 +1,5 @@
+<?xml version="1.0"?>
+<CONFIG>
+  <Compiler Value="C:\laz4android\fpc\2.7.1\bin\i386-win32\fpc.exe" Date="1118576398"/>
+  <Params Value=" -MObjFPC -Scghim -O1 -Tandroid -Parm -Xs -XX -vewnhi -FlC:\adt32\ndk7\platforms\android-8\arch-arm\usr\lib -FlC:\adt32\ndk7\toolchains\arm-linux-androideabi-4.4.3\prebuilt\windows\lib\gcc\arm-linux-androideabi\4.4.3 -FuC:\laz4android\components\LazAndroidWizard\lib\arm-android -FuC:\laz4android\lcl\units\arm-android -FuC:\laz4android\components\lazutils\lib\arm-android -FuC:\laz4android\packager\units\arm-android -FuC:\adt32\eclipse\workspace\AppDemo2\jni\ -l -FEC:\adt32\eclipse\workspace\AppDemo2\libs\ -olibcontrols -dANDROID -Xd -CpArmV6 -CfSoft -FLC:\adt32\ndk7\platforms\android-8\arch-arm\usr\lib\libdl.so -FUC:\adt32\eclipse\workspace\AppDemo2\obj\Controls -oC:\adt32\eclipse\workspace\AppDemo2\libs\armeabi\libcontrols.so controls.lpr"/>
+</CONFIG>

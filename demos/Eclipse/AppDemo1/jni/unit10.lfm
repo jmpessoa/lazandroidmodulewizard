@@ -1,0 +1,154 @@
+object AndroidModule10: TAndroidModule10
+  OnCreate = DataModuleCreate
+  OldCreateOrder = False
+  BackButton = True
+  Title = 'jForm'
+  BackgroundColor = colbrBlack
+  OnCloseQuery = DataModuleCloseQuery
+  OnRotate = DataModuleRotate
+  OnJNIPrompt = DataModuleJNIPrompt
+  Height = 378
+  HorizontalOffset = 319
+  VerticalOffset = 145
+  Width = 271
+  object jTextView1: jTextView
+    Id = 19240
+    PosRelativeToAnchor = []
+    PosRelativeToParent = [rpCenterHorizontal]
+    LayoutParamWidth = lpWrapContent
+    LayoutParamHeight = lpWrapContent
+    MarginLeft = 10
+    MarginTop = 10
+    MarginRight = 10
+    MarginBottom = 10
+    Alignment = taLeft
+    Visible = True
+    Enabled = True
+    BackgroundColor = colbrDefault
+    FontColor = colbrSilver
+    FontSize = 0
+    Text = 'OpenGLES_v1 Demo'
+    left = 112
+    top = 34
+  end
+  object jCanvasES1_1: jCanvasES1
+    Id = 31633
+    Anchor = jButton1
+    PosRelativeToAnchor = [raBelow]
+    PosRelativeToParent = [rpCenterHorizontal]
+    LayoutParamWidth = lpMatchParent
+    LayoutParamHeight = lpOneThirdOfParent
+    MarginLeft = 10
+    MarginTop = 10
+    MarginRight = 10
+    MarginBottom = 10
+    AutoRefresh = True
+    Visible = True
+    Images = jImageList1
+    OnGLCreate = jCanvasES1_1GLCreate
+    OnGLChange = jCanvasES1_1GLChange
+    OnGLDraw = jCanvasES1_1GLDraw
+    OnGLThread = jCanvasES1_1GLThread
+    OnGLMove = jCanvasES1_1GLMove
+    left = 112
+    top = 168
+  end
+  object jImageList1: jImageList
+    Images.Strings = (
+      'texture_background.png'
+      'texture_graygrid.png'
+      'texture_image1.png'
+      'texture_image2.png'
+      'texture_image3.png'
+    )
+    left = 224
+    top = 168
+  end
+  object jTimer1: jTimer
+    Enabled = False
+    Interval = 10
+    OnTimer = jTimer1Timer
+    left = 13
+    top = 14
+  end
+  object jButton1: jButton
+    Id = 72076
+    Anchor = jTextView1
+    PosRelativeToAnchor = [raBelow]
+    PosRelativeToParent = [rpLeft]
+    LayoutParamWidth = lpHalfOfParent
+    LayoutParamHeight = lpWrapContent
+    MarginLeft = 5
+    MarginTop = 5
+    MarginRight = 5
+    MarginBottom = 5
+    Visible = True
+    BackgroundColor = colbrDefault
+    Text = 'Start/Stop'
+    FontColor = colbrDefault
+    FontSize = 0
+    OnClick = jButton1Click
+    left = 78
+    top = 99
+  end
+  object jButton2: jButton
+    Id = 0
+    Anchor = jButton1
+    PosRelativeToAnchor = [raToRightOf, raAlignBaseline]
+    PosRelativeToParent = []
+    LayoutParamWidth = lpHalfOfParent
+    LayoutParamHeight = lpWrapContent
+    MarginLeft = 5
+    MarginTop = 5
+    MarginRight = 5
+    MarginBottom = 5
+    Visible = True
+    BackgroundColor = colbrDefault
+    Text = 'Fast++'
+    FontColor = colbrDefault
+    FontSize = 0
+    OnClick = jButton2Click
+    left = 157
+    top = 100
+  end
+  object jButton3: jButton
+    Id = 34322
+    Anchor = jCanvasES1_1
+    PosRelativeToAnchor = [raBelow]
+    PosRelativeToParent = []
+    LayoutParamWidth = lpMatchParent
+    LayoutParamHeight = lpWrapContent
+    MarginLeft = 5
+    MarginTop = 5
+    MarginRight = 5
+    MarginBottom = 5
+    Visible = True
+    BackgroundColor = colbrDefault
+    Text = 'Request GLThread'
+    FontColor = colbrDefault
+    FontSize = 0
+    left = 118
+    top = 238
+  end
+  object jTextView2: jTextView
+    Id = 0
+    Anchor = jButton3
+    PosRelativeToAnchor = [raBelow]
+    PosRelativeToParent = [rpLeft]
+    LayoutParamWidth = lpWrapContent
+    LayoutParamHeight = lpWrapContent
+    MarginLeft = 10
+    MarginTop = 10
+    MarginRight = 10
+    MarginBottom = 10
+    Alignment = taLeft
+    Visible = True
+    Enabled = True
+    BackgroundColor = colbrDefault
+    FontColor = colbrSilver
+    FontSize = 0
+    Text = 'Auto: Off'
+    left = 117
+    top = 307
+  end
+end

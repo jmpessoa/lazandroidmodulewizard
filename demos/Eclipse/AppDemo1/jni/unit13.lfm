@@ -1,0 +1,125 @@
+object AndroidModule13: TAndroidModule13
+  OnCreate = DataModuleCreate
+  OldCreateOrder = False
+  BackButton = True
+  Title = 'jForm'
+  BackgroundColor = colbrBlack
+  OnCloseQuery = DataModuleCloseQuery
+  OnRotate = DataModuleRotate
+  OnJNIPrompt = DataModuleJNIPrompt
+  Height = 356
+  HorizontalOffset = 319
+  VerticalOffset = 145
+  Width = 238
+  object jTextView1: jTextView
+    Id = 60950
+    PosRelativeToAnchor = []
+    PosRelativeToParent = [rpCenterHorizontal]
+    LayoutParamWidth = lpWrapContent
+    LayoutParamHeight = lpWrapContent
+    MarginLeft = 10
+    MarginTop = 10
+    MarginRight = 10
+    MarginBottom = 10
+    Alignment = taLeft
+    Visible = True
+    Enabled = True
+    BackgroundColor = colbrDefault
+    FontColor = colbrSilver
+    FontSize = 0
+    Text = 'OpenGLES2 3D Demo'
+    left = 104
+    top = 24
+  end
+  object jTimer1: jTimer
+    Enabled = False
+    Interval = 10
+    OnTimer = jTimer1Timer
+    left = 13
+    top = 12
+  end
+  object jButton1: jButton
+    Id = 21192
+    Anchor = jTextView1
+    PosRelativeToAnchor = [raBelow]
+    PosRelativeToParent = []
+    LayoutParamWidth = lpMatchParent
+    LayoutParamHeight = lpWrapContent
+    MarginLeft = 5
+    MarginTop = 5
+    MarginRight = 5
+    MarginBottom = 5
+    Visible = True
+    BackgroundColor = colbrDefault
+    Text = 'Start/Stop Zoom'
+    FontColor = colbrDefault
+    FontSize = 0
+    OnClick = jButton1Click
+    left = 104
+    top = 88
+  end
+  object jCanvasES2_1: jCanvasES2
+    Id = 18974
+    Anchor = jButton1
+    PosRelativeToAnchor = [raBelow]
+    PosRelativeToParent = []
+    LayoutParamWidth = lpMatchParent
+    LayoutParamHeight = lpOneThirdOfParent
+    MarginLeft = 10
+    MarginTop = 10
+    MarginRight = 10
+    MarginBottom = 10
+    AutoRefresh = False
+    Visible = True
+    OnGLCreate = jCanvasES2_1GLCreate
+    OnGLChange = jCanvasES2_1GLChange
+    OnGLDraw = jCanvasES2_1GLDraw
+    OnGLDown = jCanvasES2_1GLDown
+    OnGLMove = jCanvasES2_1GLMove
+    OnGLUp = jCanvasES2_1GLUp
+    left = 104
+    top = 152
+  end
+  object jTextView2: jTextView
+    Id = 41110
+    Anchor = jCanvasES2_1
+    PosRelativeToAnchor = [raBelow]
+    PosRelativeToParent = [rpLeft]
+    LayoutParamWidth = lpWrapContent
+    LayoutParamHeight = lpWrapContent
+    MarginLeft = 10
+    MarginTop = 10
+    MarginRight = 10
+    MarginBottom = 10
+    Alignment = taLeft
+    Visible = True
+    Enabled = True
+    BackgroundColor = colbrDefault
+    FontColor = colbrSilver
+    FontSize = 0
+    Text = 'Auto: Off'
+    left = 104
+    top = 216
+  end
+  object jTextView3: jTextView
+    Id = 0
+    Anchor = jTextView2
+    PosRelativeToAnchor = [raBelow]
+    PosRelativeToParent = [rpCenterHorizontal]
+    LayoutParamWidth = lpWrapContent
+    LayoutParamHeight = lpWrapContent
+    MarginLeft = 10
+    MarginTop = 10
+    MarginRight = 10
+    MarginBottom = 10
+    Alignment = taLeft
+    Visible = True
+    Enabled = True
+    BackgroundColor = colbrDefault
+    FontColor = colbrSilver
+    FontSize = 0
+    Text = 'Hint: touch  to move...'
+    left = 104
+    top = 280
+  end
+end

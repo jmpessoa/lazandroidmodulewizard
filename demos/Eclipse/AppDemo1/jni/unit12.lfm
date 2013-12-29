@@ -1,0 +1,106 @@
+object AndroidModule12: TAndroidModule12
+  OnCreate = DataModuleCreate
+  OldCreateOrder = False
+  BackButton = True
+  Title = 'jForm'
+  BackgroundColor = colbrBlack
+  OnCloseQuery = DataModuleCloseQuery
+  OnRotate = DataModuleRotate
+  OnJNIPrompt = DataModuleJNIPrompt
+  Height = 304
+  HorizontalOffset = 319
+  VerticalOffset = 145
+  Width = 270
+  object jTextView1: jTextView
+    Id = 21393
+    PosRelativeToAnchor = []
+    PosRelativeToParent = [rpCenterHorizontal]
+    LayoutParamWidth = lpWrapContent
+    LayoutParamHeight = lpWrapContent
+    MarginLeft = 10
+    MarginTop = 10
+    MarginRight = 10
+    MarginBottom = 10
+    Alignment = taLeft
+    Visible = True
+    Enabled = True
+    BackgroundColor = colbrDefault
+    FontColor = colbrSilver
+    FontSize = 0
+    Text = 'OpenGLES1 3D Demo'
+    left = 112
+    top = 40
+  end
+  object jButton1: jButton
+    Id = 73178
+    Anchor = jTextView1
+    PosRelativeToAnchor = [raBelow]
+    PosRelativeToParent = []
+    LayoutParamWidth = lpMatchParent
+    LayoutParamHeight = lpWrapContent
+    MarginLeft = 5
+    MarginTop = 5
+    MarginRight = 5
+    MarginBottom = 5
+    Visible = True
+    BackgroundColor = colbrDefault
+    Text = 'Swap Texture'
+    FontColor = colbrDefault
+    FontSize = 0
+    OnClick = jButton1Click
+    left = 112
+    top = 104
+  end
+  object jCanvasES1_1: jCanvasES1
+    Id = 1670
+    Anchor = jButton1
+    PosRelativeToAnchor = [raBelow]
+    PosRelativeToParent = []
+    LayoutParamWidth = lpMatchParent
+    LayoutParamHeight = lpOneThirdOfParent
+    MarginLeft = 10
+    MarginTop = 10
+    MarginRight = 10
+    MarginBottom = 10
+    AutoRefresh = False
+    Visible = True
+    Images = jImageList1
+    OnGLCreate = jCanvasES1_1GLCreate
+    OnGLChange = jCanvasES1_1GLChange
+    OnGLDraw = jCanvasES1_1GLDraw
+    OnGLDown = jCanvasES1_1GLDown
+    OnGLMove = jCanvasES1_1GLMove
+    OnGLUp = jCanvasES1_1GLUp
+    left = 112
+    top = 173
+  end
+  object jTextView2: jTextView
+    Id = 0
+    Anchor = jCanvasES1_1
+    PosRelativeToAnchor = [raBelow]
+    PosRelativeToParent = [rpCenterHorizontal]
+    LayoutParamWidth = lpWrapContent
+    LayoutParamHeight = lpWrapContent
+    MarginLeft = 10
+    MarginTop = 10
+    MarginRight = 10
+    MarginBottom = 10
+    Alignment = taLeft
+    Visible = True
+    Enabled = True
+    BackgroundColor = colbrDefault
+    FontColor = colbrSilver
+    FontSize = 0
+    Text = 'Hint: touch  to move...'
+    left = 112
+    top = 240
+  end
+  object jImageList1: jImageList
+    Images.Strings = (
+      'image03.png'
+      'image04.jpg'
+    )
+    left = 208
+    top = 173
+  end
+end

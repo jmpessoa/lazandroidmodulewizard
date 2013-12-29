@@ -1,0 +1,177 @@
+object AndroidModule11: TAndroidModule11
+  OnCreate = DataModuleCreate
+  OldCreateOrder = False
+  BackButton = True
+  Title = 'jForm'
+  BackgroundColor = colbrBlack
+  OnCloseQuery = DataModuleCloseQuery
+  OnRotate = DataModuleRotate
+  OnJNIPrompt = DataModuleJNIPrompt
+  Height = 425
+  HorizontalOffset = 319
+  VerticalOffset = 145
+  Width = 300
+  object jTimer1: jTimer
+    Enabled = False
+    Interval = 20
+    OnTimer = jTimer1Timer
+    left = 16
+    top = 11
+  end
+  object jTextView1: jTextView
+    Id = 44776
+    PosRelativeToAnchor = []
+    PosRelativeToParent = [rpCenterHorizontal]
+    LayoutParamWidth = lpWrapContent
+    LayoutParamHeight = lpWrapContent
+    MarginLeft = 10
+    MarginTop = 10
+    MarginRight = 10
+    MarginBottom = 10
+    Alignment = taLeft
+    Visible = True
+    Enabled = True
+    BackgroundColor = colbrDefault
+    FontColor = colbrSilver
+    FontSize = 0
+    Text = 'OpenGLES_v2 Demo'
+    left = 136
+    top = 48
+  end
+  object jButton1: jButton
+    Id = 62954
+    Anchor = jTextView1
+    PosRelativeToAnchor = [raBelow]
+    PosRelativeToParent = []
+    LayoutParamWidth = lpHalfOfParent
+    LayoutParamHeight = lpWrapContent
+    MarginLeft = 5
+    MarginTop = 5
+    MarginRight = 5
+    MarginBottom = 5
+    Visible = True
+    BackgroundColor = colbrDefault
+    Text = 'Start/Stop'
+    FontColor = colbrDefault
+    FontSize = 0
+    OnClick = jButton1Click
+    left = 83
+    top = 104
+  end
+  object jButton2: jButton
+    Id = 0
+    Anchor = jButton1
+    PosRelativeToAnchor = [raToRightOf, raAlignBaseline]
+    PosRelativeToParent = []
+    LayoutParamWidth = lpHalfOfParent
+    LayoutParamHeight = lpWrapContent
+    MarginLeft = 5
+    MarginTop = 5
+    MarginRight = 5
+    MarginBottom = 5
+    Visible = True
+    BackgroundColor = colbrDefault
+    Text = 'Fast++'
+    FontColor = colbrDefault
+    FontSize = 0
+    OnClick = jButton2Click
+    left = 184
+    top = 104
+  end
+  object jCanvasES2_1: jCanvasES2
+    Id = 14067
+    Anchor = jButton1
+    PosRelativeToAnchor = [raBelow]
+    PosRelativeToParent = []
+    LayoutParamWidth = lpMatchParent
+    LayoutParamHeight = lpOneThirdOfParent
+    MarginLeft = 10
+    MarginTop = 10
+    MarginRight = 10
+    MarginBottom = 10
+    AutoRefresh = False
+    Visible = True
+    Images = jImageList1
+    OnGLCreate = jCanvasES2_1GLCreate
+    OnGLChange = jCanvasES2_1GLChange
+    OnGLDraw = jCanvasES2_1GLDraw
+    OnGLDown = jCanvasES2_1GLDown
+    OnGLMove = jCanvasES2_1GLMove
+    OnGLUp = jCanvasES2_1GLUp
+    left = 136
+    top = 174
+  end
+  object jImageList1: jImageList
+    Images.Strings = (
+      'texture_background.png'
+      'texture_graygrid.png'
+      'texture_image1.png'
+      'texture_image2.png'
+      'texture_image3.png'
+    )
+    left = 232
+    top = 174
+  end
+  object jButton3: jButton
+    Id = 72520
+    Anchor = jCanvasES2_1
+    PosRelativeToAnchor = [raBelow]
+    PosRelativeToParent = []
+    LayoutParamWidth = lpMatchParent
+    LayoutParamHeight = lpWrapContent
+    MarginLeft = 5
+    MarginTop = 5
+    MarginRight = 5
+    MarginBottom = 5
+    Visible = True
+    BackgroundColor = colbrDefault
+    Text = 'Request GLThread'
+    FontColor = colbrDefault
+    FontSize = 0
+    OnClick = jButton3Click
+    left = 136
+    top = 240
+  end
+  object jTextView2: jTextView
+    Id = 98715
+    Anchor = jButton3
+    PosRelativeToAnchor = [raBelow]
+    PosRelativeToParent = []
+    LayoutParamWidth = lpWrapContent
+    LayoutParamHeight = lpWrapContent
+    MarginLeft = 10
+    MarginTop = 10
+    MarginRight = 10
+    MarginBottom = 10
+    Alignment = taLeft
+    Visible = True
+    Enabled = True
+    BackgroundColor = colbrDefault
+    FontColor = colbrSilver
+    FontSize = 0
+    Text = 'Auto: Off'
+    left = 136
+    top = 300
+  end
+  object jTextView3: jTextView
+    Id = 0
+    Anchor = jTextView2
+    PosRelativeToAnchor = [raBelow]
+    PosRelativeToParent = [rpCenterHorizontal]
+    LayoutParamWidth = lpWrapContent
+    LayoutParamHeight = lpWrapContent
+    MarginLeft = 10
+    MarginTop = 10
+    MarginRight = 10
+    MarginBottom = 10
+    Alignment = taLeft
+    Visible = True
+    Enabled = True
+    BackgroundColor = colbrDefault
+    FontColor = colbrSilver
+    FontSize = 0
+    Text = 'Hint: touch  to move...'
+    left = 136
+    top = 360
+  end
+end

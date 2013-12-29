@@ -1,0 +1,292 @@
+object AndroidModule3: TAndroidModule3
+  OnCreate = DataModuleCreate
+  OldCreateOrder = False
+  BackButton = True
+  Title = 'jForm'
+  BackgroundColor = colbrWhite
+  OnCloseQuery = DataModuleCloseQuery
+  OnRotate = DataModuleRotate
+  OnJNIPrompt = DataModuleJNIPrompt
+  Height = 612
+  HorizontalOffset = 324
+  VerticalOffset = 41
+  Width = 438
+  object jDialogYN1: jDialogYN
+    Title = 'jDialogYesNo'
+    Msg = 'Accept ?'
+    Yes = 'Yes'
+    No = 'No'
+    OnClickYN = jDialogYN1ClickYN
+    left = 40
+    top = 72
+  end
+  object jButton1: jButton
+    Id = 85722
+    Anchor = jTextView1
+    PosRelativeToAnchor = [raBelow]
+    PosRelativeToParent = []
+    LayoutParamWidth = lpHalfOfParent
+    LayoutParamHeight = lpWrapContent
+    MarginLeft = 5
+    MarginTop = 5
+    MarginRight = 5
+    MarginBottom = 5
+    Visible = True
+    BackgroundColor = colbrDefault
+    Text = 'jDlgYN'
+    FontColor = colbrLightSteelBlue
+    FontSize = 0
+    OnClick = jButton1Click
+    left = 120
+    top = 72
+  end
+  object jTextView1: jTextView
+    Id = 92902
+    PosRelativeToAnchor = []
+    PosRelativeToParent = [rpCenterHorizontal]
+    LayoutParamWidth = lpWrapContent
+    LayoutParamHeight = lpWrapContent
+    MarginLeft = 10
+    MarginTop = 10
+    MarginRight = 10
+    MarginBottom = 10
+    Alignment = taLeft
+    Visible = True
+    Enabled = True
+    BackgroundColor = colbrNone
+    FontColor = colbrWhite
+    FontSize = 0
+    Text = '1.Base Controls'
+    left = 176
+    top = 8
+  end
+  object jDialogProgress1: jDialogProgress
+    Title = 'jDialogProgress'
+    Msg = 'Please, wait...'
+    left = 312
+    top = 72
+  end
+  object jTimer1: jTimer
+    Enabled = False
+    Interval = 10
+    OnTimer = jTimer1Timer
+    left = 384
+    top = 72
+  end
+  object jButton2: jButton
+    Id = 0
+    Anchor = jButton1
+    PosRelativeToAnchor = [raToRightOf, raAlignBaseline]
+    PosRelativeToParent = []
+    LayoutParamWidth = lpHalfOfParent
+    LayoutParamHeight = lpWrapContent
+    MarginLeft = 5
+    MarginTop = 5
+    MarginRight = 5
+    MarginBottom = 5
+    Visible = True
+    BackgroundColor = colbrDefault
+    Text = 'jDlgProgress'
+    FontColor = colbrLightSteelBlue
+    FontSize = 0
+    OnClick = jButton2Click
+    left = 232
+    top = 72
+  end
+  object jTimer2: jTimer
+    Enabled = False
+    Interval = 20
+    OnTimer = jTimer2Timer
+    left = 248
+    top = 472
+  end
+  object jButton3: jButton
+    Id = 51708
+    Anchor = jEditText1
+    PosRelativeToAnchor = [raBelow]
+    PosRelativeToParent = []
+    LayoutParamWidth = lpMatchParent
+    LayoutParamHeight = lpWrapContent
+    MarginLeft = 5
+    MarginTop = 5
+    MarginRight = 5
+    MarginBottom = 5
+    Visible = True
+    BackgroundColor = colbrDefault
+    Text = 'jProgressBar1'
+    FontColor = colbrLightSteelBlue
+    FontSize = 0
+    OnClick = jButton3Click
+    left = 176
+    top = 408
+  end
+  object jProgressBar1: jProgressBar
+    Id = 70807
+    Anchor = jButton3
+    PosRelativeToAnchor = [raBelow]
+    PosRelativeToParent = []
+    LayoutParamWidth = lpMatchParent
+    LayoutParamHeight = lpWrapContent
+    MarginLeft = 10
+    MarginTop = 10
+    MarginRight = 10
+    MarginBottom = 10
+    Style = cjProgressBarStyleHorizontal
+    BackgroundColor = colbrDefault
+    Progress = 0
+    Max = 100
+    Visible = False
+    left = 176
+    top = 472
+  end
+  object jEditText1: jEditText
+    Id = 75870
+    Anchor = jTextView2
+    PosRelativeToAnchor = [raBelow]
+    PosRelativeToParent = []
+    LayoutParamWidth = lpTwoThirdOfParent
+    LayoutParamHeight = lpWrapContent
+    MarginLeft = 10
+    MarginTop = 10
+    MarginRight = 10
+    MarginBottom = 10
+    Alignment = taLeft
+    InputTypeEx = itxText
+    LineMaxLength = 360
+    Visible = True
+    BackgroundColor = colbrWhite
+    FontColor = colbrDefault
+    FontSize = 0
+    SingleLine = True
+    ScrollBarStyle = scrNone
+    MaxLines = 1
+    HorScrollBar = False
+    VerScrollBar = False
+    WrappingLine = True
+    left = 120
+    top = 352
+  end
+  object jCheckBox1: jCheckBox
+    Id = 89086
+    Anchor = jButton1
+    PosRelativeToAnchor = [raBelow]
+    PosRelativeToParent = []
+    LayoutParamWidth = lpMatchParent
+    LayoutParamHeight = lpWrapContent
+    MarginLeft = 5
+    MarginTop = 5
+    MarginRight = 5
+    MarginBottom = 5
+    Visible = True
+    BackgroundColor = colbrNone
+    FontColor = colbrWhite
+    FontSize = 0
+    Text = 'jCheckBox Test'
+    Checked = False
+    OnClick = jCheckBox1Click
+    left = 120
+    top = 144
+  end
+  object jRadioButton1: jRadioButton
+    Id = 48346
+    Anchor = jCheckBox1
+    PosRelativeToAnchor = [raBelow]
+    PosRelativeToParent = []
+    LayoutParamWidth = lpMatchParent
+    LayoutParamHeight = lpWrapContent
+    MarginLeft = 5
+    MarginTop = 5
+    MarginRight = 5
+    MarginBottom = 5
+    Visible = True
+    BackgroundColor = colbrNone
+    FontColor = colbrWhite
+    FontSize = 0
+    Text = 'jRadioButton Test'
+    Checked = False
+    OnClick = jRadioButton1Click
+    left = 120
+    top = 216
+  end
+  object jButton4: jButton
+    Id = 0
+    Anchor = jEditText1
+    PosRelativeToAnchor = [raToRightOf, raAlignBaseline]
+    PosRelativeToParent = []
+    LayoutParamWidth = lpMatchParent
+    LayoutParamHeight = lpWrapContent
+    MarginLeft = 5
+    MarginTop = 5
+    MarginRight = 5
+    MarginBottom = 5
+    Visible = True
+    BackgroundColor = colbrDefault
+    Text = 'Show'
+    FontColor = colbrLightSteelBlue
+    FontSize = 0
+    OnClick = jButton4Click
+    left = 232
+    top = 352
+  end
+  object jTextView2: jTextView
+    Id = 62160
+    Anchor = jRadioButton1
+    PosRelativeToAnchor = [raBelow]
+    PosRelativeToParent = []
+    LayoutParamWidth = lpMatchParent
+    LayoutParamHeight = lpWrapContent
+    MarginLeft = 10
+    MarginTop = 10
+    MarginRight = 10
+    MarginBottom = 10
+    Alignment = taLeft
+    Visible = True
+    Enabled = True
+    BackgroundColor = colbrDefault
+    FontColor = colbrSilver
+    FontSize = 0
+    Text = 'Say Hello:'
+    left = 120
+    top = 288
+  end
+  object jImageView1: jImageView
+    Id = 0
+    Anchor = jProgressBar1
+    PosRelativeToAnchor = [raBelow]
+    PosRelativeToParent = [rpCenterHorizontal]
+    LayoutParamWidth = lpWrapContent
+    LayoutParamHeight = lpWrapContent
+    MarginLeft = 0
+    MarginTop = 0
+    MarginRight = 0
+    MarginBottom = 0
+    ImageIndex = 0
+    Images = jImageList1
+    Visible = True
+    BackgroundColor = colbrNone
+    IsBackgroundImage = False
+    left = 176
+    top = 536
+  end
+  object jImageList1: jImageList
+    Images.Strings = (
+      't1.png'
+      't2.png'
+      't3.png'
+      't4.png'
+      't5.png'
+      't6.png'
+      't7.png'
+      't8.png'
+    )
+    left = 248
+    top = 536
+  end
+  object jTimer3: jTimer
+    Enabled = False
+    Interval = 20
+    OnTimer = jTimer3Timer
+    left = 312
+    top = 536
+  end
+end

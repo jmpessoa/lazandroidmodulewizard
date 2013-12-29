@@ -6,8 +6,22 @@ interface
 
      
 const
-  libname = 'libGLESv2.so';
- 
+   //libname = 'libGLESv2.so';
+
+   (* by Leledumbo for Linux users:
+       1. Build all libraries in the  ../LazAndroidWizard/linux/dummylibs
+       2. Put it somewhere ldconfig can find (or just run ldconfig with their directories as arguments)
+
+       "The idea of this is just to make the package installable in the IDE,
+       applications will still use the android version of the libraries."
+
+       ref. http://forum.lazarus.freepascal.org/index.php/topic,21919.msg137216/topicseen.html
+   *)
+
+  libname = {$ifdef android}'libGLESv2.so'
+            {$else ifdef linux}'libGL.so'{$endif};
+
+
 Type
   khronos_int8_t                         = ShortInt;
   khronos_float_t                        = Single;
