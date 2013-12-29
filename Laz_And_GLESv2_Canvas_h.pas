@@ -18,9 +18,7 @@ const
        ref. http://forum.lazarus.freepascal.org/index.php/topic,21919.msg137216/topicseen.html
    *)
 
-  libname = {$ifdef android}'libGLESv2.so'
-            {$else ifdef linux}'libGL.so'{$endif};
-
+libname = {$ifdef linux}'libGL.so'{$else}'libGLESv2.so'{$endif};
 
 Type
   khronos_int8_t                         = ShortInt;
