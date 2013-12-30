@@ -897,6 +897,7 @@ type
     Function  GetJavaBitmap : jObject;
     procedure LockPixels(var PScanDWord: PScanLine); overload;
     procedure LockPixels(var PScanJByte: {PJByte} PScanByte); overload;
+    procedure LockPixels(var PSJByte: PJByte); overload;
     procedure UnlockPixels;
     function GetInfo: boolean;
 
@@ -1053,8 +1054,8 @@ type
   protected
     procedure setParamHeight(Value: TLayoutParams);
     procedure SetParamWidth(Value: TLayoutParams);
-    function GetWidth: integer; virtual;
-    function GetHeight: integer;  virtual;
+    function GetWidth: integer; override;
+    function GetHeight: integer;  override;
     procedure ResetRules;
   public
     constructor Create(AOwner: TComponent); override;
@@ -1349,6 +1350,8 @@ type
     procedure SetImageIndex(Value: integer);
     function  GetImageName       : string;
     function  GetImageIndex      : integer;
+    function GetHeight: integer; override;
+    function GetWidth: integer;  override;
   protected
     procedure setParamHeight(Value: TLayoutParams);
     procedure SetParamWidth(Value: TLayoutParams);
@@ -1367,6 +1370,9 @@ type
     procedure SetImageBitmap(bitmap: jObject);
 
     // Property
+    property Width: integer Read GetWidth;
+    property Height: integer Read GetHeight;
+
     property Parent: jObject  read  FjPRLayout write SetParent; // Java : Parent Relative Layout
     property Count: integer read GetCount;
     property ImageName : string read GetImageName write SetImageName;
@@ -4450,6 +4456,20 @@ begin
   jImageView_setLParamHeight(App.Jni.jEnv, App.Jni.jThis, FjObject, GetLayoutParams(App, FLParamHeight, side));
 end;
 
+function jImageView.GetWidth: integer;
+begin
+  Result:= 0;
+  if FInitialized then
+   Result:= jImageView_getLParamWidth(App.Jni.jEnv, App.Jni.jThis, FjObject)
+end;
+
+function jImageView.GetHeight: integer;
+begin
+  Result:= 0;
+  if FInitialized then
+    Result:= jImageView_getLParamHeight(App.Jni.jEnv, App.Jni.jThis, FjObject);
+end;
+
 procedure jImageView.UpdateLayout;
 begin
    inherited UpdateLayout;
@@ -5928,7 +5948,7 @@ begin
   end;
 end;
 
-Function jBitmap.GetJavaBitmap : jObject;
+Function jBitmap.GetJavaBitmap: jObject;
 begin
   if FInitialized then
      Result:= jBitmap_getJavaBitmap(App.Jni.jEnv,App.Jni.jThis, FjObject);
@@ -6019,6 +6039,12 @@ procedure jBitmap.LockPixels(var PScanJByte : PScanByte{PJByte});
 begin
   if FInitialized then
     AndroidBitmap_lockPixels(App.Jni.jEnv, Self.GetJavaBitmap, @PScanJByte);
+end;
+
+procedure jBitmap.LockPixels(var PSJByte: PJByte); overload;
+begin
+  if FInitialized then
+    AndroidBitmap_lockPixels(App.Jni.jEnv, Self.GetJavaBitmap, @PSJByte);
 end;
 
 procedure jBitmap.UnlockPixels;

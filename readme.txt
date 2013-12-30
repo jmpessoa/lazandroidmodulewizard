@@ -42,6 +42,9 @@
 
               -Lazarus forum community! 
 
+version 0.3 - revision 0.3 - 30 December 2013 -
+
+      :: New! Add Option to Select Android Platform 
 
 version 0.3 - revision 0.2 - 29 December 2013 -
 

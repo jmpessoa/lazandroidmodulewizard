@@ -81,10 +81,13 @@ II. [GUI Support] Android Components Bridges - NEW! Simon's Controls remake with
 		-Select Ndk version: [7c or 9]
 
 
+		-Select Android Platform: [ex. android-14]
+
+
 	     	-Path to Ndk 
 
-	          ex.  C:\adt32\ndk7       
-
+	          ex.  C:\adt32\ndk7    
+   
 
 		-Path to Java Resources  [Simonsayz's Controls.java,  *.xml and default Icons]:
      	
@@ -180,6 +183,9 @@ III. [No GUI Support]
 
 
 		-Select Ndk version: [7c or 9]
+
+		
+		-Select Android Platform: [ex. android-14]
 
 
 	     	-Path to Ndk 

@@ -105,6 +105,9 @@ II. [GUI Support] Android Components Bridges - Simon's Controls remake with many
 
 		-Select Ndk version: [7c or 9]
 
+		
+		-Select Android Platform: [ex. android-14]
+
 
 	     	-Path to Ndk 
 
@@ -246,6 +249,9 @@ III. [No GUI Project Support]
 
 
 		-Select Ndk version: [7c or 9]
+
+
+		-Select Android Platform: [ex. android-14]
 
 
 	     	-Path to Ndk 

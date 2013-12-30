@@ -20,6 +20,7 @@ type
     BitBtn2: TBitBtn;
     CheckGroup1: TCheckGroup;
     ComboBox1: TComboBox;
+    ComboBox2: TComboBox;
     Edit1: TEdit;
     Edit2: TEdit;
     Edit4: TEdit;
@@ -32,6 +33,7 @@ type
     Label10: TLabel;
     Label2: TLabel;
     Label3: TLabel;
+    Label4: TLabel;
     Label5: TLabel;
     Label6: TLabel;
     Label7: TLabel;
@@ -59,10 +61,10 @@ type
   //  procedure CheckBox2Click(Sender: TObject);
     procedure CheckGroup1Click(Sender: TObject);
     procedure ComboBox1Exit(Sender: TObject);
+    procedure ComboBox2Change(Sender: TObject);
     procedure FormActivate(Sender: TObject);
     procedure FormClose(Sender: TObject; var CloseAction: TCloseAction);
     procedure FormCreate(Sender: TObject);
-    procedure FormShow(Sender: TObject);
     procedure ListBox1Click(Sender: TObject);
     procedure RadioGroup1Click(Sender: TObject);
     procedure RadioGroup2Click(Sender: TObject);
@@ -81,7 +83,7 @@ type
     FFilename: string;
     FPathToWorkspace: string; {C:\adt32\eclipse\workspace}
     FPathToNdkPlataforms: string; {C:\adt32\ndk\platforms\android-14\arch-arm\usr\lib}
-   // FPathToNdkToolchains: string; {C:\adt32\ndk\toolchains\arm-linux-androideabi-4.4.3\prebuilt\windows\... }
+
     FInstructionSet: string;      {ArmV6}
     FFPUSet: string;              {Soft}
     FPathToJavaTemplates: string;
@@ -99,6 +101,7 @@ type
     FAntBuildMode: string;
     FMainActivity: string;   //Simon "App"
     FNDK: string;
+    FAndroidPlatform: string;
   public
     { public declarations }
     procedure GetSubDirectories(const directory : string; list : TStrings) ;
@@ -108,7 +111,6 @@ type
     property PathToNdkPlataforms: string
                                                       read FPathToNdkPlataforms
                                                       write FPathToNdkPlataforms;
-    //property PathToNdkToolchains: string read FPathToNdkToolchains write FPathToNdkToolchains;
     property InstructionSet: string read FInstructionSet write FInstructionSet;
     property FPUSet: string  read FFPUSet write FFPUSet;
     property PathToJavaTemplates: string read FPathToJavaTemplates write FPathToJavaTemplates;
@@ -126,6 +128,7 @@ type
     property AntBuildMode: string read FAntBuildMode write FAntBuildMode;
     property MainActivity: string read FMainActivity write FMainActivity;
     property NDK: string read FNDK write FNDK;
+    property AndroidPlatform: string read FAndroidPlatform write FAndroidPlatform;
   end;
 
   function ReplaceChar(query: string; oldchar, newchar: char):string;
@@ -138,11 +141,6 @@ implementation
 {$R *.lfm}
 
 { TFormWorkspace }
-
-procedure TFormWorkspace.FormShow(Sender: TObject);
-begin
-  //
-end;
 
 procedure TFormWorkspace.ListBox1Click(Sender: TObject);
 begin
@@ -183,6 +181,8 @@ begin
   FAntPackageName:= LowerCase(Trim(Edit8.Text));
   FPathToWorkspace:= Edit1.Text;
   FAndroidProjectName:= Trim(ComboBox1.Text);
+  FAndroidPlatform:= LowerCase(ComboBox2.Text);
+
   if (Pos(DirectorySeparator, ComboBox1.Text) <= 0) or (RadioGroup3.ItemIndex = 1) then  //Ant Project
   begin
      FProjectModel:= 'Ant';
@@ -201,19 +201,6 @@ procedure TFormWorkspace.FormCreate(Sender: TObject);
 begin
 
 end;
-  {
-procedure TFormWorkspace.CheckBox1Click(Sender: TObject);
-begin
-   if CheckBox1.Checked then FTouchtestEnabled:= 'True'
-   else  FTouchtestEnabled:= 'False';
-end;
-
-procedure TFormWorkspace.CheckBox2Click(Sender: TObject);
-begin
-  if CheckBox2.Checked then FAntBuildMode:= 'debug'
-  else  FAntBuildMode:= 'release';
-end;
-   }
 
 procedure TFormWorkspace.CheckGroup1Click(Sender: TObject);
 begin
@@ -228,6 +215,11 @@ begin
     RadioGroup3.ItemIndex:= 1;
     if Edit8.Text = '' then Edit8.Text:= 'org.xxxxxxx';
   end;
+end;
+
+procedure TFormWorkspace.ComboBox2Change(Sender: TObject);
+begin
+  //
 end;
 
 procedure TFormWorkspace.FormActivate(Sender: TObject);
@@ -256,15 +248,6 @@ begin
     FPathToAndroidNDK:= SelectDirectoryDialog2.FileName;
   end;
 end;
-   (*
-procedure TFormWorkspace.SpeedButton3Click(Sender: TObject);
-begin
-{  if SelectDirectoryDialog3.Execute then
-  begin
-    Edit3.Text := SelectDirectoryDialog3.FileName;
-    FPathToNdkToolchains:= SelectDirectoryDialog3.FileName;
-  end; }
-end;  *)
 
 procedure TFormWorkspace.SpeedButton4Click(Sender: TObject);
 begin
@@ -323,7 +306,7 @@ end;
 
 procedure TFormWorkspace.LoadSettings(const pFilename: string);
 var
-  i1, i2, i3, i4, i5, j1: integer;
+  i1, i2, i3, i4, i5, j1, j2: integer;
 begin
   FFileName:= pFilename;
   with TIniFile.Create(pFilename) do
@@ -372,6 +355,11 @@ begin
        j1:= strToInt(ReadString('NewProject','TargetApi', ''))
     else j1:= 7; // Api 17
 
+    if ReadString('NewProject','AndroidPlatform', '') <> '' then
+       j2:= strToInt(ReadString('NewProject','AndroidPlatform', ''))
+    else j2:= 2; // Android-14
+    ComboBox2.ItemIndex:= j2;
+
     ComboBox1.Items.Clear;
     GetSubDirectories(FPathToWorkspace, ComboBox1.Items);
 
@@ -411,6 +399,7 @@ begin
   Edit6.Text := FPathToAndroidSDK;
   Edit7.Text := FPathToAntBin;
   Edit8.Text := FAntPackageName;
+
 end;
 
 procedure TFormWorkspace.SaveSettings(const pFilename: string);
@@ -449,6 +438,8 @@ begin
          WriteString('NewProject', 'AntBuildMode', 'release');
 
       WriteString('NewProject', 'MainActivity', FMainActivity); //dummy
+
+      WriteString('NewProject', 'AndroidPlatform', IntToStr(ComboBox2.ItemIndex));
 
       Free;
    end;

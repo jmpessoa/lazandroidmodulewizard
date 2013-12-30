@@ -423,12 +423,18 @@ Procedure jImageView_setMarginBottom(env:PJNIEnv;this:jobject; ImageView : jObje
 Procedure jImageView_setLParamWidth(env:PJNIEnv;this:jobject; ImageView : jObject; w: DWord);
 Procedure jImageView_setLParamHeight(env:PJNIEnv;this:jobject; ImageView : jObject; h: DWord);
 
+//by jmpessoa
 Procedure jImageView_setLeftTopRightBottomWidthHeight(env:PJNIEnv;this:jobject;
                                         ImageView : jObject; ml,mt,mr,mb,w,h: integer);
 
 Procedure jImageView_addLParamsParentRule(env:PJNIEnv;this:jobject; ImageView : jObject; rule: DWord);
 Procedure jImageView_addLParamsAnchorRule(env:PJNIEnv;this:jobject; ImageView : jObject; rule: DWord);
 Procedure jImageView_setLayoutAll(env:PJNIEnv;this:jobject; ImageView : jObject;  idAnchor: DWord);
+
+//by jmpessoa
+function jImageView_getLParamHeight(env:PJNIEnv;this:jobject; ImageView : jObject ): integer;
+function jImageView_getLParamWidth(env:PJNIEnv;this:jobject; ImageView : jObject): integer;
+
 
 // ListView
 Function  jListView_Create             (env:PJNIEnv;this:jobject;
@@ -1130,6 +1136,7 @@ begin
  Result     := env^.CallIntMethodA(env,this,_jMethod,@_jParams);
 end;
 
+//by jmpessoa
 function jView_getLParamWidth(env:PJNIEnv;this:jobject; View : jObject): integer;
 Const
  _cFuncName = 'jView_getLParamWidth';
@@ -4080,6 +4087,33 @@ begin
  env^.CallVoidMethodA(env,this,_jMethod,@_jParams);
 end;
 
+//by jmpessoa
+function jImageView_getLParamHeight(env:PJNIEnv;this:jobject; ImageView : jObject ): integer;
+Const
+ _cFuncName = 'jImageView_getLParamHeight';
+ _cFuncSig  = '(Ljava/lang/Object;)I';
+Var
+ _jMethod : jMethodID = nil;
+ _jParams : jValue;
+begin
+ jClassMethod(_cFuncName,_cFuncSig,env,gjClass,_jMethod);
+ _jParams.l := ImageView;
+ Result     := env^.CallIntMethodA(env,this,_jMethod,@_jParams);
+end;
+
+//by jmpessoa
+function jImageView_getLParamWidth(env:PJNIEnv;this:jobject; ImageView : jObject): integer;
+Const
+  _cFuncName = 'jImageView_getLParamWidth';
+  _cFuncSig  = '(Ljava/lang/Object;)I';
+Var
+  _jMethod : jMethodID = nil;
+  _jParams : jValue;
+begin
+  jClassMethod(_cFuncName,_cFuncSig,env,gjClass,_jMethod);
+  _jParams.l := ImageView;
+  Result     := env^.CallIntMethodA(env,this,_jMethod,@_jParams);
+end;
 
 //------------------------------------------------------------------------------
 // ListView

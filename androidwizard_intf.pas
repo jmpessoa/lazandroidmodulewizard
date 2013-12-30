@@ -46,6 +46,7 @@ type
      FAntBuildMode: string;
      FMainActivity: string;
      FPathToJavaSrc: string;
+     FAndroidPlatform: string;
 
      function SettingsFilename: string;
      function TryNewJNIAndroidInterfaceCode: boolean;
@@ -145,7 +146,6 @@ end;
 function TAndroidProjectDescriptor.TryNewJNIAndroidInterfaceCode: boolean;
 var
   frm: TFormAndroidProject;
-  //auxStr: string;
 begin
   Result := False;
   frm:= TFormAndroidProject.Create(nil);
@@ -187,13 +187,6 @@ begin
 
     ChDir(FPathToJNIFolder+DirectorySeparator+ 'obj'+DirectorySeparator+FJavaClassName);
     if IOResult <> 0 then MkDir(FPathToJNIFolder+ DirectorySeparator + 'obj'+DirectorySeparator+LowerCase(FJavaClassName));
-
-    {
-    auxStr:='armeabi';
-    if FInstructionSet = 'ArmV7' then auxStr:='armeabi-v7a';
-      ChDir(FPathToJNIFolder+DirectorySeparator+ 'libs'+DirectorySeparator+auxStr);
-      if IOResult <> 0 then MkDir(FPathToJNIFolder+ DirectorySeparator + 'libs'+DirectorySeparator+auxStr);
-    }
 
     ChDir(FPathToJNIFolder+DirectorySeparator+ 'libs'+DirectorySeparator+'x86');
     if IOResult <> 0 then MkDir(FPathToJNIFolder+ DirectorySeparator + 'libs'+DirectorySeparator+'x86');
@@ -274,6 +267,7 @@ begin
     FPathToAndroidSDK:= frm.PathToAndroidSDK;
     FPathToAndroidNDK:= frm.PathToAndroidNDK;
     FNDK:= frm.NDK;
+    FAndroidPlatform:= frm.AndroidPlatform;
 
     FPathToAntBin:= frm.PathToAntBin;
 
@@ -788,7 +782,7 @@ begin
 
    {Set compiler options for Android requirements}
   pathToNdkPlataformsArm:= FPathToAndroidNDK+DirectorySeparator+'platforms'+DirectorySeparator+
-                                                'android-14'+DirectorySeparator+'arch-arm'+DirectorySeparator+
+                                                FAndroidPlatform +DirectorySeparator+'arch-arm'+DirectorySeparator+
                                                 'usr'+DirectorySeparator+'lib';
 
   if FNdk = '7c' then
@@ -807,7 +801,7 @@ begin
   libraries_arm:= pathToNdkPlataformsArm+';'+pathToNdkToolchainsArm;
 
   pathToNdkPlataformsX86:= FPathToAndroidNDK+DirectorySeparator+'platforms'+DirectorySeparator+
-                                             'android-14'+DirectorySeparator+'arch-x86'+DirectorySeparator+
+                                             FAndroidPlatform+DirectorySeparator+'arch-x86'+DirectorySeparator+
                                              'usr'+DirectorySeparator+'lib';
   if FNdk = '7c' then
       pathToNdkToolchainsX86:= FPathToAndroidNDK+DirectorySeparator+'toolchains'+DirectorySeparator+
@@ -933,7 +927,7 @@ begin
   auxList.Clear;
   auxList.Add('How To Get More Builds:');
   auxList.Add(' ');
-  auxList.Add('   :: Warning: Your system [Laz4Android] needs to be prepared for the various builds!');
+  auxList.Add('   :: Warning: Your system [Laz4Android ?] needs to be prepared for the various builds!');
   auxList.Add(' ');
   auxList.Add('1. Edit Lazarus project file "*.lpi": [use notepad like editor]');
   auxList.Add(' ');
