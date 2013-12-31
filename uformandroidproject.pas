@@ -676,8 +676,6 @@ begin
     strPack:= strPack+'.'+FMainActivity; {App}
     strAfterReplace  := StringReplace(strAfterReplace, 'dummyAppName',strPack, [rfReplaceAll, rfIgnoreCase]);
 
-    strAfterReplace  := StringReplace(strAfterReplace, 'dummyTargetApi', FTargetApi, [rfReplaceAll, rfIgnoreCase]);
-
     ListManifest.Clear;
     ListManifest.Text:= strAfterReplace;
     ListManifest.SaveToFile(FAndroidProjectName+DirectorySeparator+'AndroidManifest.xml');
