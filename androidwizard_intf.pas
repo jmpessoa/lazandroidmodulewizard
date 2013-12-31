@@ -596,9 +596,7 @@ begin
          strList.Add('    package="'+FAntPackageName+'.'+LowerCase(projName)+'"');
          strList.Add('    android:versionCode="1"');
          strList.Add('    android:versionName="1.0" >');
-         strList.Add('    <uses-sdk');
-         strList.Add('        android:minSdkVersion="10"');
-         strList.Add('        android:targetSdkVersion="'+FTargetApi+'" />');
+         strList.Add('    <uses-sdk android:minSdkVersion="10"/>');
          strList.Add('    <application');
          strList.Add('        android:allowBackup="true"');
          strList.Add('        android:icon="@drawable/ic_launcher"');
@@ -777,7 +775,7 @@ begin
   AProject.UseManifest:= False;
   AProject.UseAppBundle:= False;
 
-  if Pos('\', FPathToAndroidNDK) > 0 then osys:= 'windows'
+  if (Pos('\', FPathToAndroidNDK) > 0) or (Pos(':', FPathToAndroidNDK) > 0) then osys:= 'windows'
   else osys:= 'linux-x86';
 
    {Set compiler options for Android requirements}
