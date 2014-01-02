@@ -29,8 +29,8 @@ unit And_jni_Bridge;
 interface
 
 uses
-  SysUtils,Classes,ctypes,
-  And_jni, And_bitmap_h;
+  ctypes, SysUtils,Classes,
+  And_jni;
 
   //{$linklib jnigraphics}   {commented by jmpessoa}
 
@@ -859,25 +859,33 @@ procedure JNI_OnUnload(vm:PJavaVM;reserved:pointer); cdecl;
 // Base Conversion
 //------------------------------------------------------------------------------
 
+//by jmpessoa: try fix this BUG....
+
+// ref. http://android-developers.blogspot.cz/2011/11/jni-local-reference-changes-in-ics.html
+
 // http://stackoverflow.com/questions/14765776/jni-error-app-bug-accessed-stale-local-reference-0xbc00021-index-8-in-a-tabl
-// http://android-developers.blogspot.cz/2011/11/jni-local-reference-changes-in-ics.html
+
 Procedure jClassMethod(FuncName, FuncSig : PChar;
-                       env : PJNIEnv; var Class_ : jClass; Var Method_ : jMethodID);
-{ var
-   tmp: jClass; }
- begin
+                       env : PJNIEnv; var Class_ : jClass; var Method_ :jMethodID);
+var
+  tmpClass: jClass;
+begin
   if Class_  = nil then
   begin
-     Class_   := env^.FindClass(env, gjClassName);  //jmpessoa fix 1:  change Manifest to targetSdkVersion="11"
-     //Class_ := jClass (env^.NewGlobalRef(env, tmp)); //jmpessoa try fix 2: why not ?
+    //by jmpessoa "try" fix: "FindClass only returns local references..."
+    tmpClass:= jClass(env^.FindClass(env, gjClassName));
+    if tmpClass <> nil then
+    begin
+       Class_ := env^.NewGlobalRef(env, tmpClass);  //<< -------- fix!
+    end;
+    //by jmpessoa: "bad" fix:change AndroidManifest to targetSdkVersion <= 13 !
+    //Class_   := env^.FindClass(env, gjClassName);
   end;
   if Method_ = nil then
   begin
-      Method_ := env^.GetMethodID( env, Class_, FuncName, FuncSig);
+    Method_:= env^.GetMethodID( env, Class_ , FuncName, FuncSig);
   end;
-  //Class_  := env^.FindClass  ( env, gjClassName );
-  //Method_ := env^.GetMethodID( env, Class_, FuncName, FuncSig);
- end;
+end;
 
 // LORDMAN - 2013-07-28
 Function jStr_getLength (env:PJNIEnv;this:jobject; Str : String): Integer;
@@ -968,7 +976,7 @@ function jSystem_GetOrientation (env:PJNIEnv;this:jobject; context: jObject): in
  Var
   _jMethod : jMethodID = nil;
   _jParam  : jValue;
-  _wh      : Integer;
+ // _wh      : Integer;
  begin
   jClassMethod(_cFuncName,_cFuncSig,env,gjClass,_jMethod);
   _jParam.l     := context;
@@ -1059,7 +1067,7 @@ Function  jAsset_SaveToFile(env:PJNIEnv; this:jobject; src,dst:String) : Boolean
  Var
   _jMethod : jMethodID = nil;
   _jParams : Array[0..1] of jValue;
-  _jString : jString;
+ // _jString : jString;
   _jBoolean: jBoolean;
  begin
   jClassMethod(_cFuncName,_cFuncSig,env,gjClass,_jMethod);
@@ -1468,7 +1476,7 @@ Procedure jImage_save                  (env:PJNIEnv;this:jobject; Bitmap : jObje
  Var
   _jMethod : jMethodID = nil;
   _jParams : Array[0..1] of jValue;
-  _jObject : jObject;
+ // _jObject : jObject;
  begin
   jClassMethod(_cFuncName,_cFuncSig,env,gjClass,_jMethod);
   _jParams[0].l := Bitmap;;
@@ -2789,7 +2797,7 @@ end;
 Procedure jButton_setOnClick(env:PJNIEnv;this:jobject;
                              Button : jObject);
  Const
-  _cFuncName = 'Button_setOnClick';
+  _cFuncName = 'jButton_setOnClick';
   _cFuncSig  = '(Landroid/widget/Button;)V';
  Var
   _jMethod : jMethodID = nil;
@@ -6511,7 +6519,7 @@ Procedure jGLSurfaceView_getBmpArray(env:PJNIEnv;this:jobject;filename : String)
   Size : Integer;
   PInt : PInteger;
   PIntS: PInteger;
-  i    : Integer;
+ // i    : Integer;
  begin
   jClassMethod(_cFuncName,_cFuncSig,env,gjClass,_jMethod);
   _jParam.l  := env^.NewStringUTF( env, pchar(filename));
@@ -7229,7 +7237,7 @@ Procedure jAsyncTask_Free   (env:PJNIEnv;this:jobject; AsyncTask : jObject);
    _jMethod : jMethodID = nil;
    _jParams : jValue;
   begin
-   dbg('jAsyncTask_Free env:'+IntTostr(integer(env)));
+   //dbg('jAsyncTask_Free env:'+IntTostr(integer(env)));
    jClassMethod(_cFuncName,_cFuncSig,env,gjClass,_jMethod);
    _jParams.l := AsyncTask;
    env^.CallVoidMethodA(env,this,_jMethod,@_jParams);

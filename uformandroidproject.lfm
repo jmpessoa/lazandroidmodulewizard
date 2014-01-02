@@ -1,7 +1,7 @@
 object FormAndroidProject: TFormAndroidProject
-  Left = 272
+  Left = 261
   Height = 570
-  Top = 14
+  Top = 42
   Width = 1040
   BorderIcons = []
   BorderStyle = bsSingle

@@ -1,12 +1,12 @@
 object FormWorkspace: TFormWorkspace
   Left = 374
-  Height = 518
+  Height = 542
   Top = 126
   Width = 650
   BorderIcons = [biSystemMenu]
   BorderStyle = bsSingle
-  Caption = 'Android Module Wizard: Configure Paths'
-  ClientHeight = 518
+  Caption = 'Android Module Wizard: Configure Paths and Project'
+  ClientHeight = 542
   ClientWidth = 650
   Icon.Data = {
     5E07000000000100010018180000010018004807000016000000280000001800
@@ -136,8 +136,8 @@ object FormWorkspace: TFormWorkspace
     Left = 200
     Height = 15
     Top = 174
-    Width = 68
-    Caption = 'Path to NDK:'
+    Width = 114
+    Caption = 'Path to Android NDK:'
     ParentColor = False
   end
   object SpeedButton2: TSpeedButton
@@ -208,9 +208,9 @@ object FormWorkspace: TFormWorkspace
     TabOrder = 6
   end
   object Label3: TLabel
-    Left = 9
+    Left = 8
     Height = 15
-    Top = 248
+    Top = 252
     Width = 402
     Caption = 'Path to Java Resources  [Simonsayz''s Controls.java,  *.xml and default Icons]:'
     ParentColor = False
@@ -218,7 +218,7 @@ object FormWorkspace: TFormWorkspace
   object SpeedButton4: TSpeedButton
     Left = 622
     Height = 22
-    Top = 272
+    Top = 271
     Width = 23
     Caption = '...'
     OnClick = SpeedButton4Click
@@ -283,7 +283,7 @@ object FormWorkspace: TFormWorkspace
   object Label7: TLabel
     Left = 8
     Height = 15
-    Top = 120
+    Top = 126
     Width = 111
     Caption = 'Path to Android SDK:'
     ParentColor = False
@@ -387,43 +387,29 @@ object FormWorkspace: TFormWorkspace
     Top = 432
     Width = 88
     Items.Strings = (
+      '8  '
       '10'
-      '11'
-      '12'
       '13'
       '14'
-      '15'
-      '16'
-      '17'
-      '18'
-      '19'
-      '20'
-      '21'
-      '22'
-      '23'
-      '24'
-      '25'
-      '26'
-      '27'
     )
     ItemHeight = 15
-    ItemIndex = 7
+    ItemIndex = 3
     OnClick = ListBox1Click
+    OnSelectionChange = ListBox1SelectionChange
     TabOrder = 14
-    TopIndex = 4
   end
   object Label10: TLabel
     Left = 176
     Height = 15
     Top = 416
-    Width = 58
-    Caption = 'Target Api:'
+    Width = 45
+    Caption = 'Min Api:'
     ParentColor = False
   end
   object RadioGroup5: TRadioGroup
     Left = 9
     Height = 40
-    Top = 174
+    Top = 175
     Width = 90
     AutoFill = True
     Caption = 'Android NDK:'
@@ -440,10 +426,12 @@ object FormWorkspace: TFormWorkspace
     Columns = 2
     ItemIndex = 0
     Items.Strings = (
-      '7c'
+      '7'
       '9'
     )
     OnClick = RadioGroup5Click
+    ParentShowHint = False
+    ShowHint = True
     TabOrder = 15
   end
   object Bevel4: TBevel
@@ -496,10 +484,6 @@ object FormWorkspace: TFormWorkspace
       'Android-8'
       'Android-9'
       'Android-14'
-      'Android-15'
-      'Android-16'
-      'Android-17'
-      'Android-18'
     )
     OnChange = ComboBox2Change
     Style = csDropDownList
@@ -510,17 +494,24 @@ object FormWorkspace: TFormWorkspace
     Left = 104
     Height = 15
     Top = 174
-    Width = 55
-    Caption = 'Plataform:'
+    Width = 82
+    Caption = 'NDK Plataform:'
     ParentColor = False
+  end
+  object StatusBar1: TStatusBar
+    Left = 0
+    Height = 23
+    Top = 519
+    Width = 650
+    Panels = <>
   end
   object SelectDirectoryDialog1: TSelectDirectoryDialog
     left = 416
     top = 320
   end
   object SelectDirectoryDialog2: TSelectDirectoryDialog
-    left = 360
-    top = 152
+    left = 376
+    top = 176
   end
   object SelectDirectoryDialog4: TSelectDirectoryDialog
     left = 416
@@ -531,8 +522,8 @@ object FormWorkspace: TFormWorkspace
     top = 16
   end
   object SelectDirectoryDialog6: TSelectDirectoryDialog
-    left = 416
-    top = 80
+    left = 392
+    top = 72
   end
   object SelectDirectoryDialog7: TSelectDirectoryDialog
     left = 520

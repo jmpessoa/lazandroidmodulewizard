@@ -287,7 +287,7 @@ IV. Technical Notes: dependencies on laz4android [win32] IDE cross compiler:
 V. Ref. Lazarus forum: http://forum.lazarus.freepascal.org/index.php/topic,21919.0.html
 
      -Help and Hints
-     -Bugs
+     -Bugs : {known bug: fail on Api > 13. Temporary solution: a workaround to prevent Api > 13 - 02 jan 2014}
      -Sugestions 
      -Colaborations	
      -Critics

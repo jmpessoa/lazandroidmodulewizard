@@ -998,7 +998,7 @@ type
 
     FFontSize  : DWord;
     FId           : DWord;        //by jmpessoa
-    FAnchorId     : DWord;
+    FAnchorId     : integer;
     FAnchor       : jVisualControl;  //http://www.semurjengkol.com/android-relative-layout-example/
     FPositionRelativeToAnchor: TPositionRelativeToAnchorIDSet;
     FPositionRelativeToParent: TPositionRelativeToParentSet;
@@ -1025,7 +1025,7 @@ type
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
     procedure Init(App: jApp);  override;
-    property AnchorId: DWord read FAnchorId write FAnchorId;
+    property AnchorId: integer read FAnchorId write FAnchorId;
     property Width: integer Read GetWidth;
     property Height: integer Read GetHeight;
   published
@@ -1350,9 +1350,9 @@ type
     procedure SetImageIndex(Value: integer);
     function  GetImageName       : string;
     function  GetImageIndex      : integer;
+  protected
     function GetHeight: integer; override;
     function GetWidth: integer;  override;
-  protected
     procedure setParamHeight(Value: TLayoutParams);
     procedure SetParamWidth(Value: TLayoutParams);
     Procedure GenEvent_OnClick(Obj: TObject);
@@ -1766,7 +1766,7 @@ function SplitStr(var theString: string; delimiter: string): string;
 function GetARGB(colbrColor: TARGBColorBridge): DWord;
 function GetProgressBarStyle(cjProgressBarStyle: TProgressBarStyle ): DWord;
 function GetInputTypeEx(itxType: TInputTypeEx): DWord;
-function GetScrollBarStyle(scrlBarStyle: TScrollBarStyle ): DWord;
+function GetScrollBarStyle(scrlBarStyle: TScrollBarStyle ): integer;
 function GetPositionRelativeToAnchor(posRelativeToAnchorID: TPositionRelativeToAnchorID): DWord;
 function GetPositionRelativeToParent(posRelativeToParent: TPositionRelativeToParent): DWord;
 
@@ -1839,7 +1839,7 @@ begin
 end;
 
 //by jmpessoa
-function GetScrollBarStyle(scrlBarStyle: TScrollBarStyle): DWord;
+function GetScrollBarStyle(scrlBarStyle: TScrollBarStyle): integer;
 var
   index: integer;
 begin
@@ -1876,8 +1876,6 @@ begin
 end;
 
 function GetLayoutParams(App:jApp; lpParam: TLayoutParams; side: TSide): DWord;
-var
-  index: integer;
 begin
   case lpParam of
      lpMatchParent:          Result:= TLayoutParamsArray[0];
@@ -2239,10 +2237,20 @@ begin
   dbg('pAppOnResume');
 end;
 
+{TODO: by jmpessoa
+Procedure Java_Event_pAppOnActive(env: PJNIEnv; this: jObject);
+var
+ Form      : jForm;
+begin
+ Form := App.Forms.Stack[App.Forms.Index-1].Form;
+ if not( Assigned(Form)) then Exit;
+ if Assigned(Form.OnActive) then Form.OnActive(Form);
+end;
+}
+
 Procedure Java_Event_pAppOnActive(env: PJNIEnv; this: jObject);
 begin
-  //dbg('pAppOnActive');
-  //ShowMessage('pAppOnActive NOT Implemented Yet!!');
+  //
 end;
 
 Procedure Java_Event_pAppOnStop(env: PJNIEnv; this: jobject);
@@ -2353,7 +2361,6 @@ begin
   If not (Assigned(Timer.OnTimer)) then Exit;
   Timer.OnTimer(Timer);
 end;
-
 
 Procedure Java_Event_pOnTouch(env: PJNIEnv; this: jobject;
                               Obj: TObject;
@@ -4607,8 +4614,6 @@ begin
 end;
 
 procedure jHttpClient.Init(App: jApp);
-var
- i: integer;
 begin
  if FInitialized  then Exit;
  inherited Init(App);
@@ -4679,8 +4684,6 @@ begin
 end;
 
 procedure jSMTPClient.Init(App: jApp);
-var
- i: integer;
 begin
  if FInitialized  then Exit;
  inherited Init(App);
@@ -4761,8 +4764,6 @@ begin
 end;
 
 procedure jSMS.Init(App: jApp);
-var
- i: integer;
 begin
  if FInitialized  then Exit;
  inherited Init(App);
@@ -4773,9 +4774,10 @@ end;
 function jSMS.GetContactList: string;
 begin
  if FInitialized then
-  FContactList.DelimitedText:= jContact_getDisplayNameList(App.Jni.jEnv,
+   FContactList.DelimitedText:= jContact_getDisplayNameList(App.Jni.jEnv,
                                                                       App.Jni.jThis, App.Jni.jActivity,
                                                                       FContactListDelimiter);
+  Result:=FContactList.DelimitedText;
 end;
 
 procedure jSMS.SetSMSMessage(Value: TStrings);

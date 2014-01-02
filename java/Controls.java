@@ -1,4 +1,4 @@
-package com.template.appdummy; //warning by jmpessoa: please do not edit ou change the place of this line!!! 
+package com.example.appdemographics1;
 //
 //
 //Android Java Interface for Pascal/Delphi XE5  - [and Lazarus: by jmpessoa - december 2013]
@@ -1201,6 +1201,7 @@ public void setLayoutAll(int idAnchor) {
 public void setIdEx(int id) {
 	  setId(id);	
 }
+
 }
 
 //-------------------------------------------------------------------------
@@ -1372,6 +1373,7 @@ private LayoutParams    lparams;           // layout XYWH
 private OnClickListener onClickListener;   //
 public  Bitmap          bmp      = null;   //
 
+
 //by jmpessoa
 private int lparamsAnchorRule[] = new int[20]; 
 int countAnchorRule = 0;
@@ -1435,24 +1437,23 @@ public void setLeftTopRightBottomWidthHeight(int left, int top, int right, int b
 	lpW = w;
 }	
 
-
 //
 public  void setParent( android.view.ViewGroup viewgroup ) {
 if (parent != null) { parent.removeView(this); }
-parent = viewgroup;
-viewgroup.addView(this,lparams);
+   parent = viewgroup;
+   viewgroup.addView(this,lparams);
 }
 
 // Free object except Self, Pascal Code Free the class.
 public  void Free() {
 if (parent != null) { parent.removeView(this); }
-if (bmp    != null) { bmp.recycle();           }
-bmp     = null;
-setImageBitmap(null);
-lparams = null;
-setImageResource(0); //android.R.color.transparent;
-onClickListener = null;
-setOnClickListener(null);
+   if (bmp    != null) { bmp.recycle(); }
+   bmp     = null;
+   setImageBitmap(null);
+   lparams = null;
+   setImageResource(0); //android.R.color.transparent;
+   onClickListener = null;
+   setOnClickListener(null);
 }
 
 //by jmpessoa
@@ -1465,7 +1466,6 @@ public void setMarginLeft(int x) {
 	MarginLeft = x;
 }
 
-//by jmpessoa
 public void setMarginTop(int y) {
 	MarginTop = y;
 }
@@ -1479,9 +1479,21 @@ public void setLParamHeight(int h) {
   lpH = h;
 }
 
+//by jmpessoa
+public int getLParamHeight() {	
+	
+    return this.getHeight();
+}  
+
+//by jmpessoa
+public int getLParamWidth() {
+
+	return this.getWidth();
+}
+
 public void addLParamsAnchorRule(int rule) {
-lparamsAnchorRule[countAnchorRule] = rule;
-countAnchorRule = countAnchorRule + 1;
+  lparamsAnchorRule[countAnchorRule] = rule;
+  countAnchorRule = countAnchorRule + 1;
 }
 
 public void addLParamsParentRule(int rule) {
@@ -1499,8 +1511,7 @@ public void setLayoutAll(int idAnchor) {
 		
 		for (int i=0; i < countAnchorRule; i++) {  
 			lparams.addRule(lparamsAnchorRule[i], idAnchor);		
-	    }
-		
+	    }		
 	} 
 	for (int j=0; j < countParentRule; j++) {  
 		lparams.addRule(lparamsParentRule[j]);		
@@ -1514,8 +1525,8 @@ public void setIdEx(int id) {
    setId(id);	
 }
 
-
 }
+ 
 
 //-------------------------------------------------------------------------
 //ListView
@@ -1946,7 +1957,9 @@ setId(id);
 
 }
 
-//----- jPanel
+//-----------------------------------------
+//----- jPanel by jmpessoa
+//-----------------------------------------
 class jPanel  extends RelativeLayout {
 	//Java-Pascal Interface
 	private int             PasObj   = 0;      // Pascal Obj
@@ -1958,7 +1971,6 @@ class jPanel  extends RelativeLayout {
 	private RelativeLayout  layout   = null;
 	private LayoutParams    layparam = null;
 	
-	//by jmpessoa
 	private int lparamsAnchorRule[] = new int[40]; 
 	int countAnchorRule = 0;
 
@@ -1974,21 +1986,18 @@ class jPanel  extends RelativeLayout {
 	int marginRight  = 0;
 	int marginBottom = 0;
     	
-	//by jmpessoa
 	public void setMarginRight(int x) {
 		marginRight = x;
 	}
 
-	//by jmpessoa
 	public void setMarginBottom(int y) {
 		marginBottom = y;
 	}
-	//by jmpessoa
+
 	public void setMarginLeft(int x) {
 		MarginLeft = x;
 	}
 
-	//by jmpessoa
 	public void setMarginTop(int y) {
 		MarginTop = y;
 	}
@@ -2004,7 +2013,6 @@ class jPanel  extends RelativeLayout {
 	   layout   = new RelativeLayout(context);
 	   layparam = new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
 	   layout.setLayoutParams(layparam);
-	   //layout.setBackgroundColor (0xFFFF0000);
 	}
 	
 	public  void setXYWH ( int x, int y, int w, int h ) {
@@ -2030,7 +2038,6 @@ class jPanel  extends RelativeLayout {
 		lpW = w;
 	}	
 	
-	//by jmpessoa
 	public void setLParamWidth(int w) {
 	  lpW = w;
 	}
@@ -2100,17 +2107,14 @@ class jPanel  extends RelativeLayout {
 		layout.setLayoutParams(layparam); 		
  	}
 
-	//by jmpessoa
 	public void setIdEx(int id) {
 	   setId(id);	
 	}
 	
-	//
 	public  android.widget.RelativeLayout getView() {
 	   return layout;
 	}
 
-	//	
 	public  void setParent( android.view.ViewGroup viewgroup ) {
     	if (parent != null) { parent.removeView(this); }
 	    parent = viewgroup;
@@ -5178,6 +5182,15 @@ public  void jImageView_setLayoutAll(java.lang.Object imageview, int idAnchor) {
 	  ((jImageView)imageview).setLayoutAll(idAnchor);
 }
 
+//by jmpessoa
+public int jImageView_getLParamHeight(java.lang.Object imageview) {
+	  return ((jImageView)imageview).getLParamHeight();
+}
+
+//by jmpessoa           
+public int jImageView_getLParamWidth(java.lang.Object imageview) {
+	return ((jImageView)imageview).getLParamWidth();	
+}
 
 // -------------------------------------------------------------------------
 //  ListView

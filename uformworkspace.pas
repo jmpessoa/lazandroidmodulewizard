@@ -5,8 +5,8 @@ unit uformworkspace;
 interface
 
 uses
-  inifiles,
-  Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, StdCtrls, Buttons, ExtCtrls;
+  inifiles, Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs,
+  StdCtrls, Buttons, ExtCtrls, ComCtrls;
 
 type
 
@@ -57,6 +57,7 @@ type
     SpeedButton5: TSpeedButton;
     SpeedButton6: TSpeedButton;
     SpeedButton7: TSpeedButton;
+    StatusBar1: TStatusBar;
   //  procedure CheckBox1Click(Sender: TObject);
   //  procedure CheckBox2Click(Sender: TObject);
     procedure CheckGroup1Click(Sender: TObject);
@@ -66,6 +67,7 @@ type
     procedure FormClose(Sender: TObject; var CloseAction: TCloseAction);
     procedure FormCreate(Sender: TObject);
     procedure ListBox1Click(Sender: TObject);
+    procedure ListBox1SelectionChange(Sender: TObject; User: boolean);
     procedure RadioGroup1Click(Sender: TObject);
     procedure RadioGroup2Click(Sender: TObject);
     procedure RadioGroup3Click(Sender: TObject);
@@ -96,7 +98,7 @@ type
     FProjectModel: string;
     FGUIControls: string;
     FAntPackageName: string;
-    FTargetApi: string;
+    FMinApi: string;
     FTouchtestEnabled: string;
     FAntBuildMode: string;
     FMainActivity: string;   //Simon "App"
@@ -107,6 +109,8 @@ type
     procedure GetSubDirectories(const directory : string; list : TStrings) ;
     procedure LoadSettings(const pFilename: string);
     procedure SaveSettings(const pFilename: string);
+    function GetTextByListIndex(index:integer): string;
+
     property PathToWorkspace: string read FPathToWorkspace write FPathToWorkspace;
     property PathToNdkPlataforms: string
                                                       read FPathToNdkPlataforms
@@ -123,7 +127,7 @@ type
     property ProjectModel: string read FProjectModel write FProjectModel; {eclipse/any}
     property GUIControls: string read FGUIControls write FGUIControls;
     property AntPackageName: string read FAntPackageName write FAntPackageName;
-    property TargetApi: string read FTargetApi write FTargetApi;
+    property MinApi: string read FMinApi write FMinApi;
     property TouchtestEnabled: string read FTouchtestEnabled write FTouchtestEnabled;
     property AntBuildMode: string read FAntBuildMode write FAntBuildMode;
     property MainActivity: string read FMainActivity write FMainActivity;
@@ -144,7 +148,33 @@ implementation
 
 procedure TFormWorkspace.ListBox1Click(Sender: TObject);
 begin
-  FTargetApi:= ListBox1.Items.Strings[ListBox1.ItemIndex];
+  {just workaround to prevent a known bug! 02 jan 2014}
+  if ListBox1.ItemIndex <=2 then
+    FMinApi:= ListBox1.Items.Strings[ListBox1.ItemIndex]
+  else
+    FMinApi:= '2';
+end;
+
+//http://developer.android.com/about/dashboards/index.html
+function TFormWorkspace.GetTextByListIndex(index:integer): string;
+begin
+    case index of
+    -1: Result:= '';
+     0: Result:= 'Api 8  (100%  market sharing) - Froyo(2.2) 1.6% of the devices. http://developer.android.com/about/dashboards';
+     1: Result:= 'Api 10 (98.4% market sharing) - Gingerbread(2.3) 24.1% of the devices. http://developer.android.com/about/dashboards';
+     2: Result:= 'Api 13 (74.3% market sharing) - Honeycomb(3.2) 0.1% of the devices. http://developer.android.com/about/dashboards';
+     3: Result:= 'Api 14 (74.2% market sharing) - Ice Cream(4.02) 18.6% of the devices. http://developer.android.com/about/dashboards';
+     4: Result:= 'Api 15 (74.2% market sharing) - Ice Cream(4.04) 18.6% of the devices. http://developer.android.com/about/dashboards';
+     5: Result:= 'Api 16 (55.6% market sharing) - Jelly Bean(4.1) 37.4% of the devices. http://developer.android.com/about/dashboards';
+     6: Result:= 'Api 17 (18.2% market sharing) - Jelly Bean(4.2) 12.9% of the devices. http://developer.android.com/about/dashboards';
+     7: Result:= 'Api 18 (5.3%  market sharing) - Jelly Bean(4.3) 4.2% of the devices. http://developer.android.com/about/dashboards';
+     8: Result:= 'Api 19 (1.1%  market sharing) - KitKat(4.4) 1.1% of the devices. http://developer.android.com/about/dashboards';
+   end;
+end;
+
+procedure TFormWorkspace.ListBox1SelectionChange(Sender: TObject; User: boolean);
+begin
+   StatusBar1.SimpleText:= GetTextByListIndex(ListBox1.ItemIndex);
 end;
 
 procedure TFormWorkspace.RadioGroup1Click(Sender: TObject);
@@ -167,10 +197,46 @@ begin
   FGUIControls:= RadioGroup4.Items[RadioGroup4.ItemIndex];  //fix 15-december-2013
 end;
 
+//Ref. http://forum.xda-developers.com/wiki/Android/Build_Numbers
 procedure TFormWorkspace.RadioGroup5Click(Sender: TObject);
 begin
-  if RadioGroup5.ItemIndex = 0 then FNDK:= '7c'
+  if RadioGroup5.ItemIndex = 0 then FNDK:= '7'
   else FNDK:= '9';
+
+  ComboBox2.Items.Clear;
+  ListBox1.Items.Clear;
+  case  RadioGroup5.ItemIndex of
+     0: begin //7
+            ComboBox2.Items.Add('android-8');  //platform
+            ComboBox2.Items.Add('android-9');  //platform
+            ComboBox2.Items.Add('android-14'); //platform
+
+            ComboBox2.ItemIndex:= 2; ////platform android-14
+
+            ListBox1.Items.Add('8');   //Api(8)Froyo (2.2)
+            ListBox1.Items.Add('10');  //Api(10)Gingerbread (2.3)
+            ListBox1.Items.Add('13');  //Api(13)Honeycomb (3.2)
+            ListBox1.Items.Add('14');  //Api(14)Ice Cream Sandwich (4.0 - 4.0.1 - 4.0.2)
+
+            ListBox1.ItemIndex:= 3;
+        end;
+     1: begin  //9
+          ComboBox2.Items.Add('android-8'); //platform
+          ComboBox2.Items.Add('android-9'); //platform
+          ComboBox2.Items.Add('android-14'); //platform
+          ComboBox2.Items.Add('android-18');  //platform
+          ComboBox2.Items.Add('android-19'); //platform
+
+          ComboBox2.ItemIndex:= 2; ////platform android-14
+
+          ListBox1.Items.Add('8');   //Api(8)Froyo (2.2)
+          ListBox1.Items.Add('10');  //Api(10)Gingerbread (2.3)
+          ListBox1.Items.Add('13');  //Api(13)Honeycomb (3.2)
+          ListBox1.Items.Add('14');  //Api(14)Ice Cream Sandwich (4.0 - 4.0.1 - 4.0.2)
+
+          ListBox1.ItemIndex:= 3;
+        end;
+  end;
 end;
 
 procedure TFormWorkspace.FormClose(Sender: TObject; var CloseAction: TCloseAction);
@@ -194,12 +260,13 @@ begin
          if IOResult <> 0 then MkDir(FPathToWorkspace+DirectorySeparator+ComboBox1.Text);
      end;
   end;
+
   if ModalResult = mrOk then SaveSettings(FFileName);
 end;
 
 procedure TFormWorkspace.FormCreate(Sender: TObject);
 begin
-
+  //
 end;
 
 procedure TFormWorkspace.CheckGroup1Click(Sender: TObject);
@@ -219,14 +286,59 @@ end;
 
 procedure TFormWorkspace.ComboBox2Change(Sender: TObject);
 begin
-  //
+  ListBox1.Items.Clear;
+  case   ComboBox2.ItemIndex of
+     0: begin   //platform 8
+          ListBox1.Items.Add('8'); //Froyo (2.2)
+          ListBox1.ItemIndex:= 0;
+        end;
+     1: begin  //platform 9
+          ListBox1.Items.Add('8');  //Froyo (2.2)
+          ListBox1.Items.Add('10'); //Gingerbread (2.3)
+          ListBox1.ItemIndex:= 1;
+        end;
+     2: begin  //platform 14
+          ListBox1.Items.Add('8');
+          ListBox1.Items.Add('10');
+          ListBox1.Items.Add('13'); //Honeycomb (3.2)
+          ListBox1.Items.Add('14'); //Ice Cream Sandwich (4.01 - 4.02)
+          ListBox1.ItemIndex:= 3;
+
+        end;
+     3: begin  //platform  18
+          ListBox1.Items.Add('8');
+          ListBox1.Items.Add('10');
+          ListBox1.Items.Add('13'); //Honeycomb (3.2)
+          ListBox1.Items.Add('14'); //Ice Cream Sandwich (4.01 - 4.02)
+          ListBox1.Items.Add('15'); //Ice Cream Sandwich (4.03 - 4.04)
+          ListBox1.Items.Add('16'); //Jelly Bean (4.1.x)
+          ListBox1.Items.Add('17'); //Jelly Bean (4.2.x)
+          ListBox1.Items.Add('18'); //Jelly Bean (4.3)
+          ListBox1.ItemIndex:= 3;
+        end;
+     4: begin  //platform 19
+          ListBox1.Items.Add('8');  //Froyo (2.2)
+          ListBox1.Items.Add('10'); //Gingerbread (2.3)
+          ListBox1.Items.Add('13'); //Honeycomb (3.2)
+          ListBox1.Items.Add('14'); //Ice Cream Sandwich (4.0 - 4.01 - 4.02)
+          ListBox1.Items.Add('15'); //Ice Cream Sandwich (4.03 - 4.04)
+          ListBox1.Items.Add('16'); //Jelly Bean (4.1)
+          ListBox1.Items.Add('17'); //Jelly Bean (4.2)
+          ListBox1.Items.Add('18'); //Jelly Bean (4.3)
+          ListBox1.Items.Add('19'); //KitKat (4.4)
+          ListBox1.ItemIndex:= 3;
+        end;
+  end;
 end;
 
 procedure TFormWorkspace.FormActivate(Sender: TObject);
 begin
   ComboBox1.SetFocus;
+
   if (not CheckGroup1.Checked[0]) and (not CheckGroup1.Checked[1]) then
      CheckGroup1.Checked[0]:= True;
+
+  StatusBar1.SimpleText:= GetTextByListIndex(ListBox1.ItemIndex);
 end;
 
 procedure TFormWorkspace.SpeedButton1Click(Sender: TObject);
@@ -237,6 +349,15 @@ begin
     FPathToWorkspace:= SelectDirectoryDialog1.FileName;
     ComboBox1.Items.Clear;
     GetSubDirectories(FPathToWorkspace, ComboBox1.Items);
+
+    //try some guesswork:
+    if Pos('eclipse', LowerCase(FPathToWorkspace) ) > 0 then
+    begin
+      RadioGroup3.ItemIndex:= 0;
+      Edit8.Text:='';
+    end;
+    if Pos('ant', LowerCase(FPathToWorkspace) ) > 0 then RadioGroup3.ItemIndex:= 1;
+
   end;
 end;
 
@@ -351,14 +472,27 @@ begin
        i4:= strToInt(ReadString('NewProject','GUIControls', ''))
     else i4:= 0;
 
-    if ReadString('NewProject','TargetApi', '') <> '' then
-       j1:= strToInt(ReadString('NewProject','TargetApi', ''))
-    else j1:= 7; // Api 17
+
+    {just workaround to prevent a known bug! 02 jan 2014}
+    if ReadString('NewProject','MinApi', '') <> '' then
+       j1:= strToInt(ReadString('NewProject','MinApi', ''))
+    else j1:= 2; // Api 13
+
+    if j1 > 2 then j1:= 2;  {just workaround to prevent a known bug! 02 jan 2014}
+
+    if  j1 < ListBox1.Items.Count then
+        ListBox1.ItemIndex:= j1
+    else
+       ListBox1.ItemIndex:= ListBox1.Items.Count-1;
 
     if ReadString('NewProject','AndroidPlatform', '') <> '' then
        j2:= strToInt(ReadString('NewProject','AndroidPlatform', ''))
     else j2:= 2; // Android-14
-    ComboBox2.ItemIndex:= j2;
+
+    if j2 < ComboBox2.Items.Count then
+        ComboBox2.ItemIndex:= j2
+    else
+        ComboBox2.ItemIndex:= ComboBox2.Items.Count-1;
 
     ComboBox1.Items.Clear;
     GetSubDirectories(FPathToWorkspace, ComboBox1.Items);
@@ -371,7 +505,7 @@ begin
   RadioGroup3.ItemIndex:= i3;
   RadioGroup4.ItemIndex:= i4;
   RadioGroup5.ItemIndex:= i5;
-  ListBox1.ItemIndex:= j1;;
+
 
   if FTouchtestEnabled = 'True' then
      CheckGroup1.Checked[1]:= True
@@ -387,7 +521,9 @@ begin
   FFPUSet:= RadioGroup2.Items[RadioGroup2.ItemIndex];
   FProjectModel:= RadioGroup3.Items[RadioGroup3.ItemIndex]; //"Eclipse Project"/"Ant Project"
   FGUIControls:=  RadioGroup4.Items[RadioGroup4.ItemIndex];
-  FTargetApi:= ListBox1.Items[ListBox1.ItemIndex];
+
+
+  FMinApi:= ListBox1.Items[ListBox1.ItemIndex];
 
   FNDK:= RadioGroup5.Items[RadioGroup5.ItemIndex];
 
@@ -399,7 +535,6 @@ begin
   Edit6.Text := FPathToAndroidSDK;
   Edit7.Text := FPathToAntBin;
   Edit8.Text := FAntPackageName;
-
 end;
 
 procedure TFormWorkspace.SaveSettings(const pFilename: string);
@@ -425,7 +560,10 @@ begin
 
       WriteString('NewProject', 'AntPackageName', LowerCase(Trim(Edit8.Text)));
 
-      WriteString('NewProject', 'TargetApi', IntToStr(ListBox1.ItemIndex));
+      if ListBox1.ItemIndex < 3 then {just workaround to prevent a known bug! 02 jan 2014}
+         WriteString('NewProject', 'MinApi', IntToStr(ListBox1.ItemIndex))
+      else
+         WriteString('NewProject', 'MinApi', '2');
 
       if CheckGroup1.Checked[1] then
          WriteString('NewProject', 'TouchtestEnabled', 'True')

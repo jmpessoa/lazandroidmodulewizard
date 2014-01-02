@@ -64,7 +64,7 @@ type
     FAndroidProjectName: string;
     FMainActivity: string;
     FListJNIBridge: TStringList;
-    FTargetApi: string;
+    FMinApi: string;
 
     Memo2List: TStringList;
 
@@ -89,7 +89,7 @@ type
     property PathToJavaTemplates: string read FPathToJavaTemplates write FPathToJavaTemplates;
     property AndroidProjectName: string read FAndroidProjectName write FAndroidProjectName;
     property MainActivity: string read FMainActivity write FMainActivity;
-    property TargetApi: string  read FTargetApi write FTargetApi;
+    property MinApi: string  read FMinApi write FMinApi;
   end;
 
 var
@@ -507,7 +507,11 @@ begin
     strOnLoadList.Add(' ');
     strOnLoadList.Add('procedure JNI_OnUnload(VM: PJavaVM; reserved: pointer); cdecl;');
     strOnLoadList.Add('begin');
-    strOnLoadList.Add('  if curEnv <> nil then (curEnv^).UnregisterNatives(curEnv, curClass);');
+    strOnLoadList.Add('  if curEnv <> nil then');
+    strOnLoadList.Add('  begin');
+    strOnLoadList.Add('    (curEnv^).UnregisterNatives(curEnv, curClass);');
+    strOnLoadList.Add('    (curEnv^).DeleteGlobalRef(curEnv, gjClass{And_jni_Bridge});');
+    strOnLoadList.Add('  end;');
     strOnLoadList.Add('  curClass:= nil;');
     strOnLoadList.Add('  curEnv:= nil;');
     strOnLoadList.Add('  curVM:= nil;');
@@ -675,6 +679,9 @@ begin
 
     strPack:= strPack+'.'+FMainActivity; {App}
     strAfterReplace  := StringReplace(strAfterReplace, 'dummyAppName',strPack, [rfReplaceAll, rfIgnoreCase]);
+
+    {known bug: there is a workaround to prevent Api > 13! - 02 jan 2014}
+    strAfterReplace  := StringReplace(strAfterReplace, 'dummyApi', FMinApi, [rfReplaceAll, rfIgnoreCase]);
 
     ListManifest.Clear;
     ListManifest.Text:= strAfterReplace;

@@ -41,7 +41,7 @@ type
      FPathToAntBin: string;
      FProjectModel: string; {"Eclipse Project"/"Ant Project"}
      FAntPackageName: string;
-     FTargetApi: string;
+     FMinApi: string;
      FTouchtestEnabled: string;
      FAntBuildMode: string;
      FMainActivity: string;
@@ -154,7 +154,7 @@ begin
   frm.AndroidProjectName:= FAndroidProjectName;
   frm.ModuleType:= FModuleType;
   frm.MainActivity:= FMainActivity;
-  frm.TargetApi:= FTargetApi;
+  frm.MinApi:= FMinApi;
   if frm.ShowModal = mrOK then
   begin
     Result := True;
@@ -223,11 +223,14 @@ end;
      //just for test! not realistic!
 function TAndroidProjectDescriptor.GetIdFromApi(api: integer): string;
 begin
+  {
   case api of
      17: result:= '1';
      18: result:= '2';
      19: result:= '3';
   end;
+  }
+  Result:= '1';
 end;
      //just for test!  not realistic!
 function TAndroidProjectDescriptor.GetFolderFromApi(api: integer): string;
@@ -271,7 +274,7 @@ begin
 
     FPathToAntBin:= frm.PathToAntBin;
 
-    FTargetApi:= frm.TargetApi;
+    FMinApi:= frm.MinApi;
 
     FMainActivity:= frm.MainActivity;
 
@@ -413,26 +416,25 @@ begin
 
       strList.Clear;
       strList.Add('cd '+FPathToAndroidSDK+DirectorySeparator+'tools');
-      strList.Add('android create avd -n avd_api_'+FTargetApi+' -t '+
-                   GetIdFromApi(StrToInt(FTargetApi)) + ' -c 32M'); //avd -n avd17 -t 17
+      strList.Add('android create avd -n avd_default -t 1 -c 32M');
       strList.Add('cd '+FAndroidProjectName);
       strList.Add('pause');
-      strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'utils'+DirectorySeparator+'create_avd_'+FTargetApi+'.bat');
+      strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'utils'+DirectorySeparator+'create_avd_default.bat');
 
       //need to pause on double-click use...
       strList.Clear;
-      strList.Add('cmd /K create_avd_'+FTargetApi+'.bat');
-      strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'utils'+DirectorySeparator+'paused_create_avd_'+FTargetApi+'.bat');
+      strList.Add('cmd /K create_avd_default.bat');
+      strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'utils'+DirectorySeparator+'paused_create_avd_default.bat');
 
       strList.Clear;
       strList.Add('cd '+FPathToAndroidSDK+DirectorySeparator+'tools');
-      if StrToInt(FTargetApi) >= 15 then
-         strList.Add('emulator -avd avd_api_'+FTargetApi + ' -gpu on &')  //gpu: api >= 15,,,
+      if StrToInt(FMinApi) >= 15 then
+         strList.Add('emulator -avd avd_default +  -gpu on &')  //gpu: api >= 15,,,
       else
-         strList.Add('tools emulator -avd avd_api_'+FTargetApi + ' &');
+         strList.Add('tools emulator -avd avd_api_'+FMinApi + ' &');
       strList.Add('cd '+FAndroidProjectName);
       //strList.Add('pause');
-      strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'launch_avd_api_'+FTargetApi+'.bat');
+      strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'launch_avd_default.bat');
 
       strList.Clear;
       strList.Add('cd '+FAndroidProjectName+DirectorySeparator+'bin');
@@ -486,7 +488,7 @@ begin
       strList.Clear;
       strList.Add('cd '+FAndroidProjectName+DirectorySeparator+'bin');
       strList.Add(FPathToAndroidSDK+DirectorySeparator+
-                  'build-tools'+DirectorySeparator+ GetFolderFromApi(StrToInt(FTargetApi))+
+                  'build-tools'+DirectorySeparator+ GetFolderFromApi(StrToInt(FMinApi))+
                   DirectorySeparator + 'aapt list '+projName+'-'+FAntBuildMode+'.apk');
       strList.Add('cd ..');
       strList.Add('pause');
@@ -496,7 +498,7 @@ begin
       strList.Add('<?xml version="1.0" encoding="UTF-8"?>');
       strList.Add('<project name="'+projName+'" default="help">');
       strList.Add('<property name="sdk.dir" location="'+FPathToAndroidSDK+'"/>');
-      strList.Add('<property name="target"  value="android-'+FTargetApi+'"/>');
+      strList.Add('<property name="target"  value="android-17"/>');
       strList.Add('<property file="ant.properties"/>');
       strList.Add('<fail message="sdk.dir is missing." unless="sdk.dir"/>');
       strList.Add('<import file="${sdk.dir}/tools/ant/build.xml"/>');
@@ -510,13 +512,13 @@ begin
       strList.Add(' ');
       strList.Add('2. If Android Virtual Device[AVD]/Emulator is running then:');
       strList.Add('   2.1 double click "install.bat" to install the Apk on the Emulator');
-      strList.Add('   2.2 look for the App '+projName+' on the Emulator and click it!');
+      strList.Add('   2.2 look for the App "'+projName+'" in the Emulator and click it!');
       strList.Add(' ');
-      strList.Add('3. If AVD/Emulator target Api['+FTargetApi+'] is NOT running:');
-      strList.Add('   3.1 If AVD/Emulator target Api['+FTargetApi+'] NOT exist:');
-      strList.Add('        3.1.1 double click "paused_create_avd*.bat" to create the AVD ['+DirectorySeparator+'utils folder]');
-      strList.Add('   3.2 double click "launch_avd*.bat" to launch the Emulator ['+DirectorySeparator+'utils  folder]');
-      strList.Add('   3.3 look for the App '+projName+' on  the Emulator and click it!');
+      strList.Add('3. If AVD/Emulator is NOT running:');
+      strList.Add('   3.1 If AVD/Emulator NOT exist:');
+      strList.Add('        3.1.1 double click "paused_create_avd_default.bat" to create the AVD ['+DirectorySeparator+'utils folder]');
+      strList.Add('   3.2 double click "launch_avd_default.bat" to launch the Emulator ['+DirectorySeparator+'utils  folder]');
+      strList.Add('   3.3 look for the App "'+projName+'" in the Emulator and click it!');
       strList.Add(' ');
       strList.Add('4. Log/Debug');
       strList.Add('   4.1 double click "logcat*.bat" to read Emulator logs and bugs! ['+DirectorySeparator+'utils folder]');
@@ -524,17 +526,19 @@ begin
       strList.Add('5. Uninstall Apk');
       strList.Add('   5.1 double click "uninstall.bat" to remove Apk from the Emulator!');
       strList.Add(' ');
-      strList.Add('6. Look for the Android '+projName+'-'+FAntBuildMode+'.apk in '+DirectorySeparator+'bin folder!');
+      strList.Add('6. To find your app Look for the "'+projName+'-'+FAntBuildMode+'.apk" in '+DirectorySeparator+'bin folder!');
       strList.Add(' ');
-      strList.Add('7. Android Asset Packaging Tool: to know which files were packed in '+projName+'-'+FAntBuildMode+'.apk');
+      strList.Add('7. Android Asset Packaging Tool: to know which files were packed in "'+projName+'-'+FAntBuildMode+'.apk"');
       strList.Add('   7.1 double click "aapt.bat" ['+DirectorySeparator+'utils folder]' );
       strList.Add(' ');
-      strList.Add('8. To see all available Android targets Api ['+DirectorySeparator+'utils folder]');
+      strList.Add('8. To see all available Android targets in your system ['+DirectorySeparator+'utils folder]');
       strList.Add('   8.1 double click "paused_list_target.bat" ');
       strList.Add(' ');
-      strList.Add('9. Hint: you can edit "*.bat" to extend/modify some command or to fix some incorrect path!');
+      strList.Add('9. Hint 1: you can edit "*.bat" to extend/modify some command or to fix some incorrect info/path!');
       strList.Add(' ');
-      strList.Add('10. Warning: After Lazarus run->build do not forget to run again: "build.bat" and "install.bat" !');
+      strList.Add('10.Hint 2: you can edit "build.xml" to set another Android target ex. "android-18" or "android-19" etc.');
+      strList.Add(' ');
+      strList.Add('11.Warning: After a new [Lazarus IDE]-> "run->build" do not forget to run again: "build.bat" and "install.bat" !');
       strList.Add(' ');
       strList.Add('....  Thank you!');
       strList.Add(' ');
@@ -783,7 +787,7 @@ begin
                                                 FAndroidPlatform +DirectorySeparator+'arch-arm'+DirectorySeparator+
                                                 'usr'+DirectorySeparator+'lib';
 
-  if FNdk = '7c' then
+  if FNdk = '7' then
       pathToNdkToolchainsArm:= FPathToAndroidNDK+DirectorySeparator+'toolchains'+DirectorySeparator+
                                                  'arm-linux-androideabi-4.4.3'+DirectorySeparator+
                                                  'prebuilt'+DirectorySeparator+osys+DirectorySeparator+
@@ -801,7 +805,7 @@ begin
   pathToNdkPlataformsX86:= FPathToAndroidNDK+DirectorySeparator+'platforms'+DirectorySeparator+
                                              FAndroidPlatform+DirectorySeparator+'arch-x86'+DirectorySeparator+
                                              'usr'+DirectorySeparator+'lib';
-  if FNdk = '7c' then
+  if FNdk = '7' then
       pathToNdkToolchainsX86:= FPathToAndroidNDK+DirectorySeparator+'toolchains'+DirectorySeparator+
                                                  'x86-4.4.3'+DirectorySeparator+'prebuilt'+DirectorySeparator+
                                                  osys+DirectorySeparator+'lib'+DirectorySeparator+
