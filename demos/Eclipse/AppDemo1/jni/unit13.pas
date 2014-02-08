@@ -20,6 +20,7 @@ type
       jTextView2: jTextView;
       jTextView3: jTextView;
       jTimer1: jTimer;
+      procedure DataModuleActive(Sender: TObject);
       procedure DataModuleCloseQuery(Sender: TObject; var CanClose: boolean);
       procedure DataModuleCreate(Sender: TObject);
       procedure DataModuleJNIPrompt(Sender: TObject);
@@ -100,8 +101,8 @@ begin
 end;
 
 procedure TAndroidModule13.DataModuleCreate(Sender: TObject);
-begin
-  Self.BackButton:= True;
+begin  //this initialization code is need here to fix Laz4Andoid  *.lfm parse.... why parse fails?
+  Self.ActivityMode:= actRecyclable;
   Self.BackgroundColor:= colbrBlack;
     //mode delphi
   Self.OnJNIPrompt:= DataModuleJNIPrompt;
@@ -115,6 +116,13 @@ begin
    gWorking:= False;
    jTimer1.Enabled:= False;
    CanClose:= True;
+end;
+
+procedure TAndroidModule13.DataModuleActive(Sender: TObject);
+begin
+  //jCanvasES2_1.Refresh;
+  gWorking:= True;
+  jTimer1.Enabled:= True;
 end;
 
 procedure TAndroidModule13.DataModuleJNIPrompt(Sender: TObject);
@@ -196,6 +204,7 @@ begin
     ArcBall_Move(gArcBall,gX,gY);
     jCanvasES2_1.Refresh;
   end;
+
 end;
 
 end.

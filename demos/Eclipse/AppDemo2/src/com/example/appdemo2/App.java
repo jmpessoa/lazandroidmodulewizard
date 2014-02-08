@@ -69,7 +69,7 @@ public class App extends Activity {
 
     @Override
     protected void onStart()                  { super.onStart();   
-    	                                          controls.jAppOnActive();        }
+    	                                          controls.jAppOnStart();        }
 
     @Override
     protected void onStop()                   { super.onStop(); 

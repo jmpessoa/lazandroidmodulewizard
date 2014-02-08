@@ -30,11 +30,12 @@ type
       jTimer1: jTimer;
       jTimer2: jTimer;
       jTimer3: jTimer;
+      procedure DataModuleActive(Sender: TObject);
+      procedure DataModuleClose(Sender: TObject);
       procedure DataModuleCloseQuery(Sender: TObject; var CanClose: boolean);
       procedure DataModuleCreate(Sender: TObject);
       procedure DataModuleJNIPrompt(Sender: TObject);
-      procedure DataModuleRotate(Sender: TObject; rotate: integer;
-        var rstRotate: integer);
+      procedure DataModuleRotate(Sender: TObject; rotate: integer; var rstRotate: integer);
       procedure jButton1Click(Sender: TObject);
       procedure jButton2Click(Sender: TObject);
       procedure jButton3Click(Sender: TObject);
@@ -110,7 +111,7 @@ end;
 
 procedure TAndroidModule3.jButton1Click(Sender: TObject);
 begin
-    jDialogYN1.Show;
+  jDialogYN1.Show;
 end;
 
 procedure TAndroidModule3.jButton2Click(Sender: TObject);
@@ -145,30 +146,39 @@ begin
 end;
 
 procedure TAndroidModule3.DataModuleCreate(Sender: TObject);
-begin
-  Self.BackButton:= True;
-  Self.BackgroundColor:= colbrBlack;
+begin //this initialization code is need here to fix Laz4Andoid  *.lfm parse.... why parse fails?
+  Img_Cnt:= -1;
+  Self.ActivityMode:= actRecyclable;
+  //Self.BackgroundColor:= colbrBlack;
   //mode delphi
   Self.OnJNIPrompt:= DataModuleJNIPrompt;
   Self.OnRotate:= DataModuleRotate;
   Self.OnCloseQuery:= DataModuleCloseQuery;
+  Self.OnActive:= DataModuleActive;
+  Self.OnClose:= DataModuleClose;
 end;
 
-procedure TAndroidModule3.DataModuleCloseQuery(Sender: TObject;
-  var CanClose: boolean);
+procedure TAndroidModule3.DataModuleCloseQuery(Sender: TObject; var CanClose: boolean);
 begin
   CanClose:= True;
+end;
+
+procedure TAndroidModule3.DataModuleActive(Sender: TObject);
+begin
+  jTimer3.Enabled:= True;
+end;
+
+procedure TAndroidModule3.DataModuleClose(Sender: TObject);
+begin
+  jTimer3.Enabled:= False;
 end;
 
 procedure TAndroidModule3.DataModuleJNIPrompt(Sender: TObject);
 begin
   Self.Show;
-  Img_Cnt:= -1;
-  jTimer3.Enabled:= True;
 end;
 
-procedure TAndroidModule3.DataModuleRotate(Sender: TObject; rotate: integer;
-  var rstRotate: integer);
+procedure TAndroidModule3.DataModuleRotate(Sender: TObject; rotate: integer; var rstRotate: integer);
 begin
   Self.UpdateLayout;
 end;

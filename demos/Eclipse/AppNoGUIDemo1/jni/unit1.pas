@@ -8,8 +8,13 @@ interface
 uses
   Classes, SysUtils, jni;
   
+const
+  gjClassPath: string='';
+  gjClass: JClass=nil;
+  gPDalvikVM: PJavaVM=nil;
+  
 type
-  TAndroidModule1 = class(TDataModule)
+  TNoGUIAndroidModule1 = class(TDataModule)
     private
       {private declarations}
     public
@@ -17,7 +22,7 @@ type
   end;
   
 var
-  AndroidModule1: TAndroidModule1;
+  NoGUIAndroidModule1: TNoGUIAndroidModule1;
 
 implementation
   

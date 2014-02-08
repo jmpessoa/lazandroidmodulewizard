@@ -1,7 +1,7 @@
 object AndroidModule8: TAndroidModule8
   OnCreate = DataModuleCreate
   OldCreateOrder = False
-  BackButton = True
+  ActivityMode = actRecyclable
   Title = 'jForm'
   BackgroundColor = colbrBlack
   OnCloseQuery = DataModuleCloseQuery
@@ -10,7 +10,7 @@ object AndroidModule8: TAndroidModule8
   Height = 239
   HorizontalOffset = 319
   VerticalOffset = 145
-  Width = 293
+  Width = 415
   object jTextView1: jTextView
     Id = 22765
     PosRelativeToAnchor = []
@@ -62,6 +62,7 @@ object AndroidModule8: TAndroidModule8
     MarginTop = 10
     MarginRight = 10
     MarginBottom = 10
+    Canvas = jCanvas1
     Visible = True
     BackgroundColor = colbrLightSteelBlue
     OnDraw = jView1Draw
@@ -70,18 +71,27 @@ object AndroidModule8: TAndroidModule8
     top = 88
   end
   object jBitmap1: jBitmap
+    FilePath = fpathData
     ImageIndex = 0
     Images = jImageList1
     Width = 0
     Height = 0
-    left = 152
+    left = 224
     top = 88
   end
   object jImageList1: jImageList
     Images.Strings = (
       'image01.png'
     )
-    left = 216
+    left = 288
+    top = 88
+  end
+  object jCanvas1: jCanvas
+    PaintStrokeWidth = 3
+    PaintStyle = psFillAndStroke
+    PaintTextSize = 20
+    PaintColor = colbrBlue
+    left = 158
     top = 88
   end
 end

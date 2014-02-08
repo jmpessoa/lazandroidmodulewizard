@@ -1,12 +1,13 @@
 object AndroidModule2: TAndroidModule2
   OnCreate = DataModuleCreate
   OldCreateOrder = False
-  BackButton = False
+  ActivityMode = actMain
   Title = 'jForm'
   BackgroundColor = colbrBlack
   OnCloseQuery = DataModuleCloseQuery
   OnRotate = DataModuleRotate
   OnJNIPrompt = DataModuleJNIPrompt
+  OnActive = DataModuleActive
   Height = 565
   HorizontalOffset = 324
   VerticalOffset = 19
@@ -27,7 +28,7 @@ object AndroidModule2: TAndroidModule2
     BackgroundColor = colbrDefault
     FontColor = colbrBlue
     FontSize = 0
-    Text = 'Android Components Demo'
+    Text = 'Lazarus Android Wizard'
     left = 136
     top = 24
   end
@@ -88,7 +89,7 @@ object AndroidModule2: TAndroidModule2
     BackgroundColor = colbrDefault
     FontColor = colbrBlue
     FontSize = 0
-    Text = 'Simonsayz''s Control for Lazarus by jmpessoa '
+    Text = 'Simon''s Controls for Lazarus by jmpessoa'
     left = 136
     top = 88
   end
@@ -182,7 +183,7 @@ object AndroidModule2: TAndroidModule2
     Anchor = jButton5
     PosRelativeToAnchor = [raToRightOf, raAlignBaseline]
     PosRelativeToParent = []
-    LayoutParamWidth = lpMatchParent
+    LayoutParamWidth = lpHalfOfParent
     LayoutParamHeight = lpWrapContent
     MarginLeft = 5
     MarginTop = 5

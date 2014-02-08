@@ -1,12 +1,13 @@
 object AndroidModule13: TAndroidModule13
   OnCreate = DataModuleCreate
   OldCreateOrder = False
-  BackButton = True
+  ActivityMode = actRecyclable
   Title = 'jForm'
   BackgroundColor = colbrBlack
   OnCloseQuery = DataModuleCloseQuery
   OnRotate = DataModuleRotate
   OnJNIPrompt = DataModuleJNIPrompt
+  OnActive = DataModuleActive
   Height = 356
   HorizontalOffset = 319
   VerticalOffset = 145
@@ -69,14 +70,14 @@ object AndroidModule13: TAndroidModule13
     MarginTop = 10
     MarginRight = 10
     MarginBottom = 10
-    AutoRefresh = False
-    Visible = True
     OnGLCreate = jCanvasES2_1GLCreate
     OnGLChange = jCanvasES2_1GLChange
     OnGLDraw = jCanvasES2_1GLDraw
     OnGLDown = jCanvasES2_1GLDown
     OnGLMove = jCanvasES2_1GLMove
     OnGLUp = jCanvasES2_1GLUp
+    AutoRefresh = False
+    Visible = True
     left = 104
     top = 152
   end

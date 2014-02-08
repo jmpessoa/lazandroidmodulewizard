@@ -14,6 +14,7 @@ type
 
   TAndroidModule9 = class(jForm)
       jBitmap1: jBitmap;
+      jCanvas1: jCanvas;
       jImageList1: jImageList;
       jTextView1: jTextView;
       jView1: jView;
@@ -34,8 +35,6 @@ type
   
 var
   AndroidModule9: TAndroidModule9;
-  PPixel : PScanLine;
-  //PPixelBuffer: PJByte;
 
 implementation
   
@@ -45,7 +44,7 @@ implementation
 
 procedure TAndroidModule9.jView1TouchMove(Sender: TObject; Touch: TMouch);
 begin
-   P := Point( Round(Touch.Pt.X), Round(Touch.Pt.Y) );
+   P:= Point( Round(Touch.Pt.X), Round(Touch.Pt.Y) );
    jView1.refresh;
 end;
 
@@ -53,12 +52,14 @@ procedure TAndroidModule9.jView1Draw(Sender: TObject; Canvas: jCanvas);
 var
   Ratio : Single;
 begin
-  jView1.Canvas.setColor(colbrGreen);
-  jView1.Canvas.setStyle(cjPaint_Style_Fill);
-  jView1.Canvas.setTextSize(20);
-  jView1.Canvas.drawText('P(x,y)= (' + IntToStr(P.X) + ',' + IntToStr(P.Y)+')',10,60);
+
+   //jView1.Canvas.PaintColor:= colbrGreen;
+  //jView1.Canvas.PaintStyle:= psFillAndStroke;
+  //jView1.Canvas.PaintTextSize:= 20;
+
   Ratio := CalcBitmapRatio;
   jView1.Canvas.drawBitmap(jBitmap1,10,10, jView1.Width-20,Round( (jView1.Width-20)*(1/Ratio) ) );
+  jView1.Canvas.drawText('P(x,y)= (' + IntToStr(P.X) + ',' + IntToStr(P.Y)+')',60,60);
 end;
 
 procedure TAndroidModule9.DataModuleCloseQuery(Sender: TObject;
@@ -68,8 +69,8 @@ begin
 end;
 
 procedure TAndroidModule9.DataModuleCreate(Sender: TObject);
-begin
-  Self.BackButton:= True;
+begin  //this initialization code is need here to fix Laz4Andoid  *.lfm parse.... why parse fails?
+  Self.ActivityMode:= actRecyclable;
   Self.BackgroundColor:= colbrBlack;
    //mode delphi
   Self.OnJNIPrompt:= DataModuleJNIPrompt;
@@ -79,6 +80,8 @@ end;
 
 procedure TAndroidModule9.DataModuleJNIPrompt(Sender: TObject);
 begin
+  P.X:= 30;
+  P.Y:= 30;
   Self.Show;
 end;
 
@@ -90,7 +93,7 @@ end;
 
 function TAndroidModule9.CalcBitmapRatio : Single;
 var
-  k    : integer;
+  k: integer;
   row, col: integer;
   PPixel : PScanLine;
   PJavaPixel: PScanByte; {need by delphi mode!} //PJByte;
@@ -99,12 +102,12 @@ begin
   if jBitmap1.GetInfo then
   begin
 
-     //demo API LockPixels... parameter is PScanLine
+     //demo API LockPixels... parameter is "PScanLine"
     jBitmap1.LockPixels(PPixel); //ok
     for k := 0 to jBitmap1.Width*jBitmap1.Height-1 do  PPixel^[k]:= not PPixel^[k];  //ok
     jBitmap1.UnlockPixels;
 
-     //demo API LockPixels - overloaded - paramenter is PJavaPixel
+     //demo API LockPixels - overloaded - paramenter is "PJavaPixel"
     jBitmap1.LockPixels(PJavaPixel); //ok
     k:= 0;
     for row:= 0 to jBitmap1.Height-1 do  //ok
@@ -118,6 +121,7 @@ begin
           inc(k);
       end;
     end;
+
     jBitmap1.UnlockPixels;
 
     Result:= Round(jBitmap1.Width/jBitmap1.Height);

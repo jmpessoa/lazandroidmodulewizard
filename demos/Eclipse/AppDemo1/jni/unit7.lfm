@@ -1,12 +1,13 @@
 object AndroidModule7: TAndroidModule7
   OnCreate = DataModuleCreate
   OldCreateOrder = False
-  BackButton = True
+  ActivityMode = actRecyclable
   Title = 'jForm'
   BackgroundColor = colbrBlack
   OnCloseQuery = DataModuleCloseQuery
   OnRotate = DataModuleRotate
   OnJNIPrompt = DataModuleJNIPrompt
+  OnActive = DataModuleActive
   Height = 520
   HorizontalOffset = 316
   VerticalOffset = 74

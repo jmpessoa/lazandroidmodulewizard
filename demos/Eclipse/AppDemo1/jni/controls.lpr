@@ -1,17 +1,11 @@
 {hint: save all files to location: C:\adt32\eclipse\workspace\AppDemo1\jni }
 library controls;
- 
+
 {$mode delphi}
- 
+
 uses
   Classes, SysUtils, And_jni, And_jni_Bridge, Laz_And_Controls, unit1;
- 
-const
-  curClassPathName: string='';
-  curClass: JClass=nil;
-  curVM: PJavaVM=nil;
-  curEnv: PJNIEnv=nil;
- 
+
 { Class:     com_example_appdemo1_Controls
   Method:    pAppOnScreenStyle
   Signature: ()I }
@@ -25,7 +19,7 @@ end;
   Signature: (Landroid/content/Context;Landroid/widget/RelativeLayout;)V }
 procedure pAppOnCreate(PEnv: PJNIEnv; this: JObject; context: JObject; layout: JObject); cdecl;
 begin
-  App.Init(PEnv,this,context,layout);AndroidModule1.Init(App);
+  gApp.Init(PEnv,this,context,layout);AndroidModule1.Init(gApp);
 end;
 
 { Class:     com_example_appdemo1_Controls
@@ -69,11 +63,11 @@ begin
 end;
 
 { Class:     com_example_appdemo1_Controls
-  Method:    pAppOnActive
+  Method:    pAppOnStart
   Signature: ()V }
-procedure pAppOnActive(PEnv: PJNIEnv; this: JObject); cdecl;
+procedure pAppOnStart(PEnv: PJNIEnv; this: JObject); cdecl;
 begin
-  Java_Event_pAppOnActive(PEnv,this);
+  Java_Event_pAppOnStart(PEnv,this);
 end;
 
 { Class:     com_example_appdemo1_Controls
@@ -118,85 +112,93 @@ end;
 
 { Class:     com_example_appdemo1_Controls
   Method:    pOnClick
-  Signature: (II)V }
-procedure pOnClick(PEnv: PJNIEnv; this: JObject; pasobj: JInt; value: JInt); cdecl;
+  Signature: (JI)V }
+procedure pOnClick(PEnv: PJNIEnv; this: JObject; pasobj: JLong; value: JInt); cdecl;
 begin
   Java_Event_pOnClick(PEnv,this,TObject(pasobj),value);
 end;
 
 { Class:     com_example_appdemo1_Controls
   Method:    pOnChange
-  Signature: (II)V }
-procedure pOnChange(PEnv: PJNIEnv; this: JObject; pasobj: JInt; EventType: JInt); cdecl;
+  Signature: (JI)V }
+procedure pOnChange(PEnv: PJNIEnv; this: JObject; pasobj: JLong; EventType: JInt); cdecl;
 begin
   Java_Event_pOnChange(PEnv,this,TObject(pasobj),EventType);
 end;
 
 { Class:     com_example_appdemo1_Controls
   Method:    pOnEnter
-  Signature: (I)V }
-procedure pOnEnter(PEnv: PJNIEnv; this: JObject; pasobj: JInt); cdecl;
+  Signature: (J)V }
+procedure pOnEnter(PEnv: PJNIEnv; this: JObject; pasobj: JLong); cdecl;
 begin
   Java_Event_pOnEnter(PEnv,this,TObject(pasobj));
 end;
 
 { Class:     com_example_appdemo1_Controls
   Method:    pOnTimer
-  Signature: (I)V }
-procedure pOnTimer(PEnv: PJNIEnv; this: JObject; pasobj: JInt); cdecl;
+  Signature: (J)V }
+procedure pOnTimer(PEnv: PJNIEnv; this: JObject; pasobj: JLong); cdecl;
 begin
   Java_Event_pOnTimer(PEnv,this,TObject(pasobj));
 end;
 
 { Class:     com_example_appdemo1_Controls
   Method:    pOnDraw
-  Signature: (ILandroid/graphics/Canvas;)V }
-procedure pOnDraw(PEnv: PJNIEnv; this: JObject; pasobj: JInt; canvas: JObject); cdecl;
+  Signature: (JLandroid/graphics/Canvas;)V }
+procedure pOnDraw(PEnv: PJNIEnv; this: JObject; pasobj: JLong; canvas: JObject); cdecl;
 begin
   Java_Event_pOnDraw(PEnv,this,TObject(pasobj),canvas);
 end;
 
 { Class:     com_example_appdemo1_Controls
   Method:    pOnTouch
-  Signature: (IIIFFFF)V }
-procedure pOnTouch(PEnv: PJNIEnv; this: JObject; pasobj: JInt; act: JInt; cnt: JInt; x1: JFloat; y1: JFloat; x2: JFloat; y2: JFloat); cdecl;
+  Signature: (JIIFFFF)V }
+procedure pOnTouch(PEnv: PJNIEnv; this: JObject; pasobj: JLong; act: JInt; cnt: JInt; x1: JFloat; y1: JFloat; x2: JFloat; y2: JFloat); cdecl;
 begin
   Java_Event_pOnTouch(PEnv,this,TObject(pasobj),act,cnt,x1,y1,x2,y2);
 end;
 
 { Class:     com_example_appdemo1_Controls
   Method:    pOnGLRenderer
-  Signature: (IIII)V }
-procedure pOnGLRenderer(PEnv: PJNIEnv; this: JObject; pasobj: JInt; EventType: JInt; w: JInt; h: JInt); cdecl;
+  Signature: (JIII)V }
+procedure pOnGLRenderer(PEnv: PJNIEnv; this: JObject; pasobj: JLong; EventType: JInt; w: JInt; h: JInt); cdecl;
 begin
   Java_Event_pOnGLRenderer(PEnv,this,TObject(pasobj),EventType,w,h);
 end;
 
 { Class:     com_example_appdemo1_Controls
   Method:    pOnClose
-  Signature: (I)V }
-procedure pOnClose(PEnv: PJNIEnv; this: JObject; actform: JInt); cdecl;
+  Signature: (J)V }
+procedure pOnClose(PEnv: PJNIEnv; this: JObject; pasobj: JLong); cdecl;
 begin
-  Java_Event_pOnClose(PEnv,this);
+  Java_Event_pOnClose(PEnv,this,TObject(pasobj));
+end;
+
+{ Class:     com_example_appdemo1_Controls
+  Method:    pOnActive
+  Signature: (J)V }
+procedure pOnActive(PEnv: PJNIEnv; this: JObject; pasobj: JLong); cdecl;
+begin
+  Java_Event_pOnActive(PEnv,this,TObject(pasobj));
 end;
 
 { Class:     com_example_appdemo1_Controls
   Method:    pOnWebViewStatus
-  Signature: (IILjava/lang/String;)I }
-function pOnWebViewStatus(PEnv: PJNIEnv; this: JObject; pasobj: JInt; EventType: JInt; url: JString): JInt; cdecl;
+  Signature: (JILjava/lang/String;)I }
+function pOnWebViewStatus(PEnv: PJNIEnv; this: JObject; pasobj: JLong; EventType: JInt; url: JString): JInt; cdecl;
 begin
   Result:=Java_Event_pOnWebViewStatus(PEnv,this,TObject(pasobj),EventType,url);
 end;
 
 { Class:     com_example_appdemo1_Controls
   Method:    pOnAsyncEvent
-  Signature: (III)V }
-procedure pOnAsyncEvent(PEnv: PJNIEnv; this: JObject; pasobj: JInt; EventType: JInt; progress: JInt); cdecl;
+  Signature: (JII)V }
+procedure pOnAsyncEvent(PEnv: PJNIEnv; this: JObject; pasobj: JLong; EventType: JInt; progress: JInt); cdecl;
 begin
   Java_Event_pOnAsyncEvent(PEnv,this,TObject(pasobj),EventType,progress);
 end;
 
-const NativeMethods:array[0..22] of JNINativeMethod = (
+const NativeMethods:array[0..23] of JNINativeMethod = (
    (name:'pAppOnScreenStyle';
     signature:'()I';
     fnPtr:@pAppOnScreenStyle;),
@@ -218,9 +220,9 @@ const NativeMethods:array[0..22] of JNINativeMethod = (
    (name:'pAppOnResume';
     signature:'()V';
     fnPtr:@pAppOnResume;),
-   (name:'pAppOnActive';
+   (name:'pAppOnStart';
     signature:'()V';
-    fnPtr:@pAppOnActive;),
+    fnPtr:@pAppOnStart;),
    (name:'pAppOnStop';
     signature:'()V';
     fnPtr:@pAppOnStop;),
@@ -237,38 +239,43 @@ const NativeMethods:array[0..22] of JNINativeMethod = (
     signature:'(IILandroid/content/Intent;)V';
     fnPtr:@pAppOnActivityResult;),
    (name:'pOnClick';
-    signature:'(II)V';
+    signature:'(JI)V';
     fnPtr:@pOnClick;),
    (name:'pOnChange';
-    signature:'(II)V';
+    signature:'(JI)V';
     fnPtr:@pOnChange;),
    (name:'pOnEnter';
-    signature:'(I)V';
+    signature:'(J)V';
     fnPtr:@pOnEnter;),
    (name:'pOnTimer';
-    signature:'(I)V';
+    signature:'(J)V';
     fnPtr:@pOnTimer;),
    (name:'pOnDraw';
-    signature:'(ILandroid/graphics/Canvas;)V';
+    signature:'(JLandroid/graphics/Canvas;)V';
     fnPtr:@pOnDraw;),
    (name:'pOnTouch';
-    signature:'(IIIFFFF)V';
+    signature:'(JIIFFFF)V';
     fnPtr:@pOnTouch;),
    (name:'pOnGLRenderer';
-    signature:'(IIII)V';
+    signature:'(JIII)V';
     fnPtr:@pOnGLRenderer;),
    (name:'pOnClose';
-    signature:'(I)V';
+    signature:'(J)V';
     fnPtr:@pOnClose;),
+   (name:'pOnActive';
+    signature:'(J)V';
+    fnPtr:@pOnActive;),
    (name:'pOnWebViewStatus';
-    signature:'(IILjava/lang/String;)I';
+    signature:'(JILjava/lang/String;)I';
     fnPtr:@pOnWebViewStatus;),
    (name:'pOnAsyncEvent';
-    signature:'(III)V';
+    signature:'(JII)V';
     fnPtr:@pOnAsyncEvent;)
 );
 
 function RegisterNativeMethodsArray(PEnv: PJNIEnv; className: PChar; methods: PJNINativeMethod; countMethods:integer):integer;
+var
+  curClass: jClass;
 begin
   Result:= JNI_FALSE;
   curClass:= (PEnv^).FindClass(PEnv, className);
@@ -277,35 +284,43 @@ begin
     if (PEnv^).RegisterNatives(PEnv, curClass, methods, countMethods) > 0 then Result:= JNI_TRUE;
   end;
 end;
- 
-function RegisterNativeMethods(PEnv: PJNIEnv): integer;
+
+function RegisterNativeMethods(PEnv: PJNIEnv; className: PChar): integer;
 begin
-  curClassPathName:= 'com/example/appdemo1/Controls';
-  Result:= RegisterNativeMethodsArray(PEnv, PChar(curClassPathName), @NativeMethods[0], Length(NativeMethods));
+  Result:= RegisterNativeMethodsArray(PEnv, className, @NativeMethods[0], Length(NativeMethods));
 end;
- 
+
 function JNI_OnLoad(VM: PJavaVM; reserved: pointer): JInt; cdecl;
 var
-  PEnv: PPointer {PJNIEnv};
+  PEnv: PPointer;
+  curEnv: PJNIEnv;
 begin
   PEnv:= nil;
   Result:= JNI_VERSION_1_6;
   (VM^).GetEnv(VM, @PEnv, Result);
-  if PEnv <> nil then RegisterNativeMethods(PJNIEnv(PEnv));
-  curVM:= VM {PJavaVM};
-  gVM:= VM {And_jni_Bridge};
-  curEnv:= PJNIEnv(PEnv);
+  if PEnv <> nil then
+  begin
+     curEnv:= PJNIEnv(PEnv);
+     RegisterNativeMethods(curEnv, 'com/example/appdemo1/Controls');
+  end;
+  gVM:= VM;{And_jni_Bridge}
 end;
- 
+
 procedure JNI_OnUnload(VM: PJavaVM; reserved: pointer); cdecl;
+var
+  PEnv: PPointer;
+  curEnv: PJNIEnv;
 begin
-  if curEnv <> nil then (curEnv^).UnregisterNatives(curEnv, curClass);
-  curClass:= nil;
-  curEnv:= nil;
-  curVM:= nil;
-  gVM:= nil;
-  App.Terminate;
-  FreeAndNil(App);
+  PEnv:= nil;
+  (VM^).GetEnv(VM, @PEnv, JNI_VERSION_1_6);
+  if PEnv <> nil then
+  begin
+    curEnv:= PJNIEnv(PEnv);
+    (curEnv^).DeleteGlobalRef(curEnv, gjClass{And_jni_Bridge});
+    gVM:= nil;{And_jni_Bridge}
+  end;
+  gApp.Terminate;
+  FreeAndNil(gApp);
 end;
 
 exports
@@ -318,7 +333,7 @@ exports
   pAppOnPause name 'Java_com_example_appdemo1_Controls_pAppOnPause',
   pAppOnRestart name 'Java_com_example_appdemo1_Controls_pAppOnRestart',
   pAppOnResume name 'Java_com_example_appdemo1_Controls_pAppOnResume',
-  pAppOnActive name 'Java_com_example_appdemo1_Controls_pAppOnActive',
+  pAppOnStart name 'Java_com_example_appdemo1_Controls_pAppOnStart',
   pAppOnStop name 'Java_com_example_appdemo1_Controls_pAppOnStop',
   pAppOnBackPressed name 'Java_com_example_appdemo1_Controls_pAppOnBackPressed',
   pAppOnRotate name 'Java_com_example_appdemo1_Controls_pAppOnRotate',
@@ -332,16 +347,18 @@ exports
   pOnTouch name 'Java_com_example_appdemo1_Controls_pOnTouch',
   pOnGLRenderer name 'Java_com_example_appdemo1_Controls_pOnGLRenderer',
   pOnClose name 'Java_com_example_appdemo1_Controls_pOnClose',
+  pOnActive name 'Java_com_example_appdemo1_Controls_pOnActive',
   pOnWebViewStatus name 'Java_com_example_appdemo1_Controls_pOnWebViewStatus',
   pOnAsyncEvent name 'Java_com_example_appdemo1_Controls_pOnAsyncEvent';
- 
+
 begin
-  App:= jApp.Create(nil);{Laz_And_Controls}
-  App.Title:= 'My Android GUI Library';
+  gApp:= jApp.Create(nil);{Laz_And_Controls}
+  gApp.Title:= 'My Android GUI Library';
   gjAppName:= 'com.example.appdemo1';{And_jni_Bridge}
   gjClassName:= 'com/example/appdemo1/Controls';{And_jni_Bridge}
-  App.AppName:=gjAppName;
-  App.ClassName:=gjClassName;
-  App.Initialize;
-  App.CreateForm(TAndroidModule1, AndroidModule1);
+  gApp.AppName:=gjAppName;
+  gApp.ClassName:=gjClassName;
+  gApp.Initialize;
+  gApp.CreateForm(TAndroidModule1, AndroidModule1);
 end.
+

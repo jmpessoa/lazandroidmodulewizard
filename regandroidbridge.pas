@@ -29,6 +29,7 @@ begin
   {$I jImageView_icon.lrs}
   {$I jImageList_icon.lrs}
   {$I jView_icon.lrs}
+  {$I jcanvas_icon.lrs}
   {$I jBitmap_icon.lrs}
   {$I jDialogYN_icon.lrs}
   {$I jDialogProgress_icon.lrs}
@@ -45,13 +46,13 @@ begin
                                         jProgressBar, jViewFlipper, jListView,
                                         jScrollView,jHorizontalScrollView, jPanel,
                                         jImageBtn, jImageView, jImageList,
-                                        jView, jBitmap,
+                                        jView, jCanvas, jBitmap,
                                         jDialogYN, jDialogProgress,
                                         jCanvasES1, jCanvasES2,
                                         jTimer, jAsyncTask, jSMS, jCamera, jWebView, jHttpClient, jSmtpClient]);
 
-  RegisterClasses([jApp, jForm, jControl, jVisualControl]);
-  RegisterNoIcon([jApp, jForm, jControl, jVisualControl]);
+  RegisterClasses([jApp, jForm, jControl, jVisualControl, jGLViewEvent]);
+  RegisterNoIcon([jApp, jForm, jControl, jVisualControl, jGLViewEvent]);
 end;
 
 initialization

@@ -1,17 +1,17 @@
 object AndroidModule1: TAndroidModule1
   OnCreate = DataModuleCreate
   OldCreateOrder = False
-  BackButton = True
+  ActivityMode = actMain
   Title = 'jForm'
   BackgroundColor = colbrBlack
-  OnActive = DataModuleActive
   OnRotate = DataModuleRotate
   OnActivityRst = DataModuleActivityRst
   OnJNIPrompt = DataModuleJNIPrompt
+  OnActive = DataModuleActive
   Height = 513
   HorizontalOffset = 424
   VerticalOffset = 125
-  Width = 301
+  Width = 517
   object jPanel1: jPanel
     Id = 139436
     PosRelativeToAnchor = []
@@ -60,7 +60,7 @@ object AndroidModule1: TAndroidModule1
     BackgroundColor = colbrDefault
     FontColor = colbrRed
     FontSize = 0
-    Text = 'jPanel And Camera Demo'
+    Text = 'jPanel And jCamera Demo'
     left = 80
     top = 8
   end
@@ -153,7 +153,7 @@ object AndroidModule1: TAndroidModule1
   object jCamera1: jCamera
     Filename = 'photo1.jpg'
     FilePath = fpathDCIM
-    left = 208
+    left = 304
     top = 280
   end
   object jBitmap1: jBitmap
@@ -161,7 +161,7 @@ object AndroidModule1: TAndroidModule1
     ImageIndex = -1
     Width = 0
     Height = 0
-    left = 144
+    left = 232
     top = 280
   end
   object jView1: jView
@@ -176,6 +176,7 @@ object AndroidModule1: TAndroidModule1
     MarginRight = 10
     MarginBottom = 5
     ParentPanel = jPanel2
+    Canvas = jCanvas1
     Visible = True
     BackgroundColor = colbrDefault
     OnDraw = jView1Draw
@@ -259,5 +260,13 @@ object AndroidModule1: TAndroidModule1
     Text = 'Panel 3'
     left = 152
     top = 368
+  end
+  object jCanvas1: jCanvas
+    PaintStrokeWidth = 2
+    PaintStyle = psFillAndStroke
+    PaintTextSize = 15
+    PaintColor = colbrBlue
+    left = 155
+    top = 280
   end
 end

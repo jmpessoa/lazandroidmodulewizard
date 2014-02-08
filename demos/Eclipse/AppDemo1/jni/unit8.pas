@@ -15,6 +15,7 @@ type
   TAndroidModule8 = class(jForm)
       jBitmap1: jBitmap;
       jButton1: jButton;
+      jCanvas1: jCanvas;
       jImageList1: jImageList;
       jTextView1: jTextView;
       jView1: jView;
@@ -49,24 +50,23 @@ var
 begin
   w1:= jView1.Width;
   h1:= jView1.Height;
-  {
-  jView1.Canvas.setStyle(cjPaint_Style_Stroke);
-  jView1.Canvas.setStrokeWidth(5);
-  jView1.Canvas.setColor(colbrLime); // ARGB
-  jView1.Canvas.drawLine(0,0,w1,h1);
-  }
+
   //Frame
-  jView1.Canvas.setStrokeWidth(5);
-  jView1.Canvas.setColor(colbrMediumSpringGreen); // ARGB
-  jView1.Canvas.drawLine(0,0,0,h1);
-  jView1.Canvas.drawLine(0,h1,w1,h1);
-  jView1.Canvas.drawLine(w1,h1,w1,0);
-  jView1.Canvas.drawLine(w1,0,0,0);
+
+ //jView1.Canvas.PaintStrokeWidth:= 5 ;
+ //jView1.Canvas.PaintColor:= colbrMediumSpringGreen;
+
+  jView1.Canvas.drawLine(0,0,0,h1-1);
+  jView1.Canvas.drawLine(0,h1-1,w1-1,h1-1);
+  jView1.Canvas.drawLine(w1-1,h1-1,w1-1,0);
+  jView1.Canvas.drawLine(w1-1,0,0,0);
+
   //
-  jView1.Canvas.setStyle(cjPaint_Style_Fill);
-  jView1.Canvas.setColor(colbrRed); //
-  jView1.Canvas.setTextSize(20);
+  //jView1.Canvas.PaintStyle:= psFillAndStroke;
+  jView1.Canvas.PaintColor:= colbrRed;
+  //jView1.Canvas.PaintTextSize:= 20;
   //jView1.Canvas.drawText('Custom View Test: Drag the cube!', 10,30);
+
   jView1.Canvas.drawText('P(x,y)=(' + IntToStr(P.X) + ',' + IntToStr(P.Y)+')',10,h1-30);
   jView1.Canvas.drawBitmap(jBitmap1, P.X-100,P.Y-100,P.X+100,P.Y+100);
 end;
@@ -101,7 +101,7 @@ end;
 
 procedure TAndroidModule8.DataModuleCreate(Sender: TObject);
 begin
-  Self.BackButton:= True;
+  Self.ActivityMode:= actRecyclable;
   Self.BackgroundColor:= colbrBlack;
   //mode delphi
   Self.OnJNIPrompt:= DataModuleJNIPrompt;

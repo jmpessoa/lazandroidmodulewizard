@@ -6,12 +6,6 @@ library jnihello;
 uses
   Classes, SysUtils, CustApp, jni, unit1;
  
-const
-  curClassPathName: string='';
-  curClass: JClass=nil;
-  curVM: PJavaVM=nil;
-  curEnv: PJNIEnv=nil;
- 
 type
  
   TApp = class(TCustomApplication)
@@ -44,28 +38,26 @@ end;
 var
   App: TApp;
  
-{ Class:     com_example_appnoguidemo1_JNIHello
-  Method:    getString
-  Signature: (I)Ljava/lang/String; }
-function getString(PEnv: PJNIEnv; this: JObject; flag: JInt): JString; cdecl;
-begin
-  
-  if flag = 1  then
-    Result:= (PEnv^).NewStringUTF(PEnv, '1.New message from Pascal')
-  else
-    Result:= (PEnv^).NewStringUTF(PEnv, '2.New message from Pascal');
+  { Class:     com_example_appnoguidemo1_JNIHello
+    Method:    getString
+    Signature: (I)Ljava/lang/String; }
+  function getString(PEnv: PJNIEnv; this: JObject; flag: JInt): JString; cdecl;
+  begin
 
-end;
+    if flag = 1  then
+      Result:= (PEnv^).NewStringUTF(PEnv, '1.New message from JNI Pascal')
+    else
+      Result:= (PEnv^).NewStringUTF(PEnv, '2.New message from JNI Pascal');
 
-{ Class:     com_example_appnoguidemo1_JNIHello
-  Method:    getSum
-  Signature: (II)I }
-function getSum(PEnv: PJNIEnv; this: JObject; x: JInt; y: JInt): JInt; cdecl;
-begin
- 
-  Result:= x + y;
-        
-end;
+  end;
+
+  { Class:     com_example_appnoguidemo1_JNIHello
+    Method:    getSum
+    Signature: (II)I }
+  function getSum(PEnv: PJNIEnv; this: JObject; x: JInt; y: JInt): JInt; cdecl;
+  begin
+    Result:= x + y;
+  end;
 
 const NativeMethods:array[0..1] of JNINativeMethod = (
    (name:'getString';
@@ -77,6 +69,8 @@ const NativeMethods:array[0..1] of JNINativeMethod = (
 );
 
 function RegisterNativeMethodsArray(PEnv: PJNIEnv; className: PChar; methods: PJNINativeMethod; countMethods:integer):integer;
+var
+  curClass: jClass;
 begin
   Result:= JNI_FALSE;
   curClass:= (PEnv^).FindClass(PEnv, className);
@@ -86,30 +80,45 @@ begin
   end;
 end;
  
-function RegisterNativeMethods(PEnv: PJNIEnv): integer;
+function RegisterNativeMethods(PEnv: PJNIEnv; className: PChar): integer;
 begin
-  curClassPathName:= 'com/example/appnoguidemo1/JNIHello';
-  Result:= RegisterNativeMethodsArray(PEnv, PChar(curClassPathName), @NativeMethods[0], Length(NativeMethods));
+  Result:= RegisterNativeMethodsArray(PEnv, className, @NativeMethods[0], Length(NativeMethods));
 end;
  
 function JNI_OnLoad(VM: PJavaVM; reserved: pointer): JInt; cdecl;
 var
-  PEnv: PPointer {PJNIEnv};
+  PEnv: PPointer;
+  curEnv: PJNIEnv;
 begin
   PEnv:= nil;
   Result:= JNI_VERSION_1_6;
   (VM^).GetEnv(VM, @PEnv, Result);
-  if PEnv <> nil then RegisterNativeMethods(PJNIEnv(PEnv));
-  curVM:= VM {PJavaVM};
-  curEnv:= PJNIEnv(PEnv);
+  if PEnv <> nil then
+  begin
+     curEnv:= PJNIEnv(PEnv);
+     RegisterNativeMethods(curEnv, 'com/example/appnoguidemo1/JNIHello');
+     gPDalvikVM:= VM;{PJavaVM}{unit1}
+     gjClassPath:= 'com/example/appnoguidemo1/JNIHello';{unit1}
+     gjClass:= (curEnv^).FindClass(curEnv, 'com/example/appnoguidemo1/JNIHello');{unit1}
+     gjClass:= (curEnv^).NewGlobalRef(curEnv, gjClass);{unit1}
+  end;
 end;
  
 procedure JNI_OnUnload(VM: PJavaVM; reserved: pointer); cdecl;
+var
+  PEnv: PPointer;
+  curEnv: PJNIEnv;
 begin
-  if curEnv <> nil then (curEnv^).UnregisterNatives(curEnv, curClass);
-  curClass:= nil;
-  curEnv:= nil;
-  curVM:= nil;
+  PEnv:= nil;
+  (VM^).GetEnv(VM, @PEnv, JNI_VERSION_1_6);
+  if PEnv <> nil then
+  begin
+    curEnv:= PJNIEnv(PEnv);
+    (curEnv^).UnregisterNatives(curEnv, gjClass{unit1});
+    (curEnv^).DeleteGlobalRef(curEnv, gjClass{unit1});
+    gjClass:= nil;
+    gPDalvikVM:= nil;
+  end;
   App.Terminate;
   FreeAndNil(App);
 end;
@@ -124,5 +133,5 @@ begin
   App:= TApp.Create(nil);
   App.Title:= 'My Android NoGUI Library';
   App.Initialize;
-  App.CreateForm(TAndroidModule1, AndroidModule1);
+  App.CreateForm(TNoGUIAndroidModule1, NoGUIAndroidModule1);
 end.

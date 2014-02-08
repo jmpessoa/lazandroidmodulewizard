@@ -1,7 +1,7 @@
 object AndroidModule6: TAndroidModule6
   OnCreate = DataModuleCreate
   OldCreateOrder = False
-  BackButton = True
+  ActivityMode = actRecyclable
   Title = 'jForm'
   BackgroundColor = colbrBlack
   OnCloseQuery = DataModuleCloseQuery
@@ -70,7 +70,6 @@ object AndroidModule6: TAndroidModule6
     BackgroundColor = colbrWhite
     FontColor = colbrDefault
     FontSize = 0
-    SingleLine = True
     ScrollBarStyle = scrNone
     MaxLines = 1
     HorScrollBar = False
@@ -117,7 +116,6 @@ object AndroidModule6: TAndroidModule6
     BackgroundColor = colbrWhite
     FontColor = colbrDefault
     FontSize = 0
-    SingleLine = True
     ScrollBarStyle = scrNone
     MaxLines = 1
     HorScrollBar = False

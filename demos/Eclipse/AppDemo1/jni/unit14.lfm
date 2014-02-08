@@ -1,12 +1,13 @@
 object AndroidModule14: TAndroidModule14
   OnCreate = DataModuleCreate
   OldCreateOrder = False
-  BackButton = True
+  ActivityMode = actRecyclable
   Title = 'jForm'
   BackgroundColor = colbrBlack
   OnCloseQuery = DataModuleCloseQuery
   OnRotate = DataModuleRotate
   OnJNIPrompt = DataModuleJNIPrompt
+  OnActive = DataModuleActive
   Height = 503
   HorizontalOffset = 319
   VerticalOffset = 145
@@ -93,6 +94,7 @@ object AndroidModule14: TAndroidModule14
   end
   object jAsyncTask1: jAsyncTask
     OnAsyncEvent = jAsyncTask1AsyncEvent
+    AutoPublishProgress = True
     left = 168
     top = 96
   end
@@ -122,7 +124,6 @@ object AndroidModule14: TAndroidModule14
     BackgroundColor = colbrLightSlateGray
     FontColor = colbrDefault
     FontSize = 0
-    SingleLine = False
     ScrollBarStyle = scrlInsideInset
     MaxLines = 1000
     HorScrollBar = False
@@ -169,7 +170,6 @@ object AndroidModule14: TAndroidModule14
     BackgroundColor = colbrLightSlateGray
     FontColor = colbrDefault
     FontSize = 0
-    SingleLine = False
     ScrollBarStyle = scrNone
     MaxLines = 1000
     HorScrollBar = False

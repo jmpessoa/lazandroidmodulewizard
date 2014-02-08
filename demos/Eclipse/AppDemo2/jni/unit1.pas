@@ -16,6 +16,7 @@ type
       jBitmap1: jBitmap;
       jButton1: jButton;
       jCamera1: jCamera;
+      jCanvas1: jCanvas;
       jImageView1: jImageView;
       jPanel1: jPanel;
       jPanel2: jPanel;
@@ -56,7 +57,7 @@ implementation
 procedure TAndroidModule1.DataModuleCreate(Sender: TObject);
 begin
   FPhotoExist:= False;
-  FSaveRotate:= 1;
+  FSaveRotate:= 1;  //default: Vertical
 
   //just to fix *.lfm parse fail. Why fail ?
   OnJNIPrompt:= DataModuleJNIPrompt;     {<-- delphi mode: do not use '@' !}
@@ -79,7 +80,7 @@ end;
 
 procedure TAndroidModule1.DataModuleActive(Sender: TObject);
 begin
-   if Self.Orietation = 2 then   // device is on horizontal...
+   if Self.Orientation = 2 then   // device is on horizontal...
    begin               //reconfigure....
       FSaveRotate:= 2;
       jPanel1.LayoutParamHeight:=lpMatchParent;
@@ -132,20 +133,20 @@ begin
                                             Round((jView1.Height)*(1/Ratio)));
        end;
 
-       { //or you can do simply this...
+       { //or you can do simply this...  NO RATIO!
        jView1.Canvas.drawBitmap(jBitmap1, 0, 0,
                                 jView1.Width,
                                 jView1.Height);
        }
 
        //just to ilustration.... you can draw or write over draw....
-       jView1.Canvas.setColor(colbrRed);
+       jView1.Canvas.PaintColor:= colbrRed;
 
        jView1.Canvas.drawLine(0, 0, jView1.Width, jView1.Height);
 
        jView1.Canvas.drawText('Hello People!', 30,30);
 
-       //or simply this other control...
+       //or simply show on other control: jImageView1
        jImageView1.SetImageBitmap(jBitmap1.GetJavaBitmap);
     end;
 end;

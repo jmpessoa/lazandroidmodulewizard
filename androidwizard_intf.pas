@@ -42,6 +42,7 @@ type
      FProjectModel: string; {"Eclipse Project"/"Ant Project"}
      FAntPackageName: string;
      FMinApi: string;
+     FTargetApi: string;
      FTouchtestEnabled: string;
      FAntBuildMode: string;
      FMainActivity: string;
@@ -155,6 +156,7 @@ begin
   frm.ModuleType:= FModuleType;
   frm.MainActivity:= FMainActivity;
   frm.MinApi:= FMinApi;
+  frm.TargetApi:= FTargetApi;
   if frm.ShowModal = mrOK then
   begin
     Result := True;
@@ -275,6 +277,7 @@ begin
     FPathToAntBin:= frm.PathToAntBin;
 
     FMinApi:= frm.MinApi;
+    FTargetApi:= frm.TargetApi;
 
     FMainActivity:= frm.MainActivity;
 
@@ -617,7 +620,6 @@ begin
          strList.Add('    </application>');
          strList.Add('</manifest>');
          strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'AndroidManifest.xml');
-
       end;
       strList.Free;
     end;
@@ -638,7 +640,6 @@ begin
         Result := mrAbort;
    end
    else Result := mrAbort;
-
 end;
 
 function TAndroidProjectDescriptor.GetAppName(className: string): string;
@@ -701,74 +702,68 @@ begin
   sourceList.Add('{$mode delphi}');
   sourceList.Add(' ');
   sourceList.Add('uses');
-
   if FModuleType = 0 then  //GUI controls
-    sourceList.Add('  Classes, SysUtils, And_jni, And_jni_Bridge, Laz_And_Controls;')
-  else //generic module :  No GUI Controls
-    sourceList.Add('  Classes, SysUtils, CustApp, jni;');
-
-  sourceList.Add(' ');
-  sourceList.Add('const');
-  sourceList.Add('  curClassPathName: string='''';');
-  sourceList.Add('  curClass: JClass=nil;');
-  sourceList.Add('  curVM: PJavaVM=nil;');
-  sourceList.Add('  curEnv: PJNIEnv=nil;');
-  sourceList.Add(' ');
-  if FModuleType = 1 then   //generic module: No GUI Controls
   begin
-      sourceList.Add('type');
-      sourceList.Add(' ');
-      sourceList.Add('  TApp = class(TCustomApplication)');
-      sourceList.Add('   public');
-      sourceList.Add('     procedure CreateForm(InstanceClass: TComponentClass; out Reference);');
-      sourceList.Add('     constructor Create(TheOwner: TComponent); override;');
-      sourceList.Add('     destructor Destroy; override;');
-      sourceList.Add('  end;');
-      sourceList.Add(' ');
-      sourceList.Add('procedure TApp.CreateForm(InstanceClass: TComponentClass; out Reference);');
-      sourceList.Add('var');
-      sourceList.Add('  Instance: TComponent;');
-      sourceList.Add('begin');
-      sourceList.Add('  Instance := TComponent(InstanceClass.NewInstance);');
-      sourceList.Add('  TComponent(Reference):= Instance;');
-      sourceList.Add('  Instance.Create(Self);');
-      sourceList.Add('end;');
-      sourceList.Add(' ');
-      sourceList.Add('constructor TApp.Create(TheOwner: TComponent);');
-      sourceList.Add('begin');
-      sourceList.Add('  inherited Create(TheOwner);');
-      sourceList.Add('  StopOnException:=True;');
-      sourceList.Add('end;');
-      sourceList.Add(' ');
-      sourceList.Add('destructor TApp.Destroy;');
-      sourceList.Add('begin');
-      sourceList.Add('  inherited Destroy;');
-      sourceList.Add('end;');
-      sourceList.Add(' ');
-      sourceList.Add('var');
-      sourceList.Add('  App: TApp;');
-      sourceList.Add(' ');
+    sourceList.Add('  Classes, SysUtils, And_jni, And_jni_Bridge, Laz_And_Controls;');
+    sourceList.Add(' ');
+  end
+  else //generic module :  No GUI Controls
+  begin
+    sourceList.Add('  Classes, SysUtils, CustApp, jni;');
+    sourceList.Add(' ');
+    sourceList.Add('type');
+    sourceList.Add(' ');
+    sourceList.Add('  jApp = class(TCustomApplication)');
+    sourceList.Add('  public');
+    sourceList.Add('     procedure CreateForm(InstanceClass: TComponentClass; out Reference);');
+    sourceList.Add('     constructor Create(TheOwner: TComponent); override;');
+    sourceList.Add('     destructor Destroy; override;');
+    sourceList.Add('  end;');
+    sourceList.Add(' ');
+    sourceList.Add('procedure jApp.CreateForm(InstanceClass: TComponentClass; out Reference);');
+    sourceList.Add('var');
+    sourceList.Add('  Instance: TComponent;');
+    sourceList.Add('begin');
+    sourceList.Add('  Instance := TComponent(InstanceClass.NewInstance);');
+    sourceList.Add('  TComponent(Reference):= Instance;');
+    sourceList.Add('  Instance.Create(Self);');
+    sourceList.Add('end;');
+    sourceList.Add(' ');
+    sourceList.Add('constructor jApp.Create(TheOwner: TComponent);');
+    sourceList.Add('begin');
+    sourceList.Add('  inherited Create(TheOwner);');
+    sourceList.Add('  StopOnException:=True;');
+    sourceList.Add('end;');
+    sourceList.Add(' ');
+    sourceList.Add('destructor jApp.Destroy;');
+    sourceList.Add('begin');
+    sourceList.Add('  inherited Destroy;');
+    sourceList.Add('end;');
+    sourceList.Add(' ');
+    sourceList.Add('var');
+    sourceList.Add('  gApp: jApp;');
+    sourceList.Add(' ');
   end;
   sourceList.Add(Trim(FPascalJNIIterfaceCode));  {from form...}
   sourceList.Add(' ');
   sourceList.Add('begin');
   if FModuleType = 0 then  //GUI controls...
   begin
-    sourceList.Add('  App:= jApp.Create(nil);{Laz_And_Controls}');
-    sourceList.Add('  App.Title:= ''My Android GUI Library'';');
+    sourceList.Add('  gApp:= jApp.Create(nil);{Laz_And_Controls}');
+    sourceList.Add('  gApp.Title:= ''My Android GUI Library'';');
     sourceList.Add('  gjAppName:= '''+GetAppName(FPathToClassName)+''';{And_jni_Bridge}');
     sourceList.Add('  gjClassName:= '''+FPathToClassName+''';{And_jni_Bridge}');
-    sourceList.Add('  App.AppName:=gjAppName;');
-    sourceList.Add('  App.ClassName:=gjClassName;');
-    sourceList.Add('  App.Initialize;');
-    sourceList.Add('  App.CreateForm(TAndroidModule1, AndroidModule1);');
+    sourceList.Add('  gApp.AppName:=gjAppName;');
+    sourceList.Add('  gApp.ClassName:=gjClassName;');
+    sourceList.Add('  gApp.Initialize;');
+    sourceList.Add('  gApp.CreateForm(TAndroidModule1, AndroidModule1);');
   end
   else
   begin
-     sourceList.Add('  App:= TApp.Create(nil);');
-     sourceList.Add('  App.Title:= ''My Android NoGUI Library'';');
-     sourceList.Add('  App.Initialize;');
-     sourceList.Add('  App.CreateForm(TNoGUIAndroidModule1, NoGUIAndroidModule1);');
+     sourceList.Add('  gApp:= jApp.Create(nil);');
+     sourceList.Add('  gApp.Title:= ''My Android NoGUI Library'';');
+     sourceList.Add('  gApp.Initialize;');
+     sourceList.Add('  gApp.CreateForm(TNoGUIAndroidModule1, NoGUIAndroidModule1);');
   end;
   sourceList.Add('end.');
 
@@ -1008,6 +1003,10 @@ constructor TAndroidFileDescPascalUnitWithResource.Create;
 begin
   inherited Create;
   Name := 'Android DataModule';
+  if ModuleType = 0 then
+    ResourceClass := TAndroidModule
+  else
+    ResourceClass := TNoGUIAndroidModule
 end;
 
 function TAndroidFileDescPascalUnitWithResource.GetLocalizedName: string;
@@ -1042,6 +1041,14 @@ begin
    sourceList.Add(' ');
    sourceList.Add('uses');
    sourceList.Add('  ' + GetInterfaceUsesSection);
+   if ModuleType = 1 then //no GUI
+   begin
+    sourceList.Add(' ');
+    sourceList.Add('const');
+    sourceList.Add('  gjClassPath: string='''';');
+    sourceList.Add('  gjClass: JClass=nil;');
+    sourceList.Add('  gPDalvikVM: PJavaVM=nil;');
+   end;
    sourceList.Add(GetInterfaceSource(Filename, SourceName, ResourceName));
    sourceList.Add('implementation');
    sourceList.Add(' ');
@@ -1069,12 +1076,20 @@ begin
   strList:= TStringList.Create;
   strList.Add(' ');
   strList.Add('type');
-
   if ModuleType = 0 then //GUI controls module
-    strList.Add('  T' + ResourceName + ' = class(jForm)')
+  begin
+    if ResourceName <> '' then
+       strList.Add('  T' + ResourceName + ' = class(jForm)')
+    else
+       strList.Add('  TAndroidModuleXX = class(jForm)');
+  end
   else //generic module
-    strList.Add('  T' + ResourceName + ' = class(TDataModule)');
-
+  begin
+    if ResourceName <> '' then
+      strList.Add('  T' + ResourceName + ' = class(TDataModule)')
+    else
+      strList.Add('  TNoGUIAndroidModuleXX  = class(TDataModule)');
+  end;
   strList.Add('   private');
   strList.Add('     {private declarations}');
   strList.Add('   public');
@@ -1082,7 +1097,21 @@ begin
   strList.Add('  end;');
   strList.Add(' ');
   strList.Add('var');
-  strList.Add('  ' + ResourceName + ': T' + ResourceName + ';');
+  //strList.Add('  ' + ResourceName + ': T' + ResourceName + ';');
+  if ModuleType = 0 then //GUI controls module
+  begin
+    if ResourceName <> '' then
+       strList.Add('  ' + ResourceName + ': T' + ResourceName + ';')
+    else
+       strList.Add('  AndroidModuleXX: TDataMoule');
+  end
+  else //generic module
+  begin
+    if ResourceName <> '' then
+      strList.Add('  ' + ResourceName + ': T' + ResourceName + ';')
+    else
+      strList.Add('  NoGUIAndroidModuleXX: TNoGUIDataMoule');
+  end;
   Result := strList.Text;
   strList.Free;
 end;

@@ -3,6 +3,7 @@
 //   Native Android Controls for Pascal
 //
 //   Compiler   Free Pascal Compiler FPC 2.7.1, ( XE5 in near future )
+//   [and Lazarus by jmpessoa@hotmail.com - december 2013]
 //
 //   Developer
 //              Simon,Choi / Choi,Won-sik , 최원식옹
@@ -115,9 +116,12 @@
 //               - Jpeg Loading 1/2, 1/4, 1/8
 //
 //------------------------------------------------------------------------------
-unit Laz_And_Controls; {start: 2013-10-26: a modified version of the simonsayz's "And_Controls"}
-                       {author: jmpessoa@hotmail.com}
-                       {ver_0.1 * 08-december-2013}
+unit Laz_And_Controls; {A modified (DataModule based) version of the simonsayz's "And_Controls.pas"}
+                       {for Lazarus Android Module Wizard}
+                       {Author: jmpessoa@hotmail.com}
+                       {Start: 2013-10-26}
+                       {Ver_0.1 - 08-december-2013}
+                       {Ver_0.2 - 08-february-2014: Add support to API > 13}
 {$mode delphi}
 
 interface
@@ -125,7 +129,7 @@ interface
 uses
   SysUtils, Classes, Math,
   And_jni, And_jni_Bridge,
-  And_lib_Unzip, And_bitmap_h, CustApp{by jmpessoa};
+  And_lib_Unzip, And_bitmap_h, CustApp {by jmpessoa};
 
 const
 
@@ -171,7 +175,7 @@ const
                                                   $0101020f,
                                                   $0101013c);
   //by jmpessoa
-  TInputTypeExArray: array[0..31] of DWord = ($00000000,
+  TInputTypeExArray: array[0..31] of DWord=($00000000,
                                             $00000001,
                                             $00001001,
                                             $00002001,
@@ -250,6 +254,7 @@ const
                                             $00800005,
                                             $00000007,
                                             $00000070);
+
 
 // ----------------------------------------------------------------------------
 //  Main
@@ -407,38 +412,12 @@ type
                     itPassText,
                     itMultiLine);
   //by jmpessoa
-  TInputTypeEx  =(itxNone,
-                  itxText,
-                  itxCapCharacters,
-                  itxCapWords,
-                  itxCapSentences,
-                  itxAutoCorrect,
-                  itxAutoComplete,
-                  itxMultiLine,
-                  itxImeMultiLine,
-                  itxNoSuggestions,
-                  itxUri,
-                  itxEmailAddress,
-                  itxEmailSubject,
-                  itxShortMessage,
-                  itxLongMessage,
-                  itxPersonName,
-                  itxPostalAddress,
-                  itxPassword,
-                  itxVisiblePassword,
-                  itxWebEditText,
-                  itxFilter,
-                  itxPhonetic,
-                  itxWebEmailAddress,
-                  itxWebPassword,
-                  itxNumber,
-                  itxNumberSigned,
-                  itxNumberDecimal,
-                  itxNumberPassword,
-                  itxPhone,
-                  itxDatetime,
-                  itxDate,
-                  itxTime);
+  TInputTypeEx  =(  itxText,
+                    itxNumber,
+                    itxPhone,
+                    itxPassNumber,
+                    itxPassText,
+                    itxMultiLine);
 
   //by jmpessoa
   //http://www.semurjengkol.com/android-relative-layout-example/#sthash.JdHGbyti.dpuf
@@ -530,6 +509,8 @@ type
 
   TLayoutRelativeTo = (lrParent, lrAnchor);
 
+  TPaintStyle = (psFill , psFillAndStroke, psStroke); //by jmpessoa
+
   //
   jCanvas    = class; // Forward Declaration
   jForm      = class; // Forward Declaration
@@ -542,6 +523,7 @@ type
   TOnTouch           = Procedure(Sender: TObject; ID: integer; X, Y: single) of object;
   TOnTouchEvent      = Procedure(Sender: TObject; Touch : TMouch ) of Object;
   TOnCloseQuery      = Procedure(Sender: TObject; var CanClose: boolean) of object;
+  //TOnBackButtonQuery = Procedure(Sender: TObject; var MustFree: boolean) of object;
   TOnRotate          = Procedure(Sender: TObject; rotate : integer; Var rstRotate : integer) of Object;
   TOnActivityRst     = Procedure(Sender: TObject; requestCode,resultCode : Integer; jData : jObject) of Object;
   TOnGLChange        = Procedure(Sender: TObject; W, H: integer) of object;
@@ -554,16 +536,20 @@ type
   TOnAsyncEvent      = Procedure(Sender: TObject; EventType,Progress : Integer) of object;
   // App
   TEnvJni     = record
-                 jEnv        : PJNIEnv;
-                 jThis       : jObject;   // JNI
-                 jActivity   : jObject;   // Java Activity / android.content.Context
-                 jRLayout    : jObject;   // Java Base Layout
+                 jEnv        : PJNIEnv;  //  a pointer reference to the JNI environment,
+                 jThis       : jObject;  // JNI: a reference to the object making this call (or class if static).
+                 jActivity   : jObject;  // Java Activity / android.content.Context
+                 jRLayout    : jObject;  // Java Base Layout
                 end;
+ {
+ The first parameter is the JNI environment, frequently used with helper functions.
+ The second parameter is the Java object that this function is a part of.
+ }
 
+ {
+   The folder "Digital Camera Image"-DCIM- store photographs from digital camera
+ }
 
-           {
-           The folder Digital Camera Image (DCIM) stored photographs from our digital camera
-           }
   //by jmpessoa
   TEnvPath    = record
                  App         : string;    // /data/app/com.kredix-1.apk
@@ -592,12 +578,12 @@ type
 
   TjFormStack=  record
                  Form        : jForm;
-                 CloseCB     : TjCallBack; // Close Call Back Event
+                 CloseCB     : TjCallBack; //Close Call Back Event
                 end;
 
   TjForms    =  record
                  Index       : integer;
-                 Stack       : Array[0..cjFormsMax-1] of TjFormStack;
+                 Stack       : array[0..cjFormsMax-1] of TjFormStack;
                 end;
 
   TjFormState = (fsFormCreate,  // Initializing
@@ -608,13 +594,14 @@ type
   jApp = class(TCustomApplication)
   private
     FInitialized : boolean;
-    FAppName     : String;
-    FClassName   : String;
+    FAppName     : string;
+    FClassName   : string;
     FForm        : jForm;       // Main/Initial Form
     //
     Procedure SetAppName  (Value : String);
     Procedure SetClassName(Value : String);
   protected
+    //
   public
     Jni           : TEnvJni;
     Path          : TEnvPath;
@@ -622,20 +609,31 @@ type
     Device        : TEnvDevice;
     Forms         : TjForms;     // Form Stack
     Lock          : Boolean;     //
-    Orientation   : integer;
+    Orientation   : integer;   //orientation on app start....
 
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
     procedure CreateForm(InstanceClass: TComponentClass; out Reference);
+    procedure Init(env: PJNIEnv; this: jObject; activity: jObject; layout: jObject);
 
-    Procedure Init(env: PJNIEnv; this: jObject; activity: jObject; layout: jObject);
-    Procedure Finish;
+    procedure Finish;
+
+    function GetCurrentFormsIndex: integer;
+
+    function GetNewFormsIndex: integer;
+    function GetPreviousFormsIndex: integer;
+
+    procedure IncFormsIndex;
+    procedure DecFormsIndex;
+
     //properties
     property Initialized : boolean read FInitialized;
-    property Form: jForm read FForm write FForm;       // Main Form
-    property AppName    : String     read FAppName    write SetAppName;
-    property ClassName  : String     read FClassName  write SetClassName;
+    property Form: jForm read FForm write FForm; // Main Form
+    property AppName    : string     read FAppName    write SetAppName;
+    property ClassName  : string     read FClassName  write SetClassName;
   end;
+
+  TActivityMode = (actMain, actRecyclable, actDisposable, actSplash);
 
   jForm = class(TDataModule)
   private
@@ -643,31 +641,37 @@ type
     // Java
     FjObject       : jObject;      // Java : Java Object
     FjRLayout{View}: jObject;      // Java Relative Layout View
+    FOrientation   : integer;
+    FApp           : jApp;
     //
     FFormName      : String;       // Form name
     FScreenWH      : TWH;
     FScreenStyle   : TScreenStyle;
     FAnimation     : TAnimation;
 
-    FApp           : jApp;
     FEnabled       : Boolean;
     FVisible       : Boolean;
     FColor         : TARGBColorBridge;        // Background Color
 
     FCloseCallback : TjCallBack;   // Close Call Back Event
-    FBackButton    : Boolean;      // Android Back Button Enabled
 
-    FOnActive      : TOnNotify;
-    FOnClose       : TOnNotify;
+    FActivityMode  : TActivityMode;
+    //FMainActivity  : boolean;
+
+    FOnActive     : TOnNotify;
+    FOnClose      :   TOnNotify;
     FOnCloseQuery  : TOnCloseQuery;
     FOnRotate      : TOnRotate;
     FOnClick       : TOnNotify;
     FOnActivityRst : TOnActivityRst;
     FOnJNIPrompt   : TOnNotify;
+    FOnBackButton  : TOnNotify;
+
     Procedure setEnabled (Value : Boolean);
     Procedure setVisible (Value : Boolean);
     Procedure setColor   (Value : TARGBColorBridge);
-    function GetOrientation: integer;
+    procedure SetOrientation(Value: integer);
+    function GetView: jObject;
   protected
     Procedure GenEvent_OnClick(Obj: TObject);
   public
@@ -675,34 +679,42 @@ type
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
 
-    procedure Init(App: jApp);
+    procedure Init(refApp: jApp);
+    procedure Finish;
     Procedure Show;
     Procedure Close;
     Procedure Refresh;
+    procedure UpdateJNI(refApp: jApp);
+    procedure ShowMessage(msg: string);
+    function GetDateTime: String;
 
     Procedure SetCloseCallBack(Func : TOnNotify; Sender : TObject);
     //by jmpessoa
     Procedure UpdateLayout;
     // Property
-    property View         : jObject        read FjRLayout      write FjRLayout;
-    property Visible      : Boolean        read FVisible       write SetVisible;
-    property ScreenStyle  : TScreenStyle   read FScreenStyle   write FScreenStyle;
-    property Animation    : TAnimation     read FAnimation     write FAnimation;
+    property View         : jObject        read FjRLayout {GetView } write FjRLayout;
+    property ScreenStyle  : TScreenStyle   read FScreenStyle    write FScreenStyle;
+    property Animation    : TAnimation     read FAnimation      write FAnimation;
     property Initialized  : boolean read FInitialized;
-    property Orietation   : integer read GetOrientation;
+    property Orientation   : integer read FOrientation write SetOrientation;
+    property Visible      : Boolean        read FVisible        write SetVisible;
     property App: jApp read FApp write FApp;
+
   published
-    property BackButton: boolean read FBackButton write FBackButton;
+    //procedure SetOnJNIPrompt(Value: TOnNotify);
+    //property MainActivity  : boolean read FMainActivity write FMainActivity;
+    property ActivityMode  : TActivityMode read FActivityMode write FActivityMode;
     property Title: string  read FFormName write FFormName;
     property BackgroundColor: TARGBColorBridge  read FColor write SetColor;
     // Event
-    property OnActive     : TOnNotify      read FOnActive      write FOnActive;
-    property OnClose      : TOnNotify      read FOnClose       write FOnClose;
     property OnCloseQuery : TOnCloseQuery  read FOnCloseQuery  write FOnCloseQuery;
     property OnRotate     : TOnRotate      read FOnRotate      write FOnRotate;
     property OnClick      : TOnNotify      read FOnClick       write FOnClick;
     property OnActivityRst: TOnActivityRst read FOnActivityRst write FOnActivityRst;
-    property OnJNIPrompt: TOnNotify read FOnJNIPrompt write FOnJNIPrompt;
+    property OnJNIPrompt  : TOnNotify read FOnJNIPrompt write {SetOnJNIPrompt;}FOnJNIPrompt;
+    property OnBackButton : TOnNotify read FOnBackButton write FOnBackButton;
+    property OnActive     : TOnNotify read FOnActive write FOnActive;
+    property OnClose      : TOnNotify read FOnClose write FOnClose;
   end;
 
   {jControl - NEW by jmpessoa}
@@ -712,14 +724,11 @@ type
     FjObject     : jObject; //Self
     FEnabled     : boolean;
     FInitialized : boolean;
-    FApp         : jApp;
   public
+    property Initialized : boolean read FInitialized write FInitialized;
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
-    procedure Init(App: jApp);  virtual;
-    // Property
-    property Initialized : boolean read FInitialized;
-    property App: jApp read FApp write FApp;
+    procedure Init;  virtual;
   end;
 
    //NEW by jmpessoa
@@ -732,7 +741,7 @@ type
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
-    procedure Init(App: jApp); override;
+    procedure Init; override;
     function GetImageByIndex(index: integer): string;
     function GetImageExByIndex(index: integer): string;
     // Property
@@ -752,7 +761,7 @@ type
   public
    constructor Create(AOwner: TComponent); override;
    destructor Destroy; override;
-   procedure Init(App: jApp); override;
+   procedure Init; override;
    function Get: string; overload;
    function Get(location: string): string; overload;
    // Property
@@ -777,7 +786,7 @@ type
   public
    constructor Create(AOwner: TComponent); override;
    destructor Destroy; override;
-   procedure Init(App: jApp); override;
+   procedure Init; override;
    procedure Send; overload;
    procedure Send(mTo: string; subject: string; msg: string); overload;
    // Property
@@ -806,7 +815,7 @@ type
   public
    constructor Create(AOwner: TComponent); override;
    destructor Destroy; override;
-   procedure Init(App: jApp); override;
+   procedure Init; override;
    procedure Send; overload;
    procedure Send(toNumber: string;  msg: string); overload;
    procedure Send(toName: string); overload;
@@ -828,7 +837,7 @@ type
    FullPathToBitmapFile: string;
    constructor Create(AOwner: TComponent); override;
    destructor Destroy; override;
-   procedure Init(App: jApp); override;
+   procedure Init; override;
    procedure TakePhoto;
    // Property
   published
@@ -845,19 +854,19 @@ type
 
     Procedure SetEnabled(Value: boolean);
     Procedure SetInterval(Value: integer);
-    Procedure SetOnTimer(Value: TOnNotify);
+    //Procedure SetOnTimer(Value: TOnNotify);
   protected
   public
     constructor Create(AOwner: TComponent); override;
     Destructor Destroy; override;
-    procedure Init(App: jApp); override;
+    procedure Init; override;
     //Property
     property Parent   : jForm     read FParent   write FParent;
   published
     property Enabled  : boolean   read FEnabled  write SetEnabled;
     property Interval : integer   read FInterval write SetInterval;
     //Event
-    property OnTimer: TOnNotify read FOnTimer write SetOnTimer;
+    property OnTimer: TOnNotify read FOnTimer write FOnTimer;//SetOnTimer;
   end;
 
   jBitmap = class(jControl)
@@ -890,7 +899,7 @@ type
   public
     constructor Create(AOwner: TComponent); override;
     Destructor  Destroy; override;
-    procedure Init(App: jApp); override;
+    procedure Init; override;
 
     Procedure LoadFromFile(fileName : String);
     Procedure CreateJavaBitmap(w,h : Integer);
@@ -928,7 +937,7 @@ type
   public
     constructor Create(AOwner: TComponent); override;
     Destructor Destroy; override;
-    procedure Init(App: jApp);  override;
+    procedure Init;  override;
     Procedure Show;
     property Parent   : jForm     read FParent   write FParent;
   published
@@ -951,7 +960,7 @@ type
   public
     constructor Create(AOwner: TComponent); override;
     Destructor Destroy; override;
-    procedure Init(App: jApp); override;
+    procedure Init; override;
     procedure Start;
     procedure Stop;
     property Parent: jForm read FParent write FParent;
@@ -964,12 +973,14 @@ type
   private
     FRunning: boolean;
     FOnAsyncEvent : TOnAsyncEvent;
+    FAutoPublishProgress: boolean;
+    procedure SetAutoPublishProgress(Value: boolean);
   protected
     Procedure GenEvent_OnAsyncEvent(Obj: TObject;EventType,Progress : Integer);
   public
     constructor Create(AOwner: TComponent); override;
     Destructor  Destroy; override;
-    procedure Init(App: jApp); override;
+    procedure Init; override;
     procedure Done;    //by jmpessoa
     Procedure Execute;
     Procedure UpdateUI(Progress : Integer);
@@ -977,6 +988,7 @@ type
   published
     // Event
     property  OnAsyncEvent : TOnAsyncEvent read FOnAsyncEvent write FOnAsyncEvent;
+    property  AutoPublishProgress: boolean read FAutoPublishProgress write SetAutoPublishProgress;
   end;
 
 
@@ -989,6 +1001,7 @@ type
     // Java
     FjPRLayout : jObject; // Java : Parent Relative Layout
     FParentPanel:  jPanel;
+    FOrientation: integer;
 
     FVisible   : Boolean;
     FColor     : TARGBColorBridge;
@@ -1024,10 +1037,11 @@ type
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
-    procedure Init(App: jApp);  override;
+    procedure Init;  override;
     property AnchorId: integer read FAnchorId write FAnchorId;
     property Width: integer Read GetWidth;
     property Height: integer Read GetHeight;
+    property Orientation: integer read FOrientation write FOrientation;
   published
     property Id: DWord read FId write SetId;
     property Anchor  : jVisualControl read FAnchor write SetAnchor;
@@ -1062,7 +1076,7 @@ type
     Destructor  Destroy; override;
     Procedure Refresh;
     Procedure UpdateLayout; override;
-    procedure Init(App: jApp);  override;
+    procedure Init;  override;
     // Property
     property Parent: jObject  read  FjPRLayout write SetParent; // Java : Parent Relative Layout
     property View: jObject read FjRLayout write FjRLayout;
@@ -1094,7 +1108,7 @@ type
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
-    procedure Init(App: jApp);  override;
+    procedure Init; override;
     Procedure Refresh;
     Procedure UpdateLayout; override;
     // Property
@@ -1107,13 +1121,13 @@ type
     property FontColor : TARGBColorBridge  read FFontColor write SetFontColor;
     property FontSize  : DWord   read FFontSize  write SetFontSize;
     property Text      : string  read FText    write SetText;
-    // Event
+    // Event - if enabled!
     property OnClick : TOnNotify read FOnClick   write FOnClick;
   end;
 
   jEditText = class(jVisualControl)
   private
-    FInputTypeEx: TInputTypeEx;  //by jmpessoa
+    FInputTypeEx: TInputTypeEx;
     FHint     : string;
     FLineMaxLength : DWord;
     FSingleLine: boolean;
@@ -1151,12 +1165,12 @@ type
   protected
     Procedure GenEvent_OnEnter (Obj: TObject);
     Procedure GenEvent_OnChange(Obj: TObject; EventType : Integer);
-    procedure setParamHeight(Value: TLayoutParams);   //override;
+    procedure setParamHeight(Value: TLayoutParams);
     procedure SetParamWidth(Value: TLayoutParams);
   public
     constructor Create(AOwner: TComponent); override;
     Destructor  Destroy; override;
-    procedure Init(App: jApp); override;
+    procedure Init; override;
     Procedure Refresh;
 
     procedure SetMovementMethod;
@@ -1180,7 +1194,7 @@ type
     property FontColor : TARGBColorBridge      read FFontColor    write SetFontColor;
     property FontSize  : DWord      read FFontSize     write SetFontSize;
     property Hint      : string     read FHint         write SetHint;
-    property SingleLine: boolean read FSingleLine write SetSingleLine;
+    //property SingleLine: boolean read FSingleLine write SetSingleLine;
     property ScrollBarStyle: TScrollBarStyle read FScrollBarStyle write SetScrollBarStyle;
     property MaxLines: DWord read FMaxLines write SetMaxLines;
     property HorScrollBar: boolean read FHorizontalScrollBar write SetHorizontalScrollBar;
@@ -1207,7 +1221,7 @@ type
   public
     constructor Create(AOwner: TComponent); override;
     Destructor  Destroy; override;
-    procedure Init(App: jApp); override;
+    procedure Init; override;
     Procedure Refresh;
     Procedure UpdateLayout; override;
     //Property
@@ -1241,7 +1255,7 @@ type
   public
     constructor Create(AOwner: TComponent); override;
     Destructor Destroy; override;
-    procedure Init(App: jApp); override;
+    procedure Init; override;
     Procedure Refresh;
     Procedure UpdateLayout; override;
 
@@ -1278,7 +1292,7 @@ type
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
-    procedure Init(App: jApp); override;
+    procedure Init; override;
     procedure Refresh;
     Procedure UpdateLayout; override;
     // Property
@@ -1318,7 +1332,7 @@ type
     Destructor Destroy; override;
     Procedure Refresh;
     Procedure UpdateLayout; override;
-    procedure Init(App: jApp); override;
+    procedure Init; override;
     procedure Stop;
     procedure Start;
     // Property
@@ -1337,7 +1351,7 @@ type
     FImageName : string;
     FImageIndex: integer;
     FImageList : jImageList;  //by jmpessoa
-    FCount: integer;
+    //FCount: integer;
     FIsBackgroundImage     : boolean;
     FFilePath: TFilePath;
 
@@ -1364,7 +1378,7 @@ type
 
       //by jmpessoa
     Procedure UpdateLayout; override;
-    procedure Init(App: jApp); override;
+    procedure Init; override;
     Procedure SetImageByName(Value : string);
     Procedure SetImageByIndex(Value : integer);
     procedure SetImageBitmap(bitmap: jObject);
@@ -1413,7 +1427,7 @@ type
     Destructor  Destroy; override;
     Procedure Refresh;
     Procedure UpdateLayout; override;
-    procedure Init(App: jApp);  override;
+    procedure Init;  override;
     // Property
     property Parent: jObject  read  FjPRLayout write SetParent; // Java : Parent Relative Layout
     property View      : jObject   read FjRLayout  write FjRLayout; //self View
@@ -1444,7 +1458,7 @@ type
     Destructor  Destroy; override;
     Procedure Refresh;
     Procedure UpdateLayout; override;
-    procedure Init(App: jApp);  override;
+    procedure Init;  override;
     // Property
     property Parent: jObject  read  FjPRLayout write SetParent; // Java : Parent Relative Layout
     property View      : jObject read FjRLayout   write FjRLayout;
@@ -1472,7 +1486,7 @@ type
     Destructor  Destroy; override;
     Procedure Refresh;
     Procedure UpdateLayout; override;
-    procedure Init(App: jApp);  override;
+    procedure Init;  override;
     // Property
     property Parent: jObject  read  FjPRLayout write SetParent; // Java : Parent Relative Layout
     property View      : jObject read FjRLayout   write FjRLayout;
@@ -1497,7 +1511,7 @@ type
     Destructor  Destroy; override;
     Procedure Refresh;
     Procedure UpdateLayout; override;
-    procedure Init(App: jApp);  override;
+    procedure Init;  override;
     // Property
     property Parent: jObject  read  FjPRLayout write SetParent; // Java : Parent Relative Layout
   published
@@ -1521,7 +1535,7 @@ type
   public
     constructor Create(AOwner: TComponent); override;
     Destructor  Destroy; override;
-    procedure Init(App: jApp); override;
+    procedure Init; override;
     Procedure Refresh;
     Procedure UpdateLayout; override;
 
@@ -1550,6 +1564,7 @@ type
     Procedure SetVisible  (Value : Boolean);
     Procedure SetColor    (Value : TARGBColorBridge);
     procedure SetParent(Value: jObject);
+    procedure SetjCanvas(Value: jCanvas);
   protected
     procedure setParamHeight(Value: TLayoutParams);
     procedure SetParamWidth(Value: TLayoutParams);
@@ -1557,21 +1572,22 @@ type
     function GetHeight: integer;  override;
     Procedure GenEvent_OnTouch(Obj: TObject; Act,Cnt: integer; X1,Y1,X2,Y2: single);
     Procedure GenEvent_OnDraw (Obj: TObject; jCanvas: jObject);
+    procedure Notification(AComponent: TComponent; Operation: TOperation); override;
   public
     constructor Create(AOwner: TComponent); override;
     Destructor  Destroy; override;
     Procedure Refresh;
     Procedure UpdateLayout; override;
-    procedure Init(App: jApp); override;
+    procedure Init; override;
     Procedure SaveToFile(fileName:String);
     // Property
     property Parent: jObject  read  FjPRLayout write SetParent; // Java : Parent Relative Layout
-    property Canvas: jCanvas read FjCanvas write FjCanvas;
   published
-    property Visible     : Boolean       read FVisible     write SetVisible;
-    property BackgroundColor       : TARGBColorBridge{DWord} read FColor       write SetColor;
+    property Canvas      : jCanvas read FjCanvas write SetjCanvas; // Java : jCanvas
+    property Visible     : Boolean read FVisible write SetVisible;
+    property BackgroundColor: TARGBColorBridge read FColor write SetColor;
     // Event - Drawing
-    property OnDraw      : TOnDraw       read FOnDraw      write FOnDraw;
+    property OnDraw      : TOnDraw read FOnDraw write FOnDraw;
     // Event - Touch
     property OnTouchDown : TOnTouchEvent read FOnTouchDown write FOnTouchDown;
     property OnTouchMove : TOnTouchEvent read FOnTouchMove write FOnTouchMove;
@@ -1606,7 +1622,7 @@ type
     Destructor  Destroy; override;
     Procedure Refresh;
     Procedure UpdateLayout; override;
-    procedure Init(App: jApp); override;
+    procedure Init; override;
     // Property
     property Parent: jObject  read  FjPRLayout write SetParent; // Java : Parent Relative Layout
   published
@@ -1620,22 +1636,30 @@ type
     property OnClick : TOnNotify read FOnClick   write FOnClick;
   end;
 
-  jCanvas = class
+  jCanvas = class(jControl)
   private
     FInitialized : boolean;
-    FApp         : jApp;
+    //FApp         : jApp;
     // Java
     FjObject     : jObject; // Java : View
+
+    FPaintStrokeWidth: single;
+    FPaintStyle: TPaintStyle;
+    FPaintTextSize: single;
+    FPaintColor: TARGBColorBridge;
+
+    Procedure setStrokeWidth       (Value : single );
+    Procedure setStyle             (Value : TPaintStyle{integer});
+    Procedure setColor             (Value : TARGBColorBridge);
+    Procedure setTextSize          (Value : single );
+
   protected
   public
-    constructor Create;
+    //constructor Create;
+    constructor Create(AOwner: TComponent); override;
     Destructor  Destroy; override;
-    procedure Init(App: jApp);
-    //
-    Procedure setStrokeWidth       (width : single );
-    Procedure setStyle             (style : integer);
-    Procedure setColor             (color : TARGBColorBridge);
-    Procedure setTextSize          (textsize : single );
+
+    procedure Init; override;
     //
     Procedure drawLine             (x1,y1,x2,y2 : single);
     // LORDMAN 2013-08-13
@@ -1643,15 +1667,17 @@ type
     Procedure drawText             (Text : String; x,y : single);
     Procedure drawBitmap           (bmp : jBitmap; b,l,r,t : integer);
     // Property
-    property  JavaObj : jObject           read FjObject;
-    property Initialized : boolean read FInitialized;
-    property App: jApp read FApp write FApp;
+    property  JavaObj : jObject read FjObject;
+  published
+    property PaintStrokeWidth: single read FPaintStrokeWidth write setStrokeWidth;
+    property PaintStyle: TPaintStyle read FPaintStyle write SetStyle;
+    property PaintTextSize: single read FPaintTextSize write SetTextSize;
+    property PaintColor: TARGBColorBridge read FPaintColor write SetColor;
   end;
 
-  jGLViewEvent = class
+  jGLViewEvent = class(jVisualControl)
   private
     FInitialized : boolean;
-    FApp         : jApp;
     //
     FOnGLCreate  : TOnNotify;
     FOnGLChange  : TOnGLChange;
@@ -1661,21 +1687,20 @@ type
     //
     FMouches     : TMouches;
     //
-    FOnTouchDown : TOnTouchEvent;
-    FOnTouchMove : TOnTouchEvent;
-    FOnTouchUp   : TOnTouchEvent;
+    FOnGLDown : TOnTouchEvent;
+    FOnGLMove : TOnTouchEvent;
+    FOnGLUp   : TOnTouchEvent;
   protected
+    //
   public
-    constructor Create;
+    constructor Create(AOwner: TComponent); override;
     Destructor  Destroy; override;
-    procedure Init(App: jApp);
+    procedure Init; override;
     //
     Procedure GenEvent_OnTouch (Obj: TObject; Act,Cnt: integer; X1,Y1,X2,Y2: single);
     Procedure GenEvent_OnRender(Obj: TObject; EventType, w, h: integer);
-    //property
-    property App: jApp read FApp write FApp;
     property Initialized : boolean read FInitialized;
-  //published
+  published
     // Event - Drawing
     property OnGLCreate  : TOnNotify     read FOnGLCreate  write FOnGLCreate;
     property OnGLChange  : TOnGLChange   read FOnGLChange  write FOnGLChange;
@@ -1683,9 +1708,9 @@ type
     property OnGLDestroy : TOnNotify     read FOnGLDestroy write FOnGLDestroy;
     property OnGLThread  : TOnNotify     read FOnGLThread  write FOnGLThread;
     // Event - Touch
-    property OnTouchDown : TOnTouchEvent read FOnTouchDown write FOnTouchDown;
-    property OnTouchMove : TOnTouchEvent read FOnTouchMove write FOnTouchMove;
-    property OnTouchUp   : TOnTouchEvent read FOnTouchUp   write FOnTouchUp;
+    property OnGLDown : TOnTouchEvent read FOnGLDown write FOnGLDown;
+    property OnGLMove : TOnTouchEvent read FOnGLMove write FOnGLMove;
+    property OnGLUp   : TOnTouchEvent read FOnGLUp   write FOnGLUp;
   end;
 
   // ----------------------------------------------------------------------------
@@ -1699,7 +1724,7 @@ type
   Procedure Java_Event_pAppOnPause               (env: PJNIEnv; this: jobject);
   Procedure Java_Event_pAppOnRestart             (env: PJNIEnv; this: jobject);
   Procedure Java_Event_pAppOnResume              (env: PJNIEnv; this: jobject);
-  Procedure Java_Event_pAppOnActive              (env: PJNIEnv; this: jobject);
+  Procedure Java_Event_pAppOnStart              (env: PJNIEnv; this: jobject); //old OnActive
   Procedure Java_Event_pAppOnStop                (env: PJNIEnv; this: jobject);
   Procedure Java_Event_pAppOnBackPressed         (env: PJNIEnv; this: jobject);
   Function  Java_Event_pAppOnRotate              (env: PJNIEnv; this: jobject; rotate : Integer) : integer;
@@ -1709,6 +1734,7 @@ type
   // Control Event
   Procedure Java_Event_pOnDraw                   (env: PJNIEnv; this: jobject; Obj: TObject; jCanvas: jObject);
   Procedure Java_Event_pOnClick                  (env: PJNIEnv; this: jobject; Obj: TObject; Value: integer);
+
   Procedure Java_Event_pOnChange                 (env: PJNIEnv; this: jobject; Obj: TObject; EventType : integer);
   Procedure Java_Event_pOnEnter                  (env: PJNIEnv; this: jobject; Obj: TObject);
   Procedure Java_Event_pOnTimer                  (env: PJNIEnv; this: jobject; Obj: TObject);
@@ -1718,7 +1744,10 @@ type
   Procedure Java_Event_pOnGLRenderer             (env: PJNIEnv;  this: jobject; Obj: TObject; EventType, w, h: integer);
 
   // Form Event
-  Procedure Java_Event_pOnClose                  (env: PJNIEnv; this: jobject);
+  Procedure Java_Event_pOnClose                  (env: PJNIEnv; this: jobject; Form : TObject);
+
+  //new by jmpessoa - form Active - after form show....
+  Procedure Java_Event_pOnActive                  (env: PJNIEnv; this: jobject; Form : TObject);
 
   // WebView Event
   Function  Java_Event_pOnWebViewStatus          (env: PJNIEnv; this: jobject; WebView : TObject; EventType : integer; URL : jString) : Integer;
@@ -1731,16 +1760,19 @@ Function  xy  (x, y: integer): TXY;
 Function  xyWH(x, y, w, h: integer): TXYWH;
 Function  fxy (x, y: Single ): TfXY;
 Function  stringLen   (str: String): Integer;
-Function  getDateTime: String;
-Procedure ShowMessage(msg: string);
+//Function  getDateTime: String;
+//Procedure ShowMessage(msg: string);   {the ShowMessage is a jForm member....}
+
 Function  getAnimation(i,o : TEffect ): TAnimation;
 // Asset Function (P : Pascal Native)
 Function  Asset_SaveToFile (srcFile,outFile : String; SkipExists : Boolean = False) : Boolean;
 Function  Asset_SaveToFileP(srcFile,outFile : String; SkipExists : Boolean = False) : Boolean;
+
 // App
-Procedure App_Lock; {just for OO model!}
+Procedure App_Lock; {just for Object Orientad model!}
 Procedure App_UnLock;
 Function  App_IsLock: Boolean;
+
 // Touch
 Procedure VHandler_touchesBegan_withEvent(Sender        : TObject;
                                           TouchCnt      : Integer;
@@ -1748,12 +1780,14 @@ Procedure VHandler_touchesBegan_withEvent(Sender        : TObject;
                                           Touch2        : TfXY;
                                           Var TouchDown : TOnTouchEvent;
                                           Var Mouches   : TMouches);
+
 Procedure VHandler_touchesMoved_withEvent(Sender        : TObject;
                                           TouchCnt      : Integer;
                                           Touch1        : TfXY;
                                           Touch2        : TfXY;
                                           Var TouchMove : TOnTouchEvent;
                                           Var Mouches   : TMouches);
+
 Procedure VHandler_touchesEnded_withEvent(Sender         : TObject;
                                           TouchCnt       : Integer;
                                           Touch1         : TfXY;
@@ -1761,11 +1795,13 @@ Procedure VHandler_touchesEnded_withEvent(Sender         : TObject;
                                           Var TouchUp    : TOnTouchEvent;
                                           Var Mouches    : TMouches);
 
+
 //by jmpessoa
+Function InputTypeToStrEx ( InputType : TInputTypeEx ) : String;
 function SplitStr(var theString: string; delimiter: string): string;
 function GetARGB(colbrColor: TARGBColorBridge): DWord;
 function GetProgressBarStyle(cjProgressBarStyle: TProgressBarStyle ): DWord;
-function GetInputTypeEx(itxType: TInputTypeEx): DWord;
+//function GetInputTypeEx(itxType: TInputTypeEx): DWord;
 function GetScrollBarStyle(scrlBarStyle: TScrollBarStyle ): integer;
 function GetPositionRelativeToAnchor(posRelativeToAnchorID: TPositionRelativeToAnchorID): DWord;
 function GetPositionRelativeToParent(posRelativeToParent: TPositionRelativeToParent): DWord;
@@ -1777,7 +1813,7 @@ function GetFilePath(filePath: TFilePath): string;
 function GetGravity(gvValue: TGravity): DWord;  //TODO
 
 var
-  App: jApp; //global App !
+  gApp: jApp; //global App !
 
 implementation
 
@@ -1899,23 +1935,26 @@ begin
   end;
 end;
 
+{
 function GetInputTypeEx(itxType: TInputTypeEx ): DWord;
 var
   index: integer;
 begin
   index:= (Ord(itxType));
+  if index = 0 then index:= 1;
   Result:= TInputTypeExArray[index];
 end;
+}
 
 function GetFilePath(filePath: TFilePath): string;
 begin
   Result:='';
   case filePath of
       fpathNone: Result:='';
-      fpathExt: Result:= App.Path.Ext;
-      fpathData: Result:= App.Path.Dat;
-      fpathDCIM: Result:= App.Path.DCIM;
-      fpathApp: Result:= App.Path.App;
+      fpathExt: Result:= gApp.Path.Ext;
+      fpathData: Result:= gApp.Path.Dat;
+      fpathDCIM: Result:= gApp.Path.DCIM;
+      fpathApp: Result:= gApp.Path.App;
   end;
 end;
 
@@ -1951,21 +1990,25 @@ Function  fxy(x, y: single): TfXY;
 // LORDMAN - 2013-07-28
 Function stringLen(str: String): Integer;
  begin
-  result := jStr_GetLength(App.Jni.jEnv, App.Jni.jThis, str);
+  result := jStr_GetLength(gApp.Jni.jEnv, gApp.Jni.jThis, str);
  end;
 
+{jmpessoa: see jForm
 // LORDMAN - 2013-07-30
 Function getDateTime: String;
- begin
-  result := jStr_GetDateTime(App.Jni.jEnv, App.Jni.jThis);
- end;
+begin
+  result := jStr_GetDateTime(gApp.Jni.jEnv, gApp.Jni.jThis);
+end;
+}
 
+{ jmpessoa: see jForm...
 Procedure ShowMessage(msg: string);
 begin
-  if App = nil then Exit;
-  if not App.Initialized then Exit;
-  jToast(App.Jni.jEnv, App.Jni.jThis, msg);
+  if gApp = nil then Exit;
+  if not gApp.Initialized then Exit;
+  jToast2(gApp.Jni.jEnv, gApp.Jni.jThis, gApp.Jni.jActivity, msg);
 end;
+}
 
 Function  getAnimation(i,o : TEffect ): TAnimation;
  begin
@@ -1984,6 +2027,19 @@ Function InputTypeToStr ( InputType : TInputType ) : String;
    itPassNumber : Result := 'PASSNUMBER';
    itPassText   : Result := 'PASSTEXT';
    itMultiLine  : Result:= 'TEXTMULTILINE';
+  end;
+ end;
+
+Function InputTypeToStrEx ( InputType : TInputTypeEx ) : String;
+ begin
+  Result := 'TEXT';
+  Case InputType of
+   itxText       : Result := 'TEXT';
+   itxNumber     : Result := 'NUMBER';
+   itxPhone      : Result := 'PHONE';
+   itxPassNumber : Result := 'PASSNUMBER';
+   itxPassText   : Result := 'PASSTEXT';
+   itxMultiLine  : Result := 'TEXTMULTILINE';
   end;
  end;
 
@@ -2011,7 +2067,7 @@ Function  Asset_SaveToFile(srcFile, outFile : String; SkipExists : Boolean = Fal
   Result := True;
   //If SkipExists = True then
   // If FileExists(outFile) then Exit;
-  jAsset_SaveToFile(App.Jni.jEnv,App.Jni.jThis,srcFile,outFile);
+  jAsset_SaveToFile(gApp.Jni.jEnv,gApp.Jni.jThis,srcFile,outFile);
   Result := FileExists(outFile);
  end;
 
@@ -2025,7 +2081,7 @@ Function  Asset_SaveToFileP(srcFile, outFile : string; SkipExists : Boolean = Fa
   If SkipExists = True then
    If FileExists(outFile) then Exit;
   Stream := TMemoryStream.Create;
-  If ZipExtract(App.Path.App,srcFile,Stream) then
+  If ZipExtract(gApp.Path.App,srcFile,Stream) then
    Stream.SaveToFile(outFile);
   Stream.free;
   Result := FileExists(outFile);
@@ -2038,17 +2094,17 @@ Function  Asset_SaveToFileP(srcFile, outFile : string; SkipExists : Boolean = Fa
 
 Procedure App_Lock;
  begin
-  App.Lock := True;
+  gApp.Lock := True;
  end;
 
 Procedure App_UnLock;
  begin
-  App.Lock := False;
+  gApp.Lock := False;
  end;
 
 Function  App_IsLock: Boolean;
  begin
-  Result := App.Lock;
+  Result := gApp.Lock;
  end;
 
 //----------------------------------------------------------------------------
@@ -2152,14 +2208,14 @@ Procedure VHandler_touchesBegan_withEvent(Sender        : TObject;
 
  begin
   //
-  If Not(Assigned(TouchDown)) then Exit;
+  If not Assigned(TouchDown) then Exit;
   //
   Mouches.Cnt    := Min(TouchCnt,cjMouchMax);
   Mouches.XYs[0] := Touch1;
   Mouches.XYs[1] := Touch2;
 
   MultiTouch_Calc(Mouches);
-  TouchDown(Sender,Mouches.Mouch);
+  TouchDown(Sender, Mouches.Mouch);
  end;
 
 //
@@ -2169,16 +2225,16 @@ Procedure VHandler_touchesMoved_withEvent(Sender        : TObject;
                                           Touch2        : TfXY;
                                           Var TouchMove : TOnTouchEvent;
                                           Var Mouches   : TMouches);
- begin
+begin
   //
-  If Not(Assigned(TouchMove)) then Exit;
+ If not(Assigned(TouchMove)) then Exit;
   //
   Mouches.Cnt    := Min(TouchCnt,cjMouchMax);
   Mouches.XYs[0] := Touch1;
   Mouches.XYs[1] := Touch2;
   MultiTouch_Calc(Mouches);
   TouchMove(Sender,Mouches.Mouch);
- end;
+end;
 
 //
 Procedure VHandler_touchesEnded_withEvent(Sender         : TObject;
@@ -2189,14 +2245,14 @@ Procedure VHandler_touchesEnded_withEvent(Sender         : TObject;
                                           Var Mouches    : TMouches);
  begin
   //
-  If Not(Assigned(TouchUp)) then Exit;
+  If not(Assigned(TouchUp)) then Exit;
   //
   Mouches.Cnt    := Min(TouchCnt,cjMouchMax);
   Mouches.XYs[0] := Touch1;
   Mouches.XYs[1] := Touch2;
 
   MultiTouch_End(Mouches);
-  TouchUp  (Sender,Mouches.Mouch);
+  TouchUp(Sender,Mouches.Mouch);
  end;
 
 //------------------------------------------------------------------------------
@@ -2205,7 +2261,9 @@ Procedure VHandler_touchesEnded_withEvent(Sender         : TObject;
 
 Function Java_Event_pAppOnScreenStyle(env: PJNIEnv; this: jobject): integer;
 begin
-  case App.Screen.Style of
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+  case gApp.Screen.Style of
     ssSensor    : Result := 0;
     ssPortrait  : Result := 1;
     ssLandScape : Result := 2;
@@ -2214,171 +2272,314 @@ end;
 
 Procedure Java_Event_pAppOnNewIntent(env: PJNIEnv; this: jObject);
 begin
-  dbg('pAppOnNewIntent');
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
 end;
 
+// The activity is about to be destroyed.
 Procedure Java_Event_pAppOnDestroy(env: PJNIEnv; this: jobject);
 begin
-  dbg('pAppOnDestroy');
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
 end;
 
+{
+Paused
+Another activity is in the foreground and has focus, but this one is still visible.
+That is, another activity is visible on top of this one and that activity is partially transparent
+or doesn't cover the entire screen. A paused activity is completely alive (the Activity object is retained in memory,
+it maintains all state and member information, and remains attached to the window manager),
+but can be killed by the system in extremely low memory situations.
+}
+// Another activity is taking focus (this activity is about to be "paused").
 Procedure Java_Event_pAppOnPause(env: PJNIEnv; this: jobject);
 begin
-  dbg('pAppOnPause');
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
 end;
+
 
 Procedure Java_Event_pAppOnRestart(env: PJNIEnv; this: jobject);
 begin
-  dbg('pAppOnRestart');
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
 end;
 
+{
+Resume: The activity is in the foreground of the screen and has user focus.
+(This state is also sometimes referred to as "running".)
+}
 Procedure Java_Event_pAppOnResume(env: PJNIEnv; this: jobject);
 begin
-  dbg('pAppOnResume');
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
 end;
 
-{TODO: by jmpessoa
-Procedure Java_Event_pAppOnActive(env: PJNIEnv; this: jObject);
-var
- Form      : jForm;
+//The activity is about to become visible.....
+Procedure Java_Event_pAppOnStart(env: PJNIEnv; this: jObject);
 begin
- Form := App.Forms.Stack[App.Forms.Index-1].Form;
- if not( Assigned(Form)) then Exit;
- if Assigned(Form.OnActive) then Form.OnActive(Form);
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
 end;
+
+{
+Stopped
+The activity is completely obscured by another activity (the activity is now in the "background").
+A stopped activity is also still alive (the Activity object is retained in memory, it maintains
+all state and member information, but is not attached to the window manager).
+However, it is no longer visible to the user and it can be killed by the system when memory is needed elsewhere.
 }
-
-Procedure Java_Event_pAppOnActive(env: PJNIEnv; this: jObject);
-begin
-  //
-end;
-
 Procedure Java_Event_pAppOnStop(env: PJNIEnv; this: jobject);
 begin
-  dbg('pAppOnStop');
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
 end;
 
 // Event : OnBackPressed -> Form OnClose
-Procedure Java_Event_pAppOnBackPressed(env: PJNIEnv; this: jobject);
+procedure Java_Event_pAppOnBackPressed(env: PJNIEnv; this: jobject);
 var
   AForm : jForm;
+  CanClose: boolean;
 begin
-  AForm := App.Forms.Stack[App.Forms.Index-1].Form;
-  if not(Assigned(AForm))           then Exit;
-  if not(AForm.BackButton)         then Exit;
+
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+
+  AForm:= gApp.Forms.Stack[gApp.GetCurrentFormsIndex].Form;
+
+  if not Assigned(AForm) then Exit;
+
   if AForm.FormState <> fsFormWork then Exit;
-  //
+
+  if Assigned(AForm.OnBackButton) then AForm.OnBackButton(AForm);
+
+  // Event : OnCloseQuery
+  if Assigned(AForm.OnCloseQuery) then
+  begin
+    CanClose := True;
+    AForm.OnCloseQuery(AForm, CanClose);
+    if CanClose = False then Exit;
+  end;
+
   AForm.Close;
+
 end;
 
 // Event : OnRotate -> Form OnRotate
-Function Java_Event_pAppOnRotate(env: PJNIEnv; this: jobject;
-                                 rotate : integer) : Integer;
- Var                   {rotate=1 --> device vertical/default position ; 2: device horizontal position}
+Function Java_Event_pAppOnRotate(env: PJNIEnv; this: jobject; rotate : integer) : Integer;
+var                   {rotate=1 --> device vertical/default position ; 2: device horizontal position}
   Form      : jForm;
   rstRotate : Integer;
- begin
-  rstRotate:= -1; //just init...
+begin
+
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+
+  rstRotate:= rotate; //just initialize [var] param...
+
   Result := rotate;
-  Form := App.Forms.Stack[App.Forms.Index-1].Form;
-  if Not( Assigned(Form         )) then Exit;
-  if Assigned(Form.OnRotate) then Form.OnRotate(Form,rotate,{var}rstRotate);
+
+  Form := gApp.Forms.Stack[gApp.GetCurrentFormsIndex].Form;
+
+  if not Assigned(Form) then Exit;
+
+  Form.UpdateJNI(gApp);
+
+  Form.SetOrientation(rotate);
+
+  if Assigned(Form.OnRotate) then Form.OnRotate(Form, rotate, {var}rstRotate);
+
+ // if rstRotate <>  Form.Orientation then Form.SetOrientation(rstRotate);
+
   Result := rstRotate;
- end;
+
+end;
 
 Procedure Java_Event_pAppOnConfigurationChanged(env: PJNIEnv; this: jobject);
- begin
-  dbg('pAppOnConfigurationChanged');
- end;
+begin
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+end;
 
 Procedure Java_Event_pAppOnActivityResult(env: PJNIEnv; this: jobject;
-                                                requestCode,resultCode : Integer;
-                                                jData : jObject);
+                                                requestCode, resultCode : Integer;
+                                               jData : jObject);
 var
-  Form      : jForm;
+  Form: jForm;
 begin
-  Form := App.Forms.Stack[App.Forms.Index-1].Form;
-  if not( Assigned(Form              )) then Exit;
-  if not( Assigned(Form.OnActivityRst)) then Exit;
-  Form.OnActivityRst(Form,requestCode,resultCode,jData);
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+  Form:= gApp.Forms.Stack[gApp.GetCurrentFormsIndex].Form;
+  if not Assigned(Form) then Exit;
+  Form.UpdateJNI(gApp);
+  if Assigned(Form.OnActivityRst) then Form.OnActivityRst(Form,requestCode,resultCode,jData);
 end;
 
 //------------------------------------------------------------------------------
 //  Control Event
 //------------------------------------------------------------------------------
 
-
 Procedure Java_Event_pOnDraw(env: PJNIEnv; this: jobject;
                              Obj: TObject; jCanvas: jObject);
 begin
-  if not (Assigned(Obj)) then Exit;
-  if Obj is jView  then begin jView(Obj).GenEvent_OnDraw(Obj, jCanvas);  end;
-end;
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
 
+  if not Assigned(Obj) then Exit;
+  if Obj is jView  then
+  begin
+    jForm(jView(Obj).Owner).UpdateJNI(gApp);
+    jView(Obj).GenEvent_OnDraw(Obj, jCanvas);
+  end;
+end;
 
 Procedure Java_Event_pOnClick(env: PJNIEnv; this: jobject; Obj: TObject; Value: integer);
 begin
+
+  //----update global "gApp": to whom it may concern------
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+  //------------------------------------------------------
+
   if not (Assigned(Obj)) then Exit;
-  if Obj is jForm        then begin jForm       (Obj).GenEvent_OnClick(Obj);       exit; end;
-  if Obj is jTextView    then begin jTextView   (Obj).GenEvent_OnClick(Obj);       exit; end;
-  if Obj is jButton      then begin jButton     (Obj).GenEvent_OnClick(Obj);       exit; end;
-  if Obj is jCheckBox    then begin jCheckBox   (Obj).GenEvent_OnClick(Obj);       exit; end;
-  if Obj is jRadioButton then begin jRadioButton(Obj).GenEvent_OnClick(Obj);       exit; end;
-  if Obj is jDialogYN    then begin jDialogYN   (Obj).GenEvent_OnClick(Obj,Value); exit; end;
-  if Obj is jImageBtn    then begin jImageBtn   (Obj).GenEvent_OnClick(Obj);       exit; end;
-  if Obj is jListView    then begin jListVIew   (Obj).GenEvent_OnClick(Obj,Value); exit; end;
-  if Obj is jImageView   then begin jImageView  (Obj).GenEvent_OnClick(Obj);       exit; end;
+  if Obj is jForm then
+  begin
+    jForm(Obj).UpdateJNI(gApp);
+    jForm(Obj).GenEvent_OnClick(Obj);       exit;
+  end;
+  if Obj is jTextView then
+  begin
+    jForm(jTextView(Obj).Owner).UpdateJNI(gApp);
+    jTextView(Obj).GenEvent_OnClick(Obj);       exit;
+  end;
+  if Obj is jButton then
+  begin
+    jForm(jButton(Obj).Owner).UpdateJNI(gApp);
+    jButton(Obj).GenEvent_OnClick(Obj);       exit;
+  end;
+  if Obj is jCheckBox then
+  begin
+    jForm(jCheckBox(Obj).Owner).UpdateJNI(gApp);
+    jCheckBox(Obj).GenEvent_OnClick(Obj);       exit;
+  end;
+  if Obj is jRadioButton then
+  begin
+    jForm(jRadioButton(Obj).Owner).UpdateJNI(gApp);
+    jRadioButton(Obj).GenEvent_OnClick(Obj);       exit;
+  end;
+  if Obj is jDialogYN then
+  begin
+    jDialogYN(Obj).GenEvent_OnClick(Obj,Value); exit;
+  end;
+  if Obj is jImageBtn then
+  begin
+    jForm(jImageBtn(Obj).Owner).UpdateJNI(gApp);
+    jImageBtn(Obj).GenEvent_OnClick(Obj);       exit;
+  end;
+  if Obj is jListView then
+  begin
+    jForm(jListVIew(Obj).Owner).UpdateJNI(gApp);
+    jListVIew(Obj).GenEvent_OnClick(Obj,Value); exit;
+  end;
+  if Obj is jImageView then
+  begin
+    jForm(jImageView(Obj).Owner).UpdateJNI(gApp);
+    jImageView(Obj).GenEvent_OnClick(Obj);       exit;
+  end;
 end;
 
 Procedure Java_Event_pOnChange(env: PJNIEnv; this: jobject;
                                Obj: TObject; EventType : integer);
-begin
- if not (Assigned(Obj)) then Exit;
- if Obj is jEditText    then begin jEditText   (Obj).GenEvent_OnChange(Obj,EventType); exit; end;
+begin                 {0:beforeTextChanged ; 1:onTextChanged ; 2: afterTextChanged}
+ gApp.Jni.jEnv:= env;
+ gApp.Jni.jThis:= this;
+
+ if not Assigned(Obj) then Exit;
+ if Obj is jEditText then
+ begin
+    jForm(jEditText(Obj).Owner).UpdateJNI(gApp);
+    jEditText(Obj).GenEvent_OnChange(Obj, EventType);
+    exit;
+ end;
+
 end;
 
 // LORDMAN
 Procedure Java_Event_pOnEnter(env: PJNIEnv; this: jobject; Obj: TObject);
 begin
-  if not (Assigned(Obj)) then Exit;
-  if Obj is jEditText    then begin jEditText   (Obj).GenEvent_OnEnter(Obj);       exit; end;
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+
+  if not Assigned(Obj) then Exit;
+  if Obj is jEditText then
+  begin
+    jForm(jEditText(Obj).Owner).UpdateJNI(gApp);
+    jEditText(Obj).GenEvent_OnEnter(Obj);
+    exit;
+  end;
+
 end;
 
 Procedure Java_Event_pOnTimer(env: PJNIEnv; this: jobject; Obj: TObject);
 Var
   Timer : jTimer;
 begin
-  If App_IsLock then Exit;
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+
+  if App_IsLock then Exit;
+
   if not (Assigned(Obj)) then Exit;
   if not (Obj is jTimer) then Exit;
 
   Timer := jTimer(Obj);
 
-  If not (Timer.Enabled)   then Exit;
+  if not (Timer.Enabled) then Exit;
 
-  If Timer.Parent.FormState = fsFormClose then Exit;
+  Timer.Parent.UpdateJNI(gApp);
 
-  If not (Assigned(Timer.OnTimer)) then Exit;
-  Timer.OnTimer(Timer);
+  if Timer.Parent.FormState = fsFormClose then Exit;
+
+  if Assigned(Timer.OnTimer) then Timer.OnTimer(Timer);
+
 end;
 
-Procedure Java_Event_pOnTouch(env: PJNIEnv; this: jobject;
+procedure Java_Event_pOnTouch(env: PJNIEnv; this: jobject;
                               Obj: TObject;
                               act,cnt: integer; x1,y1,x2,y2 : single);
 begin
-  if not (Assigned(Obj))  then Exit;
-  if Obj is jGLViewEvent  then begin jGLViewEvent(Obj).GenEvent_OnTouch(Obj,act,cnt,x1,y1,x2,y2); exit; end;
-  if Obj is jView         then begin jView       (Obj).GenEvent_OnTouch(Obj,act,cnt,x1,y1,x2,y2); exit; end;
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+  if not Assigned(Obj)  then Exit;
+  if Obj is jGLViewEvent  then
+  begin
+    jForm(jGLViewEvent(Obj).Owner).UpdateJNI(gApp);
+    jGLViewEvent(Obj).GenEvent_OnTouch(Obj,act,cnt,x1,y1,x2,y2);
+    Exit;
+  end;
+  if Obj is jView then
+  begin
+    jForm(jView(Obj).Owner).UpdateJNI(gApp);
+    jView(Obj).GenEvent_OnTouch(Obj,act,cnt,x1,y1,x2,y2);
+    Exit;
+  end;
 end;
 
-Procedure Java_Event_pOnGLRenderer(env: PJNIEnv; this: jobject;
+procedure Java_Event_pOnGLRenderer(env: PJNIEnv; this: jobject;
                                    Obj: TObject; EventType, w, h: integer);
 begin
-  if not (Assigned(Obj))  then Exit;
-  if Obj is jGLViewEvent  then begin jGLViewEvent(Obj).GenEvent_OnRender(Obj, EventType, w, h); exit; end;
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+  if not Assigned(Obj) then Exit;
+  if Obj is jGLViewEvent  then
+  begin
+    jForm(jGLViewEvent(Obj).Owner).UpdateJNI(gApp);
+    jGLViewEvent(Obj).GenEvent_OnRender(Obj, EventType, w, h);
+    Exit;
+  end;
 end;
 
-Function  Java_Event_pOnWebViewStatus(env: PJNIEnv; this: jobject;
+function Java_Event_pOnWebViewStatus(env: PJNIEnv; this: jobject;
                                       webview   : TObject;
                                       eventtype : integer;
                                       URL       : jString) : Integer;
@@ -2388,31 +2589,44 @@ var
   pasCanNavi : Boolean;
   _jBoolean  : jBoolean;
 begin
-  //
+
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+
   Result     := cjWebView_Act_Continue;
   pasWebView := jWebView(webview);
-  if Not(assigned(pasWebView         )) then Exit;
-  if Not(assigned(pasWebView.OnStatus)) then Exit;
+  if not Assigned(pasWebView) then Exit;
+  if not Assigned(pasWebView.OnStatus) then Exit;
   //
   pasURL := '';
-  If URL <> nil then
-   begin
+  if URL <> nil then
+  begin
     _jBoolean := JNI_False;
     pasURL    := String( env^.GetStringUTFChars(Env,URL,@_jBoolean) );
-   end;
+  end;
   //
   pasCanNavi := True;
   pasWebView.OnStatus(pasWebView,IntToWebViewStatus(EventType),pasURL,pasCanNavi);
-  If Not(pasCanNavi) then
-   Result := cjWebView_Act_Break;
+  if not(pasCanNavi) then Result := cjWebView_Act_Break;
+
 end;
 
 
-Procedure Java_Event_pOnAsyncEvent   (env: PJNIEnv; this: jobject;
+Procedure Java_Event_pOnAsyncEvent(env: PJNIEnv; this: jobject;
                                       Obj: TObject; EventType,Progress : integer);
 begin
-  if not (Assigned(Obj)) then Exit;
-  if Obj is jAsyncTask then begin jAsyncTask(Obj).GenEvent_OnAsyncEvent(Obj,EventType,Progress); exit; end;
+
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+
+  if not Assigned(Obj) then Exit;
+  if Obj is jAsyncTask then
+  begin
+    jForm(jAsyncTask(Obj).Owner).UpdateJNI(gApp);
+    jAsyncTask(Obj).GenEvent_OnAsyncEvent(Obj,EventType,Progress);
+    Exit;
+  end;
+
 end;
 
 //------------------------------------------------------------------------------
@@ -2450,11 +2664,11 @@ begin
   Device.ID          := '';
 
   FInitialized     := False;
+  Forms.Index      := -1; //dummy
 end;
 
 Destructor jApp.Destroy;
 begin
-  Self.Finish;
   inherited Destroy;
 end;
 
@@ -2466,13 +2680,13 @@ begin
   //
   Screen.Style  := ssSensor;     // Screen Style [Device,Portrait,Lanscape]
   // Jni
-  Jni.jEnv      := env;
-  Jni.jThis     := this;
+  Jni.jEnv      := env;  //a reference to the JNI environment
+  Jni.jThis     := this; //a reference to the object making this call (or class if static).
   Jni.jActivity := activity;
   Jni.jRLayout  := layout;
   // Screen
   Screen.WH     := jSysInfo_ScreenWH(env, this, activity);
-  Orientation   := jSystem_GetOrientation(env, this, activity{context});
+  Orientation   := jSystem_GetOrientation(env, this);
   // Device
   Path.App      := jSysInfo_PathApp(env, this, activity, PChar(FAppName){gjAppName});
   Path.Dat      := jSysInfo_PathDat(env, this, activity);
@@ -2482,6 +2696,7 @@ begin
   Device.PhoneNumber := jSysInfo_DevicePhoneNumber(env, this);
   Device.ID          := jSysInfo_DeviceID(env, this);
   FInitialized       := True;
+
 end;
 
 procedure jApp.CreateForm(InstanceClass: TComponentClass; out Reference);
@@ -2493,19 +2708,46 @@ begin
   Instance.Create(Self);
 end;
 
+function jApp.GetCurrentFormsIndex: integer;
+begin
+   Result:= Forms.Index;
+end;
+
+Procedure jApp.IncFormsIndex;
+begin
+   Inc(Forms.Index);
+end;
+
+function jApp.GetNewFormsIndex: integer;
+begin
+  Inc(Forms.Index);
+  Result:= Forms.Index;
+end;
+
+function jApp.GetPreviousFormsIndex: integer;
+begin
+  Dec(Forms.Index);
+  Result:= Forms.Index;
+end;
+
+Procedure jApp.DecFormsIndex;
+begin
+   Dec(Forms.Index);
+end;
+
 Procedure jApp.SetAppName (Value : String);
 begin
-  FAppName  := Value;
+  FAppName:= Value;
 end;
 
 Procedure jApp.SetClassName(Value : String);
 begin
-  FClassName  := Value;
+  FClassName:= Value;
 end;
 
 Procedure jApp.Finish;
 begin
-  jApp_Finish(Self.Jni.jEnv,Self.Jni.jThis);
+  jApp_Finish2(Self.Jni.jEnv, Self.Jni.jThis);
 end;
 
 //------------------------------------------------------------------------------
@@ -2516,19 +2758,19 @@ constructor jForm.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
   // Initialize
-  FApp                  := nil;
-  FVisible              := False; //True;
+  FVisible              := False;
   FEnabled              := True;
-  //FForm               := nil; //Owner;
   FColor                := colbrBlack;
   FFormName             := 'jForm';
-  FormState            := fsFormCreate;
+  FormState             := fsFormCreate;
   FCloseCallBack.Event  := nil;
   FCloseCallBack.Sender := nil;
-  FBackButton           := True;//False;        // Back Button Press Event Enabled
+ // FMainActivity          := True;
+  FActivityMode          := actMain;  //actMain, actRecyclable, actDisposable
+
   FOnActive             := nil;
-  FOnClose              := nil;
   FOnCloseQuery         := nil;
+  FOnClose              := nil;
   FOnRotate             := nil;
   FOnClick              := nil;
   FOnActivityRst        := nil;
@@ -2536,125 +2778,175 @@ begin
 
   FjObject              := nil;
   FjRLayout{View}       := nil;
+  FApp                  := nil;
+
   FScreenWH.Height      := 100; //dummy
   FScreenWH.Width       := 100;
 
   FAnimation.In_        := cjEft_None; //cjEft_FadeIn;
   FAnimation.Out_       := cjEft_None; //cjEft_FadeOut;
+  FOrientation          := 0;
   FInitialized          := False;
 end;
 
 destructor jForm.Destroy;
 begin
-  if FjObject <> nil then
-  begin
-     if App <> nil then
-     begin
-        if App.Initialized then
-        begin
-         jForm_Free(App.Jni.jEnv, App.Jni.jThis, FjObject);
-         jSystem_GC(App.Jni.jEnv, App.Jni.jThis);
-        end;
-     end;
-  end;
   inherited Destroy;
 end;
 
-procedure jForm.Init(App: jApp);
+procedure jForm.Finish;
+begin
+  UpdateJNI(gApp);
+  jForm_Free2(App.Jni.jEnv, App.Jni.jThis, FjObject);
+  jForm_FreeLayout(App.Jni.jEnv, App.Jni.jThis, FjRLayout);
+  jSystem_GC2(App.Jni.jEnv, App.Jni.jThis);
+end;
+
+procedure jForm.Init(refApp: jApp);
 var
   i: integer;
   bkImgIndex: integer;
 begin
+
   if FInitialized  then Exit;
-  if App = nil then Exit;
-  if not App.Initialized then Exit;
-  FApp:= App;
+  if refApp = nil then Exit;
+  if not refApp.Initialized then Exit;
+
+  FApp:= refApp;
+
   FScreenWH:= App.Screen.WH;
-  FjObject:= jForm_Create(App.Jni.jEnv, App.Jni.jThis, Self);
-  FjRLayout:= jForm_Getlayout(App.Jni.jEnv, App.Jni.jThis, FjObject);
+  FOrientation:= App.Orientation;
+
+  FjObject:=  jForm_Create(App.Jni.jEnv, App.Jni.jThis, Self);
+
+  FjRLayout:= jForm_Getlayout2(App.Jni.jEnv, App.Jni.jThis, FjObject);  {view}
 
   if  FColor <> colbrDefault then
      jView_SetBackGroundColor(App.Jni.jEnv, App.Jni.jThis, FjRLayout, GetARGB(FColor));
 
-  //jForm_SetVisibility(App.Jni.jEnv, App.Jni.jThis, FjObject ,FVisible); //BUG
-  jForm_SetEnabled(App.Jni.jEnv, App.Jni.jThis, FjObject, FEnabled);
-
   bkImgIndex:= -1;
+
   FInitialized:= True;
 
-  for i := Self.ComponentCount - 1 downto 0 do
+  for i:= (Self.ComponentCount-1) downto 0 do
   begin
-    if Self.Components[i] is jControl then
+    if (Self.Components[i] is jControl) then
     begin
        if (Self.Components[i] as jControl).ClassName = 'jImageView' then
        begin
           if (Self.Components[i] as jImageView).IsBackgroundImage = True then
           begin
              bkImgIndex:= i;
-            (Self.Components[i] as jControl).Init(App);
+            (Self.Components[i] as jControl).Init; //init just background image
           end;
        end;
     end;
   end;
 
-  for i := Self.ComponentCount - 1 downto 0 do
+  for i:= (Self.ComponentCount-1) downto 0 do
   begin
-    if Self.Components[i] is jControl then
+    if (Self.Components[i] is jControl) then
     begin
-      if i <> bkImgIndex then (Self.Components[i] as jControl).Init(App);
+      if i <> bkImgIndex then
+      begin
+         (Self.Components[i] as jControl).Init;
+      end;
     end;
   end;
+
+  jForm_SetEnabled2(App.Jni.jEnv, App.Jni.jThis, FjObject, FEnabled);
 
   if Assigned(FOnJNIPrompt) then FOnJNIPrompt(Self);
 end;
 
-function jForm.GetOrientation: integer;
+procedure jForm.UpdateJNI(refApp: jApp);
 begin
-  Result:= App.Orientation; //jSystem_GetOrientation(App.Jni.jEnv, App.Jni.jThis, App.Jni.jActivity{context});
+  Self.App.Jni.jEnv:= refApp.Jni.jEnv;
+  Self.App.Jni.jThis:= refApp.Jni.jThis;
+end;
+
+{
+procedure jForm.SetOnJNIPrompt(Value: TOnNotify);
+begin
+  if FOnJNIPrompt = AValue then Exit;
+  FOnJNIPrompt:= AValue;
+end;
+}
+
+procedure jForm.ShowMessage(msg: string);
+begin
+  UpdateJNI(gApp);
+  jForm_ShowMessage(Self.App.Jni.jEnv, Self.App.Jni.jThis,  FjObject, msg);
+end;
+
+function jForm.GetDateTime: String;
+begin
+  UpdateJNI(gApp);
+  Result:= jForm_GetDateTime(Self.App.Jni.jEnv, Self.App.Jni.jThis, FjObject);
+end;
+
+procedure jForm.SetOrientation(Value: integer);
+begin
+  FOrientation:= Value;
 end;
 
 Procedure jForm.setEnabled(Value: Boolean);
 begin
- FEnabled := Value;
- if FInitialized then
-   jForm_SetEnabled(App.Jni.jEnv, App.Jni.jThis, FjObject,FEnabled);
+  FEnabled := Value;
+  if FInitialized then
+  begin
+    UpdateJNI(gApp);
+    jForm_SetEnabled2(App.Jni.jEnv, App.Jni.jThis, FjObject, FEnabled);
+  end;
 end;
 
 Procedure jForm.SetVisible(Value: Boolean);
 begin
  FVisible := Value;
  if FInitialized then
-   jForm_SetVisibility(App.Jni.jEnv, App.Jni.jThis, FjObject ,FVisible);
+ begin
+   UpdateJNI(gApp);
+   jForm_SetVisibility2(App.Jni.jEnv, App.Jni.jThis, FjObject, FVisible);
+ end;
 end;
 
 Procedure jForm.SetColor(Value: TARGBColorBridge);
 begin
  FColor:= Value;
  if (FInitialized = True) and (FColor <> colbrDefault)  then
-    jView_SetBackGroundColor(App.Jni.jEnv, App.Jni.jThis, FjRLayout,GetARGB(FColor));
+ begin
+   UpdateJNI(gApp);
+   jView_SetBackGroundColor(App.Jni.jEnv, App.Jni.jThis, FjRLayout,GetARGB(FColor));
+ end;
 end;
 
 Procedure jForm.Show;
- begin
+var
+  newIndex: integer;
+begin
+
+  UpdateJNI(gApp);
+
   if not FInitialized then Exit;
   if FVisible then Exit;
-  if App.Forms.Index = cjFormsMax then Exit;
-  //
-  FVisible:= True;
-  //
-  //jForm_SetVisibility(App.Jni.jEnv, App.Jni.jThis, FjObject ,FVisible); //BUG
-  App.Forms.Stack[App.Forms.Index].Form    := Self;
-  App.Forms.Stack[App.Forms.Index].CloseCB := FCloseCallBack;
-  Inc(App.Forms.Index);
-  jForm_Show(App.Jni.jEnv,App.Jni.jThis,FjObject,FAnimation.In_);
+
+  if gApp.GetCurrentFormsIndex = (cjFormsMax-1) then Exit;
+
+  newIndex:= gApp.GetNewFormsIndex;
+  gApp.Forms.Stack[newIndex].Form    := Self;
+  gApp.Forms.Stack[newIndex].CloseCB := FCloseCallBack;
+
   FormState := fsFormWork;
-  if Assigned(FOnActive) then FOnActive(Self);
+  FVisible:= True;
+
+  jForm_Show2(App.Jni.jEnv,App.Jni.jThis,FjObject, FAnimation.In_);
 end;
 
 Procedure jForm.UpdateLayout;
 var
   i: integer;
 begin
+    UpdateJNI(gApp);
     for i := Self.ComponentCount - 1 downto 0 do
     begin
       if Self.Components[i] is jVisualControl then
@@ -2665,62 +2957,83 @@ begin
 end;
 
 //Ref. Destroy
-Procedure jForm.Close;
+procedure jForm.Close;
 var
-  CanClose : boolean;
-  //rst : Integer;
+ CanClose: boolean;
+ Inx: integer;
 begin
-  if not FInitialized then Exit;
-  // Event : OnCloseQuery
-  if Assigned(FOnCloseQuery) then
-  begin
-    CanClose := False;
-    FOnCloseQuery(Self, CanClose);
-    if CanClose = False then
-    begin
-        Exit;
-    end;
-  end;
-  //
-  FormState := fsFormClose;
-  //FVisible:= False;
-  //jForm_SetVisibility(App.Jni.jEnv, App.Jni.jThis, FjObject ,FVisible);
-  jForm_Close(App.Jni.jEnv, App.Jni.jThis, FjObject,FAnimation.Out_);
-  // Post Closing Step
-  // --------------------------------------------------------------------------
-  // Java           Java          Java-> Pascal
-  // jForm_Close -> RemoveView -> Java_Event_pOnClose
+
+ UpdateJNI(gApp);
+
+ FormState := fsFormClose;
+ FVisible:= False;
+
+ //LORDMAN - 2013-08-01 / Call Back - 현재 Form 이전것을 한다.
+ Inx := gApp.GetCurrentFormsIndex;
+
+ if Assigned(gApp.Forms.Stack[Inx].CloseCB.Event) then
+ begin
+    gApp.Forms.Stack[Inx].CloseCB.Event(gApp.Forms.Stack[Inx].CloseCB.Sender);
+    gApp.Forms.Stack[Inx].CloseCB.Event  := nil;
+    gApp.Forms.Stack[Inx].CloseCB.Sender := nil;
+ end;
+
+ gApp.DecFormsIndex;
+
+ jForm_Close2(App.Jni.jEnv, App.Jni.jThis, FjObject)
+
+ // Post Closing Step
+ // --------------------------------------------------------------------------
+ // Java           Java          Java-> Pascal
+ // jForm_Close -> RemoveView -> Java_Event_pOnClose
+
 end;
 
-Procedure Java_Event_pOnClose(env: PJNIEnv; this: jobject);
+//after form close......
+Procedure Java_Event_pOnClose(env: PJNIEnv; this: jobject;  Form : TObject);
 var
-  Form : jForm;
-  Inx  : Integer;
+  i, Inx  : Integer;
 begin
-  if App = nil then Exit;
-  if not App.Initialized then exit;
-  Form := App.Forms.stack[App.Forms.Index-1].Form;
-  if not(Assigned(Form)) then Exit;
-  Form.Visible  := False;
-  If Assigned(Form.OnClose) then Form.OnClose(Form);
 
-  If App.Forms.Index > 0 then Dec(App.Forms.Index);
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
 
-  // LORDMAN - 2013-08-01 / Call Back - 현재 Form 이전것을 한다.
+  if not Assigned(Form) then exit; //just precaution...
 
-  Inx := App.Forms.Index;
-  if Assigned(App.Forms.Stack[Inx].CloseCB.Event) then
+  jForm(Form).UpdateJNI(gApp);
+
+  if Assigned(jForm(Form).OnClose) then jForm(Form).OnClose(jForm(Form));
+
+  if jForm(Form).ActivityMode = actMain then  //"The End"
   begin
-    App.Forms.Stack[Inx].CloseCB.Event(App.Forms.Stack[Inx].CloseCB.Sender);
-    App.Forms.Stack[Inx].CloseCB.Event  := nil;
-    App.Forms.Stack[Inx].CloseCB.Sender := nil;
+    jForm(Form).Finish;
+    gApp.Finish;
   end;
+
+  if jForm(Form).ActivityMode = actDisposable then
+  begin
+    jForm(Form).Finish;
+  end;
+
+end;
+
+Procedure Java_Event_pOnActive(env: PJNIEnv; this: jobject;  Form : TObject);
+begin
+
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+
+  (Form as jForm).UpdateJNI(gApp);
+  if Assigned((Form as jForm).OnActive) then (Form as jForm).OnActive(Form);
 end;
 
 Procedure jForm.Refresh;
 begin
   if FInitialized then
-     jView_Invalidate(App.Jni.jEnv, App.Jni.jThis, Self.View);
+  begin
+    UpdateJNI(gApp);
+    jView_Invalidate(App.Jni.jEnv, App.Jni.jThis, Self.View);
+  end;
 end;
 
 Procedure jForm.SetCloseCallBack(func : TOnNotify; Sender : TObject);
@@ -2732,7 +3045,12 @@ end;
 // Event : Java -> Pascal
 Procedure jForm.GenEvent_OnClick(Obj: TObject);
 begin
-  if Assigned(FOnClick) then FOnClick(Obj);
+   if Assigned(FOnClick) then FOnClick(Obj);
+end;
+
+function jForm.GetView: jObject;
+begin
+  Result:= FjRLayout;
 end;
 
 //-------------------------------------------------
@@ -2741,7 +3059,6 @@ end;
 Constructor jControl.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
-  FApp       := nil;
   FInitialized:= False;
 end;
 
@@ -2751,11 +3068,9 @@ begin
   inherited Destroy;
 end;
 
-procedure jControl.Init(App: jApp);
+procedure jControl.Init;
 begin
-  if App = nil then Exit;
-  if not App.Initialized then Exit;
-  FApp:= App;
+  //
 end;
 
 //-------------------------------------------------
@@ -2768,10 +3083,10 @@ begin
   FjObject   := nil; //java object
   FEnabled   := True;
   FVisible   := True;
-  FColor     := colbrDefault; //colbrNone;
-  FFontColor := colbrDefault; //colbrWhite;
+  FColor     := colbrDefault;
+  FFontColor := colbrDefault;
   FFontSize  := 0; //default size!
-  FId        := 0; //( 0: no control anchor on this control!)
+  FId        := 0; //0: no control anchor on this control!
   FAnchorId  := -1;  //dummy
   FAnchor    := nil;
   FLParamWidth := lpMatchParent;
@@ -2797,10 +3112,11 @@ begin
   FId:= Value;
 end;
 
-procedure jVisualControl.Init(App: jApp);
+procedure jVisualControl.Init;
 begin
-  inherited Init(App);
+  inherited Init;
   FjPRLayout:= jForm(Owner).View;  //set parent!
+  FOrientation:= jForm(Owner).Orientation;
 end;
 
 procedure jVisualControl.Notification(AComponent: TComponent; Operation: TOperation);
@@ -2903,13 +3219,13 @@ Destructor jTextView.Destroy;
 begin
   if not (csDesigning in ComponentState) then
   begin
-    if App <> nil then
+    if jForm(Owner).App <> nil then
     begin
-      if App.Initialized then
+      if jForm(Owner).App.Initialized then
       begin
         if FjObject <> nil then
         begin
-          jTextView_Free(App.Jni.jEnv, App.Jni.jThis, FjObject);
+          jTextView_Free2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject);
           FjObject:= nil;
         end;
       end;
@@ -2918,74 +3234,82 @@ begin
   inherited Destroy;
 end;
 
-procedure jTextView.Init(App: jApp);
+procedure jTextView.Init;
 var
   rToP: TPositionRelativeToParent;
   rToA: TPositionRelativeToAnchorID;
   //gvt: TGravity;     TODO
 begin
+
   if FInitialized  then Exit;
-  inherited Init(App);
-  FjObject:= jTextView_Create(App.Jni.jEnv, App.Jni.jThis, App.Jni.jActivity, Self);
+
+  inherited Init;
+
+  FjObject:= jTextView_Create2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, Self);
 
   if FParentPanel <> nil then
   begin
-   FParentPanel.Init(App);
-   FjPRLayout:= FParentPanel.View;
+    FParentPanel.Init;
+    FjPRLayout:= FParentPanel.View;
   end;
 
-  jTextView_setParent(App.Jni.jEnv, App.Jni.jThis, FjObject, FjPRLayout);
+  jTextView_setParent(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, FjPRLayout);
 
-  jTextView_setId(App.Jni.jEnv, App.Jni.jThis, FjObject, Self.Id);
+  jTextView_setId(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, Self.Id);
 
-  jTextView_setLeftTopRightBottomWidthHeight(App.Jni.jEnv, App.Jni.jThis, FjObject,
+  jTextView_setLeftTopRightBottomWidthHeight(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject,
                                            FMarginLeft,FMarginTop,FMarginRight,FMarginBottom,
-                                           GetLayoutParams(App, FLParamWidth, sdW),
-                                           GetLayoutParams(App, FLParamHeight, sdH));
+                                           GetLayoutParams(gApp, FLParamWidth, sdW),
+                                           GetLayoutParams(gApp, FLParamHeight, sdH));
+
   (* TODO
   for gvt := gvBottom  to gvFillVertical do
   begin
     if rToA in FPositionRelativeToAnchor then
     begin
-      jTextView_addGravity(App.Jni.jEnv, App.Jni.jThis, FjObject, GetGravity(gvt));
+      jTextView_addGravity(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, GetGravity(gvt));
     end;
   end;
   *)
+
   for rToA := raAbove to raAlignRight do
   begin
     if rToA in FPositionRelativeToAnchor then
     begin
-      jTextView_addlParamsAnchorRule(App.Jni.jEnv, App.Jni.jThis, FjObject, GetPositionRelativeToAnchor(rToA));
+      jTextView_addlParamsAnchorRule(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, GetPositionRelativeToAnchor(rToA));
     end;
   end;
+
   for rToP := rpBottom to rpCenterVertical do
   begin
      if rToP in FPositionRelativeToParent then
      begin
-       jTextView_addlParamsParentRule(App.Jni.jEnv, App.Jni.jThis, FjObject, GetPositionRelativeToParent(rToP));
+       jTextView_addlParamsParentRule(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, GetPositionRelativeToParent(rToP));
      end;
   end;
 
   if Self.Anchor <> nil then Self.AnchorId:= Self.Anchor.Id
   else Self.AnchorId:= -1;
 
-  jTextView_setLayoutAll(App.Jni.jEnv, App.Jni.jThis, FjObject, Self.AnchorId);
+  jTextView_setLayoutAll(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, Self.AnchorId);
 
-  jTextView_setEnabled(App.Jni.jEnv, App.Jni.jThis, FjObject, FEnabled);
-  jTextView_setText(App.Jni.jEnv, App.Jni.jThis, FjObject, FText);
+  jTextView_setText(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, FText);
 
   if  FFontColor <> colbrDefault then
-     jTextView_setTextColor(App.Jni.jEnv, App.Jni.jThis, FjObject, GetARGB(FFontColor));
+     jTextView_setTextColor(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, GetARGB(FFontColor));
 
   if FFontSize > 0 then
-     jTextView_setTextSize(App.Jni.jEnv, App.Jni.jThis, FjObject, FFontSize);
+     jTextView_setTextSize(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, FFontSize);
 
-  jTextView_setTextAlignment(App.Jni.jEnv, App.Jni.jThis, FjObject, Ord(FTextAlignment));
+  jTextView_setTextAlignment(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, Ord(FTextAlignment));
 
   if  FColor <> colbrDefault then
-     jView_SetBackGroundColor(App.Jni.jEnv, App.Jni.jThis, FjObject, GetARGB(FColor));
+     jView_SetBackGroundColor(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, GetARGB(FColor));
 
-  jView_SetVisible(App.Jni.jEnv, App.Jni.jThis, FjObject, FVisible);
+  jTextView_setEnabled(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, FEnabled);
+
+  jView_SetVisible(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, FVisible);
+
   FInitialized:= True;
 end;
 
@@ -2993,84 +3317,78 @@ Procedure jTextView.SetParent(Value: jObject);
 begin
   FjPRLayout:= Value;
   if FInitialized then
-     jTextView_setParent(App.Jni.jEnv, App.Jni.jThis, FjObject, FjPRLayout);
+     jTextView_setParent3(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, FjPRLayout);
 end;
 
 Procedure jTextView.SetVisible(Value : Boolean);
 begin
   FVisible:= Value;
   if FInitialized then
-    jView_SetVisible(App.Jni.jEnv, App.Jni.jThis, FjObject, FVisible);
+    jView_SetVisible(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, FVisible);
 end;
 
 Procedure jTextView.SetColor(Value: TARGBColorBridge);
 begin
   FColor:= Value;
   if (FInitialized = True) and (FColor <> colbrDefault)  then
-    jView_SetBackGroundColor(App.Jni.jEnv, App.Jni.jThis, FjObject, GetARGB(FColor));
+    jView_SetBackGroundColor(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, GetARGB(FColor));
 end;
 
 Procedure jTextView.SetEnabled(Value: Boolean);
 begin
   FEnabled := Value;
   if FInitialized then
-    jTextView_setEnabled(App.Jni.jEnv, App.Jni.jThis, FjObject, FEnabled);
+    jTextView_setEnabled(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, FEnabled);
 end;
 
 Function jTextView.GetText: string;
 begin
   Result:= FText;
   if FInitialized then
-     Result:= jTextView_getText(App.Jni.jEnv, App.Jni.jThis, FjObject);
+     Result:= jTextView_getText2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject);
 end;
 
 Procedure jTextView.SetText(Value: string);
 begin
   FText:= utf8encode(Value);
   if FInitialized then
-    jTextView_setText(App.Jni.jEnv, App.Jni.jThis, FjObject, FText);
+    jTextView_setText2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, FText);
 end;
 
 Procedure jTextView.SetFontColor(Value: TARGBColorBridge);
 begin
   FFontColor:= Value;
   if (FInitialized = True) and (FFontColor <> colbrDefault) then
-    jTextView_setTextColor(App.Jni.jEnv, App.Jni.jThis, FjObject, GetARGB(FFontColor));
+    jTextView_setTextColor2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, GetARGB(FFontColor));
 end;
 
 Procedure jTextView.SetFontSize(Value: DWord);
 begin
   FFontSize:= Value;
   if FInitialized and  (FFontSize > 0) then
-    jTextView_setTextSize(App.Jni.jEnv, App.Jni.jThis, FjObject, FFontSize);
+    jTextView_setTextSize2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, FFontSize);
 end;
 
 procedure jTextView.SetParamWidth(Value: TLayoutParams);
 var
    side: TSide;
 begin
-   if FInitialized then
-   begin
-     if jSystem_GetOrientation(App.Jni.jEnv, App.Jni.jThis, App.Jni.jActivity) = App.Orientation  then
-        side:= sdW
-     else
-        side:= sdH;
-     jTextView_setLParamWidth(App.Jni.jEnv, App.Jni.jThis, FjObject, GetLayoutParams(App, FLParamWidth, side));
-   end;
+   if jForm(Owner).Orientation = jForm(Owner).App.Orientation then
+      side:= sdW
+   else
+      side:= sdH;
+   jTextView_setLParamWidth2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, GetLayoutParams(gApp, FLParamWidth, side));
 end;
 
 procedure jTextView.setParamHeight(Value: TLayoutParams);
 var
    side: TSide;
 begin
-  if not FInitialized then  Exit;
-
-  if  jSystem_GetOrientation(App.Jni.jEnv, App.Jni.jThis, App.Jni.jActivity)  = App.Orientation then
-    side:= sdH
+  if jForm(Owner).Orientation = gApp.Orientation then
+     side:= sdH
   else
-    side:= sdW;
-
-  jTextView_setLParamHeight(App.Jni.jEnv, App.Jni.jThis, FjObject, GetLayoutParams(App, FLParamHeight, side));
+     side:= sdW;
+  jTextView_setLParamHeight2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, GetLayoutParams(gApp, FLParamHeight, side));
 end;
 
 procedure jTextView.UpdateLayout;
@@ -3078,7 +3396,7 @@ begin
    inherited UpdateLayout;
    SetParamWidth(FLParamWidth);
    setParamHeight(FLParamHeight);
-   jTextView_setLayoutAll(App.Jni.jEnv, App.Jni.jThis, FjObject, Self.AnchorId);
+   jTextView_setLayoutAll2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, Self.AnchorId);
 end;
 
 // LORDMAN 2013-08-12
@@ -3086,13 +3404,13 @@ Procedure jTextView.setTextAlignment(Value: TTextAlignment);
 begin
   FTextAlignment:= Value;
   if FInitialized then
-    jTextView_setTextAlignment(App.Jni.jEnv, App.Jni.jThis, FjObject, Ord(FTextAlignment));
+    jTextView_setTextAlignment(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, Ord(FTextAlignment));
 end;
 
 Procedure jTextView.Refresh;
 begin
   if FInitialized then
-     jView_Invalidate(App.Jni.jEnv, App.Jni.jThis, FjObject);
+     jView_Invalidate(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject);
 end;
 
 // Event : Java -> Pascal
@@ -3120,8 +3438,10 @@ begin
 
   FScrollBarStyle:= scrNone;
   FVerticalScrollBar:= False;
-  FHorizontalScrollBar:= False;
-  FWrappingLine:= True;
+  FHorizontalScrollBar:= True;
+
+  FWrappingLine:= False;
+
   FMarginLeft   := 10;
   FMarginTop    := 10;
   FMarginBottom := 10;
@@ -3132,13 +3452,13 @@ Destructor jEditText.Destroy;
 begin
   if not (csDesigning in ComponentState) then
   begin
-    if App <> nil then
+    if jForm(Owner).App <> nil then
     begin
-      if App.Initialized then
+      if jForm(Owner).App.Initialized then
       begin
         if FjObject <> nil then
         begin
-          jEditText_Free(App.Jni.jEnv, App.Jni.jThis, FjObject);
+          jEditText_Free2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject);
           FjObject:= nil;
         end;
       end;
@@ -3147,83 +3467,98 @@ begin
   inherited Destroy;
 end;
 
-procedure jEditText.Init(App: jApp);
+procedure jEditText.Init;
 var
   rToP: TPositionRelativeToParent;
   rToA: TPositionRelativeToAnchorID;
 begin
   if FInitialized  then Exit;
-  inherited Init(App);
-  FjObject:= jEditText_Create(App.Jni.jEnv, App.Jni.jThis, App.Jni.jActivity, Self);
+
+  inherited Init;
+
+  FjObject:= jEditText_Create2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, Self);
 
   if FParentPanel <> nil then
   begin
-   FParentPanel.Init(App);
-   FjPRLayout:= FParentPanel.View;
+    FParentPanel.Init;
+    FjPRLayout:= FParentPanel.View;
   end;
 
-  jEditText_setParent(App.Jni.jEnv, App.Jni.jThis, FjObject, FjPRLayout);
-  jEditText_setId(App.Jni.jEnv, App.Jni.jThis, FjObject, Self.Id);
-  jEditText_setLeftTopRightBottomWidthHeight(App.Jni.jEnv, App.Jni.jThis, FjObject,
+  jEditText_setParent(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, FjPRLayout);
+
+  jEditText_setId(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, Self.Id);
+
+
+  jEditText_setLeftTopRightBottomWidthHeight(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject,
                                            FMarginLeft,FMarginTop,FMarginRight,FMarginBottom,
-                                           GetLayoutParams(App, FLParamWidth, sdW),
-                                           GetLayoutParams(App, FLParamHeight, sdH));
+                                           GetLayoutParams(gApp, FLParamWidth, sdW),
+                                           GetLayoutParams(gApp, FLParamHeight, sdH));
+
   for rToA := raAbove to raAlignRight do
   begin
     if rToA in FPositionRelativeToAnchor then
     begin
-      jEditText_addlParamsAnchorRule(App.Jni.jEnv, App.Jni.jThis, FjObject, GetPositionRelativeToAnchor(rToA));
+      jEditText_addlParamsAnchorRule(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, GetPositionRelativeToAnchor(rToA));
     end;
   end;
+
   for rToP := rpBottom to rpCenterVertical do
   begin
      if rToP in FPositionRelativeToParent then
      begin
-       jEditText_addlParamsParentRule(App.Jni.jEnv, App.Jni.jThis, FjObject, GetPositionRelativeToParent(rToP));
+       jEditText_addlParamsParentRule(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, GetPositionRelativeToParent(rToP));
      end;
   end;
+
   if Self.Anchor <> nil then Self.AnchorId:= Self.Anchor.Id
   else Self.AnchorId:= -1;
 
-  jEditText_setLayoutAll(App.Jni.jEnv, App.Jni.jThis, FjObject, Self.AnchorId);
-  jEditText_setText(App.Jni.jEnv, App.Jni.jThis, FjObject, FText);
+  jEditText_setLayoutAll(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, Self.AnchorId);
 
-  if  FFontColor <> colbrDefault then
-     jEditText_setTextColor(App.Jni.jEnv, App.Jni.jThis, FjObject, GetARGB(FFontColor));
+  if  FHint <> '' then
+    jEditText_setHint(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, FHint);
+
+  if FFontColor <> colbrDefault then
+    jEditText_setTextColor(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, GetARGB(FFontColor));
 
   if FFontSize > 0 then
-     jEditText_setTextSize(App.Jni.jEnv, App.Jni.jThis, FjObject, FFontSize);
+    jEditText_setTextSize(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, FFontSize);
 
-  jEditText_setSingleLine(App.Jni.jEnv, App.Jni.jThis, FjObject, FSingleLine);
+  jEditText_setTextAlignment(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, Ord(FTextAlignment));
 
-  if (FMaxLines > 1) and (FSingleLine = False) then
-    jEditText_setMaxLines(App.Jni.jEnv, App.Jni.jThis, FjObject, FMaxLines);
+  jEditText_maxLength(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, FLineMaxLength);
 
-  jEditText_setScroller(App.Jni.jEnv, App.Jni.jThis, App.Jni.jActivity, FjObject);
+  jEditText_setScroller2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject);
 
-  jEditText_setHorizontalScrollBarEnabled(App.Jni.jEnv, App.Jni.jThis, FjObject, FHorizontalScrollBar);
-  jEditText_setVerticalScrollBarEnabled(App.Jni.jEnv, App.Jni.jThis, FjObject, FVerticalScrollBar);
+  jEditText_setHorizontalScrollBarEnabled(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, FHorizontalScrollBar);
+  jEditText_setVerticalScrollBarEnabled(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, FVerticalScrollBar);
 
-  if FScrollBarStyle <> scrNone then
-     jEditText_setScrollBarStyle(App.Jni.jEnv, App.Jni.jThis, FjObject, GetScrollBarStyle(FScrollBarStyle));
+  if FInputTypeEx <> itxMultiLine then FInputTypeEx:= itxMultiLine; //hard code to by pass a BUG!
 
-  if (FVerticalScrollBar = True) or  (FHorizontalScrollBar = True) then
+  jEditText_editInputType(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, InputTypeToStrEx(FInputTypeEx));
+
+  if FInputTypeEx = itxMultiLine then
   begin
-    jEditText_setScrollbarFadingEnabled(App.Jni.jEnv, App.Jni.jThis, FjObject, False);
-    jEditText_setMovementMethod(App.Jni.jEnv, App.Jni.jThis, FjObject);
+    jEditText_setSingleLine(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, False);
+    jEditText_setMaxLines(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, FMaxLines);
+    jEditText_setHorizontallyScrolling(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, FWrappingLine);
+    if (FVerticalScrollBar = True) or  (FHorizontalScrollBar = True) then
+    begin
+      jEditText_setScrollbarFadingEnabled(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, False);
+      jEditText_setMovementMethod(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject);
+      if FScrollBarStyle <> scrNone then
+         jEditText_setScrollBarStyle(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, GetScrollBarStyle(FScrollBarStyle));
+    end;
   end;
 
-  jEditText_setHorizontallyScrolling(App.Jni.jEnv, App.Jni.jThis, FjObject, not(FWrappingLine));
+  if FColor <> colbrDefault then
+     jView_SetBackGroundColor(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, GetARGB(FColor));
 
-  jEditText_setHint(App.Jni.jEnv, App.Jni.jThis, FjObject, FHint);
-  jEditText_editInputTypeEx(App.Jni.jEnv, App.Jni.jThis, FjObject,GetInputTypeEx(FInputTypeEx));
-  jEditText_maxLength(App.Jni.jEnv, App.Jni.jThis, FjObject, FLineMaxLength);
-  jEditText_setTextAlignment(App.Jni.jEnv, App.Jni.jThis, FjObject, Ord(FTextAlignment));
+  jView_SetVisible(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, FVisible);
 
-  if  FColor <> colbrDefault then
-      jView_SetBackGroundColor(App.Jni.jEnv, App.Jni.jThis, FjObject, GetARGB(FColor));
+  if  FText <> '' then
+    jEditText_setText2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, FText);
 
-  jView_SetVisible(App.Jni.jEnv, App.Jni.jThis, FjObject, FVisible);
   FInitialized:= True;
 end;
 
@@ -3231,69 +3566,71 @@ Procedure jEditText.SetParent(Value: jObject);
 begin
   FjPRLayout:= Value;
   if FInitialized then
-    jEditText_setParent(App.Jni.jEnv, App.Jni.jThis, FjObject, FjPRLayout);
+    jEditText_setParent2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, FjPRLayout);
 end;
 
-Procedure jEditText.SetVisible  (Value : Boolean);
+Procedure jEditText.SetVisible(Value : Boolean);
 begin
   FVisible:= Value;
   if FInitialized then
-    jView_SetVisible(App.Jni.jEnv, App.Jni.jThis, FjObject, FVisible);
+    jView_SetVisible(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, FVisible);
 end;
 
 Procedure jEditText.setColor(Value: TARGBColorBridge);
 begin
   FColor := Value;
   if (FInitialized = True) and (FColor <> colbrDefault)  then
-    jView_SetBackGroundColor(App.Jni.jEnv, App.Jni.jThis, FjObject, GetARGB(FColor));
+    jView_SetBackGroundColor(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, GetARGB(FColor));
 end;
 
 Procedure jEditText.Refresh;
 begin
   if FInitialized then
-     jView_Invalidate(App.Jni.jEnv, App.Jni.jThis, FjObject);
+     jView_Invalidate(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject);
 end;
 
 function jEditText.GetText: string;
 begin
   Result:= FText;
   if FInitialized then
-     Result:= jEditText_getText(App.Jni.jEnv, App.Jni.jThis, FjObject);
+     Result:= jEditText_getText2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject);
 end;
 
 procedure jEditText.SetText(Value: string);
 begin
   FText:= Value;
   if FInitialized then
-     jEditText_setText(App.Jni.jEnv, App.Jni.jThis, FjObject, FText);
+  begin
+     jEditText_setText2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, FText);
+  end;
 end;
 
 procedure jEditText.SetFontColor(Value: TARGBColorBridge);
 begin
   FFontColor:= Value;
   if (FInitialized = True) and (FFontColor <> colbrDefault) then
-     jEditText_setTextColor(App.Jni.jEnv, App.Jni.jThis, FjObject, GetARGB(FFontColor));
+     jEditText_setTextColor2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, GetARGB(FFontColor));
 end;
 
 Procedure jEditText.SetFontSize(Value: DWord);
 begin
   FFontSize:= Value;
   if FInitialized and (FFontSize > 0) then
-     jEditText_setTextSize(App.Jni.jEnv, App.Jni.jThis, FjObject, FFontSize);
+     jEditText_setTextSize2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, FFontSize);
 end;
 
 Procedure jEditText.SetHint(Value : String);
 begin
   FHint:= Value;
   if FInitialized then
-     jEditText_setHint(App.Jni.jEnv, App.Jni.jThis, FjObject, FHint);
+     jEditText_setHint2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, FHint);
 end;
 
 // LORDMAN - 2013-07-26
-Procedure jEditText.SetFocus();
+Procedure jEditText.SetFocus;
 begin
   if FInitialized then
-     jEditText_SetFocus(App.Jni.jEnv, App.Jni.jThis, FjObject );
+     jEditText_SetFocus2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject );
 end;
 
 {
@@ -3303,17 +3640,17 @@ mgr.hideSoftInputFromWindow(myView.getWindowToken(), 0);
 
 }
 // LORDMAN - 2013-07-26
-Procedure jEditText.immShow();
+Procedure jEditText.immShow;
 begin
   if FInitialized then
-     jEditText_immShow(App.Jni.jEnv, App.Jni.jThis, FjObject );
+     jEditText_immShow2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject );
 end;
 
 // LORDMAN - 2013-07-26
-Procedure jEditText.immHide();
+Procedure jEditText.immHide;
 begin
   if FInitialized then
-      jEditText_immHide(App.Jni.jEnv, App.Jni.jThis, FjObject );
+      jEditText_immHide2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject );
 end;
 
 //by jmpessoa
@@ -3321,7 +3658,7 @@ Procedure jEditText.SetInputTypeEx(Value : TInputTypeEx);
 begin
   FInputTypeEx:= Value;
   if FInitialized then
-     jEditText_editInputTypeEx(App.Jni.jEnv, App.Jni.jThis, FjObject,GetInputTypeEx(FInputTypeEx));
+     jEditText_editInputType(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject,InputTypeToStrEx(FInputTypeEx));
 end;
 
 // LORDMAN - 2013-07-26
@@ -3329,7 +3666,7 @@ Procedure jEditText.SetLineMaxLength(Value: DWord);
 begin
   FLineMaxLength:= Value;
   if FInitialized then
-     jEditText_maxLength(App.Jni.jEnv, App.Jni.jThis, FjObject, Value);
+     jEditText_maxLength(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, Value);
 end;
 
 //by jmpessoa
@@ -3337,14 +3674,14 @@ Procedure jEditText.SetMaxLines(Value: DWord);
 begin
   FMaxLines:= Value;
   if FInitialized then
-     jEditText_setMaxLines(App.Jni.jEnv, App.Jni.jThis, FjObject, Value);
+     jEditText_setMaxLines(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, Value);
 end;
 
 procedure jEditText.SetSingleLine(Value: boolean);
 begin
   FSingleLine:= Value;
   if FInitialized then
-     jEditText_setSingleLine(App.Jni.jEnv, App.Jni.jThis, FjObject, Value);
+     jEditText_setSingleLine(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, Value);
 end;
 
 procedure jEditText.SetScrollBarStyle(Value: TScrollBarStyle);
@@ -3354,7 +3691,7 @@ begin
   begin
     if Value <> scrNone then
     begin
-       jEditText_setScrollBarStyle(App.Jni.jEnv, App.Jni.jThis, FjObject, GetScrollBarStyle(Value));
+       jEditText_setScrollBarStyle(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, GetScrollBarStyle(Value));
     end;
   end;
 end;
@@ -3363,26 +3700,26 @@ procedure jEditText.SetHorizontalScrollBar(Value: boolean);
 begin
   FHorizontalScrollBar:= Value;
   if FInitialized then
-    jEditText_setHorizontalScrollBarEnabled(App.Jni.jEnv, App.Jni.jThis, FjObject, Value);
+    jEditText_setHorizontalScrollBarEnabled(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, Value);
 end;
 
 procedure jEditText.SetVerticalScrollBar(Value: boolean);
 begin
   FVerticalScrollBar:= Value;
   if FInitialized then
-    jEditText_setVerticalScrollBarEnabled(App.Jni.jEnv, App.Jni.jThis, FjObject, Value);
+    jEditText_setVerticalScrollBarEnabled(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, Value);
 end;
 
 procedure jEditText.SetScrollBarFadingEnabled(Value: boolean);
 begin
   if FInitialized then
-    jEditText_setScrollbarFadingEnabled(App.Jni.jEnv, App.Jni.jThis, FjObject, Value);
+    jEditText_setScrollbarFadingEnabled(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, Value);
 end;
 
 procedure jEditText.SetMovementMethod;
 begin
   if FInitialized then ;
-    jEditText_setMovementMethod(App.Jni.jEnv, App.Jni.jThis, FjObject);
+    jEditText_setMovementMethod(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject);
 end;
 
 // LORDMAN - 2013-07-26
@@ -3391,14 +3728,14 @@ begin
   Result.x := 0;
   Result.y := 0;
   if FInitialized then
-     jEditText_GetCursorPos(App.Jni.jEnv, App.Jni.jThis, FjObject,Result.x,Result.y);
+     jEditText_GetCursorPos2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject,Result.x,Result.y);
 end;
 
 // LORDMAN - 2013-07-26
 Procedure jEditText.SetCursorPos(Value: TXY);
 begin
   if FInitialized then
-     jEditText_SetCursorPos(App.Jni.jEnv, App.Jni.jThis, FjObject, Value.X,Value.Y);
+     jEditText_SetCursorPos2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, Value.X,Value.Y);
 end;
 
 // LORDMAN 2013-08-12
@@ -3406,7 +3743,7 @@ Procedure jEditText.setTextAlignment(Value: TTextAlignment);
 begin
   FTextAlignment:= Value;
   if FInitialized then
-     jEditText_setTextAlignment(App.Jni.jEnv, App.Jni.jThis, FjObject, Ord(FTextAlignment));
+     jEditText_setTextAlignment(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, Ord(FTextAlignment));
 end;
 
 // Event : Java -> Pascal
@@ -3432,28 +3769,22 @@ procedure jEditText.SetParamWidth(Value: TLayoutParams);
 var
    side: TSide;
 begin
-   if FInitialized then
-   begin
-     if jSystem_GetOrientation(App.Jni.jEnv, App.Jni.jThis, App.Jni.jActivity) = App.Orientation  then
-        side:= sdW
-     else
-        side:= sdH;
-     jEditText_setLParamWidth(App.Jni.jEnv, App.Jni.jThis, FjObject, GetLayoutParams(App, FLParamWidth, side));
-   end;
+  if jForm(Owner).Orientation = gApp.Orientation then
+     side:= sdW
+  else
+     side:= sdH;
+  jEditText_setLParamWidth2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, GetLayoutParams(gApp, FLParamWidth, side));
 end;
 
 procedure jEditText.setParamHeight(Value: TLayoutParams);
 var
    side: TSide;
 begin
-  if not FInitialized then  Exit;
-
-  if  jSystem_GetOrientation(App.Jni.jEnv, App.Jni.jThis, App.Jni.jActivity)  = App.Orientation then
-    side:= sdH
+  if jForm(Owner).Orientation = gApp.Orientation then
+     side:= sdH
   else
-    side:= sdW;
-
-  jEditText_setLParamHeight(App.Jni.jEnv, App.Jni.jThis, FjObject, GetLayoutParams(App, FLParamHeight, side));
+     side:= sdW;
+  jEditText_setLParamHeight2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, GetLayoutParams(gApp, FLParamHeight, side));
 end;
 
 procedure jEditText.UpdateLayout;
@@ -3461,7 +3792,7 @@ begin
    inherited UpdateLayout;
    SetParamWidth(FLParamWidth);
    setParamHeight(FLParamHeight);
-   jEditText_setLayoutAll(App.Jni.jEnv, App.Jni.jThis, FjObject, Self.AnchorId);
+   jEditText_setLayoutAll2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, Self.AnchorId);
 end;
 
 //------------------------------------------------------------------------------
@@ -3481,13 +3812,13 @@ Destructor jButton.Destroy;
 begin
    if not (csDesigning in ComponentState) then
    begin
-     if App <> nil then
+     if jForm(Owner).App <> nil then
      begin
-       if App.Initialized then
+       if jForm(Owner).App.Initialized then
        begin
          if FjObject <> nil then
          begin
-           jButton_Free(App.Jni.jEnv, App.Jni.jThis, FjObject);
+           jButton_Free2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject);
            FjObject:= nil;
          end;
        end;
@@ -3496,62 +3827,64 @@ begin
    inherited Destroy;
 end;
 
-Procedure jButton.Init(App: jApp);
+Procedure jButton.Init;
 var
   rToP: TPositionRelativeToParent;
   rToA: TPositionRelativeToAnchorID;
 begin
   if FInitialized  then Exit;
-  inherited Init(App);
-  FjObject:= jButton_Create(App.Jni.jEnv, App.Jni.jThis, App.Jni.jActivity, self);
+
+  inherited Init;
+
+  FjObject:= jButton_Create2(jForm(Owner).App.Jni.jEnv,jForm(Owner).App.Jni.jThis,Self);
 
   if FParentPanel <> nil then
   begin
-   FParentPanel.Init(App);
+   FParentPanel.Init;
    FjPRLayout:= FParentPanel.View;
   end;
 
-  jButton_setParent(App.Jni.jEnv, App.Jni.jThis, FjObject, FjPRLayout);
+  jButton_setParent(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, FjPRLayout);
 
-  jButton_setId(App.Jni.jEnv, App.Jni.jThis, FjObject, Self.Id);
+  jButton_setId(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, Self.Id);
 
-  jButton_setLeftTopRightBottomWidthHeight(App.Jni.jEnv, App.Jni.jThis, FjObject,
+  jButton_setLeftTopRightBottomWidthHeight(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject,
                                            FMarginLeft,FMarginTop,FMarginRight,FMarginBottom,
-                                           GetLayoutParams(App, FLParamWidth, sdW),
-                                           GetLayoutParams(App, FLParamHeight, sdH));
-
+                                           GetLayoutParams(gApp, FLParamWidth, sdW),
+                                           GetLayoutParams(gApp, FLParamHeight, sdH));
   for rToA := raAbove to raAlignRight do
   begin
     if rToA in FPositionRelativeToAnchor then
     begin
-       jButton_addlParamsAnchorRule(App.Jni.jEnv, App.Jni.jThis, FjObject, GetPositionRelativeToAnchor(rToA));
+       jButton_addlParamsAnchorRule(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, GetPositionRelativeToAnchor(rToA));
     end;
   end;
   for rToP := rpBottom to rpCenterVertical do
   begin
      if rToP in FPositionRelativeToParent then
      begin
-       jButton_addlParamsParentRule(App.Jni.jEnv, App.Jni.jThis, FjObject, GetPositionRelativeToParent(rToP));
+       jButton_addlParamsParentRule(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, GetPositionRelativeToParent(rToP));
      end;
   end;
 
   if Self.Anchor <> nil then Self.AnchorId:= Self.Anchor.Id
   else Self.AnchorId:= -1;
 
-  jButton_setLayoutAll(App.Jni.jEnv, App.Jni.jThis, FjObject, Self.AnchorId);
+  jButton_setLayoutAll(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, Self.AnchorId);
 
-  jButton_setText(App.Jni.jEnv, App.Jni.jThis, FjObject, FText);
+  jButton_setText(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, FText);
 
   if FFontColor <> colbrDefault then
-     jButton_setTextColor(App.Jni.jEnv, App.Jni.jThis, FjObject, GetARGB(FFontColor));
+     jButton_setTextColor(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, GetARGB(FFontColor));
 
   if FFontSize > 0 then //not default...
-     jButton_setTextSize(App.Jni.jEnv, App.Jni.jThis, FjObject, FFontSize);
+     jButton_setTextSize(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, FFontSize);
 
   if FColor <> colbrDefault then
-    jView_SetBackGroundColor(App.Jni.jEnv, App.Jni.jThis, FjObject, GetARGB(FColor));
+    jView_SetBackGroundColor(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, GetARGB(FColor));
 
-  jView_SetVisible(App.Jni.jEnv, App.Jni.jThis, FjObject, FVisible);
+  jView_SetVisible(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, FVisible);
+
   FInitialized:= True;
 end;
 
@@ -3559,91 +3892,85 @@ Procedure jButton.SetParent(Value: jObject);
 begin
   FjPRLayout:= Value;
   if FInitialized then
-    jButton_setParent(App.Jni.jEnv, App.Jni.jThis, FjObject, FjPRLayout);
+    jButton_setParent2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, FjPRLayout);
 end;
 
 Procedure jButton.SetVisible  (Value : Boolean);
 begin
   FVisible:= Value;
   if FInitialized then
-     jView_SetVisible(App.Jni.jEnv, App.Jni.jThis, FjObject, FVisible);
+     jView_SetVisible(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, FVisible);
 end;
 
 Procedure jButton.SetColor(Value: TARGBColorBridge);
 begin
   FColor:= Value;
   if (FInitialized = True) and (FColor <> colbrDefault)  then
-     jView_SetBackGroundColor(App.Jni.jEnv, App.Jni.jThis, FjObject, GetARGB(FColor));
+     jView_SetBackGroundColor(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, GetARGB(FColor));
 end;
 
 Procedure jButton.Refresh;
 begin
   if not FInitialized then Exit;
-     jView_Invalidate(App.Jni.jEnv, App.Jni.jThis, FjObject);
+     jView_Invalidate(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject);
 end;
 
 Function jButton.GetText: string;
 begin
   Result:= FText;
   if FInitialized then
-     Result:= jButton_getText(App.Jni.jEnv, App.Jni.jThis, FjObject);
+     Result:= jButton_getText(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject);
 end;
 
 Procedure jButton.SetText(Value: string);
 begin
   FText:= Value;
   if FInitialized then
-    jButton_setText(App.Jni.jEnv, App.Jni.jThis, FjObject, FText);
+    jButton_setText2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, FText);
 end;
 
 Procedure jButton.SetFontColor(Value : TARGBColorBridge);
 begin
   FFontColor:= Value;
   if (FInitialized = True) and (FFontColor <> colbrDefault) then
-     jButton_setTextColor(App.Jni.jEnv, App.Jni.jThis, FjObject, GetARGB(FFontColor));
+     jButton_setTextColor2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, GetARGB(FFontColor));
 end;
 
 Procedure jButton.SetFontSize (Value : DWord);
 begin
   FFontSize:= Value;
   if FInitialized and (FFontSize > 0) then
-     jButton_setTextSize(App.Jni.jEnv, App.Jni.jThis, FjObject, FFontSize);
+     jButton_setTextSize(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, FFontSize);
 end;
 
 procedure jButton.SetParamWidth(Value: TLayoutParams);
 var
-   side: TSide;
+  side: TSide;
 begin
-   if FInitialized then
-   begin
-     if jSystem_GetOrientation(App.Jni.jEnv, App.Jni.jThis, App.Jni.jActivity) = App.Orientation  then
-        side:= sdW
-     else
-        side:= sdH;
-     jButton_setLParamWidth(App.Jni.jEnv, App.Jni.jThis, FjObject, GetLayoutParams(App, FLParamWidth, side));
-   end;
+  if jForm(Owner).Orientation = gApp.Orientation then
+     side:= sdW
+  else
+     side:= sdH;
+  jButton_setLParamWidth2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, GetLayoutParams(gApp, FLParamWidth, side));
 end;
 
 procedure jButton.setParamHeight(Value: TLayoutParams);
 var
-   side: TSide;
+  side: TSide;
 begin
-  if not FInitialized then  Exit;
-
-  if  jSystem_GetOrientation(App.Jni.jEnv, App.Jni.jThis, App.Jni.jActivity)  = App.Orientation then
-    side:= sdH
+  if jForm(Owner).Orientation = gApp.Orientation then
+     side:= sdH
   else
-    side:= sdW;
-
-  jButton_setLParamHeight(App.Jni.jEnv, App.Jni.jThis, FjObject, GetLayoutParams(App, FLParamHeight, side));
+     side:= sdW;
+  jButton_setLParamHeight2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, GetLayoutParams(gApp, FLParamHeight, side));
 end;
 
 procedure jButton.UpdateLayout;
 begin
-   inherited UpdateLayout;
-   SetParamWidth(FLParamWidth);
-   setParamHeight(FLParamHeight);
-   jButton_setLayoutAll(App.Jni.jEnv, App.Jni.jThis, FjObject, Self.AnchorId);
+  inherited UpdateLayout;
+  SetParamWidth(FLParamWidth);
+  SetParamHeight(FLParamHeight);
+  jButton_setLayoutAll2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, Self.AnchorId);
 end;
 
 // Event : Java -> Pascal
@@ -3665,19 +3992,20 @@ begin
   FMarginTop    := 5;
   FMarginBottom := 5;
   FMarginRight  := 5;
+  FFontColor    := colbrSilver;
 end;
 
 destructor jCheckBox.Destroy;
 begin
   if not (csDesigning in ComponentState) then
   begin
-    if App <> nil then
+    if jForm(Owner).App <> nil then
     begin
-      if App.Initialized then
+      if jForm(Owner).App.Initialized then
       begin
         if FjObject <> nil then
         begin
-          jCheckBox_Free(App.Jni.jEnv, App.Jni.jThis, FjObject);
+          jCheckBox_Free2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject);
           FjObject:= nil;
         end;
       end;
@@ -3686,59 +4014,62 @@ begin
   inherited Destroy;
 end;
 
-Procedure jCheckBox.Init(App: jApp);
+Procedure jCheckBox.Init;
 var
   rToP: TPositionRelativeToParent;
   rToA: TPositionRelativeToAnchorID;
 begin
   if FInitialized  then Exit;
-  inherited Init(App);
-  FjObject := jCheckBox_Create(App.Jni.jEnv, App.Jni.jThis, App.Jni.jActivity, self);
+
+  inherited Init;
+
+  FjObject := jCheckBox_Create2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, self);
 
   if FParentPanel <> nil then
   begin
-   FParentPanel.Init(App);
+   FParentPanel.Init;
    FjPRLayout:= FParentPanel.View;
   end;
 
-  jCheckBox_setParent(App.Jni.jEnv, App.Jni.jThis, FjObject, FjPRLayout);
-  jCheckBox_setId(App.Jni.jEnv, App.Jni.jThis, FjObject, Self.Id);
+  jCheckBox_setParent(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, FjPRLayout);
+  jCheckBox_setId(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, Self.Id);
 
-  jCheckBox_setLeftTopRightBottomWidthHeight(App.Jni.jEnv, App.Jni.jThis, FjObject,
+  jCheckBox_setLeftTopRightBottomWidthHeight(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject,
                                            FMarginLeft,FMarginTop,FMarginRight,FMarginBottom,
-                                           GetLayoutParams(App, FLParamWidth, sdW),
-                                           GetLayoutParams(App, FLParamHeight, sdH));
+                                           GetLayoutParams(gApp, FLParamWidth, sdW),
+                                           GetLayoutParams(gApp, FLParamHeight, sdH));
 
   for rToA := raAbove to raAlignRight do
   begin
     if rToA in FPositionRelativeToAnchor then
     begin
-      jCheckBox_addlParamsAnchorRule(App.Jni.jEnv, App.Jni.jThis, FjObject, GetPositionRelativeToAnchor(rToA));
+      jCheckBox_addlParamsAnchorRule(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, GetPositionRelativeToAnchor(rToA));
     end;
   end;
   for rToP := rpBottom to rpCenterVertical do
   begin
      if rToP in FPositionRelativeToParent then
      begin
-       jCheckBox_addlParamsParentRule(App.Jni.jEnv, App.Jni.jThis, FjObject, GetPositionRelativeToParent(rToP));
+       jCheckBox_addlParamsParentRule(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, GetPositionRelativeToParent(rToP));
      end;
   end;
   if Self.Anchor <> nil then Self.AnchorId:= Self.Anchor.Id
   else Self.AnchorId:= 0;
 
-  jCheckBox_setLayoutAll(App.Jni.jEnv, App.Jni.jThis, FjObject, Self.AnchorId);
-  jCheckBox_setText(App.Jni.jEnv, App.Jni.jThis, FjObject, FText);
+  jCheckBox_setLayoutAll(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, Self.AnchorId);
+  jCheckBox_setText(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, FText);
 
   if FFontColor <> colbrDefault then
-     jCheckBox_setTextColor(App.Jni.jEnv, App.Jni.jThis, FjObject, GetARGB(FFontColor));
+     jCheckBox_setTextColor(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, GetARGB(FFontColor));
 
   if FFontSize > 0 then
-     jCheckBox_setTextSize(App.Jni.jEnv, App.Jni.jThis, FjObject, FFontSize);
+     jCheckBox_setTextSize(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, FFontSize);
 
   if FColor <> colbrDefault then
-     jView_SetBackGroundColor(App.Jni.jEnv, App.Jni.jThis, FjObject, GetARGB(FColor));
+     jView_SetBackGroundColor(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, GetARGB(FColor));
 
-  jView_SetVisible(App.Jni.jEnv, App.Jni.jThis, FjObject, FVisible);
+  jView_SetVisible(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, FVisible);
+
   FInitialized:= True;
 end;
 
@@ -3746,97 +4077,91 @@ Procedure jCheckBox.SetParent(Value: jObject);
 begin
   FjPRLayout:= Value;
   if FInitialized then
-    jCheckBox_setParent(App.Jni.jEnv, App.Jni.jThis, FjObject, FjPRLayout);
+    jCheckBox_setParent2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, FjPRLayout);
 end;
 
 Procedure jCheckBox.SetVisible(Value : Boolean);
 begin
   FVisible := Value;
   if FInitialized then
-    jView_SetVisible(App.Jni.jEnv, App.Jni.jThis, FjObject, FVisible);
+    jView_SetVisible(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, FVisible);
 end;
 
 Procedure jCheckBox.SetColor(Value: TARGBColorBridge);
 begin
   FColor := Value;
   if (FInitialized = True) and (FColor <> colbrDefault) then
-     jView_SetBackGroundColor(App.Jni.jEnv, App.Jni.jThis, FjObject, GetARGB(FColor));
+     jView_SetBackGroundColor(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, GetARGB(FColor));
 end;
 
 Procedure jCheckBox.Refresh;
 begin
   if not FInitialized then Exit;
-  jView_Invalidate(App.Jni.jEnv, App.Jni.jThis, FjObject);
+  jView_Invalidate(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject);
 end;
 
 Function jCheckBox.GetText: string;
 begin
   Result:= FText;
   if FInitialized then
-     Result:= jCheckBox_getText(App.Jni.jEnv, App.Jni.jThis, FjObject);
+     Result:= jCheckBox_getText(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject);
 end;
 
 Procedure jCheckBox.SetText(Value: string);
 begin
   FText:= Value;
   if FInitialized then
-     jCheckBox_setText(App.Jni.jEnv, App.Jni.jThis, FjObject, FText);
+     jCheckBox_setText2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, FText);
 end;
 
 Procedure jCheckBox.SetFontColor(Value: TARGBColorBridge);
 begin
   FFontColor:= Value;
   if (FInitialized = True) and (FFontColor <> colbrDefault) then
-     jCheckBox_setTextColor(App.Jni.jEnv, App.Jni.jThis, FjObject, GetARGB(FFontColor));
+     jCheckBox_setTextColor2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, GetARGB(FFontColor));
 end;
 
 Procedure jCheckBox.SetFontSize(Value: DWord);
 begin
   FFontSize:= Value;
   if FInitialized and (FFontSize > 0) then
-     jCheckBox_setTextSize(App.Jni.jEnv, App.Jni.jThis, FjObject, FFontSize);
+     jCheckBox_setTextSize(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, FFontSize);
 end;
 
 Function jCheckBox.GetChecked: boolean;
 begin
   Result := FChecked;
   if FInitialized then
-     Result:= jCheckBox_isChecked(App.Jni.jEnv, App.Jni.jThis, FjObject);
+     Result:= jCheckBox_isChecked2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject);
 end;
 
 Procedure jCheckBox.SetChecked(Value: boolean);
 begin
   FChecked:= Value;
   if FInitialized then
-     jCheckBox_setChecked(App.Jni.jEnv, App.Jni.jThis, FjObject, FChecked);
+     jCheckBox_setChecked2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, FChecked);
 end;
 
 procedure jCheckBox.SetParamWidth(Value: TLayoutParams);
 var
    side: TSide;
 begin
-   if FInitialized then
-   begin
-     if jSystem_GetOrientation(App.Jni.jEnv, App.Jni.jThis, App.Jni.jActivity) = App.Orientation  then
-        side:= sdW
-     else
-        side:= sdH;
-     jCheckBox_setLParamWidth(App.Jni.jEnv, App.Jni.jThis, FjObject, GetLayoutParams(App, FLParamWidth, side));
-   end;
+  if jForm(Owner).Orientation = gApp.Orientation then
+     side:= sdW
+  else
+     side:= sdH;
+  jCheckBox_setLParamWidth2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, GetLayoutParams(gApp, FLParamWidth, side));
 end;
 
 procedure jCheckBox.setParamHeight(Value: TLayoutParams);
 var
    side: TSide;
 begin
-  if not FInitialized then  Exit;
-
-  if  jSystem_GetOrientation(App.Jni.jEnv, App.Jni.jThis, App.Jni.jActivity)  = App.Orientation then
-    side:= sdH
+  if jForm(Owner).Orientation = gApp.Orientation then
+     side:= sdH
   else
-    side:= sdW;
-
-  jCheckBox_setLParamHeight(App.Jni.jEnv, App.Jni.jThis, FjObject, GetLayoutParams(App, FLParamHeight, side));
+     side:= sdW;
+  jCheckBox_setLParamHeight2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, GetLayoutParams(gApp, FLParamHeight, side));
 end;
 
 procedure jCheckBox.UpdateLayout;
@@ -3844,7 +4169,7 @@ begin
    inherited UpdateLayout;
    SetParamWidth(FLParamWidth);
    setParamHeight(FLParamHeight);
-   jCheckBox_setLayoutAll(App.Jni.jEnv, App.Jni.jThis, FjObject, Self.AnchorId);
+   jCheckBox_setLayoutAll2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, Self.AnchorId);
 end;
 
 // Event Java -> Pascal
@@ -3866,19 +4191,20 @@ begin
   FMarginTop    := 5;
   FMarginBottom := 5;
   FMarginRight  := 5;
+  FFontColor    := colbrSilver;
 end;
 
 destructor jRadioButton.Destroy;
 begin
   if not (csDesigning in ComponentState) then
   begin
-    if App <> nil then
+    if jForm(Owner).App <> nil then
     begin
-      if App.Initialized then
+      if jForm(Owner).App.Initialized then
       begin
         if FjObject <> nil then
         begin
-          jRadioButton_Free(App.Jni.jEnv, App.Jni.jThis, FjObject);
+          jRadioButton_Free2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject);
           FjObject:= nil;
         end;
       end;
@@ -3887,60 +4213,62 @@ begin
   inherited Destroy;
 end;
 
-procedure jRadioButton.Init(App: jApp);
+procedure jRadioButton.Init;
 var
   rToP: TPositionRelativeToParent;
   rToA: TPositionRelativeToAnchorID;
 begin
   if FInitialized  then Exit;
-  inherited Init(App);
-  FjObject:= jRadioButton_Create(App.Jni.jEnv, App.Jni.jThis, App.Jni.jActivity, Self);
+  inherited Init;
+  FjObject:= jRadioButton_Create2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, Self);
 
   if FParentPanel <> nil then
   begin
-   FParentPanel.Init(App);
+   FParentPanel.Init;
    FjPRLayout:= FParentPanel.View;
   end;
 
-  jRadioButton_setParent(App.Jni.jEnv, App.Jni.jThis, FjObject, FjPRLayout);
-  jRadioButton_setId(App.Jni.jEnv, App.Jni.jThis, FjObject, Self.Id);
+  jRadioButton_setParent(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, FjPRLayout);
+  jRadioButton_setId(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, Self.Id);
 
-  jRadioButton_setLeftTopRightBottomWidthHeight(App.Jni.jEnv, App.Jni.jThis, FjObject,
+  jRadioButton_setLeftTopRightBottomWidthHeight(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject,
                                            FMarginLeft,FMarginTop,FMarginRight,FMarginBottom,
-                                           GetLayoutParams(App, FLParamWidth, sdW),
-                                           GetLayoutParams(App, FLParamHeight, sdH));
+                                           GetLayoutParams(gApp, FLParamWidth, sdW),
+                                           GetLayoutParams(gApp, FLParamHeight, sdH));
 
 
   for rToA := raAbove to raAlignRight do
   begin
     if rToA in FPositionRelativeToAnchor then
     begin
-      jRadioButton_addlParamsAnchorRule(App.Jni.jEnv, App.Jni.jThis, FjObject, GetPositionRelativeToAnchor(rToA));
+      jRadioButton_addlParamsAnchorRule(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, GetPositionRelativeToAnchor(rToA));
     end;
   end;
   for rToP := rpBottom to rpCenterVertical do
   begin
      if rToP in FPositionRelativeToParent then
      begin
-       jRadioButton_addlParamsParentRule(App.Jni.jEnv, App.Jni.jThis, FjObject, GetPositionRelativeToParent(rToP));
+       jRadioButton_addlParamsParentRule(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, GetPositionRelativeToParent(rToP));
      end;
   end;
   if Self.Anchor <> nil then Self.AnchorId:= Self.Anchor.Id
   else Self.AnchorId:= -1;
-  jRadioButton_setLayoutAll(App.Jni.jEnv, App.Jni.jThis, FjObject, Self.AnchorId);
-  jRadioButton_setText(App.Jni.jEnv, App.Jni.jThis, FjObject, FText);
+  jRadioButton_setLayoutAll(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, Self.AnchorId);
+  jRadioButton_setText(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, FText);
 
   if FFontColor <> colbrDefault then
-     jRadioButton_setTextColor(App.Jni.jEnv, App.Jni.jThis, FjObject, GetARGB(FFontColor));
+     jRadioButton_setTextColor(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, GetARGB(FFontColor));
 
   if FFontSize > 0 then
-     jRadioButton_setTextSize(App.Jni.jEnv, App.Jni.jThis, FjObject, FFontSize);
+     jRadioButton_setTextSize(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, FFontSize);
 
-  jRadioButton_setChecked(App.Jni.jEnv, App.Jni.jThis, FjObject, FChecked);
+  jRadioButton_setChecked(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, FChecked);
 
   if FColor <> colbrDefault then
-     jView_SetBackGroundColor(App.Jni.jEnv, App.Jni.jThis, FjObject, GetARGB(FColor));
-  jView_SetVisible(App.Jni.jEnv, App.Jni.jThis, FjObject, FVisible);
+     jView_SetBackGroundColor(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, GetARGB(FColor));
+
+  jView_SetVisible(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, FVisible);
+
   FInitialized:= True;
 end;
 
@@ -3948,97 +4276,91 @@ Procedure jRadioButton.SetParent(Value: jObject);
 begin
   FjPRLayout:= Value;
   if FInitialized then
-    jRadioButton_setParent(App.Jni.jEnv, App.Jni.jThis, FjObject, FjPRLayout);
+    jRadioButton_setParent(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, FjPRLayout);
 end;
 
 Procedure jRadioButton.SetVisible  (Value : Boolean);
 begin
   FVisible:= Value;
   if FInitialized then
-    jView_SetVisible(App.Jni.jEnv, App.Jni.jThis, FjObject, FVisible);
+    jView_SetVisible(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, FVisible);
 end;
 
 Procedure jRadioButton.SetColor(Value: TARGBColorBridge);
 begin
   FColor:= Value;
   if (FInitialized = True) and (FColor <> colbrDefault) then
-     jView_SetBackGroundColor(App.Jni.jEnv, App.Jni.jThis, FjObject, GetARGB(FColor));
+     jView_SetBackGroundColor(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, GetARGB(FColor));
 end;
 
 Procedure jRadioButton.Refresh;
 begin
   if not FInitialized then Exit;
-  jView_Invalidate(App.Jni.jEnv, App.Jni.jThis, FjObject);
+  jView_Invalidate(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject);
 end;
 
 Function jRadioButton.GetText: string;
 begin
   Result:= FText;
   if FInitialized then
-     Result:= jRadioButton_getText(App.Jni.jEnv, App.Jni.jThis, FjObject);
+     Result:= jRadioButton_getText(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject);
 end;
 
 Procedure jRadioButton.SetText(Value: string);
 begin
   FText:= Value;
   if FInitialized then
-     jRadioButton_setText(App.Jni.jEnv, App.Jni.jThis, FjObject, FText);
+     jRadioButton_setText2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, FText);
 end;
 
 Procedure jRadioButton.SetFontColor(Value: TARGBColorBridge);
 begin
   FFontColor:= Value;
   if (FInitialized = True) and (FFontColor <> colbrDefault) then
-     jRadioButton_setTextColor(App.Jni.jEnv, App.Jni.jThis, FjObject, GetARGB(FFontColor));
+     jRadioButton_setTextColor2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, GetARGB(FFontColor));
 end;
 
 Procedure jRadioButton.SetFontSize(Value: DWord);
 begin
   FFontSize:= Value;
   if FInitialized and (FFontSize > 0) then
-     jRadioButton_setTextSize(App.Jni.jEnv, App.Jni.jThis, FjObject, FFontSize);
+     jRadioButton_setTextSize(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, FFontSize);
 end;
 
 Function jRadioButton.GetChecked: boolean;
 begin
   Result:= FChecked;
   if FInitialized then
-     Result:= jRadioButton_isChecked(App.Jni.jEnv, App.Jni.jThis, FjObject);
+     Result:= jRadioButton_isChecked2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject);
 end;
 
 Procedure jRadioButton.SetChecked(Value: boolean);
 begin
   FChecked:= Value;
   if FInitialized then
-     jRadioButton_setChecked(App.Jni.jEnv, App.Jni.jThis, FjObject, FChecked);
+     jRadioButton_setChecked2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, FChecked);
 end;
 
 procedure jRadioButton.SetParamWidth(Value: TLayoutParams);
 var
   side: TSide;
 begin
-  if FInitialized then
-  begin
-     if jSystem_GetOrientation(App.Jni.jEnv, App.Jni.jThis, App.Jni.jActivity) = App.Orientation  then
-        side:= sdW
-     else
-        side:= sdH;
-     jRadioButton_setLParamWidth(App.Jni.jEnv, App.Jni.jThis, FjObject, GetLayoutParams(App, FLParamWidth, side));
-  end;
+  if jForm(Owner).Orientation = gApp.Orientation then
+     side:= sdW
+  else
+     side:= sdH;
+  jRadioButton_setLParamWidth2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, GetLayoutParams(gApp, FLParamWidth, side));
 end;
 
 procedure jRadioButton.setParamHeight(Value: TLayoutParams);
 var
   side: TSide;
 begin
-  if not FInitialized then  Exit;
-
-  if  jSystem_GetOrientation(App.Jni.jEnv, App.Jni.jThis, App.Jni.jActivity)  = App.Orientation then
-    side:= sdH
+  if jForm(Owner).Orientation = gApp.Orientation then
+     side:= sdH
   else
-    side:= sdW;
-
-  jRadioButton_setLParamHeight(App.Jni.jEnv, App.Jni.jThis, FjObject, GetLayoutParams(App, FLParamHeight, side));
+     side:= sdW;
+  jRadioButton_setLParamHeight2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, GetLayoutParams(gApp, FLParamHeight, side));
 end;
 
 procedure jRadioButton.UpdateLayout;
@@ -4046,7 +4368,7 @@ begin
    inherited UpdateLayout;
    SetParamWidth(FLParamWidth);
    setParamHeight(FLParamHeight);
-   jRadioButton_setLayoutAll(App.Jni.jEnv, App.Jni.jThis, FjObject, Self.AnchorId);
+   jRadioButton_setLayoutAll2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, Self.AnchorId);
 end;
 
 // Event Java -> Pascal
@@ -4076,13 +4398,13 @@ Destructor jProgressBar.Destroy;
 begin
    if not (csDesigning in ComponentState) then
    begin
-     if App <> nil then
+     if jForm(Owner).App <> nil then
      begin
-       if App.Initialized then
+       if jForm(Owner).App.Initialized then
        begin
          if FjObject <> nil then
          begin
-           jProgressBar_Free(App.Jni.jEnv, App.Jni.jThis, FjObject);
+           jProgressBar_Free2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject);
            FjObject:= nil;
          end;
        end;
@@ -4091,51 +4413,51 @@ begin
    inherited Destroy;
 end;
 
-Procedure jProgressBar.Init(App: jApp);
+Procedure jProgressBar.Init;
 var
   rToP: TPositionRelativeToParent;
   rToA: TPositionRelativeToAnchorID;
 begin
   if FInitialized  then Exit;
-  inherited Init(App);
-  FjObject:= jProgressBar_Create(App.Jni.jEnv, App.Jni.jThis, App.Jni.jActivity, Self, GetProgressBarStyle(FStyle));
+  inherited Init;
+  FjObject:= jProgressBar_Create2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, Self, GetProgressBarStyle(FStyle));
 
   if FParentPanel <> nil then
   begin
-   FParentPanel.Init(App);
+   FParentPanel.Init;
    FjPRLayout:= FParentPanel.View;
   end;
 
-  jProgressBar_setParent(App.Jni.jEnv, App.Jni.jThis, FjObject, FjPRLayout);
-  jProgressBar_setId(App.Jni.jEnv, App.Jni.jThis, FjObject, Self.Id);
-  jProgressBar_setLeftTopRightBottomWidthHeight(App.Jni.jEnv, App.Jni.jThis, FjObject,
+  jProgressBar_setParent(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, FjPRLayout);
+  jProgressBar_setId(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, Self.Id);
+  jProgressBar_setLeftTopRightBottomWidthHeight(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject,
                                            FMarginLeft,FMarginTop,FMarginRight,FMarginBottom,
-                                           GetLayoutParams(App, FLParamWidth, sdW),
-                                           GetLayoutParams(App, FLParamHeight, sdH));
+                                           GetLayoutParams(gApp, FLParamWidth, sdW),
+                                           GetLayoutParams(gApp, FLParamHeight, sdH));
 
   for rToA := raAbove to raAlignRight do
   begin
     if rToA in FPositionRelativeToAnchor then
     begin
-      jProgressBar_addlParamsAnchorRule(App.Jni.jEnv, App.Jni.jThis, FjObject, GetPositionRelativeToAnchor(rToA));
+      jProgressBar_addlParamsAnchorRule(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, GetPositionRelativeToAnchor(rToA));
     end;
   end;
   for rToP := rpBottom to rpCenterVertical do
   begin
      if rToP in FPositionRelativeToParent then
      begin
-       jProgressBar_addlParamsParentRule(App.Jni.jEnv, App.Jni.jThis, FjObject, GetPositionRelativeToParent(rToP));
+       jProgressBar_addlParamsParentRule(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, GetPositionRelativeToParent(rToP));
      end;
   end;
   if Self.Anchor <> nil then Self.AnchorId:= Self.Anchor.Id
   else Self.AnchorId:= -1;
-  jProgressBar_setLayoutAll(App.Jni.jEnv, App.Jni.jThis, FjObject, Self.AnchorId);
-  jProgressBar_setProgress(App.Jni.jEnv, App.Jni.jThis, FjObject, FProgress);
-  jProgressBar_setMax(App.Jni.jEnv, App.Jni.jThis, FjObject, FMax);  //by jmpessoa
+  jProgressBar_setLayoutAll(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, Self.AnchorId);
+  jProgressBar_setProgress(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, FProgress);
+  jProgressBar_setMax(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, FMax);  //by jmpessoa
 
   if FColor <> colbrDefault then
-    jView_SetBackGroundColor(App.Jni.jEnv, App.Jni.jThis, FjObject, GetARGB(FColor));
-  jView_SetVisible(App.Jni.jEnv, App.Jni.jThis, FjObject, FVisible);
+    jView_SetBackGroundColor(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, GetARGB(FColor));
+  jView_SetVisible(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, FVisible);
   FInitialized:= True;
 end;
 
@@ -4143,7 +4465,7 @@ Procedure jProgressBar.SetParent(Value: jObject);
 begin
   FjPRLayout:= Value;
   if FInitialized then
-     jProgressBar_setParent(App.Jni.jEnv, App.Jni.jThis, FjObject, FjPRLayout);
+     jProgressBar_setParent2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, FjPRLayout);
 end;
 
 procedure jProgressBar.Stop;
@@ -4167,27 +4489,27 @@ Procedure jProgressBar.SetVisible(Value: Boolean);
 begin
   FVisible:= Value;
   if FInitialized then
-    jView_SetVisible(App.Jni.jEnv, App.Jni.jThis, FjObject, FVisible);
+    jView_SetVisible(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, FVisible);
 end;
 
 Procedure jProgressBar.SetColor(Value: TARGBColorBridge);
 begin
   FColor := Value;
   if (FInitialized = True) and (FColor <> colbrDefault) then
-     jView_SetBackGroundColor(App.Jni.jEnv, App.Jni.jThis, FjObject, GetARGB(FColor));
+     jView_SetBackGroundColor(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, GetARGB(FColor));
 end;
 
 Procedure jProgressBar.Refresh;
 begin
   if not FInitialized then Exit;
-  jView_Invalidate(App.Jni.jEnv, App.Jni.jThis, FjObject);
+  jView_Invalidate(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject);
 end;
 
 Function jProgressBar.GetProgress: integer;
 begin
   Result:= FProgress;
   if FInitialized then
-     Result:= jProgressBar_getProgress(App.Jni.jEnv, App.Jni.jThis, FjObject);
+     Result:= jProgressBar_getProgress2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject);
 end;
 
 Procedure jProgressBar.SetProgress(Value: integer);
@@ -4195,7 +4517,7 @@ begin
   if Value >= 0 then FProgress:= Value
   else FProgress:= 0;
   if FInitialized then
-     jProgressBar_setProgress(App.Jni.jEnv, App.Jni.jThis, FjObject, FProgress);
+     jProgressBar_setProgress2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, FProgress);
 end;
 
 //by jmpessoa
@@ -4203,7 +4525,7 @@ Procedure jProgressBar.SetMax(Value: integer);
 begin
   if Value > FProgress  then FMax:= Value;
   if FInitialized then
-     jProgressBar_setMax(App.Jni.jEnv, App.Jni.jThis, FjObject, FMax);
+     jProgressBar_setMax2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, FMax);
 end;
 
 //by jmpessoa
@@ -4211,35 +4533,29 @@ Function jProgressBar.GetMax: integer;
 begin
   Result:= FMax;
   if FInitialized then
-     Result:= jProgressBar_getMax(App.Jni.jEnv, App.Jni.jThis, FjObject);
+     Result:= jProgressBar_getMax2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject);
 end;
 
 procedure jProgressBar.SetParamWidth(Value: TLayoutParams);
 var
    side: TSide;
 begin
-   if FInitialized then
-   begin
-     if jSystem_GetOrientation(App.Jni.jEnv, App.Jni.jThis, App.Jni.jActivity) = App.Orientation  then
-        side:= sdW
-     else
-        side:= sdH;
-     jProgressBar_setLParamWidth(App.Jni.jEnv, App.Jni.jThis, FjObject, GetLayoutParams(App, FLParamWidth, side));
-   end;
+  if jForm(Owner).Orientation = gApp.Orientation then
+     side:= sdW
+  else
+     side:= sdH;
+  jProgressBar_setLParamWidth2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, GetLayoutParams(gApp, FLParamWidth, side));
 end;
 
 procedure jProgressBar.setParamHeight(Value: TLayoutParams);
 var
    side: TSide;
 begin
-  if not FInitialized then  Exit;
-
-  if  jSystem_GetOrientation(App.Jni.jEnv, App.Jni.jThis, App.Jni.jActivity)  = App.Orientation then
-    side:= sdH
+  if jForm(Owner).Orientation = gApp.Orientation then
+     side:= sdH
   else
-    side:= sdW;
-
-  jProgressBar_setLParamHeight(App.Jni.jEnv, App.Jni.jThis, FjObject, GetLayoutParams(App, FLParamHeight, side));
+     side:= sdW;
+  jProgressBar_setLParamHeight2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, GetLayoutParams(gApp, FLParamHeight, side));
 end;
 
 procedure jProgressBar.UpdateLayout;
@@ -4247,7 +4563,7 @@ begin
    inherited UpdateLayout;
    SetParamWidth(FLParamWidth);
    setParamHeight(FLParamHeight);
-   jProgressBar_setLayoutAll(App.Jni.jEnv, App.Jni.jThis, FjObject, Self.AnchorId);
+   jProgressBar_setLayoutAll2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, Self.AnchorId);
 end;
 
 //------------------------------------------------------------------------------
@@ -4269,13 +4585,13 @@ destructor jImageView.Destroy;
 begin
    if not (csDesigning in ComponentState) then
    begin
-     if App <> nil then
+     if jForm(Owner).App <> nil then
      begin
-       if App.Initialized then
+       if jForm(Owner).App.Initialized then
        begin
          if FjObject <> nil then
          begin
-           jImageView_Free(App.Jni.jEnv, App.Jni.jThis, FjObject);
+           jImageView_Free2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject);
            FjObject:= nil;
          end;
        end;
@@ -4284,89 +4600,87 @@ begin
    inherited Destroy;
 end;
 
-Procedure jImageView.Init(App: jApp);
+Procedure jImageView.Init;
 var
   rToP: TPositionRelativeToParent;
   rToA: TPositionRelativeToAnchorID;
 begin
   if FInitialized  then Exit;
-  inherited Init(App);
-  FjObject:= jImageView_Create(App.Jni.jEnv, App.Jni.jThis, App.Jni.jActivity, Self);
+  inherited Init;
+  FjObject:= jImageView_Create2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, Self);
 
   if FParentPanel <> nil then
   begin
-   FParentPanel.Init(App);
+   FParentPanel.Init;
    FjPRLayout:= FParentPanel.View;
   end;
 
-  jImageView_setParent(App.Jni.jEnv, App.Jni.jThis,FjObject, FjPRLayout);
-  jImageView_setId(App.Jni.jEnv, App.Jni.jThis, FjObject, Self.Id);
+  jImageView_setParent(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis,FjObject, FjPRLayout);
+  jImageView_setId(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, Self.Id);
 
-  jImageView_setLeftTopRightBottomWidthHeight(App.Jni.jEnv, App.Jni.jThis, FjObject,
+  jImageView_setLeftTopRightBottomWidthHeight(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject,
                                            FMarginLeft,FMarginTop,FMarginRight,FMarginBottom,
-                                           GetLayoutParams(App, FLParamWidth, sdW),
-                                           GetLayoutParams(App, FLParamHeight, sdH));
-
-
+                                           GetLayoutParams(gApp, FLParamWidth, sdW),
+                                           GetLayoutParams(gApp, FLParamHeight, sdH));
   for rToA := raAbove to raAlignRight do
   begin
     if rToA in FPositionRelativeToAnchor then
     begin
-      jImageView_addlParamsAnchorRule(App.Jni.jEnv, App.Jni.jThis, FjObject, GetPositionRelativeToAnchor(rToA));
+      jImageView_addlParamsAnchorRule(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, GetPositionRelativeToAnchor(rToA));
     end;
   end;
   for rToP := rpBottom to rpCenterVertical do
   begin
      if rToP in FPositionRelativeToParent then
      begin
-       jImageView_addlParamsParentRule(App.Jni.jEnv, App.Jni.jThis, FjObject, GetPositionRelativeToParent(rToP));
+       jImageView_addlParamsParentRule(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, GetPositionRelativeToParent(rToP));
      end;
   end;
   if Self.Anchor <> nil then Self.AnchorId:= Self.Anchor.Id
   else Self.AnchorId:= -1;
 
   if FColor <> colbrDefault then
-      jView_SetBackGroundColor(App.Jni.jEnv, App.Jni.jThis, FjObject, GetARGB(FColor));
+      jView_SetBackGroundColor(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, GetARGB(FColor));
 
   FInitialized:= True;  //neded here....
   if FImageList <> nil then
   begin
-    FImageList.Init(App);
+    FImageList.Init;
     if FImageList.Images.Count > 0 then
     begin
        if FImageIndex >=0 then SetImageByIndex(FImageIndex);
     end;
   end;
 
-  jImageView_setLayoutAll(App.Jni.jEnv, App.Jni.jThis, FjObject, Self.AnchorId);
-  jView_SetVisible(App.Jni.jEnv, App.Jni.jThis, FjObject, FVisible);
+  jImageView_setLayoutAll(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, Self.AnchorId);
+  jView_SetVisible(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, FVisible);
 end;
 
 procedure jImageView.SetParent(Value: jObject);
 begin
   FjPRLayout:= Value;
   if FInitialized then
-    jImageView_setParent(App.Jni.jEnv, App.Jni.jThis,FjObject, FjPRLayout);
+    jImageView_setParent(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis,FjObject, FjPRLayout);
 end;
 
 Procedure jImageView.SetVisible  (Value : Boolean);
 begin
   FVisible:= Value;
   if FInitialized then
-    jView_SetVisible(App.Jni.jEnv, App.Jni.jThis, FjObject, FVisible);
+    jView_SetVisible(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, FVisible);
 end;
 
 Procedure jImageView.SetColor(Value: TARGBColorBridge);
 begin
   FColor := Value;
   if (FInitialized = True) and (FColor <> colbrDefault) then
-     jView_SetBackGroundColor(App.Jni.jEnv, App.Jni.jThis, FjObject, GetARGB(FColor));
+     jView_SetBackGroundColor(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, GetARGB(FColor));
 end;
 
 Procedure jImageView.Refresh;
 begin
   if FInitialized then
-     jView_Invalidate(App.Jni.jEnv, App.Jni.jThis, FjObject);
+     jView_Invalidate(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject);
 end;
 
 Procedure jImageView.SetImageByName(Value: string);
@@ -4385,7 +4699,7 @@ begin
    begin
       FImageIndex:= foundIndex;
       FImageName:= Trim(FImageList.Images.Strings[foundIndex]);
-      jImageView_setImage(App.Jni.jEnv, App.Jni.jThis, FjObject, GetFilePath(FFilePath){App.Path.Dat}+'/'+FImageName);
+      jImageView_setImage2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, GetFilePath(FFilePath){jForm(Owner).App.Path.Dat}+'/'+FImageName);
    end;
 end;
 
@@ -4397,7 +4711,7 @@ begin
       FImageName:= Trim(FImageList.Images.Strings[Value]);
       if  (FImageName <> '') and (FImageName <> 'null') then
       begin
-        jImageView_setImage(App.Jni.jEnv, App.Jni.jThis, FjObject, GetFilePath(FFilePath){App.Path.Dat}+'/'+FImageName);
+        jImageView_setImage2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, GetFilePath(FFilePath){jForm(Owner).App.Path.Dat}+'/'+FImageName);
       end;
    end;
 end;
@@ -4432,49 +4746,43 @@ end;
 procedure jImageView.SetImageBitmap(bitmap: jObject);
 begin
   if FInitialized then
-     jImageView_setBitmapImage(App.Jni.jEnv, App.Jni.jThis, FjObject, bitmap);
+     jImageView_setBitmapImage2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, bitmap);
 end;
 
 procedure jImageView.SetParamWidth(Value: TLayoutParams);
 var
    side: TSide;
 begin
-   if FInitialized then
-   begin
-     if jSystem_GetOrientation(App.Jni.jEnv, App.Jni.jThis, App.Jni.jActivity) = App.Orientation  then
-        side:= sdW
-     else
-        side:= sdH;
-     jImageView_setLParamWidth(App.Jni.jEnv, App.Jni.jThis, FjObject, GetLayoutParams(App, FLParamWidth, side));
-   end;
+  if jForm(Owner).Orientation = gApp.Orientation then
+     side:= sdW
+  else
+     side:= sdH;
+  jImageView_setLParamWidth2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, GetLayoutParams(gApp, FLParamWidth, side));
 end;
 
 procedure jImageView.setParamHeight(Value: TLayoutParams);
 var
    side: TSide;
 begin
-  if not FInitialized then  Exit;
-
-  if  jSystem_GetOrientation(App.Jni.jEnv, App.Jni.jThis, App.Jni.jActivity)  = App.Orientation then
-    side:= sdH
+  if jForm(Owner).Orientation = gApp.Orientation then
+     side:= sdH
   else
-    side:= sdW;
-
-  jImageView_setLParamHeight(App.Jni.jEnv, App.Jni.jThis, FjObject, GetLayoutParams(App, FLParamHeight, side));
+     side:= sdW;
+  jImageView_setLParamHeight2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, GetLayoutParams(gApp, FLParamHeight, side));
 end;
 
 function jImageView.GetWidth: integer;
 begin
   Result:= 0;
   if FInitialized then
-   Result:= jImageView_getLParamWidth(App.Jni.jEnv, App.Jni.jThis, FjObject)
+   Result:= jImageView_getLParamWidth2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject)
 end;
 
 function jImageView.GetHeight: integer;
 begin
   Result:= 0;
   if FInitialized then
-    Result:= jImageView_getLParamHeight(App.Jni.jEnv, App.Jni.jThis, FjObject);
+    Result:= jImageView_getLParamHeight2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject);
 end;
 
 procedure jImageView.UpdateLayout;
@@ -4482,7 +4790,7 @@ begin
    inherited UpdateLayout;
    SetParamWidth(FLParamWidth);
    setParamHeight(FLParamHeight);
-   jImageView_setLayoutAll(App.Jni.jEnv, App.Jni.jThis, FjObject, Self.AnchorId);
+   jImageView_setLayoutAll2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, Self.AnchorId);
 end;
 
 // Event : Java -> Pascal
@@ -4519,10 +4827,9 @@ begin
   end;
 end;
 
-//-------------- by jmpessoa
+//  new by jmpessoa
+{jImageList}
 
-    {jImageList}
-//-------------
 constructor jImageList.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
@@ -4536,9 +4843,9 @@ destructor jImageList.Destroy;
 begin
   if not (csDesigning in ComponentState) then
   begin
-    if App <> nil then
+    if jForm(Owner).App <> nil then
     begin
-      if App.Initialized then
+      if jForm(Owner).App.Initialized then
       begin
         //
       end;
@@ -4548,16 +4855,16 @@ begin
   inherited Destroy;
 end;
 
-procedure jImageList.Init(App: jApp);
+procedure jImageList.Init;
 var
   i: integer;
 begin
   if FInitialized  then Exit;
-  inherited Init(App);
+  inherited Init;
   for i:= 0 to FImages.Count - 1 do
   begin
      if Trim(FImages.Strings[i]) <> '' then
-        Asset_SaveToFile(Trim(FImages.Strings[i]),GetFilePath(FFilePath){App.Path.Dat}+'/'+Trim(FImages.Strings[i]));
+        Asset_SaveToFile(Trim(FImages.Strings[i]),GetFilePath(FFilePath){jForm(Owner).App.Path.Dat}+'/'+Trim(FImages.Strings[i]));
   end;
   FInitialized:= True;
 end;
@@ -4578,7 +4885,7 @@ begin
   if Initialized then
   begin
      if (index < FImages.Count) and (index >= 0) then
-        Result:= GetFilePath(FFilePath){App.Path.Dat}+'/'+Trim(FImages.Strings[index]);
+        Result:= GetFilePath(FFilePath){jForm(Owner).App.Path.Dat}+'/'+Trim(FImages.Strings[index]);
   end;
 end;
 
@@ -4601,9 +4908,9 @@ destructor jHttpClient.Destroy;
 begin
  if not (csDesigning in ComponentState) then
  begin
- if App <> nil then
+ if jForm(Owner).App <> nil then
  begin
-  if App.Initialized then
+  if jForm(Owner).App.Initialized then
   begin
     //
   end;
@@ -4613,10 +4920,10 @@ begin
  inherited Destroy;
 end;
 
-procedure jHttpClient.Init(App: jApp);
+procedure jHttpClient.Init;
 begin
  if FInitialized  then Exit;
- inherited Init(App);
+ inherited Init;
  SetUrlByIndex(FIndexUrl);
  FInitialized:= True;
 end;
@@ -4629,14 +4936,14 @@ end;
 function jHttpClient.Get: string;
 begin
  if FInitialized then
-   Result:= jHttp_get(App.jni.jEnv, App.jni.jThis, FUrl);
+   Result:= jHttp_get(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FUrl);
 end;
 
 function jHttpClient.Get(location: string): string;
 begin
   FUrl:= location;
   if FInitialized then
-     Result:= jHttp_get(App.jni.jEnv, App.jni.jThis, location);
+     Result:= jHttp_get(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, location);
 end;
 
 Procedure jHttpClient.SetUrlByIndex(Value: integer);
@@ -4670,9 +4977,9 @@ destructor jSMTPClient.Destroy;
 begin
  if not (csDesigning in ComponentState) then
  begin
- if App <> nil then
+ if jForm(Owner).App <> nil then
  begin
-  if App.Initialized then
+  if jForm(Owner).App.Initialized then
   begin
     //
   end;
@@ -4683,15 +4990,15 @@ begin
  inherited Destroy;
 end;
 
-procedure jSMTPClient.Init(App: jApp);
+procedure jSMTPClient.Init;
 begin
  if FInitialized  then Exit;
- inherited Init(App);
+ inherited Init;
 (*  TODO
  for i:= 0 to FMails.Count - 1 do
  begin
   if Trim(FMails.Strings[i]) <> '' then
-    Asset_SaveToFile(Trim(FImages.Strings[i]),GetFilePath(FFilePath){App.Path.Dat}+'/'+Trim(FImages.Strings[i]));
+    Asset_SaveToFile(Trim(FImages.Strings[i]),GetFilePath(FFilePath){jForm(Owner).App.Path.Dat}+'/'+Trim(FImages.Strings[i]));
  end;  *)
  FInitialized:= True;
 end;
@@ -4709,7 +5016,7 @@ end;
 procedure jSMTPClient.Send;
 begin
  if FInitialized then
-    jSend_Email(App.Jni.jEnv, App.Jni.jThis, App.Jni.jActivity,
+    jSend_Email(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis,
                 FMailTo,              //to
                 FMailCc,              //cc
                 FMailBcc,             //bcc
@@ -4720,7 +5027,7 @@ end;
 procedure jSMTPClient.Send(mTo: string; subject: string; msg: string);
 begin
   if FInitialized then
-     jSend_Email(App.Jni.jEnv, App.Jni.jThis, App.Jni.jActivity,
+     jSend_Email(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis,
                  mTo,     //to
                  '',      //cc
                  '',      //bcc
@@ -4750,9 +5057,9 @@ destructor jSMS.Destroy;
 begin
  if not (csDesigning in ComponentState) then
  begin
- if App <> nil then
+ if jForm(Owner).App <> nil then
  begin
-  if App.Initialized then
+  if jForm(Owner).App.Initialized then
   begin
     //
   end;
@@ -4763,10 +5070,10 @@ begin
  inherited Destroy;
 end;
 
-procedure jSMS.Init(App: jApp);
+procedure jSMS.Init;
 begin
  if FInitialized  then Exit;
- inherited Init(App);
+ inherited Init;
  if FLoadMobileContacts then GetContactList;
  FInitialized:= True;
 end;
@@ -4774,8 +5081,8 @@ end;
 function jSMS.GetContactList: string;
 begin
  if FInitialized then
-   FContactList.DelimitedText:= jContact_getDisplayNameList(App.Jni.jEnv,
-                                                                      App.Jni.jThis, App.Jni.jActivity,
+   FContactList.DelimitedText:= jContact_getDisplayNameList(jForm(Owner).App.Jni.jEnv,
+                                                                      jForm(Owner).App.Jni.jThis,
                                                                       FContactListDelimiter);
   Result:=FContactList.DelimitedText;
 end;
@@ -4790,10 +5097,10 @@ begin
   if FInitialized then
   begin
     if (FMobileNumber = '') and (FContactName <> '') then
-      FMobileNumber:= jContact_getMobileNumberByDisplayName(App.Jni.jEnv, App.Jni.jThis, App.Jni.jActivity,
+      FMobileNumber:= jContact_getMobileNumberByDisplayName(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis,
                                                          FContactName);
     if FMobileNumber <> '' then
-        jSend_SMS(App.Jni.jEnv, App.Jni.jThis, App.Jni.jActivity,
+        jSend_SMS(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis,
                   FMobileNumber,     //to
                   FSMSMessage.Text);  //message
   end;
@@ -4804,10 +5111,10 @@ begin
   if FInitialized then
   begin
     if toName<> '' then
-      FMobileNumber:= jContact_getMobileNumberByDisplayName(App.Jni.jEnv, App.Jni.jThis, App.Jni.jActivity,
+      FMobileNumber:= jContact_getMobileNumberByDisplayName(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis,
                                                             toName);
     if FMobileNumber <> '' then
-        jSend_SMS(App.Jni.jEnv, App.Jni.jThis, App.Jni.jActivity,
+        jSend_SMS(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis,
                   FMobileNumber,     //to
                   FSMSMessage.Text);  //message
   end;
@@ -4818,7 +5125,7 @@ begin
  if FInitialized then
  begin
     if toNumber <> '' then
-        jSend_SMS(App.Jni.jEnv, App.Jni.jThis, App.Jni.jActivity,
+        jSend_SMS(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis,
                   toNumber,     //to
                   msg);  //message
   end;
@@ -4837,9 +5144,9 @@ destructor jCamera.Destroy;
 begin
  if not (csDesigning in ComponentState) then
  begin
- if App <> nil then
+ if jForm(Owner).App <> nil then
  begin
-  if App.Initialized then
+  if jForm(Owner).App.Initialized then
   begin
     //
   end;
@@ -4848,10 +5155,10 @@ begin
  inherited Destroy;
 end;
 
-procedure jCamera.Init(App: jApp);
+procedure jCamera.Init;
 begin
  if FInitialized  then Exit;
- inherited Init(App);
+ inherited Init;
  FInitialized:= True;
 end;
 
@@ -4870,7 +5177,7 @@ begin
        FFileName:= SplitStr(strExt, '.');
        FFileName:= FFileName + '.jpg';
      end;
-     Self.FullPathToBitmapFile:= jCamera_takePhoto(App.jni.jEnv, App.jni.jThis,App.jni.jActivity,
+     Self.FullPathToBitmapFile:= jCamera_takePhoto(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis,
                                                    GetFilePath(FFilePath), FFileName);
   end;
 end;
@@ -4882,7 +5189,7 @@ end;
 constructor jListView.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
-  FItems      := TStringList.Create;
+  FItems:= TStringList.Create;
   TStringList(FItems).OnChange:= ListViewChange;  //event handle
 end;
 
@@ -4890,13 +5197,13 @@ destructor jListView.Destroy;
 begin
   if not (csDesigning in ComponentState) then
   begin
-    if App <> nil then
+    if jForm(Owner).App <> nil then
     begin
-      if App.Initialized then
+      if jForm(Owner).App.Initialized then
       begin
         if FjObject <> nil then
         begin
-          jListView_Free(App.Jni.jEnv, App.Jni.jThis, FjObject);
+          jListView_Free2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject);
           FjObject:= nil;
         end;
       end;
@@ -4906,57 +5213,57 @@ begin
   inherited Destroy;
 end;
 
-procedure jListView.Init(App: jApp);
+procedure jListView.Init;
 var
   i: integer;
   rToP: TPositionRelativeToParent;
   rToA: TPositionRelativeToAnchorID;
 begin
   if FInitialized  then Exit;
-  inherited Init(App);
-  FjObject:= jListView_Create(App.Jni.jEnv, App.Jni.jThis, App.Jni.jActivity, Self);
+  inherited Init;
+  FjObject:= jListView_Create2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, Self);
 
   if FParentPanel <> nil then
   begin
-   FParentPanel.Init(App);
+   FParentPanel.Init;
    FjPRLayout:= FParentPanel.View;
   end;
 
-  jListView_setParent(App.Jni.jEnv, App.Jni.jThis, FjObject, FjPRLayout);
-  jListView_setId(App.Jni.jEnv, App.Jni.jThis, FjObject, Self.Id);
-  jListView_setLeftTopRightBottomWidthHeight(App.Jni.jEnv, App.Jni.jThis, FjObject,
+  jListView_setParent(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, FjPRLayout);
+  jListView_setId(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, Self.Id);
+  jListView_setLeftTopRightBottomWidthHeight(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject,
                                            FMarginLeft,FMarginTop,FMarginRight,FMarginBottom,
-                                           GetLayoutParams(App, FLParamWidth, sdW),
-                                           GetLayoutParams(App, FLParamHeight, sdH));
+                                           GetLayoutParams(gApp, FLParamWidth, sdW),
+                                           GetLayoutParams(gApp, FLParamHeight, sdH));
 
   for rToA := raAbove to raAlignRight do
   begin
     if rToA in FPositionRelativeToAnchor then
     begin
-      jListView_addlParamsAnchorRule(App.Jni.jEnv, App.Jni.jThis, FjObject, GetPositionRelativeToAnchor(rToA));
+      jListView_addlParamsAnchorRule(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, GetPositionRelativeToAnchor(rToA));
     end;
   end;
   for rToP := rpBottom to rpCenterVertical do
   begin
      if rToP in FPositionRelativeToParent then
      begin
-       jListView_addlParamsParentRule(App.Jni.jEnv, App.Jni.jThis, FjObject, GetPositionRelativeToParent(rToP));
+       jListView_addlParamsParentRule(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, GetPositionRelativeToParent(rToP));
      end;
   end;
   if Self.Anchor <> nil then Self.AnchorId:= Self.Anchor.Id
   else Self.AnchorId:= -1;
-  jListView_setLayoutAll(App.Jni.jEnv, App.Jni.jThis, FjObject, Self.AnchorId);
+  jListView_setLayoutAll(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, Self.AnchorId);
 
   if FFontColor <> colbrDefault then
-     jListView_setTextColor(App.Jni.jEnv, App.Jni.jThis, FjObject, GetARGB(FFontColor));
+     jListView_setTextColor(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, GetARGB(FFontColor));
   if FFontSize > 0 then
-     jListView_setTextSize(App.Jni.jEnv, App.Jni.jThis, FjObject, FFontSize);
+     jListView_setTextSize(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, FFontSize);
   if FColor <> colbrDefault then
-     jView_SetBackGroundColor(App.Jni.jEnv, App.Jni.jThis, FjObject, GetARGB(FColor));
-  jView_SetVisible(App.Jni.jEnv, App.Jni.jThis, FjObject, FVisible);
+     jView_SetBackGroundColor(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, GetARGB(FColor));
+  jView_SetVisible(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, FVisible);
   for i:= 0 to FItems.Count - 1 do
   begin
-    jListView_add(App.Jni.jEnv, App.Jni.jThis, FjObject, FItems.Strings[i]);
+    jListView_add(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, FItems.Strings[i]);
   end;
   FInitialized:= True;
 end;
@@ -4965,69 +5272,69 @@ procedure jListView.SetParent(Value: jObject);
 begin
   FjPRLayout:= Value;
   if FInitialized then
-    jListView_setParent(App.Jni.jEnv, App.Jni.jThis, FjObject, FjPRLayout);
+    jListView_setParent2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, FjPRLayout);
 end;
 
 Procedure jListView.SetVisible  (Value : Boolean);
 begin
   FVisible := Value;
   if FInitialized then
-    jView_SetVisible(App.Jni.jEnv, App.Jni.jThis, FjObject, FVisible);
+    jView_SetVisible(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, FVisible);
 end;
 
 Procedure jListView.SetColor (Value: TARGBColorBridge);
 begin
   FColor:= Value;
   if (FInitialized = True) and (FColor <> colbrDefault) then
-     jView_SetBackGroundColor(App.Jni.jEnv, App.Jni.jThis, FjObject, GetARGB(FColor));
+     jView_SetBackGroundColor(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, GetARGB(FColor));
 end;
 
 Procedure jListView.Refresh;
 begin
   if FInitialized then
-     jView_Invalidate(App.Jni.jEnv,App.Jni.jThis, FjObject);
+     jView_Invalidate(jForm(Owner).App.Jni.jEnv,jForm(Owner).App.Jni.jThis, FjObject);
 end;
 
 Procedure jListView.SetFontColor(Value: TARGBColorBridge);
 begin
   FFontColor:= Value;
   if (FInitialized = True) and (FFontColor <> colbrDefault ) then
-     jListView_setTextColor(App.Jni.jEnv, App.Jni.jThis, FjObject, GetARGB(FFontColor));
+     jListView_setTextColor2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, GetARGB(FFontColor));
 end;
 
 Procedure jListView.SetFontSize(Value: DWord);
 begin
   FFontSize:= Value;
   if FInitialized and (FFontSize > 0) then
-     jListView_setTextSize(App.Jni.jEnv, App.Jni.jThis, FjObject, FFontSize);
+     jListView_setTextSize2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, FFontSize);
 end;
 
 // LORDMAN 2013-08-07
 Procedure jListView.SetItemPosition(Value: TXY);
 begin
   if FInitialized then
-     jListView_setItemPosition(App.Jni.jEnv, App.Jni.jThis, FjObject, Value.X, Value.Y);
+     jListView_setItemPosition2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, Value.X, Value.Y);
 end;
 
 //
 Procedure jListView.Item_Add(item : string);
 begin
   if FInitialized then
-     jListView_add(App.Jni.jEnv, App.Jni.jThis, FjObject, item);
+     jListView_add2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, item);
 end;
 
 //
 Procedure jListView.Item_Delete(index: Integer);
 begin
   if FInitialized then
-     jListView_delete(App.Jni.jEnv, App.Jni.jThis, FjObject, index);
+     jListView_delete2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, index);
 end;
 
 //
 Procedure jListView.Item_Clear;
 begin
   if FInitialized then
-    jListView_clear(App.Jni.jEnv, App.Jni.jThis, FjObject);
+    jListView_clear2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject);
 end;
 
 //by jmpessoa
@@ -5043,10 +5350,10 @@ var
 begin
   if FInitialized then
   begin
-    jListView_clear(App.Jni.jEnv, App.Jni.jThis, FjObject);
+    jListView_clear2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject);
     for i:= 0 to FItems.Count - 1 do
     begin
-       jListView_add(App.Jni.jEnv, App.Jni.jThis, FjObject, FItems.Strings[i]);
+       jListView_add2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, FItems.Strings[i]);
     end;
   end;
 end;
@@ -5055,28 +5362,22 @@ procedure jListView.SetParamWidth(Value: TLayoutParams);
 var
    side: TSide;
 begin
-   if FInitialized then
-   begin
-     if jSystem_GetOrientation(App.Jni.jEnv, App.Jni.jThis, App.Jni.jActivity) = App.Orientation  then
-        side:= sdW
-     else
-        side:= sdH;
-     jListView_setLParamWidth(App.Jni.jEnv, App.Jni.jThis, FjObject, GetLayoutParams(App, FLParamWidth, side));
-   end;
+  if jForm(Owner).Orientation = gApp.Orientation then
+     side:= sdW
+  else
+     side:= sdH;
+  jListView_setLParamWidth2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, GetLayoutParams(gApp, FLParamWidth, side));
 end;
 
 procedure jListView.setParamHeight(Value: TLayoutParams);
 var
    side: TSide;
 begin
-  if not FInitialized then  Exit;
-
-  if  jSystem_GetOrientation(App.Jni.jEnv, App.Jni.jThis, App.Jni.jActivity)  = App.Orientation then
-    side:= sdH
+  if jForm(Owner).Orientation = gApp.Orientation then
+     side:= sdH
   else
-    side:= sdW;
-
-  jListView_setLParamHeight(App.Jni.jEnv, App.Jni.jThis, FjObject, GetLayoutParams(App, FLParamHeight, side));
+     side:= sdW;
+  jListView_setLParamHeight2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, GetLayoutParams(gApp, FLParamHeight, side));
 end;
 
 procedure jListView.UpdateLayout;
@@ -5084,7 +5385,7 @@ begin
    inherited UpdateLayout;
    SetParamWidth(FLParamWidth);
    setParamHeight(FLParamHeight);
-   jListView_setLayoutAll(App.Jni.jEnv, App.Jni.jThis, FjObject, Self.AnchorId);
+   jListView_setLayoutAll2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, Self.AnchorId);
 end;
 
 // Event : Java -> Pascal
@@ -5107,13 +5408,13 @@ Destructor jScrollView.Destroy;
 begin
   if not (csDesigning in ComponentState) then
   begin
-    if App <> nil then
+    if jForm(Owner).App <> nil then
     begin
-      if App.Initialized then
+      if jForm(Owner).App.Initialized then
       begin
         if FjObject <> nil then
         begin
-          jScrollView_Free(App.Jni.jEnv, App.Jni.jThis, FjObject);
+          jScrollView_Free2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject);
           FjObject:= nil;
         end;
       end;
@@ -5122,54 +5423,54 @@ begin
   inherited Destroy;
 end;
 
-Procedure jScrollView.Init(App: jApp);
+Procedure jScrollView.Init;
 var
   rToP: TPositionRelativeToParent;
   rToA: TPositionRelativeToAnchorID;
 begin
   if FInitialized  then Exit;
-  inherited Init(App);
+  inherited Init;
 
-  FjObject:= jScrollView_Create(App.Jni.jEnv, App.Jni.jThis, App.Jni.jActivity, Self);
-  FjRLayout:= jScrollView_getView(App.Jni.jEnv, App.Jni.jThis, FjObject); // Java : Self Layout
+  FjObject:= jScrollView_Create2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, Self);
+  FjRLayout:= jScrollView_getView(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject); // Java : Self Layout
 
   if FParentPanel <> nil then
   begin
-   FParentPanel.Init(App);
+   FParentPanel.Init;
    FjPRLayout:= FParentPanel.View;
   end;
 
-  jScrollView_setParent(App.Jni.jEnv, App.Jni.jThis, FjObject, FjPRLayout);
-  jScrollView_setId(App.Jni.jEnv, App.Jni.jThis, FjObject, Self.Id);
-  jScrollView_setLeftTopRightBottomWidthHeight(App.Jni.jEnv, App.Jni.jThis, FjObject,
+  jScrollView_setParent(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, FjPRLayout);
+  jScrollView_setId(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, Self.Id);
+  jScrollView_setLeftTopRightBottomWidthHeight(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject,
                                            FMarginLeft,FMarginTop,FMarginRight,FMarginBottom,
-                                           GetLayoutParams(App, FLParamWidth, sdW),
-                                           GetLayoutParams(App, FLParamHeight, sdH));
+                                           GetLayoutParams(gApp, FLParamWidth, sdW),
+                                           GetLayoutParams(gApp, FLParamHeight, sdH));
 
   for rToA := raAbove to raAlignRight do
   begin
     if rToA in FPositionRelativeToAnchor then
     begin
-      jScrollView_addlParamsAnchorRule(App.Jni.jEnv, App.Jni.jThis, FjObject, GetPositionRelativeToAnchor(rToA));
+      jScrollView_addlParamsAnchorRule(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, GetPositionRelativeToAnchor(rToA));
     end;
   end;
   for rToP := rpBottom to rpCenterVertical do
   begin
      if rToP in FPositionRelativeToParent then
      begin
-       jScrollView_addlParamsParentRule(App.Jni.jEnv, App.Jni.jThis, FjObject, GetPositionRelativeToParent(rToP));
+       jScrollView_addlParamsParentRule(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, GetPositionRelativeToParent(rToP));
      end;
   end;
   if Self.Anchor <> nil then Self.AnchorId:= Self.Anchor.Id
   else Self.AnchorId:= -1;
-  jScrollView_setLayoutAll(App.Jni.jEnv, App.Jni.jThis, FjObject, Self.AnchorId);
+  jScrollView_setLayoutAll(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, Self.AnchorId);
 
-  jScrollView_setScrollSize(App.Jni.jEnv, App.Jni.jThis,FjObject, FScrollSize);
+  jScrollView_setScrollSize(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis,FjObject, FScrollSize);
 
   if FColor <> colbrDefault then
-     jView_SetBackGroundColor(App.Jni.jEnv, App.Jni.jThis, FjObject, GetARGB(FColor));
+     jView_SetBackGroundColor(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, GetARGB(FColor));
 
-  jView_SetVisible(App.Jni.jEnv, App.Jni.jThis, FjObject, FVisible);
+  jView_SetVisible(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, FVisible);
   FInitialized:= True;
 end;
 
@@ -5177,62 +5478,56 @@ procedure jScrollView.SetParent(Value: jObject);
 begin
   FjPRLayout:= Value;
   if FInitialized then
-    jScrollView_setParent(App.Jni.jEnv, App.Jni.jThis, FjObject, FjPRLayout);
+    jScrollView_setParent2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, FjPRLayout);
 end;
 
 Procedure jScrollView.SetVisible  (Value : Boolean);
 begin
   FVisible:= Value;
   if FInitialized then
-    jView_SetVisible(App.Jni.jEnv, App.Jni.jThis, FjObject, FVisible);
+    jView_SetVisible(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, FVisible);
 end;
 
 Procedure jScrollView.SetColor(Value: TARGBColorBridge);
 begin
   FColor:= Value;
   if (FInitialized = True) and (FColor <> colbrDefault) then
-     jView_SetBackGroundColor(App.Jni.jEnv, App.Jni.jThis, FjObject, GetARGB(FColor));
+     jView_SetBackGroundColor(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, GetARGB(FColor));
 end;
 
 Procedure jScrollView.Refresh;
 begin
   if FInitialized then
-     jView_Invalidate(App.Jni.jEnv, App.Jni.jThis, FjObject);
+     jView_Invalidate(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject);
 end;
 
 Procedure jScrollView.SetScrollSize(Value: integer);
 begin
   FScrollSize:= Value;
   if FInitialized then
-     jScrollView_setScrollSize(App.Jni.jEnv, App.Jni.jThis,FjObject, FScrollSize);
+     jScrollView_setScrollSize2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis,FjObject, FScrollSize);
 end;
 
 procedure jScrollView.SetParamWidth(Value: TLayoutParams);
 var
    side: TSide;
 begin
-   if FInitialized then
-   begin
-     if jSystem_GetOrientation(App.Jni.jEnv, App.Jni.jThis, App.Jni.jActivity) = App.Orientation  then
-        side:= sdW
-     else
-        side:= sdH;
-     jScrollView_setLParamWidth(App.Jni.jEnv, App.Jni.jThis, FjObject, GetLayoutParams(App, FLParamWidth, side));
-   end;
+  if jForm(Owner).Orientation = gApp.Orientation then
+     side:= sdW
+  else
+     side:= sdH;
+  jScrollView_setLParamWidth2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, GetLayoutParams(gApp, FLParamWidth, side));
 end;
 
 procedure jScrollView.setParamHeight(Value: TLayoutParams);
 var
    side: TSide;
 begin
-  if not FInitialized then  Exit;
-
-  if  jSystem_GetOrientation(App.Jni.jEnv, App.Jni.jThis, App.Jni.jActivity)  = App.Orientation then
-    side:= sdH
+  if jForm(Owner).Orientation = gApp.Orientation then
+     side:= sdH
   else
-    side:= sdW;
-
-  jScrollView_setLParamHeight(App.Jni.jEnv, App.Jni.jThis, FjObject, GetLayoutParams(App, FLParamHeight, side));
+     side:= sdW;
+  jScrollView_setLParamHeight2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, GetLayoutParams(gApp, FLParamHeight, side));
 end;
 
 procedure jScrollView.UpdateLayout;
@@ -5240,7 +5535,7 @@ begin
    inherited UpdateLayout;
    SetParamWidth(FLParamWidth);
    setParamHeight(FLParamHeight);
-   jScrollView_setLayoutAll(App.Jni.jEnv, App.Jni.jThis, FjObject, Self.AnchorId);
+   jScrollView_setLayoutAll2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, Self.AnchorId);
 end;
 
 {NEW jPanel by jmpessoa}
@@ -5256,13 +5551,13 @@ Destructor jPanel.Destroy;
 begin
   if not (csDesigning in ComponentState) then
   begin
-    if App <> nil then
+    if jForm(Owner).App <> nil then
     begin
-      if App.Initialized then
+      if jForm(Owner).App.Initialized then
       begin
         if FjObject <> nil then
         begin
-          jPanel_Free(App.Jni.jEnv, App.Jni.jThis, FjObject);
+          jPanel_Free2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject);
           FjObject:= nil;
         end;
       end;
@@ -5271,53 +5566,55 @@ begin
   inherited Destroy;
 end;
 
-Procedure jPanel.Init(App: jApp);
+Procedure jPanel.Init;
 var
   rToP: TPositionRelativeToParent;
   rToA: TPositionRelativeToAnchorID;
 begin
   if FInitialized  then Exit;
-  inherited Init(App);
+  inherited Init;
 
-  FjObject:= jPanel_Create(App.Jni.jEnv, App.Jni.jThis, App.Jni.jActivity, Self);
+  FjObject:= jPanel_Create2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, Self);
 
-  FjRLayout{View}:= jPanel_getView(App.Jni.jEnv, App.Jni.jThis, FjObject); // Java : Self Layout
+  FjRLayout{View}:= jPanel_getView(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject); // Java : Self Layout
 
   if FParentPanel <> nil then
   begin
-   FParentPanel.Init(App);
+   FParentPanel.Init;
    FjPRLayout:= FParentPanel.View;
   end;
 
-  jPanel_setParent(App.Jni.jEnv, App.Jni.jThis, FjObject, FjPRLayout);
-  jPanel_setId(App.Jni.jEnv, App.Jni.jThis, FjObject, Self.Id);
+  jPanel_setParent(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, FjPRLayout);
+  jPanel_setId(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, Self.Id);
 
-  jPanel_setLeftTopRightBottomWidthHeight(App.Jni.jEnv, App.Jni.jThis, FjObject,
+  jPanel_setLeftTopRightBottomWidthHeight(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject,
                                            FMarginLeft,FMarginTop,FMarginRight,FMarginBottom,
-                                           GetLayoutParams(App, FLParamWidth, sdW),
-                                           GetLayoutParams(App, FLParamHeight, sdH));
+                                           GetLayoutParams(gApp, FLParamWidth, sdW),
+                                           GetLayoutParams(gApp, FLParamHeight, sdH));
   for rToA := raAbove to raAlignRight do
   begin
     if rToA in FPositionRelativeToAnchor then
     begin
-      jPanel_addlParamsAnchorRule(App.Jni.jEnv, App.Jni.jThis, FjObject, GetPositionRelativeToAnchor(rToA));
+      jPanel_addlParamsAnchorRule(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, GetPositionRelativeToAnchor(rToA));
     end;
   end;
   for rToP := rpBottom to rpCenterVertical do
   begin
      if rToP in FPositionRelativeToParent then
      begin
-       jPanel_addlParamsParentRule(App.Jni.jEnv, App.Jni.jThis, FjObject, GetPositionRelativeToParent(rToP));
+       jPanel_addlParamsParentRule(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, GetPositionRelativeToParent(rToP));
      end;
   end;
+
   if Self.Anchor <> nil then Self.AnchorId:= Self.Anchor.Id
   else Self.AnchorId:= -1;
-  jPanel_setLayoutAll(App.Jni.jEnv, App.Jni.jThis, FjObject, Self.AnchorId);
+
+  jPanel_setLayoutAll(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, Self.AnchorId);
 
   if FColor <> colbrDefault then
-     jView_SetBackGroundColor(App.Jni.jEnv, App.Jni.jThis, FjRLayout{!}, GetARGB(FColor));
+     jView_SetBackGroundColor(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjRLayout{!}, GetARGB(FColor));
 
-  jView_SetVisible(App.Jni.jEnv, App.Jni.jThis, FjObject, FVisible);
+  jView_SetVisible(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, FVisible);
 
   FInitialized:= True;
 end;
@@ -5326,69 +5623,63 @@ procedure jPanel.SetParent(Value: jObject);
 begin
   FjPRLayout:= Value;
   if FInitialized then
-    jPanel_setParent(App.Jni.jEnv, App.Jni.jThis, FjObject, FjPRLayout);
+    jPanel_setParent2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, FjPRLayout);
 end;
 
 Procedure jPanel.SetVisible  (Value : Boolean);
 begin
   FVisible:= Value;
   if FInitialized then
-    jView_SetVisible(App.Jni.jEnv, App.Jni.jThis, FjObject, FVisible);
+    jView_SetVisible(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, FVisible);
 end;
 
 Procedure jPanel.SetColor(Value: TARGBColorBridge);
 begin
   FColor:= Value;
   if (FInitialized = True) and (FColor <> colbrDefault) then
-     jView_SetBackGroundColor(App.Jni.jEnv, App.Jni.jThis, FjRLayout{!}, GetARGB(FColor));
+     jView_SetBackGroundColor(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjRLayout{!}, GetARGB(FColor));
 end;
 
 Procedure jPanel.Refresh;
 begin
   if FInitialized then
-     jView_Invalidate(App.Jni.jEnv, App.Jni.jThis, FjObject);
+     jView_Invalidate(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject);
 end;
 
 procedure jPanel.SetParamWidth(Value: TLayoutParams);
 var
   side: TSide;
 begin
-  if FInitialized then
-  begin
-     if jSystem_GetOrientation(App.Jni.jEnv, App.Jni.jThis, App.Jni.jActivity) = App.Orientation  then
-        side:= sdW
-     else
-        side:= sdH;
-     jPanel_setLParamWidth(App.Jni.jEnv, App.Jni.jThis, FjObject, GetLayoutParams(App, FLParamWidth, side));
-  end;
+  if jForm(Owner).Orientation = gApp.Orientation then
+     side:= sdW
+  else
+     side:= sdH;
+  jPanel_setLParamWidth2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, GetLayoutParams(gApp, FLParamWidth, side));
 end;
 
 procedure jPanel.setParamHeight(Value: TLayoutParams);
 var
   side: TSide;
 begin
-  if FInitialized then
-  begin
-    if  jSystem_GetOrientation(App.Jni.jEnv, App.Jni.jThis, App.Jni.jActivity)  = App.Orientation then
-      side:= sdH
-    else
-      side:= sdW;
-    jPanel_setLParamHeight(App.Jni.jEnv, App.Jni.jThis, FjObject, GetLayoutParams(App, FLParamHeight, side));
-  end;
+  if jForm(Owner).Orientation = gApp.Orientation then
+     side:= sdH
+  else
+     side:= sdW;
+  jPanel_setLParamHeight2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, GetLayoutParams(gApp, FLParamHeight, side));
 end;
 
 function jPanel.GetWidth: integer;
 begin
    Result:= 0;
    if FInitialized then
-      Result:= jPanel_getLParamWidth(App.Jni.jEnv, App.Jni.jThis, FjObject)
+      Result:= jPanel_getLParamWidth2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject)
 end;
 
 function jPanel.GetHeight: integer;
 begin
    Result:= 0;
    if FInitialized then
-      Result:= jPanel_getLParamHeight(App.Jni.jEnv, App.Jni.jThis, FjObject);
+      Result:= jPanel_getLParamHeight2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject);
 end;
 
 procedure jPanel.ResetRules;
@@ -5396,16 +5687,16 @@ var
    rToP: TPositionRelativeToParent;
    rToA: TPositionRelativeToAnchorID;
 begin
-   jPanel_resetLParamsRules(App.Jni.jEnv, App.Jni.jThis, FjObject);
+   jPanel_resetLParamsRules2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject);
    for rToP := rpBottom to rpCenterVertical do
    begin
       if rToP in FPositionRelativeToParent then
-        jPanel_addlParamsParentRule(App.Jni.jEnv, App.Jni.jThis, FjObject, GetPositionRelativeToParent(rToP));
+        jPanel_addlParamsParentRule2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, GetPositionRelativeToParent(rToP));
    end;
    for rToA := raAbove to raAlignRight do
    begin
      if rToA in FPositionRelativeToAnchor then
-       jPanel_addlParamsAnchorRule(App.Jni.jEnv, App.Jni.jThis, FjObject, GetPositionRelativeToAnchor(rToA));
+       jPanel_addlParamsAnchorRule2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, GetPositionRelativeToAnchor(rToA));
    end;
 end;
 
@@ -5415,7 +5706,7 @@ begin
   ResetRules;    //TODO optimize here: if "only rules_changed" then --> ResetRules
   SetParamWidth(FLParamWidth);
   setParamHeight(FLParamHeight);
-  jPanel_setLayoutAll(App.Jni.jEnv, App.Jni.jThis, FjObject, Self.AnchorId);
+  jPanel_setLayoutAll2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, Self.AnchorId);
 end;
 
 //--------
@@ -5435,13 +5726,13 @@ Destructor jHorizontalScrollView.Destroy;
 begin
   if not (csDesigning in ComponentState) then
   begin
-    if App <> nil then
+    if jForm(Owner).App <> nil then
     begin
-      if App.Initialized then
+      if jForm(Owner).App.Initialized then
       begin
         if FjObject <> nil then
         begin
-          jHorizontalScrollView_Free(App.Jni.jEnv, App.Jni.jThis, FjObject);
+          jHorizontalScrollView_Free2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject);
           FjObject:= nil;
         end;
       end;
@@ -5450,50 +5741,50 @@ begin
   inherited Destroy;
 end;
 
-Procedure jHorizontalScrollView.Init(App: jApp);
+Procedure jHorizontalScrollView.Init;
 var
   rToP: TPositionRelativeToParent;
   rToA: TPositionRelativeToAnchorID;
 begin
   if FInitialized  then Exit;
-  inherited Init(App);
-  FjObject := jHorizontalScrollView_Create (App.Jni.jEnv, App.Jni.jThis, App.Jni.jActivity, Self);
-  FjRLayout:= jHorizontalScrollView_getView(App.Jni.jEnv, App.Jni.jThis, FjObject); //self layout!
+  inherited Init;                   //fix create
+  FjObject := jHorizontalScrollView_Create2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, Self);
+  FjRLayout:= jHorizontalScrollView_getView(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject); //self layout!
 
   if FParentPanel <> nil then
   begin
-   FParentPanel.Init(App);
+   FParentPanel.Init;
    FjPRLayout:= FParentPanel.View;
   end;
 
-  jHorizontalScrollView_setParent(App.Jni.jEnv, App.Jni.jThis, FjObject, FjPRLayout);
-  jHorizontalScrollView_setId(App.Jni.jEnv, App.Jni.jThis, FjObject, Self.Id);
-  jHorizontalScrollView_setLeftTopRightBottomWidthHeight(App.Jni.jEnv, App.Jni.jThis, FjObject,
+  jHorizontalScrollView_setParent(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, FjPRLayout);
+  jHorizontalScrollView_setId(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, Self.Id);
+  jHorizontalScrollView_setLeftTopRightBottomWidthHeight(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject,
                                            FMarginLeft,FMarginTop,FMarginRight,FMarginBottom,
-                                           GetLayoutParams(App, FLParamWidth, sdW),
-                                           GetLayoutParams(App, FLParamHeight, sdH));
+                                           GetLayoutParams(gApp, FLParamWidth, sdW),
+                                           GetLayoutParams(gApp, FLParamHeight, sdH));
 
   for rToA := raAbove to raAlignRight do
   begin
     if rToA in FPositionRelativeToAnchor then
     begin
-      jHorizontalScrollView_addlParamsAnchorRule(App.Jni.jEnv, App.Jni.jThis, FjObject, GetPositionRelativeToAnchor(rToA));
+      jHorizontalScrollView_addlParamsAnchorRule(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, GetPositionRelativeToAnchor(rToA));
     end;
   end;
   for rToP := rpBottom to rpCenterVertical do
   begin
      if rToP in FPositionRelativeToParent then
      begin
-       jHorizontalScrollView_addlParamsParentRule(App.Jni.jEnv, App.Jni.jThis, FjObject, GetPositionRelativeToParent(rToP));
+       jHorizontalScrollView_addlParamsParentRule(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, GetPositionRelativeToParent(rToP));
      end;
   end;
   if Self.Anchor <> nil then Self.AnchorId:= Self.Anchor.Id
   else Self.AnchorId:= -1;
-  jHorizontalScrollView_setLayoutAll(App.Jni.jEnv, App.Jni.jThis, FjObject, Self.AnchorId);
-  jHorizontalScrollView_setScrollSize(App.Jni.jEnv, App.Jni.jThis,FjObject, FScrollSize);
+  jHorizontalScrollView_setLayoutAll(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, Self.AnchorId);
+  jHorizontalScrollView_setScrollSize(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis,FjObject, FScrollSize);
   if FColor <> colbrDefault then
-     jView_SetBackGroundColor(App.Jni.jEnv, App.Jni.jThis, FjObject, GetARGB(FColor));
-  jView_SetVisible(App.Jni.jEnv, App.Jni.jThis, FjObject, FVisible);
+     jView_SetBackGroundColor(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, GetARGB(FColor));
+  jView_SetVisible(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, FVisible);
   FInitialized:= True;
 end;
 
@@ -5501,62 +5792,56 @@ procedure jHorizontalScrollView.SetParent(Value: jObject);
 begin
   FjPRLayout:= Value;
   if FInitialized then
-    jHorizontalScrollView_setParent(App.Jni.jEnv, App.Jni.jThis, FjObject, FjPRLayout);
+    jHorizontalScrollView_setParent(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, FjPRLayout);
 end;
 
 Procedure jHorizontalScrollView.SetVisible(Value : Boolean);
 begin
   FVisible:= Value;
   if FInitialized then
-     jView_SetVisible(App.Jni.jEnv, App.Jni.jThis, FjObject, FVisible);
+     jView_SetVisible(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, FVisible);
 end;
 
 Procedure jHorizontalScrollView.SetColor(Value: TARGBColorBridge);
 begin
   FColor := Value;
   if (FInitialized = True) and (FColor <> colbrDefault) then
-     jView_SetBackGroundColor(App.Jni.jEnv, App.Jni.jThis, FjObject, GetARGB(FColor));
+     jView_SetBackGroundColor(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, GetARGB(FColor));
 end;
 
 Procedure jHorizontalScrollView.Refresh;
 begin
   if not FInitialized then Exit;
-  jView_Invalidate(App.Jni.jEnv, App.Jni.jThis, FjObject);
+  jView_Invalidate(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject);
 end;
 
 Procedure jHorizontalScrollView.SetScrollSize(Value: integer);
 begin
   FScrollSize := Value;
   if FInitialized then
-     jHorizontalScrollView_setScrollSize(App.Jni.jEnv, App.Jni.jThis,FjObject, FScrollSize);
+     jHorizontalScrollView_setScrollSize2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis,FjObject, FScrollSize);
 end;
 
 procedure jHorizontalScrollView.SetParamWidth(Value: TLayoutParams);
 var
    side: TSide;
 begin
-   if FInitialized then
-   begin
-     if jSystem_GetOrientation(App.Jni.jEnv, App.Jni.jThis, App.Jni.jActivity) = App.Orientation  then
-        side:= sdW
-     else
-        side:= sdH;
-     jHorizontalScrollView_setLParamWidth(App.Jni.jEnv, App.Jni.jThis, FjObject, GetLayoutParams(App, FLParamWidth, side));
-   end;
+  if jForm(Owner).Orientation = gApp.Orientation then
+     side:= sdW
+  else
+     side:= sdH;
+  jHorizontalScrollView_setLParamWidth2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, GetLayoutParams(gApp, FLParamWidth, side));
 end;
 
 procedure jHorizontalScrollView.setParamHeight(Value: TLayoutParams);
 var
    side: TSide;
 begin
-  if not FInitialized then  Exit;
-
-  if  jSystem_GetOrientation(App.Jni.jEnv, App.Jni.jThis, App.Jni.jActivity)  = App.Orientation then
-    side:= sdH
+  if jForm(Owner).Orientation = gApp.Orientation then
+     side:= sdH
   else
-    side:= sdW;
-
-  jHorizontalScrollView_setLParamHeight(App.Jni.jEnv, App.Jni.jThis, FjObject, GetLayoutParams(App, FLParamHeight, side));
+     side:= sdW;
+  jHorizontalScrollView_setLParamHeight2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, GetLayoutParams(gApp, FLParamHeight, side));
 end;
 
 procedure jHorizontalScrollView.UpdateLayout;
@@ -5564,7 +5849,7 @@ begin
    inherited UpdateLayout;
    SetParamWidth(FLParamWidth);
    setParamHeight(FLParamHeight);
-   jHorizontalScrollView_setLayoutAll(App.Jni.jEnv, App.Jni.jThis, FjObject, Self.AnchorId);
+   jHorizontalScrollView_setLayoutAll2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, Self.AnchorId);
 end;
 
 //------------------------------------------------------------------------------
@@ -5580,13 +5865,13 @@ Destructor jViewFlipper.Destroy;
 begin
   if not (csDesigning in ComponentState) then
   begin
-    if App <> nil then
+    if jForm(Owner).App <> nil then
     begin
-      if App.Initialized then
+      if jForm(Owner).App.Initialized then
       begin
         if FjObject <> nil then
         begin
-          jViewFlipper_Free(App.Jni.jEnv, App.Jni.jThis, FjObject);
+          jViewFlipper_Free2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject);
           FjObject:= nil;
         end;
       end;
@@ -5595,48 +5880,48 @@ begin
   inherited Destroy;
 end;
 
-Procedure jViewFlipper.Init(App: jApp);
+Procedure jViewFlipper.Init;
 var
   rToP: TPositionRelativeToParent;
   rToA: TPositionRelativeToAnchorID;
 begin
   if FInitialized  then Exit;
-  inherited Init(App);
-  FjObject := jViewFlipper_Create(App.Jni.jEnv, App.Jni.jThis, App.Jni.jActivity, Self);
+  inherited Init;
+  FjObject := jViewFlipper_Create2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, Self);
 
   if FParentPanel <> nil then
   begin
-   FParentPanel.Init(App);
+   FParentPanel.Init;
    FjPRLayout:= FParentPanel.View;
   end;
 
-  jViewFlipper_setParent(App.Jni.jEnv, App.Jni.jThis, FjObject, FjPRLayout);
-  jViewFlipper_setId(App.Jni.jEnv, App.Jni.jThis, FjObject, Self.Id);
-  jViewFlipper_setLeftTopRightBottomWidthHeight(App.Jni.jEnv, App.Jni.jThis, FjObject,
+  jViewFlipper_setParent(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, FjPRLayout);
+  jViewFlipper_setId(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, Self.Id);
+  jViewFlipper_setLeftTopRightBottomWidthHeight(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject,
                                            FMarginLeft,FMarginTop,FMarginRight,FMarginBottom,
-                                           GetLayoutParams(App, FLParamWidth, sdW),
-                                           GetLayoutParams(App, FLParamHeight, sdH));
+                                           GetLayoutParams(gApp, FLParamWidth, sdW),
+                                           GetLayoutParams(gApp, FLParamHeight, sdH));
 
   for rToA := raAbove to raAlignRight do
   begin
     if rToA in FPositionRelativeToAnchor then
     begin
-      jViewFlipper_addlParamsAnchorRule(App.Jni.jEnv, App.Jni.jThis, FjObject, GetPositionRelativeToAnchor(rToA));
+      jViewFlipper_addlParamsAnchorRule(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, GetPositionRelativeToAnchor(rToA));
     end;
   end;
   for rToP := rpBottom to rpCenterVertical do
   begin
      if rToP in FPositionRelativeToParent then
      begin
-       jViewFlipper_addlParamsParentRule(App.Jni.jEnv, App.Jni.jThis, FjObject, GetPositionRelativeToParent(rToP));
+       jViewFlipper_addlParamsParentRule(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, GetPositionRelativeToParent(rToP));
      end;
   end;
   if Self.Anchor <> nil then Self.AnchorId:= Self.Anchor.Id
   else Self.AnchorId:= -1;
-  jViewFlipper_setLayoutAll(App.Jni.jEnv, App.Jni.jThis, FjObject, Self.AnchorId);
+  jViewFlipper_setLayoutAll(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, Self.AnchorId);
   if FColor <> colbrDefault then
-    jView_SetBackGroundColor(App.Jni.jEnv, App.Jni.jThis, FjObject, GetARGB(FColor));
-  jView_SetVisible(App.Jni.jEnv, App.Jni.jThis, FjObject, FVisible);
+    jView_SetBackGroundColor(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, GetARGB(FColor));
+  jView_SetVisible(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, FVisible);
   FInitialized:= True;
 end;
 
@@ -5644,55 +5929,49 @@ procedure jViewFlipper.SetParent(Value: jObject);
 begin
   FjPRLayout:= Value;
   if FInitialized then
-    jViewFlipper_setParent(App.Jni.jEnv, App.Jni.jThis, FjObject, FjPRLayout);
+    jViewFlipper_setParent2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, FjPRLayout);
 end;
 
 Procedure jViewFlipper.SetVisible  (Value : Boolean);
 begin
   FVisible := Value;
   if FInitialized then
-    jView_SetVisible(App.Jni.jEnv, App.Jni.jThis, FjObject, FVisible);
+    jView_SetVisible(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, FVisible);
 end;
 
 Procedure jViewFlipper.SetColor(Value: TARGBColorBridge);
 begin
   FColor:= Value;
   if (FInitialized = True) and (FColor <> colbrDefault) then
-     jView_SetBackGroundColor(App.Jni.jEnv, App.Jni.jThis, FjObject, GetARGB(FColor));
+     jView_SetBackGroundColor(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, GetARGB(FColor));
 end;
 
 Procedure jViewFlipper.Refresh;
 begin
   if not FInitialized then Exit;
-  jView_Invalidate(App.Jni.jEnv, App.Jni.jThis, FjObject);
+  jView_Invalidate(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject);
 end;
 
 procedure jViewFlipper.SetParamWidth(Value: TLayoutParams);
 var
    side: TSide;
 begin
-   if FInitialized then
-   begin
-     if jSystem_GetOrientation(App.Jni.jEnv, App.Jni.jThis, App.Jni.jActivity) = App.Orientation  then
-        side:= sdW
-     else
-        side:= sdH;
-     jViewFlipper_setLParamWidth(App.Jni.jEnv, App.Jni.jThis, FjObject, GetLayoutParams(App, FLParamWidth, side));
-   end;
+  if jForm(Owner).Orientation = gApp.Orientation then
+     side:= sdW
+  else
+     side:= sdH;
+  jViewFlipper_setLParamWidth2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, GetLayoutParams(gApp, FLParamWidth, side));
 end;
 
 procedure jViewFlipper.setParamHeight(Value: TLayoutParams);
 var
    side: TSide;
 begin
-  if not FInitialized then  Exit;
-
-  if  jSystem_GetOrientation(App.Jni.jEnv, App.Jni.jThis, App.Jni.jActivity)  = App.Orientation then
-    side:= sdH
+  if jForm(Owner).Orientation = gApp.Orientation then
+     side:= sdH
   else
-    side:= sdW;
-
-  jViewFlipper_setLParamHeight(App.Jni.jEnv, App.Jni.jThis, FjObject, GetLayoutParams(App, FLParamHeight, side));
+     side:= sdW;
+  jViewFlipper_setLParamHeight2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, GetLayoutParams(gApp, FLParamHeight, side));
 end;
 
 procedure jViewFlipper.UpdateLayout;
@@ -5700,7 +5979,7 @@ begin
    inherited UpdateLayout;
    SetParamWidth(FLParamWidth);
    setParamHeight(FLParamHeight);
-   jViewFlipper_setLayoutAll(App.Jni.jEnv, App.Jni.jThis, FjObject, Self.AnchorId);
+   jViewFlipper_setLayoutAll2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, Self.AnchorId);
 end;
 
 //------------------------------------------------------------------------------
@@ -5718,13 +5997,13 @@ destructor jWebView.Destroy;
 begin
   if not (csDesigning in ComponentState) then
   begin
-    if App <> nil then
+    if jForm(Owner).App <> nil then
     begin
-      if App.Initialized then
+      if jForm(Owner).App.Initialized then
       begin
         if FjObject <> nil then
         begin
-          jWebView_Free(App.Jni.jEnv, App.Jni.jThis, FjObject);
+          jWebView_Free2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject);
           FjObject:= nil;
         end;
       end;
@@ -5733,49 +6012,49 @@ begin
   inherited Destroy;
 end;
 
-procedure jWebView.Init(App: jApp);
+procedure jWebView.Init;
 var
   rToP: TPositionRelativeToParent;
   rToA: TPositionRelativeToAnchorID;
 begin
   if FInitialized  then Exit;
-  inherited Init(App);
-  FjObject:= jWebView_Create(App.Jni.jEnv, App.Jni.jThis, App.Jni.jActivity, Self);
+  inherited Init;
+  FjObject:= jWebView_Create2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, Self);
 
   if FParentPanel <> nil then
   begin
-   FParentPanel.Init(App);
+   FParentPanel.Init;
    FjPRLayout:= FParentPanel.View;
   end;
 
-  jWebView_setParent(App.Jni.jEnv, App.Jni.jThis, FjObject, FjPRLayout);
-  jWebView_setId(App.Jni.jEnv, App.Jni.jThis, FjObject, Self.Id);
-  jWebView_setLeftTopRightBottomWidthHeight(App.Jni.jEnv, App.Jni.jThis, FjObject,
+  jWebView_setParent(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, FjPRLayout);
+  jWebView_setId(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, Self.Id);
+  jWebView_setLeftTopRightBottomWidthHeight(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject,
                                            FMarginLeft,FMarginTop,FMarginRight,FMarginBottom,
-                                           GetLayoutParams(App, FLParamWidth, sdW),
-                                           GetLayoutParams(App, FLParamHeight, sdH));
+                                           GetLayoutParams(gApp, FLParamWidth, sdW),
+                                           GetLayoutParams(gApp, FLParamHeight, sdH));
 
   for rToA := raAbove to raAlignRight do
   begin
     if rToA in FPositionRelativeToAnchor then
     begin
-      jWebView_addlParamsAnchorRule(App.Jni.jEnv, App.Jni.jThis, FjObject, GetPositionRelativeToAnchor(rToA));
+      jWebView_addlParamsAnchorRule(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, GetPositionRelativeToAnchor(rToA));
     end;
   end;
   for rToP := rpBottom to rpCenterVertical do
   begin
      if rToP in FPositionRelativeToParent then
      begin
-       jWebView_addlParamsParentRule(App.Jni.jEnv, App.Jni.jThis, FjObject, GetPositionRelativeToParent(rToP));
+       jWebView_addlParamsParentRule(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, GetPositionRelativeToParent(rToP));
      end;
   end;
   if Self.Anchor <> nil then Self.AnchorId:= Self.Anchor.Id
   else Self.AnchorId:= -1;
-  jWebView_setLayoutAll(App.Jni.jEnv, App.Jni.jThis, FjObject, Self.AnchorId);
-  jWebView_SetJavaScript(App.Jni.jEnv, App.Jni.jThis, FjObject, FJavaScript);
+  jWebView_setLayoutAll(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, Self.AnchorId);
+  jWebView_SetJavaScript(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, FJavaScript);
   if FColor <> colbrDefault then
-    jView_SetBackGroundColor(App.Jni.jEnv, App.Jni.jThis, FjObject, GetARGB(FColor));
-  jView_SetVisible(App.Jni.jEnv, App.Jni.jThis, FjObject, FVisible);
+    jView_SetBackGroundColor(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, GetARGB(FColor));
+  jView_SetVisible(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, FVisible);
   FInitialized:= True;
 end;
 
@@ -5783,68 +6062,62 @@ procedure jWebView.SetParent(Value: jObject);
 begin
   FjPRLayout:= Value;
   if FInitialized then
-    jWebView_setParent(App.Jni.jEnv, App.Jni.jThis, FjObject, FjPRLayout);
+    jWebView_setParent2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, FjPRLayout);
 end;
 
 Procedure jWebView.SetVisible  (Value : Boolean);
 begin
   FVisible := Value;
   if FInitialized then
-    jView_SetVisible(App.Jni.jEnv, App.Jni.jThis, FjObject, FVisible);
+    jView_SetVisible(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, FVisible);
 end;
 
 Procedure jWebView.SetColor(Value: TARGBColorBridge);
 begin
   FColor := Value;
   if (FInitialized = True) and (FColor <> colbrDefault) then
-     jView_SetBackGroundColor(App.Jni.jEnv, App.Jni.jThis, FjObject, GetARGB(FColor));
+     jView_SetBackGroundColor(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, GetARGB(FColor));
 end;
 
 Procedure jWebView.Refresh;
  begin
   if not FInitialized then Exit;
-  jView_Invalidate(App.Jni.jEnv, App.Jni.jThis, FjObject);
+  jView_Invalidate(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject);
  end;
 
 Procedure jWebView.SetJavaScript(Value : Boolean);
 begin
   FJavaScript:= Value;
   if FInitialized then
-     jWebView_SetJavaScript(App.Jni.jEnv, App.Jni.jThis, FjObject, FJavaScript);
+     jWebView_SetJavaScript2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, FJavaScript);
 end;
 
 Procedure jWebView.Navigate(url: string);
 begin
   if not FInitialized then Exit;
-  jWebView_loadURL(App.Jni.jEnv, App.Jni.jThis, FjObject, url);
+  jWebView_loadURL2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, url);
 end;
 
 procedure jWebView.SetParamWidth(Value: TLayoutParams);
 var
    side: TSide;
 begin
-   if FInitialized then
-   begin
-     if jSystem_GetOrientation(App.Jni.jEnv, App.Jni.jThis, App.Jni.jActivity) = App.Orientation  then
-        side:= sdW
-     else
-        side:= sdH;
-     jWebView_setLParamWidth(App.Jni.jEnv, App.Jni.jThis, FjObject, GetLayoutParams(App, FLParamWidth, side));
-   end;
+  if jForm(Owner).Orientation = gApp.Orientation then
+     side:= sdW
+  else
+     side:= sdH;
+  jWebView_setLParamWidth2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, GetLayoutParams(gApp, FLParamWidth, side));
 end;
 
 procedure jWebView.setParamHeight(Value: TLayoutParams);
 var
    side: TSide;
 begin
-  if not FInitialized then  Exit;
-
-  if  jSystem_GetOrientation(App.Jni.jEnv, App.Jni.jThis, App.Jni.jActivity)  = App.Orientation then
-    side:= sdH
+  if jForm(Owner).Orientation = gApp.Orientation then
+     side:= sdH
   else
-    side:= sdW;
-
-  jWebView_setLParamHeight(App.Jni.jEnv, App.Jni.jThis, FjObject, GetLayoutParams(App, FLParamHeight, side));
+     side:= sdW;
+  jWebView_setLParamHeight2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, GetLayoutParams(gApp, FLParamHeight, side));
 end;
 
 procedure jWebView.UpdateLayout;
@@ -5852,7 +6125,7 @@ begin
    inherited UpdateLayout;
    SetParamWidth(FLParamWidth);
    setParamHeight(FLParamHeight);
-   jWebView_setLayoutAll(App.Jni.jEnv, App.Jni.jThis, FjObject, Self.AnchorId);
+   jWebView_setLayoutAll2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, Self.AnchorId);
 end;
 
 //------------------------------------------------------------------------------
@@ -5867,7 +6140,7 @@ begin
   FHeight   := 0;
   FImageName:='';
   FImageIndex:= -1;
-    { TFilePath = (pathApp, pathData, pathExt, pathDCIM); }
+    { TFilePath = (pathjForm(Owner).App, pathData, pathExt, pathDCIM); }
   FFilePath:= fpathData;
   //
   FjObject  := nil;
@@ -5877,13 +6150,13 @@ Destructor jBitmap.Destroy;
  begin
   if not (csDesigning in ComponentState) then
   begin
-    if App <> nil then
+    if jForm(Owner).App <> nil then
     begin
-      if App.Initialized then
+      if jForm(Owner).App.Initialized then
       begin
         if FjObject <> nil then
         begin
-          jBitmap_Free(App.Jni.jEnv, App.Jni.jThis, FjObject);
+          jBitmap_Free2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject);
           FjObject:= nil;
         end;
       end;
@@ -5892,15 +6165,15 @@ Destructor jBitmap.Destroy;
   inherited Destroy;
 end;
 
-Procedure jBitmap.Init(App: jApp);
+Procedure jBitmap.Init;
 begin
   if FInitialized  then Exit;
-  inherited Init(App);
-  FjObject := jBitmap_Create(App.Jni.jEnv, App.Jni.jThis, Self);
+  inherited Init;
+  FjObject := jBitmap_Create(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, Self);
   FInitialized:= True;  //neded here....
   if FImageList <> nil then
   begin
-    FImageList.Init(App);
+    FImageList.Init;
     if FImageList.Images.Count > 0 then
     begin
        if FImageIndex >=0 then SetImageByIndex(FImageIndex);
@@ -5924,16 +6197,16 @@ begin
      begin
        path:='';
 
-       if TryPath(App.Path.App,fileName) then begin path:= App.Path.App; FFilePath:= fpathApp end
-       else if TryPath(App.Path.Dat,fileName) then begin path:= App.Path.Dat; FFilePath:= fpathData  end
-       else if TryPath(App.Path.DCIM,fileName) then begin path:= App.Path.DCIM; FFilePath:= fpathDCIM end
-       else if TryPath(App.Path.Ext,fileName) then begin path:= App.Path.Ext; FFilePath:= fpathExt end;
+       if TryPath(jForm(Owner).App.Path.Dat,fileName) then begin path:= jForm(Owner).App.Path.Dat; FFilePath:= fpathApp end
+       else if TryPath(jForm(Owner).App.Path.Dat,fileName) then begin path:= jForm(Owner).App.Path.Dat; FFilePath:= fpathData  end
+       else if TryPath(jForm(Owner).App.Path.DCIM,fileName) then begin path:= jForm(Owner).App.Path.DCIM; FFilePath:= fpathDCIM end
+       else if TryPath(jForm(Owner).App.Path.Ext,fileName) then begin path:= jForm(Owner).App.Path.Ext; FFilePath:= fpathExt end;
 
        if path <> '' then FImageName:= ExtractFileName(fileName)
        else  FImageName:= fileName;
 
-       jBitmap_loadFile(App.Jni.jEnv, App.Jni.jThis, FjObject, GetFilePath(FFilePath)+'/'+FImageName);
-       jBitmap_getWH(App.Jni.jEnv, App.Jni.jThis, FjObject,integer(FWidth),integer(FHeight));
+       jBitmap_loadFile(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, GetFilePath(FFilePath)+'/'+FImageName);
+       jBitmap_getWH(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject,integer(FWidth),integer(FHeight));
      end;
   end;
 end;
@@ -5946,14 +6219,14 @@ begin
   begin
     FWidth  := w;
     FHeight := h;
-    jBitmap_createBitmap(App.Jni.jEnv, App.Jni.jThis, FjObject, FWidth, FHeight);
+    jBitmap_createBitmap2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, FWidth, FHeight);
   end;
 end;
 
 Function jBitmap.GetJavaBitmap: jObject;
 begin
   if FInitialized then
-     Result:= jBitmap_getJavaBitmap(App.Jni.jEnv,App.Jni.jThis, FjObject);
+     Result:= jBitmap_getJavaBitmap2(jForm(Owner).App.Jni.jEnv,jForm(Owner).App.Jni.jThis, FjObject);
 end;
 
 procedure jBitmap.Notification(AComponent: TComponent; Operation: TOperation);
@@ -5992,8 +6265,8 @@ begin
       FImageName:= Trim(FImageList.Images.Strings[Value]);
       if  (FImageName <> '') then
       begin
-        jBitmap_loadFile(App.Jni.jEnv, App.Jni.jThis, FjObject, GetFilePath(FFilePath){App.Path.Dat}+'/'+FImageName);
-        jBitmap_getWH(App.Jni.jEnv, App.Jni.jThis, FjObject, integer(FWidth),integer(FHeight));
+        jBitmap_loadFile2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, GetFilePath(FFilePath){jForm(Owner).App.Path.Dat}+'/'+FImageName);
+        jBitmap_getWH2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, integer(FWidth),integer(FHeight));
       end;
    end;
 end;
@@ -6020,8 +6293,8 @@ begin
    begin
      FImageIndex:= foundIndex;
      FImageName:= Trim(FImageList.Images.Strings[foundIndex]);
-     jBitmap_loadFile(App.Jni.jEnv, App.Jni.jThis, FjObject, GetFilePath(FFilePath){App.Path.Dat}+'/'+FImageName);
-     jBitmap_getWH(App.Jni.jEnv, App.Jni.jThis, FjObject,integer(FWidth),integer(FHeight));
+     jBitmap_loadFile2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, GetFilePath(FFilePath){jForm(Owner).App.Path.Dat}+'/'+FImageName);
+     jBitmap_getWH2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject,integer(FWidth),integer(FHeight));
    end;
 end;
 
@@ -6034,25 +6307,25 @@ end;
 procedure jBitmap.LockPixels(var PScanDWord : PScanLine);
 begin
   if FInitialized then
-    AndroidBitmap_lockPixels(App.Jni.jEnv, Self.GetJavaBitmap, @PScanDWord);
+    AndroidBitmap_lockPixels(jForm(Owner).App.Jni.jEnv, Self.GetJavaBitmap, @PScanDWord);
 end;
 
 procedure jBitmap.LockPixels(var PScanJByte : PScanByte{PJByte});
 begin
   if FInitialized then
-    AndroidBitmap_lockPixels(App.Jni.jEnv, Self.GetJavaBitmap, @PScanJByte);
+    AndroidBitmap_lockPixels(jForm(Owner).App.Jni.jEnv, Self.GetJavaBitmap, @PScanJByte);
 end;
 
 procedure jBitmap.LockPixels(var PSJByte: PJByte); overload;
 begin
   if FInitialized then
-    AndroidBitmap_lockPixels(App.Jni.jEnv, Self.GetJavaBitmap, @PSJByte);
+    AndroidBitmap_lockPixels(jForm(Owner).App.Jni.jEnv, Self.GetJavaBitmap, @PSJByte);
 end;
 
 procedure jBitmap.UnlockPixels;
 begin
   if FInitialized then
-     AndroidBitmap_unlockPixels(App.Jni.jEnv, Self.GetJavaBitmap);
+     AndroidBitmap_unlockPixels(jForm(Owner).App.Jni.jEnv, Self.GetJavaBitmap);
 end;
 
 function jBitmap.GetInfo: boolean;
@@ -6062,7 +6335,7 @@ begin
   Result:= False;
   if FInitialized then
   begin
-    rtn:= AndroidBitmap_getInfo(App.Jni.jEnv,Self.GetJavaBitmap,@Self.FBitmapInfo);
+    rtn:= AndroidBitmap_getInfo(jForm(Owner).App.Jni.jEnv,Self.GetJavaBitmap,@Self.FBitmapInfo);
     case rtn = 0 of
       True  :begin
                  Result:= True;
@@ -6081,86 +6354,98 @@ end;
 // jCanvas
 //------------------------------------------------------------------------------
 
-constructor jCanvas.Create;
+constructor jCanvas.Create(AOwner: TComponent);
 begin
-  //Init
-  FApp     := nil;
+  inherited Create(AOwner);
   FjObject := nil;
+  FPaintStrokeWidth:= 3;
+  FPaintStyle:= psFillAndStroke;
+  FPaintTextSize:= 20;
+  FPaintColor:= colbrBlue;
   FInitialized:= False;
 end;
 
 destructor jCanvas.Destroy;
 begin
-  if App <> nil then
+  if not (csDesigning in ComponentState) then
   begin
-    if App.Initialized then
+    if jForm(Owner).App <> nil then
     begin
-      if FjObject <> nil then
+      if jForm(Owner).App.Initialized then
       begin
-        jCanvas_Free(App.Jni.jEnv, App.Jni.jThis, FjObject);
-        FjObject:= nil;
+        if FjObject <> nil then
+        begin
+          jCanvas_Free2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject);
+          FjObject:= nil;
+        end;
       end;
     end;
   end;
   inherited Destroy;
 end;
 
-Procedure jCanvas.Init(App: jApp);
+Procedure jCanvas.Init;
 begin
   if FInitialized  then Exit;
-  if App = nil then Exit;
-  if not App.Initialized then Exit;
-  FApp:= App;
-  FjObject:= jCanvas_Create(App.Jni.jEnv, App.Jni.jThis, Self);
+  inherited Init;
+  FjObject:= jCanvas_Create(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, Self);
+  jCanvas_setStrokeWidth2(jForm(Owner).App.Jni.jEnv,jForm(Owner).App.Jni.jThis,FjObject,FPaintStrokeWidth);
+  jCanvas_setStyle2(jForm(Owner).App.Jni.jEnv,jForm(Owner).App.Jni.jThis,FjObject,ord(FPaintStyle));
+  jCanvas_setColor2(jForm(Owner).App.Jni.jEnv,jForm(Owner).App.Jni.jThis,FjObject,GetARGB(FPaintColor));
+  jCanvas_setTextSize2(jForm(Owner).App.Jni.jEnv,jForm(Owner).App.Jni.jThis,FjObject,FPaintTextSize);
   FInitialized:= True;
 end;
 
-Procedure jCanvas.SetStrokeWidth(width : single );
+Procedure jCanvas.SetStrokeWidth(Value : single );
 begin
+  FPaintStrokeWidth:= Value;
   if FInitialized then
-     jCanvas_setStrokeWidth(App.Jni.jEnv,App.Jni.jThis,FjObject,width);
+     jCanvas_setStrokeWidth2(jForm(Owner).App.Jni.jEnv,jForm(Owner).App.Jni.jThis,FjObject,FPaintStrokeWidth);
 end;
 
-Procedure jCanvas.SetStyle(style : integer);
+Procedure jCanvas.SetStyle(Value : TPaintStyle{integer});
 begin
+  FPaintStyle:= Value;
   if FInitialized then
-     jCanvas_setStyle(App.Jni.jEnv,App.Jni.jThis,FjObject,style);
+     jCanvas_setStyle2(jForm(Owner).App.Jni.jEnv,jForm(Owner).App.Jni.jThis,FjObject,Ord(FPaintStyle));
 end;
 
-Procedure jCanvas.SetColor(color : TARGBColorBridge);
+Procedure jCanvas.SetColor(Value : TARGBColorBridge);
 begin
+  FPaintColor:= Value;
   if FInitialized then
-     jCanvas_setColor(App.Jni.jEnv,App.Jni.jThis,FjObject,GetARGB(color));
+     jCanvas_setColor2(jForm(Owner).App.Jni.jEnv,jForm(Owner).App.Jni.jThis,FjObject,GetARGB(FPaintColor));
 end;
 
-Procedure jCanvas.SetTextSize(textsize: single);
+Procedure jCanvas.SetTextSize(Value: single);
 begin
+  FPaintTextSize:= Value;
   if FInitialized then
-     jCanvas_setTextSize(App.Jni.jEnv,App.Jni.jThis,FjObject,textsize);
+     jCanvas_setTextSize2(jForm(Owner).App.Jni.jEnv,jForm(Owner).App.Jni.jThis,FjObject,FPaintTextSize);
 end;
 
 Procedure jCanvas.DrawLine(x1,y1,x2,y2 : single);
 begin
   if FInitialized then
-     jCanvas_drawLine(App.Jni.jEnv,App.Jni.jThis,FjObject,x1,y1,x2,y2);
+     jCanvas_drawLine2(jForm(Owner).App.Jni.jEnv,jForm(Owner).App.Jni.jThis,FjObject,x1,y1,x2,y2);
 end;
 
 Procedure jCanvas.DrawPoint(x1,y1 : single);
 begin
   if FInitialized then
-     jCanvas_drawPoint(App.Jni.jEnv,App.Jni.jThis,FjObject,x1,y1);
+     jCanvas_drawPoint2(jForm(Owner).App.Jni.jEnv,jForm(Owner).App.Jni.jThis,FjObject,x1,y1);
 end;
 
-Procedure jCanvas.drawText(Text:string; x,y: single);
+Procedure jCanvas.drawText(Text: string; x,y: single);
 begin
   if FInitialized then
-     jCanvas_drawText(App.Jni.jEnv,App.Jni.jThis,FjObject,text,x,y);
+     jCanvas_drawText2(jForm(Owner).App.Jni.jEnv,jForm(Owner).App.Jni.jThis,FjObject,text,x,y);
 end;
 
 Procedure jCanvas.drawBitmap(bmp: jBitmap; b,l,r,t: integer);
 begin
   if FInitialized then
-     jCanvas_drawBitmap(App.Jni.jEnv,App.Jni.jThis,FjObject,bmp.GetjavaBitmap, b, l, r, t);
+     jCanvas_drawBitmap2(jForm(Owner).App.Jni.jEnv,jForm(Owner).App.Jni.jThis,FjObject,bmp.GetjavaBitmap, b, l, r, t);
 end;
 
 //------------------------------------------------------------------------------
@@ -6175,73 +6460,74 @@ begin
   FMouches.Mouch.Zoom   := 1.0;
   FMouches.Mouch.Angle  := 0.0;
   FFilePath:=  fpathData;
-  FjCanvas := jCanvas.Create; // jCanvas
+  //FjCanvas := jCanvas.Create; // jCanvas
 end;
 
 Destructor jView.Destroy;
 begin
   if not (csDesigning in ComponentState) then
   begin
-    if App <> nil then
+    if jForm(Owner).App <> nil then
     begin
-      if App.Initialized then
+      if jForm(Owner).App.Initialized then
       begin
         if FjObject <> nil then
         begin
-          jView_Free(App.Jni.jEnv, App.Jni.jThis, FjObject);
+          jView_Free2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject);
           FjObject:= nil;
         end;
       end;
     end;
   end;
-  FjCanvas.Free;
   inherited Destroy;
 end;
 
-procedure jView.Init(App: jApp);
+procedure jView.Init;
 var
   rToP: TPositionRelativeToParent;
   rToA: TPositionRelativeToAnchorID;
 begin
   if FInitialized  then Exit;
-  inherited Init(App);
-  FjCanvas.Init(App);
-  FjObject := jView_Create(App.Jni.jEnv, App.Jni.jThis, App.Jni.jActivity, Self);
-  jView_setjCanvas(App.Jni.jEnv, App.Jni.jThis, Self.FjObject, FjCanvas.JavaObj);
+  inherited Init;
+
+  FjObject := jView_Create2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, Self);
+
+  FjCanvas.Init;
+  jView_setjCanvas(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, Self.FjObject, FjCanvas.JavaObj);
 
   if FParentPanel <> nil then
   begin
-   FParentPanel.Init(App);
+   FParentPanel.Init;
    FjPRLayout:= FParentPanel.View;
   end;
 
-  jView_setParent(App.Jni.jEnv, App.Jni.jThis,FjObject, FjPRLayout);
-  jView_setId(App.Jni.jEnv, App.Jni.jThis, FjObject, Self.Id);
-  jView_setLeftTopRightBottomWidthHeight(App.Jni.jEnv, App.Jni.jThis, FjObject,
+  jView_setParent(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis,FjObject, FjPRLayout);
+  jView_setId(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, Self.Id);
+  jView_setLeftTopRightBottomWidthHeight(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject,
                                            FMarginLeft,FMarginTop,FMarginRight,FMarginBottom,
-                                           GetLayoutParams(App, FLParamWidth, sdW),
-                                           GetLayoutParams(App, FLParamHeight, sdH));
+                                           GetLayoutParams(gApp, FLParamWidth, sdW),
+                                           GetLayoutParams(gApp, FLParamHeight, sdH));
 
   for rToA := raAbove to raAlignRight do
   begin
     if rToA in FPositionRelativeToAnchor then
     begin
-      jView_addlParamsAnchorRule(App.Jni.jEnv, App.Jni.jThis, FjObject, GetPositionRelativeToAnchor(rToA));
+      jView_addlParamsAnchorRule(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, GetPositionRelativeToAnchor(rToA));
     end;
   end;
   for rToP := rpBottom to rpCenterVertical do
   begin
      if rToP in FPositionRelativeToParent then
      begin
-       jView_addlParamsParentRule(App.Jni.jEnv, App.Jni.jThis, FjObject, GetPositionRelativeToParent(rToP));
+       jView_addlParamsParentRule(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, GetPositionRelativeToParent(rToP));
      end;
   end;
   if Self.Anchor <> nil then Self.AnchorId:= Self.Anchor.Id
   else Self.AnchorId:= -1;
-  jView_setLayoutAll(App.Jni.jEnv, App.Jni.jThis, FjObject, Self.AnchorId);
+  jView_setLayoutAll(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, Self.AnchorId);
   if FColor <> colbrDefault then
-     jView_SetBackGroundColor(App.Jni.jEnv, App.Jni.jThis, FjObject, GetARGB(FColor));
-  jView_SetVisible(App.Jni.jEnv, App.Jni.jThis, FjObject, FVisible);
+     jView_SetBackGroundColor(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, GetARGB(FColor));
+  jView_SetVisible(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, FVisible);
   FInitialized:= True;
 end;
 
@@ -6249,21 +6535,21 @@ procedure jView.SetParent(Value: jObject);
 begin
   FjPRLayout:= Value;
   if FInitialized then
-    jView_setParent(App.Jni.jEnv, App.Jni.jThis,FjObject, FjPRLayout);
+    jView_setParent(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis,FjObject, FjPRLayout);
 end;
 
 Procedure jView.SetVisible  (Value : Boolean);
 begin
   FVisible := Value;
   if FInitialized then
-    jView_SetVisible(App.Jni.jEnv, App.Jni.jThis, FjObject, FVisible);
+    jView_SetVisible(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, FVisible);
 end;
 
 Procedure jView.SetColor(Value: TARGBColorBridge);
 begin
   FColor:= Value;
   if (FInitialized = True) and (FColor <> colbrDefault) then
-     jView_SetBackGroundColor(App.Jni.jEnv, App.Jni.jThis, FjObject, GetARGB(FColor));
+     jView_SetBackGroundColor(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, GetARGB(FColor));
 end;
 
 // LORDMAN 2013-08-14
@@ -6277,7 +6563,7 @@ begin
   begin
      if str <> 'null' then
      begin
-        jView_viewSave(App.Jni.jEnv, App.Jni.jThis, FjObject, GetFilePath(FFilePath){App.Path.Dat}+'/'+str);
+        jView_viewSave2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, GetFilePath(FFilePath)+'/'+str);
      end;
   end;
 end;
@@ -6285,7 +6571,7 @@ end;
 Procedure jView.Refresh;
 begin
   if FInitialized then
-     jView_Invalidate(App.Jni.jEnv, App.Jni.jThis, FjObject);
+     jView_Invalidate(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject);
 end;
 
 // Event : Java Event -> Pascal
@@ -6308,28 +6594,22 @@ procedure jView.SetParamWidth(Value: TLayoutParams);
 var
    side: TSide;
 begin
-   if FInitialized then
-   begin
-     if jSystem_GetOrientation(App.Jni.jEnv, App.Jni.jThis, App.Jni.jActivity) = App.Orientation  then
-        side:= sdW
-     else
-        side:= sdH;
-     jView_setLParamWidth(App.Jni.jEnv, App.Jni.jThis, FjObject, GetLayoutParams(App, FLParamWidth, side));
-   end;
+  if jForm(Owner).Orientation = gApp.Orientation then
+     side:= sdW
+  else
+     side:= sdH;
+  jView_setLParamWidth2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, GetLayoutParams(gApp, FLParamWidth, side));
 end;
 
 procedure jView.setParamHeight(Value: TLayoutParams);
 var
    side: TSide;
 begin
-  if FInitialized then
-  begin
-    if  jSystem_GetOrientation(App.Jni.jEnv, App.Jni.jThis, App.Jni.jActivity)  = App.Orientation then
-      side:= sdH
-    else
-      side:= sdW;
-    jView_setLParamHeight(App.Jni.jEnv, App.Jni.jThis, FjObject, GetLayoutParams(App, FLParamHeight, side));
-  end;
+  if jForm(Owner).Orientation = gApp.Orientation then
+     side:= sdH
+  else
+     side:= sdW;
+    jView_setLParamHeight2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, GetLayoutParams(gApp, FLParamHeight, side));
 end;
 
 procedure jView.UpdateLayout;
@@ -6337,21 +6617,49 @@ begin
    inherited UpdateLayout;
    SetParamWidth(FLParamWidth);
    setParamHeight(FLParamHeight);
-   jView_setLayoutAll(App.Jni.jEnv, App.Jni.jThis, FjObject, Self.AnchorId);
+   jView_setLayoutAll2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, Self.AnchorId);
 end;
 
 function jView.GetWidth: integer;
 begin
    Result:= 0;
    if FInitialized then
-      Result:= jView_getLParamWidth(App.Jni.jEnv, App.Jni.jThis, FjObject)
+      Result:= jView_getLParamWidth2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject)
 end;
 
 function jView.GetHeight: integer;
 begin
    Result:= 0;
    if FInitialized then
-      Result:= jView_getLParamHeight(App.Jni.jEnv, App.Jni.jThis, FjObject);
+      Result:= jView_getLParamHeight2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject);
+end;
+
+procedure jView.Notification(AComponent: TComponent; Operation: TOperation);
+begin
+  inherited;
+  if Operation = opRemove then
+  begin
+      if AComponent = FjCanvas then
+      begin
+        FjCanvas:= nil;
+      end
+  end;
+end;
+
+procedure jView.SetjCanvas(Value: jCanvas);
+begin
+  if Value <> FjCanvas then
+  begin
+    if Assigned(FjCanvas) then
+    begin
+       FjCanvas.RemoveFreeNotification(Self); //remove free notification...
+    end;
+    FjCanvas:= Value;
+    if Value <> nil then  //re- add free notification...
+    begin
+       Value.FreeNotification(self);
+    end;
+  end;
 end;
 
 //------------------------------------------------------------------------------
@@ -6364,7 +6672,7 @@ Constructor jTimer.Create(AOwner: TComponent);
   // Init
   FEnabled  := False;
   FInterval := 20;
-  FOnTimer   := nil;
+  FOnTimer  := nil;
   FParent   := jForm(AOwner);
   FjObject  := nil;
 end;
@@ -6373,14 +6681,14 @@ destructor jTimer.Destroy;
 begin
   if not (csDesigning in ComponentState) then
   begin
-    if App <> nil then
+    if jForm(Owner).App <> nil then
     begin
-      if App.Initialized then
+      if jForm(Owner).App.Initialized then
       begin
         if FjObject <> nil then
         begin
-          jTimer_Free(App.Jni.jEnv, App.Jni.jThis, FjObject);
-          FjObject:= nil;
+           jTimer_Free2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject);
+           FjObject:= nil;
         end;
       end;
     end;
@@ -6388,12 +6696,12 @@ begin
   inherited Destroy;
 end;
 
-Procedure jTimer.Init(App: jApp);
+Procedure jTimer.Init;
 begin
-  if FInitialized  then Exit;
-  inherited Init(App);
-  FjObject:= jTimer_Create(App.Jni.jEnv, App.Jni.jThis, Self);
-  jTimer_SetInterval(App.Jni.jEnv, App.Jni.jThis, FjObject, FInterval);
+  if FInitialized then Exit;
+  inherited Init;
+  FjObject:= jTimer_Create(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, Self);
+  jTimer_SetInterval(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, FInterval);
   FInitialized:= True;
 end;
 
@@ -6401,19 +6709,14 @@ Procedure jTimer.SetEnabled(Value: boolean);
 begin
   FEnabled:= Value;
   if FInitialized then
-     jTimer_SetEnabled(App.Jni.jEnv, App.Jni.jThis, FjObject, FEnabled);
+     jTimer_SetEnabled2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, FEnabled);
 end;
 
 Procedure jTimer.SetInterval(Value: integer);
 begin
   FInterval:= Value;
   if FInitialized then
-     jTimer_SetInterval(App.Jni.jEnv, App.Jni.jThis, FjObject, FInterval);
-end;
-
-Procedure jTimer.SetOnTimer(Value: TOnNotIFy);
-begin
-   FOnTimer:= Value;
+     jTimer_SetInterval2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, FInterval);
 end;
 
 //------------------------------------------------------------------------------
@@ -6436,13 +6739,13 @@ Destructor jDialogYN.Destroy;
 begin
   if not (csDesigning in ComponentState) then
   begin
-    if App <> nil then
+    if jForm(Owner).App <> nil then
     begin
-      if App.Initialized then
+      if jForm(Owner).App.Initialized then
       begin
         if FjObject <> nil then
         begin
-          jDialogYN_Free(App.Jni.jEnv, App.Jni.jThis, FjObject);
+          jDialogYN_Free2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject);
           FjObject:= nil;
         end;
       end;
@@ -6451,24 +6754,24 @@ begin
   inherited Destroy;
 end;
 
-procedure jDialogYN.Init(App: jApp);
+procedure jDialogYN.Init;
 begin
   if FInitialized  then Exit;
-  inherited Init(App);
-  FjObject:= jDialogYN_Create(App.Jni.jEnv, App.Jni.jThis, Self, FTitle, FMsg, FYes, FNo);
+  inherited Init;
+  FjObject:= jDialogYN_Create(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, Self, FTitle, FMsg, FYes, FNo);
   FInitialized:= True;
 end;
 
 Procedure jDialogYN.Show;
 begin
   if FInitialized then
-     jDialogYN_Show(App.Jni.jEnv, App.Jni.jThis, FjObject);
+     jDialogYN_Show2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject);
 end;
 
 // Event : Java -> Pascal
 Procedure jDialogYN.GenEvent_OnClick(Obj: TObject; Value: integer);
 begin
-  if not (Assigned(FOnDialogYN)) then Exit;
+  if not Assigned(FOnDialogYN) then Exit;
   case (Value = cjClick_Yes) of
     True : FOnDialogYN(Obj, ClickYes);
     False: FOnDialogYN(Obj, ClickNo);
@@ -6492,13 +6795,13 @@ Destructor jDialogProgress.Destroy;
 begin
   if not (csDesigning in ComponentState) then
   begin
-    if App <> nil then
+    if jForm(Owner).App <> nil then
     begin
-      if App.Initialized then
+      if jForm(Owner).App.Initialized then
       begin
         if FjObject <> nil then
         begin
-          jDialogProgress_Free(App.Jni.jEnv, App.Jni.jThis, FjObject);
+          jDialogProgress_Free2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject);
           FjObject:= nil;
         end;
       end;
@@ -6509,13 +6812,13 @@ end;
 
 procedure jDialogProgress.Stop;
 begin
-    if App <> nil then
+    if jForm(Owner).App <> nil then
     begin
-      if App.Initialized then
+      if jForm(Owner).App.Initialized then
       begin
         if FjObject <> nil then
         begin
-           jDialogProgress_Free(App.Jni.jEnv, App.Jni.jThis, FjObject);
+           jDialogProgress_Free2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject);
            FjObject:= nil;
         end;
       end;
@@ -6525,13 +6828,13 @@ end;
 procedure jDialogProgress.Start;
 begin
   if (FjObject = nil) and (FInitialized = True) then
-     FjObject:= jDialogProgress_Create(App.Jni.jEnv, App.Jni.jThis, Self, FTitle, FMsg);
+     FjObject:= jDialogProgress_Create(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, Self, FTitle, FMsg);
 end;
 
-procedure jDialogProgress.Init(App: jApp);
+procedure jDialogProgress.Init;
 begin
   if FInitialized  then Exit;
-  inherited Init(App);
+  inherited Init;
   FInitialized:= True;
 end;
 
@@ -6554,13 +6857,13 @@ Destructor jImageBtn.Destroy;
  begin
   if not (csDesigning in ComponentState) then
   begin
-    if App <> nil then
+    if jForm(Owner).App <> nil then
     begin
-      if App.Initialized then
+      if jForm(Owner).App.Initialized then
       begin
         if FjObject <> nil then
         begin
-          jImageBtn_Free(App.Jni.jEnv, App.Jni.jThis, FjObject);
+          jImageBtn_Free2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject);
           FjObject:= nil;
         end;
       end;
@@ -6569,83 +6872,83 @@ Destructor jImageBtn.Destroy;
   inherited Destroy;
 end;
 
-procedure jImageBtn.Init(App: jApp);
+procedure jImageBtn.Init;
 var
   rToP: TPositionRelativeToParent;
   rToA: TPositionRelativeToAnchorID;
 begin
   if FInitialized  then Exit;
-  inherited Init(App);
-  FjObject:= jImageBtn_Create(App.Jni.jEnv, App.Jni.jThis, App.Jni.jActivity, Self);
+  inherited Init;
+  FjObject:= jImageBtn_Create2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, Self);
 
   if FParentPanel <> nil then
   begin
-   FParentPanel.Init(App);
+   FParentPanel.Init;
    FjPRLayout:= FParentPanel.View;
   end;
 
-  jImageBtn_setParent(App.Jni.jEnv, App.Jni.jThis, FjObject, FjPRLayout);
-  jImageBtn_setId(App.Jni.jEnv, App.Jni.jThis, FjObject, Self.Id);
-  jImageBtn_setLeftTopRightBottomWidthHeight(App.Jni.jEnv, App.Jni.jThis, FjObject,
+  jImageBtn_setParent(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, FjPRLayout);
+  jImageBtn_setId(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, Self.Id);
+  jImageBtn_setLeftTopRightBottomWidthHeight(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject,
                                            FMarginLeft,FMarginTop,FMarginRight,FMarginBottom,
-                                           GetLayoutParams(App, FLParamWidth, sdW),
-                                           GetLayoutParams(App, FLParamHeight, sdH));
+                                           GetLayoutParams(gApp, FLParamWidth, sdW),
+                                           GetLayoutParams(gApp, FLParamHeight, sdH));
 
   for rToA := raAbove to raAlignRight do
   begin
     if rToA in FPositionRelativeToAnchor then
     begin
-      jImageBtn_addlParamsAnchorRule(App.Jni.jEnv, App.Jni.jThis, FjObject, GetPositionRelativeToAnchor(rToA));
+      jImageBtn_addlParamsAnchorRule(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, GetPositionRelativeToAnchor(rToA));
     end;
   end;
   for rToP := rpBottom to rpCenterVertical do
   begin
      if rToP in FPositionRelativeToParent then
      begin
-       jImageBtn_addlParamsParentRule(App.Jni.jEnv, App.Jni.jThis, FjObject, GetPositionRelativeToParent(rToP));
+       jImageBtn_addlParamsParentRule(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, GetPositionRelativeToParent(rToP));
      end;
   end;
 
   if Self.Anchor <> nil then Self.AnchorId:= Self.Anchor.Id
   else Self.AnchorId:= -1;
-  jImageBtn_setLayoutAll(App.Jni.jEnv, App.Jni.jThis, FjObject, Self.AnchorId);
+  jImageBtn_setLayoutAll(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, Self.AnchorId);
 
   FInitialized:= True;  //neded here....
 
   if FImageList <> nil then
   begin
-    FImageList.Init(App);   //must have!
+    FImageList.Init;   //must have!
     if FImageList.Images.Count > 0 then
     begin
        if FImageUpIndex >=0 then SetImageUpByIndex(FImageUpIndex);
        if FImageDownIndex >=0 then SetImageDownByIndex(FImageDownIndex);
     end;
   end;
-  jImageBtn_SetEnabled(App.Jni.jEnv, App.Jni.jThis, FjObject,FEnabled);
+  jImageBtn_SetEnabled(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject,FEnabled);
   if FColor <> colbrDefault then
-     jView_SetBackGroundColor(App.Jni.jEnv, App.Jni.jThis, FjObject, GetARGB(FColor));
-  jView_SetVisible(App.Jni.jEnv, App.Jni.jThis, FjObject, FVisible);
+     jView_SetBackGroundColor(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, GetARGB(FColor));
+  jView_SetVisible(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, FVisible);
 end;
 
 procedure jImageBtn.SetParent(Value: jObject);
 begin
   FjPRLayout:= Value;
   if FInitialized then
-     jImageBtn_setParent(App.Jni.jEnv, App.Jni.jThis, FjObject, FjPRLayout);
+     jImageBtn_setParent(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, FjPRLayout);
 end;
 
 Procedure jImageBtn.SetVisible(Value : Boolean);
 begin
   FVisible:= Value;
   if FInitialized then
-     jView_SetVisible(App.Jni.jEnv, App.Jni.jThis, FjObject, FVisible);
+     jView_SetVisible(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, FVisible);
 end;
 
 Procedure jImageBtn.SetColor(Value: TARGBColorBridge);
 begin
   FColor := Value;
   if (FInitialized = True) and (FColor <> colbrDefault) then
-     jView_SetBackGroundColor(App.Jni.jEnv, App.Jni.jThis, FjObject, GetARGB(FColor));
+     jView_SetBackGroundColor(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, GetARGB(FColor));
 end;
  
 // LORDMAN 2013-08-16
@@ -6653,13 +6956,13 @@ procedure jImageBtn.SetEnabled(Value : Boolean);
 begin
   FEnabled:= Value;
   if FInitialized then
-     jImageBtn_SetEnabled(App.Jni.jEnv, App.Jni.jThis, FjObject, FEnabled);
+     jImageBtn_SetEnabled(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, FEnabled);
 end;
 
 procedure jImageBtn.Refresh;
 begin
   if FInitialized then
-     jView_Invalidate(App.Jni.jEnv, App.Jni.jThis, FjObject);
+     jView_Invalidate(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject);
 end;
 
 Procedure jImageBtn.SetImageDownByIndex(Value: integer);
@@ -6670,7 +6973,7 @@ begin
       FImageDownName:= Trim(FImageList.Images.Strings[Value]);
       if  FImageDownName <> '' then
       begin
-        jImageBtn_setButtonDown(App.Jni.jEnv, App.Jni.jThis, FjObject, GetFilePath(FFilePath){App.Path.Dat}+'/'+FImageDownName);
+        jImageBtn_setButtonDown2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, GetFilePath(FFilePath){jForm(Owner).App.Path.Dat}+'/'+FImageDownName);
       end;
    end;
 end;
@@ -6683,7 +6986,7 @@ begin
       FImageUpName:= Trim(FImageList.Images.Strings[Value]);
       if  FImageUpName <> '' then
       begin
-        jImageBtn_setButtonUp(App.Jni.jEnv, App.Jni.jThis, FjObject,GetFilePath(FFilePath){App.Path.Dat}+'/'+FImageUpName);
+        jImageBtn_setButtonUp2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject,GetFilePath(FFilePath){jForm(Owner).App.Path.Dat}+'/'+FImageUpName);
       end;
    end;
 end;
@@ -6692,28 +6995,22 @@ procedure jImageBtn.SetParamWidth(Value: TLayoutParams);
 var
    side: TSide;
 begin
-   if FInitialized then
-   begin
-     if jSystem_GetOrientation(App.Jni.jEnv, App.Jni.jThis, App.Jni.jActivity) = App.Orientation  then
-        side:= sdW
-     else
-        side:= sdH;
-     jImageBtn_setLParamWidth(App.Jni.jEnv, App.Jni.jThis, FjObject, GetLayoutParams(App, FLParamWidth, side));
-   end;
+   if jForm(Owner).Orientation = gApp.Orientation then
+      side:= sdW
+   else
+      side:= sdH;
+  jImageBtn_setLParamWidth2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, GetLayoutParams(gApp, FLParamWidth, side));
 end;
 
 procedure jImageBtn.setParamHeight(Value: TLayoutParams);
 var
    side: TSide;
 begin
-  if not FInitialized then  Exit;
-
-  if  jSystem_GetOrientation(App.Jni.jEnv, App.Jni.jThis, App.Jni.jActivity)  = App.Orientation then
-    side:= sdH
-  else
-    side:= sdW;
-
-  jImageBtn_setLParamHeight(App.Jni.jEnv, App.Jni.jThis, FjObject, GetLayoutParams(App, FLParamHeight, side));
+   if jForm(Owner).Orientation = gApp.Orientation then
+      side:= sdH
+   else
+      side:= sdW;
+   jImageBtn_setLParamHeight2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, GetLayoutParams(gApp, FLParamHeight, side));
 end;
 
 procedure jImageBtn.UpdateLayout;
@@ -6721,7 +7018,7 @@ begin
    inherited UpdateLayout;
    SetParamWidth(FLParamWidth);
    setParamHeight(FLParamHeight);
-   jImageBtn_setLayoutAll(App.Jni.jEnv, App.Jni.jThis, FjObject, Self.AnchorId);
+   jImageBtn_setLayoutAll2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, Self.AnchorId);
 end;
 
 procedure jImageBtn.Notification(AComponent: TComponent; Operation: TOperation);
@@ -6771,19 +7068,20 @@ begin
   FOnAsyncEvent := nil;
   FjObject      := nil;
   FRunning:= False;
+  FAutoPublishProgress:= False;
 end;
 
 destructor jAsyncTask.Destroy;
 begin
   if not (csDesigning in ComponentState) then
   begin
-    if App <> nil then
+    if jForm(Owner).App <> nil then
     begin
-      if App.Initialized then
+      if jForm(Owner).App.Initialized then
       begin
         if FjObject <> nil then
         begin
-          jAsyncTask_Free(App.Jni.jEnv, App.Jni.jThis, FjObject);
+          jAsyncTask_Free2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject);
           FjObject:= nil;
         end;
       end;
@@ -6792,22 +7090,22 @@ begin
   inherited Destroy;
 end;
 
-procedure jAsyncTask.Init(App: jApp);
+procedure jAsyncTask.Init;
 begin
   if FInitialized  then Exit;
-  inherited Init(App);
+  inherited Init;
   FInitialized:= True;
 end;
 
 procedure jAsyncTask.Done;
 begin
-  if App <> nil then
+  if jForm(Owner).App <> nil then
   begin
-    if App.Initialized then
+    if jForm(Owner).App.Initialized then
     begin
       if FjObject <> nil then
       begin
-        jAsyncTask_Free(App.Jni.jEnv, App.Jni.jThis, FjObject);
+        jAsyncTask_Free2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject);
         FjObject:= nil;
         FRunning:= False;
       end;
@@ -6819,8 +7117,9 @@ Procedure jAsyncTask.Execute;
 begin
   if (FjObject = nil) and (FInitialized = True) and (FRunning = False) then
   begin
-    FjObject:= jAsyncTask_Create(App.Jni.jEnv, App.Jni.jThis, Self);
-    jAsyncTask_Execute(App.Jni.jEnv, App.Jni.jThis, FjObject);
+    FjObject:= jAsyncTask_Create(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, Self);
+    jAsyncTask_SetAutoPublishProgress(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, FAutoPublishProgress);
+    jAsyncTask_Execute2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject);
     FRunning:= True;
   end;
 end;
@@ -6828,29 +7127,40 @@ end;
 Procedure jAsyncTask.UpdateUI(Progress : Integer);
 begin
   if FInitialized then
-    jAsyncTask_setProgress(App.Jni.jEnv, App.Jni.jThis, FjObject,Progress);
+  begin
+    jAsyncTask_setProgress2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject,Progress);
+  end;
+end;
+
+procedure jAsyncTask.SetAutoPublishProgress(Value: boolean);
+begin
+  FAutoPublishProgress:= Value;
+  if FInitialized then
+  begin
+    jAsyncTask_SetAutoPublishProgress(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, Value);
+  end;
 end;
 
 Procedure jAsyncTask.GenEvent_OnAsyncEvent(Obj: TObject;EventType, Progress:Integer);
 begin
-  If Assigned(FOnAsyncEvent) then FOnAsyncEvent(Obj,EventType,Progress);
+  if Assigned(FOnAsyncEvent) then FOnAsyncEvent(Obj,EventType,Progress);
 end;
 
 //------------------------------------------------------------------------------
 // jGLViewEvent
 //------------------------------------------------------------------------------
-constructor jGLViewEvent.Create;
+
+constructor jGLViewEvent.Create(AOwner: TComponent);
 begin
-  FApp         := nil;
-  // Clear Event
+  inherited Create(AOwner);
   FOnGLCreate  := nil;
   FOnGLChange  := nil;
   FOnGLDraw    := nil;
   FOnGLDestroy := nil;
   //
-  FOnTouchDown := nil;
-  FOnTouchMove := nil;
-  FOnTouchUp   := nil;
+  FOnGLDown := nil;
+  FOnGLMove := nil;
+  FOnGLUp   := nil;
   //
   FMouches.Mouch.Active := False;
   FMouches.Mouch.Start  := False;
@@ -6866,39 +7176,37 @@ begin
   FOnGLDraw    := nil;
   FOnGLDestroy := nil;
   //
-  FOnTouchDown := nil;
-  FOnTouchMove := nil;
-  FOnTouchUp   := nil;
+  FOnGLDown := nil;
+  FOnGLMove := nil;
+  FOnGLUp   := nil;
   //
   inherited Destroy;
 end;
 
-procedure jGLViewEvent.Init(App: jApp);
+procedure jGLViewEvent.Init;
 begin
-  if FInitialized  then Exit;
-  if App = nil then Exit;
-  if not App.Initialized then Exit;
-  FApp:= App;
+  if FInitialized then Exit;
+  inherited Init;
   FInitialized:= True;
 end;
 
-// Event : Java Event -> Pascal
-Procedure jGLViewEvent.GenEvent_OnTouch(Obj: TObject; Act,Cnt: integer; X1,Y1,X2,Y2: single);
+//Event : Java Event -> Pascal
+procedure jGLViewEvent.GenEvent_OnTouch(Obj: TObject; Act,Cnt: integer; X1,Y1,X2,Y2: single);
 begin
   if not FInitialized then Exit;
-  App.Lock:= True;
+  gApp.Lock:= True;
   case Act of
-   cTouchDown : VHandler_touchesBegan_withEvent(Obj,Cnt,fXY(X1,Y1),fXY(X2,Y2),FOnTouchDown,FMouches);
-   cTouchMove : VHandler_touchesMoved_withEvent(Obj,Cnt,fXY(X1,Y1),fXY(X2,Y2),FOnTouchMove,FMouches);
-   cTouchUp   : VHandler_touchesEnded_withEvent(Obj,Cnt,fXY(X1,Y1),fXY(X2,Y2),FOnTouchUp  ,FMouches);
+    cTouchDown: VHandler_touchesBegan_withEvent(Obj,Cnt,fXY(X1,Y1),fXY(X2,Y2), FOnGLDown, FMouches);
+    cTouchMove: VHandler_touchesMoved_withEvent(Obj,Cnt,fXY(X1,Y1),fXY(X2,Y2), FOnGLMove, FMouches);
+    cTouchUp  : VHandler_touchesEnded_withEvent(Obj,Cnt,fXY(X1,Y1),fXY(X2,Y2), FOnGLUp  , FMouches);
   end;
-  App.Lock:= False;
+  gApp.Lock:= False;
 end;
 
 Procedure jGLViewEvent.GenEvent_OnRender(Obj: TObject; EventType, w, h: integer);
 begin
   if not FInitialized then Exit;
-  App.Lock:= True;
+  gApp.Lock:= True;
   Case EventType of
    cRenderer_onGLCreate  : If Assigned(FOnGLCreate ) then FOnGLCreate (Obj);
    cRenderer_onGLChange  : If Assigned(FOnGLChange ) then FOnGLChange (Obj,w,h);
@@ -6906,7 +7214,7 @@ begin
    cRenderer_onGLDestroy : If Assigned(FOnGLDestroy) then FOnGLDestroy(Obj);
    cRenderer_onGLThread  : If Assigned(FOnGLThread ) then FOnGLThread (Obj);
   end;
-  App.Lock:= False;
+  gApp.Lock:= False;
 end;
 
 end.

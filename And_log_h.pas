@@ -6,7 +6,9 @@ unit And_log_h;
 
 interface
 
-const libname='liblog.so';
+const
+
+      libname='liblog.so';
 
       ANDROID_LOG_UNKNOWN=0;
       ANDROID_LOG_DEFAULT=1;

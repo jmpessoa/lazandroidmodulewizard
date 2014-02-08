@@ -1,12 +1,13 @@
 object AndroidModule1: TAndroidModule1
   OnCreate = DataModuleCreate
   OldCreateOrder = False
-  BackButton = False
+  ActivityMode = actSplash
   Title = 'jForm'
   BackgroundColor = colbrWhite
-  OnCloseQuery = DataModuleCloseQuery
   OnRotate = DataModuleRotate
   OnJNIPrompt = DataModuleJNIPrompt
+  OnActive = DataModuleActive
+  OnClose = DataModuleClose
   Height = 278
   HorizontalOffset = 343
   VerticalOffset = 178
@@ -49,7 +50,6 @@ object AndroidModule1: TAndroidModule1
       't6.png'
       't7.png'
       't8.png'
-      ''
     )
     left = 176
     top = 80

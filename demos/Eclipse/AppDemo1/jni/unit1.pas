@@ -17,7 +17,8 @@ type
       jImageView1: jImageView;
       jTextView1: jTextView;
       jTimer1: jTimer;
-      procedure DataModuleCloseQuery(Sender: TObject; var CanClose: boolean);
+      procedure DataModuleActive(Sender: TObject);
+      procedure DataModuleClose(Sender: TObject);
       procedure DataModuleCreate(Sender: TObject);
       procedure DataModuleJNIPrompt(Sender: TObject);
       procedure DataModuleRotate(Sender: TObject; rotate: integer; var rstRotate: integer);
@@ -25,7 +26,7 @@ type
     private
       {private declarations}
       cnt_Timer: integer;
-      i: integer;
+      cnt_Image: integer;
     public
       {public declarations}
   end;
@@ -41,27 +42,35 @@ implementation
 
 procedure TAndroidModule1.DataModuleCreate(Sender: TObject);
 begin
-  Self.BackButton:= False;
+  cnt_Timer:= 0;
+  cnt_Image:= -1;
+
+  //this initialization code is need here to fix Laz4Andoid  *.lfm parse.... why parse fails?
+  Self.ActivityMode:= actSplash;
+
   Self.BackgroundColor:= colbrWhite;
-  //mode delphi
-  Self.OnJNIPrompt:= DataModuleJNIPrompt;
+  Self.OnJNIPrompt:= DataModuleJNIPrompt;   //mode delphi
   Self.OnRotate:= DataModuleRotate;
-  Self.OnCloseQuery:= DataModuleCloseQuery;
+  Self.OnClose:= DataModuleClose;
+  Self.OnActive:= DataModuleActive;
 end;
 
-procedure TAndroidModule1.DataModuleCloseQuery(Sender: TObject;
-  var CanClose: boolean);
+procedure TAndroidModule1.DataModuleClose(Sender: TObject);
 begin
-   CanClose:= True;
+  jTimer1.Enabled:= False;
+  gApp.CreateForm(TAndroidModule2, AndroidModule2);
+  AndroidModule2.Init(gApp);
+end;
+
+procedure TAndroidModule1.DataModuleActive(Sender: TObject);
+begin
+  //ShowMessage('form 1 active');
+  jTimer1.Enabled:= True;   //start Timer
 end;
 
 procedure TAndroidModule1.DataModuleJNIPrompt(Sender: TObject);
 begin
-  cnt_Timer:= 0;
-  i:= 0;
-  {if need set controls behavior/property jni dependent  here....}
   Self.Show;
-  jTimer1.Enabled:= True;   //start Timer
 end;
 
 procedure TAndroidModule1.DataModuleRotate(Sender: TObject; rotate: integer;
@@ -72,21 +81,19 @@ end;
 
 procedure TAndroidModule1.jTimer1Timer(Sender: TObject);
 begin
- // jTextView1.Text:= IntToStr(Cnt_Timer) + '%';
+  //jTextView1.Text:= IntToStr(Cnt_Timer) + '%';
   Inc(cnt_Timer, 5);
 
-  Inc(i);
-  if i = jImageView1.Count then i:= 1;
-  jImageView1.ImageIndex:= i;
+  Inc(cnt_Image);
+  if cnt_Image = jImageView1.Count then cnt_Image:= 0;
+  jImageView1.ImageIndex:= cnt_Image;
 
-  if cnt_timer < 100 then Exit;
+  if cnt_timer < 200 then Exit;
+
   jTimer1.Enabled:= False;   //Stop Timer
-  if AndroidModule2 = nil then
-  begin
-    Close;
-    AndroidModule2:= TAndroidModule2.Create(Self);
-    AndroidModule2.Init(App);
-  end else  AndroidModule2.Show;
+
+  Self.Close;
+
 end;
 
 end.

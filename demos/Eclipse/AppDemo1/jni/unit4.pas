@@ -18,6 +18,7 @@ type
       jEditText2: jEditText;
       jScrollView1: jScrollView;
       jTextView1: jTextView;
+      procedure DataModuleActive(Sender: TObject);
       procedure DataModuleCloseQuery(Sender: TObject; var CanClose: boolean);
       procedure DataModuleCreate(Sender: TObject);
       procedure DataModuleJNIPrompt(Sender: TObject);
@@ -47,12 +48,12 @@ var
 begin
    str:= TStringList.Create;
 
-   str.Add('Screen: '+ IntToStr(App.Screen.WH.Width) + 'x' + IntToStr(App.Screen.WH.Height));
-   str.Add('App Path: '+App.Path.App);
-   str.Add('App Path Dat: '+App.Path.Dat);
-   str.Add('Phone Number: '+App.Device.PhoneNumber);
-   str.Add('Device ID: '+App.Device.ID);
-   str.Add('Date Time: '+getDateTime);
+   str.Add('Screen: '+ IntToStr(Self.App.Screen.WH.Width) + 'x' + IntToStr(Self.App.Screen.WH.Height));
+   str.Add('App Path: '+Self.App.Path.App);
+   str.Add('App Path Dat: '+Self.App.Path.Dat);
+   str.Add('Phone Number: '+Self.App.Device.PhoneNumber);
+   str.Add('Device ID: '+Self.App.Device.ID);
+   str.Add('Date Time: '+Self.GetDateTime);
 
    jEditText1.Text:= str.Text;
    jEditText2.Text:= str.Text;
@@ -61,25 +62,30 @@ begin
 end;
 
 procedure TAndroidModule4.DataModuleCreate(Sender: TObject);
-begin
-  Self.BackButton:= True;
-  Self.BackgroundColor:= colbrBlack;
+begin  //this initialization code is need here to fix Laz4Andoid  *.lfm parse.... why parse fails?
+  Self.ActivityMode:= actRecyclable;
+  //Self.BackgroundColor:= colbrBlack;
   //mode delphi
   Self.OnJNIPrompt:= DataModuleJNIPrompt;
   Self.OnRotate:= DataModuleRotate;
   Self.OnCloseQuery:= DataModuleCloseQuery;
+  Self.OnActive:= DataModuleActive;
 end;
 
-procedure TAndroidModule4.DataModuleCloseQuery(Sender: TObject;
-  var CanClose: boolean);
+procedure TAndroidModule4.DataModuleCloseQuery(Sender: TObject; var CanClose: boolean);
 begin
   CanClose:= True;
 end;
 
+procedure TAndroidModule4.DataModuleActive(Sender: TObject);
+begin
+  //
+end;
+
 procedure TAndroidModule4.DataModuleJNIPrompt(Sender: TObject);
 begin
-  jEditText2.Parent:= jScrollView1.View;
-  Self.Show
+  jEditText2.Parent:= jScrollView1.View;  //change the parent here!
+  Self.Show;
 end;
 
 procedure TAndroidModule4.DataModuleRotate(Sender: TObject; rotate: integer;

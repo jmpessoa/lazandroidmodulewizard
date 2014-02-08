@@ -1,4 +1,4 @@
-{Hint: save all files to location: \jni }
+﻿{Hint: save all files to location: \jni }
 unit unit10;
   
 {$mode delphi}
@@ -22,6 +22,7 @@ type
       jTextView1: jTextView;
       jTextView2: jTextView;
       jTimer1: jTimer;
+      procedure DataModuleActive(Sender: TObject);
       procedure DataModuleCloseQuery(Sender: TObject; var CanClose: boolean);
       procedure DataModuleCreate(Sender: TObject);
       procedure DataModuleJNIPrompt(Sender: TObject);
@@ -32,9 +33,11 @@ type
       procedure jButton3Click(Sender: TObject);
       procedure jCanvasES1_1GLChange(Sender: TObject; W, H: integer);
       procedure jCanvasES1_1GLCreate(Sender: TObject);
+      procedure jCanvasES1_1GLDown(Sender: TObject; Touch: TMouch);
       procedure jCanvasES1_1GLDraw(Sender: TObject);
       procedure jCanvasES1_1GLMove(Sender: TObject; Touch: TMouch);
       procedure jCanvasES1_1GLThread(Sender: TObject);
+      procedure jCanvasES1_1GLUp(Sender: TObject; Touch: TMouch);
       procedure jTimer1Timer(Sender: TObject);
     private
       {private declarations}
@@ -61,113 +64,6 @@ implementation
 {$R *.lfm}
 
 { TAndroidModule10 }
-
-procedure TAndroidModule10.jTimer1Timer(Sender: TObject);
-begin
-  Inc(Timer_Cnt);
-  gAngle := gAngle + 4;
-  If gAngle > 360 then gAngle := 0;
-  If gWork then jCanvasES1_1.Refresh;
-end;
-
-procedure TAndroidModule10.jButton1Click(Sender: TObject);
-begin
-   jTimer1.Enabled:= not (jTimer1.Enabled);
-   if jTimer1.Enabled then
-   begin
-     gWork:= True;
-     jTextView2.Text:= 'Auto: On'
-   end
-   else
-   begin
-     jTextView2.Text:= 'Auto: Off';
-     gWork:= False;
-   end;
-end;
-            //this was needed because the fail on the *.lfm parse...
-procedure TAndroidModule10.DataModuleCreate(Sender: TObject);
-begin
-  Self.BackButton:= True;
-  Self.BackgroundColor:= colbrBlack;
-    //mode delphi
-  Self.OnJNIPrompt:= DataModuleJNIPrompt;
-  Self.OnRotate:= DataModuleRotate;
-  Self.OnCloseQuery:= DataModuleCloseQuery;
-end;
-
-procedure TAndroidModule10.DataModuleCloseQuery(Sender: TObject; var CanClose: boolean);
-begin
-   CanClose:= True;
-   jTimer1.Enabled:= False;
-end;
-
-procedure TAndroidModule10.DataModuleJNIPrompt(Sender: TObject);
-begin
-  gAngle  := 0.1;
-  gSpeed  := 1.0;
-  gWork   := False;
-  gToggle := False;
-  gH:= 150; //just dummy (or not!)
-  gW:= 300; //just dummy (or not!)
-  Self.Show;
-end;
-
-procedure TAndroidModule10.DataModuleRotate(Sender: TObject; rotate: integer;
-  var rstRotate: integer);
-begin
-  Self.UpdateLayout;
-end;
-
-procedure TAndroidModule10.jButton2Click(Sender: TObject);
-begin
-  gSpeed := gSpeed + 0.3;
-  ShowMessage('Speed ++')
-end;
-
-procedure TAndroidModule10.jButton3Click(Sender: TObject);
-begin
-  jCanvasES1_1.Request_GLThread;
-  gToggle := True;
-  jCanvasEs1_1.Refresh;
-end;
-       //you will need handle this event for perfect layout!
-procedure TAndroidModule10.jCanvasES1_1GLChange(Sender: TObject; W, H: integer);
-begin
-   gH:= H;
-   gW:= W;
-end;
-
-procedure TAndroidModule10.jCanvasES1_1GLCreate(Sender: TObject);
-begin
-  jCanvasES1_1.Texture_Load_All;
-end;
-
-procedure TAndroidModule10.jCanvasES1_1GLMove(Sender: TObject; Touch: TMouch);
-begin
-  gX:= Touch.Pt.x;
-  gY:= Touch.Pt.y;
-  jCanvasES1_1.Refresh;
-end;
-
-procedure TAndroidModule10.jCanvasES1_1GLThread(Sender: TObject); // un/load texture
-begin
-  gWork:= False;
-  case jCanvasES1_1.Textures[0].Active of
-   True  : begin
-             jCanvasES1_1.Texture_Unload_All;
-           end;
-   False : begin
-             jCanvasES1_1.Texture_Load_All;
-           end;
-  end;
-  gWork := True;
-  jCanvasES1_1.Refresh;
-end;
-
-procedure TAndroidModule10.jCanvasES1_1GLDraw(Sender: TObject);
-begin
-   DoDraw(gAngle*gSpeed, gW, gH);
-end;
 
 // Angle 0~360
 procedure TAndroidModule10.DoDraw(Angle: Single; scrW: integer; scrH: integer);
@@ -203,7 +99,7 @@ var
   Layer  : Integer;
   i      : integer;
 begin
-  if Self.FFormState = fsFormClose then Exit;
+  if Self.FormState = fsFormClose then Exit;
   gAngle := gAngle + 4;
   if gAngle > 360 then gAngle := 0;
 
@@ -309,6 +205,128 @@ begin
   jCanvasES1_1.Scale    (0.3,0.3,0.3);
   jCanvasES1_1.DrawArray(@VRXQ1,nil,@TXRQ1,@jCanvasES1_1.Textures[4],4);
   jCanvasES1_1.Update;
+end;
+
+procedure TAndroidModule10.jTimer1Timer(Sender: TObject);
+begin
+  Inc(Timer_Cnt);
+  gAngle := gAngle + 4;
+  if gAngle > 360 then gAngle := 0;
+  if gWork then jCanvasES1_1.Refresh;
+end;
+
+procedure TAndroidModule10.jButton1Click(Sender: TObject);
+begin
+   jTimer1.Enabled:= not jTimer1.Enabled;
+   if jTimer1.Enabled then
+   begin
+     gWork:= True;
+     jTextView2.Text:= 'Auto: On'
+   end
+   else
+   begin
+     jTextView2.Text:= 'Auto: Off';
+     gWork:= False;
+   end;
+end;
+
+procedure TAndroidModule10.DataModuleCreate(Sender: TObject);
+begin   //this initialization code is need here to fix Laz4Andoid  *.lfm parse.... why parse fails?
+  Self.ActivityMode:= actRecyclable;
+  Self.BackgroundColor:= colbrBlack;
+    //warning: mode delphi
+  Self.OnJNIPrompt:= DataModuleJNIPrompt;
+  Self.OnRotate:= DataModuleRotate;
+  Self.OnCloseQuery:= DataModuleCloseQuery;
+end;
+
+procedure TAndroidModule10.DataModuleCloseQuery(Sender: TObject; var CanClose: boolean);
+begin
+   CanClose:= True;
+   jTimer1.Enabled:= False;
+end;
+
+procedure TAndroidModule10.DataModuleActive(Sender: TObject);
+begin
+  //
+end;
+
+procedure TAndroidModule10.DataModuleJNIPrompt(Sender: TObject);
+begin
+  gAngle  := 0.1;
+  gSpeed  := 1.0;
+  gWork   := False;
+  gToggle := False;
+  gH:= 150;
+  gW:= 300;
+  Self.Show;
+end;
+
+procedure TAndroidModule10.DataModuleRotate(Sender: TObject; rotate: integer;
+  var rstRotate: integer);
+begin
+  Self.UpdateLayout;
+end;
+
+procedure TAndroidModule10.jButton2Click(Sender: TObject);
+begin
+  gSpeed := gSpeed + 0.3;
+  ShowMessage('Speed ++')
+end;
+
+procedure TAndroidModule10.jButton3Click(Sender: TObject);
+begin
+  jCanvasES1_1.Request_GLThread;
+  gToggle := True;
+  jCanvasEs1_1.Refresh;
+end;
+       //we needed handle this event for perfect layout --> W x H !
+procedure TAndroidModule10.jCanvasES1_1GLChange(Sender: TObject; W, H: integer);
+begin
+   gH:= H;
+   gW:= W;
+end;
+
+procedure TAndroidModule10.jCanvasES1_1GLCreate(Sender: TObject);
+begin
+  jCanvasES1_1.Texture_Load_All;
+end;
+
+procedure TAndroidModule10.jCanvasES1_1GLDown(Sender: TObject; Touch: TMouch);
+begin
+  //
+end;
+
+procedure TAndroidModule10.jCanvasES1_1GLMove(Sender: TObject; Touch: TMouch);
+begin
+  gX:= Touch.Pt.x;
+  gY:= Touch.Pt.y;
+  jCanvasES1_1.Refresh;
+end;
+
+procedure TAndroidModule10.jCanvasES1_1GLThread(Sender: TObject); // un/load texture
+begin
+  gWork:= False;
+  case jCanvasES1_1.Textures[0].Active of
+   True  : begin
+             jCanvasES1_1.Texture_Unload_All;
+           end;
+   False : begin
+             jCanvasES1_1.Texture_Load_All;
+           end;
+  end;
+  gWork := True;
+  jCanvasES1_1.Refresh;
+end;
+
+procedure TAndroidModule10.jCanvasES1_1GLUp(Sender: TObject; Touch: TMouch);
+begin
+  //
+end;
+
+procedure TAndroidModule10.jCanvasES1_1GLDraw(Sender: TObject);
+begin
+   DoDraw(gAngle*gSpeed, gW, gH);
 end;
 
 end.

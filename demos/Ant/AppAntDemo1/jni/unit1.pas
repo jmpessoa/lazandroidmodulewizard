@@ -43,7 +43,7 @@ begin
 end;
 
 procedure TAndroidModule1.DataModuleCreate(Sender: TObject);
-begin        //jus to fix *.lfm parse fail on Laz4Android cross compile...
+begin        //jus to fix *.lfm parse fail on Laz4Android cross compile... why fail ?
     Self.OnJNIPrompt:= DataModuleJNIPrompt;
 end;
 

@@ -1,7 +1,8 @@
-package com.example.appdemographics1;
+package com.example.dummyapp;
 //
 //
-//Android Java Interface for Pascal/Delphi XE5  - [and Lazarus: by jmpessoa - december 2013]
+//Android Java Interface for Pascal/Delphi XE5  - 
+//[and Lazarus: by jmpessoa@hotmail.com - december 2013]
 //
 //Developer
 //          Simon,Choi / Choi,Won-sik
@@ -47,6 +48,7 @@ package com.example.appdemographics1;
 //
 //
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.ActivityManager.RunningAppProcessInfo;
 import android.app.ActivityManager.RunningServiceInfo;
@@ -216,7 +218,7 @@ public static final int Task_BackGround             =  3;
 //-------------------------------------------------------------------------
 class jTimer {
 // Java-Pascal Interface
-private int             PasObj   = 0;      // Pascal Obj
+private long             PasObj   = 0;      // Pascal Obj
 private Controls        controls = null;   // Control Class for Event
 // Property
 private boolean         Enabled = false;   // default : false
@@ -225,8 +227,8 @@ private int             Interval = 1000;   // 1000msec
 private Runnable runnable;
 private Handler  handler;
 
-// Constructor
-public  jTimer(Controls ctrls, int pasobj) {
+// Constructor 
+public  jTimer(Controls ctrls, long pasobj) {
 // Connect Pascal I/F
 PasObj   = pasobj;
 controls = ctrls;
@@ -246,7 +248,7 @@ runnable = new Runnable() {
 
 
 public  void SetInterval(int interval) {
-Interval = interval;
+  Interval = interval;
 }
 
 public  void SetEnabled(boolean enabled) {
@@ -257,9 +259,9 @@ if (Enabled) { handler.postDelayed(runnable,Interval); };
 
 // Free object except Self, Pascal Code Free the class.
 public  void Free() {
-Enabled  = false;
-handler  = null;
-runnable = null;
+  Enabled  = false;
+  handler  = null;
+  runnable = null;
 }
 
 };
@@ -271,7 +273,7 @@ runnable = null;
 
 class jForm {
 // Java-Pascal Interface
-private int             PasObj   = 0;      // Pascal Obj
+private long             PasObj   = 0;     // Pascal Obj
 private Controls        controls = null;   // Control Class for Event
 
 private RelativeLayout  layout   = null;
@@ -282,7 +284,7 @@ private OnClickListener onClickListener;   // event
 private Boolean         enabled  = true;   //
 
 // Constructor
-public  jForm(Controls ctrls, int pasobj) {
+public  jForm(Controls ctrls, long pasobj) {
 // Connect Pascal I/F
 PasObj   = pasobj;
 controls = ctrls;
@@ -305,30 +307,34 @@ onClickListener = new OnClickListener() {
   };
 };
 layout.setOnClickListener(onClickListener);
+//Log.i("Form:","Create");
 };
 
 //
 public  RelativeLayout GetLayout() {
+  //Log.i("Form:", "getLayout");
   return layout;
 }
 
 //
 public  void Show(int effect) {
-controls.appLayout.addView( layout );
-parent = controls.appLayout;
-//
-if (effect != Const.Eft_None) {
-  layout.startAnimation(controls.Ani_Effect(effect,250));
-};
+   controls.appLayout.addView( layout );
+   parent = controls.appLayout;
+   //
+   if (effect != Const.Eft_None) {
+     layout.startAnimation(controls.Ani_Effect(effect,250));
+   };
+   controls.pOnActive(PasObj); //by jmpessoa
+   Log.i("Form:","Show --> OnActive");
 }
 
 //
 public  void Close(int effect ) {
 switch ( effect ) {
- case Const.Eft_None  : { controls.appLayout.removeView(layout);
+    case Const.Eft_None  : { controls.appLayout.removeView(layout);
              controls.pOnClose(PasObj);
              break; }
- default : { Animation animation = controls.Ani_Effect(effect,250);
+    default : { Animation animation = controls.Ani_Effect(effect,250);
              animation.setAnimationListener(new AnimationListener() {
                @Override
                public  void onAnimationEnd   (Animation animation) {
@@ -342,7 +348,13 @@ switch ( effect ) {
              });
              layout.startAnimation(animation);
            };
-};
+    };
+ }
+
+//by jmpessoa
+public  void Close2() {
+  controls.appLayout.removeView(layout);
+  controls.pOnClose(PasObj);
 }
 
 //
@@ -355,21 +367,35 @@ else         { if (layout.getParent() != null)
 
 //
 public  void SetEnabled ( boolean enabled ) {
-Log.i("Java","Parent Form Enabled "+ Integer.toString(layout.getChildCount()));
+Log.i("Form:","Parent Form Enabled "+ Integer.toString(layout.getChildCount()));
 for (int i = 0; i < layout.getChildCount(); i++) {
   View child = layout.getChildAt(i);
   child.setEnabled(enabled);
 }
+
+}
+
+//by jmpessoa
+public void ShowMessage(String msg){
+	Log.i("ShowMessage:", msg);
+   	Toast.makeText(controls.activity, msg, Toast.LENGTH_SHORT).show();	
+}
+
+//by jmpessoa
+public String GetDateTime() {
+  SimpleDateFormat formatter = new SimpleDateFormat ( "yyyy-MM-dd HH:mm:ss", Locale.getDefault() );
+  return( formatter.format ( new Date () ) );	
 }
 
 //Free object except Self, Pascal Code Free the class.
-public  void Free() {
-if (parent != null) { controls.appLayout.removeView(layout); }
-onClickListener = null;
-layout.setOnClickListener(null);
-layparam = null;
-layout   = null;
-}
+ public  void Free() {	
+   if (parent != null) { controls.appLayout.removeView(layout); }  
+   onClickListener = null;
+   layout.setOnClickListener(null);
+   layparam = null;
+   layout   = null;
+   Log.i("jForm:", "Free");
+ }
 
 };
 
@@ -380,7 +406,7 @@ layout   = null;
 
 class jTextView extends TextView {
 // Java-Pascal Interface
-private int             PasObj   = 0;      // Pascal Obj
+private long             PasObj   = 0;      // Pascal Obj
 private Controls        controls = null;   // Control Class for Event
 //
 private ViewGroup       parent   = null;   // parent view
@@ -427,7 +453,7 @@ public void setMarginTop(int y) {
 
 // Constructor
 public  jTextView(android.content.Context context,
-               Controls ctrls,int pasobj ) {
+               Controls ctrls,long pasobj ) {	
 super(context);
 // Connect Pascal I/F
 PasObj   = pasobj;
@@ -464,16 +490,12 @@ public void setLeftTopRightBottomWidthHeight(int left, int top, int right, int b
 	lpW = w;
 }	
 
-
 //by jmpessoa
 public void setLayoutAll(int idAnchor) {
 	lparams.width  = lpW; //matchParent; 
 	lparams.height = lpH; //wrapContent;
 	lparams.setMargins(MarginLeft,MarginTop,marginRight,marginBottom);
 	if (idAnchor > 0) {    	
-		//lparams.addRule(RelativeLayout.BELOW, id); 
-		//lparams.addRule(RelativeLayout.ALIGN_BASELINE, id)
-	    //lparams.addRule(RelativeLayout.LEFT_OF, id); //lparams.addRule(RelativeLayout.RIGHT_OF, id)
 		for (int i=0; i < countAnchorRule; i++) {  
 			lparams.addRule(lparamsAnchorRule[i], idAnchor);		
 	    }
@@ -509,8 +531,21 @@ public void addLParamsParentRule(int rule) {
 
 //by jmpessoa
 public void setIdEx(int id) {
-   setId(id);	
+	setId(id);   
 }
+
+public void setText2(String txt) {
+	   this.setText(txt);
+}
+
+public String getText2() {
+	return this.getText().toString();
+}
+
+public void setTextColor2(int value) {
+	this.setTextColor(value);  
+}
+
 
 // LORDMAN 2013-08-13
 public  void setTextAlignment( int align ) {
@@ -526,11 +561,11 @@ default : { setGravity( Gravity.LEFT              ); }; break;
 };
 }
 
-//
-public  void setParent( android.view.ViewGroup viewgroup ) {
+//by jmpessoa
+public  void setParent3( android.view.ViewGroup viewgroup ) {
 if (parent != null) { parent.removeView(this); }
-parent = viewgroup;
-viewgroup.addView(this,lparams);
+   parent = viewgroup;
+   viewgroup.addView(this,lparams);
 }
 
 //
@@ -550,12 +585,21 @@ public  void setEnabled( boolean value ) {
   enabled = value;
 }
 
+//by jmpessoa
+public  void SetVisible( int value ) {
+	  this.setVisibility(value);
+}
 // Free object except Self, Pascal Code Free the class.
 public  void Free() {
 if (parent != null) { parent.removeView(this); }
 setText("");
 lparams = null;
 setOnClickListener(null);
+}
+
+//by jmpessoa
+public void setTextSize2(int value) {
+	this.setTextSize(value);
 }
 
 }
@@ -567,14 +611,13 @@ setOnClickListener(null);
 
 class jEditText extends EditText {
 // Pascal Interface
-private int           PasObj   = 0;      // Pascal Obj
+private long           PasObj   = 0;      // Pascal Obj
 private Controls      controls = null;   // Control Class for Event
 //
 private ViewGroup     parent   = null;   // parent view
 private RelativeLayout.LayoutParams lparams;           // layout XYWH
 private OnKeyListener onKeyListener;     //
 private TextWatcher   textwatcher;       // OnChange
-//Context contextSave;  //by jmpessoa
 
 //by jmpessoa
 int wrapContent = RelativeLayout.LayoutParams.WRAP_CONTENT; //h
@@ -595,6 +638,9 @@ int MarginTop = 5;
 
 int marginRight = 5;
 int marginBottom = 5;
+
+boolean changeFlag;
+String bufStr;
 
 //by jmpessoa
 public void setMarginRight(int x) {
@@ -618,7 +664,8 @@ public void setMarginTop(int y) {
 
 // Constructor
 public  jEditText(android.content.Context context,
-               Controls ctrls,int pasobj ) {
+               Controls ctrls,long pasobj ) {
+
 super(context);
 
 // Connect Pascal I/F
@@ -627,45 +674,56 @@ controls = ctrls;
 // Init Class
 lparams = new RelativeLayout.LayoutParams(100,100);
 lparams.setMargins(5, 5,5,5);
+
+changeFlag = false;
+
 // 1 Line
-this.setSingleLine();
+ //this.setSingleLine(); //commented by jmpessoa
+ 
 // Init Event : http://socome.tistory.com/15
 
 onKeyListener = new OnKeyListener() {
   public  boolean onKey(View v, int keyCode, KeyEvent event) {
     if ((keyCode           == KeyEvent.KEYCODE_ENTER) &&
         (event.getAction() == KeyEvent.ACTION_UP    )    ) {
-      InputMethodManager imm = (InputMethodManager) controls.activity.getSystemService(Context.INPUT_METHOD_SERVICE);
-      imm.hideSoftInputFromWindow(getWindowToken(), 0);
-      //
-      Log.i("JNI_Java","OnEnter, Hide KeyBoard");
-      // LoadMan
-      controls.pOnEnter(PasObj);
-      return true;
+        InputMethodManager imm = (InputMethodManager) controls.activity.getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromWindow(getWindowToken(), 0);
+        //
+        Log.i("JNI_Java","OnEnter, Hide KeyBoard");
+        // LoadMan
+        controls.pOnEnter(PasObj);
+        return true;
     }
     return false;
   }
+  
 };
 setOnKeyListener(onKeyListener);
 // Event
 textwatcher = new TextWatcher() {
   @Override
   public  void beforeTextChanged(CharSequence s, int start, int count, int after) {
-    controls.pOnChange(PasObj,0);
+	  if (changeFlag) {
+         controls.pOnChange(PasObj,0);
+	  }
   }
 
   @Override
   public  void onTextChanged(CharSequence s, int start, int before, int count) {
-    controls.pOnChange(PasObj,1);
+	  if (changeFlag) { 
+        controls.pOnChange(PasObj,1);
+	 }		  
   }
 
   @Override
   public  void afterTextChanged(Editable s) {
-    controls.pOnChange(PasObj,2);
+	if (changeFlag) { 
+        controls.pOnChange(PasObj,2);
+    }
   }
 };
-addTextChangedListener(textwatcher);
 
+addTextChangedListener(textwatcher);
 }
 
 //
@@ -725,8 +783,50 @@ public void setLayoutAll(int idAnchor) {
 
 //by jmpessoa
 public void setIdEx(int id) {
-  setId(id);	
+  this.setId(id);	
 }
+
+public void setTextEx(String txt) {
+   changeFlag = false;
+   this.setText(txt);
+   changeFlag = true; 
+}
+
+public String getTextEx() {
+  return this.getText().toString();
+}
+            
+public void setSingleLineEx(boolean value) {
+  this.setSingleLine(value);
+}
+
+/*
+public void setInputTypeEx(int value) {
+	this.setInputType(value);
+}
+*/
+
+public  void setInputTypeEx(String str) {
+	  bufStr = new String(str.toString());
+	  if(str.equals("NUMBER")) {
+		  this.setInputType(android.text.InputType.TYPE_CLASS_NUMBER);
+	  }
+	  else if (str.equals("TEXT")) { 
+		  this.setInputType(android.text.InputType.TYPE_CLASS_TEXT);
+	  }
+	  else if (str.equals("PHONE"))      { this.setInputType(android.text.InputType.TYPE_CLASS_PHONE); }
+	  else if (str.equals("PASSNUMBER")) { this.setInputType(android.text.InputType.TYPE_CLASS_NUMBER);
+	  this.setTransformationMethod(android.text.method.PasswordTransformationMethod.getInstance()); }
+	  else if (str.equals("PASSTEXT"))   { this.setInputType(android.text.InputType.TYPE_CLASS_TEXT);
+	  this.setTransformationMethod(android.text.method.PasswordTransformationMethod.getInstance()); }
+	  
+	  else if (str.equals("TEXTMULTILINE")){this.setInputType(android.text.InputType.TYPE_CLASS_TEXT|android.text.InputType.TYPE_TEXT_FLAG_MULTI_LINE);}
+	                                    
+	  
+	  else                               { this.setInputType(android.text.InputType.TYPE_CLASS_TEXT); };
+	    
+	}
+
 
 // LORDMAN 2013-08-13
 public  void setTextAlignment( int align ) {
@@ -744,9 +844,9 @@ default : { setGravity( Gravity.LEFT              ); }; break;
 
 //
 public  void setParent( android.view.ViewGroup viewgroup ) {
-if (parent != null) { parent.removeView(this); }
-parent = viewgroup;
-viewgroup.addView(this,lparams);
+  if (parent != null) { parent.removeView(this); }
+    parent = viewgroup;
+    viewgroup.addView(this,lparams);
 }
 
 // Free object except Self, Pascal Code Free the class.
@@ -761,7 +861,50 @@ lparams = null;
 
 //by jmpessoa
 public void setScrollerEx(android.content.Context context) {
-	setScroller(new Scroller(context)); 
+	setScroller(new Scroller(controls.activity)); 
+}
+
+public void setTextColor2(int value) {
+	this.setTextColor(value);  
+}
+
+public void setTextSize2(int value) {
+	this.setTextSize(value);  
+}
+
+public void setFocus2() {
+	this.requestFocus();  
+}
+
+public  void immShow2() {
+	  InputMethodManager imm = (InputMethodManager) controls.activity.getSystemService(Context.INPUT_METHOD_SERVICE);
+	  imm.toggleSoftInput(0, InputMethodManager.SHOW_IMPLICIT);
+}
+
+
+public  void immHide2() {
+	  InputMethodManager imm = (InputMethodManager) controls.activity.getSystemService(Context.INPUT_METHOD_SERVICE);
+	  imm.hideSoftInputFromWindow(this.getWindowToken(), 0);
+}
+
+
+public void setHint2(String hint) {
+   this.setHint(hint);
+}
+
+public  int[] getCursorPos() {
+
+	  int[] vals = new int[2];
+
+	  vals[0] = this.getSelectionStart();
+	  vals[1] = this.getSelectionEnd();
+
+	  return vals;
+}
+
+public  void setCursorPos(int startPos, int endPos) {
+	  if (endPos == 0) { endPos = startPos; };
+	  this.setSelection(startPos,endPos);
 }
 
 }
@@ -773,7 +916,7 @@ public void setScrollerEx(android.content.Context context) {
 
 class jButton extends Button {
 // Java-Pascal Interface
-private int             PasObj   = 0;      // Pascal Obj
+private long             PasObj   = 0;      // Pascal Obj
 private Controls        controls = null;   // Control Class for Event
 //
 private ViewGroup       parent   = null;   // parent view
@@ -824,7 +967,7 @@ public void setLeftTopRightBottomWidthHeight(int left, int top, int right, int b
 
 // Constructor
 public  jButton(android.content.Context context,
-             Controls ctrls,int pasobj ) {
+             Controls ctrls,long pasobj ) {
 super(context);
 // Connect Pascal I/F
 controls   = ctrls;
@@ -839,6 +982,7 @@ onClickListener = new OnClickListener() {
   }
 };
 setOnClickListener(onClickListener);
+Log.i("jButton","created!");
 }
 
 //
@@ -855,6 +999,7 @@ public  void setParent( android.view.ViewGroup viewgroup ) {
 if (parent != null) { parent.removeView(this); }
 parent = viewgroup;
 viewgroup.addView(this,lparams);
+Log.i("jButton","setParent!");
 }
 
 // Free object except Self, Pascal Code Free the class.
@@ -908,7 +1053,16 @@ public void setLayoutAll(int idAnchor) {
 
 //by jmpessoa
 public void setIdEx(int id) {
-	  setId(id);	
+	  setId(id);
+}
+
+//by jmpessoa
+public void setTextEx(String txt) {
+	this.setText(txt);	
+}
+
+public void setTextColor2(int value) {
+	this.setTextColor(value);  
 }
 
 }
@@ -920,7 +1074,7 @@ public void setIdEx(int id) {
 
 class jCheckBox extends CheckBox {
 // Java-Pascal Interface
-private int             PasObj   = 0;      // Pascal Obj
+private long             PasObj   = 0;      // Pascal Obj
 private Controls        controls = null;   // Control Class for Event
 //
 private ViewGroup       parent   = null;   // parent view
@@ -962,7 +1116,7 @@ public void setMarginTop(int y) {
 
 // Constructor
 public  jCheckBox(android.content.Context context,
-               Controls ctrls,int pasobj ) {
+               Controls ctrls,long pasobj ) {
 super(context);
 // Connect Pascal I/F
 PasObj   = pasobj;
@@ -1056,6 +1210,18 @@ public void setIdEx(int id) {
 	  setId(id);	
 }
 
+public void setTextColor2(int value) {
+	this.setTextColor(value);  
+}
+
+public  boolean isChecked2() {
+   return this.isChecked();
+}
+
+public  void setChecked2(boolean value) {
+   this.setChecked(value);
+}
+
 }
 
 //-------------------------------------------------------------------------
@@ -1065,7 +1231,7 @@ public void setIdEx(int id) {
 
 class jRadioButton extends RadioButton {
 // Java-Pascal Interface
-private int             PasObj   = 0;      // Pascal Obj
+private long           PasObj   = 0;      // Pascal Obj
 private Controls        controls = null;   // Control Class for Event
 //
 private ViewGroup       parent   = null;   // parent view
@@ -1107,7 +1273,7 @@ public void setMarginTop(int y) {
 
 // Constructor
 public  jRadioButton(android.content.Context context,
-                  Controls ctrls,int pasobj ) {
+                  Controls ctrls,long pasobj ) {
 super(context);
 // Connect Pascal I/F
 controls   = ctrls;
@@ -1202,6 +1368,10 @@ public void setIdEx(int id) {
 	  setId(id);	
 }
 
+public void setTextColor2(int value) {
+	this.setTextColor(value);  
+}
+
 }
 
 //-------------------------------------------------------------------------
@@ -1225,7 +1395,7 @@ public void setIdEx(int id) {
 
 class jProgressBar extends ProgressBar {
 // Java-Pascal Interface
-private int             PasObj   = 0;      // Pascal Obj
+private long             PasObj   = 0;      // Pascal Obj
 private Controls        controls = null;   // Control Class for Event
 //
 private ViewGroup       parent   = null;   // parent view
@@ -1267,7 +1437,7 @@ public void setMarginTop(int y) {
 
 // Constructor
 public  jProgressBar(android.content.Context context,
-                  Controls ctrls,int pasobj,int style ) {
+                  Controls ctrls,long pasobj,int style ) {
 //super(context,null,progressBarStyleHorizontal);
 super(context,null,style);
 // Connect Pascal I/F
@@ -1353,8 +1523,30 @@ public void setLayoutAll(int idAnchor) {
 
 //by jmpessoa
 public void setIdEx(int id) {
-setId(id);	
+  setId(id);	
 }
+
+//by jmpessoa
+public void setProgressEx(int value) {
+	Log.i("jProgressBar Value","=" + value);
+	this.setProgress(value);
+}
+
+//by jmpessoa
+public int getProgress2() {
+	return this.getProgress();
+}
+
+//by jmpessoa
+public void setMax2(int value) {
+	this.setMax(value);
+}
+
+//by jmpessoa
+public int getMax2() {
+	return this.getMax();
+}
+
 
 }
 
@@ -1365,7 +1557,7 @@ setId(id);
 
 class jImageView extends ImageView {
 // Pascal Interface
-private int             PasObj   = 0;      // Pascal Obj
+private long           PasObj   = 0;      // Pascal Obj
 private Controls        controls = null;   // Control Cass for Event
 //
 private ViewGroup       parent   = null;   // parent view
@@ -1399,7 +1591,7 @@ public void setMarginBottom(int y) {
 }
 // Constructor
 public  jImageView(android.content.Context context,
-                Controls ctrls,int pasobj ) {
+                Controls ctrls,long pasobj ) {
 super(context);
 // Connect Pascal I/F
 PasObj   = pasobj;
@@ -1459,6 +1651,16 @@ if (parent != null) { parent.removeView(this); }
 //by jmpessoa
 public void setBitmapImage(Bitmap bm) {
 	this.setImageBitmap(bm);
+}
+
+public  void setImage(String str) {
+	  Bitmap bmp;
+	  bmp = this.bmp;
+	  if (bmp != null)        { bmp.recycle(); }
+	  if (str.equals("null")) { this.setImageBitmap(null);
+	                            return; };
+	  bmp = BitmapFactory.decodeFile( str );
+	  this.setImageBitmap(bmp);
 }
 
 //by jmpessoa
@@ -1581,7 +1783,7 @@ return mView;
 
 class jListView extends ListView {
 // Java-Pascal Interface
-private int             PasObj   = 0;      // Pascal Obj
+private long             PasObj   = 0;      // Pascal Obj
 private Controls        controls = null;   // Control Class for Event
 //
 private int             textColor = 0xFF000000; // black
@@ -1630,7 +1832,7 @@ public void setMarginTop(int y) {
 
 // Constructor
 public  jListView(android.content.Context context,
-                 Controls ctrls,int pasobj ) {
+                 Controls ctrls,long pasobj ) {
 super(context);
 // Connect Pascal I/F
 PasObj   = pasobj;
@@ -1701,21 +1903,21 @@ setSelectionFromTop(position, y);
 }
 
 //
-public  void add ( String item ) {
-alist.add( item );
-aadapter.notifyDataSetChanged();
+public  void add( String item ) { 
+  alist.add( item );
+  aadapter.notifyDataSetChanged();
 }
 
 //
 public  void clear() {
-alist.clear();
-aadapter.notifyDataSetChanged();
+  alist.clear();
+  aadapter.notifyDataSetChanged();
 }
 
 //
 public  void delete( int index ) {
-alist.remove( index );
-aadapter.notifyDataSetChanged();
+  alist.remove( index );
+  aadapter.notifyDataSetChanged();
 }
 
 // Free object except Self, Pascal Code Free the class.
@@ -1775,6 +1977,10 @@ public void setIdEx(int id) {
 setId(id);	
 }
 
+public void setTextColor2(int value) {
+	this.setTextColor(value);  
+}
+
 }
 
 //-------------------------------------------------------------------------
@@ -1784,7 +1990,7 @@ setId(id);
 
 class jScrollView extends ScrollView {
 // Java-Pascal Interface
-private int             PasObj   = 0;      // Pascal Obj
+private long             PasObj   = 0;      // Pascal Obj
 private Controls        controls = null;   // Control Class for Event
 //
 private ViewGroup       parent   = null;   // parent view
@@ -1829,7 +2035,7 @@ public void setMarginTop(int y) {
 
 // Constructor
 public  jScrollView(android.content.Context context,
-                 Controls ctrls,int pasobj ) {
+                 Controls ctrls,long pasobj ) {
 super(context);
 // Connect Pascal I/F
 PasObj   = pasobj;
@@ -1962,7 +2168,7 @@ setId(id);
 //-----------------------------------------
 class jPanel  extends RelativeLayout {
 	//Java-Pascal Interface
-	private int             PasObj   = 0;      // Pascal Obj
+	private long             PasObj   = 0;      // Pascal Obj
 	private Controls        controls = null;   // Control Class for Event
 	private ViewGroup       parent   = null;
 
@@ -2003,7 +2209,7 @@ class jPanel  extends RelativeLayout {
 	}
 
 	//Constructor
-	public  jPanel(android.content.Context context, Controls ctrls,int pasobj ) {
+	public  jPanel(android.content.Context context, Controls ctrls,long pasobj ) {
 	   super(context);	
 	   // Connect Pascal I/F
        PasObj   = pasobj;
@@ -2141,7 +2347,7 @@ class jPanel  extends RelativeLayout {
 
 class jHorizontalScrollView extends HorizontalScrollView {
 // Java-Pascal Interface
-private int             PasObj   = 0;      // Pascal Obj
+private long             PasObj   = 0;      // Pascal Obj
 private Controls        controls = null;   // Control Class for Event
 //
 private ViewGroup       parent   = null;   // parent view
@@ -2185,7 +2391,7 @@ public void setMarginTop(int y) {
 
 // Constructor
 public  jHorizontalScrollView(android.content.Context context,
-                 Controls ctrls,int pasobj ) {
+                 Controls ctrls,long pasobj ) {
 super(context);
 // Connect Pascal I/F
 PasObj   = pasobj;
@@ -2327,7 +2533,7 @@ setId(id);
 
 class jViewFlipper extends ViewFlipper {
 // Java-Pascal Interface
-private int             PasObj   = 0;      // Pascal Obj
+private long             PasObj   = 0;      // Pascal Obj
 private Controls        controls = null;   // Control Class for Event
 //
 private ViewGroup       parent   = null;   // parent view
@@ -2382,7 +2588,7 @@ public void setMarginTop(int y) {
 
 // Constructor
 public  jViewFlipper(android.content.Context context,
-                  Controls ctrls,int pasobj ) {
+                  Controls ctrls,long pasobj ) {
 super(context);
 // Connect Pascal I/F
 PasObj   = pasobj;
@@ -2553,7 +2759,7 @@ setId(id);
 //http://developer.android.com/reference/android/webkit/WebViewClient.html
 class jWebClient extends WebViewClient {
 // Java-Pascal Interface
-public  int             PasObj   = 0;      // Pascal Obj
+public  long            PasObj   = 0;      // Pascal Obj
 public  Controls        controls = null;   // Control Class for Event
 
 @Override
@@ -2584,7 +2790,7 @@ controls.pOnWebViewStatus(PasObj,Const.WebView_OnError, description);
 
 class jWebView extends WebView {
 // Java-Pascal Interface
-private int             PasObj   = 0;      // Pascal Obj
+private long             PasObj   = 0;      // Pascal Obj
 private Controls        controls = null;   // Control Class for Event
 //
 private ViewGroup       parent   = null;   // parent view
@@ -2626,7 +2832,7 @@ public void setMarginTop(int y) {
 
 // Constructor
 public  jWebView(android.content.Context context,
-              Controls ctrls,int pasobj ) {
+              Controls ctrls,long pasobj ) {
 super(context);
 // Connect Pascal I/F
 PasObj   = pasobj;
@@ -2724,6 +2930,17 @@ public void setIdEx(int id) {
 setId(id);	
 }
 
+
+public  void setJavaScript(boolean javascript) {
+	  this.getSettings().setJavaScriptEnabled(javascript);
+}
+
+public  void loadURL2(String str) {
+	  this.loadUrl("about:blank");
+	  this.loadUrl(str);
+}
+
+
 }
 
 //-------------------------------------------------------------------------
@@ -2736,7 +2953,7 @@ setId(id);
 
 class jCanvas {
 // Java-Pascal Interface
-private int             PasObj   = 0;      // Pascal Obj
+private long             PasObj   = 0;      // Pascal Obj
 private Controls        controls = null;   // Control Class for Event
 //
 private Canvas          canvas = null;
@@ -2744,7 +2961,7 @@ private Paint           paint  = null;
 
 
 // Constructor
-public  jCanvas(Controls ctrls,int pasobj ) {
+public  jCanvas(Controls ctrls,long pasobj ) {
 // Connect Pascal I/F
 PasObj   = pasobj;
 controls = ctrls;
@@ -2753,11 +2970,11 @@ paint   = new Paint();
 }
 
 public  void setCanvas(Canvas scanvas) {
-canvas = scanvas;
+  canvas = scanvas;
 }
 
 public  void setStrokeWidth(float width) {
-paint.setStrokeWidth(width);
+  paint.setStrokeWidth(width);
 }
 
 public  void setStyle(int style) {
@@ -2770,29 +2987,29 @@ switch (style) {
 }
 
 public  void setColor(int color) {
-paint.setColor(color);
+  paint.setColor(color);
 }
 
 public  void setTextSize(float textsize) {
-paint.setTextSize(textsize);
+  paint.setTextSize(textsize);
 }
 
 public  void drawLine(float x1, float y1, float x2, float y2) {
-canvas.drawLine(x1,y1,x2,y2,paint);
+  canvas.drawLine(x1,y1,x2,y2,paint);
 }
 
 public  void drawText(String text, float x, float y ) {
-canvas.drawText(text,x,y,paint);
+  canvas.drawText(text,x,y,paint);
 }
 
 public  void drawBitmap(Bitmap bitmap, int b, int l, int r, int t) {
-Rect rect = new Rect(b,l,r,t);
-canvas.drawBitmap(bitmap,null,rect,paint);
+  Rect rect = new Rect(b,l,r,t);
+  canvas.drawBitmap(bitmap,null,rect,paint);
 }
 
 // Free object except Self, Pascal Code Free the class.
 public  void Free() {
-paint = null;
+   paint = null;
 }
 
 }
@@ -2804,7 +3021,7 @@ paint = null;
 
 class jView extends View {
 // Java-Pascal Interface
-private int             PasObj   = 0;      // Pascal Obj
+private long             PasObj   = 0;      // Pascal Obj
 private Controls        controls = null;   // Control Class for Event
 //
 private ViewGroup       parent   = null;   // parent view
@@ -2847,7 +3064,7 @@ public void setMarginTop(int y) {
 
 // Constructor
 public  jView(android.content.Context context,
-            Controls ctrls,int pasobj ) {
+            Controls ctrls,long pasobj ) {
 super(context);
 // Connect Pascal I/F
 PasObj   = pasobj;
@@ -2885,6 +3102,10 @@ if (parent != null) { parent.removeView(this); }
 //
 public  void setjCanvas( jCanvas canvas ) {
   jcanvas = canvas;
+}
+
+public  void saveView2(String filename) {
+	  this.saveView(filename);
 }
 
 //
@@ -3062,7 +3283,7 @@ public void setIdEx(int id) {
 //http://cafe.naver.com/cocos2dxusers/405
 class jGLSurfaceView extends GLSurfaceView {
 // Java-Pascal Interface
-private int             PasObj   = 0;      // Pascal Obj
+private long            PasObj   = 0;      // Pascal Obj
 private Controls        controls = null;   // Control Class for Event
 //
 private ViewGroup       parent   = null;   // parent view
@@ -3106,12 +3327,12 @@ public void setMarginTop(int y) {
 }
 
 //
-class jRenderer implements GLSurfaceView.Renderer{
-public  void onSurfaceCreated(GL10 gl, EGLConfig config) {
+class jRenderer implements GLSurfaceView.Renderer {
+  public  void onSurfaceCreated(GL10 gl, EGLConfig config) {
              controls.pOnGLRenderer(PasObj,Const.Renderer_onSurfaceCreated,0,0); }
-public  void onSurfaceChanged(GL10 gl, int w, int h) {
+  public  void onSurfaceChanged(GL10 gl, int w, int h) {
              controls.pOnGLRenderer(PasObj,Const.Renderer_onSurfaceChanged,w,h); }
-public  void onDrawFrame     (GL10 gl) {
+  public  void onDrawFrame     (GL10 gl) {
 	             Log.i("Java","Draw before");
              controls.pOnGLRenderer(PasObj,Const.Renderer_onDrawFrame,0,0);    
              Log.i("Java","Draw after");  }
@@ -3119,32 +3340,33 @@ public  void onDrawFrame     (GL10 gl) {
 
 // Constructor
 public  jGLSurfaceView (android.content.Context context,
-                      Controls ctrls,int pasobj, int version ) {
-super(context);
-// Connect Pascal I/F
-PasObj   = pasobj;
-controls = ctrls;
-// Init Class
-lparams = new LayoutParams(100,100);     // W,H
-lparams.setMargins(10, 10,10,10); // L,T,
+                      Controls ctrls,long pasobj, int version ) {
+  super(context);
+  // Connect Pascal I/F
+  PasObj   = pasobj;
+  controls = ctrls;
+  // Init Class
+  lparams = new LayoutParams(100,100);     // W,H
+  lparams.setMargins(10, 10,10,10); // L,T,
 
-// OpenGL ES Version
-if (version != 1) {
-  setEGLContextClientVersion(2); };
-//
-renderer = new jRenderer();
-setEGLConfigChooser(8,8,8,8,16,8);       // RGBA,Depath,Stencil
-setRenderer  ( renderer );
-setRenderMode( GLSurfaceView.RENDERMODE_WHEN_DIRTY );
+  // OpenGL ES Version
+  if (version != 1) {setEGLContextClientVersion(2); };
+ 
+  renderer = new jRenderer();
+ 
+  setEGLConfigChooser(8,8,8,8,16,8);       // RGBA,Depath,Stencil
+  
+  setRenderer  ( renderer );
+  
+  setRenderMode( GLSurfaceView.RENDERMODE_WHEN_DIRTY );
 
 }
 
 //
 public  void setXYWH ( int x, int y, int w, int h ) {
-lparams.width  = w;
-lparams.height = h;
-
-lparams.setMargins(x,y,0,0);
+  lparams.width  = w;
+  lparams.height = h;
+  lparams.setMargins(x,y,0,0);
 }
 
 public void setLeftTopRightBottomWidthHeight(int left, int top, int right, int bottom, int w, int h) {
@@ -3158,9 +3380,9 @@ public void setLeftTopRightBottomWidthHeight(int left, int top, int right, int b
 
 //
 public  void setParent( android.view.ViewGroup viewgroup ) {
-if (parent != null) { parent.removeView(this); }
-parent = viewgroup;
-viewgroup.addView(this,lparams);
+  if (parent != null) { parent.removeView(this); }
+  parent = viewgroup;
+  viewgroup.addView(this,lparams);
 }
 
 //
@@ -3171,10 +3393,16 @@ switch(act) {
   case MotionEvent.ACTION_DOWN: {
         switch (event.getPointerCount()) {
         	case 1 : { controls.pOnTouch (PasObj,Const.TouchDown,1,
-        		                            event.getX(0),event.getY(0),0,0); break; }
+        		                            event.getX(0),event.getY(0),0,0);
+        	          // Log.i("touch down1:","x="+event.getX(0)+"  y="+event.getY(0));
+        	           break; 
+        		     }
         	default: { controls.pOnTouch (PasObj,Const.TouchDown,2,
         		                            event.getX(0),event.getY(0),
-        		                            event.getX(1),event.getY(1));     break; }
+        		                            event.getX(1),event.getY(1));
+                       //Log.i("touch down2:","x="+event.getX(0)+"  y="+event.getY(0));
+        	           break; 
+        	         }
         }
        break;}
   case MotionEvent.ACTION_MOVE: {
@@ -3189,10 +3417,14 @@ switch(act) {
   case MotionEvent.ACTION_UP: {
         switch (event.getPointerCount()) {
         	case 1 : { controls.pOnTouch (PasObj,Const.TouchUp  ,1,
-        		                            event.getX(0),event.getY(0),0,0); break; }
+        		                            event.getX(0),event.getY(0),0,0);
+                	//Log.i("touch up1:","x="+event.getX(0)+"  y="+event.getY(0));
+        	         break; }
         	default: { controls.pOnTouch (PasObj,Const.TouchUp  ,2,
         		                            event.getX(0),event.getY(0),
-        		                            event.getX(1),event.getY(1));     break; }
+        		                            event.getX(1),event.getY(1));  
+        	         //Log.i("touch up2:","x="+event.getX(0)+"  y="+event.getY(0));
+        	         break; }
         }
        break;}
   case MotionEvent.ACTION_POINTER_DOWN: {
@@ -3205,7 +3437,7 @@ switch(act) {
         }
        break;}
   case MotionEvent.ACTION_POINTER_UP  : {
-  	    Log.i("Java","PUp");
+  	    //Log.i("Java","PUp");
         switch (event.getPointerCount()) {
         	case 1 : { controls.pOnTouch (PasObj,Const.TouchUp  ,1,
         		                            event.getX(0),event.getY(0),0,0); break; }
@@ -3223,11 +3455,12 @@ return true;
 public void surfaceDestroyed(SurfaceHolder holder) {
 	Log.i("Java","surfaceDestroyed");
 	queueEvent(new Runnable() {
-		@Override
-		public void run() {
-    controls.pOnGLRenderer(PasObj,Const.Renderer_onSurfaceDestroyed,0,0); }
-});    
-super.surfaceDestroyed(holder);
+    	@Override
+	    public void run() {
+           controls.pOnGLRenderer(PasObj, Const.Renderer_onSurfaceDestroyed,0,0); 
+        }
+    });    
+    super.surfaceDestroyed(holder);
 }
 
 //
@@ -3246,21 +3479,21 @@ public  void genRender() {
 
 //
 public  void deleteTexture( int id ) {
-final int idx = id;
+    final int idx = id;
 	queueEvent(new Runnable() {
 		@Override
 		public void run() {
-			try{
-        int[] ids = new int[1];
+		try{
+            int[] ids = new int[1];
 	        ids[0] = idx;
-        EGL10 egl = (EGL10)EGLContext.getEGL(); 
-        GL10   gl = (GL10)egl.eglGetCurrentContext().getGL();  
+            EGL10 egl = (EGL10)EGLContext.getEGL(); 
+            GL10   gl = (GL10)egl.eglGetCurrentContext().getGL();  
           //gl.glBindTexture(GL10.GL_TEXTURE_2D, idx);
 	        gl.glDeleteTextures(1,ids,0);
-	       }
+	    }
 	   	catch ( Exception e) {
-        Log.e("deleteTexture", "Exception: "+ e.toString() ); }
-  }
+           Log.e("deleteTexture", "Exception: "+ e.toString() ); }
+        }
   });    
 }	
 
@@ -3270,12 +3503,12 @@ public  void glThread() {
 		@Override
 		public void run() {
 			controls.pOnGLRenderer(PasObj,Const.Renderer_onSurfaceThread,0,0); }
-});    
+     });    
 }	
 
-// Free object except Self, Pascal Code Free the class.
+//Free object except Self, Pascal Code Free the class.
 public  void Free() {
-if (parent != null) { parent.removeView(this); }
+  if (parent != null) { parent.removeView(this); }
   renderer = null;
   lparams  = null;
 }
@@ -3315,8 +3548,7 @@ public void setLayoutAll(int idAnchor) {
 	if (idAnchor > 0) {    	
 		for (int i=0; i < countAnchorRule; i++) {  
 			lparams.addRule(lparamsAnchorRule[i], idAnchor);		
-	    }
-		
+	    }		
 	} 
 	for (int j=0; j < countParentRule; j++) {  
 		lparams.addRule(lparamsParentRule[j]);		
@@ -3330,6 +3562,18 @@ public void setIdEx(int id) {
   setId(id);	
 }
 
+//by jmpessoa
+public void Refresh() {
+   requestRender();
+}
+
+//by jmpessoa
+public  void SetAutoRefresh(boolean active ) {
+	  if (active) {setRenderMode( GLSurfaceView.RENDERMODE_CONTINUOUSLY ); }
+	  else  {setRenderMode( GLSurfaceView.RENDERMODE_WHEN_DIRTY   ); }
+}
+
+
 }
 
 //-------------------------------------------------------------------------
@@ -3339,7 +3583,7 @@ public void setIdEx(int id) {
 
 class jDialogYN {
 // Java-Pascal Interface
-private int             PasObj   = 0;      // Pascal Obj
+private long             PasObj   = 0;      // Pascal Obj
 private Controls        controls = null;   // Control Class for Event
 //
 private String          dlgTitle;
@@ -3352,7 +3596,7 @@ private AlertDialog dialog = null;
 
 // Constructor
 public  jDialogYN(android.content.Context context,
-                Controls ctrls, int pasobj,
+                Controls ctrls, long pasobj,
                 String title, String msg, String y, String n ) {
 // Connect Pascal I/F
 PasObj   = pasobj;
@@ -3384,8 +3628,8 @@ dialog.setTitle(dlgTitle);
 }
 
 public  void show() {
-Log.i("java","DlgYN_Show");
-dialog.show();
+   //Log.i("java","DlgYN_Show");
+   dialog.show();
 }
 
 public  void Free() {
@@ -3402,14 +3646,14 @@ dialog = null;
 
 class jDialogProgress {
 // Java-Pascal Interface
-private int             PasObj   = 0;      // Pascal Obj
+private long            PasObj   = 0;      // Pascal Obj
 private Controls        controls = null;   // Control Class for Event
 //
 private ProgressDialog  dialog;
 
 // Constructor
 public  jDialogProgress(android.content.Context context,
-                     Controls ctrls, int pasobj, String title,String msg ) {
+                     Controls ctrls, long pasobj, String title,String msg ) {
 // Connect Pascal I/F
 PasObj   = pasobj;
 controls = ctrls;
@@ -3430,7 +3674,7 @@ dialog = null;
 
 class jImageBtn extends View {
 // Java-Pascal Interface
-private int             PasObj   = 0;      // Pascal Obj
+private long             PasObj   = 0;      // Pascal Obj
 private Controls        controls = null;   // Control Class for Event
 //
 private ViewGroup       parent   = null;   // parent view
@@ -3479,7 +3723,7 @@ public void setMarginTop(int y) {
 
 // Constructor
 public  jImageBtn(android.content.Context context,
-                Controls ctrls,int pasobj ) {
+                Controls ctrls,long pasobj ) {
 super(context);
 // Connect Pascal I/F
 PasObj   = pasobj;
@@ -3664,14 +3908,14 @@ public  void onAnimationEnd(Animation animation) {
 //Params , Progress , Result
 class jHttp_DownLoad extends AsyncTask<String, Integer, File>{
 // Java-Pascal Interface
-private int             PasObj   = 0;      // Pascal Obj
+private long             PasObj   = 0;      // Pascal Obj
 private Controls        controls = null;   // Control Class for Event
 //
 private String          urlfile   = "";    // url File
 private String          localfile = "";    // Local File
 
 // Constructor
-public  jHttp_DownLoad(Controls ctrls,int pasobj, String url, String local ) {
+public  jHttp_DownLoad(Controls ctrls,long pasobj, String url, String local ) {
 // Connect Pascal I/F
 PasObj   = pasobj;
 controls = ctrls;
@@ -3762,50 +4006,75 @@ return null;
 //                             Params , Progress , Result
 class jAsyncTask extends AsyncTask<Void   , Integer  , Void>{
 // Java-Pascal Interface
-private int             PasObj   = 0;      // Pascal Obj
+private long             PasObj   = 0;      // Pascal Obj
 private Controls        controls = null;   // Control Class for Event
+boolean autoPublishProgress = false;
 
 // Constructor
-public  jAsyncTask(Controls ctrls,int pasobj) {
-// Connect Pascal I/F
-PasObj   = pasobj;
-controls = ctrls;
+public  jAsyncTask(Controls ctrls,long pasobj) {
+   //Connect Pascal I/F
+   PasObj   = pasobj;
+   controls = ctrls;
 }
 
 // Step #1. Before Process
 @Override
 protected void onPreExecute() {
-super.onPreExecute();
-  controls.pOnAsyncEvent(PasObj,Const.Task_Before,0    ); // Pascal Event
+   super.onPreExecute();
+   controls.pOnAsyncEvent(PasObj,Const.Task_Before,0); // Pascal Event
 }
+
+//Step #2. Task
+@Override
+protected Void doInBackground(Void... params) {
+   int i;
+   
+   if (autoPublishProgress) {
+      for (i = 0; i < 25; i++) {
+         publishProgress(i);	
+      }
+   }
+   
+   controls.pOnAsyncEvent(PasObj, Const.Task_BackGround, 100); // Pascal Event
+   
+   if (autoPublishProgress) {
+      for (i = 25; i < 100; i++) {
+	     publishProgress(i);	
+      }
+   }  
+   return null;
+};
 
 // Step #3. Progress
 @Override
 protected void onProgressUpdate(Integer... params) {
-  super.onProgressUpdate(params);
-  controls.pOnAsyncEvent(PasObj,Const.Task_Progress,params[0]); // Pascal Event
+   super.onProgressUpdate(params);
+   controls.pOnAsyncEvent(PasObj,Const.Task_Progress,params[0]); // Pascal Event
 }
 
 // Step #4. After Process
 @Override
 protected void onPostExecute(Void result) {
-super.onPostExecute(result);
-   controls.pOnAsyncEvent(PasObj,Const.Task_Post,100); // Pascal Event
+    super.onPostExecute(result);
+    controls.pOnAsyncEvent(PasObj,Const.Task_Post,100); // Pascal Event
 }
 
-// Step #2. Task
-@Override
-protected Void doInBackground(Void... params) {
-   controls.pOnAsyncEvent(PasObj,Const.Task_BackGround,100); // Pascal Event
-return null;
-};
-
-public void setProgress(Integer progress ) {
-   Log.i("Java","setProgress " );
+public void setProgress(int progress ) {
+   Log.i("jAsyncTask","setProgress "+progress );
    publishProgress(progress);
 }
 
-// Free object except Self, Pascal Code Free the class.
+//by jmpessoa
+public void SetAutoPublishProgress(boolean value){
+    autoPublishProgress = value;
+}
+
+//by jmpessoa
+public void Execute2(){
+  execute();
+}
+
+//Free object except Self, Pascal Code Free the class.
 public  void Free() {
 }
 
@@ -3814,13 +4083,13 @@ public  void Free() {
 //
 class jTask {
 // Java-Pascal Interface
-private int             PasObj   = 0;      // Pascal Obj
+private long             PasObj   = 0;      // Pascal Obj
 private Controls        controls = null;   // Control Class for Event
 //
 public  jAsyncTask      asynctask = null;  //
 
 // Constructor
-public  jTask(Controls ctrls,int pasobj) {
+public  jTask(Controls ctrls,long pasobj) {
 // Connect Pascal I/F
 PasObj   = pasobj;
 controls = ctrls;
@@ -3828,8 +4097,8 @@ controls = ctrls;
 asynctask = new jAsyncTask(ctrls,pasobj);
 }
 
-public void setProgress(Integer progress ) {
-Log.i("Java","setProgress " );
+public void setProgress(int progress ) {
+Log.i("jTask","setProgress " );
 
 }
 
@@ -3845,13 +4114,13 @@ Log.i("Java","setProgress " );
 //https://github.com/alrieckert/lazarus/blob/master/lcl/interfaces/customdrawn/android/bitmap.pas
 class jBitmap  {
 // Java-Pascal Interface
-private int             PasObj   = 0;      // Pascal Obj
+private long             PasObj   = 0;      // Pascal Obj
 private Controls        controls = null;   // Control Class for Event
 //
 public  Bitmap bmp    = null;
 
 // Constructor
-public  jBitmap(Controls ctrls, int pasobj ) {
+public  jBitmap(Controls ctrls, long pasobj ) {
 // Connect Pascal I/F
 PasObj   = pasobj;
 controls = ctrls;
@@ -3860,8 +4129,8 @@ controls = ctrls;
 
 
 public  void loadFile(String filename) {
-if (bmp != null) { bmp.recycle(); }
-bmp = BitmapFactory.decodeFile(filename);
+  if (bmp != null) { bmp.recycle(); }
+  bmp = BitmapFactory.decodeFile(filename);
 }
 
 //by jmpessoa
@@ -3877,8 +4146,7 @@ if (bmp != null) { bmp.recycle(); }
 
 public  void createBitmap(int w, int h) {
 if (bmp != null) { bmp.recycle(); }
-bmp = Bitmap.createBitmap( w,h, Bitmap.Config.ARGB_8888 );
-
+   bmp = Bitmap.createBitmap( w,h, Bitmap.Config.ARGB_8888 );
 }
 
 public  int[] getWH() {
@@ -3893,8 +4161,13 @@ return ( wh );
 }
 
 public  void Free() {
-bmp.recycle();
-bmp = null;
+ bmp.recycle();
+ bmp = null;
+}
+
+//by jmpessoa
+public  Bitmap getJavaBitmap() {
+	  return this.bmp;
 }
 
 }
@@ -3918,33 +4191,35 @@ public   RelativeLayout appLayout;           // Base Layout
 public   int            screenStyle = 0;     // Screen Style [Dev:0 , Portrait: 1, Landscape : 2]
 
 // Jave -> Pascal Function ( Pascal Side = Event )
-public  native int  pAppOnScreenStyle();
+public  native int  pAppOnScreenStyle(); 
 public  native void pAppOnCreate     (Context context,RelativeLayout layout);
-public  native void pAppOnNewIntent  ();
-public  native void pAppOnDestroy    ();
-public  native void pAppOnPause      ();
-public  native void pAppOnRestart    ();
-public  native void pAppOnResume     ();
-public  native void pAppOnActive     ();
-public  native void pAppOnStop       ();
-public  native void pAppOnBackPressed();
-public  native int  pAppOnRotate     (int rotate);
-public  native void pAppOnConfigurationChanged();
-public  native void pAppOnActivityResult(int requestCode, int resultCode, Intent data);
+public  native void pAppOnNewIntent  ();    
+public  native void pAppOnDestroy    ();    
+public  native void pAppOnPause      ();   
+public  native void pAppOnRestart    ();    
+public  native void pAppOnResume     (); 
+public  native void pAppOnStart      ();   //change by jmpessoa : old OnActive
+public  native void pAppOnStop       (); 
+public  native void pAppOnBackPressed(); 
+public  native int  pAppOnRotate     (int rotate); 
+public  native void pAppOnConfigurationChanged(); 
+public  native void pAppOnActivityResult(int requestCode, int resultCode, Intent data); 
 //
-public  native void pOnClick     (int pasobj, int value);
-public  native void pOnChange    (int pasobj, int EventType);
-public  native void pOnEnter     (int pasobj);
-public  native void pOnTimer     (int pasobj);
+public  native void pOnClick     (long pasobj, int value);
+public  native void pOnChange    (long pasobj, int EventType);
+public  native void pOnEnter     (long pasobj);
+public  native void pOnTimer     (long pasobj);
 //
-public  native void pOnDraw      (int pasobj, Canvas canvas);
-public  native void pOnTouch     (int pasobj, int act, int cnt,float x1, float y1,float x2, float y2);
-public  native void pOnGLRenderer(int pasobj, int EventType, int w, int h);
+public  native void pOnDraw      (long pasobj, Canvas canvas);
+public  native void pOnTouch     (long pasobj, int act, int cnt,float x1, float y1,float x2, float y2);
+public  native void pOnGLRenderer(long pasobj, int EventType, int w, int h);
 //
-public  native void pOnClose     (int actform);
+public  native void pOnClose     (long pasobj);     //Add "context" by jmpessoa
+
+public  native void pOnActive     (long pasobj);     //new by jmpessoa
 //
-public  native int  pOnWebViewStatus (int pasobj, int EventType, String url);
-public  native void pOnAsyncEvent    (int pasobj, int EventType, int progress);
+public  native int  pOnWebViewStatus (long pasobj, int EventType, String url);
+public  native void pOnAsyncEvent    (long pasobj, int EventType, int progress);
 
 // Load Pascal Library
 static {
@@ -3957,24 +4232,24 @@ static {
 // -------------------------------------------------------------------------
 //  Activity Event
 // -------------------------------------------------------------------------
-public  int  jAppOnScreenStyle()          { return(pAppOnScreenStyle());   }
+public  int  jAppOnScreenStyle()          { return(pAppOnScreenStyle());   }     
 //
 public  void jAppOnCreate(Context context,RelativeLayout layout )
                                          { pAppOnCreate(context,layout);   }
-public  void jAppOnNewIntent()            { pAppOnNewIntent();             }
-public  void jAppOnDestroy()              { pAppOnDestroy();               }
-public  void jAppOnPause()                { pAppOnPause();                 }
-public  void jAppOnRestart()              { pAppOnRestart();               }
-public  void jAppOnResume()               { pAppOnResume();                }
-public  void jAppOnActive()               { pAppOnActive();                }
-public  void jAppOnStop()                 { pAppOnStop();                  }
-public  void jAppOnBackPressed()          { pAppOnBackPressed();           }
+public  void jAppOnNewIntent()            { pAppOnNewIntent();             }     
+public  void jAppOnDestroy()              { pAppOnDestroy();               }  
+public  void jAppOnPause()                { pAppOnPause();                 }  
+public  void jAppOnRestart()              { pAppOnRestart();               }    
+public  void jAppOnResume()               { pAppOnResume();                }    
+public  void jAppOnStart()                { pAppOnStart();                }     //change by jmpessoa : old OnActive
+public  void jAppOnStop()                 { pAppOnStop();                  }   
+public  void jAppOnBackPressed()          { pAppOnBackPressed();           }   
 public  int  jAppOnRotate(int rotate)     { return(pAppOnRotate(rotate));  }
 public  void jAppOnConfigurationChanged() { pAppOnConfigurationChanged();  }
 public  void jAppOnActivityResult(int requestCode, int resultCode, Intent data) 
-                                          { pAppOnActivityResult(requestCode,resultCode,data); }
+                                          { pAppOnActivityResult(requestCode,resultCode,data); } 
 
-//rotate=1 --> device on vertical/default position ; 2 --> device on horizontal position
+//rotate=1 --> device on vertical/default position ; 2 --> device on horizontal position      //tips by jmpessoa
 
 // -------------------------------------------------------------------------
 //  System, Class
@@ -3987,12 +4262,12 @@ public  void systemGC() {
 
 //
 public  void systemSetOrientation(int orientation) {
-  activity.setRequestedOrientation(orientation);
+  this.activity.setRequestedOrientation(orientation);
   }
 
 //by jmpessoa
-public  int  systemGetOrientation(android.content.Context context) {	 
-   return (context.getResources().getConfiguration().orientation);
+public  int  systemGetOrientation() {  
+   return (this.activity.getResources().getConfiguration().orientation); 
 }
 
 //
@@ -4017,7 +4292,7 @@ public  void appFinish () {
 //
 public  void appKillProcess() {
 //  android.os.Process.killProcess(android.os.Process.myPid());
-  activity.finish();
+  this.activity.finish();
  //my comm: ActivityManager am = (ActivityManager)activity.getSystemService(activity.ACTIVITY_SERVICE);
  //my com: am.restartPackage(activity.getPackageName());
 }
@@ -4035,7 +4310,7 @@ public  boolean assetSaveToFile(String src, String tgt) {
   File outDir = new File(path);
   outDir.mkdirs();
   try {
-    is = activity.getAssets().open(src);
+    is = this.activity.getAssets().open(src);
     int size = is.available();
     byte[] buffer = new byte[size];
     File outfile = new File(tgt);
@@ -4167,7 +4442,7 @@ public  void view_Invalidate(View view) {
 // -------------------------------------------------------------------------
 
 //
-public  java.lang.Object jForm_Create(int pasobj ) {
+public  java.lang.Object jForm_Create(long pasobj ) {
   return (java.lang.Object)( new jForm(this,pasobj));
 }
 
@@ -4185,13 +4460,10 @@ public  void jForm_Show (java.lang.Object form, int effect) {
   ((jForm)form).Show(effect);
 }
 
-public  void jForm_Close (java.lang.Object form, int effect) {
+public  void jForm_Close(java.lang.Object form, int effect) {
   ((jForm)form).Close(effect);
 }
 
-public  void jForm_SetVisible (java.lang.Object form, boolean visible) {
-  ((jForm)form).SetVisible(visible);
-}
 
 public  void jForm_SetEnabled (java.lang.Object form, boolean enabled) {
   ((jForm)form).SetEnabled(enabled);
@@ -4339,8 +4611,13 @@ public  void Image_save(Bitmap bmp, String filename) {
 // -------------------------------------------------------------------------
 
 public  java.lang.Object jTextView_Create(android.content.Context context,
-                                         int pasobj ) {
+                                         long pasobj ) {
   return (java.lang.Object)( new jTextView(context,this,pasobj));
+}
+
+//by jmpessoa
+public  java.lang.Object jTextView_Create2(long pasobj) {
+  return (java.lang.Object)( new jTextView(this.activity,this,pasobj));
 }
 
 public  void jTextView_Free(java.lang.Object textview) {
@@ -4362,7 +4639,7 @@ public void jTextView_setLeftTopRightBottomWidthHeight(java.lang.Object textview
 
 public  void jTextView_setParent(java.lang.Object textview,
                                 android.view.ViewGroup viewgroup) {
-  ((jTextView)textview).setParent(viewgroup);
+  ((jTextView)textview).setParent3(viewgroup);
 }
 
 public  void jTextView_setParent2(java.lang.Object textview,
@@ -4469,8 +4746,13 @@ public  void jEditText_setEditable(java.lang.Object edittext, boolean enabled ) 
 
 
 public  java.lang.Object jEditText_Create(android.content.Context context,
-                                         int pasobj ) {
+                                         long pasobj ) {
   return (java.lang.Object)( new jEditText(context,this,pasobj));
+}
+
+//by jmpessoa
+public  java.lang.Object jEditText_Create2(long pasobj ) {
+   return (java.lang.Object)( new jEditText(this.activity,this,pasobj));
 }
 
 public  void jEditText_Free(java.lang.Object edittext) {
@@ -4534,29 +4816,44 @@ public  void jEditText_immHide(java.lang.Object edittext) {
 
 // LORDMAN - 2013-07-26
 public  void jEditText_InputType(java.lang.Object edittext, String str) {
+	
   if      (str.equals("NUMBER"))     { ((jEditText)edittext).setInputType(android.text.InputType.TYPE_CLASS_NUMBER);}
-  else if (str.equals("TEXT"))       { ((jEditText)edittext).setInputType(android.text.InputType.TYPE_CLASS_TEXT);  }
+  else if (str.equals("TEXT"))       { 
+	  Log.i("EditText","1.setInputType..1");  
+	  ((jEditText)edittext).setInputType(android.text.InputType.TYPE_CLASS_TEXT);  
+	  Log.i("EditText","2.setInputType..2");  
+      }
   else if (str.equals("PHONE"))      { ((jEditText)edittext).setInputType(android.text.InputType.TYPE_CLASS_PHONE); }
   else if (str.equals("PASSNUMBER")) { ((jEditText)edittext).setInputType(android.text.InputType.TYPE_CLASS_NUMBER);
                                        ((jEditText)edittext).setTransformationMethod(android.text.method.PasswordTransformationMethod.getInstance()); }
   else if (str.equals("PASSTEXT"))   { ((jEditText)edittext).setInputType(android.text.InputType.TYPE_CLASS_TEXT);
                                        ((jEditText)edittext).setTransformationMethod(android.text.method.PasswordTransformationMethod.getInstance()); }
+  
+  else if (str.equals("TEXTMULTILINE")){((jEditText)edittext).setInputType(android.text.InputType.TYPE_CLASS_TEXT|android.text.InputType.TYPE_TEXT_FLAG_MULTI_LINE);}
+                                    
+  
   else                               { ((jEditText)edittext).setInputType(android.text.InputType.TYPE_CLASS_TEXT); };
+    
 }
 
 //by jmpessoa
 public  void jEditText_InputTypeEx(java.lang.Object edittext, int inputType) {
-	  ((jEditText)edittext).setInputType(inputType); 
+	Log.i("EditText","1.setInputTypeEx");
+	   ((jEditText)edittext).setInputType(inputType);
+	Log.i("EditText","2.setInputTypeEx");
 }
 
-
 public  void jEditText_setMaxLines(java.lang.Object edittext, int maxlines) {
-	  ((jEditText)edittext).setMaxLines(maxlines); 
+	Log.i("EditText","1.setMaxLines");
+	  ((jEditText)edittext).setMaxLines(maxlines);
+	Log.i("EditText","2.setMaxLines");
 }
 
 //by jmpessoa
 public  void jEditText_setSingleLine(java.lang.Object edittext, boolean isSingLine) {
-	  ((jEditText)edittext).setSingleLine(isSingLine); 
+	Log.i("EditText","1.setSingleLine");
+	  ((jEditText)edittext).setSingleLine(isSingLine);	
+	Log.i("EditText","2.setSingleLine");
 }
 
 //by jmpessoa
@@ -4587,7 +4884,12 @@ public  void jEditText_setMovementMethod(java.lang.Object edittext) {
 
 //by jmpessoa
 public  void jEditText_setScroller(android.content.Context context, java.lang.Object edittext) {
-	  ((jEditText)edittext).setScrollerEx(context);
+	((jEditText)edittext).setScrollerEx(context); 
+}
+
+//by jmpessoa
+public  void jEditText_setScroller2(java.lang.Object edittext) {	  
+	((jEditText)edittext).setScrollerEx(this.activity);	  
 }
 
 //by jmpessoa
@@ -4644,6 +4946,7 @@ public  void jEditText_maxLength(java.lang.Object edittext, int mLength) {
   InputFilter[] FilterArray = new InputFilter[1];
   FilterArray[0] = new InputFilter.LengthFilter(mLength);
   ((jEditText)edittext).setFilters(FilterArray);
+  Log.i("EditText","SetMaxLen");
 }
 
 // LORDMAN - 2013-07-26 , 2013-08-05
@@ -4679,8 +4982,13 @@ public  void jEditText_setHorizontallyScrolling(java.lang.Object edittext, boole
 // -------------------------------------------------------------------------
 
 public  java.lang.Object jButton_Create(android.content.Context context,
-                                       int pasobj ) {
+                                       long pasobj ) {
   return (java.lang.Object)( new jButton(context,this,pasobj));
+}
+
+//by jmpessoa
+public  java.lang.Object jButton_Create2(long pasobj ) {
+    return (java.lang.Object)( new jButton(this.activity,this,pasobj));
 }
 
 public  void jButton_Free(java.lang.Object button) {
@@ -4790,8 +5098,13 @@ obj.setFocusableInTouchMode (enabled);//*
 // -------------------------------------------------------------------------
 
 public  java.lang.Object jCheckBox_Create(android.content.Context context,
-                                         int pasobj ) {
+                                         long pasobj ) {
   return (java.lang.Object)( new jCheckBox(context,this,pasobj));
+}
+
+//by jmpessoa
+public  java.lang.Object jCheckBox_Create2(long pasobj ) {
+return (java.lang.Object)( new jCheckBox(this.activity,this,pasobj));
 }
 
 public  void jCheckBox_Free(java.lang.Object checkbox) {
@@ -4893,8 +5206,13 @@ public void jCheckBox_setMarginBottom(java.lang.Object checkbox, int y) {
 // -------------------------------------------------------------------------
 
 public  java.lang.Object jRadioButton_Create(android.content.Context context,
-                                            int pasobj ) {
+                                            long pasobj ) {
   return (java.lang.Object)( new jRadioButton(context,this,pasobj));
+}
+
+//by jmpessoa
+public  java.lang.Object jRadioButton_Create2(long pasobj ) {
+   return (java.lang.Object)( new jRadioButton(this.activity,this,pasobj));
 }
 
 public  void jRadioButton_Free(java.lang.Object radiobutton) {
@@ -4995,8 +5313,14 @@ public void jRadioButton_setMarginBottom(java.lang.Object radiobutton, int y) {
 // -------------------------------------------------------------------------
 
 public  java.lang.Object jProgressBar_Create(android.content.Context context,
-                                            int pasobj, int style ) {
+                                            long pasobj, int style ) {
   return (java.lang.Object)( new jProgressBar(context,this,pasobj,style));
+}
+
+
+//by jmpessoa
+public  java.lang.Object jProgressBar_Create2(long pasobj, int style ) {
+  return (java.lang.Object)( new jProgressBar(this.activity,this,pasobj,style));
 }
 
 public  void jProgressBar_Free(java.lang.Object progressbar) {
@@ -5092,8 +5416,13 @@ public void jProgressBar_setMarginBottom(java.lang.Object progressbar, int y) {
 // -------------------------------------------------------------------------
 
 public  java.lang.Object jImageView_Create(android.content.Context context,
-                                          int pasobj ) {
+                                          long pasobj ) {
   return (java.lang.Object)( new jImageView(context,this,pasobj));
+}
+
+//by jmpessoa
+public  java.lang.Object jImageView_Create2(long pasobj ) {
+  return (java.lang.Object)( new jImageView(this.activity,this,pasobj));
 }
 
 public  void jImageView_Free(java.lang.Object imageview) {
@@ -5197,8 +5526,13 @@ public int jImageView_getLParamWidth(java.lang.Object imageview) {
 // -------------------------------------------------------------------------
 
 public  java.lang.Object jListView_Create(android.content.Context context,
-                                         int pasobj ) {
+                                         long pasobj ) {
   return (java.lang.Object)( new jListView(context,this,pasobj));
+}
+
+//by jmpessoa
+public  java.lang.Object jListView_Create2(long pasobj ) {
+  return (java.lang.Object)( new jListView(this.activity,this,pasobj));
 }
 
 public  void jListView_Free(java.lang.Object listview) {
@@ -5303,8 +5637,14 @@ public void jListView_setMarginBottom(java.lang.Object listview, int y) {
 // -------------------------------------------------------------------------
 
 public  java.lang.Object jScrollView_Create(android.content.Context context,
-                                           int pasobj ) {
+                                           long pasobj ) {
   return (java.lang.Object)( new jScrollView(context,this,pasobj));
+}
+
+
+//by jmpessoa
+public  java.lang.Object jScrollView_Create2(long pasobj ) {
+   return (java.lang.Object)( new jScrollView(this.activity,this,pasobj));
 }
 
 public  void jScrollView_Free(java.lang.Object scrollview) {
@@ -5387,12 +5727,17 @@ public void jScrollView_setMarginBottom(java.lang.Object scrollview, int y) {
 
 
 //-------------------------------------------------------------------------
-//Panel
+//jPanel - new by jmpessoa
 //-------------------------------------------------------------------------
 
 public  java.lang.Object jPanel_Create(android.content.Context context,
-                                       int pasobj ) {
+                                       long pasobj ) {
 return (java.lang.Object)(new jPanel(context,this,pasobj));
+}
+
+
+public  java.lang.Object jPanel_Create2(long pasobj ) {
+   return (java.lang.Object)(new jPanel(this.activity,this,pasobj));
 }
 
 public  void jPanel_Free(java.lang.Object panel) {
@@ -5490,8 +5835,12 @@ public void jPanel_setMarginBottom(java.lang.Object panel, int y) {
 // -------------------------------------------------------------------------
 
 public  java.lang.Object jViewFlipper_Create(android.content.Context context,
-                                            int pasobj ) {
+                                            long pasobj ) {
   return (java.lang.Object)( new jViewFlipper(context,this,pasobj));
+}
+
+public  java.lang.Object jViewFlipper_Create2(long pasobj ) {
+   return (java.lang.Object)( new jViewFlipper(this.activity,this,pasobj));
 }
 
 public  void jViewFlipper_Free(java.lang.Object viewflipper) {
@@ -5569,8 +5918,13 @@ public void jViewFlipper_setMarginBottom(java.lang.Object viewflipper, int y) {
 // -------------------------------------------------------------------------
 
 public  java.lang.Object jWebView_Create(android.content.Context context,
-                                           int pasobj ) {
+                                           long pasobj ) {
   return (java.lang.Object)( new jWebView(context,this,pasobj));
+}
+
+//by jmpessoa
+public  java.lang.Object jWebView_Create2(long pasobj ) {
+  return (java.lang.Object)( new jWebView(this.activity,this,pasobj));
 }
 
 public  void jWebView_Free(java.lang.Object webview) {
@@ -5657,7 +6011,7 @@ public void jWebView_setMarginBottom(java.lang.Object webview, int y) {
 //  Canvas : canvas + paint
 // -------------------------------------------------------------------------
 
-public  java.lang.Object jCanvas_Create( int pasobj ) {
+public  java.lang.Object jCanvas_Create( long pasobj) {
   return (java.lang.Object)( new jCanvas(this,pasobj));
 }
 
@@ -5699,7 +6053,7 @@ public  void jCanvas_drawBitmap(java.lang.Object canvas, Bitmap bmp, int b, int 
 //  Bitmap
 // -------------------------------------------------------------------------
 
-public  java.lang.Object jBitmap_Create( int pasobj ) {
+public  java.lang.Object jBitmap_Create( long pasobj ) {
   return (java.lang.Object)( new jBitmap(this,pasobj));
 }
 
@@ -5743,8 +6097,13 @@ public  Bitmap jBitmap_getJavaBitmap( java.lang.Object bitmap) {
 //  View
 // -------------------------------------------------------------------------
 
-public  java.lang.Object jView_Create(android.content.Context context, int pasobj ) {
+public  java.lang.Object jView_Create(android.content.Context context, long pasobj ) {
   return (java.lang.Object)( new jView(context,this,pasobj));
+}
+
+//by jmpessoa
+public  java.lang.Object jView_Create2(long pasobj ) {
+  return (java.lang.Object)( new jView(this.activity,this,pasobj));
 }
 
 public  void jView_Free(java.lang.Object view) {
@@ -5839,8 +6198,13 @@ public int jView_getLParamWidth(java.lang.Object view) {
 // -------------------------------------------------------------------------
 
 public  java.lang.Object jGLSurfaceView_Create(android.content.Context context,
-                                              int pasobj, int version ) {
+                                              long pasobj, int version ) {
   return (java.lang.Object)( new jGLSurfaceView(context,this,pasobj,version));
+}
+
+//by jmpessoa
+public  java.lang.Object jGLSurfaceView_Create2(long pasobj, int version ) {
+  return (java.lang.Object)( new jGLSurfaceView(this.activity,this,pasobj,version));
 }
 
 public  void jGLSurfaceView_Free(java.lang.Object surfaceview) {
@@ -5950,7 +6314,7 @@ public void jGLSurfaceView_setMarginBottom(java.lang.Object surfaceview, int y) 
 // -------------------------------------------------------------------------
 //  Timer
 // -------------------------------------------------------------------------
-public  java.lang.Object jTimer_Create(int pasobj) {
+public  java.lang.Object jTimer_Create(long pasobj) {
   return (jTimer)(new jTimer(this,pasobj) );
 }
 
@@ -5975,7 +6339,7 @@ public  void jTimer_SetEnabled(java.lang.Object timer, boolean active ) {
 //jDialogYN DialogYNSav;
 Object DialogYNSav;
 
-public  java.lang.Object jDialogYN_Create(int pasobj,
+public  java.lang.Object jDialogYN_Create(long pasobj,
                                           String title, String msg, String y, String n ) {
   return (jDialogYN)(new jDialogYN(activity,this,pasobj,title,msg,y,n) );
   //DialogYNSav = (jDialogYN)(new jDialogYN(activity,this,pasobj,title,msg,y,n) );
@@ -5999,7 +6363,7 @@ public  void jDialogYN_Show(java.lang.Object dialog ) {
 //  Dialog Progress
 // -------------------------------------------------------------------------
 
-public  java.lang.Object jDialogProgress_Create(int pasobj,
+public  java.lang.Object jDialogProgress_Create(long pasobj,
                                                String title, String msg) {
   return (jDialogProgress)(new jDialogProgress(activity,this,pasobj,title,msg ) );
 }
@@ -6019,12 +6383,22 @@ public  void jToast( String str ) {
   Toast.makeText(activity, str, Toast.LENGTH_SHORT).show();
 }
 
+//by jmpessoa
+public  void jToast2(android.content.Context context,  String str ) {
+	  Toast.makeText(context, str, Toast.LENGTH_SHORT).show();
+}
+
 // -------------------------------------------------------------------------
 //  jImageBtn
 // -------------------------------------------------------------------------
 
-public  java.lang.Object jImageBtn_Create(android.content.Context context, int pasobj ) {
+public  java.lang.Object jImageBtn_Create(android.content.Context context, long pasobj ) {
   return (java.lang.Object)( new jImageBtn(context,this,pasobj));
+}
+
+//by jmpessoa
+public  java.lang.Object jImageBtn_Create2(long pasobj ) {
+	return (java.lang.Object)( new jImageBtn(this.activity,this,pasobj));
 }
 
 public  void jImageBtn_Free(java.lang.Object imagebtn) {
@@ -6117,7 +6491,7 @@ public void jImageBtn_setMarginBottom(java.lang.Object imagebtn, int y) {
 //  jAsyncTask
 // -------------------------------------------------------------------------
 
-public  java.lang.Object jAsyncTask_Create(int pasobj ) {
+public  java.lang.Object jAsyncTask_Create(long pasobj ) {
   return (java.lang.Object)( new jAsyncTask(this,pasobj));
 }
 
@@ -6129,6 +6503,7 @@ public  void jAsyncTask_Free(java.lang.Object asynctask) {
 public  void jAsyncTask_Execute(java.lang.Object asynctask) {
   ((jAsyncTask)asynctask).execute();
 }
+
 
 public  void jAsyncTask_setProgress(java.lang.Object asynctask, int progress) {
   ((jAsyncTask)asynctask).setProgress(progress);
@@ -6208,7 +6583,7 @@ public String jHttp_get2(String location) throws Throwable {
 //by jmpessoa
 //you need a real android device (not emulator!)
 //http://www.androidaspect.com/2013/09/how-to-send-email-from-android.html
-public void jSend_Email(android.content.Context context, 
+public void jSend_Email(
                      String to, 
                      String cc, 
                      String bcc, 
@@ -6229,7 +6604,7 @@ public void jSend_Email(android.content.Context context,
     // Use email client only
     email.setType("message/rfc822");
 
-    context.startActivity(Intent.createChooser(email, "Choose an email client"));
+    this.activity.startActivity(Intent.createChooser(email, "Choose an email client"));
     //rst = 1; //ok	
 
   }catch (Exception e) {  
@@ -6251,8 +6626,8 @@ public int jSend_SMS(String phoneNumber, String msg) {
 
 //by jmpessoa
 //http://eagle.phys.utk.edu/guidry/android/readContacts.html
-public String jContact_getMobileNumberByDisplayName(android.content.Context context, String contactName){
-	  
+public String jContact_getMobileNumberByDisplayName(String contactName){
+	                                                        
 	   String matchNumber = "";
 	   String username;
 	   
@@ -6260,7 +6635,7 @@ public String jContact_getMobileNumberByDisplayName(android.content.Context cont
 	   
 	   username = username.toLowerCase(); 
 	   
-	   Cursor phones = context.getContentResolver().query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null,null,null, null);
+	   Cursor phones = this.activity.getContentResolver().query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null,null,null, null);
 	
 	   while (phones.moveToNext())
 	   {
@@ -6284,12 +6659,12 @@ public String jContact_getMobileNumberByDisplayName(android.content.Context cont
 
 //by jmpessoa
 //http://eagle.phys.utk.edu/guidry/android/readContacts.html
-public String jContact_getDisplayNameList(android.content.Context context, char delimiter){
+public String jContact_getDisplayNameList(char delimiter){
 	  
 	   String nameList = "";
 	   //String content;
 	
-	   Cursor phones = context.getContentResolver().query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null,null,null, null);
+	   Cursor phones = this.activity.getContentResolver().query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null,null,null, null);
 	
 	   while (phones.moveToNext())
 	   {
@@ -6335,24 +6710,24 @@ public  int[] getBmpArray(String file) {
 	  activity.startActivityForResult(intent, 12345);
   }
 
- 
   /*
    * NOTE: The DCIM folder on the microSD card in your Android device is where Android stores the photos and videos 
    * you take with the device's built-in camera. When you open the Android Gallery app, 
    * you are browsing the files saved in the DCIM folder....
    */
   //by jmpessoa
-public String jCamera_takePhoto(android.content.Context context, String path, String filename) {
-	  Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+public String jCamera_takePhoto(String path, String filename) {
+ 	  Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
 	
 	  //Environment.getExternalStorageDirectory()
 	  //Environment.getExternalStorageDirectory().getAbsoluteFile()
-	  Uri mImageCaptureUri = Uri.fromFile(new File(path, '/'+filename)); // get Android.Uri from file
+	  
+ 	  Uri mImageCaptureUri = Uri.fromFile(new File(path, '/'+filename)); // get Android.Uri from file
 	  
 	  intent.putExtra(android.provider.MediaStore.EXTRA_OUTPUT, mImageCaptureUri);
 	  intent.putExtra("return-data", true);
-	  //((Activity) context).startActivityForResult(intent, 12345);
-	  activity.startActivityForResult(intent, 12345); //12345 = requestCode
+	  
+	  this.activity.startActivityForResult(intent, 12345); //12345 = requestCode
 	    
 	  return (path+'/'+filename);	  
 }
@@ -6378,8 +6753,6 @@ public float[] benchMark1 () {
   vals[1] = value;
   return ( vals );
 }
-
-
 
 }
 

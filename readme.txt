@@ -42,6 +42,38 @@
 
               -Lazarus forum community! 
 
+version 0.4 - 08 February - 2014 -
+ 
+      :: NEW! Add Support for Android API > 13. 
+         
+         1.A new code architecture! 
+         2.A lot of code lines was fix/changed/Add!
+
+      :: Fix BackButton issue. Now all Forms close correctly. [See AppDemo1]  	
+
+      :: warning: compatibility issue:  
+       
+        1. jForm: no more has the property "BackButton". 
+              Please,  edit/modify you *.lfm before loading your old project 
+                                        
+        2. jEditText: no more has the property "SingleLine". 
+              Please,  edit/modify you *.lfm before loading your old project 
+        
+        3. jView: the Canvas property  now is a component property. 
+              Please, drop the new jCanvas component and set/configure it.[See AppDemo1]
+
+            :: known issues: 
+
+               jEditText1: the "InputTypeEx" property at the moment is just "dummy". 
+                        Indeed, it is hard coded as "itxMultiLine", others values
+                        crash app! Why? 
+            
+      :: The [Projects] Demos were updated. 
+
+          :: known issues: 
+             AppDemo1: jCanvasES2 demo: [2D an 3D]: the draw disappear on the [second] button click after the BackButton pressed...
+                                            
+
 version 0.3 - revision 0.3 - 30 December 2013 -
 
       :: New! Add Option to Select Android Platform 

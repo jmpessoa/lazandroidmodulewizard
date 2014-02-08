@@ -19,6 +19,7 @@ type
       jImageList1: jImageList;
       jTextView1: jTextView;
       jTextView2: jTextView;
+      procedure DataModuleActive(Sender: TObject);
       procedure DataModuleCloseQuery(Sender: TObject; var CanClose: boolean);
       procedure DataModuleCreate(Sender: TObject);
       procedure DataModuleJNIPrompt(Sender: TObject);
@@ -205,8 +206,8 @@ end;
 
 
 procedure TAndroidModule12.DataModuleCreate(Sender: TObject);
-begin
-  Self.BackButton:= True;
+begin //this initialization code is need here to fix Laz4Andoid  *.lfm parse.... why parse fails?
+  Self.ActivityMode:= actRecyclable;
   Self.BackgroundColor:= colbrBlack;
     //mode delphi
   Self.OnJNIPrompt:= DataModuleJNIPrompt;
@@ -214,19 +215,22 @@ begin
   Self.OnCloseQuery:= DataModuleCloseQuery;
 end;
 
-procedure TAndroidModule12.DataModuleCloseQuery(Sender: TObject;
-  var CanClose: boolean);
+procedure TAndroidModule12.DataModuleCloseQuery(Sender: TObject; var CanClose: boolean);
 begin
-   CanClose:= True;
+  CanClose:= True;
+end;
+
+procedure TAndroidModule12.DataModuleActive(Sender: TObject);
+begin
+   //
 end;
 
 procedure TAndroidModule12.DataModuleJNIPrompt(Sender: TObject);
 begin
-   gZoom := 1.0;
-   gTextureID:= 0;   //default
-
-   _glArcBall_Init(gArcBall);
-   Self.Show;
+  gZoom := 1.0;
+  gTextureID:= 0;   //default picture ID
+  _glArcBall_Init(gArcBall);
+  Self.Show;
 end;
 
 procedure TAndroidModule12.DataModuleRotate(Sender: TObject; rotate: integer;
@@ -271,7 +275,6 @@ begin
   gX := Touch.Pt.x;
   gY := Touch.Pt.y;
   gZoom:= Touch.Zoom;
-
   _glArcBall_Move(gArcBall,gX,gY);
   jCanvasES1_1.Refresh;
 end;

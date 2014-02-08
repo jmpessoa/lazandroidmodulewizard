@@ -31,6 +31,7 @@ type
     edProjectName: TEdit;
     Label1: TLabel;
     Label10: TLabel;
+    Label11: TLabel;
     Label2: TLabel;
     Label3: TLabel;
     Label4: TLabel;
@@ -40,6 +41,7 @@ type
     Label8: TLabel;
     Label9: TLabel;
     ListBox1: TListBox;
+    ListBox2: TListBox;
     RadioGroup1: TRadioGroup;
     RadioGroup2: TRadioGroup;
     RadioGroup3: TRadioGroup;
@@ -65,9 +67,10 @@ type
     procedure ComboBox2Change(Sender: TObject);
     procedure FormActivate(Sender: TObject);
     procedure FormClose(Sender: TObject; var CloseAction: TCloseAction);
-    procedure FormCreate(Sender: TObject);
     procedure ListBox1Click(Sender: TObject);
     procedure ListBox1SelectionChange(Sender: TObject; User: boolean);
+    procedure ListBox2Click(Sender: TObject);
+    procedure ListBox2SelectionChange(Sender: TObject; User: boolean);
     procedure RadioGroup1Click(Sender: TObject);
     procedure RadioGroup2Click(Sender: TObject);
     procedure RadioGroup3Click(Sender: TObject);
@@ -99,6 +102,7 @@ type
     FGUIControls: string;
     FAntPackageName: string;
     FMinApi: string;
+    FTargetApi: string;
     FTouchtestEnabled: string;
     FAntBuildMode: string;
     FMainActivity: string;   //Simon "App"
@@ -110,6 +114,7 @@ type
     procedure LoadSettings(const pFilename: string);
     procedure SaveSettings(const pFilename: string);
     function GetTextByListIndex(index:integer): string;
+    function GetTextByList2Index(index:integer): string;
 
     property PathToWorkspace: string read FPathToWorkspace write FPathToWorkspace;
     property PathToNdkPlataforms: string
@@ -128,6 +133,7 @@ type
     property GUIControls: string read FGUIControls write FGUIControls;
     property AntPackageName: string read FAntPackageName write FAntPackageName;
     property MinApi: string read FMinApi write FMinApi;
+    property TargetApi: string read FTargetApi write FTargetApi;
     property TouchtestEnabled: string read FTouchtestEnabled write FTouchtestEnabled;
     property AntBuildMode: string read FAntBuildMode write FAntBuildMode;
     property MainActivity: string read FMainActivity write FMainActivity;
@@ -148,33 +154,68 @@ implementation
 
 procedure TFormWorkspace.ListBox1Click(Sender: TObject);
 begin
-  {just workaround to prevent a known bug! 02 jan 2014}
-  if ListBox1.ItemIndex <=2 then
     FMinApi:= ListBox1.Items.Strings[ListBox1.ItemIndex]
-  else
-    FMinApi:= '2';
 end;
 
 //http://developer.android.com/about/dashboards/index.html
 function TFormWorkspace.GetTextByListIndex(index:integer): string;
 begin
-    case index of
-    -1: Result:= '';
-     0: Result:= 'Api 8  (100%  market sharing) - Froyo(2.2) 1.6% of the devices. http://developer.android.com/about/dashboards';
-     1: Result:= 'Api 10 (98.4% market sharing) - Gingerbread(2.3) 24.1% of the devices. http://developer.android.com/about/dashboards';
-     2: Result:= 'Api 13 (74.3% market sharing) - Honeycomb(3.2) 0.1% of the devices. http://developer.android.com/about/dashboards';
-     3: Result:= 'Api 14 (74.2% market sharing) - Ice Cream(4.02) 18.6% of the devices. http://developer.android.com/about/dashboards';
-     4: Result:= 'Api 15 (74.2% market sharing) - Ice Cream(4.04) 18.6% of the devices. http://developer.android.com/about/dashboards';
-     5: Result:= 'Api 16 (55.6% market sharing) - Jelly Bean(4.1) 37.4% of the devices. http://developer.android.com/about/dashboards';
-     6: Result:= 'Api 17 (18.2% market sharing) - Jelly Bean(4.2) 12.9% of the devices. http://developer.android.com/about/dashboards';
-     7: Result:= 'Api 18 (5.3%  market sharing) - Jelly Bean(4.3) 4.2% of the devices. http://developer.android.com/about/dashboards';
-     8: Result:= 'Api 19 (1.1%  market sharing) - KitKat(4.4) 1.1% of the devices. http://developer.android.com/about/dashboards';
+   Result:= '';
+   case index of
+     0: Result:= '100%  market sharing';
+     1: Result:= '98.4% market sharing';
+     2: Result:= '74.3% market sharing';
+     3: Result:= '74.2% market sharing';
+     4: Result:= '74.2% market sharing';
+     5: Result:= '55.6% market sharing';
+     6: Result:= '18.2% market sharing';
+     7: Result:= '5.3%  market sharing';
+     8: Result:= '1.1%  market sharing';
    end;
 end;
 
+//http://developer.android.com/about/dashboards/index.html
+function TFormWorkspace.GetTextByList2Index(index:integer): string;
+begin
+   Result:= '';
+   case index of
+     0: Result:= 'Froyo 2.2';
+     1: Result:= 'Gingerbread 2.3';
+     2: Result:= 'Honeycomb 3.2';
+     3: Result:= 'Ice Cream 4.01';
+     4: Result:= 'Ice Cream 4.04';
+     5: Result:= 'Jelly Bean 4.1';
+     6: Result:= 'Jelly Bean 4.2';
+     7: Result:= 'Jelly Bean 4.3';
+     8: Result:= 'KitKat 4.4';
+   end;
+end;
+
+
 procedure TFormWorkspace.ListBox1SelectionChange(Sender: TObject; User: boolean);
 begin
-   StatusBar1.SimpleText:= GetTextByListIndex(ListBox1.ItemIndex);
+   //StatusBar1.SimpleText:= GetTextByListIndex(ListBox1.ItemIndex);
+    StatusBar1.Panels.Items[0].Text:= 'MinSdk Api: '+GetTextByListIndex(ListBox1.ItemIndex);
+end;
+
+procedure TFormWorkspace.ListBox2Click(Sender: TObject);
+begin
+case ListBox2.ItemIndex of
+    0: FTargetApi:='8';
+    1: FTargetApi:='10';
+    2: FTargetApi:='13';
+    3: FTargetApi:='14';
+    4: FTargetApi:='15';
+    5: FTargetApi:='16';
+    6: FTargetApi:='17';
+    7: FTargetApi:='18';
+    8: FTargetApi:='19';
+end
+end;
+
+procedure TFormWorkspace.ListBox2SelectionChange(Sender: TObject; User: boolean);
+begin
+  StatusBar1.Panels.Items[1].Text:='Target Api: '+GetTextByList2Index(ListBox2.ItemIndex);
 end;
 
 procedure TFormWorkspace.RadioGroup1Click(Sender: TObject);
@@ -243,13 +284,31 @@ procedure TFormWorkspace.FormClose(Sender: TObject; var CloseAction: TCloseActio
 var
   saveName, auxStr: string;
 begin
+  if ModalResult = mrCancel  then Exit;
+
+  if Edit1.Text = '' then
+  begin
+    ShowMessage('Error! Workplace Path was missing....[Cancel]');
+    ModalResult:= mrCancel;
+    Exit;
+  end;
+  if ComboBox1.Text = '' then
+  begin
+    ShowMessage('Error! Projec  Name was missing.... [Cancel]');
+    ModalResult:= mrCancel;
+    Exit;
+  end;
+
+  if Edit8.Text = '' then Edit8.Text:= 'org.xxxxxxx';
+
   FMainActivity:= 'App'; {dummy for Simon template} //TODO: need name flexibility here...
+
   FAntPackageName:= LowerCase(Trim(Edit8.Text));
   FPathToWorkspace:= Edit1.Text;
   FAndroidProjectName:= Trim(ComboBox1.Text);
   FAndroidPlatform:= LowerCase(ComboBox2.Text);
 
-  if (Pos(DirectorySeparator, ComboBox1.Text) <= 0) or (RadioGroup3.ItemIndex = 1) then  //Ant Project
+  if RadioGroup3.ItemIndex = 1 then  //Ant Project
   begin
      FProjectModel:= 'Ant';
      if (Pos(DirectorySeparator, ComboBox1.Text) <= 0) then  //just "name", not path+name
@@ -260,13 +319,7 @@ begin
          if IOResult <> 0 then MkDir(FPathToWorkspace+DirectorySeparator+ComboBox1.Text);
      end;
   end;
-
-  if ModalResult = mrOk then SaveSettings(FFileName);
-end;
-
-procedure TFormWorkspace.FormCreate(Sender: TObject);
-begin
-  //
+  SaveSettings(FFileName);
 end;
 
 procedure TFormWorkspace.CheckGroup1Click(Sender: TObject);
@@ -277,11 +330,7 @@ end;
 
 procedure TFormWorkspace.ComboBox1Exit(Sender: TObject);
 begin
-  if Pos(DirectorySeparator, ComboBox1.Text) <= 0 then  //Ant Project
-  begin
-    RadioGroup3.ItemIndex:= 1;
-    if Edit8.Text = '' then Edit8.Text:= 'org.xxxxxxx';
-  end;
+  //
 end;
 
 procedure TFormWorkspace.ComboBox2Change(Sender: TObject);
@@ -303,7 +352,6 @@ begin
           ListBox1.Items.Add('13'); //Honeycomb (3.2)
           ListBox1.Items.Add('14'); //Ice Cream Sandwich (4.01 - 4.02)
           ListBox1.ItemIndex:= 3;
-
         end;
      3: begin  //platform  18
           ListBox1.Items.Add('8');
@@ -335,10 +383,11 @@ procedure TFormWorkspace.FormActivate(Sender: TObject);
 begin
   ComboBox1.SetFocus;
 
-  if (not CheckGroup1.Checked[0]) and (not CheckGroup1.Checked[1]) then
-     CheckGroup1.Checked[0]:= True;
+  CheckGroup1.Checked[0]:= True; //default
+  CheckGroup1.Checked[1]:= false; //default
 
-  StatusBar1.SimpleText:= GetTextByListIndex(ListBox1.ItemIndex);
+  StatusBar1.Panels.Items[0].Text:= 'MinSdk Api: '+GetTextByListIndex(ListBox1.ItemIndex);
+  StatusBar1.Panels.Items[1].Text:= 'Target Api: '+GetTextByList2Index(ListBox2.ItemIndex);
 end;
 
 procedure TFormWorkspace.SpeedButton1Click(Sender: TObject);
@@ -356,7 +405,9 @@ begin
       RadioGroup3.ItemIndex:= 0;
       Edit8.Text:='';
     end;
-    if Pos('ant', LowerCase(FPathToWorkspace) ) > 0 then RadioGroup3.ItemIndex:= 1;
+
+    if Pos('ant', LowerCase(FPathToWorkspace) ) > 0 then
+       RadioGroup3.ItemIndex:= 1;
 
   end;
 end;
@@ -427,7 +478,7 @@ end;
 
 procedure TFormWorkspace.LoadSettings(const pFilename: string);
 var
-  i1, i2, i3, i4, i5, j1, j2: integer;
+  i1, i2, i3, i4, i5, j1, j2, j3: integer;
 begin
   FFileName:= pFilename;
   with TIniFile.Create(pFilename) do
@@ -446,8 +497,9 @@ begin
     FTouchtestEnabled:= ReadString('NewProject','TouchtestEnabled', '');
     if FTouchtestEnabled = '' then FTouchtestEnabled:= 'False';
 
-    FAntBuildMode:= ReadString('NewProject','AntBuildMode', '');
-    if FAntBuildMode = '' then FAntBuildMode:= 'debug'; //debug
+    //FAntBuildMode:= ReadString('NewProject','AntBuildMode', '');
+    //if FAntBuildMode = '' then
+    FAntBuildMode:= 'debug'; //default...
 
     FMainActivity:= ReadString('NewProject','MainActivity', '');  //dummy
     if FMainActivity = '' then FMainActivity:= 'App';
@@ -472,13 +524,9 @@ begin
        i4:= strToInt(ReadString('NewProject','GUIControls', ''))
     else i4:= 0;
 
-
-    {just workaround to prevent a known bug! 02 jan 2014}
     if ReadString('NewProject','MinApi', '') <> '' then
        j1:= strToInt(ReadString('NewProject','MinApi', ''))
     else j1:= 2; // Api 13
-
-    if j1 > 2 then j1:= 2;  {just workaround to prevent a known bug! 02 jan 2014}
 
     if  j1 < ListBox1.Items.Count then
         ListBox1.ItemIndex:= j1
@@ -494,6 +542,15 @@ begin
     else
         ComboBox2.ItemIndex:= ComboBox2.Items.Count-1;
 
+    if ReadString('NewProject','TargetApi', '') <> '' then
+       j3:= strToInt(ReadString('NewProject','TargetApi', ''))
+    else j3:= 2; // Api 13
+
+    if  j3 < ListBox2.Items.Count then
+        ListBox2.ItemIndex:= j3
+    else
+       ListBox2.ItemIndex:= ListBox2.Items.Count-1;
+
     ComboBox1.Items.Clear;
     GetSubDirectories(FPathToWorkspace, ComboBox1.Items);
 
@@ -506,24 +563,20 @@ begin
   RadioGroup4.ItemIndex:= i4;
   RadioGroup5.ItemIndex:= i5;
 
-
   if FTouchtestEnabled = 'True' then
      CheckGroup1.Checked[1]:= True
   else
      CheckGroup1.Checked[1]:= False;
 
-  if FAntBuildMode = 'debug' then
-     CheckGroup1.Checked[0]:= True
-  else
-     CheckGroup1.Checked[0]:= False;
+  CheckGroup1.Checked[0]:= True; //debug --> default
 
   FInstructionSet:= RadioGroup1.Items[RadioGroup1.ItemIndex];
   FFPUSet:= RadioGroup2.Items[RadioGroup2.ItemIndex];
   FProjectModel:= RadioGroup3.Items[RadioGroup3.ItemIndex]; //"Eclipse Project"/"Ant Project"
   FGUIControls:=  RadioGroup4.Items[RadioGroup4.ItemIndex];
 
-
   FMinApi:= ListBox1.Items[ListBox1.ItemIndex];
+  FTargetApi:= ListBox2.Items[ListBox2.ItemIndex];
 
   FNDK:= RadioGroup5.Items[RadioGroup5.ItemIndex];
 
@@ -560,20 +613,15 @@ begin
 
       WriteString('NewProject', 'AntPackageName', LowerCase(Trim(Edit8.Text)));
 
-      if ListBox1.ItemIndex < 3 then {just workaround to prevent a known bug! 02 jan 2014}
-         WriteString('NewProject', 'MinApi', IntToStr(ListBox1.ItemIndex))
-      else
-         WriteString('NewProject', 'MinApi', '2');
+      WriteString('NewProject', 'MinApi', IntToStr(ListBox1.ItemIndex));
+      WriteString('NewProject', 'TargetApi', IntToStr(ListBox2.ItemIndex));
 
       if CheckGroup1.Checked[1] then
          WriteString('NewProject', 'TouchtestEnabled', 'True')
       else
          WriteString('NewProject', 'TouchtestEnabled', 'False');
 
-      if CheckGroup1.Checked[0] then
-         WriteString('NewProject', 'AntBuildMode', 'debug')
-      else
-         WriteString('NewProject', 'AntBuildMode', 'release');
+      WriteString('NewProject', 'AntBuildMode', 'debug'); //default...
 
       WriteString('NewProject', 'MainActivity', FMainActivity); //dummy
 

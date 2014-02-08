@@ -29,6 +29,7 @@ uses
 #include <jni.h>}
 
 const
+
   libjnigraphics ='libjnigraphics.so';
 
   ANDROID_BITMAP_RESUT_SUCCESS            = 0;

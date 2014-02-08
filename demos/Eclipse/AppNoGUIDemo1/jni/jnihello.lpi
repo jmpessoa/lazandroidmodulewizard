@@ -43,7 +43,8 @@
       <Unit1>
         <Filename Value="unit1.pas"/>
         <IsPartOfProject Value="True"/>
-        <ComponentName Value="AndroidModule1"/>
+        <ComponentName Value="NoGUIAndroidModule1"/>
+        <HasResources Value="True"/>
         <ResourceBaseClass Value="DataModule"/>
         <UnitName Value="unit1"/>
       </Unit1>
@@ -56,7 +57,7 @@
       <Filename Value="C:\adt32\eclipse\workspace\AppNoGUIDemo1\libs\armeabi\jnihello"/>
     </Target>
     <SearchPaths>
-      <Libraries Value="C:\adt32\ndk7\platforms\android-14\arch-arm\usr\lib;C:\adt32\ndk7\toolchains\arm-linux-androideabi-4.4.3\prebuilt\windows\lib\gcc\arm-linux-androideabi\4.4.3"/>
+      <Libraries Value="C:\adt32\ndk7\platforms\android-14\arch-arm\usr\lib\;C:\adt32\ndk7\toolchains\arm-linux-androideabi-4.4.3\prebuilt\windows\lib\gcc\arm-linux-androideabi\4.4.3\"/>
     </SearchPaths>
     <Parsing>
       <SyntaxOptions>

@@ -1,7 +1,0 @@
-object AndroidModule1: TAndroidModule1
-  OldCreateOrder = False
-  Height = 150
-  HorizontalOffset = 330
-  VerticalOffset = 145
-  Width = 150
-end

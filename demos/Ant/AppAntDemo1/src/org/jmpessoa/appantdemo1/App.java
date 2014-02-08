@@ -1,7 +1,8 @@
 package org.jmpessoa.appantdemo1;
 
 
-//Android Java Interface for Pascal/Delphi XE5 (and Lazarus by jmpessoa)
+//Android Java Interface for Pascal/Delphi XE5 
+[and Lazarus by jmpessoa@hotmail.com - december 2013]
 
 //Developers
 //          Simon,Choi / Choi,Won-sik
@@ -82,7 +83,7 @@ public class App extends Activity {
 
     @Override
     protected void onStart()                  { super.onStart();   
-    	                                          controls.jAppOnActive();        }
+    	                                          controls.jAppOnStart();        }
 
     @Override
     protected void onStop()                   { super.onStop(); 

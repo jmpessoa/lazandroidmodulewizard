@@ -1,7 +1,7 @@
 object AndroidModule9: TAndroidModule9
   OnCreate = DataModuleCreate
   OldCreateOrder = False
-  BackButton = True
+  ActivityMode = actRecyclable
   Title = 'jForm'
   BackgroundColor = colbrBlack
   OnCloseQuery = DataModuleCloseQuery
@@ -10,20 +10,21 @@ object AndroidModule9: TAndroidModule9
   Height = 235
   HorizontalOffset = 319
   VerticalOffset = 145
-  Width = 281
+  Width = 437
   object jBitmap1: jBitmap
+    FilePath = fpathData
     ImageIndex = 0
     Images = jImageList1
     Width = 0
     Height = 0
-    left = 136
+    left = 208
     top = 96
   end
   object jImageList1: jImageList
     Images.Strings = (
       'Lazarus_Logo_new.png'
     )
-    left = 216
+    left = 280
     top = 96
   end
   object jView1: jView
@@ -37,6 +38,7 @@ object AndroidModule9: TAndroidModule9
     MarginTop = 0
     MarginRight = 0
     MarginBottom = 0
+    Canvas = jCanvas1
     Visible = True
     BackgroundColor = colbrDefault
     OnDraw = jView1Draw
@@ -63,5 +65,13 @@ object AndroidModule9: TAndroidModule9
     Text = 'Direct Bitmap Pixel Access Demo'
     left = 72
     top = 24
+  end
+  object jCanvas1: jCanvas
+    PaintStrokeWidth = 3
+    PaintStyle = psFillAndStroke
+    PaintTextSize = 20
+    PaintColor = colbrBlue
+    left = 136
+    top = 96
   end
 end

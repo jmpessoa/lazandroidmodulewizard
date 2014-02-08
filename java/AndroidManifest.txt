@@ -4,6 +4,9 @@
     package="dummyPackage" 
     android:versionCode="1"
     android:versionName="1.0">
+
+    <uses-sdk android:minSdkVersion="dummySdkApi" android:targetSdkVersion="dummyTargetApi"/>
+
     <uses-permission android:name="android.permission.CHANGE_WIFI_STATE"/>
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />   
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
@@ -28,7 +31,6 @@
                   android:normalScreens="true" 
                   android:largeScreens="true" 
                   android:anyDensity="true"/>                      
-    <uses-sdk android:minSdkVersion="dummyApi"/>
     <application
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"

@@ -1,4 +1,4 @@
-package com.template.appdummy; //warning for TEMPLATE: by jmpessoa: please do not edit ou change the place of this line!!! 
+package com.example.dummyapp;
 
 
 //Android Java Interface for Pascal/Delphi XE5 (and Lazarus by jmpessoa)
@@ -15,6 +15,7 @@ package com.template.appdummy; //warning for TEMPLATE: by jmpessoa: please do no
 
 import java.lang.Override;
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.content.pm.ActivityInfo; 
@@ -33,14 +34,14 @@ public class App extends Activity {
     public void onCreate(Bundle savedInstanceState) {
      super.onCreate(savedInstanceState);                            
      
-      //by jmpessoa --- fix http get    
+      //by jmpessoa --- fix for http get    
       //ref. http://stackoverflow.com/questions/8706464/defaulthttpclient-to-androidhttpclient 
+
      if (android.os.Build.VERSION.SDK_INT > 9) {
          StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
          StrictMode.setThreadPolicy(policy);
      }
      
-  
       Log.i("jApp","01.Activity.onCreate");
       controls             = new Controls();
       controls.activity    = this; 
@@ -55,12 +56,12 @@ public class App extends Activity {
       this.setContentView(controls.appLayout);
       this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
       // Event : Java -> Pascal
-      controls.jAppOnCreate(this, controls.appLayout);
       Log.i("jApp","02.Controls.jAppOnCreate");
+      controls.jAppOnCreate(this, controls.appLayout);
       
     }
     
-    @Override
+    @Override    
     protected void onNewIntent(Intent intent) { super.onNewIntent(intent);
     	                                          controls.jAppOnNewIntent();     }
     
@@ -82,7 +83,7 @@ public class App extends Activity {
 
     @Override
     protected void onStart()                  { super.onStart();   
-    	                                          controls.jAppOnActive();        }
+    	                                          controls.jAppOnStart();        }
 
     @Override
     protected void onStop()                   { super.onStop(); 
@@ -101,7 +102,6 @@ public class App extends Activity {
  
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-      controls.jAppOnActivityResult(requestCode,resultCode,data);                                       
+      controls.jAppOnActivityResult(requestCode,resultCode,data);                                     
     }
-
 }

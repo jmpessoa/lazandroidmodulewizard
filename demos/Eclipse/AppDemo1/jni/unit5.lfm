@@ -1,13 +1,14 @@
 object AndroidModule5: TAndroidModule5
   OnCreate = DataModuleCreate
   OldCreateOrder = False
-  BackButton = True
+  ActivityMode = actRecyclable
   Title = 'jForm'
   BackgroundColor = colbrBlack
   OnCloseQuery = DataModuleCloseQuery
   OnRotate = DataModuleRotate
   OnJNIPrompt = DataModuleJNIPrompt
-  Height = 291
+  OnActive = DataModuleActive
+  Height = 377
   HorizontalOffset = 319
   VerticalOffset = 145
   Width = 246
@@ -21,6 +22,7 @@ object AndroidModule5: TAndroidModule5
     MarginTop = 10
     MarginRight = 10
     MarginBottom = 10
+    ParentPanel = jPanel1
     Alignment = taLeft
     Visible = True
     Enabled = True
@@ -30,72 +32,6 @@ object AndroidModule5: TAndroidModule5
     Text = 'WebView Demo'
     left = 104
     top = 8
-  end
-  object jEditText1: jEditText
-    Id = 67950
-    Anchor = jTextView2
-    PosRelativeToAnchor = [raBelow]
-    PosRelativeToParent = []
-    LayoutParamWidth = lpMatchParent
-    LayoutParamHeight = lpWrapContent
-    MarginLeft = 10
-    MarginTop = 10
-    MarginRight = 10
-    MarginBottom = 10
-    Alignment = taLeft
-    InputTypeEx = itxText
-    LineMaxLength = 360
-    Text = 'http://www.freepascal.org'
-    Visible = True
-    BackgroundColor = colbrWhite
-    FontColor = colbrDefault
-    FontSize = 0
-    SingleLine = True
-    ScrollBarStyle = scrNone
-    MaxLines = 1
-    HorScrollBar = False
-    VerScrollBar = False
-    WrappingLine = True
-    left = 104
-    top = 128
-  end
-  object jButton1: jButton
-    Id = 56730
-    Anchor = jEditText1
-    PosRelativeToAnchor = [raBelow]
-    PosRelativeToParent = []
-    LayoutParamWidth = lpMatchParent
-    LayoutParamHeight = lpWrapContent
-    MarginLeft = 5
-    MarginTop = 5
-    MarginRight = 5
-    MarginBottom = 5
-    Visible = True
-    BackgroundColor = colbrDefault
-    Text = 'Go!'
-    FontColor = colbrLightSteelBlue
-    FontSize = 0
-    OnClick = jButton1Click
-    left = 104
-    top = 176
-  end
-  object jWebView1: jWebView
-    Id = 0
-    Anchor = jButton1
-    PosRelativeToAnchor = [raBelow]
-    PosRelativeToParent = []
-    LayoutParamWidth = lpMatchParent
-    LayoutParamHeight = lpMatchParent
-    MarginLeft = 10
-    MarginTop = 0
-    MarginRight = 10
-    MarginBottom = 0
-    JavaScript = False
-    Visible = True
-    BackgroundColor = colbrDefault
-    OnStatus = jWebView1Status
-    left = 104
-    top = 224
   end
   object jTextView2: jTextView
     Id = 5415497
@@ -108,6 +44,7 @@ object AndroidModule5: TAndroidModule5
     MarginTop = 10
     MarginRight = 10
     MarginBottom = 10
+    ParentPanel = jPanel1
     Alignment = taLeft
     Visible = True
     Enabled = True
@@ -117,5 +54,105 @@ object AndroidModule5: TAndroidModule5
     Text = 'Enter URL:'
     left = 104
     top = 72
+  end
+  object jEditText1: jEditText
+    Id = 4376563
+    Anchor = jTextView2
+    PosRelativeToAnchor = [raBelow]
+    PosRelativeToParent = []
+    LayoutParamWidth = lpMatchParent
+    LayoutParamHeight = lpWrapContent
+    MarginLeft = 10
+    MarginTop = 10
+    MarginRight = 10
+    MarginBottom = 10
+    ParentPanel = jPanel1
+    Alignment = taLeft
+    InputTypeEx = itxNumber
+    LineMaxLength = 300
+    Text = 'http://www.freepascal.org'
+    Visible = True
+    BackgroundColor = colbrWhite
+    FontColor = colbrDefault
+    FontSize = 0
+    ScrollBarStyle = scrNone
+    MaxLines = 1
+    HorScrollBar = True
+    VerScrollBar = False
+    WrappingLine = False
+    OnEnter = jEditText1Enter
+    OnChange = jEditText1Change
+    left = 104
+    top = 136
+  end
+  object jWebView1: jWebView
+    Id = 0
+    PosRelativeToAnchor = []
+    PosRelativeToParent = []
+    LayoutParamWidth = lpMatchParent
+    LayoutParamHeight = lpMatchParent
+    MarginLeft = 10
+    MarginTop = 0
+    MarginRight = 10
+    MarginBottom = 0
+    ParentPanel = jPanel2
+    JavaScript = False
+    Visible = True
+    BackgroundColor = colbrDefault
+    OnStatus = jWebView1Status
+    left = 104
+    top = 272
+  end
+  object jButton1: jButton
+    Id = 910220
+    Anchor = jEditText1
+    PosRelativeToAnchor = [raBelow]
+    PosRelativeToParent = []
+    LayoutParamWidth = lpMatchParent
+    LayoutParamHeight = lpWrapContent
+    MarginLeft = 5
+    MarginTop = 5
+    MarginRight = 5
+    MarginBottom = 5
+    ParentPanel = jPanel1
+    Visible = True
+    BackgroundColor = colbrDefault
+    Text = 'Go!'
+    FontColor = colbrDefault
+    FontSize = 0
+    OnClick = jButton1Click
+    left = 104
+    top = 200
+  end
+  object jPanel1: jPanel
+    Id = 7980347
+    PosRelativeToAnchor = []
+    PosRelativeToParent = []
+    LayoutParamWidth = lpMatchParent
+    LayoutParamHeight = lpOneThirdOfParent
+    MarginLeft = 10
+    MarginTop = 0
+    MarginRight = 10
+    MarginBottom = 0
+    Visible = True
+    BackgroundColor = colbrLightSlateBlue
+    left = 34
+    top = 55
+  end
+  object jPanel2: jPanel
+    Id = 0
+    Anchor = jPanel1
+    PosRelativeToAnchor = [raBelow]
+    PosRelativeToParent = []
+    LayoutParamWidth = lpMatchParent
+    LayoutParamHeight = lpMatchParent
+    MarginLeft = 0
+    MarginTop = 0
+    MarginRight = 0
+    MarginBottom = 0
+    Visible = True
+    BackgroundColor = colbrDefault
+    left = 34
+    top = 272
   end
 end

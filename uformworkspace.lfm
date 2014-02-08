@@ -72,7 +72,6 @@ object FormWorkspace: TFormWorkspace
   }
   OnActivate = FormActivate
   OnClose = FormClose
-  OnCreate = FormCreate
   Position = poScreenCenter
   LCLVersion = '1.1'
   object Edit1: TEdit
@@ -175,10 +174,10 @@ object FormWorkspace: TFormWorkspace
     TabOrder = 4
   end
   object RadioGroup2: TRadioGroup
-    Left = 88
+    Left = 80
     Height = 88
     Top = 416
-    Width = 81
+    Width = 72
     AutoFill = True
     Caption = 'ARM Fpu:'
     ChildSizing.LeftRightSpacing = 6
@@ -190,7 +189,7 @@ object FormWorkspace: TFormWorkspace
     ChildSizing.Layout = cclLeftToRightThenTopToBottom
     ChildSizing.ControlsPerLine = 1
     ClientHeight = 70
-    ClientWidth = 77
+    ClientWidth = 68
     ItemIndex = 0
     Items.Strings = (
       'Soft'
@@ -241,10 +240,10 @@ object FormWorkspace: TFormWorkspace
     TabOrder = 7
   end
   object RadioGroup3: TRadioGroup
-    Left = 368
+    Left = 400
     Height = 88
     Top = 416
-    Width = 80
+    Width = 72
     AutoFill = True
     Caption = 'Project:'
     ChildSizing.LeftRightSpacing = 6
@@ -256,8 +255,8 @@ object FormWorkspace: TFormWorkspace
     ChildSizing.Layout = cclLeftToRightThenTopToBottom
     ChildSizing.ControlsPerLine = 1
     ClientHeight = 70
-    ClientWidth = 76
-    ItemIndex = 1
+    ClientWidth = 68
+    ItemIndex = 0
     Items.Strings = (
       'Eclipse'
       'Ant'
@@ -341,7 +340,7 @@ object FormWorkspace: TFormWorkspace
     OnClick = SpeedButton7Click
   end
   object RadioGroup4: TRadioGroup
-    Left = 272
+    Left = 312
     Height = 88
     Top = 416
     Width = 88
@@ -382,10 +381,10 @@ object FormWorkspace: TFormWorkspace
     Text = 'org.lazarus'
   end
   object ListBox1: TListBox
-    Left = 174
+    Left = 154
     Height = 72
     Top = 432
-    Width = 88
+    Width = 75
     Items.Strings = (
       '8  '
       '10'
@@ -399,11 +398,11 @@ object FormWorkspace: TFormWorkspace
     TabOrder = 14
   end
   object Label10: TLabel
-    Left = 176
+    Left = 157
     Height = 15
     Top = 416
-    Width = 45
-    Caption = 'Min Api:'
+    Width = 70
+    Caption = 'Min. Sdk Api:'
     ParentColor = False
   end
   object RadioGroup5: TRadioGroup
@@ -447,10 +446,10 @@ object FormWorkspace: TFormWorkspace
     Width = 656
   end
   object CheckGroup1: TCheckGroup
-    Left = 456
+    Left = 472
     Height = 86
-    Top = 416
-    Width = 92
+    Top = 418
+    Width = 88
     AutoFill = True
     Caption = 'Ant Builds:'
     ChildSizing.LeftRightSpacing = 6
@@ -462,7 +461,7 @@ object FormWorkspace: TFormWorkspace
     ChildSizing.Layout = cclLeftToRightThenTopToBottom
     ChildSizing.ControlsPerLine = 1
     ClientHeight = 68
-    ClientWidth = 88
+    ClientWidth = 84
     Items.Strings = (
       'Debug'
       'Touchtest'
@@ -503,7 +502,52 @@ object FormWorkspace: TFormWorkspace
     Height = 23
     Top = 519
     Width = 650
-    Panels = <>
+    Panels = <    
+      item
+        Text = 'MinSdk Api:'
+        Width = 200
+      end    
+      item
+        Text = 'Target Api:'
+        Width = 200
+      end    
+      item
+        Alignment = taRightJustify
+        Text = 'Ref: developer.android.com/about/dashboards'
+        Width = 50
+      end>
+    SimplePanel = False
+  end
+  object ListBox2: TListBox
+    Left = 232
+    Height = 72
+    Top = 432
+    Width = 80
+    Items.Strings = (
+      '8'
+      '10'
+      '13'
+      '14'
+      '15'
+      '16'
+      '17'
+      '18'
+      '19'
+    )
+    ItemHeight = 15
+    ItemIndex = 6
+    OnClick = ListBox2Click
+    OnSelectionChange = ListBox2SelectionChange
+    TabOrder = 19
+    TopIndex = 3
+  end
+  object Label11: TLabel
+    Left = 236
+    Height = 15
+    Top = 416
+    Width = 58
+    Caption = 'Target Api:'
+    ParentColor = False
   end
   object SelectDirectoryDialog1: TSelectDirectoryDialog
     left = 416

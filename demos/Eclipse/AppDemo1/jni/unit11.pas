@@ -1,4 +1,4 @@
-{Hint: save all files to location: \jni }
+﻿{Hint: save all files to location: \jni }
 unit unit11;
   
 {$mode delphi}
@@ -23,6 +23,7 @@ type
       jTextView2: jTextView;
       jTextView3: jTextView;
       jTimer1: jTimer;
+      procedure DataModuleActive(Sender: TObject);
       procedure DataModuleCloseQuery(Sender: TObject; var CanClose: boolean);
       procedure DataModuleCreate(Sender: TObject);
       procedure DataModuleJNIPrompt(Sender: TObject);
@@ -36,6 +37,7 @@ type
       procedure jCanvasES2_1GLDown(Sender: TObject; Touch: TMouch);
       procedure jCanvasES2_1GLDraw(Sender: TObject);
       procedure jCanvasES2_1GLMove(Sender: TObject; Touch: TMouch);
+      procedure jCanvasES2_1GLThread(Sender: TObject);
       procedure jCanvasES2_1GLUp(Sender: TObject; Touch: TMouch);
       procedure jTimer1Timer(Sender: TObject);
     private
@@ -51,6 +53,7 @@ type
       gArcBall  : TxgArcBall;
       gW        : integer;
       gH        : integer;
+      gRunning   : boolean;
       procedure DoDraw(Angle,Zoom : Single; scrW: integer; scrH: integer);
   end;
   
@@ -214,9 +217,8 @@ begin
   gWork   := False;
   gZoom   := 1.0;
   Timer_Cnt:= 0;
-
+  gRunning:= True;
   ArcBall_Init(gArcBall);
-
   Self.Show;
 end;
 
@@ -228,7 +230,7 @@ end;
 
 procedure TAndroidModule11.jButton1Click(Sender: TObject);
 begin
-   jTimer1.Enabled:= not (jTimer1.Enabled);
+   jTimer1.Enabled:= not jTimer1.Enabled;
    if jTimer1.Enabled then
    begin
      gWork:= True;
@@ -270,12 +272,12 @@ end;
 
 procedure TAndroidModule11.jCanvasES2_1GLDown(Sender: TObject; Touch: TMouch);
 begin
-  ArcBall_Down(gArcBall, gW, gH, Touch.Pt.X,Touch.Pt.Y);
+  ArcBall_Down(gArcBall, gW, gH, Touch.Pt.X, Touch.Pt.Y);
 end;
 
 procedure TAndroidModule11.jCanvasES2_1GLDraw(Sender: TObject);
 begin
-  DoDraw(gAngle*gSpeed,gZoom, gW, gH);
+  DoDraw(gAngle*gSpeed, gZoom, gW, gH);
 end;
 
 procedure TAndroidModule11.jCanvasES2_1GLMove(Sender: TObject; Touch: TMouch);
@@ -288,6 +290,21 @@ begin
   jCanvasES2_1.Refresh;
 end;
 
+procedure TAndroidModule11.jCanvasES2_1GLThread(Sender: TObject);
+begin
+  gWork:= False;
+  case jCanvasES2_1.Textures[0].Active of
+   True  : begin
+             jCanvasES2_1.Texture_Unload_All;
+           end;
+   False : begin
+             jCanvasES2_1.Texture_Load_All;
+           end;
+  end;
+  gWork := True;
+  jCanvasES2_1.Refresh;
+end;
+
 procedure TAndroidModule11.jCanvasES2_1GLUp(Sender: TObject; Touch: TMouch);
 begin
   ArcBall_Up(gArcBall);
@@ -297,13 +314,13 @@ procedure TAndroidModule11.jTimer1Timer(Sender: TObject);
 begin
   Inc(Timer_Cnt);
   gAngle := gAngle + 4;
-  If gAngle > 360 then gAngle := 0;
-  If gWork then jCanvasES2_1.Refresh;
+  if gAngle > 360 then gAngle := 0;
+  if gWork then jCanvasES2_1.Refresh;
 end;
 
 procedure TAndroidModule11.DataModuleCreate(Sender: TObject);
-begin
-  Self.BackButton:= True;
+begin  //this initialization code is need here to fix Laz4Andoid  *.lfm parse.... why parse fails?
+  Self.ActivityMode:= actRecyclable;
   Self.BackgroundColor:= colbrBlack;
     //mode delphi
   Self.OnJNIPrompt:= DataModuleJNIPrompt;
@@ -311,11 +328,21 @@ begin
   Self.OnCloseQuery:= DataModuleCloseQuery;
 end;
 
-procedure TAndroidModule11.DataModuleCloseQuery(Sender: TObject;
-  var CanClose: boolean);
+procedure TAndroidModule11.DataModuleCloseQuery(Sender: TObject; var CanClose: boolean);
 begin
    CanClose:= True;
    jTimer1.Enabled := False;
+   gRunning:= False;
+end;
+
+procedure TAndroidModule11.DataModuleActive(Sender: TObject);
+begin
+  if not gRunning then
+  begin
+    gWork := True;
+    jTimer1.Enabled := True;
+    gRunning:= True;
+  end
 end;
 
 end.

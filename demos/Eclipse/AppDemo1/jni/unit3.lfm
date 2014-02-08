@@ -1,12 +1,14 @@
 object AndroidModule3: TAndroidModule3
   OnCreate = DataModuleCreate
   OldCreateOrder = False
-  BackButton = True
+  ActivityMode = actRecyclable
   Title = 'jForm'
-  BackgroundColor = colbrWhite
+  BackgroundColor = colbrDefault
   OnCloseQuery = DataModuleCloseQuery
   OnRotate = DataModuleRotate
   OnJNIPrompt = DataModuleJNIPrompt
+  OnActive = DataModuleActive
+  OnClose = DataModuleClose
   Height = 612
   HorizontalOffset = 324
   VerticalOffset = 41
@@ -56,7 +58,7 @@ object AndroidModule3: TAndroidModule3
     BackgroundColor = colbrNone
     FontColor = colbrWhite
     FontSize = 0
-    Text = '1.Base Controls'
+    Text = 'Base Controls'
     left = 176
     top = 8
   end
@@ -144,7 +146,7 @@ object AndroidModule3: TAndroidModule3
     Anchor = jTextView2
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = []
-    LayoutParamWidth = lpTwoThirdOfParent
+    LayoutParamWidth = lpOneThirdOfParent
     LayoutParamHeight = lpWrapContent
     MarginLeft = 10
     MarginTop = 10
@@ -157,7 +159,6 @@ object AndroidModule3: TAndroidModule3
     BackgroundColor = colbrWhite
     FontColor = colbrDefault
     FontSize = 0
-    SingleLine = True
     ScrollBarStyle = scrNone
     MaxLines = 1
     HorScrollBar = False

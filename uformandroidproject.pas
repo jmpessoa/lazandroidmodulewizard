@@ -65,6 +65,7 @@ type
     FMainActivity: string;
     FListJNIBridge: TStringList;
     FMinApi: string;
+    FTargetApi: string;
 
     Memo2List: TStringList;
 
@@ -90,6 +91,7 @@ type
     property AndroidProjectName: string read FAndroidProjectName write FAndroidProjectName;
     property MainActivity: string read FMainActivity write FMainActivity;
     property MinApi: string  read FMinApi write FMinApi;
+    property TargetApi: string  read FTargetApi write FTargetApi;
   end;
 
 var
@@ -476,6 +478,8 @@ begin
                              strNativeMethodsBody+');'+ LineEnding;
     strOnLoadList:= TStringList.Create;
     strOnLoadList.Add('function RegisterNativeMethodsArray(PEnv: PJNIEnv; className: PChar; methods: PJNINativeMethod; countMethods:integer):integer;');
+    strOnLoadList.Add('var');
+    strOnLoadList.Add('  curClass: jClass;');
     strOnLoadList.Add('begin');
     strOnLoadList.Add('  Result:= JNI_FALSE;');
     strOnLoadList.Add('  curClass:= (PEnv^).FindClass(PEnv, className);');
@@ -486,45 +490,70 @@ begin
     strOnLoadList.Add('end;');
     strOnLoadList.Add(' ');
     PathToClassName:= ReplaceChar(auxPathJNI, '_', '/');
-    strOnLoadList.Add('function RegisterNativeMethods(PEnv: PJNIEnv): integer;');
+    strOnLoadList.Add('function RegisterNativeMethods(PEnv: PJNIEnv; className: PChar): integer;');
     strOnLoadList.Add('begin');
-    strOnLoadList.Add('  curClassPathName:= '''+PathToClassName+''';');
-    strOnLoadList.Add('  Result:= RegisterNativeMethodsArray(PEnv, PChar(curClassPathName), @NativeMethods[0], Length(NativeMethods));');
+    strOnLoadList.Add('  Result:= RegisterNativeMethodsArray(PEnv, className, @NativeMethods[0], Length(NativeMethods));');
     strOnLoadList.Add('end;');
     strOnLoadList.Add(' ');
+
     strOnLoadList.Add('function JNI_OnLoad(VM: PJavaVM; reserved: pointer): JInt; cdecl;');
     strOnLoadList.Add('var');
-    strOnLoadList.Add('  PEnv: PPointer {PJNIEnv};');
+    strOnLoadList.Add('  PEnv: PPointer;');
+    strOnLoadList.Add('  curEnv: PJNIEnv;');
     strOnLoadList.Add('begin');
     strOnLoadList.Add('  PEnv:= nil;');
     strOnLoadList.Add('  Result:= JNI_VERSION_1_6;');
     strOnLoadList.Add('  (VM^).GetEnv(VM, @PEnv, Result);');
-    strOnLoadList.Add('  if PEnv <> nil then RegisterNativeMethods(PJNIEnv(PEnv));');
-    strOnLoadList.Add('  curVM:= VM {PJavaVM};');
-    if FModuleType = 0 then strOnLoadList.Add('  gVM:= VM {And_jni_Bridge};');
-    strOnLoadList.Add('  curEnv:= PJNIEnv(PEnv);');
-    strOnLoadList.Add('end;');
-    strOnLoadList.Add(' ');
-    strOnLoadList.Add('procedure JNI_OnUnload(VM: PJavaVM; reserved: pointer); cdecl;');
-    strOnLoadList.Add('begin');
-    strOnLoadList.Add('  if curEnv <> nil then');
+    strOnLoadList.Add('  if PEnv <> nil then');
     strOnLoadList.Add('  begin');
-    strOnLoadList.Add('    (curEnv^).UnregisterNatives(curEnv, curClass);');
-    strOnLoadList.Add('    (curEnv^).DeleteGlobalRef(curEnv, gjClass{And_jni_Bridge});');
+    strOnLoadList.Add('     curEnv:= PJNIEnv(PEnv);');
+    strOnLoadList.Add('     RegisterNativeMethods(curEnv, '''+PathToClassName+''');');
+    if FModuleType = 1 then
+    begin
+    strOnLoadList.Add('     gPDalvikVM:= VM;{PJavaVM}{unit1}');
+    strOnLoadList.Add('     gjClassPath:= '''+PathToClassName+''';{unit1}');
+    strOnLoadList.Add('     gjClass:= (curEnv^).FindClass(curEnv, '''+PathToClassName+''');{unit1}');
+    strOnLoadList.Add('     gjClass:= (curEnv^).NewGlobalRef(curEnv, gjClass);{unit1}');
+    end;
     strOnLoadList.Add('  end;');
-    strOnLoadList.Add('  curClass:= nil;');
-    strOnLoadList.Add('  curEnv:= nil;');
-    strOnLoadList.Add('  curVM:= nil;');
-    if FModuleType = 0 then strOnLoadList.Add('  gVM:= nil;');
-    strOnLoadList.Add('  App.Terminate;');
-    strOnLoadList.Add('  FreeAndNil(App);');
+    if FModuleType = 0 then
+    begin
+       strOnLoadList.Add('  gVM:= VM;{And_jni_Bridge}');
+    end;
     strOnLoadList.Add('end;');
 
+    strOnLoadList.Add(' ');
+    strOnLoadList.Add('procedure JNI_OnUnload(VM: PJavaVM; reserved: pointer); cdecl;');
+    strOnLoadList.Add('var');
+    strOnLoadList.Add('  PEnv: PPointer;');
+    strOnLoadList.Add('  curEnv: PJNIEnv;');
+    strOnLoadList.Add('begin');
+    strOnLoadList.Add('  PEnv:= nil;');
+    strOnLoadList.Add('  (VM^).GetEnv(VM, @PEnv, JNI_VERSION_1_6);');
+    strOnLoadList.Add('  if PEnv <> nil then');
+    strOnLoadList.Add('  begin');
+    strOnLoadList.Add('    curEnv:= PJNIEnv(PEnv);');
+
+    if FModuleType = 1 then
+    begin
+    strOnLoadList.Add('    (curEnv^).UnregisterNatives(curEnv, gjClass{unit1});');
+    strOnLoadList.Add('    (curEnv^).DeleteGlobalRef(curEnv, gjClass{unit1});');
+    strOnLoadList.Add('    gjClass:= nil;');
+    strOnLoadList.Add('    gPDalvikVM:= nil;');
+    end;
+    if FModuleType = 0 then
+    begin
+    strOnLoadList.Add('    (curEnv^).DeleteGlobalRef(curEnv, gjClass{And_jni_Bridge});');
+    strOnLoadList.Add('    gVM:= nil;{And_jni_Bridge}');
+    end;
+    strOnLoadList.Add('  end;');
+    strOnLoadList.Add('  gApp.Terminate;');
+    strOnLoadList.Add('  FreeAndNil(gApp);');
+    strOnLoadList.Add('end;');
     auxStr:= Memo6List.Strings[Memo6List.Count-1];
     Memo6List.Strings[Memo6List.Count-1]:= ReplaceChar(auxStr,',',';');
     FPascalJNIInterfaceCode:= Memo5List.Text + strNativeMethodsHeader + LineEnding+
                               strOnLoadList.Text + LineEnding+Memo6List.Text;
-
     SynMemo2.Lines.Text:= FPascalJNIInterfaceCode;
     Memo3List.Free;
     Memo4List.Free;
@@ -547,6 +576,18 @@ var
   fileName, pathPack: string;
   auxStr: string;
 begin
+  if  (FModuleType = 0) and (Pos('Controls', ShellListView1.Selected.Caption) <=  0) then
+  begin
+     ShowMessage('Error! GUI Module need "Controls.java". [Cancel]!');
+     ModalResult:= mrCancel;
+     Exit;
+  end;
+  if (FModuleType = 1) and (Pos('Controls', ShellListView1.Selected.Caption) >  0) then
+  begin
+     ShowMessage('Error! "Controls.java" incompatible with NoGUI Module. [Cancel]!');
+     ModalResult:= mrCancel;
+     Exit;
+  end;
   if ShellListView1.Selected <> nil then
   begin
 
@@ -569,9 +610,6 @@ begin
     // LabelJClass.Caption:= fileName;
 
      FJavaClassName:= SplitStr(fileName, '.');
-
-     if CompareText(FJavaClassName, 'Controls') = 0 then
-        FModuleType:= 0;  //Controls.java
 
      for i:= 0 to pathList.Count-2 do
      begin
@@ -609,7 +647,6 @@ procedure TFormAndroidProject.ToolButton1Click(Sender: TObject);
 begin
   //02-december-2013 Add support to simonsayz's controls
   //http://blog.naver.com/simonsayz
-
    ShowMessage('LazAndroidModuleWizard ver. 0.3 - revision 0.1 - 28 dec. 2013 - by jmpessoa');
 end;
 
@@ -677,11 +714,12 @@ begin
     ListManifest.LoadFromFile(FPathToJavaTemplates + DirectorySeparator + 'AndroidManifest.txt');
     strAfterReplace  := StringReplace(ListManifest.Text, 'dummyPackage',strPack, [rfReplaceAll, rfIgnoreCase]);
 
-    strPack:= strPack+'.'+FMainActivity; {App}
+    strPack:= strPack+'.'+FMainActivity; {gApp}
     strAfterReplace  := StringReplace(strAfterReplace, 'dummyAppName',strPack, [rfReplaceAll, rfIgnoreCase]);
 
-    {known bug: there is a workaround to prevent Api > 13! - 02 jan 2014}
-    strAfterReplace  := StringReplace(strAfterReplace, 'dummyApi', FMinApi, [rfReplaceAll, rfIgnoreCase]);
+    {fix bug  - 04 jan 2014}
+    strAfterReplace  := StringReplace(strAfterReplace, 'dummySdkApi', FMinApi, [rfReplaceAll, rfIgnoreCase]);
+    strAfterReplace  := StringReplace(strAfterReplace, 'dummyTargetApi', FMinApi, [rfReplaceAll, rfIgnoreCase]);
 
     ListManifest.Clear;
     ListManifest.Text:= strAfterReplace;
@@ -698,7 +736,7 @@ end;
 
 procedure TFormAndroidProject.FormCreate(Sender: TObject);
 begin
-  FModuleType:= 1; // generic...
+  FModuleType:= 0; //GUI module
   FSyntaxMode:= smDelphi;
   FImportsList:= TStringLIst.Create;
   Memo2List:= TStringList.Create;

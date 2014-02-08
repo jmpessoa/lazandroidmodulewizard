@@ -52,10 +52,9 @@ begin
    CanClose:= True;
 end;
 
- //need here only to fix *.lfm parse fail on Lazarus4android...
 procedure TAndroidModule6.DataModuleCreate(Sender: TObject);
-begin
-  Self.BackButton:= True;
+begin    //this initialization code is need here to fix Laz4Andoid  *.lfm parse.... why parse fails?
+  Self.ActivityMode:= actRecyclable;
   Self.BackgroundColor:= colbrBlack;
   //mode delphi
   Self.OnJNIPrompt:= DataModuleJNIPrompt;
@@ -82,8 +81,17 @@ begin
 end;
 
 procedure TAndroidModule6.jButton2Click(Sender: TObject);
+var
+  index: integer;
 begin
-   jListView1.Items.Delete(StrToInt(jEditText2.Text));
+  if jEditText2.Text <> '' then
+  begin
+     index:= StrToInt(jEditText2.Text);
+     if (index < jListView1.Items.Count) and (index >=0) then
+     begin
+        jListView1.Items.Delete(index);
+     end;
+  end;
 end;
 
 procedure TAndroidModule6.jButton3Click(Sender: TObject);

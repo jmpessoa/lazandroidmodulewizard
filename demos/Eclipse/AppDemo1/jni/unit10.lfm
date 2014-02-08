@@ -1,12 +1,13 @@
 object AndroidModule10: TAndroidModule10
   OnCreate = DataModuleCreate
   OldCreateOrder = False
-  BackButton = True
+  ActivityMode = actRecyclable
   Title = 'jForm'
   BackgroundColor = colbrBlack
   OnCloseQuery = DataModuleCloseQuery
   OnRotate = DataModuleRotate
   OnJNIPrompt = DataModuleJNIPrompt
+  OnActive = DataModuleActive
   Height = 378
   HorizontalOffset = 319
   VerticalOffset = 145
@@ -27,7 +28,7 @@ object AndroidModule10: TAndroidModule10
     BackgroundColor = colbrDefault
     FontColor = colbrSilver
     FontSize = 0
-    Text = 'OpenGLES_v1 Demo'
+    Text = 'OpenGLES_v1 *2D* Demo'
     left = 112
     top = 34
   end
@@ -42,14 +43,16 @@ object AndroidModule10: TAndroidModule10
     MarginTop = 10
     MarginRight = 10
     MarginBottom = 10
-    AutoRefresh = True
-    Visible = True
-    Images = jImageList1
     OnGLCreate = jCanvasES1_1GLCreate
     OnGLChange = jCanvasES1_1GLChange
     OnGLDraw = jCanvasES1_1GLDraw
     OnGLThread = jCanvasES1_1GLThread
+    OnGLDown = jCanvasES1_1GLDown
     OnGLMove = jCanvasES1_1GLMove
+    OnGLUp = jCanvasES1_1GLUp
+    AutoRefresh = True
+    Visible = True
+    Images = jImageList1
     left = 112
     top = 168
   end
