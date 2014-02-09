@@ -2,7 +2,7 @@ package com.example.appdemo2;
 //
 //
 //Android Java Interface for Pascal/Delphi XE5  - 
-//[and Lazarus: by jmpessoa - december 2013]
+//[and Lazarus: by jmpessoa@hotmail.com - december 2013]
 //
 //Developer
 //          Simon,Choi / Choi,Won-sik

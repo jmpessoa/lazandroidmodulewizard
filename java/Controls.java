@@ -2,7 +2,7 @@ package com.example.dummyapp;
 //
 //
 //Android Java Interface for Pascal/Delphi XE5  - 
-//[and Lazarus: by jmpessoa@hotmail.com - december 2013]
+//[and Lazarus by jmpessoa@hotmail.com - december 2013]
 //
 //Developer
 //          Simon,Choi / Choi,Won-sik
@@ -4287,6 +4287,7 @@ public  void classChkNull (Class object) {
 //
 public  void appFinish () {
   activity.finish();
+  System.exit(0);  //<<--------- fix by jmpessoa.
 }
 
 //

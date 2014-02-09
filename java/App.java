@@ -1,7 +1,8 @@
 package com.example.dummyapp;
 
 
-//Android Java Interface for Pascal/Delphi XE5 (and Lazarus by jmpessoa)
+//Android Java Interface for Pascal/Delphi XE5 
+//[and Lazarus by jmpessoa@hotmail.com - december 2013]
 
 //Developers
 //          Simon,Choi / Choi,Won-sik
