@@ -54,7 +54,12 @@ version 0.4 - 08 February - 2014 -
       :: warning: compatibility issue:  
        
         1. jForm: no more has the property "BackButton". 
+                  no more has the property "MainActivity".
+                  
+                  [Indeed, now there is property "ActivityMode": (actMain, actSplash, actDisposable, actRecyclable)]
+ 
               Please,  edit/modify you *.lfm before loading your old project 
+
                                         
         2. jEditText: no more has the property "SingleLine". 
               Please,  edit/modify you *.lfm before loading your old project 
