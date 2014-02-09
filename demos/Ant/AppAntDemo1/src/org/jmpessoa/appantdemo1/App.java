@@ -2,7 +2,7 @@ package org.jmpessoa.appantdemo1;
 
 
 //Android Java Interface for Pascal/Delphi XE5 
-[and Lazarus by jmpessoa@hotmail.com - december 2013]
+//[and Lazarus by jmpessoa@hotmail.com - december 2013]
 
 //Developers
 //          Simon,Choi / Choi,Won-sik
