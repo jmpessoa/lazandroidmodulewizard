@@ -42,6 +42,8 @@ begin
   {$I jWebView_icon.lrs}
   {$I jhttpclient_icon.lrs}
   {$I jsmtpclient_icon.lrs}
+  {$I jsqlitedataaccess_icon.lrs}
+  {$I jsqlitecursor_icon.lrs}
   RegisterComponents('Android Bridges',[jTextView, jEditText, jButton ,jCheckBox, jRadioButton,
                                         jProgressBar, jViewFlipper, jListView,
                                         jScrollView,jHorizontalScrollView, jPanel,
@@ -49,7 +51,8 @@ begin
                                         jView, jCanvas, jBitmap,
                                         jDialogYN, jDialogProgress,
                                         jCanvasES1, jCanvasES2,
-                                        jTimer, jAsyncTask, jSMS, jCamera, jWebView, jHttpClient, jSmtpClient]);
+                                        jTimer, jAsyncTask, jSMS, jCamera, jWebView, jHttpClient, jSmtpClient,
+                                        jSqliteDataAccess, jSqliteCursor]);
 
   RegisterClasses([jApp, jForm, jControl, jVisualControl, jGLViewEvent]);
   RegisterNoIcon([jApp, jForm, jControl, jVisualControl, jGLViewEvent]);

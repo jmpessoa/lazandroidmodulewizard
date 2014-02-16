@@ -65,6 +65,7 @@ type
         Height: Integer;
        End;
 
+ TArrayOfByte = array of byte;     //by jmpessoa
 // Utility
 
 procedure dbg(str : String); overload;
@@ -155,6 +156,9 @@ Function  jSysInfo_PathDat             (env:PJNIEnv;this:jobject;context : jObje
 Function  jSysInfo_PathExt             (env:PJNIEnv;this:jobject) : String;
 Function  jSysInfo_PathDCIM            (env:PJNIEnv;this:jobject) : String;
 
+//by jmpessoa
+Function  jSysInfo_PathDataBase             (env:PJNIEnv;this:jobject;context : jObject) : String;
+
 
 // Device Info
 Function  jSysInfo_DevicePhoneNumber   (env:PJNIEnv;this:jobject) : String;
@@ -168,11 +172,18 @@ Procedure jImage_save                  (env:PJNIEnv;this:jobject; Bitmap : jObje
 // View
 Procedure jView_SetVisible             (env:PJNIEnv;this:jobject; view : jObject; visible : Boolean);
 
+//by jmpessoa
 Procedure jView_SetVisible2             (env:PJNIEnv;this:jobject; view : jObject; visible : Boolean);
+
 
 Procedure jView_SetBackGroundColor     (env:PJNIEnv;this:jobject; view : jObject; color   : DWord  );
 
+//by jmpessoa2
+Procedure jView_SetBackGroundColor2     (env:PJNIEnv;this:jobject; view : jObject; color : DWord);
+
 Procedure jView_Invalidate             (env:PJNIEnv;this:jobject; view : jObject);
+
+Procedure jView_Invalidate2             (env:PJNIEnv;this:jobject; view : jObject);
 
 
 Function  jView_Create                 (env:PJNIEnv;this:jobject;
@@ -1066,8 +1077,11 @@ Procedure jBitmap_getWH2                (env:PJNIEnv;this:jobject;
 Function  jBitmap_getJavaBitmap        (env:PJNIEnv;this:jobject;
                                         jbitmap : jObject) : jObject;
 
-Function  jBitmap_getJavaBitmap2        (env:PJNIEnv;this:jobject;
-                                        jbitmap : jObject) : jObject;
+Function  jBitmap_getJavaBitmap2        (env:PJNIEnv; this:jobject; jbitmap: jObject): jObject;
+
+procedure  jBitmap_BitmapToByte       (env:PJNIEnv; this:jobject; jbitmap: jObject; image: jObject; var bufferImage: TArrayOfByte);
+function  jBitmap_ByteToBitmap       (env:PJNIEnv; this:jobject; jbitmap: jObject; bufferImage: TArrayOfByte): jObject;
+
 // GLSurfaceView
 Function  jGLSurfaceView_Create        (env:PJNIEnv;this:jobject;
                                         context : jObject; SelfObj : TObject; version : integer) : jObject;
@@ -1103,7 +1117,7 @@ Procedure jGLSurfaceView_deleteTexture (env:PJNIEnv;this:jobject; glView : jObje
 //by jmpessoa
 Procedure jGLSurfaceView_deleteTexture2 (env:PJNIEnv;this:jobject; glView : jObject; id : Integer);
 
-Procedure jGLSurfaceView_getBmpArray   (env:PJNIEnv;this:jobject;filename : String);
+Procedure jGLSurfaceView_getBmpArray   (env:PJNIEnv;this:jobject;filename: String);
 
 Procedure jGLSurfaceView_requestGLThread(env:PJNIEnv;this:jobject; glView : jObject);
 
@@ -1176,8 +1190,7 @@ Procedure jDialogProgress_Free2         (env:PJNIEnv;this:jobject; DialogProgres
 Procedure jToast                       (env:PJNIEnv;this:jobject; Str : String);
 
 // View
-Function  jImageBtn_Create(env:PJNIEnv;this:jobject;
-                                        context : jObject; SelfObj : TObject) : jObject;
+Function  jImageBtn_Create(env:PJNIEnv;this:jobject; context: jObject; SelfObj : TObject) : jObject;
 
 //by jmpessoa
 Function  jImageBtn_Create2             (env:PJNIEnv; this:jobject; SelfObj: TObject): jObject;
@@ -1229,7 +1242,9 @@ Procedure jImageBtn_setLayoutAll(env:PJNIEnv;this:jobject; ImageBtn : jObject;  
 Procedure jImageBtn_setLayoutAll2(env:PJNIEnv;this:jobject; ImageBtn : jObject;  idAnchor: DWord);
 
 //
-Function  jAsyncTask_Create            (env:PJNIEnv;this:jobject; SelfObj : TObject) : jObject;
+Function  jAsyncTask_Create             (env:PJNIEnv;   this:jobject;  SelfObj : TObject): jObject;
+
+function jAsyncTask_Create2             (env: PJNIEnv; this:jobject;   SelfObj: TObject): jObject;
 
 Procedure jAsyncTask_Free              (env:PJNIEnv;this:jobject; AsyncTask : jObject);
 
@@ -1246,8 +1261,61 @@ Procedure jAsyncTask_setProgress2       (env:PJNIEnv;this:jobject; AsyncTask : j
 //by jmpessoa
 Procedure jAsyncTask_SetAutoPublishProgress(env:PJNIEnv;this:jobject; AsyncTask : jObject; Value : boolean);
 
+{jSqliteCursor : by jmpessoa}
+
+Function  jSqliteCursor_Create(env:PJNIEnv; this:jobject; SelfObj: TObject): jObject;
+Procedure jSqliteCursor_Free(env:PJNIEnv;this:jobject; SqliteCursor: jObject);
+
+procedure jSqliteCursor_SetCursor(env:PJNIEnv; this:jobject; SqliteCursor: jObject; Cursor: jObject);
+
+Function  jSqliteCursor_GetCursor(env:PJNIEnv; this:jobject; SqliteCursor: jObject): jObject;
+
+procedure jSqliteCursor_MoveToFirst(env:PJNIEnv; this:jobject; SqliteCursor: jObject);
+procedure jSqliteCursor_MoveToNext(env:PJNIEnv; this:jobject; SqliteCursor: jObject);
+procedure jSqliteCursor_MoveToLast(env:PJNIEnv; this:jobject; SqliteCursor: jObject);
+procedure jSqliteCursor_MoveToPosition(env:PJNIEnv; this:jobject; SqliteCursor: jObject; position: integer);
+
+Function jSqliteCursor_GetRowCount(env:PJNIEnv; this:jobject; SqliteCursor: jObject): integer;
+
+Function jSqliteCursor_GetColumnCount(env:PJNIEnv; this:jobject; SqliteCursor: jObject):  integer;
+Function jSqliteCursor_GetColumnIndex(env:PJNIEnv; this:jobject; SqliteCursor: jObject; colName: string): integer;
+Function jSqliteCursor_GetColumName(env:PJNIEnv; this:jobject; SqliteCursor: jObject; columnIndex: integer): string;
+Function jSqliteCursor_GetValueAsString(env:PJNIEnv; this:jobject; SqliteCursor: jObject; columnIndex: integer): string;
+
+
+{jSqliteDataAccess: by jmpessoa}
+
+Function  jSqliteDataAccess_Create(env: PJNIEnv; this:jobject;  SelfObj: TObject;
+                                        dataBaseName: string; colDelimiter: char; rowDelimiter: char): jObject;
+
+Procedure jSqliteDataAccess_Free(env:PJNIEnv;this:jobject; SqliteDataBase : jObject);
+
+function jSqliteDataAccess_CheckDataBaseExists(env:PJNIEnv; this:jobject; SqliteDataBase: jObject; fullPathDB: string): boolean;
+Procedure jSqliteDataAccess_ExecSQL(env:PJNIEnv;this:jobject; SqliteDataBase: jObject; execQuery: string);
+
+Procedure jSqliteDataAccess_OpenOrCreate(env:PJNIEnv;this:jobject; SqliteDataBase: jObject; dataBaseName: string);
+Procedure jSqliteDataAccess_AddTableName(env:PJNIEnv;this:jobject; SqliteDataBase: jObject; tableName: string);
+
+Procedure jSqliteDataAccess_AddCreateTableQuery(env:PJNIEnv;this:jobject; SqliteDataBase: jObject; createTableQuery: string);
+
+procedure jSqliteDataAccess_CreateAllTables(env:PJNIEnv;this:jobject; SqliteDataBase: jObject);
+procedure jSqliteDataAccess_DropAllTables(env:PJNIEnv;this:jobject; SqliteDataBase: jObject; recreate: boolean);
+
+function jSqliteDataAccess_Select(env:PJNIEnv; this:jobject; SqliteDataBase:jObject; selectQuery: string): string; overload;
+procedure jSqliteDataAccess_Select(env:PJNIEnv; this:jobject; SqliteDataBase: jObject; selectQuery: string); overload;
+
+function jSqliteDataAccess_GetCursor(env:PJNIEnv; this:jobject; SqliteDataBase: jObject): jObject;
+
+procedure jSqliteDataAccess_SetSelectDelimiters(env:PJNIEnv;this:jobject; SqliteDataBase: jObject; coldelim: char; rowdelim: char);
+procedure jSqliteDataAccess_CreateTable(env:PJNIEnv;this:jobject; SqliteDataBase: jObject; createQuery: string);
+procedure jSqliteDataAccess_DropTable(env:PJNIEnv;this:jobject; SqliteDataBase: jObject; tableName: string);
+procedure jSqliteDataAccess_InsertIntoTable(env:PJNIEnv;this:jobject; SqliteDataBase: jObject; insertQuery: string);
+procedure jSqliteDataAccess_DeleteFromTable(env:PJNIEnv;this:jobject; SqliteDataBase: jObject; deleteQuery: string);
+procedure jSqliteDataAccess_UpdateTable(env:PJNIEnv;this:jobject; SqliteDataBase: jObject; updateQuery: string);
+procedure jSqliteDataAccess_Close(env:PJNIEnv;this:jobject; SqliteDataBase: jObject);
+
 // Http
-Function  jHttp_Get                    (env:PJNIEnv; this:jobject; URL: String) : String;
+Function  jHttp_Get(env:PJNIEnv; this:jobject; URL: String) : String;
 
 //by jmpessoa
 procedure jSend_Email(env:PJNIEnv; this:jobject;
@@ -1260,6 +1328,7 @@ procedure jSend_Email(env:PJNIEnv; this:jobject;
 function jSend_SMS(env:PJNIEnv;this:jobject;
                        toNumber: string;
                        smessage:string): integer;
+
 //by jmpessoa
 function jContact_getMobileNumberByDisplayName(env:PJNIEnv;this:jobject;
                                                contactName: string): string;
@@ -1267,7 +1336,7 @@ function jContact_getMobileNumberByDisplayName(env:PJNIEnv;this:jobject;
 function jContact_getDisplayNameList(env:PJNIEnv; this:jobject; delimiter: char): string;
 
 // Camera
-Procedure jTakePhoto                   (env:PJNIEnv; this:jobject; filename : String);
+Procedure jTakePhoto(env:PJNIEnv; this:jobject; filename : String);
 
 //by jmpessoa
 function jCamera_takePhoto(env:PJNIEnv; this:jobject;  path: string;  filename : String): string;
@@ -1275,6 +1344,8 @@ function jCamera_takePhoto(env:PJNIEnv; this:jobject;  path: string;  filename :
 // BenchMark
 Procedure jBenchMark1_Java             (env:PJNIEnv;this:jobject;var mSec : Integer;var value : single);
 Procedure jBenchMark1_Pascal           (env:PJNIEnv;this:jobject;var mSec : Integer;var value : single);
+
+function Get_gjClass(env: PJNIEnv): jClass; //by jmpessoa
 
 Var
   gVM         : PJavaVM;
@@ -1365,14 +1436,12 @@ var
 begin
   if Class_  = nil then
   begin
-    //by jmpessoa "try" fix: because "FindClass" returns only  local references..."
+    //by jmpessoa fix: "FindClass" returns only  local references..."
     tmpClass:= jClass(env^.FindClass(env, gjClassName));
     if tmpClass <> nil then
     begin
        Class_ := env^.NewGlobalRef(env, tmpClass);  //<< -------- jmpessoa fix!
     end;
-    //by jmpessoa: "bad" fix: change AndroidManifest to targetSdkVersion <= 13 !
-    //Class_   := env^.FindClass(env, gjClassName);
   end;
   if Method_ = nil then
   begin       //a jmethodID is not an object. So don't need to convert it to a GlobalRef!
@@ -1626,16 +1695,17 @@ end;
 //by jmpessoa
 Procedure jView_SetVisible2(env:PJNIEnv; this:jobject; view : jObject; visible : Boolean);
 var
-  cls: jClass;
   method: jmethodID;
-  _jParams : array[0..0] of jValue;
+  _jParams : array[0..1] of jValue;
+    cls: jClass;
 begin
+  _jParams[0].l := view;
   case visible of
-    True  : _jParams[0].i := 0; //
-    False : _jParams[0].i := 4; //
+    True  : _jParams[1].i := 0; //
+    False : _jParams[1].i := 4; //
   end;
-  cls := env^.GetObjectClass(env, view);
-  method:= env^.GetMethodID(env, cls, 'setVisibility', '(I)V');
+  cls:= Get_gjClass(env);
+  method:= env^.GetMethodID(env, cls, 'jView_SetVisible2', '(Landroid/view/View;I)V');
   env^.CallVoidMethodA(env, view, method, @_jParams);
 end;
 
@@ -1654,6 +1724,20 @@ begin
  env^.CallVoidMethodA(env,this,_jMethod,@_jParams);
 end;
 
+//by jmpessoa
+Procedure jView_SetBackGroundColor2(env:PJNIEnv;this:jobject; view : jObject; color : DWord);
+var
+ _jMethod : jMethodID = nil;
+ _jParams : Array[0..1] of jValue;
+  cls: jClass;
+begin
+ _jParams[0].l := view;
+ _jParams[1].i := color;
+ cls:= Get_gjClass(env);
+ _jMethod:= env^.GetMethodID(env, cls, 'view_SetBackGroundColor', '(Landroid/view/View;I)V');
+ env^.CallVoidMethodA(env,this,_jMethod,@_jParams);
+end;
+
 //
 Procedure jView_Invalidate (env:PJNIEnv;this:jobject; view : jObject);
 Const
@@ -1665,6 +1749,19 @@ Var
 begin
  jClassMethod(_cFuncName,_cFuncSig,env,gjClass,_jMethod);
  _jParam.l := view;
+ env^.CallVoidMethodA(env,this,_jMethod,@_jParam);
+end;
+
+//by jmpessoa
+Procedure jView_Invalidate2(env:PJNIEnv;this:jobject; view : jObject);
+var
+ _jMethod : jMethodID = nil;
+ _jParam  : jValue;
+ cls: jClass;
+begin
+ _jParam.l := view;
+ cls:= Get_gjClass(env);
+ _jMethod:= env^.GetMethodID(env, cls, 'view_Invalidate', '(Landroid/view/View;)V');
  env^.CallVoidMethodA(env,this,_jMethod,@_jParam);
 end;
 
@@ -1682,6 +1779,7 @@ begin
  Result     := env^.CallIntMethodA(env,this,_jMethod,@_jParams);
 end;
 
+//by jmpessoa
 function jView_getLParamHeight2(env:PJNIEnv;this:jobject; View : jObject ): integer;
 var
  _jMethod: jMethodID = nil;
@@ -2008,6 +2106,30 @@ Function  jSysInfo_PathDat  (env:PJNIEnv; this:jobject; context : jObject) : Str
   dbg('PathDat:'+ Result);
  end;
 
+//by jmpessoa
+Function  jSysInfo_PathDataBase (env:PJNIEnv;this:jobject;context : jObject) : String;
+Const
+ _cFuncName = 'getPathDataBase';
+ _cFuncSig  = '(Landroid/content/Context;)Ljava/lang/String;';
+Var
+ _jMethod : jMethodID = nil;
+ _jParam  : jValue;
+ _jString : jString;
+ _jBoolean: jBoolean;
+begin
+ jClassMethod(_cFuncName,_cFuncSig,env,gjClass,_jMethod);
+ _jParam.l := context;
+ _jString  := env^.CallObjectMethodA(env,this,_jMethod,@_jParam);
+ Case _jString = nil of
+  True : Result    := '';
+  False: begin
+          _jBoolean := JNI_False;
+          Result    := String( env^.GetStringUTFChars(Env,_jString,@_jBoolean) );
+         end;
+ end;
+ dbg('PathDataBase:'+ Result);
+end;
+
 Function  jSysInfo_PathExt             (env:PJNIEnv;this:jobject) : String;
  Const
   _cFuncName = 'getPathExt';
@@ -2176,20 +2298,22 @@ Function jTextView_Create(env:PJNIEnv;this:jobject;
   Result := env^.NewGlobalRef(env,Result);
  end;
 
+
 //by jmpessoa
-Function jTextView_Create2(env:PJNIEnv; this:jobject; SelfObj: TObject ): jObject;
- Const
-  _cFuncName = 'jTextView_Create2';
-  _cFuncSig  = '(J)Ljava/lang/Object;';
- Var
-  _jMethod : jMethodID = nil;
-  _jParams : array[0..0] of jValue;
- begin
-  jClassMethod(_cFuncName,_cFuncSig,env,gjClass,_jMethod);
+
+
+Function jTextView_Create2(env: PJNIEnv; this:jobject;  SelfObj: TObject): jObject;
+var
+ _jMethod : jMethodID = nil;
+ _jParams : array[0..0] of jValue;
+ cls: jClass;
+begin
+  cls:= Get_gjClass(env); {global}          {warning: a jmethodID is not an object. So don't need to convert it to a GlobalRef!}
+  _jMethod:= env^.GetMethodID(env, cls, 'jTextView_Create2', '(J)Ljava/lang/Object;');
   _jParams[0].j := Int64(SelfObj);
-  Result := env^.CallObjectMethodA(env,this,_jMethod,@_jParams);
+  Result := env^.CallObjectMethodA(env, this, _jMethod,@_jParams);
   Result := env^.NewGlobalRef(env,Result);
- end;
+end;
 
 //
 Procedure jTextView_Free(env:PJNIEnv;this:jobject; TextView : jObject);
@@ -2703,19 +2827,19 @@ Function jEditText_Create(env:PJNIEnv;this:jobject;
  end;
 
 //by jmpessoa
-Function jEditText_Create2(env:PJNIEnv; this:jobject; SelfObj: TObject ) : jObject;
- Const
-  _cFuncName = 'jEditText_Create2';
-  _cFuncSig  = '(J)Ljava/lang/Object;';
- Var
-  _jMethod : jMethodID = nil;
-  _jParams : array[0..0] of jValue;
- begin
-  jClassMethod(_cFuncName,_cFuncSig, env,gjClass,_jMethod);
+Function jEditText_Create2(env: PJNIEnv; this:jobject;  SelfObj: TObject): jObject;
+var
+ _jMethod : jMethodID = nil;
+ _jParams : array[0..0] of jValue;
+ cls: jClass;
+begin
+  cls:= Get_gjClass(env);{global}           {warning: a jmethodID is not an object. So don't need to convert it to a GlobalRef!}
+  _jMethod:= env^.GetMethodID(env, cls, 'jEditText_Create2', '(J)Ljava/lang/Object;');
   _jParams[0].j := Int64(SelfObj);
-  Result := env^.CallObjectMethodA(env, this,_jMethod,@_jParams);
-  Result := env^.NewGlobalRef(env, Result);
- end;
+  Result := env^.CallObjectMethodA(env, this, _jMethod,@_jParams);
+  Result := env^.NewGlobalRef(env,Result);
+end;
+
 
 //
 Procedure jEditText_Free (env:PJNIEnv;this:jobject; EditText : jObject);
@@ -3612,18 +3736,17 @@ Function jButton_Create(env:PJNIEnv;this:jobject;
  end;
 
 //by jmpessoa
-Function  jButton_Create2(env:PJNIEnv; this:jobject; SelfObj: TObject): jObject;
-Const
- _cFuncName = 'jButton_Create2';
- _cFuncSig  = '(J)Ljava/lang/Object;';
+Function jButton_Create2(env: PJNIEnv; this:jobject;  SelfObj: TObject): jObject;
 var
  _jMethod : jMethodID = nil;
  _jParams : array[0..0] of jValue;
+ cls: jClass;
 begin
- jClassMethod(_cFuncName,_cFuncSig,env,gjClass,_jMethod);
- _jParams[0].j := Int64(SelfObj);
- Result := env^.CallObjectMethodA(env,this,_jMethod,@_jParams);
- Result := env^.NewGlobalRef(env, Result);
+  cls:= Get_gjClass(env); {global}          {warning: a jmethodID is not an object. So don't need to convert it to a GlobalRef!}
+  _jMethod:= env^.GetMethodID(env, cls, 'jButton_Create2', '(J)Ljava/lang/Object;');
+  _jParams[0].j := Int64(SelfObj);
+  Result := env^.CallObjectMethodA(env, this, _jMethod,@_jParams);
+  Result := env^.NewGlobalRef(env,Result);
 end;
 
 //
@@ -4057,22 +4180,20 @@ Function jCheckBox_Create(env:PJNIEnv;this:jobject;
   Result := env^.NewGlobalRef(env,Result);
  end;
 
-
-Function jCheckBox_Create2(env:PJNIEnv; this:jobject; SelfObj: TObject ): jObject;
- Const
-  _cFuncName = 'jCheckBox_Create2';
-  _cFuncSig  = '(J)Ljava/lang/Object;';
- Var
-  _jMethod : jMethodID = nil;
-  _jParams : array[0..0] of jValue;
- begin
-  jClassMethod(_cFuncName,_cFuncSig,env,gjClass,_jMethod);
+//by jmpessoa
+Function jCheckBox_Create2(env: PJNIEnv; this:jobject;  SelfObj: TObject): jObject;
+var
+ _jMethod : jMethodID = nil;
+ _jParams : array[0..0] of jValue;
+ cls: jClass;
+begin
+  cls:= Get_gjClass(env); {global}          {warning: a jmethodID is not an object. So don't need to convert it to a GlobalRef!}
+  _jMethod:= env^.GetMethodID(env, cls, 'jCheckBox_Create2', '(J)Ljava/lang/Object;');
   _jParams[0].j := Int64(SelfObj);
-  Result := env^.CallObjectMethodA(env,this,_jMethod,@_jParams);
+  Result := env^.CallObjectMethodA(env, this, _jMethod,@_jParams);
   Result := env^.NewGlobalRef(env,Result);
- end;
+end;
 
-//
 Procedure jCheckBox_Free (env:PJNIEnv;this:jobject; CheckBox : jObject);
   Const
    _cFuncName = 'jCheckBox_Free';
@@ -4531,22 +4652,21 @@ Function jRadioButton_Create(env:PJNIEnv; this:jobject;
   Result := env^.NewGlobalRef(env,Result);
  end;
 
-Function jRadioButton_Create2(env:PJNIEnv; this:jobject; SelfObj: TObject ) : jObject;
- Const
-  _cFuncName = 'jRadioButton_Create2';
-  _cFuncSig  = '(J)Ljava/lang/Object;';
- Var
-  _jMethod : jMethodID = nil;
-  _jParams : array[0..0] of jValue;
- begin
-  jClassMethod(_cFuncName,_cFuncSig,env,gjClass,_jMethod);
+function jRadioButton_Create2(env: PJNIEnv; this:jobject;  SelfObj: TObject): jObject;
+var
+ _jMethod : jMethodID = nil;
+ _jParams : array[0..0] of jValue;
+ cls: jClass;
+begin
+  cls:= Get_gjClass(env); {global}          {warning: a jmethodID is not an object. So don't need to convert it to a GlobalRef!}
+  _jMethod:= env^.GetMethodID(env, cls, 'jRadioButton_Create2', '(J)Ljava/lang/Object;');
   _jParams[0].j := Int64(SelfObj);
-  Result := env^.CallObjectMethodA(env,this,_jMethod,@_jParams);
+  Result := env^.CallObjectMethodA(env, this, _jMethod,@_jParams);
   Result := env^.NewGlobalRef(env,Result);
- end;
+end;
 
 //
-Procedure jRadioButton_Free (env:PJNIEnv;this:jobject; RadioButton : jObject);
+Procedure jRadioButton_Free(env:PJNIEnv;this:jobject; RadioButton : jObject);
   Const
    _cFuncName = 'jRadioButton_Free';
    _cFuncSig  = '(Ljava/lang/Object;)V';
@@ -4560,6 +4680,7 @@ Procedure jRadioButton_Free (env:PJNIEnv;this:jobject; RadioButton : jObject);
    env^.DeleteGlobalRef(env,RadioButton);
   end;
 
+//by jmpessoa
 Procedure jRadioButton_Free2(env:PJNIEnv;this:jobject; RadioButton : jObject);
 var
    _jMethod : jMethodID = nil;
@@ -4990,20 +5111,19 @@ Function jProgressBar_Create(env:PJNIEnv;this:jobject;
  end;
 
 //by jmpessoa
-Function jProgressBar_Create2(env:PJNIEnv; this:jobject; SelfObj: TObject; Style: DWord): jObject;
- Const
-  _cFuncName = 'jProgressBar_Create2';
-  _cFuncSig  = '(JI)Ljava/lang/Object;';
- Var
-  _jMethod : jMethodID = nil;
-  _jParams : array[0..1] of jValue;
- begin
-  jClassMethod(_cFuncName,_cFuncSig,env,gjClass,_jMethod);
+function jProgressBar_Create2(env: PJNIEnv; this:jobject;  SelfObj: TObject; Style: DWord): jObject;
+var
+ _jMethod : jMethodID = nil;
+ _jParams : array[0..1] of jValue;
+ cls: jClass;
+begin
+  cls:= Get_gjClass(env); {global}          {warning: a jmethodID is not an object. So don't need to convert it to a GlobalRef!}
+  _jMethod:= env^.GetMethodID(env, cls, 'jProgressBar_Create2', '(JI)Ljava/lang/Object;');
   _jParams[0].j := Int64(SelfObj);
   _jParams[1].i := Style;
-  Result := env^.CallObjectMethodA(env,this,_jMethod,@_jParams);
+  Result := env^.CallObjectMethodA(env, this, _jMethod,@_jParams);
   Result := env^.NewGlobalRef(env,Result);
- end;
+end;
 
 //
 Procedure jProgressBar_Free (env:PJNIEnv;this:jobject; ProgressBar : jObject);
@@ -5417,19 +5537,18 @@ Function  jImageView_Create  (env:PJNIEnv;this:jobject;
  end;
 
 //by jmpessoa
-Function  jImageView_Create2(env:PJNIEnv; this:jobject; SelfObj: TObject): jObject;
- Const
-  _cFuncName = 'jImageView_Create2';
-  _cFuncSig  = '(J)Ljava/lang/Object;';
- Var
-  _jMethod : jMethodID = nil;
-  _jParams : array[0..0] of jValue;
- begin
-  jClassMethod(_cFuncName,_cFuncSig,env,gjClass,_jMethod);
+function jImageView_Create2(env: PJNIEnv; this:jobject;  SelfObj: TObject): jObject;
+var
+ _jMethod : jMethodID = nil;
+ _jParams : array[0..0] of jValue;
+ cls: jClass;
+begin
+  cls:= Get_gjClass(env); {global}          {warning: a jmethodID is not an object. So don't need to convert it to a GlobalRef!}
+  _jMethod:= env^.GetMethodID(env, cls, 'jImageView_Create2', '(J)Ljava/lang/Object;');
   _jParams[0].j := Int64(SelfObj);
-  Result := env^.CallObjectMethodA(env,this,_jMethod,@_jParams);
+  Result := env^.CallObjectMethodA(env, this, _jMethod,@_jParams);
   Result := env^.NewGlobalRef(env,Result);
- end;
+end;
 
 //
 Procedure jImageView_Free   (env:PJNIEnv;this:jobject; ImageView : jObject);
@@ -5829,20 +5948,19 @@ Function  jListView_Create  (env:PJNIEnv;this:jobject;
   Result := env^.NewGlobalRef(env,Result);
  end;
 
-
-Function  jListView_Create2(env:PJNIEnv; this:jobject; SelfObj: TObject): jObject;
- Const
-  _cFuncName = 'jListView_Create2';
-  _cFuncSig  = '(J)Ljava/lang/Object;';
- Var
-  _jMethod : jMethodID = nil;
-  _jParams : array[0..0] of jValue;
- begin
-  jClassMethod(_cFuncName,_cFuncSig,env,gjClass,_jMethod);
+//by jmpessoa
+function jListView_Create2(env: PJNIEnv; this:jobject;  SelfObj: TObject): jObject;
+var
+ _jMethod : jMethodID = nil;
+ _jParams : array[0..0] of jValue;
+ cls: jClass;
+begin
+  cls:= Get_gjClass(env); {global}          {warning: a jmethodID is not an object. So don't need to convert it to a GlobalRef!}
+  _jMethod:= env^.GetMethodID(env, cls, 'jListView_Create2', '(J)Ljava/lang/Object;');
   _jParams[0].j := Int64(SelfObj);
-  Result := env^.CallObjectMethodA(env,this,_jMethod,@_jParams);
+  Result := env^.CallObjectMethodA(env, this, _jMethod,@_jParams);
   Result := env^.NewGlobalRef(env,Result);
- end;
+end;
 
 //
 Procedure jListView_Free   (env:PJNIEnv;this:jobject; ListView : jObject);
@@ -6321,20 +6439,19 @@ Function  jScrollView_Create  (env:PJNIEnv;this:jobject;
   Result := env^.NewGlobalRef(env,Result);
  end;
 
-
-Function  jScrollView_Create2(env:PJNIEnv; this:jobject; SelfObj: TObject): jObject;
- Const
-  _cFuncName = 'jScrollView_Create2';
-  _cFuncSig  = '(J)Ljava/lang/Object;';
- Var
-  _jMethod : jMethodID = nil;
-  _jParams : array[0..0] of jValue;
- begin
-  jClassMethod(_cFuncName,_cFuncSig,env,gjClass,_jMethod);
+//by jmpessoa
+function jScrollView_Create2(env: PJNIEnv; this:jobject;  SelfObj: TObject): jObject;
+var
+ _jMethod : jMethodID = nil;
+ _jParams : array[0..0] of jValue;
+ cls: jClass;
+begin
+  cls:= Get_gjClass(env); {global}          {warning: a jmethodID is not an object. So don't need to convert it to a GlobalRef!}
+  _jMethod:= env^.GetMethodID(env, cls, 'jScrollView_Create2', '(J)Ljava/lang/Object;');
   _jParams[0].j := Int64(SelfObj);
-  Result := env^.CallObjectMethodA(env,this,_jMethod,@_jParams);
+  Result := env^.CallObjectMethodA(env, this, _jMethod,@_jParams);
   Result := env^.NewGlobalRef(env,Result);
- end;
+end;
 
 //
 Procedure jScrollView_Free   (env:PJNIEnv;this:jobject; ScrollView : jObject);
@@ -6678,21 +6795,19 @@ Function  jPanel_Create  (env:PJNIEnv;this:jobject;
   Result := env^.NewGlobalRef(env,Result);
  end;
 
-Function  jPanel_Create2(env:PJNIEnv; this:jobject; SelfObj: TObject): jObject;
- Const
-  _cFuncName = 'jPanel_Create2';
-  _cFuncSig  = '(J)Ljava/lang/Object;';
- Var
-  _jMethod : jMethodID = nil;
-  _jParams : array[0..0] of jValue;
- begin
-  jClassMethod(_cFuncName,_cFuncSig,env,gjClass,_jMethod);
+function jPanel_Create2(env: PJNIEnv; this:jobject;  SelfObj: TObject): jObject;
+var
+ _jMethod : jMethodID = nil;
+ _jParams : array[0..0] of jValue;
+ cls: jClass;
+begin
+  cls:= Get_gjClass(env); {global}          {warning: a jmethodID is not an object. So don't need to convert it to a GlobalRef!}
+  _jMethod:= env^.GetMethodID(env, cls, 'jPanel_Create2', '(J)Ljava/lang/Object;');
   _jParams[0].j := Int64(SelfObj);
-  Result := env^.CallObjectMethodA(env,this,_jMethod,@_jParams);
+  Result := env^.CallObjectMethodA(env, this, _jMethod,@_jParams);
   Result := env^.NewGlobalRef(env,Result);
- end;
+end;
 
-////by jmpessoa
 Procedure jPanel_Free   (env:PJNIEnv;this:jobject; Panel : jObject);
   Const
    _cFuncName = 'jPanel_Free';
@@ -7108,20 +7223,18 @@ Function  jHorizontalScrollView_Create  (env:PJNIEnv;this:jobject;
  end;
 
 //by jmpessoa
-Function  jHorizontalScrollView_Create2 (env:PJNIEnv; this:jobject; SelfObj: TObject): jObject;
- Const
-  _cFuncName = 'jHorizontalScrollView_Create2';
-  _cFuncSig  = '(J)Ljava/lang/Object;';
- Var
-  _jMethod : jMethodID = nil;
-  _jParams : array[0..0] of jValue;
- begin
-  jClassMethod(_cFuncName,_cFuncSig,env,gjClass,_jMethod);
+function jHorizontalScrollView_Create2(env: PJNIEnv; this:jobject;  SelfObj: TObject): jObject;
+var
+ _jMethod : jMethodID = nil;
+ _jParams : array[0..0] of jValue;
+ cls: jClass;
+begin
+  cls:= Get_gjClass(env); {global}          {warning: a jmethodID is not an object. So don't need to convert it to a GlobalRef!}
+  _jMethod:= env^.GetMethodID(env, cls, 'jHorizontalScrollView_Create2', '(J)Ljava/lang/Object;');
   _jParams[0].j := Int64(SelfObj);
-  Result := env^.CallObjectMethodA(env,this,_jMethod,@_jParams);
+  Result := env^.CallObjectMethodA(env, this, _jMethod,@_jParams);
   Result := env^.NewGlobalRef(env,Result);
- end;
-
+end;
 //
 Procedure jHorizontalScrollView_Free(env:PJNIEnv;this:jobject; ScrollView : jObject);
   Const
@@ -7453,19 +7566,18 @@ begin
  Result := env^.NewGlobalRef(env,Result);
 end;
 
-
-Function  jViewFlipper_Create2(env:PJNIEnv; this:jobject; SelfObj: TObject): jObject;
-Const
- _cFuncName = 'jViewFlipper_Create2';
- _cFuncSig  = '(J)Ljava/lang/Object;';
-Var
+//jmpessoa
+function jViewFlipper_Create2(env: PJNIEnv; this:jobject;  SelfObj: TObject): jObject;
+var
  _jMethod : jMethodID = nil;
  _jParams : array[0..0] of jValue;
+ cls: jClass;
 begin
- jClassMethod(_cFuncName,_cFuncSig,env,gjClass,_jMethod);
- _jParams[0].j := Int64(SelfObj);
- Result := env^.CallObjectMethodA(env,this,_jMethod,@_jParams);
- Result := env^.NewGlobalRef(env,Result);
+  cls:= Get_gjClass(env); {global}          {warning: a jmethodID is not an object. So don't need to convert it to a GlobalRef!}
+  _jMethod:= env^.GetMethodID(env, cls, 'jViewFlipper_Create2', '(J)Ljava/lang/Object;');
+  _jParams[0].j := Int64(SelfObj);
+  Result := env^.CallObjectMethodA(env, this, _jMethod,@_jParams);
+  Result := env^.NewGlobalRef(env,Result);
 end;
 
 Procedure jViewFlipper_Free            (env:PJNIEnv;this:jobject; ViewFlipper : jObject);
@@ -7764,20 +7876,19 @@ Function  jWebView_Create  (env:PJNIEnv;this:jobject;
   Result := env^.NewGlobalRef(env,Result);
  end;
 
-
-Function  jWebView_Create2(env:PJNIEnv; this:jobject; SelfObj: TObject): jObject;
- Const
-  _cFuncName = 'jWebView_Create2';
-  _cFuncSig  = '(J)Ljava/lang/Object;';
- Var
-  _jMethod : jMethodID = nil;
-  _jParams : array[0..0] of jValue;
- begin
-  jClassMethod(_cFuncName,_cFuncSig,env,gjClass,_jMethod);
+//by jmpessoa
+function jWebView_Create2(env: PJNIEnv; this:jobject;  SelfObj: TObject): jObject;
+var
+ _jMethod : jMethodID = nil;
+ _jParams : array[0..0] of jValue;
+ cls: jClass;
+begin
+  cls:= Get_gjClass(env); {global}          {warning: a jmethodID is not an object. So don't need to convert it to a GlobalRef!}
+  _jMethod:= env^.GetMethodID(env, cls, 'jWebView_Create2', '(J)Ljava/lang/Object;');
   _jParams[0].j := Int64(SelfObj);
-  Result := env^.CallObjectMethodA(env,this,_jMethod,@_jParams);
+  Result := env^.CallObjectMethodA(env, this, _jMethod,@_jParams);
   Result := env^.NewGlobalRef(env,Result);
- end;
+end;
 
 //
 Procedure jWebView_Free   (env:PJNIEnv;this:jobject; WebView : jObject);
@@ -8592,12 +8703,44 @@ end;
 Function  jBitmap_getJavaBitmap2(env:PJNIEnv;this:jobject;
                                  jbitmap : jObject) : jObject;
 var
- _jMethod : jMethodID = nil;
- cls: jClass;
+  _jMethod : jMethodID = nil;
+  cls: jClass;
 begin
- cls := env^.GetObjectClass(env, jbitmap);
+  cls := env^.GetObjectClass(env, jbitmap);
   _jMethod:= env^.GetMethodID(env, cls, 'getJavaBitmap', '()Landroid/graphics/Bitmap;');
- Result := env^.CallObjectMethod(env,jbitmap,_jMethod);
+  Result := env^.CallObjectMethod(env,jbitmap,_jMethod);
+end;
+
+procedure jBitmap_BitmapToByte(env:PJNIEnv; this:jobject; jbitmap: jObject; image: jObject; var bufferImage: TArrayOfByte);
+var
+  _jMethod: jMethodID = nil;
+  _jParam: jValue;
+  _jbyteArray: jbyteArray;
+  _jBoolean: jBoolean;
+  cls: jClass;
+  Size : Integer;
+begin
+  _jParam.l:= image;
+  cls := env^.GetObjectClass(env, jbitmap);
+  _jMethod:= env^.GetMethodID(env, cls, 'BitmapToByte', '(Landroid/graphics/Bitmap;)[B');
+
+  _jbyteArray := env^.CallObjectMethodA(env,this,_jMethod,@_jParam);
+  Size:= env^.GetArrayLength(env,_jbyteArray);
+
+  SetLength(bufferImage, Size);
+  env^.GetByteArrayRegion(env, _jbyteArray, 0, Size, @bufferImage[0]);
+end;
+
+function jBitmap_ByteToBitmap(env:PJNIEnv; this:jobject; jbitmap: jObject; bufferImage: TArrayOfByte): jObject;
+var
+  _jMethod: jMethodID = nil;
+  cls: jClass;
+  _jParam: array[0..0] of jValue;
+begin
+  _jParam[0].l:= bufferImage;
+  cls := env^.GetObjectClass(env, jbitmap);
+  _jMethod:= env^.GetMethodID(env, cls, 'ByteToBitmap', '([B)Landroid/graphics/Bitmap;');
+  Result := env^.CallObjectMethodA(env,jbitmap,_jMethod, @_jParam);
 end;
 
 //------------------------------------------------------------------------------
@@ -8621,19 +8764,19 @@ Function  jView_Create  (env:PJNIEnv;this:jobject;
   Result := env^.NewGlobalRef(env,Result);
  end;
 
-Function  jView_Create2(env:PJNIEnv; this:jobject; SelfObj: TObject): jObject;
- Const
-  _cFuncName = 'jView_Create2';
-  _cFuncSig  = '(J)Ljava/lang/Object;';
- Var
-  _jMethod : jMethodID = nil;
-  _jParams : array[0..0] of jValue;
- begin
-  jClassMethod(_cFuncName,_cFuncSig,env,gjClass,_jMethod);
+//by jmpessoa
+function jView_Create2(env: PJNIEnv; this:jobject;  SelfObj: TObject): jObject;
+var
+ _jMethod : jMethodID = nil;
+ _jParams : array[0..0] of jValue;
+ cls: jClass;
+begin
+  cls:= Get_gjClass(env); {global}          {warning: a jmethodID is not an object. So don't need to convert it to a GlobalRef!}
+  _jMethod:= env^.GetMethodID(env, cls, 'jView_Create2', '(J)Ljava/lang/Object;');
   _jParams[0].j := Int64(SelfObj);
-  Result := env^.CallObjectMethodA(env,this,_jMethod,@_jParams);
+  Result := env^.CallObjectMethodA(env, this, _jMethod,@_jParams);
   Result := env^.NewGlobalRef(env,Result);
- end;
+end;
 
 //
 Procedure jView_Free   (env:PJNIEnv;this:jobject; View : jObject);
@@ -8822,7 +8965,6 @@ begin
  env^.CallVoidMethodA(env,this,_jMethod,@_jParams);
 end;
 
-
 Procedure jView_setMarginRight(env:PJNIEnv;this:jobject; View: jObject; x: DWord);
 Const
  _cFuncName = 'jView_setMarginRight';
@@ -8983,21 +9125,20 @@ Function  jGLSurfaceView_Create(env:PJNIEnv;this:jobject;
   Result := env^.NewGlobalRef(env,Result);
  end;
 
-
-Function  jGLSurfaceView_Create2(env:PJNIEnv;this:jobject; SelfObj : TObject; version : integer) : jObject;
- Const
-  _cFuncName = 'jGLSurfaceView_Create2';
-  _cFuncSig  = '(JI)Ljava/lang/Object;';
- Var
-  _jMethod : jMethodID = nil;
-  _jParams : array[0..1] of jValue;
- begin
-  jClassMethod(_cFuncName,_cFuncSig,env,gjClass,_jMethod);
+//by jmpessoa
+function jGLSurfaceView_Create2(env: PJNIEnv; this:jobject;  SelfObj: TObject; version : integer): jObject;
+var
+ _jMethod : jMethodID = nil;
+ _jParams : array[0..1] of jValue;
+ cls: jClass;
+begin
+  cls:= Get_gjClass(env); {global}          {warning: a jmethodID is not an object. So don't need to convert it to a GlobalRef!}
+  _jMethod:= env^.GetMethodID(env, cls, 'jGLSurfaceView_Create2', '(JI)Ljava/lang/Object;');
   _jParams[0].j := Int64(SelfObj);
   _jParams[1].i := version;
-  Result := env^.CallObjectMethodA(env,this,_jMethod,@_jParams);
+  Result := env^.CallObjectMethodA(env, this, _jMethod,@_jParams);
   Result := env^.NewGlobalRef(env,Result);
- end;
+end;
 
 //
 Procedure jGLSurfaceView_Free   (env:PJNIEnv;this:jobject; GLSurfaceView : jObject);
@@ -9722,18 +9863,17 @@ Function  jImageBtn_Create  (env:PJNIEnv;this:jobject;
   Result := env^.NewGlobalRef(env,Result);
  end;
 
-
-Function  jImageBtn_Create2(env:PJNIEnv; this:jobject; SelfObj : TObject) : jObject;
-const
-  _cFuncName = 'jImageBtn_Create2';
-  _cFuncSig  = '(J)Ljava/lang/Object;';
+//by jmpessoa
+function jImageBtn_Create2(env: PJNIEnv; this:jobject;  SelfObj: TObject): jObject;
 var
-  _jMethod : jMethodID = nil;
-  _jParams : array[0..0] of jValue;
+ _jMethod : jMethodID = nil;
+ _jParams : array[0..0] of jValue;
+ cls: jClass;
 begin
-  jClassMethod(_cFuncName,_cFuncSig,env,gjClass,_jMethod);
+  cls:= Get_gjClass(env); {global}          {warning: a jmethodID is not an object. So don't need to convert it to a GlobalRef!}
+  _jMethod:= env^.GetMethodID(env, cls, 'jImageBtn_Create2', '(J)Ljava/lang/Object;');
   _jParams[0].j := Int64(SelfObj);
-  Result := env^.CallObjectMethodA(env,this,_jMethod,@_jParams);
+  Result := env^.CallObjectMethodA(env, this, _jMethod,@_jParams);
   Result := env^.NewGlobalRef(env,Result);
 end;
 
@@ -10030,7 +10170,6 @@ begin
  env^.CallVoidMethodA(env,this,_jMethod,@_jParams);
 end;
 
-
 Procedure jImageBtn_setLParamHeight2(env:PJNIEnv;this:jobject; ImageBtn : jObject; h: DWord);
 var
  _jMethod : jMethodID = nil;
@@ -10105,6 +10244,7 @@ end;
 //------------------------------------------------------------------------------
 
 //
+
 Function  jAsyncTask_Create(env:PJNIEnv;this:jobject;
                               SelfObj : TObject) : jObject;
  Const
@@ -10120,6 +10260,20 @@ Function  jAsyncTask_Create(env:PJNIEnv;this:jobject;
   Result := env^.CallObjectMethodA(env,this,_jMethod,@_jParam);
   Result := env^.NewGlobalRef(env,Result);
  end;
+
+//by jmpessoa
+function jAsyncTask_Create2(env: PJNIEnv; this:jobject;  SelfObj: TObject): jObject;
+var
+ _jMethod : jMethodID = nil;
+ _jParams : array[0..0] of jValue;
+ cls: jClass;
+begin
+  cls:= Get_gjClass(env); {global}          {warning: a jmethodID is not an object. So don't need to convert it to a GlobalRef!}
+  _jMethod:= env^.GetMethodID(env, cls, 'jAsyncTask_Create', '(J)Ljava/lang/Object;');
+  _jParams[0].j := Int64(SelfObj);
+  Result := env^.CallObjectMethodA(env, this, _jMethod,@_jParams);
+  Result := env^.NewGlobalRef(env,Result);
+end;
 
 //
 Procedure jAsyncTask_Free   (env:PJNIEnv;this:jobject; AsyncTask : jObject);
@@ -10215,6 +10369,441 @@ begin
  _jMethod:= env^.GetMethodID(env, cls, 'SetAutoPublishProgress', '(Z)V');
  env^.CallVoidMethodA(env, AsyncTask,_jMethod,@_jParams);
 end;
+
+{jSqliteCursor by jmpessoa}
+
+Function jSqliteCursor_Create(env: PJNIEnv; this:jobject;  SelfObj: TObject): jObject;
+var
+ _jMethod : jMethodID = nil;
+ _jParams : array[0..0] of jValue;
+ cls: jClass;
+begin
+  cls:= Get_gjClass(env);           {a jmethodID is not an object. So don't need to convert it to a GlobalRef!}
+  _jMethod:= env^.GetMethodID(env, cls, 'jSqliteCursor_Create', '(J)Ljava/lang/Object;');
+  _jParams[0].j := Int64(SelfObj);
+  Result := env^.CallObjectMethodA(env, this, _jMethod,@_jParams);
+  Result := env^.NewGlobalRef(env,Result);
+end;
+
+Procedure jSqliteCursor_Free(env:PJNIEnv;this:jobject; SqliteCursor: jObject);
+var
+   _jMethod : jMethodID = nil;
+   cls: jClass;
+begin
+  cls := env^.GetObjectClass(env, SqliteCursor);
+  _jMethod:= env^.GetMethodID(env, cls, 'Free', '()V');
+  env^.CallVoidMethod(env, SqliteCursor,_jMethod);
+  env^.DeleteGlobalRef(env,SqliteCursor);
+end;
+
+procedure jSqliteCursor_SetCursor(env:PJNIEnv; this: jobject; SqliteCursor: jObject; Cursor: jObject);
+var
+   _jMethod : jMethodID = nil;
+   cls: jClass;
+   _jParam: array[0..0] of jValue;
+begin
+  _jParam[0].l:= Cursor;
+  cls := env^.GetObjectClass(env, SqliteCursor);
+  _jMethod:= env^.GetMethodID(env, cls, 'SetCursor', '(Landroid/database/Cursor;)V');
+  env^.CallVoidMethodA(env, SqliteCursor,_jMethod, @_jParam);
+end;
+
+Function jSqliteCursor_GetCursor (env:PJNIEnv; this:jobject; SqliteCursor: jObject) : jObject;
+var
+ _jMethod : jMethodID = nil;
+ cls: jClass;
+begin
+ cls := env^.GetObjectClass(env, SqliteCursor);
+  _jMethod:= env^.GetMethodID(env, cls, 'GetCursor', '()Landroid/database/Cursor;');
+ Result := env^.CallObjectMethod(env,SqliteCursor,_jMethod);
+end;
+
+procedure jSqliteCursor_MoveToFirst(env:PJNIEnv; this:jobject; SqliteCursor: jObject);
+var
+ _jMethod : jMethodID = nil;
+ cls: jClass;
+begin
+ cls := env^.GetObjectClass(env, SqliteCursor);
+  _jMethod:= env^.GetMethodID(env, cls, 'MoveToFirst', '()V');
+ env^.CallVoidMethod(env,SqliteCursor,_jMethod);
+end;
+
+procedure jSqliteCursor_MoveToNext(env:PJNIEnv; this:jobject; SqliteCursor: jObject);
+var
+ _jMethod : jMethodID = nil;
+ cls: jClass;
+begin
+ cls := env^.GetObjectClass(env, SqliteCursor);
+  _jMethod:= env^.GetMethodID(env, cls, 'MoveToNext', '()V');
+ env^.CallVoidMethod(env,SqliteCursor,_jMethod);
+end;
+
+procedure jSqliteCursor_MoveToLast(env:PJNIEnv; this:jobject; SqliteCursor: jObject);
+var
+ _jMethod : jMethodID = nil;
+ cls: jClass;
+begin
+ cls := env^.GetObjectClass(env, SqliteCursor);
+  _jMethod:= env^.GetMethodID(env, cls, 'MoveToLast', '()V');
+ env^.CallVoidMethod(env,SqliteCursor,_jMethod);
+end;
+
+procedure jSqliteCursor_MoveToPosition(env:PJNIEnv; this:jobject; SqliteCursor: jObject; position: integer);
+var
+ _jMethod : jMethodID = nil;
+ cls: jClass;
+ _lparam: array[0..0] of jValue;
+begin
+ _lparam[0].i := position;
+ cls := env^.GetObjectClass(env, SqliteCursor);
+   _jMethod:= env^.GetMethodID(env, cls, 'MoveToPosition', '(I)V');
+ env^.CallVoidMethodA(env,SqliteCursor,_jMethod, @_lparam);
+end;
+
+Function jSqliteCursor_GetRowCount(env:PJNIEnv; this:jobject; SqliteCursor: jObject): integer;
+var
+ _jMethod : jMethodID = nil;
+ cls: jClass;
+begin
+ cls := env^.GetObjectClass(env, SqliteCursor);
+  _jMethod:= env^.GetMethodID(env, cls, 'GetRowCount', '()I');
+ Result := env^.CallIntMethod(env,SqliteCursor,_jMethod);
+end;
+
+Function jSqliteCursor_GetColumnCount(env:PJNIEnv; this:jobject; SqliteCursor: jObject):  integer;
+var
+  _jMethod : jMethodID = nil;
+  cls: jClass;
+begin
+  cls := env^.GetObjectClass(env, SqliteCursor);
+  _jMethod:= env^.GetMethodID(env, cls, 'GetColumnCount', '()I');
+  Result:= env^.CallIntMethod(env,SqliteCursor,_jMethod);
+end;
+
+Function jSqliteCursor_GetColumName(env:PJNIEnv; this:jobject; SqliteCursor: jObject; columnIndex: integer): string;
+var
+ _jMethod : jMethodID = nil;
+ cls: jClass;
+ _jParam: array[0..0] of jValue;
+ _jString  : jString;
+ _jBoolean : jBoolean;
+begin
+  _jParam[0].i := columnIndex;
+  cls := env^.GetObjectClass(env, SqliteCursor);
+  _jMethod:= env^.GetMethodID(env, cls, 'GetColumName', '(I)Ljava/lang/String;');
+  _jString   := env^.CallObjectMethodA(env,SqliteCursor,_jMethod,@_jParam);
+  case _jString = nil of
+    True : Result    := '';
+    False: begin
+            _jBoolean := JNI_False;
+            Result    := String( env^.GetStringUTFChars(env,_jString,@_jBoolean) );
+           end;
+  end;
+end;
+
+Function jSqliteCursor_GetColumnIndex(env:PJNIEnv; this:jobject; SqliteCursor: jObject; colName: string): integer;
+var
+ _jMethod : jMethodID = nil;
+ cls: jClass;
+ _jParam: array[0..0] of jValue;
+begin
+ _jParam[0].l := env^.NewStringUTF(env, pchar(colName));
+ cls := env^.GetObjectClass(env, SqliteCursor);
+ _jMethod:= env^.GetMethodID(env, cls, 'GetColumnIndex', '(Ljava/lang/String;)I');
+ Result := env^.CallIntMethodA(env,SqliteCursor,_jMethod, @_jParam);
+ env^.DeleteLocalRef(env,_jParam[0].l);
+end;
+
+Function jSqliteCursor_GetValueAsString(env:PJNIEnv; this:jobject; SqliteCursor: jObject; columnIndex: integer): string;
+var
+ _jMethod : jMethodID = nil;
+ cls: jClass;
+ _jParam: array[0..0] of jValue;
+  _jString  : jString;
+ _jBoolean : jBoolean;
+begin
+  _jParam[0].i := columnIndex;
+  cls := env^.GetObjectClass(env, SqliteCursor);
+  _jMethod:= env^.GetMethodID(env, cls, 'GetValueAsString', '(I)Ljava/lang/String;');
+  _jString   := env^.CallObjectMethodA(env,SqliteCursor,_jMethod,@_jParam);
+  case _jString = nil of
+    True : Result    := '';
+    False: begin
+            _jBoolean := JNI_False;
+            Result    := String( env^.GetStringUTFChars(Env,_jString,@_jBoolean) );
+          end;
+  end;
+end;
+
+//by jmpessoa
+function Get_gjClass(env: PJNIEnv): jClass;
+begin
+  if gjClass {global} = nil then
+  begin
+     gjClass:= jClass(env^.FindClass(env, gjClassName {global}));
+     if gjClass <> nil then gjClass := env^.NewGlobalRef(env, gjClass); //needed for Appi > 13
+  end;
+  Result:= gjClass;
+end;
+
+ {jSqliteDataAccess - by jmpessoa}
+
+Function  jSqliteDataAccess_Create(env: PJNIEnv; this:jobject;  SelfObj: TObject;
+                                         dataBaseName: string; colDelimiter: char; rowDelimiter: char): jObject;
+var
+ _jMethod : jMethodID = nil;
+ _jParams : array[0..3] of jValue;
+ cls: jClass;
+begin
+  cls:= Get_gjClass(env);           {a jmethodID is not an object. So don't need to convert it to a GlobalRef!}
+  _jMethod:= env^.GetMethodID(env, cls, 'jSqliteDataAccess_Create', '(JLjava/lang/String;CC)Ljava/lang/Object;');
+  _jParams[0].j := Int64(SelfObj);
+  _jParams[1].l := env^.NewStringUTF(env, pchar(dataBaseName));
+  _jParams[2].c := jChar(colDelimiter);
+  _jParams[3].c := jChar(rowDelimiter);
+  Result := env^.CallObjectMethodA(env, this, _jMethod,@_jParams);
+  Result := env^.NewGlobalRef(env,Result);
+  env^.DeleteLocalRef(env,_jParams[1].l);
+end;
+
+//by jmpessoa
+Procedure jSqliteDataAccess_Free(env:PJNIEnv;this:jobject; SqliteDataBase : jObject);
+var
+ _jMethod : jMethodID = nil;
+ cls: jClass;
+begin
+ cls := env^.GetObjectClass(env, SqliteDataBase);
+ _jMethod:= env^.GetMethodID(env, cls, 'Free', '()V');
+ env^.CallVoidMethod(env,SqliteDataBase,_jMethod);
+ env^.DeleteGlobalRef(env,SqliteDataBase);
+end;
+
+//java: public void ExecSQL(String execQuery)
+Procedure jSqliteDataAccess_ExecSQL(env:PJNIEnv;this:jobject; SqliteDataBase : jObject; execQuery: string);
+var
+  cls: jClass;
+  method: jmethodID;
+  _jParams : array[0..0] of jValue;
+begin
+  _jParams[0].l := env^.NewStringUTF(env, pchar(execQuery));
+  cls := env^.GetObjectClass(env, SqliteDataBase);
+  method:= env^.GetMethodID(env, cls, 'ExecSQL', '(Ljava/lang/String;)V');
+  env^.CallVoidMethodA(env, SqliteDataBase, method,@_jParams);
+  env^.DeleteLocalRef(env,_jParams[0].l);
+end;
+
+Procedure jSqliteDataAccess_OpenOrCreate(env:PJNIEnv;this:jobject; SqliteDataBase : jObject; dataBaseName: string);
+var
+  cls: jClass;
+  method: jmethodID;
+  _jParams : array[0..0] of jValue;
+begin
+  _jParams[0].l := env^.NewStringUTF(env, pchar(dataBaseName));
+  cls := env^.GetObjectClass(env, SqliteDataBase);
+  method:= env^.GetMethodID(env, cls, 'OpenOrCreate', '(Ljava/lang/String;)V');
+  env^.CallVoidMethodA(env, SqliteDataBase, method,@_jParams);
+  env^.DeleteLocalRef(env,_jParams[0].l);
+end;
+
+Procedure jSqliteDataAccess_AddTableName(env:PJNIEnv;this:jobject; SqliteDataBase: jObject; tableName: string);
+var
+  cls: jClass;
+  method: jmethodID;
+  _jParams : array[0..0] of jValue;
+begin
+  _jParams[0].l := env^.NewStringUTF(env, pchar(tableName));
+  cls := env^.GetObjectClass(env, SqliteDataBase);
+  method:= env^.GetMethodID(env, cls, 'AddTableName', '(Ljava/lang/String;)V');
+  env^.CallVoidMethodA(env, SqliteDataBase, method,@_jParams);
+  env^.DeleteLocalRef(env,_jParams[0].l);
+end;
+
+Procedure jSqliteDataAccess_AddCreateTableQuery(env:PJNIEnv;this:jobject; SqliteDataBase: jObject; createTableQuery: string);
+var
+  cls: jClass;
+  method: jmethodID;
+  _jParams : array[0..0] of jValue;
+begin
+  _jParams[0].l := env^.NewStringUTF(env, pchar(createTableQuery));
+  cls := env^.GetObjectClass(env, SqliteDataBase);
+  method:= env^.GetMethodID(env, cls, 'AddCreateTableQuery', '(Ljava/lang/String;)V');
+  env^.CallVoidMethodA(env, SqliteDataBase, method,@_jParams);
+  env^.DeleteLocalRef(env,_jParams[0].l);
+end;
+
+Procedure jSqliteDataAccess_CreateTable(env:PJNIEnv;this:jobject; SqliteDataBase: jObject; createQuery: string);
+var
+  cls: jClass;
+  method: jmethodID;
+  _jParams : array[0..0] of jValue;
+begin
+  _jParams[0].l := env^.NewStringUTF(env, pchar(createQuery));
+  cls := env^.GetObjectClass(env, SqliteDataBase);
+  method:= env^.GetMethodID(env, cls, 'ExecSQL', '(Ljava/lang/String;)V');
+  env^.CallVoidMethodA(env, SqliteDataBase, method,@_jParams);
+  env^.DeleteLocalRef(env,_jParams[0].l);
+end;
+
+Procedure jSqliteDataAccess_DropTable(env:PJNIEnv; this:jobject; SqliteDataBase: jObject; tableName: string);
+var
+  cls: jClass;
+  method: jmethodID;
+  _jParams : array[0..0] of jValue;
+begin
+  _jParams[0].l := env^.NewStringUTF(env, pchar(tableName));
+  cls := env^.GetObjectClass(env, SqliteDataBase);
+  method:= env^.GetMethodID(env, cls, 'ExecSQL', '(Ljava/lang/String;)V');
+  env^.CallVoidMethodA(env, SqliteDataBase, method,@_jParams);
+  env^.DeleteLocalRef(env,_jParams[0].l);
+end;
+
+function jSqliteDataAccess_Select(env:PJNIEnv; this:jobject; SqliteDataBase:jObject; selectQuery: string): string;
+var
+  _jMethod : jMethodID = nil;
+  _jString : jString;
+  _jBoolean: jBoolean;
+  _jParams : array[0..0] of jValue;
+  cls: jClass;
+begin
+  cls := env^.GetObjectClass(env, SqliteDataBase);
+  _jMethod:= env^.GetMethodID(env, cls, 'SelectS', '(Ljava/lang/String;)Ljava/lang/String;');
+  _jParams[0].l:= env^.NewStringUTF(env, pchar(selectQuery));
+  _jString:= env^.CallObjectMethodA(env,SqliteDataBase,_jMethod, @_jParams);
+  case _jString = nil of
+    True : Result    := '';
+    False: begin
+           _jBoolean := JNI_False;
+           Result    := String( env^.GetStringUTFChars(env,_jString,@_jBoolean) );
+          end;
+  end;
+  env^.DeleteLocalRef(env,_jParams[0].l);
+end;
+
+procedure jSqliteDataAccess_Select(env:PJNIEnv; this:jobject; SqliteDataBase: jObject; selectQuery: string);
+var
+  cls: jClass;
+  _methodID: jmethodID;
+  _jParams : array[0..0] of jValue;
+begin
+  _jParams[0].l := env^.NewStringUTF(env, PChar(selectQuery));
+  cls := env^.GetObjectClass(env, SqliteDataBase);
+  _methodID:= env^.GetMethodID(env, cls, 'SelectV', '(Ljava/lang/String;)V');
+  env^.CallVoidMethodA(env, SqliteDataBase, _methodID,@_jParams);
+  env^.DeleteLocalRef(env,_jParams[0].l);
+end;
+
+function jSqliteDataAccess_GetCursor(env:PJNIEnv; this:jobject; SqliteDataBase: jObject): jObject;
+var
+  cls: jClass;
+  _methodID: jmethodID;
+begin
+  cls := env^.GetObjectClass(env, SqliteDataBase);
+  _methodID:= env^.GetMethodID(env, cls, 'GetCursor', '()Landroid/database/Cursor;');
+  Result  := env^.CallObjectMethod(env, SqliteDataBase, _methodID);
+end;
+
+//java:  public boolean CheckDataBase(String pathDB)
+function jSqliteDataAccess_CheckDataBaseExists(env:PJNIEnv; this:jobject; SqliteDataBase: jObject; fullPathDB: string): boolean;
+var
+  cls: jClass;
+  _methodID: jmethodID;
+  _jParams : array[0..0] of jValue;
+  _jBoolean: jBoolean;
+begin
+  _jParams[0].l := env^.NewStringUTF(env, PChar(fullPathDB));
+  cls := env^.GetObjectClass(env, SqliteDataBase);
+  _methodID:= env^.GetMethodID(env, cls, 'CheckDataBaseExists', '(Ljava/lang/String;)V');
+  _jBoolean  := env^.CallBooleanMethodA(env, SqliteDataBase, _methodID,@_jParams);
+  Result     := boolean(_jBoolean);
+  env^.DeleteLocalRef(env,_jParams[0].l);
+end;
+
+procedure jSqliteDataAccess_CreateAllTables(env:PJNIEnv;this:jobject; SqliteDataBase: jObject);
+var
+  cls: jClass;
+  _methodID: jmethodID;
+begin
+  cls := env^.GetObjectClass(env, SqliteDataBase);
+  _methodID:= env^.GetMethodID(env, cls, 'CreateAllTables', '()V');
+  env^.CallVoidMethod(env, SqliteDataBase, _methodID);
+end;
+
+procedure jSqliteDataAccess_DropAllTables(env:PJNIEnv;this:jobject; SqliteDataBase: jObject; recreate: boolean);
+var
+   cls: jClass;
+  _methodID: jmethodID;
+  _jParams: array[0..0] of jValue;
+begin
+  _jParams[0].z:= jBool(recreate);
+  cls:= env^.GetObjectClass(env, SqliteDataBase);
+  _methodID:= env^.GetMethodID(env, cls, 'DropAllTables', '(Z)V');
+  env^.CallVoidMethodA(env, SqliteDataBase, _methodID,@_jParams);
+end;
+
+procedure jSqliteDataAccess_SetSelectDelimiters(env:PJNIEnv;this:jobject; SqliteDataBase: jObject;
+                              coldelim: char; rowdelim: char);
+var
+   cls: jClass;
+  _methodID: jmethodID;
+  _jParams: array[0..1] of jValue;
+begin
+ _jParams[0].c := jChar(coldelim);
+ _jParams[1].c := jChar(rowdelim);
+   cls:= env^.GetObjectClass(env, SqliteDataBase);
+  _methodID:= env^.GetMethodID(env, cls, 'SetSelectDelimiters', '(CC)V');
+  env^.CallVoidMethodA(env, SqliteDataBase, _methodID,@_jParams);
+end;
+
+
+procedure jSqliteDataAccess_InsertIntoTable(env:PJNIEnv;this:jobject; SqliteDataBase: jObject; insertQuery: string);
+var
+  cls: jClass;
+  method: jmethodID;
+  _jParams : array[0..0] of jValue;
+begin
+  _jParams[0].l := env^.NewStringUTF(env, pchar(insertQuery));
+  cls := env^.GetObjectClass(env, SqliteDataBase);
+  method:= env^.GetMethodID(env, cls, 'InsertIntoTable', '(Ljava/lang/String;)V');
+  env^.CallVoidMethodA(env, SqliteDataBase, method,@_jParams);
+  env^.DeleteLocalRef(env,_jParams[0].l);
+end;
+
+procedure jSqliteDataAccess_DeleteFromTable(env:PJNIEnv;this:jobject; SqliteDataBase: jObject; deleteQuery: string);
+var
+  cls: jClass;
+  method: jmethodID;
+  _jParams : array[0..0] of jValue;
+begin
+  _jParams[0].l := env^.NewStringUTF(env, pchar(deleteQuery));
+  cls := env^.GetObjectClass(env, SqliteDataBase);
+  method:= env^.GetMethodID(env, cls, 'DeleteFromTable', '(Ljava/lang/String;)V');
+  env^.CallVoidMethodA(env, SqliteDataBase, method,@_jParams);
+  env^.DeleteLocalRef(env,_jParams[0].l);
+end;
+
+procedure jSqliteDataAccess_UpdateTable(env:PJNIEnv;this:jobject; SqliteDataBase: jObject; updateQuery: string);
+var
+  cls: jClass;
+  method: jmethodID;
+  _jParams : array[0..0] of jValue;
+begin
+  _jParams[0].l := env^.NewStringUTF(env, pchar(updateQuery));
+  cls := env^.GetObjectClass(env, SqliteDataBase);
+  method:= env^.GetMethodID(env, cls, 'UpdateTable', '(Ljava/lang/String;)V');
+  env^.CallVoidMethodA(env, SqliteDataBase, method,@_jParams);
+  env^.DeleteLocalRef(env,_jParams[0].l);
+end;
+
+procedure jSqliteDataAccess_Close(env:PJNIEnv;this:jobject; SqliteDataBase: jObject);
+var
+   cls: jClass;
+  _methodID: jmethodID;
+begin
+   cls:= env^.GetObjectClass(env, SqliteDataBase);
+  _methodID:= env^.GetMethodID(env, cls, 'Close', '()V');
+  env^.CallVoidMethod(env, SqliteDataBase, _methodID);
+end;
+
 
 //------------------------------------------------------------------------------
 // jHttp_Get
@@ -10363,7 +10952,7 @@ begin
 end;
 
 //by jmpessoa   - //Use: path =  App.Path.DCIM
-                  //     filename = '/test.jpg
+                  //     filename = '/test.jpg'
 function jCamera_takePhoto(env:PJNIEnv; this:jobject; path: string; filename : String): string;
 const
  _cFuncName = 'jCamera_takePhoto';
@@ -10449,6 +11038,8 @@ Procedure jBenchMark1_Pascal (env:PJNIEnv;this:jobject;var mSec : Integer;var va
   //
   mSec := EndTime - StartTime;
  end;
+
+
 
 initialization    //commented by jmpessoa
 { gDbgMode    := True;

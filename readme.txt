@@ -42,6 +42,13 @@
 
               -Lazarus forum community! 
 
+version 0.4 - revision: 01 - 16 February - 2014 -
+      :: New Add [Partial] Support to SQLite: jSqliteDataAccess, jSqliteCursor
+
+         Supported FIELD_TYPE: [INTEGER, STRING, FLOAT] 
+        
+         ::New Eclipse project demo:  AppSqliteDemo1
+
 version 0.4 - 08 February - 2014 -
  
       :: NEW! Add Support for Android API > 13. 

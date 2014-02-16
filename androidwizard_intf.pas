@@ -122,10 +122,10 @@ end;
 
 function TAndroidProjectDescriptor.GetPathToJNIFolder(fullPath: string): string;
 var
-  pathList: TStringList;
-  i, j, k: integer;
+  //pathList: TStringList;
+  i: integer;
 begin
-  pathList:= TStringList.Create;
+ { pathList:= TStringList.Create;
   pathList.Delimiter:=DirectorySeparator;
   pathList.DelimitedText:= TrimChar(fullPath,DirectorySeparator);
 
@@ -133,15 +133,27 @@ begin
   begin
      if Pos('src', pathList.Strings[i]) > 0 then k:= i;
   end;
+  }
 
+
+  //fix by Leledumbo - for linux compatility
+  i := Pos('src',fullPath);
+  if i > 2 then
+  begin
+    Result := Copy(fullPath,1,i - 2); // we don't need the trailing slash
+  end else
+    raise Exception.Create('src folder not found');
+
+
+  {
   Result:= '';
   for j:= 0 to k-1 do
   begin
       Result:= Result + pathList.Strings[j]+DirectorySeparator;
   end;
 
-  Result:= TrimChar(Result, DirectorySeparator);;
-  pathList.Free;
+  Result:= TrimChar(Result, DirectorySeparator);
+  pathList.Free;}
 end;
 
 function TAndroidProjectDescriptor.TryNewJNIAndroidInterfaceCode: boolean;

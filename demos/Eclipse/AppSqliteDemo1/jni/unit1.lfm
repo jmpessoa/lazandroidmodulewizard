@@ -1,0 +1,211 @@
+object AndroidModule1: TAndroidModule1
+  OnCreate = DataModuleCreate
+  OldCreateOrder = False
+  ActivityMode = actMain
+  Title = 'jForm'
+  BackgroundColor = colbrBlack
+  OnJNIPrompt = DataModuleJNIPrompt
+  Height = 652
+  HorizontalOffset = 359
+  VerticalOffset = 16
+  Width = 306
+  object jTextView1: jTextView
+    Id = 4672521
+    PosRelativeToAnchor = []
+    PosRelativeToParent = [rpTop, rpCenterHorizontal]
+    LayoutParamWidth = lpWrapContent
+    LayoutParamHeight = lpWrapContent
+    MarginLeft = 10
+    MarginTop = 10
+    MarginRight = 10
+    MarginBottom = 10
+    Alignment = taLeft
+    Visible = True
+    Enabled = True
+    BackgroundColor = colbrDefault
+    FontColor = colbrSilver
+    FontSize = 0
+    Text = 'Sqlite Demo 1'
+    left = 120
+    top = 96
+  end
+  object jButton1: jButton
+    Id = 243613
+    Anchor = jTextView1
+    PosRelativeToAnchor = [raBelow]
+    PosRelativeToParent = []
+    LayoutParamWidth = lpMatchParent
+    LayoutParamHeight = lpWrapContent
+    MarginLeft = 5
+    MarginTop = 5
+    MarginRight = 5
+    MarginBottom = 5
+    Visible = True
+    BackgroundColor = colbrDefault
+    Text = 'Create Database'
+    FontColor = colbrDefault
+    FontSize = 0
+    OnClick = jButton1Click
+    left = 120
+    top = 152
+  end
+  object jButton2: jButton
+    Id = 9396074
+    Anchor = jButton1
+    PosRelativeToAnchor = [raBelow]
+    PosRelativeToParent = []
+    LayoutParamWidth = lpMatchParent
+    LayoutParamHeight = lpWrapContent
+    MarginLeft = 5
+    MarginTop = 5
+    MarginRight = 5
+    MarginBottom = 5
+    Visible = True
+    BackgroundColor = colbrDefault
+    Text = 'Create Table'
+    FontColor = colbrDefault
+    FontSize = 0
+    OnClick = jButton2Click
+    left = 120
+    top = 208
+  end
+  object jButton3: jButton
+    Id = 6997750
+    Anchor = jButton2
+    PosRelativeToAnchor = [raBelow]
+    PosRelativeToParent = []
+    LayoutParamWidth = lpMatchParent
+    LayoutParamHeight = lpWrapContent
+    MarginLeft = 5
+    MarginTop = 5
+    MarginRight = 5
+    MarginBottom = 5
+    Visible = True
+    BackgroundColor = colbrDefault
+    Text = 'Inserto Into Table'
+    FontColor = colbrDefault
+    FontSize = 0
+    OnClick = jButton3Click
+    left = 120
+    top = 264
+  end
+  object jButton4: jButton
+    Id = 463965
+    Anchor = jButton3
+    PosRelativeToAnchor = [raBelow]
+    PosRelativeToParent = []
+    LayoutParamWidth = lpMatchParent
+    LayoutParamHeight = lpWrapContent
+    MarginLeft = 5
+    MarginTop = 5
+    MarginRight = 5
+    MarginBottom = 5
+    Visible = True
+    BackgroundColor = colbrDefault
+    Text = 'Show Select * From'
+    FontColor = colbrDefault
+    FontSize = 0
+    OnClick = jButton4Click
+    left = 120
+    top = 312
+  end
+  object jButton5: jButton
+    Id = 2266437
+    Anchor = jButton4
+    PosRelativeToAnchor = [raBelow]
+    PosRelativeToParent = []
+    LayoutParamWidth = lpMatchParent
+    LayoutParamHeight = lpWrapContent
+    MarginLeft = 5
+    MarginTop = 5
+    MarginRight = 5
+    MarginBottom = 5
+    Visible = True
+    BackgroundColor = colbrDefault
+    Text = 'Count Select Row'
+    FontColor = colbrDefault
+    FontSize = 0
+    OnClick = jButton5Click
+    left = 120
+    top = 368
+  end
+  object jEditText1: jEditText
+    Id = 2166778
+    Anchor = jTextView2
+    PosRelativeToAnchor = [raBelow]
+    PosRelativeToParent = []
+    LayoutParamWidth = lpOneThirdOfParent
+    LayoutParamHeight = lpWrapContent
+    MarginLeft = 10
+    MarginTop = 10
+    MarginRight = 10
+    MarginBottom = 10
+    Alignment = taLeft
+    InputTypeEx = itxText
+    LineMaxLength = 300
+    Visible = True
+    BackgroundColor = colbrWhite
+    FontColor = colbrDefault
+    FontSize = 0
+    ScrollBarStyle = scrNone
+    MaxLines = 1
+    HorScrollBar = True
+    VerScrollBar = False
+    WrappingLine = False
+    left = 40
+    top = 480
+  end
+  object jTextView2: jTextView
+    Id = 9513098
+    Anchor = jButton5
+    PosRelativeToAnchor = [raBelow]
+    PosRelativeToParent = []
+    LayoutParamWidth = lpWrapContent
+    LayoutParamHeight = lpWrapContent
+    MarginLeft = 10
+    MarginTop = 10
+    MarginRight = 10
+    MarginBottom = 10
+    Alignment = taLeft
+    Visible = True
+    Enabled = True
+    BackgroundColor = colbrDefault
+    FontColor = colbrSilver
+    FontSize = 0
+    Text = 'Enter Index:'
+    left = 40
+    top = 424
+  end
+  object jButton6: jButton
+    Id = 1300451
+    Anchor = jEditText1
+    PosRelativeToAnchor = [raToRightOf, raAlignBaseline]
+    PosRelativeToParent = []
+    LayoutParamWidth = lpTwoThirdOfParent
+    LayoutParamHeight = lpWrapContent
+    MarginLeft = 5
+    MarginTop = 5
+    MarginRight = 5
+    MarginBottom = 5
+    Visible = True
+    BackgroundColor = colbrDefault
+    Text = 'MoveToRow Index'
+    FontColor = colbrDefault
+    FontSize = 0
+    OnClick = jButton6Click
+    left = 120
+    top = 480
+  end
+  object jSqliteDataAccess1: jSqliteDataAccess
+    Cursor = jSqliteCursor1
+    ColDelimiter = '|'
+    RowDelimiter = '#'
+    DataBaseName = 'myData.db'
+    left = 60
+    top = 27
+  end
+  object jSqliteCursor1: jSqliteCursor
+    left = 188
+    top = 27
+  end
+end

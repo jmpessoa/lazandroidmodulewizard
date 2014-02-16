@@ -1,9 +1,13 @@
 package com.example.appdemo1;
 //
 //
-//Android Java Interface for Pascal/Delphi XE5  - 
-//[and Lazarus: by jmpessoa@hotmail.com - december 2013]
 //
+//[LazAndroidModuleWizard - ver.0.4_r.01 :16-feb-2014]
+//[https://github.com/jmpessoa/lazandroidmodulewizard]
+
+//Android Java Interface for Pascal/Delphi XE5  - 
+//[And LAZARUS by jmpessoa@hotmail.com - december 2013]
+
 //Developer
 //          Simon,Choi / Choi,Won-sik
 //                       simonsayz@naver.com
