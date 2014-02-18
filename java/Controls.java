@@ -1,8 +1,12 @@
 package com.example.dummyapp;
 //
 //
+//[LazAndroidModuleWizard - ver.0.4_r.02 :17-feb-2014]
+//[https://github.com/jmpessoa/lazandroidmodulewizard]
+
 //Android Java Interface for Pascal/Delphi XE5  - 
-//[and Lazarus by jmpessoa@hotmail.com - december 2013]
+//[And LAZARUS by jmpessoa@hotmail.com - december 2013]
+
 //
 //Developer
 //          Simon,Choi / Choi,Won-sik
@@ -56,7 +60,9 @@ import android.app.ActivityManager;
 import android.app.AlertDialog;
 import android.app.PendingIntent;
 import android.app.ProgressDialog;
+import android.content.ContentValues;
 import android.content.Context;
+import android.content.ContextWrapper;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager.NameNotFoundException;
@@ -89,6 +95,7 @@ import android.text.InputType;
 import android.text.TextWatcher;
 import android.text.method.ScrollingMovementMethod;
 import android.util.DisplayMetrics;
+import android.media.MediaPlayer;
 import android.net.Uri;
 import android.util.Log;
 import android.util.TypedValue;
@@ -132,6 +139,7 @@ import android.widget.Toast;
 import android.widget.ViewFlipper;
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -162,7 +170,11 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.ByteArrayBuffer;
 import org.apache.http.util.EntityUtils;
-
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+//import android.database.sqlite.SQLiteOpenHelper;
+import android.database.SQLException;
+import android.database.sqlite.SQLiteException;
 //-------------------------------------------------------------------------
 //Constants
 //-------------------------------------------------------------------------
@@ -601,6 +613,8 @@ setOnClickListener(null);
 public void setTextSize2(int value) {
 	this.setTextSize(value);
 }
+
+
 
 }
 
@@ -3291,7 +3305,6 @@ private RelativeLayout.LayoutParams    lparams;           // layout XYWH -fix by
 private jRenderer       renderer;
 private GL10            savGL;
 
-
 //by jmpessoa
 private int lparamsAnchorRule[] = new int[20]; 
 int countAnchorRule = 0;
@@ -3572,7 +3585,6 @@ public  void SetAutoRefresh(boolean active ) {
 	  if (active) {setRenderMode( GLSurfaceView.RENDERMODE_CONTINUOUSLY ); }
 	  else  {setRenderMode( GLSurfaceView.RENDERMODE_WHEN_DIRTY   ); }
 }
-
 
 }
 
@@ -4124,9 +4136,8 @@ public  jBitmap(Controls ctrls, long pasobj ) {
 // Connect Pascal I/F
 PasObj   = pasobj;
 controls = ctrls;
-// Init
-}
 
+}
 
 public  void loadFile(String filename) {
   if (bmp != null) { bmp.recycle(); }
@@ -4170,19 +4181,443 @@ public  Bitmap getJavaBitmap() {
 	  return this.bmp;
 }
 
+//by jmpessoa
+public byte[] GetByteArrayFromBitmap() {
+    ByteArrayOutputStream stream = new ByteArrayOutputStream();
+    this.bmp.compress(CompressFormat.PNG, 0, stream);
+    Log.i("GetByteArrayFromBitmap","size="+ stream.size());
+    return stream.toByteArray();
+}
+
+//by jmpessoa
+public void SetByteArrayToBitmap(byte[] image) {
+	this.bmp = BitmapFactory.decodeByteArray(image, 0, image.length);
+	Log.i("SetByteArrayToBitmap","size="+ image.length);
+}
+
+}
+
+/**
+ * 
+ * jSqliteCursor
+ *
+ * by jmpessoa
+ *
+ */
+//http://android-codes-examples.blogspot.com.br/2011/09/using-sqlite-to-populate-listview-in.html <<----------
+//http://www.coderzheaven.com/2012/12/23/store-image-android-sqlite-retrieve-it/  <<---------------
+	
+//http://www.coderzheaven.com/2011/04/17/using-sqlite-in-android-a-really-simple-example/
+//http://www.androidhive.info/2011/11/android-sqlite-database-tutorial/
+//http://androidexample.com/SQLite_Database_Manipulation_Class_-_Android_Example/index.php?view=article_discription&aid=51
+//http://javapapers.com/android/android-sqlite-database/  <<------------------- 
+//http://chintankhetiya.wordpress.com/2013/06/01/sqlite-database-example/
+//http://androidituts.com/android-sqlite-database-insert-example/
+//http://www.codeproject.com/Articles/119293/Using-SQLite-Database-with-Android   <<---------------
+//http://stackoverflow.com/questions/5742101/how-using-sqliteopenhelper-with-database-on-sd-card
+
+class jSqliteCursor {
+
+	private long       PasObj  = 0;      // Pascal Obj
+	private Controls   controls = null;   // Control Class for Event
+
+	public Cursor cursor = null;
+	
+	//Constructor
+	public  jSqliteCursor(Controls ctrls, long pasobj ) {
+	   //Connect Pascal I/F
+	   PasObj   = pasobj;
+	   controls = ctrls;
+	}
+	
+	public  void SetCursor(Cursor curs) {
+		this.cursor = curs;
+	}
+	
+    public  Cursor GetCursor() {
+  	    return this.cursor;
+    }
+	
+	public int GetRowCount() {
+		if (this.cursor != null) {
+    		return this.cursor.getCount();    		
+    	}
+    	else{
+    		return 0;
+    	}
+    }
+      
+    public void MoveToFirst() {
+    	if (cursor != null) cursor.moveToFirst();
+    }
+    
+    public void MoveToNext() {
+    	if (cursor != null) cursor.moveToNext();
+    }
+    
+    public void MoveToLast() {
+    	if (cursor != null) cursor.moveToLast();
+    }
+  
+    public void MoveToPosition(int position) {
+    	if (cursor != null) cursor.moveToPosition(position);
+    }
+  
+    public int GetColumnIndex(String colName) {
+    	if (cursor != null) return cursor.getColumnIndex(colName);
+    	else  return -1;
+    }
+     
+    public String GetValueAsString(int columnIndex) {
+    	if (cursor != null) return cursor.getString(columnIndex);
+    	else return "";			
+    }
+    
+    public int GetColType(int columnIndex) {
+    	if (cursor != null) return cursor.getType(columnIndex);
+    	else return Cursor.FIELD_TYPE_NULL ;			
+    }
+    
+    public byte[] GetValueAsBlod(int columnIndex) {
+    	if (cursor != null) return cursor.getBlob(columnIndex);
+    	else return null;			
+    }
+    
+    public int GetValueAsInt(int columnIndex) {
+    	int index = 0;
+    	
+    	if (cursor != null){ 
+    	    if	(columnIndex < 0) {index = 0;}
+    	    if  (columnIndex >= cursor.getColumnCount() ) {index = cursor.getColumnCount()-1;} 
+    		return cursor.getInt(index);
+    	}	
+    	else return -1;			
+    }
+    
+    public short GetValueAsShort(int columnIndex) {
+    	if (cursor != null) return cursor.getShort(columnIndex);
+    	else return -1;			
+    }
+
+    public long GetValueAsLong(int columnIndex) {
+    	if (cursor != null) return cursor.getLong(columnIndex);
+    	else return -1;			
+    }
+
+    public float GetValueAsFloat(int columnIndex) {
+    	if (cursor != null) return cursor.getFloat(columnIndex);
+    	else return -1;			
+    }
+     
+    public double GetValueAsDouble(int columnIndex) {
+    	if (cursor != null) return cursor.getDouble(columnIndex);
+    	else return -1;			
+    }
+       
+    public int GetColumnCount() {
+    	if (cursor != null) {return cursor.getColumnCount();}
+    	else {return 0;}
+    }
+    
+    public String GetColumName(int columnIndex) {
+    	if (cursor != null) return cursor.getColumnName(columnIndex);
+    	else return "";			
+    }
+        
+    public void Free() {
+      cursor = null;	
+    }
+    
+}
+
+/**
+ * 
+ * jSqliteDataAccess
+ * 
+ * by jmpessoa
+ *
+ */
+class jSqliteDataAccess {
+
+        private long PasObj   = 0;           // Pascal Obj
+        private Controls controls = null;   // Control Class for Event
+        
+        private String[] storeTableCreateQuery = new String[10]; //max 10 create tables scripts
+        private String[] storeTableName = new String[10];       //max 10  tables name
+       
+        private int countTableName = 0;
+        private int countTableQuery = 0;
+       
+        private SQLiteDatabase mydb = null;
+        
+        public Cursor cursor = null;
+        
+        private static String DATABASE_NAME;                         
+        private static final int DATABASE_VERSION = 1;
+       
+        char selectColDelimiter;  
+        char selectRowDelimiter;
+	   
+        public void SetSelectDelimiters(char coldelim, char rowdelim){
+    	   selectColDelimiter = coldelim;
+    	   selectRowDelimiter = rowdelim;
+        }
+        
+        public void AddTableName(String tabName) {
+    	   storeTableName[countTableName] = tabName;
+    	   countTableName++;
+	    }
+	   
+        public void AddCreateTableQuery(String queryCreateTable) {
+    	   storeTableCreateQuery[countTableQuery] = queryCreateTable; 
+    	   countTableQuery++;
+	    }
+	          
+	    public void CreateAllTables() {
+		   for(int i=0; i < countTableQuery-1; i++) {
+			   this.ExecSQL(storeTableCreateQuery[i]);  
+		   }
+	    }
+	   	   	   
+        public void DropAllTables(boolean recreate) {
+		   //drop All tables
+    	   for(int i=0; i < countTableName-1; i++) {
+    		  this.ExecSQL("DROP TABLE IF EXISTS "+storeTableName[i]);
+    	   }
+    	   
+    	   if (recreate = true) { CreateAllTables(); }
+	    }
+       
+        //constructor ...
+	    public jSqliteDataAccess (Controls ctrls, long pasobj, String dbName, char colDelim, char rowDelim) {	    
+		   PasObj   = pasobj;
+		   controls = ctrls;
+		   selectColDelimiter = colDelim;  
+	       selectRowDelimiter = rowDelim;
+	       DATABASE_NAME = dbName;
+	    }
+
+        // Open/Create database for insert,update,delete in syncronized manner
+        private synchronized SQLiteDatabase Open() throws SQLException {
+    	   return controls.activity.openOrCreateDatabase(DATABASE_NAME, Context.MODE_PRIVATE, null);
+        }
+       
+	    public void OpenOrCreate(String dataBaseName) {
+		   DATABASE_NAME = dataBaseName;
+		   mydb = this.Open();
+	    }
+	           
+        public void ExecSQL(String execQuery){
+	        try{ 	
+	           mydb = this.Open();	
+	           mydb.execSQL(execQuery);
+	           mydb.close();
+	        }catch(SQLiteException se){
+	        	Log.e(getClass().getSimpleName(), "Could not execute: "+ execQuery);
+	        	
+	        }
+	    }
+        
+	    public String SelectS(String selectQuery) {	 
+	    	
+		     String row = "";
+		     String rows = "";
+		     String colValue;		     
+		     String headerRow;
+		     int colCount;	    	
+		     int i;
+		     String allRows = null;
+		      		     		     
+		     try{
+		       mydb = this.Open();	            
+		       cursor  = mydb.rawQuery(selectQuery, null);		       
+		        	
+		            colCount = cursor.getColumnCount();
+		        
+		            headerRow = "";
+		            for (i = 0; i < colCount; i++) {
+		            	headerRow = headerRow + cursor.getColumnName(i) + selectColDelimiter;
+		            } 
+		            headerRow = headerRow.substring(0, headerRow.length() - 1);
+		            if(cursor.moveToFirst()){
+		                do{
+		                	 row ="";	   
+		                	 colValue = "";		                	 		                	
+		                     for (i = 0; i < colCount; i++) {		                    	 	 
+		                    	 switch (cursor.getType(i)) {                //  
+		                    	   case Cursor.FIELD_TYPE_INTEGER: colValue = Integer.toString(cursor.getInt(i)); break;
+		                    	   case Cursor.FIELD_TYPE_STRING: colValue =  cursor.getString(i); break;
+		                    	   case Cursor.FIELD_TYPE_FLOAT: colValue =  String.format("%.3f", cursor.getDouble(i));  break;
+		                    	   //TODO ... more field type here...
+		                    	   default: colValue= "UNKNOW"; break;
+		                     	 }
+		                    	 row = row + colValue + selectColDelimiter ;
+		                      }
+		                      row = row.substring(0, row.length() - 1); 
+		                      rows = rows + row + selectRowDelimiter;
+		                      
+		                }
+		                while(cursor.moveToNext());
+		            }
+		            
+		            
+		            mydb.close();
+		            cursor.moveToFirst();
+		            
+		            allRows = headerRow + selectRowDelimiter + rows;
+		          		      
+		     }catch(SQLiteException se){
+		         	 Log.e(getClass().getSimpleName(), "Could not select:" + selectQuery);
+		     }	    
+		      
+		     return allRows; 
+	    }
+	    	    
+	    public void SelectV(String selectQuery) {
+	    	    this.cursor = null;
+		        try{  //controls.activity.openOrCreateDatabase(DATABASE_NAME, Context.MODE_PRIVATE, null); //
+			     	mydb = this.Open();	            
+			     	this.cursor  = mydb.rawQuery(selectQuery, null);			    			        
+			        mydb.close();			       
+			     }catch(SQLiteException se){
+			         Log.e(getClass().getSimpleName(), "Could not select:" + selectQuery);
+			     }	     		         			     
+		}
+
+	    public Cursor GetCursor() {
+    	    return this.cursor;
+	    }
+	    
+        //ex. "CREATE TABLE IF NOT EXISTS TABLE1  (_ID INTEGER PRIMARY KEY, NAME TEXT, PLACE TEXT);"
+	    public void CreateTable(String query){
+	       this.ExecSQL(query);	      
+	    }
+
+	    //ex: "INSERT INTO TABLE1 (NAME, PLACE) VALUES('CODERZHEAVEN','GREAT INDIA')"
+	    public void InsertIntoTable(String query){
+	       this.ExecSQL(query);	            
+	    }
+	    
+	    //ex: "UPDATE TABLE1 SET NAME = 'MAX' WHERE PLACE = 'USA'"
+	    public void UpdateTable(String query){
+	        this.ExecSQL(query);	        
+	    }
+	    
+	    //ex: "DELETE FROM TABLE1  WHERE PLACE = 'USA'";
+	    public void DeleteFromTable(String query){
+	       this.ExecSQL(query);	       
+	    }
+	    
+	    //ex:  "TABLE1" 
+	    public void DropTable(String tbName){
+	       this.ExecSQL("DROP TABLE " + tbName);	           
+	    }
+	    
+		//Check if the database exist... 
+		public boolean CheckDataBaseExists(String dbPath) {   
+		      SQLiteDatabase checkDB = null; 
+		      try {
+		          String myPath = dbPath; //"data/data/com.data.pack/databases/" + dbName;
+		          checkDB = SQLiteDatabase.openDatabase(myPath, null, SQLiteDatabase.OPEN_READONLY);
+		      } catch (SQLiteException e) {
+		    	  Log.e("SQLiteDatabase","database does't exist yet.");
+		      } 
+		      if (checkDB != null) {
+	             checkDB.close();
+		      }      	         
+		      return checkDB != null ? true : false;
+		}
+	     
+		public void Close() {
+		   if (mydb.isOpen()) { mydb.close();}			  
+		}
+		   
+		public void Free() {
+		   if (mydb.isOpen()) { mydb.close();}
+		   mydb = null;
+		}		
+}
+
+
+ /**
+  * TODO
+  * jMediaPlayer
+  * 
+  * by jmpessoa
+  *
+  */
+//http://www.javatpoint.com/playing-audio-in-android-example
+class jMediaPlayer{
+	
+    private long PasObj   = 0;           // Pascal Obj
+    private Controls controls = null;   // Control Class for Event
+    private MediaPlayer mplayer = null;
+    private String FILE_NAME; 
+    
+    public jMediaPlayer (Controls ctrls, long pasobj, String pathToFileName) {	    
+	   PasObj   = pasobj;
+	   controls = ctrls;
+	   FILE_NAME = pathToFileName;
+	   this.mplayer = new MediaPlayer();
+    }
+    
+    public void SetDataSource(String path){	 //sets the data source (file path or http url) to use.
+    	FILE_NAME = path;
+    	try {
+			this.mplayer.setDataSource(FILE_NAME);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+    }
+    
+    public void Prepare(){	 //prepares the player for playback synchronously.
+    	try {
+			this.mplayer.prepare();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+    }
+    public void Start(){	 //it starts or resumes the playback.
+    	this.mplayer.start();
+    }
+    public void Stop(){	 //it stops the playback.
+    	this.mplayer.stop();
+    }
+    public void Pause(){	 //it pauses the playback.
+    	this.mplayer.pause();
+    }
+    public boolean IsPlaying(){	 //checks if media player is playing.
+    	return this.mplayer.isPlaying();
+    }
+    public void SeekTo(int millis){	 //seeks to specified time in miliseconds.
+    	this.mplayer.seekTo(millis);	
+    }
+    public void SetLooping(boolean looping){	 //sets the player for looping or non-looping.
+    	this.mplayer.setLooping(looping);
+    }
+    public boolean IsLooping(){	 //checks if the player is looping or non-looping.
+    	return this.mplayer.isLooping();
+    }
+    public void SelectTrack(int index){	 //it selects a track for the specified index.
+    	
+    }
+    public int GetCurrentPosition(){	 //returns the current playback position.
+    	return this.mplayer.getCurrentPosition();
+    }
+    public int GetDuration(){	 //returns duration of the file.
+    	return this.mplayer.getDuration();
+    }
+    public void SetVolume(float leftVolume,float rightVolume){
+    	this.mplayer.setVolume(leftVolume, rightVolume);
+    }
 }
 
 //------------------------------------------------------------------------------
 //
 //Javas/Pascal Interface Class
 //
-//
-//
-//
-//
-//
 //------------------------------------------------------------------------------
-//!!!! classcontrols  
+//!!!! class controls  
 //
 public  class Controls {
 //
@@ -4262,8 +4697,8 @@ public  void systemGC() {
 
 //
 public  void systemSetOrientation(int orientation) {
-  this.activity.setRequestedOrientation(orientation);
-  }
+   this.activity.setRequestedOrientation(orientation);
+}
 
 //by jmpessoa
 public  int  systemGetOrientation() {  
@@ -4272,7 +4707,7 @@ public  int  systemGetOrientation() {
 
 //
 public  void classSetNull (Class object) {
-  object = null;
+   object = null;
 }
 
 public  void classChkNull (Class object) {
@@ -4287,8 +4722,9 @@ public  void classChkNull (Class object) {
 //
 public  void appFinish () {
   activity.finish();
-  System.exit(0);  //<<--------- fix by jmpessoa.
+  System.exit(0); //<< ------- fix by jmpessoa
 }
+
 
 //
 public  void appKillProcess() {
@@ -4396,7 +4832,8 @@ public  Animation Ani_FadeOut(int duration) {
     Alpha.setStartOffset(0);
     Alpha.setFillAfter (false);
     Alpha.setFillBefore(false);
-    return Alpha;   }
+    return Alpha;   
+}
 
 // https://coderwall.com/p/jpijag
 public  AnimationSet Ani_iR2LFadeIn(int duration) {
@@ -4520,6 +4957,7 @@ public  String getPathDat (android.content.Context context) {
   Log.i("JAVA:",version);
   //
   String PathDat = context.getFilesDir().getAbsolutePath();
+  
   return ( PathDat );
 }
 
@@ -4533,6 +4971,13 @@ public  String getPathExt() {
 public  String getPathDCIM() {
   File FileDCIM =  Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM);
   return ( FileDCIM.getPath() );
+}
+
+//by jmpessoa
+public  String getPathDataBase(android.content.Context context) {
+   String destPath = context.getFilesDir().getAbsolutePath();
+   destPath = destPath.substring(0, destPath.lastIndexOf("/")) + "/databases";
+   return destPath;
 }
 
 // -------------------------------------------------------------------------
@@ -6094,6 +6539,7 @@ public  Bitmap jBitmap_getJavaBitmap( java.lang.Object bitmap) {
   return ( ((jBitmap)bitmap).bmp );
 }
 
+
 // -------------------------------------------------------------------------
 //  View
 // -------------------------------------------------------------------------
@@ -6755,6 +7201,22 @@ public float[] benchMark1 () {
   return ( vals );
 }
 
+//by jmpessoa
+public  java.lang.Object jSqliteCursor_Create( long pasobj ) {
+	return (java.lang.Object)( new jSqliteCursor(this,pasobj) );
 }
+
+//by jmpessoa
+public  java.lang.Object jSqliteDataAccess_Create(long pasobj, String databaseName, char colDelim, char rowDelim) {
+	return (java.lang.Object)( new jSqliteDataAccess(this,pasobj,databaseName,colDelim,rowDelim) );
+}
+
+/* TODO: by jmpessoa
+public  java.lang.Object jMediaPlayer_Create(long pasobj, String pathToFileName) {
+	return (java.lang.Object)( new jMediaPlayer(this,pasobj,pathToFileName) );
+} */
+
+
+} //END - class Controls
 
 

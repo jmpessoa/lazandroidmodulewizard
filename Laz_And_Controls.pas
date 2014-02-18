@@ -501,12 +501,6 @@ type
                     Mouch   : TMouch;  // MultiTouch Result (Pt,Zoom,Angle)
                    End;
 
-  TScanLine = Array[0..0] of DWord;
-  PScanLine = ^TScanline;
-
-  TScanByte = Array[0..0] of JByte;  //by jmpessoa
-  PScanByte = ^TScanByte;
-
   TLayoutRelativeTo = (lrParent, lrAnchor);
 
   TPaintStyle = (psFill , psFillAndStroke, psStroke); //by jmpessoa
@@ -703,7 +697,6 @@ type
 
   published
     //procedure SetOnJNIPrompt(Value: TOnNotify);
-    //property MainActivity  : boolean read FMainActivity write FMainActivity;
     property ActivityMode  : TActivityMode read FActivityMode write FActivityMode;
     property Title: string  read FFormName write FFormName;
     property BackgroundColor: TARGBColorBridge  read FColor write SetColor;
@@ -905,17 +898,23 @@ type
     Procedure LoadFromFile(fileName : String);
     Procedure CreateJavaBitmap(w,h : Integer);
     Function  GetJavaBitmap : jObject;
-    procedure BitmapToByte(image: jObject; var bufferImage: TArrayOfByte);
-    function ByteToBitmap(image: TArrayOfByte): jObject;
-    procedure LockPixels(var PScanDWord: PScanLine); overload;
-    procedure LockPixels(var PScanJByte: {PJByte} PScanByte); overload;
-    procedure LockPixels(var PSJByte: PJByte); overload;
-    procedure UnlockPixels;
-    function GetInfo: boolean;
 
-    //Function  GetBitmap : Pointer;
-    //Procedure SetBitmap ( data : pointer );
-    // Property
+
+    function BitmapToByte(var bufferImage: TArrayOfByte): integer;  //local/self
+
+    function GetByteArrayFromBitmap(var bufferImage: TArrayOfByte): integer;
+    procedure SetByteArrayToBitmap(var bufferImage: TArrayOfByte; size: integer);
+
+    procedure LockPixels(var PDWordPixel: PScanLine); overload;
+    procedure LockPixels(var PBytePixel: PScanByte {delphi mode} ); overload;
+    procedure LockPixels(var PSJByte: PJByte{fpc mode}); overload;
+    procedure UnlockPixels;
+
+    procedure ScanPixel(PBytePixel: PScanByte; notByteIndex: integer); overload;   //TODO - just draft
+    procedure ScanPixel(PDWordPixel: PScanLine);  overload; //TODO - just draft
+    function GetInfo: boolean;
+    function  GetRatio: Single;
+
 
     property  JavaObj : jObject           read FjObject;
     property ImageName: string read FImageName write SetImageName;
@@ -994,6 +993,7 @@ type
     property  AutoPublishProgress: boolean read FAutoPublishProgress write SetAutoPublishProgress;
   end;
 
+  //NEW by jmpessoa
   jSqliteCursor = class(jControl)
    private
       FInitialized: boolean;
@@ -1014,10 +1014,15 @@ type
      function GetColumnIndex(colName: string): integer;
      function GetColumName(columnIndex: integer): string;
      function GetValueAsString(columnIndex: integer): string;
+     function GetValueAsBitmap(columnIndex: integer): jObject;
+     function GetValueAsInteger(columnIndex: integer): integer;
+     function GetValueAsDouble(columnIndex: integer): double;
+
      procedure SetCursor(Value: jObject);
    published
    end;
 
+  //NEW by jmpessoa
   jSqliteDataAccess = class(jControl)
   private
     FjSqliteCursor    : jSqliteCursor;
@@ -1048,6 +1053,7 @@ type
     procedure InsertIntoTable(insertQuery: string);
     procedure DeleteFromTable(deleteQuery: string);
     procedure UpdateTable(updateQuery: string);
+    procedure UpdateImage(tableName: string; fieldName: string; keyId: integer; image: jObject);
     procedure Close;
     function  GetCursor: jObject;    overload;
   published
@@ -1732,7 +1738,12 @@ type
     // LORDMAN 2013-08-13
     Procedure drawPoint            (x1,y1 : single);
     Procedure drawText             (Text : String; x,y : single);
-    Procedure drawBitmap           (bmp : jBitmap; b,l,r,t : integer);
+    Procedure drawBitmap           (bmp : jBitmap; b,l,r,t : integer);  overload;
+
+     //by jmpessoa
+    Procedure drawBitmap           (bmp : jObject; b,l,r,t : integer);  overload;
+    //by jmpessoa
+    Procedure drawBitmap(bmp: jBitmap; x1, y1, size: integer; ratio: single); overload;
     // Property
     property  JavaObj : jObject read FjObject;
   published
@@ -2456,8 +2467,6 @@ begin
   Form.SetOrientation(rotate);
 
   if Assigned(Form.OnRotate) then Form.OnRotate(Form, rotate, {var}rstRotate);
-
- // if rstRotate <>  Form.Orientation then Form.SetOrientation(rstRotate);
 
   Result := rstRotate;
 
@@ -6298,19 +6307,54 @@ end;
 Function jBitmap.GetJavaBitmap: jObject;
 begin
   if FInitialized then
+  begin
      Result:= jBitmap_getJavaBitmap2(jForm(Owner).App.Jni.jEnv,jForm(Owner).App.Jni.jThis, FjObject);
+  end;
 end;
 
-procedure jBitmap.BitmapToByte(image: jObject; var bufferImage: TArrayOfByte);
+function jBitmap.BitmapToByte(var bufferImage: TArrayOfByte): integer; //local/self
+var
+  PJavaPixel: PScanByte; {need by delphi mode!} //PJByte;
+  k, row, col: integer;
+  w, h: integer;
 begin
-   if FInitialized then
-     jBitmap_BitmapToByte(jForm(Owner).App.Jni.jEnv,jForm(Owner).App.Jni.jThis, FjObject, image, bufferImage);
+  Result:= 0;
+  if Self.GetInfo then
+  begin
+     //demo API LockPixels - overloaded - paramenter is "PJavaPixel"
+    Self.LockPixels(PJavaPixel); //ok
+    k:= 0;
+    w:= Self.Width;
+    h:= Self.Height;
+    Result:=  h*w;
+    SetLength(bufferImage,Result);
+    for row:= 0 to h-1 do  //ok
+    begin
+      for col:= 0 to w-1 do //ok
+      begin
+          bufferImage[k*4]:=    PJavaPixel^[k*4]; //delphi mode....
+          bufferImage[k*4+1]:=  PJavaPixel^[k*4+1];
+          bufferImage[k*4+2]:=  PJavaPixel^[k*4+2];
+          bufferImage[k*4+3]:=  PJavaPixel^[k*4+3];
+          inc(k);
+      end;
+    end;
+    Self.UnlockPixels;
+  end;
 end;
 
-function jBitmap.ByteToBitmap(image: TArrayOfByte): jObject;
+function jBitmap.GetByteArrayFromBitmap(var bufferImage: TArrayOfByte): integer;
 begin
-   if FInitialized then
-     Result:= jBitmap_ByteToBitmap(jForm(Owner).App.Jni.jEnv,jForm(Owner).App.Jni.jThis, FjObject, image);
+  if FInitialized then
+   Result:= jBitmap_GetByteArrayFromBitmap(jForm(Owner).App.Jni.jEnv,jForm(Owner).App.Jni.jThis,
+                                    FjObject, bufferImage);
+end;
+
+procedure jBitmap.SetByteArrayToBitmap(var bufferImage: TArrayOfByte; size: integer);
+begin
+  if FInitialized then
+    jBitmap_SetByteArrayToBitmap(jForm(Owner).App.Jni.jEnv,jForm(Owner).App.Jni.jThis,
+                                    FjObject, bufferImage, size);
 end;
 
 procedure jBitmap.Notification(AComponent: TComponent; Operation: TOperation);
@@ -6388,19 +6432,19 @@ begin
   if FInitialized then SetImageByName(FImageName);
 end;
 
-procedure jBitmap.LockPixels(var PScanDWord : PScanLine);
+procedure jBitmap.LockPixels(var PDWordPixel : PScanLine);
 begin
   if FInitialized then
-    AndroidBitmap_lockPixels(jForm(Owner).App.Jni.jEnv, Self.GetJavaBitmap, @PScanDWord);
+    AndroidBitmap_lockPixels(jForm(Owner).App.Jni.jEnv, Self.GetJavaBitmap, @PDWordPixel);
 end;
 
-procedure jBitmap.LockPixels(var PScanJByte : PScanByte{PJByte});
+procedure jBitmap.LockPixels(var PBytePixel : PScanByte {delphi mode});
 begin
   if FInitialized then
-    AndroidBitmap_lockPixels(jForm(Owner).App.Jni.jEnv, Self.GetJavaBitmap, @PScanJByte);
+    AndroidBitmap_lockPixels(jForm(Owner).App.Jni.jEnv, Self.GetJavaBitmap, @PBytePixel);
 end;
 
-procedure jBitmap.LockPixels(var PSJByte: PJByte); overload;
+procedure jBitmap.LockPixels(var PSJByte: PJByte {FPC mode });
 begin
   if FInitialized then
     AndroidBitmap_lockPixels(jForm(Owner).App.Jni.jEnv, Self.GetJavaBitmap, @PSJByte);
@@ -6434,6 +6478,94 @@ begin
   end;
 end;
 
+function jBitmap.GetRatio: Single;
+begin
+  Result:= 1;  //dummy
+  if Self.GetInfo then Result:= Round(Self.Width/Self.Height);
+end;
+
+//TODO: http://stackoverflow.com/questions/13583451/how-to-use-scanline-property-for-24-bit-bitmaps
+procedure jBitmap.ScanPixel(PBytePixel: PScanByte; notByteIndex: integer);
+var
+  row, col, k, notFlag: integer;
+begin
+
+    if (notByteIndex < 0) or (notByteIndex > 4) then
+        notFlag:= 4
+    else
+       notFlag:= notByteIndex;
+
+     //API LockPixels - overloaded - paramenter is PScanByte
+    Self.LockPixels(PBytePixel); //ok
+    k:= 0;
+    case notFlag of
+      1:begin
+          for row:= 0 to Self.Height-1 do  //ok
+          begin
+             for col:= 0 to Self.Width-1 do //ok
+             begin
+               PBytePixel^[k*4+0]:= not PBytePixel^[k*4]; //delphi mode....
+               PBytePixel^[k*4+1]:= PBytePixel^[k*4+1];
+               PBytePixel^[k*4+2]:= PBytePixel^[k*4+2];
+               PBytePixel^[k*4+3]:= PBytePixel^[k*4+3];
+               inc(k);
+             end;
+          end;
+      end;
+      2:begin
+          for row:= 0 to Self.Height-1 do  //ok
+          begin
+             for col:= 0 to Self.Width-1 do //ok
+             begin
+               PBytePixel^[k*4+0]:= not PBytePixel^[k*4]; //delphi mode....
+               PBytePixel^[k*4+1]:= PBytePixel^[k*4+1];
+               PBytePixel^[k*4+2]:= PBytePixel^[k*4+2];
+               PBytePixel^[k*4+3]:= PBytePixel^[k*4+3];
+               inc(k);
+             end;
+          end;
+      end;
+      3:begin
+          for row:= 0 to Self.Height-1 do  //ok
+          begin
+             for col:= 0 to Self.Width-1 do //ok
+             begin
+               PBytePixel^[k*4+0]:= not PBytePixel^[k*4]; //delphi mode....
+               PBytePixel^[k*4+1]:= PBytePixel^[k*4+1];
+               PBytePixel^[k*4+2]:= PBytePixel^[k*4+2];
+               PBytePixel^[k*4+3]:= PBytePixel^[k*4+3];
+               inc(k);
+             end;
+          end;
+      end;
+      4:begin
+          for row:= 0 to Self.Height-1 do  //ok
+          begin
+             for col:= 0 to Self.Width-1 do //ok
+             begin
+               PBytePixel^[k*4+0]:= not PBytePixel^[k*4]; //delphi mode....
+               PBytePixel^[k*4+1]:= PBytePixel^[k*4+1];
+               PBytePixel^[k*4+2]:= PBytePixel^[k*4+2];
+               PBytePixel^[k*4+3]:= PBytePixel^[k*4+3];
+               inc(k);
+             end;
+          end;
+      end;
+    end;
+    Self.UnlockPixels;
+end;
+
+//TODO: http://stackoverflow.com/questions/13583451/how-to-use-scanline-property-for-24-bit-bitmaps
+procedure jBitmap.ScanPixel(PDWordPixel: PScanLine);
+var
+  k: integer;
+begin     //API LockPixels... parameter is "PScanLine"
+    Self.LockPixels(PDWordPixel); //ok
+    for k:= 0 to Self.Width*Self.Height-1 do
+        PDWordPixel^[k]:= not PDWordPixel^[k];  //ok
+    Self.UnlockPixels;
+end;
+
 //------------------------------------------------------------------------------
 // jCanvas
 //------------------------------------------------------------------------------
@@ -6442,7 +6574,7 @@ constructor jCanvas.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
   FjObject := nil;
-  FPaintStrokeWidth:= 3;
+  FPaintStrokeWidth:= 1;
   FPaintStyle:= psFillAndStroke;
   FPaintTextSize:= 20;
   FPaintColor:= colbrBlue;
@@ -6530,6 +6662,22 @@ Procedure jCanvas.drawBitmap(bmp: jBitmap; b,l,r,t: integer);
 begin
   if FInitialized then
      jCanvas_drawBitmap2(jForm(Owner).App.Jni.jEnv,jForm(Owner).App.Jni.jThis,FjObject,bmp.GetjavaBitmap, b, l, r, t);
+end;
+
+Procedure jCanvas.drawBitmap(bmp: jBitmap; x1, y1, size: integer; ratio: single);
+var
+  r1, t1: integer;
+begin
+  r1:= Round(size-20);
+  t1:= Round((size-20)*(1/ratio));
+  if FInitialized then
+    jCanvas_drawBitmap2(jForm(Owner).App.Jni.jEnv,jForm(Owner).App.Jni.jThis,FjObject,bmp.GetjavaBitmap, x1, y1, r1, t1);
+end;
+
+Procedure jCanvas.drawBitmap(bmp: jObject;b,l,r,t: integer);
+begin
+  if FInitialized then
+     jCanvas_drawBitmap2(jForm(Owner).App.Jni.jEnv,jForm(Owner).App.Jni.jThis,FjObject, bmp, b, l, r, t);
 end;
 
 //------------------------------------------------------------------------------
@@ -7393,38 +7541,27 @@ end;
 
 function jSqliteCursor.GetValueAsString(columnIndex: integer): string;
 begin
-   if not FInitialized  then Exit;
+ if not FInitialized  then Exit;
    Result:= jSqliteCursor_GetValueAsString(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, columnIndex);
 end;
-   {
-procedure jSqliteCursor.Notification(AComponent: TComponent; Operation: TOperation);
+
+function jSqliteCursor.GetValueAsBitmap(columnIndex: integer): jObject;
 begin
-  inherited;
-  if Operation = opRemove then
-  begin
-      if AComponent = FjSqliteDataAccess then
-      begin
-        FjSqliteDataAccess:= nil;
-      end
-  end;
+  if not FInitialized  then Exit;
+    Result:=  jSqliteCursor_GetValueAsBitmap(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, columnIndex);
 end;
 
-procedure jSqliteCursor.SetjSqliteDataAccess(Value: jSqliteDataAccess);
+function jSqliteCursor.GetValueAsInteger(columnIndex: integer): integer;
 begin
-  if Value <> FjSqliteDataAccess then
-  begin
-    if Assigned(FjSqliteDataAccess) then
-    begin
-       FjSqliteDataAccess.RemoveFreeNotification(Self); //remove free notification...
-    end;
-    FjSqliteDataAccess:= Value;
-    if Value <> nil then  //re- add free notification...
-    begin
-       Value.FreeNotification(self);
-    end;
-  end;
+  if not FInitialized  then Exit;
+    Result:=  jSqliteCursor_GetValueAsInteger(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, columnIndex);
 end;
-    }
+
+function jSqliteCursor.GetValueAsDouble(columnIndex: integer): double;
+begin
+  if not FInitialized  then Exit;
+    Result:=  jSqliteCursor_GetValueAsDouble(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, columnIndex);
+end;
 
 {jSqliteDataAccess}
 
@@ -7587,6 +7724,12 @@ procedure jSqliteDataAccess.UpdateTable(updateQuery: string);
 begin
   if not FInitialized then Exit;
   jSqliteDataAccess_UpdateTable(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, updateQuery);
+end;
+
+procedure jSqliteDataAccess.UpdateImage(tableName: string; fieldName: string; keyId: integer; image: jObject);
+begin
+  jSqliteDataAccess_UpdateImage(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject,
+                              tableName, fieldName, keyId, image);
 end;
 
 procedure jSqliteDataAccess.Close;

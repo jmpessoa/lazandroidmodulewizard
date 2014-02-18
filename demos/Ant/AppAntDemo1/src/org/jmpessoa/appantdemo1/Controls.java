@@ -1,11 +1,12 @@
 package org.jmpessoa.appantdemo1;
 //
 //
-//[LazAndroidModuleWizard - ver.0.4_r.01 :16-feb-2014]
+//[LazAndroidModuleWizard - ver.0.4_r.02 :17-feb-2014]
 //[https://github.com/jmpessoa/lazandroidmodulewizard]
 
 //Android Java Interface for Pascal/Delphi XE5  - 
 //[And LAZARUS by jmpessoa@hotmail.com - december 2013]
+
 //
 //Developer
 //          Simon,Choi / Choi,Won-sik
@@ -4181,17 +4182,17 @@ public  Bitmap getJavaBitmap() {
 }
 
 //by jmpessoa
-//convert from bitmap to byte array 
-public byte[] BitmapToByte(Bitmap bitmap) {
+public byte[] GetByteArrayFromBitmap() {
     ByteArrayOutputStream stream = new ByteArrayOutputStream();
-    bitmap.compress(CompressFormat.PNG, 0, stream);
+    this.bmp.compress(CompressFormat.PNG, 0, stream);
+    Log.i("GetByteArrayFromBitmap","size="+ stream.size());
     return stream.toByteArray();
 }
 
 //by jmpessoa
-// convert from byte array to bitmap
-public Bitmap ByteToBitmap(byte[] image) {
-    return BitmapFactory.decodeByteArray(image, 0, image.length);
+public void SetByteArrayToBitmap(byte[] image) {
+	this.bmp = BitmapFactory.decodeByteArray(image, 0, image.length);
+	Log.i("SetByteArrayToBitmap","size="+ image.length);
 }
 
 }

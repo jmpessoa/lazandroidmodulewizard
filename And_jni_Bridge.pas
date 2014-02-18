@@ -65,7 +65,16 @@ type
         Height: Integer;
        End;
 
- TArrayOfByte = array of byte;     //by jmpessoa
+ TArrayOfByte = array of JByte;             //by jmpessoa
+
+ TScanByte = Array[0..0] of JByte;  //by jmpessoa
+ PScanByte = ^TScanByte;
+
+ TScanLine = Array[0..0] of DWord;
+ PScanLine = ^TScanline;
+
+
+
 // Utility
 
 procedure dbg(str : String); overload;
@@ -1048,7 +1057,9 @@ Procedure jCanvas_drawBitmap           (env:PJNIEnv;this:jobject;
                                         jCanvas : jObject; bmp : jObject; b,l,r,t : integer);
 
 Procedure jCanvas_drawBitmap2           (env:PJNIEnv;this:jobject;
-                                        jCanvas : jObject; bmp : jObject; b,l,r,t : integer);
+                                        jCanvas : jObject; bmp : jObject; b,l,r,t : integer); overload;
+
+
 // Bitmap
 Function  jBitmap_Create               (env:PJNIEnv;this:jobject;
                                         SelfObj : TObject) : jObject;
@@ -1070,19 +1081,22 @@ Procedure jBitmap_createBitmap2         (env:PJNIEnv;this:jobject;
 
 Procedure jBitmap_getWH                (env:PJNIEnv;this:jobject;
                                         jbitmap : jObject; var w,h : integer);
-
+//by jmpessoa
 Procedure jBitmap_getWH2                (env:PJNIEnv;this:jobject;
                                         jbitmap : jObject; var w,h : integer);
 
 Function  jBitmap_getJavaBitmap        (env:PJNIEnv;this:jobject;
                                         jbitmap : jObject) : jObject;
+//by jmpessoa
+Function  jBitmap_getJavaBitmap2(env:PJNIEnv; this:jobject; jbitmap: jObject): jObject;
 
-Function  jBitmap_getJavaBitmap2        (env:PJNIEnv; this:jobject; jbitmap: jObject): jObject;
-
-procedure  jBitmap_BitmapToByte       (env:PJNIEnv; this:jobject; jbitmap: jObject; image: jObject; var bufferImage: TArrayOfByte);
-function  jBitmap_ByteToBitmap       (env:PJNIEnv; this:jobject; jbitmap: jObject; bufferImage: TArrayOfByte): jObject;
-
-// GLSurfaceView
+//by jmpessoa
+function jBitmap_GetByteArrayFromBitmap(env:PJNIEnv; this:jobject; jbitmap: jObject;
+                                                   var bufferImage: TArrayOfByte): integer;
+//by jmpessoa
+procedure jBitmap_SetByteArrayToBitmap(env:PJNIEnv; this:jobject; jbitmap: jObject;
+                                                                        var bufferImage: TArrayOfByte; size: integer);
+//GLSurfaceView
 Function  jGLSurfaceView_Create        (env:PJNIEnv;this:jobject;
                                         context : jObject; SelfObj : TObject; version : integer) : jObject;
 
@@ -1280,9 +1294,12 @@ Function jSqliteCursor_GetRowCount(env:PJNIEnv; this:jobject; SqliteCursor: jObj
 Function jSqliteCursor_GetColumnCount(env:PJNIEnv; this:jobject; SqliteCursor: jObject):  integer;
 Function jSqliteCursor_GetColumnIndex(env:PJNIEnv; this:jobject; SqliteCursor: jObject; colName: string): integer;
 Function jSqliteCursor_GetColumName(env:PJNIEnv; this:jobject; SqliteCursor: jObject; columnIndex: integer): string;
+
 Function jSqliteCursor_GetValueAsString(env:PJNIEnv; this:jobject; SqliteCursor: jObject; columnIndex: integer): string;
+function jSqliteCursor_GetValueAsBitmap(env:PJNIEnv; this:jobject; SqliteCursor: jObject; columnIndex: integer): jObject;
 
-
+function jSqliteCursor_GetValueAsDouble (env:PJNIEnv; this:jobject; SqliteCursor: jObject; columnIndex: integer): double;
+function jSqliteCursor_GetValueAsInteger(env:PJNIEnv; this:jobject; SqliteCursor: jObject; columnIndex: integer): integer;
 {jSqliteDataAccess: by jmpessoa}
 
 Function  jSqliteDataAccess_Create(env: PJNIEnv; this:jobject;  SelfObj: TObject;
@@ -1310,8 +1327,12 @@ procedure jSqliteDataAccess_SetSelectDelimiters(env:PJNIEnv;this:jobject; Sqlite
 procedure jSqliteDataAccess_CreateTable(env:PJNIEnv;this:jobject; SqliteDataBase: jObject; createQuery: string);
 procedure jSqliteDataAccess_DropTable(env:PJNIEnv;this:jobject; SqliteDataBase: jObject; tableName: string);
 procedure jSqliteDataAccess_InsertIntoTable(env:PJNIEnv;this:jobject; SqliteDataBase: jObject; insertQuery: string);
+
 procedure jSqliteDataAccess_DeleteFromTable(env:PJNIEnv;this:jobject; SqliteDataBase: jObject; deleteQuery: string);
+
 procedure jSqliteDataAccess_UpdateTable(env:PJNIEnv;this:jobject; SqliteDataBase: jObject; updateQuery: string);
+procedure jSqliteDataAccess_UpdateImage(env:PJNIEnv;this:jobject; SqliteDataBase: jObject; tableName: string; fieldName: string; keyId: integer; image: jObject);
+
 procedure jSqliteDataAccess_Close(env:PJNIEnv;this:jobject; SqliteDataBase: jObject);
 
 // Http
@@ -8389,7 +8410,7 @@ _jMethod:= env^.GetMethodID(env, cls, 'setTextSize', '(F)V');
  env^.CallVoidMethodA(env,jCanvas,_jMethod,@_jParams);
 end;
 
-Procedure jCanvas_drawLine             (env:PJNIEnv;this:jobject;
+Procedure jCanvas_drawLine(env:PJNIEnv;this:jobject;
                                         jCanvas : jObject; x1,y1,x2,y2 : single);
 Const
  _cFuncName = 'jCanvas_drawLine';
@@ -8700,6 +8721,7 @@ begin
  Dbg('Pascal:jBitmap_getJavaBitmap');
 end;
 
+//by jmpessoa
 Function  jBitmap_getJavaBitmap2(env:PJNIEnv;this:jobject;
                                  jbitmap : jObject) : jObject;
 var
@@ -8711,36 +8733,37 @@ begin
   Result := env^.CallObjectMethod(env,jbitmap,_jMethod);
 end;
 
-procedure jBitmap_BitmapToByte(env:PJNIEnv; this:jobject; jbitmap: jObject; image: jObject; var bufferImage: TArrayOfByte);
-var
-  _jMethod: jMethodID = nil;
-  _jParam: jValue;
-  _jbyteArray: jbyteArray;
-  _jBoolean: jBoolean;
-  cls: jClass;
-  Size : Integer;
-begin
-  _jParam.l:= image;
-  cls := env^.GetObjectClass(env, jbitmap);
-  _jMethod:= env^.GetMethodID(env, cls, 'BitmapToByte', '(Landroid/graphics/Bitmap;)[B');
-
-  _jbyteArray := env^.CallObjectMethodA(env,this,_jMethod,@_jParam);
-  Size:= env^.GetArrayLength(env,_jbyteArray);
-
-  SetLength(bufferImage, Size);
-  env^.GetByteArrayRegion(env, _jbyteArray, 0, Size, @bufferImage[0]);
-end;
-
-function jBitmap_ByteToBitmap(env:PJNIEnv; this:jobject; jbitmap: jObject; bufferImage: TArrayOfByte): jObject;
+//by jmpessoa
+procedure jBitmap_SetByteArrayToBitmap(env:PJNIEnv; this:jobject; jbitmap: jObject; var bufferImage: TArrayOfByte; size: integer);
 var
   _jMethod: jMethodID = nil;
   cls: jClass;
   _jParam: array[0..0] of jValue;
+  _jbyteArray : jByteArray;
 begin
-  _jParam[0].l:= bufferImage;
+   //Convert the Pascal's Native array[] of jbyte to JNI jbytearray
+  _jbyteArray:= env^.NewByteArray(env, size);  // allocate
+  env^.SetByteArrayRegion(env, _jbyteArray, 0 , size, @bufferImage[0] {source});  // copy
+  _jParam[0].l:= _jbyteArray;
   cls := env^.GetObjectClass(env, jbitmap);
-  _jMethod:= env^.GetMethodID(env, cls, 'ByteToBitmap', '([B)Landroid/graphics/Bitmap;');
-  Result := env^.CallObjectMethodA(env,jbitmap,_jMethod, @_jParam);
+  _jMethod:= env^.GetMethodID(env, cls, 'SetByteArrayToBitmap', '([B)V');
+  env^.CallVoidMethodA(env,jbitmap,_jMethod, @_jParam);
+  env^.DeleteLocalRef(env,_jParam[0].l);
+end;
+
+//by jmpessoa
+function jBitmap_GetByteArrayFromBitmap(env:PJNIEnv; this:jobject; jbitmap: jObject;  var bufferImage: TArrayOfByte): integer;
+var
+  _jMethod: jMethodID = nil;
+  _jbyteArray: jbyteArray;
+  cls: jClass;
+begin
+ cls := env^.GetObjectClass(env, jbitmap);
+ _jMethod:= env^.GetMethodID(env, cls, 'GetByteArrayFromBitmap', '()[B');
+  _jbyteArray := env^.CallObjectMethod(env,jbitmap,_jMethod);
+  Result:= env^.GetArrayLength(env,_jbyteArray);
+  SetLength(bufferImage, Result);
+  env^.GetByteArrayRegion(env, _jbyteArray, 0, Result, @bufferImage[0] {target});
 end;
 
 //------------------------------------------------------------------------------
@@ -10535,6 +10558,48 @@ begin
   end;
 end;
 
+function jSqliteCursor_GetValueAsBitmap(env:PJNIEnv; this:jobject; SqliteCursor: jObject; columnIndex: integer): jObject;
+var
+ _jMethod : jMethodID = nil;
+ cls: jClass;
+ _jParam: array[0..0] of jValue;
+  _jString  : jString;
+ _jBoolean : jBoolean;
+begin
+  _jParam[0].i := columnIndex;
+  cls := env^.GetObjectClass(env, SqliteCursor);
+  _jMethod:= env^.GetMethodID(env, cls, 'GetValueAsBitmap', '(I)Landroid/graphics/Bitmap');
+  Result:= env^.CallObjectMethodA(env,SqliteCursor,_jMethod,@_jParam);
+end;
+
+function jSqliteCursor_GetValueAsInteger(env:PJNIEnv; this:jobject; SqliteCursor: jObject; columnIndex: integer): integer;
+var
+ _jMethod : jMethodID = nil;
+ cls: jClass;
+ _jParam: array[0..0] of jValue;
+  _jString  : jString;
+ _jBoolean : jBoolean;
+begin
+  _jParam[0].i := columnIndex;
+  cls := env^.GetObjectClass(env, SqliteCursor);
+  _jMethod:= env^.GetMethodID(env, cls, 'GetValueAsInteger', '(I)I');
+  Result:= env^.CallIntMethodA(env,SqliteCursor,_jMethod,@_jParam);
+end;
+
+function jSqliteCursor_GetValueAsDouble(env:PJNIEnv; this:jobject; SqliteCursor: jObject; columnIndex: integer): double;
+var
+ _jMethod : jMethodID = nil;
+ cls: jClass;
+ _jParam: array[0..0] of jValue;
+  _jString  : jString;
+ _jBoolean : jBoolean;
+begin
+  _jParam[0].i := columnIndex;
+  cls := env^.GetObjectClass(env, SqliteCursor);
+  _jMethod:= env^.GetMethodID(env, cls, 'GetValueAsDouble', '(I)D');
+  Result:= env^.CallDoubleMethodA(env,SqliteCursor,_jMethod,@_jParam);
+end;
+
 //by jmpessoa
 function Get_gjClass(env: PJNIEnv): jClass;
 begin
@@ -10767,6 +10832,25 @@ begin
   env^.CallVoidMethodA(env, SqliteDataBase, method,@_jParams);
   env^.DeleteLocalRef(env,_jParams[0].l);
 end;
+
+procedure jSqliteDataAccess_UpdateImage(env:PJNIEnv;this:jobject; SqliteDataBase: jObject;
+                              tableName: string; fieldName: string; keyId: integer; image: jObject);
+var
+  cls: jClass;
+  method: jmethodID;
+  _jParams : array[0..3] of jValue;
+begin
+  _jParams[0].l := env^.NewStringUTF(env, pchar(tableName));
+  _jParams[1].l := env^.NewStringUTF(env, pchar(fieldName));
+  _jParams[2].l:= image;
+  _jParams[3].i := keyId;
+  cls := env^.GetObjectClass(env, SqliteDataBase);
+  method:= env^.GetMethodID(env, cls, 'UpdateImage', '(Ljava/lang/String;Ljava/lang/String;ILandroid/graphics/Bitmap;)V');
+  env^.CallVoidMethodA(env, SqliteDataBase, method,@_jParams);
+  env^.DeleteLocalRef(env,_jParams[0].l);
+  env^.DeleteLocalRef(env,_jParams[1].l);
+end;
+
 
 procedure jSqliteDataAccess_DeleteFromTable(env:PJNIEnv;this:jobject; SqliteDataBase: jObject; deleteQuery: string);
 var
