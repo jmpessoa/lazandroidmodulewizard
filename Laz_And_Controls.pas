@@ -1,9 +1,13 @@
 ﻿//------------------------------------------------------------------------------
+//[LazAndroidModuleWizard - ver.0.4_r.02 :17-feb-2014]
+//[https://github.com/jmpessoa/lazandroidmodulewizard]
+
+// Android Native Android Controls for Pascal
+//[And LAZARUS by jmpessoa@hotmail.com - december 2013]
 //
 //   Native Android Controls for Pascal
 //
 //   Compiler   Free Pascal Compiler FPC 2.7.1, ( XE5 in near future )
-//   [and Lazarus by jmpessoa@hotmail.com - december 2013]
 //
 //   Developer
 //              Simon,Choi / Choi,Won-sik , 최원식옹

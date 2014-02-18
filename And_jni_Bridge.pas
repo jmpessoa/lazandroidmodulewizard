@@ -1,7 +1,12 @@
 //------------------------------------------------------------------------------
 //
+//[LazAndroidModuleWizard - ver.0.4_r.02 :17-feb-2014]
+//[https://github.com/jmpessoa/lazandroidmodulewizard]
+
 // Android JNI Interface for Pascal/Delphi
-//[and Lazarus by jmpessoa@hotmail.com - december 2013]
+//[And LAZARUS by jmpessoa@hotmail.com - december 2013]
+
+
 //
 //   Developer
 //              Simon,Choi / Choi,Won-sik ,

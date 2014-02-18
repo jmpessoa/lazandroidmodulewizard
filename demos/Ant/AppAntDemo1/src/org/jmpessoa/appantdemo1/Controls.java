@@ -4223,6 +4223,8 @@ class jSqliteCursor {
 
 	public Cursor cursor = null;
 	
+	public Bitmap bufBmp = null;
+	
 	//Constructor
 	public  jSqliteCursor(Controls ctrls, long pasobj ) {
 	   //Connect Pascal I/F
@@ -4281,6 +4283,13 @@ class jSqliteCursor {
     public byte[] GetValueAsBlod(int columnIndex) {
     	if (cursor != null) return cursor.getBlob(columnIndex);
     	else return null;			
+    }
+    
+    //by jmpessoa
+    public Bitmap GetValueAsBitmap(int columnIndex) {
+    	byte[] image = GetValueAsBlod(columnIndex);
+    	this.bufBmp = BitmapFactory.decodeByteArray(image, 0, image.length);
+    	return bufBmp;
     }
     
     public int GetValueAsInt(int columnIndex) {
@@ -4352,6 +4361,8 @@ class jSqliteDataAccess {
         
         public Cursor cursor = null;
         
+        public Bitmap bufBmp = null;
+        
         private static String DATABASE_NAME;                         
         private static final int DATABASE_VERSION = 1;
        
@@ -4418,6 +4429,19 @@ class jSqliteDataAccess {
 	        }
 	    }
         
+        public void UpdateImage(String tabName, String fieldName, int keyId, Bitmap image) {
+        	ByteArrayOutputStream stream = new ByteArrayOutputStream();
+        	bufBmp = image;
+        	bufBmp.compress(CompressFormat.PNG, 0, stream);            
+            byte[] image_byte = stream.toByteArray();
+        	mydb.execSQL("UPDATE " + tabName + " SET "+fieldName+" = ? WHERE "+keyId+" = ?", new Object[] {image_byte, keyId} );
+        }
+        
+        public void UpdateImage(String tabName, String fieldName, int keyId, byte[] image) {
+        	mydb.execSQL("UPDATE " + tabName + " SET "+fieldName+" = ? WHERE "+keyId+" = ?", new Object[] {image, keyId} );
+        }
+        
+        
 	    public String SelectS(String selectQuery) {	 
 	    	
 		     String row = "";
@@ -4444,12 +4468,13 @@ class jSqliteDataAccess {
 		                	 row ="";	   
 		                	 colValue = "";		                	 		                	
 		                     for (i = 0; i < colCount; i++) {		                    	 	 
-		                    	 switch (cursor.getType(i)) {                //  
-		                    	   case Cursor.FIELD_TYPE_INTEGER: colValue = Integer.toString(cursor.getInt(i)); break;
-		                    	   case Cursor.FIELD_TYPE_STRING: colValue =  cursor.getString(i); break;
-		                    	   case Cursor.FIELD_TYPE_FLOAT: colValue =  String.format("%.3f", cursor.getDouble(i));  break;
-		                    	   //TODO ... more field type here...
-		                    	   default: colValue= "UNKNOW"; break;
+		                    	 switch (cursor.getType(i)) {                
+		                    	   case Cursor.FIELD_TYPE_INTEGER: colValue = Integer.toString(cursor.getInt(i));           break;
+		                    	   case Cursor.FIELD_TYPE_STRING : colValue =  cursor.getString(i);                         break;
+		                    	   case Cursor.FIELD_TYPE_FLOAT  : colValue =  String.format("%.3f", cursor.getDouble(i));  break;
+		                    	   case Cursor.FIELD_TYPE_BLOB   : colValue = "BLOB";                                       break;
+		                    	   case Cursor.FIELD_TYPE_NULL   : colValue = "NULL";                                       break;
+		                    	   default:                        colValue = "UNKNOW";                              
 		                     	 }
 		                    	 row = row + colValue + selectColDelimiter ;
 		                      }
