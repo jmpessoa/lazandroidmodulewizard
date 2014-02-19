@@ -1,7 +1,7 @@
 package com.example.appsqlitedemo1;
 //
 //
-//[LazAndroidModuleWizard - ver.0.4_r.02 :17-feb-2014]
+//[LazAndroidModuleWizard - ver.0.4_r.03 :19-feb-2014]
 //[https://github.com/jmpessoa/lazandroidmodulewizard]
 
 //Android Java Interface for Pascal/Delphi XE5  - 
@@ -1762,10 +1762,10 @@ private int           textColor = 0xFF000000; // black
 private int           textSize  = 20;         //
 
 public  jArrayAdapter(Context context, int textViewResourceId , List<String> list ) {
-super(context, textViewResourceId, list);
-ctx   = context;
-id    = textViewResourceId;
-items = list ;
+   super(context, textViewResourceId, list);
+   ctx   = context;
+   id    = textViewResourceId;
+   items = list ;
 }
 
 public  void setTextColor ( int textcolor ) {
@@ -1778,19 +1778,18 @@ textSize  = textsize;
 
 @Override
 public  View getView(int position, View v, ViewGroup parent) {
-View mView = v ;
+     View mView = v;
 
-if(mView == null){
-  LayoutInflater vi = (LayoutInflater)ctx.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-  mView = vi.inflate(id, null);
-}
-//
-TextView tv = (TextView)mView;
-tv.setTextColor (textColor);
-tv.setTextSize  (TypedValue.COMPLEX_UNIT_PX,textSize );
-tv.setText      (items.get(position));   // position [0 ~ n-1]
-
-return mView;
+    if(mView == null){
+       LayoutInflater vi = (LayoutInflater)ctx.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+       mView = vi.inflate(id, null);
+    }
+   //
+   TextView tv = (TextView)mView;
+   tv.setTextColor (textColor);
+   tv.setTextSize  (TypedValue.COMPLEX_UNIT_PX,textSize );
+   tv.setText      (items.get(position));   // position [0 ~ n-1]
+   return mView;
 };
 
 }
@@ -1807,7 +1806,9 @@ private ViewGroup       parent    = null;       // parent view
 private RelativeLayout.LayoutParams lparams;  // Control xywh
 //
 private ArrayList<String>    alist;
+
 private jArrayAdapter        aadapter;
+
 private OnItemClickListener  onItemClickListener;
 
 //by jmpessoa
@@ -1858,9 +1859,7 @@ setBackgroundColor (0x00000000);
 setCacheColorHint  (0);
 //
 alist    = new ArrayList<String>();
-aadapter = new jArrayAdapter(context,
-                             android.R.layout.simple_list_item_1,
-                             alist);
+aadapter = new jArrayAdapter(context, android.R.layout.simple_list_item_1, alist);
 aadapter.setTextColor(textColor); // Font Color
 aadapter.setTextSize (textSize ); // Font Size
 //
@@ -4275,6 +4274,11 @@ class jSqliteCursor {
     	else return "";			
     }
     
+    //Cursor.FIELD_TYPE_BLOB; //4
+	//Cursor.FIELD_TYPE_FLOAT//2
+	//Cursor.FIELD_TYPE_INTEGER//1
+	//Cursor.FIELD_TYPE_STRING//3
+	//Cursor.FIELD_TYPE_NULL //0
     public int GetColType(int columnIndex) {
     	if (cursor != null) return cursor.getType(columnIndex);
     	else return Cursor.FIELD_TYPE_NULL ;			
@@ -4285,14 +4289,16 @@ class jSqliteCursor {
     	else return null;			
     }
     
-    //by jmpessoa
     public Bitmap GetValueAsBitmap(int columnIndex) {
+    	bufBmp = null;
     	byte[] image = GetValueAsBlod(columnIndex);
-    	this.bufBmp = BitmapFactory.decodeByteArray(image, 0, image.length);
+    	if (image != null) {
+    	     this.bufBmp = BitmapFactory.decodeByteArray(image, 0, image.length);
+    	}     
     	return bufBmp;
     }
     
-    public int GetValueAsInt(int columnIndex) {
+    public int GetValueAsInteger(int columnIndex) {
     	int index = 0;
     	
     	if (cursor != null){ 
@@ -4332,9 +4338,10 @@ class jSqliteCursor {
     	if (cursor != null) return cursor.getColumnName(columnIndex);
     	else return "";			
     }
-        
+         
     public void Free() {
       cursor = null;	
+      bufBmp = null;
     }
     
 }
@@ -4429,19 +4436,23 @@ class jSqliteDataAccess {
 	        }
 	    }
         
-        public void UpdateImage(String tabName, String fieldName, int keyId, Bitmap image) {
+        public void UpdateImage(String tabName, String imageFieldName, String keyFieldName, Bitmap imageValue, int keyValue) {
         	ByteArrayOutputStream stream = new ByteArrayOutputStream();
-        	bufBmp = image;
+        	bufBmp = imageValue;
         	bufBmp.compress(CompressFormat.PNG, 0, stream);            
             byte[] image_byte = stream.toByteArray();
-        	mydb.execSQL("UPDATE " + tabName + " SET "+fieldName+" = ? WHERE "+keyId+" = ?", new Object[] {image_byte, keyId} );
+            Log.i("UpdateImage","UPDATE " + tabName + " SET "+imageFieldName+" = ? WHERE "+keyFieldName+" = ?");
+            mydb = this.Open();
+        	mydb.execSQL("UPDATE " + tabName + " SET "+imageFieldName+" = ? WHERE "+keyFieldName+" = ?", new Object[] {image_byte, keyValue} );
+        	mydb.close();
+        	Log.i("UpdateImage", "Ok. Image Updated!");
+        	bufBmp = null;
         }
         
-        public void UpdateImage(String tabName, String fieldName, int keyId, byte[] image) {
-        	mydb.execSQL("UPDATE " + tabName + " SET "+fieldName+" = ? WHERE "+keyId+" = ?", new Object[] {image, keyId} );
+        public void UpdateImage(String tabName, String imageFieldName, String keyFieldName, byte[] imageValue, int keyValue) {
+        	mydb.execSQL("UPDATE " + tabName + " SET "+imageFieldName+" = ? WHERE "+keyFieldName+" = ?", new Object[] {imageValue, keyValue} );
         }
-        
-        
+                
 	    public String SelectS(String selectQuery) {	 
 	    	
 		     String row = "";
@@ -4471,7 +4482,7 @@ class jSqliteDataAccess {
 		                    	 switch (cursor.getType(i)) {                
 		                    	   case Cursor.FIELD_TYPE_INTEGER: colValue = Integer.toString(cursor.getInt(i));           break;
 		                    	   case Cursor.FIELD_TYPE_STRING : colValue =  cursor.getString(i);                         break;
-		                    	   case Cursor.FIELD_TYPE_FLOAT  : colValue =  String.format("%.3f", cursor.getDouble(i));  break;
+		                    	   case Cursor.FIELD_TYPE_FLOAT  : colValue =  String.format("%.3f", cursor.getFloat(i));  break;
 		                    	   case Cursor.FIELD_TYPE_BLOB   : colValue = "BLOB";                                       break;
 		                    	   case Cursor.FIELD_TYPE_NULL   : colValue = "NULL";                                       break;
 		                    	   default:                        colValue = "UNKNOW";                              
@@ -4542,7 +4553,7 @@ class jSqliteDataAccess {
 		public boolean CheckDataBaseExists(String dbPath) {   
 		      SQLiteDatabase checkDB = null; 
 		      try {
-		          String myPath = dbPath; //"data/data/com.data.pack/databases/" + dbName;
+		          String myPath = dbPath; //"data/data/com.example.appsqlitedemo1/databases/" + dbName;
 		          checkDB = SQLiteDatabase.openDatabase(myPath, null, SQLiteDatabase.OPEN_READONLY);
 		      } catch (SQLiteException e) {
 		    	  Log.e("SQLiteDatabase","database does't exist yet.");

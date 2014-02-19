@@ -8,7 +8,7 @@ object AndroidModule1: TAndroidModule1
   Height = 652
   HorizontalOffset = 359
   VerticalOffset = 16
-  Width = 306
+  Width = 323
   object jTextView1: jTextView
     Id = 4672521
     PosRelativeToAnchor = []
@@ -207,5 +207,47 @@ object AndroidModule1: TAndroidModule1
   object jSqliteCursor1: jSqliteCursor
     left = 188
     top = 27
+  end
+  object jImageView1: jImageView
+    Id = 0
+    Anchor = jEditText1
+    PosRelativeToAnchor = [raBelow]
+    PosRelativeToParent = [rpCenterHorizontal]
+    LayoutParamWidth = lpWrapContent
+    LayoutParamHeight = lpWrapContent
+    MarginLeft = 0
+    MarginTop = 0
+    MarginRight = 0
+    MarginBottom = 0
+    ImageIndex = 3
+    Images = jImageList1
+    Visible = True
+    BackgroundColor = colbrGreenYellow
+    IsBackgroundImage = False
+    left = 120
+    top = 552
+  end
+  object jImageList1: jImageList
+    Images.Strings = (
+      't1.png'
+      't2.png'
+      't3.png'
+      't4.png'
+      't5.png'
+      't6.png'
+      't7.png'
+      't8.png'
+    )
+    left = 256
+    top = 552
+  end
+  object jBitmap1: jBitmap
+    FilePath = fpathData
+    ImageIndex = -1
+    Images = jImageList1
+    Width = 0
+    Height = 0
+    left = 192
+    top = 552
   end
 end

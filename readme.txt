@@ -42,6 +42,9 @@
 
               -Lazarus forum community! 
 
+version 0.4 - revision: 03 - 19 February - 2014 -
+              :: New Add Image/BLOB Support to SQLite: jSqliteDataAccess, jSqliteCursor
+
 version 0.4 - revision: 02 - 17 February - 2014 - Minor update...
 
 version 0.4 - revision: 01 - 16 February - 2014 -

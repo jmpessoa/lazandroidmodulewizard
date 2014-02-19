@@ -1,13 +1,9 @@
 ﻿//------------------------------------------------------------------------------
-//[LazAndroidModuleWizard - ver.0.4_r.02 :17-feb-2014]
-//[https://github.com/jmpessoa/lazandroidmodulewizard]
-
-// Android Native Android Controls for Pascal
-//[And LAZARUS by jmpessoa@hotmail.com - december 2013]
 //
 //   Native Android Controls for Pascal
 //
 //   Compiler   Free Pascal Compiler FPC 2.7.1, ( XE5 in near future )
+//   [and Lazarus by jmpessoa@hotmail.com - december 2013]
 //
 //   Developer
 //              Simon,Choi / Choi,Won-sik , 최원식옹
@@ -589,6 +585,8 @@ type
                  fsFormWork,    // Working
                  fsFormClose);  // Closing
 
+  //by jmpessoa
+  TSqliteFieldType = (ftNull,ftInteger,ftFloat,ftString,ftBlob);
 
   jApp = class(TCustomApplication)
   private
@@ -1017,10 +1015,12 @@ type
      function GetColumnCount: integer;
      function GetColumnIndex(colName: string): integer;
      function GetColumName(columnIndex: integer): string;
+     function GetColType(columnIndex: integer): TSqliteFieldType;
      function GetValueAsString(columnIndex: integer): string;
      function GetValueAsBitmap(columnIndex: integer): jObject;
      function GetValueAsInteger(columnIndex: integer): integer;
      function GetValueAsDouble(columnIndex: integer): double;
+     function GetValueAsFloat(columnIndex: integer): real;
 
      procedure SetCursor(Value: jObject);
    published
@@ -1057,7 +1057,7 @@ type
     procedure InsertIntoTable(insertQuery: string);
     procedure DeleteFromTable(deleteQuery: string);
     procedure UpdateTable(updateQuery: string);
-    procedure UpdateImage(tableName: string; fieldName: string; keyId: integer; image: jObject);
+    procedure UpdateImage(tableName: string;imageFieldName: string;keyFieldName: string; imageValue: jObject;keyValue: integer);
     procedure Close;
     function  GetCursor: jObject;    overload;
   published
@@ -7542,6 +7542,27 @@ begin
    if not FInitialized  then Exit;
    Result:= jSqliteCursor_GetColumName(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, columnIndex);
 end;
+{
+Cursor.FIELD_TYPE_NULL    //0
+Cursor.FIELD_TYPE_INTEGER //1
+Cursor.FIELD_TYPE_FLOAT   //2
+Cursor.FIELD_TYPE_STRING  //3
+Cursor.FIELD_TYPE_BLOB;   //4
+}
+function jSqliteCursor.GetColType(columnIndex: integer): TSqliteFieldType;
+var
+   colType: integer;
+begin
+   if not FInitialized  then Exit;
+   colType:= jSqliteCursor_GetColType(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, columnIndex);
+   case colType of
+     0: Result:= ftNull;
+     1: Result:= ftInteger;
+     2: Result:= ftFloat;
+     3: Result:= ftString;
+     4: Result:= ftBlob;
+   end;
+end;
 
 function jSqliteCursor.GetValueAsString(columnIndex: integer): string;
 begin
@@ -7552,7 +7573,7 @@ end;
 function jSqliteCursor.GetValueAsBitmap(columnIndex: integer): jObject;
 begin
   if not FInitialized  then Exit;
-    Result:=  jSqliteCursor_GetValueAsBitmap(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, columnIndex);
+    Result:= jSqliteCursor_GetValueAsBitmap(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, columnIndex);
 end;
 
 function jSqliteCursor.GetValueAsInteger(columnIndex: integer): integer;
@@ -7566,6 +7587,14 @@ begin
   if not FInitialized  then Exit;
     Result:=  jSqliteCursor_GetValueAsDouble(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, columnIndex);
 end;
+
+
+function jSqliteCursor.GetValueAsFloat(columnIndex: integer): real;
+begin
+  if not FInitialized  then Exit;
+    Result:=  jSqliteCursor_GetValueAsFloat(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, columnIndex);
+end;
+
 
 {jSqliteDataAccess}
 
@@ -7730,10 +7759,10 @@ begin
   jSqliteDataAccess_UpdateTable(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, updateQuery);
 end;
 
-procedure jSqliteDataAccess.UpdateImage(tableName: string; fieldName: string; keyId: integer; image: jObject);
+procedure jSqliteDataAccess.UpdateImage(tableName: string;imageFieldName: string;keyFieldName: string;imageValue: jObject;keyValue: integer);
 begin
   jSqliteDataAccess_UpdateImage(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject,
-                              tableName, fieldName, keyId, image);
+                                 tableName,imageFieldName,keyFieldName,imageValue,keyValue);
 end;
 
 procedure jSqliteDataAccess.Close;

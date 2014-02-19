@@ -1,12 +1,7 @@
 //------------------------------------------------------------------------------
 //
-//[LazAndroidModuleWizard - ver.0.4_r.02 :17-feb-2014]
-//[https://github.com/jmpessoa/lazandroidmodulewizard]
-
 // Android JNI Interface for Pascal/Delphi
-//[And LAZARUS by jmpessoa@hotmail.com - december 2013]
-
-
+//[and Lazarus by jmpessoa@hotmail.com - december 2013]
 //
 //   Developer
 //              Simon,Choi / Choi,Won-sik ,
@@ -1300,10 +1295,14 @@ Function jSqliteCursor_GetColumnCount(env:PJNIEnv; this:jobject; SqliteCursor: j
 Function jSqliteCursor_GetColumnIndex(env:PJNIEnv; this:jobject; SqliteCursor: jObject; colName: string): integer;
 Function jSqliteCursor_GetColumName(env:PJNIEnv; this:jobject; SqliteCursor: jObject; columnIndex: integer): string;
 
+Function jSqliteCursor_GetColType(env:PJNIEnv; this:jobject; SqliteCursor: jObject; columnIndex: integer): integer;
+
 Function jSqliteCursor_GetValueAsString(env:PJNIEnv; this:jobject; SqliteCursor: jObject; columnIndex: integer): string;
 function jSqliteCursor_GetValueAsBitmap(env:PJNIEnv; this:jobject; SqliteCursor: jObject; columnIndex: integer): jObject;
 
 function jSqliteCursor_GetValueAsDouble (env:PJNIEnv; this:jobject; SqliteCursor: jObject; columnIndex: integer): double;
+function jSqliteCursor_GetValueAsFloat (env:PJNIEnv; this:jobject; SqliteCursor: jObject; columnIndex: integer): real;
+
 function jSqliteCursor_GetValueAsInteger(env:PJNIEnv; this:jobject; SqliteCursor: jObject; columnIndex: integer): integer;
 {jSqliteDataAccess: by jmpessoa}
 
@@ -1336,7 +1335,8 @@ procedure jSqliteDataAccess_InsertIntoTable(env:PJNIEnv;this:jobject; SqliteData
 procedure jSqliteDataAccess_DeleteFromTable(env:PJNIEnv;this:jobject; SqliteDataBase: jObject; deleteQuery: string);
 
 procedure jSqliteDataAccess_UpdateTable(env:PJNIEnv;this:jobject; SqliteDataBase: jObject; updateQuery: string);
-procedure jSqliteDataAccess_UpdateImage(env:PJNIEnv;this:jobject; SqliteDataBase: jObject; tableName: string; fieldName: string; keyId: integer; image: jObject);
+procedure jSqliteDataAccess_UpdateImage(env:PJNIEnv;this:jobject; SqliteDataBase: jObject;
+                                        tableName: string; imageFieldName: string; keyFieldName: string; imageValue: jObject; keyValue: integer);
 
 procedure jSqliteDataAccess_Close(env:PJNIEnv;this:jobject; SqliteDataBase: jObject);
 
@@ -1454,6 +1454,19 @@ procedure JNI_OnUnload(vm:PJavaVM;reserved:pointer); cdecl;
 // ref. http://android-developers.blogspot.cz/2011/11/jni-local-reference-changes-in-ics.html
 
 // http://stackoverflow.com/questions/14765776/jni-error-app-bug-accessed-stale-local-reference-0xbc00021-index-8-in-a-tabl
+
+
+//by jmpessoa
+function Get_gjClass(env: PJNIEnv): jClass;
+begin
+  if gjClass {global} = nil then
+  begin
+     gjClass:= jClass(env^.FindClass(env, gjClassName {global}));
+     if gjClass <> nil then gjClass := env^.NewGlobalRef(env, gjClass); //needed for Appi > 13
+  end;
+  Result:= gjClass;
+end;
+
 
 Procedure jClassMethod(FuncName, FuncSig : PChar;
                        env : PJNIEnv; var Class_ : jClass; var Method_ :jMethodID);
@@ -10542,6 +10555,18 @@ begin
  env^.DeleteLocalRef(env,_jParam[0].l);
 end;
 
+Function jSqliteCursor_GetColType(env:PJNIEnv; this:jobject; SqliteCursor: jObject; columnIndex: integer): integer;
+var
+ _jMethod: jMethodID = nil;
+ cls: jClass;
+ _jParam: array[0..0] of jValue;
+begin
+ _jParam[0].i:= columnIndex;
+ cls:= env^.GetObjectClass(env, SqliteCursor);
+ _jMethod:= env^.GetMethodID(env, cls, 'GetColType', '(I)I');
+ Result := env^.CallIntMethodA(env,SqliteCursor,_jMethod, @_jParam);
+end;
+
 Function jSqliteCursor_GetValueAsString(env:PJNIEnv; this:jobject; SqliteCursor: jObject; columnIndex: integer): string;
 var
  _jMethod : jMethodID = nil;
@@ -10573,7 +10598,7 @@ var
 begin
   _jParam[0].i := columnIndex;
   cls := env^.GetObjectClass(env, SqliteCursor);
-  _jMethod:= env^.GetMethodID(env, cls, 'GetValueAsBitmap', '(I)Landroid/graphics/Bitmap');
+  _jMethod:= env^.GetMethodID(env, cls, 'GetValueAsBitmap', '(I)Landroid/graphics/Bitmap;');
   Result:= env^.CallObjectMethodA(env,SqliteCursor,_jMethod,@_jParam);
 end;
 
@@ -10605,15 +10630,18 @@ begin
   Result:= env^.CallDoubleMethodA(env,SqliteCursor,_jMethod,@_jParam);
 end;
 
-//by jmpessoa
-function Get_gjClass(env: PJNIEnv): jClass;
+function jSqliteCursor_GetValueAsFloat(env:PJNIEnv; this:jobject; SqliteCursor: jObject; columnIndex: integer): real;
+var
+ _jMethod : jMethodID = nil;
+ cls: jClass;
+ _jParam: array[0..0] of jValue;
+  _jString  : jString;
+ _jBoolean : jBoolean;
 begin
-  if gjClass {global} = nil then
-  begin
-     gjClass:= jClass(env^.FindClass(env, gjClassName {global}));
-     if gjClass <> nil then gjClass := env^.NewGlobalRef(env, gjClass); //needed for Appi > 13
-  end;
-  Result:= gjClass;
+  _jParam[0].i := columnIndex;
+  cls := env^.GetObjectClass(env, SqliteCursor);
+  _jMethod:= env^.GetMethodID(env, cls, 'GetValueAsFloat', '(I)F');
+  Result:= env^.CallDoubleMethodA(env,SqliteCursor,_jMethod,@_jParam);
 end;
 
  {jSqliteDataAccess - by jmpessoa}
@@ -10839,21 +10867,28 @@ begin
 end;
 
 procedure jSqliteDataAccess_UpdateImage(env:PJNIEnv;this:jobject; SqliteDataBase: jObject;
-                              tableName: string; fieldName: string; keyId: integer; image: jObject);
+                                          tableName: string;
+                                          imageFieldName: string;
+                                          keyFieldName: string;
+                                          imageValue: jObject;
+                                          keyValue: integer);
 var
   cls: jClass;
   method: jmethodID;
-  _jParams : array[0..3] of jValue;
+  _jParams : array[0..4] of jValue;
 begin
   _jParams[0].l := env^.NewStringUTF(env, pchar(tableName));
-  _jParams[1].l := env^.NewStringUTF(env, pchar(fieldName));
-  _jParams[2].l:= image;
-  _jParams[3].i := keyId;
+  _jParams[1].l := env^.NewStringUTF(env, pchar(imageFieldName));
+  _jParams[2].l := env^.NewStringUTF(env, pchar(keyFieldName));
+  _jParams[3].l:= imageValue;
+  _jParams[4].i := keyValue;
   cls := env^.GetObjectClass(env, SqliteDataBase);
-  method:= env^.GetMethodID(env, cls, 'UpdateImage', '(Ljava/lang/String;Ljava/lang/String;ILandroid/graphics/Bitmap;)V');
+  method:= env^.GetMethodID(env, cls, 'UpdateImage',
+                                      '(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Landroid/graphics/Bitmap;I)V');
   env^.CallVoidMethodA(env, SqliteDataBase, method,@_jParams);
   env^.DeleteLocalRef(env,_jParams[0].l);
   env^.DeleteLocalRef(env,_jParams[1].l);
+  env^.DeleteLocalRef(env,_jParams[2].l);
 end;
 
 

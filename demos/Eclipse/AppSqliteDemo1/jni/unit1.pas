@@ -13,6 +13,7 @@ type
   { TAndroidModule1 }
 
   TAndroidModule1 = class(jForm)
+      jBitmap1: jBitmap;
       jButton1: jButton;
       jButton2: jButton;
       jButton3: jButton;
@@ -20,6 +21,8 @@ type
       jButton5: jButton;
       jButton6: jButton;
       jEditText1: jEditText;
+      jImageList1: jImageList;
+      jImageView1: jImageView;
       jSqliteCursor1: jSqliteCursor;
       jSqliteDataAccess1: jSqliteDataAccess;
       jTextView1: jTextView;
@@ -71,7 +74,8 @@ end;
 
 procedure TAndroidModule1.jButton2Click(Sender: TObject);
 begin
-   jSqliteDataAccess1.CreateTable('CREATE TABLE IF  NOT EXISTS '+ FTableName +'(_ID INTEGER PRIMARY KEY, TITLE TEXT, AUTHOR TEXT, COUNT INTEGER);');
+   jSqliteDataAccess1.CreateTable('CREATE TABLE IF  NOT EXISTS '+ FTableName +
+                                  '(_ID INTEGER PRIMARY KEY AUTOINCREMENT, TITLE TEXT, AUTHOR TEXT, COUNT INTEGER, FIGURE BLOB);');
    ShowMessage('table created!');
 end;
 
@@ -79,17 +83,40 @@ procedure TAndroidModule1.jButton3Click(Sender: TObject);
 begin
   if not FInsertInto then
   begin
-    jSqliteDataAccess1.InsertIntoTable('INSERT INTO ' + FTableName + '(TITLE, AUTHOR, COUNT) VALUES(''Compilers: Principles, Techniques'',''Aho Sethi Ullman'',3)');
-    jSqliteDataAccess1.InsertIntoTable('INSERT INTO ' + FTableName + '(TITLE, AUTHOR, COUNT) VALUES(''Object-Oriented Analysis and Design'',''Grady Booch'',10)' );
-    jSqliteDataAccess1.InsertIntoTable('INSERT INTO ' + FTableName + '(TITLE, AUTHOR, COUNT) VALUES(''Delphi Component Design'',''Danny Thorpe'',12)');
-    jSqliteDataAccess1.InsertIntoTable('INSERT INTO ' + FTableName + '(TITLE, AUTHOR, COUNT) VALUES(''Lazarus - The Complete Guide'',''Canneyt Gartner Heinig Cavalho Ouedraogo'',12)');
-    jSqliteDataAccess1.InsertIntoTable('INSERT INTO ' + FTableName + '(TITLE, AUTHOR, COUNT) VALUES(''The Design of Everyday Things'',''Donald Norman'',6)');
-    jSqliteDataAccess1.InsertIntoTable('INSERT INTO ' + FTableName + '(TITLE, AUTHOR, COUNT) VALUES(''How To Solve It'',''George Polya'',9)' );
-    jSqliteDataAccess1.InsertIntoTable('INSERT INTO ' + FTableName + '(TITLE, AUTHOR, COUNT) VALUES(''Algorithms + Data Structures = Programs'',''Niklaus Wirth'',8)' );
+     //warning: insert field_blob value as null and after update it!
+     jSqliteDataAccess1.InsertIntoTable('INSERT INTO ' + FTableName + '(TITLE, AUTHOR, COUNT, FIGURE) VALUES(''Compilers: Principles, Techniques'',''Aho Sethi Ullman'',3,null)');
+
+     jBitmap1.ImageIndex:= 1;
+     //hide sintaxe: "UPDATE " + tableName + " SET "+imageFieldName+" = ? WHERE "+keyFieldName+" = ?", {imageValue, keyValue}"
+     jSqliteDataAccess1.UpdateImage(FTableName, 'FIGURE', '_ID', jBitmap1.GetJavaBitmap{figure}, 1 {_id});
+
+     jSqliteDataAccess1.InsertIntoTable('INSERT INTO ' + FTableName + '(TITLE, AUTHOR, COUNT, FIGURE) VALUES(''Object-Oriented Analysis and Design'',''Grady Booch'',10,null)' );
+     jBitmap1.ImageIndex:= 2;
+     jSqliteDataAccess1.UpdateImage(FTableName, 'FIGURE', '_ID', jBitmap1.GetJavaBitmap, 2);
+
+     jSqliteDataAccess1.InsertIntoTable('INSERT INTO ' + FTableName + '(TITLE, AUTHOR, COUNT, FIGURE) VALUES(''Delphi Component Design'',''Danny Thorpe'',12,null)');
+     jBitmap1.ImageIndex:= 3;
+     jSqliteDataAccess1.UpdateImage(FTableName, 'FIGURE', '_ID', jBitmap1.GetJavaBitmap, 3);
+
+     jSqliteDataAccess1.InsertIntoTable('INSERT INTO ' + FTableName + '(TITLE, AUTHOR, COUNT, FIGURE) VALUES(''Lazarus - The Complete Guide'',''Canneyt Gartner Heinig Cavalho Ouedraogo'',12,null)');
+     jBitmap1.ImageIndex:= 4;
+     jSqliteDataAccess1.UpdateImage(FTableName, 'FIGURE', '_ID', jBitmap1.GetJavaBitmap, 4);
+
+     jSqliteDataAccess1.InsertIntoTable('INSERT INTO ' + FTableName + '(TITLE, AUTHOR, COUNT, FIGURE) VALUES(''The Design of Everyday Things'',''Donald Norman'',6,null)');
+     jBitmap1.ImageIndex:= 5;
+     jSqliteDataAccess1.UpdateImage(FTableName, 'FIGURE', '_ID', jBitmap1.GetJavaBitmap, 5);
+
+     jSqliteDataAccess1.InsertIntoTable('INSERT INTO ' + FTableName + '(TITLE, AUTHOR, COUNT, FIGURE) VALUES(''How To Solve It'',''George Polya'',9,null)' );
+     jBitmap1.ImageIndex:= 6;
+     jSqliteDataAccess1.UpdateImage(FTableName, 'FIGURE', '_ID', jBitmap1.GetJavaBitmap, 6);
+
+     jSqliteDataAccess1.InsertIntoTable('INSERT INTO ' + FTableName + '(TITLE, AUTHOR, COUNT, FIGURE) VALUES(''Algorithms + Data Structures = Programs'',''Niklaus Wirth'',8,null)' );
+     jBitmap1.ImageIndex:= 7;
+     jSqliteDataAccess1.UpdateImage(FTableName, 'FIGURE', '_ID', jBitmap1.GetJavaBitmap, 7);
+
     FInsertInto:= True;
     ShowMessage('Ok. Table Inserted!');
   end else  ShowMessage('warning: table was inserted!');
-
 end;
 
 procedure TAndroidModule1.jButton4Click(Sender: TObject);
@@ -101,12 +128,10 @@ begin
    rows.StrictDelimiter:= True;
    rows.Delimiter:= jSqliteDataAccess1.RowDelimiter;
    rows.DelimitedText:= jSqliteDataAccess1.Select('SELECT * FROM '+  FTableName);
-
    for i:= 0 to rows.Count-1 do
    begin
      ShowMessage(rows.Strings[i]);
    end;
-
    rows.Free;
 end;
 
@@ -122,24 +147,32 @@ end;
 procedure TAndroidModule1.jButton6Click(Sender: TObject);
 var
    rowIndex, colCount, colIndex, maxIndex: integer;
+   colType: integer;
+   intColValue: integer;
+   floatColValue: double;
 begin
-
    rowIndex:=  StrToInt(jEditText1.Text);
    maxIndex:= jSqliteDataAccess1.Cursor.GetRowCount-1;
-
    if rowIndex < 0 then rowIndex:= 0;
    if rowIndex > (maxIndex) then rowIndex:= maxIndex;
-
    jSqliteDataAccess1.Cursor.MoveToPosition(rowIndex);
-
    colCount:= jSqliteDataAccess1.Cursor.GetColumnCount;
-
    for colIndex:= 0 to colCount-1 do
    begin
-      ShowMessage(jSqliteDataAccess1.Cursor.GetColumName(colIndex)+'='+
-                  jSqliteDataAccess1.Cursor.GetValueAsString(colIndex));
+     case jSqliteDataAccess1.Cursor.GetColType(colIndex) of
+       ftInteger:begin
+                    intColValue:= jSqliteDataAccess1.Cursor.GetValueAsInteger(colIndex);
+                    ShowMessage(jSqliteDataAccess1.Cursor.GetColumName(colIndex)+'='+ IntToStr(intColValue));
+                 end;
+       ftFloat:begin
+                   floatColValue:= jSqliteDataAccess1.Cursor.GetValueAsDouble(colIndex);
+                   ShowMessage(jSqliteDataAccess1.Cursor.GetColumName(colIndex)+ '='+ FloatToStrF(floatColValue, ffFixed, 0,2));
+                end;
+       ftString: ShowMessage(jSqliteDataAccess1.Cursor.GetColumName(colIndex)+'='+ jSqliteDataAccess1.Cursor.GetValueAsString(colIndex));
+       ftBlob:   jImageView1.SetImageBitmap(jSqliteDataAccess1.Cursor.GetValueAsBitmap(colIndex));
+       ftNull: ShowMessage('warning: NULL found');
+     end;
    end;
-
 end;
 
 end.
