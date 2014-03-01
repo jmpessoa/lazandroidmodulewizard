@@ -44,6 +44,7 @@
 
 version 0.4 - revision: 04 - 01 March - 2014 -
               :: New Add Custom Row Support to jListView
+              :: Update [Eclipse] AppDemo1 [List View Demo]
 
 version 0.4 - revision: 03 - 19 February - 2014 -
               :: New Add Image/BLOB Support to SQLite: jSqliteDataAccess, jSqliteCursor
