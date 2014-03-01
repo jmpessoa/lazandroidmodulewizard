@@ -18,18 +18,18 @@ object AndroidModule9: TAndroidModule9
     Width = 0
     Height = 0
     left = 208
-    top = 96
+    top = 160
   end
   object jImageList1: jImageList
     Images.Strings = (
       'Lazarus_Logo_new.png'
     )
-    left = 280
-    top = 96
+    left = 272
+    top = 160
   end
   object jView1: jView
-    Id = 0
-    Anchor = jTextView1
+    Id = 6162235
+    Anchor = jButton1
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = [rpCenterHorizontal]
     LayoutParamWidth = lpWrapContent
@@ -44,7 +44,7 @@ object AndroidModule9: TAndroidModule9
     OnDraw = jView1Draw
     OnTouchMove = jView1TouchMove
     left = 72
-    top = 96
+    top = 160
   end
   object jTextView1: jTextView
     Id = 35711
@@ -67,11 +67,31 @@ object AndroidModule9: TAndroidModule9
     top = 24
   end
   object jCanvas1: jCanvas
-    PaintStrokeWidth = 3
+    PaintStrokeWidth = 1
     PaintStyle = psFillAndStroke
     PaintTextSize = 20
     PaintColor = colbrBlue
     left = 136
+    top = 160
+  end
+  object jButton1: jButton
+    Id = 7531079
+    Anchor = jTextView1
+    PosRelativeToAnchor = [raBelow]
+    PosRelativeToParent = []
+    LayoutParamWidth = lpMatchParent
+    LayoutParamHeight = lpWrapContent
+    MarginLeft = 5
+    MarginTop = 5
+    MarginRight = 5
+    MarginBottom = 5
+    Visible = True
+    BackgroundColor = colbrDefault
+    Text = 'Swap Image'
+    FontColor = colbrDefault
+    FontSize = 0
+    OnClick = jButton1Click
+    left = 72
     top = 96
   end
 end

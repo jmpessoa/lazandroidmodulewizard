@@ -153,7 +153,7 @@ object AndroidModule3: TAndroidModule3
     MarginRight = 10
     MarginBottom = 10
     Alignment = taLeft
-    InputTypeEx = itxText
+    InputTypeEx = itxMultiLine
     LineMaxLength = 360
     Visible = True
     BackgroundColor = colbrWhite

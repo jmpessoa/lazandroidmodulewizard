@@ -12,6 +12,7 @@ pAppOnRotate=Java_Event_pAppOnRotate(PEnv,this,rotate);
 pAppOnConfigurationChanged=Java_Event_pAppOnConfigurationChanged(PEnv,this);
 pAppOnActivityResult=Java_Event_pAppOnActivityResult(PEnv,this,requestCode,resultCode,data);
 pOnClick=Java_Event_pOnClick(PEnv,this,TObject(pasobj),value);
+pOnClickWidgetItem=Java_Event_pOnClickWidgetItem(PEnv,this,TObject(pasobj),index,Boolean(checked));
 pOnChange=Java_Event_pOnChange(PEnv,this,TObject(pasobj),EventType);
 pOnEnter=Java_Event_pOnEnter(PEnv,this,TObject(pasobj));
 pOnTimer=Java_Event_pOnTimer(PEnv,this,TObject(pasobj));

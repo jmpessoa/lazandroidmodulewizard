@@ -1,7 +1,7 @@
 package org.jmpessoa.appantdemo1;
 //
 //
-//[LazAndroidModuleWizard - ver.0.4_r.03 :19-feb-2014]
+//[LazAndroidModuleWizard - ver.0.4_r.04 :01-mar-2014]
 //[https://github.com/jmpessoa/lazandroidmodulewizard]
 
 //Android Java Interface for Pascal/Delphi XE5  - 
@@ -75,6 +75,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
+import android.graphics.Typeface;
 import android.opengl.GLES10;
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView.Renderer;
@@ -118,8 +119,10 @@ import android.view.animation.TranslateAnimation;
 import android.view.inputmethod.InputMethodManager;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
@@ -159,6 +162,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.regex.Pattern;
+
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 import javax.microedition.khronos.egl.EGLContext;
@@ -828,16 +833,16 @@ public  void setInputTypeEx(String str) {
 	  else if (str.equals("TEXT")) { 
 		  this.setInputType(android.text.InputType.TYPE_CLASS_TEXT);
 	  }
-	  else if (str.equals("PHONE"))      { this.setInputType(android.text.InputType.TYPE_CLASS_PHONE); }
-	  else if (str.equals("PASSNUMBER")) { this.setInputType(android.text.InputType.TYPE_CLASS_NUMBER);
-	  this.setTransformationMethod(android.text.method.PasswordTransformationMethod.getInstance()); }
-	  else if (str.equals("PASSTEXT"))   { this.setInputType(android.text.InputType.TYPE_CLASS_TEXT);
-	  this.setTransformationMethod(android.text.method.PasswordTransformationMethod.getInstance()); }
+	  else if (str.equals("PHONE"))       {this.setInputType(android.text.InputType.TYPE_CLASS_PHONE); }
+	  else if (str.equals("PASSNUMBER"))  {this.setInputType(android.text.InputType.TYPE_CLASS_NUMBER);
+	                                       this.setTransformationMethod(android.text.method.PasswordTransformationMethod.getInstance()); }
+	  else if (str.equals("PASSTEXT"))    {this.setInputType(android.text.InputType.TYPE_CLASS_TEXT);
+	                                       this.setTransformationMethod(android.text.method.PasswordTransformationMethod.getInstance()); }
 	  
 	  else if (str.equals("TEXTMULTILINE")){this.setInputType(android.text.InputType.TYPE_CLASS_TEXT|android.text.InputType.TYPE_TEXT_FLAG_MULTI_LINE);}
 	                                    
 	  
-	  else                               { this.setInputType(android.text.InputType.TYPE_CLASS_TEXT); };
+	  else                                 {this.setInputType(android.text.InputType.TYPE_CLASS_TEXT);};
 	    
 	}
 
@@ -1750,62 +1755,279 @@ public void setIdEx(int id) {
 //
 //
 //-------------------------------------------------------------------------
+//by jmpessoa : custom row!
+class jListItemRow{
+	String label;
+	int    id; 
+	int widget = 0;
+	String widgetText;
+	String delimiter;
+	boolean checked;
+	int textSize;
+	int textColor;
+	int textDecorated;
+	int textSizeDecorated;
+	int itemLayout;
+	int textAlign;
+	Context ctx;
+	Bitmap bmp;
+	public  jListItemRow(Context context) {
+		ctx = context;
+	}
+}
 
 //http://stackoverflow.com/questions/7361135/how-to-change-color-and-font-on-listview
 class jArrayAdapter extends ArrayAdapter {
 //
+private long             PasObj   = 0;      // Pascal Obj
+private Controls        controls = null;   // Control Class for Event	
 private Context       ctx;
 private int           id;
-private List <String> items ;
-//
-private int           textColor = 0xFF000000; // black
-private int           textSize  = 20;         //
+private List <jListItemRow> items ;
 
-public  jArrayAdapter(Context context, int textViewResourceId , List<String> list ) {
+public  jArrayAdapter(Context context, Controls ctrls,long pasobj, int textViewResourceId , 
+		               List<jListItemRow> list) {
    super(context, textViewResourceId, list);
+   PasObj = pasobj;
+   controls = ctrls;
    ctx   = context;
    id    = textViewResourceId;
-   items = list ;
-}
-
-public  void setTextColor ( int textcolor ) {
-textColor = textcolor;
-}
-
-public  void setTextSize  ( int textsize  ) {
-textSize  = textsize;
+   items = list;
 }
 
 @Override
 public  View getView(int position, View v, ViewGroup parent) {
-     View mView = v;
-
+ 
+   //old code: commented by jmpessoa
+   /*  
+    View mView = v;
+   
     if(mView == null){
        LayoutInflater vi = (LayoutInflater)ctx.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
        mView = vi.inflate(id, null);
     }
-   //
+   
+	
    TextView tv = (TextView)mView;
    tv.setTextColor (textColor);
    tv.setTextSize  (TypedValue.COMPLEX_UNIT_PX,textSize );
-   tv.setText      (items.get(position));   // position [0 ~ n-1]
+   tv.setText      (items.get(position));   // position [0 ~ n-1]       
    return mView;
-};
+   */	
+	
+ //new code: by jmpessoa: custom row!	
+ if (items.get(position).label != "") {
+		  
+   LinearLayout listLayout = new LinearLayout(ctx);
+   
+   listLayout.setOrientation(LinearLayout.HORIZONTAL);  
+   AbsListView.LayoutParams lparam =new AbsListView.LayoutParams(AbsListView.LayoutParams.MATCH_PARENT, 
+		                                                         AbsListView.LayoutParams.WRAP_CONTENT); //w, h
+   listLayout.setLayoutParams(lparam);
+   
+   LayoutParams imgParam = null;      
+   ImageView itemImage = null; 
+	
+   if (items.get(position).bmp !=  null) {  
+	   imgParam = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT); //w,h
+	   itemImage = new ImageView(ctx); 
+	   itemImage.setId(position);
+	   itemImage.setImageBitmap(items.get(position).bmp);  
+	   itemImage.setFocusable(false);
+	   itemImage.setFocusableInTouchMode(false);
+	   itemImage.setPadding(6, 6, 0, 0);
+	   itemImage.setOnClickListener(getOnCheckItem(itemImage, position));       
+   }
+   
+   RelativeLayout itemLayout = new RelativeLayout(ctx);
+       
+   String line = items.get(position).label;   
+   String[] lines = line.split(Pattern.quote(items.get(position).delimiter));
+   
+   TextView[] itemText = new TextView[lines.length];
+   
+   LinearLayout txtLayout = new LinearLayout(ctx);
+   txtLayout.setOrientation(LinearLayout.VERTICAL);
+     
+   int faceTitle;
+   int faceBody;
+   switch (items.get(position).textDecorated) {
+     case 0:  faceTitle = Typeface.NORMAL; faceBody = Typeface.NORMAL; break;
+     case 1:  faceTitle = Typeface.NORMAL; faceBody = Typeface.ITALIC; break;
+     case 2:  faceTitle = Typeface.NORMAL; faceBody = Typeface.BOLD; break;
+     
+     case 3:  faceTitle = Typeface.BOLD; faceBody = Typeface.BOLD; break;
+     case 4:  faceTitle = Typeface.BOLD;   faceBody = Typeface.NORMAL; break;
+     case 5:  faceTitle = Typeface.BOLD;   faceBody = Typeface.ITALIC; break;
+     
+     case 6:  faceTitle = Typeface.ITALIC; faceBody = Typeface.ITALIC; break;
+     case 7:  faceTitle = Typeface.ITALIC;   faceBody = Typeface.NORMAL; break;
+     case 8:  faceTitle = Typeface.ITALIC;   faceBody = Typeface.ITALIC; break;
+     
+     default: faceTitle = Typeface.NORMAL; faceBody = Typeface.NORMAL; break;
+   }
+
+   LayoutParams txtParam = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT); //w,h
+  
+   //txtParam.alignWithParent = true;
+   
+     
+   for (int i=0; i < lines.length; i++) {
+	   itemText[i] = new TextView(ctx);
+	   
+	   if (items.get(position).textSize != 0){
+		   itemText[i].setTextSize(TypedValue.COMPLEX_UNIT_PX,items.get(position).textSize);
+	   }
+	   
+	   if (i == 0) {		   
+		    itemText[i].setTypeface(null,faceTitle);
+		}
+		else{			
+		   itemText[i].setTypeface(null,faceBody);
+		   if (items.get(position).textSizeDecorated == 1) {
+			     itemText[i].setTextSize(TypedValue.COMPLEX_UNIT_PX, itemText[i].getTextSize() - 2*i);
+		   }		   
+		}
+	   
+	    itemText[i].setText(lines[i]);
+	    
+	    if (items.get(position).textColor != 0) {
+	       itemText[i].setTextColor(items.get(position).textColor);
+	    }
+	    
+	    txtLayout.addView(itemText[i]);   
+   }
+   
+   View itemWidget = null;
+   
+   switch(items.get(position).widget) {
+     case 1:  itemWidget = new CheckBox(ctx);  ((CheckBox)itemWidget).setText(items.get(position).widgetText);  break;
+     case 2:  itemWidget = new RadioButton(ctx); ((RadioButton)itemWidget).setText(items.get(position).widgetText); break;
+     case 3:  itemWidget = new Button(ctx);  ((Button)itemWidget).setText(items.get(position).widgetText);    break;
+     case 4:  itemWidget = new TextView(ctx); ((TextView)itemWidget).setText(" "+items.get(position).widgetText+" ");   break;
+     default: ;
+   }
+
+   LayoutParams widgetParam = null;
+
+   if (itemWidget != null) {
+	  widgetParam = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT); //w,h	   
+	  itemWidget.setFocusable(false);
+      itemWidget.setFocusableInTouchMode(false);
+      itemWidget.setOnClickListener(getOnCheckItem(itemWidget, position));       
+   }
+                          
+   if (items.get(position).itemLayout == 0) {	//default...   
+	   if (itemImage != null) {
+		  listLayout.addView(itemImage, imgParam);
+	   }
+	   
+	   txtParam.leftMargin = 10;
+	   txtParam.rightMargin = 10;
+	   
+	   switch(items.get(position).textAlign) {
+	     case 0: txtParam.addRule(RelativeLayout.ALIGN_PARENT_LEFT);  break;
+	     case 1: txtParam.addRule(RelativeLayout.CENTER_HORIZONTAL);  break;
+	     case 2: txtParam.addRule(RelativeLayout.ALIGN_PARENT_RIGHT); break;
+	     default: ;
+	   }
+	   
+	   itemLayout.addView(txtLayout, txtParam);
+	   
+	   if (itemWidget != null) {
+		  widgetParam.rightMargin = 10;
+		  if (items.get(position).textAlign != 2) {
+		    widgetParam.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+		  }else {widgetParam.addRule(RelativeLayout.CENTER_HORIZONTAL);}
+		  itemLayout.addView(itemWidget, widgetParam);			  			  			  		  
+	   }	   
+	   
+   } else {
+	   
+	   if (itemWidget != null) {
+		  listLayout.addView(itemWidget, widgetParam);
+	   }   
+	   
+	   txtParam.leftMargin = 10;
+	   txtParam.rightMargin = 10;
+	   switch(items.get(position).textAlign) {
+	     case 0: txtParam.addRule(RelativeLayout.ALIGN_PARENT_LEFT);break;
+	     case 1: txtParam.addRule(RelativeLayout.CENTER_HORIZONTAL); break;
+	     case 2: txtParam.addRule(RelativeLayout.ALIGN_PARENT_RIGHT); break;
+	     default: ;
+	   }
+	   
+	   itemLayout.addView(txtLayout, txtParam);
+	   
+	   if (itemImage != null) {
+		  imgParam.rightMargin = 10;
+		  
+		  if (items.get(position).textAlign != 2) {
+		  imgParam.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);}
+		  else{imgParam.addRule(RelativeLayout.CENTER_HORIZONTAL);}
+		  
+		  itemLayout.addView(itemImage, imgParam);
+	   }	   
+	   	   
+   }
+   
+   listLayout.addView(itemLayout);
+   return listLayout;
+   
+ } 
+ else return v;
+ 
+}
+  //by jmpessoa 
+View.OnClickListener getOnCheckItem(final View cb, final int position) { 
+    return new View.OnClickListener() { 
+	             public void onClick(View v) { 
+	               if (items.get(position).widget == 1) {	 
+	                  items.get(position).checked = ((CheckBox)cb).isChecked();	                 	                  
+	                  controls.pOnClickWidgetItem(PasObj, position, ((CheckBox)cb).isChecked());
+	               }
+	               if (items.get(position).widget == 2) {
+	            	      if ( items.get(position).checked ) {((RadioButton)cb).setChecked(false);}
+		                  items.get(position).checked = ((RadioButton)cb).isChecked();
+		                  controls.pOnClickWidgetItem(PasObj, position, ((RadioButton)cb).isChecked());
+		           }
+	               if (items.get(position).widget == 3) { //button	            	      	            	        
+			             controls.pOnClickWidgetItem(PasObj, position, true); 		                  
+		           }
+	               if (items.get(position).widget == 4) { //textview  
+			             controls.pOnClickWidgetItem(PasObj, position, true); 		                  
+		           }	               
+              } 
+	   }; 
+}
 
 }
+
+//-------------------
+// jListView
+//------------------------
 
 class jListView extends ListView {
 // Java-Pascal Interface
 private long             PasObj   = 0;      // Pascal Obj
 private Controls        controls = null;   // Control Class for Event
-//
-private int             textColor = 0xFF000000; // black
-private int             textSize  = 20;         //
-//
+
+private Bitmap          genericBmp;
+private int             widgetItem;
+private String          widgetText;
+private int             textColor; 
+private int             textSize;     
+int textDecorated;
+int itemLayout;
+int textSizeDecorated;
+int textAlign;
+
+String delimiter;
+
 private ViewGroup       parent    = null;       // parent view
 private RelativeLayout.LayoutParams lparams;  // Control xywh
-//
-private ArrayList<String>    alist;
+
+private ArrayList<jListItemRow>    alist;
 
 private jArrayAdapter        aadapter;
 
@@ -1826,6 +2048,56 @@ int MarginTop = 5;
 int marginRight = 5;
 int marginBottom = 5;
 
+//Constructor
+public  jListView(android.content.Context context,
+              Controls ctrls,long pasobj, int widget, String widgetTxt,  Bitmap bmp,
+              int txtDecorated,
+              int itemLay,
+              int txtSizeDecorated,  int txtAlign) {
+super(context);
+// Connect Pascal I/F
+PasObj   = pasobj;
+controls = ctrls;
+
+textColor = 0; //dummy: default
+textSize  = 0; //dummy: default       
+
+widgetItem = widget;
+widgetText = widgetTxt; 
+genericBmp = bmp;
+textDecorated = txtDecorated;
+itemLayout =itemLay;
+textSizeDecorated = txtSizeDecorated;
+textAlign = txtAlign;
+
+// Init Class
+lparams = new RelativeLayout.LayoutParams (100,100);
+lparams.setMargins (50,50,0,0);
+setBackgroundColor (0x00000000);
+setCacheColorHint  (0);
+
+alist = new ArrayList<jListItemRow>();
+   
+aadapter = new jArrayAdapter(context, controls, PasObj, android.R.layout.simple_list_item_1,  alist);
+
+setAdapter(aadapter);
+
+setChoiceMode(ListView.CHOICE_MODE_SINGLE);
+//Init Event
+onItemClickListener = new OnItemClickListener() {
+   @Override
+   public  void onItemClick(AdapterView<?> parent, View v, int position, long id) {
+     controls.pOnClick(PasObj, (int)id );
+   }
+};
+
+setOnItemClickListener(onItemClickListener);
+}
+
+//by jmpessoa
+public boolean isItemChecked(int index) {
+  return alist.get(index).checked;		
+}
 //by jmpessoa
 public void setMarginRight(int x) {
 	marginRight = x;
@@ -1845,45 +2117,16 @@ public void setMarginTop(int y) {
 	MarginTop = y;
 }
 
-// Constructor
-public  jListView(android.content.Context context,
-                 Controls ctrls,long pasobj ) {
-super(context);
-// Connect Pascal I/F
-PasObj   = pasobj;
-controls = ctrls;
-// Init Class
-lparams = new RelativeLayout.LayoutParams (100,100);
-lparams.setMargins (50,50,0,0);
-setBackgroundColor (0x00000000);
-setCacheColorHint  (0);
-//
-alist    = new ArrayList<String>();
-aadapter = new jArrayAdapter(context, android.R.layout.simple_list_item_1, alist);
-aadapter.setTextColor(textColor); // Font Color
-aadapter.setTextSize (textSize ); // Font Size
-//
-setAdapter   (aadapter);
-setChoiceMode(ListView.CHOICE_MODE_SINGLE);
-// Init Event
-onItemClickListener = new OnItemClickListener() {
-  @Override
-  public  void onItemClick(AdapterView<?> parent, View v, int position, long id) {
-    controls.pOnClick(PasObj, (int)id );
-  }
-};
-setOnItemClickListener(onItemClickListener);
-}
-
 //
 public  void setXYWH ( int x, int y, int w, int h ) {
-lparams.width  = w;
-lparams.height = h;
-lparams.setMargins(x,y,0,0);
-//
-setLayoutParams(lparams);
+  lparams.width  = w;
+  lparams.height = h;
+  lparams.setMargins(x,y,0,0);
+  //
+  setLayoutParams(lparams);
 }
 
+//by jmpessoa
 public void setLeftTopRightBottomWidthHeight(int left, int top, int right, int bottom, int w, int h) {
 	MarginLeft = left;
 	MarginTop = top;
@@ -1893,32 +2136,23 @@ public void setLeftTopRightBottomWidthHeight(int left, int top, int right, int b
 	lpW = w;
 }	
 
-//
 public  void setParent( android.view.ViewGroup viewgroup ) {
 if (parent != null) { parent.removeView(this); }
-parent = viewgroup;
-viewgroup.addView(this,lparams);
+   parent = viewgroup;
+   viewgroup.addView(this,lparams);
 }
 
-//
-public  void setTextColor( int textcolor ) {
-aadapter.setTextColor ( textcolor );
+public  void setTextColor( int textcolor) {
+   this.textColor =textcolor;
 }
 
-//
-public  void setTextSize ( int textsize  ) {
-aadapter.setTextSize ( textsize );
+public  void setTextSize (int textsize) {
+   this.textSize =textsize ;
 }
 
 // LORDMAN - 2013-08-07
 public void setItemPosition ( int position, int y ) {
-setSelectionFromTop(position, y);
-}
-
-//
-public  void add( String item ) { 
-  alist.add( item );
-  aadapter.notifyDataSetChanged();
+  setSelectionFromTop(position, y);
 }
 
 //
@@ -1935,32 +2169,36 @@ public  void delete( int index ) {
 
 // Free object except Self, Pascal Code Free the class.
 public  void Free() {
-if (parent != null) { parent.removeView(this); }
-alist.clear();
-alist    = null;
-setAdapter(null);
-aadapter = null;
-lparams  = null;
-setOnItemClickListener(null);
+  if (parent != null) { parent.removeView(this); }
+  alist.clear();
+  genericBmp = null;
+  alist    = null;
+  setAdapter(null);
+ 
+  aadapter = null;
+  lparams  = null;
+  setOnItemClickListener(null);
 }
 
 //by jmpessoa
 public void setLParamWidth(int w) {
-lpW = w;
+  lpW = w;
 }
 
 public void setLParamHeight(int h) {
-lpH = h;
+  lpH = h;
 }
 
+//by jmpessoa
 public void addLParamsAnchorRule(int rule) {
-lparamsAnchorRule[countAnchorRule] = rule;
-countAnchorRule = countAnchorRule + 1;
+  lparamsAnchorRule[countAnchorRule] = rule;
+  countAnchorRule = countAnchorRule + 1;
 }
 
+//by jmpessoa
 public void addLParamsParentRule(int rule) {
-	lparamsParentRule[countParentRule] = rule;
-	countParentRule = countParentRule + 1;
+  lparamsParentRule[countParentRule] = rule;
+  countParentRule = countParentRule + 1;
 }
 
 //by jmpessoa
@@ -1981,21 +2219,180 @@ public void setLayoutAll(int idAnchor) {
 	for (int j=0; j < countParentRule; j++) {  
 		lparams.addRule(lparamsParentRule[j]);		
   }
-	//
-	setLayoutParams(lparams);
+  //
+  setLayoutParams(lparams);
 }
 
 //by jmpessoa
 public void setIdEx(int id) {
-setId(id);	
+   setId(id);	
 }
 
-public void setTextColor2(int value) {
-	this.setTextColor(value);  
+//by jmpessoa
+public  void add2(String item, String delimiter) {
+jListItemRow info = new jListItemRow(controls.activity);
+info.label = item;
+info.delimiter=  delimiter;
+info.id = alist.size();
+info.checked = false;
+info.widget = widgetItem;
+info.widgetText= widgetText;
+info.checked = false;
+info.textSize= textSize;
+info.textColor= textColor;
+info.bmp = genericBmp;
+
+info.textDecorated = textDecorated;
+info.itemLayout =itemLayout;
+info.textSizeDecorated = textSizeDecorated;
+info.textAlign = textAlign;
+
+alist.add(info);
+aadapter.notifyDataSetChanged();
+}
+
+
+//by jmpessoa
+public  void add22(String item, String delimiter, Bitmap bm) {
+jListItemRow info = new jListItemRow(controls.activity);
+info.label = item;
+info.delimiter=  delimiter;
+info.id = alist.size();
+info.checked = false;
+info.widget = widgetItem;
+info.widgetText= widgetText;
+info.checked = false;
+info.textSize= textSize;
+info.textColor= textColor;
+info.bmp = bm;
+
+info.textDecorated = textDecorated;
+info.itemLayout =itemLayout;
+info.textSizeDecorated = textSizeDecorated;
+info.textAlign = textAlign;
+
+alist.add(info);
+aadapter.notifyDataSetChanged();
+}
+
+//by jmpessoa
+public  void add3(String item, String delimiter, int fontColor, int fontSize, int widgetItem, String wgtText, Bitmap img) {
+	  jListItemRow info = new jListItemRow(controls.activity);
+	  info.label = item;
+	  info.id = alist.size();
+	  info.checked = false;
+	  info.widget = widgetItem;
+	  info.widgetText= wgtText;
+	  info.checked = false;
+	  info.delimiter=  delimiter;
+	  info.textSize= fontSize;
+	  info.textColor= fontColor;	
+	  info.bmp = img;
+
+	  info.textDecorated = textDecorated;
+	  info.itemLayout =itemLayout;
+	  info.textSizeDecorated = textSizeDecorated;
+	  info.textAlign = textAlign;
+
+	  alist.add(info);
+	  aadapter.notifyDataSetChanged();
+}
+
+//by jmpessoa 
+public  void add4(String item, String delimiter, int fontColor, int fontSize, int widgetItem, String wgtText) {
+	  jListItemRow info = new jListItemRow(controls.activity);
+	  info.label = item;
+	  info.id = alist.size();
+	  info.checked = false;
+	  info.widget = widgetItem;
+	  info.widgetText= wgtText;
+	  info.checked = false;
+	  info.delimiter=  delimiter;
+	  info.textSize= fontSize;
+	  info.textColor= fontColor;	
+	  info.bmp = null;
+
+	  info.textDecorated = textDecorated;
+	  info.itemLayout =itemLayout;
+	  info.textSizeDecorated = textSizeDecorated;
+	  info.textAlign = textAlign;
+	  
+	  alist.add(info);
+	  aadapter.notifyDataSetChanged();
+}
+
+//by jmpessoa
+public void setTextColor2(int value, int index) {
+	if (value != 0) {
+    	alist.get(index).textColor = value;
+	    aadapter.notifyDataSetChanged();
+	}
+}
+
+//by jmpessoa
+public  void setTextSize2(int textsize, int index) {
+	if (textsize != 0) { 
+	  alist.get(index).textSize = textsize;
+	  aadapter.notifyDataSetChanged();
+	}
+}
+
+//by jmpessoa
+public  void setImageItem(Bitmap bm, int index) {
+	alist.get(index).bmp = bm;
+	aadapter.notifyDataSetChanged();
+}
+
+//by jmpessoa
+public void setTextDecorated(int value, int index){
+	alist.get(index).textDecorated = value;
+	aadapter.notifyDataSetChanged();
+}
+
+public void setTextSizeDecorated(int value, int index) {
+	alist.get(index).textSizeDecorated = value;
+	aadapter.notifyDataSetChanged();
+}
+
+//by jmpessoa
+public void setItemLayout(int value, int index){
+	alist.get(index).itemLayout = value; //0: image-text-widget; 1 = widget-text-image
+	aadapter.notifyDataSetChanged();
+}
+
+//by jmpessoa
+public void setWidgetItem(int value, int index){
+	alist.get(index).widget = value;
+	aadapter.notifyDataSetChanged();
+}
+
+//by jmpessoa
+public void setTextAlign(int value, int index){
+	alist.get(index).textAlign = value;
+	aadapter.notifyDataSetChanged();
+}
+
+
+//by jmpessoa
+public void setWidgetItem(int value, String txt, int index){
+	alist.get(index).widget = value;
+	alist.get(index).widgetText = txt;
+	aadapter.notifyDataSetChanged();
+}
+
+//by jmpessoa
+public void setWidgetText(String value, int index){
+	alist.get(index).widgetText = value;
+	aadapter.notifyDataSetChanged();
+}
+
+//by jmpessoa
+public void setWidgetCheck(boolean value, int index){
+	alist.get(index).checked = value;
+	aadapter.notifyDataSetChanged();
 }
 
 }
-
 //-------------------------------------------------------------------------
 //ScrollView
 //      Event pOnClick
@@ -4139,7 +4536,7 @@ controls = ctrls;
 }
 
 public  void loadFile(String filename) {
-  if (bmp != null) { bmp.recycle(); }
+  //if (bmp != null) { bmp.recycle(); }
   bmp = BitmapFactory.decodeFile(filename);
 }
 
@@ -4147,7 +4544,7 @@ public  void loadFile(String filename) {
 //BitmapFactory.Options options = new BitmapFactory.Options();
 //options.inSampleSize = 4;
 public  void loadFileEx(String filename) {
-if (bmp != null) { bmp.recycle(); }
+ //if (bmp != null) { bmp.recycle(); }
   BitmapFactory.Options options = new BitmapFactory.Options();
   options.inSampleSize = 4; // --> 1/4
   bmp = BitmapFactory.decodeFile(filename, options);
@@ -4155,28 +4552,28 @@ if (bmp != null) { bmp.recycle(); }
 
 
 public  void createBitmap(int w, int h) {
-if (bmp != null) { bmp.recycle(); }
+  //if (bmp != null) { bmp.recycle(); }
    bmp = Bitmap.createBitmap( w,h, Bitmap.Config.ARGB_8888 );
 }
 
 public  int[] getWH() {
-int[] wh = new int[2];
-wh[0] = 0; // width
-wh[1] = 0; // height
+ int[] wh = new int[2];
+ wh[0] = 0; // width
+ wh[1] = 0; // height
 if ( bmp != null ) {
   wh[0] = bmp.getWidth();
   wh[1] = bmp.getHeight();
 }
-return ( wh );
+ return ( wh );
 }
 
 public  void Free() {
- bmp.recycle();
+ //bmp.recycle();
  bmp = null;
 }
 
 //by jmpessoa
-public  Bitmap getJavaBitmap() {
+public  Bitmap jInstance() {
 	  return this.bmp;
 }
 
@@ -4692,6 +5089,9 @@ public  native void pOnActive     (long pasobj);     //new by jmpessoa
 public  native int  pOnWebViewStatus (long pasobj, int EventType, String url);
 public  native void pOnAsyncEvent    (long pasobj, int EventType, int progress);
 
+//new by jmpessoa: support for jListView custom row
+public  native void pOnClickWidgetItem(long pasobj, int position, boolean checked); 
+
 // Load Pascal Library
 static {
     Log.i("JNI_Java", "1.load libcontrols.so");
@@ -5092,8 +5492,7 @@ public  void Image_save(Bitmap bmp, String filename) {
 //  TextView
 // -------------------------------------------------------------------------
 
-public  java.lang.Object jTextView_Create(android.content.Context context,
-                                         long pasobj ) {
+public  java.lang.Object jTextView_Create(android.content.Context context, long pasobj) {
   return (java.lang.Object)( new jTextView(context,this,pasobj));
 }
 
@@ -6007,14 +6406,24 @@ public int jImageView_getLParamWidth(java.lang.Object imageview) {
 //  ListView
 // -------------------------------------------------------------------------
 
+/*
 public  java.lang.Object jListView_Create(android.content.Context context,
-                                         long pasobj ) {
-  return (java.lang.Object)( new jListView(context,this,pasobj));
+                                         long pasobj, int hasWidget, String delim) {
+  return (java.lang.Object)( new jListView(context,this,pasobj, hasWidget, delim));
 }
+*/
 
 //by jmpessoa
-public  java.lang.Object jListView_Create2(long pasobj ) {
-  return (java.lang.Object)( new jListView(this.activity,this,pasobj));
+public  java.lang.Object jListView_Create2(long pasobj,  int widget, String widgetTxt, Bitmap bmp, 
+		int txtDecorated, int itemLay, int textSizeDecorated, int textAlign) {
+   return (java.lang.Object)(new jListView(this.activity,this,pasobj,widget,widgetTxt,bmp,
+		   txtDecorated,itemLay,textSizeDecorated, textAlign));
+}
+
+public  java.lang.Object jListView_Create3(long pasobj,  int widget, String widgetTxt,
+		int txtDecorated, int itemLay, int textSizeDecorated, int textAlign) {
+	   return (java.lang.Object)(new jListView(this.activity,this,pasobj,widget,widgetTxt, null,
+			   txtDecorated,itemLay,textSizeDecorated, textAlign));
 }
 
 public  void jListView_Free(java.lang.Object listview) {
@@ -6051,10 +6460,10 @@ public void jListView_setItemPosition (java.lang.Object listview, int position, 
   ((jListView)listview).setItemPosition(position, y);
 }
 
-// Item.add
-public  void jListView_add      (java.lang.Object listview, String item) {
+/*
+public  void jListView_add(java.lang.Object listview, String item) {
   ((jListView)listview).add(item);
-}
+}*/
 
 // Item.delete
 public  void jListView_delete   (java.lang.Object listview, int index)  {
@@ -6571,10 +6980,9 @@ public  int[] jBitmap_getWH( java.lang.Object bitmap) {
   return ( ((jBitmap)bitmap).getWH() );
 }
 
-public  Bitmap jBitmap_getJavaBitmap( java.lang.Object bitmap) {
+public  Bitmap jBitmap_jInstance( java.lang.Object bitmap) {
   return ( ((jBitmap)bitmap).bmp );
 }
-
 
 // -------------------------------------------------------------------------
 //  View

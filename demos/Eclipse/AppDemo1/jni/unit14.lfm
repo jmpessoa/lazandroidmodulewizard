@@ -11,7 +11,7 @@ object AndroidModule14: TAndroidModule14
   Height = 503
   HorizontalOffset = 319
   VerticalOffset = 145
-  Width = 234
+  Width = 344
   object jTextView1: jTextView
     Id = 41380
     PosRelativeToAnchor = []

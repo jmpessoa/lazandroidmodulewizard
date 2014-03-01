@@ -523,7 +523,10 @@ type
   TOnGLChange        = Procedure(Sender: TObject; W, H: integer) of object;
 
   TOnClickYN         = Procedure(Sender: TObject; YN  : TClickYN) of object;
-  TOnClickItem       = Procedure(Sender: TObject; Item: Integer ) of object;
+  TOnClickItem       = Procedure(Sender: TObject; Item: Integer) of object;
+
+  TOnClickWidgetItem = Procedure(Sender: TObject; Item: integer; checked: boolean) of object;
+
   //
   TOnWebViewStatus   = Procedure(Sender: TObject; Status : TWebViewStatus;
                                  URL : String; Var CanNavi : Boolean) of object;
@@ -587,6 +590,7 @@ type
 
   //by jmpessoa
   TSqliteFieldType = (ftNull,ftInteger,ftFloat,ftString,ftBlob);
+  TWidgetItem = (wgNone,wgCheckBox,wgRadioButton,wgButton,wgTextView);
 
   jApp = class(TCustomApplication)
   private
@@ -732,6 +736,7 @@ type
   private
     FImages : TStrings;
     FFilePath: TFilePath;
+    function GetCount: integer;
     procedure SetImages(Value: TStrings);
     procedure ListImagesChange(Sender: TObject);
   public
@@ -741,6 +746,7 @@ type
     function GetImageByIndex(index: integer): string;
     function GetImageExByIndex(index: integer): string;
     // Property
+    property Count: integer read  GetCount;
   published
     property Images: TStrings read FImages write SetImages;
   end;
@@ -899,8 +905,7 @@ type
 
     Procedure LoadFromFile(fileName : String);
     Procedure CreateJavaBitmap(w,h : Integer);
-    Function  GetJavaBitmap : jObject;
-
+    Function  GetJavaBitmap: jObject;
 
     function BitmapToByte(var bufferImage: TArrayOfByte): integer;  //local/self
 
@@ -916,7 +921,6 @@ type
     procedure ScanPixel(PDWordPixel: PScanLine);  overload; //TODO - just draft
     function GetInfo: boolean;
     function  GetRatio: Single;
-
 
     property  JavaObj : jObject           read FjObject;
     property ImageName: string read FImageName write SetImageName;
@@ -1459,7 +1463,6 @@ type
     Procedure SetImageByName(Value : string);
     Procedure SetImageByIndex(Value : integer);
     procedure SetImageBitmap(bitmap: jObject);
-
     // Property
     property Width: integer Read GetWidth;
     property Height: integer Read GetHeight;
@@ -1477,46 +1480,103 @@ type
      property OnClick: TOnNotify read FOnClick write FOnClick;
   end;
 
+
+  TTextDecorated = (txtNormal,
+                    txtNormalAndItalic,
+                    txtNormalAndBold,
+                    txtBold,
+                    txtBoldAndNormal,
+                    txtBoldAndItalic,
+                    txtItalic,
+                    txtItalicAndNormal,
+                    txtItalicAndBold);
+
+  TItemLayout = (layImageTextWidget, layWidgetTextImage);
+
+  TTextAlign= (alLeft, alCenter, alRight);
+
+  TTextSizeDecorated = (sdNone, sdDecreasing, sdIncreasing);
+
   jListView = class(jVisualControl)
   private
-    FjRLayout    : jObject; // Java : Self Layout
-    FOnClickItem : TOnClickItem;
-    FItems       : TStrings;
+    FjRLayout     : jObject; // Java : Self Layout
+    FOnClickItem  : TOnClickItem;
+    FOnClickWidgetItem: TOnClickWidgetItem;
+    FItems        : TStrings;
+    FWidgetItem   : TWidgetItem;
+    FWidgetText   : string;
+    FDelimiter    : string;
+    FImageItem    : jBitmap;
+    FTextDecorated: TTextDecorated;
+    FTextSizeDecorated: TTextSizeDecorated;
+    FItemLayout   : TItemLayout;
+    FTextAlign     : TTextAlign;
     Procedure SetVisible      (Value : Boolean);
     Procedure SetColor        (Value : TARGBColorBridge);
-    Procedure SetFontColor    (Value : TARGBColorBridge);
-    Procedure SetFontSize     (Value : DWord  );
-    Procedure SetItemPosition (Value : TXY    );
-    procedure ListViewChange(Sender: TObject);
+    Procedure SetItemPosition (Value : TXY);
+    procedure ListViewChange  (Sender: TObject);
 
     procedure SetItems(Value: TStrings);
 
-    Procedure Item_Add(item : string);
-    Procedure Item_Delete(index: Integer);
-    Procedure Item_Clear;
     procedure SetParent(Value: jObject);
+    Procedure SetFontColor    (Value : TARGBColorBridge);
+    Procedure SetFontSize     (Value : DWord);
+    procedure SetWidget(Value: TWidgetItem);
+    procedure SetImage(Value: jBitmap);
   protected
     procedure setParamHeight(Value: TLayoutParams);
     procedure SetParamWidth(Value: TLayoutParams);
     Procedure GenEvent_OnClick(Obj: TObject; Value: integer);
+    procedure GenEvent_OnClickWidgetItem(Obj: TObject; index: integer; checked: boolean);
+    procedure Notification(AComponent: TComponent; Operation: TOperation); override;
   public
     constructor Create(AOwner: TComponent); override;
-    Destructor  Destroy; override;
-    Procedure Refresh;
-    Procedure UpdateLayout; override;
+    destructor Destroy; override;
+    procedure Refresh;
+    procedure UpdateLayout; override;
     procedure Init;  override;
+    function IsItemChecked(index: integer): boolean;
+    procedure Add(item: string; delim: string); overload;
+    procedure Add(item: string; delim: string; fColor: TARGBColorBridge;
+                  fSize: integer; hasWidget: TWidgetItem; widgetText: string; image: jObject); overload;
+    Procedure Delete(index: Integer);
+    Procedure Clear;
+    Procedure SetFontColorByIndex(Value : TARGBColorBridge; index: integer);
+    Procedure SetFontSizeByIndex(Value : DWord; index: integer  );
+
+    procedure SetWidgetByIndex(Value: TWidgetItem; index: integer); overload;
+    procedure SetWidgetByIndex(Value: TWidgetItem; txt: string; index: integer); overload;
+    procedure SetWidgetTextByIndex(txt: string; index: integer);
+
+    procedure SetImageByIndex(Value: jObject; index: integer);
+
+    procedure SetTextDecoratedByIndex(Value: TTextDecorated; index: integer);
+    procedure SetTextSizeDecoratedByIndex(value: TTextSizeDecorated; index: integer);
+    procedure SetTextAlignByIndex(Value: TTextAlign; index: integer);
+
+    procedure SetLayoutByIndex(Value: TItemLayout; index: integer);
+
     // Property
-    property Parent: jObject  read  FjPRLayout write SetParent; // Java : Parent Relative Layout
+    property Parent: jObject  read  FjPRLayout write SetParent; // Java: Parent Relative Layout
     property View      : jObject   read FjRLayout  write FjRLayout; //self View
     property setItemIndex: TXY write SetItemPosition;
   published
-    property Items     : TStrings read FItems write SetItems;
-    property Visible   : Boolean   read FVisible   write SetVisible;
-    property BackgroundColor     : TARGBColorBridge read FColor     write SetColor;
-    property FontColor : TARGBColorBridge read FFontColor write SetFontColor;
-    property FontSize  : DWord     read FFontSize  write SetFontSize;
+    property Items: TStrings read FItems write SetItems;
+    property Visible: Boolean   read FVisible   write SetVisible;
+    property BackgroundColor: TARGBColorBridge read FColor     write SetColor;
+    property FontColor: TARGBColorBridge read FFontColor write SetFontColor;
+    property FontSize: DWord read FFontSize  write SetFontSize;
+    property WidgetItem: TWidgetItem read FWidgetItem write SetWidget;
+    property WidgetText: string read FWidgetText write FWidgetText;
+    property ImageItem: jBitmap read FImageItem write SetImage;
+    property Delimiter: string read FDelimiter write FDelimiter;
+    property TextDecorated: TTextDecorated read FTextDecorated write FTextDecorated;
+    property ItemLayout: TItemLayout read FItemLayout write FItemLayout;
+    property TextSizeDecorated: TTextSizeDecorated read FTextSizeDecorated write FTextSizeDecorated;
+    property TextAlign: TTextAlign read FTextAlign write FTextAlign;
     // Event
     property OnClickItem : TOnClickItem read FOnClickItem write FOnClickItem;
+    property OnClickWidgetItem: TOnClickWidgetItem read FOnClickWidgetItem write FOnClickWidgetItem;
   end;
 
   jScrollView = class(jVisualControl)
@@ -1742,12 +1802,12 @@ type
     // LORDMAN 2013-08-13
     Procedure drawPoint            (x1,y1 : single);
     Procedure drawText             (Text : String; x,y : single);
-    Procedure drawBitmap           (bmp : jBitmap; b,l,r,t : integer);  overload;
 
+    Procedure drawBitmap           (bmp : jBitmap; b,l,r,t : integer);  overload;
      //by jmpessoa
-    Procedure drawBitmap           (bmp : jObject; b,l,r,t : integer);  overload;
-    //by jmpessoa
-    Procedure drawBitmap(bmp: jBitmap; x1, y1, size: integer; ratio: single); overload;
+    Procedure drawBitmap           (bmp: jObject; b,l,r,t : integer);  overload;
+    Procedure drawBitmap           (bmp: jBitmap; x1, y1, size: integer; ratio: single); overload;
+    Procedure drawBitmap           (bmp: jObject; x1, y1, size: integer; ratio: single); overload;
     // Property
     property  JavaObj : jObject read FjObject;
   published
@@ -1816,6 +1876,8 @@ type
   // Control Event
   Procedure Java_Event_pOnDraw                   (env: PJNIEnv; this: jobject; Obj: TObject; jCanvas: jObject);
   Procedure Java_Event_pOnClick                  (env: PJNIEnv; this: jobject; Obj: TObject; Value: integer);
+
+  Procedure Java_Event_pOnClickWidgetItem     (env: PJNIEnv; this: jobject; Obj: TObject;index: integer; checked: boolean);
 
   Procedure Java_Event_pOnChange                 (env: PJNIEnv; this: jobject; Obj: TObject; EventType : integer);
   Procedure Java_Event_pOnEnter                  (env: PJNIEnv; this: jobject; Obj: TObject);
@@ -2566,6 +2628,17 @@ begin
   begin
     jForm(jImageView(Obj).Owner).UpdateJNI(gApp);
     jImageView(Obj).GenEvent_OnClick(Obj);       exit;
+  end;
+end;
+
+Procedure Java_Event_pOnClickWidgetItem(env: PJNIEnv; this: jobject; Obj: TObject;index: integer; checked: boolean);
+begin
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+  if Obj is jListView then
+  begin
+    jForm(jListVIew(Obj).Owner).UpdateJNI(gApp);
+    jListVIew(Obj).GenEvent_OnClickWidgetItem(Obj, index, checked); exit;
   end;
 end;
 
@@ -4820,7 +4893,12 @@ end;
 procedure jImageView.SetImageIndex(Value: integer);
 begin
   FImageIndex:= Value;
-  if FInitialized then SetImageByIndex(Value);
+  if FInitialized then
+  begin
+    if Value > FImageList.Images.Count then FImageIndex:= FImageList.Images.Count;
+    if Value < 0 then FImageIndex:= 0;
+    SetImageByIndex(Value);
+  end;
 end;
 
 function jImageView.GetImageIndex: integer;
@@ -4957,6 +5035,11 @@ end;
 procedure jImageList.SetImages(Value: TStrings);
 begin
   FImages.Assign(Value);
+end;
+
+function jImageList.GetCount: integer;
+begin
+  Result:= FImages.Count;
 end;
 
 function jImageList.GetImageByIndex(index: integer): string;
@@ -5270,10 +5353,22 @@ end;
 //------------------------------------------------------------------------------
 // jListlView
 //------------------------------------------------------------------------------
+//TWidgetItem = (hasNone,hasCheckBox,hasRadioButton,hasButton,hasTextView,hastEditText,hasImageView);
 
 constructor jListView.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
+  FFontSize:= 0;
+  FFontColor:= colbrRed;
+  FWidgetItem:= wgNone;
+
+  FDelimiter:= '|';
+
+  FTextDecorated:= txtNormal;
+  FItemLayout:= layImageTextWidget;
+  FTextSizeDecorated:= sdNone;
+  FTextAlign:= alLeft;
+
   FItems:= TStringList.Create;
   TStringList(FItems).OnChange:= ListViewChange;  //event handle
 end;
@@ -5306,7 +5401,48 @@ var
 begin
   if FInitialized  then Exit;
   inherited Init;
-  FjObject:= jListView_Create2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, Self);
+
+  if Self.Items.Count = 0 then  FWidgetItem:= wgNone;
+
+  if FImageItem <> nil then
+  begin
+     FImageItem.Init;
+     FjObject:= jListView_Create2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, Self,
+                               Ord(FWidgetItem), FWidgetText, FImageItem.GetJavaBitmap,
+                               Ord(FTextDecorated),Ord(FItemLayout), Ord(FTextSizeDecorated), Ord(FTextAlign));
+    if FFontColor <> colbrDefault then
+       jListView_setTextColor(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, GetARGB(FFontColor));
+
+    if FFontSize > 0 then
+       jListView_setTextSize(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, FFontSize);
+
+    if FColor <> colbrDefault then
+       jView_SetBackGroundColor(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, GetARGB(FColor));
+
+     for i:= 0 to Self.Items.Count-1 do
+     begin
+       FImageItem.ImageIndex:= i;
+       jListView_add22(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, Self.Items.Strings[i], FDelimiter, FImageItem.GetJavaBitmap);
+     end;
+  end
+  else
+  begin
+     FjObject:= jListView_Create3(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, Self,
+                               Ord(FWidgetItem), FWidgetText,
+                               Ord(FTextDecorated),Ord(FItemLayout), Ord(FTextSizeDecorated), Ord(FTextAlign));
+     if FFontColor <> colbrDefault then
+        jListView_setTextColor(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, GetARGB(FFontColor));
+
+     if FFontSize > 0 then
+        jListView_setTextSize(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, FFontSize);
+
+     if FColor <> colbrDefault then
+        jView_SetBackGroundColor(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, GetARGB(FColor));
+
+     for i:= 0 to Self.Items.Count-1 do
+        jListView_add2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, Self.Items.Strings[i], FDelimiter);
+  end;
+
 
   if FParentPanel <> nil then
   begin
@@ -5328,6 +5464,7 @@ begin
       jListView_addlParamsAnchorRule(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, GetPositionRelativeToAnchor(rToA));
     end;
   end;
+
   for rToP := rpBottom to rpCenterVertical do
   begin
      if rToP in FPositionRelativeToParent then
@@ -5335,22 +5472,78 @@ begin
        jListView_addlParamsParentRule(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, GetPositionRelativeToParent(rToP));
      end;
   end;
+
   if Self.Anchor <> nil then Self.AnchorId:= Self.Anchor.Id
   else Self.AnchorId:= -1;
+
   jListView_setLayoutAll(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, Self.AnchorId);
 
-  if FFontColor <> colbrDefault then
-     jListView_setTextColor(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, GetARGB(FFontColor));
-  if FFontSize > 0 then
-     jListView_setTextSize(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, FFontSize);
-  if FColor <> colbrDefault then
-     jView_SetBackGroundColor(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, GetARGB(FColor));
   jView_SetVisible(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, FVisible);
-  for i:= 0 to FItems.Count - 1 do
-  begin
-    jListView_add(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, FItems.Strings[i]);
-  end;
+
   FInitialized:= True;
+end;
+
+procedure jListView.SetWidget(Value: TWidgetItem);
+begin
+  FWidgetItem:= Value;
+ // if FInitialized then
+   //  jListView_setHasWidgetItem(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, ord(FHasWidgetItem));
+end;
+
+procedure jListView.SetWidgetByIndex(Value: TWidgetItem; index: integer);
+begin
+    if FInitialized then
+     jListView_setWidgetItem2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, ord(Value), index);
+end;
+
+procedure jListView.SetWidgetByIndex(Value: TWidgetItem; txt: string; index: integer);
+begin
+    if FInitialized then
+     jListView_setWidgetItem3(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, ord(Value), txt, index);
+end;
+
+procedure jListView.SetWidgetTextByIndex(txt: string; index: integer);
+begin
+   if FInitialized then
+      jListView_setWidgetText(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis,FjObject,txt,index);
+end;
+
+procedure jListView.SetTextDecoratedByIndex(Value: TTextDecorated; index: integer);
+begin
+  if FInitialized then
+   jListView_setTextDecorated(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, ord(Value), index);
+end;
+
+procedure jListView.SetTextSizeDecoratedByIndex(value: TTextSizeDecorated; index: integer);
+begin
+  if FInitialized then
+   jListView_setTextSizeDecorated(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, Ord(value), index);
+end;
+
+procedure jListView.SetLayoutByIndex(Value: TItemLayout; index: integer);
+begin
+  if FInitialized then
+   jListView_setItemLayout(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, ord(Value), index);
+end;
+
+procedure jListView.SetImageByIndex(Value: jObject; index: integer);
+begin
+  //FHasWidgetItem:= Value;
+  if FInitialized then
+     jListView_SetImageItem(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, Value, index);
+end;
+
+procedure jListView.SetTextAlignByIndex(Value: TTextAlign; index: integer);
+begin
+  if FInitialized then
+    jListView_setTextAlign(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, ord(Value), index);
+end;
+
+
+function jListView.IsItemChecked(index: integer): boolean;
+begin
+  if FInitialized then
+    Result:= jListView_IsItemChecked(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, index);
 end;
 
 procedure jListView.SetParent(Value: jObject);
@@ -5380,18 +5573,33 @@ begin
      jView_Invalidate(jForm(Owner).App.Jni.jEnv,jForm(Owner).App.Jni.jThis, FjObject);
 end;
 
+
 Procedure jListView.SetFontColor(Value: TARGBColorBridge);
 begin
   FFontColor:= Value;
-  if (FInitialized = True) and (FFontColor <> colbrDefault ) then
-     jListView_setTextColor2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, GetARGB(FFontColor));
+  //if (FInitialized = True) and (FFontColor <> colbrDefault ) then
+    // jListView_setTextColor2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, GetARGB(FFontColor), index);
+end;
+
+Procedure jListView.SetFontColorByIndex(Value: TARGBColorBridge; index: integer);
+begin
+  //FFontColor:= Value;
+  if FInitialized  and (Value <> colbrDefault) then
+     jListView_setTextColor2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, GetARGB(Value), index);
 end;
 
 Procedure jListView.SetFontSize(Value: DWord);
 begin
   FFontSize:= Value;
-  if FInitialized and (FFontSize > 0) then
-     jListView_setTextSize2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, FFontSize);
+  //if FInitialized and (FFontSize > 0) then
+   //  jListView_setTextSize2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, FFontSize, index);
+end;
+
+Procedure jListView.SetFontSizeByIndex(Value: DWord; index: integer);
+begin
+  //FFontSize:= Value;
+  if FInitialized and (Value > 0) then
+     jListView_setTextSize2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, Value, index);
 end;
 
 // LORDMAN 2013-08-07
@@ -5402,21 +5610,29 @@ begin
 end;
 
 //
-Procedure jListView.Item_Add(item : string);
+Procedure jListView.Add(item: string; delim: string);
 begin
   if FInitialized then
-     jListView_add2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, item);
+     jListView_add2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, item,delim);
+end;
+
+Procedure jListView.Add(item: string; delim: string; fColor: TARGBColorBridge; fSize: integer; hasWidget:
+                                      TWidgetItem; widgetText: string; image: jObject);
+begin
+  if FInitialized then
+     jListView_add3(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, item,
+    delim, GetARGB(fColor), fSize, Ord(hasWidget), widgetText, image);
 end;
 
 //
-Procedure jListView.Item_Delete(index: Integer);
+Procedure jListView.Delete(index: Integer);
 begin
   if FInitialized then
      jListView_delete2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, index);
 end;
 
 //
-Procedure jListView.Item_Clear;
+Procedure jListView.Clear;
 begin
   if FInitialized then
     jListView_clear2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject);
@@ -5433,14 +5649,15 @@ procedure jListView.ListViewChange(Sender: TObject);
 var
   i: integer;
 begin
-  if FInitialized then
+{  if FInitialized then
   begin
     jListView_clear2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject);
     for i:= 0 to FItems.Count - 1 do
     begin
-       jListView_add2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, FItems.Strings[i]);
+       jListView_add2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, FItems.Strings[i],
+                                    FDelimiter, GetARGB(FFontColor), FFontSize, FWidgetText, Ord(FWidgetItem));
     end;
-  end;
+  end; }
 end;
 
 procedure jListView.SetParamWidth(Value: TLayoutParams);
@@ -5473,10 +5690,44 @@ begin
    jListView_setLayoutAll2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, Self.AnchorId);
 end;
 
+procedure jListView.Notification(AComponent: TComponent; Operation: TOperation);
+begin
+  inherited;
+  if Operation = opRemove then
+  begin
+      if AComponent = FImageItem then
+      begin
+        FImageItem:= nil;
+      end
+  end;
+end;
+
+procedure jListView.SetImage(Value: jBitmap);
+begin
+  if Value <> FImageItem then
+  begin
+    if Assigned(FImageItem) then
+    begin
+       FImageItem.RemoveFreeNotification(Self); //remove free notification...
+    end;
+    FImageItem:= Value;
+    if Value <> nil then  //re- add free notification...
+    begin
+       Value.FreeNotification(self);
+    end;
+  end;
+end;
+
 // Event : Java -> Pascal
 Procedure jListView.GenEvent_OnClick(Obj: TObject; Value: integer);
 begin
   if Assigned(FOnClickItem) then FOnClickItem(Obj,Value);
+end;
+
+//by jmpessoa
+procedure jListView.GenEvent_OnClickWidgetItem(Obj: TObject; index: integer; checked: boolean);
+begin
+  if Assigned(FOnClickWidgetItem) then FOnClickWidgetItem(Obj,index,checked);
 end;
 
 //------------------------------------------------------------------------------
@@ -6312,7 +6563,7 @@ Function jBitmap.GetJavaBitmap: jObject;
 begin
   if FInitialized then
   begin
-     Result:= jBitmap_getJavaBitmap2(jForm(Owner).App.Jni.jEnv,jForm(Owner).App.Jni.jThis, FjObject);
+     Result:= jBitmap_jInstance2(jForm(Owner).App.Jni.jEnv,jForm(Owner).App.Jni.jThis, FjObject);
   end;
 end;
 
@@ -6406,7 +6657,12 @@ end;
 procedure jBitmap.SetImageIndex(Value: integer);
 begin
   FImageIndex:= Value;
-  if FInitialized then SetImageByIndex(Value);
+  if FInitialized then
+  begin
+    if Value > FImageList.Images.Count then  FImageIndex:= FImageList.Images.Count;
+    if Value < 0 then  FImageIndex:= 0;
+    SetImageByIndex(FImageIndex);
+  end;
 end;
 
 Procedure jBitmap.SetImageByName(Value: string);
@@ -6665,7 +6921,7 @@ end;
 Procedure jCanvas.drawBitmap(bmp: jBitmap; b,l,r,t: integer);
 begin
   if FInitialized then
-     jCanvas_drawBitmap2(jForm(Owner).App.Jni.jEnv,jForm(Owner).App.Jni.jThis,FjObject,bmp.GetjavaBitmap, b, l, r, t);
+     jCanvas_drawBitmap2(jForm(Owner).App.Jni.jEnv,jForm(Owner).App.Jni.jThis,FjObject,bmp.GetJavaBitmap, b, l, r, t);
 end;
 
 Procedure jCanvas.drawBitmap(bmp: jBitmap; x1, y1, size: integer; ratio: single);
@@ -6675,13 +6931,23 @@ begin
   r1:= Round(size-20);
   t1:= Round((size-20)*(1/ratio));
   if FInitialized then
-    jCanvas_drawBitmap2(jForm(Owner).App.Jni.jEnv,jForm(Owner).App.Jni.jThis,FjObject,bmp.GetjavaBitmap, x1, y1, r1, t1);
+    jCanvas_drawBitmap2(jForm(Owner).App.Jni.jEnv,jForm(Owner).App.Jni.jThis,FjObject, bmp.GetJavaBitmap, x1, y1, r1, t1);
 end;
 
-Procedure jCanvas.drawBitmap(bmp: jObject;b,l,r,t: integer);
+Procedure jCanvas.drawBitmap(bmp: jObject; b,l,r,t: integer);
 begin
   if FInitialized then
-     jCanvas_drawBitmap2(jForm(Owner).App.Jni.jEnv,jForm(Owner).App.Jni.jThis,FjObject, bmp, b, l, r, t);
+     jCanvas_drawBitmap2(jForm(Owner).App.Jni.jEnv,jForm(Owner).App.Jni.jThis,FjObject,bmp, b, l, r, t);
+end;
+
+Procedure jCanvas.drawBitmap(bmp: jObject; x1, y1, size: integer; ratio: single);
+var
+  r1, t1: integer;
+begin
+  r1:= Round(size-20);
+  t1:= Round((size-20)*(1/ratio));
+  if FInitialized then
+    jCanvas_drawBitmap2(jForm(Owner).App.Jni.jEnv,jForm(Owner).App.Jni.jThis,FjObject, bmp, x1, y1, r1, t1);
 end;
 
 //------------------------------------------------------------------------------

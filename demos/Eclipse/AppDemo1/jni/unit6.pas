@@ -13,11 +13,13 @@ type
   { TAndroidModule6 }
 
   TAndroidModule6 = class(jForm)
+      jBitmap1: jBitmap;
       jButton1: jButton;
       jButton2: jButton;
       jButton3: jButton;
       jEditText1: jEditText;
       jEditText2: jEditText;
+      jImageList1: jImageList;
       jListView1: jListView;
       jTextView1: jTextView;
       jTextView2: jTextView;
@@ -31,6 +33,8 @@ type
       procedure jButton2Click(Sender: TObject);
       procedure jButton3Click(Sender: TObject);
       procedure jListView1ClickItem(Sender: TObject; Item: Integer);
+      procedure jListView1ClickWidgetItem(Sender: TObject; Item: integer;
+        checked: boolean);
     private
       {private declarations}
     public
@@ -74,10 +78,37 @@ end;
 
 procedure TAndroidModule6.jButton1Click(Sender: TObject);
 begin
-  if jEditText1.Text <> '' then
-    jListView1.Items.Add(jEditText1.Text)
+
+  jBitmap1.ImageIndex:= 3;   //set image
+
+  if jEditText1.Text = '' then
+     jListView1.Add('Hello|World!', jListView1.Delimiter, jListView1.FontColor,
+                    jListView1.FontSize, jListView1.WidgetItem,'', jBitmap1.GetJavaBitmap)
   else
-    jListView1.Items.Add('item_'+ IntToStr(Random(100)));
+    jListView1.Add(jEditText1.Text, jListView1.Delimiter, jListView1.FontColor,
+                   jListView1.FontSize, jListView1.WidgetItem,'', jBitmap1.GetJavaBitmap);
+
+  //APIs Demo... change Item index = 2
+
+  jBitmap1.ImageIndex:= 3;  //change image
+  jListView1.SetImageByIndex(jBitmap1.GetJavaBitmap, 2);
+
+  jListView1.SetFontColorByIndex(colbrGreen, 2);
+  jListView1.SetFontSizeByIndex(16, 2);
+  jListView1.SetTextDecoratedByIndex(txtItalicAndBold, 2);
+
+  //or
+  //jListView1.SetWidgetByIndex(wgTextView,'hello!',2);
+
+  //or
+  jListView1.SetWidgetByIndex(wgRadioButton, 2);
+
+  jListView1.SetTextAlignByIndex(alCenter, 2);
+
+  jListView1.SetTextSizeDecoratedByIndex(sdDecreasing, 2);
+
+  jListView1.SetLayoutByIndex(layWidgetTextImage,2);  //cahange layout
+
 end;
 
 procedure TAndroidModule6.jButton2Click(Sender: TObject);
@@ -89,19 +120,29 @@ begin
      index:= StrToInt(jEditText2.Text);
      if (index < jListView1.Items.Count) and (index >=0) then
      begin
-        jListView1.Items.Delete(index);
+        jListView1.Delete(index);
      end;
   end;
 end;
 
 procedure TAndroidModule6.jButton3Click(Sender: TObject);
 begin
-  jListView1.Items.Clear;
+  jListView1.Clear;
 end;
 
 procedure TAndroidModule6.jListView1ClickItem(Sender: TObject; Item: Integer);
+var
+  strCheck: string;
 begin
-  ShowMessage(IntToStr(Item));
+  if jListView1.IsItemChecked(Item) then strCheck:= 'checked!'
+  else strCheck:= 'not checked!';
+  ShowMessage(IntToStr(Item)+ ' :: ' + strCheck);
+end;
+
+procedure TAndroidModule6.jListView1ClickWidgetItem(Sender: TObject;
+  Item: integer; checked: boolean);
+begin
+   ShowMessage('ClickWidgetItem...');
 end;
 
 end.

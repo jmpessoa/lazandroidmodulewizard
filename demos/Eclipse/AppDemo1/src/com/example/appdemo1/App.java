@@ -1,8 +1,7 @@
 package com.example.appdemo1;
 
 
-//Android Java Interface for Pascal/Delphi XE5
-//[and Lazarus by jmpessoa@hotmail.com - december/2013)
+//Android Java Interface for Pascal/Delphi XE5 (and Lazarus by jmpessoa)
 
 //Developers
 //          Simon,Choi / Choi,Won-sik
@@ -33,15 +32,15 @@ public class App extends Activity {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-     super.onCreate(savedInstanceState);                            
+      super.onCreate(savedInstanceState);                            
      
       //by jmpessoa --- fix for http get    
       //ref. http://stackoverflow.com/questions/8706464/defaulthttpclient-to-androidhttpclient 
 
-     if (android.os.Build.VERSION.SDK_INT > 9) {
+      if (android.os.Build.VERSION.SDK_INT > 9) {
          StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
          StrictMode.setThreadPolicy(policy);
-     }
+      }
      
       Log.i("jApp","01.Activity.onCreate");
       controls             = new Controls();

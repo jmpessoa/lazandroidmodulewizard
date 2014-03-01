@@ -14,6 +14,7 @@ type
 
   TAndroidModule9 = class(jForm)
       jBitmap1: jBitmap;
+      jButton1: jButton;
       jCanvas1: jCanvas;
       jImageList1: jImageList;
       jTextView1: jTextView;
@@ -21,16 +22,19 @@ type
       procedure DataModuleCloseQuery(Sender: TObject; var CanClose: boolean);
       procedure DataModuleCreate(Sender: TObject);
       procedure DataModuleJNIPrompt(Sender: TObject);
-      procedure DataModuleRotate(Sender: TObject; rotate: integer;
-        var rstRotate: integer);
+      procedure DataModuleRotate(Sender: TObject; rotate: integer; var rstRotate: integer);
+      procedure jButton1Click(Sender: TObject);
       procedure jView1Draw(Sender: TObject; Canvas: jCanvas);
       procedure jView1TouchMove(Sender: TObject; Touch: TMouch);
     private
       {private declarations}
+
     public
       {public declarations}
       P: TPoint;
-      function CalcBitmapRatio : Single;
+      Ratio : Single;
+      SwapCanMode: integer;
+      //function CalcBitmapRatio : Single;
   end;
   
 var
@@ -49,21 +53,16 @@ begin
 end;
 
 procedure TAndroidModule9.jView1Draw(Sender: TObject; Canvas: jCanvas);
-var
-  Ratio : Single;
 begin
-
-   //jView1.Canvas.PaintColor:= colbrGreen;
-  //jView1.Canvas.PaintStyle:= psFillAndStroke;
-  //jView1.Canvas.PaintTextSize:= 20;
-
-  Ratio := CalcBitmapRatio;
-  jView1.Canvas.drawBitmap(jBitmap1,10,10, jView1.Width-20,Round( (jView1.Width-20)*(1/Ratio) ) );
-  jView1.Canvas.drawText('P(x,y)= (' + IntToStr(P.X) + ',' + IntToStr(P.Y)+')',60,60);
+     //jView1.Canvas.PaintColor:= colbrGreen;
+     //jView1.Canvas.PaintStyle:= psFillAndStroke;
+     //jView1.Canvas.PaintTextSize:= 20;
+     //jView1.Canvas.drawBitmap(jBitmap1,10,10, jView1.Width-20,Round( (jView1.Width-20)*(1/Ratio) ) );
+     jView1.Canvas.drawBitmap(jBitmap1,10,10, jView1.Width, Ratio);
+     jView1.Canvas.drawText('P(x,y)= (' + IntToStr(P.X) + ',' + IntToStr(P.Y)+')',60,60);
 end;
 
-procedure TAndroidModule9.DataModuleCloseQuery(Sender: TObject;
-  var CanClose: boolean);
+procedure TAndroidModule9.DataModuleCloseQuery(Sender: TObject; var CanClose: boolean);
 begin
   CanClose:= True;
 end;
@@ -82,7 +81,9 @@ procedure TAndroidModule9.DataModuleJNIPrompt(Sender: TObject);
 begin
   P.X:= 30;
   P.Y:= 30;
+  SwapCanMode:= 0;
   Self.Show;
+  Ratio:= jBitmap1.GetRatio;
 end;
 
 procedure TAndroidModule9.DataModuleRotate(Sender: TObject; rotate: integer;
@@ -91,41 +92,30 @@ begin
   Self.UpdateLayout;
 end;
 
-function TAndroidModule9.CalcBitmapRatio : Single;
+procedure TAndroidModule9.jButton1Click(Sender: TObject);
 var
-  k: integer;
-  row, col: integer;
-  PPixel : PScanLine;
-  PJavaPixel: PScanByte; {need by delphi mode!} //PJByte;
+   byteBuffer: TArrayOfByte;
+   size: integer;
+   PBytePixel: PScanByte;
+   PDWordPixel: PScanLine;
 begin
-  Result:= 1;  //dummy
-  if jBitmap1.GetInfo then
+
+  size:= jBitmap1.GetByteArrayFromBitmap({var}byteBuffer);  //just test!
+  jBitmap1.SetByteArrayToBitmap(byteBuffer, size);          //just test!
+  Setlength(byteBuffer, 0); //free byte buffer
+
+  if SwapCanMode = 0 then
   begin
-
-     //demo API LockPixels... parameter is "PScanLine"
-    jBitmap1.LockPixels(PPixel); //ok
-    for k := 0 to jBitmap1.Width*jBitmap1.Height-1 do  PPixel^[k]:= not PPixel^[k];  //ok
-    jBitmap1.UnlockPixels;
-
-     //demo API LockPixels - overloaded - paramenter is "PJavaPixel"
-    jBitmap1.LockPixels(PJavaPixel); //ok
-    k:= 0;
-    for row:= 0 to jBitmap1.Height-1 do  //ok
-    begin
-      for col:= 0 to jBitmap1.Width-1 do //ok
-      begin
-          PJavaPixel^[k*4]:=    not PJavaPixel^[k*4]; //delphi mode....
-          PJavaPixel^[k*4+1]:=   PJavaPixel^[k*4+1];
-          PJavaPixel^[k*4+2]:=  not PJavaPixel^[k*4+2];
-          PJavaPixel^[k*4+3]:=  not PJavaPixel^[k*4+3];
-          inc(k);
-      end;
-    end;
-
-    jBitmap1.UnlockPixels;
-
-    Result:= Round(jBitmap1.Width/jBitmap1.Height);
+    jBitmap1.ScanPixel(PDWordPixel);
+    SwapCanMode:= 1;
+  end
+  else
+  begin
+    jBitmap1.ScanPixel(PBytePixel, 4);
+    SwapCanMode:= 0;
   end;
+  jView1.Refresh;
+
 end;
 
 end.

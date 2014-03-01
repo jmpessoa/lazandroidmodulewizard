@@ -119,7 +119,15 @@ begin
 end;
 
 { Class:     com_example_appdemo1_Controls
-  Method:    pOnChange
+  Method:    pOnClickWidgetItem
+  Signature: (JIZ)V }
+procedure pOnClickWidgetItem(PEnv: PJNIEnv; this: JObject; pasobj: JLong; index: JInt; checked: JBoolean); cdecl;
+begin
+  Java_Event_pOnClickWidgetItem(PEnv,this,TObject(pasobj),index,Boolean(checked));
+end;
+
+{ Class:   com_example_appdemo1_Controls
+  Method:  pOnChange
   Signature: (JI)V }
 procedure pOnChange(PEnv: PJNIEnv; this: JObject; pasobj: JLong; EventType: JInt); cdecl;
 begin
@@ -198,7 +206,7 @@ begin
   Java_Event_pOnAsyncEvent(PEnv,this,TObject(pasobj),EventType,progress);
 end;
 
-const NativeMethods:array[0..23] of JNINativeMethod = (
+const NativeMethods:array[0..24] of JNINativeMethod = (
    (name:'pAppOnScreenStyle';
     signature:'()I';
     fnPtr:@pAppOnScreenStyle;),
@@ -241,6 +249,9 @@ const NativeMethods:array[0..23] of JNINativeMethod = (
    (name:'pOnClick';
     signature:'(JI)V';
     fnPtr:@pOnClick;),
+   (name:'pOnClickWidgetItem';
+    signature:'(JIZ)V';
+    fnPtr:@pOnClickWidgetItem;),
    (name:'pOnChange';
     signature:'(JI)V';
     fnPtr:@pOnChange;),
@@ -340,6 +351,7 @@ exports
   pAppOnConfigurationChanged name 'Java_com_example_appdemo1_Controls_pAppOnConfigurationChanged',
   pAppOnActivityResult name 'Java_com_example_appdemo1_Controls_pAppOnActivityResult',
   pOnClick name 'Java_com_example_appdemo1_Controls_pOnClick',
+  pOnClickWidgetItem name 'Java_com_example_appdemo1_Controls_pOnClickWidgetItem',
   pOnChange name 'Java_com_example_appdemo1_Controls_pOnChange',
   pOnEnter name 'Java_com_example_appdemo1_Controls_pOnEnter',
   pOnTimer name 'Java_com_example_appdemo1_Controls_pOnTimer',

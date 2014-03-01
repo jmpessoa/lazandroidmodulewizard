@@ -7,10 +7,10 @@ object AndroidModule6: TAndroidModule6
   OnCloseQuery = DataModuleCloseQuery
   OnRotate = DataModuleRotate
   OnJNIPrompt = DataModuleJNIPrompt
-  Height = 443
-  HorizontalOffset = 319
-  VerticalOffset = 145
-  Width = 224
+  Height = 488
+  HorizontalOffset = 322
+  VerticalOffset = 62
+  Width = 320
   object jTextView1: jTextView
     Id = 26515
     PosRelativeToAnchor = []
@@ -66,6 +66,7 @@ object AndroidModule6: TAndroidModule6
     Alignment = taLeft
     InputTypeEx = itxText
     LineMaxLength = 360
+    Text = 'Hello|World!'
     Visible = True
     BackgroundColor = colbrWhite
     FontColor = colbrDefault
@@ -177,15 +178,23 @@ object AndroidModule6: TAndroidModule6
     MarginRight = 10
     MarginBottom = 0
     Items.Strings = (
-      'Lazarus'
-      'Pascal'
-      'Android'
+      'Pascal|The Best Language'
+      'Lazarus|The Best IDE'
+      'Android|The Smart SO'
     )
     Visible = True
     BackgroundColor = colbrLightSteelBlue
     FontColor = colbrRed
     FontSize = 0
+    WidgetItem = wgCheckBox
+    ImageItem = jBitmap1
+    Delimiter = '|'
+    TextDecorated = txtBoldAndItalic
+    ItemLayout = layImageTextWidget
+    TextSizeDecorated = sdNone
+    TextAlign = alLeft
     OnClickItem = jListView1ClickItem
+    OnClickWidgetItem = jListView1ClickWidgetItem
     left = 96
     top = 208
   end
@@ -208,5 +217,24 @@ object AndroidModule6: TAndroidModule6
     OnClick = jButton3Click
     left = 96
     top = 376
+  end
+  object jBitmap1: jBitmap
+    FilePath = fpathData
+    ImageIndex = 0
+    Images = jImageList1
+    Width = 0
+    Height = 0
+    left = 176
+    top = 208
+  end
+  object jImageList1: jImageList
+    Images.Strings = (
+      'pascal4android32x32.png'
+      'laz4android32x32.png'
+      'android32x32.png'
+      'helloandroid32x32.png'
+    )
+    left = 248
+    top = 208
   end
 end

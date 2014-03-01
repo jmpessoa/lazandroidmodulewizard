@@ -11,7 +11,7 @@ object AndroidModule4: TAndroidModule4
   Height = 273
   HorizontalOffset = 319
   VerticalOffset = 145
-  Width = 308
+  Width = 426
   object jButton1: jButton
     Id = 31367
     Anchor = jTextView1

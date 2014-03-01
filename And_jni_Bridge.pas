@@ -710,10 +710,19 @@ function jImageView_getLParamWidth2(env:PJNIEnv;this:jobject; ImageView : jObjec
 
 // ListView
 Function  jListView_Create             (env:PJNIEnv;this:jobject;
-                                        context : jObject; SelfObj : TObject) : jObject;
+                                        context : jObject; SelfObj : TObject;
+                                        hasWidget: integer; delimiter: string) : jObject;
 
 //by jmpessoa
-Function  jListView_Create2             (env:PJNIEnv; this:jobject; SelfObj: TObject): jObject;
+Function  jListView_Create2             (env:PJNIEnv; this:jobject; SelfObj: TObject;
+                                         {ftColor: integer; ftSize: integer;} widget: integer;
+                                         widgetText: string; image: jObject;
+                                         txtDecorated: integer; itemLay: integer; txtSizeDec: integer; txtAlign: integer): jObject;
+
+Function  jListView_Create3             (env:PJNIEnv; this:jobject; SelfObj: TObject;
+                                         {ftColor: integer; ftSize: integer;} widget: integer;
+                                         widgetText: string;
+                                         txtDecorated: integer; itemLay: integer; txtSizeDec: integer; txtAlign: integer): jObject;
 
 Procedure jListView_Free               (env:PJNIEnv;this:jobject; ListView : jObject);
 
@@ -726,10 +735,10 @@ Procedure jListView_setParent          (env:PJNIEnv;this:jobject;
 Procedure jListView_setParent2          (env:PJNIEnv;this:jobject;
                                         ListView : jObject;ViewGroup : jObject);
 Procedure jListView_setTextColor       (env:PJNIEnv;this:jobject; ListView : jObject; color : DWord);
-Procedure jListView_setTextColor2       (env:PJNIEnv;this:jobject; ListView : jObject; color : DWord);
+Procedure jListView_setTextColor2       (env:PJNIEnv;this:jobject; ListView : jObject; color : DWord; index: integer);
 
 Procedure jListView_setTextSize        (env:PJNIEnv;this:jobject; ListView : jObject; size  : DWord);
-Procedure jListView_setTextSize2        (env:PJNIEnv;this:jobject; ListView : jObject; size  : DWord);
+Procedure jListView_setTextSize2        (env:PJNIEnv;this:jobject; ListView : jObject; size  : DWord; index: integer);
 
 Procedure jListView_setItemPosition    (env:PJNIEnv;this:jobject;
                                         ListView : jObject; Pos: integer; y:Integer );
@@ -738,10 +747,23 @@ Procedure jListView_setItemPosition2    (env:PJNIEnv;this:jobject;
                                         ListView : jObject; Pos: integer; y:Integer );
 //
 Procedure jListView_add                (env:PJNIEnv;this:jobject;
-                                        ListView : jObject; Str : String);
+                                        ListView : jObject; Str : string;
+                                        delimiter: string; fontColor: integer; fontSize: integer; hasWidgetItem: integer);
 //by jmpessoa
-Procedure jListView_add2                (env:PJNIEnv;this:jobject;
-                                        ListView : jObject; Str : String);
+Procedure jListView_add2(env:PJNIEnv;this:jobject; ListView: jObject; Str: string; delimiter: string);
+
+Procedure jListView_add22(env:PJNIEnv;this:jobject; ListView: jObject; Str: string; delimiter: string; image: jObject);
+
+Procedure jListView_add3                (env:PJNIEnv;this:jobject;
+                                        ListView : jObject; Str : string;
+                                        delimiter: string; fontColor: integer; fontSize: integer;
+                                        widgetItem: integer; widgetText: string; image: jObject);
+
+Procedure jListView_add4                (env:PJNIEnv;this:jobject;
+                                        ListView : jObject; Str : string;
+                                        delimiter: string; fontColor: integer; fontSize: integer;
+                                        widgetItem: integer; widgetText: string);
+
 
 Procedure jListView_clear              (env:PJNIEnv;this:jobject;
                                         ListView : jObject);
@@ -758,6 +780,25 @@ Procedure jListView_delete2             (env:PJNIEnv;this:jobject;
 
 //by jmpessoa
 Procedure jListView_setId(env:PJNIEnv;this:jobject; ListView : jObject; id: DWord);
+
+Procedure jListView_setWidgetItem(env:PJNIEnv;this:jobject; ListView : jObject; value: integer);
+
+Procedure jListView_setWidgetItem2(env:PJNIEnv;this:jobject; ListView : jObject; value: integer; index: integer);
+Procedure jListView_setWidgetItem3(env:PJNIEnv;this:jobject; ListView : jObject; value: integer; txt: string; index: integer);
+Procedure jListView_setWidgetText(env:PJNIEnv;this:jobject; ListView : jObject; txt: string; index: integer);
+
+Procedure jListView_setTextDecorated(env:PJNIEnv;this:jobject; ListView : jObject; value: integer; index: integer);
+Procedure jListView_setTextSizeDecorated(env:PJNIEnv;this:jobject; ListView : jObject; value: integer; index:integer);
+
+Procedure jListView_setItemLayout(env:PJNIEnv;this:jobject; ListView : jObject; value: integer; index: integer);
+
+
+Procedure jListView_setImageItem(env:PJNIEnv;this:jobject; ListView : jObject; bitmap: jObject; index: integer);
+
+Procedure jListView_setTextAlign(env:PJNIEnv;this:jobject; ListView : jObject; value: integer; index: integer);
+
+function jListView_IsItemChecked(env:PJNIEnv;this:jobject; ListView : jObject; index: integer): boolean;
+
 Procedure jListView_setMarginLeft(env:PJNIEnv;this:jobject; ListView : jObject; x: DWord);
 Procedure jListView_setMarginTop(env:PJNIEnv;this:jobject; ListView : jObject; y: DWord);
 Procedure jListView_setMarginRight(env:PJNIEnv;this:jobject; ListView : jObject; x: DWord);
@@ -1085,10 +1126,10 @@ Procedure jBitmap_getWH                (env:PJNIEnv;this:jobject;
 Procedure jBitmap_getWH2                (env:PJNIEnv;this:jobject;
                                         jbitmap : jObject; var w,h : integer);
 
-Function  jBitmap_getJavaBitmap        (env:PJNIEnv;this:jobject;
+Function  jBitmap_jInstance(env:PJNIEnv;this:jobject;
                                         jbitmap : jObject) : jObject;
 //by jmpessoa
-Function  jBitmap_getJavaBitmap2(env:PJNIEnv; this:jobject; jbitmap: jObject): jObject;
+Function  jBitmap_jInstance2(env:PJNIEnv; this:jobject; jbitmap: jObject): jObject;
 
 //by jmpessoa
 function jBitmap_GetByteArrayFromBitmap(env:PJNIEnv; this:jobject; jbitmap: jObject;
@@ -5969,40 +6010,87 @@ end;
 //------------------------------------------------------------------------------
 // ListView
 //------------------------------------------------------------------------------
-
 //
-Function  jListView_Create  (env:PJNIEnv;this:jobject;
-                             context : jObject; SelfObj : TObject) : jObject;
- Const
+function  jListView_Create(env:PJNIEnv;this:jobject;
+                             context : jObject; SelfObj : TObject; hasWidget: integer; delimiter: string) : jObject;
+const
   _cFuncName = 'jListView_Create';
-  _cFuncSig  = '(Landroid/content/Context;J)Ljava/lang/Object;';
- Var
+  _cFuncSig  = '(Landroid/content/Context;JILjava/lang/String;)Ljava/lang/Object;';
+var
   _jMethod : jMethodID = nil;
-  _jParams : array[0..1] of jValue;
- begin
+  _jParams : array[0..3] of jValue;
+begin
   jClassMethod(_cFuncName,_cFuncSig,env,gjClass,_jMethod);
   _jParams[0].l := context;
   _jParams[1].j := Int64(SelfObj);
+  _jParams[2].i := hasWidget;
+  _jParams[3].l := env^.NewStringUTF(env, pchar(delimiter) );
   Result := env^.CallObjectMethodA(env,this,_jMethod,@_jParams);
   Result := env^.NewGlobalRef(env,Result);
- end;
+  env^.DeleteLocalRef(env,_jParams[3].l);
+end;
 
 //by jmpessoa
-function jListView_Create2(env: PJNIEnv; this:jobject;  SelfObj: TObject): jObject;
+function jListView_Create2(env:PJNIEnv; this:jobject; SelfObj: TObject;
+                                         {ftColor: integer; ftSize: integer;} widget: integer;
+                                         widgetText: string; image: jObject;
+                                         txtDecorated: integer; itemLay: integer; txtSizeDec: integer; txtAlign: integer): jObject;
 var
- _jMethod : jMethodID = nil;
- _jParams : array[0..0] of jValue;
+ _jMethod: jMethodID = nil;
+ _jParams: array[0..7] of jValue;
  cls: jClass;
 begin
-  cls:= Get_gjClass(env); {global}          {warning: a jmethodID is not an object. So don't need to convert it to a GlobalRef!}
-  _jMethod:= env^.GetMethodID(env, cls, 'jListView_Create2', '(J)Ljava/lang/Object;');
-  _jParams[0].j := Int64(SelfObj);
+ _jParams[0].j := Int64(SelfObj);
+ //_jParams[1].i := ftColor;
+// _jParams[2].i := ftSize;
+ _jParams[1].i := widget;
+ _jParams[2].l := env^.NewStringUTF(env, PChar(widgetText));
+ _jParams[3].l := image;
+ _jParams[4].i := txtDecorated;
+ _jParams[5].i := itemLay;
+ _jParams[6].i := txtSizeDec;
+ _jParams[7].i := txtAlign;
+  cls:= Get_gjClass(env); {global}
+  {jmpessoa/warning: a jmethodID is not an object. So don't need to convert it to a GlobalRef!}
+ _jMethod:= env^.GetMethodID(env, cls, 'jListView_Create2',
+                                       '(JILjava/lang/String;Landroid/graphics/Bitmap;IIII)Ljava/lang/Object;');
   Result := env^.CallObjectMethodA(env, this, _jMethod,@_jParams);
   Result := env^.NewGlobalRef(env,Result);
+  env^.DeleteLocalRef(env,_jParams[2].l);
+end;
+
+
+//by jmpessoa
+function jListView_Create3(env:PJNIEnv; this:jobject; SelfObj: TObject;
+                                         {ftColor: integer; ftSize: integer;} widget: integer;
+                                         widgetText: string;
+                                         txtDecorated: integer; itemLay: integer; txtSizeDec: integer; txtAlign: integer): jObject;
+var
+ _jMethod: jMethodID = nil;
+ _jParams: array[0..6] of jValue;
+ cls: jClass;
+begin
+ _jParams[0].j := Int64(SelfObj);
+// _jParams[1].i := ftColor;
+// _jParams[2].i := ftSize;
+ _jParams[1].i := widget;
+ _jParams[2].l := env^.NewStringUTF(env, pchar(widgetText) );
+ _jParams[3].i := txtDecorated;
+ _jParams[4].i := itemLay;
+ _jParams[5].i := txtSizeDec;
+ _jParams[6].i := txtAlign;
+  cls:= Get_gjClass(env); {global}
+
+  {jmpessoa/warning: a jmethodID is not an object. So don't need to convert it to a GlobalRef!}
+ _jMethod:= env^.GetMethodID(env, cls, 'jListView_Create3',
+                                       '(JILjava/lang/String;IIII)Ljava/lang/Object;');
+  Result:= env^.CallObjectMethodA(env, this, _jMethod,@_jParams);
+  Result:= env^.NewGlobalRef(env,Result);
+  env^.DeleteLocalRef(env,_jParams[2].l);
 end;
 
 //
-Procedure jListView_Free   (env:PJNIEnv;this:jobject; ListView : jObject);
+Procedure jListView_Free(env:PJNIEnv;this:jobject; ListView : jObject);
   Const
    _cFuncName = 'jListView_Free';
    _cFuncSig  = '(Ljava/lang/Object;)V';
@@ -6028,15 +6116,15 @@ begin
 end;
 
 //
-Procedure jListView_setXYWH(env:PJNIEnv;this:jobject;
-                            ListView : jObject;x,y,w,h : integer);
- Const
+procedure jListView_setXYWH(env:PJNIEnv;this:jobject;
+                            ListView: jObject;x,y,w,h : integer);
+const
   _cFuncName = 'jListView_setXYWH';
   _cFuncSig  = '(Ljava/lang/Object;IIII)V';
- Var
+var
   _jMethod : jMethodID = nil;
   _jParams : array[0..4] of jValue;
- begin
+begin
   jClassMethod(_cFuncName,_cFuncSig,env,gjClass,_jMethod);
   _jParams[0].l := ListView;
   _jParams[1].i := x;
@@ -6044,7 +6132,7 @@ Procedure jListView_setXYWH(env:PJNIEnv;this:jobject;
   _jParams[3].i := w;
   _jParams[4].i := h;
   env^.CallVoidMethodA(env,this,_jMethod,@_jParams);
- end;
+end;
 
 Procedure jListView_setLeftTopRightBottomWidthHeight(env:PJNIEnv;this:jobject;
                                         ListView : jObject; ml,mt,mr,mb,w,h: integer);
@@ -6112,21 +6200,21 @@ Const
  end;
 
 Procedure jListView_setTextColor2(env:PJNIEnv;this:jobject;
-                                  ListView : jObject; color : DWord);
+                                  ListView : jObject; color : DWord; index: integer);
  var
    _jMethod : jMethodID = nil;
-   _jParams : array[0..0] of jValue;
+   _jParams : array[0..1] of jValue;
    cls: jClass;
  begin
    _jParams[0].i := color;
+   _jParams[1].i := index;
    cls := env^.GetObjectClass(env, ListView);
-   _jMethod:= env^.GetMethodID(env, cls, 'setTextColor2', '(I)V');
+   _jMethod:= env^.GetMethodID(env, cls, 'setTextColor2', '(II)V');
    env^.CallVoidMethodA(env,ListView,_jMethod,@_jParams);
  end;
 
 //
-Procedure jListView_setTextSize  (env:PJNIEnv;this:jobject;
-                                  ListView : jObject; size  : DWord);
+Procedure jListView_setTextSize(env:PJNIEnv;this:jobject; ListView : jObject; size  : DWord);
 Const
  _cFuncName = 'jListView_setTextSize';
  _cFuncSig  = '(Ljava/lang/Object;I)V';
@@ -6142,15 +6230,16 @@ end;
 
 
 Procedure jListView_setTextSize2  (env:PJNIEnv;this:jobject;
-                                  ListView : jObject; size  : DWord);
+                                  ListView : jObject; size  : DWord; index: integer);
 var
  _jMethod : jMethodID = nil;
- _jParams : array[0..0] of jValue;
+ _jParams : array[0..1] of jValue;
  cls: jClass;
 begin
  _jParams[0].i := size;
+ _jParams[1].i := index;
    cls := env^.GetObjectClass(env, ListView);
- _jMethod:= env^.GetMethodID(env, cls, 'setTextSize', '(I)V');
+ _jMethod:= env^.GetMethodID(env, cls, 'setTextSize2', '(II)V');
  env^.CallVoidMethodA(env,ListView,_jMethod,@_jParams);
 end;
 
@@ -6188,33 +6277,103 @@ begin
 end;
 
 // Java Function
-Procedure jListView_add(env:PJNIEnv;this:jobject; ListView : jObject; Str : String);
- Const
+Procedure jListView_add(env:PJNIEnv;this:jobject; ListView : jObject; Str : string;
+                                        delimiter: string; fontColor: integer; fontSize: integer; hasWidgetItem: integer);
+const
   _cFuncName = 'jListView_add';
-  _cFuncSig  = '(Ljava/lang/Object;Ljava/lang/String;)V';
- Var
+  _cFuncSig  = '(Ljava/lang/Object;Ljava/lang/String;Ljava/lang/String;III)V';
+var
   _jMethod: jMethodID = nil;
-  _jParams: array[0..1] of jValue;
- begin
+  _jParams: array[0..5] of jValue;
+begin
   jClassMethod(_cFuncName,_cFuncSig,env,gjClass,_jMethod);
   _jParams[0].l := ListView;
   _jParams[1].l := env^.NewStringUTF(env, pchar(Str) );
+  _jParams[2].l := env^.NewStringUTF(env, pchar(delimiter) );
+  _jParams[3].i := fontColor;
+  _jParams[4].i := fontSize;
+  _jParams[5].i := hasWidgetItem;
   env^.CallVoidMethodA(env,this,_jMethod,@_jParams);
   env^.DeleteLocalRef(env,_jParams[1].l);
- end;
+  env^.DeleteLocalRef(env,_jParams[2].l);
+end;
 
 //by jmpessoa
-Procedure jListView_add2(env:PJNIEnv;this:jobject; ListView : jObject; Str : String);
+Procedure jListView_add2(env:PJNIEnv;this:jobject; ListView: jObject; Str: string; delimiter: string);
 var
   _jMethod: jMethodID = nil;
-  _jParams: array[0..0] of jValue;
+  _jParams: array[0..1] of jValue;
   cls: jClass;
 begin
   _jParams[0].l := env^.NewStringUTF(env, pchar(Str) );
+  _jParams[1].l := env^.NewStringUTF(env, pchar(delimiter) );
   cls := env^.GetObjectClass(env, ListView);
-  _jMethod:= env^.GetMethodID(env, cls, 'add', '(Ljava/lang/String;)V');
+  _jMethod:= env^.GetMethodID(env, cls, 'add2', '(Ljava/lang/String;Ljava/lang/String;)V');
   env^.CallVoidMethodA(env,ListView,_jMethod,@_jParams);
   env^.DeleteLocalRef(env,_jParams[0].l);
+  env^.DeleteLocalRef(env,_jParams[1].l);
+end;
+
+Procedure jListView_add22(env:PJNIEnv;this:jobject; ListView: jObject; Str: string; delimiter: string; image: jObject);
+var
+  _jMethod: jMethodID = nil;
+  _jParams: array[0..2] of jValue;
+  cls: jClass;
+begin
+  _jParams[0].l := env^.NewStringUTF(env, pchar(Str) );
+  _jParams[1].l := env^.NewStringUTF(env, pchar(delimiter) );
+  _jParams[2].l := image;
+  cls := env^.GetObjectClass(env, ListView);
+  _jMethod:= env^.GetMethodID(env, cls, 'add22', '(Ljava/lang/String;Ljava/lang/String;Landroid/graphics/Bitmap;)V');
+  env^.CallVoidMethodA(env,ListView,_jMethod,@_jParams);
+  env^.DeleteLocalRef(env,_jParams[0].l);
+  env^.DeleteLocalRef(env,_jParams[1].l);
+end;
+
+//by jmpessoa
+Procedure jListView_add3(env:PJNIEnv;this:jobject; ListView : jObject; Str : string;
+       delimiter: string; fontColor: integer; fontSize: integer; widgetItem: integer; widgetText: string;  image: jObject);
+var
+  _jMethod: jMethodID = nil;
+  _jParams: array[0..6] of jValue;
+  cls: jClass;
+begin
+  _jParams[0].l := env^.NewStringUTF(env, pchar(Str) );
+  _jParams[1].l := env^.NewStringUTF(env, pchar(delimiter) );
+  _jParams[2].i := fontColor;
+  _jParams[3].i := fontSize;
+  _jParams[4].i := widgetItem;
+  _jParams[5].l := env^.NewStringUTF(env, pchar(widgetText) );
+  _jParams[6].l := image;
+  cls:= env^.GetObjectClass(env, ListView);
+  _jMethod:= env^.GetMethodID(env, cls, 'add3', '(Ljava/lang/String;Ljava/lang/String;IIILjava/lang/String;Landroid/graphics/Bitmap;)V');
+  env^.CallVoidMethodA(env,ListView,_jMethod,@_jParams);
+  env^.DeleteLocalRef(env,_jParams[0].l);
+  env^.DeleteLocalRef(env,_jParams[1].l);
+  env^.DeleteLocalRef(env,_jParams[5].l);
+end;
+
+
+//by jmpessoa
+Procedure jListView_add4(env:PJNIEnv;this:jobject; ListView : jObject; Str : string;
+       delimiter: string; fontColor: integer; fontSize: integer; widgetItem: integer; widgetText: string);
+var
+  _jMethod: jMethodID = nil;
+  _jParams: array[0..5] of jValue;
+  cls: jClass;
+begin
+  _jParams[0].l := env^.NewStringUTF(env, pchar(Str) );
+  _jParams[1].l := env^.NewStringUTF(env, pchar(delimiter) );
+  _jParams[2].i := fontColor;
+  _jParams[3].i := fontSize;
+  _jParams[4].i := widgetItem;
+  _jParams[5].l := env^.NewStringUTF(env, pchar(widgetText) );
+  cls:= env^.GetObjectClass(env, ListView);
+  _jMethod:= env^.GetMethodID(env, cls, 'add4', '(Ljava/lang/String;Ljava/lang/String;IIILjava/lang/String;)V');
+  env^.CallVoidMethodA(env,ListView,_jMethod,@_jParams);
+  env^.DeleteLocalRef(env,_jParams[0].l);
+  env^.DeleteLocalRef(env,_jParams[1].l);
+  env^.DeleteLocalRef(env,_jParams[5].l);
 end;
 
 Procedure jListView_clear              (env:PJNIEnv;this:jobject;
@@ -6270,6 +6429,18 @@ begin
  env^.CallVoidMethodA(env,ListView,_jMethod,@_jParams);
 end;
 
+Procedure jListView_setImageItem(env:PJNIEnv;this:jobject; ListView : jObject; bitmap: jObject; index: integer);
+var
+ _jMethod : jMethodID = nil;
+ _jParams : array[0..1] of jValue;
+   cls: jClass;
+begin
+ _jParams[0].l := bitmap;
+ _jParams[1].i := index;
+ cls := env^.GetObjectClass(env, ListView);
+ _jMethod:= env^.GetMethodID(env, cls, 'setImageItem', '(Landroid/graphics/Bitmap;I)V');
+ env^.CallVoidMethodA(env,ListView,_jMethod,@_jParams);
+end;
 
 //by jmpessoa
 Procedure jListView_setId(env:PJNIEnv;this:jobject; ListView : jObject; id: DWord);
@@ -6286,6 +6457,129 @@ begin
  env^.CallVoidMethodA(env,this,_jMethod,@_jParams);
 end;
 
+//by jmpessoa
+Procedure jListView_setTextSizeDecorated(env:PJNIEnv;this:jobject; ListView : jObject; value: integer; index:integer);
+var
+ _jMethod : jMethodID = nil;
+ _jParams : array[0..1] of jValue;
+   cls: jClass;
+begin
+ _jParams[0].i := value;
+ _jParams[1].i := index;
+ cls := env^.GetObjectClass(env, ListView);
+ _jMethod:= env^.GetMethodID(env, cls, 'setTextSizeDecorated', '(II)V');
+ env^.CallVoidMethodA(env,ListView,_jMethod,@_jParams);
+end;
+
+Procedure jListView_setTextDecorated(env:PJNIEnv;this:jobject; ListView : jObject; value: integer; index: integer);
+var
+ _jMethod : jMethodID = nil;
+ _jParams : array[0..1] of jValue;
+   cls: jClass;
+begin
+ _jParams[0].i := value;
+ _jParams[1].i := index;
+ cls := env^.GetObjectClass(env, ListView);
+ _jMethod:= env^.GetMethodID(env, cls, 'setTextDecorated', '(II)V');
+ env^.CallVoidMethodA(env,ListView,_jMethod,@_jParams);
+end;
+
+Procedure jListView_setTextAlign(env:PJNIEnv;this:jobject; ListView : jObject; value: integer; index: integer);
+var
+ _jMethod : jMethodID = nil;
+ _jParams : array[0..1] of jValue;
+   cls: jClass;
+begin
+ _jParams[0].i := value;
+ _jParams[1].i := index;
+ cls := env^.GetObjectClass(env, ListView);
+ _jMethod:= env^.GetMethodID(env, cls, 'setTextAlign', '(II)V');
+ env^.CallVoidMethodA(env,ListView,_jMethod,@_jParams);
+end;
+
+Procedure jListView_setItemLayout(env:PJNIEnv;this:jobject; ListView : jObject; value: integer; index: integer);
+var
+ _jMethod : jMethodID = nil;
+ _jParams : array[0..1] of jValue;
+   cls: jClass;
+begin
+ _jParams[0].i := value;
+ _jParams[1].i := index;
+ cls := env^.GetObjectClass(env, ListView);
+ _jMethod:= env^.GetMethodID(env, cls, 'setItemLayout', '(II)V');
+ env^.CallVoidMethodA(env,ListView,_jMethod,@_jParams);
+end;
+
+//by jmpessoa
+Procedure jListView_setWidgetItem(env:PJNIEnv;this:jobject; ListView : jObject; value: integer);
+var
+ _jMethod : jMethodID = nil;
+ _jParams : array[0..0] of jValue;
+   cls: jClass;
+begin
+ _jParams[0].i := value;
+ cls := env^.GetObjectClass(env, ListView);
+ _jMethod:= env^.GetMethodID(env, cls, 'setWidgetItem', '(I)V');
+ env^.CallVoidMethodA(env,ListView,_jMethod,@_jParams);
+end;
+
+//by jmpessoa
+Procedure jListView_setWidgetItem2(env:PJNIEnv;this:jobject; ListView : jObject; value: integer; index: integer);
+var
+ _jMethod : jMethodID = nil;
+ _jParams : array[0..1] of jValue;
+   cls: jClass;
+begin
+ _jParams[0].i := value;
+ _jParams[1].i := index;
+ cls := env^.GetObjectClass(env, ListView);
+ _jMethod:= env^.GetMethodID(env, cls, 'setWidgetItem', '(II)V');
+ env^.CallVoidMethodA(env,ListView,_jMethod,@_jParams);
+end;
+
+Procedure jListView_setWidgetItem3(env:PJNIEnv;this:jobject; ListView : jObject; value: integer; txt: string; index: integer);
+var
+ _jMethod : jMethodID = nil;
+ _jParams : array[0..2] of jValue;
+   cls: jClass;
+begin
+ _jParams[0].i := value;
+ _jParams[1].l := env^.NewStringUTF(env, pchar(txt) );
+ _jParams[2].i := index;
+ cls := env^.GetObjectClass(env, ListView);
+ _jMethod:= env^.GetMethodID(env, cls, 'setWidgetItem', '(ILjava/lang/String;I)V');
+ env^.CallVoidMethodA(env,ListView,_jMethod,@_jParams);
+ env^.DeleteLocalRef(env,_jParams[1].l);
+end;
+
+Procedure jListView_setWidgetText(env:PJNIEnv;this:jobject; ListView : jObject; txt: string; index: integer);
+var
+ _jMethod : jMethodID = nil;
+ _jParams : array[0..1] of jValue;
+   cls: jClass;
+begin
+ _jParams[0].l := env^.NewStringUTF(env, pchar(txt) );
+ _jParams[1].i := index;
+ cls := env^.GetObjectClass(env, ListView);
+ _jMethod:= env^.GetMethodID(env, cls, 'setWidgetText', '(Ljava/lang/String;I)V');
+ env^.CallVoidMethodA(env,ListView,_jMethod,@_jParams);
+ env^.DeleteLocalRef(env,_jParams[0].l);
+end;
+
+function jListView_IsItemChecked(env:PJNIEnv;this:jobject; ListView : jObject; index: integer): boolean;
+var
+ _jMethod : jMethodID = nil;
+ _jParams : array[0..0] of jValue;
+   cls: jClass;
+   _jBool: jBoolean;
+begin
+ _jParams[0].i:= index;
+ cls := env^.GetObjectClass(env, ListView);
+ _jMethod:= env^.GetMethodID(env, cls, 'isItemChecked', '(I)Z');
+ _jBool:= env^.CallBooleanMethodA(env,ListView,_jMethod,@_jParams);
+ Result:= Boolean(_jBool);
+end;
+
 Procedure jListView_setMarginLeft(env:PJNIEnv;this:jobject; ListView : jObject; x: DWord);
 Const
  _cFuncName = 'jListView_setMarginLeft';
@@ -6299,6 +6593,7 @@ begin
  _jParams[1].i := x;
  env^.CallVoidMethodA(env,this,_jMethod,@_jParams);
 end;
+
 
 //by jmpessoa
 Procedure jListView_setMarginTop(env:PJNIEnv;this:jobject; ListView : jObject; y: DWord);
@@ -8724,10 +9019,10 @@ var
   env^.ReleaseIntArrayElements(env,_jIntArray,PIntSav,0);
  end;
 
-Function  jBitmap_getJavaBitmap (env:PJNIEnv;this:jobject;
+Function  jBitmap_jInstance(env:PJNIEnv;this:jobject;
                                  jbitmap : jObject) : jObject;
 Const
- _cFuncName = 'jBitmap_getJavaBitmap';
+ _cFuncName = 'jBitmap_jInstance';
  _cFuncSig  = '(Ljava/lang/Object;)Landroid/graphics/Bitmap;';
 Var
  _jMethod : jMethodID = nil;
@@ -8736,18 +9031,16 @@ begin
  jClassMethod(_cFuncName,_cFuncSig,env,gjClass,_jMethod);
  _jParam.l := jbitmap;
  Result := env^.CallObjectMethodA(env,this,_jMethod,@_jParam);
- Dbg('Pascal:jBitmap_getJavaBitmap');
 end;
 
 //by jmpessoa
-Function  jBitmap_getJavaBitmap2(env:PJNIEnv;this:jobject;
-                                 jbitmap : jObject) : jObject;
+Function  jBitmap_jInstance2(env:PJNIEnv;this:jobject; jbitmap: jObject): jObject;
 var
   _jMethod : jMethodID = nil;
   cls: jClass;
 begin
   cls := env^.GetObjectClass(env, jbitmap);
-  _jMethod:= env^.GetMethodID(env, cls, 'getJavaBitmap', '()Landroid/graphics/Bitmap;');
+  _jMethod:= env^.GetMethodID(env, cls,'jInstance', '()Landroid/graphics/Bitmap;');
   Result := env^.CallObjectMethod(env,jbitmap,_jMethod);
 end;
 
