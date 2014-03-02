@@ -82,7 +82,7 @@ begin
   jBitmap1.ImageIndex:= 3;   //set image
 
   if jEditText1.Text = '' then
-     jListView1.Add('Hello|World!', jListView1.Delimiter, jListView1.FontColor,
+     jListView1.Add('Hello|Android|World!', jListView1.Delimiter, jListView1.FontColor,
                     jListView1.FontSize, jListView1.WidgetItem,'', jBitmap1.GetJavaBitmap)
   else
     jListView1.Add(jEditText1.Text, jListView1.Delimiter, jListView1.FontColor,
@@ -134,15 +134,22 @@ procedure TAndroidModule6.jListView1ClickItem(Sender: TObject; Item: Integer);
 var
   strCheck: string;
 begin
+
   if jListView1.IsItemChecked(Item) then strCheck:= 'checked!'
   else strCheck:= 'not checked!';
-  ShowMessage(IntToStr(Item)+ ' :: ' + strCheck);
+
+  ShowMessage(IntToStr(Item)+ ' ['+ jListView1.GetText(Item)+ '] :'+ strCheck);
 end;
 
-procedure TAndroidModule6.jListView1ClickWidgetItem(Sender: TObject;
-  Item: integer; checked: boolean);
+procedure TAndroidModule6.jListView1ClickWidgetItem(Sender: TObject; Item: integer; checked: boolean);
+var
+  strCheck: string;
 begin
-   ShowMessage('ClickWidgetItem...');
+
+  if checked then strCheck:= 'checked!'
+  else strCheck:= 'not checked!';
+
+  ShowMessage('Item '+ IntToStr(Item) + ' is ' + strCheck);
 end;
 
 end.

@@ -1,4 +1,6 @@
 //------------------------------------------------------------------------------
+//[LazAndroidModuleWizard - ver.0.4_r.04 :01-mar-2014]
+//[https://github.com/jmpessoa/lazandroidmodulewizard]
 //
 // Android JNI Interface for Pascal/Delphi
 //[and Lazarus by jmpessoa@hotmail.com - december 2013]
@@ -798,6 +800,8 @@ Procedure jListView_setImageItem(env:PJNIEnv;this:jobject; ListView : jObject; b
 Procedure jListView_setTextAlign(env:PJNIEnv;this:jobject; ListView : jObject; value: integer; index: integer);
 
 function jListView_IsItemChecked(env:PJNIEnv;this:jobject; ListView : jObject; index: integer): boolean;
+
+function jListView_GetItemText(env:PJNIEnv;this:jobject; ListView : jObject; index: integer): String;
 
 Procedure jListView_setMarginLeft(env:PJNIEnv;this:jobject; ListView : jObject; x: DWord);
 Procedure jListView_setMarginTop(env:PJNIEnv;this:jobject; ListView : jObject; y: DWord);
@@ -6578,6 +6582,27 @@ begin
  _jMethod:= env^.GetMethodID(env, cls, 'isItemChecked', '(I)Z');
  _jBool:= env^.CallBooleanMethodA(env,ListView,_jMethod,@_jParams);
  Result:= Boolean(_jBool);
+end;
+
+function jListView_GetItemText(env:PJNIEnv;this:jobject; ListView : jObject; index: integer): String;
+var
+  _jMethod : jMethodID = nil;
+  _jString : jString;
+  _jBoolean: jBoolean;
+  cls: jClass;
+   _jParams : array[0..0] of jValue;
+begin
+   _jParams[0].i:= index;
+  cls := env^.GetObjectClass(env, ListView);
+  _jMethod:= env^.GetMethodID(env, cls, 'getItemText', '(I)Ljava/lang/String;');
+  _jString   := env^.CallObjectMethodA(env,ListView,_jMethod, @_jParams);
+  Case _jString = nil of
+   True : Result    := '';
+   False: begin
+            _jBoolean := JNI_False;
+            Result    := String( env^.GetStringUTFChars(env,_jString,@_jBoolean) );
+          end;
+  end;
 end;
 
 Procedure jListView_setMarginLeft(env:PJNIEnv;this:jobject; ListView : jObject; x: DWord);

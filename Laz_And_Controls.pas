@@ -1,4 +1,6 @@
 ﻿//------------------------------------------------------------------------------
+//[LazAndroidModuleWizard - ver.0.4_r.04 :01-mar-2014]
+//[https://github.com/jmpessoa/lazandroidmodulewizard]
 //
 //   Native Android Controls for Pascal
 //
@@ -1540,6 +1542,7 @@ type
     procedure Add(item: string; delim: string; fColor: TARGBColorBridge;
                   fSize: integer; hasWidget: TWidgetItem; widgetText: string; image: jObject); overload;
     Procedure Delete(index: Integer);
+    function GetText(index: integer): string;
     Procedure Clear;
     Procedure SetFontColorByIndex(Value : TARGBColorBridge; index: integer);
     Procedure SetFontSizeByIndex(Value : DWord; index: integer  );
@@ -5613,29 +5616,51 @@ end;
 Procedure jListView.Add(item: string; delim: string);
 begin
   if FInitialized then
+  begin
      jListView_add2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, item,delim);
+     Self.Items.Add(item);
+  end;
 end;
 
 Procedure jListView.Add(item: string; delim: string; fColor: TARGBColorBridge; fSize: integer; hasWidget:
                                       TWidgetItem; widgetText: string; image: jObject);
 begin
   if FInitialized then
+  begin
      jListView_add3(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, item,
-    delim, GetARGB(fColor), fSize, Ord(hasWidget), widgetText, image);
+     delim, GetARGB(fColor), fSize, Ord(hasWidget), widgetText, image);
+     Self.Items.Add(item);
+  end;
+
+end;
+
+function jListView.GetText(index: Integer): string;
+begin
+  if FInitialized then
+    Result:= jListView_GetItemText(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, index);
 end;
 
 //
 Procedure jListView.Delete(index: Integer);
 begin
   if FInitialized then
-     jListView_delete2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, index);
+  begin
+     if (index > 0) and (index < Self.Items.Count) then
+     begin
+       jListView_delete2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, index);
+       Self.Items.Delete(index);
+     end;
+  end;
 end;
 
 //
 Procedure jListView.Clear;
 begin
   if FInitialized then
+  begin
     jListView_clear2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject);
+    Self.Items.Clear;
+  end;
 end;
 
 //by jmpessoa
@@ -5646,8 +5671,8 @@ end;
 
 //by jmpessoa
 procedure jListView.ListViewChange(Sender: TObject);
-var
-  i: integer;
+//var
+  //i: integer;
 begin
 {  if FInitialized then
   begin

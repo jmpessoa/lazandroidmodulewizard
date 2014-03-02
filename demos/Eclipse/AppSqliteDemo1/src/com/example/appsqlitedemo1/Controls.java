@@ -1,7 +1,7 @@
 package com.example.appsqlitedemo1;
 //
 //
-//[LazAndroidModuleWizard - ver.0.4_r.04 :01-mar-2014]
+//[LazAndroidModuleWizard - ver.0.4_r.05 :02-Mar-2014]
 //[https://github.com/jmpessoa/lazandroidmodulewizard]
 
 //Android Java Interface for Pascal/Delphi XE5  - 
@@ -563,7 +563,6 @@ public void setTextColor2(int value) {
 	this.setTextColor(value);  
 }
 
-
 // LORDMAN 2013-08-13
 public  void setTextAlignment( int align ) {
 switch ( align ) {
@@ -618,7 +617,6 @@ setOnClickListener(null);
 public void setTextSize2(int value) {
 	this.setTextSize(value);
 }
-
 
 
 }
@@ -1870,8 +1868,7 @@ public  View getView(int position, View v, ViewGroup parent) {
    LayoutParams txtParam = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT); //w,h
   
    //txtParam.alignWithParent = true;
-   
-     
+        
    for (int i=0; i < lines.length; i++) {
 	   itemText[i] = new TextView(ctx);
 	   
@@ -1967,13 +1964,11 @@ public  View getView(int position, View v, ViewGroup parent) {
 		  else{imgParam.addRule(RelativeLayout.CENTER_HORIZONTAL);}
 		  
 		  itemLayout.addView(itemImage, imgParam);
-	   }	   
-	   	   
+	   }	   	   	   
    }
    
    listLayout.addView(itemLayout);
-   return listLayout;
-   
+   return listLayout;   
  } 
  else return v;
  
@@ -1981,24 +1976,27 @@ public  View getView(int position, View v, ViewGroup parent) {
   //by jmpessoa 
 View.OnClickListener getOnCheckItem(final View cb, final int position) { 
     return new View.OnClickListener() { 
-	             public void onClick(View v) { 
-	               if (items.get(position).widget == 1) {	 
+	            public void onClick(View v) {
+	               if (cb.getClass().getName().equals("android.widget.ImageView")) {
+	            	   controls.pOnClickWidgetItem(PasObj, position, items.get(position).checked);
+	               }	 
+	               if (cb.getClass().getName().equals("android.widget.CheckBox")) {	 
 	                  items.get(position).checked = ((CheckBox)cb).isChecked();	                 	                  
 	                  controls.pOnClickWidgetItem(PasObj, position, ((CheckBox)cb).isChecked());
 	               }
-	               if (items.get(position).widget == 2) {
+	               if (cb.getClass().getName().equals("android.widget.RadioButton")) {
 	            	      if ( items.get(position).checked ) {((RadioButton)cb).setChecked(false);}
 		                  items.get(position).checked = ((RadioButton)cb).isChecked();
 		                  controls.pOnClickWidgetItem(PasObj, position, ((RadioButton)cb).isChecked());
 		           }
-	               if (items.get(position).widget == 3) { //button	            	      	            	        
-			             controls.pOnClickWidgetItem(PasObj, position, true); 		                  
+	               if (cb.getClass().getName().equals("android.widget.Button")) { //button	            	      	            	        
+			             controls.pOnClickWidgetItem(PasObj, position, items.get(position).checked); 		                  
 		           }
-	               if (items.get(position).widget == 4) { //textview  
-			             controls.pOnClickWidgetItem(PasObj, position, true); 		                  
+	               if (cb.getClass().getName().equals("android.widget.TextView")) { //textview  
+			             controls.pOnClickWidgetItem(PasObj, position, items.get(position).checked); 		                  
 		           }	               
-              } 
-	   }; 
+                } 
+	}; 
 }
 
 }
@@ -2165,6 +2163,11 @@ public  void clear() {
 public  void delete( int index ) {
   alist.remove( index );
   aadapter.notifyDataSetChanged();
+}
+
+public  String  getItemText(int index) {
+  return alist.get(index).label;
+  //aadapter.notifyDataSetChanged();
 }
 
 // Free object except Self, Pascal Code Free the class.

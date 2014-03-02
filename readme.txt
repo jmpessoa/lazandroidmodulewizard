@@ -42,6 +42,10 @@
 
               -Lazarus forum community! 
 
+version 0.4 - revision: 05 - 02 March - 2014 -
+              :: Added NEW method GetText to jListView [and minor bug fix]
+              :: Update [Eclipse] AppDemo1 [List View Demo]
+
 version 0.4 - revision: 04 - 01 March - 2014 -
               :: New Add Custom Row Support to jListView
               :: Update [Eclipse] AppDemo1 [List View Demo]

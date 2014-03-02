@@ -66,7 +66,7 @@ object AndroidModule6: TAndroidModule6
     Alignment = taLeft
     InputTypeEx = itxText
     LineMaxLength = 360
-    Text = 'Hello|World!'
+    Text = 'Hello|Android|World!'
     Visible = True
     BackgroundColor = colbrWhite
     FontColor = colbrDefault
