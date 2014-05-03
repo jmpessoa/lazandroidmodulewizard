@@ -1,8 +1,11 @@
 package com.example.dummyapp;
 
+//[LazAndroidModuleWizard - ver.0.5 :03-MAy-2014]
+//
+//[https://github.com/jmpessoa/lazandroidmodulewizard]
 
 //Android Java Interface for Pascal/Delphi XE5 
-//[and Lazarus by jmpessoa@hotmail.com - december 2013]
+//[and Lazarus by jmpessoa@hotmail.com - december/2013]
 
 //Developers
 //          Simon,Choi / Choi,Won-sik
@@ -37,7 +40,6 @@ public class App extends Activity {
      
       //by jmpessoa --- fix for http get    
       //ref. http://stackoverflow.com/questions/8706464/defaulthttpclient-to-androidhttpclient 
-
      if (android.os.Build.VERSION.SDK_INT > 9) {
          StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
          StrictMode.setThreadPolicy(policy);
