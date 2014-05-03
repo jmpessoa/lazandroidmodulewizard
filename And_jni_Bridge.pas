@@ -1,4 +1,6 @@
 //------------------------------------------------------------------------------
+//[LazAndroidModuleWizard - ver.0.4_r.04 :01-mar-2014]
+//[https://github.com/jmpessoa/lazandroidmodulewizard]
 //
 // Android JNI Interface for Pascal/Delphi
 //[and Lazarus by jmpessoa@hotmail.com - december 2013]
@@ -64,33 +66,8 @@ type
         Width : Integer;
         Height: Integer;
        End;
- {
-     jboolean=byte;        // unsigned 8 bits
-     jbyte=shortint;       // signed 8 bits
-     jchar=word;           // unsigned 16 bits
-     jshort=smallint;      // signed 16 bits
-     jint=longint;         // signed 32 bits
-     jlong=int64;          // signed 64 bits
-     jfloat=single;        // 32-bit IEEE 754
-     jdouble=double;       // 64-bit IEEE 754
- }
 
- //by jmpessoa
- TDynArrayOfSmallint = array of smallint;
-
- TDynArrayOfInteger = array of integer;
-
- TDynArrayOfLongint = array of longint;
- TDynArrayOfDouble = array of double;
- TDynArrayOfSingle = array of single;
- TDynArrayOfInt64  = array of int64;
- TDynArrayOfString = array of string;
-
- TDynArrayOfJChar = array of JChar;
- TDynArrayOfJBoolean = array of JBoolean;
- TDynArrayOfJByte = array of JByte;
-
- TArrayOfByte = array of JByte;
+ TArrayOfByte = array of JByte;             //by jmpessoa
 
  TScanByte = Array[0..0] of JByte;  //by jmpessoa
  PScanByte = ^TScanByte;
@@ -824,8 +801,7 @@ Procedure jListView_setTextAlign(env:PJNIEnv;this:jobject; ListView : jObject; v
 
 function jListView_IsItemChecked(env:PJNIEnv;this:jobject; ListView : jObject; index: integer): boolean;
 
-function jListView_GetItemText(env:PJNIEnv;this:jobject; ListView : jObject; index: integer): string;
-function jListView_GetCount(env:PJNIEnv;this:jobject; ListView : jObject): integer;
+function jListView_GetItemText(env:PJNIEnv;this:jobject; ListView : jObject; index: integer): String;
 
 Procedure jListView_setMarginLeft(env:PJNIEnv;this:jobject; ListView : jObject; x: DWord);
 Procedure jListView_setMarginTop(env:PJNIEnv;this:jobject; ListView : jObject; y: DWord);
@@ -1409,24 +1385,6 @@ procedure jSqliteDataAccess_UpdateImage(env:PJNIEnv;this:jobject; SqliteDataBase
 
 procedure jSqliteDataAccess_Close(env:PJNIEnv;this:jobject; SqliteDataBase: jObject);
 
-{jMediaPlayer :by jmpessoa}
-(*
-function jMediaPlayer_Create(env:  PJNIEnv; this: jObject; selfPas: TObject; pathToFileName: string): jObject;
-procedure jMediaPlayer_Free (env: PJNIEnv; this: jObject; MediaPlayer: jObject);
-procedure jMediaPlayer_SetVolume(env: PJNIEnv; this: JObject; MediaPlayer: jObject; leftVolume: JFloat; rightVolume: JFloat);
-function jMediaPlayer_GetDuration(env: PJNIEnv; this: JObject; MediaPlayer: jObject): JInt;
-function jMediaPlayer_GetCurrentPosition(env: PJNIEnv; this: JObject; MediaPlayer: jObject): JInt;
-procedure jMediaPlayer_SelectTrack(env: PJNIEnv; this: JObject; MediaPlayer: jObject; index: JInt);
-function jMediaPlayer_IsLooping(env: PJNIEnv; this: JObject; MediaPlayer: jObject): boolean;
-procedure jMediaPlayer_SetLooping(env: PJNIEnv; this: JObject; MediaPlayer: jObject; looping: boolean);
-procedure jMediaPlayer_SeekTo(env: PJNIEnv; this: JObject; MediaPlayer: jObject; millis: JInt);
-function jMediaPlayer_IsPlaying(env: PJNIEnv; this: JObject; MediaPlayer: jObject): boolean;
-procedure jMediaPlayer_Pause(env: PJNIEnv; this: JObject; MediaPlayer: jObject);
-procedure jMediaPlayer_Stop(env: PJNIEnv; this: JObject; MediaPlayer: jObject);
-procedure jMediaPlayer_Start(env: PJNIEnv; this: JObject; MediaPlayer: jObject);
-procedure jMediaPlayer_Prepare(env: PJNIEnv; this: JObject; MediaPlayer: jObject);
-procedure jMediaPlayer_SetDataSource(env: PJNIEnv; this: JObject; MediaPlayer: jObject; path: string);
-  *)
 // Http
 Function  jHttp_Get(env:PJNIEnv; this:jobject; URL: String) : String;
 
@@ -1459,8 +1417,6 @@ Procedure jBenchMark1_Java             (env:PJNIEnv;this:jobject;var mSec : Inte
 Procedure jBenchMark1_Pascal           (env:PJNIEnv;this:jobject;var mSec : Integer;var value : single);
 
 function Get_gjClass(env: PJNIEnv): jClass; //by jmpessoa
-
-function JBool( Bool : Boolean ) : byte;
 
 Var
   gVM         : PJavaVM;
@@ -1506,7 +1462,7 @@ procedure dbg(obj : jObject; objName : String); overload;
                else dbg(objName + ' not nil');
  end;
 
-function JBool( Bool : Boolean ) : byte;
+function JBool ( Bool : Boolean ) : Integer;
  begin
   Case Bool of
    True  : Result := 1;
@@ -3379,8 +3335,6 @@ begin
 end;
 
 //by jmpessoa
-//The attribute maxLines corresponds to the maximum height of the EditText,
-//it controls the outer boundaries and not inner text lines.
 Procedure jEditText_setMaxLines(env: PJNIEnv; this: jobject; EditText: jObject; max:DWord);
 Const
  _cFuncName = 'jEditText_setMaxLines';
@@ -6620,8 +6574,8 @@ function jListView_IsItemChecked(env:PJNIEnv;this:jobject; ListView : jObject; i
 var
  _jMethod : jMethodID = nil;
  _jParams : array[0..0] of jValue;
- cls: jClass;
- _jBool: jBoolean;
+   cls: jClass;
+   _jBool: jBoolean;
 begin
  _jParams[0].i:= index;
  cls := env^.GetObjectClass(env, ListView);
@@ -6649,16 +6603,6 @@ begin
             Result    := String( env^.GetStringUTFChars(env,_jString,@_jBoolean) );
           end;
   end;
-end;
-
-function jListView_GetCount(env:PJNIEnv; this:jobject; ListView : jObject): integer;
-var
-  _jMethod : jMethodID = nil;
-  cls: jClass;
-begin
-  cls := env^.GetObjectClass(env, ListView);
-  _jMethod:= env^.GetMethodID(env, cls, 'GetSize', '()I');
-  Result:= env^.CallIntMethod(env,ListView,_jMethod);
 end;
 
 Procedure jListView_setMarginLeft(env:PJNIEnv;this:jobject; ListView : jObject; x: DWord);
@@ -11301,146 +11245,6 @@ begin
   _methodID:= env^.GetMethodID(env, cls, 'Close', '()V');
   env^.CallVoidMethod(env, SqliteDataBase, _methodID);
 end;
-
-{jMediaPlayer :by jmpessoa}
-
-(*
-function jMediaPlayer_Create(env: PJNIEnv; this: jObject; selfPas: TObject; pathToFileName: string): jObject;
-var
-  jMethod : jMethodID = nil;
-  jParams : array[0..1] of jValue;
-  jCls: jClass;
-begin
-  jParams[0].j := Int64(selfPas);
-  jParams[1].l := env^.NewStringUTF(env, PChar(pathToFileName));
-  jCls:= Get_gjClass(env);
-  jMethod:= env^.GetMethodID(env, jCls, 'jMediaPlayer_Create', '(JLjava/lang/String;)Ljava/lang/Object;');
-  Result := env^.CallObjectMethodA(env, this, jMethod, @jParams);
-  Result := env^.NewGlobalRef(env,Result);
-  env^.DeleteLocalRef(env,jParams[1].l);
-end;
-
-procedure jMediaPlayer_Free(env: PJNIEnv; this: jObject; MediaPlayer: jObject);
-var
-  jMethod: jMethodID = nil;
-  jCls: jClass;
-begin
-  jCls:= env^.GetObjectClass(env, MediaPlayer);
-  jMethod:= env^.GetMethodID(env, jCls, 'Free', '()V');
-  env^.CallVoidMethod(env, MediaPlayer, jMethod);
-  env^.DeleteGlobalRef(env, MediaPlayer);
-end;
-
-procedure jMediaPlayer_SetDataSource(env: PJNIEnv; this: JObject; MediaPlayer: jObject; path: string);
-var
-  jMethod : jMethodID = nil;
-  jParams : array[0..0] of jValue;
-  jCls: jClass;
-begin
-  jParams[0].l := env^.NewStringUTF(env, PChar(path));
-  jCls:= env^.GetObjectClass(env, MediaPlayer);
-  jMethod:= env^.GetMethodID(env, jCls, 'SetDataSource', '(Ljava/lang/String;)V');
-  env^.CallVoidMethodA(env, MediaPlayer, jMethod, @jParams);
-  env^.DeleteLocalRef(env,jParams[0].l);
-end;
-
-{ Class:     org_jmpessoa_trycode_JNIHello
-  Method:    Prepare
-  Signature: ()V }
-procedure jMediaPlayer_Prepare(env: PJNIEnv; this: JObject; MediaPlayer: jObject);
-begin
-  {your code....}
-end;
-
-{ Class:     org_jmpessoa_trycode_JNIHello
-  Method:    Start
-  Signature: ()V }
-procedure jMediaPlayer_Start(env: PJNIEnv; this: JObject; MediaPlayer: jObject);
-begin
-  {your code....}
-end;
-
-{ Class:     org_jmpessoa_trycode_JNIHello
-  Method:    Stop
-  Signature: ()V }
-procedure jMediaPlayer_Stop(env: PJNIEnv; this: JObject; MediaPlayer: jObject);
-begin
-  {your code....}
-end;
-
-{ Class:     org_jmpessoa_trycode_JNIHello
-  Method:    Pause
-  Signature: ()V }
-procedure jMediaPlayer_Pause(env: PJNIEnv; this: JObject; MediaPlayer: jObject);
-begin
-  {your code....}
-end;
-
-{ Class:     org_jmpessoa_trycode_JNIHello
-  Method:    IsPlaying
-  Signature: ()Z }
-function jMediaPlayer_IsPlaying(env: PJNIEnv; this: JObject; MediaPlayer: jObject): boolean;
-begin
-  {your code....}
-  {Result:=;}
-end;
-
-{ Class:     org_jmpessoa_trycode_JNIHello
-  Method:    SeekTo
-  Signature: (I)V }
-procedure jMediaPlayer_SeekTo(env: PJNIEnv; this: JObject; MediaPlayer: jObject; millis: JInt);
-begin
-  {your code....}
-end;
-
-{ Class:     org_jmpessoa_trycode_JNIHello
-  Method:    SetLooping
-  Signature: (Z)UNKNOWN }
-procedure jMediaPlayer_SetLooping(env: PJNIEnv; this: JObject; MediaPlayer: jObject; looping: boolean);
-begin
-  {your code....}
-  {Result:=;}
-end;
-
-{ Class:     org_jmpessoa_trycode_JNIHello
-  Method:    IsLooping
-  Signature: ()Z }
-function jMediaPlayer_IsLooping(env: PJNIEnv; this: JObject; MediaPlayer: jObject): boolean;
-begin
-  {your code....}
-  {Result:=;}
-end;
-
-procedure jMediaPlayer_SelectTrack(env: PJNIEnv; this: JObject; MediaPlayer: jObject; index: JInt);
-begin
-end;
-
-{ Class:     org_jmpessoa_trycode_JNIHello
-  Method:    GetCurrentPosition
-  Signature: ()I }
-function jMediaPlayer_GetCurrentPosition(env: PJNIEnv; this: JObject; MediaPlayer: jObject): JInt;
-begin
-  {your code....}
-  {Result:=;}
-end;
-
-{ Class:     org_jmpessoa_trycode_JNIHello
-  Method:    GetDuration
-  Signature: ()I }
-function jMediaPlayer_GetDuration(env: PJNIEnv; this: JObject; MediaPlayer: jObject): JInt;
-begin
-  {your code....}
-  {Result:=;}
-end;
-
-{ Class:     org_jmpessoa_trycode_JNIHello
-  Method:    SetVolume
-  Signature: (FF)V }
-procedure jMediaPlayer_SetVolume(env: PJNIEnv; this: JObject; MediaPlayer: jObject; leftVolume: JFloat; rightVolume: JFloat);
-begin
-  {your code....}
-end;
-*)
 
 
 //------------------------------------------------------------------------------

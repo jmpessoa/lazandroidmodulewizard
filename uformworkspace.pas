@@ -18,6 +18,7 @@ type
     Bevel4: TBevel;
     Bevel5: TBevel;
     BitBtn2: TBitBtn;
+    CheckGroup1: TCheckGroup;
     ComboBox1: TComboBox;
     ComboBox2: TComboBox;
     Edit1: TEdit;
@@ -44,6 +45,7 @@ type
     RadioGroup1: TRadioGroup;
     RadioGroup2: TRadioGroup;
     RadioGroup3: TRadioGroup;
+    RadioGroup4: TRadioGroup;
     RadioGroup5: TRadioGroup;
     SelectDirectoryDialog1: TSelectDirectoryDialog;
     SelectDirectoryDialog2: TSelectDirectoryDialog;
@@ -58,12 +60,13 @@ type
     SpeedButton6: TSpeedButton;
     SpeedButton7: TSpeedButton;
     StatusBar1: TStatusBar;
-    procedure CheckBox1Click(Sender: TObject);
+  //  procedure CheckBox1Click(Sender: TObject);
+  //  procedure CheckBox2Click(Sender: TObject);
+    procedure CheckGroup1Click(Sender: TObject);
     procedure ComboBox1Exit(Sender: TObject);
     procedure ComboBox2Change(Sender: TObject);
     procedure FormActivate(Sender: TObject);
     procedure FormClose(Sender: TObject; var CloseAction: TCloseAction);
-    procedure FormCreate(Sender: TObject);
     procedure ListBox1Click(Sender: TObject);
     procedure ListBox1SelectionChange(Sender: TObject; User: boolean);
     procedure ListBox2Click(Sender: TObject);
@@ -71,9 +74,11 @@ type
     procedure RadioGroup1Click(Sender: TObject);
     procedure RadioGroup2Click(Sender: TObject);
     procedure RadioGroup3Click(Sender: TObject);
+    procedure RadioGroup4Click(Sender: TObject);
     procedure RadioGroup5Click(Sender: TObject);
     procedure SpeedButton1Click(Sender: TObject);
     procedure SpeedButton2Click(Sender: TObject);
+  //  procedure SpeedButton3Click(Sender: TObject);
     procedure SpeedButton4Click(Sender: TObject);
     procedure SpeedButton5Click(Sender: TObject);
     procedure SpeedButton6Click(Sender: TObject);
@@ -94,9 +99,7 @@ type
     FPathToAndroidNDK: string;
     FPathToAntBin: string;
     FProjectModel: string;
-
-    FUseControls: string;
-
+    FGUIControls: string;
     FAntPackageName: string;
     FMinApi: string;
     FTargetApi: string;
@@ -126,8 +129,8 @@ type
     property PathToAndroidSDK: string read FPathToAndroidSDK write FPathToAndroidSDK;
     property PathToAndroidNDK: string read FPathToAndroidNDK write FPathToAndroidNDK;
     property PathToAntBin: string read FPathToAntBin write FPathToAntBin;
-    property ProjectModel: string read FProjectModel write FProjectModel; {eclipse/ant/jbridge}
-    property UseControls: string read FUseControls write FUseControls;
+    property ProjectModel: string read FProjectModel write FProjectModel; {eclipse/any}
+    property GUIControls: string read FGUIControls write FGUIControls;
     property AntPackageName: string read FAntPackageName write FAntPackageName;
     property MinApi: string read FMinApi write FMinApi;
     property TargetApi: string read FTargetApi write FTargetApi;
@@ -191,23 +194,23 @@ end;
 
 procedure TFormWorkspace.ListBox1SelectionChange(Sender: TObject; User: boolean);
 begin
-    //StatusBar1.SimpleText:= GetTextByListIndex(ListBox1.ItemIndex);
+   //StatusBar1.SimpleText:= GetTextByListIndex(ListBox1.ItemIndex);
     StatusBar1.Panels.Items[0].Text:= 'MinSdk Api: '+GetTextByListIndex(ListBox1.ItemIndex);
 end;
 
 procedure TFormWorkspace.ListBox2Click(Sender: TObject);
 begin
-  case ListBox2.ItemIndex of
-      0: FTargetApi:='8';
-      1: FTargetApi:='10';
-      2: FTargetApi:='13';
-      3: FTargetApi:='14';
-      4: FTargetApi:='15';
-      5: FTargetApi:='16';
-      6: FTargetApi:='17';
-      7: FTargetApi:='18';
-      8: FTargetApi:='19';
-  end
+case ListBox2.ItemIndex of
+    0: FTargetApi:='8';
+    1: FTargetApi:='10';
+    2: FTargetApi:='13';
+    3: FTargetApi:='14';
+    4: FTargetApi:='15';
+    5: FTargetApi:='16';
+    6: FTargetApi:='17';
+    7: FTargetApi:='18';
+    8: FTargetApi:='19';
+end
 end;
 
 procedure TFormWorkspace.ListBox2SelectionChange(Sender: TObject; User: boolean);
@@ -228,6 +231,11 @@ end;
 procedure TFormWorkspace.RadioGroup3Click(Sender: TObject);
 begin
   FProjectModel:= RadioGroup3.Items[RadioGroup3.ItemIndex];  //fix 15-december-2013
+end;
+
+procedure TFormWorkspace.RadioGroup4Click(Sender: TObject);
+begin
+  FGUIControls:= RadioGroup4.Items[RadioGroup4.ItemIndex];  //fix 15-december-2013
 end;
 
 //Ref. http://forum.xda-developers.com/wiki/Android/Build_Numbers
@@ -273,6 +281,8 @@ begin
 end;
 
 procedure TFormWorkspace.FormClose(Sender: TObject; var CloseAction: TCloseAction);
+var
+  saveName, auxStr: string;
 begin
   if ModalResult = mrCancel  then Exit;
 
@@ -282,10 +292,9 @@ begin
     ModalResult:= mrCancel;
     Exit;
   end;
-
   if ComboBox1.Text = '' then
   begin
-    ShowMessage('Error! Projec Name was missing.... [Cancel]');
+    ShowMessage('Error! Projec  Name was missing.... [Cancel]');
     ModalResult:= mrCancel;
     Exit;
   end;
@@ -302,7 +311,7 @@ begin
   if RadioGroup3.ItemIndex = 1 then  //Ant Project
   begin
      FProjectModel:= 'Ant';
-     if (Pos(DirectorySeparator, ComboBox1.Text) = 0) then  //i.e just "name", not path+name
+     if (Pos(DirectorySeparator, ComboBox1.Text) <= 0) then  //just "name", not path+name
      begin
          FAndroidProjectName:= FPathToWorkspace + DirectorySeparator + ComboBox1.Text; //get full name: path+name
          {$I-}
@@ -310,20 +319,13 @@ begin
          if IOResult <> 0 then MkDir(FPathToWorkspace+DirectorySeparator+ComboBox1.Text);
      end;
   end;
-
   SaveSettings(FFileName);
-
 end;
 
-procedure TFormWorkspace.FormCreate(Sender: TObject);
+procedure TFormWorkspace.CheckGroup1Click(Sender: TObject);
 begin
-
-end;
-
-procedure TFormWorkspace.CheckBox1Click(Sender: TObject);
-begin
-{  if CheckBox1.Checked then FUseControls:='Yes'
-  else FUseControls:='No';}
+  If CheckGroup1.Checked[0] then FAntBuildMode:= 'debug'
+  else  FAntBuildMode:= 'release';
 end;
 
 procedure TFormWorkspace.ComboBox1Exit(Sender: TObject);
@@ -380,6 +382,10 @@ end;
 procedure TFormWorkspace.FormActivate(Sender: TObject);
 begin
   ComboBox1.SetFocus;
+
+  CheckGroup1.Checked[0]:= True; //default
+  CheckGroup1.Checked[1]:= false; //default
+
   StatusBar1.Panels.Items[0].Text:= 'MinSdk Api: '+GetTextByListIndex(ListBox1.ItemIndex);
   StatusBar1.Panels.Items[1].Text:= 'Target Api: '+GetTextByList2Index(ListBox2.ItemIndex);
 end;
@@ -472,7 +478,7 @@ end;
 
 procedure TFormWorkspace.LoadSettings(const pFilename: string);
 var
-  i1, i2, i3, i5, j1, j2, j3: integer;
+  i1, i2, i3, i4, i5, j1, j2, j3: integer;
 begin
   FFileName:= pFilename;
   with TIniFile.Create(pFilename) do
@@ -488,13 +494,15 @@ begin
     FPathToAntBin:= ReadString('NewProject','PathToAntBin', '');
     FAntPackageName:= ReadString('NewProject','AntPackageName', '');
 
+    FTouchtestEnabled:= ReadString('NewProject','TouchtestEnabled', '');
+    if FTouchtestEnabled = '' then FTouchtestEnabled:= 'False';
+
+    //FAntBuildMode:= ReadString('NewProject','AntBuildMode', '');
+    //if FAntBuildMode = '' then
     FAntBuildMode:= 'debug'; //default...
-    FTouchtestEnabled:= 'True'; //default
 
     FMainActivity:= ReadString('NewProject','MainActivity', '');  //dummy
     if FMainActivity = '' then FMainActivity:= 'App';
-
-    FUseControls:= ReadString('NewProject','UseControls', '');
 
     if ReadString('NewProject','NDK', '') <> '' then
       i5:= strToInt(ReadString('NewProject','NDK', ''))
@@ -511,6 +519,10 @@ begin
     if ReadString('NewProject','ProjectModel', '') <> '' then
        i3:= strToInt(ReadString('NewProject','ProjectModel', ''))
     else i3:= 0;
+
+    if ReadString('NewProject','GUIControls', '') <> '' then
+       i4:= strToInt(ReadString('NewProject','GUIControls', ''))
+    else i4:= 0;
 
     if ReadString('NewProject','MinApi', '') <> '' then
        j1:= strToInt(ReadString('NewProject','MinApi', ''))
@@ -547,15 +559,21 @@ begin
 
   RadioGroup1.ItemIndex:= i1;
   RadioGroup2.ItemIndex:= i2;
-
-  if i3 > 1 then i3:= 0;
   RadioGroup3.ItemIndex:= i3;
-
+  RadioGroup4.ItemIndex:= i4;
   RadioGroup5.ItemIndex:= i5;
+
+  if FTouchtestEnabled = 'True' then
+     CheckGroup1.Checked[1]:= True
+  else
+     CheckGroup1.Checked[1]:= False;
+
+  CheckGroup1.Checked[0]:= True; //debug --> default
 
   FInstructionSet:= RadioGroup1.Items[RadioGroup1.ItemIndex];
   FFPUSet:= RadioGroup2.Items[RadioGroup2.ItemIndex];
   FProjectModel:= RadioGroup3.Items[RadioGroup3.ItemIndex]; //"Eclipse Project"/"Ant Project"
+  FGUIControls:=  RadioGroup4.Items[RadioGroup4.ItemIndex];
 
   FMinApi:= ListBox1.Items[ListBox1.ItemIndex];
   FTargetApi:= ListBox2.Items[ListBox2.ItemIndex];
@@ -590,20 +608,18 @@ begin
       WriteString('NewProject', 'PathToAndroidSDK', Edit6.Text);
       WriteString('NewProject', 'PathToAntBin', Edit7.Text);
 
-      WriteString('NewProject', 'ProjectModel',IntToStr(RadioGroup3.ItemIndex));  //Eclipse/Ant
-      WriteString('NewProject', 'UseControls', FUseControls); //yes/no
+      WriteString('NewProject', 'ProjectModel',IntToStr(RadioGroup3.ItemIndex));
+      WriteString('NewProject', 'GUIControls', IntToStr(RadioGroup4.ItemIndex));
 
       WriteString('NewProject', 'AntPackageName', LowerCase(Trim(Edit8.Text)));
 
       WriteString('NewProject', 'MinApi', IntToStr(ListBox1.ItemIndex));
       WriteString('NewProject', 'TargetApi', IntToStr(ListBox2.ItemIndex));
 
-      {
       if CheckGroup1.Checked[1] then
          WriteString('NewProject', 'TouchtestEnabled', 'True')
       else
          WriteString('NewProject', 'TouchtestEnabled', 'False');
-      }
 
       WriteString('NewProject', 'AntBuildMode', 'debug'); //default...
 

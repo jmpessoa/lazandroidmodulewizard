@@ -1,10 +1,8 @@
 package com.example.appsqlitedemo1;
 //
 //
-//[LazAndroidModuleWizard - ver.0.5 :03-MAy-2014]
-//
+//[LazAndroidModuleWizard - ver.0.4_r.05 :02-Mar-2014]
 //[https://github.com/jmpessoa/lazandroidmodulewizard]
-//
 
 //Android Java Interface for Pascal/Delphi XE5  - 
 //[And LAZARUS by jmpessoa@hotmail.com - december 2013]
@@ -62,8 +60,6 @@ import android.app.ActivityManager;
 import android.app.AlertDialog;
 import android.app.PendingIntent;
 import android.app.ProgressDialog;
-import android.content.ClipData;
-import android.content.ClipboardManager;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.ContextWrapper;
@@ -71,7 +67,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.content.pm.PackageManager;
-import android.content.res.AssetFileDescriptor;
 import android.database.Cursor;
 import android.graphics.Bitmap.CompressFormat;
 import android.graphics.Bitmap;
@@ -95,7 +90,6 @@ import android.telephony.SmsManager;
 import android.telephony.TelephonyManager;
 import android.provider.ContactsContract;
 import android.provider.MediaStore;
-import android.provider.Settings;
 import android.text.Editable;
 import android.text.InputFilter;
 import android.text.InputType;
@@ -103,7 +97,6 @@ import android.text.TextWatcher;
 import android.text.method.ScrollingMovementMethod;
 import android.util.DisplayMetrics;
 import android.media.MediaPlayer;
-
 import android.net.Uri;
 import android.util.Log;
 import android.util.TypedValue;
@@ -147,11 +140,15 @@ import android.widget.Scroller;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ViewFlipper;
-
-import java.io.*;
-
+import java.io.BufferedInputStream;
+import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.lang.*;
-
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -165,7 +162,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import java.util.regex.Pattern;
 
 import javax.microedition.khronos.egl.EGLConfig;
@@ -184,7 +180,6 @@ import android.database.sqlite.SQLiteDatabase;
 //import android.database.sqlite.SQLiteOpenHelper;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteException;
-import java.lang.reflect.*;
 //-------------------------------------------------------------------------
 //Constants
 //-------------------------------------------------------------------------
@@ -340,8 +335,6 @@ public  RelativeLayout GetLayout() {
 
 //
 public  void Show(int effect) {
-		
-   Log.i("Form:","Show");	
    controls.appLayout.addView( layout );
    parent = controls.appLayout;
    //
@@ -1078,7 +1071,6 @@ public void setLayoutAll(int idAnchor) {
 //by jmpessoa
 public void setIdEx(int id) {
 	  setId(id);
-	  Log.i("jButton","setIdEx!");	  
 }
 
 //by jmpessoa
@@ -1821,9 +1813,8 @@ public  View getView(int position, View v, ViewGroup parent) {
    return mView;
    */	
 	
- 	
  //new code: by jmpessoa: custom row!	
- if (position >= 0 && (!items.get(position).label.equals("")) ) {
+ if (items.get(position).label != "") {
 		  
    LinearLayout listLayout = new LinearLayout(ctx);
    
@@ -1911,7 +1902,7 @@ public  View getView(int position, View v, ViewGroup parent) {
      case 2:  itemWidget = new RadioButton(ctx); ((RadioButton)itemWidget).setText(items.get(position).widgetText); break;
      case 3:  itemWidget = new Button(ctx);  ((Button)itemWidget).setText(items.get(position).widgetText);    break;
      case 4:  itemWidget = new TextView(ctx); ((TextView)itemWidget).setText(" "+items.get(position).widgetText+" ");   break;
-     //default: ;
+     default: ;
    }
 
    LayoutParams widgetParam = null;
@@ -1978,7 +1969,8 @@ public  View getView(int position, View v, ViewGroup parent) {
    
    listLayout.addView(itemLayout);
    return listLayout;   
- } else return v;
+ } 
+ else return v;
  
 }
   //by jmpessoa 
@@ -2015,7 +2007,7 @@ View.OnClickListener getOnCheckItem(final View cb, final int position) {
 
 class jListView extends ListView {
 // Java-Pascal Interface
-private long            PasObj   = 0;      // Pascal Obj
+private long             PasObj   = 0;      // Pascal Obj
 private Controls        controls = null;   // Control Class for Event
 
 private Bitmap          genericBmp;
@@ -2083,7 +2075,7 @@ setBackgroundColor (0x00000000);
 setCacheColorHint  (0);
 
 alist = new ArrayList<jListItemRow>();
-//simple_list_item_1
+   
 aadapter = new jArrayAdapter(context, controls, PasObj, android.R.layout.simple_list_item_1,  alist);
 
 setAdapter(aadapter);
@@ -2175,12 +2167,6 @@ public  void delete( int index ) {
 
 public  String  getItemText(int index) {
   return alist.get(index).label;
-  //aadapter.notifyDataSetChanged();
-}
-
-
-public int GetSize() {
-  return alist.size();
   //aadapter.notifyDataSetChanged();
 }
 
@@ -4537,7 +4523,7 @@ Log.i("jTask","setProgress " );
 //------------------------------------------------------------------------------
 //http://forum.lazarus.freepascal.org/index.php?topic=21568.0
 //https://github.com/alrieckert/lazarus/blob/master/lcl/interfaces/customdrawn/android/bitmap.pas
-class jBitmap {
+class jBitmap  {
 // Java-Pascal Interface
 private long             PasObj   = 0;      // Pascal Obj
 private Controls        controls = null;   // Control Class for Event
@@ -4989,894 +4975,87 @@ class jSqliteDataAccess {
 }
 
 
-/*Draft java code by "Lazarus Android Module Wizard"*/
-/*https://github.com/jmpessoa/lazandroidmodulewizard*/
-/*jControl template*/
-
-class jMyHello /*extends ...*/ {         
-
-        private long     pascalObj = 0;      // Pascal Object
-        private Controls controls  = null;   // Control Class for events
-        private Context  context   = null;
-
-        private int    mFlag;          // <<----- custom property
-        private String mMsgHello = ""; // <<----- custom property 
-        private int[]  mBufArray;      // <<----- custom property
-
-        public jMyHello(Controls _ctrls, long _Self, int _flag, String _hello) { //Add more '_xxx' params if needed!
-
-          //super(_ctrls.activity);
-          context   = _ctrls.activity;
-          pascalObj = _Self;
-          controls  = _ctrls;
-
-          mFlag = _flag;
-          mMsgHello = _hello;
-          mBufArray = null;
-          Log.i("jMyHello", "Create!");          
-        }
-
-        public void jFree() {
-          //free local objects...
-           mBufArray = null;
-        }
-
-       //write others [public] methods code here......  <<----- customs methods
-
-        public void SetFlag(int _flag) {  
-           mFlag =  _flag;   
-        }
-
-        public int GetFlag() {
-           return mFlag;   
-        }
-
-        public void SetHello(String _hello) {
-        	mMsgHello =  _hello;   
-        }
-
-        public String GetHello() {
-           return mMsgHello;   
-        }
-        
-        public String[] GetStringArray() { 
-        	String[] strArray = {"Helo", "Pascal", "World"};
-            return strArray;   
-        }
-        
-        
-        public String[] ToUpperStringArray(String[] _msgArray) { 
-        	int size = _msgArray.length;
-        	String[] resStr = new String[size];
-        	for (int i = 0; i < size; i++) {
-        		resStr[i]= _msgArray[i].toUpperCase();
-        	}
-            return resStr;   
-        }
-      
-        public String[] ConcatStringArray(String[]  _strArrayA, String[]  _strArrayB) {
-        	
-        	int size1 = _strArrayA.length;
-        	int size2 = _strArrayB.length;
-        	
-        	String[] resStr = new String[size1+size2];
-        	
-        	for (int i = 0; i < size1; i++) {
-        	  resStr[i]= _strArrayA[i];
-        	}
-        	
-        	int j = size1;
-        	for (int i = 0; i < size2; i++) {
-        	  resStr[j]= _strArrayB[i];
-        	  j++;
-        	}
-        	
-            return resStr;
-        }
-        
-        public int[] GetIntArray() {
-        	int[] mIntArray = {1, 2, 3};
-            return mIntArray;
-        }
-
-        public int[] GetSumIntArray(int[] _vA, int[] _vB, int _size) {
-
-           mBufArray = new int[_size];
-
-           for (int i=0; i < _size; i++) {
-              mBufArray[i] = _vA[i] + _vB[i];
-           }
-           return mBufArray;
-        }
-                
-        public void ShowHello() {
-           Toast.makeText(controls.activity, mMsgHello, Toast.LENGTH_SHORT).show();  	      
-        }        
-}
-
-/*Draft java code by "Lazarus Android Module Wizard"*/
-/*https://github.com/jmpessoa/lazandroidmodulewizard*/
-/*jControl template*/
-
-class jDumpJavaMethods /*extends ...*/ {         
-
-    private long     pascalObj = 0;      // Pascal Object
-    private Controls controls  = null;   // Control Class Java/Pascal Interface ...
-    private Context  context   = null;
-
-    private boolean mStripFullTypeName;                           
-    private String  mFullJavaClassName= "";   //ex: "android.media.MediaPlayer", "java.util.List" etc..    
-    private String  mMethodFullSignature= "";
-    private String  mMethodImplementation= "";
-    private String  mObjReferenceName= ""; //now it is not null!!!
-    private String  mDelimiter= "";
-    private String  mMethodHeader= "";
-    
-    ArrayList<String> mListMethodHeader = new ArrayList<String>();                         
-    ArrayList<String> mListNoMaskedMethodImplementation = new ArrayList<String>();    
-       
-    String mNoMaskedMethodImplementation="";
-        
-    public jDumpJavaMethods(Controls _ctrls, long _Self, String _fullJavaClassName) { //Add more '_xxx' params if needed!
-      //super(_ctrls.activity);
-      context   = _ctrls.activity;
-      pascalObj = _Self;      
-      controls  = _ctrls;
-      
-      mFullJavaClassName = _fullJavaClassName;     
-      mDelimiter =  "|";
-      
-      mObjReferenceName = "this";
-      mStripFullTypeName = true;
-      
-      Log.i("jDumpJavaMethods", "Created!");                
-    }
-
-    public void jFree() {
-      //free local objects...
-    	mListMethodHeader = null;
-    	mListNoMaskedMethodImplementation = null;
-    }
-
-   //write others [public] methods code here...... 
-    
-   public String GetMethodFullSignatureList() {
-	      return mMethodFullSignature;
-   }
-
-   public String GetMethodImplementationList() {
-	   return mMethodImplementation;
-   }
-   
-    public void SetStripFullTypeName(boolean _stripFullTypeName) {  
-    	mStripFullTypeName =  _stripFullTypeName;   
-    }
-
-    public boolean GetStripFullTypeName() {
-       return mStripFullTypeName;   
-    }
-
-    public void SetFullJavaClassName(String _fullJavaClassName) {
-    	mFullJavaClassName =  _fullJavaClassName;   
-    }
-
-    public String GetFullJavaClassName() {
-       return mFullJavaClassName;   
-    }
-   
-    public void SetObjReferenceName(String _objReferenceName) {
-       mObjReferenceName = _objReferenceName;
-    }
-
-    public String GetObjReferenceName() {
-        return mObjReferenceName;
-    }
-
-    public void SetDelimiter(String _delimiter) {
-        mDelimiter = _delimiter;
-     }
-
-     public String GetDelimiter() {
-         return mDelimiter;
-     }
-
-     public String GetMethodHeaderList() {
-        return mMethodHeader;
-     }
-     
-     public int GetMethodHeaderListSize(){
-        	return mListMethodHeader.size();
-     }     
-  
-     public String GetMethodHeaderByIndex(int _index){
-      	return mListMethodHeader.get(_index);
-     }
-              
-     public void MaskMethodHeaderByIndex(int _index){
-    	String strSave = mListMethodHeader.get(_index); 
-    	mListMethodHeader.set(_index, mDelimiter+strSave);
-     }
-
-     public void UnMaskMethodHeaderByIndex(int _index){
-    	String strSave = (mListMethodHeader.get(_index)).substring(1); 
-    	mListMethodHeader.set(_index, strSave);
-     }
-                                          
-     public String GetNoMaskedMethodHeaderList() {
-    	 String strRet= "";
-    	 for(int i=0; i < mListMethodHeader.size(); i++) {
-    		 if (mListMethodHeader.get(i).charAt(i) != '|') {
-    			 if (i != (mListMethodHeader.size()-1) ) {  
-    		        strRet = strRet + mListMethodHeader.get(i) + mDelimiter;
-    			 }else {
-    				strRet = strRet + mListMethodHeader.get(i); 
-    			 }
-    		     Log.i("Dump_List_Header", mListMethodHeader.get(i));
-    		 }
-    	 }
-    	 if ( strRet.length() == 0 ) {strRet = mDelimiter;}
-    	 return strRet; 
-     }
-                               
-     public String Extract() {
-     	return Extract(mFullJavaClassName, mDelimiter);
-     } 
-      
-     public String Extract(String _fullJavaClassName, String _delimiter) {
-	      String str; 
-	      String newStr1;
-	      String newStr2;
-	      String newStr3;
-	      String finalStr1;
-	      String finalStr2;
-	      String params;
-	      String auxParams;
-	      String newParams;
-	      String newItem;
-	      String localRef;
-	      String mainParam;
-	      String mainItem;
-	      String simpleParams="";
-	      
-	      int firstPos1;
-	      int lastPos1;	      
-	      
-	      int lastPos2;	      
-	      int countParams;
-         //Toast.makeText(controls.activity, mMsgHello, Toast.LENGTH_SHORT).show();	      
-	  try {		  
-		 //String eol = System.getProperty("line.separator");		 
-		 StringBuilder sbSignature = new StringBuilder();
-		 StringBuilder sbImplementation = new StringBuilder();
-		 StringBuilder sbHeader = new StringBuilder();
-		 
-         Class cls = Class.forName(_fullJavaClassName); 
-         Method mth[] = cls.getDeclaredMethods();       //c.getMethods()
-         
-         for (int i = 0; i < mth.length; i++) {
-             str= mth[i].toString(); 
-        	 if (str.indexOf("private") < 0 && str.indexOf("static") < 0 &&
-        		 str.indexOf("protected") < 0 && str.indexOf("$") < 0)       {
-        		
-        		newStr1 = str.replace(_fullJavaClassName+".", "");
-        		newStr2 = newStr1.replace("native ", "");
-        		                                
-        		firstPos1= newStr2.lastIndexOf("(");
-        		lastPos1 = newStr2.lastIndexOf(")");
-        		
-        		countParams = 0;            		
-        		params = "";
-        		auxParams= "";            		       
-        		newParams= "";
-        		simpleParams = "";
-        		
-        		if (lastPos1 > firstPos1+2) {
-        			params = newStr2.substring(firstPos1+1, lastPos1);
-        			countParams = 1;        		
-        			int index = params.indexOf(",");        			
-        			if (index > 0) {        			   
-        		        String[] items = params.split(",");
-        		        countParams = items.length;
-        		        newItem = items[0];        	        		        
-        		        mainItem = newItem;  
-        		        lastPos2 = mainItem.lastIndexOf(".");        		        
-        		        if (lastPos2 > 0) {
-        		           mainItem = newItem.substring(lastPos2+1);
-        		        }        		     
-        		        if (mStripFullTypeName) {
-        		        	newItem = mainItem;        		        
-        		        }
-        		        auxParams = "_"+mainItem.charAt(0)+"0";
-        				newParams = newItem + " _"+mainItem.charAt(0)+"0";
-        				simpleParams = mainItem;
-        				
-        		        for (int k = 1; k < items.length; k++) {        		                    		        
-        		            newItem = items[k];  
-        		            lastPos2 = newItem.lastIndexOf(".");        		           
-        		            mainItem = newItem;
-        		            
-        		            if (lastPos2 > 0) {
-             		           mainItem = newItem.substring(lastPos2+1);
-             		        }
-        		            
-            		        auxParams = auxParams + ",_"+mainItem.charAt(0)+k;
-        		            if (mStripFullTypeName) {
-            		        	newItem = mainItem;            		        	
-        		            }     
-        		            newParams = newParams + ","+newItem+" _"+mainItem.charAt(0)+k;
-        		            simpleParams =  simpleParams + "," + mainItem;
-        		        }        		        
-        			}
-        			else {                			    
-        				mainParam = params;
-        				lastPos2 = params.lastIndexOf(".");    		        
-    		        	if (lastPos2 > 0) {
-    		        		mainParam = params.substring(lastPos2+1);                                                        
-    		        	}
-    		        	auxParams = "_"+mainParam.charAt(0)+"0";   		        	
-        				newParams = params + " " + auxParams;
-        				        				        				
-        				if (mStripFullTypeName) {        				        					
-       		        		newParams = mainParam + " " + auxParams; 
-        				}
-        				simpleParams =  mainParam;
-        			}
-        		}
-        		            		
-        		newStr3 = newStr2.substring(0,lastPos1+1);        		        	
-        		String[] splitedStr = newStr3.split("\\s+");
-        		String input = splitedStr[splitedStr.length-1];        		
-        		String output = Character.toUpperCase(input.charAt(0)) + input.substring(1);
-        		
-        		finalStr1 = "";
-        		for (int j= 0; j < splitedStr.length-1; j++) {
-        		   finalStr1 = finalStr1 + " " + splitedStr[j];        		
-        		}        		        		        		                		
-        		if (mObjReferenceName.equals("this")) {        		   
-        		   localRef = "this.";  
-        	    }else{
-        	    	localRef = mObjReferenceName+".";  
-        	    }        		        		        		
-        		
-        		String innerStr0 = splitedStr[splitedStr.length-1];
-        		String innerStr1 = innerStr0;
-        		if (countParams > 0) {
-           			int p= innerStr0.indexOf("(");       			
-           			innerStr1 = innerStr0.substring(0, p)+"(" + auxParams + ")"; 
-           		}	
-           		
-           		String newOutput= output;
-           		if ( countParams > 0 ) {        			
-           			int p1 = output.indexOf("(");       			
-           			newOutput = output.substring(0, p1)+"(" + newParams + ")";       			
-           		}
-           		           		
-           		if (finalStr1.contains(" void")) {  //TODO: test! add public?         		        		   
-        		   finalStr2 = "public"+finalStr1 + " " + newOutput + "{"+ localRef +innerStr1+ ";}";
-           		}else{
-           		   finalStr2 = "public"+finalStr1 + " " + newOutput + "{return "+ localRef +innerStr1+ ";}";
-           		}
-           		
-        		sbSignature.append(params);               		
-        		sbSignature.append(_delimiter);
-        		//Log.i("Dump_Sign",params);
-        		
-        		sbImplementation.append(finalStr2);        		
-        		sbImplementation.append(_delimiter);
-        		//Log.i("Dump_Impl", finalStr2);
-        		
-         		//----Methods Signature Resume --------
-        		
-        		String head0 = splitedStr[1];        		
-        		String head = head0;        		
-        		if ( head0.indexOf(".") > 0) {
-         			String[] listHead = head0.split("\\.");         			
-         			head = listHead[listHead.length-1];         			
-        		}        		      		
-        		String tail0 = splitedStr[splitedStr.length-1];
-        		String tail1 = tail0;
-        		if (countParams > 0) {
-        			int p2 = tail0.indexOf("(");
-        			tail1 = tail0.substring(0,p2) + "(" + simpleParams + ")";
-        					//tail0.replace(params, simpleParams);
-        		}	
-
-    		  	sbHeader.append(head+" "+tail1);            		  	
-            	sbHeader.append(_delimiter);
-            	Log.i("Dump_Header::", head+" "+tail1);
-            	mListMethodHeader.add(head+" "+tail1);
-        	 }        	 
-         }  
-         
-         mMethodFullSignature = sbSignature.toString();                  
-         mMethodImplementation = sbImplementation.toString();        
-         lastPos2 = (sbHeader.toString()).lastIndexOf(_delimiter);         
-         mMethodHeader = (sbHeader.toString()).substring(0, lastPos2);          
-    
-         /* Test...
-          MaskListMethodHeader(5);
-          MaskListMethodHeader(10);
-       	  Log.i("Dump_Lit_4", mListMethodHeader.get(4));
-       	  Log.i("Dump_Lit_5", mListMethodHeader.get(5));
-       	  Log.i("Dump_Lit_9", mListMethodHeader.get(9));
-       	  Log.i("Dump_Lit_10", mListMethodHeader.get(10));
-       	  Log.i("Dump_Lit_11", mListMethodHeader.get(11));
-       	 */         
-       	 
-         GetNoMaskedMethodImplementationList();            
-      }
-      catch (Throwable e) {
-         //System.err.println(e);
-    	  Log.i("Dump_error", e.toString());
-      }
-	  
-	  return mMethodImplementation;
-    }
-    
-    public String GetNoMaskedMethodImplementationByIndex(int _index){
-       	return mListNoMaskedMethodImplementation.get(_index);
-    }
-      
-    public int GetNoMaskedMethodImplementationListSize(){
-        	return mListNoMaskedMethodImplementation.size();
-    }     
-    public String GetNoMaskedMethodImplementationList() {
-	      String str; 	     
-	      String newStr2;
-	      String newStr3;
-	      String finalStr1;
-	      String finalStr2;
-	      String params;
-	      String auxParams;
-	      String newParams;
-	      String newItem;
-	      String localRef;
-	      
-	      String mainParam;
-	      String mainItem;	     
-	      
-	      int firstPos1;
-	      int lastPos1;	      
-	      	          
-	      int countParams;
-	      
-	  try {		  
-	    StringBuilder sbImplementation = new StringBuilder();	    
-        String mth[] = mListMethodHeader.toArray(new String[mListMethodHeader.size()]);
-        for (int i = 0; i < mth.length; i++) {
-          str= mth[i].toString(); 
-       	  if (str.indexOf(mDelimiter)< 0)       {       		
-       		newStr2 = str;       		
-       		firstPos1= newStr2.lastIndexOf("(");
-       		lastPos1 = newStr2.lastIndexOf(")");
-       		countParams = 0;            		
-       		params = "";
-       		auxParams= "";            		       
-       		newParams= "";
-       		
-       		if (lastPos1 > firstPos1+2) {
-       			params = newStr2.substring(firstPos1+1, lastPos1);
-       			countParams = 1;        		
-       			int index = params.indexOf(",");        			
-       			if (index > 0) {        			   
-       		        String[] items = params.split(",");
-       		        countParams = items.length;
-       		        newItem = items[0];        	        		        
-       		        mainItem = newItem;  
-       		        
-       		        auxParams = "_"+mainItem.charAt(0)+"0";
-       				newParams = newItem + " _"+mainItem.charAt(0)+"0";
-       				       			
-       		        for (int k = 1; k < items.length; k++) {        		                    		        
-       		            newItem = items[k];  
-       		            mainItem = newItem;       		                   		            
-           		        auxParams = auxParams + ",_"+mainItem.charAt(0)+k;       		             
-       		            newParams = newParams + ","+newItem+" _"+mainItem.charAt(0)+k;       		            
-       		        }        		        
-       			}
-       			else {                			    
-       				mainParam = params;       				
-   		        	auxParams = "_"+mainParam.charAt(0)+"0";   		        	
-       				newParams = params + " " + auxParams;
-       			}
-       		}
-       		
-       		newStr3 = newStr2.substring(0,lastPos1+1);        		        	
-       		String[] splitedStr = newStr3.split("\\s+");
-       		
-       		String input = splitedStr[splitedStr.length-1];        		
-       		String output = Character.toUpperCase(input.charAt(0)) + input.substring(1);
-       		
-       		finalStr1 = "";
-       		for (int j= 0; j < splitedStr.length-1; j++) {
-       		   finalStr1 = finalStr1 + " " + splitedStr[j];
-       		   
-       		} 
-       		       	
-       		if (mObjReferenceName.equals("this")) {       		  
-       		  localRef = "this."; 
-       	    }else{
-       	      localRef = mObjReferenceName+"."; 
-       	    }
-       		
-       		String innerStr0 = splitedStr[splitedStr.length-1];
-       		
-       		String innerStr1 = innerStr0;       		       		
-       		if (countParams > 0) {
-       			int p= innerStr0.indexOf("(");       			
-       			innerStr1 = innerStr0.substring(0, p)+"(" + auxParams + ")"; 
-       		}	
-       		
-       		String newOutput= output;
-       		if ( countParams > 0 ) {        			
-       			int p1 = output.indexOf("(");       			
-       			newOutput = output.substring(0, p1)+"(" + newParams + ")";       			
-       		}	       		
-       		
-       		
-       		if (finalStr1.contains(" void")) {           		
-       			finalStr2 = "public"+finalStr1 + " " + newOutput + "{"+ localRef +innerStr1+ ";}";
-       		}else{
-       			finalStr2 = "public"+finalStr1 + " " + newOutput + "{return "+ localRef +innerStr1+ ";}";
-       		}
-       		
-       		//finalStr2 = "public"+finalStr1 + " " + newOutput + "{"+ localRef +innerStr1+ ";}";
-       		
-       		sbImplementation.append(finalStr2);        		
-       		sbImplementation.append(mDelimiter);
-       		Log.i("Dump_Produce", finalStr2);
-       		
-       		mListNoMaskedMethodImplementation.add(finalStr2);
-       	 }        	 
-        }
-        mNoMaskedMethodImplementation = sbImplementation.toString();;
-     }
-     catch (Throwable e) {
-        //System.err.println(e);
-   	  Log.i("Dump_NoMaskedImpl_error", e.toString());
-     }
-	 return mNoMaskedMethodImplementation;
-   }
-           
-}
-
-/*Draft java code by "Lazarus Android Module Wizard"*/
-/*https://github.com/jmpessoa/lazandroidmodulewizard*/
-/*jControl template*/
-
-class jTextFileManager /*extends ...*/ {
-
-    private long     pascalObj = 0;      // Pascal Object
-    private Controls controls  = null;   // Control Class -> Java/Pascal Interface ...
-    private Context  context   = null;
-    
-    private ClipboardManager mClipBoard = null;
-    private ClipData mClipData = null;
-
-    //Warning: please, preferentially init your news params names with "_", ex: int _flag, String _hello ...
-
-    public jTextFileManager(Controls _ctrls, long _Self) { //Add more here new "_xxx" params if needed!
-       //super(contrls.activity);
-       context   = _ctrls.activity;
-       pascalObj = _Self;
-       controls  = _ctrls;      
-       mClipBoard = (ClipboardManager) controls.activity.getSystemService(Context.CLIPBOARD_SERVICE);
-    }
-
-    public void jFree() {
-      //free local objects...
-    }
-    
-    public void CopyToClipboard(String _text) {
-    	mClipData = ClipData.newPlainText("text", _text);
-        mClipBoard.setPrimaryClip(mClipData);
-    }
-    
-    public String PasteFromClipboard() {
-        ClipData cdata = mClipBoard.getPrimaryClip();
-        ClipData.Item item = cdata.getItemAt(0);
-        String txt = item.getText().toString();
-        return txt;
-    }    
-
-   //write others [public] methods code here......
-   //Warning: please, preferentially init your news params names with "_", ex: int _flag, String _hello ...
-    
-   //http://thedevelopersinfo.com/2009/11/26/using-filesystem-in-android/
-   //http://tausiq.wordpress.com/2012/06/16/readwrite-text-filedata-in-android-example-code/
-   //if you want to save/preserve the old data then you need to open the file in MODE_APPEND, not MODE_PRIVATE
-    
-   //***if you want to get your file you should look at: data/data/your_package/files/your_file_name !!!!
-   public void SaveToFile(String _txtContent, String _filename) {	  	 
-     try {
-         OutputStreamWriter outputStreamWriter = new OutputStreamWriter(context.openFileOutput(_filename, Context.MODE_PRIVATE));
-         //outputStreamWriter.write("_header");
-         outputStreamWriter.write(_txtContent);
-         //outputStreamWriter.write("_footer");
-         outputStreamWriter.close();
-     }
-     catch (IOException e) {
-         Log.i("jTextFileManager", "File write failed: " + e.toString());
-     }
-
-   }
-
-   public String LoadFromFile(String _filename) {
-
-     String ret = "";
-
-     try {
-         InputStream inputStream = context.openFileInput(_filename);
-
-         if ( inputStream != null ) {
-             InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
-             BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
-             String receiveString = "";
-             StringBuilder stringBuilder = new StringBuilder();
-
-             while ( (receiveString = bufferedReader.readLine()) != null ) {
-                 stringBuilder.append(receiveString);
-             }
-
-             inputStream.close();
-             ret = stringBuilder.toString();
-         }
-     }
-     catch (IOException e) {
-         Log.i("jTextFileManager", "Can not read file: " + e.toString());
-     }
-
-     return ret;
-   }
-      
-   //http://www.coderzheaven.com/2012/01/29/saving-textfile-to-sdcard-in-android/
-   public void SaveToSdCardFile(String _txtContent, String _filename){
-     FileWriter fWriter;     
-   //Toast.makeText(controls.activity, Environment.getExternalStorageDirectory().getPath(), Toast.LENGTH_SHORT).show();     
-     try{ // Environment.getExternalStorageDirectory().getPath()
-          fWriter = new FileWriter(Environment.getExternalStorageDirectory().getPath() +"/"+ _filename);
-          fWriter.write(_txtContent);
-          fWriter.flush();
-          fWriter.close();
-      }catch(Exception e){
-          e.printStackTrace();
-      }
-   }
-
-   //File file = new File(Environment.getExternalStorageDirectory(), filename);
-   public String LoadFromSdCardFile(String _filename){
-     char buf[] = new char[512];
-     FileReader rdr;
-     String contents = "";  //new File(Environment.getExternalStorageDirectory(), "alert.txt");
-     try {  // Environment.getExternalStorageDirectory().getPath() --> /sdcard
-         rdr = new FileReader(Environment.getExternalStorageDirectory().getPath()+"/"+_filename);
-         int s = rdr.read(buf);
-         for(int k = 0; k < s; k++){
-             contents+=buf[k];
-         }
-         rdr.close();
-     } catch (Exception e) {
-         e.printStackTrace();
-     }
-     return contents;
-   }
-   
-   public String LoadFromAssetsFile(String _filename) {	 //full file name...  
-	   InputStream is = null;
-	   FileOutputStream fos = null;	  	   
-	   String path = '/' + _filename.substring(1,_filename.lastIndexOf("/"));	   
-	   String scrFilename = _filename.substring(_filename.lastIndexOf("/")+1);	   	   	   	  
-	   File outDir = new File(path);	   
-	   outDir.mkdirs();	   
-	   try {		   
-	     is = controls.activity.getAssets().open(scrFilename);	     
-	     int size = is.available();	     
-	     byte[] buffer = new byte[size];	     
-	     File outfile = new File(_filename);
-	     fos = new FileOutputStream(outfile);  //from assets to app local data...	     
-	     for (int c = is.read(buffer); c != -1; c = is.read(buffer)){
-	       fos.write(buffer, 0, c);
-	     }	     
-	     is.close();
-	     fos.close();
-	   }
-	   catch (IOException e) {
-	      e.printStackTrace();       
-	   }	   	 
-       return  this.LoadFromFile(scrFilename);
-   }    
-}
-
-/*Draft java code by "Lazarus Android Module Wizard"*/
-/*https://github.com/jmpessoa/lazandroidmodulewizard*/
-/*jControl template*/
-
+ /**
+  * TODO
+  * jMediaPlayer
+  * 
+  * by jmpessoa
+  *
+  */
 //http://www.javatpoint.com/playing-audio-in-android-example
-//http://www.learn-android-easily.com/2013/09/android-mediaplayer-example.html
-//https://software.intel.com/en-us/forums/topic/277068
-//http://www.streamhead.com/android-tutorial-sd-card/
+class jMediaPlayer{
 	
-class jMediaPlayer {
-
-	  private long pascalObj = 0;           // Pascal Object
-	  private Controls controls  = null;    // Control Class for events
-	  private Context  context   = null;
-		
-	  private MediaPlayer mplayer;
-	  
-	  public jMediaPlayer (Controls _ctrls, long _Self) {	    
-	     
-	     //super(_ctrls.activity);
-	     pascalObj = _Self ;
-		 controls  = _ctrls;
-		 context   = _ctrls.activity;
-		   
-		 this.mplayer = new MediaPlayer();
-		 	 
-		 Log.i("jMediaPlayer", "Created!");
-	  }
-	  
-	  public void jFree() {
-	      //free local objects...
-		mplayer.release();
-	  	mplayer = null;
-	  }
-	      
-	  public void DeselectTrack(int _index){
-	  	this.mplayer.deselectTrack(_index);
-	  }
-	  
-	  /*
-	   * call the release method on your Media Player object to free the resources associated with the MediaPlayer
-	   */
-	  public void Release(){ 
-	  	this.mplayer.release();
-	  }
-	  
-	  public void Reset(){
-	  	this.mplayer.reset();
-	  }
-	      
-	  public void SetDataSource(String _path){
-		 
-		 if (this.mplayer != null) { 
-			 this.mplayer.stop();
-			 this.mplayer.reset();  //the object is like being just created....
-			 /*
-			  * Resets the MediaPlayer to its uninitialized state. After calling this method, 
-	            we will have to initialize it again by setting the data source and calling prepare(). 
-			  */
-		 } else {this.mplayer = new MediaPlayer();}
-		  
-		 if (_path.indexOf("://") > 0) {
-			  Uri uri0 = Uri.parse(_path);                //ex. "http://site.com/audio/audio.mp3"
-			  try{                                        //    "file:///sdcard/localfile.mp3" 
-			     this.mplayer.setDataSource(context, uri0);
-			  }catch (IOException e){
-				 e.printStackTrace();	
-			  }
-		 }else if (_path.indexOf("DEFAULT_RINGTONE_URI") >= 0){
-			 
-			 Log.i("jMediaPlayer", "DEFAULT_RINGTONE_URI");
-			 
-	         try{ 
-	              this.mplayer.setDataSource(context, Settings.System.DEFAULT_RINGTONE_URI);
-	         }catch (IOException e){
-	        	  Log.i("jMediaPlayer", "RINGTONE ERROR");
-	  	          e.printStackTrace();  	         
-	         }
-	         
-		 }else if (_path.indexOf("sdcard") >= 0){ //Environment.getExternalStorageDirectory().getPath()		 
-			 String sdPath =Environment.getExternalStorageDirectory().getPath();		 
-			 String newPath;     
-			 int p1 = _path.indexOf("sdcard/", 0);		 
-			 if ( p1 >= 0) {		  	 		 		   		   		   
-			   int p2 = p1+6;			 
-			   newPath = sdPath +  _path.substring(p2);				
-			   //Toast.makeText(controls.activity, newPath, Toast.LENGTH_SHORT).show();		   
-			   
-	  		    try{                                
-			       this.mplayer.setDataSource(newPath);  //    "/sdcard/music/tarck1.mp3"
-			    }catch (IOException e){
-		           e.printStackTrace();	
-	            }
-	           		   
-	  		    Log.i("jMediaPlayer", newPath);
-	  		   
-		      } else {	    	 
-		    	 String initChar = _path.substring(0,1);	    	 
-		    	 if (! initChar.equals("/")) {newPath = sdPath + '/'+ _path;}
-		    	 else {newPath = sdPath + _path;}		    	 
-		    	 //Toast.makeText(controls.activity, "->" +newPath, Toast.LENGTH_SHORT).show();
-	  		     try{                                
-		               this.mplayer.setDataSource(newPath);  //    "/sdcard/music/tarck1.mp3"
-		 		 }catch (IOException e){
-		 	            e.printStackTrace();	
-		         }
-	     	 }		 	
-		 }else {
-			 Log.i("jMediaPlayer", "loadFromAssets: "+ _path);
-			 AssetFileDescriptor afd;
-			 try {
-			 	afd = controls.activity.getAssets().openFd(_path);
-			 	this.mplayer.setDataSource(afd.getFileDescriptor(),afd.getStartOffset(),afd.getLength());  
-			 } catch (IOException e1) {
-				e1.printStackTrace();
-			 }            	     
-		 }	 
-	  }	    	
-	    
-	  //for files, it is OK to call prepare(), which blocks until MediaPlayer is ready for playback...
-	  public void Prepare(){	 //prepares the player for playback synchronously.
-	  	try {
-	  		   Log.i("jMediaPlayer", "Prepare");
-	  		   this.mplayer.prepare();		
-			} catch (IOException e) {
-				e.printStackTrace();		
+    private long PasObj   = 0;           // Pascal Obj
+    private Controls controls = null;   // Control Class for Event
+    private MediaPlayer mplayer = null;
+    private String FILE_NAME; 
+    
+    public jMediaPlayer (Controls ctrls, long pasobj, String pathToFileName) {	    
+	   PasObj   = pasobj;
+	   controls = ctrls;
+	   FILE_NAME = pathToFileName;
+	   this.mplayer = new MediaPlayer();
+    }
+    
+    public void SetDataSource(String path){	 //sets the data source (file path or http url) to use.
+    	FILE_NAME = path;
+    	try {
+			this.mplayer.setDataSource(FILE_NAME);
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
-	  }
-	  
-	  //TODO:  prepareAsync()  
-	  
-	  public void Start(){	 //it starts or resumes the playback.
-	  	 this.mplayer.start();
-	  }
-	  
-	  /*
-	   * Once in the Stopped state, playback cannot be started
-	   * until prepare() or prepareAsync() are called to set the MediaPlayer object to the Prepared state again.
-	   */
-	  public void Stop(){	 //it stops the playback.
-	  	 this.mplayer.stop();
-	  }
-	  
-	  public void Pause(){	 //it pauses the playback.
-	  	 this.mplayer.pause();
-	  }
-	  
-	  public boolean IsPlaying(){	 //checks if media player is playing.
-	  	return this.mplayer.isPlaying();
-	  }
-	  
-	  public void SeekTo(int _millis){	 //seeks to specified time in miliseconds.
-	  	this.mplayer.seekTo(_millis);	
-	  }
-	  
-	  public void SetLooping(boolean _looping){	 //sets the player for looping or non-looping.
-	  	this.mplayer.setLooping(_looping);
-	  }
-	  
-	  public boolean IsLooping(){	 //checks if the player is looping or non-looping.
-	  	return this.mplayer.isLooping();
-	  }
-	  
-	  public void SelectTrack(int _index){	 //it selects a track for the specified index.
-		  this.mplayer.selectTrack(_index);
-	  }
-	  
-	  public int GetCurrentPosition(){	 //returns the current playback position.
-	  	return this.mplayer.getCurrentPosition();
-	  }
-
-	  public int GetDuration(){	 //returns duration of the file.
-	  	return this.mplayer.getDuration();
-	  }
-	  
-	  /*
-	    setVolume  takes a scalar float value between 0 and 1 for both the left and right channels (where 0 is silent and 1 is
-	    maximum volume) ex. mediaPlayer.setVolume(1f, 0.5f);
-	   */
-	  
-	  public void SetVolume(float _leftVolume,float _rightVolume){
-	  	 this.mplayer.setVolume(_leftVolume, _rightVolume);
-	  }
-	  
+    }
+    
+    public void Prepare(){	 //prepares the player for playback synchronously.
+    	try {
+			this.mplayer.prepare();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+    }
+    public void Start(){	 //it starts or resumes the playback.
+    	this.mplayer.start();
+    }
+    public void Stop(){	 //it stops the playback.
+    	this.mplayer.stop();
+    }
+    public void Pause(){	 //it pauses the playback.
+    	this.mplayer.pause();
+    }
+    public boolean IsPlaying(){	 //checks if media player is playing.
+    	return this.mplayer.isPlaying();
+    }
+    public void SeekTo(int millis){	 //seeks to specified time in miliseconds.
+    	this.mplayer.seekTo(millis);	
+    }
+    public void SetLooping(boolean looping){	 //sets the player for looping or non-looping.
+    	this.mplayer.setLooping(looping);
+    }
+    public boolean IsLooping(){	 //checks if the player is looping or non-looping.
+    	return this.mplayer.isLooping();
+    }
+    public void SelectTrack(int index){	 //it selects a track for the specified index.
+    	
+    }
+    public int GetCurrentPosition(){	 //returns the current playback position.
+    	return this.mplayer.getCurrentPosition();
+    }
+    public int GetDuration(){	 //returns duration of the file.
+    	return this.mplayer.getDuration();
+    }
+    public void SetVolume(float leftVolume,float rightVolume){
+    	this.mplayer.setVolume(leftVolume, rightVolume);
+    }
 }
 
-
-//Javas/Pascal Interface Class 
-
-public  class Controls {          // <<---------
+//------------------------------------------------------------------------------
+//
+//Javas/Pascal Interface Class
+//
+//------------------------------------------------------------------------------
+//!!!! class controls  
+//
+public  class Controls {
 //
 public   Activity       activity;            // Activity
 public   RelativeLayout appLayout;           // Base Layout
@@ -5920,7 +5099,8 @@ public  native void pOnClickWidgetItem(long pasobj, int position, boolean checke
 static {
     Log.i("JNI_Java", "1.load libcontrols.so");
     System.loadLibrary("controls");
-    Log.i("JNI_Java", "2.load libcontrols.so");    
+    Log.i("JNI_Java", "2.load libcontrols.so");
+    
 }
 
 // -------------------------------------------------------------------------
@@ -5929,7 +5109,7 @@ static {
 public  int  jAppOnScreenStyle()          { return(pAppOnScreenStyle());   }     
 //
 public  void jAppOnCreate(Context context,RelativeLayout layout )
-                                          { pAppOnCreate(context,layout);   }
+                                         { pAppOnCreate(context,layout);   }
 public  void jAppOnNewIntent()            { pAppOnNewIntent();             }     
 public  void jAppOnDestroy()              { pAppOnDestroy();               }  
 public  void jAppOnPause()                { pAppOnPause();                 }  
@@ -6179,11 +5359,8 @@ public  int  getScreenWH(android.content.Context context) {
 }
 
 // LORDMAN - 2013-07-28
-public  int getStrLength(String Txt) {  //fix by jmpessoa
-  int len = 0;	
-  if(Txt != null) {	
-     len = Txt.length();
-  }
+public  int getStrLength(String Txt) {
+  int len = Txt.length();
   return ( len );
 }
 
@@ -6550,8 +5727,6 @@ public  void jEditText_InputTypeEx(java.lang.Object edittext, int inputType) {
 	Log.i("EditText","2.setInputTypeEx");
 }
 
-//The attribute maxLines corresponds to the maximum height of the EditText, 
-//it controls the outer boundaries and not inner text lines.
 public  void jEditText_setMaxLines(java.lang.Object edittext, int maxlines) {
 	Log.i("EditText","1.setMaxLines");
 	  ((jEditText)edittext).setMaxLines(maxlines);
@@ -6990,7 +6165,7 @@ public void jRadioButton_addLParamsAnchorRule(java.lang.Object radiobutton, int 
 }
 
 public void jRadioButton_addLParamsParentRule(java.lang.Object radiobutton, int rule) {
-	((jRadioButton)radiobutton).addLParamsParentRule(rule);
+	((jEditText)radiobutton).addLParamsParentRule(rule);
 }
 
 //by jmpessoa
@@ -8482,22 +7657,13 @@ public  java.lang.Object jSqliteCursor_Create( long pasobj ) {
 public  java.lang.Object jSqliteDataAccess_Create(long pasobj, String databaseName, char colDelim, char rowDelim) {
 	return (java.lang.Object)( new jSqliteDataAccess(this,pasobj,databaseName,colDelim,rowDelim) );
 }
-   
-   public java.lang.Object jMyHello_jCreate(long _Self, int _flag, String _hello) {
-      return (java.lang.Object)(new jMyHello(this,_Self,_flag,_hello));
-   }
-  
-   public java.lang.Object jMediaPlayer_jCreate(long _Self) {
-      return (java.lang.Object)(new jMediaPlayer(this,_Self));
-   }
-                           
-   public java.lang.Object jDumpJavaMethods_jCreate(long _Self, String _fullJavaClassName) {	   
-      return (java.lang.Object)(new jDumpJavaMethods(this,_Self,_fullJavaClassName));
-   }
-  
-   public java.lang.Object jTextFileManager_jCreate(long _Self) {
-      return (java.lang.Object)(new jTextFileManager(this,_Self));
-   }
-  
 
-}
+/* TODO: by jmpessoa
+public  java.lang.Object jMediaPlayer_Create(long pasobj, String pathToFileName) {
+	return (java.lang.Object)( new jMediaPlayer(this,pasobj,pathToFileName) );
+} */
+
+
+} //END - class Controls
+
+

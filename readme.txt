@@ -27,7 +27,7 @@
                   	
 	       https://skydrive.live.com/?cid=89ae6b50650182c6&id=89AE6B50650182C6%21149
 
-               Warning: laz4android1.1-41139 work just for win32 and  Android NDK-7c and ARM
+               Warning: original laz4android1.1-41139 win32/Android NDK-7c/ARM
  
       
       	       NEW! win32/Android NDK-9/{ARM and x86 !} :: Thanks again to TrueTom!
@@ -40,46 +40,22 @@
                 http://forum.lazarus.freepascal.org/index.php/topic,22079.0.html
 
 
-		warning: .We use a modified and expanded version of Simonsayz's "Controls.java" 
-
-		         .We use a modified and expanded version of Simonsayz's "App.java" 
-
-
               -Lazarus forum community! 
 
-
-Version 0.5 - 05 May 2014 -
-
-      :: NEW Add Component Create Wizard!
-      :: Please, read "fast_tutorial_jni_bridges_component_create.txt"
-
-
-      :: New Components[Android Bridges Extra] and Demos [Eclipse Projects]: 
-
-		jMyHello	[AppTryCode1] 
-		jMediaPlayer	[AppTryCode2]
- 
-		jTextFileManager, jDumpJavaMethods [AppTryCode3]
- 
-
 version 0.4 - revision: 05 - 02 March - 2014 -
-
-      :: Added NEW method GetText to jListView [and minor bug fix]
-      :: Update [Eclipse] AppDemo1 [List View Demo]
+              :: Added NEW method GetText to jListView [and minor bug fix]
+              :: Update [Eclipse] AppDemo1 [List View Demo]
 
 version 0.4 - revision: 04 - 01 March - 2014 -
-
-      :: New Add Custom Row Support to jListView
-      :: Update [Eclipse] AppDemo1 [List View Demo]
+              :: New Add Custom Row Support to jListView
+              :: Update [Eclipse] AppDemo1 [List View Demo]
 
 version 0.4 - revision: 03 - 19 February - 2014 -
-
-      :: New Add Image/BLOB Support to SQLite: jSqliteDataAccess, jSqliteCursor
+              :: New Add Image/BLOB Support to SQLite: jSqliteDataAccess, jSqliteCursor
 
 version 0.4 - revision: 02 - 17 February - 2014 - Minor update...
 
 version 0.4 - revision: 01 - 16 February - 2014 -
-
       :: New Add [Partial] Support to SQLite: jSqliteDataAccess, jSqliteCursor
 
          Supported FIELD_TYPE: [INTEGER, STRING, FLOAT] 
