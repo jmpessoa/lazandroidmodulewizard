@@ -1,11 +1,11 @@
 object FormAndroidProject: TFormAndroidProject
-  Left = 261
+  Left = 254
   Height = 570
-  Top = 42
+  Top = 112
   Width = 1040
   BorderIcons = []
   BorderStyle = bsSingle
-  Caption = 'Android Module Wizard: Select Java Source [JNI/Native Methods]'
+  Caption = 'Android Module Wizard: Select Java Source'
   ClientHeight = 570
   ClientWidth = 1040
   Icon.Data = {
@@ -72,6 +72,7 @@ object FormAndroidProject: TFormAndroidProject
   }
   OnCloseQuery = FormCloseQuery
   OnCreate = FormCreate
+  OnDeactivate = FormDeactivate
   OnShow = FormShow
   Position = poScreenCenter
   LCLVersion = '1.1'
@@ -97,8 +98,9 @@ object FormAndroidProject: TFormAndroidProject
         Left = 1
         Top = 2
         Caption = 'ToolButton1'
-        ImageIndex = 0
-        OnClick = ToolButton1Click
+        DropdownMenu = PopupMenu3
+        ImageIndex = 1
+        Style = tbsDropDown
       end
     end
   end
@@ -122,6 +124,7 @@ object FormAndroidProject: TFormAndroidProject
       HideSelection = False
       ReadOnly = True
       TabOrder = 0
+      OnChange = ShellTreeView1Change
       OnClick = ShellTreeView1Click
       Options = [tvoAutoItemHeight, tvoKeepCollapsedNodes, tvoReadOnly, tvoShowButtons, tvoShowLines, tvoShowRoot, tvoToolTips, tvoThemedDraw]
       ObjectTypes = [otFolders]
@@ -173,9 +176,9 @@ object FormAndroidProject: TFormAndroidProject
           Height = 359
           Top = 1
           Width = 708
-          ActivePage = TabSheet1
+          ActivePage = TabSheet2
           Align = alClient
-          TabIndex = 0
+          TabIndex = 1
           TabOrder = 0
           OnChange = PageControl1Change
           object TabSheet1: TTabSheet
@@ -195,6 +198,7 @@ object FormAndroidProject: TFormAndroidProject
               Font.Quality = fqNonAntialiased
               ParentColor = False
               ParentFont = False
+              PopupMenu = PopupMenu2
               TabOrder = 0
               Gutter.Width = 57
               Gutter.MouseActions = <>
@@ -668,7 +672,7 @@ object FormAndroidProject: TFormAndroidProject
               end
             end
           end
-          object TabSheet3: TTabSheet
+          object TabSheet2: TTabSheet
             Caption = 'Pascal JNI Interface'
             ClientHeight = 331
             ClientWidth = 700
@@ -685,7 +689,7 @@ object FormAndroidProject: TFormAndroidProject
               Font.Quality = fqNonAntialiased
               ParentColor = False
               ParentFont = False
-              PopupMenu = PopupMenu1
+              PopupMenu = PopupMenu4
               TabOrder = 0
               Gutter.Width = 57
               Gutter.MouseActions = <>
@@ -1185,6 +1189,7 @@ object FormAndroidProject: TFormAndroidProject
           ShowColumnHeaders = False
           SortType = stText
           TabOrder = 0
+          OnContextPopup = ShellListView1ContextPopup
           OnDblClick = ShellListView1DblClick
           ObjectTypes = [otNonFolders]
           ShellTreeView = ShellTreeView1
@@ -1218,6 +1223,7 @@ object FormAndroidProject: TFormAndroidProject
           Width = 75
           Anchors = [akTop, akRight]
           DefaultCaption = True
+          GlyphShowMode = gsmSystem
           Kind = bkOK
           ModalResult = 1
           TabOrder = 1
@@ -1269,10 +1275,10 @@ object FormAndroidProject: TFormAndroidProject
     top = 256
   end
   object ImageList1: TImageList
-    left = 32
-    top = 48
+    left = 89
+    top = 40
     Bitmap = {
-      4C69010000001000000010000000F0F0F000F0F0F000F0F0F000F0F0F000F0F0
+      4C69020000001000000010000000F0F0F000F0F0F000F0F0F000F0F0F000F0F0
       F000F0F0F000F0F0F000F1F1F1FFF5F5F5FFF5F5F5FFF8F8F8FFFAFAFAFFF6F6
       F6FFF1F1F1FFF0F0F000F1F1F1FFF0F0F000F0F0F000F0F0F000F2F2F2FFF0F0
       F000F0F0F000F0F0F000F3F3F3FFF0F0F000F0F0F000F0F0F000F3F3F3FFF0F0
@@ -1304,7 +1310,39 @@ object FormAndroidProject: TFormAndroidProject
       F000F7F7F7FFF3F3F3FFF5F5F5FFF5F5F5FFF1F1F1FFF0F0F000F0F0F000F4F4
       F4FFF7F7F7FFF3F3F3FFF8F8F8FFF0F0F000F0F0F000F0F0F000F0F0F000F0F0
       F000F0F0F000F0F0F000F0F0F000F0F0F000F0F0F000F0F0F000F0F0F000F1F1
-      F1FFF0F0F000F0F0F000F0F0F000
+      F1FFF0F0F000F0F0F000F0F0F000FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+      FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+      FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+      FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+      FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00B8875812B88758A5B887
+      58F9B88758FFB88758FFB88758FFB88758FFB88758FFB88758FFB88758FFB887
+      58BAB8875824FFFFFF00FFFFFF00FFFFFF00FFFFFF00B88758B1DAC1A9FFFDFC
+      FBFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFDFC9
+      B4FFB88758DBB8875806FFFFFF00FFFFFF00B887580CB88758FCFEFEFDFFFEF6
+      F0FFFEF2E9FFFEF1E6FFFEEFE4FFFEEEE1FFFEECDEFFFDEADBFFFDEADCFFFFFF
+      FFFFC7A07BFFB8875836FFFFFF00FFFFFF00B887581EC0956CFFFFFFFFFFFEF1
+      E8FFFEF0E6FFFEEFE3FFFEEDE0FFFEECDDFFFDEADBFFFDE8D7FFFDE6D5FFFFFF
+      FFFFCDAA89FFB887584BFFFFFF00FFFFFF00B887581EC0956CFFFFFFFFFFFEF0
+      E5FFFEEEE2FFFEEDE0FFFEEBDDFFFDE9DAFFFDE8D7FFFDE6D4FFFDE4D1FFFFFF
+      FFFFCDAA89FFB887584BFFFFFF00FFFFFF00B887580CB88758FCFEFEFDFFFEF2
+      E9FFFEECDFFFFDEBDCFFFDE9D9FFFDE7D6FFFDE6D3FFFDE4D0FFFCE4D1FFFFFF
+      FFFFC8A27DFFB8875839FFFFFF00FFFFFF00FFFFFF00B88758B1DAC1A9FFFEFE
+      FDFFFFFFFFFFFFFFFFFFFFFFFFFFFEEEE2FFFDE3D0FFFEF2E9FFFFFFFFFFDFC9
+      B4FFB88758DBB8875809FFFFFF00FFFFFF00FFFFFF00B8875812B88758A5B887
+      58FCB88758FFB88758FFD5B89DFFFFFFFFFFFFFFFFFFF8F3EFFFD5B89DFFB887
+      58D3B8875824FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+      FF00FFFFFF00FFFFFF00B88758DCF5EEE7FFD5B89DFFB88758F7B887587DFFFF
+      FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+      FF00FFFFFF00B887588DD4B699FFB88758F4B8875871FFFFFF00FFFFFF00FFFF
+      FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+      FF00B8875822B88758DEB8875864FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+      FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+      FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+      FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+      FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+      FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+      FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+      FF00FFFFFF00FFFFFF00FFFFFF00
     }
   end
   object PopupMenu1: TPopupMenu
@@ -1313,6 +1351,65 @@ object FormAndroidProject: TFormAndroidProject
     object MenuItem1: TMenuItem
       Caption = 'Get Simonsayz''s Templates'
       OnClick = PopupMenu1Close
+    end
+  end
+  object PopupMenu2: TPopupMenu
+    left = 285
+    top = 301
+    object MenuItem14: TMenuItem
+      Caption = 'Insert Java jControl Template'
+      OnClick = PopupMenu2Close
+    end
+    object MenuItem13: TMenuItem
+      Caption = 'Insert Java jVisualControl Template'
+      OnClick = PopupMenu2Close
+    end
+    object MenuItem15: TMenuItem
+      Caption = '-'
+    end
+    object MenuItem2: TMenuItem
+      Caption = 'Write [Draft] Pascal jControl  Interface'
+      OnClick = PopupMenu2Close
+    end
+    object MenuItem3: TMenuItem
+      Caption = 'Write  [Draft] Pascal jVisualControl Interface'
+      OnClick = PopupMenu2Close
+    end
+    object MenuItem8: TMenuItem
+      Caption = '-'
+    end
+    object MenuItem9: TMenuItem
+      Caption = 'Cancel'
+      OnClick = PopupMenu2Close
+    end
+  end
+  object PopupMenu3: TPopupMenu
+    left = 24
+    top = 40
+    object MenuItem6: TMenuItem
+      Caption = 'About'
+      OnClick = PopupMenu3Close
+    end
+    object MenuItem7: TMenuItem
+      Caption = '-'
+    end
+    object MenuItem4: TMenuItem
+      Caption = 'Exit'
+      OnClick = PopupMenu3Close
+    end
+  end
+  object PopupMenu4: TPopupMenu
+    left = 456
+    top = 384
+    object MenuItem10: TMenuItem
+      Caption = 'Register Component...'
+      OnClick = PopupMenu4Close
+    end
+    object MenuItem11: TMenuItem
+      Caption = '-'
+    end
+    object MenuItem12: TMenuItem
+      Caption = 'Cancel'
     end
   end
 end

@@ -16,7 +16,7 @@
         <CompilerPath Value="$(CompPath)"/>
       </Other>
     </CompilerOptions>
-    <Files Count="13">
+    <Files Count="14">
       <Item1>
         <Filename Value="regandroidbridge.pas"/>
         <HasRegisterProc Value="True"/>
@@ -70,6 +70,11 @@
         <Filename Value="And_log_h.pas"/>
         <UnitName Value="And_log_h"/>
       </Item13>
+      <Item14>
+        <Filename Value="register_extras.pas"/>
+        <HasRegisterProc Value="True"/>
+        <UnitName Value="register_extras"/>
+      </Item14>
     </Files>
     <Type Value="RunAndDesignTime"/>
     <RequiredPkgs Count="2">

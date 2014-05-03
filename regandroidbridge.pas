@@ -5,8 +5,12 @@ unit regandroidbridge;
 interface
 
 uses
-  Classes, SysUtils,
-  Laz_And_Controls, Laz_And_GLESv1_Canvas, Laz_And_GLESv2_Canvas, LResources;
+  Classes,
+  SysUtils,
+  Laz_And_Controls,
+  Laz_And_GLESv1_Canvas,
+  Laz_And_GLESv2_Canvas,
+  LResources;
 
 Procedure Register;
 
@@ -44,16 +48,39 @@ begin
   {$I jsmtpclient_icon.lrs}
   {$I jsqlitedataaccess_icon.lrs}
   {$I jsqlitecursor_icon.lrs}
-  RegisterComponents('Android Bridges',[jTextView, jEditText, jButton ,jCheckBox, jRadioButton,
-                                        jProgressBar, jViewFlipper, jListView,
-                                        jScrollView,jHorizontalScrollView, jPanel,
-                                        jImageBtn, jImageView, jImageList,
-                                        jView, jCanvas, jBitmap,
-                                        jDialogYN, jDialogProgress,
-                                        jCanvasES1, jCanvasES2,
-                                        jTimer, jAsyncTask, jSMS, jCamera, jWebView, jHttpClient, jSmtpClient,
-                                        jSqliteDataAccess, jSqliteCursor]);
-
+  RegisterComponents('Android Bridges',
+   [
+    jTextView,
+    jEditText,
+    jButton ,
+    jCheckBox,
+    jRadioButton,
+    jProgressBar,
+    jViewFlipper,
+    jListView,
+    jScrollView,jHorizontalScrollView,
+    jPanel,
+    jImageBtn,
+    jImageView,
+    jImageList,
+    jView,
+    jCanvas,
+    jBitmap,
+    jDialogYN,
+    jDialogProgress,
+    jCanvasES1,
+    jCanvasES2,
+    jTimer,
+    jAsyncTask,
+    jSMS,
+    jCamera,
+    jWebView,
+    jHttpClient,
+    jSmtpClient,
+    jSqliteDataAccess,
+    jSqliteCursor
+   ]
+  );
   RegisterClasses([jApp, jForm, jControl, jVisualControl, jGLViewEvent]);
   RegisterNoIcon([jApp, jForm, jControl, jVisualControl, jGLViewEvent]);
 end;
