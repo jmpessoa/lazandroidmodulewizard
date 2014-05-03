@@ -16,7 +16,7 @@
         <CompilerPath Value="$(CompPath)"/>
       </Other>
     </CompilerOptions>
-    <Files Count="6">
+    <Files Count="7">
       <Item1>
         <Filename Value="androidwizard_intf.pas"/>
         <HasRegisterProc Value="True"/>
@@ -42,6 +42,10 @@
         <Filename Value="uformandroidproject.lfm"/>
         <Type Value="LFM"/>
       </Item6>
+      <Item7>
+        <Filename Value="uregisterform.pas"/>
+        <UnitName Value="uRegisterForm"/>
+      </Item7>
     </Files>
     <Type Value="RunAndDesignTime"/>
     <RequiredPkgs Count="3">

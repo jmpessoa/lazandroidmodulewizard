@@ -1,4 +1,16 @@
+{* 
+ * Open source license agreement: Lazarus Modified LGPL 
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *}
+
+
 unit Laz_And_GLESv1_Canvas_h;
+
 
 {$ifdef fpc}
  {$mode delphi}
@@ -18,6 +30,13 @@ const
 
        ref. http://forum.lazarus.freepascal.org/index.php/topic,21919.msg137216/topicseen.html
    *)
+
+
+   (*Modified by Stephano [14-04-2014]: "I saw Leledumbo's post and the readme file. The 2 solutions that I proposed are much cleaner and don't
+     require any extra steps from the user."
+    ref. http://forum.lazarus.freepascal.org/index.php/topic,21919.105.html *)
+
+
 libname = {$ifdef linux}'libGL.so'{$else}'libGLESv1_CM.so'{$endif};
 
 type
@@ -547,7 +566,7 @@ procedure glColor4f(red, green, blue, alpha: GLfloat); cdecl; external libname;
 procedure glDepthRangef(zNear, zFar: GLclampf); cdecl; external libname;
 procedure glFogf(pname: GLenum; param: GLfloat); cdecl; external libname;
 procedure glFogfv(pname: GLenum; params: PGLfloat); cdecl; external libname;
-procedure glFrustumf(left, right, bottom, top, zNear, zFar: GLfloat); cdecl; external libname;
+procedure glFrustumf(left, right, bottom, top, zNear, zFar: GLfloat); {$IFDEF android}cdecl; external libname;{$ENDIF}
 procedure glGetClipPlanef(pname: GLenum; eqn: GLfloat); cdecl; external libname;
 procedure glGetFloatv(pname: GLenum; params: PGLfloat); cdecl; external libname;
 procedure glGetLightfv(light, pname: GLenum; params: PGLfloat); cdecl; external libname;
@@ -704,5 +723,12 @@ procedure glPointSizePointerOES(type_: GLenum; stride: GLsizei; pointer: PGLvoid
 
 implementation
 
+{$IFnDEF android}
+procedure glFrustumf(left, right, bottom, top, zNear, zFar: GLfloat);
+begin
+
+end;
+
+{$ENDIF}
 
 end.

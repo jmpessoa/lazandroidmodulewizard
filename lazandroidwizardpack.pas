@@ -7,7 +7,8 @@ unit LazAndroidWizardPack;
 interface
 
 uses
-  AndroidWizard_intf, uformworkspace, uFormAndroidProject, LazarusPackageIntf;
+  AndroidWizard_intf, uformworkspace, uFormAndroidProject, uRegisterForm, 
+  LazarusPackageIntf;
 
 implementation
 

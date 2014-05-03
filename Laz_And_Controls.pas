@@ -1,6 +1,4 @@
 ﻿//------------------------------------------------------------------------------
-//[LazAndroidModuleWizard - ver.0.4_r.04 :01-mar-2014]
-//[https://github.com/jmpessoa/lazandroidmodulewizard]
 //
 //   Native Android Controls for Pascal
 //
@@ -1004,8 +1002,8 @@ type
   //NEW by jmpessoa
   jSqliteCursor = class(jControl)
    private
-      FInitialized: boolean;
-      FjObject: jObject;
+      //FInitialized: boolean;
+      //FjObject: jObject;
    protected
    public
      constructor Create(AOwner: TComponent); override;
@@ -1075,6 +1073,32 @@ type
     property TableName: TStrings read FTableName write FTableName;
   end;
 
+  (*
+  jMediaPlayer = class(jControl)
+  private
+  protected
+  public
+    constructor Create(AOwner: TComponent); override;
+    Destructor  Destroy; override;
+    procedure Init; override;
+    procedure SetVolume(leftVolume: JFloat; rightVolume: JFloat);
+    function GetDuration(): JInt;
+    function GetCurrentPosition(): JInt;
+    procedure SelectTrack(index: JInt);
+    function IsLooping(): boolean;
+    procedure SetLooping(looping: boolean);
+    procedure SeekTo(millis: JInt);
+    function IsPlaying(): boolean;
+    procedure Pause();
+    procedure Stop();
+    procedure Start();
+    procedure Prepare();
+    procedure SetDataSource(path: string);
+
+   published
+  end;
+    *)
+
   jVisualControl = class;
   jPanel = class;
 
@@ -1093,7 +1117,7 @@ type
     FTextAlignment: TTextAlignment;
 
     FFontSize  : DWord;
-    FId           : DWord;        //by jmpessoa
+    FId           : DWord;
     FAnchorId     : integer;
     FAnchor       : jVisualControl;  //http://www.semurjengkol.com/android-relative-layout-example/
     FPositionRelativeToAnchor: TPositionRelativeToAnchorIDSet;
@@ -1525,6 +1549,7 @@ type
     Procedure SetFontSize     (Value : DWord);
     procedure SetWidget(Value: TWidgetItem);
     procedure SetImage(Value: jBitmap);
+    function GetCount: integer;
   protected
     procedure setParamHeight(Value: TLayoutParams);
     procedure SetParamWidth(Value: TLayoutParams);
@@ -1538,6 +1563,7 @@ type
     procedure UpdateLayout; override;
     procedure Init;  override;
     function IsItemChecked(index: integer): boolean;
+    procedure Add(item: string); overload;
     procedure Add(item: string; delim: string); overload;
     procedure Add(item: string; delim: string; fColor: TARGBColorBridge;
                   fSize: integer; hasWidget: TWidgetItem; widgetText: string; image: jObject); overload;
@@ -1563,6 +1589,7 @@ type
     property Parent: jObject  read  FjPRLayout write SetParent; // Java: Parent Relative Layout
     property View      : jObject   read FjRLayout  write FjRLayout; //self View
     property setItemIndex: TXY write SetItemPosition;
+    property Count: integer read GetCount;
   published
     property Items: TStrings read FItems write SetItems;
     property Visible: Boolean   read FVisible   write SetVisible;
@@ -1806,11 +1833,14 @@ type
     Procedure drawPoint            (x1,y1 : single);
     Procedure drawText             (Text : String; x,y : single);
 
-    Procedure drawBitmap           (bmp : jBitmap; b,l,r,t : integer);  overload;
-     //by jmpessoa
-    Procedure drawBitmap           (bmp: jObject; b,l,r,t : integer);  overload;
-    Procedure drawBitmap           (bmp: jBitmap; x1, y1, size: integer; ratio: single); overload;
-    Procedure drawBitmap           (bmp: jObject; x1, y1, size: integer; ratio: single); overload;
+    Procedure drawBitmap(bmp: jObject; b,l,r,t: integer); overload;
+
+    Procedure drawBitmap(bmp: jBitmap; x1, y1, size: integer; ratio: single); overload;
+
+    Procedure drawBitmap(bmp: jObject; x1, y1, size: integer; ratio: single); overload;
+
+    Procedure drawBitmap(bmp: jBitmap; b,l,r,t: integer); overload;
+
     // Property
     property  JavaObj : jObject read FjObject;
   published
@@ -5405,7 +5435,7 @@ begin
   if FInitialized  then Exit;
   inherited Init;
 
-  if Self.Items.Count = 0 then  FWidgetItem:= wgNone;
+  //if Self.Items.Count = 0 then Self.Items.Add('------Select------');  Items//FWidgetItem:= wgNone;
 
   if FImageItem <> nil then
   begin
@@ -5445,7 +5475,6 @@ begin
      for i:= 0 to Self.Items.Count-1 do
         jListView_add2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, Self.Items.Strings[i], FDelimiter);
   end;
-
 
   if FParentPanel <> nil then
   begin
@@ -5617,7 +5646,19 @@ Procedure jListView.Add(item: string; delim: string);
 begin
   if FInitialized then
   begin
+     if delim = '' then delim:= '+';
+     if item = '' then delim:= 'dummy';
      jListView_add2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, item,delim);
+     Self.Items.Add(item);
+  end;
+end;
+
+Procedure jListView.Add(item: string);
+begin
+  if FInitialized then
+  begin
+     if item = '' then item:= 'dummy';
+     jListView_add2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, item,'+');
      Self.Items.Add(item);
   end;
 end;
@@ -5627,11 +5668,12 @@ Procedure jListView.Add(item: string; delim: string; fColor: TARGBColorBridge; f
 begin
   if FInitialized then
   begin
+     if delim = '' then delim:= '+';
+     if item = '' then delim:= 'dummy';
      jListView_add3(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, item,
      delim, GetARGB(fColor), fSize, Ord(hasWidget), widgetText, image);
      Self.Items.Add(item);
   end;
-
 end;
 
 function jListView.GetText(index: Integer): string;
@@ -5640,12 +5682,19 @@ begin
     Result:= jListView_GetItemText(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, index);
 end;
 
+function jListView.GetCount: integer;
+begin
+  Result:= Self.Items.Count;
+  if FInitialized then
+    Result:= jListView_GetCount(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject);
+end;
+
 //
 Procedure jListView.Delete(index: Integer);
 begin
   if FInitialized then
   begin
-     if (index > 0) and (index < Self.Items.Count) then
+     if (index >= 0) and (index < Self.Items.Count) then    //bug fix 27-april-2014
      begin
        jListView_delete2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, index);
        Self.Items.Delete(index);
@@ -6943,27 +6992,18 @@ begin
      jCanvas_drawText2(jForm(Owner).App.Jni.jEnv,jForm(Owner).App.Jni.jThis,FjObject,text,x,y);
 end;
 
+Procedure jCanvas.drawBitmap(bmp: jObject; b,l,r,t: integer);
+begin
+  if FInitialized then
+     jCanvas_drawBitmap2(jForm(Owner).App.Jni.jEnv,jForm(Owner).App.Jni.jThis,FjObject,bmp, b, l, r, t);
+end;
+
 Procedure jCanvas.drawBitmap(bmp: jBitmap; b,l,r,t: integer);
 begin
   if FInitialized then
      jCanvas_drawBitmap2(jForm(Owner).App.Jni.jEnv,jForm(Owner).App.Jni.jThis,FjObject,bmp.GetJavaBitmap, b, l, r, t);
 end;
 
-Procedure jCanvas.drawBitmap(bmp: jBitmap; x1, y1, size: integer; ratio: single);
-var
-  r1, t1: integer;
-begin
-  r1:= Round(size-20);
-  t1:= Round((size-20)*(1/ratio));
-  if FInitialized then
-    jCanvas_drawBitmap2(jForm(Owner).App.Jni.jEnv,jForm(Owner).App.Jni.jThis,FjObject, bmp.GetJavaBitmap, x1, y1, r1, t1);
-end;
-
-Procedure jCanvas.drawBitmap(bmp: jObject; b,l,r,t: integer);
-begin
-  if FInitialized then
-     jCanvas_drawBitmap2(jForm(Owner).App.Jni.jEnv,jForm(Owner).App.Jni.jThis,FjObject,bmp, b, l, r, t);
-end;
 
 Procedure jCanvas.drawBitmap(bmp: jObject; x1, y1, size: integer; ratio: single);
 var
@@ -6973,6 +7013,17 @@ begin
   t1:= Round((size-20)*(1/ratio));
   if FInitialized then
     jCanvas_drawBitmap2(jForm(Owner).App.Jni.jEnv,jForm(Owner).App.Jni.jThis,FjObject, bmp, x1, y1, r1, t1);
+end;
+
+
+Procedure jCanvas.drawBitmap(bmp: jBitmap; x1, y1, size: integer; ratio: single);
+var
+  r1, t1: integer;
+begin
+  r1:= Round(size-20);
+  t1:= Round((size-20)*(1/ratio));
+  if FInitialized then
+    jCanvas_drawBitmap2(jForm(Owner).App.Jni.jEnv,jForm(Owner).App.Jni.jThis,FjObject, bmp.GetJavaBitmap, x1, y1, r1, t1);
 end;
 
 //------------------------------------------------------------------------------
@@ -7749,7 +7800,7 @@ end;
 constructor jSqliteCursor.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
-  FjObject := nil;
+  //FjObject := nil;
 end;
 
 destructor jSqliteCursor.Destroy;
@@ -8089,5 +8140,109 @@ begin
     end;
   end;
 end;
+
+{jMediaPlayer}
+(*
+constructor jMediaPlayer.Create(AOwner: TComponent);
+begin
+  inherited Create(AOwner);
+  //your code here....
+end;
+
+
+destructor jMediaPlayer.Destroy;
+begin
+  if not (csDesigning in ComponentState) then
+  begin
+    if jForm(Owner).App <> nil then
+    begin
+      if jForm(Owner).App.Initialized then
+      begin
+        if FjObject <> nil then
+        begin
+           jMediaPlayer_Free(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject);
+           FjObject:= nil;
+        end;
+      end;
+    end;
+  end;
+  //you others free code here...
+  inherited Destroy;
+end;
+
+Procedure jMediaPlayer.Init;
+begin
+  if FInitialized  then Exit;
+  inherited Init;
+  FjObject := jMediaPlayer_Create(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, Self, 'Path');
+  //your code here
+  FInitialized:= True;
+end;
+
+procedure jMediaPlayer.SetVolume(leftVolume: JFloat; rightVolume: JFloat);
+begin
+
+end;
+
+function jMediaPlayer.GetDuration(): JInt;
+begin
+
+end;
+
+function jMediaPlayer.GetCurrentPosition(): JInt;
+begin
+
+end;
+
+procedure jMediaPlayer.SelectTrack(index: JInt);
+begin
+
+end;
+
+function jMediaPlayer.IsLooping(): boolean;
+begin
+
+end;
+
+procedure jMediaPlayer.SetLooping(looping: boolean);
+begin
+
+end;
+
+procedure jMediaPlayer.SeekTo(millis: JInt);
+begin
+
+end;
+
+function jMediaPlayer.IsPlaying(): boolean;
+begin
+
+end;
+
+procedure jMediaPlayer.Pause();
+begin
+
+end;
+
+procedure jMediaPlayer.Stop();
+begin
+
+end;
+
+procedure jMediaPlayer.Start();
+begin
+
+end;
+
+procedure jMediaPlayer.Prepare();
+begin
+
+end;
+
+procedure jMediaPlayer.SetDataSource(path: string);
+begin
+
+end;
+  *)
 
 end.

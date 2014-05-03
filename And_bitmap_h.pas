@@ -1,12 +1,6 @@
 
-{*
- * Copyright (C) 2009 The Android Open Source Project
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
+{* 
+ * Open source license agreement: Lazarus Modified LGPL 
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -16,6 +10,10 @@
  *}
 
 unit And_bitmap_h;
+
+   (*Modified by Stephano [14-04-2014]: "I saw Leledumbo's post and the readme file. The 2 solutions that I proposed are much cleaner and don't
+     require any extra steps from the user."
+    ref. http://forum.lazarus.freepascal.org/index.php/topic,21919.105.html *)
 
 {$mode delphi}
 {$packrecords c}
@@ -58,15 +56,33 @@ type
 
   // jnigraphics
   function AndroidBitmap_getInfo(env: PJNIEnv; jbitmap: jobject; info: PAndroidBitmapInfo): cint;
-                                     cdecl; external libjnigraphics name 'AndroidBitmap_getInfo';
+                                     {$IFDEF android}cdecl; external libjnigraphics name 'AndroidBitmap_getInfo';{$ENDIF}
 
  function AndroidBitmap_lockPixels(env: PJNIEnv; jbitmap: jobject; addrPtr: PPointer {void**}): cint;
-                                     cdecl; external libjnigraphics name 'AndroidBitmap_lockPixels';
+                                     {$IFDEF android}cdecl; external libjnigraphics name 'AndroidBitmap_lockPixels';{$ENDIF}
 
   function AndroidBitmap_unlockPixels(env: PJNIEnv; jbitmap: jobject): cint;
-                                     cdecl; external libjnigraphics name 'AndroidBitmap_unlockPixels';
-
+                                     {$IFDEF android}cdecl; external libjnigraphics name 'AndroidBitmap_unlockPixels';{$ENDIF}
 
 implementation
+
+{$IFnDEF android}
+function AndroidBitmap_getInfo(env: PJNIEnv; jbitmap: jobject;
+  info: PAndroidBitmapInfo): cint;
+begin
+  Result := 0;
+end;
+
+function AndroidBitmap_lockPixels(env: PJNIEnv; jbitmap: jobject;
+  addrPtr: PPointer): cint;
+begin
+  Result := 0;
+end;
+
+function AndroidBitmap_unlockPixels(env: PJNIEnv; jbitmap: jobject): cint;
+begin
+  Result := 0;
+end;
+{$ENDIF}
 
 end.

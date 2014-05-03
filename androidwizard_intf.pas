@@ -18,7 +18,7 @@ type
 
   TAndroidProjectDescriptor = class(TProjectDescriptor)
    private
-     FPascalJNIIterfaceCode: string;
+     FPascalJNIInterfaceCode: string;
      FJavaClassName: string;
      FPathToClassName: string;
      FPathToJavaClass: string;
@@ -39,7 +39,7 @@ type
      FNDK: string;
 
      FPathToAntBin: string;
-     FProjectModel: string; {"Eclipse Project"/"Ant Project"}
+     FProjectModel: string; {"Eclipse Project"/"Ant Project"/"jControl"/"jGuiControl"}
      FAntPackageName: string;
      FMinApi: string;
      FTargetApi: string;
@@ -125,41 +125,43 @@ var
   //pathList: TStringList;
   i: integer;
 begin
- { pathList:= TStringList.Create;
-  pathList.Delimiter:=DirectorySeparator;
+
+{
+  pathList:= TStringList.Create;
+  pathList.StrictDelimiter:=DirectorySeparator;
   pathList.DelimitedText:= TrimChar(fullPath,DirectorySeparator);
 
   for i:=0 to pathList.Count-1 do
   begin
      if Pos('src', pathList.Strings[i]) > 0 then k:= i;
   end;
-  }
-
+}
 
   //fix by Leledumbo - for linux compatility
-  i := Pos('src',fullPath);
+
+  i:= Pos('src',fullPath);
   if i > 2 then
   begin
-    Result := Copy(fullPath,1,i - 2); // we don't need the trailing slash
+    Result:= Copy(fullPath,1,i - 2); // we don't need the trailing slash
   end else
-    raise Exception.Create('src folder not found');
+    raise Exception.Create('src folder not found...');
 
-
-  {
-  Result:= '';
+{
   for j:= 0 to k-1 do
   begin
       Result:= Result + pathList.Strings[j]+DirectorySeparator;
   end;
-
   Result:= TrimChar(Result, DirectorySeparator);
-  pathList.Free;}
+  pathList.Free;
+}
+
 end;
 
 function TAndroidProjectDescriptor.TryNewJNIAndroidInterfaceCode: boolean;
 var
   frm: TFormAndroidProject;
 begin
+
   Result := False;
   frm:= TFormAndroidProject.Create(nil);
   frm.ShellTreeView1.Root:= FPathToJNIFolder;  //workspace...
@@ -169,10 +171,11 @@ begin
   frm.MainActivity:= FMainActivity;
   frm.MinApi:= FMinApi;
   frm.TargetApi:= FTargetApi;
+  frm.ProjectModel:= FProjectModel;
+
   if frm.ShowModal = mrOK then
   begin
     Result := True;
-
     FSyntaxMode:= frm.SyntaxMode;
     FPathToJavaClass:= frm.PathToJavaClass;
 
@@ -182,9 +185,11 @@ begin
     AndroidFileDescriptor.ModuleType:= FModuleType;
     AndroidFileDescriptor.SyntaxMode:= FSyntaxMode;
 
-    FJavaClassName:= frm.JavaClassName;
+    FJavaClassName:= frm.JavaClassName;  //updated!
+
     FPathToClassName:= frm.PathToClassName;
-    FPascalJNIIterfaceCode:= frm.PascalJNIInterfaceCode;
+
+    FPascalJNIInterfaceCode:= frm.PascalJNIInterfaceCode;
 
     {$I-}
     ChDir(FAndroidProjectName+DirectorySeparator+ 'jni');
@@ -212,7 +217,6 @@ begin
     if IOResult <> 0 then MkDir(FPathToJNIFolder+ DirectorySeparator + 'libs'+DirectorySeparator+'armeabi-v7a');
 
   end;
-
   frm.Free;
 end;
 
@@ -269,6 +273,7 @@ begin
   if frm.ShowModal = mrOK then
   begin
     frm.SaveSettings(SettingsFilename);
+    strList:= TStringList.Create;
 
     FPathToJNIFolder:= frm.PathToWorkspace;
     FPathToNdkPlataforms:= frm.PathToNdkPlataforms;
@@ -300,24 +305,20 @@ begin
 
     FAntBuildMode:= frm.AntBuildMode;
 
-    if frm.GUIControls = 'Yes' then
-      FModuleType:= 0  {Yes: GUI / No: NoGUI}
-    else
-      FModuleType:= 1;
 
     FProjectModel:= frm.ProjectModel; //"Eclipse Project"/"Ant Project"
 
     if  FProjectModel = 'Ant' then
     begin
-      strList:= TStringList.Create;
-
       FAntPackageName:= frm.AntPackageName;   //ex. just org.lazarus
 
+      strList.StrictDelimiter:= True;
       strList.Delimiter:= DirectorySeparator;
       strList.DelimitedText:= TrimChar(FAndroidProjectName, DirectorySeparator);
       projName:= strList.Strings[strList.Count-1]; //'AppTest1';
 
       strList.Clear;
+      strList.StrictDelimiter:= True;
       strList.Delimiter:= '.';
       strList.DelimitedText:= FAntPackageName+'.'+LowerCase(projName);
       if strList.Count < 3 then strList.DelimitedText:= 'org.'+FAntPackageName+'.'+LowerCase(projName);
@@ -513,7 +514,7 @@ begin
       strList.Add('<?xml version="1.0" encoding="UTF-8"?>');
       strList.Add('<project name="'+projName+'" default="help">');
       strList.Add('<property name="sdk.dir" location="'+FPathToAndroidSDK+'"/>');
-      strList.Add('<property name="target"  value="android-17"/>');
+      strList.Add('<property name="target"  value="android-'+Trim(FTargetApi)+'"/>');
       strList.Add('<property file="ant.properties"/>');
       strList.Add('<fail message="sdk.dir is missing." unless="sdk.dir"/>');
       strList.Add('<import file="${sdk.dir}/tools/ant/build.xml"/>');
@@ -633,9 +634,8 @@ begin
          strList.Add('</manifest>');
          strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'AndroidManifest.xml');
       end;
-      strList.Free;
     end;
-    //MessageDlg('Welcome to: *'+FProjectModel+'*',mtInformation, [mbOK], 0);
+    strList.Free;
     Result := True;
   end;
   frm.Free;
@@ -660,8 +660,8 @@ var
   lastIndex: integer;
 begin
   listAux:= TStringList.Create;
-  listAux.Delimiter:= '.';
   listAux.StrictDelimiter:= True;
+  listAux.Delimiter:= '.';
   listAux.DelimitedText:= ReplaceChar(className,'/','.');
   lastIndex:= listAux.Count-1;
   listAux.Delete(lastIndex);
@@ -699,14 +699,15 @@ begin
   inherited InitProject(AProject);
 
   sourceList:= TStringList.Create;
+
   projName:= LowerCase(FJavaClassName) + '.lpr';
+
   MainFile := AProject.CreateProjectFile(projName);
   MainFile.IsPartOfProject := True;
   AProject.AddFile(MainFile, False);
   AProject.MainFileID := 0;
 
-  if FModuleType = 0 then  //GUI controls
-     AProject.AddPackageDependency('tfpandroidbridge_pack');
+  if FModuleType = 0 then AProject.AddPackageDependency('tfpandroidbridge_pack'); //GUI controls
 
   sourceList.Add('{hint: save all files to location: ' +FPathToJNIFolder+DirectorySeparator+'jni }');
   sourceList.Add('library '+ LowerCase(FJavaClassName) +';');
@@ -756,13 +757,15 @@ begin
     sourceList.Add('  gApp: jApp;');
     sourceList.Add(' ');
   end;
-  sourceList.Add(Trim(FPascalJNIIterfaceCode));  {from form...}
+
+  sourceList.Add(Trim(FPascalJNIInterfaceCode));  {from form...}
+
   sourceList.Add(' ');
   sourceList.Add('begin');
   if FModuleType = 0 then  //GUI controls...
   begin
     sourceList.Add('  gApp:= jApp.Create(nil);{Laz_And_Controls}');
-    sourceList.Add('  gApp.Title:= ''My Android GUI Library'';');
+    sourceList.Add('  gApp.Title:= ''My Android Bridges Library'';');
     sourceList.Add('  gjAppName:= '''+GetAppName(FPathToClassName)+''';{And_jni_Bridge}');
     sourceList.Add('  gjClassName:= '''+FPathToClassName+''';{And_jni_Bridge}');
     sourceList.Add('  gApp.AppName:=gjAppName;');
@@ -773,13 +776,15 @@ begin
   else
   begin
      sourceList.Add('  gApp:= jApp.Create(nil);');
-     sourceList.Add('  gApp.Title:= ''My Android NoGUI Library'';');
+     sourceList.Add('  gApp.Title:= ''My Android Pure Library'';');
      sourceList.Add('  gApp.Initialize;');
      sourceList.Add('  gApp.CreateForm(TNoGUIAndroidModule1, NoGUIAndroidModule1);');
   end;
+
   sourceList.Add('end.');
 
   AProject.MainFile.SetSourceText(sourceList.Text);
+
   AProject.Flags := AProject.Flags - [pfMainUnitHasCreateFormStatements,
                                       pfMainUnitHasTitleStatement,
                                       pfLRSFilesInOutputDirectory];
@@ -990,6 +995,7 @@ begin
                         ' -FL'+FPathToNdkPlataforms+DirectorySeparator+'libdl.so' +  {as dynamic linker}
                         ' -FU'+FPathToJNIFolder+DirectorySeparator+'obj'+ DirectorySeparator+ FJavaClassName +
                         ' -o'+FPathToJNIFolder+DirectorySeparator+'libs'+DirectorySeparator+auxStr+DirectorySeparator+'lib'+LowerCase(FJavaClassName)+'.so';  {-o}
+  //--------------------------
   sourceList.Free;
   Result := mrOK;
 end;
