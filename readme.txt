@@ -290,6 +290,9 @@ IV. Technical Notes: dependencies on laz4android [win32] IDE cross compiler:
 	end.   
 
 
+ 	:: [Edited 04-May-2014] :: WARNING:  Please, read the  NEW "fast_tutorial_jni_bridges_component_create.txt" - 
+
+
 3. About NDK libs (.so) dependency on laz4android [win32] IDE cross compiler
      
 

@@ -154,9 +154,6 @@
         Ref. image: https://jmpessoa.opendrive.com/files?Ml80ODAyNjU4Nl9XM3hTOQ
 
         WARNING: Mac users: Please, you must copy the console app "lazres" [lazarus/tools] to the folder /LazAndroidWizard; 
-
-		 Windows user: there is a "lazres.exe" in /LazAndroidWizard 
-	
                  Linux user: Thanks to  Stephano there is a "lazres" in /LazAndroidWizard 
 
    2.10. From [Dialog]: Open a 16x16 PNG icon file;

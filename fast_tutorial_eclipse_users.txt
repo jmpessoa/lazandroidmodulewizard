@@ -50,9 +50,10 @@ I. INSTALL Laz4Android
             - Use -> Install
 
 
-II. [GUI Support] Android Components Bridges - Simon's Controls remake with many extensions!
+II. [GUI Project Support] Android Components Bridges - Simon's Controls remake with many extensions!
         
-     
+    :: Support for "Android Bridges" components Controls [jControls/jVisualControls]!
+
   1. From Eclipse IDE: 
 
         1.1. File -> New -> Android Application Project
@@ -189,7 +190,10 @@ II. [GUI Support] Android Components Bridges - Simon's Controls remake with many
           -right click your  project: -> Run as -> Android Application
 	  
 
-III. [No GUI Project Support]
+
+III. [No GUI Project Support] - just a basic android ".so" - 
+
+      :: No Support for "Android Bridges" components  jControls/jVisualControls!
 
   
 1. From Eclipse IDE:
