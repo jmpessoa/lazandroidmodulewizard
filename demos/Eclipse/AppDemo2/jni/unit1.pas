@@ -122,7 +122,7 @@ begin
           Ratio:= Round(jBitmap1.Width/jBitmap1.Height);
           jView1.Canvas.drawBitmap(jBitmap1, 0, 0,
                                              jView1.Width,
-                                             Round((jView1.Width)*(1/Ratio)));
+                                             Ratio);
 
        end
        else
@@ -130,7 +130,7 @@ begin
          Ratio:= Round(jBitmap1.Height/jBitmap1.Width);
          jView1.Canvas.drawBitmap(jBitmap1, 0, 0,
                                             jView1.Height,
-                                            Round((jView1.Height)*(1/Ratio)));
+                                            Ratio);
        end;
 
        { //or you can do simply this...  NO RATIO!
