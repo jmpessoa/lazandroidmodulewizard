@@ -839,7 +839,7 @@ begin
   begin
      if Pos('[', paramType) > 0 then
      begin
-        strList.Add('  newSize0:= ?');
+        strList.Add('  newSize0:= ?; //Length(?);');
 
         if Pos('String', paramType) = 0 then
           strList.Add('  jNewArray0:= env^.New'+GetArrayTypeNameHack(paramType)+'Array(env, newSize0);  // allocate')
@@ -876,7 +876,7 @@ begin
        lstParam.GetNameValue(i, paramName, paramType);
        if Pos('[', paramType) > 0 then
        begin
-          strList.Add('  newSize'+IntToStr(k)+':= ?');
+          strList.Add('  newSize'+IntToStr(k)+':= ?; //Length(?);');
           if Pos('String', paramType) = 0 then
             strList.Add('  jNewArray'+IntToStr(k)+':= env^.New'+GetArrayTypeNameHack(paramType)+'Array(env, newSize'+IntToStr(k)+');  // allocate')
           else

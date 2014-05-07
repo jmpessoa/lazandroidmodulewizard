@@ -9,6 +9,7 @@ interface
 
 uses 
   Classes,
+  menu,
   myhello,
   textfilemanager,
   dumpjavamethods,
@@ -24,12 +25,14 @@ implementation
   
 Procedure Register;
 begin
+  {$I jmenu_icon.lrs}
   {$I jmyhello_icon.lrs}
   {$I jtextfilemanager_icon.lrs}
   {$I jdumpjavamethods_icon.lrs}
   {$I jmediaplayer_icon.lrs}
   RegisterComponents('Android Bridges Extra',
     [
+      jMenu,
       jMyHello,
       jTextFileManager,
       jDumpJavaMethods,

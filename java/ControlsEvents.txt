@@ -23,3 +23,7 @@ pOnClose=Java_Event_pOnClose(PEnv,this,TObject(pasobj));
 pOnActive=Java_Event_pOnActive(PEnv,this,TObject(pasobj));
 pOnWebViewStatus=Java_Event_pOnWebViewStatus(PEnv,this,TObject(pasobj),EventType,url);
 pOnAsyncEvent=Java_Event_pOnAsyncEvent(PEnv,this,TObject(pasobj),EventType,progress);
+pAppOnCreateOptionsMenu=Java_Event_pAppOnCreateOptionsMenu(PEnv,this,menu);
+pAppOnClickOptionMenuItem=Java_Event_pAppOnClickOptionMenuItem(PEnv,this,menuItem,itemID,itemCaption,Boolean(checked));
+pAppOnCreateContextMenu=Java_Event_pAppOnCreateContextMenu(PEnv,this,menu);
+pAppOnClickContextMenuItem=Java_Event_pAppOnClickContextMenuItem(PEnv,this,menuItem,itemID,itemCaption,Boolean(checked));

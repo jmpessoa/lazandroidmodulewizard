@@ -47,6 +47,12 @@
 
               -Lazarus forum community! 
 
+Version 0.5 - rev. 01 - 06 May 2014 -
+
+      :: NEW Add Partial Support for Menu Object [Option Menu/SubMenu and Context Menu]! //<<---- A suggestion and request by Fatih KILIÇ
+      :: NEW jMenu Component [Android Bridges EXtra]
+      :: NEW AppMenuDemo [Eclipse Project]
+
 
 Version 0.5 - 05 May 2014 -
 

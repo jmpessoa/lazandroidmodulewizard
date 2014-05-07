@@ -1,7 +1,7 @@
-package com.example.dummyapp;
+package com.example.appmenudemo;
 //
 //
-//[LazAndroidModuleWizard - ver.0.5 - rev. 01 :06-MAy-2014]
+//[LazAndroidModuleWizard - ver.0.5 - rev. 01 :05-MAy-2014]
 //
 //[https://github.com/jmpessoa/lazandroidmodulewizard]
 //

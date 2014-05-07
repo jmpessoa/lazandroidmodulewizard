@@ -519,6 +519,15 @@ type
   TOnCloseQuery      = Procedure(Sender: TObject; var CanClose: boolean) of object;
   //TOnBackButtonQuery = Procedure(Sender: TObject; var MustFree: boolean) of object;
   TOnRotate          = Procedure(Sender: TObject; rotate : integer; Var rstRotate : integer) of Object;
+
+  TOnOptionMenuItemCreate=  Procedure(Sender: TObject; jObjMenu: jObject) of Object;
+  TOnClickOptionMenuItem = Procedure(Sender: TObject; jObjMenuItem: jObject;
+                                     itemID: integer; itemCaption: string; checked: boolean) of Object;
+
+  TOnContextMenuItemCreate=  Procedure(Sender: TObject; jObjMenu: jObject) of Object;
+  TOnClickContextMenuItem = Procedure(Sender: TObject; jObjMenuItem: jObject;
+                                     itemID: integer; itemCaption: string; checked: boolean) of Object;
+
   TOnActivityRst     = Procedure(Sender: TObject; requestCode,resultCode : Integer; jData : jObject) of Object;
   TOnGLChange        = Procedure(Sender: TObject; W, H: integer) of object;
 
@@ -668,6 +677,11 @@ type
     FOnJNIPrompt   : TOnNotify;
     FOnBackButton  : TOnNotify;
 
+    FOnOptionMenuCreate: TOnOptionMenuItemCreate;
+    FOnClickOptionMenuItem: TOnClickOptionMenuItem;
+    FOnContextMenuCreate: TOnContextMenuItemCreate;
+    FOnClickContextMenuItem: TOnClickContextMenuItem;
+
     Procedure setEnabled (Value : Boolean);
     Procedure setVisible (Value : Boolean);
     Procedure setColor   (Value : TARGBColorBridge);
@@ -700,9 +714,9 @@ type
     property Orientation   : integer read FOrientation write SetOrientation;
     property Visible      : Boolean        read FVisible        write SetVisible;
     property App: jApp read FApp write FApp;
-
+    property jSef: jObject read FjObject;
   published
-    //procedure SetOnJNIPrompt(Value: TOnNotify);
+
     property ActivityMode  : TActivityMode read FActivityMode write FActivityMode;
     property Title: string  read FFormName write FFormName;
     property BackgroundColor: TARGBColorBridge  read FColor write SetColor;
@@ -711,10 +725,14 @@ type
     property OnRotate     : TOnRotate      read FOnRotate      write FOnRotate;
     property OnClick      : TOnNotify      read FOnClick       write FOnClick;
     property OnActivityRst: TOnActivityRst read FOnActivityRst write FOnActivityRst;
-    property OnJNIPrompt  : TOnNotify read FOnJNIPrompt write {SetOnJNIPrompt;}FOnJNIPrompt;
+    property OnJNIPrompt  : TOnNotify read FOnJNIPrompt write FOnJNIPrompt;
     property OnBackButton : TOnNotify read FOnBackButton write FOnBackButton;
     property OnActive     : TOnNotify read FOnActive write FOnActive;
     property OnClose      : TOnNotify read FOnClose write FOnClose;
+    property OnCreateOptionMenu: TOnOptionMenuItemCreate read FOnOptionMenuCreate write FOnOptionMenuCreate;
+    property OnClickOptionMenuItem: TOnClickOptionMenuItem read FOnClickOptionMenuItem write FOnClickOptionMenuItem;
+    property OnCreateContextMenu: TOnContextMenuItemCreate read FOnContextMenuCreate write FOnContextMenuCreate;
+    property OnClickContextMenuItem: TOnClickContextMenuItem read FOnClickContextMenuItem write FOnClickContextMenuItem;
   end;
 
   {jControl - NEW by jmpessoa}
@@ -729,6 +747,7 @@ type
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
     procedure Init;  virtual;
+    property jSelf: jObject read FjObject;
   end;
 
    //NEW by jmpessoa
@@ -1072,32 +1091,6 @@ type
     property CreateTableQuery: TStrings read FCreateTableQuery write FCreateTableQuery;
     property TableName: TStrings read FTableName write FTableName;
   end;
-
-  (*
-  jMediaPlayer = class(jControl)
-  private
-  protected
-  public
-    constructor Create(AOwner: TComponent); override;
-    Destructor  Destroy; override;
-    procedure Init; override;
-    procedure SetVolume(leftVolume: JFloat; rightVolume: JFloat);
-    function GetDuration(): JInt;
-    function GetCurrentPosition(): JInt;
-    procedure SelectTrack(index: JInt);
-    function IsLooping(): boolean;
-    procedure SetLooping(looping: boolean);
-    procedure SeekTo(millis: JInt);
-    function IsPlaying(): boolean;
-    procedure Pause();
-    procedure Stop();
-    procedure Start();
-    procedure Prepare();
-    procedure SetDataSource(path: string);
-
-   published
-  end;
-    *)
 
   jVisualControl = class;
   jPanel = class;
@@ -1905,9 +1898,19 @@ type
   Function  Java_Event_pAppOnRotate              (env: PJNIEnv; this: jobject; rotate : Integer) : integer;
   Procedure Java_Event_pAppOnConfigurationChanged(env: PJNIEnv; this: jobject);
   Procedure Java_Event_pAppOnActivityResult      (env: PJNIEnv; this: jobject; requestCode,resultCode : Integer; jData : jObject);
+  //by jmpessoa: support to Option Menu
+  procedure Java_Event_pAppOnCreateOptionsMenu(env: PJNIEnv; this: jobject; jObjMenu: jObject);
+  Procedure Java_Event_pAppOnClickOptionMenuItem(env: PJNIEnv; this: jobject; jObjMenuItem: jObject;
+                                                 itemID: integer; itemCaption: JString; checked: boolean);
+  //by jmpessoa: support to Context Menu
+  Procedure Java_Event_pAppOnClickContextMenuItem(env: PJNIEnv; this: jobject; jObjMenuItem: jObject;
+                                                itemID: integer; itemCaption: JString; checked: boolean);
+  procedure Java_Event_pAppOnCreateContextMenu(env: PJNIEnv; this: jobject; jObjMenu: jObject);
 
   // Control Event
   Procedure Java_Event_pOnDraw                   (env: PJNIEnv; this: jobject; Obj: TObject; jCanvas: jObject);
+
+
   Procedure Java_Event_pOnClick                  (env: PJNIEnv; this: jobject; Obj: TObject; Value: integer);
 
   Procedure Java_Event_pOnClickWidgetItem     (env: PJNIEnv; this: jobject; Obj: TObject;index: integer; checked: boolean);
@@ -1994,6 +1997,8 @@ var
 
 implementation
 
+uses
+  menu;
 // Event id for Pascal & Java
 const
   cTouchDown            = 0;
@@ -2591,6 +2596,81 @@ begin
   if Assigned(Form.OnActivityRst) then Form.OnActivityRst(Form,requestCode,resultCode,jData);
 end;
 
+//by jmpessoa: support to Option Menu
+procedure Java_Event_pAppOnCreateOptionsMenu(env: PJNIEnv; this: jobject; jObjMenu: jObject);
+var
+  Form: jForm;
+begin
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+  Form:= gApp.Forms.Stack[gApp.GetCurrentFormsIndex].Form;
+  if not Assigned(Form) then Exit;
+  Form.UpdateJNI(gApp);
+  if Assigned(Form.OnCreateOptionMenu) then Form.OnCreateOptionMenu(Form, jObjMenu);
+end;
+
+//by jmpessoa: support to Option Menu
+Procedure Java_Event_pAppOnClickOptionMenuItem(env: PJNIEnv; this: jobject; jObjMenuItem: jObject;
+                                                itemID: integer; itemCaption: JString; checked: boolean);
+var
+  Form: jForm;
+  pasStr: string;
+  _jBoolean: JBoolean;
+begin
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+  Form:= gApp.Forms.Stack[gApp.GetCurrentFormsIndex].Form;
+  if not Assigned(Form) then Exit;
+  Form.UpdateJNI(gApp);
+
+  pasStr := '';
+  if itemCaption <> nil then
+  begin
+    _jBoolean := JNI_False;
+    pasStr    := String( env^.GetStringUTFChars(Env,itemCaption,@_jBoolean) );
+  end;
+
+  if Assigned(Form.OnClickOptionMenuItem) then Form.OnClickOptionMenuItem(Form,jObjMenuItem,itemID,pasStr,checked);
+end;
+
+
+//by jmpessoa: support to Context Menu
+procedure Java_Event_pAppOnCreateContextMenu(env: PJNIEnv; this: jobject; jObjMenu: jObject);
+var
+  Form: jForm;
+begin
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+  Form:= gApp.Forms.Stack[gApp.GetCurrentFormsIndex].Form;
+  if not Assigned(Form) then Exit;
+  Form.UpdateJNI(gApp);
+  if Assigned(Form.OnCreateContextMenu) then Form.OnCreateContextMenu(Form, jObjMenu);
+end;
+
+//by jmpessoa: support to Context Menu
+Procedure Java_Event_pAppOnClickContextMenuItem(env: PJNIEnv; this: jobject; jObjMenuItem: jObject;
+                                                itemID: integer; itemCaption: JString; checked: boolean);
+var
+  Form: jForm;
+  pasStr: string;
+  _jBoolean: JBoolean;
+begin
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+  Form:= gApp.Forms.Stack[gApp.GetCurrentFormsIndex].Form;
+  if not Assigned(Form) then Exit;
+  Form.UpdateJNI(gApp);
+
+  pasStr := '';
+  if itemCaption <> nil then
+  begin
+    _jBoolean := JNI_False;
+    pasStr    := String( env^.GetStringUTFChars(Env,itemCaption,@_jBoolean) );
+  end;
+
+  if Assigned(Form.OnClickContextMenuItem) then Form.OnClickContextMenuItem(Form,jObjMenuItem,itemID,pasStr,checked);
+end;
+
 //------------------------------------------------------------------------------
 //  Control Event
 //------------------------------------------------------------------------------
@@ -2608,6 +2688,7 @@ begin
     jView(Obj).GenEvent_OnDraw(Obj, jCanvas);
   end;
 end;
+
 
 Procedure Java_Event_pOnClick(env: PJNIEnv; this: jobject; Obj: TObject; Value: integer);
 begin
@@ -2677,7 +2758,7 @@ end;
 
 Procedure Java_Event_pOnChange(env: PJNIEnv; this: jobject;
                                Obj: TObject; EventType : integer);
-begin                 {0:beforeTextChanged ; 1:onTextChanged ; 2: afterTextChanged}
+begin {0:beforeTextChanged ; 1:onTextChanged ; 2: afterTextChanged}
  gApp.Jni.jEnv:= env;
  gApp.Jni.jThis:= this;
 
@@ -3008,7 +3089,7 @@ begin
   FScreenWH:= App.Screen.WH;
   FOrientation:= App.Orientation;
 
-  FjObject:=  jForm_Create(App.Jni.jEnv, App.Jni.jThis, Self);
+  FjObject:=  jForm_Create(App.Jni.jEnv, App.Jni.jThis, Self); {jSef}
 
   FjRLayout:= jForm_Getlayout2(App.Jni.jEnv, App.Jni.jThis, FjObject);  {view}
 
@@ -3055,14 +3136,6 @@ begin
   Self.App.Jni.jEnv:= refApp.Jni.jEnv;
   Self.App.Jni.jThis:= refApp.Jni.jThis;
 end;
-
-{
-procedure jForm.SetOnJNIPrompt(Value: TOnNotify);
-begin
-  if FOnJNIPrompt = AValue then Exit;
-  FOnJNIPrompt:= AValue;
-end;
-}
 
 procedure jForm.ShowMessage(msg: string);
 begin
@@ -8140,109 +8213,5 @@ begin
     end;
   end;
 end;
-
-{jMediaPlayer}
-(*
-constructor jMediaPlayer.Create(AOwner: TComponent);
-begin
-  inherited Create(AOwner);
-  //your code here....
-end;
-
-
-destructor jMediaPlayer.Destroy;
-begin
-  if not (csDesigning in ComponentState) then
-  begin
-    if jForm(Owner).App <> nil then
-    begin
-      if jForm(Owner).App.Initialized then
-      begin
-        if FjObject <> nil then
-        begin
-           jMediaPlayer_Free(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject);
-           FjObject:= nil;
-        end;
-      end;
-    end;
-  end;
-  //you others free code here...
-  inherited Destroy;
-end;
-
-Procedure jMediaPlayer.Init;
-begin
-  if FInitialized  then Exit;
-  inherited Init;
-  FjObject := jMediaPlayer_Create(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, Self, 'Path');
-  //your code here
-  FInitialized:= True;
-end;
-
-procedure jMediaPlayer.SetVolume(leftVolume: JFloat; rightVolume: JFloat);
-begin
-
-end;
-
-function jMediaPlayer.GetDuration(): JInt;
-begin
-
-end;
-
-function jMediaPlayer.GetCurrentPosition(): JInt;
-begin
-
-end;
-
-procedure jMediaPlayer.SelectTrack(index: JInt);
-begin
-
-end;
-
-function jMediaPlayer.IsLooping(): boolean;
-begin
-
-end;
-
-procedure jMediaPlayer.SetLooping(looping: boolean);
-begin
-
-end;
-
-procedure jMediaPlayer.SeekTo(millis: JInt);
-begin
-
-end;
-
-function jMediaPlayer.IsPlaying(): boolean;
-begin
-
-end;
-
-procedure jMediaPlayer.Pause();
-begin
-
-end;
-
-procedure jMediaPlayer.Stop();
-begin
-
-end;
-
-procedure jMediaPlayer.Start();
-begin
-
-end;
-
-procedure jMediaPlayer.Prepare();
-begin
-
-end;
-
-procedure jMediaPlayer.SetDataSource(path: string);
-begin
-
-end;
-  *)
 
 end.
