@@ -1,7 +1,7 @@
 package com.example.apptrycode1;
 //
 //
-//[LazAndroidModuleWizard - ver.0.5 :03-MAy-2014]
+//[LazAndroidModuleWizard - ver.0.5 - rev. 01 :05-MAy-2014]
 //
 //[https://github.com/jmpessoa/lazandroidmodulewizard]
 //
@@ -107,10 +107,13 @@ import android.media.MediaPlayer;
 import android.net.Uri;
 import android.util.Log;
 import android.util.TypedValue;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
+import android.view.SubMenu;
 import android.view.SurfaceHolder;
 import android.view.View.OnClickListener;
 import android.view.View;
@@ -185,6 +188,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteException;
 import java.lang.reflect.*;
+
 //-------------------------------------------------------------------------
 //Constants
 //-------------------------------------------------------------------------
@@ -5873,14 +5877,168 @@ class jMediaPlayer {
 	  
 }
 
+/*Draft java code by "Lazarus Android Module Wizard" [4-5-14 20:46:56]*/
+/*https://github.com/jmpessoa/lazandroidmodulewizard*/
+/*jControl template*/
+
+class jMenu /*extends ...*/ {
+  
+    private long     pascalObj = 0;      // Pascal Object
+    private Controls controls  = null;   // Control Class -> Java/Pascal Interface ...
+    private Context  context   = null;
+    private Menu     mMenu     = null;
+    private SubMenu[] mSubMenus;
+    private int mCountSubMenu = 0;
+  
+    //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
+  
+    public jMenu(Controls _ctrls, long _Self) { //Add more others news "_xxx" params if needed!
+       //super(_ctrls.activity);
+       context   = _ctrls.activity;
+       pascalObj = _Self;
+       controls  = _ctrls;
+       mMenu     = null;
+       mSubMenus = new SubMenu[8];
+    }
+  
+    public void jFree() {
+        //free local objects...
+    	mMenu = null;
+    }
+  
+    //write others [public] methods code here......
+    //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...       
+    public void Add(Menu _menu, int _itemID, String _caption){
+	  _menu.add(0,_itemID,0 ,(CharSequence)_caption);
+	  if (mMenu == null) mMenu = _menu;
+	  Log.i("jMenu_add", _caption);
+    }
+    
+    public void AddCheckable(Menu _menu, int _itemID, String _caption){
+	   _menu.add(0,_itemID,0 ,(CharSequence)_caption).setCheckable(true);
+	   if (mMenu == null) mMenu = _menu;
+	   Log.i("jMenu_AddCheckable", _caption);
+    }
+    
+    //TODO: ic_launcher.png just for test!
+    public void AddDrawable(Menu _menu, int _itemID, String _caption){    	
+ 	   _menu.add(0,_itemID,0 ,(CharSequence)_caption).setIcon(R.drawable.ic_launcher);
+ 	   if (mMenu == null) mMenu = _menu;
+ 	   Log.i("jMenu_AddDrawable", _caption);
+    }
+    
+    public void CheckItemCommute(MenuItem _item){
+    	int flag = 0;
+    	if (_item.isChecked()) flag = 1;
+    	switch (flag) {
+    	  case 0: _item.setChecked(false); 
+    	  case 1: _item.setChecked(true);
+        }
+  	   Log.i("jMenu_CheckItemCommute", _item.getTitle().toString());
+    }
+    
+    public void CheckItem(MenuItem _item){
+       _item.setChecked(true);
+       Log.i("jMenu_CheckItem", _item.getTitle().toString());
+    }
+    
+    public void UnCheckItem(MenuItem _item){
+       _item.setChecked(false);       
+   	   Log.i("jMenu_UnCheckItem", _item.getTitle().toString());
+    }    
+    
+    public void AddSubMenu(Menu _menu, int _startItemID, String[] _captions){
+    	
+    	int size = _captions.length;
+    	if (size > 1) {
+    			
+     	   mSubMenus[mCountSubMenu] = _menu.addSubMenu((CharSequence)_captions[0]); //main title     	        	   
+     	   mSubMenus[mCountSubMenu].setHeaderIcon(R.drawable.ic_launcher);  
+     	   
+    	   Log.i("jMenu_addSubMenu", _captions[0]);
+    	   
+    	   for(int i=1; i < size; i++) {    	
+    		   mSubMenus[mCountSubMenu].add(0,_startItemID+(i-1),0,(CharSequence)_captions[i]); //sub titles...
+    	     Log.i("jMenu_addSubMenu", _captions[i]);
+    	   }
+    	   
+    	   mCountSubMenu++;
+    	   
+    	   if (mMenu == null) mMenu = _menu;
+    	}    	    	
+    }
+
+   //TODO: ic_launcher.png just for test!
+    public void AddCheckableSubMenu(Menu _menu, int _startItemID, String[] _captions){
+    	
+    	int size = _captions.length;
+    	if (size > 1) {
+    		
+    	   mSubMenus[mCountSubMenu] = _menu.addSubMenu((CharSequence)_captions[0]); //main title
+    	   mSubMenus[mCountSubMenu].setHeaderIcon(R.drawable.ic_launcher);  
+     	   
+    	   Log.i("jMenu_AddCheckableSubMenu", _captions[0]);
+    	   for(int i=1; i < size; i++) {    	
+    		  mSubMenus[mCountSubMenu].add(0,_startItemID+(i-1),0,(CharSequence)_captions[i]).setCheckable(true); //sub titles...
+    	      Log.i("jMenu_addSubMenu", _captions[i]);
+    	   }
+    	   
+    	   mCountSubMenu++;
+    	   if (mMenu == null) mMenu = _menu;	   
+    	}
+    }
+    
+    public int Size(){
+    	if (mMenu != null)
+    	   return mMenu.size();
+    	else 
+    	  return 0;   			
+    }
+    
+    public MenuItem FindMenuItemByID(int _itemID){
+    	if (mMenu != null) return mMenu.findItem(_itemID);
+    	else return null;
+    }
+
+    public MenuItem GetMenuItemByIndex(int _index){
+    	if (mMenu != null)
+    	   return mMenu.getItem(_index);
+    	else return null;
+    }
+    
+    public void UnCheckAllMenuItem(){
+      if (mMenu != null){	
+    	 for(int index=0; index < mMenu.size(); index++){
+    		mMenu.getItem(index).setChecked(false);
+    	 }    	 
+      } 	
+    }
+    
+    public int CountSubMenus(){
+       return mCountSubMenu; 	
+    } 
+    
+    public void UnCheckAllSubMenuItemByIndex(int _subMenuIndex){
+       if (mMenu != null){	
+      	  for(int i=0; i < mSubMenus[_subMenuIndex].size(); i++){
+      		 mSubMenus[_subMenuIndex].getItem(i).setChecked(false);
+      	  }    	 
+       } 	
+    }
+    
+    public void RegisterForContextMenu(View _view){
+       controls.activity.registerForContextMenu(_view);
+    }
+    
+}
 
 //Javas/Pascal Interface Class 
 
-public  class Controls {          // <<---------
+public  class Controls {          // <<--------- 
 //
-public   Activity       activity;            // Activity
-public   RelativeLayout appLayout;           // Base Layout
-public   int            screenStyle = 0;     // Screen Style [Dev:0 , Portrait: 1, Landscape : 2]
+public Activity        activity;             // Activity
+public RelativeLayout  appLayout;            // Base Layout
+public int             screenStyle=0;        // Screen Style [Dev:0 , Portrait: 1, Landscape : 2]
 
 // Jave -> Pascal Function ( Pascal Side = Event )
 public  native int  pAppOnScreenStyle(); 
@@ -5895,7 +6053,16 @@ public  native void pAppOnStop       ();
 public  native void pAppOnBackPressed(); 
 public  native int  pAppOnRotate     (int rotate); 
 public  native void pAppOnConfigurationChanged(); 
-public  native void pAppOnActivityResult(int requestCode, int resultCode, Intent data); 
+public  native void pAppOnActivityResult(int requestCode,int resultCode,Intent data); 
+
+//by jmpessoa: support Option Menu
+public  native void pAppOnCreateOptionsMenu(Menu menu);
+public  native void pAppOnClickOptionMenuItem(MenuItem menuItem,int itemID,String itemCaption,boolean checked);
+
+//by jmpessoa: support Context Menu
+public  native void pAppOnCreateContextMenu(Menu menu);
+public  native void pAppOnClickContextMenuItem(MenuItem menuItem,int itemID,String itemCaption,boolean checked);
+
 //
 public  native void pOnClick     (long pasobj, int value);
 public  native void pOnChange    (long pasobj, int EventType);
@@ -5903,12 +6070,13 @@ public  native void pOnEnter     (long pasobj);
 public  native void pOnTimer     (long pasobj);
 //
 public  native void pOnDraw      (long pasobj, Canvas canvas);
+
 public  native void pOnTouch     (long pasobj, int act, int cnt,float x1, float y1,float x2, float y2);
 public  native void pOnGLRenderer(long pasobj, int EventType, int w, int h);
 //
-public  native void pOnClose     (long pasobj);     //Add "context" by jmpessoa
+public  native void pOnClose     (long pasobj);    
 
-public  native void pOnActive     (long pasobj);     //new by jmpessoa
+public  native void pOnActive     (long pasobj); //new by jmpessoa
 //
 public  native int  pOnWebViewStatus (long pasobj, int EventType, String url);
 public  native void pOnAsyncEvent    (long pasobj, int EventType, int progress);
@@ -5916,7 +6084,7 @@ public  native void pOnAsyncEvent    (long pasobj, int EventType, int progress);
 //new by jmpessoa: support for jListView custom row
 public  native void pOnClickWidgetItem(long pasobj, int position, boolean checked); 
 
-// Load Pascal Library
+//Load Pascal Library
 static {
     Log.i("JNI_Java", "1.load libcontrols.so");
     System.loadLibrary("controls");
@@ -5929,19 +6097,26 @@ static {
 public  int  jAppOnScreenStyle()          { return(pAppOnScreenStyle());   }     
 //
 public  void jAppOnCreate(Context context,RelativeLayout layout )
-                                          { pAppOnCreate(context,layout);   }
+                                          { pAppOnCreate(context,layout);  }
 public  void jAppOnNewIntent()            { pAppOnNewIntent();             }     
 public  void jAppOnDestroy()              { pAppOnDestroy();               }  
 public  void jAppOnPause()                { pAppOnPause();                 }  
 public  void jAppOnRestart()              { pAppOnRestart();               }    
 public  void jAppOnResume()               { pAppOnResume();                }    
-public  void jAppOnStart()                { pAppOnStart();                }     //change by jmpessoa : old OnActive
+public  void jAppOnStart()                { pAppOnStart();                 }     //change by jmpessoa : old OnActive
 public  void jAppOnStop()                 { pAppOnStop();                  }   
 public  void jAppOnBackPressed()          { pAppOnBackPressed();           }   
 public  int  jAppOnRotate(int rotate)     { return(pAppOnRotate(rotate));  }
 public  void jAppOnConfigurationChanged() { pAppOnConfigurationChanged();  }
 public  void jAppOnActivityResult(int requestCode, int resultCode, Intent data) 
                                           { pAppOnActivityResult(requestCode,resultCode,data); } 
+//By jmpessoa: support Option Menu
+public  void jAppOnCreateOptionsMenu(Menu m) {pAppOnCreateOptionsMenu(m);}
+public  void jAppOnClickOptionMenuItem(MenuItem item,int itemID, String itemCaption, boolean checked){pAppOnClickOptionMenuItem(item,itemID,itemCaption,checked);}
+
+//By jmpessoa: supportContextMenu
+public  void jAppOnCreateContextMenu(Menu m) {pAppOnCreateContextMenu(m);}
+public  void jAppOnClickContextMenuItem(MenuItem item,int itemID, String itemCaption, boolean checked){pAppOnClickContextMenuItem(item,itemID,itemCaption,checked);}
 
 //rotate=1 --> device on vertical/default position ; 2 --> device on horizontal position      //tips by jmpessoa
 
@@ -5951,7 +6126,7 @@ public  void jAppOnActivityResult(int requestCode, int resultCode, Intent data)
 
 //
 public  void systemGC() {
-  System.gc();
+   System.gc();
 }
 
 //
@@ -5970,25 +6145,24 @@ public  void classSetNull (Class object) {
 }
 
 public  void classChkNull (Class object) {
-  if (object == null) { Log.i("JAVA","checkNull-Null"); };
-  if (object != null) { Log.i("JAVA","checkNull-Not Null"); };
+   if (object == null) { Log.i("JAVA","checkNull-Null"); };
+   if (object != null) { Log.i("JAVA","checkNull-Not Null"); };
 }
 
 // -------------------------------------------------------------------------
 //  App Related
 // -------------------------------------------------------------------------
-
 //
-public  void appFinish () {
-  activity.finish();
-  System.exit(0); //<< ------- fix by jmpessoa
-}
 
+public  void appFinish () {
+   activity.finish();
+   System.exit(0); //<< ------- fix by jmpessoa
+}
 
 //
 public  void appKillProcess() {
 //  android.os.Process.killProcess(android.os.Process.myPid());
-  this.activity.finish();
+   this.activity.finish();
  //my comm: ActivityManager am = (ActivityManager)activity.getSystemService(activity.ACTIVITY_SERVICE);
  //my com: am.restartPackage(activity.getPackageName());
 }
@@ -8497,6 +8671,12 @@ public  java.lang.Object jSqliteDataAccess_Create(long pasobj, String databaseNa
   
    public java.lang.Object jTextFileManager_jCreate(long _Self) {
       return (java.lang.Object)(new jTextFileManager(this,_Self));
+   }
+  
+
+  
+   public java.lang.Object jMenu_jCreate(long _Self) {
+      return (java.lang.Object)(new jMenu(this,_Self));
    }
   
 

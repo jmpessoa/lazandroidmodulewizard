@@ -1,5 +1,9 @@
 package com.example.apptrycode3;
 
+//[LazAndroidModuleWizard - ver.0.5 - rev. 01 :05-MAy-2014]
+//
+//[https://github.com/jmpessoa/lazandroidmodulewizard]
+
 //Android Java Interface for Pascal/Delphi XE5 
 //[and Lazarus by jmpessoa@hotmail.com - december/2013]
 
@@ -20,6 +24,11 @@ import android.content.Intent;
 import android.content.res.Configuration;
 import android.content.pm.ActivityInfo; 
 import android.widget.RelativeLayout;
+import android.view.ContextMenu;
+import android.view.ContextMenu.ContextMenuInfo;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
 import android.view.WindowManager;
 //import android.view.View;
 import android.os.Bundle;
@@ -103,4 +112,36 @@ public class App extends Activity {
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
       controls.jAppOnActivityResult(requestCode,resultCode,data);                                     
     }
+
+   //by jmpessoa: option menu support
+   @Override
+   public boolean onCreateOptionsMenu(Menu menu) {
+    	controls.jAppOnCreateOptionsMenu(menu);
+        return true;
+   }
+
+   /*by jmpessoa: Handles menu item selections */
+   @Override
+   public boolean onOptionsItemSelected(MenuItem item) {
+      String caption = item.getTitle().toString();
+      controls.jAppOnClickOptionMenuItem(item, item.getItemId(), caption, item.isChecked());
+      return false;
+   }
+
+ //by jmpessoa: context menu support -  Context menu items do not support icons!
+   @Override    
+   public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
+      super.onCreateContextMenu(menu, v, menuInfo);
+      Log.i("App.Java_onCreateContextMenu", "long_pressed!");
+      controls.jAppOnCreateContextMenu(menu);              
+   }
+
+   /*by jmpessoa: Handles menu item selections*/
+   @Override    
+   public boolean onContextItemSelected(MenuItem item) {
+   	  String caption = item.getTitle().toString();
+   	  controls.jAppOnClickContextMenuItem(item, item.getItemId(), caption, item.isChecked());
+      return false;
+   }
+   
 }
