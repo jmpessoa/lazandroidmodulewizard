@@ -39,17 +39,17 @@ implementation
 
 procedure TAndroidModule1.jButton1Click(Sender: TObject);
 begin
-    ShowMessage(UpperCase(jEditText1.Text));
+  ShowMessage(UpperCase(jEditText1.Text));
 end;
 
 procedure TAndroidModule1.DataModuleCreate(Sender: TObject);
 begin        //jus to fix *.lfm parse fail on Laz4Android cross compile... why fail ?
-    Self.OnJNIPrompt:= DataModuleJNIPrompt;
+  Self.OnJNIPrompt:= DataModuleJNIPrompt;
 end;
 
 procedure TAndroidModule1.DataModuleJNIPrompt(Sender: TObject);
 begin
-    Self.Show;
+  Self.Show;
 end;
 
 procedure TAndroidModule1.DataModuleRotate(Sender: TObject; rotate: integer;

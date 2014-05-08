@@ -9,10 +9,13 @@
         <Filename Value="controls.lpr"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="controls"/>
+        <IsVisibleTab Value="True"/>
+        <EditorIndex Value="1"/>
         <WindowIndex Value="0"/>
-        <TopLine Value="23"/>
-        <CursorPos X="7" Y="31"/>
+        <TopLine Value="402"/>
+        <CursorPos X="5" Y="423"/>
         <UsageCount Value="35"/>
+        <Loaded Value="True"/>
         <DefaultSyntaxHighlighter Value="Delphi"/>
       </Unit0>
       <Unit1>
@@ -22,7 +25,6 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="DataModule"/>
         <UnitName Value="unit1"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="0"/>
         <WindowIndex Value="0"/>
         <TopLine Value="61"/>
@@ -52,7 +54,7 @@
     <General>
       <ActiveWindowIndexAtStart Value="0"/>
     </General>
-    <JumpHistory Count="20" HistoryIndex="19">
+    <JumpHistory Count="21" HistoryIndex="20">
       <Position1>
         <Filename Value="unit1.pas"/>
         <Caret Line="10" Column="12" TopLine="1"/>
@@ -133,6 +135,10 @@
         <Filename Value="unit1.pas"/>
         <Caret Line="69" Column="9" TopLine="61"/>
       </Position20>
+      <Position21>
+        <Filename Value="controls.lpr"/>
+        <Caret Line="26" Column="25" TopLine="23"/>
+      </Position21>
     </JumpHistory>
   </ProjectSession>
   <EditorMacros Count="0"/>

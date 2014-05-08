@@ -4,7 +4,7 @@ library controls;
 {$mode delphi}
 
 uses
-  Classes, SysUtils, And_jni, And_jni_Bridge, Laz_And_Controls, unit1;
+  Classes, SysUtils, And_jni, And_jni_Bridge, Laz_And_Controls, Unit1;
 
 { Class:     com_example_appdemo1_Controls
   Method:    pAppOnScreenStyle
@@ -111,6 +111,38 @@ begin
 end;
 
 { Class:     com_example_appdemo1_Controls
+  Method:    pAppOnCreateOptionsMenu
+  Signature: (Landroid/view/Menu;)V }
+procedure pAppOnCreateOptionsMenu(PEnv: PJNIEnv; this: JObject; menu: JObject); cdecl;
+begin
+  Java_Event_pAppOnCreateOptionsMenu(PEnv,this,menu);
+end;
+
+{ Class:     com_example_appdemo1_Controls
+  Method:    pAppOnClickOptionMenuItem
+  Signature: (Landroid/view/MenuItem;ILjava/lang/String;Z)V }
+procedure pAppOnClickOptionMenuItem(PEnv: PJNIEnv; this: JObject; menuItem: JObject; itemID: JInt; itemCaption: JString; checked: JBoolean); cdecl;
+begin
+  Java_Event_pAppOnClickOptionMenuItem(PEnv,this,menuItem,itemID,itemCaption,Boolean(checked));
+end;
+
+{ Class:     com_example_appdemo1_Controls
+  Method:    pAppOnCreateContextMenu
+  Signature: (Landroid/view/Menu;)V }
+procedure pAppOnCreateContextMenu(PEnv: PJNIEnv; this: JObject; menu: JObject); cdecl;
+begin
+  Java_Event_pAppOnCreateContextMenu(PEnv,this,menu);
+end;
+
+{ Class:     com_example_appdemo1_Controls
+  Method:    pAppOnClickContextMenuItem
+  Signature: (Landroid/view/MenuItem;ILjava/lang/String;Z)V }
+procedure pAppOnClickContextMenuItem(PEnv: PJNIEnv; this: JObject; menuItem: JObject; itemID: JInt; itemCaption: JString; checked: JBoolean); cdecl;
+begin
+  Java_Event_pAppOnClickContextMenuItem(PEnv,this,menuItem,itemID,itemCaption,Boolean(checked));
+end;
+
+{ Class:     com_example_appdemo1_Controls
   Method:    pOnClick
   Signature: (JI)V }
 procedure pOnClick(PEnv: PJNIEnv; this: JObject; pasobj: JLong; value: JInt); cdecl;
@@ -119,15 +151,7 @@ begin
 end;
 
 { Class:     com_example_appdemo1_Controls
-  Method:    pOnClickWidgetItem
-  Signature: (JIZ)V }
-procedure pOnClickWidgetItem(PEnv: PJNIEnv; this: JObject; pasobj: JLong; index: JInt; checked: JBoolean); cdecl;
-begin
-  Java_Event_pOnClickWidgetItem(PEnv,this,TObject(pasobj),index,Boolean(checked));
-end;
-
-{ Class:   com_example_appdemo1_Controls
-  Method:  pOnChange
+  Method:    pOnChange
   Signature: (JI)V }
 procedure pOnChange(PEnv: PJNIEnv; this: JObject; pasobj: JLong; EventType: JInt); cdecl;
 begin
@@ -206,7 +230,15 @@ begin
   Java_Event_pOnAsyncEvent(PEnv,this,TObject(pasobj),EventType,progress);
 end;
 
-const NativeMethods:array[0..24] of JNINativeMethod = (
+{ Class:     com_example_appdemo1_Controls
+  Method:    pOnClickWidgetItem
+  Signature: (JIZ)V }
+procedure pOnClickWidgetItem(PEnv: PJNIEnv; this: JObject; pasobj: JLong; position: JInt; checked: JBoolean); cdecl;
+begin
+  Java_Event_pOnClickWidgetItem(PEnv,this,TObject(pasobj),position,Boolean(checked));
+end;
+
+const NativeMethods:array[0..28] of JNINativeMethod = (
    (name:'pAppOnScreenStyle';
     signature:'()I';
     fnPtr:@pAppOnScreenStyle;),
@@ -246,12 +278,21 @@ const NativeMethods:array[0..24] of JNINativeMethod = (
    (name:'pAppOnActivityResult';
     signature:'(IILandroid/content/Intent;)V';
     fnPtr:@pAppOnActivityResult;),
+   (name:'pAppOnCreateOptionsMenu';
+    signature:'(Landroid/view/Menu;)V';
+    fnPtr:@pAppOnCreateOptionsMenu;),
+   (name:'pAppOnClickOptionMenuItem';
+    signature:'(Landroid/view/MenuItem;ILjava/lang/String;Z)V';
+    fnPtr:@pAppOnClickOptionMenuItem;),
+   (name:'pAppOnCreateContextMenu';
+    signature:'(Landroid/view/Menu;)V';
+    fnPtr:@pAppOnCreateContextMenu;),
+   (name:'pAppOnClickContextMenuItem';
+    signature:'(Landroid/view/MenuItem;ILjava/lang/String;Z)V';
+    fnPtr:@pAppOnClickContextMenuItem;),
    (name:'pOnClick';
     signature:'(JI)V';
     fnPtr:@pOnClick;),
-   (name:'pOnClickWidgetItem';
-    signature:'(JIZ)V';
-    fnPtr:@pOnClickWidgetItem;),
    (name:'pOnChange';
     signature:'(JI)V';
     fnPtr:@pOnChange;),
@@ -281,7 +322,10 @@ const NativeMethods:array[0..24] of JNINativeMethod = (
     fnPtr:@pOnWebViewStatus;),
    (name:'pOnAsyncEvent';
     signature:'(JII)V';
-    fnPtr:@pOnAsyncEvent;)
+    fnPtr:@pOnAsyncEvent;),
+   (name:'pOnClickWidgetItem';
+    signature:'(JIZ)V';
+    fnPtr:@pOnClickWidgetItem;)
 );
 
 function RegisterNativeMethodsArray(PEnv: PJNIEnv; className: PChar; methods: PJNINativeMethod; countMethods:integer):integer;
@@ -350,8 +394,11 @@ exports
   pAppOnRotate name 'Java_com_example_appdemo1_Controls_pAppOnRotate',
   pAppOnConfigurationChanged name 'Java_com_example_appdemo1_Controls_pAppOnConfigurationChanged',
   pAppOnActivityResult name 'Java_com_example_appdemo1_Controls_pAppOnActivityResult',
+  pAppOnCreateOptionsMenu name 'Java_com_example_appdemo1_Controls_pAppOnCreateOptionsMenu',
+  pAppOnClickOptionMenuItem name 'Java_com_example_appdemo1_Controls_pAppOnClickOptionMenuItem',
+  pAppOnCreateContextMenu name 'Java_com_example_appdemo1_Controls_pAppOnCreateContextMenu',
+  pAppOnClickContextMenuItem name 'Java_com_example_appdemo1_Controls_pAppOnClickContextMenuItem',
   pOnClick name 'Java_com_example_appdemo1_Controls_pOnClick',
-  pOnClickWidgetItem name 'Java_com_example_appdemo1_Controls_pOnClickWidgetItem',
   pOnChange name 'Java_com_example_appdemo1_Controls_pOnChange',
   pOnEnter name 'Java_com_example_appdemo1_Controls_pOnEnter',
   pOnTimer name 'Java_com_example_appdemo1_Controls_pOnTimer',
@@ -361,11 +408,12 @@ exports
   pOnClose name 'Java_com_example_appdemo1_Controls_pOnClose',
   pOnActive name 'Java_com_example_appdemo1_Controls_pOnActive',
   pOnWebViewStatus name 'Java_com_example_appdemo1_Controls_pOnWebViewStatus',
-  pOnAsyncEvent name 'Java_com_example_appdemo1_Controls_pOnAsyncEvent';
+  pOnAsyncEvent name 'Java_com_example_appdemo1_Controls_pOnAsyncEvent',
+  pOnClickWidgetItem name 'Java_com_example_appdemo1_Controls_pOnClickWidgetItem';
 
 begin
   gApp:= jApp.Create(nil);{Laz_And_Controls}
-  gApp.Title:= 'My Android GUI Library';
+  gApp.Title:= 'My Android Bridges Library';
   gjAppName:= 'com.example.appdemo1';{And_jni_Bridge}
   gjClassName:= 'com/example/appdemo1/Controls';{And_jni_Bridge}
   gApp.AppName:=gjAppName;
@@ -373,4 +421,3 @@ begin
   gApp.Initialize;
   gApp.CreateForm(TAndroidModule1, AndroidModule1);
 end.
-

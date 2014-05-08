@@ -1,11 +1,11 @@
 {hint: save all files to location: C:\adt32\eclipse\workspace\AppTryCode2\jni }
 library controls;
- 
+
 {$mode delphi}
- 
+
 uses
-  Classes, SysUtils, And_jni, And_jni_Bridge, Laz_And_Controls, unit1;
- 
+  Classes, SysUtils, And_jni, And_jni_Bridge, Laz_And_Controls, Unit1;
+
 { Class:     com_example_apptrycode2_Controls
   Method:    pAppOnScreenStyle
   Signature: ()I }
@@ -111,6 +111,38 @@ begin
 end;
 
 { Class:     com_example_apptrycode2_Controls
+  Method:    pAppOnCreateOptionsMenu
+  Signature: (Landroid/view/Menu;)V }
+procedure pAppOnCreateOptionsMenu(PEnv: PJNIEnv; this: JObject; menu: JObject); cdecl;
+begin
+  Java_Event_pAppOnCreateOptionsMenu(PEnv,this,menu);
+end;
+
+{ Class:     com_example_apptrycode2_Controls
+  Method:    pAppOnClickOptionMenuItem
+  Signature: (Landroid/view/MenuItem;ILjava/lang/String;Z)V }
+procedure pAppOnClickOptionMenuItem(PEnv: PJNIEnv; this: JObject; menuItem: JObject; itemID: JInt; itemCaption: JString; checked: JBoolean); cdecl;
+begin
+  Java_Event_pAppOnClickOptionMenuItem(PEnv,this,menuItem,itemID,itemCaption,Boolean(checked));
+end;
+
+{ Class:     com_example_apptrycode2_Controls
+  Method:    pAppOnCreateContextMenu
+  Signature: (Landroid/view/Menu;)V }
+procedure pAppOnCreateContextMenu(PEnv: PJNIEnv; this: JObject; menu: JObject); cdecl;
+begin
+  Java_Event_pAppOnCreateContextMenu(PEnv,this,menu);
+end;
+
+{ Class:     com_example_apptrycode2_Controls
+  Method:    pAppOnClickContextMenuItem
+  Signature: (Landroid/view/MenuItem;ILjava/lang/String;Z)V }
+procedure pAppOnClickContextMenuItem(PEnv: PJNIEnv; this: JObject; menuItem: JObject; itemID: JInt; itemCaption: JString; checked: JBoolean); cdecl;
+begin
+  Java_Event_pAppOnClickContextMenuItem(PEnv,this,menuItem,itemID,itemCaption,Boolean(checked));
+end;
+
+{ Class:     com_example_apptrycode2_Controls
   Method:    pOnClick
   Signature: (JI)V }
 procedure pOnClick(PEnv: PJNIEnv; this: JObject; pasobj: JLong; value: JInt); cdecl;
@@ -206,7 +238,7 @@ begin
   Java_Event_pOnClickWidgetItem(PEnv,this,TObject(pasobj),position,Boolean(checked));
 end;
 
-const NativeMethods:array[0..24] of JNINativeMethod = (
+const NativeMethods:array[0..28] of JNINativeMethod = (
    (name:'pAppOnScreenStyle';
     signature:'()I';
     fnPtr:@pAppOnScreenStyle;),
@@ -246,6 +278,18 @@ const NativeMethods:array[0..24] of JNINativeMethod = (
    (name:'pAppOnActivityResult';
     signature:'(IILandroid/content/Intent;)V';
     fnPtr:@pAppOnActivityResult;),
+   (name:'pAppOnCreateOptionsMenu';
+    signature:'(Landroid/view/Menu;)V';
+    fnPtr:@pAppOnCreateOptionsMenu;),
+   (name:'pAppOnClickOptionMenuItem';
+    signature:'(Landroid/view/MenuItem;ILjava/lang/String;Z)V';
+    fnPtr:@pAppOnClickOptionMenuItem;),
+   (name:'pAppOnCreateContextMenu';
+    signature:'(Landroid/view/Menu;)V';
+    fnPtr:@pAppOnCreateContextMenu;),
+   (name:'pAppOnClickContextMenuItem';
+    signature:'(Landroid/view/MenuItem;ILjava/lang/String;Z)V';
+    fnPtr:@pAppOnClickContextMenuItem;),
    (name:'pOnClick';
     signature:'(JI)V';
     fnPtr:@pOnClick;),
@@ -295,12 +339,12 @@ begin
     if (PEnv^).RegisterNatives(PEnv, curClass, methods, countMethods) > 0 then Result:= JNI_TRUE;
   end;
 end;
- 
+
 function RegisterNativeMethods(PEnv: PJNIEnv; className: PChar): integer;
 begin
   Result:= RegisterNativeMethodsArray(PEnv, className, @NativeMethods[0], Length(NativeMethods));
 end;
- 
+
 function JNI_OnLoad(VM: PJavaVM; reserved: pointer): JInt; cdecl;
 var
   PEnv: PPointer;
@@ -316,7 +360,7 @@ begin
   end;
   gVM:= VM;{And_jni_Bridge}
 end;
- 
+
 procedure JNI_OnUnload(VM: PJavaVM; reserved: pointer); cdecl;
 var
   PEnv: PPointer;
@@ -350,6 +394,10 @@ exports
   pAppOnRotate name 'Java_com_example_apptrycode2_Controls_pAppOnRotate',
   pAppOnConfigurationChanged name 'Java_com_example_apptrycode2_Controls_pAppOnConfigurationChanged',
   pAppOnActivityResult name 'Java_com_example_apptrycode2_Controls_pAppOnActivityResult',
+  pAppOnCreateOptionsMenu name 'Java_com_example_apptrycode2_Controls_pAppOnCreateOptionsMenu',
+  pAppOnClickOptionMenuItem name 'Java_com_example_apptrycode2_Controls_pAppOnClickOptionMenuItem',
+  pAppOnCreateContextMenu name 'Java_com_example_apptrycode2_Controls_pAppOnCreateContextMenu',
+  pAppOnClickContextMenuItem name 'Java_com_example_apptrycode2_Controls_pAppOnClickContextMenuItem',
   pOnClick name 'Java_com_example_apptrycode2_Controls_pOnClick',
   pOnChange name 'Java_com_example_apptrycode2_Controls_pOnChange',
   pOnEnter name 'Java_com_example_apptrycode2_Controls_pOnEnter',
@@ -362,7 +410,7 @@ exports
   pOnWebViewStatus name 'Java_com_example_apptrycode2_Controls_pOnWebViewStatus',
   pOnAsyncEvent name 'Java_com_example_apptrycode2_Controls_pOnAsyncEvent',
   pOnClickWidgetItem name 'Java_com_example_apptrycode2_Controls_pOnClickWidgetItem';
- 
+
 begin
   gApp:= jApp.Create(nil);{Laz_And_Controls}
   gApp.Title:= 'My Android Bridges Library';

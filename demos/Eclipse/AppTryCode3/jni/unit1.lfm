@@ -143,7 +143,7 @@ object AndroidModule1: TAndroidModule1
     MarginBottom = 5
     Visible = True
     BackgroundColor = colbrDefault
-    Text = 'Save to /sdcard'
+    Text = 'Save to /data'
     FontColor = colbrDefault
     FontSize = 0
     OnClick = jButton2Click
@@ -226,7 +226,7 @@ object AndroidModule1: TAndroidModule1
     MarginBottom = 5
     Visible = True
     BackgroundColor = colbrDefault
-    Text = 'Save to /data'
+    Text = 'Save to /sdcard'
     FontColor = colbrDefault
     FontSize = 0
     OnClick = jButton3Click
