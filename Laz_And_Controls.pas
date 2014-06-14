@@ -535,6 +535,8 @@ type
   TOnClickItem       = Procedure(Sender: TObject; Item: Integer) of object;
 
   TOnClickWidgetItem = Procedure(Sender: TObject; Item: integer; checked: boolean) of object;
+  TOnClickCaptionItem= Procedure(Sender: TObject; Item: integer; caption: string) of object;
+
 
   //
   TOnWebViewStatus   = Procedure(Sender: TObject; Status : TWebViewStatus;
@@ -1082,9 +1084,9 @@ type
     procedure UpdateTable(updateQuery: string);
     procedure UpdateImage(tableName: string;imageFieldName: string;keyFieldName: string; imageValue: jObject;keyValue: integer);
     procedure Close;
-    function  GetCursor: jObject;    overload;
+    function  GetCursor: jObject; overload;
   published
-    property Cursor    : jSqliteCursor read FjSqliteCursor write SetjSqliteCursor;     //by jmpessoa
+    property Cursor    : jSqliteCursor read FjSqliteCursor write SetjSqliteCursor;
     property ColDelimiter: char read FColDelimiter write FColDelimiter;
     property RowDelimiter: char read FRowDelimiter write FRowDelimiter;
     property DataBaseName: string read FDataBaseName write FDataBaseName;
@@ -1099,7 +1101,7 @@ type
   jVisualControl = class(jControl)
   protected
     // Java
-    FjPRLayout : jObject; // Java : Parent Relative Layout
+    FjPRLayout : jObject; // Java : jParent Relative Layout
     FParentPanel:  jPanel;
     FOrientation: integer;
 
@@ -1521,6 +1523,8 @@ type
     FjRLayout     : jObject; // Java : Self Layout
     FOnClickItem  : TOnClickItem;
     FOnClickWidgetItem: TOnClickWidgetItem;
+    FOnClickCaptionItem: TOnClickCaptionItem;
+
     FItems        : TStrings;
     FWidgetItem   : TWidgetItem;
     FWidgetText   : string;
@@ -1548,6 +1552,7 @@ type
     procedure SetParamWidth(Value: TLayoutParams);
     Procedure GenEvent_OnClick(Obj: TObject; Value: integer);
     procedure GenEvent_OnClickWidgetItem(Obj: TObject; index: integer; checked: boolean);
+    procedure GenEvent_OnClickCaptionItem(Obj: TObject; index: integer; caption: string);
     procedure Notification(AComponent: TComponent; Operation: TOperation); override;
   public
     constructor Create(AOwner: TComponent); override;
@@ -1600,6 +1605,8 @@ type
     // Event
     property OnClickItem : TOnClickItem read FOnClickItem write FOnClickItem;
     property OnClickWidgetItem: TOnClickWidgetItem read FOnClickWidgetItem write FOnClickWidgetItem;
+    property OnClickCaptionItem: TOnClickCaptionItem read FOnClickCaptionItem write FOnClickCaptionItem;
+
   end;
 
   jScrollView = class(jVisualControl)
@@ -1913,7 +1920,10 @@ type
 
   Procedure Java_Event_pOnClick                  (env: PJNIEnv; this: jobject; Obj: TObject; Value: integer);
 
-  Procedure Java_Event_pOnClickWidgetItem     (env: PJNIEnv; this: jobject; Obj: TObject;index: integer; checked: boolean);
+  //by jmpessoa
+  Procedure Java_Event_pOnClickWidgetItem(env: PJNIEnv; this: jobject; Obj: TObject;index: integer; checked: boolean);
+  Procedure Java_Event_pOnClickCaptionItem(env: PJNIEnv; this: jobject; Obj: TObject;index: integer; caption: JString);
+
 
   Procedure Java_Event_pOnChange                 (env: PJNIEnv; this: jobject; Obj: TObject; EventType : integer);
   Procedure Java_Event_pOnEnter                  (env: PJNIEnv; this: jobject; Obj: TObject);
@@ -2741,7 +2751,7 @@ begin
   if Obj is jImageView then
   begin
     jForm(jImageView(Obj).Owner).UpdateJNI(gApp);
-    jImageView(Obj).GenEvent_OnClick(Obj);       exit;
+    jImageView(Obj).GenEvent_OnClick(Obj);  Exit;
   end;
 end;
 
@@ -2752,8 +2762,30 @@ begin
   if Obj is jListView then
   begin
     jForm(jListVIew(Obj).Owner).UpdateJNI(gApp);
-    jListVIew(Obj).GenEvent_OnClickWidgetItem(Obj, index, checked); exit;
+    jListVIew(Obj).GenEvent_OnClickWidgetItem(Obj, index, checked); Exit;
   end;
+end;
+
+Procedure Java_Event_pOnClickCaptionItem(env: PJNIEnv; this: jobject; Obj: TObject;index: integer; caption: JString);
+var
+   pasCaption: string;
+ _jBoolean: JBoolean;
+begin
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+
+  if Obj is jListVIew then
+  begin
+    jForm(jListVIew(Obj).Owner).UpdateJNI(gApp);
+    pasCaption := '';
+    if caption <> nil then
+    begin
+      _jBoolean:= JNI_False;
+      pasCaption:= string( env^.GetStringUTFChars(env,caption,@_jBoolean) );
+    end;
+    jListVIew(Obj).GenEvent_OnClickCaptionItem(Obj, index, pasCaption);
+  end;
+
 end;
 
 Procedure Java_Event_pOnChange(env: PJNIEnv; this: jobject;
@@ -3029,6 +3061,7 @@ end;
 constructor jForm.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
+
   // Initialize
   FVisible              := False;
   FEnabled              := True;
@@ -3059,6 +3092,7 @@ begin
   FAnimation.Out_       := cjEft_None; //cjEft_FadeOut;
   FOrientation          := 0;
   FInitialized          := False;
+
 end;
 
 destructor jForm.Destroy;
@@ -3320,7 +3354,7 @@ end;
 //-------------------------------------------------
    {jControl by jmpessoa}
 //--------------------------------------------------
-Constructor jControl.Create(AOwner: TComponent);
+constructor jControl.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
   FInitialized:= False;
@@ -5591,8 +5625,8 @@ end;
 procedure jListView.SetWidget(Value: TWidgetItem);
 begin
   FWidgetItem:= Value;
- // if FInitialized then
-   //  jListView_setHasWidgetItem(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, ord(FHasWidgetItem));
+  //if FInitialized then
+  //jListView_setHasWidgetItem(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, ord(FHasWidgetItem));
 end;
 
 procedure jListView.SetWidgetByIndex(Value: TWidgetItem; index: integer);
@@ -5875,6 +5909,11 @@ end;
 procedure jListView.GenEvent_OnClickWidgetItem(Obj: TObject; index: integer; checked: boolean);
 begin
   if Assigned(FOnClickWidgetItem) then FOnClickWidgetItem(Obj,index,checked);
+end;
+
+procedure jListView.GenEvent_OnClickCaptionItem(Obj: TObject; index: integer; caption: string);
+begin
+  if Assigned(FOnClickCaptionItem) then FOnClickCaptionItem(Obj,index,caption);
 end;
 
 //------------------------------------------------------------------------------

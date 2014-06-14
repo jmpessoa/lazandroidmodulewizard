@@ -1,0 +1,129 @@
+object AndroidModule1: TAndroidModule1
+  OnCreate = DataModuleCreate
+  OldCreateOrder = False
+  ActivityMode = actMain
+  Title = 'jForm'
+  BackgroundColor = colbrBlack
+  OnJNIPrompt = DataModuleJNIPrompt
+  Height = 435
+  HorizontalOffset = 300
+  VerticalOffset = 146
+  Width = 253
+  object jTextView1: jTextView
+    Id = 475129
+    PosRelativeToAnchor = []
+    PosRelativeToParent = [rpTop, rpCenterHorizontal]
+    LayoutParamWidth = lpWrapContent
+    LayoutParamHeight = lpWrapContent
+    MarginLeft = 10
+    MarginTop = 10
+    MarginRight = 10
+    MarginBottom = 10
+    Alignment = taLeft
+    Visible = True
+    Enabled = True
+    BackgroundColor = colbrDefault
+    FontColor = colbrSilver
+    FontSize = 0
+    Text = 'jListView Demo'
+    left = 104
+    top = 16
+  end
+  object jButton1: jButton
+    Id = 5638307
+    Anchor = jEditText1
+    PosRelativeToAnchor = [raBelow]
+    PosRelativeToParent = []
+    LayoutParamWidth = lpHalfOfParent
+    LayoutParamHeight = lpWrapContent
+    MarginLeft = 5
+    MarginTop = 5
+    MarginRight = 5
+    MarginBottom = 5
+    Visible = True
+    BackgroundColor = colbrDefault
+    Text = 'Add Item'
+    FontColor = colbrDefault
+    FontSize = 0
+    OnClick = jButton1Click
+    left = 72
+    top = 136
+  end
+  object jButton2: jButton
+    Id = 0
+    Anchor = jButton1
+    PosRelativeToAnchor = [raToRightOf, raAlignBaseline]
+    PosRelativeToParent = []
+    LayoutParamWidth = lpHalfOfParent
+    LayoutParamHeight = lpWrapContent
+    MarginLeft = 5
+    MarginTop = 5
+    MarginRight = 5
+    MarginBottom = 5
+    Visible = True
+    BackgroundColor = colbrDefault
+    Text = 'Del Checked!'
+    FontColor = colbrDefault
+    FontSize = 0
+    OnClick = jButton2Click
+    left = 136
+    top = 136
+  end
+  object jEditText1: jEditText
+    Id = 9565430
+    Anchor = jTextView1
+    PosRelativeToAnchor = [raBelow]
+    PosRelativeToParent = []
+    LayoutParamWidth = lpMatchParent
+    LayoutParamHeight = lpWrapContent
+    MarginLeft = 10
+    MarginTop = 10
+    MarginRight = 10
+    MarginBottom = 10
+    Alignment = taLeft
+    InputTypeEx = itxText
+    LineMaxLength = 300
+    Visible = True
+    BackgroundColor = colbrWhite
+    FontColor = colbrDefault
+    FontSize = 0
+    ScrollBarStyle = scrNone
+    MaxLines = 1
+    HorScrollBar = True
+    VerScrollBar = False
+    WrappingLine = False
+    left = 104
+    top = 80
+  end
+  object jListView1: jListView
+    Id = 0
+    Anchor = jButton1
+    PosRelativeToAnchor = [raBelow]
+    PosRelativeToParent = []
+    LayoutParamWidth = lpMatchParent
+    LayoutParamHeight = lpMatchParent
+    MarginLeft = 0
+    MarginTop = 0
+    MarginRight = 0
+    MarginBottom = 0
+    Items.Strings = (
+      'Hello'
+      'Android'
+      'World!'
+    )
+    Visible = True
+    BackgroundColor = colbrDefault
+    FontColor = colbrRed
+    FontSize = 0
+    WidgetItem = wgRadioButton
+    Delimiter = '|'
+    TextDecorated = txtNormal
+    ItemLayout = layImageTextWidget
+    TextSizeDecorated = sdNone
+    TextAlign = alLeft
+    OnClickWidgetItem = jListView1ClickWidgetItem
+    OnClickCaptionItem = jListView1ClickCaptionItem
+    left = 104
+    top = 208
+  end
+end

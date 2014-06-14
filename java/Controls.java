@@ -1,7 +1,7 @@
 package com.example.dummyapp;
 //
 //
-//[LazAndroidModuleWizard - ver.0.5 - rev. 01 :06-MAy-2014]
+//[LazAndroidModuleWizard - ver.0.5 - rev. 03 : 13-June-2014]
 //
 //[https://github.com/jmpessoa/lazandroidmodulewizard]
 //
@@ -62,6 +62,11 @@ import android.app.ActivityManager;
 import android.app.AlertDialog;
 import android.app.PendingIntent;
 import android.app.ProgressDialog;
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
+import android.bluetooth.BluetoothServerSocket;
+import android.bluetooth.BluetoothSocket;
+import android.content.BroadcastReceiver;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.ContentValues;
@@ -69,8 +74,10 @@ import android.content.Context;
 import android.content.ContextWrapper;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.content.res.AssetFileDescriptor;
 import android.database.Cursor;
 import android.graphics.Bitmap.CompressFormat;
@@ -91,6 +98,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
+import android.os.Message;
 import android.telephony.SmsManager;
 import android.telephony.TelephonyManager;
 import android.provider.ContactsContract;
@@ -147,6 +155,7 @@ import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.HorizontalScrollView;
 import android.widget.Scroller;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ViewFlipper;
@@ -169,6 +178,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
 import java.util.regex.Pattern;
 
 import javax.microedition.khronos.egl.EGLConfig;
@@ -489,7 +500,7 @@ controls = ctrls;
 // Init Class
 lparams = new LayoutParams(100,100);     // W,H
 lparams.setMargins(5,5,5,5); // L,T,
-// Init Event
+//Init Event
 onClickListener = new OnClickListener() {
   public  void onClick(View view) {
     if (enabled) {
@@ -498,6 +509,7 @@ onClickListener = new OnClickListener() {
   };
 };
 setOnClickListener(onClickListener);
+
 }
 
 //
@@ -576,16 +588,16 @@ public void setTextColor2(int value) {
 
 // LORDMAN 2013-08-13
 public  void setTextAlignment( int align ) {
-switch ( align ) {
- case 0 : { setGravity( Gravity.LEFT              ); }; break;
- case 1 : { setGravity( Gravity.RIGHT             ); }; break;
- case 2 : { setGravity( Gravity.TOP               ); }; break;
- case 3 : { setGravity( Gravity.BOTTOM            ); }; break;
- case 4 : { setGravity( Gravity.CENTER            ); }; break;
- case 5 : { setGravity( Gravity.CENTER_HORIZONTAL ); }; break;
- case 6 : { setGravity( Gravity.CENTER_VERTICAL   ); }; break;
-default : { setGravity( Gravity.LEFT              ); }; break;
-};
+  switch ( align ) {
+     case 0 : { setGravity( Gravity.LEFT              ); }; break;
+     case 1 : { setGravity( Gravity.RIGHT             ); }; break;
+     case 2 : { setGravity( Gravity.TOP               ); }; break;
+     case 3 : { setGravity( Gravity.BOTTOM            ); }; break;
+     case 4 : { setGravity( Gravity.CENTER            ); }; break;
+     case 5 : { setGravity( Gravity.CENTER_HORIZONTAL ); }; break;
+     case 6 : { setGravity( Gravity.CENTER_VERTICAL   ); }; break;
+     default : { setGravity( Gravity.LEFT              ); }; break;
+  };
 }
 
 //by jmpessoa
@@ -1003,6 +1015,7 @@ PasObj = pasobj;
 // Init Class
 lparams = new LayoutParams(100,100);     // W,H
 lparams.setMargins(5,5,5,5); // L,T,
+
 // Init Event
 onClickListener = new OnClickListener() {
   public  void onClick(View view) {
@@ -1770,6 +1783,7 @@ class jListItemRow{
 	String label;
 	int    id; 
 	int widget = 0;
+	View jWidget; //needed to fix  the RadioButton Group default behavior: thanks to Leledumbo.
 	String widgetText;
 	String delimiter;
 	boolean checked;
@@ -1807,24 +1821,6 @@ public  jArrayAdapter(Context context, Controls ctrls,long pasobj, int textViewR
 
 @Override
 public  View getView(int position, View v, ViewGroup parent) {
- 
-   //old code: commented by jmpessoa
-   /*  
-    View mView = v;
-   
-    if(mView == null){
-       LayoutInflater vi = (LayoutInflater)ctx.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-       mView = vi.inflate(id, null);
-    }
-   
-	
-   TextView tv = (TextView)mView;
-   tv.setTextColor (textColor);
-   tv.setTextSize  (TypedValue.COMPLEX_UNIT_PX,textSize );
-   tv.setText      (items.get(position));   // position [0 ~ n-1]       
-   return mView;
-   */	
-	
  	
  //new code: by jmpessoa: custom row!	
  if (position >= 0 && (!items.get(position).label.equals("")) ) {
@@ -1914,9 +1910,13 @@ public  View getView(int position, View v, ViewGroup parent) {
      case 1:  itemWidget = new CheckBox(ctx);  ((CheckBox)itemWidget).setText(items.get(position).widgetText);  break;
      case 2:  itemWidget = new RadioButton(ctx); ((RadioButton)itemWidget).setText(items.get(position).widgetText); break;
      case 3:  itemWidget = new Button(ctx);  ((Button)itemWidget).setText(items.get(position).widgetText);    break;
-     case 4:  itemWidget = new TextView(ctx); ((TextView)itemWidget).setText(" "+items.get(position).widgetText+" ");   break;
+     case 4:  itemWidget = new TextView(ctx); ((TextView)itemWidget).setText(" "+items.get(position).widgetText+" ");break;
      //default: ;
    }
+   
+   if (itemWidget != null)
+       items.get(position).jWidget = itemWidget;
+
 
    LayoutParams widgetParam = null;
 
@@ -1992,19 +1992,27 @@ View.OnClickListener getOnCheckItem(final View cb, final int position) {
 	               if (cb.getClass().getName().equals("android.widget.ImageView")) {
 	            	   controls.pOnClickWidgetItem(PasObj, position, items.get(position).checked);
 	               }	 
-	               if (cb.getClass().getName().equals("android.widget.CheckBox")) {	 
+	               else if (cb.getClass().getName().equals("android.widget.CheckBox")) {	 
 	                  items.get(position).checked = ((CheckBox)cb).isChecked();	                 	                  
 	                  controls.pOnClickWidgetItem(PasObj, position, ((CheckBox)cb).isChecked());
 	               }
-	               if (cb.getClass().getName().equals("android.widget.RadioButton")) {
-	            	      if ( items.get(position).checked ) {((RadioButton)cb).setChecked(false);}
-		                  items.get(position).checked = ((RadioButton)cb).isChecked();
+	               else if (cb.getClass().getName().equals("android.widget.RadioButton")) {
+	            	   
+	            	     //new code: fix to RadioButton Group  default behavior: thanks to Leledumbo.
+	            	      boolean doCheck = ((RadioButton)cb).isChecked(); //new code	            	    		            	     		            	      
+	            	      for (int i=0; i < items.size(); i++) {
+	            	    	  ((RadioButton)items.get(i).jWidget).setChecked(false);
+	            	    	  items.get(i).checked = false;	            	    	  
+	            	      }	            	      
+		                  items.get(position).checked = doCheck; 
+		                  ((RadioButton)cb).setChecked(doCheck);		                  		                  
 		                  controls.pOnClickWidgetItem(PasObj, position, ((RadioButton)cb).isChecked());
+		                  
 		           }
-	               if (cb.getClass().getName().equals("android.widget.Button")) { //button	            	      	            	        
+	               else if (cb.getClass().getName().equals("android.widget.Button")) { //button	            	      	            	        
 			             controls.pOnClickWidgetItem(PasObj, position, items.get(position).checked); 		                  
 		           }
-	               if (cb.getClass().getName().equals("android.widget.TextView")) { //textview  
+	               else if (cb.getClass().getName().equals("android.widget.TextView")) { //textview  
 			             controls.pOnClickWidgetItem(PasObj, position, items.get(position).checked); 		                  
 		           }	               
                 } 
@@ -2098,6 +2106,7 @@ onItemClickListener = new OnItemClickListener() {
    @Override
    public  void onItemClick(AdapterView<?> parent, View v, int position, long id) {
      controls.pOnClick(PasObj, (int)id );
+     controls.pOnClickCaptionItem(PasObj, (int)id , alist.get((int)id).label);
    }
 };
 
@@ -2106,7 +2115,17 @@ setOnItemClickListener(onItemClickListener);
 
 //by jmpessoa
 public boolean isItemChecked(int index) {
-  return alist.get(index).checked;		
+  return alist.get(index).checked;	
+  
+}
+
+public void ItemCheck(int index) {
+	int w = alist.get(index).widget;
+	
+}
+
+public void ItemUnCheck(int index) {
+	  //alist.;		
 }
 //by jmpessoa
 public void setMarginRight(int x) {
@@ -2409,7 +2428,7 @@ public void setWidgetText(String value, int index){
 
 //by jmpessoa
 public void setWidgetCheck(boolean value, int index){
-	alist.get(index).checked = value;
+	alist.get(index).checked = value;	
 	aadapter.notifyDataSetChanged();
 }
 
@@ -5556,7 +5575,9 @@ class jTextFileManager /*extends ...*/ {
     
     private ClipboardManager mClipBoard = null;
     private ClipData mClipData = null;
-
+    
+    private Intent intent = null;
+    
     //Warning: please, preferentially init your news params names with "_", ex: int _flag, String _hello ...
 
     public jTextFileManager(Controls _ctrls, long _Self) { //Add more here new "_xxx" params if needed!
@@ -5564,11 +5585,41 @@ class jTextFileManager /*extends ...*/ {
        context   = _ctrls.activity;
        pascalObj = _Self;
        controls  = _ctrls;      
-       mClipBoard = (ClipboardManager) controls.activity.getSystemService(Context.CLIPBOARD_SERVICE);
+       mClipBoard = (ClipboardManager) controls.activity.getSystemService(Context.CLIPBOARD_SERVICE);       
+       intent = new Intent();
+       intent.setAction(Intent.ACTION_SEND);
+       intent.setType("text/plain");      
     }
 
     public void jFree() {
       //free local objects...
+    	mClipBoard = null;
+    	intent = null;
+    }
+    
+  //Once you choose bluetooth, the android bluetooth application will launch and let you pick the device to send it too.
+    public void ShareFromSdCardFile(String _filename) {        	
+    	//File externalFile = new File(Environment.getExternalStorageDirectory().getPath() +"/"+ _filename);
+    	File file = new File(Environment.getExternalStorageDirectory(), _filename);    	    	    	 
+    	intent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(file));
+    	controls.activity.startActivity(intent);    	
+    }
+        
+   //Once you choose bluetooth, the android bluetooth application will launch and let you pick the device to send it too.
+    public void ShareFromFile(String _filename) {    	    	    	
+    	//String PathDat = context.getFilesDir().getAbsolutePath();   //   //Result : /data/data/com/MyApp/files 	
+    	//File file = new File(PathDat+"/"+ _filename);
+    	File file = new File(context.getFilesDir().getAbsolutePath(),_filename);
+    	intent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(file));
+    	controls.activity.startActivity(intent);    	
+    }
+        
+    public String GetPathToExternalStorage() {    	
+      return Environment.getExternalStorageDirectory().getPath();
+    }
+        
+    public String GetPathToFile() {    	       	    
+      return context.getFilesDir().getAbsolutePath(); //Result : /data/data/com/MyApp/files 
     }
     
     public void CopyToClipboard(String _text) {
@@ -5607,7 +5658,7 @@ class jTextFileManager /*extends ...*/ {
 
    public String LoadFromFile(String _filename) {
 
-     String ret = "";
+     String retStr = "";
 
      try {
          InputStream inputStream = context.openFileInput(_filename);
@@ -5623,20 +5674,44 @@ class jTextFileManager /*extends ...*/ {
              }
 
              inputStream.close();
-             ret = stringBuilder.toString();
+             retStr = stringBuilder.toString();
          }
      }
      catch (IOException e) {
          Log.i("jTextFileManager", "Can not read file: " + e.toString());
      }
 
-     return ret;
+     return retStr;
+   }
+   
+   //http://manojprasaddevelopers.blogspot.com.br/search/label/Write%20and%20ReadFile
+   /*.*/public String ReadTextFile(String _filename)
+   {
+      String json = "";
+      try
+      {
+        InputStream is = context.getAssets().open(_filename);
+        int size = is.available();
+        
+        
+       
+        byte[] buffer = new byte[size];
+        is.read(buffer);
+        is.close();
+       
+        json = new String(buffer, "UTF-8");
+       
+      } catch (IOException e){
+    	 //
+      }
+      
+      return json.toString();
+     
    }
       
    //http://www.coderzheaven.com/2012/01/29/saving-textfile-to-sdcard-in-android/
    public void SaveToSdCardFile(String _txtContent, String _filename){
      FileWriter fWriter;     
-   //Toast.makeText(controls.activity, Environment.getExternalStorageDirectory().getPath(), Toast.LENGTH_SHORT).show();     
      try{ // Environment.getExternalStorageDirectory().getPath()
           fWriter = new FileWriter(Environment.getExternalStorageDirectory().getPath() +"/"+ _filename);
           fWriter.write(_txtContent);
@@ -5646,8 +5721,7 @@ class jTextFileManager /*extends ...*/ {
           e.printStackTrace();
       }
    }
-
-   //File file = new File(Environment.getExternalStorageDirectory(), filename);
+   
    public String LoadFromSdCardFile(String _filename){
      char buf[] = new char[512];
      FileReader rdr;
@@ -5665,7 +5739,7 @@ class jTextFileManager /*extends ...*/ {
      return contents;
    }
    
-   public String LoadFromAssetsFile(String _filename) {	 //full file name...  
+   public String LoadFromAssetsFile(String _filename) {  
 	   InputStream is = null;
 	   FileOutputStream fos = null;	  	   
 	   String path = '/' + _filename.substring(1,_filename.lastIndexOf("/"));	   
@@ -5677,7 +5751,7 @@ class jTextFileManager /*extends ...*/ {
 	     int size = is.available();	     
 	     byte[] buffer = new byte[size];	     
 	     File outfile = new File(_filename);
-	     fos = new FileOutputStream(outfile);  //from assets to app local data...	     
+	     fos = new FileOutputStream(outfile);  //save to data/data/your_package/files/your_file_name
 	     for (int c = is.read(buffer); c != -1; c = is.read(buffer)){
 	       fos.write(buffer, 0, c);
 	     }	     
@@ -5721,7 +5795,7 @@ class jMediaPlayer {
 	  }
 	  
 	  public void jFree() {
-	      //free local objects...
+	    //free local objects...
 		mplayer.release();
 	  	mplayer = null;
 	  }
@@ -5952,7 +6026,11 @@ class jMenu /*extends ...*/ {
     	int size = _captions.length;
     	if (size > 1) {
     			
-     	   mSubMenus[mCountSubMenu] = _menu.addSubMenu((CharSequence)_captions[0]); //main title     	        	   
+     	   mSubMenus[mCountSubMenu] = _menu.addSubMenu((CharSequence)_captions[0]); //main title
+     	   
+     	   //int resID = context.getResources().getIdentifier("ic_launcher", "drawable", context.getPackageName());
+     	   //ex: Read the resource:
+     	   // InputStream inputStream = context.getResources().openRawResource(resID);
      	   mSubMenus[mCountSubMenu].setHeaderIcon(R.drawable.ic_launcher);  
      	   
     	   Log.i("jMenu_addSubMenu", _captions[0]);
@@ -6032,6 +6110,1288 @@ class jMenu /*extends ...*/ {
     
 }
 
+//ref. http://stackoverflow.com/questions/19395970/android-bluetooth-background-listner?rq=1
+//ref. http://androidcookbook.com/Recipe.seam;jsessionid=6C1411AB8CCAFBA9384A5EC295B44525?recipeId=1991
+class jBluetoothServerSocket {
+
+    private long     pascalObj = 0;      // Pascal Object
+    private Controls controls  = null;   // Control Class -> Java/Pascal Interface ...
+    private Context  context   = null;
+
+    private BluetoothAdapter mBAdapter;
+    private String mServerName = "jBluetoothServerSocket";
+    private BluetoothServerSocket mServerSocket;
+    private BluetoothSocket mConnectedSocket;
+
+    byte[] mBufferIn;
+    byte[] mBufferOut;
+    
+	private  InputStream mInStream;
+	private  OutputStream mOutStream;
+   
+    private final String TAG = "jBluetoothServerSocket";
+   
+    static final String ACTION = "jBluetoothServerSocket.action.CONNECTED";
+    private boolean mConnected;
+    
+    String mStrUUID = null;
+            
+	private Handler mHandler = new Handler(){
+        /*.*/public void handleMessage(Message msg) {
+           if (msg.what == 0){ 
+         		controls.pOnBluetoothServerSocketConnected(pascalObj, 
+         				msg.getData().getString("DeviceName"),
+         				msg.getData().getString("DeviceAddress"));
+           }else if(msg.what == 1){		
+          	    HandleInput();
+           }else if (msg.what == 2){  //qet as text....
+        	    controls.pOnBluetoothClientSocketIncomingMessage(pascalObj, msg.getData().getString("text"));
+        	    Log.i("mHandler",msg.getData().getString("text"));	                
+           }else if (msg.what == 3){ //QUIT
+        	   mConnected = false;
+           }	           
+        }        
+    };
+
+    
+    public jBluetoothServerSocket(Controls _ctrls, long _Self) {
+        context   = _ctrls.activity;
+	    pascalObj = _Self;
+	    controls  = _ctrls;
+	    
+	    mConnected= false;
+	    
+	    //Well known SPP UUID	       
+	    mStrUUID = "00001101-0000-1000-8000-00805F9B34FB";
+	    
+	    mBAdapter = BluetoothAdapter.getDefaultAdapter(); // Emulator -->> null!!!
+    }
+    
+	public void jFree() {
+        //free local objects...
+	}
+
+	public void SetUUID(String _strUUID) {
+		if (!_strUUID.equals("")) {
+			mStrUUID = _strUUID;
+			//mmUUID = UUID.fromString(mmUUIDString);
+		}   
+	}
+	
+	private void TryListen(){
+		mConnected = true;		
+	    Thread listenThread = new Thread() {
+	            @Override
+	       /*.*/public void run() {
+	                try {
+	                    while(mConnected) {
+	                        // do things
+  				             if (mConnectedSocket.isConnected()) {  				            	 
+  				            	//notice that when the server is connected it sends a broadcast so any activity could register it and receive 
+  				            	//so there is no problem in changing activities while the BT connects.            	                            
+  				            	//Broadcast(); //??  				            	     				            	
+  				                CloseServerSocket(); //??  				                
+  				                //Create a data stream so we can talk to client....
+  				            	mInStream  = mConnectedSocket.getInputStream();
+  			        			mOutStream = mConnectedSocket.getOutputStream();   			        			
+  				                Message msgDone = new Message();
+  				  		        Bundle messageData = new Bundle();
+  				  		        msgDone.what = 0; //connected!    
+  				  		        messageData.putString("DeviceName",mConnectedSocket.getRemoteDevice().getName());
+  				  		        messageData.putString("DeviceAddress",mConnectedSocket.getRemoteDevice().getAddress()); 
+  				  		        msgDone.setData(messageData);    				  		        
+  				  		        mHandler.sendMessage(msgDone);
+  				             } else {
+  				            	 mConnected = false;
+  				             }
+	                    }
+	                } catch(Exception e) {
+	                	mConnected = false;
+	                } finally {	                   
+	                   mConnected = false;
+	                }
+	            }
+	    };
+	    listenThread.start();
+	}
+	
+	public void Listen() {
+      if ( !mStrUUID.equals("") && mBAdapter != null) {		    	  
+        try {
+        	        	
+        	if (mBAdapter != null) {
+        		        		        	  
+        	  controls.pOnBluetoothServerSocketListen(pascalObj, mBAdapter.getName(), mBAdapter.getAddress());
+        	  
+        	  if (!mBAdapter.isEnabled()) {
+                  controls.activity.startActivityForResult(new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE), 1001);
+              }
+        	
+        	  mServerSocket = null; 
+			  mServerSocket = mBAdapter.listenUsingRfcommWithServiceRecord(mServerName, UUID.fromString(mStrUUID));
+			  if (mServerSocket != null) {
+				 mConnectedSocket = null;																
+            	 mConnectedSocket = mServerSocket.accept();            	            	            	            	
+            	 if (mConnectedSocket != null) {            		
+			        TryListen();
+            	 }
+			  } else {
+				 mConnected = false;
+			  }
+        	}
+		} catch (IOException e1) {
+			mConnected = false;
+			//e1.printStackTrace();
+		}                
+	  }        
+	}
+	
+    private void HandleInput() {    	
+      String content;
+      ArrayList<String> textLines = new ArrayList<String>();
+      //int size;
+        
+   	  try {
+   		//size =  mInStream.available();
+   		
+   		BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(mInStream, "UTF-8"));		 
+  	 	content = bufferedReader.readLine();  
+  	 	if (content != null) {
+  	 	  if (!content.equals("QUIT")) {		 		     
+  	 		     while(content != null){ 		    	                             	              
+  	               textLines.add(content);
+  	               content = bufferedReader.readLine();
+  	             }
+  		         Message msgDone = new Message();
+  		         Bundle messageData = new Bundle();
+  		         msgDone.what = 1; //set messageBuffer...    
+  		         messageData.putString("text", textLines.toString()); //[..., ...., ...]
+  		         msgDone.setData(messageData);
+  		         // send message to mHandler...
+  		         mHandler.sendMessage(msgDone);		         
+  		   } else { //QUIT 
+  		         Message msgDone = new Message();
+  	             Bundle messageData = new Bundle();
+  	             msgDone.what = 2;   //done.... interrupt thread...   
+  	             messageData.putString("text", "QUIT");
+  	             msgDone.setData(messageData);
+  	            // send message to mHandler...
+  	             mHandler.sendMessage(msgDone);
+  			   //} 
+  		   }		 
+  	 	} 		 
+  	  } catch (IOException e) {
+  		e.printStackTrace();
+  	  } 	 	  	  
+    }
+
+	//send text
+	public void WriteMessage(String _message) {
+	   mBufferOut = _message.getBytes();
+	   if (mConnected) {
+	      controls.pOnBluetoothServerSocketWritingMessage(pascalObj);
+          Thread sender = new Thread(){
+    	    @Override
+          /*.*/public void run() {                       
+               try { 
+                   //mmOutStream.write(mmBufferOut.length); //data size
+              	   mOutStream.write(mBufferOut); //data content              
+                } catch (IOException e) { 
+                   //
+                }
+             }
+          };
+         sender.start(); // Inicialização
+	   }
+	}
+
+	public void Write(byte[] _buffer) {		
+		mBufferOut = _buffer;
+		if (mConnected) {
+		   controls.pOnBluetoothServerSocketWritingMessage(pascalObj);
+	       Thread sender = new Thread(){
+	         @Override
+	    /*.*/public void run() {                       
+	                try {
+		              //mOutStream.write("RAW"); ?? 	
+	              	  mOutStream.write(mBufferOut.length); // write the data length to server/socket stream
+	              	  mOutStream.write(mBufferOut);        // write the data content to server/socket stream
+	                 } catch (IOException e) {
+	                 //
+	                 }
+	           }	          
+	       };
+	       sender.start(); // Inicialização
+		}    
+	}
+	
+    private void Broadcast() {
+       try {    	       	   
+            Intent intent = new Intent();
+            intent.setAction(ACTION);            
+            if (mConnectedSocket != null && mConnectedSocket.isConnected()) {
+               intent.putExtra("state", "true");
+               mConnected = true;  //break listen!
+            }else{
+              intent.putExtra("state", "false");
+            }              
+            controls.activity.sendBroadcast(intent);           
+        }
+        catch (RuntimeException runTimeEx) {
+            //
+        }
+        this.CloseServerSocket();
+    }
+
+    public void CloseServerSocket() {
+        try {
+        	if (mServerSocket != null) mServerSocket.close();        	
+        }
+        catch (IOException ex) {
+            //Log.e(TAG+":cancel", "error while closing server socket");
+        }
+    }
+
+	public void Disconnect() {
+	   mConnected = false;
+	   try {
+	      if (mConnectedSocket != null && mConnectedSocket.isConnected()) 	    	   
+	    	  mConnectedSocket.close();
+	   } catch (IOException e) {
+		  //e.printStackTrace();
+	   }
+    }
+
+	public boolean IsConnected() {		
+       return mConnected;
+    }
+    
+	//ref. http://flanzer.wordpress.com/2011/09/20/convert-inputstream-to-byte/
+    public byte[] Read() {
+    	
+      if (mConnected){
+    	  
+    	  ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+		  int count;   
+    	  byte[] data = new byte[1024];  //or 8192 or 16384 ...
+    	  
+    	  try {
+			while ((count = mInStream.read(data, 0, data.length)) != -1) {
+			   buffer.write(data, 0, count);
+			}
+ 		  } catch (IOException e) {
+             //
+		  }    	  
+    	  try {
+			buffer.flush();
+	  	  } catch (IOException e) {
+            //
+		  }
+    	  return buffer.toByteArray();
+    	  
+       }else return null;
+      
+    }  
+}
+
+//ref. http://androidcookbook.com/Recipe.seam;jsessionid=9B476BA317AA36E2CB0D6517ABE60A5E?recipeId=1665
+//ref. http://javarevisited.blogspot.com.br/2012/08/convert-inputstream-to-string-java-example-tutorial.html
+class jBluetoothClientSocket {
+	
+    private long     pascalObj = 0;      // Pascal Object
+    private Controls controls  = null;   // Control Class -> Java/Pascal Interface ...
+    private Context  context   = null;
+
+	private  BluetoothSocket mmSocket;
+	private  InputStream mmInStream;
+	private  OutputStream mmOutStream;
+	private BluetoothDevice mmDevice;
+	
+	private byte[] mmBufferIn;
+	private byte[] mmBufferOut;
+	
+	boolean mmConnected;
+	boolean jBluetoothServerSocketIsListen = false;
+	
+	BluetoothAdapter mmBAdapter;
+
+	//Unique UUID for this application.....
+	//private UUID mmUUID = UUID.fromString("fa87c0d0-afac-11de-8a39-0800200c9a66");
+	
+	private String mmUUIDString = null;
+	
+	private Handler mmHandler = new Handler(){
+	   /*.*/public void handleMessage(Message msg) {
+	           if (msg.what == 0){ 	        	   
+	        	     controls.pOnBluetoothClientSocketConnected(pascalObj,
+			                mmSocket.getRemoteDevice().getName(),								
+			                mmSocket.getRemoteDevice().getAddress());
+	           }else if (msg.what == 1){ 
+	        	     HandleInput();        	   
+	           }else if (msg.what == 2){  //qet as  text
+	        	    controls.pOnBluetoothClientSocketIncomingMessage(pascalObj, msg.getData().getString("text"));	        	    
+	        	    Log.i("mHandler",msg.getData().getString("text"));	                
+	           }else if (msg.what == 3){ //QUIT
+	        	   mmConnected = false;
+	           }	           
+	        }        
+	};
+	
+    final BroadcastReceiver mBroadcastReceiverConnector = new BroadcastReceiver() { //just for app running in same device!
+         @Override
+    /*.*/public void onReceive(Context context, Intent intent) {
+            if (intent.getAction().equals("jBluetoothServerSocket.action.CONNECTED" ) ){
+            	if (intent.getStringExtra("state").equals("true")) {
+            	    jBluetoothServerSocketIsListen = true;
+            	}    
+            }
+         }
+    };
+	
+	public jBluetoothClientSocket(Controls _ctrls, long _Self) {
+	       context   = _ctrls.activity;
+	       pascalObj = _Self;
+	       controls  = _ctrls;
+	   	   //Well known SPP UUID	       
+	       mmUUIDString = "00001101-0000-1000-8000-00805F9B34FB";
+	       
+	       mmBAdapter = BluetoothAdapter.getDefaultAdapter(); // Emulator -->> null!!!
+	}
+	
+	public void jFree() {
+         //free local objects...
+		mmDevice = null;
+	}
+	
+	public void SetDevice(BluetoothDevice _device) {
+		Log.i("SetDevice","SetDevice...");
+		mmDevice = _device;
+	}
+	
+	public void SetUUID(String _strUUID) {
+		if (!_strUUID.equals("")) {
+			mmUUIDString = _strUUID;
+			//mmUUID = UUID.fromString(mmUUIDString);
+		}   
+	}
+		
+	private void TryConnect() {
+		
+		try {
+			mmSocket = mmDevice.createRfcommSocketToServiceRecord(UUID.fromString(mmUUIDString));
+		} catch (IOException e) {
+			//e.printStackTrace();
+			mmConnected = false;
+		}
+					
+		Thread connectionThread  = new Thread() {				
+ 	    @Override
+   /*.*/public void run() {
+					// Always cancel discovery because it will slow down a connection					
+					// Make a connection to the BluetoothSocket
+					try {
+						// This is a blocking call and will only return on a
+						// successful connection or an exception
+						mmConnected = true;						
+						mmSocket.connect();												
+						//Get the BluetoothSocket input and output streams
+						try {
+							mmInStream = mmSocket.getInputStream();
+							mmOutStream = mmSocket.getOutputStream(); // Create a data stream so we can talk to server....
+							mmBufferIn = new byte[1024];         //init buffer for input...
+							//mmBufferOut = new byte[1024];      //init buffer...
+						} catch (IOException e) {
+							mmConnected = false;
+							//e.printStackTrace();
+						}
+						
+					    Message msgDone = new Message();
+		  		        Bundle messageData = new Bundle();
+		  		        msgDone.what = 0; //connected!    
+		  		        //messageData.putString("RemoteName",mmSocket.getRemoteDevice().getName());
+		  		        //messageData.putString("RemoteAddress",mmSocket.getRemoteDevice().getAddress()); 
+		  		        msgDone.setData(messageData);    				  		        
+		  		        mmHandler.sendMessage(msgDone);
+		  		        
+						//java --> pascal
+					} catch (IOException e) {
+						//connection to device failed so close the socket
+						mmConnected = false;
+						try {
+							mmSocket.close();
+						} catch (IOException e2) {
+							e2.printStackTrace();
+							//finish();
+						}
+					}
+				}
+		};		
+		connectionThread.start();						        
+	}
+		
+    private void HandleInput() {    	
+      String content;
+      ArrayList<String> textLines = new ArrayList<String>();
+      //int size;
+      
+ 	  try {
+ 		  
+ 		//size = mmInStream.available();
+ 		
+ 		BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(mmInStream, "UTF-8"));		 
+	 	content = bufferedReader.readLine();  
+	 	if (content != null) {
+	 	  if (!content.equals("QUIT")) {		 		     
+	 		     while(content != null){ 		    	                             	              
+	               textLines.add(content);
+	               content = bufferedReader.readLine();
+	             }
+		         Message msgDone = new Message();
+		         Bundle messageData = new Bundle();
+		         msgDone.what = 2; //set messageBuffer...    
+		         messageData.putString("text", textLines.toString()); //[..., ...., ...]
+		         msgDone.setData(messageData);
+		         // send message to mHandler...
+		         mmHandler.sendMessage(msgDone);		         
+		   } else { //QUIT 
+		         Message msgDone = new Message();
+	             Bundle messageData = new Bundle();
+	             msgDone.what = 3;   //done.... interrupt thread...   
+	             messageData.putString("text", "QUIT");
+	             msgDone.setData(messageData);
+	            // send message to mHandler...
+	             mmHandler.sendMessage(msgDone);
+			   //} 
+		   }		 
+	 	} 		 
+	  } catch (IOException e) {
+		e.printStackTrace();
+	  } 	 	  	  
+    }
+
+	
+	public void Connect() {
+
+	 if (mmBAdapter != null) {
+					
+  	    if (!mmBAdapter.isEnabled()) {
+            controls.activity.startActivityForResult(new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE), 1000);
+        }
+  	    
+  	    if (mmBAdapter.isDiscovering()) mmBAdapter.cancelDiscovery(); //must cancel to connect!
+  						
+		mmConnected = true;
+		
+		Thread mainThread = new Thread() {
+			
+            // setting the behavior we want from the Thread
+            @Override
+         /*.*/public void run() {
+                try {
+                    // a Thread loop
+                    while(mmConnected) {
+                        // do things
+                     	
+                    	if (mmDevice != null &&  !mmUUIDString.equals("")) {
+                    	   TryConnect();
+                    	} else mmConnected = false;
+                    }
+                } catch(Exception e) {
+                    // don't forget to deal with exceptions....
+                	mmConnected = false;
+                	
+                } finally {
+                    // this block always executes so take care here of
+                    // unfinished business
+                	mmConnected = false;
+                }
+            }
+        };
+        mainThread.start();
+	 }  
+	}
+			
+	public void Write(byte[] _buffer) {	  	
+	  mmBufferOut = _buffer;
+      if (mmConnected){	
+		controls.pOnBluetoothClientSocketWritingMessage(pascalObj);
+	      Thread sender = new Thread(){
+	         @Override
+	      /*.*/public void run() {                       
+	                try {                //data content output...
+	              	  mmOutStream.write(mmBufferOut.length); // write the data length to server/socket stream
+	              	  mmOutStream.write(mmBufferOut);        // write the data content to server/socket stream
+	              	  
+	 		         Message msgDone = new Message();
+			         Bundle messageData = new Bundle();
+			         msgDone.what = 1; //handle input..			         			         
+			         msgDone.setData(messageData);
+			         mmHandler.sendMessage(msgDone);
+	                 } catch (IOException e) {
+	                 //
+	                 }
+	           }	          
+	      };
+	      sender.start(); 
+       }  
+	}
+
+	//send text
+	public void WriteMessage(String _message) {
+	  mmBufferOut = _message.getBytes();
+	  if (mmConnected){
+		  	  
+	     controls.pOnBluetoothClientSocketWritingMessage(pascalObj);
+	  
+         Thread sender = new Thread(){
+    	    @Override
+        /*.*/public void run() {                       
+               try { 
+                	 //mmOutStream.write(mmBufferOut.length); //data size    ::TODO        	   
+            	     mmOutStream.write(mmBufferOut); //data content output...
+            	    
+	 		         Message msgDone = new Message();
+			         Bundle messageData = new Bundle();
+			         msgDone.what = 1; //handle input..    
+			         msgDone.setData(messageData);
+			         mmHandler.sendMessage(msgDone);
+
+                } catch (IOException e) { 
+                   //
+                }
+             }
+         };         
+         sender.start(); 
+	  } 
+	}
+		
+	public byte[] Read() {
+	    	
+	   if (mmConnected){	      	  		     		   
+	      	  ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+	  		  int count;
+	      	  byte[] data = new byte[1024];  //16384
+	      	  
+	      	  try {
+	  			while ((count = mmInStream.read(data, 0, data.length)) != -1) {
+	  			   buffer.write(data, 0, count);
+	  			}
+	   		  } catch (IOException e) {
+	               //
+	  		  }    	  
+	      	  try {
+	  			buffer.flush();
+	  	  	  } catch (IOException e) {
+	              //
+	  		  }
+	      	  return buffer.toByteArray();
+	      	  
+	   }else return null;
+	        
+	}
+
+	public boolean IsConnected() {
+		return mmConnected;
+	}
+	
+	public void Disconnect() {
+		mmConnected = false;
+		try {
+			mmSocket.close();
+		} catch (IOException e2) {			
+			//finish();
+		}	
+	}
+	
+}
+
+/*Draft java code by "Lazarus Android Module Wizard" [5/10/2014 14:32:21]*/
+/*https://github.com/jmpessoa/lazandroidmodulewizard*/
+/*jControl template*/
+
+//ref. http://www.tutorialspoint.com/android/android_bluetooth.htm
+//ref. http://examples.javacodegeeks.com/android/core/bluetooth/bluetoothadapter/android-bluetooth-example/
+//ref. http://www.javacodegeeks.com/2013/09/bluetooth-data-transfer-with-android.html
+//ref. http://www.bravenewgeek.com/bluetooth-blues/
+class jBluetooth /*extends ...*/ {
+
+    private long     pascalObj = 0;      // Pascal Object
+    private Controls controls  = null;   // Control Class -> Java/Pascal Interface ...
+    private Context  context   = null;
+
+    private BluetoothAdapter mBA = null;
+    
+    Intent intent = null;
+    
+    ArrayList<String> mListFoundedDevices = new ArrayList<String>();
+    ArrayList<BluetoothDevice> mListReachablePairedDevices  = new ArrayList<BluetoothDevice>();
+    
+    //jBluetoothClientSocket mBluetoothClientSocket;    
+
+    final BroadcastReceiver mBroadcastReceiver = new BroadcastReceiver() {
+	    @Override
+   /*.*/public void onReceive(Context context, Intent intent){
+	    	
+	        String action = intent.getAction();
+	        
+	        if (BluetoothDevice.ACTION_FOUND.equals(action)){	          
+	           BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);	           			        
+	           if (mBA.getBondedDevices().contains(device)) {
+	        	   mListReachablePairedDevices.add(device);	               
+	           }
+			   mListFoundedDevices.add( device.getName() + "|" + device.getAddress() );
+			   Log.i("jBluetooth_onReceive",device.getName() + "|" + device.getAddress());	        	   
+	           	           
+	           controls.pOnBluetoothDeviceFound(pascalObj,device.getName(),device.getAddress());
+	           
+	        }else if (BluetoothAdapter.ACTION_DISCOVERY_STARTED.equals(action)) {
+	             controls.pOnBluetoothDiscoveryStarted(pascalObj);
+	        }else if (BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(action)) {
+	             controls.pOnBluetoothDiscoveryFinished(pascalObj, mListFoundedDevices.size(), mListReachablePairedDevices.size());
+	        }else if (BluetoothDevice.ACTION_BOND_STATE_CHANGED.equals(action)) {
+	            // Device pairing/unpairing occurred
+	            BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);	            
+	            int state = intent.getIntExtra(BluetoothDevice.EXTRA_BOND_STATE, 0);
+	            /*switch (state) {
+	                case BluetoothDevice.BOND_BONDED: //12
+	                    // Device was paired
+	                	
+	                    Log.i("BluetoothReceiver", "Paired with " + device.getName());
+	                    break;
+	                case BluetoothDevice.BOND_NONE:  //10
+	                    // Device was unpaired
+	                	
+	                    Log.i("BluetoothReceiver", "Unpaired with " + device.getName());
+	                    break;
+	                case BluetoothDevice.BOND_BONDING:  //11
+	                    // Device is in the process of pairing
+	                	
+	                    Log.i("BluetoothReceiver", "Pairing with " + device.getName());
+	                    break;
+	            }*/
+	            
+	            controls.pOnBluetoothDeviceBondStateChanged(pascalObj, state, device.getName(), device.getAddress());
+	        } 	        
+	    }
+    };    
+    
+    //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
+    public jBluetooth(Controls _ctrls, long _Self) { //Add more others news "_xxx" params if needed!
+       //super(_ctrls.activity);
+       context   = _ctrls.activity;
+       pascalObj = _Self;
+       controls  = _ctrls;
+       
+	   mBA = BluetoothAdapter.getDefaultAdapter(); // Emulator -->> null!!!
+	   
+       intent = new Intent();
+	   intent.setAction(Intent.ACTION_SEND);
+	   
+       controls.activity.registerReceiver(mBroadcastReceiver, new IntentFilter(BluetoothDevice.ACTION_FOUND));        
+       controls.activity.registerReceiver(mBroadcastReceiver, new IntentFilter(BluetoothAdapter.ACTION_DISCOVERY_STARTED));      
+       controls.activity.registerReceiver(mBroadcastReceiver, new IntentFilter(BluetoothAdapter.ACTION_DISCOVERY_FINISHED));
+       controls.activity.registerReceiver(mBroadcastReceiver, new IntentFilter(BluetoothDevice.ACTION_BOND_STATE_CHANGED));
+
+    }
+
+    public void jFree() {
+       //free local objects...
+    	controls.activity.unregisterReceiver(mBroadcastReceiver);
+    	if (mBA != null) {    		
+    		mBA.cancelDiscovery();
+    		mBA.disable();
+    	}	    	
+    }
+
+    //write others [public] methods code here......
+    //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
+    
+    public void Enabled(){
+    	
+    	if (mBA != null) {   //real device... 
+    	   Toast.makeText(controls.activity.getApplicationContext(),"Adapter: "+mBA.getName() ,Toast.LENGTH_LONG).show();    	
+           if (!mBA.isEnabled()) {
+             controls.activity.startActivityForResult(new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE), 999);
+             //Toast.makeText(controls.activity.getApplicationContext(),"Bluetooth turned On" ,Toast.LENGTH_LONG).show();
+             controls.pOnBluetoothEnabled(pascalObj);
+           }          
+    	}else { //Emulator...
+    	   Toast.makeText(controls.activity.getApplicationContext(),"Warning: Try Real Device!",Toast.LENGTH_LONG).show();
+    	}    	    	
+    }
+        
+    public void Discovery() {
+    	if (mBA != null && mBA.isEnabled()) {	
+           if (mBA.isDiscovering())	mBA.cancelDiscovery();
+           mListFoundedDevices.clear();  //new devices....
+           mListReachablePairedDevices.clear();	
+           mBA.startDiscovery();    	   
+    	}
+    }
+        
+    public void CancelDiscovery() {  //must Cancel to Connect socket!!!
+    	if (mBA != null && mBA.isEnabled()) {	
+            mBA.cancelDiscovery();
+    	}
+    }  
+            
+    public String[] GetPairedDevices(){  //list all paired devices...
+    	
+        ArrayList<String> listBondedDevices = new ArrayList<String>();
+        
+        listBondedDevices.add("null|null");
+        
+        if (mBA != null && mBA.isEnabled()){
+            
+           Set<BluetoothDevice> Devices = mBA.getBondedDevices();
+           
+           Toast.makeText(controls.activity.getApplicationContext(),"Devices Count = "+Devices.size(), Toast.LENGTH_SHORT).show();
+           
+           if(Devices.size() > 0) {
+        	   
+              listBondedDevices.clear();
+              
+              for(BluetoothDevice device : Devices) {        	
+         	     listBondedDevices.add(device.getName()+"|"+ device.getAddress());
+           	     Log.i("Bluetooch_devices",device.getName());  //device.getAddress()            
+              }
+              
+           }  
+        }
+        //strDevices = new String[mPairedDevices.size()];
+        //strDevices = listDevices.toArray(strDevices);
+        String strDevices[] = listBondedDevices.toArray(new String[listBondedDevices.size()]);    	  
+        return strDevices;        
+    }
+
+    public String[] GetFoundedDevices(){  //list
+    	if (mListFoundedDevices.size() == 0) {
+            mListFoundedDevices.add("null|null");
+    	}
+        String strDevices[] = mListFoundedDevices.toArray(new String[mListFoundedDevices.size()]);    	  
+        return strDevices;        
+    }
+    
+    public String[] GetReachablePairedDevices(){  //list
+    	String[] strRes;
+    	int size = mListReachablePairedDevices.size();
+    	if (size > 0) {
+    		strRes = new String[size];
+    		for (int i=0; i < size; i++) {
+    			strRes[i] = mListReachablePairedDevices.get(i).getName() +"|" + mListReachablePairedDevices.get(i).getAddress();	
+    		}
+    	} else {
+    		strRes = new String[1];
+    		strRes[0] = "null|null";
+    	}    	            	 
+        return strRes;        
+    }
+
+    public void Disable(){
+       if (mBA != null) {
+    	   mBA.disable(); 
+           controls.pOnBluetoothDisabled(pascalObj);          
+       }
+       //Toast.makeText(controls.activity.getApplicationContext(),"Bluetooth turned Off" ,Toast.LENGTH_LONG).show();
+    }
+    
+    public boolean IsEnable() {
+    	if (mBA.isEnabled()) {
+    		return true;
+    	} else {
+    	  return false;
+    	}
+    }
+    
+    //This method returns the current state of the Bluetooth Adapter.
+    public int GetState() {
+      if (mBA != null) {
+        return mBA.getState();  //STATE_OFF, STATE_TURNING_ON, STATE_ON, STATE_TURNING_OFF.
+      } else { 
+    	  return -1;
+      }
+    }       
+                         
+    //Once you choose bluetooth, the android bluetooth application will launch and let you pick the device to send it too.
+    public void ShareFromSdCardFile(String  _filename) {
+    	
+       PackageManager pm = controls.activity.getPackageManager();
+       List<ResolveInfo>  appsList = pm.queryIntentActivities(intent, 0);
+     
+       if(appsList.size() > 0) {
+    	   String packageName = null;
+    	   String className = null;
+    	   boolean found = false;
+    	    
+    	   for(int i=0; i<  appsList.size()-1;i++){    		       		 
+    		 ResolveInfo info = appsList.get(i); //(ResolveInfo)    
+    	     packageName = info.activityInfo.packageName;
+    	     if( packageName.equals("com.android.bluetooth")){
+    	        className = info.activityInfo.name;
+    	        found = true;
+    	        break;// found
+    	     }
+    	   }
+    	   
+    	   if(found){
+    		 //set our intent to launch Bluetooth
+    		 intent.setClassName(packageName, className);
+    		 File file = new File(Environment.getExternalStorageDirectory().getPath() +"/"+ _filename);
+    		 
+    		 intent.setType("*/*");
+    	     intent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(file)); /* "/sdcard/test.txt" result : "file:///sdcard/test.txt" */
+    	     controls.activity.startActivity(intent);      		       		       	
+    	   }else{
+    		  Toast.makeText(controls.activity.getApplicationContext(),"com.android.bluetooth Not Found!" ,Toast.LENGTH_LONG).show();  
+    	   }    
+    	   
+       }       
+    }
+    
+    //Once you choose bluetooth, the android bluetooth application will launch and let you pick the device to send it too.
+    public void ShareFromFile(String _filename) {
+    	
+        PackageManager pm = controls.activity.getPackageManager();
+        List<ResolveInfo>  appsList = pm.queryIntentActivities(intent, 0);
+      
+        if(appsList.size() > 0) {
+     	   String packageName = null;
+     	   String className = null;
+     	   boolean found = false;
+     	    
+     	   for(int i=0; i<  appsList.size()-1;i++){    		       		 
+     		 ResolveInfo info = appsList.get(i);     
+     	     packageName = info.activityInfo.packageName;
+     	     if( packageName.equals("com.android.bluetooth")){
+     	        className = info.activityInfo.name;
+     	        found = true;
+     	        break;// found
+     	     }
+     	   }    	   
+     	   if(found){
+     		 //set our intent to launch Bluetooth
+    		 intent.setClassName(packageName, className);     		      		
+       		 
+          	 String PathDat = context.getFilesDir().getAbsolutePath();   //   //Result : /data/data/com/MyApp/files 	
+        	 File file = new File(PathDat+"/"+ _filename);
+        	 
+        	 intent.setType("*/*");
+        	 intent.putExtra(Intent.EXTRA_STREAM,Uri.fromFile(file)); /* "/sdcard/test.txt" result : "file:///sdcard/test.txt" */
+        	 controls.activity.startActivity(intent);    	
+       		 
+     	   }else{
+     		  Toast.makeText(controls.activity.getApplicationContext(),"com.android.bluetooth Not Found!" ,Toast.LENGTH_LONG).show();  
+     	   }    		   
+        }
+    }
+    
+    public BluetoothDevice GetReachablePairedDeviceByName(String _deviceName) {
+    	
+    	int index = -1;
+    	
+        for (int i=0; i < mListReachablePairedDevices.size(); i++) {
+        	if (mListReachablePairedDevices.get(i).getName().equals(_deviceName)) {
+        		index = i;
+        		break;
+        	}
+        }
+        if (index > -1) { 
+    	   return mListReachablePairedDevices.get(index);
+        }	
+        else return null;
+    }
+    
+    public BluetoothDevice GetReachablePairedDeviceByAddress(String _deviceAddress) {
+    	
+    	int index = -1;
+    	
+        for (int i=0; i < mListReachablePairedDevices.size(); i++) {
+        	if (mListReachablePairedDevices.get(i).getAddress().equals(_deviceAddress)) {
+        		index = i;
+        		break;
+        	}
+        }
+        if (index > -1) { 
+        	return mListReachablePairedDevices.get(index);
+        }	
+        else return null;
+    }
+        
+    public boolean IsReachablePairedDevice(String _deviceAddress) {    	
+    	int index = -1;    	
+        for (int i=0; i < mListReachablePairedDevices.size(); i++) {
+        	if (mListReachablePairedDevices.get(i).getAddress().equals(_deviceAddress)) {
+        		index = i;
+        		break;
+        	}
+        }
+        if (index > -1) { 
+    	   return true;
+        }	
+        else return false;    	    
+    }
+ 
+    public BluetoothDevice GetRemoteDeviceByAddress(String _deviceAddress){
+    	
+       if (IsReachablePairedDevice(_deviceAddress))	
+          return mBA.getRemoteDevice(_deviceAddress);
+       else
+    	  return null; 
+       
+    }
+    
+    public String GetDeviceNameByAddress(String _deviceAddress){
+    	
+    	String device;
+    	String devAddr = "";
+    	
+    	for(int i=0; i < mListFoundedDevices.size(); i++) {
+    	    device = mListFoundedDevices.get(i);    	   
+    	    devAddr = device.substring(device.indexOf("|")+1);
+    	    Log.i("devAddr",devAddr);
+    	    if (devAddr.equals(_deviceAddress)) {
+    	    	break;
+    	    }    	       	    	    
+    	}    	
+    	return devAddr;    	    	
+    }
+    
+    public String GetDeviceAddressByName(String _deviceName){
+    	String device;
+    	String devName = "";
+    	
+    	for(int i=0; i < mListFoundedDevices.size(); i++) {
+    	    device = mListFoundedDevices.get(i);    	   
+    	    devName = device.substring(0, device.indexOf("|")-1);
+    	    Log.i("devName",devName);
+    	    if (devName.equals(_deviceName)) {
+    	    	break;
+    	    }    	       	    	    
+    	}    	
+    	return devName;
+    }    
+}
+
+class jShareFile /*extends ...*/ {
+
+    private long     pascalObj = 0;      // Pascal Object
+    private Controls controls  = null;   // Control Class -> Java/Pascal Interface ...
+    private Context  context   = null;
+    
+    Intent intent = null;
+	        
+    //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
+
+    public jShareFile(Controls _ctrls, long _Self) { //Add more others news "_xxx" params if needed!
+       //super(_ctrls.activity);
+       context   = _ctrls.activity;
+       pascalObj = _Self;
+       controls  = _ctrls;
+       intent = new Intent();
+	   intent.setAction(Intent.ACTION_SEND);
+    }
+
+    public void jFree() {
+      //free local objects...
+      intent = null;      
+    }
+
+    //write others [public] methods code here......
+    //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
+    
+	public void SendFromSdCard(String _filename, String _mimetype){			 		 
+		intent.setType(_mimetype);		
+	    File file = new File(Environment.getExternalStorageDirectory().getPath() +"/"+ _filename);
+	    intent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(file)); /* "/sdcard/test.txt" result : "file:///sdcard/test.txt" */			 	         		 		 			 		
+		controls.activity.startActivity(intent);
+	}
+	
+	public void SendFromAssets(String _filename, String _mimetype){
+		    intent.setType(_mimetype);
+			InputStream is = null;
+			FileOutputStream fos = null;	  	   
+			String path = '/' + _filename.substring(1,_filename.lastIndexOf("/"));	   
+			String scrFilename = _filename.substring(_filename.lastIndexOf("/")+1);	   	   	   	  
+			File outDir = new File(path);	   
+			outDir.mkdirs();	   
+			try {		   
+				is = controls.activity.getAssets().open(scrFilename);	     
+				int size = is.available();	     
+				byte[] buffer = new byte[size];	     
+				File outfile = new File(_filename);
+				fos = new FileOutputStream(outfile);  //save to data/data/your_package/files/your_file_name
+				for (int c = is.read(buffer); c != -1; c = is.read(buffer)){
+			      fos.write(buffer, 0, c);
+				}	     
+				is.close();
+				fos.close();
+			}catch (IOException e) {
+			     e.printStackTrace();       
+			}	   	 
+			//LoadFromFile(scrFilename);		 		
+       	    String PathDat = context.getFilesDir().getAbsolutePath();  //Result : /data/data/com/MyApp/files       	           	           	   
+       	    File file = new File(PathDat+"/"+ _filename);       	    
+			intent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(file)); 		 			            	     			    	
+			controls.activity.startActivity(intent);
+	}	
+	
+	public void SendFromFile(File _filename, String _mimetype) {	    		     
+	   String PathDat = context.getFilesDir().getAbsolutePath();       //Result : /data/data/com/MyApp/files 	
+	   File file = new File(PathDat+"/"+ _filename);	        	 
+	   intent.setType(_mimetype);
+	   intent.putExtra(Intent.EXTRA_STREAM,Uri.fromFile(file));
+	   controls.activity.startActivity(intent);    		       		 	     
+	}		
+}
+
+//by jmpessoa
+class CustomSpinnerArrayAdapter<T> extends ArrayAdapter<String>{
+	
+	Context ctx; 
+	private int mTextColor = Color.LTGRAY;
+	private int mTexBackgroundtColor = Color.DKGRAY;
+	private int mSelectedTextColor = Color.GREEN;
+	private int flag = 0;
+	private boolean mLastItemAsPrompt = false;
+	
+    public CustomSpinnerArrayAdapter(Context context, int simpleSpinnerItem, ArrayList<String> alist) {
+       super(context, simpleSpinnerItem, alist);
+       ctx = context;
+ 	}
+
+    //This method is used to display the dropdown popup that contains data.
+	@Override
+    public View getDropDownView(int position, View convertView, ViewGroup parent)
+    {
+        View view = super.getView(position, convertView, parent);        
+        //we know that simple_spinner_item has android.R.id.text1 TextView:         
+        TextView text = (TextView)view.findViewById(android.R.id.text1);
+        text.setTextColor(mTextColor);//Color.RED choose
+        text.setBackgroundColor(mTexBackgroundtColor);
+        return view;        
+    }
+		
+	//This method is used to return the customized view at specified position in list.
+	@Override
+	public View getView(int pos, View cnvtView, ViewGroup prnt) {
+		
+	    View view = super.getView(pos, cnvtView, prnt);	    
+	    TextView text = (TextView)view.findViewById(android.R.id.text1);
+        text.setTextColor(mSelectedTextColor);
+        if (mLastItemAsPrompt) flag = 1;
+        return view; 
+    }
+	
+	@Override
+    public int getCount() {
+	  if (flag == 1)
+        return super.getCount() - 1; //do not show last item
+	  else
+		return super.getCount();
+    }
+				
+	public void SetTextColor(int txtColor){
+		mTextColor = txtColor;
+	}
+	
+	public void SetBackgroundColor(int txtColor){
+		mTexBackgroundtColor = txtColor;
+	}
+	
+	public void SetSelectedTextColor(int txtColor){
+		mSelectedTextColor = txtColor;
+	}
+	
+	 public void SetLastItemAsPrompt(boolean _hasPrompt) {
+	   mLastItemAsPrompt = _hasPrompt;	   
+	 }
+	
+}
+
+/*Draft java code by "Lazarus Android Module Wizard" [6/11/2014 22:00:44]*/
+/*https://github.com/jmpessoa/lazandroidmodulewizard*/
+/*jVisualControl template*/
+
+class jSpinner extends Spinner /*dummy*/ { //please, fix what GUI object will be extended!
+
+   private long       pascalObj = 0;    // Pascal Object
+   private Controls   controls  = null; // Control Class for events
+
+   private Context context = null;
+   private ViewGroup parent  = null;         // parent view
+   private RelativeLayout.LayoutParams lparams;              // layout XYWH
+   private Boolean enabled  = true;           // click-touch enabled!
+   private int lparamsAnchorRule[] = new int[30];
+   private int countAnchorRule = 0;
+   private int lparamsParentRule[] = new int[30];
+   private int countParentRule = 0;
+   private int lparamH = 100; 
+   private int lparamW = 100;
+   private int marginLeft = 0;
+   private int marginTop = 0;
+   private int marginRight = 0;
+   private int marginBottom = 0;
+
+   private ArrayList<String>  mStrList;
+   private CustomSpinnerArrayAdapter<String> mSpAdapter;
+   private boolean mLastItemAsPrompt = false;
+   
+   //implement action listener type of OnItemSelectedListener
+   private OnItemSelectedListener spinnerListener =new OnItemSelectedListener() {
+	   
+        @Override   
+   /*.*/public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {        	
+    	     String caption = mStrList.get(position).toString();
+	         setSelection(position);	          		            		          		            
+    	     controls.pOnSpinnerItemSeleceted(pascalObj,position,caption);              
+        }
+        
+        @Override
+   /*.*/public void onNothingSelected(AdapterView<?> parent) {}    
+        
+   };
+   
+   //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
+   public jSpinner(Controls _ctrls, long _Self) { //Add more others news "_xxx" params if needed!
+      super(_ctrls.activity);
+      context   = _ctrls.activity;
+      pascalObj = _Self;
+      controls  = _ctrls;
+      
+      lparams =new RelativeLayout.LayoutParams(100,100); //lparamW, lparamH
+     
+      mStrList = new ArrayList<String>();
+                  
+      mSpAdapter = new CustomSpinnerArrayAdapter<String>(context, android.R.layout.simple_spinner_item,mStrList);
+      mSpAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+      setAdapter(mSpAdapter);                  
+      setOnItemSelectedListener(spinnerListener);      
+   } //end constructor
+   
+   public void jFree() {
+      if (parent != null) { parent.removeView(this); }
+      //free local objects...
+      mStrList = null; 
+      mSpAdapter = null;    
+      lparams = null;
+      setOnClickListener(null);
+   }
+
+   public void SetjParent(ViewGroup _viewgroup) {
+      if (parent != null) { parent.removeView(this); }
+      parent = _viewgroup;
+      _viewgroup.addView(this,lparams);
+   }
+
+   public void SetLParamWidth(int _w) {
+      lparamW = _w;
+   }
+
+   public void SetLParamHeight(int _h) {
+      lparamH = _h;
+   }
+
+   public void SetLeftTopRightBottomWidthHeight(int _left, int _top, int _right, int _bottom, int _w, int _h) {
+      marginLeft = _left;
+      marginTop = _top;
+      marginRight = _right;
+      marginBottom = _bottom;
+      lparamH = _h;
+      lparamW = _w;
+   }
+
+   public void AddLParamsAnchorRule(int _rule) {
+      lparamsAnchorRule[countAnchorRule] = _rule;
+      countAnchorRule = countAnchorRule + 1;
+   }
+
+   public void AddLParamsParentRule(int _rule) {
+      lparamsParentRule[countParentRule] = _rule;
+      countParentRule = countParentRule + 1;
+   }
+
+   public void SetLayoutAll(int _idAnchor) {
+  	 lparams.width  = lparamW;
+	 lparams.height = lparamH;
+    
+	 lparams.setMargins(marginLeft,marginTop,marginRight,marginBottom);
+	
+	 if (_idAnchor > 0) {
+	    for (int i=0; i < countAnchorRule; i++) {
+	  	    lparams.addRule(lparamsAnchorRule[i], _idAnchor);
+	    }
+	 }
+     for (int j=0; j < countParentRule; j++) {
+         lparams.addRule(lparamsParentRule[j]);
+     }
+    this.setLayoutParams(lparams);
+   }
+
+   public void SetId(int _id) { //wrapper method pattern ...
+      this.setId(_id);
+   }
+   
+   //write others [public] methods code here......
+   //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ..
+   
+   public int GetSelectedItemPosition() {
+      return this.getSelectedItemPosition();
+   }
+   
+   public String GetSelectedItem() {	   
+ 	 return this.getSelectedItem().toString();	  
+   }
+  
+   public void Add(String _item) {	  	 
+	 mStrList.add(_item);    
+     mSpAdapter.notifyDataSetChanged();
+     //if (mLastItemAsPrompt) setSelection(mStrList.size()-1);
+   }
+   
+   public void SetSelectedTextColor(int _color) {
+	  mSpAdapter.SetSelectedTextColor(_color);
+   }
+   
+   public void SetDropListTextColor(int _color) {
+	  mSpAdapter.SetTextColor(_color);
+   }
+   
+   public void SetDropListBackgroundColor(int _color) {
+	  mSpAdapter.SetBackgroundColor(_color);
+   }
+   
+   public void SetLastItemAsPrompt(boolean _hasPrompt) {
+	   mLastItemAsPrompt = _hasPrompt;
+	   mSpAdapter.SetLastItemAsPrompt(_hasPrompt);
+	   if (mLastItemAsPrompt) setSelection(mStrList.size()-1);	   
+   }
+   
+   public int GetSize() {
+	  return mStrList.size();
+   }
+   
+   public void Delete(int _index) {	     
+	   if (_index < 0) mStrList.remove(0);
+	   else if (_index > (mStrList.size()-1)) mStrList.remove(mStrList.size()-1);
+	   else mStrList.remove(_index);	   	   		 		 
+	   mSpAdapter.notifyDataSetChanged();
+   }      
+   
+   public void SetSelection(int _index) {
+	   if (_index < 0) setSelection(0);
+	   else if (_index > (mStrList.size()-1)) setSelection(mStrList.size()-1);
+	   else setSelection(_index);	   
+   }
+   
+   public void SetItem(int _index, String _item) {	   
+	   if (_index < 0) mStrList.set(0,_item);
+	   else if (_index > (mStrList.size()-1)) mStrList.set(mStrList.size()-1,_item);
+	   else mStrList.set(_index,_item);	 
+	   mSpAdapter.notifyDataSetChanged();
+   }
+   
+}  //end class
+
 //Javas/Pascal Interface Class 
 
 public  class Controls {          // <<--------- 
@@ -6083,6 +7443,26 @@ public  native void pOnAsyncEvent    (long pasobj, int EventType, int progress);
 
 //new by jmpessoa: support for jListView custom row
 public  native void pOnClickWidgetItem(long pasobj, int position, boolean checked); 
+public  native void pOnClickCaptionItem(long pasobj, int position, String caption);
+
+//new by jmpessoa: support for Bluetooth
+public  native void pOnBluetoothEnabled(long pasobj);
+public  native void pOnBluetoothDisabled(long pasobj);
+public  native void pOnBluetoothDeviceFound(long pasobj,String deviceName,String deviceAddress);
+public  native void pOnBluetoothDiscoveryStarted(long pasobj);
+public  native void pOnBluetoothDiscoveryFinished(long pasobj,int countFoundedDevices,int countPairedDevices);
+public  native void pOnBluetoothDeviceBondStateChanged(long pasobj, int state, String deviceName, String deviceAddress);
+
+public  native void pOnBluetoothClientSocketConnected(long pasobj, String deviceName, String deviceAddress);
+public  native void pOnBluetoothClientSocketIncomingMessage(long pasobj, String messageText);
+public  native void pOnBluetoothClientSocketWritingMessage(long pasobj);
+
+public  native void pOnBluetoothServerSocketConnected(long pasobj, String deviceName, String deviceAddress);
+public  native void pOnBluetoothServerSocketIncomingMessage(long pasobj, String messageText);
+public  native void pOnBluetoothServerSocketWritingMessage(long pasobj);
+public  native void pOnBluetoothServerSocketListen(long pasobj, String deviceName, String deviceAddress);
+
+public  native void pOnSpinnerItemSeleceted(long pasobj, int position, String caption);
 
 //Load Pascal Library
 static {
@@ -8677,6 +10057,28 @@ public  java.lang.Object jSqliteDataAccess_Create(long pasobj, String databaseNa
   
    public java.lang.Object jMenu_jCreate(long _Self) {
       return (java.lang.Object)(new jMenu(this,_Self));
+   }
+  
+  
+   public java.lang.Object jBluetooth_jCreate(long _Self) {
+      return (java.lang.Object)(new jBluetooth(this,_Self));
+   }
+  
+  
+   public java.lang.Object jBluetoothServerSocket_jCreate(long _Self) {
+      return (java.lang.Object)(new jBluetoothServerSocket(this,_Self));
+   }
+  
+
+  
+   public java.lang.Object jBluetoothClientSocket_jCreate(long _Self) {
+      return (java.lang.Object)(new jBluetoothClientSocket(this,_Self));
+   }
+  
+
+  
+   public java.lang.Object jSpinner_jCreate(long _Self) {
+      return (java.lang.Object)(new jSpinner(this,_Self));
    }
   
 

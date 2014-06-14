@@ -47,9 +47,8 @@ begin
   Self.OnJNIPrompt:= DataModuleJNIPrompt;
 end;
 
-procedure TAndroidModule1.DataModuleCreateContextMenu(Sender: TObject;
-  jObjMenu: jObject);
-  var
+procedure TAndroidModule1.DataModuleCreateContextMenu(Sender: TObject; jObjMenu: jObject);
+var
   i: integer;
 begin
   for i:=0 to jMenu1.Options.Count-1 do
@@ -85,8 +84,8 @@ begin
 end;
 
 procedure TAndroidModule1.DataModuleClickContextMenuItem(Sender: TObject;
-  jObjMenuItem: jObject; itemID: integer; itemCaption: string;
-  checked: boolean);
+   jObjMenuItem: jObject; itemID: integer; itemCaption: string;
+   checked: boolean);
 begin
   //ShowMessage('Context Menu: Index = '+intToStr(itemID)+ ' :: ' + itemCaption);
    if itemID = 10 then jButton1.FontColor:= colbrGreen;
@@ -133,13 +132,13 @@ end;
 
 procedure TAndroidModule1.DataModuleJNIPrompt(Sender: TObject);
 begin
-   Self.Show;
-   jMenu1.RegisterForContextMenu(jButton1.jSelf);  // <------- register jButton1 for Context Menu!
+  Self.Show;
+  jMenu1.RegisterForContextMenu(jButton1.jSelf);  // <------- register jButton1 for Context Menu!
 end;
 
 procedure TAndroidModule1.jButton1Click(Sender: TObject);
 begin
-  ShowMessage('click!');
+  ShowMessage('Button clicked!');
 end;
 
 end.

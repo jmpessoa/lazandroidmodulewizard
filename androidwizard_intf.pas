@@ -167,7 +167,7 @@ begin
   frm.ShellTreeView1.Root:= FPathToJNIFolder;  //workspace...
   frm.PathToJavaTemplates:= FPathToJavaTemplates;
   frm.AndroidProjectName:= FAndroidProjectName;
-  frm.ModuleType:= FModuleType;
+  //frm.ModuleType:= FModuleType;
   frm.MainActivity:= FMainActivity;
   frm.MinApi:= FMinApi;
   frm.TargetApi:= FTargetApi;
@@ -177,9 +177,11 @@ begin
   begin
     Result := True;
     FSyntaxMode:= frm.SyntaxMode;
-    FPathToJavaClass:= frm.PathToJavaClass;
 
+    FPathToJavaClass:= frm.PathToJavaClass;
     FPathToJNIFolder:=GetPathToJNIFolder(FPathToJavaClass);
+
+    FModuleType:= frm.ModuleType;
 
     AndroidFileDescriptor.PathToJNIFolder:= FPathToJNIFolder;
     AndroidFileDescriptor.ModuleType:= FModuleType;
@@ -717,7 +719,7 @@ begin
   sourceList.Add('uses');
   if FModuleType = 0 then  //GUI controls
   begin
-    sourceList.Add('  Classes, SysUtils, And_jni, And_jni_Bridge, Laz_And_Controls;');
+    sourceList.Add('  Classes, SysUtils, And_jni, And_jni_Bridge, Laz_And_Controls, Laz_And_Controls_Events;');
     sourceList.Add(' ');
   end
   else //generic module :  No GUI Controls
@@ -1082,7 +1084,7 @@ begin
   if ModuleType = 1 then //generic module: No GUI Controls
     Result := 'Classes, SysUtils, jni;'
   else  //GUI controls module
-    Result := 'Classes, SysUtils, And_jni, And_jni_Bridge, Laz_And_Controls;';
+    Result := 'Classes, SysUtils, And_jni, And_jni_Bridge, Laz_And_Controls, Laz_And_Controls_Events;';
 end;
 
 function TAndroidFileDescPascalUnitWithResource.GetInterfaceSource(const Filename     : string;

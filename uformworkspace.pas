@@ -59,6 +59,7 @@ type
     SpeedButton7: TSpeedButton;
     StatusBar1: TStatusBar;
     procedure CheckBox1Click(Sender: TObject);
+    procedure ComboBox1DblClick(Sender: TObject);
     procedure ComboBox1Exit(Sender: TObject);
     procedure ComboBox2Change(Sender: TObject);
     procedure FormActivate(Sender: TObject);
@@ -257,6 +258,7 @@ begin
           ComboBox2.Items.Add('android-8'); //platform
           ComboBox2.Items.Add('android-9'); //platform
           ComboBox2.Items.Add('android-14'); //platform
+          //ComboBox2.Items.Add('android-17');  //platform
           ComboBox2.Items.Add('android-18');  //platform
           ComboBox2.Items.Add('android-19'); //platform
 
@@ -324,6 +326,25 @@ procedure TFormWorkspace.CheckBox1Click(Sender: TObject);
 begin
 {  if CheckBox1.Checked then FUseControls:='Yes'
   else FUseControls:='No';}
+end;
+
+procedure TFormWorkspace.ComboBox1DblClick(Sender: TObject);
+begin
+
+  FPathToWorkspace:= Edit1.Text;
+  ComboBox1.Items.Clear;
+  GetSubDirectories(FPathToWorkspace, ComboBox1.Items);
+
+  //try some guesswork:
+  if Pos('eclipse', LowerCase(FPathToWorkspace) ) > 0 then
+  begin
+    RadioGroup3.ItemIndex:= 0;
+    Edit8.Text:='';
+  end;
+
+  if Pos('ant', LowerCase(FPathToWorkspace) ) > 0 then
+     RadioGroup3.ItemIndex:= 1;
+
 end;
 
 procedure TFormWorkspace.ComboBox1Exit(Sender: TObject);

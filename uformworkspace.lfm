@@ -211,8 +211,8 @@ object FormWorkspace: TFormWorkspace
     Left = 8
     Height = 15
     Top = 252
-    Width = 402
-    Caption = 'Path to Java Resources  [Simonsayz''s Controls.java,  *.xml and default Icons]:'
+    Width = 555
+    Caption = 'Path to Java Resources  [Simonsayz''s Controls.java,  *.xml and default Icons] ex: .../LazAndroidWizard/java'
     ParentColor = False
   end
   object SpeedButton4: TSpeedButton
@@ -237,7 +237,7 @@ object FormWorkspace: TFormWorkspace
     Top = 385
     Width = 472
     ItemHeight = 15
-    OnExit = ComboBox1Exit
+    OnDblClick = ComboBox1DblClick
     TabOrder = 7
   end
   object RadioGroup3: TRadioGroup

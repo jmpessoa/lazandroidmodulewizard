@@ -45,11 +45,21 @@
 		         .We use a modified and expanded version of Simonsayz's "App.java" 
 
 
-              -Lazarus forum community! 
+              -Lazarus forum community!
+ 
+Version 0.5 - rev. 02 - 14 june 2014 -
+
+      :: New Add Partial Support for Spinner Object //<<---- A suggestion and request by Leledumbo
+      :: NEW jSpinner Component [Android Bridges EXtra]
+      :: NEW AppSpinerDemo [Eclipse Project] 
+
+      :: NEW AppSListViewDemo [Eclipse Project] :: fix RadioButton behavior...//<<---- A suggestion and request by Leledumbo
+
+      :: Warning: Bluetooth support yet unfinished! [BUG?]!
 
 Version 0.5 - rev. 01 - 06 May 2014 -
 
-      :: NEW Add Partial Support for Menu Object [Option Menu/SubMenu and Context Menu]! //<<---- A suggestion and request by Fatih KILIÇ
+      :: NEW Add Partial Support for Menu Object [Option Menu/SubMenu and Context Menu]! 
       :: NEW jMenu Component [Android Bridges EXtra]
       :: NEW AppMenuDemo [Eclipse Project]
 

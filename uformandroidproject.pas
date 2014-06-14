@@ -1562,6 +1562,8 @@ begin
   listPascal.Add(' ');
   if FProjectModel = 'jVisualControl' then
   begin
+    //listPascal.Add('TOnNotify          = Procedure(Sender: TObject) of object;');
+    //listPascal.Add('   ');
     listPascal.Add('{jVisualControl template}');
     listPascal.Add(' ');
     listPascal.Add(FJavaClassName+' = class(jVisualControl)')
@@ -1593,14 +1595,13 @@ begin
   if FProjectModel = 'jVisualControl' then
   begin
    listPascal.Add('    procedure SetVisible(Value: Boolean);');
-   listPascal.Add('    procedure SetColor(Value: TARGBColorBridge);');
+   listPascal.Add('    procedure SetColor(Value: TARGBColorBridge); //background color');
   end;
 
   listPascal.Add(' ');
   listPascal.Add(' protected');
 
   if FProjectModel = 'jVisualControl' then
-    listPascal.Add('    procedure GenEvent_OnClick(Obj: TObject);');
 
   listPascal.Add(' ');
   listPascal.Add(' public');
@@ -1614,6 +1615,11 @@ begin
     listPascal.Add('    procedure UpdateLayout; override;');
     listPascal.Add('    procedure SetParamHeight(Value: TLayoutParams);');
     listPascal.Add('    procedure SetParamWidth(Value: TLayoutParams);');
+    listPascal.Add('    ');
+    listPascal.Add('    procedure GenEvent_OnClick(Obj: TObject);');
+    listPascal.Add('    ');
+    listPascal.Add('    property jParent: jObject  read  FjPRLayout write SetjParent; // Java : Parent Relative Layout');
+
   end;
 
   listPascal.Add(FHackListPascalClass.Text);
@@ -1697,7 +1703,7 @@ begin
   listPascal.Add('      end;');
   listPascal.Add('    end;');
   listPascal.Add('  end;');
-  listPascal.Add('  //you others free code here...''');
+  listPascal.Add('  //you others free code here...');
   listPascal.Add('  inherited Destroy;');
   listPascal.Add('end;');
   listPascal.Add(' ');
@@ -1743,9 +1749,9 @@ begin
    listPascal.Add('    FParentPanel.Init;');
    listPascal.Add('    FjPRLayout:= FParentPanel.View;');
    listPascal.Add('  end;');
-   listPascal.Add('  '+FJavaClassName+'_setParent(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, FjPRLayout);');
-   listPascal.Add('  '+FJavaClassName+'_setId(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, Self.Id);');
-   listPascal.Add('  '+FJavaClassName+'_setLeftTopRightBottomWidthHeight(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject,');
+   listPascal.Add('  '+FJavaClassName+'_SetjParent(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, FjPRLayout);');
+   listPascal.Add('  '+FJavaClassName+'_SetId(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, Self.Id);');
+   listPascal.Add('  '+FJavaClassName+'_SetLeftTopRightBottomWidthHeight(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject,');
    listPascal.Add('                        FMarginLeft,FMarginTop,FMarginRight,FMarginBottom,');
    listPascal.Add('                        GetLayoutParams(gApp, FLParamWidth, sdW),');
    listPascal.Add('                        GetLayoutParams(gApp, FLParamHeight, sdH));');
@@ -1753,19 +1759,19 @@ begin
    listPascal.Add('  begin');
    listPascal.Add('    if rToA in FPositionRelativeToAnchor then');
    listPascal.Add('    begin');
-   listPascal.Add('      '+FJavaClassName+'_addlParamsAnchorRule(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, GetPositionRelativeToAnchor(rToA));');
+   listPascal.Add('      '+FJavaClassName+'_AddlParamsAnchorRule(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, GetPositionRelativeToAnchor(rToA));');
    listPascal.Add('    end;');
    listPascal.Add('  end;');
    listPascal.Add('  for rToP := rpBottom to rpCenterVertical do');
    listPascal.Add('  begin');
    listPascal.Add('    if rToP in FPositionRelativeToParent then');
    listPascal.Add('    begin');
-   listPascal.Add('      '+FJavaClassName+'_addlParamsParentRule(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, GetPositionRelativeToParent(rToP));');
+   listPascal.Add('      '+FJavaClassName+'_AddlParamsParentRule(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, GetPositionRelativeToParent(rToP));');
    listPascal.Add('    end;');
    listPascal.Add('  end;');
    listPascal.Add('  if Self.Anchor <> nil then Self.AnchorId:= Self.Anchor.Id');
    listPascal.Add('  else Self.AnchorId:= -1;');
-   listPascal.Add('  '+FJavaClassName+'_setLayoutAll(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, Self.AnchorId);');
+   listPascal.Add('  '+FJavaClassName+'_SetLayoutAll(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, Self.AnchorId);');
    listPascal.Add('  if  FColor <> colbrDefault then');
    listPascal.Add('    jView_SetBackGroundColor(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, GetARGB(FColor));');
    listPascal.Add('  jView_SetVisible(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, FVisible);');
@@ -1863,7 +1869,10 @@ begin
 
     SplitStr(strCaption, ' ');
 
-    FProjectModel:= strCaption;
+    if  Pos('jVisual', strCaption) > 0 then
+      FProjectModel:= 'jVisualControl'
+    else FProjectModel:= 'jControl';
+
 
     selList:= TStringList.Create;
     selList.Text:= SynMemo1.SelText; //java class code...
@@ -2046,7 +2055,7 @@ begin
      strList.Add('   ');
      strList.Add('   private Context context = null;');
      strList.Add('   private ViewGroup parent   = null;         // parent view');
-     strList.Add('   private LayoutParams lparams;              // layout XYWH ');
+     strList.Add('   private RelativeLayout.LayoutParams lparams;              // layout XYWH ');
      strList.Add('   private OnClickListener onClickListener;   // click event');
      strList.Add('   private Boolean enabled  = true;           // click-touch enabled!');
      strList.Add('   private int lparamsAnchorRule[] = new int[30];');
@@ -2068,7 +2077,7 @@ begin
      strList.Add('      pascalObj = _Self;');
      strList.Add('      controls  = _ctrls;');
      strList.Add('   ');
-     strList.Add('      lparams = new LayoutParams(lparamW, lparamH);');
+     strList.Add('      lparams = new RelativeLayout.LayoutParams(lparamW, lparamH);');
      strList.Add('   ');
      strList.Add('      onClickListener = new OnClickListener(){');
      strList.Add('      /*.*/public void onClick(View view){  //please, do not remove /*.*/ mask for parse invisibility!');
@@ -2087,7 +2096,7 @@ begin
      strList.Add('      setOnClickListener(null);');
      strList.Add('   }');
      strList.Add('  ');
-     strList.Add('   public void SetParent(ViewGroup _viewgroup) {');
+     strList.Add('   public void SetjParent(ViewGroup _viewgroup) {');
      strList.Add('      if (parent != null) { parent.removeView(this); }');
      strList.Add('      parent = _viewgroup;');
      strList.Add('      _viewgroup.addView(this,lparams);');

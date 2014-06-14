@@ -16,7 +16,7 @@
         <CompilerPath Value="$(CompPath)"/>
       </Other>
     </CompilerOptions>
-    <Files Count="14">
+    <Files Count="15">
       <Item1>
         <Filename Value="regandroidbridge.pas"/>
         <HasRegisterProc Value="True"/>
@@ -75,6 +75,10 @@
         <HasRegisterProc Value="True"/>
         <UnitName Value="register_extras"/>
       </Item14>
+      <Item15>
+        <Filename Value="laz_and_controls_events.pas"/>
+        <UnitName Value="Laz_And_Controls_Events"/>
+      </Item15>
     </Files>
     <Type Value="RunAndDesignTime"/>
     <RequiredPkgs Count="2">

@@ -9,6 +9,10 @@ interface
 
 uses 
   Classes,
+  spinner,
+  bluetoothclientsocket,
+  bluetoothserversocket,
+  bluetooth,
   menu,
   myhello,
   textfilemanager,
@@ -25,6 +29,10 @@ implementation
   
 Procedure Register;
 begin
+  {$I jspinner_icon.lrs}
+  {$I jbluetoothclientsocket_icon.lrs}
+  {$I jbluetoothserversocket_icon.lrs}
+  {$I jbluetooth_icon.lrs}
   {$I jmenu_icon.lrs}
   {$I jmyhello_icon.lrs}
   {$I jtextfilemanager_icon.lrs}
@@ -32,6 +40,10 @@ begin
   {$I jmediaplayer_icon.lrs}
   RegisterComponents('Android Bridges Extra',
     [
+      jSpinner,
+      jBluetoothClientSocket,
+      jBluetoothServerSocket,
+      jBluetooth,
       jMenu,
       jMyHello,
       jTextFileManager,
