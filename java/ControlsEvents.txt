@@ -43,3 +43,7 @@ pOnBluetoothServerSocketWritingMessage=Java_Event_pOnBluetoothServerSocketWritin
 pOnBluetoothServerSocketListen=Java_Event_pOnBluetoothServerSocketListen(PEnv,this,TObject(pasobj),deviceName,deviceAddress);
 pOnBluetoothServerSocketAccept=Java_Event_pOnBluetoothServerSocketAccept(PEnv,this,TObject(pasobj),deviceName,deviceAddress);
 pOnSpinnerItemSeleceted=Java_Event_pOnSpinnerItemSeleceted(PEnv,this,TObject(pasobj),position,caption);
+pOnLocationChanged=Java_Event_pOnLocationChanged(PEnv,this,TObject(pasobj),latitude,longitude,altitude,address);
+pOnLocationStatusChanged=Java_Event_pOnLocationStatusChanged(PEnv,this,TObject(pasobj),status,provider,msgStatus);
+pOnLocationProviderEnabled=Java_Event_pOnLocationProviderEnabled(PEnv,this,TObject(pasobj),provider);
+pOnLocationProviderDisabled=Java_Event_pOnLocationProviderDisabled(PEnv,this,TObject(pasobj),provider);

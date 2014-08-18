@@ -1,4 +1,4 @@
-package com.example.dummyapp;
+package com.example.applocationdemo1;
 
 //[LazAndroidModuleWizard - ver.0.5 - rev. 03 :17-August-2014]
 //

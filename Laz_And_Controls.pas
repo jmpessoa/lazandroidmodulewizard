@@ -693,6 +693,7 @@ type
     Procedure GenEvent_OnClick(Obj: TObject);
   public
     FormState     : TjFormState;
+    constructor CreateNew(AOwner: TComponent);  {thanks to  x2nie !!}
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
 
@@ -1103,6 +1104,7 @@ type
     // Java
     FjPRLayout : jObject; // Java : jParent Relative Layout
     FParentPanel:  jPanel;
+
     FOrientation: integer;
 
     FVisible   : Boolean;
@@ -1130,7 +1132,7 @@ type
     FOnClick: TOnNotify;
     procedure SetAnchor(Value: jVisualControl);
     procedure SetId(Value: DWord);
-  protected
+
     procedure Notification(AComponent: TComponent; Operation: TOperation); override;
     procedure UpdateLayout; virtual;
     function GetWidth: integer; virtual;
@@ -3058,9 +3060,15 @@ end;
 // jForm
 //------------------------------------------------------------------------------
 
+
+constructor jForm.CreateNew(AOwner: TComponent);  {thanks to  x2nie !!}
+begin
+  inherited Create(AOwner); //don't load stream
+end;
+
 constructor jForm.Create(AOwner: TComponent);
 begin
-  inherited Create(AOwner);
+  CreateNew(AOwner); //no stream loaded yet.
 
   // Initialize
   FVisible              := False;
@@ -3092,6 +3100,9 @@ begin
   FAnimation.Out_       := cjEft_None; //cjEft_FadeOut;
   FOrientation          := 0;
   FInitialized          := False;
+
+  //now load the stream
+  //InitInheritedComponent(Self, TDataModule);  //fail !!
 
 end;
 

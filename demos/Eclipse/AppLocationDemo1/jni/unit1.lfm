@@ -1,0 +1,162 @@
+object AndroidModule1: TAndroidModule1
+  OnCreate = DataModuleCreate
+  OldCreateOrder = False
+  ActivityMode = actMain
+  Title = 'jForm'
+  BackgroundColor = colbrBlack
+  OnJNIPrompt = DataModuleJNIPrompt
+  Height = 491
+  HorizontalOffset = 302
+  VerticalOffset = 150
+  Width = 263
+  object jButton1: jButton
+    Id = 1712792
+    Anchor = jCheckBox1
+    PosRelativeToAnchor = [raBelow]
+    PosRelativeToParent = []
+    LayoutParamWidth = lpMatchParent
+    LayoutParamHeight = lpWrapContent
+    MarginLeft = 5
+    MarginTop = 5
+    MarginRight = 5
+    MarginBottom = 5
+    Visible = True
+    BackgroundColor = colbrDefault
+    Text = 'ShowSettings [GPS]'
+    FontColor = colbrDefault
+    FontSize = 0
+    OnClick = jButton1Click
+    left = 104
+    top = 168
+  end
+  object jButton2: jButton
+    Id = 1986420
+    Anchor = jButton1
+    PosRelativeToAnchor = [raBelow]
+    PosRelativeToParent = []
+    LayoutParamWidth = lpMatchParent
+    LayoutParamHeight = lpWrapContent
+    MarginLeft = 5
+    MarginTop = 5
+    MarginRight = 5
+    MarginBottom = 5
+    Visible = True
+    BackgroundColor = colbrDefault
+    Text = 'StartTracker'
+    FontColor = colbrDefault
+    FontSize = 0
+    OnClick = jButton2Click
+    left = 104
+    top = 224
+  end
+  object jButton3: jButton
+    Id = 5497825
+    Anchor = jButton2
+    PosRelativeToAnchor = [raBelow]
+    PosRelativeToParent = []
+    LayoutParamWidth = lpMatchParent
+    LayoutParamHeight = lpWrapContent
+    MarginLeft = 5
+    MarginTop = 5
+    MarginRight = 5
+    MarginBottom = 5
+    Visible = True
+    BackgroundColor = colbrDefault
+    Text = 'StopTracker '
+    FontColor = colbrDefault
+    FontSize = 0
+    OnClick = jButton3Click
+    left = 104
+    top = 272
+  end
+  object jLocation1: jLocation
+    MapType = mtTerrain
+    CriteriaAccuracy = crCoarse
+    TimeForUpdates = 15000
+    DistanceForUpdates = 1
+    OnLocationChanged = jLocation1LocationChanged
+    OnLocationStatusChanged = jLocation1LocationStatusChanged
+    OnLocationProviderEnabled = jLocation1LocationProviderEnabled
+    OnLocationProviderDisabled = jLocation1LocationProviderDisabled
+    left = 24
+    top = 24
+  end
+  object jButton4: jButton
+    Id = 3561557
+    Anchor = jButton3
+    PosRelativeToAnchor = [raBelow]
+    PosRelativeToParent = []
+    LayoutParamWidth = lpMatchParent
+    LayoutParamHeight = lpWrapContent
+    MarginLeft = 5
+    MarginTop = 5
+    MarginRight = 5
+    MarginBottom = 5
+    Visible = True
+    BackgroundColor = colbrDefault
+    Text = 'Get Google Maps Url'
+    FontColor = colbrDefault
+    FontSize = 0
+    OnClick = jButton4Click
+    left = 104
+    top = 320
+  end
+  object jCheckBox1: jCheckBox
+    Id = 3200406
+    Anchor = jTextView1
+    PosRelativeToAnchor = [raBelow]
+    PosRelativeToParent = []
+    LayoutParamWidth = lpMatchParent
+    LayoutParamHeight = lpWrapContent
+    MarginLeft = 5
+    MarginTop = 5
+    MarginRight = 5
+    MarginBottom = 5
+    Visible = True
+    BackgroundColor = colbrDefault
+    FontColor = colbrSilver
+    FontSize = 0
+    Text = 'Enable Wifi'
+    Checked = False
+    OnClick = jCheckBox1Click
+    left = 104
+    top = 112
+  end
+  object jWebView1: jWebView
+    Id = 0
+    Anchor = jButton4
+    PosRelativeToAnchor = [raBelow]
+    PosRelativeToParent = []
+    LayoutParamWidth = lpMatchParent
+    LayoutParamHeight = lpMatchParent
+    MarginLeft = 0
+    MarginTop = 0
+    MarginRight = 0
+    MarginBottom = 0
+    JavaScript = True
+    Visible = True
+    BackgroundColor = colbrDefault
+    left = 104
+    top = 384
+  end
+  object jTextView1: jTextView
+    Id = 804639
+    PosRelativeToAnchor = []
+    PosRelativeToParent = [rpTop, rpCenterHorizontal]
+    LayoutParamWidth = lpWrapContent
+    LayoutParamHeight = lpWrapContent
+    MarginLeft = 10
+    MarginTop = 10
+    MarginRight = 10
+    MarginBottom = 10
+    Alignment = taLeft
+    Visible = True
+    Enabled = True
+    BackgroundColor = colbrDefault
+    FontColor = colbrSilver
+    FontSize = 0
+    Text = 'jLocation Demo'
+    left = 104
+    top = 48
+  end
+end

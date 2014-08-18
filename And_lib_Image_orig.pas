@@ -14,8 +14,6 @@
 //
 //
 //
-//modified by Stephano(patspiper@gmail.com) for compiles under Linux 64 bits! :: June 14, 2014
-
 unit And_lib_Image;
 
 {$ifdef fpc}
@@ -24,9 +22,6 @@ unit And_lib_Image;
  {$hints off}
  {$ifdef cpui386}
   {$define cpu386}
-  {$asmmode intel}
- {$endif}
- {$ifdef cpu64}
   {$asmmode intel}
  {$endif}
  {$ifdef fpc_little_endian}
@@ -1497,7 +1492,7 @@ asm
   mov cl,j
   sar eax,cl
 end;
-{$elseif defined(CPU64)}
+{$elseif defined(CPUX64)}
 asm
   mov eax,i
   mov cl,j

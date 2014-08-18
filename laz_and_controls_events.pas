@@ -5,7 +5,8 @@ unit Laz_And_Controls_Events;
 interface
 
 uses
-   Classes, SysUtils, And_jni, And_jni_Bridge, Laz_And_Controls, bluetooth, bluetoothclientsocket, bluetoothserversocket, spinner;
+   Classes, SysUtils, And_jni, And_jni_Bridge, Laz_And_Controls, bluetooth, bluetoothclientsocket,
+   bluetoothserversocket, spinner, location;
 
    procedure Java_Event_pOnBluetoothEnabled(env: PJNIEnv; this: jobject; Obj: TObject);
    procedure Java_Event_pOnBluetoothDisabled(env: PJNIEnv; this: jobject; Obj: TObject);
@@ -24,6 +25,13 @@ uses
    procedure Java_Event_pOnBluetoothServerSocketListen(env: PJNIEnv; this: jobject; Obj: TObject; deviceName: JString; deviceAddress: JString);
    procedure Java_Event_pOnBluetoothServerSocketAccept(env: PJNIEnv; this: jobject; Obj: TObject; deviceName: JString; deviceAddress: JString);
    procedure Java_Event_pOnSpinnerItemSeleceted(env: PJNIEnv; this: jobject; Obj: TObject; position: integer; caption: JString);
+
+   procedure Java_Event_pOnLocationChanged(env: PJNIEnv; this: jobject; Obj: TObject; latitude: JDouble; longitude: JDouble; altitude: JDouble; address: JString);
+   procedure Java_Event_pOnLocationStatusChanged(env: PJNIEnv; this: jobject; Obj: TObject; status: integer; provider: JString; msgStatus: JString);
+   procedure Java_Event_pOnLocationProviderEnabled(env: PJNIEnv; this: jobject; Obj: TObject; provider:JString);
+   procedure Java_Event_pOnLocationProviderDisabled(env: PJNIEnv; this: jobject; Obj: TObject; provider: JString);
+
+
 implementation
 
 procedure Java_Event_pOnBluetoothEnabled(env: PJNIEnv; this: jobject; Obj: TObject);
@@ -317,6 +325,100 @@ begin
       pasCaption:= string( env^.GetStringUTFChars(Env,caption,@_jBoolean) );
     end;
     jSpinner(Obj).GenEvent_OnSpinnerItemSeleceted(Obj, pasCaption, position);
+  end;
+end;
+
+procedure Java_Event_pOnLocationChanged(env: PJNIEnv; this: jobject; Obj: TObject; latitude: JDouble; longitude: JDouble; altitude: JDouble; address: JString);
+var
+  pasaddress: string;
+ _jBoolean: JBoolean;
+begin
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+
+  if Obj is jLocation then
+  begin
+    jForm(jLocation(Obj).Owner).UpdateJNI(gApp);
+    pasaddress:='';
+
+    if address <> nil then
+    begin
+      _jBoolean:= JNI_False;
+      pasaddress:= string( env^.GetStringUTFChars(Env,address,@_jBoolean) );
+    end;
+
+    jLocation(Obj).GenEvent_OnLocationChanged(Obj, latitude, longitude, altitude, pasaddress);
+  end;
+end;
+
+procedure Java_Event_pOnLocationStatusChanged(env: PJNIEnv; this: jobject; Obj: TObject; status: integer; provider: JString; msgStatus: JString);
+var
+ pasmsgStatus, pasprovider: string;
+ _jBoolean: JBoolean;
+begin
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+
+  if Obj is jLocation then
+  begin
+    jForm(jLocation(Obj).Owner).UpdateJNI(gApp);
+    pasmsgStatus:= '';
+    pasprovider:= '';
+    if provider <> nil then
+    begin
+      _jBoolean:= JNI_False;
+      pasprovider:= string( env^.GetStringUTFChars(Env,provider,@_jBoolean) );
+    end;
+
+    if msgStatus <> nil then
+    begin
+      _jBoolean:= JNI_False;
+      pasmsgStatus:= string( env^.GetStringUTFChars(Env,msgStatus,@_jBoolean) );
+    end;
+
+    jLocation(Obj).GenEvent_OnLocationStatusChanged(Obj, status, pasprovider, pasmsgStatus);
+  end;
+end;
+
+procedure Java_Event_pOnLocationProviderEnabled(env: PJNIEnv; this: jobject; Obj: TObject; provider:JString);
+var
+ pasprovider: string;
+ _jBoolean: JBoolean;
+begin
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+
+  if Obj is jLocation then
+  begin
+    jForm(jLocation(Obj).Owner).UpdateJNI(gApp);
+    pasprovider := '';
+    if provider <> nil then
+    begin
+      _jBoolean:= JNI_False;
+      pasprovider:= string( env^.GetStringUTFChars(Env,provider,@_jBoolean) );
+    end;
+    jLocation(Obj).GenEvent_OnLocationProviderEnabled(Obj, pasprovider);
+  end;
+end;
+
+procedure Java_Event_pOnLocationProviderDisabled(env: PJNIEnv; this: jobject; Obj: TObject; provider: JString);
+var
+ pasprovider: string;
+ _jBoolean: JBoolean;
+begin
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+
+  if Obj is jLocation then
+  begin
+    jForm(jLocation(Obj).Owner).UpdateJNI(gApp);
+    pasprovider := '';
+    if provider <> nil then
+    begin
+      _jBoolean:= JNI_False;
+      pasprovider:= string( env^.GetStringUTFChars(Env,provider,@_jBoolean) );
+    end;
+    jLocation(Obj).GenEvent_OnLocationProviderDisabled(Obj, pasprovider);
   end;
 end;
 

@@ -1602,6 +1602,7 @@ begin
   listPascal.Add(' protected');
 
   if FProjectModel = 'jVisualControl' then
+    listPascal.Add('    procedure GenEvent_OnClick(Obj: TObject);');
 
   listPascal.Add(' ');
   listPascal.Add(' public');

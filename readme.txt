@@ -46,11 +46,16 @@
 
 
               -Lazarus forum community!
- 
+                           
+Version 0.5 - rev. 03 - 17 august 2014 -
+      :: New jLocation Component: Add Partial Support for Location Object //<<---- A suggestion and request by Fatih KILIÇ
+      :: New jPreference Component: Add Partial Support for Preferences Object //<<---- A suggestion and request by Fatih KILIÇ
+
+      :: NEW AppLocationDemo [Eclipse Project] 
+
 Version 0.5 - rev. 02 - 14 june 2014 -
 
       :: New Add Partial Support for Spinner Object //<<---- A suggestion and request by Leledumbo
-      :: NEW jSpinner Component [Android Bridges EXtra]
       :: NEW AppSpinerDemo [Eclipse Project] 
 
       :: NEW AppSListViewDemo [Eclipse Project] :: fix RadioButton behavior...//<<---- A suggestion and request by Leledumbo

@@ -9,6 +9,8 @@ interface
 
 uses 
   Classes,
+  preferences,
+  location,
   spinner,
   bluetoothclientsocket,
   bluetoothserversocket,
@@ -29,6 +31,8 @@ implementation
   
 Procedure Register;
 begin
+  {$I jpreferences_icon.lrs}
+  {$I jlocation_icon.lrs}
   {$I jspinner_icon.lrs}
   {$I jbluetoothclientsocket_icon.lrs}
   {$I jbluetoothserversocket_icon.lrs}
@@ -40,6 +44,8 @@ begin
   {$I jmediaplayer_icon.lrs}
   RegisterComponents('Android Bridges Extra',
     [
+      jPreferences,
+      jLocation,
       jSpinner,
       jBluetoothClientSocket,
       jBluetoothServerSocket,
