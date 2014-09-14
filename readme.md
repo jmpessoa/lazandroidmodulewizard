@@ -215,58 +215,58 @@ IV. Technical Notes: dependencies on laz4android [win32] IDE cross compiler:
       1. File 1 - foo.pas - component code - here no LCL dependency at all!
 
         ```pascal
-unit foo;
+        unit foo;
 
-{$mode objfpc}{$H+}
+        {$mode objfpc}{$H+}
 
-interface 
+        interface 
 
-uses
-  Classes, SysUtils;
+        uses
+          Classes, SysUtils;
 
-type
+        type
 
-  TFoo = class(TComponent)
-  private
-    { Private declarations }
-  protected
-    { Protected declarations }
-  public
-    { Public declarations }
-  published
-    { Published declarations }
-  end;
+          TFoo = class(TComponent)
+          private
+            { Private declarations }
+          protected
+            { Protected declarations }
+          public
+            { Public declarations }
+          published
+            { Published declarations }
+          end;
 
-implementation
+        implementation
 
-end.
+        end.
         ```
 
       2. File 2 - regtfoo.pas - register component code -  here you will nedd LCLBase for LResources unit
 
         ```pascal
-unit regtfoo;
+        unit regtfoo;
 
-{$mode objfpc}{$H+}
+        {$mode objfpc}{$H+}
 
-interface
+        interface
 
-uses
-  Classes, SysUtils, LResources {nedded for custom icon loading...}; 
+        uses
+          Classes, SysUtils, LResources {nedded for custom icon loading...}; 
 
-Procedure Register;
+        Procedure Register;
 
-implementation
+        implementation
 
-Procedure Register;
-begin
-  {$I tfoo_icon.lrs}  //you custom icon
-  RegisterComponents('Android Bridges',[TFoo);
-end;
+        Procedure Register;
+        begin
+          {$I tfoo_icon.lrs}  //you custom icon
+          RegisterComponents('Android Bridges',[TFoo);
+        end;
 
-initialization
+        initialization
 
-end.   
+        end.   
         ```
 
 [Edited 04-May-2014] :: WARNING:  Please, read the  NEW "fast_tutorial_jni_bridges_component_create.txt" - 
@@ -280,70 +280,70 @@ end.
       1. File 1 - "And_log_h.pas" - the header interface file
 
         ```pascal
-unit And_log_h;
+        unit And_log_h;
 
-{$mode delphi}
+        {$mode delphi}
 
-interface
+        interface
 
-const 
-  libname='liblog.so';
-  ANDROID_LOG_UNKNOWN=0;
-  ANDROID_LOG_DEFAULT=1;
-  ANDROID_LOG_VERBOSE=2;
-  ANDROID_LOG_DEBUG=3;
-  ANDROID_LOG_INFO=4;
-  ANDROID_LOG_WARN=5;
-  ANDROID_LOG_ERROR=6;
-  ANDROID_LOG_FATAL=7;
-  ANDROID_LOG_SILENT=8;
+        const 
+          libname='liblog.so';
+          ANDROID_LOG_UNKNOWN=0;
+          ANDROID_LOG_DEFAULT=1;
+          ANDROID_LOG_VERBOSE=2;
+          ANDROID_LOG_DEBUG=3;
+          ANDROID_LOG_INFO=4;
+          ANDROID_LOG_WARN=5;
+          ANDROID_LOG_ERROR=6;
+          ANDROID_LOG_FATAL=7;
+          ANDROID_LOG_SILENT=8;
 
-type
+        type
 
-  android_LogPriority=integer;
+          android_LogPriority=integer;
 
-function __android_log_write(prio:longint; tag,text: pchar):longint; cdecl; external libname name '__android_log_write';
+        function __android_log_write(prio:longint; tag,text: pchar):longint; cdecl; external libname name '__android_log_write';
 
-implementation
+        implementation
 
-end.
+        end.
         ```
 
       2. File 2 - "And_log.pas" - component/unit code
 
         ```pascal
-unit And_log;
+        unit And_log;
 
-interface
+        interface
 
-uses
-  And_log_h;  // <-- here is the link/bind to NDK lib
+        uses
+          And_log_h;  // <-- here is the link/bind to NDK lib
 
-type
+        type
 
-  jLog = class(jControls)  
-  end;
+          jLog = class(jControls)  
+          end;
 
-  jLog  = class(jControl)
-  private
-    { Private declarations }
-  protected
-    { Protected declarations }
-  public
-    { Public declarations }
-    procedures wLog(msg: pchar);  // << ----------- dependency!
-  published
-    { Published declarations }
-  end;
+          jLog  = class(jControl)
+          private
+            { Private declarations }
+          protected
+            { Protected declarations }
+          public
+            { Public declarations }
+            procedures wLog(msg: pchar);  // << ----------- dependency!
+          published
+            { Published declarations }
+          end;
 
-implementation
+        implementation
 
-procedure jLog.WLog(msg: pchar);
-begin
-  __android_log_write(ANDROID_LOG_FATAL,'crap',msg);  // << ---------- dependency!
-end;
+        procedure jLog.WLog(msg: pchar);
+        begin
+          __android_log_write(ANDROID_LOG_FATAL,'crap',msg);  // << ---------- dependency!
+        end;
 
-end.
+        end.
         ```
 
 V. Ref. Lazarus forum: http://forum.lazarus.freepascal.org/index.php/topic,21919.0.html
