@@ -214,7 +214,7 @@ IV. Technical Notes: dependencies on laz4android [win32] IDE cross compiler:
 
       1. File 1 - foo.pas - component code - here no LCL dependency at all!
 
-```pascal
+        ```pascal
 unit foo;
 
 {$mode objfpc}{$H+}
@@ -240,11 +240,11 @@ type
 implementation
 
 end.
-```
+        ```
 
       2. File 2 - regtfoo.pas - register component code -  here you will nedd LCLBase for LResources unit
 
-```pascal
+        ```pascal
 unit regtfoo;
 
 {$mode objfpc}{$H+}
@@ -267,7 +267,7 @@ end;
 initialization
 
 end.   
-```
+        ```
 
 [Edited 04-May-2014] :: WARNING:  Please, read the  NEW "fast_tutorial_jni_bridges_component_create.txt" - 
 
@@ -279,7 +279,7 @@ end.
 
       1. File 1 - "And_log_h.pas" - the header interface file
 
-```pascal
+        ```pascal
 unit And_log_h;
 
 {$mode delphi}
@@ -307,11 +307,11 @@ function __android_log_write(prio:longint; tag,text: pchar):longint; cdecl; exte
 implementation
 
 end.
-```
+        ```
 
       2. File 2 - "And_log.pas" - component/unit code
 
-```pascal
+        ```pascal
 unit And_log;
 
 interface
@@ -344,7 +344,7 @@ begin
 end;
 
 end.
-```
+        ```
 
 V. Ref. Lazarus forum: http://forum.lazarus.freepascal.org/index.php/topic,21919.0.html
 
