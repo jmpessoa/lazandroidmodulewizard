@@ -7,7 +7,7 @@ interface
   
 uses
   Classes, SysUtils, And_jni, And_jni_Bridge, Laz_And_Controls, 
-    Laz_And_Controls_Events;
+  Laz_And_Controls_Events, AndroidWidget;
   
 type
 
@@ -44,12 +44,12 @@ implementation
 
 procedure TAndroidModule1.DataModuleCreate(Sender: TObject);
 begin
-   Self.OnJNIPrompt:= DataModuleJNIPrompt;
+   //
 end;
 
 procedure TAndroidModule1.DataModuleJNIPrompt(Sender: TObject);
 begin
-  Self.Show;
+  //
 end;
 
 procedure TAndroidModule1.jButton1Click(Sender: TObject);
@@ -91,7 +91,7 @@ begin
   if jListView1.IsItemChecked(Item) then
      ShowMessage('index = ['+intToStr(Item)+'/'+caption+'] is Cheched!')
   else
-     ShowMessage('index = ['+intToStr(Item)+'/'+caption+'] is Not Cheched!')
+     ShowMessage('index = ['+intToStr(Item)+'/'+caption+'] is Not Cheched!');
 end;
 
 procedure TAndroidModule1.jListView1ClickWidgetItem(Sender: TObject;
@@ -99,11 +99,11 @@ procedure TAndroidModule1.jListView1ClickWidgetItem(Sender: TObject;
 var
   i: integer;
 begin
-   //ShowMessage();
-   for i:=0 to jListView1.Count-1 do
-   begin
+  //ShowMessage();
+  for i:=0 to jListView1.Count-1 do
+  begin
      if jListView1.IsItemChecked(i) then ShowMessage('just index = ['+intToStr(i)+'] is Cheched!');
-   end;
+  end;
 end;
 
 end.

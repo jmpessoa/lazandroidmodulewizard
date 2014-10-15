@@ -7,7 +7,7 @@ interface
   
 uses
   Classes, SysUtils, And_jni, And_jni_Bridge, Laz_And_Controls,
-  Laz_And_GLESv2_Canvas, Laz_And_GLESv2_Canvas_h;
+  Laz_And_GLESv2_Canvas, Laz_And_GLESv2_Canvas_h, Laz_And_Controls_Events, AndroidWidget;
   
 type
 
@@ -23,7 +23,6 @@ type
       jTextView2: jTextView;
       jTextView3: jTextView;
       jTimer1: jTimer;
-      procedure DataModuleActive(Sender: TObject);
       procedure DataModuleCloseQuery(Sender: TObject; var CanClose: boolean);
       procedure DataModuleCreate(Sender: TObject);
       procedure DataModuleJNIPrompt(Sender: TObject);
@@ -44,7 +43,6 @@ type
       {private declarations}
     public
       {public declarations}
-      Timer_Cnt : Integer;
       gAngle    : Single;
       gSpeed    : Single;
       gWork     : Boolean;
@@ -216,10 +214,8 @@ begin
   gSpeed  := 1.0;
   gWork   := False;
   gZoom   := 1.0;
-  Timer_Cnt:= 0;
   gRunning:= True;
   ArcBall_Init(gArcBall);
-  Self.Show;
 end;
 
 procedure TAndroidModule11.DataModuleRotate(Sender: TObject; rotate: integer;
@@ -312,20 +308,14 @@ end;
 
 procedure TAndroidModule11.jTimer1Timer(Sender: TObject);
 begin
-  Inc(Timer_Cnt);
   gAngle := gAngle + 4;
   if gAngle > 360 then gAngle := 0;
   if gWork then jCanvasES2_1.Refresh;
 end;
 
 procedure TAndroidModule11.DataModuleCreate(Sender: TObject);
-begin  //this initialization code is need here to fix Laz4Andoid  *.lfm parse.... why parse fails?
-  Self.ActivityMode:= actRecyclable;
-  Self.BackgroundColor:= colbrBlack;
-    //mode delphi
-  Self.OnJNIPrompt:= DataModuleJNIPrompt;
-  Self.OnRotate:= DataModuleRotate;
-  Self.OnCloseQuery:= DataModuleCloseQuery;
+begin
+  //
 end;
 
 procedure TAndroidModule11.DataModuleCloseQuery(Sender: TObject; var CanClose: boolean);
@@ -335,14 +325,5 @@ begin
    gRunning:= False;
 end;
 
-procedure TAndroidModule11.DataModuleActive(Sender: TObject);
-begin
-  if not gRunning then
-  begin
-    gWork := True;
-    jTimer1.Enabled := True;
-    gRunning:= True;
-  end
-end;
 
 end.

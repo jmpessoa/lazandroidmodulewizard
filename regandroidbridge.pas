@@ -7,7 +7,7 @@ interface
 uses
   Classes,
   SysUtils,
-  Laz_And_Controls,
+  Laz_And_Controls, AndroidWidget,
   Laz_And_GLESv1_Canvas,
   Laz_And_GLESv2_Canvas,
   LResources;

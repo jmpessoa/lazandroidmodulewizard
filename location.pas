@@ -5,7 +5,7 @@ unit location;
 interface
 
 uses
-  Classes, SysUtils, And_jni, And_jni_Bridge, Laz_And_Controls;
+  Classes, SysUtils, And_jni, And_jni_Bridge, Laz_And_Controls, AndroidWidget;
 
 type
 
@@ -45,7 +45,8 @@ jLocation = class(jControl)
  public
     constructor Create(AOwner: TComponent); override;
     destructor  Destroy; override;
-    procedure Init; override;
+    procedure Init(refApp: jApp); override;
+
     function jCreate( _TimeForUpdates: int64; _DistanceForUpdates: int64; _CriteriaAccuracy: integer; _MapType: integer): jObject;
     procedure jFree();
     function StartTracker(): boolean;
@@ -143,10 +144,10 @@ begin
     begin
       if jForm(Owner).App.Initialized then
       begin
-        if FjObject <> nil then
+        if FjObject  <> nil then
         begin
            jFree();
-           FjObject:= nil;
+           FjObject := nil;
         end;
       end;
     end;
@@ -155,12 +156,12 @@ begin
   inherited Destroy;
 end;
 
-procedure jLocation.Init;
+procedure jLocation.Init(refApp: jApp);
 begin
   if FInitialized  then Exit;
-  inherited Init;
+  inherited Init(refApp);
   //your code here: set/initialize create params....
-  FjObject:= jCreate(FTimeForUpdates ,FDistanceForUpdates ,Ord(FCriteriaAccuracy) ,Ord(FMapType));
+  FjObject := jCreate(FTimeForUpdates ,FDistanceForUpdates ,Ord(FCriteriaAccuracy) ,Ord(FMapType));
 
   FInitialized:= True;
 end;
@@ -175,7 +176,7 @@ procedure jLocation.jFree();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jLocation_jFree(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject);
+     jLocation_jFree(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject );
 end;
 
 function jLocation.StartTracker(): boolean;
@@ -183,28 +184,28 @@ begin
   //in designing component state: result value here...
   Result:= False;
   if FInitialized then
-   Result:= jLocation_StartTracker(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject);
+   Result:= jLocation_StartTracker(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject );
 end;
 
 procedure jLocation.ShowLocationSouceSettings();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jLocation_ShowLocationSouceSettings(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject);
+     jLocation_ShowLocationSouceSettings(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject );
 end;
 
 procedure jLocation.RequestLocationUpdates();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jLocation_RequestLocationUpdates(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject);
+     jLocation_RequestLocationUpdates(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject );
 end;
 
 procedure jLocation.StopTracker();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jLocation_StopTracker(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject);
+     jLocation_StopTracker(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject );
 end;
 
 procedure jLocation.SetCriteriaAccuracy(_accuracy: TCriteriaAccuracy);
@@ -212,21 +213,21 @@ begin
   //in designing component state: set value here...
   FCriteriaAccuracy:= _accuracy;
   if FInitialized then
-     jLocation_SetCriteriaAccuracy(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, Ord(_accuracy));
+     jLocation_SetCriteriaAccuracy(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject , Ord(_accuracy));
 end;
 
 function jLocation.IsGPSProvider(): boolean;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jLocation_IsGPSProvider(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject);
+   Result:= jLocation_IsGPSProvider(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject );
 end;
 
 function jLocation.IsNetProvider(): boolean;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jLocation_IsNetProvider(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject);
+   Result:= jLocation_IsNetProvider(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject );
 end;
 
 procedure jLocation.SetTimeForUpdates(_time: int64);
@@ -234,7 +235,7 @@ begin
   //in designing component state: set value here...
   FTimeForUpdates:= _time;
   if FInitialized then
-     jLocation_SetTimeForUpdates(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, _time);
+     jLocation_SetTimeForUpdates(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject , _time);
 end;
 
 procedure jLocation.SetDistanceForUpdates(_distance: int64);
@@ -242,49 +243,49 @@ begin
   //in designing component state: set value here...
   FDistanceForUpdates:= _distance;
   if FInitialized then
-     jLocation_SetDistanceForUpdades(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, _distance);
+     jLocation_SetDistanceForUpdades(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject , _distance);
 end;
 
 function jLocation.GetLatitude(): double;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jLocation_GetLatitude(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject);
+   Result:= jLocation_GetLatitude(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject );
 end;
 
 function jLocation.GetLongitude(): double;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jLocation_GetLongitude(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject);
+   Result:= jLocation_GetLongitude(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject );
 end;
 
 function jLocation.GetAltitude(): double;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jLocation_GetAltitude(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject);
+   Result:= jLocation_GetAltitude(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject );
 end;
 
 function jLocation.IsWifiEnabled(): boolean;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jLocation_IsWifiEnabled(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject);
+   Result:= jLocation_IsWifiEnabled(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject );
 end;
 
 procedure jLocation.SetWifiEnabled(_status: boolean);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jLocation_SetWifiEnabled(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, _status);
+     jLocation_SetWifiEnabled(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject , _status);
 end;
 
 function jLocation.GetGoogleMapsUrl(_latitude: double; _longitude: double): string;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jLocation_GetGoogleMapsUrl(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, _latitude ,_longitude);
+   Result:= jLocation_GetGoogleMapsUrl(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject , _latitude ,_longitude);
 end;
 
 procedure jLocation.SetMapWidth(_mapwidth: integer);
@@ -292,7 +293,7 @@ begin
   //in designing component state: set value here...
   FMapWidth:= _mapwidth;
   if FInitialized then
-     jLocation_SetMapWidth(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, _mapwidth);
+     jLocation_SetMapWidth(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject , _mapwidth);
 end;
 
 procedure jLocation.SetMapHeight(_mapheight: integer);
@@ -300,7 +301,7 @@ begin
   //in designing component state: set value here...
   FMapHeight:=_mapheight;
   if FInitialized then
-     jLocation_SetMapHeight(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, _mapheight);
+     jLocation_SetMapHeight(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject , _mapheight);
 end;
 
 procedure jLocation.SetMapZoom(_mapzoom: integer);
@@ -308,7 +309,7 @@ begin
   //in designing component state: set value here...
   FMapZoom:= _mapzoom;
   if FInitialized then
-     jLocation_SetMapZoom(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, _mapzoom);
+     jLocation_SetMapZoom(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject , _mapzoom);
 end;
 
 procedure jLocation.SetMapType(_maptype: TMapType);
@@ -316,21 +317,21 @@ begin
   //in designing component state: set value here...
   FMapType:= _maptype;
   if FInitialized then
-     jLocation_SetMapType(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, Ord(_maptype));
+     jLocation_SetMapType(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject , Ord(_maptype));
 end;
 
 function jLocation.GetAddress(): string;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jLocation_GetAddress(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject);
+   Result:= jLocation_GetAddress(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject );
 end;
 
 function jLocation.GetAddress(_latitude: double; _longitude: double): string;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jLocation_GetAddress(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, _latitude ,_longitude);
+   Result:= jLocation_GetAddress(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject , _latitude ,_longitude);
 end;
 
 procedure jLocation.GenEvent_OnLocationChanged(Obj: TObject; latitude: double; longitude: double; altitude: double; address: string);

@@ -5,7 +5,7 @@ unit preferences;
 interface
 
 uses
-  Classes, SysUtils, And_jni, And_jni_Bridge, Laz_And_Controls;
+  Classes, SysUtils, And_jni, And_jni_Bridge, Laz_And_Controls, AndroidWidget;
 
 type
 
@@ -23,7 +23,7 @@ jPreferences = class(jControl)
  public
     constructor Create(AOwner: TComponent); override;
     destructor  Destroy; override;
-    procedure Init; override;
+    procedure Init(refApp: jApp); override;
     function jCreate( _IsShared: boolean): jObject;
     procedure jFree();
     function GetIntData(_key: string; _defaultValue: integer): integer;
@@ -67,10 +67,10 @@ begin
     begin
       if jForm(Owner).App.Initialized then
       begin
-        if FjObject <> nil then
+        if FjObject  <> nil then
         begin
            jFree();
-           FjObject:= nil;
+           FjObject := nil;
         end;
       end;
     end;
@@ -79,12 +79,12 @@ begin
   inherited Destroy;
 end;
 
-procedure jPreferences.Init;
+procedure jPreferences.Init(refApp: jApp);
 begin
   if FInitialized  then Exit;
-  inherited Init;
+  inherited Init(refApp);
   //your code here: set/initialize create params....
-  FjObject:= jCreate(FIsShared);
+  FjObject := jCreate(FIsShared);
   FInitialized:= True;
 end;
 
@@ -98,49 +98,49 @@ procedure jPreferences.jFree();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jPreferences_jFree(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject);
+     jPreferences_jFree(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject );
 end;
 
 function jPreferences.GetIntData(_key: string; _defaultValue: integer): integer;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jPreferences_GetIntData(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, _key ,_defaultValue);
+   Result:= jPreferences_GetIntData(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject , _key ,_defaultValue);
 end;
 
 procedure jPreferences.SetIntData(_key: string; _value: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jPreferences_SetIntData(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, _key ,_value);
+     jPreferences_SetIntData(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject , _key ,_value);
 end;
 
 function jPreferences.GetStringData(_key: string; _defaultValue: string): string;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jPreferences_GetStringData(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, _key ,_defaultValue);
+   Result:= jPreferences_GetStringData(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject , _key ,_defaultValue);
 end;
 
 procedure jPreferences.SetStringData(_key: string; _value: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jPreferences_SetStringData(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, _key ,_value);
+     jPreferences_SetStringData(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject , _key ,_value);
 end;
 
 function jPreferences.GetBoolData(_key: string; _defaultValue: boolean): boolean;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jPreferences_GetBoolData(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, _key ,_defaultValue);
+   Result:= jPreferences_GetBoolData(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject , _key ,_defaultValue);
 end;
 
 procedure jPreferences.SetBoolData(_key: string; _value: boolean);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jPreferences_SetBoolData(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, _key ,_value);
+     jPreferences_SetBoolData(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject , _key ,_value);
 end;
 
 {-------- jPreferences_JNI_Bridge ----------}

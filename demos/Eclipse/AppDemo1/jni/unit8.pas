@@ -6,7 +6,7 @@ unit unit8;
 interface
   
 uses
-  Classes, SysUtils, And_jni, And_jni_Bridge, Laz_And_Controls;
+  Classes, SysUtils, And_jni, And_jni_Bridge, Laz_And_Controls, Laz_And_Controls_Events, AndroidWidget;
   
 type
 
@@ -90,7 +90,7 @@ procedure TAndroidModule8.DataModuleJNIPrompt(Sender: TObject);
 begin
   P.X:= 135;
   P.Y:= 135;
-  Self.Show;
+ // Self.Show;
 end;
 
 procedure TAndroidModule8.DataModuleRotate(Sender: TObject; rotate: integer;
@@ -101,12 +101,12 @@ end;
 
 procedure TAndroidModule8.DataModuleCreate(Sender: TObject);
 begin
-  Self.ActivityMode:= actRecyclable;
+ (* Self.ActivityMode:= actRecyclable;
   Self.BackgroundColor:= colbrBlack;
   //mode delphi
   Self.OnJNIPrompt:= DataModuleJNIPrompt;
   Self.OnRotate:= DataModuleRotate;
-  Self.OnCloseQuery:= DataModuleCloseQuery;
+  Self.OnCloseQuery:= DataModuleCloseQuery;  *)
 end;
 
 procedure TAndroidModule8.DataModuleCloseQuery(Sender: TObject; var CanClose: boolean);

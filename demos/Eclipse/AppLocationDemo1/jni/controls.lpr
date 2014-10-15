@@ -4,7 +4,7 @@ library controls;
 {$mode delphi}
 
 uses
-  Classes, SysUtils, And_jni, And_jni_Bridge, Laz_And_Controls,
+  Classes, SysUtils, And_jni, AndroidWidget, And_jni_Bridge, Laz_And_Controls,
   Laz_And_Controls_Events, Unit1;
 
 { Class:     com_example_applocationdemo1_Controls
@@ -208,14 +208,6 @@ begin
 end;
 
 { Class:     com_example_applocationdemo1_Controls
-  Method:    pOnActive
-  Signature: (J)V }
-procedure pOnActive(PEnv: PJNIEnv; this: JObject; pasobj: JLong); cdecl;
-begin
-  Java_Event_pOnActive(PEnv,this,TObject(pasobj));
-end;
-
-{ Class:     com_example_applocationdemo1_Controls
   Method:    pOnWebViewStatus
   Signature: (JILjava/lang/String;)I }
 function pOnWebViewStatus(PEnv: PJNIEnv; this: JObject; pasobj: JLong; EventType: JInt; url: JString): JInt; cdecl;
@@ -391,7 +383,23 @@ begin
   Java_Event_pOnLocationProviderDisabled(PEnv,this,TObject(pasobj),provider);
 end;
 
-const NativeMethods:array[0..47] of JNINativeMethod = (
+{ Class:     com_example_applocationdemo1_Controls
+  Method:    pAppOnViewClick
+  Signature: (Landroid/view/View;I)V }
+procedure pAppOnViewClick(PEnv: PJNIEnv; this: JObject; view: JObject; id: JInt); cdecl;
+begin
+  Java_Event_pAppOnViewClick(PEnv,this,view,id);
+end;
+
+{ Class:     com_example_applocationdemo1_Controls
+  Method:    pAppOnListItemClick
+  Signature: (Landroid/widget/AdapterView;Landroid/view/View;II)V }
+procedure pAppOnListItemClick(PEnv: PJNIEnv; this: JObject; adapter: JObject; view: JObject; position: JInt; id: JInt); cdecl;
+begin
+  Java_Event_pAppOnListItemClick(PEnv,this,adapter,view,position,id);
+end;
+
+const NativeMethods:array[0..48] of JNINativeMethod = (
    (name:'pAppOnScreenStyle';
     signature:'()I';
     fnPtr:@pAppOnScreenStyle;),
@@ -467,9 +475,6 @@ const NativeMethods:array[0..47] of JNINativeMethod = (
    (name:'pOnClose';
     signature:'(J)V';
     fnPtr:@pOnClose;),
-   (name:'pOnActive';
-    signature:'(J)V';
-    fnPtr:@pOnActive;),
    (name:'pOnWebViewStatus';
     signature:'(JILjava/lang/String;)I';
     fnPtr:@pOnWebViewStatus;),
@@ -535,7 +540,13 @@ const NativeMethods:array[0..47] of JNINativeMethod = (
     fnPtr:@pOnLocationProviderEnabled;),
    (name:'pOnLocationProviderDisabled';
     signature:'(JLjava/lang/String;)V';
-    fnPtr:@pOnLocationProviderDisabled;)
+    fnPtr:@pOnLocationProviderDisabled;),
+   (name:'pAppOnViewClick';
+    signature:'(Landroid/view/View;I)V';
+    fnPtr:@pAppOnViewClick;),
+   (name:'pAppOnListItemClick';
+    signature:'(Landroid/widget/AdapterView;Landroid/view/View;II)V';
+    fnPtr:@pAppOnListItemClick;)
 );
 
 function RegisterNativeMethodsArray(PEnv: PJNIEnv; className: PChar; methods: PJNINativeMethod; countMethods:integer):integer;
@@ -616,7 +627,6 @@ exports
   pOnTouch name 'Java_com_example_applocationdemo1_Controls_pOnTouch',
   pOnGLRenderer name 'Java_com_example_applocationdemo1_Controls_pOnGLRenderer',
   pOnClose name 'Java_com_example_applocationdemo1_Controls_pOnClose',
-  pOnActive name 'Java_com_example_applocationdemo1_Controls_pOnActive',
   pOnWebViewStatus name 'Java_com_example_applocationdemo1_Controls_pOnWebViewStatus',
   pOnAsyncEvent name 'Java_com_example_applocationdemo1_Controls_pOnAsyncEvent',
   pOnClickWidgetItem name 'Java_com_example_applocationdemo1_Controls_pOnClickWidgetItem',
@@ -638,7 +648,9 @@ exports
   pOnLocationChanged name 'Java_com_example_applocationdemo1_Controls_pOnLocationChanged',
   pOnLocationStatusChanged name 'Java_com_example_applocationdemo1_Controls_pOnLocationStatusChanged',
   pOnLocationProviderEnabled name 'Java_com_example_applocationdemo1_Controls_pOnLocationProviderEnabled',
-  pOnLocationProviderDisabled name 'Java_com_example_applocationdemo1_Controls_pOnLocationProviderDisabled';
+  pOnLocationProviderDisabled name 'Java_com_example_applocationdemo1_Controls_pOnLocationProviderDisabled',
+  pAppOnViewClick name 'Java_com_example_applocationdemo1_Controls_pAppOnViewClick',
+  pAppOnListItemClick name 'Java_com_example_applocationdemo1_Controls_pAppOnListItemClick';
 
 begin
   gApp:= jApp.Create(nil);{Laz_And_Controls}

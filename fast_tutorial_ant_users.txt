@@ -2,7 +2,7 @@
 **Tutorial: Lazarus Android Module Wizard for "Ant" users ** 
 
 
-	Version 0.3 - revision 0.1 - 28 december 2013 -
+	Version 0.6 -  15 october 2014 -
 				
 
 "A wizard for create JNI Android loadable module (.so) in Lazarus/Free Pascal using DataModules" 
@@ -13,23 +13,38 @@
       Please, for complete reference read "readme.txt"
 
 
-I. INSTALL Laz4Android
+I. INSTALL LiteZarus4Android
+			
+	FPC: 2.7.1 SVN 26270  win32/arm-android/i386-android
+	Android NDK: r9b (arm-linux-androideabi-4.6 + x86-4.6)
+
+			:DOWNLOAD from: https://onedrive.live.com/redir?resid=78D6F726E8F0C522%21236 [right to download!]
+			:To Install, please, read the "LiteZarus4Android_readme.txt"
 
 
-      https://skydrive.live.com/?cid=89ae6b50650182c6&id=89AE6B50650182C6%21149
+			1. From LiteZarus4Android IDE - Install Wizard Packages
 
-      Warning: original laz4android1.1-41139 --> win32/Android NDK-7c/ARM
- 
-      
-      NEW! win32/Android NDK-9/{ARM and x86 !} :: Thanks to TrueTom!
+			1.1 Package -> Open Package -> "tfpandroidbridge_pack.lpk"  [Android Components Bridges!]
+				Ref. image: https://www.opendrive.com/files?Ml8zNjMwNDQ3NF83SzhsZg
 
-      https://sourceforge.net/projects/laz4android/files/?source=navbar 
+			1.1.1 From Package Wizard
+				- Compile
+				- Use -> Install
+ 			1.2 Package -> Open Package -> "lazandroidwizardpack.lpk"
+   			1.2.1 From Package Wizard
+				- Compile
+				- Use -> Install     
+
+			HINT: to compile/install/reinstall a package in LiteZarus4Android,
+				please, open a "dummy" windows project.... you always MUST close the cross compile project!  
+			
+		-->> Linux Users: Get Lazarus 1.3 rev >= 45216,45217 ... and fpc 2.7.1 cross /arm/x86/android ... etc.
        
 
-   1. From Laz4Android IDE  - Install Packages
+   1. From LiteZarus4Android IDE  - Install Packages
 
 
-      HINT: to compile/install/reinstall a package in Laz4Android, please, open a "dummy" windows project.... 
+      HINT: to compile/install/reinstall a package in LiteZarus4Android, please, open a "dummy" windows project.... 
             you always MUST close the cross compile project!  
  
 
@@ -79,7 +94,7 @@ II. [GUI Project Support] Android Components Bridges - NEW! Simon's Controls rem
                   ex. C:\adt32\sdk
 
 
-		-Select Ndk version: [7c or 9]
+		-Select Ndk version: [9b]
 
 
 		-Select Android Platform: [ex. android-14]
@@ -87,15 +102,15 @@ II. [GUI Project Support] Android Components Bridges - NEW! Simon's Controls rem
 
 	     	-Path to Ndk 
 
-	          ex.  C:\adt32\ndk7    
+	          ex.  C:\adt32\ndk9b    
    
 
 		-Path to Java Resources  [Simonsayz's Controls.java,  *.xml and default Icons]:
      	
-		  ex. C:\laz4android\components\LazAndroidWizard\java
+		  ex. C:\LiteZarus4Android\components\LazAndroidWizard\java
 
 
-          	-Path to Workspace
+          	-Path to Workspace [just a projects folder]
 
          	  ex. C:\adt32\ant\workspace
 
@@ -139,10 +154,10 @@ II. [GUI Project Support] Android Components Bridges - NEW! Simon's Controls rem
         
         	ref. Image: http://www.opendrive.com/files?Ml8zNjMwNDQ3NF83SzhsZg
                             
-		-Put e configure some component on DataModule form... etc...
+		-Put e configure some component on android form... etc...
 
 
-	1.9. From Lazarus IDE
+	1.9. From LiteZarus4Android IDE
 
 		-Run -> Build
 
@@ -161,7 +176,7 @@ III. [No GUI Project Support] - just a basic android ".so" -
       :: No Support for "Android Bridges" components  jControls/jVisualControls!
 
       
-1. From Laz4Android IDE 
+1. From LiteZarus4Android IDE 
 
 
    1.1. On "Create a new project" Dialog select: <JNI Android Module> 
@@ -185,7 +200,7 @@ III. [No GUI Project Support] - just a basic android ".so" -
                   ex. C:\adt32\sdk
 
 
-		-Select Ndk version: [7c or 9]
+		-Select Ndk version: [9b]
 
 		
 		-Select Android Platform: [ex. android-14]
@@ -193,17 +208,17 @@ III. [No GUI Project Support] - just a basic android ".so" -
 
 	     	-Path to Ndk 
 
-	          ex.  C:\adt32\ndk7       
+	          ex.  C:\adt32\ndk9b      
 
 
 		-Path to Java Resources  [Simonsayz's Controls.java,  *.xml and default Icons]:
      	         
-                 ex. C:\laz4android\components\LazAndroidWizard\java    [... need for "*.xml", icons, and etc...] 
+                 ex. C:\LiteZarus4Android\components\LazAndroidWizard\java    [... need for "*.xml", icons, and etc...] 
 
 
-          	-Path to Workspace
+          	-Path to Workspace [just a projects folder]
 
-         	  ex. C:\adt32\ant\workspace
+         	  ex. C:\adt32\ant\workspace 
 
 
 	        -Ant Project Name:	-Ant Package Preface Name	                                             
@@ -211,7 +226,7 @@ III. [No GUI Project Support] - just a basic android ".so" -
 	         ex.AppAntNoGUIDemo1     ex. org.jmpessoa   ::warning: final package name = "org.jmpessoa.appantnoguidemo1"	  
 
                                                   
-	        -Select others Options [Instructions; FPU; Project "Ant" ; GUI Controls "No"; Target Api, etc...] 
+	        -Select others Options [Instructions; FPU; Project "Ant" ; Target Api, etc...] 
 
 
    2.3. OK!
@@ -237,7 +252,7 @@ III. [No GUI Project Support] - just a basic android ".so" -
    2.7. Implement the Pascal JNI Interface methods.....
 
 
-   2.8. From Lazarus4Android IDE
+   2.8. From LiteZarus4Android IDE
 
        -Run -> Build         
 
@@ -251,16 +266,34 @@ III. [No GUI Project Support] - just a basic android ".so" -
    3.1. Please, read the "readme.txt" in your project folder to learn how to buidl Android Application [Apk]
                       	
 
-IV. Download Demos 
+IV. How to use the Demos:
 
-    [Ant GUI Projects]
-      
-    AppAntDemo1 - ref. http://www.opendrive.com/files?Ml8zNjk2NDU4NF94ck5Fdw
+	1. Open the lazarus project "controls.lpi" [...\jni] 
+
+	Change this informations to correct one!
+
+	"C:\adt32\ndk7"   -- just my system NDK path
+	"C:\adt32\eclipse\workspace"  -- just my system eclipse workspace 
+
+	2. Go to Lazarus IDE
+
+		->Project
+
+		->Project -> Option
+
+		->Path
+
+		change/modify paths according to your system ..
 
 
-    [Ant NO GUI Projects]
+	3. Open/edit the "controls.lpi" [...\jni],  you can use Notepad like editor....
 
-    AppAntNoGUIDemo1 - ref.  http://jmpessoa.opendrive.com/files?Ml8zNzQ1MjAxN195ZDBUZA
+		Modify some [piece] of path information 
+
+		[C:\adt32\eclipse\workspace] 
+		[C:\adt32\ndk7]
+
+		according to your system ..
 
 
 V. Yes! Lazarus/Free Pascal does RAD on Android!

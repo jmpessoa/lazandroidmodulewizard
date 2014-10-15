@@ -113,6 +113,7 @@ type
     procedure SaveSettings(const pFilename: string);
     function GetTextByListIndex(index:integer): string;
     function GetTextByList2Index(index:integer): string;
+    function GetNDKPlatform(identName: string): string;
 
     property PathToWorkspace: string read FPathToWorkspace write FPathToWorkspace;
     property PathToNdkPlataforms: string
@@ -160,15 +161,14 @@ function TFormWorkspace.GetTextByListIndex(index:integer): string;
 begin
    Result:= '';
    case index of
-     0: Result:= '100%  market sharing';
-     1: Result:= '98.4% market sharing';
-     2: Result:= '74.3% market sharing';
-     3: Result:= '74.2% market sharing';
-     4: Result:= '74.2% market sharing';
-     5: Result:= '55.6% market sharing';
-     6: Result:= '18.2% market sharing';
-     7: Result:= '5.3%  market sharing';
-     8: Result:= '1.1%  market sharing';
+     0: Result:= '100% market sharing'; // Api(8)
+     1: Result:= '99.2% market sharing'; // Api(10)
+     2: Result:= '84.3% market sharing'; // Api(14)
+     3: Result:= '84.3% market sharing'; // Api(15)
+     4: Result:= '72% market sharing'; // Api(16)
+     5: Result:= '43% market sharing'; // Api(17)
+     6: Result:= '23.9% market sharing'; // Api(18)
+     7: Result:= '13.6% market sharing'; // Api(19)
    end;
 end;
 
@@ -177,15 +177,14 @@ function TFormWorkspace.GetTextByList2Index(index:integer): string;
 begin
    Result:= '';
    case index of
-     0: Result:= 'Froyo 2.2';
-     1: Result:= 'Gingerbread 2.3';
-     2: Result:= 'Honeycomb 3.2';
-     3: Result:= 'Ice Cream 4.01';
-     4: Result:= 'Ice Cream 4.04';
-     5: Result:= 'Jelly Bean 4.1';
-     6: Result:= 'Jelly Bean 4.2';
-     7: Result:= 'Jelly Bean 4.3';
-     8: Result:= 'KitKat 4.4';
+     0: Result:= 'Froyo 2.2';        //0.8%  -  Api:8
+     1: Result:= 'Gingerbread 2.3';  //14.9% -  Api:10
+     2: Result:= 'Ice Cream 4.0';    //15.7% -  Api:14
+     3: Result:= 'Ice Cream 4.0x';   //12.3% -  Api:15
+     4: Result:= 'Jelly Bean 4.1';   //29.0% -  Api:16
+     5: Result:= 'Jelly Bean 4.2';   //19.1% -  Api:17
+     6: Result:= 'Jelly Bean 4.3';   //10.3% -  Api:18
+     7: Result:= 'KitKat 4.4';       //13.6% -  Api:19
    end;
 end;
 
@@ -199,15 +198,14 @@ end;
 procedure TFormWorkspace.ListBox2Click(Sender: TObject);
 begin
   case ListBox2.ItemIndex of
-      0: FTargetApi:='8';
-      1: FTargetApi:='10';
-      2: FTargetApi:='13';
-      3: FTargetApi:='14';
-      4: FTargetApi:='15';
-      5: FTargetApi:='16';
-      6: FTargetApi:='17';
-      7: FTargetApi:='18';
-      8: FTargetApi:='19';
+      0: FTargetApi:= '8';
+      1: FTargetApi:= '10';
+      2: FTargetApi:= '14';
+      3: FTargetApi:= '15';
+      4: FTargetApi:= '16';
+      5: FTargetApi:= '17';
+      6: FTargetApi:= '18';
+      7: FTargetApi:= '19';
   end
 end;
 
@@ -231,45 +229,78 @@ begin
   FProjectModel:= RadioGroup3.Items[RadioGroup3.ItemIndex];  //fix 15-december-2013
 end;
 
+function TFormWorkspace.GetNDKPlatform(identName: string): string;
+begin
+         if identName = 'Froyo' then Result:= 'android-8'
+    else if identName = 'Gingerbread' then Result:= 'android-13'
+    else if identName = 'Ice Cream 4.0' then Result:= 'android-14'
+    else if identName = 'Ice Cream 4.0x' then Result:= 'android-15'
+    else if identName = 'Jelly Bean 4.1' then Result:= 'android-16'
+    else if identName = 'Jelly Bean 4.2' then Result:= 'android-17'
+    else if identName = 'Jelly Bean 4.3' then Result:= 'android-18'
+    else if identName = 'KitKat 4.4' then Result:= 'android-19'
+    else Result:= 'android-14';
+end;
+
 //Ref. http://forum.xda-developers.com/wiki/Android/Build_Numbers
 procedure TFormWorkspace.RadioGroup5Click(Sender: TObject);
 begin
+
   if RadioGroup5.ItemIndex = 0 then FNDK:= '7'
   else FNDK:= '9';
 
   ComboBox2.Items.Clear;
   ListBox1.Items.Clear;
+
   case  RadioGroup5.ItemIndex of
      0: begin //7
-            ComboBox2.Items.Add('android-8');  //platform
-            ComboBox2.Items.Add('android-9');  //platform
-            ComboBox2.Items.Add('android-14'); //platform
+
+            {
+              ComboBox2.Items.Add('android-8');  //platform
+              ComboBox2.Items.Add('android-10');  //platform
+              ComboBox2.Items.Add('android-14'); //platform
+            }
+
+            ComboBox2.Items.Add('Froyo');
+            ComboBox2.Items.Add('Gingerbread');
+            ComboBox2.Items.Add('Ice Cream 4.0');
 
             ComboBox2.ItemIndex:= 2; ////platform android-14
 
             ListBox1.Items.Add('8');   //Api(8)Froyo (2.2)
             ListBox1.Items.Add('10');  //Api(10)Gingerbread (2.3)
-            ListBox1.Items.Add('13');  //Api(13)Honeycomb (3.2)
             ListBox1.Items.Add('14');  //Api(14)Ice Cream Sandwich (4.0 - 4.0.1 - 4.0.2)
 
-            ListBox1.ItemIndex:= 3;
+            ListBox1.ItemIndex:= 2;
         end;
      1: begin  //9
-          ComboBox2.Items.Add('android-8'); //platform
-          ComboBox2.Items.Add('android-9'); //platform
-          ComboBox2.Items.Add('android-14'); //platform
-          //ComboBox2.Items.Add('android-17');  //platform
-          ComboBox2.Items.Add('android-18');  //platform
-          ComboBox2.Items.Add('android-19'); //platform
+            {
+          ComboBox2.Items.Add('android-8 [Froyo]');
+          ComboBox2.Items.Add('android-10 [Gingerbread]');
+          ComboBox2.Items.Add('android-14 [Ice Cream 4.0]');
+          ComboBox2.Items.Add('android-15 [Ice Cream 4.0x]');
+          ComboBox2.Items.Add('android-16 [Jelly Bean 4.1]');
+          ComboBox2.Items.Add('android-17 [Jelly Bean 4.2]');
+          ComboBox2.Items.Add('android-18 [Jelly Bean 4.3]');
+          ComboBox2.Items.Add('android-19 [KitKat 4.4]');
+             }
+
+          ComboBox2.Items.Add('Froyo');
+          ComboBox2.Items.Add('Gingerbread');
+          ComboBox2.Items.Add('Ice Cream 4.0');
+          ComboBox2.Items.Add('Ice Cream 4.0x');
+          ComboBox2.Items.Add('Jelly Bean 4.1');
+          ComboBox2.Items.Add('Jelly Bean 4.2');
+          ComboBox2.Items.Add('Jelly Bean 4.3');
+          ComboBox2.Items.Add('KitKat 4.4');
 
           ComboBox2.ItemIndex:= 2; ////platform android-14
 
           ListBox1.Items.Add('8');   //Api(8)Froyo (2.2)
           ListBox1.Items.Add('10');  //Api(10)Gingerbread (2.3)
-          ListBox1.Items.Add('13');  //Api(13)Honeycomb (3.2)
           ListBox1.Items.Add('14');  //Api(14)Ice Cream Sandwich (4.0 - 4.0.1 - 4.0.2)
 
-          ListBox1.ItemIndex:= 3;
+          ListBox1.ItemIndex:= 2;
         end;
   end;
 end;
@@ -292,14 +323,14 @@ begin
     Exit;
   end;
 
-  if Edit8.Text = '' then Edit8.Text:= 'org.xxxxxxx';
+  if Edit8.Text = '' then Edit8.Text:= 'org.lazarus';
 
   FMainActivity:= 'App'; {dummy for Simon template} //TODO: need name flexibility here...
 
   FAntPackageName:= LowerCase(Trim(Edit8.Text));
   FPathToWorkspace:= Edit1.Text;
   FAndroidProjectName:= Trim(ComboBox1.Text);
-  FAndroidPlatform:= LowerCase(ComboBox2.Text);
+  FAndroidPlatform:= GetNDKPlatform(ComboBox2.Text);
 
   if RadioGroup3.ItemIndex = 1 then  //Ant Project
   begin
@@ -355,12 +386,12 @@ end;
 procedure TFormWorkspace.ComboBox2Change(Sender: TObject);
 begin
   ListBox1.Items.Clear;
-  case   ComboBox2.ItemIndex of
+  case ComboBox2.ItemIndex of
      0: begin   //platform 8
           ListBox1.Items.Add('8'); //Froyo (2.2)
           ListBox1.ItemIndex:= 0;
         end;
-     1: begin  //platform 9
+     1: begin  //platform 10
           ListBox1.Items.Add('8');  //Froyo (2.2)
           ListBox1.Items.Add('10'); //Gingerbread (2.3)
           ListBox1.ItemIndex:= 1;
@@ -368,32 +399,56 @@ begin
      2: begin  //platform 14
           ListBox1.Items.Add('8');
           ListBox1.Items.Add('10');
-          ListBox1.Items.Add('13'); //Honeycomb (3.2)
           ListBox1.Items.Add('14'); //Ice Cream Sandwich (4.01 - 4.02)
-          ListBox1.ItemIndex:= 3;
+          ListBox1.ItemIndex:= 2;
         end;
-     3: begin  //platform  18
+     3: begin  //platform  15
           ListBox1.Items.Add('8');
           ListBox1.Items.Add('10');
-          ListBox1.Items.Add('13'); //Honeycomb (3.2)
+          ListBox1.Items.Add('14'); //Ice Cream Sandwich (4.01 - 4.02)
+          ListBox1.Items.Add('15'); //Ice Cream Sandwich (4.03 - 4.04)
+          ListBox1.ItemIndex:= 2;
+        end;
+     4: begin  //platform  16
+          ListBox1.Items.Add('8');
+          ListBox1.Items.Add('10');
+          ListBox1.Items.Add('14'); //Ice Cream Sandwich (4.01 - 4.02)
+          ListBox1.Items.Add('15'); //Ice Cream Sandwich (4.03 - 4.04)
+          ListBox1.Items.Add('16'); //Jelly Bean (4.1.x)
+          ListBox1.ItemIndex:= 2;
+        end;
+
+     5: begin  //platform  17
+          ListBox1.Items.Add('8');
+          ListBox1.Items.Add('10');
+          ListBox1.Items.Add('14'); //Ice Cream Sandwich (4.01 - 4.02)
+          ListBox1.Items.Add('15'); //Ice Cream Sandwich (4.03 - 4.04)
+          ListBox1.Items.Add('16'); //Jelly Bean (4.1.x)
+          ListBox1.Items.Add('17'); //Jelly Bean (4.2.x)
+          ListBox1.ItemIndex:= 2;
+        end;
+
+     6: begin  //platform  18
+          ListBox1.Items.Add('8');
+          ListBox1.Items.Add('10');
           ListBox1.Items.Add('14'); //Ice Cream Sandwich (4.01 - 4.02)
           ListBox1.Items.Add('15'); //Ice Cream Sandwich (4.03 - 4.04)
           ListBox1.Items.Add('16'); //Jelly Bean (4.1.x)
           ListBox1.Items.Add('17'); //Jelly Bean (4.2.x)
           ListBox1.Items.Add('18'); //Jelly Bean (4.3)
-          ListBox1.ItemIndex:= 3;
+          ListBox1.ItemIndex:= 2;
         end;
-     4: begin  //platform 19
+
+     7: begin  //platform 19
           ListBox1.Items.Add('8');  //Froyo (2.2)
           ListBox1.Items.Add('10'); //Gingerbread (2.3)
-          ListBox1.Items.Add('13'); //Honeycomb (3.2)
           ListBox1.Items.Add('14'); //Ice Cream Sandwich (4.0 - 4.01 - 4.02)
           ListBox1.Items.Add('15'); //Ice Cream Sandwich (4.03 - 4.04)
           ListBox1.Items.Add('16'); //Jelly Bean (4.1)
           ListBox1.Items.Add('17'); //Jelly Bean (4.2)
           ListBox1.Items.Add('18'); //Jelly Bean (4.3)
           ListBox1.Items.Add('19'); //KitKat (4.4)
-          ListBox1.ItemIndex:= 3;
+          ListBox1.ItemIndex:= 2;
         end;
   end;
 end;
@@ -519,7 +574,7 @@ begin
 
     if ReadString('NewProject','NDK', '') <> '' then
       i5:= strToInt(ReadString('NewProject','NDK', ''))
-    else i5:= 0;  //ndk 7
+    else i5:= 1;  //ndk 9
 
     if ReadString('NewProject','InstructionSet', '') <> '' then
        i1:= strToInt(ReadString('NewProject','InstructionSet', ''))
@@ -535,7 +590,7 @@ begin
 
     if ReadString('NewProject','MinApi', '') <> '' then
        j1:= strToInt(ReadString('NewProject','MinApi', ''))
-    else j1:= 2; // Api 13
+    else j1:= 2; // Api 14
 
     if  j1 < ListBox1.Items.Count then
         ListBox1.ItemIndex:= j1
@@ -553,7 +608,7 @@ begin
 
     if ReadString('NewProject','TargetApi', '') <> '' then
        j3:= strToInt(ReadString('NewProject','TargetApi', ''))
-    else j3:= 2; // Api 13
+    else j3:= 2; // Api 14
 
     if  j3 < ListBox2.Items.Count then
         ListBox2.ItemIndex:= j3

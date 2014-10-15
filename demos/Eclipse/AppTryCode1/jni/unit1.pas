@@ -6,7 +6,7 @@ unit unit1;
 interface
   
 uses
-  Classes, SysUtils, And_jni, And_jni_Bridge, Laz_And_Controls, myhello;
+  Classes, SysUtils, And_jni, And_jni_Bridge, Laz_And_Controls, AndroidWidget, myhello;
   
 type
 
@@ -132,7 +132,7 @@ end;
 
 procedure TAndroidModule1.DataModuleCreate(Sender: TObject);
 begin //warning: this is needed here to by pass the Laz4Android *.lfm parse fail... why fail?
-   Self.OnJNIPrompt:= DataModuleJNIPrompt;
+  Self.OnJNIPrompt:= DataModuleJNIPrompt;
 end;
 
 procedure TAndroidModule1.DataModuleJNIPrompt(Sender: TObject);

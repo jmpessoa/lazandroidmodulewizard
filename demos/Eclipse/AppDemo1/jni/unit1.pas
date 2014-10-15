@@ -6,7 +6,7 @@ unit unit1;
 interface
   
 uses
-  Classes, SysUtils, And_jni, And_jni_Bridge, Laz_And_Controls, unit2;
+  Classes, SysUtils, And_jni, And_jni_Bridge, Laz_And_Controls, Laz_And_Controls_Events, AndroidWidget, unit2;
   
 type
 
@@ -17,7 +17,8 @@ type
       jImageView1: jImageView;
       jTextView1: jTextView;
       jTimer1: jTimer;
-      procedure DataModuleActive(Sender: TObject);
+      procedure AndroidModule1CloseQuery(Sender: TObject; var CanClose: boolean
+        );
       procedure DataModuleClose(Sender: TObject);
       procedure DataModuleCreate(Sender: TObject);
       procedure DataModuleJNIPrompt(Sender: TObject);
@@ -44,15 +45,6 @@ procedure TAndroidModule1.DataModuleCreate(Sender: TObject);
 begin
   cnt_Timer:= 0;
   cnt_Image:= -1;
-
-  //this initialization code is need here to fix Laz4Andoid  *.lfm parse.... why parse fails?
-  Self.ActivityMode:= actSplash;
-
-  Self.BackgroundColor:= colbrWhite;
-  Self.OnJNIPrompt:= DataModuleJNIPrompt;   //mode delphi
-  Self.OnRotate:= DataModuleRotate;
-  Self.OnClose:= DataModuleClose;
-  Self.OnActive:= DataModuleActive;
 end;
 
 procedure TAndroidModule1.DataModuleClose(Sender: TObject);
@@ -62,15 +54,15 @@ begin
   AndroidModule2.Init(gApp);
 end;
 
-procedure TAndroidModule1.DataModuleActive(Sender: TObject);
+procedure TAndroidModule1.AndroidModule1CloseQuery(Sender: TObject;
+  var CanClose: boolean);
 begin
-  //ShowMessage('form 1 active');
-  jTimer1.Enabled:= True;   //start Timer
+  ShowMessage('form 1 can close....')
 end;
 
 procedure TAndroidModule1.DataModuleJNIPrompt(Sender: TObject);
 begin
-  Self.Show;
+  jTimer1.Enabled:= True
 end;
 
 procedure TAndroidModule1.DataModuleRotate(Sender: TObject; rotate: integer;

@@ -1,4 +1,4 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <CONFIG>
   <Package Version="4">
     <PathDelim Value="\"/>
@@ -16,7 +16,7 @@
         <CompilerPath Value="$(CompPath)"/>
       </Other>
     </CompilerOptions>
-    <Files Count="15">
+    <Files Count="17">
       <Item1>
         <Filename Value="regandroidbridge.pas"/>
         <HasRegisterProc Value="True"/>
@@ -79,6 +79,14 @@
         <Filename Value="laz_and_controls_events.pas"/>
         <UnitName Value="Laz_And_Controls_Events"/>
       </Item15>
+      <Item16>
+        <Filename Value="androidwidget.pas"/>
+        <UnitName Value="AndroidWidget"/>
+      </Item16>
+      <Item17>
+        <Filename Value="laz_and_jni_controls.pas"/>
+        <UnitName Value="Laz_And_jni_Controls"/>
+      </Item17>
     </Files>
     <Type Value="RunAndDesignTime"/>
     <RequiredPkgs Count="2">

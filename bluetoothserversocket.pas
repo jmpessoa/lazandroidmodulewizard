@@ -5,7 +5,7 @@ unit bluetoothserversocket;
 interface
 
 uses
-  Classes, SysUtils, And_jni, And_jni_Bridge, Laz_And_Controls;
+  Classes, SysUtils, And_jni, And_jni_Bridge, AndroidWidget;
 
 type
 
@@ -32,7 +32,7 @@ jBluetoothServerSocket = class(jControl)
  public
     constructor Create(AOwner: TComponent); override;
     destructor  Destroy; override;
-    procedure Init; override;
+    procedure Init(refApp: jApp); override;
     function jCreate(): jObject;
     procedure jFree();
     procedure SetUUID(_strUUID: string);
@@ -109,10 +109,10 @@ begin
   inherited Destroy;
 end;
 
-procedure jBluetoothServerSocket.Init;
+procedure jBluetoothServerSocket.Init(refApp: jApp);
 begin
   if FInitialized  then Exit;
-  inherited Init;
+  inherited Init(refApp);
   //your code here: set/initialize create params....
   FjObject:= jCreate();
   FInitialized:= True;

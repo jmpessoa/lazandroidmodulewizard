@@ -6,7 +6,7 @@ unit unit3;
 interface
   
 uses
-  Classes, SysUtils, And_jni, And_jni_Bridge, Laz_And_Controls;
+  Classes, SysUtils, And_jni, And_jni_Bridge, Laz_And_Controls, Laz_And_Controls_Events, AndroidWidget;
   
 type
 
@@ -131,7 +131,7 @@ end;
 
 procedure TAndroidModule3.jButton4Click(Sender: TObject);
 begin
-  ShowMessage('You say: "'+Uppercase(jEditText1.Text+'"'))
+   ShowMessage(jEditText1.Text);
 end;
 
 procedure TAndroidModule3.jCheckBox1Click(Sender: TObject);
@@ -148,19 +148,20 @@ end;
 procedure TAndroidModule3.DataModuleCreate(Sender: TObject);
 begin //this initialization code is need here to fix Laz4Andoid  *.lfm parse.... why parse fails?
   Img_Cnt:= -1;
-  Self.ActivityMode:= actRecyclable;
+(*  Self.ActivityMode:= actRecyclable;
   //Self.BackgroundColor:= colbrBlack;
   //mode delphi
   Self.OnJNIPrompt:= DataModuleJNIPrompt;
   Self.OnRotate:= DataModuleRotate;
   Self.OnCloseQuery:= DataModuleCloseQuery;
-  Self.OnActive:= DataModuleActive;
-  Self.OnClose:= DataModuleClose;
+ // Self.OnActive:= DataModuleActive;
+  Self.OnClose:= DataModuleClose;    *)
 end;
 
 procedure TAndroidModule3.DataModuleCloseQuery(Sender: TObject; var CanClose: boolean);
 begin
   CanClose:= True;
+  ShowMessage('close form 3');
 end;
 
 procedure TAndroidModule3.DataModuleActive(Sender: TObject);
@@ -175,7 +176,7 @@ end;
 
 procedure TAndroidModule3.DataModuleJNIPrompt(Sender: TObject);
 begin
-  Self.Show;
+  //Self.Show;
 end;
 
 procedure TAndroidModule3.DataModuleRotate(Sender: TObject; rotate: integer; var rstRotate: integer);

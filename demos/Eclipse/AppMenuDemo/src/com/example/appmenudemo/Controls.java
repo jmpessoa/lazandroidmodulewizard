@@ -1,7 +1,6 @@
 package com.example.appmenudemo;
-//
-//
-//[LazAndroidModuleWizard - ver.0.5 - rev. 02 : 14-June-2014]
+
+//[LazAndroidModuleWizard - Version 0.6 - 12 October 2014 // Add FORM Designer and more!
 //
 //[https://github.com/jmpessoa/lazandroidmodulewizard]
 //
@@ -55,6 +54,7 @@ package com.example.appmenudemo;
 //
 
 import android.annotation.SuppressLint;
+import android.app.ActionBar;
 import android.app.Activity;
 import android.app.ActivityManager.RunningAppProcessInfo;
 import android.app.ActivityManager.RunningServiceInfo;
@@ -75,6 +75,7 @@ import android.content.ContextWrapper;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
@@ -101,6 +102,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.telephony.SmsManager;
 import android.telephony.TelephonyManager;
+import android.preference.PreferenceManager;
 import android.provider.ContactsContract;
 import android.provider.MediaStore;
 import android.provider.Settings;
@@ -110,9 +112,17 @@ import android.text.InputType;
 import android.text.TextWatcher;
 import android.text.method.ScrollingMovementMethod;
 import android.util.DisplayMetrics;
+import android.location.Address;
+import android.location.Criteria;
+import android.location.Geocoder;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
+import android.location.LocationProvider;
 import android.media.MediaPlayer;
 
 import android.net.Uri;
+import android.net.wifi.WifiManager;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.Menu;
@@ -139,6 +149,7 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 import android.widget.Button;
@@ -150,12 +161,14 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.RadioButton;
+import android.widget.Spinner;
+import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.RelativeLayout.LayoutParams;
+//import android.view.ViewGroup.LayoutParams;
 import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.HorizontalScrollView;
 import android.widget.Scroller;
-import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ViewFlipper;
@@ -193,6 +206,7 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.ByteArrayBuffer;
 import org.apache.http.util.EntityUtils;
+
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 //import android.database.sqlite.SQLiteOpenHelper;
@@ -318,13 +332,20 @@ private LayoutParams    layparam = null;
 private RelativeLayout  parent   = null;
 
 private OnClickListener onClickListener;   // event
+
+private OnClickListener onViewClickListener;   // generic delegate event
+
+private OnItemClickListener onListItemClickListener;
+
 private Boolean         enabled  = true;   //
+private Intent intent;
 
 // Constructor
 public  jForm(Controls ctrls, long pasobj) {
 // Connect Pascal I/F
 PasObj   = pasobj;
 controls = ctrls;
+
 //
 layout   = new RelativeLayout(controls.activity);
 
@@ -334,18 +355,39 @@ layparam = new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
                             ViewGroup.LayoutParams.MATCH_PARENT);
 
 layout.setLayoutParams(layparam);
-
+ 
 // Init Event
 onClickListener = new OnClickListener() {
   public  void onClick(View view) {
     if (enabled) {
+	  //Log.i("Form_listener","Click!");
       controls.pOnClick(PasObj,Const.Click_Default);
     }
-  };
+  }; 
 };
+
+//Init Event
+onListItemClickListener = new OnItemClickListener() {
+@Override
+public  void onItemClick(AdapterView<?> parent, View v, int position, long id) {	   
+	 Log.i("Form_App_ItemListClicklistener","ItemClick!");
+     controls.jAppOnListItemClick(parent, v, position, v.getId());
+}
+};
+
+//Init Event
+onViewClickListener = new OnClickListener() {
+public  void onClick(View view) {
+ if (enabled) {
+   Log.i("Form_App_Clicklistener","Click!");
+   controls.jAppOnViewClick(view, view.getId());
+ }
+};
+};
+
 layout.setOnClickListener(onClickListener);
-//Log.i("Form:","Create");
-};
+
+}
 
 //
 public  RelativeLayout GetLayout() {
@@ -356,15 +398,15 @@ public  RelativeLayout GetLayout() {
 //
 public  void Show(int effect) {
 		
-   Log.i("Form:","Show");	
+   //Log.i("Form:","Show");	
    controls.appLayout.addView( layout );
    parent = controls.appLayout;
    //
    if (effect != Const.Eft_None) {
      layout.startAnimation(controls.Ani_Effect(effect,250));
    };
-   controls.pOnActive(PasObj); //by jmpessoa
-   Log.i("Form:","Show --> OnActive");
+
+   Log.i("Form:","Show --> OnJNIPrompt");
 }
 
 //
@@ -406,7 +448,7 @@ else         { if (layout.getParent() != null)
 
 //
 public  void SetEnabled ( boolean enabled ) {
-Log.i("Form:","Parent Form Enabled "+ Integer.toString(layout.getChildCount()));
+//Log.i("Form:","Parent Form Enabled "+ Integer.toString(layout.getChildCount()));
 for (int i = 0; i < layout.getChildCount(); i++) {
   View child = layout.getChildAt(i);
   child.setEnabled(enabled);
@@ -416,8 +458,8 @@ for (int i = 0; i < layout.getChildCount(); i++) {
 
 //by jmpessoa
 public void ShowMessage(String msg){
-	Log.i("ShowMessage:", msg);
-   	Toast.makeText(controls.activity, msg, Toast.LENGTH_SHORT).show();	
+  Log.i("ShowMessage:", msg);
+  Toast.makeText(controls.activity, msg, Toast.LENGTH_SHORT).show();	
 }
 
 //by jmpessoa
@@ -433,10 +475,60 @@ public String GetDateTime() {
    layout.setOnClickListener(null);
    layparam = null;
    layout   = null;
+  
    Log.i("jForm:", "Free");
  }
+  
+ //http://startandroid.ru/en/lessons/complete-list/250-lesson-29-invoking-activity-and-getting-a-result-startactivityforresult-method.html
+public String GetStringExtra(Intent data, String extraName) {
+		String valueStr;
+		valueStr= "";
+	    if (data != null) { 
+	    	valueStr = data.getStringExtra(extraName);
+	    } 	    
+	    return valueStr;	  
+}
 
-};
+public int GetIntExtra(Intent data, String extraName, int defaultValue) {
+	int value;
+	value = defaultValue;
+    if (data != null) { 
+    	value = data.getIntExtra(extraName, defaultValue); 
+    } 	    
+    return value;  
+}
+
+public double GetDoubleExtra(Intent data, String extraName, double defaultValue) {
+	double value;
+	value = defaultValue;
+    if (data != null) { 
+    	value = data.getDoubleExtra(extraName, defaultValue); 
+    } 	    
+    return value;  
+}
+
+                        
+public  OnClickListener GetOnViewClickListener () {   
+	return this.onViewClickListener; 
+}
+
+
+public  OnItemClickListener  GetOnListItemClickListener  () {   
+	return this.onListItemClickListener; 
+}
+
+public void SetWifiEnabled(boolean _status) {
+    WifiManager wifiManager = (WifiManager)this.controls.activity.getSystemService(Context.WIFI_SERVICE);             
+    wifiManager.setWifiEnabled(_status);
+ }
+
+ public boolean IsWifiEnabled() {
+    WifiManager wifiManager = (WifiManager)this.controls.activity.getSystemService(Context.WIFI_SERVICE);
+    return  wifiManager.isWifiEnabled();	
+ }
+
+
+}
 
 //-------------------------------------------------------------------------
 //TextView
@@ -492,7 +584,7 @@ public void setMarginTop(int y) {
 
 // Constructor
 public  jTextView(android.content.Context context,
-               Controls ctrls,long pasobj ) {	
+               Controls ctrls,long pasobj ) {                    //jTextView(this.activity,this,pasobj));
 super(context);
 // Connect Pascal I/F
 PasObj   = pasobj;
@@ -500,7 +592,7 @@ controls = ctrls;
 // Init Class
 lparams = new LayoutParams(100,100);     // W,H
 lparams.setMargins(5,5,5,5); // L,T,
-//Init Event
+// Init Event
 onClickListener = new OnClickListener() {
   public  void onClick(View view) {
     if (enabled) {
@@ -509,7 +601,6 @@ onClickListener = new OnClickListener() {
   };
 };
 setOnClickListener(onClickListener);
-
 }
 
 //
@@ -518,7 +609,7 @@ lparams.width  = w;
 lparams.height = h;
 lparams.setMargins(x,y,10,10);
 //
-setLayoutParams(lparams);
+this.setLayoutParams(lparams);
 }
 
 public void setLeftTopRightBottomWidthHeight(int left, int top, int right, int bottom, int w, int h) {
@@ -544,7 +635,7 @@ public void setLayoutAll(int idAnchor) {
 		lparams.addRule(lparamsParentRule[j]);		
     }
 	//
-	setLayoutParams(lparams);
+	this.setLayoutParams(lparams);
 }
 
 //by jmpessoa
@@ -833,6 +924,7 @@ public void setTextEx(String txt) {
 }
 
 public String getTextEx() {
+  //Log.i("getTextEx",this.getText().toString());	
   return this.getText().toString();
 }
             
@@ -976,6 +1068,7 @@ int MarginLeft = 5;
 int MarginTop = 5;
 int marginRight = 5;
 int marginBottom = 5;
+int textColor;
 
 //by jmpessoa
 public void setMarginRight(int x) {
@@ -1015,15 +1108,16 @@ PasObj = pasobj;
 // Init Class
 lparams = new LayoutParams(100,100);     // W,H
 lparams.setMargins(5,5,5,5); // L,T,
-
 // Init Event
 onClickListener = new OnClickListener() {
-  public  void onClick(View view) {
-    controls.pOnClick(PasObj,Const.Click_Default); 
+  public  void onClick(View view) {	
+     controls.pOnClick(PasObj,Const.Click_Default); 
   }
 };
+
 setOnClickListener(onClickListener);
-Log.i("jButton","created!");
+
+//Log.i("jButton","created!");
 }
 
 //
@@ -1040,7 +1134,8 @@ public  void setParent( android.view.ViewGroup viewgroup ) {
 if (parent != null) { parent.removeView(this); }
 parent = viewgroup;
 viewgroup.addView(this,lparams);
-Log.i("jButton","setParent!");
+
+//Log.i("jButton","setParent!");
 }
 
 // Free object except Self, Pascal Code Free the class.
@@ -1086,16 +1181,16 @@ public void setLayoutAll(int idAnchor) {
 			
 		} 
 		for (int j=0; j < countParentRule; j++) {  
-			lparams.addRule(lparamsParentRule[j]);		
+			lparams.addRule(lparamsParentRule[j]);			
 	    }
 		//
-		setLayoutParams(lparams);
+		this.setLayoutParams(lparams);
 	}
 
 //by jmpessoa
 public void setIdEx(int id) {
 	  setId(id);
-	  Log.i("jButton","setIdEx!");	  
+	  //Log.i("jButton","setIdEx!");	  
 }
 
 //by jmpessoa
@@ -1104,8 +1199,14 @@ public void setTextEx(String txt) {
 }
 
 public void setTextColor2(int value) {
-	this.setTextColor(value);  
+	textColor = value;
+	this.setTextColor(value);  	
 }
+
+public void SetBackgroundColor(int color) {	
+	this.setBackgroundColor(color);	
+}
+
 
 }
 
@@ -1301,6 +1402,7 @@ public void setMarginRight(int x) {
 
 //by jmpessoa
 public void setMarginBottom(int y) {
+	
 	marginBottom = y;
 }
 //by jmpessoa
@@ -1779,6 +1881,7 @@ public void setIdEx(int id) {
 //
 //-------------------------------------------------------------------------
 //by jmpessoa : custom row!
+//by jmpessoa : custom row!
 class jListItemRow{
 	String label;
 	int    id; 
@@ -1907,17 +2010,26 @@ public  View getView(int position, View v, ViewGroup parent) {
    View itemWidget = null;
    
    switch(items.get(position).widget) {
-     case 1:  itemWidget = new CheckBox(ctx);  ((CheckBox)itemWidget).setText(items.get(position).widgetText);  break;
-     case 2:  itemWidget = new RadioButton(ctx); ((RadioButton)itemWidget).setText(items.get(position).widgetText); break;
-     case 3:  itemWidget = new Button(ctx);  ((Button)itemWidget).setText(items.get(position).widgetText);    break;
-     case 4:  itemWidget = new TextView(ctx); ((TextView)itemWidget).setText(" "+items.get(position).widgetText+" ");break;
+     case 1:  itemWidget = new CheckBox(ctx);  ((CheckBox)itemWidget).setText(items.get(position).widgetText);                                                    
+                           ((CheckBox)itemWidget).setText(items.get(position).widgetText);                           
+                           items.get(position).jWidget = itemWidget; //                           
+                           ((CheckBox)itemWidget).setChecked(items.get(position).checked);                                                      
+     break;
+     case 2:  itemWidget = new RadioButton(ctx); 
+                           ((RadioButton)itemWidget).setText(items.get(position).widgetText);                           
+                           items.get(position).jWidget = itemWidget; //                           
+                           ((RadioButton)itemWidget).setChecked(items.get(position).checked);                          
+     break;
+     case 3:  itemWidget = new Button(ctx);  ((Button)itemWidget).setText(items.get(position).widgetText);
+                           items.get(position).jWidget = itemWidget;
+     break;
+     case 4:  itemWidget = new TextView(ctx); 
+                           ((TextView)itemWidget).setText(" "+items.get(position).widgetText+" ");
+                           items.get(position).jWidget = itemWidget;
+     break;
      //default: ;
    }
-   
-   if (itemWidget != null)
-       items.get(position).jWidget = itemWidget;
-
-
+           
    LayoutParams widgetParam = null;
 
    if (itemWidget != null) {
@@ -2004,7 +2116,8 @@ View.OnClickListener getOnCheckItem(final View cb, final int position) {
 	            	    	  ((RadioButton)items.get(i).jWidget).setChecked(false);
 	            	    	  items.get(i).checked = false;	            	    	  
 	            	      }	            	      
-		                  items.get(position).checked = doCheck; 
+		                  items.get(position).checked = doCheck;
+		                  //items.get(position).jWidget = ((RadioButton)cb); 
 		                  ((RadioButton)cb).setChecked(doCheck);		                  		                  
 		                  controls.pOnClickWidgetItem(PasObj, position, ((RadioButton)cb).isChecked());
 		                  
@@ -2066,6 +2179,11 @@ int MarginTop = 5;
 int marginRight = 5;
 int marginBottom = 5;
 
+boolean highLightSelectedItem = true;
+int highLightColor = Color.RED;
+int lastSelectedItem = -1;
+
+
 //Constructor
 public  jListView(android.content.Context context,
               Controls ctrls,long pasobj, int widget, String widgetTxt,  Bitmap bmp,
@@ -2101,10 +2219,19 @@ aadapter = new jArrayAdapter(context, controls, PasObj, android.R.layout.simple_
 setAdapter(aadapter);
 
 setChoiceMode(ListView.CHOICE_MODE_SINGLE);
+
 //Init Event
 onItemClickListener = new OnItemClickListener() {
    @Override
    public  void onItemClick(AdapterView<?> parent, View v, int position, long id) {
+	   
+		 if (highLightSelectedItem) {		 
+			 if (lastSelectedItem > -1) {highlight(lastSelectedItem, textColor);}
+			 highlight(position, highLightColor);
+		 }
+		 
+		 lastSelectedItem = position;
+		 
      controls.pOnClick(PasObj, (int)id );
      controls.pOnClickCaptionItem(PasObj, (int)id , alist.get((int)id).label);
    }
@@ -2115,18 +2242,9 @@ setOnItemClickListener(onItemClickListener);
 
 //by jmpessoa
 public boolean isItemChecked(int index) {
-  return alist.get(index).checked;	
-  
+  return alist.get(index).checked;	  
 }
 
-public void ItemCheck(int index) {
-	int w = alist.get(index).widget;
-	
-}
-
-public void ItemUnCheck(int index) {
-	  //alist.;		
-}
 //by jmpessoa
 public void setMarginRight(int x) {
 	marginRight = x;
@@ -2432,6 +2550,19 @@ public void setWidgetCheck(boolean value, int index){
 	aadapter.notifyDataSetChanged();
 }
 
+private void highlight(int position, int _color) {
+   	alist.get(position).textColor = _color;    	
+    aadapter.notifyDataSetChanged();		
+}
+
+public void SetHighLightSelectedItem(boolean _value)  {
+	highLightSelectedItem = _value;
+}
+
+public void SetHighLightSelectedItemColor(int _color)  {
+	highLightColor = _color;
+}
+
 }
 //-------------------------------------------------------------------------
 //ScrollView
@@ -2703,11 +2834,11 @@ class jPanel  extends RelativeLayout {
 	}
 
 	public int getLParamHeight() {	
-	  return getHeight();
+	  return lpH; //getHeight();
 	}  
 
 	public int getLParamWidth() {
-		return getWidth();
+		return lpW; //getWidth();
 	}
 
 	public void resetLParamsRules() {
@@ -4592,7 +4723,7 @@ public  void loadFileEx(String filename) {
 
 
 public  void createBitmap(int w, int h) {
-  //if (bmp != null) { bmp.recycle(); }
+   //if (bmp != null) { bmp.recycle(); }
    bmp = Bitmap.createBitmap( w,h, Bitmap.Config.ARGB_8888 );
 }
 
@@ -4605,6 +4736,24 @@ if ( bmp != null ) {
   wh[1] = bmp.getHeight();
 }
  return ( wh );
+}
+
+public  int GetWidth() {
+	 
+	if ( bmp != null ) {
+	   return bmp.getWidth();
+	  
+	} else return 0;
+	 
+}
+
+public  int GetHeight() {
+	 
+	if ( bmp != null ) {
+	   return bmp.getHeight();
+	  
+	} else return 0;
+	 
 }
 
 public  void Free() {
@@ -7144,50 +7293,52 @@ class jShareFile /*extends ...*/ {
 	}		
 }
 
+
 //by jmpessoa
 class CustomSpinnerArrayAdapter<T> extends ArrayAdapter<String>{
 	
 	Context ctx; 
-	private int mTextColor = Color.LTGRAY;
-	private int mTexBackgroundtColor = Color.DKGRAY;
-	private int mSelectedTextColor = Color.GREEN;
+	private int mTextColor = Color.BLACK;
+	private int mTexBackgroundtColor = Color.TRANSPARENT; 
+	private int mSelectedTextColor = Color.LTGRAY; 
 	private int flag = 0;
 	private boolean mLastItemAsPrompt = false;
 	
-    public CustomSpinnerArrayAdapter(Context context, int simpleSpinnerItem, ArrayList<String> alist) {
-       super(context, simpleSpinnerItem, alist);
-       ctx = context;
- 	}
+  public CustomSpinnerArrayAdapter(Context context, int simpleSpinnerItem, ArrayList<String> alist) {
+     super(context, simpleSpinnerItem, alist);
+     ctx = context;
+  }
 
-    //This method is used to display the dropdown popup that contains data.
+  //This method is used to display the dropdown popup that contains data.
 	@Override
-    public View getDropDownView(int position, View convertView, ViewGroup parent)
-    {
-        View view = super.getView(position, convertView, parent);        
-        //we know that simple_spinner_item has android.R.id.text1 TextView:         
-        TextView text = (TextView)view.findViewById(android.R.id.text1);
-        text.setTextColor(mTextColor);//Color.RED choose
-        text.setBackgroundColor(mTexBackgroundtColor);
-        return view;        
-    }
+  public View getDropDownView(int position, View convertView, ViewGroup parent)
+  {
+      View view = super.getView(position, convertView, parent);        
+      //we know that simple_spinner_item has android.R.id.text1 TextView:         
+      TextView text = (TextView)view.findViewById(android.R.id.text1);
+      text.setTextColor(mTextColor);
+      text.setBackgroundColor(mTexBackgroundtColor);
+      return view;        
+  }
 		
 	//This method is used to return the customized view at specified position in list.
 	@Override
 	public View getView(int pos, View cnvtView, ViewGroup prnt) {
 		
-	    View view = super.getView(pos, cnvtView, prnt);	    
-	    TextView text = (TextView)view.findViewById(android.R.id.text1);
-        text.setTextColor(mSelectedTextColor);
-        if (mLastItemAsPrompt) flag = 1;
-        return view; 
+	  View view = super.getView(pos, cnvtView, prnt);	    
+	  TextView text = (TextView)view.findViewById(android.R.id.text1);
+	       
+      text.setTextColor(mSelectedTextColor);      
+      
+      if (mLastItemAsPrompt) flag = 1;
+      return view; 
     }
 	
-	@Override
+    @Override
     public int getCount() {
-	  if (flag == 1)
+	  if (flag == 1) 
         return super.getCount() - 1; //do not show last item
-	  else
-		return super.getCount();
+	   else return super.getCount();
     }
 				
 	public void SetTextColor(int txtColor){
@@ -7203,7 +7354,7 @@ class CustomSpinnerArrayAdapter<T> extends ArrayAdapter<String>{
 	}
 	
 	 public void SetLastItemAsPrompt(boolean _hasPrompt) {
-	   mLastItemAsPrompt = _hasPrompt;	   
+	    mLastItemAsPrompt = _hasPrompt;	   
 	 }
 	
 }
@@ -7258,7 +7409,7 @@ class jSpinner extends Spinner /*dummy*/ { //please, fix what GUI object will be
       pascalObj = _Self;
       controls  = _ctrls;
       
-      lparams =new RelativeLayout.LayoutParams(100,100); //lparamW, lparamH
+      lparams = new RelativeLayout.LayoutParams(100,100); //lparamW, lparamH
      
       mStrList = new ArrayList<String>();
                   
@@ -7345,7 +7496,6 @@ class jSpinner extends Spinner /*dummy*/ { //please, fix what GUI object will be
    public void Add(String _item) {	  	 
 	 mStrList.add(_item);    
      mSpAdapter.notifyDataSetChanged();
-     //if (mLastItemAsPrompt) setSelection(mStrList.size()-1);
    }
    
    public void SetSelectedTextColor(int _color) {
@@ -7363,7 +7513,9 @@ class jSpinner extends Spinner /*dummy*/ { //please, fix what GUI object will be
    public void SetLastItemAsPrompt(boolean _hasPrompt) {
 	   mLastItemAsPrompt = _hasPrompt;
 	   mSpAdapter.SetLastItemAsPrompt(_hasPrompt);
-	   if (mLastItemAsPrompt) setSelection(mStrList.size()-1);	   
+	   if (mLastItemAsPrompt) {
+		 if (mStrList.size() > 0) setSelection(mStrList.size()-1);
+	   }	   
    }
    
    public int GetSize() {
@@ -7392,13 +7544,418 @@ class jSpinner extends Spinner /*dummy*/ { //please, fix what GUI object will be
    
 }  //end class
 
+
+/*Draft java code by "Lazarus Android Module Wizard" [8/9/2014 20:25:55]*/
+/*https://github.com/jmpessoa/lazandroidmodulewizard*/
+/*jControl template*/
+
+//ref. 1:  http://examples.javacodegeeks.com/android/core/location/android-location-based-services-example/
+//ref. 2   http://examples.javacodegeeks.com/android/core/location/proximity-alerts-example/
+//ref. 3:  http://www.wingnity.com/blog/android-gps-location-address-using-location-manager/
+//ref. 4:  http://www.techrepublic.com/blog/software-engineer/take-advantage-of-androids-gps-api/
+//ref. 5:  http://androidexample.com/GPS_Basic__-__Android_Example/index.php?view=article_discription&aid=68&aaid=93
+//ref. 6:  http://hejp.co.uk/android/android-gps-example/
+//ref. 7:  http://www.slideshare.net/androidstream/android-gps-tutorial
+
+class jLocation /*extends ...*/ {
+
+    private long     pascalObj = 0;      // Pascal Object
+    private Controls controls  = null;   // Control Class -> Java/Pascal Interface ...
+    private Context  context   = null;
+
+    private MyLocationListener mlistener;    
+    private LocationManager mLocationManager;
+    private Criteria mCriteria;
+    private String mProvider;
+    private String mLatitude;
+    private String mLongitude;
+    private String mAltitude;
+        
+    private String mAddress;
+    private String mStatus;
+    
+    //The minimum distance to change Updates in meters
+    private long mDistanceForUpdates;
+    // The minimum time between updates in milliseconds
+    private long mTimeForUpdates;
+    
+    private double mLat; 
+    private double mLng;
+    private double mAlt;
+    
+    private int mCriteriaAccuracy;
+  
+    private String mMapType;
+    private int mMapZoom;
+    private int mMapSizeW;
+    private int mMapSizeH;
+    
+    
+    //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
+    public jLocation(Controls _ctrls, long _Self, long _TimeForUpdates, long _DistanceForUpdates, int _CriteriaAccuracy, int _MapType) { //Add more others news "_xxx" params if needed!
+       //super(_ctrls.activity);
+       context   = _ctrls.activity;
+       pascalObj = _Self;
+       controls  = _ctrls;
+       
+       //Get the location manager
+       mLocationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
+       //Define the criteria how to select the location provider
+       mCriteria = new Criteria();
+       
+       if (_CriteriaAccuracy == 0) {
+          mCriteriaAccuracy = Criteria.ACCURACY_COARSE; //default::Network-based/wi-fi
+       }else {
+    	  mCriteriaAccuracy = Criteria.ACCURACY_FINE;  
+       }
+       
+       switch(_MapType) { //mt, mt, mtHybrid
+         case 0: mMapType = "roadmap"; break;
+         case 1: mMapType = "satellite"; break;
+         case 2: mMapType = "terrain"; break;
+         case 3: mMapType = "hybrid"; break;
+         default: mMapType = "roadmap";
+       }
+       
+       /*
+        * the Android Location Services periodically checks on your location using GPS, Cell-ID, 
+        * and Wi-Fi to locate your device. When it does this,
+        *  your Android phone will send back publicly broadcast Wi-Fi access points' Service set identifier (SSID) 
+        *  and Media Access Control (MAC) data.
+        *  ref: http://www.zdnet.com/blog/networking/how-google-and-everyone-else-gets-wi-fi-location-data/1664
+        */
+       
+       mlistener = new MyLocationListener();
+       
+       mLat = 0.0; 
+       mLng = 0.0;
+       
+       mTimeForUpdates = _TimeForUpdates;           //(long) (1000 * 60 * 1)/4; // 1 minute
+       mDistanceForUpdates = _DistanceForUpdates;  //1; //meters
+       
+       mMapZoom = 14;
+       mMapSizeW = 512;
+       mMapSizeH = 512;
+       
+    }
+
+    public void jFree() {
+      //free local objects...
+      mLocationManager = null;
+      mCriteria = null;
+      mlistener = null;    	
+    }
+    
+  //write others [public] methods code here......
+  //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
+    
+  public boolean StartTracker() {
+        boolean result;
+        
+	    mCriteria.setAccuracy(mCriteriaAccuracy);                     
+	    mCriteria.setCostAllowed(false);
+	                                 
+	    //get the best provider depending on the criteria
+        mProvider = mLocationManager.getBestProvider(mCriteria, false);       
+
+        //the last known location of this provider		 		 
+        Location location = mLocationManager.getLastKnownLocation(mProvider);                    
+                
+        if (location != null) {
+          mLat = location.getLatitude(); 
+          mLng = location.getLongitude();
+          mAlt = location.getAltitude();
+          mAddress = GetAddress(mLat, mLng);          
+          mlistener.onLocationChanged(location);
+          result = true;
+        }            
+        else {
+        	 Log.i("jLocation", "Wait... No Location Yet!!");                	        
+        	 result = false;
+        }    
+        
+        mLocationManager.requestLocationUpdates(mProvider, mTimeForUpdates, mDistanceForUpdates, mlistener);
+        
+        return result;
+   }
+
+   public void ShowLocationSouceSettings() {
+	  Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+      context.startActivity(intent); 
+   }   
+   
+   public void RequestLocationUpdates() {          	      
+      mLocationManager.requestLocationUpdates(mProvider, mTimeForUpdates, mDistanceForUpdates, mlistener);
+   } 	
+       
+   public void StopTracker() {  // finalize ....
+      mlistener.RemoveUpdates(mLocationManager);
+   }
+    
+   public void SetCriteriaAccuracy(int _accuracy) {
+       if(_accuracy == 0){  //default...     	            
+          mCriteria.setAccuracy(Criteria.ACCURACY_COARSE);   //less accuracy      
+       }else { 
+    	  mCriteria.setAccuracy(Criteria.ACCURACY_FINE); //high accuracy         
+       }          
+    }       
+        
+    public boolean IsGPSProvider() {
+       return mLocationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+    }
+    
+    public boolean IsNetProvider() {
+       return mLocationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
+    }
+    
+    public void SetTimeForUpdates(long _time) { // millsecs 
+      mTimeForUpdates = _time;
+    }
+    
+    public void SetDistanceForUpdates(long _distance) { //meters
+      mDistanceForUpdates = _distance;
+    }
+    
+    public double GetLatitude() { 
+      return mLat;
+    }   
+    
+    public double GetLongitude() {
+      return mLng;
+    }   
+
+    public double GetAltitude() {
+      return mAlt;
+    }   
+        
+    public boolean IsWifiEnabled() {
+       WifiManager wifiManager = (WifiManager)this.context.getSystemService(Context.WIFI_SERVICE);
+       return  wifiManager.isWifiEnabled();	
+    }
+    
+    public void SetWifiEnabled(boolean _status) {
+       WifiManager wifiManager = (WifiManager)this.context.getSystemService(Context.WIFI_SERVICE);             
+       wifiManager.setWifiEnabled(_status);
+    }
+        
+    //https://developers.google.com/maps/documentation/staticmaps
+    public String GetGoogleMapsUrl(double _latitude, double _longitude) {        
+      String url = "http://maps.googleapis.com/maps/api/staticmap?center="+_latitude + "," + _longitude+
+                    "&zoom="+mMapZoom+"&size="+mMapSizeW+"x"+mMapSizeH+"&maptype="+mMapType+"&markers="+_latitude + "," + _longitude;          		                         
+      return url;
+    }
+    
+    public void SetMapWidth(int _mapwidth) {
+	   mMapSizeW = _mapwidth;    	
+    }
+    
+    public void SetMapHeight(int _mapheight) {
+	  mMapSizeH= _mapheight;    	
+    }
+    
+    public void SetMapZoom(int _mapzoom) {
+      if (_mapzoom < 15) {	
+	     mMapZoom = _mapzoom;
+      }
+      else {
+    	 mMapZoom = 14;
+      }      
+    }
+    
+   public void SetMapType(int _maptype) {
+	  switch(_maptype) {
+		 case 0: mMapType= "roadmap"; break;
+		 case 1: mMapType= "satellite"; break;
+		 case 2: mMapType= "terrain"; break;
+		 case 3: mMapType= "hybrid"; break;
+		 default: mMapType= "roadmap";
+	  }   		
+    }
+
+   public String GetAddress() {
+	     return mAddress;
+   }
+
+    public String GetAddress(double _latitude, double _longitude) {
+  	 
+           Geocoder geocoder = new Geocoder(context, Locale.getDefault());
+           // Get the current location from the input parameter list
+           // Create a list to contain the result address
+           List<Address> addresses = null;
+           try {
+               /*
+                * Return 1 address.
+                */
+               addresses = geocoder.getFromLocation(_latitude, _longitude, 1);
+           } catch (IOException e1) {
+               e1.printStackTrace();
+               return ("IO Exception trying to get address:" + e1);
+           } catch (IllegalArgumentException e2) {
+               // Error message to post in the log
+               String errorString = "Illegal arguments passed to address service";
+               e2.printStackTrace();
+               return errorString;
+           }
+           // If the reverse geocode returned an address
+           if (addresses != null && addresses.size() > 0) {
+               // Get the first address
+               Address address = addresses.get(0);
+               /*
+                * Format the first line of address (if available), city, and
+                * country name.
+                */
+               String addressText = String.format(
+                       "%s, %s, %s",
+                       // If there's a street address, add it
+                       address.getMaxAddressLineIndex() > 0 ? address
+                               .getAddressLine(0) : "",
+                       // Locality is usually a city
+                       address.getLocality(),
+                       // The country of the address
+                       address.getCountryName());
+               // Return the text
+               return addressText;
+           } else {
+               return "No address found by the service: Note to the developers, If no address is found by google itself, there is nothing you can do about it. :(";
+           }
+    }
+       
+    private class MyLocationListener implements LocationListener {    	    	
+    	
+        @Override
+        /*.*/public void onLocationChanged(Location location) {
+             //Initialize the location fields
+                          
+             mLat = location.getLatitude();
+             mLng = location.getLongitude();
+             mAlt= location.getAltitude();
+                         
+             mLatitude= String.valueOf(mLat);
+             mLongitude= String.valueOf(mLng);
+             mAltitude= String.valueOf(mAlt);
+             
+             mAddress = GetAddress(mLat, mLng);
+             
+             Log.i("jLocation", "Latitude: "+ mLatitude+ " ... Longitude: "+mLongitude+" ... Altitude: " + mAltitude);
+                          
+        	 controls.pOnLocationChanged(pascalObj,mLat,mLng,mAlt,mAddress);        		
+        }
+
+        @Override
+        /*.*/public void onStatusChanged(String provider, int status, Bundle extras) {
+           
+        	switch (status) {
+    		  case LocationProvider.OUT_OF_SERVICE:
+    			 mStatus="Out of Service";
+    		  break;
+    		  case LocationProvider.TEMPORARILY_UNAVAILABLE:
+    			  mStatus="Temporarily Unavailable";    			
+    	      break;
+    		  case LocationProvider.AVAILABLE:
+    			 mStatus="Available";    		
+              break;
+    		}        	        	
+        	Log.i("jLocation", "mStatus: "+mStatus);
+        	
+        	controls.pOnLocationStatusChanged(pascalObj, status, provider, mStatus);
+        }
+
+        @Override
+        /*.*/public void onProviderEnabled(String provider) {
+        	Log.i("jLocation", "Enabled: "+provider);
+        	controls.pOnLocationProviderEnabled(pascalObj, provider);
+        }
+        
+        @Override
+        /*.*/public void onProviderDisabled(String provider) {        
+        	///* this is called if/when the GPS is disabled in settings */
+        	Log.i("jLocation", "Disabled: "+provider);
+        	controls.pOnLocationProviderDisabled(pascalObj, provider);        	
+        }
+                
+        /*.*/public void RemoveUpdates(LocationManager lm) {
+        	lm.removeUpdates(this);
+        } 
+    }
+}
+
+
+/*Draft java code by "Lazarus Android Module Wizard" [8/13/2014 1:43:12]*/
+/*https://github.com/jmpessoa/lazandroidmodulewizard*/
+/*jControl template*/
+
+class jPreferences /*extends ...*/ {
+
+    private long     pascalObj = 0;      // Pascal Object
+    private Controls controls  = null;   // Control Class -> Java/Pascal Interface ...
+    private Context  context   = null;
+    
+    private SharedPreferences mPreferences;
+    
+    //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
+
+    public jPreferences(Controls _ctrls, long _Self, boolean _IsShared) { //Add more others news "_xxx" params if needed!
+       //super(_ctrls.activity);
+       context   = _ctrls.activity;
+       pascalObj = _Self;
+       controls  = _ctrls;
+       
+       if (_IsShared) { 
+          mPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+       }
+       else {
+          mPreferences = _ctrls.activity.getPreferences(Context.MODE_PRIVATE);
+       }
+       
+    }
+
+    public void jFree() {
+      //free local objects...
+    	mPreferences = null;
+    }
+
+  //write others [public] methods code here......
+  //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
+    
+   public int GetIntData(String _key, int _defaultValue) {
+		return mPreferences.getInt(_key, _defaultValue);
+	}
+
+	public void SetIntData(String _key, int _value) {
+		SharedPreferences.Editor edt = mPreferences.edit();
+		edt.putInt(_key, _value);
+		edt.commit();
+	}
+
+	public String GetStringData(String _key, String _defaultValue) {
+		return mPreferences.getString(_key, _defaultValue);
+	}
+
+	public void SetStringData(String _key, String _value) {
+		SharedPreferences.Editor edt = mPreferences.edit();
+		edt.putString(_key, _value);
+		edt.commit();
+	}
+
+	public boolean GetBoolData(String _key, boolean _defaultValue) {
+		return mPreferences.getBoolean(_key, _defaultValue);
+	}
+
+	public void SetBoolData(String _key, boolean _value) {
+		SharedPreferences.Editor edt = mPreferences.edit();
+		edt.putBoolean(_key, _value);
+		edt.commit();
+	}
+}
+
 //Javas/Pascal Interface Class 
 
-public  class Controls {          // <<--------- 
+public class Controls {          // <<--------- 
 //
-public Activity        activity;             // Activity
-public RelativeLayout  appLayout;            // Base Layout
-public int             screenStyle=0;        // Screen Style [Dev:0 , Portrait: 1, Landscape : 2]
+public Activity        activity;  // Activity
+public RelativeLayout  appLayout; // Base Layout
+public int screenStyle=0;         // Screen Style [Dev:0 , Portrait: 1, Landscape : 2]
+
 
 // Jave -> Pascal Function ( Pascal Side = Event )
 public  native int  pAppOnScreenStyle(); 
@@ -7436,7 +7993,7 @@ public  native void pOnGLRenderer(long pasobj, int EventType, int w, int h);
 //
 public  native void pOnClose     (long pasobj);    
 
-public  native void pOnActive     (long pasobj); //new by jmpessoa
+//public  native void pOnActive     (long pasobj); //new by jmpessoa
 //
 public  native int  pOnWebViewStatus (long pasobj, int EventType, String url);
 public  native void pOnAsyncEvent    (long pasobj, int EventType, int progress);
@@ -7464,11 +8021,22 @@ public  native void pOnBluetoothServerSocketListen(long pasobj, String deviceNam
 
 public  native void pOnSpinnerItemSeleceted(long pasobj, int position, String caption);
 
+//gps - location
+public  native void pOnLocationChanged(long pasobj, double latitude,  double longitude, double altitude, String address);
+public  native void pOnLocationStatusChanged(long pasobj, int status, String provider, String msgStatus);
+public  native void pOnLocationProviderEnabled(long pasobj, String provider);
+public  native void pOnLocationProviderDisabled(long pasobj, String provider);
+
+public  native void pAppOnViewClick(View view, int id);
+public  native void pAppOnListItemClick(AdapterView adapter, View view, int position, int id);
+
+
 //Load Pascal Library
 static {
     Log.i("JNI_Java", "1.load libcontrols.so");
     System.loadLibrary("controls");
-    Log.i("JNI_Java", "2.load libcontrols.so");    
+    Log.i("JNI_Java", "2.load libcontrols.so");
+    
 }
 
 // -------------------------------------------------------------------------
@@ -7478,6 +8046,7 @@ public  int  jAppOnScreenStyle()          { return(pAppOnScreenStyle());   }
 //
 public  void jAppOnCreate(Context context,RelativeLayout layout )
                                           { pAppOnCreate(context,layout);  }
+
 public  void jAppOnNewIntent()            { pAppOnNewIntent();             }     
 public  void jAppOnDestroy()              { pAppOnDestroy();               }  
 public  void jAppOnPause()                { pAppOnPause();                 }  
@@ -7486,21 +8055,28 @@ public  void jAppOnResume()               { pAppOnResume();                }
 public  void jAppOnStart()                { pAppOnStart();                 }     //change by jmpessoa : old OnActive
 public  void jAppOnStop()                 { pAppOnStop();                  }   
 public  void jAppOnBackPressed()          { pAppOnBackPressed();           }   
-public  int  jAppOnRotate(int rotate)     { return(pAppOnRotate(rotate));  }
+public  int  jAppOnRotate(int rotate)     {  return(pAppOnRotate(rotate)); }
 public  void jAppOnConfigurationChanged() { pAppOnConfigurationChanged();  }
+
 public  void jAppOnActivityResult(int requestCode, int resultCode, Intent data) 
-                                          { pAppOnActivityResult(requestCode,resultCode,data); } 
+                                          { pAppOnActivityResult(requestCode,resultCode,data); }
+
 //By jmpessoa: support Option Menu
 public  void jAppOnCreateOptionsMenu(Menu m) {pAppOnCreateOptionsMenu(m);}
 public  void jAppOnClickOptionMenuItem(MenuItem item,int itemID, String itemCaption, boolean checked){pAppOnClickOptionMenuItem(item,itemID,itemCaption,checked);}
 
 //By jmpessoa: supportContextMenu
 public  void jAppOnCreateContextMenu(Menu m) {pAppOnCreateContextMenu(m);}
-public  void jAppOnClickContextMenuItem(MenuItem item,int itemID, String itemCaption, boolean checked){pAppOnClickContextMenuItem(item,itemID,itemCaption,checked);}
+public  void jAppOnClickContextMenuItem(MenuItem item,int itemID, String itemCaption, boolean checked) {pAppOnClickContextMenuItem(item,itemID,itemCaption,checked);}
+
+public void jAppOnViewClick(View view, int id){ pAppOnViewClick(view,id);}
+
+public void jAppOnListItemClick(AdapterView adapter, View view, int position, int id){ pAppOnListItemClick(adapter, view,position,id);}
 
 //rotate=1 --> device on vertical/default position ; 2 --> device on horizontal position      //tips by jmpessoa
 
-// -------------------------------------------------------------------------
+
+//// -------------------------------------------------------------------------
 //  System, Class
 // -------------------------------------------------------------------------
 
@@ -7529,14 +8105,19 @@ public  void classChkNull (Class object) {
    if (object != null) { Log.i("JAVA","checkNull-Not Null"); };
 }
 
+public Context GetContext() {   
+   return this.activity; 
+}
+
+
 // -------------------------------------------------------------------------
 //  App Related
 // -------------------------------------------------------------------------
 //
 
 public  void appFinish () {
-   activity.finish();
-   System.exit(0); //<< ------- fix by jmpessoa
+	   activity.finish();
+	   System.exit(0); //<< ------- fix by jmpessoa
 }
 
 //
@@ -10074,11 +10655,19 @@ public  java.lang.Object jSqliteDataAccess_Create(long pasobj, String databaseNa
    public java.lang.Object jBluetoothClientSocket_jCreate(long _Self) {
       return (java.lang.Object)(new jBluetoothClientSocket(this,_Self));
    }
-  
+   
+   public java.lang.Object jSpinner_jCreate(long _Self) {
+	      return (java.lang.Object)(new jSpinner(this,_Self));
+   }    
+
+
+   public java.lang.Object jLocation_jCreate(long _Self, long _TimeForUpdates, long _DistanceForUpdates, int _CriteriaAccuracy, int _MapType) {
+      return (java.lang.Object)(new jLocation(this,_Self,_TimeForUpdates,_DistanceForUpdates,_CriteriaAccuracy, _MapType));
+   }
 
   
-   public java.lang.Object jSpinner_jCreate(long _Self) {
-      return (java.lang.Object)(new jSpinner(this,_Self));
+   public java.lang.Object jPreferences_jCreate(long _Self, boolean _IsShared) {
+      return (java.lang.Object)(new jPreferences(this,_Self,_IsShared));
    }
   
 

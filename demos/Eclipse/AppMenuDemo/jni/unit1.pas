@@ -6,7 +6,7 @@ unit unit1;
 interface
   
 uses
-  Classes, SysUtils, And_jni, And_jni_Bridge, Laz_And_Controls, menu;
+  Classes, SysUtils, And_jni, And_jni_Bridge, Laz_And_Controls, AndroidWidget, menu;
   
 type
 

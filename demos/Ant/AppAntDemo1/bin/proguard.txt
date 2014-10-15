@@ -1,0 +1,3 @@
+# view AndroidManifest.xml #generated:37
+-keep class org.jmpessoa.appantdemo1.App { <init>(...); }
+

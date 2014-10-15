@@ -1,6 +1,6 @@
 package com.example.apptrycode2;
 
-//[LazAndroidModuleWizard - ver.0.5 - rev. 01 :05-MAy-2014]
+//[LazAndroidModuleWizard - Version 0.6 - 12 October 2014 // Add FORM Designer and more!
 //
 //[https://github.com/jmpessoa/lazandroidmodulewizard]
 
@@ -63,6 +63,8 @@ public class App extends Activity {
       } 	
       this.setContentView(controls.appLayout);
       this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
+      
+      
       // Event : Java -> Pascal
       Log.i("jApp","02.Controls.jAppOnCreate");
       controls.jAppOnCreate(this, controls.appLayout);
@@ -71,31 +73,33 @@ public class App extends Activity {
     
     @Override    
     protected void onNewIntent(Intent intent) { super.onNewIntent(intent);
-    	                                          controls.jAppOnNewIntent();     }
+    	                                        controls.jAppOnNewIntent();     }
     
     @Override
     protected void onDestroy()                { super.onDestroy(); 
-    	                                          controls.jAppOnDestroy();       }
+    	                                        controls.jAppOnDestroy();       }
     
     @Override
-    protected void onPause()                  { super.onPause(); 
-    	                                          controls.jAppOnPause();         }    
+    protected void onPause()                  { super.onPause();
+                                                Log.i("jApp","onPause");
+    	                                        controls.jAppOnPause();         }    
     
     @Override
-    protected void onRestart()                { super.onRestart(); 
-    	                                          controls.jAppOnRestart();       }
+    protected void onRestart()                { super.onRestart();
+                                                Log.i("jApp","onRestart");
+    	                                        controls.jAppOnRestart();    	  }
 
     @Override
     protected void onResume()                 { super.onResume();  
-    	                                          controls.jAppOnResume();        }
+    	                                        controls.jAppOnResume();        }
 
     @Override
-    protected void onStart()                  { super.onStart();   
-    	                                          controls.jAppOnStart();        }
-
+    protected void onStart()                  { super.onStart();
+                                                Log.i("jApp","onStart");
+    	                                        controls.jAppOnStart();        }
     @Override
     protected void onStop()                   { super.onStop(); 
-    	                                          controls.jAppOnStop();          }
+    	                                        controls.jAppOnStop();          }
 
     @Override
     public    void onBackPressed()            { controls.jAppOnBackPressed();   }

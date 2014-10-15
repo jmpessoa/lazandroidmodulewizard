@@ -7,7 +7,7 @@ interface
   
 uses
   Classes, SysUtils, And_jni, And_jni_Bridge, Laz_And_Controls,
-  Laz_And_GLESv1_Canvas, Laz_And_GLESv1_Canvas_h;
+  Laz_And_GLESv1_Canvas, Laz_And_GLESv1_Canvas_h, Laz_And_Controls_Events, AndroidWidget;
   
 type
 
@@ -207,12 +207,12 @@ end;
 
 procedure TAndroidModule12.DataModuleCreate(Sender: TObject);
 begin //this initialization code is need here to fix Laz4Andoid  *.lfm parse.... why parse fails?
-  Self.ActivityMode:= actRecyclable;
+(*  Self.ActivityMode:= actRecyclable;
   Self.BackgroundColor:= colbrBlack;
     //mode delphi
   Self.OnJNIPrompt:= DataModuleJNIPrompt;
   Self.OnRotate:= DataModuleRotate;
-  Self.OnCloseQuery:= DataModuleCloseQuery;
+  Self.OnCloseQuery:= DataModuleCloseQuery;   *)
 end;
 
 procedure TAndroidModule12.DataModuleCloseQuery(Sender: TObject; var CanClose: boolean);
@@ -230,7 +230,7 @@ begin
   gZoom := 1.0;
   gTextureID:= 0;   //default picture ID
   _glArcBall_Init(gArcBall);
-  Self.Show;
+ // Self.Show;
 end;
 
 procedure TAndroidModule12.DataModuleRotate(Sender: TObject; rotate: integer;

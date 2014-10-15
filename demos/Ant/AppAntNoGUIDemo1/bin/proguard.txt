@@ -1,0 +1,3 @@
+# view AndroidManifest.xml #generated:14
+-keep class org.jmpessoa.appantnoguidemo1.App { <init>(...); }
+

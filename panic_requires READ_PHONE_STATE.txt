@@ -1,4 +1,0 @@
-06-11 22:32:12.939: I/dalvikvm(3114): 
-java.lang.SecurityException: Requires READ_PHONE_STATE: Neither user 10039 nor current process has android.permission.READ_PHONE_STATE.
-
-Solution [Eclipse]: simulates one [false] edition of "AndroidManifest.xml" and save it!

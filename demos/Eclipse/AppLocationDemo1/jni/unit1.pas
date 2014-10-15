@@ -7,7 +7,7 @@ interface
   
 uses
   Classes, SysUtils, And_jni, And_jni_Bridge, Laz_And_Controls, 
-    Laz_And_Controls_Events, location;
+  Laz_And_Controls_Events, AndroidWidget, location;
   
 type
 

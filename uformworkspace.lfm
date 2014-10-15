@@ -74,7 +74,7 @@ object FormWorkspace: TFormWorkspace
   OnClose = FormClose
   OnCreate = FormCreate
   Position = poScreenCenter
-  LCLVersion = '1.1'
+  LCLVersion = '1.3'
   object Edit1: TEdit
     Left = 9
     Height = 23
@@ -87,8 +87,8 @@ object FormWorkspace: TFormWorkspace
     Left = 9
     Height = 15
     Top = 320
-    Width = 102
-    Caption = 'Path to Workspace:'
+    Width = 189
+    Caption = 'Path to Workspace [projects folder]:'
     ParentColor = False
   end
   object SpeedButton1: TSpeedButton
@@ -126,14 +126,14 @@ object FormWorkspace: TFormWorkspace
     TabOrder = 2
   end
   object Edit2: TEdit
-    Left = 200
+    Left = 236
     Height = 23
     Top = 192
-    Width = 416
+    Width = 380
     TabOrder = 3
   end
   object Label2: TLabel
-    Left = 200
+    Left = 236
     Height = 15
     Top = 174
     Width = 114
@@ -141,7 +141,7 @@ object FormWorkspace: TFormWorkspace
     ParentColor = False
   end
   object SpeedButton2: TSpeedButton
-    Left = 622
+    Left = 620
     Height = 22
     Top = 192
     Width = 23
@@ -211,12 +211,12 @@ object FormWorkspace: TFormWorkspace
     Left = 8
     Height = 15
     Top = 252
-    Width = 555
-    Caption = 'Path to Java Resources  [Simonsayz''s Controls.java,  *.xml and default Icons] ex: .../LazAndroidWizard/java'
+    Width = 542
+    Caption = 'Path to Java Resources: Simonsayz''s  templates,  *.xml, default Icons ...  [ ex: .../LazAndroidWizard/java ]'
     ParentColor = False
   end
   object SpeedButton4: TSpeedButton
-    Left = 622
+    Left = 620
     Height = 22
     Top = 271
     Width = 23
@@ -227,8 +227,8 @@ object FormWorkspace: TFormWorkspace
     Left = 9
     Height = 15
     Top = 369
-    Width = 323
-    Caption = '[Select] Eclipse Project or [Enter] Ant/jWrapper Project Name:'
+    Width = 270
+    Caption = '[Select] Eclipse Project or [Enter] Ant Project Name:'
     ParentColor = False
   end
   object ComboBox1: TComboBox
@@ -269,8 +269,8 @@ object FormWorkspace: TFormWorkspace
     Left = 8
     Height = 15
     Top = 8
-    Width = 88
-    Caption = 'Path to Java JDK:'
+    Width = 375
+    Caption = 'Path to Java JDK:  [ex.  C:\Program Files (x86)\Java\jdk1.7.0_21 ] {win32} '
     ParentColor = False
   end
   object Edit5: TEdit
@@ -299,8 +299,8 @@ object FormWorkspace: TFormWorkspace
     Left = 9
     Height = 15
     Top = 56
-    Width = 83
-    Caption = 'Path to Ant bin:'
+    Width = 170
+    Caption = 'Path to Ant bin: [ex.   ...\ant\bin]'
     ParentColor = False
   end
   object Edit7: TEdit
@@ -325,17 +325,17 @@ object FormWorkspace: TFormWorkspace
     OnClick = SpeedButton5Click
   end
   object SpeedButton6: TSpeedButton
-    Left = 622
+    Left = 620
     Height = 22
-    Top = 79
+    Top = 144
     Width = 23
     Caption = '...'
     OnClick = SpeedButton6Click
   end
   object SpeedButton7: TSpeedButton
-    Left = 622
+    Left = 620
     Height = 22
-    Top = 144
+    Top = 72
     Width = 23
     Caption = '...'
     OnClick = SpeedButton7Click
@@ -364,11 +364,9 @@ object FormWorkspace: TFormWorkspace
     Items.Strings = (
       '8  '
       '10'
-      '13'
       '14'
     )
     ItemHeight = 15
-    ItemIndex = 3
     OnClick = ListBox1Click
     OnSelectionChange = ListBox1SelectionChange
     TabOrder = 13
@@ -399,10 +397,10 @@ object FormWorkspace: TFormWorkspace
     ClientHeight = 22
     ClientWidth = 86
     Columns = 2
-    ItemIndex = 0
+    ItemIndex = 1
     Items.Strings = (
-      '7'
-      '9'
+      '7c'
+      '9b'
     )
     OnClick = RadioGroup5Click
     ParentShowHint = False
@@ -425,25 +423,30 @@ object FormWorkspace: TFormWorkspace
     Left = 104
     Height = 23
     Top = 191
-    Width = 88
+    Width = 125
     ItemHeight = 15
     ItemIndex = 2
     Items.Strings = (
-      'Android-8'
-      'Android-9'
-      'Android-14'
+      'Froyo'
+      'Gingerbread'
+      'Ice Cream 4.0'
+      'Ice Cream 4.0x'
+      'Jelly Bean 4.1'
+      'Jelly Bean 4.2'
+      'Jelly Bean 4.3'
+      'KitKat 4.4'
     )
     OnChange = ComboBox2Change
     Style = csDropDownList
     TabOrder = 15
-    Text = 'Android-14'
+    Text = 'Ice Cream 4.0'
   end
   object Label4: TLabel
     Left = 104
     Height = 15
     Top = 174
-    Width = 82
-    Caption = 'NDK Plataform:'
+    Width = 55
+    Caption = 'Plataform:'
     ParentColor = False
   end
   object StatusBar1: TStatusBar
@@ -475,7 +478,6 @@ object FormWorkspace: TFormWorkspace
     Items.Strings = (
       '8'
       '10'
-      '13'
       '14'
       '15'
       '16'
@@ -484,11 +486,9 @@ object FormWorkspace: TFormWorkspace
       '19'
     )
     ItemHeight = 15
-    ItemIndex = 6
     OnClick = ListBox2Click
     OnSelectionChange = ListBox2SelectionChange
     TabOrder = 17
-    TopIndex = 2
   end
   object Label11: TLabel
     Left = 236
@@ -515,11 +515,11 @@ object FormWorkspace: TFormWorkspace
     top = 16
   end
   object SelectDirectoryDialog6: TSelectDirectoryDialog
-    left = 392
-    top = 72
+    left = 424
+    top = 136
   end
   object SelectDirectoryDialog7: TSelectDirectoryDialog
-    left = 520
-    top = 128
+    left = 512
+    top = 72
   end
 end

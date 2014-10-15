@@ -1,0 +1,3 @@
+<Libraries Value="C:\adt32\ndk9\platforms\android-14\arch-arm\usr\lib;"/>
+<TargetCPU Value="arm"/>
+<CustomOptions Value="-dANDROID -Xd -CpArmV7a -CfVfpV2 -FLC:\adt32\ndk9\platforms\android-14\arch-arm\usr\lib\libdl.so -FUC:\adt32\eclipse\workspace\AppCameraDemo\obj\Controls -oC:\adt32\eclipse\workspace\AppCameraDemo\libs\armeabi-v7a\libcontrols.so"/>

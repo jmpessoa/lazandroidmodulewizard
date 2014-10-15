@@ -4,7 +4,8 @@ library controls;
 {$mode delphi}
 
 uses
-  Classes, SysUtils, And_jni, And_jni_Bridge, Laz_And_Controls, Unit1;
+  Classes, SysUtils, And_jni, AndroidWidget, And_jni_Bridge, Laz_And_Controls,
+  Laz_And_Controls_Events, Unit1;
 
 { Class:     com_example_appdemo1_Controls
   Method:    pAppOnScreenStyle
@@ -207,14 +208,6 @@ begin
 end;
 
 { Class:     com_example_appdemo1_Controls
-  Method:    pOnActive
-  Signature: (J)V }
-procedure pOnActive(PEnv: PJNIEnv; this: JObject; pasobj: JLong); cdecl;
-begin
-  Java_Event_pOnActive(PEnv,this,TObject(pasobj));
-end;
-
-{ Class:     com_example_appdemo1_Controls
   Method:    pOnWebViewStatus
   Signature: (JILjava/lang/String;)I }
 function pOnWebViewStatus(PEnv: PJNIEnv; this: JObject; pasobj: JLong; EventType: JInt; url: JString): JInt; cdecl;
@@ -238,7 +231,175 @@ begin
   Java_Event_pOnClickWidgetItem(PEnv,this,TObject(pasobj),position,Boolean(checked));
 end;
 
-const NativeMethods:array[0..28] of JNINativeMethod = (
+{ Class:     com_example_appdemo1_Controls
+  Method:    pOnClickCaptionItem
+  Signature: (JILjava/lang/String;)V }
+procedure pOnClickCaptionItem(PEnv: PJNIEnv; this: JObject; pasobj: JLong; position: JInt; caption: JString); cdecl;
+begin
+  Java_Event_pOnClickCaptionItem(PEnv,this,TObject(pasobj),position,caption);
+end;
+
+{ Class:     com_example_appdemo1_Controls
+  Method:    pOnBluetoothEnabled
+  Signature: (J)V }
+procedure pOnBluetoothEnabled(PEnv: PJNIEnv; this: JObject; pasobj: JLong); cdecl;
+begin
+  Java_Event_pOnBluetoothEnabled(PEnv,this,TObject(pasobj));
+end;
+
+{ Class:     com_example_appdemo1_Controls
+  Method:    pOnBluetoothDisabled
+  Signature: (J)V }
+procedure pOnBluetoothDisabled(PEnv: PJNIEnv; this: JObject; pasobj: JLong); cdecl;
+begin
+  Java_Event_pOnBluetoothDisabled(PEnv,this,TObject(pasobj));
+end;
+
+{ Class:     com_example_appdemo1_Controls
+  Method:    pOnBluetoothDeviceFound
+  Signature: (JLjava/lang/String;Ljava/lang/String;)V }
+procedure pOnBluetoothDeviceFound(PEnv: PJNIEnv; this: JObject; pasobj: JLong; deviceName: JString; deviceAddress: JString); cdecl;
+begin
+  Java_Event_pOnBluetoothDeviceFound(PEnv,this,TObject(pasobj),deviceName,deviceAddress);
+end;
+
+{ Class:     com_example_appdemo1_Controls
+  Method:    pOnBluetoothDiscoveryStarted
+  Signature: (J)V }
+procedure pOnBluetoothDiscoveryStarted(PEnv: PJNIEnv; this: JObject; pasobj: JLong); cdecl;
+begin
+  Java_Event_pOnBluetoothDiscoveryStarted(PEnv,this,TObject(pasobj));
+end;
+
+{ Class:     com_example_appdemo1_Controls
+  Method:    pOnBluetoothDiscoveryFinished
+  Signature: (JII)V }
+procedure pOnBluetoothDiscoveryFinished(PEnv: PJNIEnv; this: JObject; pasobj: JLong; countFoundedDevices: JInt; countPairedDevices: JInt); cdecl;
+begin
+  Java_Event_pOnBluetoothDiscoveryFinished(PEnv,this,TObject(pasobj),countFoundedDevices,countPairedDevices);
+end;
+
+{ Class:     com_example_appdemo1_Controls
+  Method:    pOnBluetoothDeviceBondStateChanged
+  Signature: (JILjava/lang/String;Ljava/lang/String;)V }
+procedure pOnBluetoothDeviceBondStateChanged(PEnv: PJNIEnv; this: JObject; pasobj: JLong; state: JInt; deviceName: JString; deviceAddress: JString); cdecl;
+begin
+  Java_Event_pOnBluetoothDeviceBondStateChanged(PEnv,this,TObject(pasobj),state,deviceName,deviceAddress);
+end;
+
+{ Class:     com_example_appdemo1_Controls
+  Method:    pOnBluetoothClientSocketConnected
+  Signature: (JLjava/lang/String;Ljava/lang/String;)V }
+procedure pOnBluetoothClientSocketConnected(PEnv: PJNIEnv; this: JObject; pasobj: JLong; deviceName: JString; deviceAddress: JString); cdecl;
+begin
+  Java_Event_pOnBluetoothClientSocketConnected(PEnv,this,TObject(pasobj),deviceName,deviceAddress);
+end;
+
+{ Class:     com_example_appdemo1_Controls
+  Method:    pOnBluetoothClientSocketIncomingMessage
+  Signature: (JLjava/lang/String;)V }
+procedure pOnBluetoothClientSocketIncomingMessage(PEnv: PJNIEnv; this: JObject; pasobj: JLong; messageText: JString); cdecl;
+begin
+  Java_Event_pOnBluetoothClientSocketIncomingMessage(PEnv,this,TObject(pasobj),messageText);
+end;
+
+{ Class:     com_example_appdemo1_Controls
+  Method:    pOnBluetoothClientSocketWritingMessage
+  Signature: (J)V }
+procedure pOnBluetoothClientSocketWritingMessage(PEnv: PJNIEnv; this: JObject; pasobj: JLong); cdecl;
+begin
+  Java_Event_pOnBluetoothClientSocketWritingMessage(PEnv,this,TObject(pasobj));
+end;
+
+{ Class:     com_example_appdemo1_Controls
+  Method:    pOnBluetoothServerSocketConnected
+  Signature: (JLjava/lang/String;Ljava/lang/String;)V }
+procedure pOnBluetoothServerSocketConnected(PEnv: PJNIEnv; this: JObject; pasobj: JLong; deviceName: JString; deviceAddress: JString); cdecl;
+begin
+  Java_Event_pOnBluetoothServerSocketConnected(PEnv,this,TObject(pasobj),deviceName,deviceAddress);
+end;
+
+{ Class:     com_example_appdemo1_Controls
+  Method:    pOnBluetoothServerSocketIncomingMessage
+  Signature: (JLjava/lang/String;)V }
+procedure pOnBluetoothServerSocketIncomingMessage(PEnv: PJNIEnv; this: JObject; pasobj: JLong; messageText: JString); cdecl;
+begin
+  Java_Event_pOnBluetoothServerSocketIncomingMessage(PEnv,this,TObject(pasobj),messageText);
+end;
+
+{ Class:     com_example_appdemo1_Controls
+  Method:    pOnBluetoothServerSocketWritingMessage
+  Signature: (J)V }
+procedure pOnBluetoothServerSocketWritingMessage(PEnv: PJNIEnv; this: JObject; pasobj: JLong); cdecl;
+begin
+  Java_Event_pOnBluetoothServerSocketWritingMessage(PEnv,this,TObject(pasobj));
+end;
+
+{ Class:     com_example_appdemo1_Controls
+  Method:    pOnBluetoothServerSocketListen
+  Signature: (JLjava/lang/String;Ljava/lang/String;)V }
+procedure pOnBluetoothServerSocketListen(PEnv: PJNIEnv; this: JObject; pasobj: JLong; deviceName: JString; deviceAddress: JString); cdecl;
+begin
+  Java_Event_pOnBluetoothServerSocketListen(PEnv,this,TObject(pasobj),deviceName,deviceAddress);
+end;
+
+{ Class:     com_example_appdemo1_Controls
+  Method:    pOnSpinnerItemSeleceted
+  Signature: (JILjava/lang/String;)V }
+procedure pOnSpinnerItemSeleceted(PEnv: PJNIEnv; this: JObject; pasobj: JLong; position: JInt; caption: JString); cdecl;
+begin
+  Java_Event_pOnSpinnerItemSeleceted(PEnv,this,TObject(pasobj),position,caption);
+end;
+
+{ Class:     com_example_appdemo1_Controls
+  Method:    pOnLocationChanged
+  Signature: (JDDDLjava/lang/String;)V }
+procedure pOnLocationChanged(PEnv: PJNIEnv; this: JObject; pasobj: JLong; latitude: JDouble; longitude: JDouble; altitude: JDouble; address: JString); cdecl;
+begin
+  Java_Event_pOnLocationChanged(PEnv,this,TObject(pasobj),latitude,longitude,altitude,address);
+end;
+
+{ Class:     com_example_appdemo1_Controls
+  Method:    pOnLocationStatusChanged
+  Signature: (JILjava/lang/String;Ljava/lang/String;)V }
+procedure pOnLocationStatusChanged(PEnv: PJNIEnv; this: JObject; pasobj: JLong; status: JInt; provider: JString; msgStatus: JString); cdecl;
+begin
+  Java_Event_pOnLocationStatusChanged(PEnv,this,TObject(pasobj),status,provider,msgStatus);
+end;
+
+{ Class:     com_example_appdemo1_Controls
+  Method:    pOnLocationProviderEnabled
+  Signature: (JLjava/lang/String;)V }
+procedure pOnLocationProviderEnabled(PEnv: PJNIEnv; this: JObject; pasobj: JLong; provider: JString); cdecl;
+begin
+  Java_Event_pOnLocationProviderEnabled(PEnv,this,TObject(pasobj),provider);
+end;
+
+{ Class:     com_example_appdemo1_Controls
+  Method:    pOnLocationProviderDisabled
+  Signature: (JLjava/lang/String;)V }
+procedure pOnLocationProviderDisabled(PEnv: PJNIEnv; this: JObject; pasobj: JLong; provider: JString); cdecl;
+begin
+  Java_Event_pOnLocationProviderDisabled(PEnv,this,TObject(pasobj),provider);
+end;
+
+{ Class:     com_example_appdemo1_Controls
+  Method:    pAppOnViewClick
+  Signature: (Landroid/view/View;I)V }
+procedure pAppOnViewClick(PEnv: PJNIEnv; this: JObject; view: JObject; id: JInt); cdecl;
+begin
+  Java_Event_pAppOnViewClick(PEnv,this,view,id);
+end;
+
+{ Class:     com_example_appdemo1_Controls
+  Method:    pAppOnListItemClick
+  Signature: (Landroid/widget/AdapterView;Landroid/view/View;II)V }
+procedure pAppOnListItemClick(PEnv: PJNIEnv; this: JObject; adapter: JObject; view: JObject; position: JInt; id: JInt); cdecl;
+begin
+  Java_Event_pAppOnListItemClick(PEnv,this,adapter,view,position,id);
+end;
+
+const NativeMethods:array[0..48] of JNINativeMethod = (
    (name:'pAppOnScreenStyle';
     signature:'()I';
     fnPtr:@pAppOnScreenStyle;),
@@ -314,9 +475,6 @@ const NativeMethods:array[0..28] of JNINativeMethod = (
    (name:'pOnClose';
     signature:'(J)V';
     fnPtr:@pOnClose;),
-   (name:'pOnActive';
-    signature:'(J)V';
-    fnPtr:@pOnActive;),
    (name:'pOnWebViewStatus';
     signature:'(JILjava/lang/String;)I';
     fnPtr:@pOnWebViewStatus;),
@@ -325,7 +483,70 @@ const NativeMethods:array[0..28] of JNINativeMethod = (
     fnPtr:@pOnAsyncEvent;),
    (name:'pOnClickWidgetItem';
     signature:'(JIZ)V';
-    fnPtr:@pOnClickWidgetItem;)
+    fnPtr:@pOnClickWidgetItem;),
+   (name:'pOnClickCaptionItem';
+    signature:'(JILjava/lang/String;)V';
+    fnPtr:@pOnClickCaptionItem;),
+   (name:'pOnBluetoothEnabled';
+    signature:'(J)V';
+    fnPtr:@pOnBluetoothEnabled;),
+   (name:'pOnBluetoothDisabled';
+    signature:'(J)V';
+    fnPtr:@pOnBluetoothDisabled;),
+   (name:'pOnBluetoothDeviceFound';
+    signature:'(JLjava/lang/String;Ljava/lang/String;)V';
+    fnPtr:@pOnBluetoothDeviceFound;),
+   (name:'pOnBluetoothDiscoveryStarted';
+    signature:'(J)V';
+    fnPtr:@pOnBluetoothDiscoveryStarted;),
+   (name:'pOnBluetoothDiscoveryFinished';
+    signature:'(JII)V';
+    fnPtr:@pOnBluetoothDiscoveryFinished;),
+   (name:'pOnBluetoothDeviceBondStateChanged';
+    signature:'(JILjava/lang/String;Ljava/lang/String;)V';
+    fnPtr:@pOnBluetoothDeviceBondStateChanged;),
+   (name:'pOnBluetoothClientSocketConnected';
+    signature:'(JLjava/lang/String;Ljava/lang/String;)V';
+    fnPtr:@pOnBluetoothClientSocketConnected;),
+   (name:'pOnBluetoothClientSocketIncomingMessage';
+    signature:'(JLjava/lang/String;)V';
+    fnPtr:@pOnBluetoothClientSocketIncomingMessage;),
+   (name:'pOnBluetoothClientSocketWritingMessage';
+    signature:'(J)V';
+    fnPtr:@pOnBluetoothClientSocketWritingMessage;),
+   (name:'pOnBluetoothServerSocketConnected';
+    signature:'(JLjava/lang/String;Ljava/lang/String;)V';
+    fnPtr:@pOnBluetoothServerSocketConnected;),
+   (name:'pOnBluetoothServerSocketIncomingMessage';
+    signature:'(JLjava/lang/String;)V';
+    fnPtr:@pOnBluetoothServerSocketIncomingMessage;),
+   (name:'pOnBluetoothServerSocketWritingMessage';
+    signature:'(J)V';
+    fnPtr:@pOnBluetoothServerSocketWritingMessage;),
+   (name:'pOnBluetoothServerSocketListen';
+    signature:'(JLjava/lang/String;Ljava/lang/String;)V';
+    fnPtr:@pOnBluetoothServerSocketListen;),
+   (name:'pOnSpinnerItemSeleceted';
+    signature:'(JILjava/lang/String;)V';
+    fnPtr:@pOnSpinnerItemSeleceted;),
+   (name:'pOnLocationChanged';
+    signature:'(JDDDLjava/lang/String;)V';
+    fnPtr:@pOnLocationChanged;),
+   (name:'pOnLocationStatusChanged';
+    signature:'(JILjava/lang/String;Ljava/lang/String;)V';
+    fnPtr:@pOnLocationStatusChanged;),
+   (name:'pOnLocationProviderEnabled';
+    signature:'(JLjava/lang/String;)V';
+    fnPtr:@pOnLocationProviderEnabled;),
+   (name:'pOnLocationProviderDisabled';
+    signature:'(JLjava/lang/String;)V';
+    fnPtr:@pOnLocationProviderDisabled;),
+   (name:'pAppOnViewClick';
+    signature:'(Landroid/view/View;I)V';
+    fnPtr:@pAppOnViewClick;),
+   (name:'pAppOnListItemClick';
+    signature:'(Landroid/widget/AdapterView;Landroid/view/View;II)V';
+    fnPtr:@pAppOnListItemClick;)
 );
 
 function RegisterNativeMethodsArray(PEnv: PJNIEnv; className: PChar; methods: PJNINativeMethod; countMethods:integer):integer;
@@ -406,10 +627,30 @@ exports
   pOnTouch name 'Java_com_example_appdemo1_Controls_pOnTouch',
   pOnGLRenderer name 'Java_com_example_appdemo1_Controls_pOnGLRenderer',
   pOnClose name 'Java_com_example_appdemo1_Controls_pOnClose',
-  pOnActive name 'Java_com_example_appdemo1_Controls_pOnActive',
   pOnWebViewStatus name 'Java_com_example_appdemo1_Controls_pOnWebViewStatus',
   pOnAsyncEvent name 'Java_com_example_appdemo1_Controls_pOnAsyncEvent',
-  pOnClickWidgetItem name 'Java_com_example_appdemo1_Controls_pOnClickWidgetItem';
+  pOnClickWidgetItem name 'Java_com_example_appdemo1_Controls_pOnClickWidgetItem',
+  pOnClickCaptionItem name 'Java_com_example_appdemo1_Controls_pOnClickCaptionItem',
+  pOnBluetoothEnabled name 'Java_com_example_appdemo1_Controls_pOnBluetoothEnabled',
+  pOnBluetoothDisabled name 'Java_com_example_appdemo1_Controls_pOnBluetoothDisabled',
+  pOnBluetoothDeviceFound name 'Java_com_example_appdemo1_Controls_pOnBluetoothDeviceFound',
+  pOnBluetoothDiscoveryStarted name 'Java_com_example_appdemo1_Controls_pOnBluetoothDiscoveryStarted',
+  pOnBluetoothDiscoveryFinished name 'Java_com_example_appdemo1_Controls_pOnBluetoothDiscoveryFinished',
+  pOnBluetoothDeviceBondStateChanged name 'Java_com_example_appdemo1_Controls_pOnBluetoothDeviceBondStateChanged',
+  pOnBluetoothClientSocketConnected name 'Java_com_example_appdemo1_Controls_pOnBluetoothClientSocketConnected',
+  pOnBluetoothClientSocketIncomingMessage name 'Java_com_example_appdemo1_Controls_pOnBluetoothClientSocketIncomingMessage',
+  pOnBluetoothClientSocketWritingMessage name 'Java_com_example_appdemo1_Controls_pOnBluetoothClientSocketWritingMessage',
+  pOnBluetoothServerSocketConnected name 'Java_com_example_appdemo1_Controls_pOnBluetoothServerSocketConnected',
+  pOnBluetoothServerSocketIncomingMessage name 'Java_com_example_appdemo1_Controls_pOnBluetoothServerSocketIncomingMessage',
+  pOnBluetoothServerSocketWritingMessage name 'Java_com_example_appdemo1_Controls_pOnBluetoothServerSocketWritingMessage',
+  pOnBluetoothServerSocketListen name 'Java_com_example_appdemo1_Controls_pOnBluetoothServerSocketListen',
+  pOnSpinnerItemSeleceted name 'Java_com_example_appdemo1_Controls_pOnSpinnerItemSeleceted',
+  pOnLocationChanged name 'Java_com_example_appdemo1_Controls_pOnLocationChanged',
+  pOnLocationStatusChanged name 'Java_com_example_appdemo1_Controls_pOnLocationStatusChanged',
+  pOnLocationProviderEnabled name 'Java_com_example_appdemo1_Controls_pOnLocationProviderEnabled',
+  pOnLocationProviderDisabled name 'Java_com_example_appdemo1_Controls_pOnLocationProviderDisabled',
+  pAppOnViewClick name 'Java_com_example_appdemo1_Controls_pAppOnViewClick',
+  pAppOnListItemClick name 'Java_com_example_appdemo1_Controls_pAppOnListItemClick';
 
 begin
   gApp:= jApp.Create(nil);{Laz_And_Controls}

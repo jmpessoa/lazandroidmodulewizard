@@ -5,7 +5,7 @@ unit myhello;
 interface
 
 uses
-  Classes, SysUtils, And_jni, And_jni_Bridge, Laz_And_Controls;
+  Classes, SysUtils, And_jni, And_jni_Bridge, AndroidWidget;
 
 type
 
@@ -30,7 +30,7 @@ jMyHello = class(jControl)
  public
     constructor Create(AOwner: TComponent); override;
     destructor  Destroy; override;
-    procedure Init; override;
+    procedure Init(refApp: jApp); override;
     function jCreate( _flag: integer; _hello: string): jObject;
     procedure jFree();
     function GetStringArray(): TDynArrayOfString;
@@ -89,10 +89,10 @@ begin
   inherited Destroy;
 end;
 
-procedure jMyHello.Init;
+procedure jMyHello.Init(refApp: jApp);
 begin
   if FInitialized  then Exit;
-  inherited Init;
+  inherited Init(refApp);
   //your code here: set/initialize create params....
   if  Fhello = '' then Fhello:= 'Hello Android World!';
   FjObject:= jCreate(Fflag ,Fhello);

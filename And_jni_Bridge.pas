@@ -30,7 +30,7 @@ unit And_jni_Bridge;
 interface
 
 uses
-  ctypes, SysUtils,Classes, And_jni;
+  SysUtils,Classes, And_jni;
 
   //{$linklib jnigraphics}   {commented by jmpessoa}
 
@@ -134,6 +134,10 @@ Procedure jApp_Finish                  (env:PJNIEnv;this:jobject);
 
 //by jmpessoa
 Procedure jApp_Finish2                  (env:PJNIEnv;this:jobject);
+function  jApp_GetContext               (env:PJNIEnv;this:jobject): jObject;
+
+function  jForm_GetOnViewClickListener        (env:PJNIEnv; this:jobject; Form: jObject): jObject;
+function  jForm_GetOnListItemClickListener    (env:PJNIEnv; this:jobject; Form: jObject): jObject;
 
 Procedure jApp_KillProcess             (env:PJNIEnv;this:jobject);
 Procedure jApp_ScreenStyle             (env:PJNIEnv;this:jobject; screenstyle : integer);
@@ -166,6 +170,8 @@ Function  jForm_GetLayout              (env:PJNIEnv;this:jobject; Form    : jObj
 //by jmpessoa
 Function  jForm_GetLayout2              (env:PJNIEnv;this:jobject; Form    : jObject) : jObject;
 
+Function jForm_GetClickListener(env:PJNIEnv; this:jobject; Form: jObject): jObject;
+
 //by jmpessoa
 Procedure jForm_FreeLayout              (env:PJNIEnv;this:jobject; Layout    : jObject);
 
@@ -182,6 +188,10 @@ Procedure jForm_SetEnabled2             (env:PJNIEnv;this:jobject; Form    : jOb
 //by jmpessoa
 procedure jForm_ShowMessage(env:PJNIEnv; this:jobject; Form:jObject; msg: string);
 function jForm_GetDateTime(env:PJNIEnv; this:jobject; Form:jObject): string;
+
+procedure jForm_SetWifiEnabled(env: PJNIEnv; this: JObject; _jform: JObject; _status: boolean);
+function jForm_IsWifiEnabled(env: PJNIEnv; this: JObject; _jform: JObject): boolean;
+
 
 // System Info
 Function  jSysInfo_ScreenWH            (env:PJNIEnv;this:jobject;context : jObject) : TWH;
@@ -843,6 +853,9 @@ Procedure jListView_addLParamsParentRule(env:PJNIEnv;this:jobject; ListView : jO
 Procedure jListView_addLParamsAnchorRule(env:PJNIEnv;this:jobject; ListView : jObject; rule: DWord);
 Procedure jListView_setLayoutAll(env:PJNIEnv;this:jobject; ListView : jObject;  idAnchor: DWord);
 Procedure jListView_setLayoutAll2(env:PJNIEnv;this:jobject; ListView : jObject;  idAnchor: DWord);
+procedure jListView_SetHighLightSelectedItem(env: PJNIEnv; this: JObject; _jlistview: JObject; _value: boolean);
+procedure jListView_SetHighLightSelectedItemColor(env: PJNIEnv; this: JObject; _jlistview: JObject; _color: integer);
+
 
 // ScrollView
 Function  jScrollView_Create           (env:PJNIEnv;this:jobject;
@@ -1153,6 +1166,10 @@ Procedure jBitmap_getWH                (env:PJNIEnv;this:jobject;
 //by jmpessoa
 Procedure jBitmap_getWH2                (env:PJNIEnv;this:jobject;
                                         jbitmap : jObject; var w,h : integer);
+
+function jBitmap_GetWidth(env: PJNIEnv; this: JObject; _jbitmap: JObject): integer;
+function jBitmap_GetHeight(env: PJNIEnv; this: JObject; _jbitmap: JObject): integer;
+
 
 Function  jBitmap_jInstance(env:PJNIEnv;this:jobject;
                                         jbitmap : jObject) : jObject;
@@ -1556,7 +1573,6 @@ begin
   Result:= gjClass;
 end;
 
-
 Procedure jClassMethod(FuncName, FuncSig : PChar;
                        env : PJNIEnv; var Class_ : jClass; var Method_ :jMethodID);
 var
@@ -1576,6 +1592,8 @@ begin
     Method_:= env^.GetMethodID( env, Class_ , FuncName, FuncSig);
   end;
 end;
+
+//----------------------------------------------------------------
 
 // LORDMAN - 2013-07-28
 Function jStr_getLength (env:PJNIEnv; this:jobject; Str : String): Integer;
@@ -1737,6 +1755,38 @@ begin
   cls := env^.GetObjectClass(env, this);
   method:= env^.GetMethodID(env, cls, 'appFinish', '()V');
   env^.CallVoidMethod(env, this, method);
+end;
+
+function  jApp_GetContext(env:PJNIEnv;this:jobject): jObject;
+var
+  cls: jClass;
+  method: jmethodID;
+begin
+  cls := env^.GetObjectClass(env, this);
+  method:= env^.GetMethodID(env, cls, 'GetContext', '()Landroid/content/Context;');
+  Result:= env^.CallObjectMethod(env, this, method);
+end;
+
+function  jForm_GetOnViewClickListener(env:PJNIEnv; this:jobject; Form: jObject): jObject;
+var
+  cls: jClass;
+  method: jmethodID;
+begin
+  cls := env^.GetObjectClass(env, Form);
+  method:= env^.GetMethodID(env, cls, 'GetOnViewClickListener', '()Landroid/view/View$OnClickListener;');
+  Result:= env^.CallObjectMethod(env, Form, method);
+  //Result := env^.NewGlobalRef(env,Result);
+end;
+
+function  jForm_GetOnListItemClickListener(env:PJNIEnv; this:jobject; Form: jObject): jObject;
+var
+  cls: jClass;
+  method: jmethodID;
+begin
+  cls := env^.GetObjectClass(env, Form);
+  method:= env^.GetMethodID(env, cls, 'GetOnListItemClickListener', '()Landroid/widget/AdapterView$OnItemClickListener;');
+  Result:= env^.CallObjectMethod(env, Form, method);
+  //Result := env^.NewGlobalRef(env,Result);
 end;
 
 Procedure jApp_KillProcess(env:PJNIEnv;this:jobject);
@@ -1978,7 +2028,7 @@ begin
 end;
 
 //by jmpessoa
-Procedure jForm_Free2(env:PJNIEnv;this:jobject; Form    : jObject);
+Procedure jForm_Free2(env:PJNIEnv; this:jobject; Form: jObject);
 var
   cls: jClass;
   method: jmethodID;
@@ -2065,6 +2115,18 @@ begin
     method:= env^.GetMethodID(env, cls, 'GetLayout', '()Landroid/widget/RelativeLayout;');
     Result:= env^.CallObjectMethod(env, Form, method);
     Result := env^.NewGlobalRef(env,Result);   //<---- need here for ap1 > 13 - by jmpessoa
+end;
+
+
+//by jmpessoa
+Function jForm_GetClickListener(env:PJNIEnv; this:jobject; Form: jObject): jObject;
+var
+   cls: jClass;
+   method: jmethodID;
+begin
+    cls := env^.GetObjectClass(env, Form);
+    method:= env^.GetMethodID(env, cls, 'GetClikListener', '()Landroid/view/View$OnClickListener;');
+    Result:= env^.CallObjectMethod(env, Form, method);
 end;
 
 //by jmpessoa
@@ -2160,6 +2222,31 @@ begin
            Result    := string( env^.GetStringUTFChars(env,_jString,@_jBoolean) );
           end;
   end;
+end;
+
+procedure jForm_SetWifiEnabled(env: PJNIEnv; this: JObject; _jform: JObject; _status: boolean);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].z:= JBool(_status);
+  jCls:= env^.GetObjectClass(env, _jform);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetWifiEnabled', '(Z)V');
+  env^.CallVoidMethodA(env, _jform, jMethod, @jParams);
+end;
+
+
+function jForm_IsWifiEnabled(env: PJNIEnv; this: JObject; _jform: JObject): boolean;
+var
+  jBoo: JBoolean;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jform);
+  jMethod:= env^.GetMethodID(env, jCls, 'IsWifiEnabled', '()Z');
+  jBoo:= env^.CallBooleanMethod(env, _jform, jMethod);
+  Result:= boolean(jBoo);
 end;
 
 //------------------------------------------------------------------------------
@@ -3178,7 +3265,6 @@ Const
 Var
  _jMethod : jMethodID = nil;
  _jParams : array[0..1] of jValue;
-  cls: jClass;
 begin
  jClassMethod(_cFuncName,_cFuncSig,env,gjClass,_jMethod);
  _jParams[0].l := EditText;
@@ -6346,6 +6432,7 @@ begin
   env^.CallVoidMethodA(env,this,_jMethod,@_jParams);
   env^.DeleteLocalRef(env,_jParams[1].l);
   env^.DeleteLocalRef(env,_jParams[2].l);
+
 end;
 
 //by jmpessoa
@@ -6357,11 +6444,12 @@ var
 begin
   _jParams[0].l := env^.NewStringUTF(env, pchar(Str) );
   _jParams[1].l := env^.NewStringUTF(env, pchar(delimiter) );
-  cls := env^.GetObjectClass(env, ListView);
+  cls:= env^.GetObjectClass(env, ListView);
   _jMethod:= env^.GetMethodID(env, cls, 'add2', '(Ljava/lang/String;Ljava/lang/String;)V');
   env^.CallVoidMethodA(env,ListView,_jMethod,@_jParams);
   env^.DeleteLocalRef(env,_jParams[0].l);
   env^.DeleteLocalRef(env,_jParams[1].l);
+  env^.DeleteLocalRef(env, cls);  // <---- Added this for bug fix! 09-Sept-2014 [thanks to @Fatih!]
 end;
 
 Procedure jListView_add22(env:PJNIEnv;this:jobject; ListView: jObject; Str: string; delimiter: string; image: jObject);
@@ -6378,6 +6466,7 @@ begin
   env^.CallVoidMethodA(env,ListView,_jMethod,@_jParams);
   env^.DeleteLocalRef(env,_jParams[0].l);
   env^.DeleteLocalRef(env,_jParams[1].l);
+  env^.DeleteLocalRef(env, cls);  // <---- Added this for bug fix! 09-Sept-2014
 end;
 
 //by jmpessoa
@@ -6401,6 +6490,7 @@ begin
   env^.DeleteLocalRef(env,_jParams[0].l);
   env^.DeleteLocalRef(env,_jParams[1].l);
   env^.DeleteLocalRef(env,_jParams[5].l);
+  env^.DeleteLocalRef(env, cls);  // <---- Added this for bug fix! 09-Sept-2014
 end;
 
 
@@ -6424,6 +6514,7 @@ begin
   env^.DeleteLocalRef(env,_jParams[0].l);
   env^.DeleteLocalRef(env,_jParams[1].l);
   env^.DeleteLocalRef(env,_jParams[5].l);
+  env^.DeleteLocalRef(env, cls);  // <---- Added this for bug fix! 09-Sept-2014
 end;
 
 Procedure jListView_clear              (env:PJNIEnv;this:jobject;
@@ -6831,6 +6922,31 @@ begin
  cls := env^.GetObjectClass(env, ListView);
 _jMethod:= env^.GetMethodID(env, cls, 'setLayoutAll', '(I)V');
  env^.CallVoidMethodA(env,ListView,_jMethod,@_jParams);
+end;
+
+procedure jListView_SetHighLightSelectedItem(env: PJNIEnv; this: JObject; _jlistview: JObject; _value: boolean);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].z:= JBool(_value);
+  jCls:= env^.GetObjectClass(env, _jlistview);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetHighLightSelectedItem', '(Z)V');
+  env^.CallVoidMethodA(env, _jlistview, jMethod, @jParams);
+end;
+
+
+procedure jListView_SetHighLightSelectedItemColor(env: PJNIEnv; this: JObject; _jlistview: JObject; _color: integer);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].i:= _color;
+  jCls:= env^.GetObjectClass(env, _jlistview);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetHighLightSelectedItemColor', '(I)V');
+  env^.CallVoidMethodA(env, _jlistview, jMethod, @jParams);
 end;
 
 //------------------------------------------------------------------------------
@@ -7478,7 +7594,6 @@ end;
 function jPanel_getLParamHeight2(env:PJNIEnv;this:jobject; Panel : jObject ): integer;
 var
  _jMethod : jMethodID = nil;
- _jParams : jValue;
  cls : jClass;
 begin
  cls := env^.GetObjectClass(env, Panel);
@@ -9112,6 +9227,27 @@ begin
  jClassMethod(_cFuncName,_cFuncSig,env,gjClass,_jMethod);
  _jParam.l := jbitmap;
  Result := env^.CallObjectMethodA(env,this,_jMethod,@_jParam);
+end;
+//by jmpessoa
+function jBitmap_GetWidth(env: PJNIEnv; this: JObject; _jbitmap: JObject): integer;
+var
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jbitmap);
+  jMethod:= env^.GetMethodID(env, jCls, 'GetWidth', '()I');
+  Result:= env^.CallIntMethod(env, _jbitmap, jMethod);
+end;
+
+//by jmpessoa
+function jBitmap_GetHeight(env: PJNIEnv; this: JObject; _jbitmap: JObject): integer;
+var
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jbitmap);
+  jMethod:= env^.GetMethodID(env, jCls, 'GetHeight', '()I');
+  Result:= env^.CallIntMethod(env, _jbitmap, jMethod);
 end;
 
 //by jmpessoa
@@ -10967,8 +11103,6 @@ var
  _jMethod : jMethodID = nil;
  cls: jClass;
  _jParam: array[0..0] of jValue;
-  _jString  : jString;
- _jBoolean : jBoolean;
 begin
   _jParam[0].i := columnIndex;
   cls := env^.GetObjectClass(env, SqliteCursor);
@@ -10981,8 +11115,6 @@ var
  _jMethod : jMethodID = nil;
  cls: jClass;
  _jParam: array[0..0] of jValue;
-  _jString  : jString;
- _jBoolean : jBoolean;
 begin
   _jParam[0].i := columnIndex;
   cls := env^.GetObjectClass(env, SqliteCursor);
@@ -10995,8 +11127,6 @@ var
  _jMethod : jMethodID = nil;
  cls: jClass;
  _jParam: array[0..0] of jValue;
-  _jString  : jString;
- _jBoolean : jBoolean;
 begin
   _jParam[0].i := columnIndex;
   cls := env^.GetObjectClass(env, SqliteCursor);
@@ -11009,8 +11139,6 @@ var
  _jMethod : jMethodID = nil;
  cls: jClass;
  _jParam: array[0..0] of jValue;
-  _jString  : jString;
- _jBoolean : jBoolean;
 begin
   _jParam[0].i := columnIndex;
   cls := env^.GetObjectClass(env, SqliteCursor);

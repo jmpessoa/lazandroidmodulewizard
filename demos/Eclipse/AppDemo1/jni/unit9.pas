@@ -6,7 +6,7 @@ unit unit9;
 interface
   
 uses
-  Classes, SysUtils, And_jni, And_jni_Bridge, Laz_And_Controls, And_bitmap_h;
+  Classes, SysUtils, And_jni, And_jni_Bridge, Laz_And_Controls, And_bitmap_h, Laz_And_Controls_Events, AndroidWidget;
   
 type
 
@@ -69,12 +69,12 @@ end;
 
 procedure TAndroidModule9.DataModuleCreate(Sender: TObject);
 begin  //this initialization code is needed here to fix Laz4Andoid  *.lfm parse.... why parse fails?
-  Self.ActivityMode:= actRecyclable;
+ (* Self.ActivityMode:= actRecyclable;
   Self.BackgroundColor:= colbrBlack;
    //mode delphi
   Self.OnJNIPrompt:= DataModuleJNIPrompt;
   Self.OnRotate:= DataModuleRotate;
-  Self.OnCloseQuery:= DataModuleCloseQuery;
+  Self.OnCloseQuery:= DataModuleCloseQuery;    *)
 end;
 
 procedure TAndroidModule9.DataModuleJNIPrompt(Sender: TObject);
@@ -82,7 +82,7 @@ begin
   P.X:= 30;
   P.Y:= 30;
   SwapCanMode:= 0;
-  Self.Show;
+  //Self.Show;
   Ratio:= jBitmap1.GetRatio;
 end;
 

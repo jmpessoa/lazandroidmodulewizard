@@ -5,7 +5,7 @@ unit textfilemanager;
 interface
 
 uses
-  Classes, SysUtils, And_jni, And_jni_Bridge, Laz_And_Controls;
+  Classes, SysUtils, And_jni, And_jni_Bridge, AndroidWidget;
 
 type
 
@@ -23,7 +23,7 @@ jTextFileManager = class(jControl)
  public
     constructor Create(AOwner: TComponent); override;
     destructor  Destroy; override;
-    procedure Init; override;
+    procedure Init(refApp: jApp); override;
     function jCreate(): jObject;
     procedure jFree();
     procedure SaveToFile(_txtContent: string; _filename: string);
@@ -79,10 +79,10 @@ begin
   inherited Destroy;
 end;
 
-procedure jTextFileManager.Init;
+procedure jTextFileManager.Init(refApp: jApp);
 begin
   if FInitialized  then Exit;
-  inherited Init;
+  inherited Init(refApp);
   //your code here: set/initialize create params....
   FjObject:= jCreate();
   FInitialized:= True;

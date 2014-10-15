@@ -5,7 +5,7 @@ unit Laz_And_Controls_Events;
 interface
 
 uses
-   Classes, SysUtils, And_jni, And_jni_Bridge, Laz_And_Controls, bluetooth, bluetoothclientsocket,
+   Classes, SysUtils, And_jni, And_jni_Bridge, Laz_And_Controls, AndroidWidget, bluetooth, bluetoothclientsocket,
    bluetoothserversocket, spinner, location;
 
    procedure Java_Event_pOnBluetoothEnabled(env: PJNIEnv; this: jobject; Obj: TObject);

@@ -1,0 +1,3 @@
+<Libraries Value="C:\adt32\ndk9\platforms\android-14\arch-x86\usr\lib;"/>
+<TargetCPU Value="i386"/>
+<CustomOptions Value="-dANDROID -Xd -FLC:\adt32\ndk9\platforms\android-14\arch-x86\usr\lib\libdl.so -FUC:\adt32\eclipse\workspace\AppTest2\obj\Controls -oC:\adt32\eclipse\workspace\AppTest2\libs\x86\libcontrols.so"/>
