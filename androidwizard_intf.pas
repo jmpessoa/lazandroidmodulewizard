@@ -914,6 +914,10 @@ var
   projName: string;
   strList: TStringList;
   i: integer;
+  linuxDirSeparator: string;
+  linuxPathToJavaJDK: string;
+  linuxAndroidProjectName: string;
+  tempStr: string;
 begin
   Result:= False;
   frm:= TFormWorkspace.Create(nil);
@@ -960,12 +964,12 @@ begin
     strList.DelimitedText:= TrimChar(FAndroidProjectName, DirectorySeparator);
     projName:= strList.Strings[strList.Count-1]; //'AppTest1';
 
+    //if eclipse project = just dummy!
+    FAntPackageName:= frm.AntPackageName;
+
     if  FProjectModel = 'Ant' then
     begin
       FAntPackageName:= frm.AntPackageName;   //ex. just org.lazarus
-
-
-
       strList.Clear;
       strList.StrictDelimiter:= True;
       strList.Delimiter:= '.';
@@ -1193,8 +1197,6 @@ begin
     strList.Add('cd '+FAndroidProjectName+DirectorySeparator+'bin');
     strList.Add(FPathToAndroidSDK+DirectorySeparator+'platform-tools'+
                DirectorySeparator+'adb uninstall '+FAntPackageName+'.'+LowerCase(projName));
-    strList.Add('cd ..');
-    strList.Add('pause');
     strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'uninstall.bat');
 
     strList.Clear;
@@ -1285,10 +1287,54 @@ begin
     strList.Add(' ');
     strList.Add('11.Warning: After a new [Lazarus IDE]-> "run->build" do not forget to run again: "build.bat" and "install.bat" !');
     strList.Add(' ');
+    strList.Add('12. Linux users: use "build.sh" , "install.sh" , "uninstall.sh" and "logcat.sh" [thanks to Stephano!]');
+     strList.Add(' ');
     strList.Add('....  Thank you!');
     strList.Add(' ');
     strList.Add('....  by jmpessoa_hotmail_com');
     strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'readme.txt');
+
+
+    linuxDirSeparator:=  DirectorySeparator;    //  C:\adt32\eclipse\workspace\AppTest1
+    linuxPathToJavaJDK:=  FPathToJavaJDK;       //  C:\adt32\sdk
+    linuxAndroidProjectName:= FAndroidProjectName;
+    {$IFDEF WINDOWS}
+       linuxDirSeparator:= '/';
+       tempStr:= FPathToJavaJDK;
+       SplitStr(tempStr, ':');
+       linuxPathToJavaJDK:= ReplaceChar (tempStr, '\', '/');
+
+       tempStr:= FAndroidProjectName;
+       SplitStr(tempStr, ':');
+       linuxAndroidProjectName:= ReplaceChar (tempStr, '\', '/');
+    {$ENDIF}
+    //linux build Apk using "Ant"
+    strList.Clear;
+    strList.Add('export JAVA_HOME='+linuxPathToJavaJDK);
+    strList.Add('cd '+linuxAndroidProjectName);
+    strList.Add('ant debug');
+    strList.SaveToFile(linuxAndroidProjectName+linuxDirSeparator+'build.sh');
+
+    //linux install
+    strList.Clear;
+    strList.Add('~'+linuxPathToJavaJDK+linuxDirSeparator+'platform-tools'+
+               linuxDirSeparator+'adb install -r bin'+linuxDirSeparator+projName+'-'+FAntBuildMode+'.apk');
+    strList.SaveToFile(linuxAndroidProjectName+linuxDirSeparator+'install.sh');
+
+    //linux uninstall
+    strList.Clear;
+    strList.Add('~'+linuxPathToJavaJDK+linuxDirSeparator+'platform-tools'+
+               linuxDirSeparator+'adb uninstall '+FAntPackageName+'.'+LowerCase(projName));
+    strList.SaveToFile(linuxAndroidProjectName+linuxDirSeparator+'uninstall.sh');
+
+    //linux logcat
+    strList.Clear;
+    strList.Add('~'+linuxPathToJavaJDK+linuxDirSeparator+'platform-tools'+
+               linuxDirSeparator+'adb logcat');
+    strList.SaveToFile(linuxAndroidProjectName+linuxDirSeparator+'logcat.sh');
+
+
+
     strList.Free;
     Result := True;
   end;

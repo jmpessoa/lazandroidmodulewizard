@@ -264,6 +264,8 @@ III. [No GUI Project Support] - just a basic android ".so" -
 
 
    3.1. Please, read the "readme.txt" in your project folder to learn how to buidl Android Application [Apk]
+	::build.* , intall.* , unistall.*, logcat.*  
+        ::warning: if needed change this files according to your system! 
                       	
 
 IV. How to use the Demos:
@@ -294,6 +296,9 @@ IV. How to use the Demos:
 		[C:\adt32\ndk7]
 
 		according to your system ..
+
+	4. Change/edit build.* , intall.* , unistall.*, logcat.*  according to your system!
+	
 
 
 V. Yes! Lazarus/Free Pascal does RAD on Android!

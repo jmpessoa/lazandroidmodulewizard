@@ -1537,8 +1537,8 @@ begin
       ListManifest.Text:= strAfterReplace;
       ListManifest.SaveToFile(FAndroidProjectName+DirectorySeparator+'AndroidManifest.xml');
       ListManifest.Free;
-
     end;
+
   end;
 end;
 

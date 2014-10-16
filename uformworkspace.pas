@@ -108,7 +108,6 @@ type
     FAndroidPlatform: string;
   public
     { public declarations }
-    procedure GetSubDirectories(const directory : string; list : TStrings) ;
     procedure LoadSettings(const pFilename: string);
     procedure SaveSettings(const pFilename: string);
     function GetTextByListIndex(index:integer): string;
@@ -140,7 +139,9 @@ type
     property AndroidPlatform: string read FAndroidPlatform write FAndroidPlatform;
   end;
 
+  procedure GetSubDirectories(const directory : string; list : TStrings);
   function ReplaceChar(query: string; oldchar, newchar: char):string;
+  function TrimChar(query: string; delimiter: char): string;
 
 var
    FormWorkspace: TFormWorkspace;
@@ -306,6 +307,10 @@ begin
 end;
 
 procedure TFormWorkspace.FormClose(Sender: TObject; var CloseAction: TCloseAction);
+var
+   strList: TStringList;
+   count, i, j: integer;
+   path, savePath: string;
 begin
   if ModalResult = mrCancel  then Exit;
 
@@ -331,6 +336,38 @@ begin
   FPathToWorkspace:= Edit1.Text;
   FAndroidProjectName:= Trim(ComboBox1.Text);
   FAndroidPlatform:= GetNDKPlatform(ComboBox2.Text);
+
+  if FProjectModel <> 'Ant' then
+  begin
+      strList:= TStringList.Create;
+      path:= FAndroidProjectName+DirectorySeparator+'src';
+      GetSubDirectories(path, strList);
+      count:= strList.Count;
+      while count > 0 do
+      begin
+         path:= strList.Strings[0];
+         strList.Clear;
+         GetSubDirectories(path, strList);
+         count:= strList.Count;
+      end;
+      strList.Clear;
+      strList.Delimiter:= DirectorySeparator;
+      strList.DelimitedText:= path;
+      i:= 0;
+      path:=strList.Strings[i];
+      while path <> 'src' do
+      begin
+         i:= i+1;
+         path:= strList.Strings[i];
+      end;
+      path:='';
+      for j:= (i+1) to strList.Count-2 do
+      begin
+         path:= path + '.' + strList.Strings[j];
+      end;
+      FAntPackageName:= TrimChar(path, '.');
+      strList.Free;
+  end;
 
   if RadioGroup3.ItemIndex = 1 then  //Ant Project
   begin
@@ -527,25 +564,6 @@ begin
   end;
 end;
 
-//http://delphi.about.com/od/delphitips2008/qt/subdirectories.htm
-//fils the "list" TStrings with the subdirectories of the "directory" directory
-procedure TFormWorkspace.GetSubDirectories(const directory : string; list : TStrings) ;
-var
-   sr : TSearchRec;
-begin
-   try
-     if FindFirst(IncludeTrailingPathDelimiter(directory) + '*.*', faDirectory, sr) < 0 then
-       Exit
-     else
-     repeat
-       if ((sr.Attr and faDirectory <> 0) and (sr.Name <> '.') and (sr.Name <> '..')) then
-         List.Add(IncludeTrailingPathDelimiter(directory) + sr.Name) ;
-     until FindNext(sr) <> 0;
-   finally
-     SysUtils.FindClose(sr) ;
-   end;
-end;
-
 procedure TFormWorkspace.LoadSettings(const pFilename: string);
 var
   i1, i2, i3, i5, j1, j2, j3: integer;
@@ -699,6 +717,47 @@ begin
      while Pos(oldchar,query) > 0 do query[pos(oldchar,query)]:= newchar;
      Result:= query;
   end;
+end;
+
+function TrimChar(query: string; delimiter: char): string;
+var
+  auxStr: string;
+  count: integer;
+  newchar: char;
+begin
+  newchar:=' ';
+  if query <> '' then
+  begin
+      auxStr:= Trim(query);
+      count:= Length(auxStr);
+      if count >= 2 then
+      begin
+         if auxStr[1] = delimiter then  auxStr[1] := newchar;
+         if auxStr[count] = delimiter then  auxStr[count] := newchar;
+      end;
+      Result:= Trim(auxStr);
+  end;
+end;
+
+//http://delphi.about.com/od/delphitips2008/qt/subdirectories.htm
+//fils the "list" TStrings with the subdirectories of the "directory" directory
+//Warning: if not  subdirectories was found return empty list [list.count = 0]!
+procedure GetSubDirectories(const directory : string; list : TStrings);
+var
+   sr : TSearchRec;
+begin
+   try
+     if FindFirst(IncludeTrailingPathDelimiter(directory) + '*.*', faDirectory, sr) < 0 then Exit
+     else
+     repeat
+       if ((sr.Attr and faDirectory <> 0) and (sr.Name <> '.') and (sr.Name <> '..')) then
+       begin
+           List.Add(IncludeTrailingPathDelimiter(directory) + sr.Name);
+       end;
+     until FindNext(sr) <> 0;
+   finally
+     SysUtils.FindClose(sr) ;
+   end;
 end;
 
 end.
