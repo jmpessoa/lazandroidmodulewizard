@@ -80,7 +80,8 @@ Version 0.6 - 15 October 2014 -
 						[--->> A suggestion and request by Stephano]
                     
 		-->> All Apps Demos [Eclipse projects] was adjusted/updated !  
-		-->> All project now support Ant "build.bat" [just windows, sorry]	
+		-->> All project now support Ant "build.*" "intall.*" etc..
+			:warning: if needed change this files according to your system! 	
 
 	3. Guide line for "Old" Projects [Collateral Effects]
 
