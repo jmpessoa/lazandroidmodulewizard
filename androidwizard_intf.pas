@@ -1205,7 +1205,7 @@ begin
                DirectorySeparator+'adb logcat');
     strList.Add('cd ..');
     strList.Add('pause');
-    strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'utils'+DirectorySeparator+'logcat.bat');
+    strList.SaveToFile(FAndroidProjectName+DirectorySeparator+{'utils'+}DirectorySeparator+'logcat.bat');
 
     strList.Clear;
     strList.Add('cd '+FAndroidProjectName+DirectorySeparator+'bin');
@@ -1257,7 +1257,7 @@ begin
     strList.Add(' ');
     strList.Add('1. Double click "build.bat" to build Apk');
     strList.Add(' ');
-    strList.Add('2. If Android Virtual Device[AVD]/Emulator is running then:');
+    strList.Add('2. If Android Virtual Device[AVD]/Emulator [or real device] is running then:');
     strList.Add('   2.1 double click "install.bat" to install the Apk on the Emulator');
     strList.Add('   2.2 look for the App "'+projName+'" in the Emulator and click it!');
     strList.Add(' ');
@@ -1284,9 +1284,12 @@ begin
     strList.Add('9. Hint 1: you can edit "*.bat" to extend/modify some command or to fix some incorrect info/path!');
     strList.Add(' ');
     strList.Add('10.Hint 2: you can edit "build.xml" to set another Android target ex. "android-18" or "android-19" etc.');
+    strList.Add('   Yes, if after run  "build.*" the folder "...\bin" is still empty then try another target!' );
     strList.Add(' ');
     strList.Add('11.Warning: After a new [Lazarus IDE]-> "run->build" do not forget to run again: "build.bat" and "install.bat" !');
     strList.Add(' ');
+    strList.Add('12. Linux users: use "build.sh" , "install.sh" , "uninstall.sh" and "logcat.sh" [thanks to Stephano!]');
+    strList.Add('    WARNING: All demos Apps was generate on windows system! So, please,  edit the *.sh to correct one!');
     strList.Add('12. Linux users: use "build.sh" , "install.sh" , "uninstall.sh" and "logcat.sh" [thanks to Stephano!]');
      strList.Add(' ');
     strList.Add('....  Thank you!');

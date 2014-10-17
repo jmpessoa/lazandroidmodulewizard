@@ -79,6 +79,7 @@ Version 0.6 - 15 October 2014 -
 						model "laz_and_jni_controls.pas" [not java wrapper at all!] 
 						[--->> A suggestion and request by Stephano]
                     
+		-->> AppAntDemo1 [Ant project] was adjusted/updated !  
 		-->> All Apps Demos [Eclipse projects] was adjusted/updated !  
 		-->> All project now support Ant "build.*" "intall.*" etc..
 			:warning: if needed change this files according to your system! 	

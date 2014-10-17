@@ -10,7 +10,16 @@ uses
     Laz_And_Controls_Events, AndroidWidget;
   
 type
+
+  { TAndroidModule1 }
+
   TAndroidModule1 = class(jForm)
+      jButton1: jButton;
+      jEditText1: jEditText;
+      jTextView1: jTextView;
+      jTextView2: jTextView;
+      procedure AndroidModule1Click(Sender: TObject);
+      procedure jButton1Click(Sender: TObject);
     private
       {private declarations}
     public
@@ -23,5 +32,17 @@ var
 implementation
   
 {$R *.lfm}
+
+{ TAndroidModule1 }
+
+procedure TAndroidModule1.jButton1Click(Sender: TObject);
+begin
+   ShowMessage(jEditText1.Text);
+end;
+
+procedure TAndroidModule1.AndroidModule1Click(Sender: TObject);
+begin
+     ShowMessage('Form Clicked!');
+end;
 
 end.
