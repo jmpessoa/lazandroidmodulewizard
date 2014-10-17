@@ -1413,7 +1413,7 @@ begin
 
 
   sourceList.Add('{hint: save all files to location: ' +FPathToJNIFolder+DirectorySeparator+'jni }');
-  sourceList.Add('library '+ LowerCase(FJavaClassName) +'; '+ ' [by LazAndroidWizard: '+DateTimeToStr(Now)+']');
+  sourceList.Add('library '+ LowerCase(FJavaClassName) +'; '+ ' //[by LazAndroidWizard: '+DateTimeToStr(Now)+']');
   sourceList.Add(' ');
   sourceList.Add('{$mode delphi}');
   sourceList.Add(' ');
