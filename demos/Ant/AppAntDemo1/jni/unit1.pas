@@ -6,7 +6,8 @@ unit unit1;
 interface
   
 uses
-  Classes, SysUtils, And_jni, And_jni_Bridge, Laz_And_Controls;
+  Classes, SysUtils, And_jni, And_jni_Bridge, Laz_And_Controls, 
+    Laz_And_Controls_Events, AndroidWidget;
   
 type
 
@@ -17,10 +18,7 @@ type
       jEditText1: jEditText;
       jTextView1: jTextView;
       jTextView2: jTextView;
-      procedure DataModuleCreate(Sender: TObject);
-      procedure DataModuleJNIPrompt(Sender: TObject);
-      procedure DataModuleRotate(Sender: TObject; rotate: integer;
-        var rstRotate: integer);
+      procedure AndroidModule1Click(Sender: TObject);
       procedure jButton1Click(Sender: TObject);
     private
       {private declarations}
@@ -39,23 +37,12 @@ implementation
 
 procedure TAndroidModule1.jButton1Click(Sender: TObject);
 begin
-  ShowMessage(UpperCase(jEditText1.Text));
+   ShowMessage(jEditText1.Text);
 end;
 
-procedure TAndroidModule1.DataModuleCreate(Sender: TObject);
-begin        //jus to fix *.lfm parse fail on Laz4Android cross compile... why fail ?
-  Self.OnJNIPrompt:= DataModuleJNIPrompt;
-end;
-
-procedure TAndroidModule1.DataModuleJNIPrompt(Sender: TObject);
+procedure TAndroidModule1.AndroidModule1Click(Sender: TObject);
 begin
-  Self.Show;
-end;
-
-procedure TAndroidModule1.DataModuleRotate(Sender: TObject; rotate: integer;
-  var rstRotate: integer);
-begin
-   Self.UpdateLayout;
+     ShowMessage('Form Clicked!');
 end;
 
 end.

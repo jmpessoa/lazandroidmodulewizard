@@ -1,8 +1,8 @@
-Tutorial: How to get your Android Application [Apk]:
+Tutorial: How to get your Android Application [Apk] using "Ant":
  
 1. Double click "build.bat" to build Apk
  
-2. If Android Virtual Device[AVD]/Emulator is running then:
+2. If Android Virtual Device[AVD]/Emulator [or real device] is running then:
    2.1 double click "install.bat" to install the Apk on the Emulator
    2.2 look for the App "AppAntDemo1" in the Emulator and click it!
  
@@ -29,8 +29,13 @@ Tutorial: How to get your Android Application [Apk]:
 9. Hint 1: you can edit "*.bat" to extend/modify some command or to fix some incorrect info/path!
  
 10.Hint 2: you can edit "build.xml" to set another Android target ex. "android-18" or "android-19" etc.
+   Yes, if after run  "build.*" the folder "...\bin" is still empty then try another target!
  
 11.Warning: After a new [Lazarus IDE]-> "run->build" do not forget to run again: "build.bat" and "install.bat" !
+ 
+12. Linux users: use "build.sh" , "install.sh" , "uninstall.sh" and "logcat.sh" [thanks to Stephano!]
+    WARNING: All demos Apps was generate on windows system! So, please,  edit the *.sh to correct one!
+12. Linux users: use "build.sh" , "install.sh" , "uninstall.sh" and "logcat.sh" [thanks to Stephano!]
  
 ....  Thank you!
  

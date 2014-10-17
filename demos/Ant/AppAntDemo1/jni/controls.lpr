@@ -1,12 +1,13 @@
 {hint: save all files to location: C:\adt32\ant\workspace\AppAntDemo1\jni }
-library controls;
-
+library controls;  //[by LazAndroidWizard: 10/17/2014 15:28:15]
+ 
 {$mode delphi}
-
+ 
 uses
-  Classes, SysUtils, And_jni, And_jni_Bridge, Laz_And_Controls, Unit1;
-
-{ Class:     org_jmpessoa_appantdemo1_Controls
+  Classes, SysUtils, And_jni, And_jni_Bridge, AndroidWidget, Laz_And_Controls,
+  Laz_And_Controls_Events, unit1;
+ 
+{ Class:     org_lazarus_appantdemo1_Controls
   Method:    pAppOnScreenStyle
   Signature: ()I }
 function pAppOnScreenStyle(PEnv: PJNIEnv; this: JObject): JInt; cdecl;
@@ -14,7 +15,7 @@ begin
   Result:=Java_Event_pAppOnScreenStyle(PEnv,this);
 end;
 
-{ Class:     org_jmpessoa_appantdemo1_Controls
+{ Class:     org_lazarus_appantdemo1_Controls
   Method:    pAppOnCreate
   Signature: (Landroid/content/Context;Landroid/widget/RelativeLayout;)V }
 procedure pAppOnCreate(PEnv: PJNIEnv; this: JObject; context: JObject; layout: JObject); cdecl;
@@ -22,7 +23,7 @@ begin
   gApp.Init(PEnv,this,context,layout);AndroidModule1.Init(gApp);
 end;
 
-{ Class:     org_jmpessoa_appantdemo1_Controls
+{ Class:     org_lazarus_appantdemo1_Controls
   Method:    pAppOnNewIntent
   Signature: ()V }
 procedure pAppOnNewIntent(PEnv: PJNIEnv; this: JObject); cdecl;
@@ -30,7 +31,7 @@ begin
   Java_Event_pAppOnNewIntent(PEnv,this);
 end;
 
-{ Class:     org_jmpessoa_appantdemo1_Controls
+{ Class:     org_lazarus_appantdemo1_Controls
   Method:    pAppOnDestroy
   Signature: ()V }
 procedure pAppOnDestroy(PEnv: PJNIEnv; this: JObject); cdecl;
@@ -38,7 +39,7 @@ begin
   Java_Event_pAppOnDestroy(PEnv,this);
 end;
 
-{ Class:     org_jmpessoa_appantdemo1_Controls
+{ Class:     org_lazarus_appantdemo1_Controls
   Method:    pAppOnPause
   Signature: ()V }
 procedure pAppOnPause(PEnv: PJNIEnv; this: JObject); cdecl;
@@ -46,7 +47,7 @@ begin
   Java_Event_pAppOnPause(PEnv,this);
 end;
 
-{ Class:     org_jmpessoa_appantdemo1_Controls
+{ Class:     org_lazarus_appantdemo1_Controls
   Method:    pAppOnRestart
   Signature: ()V }
 procedure pAppOnRestart(PEnv: PJNIEnv; this: JObject); cdecl;
@@ -54,7 +55,7 @@ begin
   Java_Event_pAppOnRestart(PEnv,this);
 end;
 
-{ Class:     org_jmpessoa_appantdemo1_Controls
+{ Class:     org_lazarus_appantdemo1_Controls
   Method:    pAppOnResume
   Signature: ()V }
 procedure pAppOnResume(PEnv: PJNIEnv; this: JObject); cdecl;
@@ -62,7 +63,7 @@ begin
   Java_Event_pAppOnResume(PEnv,this);
 end;
 
-{ Class:     org_jmpessoa_appantdemo1_Controls
+{ Class:     org_lazarus_appantdemo1_Controls
   Method:    pAppOnStart
   Signature: ()V }
 procedure pAppOnStart(PEnv: PJNIEnv; this: JObject); cdecl;
@@ -70,7 +71,7 @@ begin
   Java_Event_pAppOnStart(PEnv,this);
 end;
 
-{ Class:     org_jmpessoa_appantdemo1_Controls
+{ Class:     org_lazarus_appantdemo1_Controls
   Method:    pAppOnStop
   Signature: ()V }
 procedure pAppOnStop(PEnv: PJNIEnv; this: JObject); cdecl;
@@ -78,7 +79,7 @@ begin
   Java_Event_pAppOnStop(PEnv,this);
 end;
 
-{ Class:     org_jmpessoa_appantdemo1_Controls
+{ Class:     org_lazarus_appantdemo1_Controls
   Method:    pAppOnBackPressed
   Signature: ()V }
 procedure pAppOnBackPressed(PEnv: PJNIEnv; this: JObject); cdecl;
@@ -86,7 +87,7 @@ begin
   Java_Event_pAppOnBackPressed(PEnv,this);
 end;
 
-{ Class:     org_jmpessoa_appantdemo1_Controls
+{ Class:     org_lazarus_appantdemo1_Controls
   Method:    pAppOnRotate
   Signature: (I)I }
 function pAppOnRotate(PEnv: PJNIEnv; this: JObject; rotate: JInt): JInt; cdecl;
@@ -94,7 +95,7 @@ begin
   Result:=Java_Event_pAppOnRotate(PEnv,this,rotate);
 end;
 
-{ Class:     org_jmpessoa_appantdemo1_Controls
+{ Class:     org_lazarus_appantdemo1_Controls
   Method:    pAppOnConfigurationChanged
   Signature: ()V }
 procedure pAppOnConfigurationChanged(PEnv: PJNIEnv; this: JObject); cdecl;
@@ -102,7 +103,7 @@ begin
   Java_Event_pAppOnConfigurationChanged(PEnv,this);
 end;
 
-{ Class:     org_jmpessoa_appantdemo1_Controls
+{ Class:     org_lazarus_appantdemo1_Controls
   Method:    pAppOnActivityResult
   Signature: (IILandroid/content/Intent;)V }
 procedure pAppOnActivityResult(PEnv: PJNIEnv; this: JObject; requestCode: JInt; resultCode: JInt; data: JObject); cdecl;
@@ -110,7 +111,7 @@ begin
   Java_Event_pAppOnActivityResult(PEnv,this,requestCode,resultCode,data);
 end;
 
-{ Class:     org_jmpessoa_appantdemo1_Controls
+{ Class:     org_lazarus_appantdemo1_Controls
   Method:    pAppOnCreateOptionsMenu
   Signature: (Landroid/view/Menu;)V }
 procedure pAppOnCreateOptionsMenu(PEnv: PJNIEnv; this: JObject; menu: JObject); cdecl;
@@ -118,7 +119,7 @@ begin
   Java_Event_pAppOnCreateOptionsMenu(PEnv,this,menu);
 end;
 
-{ Class:     org_jmpessoa_appantdemo1_Controls
+{ Class:     org_lazarus_appantdemo1_Controls
   Method:    pAppOnClickOptionMenuItem
   Signature: (Landroid/view/MenuItem;ILjava/lang/String;Z)V }
 procedure pAppOnClickOptionMenuItem(PEnv: PJNIEnv; this: JObject; menuItem: JObject; itemID: JInt; itemCaption: JString; checked: JBoolean); cdecl;
@@ -126,7 +127,7 @@ begin
   Java_Event_pAppOnClickOptionMenuItem(PEnv,this,menuItem,itemID,itemCaption,Boolean(checked));
 end;
 
-{ Class:     org_jmpessoa_appantdemo1_Controls
+{ Class:     org_lazarus_appantdemo1_Controls
   Method:    pAppOnCreateContextMenu
   Signature: (Landroid/view/Menu;)V }
 procedure pAppOnCreateContextMenu(PEnv: PJNIEnv; this: JObject; menu: JObject); cdecl;
@@ -134,7 +135,7 @@ begin
   Java_Event_pAppOnCreateContextMenu(PEnv,this,menu);
 end;
 
-{ Class:     org_jmpessoa_appantdemo1_Controls
+{ Class:     org_lazarus_appantdemo1_Controls
   Method:    pAppOnClickContextMenuItem
   Signature: (Landroid/view/MenuItem;ILjava/lang/String;Z)V }
 procedure pAppOnClickContextMenuItem(PEnv: PJNIEnv; this: JObject; menuItem: JObject; itemID: JInt; itemCaption: JString; checked: JBoolean); cdecl;
@@ -142,7 +143,7 @@ begin
   Java_Event_pAppOnClickContextMenuItem(PEnv,this,menuItem,itemID,itemCaption,Boolean(checked));
 end;
 
-{ Class:     org_jmpessoa_appantdemo1_Controls
+{ Class:     org_lazarus_appantdemo1_Controls
   Method:    pOnClick
   Signature: (JI)V }
 procedure pOnClick(PEnv: PJNIEnv; this: JObject; pasobj: JLong; value: JInt); cdecl;
@@ -150,7 +151,7 @@ begin
   Java_Event_pOnClick(PEnv,this,TObject(pasobj),value);
 end;
 
-{ Class:     org_jmpessoa_appantdemo1_Controls
+{ Class:     org_lazarus_appantdemo1_Controls
   Method:    pOnChange
   Signature: (JI)V }
 procedure pOnChange(PEnv: PJNIEnv; this: JObject; pasobj: JLong; EventType: JInt); cdecl;
@@ -158,7 +159,7 @@ begin
   Java_Event_pOnChange(PEnv,this,TObject(pasobj),EventType);
 end;
 
-{ Class:     org_jmpessoa_appantdemo1_Controls
+{ Class:     org_lazarus_appantdemo1_Controls
   Method:    pOnEnter
   Signature: (J)V }
 procedure pOnEnter(PEnv: PJNIEnv; this: JObject; pasobj: JLong); cdecl;
@@ -166,7 +167,7 @@ begin
   Java_Event_pOnEnter(PEnv,this,TObject(pasobj));
 end;
 
-{ Class:     org_jmpessoa_appantdemo1_Controls
+{ Class:     org_lazarus_appantdemo1_Controls
   Method:    pOnTimer
   Signature: (J)V }
 procedure pOnTimer(PEnv: PJNIEnv; this: JObject; pasobj: JLong); cdecl;
@@ -174,7 +175,7 @@ begin
   Java_Event_pOnTimer(PEnv,this,TObject(pasobj));
 end;
 
-{ Class:     org_jmpessoa_appantdemo1_Controls
+{ Class:     org_lazarus_appantdemo1_Controls
   Method:    pOnDraw
   Signature: (JLandroid/graphics/Canvas;)V }
 procedure pOnDraw(PEnv: PJNIEnv; this: JObject; pasobj: JLong; canvas: JObject); cdecl;
@@ -182,7 +183,7 @@ begin
   Java_Event_pOnDraw(PEnv,this,TObject(pasobj),canvas);
 end;
 
-{ Class:     org_jmpessoa_appantdemo1_Controls
+{ Class:     org_lazarus_appantdemo1_Controls
   Method:    pOnTouch
   Signature: (JIIFFFF)V }
 procedure pOnTouch(PEnv: PJNIEnv; this: JObject; pasobj: JLong; act: JInt; cnt: JInt; x1: JFloat; y1: JFloat; x2: JFloat; y2: JFloat); cdecl;
@@ -190,7 +191,7 @@ begin
   Java_Event_pOnTouch(PEnv,this,TObject(pasobj),act,cnt,x1,y1,x2,y2);
 end;
 
-{ Class:     org_jmpessoa_appantdemo1_Controls
+{ Class:     org_lazarus_appantdemo1_Controls
   Method:    pOnGLRenderer
   Signature: (JIII)V }
 procedure pOnGLRenderer(PEnv: PJNIEnv; this: JObject; pasobj: JLong; EventType: JInt; w: JInt; h: JInt); cdecl;
@@ -198,7 +199,7 @@ begin
   Java_Event_pOnGLRenderer(PEnv,this,TObject(pasobj),EventType,w,h);
 end;
 
-{ Class:     org_jmpessoa_appantdemo1_Controls
+{ Class:     org_lazarus_appantdemo1_Controls
   Method:    pOnClose
   Signature: (J)V }
 procedure pOnClose(PEnv: PJNIEnv; this: JObject; pasobj: JLong); cdecl;
@@ -206,15 +207,7 @@ begin
   Java_Event_pOnClose(PEnv,this,TObject(pasobj));
 end;
 
-{ Class:     org_jmpessoa_appantdemo1_Controls
-  Method:    pOnActive
-  Signature: (J)V }
-procedure pOnActive(PEnv: PJNIEnv; this: JObject; pasobj: JLong); cdecl;
-begin
-  Java_Event_pOnActive(PEnv,this,TObject(pasobj));
-end;
-
-{ Class:     org_jmpessoa_appantdemo1_Controls
+{ Class:     org_lazarus_appantdemo1_Controls
   Method:    pOnWebViewStatus
   Signature: (JILjava/lang/String;)I }
 function pOnWebViewStatus(PEnv: PJNIEnv; this: JObject; pasobj: JLong; EventType: JInt; url: JString): JInt; cdecl;
@@ -222,7 +215,7 @@ begin
   Result:=Java_Event_pOnWebViewStatus(PEnv,this,TObject(pasobj),EventType,url);
 end;
 
-{ Class:     org_jmpessoa_appantdemo1_Controls
+{ Class:     org_lazarus_appantdemo1_Controls
   Method:    pOnAsyncEvent
   Signature: (JII)V }
 procedure pOnAsyncEvent(PEnv: PJNIEnv; this: JObject; pasobj: JLong; EventType: JInt; progress: JInt); cdecl;
@@ -230,7 +223,7 @@ begin
   Java_Event_pOnAsyncEvent(PEnv,this,TObject(pasobj),EventType,progress);
 end;
 
-{ Class:     org_jmpessoa_appantdemo1_Controls
+{ Class:     org_lazarus_appantdemo1_Controls
   Method:    pOnClickWidgetItem
   Signature: (JIZ)V }
 procedure pOnClickWidgetItem(PEnv: PJNIEnv; this: JObject; pasobj: JLong; position: JInt; checked: JBoolean); cdecl;
@@ -238,7 +231,175 @@ begin
   Java_Event_pOnClickWidgetItem(PEnv,this,TObject(pasobj),position,Boolean(checked));
 end;
 
-const NativeMethods:array[0..28] of JNINativeMethod = (
+{ Class:     org_lazarus_appantdemo1_Controls
+  Method:    pOnClickCaptionItem
+  Signature: (JILjava/lang/String;)V }
+procedure pOnClickCaptionItem(PEnv: PJNIEnv; this: JObject; pasobj: JLong; position: JInt; caption: JString); cdecl;
+begin
+  Java_Event_pOnClickCaptionItem(PEnv,this,TObject(pasobj),position,caption);
+end;
+
+{ Class:     org_lazarus_appantdemo1_Controls
+  Method:    pOnBluetoothEnabled
+  Signature: (J)V }
+procedure pOnBluetoothEnabled(PEnv: PJNIEnv; this: JObject; pasobj: JLong); cdecl;
+begin
+  Java_Event_pOnBluetoothEnabled(PEnv,this,TObject(pasobj));
+end;
+
+{ Class:     org_lazarus_appantdemo1_Controls
+  Method:    pOnBluetoothDisabled
+  Signature: (J)V }
+procedure pOnBluetoothDisabled(PEnv: PJNIEnv; this: JObject; pasobj: JLong); cdecl;
+begin
+  Java_Event_pOnBluetoothDisabled(PEnv,this,TObject(pasobj));
+end;
+
+{ Class:     org_lazarus_appantdemo1_Controls
+  Method:    pOnBluetoothDeviceFound
+  Signature: (JLjava/lang/String;Ljava/lang/String;)V }
+procedure pOnBluetoothDeviceFound(PEnv: PJNIEnv; this: JObject; pasobj: JLong; deviceName: JString; deviceAddress: JString); cdecl;
+begin
+  Java_Event_pOnBluetoothDeviceFound(PEnv,this,TObject(pasobj),deviceName,deviceAddress);
+end;
+
+{ Class:     org_lazarus_appantdemo1_Controls
+  Method:    pOnBluetoothDiscoveryStarted
+  Signature: (J)V }
+procedure pOnBluetoothDiscoveryStarted(PEnv: PJNIEnv; this: JObject; pasobj: JLong); cdecl;
+begin
+  Java_Event_pOnBluetoothDiscoveryStarted(PEnv,this,TObject(pasobj));
+end;
+
+{ Class:     org_lazarus_appantdemo1_Controls
+  Method:    pOnBluetoothDiscoveryFinished
+  Signature: (JII)V }
+procedure pOnBluetoothDiscoveryFinished(PEnv: PJNIEnv; this: JObject; pasobj: JLong; countFoundedDevices: JInt; countPairedDevices: JInt); cdecl;
+begin
+  Java_Event_pOnBluetoothDiscoveryFinished(PEnv,this,TObject(pasobj),countFoundedDevices,countPairedDevices);
+end;
+
+{ Class:     org_lazarus_appantdemo1_Controls
+  Method:    pOnBluetoothDeviceBondStateChanged
+  Signature: (JILjava/lang/String;Ljava/lang/String;)V }
+procedure pOnBluetoothDeviceBondStateChanged(PEnv: PJNIEnv; this: JObject; pasobj: JLong; state: JInt; deviceName: JString; deviceAddress: JString); cdecl;
+begin
+  Java_Event_pOnBluetoothDeviceBondStateChanged(PEnv,this,TObject(pasobj),state,deviceName,deviceAddress);
+end;
+
+{ Class:     org_lazarus_appantdemo1_Controls
+  Method:    pOnBluetoothClientSocketConnected
+  Signature: (JLjava/lang/String;Ljava/lang/String;)V }
+procedure pOnBluetoothClientSocketConnected(PEnv: PJNIEnv; this: JObject; pasobj: JLong; deviceName: JString; deviceAddress: JString); cdecl;
+begin
+  Java_Event_pOnBluetoothClientSocketConnected(PEnv,this,TObject(pasobj),deviceName,deviceAddress);
+end;
+
+{ Class:     org_lazarus_appantdemo1_Controls
+  Method:    pOnBluetoothClientSocketIncomingMessage
+  Signature: (JLjava/lang/String;)V }
+procedure pOnBluetoothClientSocketIncomingMessage(PEnv: PJNIEnv; this: JObject; pasobj: JLong; messageText: JString); cdecl;
+begin
+  Java_Event_pOnBluetoothClientSocketIncomingMessage(PEnv,this,TObject(pasobj),messageText);
+end;
+
+{ Class:     org_lazarus_appantdemo1_Controls
+  Method:    pOnBluetoothClientSocketWritingMessage
+  Signature: (J)V }
+procedure pOnBluetoothClientSocketWritingMessage(PEnv: PJNIEnv; this: JObject; pasobj: JLong); cdecl;
+begin
+  Java_Event_pOnBluetoothClientSocketWritingMessage(PEnv,this,TObject(pasobj));
+end;
+
+{ Class:     org_lazarus_appantdemo1_Controls
+  Method:    pOnBluetoothServerSocketConnected
+  Signature: (JLjava/lang/String;Ljava/lang/String;)V }
+procedure pOnBluetoothServerSocketConnected(PEnv: PJNIEnv; this: JObject; pasobj: JLong; deviceName: JString; deviceAddress: JString); cdecl;
+begin
+  Java_Event_pOnBluetoothServerSocketConnected(PEnv,this,TObject(pasobj),deviceName,deviceAddress);
+end;
+
+{ Class:     org_lazarus_appantdemo1_Controls
+  Method:    pOnBluetoothServerSocketIncomingMessage
+  Signature: (JLjava/lang/String;)V }
+procedure pOnBluetoothServerSocketIncomingMessage(PEnv: PJNIEnv; this: JObject; pasobj: JLong; messageText: JString); cdecl;
+begin
+  Java_Event_pOnBluetoothServerSocketIncomingMessage(PEnv,this,TObject(pasobj),messageText);
+end;
+
+{ Class:     org_lazarus_appantdemo1_Controls
+  Method:    pOnBluetoothServerSocketWritingMessage
+  Signature: (J)V }
+procedure pOnBluetoothServerSocketWritingMessage(PEnv: PJNIEnv; this: JObject; pasobj: JLong); cdecl;
+begin
+  Java_Event_pOnBluetoothServerSocketWritingMessage(PEnv,this,TObject(pasobj));
+end;
+
+{ Class:     org_lazarus_appantdemo1_Controls
+  Method:    pOnBluetoothServerSocketListen
+  Signature: (JLjava/lang/String;Ljava/lang/String;)V }
+procedure pOnBluetoothServerSocketListen(PEnv: PJNIEnv; this: JObject; pasobj: JLong; deviceName: JString; deviceAddress: JString); cdecl;
+begin
+  Java_Event_pOnBluetoothServerSocketListen(PEnv,this,TObject(pasobj),deviceName,deviceAddress);
+end;
+
+{ Class:     org_lazarus_appantdemo1_Controls
+  Method:    pOnSpinnerItemSeleceted
+  Signature: (JILjava/lang/String;)V }
+procedure pOnSpinnerItemSeleceted(PEnv: PJNIEnv; this: JObject; pasobj: JLong; position: JInt; caption: JString); cdecl;
+begin
+  Java_Event_pOnSpinnerItemSeleceted(PEnv,this,TObject(pasobj),position,caption);
+end;
+
+{ Class:     org_lazarus_appantdemo1_Controls
+  Method:    pOnLocationChanged
+  Signature: (JDDDLjava/lang/String;)V }
+procedure pOnLocationChanged(PEnv: PJNIEnv; this: JObject; pasobj: JLong; latitude: JDouble; longitude: JDouble; altitude: JDouble; address: JString); cdecl;
+begin
+  Java_Event_pOnLocationChanged(PEnv,this,TObject(pasobj),latitude,longitude,altitude,address);
+end;
+
+{ Class:     org_lazarus_appantdemo1_Controls
+  Method:    pOnLocationStatusChanged
+  Signature: (JILjava/lang/String;Ljava/lang/String;)V }
+procedure pOnLocationStatusChanged(PEnv: PJNIEnv; this: JObject; pasobj: JLong; status: JInt; provider: JString; msgStatus: JString); cdecl;
+begin
+  Java_Event_pOnLocationStatusChanged(PEnv,this,TObject(pasobj),status,provider,msgStatus);
+end;
+
+{ Class:     org_lazarus_appantdemo1_Controls
+  Method:    pOnLocationProviderEnabled
+  Signature: (JLjava/lang/String;)V }
+procedure pOnLocationProviderEnabled(PEnv: PJNIEnv; this: JObject; pasobj: JLong; provider: JString); cdecl;
+begin
+  Java_Event_pOnLocationProviderEnabled(PEnv,this,TObject(pasobj),provider);
+end;
+
+{ Class:     org_lazarus_appantdemo1_Controls
+  Method:    pOnLocationProviderDisabled
+  Signature: (JLjava/lang/String;)V }
+procedure pOnLocationProviderDisabled(PEnv: PJNIEnv; this: JObject; pasobj: JLong; provider: JString); cdecl;
+begin
+  Java_Event_pOnLocationProviderDisabled(PEnv,this,TObject(pasobj),provider);
+end;
+
+{ Class:     org_lazarus_appantdemo1_Controls
+  Method:    pAppOnViewClick
+  Signature: (Landroid/view/View;I)V }
+procedure pAppOnViewClick(PEnv: PJNIEnv; this: JObject; view: JObject; id: JInt); cdecl;
+begin
+  Java_Event_pAppOnViewClick(PEnv,this,view,id);
+end;
+
+{ Class:     org_lazarus_appantdemo1_Controls
+  Method:    pAppOnListItemClick
+  Signature: (Landroid/widget/AdapterView;Landroid/view/View;II)V }
+procedure pAppOnListItemClick(PEnv: PJNIEnv; this: JObject; adapter: JObject; view: JObject; position: JInt; id: JInt); cdecl;
+begin
+  Java_Event_pAppOnListItemClick(PEnv,this,adapter,view,position,id);
+end;
+
+const NativeMethods:array[0..48] of JNINativeMethod = (
    (name:'pAppOnScreenStyle';
     signature:'()I';
     fnPtr:@pAppOnScreenStyle;),
@@ -314,9 +475,6 @@ const NativeMethods:array[0..28] of JNINativeMethod = (
    (name:'pOnClose';
     signature:'(J)V';
     fnPtr:@pOnClose;),
-   (name:'pOnActive';
-    signature:'(J)V';
-    fnPtr:@pOnActive;),
    (name:'pOnWebViewStatus';
     signature:'(JILjava/lang/String;)I';
     fnPtr:@pOnWebViewStatus;),
@@ -325,7 +483,70 @@ const NativeMethods:array[0..28] of JNINativeMethod = (
     fnPtr:@pOnAsyncEvent;),
    (name:'pOnClickWidgetItem';
     signature:'(JIZ)V';
-    fnPtr:@pOnClickWidgetItem;)
+    fnPtr:@pOnClickWidgetItem;),
+   (name:'pOnClickCaptionItem';
+    signature:'(JILjava/lang/String;)V';
+    fnPtr:@pOnClickCaptionItem;),
+   (name:'pOnBluetoothEnabled';
+    signature:'(J)V';
+    fnPtr:@pOnBluetoothEnabled;),
+   (name:'pOnBluetoothDisabled';
+    signature:'(J)V';
+    fnPtr:@pOnBluetoothDisabled;),
+   (name:'pOnBluetoothDeviceFound';
+    signature:'(JLjava/lang/String;Ljava/lang/String;)V';
+    fnPtr:@pOnBluetoothDeviceFound;),
+   (name:'pOnBluetoothDiscoveryStarted';
+    signature:'(J)V';
+    fnPtr:@pOnBluetoothDiscoveryStarted;),
+   (name:'pOnBluetoothDiscoveryFinished';
+    signature:'(JII)V';
+    fnPtr:@pOnBluetoothDiscoveryFinished;),
+   (name:'pOnBluetoothDeviceBondStateChanged';
+    signature:'(JILjava/lang/String;Ljava/lang/String;)V';
+    fnPtr:@pOnBluetoothDeviceBondStateChanged;),
+   (name:'pOnBluetoothClientSocketConnected';
+    signature:'(JLjava/lang/String;Ljava/lang/String;)V';
+    fnPtr:@pOnBluetoothClientSocketConnected;),
+   (name:'pOnBluetoothClientSocketIncomingMessage';
+    signature:'(JLjava/lang/String;)V';
+    fnPtr:@pOnBluetoothClientSocketIncomingMessage;),
+   (name:'pOnBluetoothClientSocketWritingMessage';
+    signature:'(J)V';
+    fnPtr:@pOnBluetoothClientSocketWritingMessage;),
+   (name:'pOnBluetoothServerSocketConnected';
+    signature:'(JLjava/lang/String;Ljava/lang/String;)V';
+    fnPtr:@pOnBluetoothServerSocketConnected;),
+   (name:'pOnBluetoothServerSocketIncomingMessage';
+    signature:'(JLjava/lang/String;)V';
+    fnPtr:@pOnBluetoothServerSocketIncomingMessage;),
+   (name:'pOnBluetoothServerSocketWritingMessage';
+    signature:'(J)V';
+    fnPtr:@pOnBluetoothServerSocketWritingMessage;),
+   (name:'pOnBluetoothServerSocketListen';
+    signature:'(JLjava/lang/String;Ljava/lang/String;)V';
+    fnPtr:@pOnBluetoothServerSocketListen;),
+   (name:'pOnSpinnerItemSeleceted';
+    signature:'(JILjava/lang/String;)V';
+    fnPtr:@pOnSpinnerItemSeleceted;),
+   (name:'pOnLocationChanged';
+    signature:'(JDDDLjava/lang/String;)V';
+    fnPtr:@pOnLocationChanged;),
+   (name:'pOnLocationStatusChanged';
+    signature:'(JILjava/lang/String;Ljava/lang/String;)V';
+    fnPtr:@pOnLocationStatusChanged;),
+   (name:'pOnLocationProviderEnabled';
+    signature:'(JLjava/lang/String;)V';
+    fnPtr:@pOnLocationProviderEnabled;),
+   (name:'pOnLocationProviderDisabled';
+    signature:'(JLjava/lang/String;)V';
+    fnPtr:@pOnLocationProviderDisabled;),
+   (name:'pAppOnViewClick';
+    signature:'(Landroid/view/View;I)V';
+    fnPtr:@pAppOnViewClick;),
+   (name:'pAppOnListItemClick';
+    signature:'(Landroid/widget/AdapterView;Landroid/view/View;II)V';
+    fnPtr:@pAppOnListItemClick;)
 );
 
 function RegisterNativeMethodsArray(PEnv: PJNIEnv; className: PChar; methods: PJNINativeMethod; countMethods:integer):integer;
@@ -339,12 +560,12 @@ begin
     if (PEnv^).RegisterNatives(PEnv, curClass, methods, countMethods) > 0 then Result:= JNI_TRUE;
   end;
 end;
-
+ 
 function RegisterNativeMethods(PEnv: PJNIEnv; className: PChar): integer;
 begin
   Result:= RegisterNativeMethodsArray(PEnv, className, @NativeMethods[0], Length(NativeMethods));
 end;
-
+ 
 function JNI_OnLoad(VM: PJavaVM; reserved: pointer): JInt; cdecl;
 var
   PEnv: PPointer;
@@ -356,11 +577,11 @@ begin
   if PEnv <> nil then
   begin
      curEnv:= PJNIEnv(PEnv);
-     RegisterNativeMethods(curEnv, 'org/jmpessoa/appantdemo1/Controls');
+     RegisterNativeMethods(curEnv, 'org/lazarus/appantdemo1/Controls');
   end;
   gVM:= VM;{And_jni_Bridge}
 end;
-
+ 
 procedure JNI_OnUnload(VM: PJavaVM; reserved: pointer); cdecl;
 var
   PEnv: PPointer;
@@ -381,41 +602,61 @@ end;
 exports
   JNI_OnLoad name 'JNI_OnLoad',
   JNI_OnUnload name 'JNI_OnUnload',
-  pAppOnScreenStyle name 'Java_org_jmpessoa_appantdemo1_Controls_pAppOnScreenStyle',
-  pAppOnCreate name 'Java_org_jmpessoa_appantdemo1_Controls_pAppOnCreate',
-  pAppOnNewIntent name 'Java_org_jmpessoa_appantdemo1_Controls_pAppOnNewIntent',
-  pAppOnDestroy name 'Java_org_jmpessoa_appantdemo1_Controls_pAppOnDestroy',
-  pAppOnPause name 'Java_org_jmpessoa_appantdemo1_Controls_pAppOnPause',
-  pAppOnRestart name 'Java_org_jmpessoa_appantdemo1_Controls_pAppOnRestart',
-  pAppOnResume name 'Java_org_jmpessoa_appantdemo1_Controls_pAppOnResume',
-  pAppOnStart name 'Java_org_jmpessoa_appantdemo1_Controls_pAppOnStart',
-  pAppOnStop name 'Java_org_jmpessoa_appantdemo1_Controls_pAppOnStop',
-  pAppOnBackPressed name 'Java_org_jmpessoa_appantdemo1_Controls_pAppOnBackPressed',
-  pAppOnRotate name 'Java_org_jmpessoa_appantdemo1_Controls_pAppOnRotate',
-  pAppOnConfigurationChanged name 'Java_org_jmpessoa_appantdemo1_Controls_pAppOnConfigurationChanged',
-  pAppOnActivityResult name 'Java_org_jmpessoa_appantdemo1_Controls_pAppOnActivityResult',
-  pAppOnCreateOptionsMenu name 'Java_org_jmpessoa_appantdemo1_Controls_pAppOnCreateOptionsMenu',
-  pAppOnClickOptionMenuItem name 'Java_org_jmpessoa_appantdemo1_Controls_pAppOnClickOptionMenuItem',
-  pAppOnCreateContextMenu name 'Java_org_jmpessoa_appantdemo1_Controls_pAppOnCreateContextMenu',
-  pAppOnClickContextMenuItem name 'Java_org_jmpessoa_appantdemo1_Controls_pAppOnClickContextMenuItem',
-  pOnClick name 'Java_org_jmpessoa_appantdemo1_Controls_pOnClick',
-  pOnChange name 'Java_org_jmpessoa_appantdemo1_Controls_pOnChange',
-  pOnEnter name 'Java_org_jmpessoa_appantdemo1_Controls_pOnEnter',
-  pOnTimer name 'Java_org_jmpessoa_appantdemo1_Controls_pOnTimer',
-  pOnDraw name 'Java_org_jmpessoa_appantdemo1_Controls_pOnDraw',
-  pOnTouch name 'Java_org_jmpessoa_appantdemo1_Controls_pOnTouch',
-  pOnGLRenderer name 'Java_org_jmpessoa_appantdemo1_Controls_pOnGLRenderer',
-  pOnClose name 'Java_org_jmpessoa_appantdemo1_Controls_pOnClose',
-  pOnActive name 'Java_org_jmpessoa_appantdemo1_Controls_pOnActive',
-  pOnWebViewStatus name 'Java_org_jmpessoa_appantdemo1_Controls_pOnWebViewStatus',
-  pOnAsyncEvent name 'Java_org_jmpessoa_appantdemo1_Controls_pOnAsyncEvent',
-  pOnClickWidgetItem name 'Java_org_jmpessoa_appantdemo1_Controls_pOnClickWidgetItem';
-
+  pAppOnScreenStyle name 'Java_org_lazarus_appantdemo1_Controls_pAppOnScreenStyle',
+  pAppOnCreate name 'Java_org_lazarus_appantdemo1_Controls_pAppOnCreate',
+  pAppOnNewIntent name 'Java_org_lazarus_appantdemo1_Controls_pAppOnNewIntent',
+  pAppOnDestroy name 'Java_org_lazarus_appantdemo1_Controls_pAppOnDestroy',
+  pAppOnPause name 'Java_org_lazarus_appantdemo1_Controls_pAppOnPause',
+  pAppOnRestart name 'Java_org_lazarus_appantdemo1_Controls_pAppOnRestart',
+  pAppOnResume name 'Java_org_lazarus_appantdemo1_Controls_pAppOnResume',
+  pAppOnStart name 'Java_org_lazarus_appantdemo1_Controls_pAppOnStart',
+  pAppOnStop name 'Java_org_lazarus_appantdemo1_Controls_pAppOnStop',
+  pAppOnBackPressed name 'Java_org_lazarus_appantdemo1_Controls_pAppOnBackPressed',
+  pAppOnRotate name 'Java_org_lazarus_appantdemo1_Controls_pAppOnRotate',
+  pAppOnConfigurationChanged name 'Java_org_lazarus_appantdemo1_Controls_pAppOnConfigurationChanged',
+  pAppOnActivityResult name 'Java_org_lazarus_appantdemo1_Controls_pAppOnActivityResult',
+  pAppOnCreateOptionsMenu name 'Java_org_lazarus_appantdemo1_Controls_pAppOnCreateOptionsMenu',
+  pAppOnClickOptionMenuItem name 'Java_org_lazarus_appantdemo1_Controls_pAppOnClickOptionMenuItem',
+  pAppOnCreateContextMenu name 'Java_org_lazarus_appantdemo1_Controls_pAppOnCreateContextMenu',
+  pAppOnClickContextMenuItem name 'Java_org_lazarus_appantdemo1_Controls_pAppOnClickContextMenuItem',
+  pOnClick name 'Java_org_lazarus_appantdemo1_Controls_pOnClick',
+  pOnChange name 'Java_org_lazarus_appantdemo1_Controls_pOnChange',
+  pOnEnter name 'Java_org_lazarus_appantdemo1_Controls_pOnEnter',
+  pOnTimer name 'Java_org_lazarus_appantdemo1_Controls_pOnTimer',
+  pOnDraw name 'Java_org_lazarus_appantdemo1_Controls_pOnDraw',
+  pOnTouch name 'Java_org_lazarus_appantdemo1_Controls_pOnTouch',
+  pOnGLRenderer name 'Java_org_lazarus_appantdemo1_Controls_pOnGLRenderer',
+  pOnClose name 'Java_org_lazarus_appantdemo1_Controls_pOnClose',
+  pOnWebViewStatus name 'Java_org_lazarus_appantdemo1_Controls_pOnWebViewStatus',
+  pOnAsyncEvent name 'Java_org_lazarus_appantdemo1_Controls_pOnAsyncEvent',
+  pOnClickWidgetItem name 'Java_org_lazarus_appantdemo1_Controls_pOnClickWidgetItem',
+  pOnClickCaptionItem name 'Java_org_lazarus_appantdemo1_Controls_pOnClickCaptionItem',
+  pOnBluetoothEnabled name 'Java_org_lazarus_appantdemo1_Controls_pOnBluetoothEnabled',
+  pOnBluetoothDisabled name 'Java_org_lazarus_appantdemo1_Controls_pOnBluetoothDisabled',
+  pOnBluetoothDeviceFound name 'Java_org_lazarus_appantdemo1_Controls_pOnBluetoothDeviceFound',
+  pOnBluetoothDiscoveryStarted name 'Java_org_lazarus_appantdemo1_Controls_pOnBluetoothDiscoveryStarted',
+  pOnBluetoothDiscoveryFinished name 'Java_org_lazarus_appantdemo1_Controls_pOnBluetoothDiscoveryFinished',
+  pOnBluetoothDeviceBondStateChanged name 'Java_org_lazarus_appantdemo1_Controls_pOnBluetoothDeviceBondStateChanged',
+  pOnBluetoothClientSocketConnected name 'Java_org_lazarus_appantdemo1_Controls_pOnBluetoothClientSocketConnected',
+  pOnBluetoothClientSocketIncomingMessage name 'Java_org_lazarus_appantdemo1_Controls_pOnBluetoothClientSocketIncomingMessage',
+  pOnBluetoothClientSocketWritingMessage name 'Java_org_lazarus_appantdemo1_Controls_pOnBluetoothClientSocketWritingMessage',
+  pOnBluetoothServerSocketConnected name 'Java_org_lazarus_appantdemo1_Controls_pOnBluetoothServerSocketConnected',
+  pOnBluetoothServerSocketIncomingMessage name 'Java_org_lazarus_appantdemo1_Controls_pOnBluetoothServerSocketIncomingMessage',
+  pOnBluetoothServerSocketWritingMessage name 'Java_org_lazarus_appantdemo1_Controls_pOnBluetoothServerSocketWritingMessage',
+  pOnBluetoothServerSocketListen name 'Java_org_lazarus_appantdemo1_Controls_pOnBluetoothServerSocketListen',
+  pOnSpinnerItemSeleceted name 'Java_org_lazarus_appantdemo1_Controls_pOnSpinnerItemSeleceted',
+  pOnLocationChanged name 'Java_org_lazarus_appantdemo1_Controls_pOnLocationChanged',
+  pOnLocationStatusChanged name 'Java_org_lazarus_appantdemo1_Controls_pOnLocationStatusChanged',
+  pOnLocationProviderEnabled name 'Java_org_lazarus_appantdemo1_Controls_pOnLocationProviderEnabled',
+  pOnLocationProviderDisabled name 'Java_org_lazarus_appantdemo1_Controls_pOnLocationProviderDisabled',
+  pAppOnViewClick name 'Java_org_lazarus_appantdemo1_Controls_pAppOnViewClick',
+  pAppOnListItemClick name 'Java_org_lazarus_appantdemo1_Controls_pAppOnListItemClick';
+ 
 begin
   gApp:= jApp.Create(nil);{Laz_And_Controls}
   gApp.Title:= 'My Android Bridges Library';
-  gjAppName:= 'org.jmpessoa.appantdemo1';{And_jni_Bridge}
-  gjClassName:= 'org/jmpessoa/appantdemo1/Controls';{And_jni_Bridge}
+  gjAppName:= 'org.lazarus.appantdemo1';{And_jni_Bridge}
+  gjClassName:= 'org/lazarus/appantdemo1/Controls';{And_jni_Bridge}
   gApp.AppName:=gjAppName;
   gApp.ClassName:=gjClassName;
   gApp.Initialize;
