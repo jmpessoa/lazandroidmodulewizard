@@ -29,7 +29,7 @@
 			http://github.com/x2nie/LiteZarus
 
 
-		NEW! LiteZarus4Android [just for Windows, sorry] :: win32/Android NDK-9/{ARM and x86 !}
+		NEW! LiteZarus4Android [just for Windows, sorry] :: win32/Android NDK-9b/{ARM and x86 !}
 			https://onedrive.live.com/redir?resid=78D6F726E8F0C522%21236 [right to download!]
                                 
 		-Lazarus forum community!
@@ -124,12 +124,15 @@ Version 0.6 - 15 October 2014 -
 
 			change/modify paths according to your system ..
 
+			-->Others
 
-		2. Open/edit the "controls.lpi" [...\jni],  you can use Notepad like editor....
+			change/modify paths according to your system ..
 
-		Modify some [piece] of path information 
+		2. If needed: open/edit the "controls.lpi" [...\jni],  you can use Notepad like editor....
 
-		[C:\adt32\eclipse\workspace] 
+		Modify some [piece] of path information like:
+
+		[C:\adt32\eclipse\workspace] or [C:\adt32\ant\workspace] 
 		[C:\adt32\ndk7]
 
 		according to your system ..

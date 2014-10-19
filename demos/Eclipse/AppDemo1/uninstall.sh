@@ -1,1 +1,1 @@
-~/Program Files (x86)/Java/jdk1.7.0_21/platform-tools/adb uninstall com.example.appdemo1
+~/adt32/sdk/platform-tools/adb uninstall com.example.appdemo1

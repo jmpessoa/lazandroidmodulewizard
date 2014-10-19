@@ -914,10 +914,16 @@ var
   projName: string;
   strList: TStringList;
   i: integer;
+
   linuxDirSeparator: string;
   linuxPathToJavaJDK: string;
+  linuxPathToAndroidSdk: string;
+
   linuxAndroidProjectName: string;
   tempStr: string;
+
+  linuxPathToAdbBin: string;
+  linuxPathToAntBin: string;
 begin
   Result:= False;
   frm:= TFormWorkspace.Create(nil);
@@ -1284,14 +1290,15 @@ begin
     strList.Add('9. Hint 1: you can edit "*.bat" to extend/modify some command or to fix some incorrect info/path!');
     strList.Add(' ');
     strList.Add('10.Hint 2: you can edit "build.xml" to set another Android target ex. "android-18" or "android-19" etc.');
-    strList.Add('   Yes, if after run  "build.*" the folder "...\bin" is still empty then try another target!' );
+    strList.Add('   WARNING: Yes, if after run  "build.*" the folder "...\bin" is still empty then try another target!' );
     strList.Add(' ');
-    strList.Add('11.Warning: After a new [Lazarus IDE]-> "run->build" do not forget to run again: "build.bat" and "install.bat" !');
+    strList.Add('11.WARNING: After a new [Lazarus IDE]-> "run->build" do not forget to run again: "build.bat" and "install.bat" !');
     strList.Add(' ');
     strList.Add('12. Linux users: use "build.sh" , "install.sh" , "uninstall.sh" and "logcat.sh" [thanks to Stephano!]');
-    strList.Add('    WARNING: All demos Apps was generate on windows system! So, please,  edit the *.sh to correct one!');
-    strList.Add('12. Linux users: use "build.sh" , "install.sh" , "uninstall.sh" and "logcat.sh" [thanks to Stephano!]');
-     strList.Add(' ');
+    strList.Add('    WARNING: All demos Apps was generate on windows system! So, please,  edit the *.sh to correct paths one!');
+    strList.Add(' ');
+    strList.Add('13. PLEASE, look for "How to use the Demos" in "readme.txt"!!');
+    strList.Add(' ');
     strList.Add('....  Thank you!');
     strList.Add(' ');
     strList.Add('....  by jmpessoa_hotmail_com');
@@ -1301,6 +1308,8 @@ begin
     linuxDirSeparator:=  DirectorySeparator;    //  C:\adt32\eclipse\workspace\AppTest1
     linuxPathToJavaJDK:=  FPathToJavaJDK;       //  C:\adt32\sdk
     linuxAndroidProjectName:= FAndroidProjectName;
+    linuxPathToAntBin:= FPathToAntBin;
+    linuxPathToAndroidSdk:= FPathToAndroidSDK;
     {$IFDEF WINDOWS}
        linuxDirSeparator:= '/';
        tempStr:= FPathToJavaJDK;
@@ -1310,38 +1319,61 @@ begin
        tempStr:= FAndroidProjectName;
        SplitStr(tempStr, ':');
        linuxAndroidProjectName:= ReplaceChar (tempStr, '\', '/');
+
+       tempStr:= FPathToAntBin;
+       SplitStr(tempStr, ':');
+       linuxPathToAntBin:= ReplaceChar (tempStr, '\', '/');
+
+       tempStr:= FPathToAndroidSDK;
+       SplitStr(tempStr, ':');
+       linuxPathToAndroidSdk:= ReplaceChar (tempStr, '\', '/');
+
     {$ENDIF}
-    //linux build Apk using "Ant"
+
+    //linux build Apk using "Ant"  ---- Thanks to Stephano!
     strList.Clear;
-    strList.Add('export JAVA_HOME='+linuxPathToJavaJDK);
+    if FPathToAntBin <> '' then
+      strList.Add('export PATH='+linuxPathToAntBin+':PATH'); //export PATH=/usr/bin/ant:PATH
+
+    strList.Add('export JAVA_HOME='+linuxPathToJavaJDK);     //export JAVA_HOME=/usr/lib/jvm/java-6-openjdk
     strList.Add('cd '+linuxAndroidProjectName);
-    strList.Add('ant debug');
+
+    if FAntBuildMode = 'debug' then
+    begin
+      if FTouchtestEnabled='' then
+         strList.Add('ant debug')
+      else
+        strList.Add('ant -Dtouchtest.enabled=true debug');
+    end
+    else
+    begin
+     strList.Add('ant release');
+    end;
     strList.SaveToFile(linuxAndroidProjectName+linuxDirSeparator+'build.sh');
 
+    linuxPathToAdbBin:= linuxPathToAndroidSdk+linuxDirSeparator+'platform-tools';
     //linux install
     strList.Clear;
-    strList.Add('~'+linuxPathToJavaJDK+linuxDirSeparator+'platform-tools'+
-               linuxDirSeparator+'adb install -r bin'+linuxDirSeparator+projName+'-'+FAntBuildMode+'.apk');
+    strList.Add('~'+linuxPathToAdbBin+linuxDirSeparator+'adb uninstall '+FAntPackageName+'.'+LowerCase(projName));
+    strList.Add('~'+linuxPathToAdbBin+linuxDirSeparator+'adb install -r '+linuxDirSeparator+'bin'+linuxDirSeparator+projName+'-'+FAntBuildMode+'.apk');
+    strList.Add('~'+linuxPathToAdbBin+linuxDirSeparator+'adb logcat');
     strList.SaveToFile(linuxAndroidProjectName+linuxDirSeparator+'install.sh');
 
     //linux uninstall
     strList.Clear;
-    strList.Add('~'+linuxPathToJavaJDK+linuxDirSeparator+'platform-tools'+
-               linuxDirSeparator+'adb uninstall '+FAntPackageName+'.'+LowerCase(projName));
+    strList.Add('~'+linuxPathToAdbBin+linuxDirSeparator+'adb uninstall '+FAntPackageName+'.'+LowerCase(projName));
     strList.SaveToFile(linuxAndroidProjectName+linuxDirSeparator+'uninstall.sh');
 
     //linux logcat
     strList.Clear;
-    strList.Add('~'+linuxPathToJavaJDK+linuxDirSeparator+'platform-tools'+
-               linuxDirSeparator+'adb logcat');
+    strList.Add('~'+linuxPathToAdbBin+linuxDirSeparator+'adb logcat');
     strList.SaveToFile(linuxAndroidProjectName+linuxDirSeparator+'logcat.sh');
-
-
 
     strList.Free;
     Result := True;
   end;
   frm.Free;
+
 end;
 
 function TAndroidProjectDescriptor.DoInitDescriptor: TModalResult;
@@ -1383,19 +1415,22 @@ var
   libraries_arm: string;
 
   customOptions_x86: string;
+  customOptions_default: string;
 
-  customOptions_armV6_soft: string;
-  customOptions_armV6_vfpv2: string;
-  customOptions_armV6_vfpv3: string;
+  customOptions_armV6: string;
 
-  customOptions_armV7a_soft: string;
-  customOptions_armV7a_vfpv2: string;
-  customOptions_armV7a_vfpv3: string;
+  customOptions_armV7a: string;
 
   pathToNdkPlataformsArm: string;
   pathToNdkPlataformsX86: string;
+
   pathToNdkToolchainsX86: string;
   pathToNdkToolchainsArm: string;
+
+   //Stephano
+  pathToNdkToolchainsBinX86: string;
+  pathToNdkToolchainsBinArm: string;
+
   osys: string;      {windows or linux-x86}
 begin
 
@@ -1410,10 +1445,8 @@ begin
   AProject.AddFile(MainFile, False);
   AProject.MainFileID := 0;
 
-
   if FModuleType = 0 then
     AProject.AddPackageDependency('tfpandroidbridge_pack'); //GUI controls
-
 
   sourceList.Add('{hint: save all files to location: ' +FPathToJNIFolder+DirectorySeparator+'jni }');
   sourceList.Add('library '+ LowerCase(FJavaClassName) +'; '+ ' //[by LazAndroidWizard: '+DateTimeToStr(Now)+']');
@@ -1500,12 +1533,13 @@ begin
   if (Pos('\', FPathToAndroidNDK) > 0) or (Pos(':', FPathToAndroidNDK) > 0) then osys:= 'windows'
   else osys:= 'linux-x86';
 
-   {Set compiler options for Android requirements}
+  {Set compiler options for Android requirements}
+
   pathToNdkPlataformsArm:= FPathToAndroidNDK+DirectorySeparator+'platforms'+DirectorySeparator+
                                                 FAndroidPlatform +DirectorySeparator+'arch-arm'+DirectorySeparator+
                                                 'usr'+DirectorySeparator+'lib';
 
-  if FNdk = '7' then
+  if FNDK = '7' then
       pathToNdkToolchainsArm:= FPathToAndroidNDK+DirectorySeparator+'toolchains'+DirectorySeparator+
                                                  'arm-linux-androideabi-4.4.3'+DirectorySeparator+
                                                  'prebuilt'+DirectorySeparator+osys+DirectorySeparator+
@@ -1517,6 +1551,17 @@ begin
                                                  'prebuilt'+DirectorySeparator+osys+DirectorySeparator+
                                                  'lib'+DirectorySeparator+'gcc'+DirectorySeparator+
                                                  'arm-linux-androideabi'+DirectorySeparator+'4.6';
+
+  if FNDK = '7' then
+      pathToNdkToolchainsBinArm:= FPathToAndroidNDK+DirectorySeparator+'toolchains'+DirectorySeparator+
+                                                 'arm-linux-androideabi-4.4.3'+DirectorySeparator+
+                                                 'prebuilt'+DirectorySeparator+osys+DirectorySeparator+
+                                                 'bin';
+  if FNDK = '9' then
+      pathToNdkToolchainsBinArm:= FPathToAndroidNDK+DirectorySeparator+'toolchains'+DirectorySeparator+
+                                                 'arm-linux-androideabi-4.6'+DirectorySeparator+
+                                                 'prebuilt'+DirectorySeparator+osys+DirectorySeparator+
+                                                 'bin';
 
   libraries_arm:= pathToNdkPlataformsArm+';'+pathToNdkToolchainsArm;
 
@@ -1533,6 +1578,15 @@ begin
                                                  'x86-4.6'+DirectorySeparator+'prebuilt'+DirectorySeparator+
                                                  osys+DirectorySeparator+'lib'+DirectorySeparator+'gcc'+DirectorySeparator+
                                                  'i686-android-linux'+DirectorySeparator+'4.6';
+
+  if FNDK = '7' then
+      pathToNdkToolchainsBinX86:= FPathToAndroidNDK+DirectorySeparator+'toolchains'+DirectorySeparator+
+                                                 'x86-4.4.3'+DirectorySeparator+'prebuilt'+DirectorySeparator+
+                                                 osys+DirectorySeparator+'bin';
+  if FNDK = '9' then
+      pathToNdkToolchainsBinX86:= FPathToAndroidNDK+DirectorySeparator+'toolchains'+DirectorySeparator+
+                                                 'x86-4.6'+DirectorySeparator+'prebuilt'+DirectorySeparator+
+                                                 osys+DirectorySeparator+'bin';
 
   libraries_x86:= pathToNdkPlataformsX86+';'+pathToNdkToolchainsX86;
 
@@ -1551,7 +1605,7 @@ begin
      FPathToNdkToolchains:= pathToNdkToolchainsArm
   end;
 
-   {Parsing}
+  {Parsing}
   AProject.LazCompilerOptions.SyntaxMode:= 'delphi';  {-M}
   AProject.LazCompilerOptions.CStyleOperators:= True;
   AProject.LazCompilerOptions.AllowLabel:= True;
@@ -1559,7 +1613,8 @@ begin
   AProject.LazCompilerOptions.CStyleMacros:= True;
   AProject.LazCompilerOptions.UseAnsiStrings:= True;
   AProject.LazCompilerOptions.UseLineInfoUnit:= True;
-   {Code Generation}
+
+  {Code Generation}
   AProject.LazCompilerOptions.TargetOS:= 'android'; {-T}
 
   AProject.LazCompilerOptions.OptimizationLevel:= 1;
@@ -1572,11 +1627,51 @@ begin
 
   {Verbose}
       //.....................
+
   auxList:= TStringList.Create;
-  customOptions_x86:= '-dANDROID -Xd'+
-                      ' -FL'+pathToNdkPlataformsX86+DirectorySeparator+'libdl.so' +  {as dynamic linker}
-                      ' -FU'+FPathToJNIFolder+DirectorySeparator+'obj'+ DirectorySeparator+ FJavaClassName +
-                      ' -o'+FPathToJNIFolder+DirectorySeparator+'libs'+DirectorySeparator+'x86'+DirectorySeparator+'lib'+ LowerCase(FJavaClassName)+'.so';  {-o}
+
+  auxStr:= 'armeabi';
+  if FInstructionSet = 'ARMv7a' then auxStr:='armeabi-v7a';
+  if FInstructionSet = 'x86' then auxStr:='x86';
+
+  if FInstructionSet <> 'x86' then
+  begin
+     customOptions_default:='-Xd'+' -Cf'+ FFPUSet;
+     customOptions_default:= customOptions_default + ' -Cp'+FInstructionSet;
+  end
+  else
+  begin
+     customOptions_default:= '-Xd';
+  end;
+
+  customOptions_armV6:= '-Xd'+' -Cf'+ FFPUSet + ' -CpArmV6';
+  customOptions_armV7a:='-Xd'+' -Cf'+ FFPUSet + ' -CpArmV7a';
+  customOptions_x86:= '-Xd';
+
+  customOptions_default:= customOptions_default +' -XParm-linux-androideabi-';
+
+  customOptions_armV6:= customOptions_armV6 +' -XParm-linux-androideabi-';
+  customOptions_armV7a:=customOptions_armV7a +' -XParm-linux-androideabi-';
+  customOptions_x86:= customOptions_x86+' -XParm-linux-androideabi-';
+
+  if FInstructionSet <> 'x86' then
+  begin
+    customOptions_default:= customOptions_default+' -FD'+pathToNdkToolchainsBinArm;
+  end
+  else
+  begin
+    customOptions_default:= customOptions_default+' -FD'+pathToNdkToolchainsBinX86;
+  end;
+
+  customOptions_armV6:= customOptions_armV6+' -FD'+pathToNdkToolchainsBinArm;
+  customOptions_armV7a:= customOptions_armV7a+' -FD'+pathToNdkToolchainsBinArm;
+  customOptions_x86:= customOptions_x86+' -FD'+pathToNdkToolchainsBinX86;
+
+  customOptions_default:= customOptions_default+' -o'+FPathToJNIFolder+DirectorySeparator+'libs'+DirectorySeparator+auxStr+DirectorySeparator+'lib'+LowerCase(FJavaClassName)+'.so';
+
+  customOptions_armV6:= customOptions_armV6+' -o'+FPathToJNIFolder+DirectorySeparator+'libs'+DirectorySeparator+auxStr+DirectorySeparator+'lib'+LowerCase(FJavaClassName)+'.so';
+  customOptions_armV7a:= customOptions_armV7a+' -o'+FPathToJNIFolder+DirectorySeparator+'libs'+DirectorySeparator+auxStr+DirectorySeparator+'lib'+LowerCase(FJavaClassName)+'.so';
+  customOptions_x86:= customOptions_x86+' -o'+FPathToJNIFolder+DirectorySeparator+'libs'+DirectorySeparator+auxStr+DirectorySeparator+'lib'+LowerCase(FJavaClassName)+'.so';
 
   auxList.Clear;
   auxList.Add('<Libraries Value="'+libraries_x86+'"/>');
@@ -1584,65 +1679,17 @@ begin
   auxList.Add('<CustomOptions Value="'+customOptions_x86+'"/>');
   auxList.SaveToFile(FPathToJNIFolder+DirectorySeparator+'jni'+DirectorySeparator+'build-modes'+DirectorySeparator+'build_x86.txt');
 
-  customOptions_armV6_soft:= '-dANDROID -Xd -CpArmV6 -CfSoft'+
-                             ' -FL'+pathToNdkPlataformsArm+DirectorySeparator+'libdl.so' +  {as dynamic linker}
-                             ' -FU'+FPathToJNIFolder+DirectorySeparator+'obj'+ DirectorySeparator+ FJavaClassName +
-                             ' -o'+FPathToJNIFolder+DirectorySeparator+'libs'+DirectorySeparator+'armeabi'+DirectorySeparator+'lib'+ LowerCase(FJavaClassName)+'.so';  {-o}
   auxList.Clear;
   auxList.Add('<Libraries Value="'+libraries_arm+'"/>');
   auxList.Add('<TargetCPU Value="arm"/>');
-  auxList.Add('<CustomOptions Value="'+customOptions_armV6_soft+'"/>');
-  auxList.SaveToFile(FPathToJNIFolder+DirectorySeparator+'jni'+DirectorySeparator+'build-modes'+DirectorySeparator+'build_armV6_soft.txt');
+  auxList.Add('<CustomOptions Value="'+customOptions_armV6+'"/>');
+  auxList.SaveToFile(FPathToJNIFolder+DirectorySeparator+'jni'+DirectorySeparator+'build-modes'+DirectorySeparator+'build_armV6.txt');
 
-  customOptions_armV6_vfpV2:= '-dANDROID -Xd -CpArmV6 -CfVfpV2'+
-                              ' -FL'+pathToNdkPlataformsArm+DirectorySeparator+'libdl.so' +  {as dynamic linker}
-                              ' -FU'+FPathToJNIFolder+DirectorySeparator+'obj'+ DirectorySeparator+ FJavaClassName +
-                              ' -o'+FPathToJNIFolder+DirectorySeparator+'libs'+DirectorySeparator+'armeabi'+DirectorySeparator+'lib'+ LowerCase(FJavaClassName)+'.so';  {-o}
   auxList.Clear;
   auxList.Add('<Libraries Value="'+libraries_arm+'"/>');
   auxList.Add('<TargetCPU Value="arm"/>');
-  auxList.Add('<CustomOptions Value="'+customOptions_armV6_vfpV2+'"/>');
-  auxList.SaveToFile(FPathToJNIFolder+DirectorySeparator+'jni'+DirectorySeparator+'build-modes'+DirectorySeparator+'build_armV6_vfpV2.txt');
-
-  customOptions_armV6_vfpV3:= '-dANDROID -Xd -CpArmV6 -CfVfpV3'+
-                              ' -FL'+pathToNdkPlataformsArm+DirectorySeparator+'libdl.so' +  {as dynamic linker}
-                              ' -FU'+FPathToJNIFolder+DirectorySeparator+'obj'+ DirectorySeparator+ FJavaClassName +
-                              ' -o'+FPathToJNIFolder+DirectorySeparator+'libs'+DirectorySeparator+'armeabi'+DirectorySeparator+'lib'+ LowerCase(FJavaClassName)+'.so';  {-o}
-  auxList.Clear;
-  auxList.Add('<Libraries Value="'+libraries_arm+'"/>');
-  auxList.Add('<TargetCPU Value="arm"/>');
-  auxList.Add('<CustomOptions Value="'+customOptions_armV6_vfpV3+'"/>');
-  auxList.SaveToFile(FPathToJNIFolder+DirectorySeparator+'jni'+DirectorySeparator+'build-modes'+DirectorySeparator+'build_armV6_vfpV3.txt');
-
-  customOptions_armV7a_soft:= '-dANDROID -Xd -CpArmV7a -CfSoft'+
-                              ' -FL'+pathToNdkPlataformsArm+DirectorySeparator+'libdl.so' +  {as dynamic linker}
-                              ' -FU'+FPathToJNIFolder+DirectorySeparator+'obj'+ DirectorySeparator+ FJavaClassName +
-                              ' -o'+FPathToJNIFolder+DirectorySeparator+'libs'+DirectorySeparator+'armeabi-v7a'+DirectorySeparator+'lib'+ LowerCase(FJavaClassName)+'.so';  {-o}
-  auxList.Clear;
-  auxList.Add('<Libraries Value="'+libraries_arm+'"/>');
-  auxList.Add('<TargetCPU Value="arm"/>');
-  auxList.Add('<CustomOptions Value="'+customOptions_armV7a_soft+'"/>');
-  auxList.SaveToFile(FPathToJNIFolder+DirectorySeparator+'jni'+DirectorySeparator+'build-modes'+DirectorySeparator+'build_armV7a_soft.txt');
-
-  customOptions_armV7a_vfpV2:= '-dANDROID -Xd -CpArmV7a -CfVfpV2'+
-                               ' -FL'+pathToNdkPlataformsArm+DirectorySeparator+'libdl.so' +  {as dynamic linker}
-                               ' -FU'+FPathToJNIFolder+DirectorySeparator+'obj'+ DirectorySeparator+ FJavaClassName +
-                               ' -o'+FPathToJNIFolder+DirectorySeparator+'libs'+DirectorySeparator+'armeabi-v7a'+DirectorySeparator+'lib'+ LowerCase(FJavaClassName)+'.so';  {-o}
-  auxList.Clear;
-  auxList.Add('<Libraries Value="'+libraries_arm+'"/>');
-  auxList.Add('<TargetCPU Value="arm"/>');
-  auxList.Add('<CustomOptions Value="'+customOptions_armV7a_vfpV2+'"/>');
-  auxList.SaveToFile(FPathToJNIFolder+DirectorySeparator+'jni'+DirectorySeparator+'build-modes'+DirectorySeparator+'build_armV7a_vfpV2.txt');
-
-  customOptions_armV7a_vfpV3:= '-dANDROID -Xd -CpArmV7a -CfVfpV3'+
-                               ' -FL'+pathToNdkPlataformsArm+DirectorySeparator+'libdl.so' +  {as dynamic linker}
-                               ' -FU'+FPathToJNIFolder+DirectorySeparator+'obj'+ DirectorySeparator+ FJavaClassName +
-                               ' -o'+FPathToJNIFolder+DirectorySeparator+'libs'+DirectorySeparator+'armeabi-v7a'+DirectorySeparator+'lib'+ LowerCase(FJavaClassName)+'.so';  {-o}
-  auxList.Clear;
-  auxList.Add('<Libraries Value="'+libraries_arm+'"/>');
-  auxList.Add('<TargetCPU Value="arm"/>');
-  auxList.Add('<CustomOptions Value="'+customOptions_armV7a_vfpV3+'"/>');
-  auxList.SaveToFile(FPathToJNIFolder+DirectorySeparator+'jni'+DirectorySeparator+'build-modes'+DirectorySeparator+'build_armV7a_vfpV3.txt');
+  auxList.Add('<CustomOptions Value="'+customOptions_armV7a+'"/>');
+  auxList.SaveToFile(FPathToJNIFolder+DirectorySeparator+'jni'+DirectorySeparator+'build-modes'+DirectorySeparator+'build_armV7a.txt');
 
   auxList.Clear;
   auxList.Add('How To Get More Builds:');
@@ -1667,6 +1714,7 @@ begin
   auxList.Add(' ');
   auxList.Add('4. Repeat for others "build_*.txt" if needed...');
   auxList.Add(' ');
+
   if FProjectModel = 'Ant' then
     auxList.Add('4. Execute [double click] the "build.bat" file to get the Apk !')
   else
@@ -1677,31 +1725,30 @@ begin
     auxList.Add(' ');
     auxList.Add('   -right click your  project: -> Run as -> Android Application');
   end;
+
   auxList.Add(' ');
   auxList.Add(' ');
   auxList.Add(' ');
   auxList.Add('      Thank you!');
   auxList.Add('      By  ___jmpessoa_hotmail.com_____');
+
   auxList.SaveToFile(FPathToJNIFolder+DirectorySeparator+'jni'+DirectorySeparator+'build-modes'+DirectorySeparator+'readme.txt');
 
   auxList.Free;
+
   extInstructionSet:='';
   if FInstructionSet <> 'x86' then extInstructionSet:= ' -Cp'+FInstructionSet + ' -Cf'+ FFPUSet;
-
-  auxStr:= 'armeabi';
-  if FInstructionSet = 'ARMv7a' then auxStr:='armeabi-v7a';
-  if FInstructionSet = 'x86' then auxStr:='x86';
 
   AProject.LazCompilerOptions.TargetFilename:=
                               FPathToJNIFolder+DirectorySeparator+'libs'+DirectorySeparator+auxStr+DirectorySeparator+'lib'+LowerCase(FJavaClassName)+'.so';{-o}
 
+  AProject.LazCompilerOptions.UnitOutputDirectory :=
+                              FPathToJNIFolder+DirectorySeparator+'obj'+ DirectorySeparator+ LowerCase(FJavaClassName);
+
   {Others}
-  AProject.LazCompilerOptions.CustomOptions:=
-                        '-dANDROID -Xd'+extInstructionSet+
-                        ' -FL'+FPathToNdkPlataforms+DirectorySeparator+'libdl.so' +  {as dynamic linker}
-                        ' -FU'+FPathToJNIFolder+DirectorySeparator+'obj'+ DirectorySeparator+ FJavaClassName +
-                        ' -o'+FPathToJNIFolder+DirectorySeparator+'libs'+DirectorySeparator+auxStr+DirectorySeparator+'lib'+LowerCase(FJavaClassName)+'.so';  {-o}
-  //--------------------------
+  AProject.LazCompilerOptions.CustomOptions:= customOptions_default;
+
+
   sourceList.Free;
   Result := mrOK;
 end;

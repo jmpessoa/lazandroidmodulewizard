@@ -59,6 +59,7 @@ type
     SpeedButton7: TSpeedButton;
     StatusBar1: TStatusBar;
     procedure CheckBox1Click(Sender: TObject);
+    procedure ComboBox1Click(Sender: TObject);
     procedure ComboBox1DblClick(Sender: TObject);
     procedure ComboBox1Exit(Sender: TObject);
     procedure ComboBox2Change(Sender: TObject);
@@ -394,6 +395,11 @@ procedure TFormWorkspace.CheckBox1Click(Sender: TObject);
 begin
 {  if CheckBox1.Checked then FUseControls:='Yes'
   else FUseControls:='No';}
+end;
+
+procedure TFormWorkspace.ComboBox1Click(Sender: TObject);
+begin
+   //
 end;
 
 procedure TFormWorkspace.ComboBox1DblClick(Sender: TObject);

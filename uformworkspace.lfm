@@ -234,10 +234,14 @@ object FormWorkspace: TFormWorkspace
   object ComboBox1: TComboBox
     Left = 9
     Height = 23
+    Hint = 'Hint: double click to update!'
     Top = 385
     Width = 472
     ItemHeight = 15
+    OnClick = ComboBox1Click
     OnDblClick = ComboBox1DblClick
+    ParentShowHint = False
+    ShowHint = True
     TabOrder = 7
   end
   object RadioGroup3: TRadioGroup
@@ -399,8 +403,8 @@ object FormWorkspace: TFormWorkspace
     Columns = 2
     ItemIndex = 1
     Items.Strings = (
-      '7c'
-      '9b'
+      '7'
+      '9'
     )
     OnClick = RadioGroup5Click
     ParentShowHint = False
