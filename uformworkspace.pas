@@ -249,7 +249,8 @@ procedure TFormWorkspace.RadioGroup5Click(Sender: TObject);
 begin
 
   if RadioGroup5.ItemIndex = 0 then FNDK:= '7'
-  else FNDK:= '9';
+  else if RadioGroup5.ItemIndex = 1 then FNDK:= '9'
+  else FNDK:= '10';
 
   ComboBox2.Items.Clear;
   ListBox1.Items.Clear;
@@ -276,6 +277,35 @@ begin
             ListBox1.ItemIndex:= 2;
         end;
      1: begin  //9
+            {
+          ComboBox2.Items.Add('android-8 [Froyo]');
+          ComboBox2.Items.Add('android-10 [Gingerbread]');
+          ComboBox2.Items.Add('android-14 [Ice Cream 4.0]');
+          ComboBox2.Items.Add('android-15 [Ice Cream 4.0x]');
+          ComboBox2.Items.Add('android-16 [Jelly Bean 4.1]');
+          ComboBox2.Items.Add('android-17 [Jelly Bean 4.2]');
+          ComboBox2.Items.Add('android-18 [Jelly Bean 4.3]');
+          ComboBox2.Items.Add('android-19 [KitKat 4.4]');
+             }
+
+          ComboBox2.Items.Add('Froyo');
+          ComboBox2.Items.Add('Gingerbread');
+          ComboBox2.Items.Add('Ice Cream 4.0');
+          ComboBox2.Items.Add('Ice Cream 4.0x');
+          ComboBox2.Items.Add('Jelly Bean 4.1');
+          ComboBox2.Items.Add('Jelly Bean 4.2');
+          ComboBox2.Items.Add('Jelly Bean 4.3');
+          ComboBox2.Items.Add('KitKat 4.4');
+
+          ComboBox2.ItemIndex:= 2; ////platform android-14
+
+          ListBox1.Items.Add('8');   //Api(8)Froyo (2.2)
+          ListBox1.Items.Add('10');  //Api(10)Gingerbread (2.3)
+          ListBox1.Items.Add('14');  //Api(14)Ice Cream Sandwich (4.0 - 4.0.1 - 4.0.2)
+
+          ListBox1.ItemIndex:= 2;
+        end;
+     2: begin  //10
             {
           ComboBox2.Items.Add('android-8 [Froyo]');
           ComboBox2.Items.Add('android-10 [Gingerbread]');
@@ -334,7 +364,13 @@ begin
   FMainActivity:= 'App'; {dummy for Simon template} //TODO: need name flexibility here...
 
   FAntPackageName:= LowerCase(Trim(Edit8.Text));
+
   FPathToWorkspace:= Edit1.Text;
+  FPathToAndroidNDK:= Edit2.Text;
+  FPathToAndroidSDK:=   Edit6.Text;
+
+  FPathToJavaTemplates:= Edit4.Text;
+
   FAndroidProjectName:= Trim(ComboBox1.Text);
   FAndroidPlatform:= GetNDKPlatform(ComboBox2.Text);
 

@@ -561,6 +561,10 @@ type
     procedure Finish;
     function  GetContext: jObject;
 
+    function GetStringResourceId(_resName: string): integer;
+    function GetStringResourceById(_resId: integer): string;
+
+
     function GetCurrentFormsIndex: integer;
 
     function GetNewFormsIndex: integer;
@@ -2180,6 +2184,16 @@ end;
 function jApp.GetContext: jObject;
 begin
   Result:= jApp_GetContext(Self.Jni.jEnv, Self.Jni.jThis);
+end;
+
+function jApp.GetStringResourceId(_resName: string): integer;
+begin
+   Result:= jApp_GetStringResourceId(Self.Jni.jEnv, Self.Jni.jThis, PChar(_resName));
+end;
+
+function  jApp.GetStringResourceById(_resId: integer): string;
+begin
+  Result:= jApp_GetStringResourceById(Self.Jni.jEnv, Self.Jni.jThis, _resId);
 end;
 
 Function InputTypeToStrEx ( InputType : TInputTypeEx ) : String;

@@ -1545,7 +1545,7 @@ begin
                                                  'prebuilt'+DirectorySeparator+osys+DirectorySeparator+
                                                  'lib'+DirectorySeparator+'gcc'+DirectorySeparator+
                                                  'arm-linux-androideabi'+DirectorySeparator+'4.4.3';
-  if FNDK = '9' then
+  if (FNDK = '9') or (FNDK = '10') then
       pathToNdkToolchainsArm:= FPathToAndroidNDK+DirectorySeparator+'toolchains'+DirectorySeparator+
                                                  'arm-linux-androideabi-4.6'+DirectorySeparator+
                                                  'prebuilt'+DirectorySeparator+osys+DirectorySeparator+
@@ -1557,7 +1557,7 @@ begin
                                                  'arm-linux-androideabi-4.4.3'+DirectorySeparator+
                                                  'prebuilt'+DirectorySeparator+osys+DirectorySeparator+
                                                  'bin';
-  if FNDK = '9' then
+  if (FNDK = '9') or (FNDK = '10') then
       pathToNdkToolchainsBinArm:= FPathToAndroidNDK+DirectorySeparator+'toolchains'+DirectorySeparator+
                                                  'arm-linux-androideabi-4.6'+DirectorySeparator+
                                                  'prebuilt'+DirectorySeparator+osys+DirectorySeparator+
@@ -1573,7 +1573,7 @@ begin
                                                  'x86-4.4.3'+DirectorySeparator+'prebuilt'+DirectorySeparator+
                                                  osys+DirectorySeparator+'lib'+DirectorySeparator+
                                                  'gcc'+DirectorySeparator+'i686-android-linux'+DirectorySeparator+'4.4.3';
-  if FNDK = '9' then
+  if (FNDK = '9') or (FNDK = '10') then
       pathToNdkToolchainsX86:= FPathToAndroidNDK+DirectorySeparator+'toolchains'+DirectorySeparator+
                                                  'x86-4.6'+DirectorySeparator+'prebuilt'+DirectorySeparator+
                                                  osys+DirectorySeparator+'lib'+DirectorySeparator+'gcc'+DirectorySeparator+
@@ -1583,7 +1583,7 @@ begin
       pathToNdkToolchainsBinX86:= FPathToAndroidNDK+DirectorySeparator+'toolchains'+DirectorySeparator+
                                                  'x86-4.4.3'+DirectorySeparator+'prebuilt'+DirectorySeparator+
                                                  osys+DirectorySeparator+'bin';
-  if FNDK = '9' then
+  if (FNDK = '9') or (FNDK = '10') then
       pathToNdkToolchainsBinX86:= FPathToAndroidNDK+DirectorySeparator+'toolchains'+DirectorySeparator+
                                                  'x86-4.6'+DirectorySeparator+'prebuilt'+DirectorySeparator+
                                                  osys+DirectorySeparator+'bin';

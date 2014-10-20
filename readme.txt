@@ -29,10 +29,26 @@
 			http://github.com/x2nie/LiteZarus
 
 
-		NEW! LiteZarus4Android [just for Windows, sorry] :: win32/Android NDK-9b/{ARM and x86 !}
+		NEW! LiteZarus4Android [just for Windows, sorry] :: win32/Android NDK-9/{ARM and x86 !}
 			https://onedrive.live.com/redir?resid=78D6F726E8F0C522%21236 [right to download!]
+
+		NEW! Laz4Android [by TrueTom]
+			Date:2014-10-18
+			FPC: 2.7.1 SVN 28863  win32/arm-android/i386-android/jvm-android
+			Lazarus:1.3 trunk svn 46592
+			Android NDK: r10c (arm-linux-androideabi-4.6 + x86-4.6)
+			http://sourceforge.net/projects/laz4android/files/?source=navbar
+
+
                                 
 		-Lazarus forum community!
+
+Version 0.6 - rev. 01 - 20 October 2014 -
+
+NEW! Added Support to Laz4Android [by TrueTom]: 
+		Lazarus:1.3 trunk svn 46592 +  
+		FPC: 2.7.1 SVN 28863  win32/arm-android/i386-android/jvm-android
+		http://sourceforge.net/projects/laz4android/files/?source=navbar
 
 Version 0.6 - 15 October 2014 -
 
@@ -132,7 +148,7 @@ Version 0.6 - 15 October 2014 -
 
 		Modify some [piece] of path information like:
 
-		[C:\adt32\eclipse\workspace] or [C:\adt32\ant\workspace] 
+		[C:\adt32\eclipse\workspace] 
 		[C:\adt32\ndk7]
 
 		according to your system ..

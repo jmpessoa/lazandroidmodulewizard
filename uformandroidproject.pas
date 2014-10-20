@@ -1444,6 +1444,7 @@ begin
   end;
 end;
 
+
 procedure TFormAndroidProject.FormCloseQuery(Sender: TObject; var CanClose: boolean);
 begin
 
@@ -1468,10 +1469,27 @@ begin
 end;
 
 procedure TFormAndroidProject.FormShow(Sender: TObject);
+var
+  selectedProject: TTreeNode;
+  i: integer;
+  strTemp: string;
 begin
    SynMemo1.Lines.Clear;
    SynMemo2.Lines.Clear;
    PageControl1.ActivePage:= TabSheet1;
+
+   Self.Caption:= Self.Caption+ ' <> ' + Self.AndroidProjectName;
+
+   i:= LastPos(DirectorySeparator, Self.AndroidProjectName);
+
+   if i > 0 then  strTemp:= Copy(Self.AndroidProjectName,i+1, 100 {dummy})
+   else  strTemp:=  Self.AndroidProjectName;
+
+   //ShowMessage(strTemp);
+
+   selectedProject:= ShellTreeView1.Items.FindNodeWithText(Trim(strTemp));
+   ShellTreeView1.Selected:= selectedProject;
+
 end;
 
 
@@ -2364,6 +2382,7 @@ begin
   FHackListJNIHeader:= TStringList.Create;
   FHackListPascalClass:= TStringList.Create;
   FHackListPascalClassImpl:= TStringList.Create;
+
 end;
 
    {...........generics.............}

@@ -8109,6 +8109,31 @@ public Context GetContext() {
    return this.activity; 
 }
 
+//http://daniel-codes.blogspot.com.br/2009/12/dynamically-retrieving-resources-in.html
+/*
+ *Given that you can access R.java just fine normally in code.
+  As long as you are retrieving data from your application's R.java - Use reflection!
+ * 
+ */
+
+public int GetStringResourceId(String _resName) {
+	  try {
+	     Class res = R.string.class;
+	     Field field = res.getField(_resName);  //"drawableName"
+	     int strId = field.getInt(null);
+	     return strId;
+	   }
+	   catch (Exception e) {
+	     Log.e("MyTag", "Failure to get strId.", e);
+	     return 0;
+	   }   
+}
+
+public String GetStringResourceById(int _resID) {   	
+	return (String)( this.activity.getResources().getText(_resID));
+}
+
+   
 
 // -------------------------------------------------------------------------
 //  App Related

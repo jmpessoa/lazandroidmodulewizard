@@ -145,6 +145,10 @@ Procedure jApp_ScreenStyle             (env:PJNIEnv;this:jobject; screenstyle : 
 //by jmpessoa
 procedure jApp_GetJNIEnv(var env: PJNIEnv);
 
+function  jApp_GetStringResourceId(env:PJNIEnv;this:jobject; _resName: string): integer;
+function  jApp_GetStringResourceById(env:PJNIEnv;this:jobject; _resId: integer ): string;
+
+
 // Asset
 Function  jAsset_SaveToFile            (env:PJNIEnv; this:jobject; src,dst:String) : Boolean;
 //
@@ -1822,6 +1826,41 @@ begin
   gVM^.GetEnv(gVM, @PEnv,JNI_VERSION_1_6);
   env:= PJNIEnv(PEnv);
 end;
+
+function  jApp_GetStringResourceId(env:PJNIEnv;this:jobject; _resName: string): integer;
+var
+ _cls: jClass;
+ _jMethod : jMethodID = nil;
+ _jParams : array[0..0] of jValue;
+begin
+  _cls := env^.GetObjectClass(env, this);
+  _jMethod:= env^.GetMethodID(env, _cls, 'GetStringResourceId', '(Ljava/lang/String;)I');
+  _jParams[0].l := env^.NewStringUTF(env, pchar(_resName) );
+  Result:= env^.CallIntMethodA(env,this,_jMethod,@_jParams);
+  env^.DeleteLocalRef(env,_jParams[0].l);
+end;
+
+function  jApp_GetStringResourceById(env:PJNIEnv;this:jobject; _resId: integer ): string;
+var
+ _cls: jClass;
+ _jMethod : jMethodID = nil;
+ _jParams : array[0..0] of jValue;
+ _jString : jString;
+ _jBoolean: jBoolean;
+begin
+  _cls := env^.GetObjectClass(env, this);
+  _jMethod:= env^.GetMethodID(env, _cls, 'GetStringResourceById', '(I)Ljava/lang/String;');
+  _jParams[0].i := _resId;
+  _jString:= env^.CallObjectMethodA(env,this,_jMethod,@_jParams);
+  Case _jString = nil of
+   True : Result    := '';
+   False: begin
+           _jBoolean := JNI_False;
+           Result    := String( env^.GetStringUTFChars(Env,_jString,@_jBoolean) );
+          end;
+  end;
+end;
+
 //------------------------------------------------------------------------------
 // Asset
 //------------------------------------------------------------------------------
@@ -11429,147 +11468,6 @@ begin
   _methodID:= env^.GetMethodID(env, cls, 'Close', '()V');
   env^.CallVoidMethod(env, SqliteDataBase, _methodID);
 end;
-
-{jMediaPlayer :by jmpessoa}
-
-(*
-function jMediaPlayer_Create(env: PJNIEnv; this: jObject; selfPas: TObject; pathToFileName: string): jObject;
-var
-  jMethod : jMethodID = nil;
-  jParams : array[0..1] of jValue;
-  jCls: jClass;
-begin
-  jParams[0].j := Int64(selfPas);
-  jParams[1].l := env^.NewStringUTF(env, PChar(pathToFileName));
-  jCls:= Get_gjClass(env);
-  jMethod:= env^.GetMethodID(env, jCls, 'jMediaPlayer_Create', '(JLjava/lang/String;)Ljava/lang/Object;');
-  Result := env^.CallObjectMethodA(env, this, jMethod, @jParams);
-  Result := env^.NewGlobalRef(env,Result);
-  env^.DeleteLocalRef(env,jParams[1].l);
-end;
-
-procedure jMediaPlayer_Free(env: PJNIEnv; this: jObject; MediaPlayer: jObject);
-var
-  jMethod: jMethodID = nil;
-  jCls: jClass;
-begin
-  jCls:= env^.GetObjectClass(env, MediaPlayer);
-  jMethod:= env^.GetMethodID(env, jCls, 'Free', '()V');
-  env^.CallVoidMethod(env, MediaPlayer, jMethod);
-  env^.DeleteGlobalRef(env, MediaPlayer);
-end;
-
-procedure jMediaPlayer_SetDataSource(env: PJNIEnv; this: JObject; MediaPlayer: jObject; path: string);
-var
-  jMethod : jMethodID = nil;
-  jParams : array[0..0] of jValue;
-  jCls: jClass;
-begin
-  jParams[0].l := env^.NewStringUTF(env, PChar(path));
-  jCls:= env^.GetObjectClass(env, MediaPlayer);
-  jMethod:= env^.GetMethodID(env, jCls, 'SetDataSource', '(Ljava/lang/String;)V');
-  env^.CallVoidMethodA(env, MediaPlayer, jMethod, @jParams);
-  env^.DeleteLocalRef(env,jParams[0].l);
-end;
-
-{ Class:     org_jmpessoa_trycode_JNIHello
-  Method:    Prepare
-  Signature: ()V }
-procedure jMediaPlayer_Prepare(env: PJNIEnv; this: JObject; MediaPlayer: jObject);
-begin
-  {your code....}
-end;
-
-{ Class:     org_jmpessoa_trycode_JNIHello
-  Method:    Start
-  Signature: ()V }
-procedure jMediaPlayer_Start(env: PJNIEnv; this: JObject; MediaPlayer: jObject);
-begin
-  {your code....}
-end;
-
-{ Class:     org_jmpessoa_trycode_JNIHello
-  Method:    Stop
-  Signature: ()V }
-procedure jMediaPlayer_Stop(env: PJNIEnv; this: JObject; MediaPlayer: jObject);
-begin
-  {your code....}
-end;
-
-{ Class:     org_jmpessoa_trycode_JNIHello
-  Method:    Pause
-  Signature: ()V }
-procedure jMediaPlayer_Pause(env: PJNIEnv; this: JObject; MediaPlayer: jObject);
-begin
-  {your code....}
-end;
-
-{ Class:     org_jmpessoa_trycode_JNIHello
-  Method:    IsPlaying
-  Signature: ()Z }
-function jMediaPlayer_IsPlaying(env: PJNIEnv; this: JObject; MediaPlayer: jObject): boolean;
-begin
-  {your code....}
-  {Result:=;}
-end;
-
-{ Class:     org_jmpessoa_trycode_JNIHello
-  Method:    SeekTo
-  Signature: (I)V }
-procedure jMediaPlayer_SeekTo(env: PJNIEnv; this: JObject; MediaPlayer: jObject; millis: JInt);
-begin
-  {your code....}
-end;
-
-{ Class:     org_jmpessoa_trycode_JNIHello
-  Method:    SetLooping
-  Signature: (Z)UNKNOWN }
-procedure jMediaPlayer_SetLooping(env: PJNIEnv; this: JObject; MediaPlayer: jObject; looping: boolean);
-begin
-  {your code....}
-  {Result:=;}
-end;
-
-{ Class:     org_jmpessoa_trycode_JNIHello
-  Method:    IsLooping
-  Signature: ()Z }
-function jMediaPlayer_IsLooping(env: PJNIEnv; this: JObject; MediaPlayer: jObject): boolean;
-begin
-  {your code....}
-  {Result:=;}
-end;
-
-procedure jMediaPlayer_SelectTrack(env: PJNIEnv; this: JObject; MediaPlayer: jObject; index: JInt);
-begin
-end;
-
-{ Class:     org_jmpessoa_trycode_JNIHello
-  Method:    GetCurrentPosition
-  Signature: ()I }
-function jMediaPlayer_GetCurrentPosition(env: PJNIEnv; this: JObject; MediaPlayer: jObject): JInt;
-begin
-  {your code....}
-  {Result:=;}
-end;
-
-{ Class:     org_jmpessoa_trycode_JNIHello
-  Method:    GetDuration
-  Signature: ()I }
-function jMediaPlayer_GetDuration(env: PJNIEnv; this: JObject; MediaPlayer: jObject): JInt;
-begin
-  {your code....}
-  {Result:=;}
-end;
-
-{ Class:     org_jmpessoa_trycode_JNIHello
-  Method:    SetVolume
-  Signature: (FF)V }
-procedure jMediaPlayer_SetVolume(env: PJNIEnv; this: JObject; MediaPlayer: jObject; leftVolume: JFloat; rightVolume: JFloat);
-begin
-  {your code....}
-end;
-*)
-
 
 //------------------------------------------------------------------------------
 // jHttp_Get

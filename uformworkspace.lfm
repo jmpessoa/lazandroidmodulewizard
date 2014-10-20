@@ -126,16 +126,16 @@ object FormWorkspace: TFormWorkspace
     TabOrder = 2
   end
   object Edit2: TEdit
-    Left = 236
+    Left = 248
     Height = 23
     Top = 192
-    Width = 380
+    Width = 368
     TabOrder = 3
   end
   object Label2: TLabel
-    Left = 236
+    Left = 248
     Height = 15
-    Top = 174
+    Top = 176
     Width = 114
     Caption = 'Path to Android NDK:'
     ParentColor = False
@@ -385,10 +385,11 @@ object FormWorkspace: TFormWorkspace
   end
   object RadioGroup5: TRadioGroup
     Left = 9
-    Height = 40
+    Height = 49
     Top = 175
-    Width = 90
+    Width = 100
     AutoFill = True
+    AutoSize = True
     Caption = 'Android NDK:'
     ChildSizing.LeftRightSpacing = 6
     ChildSizing.TopBottomSpacing = 6
@@ -397,14 +398,15 @@ object FormWorkspace: TFormWorkspace
     ChildSizing.ShrinkHorizontal = crsScaleChilds
     ChildSizing.ShrinkVertical = crsScaleChilds
     ChildSizing.Layout = cclLeftToRightThenTopToBottom
-    ChildSizing.ControlsPerLine = 2
-    ClientHeight = 22
-    ClientWidth = 86
-    Columns = 2
+    ChildSizing.ControlsPerLine = 3
+    ClientHeight = 31
+    ClientWidth = 96
+    Columns = 3
     ItemIndex = 1
     Items.Strings = (
       '7'
       '9'
+      '10'
     )
     OnClick = RadioGroup5Click
     ParentShowHint = False
@@ -424,9 +426,9 @@ object FormWorkspace: TFormWorkspace
     Width = 656
   end
   object ComboBox2: TComboBox
-    Left = 104
+    Left = 112
     Height = 23
-    Top = 191
+    Top = 192
     Width = 125
     ItemHeight = 15
     ItemIndex = 2
@@ -446,7 +448,7 @@ object FormWorkspace: TFormWorkspace
     Text = 'Ice Cream 4.0'
   end
   object Label4: TLabel
-    Left = 104
+    Left = 120
     Height = 15
     Top = 174
     Width = 55
@@ -487,7 +489,8 @@ object FormWorkspace: TFormWorkspace
       '16'
       '17'
       '18'
-      '19'
+      '20'
+      '21'
     )
     ItemHeight = 15
     OnClick = ListBox2Click
@@ -507,7 +510,7 @@ object FormWorkspace: TFormWorkspace
     top = 320
   end
   object SelectDirectoryDialog2: TSelectDirectoryDialog
-    left = 376
+    left = 384
     top = 176
   end
   object SelectDirectoryDialog4: TSelectDirectoryDialog
@@ -519,7 +522,7 @@ object FormWorkspace: TFormWorkspace
     top = 16
   end
   object SelectDirectoryDialog6: TSelectDirectoryDialog
-    left = 424
+    left = 472
     top = 136
   end
   object SelectDirectoryDialog7: TSelectDirectoryDialog
