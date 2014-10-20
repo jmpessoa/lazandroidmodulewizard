@@ -43,6 +43,11 @@
                                 
 		-Lazarus forum community!
 
+Version 0.6 - rev. 02 - 20 October 2014 -
+
+NEW! [Dialog config paths ...] Add Checkbox to configure output files path 
+NEW! [Dialog config paths ...] Add Checkbox to add ".so" suffix
+
 Version 0.6 - rev. 01 - 20 October 2014 -
 
 NEW! Added Support to Laz4Android [by TrueTom]: 

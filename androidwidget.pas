@@ -561,12 +561,11 @@ type
     procedure Finish;
     function  GetContext: jObject;
 
+    //thanks to  thierrydijoux
     function GetStringResourceId(_resName: string): integer;
     function GetStringResourceById(_resId: integer): string;
 
-
     function GetCurrentFormsIndex: integer;
-
     function GetNewFormsIndex: integer;
     function GetPreviousFormsIndex: integer;
 
@@ -2186,6 +2185,7 @@ begin
   Result:= jApp_GetContext(Self.Jni.jEnv, Self.Jni.jThis);
 end;
 
+//thanks to  thierrydijoux
 function jApp.GetStringResourceId(_resName: string): integer;
 begin
    Result:= jApp_GetStringResourceId(Self.Jni.jEnv, Self.Jni.jThis, PChar(_resName));

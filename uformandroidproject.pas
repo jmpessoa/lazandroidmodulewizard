@@ -110,6 +110,9 @@ type
 
     FHackCreateProperties: string;
 
+     FSetFileSuffixSo: boolean;
+     FAbsolutOutputFilePath: boolean;
+
     procedure DoJavaParse;
 
     function GetPascalCode(funcName, funcParam, funcResult: string): string;
@@ -153,6 +156,8 @@ type
     property MainActivity: string read FMainActivity write FMainActivity;
     property MinApi: string  read FMinApi write FMinApi;
     property TargetApi: string  read FTargetApi write FTargetApi;
+    property SetFileSuffixSo: boolean read FSetFileSuffixSo write FSetFileSuffixSo;
+    property AbsolutOutputFilePath: boolean read FAbsolutOutputFilePath write FAbsolutOutputFilePath;
   end;
 
 var

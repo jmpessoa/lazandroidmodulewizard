@@ -18,6 +18,7 @@ type
     Bevel4: TBevel;
     Bevel5: TBevel;
     BitBtn2: TBitBtn;
+    CheckGroup1: TCheckGroup;
     ComboBox1: TComboBox;
     ComboBox2: TComboBox;
     Edit1: TEdit;
@@ -58,14 +59,11 @@ type
     SpeedButton6: TSpeedButton;
     SpeedButton7: TSpeedButton;
     StatusBar1: TStatusBar;
-    procedure CheckBox1Click(Sender: TObject);
-    procedure ComboBox1Click(Sender: TObject);
     procedure ComboBox1DblClick(Sender: TObject);
     procedure ComboBox1Exit(Sender: TObject);
     procedure ComboBox2Change(Sender: TObject);
     procedure FormActivate(Sender: TObject);
     procedure FormClose(Sender: TObject; var CloseAction: TCloseAction);
-    procedure FormCreate(Sender: TObject);
     procedure ListBox1Click(Sender: TObject);
     procedure ListBox1SelectionChange(Sender: TObject; User: boolean);
     procedure ListBox2Click(Sender: TObject);
@@ -107,6 +105,10 @@ type
     FMainActivity: string;   //Simon "App"
     FNDK: string;
     FAndroidPlatform: string;
+
+    FSetFileSuffixSo: boolean;
+    FAbsolutOutputFilePath: boolean;
+
   public
     { public declarations }
     procedure LoadSettings(const pFilename: string);
@@ -138,6 +140,8 @@ type
     property MainActivity: string read FMainActivity write FMainActivity;
     property NDK: string read FNDK write FNDK;
     property AndroidPlatform: string read FAndroidPlatform write FAndroidPlatform;
+    property SetFileSuffixSo: boolean read FSetFileSuffixSo write FSetFileSuffixSo;
+    property AbsolutOutputFilePath: boolean read FAbsolutOutputFilePath write FAbsolutOutputFilePath;
   end;
 
   procedure GetSubDirectories(const directory : string; list : TStrings);
@@ -418,24 +422,11 @@ begin
      end;
   end;
 
+  FSetFileSuffixSo:= CheckGroup1.Checked[0];
+  FAbsolutOutputFilePath:= CheckGroup1.Checked[1];
+
   SaveSettings(FFileName);
 
-end;
-
-procedure TFormWorkspace.FormCreate(Sender: TObject);
-begin
-
-end;
-
-procedure TFormWorkspace.CheckBox1Click(Sender: TObject);
-begin
-{  if CheckBox1.Checked then FUseControls:='Yes'
-  else FUseControls:='No';}
-end;
-
-procedure TFormWorkspace.ComboBox1Click(Sender: TObject);
-begin
-   //
 end;
 
 procedure TFormWorkspace.ComboBox1DblClick(Sender: TObject);
@@ -609,10 +600,22 @@ end;
 procedure TFormWorkspace.LoadSettings(const pFilename: string);
 var
   i1, i2, i3, i5, j1, j2, j3: integer;
+  strYesNo: string;
 begin
   FFileName:= pFilename;
   with TIniFile.Create(pFilename) do
   begin
+
+    strYesNo:= ReadString('NewProject','SetFileSuffixSo', '');
+    FSetFileSuffixSo:= True;
+    if (strYesNo = '') or (strYesNo='no') then FSetFileSuffixSo:= False;
+    CheckGroup1.Checked[0]:= FSetFileSuffixSo;
+
+    strYesNo:= ReadString('NewProject','AbsolutOutputFilePath', '');
+    FAbsolutOutputFilePath:= True;
+    if (strYesNo = '') or (strYesNo='no') then FAbsolutOutputFilePath:= False;
+    CheckGroup1.Checked[1]:= FAbsolutOutputFilePath;
+
     FPathToWorkspace:= ReadString('NewProject','PathToWorkspace', '');
     FPathToNdkPlataforms:= ReadString('NewProject','PathToNdkPlataforms', '');
 
@@ -709,6 +712,8 @@ begin
 end;
 
 procedure TFormWorkspace.SaveSettings(const pFilename: string);
+var
+  strFlag: string;
 begin
    with TInifile.Create(pFilename) do
    begin
@@ -734,18 +739,17 @@ begin
       WriteString('NewProject', 'MinApi', IntToStr(ListBox1.ItemIndex));
       WriteString('NewProject', 'TargetApi', IntToStr(ListBox2.ItemIndex));
 
-      {
-      if CheckGroup1.Checked[1] then
-         WriteString('NewProject', 'TouchtestEnabled', 'True')
-      else
-         WriteString('NewProject', 'TouchtestEnabled', 'False');
-      }
-
       WriteString('NewProject', 'AntBuildMode', 'debug'); //default...
 
       WriteString('NewProject', 'MainActivity', FMainActivity); //dummy
 
       WriteString('NewProject', 'AndroidPlatform', IntToStr(ComboBox2.ItemIndex));
+
+      if CheckGroup1.Checked[0] then strFlag:= 'yes' else  strFlag:= 'no';
+      WriteString('NewProject', 'SetFileSuffixSo', strFlag);
+
+      if CheckGroup1.Checked[1] then strFlag:= 'yes' else  strFlag:= 'no';
+      WriteString('NewProject', 'AbsolutOutputFilePath', strFlag);
 
       Free;
    end;

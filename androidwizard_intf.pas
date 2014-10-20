@@ -199,6 +199,9 @@ type
      FPathToJavaSrc: string;
      FAndroidPlatform: string;
 
+     FSetFileSuffixSo: boolean;
+     FAbsolutOutputFilePath: boolean;
+
      function SettingsFilename: string;
      function TryNewJNIAndroidInterfaceCode: boolean;
      function GetPathToJNIFolder(fullPath: string): string;
@@ -838,7 +841,6 @@ begin
     FJavaClassName:= frm.JavaClassName;
     FPathToClassName:= frm.PathToClassName;
     FPascalJNIInterfaceCode:= frm.PascalJNIInterfaceCode;
-
     {$I-}
     ChDir(FAndroidProjectName+DirectorySeparator+ 'jni');
     if IOResult <> 0 then MkDir(FAndroidProjectName+ DirectorySeparator + 'jni');
@@ -876,7 +878,7 @@ end;
 
 function TAndroidProjectDescriptor.GetLocalizedName: string;
 begin
-  Result := 'JNI Android Module'+ LineEnding;
+  Result := 'JNI Android Module' {+ LineEnding}; // thanks to Stephano!
 end;
 
 function TAndroidProjectDescriptor.GetLocalizedDescription: string;
@@ -955,6 +957,9 @@ begin
     FTargetApi:= frm.TargetApi;
 
     FMainActivity:= frm.MainActivity;
+
+    FSetFileSuffixSo:= frm.SetFileSuffixSo;
+    FAbsolutOutputFilePath:= frm.AbsolutOutputFilePath;
 
     if  frm.TouchtestEnabled = 'True' then
         FTouchtestEnabled:= '-Dtouchtest.enabled=true'
@@ -1354,19 +1359,19 @@ begin
     linuxPathToAdbBin:= linuxPathToAndroidSdk+linuxDirSeparator+'platform-tools';
     //linux install
     strList.Clear;
-    strList.Add('~'+linuxPathToAdbBin+linuxDirSeparator+'adb uninstall '+FAntPackageName+'.'+LowerCase(projName));
-    strList.Add('~'+linuxPathToAdbBin+linuxDirSeparator+'adb install -r '+linuxDirSeparator+'bin'+linuxDirSeparator+projName+'-'+FAntBuildMode+'.apk');
-    strList.Add('~'+linuxPathToAdbBin+linuxDirSeparator+'adb logcat');
+    strList.Add(linuxPathToAdbBin+linuxDirSeparator+'adb uninstall '+FAntPackageName+'.'+LowerCase(projName));
+    strList.Add(linuxPathToAdbBin+linuxDirSeparator+'adb install -r '+linuxDirSeparator+'bin'+linuxDirSeparator+projName+'-'+FAntBuildMode+'.apk');
+    strList.Add(linuxPathToAdbBin+linuxDirSeparator+'adb logcat');
     strList.SaveToFile(linuxAndroidProjectName+linuxDirSeparator+'install.sh');
 
     //linux uninstall
     strList.Clear;
-    strList.Add('~'+linuxPathToAdbBin+linuxDirSeparator+'adb uninstall '+FAntPackageName+'.'+LowerCase(projName));
+    strList.Add(linuxPathToAdbBin+linuxDirSeparator+'adb uninstall '+FAntPackageName+'.'+LowerCase(projName));
     strList.SaveToFile(linuxAndroidProjectName+linuxDirSeparator+'uninstall.sh');
 
     //linux logcat
     strList.Clear;
-    strList.Add('~'+linuxPathToAdbBin+linuxDirSeparator+'adb logcat');
+    strList.Add(linuxPathToAdbBin+linuxDirSeparator+'adb logcat');
     strList.SaveToFile(linuxAndroidProjectName+linuxDirSeparator+'logcat.sh');
 
     strList.Free;
@@ -1636,23 +1641,23 @@ begin
 
   if FInstructionSet <> 'x86' then
   begin
-     customOptions_default:='-Xd'+' -Cf'+ FFPUSet;
-     customOptions_default:= customOptions_default + ' -Cp'+FInstructionSet;
+     customOptions_default:='-Xd'+' -Cf'+ FFPUSet; //customOptions_default:= FInstructionSet; {-Cp}
+     {customOptions_default:= customOptions_default + ' -Cp'+FInstructionSet;}
   end
   else
   begin
      customOptions_default:= '-Xd';
   end;
 
-  customOptions_armV6:= '-Xd'+' -Cf'+ FFPUSet + ' -CpArmV6';
-  customOptions_armV7a:='-Xd'+' -Cf'+ FFPUSet + ' -CpArmV7a';
+  customOptions_armV6:= '-Xd'+' -Cf'+ FFPUSet; {+ ' -CpArmV6';}
+  customOptions_armV7a:='-Xd'+' -Cf'+ FFPUSet; {+ ' -CpArmV7a';}
   customOptions_x86:= '-Xd';
 
   customOptions_default:= customOptions_default +' -XParm-linux-androideabi-';
 
   customOptions_armV6:= customOptions_armV6 +' -XParm-linux-androideabi-';
   customOptions_armV7a:=customOptions_armV7a +' -XParm-linux-androideabi-';
-  customOptions_x86:= customOptions_x86+' -XParm-linux-androideabi-';
+  customOptions_x86:= customOptions_x86+' -XPi686-linux-androideabi-';
 
   if FInstructionSet <> 'x86' then
   begin
@@ -1666,12 +1671,13 @@ begin
   customOptions_armV6:= customOptions_armV6+' -FD'+pathToNdkToolchainsBinArm;
   customOptions_armV7a:= customOptions_armV7a+' -FD'+pathToNdkToolchainsBinArm;
   customOptions_x86:= customOptions_x86+' -FD'+pathToNdkToolchainsBinX86;
-
-  customOptions_default:= customOptions_default+' -o'+FPathToJNIFolder+DirectorySeparator+'libs'+DirectorySeparator+auxStr+DirectorySeparator+'lib'+LowerCase(FJavaClassName)+'.so';
-
+  if FSetFileSuffixSo then
+    customOptions_default:= customOptions_default+' -o'+FPathToJNIFolder+DirectorySeparator+'libs'+DirectorySeparator+auxStr+DirectorySeparator+'lib'+LowerCase(FJavaClassName)+'.so';
   customOptions_armV6:= customOptions_armV6+' -o'+FPathToJNIFolder+DirectorySeparator+'libs'+DirectorySeparator+auxStr+DirectorySeparator+'lib'+LowerCase(FJavaClassName)+'.so';
+
   customOptions_armV7a:= customOptions_armV7a+' -o'+FPathToJNIFolder+DirectorySeparator+'libs'+DirectorySeparator+auxStr+DirectorySeparator+'lib'+LowerCase(FJavaClassName)+'.so';
-  customOptions_x86:= customOptions_x86+' -o'+FPathToJNIFolder+DirectorySeparator+'libs'+DirectorySeparator+auxStr+DirectorySeparator+'lib'+LowerCase(FJavaClassName)+'.so';
+  if FSetFileSuffixSo then
+    customOptions_x86:= customOptions_x86+' -o'+FPathToJNIFolder+DirectorySeparator+'libs'+DirectorySeparator+auxStr+DirectorySeparator+'lib'+LowerCase(FJavaClassName)+'.so';
 
   auxList.Clear;
   auxList.Add('<Libraries Value="'+libraries_x86+'"/>');
@@ -1739,11 +1745,17 @@ begin
   extInstructionSet:='';
   if FInstructionSet <> 'x86' then extInstructionSet:= ' -Cp'+FInstructionSet + ' -Cf'+ FFPUSet;
 
-  AProject.LazCompilerOptions.TargetFilename:=
-                              FPathToJNIFolder+DirectorySeparator+'libs'+DirectorySeparator+auxStr+DirectorySeparator+'lib'+LowerCase(FJavaClassName)+'.so';{-o}
+  if FAbsolutOutputFilePath then
+    AProject.LazCompilerOptions.TargetFilename:=
+          FPathToJNIFolder+DirectorySeparator+'libs'+DirectorySeparator+auxStr+DirectorySeparator+'lib'+LowerCase(FJavaClassName){+'.so';}
+  else
+    AProject.LazCompilerOptions.TargetFilename:=
+          '..'+DirectorySeparator+'libs'+DirectorySeparator+auxStr+DirectorySeparator+'lib'+LowerCase(FJavaClassName);{-o}
 
-  AProject.LazCompilerOptions.UnitOutputDirectory :=
-                              FPathToJNIFolder+DirectorySeparator+'obj'+ DirectorySeparator+ LowerCase(FJavaClassName);
+  if FAbsolutOutputFilePath  then
+    AProject.LazCompilerOptions.UnitOutputDirectory :=FPathToJNIFolder+DirectorySeparator+'obj'+ DirectorySeparator+ LowerCase(FJavaClassName)
+  else
+   AProject.LazCompilerOptions.UnitOutputDirectory :='..'+DirectorySeparator+'obj'+ DirectorySeparator+LowerCase(FJavaClassName); {-FU}
 
   {Others}
   AProject.LazCompilerOptions.CustomOptions:= customOptions_default;

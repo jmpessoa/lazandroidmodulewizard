@@ -8116,6 +8116,7 @@ public Context GetContext() {
  * 
  */
 
+//thanks to thierrydijoux
 public int GetStringResourceId(String _resName) {
 	  try {
 	     Class res = R.string.class;
