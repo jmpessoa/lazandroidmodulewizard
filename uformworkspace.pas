@@ -59,6 +59,7 @@ type
     SpeedButton6: TSpeedButton;
     SpeedButton7: TSpeedButton;
     StatusBar1: TStatusBar;
+    procedure CheckGroup1Click(Sender: TObject);
     procedure ComboBox1DblClick(Sender: TObject);
     procedure ComboBox1Exit(Sender: TObject);
     procedure ComboBox2Change(Sender: TObject);
@@ -445,6 +446,11 @@ begin
 
   if Pos('ant', LowerCase(FPathToWorkspace) ) > 0 then
      RadioGroup3.ItemIndex:= 1;
+
+end;
+
+procedure TFormWorkspace.CheckGroup1Click(Sender: TObject);
+begin
 
 end;
 

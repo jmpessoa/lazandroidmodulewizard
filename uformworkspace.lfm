@@ -384,7 +384,7 @@ object FormWorkspace: TFormWorkspace
   object RadioGroup5: TRadioGroup
     Left = 9
     Height = 51
-    Top = 175
+    Top = 174
     Width = 100
     AutoFill = True
     AutoSize = True
@@ -504,12 +504,12 @@ object FormWorkspace: TFormWorkspace
     ParentColor = False
   end
   object CheckGroup1: TCheckGroup
-    Left = 392
-    Height = 96
-    Top = 418
-    Width = 168
+    Left = 388
+    Height = 98
+    Top = 416
+    Width = 176
     AutoFill = True
-    Caption = 'Compile/build:'
+    Caption = 'Compile/build [libcontrols]:'
     ChildSizing.LeftRightSpacing = 6
     ChildSizing.TopBottomSpacing = 6
     ChildSizing.EnlargeHorizontal = crsHomogenousChildResize
@@ -518,12 +518,13 @@ object FormWorkspace: TFormWorkspace
     ChildSizing.ShrinkVertical = crsScaleChilds
     ChildSizing.Layout = cclLeftToRightThenTopToBottom
     ChildSizing.ControlsPerLine = 1
-    ClientHeight = 76
-    ClientWidth = 164
+    ClientHeight = 78
+    ClientWidth = 172
     Items.Strings = (
-      'Add ".so" suffix [win!]'
-      'Output file = Project Path'
+      'Add ''.so'' [laz(win) < 46598]'
+      'Output   -> Project/libs/...'
     )
+    OnClick = CheckGroup1Click
     TabOrder = 18
     Data = {
       020000000202
