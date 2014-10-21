@@ -524,7 +524,6 @@ object FormWorkspace: TFormWorkspace
       'Add ''.so'' [laz(win) < 46598]'
       'Output   -> Project/libs/...'
     )
-    OnClick = CheckGroup1Click
     TabOrder = 18
     Data = {
       020000000202

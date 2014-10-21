@@ -59,9 +59,7 @@ type
     SpeedButton6: TSpeedButton;
     SpeedButton7: TSpeedButton;
     StatusBar1: TStatusBar;
-    procedure CheckGroup1Click(Sender: TObject);
     procedure ComboBox1DblClick(Sender: TObject);
-    procedure ComboBox1Exit(Sender: TObject);
     procedure ComboBox2Change(Sender: TObject);
     procedure FormActivate(Sender: TObject);
     procedure FormClose(Sender: TObject; var CloseAction: TCloseAction);
@@ -449,16 +447,6 @@ begin
 
 end;
 
-procedure TFormWorkspace.CheckGroup1Click(Sender: TObject);
-begin
-
-end;
-
-procedure TFormWorkspace.ComboBox1Exit(Sender: TObject);
-begin
-  //
-end;
-
 procedure TFormWorkspace.ComboBox2Change(Sender: TObject);
 begin
   ListBox1.Items.Clear;
@@ -613,13 +601,13 @@ begin
   begin
 
     strYesNo:= ReadString('NewProject','SetFileSuffixSo', '');
-    FSetFileSuffixSo:= True;
-    if (strYesNo = '') or (strYesNo='no') then FSetFileSuffixSo:= False;
+    FSetFileSuffixSo:= False;
+    if (strYesNo = '') or (strYesNo='yes') then FSetFileSuffixSo:= True;
     CheckGroup1.Checked[0]:= FSetFileSuffixSo;
 
     strYesNo:= ReadString('NewProject','AbsolutOutputFilePath', '');
-    FAbsolutOutputFilePath:= True;
-    if (strYesNo = '') or (strYesNo='no') then FAbsolutOutputFilePath:= False;
+    FAbsolutOutputFilePath:= False;
+    if (strYesNo = '') or (strYesNo='yes') then FAbsolutOutputFilePath:= True;
     CheckGroup1.Checked[1]:= FAbsolutOutputFilePath;
 
     FPathToWorkspace:= ReadString('NewProject','PathToWorkspace', '');
