@@ -1432,7 +1432,7 @@ var
   pathToNdkToolchainsX86: string;
   pathToNdkToolchainsArm: string;
 
-   //Stephano
+   //by Stephano
   pathToNdkToolchainsBinX86: string;
   pathToNdkToolchainsBinArm: string;
 
@@ -1641,8 +1641,7 @@ begin
 
   if FInstructionSet <> 'x86' then
   begin
-     customOptions_default:='-Xd'+' -Cf'+ FFPUSet; //customOptions_default:= FInstructionSet; {-Cp}
-     {customOptions_default:= customOptions_default + ' -Cp'+FInstructionSet;}
+     customOptions_default:='-Xd'+' -Cf'+ FFPUSet;
   end
   else
   begin
@@ -1683,18 +1682,21 @@ begin
   auxList.Add('<Libraries Value="'+libraries_x86+'"/>');
   auxList.Add('<TargetCPU Value="i386"/>');
   auxList.Add('<CustomOptions Value="'+customOptions_x86+'"/>');
+
   auxList.SaveToFile(FPathToJNIFolder+DirectorySeparator+'jni'+DirectorySeparator+'build-modes'+DirectorySeparator+'build_x86.txt');
 
   auxList.Clear;
   auxList.Add('<Libraries Value="'+libraries_arm+'"/>');
   auxList.Add('<TargetCPU Value="arm"/>');
   auxList.Add('<CustomOptions Value="'+customOptions_armV6+'"/>');
+  auxList.Add('<TargetProcessor Value="ARMV6"/>');
   auxList.SaveToFile(FPathToJNIFolder+DirectorySeparator+'jni'+DirectorySeparator+'build-modes'+DirectorySeparator+'build_armV6.txt');
 
   auxList.Clear;
   auxList.Add('<Libraries Value="'+libraries_arm+'"/>');
   auxList.Add('<TargetCPU Value="arm"/>');
   auxList.Add('<CustomOptions Value="'+customOptions_armV7a+'"/>');
+  auxList.Add('<TargetProcessor Value="ARMV7A"/>');
   auxList.SaveToFile(FPathToJNIFolder+DirectorySeparator+'jni'+DirectorySeparator+'build-modes'+DirectorySeparator+'build_armV7a.txt');
 
   auxList.Clear;
@@ -1709,6 +1711,7 @@ begin
   auxList.Add('       -If needed replace the line <Libraries ..... /> in the "*.lpi" by line from "build_*.txt"');
   auxList.Add('       -If needed replace the line <TargetCPU ..... /> in the "*.lpi" by line from "build_*.txt"');
   auxList.Add('       -If needed replace the line <CustomOptions ..... /> in the "*.lpi" by line from "build_*.txt"');
+  auxList.Add('       -If needed replace the line <TargetProcessor...../> in the "*.lpi" by line from "build_*.txt"');
   auxList.Add(' ');
   auxList.Add('   > Save the "*.lpi" project file ');
   auxList.Add(' ');
@@ -1757,9 +1760,12 @@ begin
   else
    AProject.LazCompilerOptions.UnitOutputDirectory :='..'+DirectorySeparator+'obj'+ DirectorySeparator+LowerCase(FJavaClassName); {-FU}
 
+  {TargetProcessor}  //again thanks to Stephano!
+  if FInstructionSet <> 'x86' then
+     AProject.LazCompilerOptions.TargetProcessor:= FInstructionSet; {-Cp}
+
   {Others}
   AProject.LazCompilerOptions.CustomOptions:= customOptions_default;
-
 
   sourceList.Free;
   Result := mrOK;
