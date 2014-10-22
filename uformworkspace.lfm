@@ -503,32 +503,6 @@ object FormWorkspace: TFormWorkspace
     Caption = 'Target Api:'
     ParentColor = False
   end
-  object CheckGroup1: TCheckGroup
-    Left = 388
-    Height = 98
-    Top = 416
-    Width = 176
-    AutoFill = True
-    Caption = 'Compile/build [libcontrols]:'
-    ChildSizing.LeftRightSpacing = 6
-    ChildSizing.TopBottomSpacing = 6
-    ChildSizing.EnlargeHorizontal = crsHomogenousChildResize
-    ChildSizing.EnlargeVertical = crsHomogenousChildResize
-    ChildSizing.ShrinkHorizontal = crsScaleChilds
-    ChildSizing.ShrinkVertical = crsScaleChilds
-    ChildSizing.Layout = cclLeftToRightThenTopToBottom
-    ChildSizing.ControlsPerLine = 1
-    ClientHeight = 78
-    ClientWidth = 172
-    Items.Strings = (
-      'Add ''.so'' [laz(win) < 46598]'
-      'Output   -> Project/libs/...'
-    )
-    TabOrder = 18
-    Data = {
-      020000000202
-    }
-  end
   object SelectDirectoryDialog1: TSelectDirectoryDialog
     left = 416
     top = 320

@@ -38,10 +38,16 @@
 			Lazarus:1.3 trunk svn 46592
 			Android NDK: r10c (arm-linux-androideabi-4.6 + x86-4.6)
 			http://sourceforge.net/projects/laz4android/files/?source=navbar
-
-
                                 
 		-Lazarus forum community!
+
+Version 0.6 - rev. 03 - 22 October 2014 -
+
+UNDOES rev. 02: a new approach/solution for missing ".so" in Lazarus rev < 46598 [just windows!] 
+FIX the [absolut] output file paths! [Thanks to Stephano!]
+
+NEW! Simplifies navigation in dialog 2: "select java source"
+
 
 Version 0.6 - rev. 02 - 20 October 2014 -
 

@@ -199,9 +199,6 @@ type
      FPathToJavaSrc: string;
      FAndroidPlatform: string;
 
-     FSetFileSuffixSo: boolean;
-     FAbsolutOutputFilePath: boolean;
-
      function SettingsFilename: string;
      function TryNewJNIAndroidInterfaceCode: boolean;
      function GetPathToJNIFolder(fullPath: string): string;
@@ -815,7 +812,10 @@ begin
 
   Result := False;
   frm:= TFormAndroidProject.Create(nil);
-  frm.ShellTreeView1.Root:= FPathToJNIFolder;  //workspace...
+
+  frm.ShellTreeView1.ShowRoot:= False;
+  frm.ShellTreeView1.Root:= FAndroidProjectName; {seleceted project}        //FPathToJNIFolder; {workspace}
+
   frm.PathToJavaTemplates:= FPathToJavaTemplates;
   frm.AndroidProjectName:= FAndroidProjectName;
 
@@ -957,9 +957,6 @@ begin
     FTargetApi:= frm.TargetApi;
 
     FMainActivity:= frm.MainActivity;
-
-    FSetFileSuffixSo:= frm.SetFileSuffixSo;
-    FAbsolutOutputFilePath:= frm.AbsolutOutputFilePath;
 
     if  frm.TouchtestEnabled = 'True' then
         FTouchtestEnabled:= '-Dtouchtest.enabled=true'
@@ -1332,7 +1329,6 @@ begin
        tempStr:= FPathToAndroidSDK;
        SplitStr(tempStr, ':');
        linuxPathToAndroidSdk:= ReplaceChar (tempStr, '\', '/');
-
     {$ENDIF}
 
     //linux build Apk using "Ant"  ---- Thanks to Stephano!
@@ -1414,7 +1410,6 @@ var
   projName, auxStr: string;
   sourceList: TStringList;
   auxList: TStringList;
-  extInstructionSet: string;
 
   libraries_x86: string;
   libraries_arm: string;
@@ -1642,14 +1637,15 @@ begin
   if FInstructionSet <> 'x86' then
   begin
      customOptions_default:='-Xd'+' -Cf'+ FFPUSet;
+     customOptions_default:= customOptions_default + ' -Cp'+ FInstructionSet; //until laz bug fix for ARMV7A
   end
   else
   begin
      customOptions_default:= '-Xd';
   end;
 
-  customOptions_armV6:= '-Xd'+' -Cf'+ FFPUSet; {+ ' -CpArmV6';}
-  customOptions_armV7a:='-Xd'+' -Cf'+ FFPUSet; {+ ' -CpArmV7a';}
+  customOptions_armV6:= '-Xd'+' -Cf'+ FFPUSet+ ' -CpArmV6';  //until laz bug fix for ARMV7A
+  customOptions_armV7a:='-Xd'+' -Cf'+ FFPUSet+ ' -CpArmV7a'; //until laz bug fix for ARMV7A
   customOptions_x86:= '-Xd';
 
   customOptions_default:= customOptions_default +' -XParm-linux-androideabi-';
@@ -1670,19 +1666,27 @@ begin
   customOptions_armV6:= customOptions_armV6+' -FD'+pathToNdkToolchainsBinArm;
   customOptions_armV7a:= customOptions_armV7a+' -FD'+pathToNdkToolchainsBinArm;
   customOptions_x86:= customOptions_x86+' -FD'+pathToNdkToolchainsBinX86;
-  if FSetFileSuffixSo then
-    customOptions_default:= customOptions_default+' -o'+FPathToJNIFolder+DirectorySeparator+'libs'+DirectorySeparator+auxStr+DirectorySeparator+'lib'+LowerCase(FJavaClassName)+'.so';
-  customOptions_armV6:= customOptions_armV6+' -o'+FPathToJNIFolder+DirectorySeparator+'libs'+DirectorySeparator+auxStr+DirectorySeparator+'lib'+LowerCase(FJavaClassName)+'.so';
 
+
+  {$IFDEF WINDOWS}
+     //to others :: just to [fix bug] lazarus  rev < 46598 .... //thanks to Stephano!
+     customOptions_default:= customOptions_default+' -o..'+DirectorySeparator+'libs'+DirectorySeparator+auxStr+DirectorySeparator+'lib'+LowerCase(FJavaClassName)+'.so';
+  {$ENDIF}
+
+
+  customOptions_armV6:= customOptions_armV6+' -o'+FPathToJNIFolder+DirectorySeparator+'libs'+DirectorySeparator+auxStr+DirectorySeparator+'lib'+LowerCase(FJavaClassName)+'.so';
   customOptions_armV7a:= customOptions_armV7a+' -o'+FPathToJNIFolder+DirectorySeparator+'libs'+DirectorySeparator+auxStr+DirectorySeparator+'lib'+LowerCase(FJavaClassName)+'.so';
-  if FSetFileSuffixSo then
-    customOptions_x86:= customOptions_x86+' -o'+FPathToJNIFolder+DirectorySeparator+'libs'+DirectorySeparator+auxStr+DirectorySeparator+'lib'+LowerCase(FJavaClassName)+'.so';
+
+  {$IFDEF WINDOWS}
+     //to others :: just to [fix bug] lazarus  rev < 46598 .... //thanks to Stephano!
+    customOptions_x86:= customOptions_x86+' -o..'+DirectorySeparator+'libs'+DirectorySeparator+auxStr+DirectorySeparator+'lib'+LowerCase(FJavaClassName)+'.so';
+  {$ENDIF}
 
   auxList.Clear;
   auxList.Add('<Libraries Value="'+libraries_x86+'"/>');
   auxList.Add('<TargetCPU Value="i386"/>');
   auxList.Add('<CustomOptions Value="'+customOptions_x86+'"/>');
-
+  auxList.Add('<TargetProcessor Value=""/>');
   auxList.SaveToFile(FPathToJNIFolder+DirectorySeparator+'jni'+DirectorySeparator+'build-modes'+DirectorySeparator+'build_x86.txt');
 
   auxList.Clear;
@@ -1745,24 +1749,18 @@ begin
 
   auxList.Free;
 
-  extInstructionSet:='';
-  if FInstructionSet <> 'x86' then extInstructionSet:= ' -Cp'+FInstructionSet + ' -Cf'+ FFPUSet;
+  AProject.LazCompilerOptions.TargetFilename:=
+          '..'+DirectorySeparator+'libs'+DirectorySeparator+auxStr+DirectorySeparator+'lib'+LowerCase(FJavaClassName){+'.so'};
 
-  if FAbsolutOutputFilePath then
-    AProject.LazCompilerOptions.TargetFilename:=
-          FPathToJNIFolder+DirectorySeparator+'libs'+DirectorySeparator+auxStr+DirectorySeparator+'lib'+LowerCase(FJavaClassName){+'.so';}
-  else
-    AProject.LazCompilerOptions.TargetFilename:=
-          '..'+DirectorySeparator+'libs'+DirectorySeparator+auxStr+DirectorySeparator+'lib'+LowerCase(FJavaClassName);{-o}
+  AProject.LazCompilerOptions.UnitOutputDirectory :=
+         '..'+DirectorySeparator+'obj'+ DirectorySeparator+LowerCase(FJavaClassName); {-FU}
 
-  if FAbsolutOutputFilePath  then
-    AProject.LazCompilerOptions.UnitOutputDirectory :=FPathToJNIFolder+DirectorySeparator+'obj'+ DirectorySeparator+ LowerCase(FJavaClassName)
-  else
-   AProject.LazCompilerOptions.UnitOutputDirectory :='..'+DirectorySeparator+'obj'+ DirectorySeparator+LowerCase(FJavaClassName); {-FU}
+  {TargetProcessor}
 
-  {TargetProcessor}  //again thanks to Stephano!
+  (* //until lazarus fix bug for missing ARMV7A  //again thanks to Stephano!
   if FInstructionSet <> 'x86' then
      AProject.LazCompilerOptions.TargetProcessor:= FInstructionSet; {-Cp}
+  *)
 
   {Others}
   AProject.LazCompilerOptions.CustomOptions:= customOptions_default;

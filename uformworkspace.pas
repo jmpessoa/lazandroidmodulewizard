@@ -18,7 +18,6 @@ type
     Bevel4: TBevel;
     Bevel5: TBevel;
     BitBtn2: TBitBtn;
-    CheckGroup1: TCheckGroup;
     ComboBox1: TComboBox;
     ComboBox2: TComboBox;
     Edit1: TEdit;
@@ -105,9 +104,6 @@ type
     FNDK: string;
     FAndroidPlatform: string;
 
-    FSetFileSuffixSo: boolean;
-    FAbsolutOutputFilePath: boolean;
-
   public
     { public declarations }
     procedure LoadSettings(const pFilename: string);
@@ -139,8 +135,6 @@ type
     property MainActivity: string read FMainActivity write FMainActivity;
     property NDK: string read FNDK write FNDK;
     property AndroidPlatform: string read FAndroidPlatform write FAndroidPlatform;
-    property SetFileSuffixSo: boolean read FSetFileSuffixSo write FSetFileSuffixSo;
-    property AbsolutOutputFilePath: boolean read FAbsolutOutputFilePath write FAbsolutOutputFilePath;
   end;
 
   procedure GetSubDirectories(const directory : string; list : TStrings);
@@ -421,8 +415,6 @@ begin
      end;
   end;
 
-  FSetFileSuffixSo:= CheckGroup1.Checked[0];
-  FAbsolutOutputFilePath:= CheckGroup1.Checked[1];
 
   SaveSettings(FFileName);
 
@@ -599,16 +591,9 @@ begin
   FFileName:= pFilename;
   with TIniFile.Create(pFilename) do
   begin
-
     strYesNo:= ReadString('NewProject','SetFileSuffixSo', '');
-    FSetFileSuffixSo:= False;
-    if (strYesNo = '') or (strYesNo='yes') then FSetFileSuffixSo:= True;
-    CheckGroup1.Checked[0]:= FSetFileSuffixSo;
 
     strYesNo:= ReadString('NewProject','AbsolutOutputFilePath', '');
-    FAbsolutOutputFilePath:= False;
-    if (strYesNo = '') or (strYesNo='yes') then FAbsolutOutputFilePath:= True;
-    CheckGroup1.Checked[1]:= FAbsolutOutputFilePath;
 
     FPathToWorkspace:= ReadString('NewProject','PathToWorkspace', '');
     FPathToNdkPlataforms:= ReadString('NewProject','PathToNdkPlataforms', '');
@@ -738,12 +723,6 @@ begin
       WriteString('NewProject', 'MainActivity', FMainActivity); //dummy
 
       WriteString('NewProject', 'AndroidPlatform', IntToStr(ComboBox2.ItemIndex));
-
-      if CheckGroup1.Checked[0] then strFlag:= 'yes' else  strFlag:= 'no';
-      WriteString('NewProject', 'SetFileSuffixSo', strFlag);
-
-      if CheckGroup1.Checked[1] then strFlag:= 'yes' else  strFlag:= 'no';
-      WriteString('NewProject', 'AbsolutOutputFilePath', strFlag);
 
       Free;
    end;

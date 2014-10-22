@@ -66,7 +66,6 @@ type
     procedure PopupMenu4Close(Sender: TObject);
     procedure ShellListView1ContextPopup(Sender: TObject; MousePos: TPoint;
       var Handled: Boolean);
-    procedure ShellTreeView1Change(Sender: TObject; Node: TTreeNode);
     procedure ShellTreeView1Click(Sender: TObject);
     procedure FormCloseQuery(Sender: TObject; var CanClose: boolean);
     procedure FormCreate(Sender: TObject);
@@ -1449,7 +1448,6 @@ begin
   end;
 end;
 
-
 procedure TFormAndroidProject.FormCloseQuery(Sender: TObject; var CanClose: boolean);
 begin
 
@@ -1475,25 +1473,29 @@ end;
 
 procedure TFormAndroidProject.FormShow(Sender: TObject);
 var
-  selectedProject: TTreeNode;
-  i: integer;
-  strTemp: string;
+  selectedNode, tempNode : TTreeNode;
 begin
    SynMemo1.Lines.Clear;
    SynMemo2.Lines.Clear;
    PageControl1.ActivePage:= TabSheet1;
-
    Self.Caption:= Self.Caption+ ' <> ' + Self.AndroidProjectName;
 
-   i:= LastPos(DirectorySeparator, Self.AndroidProjectName);
+   selectedNode:= ShellTreeView1.Items.FindNodeWithText('src');
 
-   if i > 0 then  strTemp:= Copy(Self.AndroidProjectName,i+1, 100 {dummy})
-   else  strTemp:=  Self.AndroidProjectName;
+   if selectedNode = nil then Exit;
 
-   //ShowMessage(strTemp);
+   selectedNode.Expanded:= True;
+   tempNode:= selectedNode.GetFirstVisibleChild;
+   while tempNode  <> nil do
+   begin
+       selectedNode:= tempNode;
+       selectedNode.Expanded:= True;
+       tempNode:= selectedNode.GetFirstVisibleChild;
+   end;
 
-   selectedProject:= ShellTreeView1.Items.FindNodeWithText(Trim(strTemp));
-   ShellTreeView1.Selected:= selectedProject;
+   ShellTreeView1.Selected:= selectedNode;
+
+   StatusBar1.Panels.Items[0].Text:= ShellTreeView1.GetPathFromNode(ShellTreeView1.Selected);
 
 end;
 
@@ -2247,7 +2249,9 @@ begin
       //ShowMessage('LazAndroidModuleWizard ver. 0.3 - revision 0.1 - 28 dec. 2013 - by jmpessoa');
       //Add jniBridge Wizard - aka jBridge
       //ShowMessage('LazAndroidModuleWizard ver. 0.4 - 05 mar. 2014 - by jmpessoa');
-      ShowMessage('LazAndroidModuleWizard ver. 0.5 - 14 Abril 2014 - by jmpessoa');
+      //ShowMessage('LazAndroidModuleWizard ver. 0.5 - 14 Abril 2014 - by jmpessoa');
+     //Add Form Designer
+      ShowMessage('LazAndroidModuleWizard ver. 0.6 - 12 October 2014 - by jmpessoa');
    end;
    if Pos('Exit', txtCaption) > 0 then
    begin
@@ -2360,12 +2364,6 @@ begin
     else
       Handled:= True;
   end;
-end;
-
-procedure TFormAndroidProject.ShellTreeView1Change(Sender: TObject;
-  Node: TTreeNode);
-begin
-   //
 end;
 
 procedure TFormAndroidProject.ShellTreeView1Click(Sender: TObject);

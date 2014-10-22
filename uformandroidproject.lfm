@@ -123,10 +123,11 @@ object FormAndroidProject: TFormAndroidProject
       FileSortType = fstAlphabet
       HideSelection = False
       ReadOnly = True
+      RowSelect = True
+      ShowRoot = False
       TabOrder = 0
-      OnChange = ShellTreeView1Change
       OnClick = ShellTreeView1Click
-      Options = [tvoAutoItemHeight, tvoKeepCollapsedNodes, tvoReadOnly, tvoShowButtons, tvoShowLines, tvoShowRoot, tvoToolTips, tvoThemedDraw]
+      Options = [tvoAutoItemHeight, tvoKeepCollapsedNodes, tvoReadOnly, tvoRowSelect, tvoShowButtons, tvoShowLines, tvoToolTips, tvoThemedDraw]
       ObjectTypes = [otFolders]
       ShellListView = ShellListView1
     end
@@ -1286,7 +1287,7 @@ object FormAndroidProject: TFormAndroidProject
     top = 256
   end
   object ImageList1: TImageList
-    left = 89
+    left = 112
     top = 40
     Bitmap = {
       4C69020000001000000010000000F0F0F000F0F0F000F0F0F000F0F0F000F0F0
@@ -1402,7 +1403,7 @@ object FormAndroidProject: TFormAndroidProject
     end
   end
   object PopupMenu3: TPopupMenu
-    left = 24
+    left = 40
     top = 40
     object MenuItem6: TMenuItem
       Caption = 'About'
