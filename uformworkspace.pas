@@ -415,7 +415,6 @@ begin
      end;
   end;
 
-
   SaveSettings(FFileName);
 
 end;

@@ -41,13 +41,23 @@
                                 
 		-Lazarus forum community!
 
-Version 0.6 - rev. 03 - 22 October 2014 -
+Version 0.6 - rev. 04 - 23 October 2014 -
 
+NEW! Add support to [jApp] plurals and locale. [thanks to Thierrydijoux]
+NEW! Add support to string resource. [thanks to Thierrydijoux]
+
+NEW! Add Api [jApp] GetControlsVersionFeatures ...
+NEW! Add Api [jApp] GetControlsVersionInfo ...
+
+Fix! Enable default android's theme. [thanks to Thierrydijoux]
+Fix! fix formWorkspace tab order and added android target 19.[thanks to Thierrydijoux]
+
+Version 0.6 - rev. 03 - 22 October 2014 -
+									   
 UNDOES rev. 02: a new approach/solution for missing ".so" in Lazarus rev < 46598 [just windows!] 
 FIX the [absolut] output file paths! [Thanks to Stephano!]
 
 NEW! Simplifies navigation in dialog 2: "select java source"
-
 
 Version 0.6 - rev. 02 - 20 October 2014 -
 

@@ -1,7 +1,7 @@
 package com.example.dummyapp;
 
-//[LazAndroidModuleWizard - Version 0.6 - 12 October 2014 // Add FORM Designer and more!
-//
+//[LazAndroidModuleWizard - Version 0.6 - rev 04 - 23 October 2014 
+
 //[https://github.com/jmpessoa/lazandroidmodulewizard]
 //
 
@@ -8134,7 +8134,19 @@ public String GetStringResourceById(int _resID) {
 	return (String)( this.activity.getResources().getText(_resID));
 }
 
-   
+//by  thierrydijoux
+public String getQuantityStringByName(String _resName, int _quantity) {
+	int id = this.activity.getResources().getIdentifier(_resName, "plurals", this.activity.getPackageName());
+    String value = id == 0 ? "" : (String) this.activity.getResources().getQuantityString(id, _quantity, _quantity);
+	return value;
+}
+
+//by thierrydijoux
+public String getStringResourceByName(String _resName) {
+	int id = this.activity.getResources().getIdentifier(_resName, "string", this.activity.getPackageName());
+    String value = id == 0 ? "" : (String) this.activity.getResources().getText(id);
+	return value;
+}   
 
 // -------------------------------------------------------------------------
 //  App Related
@@ -8348,10 +8360,25 @@ public  int getStrLength(String Txt) {  //fix by jmpessoa
   return ( len );
 }
 
-// LORDMAN - 2013-07-30
-public  String getStrDateTime() {
+//----------------------------------------------
+// Controls Version Info
+//-------------------------------------------
+
+/*LORDMAN - 2013-07-30
+public  String getStrDateTime() { 
   SimpleDateFormat formatter = new SimpleDateFormat ( "yyyy-MM-dd HH:mm:ss", Locale.KOREA );
   return( formatter.format ( new Date () ) );
+}
+*/
+
+//GetControlsVersionFeatures ...
+public  String getStrDateTime() {  //hacked by jmpessoa!! sorry, was for a good cause! please, use the  jForm_GetDateTime!!
+  return "6$4=GetControlsVersionInfo;6$4=getLocale";   //controls version-revision info! [0.6-04]
+}
+
+//by jmpessoa:  Class controls version info
+public String GetControlsVersionInfo() { 
+  return "6$4";  //version$revision  [0.6$04]
 }
 
 public long getTick() {
@@ -8402,6 +8429,37 @@ public  String getPathDataBase(android.content.Context context) {
    destPath = destPath.substring(0, destPath.lastIndexOf("/")) + "/databases";
    return destPath;
 }
+
+// -------------------------------------------------------------------------
+//  Android Locale
+// -------------------------------------------------------------------------
+
+// thierrydijoux - get locale info
+public String getLocale(int localeType) {
+        Context context = this.activity;
+  	String value = "";	
+   	switch (localeType) {
+   		case 0: value = context.getResources().getConfiguration().locale.getCountry();
+				break;
+		case 1: value = context.getResources().getConfiguration().locale.getDisplayCountry();
+				break;
+   		case 2: value = context.getResources().getConfiguration().locale.getDisplayLanguage();
+				break;
+   		case 3: value = context.getResources().getConfiguration().locale.getDisplayName();
+				break;
+   		case 4: value = context.getResources().getConfiguration().locale.getDisplayVariant();
+				break;
+   		case 5: value = context.getResources().getConfiguration().locale.getISO3Country();
+				break;
+   		case 6: value = context.getResources().getConfiguration().locale.getISO3Language();
+				break;
+   		case 7: value = context.getResources().getConfiguration().locale.getVariant();
+				break;
+   	}
+
+   	return value;
+}
+
 
 // -------------------------------------------------------------------------
 //  Android Device

@@ -1283,7 +1283,7 @@ type
 Function  xy  (x, y: integer): TXY;
 Function  xyWH(x, y, w, h: integer): TXYWH;
 Function  fxy (x, y: Single ): TfXY;
-Function  stringLen   (str: String): Integer;
+//Function  stringLen   (str: String): Integer;
 //Function  getDateTime: String;
 //Procedure ShowMessage(msg: string);   {the ShowMessage is a jForm member....}
 
@@ -1361,11 +1361,14 @@ Function  fxy(x, y: single): TfXY;
   Result.y := y;
  end;
 
+{jmpessoa: see jForm
 // LORDMAN - 2013-07-28
+(*
 Function stringLen(str: String): Integer;
  begin
   result := jStr_GetLength(gApp.Jni.jEnv, gApp.Jni.jThis, str);
  end;
+*)
 
 {jmpessoa: see jForm
 // LORDMAN - 2013-07-30
@@ -2574,9 +2577,10 @@ begin
   end;
    *)
 
+  //thierrydijoux - if SetBackGroundColor to black, no theme
   if FColor <> colbrDefault then
-     jView_SetBackGroundColor(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject , GetARGB(FColor))
-  else  jView_SetBackGroundColor(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject , GetARGB(colbrWhite));
+     jView_SetBackGroundColor(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject , GetARGB(FColor));
+  //else  jView_SetBackGroundColor(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject , GetARGB(colbrWhite));
 
   jView_SetVisible(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject , FVisible);
 

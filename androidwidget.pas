@@ -512,6 +512,19 @@ type
                  ID          : string;
                 end;
 
+  //by thierrydijoux
+  TLocale =     record
+                 Country         : string;
+                 DisplayCountry  : string;
+                 DisplayLanguage : string;
+                 DisplayName     : string;
+                 DisplayVariant  : string;
+                 Iso3Country     : string;
+                 Iso3Language    : string;
+                 Variant         : string;
+                end;
+
+
   jForm      = class; // Forward Declaration
 
   TjFormStack=  record
@@ -550,6 +563,11 @@ type
     Lock          : Boolean;     //
     Orientation   : integer;   //orientation on app start....
 
+    Locale        : TLocale;    //by thierrydijoux
+
+    ControlsVersionInfo: string; //by jmpessoa
+
+
     TopIndex: integer;
     BaseIndex: integer;
 
@@ -561,9 +579,16 @@ type
     procedure Finish;
     function  GetContext: jObject;
 
+    function GetControlsVersionInfo: string;
+    function GetControlsVersionFeatures: string; //sorry!
+
     //thanks to  thierrydijoux
     function GetStringResourceId(_resName: string): integer;
     function GetStringResourceById(_resId: integer): string;
+
+    //by thierrydijoux - get a resource string by name
+    function GetStringResourceByName(_resName: string): string;
+    function GetQuantityStringByName(_resName: string; _Quantity: integer): string;
 
     function GetCurrentFormsIndex: integer;
     function GetNewFormsIndex: integer;
@@ -944,6 +969,7 @@ end;
   //by jmpessoa
   Function InputTypeToStrEx ( InputType : TInputTypeEx ) : String;
   function SplitStr(var theString: string; delimiter: string): string;
+  function ReplaceChar(query: string; oldchar, newchar: char):string;
 
   function GetARGB(colbrColor: TARGBColorBridge): DWord;
 
@@ -1635,10 +1661,11 @@ begin
 
   FjRLayout:= jForm_Getlayout2(App.Jni.jEnv, App.Jni.jThis, FjObject);  {view/RelativeLayout}
 
+  //thierrydijoux - if backgroundColor is set to black, no theme ...
   if  FColor <> colbrDefault then
-     jView_SetBackGroundColor(App.Jni.jEnv, App.Jni.jThis, FjRLayout, GetARGB(FColor))
-  else
-     jView_SetBackGroundColor(App.Jni.jEnv, App.Jni.jThis, FjRLayout, GetARGB(colbrBlack));
+     jView_SetBackGroundColor(App.Jni.jEnv, App.Jni.jThis, FjRLayout, GetARGB(FColor));
+  //else
+     //jView_SetBackGroundColor(App.Jni.jEnv, App.Jni.jThis, FjRLayout, GetARGB(colbrBlack));
 
   bkImgIndex:= -1;
 
@@ -2101,6 +2128,11 @@ begin
 end;
 
 Procedure jApp.Init(env: PJNIEnv; this: jObject; activity: jObject; layout: jObject);
+//var
+  //version, revision: string;
+  //intVer: integer;
+  //intRev: integer;
+
 begin
   if FInitialized  then Exit;
   // Setting Global Environment -----------------------------------------------
@@ -2122,6 +2154,21 @@ begin
   Path.DCIM     := jSysInfo_PathDCIM(env, this);
 
   Path.DataBase := jSysInfo_PathDataBase(env, this, activity);  //by jmpessoa
+
+  if Pos('getLocale',Self.GetControlsVersionFeatures) > 0 then //"ver&rev=Feature;ver$rev=Feature2"
+  begin
+      with Locale do
+      begin
+         Country         := jSysInfo_Language(env, this, ltCountry);
+         DisplayCountry  := jSysInfo_Language(env, this, ltDisplayCountry);
+         DisplayLanguage := jSysInfo_Language(env, this, ltDisplayLanguage);
+         DisplayName     := jSysInfo_Language(env, this, ltDisplayName);
+         DisplayVariant  := jSysInfo_Language(env, this, ltDisplayVariant);
+         Iso3Country     := jSysInfo_Language(env, this, ltIso3Country);
+         Iso3Language    := jSysInfo_Language(env, this, ltIso3Language);
+         Variant         := jSysInfo_Language(env, this, ltVariant);
+      end;
+  end;
 
   // Phone
   Device.PhoneNumber := jSysInfo_DevicePhoneNumber(env, this);
@@ -2185,6 +2232,16 @@ begin
   Result:= jApp_GetContext(Self.Jni.jEnv, Self.Jni.jThis);
 end;
 
+function jApp.GetControlsVersionInfo: string;
+begin
+   Result:= jApp_GetControlsVersionInfo(Self.Jni.jEnv, Self.Jni.jThis); //"ver&rev|newFeature;ver$rev|newfeature2"
+end;
+
+function jApp.GetControlsVersionFeatures: string;     //"ver&rev|newFeature;ver$rev|newfeature2"
+begin
+   Result:= jApp_GetControlsVersionFeatures(Self.Jni.jEnv, Self.Jni.jThis);
+end;
+
 //thanks to  thierrydijoux
 function jApp.GetStringResourceId(_resName: string): integer;
 begin
@@ -2195,6 +2252,19 @@ function  jApp.GetStringResourceById(_resId: integer): string;
 begin
   Result:= jApp_GetStringResourceById(Self.Jni.jEnv, Self.Jni.jThis, _resId);
 end;
+
+//by thierrydijoux - get a resource string by name
+function jApp.GetStringResourceByName(_resName: string): string;
+begin
+  Result:= jApp_GetStringResourceByName(Self.Jni.jEnv, Self.Jni.jThis, _resName);
+end;
+
+//by thierrydijoux - get a resource string by name
+function jApp.GetQuantityStringByName(_resName: string; _Quantity: integer): string;
+begin
+  Result:= jApp_GetQuantityStringByName(Self.Jni.jEnv, Self.Jni.jThis, _resName, _Quantity);
+end;
+
 
 Function InputTypeToStrEx ( InputType : TInputTypeEx ) : String;
  begin
@@ -2772,6 +2842,16 @@ begin
   Result:= boolean(gApp.Jni.jEnv^.CallStaticBooleanMethod(gApp.Jni.jEnv, cls, Mid));
   Delete_jLocalRef(cls);
 end;
+
+function ReplaceChar(query: string; oldchar, newchar: char):string;
+begin
+  if query <> '' then
+  begin
+     while Pos(oldchar,query) > 0 do query[pos(oldchar,query)]:= newchar;
+     Result:= query;
+  end;
+end;
+
 
 end.
 

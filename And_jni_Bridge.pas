@@ -98,6 +98,10 @@ type
  TScanLine = Array[0..0] of DWord;
  PScanLine = ^TScanline;
 
+ // thierrydijoux - locale type def
+ TLocaleType = (ltCountry = 0, ltDisplayCountry = 1, ltDisplayLanguage = 2,
+                ltDisplayName = 3, ltDisplayVariant = 4, ltIso3Country = 5,
+                ltIso3Language = 6, ltVariant = 7);
 
 
 // Utility
@@ -109,9 +113,17 @@ procedure dbg(obj : jObject; objName : String); overload;
 //function  JNI_OnLoad                   (vm:PJavaVM;reserved:pointer):jint; cdecl;
 //procedure JNI_OnUnload                 (vm:PJavaVM;reserved:pointer); cdecl;
 
-// Base 
-Function  jStr_getLength               (env:PJNIEnv;this:jobject; Str : String): Integer;
-Function  jStr_getDateTime             (env:PJNIEnv;this:jobject): String;
+// Base
+//Please, use jForm_getLength [jmpessoa]
+//Function  jStr_getLength               (env:PJNIEnv;this:jobject; Str : String): Integer;
+
+
+
+//Function  jStr_getDateTime             (env:PJNIEnv;this:jobject): String;
+//Please, use jForm_getDateTime...
+
+Function jApp_GetControlsVersionFeatures          (env:PJNIEnv;this:jobject): String;
+
 Function  jgetTick                     (env:PJNIEnv;this:jobject) : LongInt;
 
 // System
@@ -135,6 +147,7 @@ Procedure jApp_Finish                  (env:PJNIEnv;this:jobject);
 //by jmpessoa
 Procedure jApp_Finish2                  (env:PJNIEnv;this:jobject);
 function  jApp_GetContext               (env:PJNIEnv;this:jobject): jObject;
+function jApp_GetControlsVersionInfo(env:PJNIEnv;this:jobject): string;
 
 function  jForm_GetOnViewClickListener        (env:PJNIEnv; this:jobject; Form: jObject): jObject;
 function  jForm_GetOnListItemClickListener    (env:PJNIEnv; this:jobject; Form: jObject): jObject;
@@ -147,6 +160,10 @@ procedure jApp_GetJNIEnv(var env: PJNIEnv);
 
 function  jApp_GetStringResourceId(env:PJNIEnv;this:jobject; _resName: string): integer;
 function  jApp_GetStringResourceById(env:PJNIEnv;this:jobject; _resId: integer ): string;
+
+// thierrydijoux - get a resource quantity string by name
+function  jApp_GetStringResourceByName(env:PJNIEnv;this:jobject; _resName: string): string;
+function  jApp_GetQuantityStringByName(env:PJNIEnv;this:jobject; _resName: string; _Quantity: integer): string;
 
 
 // Asset
@@ -203,6 +220,9 @@ Function  jSysInfo_PathApp             (env:PJNIEnv;this:jobject;context : jObje
 Function  jSysInfo_PathDat             (env:PJNIEnv;this:jobject;context : jObject) : String;
 Function  jSysInfo_PathExt             (env:PJNIEnv;this:jobject) : String;
 Function  jSysInfo_PathDCIM            (env:PJNIEnv;this:jobject) : String;
+
+//by thierrydijoux
+Function jSysInfo_Language (env:PJNIEnv; this: jobject; localeType: TLocaleType): String;
 
 //by jmpessoa
 Function  jSysInfo_PathDataBase             (env:PJNIEnv;this:jobject;context : jObject) : String;
@@ -1599,6 +1619,7 @@ end;
 
 //----------------------------------------------------------------
 
+(*
 // LORDMAN - 2013-07-28
 Function jStr_getLength (env:PJNIEnv; this:jobject; Str : String): Integer;
  Const
@@ -1612,9 +1633,11 @@ Function jStr_getLength (env:PJNIEnv; this:jobject; Str : String): Integer;
   _jParams.l := env^.NewStringUTF(env, pchar(Str) );
   Result     := env^.CallIntMethodA(env, this ,_jMethod,@_jParams);
  end;
- 
-// LORDMAN - 2013-07-30
-Function  jStr_GetDateTime (env:PJNIEnv; this:jobject): String;
+*)
+
+// LORDMAN - 2013-07-30 //
+(*
+Function  jStr_GetDateTime(env:PJNIEnv; this:jobject): String;  //return Controls "version-revision"!
  Const
   _cFuncName = 'getStrDateTime';
   _cFuncSig  = '()Ljava/lang/String;';
@@ -1633,6 +1656,29 @@ Function  jStr_GetDateTime (env:PJNIEnv; this:jobject): String;
           end;
   end;
  end;
+*)
+
+//hacked by jmpessoa!! sorry, was for a good cause!
+//please, use the  jForm_GetDateTime!!
+//return GetControlsVersionFeatures ... "6$4=GetControlsVersionInfo;6$4=getLocale"
+function jApp_GetControlsVersionFeatures(env:PJNIEnv;this:jobject): string;
+var
+ _cls: jClass;
+ _jMethod : jMethodID = nil;
+ _jString : jstring;
+ _jBoolean: jBoolean;
+begin
+  _cls := env^.GetObjectClass(env, this);
+  _jMethod:= env^.GetMethodID(env, _cls, 'getStrDateTime', '()Ljava/lang/String;');
+  _jString:= env^.CallObjectMethod(env,this,_jMethod);
+  Case _jString = nil of
+   True : Result    := '';
+   False: begin
+           _jBoolean := JNI_False;
+           Result    := String( env^.GetStringUTFChars(Env,_jString,@_jBoolean) );
+          end;
+  end;
+end;
 
 //
 Function  jgetTick (env:PJNIEnv;this:jobject) : LongInt;
@@ -1771,6 +1817,25 @@ begin
   Result:= env^.CallObjectMethod(env, this, method);
 end;
 
+function jApp_GetControlsVersionInfo(env:PJNIEnv;this:jobject): string;
+var
+ _cls: jClass;
+ _jMethod : jMethodID = nil;
+ _jString : jstring;
+ _jBoolean: jBoolean;
+begin
+  _cls := env^.GetObjectClass(env, this);
+  _jMethod:= env^.GetMethodID(env, _cls, 'GetControlsVersionInfo', '()Ljava/lang/String;');
+  _jString:= env^.CallObjectMethod(env,this,_jMethod);
+  Case _jString = nil of
+   True : Result    := '';
+   False: begin
+           _jBoolean := JNI_False;
+           Result    := String( env^.GetStringUTFChars(Env,_jString,@_jBoolean) );
+          end;
+  end;
+end;
+
 function  jForm_GetOnViewClickListener(env:PJNIEnv; this:jobject; Form: jObject): jObject;
 var
   cls: jClass;
@@ -1803,7 +1868,6 @@ begin
  jClassMethod(_cFuncName,_cFuncSig,env,gjClass,_jMethod);
  env^.CallVoidMethod(env,this,_jMethod);
 end;
-
 
 Procedure jApp_ScreenStyle(env:PJNIEnv; this:jobject; screenstyle: integer);
 Const
@@ -1852,6 +1916,52 @@ begin
   _jMethod:= env^.GetMethodID(env, _cls, 'GetStringResourceById', '(I)Ljava/lang/String;');
   _jParams[0].i := _resId;
   _jString:= env^.CallObjectMethodA(env,this,_jMethod,@_jParams);
+  Case _jString = nil of
+   True : Result    := '';
+   False: begin
+           _jBoolean := JNI_False;
+           Result    := String( env^.GetStringUTFChars(Env,_jString,@_jBoolean) );
+          end;
+  end;
+end;
+
+function  jApp_GetStringResourceByName(env:PJNIEnv;this:jobject; _resName: string): string;
+var
+ _cls: jClass;
+ _jMethod : jMethodID = nil;
+ _jParams : array[0..0] of jValue;
+ _jString : jstring;
+ _jBoolean: jBoolean;
+begin
+  _cls := env^.GetObjectClass(env, this);
+  _jMethod:= env^.GetMethodID(env, _cls, 'getStringResourceByName', '(Ljava/lang/String;)Ljava/lang/String;');
+  _jParams[0].l := env^.NewStringUTF(env, pchar(_resName) );
+  _jString:= env^.CallObjectMethodA(env,this,_jMethod,@_jParams);
+   env^.DeleteLocalRef(env,_jParams[0].l); //added ...
+  Case _jString = nil of
+   True : Result    := '';
+   False: begin
+           _jBoolean := JNI_False;
+           Result    := String( env^.GetStringUTFChars(Env,_jString,@_jBoolean) );
+          end;
+  end;
+end;
+
+// thierrydijoux - get a resource quantity string by name
+function  jApp_GetQuantityStringByName(env:PJNIEnv;this:jobject; _resName: string; _Quantity: integer): string;
+var
+ _cls: jClass;
+ _jMethod : jMethodID = nil;
+ _jParams : array[0..1] of jValue;
+ _jString : jstring;
+ _jBoolean: jBoolean;
+begin
+  _cls := env^.GetObjectClass(env, this);
+  _jMethod:= env^.GetMethodID(env, _cls, 'getQuantityStringByName', '(Ljava/lang/String;I)Ljava/lang/String;');
+  _jParams[0].l := env^.NewStringUTF(env, pchar(_resName) );
+  _jParams[1].i:= _Quantity;
+  _jString:= env^.CallObjectMethodA(env,this,_jMethod,@_jParams);
+   env^.DeleteLocalRef(env,_jParams[0].l); //added..
   Case _jString = nil of
    True : Result    := '';
    False: begin
@@ -2425,6 +2535,29 @@ Function  jSysInfo_PathDCIM            (env:PJNIEnv;this:jobject) : String;
   end;
   dbg('PathDCIM:'+ Result);
  end;
+
+//by thierrydijoux
+Function jSysInfo_Language (env:PJNIEnv; this: jObject; localeType: TLocaleType): String;
+Var
+ _jCls: jClass;
+ _jMethod : jMethodID;
+ _jParams : Array[0..0] of jValue;
+ _jString : jString;
+ _jBoolean: jBoolean;
+begin
+ _jCls:= env^.GetObjectClass(env, this);
+ _jMethod:= env^.GetMethodID(env, _jCls, 'getLocale', '(I)Ljava/lang/String;');
+ _jParams[0].i := Ord(localeType);
+ _jString  := env^.CallObjectMethodA(env,this,_jMethod,@_jParams);
+ Case _jString = nil of
+  True : Result    := '';
+  False: begin
+          _jBoolean := JNI_False;
+          Result    := String( env^.GetStringUTFChars(Env,_jString,@_jBoolean) );
+         end;
+ end;
+ dbg('Language:'+ Result);
+end;
 
 //------------------------------------------------------------------------------
 // Device Info

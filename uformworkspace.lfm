@@ -80,7 +80,7 @@ object FormWorkspace: TFormWorkspace
     Top = 335
     Width = 472
     Anchors = [akTop, akLeft, akRight]
-    TabOrder = 0
+    TabOrder = 7
   end
   object Label1: TLabel
     Left = 9
@@ -110,7 +110,7 @@ object FormWorkspace: TFormWorkspace
     Default = True
     Kind = bkOK
     ModalResult = 1
-    TabOrder = 1
+    TabOrder = 15
   end
   object BitBtn2: TBitBtn
     Left = 568
@@ -122,14 +122,14 @@ object FormWorkspace: TFormWorkspace
     Caption = 'Cancel'
     Kind = bkCancel
     ModalResult = 2
-    TabOrder = 2
+    TabOrder = 16
   end
   object Edit2: TEdit
     Left = 248
     Height = 23
     Top = 192
     Width = 368
-    TabOrder = 3
+    TabOrder = 5
   end
   object Label2: TLabel
     Left = 248
@@ -171,7 +171,7 @@ object FormWorkspace: TFormWorkspace
       'x86'
     )
     OnClick = RadioGroup1Click
-    TabOrder = 4
+    TabOrder = 10
   end
   object RadioGroup2: TRadioGroup
     Left = 80
@@ -197,7 +197,7 @@ object FormWorkspace: TFormWorkspace
       'VFPv3'
     )
     OnClick = RadioGroup2Click
-    TabOrder = 5
+    TabOrder = 11
   end
   object Edit4: TEdit
     Left = 8
@@ -240,7 +240,7 @@ object FormWorkspace: TFormWorkspace
     OnDblClick = ComboBox1DblClick
     ParentShowHint = False
     ShowHint = True
-    TabOrder = 7
+    TabOrder = 8
   end
   object RadioGroup3: TRadioGroup
     Left = 312
@@ -265,7 +265,7 @@ object FormWorkspace: TFormWorkspace
       'Ant'
     )
     OnClick = RadioGroup3Click
-    TabOrder = 8
+    TabOrder = 14
   end
   object Label5: TLabel
     Left = 8
@@ -280,7 +280,7 @@ object FormWorkspace: TFormWorkspace
     Height = 23
     Top = 24
     Width = 606
-    TabOrder = 9
+    TabOrder = 0
   end
   object Label7: TLabel
     Left = 8
@@ -295,7 +295,7 @@ object FormWorkspace: TFormWorkspace
     Height = 23
     Top = 144
     Width = 607
-    TabOrder = 10
+    TabOrder = 2
   end
   object Label8: TLabel
     Left = 9
@@ -310,7 +310,7 @@ object FormWorkspace: TFormWorkspace
     Height = 23
     Top = 72
     Width = 606
-    TabOrder = 11
+    TabOrder = 1
   end
   object Bevel3: TBevel
     Left = 0
@@ -355,7 +355,7 @@ object FormWorkspace: TFormWorkspace
     Height = 23
     Top = 385
     Width = 153
-    TabOrder = 12
+    TabOrder = 9
     Text = 'org.lazarus'
   end
   object ListBox1: TListBox
@@ -371,7 +371,7 @@ object FormWorkspace: TFormWorkspace
     ItemHeight = 15
     OnClick = ListBox1Click
     OnSelectionChange = ListBox1SelectionChange
-    TabOrder = 13
+    TabOrder = 12
   end
   object Label10: TLabel
     Left = 157
@@ -409,7 +409,7 @@ object FormWorkspace: TFormWorkspace
     OnClick = RadioGroup5Click
     ParentShowHint = False
     ShowHint = True
-    TabOrder = 14
+    TabOrder = 3
   end
   object Bevel4: TBevel
     Left = -6
@@ -442,7 +442,7 @@ object FormWorkspace: TFormWorkspace
     )
     OnChange = ComboBox2Change
     Style = csDropDownList
-    TabOrder = 15
+    TabOrder = 4
     Text = 'Ice Cream 4.0'
   end
   object Label4: TLabel
@@ -487,13 +487,14 @@ object FormWorkspace: TFormWorkspace
       '16'
       '17'
       '18'
+      '19'
       '20'
       '21'
     )
     ItemHeight = 15
     OnClick = ListBox2Click
     OnSelectionChange = ListBox2SelectionChange
-    TabOrder = 17
+    TabOrder = 13
   end
   object Label11: TLabel
     Left = 236
