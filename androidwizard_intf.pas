@@ -1673,9 +1673,9 @@ begin
      customOptions_default:= customOptions_default+' -o..'+DirectorySeparator+'libs'+DirectorySeparator+auxStr+DirectorySeparator+'lib'+LowerCase(FJavaClassName)+'.so';
   {$ENDIF}
 
-
-  customOptions_armV6:= customOptions_armV6+' -o'+FPathToJNIFolder+DirectorySeparator+'libs'+DirectorySeparator+auxStr+DirectorySeparator+'lib'+LowerCase(FJavaClassName)+'.so';
-  customOptions_armV7a:= customOptions_armV7a+' -o'+FPathToJNIFolder+DirectorySeparator+'libs'+DirectorySeparator+auxStr+DirectorySeparator+'lib'+LowerCase(FJavaClassName)+'.so';
+  // ThierryDijoux - change auxStr by value of the folder
+  customOptions_armV6:= customOptions_armV6+' -o'+FPathToJNIFolder+DirectorySeparator+'libs'+DirectorySeparator+'armeabi'+DirectorySeparator+'lib'+LowerCase(FJavaClassName)+'.so';
+  customOptions_armV7a:= customOptions_armV7a+' -o'+FPathToJNIFolder+DirectorySeparator+'libs'+DirectorySeparator+'armeabi-v7a'+DirectorySeparator+'lib'+LowerCase(FJavaClassName)+'.so';
 
   {$IFDEF WINDOWS}
      //to others :: just to [fix bug] lazarus  rev < 46598 .... //thanks to Stephano!
