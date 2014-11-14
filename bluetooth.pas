@@ -53,8 +53,6 @@ jBluetooth = class(jControl)
     procedure Disable();
     function IsEnable(): boolean;
     function GetState(): integer;
-    procedure ShareFromSdCardFile(_filename: string);
-    procedure ShareFromFile(_filename: string);
 
     function GetReachablePairedDeviceByName(_deviceName: string): jObject;
     function GetReachablePairedDeviceByAddress(_deviceAddress: string): jObject;
@@ -99,8 +97,6 @@ function jBluetooth_GetReachablePairedDevices(env: PJNIEnv; this: JObject; _jblu
 procedure jBluetooth_Disable(env: PJNIEnv; this: JObject; _jbluetooth: JObject);
 function jBluetooth_IsEnable(env: PJNIEnv; this: JObject; _jbluetooth: JObject): boolean;
 function jBluetooth_GetState(env: PJNIEnv; this: JObject; _jbluetooth: JObject): integer;
-procedure jBluetooth_ShareFromSdCardFile(env: PJNIEnv; this: JObject; _jbluetooth: JObject; _filename: string);
-procedure jBluetooth_ShareFromFile(env: PJNIEnv; this: JObject; _jbluetooth: JObject; _filename: string);
 function jBluetooth_GetReachablePairedDeviceByName(env: PJNIEnv; this: JObject; _jbluetooth: JObject; _deviceName: string): jObject;
 function jBluetooth_GetReachablePairedDeviceByAddress(env: PJNIEnv; this: JObject; _jbluetooth: JObject; _deviceAddress: string): jObject;
 function jBluetooth_IsReachablePairedDevice(env: PJNIEnv; this: JObject; _jbluetooth: JObject; _macAddress: string): boolean;
@@ -220,20 +216,6 @@ begin
   //in designing component state: result value here...
   if FInitialized then
    Result:= jBluetooth_GetState(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject);
-end;
-
-procedure jBluetooth.ShareFromSdCardFile(_filename: string);
-begin
-  //in designing component state: set value here...
-  if FInitialized then
-     jBluetooth_ShareFromSdCardFile(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, _filename);
-end;
-
-procedure jBluetooth.ShareFromFile(_filename: string);
-begin
-  //in designing component state: set value here...
-  if FInitialized then
-     jBluetooth_ShareFromFile(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, _filename);
 end;
 
 function jBluetooth.GetReachablePairedDeviceByName(_deviceName: string): jObject;
@@ -525,32 +507,6 @@ begin
   jCls:= env^.GetObjectClass(env, _jbluetooth);
   jMethod:= env^.GetMethodID(env, jCls, 'GetState', '()I');
   Result:= env^.CallIntMethod(env, _jbluetooth, jMethod);
-end;
-
-procedure jBluetooth_ShareFromSdCardFile(env: PJNIEnv; this: JObject; _jbluetooth: JObject; _filename: string);
-var
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].l:= env^.NewStringUTF(env, PChar(_filename));
-  jCls:= env^.GetObjectClass(env, _jbluetooth);
-  jMethod:= env^.GetMethodID(env, jCls, 'ShareFromSdCardFile', '(Ljava/lang/String;)V');
-  env^.CallVoidMethodA(env, _jbluetooth, jMethod, @jParams);
-  env^.DeleteLocalRef(env,jParams[0].l);
-end;
-
-procedure jBluetooth_ShareFromFile(env: PJNIEnv; this: JObject; _jbluetooth: JObject; _filename: string);
-var
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].l:= env^.NewStringUTF(env, PChar(_filename));
-  jCls:= env^.GetObjectClass(env, _jbluetooth);
-  jMethod:= env^.GetMethodID(env, jCls, 'ShareFromFile', '(Ljava/lang/String;)V');
-  env^.CallVoidMethodA(env, _jbluetooth, jMethod, @jParams);
-  env^.DeleteLocalRef(env,jParams[0].l);
 end;
 
 function jBluetooth_GetReachablePairedDeviceByName(env: PJNIEnv; this: JObject; _jbluetooth: JObject; _deviceName: string): jObject;

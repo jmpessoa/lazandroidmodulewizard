@@ -12,12 +12,18 @@
               
 		-Eny and Phil for the Project wizard hints...
 		http://forum.lazarus.freepascal.org/index.php/topic,20763.msg120823.html#msg120823
+
 		-Felipe for the Android support...
+
 		-TrueTom for the Laz4Android Package
-			https://skydrive.live.com/?cid=89ae6b50650182c6&id=89AE6B50650182C6%21149
-			Warning: laz4android1.1-41139 work just for win32 and  Android NDK-7c and ARM
- 			NEW! win32/Android NDK-9/{ARM and x86 !} :: Thanks again to TrueTom!
-			https://sourceforge.net/projects/laz4android/files/?source=navbar 
+
+			Date:2014-10-18
+			FPC: 2.7.1 SVN 28863  win32/arm-android/i386-android/jvm-android
+			Lazarus:1.3 trunk svn 46592
+			Android NDK: r10c (arm-linux-androideabi-4.6 + x86-4.6)
+			http://sourceforge.net/projects/laz4android/files/?source=navbar
+			:To Install, please, read the "Laz4Android_readme.txt"
+
       		-Simonsayz for the great work on Android [GUI] Controls
 			http://forum.lazarus.freepascal.org/index.php/topic,22079.0.html
 
@@ -28,45 +34,103 @@
 		-x2nie for Lazarus 1.3 patch [No LCL form design!] 
 			http://github.com/x2nie/LiteZarus
 
+                -Fatih KILIÇ - How To Install!       
+                  http://www.youtube.com/watch?v=sQnFYJyltwY&list=UUkQrLhaIXrKY4eq9zTymxpQ
 
-		NEW! LiteZarus4Android [just for Windows, sorry] :: win32/Android NDK-9/{ARM and x86 !}
-			https://onedrive.live.com/redir?resid=78D6F726E8F0C522%21236 [right to download!]
-
-		NEW! Laz4Android [by TrueTom]
-			Date:2014-10-18
-			FPC: 2.7.1 SVN 28863  win32/arm-android/i386-android/jvm-android
-			Lazarus:1.3 trunk svn 46592
-			Android NDK: r10c (arm-linux-androideabi-4.6 + x86-4.6)
-			http://sourceforge.net/projects/laz4android/files/?source=navbar
-                                
+		-Thierry Dijoux - Late: Apk Expert Tools [Build, Install, ...]
+		
 		-Lazarus forum community!
+
+		
+	References:
+
+		Ant	http://ant.apache.org/bindownload.cgi 
+			Simply extract the zip file to a convenient location...
+                                
+
+
+Version 0.6 - rev. 05 - 13 November 2014 -
+
+	NEW! Lazarus Package "amw_ide_tools.lpk" (*) [..\LazAndroidWizard\ide_tools]
+
+		.Add entry "Android Module Wizard" to Lazarus IDE "Tools" menu <<--- by Thierry Dijoux! 
+		ref. image: https://jmpessoa.opendrive.com/files?Ml82Nzg4MzAyNF9leGVIVg
+
+		.Add sub entry "Late: Apk Expert Tools [Build, Install, ...]" <<---- by Thierry Dijoux! 
+		ref. image: https://jmpessoa.opendrive.com/files?Ml82Nzg4MzA2N184VWZaWg
+
+			:: Improves and automates the "Ant" support!
+
+		.Add sub entry "Upgrade Code Templates [*.lpr, *.java]" 
+		ref. image: https://jmpessoa.opendrive.com/files?Ml82Nzg4MzA3Ml80MFVjSQ
+
+			:: Yes, Now became easy to keep the [olds] projects in sync with the new AMW version-revision!	
+
+		.Add sub entry "Path Settings [JDK, SDK, NDK, ...]" <<--- Stephano's sugestion! (**)
+		ref. image: https://jmpessoa.opendrive.com/files?Ml82Nzg4MzA1OF9yVVU3RA
+
+			:: WARNING: I recommend that "new" User start here: Set Paths to JDK, SDK, NDK, ...
+		
+		(*)Please, look for [and install it!] "amw_ide_tools.lpk" in folder ..\LazAndroidWizard\ide_tools 
+
+		(**) Yes, this paths configuration was removed from prompt dialog of "Android Module Wizard"
+		ref. image: https://jmpessoa.opendrive.com/files?Ml82Nzg4MzE0Nl9LczBuTQ
+		
+		WARNING! Windows Users: Please, update to [new] TrueTom Laz4Android [or some more advanced!]
+		 ref. http://sourceforge.net/projects/laz4android/files/?source=navbar
+		:To Install, please, read the "Laz4Android_readme.txt"
+
+	NEW!	.jShareFile component [Android Bridges Extra]
+		.jImageFileManager component [Android Bridges Extra]
+
+		.Add new methods to jForm:
+									
+			CopyFile;
+			DeleteFile;
+			CreateDir;
+			LoadFromAssets; //<-- result the full path to app internal storage
+			
+			GetEnvironmentDirectoryPath;
+			GetInternalAppStoragePath;
+							
+			IsSdCardMounted;								
+			IsExternalStorageEmulated;
+			IsExternalStorageRemovable;
+
+			IsWifiEnabled;
+			SetWifiEnabled;
+
+	NEW! DEMO AppShareFileDemo1 [Eclipse Project] 
+		-->> jShareFile, jTexFileManager and jImageFileManager
+																									
+	FIX! Improves/fix the support to Project Compiler Options ... Thanks to Stephano! 
 
 Version 0.6 - rev. 04 - 23 October 2014 -
 
-NEW! Add support to [jApp] plurals and locale. [thanks to Thierrydijoux]
-NEW! Add support to string resource. [thanks to Thierrydijoux]
+	NEW! Add support to [jApp] plurals and locale. [thanks to Thierrydijoux]
+	NEW! Add support to string resource. [thanks to Thierrydijoux]
 
-NEW! Add Api [jApp] GetControlsVersionFeatures ...
-NEW! Add Api [jApp] GetControlsVersionInfo ...
+	NEW! Add Api [jApp] GetControlsVersionFeatures ...
+	NEW! Add Api [jApp] GetControlsVersionInfo ...
 
-Fix! Enable default android's theme. [thanks to Thierrydijoux]
-Fix! fix formWorkspace tab order and added android target 19.[thanks to Thierrydijoux]
+	Fix! Enable default android's theme. [thanks to Thierrydijoux]
+	Fix! fix formWorkspace tab order and added android target 19.[thanks to Thierrydijoux]
 
 Version 0.6 - rev. 03 - 22 October 2014 -
 									   
-UNDOES rev. 02: a new approach/solution for missing ".so" in Lazarus rev < 46598 [just windows!] 
-FIX the [absolut] output file paths! [Thanks to Stephano!]
+	UNDOES rev. 02: a new approach/solution for missing ".so" in Lazarus rev < 46598 [just windows!] 
+	FIX the [absolut] output file paths! [Thanks to Stephano!]
 
-NEW! Simplifies navigation in dialog 2: "select java source"
+	NEW! Simplifies navigation in dialog 2: "select java source"
 
 Version 0.6 - rev. 02 - 20 October 2014 -
 
-NEW! [Dialog config paths ...] Add Checkbox to configure output files path 
-NEW! [Dialog config paths ...] Add Checkbox to add ".so" suffix
+	NEW! [Dialog config paths ...] Add Checkbox to configure output files path 
+	NEW! [Dialog config paths ...] Add Checkbox to add ".so" suffix
 
 Version 0.6 - rev. 01 - 20 October 2014 -
 
-NEW! Added Support to Laz4Android [by TrueTom]: 
+	NEW! Added Support to Laz4Android [by TrueTom]: 
 		Lazarus:1.3 trunk svn 46592 +  
 		FPC: 2.7.1 SVN 28863  win32/arm-android/i386-android/jvm-android
 		http://sourceforge.net/projects/laz4android/files/?source=navbar
@@ -83,13 +147,11 @@ Version 0.6 - 15 October 2014 -
                       form2 design : https://jmpessoa.opendrive.com/files?Ml82NTQ0Nzk5N19RbXFjVw
                       form2 Screen : https://jmpessoa.opendrive.com/files?Ml82NTQ0NzQ3NF9wMGhHcQ
 
-		-->> Windows Users: Get LiteZarus4Android [Lazarus 1.3 + x2nie patch [No LCLform design] + TrueTom fpc 2.7.1 cross Arm/x86/android/]
+		WARNING! Windows Users: Please, update to [new] TrueTom Laz4Android [or some more advanced!]
+			ref. http://sourceforge.net/projects/laz4android/files/?source=navbar
+			:To Install, please, read the "Laz4Android_readme.txt"
 
-			:DOWNLOAD from: https://onedrive.live.com/redir?resid=78D6F726E8F0C522%21236 [right to download!]
-			:To Install, please, read the "LiteZarus4Android_readme.txt"
-
-
-			1. From LiteZarus4Android IDE - Install Wizard Packages
+			1. From Laz4Android IDE - Install Wizard Packages
 
 			1.1 Package -> Open Package -> "tfpandroidbridge_pack.lpk"  [Android Components Bridges!]
 				Ref. image: https://www.opendrive.com/files?Ml8zNjMwNDQ3NF83SzhsZg
@@ -100,9 +162,15 @@ Version 0.6 - 15 October 2014 -
  			1.2 Package -> Open Package -> "lazandroidwizardpack.lpk"
    			1.2.1 From Package Wizard
 				- Compile
-				- Use -> Install     
+				- Use -> Install  
+  
+ 			1.3 Package -> Open Package -> "amw_ide_tools.lpk"  [folder: ..\LazAndroidWizard\ide_tools]
+   			1.3.1 From Package Wizard
+				- Compile
+				- Use -> Install    
+				- ref. https://jmpessoa.opendrive.com/files?Ml82NzAyMTYwMl9pUDV3RQ 
 
-			HINT: to compile/install/reinstall a package in LiteZarus4Android,
+			HINT: to compile/install/reinstall a package in Laz4Android,
 				please, open a "dummy" windows project.... you always MUST close the cross compile project!  
 			
 		-->> Linux Users: Get Lazarus 1.3 rev >= 45216,45217 ... and fpc 2.7.1 cross /arm/x86/android ... etc.
@@ -142,7 +210,7 @@ Version 0.6 - 15 October 2014 -
 					this value! To "unfreeze" not just change by design, you will need
 					change the value in OI by hand to any other value, so it will adjust correctly! 
 
-		-->> Add new "AndroidWidget" unit to uses clauses [*.dpr/*.pas]
+		-->> Add new "AndroidWidget" unit to uses clauses [*.lpr/*.pas]
 
 	4. How to use the Demos:
 
@@ -282,6 +350,9 @@ version 0.3 - revision 0.1 - 28 December 2013 -
 version 0.3 - 22 December 2013 
 	:: NEW! Introduces Support to Ant Project  
 
+		ref. http://ant.apache.org/bindownload.cgi 
+			Then simply extract the zip file to a convenient location...
+
 version 0.2 - 14 December 2013 -
 	:: NEW! Introduces Android [GUI] Android Components Bridges - Based on Simonsayz's controls 
 
@@ -290,29 +361,7 @@ version 0.1 - revision 0.1 - 09 September - 2013 -
 
 version 0.1 - August 2013 -
 	:: Warning: at the moment this code is just a *proof-of-concept*
-      
-I. INSTALL LiteZarus4Android 
-
-	-->> Windows Users: Get LiteZarus4Android [Lazarus 1.3 + x2nie patch [No LCLform design] + TrueTom fpc 2.7.1 cross Arm/x86/android/]
-
-		:DOWNLOAD from: https://onedrive.live.com/redir?resid=78D6F726E8F0C522%21236 [right to download!]
-		:To Install, please, read the "LiteZarus4Android_readme.txt"
-			
-	-->> Linux Users: Get Lazarus 1.3 rev >= 45216,45217 ... and fpc 2.7.1 cross /arm/x86/android ... etc.
-
-		
-	1. From LiteZarus4Android IDE - Install Wizard Packages
-
-	1.1 Package -> Open Package -> "tfpandroidbridge_pack.lpk"  [Android Components Bridges!]
-		Ref. image: https://www.opendrive.com/files?Ml8zNjMwNDQ3NF83SzhsZg
-
-	1.1.1 From Package Wizard
-		- Compile
-		- Use -> Install
- 	1.2 Package -> Open Package -> "lazandroidwizardpack.lpk"
-   	1.2.1 From Package Wizard
-		- Compile
-		- Use -> Install               
+              
 II.  Ant Projec Development: please, read "fast_tutorial_ant_users.txt"
 
 III. Eclipse Project Development: please, read "fast_tutorial_eclipse_users.txt"
@@ -462,7 +511,7 @@ IV. Technical Notes: dependencies on laz4android [win32] IDE cross compiler:
 V. Ref. Lazarus forum: http://forum.lazarus.freepascal.org/index.php/topic,21919.0.html
 
      -Help and Hints
-     -Bugs : {known bug: fail on Api > 13. Temporary solution: a workaround to prevent Api > 13 - 02 jan 2014}
+     -Bugs : [SOLVED!] {known bug: fail on Api > 13. Temporary solution: a workaround to prevent Api > 13 - 02 jan 2014} 
      -Sugestions 
      -Colaborations	
      -Critics

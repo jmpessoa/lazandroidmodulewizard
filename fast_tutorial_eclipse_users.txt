@@ -2,7 +2,7 @@
 ** Tutorial: Lazarus Android Module Wizard For Eclipse Users ** 
        
      
-    Version 6 - 15 october 2014 -
+    Version 6 - rev. 05 - 13 November 2014 -
 				
 
 "A wizard for create JNI Android loadable module (.so) in Lazarus/Free Pascal using DataModule like form" 
@@ -11,19 +11,21 @@
       Author: Jose Marques Pessoa : jmpessoa__hotmail_com
 
 
-      Please, for complete reference read "readme.txt"
+      Please, for complete [UPDATED !!] reference read "readme.txt"
 
 
-I. INSTALL LiteZarus4Android
+I. INSTALL Laz4Android [win32]
 			
-	FPC: 2.7.1 SVN 26270  win32/arm-android/i386-android
-	Android NDK: r9b (arm-linux-androideabi-4.6 + x86-4.6)
+		NEW! Laz4Android [by TrueTom]
+			Date:2014-10-18
+			FPC: 2.7.1 SVN 28863  win32/arm-android/i386-android/jvm-android
+			Lazarus:1.3 trunk svn 46592
+			Android NDK: r10c (arm-linux-androideabi-4.6 + x86-4.6)
+			http://sourceforge.net/projects/laz4android/files/?source=navbar
+			:To Install, please, read the "Laz4Android_readme.txt"
 
-			:DOWNLOAD from: https://onedrive.live.com/redir?resid=78D6F726E8F0C522%21236 [right to download!]
-			:To Install, please, read the "LiteZarus4Android_readme.txt"
 
-
-			1. From LiteZarus4Android IDE - Install Wizard Packages
+			1. From Laz4Android IDE - Install Wizard Packages
 
 			1.1 Package -> Open Package -> "tfpandroidbridge_pack.lpk"  [Android Components Bridges!]
 				Ref. image: https://www.opendrive.com/files?Ml8zNjMwNDQ3NF83SzhsZg
@@ -31,47 +33,29 @@ I. INSTALL LiteZarus4Android
 			1.1.1 From Package Wizard
 				- Compile
 				- Use -> Install
+
  			1.2 Package -> Open Package -> "lazandroidwizardpack.lpk"
    			1.2.1 From Package Wizard
 				- Compile
 				- Use -> Install     
 
-			HINT: to compile/install/reinstall a package in LiteZarus4Android,
+ 			1.3 Package -> Open Package -> "amw_ide_tools.lpk"  [folder: ..\LazAndroidWizard\ide_tools]
+   			1.3.1 From Package Wizard
+				- Compile
+				- Use -> Install    
+				- ref. https://jmpessoa.opendrive.com/files?Ml82Nzg4MzAyNF9leGVIVg
+
+			HINT: to compile/install/reinstall a package in Laz4Android [win32!],
 				please, open a "dummy" windows project.... you always MUST close the cross compile project!  
 			
 		-->> Linux Users: Get Lazarus 1.3 rev >= 45216,45217 ... and fpc 2.7.1 cross /arm/x86/android ... etc.
 
-
-
-   1. From LiteZarus4Android IDE   - Install Packages
-
-
-      HINT: to compile/install/reinstall a package in LiteZarus4Android, please, open a "dummy" windows project.... 
-            you always MUST close the cross compile project!   
-
-
-      1.1 Package -> Open Package -> "tfpandroidbridge_pack.lpk"  [Android Components Bridges]
-
-	  Ref. image: http://www.opendrive.com/files?Ml8zNjMwNDQ3NF83SzhsZg
-
-      1.1.1 From Package Wizard
-
-            - Compile
-            - Use -> Install
- 
-      1.2 Package -> Open Package -> "lazandroidwizardpack.lpk"
-   
-      1.2.1 From Package Wizard
-
-            - Compile
-            - Use -> Install
-
-
-II. [GUI Project Support] Android Components Bridges - Simon's Controls remake with many extensions!
+II. [Android Project] 
         
     :: Support for "Android Bridges" components Controls [jControls/jVisualControls]!
+	[Simon's Controls remake with many extensions!]
 
-  1. From Eclipse IDE: 
+	1. From Eclipse IDE: 
 
         1.1. File -> New -> Android Application Project
         
@@ -82,84 +66,65 @@ II. [GUI Project Support] Android Components Bridges - Simon's Controls remake w
 	1.5. On "Create Activity" Dialog select: <Blank Activity>   [Next]
              
              ref. Image: http://www.opendrive.com/files?Ml8zNjMwMDUwOF9pZm4xMQ
-
-
-             
+          
         1.6. On "Activity Name" Dialog enter: App  [Finish] 
              
-
              WARNING:"App" name is MANDATORY! 
    
-
              ref. Image: https://www.opendrive.com/files?Ml8zNjMwMDE0M19aZ2dkeA
-
         
        	1.7  Right click your recent created project -> Close  
-    
-  
-  2. From LiteZarus4Android IDE
-	
-	2.1. Project -> New Project 
-        
-	2.2. On "Create a new project" Dialog select: <JNI Android Module> 
+      
+	2. From Lazarus IDE menu Tools -->> "Android Module Wizard" --> Paths Settings"
 
-	     ref. Image: http://www.opendrive.com/files?Ml8zNjMwMTY4MF9HMVRHRg
-
-
-        2.2. From "Android Module Wizard: Configure Paths"
-
-             ref. Image: http://jmpessoa.opendrive.com/files?Ml8zNzM2NzE1OV9YdHJXaw
-                         
-                         
-    		-Path to Java JDK
+		ref. https://jmpessoa.opendrive.com/files?Ml82Nzg4MzA1OF9yVVU3RA
+                                                 
+   		-Path to Java JDK
      	
-	          ex. C:\Program Files (x86)\Java\jdk1.7.0_21    {win32}
-
+	          ex. C:\Program Files (x86)\Java\jdk1.7.0_21    {java win32}
 
        		-Path to Android SDK
 
                   ex. C:\adt32\sdk
 
 
-		-Select Ndk version: [9b]
-
-		
-		-Select Android Platform: [ex. android-14]
-
+		-Select Ndk version: [10]
 
 	     	-Path to Ndk 
 
-	          ex.  C:\adt32\ndk9b       
-
-
-		-Path to Java Resources  [Simonsayz's Controls.java,  *.xml and etc...]:
+	          ex.  C:\adt32\ndk10   
+   
+		-Path to Java Resources  [Simonsayz's Controls.java,  *.xml and default Icons]:
      	
-		  ex. C:LiteZarus4Android,\components\LazAndroidWizard\java
+		  ex. C:\Laz4Android\components\LazAndroidWizard\java
 
+		-Path to Lazbuild 
 
-          	-Path to Workspace
+		  ex. C:\Laz4Android
+
+	2.1 Project -> New Project 
+        
+	2.2. On "Create a new project" Dialog select: <JNI Android Module> 
+
+	     ref. Image: http://www.opendrive.com/files?Ml8zNjMwMTY4MF9HMVRHRg
+
+        2.3. From "Android Module Wizard" dialog prompt:
+
+		ref. https://jmpessoa.opendrive.com/files?Ml82NzAyMTYzNV9JczRSMw
+
+          	-Path to Workspace [just a projects folder]
 
          	  ex. C:\adt32\eclipse\workspace
 
-
- 	        -Select Eclipse Project:		                                             
-   
-	          ex.C:\adt32\eclipse\workspace\AppDemo1	  
-
-                                                  
-	        -Select others Options [Instructions; FPU; Project "Eclipse"; Target Api] 
-
-
-        2.3. OK!
-
+	        -Select others Options [Instructions; FPU;  Target Api, etc..., Project "Eclipse";] 
                          
         2.4. From "Android Module Wizard: Select Java Source for JNI..."
 
-		-From left panel/tree Select Project by Name [AppDemo1] -> src
+		-From left panel/tree Select Project by name -> src
 
                 -From top panel/View right click "App.java" file 
 
-		-On Popup menu select/click <Get Simonsayz's Templates> 
+		    --> On Popup menu select/click <Get Simonsayz's Templates> 
             
 		 	ref. Image: http://www.opendrive.com/files?Ml8zNjMwMjI1Ml9kOXNRag 
 
@@ -169,34 +134,34 @@ II. [GUI Project Support] Android Components Bridges - Simon's Controls remake w
 
 	2.5. OK  
 
-	      - Pascal JNI Interface was created! 	
-
+	        - Pascal JNI Interface was created! 	
 
 	2.6. follow the hint on code: "save all files to location....."  { \jni folder }
 
-
-	2.7. From Component Palette select page <Android Bridges>
-
+	2.6. From Component Palette select page <Android Bridges>
         
-       	      ref. Image: http://www.opendrive.com/files?Ml8zNjMwNDQ3NF83SzhsZg
+        	ref. Image: http://www.opendrive.com/files?Ml8zNjMwNDQ3NF83SzhsZg
                             
+		-Put e configure some component on android form... etc...
 
-	     -Put e configure some component on android form ... etc...
+	3. From Laz4Android IDE
+
+		-Run -> Build
+
+        4. Yes! You got it! ".so" was created! see \libs folder...
+
+        5. NEW! For multi build modes, please, read "readme.txt" in ..\jni\build-modes folder 
+
+        6. Please, read the "readme.txt" in your project folder to learn how to buidl Android Application [Apk]
+	
+	7. NEW! Lazarus IDE menu "Tools" -> "Android Module Wizard" -> Late: Apk Expert Tools [Build, Install, ...]
+		:: Thanks to Thierry Dijoux! 
+		ref. https://jmpessoa.opendrive.com/files?Ml82Nzg4MzA2N184VWZaWg 
+
+		:: Plug your device to usb port -> go to "build apk" -> go to "install apk" -- enjoy it!			
 
 
-	2.8. From Lazarus IDE
-
-      	     -Run -> Build
-
-
-        2.9. Yes! You got it! ".so" was created! see \libs folder...
-
-
-        3.0. NEW! For multi build modes, please, read "readme.txt" in ..\jni\build-modes folder
-
-
-    3. Build and Run Android Application
-
+    3. Build and Run Android Application 
 
         3.1.From Eclipse IDE
 
@@ -206,12 +171,9 @@ II. [GUI Project Support] Android Components Bridges - Simon's Controls remake w
 	
           -right click your  project: -> Run as -> Android Application
 	  
-
-
-III. [No GUI Project Support] - just a basic android ".so" - 
+III. [Generic Project Support] - just a basic android ".so" - 
 
       :: No Support for "Android Bridges" components  jControls/jVisualControls!
-
   
 1. From Eclipse IDE:
 
@@ -246,60 +208,11 @@ III. [No GUI Project Support] - just a basic android ".so" -
        * warning: System.loadLibrary("...") must match class Name "lowercase"...
          ex. JNIHello -> "jnihello"
       
-2. From LiteZarus4Android IDE 
+2. From Laz4Android IDE 
 
    2.1. On "Create a new project" Dialog select: <JNI Android Module> 
 
        ref. Image: https://www.opendrive.com/files?Ml8zNjg3MDU0MV9nTXZsdA
-
-
-   2.2. From "Android Module Wizard: Configure Paths"
-
-  
-      ref. Image: http://jmpessoa.opendrive.com/files?Ml8zNzM2NzE1OV9YdHJXaw
-                         
-                         
-    		-Path to Java JDK
-     	
-	          ex. C:\Program Files (x86)\Java\jdk1.7.0_21    {win32}
-
-
-       		-Path to Android SDK
-
-                  ex. C:\adt32\sdk
-
-
-		-Select Ndk version: [7c or 9b]
-
-
-		-Select Android Platform: [ex. android-14]
-
-
-	     	-Path to Ndk 
-
-	          ex.  C:\adt32\ndk7       
-
-
-		-Path to Java Resources  [Simonsayz's Controls.java,  *.xml and etc...]:
-     	
-		  ex. C:\LiteZarus4Android\components\LazAndroidWizard\java    [... but not used for "noGUI" Eclipse Project] 
-
-
-          	-Path to Workspace
-
-         	  ex. C:\adt32\eclipse\workspace
-
-
- 	        -Select Eclipse Project:		                                             
-   
-	          ex.C:\adt32\eclipse\workspace\AppNoGUIDemo1	  
-
-                                                  
-	        -Select others Options [Instructions; FPU; Project "Eclipse"; GUI Controls "No"; Target Api, etc...] 
-
-
-   2.3. OK!
-
 
    2.4. From "Android Module Wizard: Select Java Source for JNI..."
 
@@ -309,30 +222,27 @@ III. [No GUI Project Support] - just a basic android ".so" -
  
       ex. "JNIHello.java" 
 
-
    2.5. OK!  
 
       - Pascal JNI Interface was created! 
 	
-
    2.6. follow the code hint: "save all files to location....." {save all in \jni folder ...}
-
      
    2.7. Implement the Pascal JNI Interface methods.....
-
 
    2.8. From Lazarus4Android IDE
 
        -Run -> Build  
-      
- 
+       
    2.9. Yes! You got it! ".so" was created! see \libs folder...
-
 
    3.0. NEW! For multi build modes, please, read "readme.txt" in ..\jni\build-modes folder 
 
-
    3.1. Yes! You got it! ".so" was created! see \libs folder...
+
+   3.2. NEW! Lazarus IDE menu "Tools" -> "Android Module Wizard" -> Late: Apk Expert Tools [Build, Install, ...]
+		:: Thanks to Thierry Dijoux! 
+		ref. https://jmpessoa.opendrive.com/files?Ml82NzAyMTYwMl9pUDV3RQ  		
 
 3. Build and Run Android Application
 
@@ -362,7 +272,7 @@ IV. How to use the Demos:
 
 	Change this informations to correct one!
 
-	"C:\adt32\ndk7"   -- just my system NDK path
+	"C:\adt32\Ndk10"   -- just my system NDK path
 	"C:\adt32\eclipse\workspace"  -- just my system eclipse workspace 
 
 	2. Go to Lazarus IDE
@@ -381,10 +291,9 @@ IV. How to use the Demos:
 		Modify some [piece] of path information 
 
 		[C:\adt32\eclipse\workspace] 
-		[C:\adt32\ndk7]
+		[C:\adt32\Ndk10]
 
 		according to your system ..
-
                             	
 V. Yes! Lazarus/Free Pascal does RAD on Android!
 

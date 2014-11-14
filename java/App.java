@@ -1,6 +1,6 @@
 package com.example.dummyapp;
 
-//[LazAndroidModuleWizard - Version 0.6 - 12 October 2014 // Add FORM Designer and more!
+//[LazAndroidModuleWizard - Version 0.6 - rev 05 - 13 November 2014
 //
 //[https://github.com/jmpessoa/lazandroidmodulewizard]
 

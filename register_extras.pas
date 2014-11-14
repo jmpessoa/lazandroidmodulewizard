@@ -3,23 +3,24 @@ unit register_extras;
 {$mode objfpc}{$H+}
   
 interface
-  
 
 //please, do not change this code format/layout!
 
 uses 
   Classes,
-  preferences,
-  location,
   spinner,
+  menu,
+  location,
+  preferences,
+  textfilemanager,
+  imagefilemanager,
+  bluetooth,
   bluetoothclientsocket,
   bluetoothserversocket,
-  bluetooth,
-  menu,
-  myhello,
-  textfilemanager,
-  dumpjavamethods,
+  sharefile,
   mediaplayer,
+  dumpjavamethods,
+  myhello,
   SysUtils,
   LResources;
   
@@ -31,30 +32,34 @@ implementation
   
 Procedure Register;
 begin
-  {$I jpreferences_icon.lrs}
-  {$I jlocation_icon.lrs}
   {$I jspinner_icon.lrs}
+  {$I jmenu_icon.lrs}
+  {$I jlocation_icon.lrs}
+  {$I jpreferences_icon.lrs}
+  {$I jtextfilemanager_icon.lrs}
+  {$I jimagefilemanager_icon.lrs}
+  {$I jbluetooth_icon.lrs}
   {$I jbluetoothclientsocket_icon.lrs}
   {$I jbluetoothserversocket_icon.lrs}
-  {$I jbluetooth_icon.lrs}
-  {$I jmenu_icon.lrs}
-  {$I jmyhello_icon.lrs}
-  {$I jtextfilemanager_icon.lrs}
-  {$I jdumpjavamethods_icon.lrs}
+  {$I jsharefile_icon.lrs}
   {$I jmediaplayer_icon.lrs}
+  {$I jdumpjavamethods_icon.lrs}
+  {$I jmyhello_icon.lrs}
   RegisterComponents('Android Bridges Extra',
     [
-      jPreferences,
-      jLocation,
       jSpinner,
+      jMenu,
+      jLocation,
+      jPreferences,
+      jTextFileManager,
+      jImageFileManager,
+      jBluetooth,
       jBluetoothClientSocket,
       jBluetoothServerSocket,
-      jBluetooth,
-      jMenu,
-      jMyHello,
-      jTextFileManager,
+      jSharefile,
+      jMediaPlayer,
       jDumpJavaMethods,
-      jMediaPlayer
+      jMyHello
     ]
   );
 end;

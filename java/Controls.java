@@ -1,6 +1,6 @@
 package com.example.dummyapp;
 
-//[LazAndroidModuleWizard - Version 0.6 - rev 04 - 23 October 2014 
+//[LazAndroidModuleWizard - Version 0.6 - rev 05 - 13 November 2014 
 
 //[https://github.com/jmpessoa/lazandroidmodulewizard]
 //
@@ -80,6 +80,7 @@ import android.content.pm.PackageManager.NameNotFoundException;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.content.res.AssetFileDescriptor;
+import android.content.res.AssetManager;
 import android.database.Cursor;
 import android.graphics.Bitmap.CompressFormat;
 import android.graphics.Bitmap;
@@ -469,7 +470,7 @@ public String GetDateTime() {
 }
 
 //Free object except Self, Pascal Code Free the class.
- public  void Free() {	
+ public void Free() {	
    if (parent != null) { controls.appLayout.removeView(layout); }  
    onClickListener = null;
    layout.setOnClickListener(null);
@@ -526,6 +527,203 @@ public void SetWifiEnabled(boolean _status) {
     WifiManager wifiManager = (WifiManager)this.controls.activity.getSystemService(Context.WIFI_SERVICE);
     return  wifiManager.isWifiEnabled();	
  }
+              
+public String GetEnvironmentDirectoryPath(int _directory) {
+	
+	File filePath= null;
+	String absPath="";   //fail!
+	  
+	//Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS);break; //only Api 19!
+	if (_directory != 8) {		  	   	 
+	  switch(_directory) {	                       
+	    case 0:  filePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS); break;	   
+	    case 1:  filePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM); break;
+	    case 2:  filePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MUSIC); break;
+	    case 3:  filePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES); break;
+	    case 4:  filePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_NOTIFICATIONS); break;
+	    case 5:  filePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MOVIES); break;
+	    case 6:  filePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PODCASTS); break;
+	    case 7:  filePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_RINGTONES); break;
+	    
+	    case 9: absPath  = this.controls.activity.getFilesDir().getAbsolutePath(); break;      //Result : /data/data/com/MyApp/files	    	    
+	    case 10: absPath = this.controls.activity.getFilesDir().getPath();
+	             absPath = absPath.substring(0, absPath.lastIndexOf("/")) + "/databases"; break;
+	    case 11: absPath = this.controls.activity.getFilesDir().getPath();
+                 absPath = absPath.substring(0, absPath.lastIndexOf("/")) + "/shared_prefs"; break;	             
+	           
+	  }
+	  	  
+	  //Make sure the directory exists.
+      if (_directory < 8) { 
+    	 filePath.mkdirs();
+    	 absPath= filePath.getPath(); 
+      }	        
+      
+	}else {  //== 8 
+	    if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED) == true) {
+	    	filePath = Environment.getExternalStorageDirectory();  //sdcard!
+	    	// Make sure the directory exists.
+	    	filePath.mkdirs();
+	   	    absPath= filePath.getPath();
+	    }
+	}    	
+	    		  
+	return absPath;
+}
+
+public String GetInternalAppStoragePath() { //GetAbsoluteDirectoryPath 
+   String PathDat = this.controls.activity.getFilesDir().getAbsolutePath();       //Result : /data/data/com/MyApp/files
+   return PathDat;
+}
+
+
+private void copyFileUsingFileStreams(File source, File dest)
+		throws IOException {
+	InputStream input = null;
+	OutputStream output = null;
+	try {
+		input = new FileInputStream(source);
+		output = new FileOutputStream(dest);
+		byte[] buf = new byte[1024];
+		int bytesRead;
+		while ((bytesRead = input.read(buf)) > 0) {
+			output.write(buf, 0, bytesRead);
+		}
+	} finally {
+		input.close();
+		output.close();
+	}
+}
+
+public boolean CopyFile(String _scrFullFileName, String _destFullFileName) {
+	File src= new File(_scrFullFileName);
+	File dest= new File(_destFullFileName);
+	try {
+		copyFileUsingFileStreams(src, dest);
+		return true;
+	} catch (IOException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+		return false;
+	}
+}
+
+
+//ref. https://xjaphx.wordpress.com/2011/10/02/store-and-use-files-in-assets/
+
+//result: path to new storage [Internal App Storage]
+public String LoadFromAssets(String _filename){
+	    
+	    String pathRes="";
+	    
+		InputStream is = null;
+		FileOutputStream fos = null;					    		           			
+		String PathDat = controls.activity.getFilesDir().getAbsolutePath();		
+		try {		   		     			
+			File outfile = new File(PathDat, _filename);				
+							
+			fos = new FileOutputStream(outfile);  //save to data/data/your_package/files/your_file_name										
+			is = controls.activity.getAssets().open(_filename);	     
+			int size = is.available();	     
+			byte[] buffer = new byte[size];
+			
+			for (int c = is.read(buffer); c != -1; c = is.read(buffer)){
+		      fos.write(buffer, 0, c);
+			}	     								
+			is.close();								
+			fos.close();
+			pathRes= PathDat +"/"+ _filename;
+			
+		}catch (IOException e) {
+		     e.printStackTrace();		     
+		}
+		
+		return pathRes;
+}
+
+public boolean isSdCardMounted() {		  
+   return Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED); 
+}
+
+public void DeleteFile(String _filename) {
+   this.controls.activity.deleteFile(_filename);
+}
+
+public void DeleteFile(String _fullPath, String _filename) {	
+   File file;
+   if ( _fullPath.equalsIgnoreCase("") ) {	
+      file = new File(Environment.getExternalStorageDirectory()+"/"+ _filename); // root
+   }
+   else {
+	  file = new File(_fullPath+"/"+ _filename);   
+   }  
+   file.delete();   
+}
+
+public void DeleteFile(int _environmentDir, String _filename) {		  
+	String baseDir = GetEnvironmentDirectoryPath(_environmentDir);
+	if (!baseDir.equalsIgnoreCase("")) {
+   	    File file = new File(baseDir, _filename);    	    
+	    file.delete();	   
+	}
+}
+
+public String CreateDir(String _dirName) {
+	this.controls.activity.getDir(_dirName, 0); //if not exist -->> CREATE!
+    String absPath = this.controls.activity.getFilesDir().getPath();
+    absPath = absPath.substring(0, absPath.lastIndexOf("/")) + "/"+_dirName; 
+	return absPath;
+}
+
+public String CreateDir(int _environmentDir, String _dirName) {	
+    String baseDir = GetEnvironmentDirectoryPath(_environmentDir);
+    if (!baseDir.equalsIgnoreCase("")) {
+       File file = new File(baseDir, _dirName);    
+       file.mkdirs();        
+  	  return file.getPath(); 
+    }else return "";
+}
+
+public String CreateDir(String _fullPath, String _dirName) {	
+    File file = new File(_fullPath, _dirName);    
+    file.mkdirs();      
+    return file.getPath();
+}
+
+/*
+Added in API level 11
+Returns whether the primary "external" storage device is emulated. If true, 
+data stored on this device will be stored on a portion of the internal storage system.
+*/
+public boolean IsExternalStorageEmulated () {
+  return  Environment.isExternalStorageEmulated();
+}	
+
+/*
+Added in API level 9
+Returns whether the primary "external" storage device is removable.
+*/
+public boolean IsExternalStorageRemovable() {
+	return  Environment.isExternalStorageRemovable();
+}	
+
+//
+public  String GetjFormVersionFeatures() { 
+    String listVersionInfo = 
+		   "6$5=SetWifiEnabled;" +  //[0.6-05]
+		   "6$5=IsWifiEnabled;" +
+		   "6$5=GetEnvironmentDirectoryPath;" +
+		   "6$5=GetInternalAppStoragePath;" +
+		   "6$5=CopyFile;" +
+		   "6$5=LoadFromAssets;" +  		         
+		   "6$5=IsSdCardMounted;" +
+		   "6$5=DeleteFile;" +
+		   "6$5=CreateDir;" +
+		   "6$5=IsExternalStorageEmulated;" +
+		   "6$5=IsExternalStorageRemovable";  
+    return listVersionInfo;
+}
+
 
 
 }
@@ -4706,7 +4904,7 @@ controls = ctrls;
 
 }
 
-public  void loadFile(String filename) {
+public  void loadFile(String filename) {  //full file name!
   //if (bmp != null) { bmp.recycle(); }
   bmp = BitmapFactory.decodeFile(filename);
 }
@@ -4769,7 +4967,7 @@ public  Bitmap jInstance() {
 //by jmpessoa
 public byte[] GetByteArrayFromBitmap() {
     ByteArrayOutputStream stream = new ByteArrayOutputStream();
-    this.bmp.compress(CompressFormat.PNG, 0, stream);
+    this.bmp.compress(CompressFormat.PNG, 0, stream); //O: PNG will ignore the quality setting...
     Log.i("GetByteArrayFromBitmap","size="+ stream.size());
     return stream.toByteArray();
 }
@@ -5746,36 +5944,12 @@ class jTextFileManager /*extends ...*/ {
     	intent = null;
     }
     
-  //Once you choose bluetooth, the android bluetooth application will launch and let you pick the device to send it too.
-    public void ShareFromSdCardFile(String _filename) {        	
-    	//File externalFile = new File(Environment.getExternalStorageDirectory().getPath() +"/"+ _filename);
-    	File file = new File(Environment.getExternalStorageDirectory(), _filename);    	    	    	 
-    	intent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(file));
-    	controls.activity.startActivity(intent);    	
-    }
-        
-   //Once you choose bluetooth, the android bluetooth application will launch and let you pick the device to send it too.
-    public void ShareFromFile(String _filename) {    	    	    	
-    	//String PathDat = context.getFilesDir().getAbsolutePath();   //   //Result : /data/data/com/MyApp/files 	
-    	//File file = new File(PathDat+"/"+ _filename);
-    	File file = new File(context.getFilesDir().getAbsolutePath(),_filename);
-    	intent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(file));
-    	controls.activity.startActivity(intent);    	
-    }
-        
-    public String GetPathToExternalStorage() {    	
-      return Environment.getExternalStorageDirectory().getPath();
-    }
-        
-    public String GetPathToFile() {    	       	    
-      return context.getFilesDir().getAbsolutePath(); //Result : /data/data/com/MyApp/files 
-    }
     
     public void CopyToClipboard(String _text) {
     	mClipData = ClipData.newPlainText("text", _text);
         mClipBoard.setPrimaryClip(mClipData);
     }
-    
+       
     public String PasteFromClipboard() {
         ClipData cdata = mClipBoard.getPrimaryClip();
         ClipData.Item item = cdata.getItemAt(0);
@@ -5800,11 +5974,21 @@ class jTextFileManager /*extends ...*/ {
          outputStreamWriter.close();
      }
      catch (IOException e) {
-         Log.i("jTextFileManager", "File write failed: " + e.toString());
+         Log.i("jTextFileManager", "SaveToFile failed: " + e.toString());
      }
-
    }
 
+   public void SaveToFile(String _txtContent, String _path, String _filename){
+	     FileWriter fWriter;     
+	     try{ // Environment.getExternalStorageDirectory().getPath()
+	          fWriter = new FileWriter(_path +"/"+ _filename);
+	          fWriter.write(_txtContent);
+	          fWriter.flush();
+	          fWriter.close();
+	      }catch(Exception e){
+	          e.printStackTrace();
+	      }
+	   }   
    public String LoadFromFile(String _filename) {
 
      String retStr = "";
@@ -5827,39 +6011,35 @@ class jTextFileManager /*extends ...*/ {
          }
      }
      catch (IOException e) {
-         Log.i("jTextFileManager", "Can not read file: " + e.toString());
+         Log.i("jTextFileManager", "LoadFromFile error: " + e.toString());
      }
 
      return retStr;
    }
    
+   
+   public String LoadFromFile(String _path, String _filename) {
+	     char buf[] = new char[512];
+	     FileReader rdr;
+	     String contents = "";  //new File(Environment.getExternalStorageDirectory(), "alert.txt");
+	     try {                  // Environment.getExternalStorageDirectory().getPath() --> /sdcard
+	         rdr = new FileReader(_path+"/"+_filename);
+	         int s = rdr.read(buf);
+	         for(int k = 0; k < s; k++){
+	             contents+=buf[k];
+	         }
+	         
+	         rdr.close();
+	     } catch (Exception e) {
+	         e.printStackTrace();
+	     }
+	     return contents;
+	   }
+   
    //http://manojprasaddevelopers.blogspot.com.br/search/label/Write%20and%20ReadFile
-   /*.*/public String ReadTextFile(String _filename)
-   {
-      String json = "";
-      try
-      {
-        InputStream is = context.getAssets().open(_filename);
-        int size = is.available();
-        
-        
-       
-        byte[] buffer = new byte[size];
-        is.read(buffer);
-        is.close();
-       
-        json = new String(buffer, "UTF-8");
-       
-      } catch (IOException e){
-    	 //
-      }
-      
-      return json.toString();
-     
-   }
       
    //http://www.coderzheaven.com/2012/01/29/saving-textfile-to-sdcard-in-android/
-   public void SaveToSdCardFile(String _txtContent, String _filename){
+   public void SaveToSdCard(String _txtContent, String _filename){
      FileWriter fWriter;     
      try{ // Environment.getExternalStorageDirectory().getPath()
           fWriter = new FileWriter(Environment.getExternalStorageDirectory().getPath() +"/"+ _filename);
@@ -5871,7 +6051,7 @@ class jTextFileManager /*extends ...*/ {
       }
    }
    
-   public String LoadFromSdCardFile(String _filename){
+   public String LoadFromSdCard(String _filename){
      char buf[] = new char[512];
      FileReader rdr;
      String contents = "";  //new File(Environment.getExternalStorageDirectory(), "alert.txt");
@@ -5881,6 +6061,7 @@ class jTextFileManager /*extends ...*/ {
          for(int k = 0; k < s; k++){
              contents+=buf[k];
          }
+         
          rdr.close();
      } catch (Exception e) {
          e.printStackTrace();
@@ -5888,31 +6069,50 @@ class jTextFileManager /*extends ...*/ {
      return contents;
    }
    
-   public String LoadFromAssetsFile(String _filename) {  
-	   InputStream is = null;
-	   FileOutputStream fos = null;	  	   
-	   String path = '/' + _filename.substring(1,_filename.lastIndexOf("/"));	   
-	   String scrFilename = _filename.substring(_filename.lastIndexOf("/")+1);	   	   	   	  
-	   File outDir = new File(path);	   
-	   outDir.mkdirs();	   
-	   try {		   
-	     is = controls.activity.getAssets().open(scrFilename);	     
-	     int size = is.available();	     
-	     byte[] buffer = new byte[size];	     
-	     File outfile = new File(_filename);
-	     fos = new FileOutputStream(outfile);  //save to data/data/your_package/files/your_file_name
-	     for (int c = is.read(buffer); c != -1; c = is.read(buffer)){
-	       fos.write(buffer, 0, c);
-	     }	     
-	     is.close();
-	     fos.close();
-	   }
-	   catch (IOException e) {
-	      e.printStackTrace();       
-	   }	   	 
-       return  this.LoadFromFile(scrFilename);
-   }    
+   //https://xjaphx.wordpress.com/2011/10/02/store-and-use-files-in-assets/    
+   public String LoadFromAssets(String _filename) {
+	   String str;
+       // load text
+       try {
+    	   //Log.i("loadFromAssets", "name: "+_filename);
+           // get input stream for text
+           InputStream is = controls.activity.getAssets().open(_filename);
+           // check size
+           int size = is.available();
+           // create buffer for IO
+           byte[] buffer = new byte[size];
+           // get data to buffer
+           is.read(buffer);
+           // close stream
+           is.close();
+           // set result to TextView
+           str = new String(buffer);
+           //Log.i("loadFromAssets", ":: "+ str);
+           return str.toString();
+       }
+       catch (IOException ex) {
+    	   //Log.i("loadFromAssets", "error!");
+           return "";
+       }       
+   }
+   
+   public void CopyContentToClipboard(String _filename) {
+   	 String txt = LoadFromFile(_filename);
+   	 mClipData = ClipData.newPlainText("text", txt);
+     mClipBoard.setPrimaryClip(mClipData);
+   }
+   
+   public void PasteContentFromClipboard(String _filename) {
+      ClipData cdata = mClipBoard.getPrimaryClip();
+      ClipData.Item item = cdata.getItemAt(0);
+      String txt = item.getText().toString();
+      SaveToFile(txt, _filename);
+   }   
+
 }
+
+
+
 
 /*Draft java code by "Lazarus Android Module Wizard"*/
 /*https://github.com/jmpessoa/lazandroidmodulewizard*/
@@ -6450,7 +6650,7 @@ class jBluetoothServerSocket {
                 }
              }
           };
-         sender.start(); // Inicialização
+         sender.start(); // Init
 	   }
 	}
 
@@ -6470,7 +6670,7 @@ class jBluetoothServerSocket {
 	                 }
 	           }	          
 	       };
-	       sender.start(); // Inicialização
+	       sender.start(); // Init
 		}    
 	}
 	
@@ -6862,6 +7062,7 @@ class jBluetoothClientSocket {
 //ref. http://examples.javacodegeeks.com/android/core/bluetooth/bluetoothadapter/android-bluetooth-example/
 //ref. http://www.javacodegeeks.com/2013/09/bluetooth-data-transfer-with-android.html
 //ref. http://www.bravenewgeek.com/bluetooth-blues/
+       
 class jBluetooth /*extends ...*/ {
 
     private long     pascalObj = 0;      // Pascal Object
@@ -7061,78 +7262,6 @@ class jBluetooth /*extends ...*/ {
       }
     }       
                          
-    //Once you choose bluetooth, the android bluetooth application will launch and let you pick the device to send it too.
-    public void ShareFromSdCardFile(String  _filename) {
-    	
-       PackageManager pm = controls.activity.getPackageManager();
-       List<ResolveInfo>  appsList = pm.queryIntentActivities(intent, 0);
-     
-       if(appsList.size() > 0) {
-    	   String packageName = null;
-    	   String className = null;
-    	   boolean found = false;
-    	    
-    	   for(int i=0; i<  appsList.size()-1;i++){    		       		 
-    		 ResolveInfo info = appsList.get(i); //(ResolveInfo)    
-    	     packageName = info.activityInfo.packageName;
-    	     if( packageName.equals("com.android.bluetooth")){
-    	        className = info.activityInfo.name;
-    	        found = true;
-    	        break;// found
-    	     }
-    	   }
-    	   
-    	   if(found){
-    		 //set our intent to launch Bluetooth
-    		 intent.setClassName(packageName, className);
-    		 File file = new File(Environment.getExternalStorageDirectory().getPath() +"/"+ _filename);
-    		 
-    		 intent.setType("*/*");
-    	     intent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(file)); /* "/sdcard/test.txt" result : "file:///sdcard/test.txt" */
-    	     controls.activity.startActivity(intent);      		       		       	
-    	   }else{
-    		  Toast.makeText(controls.activity.getApplicationContext(),"com.android.bluetooth Not Found!" ,Toast.LENGTH_LONG).show();  
-    	   }    
-    	   
-       }       
-    }
-    
-    //Once you choose bluetooth, the android bluetooth application will launch and let you pick the device to send it too.
-    public void ShareFromFile(String _filename) {
-    	
-        PackageManager pm = controls.activity.getPackageManager();
-        List<ResolveInfo>  appsList = pm.queryIntentActivities(intent, 0);
-      
-        if(appsList.size() > 0) {
-     	   String packageName = null;
-     	   String className = null;
-     	   boolean found = false;
-     	    
-     	   for(int i=0; i<  appsList.size()-1;i++){    		       		 
-     		 ResolveInfo info = appsList.get(i);     
-     	     packageName = info.activityInfo.packageName;
-     	     if( packageName.equals("com.android.bluetooth")){
-     	        className = info.activityInfo.name;
-     	        found = true;
-     	        break;// found
-     	     }
-     	   }    	   
-     	   if(found){
-     		 //set our intent to launch Bluetooth
-    		 intent.setClassName(packageName, className);     		      		
-       		 
-          	 String PathDat = context.getFilesDir().getAbsolutePath();   //   //Result : /data/data/com/MyApp/files 	
-        	 File file = new File(PathDat+"/"+ _filename);
-        	 
-        	 intent.setType("*/*");
-        	 intent.putExtra(Intent.EXTRA_STREAM,Uri.fromFile(file)); /* "/sdcard/test.txt" result : "file:///sdcard/test.txt" */
-        	 controls.activity.startActivity(intent);    	
-       		 
-     	   }else{
-     		  Toast.makeText(controls.activity.getApplicationContext(),"com.android.bluetooth Not Found!" ,Toast.LENGTH_LONG).show();  
-     	   }    		   
-        }
-    }
     
     public BluetoothDevice GetReachablePairedDeviceByName(String _deviceName) {
     	
@@ -7221,23 +7350,30 @@ class jBluetooth /*extends ...*/ {
     }    
 }
 
+//by jmpessoa
 class jShareFile /*extends ...*/ {
 
     private long     pascalObj = 0;      // Pascal Object
     private Controls controls  = null;   // Control Class -> Java/Pascal Interface ...
     private Context  context   = null;
+    private String mTransitoryEnvironmentDirectoryPath;
     
-    Intent intent = null;
-	        
+    private Intent intent = null;
+        	        
     //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
-
     public jShareFile(Controls _ctrls, long _Self) { //Add more others news "_xxx" params if needed!
        //super(_ctrls.activity);
        context   = _ctrls.activity;
        pascalObj = _Self;
        controls  = _ctrls;
+       
+       mTransitoryEnvironmentDirectoryPath = GetEnvironmentDirectoryPath(1); //download!
+       
        intent = new Intent();
 	   intent.setAction(Intent.ACTION_SEND);
+       //intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+  	   intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+
     }
 
     public void jFree() {
@@ -7247,52 +7383,135 @@ class jShareFile /*extends ...*/ {
 
     //write others [public] methods code here......
     //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
+    private static void copyFileUsingFileStreams(File source, File dest)
+    		throws IOException {
+    	InputStream input = null;
+    	OutputStream output = null;
+    	try {
+    		input = new FileInputStream(source);
+    		output = new FileOutputStream(dest);
+    		byte[] buf = new byte[1024];
+    		int bytesRead;
+    		while ((bytesRead = input.read(buf)) > 0) {
+    			output.write(buf, 0, bytesRead);
+    		}
+    	} finally {
+    		input.close();
+    		output.close();
+    	}
+    }
+
+    private boolean CopyFile(String _scrFullFileName, String _destFullFileName) {
+    	File src= new File(_scrFullFileName);
+    	File dest= new File(_destFullFileName);
+    	try {
+    		copyFileUsingFileStreams(src, dest);
+    		return true;
+    	} catch (IOException e) {
+    		// TODO Auto-generated catch block
+    		e.printStackTrace();
+    		return false;
+    	}
+    }
     
-	public void SendFromSdCard(String _filename, String _mimetype){			 		 
+	public void ShareFromSdCard(String _filename, String _mimetype){			 		 
 		intent.setType(_mimetype);		
 	    File file = new File(Environment.getExternalStorageDirectory().getPath() +"/"+ _filename);
-	    intent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(file)); /* "/sdcard/test.txt" result : "file:///sdcard/test.txt" */			 	         		 		 			 		
-		controls.activity.startActivity(intent);
+	    intent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(file)); /* "/sdcard/test.txt" result : "file:///sdcard/test.txt" */			 	         		 		 			 				
+		controls.activity.startActivity(Intent.createChooser(intent, "Share ["+_filename+"] by:"));
 	}
 	
-	public void SendFromAssets(String _filename, String _mimetype){
-		    intent.setType(_mimetype);
+	//https://xjaphx.wordpress.com/2011/10/02/store-and-use-files-in-assets/
+	public void ShareFromAssets(String _filename, String _mimetype){				    		   
 			InputStream is = null;
-			FileOutputStream fos = null;	  	   
-			String path = '/' + _filename.substring(1,_filename.lastIndexOf("/"));	   
-			String scrFilename = _filename.substring(_filename.lastIndexOf("/")+1);	   	   	   	  
-			File outDir = new File(path);	   
-			outDir.mkdirs();	   
-			try {		   
-				is = controls.activity.getAssets().open(scrFilename);	     
+			FileOutputStream fos = null;			
+			String PathDat = controls.activity.getFilesDir().getAbsolutePath();			 			
+			try {		   		     			
+				File outfile = new File(PathDat+"/"+_filename);								
+				// if file doesnt exists, then create it
+				if (!outfile.exists()) {
+					outfile.createNewFile();
+				
+				}												
+				fos = new FileOutputStream(outfile);  //save to data/data/your_package/files/your_file_name														
+				is = controls.activity.getAssets().open(_filename);																				
 				int size = is.available();	     
-				byte[] buffer = new byte[size];	     
-				File outfile = new File(_filename);
-				fos = new FileOutputStream(outfile);  //save to data/data/your_package/files/your_file_name
+				byte[] buffer = new byte[size];												
 				for (int c = is.read(buffer); c != -1; c = is.read(buffer)){
 			      fos.write(buffer, 0, c);
-				}	     
-				is.close();
-				fos.close();
+				}																
+				is.close();								
+				fos.close();								
+				ShareFromInternalAppStorage(_filename,_mimetype);				
 			}catch (IOException e) {
-			     e.printStackTrace();       
-			}	   	 
-			//LoadFromFile(scrFilename);		 		
-       	    String PathDat = context.getFilesDir().getAbsolutePath();  //Result : /data/data/com/MyApp/files       	           	           	   
-       	    File file = new File(PathDat+"/"+ _filename);       	    
-			intent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(file)); 		 			            	     			    	
-			controls.activity.startActivity(intent);
+				 Log.i("ShareFromAssets","fail!!");
+			     e.printStackTrace();			     
+			}									
 	}	
 	
-	public void SendFromFile(File _filename, String _mimetype) {	    		     
-	   String PathDat = context.getFilesDir().getAbsolutePath();       //Result : /data/data/com/MyApp/files 	
-	   File file = new File(PathDat+"/"+ _filename);	        	 
-	   intent.setType(_mimetype);
-	   intent.putExtra(Intent.EXTRA_STREAM,Uri.fromFile(file));
-	   controls.activity.startActivity(intent);    		       		 	     
-	}		
+	public void ShareFromInternalAppStorage(String _filename, String _mimetype) {	 
+	  String srcPath = controls.activity.getFilesDir().getAbsolutePath()+"/"+ _filename;       //Result : /data/data/com/MyApp/files	 
+	  String destPath = mTransitoryEnvironmentDirectoryPath + "/" + _filename;	  
+	  CopyFile(srcPath, destPath);	  
+	  ShareFrom(destPath, _mimetype);	  	   
+	}
+		
+	public void ShareFrom(String _fullFilename, String _mimetype) {
+		   int p1 = _fullFilename.lastIndexOf("/");
+		   String filename = _fullFilename.substring(p1+1, _fullFilename.length());		   		   
+		   File file = new File(_fullFilename);	        	 
+		   intent.setType(_mimetype);
+		   intent.putExtra(Intent.EXTRA_STREAM,Uri.fromFile(file));    		       		 	     
+		   controls.activity.startActivity(Intent.createChooser(intent, "Share ["+filename+"] by:")); 		   
+	}	
+		
+	private String GetEnvironmentDirectoryPath(int _directory) {
+		
+		File filePath= null;
+		String absPath="";   //fail!
+		  
+		//Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS);break; //API 19!
+		if (_directory != 8) {		  	   	 
+		  switch(_directory) {	                       
+		    
+		    case 0:  filePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS); break; //hack		    
+		    case 1:  filePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM); break;
+		    case 2:  filePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MUSIC); break;
+		    case 3:  filePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES); break;
+		    case 4:  filePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_NOTIFICATIONS); break;
+		    case 5:  filePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MOVIES); break;
+		    case 6:  filePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PODCASTS); break;
+		    case 7:  filePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_RINGTONES); break;
+		    
+		    case 9: absPath  = this.controls.activity.getFilesDir().getAbsolutePath(); break;      //Result : /data/data/com/MyApp/files	    	    
+		    case 10: absPath = this.controls.activity.getFilesDir().getPath();
+		             absPath = absPath.substring(0, absPath.lastIndexOf("/")) + "/databases"; break;
+		    case 11: absPath = this.controls.activity.getFilesDir().getPath();
+	                 absPath = absPath.substring(0, absPath.lastIndexOf("/")) + "/shared_prefs"; break;	             		           
+		  }
+		  	  
+		  //Make sure the directory exists.
+	      if (_directory < 8) { 
+	    	 filePath.mkdirs();
+	    	 absPath= filePath.getPath(); 
+	      }	        
+	      
+		}else {  //== 8
+		    if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED) == true) {
+		    	filePath = Environment.getExternalStorageDirectory();  //sdcard!
+		    	// Make sure the directory exists.
+		    	filePath.mkdirs();
+		   	    absPath= filePath.getPath();
+		    }
+		}    			    		 
+		return absPath;
+	}	
+	
+    public void SetTransitoryEnvironmentDirectory(int _index) {   
+    	mTransitoryEnvironmentDirectoryPath = GetEnvironmentDirectoryPath(_index);
+    }
+	
 }
-
 
 //by jmpessoa
 class CustomSpinnerArrayAdapter<T> extends ArrayAdapter<String>{
@@ -7948,6 +8167,174 @@ class jPreferences /*extends ...*/ {
 	}
 }
 
+//by jmpessoa
+class jImageFileManager /*extends ...*/ {
+
+    private long     pascalObj = 0;      // Pascal Object
+    private Controls controls  = null;   // Control Class -> Java/Pascal Interface ...
+    private Context  context   = null;
+    
+    //Warning: please, preferentially init your news params names with "_", ex: int _flag, String _hello ...
+    public jImageFileManager(Controls _ctrls, long _Self) { //Add more here new "_xxx" params if needed!
+       //super(contrls.activity);
+       context   = _ctrls.activity;
+       pascalObj = _Self;
+       controls  = _ctrls;                   
+    }
+
+    public void jFree() {
+      //free local objects...        	
+    }
+
+   public void SaveToSdCard(Bitmap _image, String _filename) {	
+	   	  	   
+	    File file;
+	    String root = Environment.getExternalStorageDirectory().toString();
+	    
+	    file = new File (root+"/"+_filename);	
+	    
+	    if (file.exists ()) file.delete (); 
+	    try {
+	       FileOutputStream out = new FileOutputStream(file);	           	           	         
+	     
+           if ( _filename.toLowerCase().contains(".jpg") ) _image.compress(Bitmap.CompressFormat.JPEG, 90, out);
+	       if ( _filename.toLowerCase().contains(".png") ) _image.compress(Bitmap.CompressFormat.JPEG, 100, out);	       
+	       
+	       out.flush();
+	       out.close();
+	    } catch (Exception e) {
+           e.printStackTrace();
+	    }
+	    
+   }
+   
+   // By using this line you can able to see saved images in the gallery view.
+   public void ShowImagesFromGallery () {	   
+	   controls.activity.sendBroadcast(new Intent(
+		   Intent.ACTION_MEDIA_MOUNTED,
+		               Uri.parse("file://" + Environment.getExternalStorageDirectory())));
+   }
+   
+   public Bitmap LoadFromSdCard(String _filename) {	   
+	      String imageInSD = Environment.getExternalStorageDirectory().getPath()+"/"+_filename;	      
+	      Bitmap bitmap = BitmapFactory.decodeFile(imageInSD);	      
+	      return bitmap; 
+   }
+      
+   //http://android-er.blogspot.com.br/2010/07/save-file-to-sd-card.html
+   private InputStream OpenHttpConnection(String strURL) throws IOException{
+	   InputStream inputStream = null;
+	   URL url = new URL(strURL);
+	   URLConnection conn = url.openConnection();
+
+	   try{
+	    HttpURLConnection httpConn = (HttpURLConnection)conn;
+	    httpConn.setRequestMethod("GET");
+	    httpConn.connect();
+
+	    if (httpConn.getResponseCode() == HttpURLConnection.HTTP_OK) {
+	     inputStream = httpConn.getInputStream();
+	    }
+	   }
+	   catch (Exception ex)
+	   {
+	   }
+	   return inputStream;
+   }
+   
+   public Bitmap LoadFromURL(String _imageURL) {
+	   
+    BitmapFactory.Options bmOptions;
+	bmOptions = new BitmapFactory.Options();
+	bmOptions.inSampleSize = 1;
+	   
+    Bitmap bitmap = null;
+    InputStream in = null;      
+       try {
+           in = OpenHttpConnection(_imageURL);
+           bitmap = BitmapFactory.decodeStream(in, null, bmOptions);
+           in.close();
+       } catch (IOException e1) {
+       }
+       return bitmap;              
+       
+   }
+                   
+   public Bitmap LoadFromAssets(String strName)
+   {
+       AssetManager assetManager = controls.activity.getAssets();
+       InputStream istr = null;
+       try {
+           istr = assetManager.open(strName);
+       } catch (IOException e) {
+           e.printStackTrace();
+       }
+       Bitmap bitmap = BitmapFactory.decodeStream(istr);
+       return bitmap;
+   }
+   
+   public Bitmap LoadFromFile(String _filename) {	   
+	   Bitmap bmap=null;	  
+	   File fDir = this.controls.activity.getFilesDir();  //Result : /data/data/com/MyApp/files
+	   File file = new File(fDir, _filename);	   
+	   InputStream fileInputStream = null;	   
+  	   try {
+		 fileInputStream = new FileInputStream(file);
+		 BitmapFactory.Options bitmapOptions = new BitmapFactory.Options();
+		 bitmapOptions.inSampleSize = 1; //original image size :: 4 --> size 1/4!
+		 bitmapOptions.inJustDecodeBounds = false; //If set to true, the decoder will return null (no bitmap), 
+		 bmap = BitmapFactory.decodeStream(fileInputStream, null, bitmapOptions);		 
+	   } catch (FileNotFoundException e) {
+		// TODO Auto-generated catch block
+		 e.printStackTrace();
+	   }  	   
+  	   return bmap;  	   
+   }
+   
+   public Bitmap LoadFromFile(String _path, String _filename) {	   
+	      String imageIn = _path+"/"+_filename;	      
+	      Bitmap bitmap = BitmapFactory.decodeFile(imageIn);	      
+	      return bitmap; 
+   }
+   
+   public void SaveToFile(Bitmap _image, String _filename) {	   	    
+	    String root = this.controls.activity.getFilesDir().getAbsolutePath();	      	    	    
+	    File file = new File (root +"/"+ _filename);	    
+	    if (file.exists ()) file.delete (); 
+	    try {
+	        FileOutputStream out = new FileOutputStream(file);	  
+	        
+	        if ( _filename.toLowerCase().contains(".jpg") ) _image.compress(Bitmap.CompressFormat.JPEG, 90, out);
+	        if ( _filename.toLowerCase().contains(".png") ) _image.compress(Bitmap.CompressFormat.JPEG, 100, out);
+	        
+	         out.flush();
+	         out.close();
+	    } catch (Exception e) {
+	         e.printStackTrace();
+	    }  	     	   
+   }
+   
+   
+   public void SaveToFile(Bitmap _image,String _path, String _filename) {	   	    
+	       	    	    
+	    File file = new File (_path +"/"+ _filename);	    
+	    if (file.exists ()) file.delete (); 
+	    try {
+	        FileOutputStream out = new FileOutputStream(file);	  
+	        
+	        if ( _filename.toLowerCase().contains(".jpg") ) _image.compress(Bitmap.CompressFormat.JPEG, 90, out);
+	        if ( _filename.toLowerCase().contains(".png") ) _image.compress(Bitmap.CompressFormat.JPEG, 100, out);
+	        
+	         out.flush();
+	         out.close();
+	    } catch (Exception e) {
+	         e.printStackTrace();
+	    }  	     	   
+  }
+   
+}
+
+
 //Javas/Pascal Interface Class 
 
 public class Controls {          // <<--------- 
@@ -8172,6 +8559,7 @@ public  void appKillProcess() {
 
 // src : codedata.txt
 // tgt : /data/data/com.kredix.control/data/codedata.txt
+
 public  boolean assetSaveToFile(String src, String tgt) {
   InputStream is = null;
   FileOutputStream fos = null;
@@ -8371,14 +8759,16 @@ public  String getStrDateTime() {
 }
 */
 
-//GetControlsVersionFeatures ...
+//GetControlsVersionFeatures ...  //Controls.java version-revision info! [0.6-04]
 public  String getStrDateTime() {  //hacked by jmpessoa!! sorry, was for a good cause! please, use the  jForm_GetDateTime!!
-  return "6$4=GetControlsVersionInfo;6$4=getLocale";   //controls version-revision info! [0.6-04]
+  String listVersionInfo = "6$4=GetControlsVersionInfo;" +
+  		   "6$4=getLocale;";  
+  return listVersionInfo;
 }
 
 //by jmpessoa:  Class controls version info
 public String GetControlsVersionInfo() { 
-  return "6$4";  //version$revision  [0.6$04]
+  return "6$5";  //version$revision  [0.6$5]
 }
 
 public long getTick() {
@@ -8419,7 +8809,7 @@ public  String getPathExt() {
 
 // Result : /storage/emulated/0/DCIM
 public  String getPathDCIM() {
-  File FileDCIM =  Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM);
+  File FileDCIM =  Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM);  
   return ( FileDCIM.getPath() );
 }
 
@@ -10752,6 +11142,18 @@ public  java.lang.Object jSqliteDataAccess_Create(long pasobj, String databaseNa
   
    public java.lang.Object jPreferences_jCreate(long _Self, boolean _IsShared) {
       return (java.lang.Object)(new jPreferences(this,_Self,_IsShared));
+   }
+  
+
+  
+   public java.lang.Object jShareFile_jCreate(long _Self) {
+      return (java.lang.Object)(new jShareFile(this,_Self));
+   }
+  
+
+  
+   public java.lang.Object jImageFileManager_jCreate(long _Self) {
+      return (java.lang.Object)(new jImageFileManager(this,_Self));
    }
   
 

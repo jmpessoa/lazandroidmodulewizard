@@ -26,13 +26,17 @@ jTextFileManager = class(jControl)
     procedure Init(refApp: jApp); override;
     function jCreate(): jObject;
     procedure jFree();
-    procedure SaveToFile(_txtContent: string; _filename: string);
-    function LoadFromFile(_filename: string): string;
-    procedure SaveToSdCardFile(_txtContent: string; _filename: string);
-    function LoadFromSdCardFile(_filename: string): string;
-    function LoadFromAssetsFile(_filename: string): string;
+    procedure SaveToFile(_txtContent: string; _filename: string); overload;
+    procedure SaveToFile(_txtContent: string;_path: string; _filename: string); overload;
+    function LoadFromFile(_filename: string): string; overload;
+    function LoadFromFile(_path: string; _filename: string): string; overload;
+    procedure SaveToSdCard(_txtContent: string; _filename: string);
+    function LoadFromSdCard(_filename: string): string;
+    function LoadFromAssets(_filename: string): string;
     procedure CopyToClipboard(_text: string);
     function PasteFromClipboard(): string;
+    procedure CopyContentToClipboard(_filename: string);
+    procedure PasteContentFromClipboard(_filename: string);
 
  published
 
@@ -40,13 +44,20 @@ end;
 
 function jTextFileManager_jCreate(env: PJNIEnv; this: JObject;_Self: int64): jObject;
 procedure jTextFileManager_jFree(env: PJNIEnv; this: JObject; _jtextfilemanager: JObject);
-procedure jTextFileManager_SaveToFile(env: PJNIEnv; this: JObject; _jtextfilemanager: JObject; _txtContent: string; _filename: string);
-function jTextFileManager_LoadFromFile(env: PJNIEnv; this: JObject; _jtextfilemanager: JObject; _filename: string): string;
-procedure jTextFileManager_SaveToSdCardFile(env: PJNIEnv; this: JObject; _jtextfilemanager: JObject; _txtContent: string; _filename: string);
-function jTextFileManager_LoadFromSdCardFile(env: PJNIEnv; this: JObject; _jtextfilemanager: JObject; _filename: string): string;
-function jTextFileManager_LoadFromAssetsFile(env: PJNIEnv; this: JObject; _jtextfilemanager: JObject; _filename: string): string;
+procedure jTextFileManager_SaveToFile(env: PJNIEnv; this: JObject; _jtextfilemanager: JObject; _txtContent: string; _filename: string); overload;
+procedure jTextFileManager_SaveToFile(env: PJNIEnv; this: JObject; _jtextfilemanager: JObject; _txtContent: string; _path: string; _filename: string); overload;
+function jTextFileManager_LoadFromFile(env: PJNIEnv; this: JObject; _jtextfilemanager: JObject; _filename: string): string; overload;
+function jTextFileManager_LoadFromFile(env: PJNIEnv; this: JObject; _jtextfilemanager: JObject; _path: string; _filename: string): string; overload;
+procedure jTextFileManager_SaveToSdCard(env: PJNIEnv; this: JObject; _jtextfilemanager: JObject; _txtContent: string; _filename: string);
+function jTextFileManager_LoadFromSdCard(env: PJNIEnv; this: JObject; _jtextfilemanager: JObject; _filename: string): string;
+function jTextFileManager_LoadFromAssets(env: PJNIEnv; this: JObject; _jtextfilemanager: JObject; _filename: string): string;
 procedure jTextFileManager_CopyToClipboard(env: PJNIEnv; this: JObject; _jtextfilemanager: JObject; _text: string);
 function jTextFileManager_PasteFromClipboard(env: PJNIEnv; this: JObject; _jtextfilemanager: JObject): string;
+
+procedure jTextFileManager_CopyContentToClipboard(env: PJNIEnv; this: JObject; _jtextfilemanager: JObject; _filename: string);
+procedure jTextFileManager_PasteContentFromClipboard(env: PJNIEnv; this: JObject; _jtextfilemanager: JObject; _filename: string);
+
+
 
 implementation
 
@@ -109,6 +120,13 @@ begin
      jTextFileManager_SaveToFile(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, _txtContent ,_filename);
 end;
 
+procedure jTextFileManager.SaveToFile(_txtContent: string; _path: string; _filename: string);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jTextFileManager_SaveToFile(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, _txtContent ,_path, _filename);
+end;
+
 function jTextFileManager.LoadFromFile(_filename: string): string;
 begin
   //in designing component state: result value here...
@@ -116,25 +134,32 @@ begin
    Result:= jTextFileManager_LoadFromFile(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, _filename);
 end;
 
-procedure jTextFileManager.SaveToSdCardFile(_txtContent: string; _filename: string);
+function jTextFileManager.LoadFromFile(_path: string; _filename: string): string;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jTextFileManager_LoadFromFile(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject,_path, _filename);
+end;
+
+procedure jTextFileManager.SaveToSdCard(_txtContent: string; _filename: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jTextFileManager_SaveToSdCardFile(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, _txtContent ,_filename);
+     jTextFileManager_SaveToSdCard(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, _txtContent ,_filename);
 end;
 
-function jTextFileManager.LoadFromSdCardFile(_filename: string): string;
+function jTextFileManager.LoadFromSdCard(_filename: string): string;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jTextFileManager_LoadFromSdCardFile(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, _filename);
+   Result:= jTextFileManager_LoadFromSdCard(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, _filename);
 end;
 
-function jTextFileManager.LoadFromAssetsFile(_filename: string): string;
+function jTextFileManager.LoadFromAssets(_filename: string): string;
 begin
   //in designing component state: result value here...
   if FInitialized then
-     Result:= jTextFileManager_LoadFromAssetsFile(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, GetFilePath(FFilePath)+'/'+_filename);
+     Result:= jTextFileManager_LoadFromAssets(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, _filename);
 end;
 
 procedure jTextFileManager.CopyToClipboard(_text: string);
@@ -150,6 +175,21 @@ begin
   if FInitialized then
    Result:= jTextFileManager_PasteFromClipboard(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject);
 end;
+
+procedure jTextFileManager.CopyContentToClipboard(_filename: string);
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+     jTextFileManager_CopyContentToClipboard(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, _filename);
+end;
+
+procedure jTextFileManager.PasteContentFromClipboard(_filename: string);
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+     jTextFileManager_PasteContentFromClipboard(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, _filename);
+end;
+
 
 {-------- jTextFileManager_JNI_Bridge ----------}
 
@@ -201,6 +241,23 @@ begin
   env^.DeleteLocalRef(env,jParams[1].l);
 end;
 
+procedure jTextFileManager_SaveToFile(env: PJNIEnv; this: JObject; _jtextfilemanager: JObject; _txtContent: string; _path: string; _filename: string);
+var
+  jParams: array[0..2] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_txtContent));
+  jParams[1].l:= env^.NewStringUTF(env, PChar(_path));
+  jParams[2].l:= env^.NewStringUTF(env, PChar(_filename));
+  jCls:= env^.GetObjectClass(env, _jtextfilemanager);
+  jMethod:= env^.GetMethodID(env, jCls, 'SaveToFile', '(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V');
+  env^.CallVoidMethodA(env, _jtextfilemanager, jMethod, @jParams);
+  env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env,jParams[1].l);
+  env^.DeleteLocalRef(env,jParams[2].l);
+end;
+
 function jTextFileManager_LoadFromFile(env: PJNIEnv; this: JObject; _jtextfilemanager: JObject; _filename: string): string;
 var
   jStr: JString;
@@ -223,7 +280,31 @@ begin
   env^.DeleteLocalRef(env,jParams[0].l);
 end;
 
-procedure jTextFileManager_SaveToSdCardFile(env: PJNIEnv; this: JObject; _jtextfilemanager: JObject; _txtContent: string; _filename: string);
+function jTextFileManager_LoadFromFile(env: PJNIEnv; this: JObject; _jtextfilemanager: JObject;_path: string; _filename: string): string;
+var
+  jStr: JString;
+  jBoo: JBoolean;
+  jParams: array[0..1] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_path));
+  jParams[1].l:= env^.NewStringUTF(env, PChar(_filename));
+  jCls:= env^.GetObjectClass(env, _jtextfilemanager);
+  jMethod:= env^.GetMethodID(env, jCls, 'LoadFromFile', '(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;');
+  jStr:= env^.CallObjectMethodA(env, _jtextfilemanager, jMethod, @jParams);
+  case jStr = nil of
+     True : Result:= '';
+     False: begin
+              jBoo:= JNI_False;
+              Result:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
+            end;
+  end;
+  env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env,jParams[1].l);
+end;
+
+procedure jTextFileManager_SaveToSdCard(env: PJNIEnv; this: JObject; _jtextfilemanager: JObject; _txtContent: string; _filename: string);
 var
   jParams: array[0..1] of jValue;
   jMethod: jMethodID=nil;
@@ -232,13 +313,13 @@ begin
   jParams[0].l:= env^.NewStringUTF(env, PChar(_txtContent));
   jParams[1].l:= env^.NewStringUTF(env, PChar(_filename));
   jCls:= env^.GetObjectClass(env, _jtextfilemanager);
-  jMethod:= env^.GetMethodID(env, jCls, 'SaveToSdCardFile', '(Ljava/lang/String;Ljava/lang/String;)V');
+  jMethod:= env^.GetMethodID(env, jCls, 'SaveToSdCard', '(Ljava/lang/String;Ljava/lang/String;)V');
   env^.CallVoidMethodA(env, _jtextfilemanager, jMethod, @jParams);
   env^.DeleteLocalRef(env,jParams[0].l);
   env^.DeleteLocalRef(env,jParams[1].l);
 end;
 
-function jTextFileManager_LoadFromSdCardFile(env: PJNIEnv; this: JObject; _jtextfilemanager: JObject; _filename: string): string;
+function jTextFileManager_LoadFromSdCard(env: PJNIEnv; this: JObject; _jtextfilemanager: JObject; _filename: string): string;
 var
   jStr: JString;
   jBoo: JBoolean;
@@ -248,7 +329,7 @@ var
 begin
   jParams[0].l:= env^.NewStringUTF(env, PChar(_filename));
   jCls:= env^.GetObjectClass(env, _jtextfilemanager);
-  jMethod:= env^.GetMethodID(env, jCls, 'LoadFromSdCardFile', '(Ljava/lang/String;)Ljava/lang/String;');
+  jMethod:= env^.GetMethodID(env, jCls, 'LoadFromSdCard', '(Ljava/lang/String;)Ljava/lang/String;');
   jStr:= env^.CallObjectMethodA(env, _jtextfilemanager, jMethod, @jParams);
   case jStr = nil of
      True : Result:= '';
@@ -260,7 +341,7 @@ begin
   env^.DeleteLocalRef(env,jParams[0].l);
 end;
 
-function jTextFileManager_LoadFromAssetsFile(env: PJNIEnv; this: JObject; _jtextfilemanager: JObject; _filename: string): string;
+function jTextFileManager_LoadFromAssets(env: PJNIEnv; this: JObject; _jtextfilemanager: JObject; _filename: string): string;
 var
   jStr: JString;
   jBoo: JBoolean;
@@ -270,7 +351,7 @@ var
 begin
   jParams[0].l:= env^.NewStringUTF(env, PChar(_filename));
   jCls:= env^.GetObjectClass(env, _jtextfilemanager);
-  jMethod:= env^.GetMethodID(env, jCls, 'LoadFromAssetsFile', '(Ljava/lang/String;)Ljava/lang/String;');
+  jMethod:= env^.GetMethodID(env, jCls, 'LoadFromAssets', '(Ljava/lang/String;)Ljava/lang/String;');
   jStr:= env^.CallObjectMethodA(env, _jtextfilemanager, jMethod, @jParams);
   case jStr = nil of
      True : Result:= '';
@@ -313,5 +394,32 @@ begin
             end;
   end;
 end;
+
+procedure jTextFileManager_CopyContentToClipboard(env: PJNIEnv; this: JObject; _jtextfilemanager: JObject; _filename: string);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_filename));
+  jCls:= env^.GetObjectClass(env, _jtextfilemanager);
+  jMethod:= env^.GetMethodID(env, jCls, 'CopyContentToClipboard', '(Ljava/lang/String;)V');
+  env^.CallVoidMethodA(env, _jtextfilemanager, jMethod, @jParams);
+  env^.DeleteLocalRef(env,jParams[0].l);
+end;
+
+procedure jTextFileManager_PasteContentFromClipboard(env: PJNIEnv; this: JObject; _jtextfilemanager: JObject; _filename: string);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_filename));
+  jCls:= env^.GetObjectClass(env, _jtextfilemanager);
+  jMethod:= env^.GetMethodID(env, jCls, 'PasteContentFromClipboard', '(Ljava/lang/String;)V');
+  env^.CallVoidMethodA(env, _jtextfilemanager, jMethod, @jParams);
+  env^.DeleteLocalRef(env,jParams[0].l);
+end;
+
 
 end.

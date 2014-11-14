@@ -7,6 +7,8 @@
 
     <uses-sdk android:minSdkVersion="dummySdkApi" android:targetSdkVersion="dummyTargetApi"/>
 
+    <uses-permission android:name="android.permission.NFC" />
+
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.CHANGE_WIFI_STATE"/>
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />   
@@ -24,6 +26,8 @@
     <uses-permission android:name="android.permission.SEND_SMS"/>
 
     <uses-permission android:name="android.permission.CAMERA"/>
+
+    <uses-permission android:name="android.permission.ACCESS_BLUETOOTH_SHARE"/>
    <uses-permission android:name="android.permission.BLUETOOTH"/>
    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN"/>
     <uses-feature android:name="android.hardware.camera" android:required="false"/>

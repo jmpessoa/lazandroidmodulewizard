@@ -9,14 +9,8 @@
       <SearchPaths>
         <UnitOutputDirectory Value="lib\$(TargetCPU)-$(TargetOS)"/>
       </SearchPaths>
-      <Other>
-        <CompilerMessages>
-          <MsgFileName Value=""/>
-        </CompilerMessages>
-        <CompilerPath Value="$(CompPath)"/>
-      </Other>
     </CompilerOptions>
-    <Files Count="7">
+    <Files Count="9">
       <Item1>
         <Filename Value="androidwizard_intf.pas"/>
         <HasRegisterProc Value="True"/>
@@ -46,6 +40,14 @@
         <Filename Value="uregisterform.pas"/>
         <UnitName Value="uRegisterForm"/>
       </Item7>
+      <Item8>
+        <Filename Value="formpathmissing.lfm"/>
+        <Type Value="LFM"/>
+      </Item8>
+      <Item9>
+        <Filename Value="formpathmissing.pas"/>
+        <UnitName Value="FormPathMissing"/>
+      </Item9>
     </Files>
     <Type Value="RunAndDesignTime"/>
     <RequiredPkgs Count="3">

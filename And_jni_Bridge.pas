@@ -211,8 +211,12 @@ procedure jForm_ShowMessage(env:PJNIEnv; this:jobject; Form:jObject; msg: string
 function jForm_GetDateTime(env:PJNIEnv; this:jobject; Form:jObject): string;
 
 procedure jForm_SetWifiEnabled(env: PJNIEnv; this: JObject; _jform: JObject; _status: boolean);
-function jForm_IsWifiEnabled(env: PJNIEnv; this: JObject; _jform: JObject): boolean;
-
+function jForm_IsWifiEnabled              (env: PJNIEnv; this: JObject; _jform: JObject): boolean;
+function jForm_GetEnvironmentDirectoryPath(env: PJNIEnv; this: JObject; _jform: JObject; _directory: integer): string;
+function jForm_GetInternalAppStoragePath(env: PJNIEnv; this: JObject; _jform: JObject): string;
+function jForm_CopyFile(env: PJNIEnv; this: JObject; _jform: JObject; _srcFullName: string; _destFullName: string): boolean;
+function jForm_LoadFromAssets(env: PJNIEnv; this: JObject; _jform: JObject; _fileName: string): string;
+function jForm_isSdCardMounted(env: PJNIEnv; this: JObject; _jform: JObject): boolean;
 
 // System Info
 Function  jSysInfo_ScreenWH            (env:PJNIEnv;this:jobject;context : jObject) : TWH;
@@ -2397,6 +2401,98 @@ begin
   jBoo:= env^.CallBooleanMethod(env, _jform, jMethod);
   Result:= boolean(jBoo);
 end;
+
+function jForm_GetEnvironmentDirectoryPath(env: PJNIEnv; this: JObject; _jform: JObject; _directory: integer): string;
+var
+  _jParams: array[0..0] of jValue;
+ _cls: jClass;
+ _jMethod : jMethodID = nil;
+ _jString : jstring;
+ _jBoolean: jBoolean;
+begin
+  _cls := env^.GetObjectClass(env, _jform);
+  _jMethod:= env^.GetMethodID(env, _cls, 'GetEnvironmentDirectoryPath', '(I)Ljava/lang/String;');
+  _jParams[0].i:= _directory;
+  _jString:= env^.CallObjectMethodA(env,_jform,_jMethod, @_jParams);
+  case _jString = nil of
+     True : Result    := '';
+     False: begin
+             _jBoolean := JNI_False;
+             Result:= String( env^.GetStringUTFChars(Env,_jString,@_jBoolean) );
+           end;
+  end;
+end;
+
+function jForm_GetInternalAppStoragePath(env: PJNIEnv; this: JObject; _jform: JObject): string;
+var
+ _cls: jClass;
+ _jMethod : jMethodID = nil;
+ _jString : jstring;
+ _jBoolean: jBoolean;
+begin
+  _cls := env^.GetObjectClass(env, _jform);
+  _jMethod:= env^.GetMethodID(env, _cls, 'GetInternalAppStoragePath', '()Ljava/lang/String;');
+  _jString:= env^.CallObjectMethod(env,_jform,_jMethod);
+  case _jString = nil of
+     True : Result    := '';
+     False: begin
+             _jBoolean := JNI_False;
+             Result:= String( env^.GetStringUTFChars(Env,_jString,@_jBoolean) );
+           end;
+  end;
+end;
+
+function jForm_CopyFile(env: PJNIEnv; this: JObject; _jform: JObject; _srcFullName: string; _destFullName: string): boolean;
+var
+   _jBoo: JBoolean;
+   _jCls: jClass;
+   _jMethod: jmethodID;
+   _jParams : Array[0..1] of jValue;
+begin
+ _jParams[0].l:= env^.NewStringUTF(env, pchar(_srcFullName) );
+ _jParams[1].l:= env^.NewStringUTF(env, pchar(_destFullName) );
+  _jCls := env^.GetObjectClass(env, _jform);
+  _jMethod:= env^.GetMethodID(env, _jCls, 'CopyFile', '(Ljava/lang/String;Ljava/lang/String;)Z');
+  _jBoo:= env^.CallBooleanMethodA(env, _jform, _jMethod,@_jParams);
+  env^.DeleteLocalRef(env,_jParams[0].l);
+  env^.DeleteLocalRef(env,_jParams[1].l);
+  Result:= boolean(_jBoo);
+end;
+
+function jForm_LoadFromAssets(env: PJNIEnv; this: JObject; _jform: JObject; _fileName: string): string;
+var
+   _jString: jString;
+   _jBoolean: JBoolean;
+   _jCls: jClass;
+   _jMethod: jmethodID;
+   _jParams : Array[0..0] of jValue;
+begin
+ _jParams[0].l:= env^.NewStringUTF(env, pchar(_fileName) );
+  _jCls := env^.GetObjectClass(env, _jform);
+  _jMethod:= env^.GetMethodID(env, _jCls, 'LoadFromAssets', '(Ljava/lang/String;)Ljava/lang/String;');
+  _jString:= env^.CallObjectMethodA(env, _jform, _jMethod,@_jParams);
+  case _jString = nil of
+     True : Result    := '';
+     False: begin
+             _jBoolean := JNI_False;
+             Result:= String( env^.GetStringUTFChars(Env,_jString,@_jBoolean) );
+           end;
+  end;
+  env^.DeleteLocalRef(env,_jParams[0].l);
+end;
+
+function jForm_isSdCardMounted(env: PJNIEnv; this: JObject; _jform: JObject): boolean;
+var
+   _jBoo: JBoolean;
+   _jCls: jClass;
+   _jMethod: jmethodID;
+begin
+  _jCls := env^.GetObjectClass(env, _jform);
+  _jMethod:= env^.GetMethodID(env, _jCls, 'isSdCardMounted', '()Z');
+  _jBoo:= env^.CallBooleanMethod(env, _jform, _jMethod);
+  Result:= boolean(_jBoo);
+end;
+
 
 //------------------------------------------------------------------------------
 // System Info

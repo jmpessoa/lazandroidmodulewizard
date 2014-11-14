@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CONFIG>
+  <Package Version="4">
+    <PathDelim Value="\"/>
+    <Name Value="amw_ide_tools"/>
+    <CompilerOptions>
+      <Version Value="11"/>
+      <PathDelim Value="\"/>
+      <SearchPaths>
+        <UnitOutputDirectory Value="lib\$(TargetCPU)-$(TargetOS)"/>
+      </SearchPaths>
+    </CompilerOptions>
+    <Files Count="7">
+      <Item1>
+        <Filename Value="amw_ide_menu_items.pas"/>
+        <HasRegisterProc Value="True"/>
+        <UnitName Value="amw_ide_menu_items"/>
+      </Item1>
+      <Item2>
+        <Filename Value="lazandroidtoolsexpert.lfm"/>
+        <Type Value="LFM"/>
+      </Item2>
+      <Item3>
+        <Filename Value="lazandroidtoolsexpert.pas"/>
+        <UnitName Value="lazandroidtoolsexpert"/>
+      </Item3>
+      <Item4>
+        <Filename Value="uformsettingspaths.lfm"/>
+        <Type Value="LFM"/>
+      </Item4>
+      <Item5>
+        <Filename Value="uformsettingspaths.pas"/>
+        <UnitName Value="uformsettingspaths"/>
+      </Item5>
+      <Item6>
+        <Filename Value="uformupdatecodetemplate.pas"/>
+        <UnitName Value="uformupdatecodetemplate"/>
+      </Item6>
+      <Item7>
+        <Filename Value="uformupdatecodetemplate.lfm"/>
+        <Type Value="LFM"/>
+      </Item7>
+    </Files>
+    <Type Value="RunAndDesignTime"/>
+    <RequiredPkgs Count="2">
+      <Item1>
+        <PackageName Value="IDEIntf"/>
+      </Item1>
+      <Item2>
+        <PackageName Value="FCL"/>
+      </Item2>
+    </RequiredPkgs>
+    <UsageOptions>
+      <UnitPath Value="$(PkgOutDir)"/>
+    </UsageOptions>
+    <PublishOptions>
+      <Version Value="2"/>
+    </PublishOptions>
+    <CustomOptions Items="ExternHelp" Version="2">
+      <_ExternHelp Items="Count"/>
+    </CustomOptions>
+  </Package>
+</CONFIG>

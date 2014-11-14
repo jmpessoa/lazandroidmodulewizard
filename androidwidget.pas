@@ -382,6 +382,20 @@ type
                     wvOnFinish,
                     wvOnError);
 
+       //dirDocuments,  //only for API >= 19!!!!
+   TEnvDirectory = (dirDownloads,
+                    dirDCIM,
+                    dirMusic,
+                    dirPictures,
+                    dirNotifications,
+                    dirMovies,
+                    dirPodcasts,
+                    dirRingtones,
+                    dirSdCard,
+                    dirInternalAppStorage,
+                    dirDatabase,
+                    dirSharedPrefs);
+
   TEffect        = DWord;
 
   TAnimation     = Record
@@ -469,7 +483,7 @@ type
   TEnvJni     = record
                  jEnv        : PJNIEnv;  // a pointer reference to the JNI environment,
                  jThis       : jObject;  // a reference to the object making this call (or class if static).
-                 jActivity   : jObject;  // Java Activity / android.content.Context
+                 jActivity   : jObject;  // Java Activity / android.content.Context -
                  jRLayout    : jObject;  // Java Base Layout
                 end;
 
@@ -752,25 +766,19 @@ type
     FCBDataInteger: integer;
     FCBDataDouble: double;
 
-    // Java
-    //FjObject       : jObject;      // Java : Java Object
     FjRLayout{View}: jObject;      // Java Relative Layout View
 
     FOnViewClick      : TViewClick;
     FOnListItemClick  : TListItemClick;
 
     FOrientation   : integer;
-    //FApp           : jApp;
+
     FScreenWH      : TWH;
     FScreenStyle   : TScreenStyle;
     FAnimation     : TAnimation;
 
     FActivityMode  : TActivityMode;
-
-    FActivity      : jObject;
-
     FOnClick      : TOnNotify;
-    //FOnActive     : TOnNotify;
     FOnClose      :   TOnNotify;
     FOnCloseQuery  : TOnCloseQuery;
     FOnRotate      : TOnRotate;
@@ -807,8 +815,6 @@ type
     }
 
   protected
-
-
     //procedure DefineProperties(Filer: TFiler); override;
     FCloseCallback : TjCallBack;   // Close Call Back Event
 
@@ -829,7 +835,6 @@ type
     procedure SetOrientation(Value: integer);
     Procedure GenEvent_OnClick(Obj: TObject);
 
-    //Warning: An inherited method is hidden by "procedure Init(jApp);"
     procedure Init(refApp: jApp); override;
     procedure Finish;
     Procedure Show;
@@ -855,6 +860,21 @@ type
     procedure SetWifiEnabled(_status: boolean);
     function IsWifiEnabled(): boolean;
 
+    function GetEnvironmentDirectoryPath(_directory: TEnvDirectory): string;
+    function GetInternalAppStoragePath: string;
+    function CopyFile(srcFullFilename: string; destFullFilename: string): boolean;
+    function LoadFromAssets(fileName: string): string;
+    function IsSdCardMounted: boolean;
+
+    procedure DeleteFile(_filename: string);  overload; //mode delphi!
+    procedure DeleteFile(_fullPath: string; _filename: string); overload; //mode delphi!
+    procedure DeleteFile(_environmentDir: TEnvDirectory; _filename: string); overload; //mode delphi!
+    function CreateDir(_dirName: string): string;  overload; //mode delphi!
+    function CreateDir(_environmentDir: TEnvDirectory; _dirName: string): string;  overload; //mode delphi!
+    function CreateDir(_fullPath: string; _dirName: string): string; overload; //mode delphi!
+    function IsExternalStorageEmulated(): boolean;  //API level 11
+    function IsExternalStorageRemovable(): boolean; //API level 9
+
     // Property
     property View         : jObject        read FjRLayout {GetView } write FjRLayout;
     property ScreenStyle  : TScreenStyle   read FScreenStyle    write FScreenStyle;
@@ -866,8 +886,6 @@ type
     property CallBackDataString: string read FCBDataString write FCBDataString;
     property CallBackDataInteger: integer read FCBDataInteger write FCBDataInteger;
     property CallBackDataDouble: double read FCBDataDouble write FCBDataDouble;
-
-    property Activity: jObject read FActivity write FActivity;
 
     property  OnViewClick: TViewClick read FOnViewClick write FOnViewClick;
     property  OnListItemClick: TListItemClick read FOnListItemClick write FOnListItemClick;
@@ -1005,6 +1023,16 @@ end;
   function jForm_GetStringExtra(env: PJNIEnv; this: JObject; _jform: JObject; data: jObject; extraName: string): string;
   function jForm_GetIntExtra(env: PJNIEnv; this: JObject; _jform: JObject; data: jObject; extraName: string; defaultValue: integer): integer;
   function jForm_GetDoubleExtra(env: PJNIEnv; this: JObject; _jform: JObject; data: jObject; extraName: string; defaultValue: double): double;
+
+  procedure jForm_DeleteFile(env: PJNIEnv; this: JObject; _jform: JObject; _filename: string); overload;
+  procedure jForm_DeleteFile(env: PJNIEnv; this: JObject; _jform: JObject; _fullPath: string; _filename: string);  overload;
+  procedure jForm_DeleteFile(env: PJNIEnv; this: JObject; _jform: JObject; _environmentDir: integer; _filename: string);  overload;
+  function jForm_CreateDir(env: PJNIEnv; this: JObject; _jform: JObject; _dirName: string): string;  overload;
+  function jForm_CreateDir(env: PJNIEnv; this: JObject; _jform: JObject; _environmentDir: integer; _dirName: string): string;  overload;
+  function jForm_CreateDir(env: PJNIEnv; this: JObject; _jform: JObject; _fullPath: string; _dirName: string): string;  overload;
+  function jForm_IsExternalStorageEmulated(env: PJNIEnv; this: JObject; _jform: JObject): boolean;
+  function jForm_IsExternalStorageRemovable(env: PJNIEnv; this: JObject; _jform: JObject): boolean;
+
 
 //jni API Bridge
 // http://docs.oracle.com/javase/7/docs/technotes/guides/jni/spec/functions.html
@@ -1645,7 +1673,7 @@ end;
 procedure jForm.Init(refApp: jApp);
 var
   i: integer;
-  bkImgIndex, newIndex: integer;
+  bkImgIndex: integer;
 begin
   if FInitialized  then Exit;
   if refApp = nil then Exit;
@@ -1655,7 +1683,7 @@ begin
 
   FScreenWH:= App.Screen.WH;
   FOrientation:= App.Orientation;   //on start ...
-  FActivity:= App.Jni.jActivity;
+  //FActivity:= App.Jni.jActivity;
 
   FjObject:=  jForm_Create(App.Jni.jEnv, App.Jni.jThis, Self); {jSef}
 
@@ -1778,8 +1806,6 @@ begin
 end;
 
 Procedure jForm.Show;
-var
-  newIndex: integer;
 begin
 
   UpdateJNI(gApp);
@@ -1821,18 +1847,14 @@ begin
  // --------------------------------------------------------------------------
  // Java           Java          Java-> Pascal
  // jForm_Close -> RemoveView -> Java_Event_pOnClose
-
-
   UpdateJNI(gApp);
   jForm_Close2(App.Jni.jEnv, App.Jni.jThis, FjObject);  //close java form...
-
 end;
 
 //after java form close......
 Procedure Java_Event_pOnClose(env: PJNIEnv; this: jobject;  Form : TObject);
 var
   Inx: integer;
-  canClose: boolean;
 begin
 
   gApp.Jni.jEnv:= env;
@@ -1876,7 +1898,6 @@ begin
     jForm(Form).Finish;
     gApp.Finish;
   end;
-
 end;
 
 Procedure jForm.Refresh;
@@ -1884,7 +1905,7 @@ begin
   if FInitialized then
   begin
     UpdateJNI(gApp);
-    jView_Invalidate(App.Jni.jEnv, App.Jni.jThis, Self.View);
+    jView_Invalidate(Self.App.Jni.jEnv, Self.App.Jni.jThis, Self.View);
   end;
 end;
 
@@ -1906,7 +1927,6 @@ begin
    if Assigned(FOnClick) then FOnClick(Obj);
 end;
 
-
 function jForm.GetView: jObject;
 begin
   Result:= FjRLayout;
@@ -1914,16 +1934,21 @@ end;
 
 function  jForm.GetOnViewClickListener(jObjForm: jObject): jObject;
 begin
- if FInitialized then
-   Result:= jForm_GetOnViewClickListener(gApp.Jni.jEnv, gApp.Jni.jThis, jObjForm);
+  if FInitialized then
+  begin
+    UpdateJNI(gApp);
+    Result:= jForm_GetOnViewClickListener(Self.App.Jni.jEnv, Self.App.Jni.jThis, jObjForm);
+  end;
 end;
 
 function  jForm.GetOnListItemClickListener(jObjForm: jObject): jObject;
 begin
- if FInitialized then
-   Result:= jForm_GetOnListItemClickListener(gApp.Jni.jEnv, gApp.Jni.jThis, jObjForm);
+  if FInitialized then
+  begin
+    UpdateJNI(gApp);
+    Result:= jForm_GetOnListItemClickListener(Self.App.Jni.jEnv, Self.App.Jni.jThis, jObjForm);
+  end;
 end;
-
 
 Procedure jForm.GenEvent_OnListItemClick(jObjAdapterView: jObject; jObjView: jObject; position: integer; Id: integer);
 begin
@@ -1992,36 +2017,165 @@ end;
 function jForm.GetStringExtra(data: jObject; extraName: string): string;
 begin
   //in designing component state: result value here...
-  if FInitialized then
-   Result:= jForm_GetStringExtra(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, data ,extraName);
+   if FInitialized then
+   begin
+     UpdateJNI(gApp);
+     Result:= jForm_GetStringExtra(Self.App.Jni.jEnv, Self.App.Jni.jThis, FjObject, data ,extraName);
+   end;
 end;
 
 function jForm.GetIntExtra(data: jObject; extraName: string; defaultValue: integer): integer;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jForm_GetIntExtra(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, data ,extraName ,defaultValue);
+  begin
+    UpdateJNI(gApp);
+    Result:= jForm_GetIntExtra(Self.App.Jni.jEnv, Self.App.Jni.jThis, FjObject, data ,extraName ,defaultValue);
+  end;
 end;
 
 function jForm.GetDoubleExtra(data: jObject; extraName: string; defaultValue: double): double;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jForm_GetDoubleExtra(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, data ,extraName ,defaultValue);
+  begin
+    UpdateJNI(gApp);
+    Result:= jForm_GetDoubleExtra(Self.App.Jni.jEnv, Self.App.Jni.jThis, FjObject, data ,extraName ,defaultValue);
+  end;
 end;
 
 procedure jForm.SetWifiEnabled(_status: boolean);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jForm_SetWifiEnabled(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, _status);
+  begin
+     UpdateJNI(gApp);
+     jForm_SetWifiEnabled(Self.App.Jni.jEnv, Self.App.Jni.jThis, FjObject, _status);
+  end;
 end;
 
 function jForm.IsWifiEnabled(): boolean;
 begin
   //in designing component state: result value here...
+   if FInitialized then
+   begin
+      UpdateJNI(gApp);
+      Result:= jForm_IsWifiEnabled(Self.App.Jni.jEnv, Self.App.Jni.jThis, FjObject);
+   end;
+end;
+
+function jForm.GetEnvironmentDirectoryPath(_directory: TEnvDirectory): string;
+begin
+  Result:='';
   if FInitialized then
-   Result:= jForm_IsWifiEnabled(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject);
+  begin
+    UpdateJNI(gApp);
+    Result:= jForm_GetEnvironmentDirectoryPath(Self.App.Jni.jEnv, Self.App.Jni.jThis, FjObject, Ord(_directory))
+  end;
+end;
+
+function jForm.GetInternalAppStoragePath: string;
+begin
+  Result:='';
+  if FInitialized then
+  begin
+    UpdateJNI(gApp);
+    Result:= jForm_GetInternalAppStoragePath(Self.App.Jni.jEnv, Self.App.Jni.jThis, FjObject);
+  end;
+end;
+
+function jForm.CopyFile(srcFullFilename: string; destFullFilename: string): boolean;
+begin
+  Result:= False;
+  if FInitialized then
+  begin
+    UpdateJNI(gApp);
+    Result:= jForm_CopyFile(Self.App.Jni.jEnv, Self.App.Jni.jThis, FjObject, srcFullFilename, destFullFilename);
+  end;
+end;
+
+function jForm.LoadFromAssets(fileName: string): string;
+begin
+  Result:= '';
+  if FInitialized then
+  begin
+    UpdateJNI(gApp);
+    Result:= jForm_LoadFromAssets(Self.App.Jni.jEnv, Self.App.Jni.jThis, FjObject, fileName);
+  end;
+end;
+
+function jForm.IsSdCardMounted: boolean;
+begin
+  Result:= False;
+  if FInitialized then
+  begin
+    UpdateJNI(gApp);
+    Result:= jForm_isSdCardMounted(Self.App.Jni.jEnv, Self.App.Jni.jThis, FjObject);
+  end;
+end;
+
+procedure jForm.DeleteFile(_filename: string);
+begin
+  //in designing component state: set value here...
+  UpdateJNI(gApp);
+  if FInitialized then
+     jForm_DeleteFile(Self.App.Jni.jEnv, Self.App.Jni.jThis, FjObject, _filename);
+end;
+
+procedure jForm.DeleteFile(_fullPath: string; _filename: string);
+begin
+  //in designing component state: set value here...
+  UpdateJNI(gApp);
+  if FInitialized then
+     jForm_DeleteFile(Self.App.Jni.jEnv, Self.App.Jni.jThis, FjObject, _fullPath ,_filename);
+end;
+
+procedure jForm.DeleteFile(_environmentDir: TEnvDirectory; _filename: string);
+begin
+  //in designing component state: set value here...
+  UpdateJNI(gApp);
+  if FInitialized then
+     jForm_DeleteFile(Self.App.Jni.jEnv, Self.App.Jni.jThis, FjObject, Ord(_environmentDir) ,_filename);
+end;
+
+function jForm.CreateDir(_dirName: string): string;
+begin
+  //in designing component state: result value here...
+  UpdateJNI(gApp);
+  if FInitialized then
+   Result:= jForm_CreateDir(Self.App.Jni.jEnv, Self.App.Jni.jThis, FjObject, _dirName);
+end;
+
+function jForm.CreateDir(_environmentDir: TEnvDirectory; _dirName: string): string;
+begin
+  //in designing component state: result value here...
+  UpdateJNI(gApp);
+  if FInitialized then
+   Result:= jForm_CreateDir(Self.App.Jni.jEnv, Self.App.Jni.jThis, FjObject, Ord(_environmentDir) ,_dirName);
+end;
+
+function jForm.CreateDir(_fullPath: string; _dirName: string): string;
+begin
+  //in designing component state: result value here...
+  UpdateJNI(gApp);
+  if FInitialized then
+   Result:= jForm_CreateDir(Self.App.Jni.jEnv, Self.App.Jni.jThis, FjObject, _fullPath ,_dirName);
+end;
+
+function jForm.IsExternalStorageEmulated(): boolean;
+begin
+  //in designing component state: result value here...
+  UpdateJNI(gApp);
+  if FInitialized then
+   Result:= jForm_IsExternalStorageEmulated(Self.App.Jni.jEnv, Self.App.Jni.jThis, FjObject);
+end;
+
+function jForm.IsExternalStorageRemovable(): boolean;
+begin
+  //in designing component state: result value here...
+  UpdateJNI(gApp);
+  if FInitialized then
+   Result:= jForm_IsExternalStorageRemovable(Self.App.Jni.jEnv, Self.App.Jni.jThis, FjObject);
 end;
 
 {-------- jForm_JNI_Bridge ----------}
@@ -2046,7 +2200,7 @@ begin
               Result:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
             end;
   end;
-env^.DeleteLocalRef(env,jParams[1].l);
+  env^.DeleteLocalRef(env,jParams[1].l);
 end;
 
 
@@ -2078,6 +2232,149 @@ begin
   jMethod:= env^.GetMethodID(env, jCls, 'GetDoubleExtra', '(Landroid/content/Intent;Ljava/lang/String;D)D');
   Result:= env^.CallIntMethodA(env, _jform, jMethod, @jParams);
   env^.DeleteLocalRef(env,jParams[1].l);
+end;
+
+
+procedure jForm_DeleteFile(env: PJNIEnv; this: JObject; _jform: JObject; _filename: string);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_filename));
+  jCls:= env^.GetObjectClass(env, _jform);
+  jMethod:= env^.GetMethodID(env, jCls, 'DeleteFile', '(Ljava/lang/String;)V');
+  env^.CallVoidMethodA(env, _jform, jMethod, @jParams);
+env^.DeleteLocalRef(env,jParams[0].l);
+end;
+
+
+procedure jForm_DeleteFile(env: PJNIEnv; this: JObject; _jform: JObject; _fullPath: string; _filename: string);
+var
+  jParams: array[0..1] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_fullPath));
+  jParams[1].l:= env^.NewStringUTF(env, PChar(_filename));
+  jCls:= env^.GetObjectClass(env, _jform);
+  jMethod:= env^.GetMethodID(env, jCls, 'DeleteFile', '(Ljava/lang/String;Ljava/lang/String;)V');
+  env^.CallVoidMethodA(env, _jform, jMethod, @jParams);
+env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env,jParams[1].l);
+end;
+
+
+procedure jForm_DeleteFile(env: PJNIEnv; this: JObject; _jform: JObject; _environmentDir: integer; _filename: string);
+var
+  jParams: array[0..1] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].i:= _environmentDir;
+  jParams[1].l:= env^.NewStringUTF(env, PChar(_filename));
+  jCls:= env^.GetObjectClass(env, _jform);
+  jMethod:= env^.GetMethodID(env, jCls, 'DeleteFile', '(ILjava/lang/String;)V');
+  env^.CallVoidMethodA(env, _jform, jMethod, @jParams);
+env^.DeleteLocalRef(env,jParams[1].l);
+end;
+
+
+function jForm_CreateDir(env: PJNIEnv; this: JObject; _jform: JObject; _dirName: string): string;
+var
+  jStr: JString;
+  jBoo: JBoolean;
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_dirName));
+  jCls:= env^.GetObjectClass(env, _jform);
+  jMethod:= env^.GetMethodID(env, jCls, 'CreateDir', '(Ljava/lang/String;)Ljava/lang/String;');
+  jStr:= env^.CallObjectMethodA(env, _jform, jMethod, @jParams);
+  case jStr = nil of
+     True : Result:= '';
+     False: begin
+              jBoo:= JNI_False;
+              Result:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
+            end;
+  end;
+env^.DeleteLocalRef(env,jParams[0].l);
+end;
+
+
+function jForm_CreateDir(env: PJNIEnv; this: JObject; _jform: JObject; _environmentDir: integer; _dirName: string): string;
+var
+  jStr: JString;
+  jBoo: JBoolean;
+  jParams: array[0..1] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].i:= _environmentDir;
+  jParams[1].l:= env^.NewStringUTF(env, PChar(_dirName));
+  jCls:= env^.GetObjectClass(env, _jform);
+  jMethod:= env^.GetMethodID(env, jCls, 'CreateDir', '(ILjava/lang/String;)Ljava/lang/String;');
+  jStr:= env^.CallObjectMethodA(env, _jform, jMethod, @jParams);
+  case jStr = nil of
+     True : Result:= '';
+     False: begin
+              jBoo:= JNI_False;
+              Result:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
+            end;
+  end;
+env^.DeleteLocalRef(env,jParams[1].l);
+end;
+
+
+function jForm_CreateDir(env: PJNIEnv; this: JObject; _jform: JObject; _fullPath: string; _dirName: string): string;
+var
+  jStr: JString;
+  jBoo: JBoolean;
+  jParams: array[0..1] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_fullPath));
+  jParams[1].l:= env^.NewStringUTF(env, PChar(_dirName));
+  jCls:= env^.GetObjectClass(env, _jform);
+  jMethod:= env^.GetMethodID(env, jCls, 'CreateDir', '(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;');
+  jStr:= env^.CallObjectMethodA(env, _jform, jMethod, @jParams);
+  case jStr = nil of
+     True : Result:= '';
+     False: begin
+              jBoo:= JNI_False;
+              Result:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
+            end;
+  end;
+env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env,jParams[1].l);
+end;
+
+
+function jForm_IsExternalStorageEmulated(env: PJNIEnv; this: JObject; _jform: JObject): boolean;
+var
+  jBoo: JBoolean;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jform);
+  jMethod:= env^.GetMethodID(env, jCls, 'IsExternalStorageEmulated', '()Z');
+  jBoo:= env^.CallBooleanMethod(env, _jform, jMethod);
+  Result:= boolean(jBoo);
+end;
+
+
+function jForm_IsExternalStorageRemovable(env: PJNIEnv; this: JObject; _jform: JObject): boolean;
+var
+  jBoo: JBoolean;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jform);
+  jMethod:= env^.GetMethodID(env, jCls, 'IsExternalStorageRemovable', '()Z');
+  jBoo:= env^.CallBooleanMethod(env, _jform, jMethod);
+  Result:= boolean(jBoo);
 end;
 
   {jApp by jmpessoa}
@@ -2142,7 +2439,7 @@ begin
   // Jni
   Jni.jEnv      := env;  //a reference to the JNI environment
   Jni.jThis     := this; //a reference to the object making this call (or class if static).
-  Jni.jActivity := activity;
+  Jni.jActivity := activity;  //[by jmpessoa: for API > 13 STALED!!! do not use!
   Jni.jRLayout  := layout;
   // Screen
   Screen.WH     := jSysInfo_ScreenWH(env, this, activity);

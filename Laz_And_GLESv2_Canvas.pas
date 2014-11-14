@@ -1039,7 +1039,7 @@ Var
  //
  Size : Integer;
  PInt : PInteger;
- PIntS: PInteger;
+// PIntS: PInteger;
  i    : Integer;
  w,h  : Integer;
  //
@@ -1830,7 +1830,7 @@ var
   xyTris   : TxyTriangles;
   xyzTris  : TxyzTriangles;
   Color    : TRGBA;
-  TriColor : Array[0..2] of TRGBA;
+ // TriColor : Array[0..2] of TRGBA;
   i,j      : Integer;
 begin
   //

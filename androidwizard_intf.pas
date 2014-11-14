@@ -206,6 +206,7 @@ type
      function GetAppName(className: string): string;
      function GetIdFromApi(api: integer): string;
      function GetFolderFromApi(api: integer): string;
+
    public
      constructor Create; override;
      function GetLocalizedName: string; override;
@@ -772,37 +773,13 @@ end;
 
 function TAndroidProjectDescriptor.GetPathToJNIFolder(fullPath: string): string;
 var
-  //pathList: TStringList;
   i: integer;
 begin
-
-{
-  pathList:= TStringList.Create;
-  pathList.StrictDelimiter:=DirectorySeparator;
-  pathList.DelimitedText:= TrimChar(fullPath,DirectorySeparator);
-
-  for i:=0 to pathList.Count-1 do
-  begin
-     if Pos('src', pathList.Strings[i]) > 0 then k:= i;
-  end;
-}
-
   //fix by Leledumbo - for linux compatility
-
   i:= Pos('src',fullPath);
   if i > 2 then
     Result:= Copy(fullPath,1,i - 2)// we don't need the trailing slash
   else raise Exception.Create('src folder not found...');
-
-{
-  for j:= 0 to k-1 do
-  begin
-      Result:= Result + pathList.Strings[j]+DirectorySeparator;
-  end;
-  Result:= TrimChar(Result, DirectorySeparator);
-  pathList.Free;
-}
-
 end;
 
 function TAndroidProjectDescriptor.TryNewJNIAndroidInterfaceCode: boolean;
@@ -814,7 +791,7 @@ begin
   frm:= TFormAndroidProject.Create(nil);
 
   frm.ShellTreeView1.ShowRoot:= False;
-  frm.ShellTreeView1.Root:= FAndroidProjectName; {seleceted project}        //FPathToJNIFolder; {workspace}
+  frm.ShellTreeView1.Root:= FAndroidProjectName; {seleceted project}
 
   frm.PathToJavaTemplates:= FPathToJavaTemplates;
   frm.AndroidProjectName:= FAndroidProjectName;
@@ -878,7 +855,7 @@ end;
 
 function TAndroidProjectDescriptor.GetLocalizedName: string;
 begin
-  Result := 'JNI Android Module' {+ LineEnding}; // thanks to Stephano!
+  Result := 'JNI Android Module'; //fix thanks to Stephano!
 end;
 
 function TAndroidProjectDescriptor.GetLocalizedDescription: string;
@@ -936,26 +913,22 @@ begin
     strList:= TStringList.Create;
 
     FPathToJNIFolder:= frm.PathToWorkspace;
-    FPathToNdkPlataforms:= frm.PathToNdkPlataforms;
 
     FInstructionSet:= frm.InstructionSet;{ ex. ArmV6}
     FFPUSet:= frm.FPUSet; {ex. Soft}
 
-    FPathToJavaTemplates:= frm.PathToJavaTemplates;
     FAndroidProjectName:= frm.AndroidProjectName;    //warning: full project name = path + name !
 
+    FPathToJavaTemplates:= frm.PathToJavaTemplates;
     FPathToJavaJDK:= frm.PathToJavaJDK;
-
     FPathToAndroidSDK:= frm.PathToAndroidSDK;
     FPathToAndroidNDK:= frm.PathToAndroidNDK;
     FNDK:= frm.NDK;
     FAndroidPlatform:= frm.AndroidPlatform;
-
     FPathToAntBin:= frm.PathToAntBin;
 
     FMinApi:= frm.MinApi;
     FTargetApi:= frm.TargetApi;
-
     FMainActivity:= frm.MainActivity;
 
     if  frm.TouchtestEnabled = 'True' then
@@ -965,19 +938,18 @@ begin
 
     FAntBuildMode:= frm.AntBuildMode;
 
-    FProjectModel:= frm.ProjectModel; //"Eclipse Project"/"Ant Project"
+    FProjectModel:= frm.ProjectModel; //Eclipse Project or Ant Project
 
     strList.StrictDelimiter:= True;
     strList.Delimiter:= DirectorySeparator;
     strList.DelimitedText:= TrimChar(FAndroidProjectName, DirectorySeparator);
-    projName:= strList.Strings[strList.Count-1]; //'AppTest1';
+    projName:= strList.Strings[strList.Count-1]; //ex. AppTest1
 
-    //if eclipse project = just dummy!
     FAntPackageName:= frm.AntPackageName;
 
     if  FProjectModel = 'Ant' then
     begin
-      FAntPackageName:= frm.AntPackageName;   //ex. just org.lazarus
+      FAntPackageName:= frm.AntPackageName;   //ex.: org.lazarus
       strList.Clear;
       strList.StrictDelimiter:= True;
       strList.Delimiter:= '.';
@@ -1033,6 +1005,20 @@ begin
       CopyFile(FPathToJavaTemplates+DirectorySeparator+'values'+DirectorySeparator+'styles.xml',
                    FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'values'+DirectorySeparator+'styles.xml');
 
+
+      ChDir(FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'values-v11');
+      if IOResult <> 0 then MkDir(FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'values-v11');
+
+      CopyFile(FPathToJavaTemplates+DirectorySeparator+'values-v11'+DirectorySeparator+'styles.xml',
+                   FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'values-v11'+DirectorySeparator+'styles.xml');
+
+
+      ChDir(FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'values-v14');
+      if IOResult <> 0 then MkDir(FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'values-v14');
+      CopyFile(FPathToJavaTemplates+DirectorySeparator+'values-v14'+DirectorySeparator+'styles.xml',
+                   FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'values-v14'+DirectorySeparator+'styles.xml');
+
+
       ChDir(FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'layout');
       if IOResult <> 0 then MkDir(FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'layout');
       CopyFile(FPathToJavaTemplates+DirectorySeparator+'layout'+DirectorySeparator+'activity_app.xml',
@@ -1047,7 +1033,7 @@ begin
       ChDir(FAndroidProjectName+DirectorySeparator+ 'gen');
       if IOResult <> 0 then MkDir(FAndroidProjectName+ DirectorySeparator + 'gen');
 
-      if FModuleType = 0 then     //GUI Android Controls...
+      if FModuleType = 0 then     //Android Bridges Controls...
       begin
         strList.Clear;    //dummy App.java - will be replaced with simonsayz's "App.java" template!
         strList.Add('package '+FAntPackageName+'.'+LowerCase(projName)+';');
@@ -1057,11 +1043,7 @@ begin
         strList.SaveToFile(FPathToJavaSrc+DirectorySeparator+'App.java');
       end;
 
-//-------------
-
-//-------------
-
-      if FModuleType = 1 then     //No GUI Android Controls...
+      if FModuleType = 1 then     //Not Android Bridges  Controls...
       begin
          strList.Clear;    //dummy App.java - will be replaced with simonsayz's "App.java" template!
          strList.Add('package '+FAntPackageName+'.'+LowerCase(projName)+';');
@@ -1133,6 +1115,11 @@ begin
          strList.Add('    </application>');
          strList.Add('</manifest>');
          strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'AndroidManifest.xml');
+
+         strList.Clear;
+         strList.Add(FAntPackageName+'.'+LowerCase(projName));
+         strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'packagename.txt');
+
       end;
     end; //just Ant project
 
@@ -1353,19 +1340,20 @@ begin
     strList.SaveToFile(linuxAndroidProjectName+linuxDirSeparator+'build.sh');
 
     linuxPathToAdbBin:= linuxPathToAndroidSdk+linuxDirSeparator+'platform-tools';
-    //linux install
+
+    //linux install - thanks to Stephano!
     strList.Clear;
     strList.Add(linuxPathToAdbBin+linuxDirSeparator+'adb uninstall '+FAntPackageName+'.'+LowerCase(projName));
     strList.Add(linuxPathToAdbBin+linuxDirSeparator+'adb install -r '+linuxDirSeparator+'bin'+linuxDirSeparator+projName+'-'+FAntBuildMode+'.apk');
     strList.Add(linuxPathToAdbBin+linuxDirSeparator+'adb logcat');
     strList.SaveToFile(linuxAndroidProjectName+linuxDirSeparator+'install.sh');
 
-    //linux uninstall
+    //linux uninstall  - thanks to Stephano!
     strList.Clear;
     strList.Add(linuxPathToAdbBin+linuxDirSeparator+'adb uninstall '+FAntPackageName+'.'+LowerCase(projName));
     strList.SaveToFile(linuxAndroidProjectName+linuxDirSeparator+'uninstall.sh');
 
-    //linux logcat
+    //linux logcat  - thanks to Stephano!
     strList.Clear;
     strList.Add(linuxPathToAdbBin+linuxDirSeparator+'adb logcat');
     strList.SaveToFile(linuxAndroidProjectName+linuxDirSeparator+'logcat.sh');
@@ -1459,7 +1447,7 @@ begin
     sourceList.Add('  Classes, SysUtils, And_jni, And_jni_Bridge, AndroidWidget, Laz_And_Controls, Laz_And_Controls_Events;');
     sourceList.Add(' ');
   end
-  else //generic module :  No GUI Controls
+  else //generic module :  Not Android Bridges Controls
   begin
     sourceList.Add('  Classes, SysUtils, CustApp, jni;');
     sourceList.Add(' ');
@@ -1501,7 +1489,7 @@ begin
 
   sourceList.Add(' ');
   sourceList.Add('begin');
-  if FModuleType = 0 then  //GUI controls...
+  if FModuleType = 0 then  //Android Bridges ontrols...
   begin
     sourceList.Add('  gApp:= jApp.Create(nil);{Laz_And_Controls}');
     sourceList.Add('  gApp.Title:= ''My Android Bridges Library'';');
@@ -1630,29 +1618,28 @@ begin
 
   auxList:= TStringList.Create;
 
-  auxStr:= 'armeabi';
+  auxStr:= 'armeabi';  //ARMv6
   if FInstructionSet = 'ARMv7a' then auxStr:='armeabi-v7a';
   if FInstructionSet = 'x86' then auxStr:='x86';
 
   if FInstructionSet <> 'x86' then
   begin
      customOptions_default:='-Xd'+' -Cf'+ FFPUSet;
-     customOptions_default:= customOptions_default + ' -Cp'+ FInstructionSet; //until laz bug fix for ARMV7A
+     customOptions_default:= customOptions_default + ' -Cp'+ UpperCase(FInstructionSet); //until laz bug fix for ARMV7A
   end
   else
   begin
      customOptions_default:= '-Xd';
   end;
 
-  customOptions_armV6:= '-Xd'+' -Cf'+ FFPUSet+ ' -CpArmV6';  //until laz bug fix for ARMV7A
-  customOptions_armV7a:='-Xd'+' -Cf'+ FFPUSet+ ' -CpArmV7a'; //until laz bug fix for ARMV7A
-  customOptions_x86:= '-Xd';
+  customOptions_armV6:= '-Xd'+' -Cf'+ FFPUSet+ ' -CpARMV6';  //until laz bug fix for ARMV7A
+  customOptions_armV7a:='-Xd'+' -Cf'+ FFPUSet+ ' -CpARMV7A'; //until laz bug fix for ARMV7A
+  customOptions_x86:=   '-Xd';
 
-  customOptions_default:= customOptions_default +' -XParm-linux-androideabi-';
-
-  customOptions_armV6:= customOptions_armV6 +' -XParm-linux-androideabi-';
-  customOptions_armV7a:=customOptions_armV7a +' -XParm-linux-androideabi-';
-  customOptions_x86:= customOptions_x86+' -XPi686-linux-androideabi-';
+  customOptions_default:=customOptions_default+' -XParm-linux-androideabi-';
+  customOptions_armV6:=  customOptions_armV6  +' -XParm-linux-androideabi-';
+  customOptions_armV7a:= customOptions_armV7a +' -XParm-linux-androideabi-';
+  customOptions_x86:=    customOptions_x86    +' -XPi686-linux-android-';   //fix by jmpessoa
 
   if FInstructionSet <> 'x86' then
   begin
@@ -1667,40 +1654,34 @@ begin
   customOptions_armV7a:= customOptions_armV7a+' -FD'+pathToNdkToolchainsBinArm;
   customOptions_x86:= customOptions_x86+' -FD'+pathToNdkToolchainsBinX86;
 
-
   {$IFDEF WINDOWS}
-     //to others :: just to [fix bug] lazarus  rev < 46598 .... //thanks to Stephano!
-     customOptions_default:= customOptions_default+' -o..'+DirectorySeparator+'libs'+DirectorySeparator+auxStr+DirectorySeparator+'lib'+LowerCase(FJavaClassName)+'.so';
-  {$ENDIF}
-
-  // ThierryDijoux - change auxStr by value of the folder
-  customOptions_armV6:= customOptions_armV6+' -o'+FPathToJNIFolder+DirectorySeparator+'libs'+DirectorySeparator+'armeabi'+DirectorySeparator+'lib'+LowerCase(FJavaClassName)+'.so';
-  customOptions_armV7a:= customOptions_armV7a+' -o'+FPathToJNIFolder+DirectorySeparator+'libs'+DirectorySeparator+'armeabi-v7a'+DirectorySeparator+'lib'+LowerCase(FJavaClassName)+'.so';
-
-  {$IFDEF WINDOWS}
-     //to others :: just to [fix bug] lazarus  rev < 46598 .... //thanks to Stephano!
-    customOptions_x86:= customOptions_x86+' -o..'+DirectorySeparator+'libs'+DirectorySeparator+auxStr+DirectorySeparator+'lib'+LowerCase(FJavaClassName)+'.so';
+     //to others :: just to [fix a bug]  lazarus  rev < 46598 .... //thanks to Stephano!
+     // ThierryDijoux - change auxStr by value of the correct folder
+     customOptions_default:= customOptions_default+' -o..'+DirectorySeparator+'libs'+DirectorySeparator+auxStr       +DirectorySeparator+'lib'+LowerCase(FJavaClassName)+'.so';
+     customOptions_armV6:=   customOptions_armV6  +' -o..'+DirectorySeparator+'libs'+DirectorySeparator+'armeabi'    +DirectorySeparator+'lib'+LowerCase(FJavaClassName)+'.so';
+     customOptions_armV7a:=  customOptions_armV7a +' -o..'+DirectorySeparator+'libs'+DirectorySeparator+'armeabi-v7a'+DirectorySeparator+'lib'+LowerCase(FJavaClassName)+'.so';
+     customOptions_x86:=     customOptions_x86    +' -o..'+DirectorySeparator+'libs'+DirectorySeparator+'x86'        +DirectorySeparator+'lib'+LowerCase(FJavaClassName)+'.so';
   {$ENDIF}
 
   auxList.Clear;
   auxList.Add('<Libraries Value="'+libraries_x86+'"/>');
   auxList.Add('<TargetCPU Value="i386"/>');
   auxList.Add('<CustomOptions Value="'+customOptions_x86+'"/>');
-  auxList.Add('<TargetProcessor Value=""/>');
+  //auxList.Add('<TargetProcessor Value=""/>');  //commented until lazarus fix bug for missing ARMV7A  //again thanks to Stephano!
   auxList.SaveToFile(FPathToJNIFolder+DirectorySeparator+'jni'+DirectorySeparator+'build-modes'+DirectorySeparator+'build_x86.txt');
 
   auxList.Clear;
   auxList.Add('<Libraries Value="'+libraries_arm+'"/>');
   auxList.Add('<TargetCPU Value="arm"/>');
   auxList.Add('<CustomOptions Value="'+customOptions_armV6+'"/>');
-  auxList.Add('<TargetProcessor Value="ARMV6"/>');
+  //auxList.Add('<TargetProcessor Value="ARMV6"/>');  //commented until lazarus fix bug for missing ARMV7A  //again thanks to Stephano!
   auxList.SaveToFile(FPathToJNIFolder+DirectorySeparator+'jni'+DirectorySeparator+'build-modes'+DirectorySeparator+'build_armV6.txt');
 
   auxList.Clear;
   auxList.Add('<Libraries Value="'+libraries_arm+'"/>');
   auxList.Add('<TargetCPU Value="arm"/>');
   auxList.Add('<CustomOptions Value="'+customOptions_armV7a+'"/>');
-  auxList.Add('<TargetProcessor Value="ARMV7A"/>');
+  //auxList.Add('<TargetProcessor Value="ARMV7A"/>');  //commented until lazarus fix bug for missing ARMV7A  //again thanks to Stephano!
   auxList.SaveToFile(FPathToJNIFolder+DirectorySeparator+'jni'+DirectorySeparator+'build-modes'+DirectorySeparator+'build_armV7a.txt');
 
   auxList.Clear;
@@ -1717,7 +1698,7 @@ begin
   auxList.Add('       -If needed replace the line <CustomOptions ..... /> in the "*.lpi" by line from "build_*.txt"');
   auxList.Add('       -If needed replace the line <TargetProcessor...../> in the "*.lpi" by line from "build_*.txt"');
   auxList.Add(' ');
-  auxList.Add('   > Save the "*.lpi" project file ');
+  auxList.Add('   > Save the modified "*.lpi" project file ');
   auxList.Add(' ');
   auxList.Add('2. From Laz4Android IDE');
   auxList.Add(' ');
@@ -1757,9 +1738,9 @@ begin
 
   {TargetProcessor}
 
-  (* //until lazarus fix bug for missing ARMV7A  //again thanks to Stephano!
+  (* //commented until lazarus fix bug for missing ARMV7A  //again thanks to Stephano!
   if FInstructionSet <> 'x86' then
-     AProject.LazCompilerOptions.TargetProcessor:= FInstructionSet; {-Cp}
+     AProject.LazCompilerOptions.TargetProcessor:= UpperCase(FInstructionSet); {-Cp}
   *)
 
   {Others}
@@ -1794,11 +1775,6 @@ end;
 constructor TAndroidFileDescPascalUnitWithResource.Create;
 begin
   inherited Create;
-
-  {
-  ResourceClass:= TAndroidForm;
-  UseCreateFormStatements:=true;
-  }
 
   Name := 'Android DataModule';
 

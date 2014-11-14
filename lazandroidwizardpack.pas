@@ -8,7 +8,7 @@ interface
 
 uses
   AndroidWizard_intf, uformworkspace, uFormAndroidProject, uRegisterForm, 
-  LazarusPackageIntf;
+  FormPathMissing, LazarusPackageIntf;
 
 implementation
 
