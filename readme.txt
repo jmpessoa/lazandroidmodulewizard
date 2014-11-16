@@ -61,6 +61,17 @@ Version 0.6 - rev. 05 - 13 November 2014 -
 
 			:: Improves and automates the "Ant" support!
 
+			:: WARNING: [Build Android Apk]: If you got "[echo] Resolving Build Target for..."
+				ref image https://jmpessoa.opendrive.com/files?Ml82Nzk0NzM1N19taU1QUg
+
+				.Please, Open ["build.xml"] {notepad like editor...}
+
+				.Change this line:
+					"<property name="target"  value="android-14"/>"
+					to another [target] supported by your SDK installation.
+					 ex: value="android-17"
+				
+
 		.Add sub entry "Upgrade Code Templates [*.lpr, *.java]" 
 		ref. image: https://jmpessoa.opendrive.com/files?Ml82Nzg4MzA3Ml80MFVjSQ
 

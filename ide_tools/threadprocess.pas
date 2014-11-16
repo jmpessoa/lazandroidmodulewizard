@@ -5,7 +5,7 @@ unit ThreadProcess;
 interface
 
 uses
-  Classes, SysUtils;
+  Classes, SysUtils, process;
 
 Type
 
@@ -21,6 +21,8 @@ Type
     FIsTerminated: boolean;
     FDelay: integer;
 
+    FProcess: TProcess;
+
     (*TODO: : by jmpessoa
     FParameters: TStringList;
     FExecutable: string;
@@ -31,7 +33,10 @@ Type
   protected
     procedure Execute; override;
   public
-    ForceStop: boolean;
+    FForceStop: boolean;
+    FActive: boolean;
+    procedure Terminate;
+    procedure TerminateProcess(Sender: TObject);
     Constructor Create(CreateSuspended: Boolean);
     property Delay: integer read FDelay write FDelay;
     property IsTerminated: boolean read FIsTerminated;
@@ -49,77 +54,111 @@ Type
 
 implementation
 
-uses process;
-
 { TThreadProcess }
 
 procedure TThreadProcess.Execute;
 Var
-  FProcess: TProcess;
   i: integer;
 begin
-  OutPut:= TStringList.Create;
-  FProcess:= TProcess.Create(nil);
-  {$IFDEF WINDOWS}
-    FProcess.ShowWindow:= swoHIDE;;
-  {$ENDIF}
-  for i:= 0 To FEnv.Count -1 do
-    FProcess.Environment.add(FEnv.Strings[i]);
-  FProcess.CurrentDirectory:= FDir;
-  FProcess.Options := FProcess.Options + [poUsePipes {$IFDEF UNIX},poNoConsole {$ENDIF}];
-
-  FProcess.CommandLine:= FCommandLine;  //TODO: : [by jmpessoa] fix here: deprecated!
-
-  (*TODO: [by jmpessoa] test it!  :
-  FProcess.Executable:= FExecutable;
-  for i:= 0 To FParameters.Count -1 do
-     FProcess.Parameters.add(FParameters.Strings[i]);
-  *)
-
-  FProcess.Execute;
-
-  while (not Terminated) and FProcess.Running do
+  With FProcess do
   begin
-    if ForceStop then
-      FProcess.Terminate(0);
+    for i:= 0 To FEnv.Count -1 do
+      Environment.add(FEnv.Strings[i]);
+    CurrentDirectory:= FDir;
+    Options := FProcess.Options + [poUsePipes {$IFDEF UNIX},poNoConsole {$ENDIF}];
+    CommandLine:= FCommandLine;   // //TODO: : [by jmpessoa] fix here: deprecated!
 
+    (*TODO: [by jmpessoa] test it!  :
+    Executable:= FExecutable;
+    for i:= 0 To FParameters.Count -1 do
+      Parameters.add(FParameters.Strings[i]);
+    *)
+
+    Execute;
+  end;
+
+  FActive:= True;
+  OutPut.LoadFromStream(FProcess.Output);
+  Synchronize(@DisplayOutput);
+
+  While (not Terminated) and (FProcess.Running) do
+  begin
+
+    FActive:= FProcess.Running;
     if not FProcess.Running then Terminate;
-    OutPut.LoadFromStream(FProcess.Output);
-//    if Length(OutPut.Text) > 0 then
-      Synchronize(@DisplayOutput);
+    Output.LoadFromStream(FProcess.Output);
+    Synchronize(@DisplayOutput);
+
     if FDelay > 0 then
       sleep(FDelay);
+
   end;
+
+  FActive:= False;
   OutPut.LoadFromStream(FProcess.Output);
-  if Length(OutPut.Text) > 0 then
-    Synchronize(@DisplayOutput);
-  if Assigned(FProcess) then
-    FProcess.Free;
-  OutPut.Free;
-  FEnv.Free;
+  Synchronize(@DisplayOutput);
 
   (*TODO: by jmpessoa
   FParameters.Free;
   *)
 
   FIsTerminated:= True;
+  Terminate;
 end;
 
-procedure TThreadProcess.DisplayOutput;
+procedure TThreadProcess.TerminateProcess(Sender: TObject);
 begin
-  if Assigned(FOnDisplayOutput) then
-    FOnDisplayOutput(Output);
-  OutPut.Clear;
+  if Assigned(FProcess) then
+  begin
+    FActive:= False;
+    FProcess.Terminate(0);
+    FIsTerminated:= True;
+  end;
+
+  Synchronize(@DisplayOutput);
+  FForceStop:= True;
+  FProcess.CloseOutput;
+  FProcess.Terminate(0);
+  FProcess.Free;
+  OutPut.Free;
+  FEnv.Free;
+  FIsTerminated:= True;
 end;
 
-constructor TThreadProcess.Create(CreateSuspended: Boolean);
+procedure TThreadProcess.Terminate;
+begin
+  if Assigned(FProcess) then
+  begin
+    FActive:= False;
+    FProcess.Terminate(0);
+  end;
+  FIsTerminated:= True;
+end;
+
+procedure TThreadProcess.DisplayOutput; //fix by thierry 15-11-2014
+begin
+
+  if Assigned(FOnDisplayOutput) then
+     if Length(Output.Text) > 0 then
+       FOnDisplayOutput(Output);
+   OutPut.Clear;
+
+end;
+
+constructor TThreadProcess.Create(CreateSuspended: Boolean);  //fix by thierry 15-11-2014
 begin
   inherited Create(CreateSuspended);
   FreeOnTerminate:= True;
+  OnTerminate:= @TerminateProcess;
   FIsTerminated:= False;
-  ForceStop:= False;
   FDelay:= 200;
+  FActive:= False;
   FEnv:= TStringList.Create;
+  FProcess:= TProcess.Create(nil);
+  OutPut:= TStringList.Create;
+  {$IFDEF WINDOWS}
+    FProcess.ShowWindow:= swoHIDE;;
+  {$ENDIF}
 
   (*TUDO: by jmpessoa
   FParameters:= TStringList.Create;
