@@ -324,7 +324,6 @@ begin
         edtAndroidNdkPath.Text:= SdkPath;
         edtJdkPath.Text:= JdkPath;
         edtAntPath.Text:= AntPath;
-        edtWorkpspacePath.Text:= PathToLazbuild;
 
         SaveSettings;
       end;
@@ -557,13 +556,9 @@ procedure TfrmLazAndroidToolsExpert.FormClose(Sender: TObject;
 begin
   SaveSettings;
   if Assigned(APKProcess) then
-  begin
     if not APKProcess.IsTerminated then
-    begin
-      APKProcess.ForceStop:= True;
       APKProcess.Terminate;
-    end;
-  end;
+
 end;
 
 procedure TfrmLazAndroidToolsExpert.ShowProcOutput(AOutput: TStrings);
