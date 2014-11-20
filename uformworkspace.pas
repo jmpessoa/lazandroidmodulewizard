@@ -6,50 +6,53 @@ interface
 
 uses
   inifiles, Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, LazIDEIntf,
-  StdCtrls, Buttons, ExtCtrls, ComCtrls, FormPathMissing;
+  StdCtrls, Buttons, ExtCtrls, ComCtrls, ButtonPanel, FormPathMissing;
 
 type
 
   { TFormWorkspace }
 
   TFormWorkspace  = class(TForm)
-    bbOK: TBitBtn;
+    BitBtnOK: TBitBtn;
     Bevel1: TBevel;
-    BitBtn2: TBitBtn;
-    ComboBox1: TComboBox;
-    Edit1: TEdit;
-    Edit8: TEdit;
+    BitBtnCancel: TBitBtn;
+    ComboSelectProjectName: TComboBox;
+    EditPathToWorkspace: TEdit;
+    EditPackagePrefaceName: TEdit;
     edProjectName: TEdit;
-    Label1: TLabel;
-    Label10: TLabel;
-    Label11: TLabel;
-    Label2: TLabel;
-    Label6: TLabel;
-    Label9: TLabel;
-    ListBox1: TListBox;
-    ListBox2: TListBox;
-    ListBox3: TListBox;
-    RadioGroup1: TRadioGroup;
-    RadioGroup2: TRadioGroup;
-    RadioGroup3: TRadioGroup;
-    SelectDirectoryDialog1: TSelectDirectoryDialog;
-    SpeedButton1: TSpeedButton;
-    SpeedButton2: TSpeedButton;
-    StatusBar1: TStatusBar;
+    LabelPathToWorkspace: TLabel;
+    LabelMinSDK: TLabel;
+    LabelTargetAPI: TLabel;
+    LabelPlatform: TLabel;
+    LabelSelectProjectName: TLabel;
+    LabelPackagePrefaceName: TLabel;
+    ListBoxMinSDK: TListBox;
+    ListBoxTargetAPI: TListBox;
+    ListBoxPlatform: TListBox;
+    PanelButtons: TPanel;
+    PanelListBox: TPanel;
+    PanelRadioGroup: TPanel;
+    RGInstruction: TRadioGroup;
+    RGFPU: TRadioGroup;
+    RGProjectType: TRadioGroup;
+    SelDirDlgPathToWorkspace: TSelectDirectoryDialog;
+    SpdBtnPathToWorkspace: TSpeedButton;
+    SpdBtnRefreshProjectName: TSpeedButton;
+    StatusBarInfo: TStatusBar;
 
     procedure FormActivate(Sender: TObject);
     procedure FormClose(Sender: TObject; var CloseAction: TCloseAction);
 
-    procedure ListBox1Click(Sender: TObject);
-    procedure ListBox1SelectionChange(Sender: TObject; User: boolean);
-    procedure ListBox2Click(Sender: TObject);
-    procedure ListBox2SelectionChange(Sender: TObject; User: boolean);
-    procedure ListBox3Click(Sender: TObject);
-    procedure RadioGroup1Click(Sender: TObject);
-    procedure RadioGroup2Click(Sender: TObject);
-    procedure RadioGroup3Click(Sender: TObject);
-    procedure SpeedButton1Click(Sender: TObject);
-    procedure SpeedButton2Click(Sender: TObject);
+    procedure ListBoxMinSDKClick(Sender: TObject);
+    procedure ListBoxMinSDKSelectionChange(Sender: TObject; User: boolean);
+    procedure ListBoxTargetAPIClick(Sender: TObject);
+    procedure ListBoxTargetAPISelectionChange(Sender: TObject; User: boolean);
+    procedure ListBoxPlatformClick(Sender: TObject);
+    procedure RGInstructionClick(Sender: TObject);
+    procedure RGFPUClick(Sender: TObject);
+    procedure RGProjectTypeClick(Sender: TObject);
+    procedure SpdBtnPathToWorkspaceClick(Sender: TObject);
+    procedure SpdBtnRefreshProjectNameClick(Sender: TObject);
 
   private
     { private declarations }
@@ -127,9 +130,9 @@ implementation
 
 { TFormWorkspace }
 
-procedure TFormWorkspace.ListBox1Click(Sender: TObject);
+procedure TFormWorkspace.ListBoxMinSDKClick(Sender: TObject);
 begin
-    FMinApi:= ListBox1.Items.Strings[ListBox1.ItemIndex]
+    FMinApi:= ListBoxMinSDK.Items.Strings[ListBoxMinSDK.ItemIndex]
 end;
 
 //http://developer.android.com/about/dashboards/index.html
@@ -163,15 +166,15 @@ begin
 end;
 
 
-procedure TFormWorkspace.ListBox1SelectionChange(Sender: TObject; User: boolean);
+procedure TFormWorkspace.ListBoxMinSDKSelectionChange(Sender: TObject; User: boolean);
 begin
-    //StatusBar1.SimpleText:= GetTextByListIndex(ListBox1.ItemIndex);
-    StatusBar1.Panels.Items[0].Text:= 'MinSdk Api: '+GetTextByListIndex(ListBox1.ItemIndex);
+    //StatusBarInfo.SimpleText:= GetTextByListIndex(ListBoxMinSDK.ItemIndex);
+    StatusBarInfo.Panels.Items[0].Text:= 'MinSdk Api: '+GetTextByListIndex(ListBoxMinSDK.ItemIndex);
 end;
 
-procedure TFormWorkspace.ListBox2Click(Sender: TObject);
+procedure TFormWorkspace.ListBoxTargetAPIClick(Sender: TObject);
 begin
-  case ListBox2.ItemIndex of
+  case ListBoxTargetAPI.ItemIndex of
       0: FTargetApi:= '8';
       1: FTargetApi:= '10';
       2: FTargetApi:= '14';
@@ -185,62 +188,62 @@ begin
   end
 end;
 
-procedure TFormWorkspace.ListBox2SelectionChange(Sender: TObject; User: boolean);
+procedure TFormWorkspace.ListBoxTargetAPISelectionChange(Sender: TObject; User: boolean);
 begin
-  StatusBar1.Panels.Items[1].Text:='Target Api: '+GetTextByList2Index(ListBox2.ItemIndex);
+  StatusBarInfo.Panels.Items[1].Text:='Target Api: '+GetTextByList2Index(ListBoxTargetAPI.ItemIndex);
 end;
 
-procedure TFormWorkspace.ListBox3Click(Sender: TObject);
+procedure TFormWorkspace.ListBoxPlatformClick(Sender: TObject);
 var
    saveIndex: integer;
 begin
-   saveIndex:=ListBox1.ItemIndex;
-   ListBox1.Clear;
-   if ListBox3.ItemIndex = 0 then
+   saveIndex:=ListBoxMinSDK.ItemIndex;
+   ListBoxMinSDK.Clear;
+   if ListBoxPlatform.ItemIndex = 0 then
    begin
-     ListBox1.Items.Add('8');
-     //ListBox1.Items.Add('10');
-     //ListBox1.Items.Add('14');
+     ListBoxMinSDK.Items.Add('8');
+     //ListBoxMinSDK.Items.Add('10');
+     //ListBoxMinSDK.Items.Add('14');
    end
-   else if ListBox3.ItemIndex = 1 then
+   else if ListBoxPlatform.ItemIndex = 1 then
    begin
-     ListBox1.Items.Add('8');
-     ListBox1.Items.Add('10');
-     //ListBox1.Items.Add('14');
+     ListBoxMinSDK.Items.Add('8');
+     ListBoxMinSDK.Items.Add('10');
+     //ListBoxMinSDK.Items.Add('14');
    end
    else
    begin
-     ListBox1.Items.Add('8');
-     ListBox1.Items.Add('10');
-     //ListBox1.Items.Add('14');
-     ListBox1.Items.Add('15');
-     ListBox1.Items.Add('16');
-     ListBox1.Items.Add('17');
-     ListBox1.Items.Add('18');
-     ListBox1.Items.Add('19');
+     ListBoxMinSDK.Items.Add('8');
+     ListBoxMinSDK.Items.Add('10');
+     //ListBoxMinSDK.Items.Add('14');
+     ListBoxMinSDK.Items.Add('15');
+     ListBoxMinSDK.Items.Add('16');
+     ListBoxMinSDK.Items.Add('17');
+     ListBoxMinSDK.Items.Add('18');
+     ListBoxMinSDK.Items.Add('19');
    end;
 
-   if saveIndex < ListBox1.Count then
-      ListBox1.ItemIndex:= saveIndex
+   if saveIndex < ListBoxMinSDK.Count then
+      ListBoxMinSDK.ItemIndex:= saveIndex
    else
-      ListBox1.ItemIndex:= ListBox1.Count-1;
+      ListBoxMinSDK.ItemIndex:= ListBoxMinSDK.Count-1;
 
-   ListBox1Click(nil);
+   ListBoxPlatformClick(nil);
 end;
 
-procedure TFormWorkspace.RadioGroup1Click(Sender: TObject);
+procedure TFormWorkspace.RGInstructionClick(Sender: TObject);
 begin
-  FInstructionSet:= RadioGroup1.Items[RadioGroup1.ItemIndex];  //fix 15-december-2013
+  FInstructionSet:= RGInstruction.Items[RGInstruction.ItemIndex];  //fix 15-december-2013
 end;
 
-procedure TFormWorkspace.RadioGroup2Click(Sender: TObject);
+procedure TFormWorkspace.RGFPUClick(Sender: TObject);
 begin
-  FFPUSet:= RadioGroup2.Items[RadioGroup2.ItemIndex];  //fix 15-december-2013
+  FFPUSet:= RGFPU.Items[RGFPU.ItemIndex];  //fix 15-december-2013
 end;
 
-procedure TFormWorkspace.RadioGroup3Click(Sender: TObject);
+procedure TFormWorkspace.RGProjectTypeClick(Sender: TObject);
 begin
-  FProjectModel:= RadioGroup3.Items[RadioGroup3.ItemIndex];  //fix 15-december-2013
+  FProjectModel:= RGProjectType.Items[RGProjectType.ItemIndex];  //fix 15-december-2013
 end;
 
 function TFormWorkspace.GetNDKPlatform(identName: string): string;
@@ -263,31 +266,31 @@ var
 begin
   if ModalResult = mrCancel  then Exit;
 
-  if Edit1.Text = '' then
+  if EditPathToWorkspace.Text = '' then
   begin
     ShowMessage('Error! Workplace Path was missing....[Cancel]');
     ModalResult:= mrCancel;
     Exit;
   end;
 
-  if ComboBox1.Text = '' then
+  if ComboSelectProjectName.Text = '' then
   begin
     ShowMessage('Error! Projec Name was missing.... [Cancel]');
     ModalResult:= mrCancel;
     Exit;
   end;
 
-  if Edit8.Text = '' then Edit8.Text:= 'org.lazarus';
+  if EditPackagePrefaceName.Text = '' then EditPackagePrefaceName.Text:= 'org.lazarus';
 
   Self.LoadPathsSettings(AppendPathDelim(LazarusIDE.GetPrimaryConfigPath) + 'JNIAndroidProject.ini');
 
   FMainActivity:= 'App'; {dummy for Simon template} //TODO: need name flexibility here...
 
-  FAntPackageName:= LowerCase(Trim(Edit8.Text));
+  FAntPackageName:= LowerCase(Trim(EditPackagePrefaceName.Text));
 
-  FPathToWorkspace:= Edit1.Text;
-  FAndroidProjectName:= Trim(ComboBox1.Text);
-  FAndroidPlatform:= GetNDKPlatform(ListBox3.Items.Strings[ListBox3.ItemIndex]);
+  FPathToWorkspace:= EditPathToWorkspace.Text;
+  FAndroidProjectName:= Trim(ComboSelectProjectName.Text);
+  FAndroidPlatform:= GetNDKPlatform(ListBoxPlatform.Items.Strings[ListBoxPlatform.ItemIndex]);
 
   if FProjectModel <> 'Ant' then
   begin
@@ -321,15 +324,15 @@ begin
       strList.Free;
   end;
 
-  if RadioGroup3.ItemIndex = 1 then  //Ant Project
+  if RGProjectType.ItemIndex = 1 then  //Ant Project
   begin
      FProjectModel:= 'Ant';
-     if (Pos(DirectorySeparator, ComboBox1.Text) = 0) then  //i.e just "name", not path+name
+     if (Pos(DirectorySeparator, ComboSelectProjectName.Text) = 0) then  //i.e just "name", not path+name
      begin
-         FAndroidProjectName:= FPathToWorkspace + DirectorySeparator + ComboBox1.Text; //get full name: path+name
+         FAndroidProjectName:= FPathToWorkspace + DirectorySeparator + ComboSelectProjectName.Text; //get full name: path+name
          {$I-}
-         ChDir(FPathToWorkspace+DirectorySeparator+ComboBox1.Text);
-         if IOResult <> 0 then MkDir(FPathToWorkspace+DirectorySeparator+ComboBox1.Text);
+         ChDir(FPathToWorkspace+DirectorySeparator+ComboSelectProjectName.Text);
+         if IOResult <> 0 then MkDir(FPathToWorkspace+DirectorySeparator+ComboSelectProjectName.Text);
      end;
   end;
 
@@ -425,48 +428,48 @@ end;
 
 procedure TFormWorkspace.FormActivate(Sender: TObject);
 begin
-  ComboBox1.SetFocus;
-  StatusBar1.Panels.Items[0].Text:= 'MinSdk Api: '+GetTextByListIndex(ListBox1.ItemIndex);
-  StatusBar1.Panels.Items[1].Text:= 'Target Api: '+GetTextByList2Index(ListBox2.ItemIndex);
+  ComboSelectProjectName.SetFocus;
+  StatusBarInfo.Panels.Items[0].Text:= 'MinSdk Api: '+GetTextByListIndex(ListBoxMinSDK.ItemIndex);
+  StatusBarInfo.Panels.Items[1].Text:= 'Target Api: '+GetTextByList2Index(ListBoxTargetAPI.ItemIndex);
 end;
 
-procedure TFormWorkspace.SpeedButton1Click(Sender: TObject);
+procedure TFormWorkspace.SpdBtnPathToWorkspaceClick(Sender: TObject);
 begin
-  if SelectDirectoryDialog1.Execute then
+  if SelDirDlgPathToWorkspace.Execute then
   begin
-    Edit1.Text := SelectDirectoryDialog1.FileName;
-    FPathToWorkspace:= SelectDirectoryDialog1.FileName;
-    ComboBox1.Items.Clear;
-    GetSubDirectories(FPathToWorkspace, ComboBox1.Items);
+    EditPathToWorkspace.Text := SelDirDlgPathToWorkspace.FileName;
+    FPathToWorkspace:= SelDirDlgPathToWorkspace.FileName;
+    ComboSelectProjectName.Items.Clear;
+    GetSubDirectories(FPathToWorkspace, ComboSelectProjectName.Items);
 
     //try some guesswork:
     if Pos('eclipse', LowerCase(FPathToWorkspace) ) > 0 then
     begin
-      RadioGroup3.ItemIndex:= 0;
-      Edit8.Text:='';
+      RGProjectType.ItemIndex:= 0;
+      EditPackagePrefaceName.Text:='';
     end;
 
     if Pos('ant', LowerCase(FPathToWorkspace) ) > 0 then
-       RadioGroup3.ItemIndex:= 1;
+       RGProjectType.ItemIndex:= 1;
 
   end;
 end;
 
-procedure TFormWorkspace.SpeedButton2Click(Sender: TObject);
+procedure TFormWorkspace.SpdBtnRefreshProjectNameClick(Sender: TObject);
 begin
-  FPathToWorkspace:= Edit1.Text;
-  ComboBox1.Items.Clear;
-  GetSubDirectories(FPathToWorkspace, ComboBox1.Items);
+  FPathToWorkspace:= EditPathToWorkspace.Text;
+  ComboSelectProjectName.Items.Clear;
+  GetSubDirectories(FPathToWorkspace, ComboSelectProjectName.Items);
 
   //try some guesswork:
   if Pos('eclipse', LowerCase(FPathToWorkspace) ) > 0 then
   begin
-    RadioGroup3.ItemIndex:= 0;
-    Edit8.Text:='';
+    RGProjectType.ItemIndex:= 0;
+    EditPackagePrefaceName.Text:='';
   end;
 
   if Pos('ant', LowerCase(FPathToWorkspace) ) > 0 then
-     RadioGroup3.ItemIndex:= 1;
+     RGProjectType.ItemIndex:= 1;
 end;
 
 procedure TFormWorkspace.LoadSettings(const pFilename: string);
@@ -489,22 +492,22 @@ begin
       i5:= strToInt(ReadString('NewProject','NDK', ''))
     else i5:= 2;  //ndk 10
 
-    ListBox3.Clear;
+    ListBoxPlatform.Clear;
     if i5 > 0 then //not ndk7
     begin
-      ListBox3.Items.Add('Froyo');
-      ListBox3.Items.Add('Gingerbread');
-      ListBox3.Items.Add('Ice Cream 4.0x');
-      ListBox3.Items.Add('Jelly Bean 4.1');
-      ListBox3.Items.Add('Jelly Bean 4.2');
-      ListBox3.Items.Add('Jelly Bean 4.3');
-      ListBox3.Items.Add('KitKat 4.4');
+      ListBoxPlatform.Items.Add('Froyo');
+      ListBoxPlatform.Items.Add('Gingerbread');
+      ListBoxPlatform.Items.Add('Ice Cream 4.0x');
+      ListBoxPlatform.Items.Add('Jelly Bean 4.1');
+      ListBoxPlatform.Items.Add('Jelly Bean 4.2');
+      ListBoxPlatform.Items.Add('Jelly Bean 4.3');
+      ListBoxPlatform.Items.Add('KitKat 4.4');
     end
     else
     begin  //just ndk7
-      ListBox3.Items.Add('Froyo');
-      ListBox3.Items.Add('Gingerbread');
-      ListBox3.Items.Add('Ice Cream 4.0');  //Android-14
+      ListBoxPlatform.Items.Add('Froyo');
+      ListBoxPlatform.Items.Add('Gingerbread');
+      ListBoxPlatform.Items.Add('Ice Cream 4.0');  //Android-14
     end;
 
     if ReadString('NewProject','InstructionSet', '') <> '' then
@@ -523,70 +526,70 @@ begin
        j1:= strToInt(ReadString('NewProject','MinApi', ''))
     else j1:= 2; // Api 14
 
-    if  j1 < ListBox1.Items.Count then
-        ListBox1.ItemIndex:= j1
+    if  j1 < ListBoxMinSDK.Items.Count then
+        ListBoxMinSDK.ItemIndex:= j1
     else
-       ListBox1.ItemIndex:= ListBox1.Items.Count-1;
+       ListBoxMinSDK.ItemIndex:= ListBoxMinSDK.Items.Count-1;
 
     if ReadString('NewProject','AndroidPlatform', '') <> '' then
        j2:= strToInt(ReadString('NewProject','AndroidPlatform', ''))
     else j2:= 2; // Android-14
 
-    ListBox3.ItemIndex:= j2;
-    ListBox3Click(nil); //update ListBox1
+    ListBoxPlatform.ItemIndex:= j2;
+    ListBoxMinSDKClick(nil); //update ListBoxMinSDK
 
 
-    FAndroidPlatform:=  GetNDKPlatform(ListBox3.Items.Strings[ListBox3.ItemIndex]);
+    FAndroidPlatform:=  GetNDKPlatform(ListBoxPlatform.Items.Strings[ListBoxPlatform.ItemIndex]);
 
     if ReadString('NewProject','TargetApi', '') <> '' then
        j3:= strToInt(ReadString('NewProject','TargetApi', ''))
     else j3:= 2; // Api 14
 
-    if  j3 < ListBox2.Items.Count then
-        ListBox2.ItemIndex:= j3
+    if  j3 < ListBoxTargetAPI.Items.Count then
+        ListBoxTargetAPI.ItemIndex:= j3
     else
-       ListBox2.ItemIndex:= ListBox2.Items.Count-1;
+       ListBoxTargetAPI.ItemIndex:= ListBoxTargetAPI.Items.Count-1;
 
-    ComboBox1.Items.Clear;
-    GetSubDirectories(FPathToWorkspace, ComboBox1.Items);
+    ComboSelectProjectName.Items.Clear;
+    GetSubDirectories(FPathToWorkspace, ComboSelectProjectName.Items);
 
     Free;
   end;
 
-  RadioGroup1.ItemIndex:= i1;
-  RadioGroup2.ItemIndex:= i2;
+  RGInstruction.ItemIndex:= i1;
+  RGFPU.ItemIndex:= i2;
 
   if i3 > 1 then i3:= 0;
-  RadioGroup3.ItemIndex:= i3;
+  RGProjectType.ItemIndex:= i3;
 
-  FInstructionSet:= RadioGroup1.Items[RadioGroup1.ItemIndex];
-  FFPUSet:= RadioGroup2.Items[RadioGroup2.ItemIndex];
-  FProjectModel:= RadioGroup3.Items[RadioGroup3.ItemIndex]; //Eclipse Project or Ant Project
+  FInstructionSet:= RGInstruction.Items[RGInstruction.ItemIndex];
+  FFPUSet:= RGFPU.Items[RGFPU.ItemIndex];
+  FProjectModel:= RGProjectType.Items[RGProjectType.ItemIndex]; //Eclipse Project or Ant Project
 
-  FMinApi:= ListBox1.Items[ListBox1.ItemIndex];
-  FTargetApi:= ListBox2.Items[ListBox2.ItemIndex];
+  FMinApi:= ListBoxMinSDK.Items[ListBoxMinSDK.ItemIndex];
+  FTargetApi:= ListBoxTargetAPI.Items[ListBoxTargetAPI.ItemIndex];
 
-  Edit1.Text := FPathToWorkspace;
+  EditPathToWorkspace.Text := FPathToWorkspace;
 
-  Edit8.Text := FAntPackageName;
+  EditPackagePrefaceName.Text := FAntPackageName;
 end;
 
 procedure TFormWorkspace.SaveSettings(const pFilename: string);
 begin
    with TInifile.Create(pFilename) do
    begin
-      WriteString('NewProject', 'PathToWorkspace', Edit1.Text);
+      WriteString('NewProject', 'PathToWorkspace', EditPathToWorkspace.Text);
 
       WriteString('NewProject', 'FullProjectName', FAndroidProjectName);
-      WriteString('NewProject', 'InstructionSet', IntToStr(RadioGroup1.ItemIndex));
-      WriteString('NewProject', 'FPUSet', IntToStr(RadioGroup2.ItemIndex));
+      WriteString('NewProject', 'InstructionSet', IntToStr(RGInstruction.ItemIndex));
+      WriteString('NewProject', 'FPUSet', IntToStr(RGFPU.ItemIndex));
 
-      WriteString('NewProject', 'ProjectModel',IntToStr(RadioGroup3.ItemIndex));  //Eclipse or Ant
-      WriteString('NewProject', 'AntPackageName', LowerCase(Trim(Edit8.Text)));
+      WriteString('NewProject', 'ProjectModel',IntToStr(RGProjectType.ItemIndex));  //Eclipse or Ant
+      WriteString('NewProject', 'AntPackageName', LowerCase(Trim(EditPackagePrefaceName.Text)));
 
-      WriteString('NewProject', 'AndroidPlataform', IntToStr(ListBox3.ItemIndex));
-      WriteString('NewProject', 'MinApi', IntToStr(ListBox1.ItemIndex));
-      WriteString('NewProject', 'TargetApi', IntToStr(ListBox2.ItemIndex));
+      WriteString('NewProject', 'AndroidPlataform', IntToStr(ListBoxPlatform.ItemIndex));
+      WriteString('NewProject', 'MinApi', IntToStr(ListBoxMinSDK.ItemIndex));
+      WriteString('NewProject', 'TargetApi', IntToStr(ListBoxTargetAPI.ItemIndex));
 
       WriteString('NewProject', 'AntBuildMode', 'debug'); //default...
       WriteString('NewProject', 'MainActivity', FMainActivity); //dummy
