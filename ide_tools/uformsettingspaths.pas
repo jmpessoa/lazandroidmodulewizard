@@ -13,50 +13,48 @@ type
   { TFormSettingsPaths }
 
   TFormSettingsPaths  = class(TForm)
-    bbOK: TBitBtn;
-    Bevel3: TBevel;
-    Bevel4: TBevel;
-    Bevel5: TBevel;
-    BitBtn2: TBitBtn;
-    Edit1: TEdit;
-    Edit2: TEdit;
-    Edit4: TEdit;
-    Edit5: TEdit;
-    Edit6: TEdit;
-    Edit7: TEdit;
-    edProjectName: TEdit;
-    Label1: TLabel;
-    Label2: TLabel;
-    Label3: TLabel;
-    Label5: TLabel;
-    Label7: TLabel;
-    Label8: TLabel;
-    RadioGroup5: TRadioGroup;
-    SelectDirectoryDialog1: TSelectDirectoryDialog;
-    SelectDirectoryDialog2: TSelectDirectoryDialog;
-    SelectDirectoryDialog4: TSelectDirectoryDialog;
-    SelectDirectoryDialog5: TSelectDirectoryDialog;
-    SelectDirectoryDialog6: TSelectDirectoryDialog;
-    SelectDirectoryDialog7: TSelectDirectoryDialog;
-    SpeedButton1: TSpeedButton;
-    SpeedButton2: TSpeedButton;
-    SpeedButton4: TSpeedButton;
-    SpeedButton5: TSpeedButton;
-    SpeedButton6: TSpeedButton;
-    SpeedButton7: TSpeedButton;
-    StatusBar1: TStatusBar;
-    procedure bbOKClick(Sender: TObject);
-    procedure BitBtn2Click(Sender: TObject);
+    BitBtnOK: TBitBtn;
+    BevelSimonsayzTemplateLazBuildAndButtons: TBevel;
+    BevelSDKNDKAndSimonsayzTemplateLazBuild: TBevel;
+    BevelJDKAntAndSDKNDK: TBevel;
+    BitBtnCancel: TBitBtn;
+    EditPathToLazBuild: TEdit;
+    EditPathToAndroidNDK: TEdit;
+    EditPathToSimonsayzTemplate: TEdit;
+    EditPathToJavaJDK: TEdit;
+    EditPathToAndroidSDK: TEdit;
+    EditPathToAntBinary: TEdit;
+    LabelPathToLazBuild: TLabel;
+    LabelPathToAndroidNDK: TLabel;
+    LabelPathToSimonsayzTemplate: TLabel;
+    LabelPathToJavaJDK: TLabel;
+    LabelPathToAndroidSDK: TLabel;
+    LabelPathToAntBinary: TLabel;
+    RGNDKVersion: TRadioGroup;
+    SelDirDlgPathToLazBuild: TSelectDirectoryDialog;
+    SelDirDlgPathToAndroidNDK: TSelectDirectoryDialog;
+    SelDirDlgPathToSimonsayzTemplate: TSelectDirectoryDialog;
+    SelDirDlgPathToJavaJDK: TSelectDirectoryDialog;
+    SelDirDlgPathToAndroidSDK: TSelectDirectoryDialog;
+    SelDirDlgPathToAntBinary: TSelectDirectoryDialog;
+    SpBPathToLazBuild: TSpeedButton;
+    SpBPathToAndroidNDK: TSpeedButton;
+    SpBPathToSimonsayzTemplate: TSpeedButton;
+    SpBPathToJavaJDK: TSpeedButton;
+    SpBPathToAndroidSDK: TSpeedButton;
+    SpBPathToAntBinary: TSpeedButton;
+    procedure BitBtnOKClick(Sender: TObject);
+    procedure BitBtnCancelClick(Sender: TObject);
     procedure FormActivate(Sender: TObject);
     procedure FormClose(Sender: TObject; var CloseAction: TCloseAction);
     procedure FormShow(Sender: TObject);
-    procedure SpeedButton1Click(Sender: TObject);
+    procedure SpBPathToLazBuildClick(Sender: TObject);
 
-    procedure SpeedButton2Click(Sender: TObject);
-    procedure SpeedButton4Click(Sender: TObject);
-    procedure SpeedButton5Click(Sender: TObject);
-    procedure SpeedButton6Click(Sender: TObject);
-    procedure SpeedButton7Click(Sender: TObject);
+    procedure SpBPathToAndroidNDKClick(Sender: TObject);
+    procedure SpBPathToSimonsayzTemplateClick(Sender: TObject);
+    procedure SpBPathToJavaJDKClick(Sender: TObject);
+    procedure SpBPathToAndroidSDKClick(Sender: TObject);
+    procedure SpBPathToAntBinaryClick(Sender: TObject);
   private
     { private declarations }
     FPathToJavaTemplates: string;
@@ -93,73 +91,73 @@ begin
    Self.LoadSettings(AppendPathDelim(LazarusIDE.GetPrimaryConfigPath) + 'JNIAndroidProject.ini');
 end;
 
-procedure TFormSettingsPaths.SpeedButton1Click(Sender: TObject);
+procedure TFormSettingsPaths.SpBPathToLazBuildClick(Sender: TObject);
 begin
-  if SelectDirectoryDialog1.Execute then
+  if SelDirDlgPathToLazBuild.Execute then
   begin
-    Edit1.Text := SelectDirectoryDialog1.FileName;
+    EditPathToLazBuild.Text := SelDirDlgPathToLazBuild.FileName;
   end;
 end;
 
 procedure TFormSettingsPaths.FormActivate(Sender: TObject);
 begin
-  Edit5.SetFocus;
+  EditPathToJavaJDK.SetFocus;
 end;
 
-procedure TFormSettingsPaths.BitBtn2Click(Sender: TObject);
+procedure TFormSettingsPaths.BitBtnCancelClick(Sender: TObject);
 begin
   FOk:= False;
   Close;
 end;
 
-procedure TFormSettingsPaths.bbOKClick(Sender: TObject);
+procedure TFormSettingsPaths.BitBtnOKClick(Sender: TObject);
 begin
    FOk:= True;
    Close;
 end;
 
-procedure TFormSettingsPaths.SpeedButton2Click(Sender: TObject);
+procedure TFormSettingsPaths.SpBPathToAndroidNDKClick(Sender: TObject);
 begin
-  if SelectDirectoryDialog2.Execute then
+  if SelDirDlgPathToAndroidNDK.Execute then
   begin
-    Edit2.Text := SelectDirectoryDialog2.FileName;
-    FPathToAndroidNDK:= SelectDirectoryDialog2.FileName;
+    EditPathToAndroidNDK.Text := SelDirDlgPathToAndroidNDK.FileName;
+    FPathToAndroidNDK:= SelDirDlgPathToAndroidNDK.FileName;
   end;
 end;
 
-procedure TFormSettingsPaths.SpeedButton4Click(Sender: TObject);
+procedure TFormSettingsPaths.SpBPathToSimonsayzTemplateClick(Sender: TObject);
 begin
-  if SelectDirectoryDialog4.Execute then
+  if SelDirDlgPathToSimonsayzTemplate.Execute then
   begin
-    Edit4.Text := SelectDirectoryDialog4.FileName;
-    FPathToJavaTemplates:= SelectDirectoryDialog4.FileName;
+    EditPathToSimonsayzTemplate.Text := SelDirDlgPathToSimonsayzTemplate.FileName;
+    FPathToJavaTemplates:= SelDirDlgPathToSimonsayzTemplate.FileName;
   end;
 end;
 
-procedure TFormSettingsPaths.SpeedButton5Click(Sender: TObject);
+procedure TFormSettingsPaths.SpBPathToJavaJDKClick(Sender: TObject);
 begin
-  if SelectDirectoryDialog5.Execute then
+  if SelDirDlgPathToJavaJDK.Execute then
   begin
-    Edit5.Text := SelectDirectoryDialog5.FileName;
-    FPathToJavaJDK:= SelectDirectoryDialog5.FileName;
+    EditPathToJavaJDK.Text := SelDirDlgPathToJavaJDK.FileName;
+    FPathToJavaJDK:= SelDirDlgPathToJavaJDK.FileName;
   end;
 end;
 
-procedure TFormSettingsPaths.SpeedButton6Click(Sender: TObject);
+procedure TFormSettingsPaths.SpBPathToAndroidSDKClick(Sender: TObject);
 begin
-  if SelectDirectoryDialog6.Execute then
+  if SelDirDlgPathToAndroidSDK.Execute then
   begin
-    Edit6.Text := SelectDirectoryDialog6.FileName;
-    FPathToAndroidSDK:= SelectDirectoryDialog6.FileName;
+    EditPathToAndroidSDK.Text := SelDirDlgPathToAndroidSDK.FileName;
+    FPathToAndroidSDK:= SelDirDlgPathToAndroidSDK.FileName;
   end;
 end;
 
-procedure TFormSettingsPaths.SpeedButton7Click(Sender: TObject);
+procedure TFormSettingsPaths.SpBPathToAntBinaryClick(Sender: TObject);
 begin
-    if SelectDirectoryDialog7.Execute then
+    if SelDirDlgPathToAntBinary.Execute then
   begin
-    Edit7.Text := SelectDirectoryDialog7.FileName;
-    FPathToAntBin:= SelectDirectoryDialog7.FileName;
+    EditPathToAntBinary.Text := SelDirDlgPathToAntBinary.FileName;
+    FPathToAntBin:= SelDirDlgPathToAntBinary.FileName;
   end;
 end;
 
@@ -171,20 +169,20 @@ begin
   begin
     with TIniFile.Create(fileName) do
     begin
-      Edit2.Text := ReadString('NewProject','PathToAndroidNDK', '');
-      Edit4.Text := ReadString('NewProject','PathToJavaTemplates', '');
-      Edit5.Text := ReadString('NewProject','PathToJavaJDK', '');
-      Edit6.Text := ReadString('NewProject','PathToAndroidSDK', '');
+      EditPathToAndroidNDK.Text := ReadString('NewProject','PathToAndroidNDK', '');
+      EditPathToSimonsayzTemplate.Text := ReadString('NewProject','PathToJavaTemplates', '');
+      EditPathToJavaJDK.Text := ReadString('NewProject','PathToJavaJDK', '');
+      EditPathToAndroidSDK.Text := ReadString('NewProject','PathToAndroidSDK', '');
 
-      Edit7.Text := ReadString('NewProject','PathToAntBin', '');
-      Edit1.Text:=  ReadString('NewProject','PathToLazbuild', '');
+      EditPathToAntBinary.Text := ReadString('NewProject','PathToAntBin', '');
+      EditPathToLazBuild.Text:=  ReadString('NewProject','PathToLazbuild', '');
 
       if ReadString('NewProject','NDK', '') <> '' then
           indexNdk:= StrToInt(ReadString('NewProject','NDK', ''))
       else
           indexNdk:= 2;  //ndk 10
 
-      RadioGroup5.ItemIndex:= indexNdk;
+      RGNDKVersion.ItemIndex:= indexNdk;
 
       Free;
     end;
@@ -195,18 +193,17 @@ procedure TFormSettingsPaths.SaveSettings(const fileName: string);
 begin
   with TInifile.Create(fileName) do
   begin
-      WriteString('NewProject', 'PathToNdkPlataforms', Edit2.Text);
-      WriteString('NewProject', 'PathToJavaTemplates', Edit4.Text);
-      WriteString('NewProject', 'PathToJavaJDK', Edit5.Text);
-      WriteString('NewProject', 'PathToAndroidNDK', Edit2.Text);
-      WriteString('NewProject', 'PathToAndroidSDK', Edit6.Text);
-      WriteString('NewProject', 'PathToAntBin', Edit7.Text);
-      WriteString('NewProject', 'NDK', IntToStr(RadioGroup5.ItemIndex));
-      WriteString('NewProject', 'PathToLazbuild', Edit1.Text);
+      WriteString('NewProject', 'PathToNdkPlataforms', EditPathToAndroidNDK.Text);
+      WriteString('NewProject', 'PathToJavaTemplates', EditPathToSimonsayzTemplate.Text);
+      WriteString('NewProject', 'PathToJavaJDK', EditPathToJavaJDK.Text);
+      WriteString('NewProject', 'PathToAndroidNDK', EditPathToAndroidNDK.Text);
+      WriteString('NewProject', 'PathToAndroidSDK', EditPathToAndroidSDK.Text);
+      WriteString('NewProject', 'PathToAntBin', EditPathToAntBinary.Text);
+      WriteString('NewProject', 'NDK', IntToStr(RGNDKVersion.ItemIndex));
+      WriteString('NewProject', 'PathToLazbuild', EditPathToLazBuild.Text);
       Free;
   end;
 end;
-
 
 end.
 
