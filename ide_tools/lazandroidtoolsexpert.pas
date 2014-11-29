@@ -170,14 +170,15 @@ Var
   NewLib, NewTargetCPU, NewCustomOptions: string;
 begin
 
-  With TStringList.Create do
-  begin
-    LoadFromFile(GetFile(ABuildMode));
-    NewLib:= GetValue(Strings[0]);
-    NewTargetCPU:= GetValue(Strings[1]);
-    NewCustomOptions:= GetValue(Strings[2]);
-    Free;
-  end;
+  with TStringList.Create do
+    try
+      LoadFromFile(GetFile(ABuildMode));
+      NewLib:= GetValue(Strings[0]);
+      NewTargetCPU:= GetValue(Strings[1]);
+      NewCustomOptions:= GetValue(Strings[2]);
+    finally
+      Free;
+    end;
 
   Project:= TXMLDocument.Create;
 
@@ -508,11 +509,17 @@ begin
   if ProjectPath  <> '' then
   begin
        DefaultBuildModeIndex:= ComboBoxTarget.ItemIndex;
-       ChangeBuildMode(Target);
-       if MessageDlg('Build Mode Changed! ['+strTarget+']',
-                     'Do you wish to (Re)Build Library [.so] for "'+strTarget+'"?',
-                     mtConfirmation, [mbYes, mbNo],0) = mrYes then
-          RebuildLibrary;  //by jmpessoa
+       try
+         ChangeBuildMode(Target);
+         if MessageDlg('Build Mode Changed! ['+strTarget+']',
+                       'Do you wish to (Re)Build Library [.so] for "'+strTarget+'"?',
+                       mtConfirmation, [mbYes, mbNo],0) = mrYes then
+            RebuildLibrary;  //by jmpessoa
+       except
+         on e: Exception do begin
+           MessageDlg('Error',e.Message,mtError,[mbOK],0);
+         end;
+       end;
   end;
 
 end;
