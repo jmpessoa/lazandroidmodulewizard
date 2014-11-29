@@ -342,6 +342,8 @@ begin
 end;
 
 procedure TfrmLazAndroidToolsExpert.FormShow(Sender: TObject);
+var
+  SubDirs: TStringList;
 begin
 
   EditAndroidSDKPath.Text:= SdkPath;
@@ -354,10 +356,16 @@ begin
   PageControlMain.ActivePage:= TabSheetAction;
 
   ComboBoxSelectProject.Items.Clear;  //by jmpessoa
-  if PathToWorkspace <> '' then
+  if (PathToWorkspace <> '') and DirectoryExists(PathToWorkspace) then
   begin
-    GetSubDirectories(PathToWorkspace, ComboBoxSelectProject.Items);
-    if ProjectPath <> '' then
+    SubDirs := FindAllDirectories(PathToWorkspace,false);
+    try
+      ComboBoxSelectProject.Items.Assign(SubDirs);
+    finally
+      SubDirs.Free;
+    end;
+    //GetSubDirectories(PathToWorkspace, ComboBoxSelectProject.Items);
+    if (ProjectPath <> '') and DirectoryExists(ProjectPath) then
     begin
       ComboBoxSelectProject.Text:= ProjectPath;
       StatusBarMain.SimpleText:= 'Recent: '+ ProjectPath; //path to most recent project ...   by jmpessoa
@@ -406,7 +414,7 @@ end;
 procedure TfrmLazAndroidToolsExpert.SpBSelectProjectClick(Sender: TObject);
 begin
   PathToWorkspace:= EditPathToWorkspace.Text;   //change Workspace...
-  ComboBox2.Items.Clear;
+  ComboBoxSelectProject.Items.Clear;
   GetSubDirectories(PathToWorkspace, ComboBoxSelectProject.Items);
   ComboBoxSelectProject.ItemIndex:= -1;
   ComboBoxTarget.ItemIndex:= -1;
@@ -546,7 +554,7 @@ begin
     if  DefaultBuildModeIndex = -1 then DefaultBuildModeIndex:= GetDefaultBuildModeIndex2;
 
     ComboBoxTarget.ItemIndex:= DefaultBuildModeIndex;
-    ComboBox1Change(nil);
+    ComboBoxTargetChange(nil);
   end;
 end;
 
