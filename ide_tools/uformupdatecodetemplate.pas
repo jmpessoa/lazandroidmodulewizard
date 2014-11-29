@@ -14,25 +14,25 @@ type
   { TFormUpdateCodeTemplate }
 
   TFormUpdateCodeTemplate = class(TForm)
-    BitBtn1: TBitBtn;
-    BitBtn2: TBitBtn;
-    CheckGroup1: TCheckGroup;
-    ComboBox1: TComboBox;
-    edtWorkpspacePath: TEdit;
-    Label1: TLabel;
-    Label2: TLabel;
+    BitBtnOK: TBitBtn;
+    BitBtnClose: TBitBtn;
+    CheckGroupUpgradeTemplates: TCheckGroup;
+    ComboBoxSelectProject: TComboBox;
+    EditPathToWorkspace: TEdit;
+    LabelPathToWorkspace: TLabel;
+    LabelSelectProject: TLabel;
     sddPath: TSelectDirectoryDialog;
-    SpeedButton1: TSpeedButton;
-    SpeedButton2: TSpeedButton;
+    SpBPathToWorkspace: TSpeedButton;
+    SpBSelectProject: TSpeedButton;
     StatusBar1: TStatusBar;
-    procedure BitBtn1Click(Sender: TObject);
-    procedure ComboBox1Change(Sender: TObject);
+    procedure BitBtnOKClick(Sender: TObject);
+    procedure ComboBoxSelectProjectChange(Sender: TObject);
     procedure FormClose(Sender: TObject; var CloseAction: TCloseAction);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure FormShow(Sender: TObject);
-    procedure SpeedButton1Click(Sender: TObject);
-    procedure SpeedButton2Click(Sender: TObject);
+    procedure SpBPathToWorkspaceClick(Sender: TObject);
+    procedure SpBSelectProjectClick(Sender: TObject);
   private
     { private declarations }
     ProjectPath: string;
@@ -99,7 +99,7 @@ begin
    end;
 end;
 
-procedure TFormUpdateCodeTemplate.BitBtn1Click(Sender: TObject);
+procedure TFormUpdateCodeTemplate.BitBtnOKClick(Sender: TObject);
 var
   packList: TstringList;
   pk, i: integer;
@@ -113,16 +113,16 @@ begin
 
   packList:= TstringList.Create;
 
-  if FileExists(ComboBox1.Text+DirectorySeparator+'packagename.txt') then //for release >= 0.6/05
+  if FileExists(ComboBoxSelectProject.Text+DirectorySeparator+'packagename.txt') then //for release >= 0.6/05
   begin
-    packList.LoadFromFile(ComboBox1.Text+DirectorySeparator+'packagename.txt');
+    packList.LoadFromFile(ComboBoxSelectProject.Text+DirectorySeparator+'packagename.txt');
     PackageName:= Trim(packList.Strings[0]);  //ex. com.example.appbuttondemo1
-    PathToJavaClass:= ComboBox1.Text+DirectorySeparator+'src'+
+    PathToJavaClass:= ComboBoxSelectProject.Text+DirectorySeparator+'src'+
                  DirectorySeparator+ReplaceChar(PackageName, '.',DirectorySeparator);
   end
   else  //try get PackageName from 'AndroidManifest.xml'
   begin
-     packList.LoadFromFile(ComboBox1.Text+DirectorySeparator+'AndroidManifest.xml');
+     packList.LoadFromFile(ComboBoxSelectProject.Text+DirectorySeparator+'AndroidManifest.xml');
      pk:= Pos('package="',packList.Text);  //ex. package="com.example.appbuttondemo1"
      strAux:= Copy(packList.Text, pk+Length('package="'), 200);
 
@@ -133,12 +133,12 @@ begin
      end;
      PackageName:= Trim(Copy(strAux, 1, i-1));
 
-     PathToJavaClass:= ComboBox1.Text+DirectorySeparator+'src'+
+     PathToJavaClass:= ComboBoxSelectProject.Text+DirectorySeparator+'src'+
                  DirectorySeparator+ReplaceChar(PackageName, '.',DirectorySeparator);
   end;
 
   //upgrade "App.java"
-  if  CheckGroup1.Checked[0] then
+  if  CheckGroupUpgradeTemplates.Checked[0] then
   begin
     packList.Clear;
     packList.LoadFromFile(PathToJavaTemplates+DirectorySeparator+'App.java');
@@ -147,7 +147,7 @@ begin
   end;
 
   //upgrade "Controls.java"
-  if  CheckGroup1.Checked[1] then
+  if  CheckGroupUpgradeTemplates.Checked[1] then
   begin
     packList.Clear;                                              //JavaClassName
     packList.LoadFromFile(PathToJavaTemplates+DirectorySeparator+'Controls.java');
@@ -157,7 +157,7 @@ begin
   packList.Free;
 
   //upgrade [library] controls.lpr
-  if  CheckGroup1.Checked[2] then
+  if  CheckGroupUpgradeTemplates.Checked[2] then
   begin
     SynMemo1.Clear; //Controls.java
     SynMemo1.LoadFromFile(PathToJavaClass+DirectorySeparator+JavaClassName+'.java');
@@ -191,26 +191,26 @@ begin
   end;
 
   strApp:='';
-  if (CheckGroup1.Checked[0]) then
+  if (CheckGroupUpgradeTemplates.Checked[0]) then
      strApp:=' [App.java]';
 
   strControls:='';
-  if (CheckGroup1.Checked[1]) then
+  if (CheckGroupUpgradeTemplates.Checked[1]) then
      strControls:=' [Controls.java]';
 
   strProject:='';
-  if (CheckGroup1.Checked[2]) then
+  if (CheckGroupUpgradeTemplates.Checked[2]) then
      strProject:=' [controls.lpr]';
 
   ShowMessage('The code templates'+strApp+strControls+strProject+' was updated!');
 
 end;
 
-procedure TFormUpdateCodeTemplate.ComboBox1Change(Sender: TObject);
+procedure TFormUpdateCodeTemplate.ComboBoxSelectProjectChange(Sender: TObject);
 begin
-  if ComboBox1.ItemIndex > -1 then
+  if ComboBoxSelectProject.ItemIndex > -1 then
   begin
-    ProjectPath:= ComboBox1.Items.Strings[ComboBox1.ItemIndex];
+    ProjectPath:= ComboBoxSelectProject.Items.Strings[ComboBoxSelectProject.ItemIndex];
     JNIProjectPath:= ProjectPath + DirectorySeparator + 'jni';
     StatusBar1.SimpleText:= ProjectPath;
   end;
@@ -252,45 +252,45 @@ end;
 
 procedure TFormUpdateCodeTemplate.FormShow(Sender: TObject);
 begin
-  edtWorkpspacePath.Text:= PathToWorkspace; //by jmpessoa
-  ComboBox1.Items.Clear;  //by jmpessoa
+  EditPathToWorkspace.Text:= PathToWorkspace; //by jmpessoa
+  ComboBoxSelectProject.Items.Clear;  //by jmpessoa
   if PathToWorkspace <> '' then
   begin
-    GetSubDirectories(PathToWorkspace, ComboBox1.Items);
+    GetSubDirectories(PathToWorkspace, ComboBoxSelectProject.Items);
     if ProjectPath <> '' then
     begin
-      ComboBox1.Text:= ProjectPath;
+      ComboBoxSelectProject.Text:= ProjectPath;
       StatusBar1.SimpleText:= 'Recent: '+ ProjectPath; //path to most recent project ...   by jmpessoa
       JNIProjectPath:= ProjectPath + DirectorySeparator + 'jni';
     end;
   end;
-  CheckGroup1.Checked[0]:= True;
-  CheckGroup1.Checked[1]:= True;
-  CheckGroup1.Checked[2]:= True;
+  CheckGroupUpgradeTemplates.Checked[0]:= True;
+  CheckGroupUpgradeTemplates.Checked[1]:= True;
+  CheckGroupUpgradeTemplates.Checked[2]:= True;
 end;
 
-procedure TFormUpdateCodeTemplate.SpeedButton1Click(Sender: TObject);
+procedure TFormUpdateCodeTemplate.SpBPathToWorkspaceClick(Sender: TObject);
 begin
     sddPath.Title:= 'Select Projects Workspace Path';
-  if Trim(edtWorkpspacePath.Text) <> '' then
-    if DirPathExists(edtWorkpspacePath.Text) then
-      sddPath.InitialDir:= edtWorkpspacePath.Text;
+  if Trim(EditPathToWorkspace.Text) <> '' then
+    if DirPathExists(EditPathToWorkspace.Text) then
+      sddPath.InitialDir:= EditPathToWorkspace.Text;
   if sddPath.Execute then
   begin
      PathToWorkspace:= sddPath.FileName;
-     edtWorkpspacePath.Text:= PathToWorkspace;
-     ComboBox1.Items.Clear;
-     GetSubDirectories(PathToWorkspace, ComboBox1.Items);
+     EditPathToWorkspace.Text:= PathToWorkspace;
+     ComboBoxSelectProject.Items.Clear;
+     GetSubDirectories(PathToWorkspace, ComboBoxSelectProject.Items);
   end;
 end;
 
-procedure TFormUpdateCodeTemplate.SpeedButton2Click(Sender: TObject);
+procedure TFormUpdateCodeTemplate.SpBSelectProjectClick(Sender: TObject);
 begin
-  PathToWorkspace:= edtWorkpspacePath.Text;   //change Workspace...
-  ComboBox1.Items.Clear;
-  GetSubDirectories(PathToWorkspace, ComboBox1.Items);
-  ComboBox1.ItemIndex:= -1;
-  ComboBox1.Text:='';
+  PathToWorkspace:= EditPathToWorkspace.Text;   //change Workspace...
+  ComboBoxSelectProject.Items.Clear;
+  GetSubDirectories(PathToWorkspace, ComboBoxSelectProject.Items);
+  ComboBoxSelectProject.ItemIndex:= -1;
+  ComboBoxSelectProject.Text:='';
 end;
 
 function TFormUpdateCodeTemplate.GetJTypeSignature(jType: string): string;

@@ -1,11 +1,12 @@
 object FormUpdateCodeTemplate: TFormUpdateCodeTemplate
-  Left = 447
-  Height = 294
-  Top = 245
+  Left = 308
+  Height = 234
+  Top = 370
   Width = 463
+  AutoSize = True
   BorderStyle = bsSizeToolWin
   Caption = 'Android Module Wizard : Upgrade Code Templates'
-  ClientHeight = 294
+  ClientHeight = 234
   ClientWidth = 463
   Color = clWhite
   OnClose = FormClose
@@ -15,41 +16,68 @@ object FormUpdateCodeTemplate: TFormUpdateCodeTemplate
   Position = poScreenCenter
   LCLVersion = '1.3'
   object StatusBar1: TStatusBar
+    AnchorSideTop.Control = BitBtnOK
+    AnchorSideTop.Side = asrBottom
     Left = 0
-    Height = 23
-    Top = 271
+    Height = 19
+    Top = 215
     Width = 463
+    Anchors = [akTop, akLeft, akRight, akBottom]
     Panels = <>
   end
-  object edtWorkpspacePath: TEdit
-    Left = 18
-    Height = 23
-    Top = 32
-    Width = 400
+  object EditPathToWorkspace: TEdit
+    AnchorSideLeft.Control = Owner
+    AnchorSideTop.Control = LabelPathToWorkspace
+    AnchorSideTop.Side = asrBottom
+    AnchorSideRight.Control = SpBPathToWorkspace
+    Left = 8
+    Height = 22
+    Top = 30
+    Width = 416
+    Anchors = [akTop, akLeft, akRight]
+    BorderSpacing.Around = 8
     TabOrder = 1
   end
-  object SpeedButton1: TSpeedButton
-    Left = 424
+  object SpBPathToWorkspace: TSpeedButton
+    AnchorSideTop.Control = EditPathToWorkspace
+    AnchorSideTop.Side = asrCenter
+    AnchorSideRight.Control = Owner
+    AnchorSideRight.Side = asrBottom
+    Left = 432
     Height = 22
-    Top = 32
+    Top = 30
     Width = 23
+    Anchors = [akTop, akRight]
+    BorderSpacing.Around = 8
     Caption = '...'
-    OnClick = SpeedButton1Click
+    OnClick = SpBPathToWorkspaceClick
   end
-  object ComboBox1: TComboBox
-    Left = 18
+  object ComboBoxSelectProject: TComboBox
+    AnchorSideLeft.Control = Owner
+    AnchorSideTop.Control = LabelSelectProject
+    AnchorSideTop.Side = asrBottom
+    AnchorSideRight.Control = SpBSelectProject
+    Left = 8
     Height = 23
-    Top = 88
-    Width = 398
-    ItemHeight = 15
-    OnChange = ComboBox1Change
+    Top = 82
+    Width = 416
+    Anchors = [akTop, akLeft, akRight]
+    BorderSpacing.Around = 8
+    ItemHeight = 14
+    OnChange = ComboBoxSelectProjectChange
     TabOrder = 2
   end
-  object SpeedButton2: TSpeedButton
-    Left = 424
+  object SpBSelectProject: TSpeedButton
+    AnchorSideTop.Control = ComboBoxSelectProject
+    AnchorSideTop.Side = asrCenter
+    AnchorSideRight.Control = Owner
+    AnchorSideRight.Side = asrBottom
+    Left = 432
     Height = 22
-    Top = 88
+    Top = 82
     Width = 23
+    Anchors = [akTop, akLeft, akRight]
+    BorderSpacing.Around = 8
     Glyph.Data = {
       36040000424D3604000000000000360000002800000010000000100000000100
       2000000000000004000064000000640000000000000000000000FFFFFF00FFFF
@@ -86,36 +114,55 @@ object FormUpdateCodeTemplate: TFormUpdateCodeTemplate
       FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
       FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00
     }
-    OnClick = SpeedButton2Click
+    OnClick = SpBSelectProjectClick
   end
-  object BitBtn1: TBitBtn
-    Left = 16
+  object BitBtnOK: TBitBtn
+    AnchorSideLeft.Control = Owner
+    AnchorSideTop.Control = CheckGroupUpgradeTemplates
+    AnchorSideTop.Side = asrBottom
+    AnchorSideRight.Control = BitBtnClose
+    Left = 8
     Height = 30
-    Top = 184
-    Width = 431
+    Top = 177
+    Width = 212
+    Anchors = [akTop, akLeft, akRight]
+    BorderSpacing.Around = 8
     Default = True
     DefaultCaption = True
     Kind = bkOK
     ModalResult = 1
-    OnClick = BitBtn1Click
+    OnClick = BitBtnOKClick
     TabOrder = 3
   end
-  object BitBtn2: TBitBtn
-    Left = 18
+  object BitBtnClose: TBitBtn
+    AnchorSideTop.Control = BitBtnOK
+    AnchorSideTop.Side = asrCenter
+    AnchorSideRight.Control = Owner
+    AnchorSideRight.Side = asrBottom
+    Left = 228
     Height = 30
-    Top = 224
-    Width = 429
+    Top = 177
+    Width = 227
+    Anchors = [akTop, akLeft, akRight]
+    BorderSpacing.Around = 8
     DefaultCaption = True
     Kind = bkClose
     ModalResult = 11
     TabOrder = 4
   end
-  object CheckGroup1: TCheckGroup
-    Left = 16
+  object CheckGroupUpgradeTemplates: TCheckGroup
+    AnchorSideLeft.Control = Owner
+    AnchorSideTop.Control = ComboBoxSelectProject
+    AnchorSideTop.Side = asrBottom
+    AnchorSideRight.Control = Owner
+    AnchorSideRight.Side = asrBottom
+    Left = 8
     Height = 56
-    Top = 120
-    Width = 431
+    Top = 113
+    Width = 447
+    Anchors = [akTop, akLeft, akRight]
     AutoFill = True
+    BorderSpacing.Around = 8
     Caption = 'Upgrade Templates  --> Get New [AMW] version-revision'
     ChildSizing.LeftRightSpacing = 6
     ChildSizing.TopBottomSpacing = 6
@@ -125,8 +172,8 @@ object FormUpdateCodeTemplate: TFormUpdateCodeTemplate
     ChildSizing.ShrinkVertical = crsScaleChilds
     ChildSizing.Layout = cclLeftToRightThenTopToBottom
     ChildSizing.ControlsPerLine = 3
-    ClientHeight = 36
-    ClientWidth = 427
+    ClientHeight = 38
+    ClientWidth = 443
     Columns = 3
     Items.Strings = (
       '"App.java"'
@@ -138,19 +185,26 @@ object FormUpdateCodeTemplate: TFormUpdateCodeTemplate
       03000000020202
     }
   end
-  object Label1: TLabel
-    Left = 18
-    Height = 15
-    Top = 11
-    Width = 189
+  object LabelPathToWorkspace: TLabel
+    AnchorSideLeft.Control = Owner
+    AnchorSideTop.Control = Owner
+    Left = 8
+    Height = 14
+    Top = 8
+    Width = 226
+    BorderSpacing.Around = 8
     Caption = 'Path to [projects folder] Workspace:'
     ParentColor = False
   end
-  object Label2: TLabel
-    Left = 20
-    Height = 15
-    Top = 70
-    Width = 74
+  object LabelSelectProject: TLabel
+    AnchorSideLeft.Control = Owner
+    AnchorSideTop.Control = EditPathToWorkspace
+    AnchorSideTop.Side = asrBottom
+    Left = 8
+    Height = 14
+    Top = 60
+    Width = 91
+    BorderSpacing.Around = 8
     Caption = 'Select Project:'
     ParentColor = False
   end
