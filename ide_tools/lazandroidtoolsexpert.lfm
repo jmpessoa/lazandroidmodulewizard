@@ -17,9 +17,9 @@ object frmLazAndroidToolsExpert: TfrmLazAndroidToolsExpert
     Height = 371
     Top = 0
     Width = 442
-    ActivePage = TabSheetAbout
+    ActivePage = TabSheetAction
     Align = alClient
-    TabIndex = 2
+    TabIndex = 0
     TabOrder = 0
     object TabSheetAction: TTabSheet
       Caption = 'Action'
@@ -170,7 +170,6 @@ object frmLazAndroidToolsExpert: TfrmLazAndroidToolsExpert
         Anchors = [akTop, akLeft, akRight]
         BorderSpacing.Around = 8
         Color = clBackground
-        Font.Color = clYellow
         OnDblClick = MemoLogDblClick
         ParentFont = False
         ScrollBars = ssBoth
