@@ -16,62 +16,61 @@ type
   TBuildMode = (bmArmV6Soft, bmArmV6v2, bmArmV6v3, bmArmV7Soft, bmArmV7v2, bmArmV7v3, bmX86);
 
   TfrmLazAndroidToolsExpert = class(TForm)
-    AndroidNdkPath: TLabel;
-    AndroidSdkPath: TLabel;
-    bbBuild: TBitBtn;
-    bbInstall: TBitBtn;
-    BitBtn1: TBitBtn;
-    btnBrowseAndroidNdkPath: TButton;
-    btnBrowseAndroidSDKPath: TButton;
-    btnBrowseAntPath: TButton;
-    btnBrowseJdkPath: TButton;
+    LabelAndroidNDKPath: TLabel;
+    LabelAndroidSDKPath: TLabel;
+    BitBtnBuild: TBitBtn;
+    BitBtnInstall: TBitBtn;
+    BitBtnClose: TBitBtn;
+    BtnAndroidNDKPath: TButton;
+    BtnAndroidSDKPath: TButton;
+    BtnAntBinaryPath: TButton;
+    BtnJDKPath: TButton;
     chkbxUseAntBuild: TCheckBox;
-    ComboBox1: TComboBox;
-    ComboBox2: TComboBox;
-    edtWorkpspacePath: TEdit;
-    edtLazbuildPath: TEdit;
-    edtAndroidNdkPath: TEdit;
-    edtAndroidSdkPath: TEdit;
-    edtAntPath: TEdit;
-    edtJdkPath: TEdit;
-    Label1: TLabel;
-    Label2: TLabel;
-    Label3: TLabel;
-    lblAntPath: TLabel;
-    lblJdkPath: TLabel;
+    ComboBoxTarget: TComboBox;
+    ComboBoxSelectProject: TComboBox;
+    EditPathToWorkspace: TEdit;
+    EditLazBuildPath: TEdit;
+    EditAndroidNDKPath: TEdit;
+    EditAndroidSDKPath: TEdit;
+    EditAntBinaryPath: TEdit;
+    EditJDKPath: TEdit;
+    LabelTarget: TLabel;
+    LabelPathToWorkspace: TLabel;
+    LabelLazBuildPath: TLabel;
+    LabelAntBinaryPath: TLabel;
+    LabelJDKPath: TLabel;
     MemoLog: TMemo;
     MenuItem1: TMenuItem;
     MenuItem2: TMenuItem;
-    pcMain: TPageControl;
-    sddPath: TSelectDirectoryDialog;
-    SpeedButton1: TSpeedButton;
-    SpeedButton2: TSpeedButton;
-    SpeedButton3: TSpeedButton;
-    StaticText1: TStaticText;
-    StaticText2: TStaticText;
-    StaticText3: TStaticText;
-    StatusBar1: TStatusBar;
-    tsAction: TTabSheet;
-    tsAbout: TTabSheet;
-    tsSettings: TTabSheet;
-    procedure bbBuildClick(Sender: TObject);
-    procedure bbInstallClick(Sender: TObject);
-    procedure BitBtn1Click(Sender: TObject);
+    PageControlMain: TPageControl;
+    SelDirDlgPath: TSelectDirectoryDialog;
+    SpBPathToWorkspace: TSpeedButton;
+    SpBLazBuildPath: TSpeedButton;
+    SpBSelectProject: TSpeedButton;
+    StatusBarMain: TStatusBar;
+    TabSheetAction: TTabSheet;
+    TabSheetAbout: TTabSheet;
+    TabSheetSettings: TTabSheet;
+    LabelAboutInfo: TLabel;
+    LabelSelectProject: TLabel;
+    procedure BitBtnBuildClick(Sender: TObject);
+    procedure BitBtnInstallClick(Sender: TObject);
+    procedure BitBtnCloseClick(Sender: TObject);
 
-    procedure btnBrowseAndroidNdkPathClick(Sender: TObject);
-    procedure btnBrowseAndroidSDKPathClick(Sender: TObject);
-    procedure btnBrowseAntPathClick(Sender: TObject);
-    procedure btnBrowseJdkPathClick(Sender: TObject);
+    procedure BtnAndroidNDKPathClick(Sender: TObject);
+    procedure BtnAndroidSDKPathClick(Sender: TObject);
+    procedure BtnAntBinaryPathClick(Sender: TObject);
+    procedure BtnJDKPathClick(Sender: TObject);
 
-    procedure ComboBox1Change(Sender: TObject);
-    procedure ComboBox2Change(Sender: TObject);
+    procedure ComboBoxTargetChange(Sender: TObject);
+    procedure ComboBoxSelectProjectChange(Sender: TObject);
     procedure FormClose(Sender: TObject; var CloseAction: TCloseAction);
     procedure FormCreate(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure MemoLogDblClick(Sender: TObject);     //clear...
-    procedure SpeedButton1Click(Sender: TObject);
-    procedure SpeedButton2Click(Sender: TObject);
-    procedure SpeedButton3Click(Sender: TObject);
+    procedure SpBPathToWorkspaceClick(Sender: TObject);
+    procedure SpBLazBuildPathClick(Sender: TObject);
+    procedure SpBSelectProjectClick(Sender: TObject);
   private
     { private declarations }
     ProjectPath: string;
@@ -320,10 +319,10 @@ begin
 
         ProjectPath:= ReadString('NewProject', 'FullProjectName', '');      //by jmpessoa
 
-        edtAndroidNdkPath.Text:= NdkPath;
-        edtAndroidNdkPath.Text:= SdkPath;
-        edtJdkPath.Text:= JdkPath;
-        edtAntPath.Text:= AntPath;
+        EditAndroidNDKPath.Text:= NdkPath;
+        EditAndroidNDKPath.Text:= SdkPath;
+        EditJDKPath.Text:= JdkPath;
+        EditAntBinaryPath.Text:= AntPath;
 
         SaveSettings;
       end;
@@ -345,27 +344,27 @@ end;
 procedure TfrmLazAndroidToolsExpert.FormShow(Sender: TObject);
 begin
 
-  edtAndroidSdkPath.Text:= SdkPath;
-  edtAndroidNdkPath.Text:= NdkPath;
-  edtJdkPath.Text:= JdkPath;
-  edtAntPath.Text:= AntPath;
-  edtWorkpspacePath.Text:= PathToWorkspace; //by jmpessoa
-  edtLazbuildPath.Text:= PathToLazbuild;  //by jmpessoa
+  EditAndroidSDKPath.Text:= SdkPath;
+  EditAndroidNDKPath.Text:= NdkPath;
+  EditJDKPath.Text:= JdkPath;
+  EditAntBinaryPath.Text:= AntPath;
+  EditPathToWorkspace.Text:= PathToWorkspace; //by jmpessoa
+  EditLazBuildPath.Text:= PathToLazbuild;  //by jmpessoa
   chkbxUseAntBuild.Checked:= UseAnt;
-  pcMain.ActivePage:= tsAction;
+  PageControlMain.ActivePage:= TabSheetAction;
 
-  ComboBox2.Items.Clear;  //by jmpessoa
+  ComboBoxSelectProject.Items.Clear;  //by jmpessoa
   if PathToWorkspace <> '' then
   begin
-    GetSubDirectories(PathToWorkspace, ComboBox2.Items);
+    GetSubDirectories(PathToWorkspace, ComboBoxSelectProject.Items);
     if ProjectPath <> '' then
     begin
-      ComboBox2.Text:= ProjectPath;
-      StatusBar1.SimpleText:= 'Recent: '+ ProjectPath; //path to most recent project ...   by jmpessoa
+      ComboBoxSelectProject.Text:= ProjectPath;
+      StatusBarMain.SimpleText:= 'Recent: '+ ProjectPath; //path to most recent project ...   by jmpessoa
       JNIProjectPath:= ProjectPath + DirectorySeparator + 'jni';
       DefaultBuildModeIndex:= GetDefaultBuildModeIndex;   //by jmpessoa
       if DefaultBuildModeIndex = -1 then  DefaultBuildModeIndex:= GetDefaultBuildModeIndex2;
-      ComboBox1.ItemIndex:= Self.DefaultBuildModeIndex;
+      ComboBoxTarget.ItemIndex:= Self.DefaultBuildModeIndex;
     end;
   end;
 end;
@@ -375,85 +374,85 @@ begin
   MemoLog.Clear;
 end;
 
-procedure TfrmLazAndroidToolsExpert.SpeedButton1Click(Sender: TObject);
+procedure TfrmLazAndroidToolsExpert.SpBPathToWorkspaceClick(Sender: TObject);
 begin
-  sddPath.Title:= 'Select Projects Workspace Path';
-  if Trim(edtWorkpspacePath.Text) <> '' then
-    if DirPathExists(edtWorkpspacePath.Text) then
-      sddPath.InitialDir:= edtWorkpspacePath.Text;
-  if sddPath.Execute then
+  SelDirDlgPath.Title:= 'Select Projects Workspace Path';
+  if Trim(EditPathToWorkspace.Text) <> '' then
+    if DirPathExists(EditPathToWorkspace.Text) then
+      SelDirDlgPath.InitialDir:= EditPathToWorkspace.Text;
+  if SelDirDlgPath.Execute then
   begin
-     PathToWorkspace:= sddPath.FileName;
-     edtWorkpspacePath.Text:= PathToWorkspace;
-     ComboBox2.Items.Clear;
-     GetSubDirectories(PathToWorkspace, ComboBox2.Items);
-     ComboBox2.ItemIndex:= -1;
+     PathToWorkspace:= SelDirDlgPath.FileName;
+     EditPathToWorkspace.Text:= PathToWorkspace;
+     ComboBoxSelectProject.Items.Clear;
+     GetSubDirectories(PathToWorkspace, ComboBoxSelectProject.Items);
+     ComboBoxSelectProject.ItemIndex:= -1;
   end;
 end;
 
-procedure TfrmLazAndroidToolsExpert.SpeedButton2Click(Sender: TObject);
+procedure TfrmLazAndroidToolsExpert.SpBLazBuildPathClick(Sender: TObject);
 begin
-  sddPath.Title:= 'Select Lazbuild path';
-  if Trim(edtLazbuildPath.Text) <> '' then
-    if DirPathExists(edtLazbuildPath.Text) then
-      sddPath.InitialDir:= edtLazbuildPath.Text;
-  if sddPath.Execute then
+  SelDirDlgPath.Title:= 'Select Lazbuild path';
+  if Trim(EditLazBuildPath.Text) <> '' then
+    if DirPathExists(EditLazBuildPath.Text) then
+      SelDirDlgPath.InitialDir:= EditLazBuildPath.Text;
+  if SelDirDlgPath.Execute then
   begin
-    PathToLazbuild:= sddPath.FileName;    //by jmpessoa
-    edtLazbuildPath.Text:= PathToLazbuild;
+    PathToLazbuild:= SelDirDlgPath.FileName;    //by jmpessoa
+    EditLazBuildPath.Text:= PathToLazbuild;
   end;
 end;
 
-procedure TfrmLazAndroidToolsExpert.SpeedButton3Click(Sender: TObject);
+procedure TfrmLazAndroidToolsExpert.SpBSelectProjectClick(Sender: TObject);
 begin
-  PathToWorkspace:= edtWorkpspacePath.Text;   //change Workspace...
+  PathToWorkspace:= EditPathToWorkspace.Text;   //change Workspace...
   ComboBox2.Items.Clear;
-  GetSubDirectories(PathToWorkspace, ComboBox2.Items);
-  ComboBox2.ItemIndex:= -1;
-  ComboBox1.ItemIndex:= -1;
-  ComboBox2.Text:='';
-  ComboBox1.Text:='';
+  GetSubDirectories(PathToWorkspace, ComboBoxSelectProject.Items);
+  ComboBoxSelectProject.ItemIndex:= -1;
+  ComboBoxTarget.ItemIndex:= -1;
+  ComboBoxSelectProject.Text:='';
+  ComboBoxTarget.Text:='';
   DefaultBuildModeIndex:= -1;
 end;
 
-procedure TfrmLazAndroidToolsExpert.btnBrowseAndroidSDKPathClick(Sender: TObject);
+procedure TfrmLazAndroidToolsExpert.BtnAndroidSDKPathClick(Sender: TObject);
 begin
-  sddPath.Title:= 'Select Android Sdk path';
-  if Trim(edtAndroidSdkPath.Text) <> '' then
-    if DirPathExists(edtAndroidSdkPath.Text) then
-      sddPath.InitialDir:= edtAndroidSdkPath.Text;
-  if sddPath.Execute then
-    edtAndroidSdkPath.Text:= sddPath.FileName;
+  SelDirDlgPath.Title:= 'Select Android Sdk path';
+  if Trim(EditAndroidSDKPath.Text) <> '' then
+    if DirPathExists(EditAndroidSDKPath.Text) then
+      SelDirDlgPath.InitialDir:= EditAndroidSDKPath.Text;
+  if SelDirDlgPath.Execute then
+    EditAndroidSDKPath.Text:= SelDirDlgPath.FileName;
 end;
 
-procedure TfrmLazAndroidToolsExpert.btnBrowseAndroidNdkPathClick(Sender: TObject);
+procedure TfrmLazAndroidToolsExpert.BtnAndroidNDKPathClick(Sender: TObject);
 begin
-  sddPath.Title:= 'Select Android Ndk path';
-  if Trim(edtAndroidNdkPath.Text) <> '' then
-    if DirPathExists(edtAndroidNdkPath.Text) then
-      sddPath.InitialDir:= edtAndroidNdkPath.Text;
-  if sddPath.Execute then
-    edtAndroidNdkPath.Text:= sddPath.FileName;
+  SelDirDlgPath.Title:= 'Select Android Ndk path';
+  if Trim(EditAndroidNDKPath.Text) <> '' then
+    if DirPathExists(EditAndroidNDKPath.Text) then
+      SelDirDlgPath.InitialDir:= EditAndroidNDKPath.Text;
+  if SelDirDlgPath.Execute then
+    EditAndroidNDKPath.Text:= SelDirDlgPath.FileName;
 end;
 
-procedure TfrmLazAndroidToolsExpert.btnBrowseAntPathClick(Sender: TObject);
+procedure TfrmLazAndroidToolsExpert.BtnAntBinaryPathClick(Sender: TObject);
 begin
-  sddPath.Title:= 'Select Ant bin path';
-  if Trim(edtAntPath.Text) <> '' then
-    if DirPathExists(edtAntPath.Text) then
-      sddPath.InitialDir:= edtAntPath.Text;
-  if sddPath.Execute then
-    edtAntPath.Text:= sddPath.FileName;
+  SelDirDlgPath.Title:= 'Select Ant bin path';
+  if Trim(EditAntBinaryPath.Text) <> '' then
+    if DirPathExists(EditAntBinaryPath.Text) then
+      SelDirDlgPath.InitialDir:= EditAntBinaryPath.Text;
+  if SelDirDlgPath.Execute then
+    EditAntBinaryPath.Text:= SelDirDlgPath.FileName;
 end;
 
-procedure TfrmLazAndroidToolsExpert.btnBrowseJdkPathClick(Sender: TObject);
+procedure TfrmLazAndroidToolsExpert.BtnJDKPathClick(Sender: TObject);
 begin
-  sddPath.Title:= 'Select JDK path';
-  if Trim(edtJdkPath.Text) <> '' then
-    if DirPathExists(edtJdkPath.Text) then
-      sddPath.InitialDir:= edtJdkPath.Text;
-  if sddPath.Execute then
-    edtJdkPath.Text:= sddPath.FileName;
+  SelDirDlgPath.Title:= 'Select JDK path';
+  if Trim(EditJDKPath.Text) <> '' then
+    if DirPathExists(EditJDKPath.Text) then
+      SelDirDlgPath.InitialDir:= EditJDKPath.Text;
+  if SelDirDlgPath.Execute then
+    EditJDKPath.Text:= SelDirDlgPath.FileName;
 end;
 
 procedure TfrmLazAndroidToolsExpert.RebuildLibrary; //by jmpessoa
@@ -484,15 +483,15 @@ begin
 end;
 
 
-procedure TfrmLazAndroidToolsExpert.ComboBox1Change(Sender: TObject);
+procedure TfrmLazAndroidToolsExpert.ComboBoxTargetChange(Sender: TObject);
 Var
   Target: TBuildMode;
   strTarget: string;
 begin
 
-  if ComboBox1.ItemIndex < 0 then Exit;
+  if ComboBoxTarget.ItemIndex < 0 then Exit;
 
-  case ComboBox1.ItemIndex of
+  case ComboBoxTarget.ItemIndex of
       0: begin Target:= bmArmV6Soft; strTarget:='ArmV6' end;
       1: begin Target:= bmArmV7Soft; strTarget:='ArmV7a' end;
       2: begin Target:= bmX86; strTarget:='x86' end;
@@ -500,7 +499,7 @@ begin
 
   if ProjectPath  <> '' then
   begin
-       DefaultBuildModeIndex:= ComboBox1.ItemIndex;
+       DefaultBuildModeIndex:= ComboBoxTarget.ItemIndex;
        ChangeBuildMode(Target);
        if MessageDlg('Build Mode Changed! ['+strTarget+']',
                      'Do you wish to (Re)Build Library [.so] for "'+strTarget+'"?',
@@ -535,18 +534,18 @@ begin
 
 end;
 
-procedure TfrmLazAndroidToolsExpert.ComboBox2Change(Sender: TObject);
+procedure TfrmLazAndroidToolsExpert.ComboBoxSelectProjectChange(Sender: TObject);
 begin
-  if ComboBox2.ItemIndex > -1 then
+  if ComboBoxSelectProject.ItemIndex > -1 then
   begin
-    ProjectPath:= ComboBox2.Items.Strings[ComboBox2.ItemIndex];
+    ProjectPath:= ComboBoxSelectProject.Items.Strings[ComboBoxSelectProject.ItemIndex];
     JNIProjectPath:= ProjectPath + DirectorySeparator + 'jni';
-    StatusBar1.SimpleText:= ProjectPath;
+    StatusBarMain.SimpleText:= ProjectPath;
 
     DefaultBuildModeIndex:= GetDefaultBuildModeIndex;
     if  DefaultBuildModeIndex = -1 then DefaultBuildModeIndex:= GetDefaultBuildModeIndex2;
 
-    ComboBox1.ItemIndex:= DefaultBuildModeIndex;
+    ComboBoxTarget.ItemIndex:= DefaultBuildModeIndex;
     ComboBox1Change(nil);
   end;
 end;
@@ -580,7 +579,7 @@ begin
 end;
 
 
-procedure TfrmLazAndroidToolsExpert.bbBuildClick(Sender: TObject);
+procedure TfrmLazAndroidToolsExpert.BitBtnBuildClick(Sender: TObject);
 begin
 
   if ProjectPath = '' then
@@ -611,7 +610,7 @@ begin
   end;
 end;
 
-procedure TfrmLazAndroidToolsExpert.bbInstallClick(Sender: TObject);
+procedure TfrmLazAndroidToolsExpert.BitBtnInstallClick(Sender: TObject);
 Var
   ApkName: string;
 begin
@@ -650,7 +649,7 @@ begin
   end;
 end;
 
-procedure TfrmLazAndroidToolsExpert.BitBtn1Click(Sender: TObject);
+procedure TfrmLazAndroidToolsExpert.BitBtnCloseClick(Sender: TObject);
 begin
   Close;
 end;
