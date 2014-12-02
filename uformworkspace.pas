@@ -6,31 +6,33 @@ interface
 
 uses
   inifiles, Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, LazIDEIntf,
-  StdCtrls, Buttons, ExtCtrls, ComCtrls, ButtonPanel, FormPathMissing;
+  StdCtrls, Buttons, ExtCtrls, ComCtrls, FormPathMissing;
 
 type
 
   { TFormWorkspace }
 
   TFormWorkspace  = class(TForm)
-    BitBtnOK: TBitBtn;
-    Bevel1: TBevel;
     BitBtnCancel: TBitBtn;
+    BitBtnOK: TBitBtn;
+    CheckBox1: TCheckBox;
     ComboSelectProjectName: TComboBox;
-    EditPathToWorkspace: TEdit;
     EditPackagePrefaceName: TEdit;
+    EditPathToWorkspace: TEdit;
     edProjectName: TEdit;
-    LabelPathToWorkspace: TLabel;
-    LabelMinSDK: TLabel;
+    GroupBox1: TGroupBox;
     LabelTargetAPI: TLabel;
+    LabelPathToWorkspace: TLabel;
     LabelPlatform: TLabel;
     LabelSelectProjectName: TLabel;
-    LabelPackagePrefaceName: TLabel;
+    LabelSdkMin: TLabel;
     ListBoxMinSDK: TListBox;
-    ListBoxTargetAPI: TListBox;
     ListBoxPlatform: TListBox;
-    PanelButtons: TPanel;
+    ListBoxTargetAPI: TListBox;
+    Panel1: TPanel;
+    Panel2: TPanel;
     PanelListBox: TPanel;
+    PanelButtons: TPanel;
     PanelRadioGroup: TPanel;
     RGInstruction: TRadioGroup;
     RGFPU: TRadioGroup;
@@ -40,14 +42,17 @@ type
     SpdBtnRefreshProjectName: TSpeedButton;
     StatusBarInfo: TStatusBar;
 
+    procedure CheckBox1Click(Sender: TObject);
     procedure FormActivate(Sender: TObject);
     procedure FormClose(Sender: TObject; var CloseAction: TCloseAction);
+    procedure FormCreate(Sender: TObject);
 
     procedure ListBoxMinSDKClick(Sender: TObject);
     procedure ListBoxMinSDKSelectionChange(Sender: TObject; User: boolean);
     procedure ListBoxTargetAPIClick(Sender: TObject);
     procedure ListBoxTargetAPISelectionChange(Sender: TObject; User: boolean);
     procedure ListBoxPlatformClick(Sender: TObject);
+
     procedure RGInstructionClick(Sender: TObject);
     procedure RGFPUClick(Sender: TObject);
     procedure RGProjectTypeClick(Sender: TObject);
@@ -82,6 +87,7 @@ type
     FMainActivity: string;   //Simon "App"
     FNDK: string;
     FAndroidPlatform: string;
+    FSupportV4: string;
 
   public
     { public declarations }
@@ -115,6 +121,7 @@ type
     property MainActivity: string read FMainActivity write FMainActivity;
     property NDK: string read FNDK write FNDK;
     property AndroidPlatform: string read FAndroidPlatform write FAndroidPlatform;
+    property SupportV4: string read FSupportV4 write FSupportV4;
   end;
 
   procedure GetSubDirectories(const directory : string; list : TStrings);
@@ -231,6 +238,7 @@ begin
    ListBoxPlatformClick(nil);
 end;
 
+
 procedure TFormWorkspace.RGInstructionClick(Sender: TObject);
 begin
   FInstructionSet:= RGInstruction.Items[RGInstruction.ItemIndex];  //fix 15-december-2013
@@ -255,7 +263,8 @@ begin
     else if identName = 'Jelly Bean 4.1' then Result:= 'android-16'
     else if identName = 'Jelly Bean 4.2' then Result:= 'android-17'
     else if identName = 'Jelly Bean 4.3' then Result:= 'android-18'
-    else if identName = 'KitKat 4.4'     then Result:= 'android-19';
+    else if identName = 'KitKat 4.4'     then Result:= 'android-19'
+    else if identName = 'Lollipop 5.0'   then Result:= 'android-21';
 end;
 
 procedure TFormWorkspace.FormClose(Sender: TObject; var CloseAction: TCloseAction);
@@ -282,7 +291,7 @@ begin
 
   if EditPackagePrefaceName.Text = '' then EditPackagePrefaceName.Text:= 'org.lazarus';
 
-  Self.LoadPathsSettings(AppendPathDelim(LazarusIDE.GetPrimaryConfigPath) + 'JNIAndroidProject.ini');
+  //Self.LoadPathsSettings(AppendPathDelim(LazarusIDE.GetPrimaryConfigPath) + 'JNIAndroidProject.ini');
 
   FMainActivity:= 'App'; {dummy for Simon template} //TODO: need name flexibility here...
 
@@ -340,17 +349,20 @@ begin
 
 end;
 
+procedure TFormWorkspace.FormCreate(Sender: TObject);
+begin
+  Self.LoadPathsSettings(AppendPathDelim(LazarusIDE.GetPrimaryConfigPath) + 'JNIAndroidProject.ini');
+end;
+
 procedure TFormWorkspace.LoadPathsSettings(const fileName: string);
 var
    indexNdk: integer;
    frm: TFormPathMissing;
-   testPath: string;
 begin
   if FileExists(fileName) then
   begin
     with TIniFile.Create(fileName) do
     begin
-
       FPathToJavaJDK:= ReadString('NewProject','PathToJavaJDK', '');
 
       if  FPathToJavaJDK = '' then
@@ -416,10 +428,15 @@ begin
       if  FPathToLazbuild = '' then
       begin
           frm:= TFormPathMissing.Create(nil);
-          frm.LabelPathTo.Caption:= 'WARNING! Path to Lazbuild: [ex. C:\Laz4Android]';
+          frm.LabelPathTo.Caption:= 'WARNING! Path to "lazbuild": [ex. C:\lazarus {or Laz4Android)]';
           if frm.ShowModal = mrOK then  FPathToLazbuild:= frm.PathMissing;
           frm.Free;
       end;
+
+      CheckBox1.Checked:= False;
+      FSupportV4:= ReadString('NewProject','SupportV4', '');
+      if FSupportV4 = 'yes' then CheckBox1.Checked:= True
+      else FSupportV4 := 'no';
 
       Free;
     end;
@@ -431,6 +448,12 @@ begin
   ComboSelectProjectName.SetFocus;
   StatusBarInfo.Panels.Items[0].Text:= 'MinSdk Api: '+GetTextByListIndex(ListBoxMinSDK.ItemIndex);
   StatusBarInfo.Panels.Items[1].Text:= 'Target Api: '+GetTextByList2Index(ListBoxTargetAPI.ItemIndex);
+end;
+
+procedure TFormWorkspace.CheckBox1Click(Sender: TObject);
+begin
+    if  CheckBox1.Checked then FSupportV4:= 'yes'
+    else FSupportV4:= 'no';
 end;
 
 procedure TFormWorkspace.SpdBtnPathToWorkspaceClick(Sender: TObject);
@@ -502,6 +525,7 @@ begin
       ListBoxPlatform.Items.Add('Jelly Bean 4.2');
       ListBoxPlatform.Items.Add('Jelly Bean 4.3');
       ListBoxPlatform.Items.Add('KitKat 4.4');
+      ListBoxPlatform.Items.Add('Lollipop 5.0');
     end
     else
     begin  //just ndk7
@@ -593,6 +617,9 @@ begin
 
       WriteString('NewProject', 'AntBuildMode', 'debug'); //default...
       WriteString('NewProject', 'MainActivity', FMainActivity); //dummy
+
+      WriteString('NewProject', 'SupportV4', FSupportV4); //dummy
+
 
       Free;
    end;
