@@ -189,10 +189,11 @@ type
      FNDK: string;
 
      FPathToAntBin: string;
-     FProjectModel: string; {"Eclipse Project"/"Ant Project"/"jControl"/"jGuiControl"}
+     FProjectModel: string;
      FAntPackageName: string;
      FMinApi: string;
      FTargetApi: string;
+     FSupportV4: string;
      FTouchtestEnabled: string;
      FAntBuildMode: string;
      FMainActivity: string;
@@ -799,6 +800,7 @@ begin
   frm.MainActivity:= FMainActivity;
   frm.MinApi:= FMinApi;
   frm.TargetApi:= FTargetApi;
+
   frm.ProjectModel:= FProjectModel;
 
   if frm.ShowModal = mrOK then
@@ -827,6 +829,12 @@ begin
 
     ChDir(FAndroidProjectName+DirectorySeparator+ 'libs');
     if IOResult <> 0 then MkDir(FAndroidProjectName+ DirectorySeparator + 'libs');
+
+    if FSupportV4 = 'yes' then  //add android 4.0 support to olds devices ...
+          CopyFile(FPathToJavaTemplates+DirectorySeparator+'libs'+DirectorySeparator+'android-support-v4.jar',
+               FAndroidProjectName+DirectorySeparator+'libs'+DirectorySeparator+'android-support-v4.jar');
+
+
 
     ChDir(FAndroidProjectName+DirectorySeparator+ 'obj');
     if IOResult <> 0 then MkDir(FAndroidProjectName+ DirectorySeparator + 'obj');
@@ -929,6 +937,8 @@ begin
 
     FMinApi:= frm.MinApi;
     FTargetApi:= frm.TargetApi;
+    FSupportV4:= frm.SupportV4;
+
     FMainActivity:= frm.MainActivity;
 
     if  frm.TouchtestEnabled = 'True' then

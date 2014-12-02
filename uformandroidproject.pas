@@ -16,9 +16,10 @@ type
   { TFormAndroidProject }
 
   TFormAndroidProject = class(TForm)
-    bbOK: TBitBtn;
+    BitBtn1: TBitBtn;
     BitBtn2: TBitBtn;
     ImageList1: TImageList;
+    MainMenu1: TMainMenu;
     MenuItem1: TMenuItem;
     MenuItem10: TMenuItem;
     MenuItem11: TMenuItem;
@@ -27,7 +28,11 @@ type
     MenuItem14: TMenuItem;
     MenuItem15: TMenuItem;
     MenuItem16: TMenuItem;
+    MenuItem17: TMenuItem;
+    MenuItem18: TMenuItem;
+    MenuItem19: TMenuItem;
     MenuItem2: TMenuItem;
+    MenuItem20: TMenuItem;
     MenuItem3: TMenuItem;
     MenuItem4: TMenuItem;
     MenuItem5: TMenuItem;
@@ -40,12 +45,9 @@ type
     Panel2: TPanel;
     Panel3: TPanel;
     Panel4: TPanel;
-    Panel5: TPanel;
-    Panel6: TPanel;
     Panel7: TPanel;
     PopupMenu1: TPopupMenu;
     PopupMenu2: TPopupMenu;
-    PopupMenu3: TPopupMenu;
     PopupMenu4: TPopupMenu;
     ShellListView1: TShellListView;
     ShellTreeView1: TShellTreeView;
@@ -56,14 +58,15 @@ type
     SynMemo2: TSynMemo;
     TabSheet1: TTabSheet;
     TabSheet2: TTabSheet;
-    ToolBar1: TToolBar;
-    ToolButton1: TToolButton;
     procedure FormDeactivate(Sender: TObject);
     procedure FormShow(Sender: TObject);
+    procedure MenuItem18Click(Sender: TObject);
+    procedure MenuItem20Click(Sender: TObject);
     procedure PopupMenu1Close(Sender: TObject);
     procedure PopupMenu2Close(Sender: TObject);
-    procedure PopupMenu3Close(Sender: TObject);
+
     procedure PopupMenu4Close(Sender: TObject);
+    procedure PopupMenu4Popup(Sender: TObject);
     procedure ShellListView1ContextPopup(Sender: TObject; MousePos: TPoint;
       var Handled: Boolean);
     procedure ShellTreeView1Click(Sender: TObject);
@@ -600,6 +603,7 @@ end;
 procedure TFormAndroidProject.TryInsertJavaCreate(txt: string);
 var
  i: integer;
+ fileList: TStringList;
 begin
  if MessageDlg('Changing "Controls.java" ...',
     'Insert ' + txt+' to "Controls.java" ?', mtConfirmation, [mbYes, mbNo],0) = mrYes then
@@ -612,7 +616,18 @@ begin
     SynMemo1.Lines.Strings[i]:= txt;
     SynMemo1.Lines.Add('}');
  end;
- if FPathToJavaClass <> '' then SynMemo1.Lines.SaveToFile(FPathToJavaClass);
+
+ if FPathToJavaClass <> '' then
+ begin
+   if FileExists(FPathToJavaClass) then
+   begin
+      fileList:= TStringList.Create;
+      fileList.LoadFromFile(FPathToJavaClass);
+      fileList.SaveToFile(FPathToJavaClass+'.bak');
+      fileList.Free;
+   end;
+   SynMemo1.Lines.SaveToFile(FPathToJavaClass);
+ end;
 end;
 
 function TFormAndroidProject.GetPascalCodeHack(funcName, funcParam, funcResult, jniSignature: string): string;
@@ -1445,6 +1460,8 @@ begin
 end;
 
 procedure TFormAndroidProject.FormCloseQuery(Sender: TObject; var CanClose: boolean);
+var
+  fileList: TStringList;
 begin
 
   FJavaClassName:= FSaveJavaClassName;
@@ -1453,7 +1470,17 @@ begin
       DoJavaParse;
       SynMemo2.Lines.Add(' ');
       FPascalJNIInterfaceCode:= SynMemo2.Lines.Text;
-      if FPathToJavaClass <> '' then SynMemo1.Lines.SaveToFile(FPathToJavaClass);
+      if FPathToJavaClass <> '' then
+      begin
+        if FileExists(FPathToJavaClass) then
+        begin
+          fileList:= TStringList.Create;
+          fileList.LoadFromFile(FPathToJavaClass);
+          fileList.SaveToFile(FPathToJavaClass+'.bak');
+          fileList.Free;
+        end;
+        SynMemo1.Lines.SaveToFile(FPathToJavaClass);
+      end;
   end;
 
   FImportsList.Free;
@@ -1495,6 +1522,28 @@ begin
 
 end;
 
+procedure TFormAndroidProject.MenuItem18Click(Sender: TObject);
+var
+  txtCaption: string;
+begin
+   txtCaption:= (Sender as TMenuItem).Caption;
+   if Pos('About', txtCaption) > 0 then
+   begin
+      //02-december-2013 Add support to simonsayz's controls: http://blog.naver.com/simonsayz
+      //ShowMessage('LazAndroidModuleWizard ver. 0.3 - revision 0.1 - 28 dec. 2013 - by jmpessoa');
+      //Add jniBridge Wizard - aka jBridge
+      //ShowMessage('LazAndroidModuleWizard ver. 0.4 - 05 mar. 2014 - by jmpessoa');
+      //ShowMessage('LazAndroidModuleWizard ver. 0.5 - 14 Abril 2014 - by jmpessoa');
+     //Add Form Designer
+      ShowMessage('LazAndroidModuleWizard ver. 0.6 - 12 October 2014 - by jmpessoa');
+   end;
+end;
+
+procedure TFormAndroidProject.MenuItem20Click(Sender: TObject);
+begin
+  Self.ModalResult:= mrCancel;
+end;
+
 
 procedure TFormAndroidProject.FormDeactivate(Sender: TObject);
 begin
@@ -1510,6 +1559,7 @@ var
   NodeSelected:  TTreeNode;
   ListManifest: TStringList;
   strAfterReplace: string;
+  fileList: TStringList;
 begin
 
   NodeSelected:= ShellTreeView1.Selected;
@@ -1529,6 +1579,14 @@ begin
       auxList.SaveToFile(auxPath + FMainActivity+'.java' );
 
       auxList.Clear;
+
+      if FileExists(auxPath + 'Controls.java') then
+      begin
+        fileList:= TStringList.Create;
+        fileList.LoadFromFile(auxPath + 'Controls.java');
+        fileList.SaveToFile(auxPath + 'Controls.java'+'.bak');
+        fileList.Free;
+      end;
       auxList.LoadFromFile(FPathToJavaTemplates + DirectorySeparator + 'Controls.java');
       auxList.Strings[0]:= strPack;
       auxList.SaveToFile(auxPath + 'Controls.java');
@@ -1926,7 +1984,7 @@ begin
 
   if Pos('Search ', strCaption) > 0 then
   begin
-     responseStr := InputBox('Java JNI Source:', 'Search: [MatchCase & WholeWord]', '');
+     responseStr := InputBox('Java Source:', 'Search: [MatchCase+WholeWord]', '');
      if responseStr <> '' then
         SynMemo1.SearchReplace(responseStr, responseStr,[ssoMatchCase,ssoWholeWord]);
   end;
@@ -2234,27 +2292,6 @@ begin
    end;
 end;
 
-procedure TFormAndroidProject.PopupMenu3Close(Sender: TObject);
-var
-  txtCaption: string;
-begin
-   txtCaption:= (Sender as TMenuItem).Caption;
-   if Pos('About', txtCaption) > 0 then
-   begin
-      //02-december-2013 Add support to simonsayz's controls: http://blog.naver.com/simonsayz
-      //ShowMessage('LazAndroidModuleWizard ver. 0.3 - revision 0.1 - 28 dec. 2013 - by jmpessoa');
-      //Add jniBridge Wizard - aka jBridge
-      //ShowMessage('LazAndroidModuleWizard ver. 0.4 - 05 mar. 2014 - by jmpessoa');
-      //ShowMessage('LazAndroidModuleWizard ver. 0.5 - 14 Abril 2014 - by jmpessoa');
-     //Add Form Designer
-      ShowMessage('LazAndroidModuleWizard ver. 0.6 - 12 October 2014 - by jmpessoa');
-   end;
-   if Pos('Exit', txtCaption) > 0 then
-   begin
-     Self.ModalResult:= mrCancel;
-   end;
-end;
-
 procedure TFormAndroidProject.PopupMenu4Close(Sender: TObject);
 var
  AProcess: TProcess;
@@ -2266,6 +2303,11 @@ var
 begin
   if (Sender as TMenuItem).Caption <> 'Cancel' then
   begin
+    if Pos('unit ', SynMemo2.Lines.Strings[0] ) = 0  then  // In case Substr isn't found, 0 is returned. The search is case-sensitive.
+    begin
+       ShowMessage('You do not have the code to create a component!');
+       Exit;
+    end;
     frm:= TFormRegister.Create(nil);
     frm.OpenDialog2.InitialDir:= FPathToWizardCode+DirectorySeparator;
     frm.Edit2.Text:= FPathToWizardCode+DirectorySeparator+'register_extras.pas';
@@ -2348,6 +2390,11 @@ begin
     end;      //showModal
     frm.Free;
   end;
+end;
+
+procedure TFormAndroidProject.PopupMenu4Popup(Sender: TObject);
+begin
+  //
 end;
 
 procedure TFormAndroidProject.ShellListView1ContextPopup(Sender: TObject;
