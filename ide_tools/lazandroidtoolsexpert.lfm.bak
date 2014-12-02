@@ -83,9 +83,9 @@ object frmLazAndroidToolsExpert: TfrmLazAndroidToolsExpert
           Height = 219
           Top = 0
           Width = 492
-          ActivePage = TabSheetRunTimeErrorLog
+          ActivePage = TabSheetBuildInstallLog
           Align = alClient
-          TabIndex = 2
+          TabIndex = 0
           TabOrder = 0
           OnChange = PageControlLogChange
           object TabSheetBuildInstallLog: TTabSheet
@@ -100,19 +100,22 @@ object frmLazAndroidToolsExpert: TfrmLazAndroidToolsExpert
               Align = alClient
               Color = clBackground
               Font.Color = clYellow
+              Lines.Strings = (
+                'MemoLog'
+              )
               ParentFont = False
               TabOrder = 0
             end
           end
           object TabSheetTAGFilterLog: TTabSheet
             Caption = 'TAG Filter Log'
-            ClientHeight = 191
-            ClientWidth = 484
+            ClientHeight = 96
+            ClientWidth = 482
             object MemoLogFilter: TMemo
               Left = 0
-              Height = 191
+              Height = 96
               Top = 0
-              Width = 484
+              Width = 482
               Align = alClient
               Color = clBackground
               Font.Color = clYellow
@@ -155,18 +158,18 @@ object frmLazAndroidToolsExpert: TfrmLazAndroidToolsExpert
           end
           object TabSheetRunTimeErrorLog: TTabSheet
             Caption = 'Run Time Error Log'
-            ClientHeight = 191
-            ClientWidth = 484
+            ClientHeight = 208
+            ClientWidth = 514
             object MemoLogError: TMemo
               Left = 0
-              Height = 191
+              Height = 208
               Top = 0
-              Width = 484
+              Width = 514
               Align = alClient
               Color = clBackground
               Font.Color = clYellow
               Lines.Strings = (
-                ''
+                'MemoRunTimerError'
               )
               ParentFont = False
               ScrollBars = ssBoth

@@ -10,7 +10,7 @@
         <UnitOutputDirectory Value="lib\$(TargetCPU)-$(TargetOS)"/>
       </SearchPaths>
     </CompilerOptions>
-    <Files Count="7">
+    <Files Count="10">
       <Item1>
         <Filename Value="amw_ide_menu_items.pas"/>
         <HasRegisterProc Value="True"/>
@@ -40,6 +40,18 @@
         <Filename Value="uformupdatecodetemplate.lfm"/>
         <Type Value="LFM"/>
       </Item7>
+      <Item8>
+        <Filename Value="AndroidXMLResString.pas"/>
+        <UnitName Value="AndroidXMLResString"/>
+      </Item8>
+      <Item9>
+        <Filename Value="ufrmEditor.lfm"/>
+        <Type Value="LFM"/>
+      </Item9>
+      <Item10>
+        <Filename Value="ufrmEditor.pas"/>
+        <UnitName Value="ufrmEditor"/>
+      </Item10>
     </Files>
     <Type Value="RunAndDesignTime"/>
     <RequiredPkgs Count="2">

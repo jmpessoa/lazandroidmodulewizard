@@ -102,6 +102,7 @@ end;
 procedure TFormUpdateCodeTemplate.BitBtnOKClick(Sender: TObject);
 var
   packList: TstringList;
+  fileList: TStringList;
   pk, i: integer;
   strAux, strApp, strControls, strProject: string;
 begin
@@ -140,6 +141,13 @@ begin
   //upgrade "App.java"
   if  CheckGroupUpgradeTemplates.Checked[0] then
   begin
+    if FileExists(PathToJavaClass+DirectorySeparator+'App.java') then
+    begin
+      fileList:= TStringList.Create;
+      fileList.LoadFromFile(PathToJavaClass+DirectorySeparator+'App.java');
+      fileList.SaveToFile(PathToJavaClass+DirectorySeparator+'App.java'+'.bak');
+      fileList.Free;
+    end;
     packList.Clear;
     packList.LoadFromFile(PathToJavaTemplates+DirectorySeparator+'App.java');
     packList.Strings[0]:= 'package '+ PackageName+';'; //ex. package com.example.appbuttondemo1;
@@ -149,6 +157,13 @@ begin
   //upgrade "Controls.java"
   if  CheckGroupUpgradeTemplates.Checked[1] then
   begin
+    if FileExists(PathToJavaClass+DirectorySeparator+'Controls.java') then
+    begin
+      fileList:= TStringList.Create;
+      fileList.LoadFromFile(PathToJavaClass+DirectorySeparator+'Controls.java');
+      fileList.SaveToFile(PathToJavaClass+DirectorySeparator+'Controls.java'+'.bak');
+      fileList.Free;
+    end;
     packList.Clear;                                              //JavaClassName
     packList.LoadFromFile(PathToJavaTemplates+DirectorySeparator+'Controls.java');
     packList.Strings[0]:= 'package '+ PackageName+';'; //ex. package com.example.appbuttondemo1;
@@ -187,6 +202,13 @@ begin
     SynMemo2.Add('  gApp.Initialize;');
     SynMemo2.Add('  gApp.CreateForm(TAndroidModule1, AndroidModule1);');
     SynMemo2.Add('end.');
+    if FileExists(JNIProjectPath+DirectorySeparator+'controls.lpr') then
+    begin
+      fileList:= TStringList.Create;
+      fileList.LoadFromFile(JNIProjectPath+DirectorySeparator+'controls.lpr');
+      fileList.SaveToFile(JNIProjectPath+DirectorySeparator+'controls.lpr'+'.bak');
+      fileList.Free;
+    end;
     SynMemo2.SaveToFile(JNIProjectPath+DirectorySeparator+'controls.lpr');
   end;
 

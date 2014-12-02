@@ -6,11 +6,12 @@ interface
 
 uses
   Classes, SysUtils, Dialogs, IDECommands, MenuIntf, Forms,
-  uformsettingspaths, lazandroidtoolsexpert, uformupdatecodetemplate;
+  uformsettingspaths, lazandroidtoolsexpert, uformupdatecodetemplate, ufrmEditor;
 
 procedure StartPathTool(Sender: TObject);
 procedure StartLateTool(Sender: TObject);   //By Thierrydijoux!
 procedure StartUpdateCodeTemplateTool(Sender: TObject);
+procedure StartResEditor(Sender: TObject);   //By Thierrydijoux!
 
 procedure Register;
 
@@ -37,6 +38,13 @@ begin
   FormUpdateCodeTemplate.Show;
 end;
 
+procedure StartResEditor(Sender: TObject);
+begin
+  // Call res editor
+  frmEditor:= TfrmEditor.Create(etResString, nil);
+  frmEditor.Show;
+end;
+
 procedure Register;
 Var
   ideMnuAMW: TIDEMenuSection;
@@ -47,13 +55,17 @@ begin
   // Register submenu
   ideSubMnuAMW:= RegisterIDESubMenu(ideMnuAMW, 'AMW', 'Android Module Wizard');
 
+
   // Adding first entry
   RegisterIDEMenuCommand(ideSubMnuAMW, 'PathLateCmd', 'LATE: "Apk" Expert Tools [Build, Install, ...]', nil,@StartLateTool);
   // Adding second entry
+   RegisterIDEMenuCommand(ideSubMnuAMW, 'PathResEditorCmd', 'Resource Editor [strings.xml] ', nil,@StartResEditor);
+   // Adding third entry
   RegisterIDEMenuCommand(ideSubMnuAMW, 'PathUpdateCmd','Upgrade Code Templates [*.lpr, *.java]', nil,@StartUpdateCodeTemplateTool);
-  // Adding third entry
+  // Adding fourth entry
   RegisterIDEMenuCommand(ideSubMnuAMW, 'PathToolCmd', 'Path Settings [Jdk, Sdk, Ndk, ...]', nil,@StartPathTool);
   // And so on...
+
 end;
 
 end.

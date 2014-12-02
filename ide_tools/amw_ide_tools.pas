@@ -8,7 +8,7 @@ interface
 
 uses
   amw_ide_menu_items, lazandroidtoolsexpert, uformsettingspaths, 
-  uformupdatecodetemplate, LazarusPackageIntf;
+  uformupdatecodetemplate, AndroidXMLResString, ufrmEditor, LazarusPackageIntf;
 
 implementation
 
