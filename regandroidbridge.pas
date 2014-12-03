@@ -24,7 +24,6 @@ begin
   {$I jCheckBox_icon.lrs}
   {$I jRadioButton_icon.lrs}
   {$I jProgressBar_icon.lrs}
-  {$I jViewFlipper_icon.lrs}
   {$I jListView_icon.lrs}
   {$I jScrollView_icon.lrs}
   {$I jHorizontalScrollView_icon.lrs}
@@ -56,7 +55,6 @@ begin
     jCheckBox,
     jRadioButton,
     jProgressBar,
-    jViewFlipper,
     jListView,
     jScrollView,jHorizontalScrollView,
     jPanel,

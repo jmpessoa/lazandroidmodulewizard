@@ -1,4 +1,4 @@
-unit Laz_And_Controls_Events;
+unit Laz_And_Controls_Events;    //by jmpessoa
 
 {$mode delphi}
 
@@ -6,7 +6,7 @@ interface
 
 uses
    Classes, SysUtils, And_jni, And_jni_Bridge, Laz_And_Controls, AndroidWidget, bluetooth, bluetoothclientsocket,
-   bluetoothserversocket, spinner, location;
+   bluetoothserversocket, spinner, location, actionbartab;
 
    procedure Java_Event_pOnBluetoothEnabled(env: PJNIEnv; this: jobject; Obj: TObject);
    procedure Java_Event_pOnBluetoothDisabled(env: PJNIEnv; this: jobject; Obj: TObject);
@@ -30,6 +30,10 @@ uses
    procedure Java_Event_pOnLocationStatusChanged(env: PJNIEnv; this: jobject; Obj: TObject; status: integer; provider: JString; msgStatus: JString);
    procedure Java_Event_pOnLocationProviderEnabled(env: PJNIEnv; this: jobject; Obj: TObject; provider:JString);
    procedure Java_Event_pOnLocationProviderDisabled(env: PJNIEnv; this: jobject; Obj: TObject; provider: JString);
+
+  Procedure Java_Event_pOnActionBarTabSelected(env: PJNIEnv; this: jobject; Obj: TObject; view: jObject; title: jString);
+  Procedure Java_Event_pOnActionBarTabUnSelected(env: PJNIEnv; this: jobject; Obj: TObject; view:jObject; title: jString);
+
 
 
 implementation
@@ -419,6 +423,46 @@ begin
       pasprovider:= string( env^.GetStringUTFChars(Env,provider,@_jBoolean) );
     end;
     jLocation(Obj).GenEvent_OnLocationProviderDisabled(Obj, pasprovider);
+  end;
+end;
+
+Procedure Java_Event_pOnActionBarTabSelected(env: PJNIEnv; this: jobject; Obj: TObject; view: jObject; title: jString);
+var
+  pastitle: string;
+  _jBoolean: JBoolean;
+begin
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+  if Obj is jActionBarTab then
+  begin
+    jForm(jActionBarTab(Obj).Owner).UpdateJNI(gApp);
+    pastitle:= '';
+    if title <> nil then
+    begin
+      _jBoolean:= JNI_False;
+      pastitle:= string( env^.GetStringUTFChars(Env, title,@_jBoolean) );
+    end;
+    jActionBarTab(Obj).GenEvent_OnActionBarTabSelected(Obj, view, pastitle);
+  end;
+end;
+
+Procedure Java_Event_pOnActionBarTabUnSelected(env: PJNIEnv; this: jobject; Obj: TObject; view:jObject; title: jString);
+var
+   pastitle: string;
+  _jBoolean: JBoolean;
+begin
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+  if Obj is jActionBarTab then
+  begin
+    jForm(jActionBarTab(Obj).Owner).UpdateJNI(gApp);
+    pastitle:= '';
+    if title <> nil then
+    begin
+      _jBoolean:= JNI_False;
+      pastitle:= string(env^.GetStringUTFChars(Env, title,@_jBoolean) );
+    end;
+    jActionBarTab(Obj).GenEvent_OnActionBarTabUnSelected(Obj, view, pastitle);
   end;
 end;
 

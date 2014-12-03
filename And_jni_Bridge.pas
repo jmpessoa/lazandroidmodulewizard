@@ -216,7 +216,7 @@ function jForm_GetEnvironmentDirectoryPath(env: PJNIEnv; this: JObject; _jform: 
 function jForm_GetInternalAppStoragePath(env: PJNIEnv; this: JObject; _jform: JObject): string;
 function jForm_CopyFile(env: PJNIEnv; this: JObject; _jform: JObject; _srcFullName: string; _destFullName: string): boolean;
 function jForm_LoadFromAssets(env: PJNIEnv; this: JObject; _jform: JObject; _fileName: string): string;
-function jForm_isSdCardMounted(env: PJNIEnv; this: JObject; _jform: JObject): boolean;
+function jForm_IsSdCardMounted(env: PJNIEnv; this: JObject; _jform: JObject): boolean;
 
 // System Info
 Function  jSysInfo_ScreenWH            (env:PJNIEnv;this:jobject;context : jObject) : TWH;
@@ -350,6 +350,8 @@ Procedure jTextView_setTextSize        (env:PJNIEnv;this:jobject; TextView : jOb
 
 //by jmpessoa
 Procedure jTextView_setTextSize2        (env:PJNIEnv;this:jobject; TextView : jObject; size  : DWord);
+Procedure jTextView_SetTextTypeFace     (env:PJNIEnv;this:jobject; TextView : jObject; value  : DWord);
+
 
 Procedure jTextView_setTextAlignment   (env:PJNIEnv;this:jobject; TextView : jObject; align : DWord);
 //by jmpessoa
@@ -739,6 +741,8 @@ Procedure jImageView_setBitmapImage(env:PJNIEnv;this:jobject;
 
 Procedure jImageView_setBitmapImage2(env:PJNIEnv;this:jobject;
                                     ImageView : jObject; bitmap : jObject);
+
+Procedure jImageView_SetImageByIdentifier(env:PJNIEnv;this:jobject; ImageView : jObject; _imageIdentifier: string);
 
 
 //by jmpessoa
@@ -2481,14 +2485,14 @@ begin
   env^.DeleteLocalRef(env,_jParams[0].l);
 end;
 
-function jForm_isSdCardMounted(env: PJNIEnv; this: JObject; _jform: JObject): boolean;
+function jForm_IsSdCardMounted(env: PJNIEnv; this: JObject; _jform: JObject): boolean;
 var
    _jBoo: JBoolean;
    _jCls: jClass;
    _jMethod: jmethodID;
 begin
   _jCls := env^.GetObjectClass(env, _jform);
-  _jMethod:= env^.GetMethodID(env, _jCls, 'isSdCardMounted', '()Z');
+  _jMethod:= env^.GetMethodID(env, _jCls, 'IsSdCardMounted', '()Z');
   _jBoo:= env^.CallBooleanMethod(env, _jform, _jMethod);
   Result:= boolean(_jBoo);
 end;
@@ -3073,6 +3077,18 @@ begin
   _jParams[0].i := size;
   cls := env^.GetObjectClass(env, TextView);
   _jMethod:= env^.GetMethodID(env, cls, 'setTextSize2', '(I)V');
+  env^.CallVoidMethodA(env,TextView,_jMethod,@_jParams);
+end;
+
+Procedure jTextView_SetTextTypeFace(env:PJNIEnv;this:jobject; TextView : jObject; value  : DWord);
+var
+  _jMethod : jMethodID = nil;
+  _jParams : array[0..0] of jValue;
+  cls: jClass;
+begin
+  _jParams[0].i := value;
+  cls := env^.GetObjectClass(env, TextView);
+  _jMethod:= env^.GetMethodID(env, cls, 'SetTextTypeFace', '(I)V');
   env^.CallVoidMethodA(env,TextView,_jMethod,@_jParams);
 end;
 
@@ -6175,6 +6191,19 @@ Procedure jImageView_setBitmapImage2(env:PJNIEnv;this:jobject;
     cls := env^.GetObjectClass(env, ImageView);
  _jMethod:= env^.GetMethodID(env, cls, 'setBitmapImage', '(Landroid/graphics/Bitmap;)V');
   env^.CallVoidMethodA(env,ImageView,_jMethod,@_jParams);
+ end;
+
+Procedure jImageView_SetImageByIdentifier(env:PJNIEnv;this:jobject; ImageView : jObject; _imageIdentifier: string);
+ var
+  _jMethod : jMethodID = nil;
+  _jParams : array[0..0] of jValue;
+  cls: jClass;
+ begin
+  _jParams[0].l := env^.NewStringUTF(env, PChar(_imageIdentifier) );
+  cls := env^.GetObjectClass(env, ImageView);
+ _jMethod:= env^.GetMethodID(env, cls, 'SetImageByIdentifier', '(Ljava/lang/String;)V');
+  env^.CallVoidMethodA(env,ImageView,_jMethod,@_jParams);
+  env^.DeleteLocalRef(env,_jParams[0].l);
  end;
 
 //by jmpessoa

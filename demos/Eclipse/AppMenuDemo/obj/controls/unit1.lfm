@@ -85,20 +85,25 @@ object AndroidModule1: TAndroidModule1
   end
   object jMenu1: jMenu
     Options.Strings = (
+      'Red'
+      'Blue...'
+      'Olive'
+    )
+    Icons.Strings = (
+      'ic_action_cloud'
+      'ic_action_person'
+      'ic_action_picture'
+    )
+    left = 144
+    top = 224
+  end
+  object jContextMenu1: jContextMenu
+    Options.Strings = (
       'Green'
       'Blue'
       'Yellow'
     )
-    left = 48
-    top = 224
-  end
-  object jMenu2: jMenu
-    Options.Strings = (
-      'Red'
-      'Salmon'
-      'Olive'
-    )
-    left = 144
-    top = 224
+    left = 76
+    top = 322
   end
 end

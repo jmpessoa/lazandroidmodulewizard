@@ -8,8 +8,10 @@ interface
 
 uses 
   Classes,
-  spinner,
+  actionbartab,
   menu,
+  contextmenu,
+  spinner,
   location,
   preferences,
   textfilemanager,
@@ -32,8 +34,10 @@ implementation
   
 Procedure Register;
 begin
-  {$I jspinner_icon.lrs}
+  {$I jactionbartab_icon.lrs}
   {$I jmenu_icon.lrs}
+  {$I jcontextmenu_icon.lrs}
+  {$I jspinner_icon.lrs}
   {$I jlocation_icon.lrs}
   {$I jpreferences_icon.lrs}
   {$I jtextfilemanager_icon.lrs}
@@ -47,8 +51,10 @@ begin
   {$I jmyhello_icon.lrs}
   RegisterComponents('Android Bridges Extra',
     [
-      jSpinner,
+      jActionBarTab,
       jMenu,
+      jContextMenu,    
+      jSpinner,     
       jLocation,
       jPreferences,
       jTextFileManager,

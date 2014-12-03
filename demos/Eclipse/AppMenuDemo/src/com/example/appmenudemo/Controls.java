@@ -1,7 +1,7 @@
 package com.example.appmenudemo;
 
-//[LazAndroidModuleWizard - Version 0.6 - 12 October 2014 // Add FORM Designer and more!
-//
+//[LazAndroidModuleWizard - Version 0.6 - rev 06 - 03 December - 2014 
+
 //[https://github.com/jmpessoa/lazandroidmodulewizard]
 //
 
@@ -54,12 +54,18 @@ package com.example.appmenudemo;
 //
 
 import android.annotation.SuppressLint;
+import android.annotation.TargetApi;
 import android.app.ActionBar;
+import android.app.ActionBar.Tab;
+import android.app.ActionBar.TabListener;
 import android.app.Activity;
 import android.app.ActivityManager.RunningAppProcessInfo;
 import android.app.ActivityManager.RunningServiceInfo;
 import android.app.ActivityManager;
 import android.app.AlertDialog;
+import android.app.Fragment;
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
 import android.app.PendingIntent;
 import android.app.ProgressDialog;
 import android.bluetooth.BluetoothAdapter;
@@ -80,6 +86,7 @@ import android.content.pm.PackageManager.NameNotFoundException;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.content.res.AssetFileDescriptor;
+import android.content.res.AssetManager;
 import android.database.Cursor;
 import android.graphics.Bitmap.CompressFormat;
 import android.graphics.Bitmap;
@@ -89,6 +96,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.Typeface;
+import android.graphics.drawable.Drawable;
 import android.opengl.GLES10;
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView.Renderer;
@@ -125,6 +133,7 @@ import android.net.Uri;
 import android.net.wifi.WifiManager;
 import android.util.Log;
 import android.util.TypedValue;
+import android.view.ContextMenu;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.Gravity;
@@ -206,6 +215,8 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.ByteArrayBuffer;
 import org.apache.http.util.EntityUtils;
+
+//import com.example.appmenudemo.R.drawable;
 
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -335,10 +346,12 @@ private OnClickListener onClickListener;   // event
 
 private OnClickListener onViewClickListener;   // generic delegate event
 
-private OnItemClickListener onListItemClickListener;
+private OnItemClickListener onListItemClickListener; 
 
 private Boolean         enabled  = true;   //
 private Intent intent;
+
+private int mCountTab = 0;
 
 // Constructor
 public  jForm(Controls ctrls, long pasobj) {
@@ -366,20 +379,21 @@ onClickListener = new OnClickListener() {
   }; 
 };
 
-//Init Event
+//geric list item click Event
 onListItemClickListener = new OnItemClickListener() {
 @Override
 public  void onItemClick(AdapterView<?> parent, View v, int position, long id) {	   
-	 Log.i("Form_App_ItemListClicklistener","ItemClick!");
+	 //Log.i("Form_App_ItemListClicklistener","ItemClick!");
      controls.jAppOnListItemClick(parent, v, position, v.getId());
 }
 };
+
 
 //Init Event
 onViewClickListener = new OnClickListener() {
 public  void onClick(View view) {
  if (enabled) {
-   Log.i("Form_App_Clicklistener","Click!");
+   //Log.i("Form_App_Clicklistener","Click!");
    controls.jAppOnViewClick(view, view.getId());
  }
 };
@@ -396,8 +410,7 @@ public  RelativeLayout GetLayout() {
 }
 
 //
-public  void Show(int effect) {
-		
+public  void Show(int effect) {		
    //Log.i("Form:","Show");	
    controls.appLayout.addView( layout );
    parent = controls.appLayout;
@@ -405,8 +418,7 @@ public  void Show(int effect) {
    if (effect != Const.Eft_None) {
      layout.startAnimation(controls.Ani_Effect(effect,250));
    };
-
-   Log.i("Form:","Show --> OnJNIPrompt");
+   //Log.i("Form:","Show --> OnJNIPrompt");
 }
 
 //
@@ -469,14 +481,14 @@ public String GetDateTime() {
 }
 
 //Free object except Self, Pascal Code Free the class.
- public  void Free() {	
+ public void Free() {	
    if (parent != null) { controls.appLayout.removeView(layout); }  
    onClickListener = null;
    layout.setOnClickListener(null);
    layparam = null;
    layout   = null;
   
-   Log.i("jForm:", "Free");
+   //Log.i("jForm:", "Free");
  }
   
  //http://startandroid.ru/en/lessons/complete-list/250-lesson-29-invoking-activity-and-getting-a-result-startactivityforresult-method.html
@@ -526,6 +538,329 @@ public void SetWifiEnabled(boolean _status) {
     WifiManager wifiManager = (WifiManager)this.controls.activity.getSystemService(Context.WIFI_SERVICE);
     return  wifiManager.isWifiEnabled();	
  }
+              
+public String GetEnvironmentDirectoryPath(int _directory) {
+	
+	File filePath= null;
+	String absPath="";   //fail!
+	  
+	//Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS);break; //only Api 19!
+	if (_directory != 8) {		  	   	 
+	  switch(_directory) {	                       
+	    case 0:  filePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS); break;	   
+	    case 1:  filePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM); break;
+	    case 2:  filePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MUSIC); break;
+	    case 3:  filePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES); break;
+	    case 4:  filePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_NOTIFICATIONS); break;
+	    case 5:  filePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MOVIES); break;
+	    case 6:  filePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PODCASTS); break;
+	    case 7:  filePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_RINGTONES); break;
+	    
+	    case 9: absPath  = this.controls.activity.getFilesDir().getAbsolutePath(); break;      //Result : /data/data/com/MyApp/files	    	    
+	    case 10: absPath = this.controls.activity.getFilesDir().getPath();
+	             absPath = absPath.substring(0, absPath.lastIndexOf("/")) + "/databases"; break;
+	    case 11: absPath = this.controls.activity.getFilesDir().getPath();
+                 absPath = absPath.substring(0, absPath.lastIndexOf("/")) + "/shared_prefs"; break;	             
+	           
+	  }
+	  	  
+	  //Make sure the directory exists.
+      if (_directory < 8) { 
+    	 filePath.mkdirs();
+    	 absPath= filePath.getPath(); 
+      }	        
+      
+	}else {  //== 8 
+	    if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED) == true) {
+	    	filePath = Environment.getExternalStorageDirectory();  //sdcard!
+	    	// Make sure the directory exists.
+	    	filePath.mkdirs();
+	   	    absPath= filePath.getPath();
+	    }
+	}    	
+	    		  
+	return absPath;
+}
+
+public String GetInternalAppStoragePath() { //GetAbsoluteDirectoryPath 
+   String PathDat = this.controls.activity.getFilesDir().getAbsolutePath();       //Result : /data/data/com/MyApp/files
+   return PathDat;
+}
+
+
+private void copyFileUsingFileStreams(File source, File dest)
+		throws IOException {
+	InputStream input = null;
+	OutputStream output = null;
+	try {
+		input = new FileInputStream(source);
+		output = new FileOutputStream(dest);
+		byte[] buf = new byte[1024];
+		int bytesRead;
+		while ((bytesRead = input.read(buf)) > 0) {
+			output.write(buf, 0, bytesRead);
+		}
+	} finally {
+		input.close();
+		output.close();
+	}
+}
+
+public boolean CopyFile(String _scrFullFileName, String _destFullFileName) {
+	File src= new File(_scrFullFileName);
+	File dest= new File(_destFullFileName);
+	try {
+		copyFileUsingFileStreams(src, dest);
+		return true;
+	} catch (IOException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+		return false;
+	}
+}
+
+//ref. https://xjaphx.wordpress.com/2011/10/02/store-and-use-files-in-assets/
+//result: path to new storage [Internal App Storage]
+
+public String LoadFromAssets(String _filename){
+	    
+	    String pathRes="";
+	    
+		InputStream is = null;
+		FileOutputStream fos = null;					    		           			
+		String PathDat = controls.activity.getFilesDir().getAbsolutePath();		
+		try {		   		     			
+			File outfile = new File(PathDat, _filename);				
+							
+			fos = new FileOutputStream(outfile);  //save to data/data/your_package/files/your_file_name										
+			is = controls.activity.getAssets().open(_filename);	     
+			int size = is.available();	     
+			byte[] buffer = new byte[size];
+			
+			for (int c = is.read(buffer); c != -1; c = is.read(buffer)){
+		      fos.write(buffer, 0, c);
+			}	     								
+			is.close();								
+			fos.close();
+			pathRes= PathDat +"/"+ _filename;
+			
+		}catch (IOException e) {
+		     e.printStackTrace();		     
+		}
+		
+		return pathRes;
+}
+
+public boolean IsSdCardMounted() {		  
+   return Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED); 
+}
+
+public void DeleteFile(String _filename) {
+   this.controls.activity.deleteFile(_filename);
+}
+
+public void DeleteFile(String _fullPath, String _filename) {	
+   File file;
+   if ( _fullPath.equalsIgnoreCase("") ) {	
+      file = new File(Environment.getExternalStorageDirectory()+"/"+ _filename); // root
+   }
+   else {
+	  file = new File(_fullPath+"/"+ _filename);   
+   }  
+   file.delete();   
+}
+
+public void DeleteFile(int _environmentDir, String _filename) {		  
+	String baseDir = GetEnvironmentDirectoryPath(_environmentDir);
+	if (!baseDir.equalsIgnoreCase("")) {
+   	    File file = new File(baseDir, _filename);    	    
+	    file.delete();	   
+	}
+}
+
+public String CreateDir(String _dirName) {
+	this.controls.activity.getDir(_dirName, 0); //if not exist -->> CREATE!
+    String absPath = this.controls.activity.getFilesDir().getPath();
+    absPath = absPath.substring(0, absPath.lastIndexOf("/")) + "/"+_dirName; 
+	return absPath;
+}
+
+public String CreateDir(int _environmentDir, String _dirName) {	
+    String baseDir = GetEnvironmentDirectoryPath(_environmentDir);
+    if (!baseDir.equalsIgnoreCase("")) {
+       File file = new File(baseDir, _dirName);    
+       file.mkdirs();        
+  	  return file.getPath(); 
+    }else return "";
+}
+
+public String CreateDir(String _fullPath, String _dirName) {	
+    File file = new File(_fullPath, _dirName);    
+    file.mkdirs();      
+    return file.getPath();
+}
+
+/*
+Added in API level 11
+Returns whether the primary "external" storage device is emulated. If true, 
+data stored on this device will be stored on a portion of the internal storage system.
+*/
+public boolean IsExternalStorageEmulated () {
+  return  Environment.isExternalStorageEmulated();
+}	
+
+/*
+Added in API level 9
+Returns whether the primary "external" storage device is removable.
+*/
+public boolean IsExternalStorageRemovable() {
+	return  Environment.isExternalStorageRemovable();
+}	
+
+//
+public  String GetjFormVersionFeatures() { 
+    String listVersionInfo = 
+		   "6$5=SetWifiEnabled;" +  //[0.6-05]
+		   "6$5=IsWifiEnabled;" +
+		   "6$5=GetEnvironmentDirectoryPath;" +
+		   "6$5=GetInternalAppStoragePath;" +
+		   "6$5=CopyFile;" +
+		   "6$5=LoadFromAssets;" +  		         
+		   "6$5=IsSdCardMounted;" +
+		   "6$5=DeleteFile;" +
+		   "6$5=CreateDir;" +
+		   "6$5=IsExternalStorageEmulated;" +
+		   "6$5=IsExternalStorageRemovable";  
+    return listVersionInfo;
+}
+
+
+//http://daniel-codes.blogspot.com.br/2009/12/dynamically-retrieving-resources-in.html
+
+/*
+*Given that you can access R.java just fine normally in code.
+*As long as you are retrieving data from your application's R.java - Use reflection!
+*/
+public int GetStringResourceId(String _resName) {
+	  try {
+	     Class<?> res = R.string.class;
+	     Field field = res.getField(_resName); 
+	     int strId = field.getInt(null);
+	     return strId;
+	   }
+	   catch (Exception e) {
+	     Log.e("jForm", "Failure to Get String  Resource", e);
+	     return 0;
+	   }   
+}
+
+//by jmpessoa
+public String GetStringResourceById(int _resID) {   	
+   return (String)( this.controls.activity.getResources().getText(_resID));
+}
+
+//by jmpessoa
+public int GetDrawableResourceId(String _resName) {
+	  try {
+	     Class<?> res = R.drawable.class;
+	     Field field = res.getField(_resName);  //"drawableName"
+	     int drawableId = field.getInt(null);
+	     return drawableId;
+	  }
+	  catch (Exception e) {
+	     Log.e("jForm", "Failure to get drawable id.", e);
+	     return 0;
+	  }
+}
+
+//by jmpessoa
+public Drawable GetDrawableResourceById(int _resID) {
+	return (Drawable)( this.controls.activity.getResources().getDrawable(_resID));	
+}
+
+//by  thierrydijoux
+public String GetQuantityStringByName(String _resName, int _quantity) {
+	int id = this.controls.activity.getResources().getIdentifier(_resName, "plurals", this.controls.activity.getPackageName());
+  String value = id == 0 ? "" : (String) this.controls.activity.getResources().getQuantityString(id, _quantity, _quantity);
+	return value;
+}
+
+//by thierrydijoux
+public String GetStringResourceByName(String _resName) {
+	int id = this.controls.activity.getResources().getIdentifier(_resName, "string", this.controls.activity.getPackageName());
+  String value = id == 0 ? "" : (String) this.controls.activity.getResources().getText(id);
+	return value;
+}   
+
+
+public ActionBar GetActionBar() { 
+    return this.controls.activity.getActionBar();
+}
+
+/*
+ * To disableAction-bar Icon and Title, you must do two things:
+ setDisplayShowHomeEnabled(false);  // hides action bar icon
+ setDisplayShowTitleEnabled(false); // hides action bar title
+ */
+
+public void HideActionBar() {
+ ActionBar actionBar = this.controls.activity.getActionBar(); 
+ actionBar.hide();          
+}
+
+public void ShowActionBar() {	         
+	ActionBar actionBar = this.controls.activity.getActionBar();
+	actionBar.show();
+}
+
+//Hide the title label
+public void ShowTitleActionBar(boolean _value) {
+	ActionBar actionBar = this.controls.activity.getActionBar();
+    actionBar.setDisplayShowTitleEnabled(_value);
+}
+
+//Hide the logo
+public void HideLogoActionBar(boolean _value) { 
+   ActionBar actionBar = this.controls.activity.getActionBar();	    
+   actionBar.setDisplayShowHomeEnabled(_value);
+}
+
+//set a title and subtitle to the Action bar as shown in the code snippet.
+public void SetTitleActionBar(String _title) {
+	ActionBar actionBar = this.controls.activity.getActionBar();   	
+    actionBar.setTitle(_title);    
+}
+
+//set a title and subtitle to the Action bar as shown in the code snippet.
+public void SetSubTitleActionBar(String _subtitle) {
+   ActionBar actionBar = this.controls.activity.getActionBar();    
+   actionBar.setSubtitle(_subtitle);
+   //actionBar.setDisplayHomeAsUpEnabled(true);  
+}
+
+//forward [<] activity! // If your minSdkVersion is 11 or higher!
+/*.*/public void SetDisplayHomeAsUpEnabledActionBar(boolean _value) {
+   ActionBar actionBar = this.controls.activity.getActionBar();    
+   actionBar.setDisplayHomeAsUpEnabled(_value);
+}	
+
+public void SetIconActionBar(String _iconIdentifier) {
+	ActionBar actionBar = this.controls.activity.getActionBar();   	
+    actionBar.setIcon(GetDrawableResourceById(GetDrawableResourceId(_iconIdentifier)));
+}
+
+public void SetTabNavigationModeActionBar(){
+	ActionBar actionBar = this.controls.activity.getActionBar();
+	actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);	//API 11
+	actionBar.setSelectedNavigationItem(0);
+}
+
+//This method remove all tabs from the action bar and deselect the current tab
+public void RemoveAllTabsActionBar() {
+	ActionBar actionBar = this.controls.activity.getActionBar();
+	actionBar.removeAllTabs();
+}
+
 
 
 }
@@ -731,6 +1066,17 @@ setOnClickListener(null);
 public void setTextSize2(int value) {
 	this.setTextSize(value);
 }
+
+/*
+ * 	this.setTypeface(null, Typeface.BOLD_ITALIC);
+	this.setTypeface(null, Typeface.BOLD);
+    this.setTypeface(null, Typeface.ITALIC);
+    this.setTypeface(null, Typeface.NORMAL);
+ */
+public void SetTextTypeFace(int _typeface) { //by jmpessoa
+	 this.setTypeface(null, _typeface);
+}
+
 
 
 }
@@ -1110,8 +1456,11 @@ lparams = new LayoutParams(100,100);     // W,H
 lparams.setMargins(5,5,5,5); // L,T,
 // Init Event
 onClickListener = new OnClickListener() {
-  public  void onClick(View view) {	
-     controls.pOnClick(PasObj,Const.Click_Default); 
+  public  void onClick(View view) {
+	  
+	Log.i("TAG_CLICK", "jButton_Clicked!"); //just demo for LATE logcat filter!
+	
+    controls.pOnClick(PasObj,Const.Click_Default); 
   }
 };
 
@@ -1805,6 +2154,29 @@ public  void setImage(String str) {
 	                            return; };
 	  bmp = BitmapFactory.decodeFile( str );
 	  this.setImageBitmap(bmp);
+}
+
+//by jmpessoa
+public int GetDrawableResourceId(String _resName) {
+	  try {
+	     Class<?> res = R.drawable.class;
+	     Field field = res.getField(_resName);  //"drawableName"
+	     int drawableId = field.getInt(null);
+	     return drawableId;
+	  }
+	  catch (Exception e) {
+	     Log.e("jForm", "Failure to get drawable id.", e);
+	     return 0;
+	  }
+}
+
+//by jmpessoa
+public Drawable GetDrawableResourceById(int _resID) {
+	return (Drawable)( this.controls.activity.getResources().getDrawable(_resID));	
+}
+        
+public void SetImageByIdentifier(String _imageIdentifier) {
+	this.setImageDrawable(GetDrawableResourceById(GetDrawableResourceId(_imageIdentifier)));
 }
 
 //by jmpessoa
@@ -4706,7 +5078,7 @@ controls = ctrls;
 
 }
 
-public  void loadFile(String filename) {
+public  void loadFile(String filename) {  //full file name!
   //if (bmp != null) { bmp.recycle(); }
   bmp = BitmapFactory.decodeFile(filename);
 }
@@ -4769,7 +5141,7 @@ public  Bitmap jInstance() {
 //by jmpessoa
 public byte[] GetByteArrayFromBitmap() {
     ByteArrayOutputStream stream = new ByteArrayOutputStream();
-    this.bmp.compress(CompressFormat.PNG, 0, stream);
+    this.bmp.compress(CompressFormat.PNG, 0, stream); //O: PNG will ignore the quality setting...
     Log.i("GetByteArrayFromBitmap","size="+ stream.size());
     return stream.toByteArray();
 }
@@ -5746,36 +6118,12 @@ class jTextFileManager /*extends ...*/ {
     	intent = null;
     }
     
-  //Once you choose bluetooth, the android bluetooth application will launch and let you pick the device to send it too.
-    public void ShareFromSdCardFile(String _filename) {        	
-    	//File externalFile = new File(Environment.getExternalStorageDirectory().getPath() +"/"+ _filename);
-    	File file = new File(Environment.getExternalStorageDirectory(), _filename);    	    	    	 
-    	intent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(file));
-    	controls.activity.startActivity(intent);    	
-    }
-        
-   //Once you choose bluetooth, the android bluetooth application will launch and let you pick the device to send it too.
-    public void ShareFromFile(String _filename) {    	    	    	
-    	//String PathDat = context.getFilesDir().getAbsolutePath();   //   //Result : /data/data/com/MyApp/files 	
-    	//File file = new File(PathDat+"/"+ _filename);
-    	File file = new File(context.getFilesDir().getAbsolutePath(),_filename);
-    	intent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(file));
-    	controls.activity.startActivity(intent);    	
-    }
-        
-    public String GetPathToExternalStorage() {    	
-      return Environment.getExternalStorageDirectory().getPath();
-    }
-        
-    public String GetPathToFile() {    	       	    
-      return context.getFilesDir().getAbsolutePath(); //Result : /data/data/com/MyApp/files 
-    }
     
     public void CopyToClipboard(String _text) {
     	mClipData = ClipData.newPlainText("text", _text);
         mClipBoard.setPrimaryClip(mClipData);
     }
-    
+       
     public String PasteFromClipboard() {
         ClipData cdata = mClipBoard.getPrimaryClip();
         ClipData.Item item = cdata.getItemAt(0);
@@ -5800,11 +6148,21 @@ class jTextFileManager /*extends ...*/ {
          outputStreamWriter.close();
      }
      catch (IOException e) {
-         Log.i("jTextFileManager", "File write failed: " + e.toString());
+         Log.i("jTextFileManager", "SaveToFile failed: " + e.toString());
      }
-
    }
 
+   public void SaveToFile(String _txtContent, String _path, String _filename){
+	     FileWriter fWriter;     
+	     try{ // Environment.getExternalStorageDirectory().getPath()
+	          fWriter = new FileWriter(_path +"/"+ _filename);
+	          fWriter.write(_txtContent);
+	          fWriter.flush();
+	          fWriter.close();
+	      }catch(Exception e){
+	          e.printStackTrace();
+	      }
+	   }   
    public String LoadFromFile(String _filename) {
 
      String retStr = "";
@@ -5827,39 +6185,35 @@ class jTextFileManager /*extends ...*/ {
          }
      }
      catch (IOException e) {
-         Log.i("jTextFileManager", "Can not read file: " + e.toString());
+         Log.i("jTextFileManager", "LoadFromFile error: " + e.toString());
      }
 
      return retStr;
    }
    
+   
+   public String LoadFromFile(String _path, String _filename) {
+	     char buf[] = new char[512];
+	     FileReader rdr;
+	     String contents = "";  //new File(Environment.getExternalStorageDirectory(), "alert.txt");
+	     try {                  // Environment.getExternalStorageDirectory().getPath() --> /sdcard
+	         rdr = new FileReader(_path+"/"+_filename);
+	         int s = rdr.read(buf);
+	         for(int k = 0; k < s; k++){
+	             contents+=buf[k];
+	         }
+	         
+	         rdr.close();
+	     } catch (Exception e) {
+	         e.printStackTrace();
+	     }
+	     return contents;
+	   }
+   
    //http://manojprasaddevelopers.blogspot.com.br/search/label/Write%20and%20ReadFile
-   /*.*/public String ReadTextFile(String _filename)
-   {
-      String json = "";
-      try
-      {
-        InputStream is = context.getAssets().open(_filename);
-        int size = is.available();
-        
-        
-       
-        byte[] buffer = new byte[size];
-        is.read(buffer);
-        is.close();
-       
-        json = new String(buffer, "UTF-8");
-       
-      } catch (IOException e){
-    	 //
-      }
-      
-      return json.toString();
-     
-   }
       
    //http://www.coderzheaven.com/2012/01/29/saving-textfile-to-sdcard-in-android/
-   public void SaveToSdCardFile(String _txtContent, String _filename){
+   public void SaveToSdCard(String _txtContent, String _filename){
      FileWriter fWriter;     
      try{ // Environment.getExternalStorageDirectory().getPath()
           fWriter = new FileWriter(Environment.getExternalStorageDirectory().getPath() +"/"+ _filename);
@@ -5871,7 +6225,7 @@ class jTextFileManager /*extends ...*/ {
       }
    }
    
-   public String LoadFromSdCardFile(String _filename){
+   public String LoadFromSdCard(String _filename){
      char buf[] = new char[512];
      FileReader rdr;
      String contents = "";  //new File(Environment.getExternalStorageDirectory(), "alert.txt");
@@ -5881,6 +6235,7 @@ class jTextFileManager /*extends ...*/ {
          for(int k = 0; k < s; k++){
              contents+=buf[k];
          }
+         
          rdr.close();
      } catch (Exception e) {
          e.printStackTrace();
@@ -5888,31 +6243,50 @@ class jTextFileManager /*extends ...*/ {
      return contents;
    }
    
-   public String LoadFromAssetsFile(String _filename) {  
-	   InputStream is = null;
-	   FileOutputStream fos = null;	  	   
-	   String path = '/' + _filename.substring(1,_filename.lastIndexOf("/"));	   
-	   String scrFilename = _filename.substring(_filename.lastIndexOf("/")+1);	   	   	   	  
-	   File outDir = new File(path);	   
-	   outDir.mkdirs();	   
-	   try {		   
-	     is = controls.activity.getAssets().open(scrFilename);	     
-	     int size = is.available();	     
-	     byte[] buffer = new byte[size];	     
-	     File outfile = new File(_filename);
-	     fos = new FileOutputStream(outfile);  //save to data/data/your_package/files/your_file_name
-	     for (int c = is.read(buffer); c != -1; c = is.read(buffer)){
-	       fos.write(buffer, 0, c);
-	     }	     
-	     is.close();
-	     fos.close();
-	   }
-	   catch (IOException e) {
-	      e.printStackTrace();       
-	   }	   	 
-       return  this.LoadFromFile(scrFilename);
-   }    
+   //https://xjaphx.wordpress.com/2011/10/02/store-and-use-files-in-assets/    
+   public String LoadFromAssets(String _filename) {
+	   String str;
+       // load text
+       try {
+    	   //Log.i("loadFromAssets", "name: "+_filename);
+           // get input stream for text
+           InputStream is = controls.activity.getAssets().open(_filename);
+           // check size
+           int size = is.available();
+           // create buffer for IO
+           byte[] buffer = new byte[size];
+           // get data to buffer
+           is.read(buffer);
+           // close stream
+           is.close();
+           // set result to TextView
+           str = new String(buffer);
+           //Log.i("loadFromAssets", ":: "+ str);
+           return str.toString();
+       }
+       catch (IOException ex) {
+    	   //Log.i("loadFromAssets", "error!");
+           return "";
+       }       
+   }
+   
+   public void CopyContentToClipboard(String _filename) {
+   	 String txt = LoadFromFile(_filename);
+   	 mClipData = ClipData.newPlainText("text", txt);
+     mClipBoard.setPrimaryClip(mClipData);
+   }
+   
+   public void PasteContentFromClipboard(String _filename) {
+      ClipData cdata = mClipBoard.getPrimaryClip();
+      ClipData.Item item = cdata.getItemAt(0);
+      String txt = item.getText().toString();
+      SaveToFile(txt, _filename);
+   }   
+
 }
+
+
+
 
 /*Draft java code by "Lazarus Android Module Wizard"*/
 /*https://github.com/jmpessoa/lazandroidmodulewizard*/
@@ -6121,34 +6495,50 @@ class jMenu /*extends ...*/ {
        pascalObj = _Self;
        controls  = _ctrls;
        mMenu     = null;
-       mSubMenus = new SubMenu[8];
+       mSubMenus = new SubMenu[9]; //max sub menus number = 10!
     }
   
     public void jFree() {
         //free local objects...
+        if (mMenu != null){	
+        	  for(int i=0; i < mCountSubMenu; i++){
+        		 mSubMenus[i] = null;
+        	  }    	 
+        }
     	mMenu = null;
     }
   
+    
+    //http://android-developers.blogspot.com.br/2012/01/say-goodbye-to-menu-button.html 
+    /*
+     * ... if you do not want an action bar: set targetSdkVersi to 13 or below ....!! 
+     */
+    
     //write others [public] methods code here......
-    //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...       
-    public void Add(Menu _menu, int _itemID, String _caption){
-	  _menu.add(0,_itemID,0 ,(CharSequence)_caption);
-	  if (mMenu == null) mMenu = _menu;
-	  Log.i("jMenu_add", _caption);
+    //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ... 
+    
+    /*
+     * The overflow icon [...] only appears on phones that have no menu hardware keys. 
+     * Phones with menu keys display the action overflow when the user presses the key.
+     */
+    
+    public void Add(Menu _menu, int _itemID, String _caption){    	
+      _menu.add(0,_itemID,0 ,(CharSequence)_caption); //return MenuItem
+      if (mMenu == null) mMenu = _menu; 
+    }
+        
+    //TODO: ic_launcher.png just for test!
+    public void AddDrawable(Menu _menu, int _itemID, String _caption){    	     	
+       String _resName = "ic_launcher"; //ok       
+       MenuItem item = _menu.add(0,_itemID,0 ,(CharSequence)_caption);       
+       item.setIcon(GetDrawableResourceId(_resName));
+       if (mMenu == null) mMenu = _menu;
     }
     
     public void AddCheckable(Menu _menu, int _itemID, String _caption){
-	   _menu.add(0,_itemID,0 ,(CharSequence)_caption).setCheckable(true);
-	   if (mMenu == null) mMenu = _menu;
-	   Log.i("jMenu_AddCheckable", _caption);
-    }
-    
-    //TODO: ic_launcher.png just for test!
-    public void AddDrawable(Menu _menu, int _itemID, String _caption){    	
- 	   _menu.add(0,_itemID,0 ,(CharSequence)_caption).setIcon(R.drawable.ic_launcher);
- 	   if (mMenu == null) mMenu = _menu;
- 	   Log.i("jMenu_AddDrawable", _caption);
-    }
+        _menu.add(0,_itemID,0 ,(CharSequence)_caption).setCheckable(true);
+        if (mMenu == null) mMenu = _menu;
+     }
     
     public void CheckItemCommute(MenuItem _item){
     	int flag = 0;
@@ -6157,7 +6547,7 @@ class jMenu /*extends ...*/ {
     	  case 0: _item.setChecked(false); 
     	  case 1: _item.setChecked(true);
         }
-  	   Log.i("jMenu_CheckItemCommute", _item.getTitle().toString());
+  	    Log.i("jMenu_CheckItemCommute", _item.getTitle().toString());
     }
     
     public void CheckItem(MenuItem _item){
@@ -6170,48 +6560,29 @@ class jMenu /*extends ...*/ {
    	   Log.i("jMenu_UnCheckItem", _item.getTitle().toString());
     }    
     
-    public void AddSubMenu(Menu _menu, int _startItemID, String[] _captions){
-    	
+    public void AddSubMenu(Menu _menu, int _startItemID, String[] _captions){    	
     	int size = _captions.length;
-    	if (size > 1) {
-    			
-     	   mSubMenus[mCountSubMenu] = _menu.addSubMenu((CharSequence)_captions[0]); //main title
-     	   
-     	   //int resID = context.getResources().getIdentifier("ic_launcher", "drawable", context.getPackageName());
-     	   //ex: Read the resource:
-     	   // InputStream inputStream = context.getResources().openRawResource(resID);
-     	   mSubMenus[mCountSubMenu].setHeaderIcon(R.drawable.ic_launcher);  
-     	   
-    	   Log.i("jMenu_addSubMenu", _captions[0]);
-    	   
+    	if (size > 1) {    		    	     	   
+    	   mSubMenus[mCountSubMenu] = _menu.addSubMenu((CharSequence)_captions[0]); //main title      	  
+     	   mSubMenus[mCountSubMenu].setHeaderIcon(R.drawable.ic_launcher);      	       	   
     	   for(int i=1; i < size; i++) {    	
-    		   mSubMenus[mCountSubMenu].add(0,_startItemID+(i-1),0,(CharSequence)_captions[i]); //sub titles...
-    	     Log.i("jMenu_addSubMenu", _captions[i]);
-    	   }
-    	   
-    	   mCountSubMenu++;
-    	   
-    	   if (mMenu == null) mMenu = _menu;
+    		   MenuItem item = mSubMenus[mCountSubMenu].add(0,_startItemID+(i-1),0,(CharSequence)_captions[i]); //sub titles...    		       	    
+    	   }    	   
+    	   mCountSubMenu++;    	       	   
     	}    	    	
     }
 
    //TODO: ic_launcher.png just for test!
-    public void AddCheckableSubMenu(Menu _menu, int _startItemID, String[] _captions){
-    	
+    public void AddCheckableSubMenu(Menu _menu, int _startItemID, String[] _captions){    	
     	int size = _captions.length;
-    	if (size > 1) {
-    		
+    	if (size > 1) {    		
     	   mSubMenus[mCountSubMenu] = _menu.addSubMenu((CharSequence)_captions[0]); //main title
-    	   mSubMenus[mCountSubMenu].setHeaderIcon(R.drawable.ic_launcher);  
-     	   
+    	   mSubMenus[mCountSubMenu].setHeaderIcon(R.drawable.ic_launcher);       	   
     	   Log.i("jMenu_AddCheckableSubMenu", _captions[0]);
     	   for(int i=1; i < size; i++) {    	
     		  mSubMenus[mCountSubMenu].add(0,_startItemID+(i-1),0,(CharSequence)_captions[i]).setCheckable(true); //sub titles...
-    	      Log.i("jMenu_addSubMenu", _captions[i]);
-    	   }
-    	   
-    	   mCountSubMenu++;
-    	   if (mMenu == null) mMenu = _menu;	   
+    	   }    	   
+    	   mCountSubMenu++;	   
     	}
     }
     
@@ -6256,7 +6627,222 @@ class jMenu /*extends ...*/ {
     public void RegisterForContextMenu(View _view){
        controls.activity.registerForContextMenu(_view);
     }
+        
+    //http://daniel-codes.blogspot.com.br/2009/12/dynamically-retrieving-resources-in.html
+   //Just note that in case you want to retrieve Views (Buttons, TextViews, etc.) 
+    //you must implement R.id.class instead of R.drawable.
+    private int GetDrawableResourceId(String _resName) {
+    	  try {
+    	     Class<?> res = R.drawable.class;
+    	     Field field = res.getField(_resName);  //"drawableName"
+    	     int drawableId = field.getInt(null);
+    	     return drawableId;
+    	  }
+    	  catch (Exception e) {
+    	     Log.e("MyTag", "Failure to get drawable id.", e);
+    	     return 0;
+    	  }
+    }
     
+    private Drawable GetDrawableResourceById(int _resID) {   	    	 
+    	 return (Drawable)( this.controls.activity.getResources().getDrawable(_resID));
+    }
+    
+    //_itemType --> 0:Default, 1:Checkable
+    public void AddItem(Menu _menu, int _itemID, String _caption, String _iconIdentifier, int _itemType, int _showAsAction){    	     	
+    	MenuItem item = _menu.add(0,_itemID,0 ,(CharSequence)_caption);
+    			
+    	switch  (_itemType) {
+    	case 1:  item.setCheckable(true); break;    	
+    	}
+    	
+        if (!_iconIdentifier.equals("")) {
+           item.setIcon(GetDrawableResourceId(_iconIdentifier));
+        }
+                      
+        switch (_showAsAction) {
+          case 0: item.setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER); break;
+          case 1: item.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM); break;
+          case 2: item.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS); break;
+          case 4: item.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM|MenuItem.SHOW_AS_ACTION_WITH_TEXT); 
+                  item.setTitleCondensed("ok0"); break;                    
+          case 5: item.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS|MenuItem.SHOW_AS_ACTION_WITH_TEXT);
+                  item.setTitleCondensed("ok1");break;
+        } 	
+        
+  	   if (mMenu == null) mMenu = _menu;
+  	   
+     }
+    
+    ////Sub menus Items: Do not support item icons, or nested sub menus.    
+    public void AddItem(SubMenu _subMenu, int _itemID, String _caption, int _itemType){    	     	        
+        MenuItem item = _subMenu.add(0,_itemID,0 ,(CharSequence)_caption);        
+    	switch  (_itemType) {
+    	case 1:  item.setCheckable(true); break;    	
+    	}                            
+     }
+    
+    public SubMenu AddSubMenu(Menu _menu, String _title, String _headerIconIdentifier){  
+     	   SubMenu sm =_menu.addSubMenu((CharSequence)_title); //main title     	        	       	  
+     	   sm.setHeaderIcon(GetDrawableResourceId(_headerIconIdentifier));
+    	   mSubMenus[mCountSubMenu] = sm;      	       	     	       	       	   
+    	   mCountSubMenu++;    	   
+    	   return sm;  	    	
+    }  
+}
+
+
+/*Draft java code by "Lazarus Android Module Wizard" [4-5-14 20:46:56]*/
+/*https://github.com/jmpessoa/lazandroidmodulewizard*/
+/*jControl template*/
+
+class jContextMenu /*extends ...*/ {
+  
+    private long pascalObj = 0;      // Pascal Object
+    private Controls controls  = null;   // Control Class -> Java/Pascal Interface ...
+    private Context  context   = null;
+    private ContextMenu  mMenu = null;
+    private ArrayList<String>    mItemList;
+    
+    private String mHeaderTitle;
+    private String mHeaderIconIdentifier;
+    
+    //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
+  
+    public jContextMenu(Controls _ctrls, long _Self) { //Add more others news "_xxx" params if needed!
+       //super(_ctrls.activity);
+       context   = _ctrls.activity;
+       pascalObj = _Self;
+       controls  = _ctrls;
+       mMenu     = null;
+       mItemList = new ArrayList<String>();
+    }
+  
+    public void jFree() {
+        //free local objects...
+    	mMenu = null;
+    	mItemList.clear();
+    	mItemList = null;    	    	
+    }
+      
+    public int CheckItemCommute(MenuItem _item){
+    	int flag = 0;
+    	
+    	int id = _item.getItemId();
+    	if (_item.isChecked()) flag = 1;
+    	switch (flag) {
+    	  case 0: _item.setChecked(false);
+    	           mItemList.remove(Integer.toString(id));                   
+    	  break; 
+    	  case 1: _item.setChecked(true);
+    	          mItemList.remove(Integer.toString(id));
+    	          mItemList.add(Integer.toString(id)); 
+    	  break;
+        }
+  	   return id;
+    }
+    
+    public int CheckItem(MenuItem _item){
+       _item.setChecked(true);
+       int id = _item.getItemId();
+       mItemList.remove(Integer.toString(id));
+       mItemList.add(Integer.toString(id));
+       return  id;
+    }
+    
+    public int UnCheckItem(MenuItem _item){
+      _item.setChecked(false);       
+      int id =_item.getItemId();
+      mItemList.remove(Integer.toString(id));
+      return id;
+    }    
+        
+    public int Size(){
+    	if (mMenu != null)
+    	   return mMenu.size();
+    	else 
+    	  return 0;   			
+    }
+    
+    public MenuItem FindMenuItemByID(int _itemID){
+    	if (mMenu != null) return mMenu.findItem(_itemID);
+    	else return null;
+    }
+
+    public MenuItem GetMenuItemByIndex(int _index){
+    	if (mMenu != null)
+    	   return mMenu.getItem(_index);
+    	else return null;
+    }
+    
+    public void UnCheckAllMenuItem(){
+      if (mMenu != null){	
+    	 for(int index=0; index < mMenu.size(); index++){
+    		mMenu.getItem(index).setChecked(false);
+    	 }    	 
+    	 mItemList.clear();
+      } 	
+    }
+        
+    public void RegisterForContextMenu(View _view){
+       controls.activity.registerForContextMenu(_view);
+    }   
+    
+    //_itemType --> 0:Default, 1:Checkable
+    public MenuItem AddItem(ContextMenu _menu, int _itemID, String _caption, int _itemType){    	     	
+    	MenuItem item = _menu.add(0,_itemID,0 ,(CharSequence)_caption);
+    	
+    	switch  (_itemType) {
+    	case 1:  item.setCheckable(true); break;    	
+    	}
+    	                      
+  	    if (mMenu == null) mMenu = _menu;
+  	   
+  	    return item;
+    }
+    
+    private int GetDrawableResourceId(String _resName) {
+  	  try {
+  	     Class<?> res = R.drawable.class;
+  	     Field field = res.getField(_resName);  //"drawableName"
+  	     int drawableId = field.getInt(null);
+  	     return drawableId;
+  	  }
+  	  catch (Exception e) {
+  	     Log.e("jContextMenu_error", "Failure to get drawable id.", e);
+  	     return 0;
+  	  }
+    }
+    
+    public void SetHeader(ContextMenu _menu, String _title, String _iconIdentifier){
+    	mHeaderTitle = _title;
+    	mHeaderIconIdentifier = _iconIdentifier;
+  	   _menu.setHeaderTitle((CharSequence)_title);
+  	   _menu.setHeaderIcon(GetDrawableResourceId(_iconIdentifier));
+  	   if (mMenu == null) mMenu = _menu;
+    }
+    
+    public void SetHeaderTitle(String _title){    	     	  
+   	   mHeaderTitle = _title;
+   	   if (mMenu != null) {
+   		   mMenu.setHeaderTitle((CharSequence)_title);
+   	   }   	   
+     }
+    
+    public void SetHeaderIconByIdentifier(String _iconIdentifier){    	     	  
+   	   mHeaderIconIdentifier = _iconIdentifier;
+   	   if (mMenu != null) {
+   		  mMenu.setHeaderIcon(GetDrawableResourceId(_iconIdentifier));
+   	   }
+     }    
+    public boolean IsItemChecked(int _itemID) {
+    	boolean res = false; 
+    	if (mItemList.size() > 0)  {
+    		if ( mItemList.indexOf( Integer.toString(_itemID)) >= 0  ) res = true; 	
+    	}    	
+    	return res;
+    }
+           
 }
 
 //ref. http://stackoverflow.com/questions/19395970/android-bluetooth-background-listner?rq=1
@@ -6450,7 +7036,7 @@ class jBluetoothServerSocket {
                 }
              }
           };
-         sender.start(); // Inicialização
+         sender.start(); // Init
 	   }
 	}
 
@@ -6470,7 +7056,7 @@ class jBluetoothServerSocket {
 	                 }
 	           }	          
 	       };
-	       sender.start(); // Inicialização
+	       sender.start(); // Init
 		}    
 	}
 	
@@ -6862,6 +7448,7 @@ class jBluetoothClientSocket {
 //ref. http://examples.javacodegeeks.com/android/core/bluetooth/bluetoothadapter/android-bluetooth-example/
 //ref. http://www.javacodegeeks.com/2013/09/bluetooth-data-transfer-with-android.html
 //ref. http://www.bravenewgeek.com/bluetooth-blues/
+       
 class jBluetooth /*extends ...*/ {
 
     private long     pascalObj = 0;      // Pascal Object
@@ -7061,78 +7648,6 @@ class jBluetooth /*extends ...*/ {
       }
     }       
                          
-    //Once you choose bluetooth, the android bluetooth application will launch and let you pick the device to send it too.
-    public void ShareFromSdCardFile(String  _filename) {
-    	
-       PackageManager pm = controls.activity.getPackageManager();
-       List<ResolveInfo>  appsList = pm.queryIntentActivities(intent, 0);
-     
-       if(appsList.size() > 0) {
-    	   String packageName = null;
-    	   String className = null;
-    	   boolean found = false;
-    	    
-    	   for(int i=0; i<  appsList.size()-1;i++){    		       		 
-    		 ResolveInfo info = appsList.get(i); //(ResolveInfo)    
-    	     packageName = info.activityInfo.packageName;
-    	     if( packageName.equals("com.android.bluetooth")){
-    	        className = info.activityInfo.name;
-    	        found = true;
-    	        break;// found
-    	     }
-    	   }
-    	   
-    	   if(found){
-    		 //set our intent to launch Bluetooth
-    		 intent.setClassName(packageName, className);
-    		 File file = new File(Environment.getExternalStorageDirectory().getPath() +"/"+ _filename);
-    		 
-    		 intent.setType("*/*");
-    	     intent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(file)); /* "/sdcard/test.txt" result : "file:///sdcard/test.txt" */
-    	     controls.activity.startActivity(intent);      		       		       	
-    	   }else{
-    		  Toast.makeText(controls.activity.getApplicationContext(),"com.android.bluetooth Not Found!" ,Toast.LENGTH_LONG).show();  
-    	   }    
-    	   
-       }       
-    }
-    
-    //Once you choose bluetooth, the android bluetooth application will launch and let you pick the device to send it too.
-    public void ShareFromFile(String _filename) {
-    	
-        PackageManager pm = controls.activity.getPackageManager();
-        List<ResolveInfo>  appsList = pm.queryIntentActivities(intent, 0);
-      
-        if(appsList.size() > 0) {
-     	   String packageName = null;
-     	   String className = null;
-     	   boolean found = false;
-     	    
-     	   for(int i=0; i<  appsList.size()-1;i++){    		       		 
-     		 ResolveInfo info = appsList.get(i);     
-     	     packageName = info.activityInfo.packageName;
-     	     if( packageName.equals("com.android.bluetooth")){
-     	        className = info.activityInfo.name;
-     	        found = true;
-     	        break;// found
-     	     }
-     	   }    	   
-     	   if(found){
-     		 //set our intent to launch Bluetooth
-    		 intent.setClassName(packageName, className);     		      		
-       		 
-          	 String PathDat = context.getFilesDir().getAbsolutePath();   //   //Result : /data/data/com/MyApp/files 	
-        	 File file = new File(PathDat+"/"+ _filename);
-        	 
-        	 intent.setType("*/*");
-        	 intent.putExtra(Intent.EXTRA_STREAM,Uri.fromFile(file)); /* "/sdcard/test.txt" result : "file:///sdcard/test.txt" */
-        	 controls.activity.startActivity(intent);    	
-       		 
-     	   }else{
-     		  Toast.makeText(controls.activity.getApplicationContext(),"com.android.bluetooth Not Found!" ,Toast.LENGTH_LONG).show();  
-     	   }    		   
-        }
-    }
     
     public BluetoothDevice GetReachablePairedDeviceByName(String _deviceName) {
     	
@@ -7221,23 +7736,30 @@ class jBluetooth /*extends ...*/ {
     }    
 }
 
+//by jmpessoa
 class jShareFile /*extends ...*/ {
 
     private long     pascalObj = 0;      // Pascal Object
     private Controls controls  = null;   // Control Class -> Java/Pascal Interface ...
     private Context  context   = null;
+    private String mTransitoryEnvironmentDirectoryPath;
     
-    Intent intent = null;
-	        
+    private Intent intent = null;
+        	        
     //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
-
     public jShareFile(Controls _ctrls, long _Self) { //Add more others news "_xxx" params if needed!
        //super(_ctrls.activity);
        context   = _ctrls.activity;
        pascalObj = _Self;
        controls  = _ctrls;
+       
+       mTransitoryEnvironmentDirectoryPath = GetEnvironmentDirectoryPath(1); //download!
+       
        intent = new Intent();
 	   intent.setAction(Intent.ACTION_SEND);
+       //intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+  	   intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+
     }
 
     public void jFree() {
@@ -7247,52 +7769,135 @@ class jShareFile /*extends ...*/ {
 
     //write others [public] methods code here......
     //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
+    private static void copyFileUsingFileStreams(File source, File dest)
+    		throws IOException {
+    	InputStream input = null;
+    	OutputStream output = null;
+    	try {
+    		input = new FileInputStream(source);
+    		output = new FileOutputStream(dest);
+    		byte[] buf = new byte[1024];
+    		int bytesRead;
+    		while ((bytesRead = input.read(buf)) > 0) {
+    			output.write(buf, 0, bytesRead);
+    		}
+    	} finally {
+    		input.close();
+    		output.close();
+    	}
+    }
+
+    private boolean CopyFile(String _scrFullFileName, String _destFullFileName) {
+    	File src= new File(_scrFullFileName);
+    	File dest= new File(_destFullFileName);
+    	try {
+    		copyFileUsingFileStreams(src, dest);
+    		return true;
+    	} catch (IOException e) {
+    		// TODO Auto-generated catch block
+    		e.printStackTrace();
+    		return false;
+    	}
+    }
     
-	public void SendFromSdCard(String _filename, String _mimetype){			 		 
+	public void ShareFromSdCard(String _filename, String _mimetype){			 		 
 		intent.setType(_mimetype);		
 	    File file = new File(Environment.getExternalStorageDirectory().getPath() +"/"+ _filename);
-	    intent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(file)); /* "/sdcard/test.txt" result : "file:///sdcard/test.txt" */			 	         		 		 			 		
-		controls.activity.startActivity(intent);
+	    intent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(file)); /* "/sdcard/test.txt" result : "file:///sdcard/test.txt" */			 	         		 		 			 				
+		controls.activity.startActivity(Intent.createChooser(intent, "Share ["+_filename+"] by:"));
 	}
 	
-	public void SendFromAssets(String _filename, String _mimetype){
-		    intent.setType(_mimetype);
+	//https://xjaphx.wordpress.com/2011/10/02/store-and-use-files-in-assets/
+	public void ShareFromAssets(String _filename, String _mimetype){				    		   
 			InputStream is = null;
-			FileOutputStream fos = null;	  	   
-			String path = '/' + _filename.substring(1,_filename.lastIndexOf("/"));	   
-			String scrFilename = _filename.substring(_filename.lastIndexOf("/")+1);	   	   	   	  
-			File outDir = new File(path);	   
-			outDir.mkdirs();	   
-			try {		   
-				is = controls.activity.getAssets().open(scrFilename);	     
+			FileOutputStream fos = null;			
+			String PathDat = controls.activity.getFilesDir().getAbsolutePath();			 			
+			try {		   		     			
+				File outfile = new File(PathDat+"/"+_filename);								
+				// if file doesnt exists, then create it
+				if (!outfile.exists()) {
+					outfile.createNewFile();
+				
+				}												
+				fos = new FileOutputStream(outfile);  //save to data/data/your_package/files/your_file_name														
+				is = controls.activity.getAssets().open(_filename);																				
 				int size = is.available();	     
-				byte[] buffer = new byte[size];	     
-				File outfile = new File(_filename);
-				fos = new FileOutputStream(outfile);  //save to data/data/your_package/files/your_file_name
+				byte[] buffer = new byte[size];												
 				for (int c = is.read(buffer); c != -1; c = is.read(buffer)){
 			      fos.write(buffer, 0, c);
-				}	     
-				is.close();
-				fos.close();
+				}																
+				is.close();								
+				fos.close();								
+				ShareFromInternalAppStorage(_filename,_mimetype);				
 			}catch (IOException e) {
-			     e.printStackTrace();       
-			}	   	 
-			//LoadFromFile(scrFilename);		 		
-       	    String PathDat = context.getFilesDir().getAbsolutePath();  //Result : /data/data/com/MyApp/files       	           	           	   
-       	    File file = new File(PathDat+"/"+ _filename);       	    
-			intent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(file)); 		 			            	     			    	
-			controls.activity.startActivity(intent);
+				 Log.i("ShareFromAssets","fail!!");
+			     e.printStackTrace();			     
+			}									
 	}	
 	
-	public void SendFromFile(File _filename, String _mimetype) {	    		     
-	   String PathDat = context.getFilesDir().getAbsolutePath();       //Result : /data/data/com/MyApp/files 	
-	   File file = new File(PathDat+"/"+ _filename);	        	 
-	   intent.setType(_mimetype);
-	   intent.putExtra(Intent.EXTRA_STREAM,Uri.fromFile(file));
-	   controls.activity.startActivity(intent);    		       		 	     
-	}		
+	public void ShareFromInternalAppStorage(String _filename, String _mimetype) {	 
+	  String srcPath = controls.activity.getFilesDir().getAbsolutePath()+"/"+ _filename;       //Result : /data/data/com/MyApp/files	 
+	  String destPath = mTransitoryEnvironmentDirectoryPath + "/" + _filename;	  
+	  CopyFile(srcPath, destPath);	  
+	  ShareFrom(destPath, _mimetype);	  	   
+	}
+		
+	public void ShareFrom(String _fullFilename, String _mimetype) {
+		   int p1 = _fullFilename.lastIndexOf("/");
+		   String filename = _fullFilename.substring(p1+1, _fullFilename.length());		   		   
+		   File file = new File(_fullFilename);	        	 
+		   intent.setType(_mimetype);
+		   intent.putExtra(Intent.EXTRA_STREAM,Uri.fromFile(file));    		       		 	     
+		   controls.activity.startActivity(Intent.createChooser(intent, "Share ["+filename+"] by:")); 		   
+	}	
+		
+	private String GetEnvironmentDirectoryPath(int _directory) {
+		
+		File filePath= null;
+		String absPath="";   //fail!
+		  
+		//Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS);break; //API 19!
+		if (_directory != 8) {		  	   	 
+		  switch(_directory) {	                       
+		    
+		    case 0:  filePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS); break; //hack		    
+		    case 1:  filePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM); break;
+		    case 2:  filePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MUSIC); break;
+		    case 3:  filePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES); break;
+		    case 4:  filePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_NOTIFICATIONS); break;
+		    case 5:  filePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MOVIES); break;
+		    case 6:  filePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PODCASTS); break;
+		    case 7:  filePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_RINGTONES); break;
+		    
+		    case 9: absPath  = this.controls.activity.getFilesDir().getAbsolutePath(); break;      //Result : /data/data/com/MyApp/files	    	    
+		    case 10: absPath = this.controls.activity.getFilesDir().getPath();
+		             absPath = absPath.substring(0, absPath.lastIndexOf("/")) + "/databases"; break;
+		    case 11: absPath = this.controls.activity.getFilesDir().getPath();
+	                 absPath = absPath.substring(0, absPath.lastIndexOf("/")) + "/shared_prefs"; break;	             		           
+		  }
+		  	  
+		  //Make sure the directory exists.
+	      if (_directory < 8) { 
+	    	 filePath.mkdirs();
+	    	 absPath= filePath.getPath(); 
+	      }	        
+	      
+		}else {  //== 8
+		    if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED) == true) {
+		    	filePath = Environment.getExternalStorageDirectory();  //sdcard!
+		    	// Make sure the directory exists.
+		    	filePath.mkdirs();
+		   	    absPath= filePath.getPath();
+		    }
+		}    			    		 
+		return absPath;
+	}	
+	
+    public void SetTransitoryEnvironmentDirectory(int _index) {   
+    	mTransitoryEnvironmentDirectoryPath = GetEnvironmentDirectoryPath(_index);
+    }
+	
 }
-
 
 //by jmpessoa
 class CustomSpinnerArrayAdapter<T> extends ArrayAdapter<String>{
@@ -7948,6 +8553,363 @@ class jPreferences /*extends ...*/ {
 	}
 }
 
+//by jmpessoa
+class jImageFileManager /*extends ...*/ {
+
+    private long     pascalObj = 0;      // Pascal Object
+    private Controls controls  = null;   // Control Class -> Java/Pascal Interface ...
+    private Context  context   = null;
+    
+    //Warning: please, preferentially init your news params names with "_", ex: int _flag, String _hello ...
+    public jImageFileManager(Controls _ctrls, long _Self) { //Add more here new "_xxx" params if needed!
+       //super(contrls.activity);
+       context   = _ctrls.activity;
+       pascalObj = _Self;
+       controls  = _ctrls;                   
+    }
+
+    public void jFree() {
+      //free local objects...        	
+    }
+
+   public void SaveToSdCard(Bitmap _image, String _filename) {	
+	   	  	   
+	    File file;
+	    String root = Environment.getExternalStorageDirectory().toString();
+	    
+	    file = new File (root+"/"+_filename);	
+	    
+	    if (file.exists ()) file.delete (); 
+	    try {
+	       FileOutputStream out = new FileOutputStream(file);	           	           	         
+	     
+           if ( _filename.toLowerCase().contains(".jpg") ) _image.compress(Bitmap.CompressFormat.JPEG, 90, out);
+	       if ( _filename.toLowerCase().contains(".png") ) _image.compress(Bitmap.CompressFormat.JPEG, 100, out);	       
+	       
+	       out.flush();
+	       out.close();
+	    } catch (Exception e) {
+           e.printStackTrace();
+	    }
+	    
+   }
+   
+   // By using this line you can able to see saved images in the gallery view.
+   public void ShowImagesFromGallery () {	   
+	   controls.activity.sendBroadcast(new Intent(
+		   Intent.ACTION_MEDIA_MOUNTED,
+		               Uri.parse("file://" + Environment.getExternalStorageDirectory())));
+   }
+   
+   public Bitmap LoadFromSdCard(String _filename) {	   
+	      String imageInSD = Environment.getExternalStorageDirectory().getPath()+"/"+_filename;	      
+	      Bitmap bitmap = BitmapFactory.decodeFile(imageInSD);	      
+	      return bitmap; 
+   }
+      
+   //http://android-er.blogspot.com.br/2010/07/save-file-to-sd-card.html
+   private InputStream OpenHttpConnection(String strURL) throws IOException{
+	   InputStream inputStream = null;
+	   URL url = new URL(strURL);
+	   URLConnection conn = url.openConnection();
+
+	   try{
+	    HttpURLConnection httpConn = (HttpURLConnection)conn;
+	    httpConn.setRequestMethod("GET");
+	    httpConn.connect();
+
+	    if (httpConn.getResponseCode() == HttpURLConnection.HTTP_OK) {
+	     inputStream = httpConn.getInputStream();
+	    }
+	   }
+	   catch (Exception ex)
+	   {
+	   }
+	   return inputStream;
+   }
+   
+   public Bitmap LoadFromURL(String _imageURL) {
+	   
+    BitmapFactory.Options bmOptions;
+	bmOptions = new BitmapFactory.Options();
+	bmOptions.inSampleSize = 1;
+	   
+    Bitmap bitmap = null;
+    InputStream in = null;      
+       try {
+           in = OpenHttpConnection(_imageURL);
+           bitmap = BitmapFactory.decodeStream(in, null, bmOptions);
+           in.close();
+       } catch (IOException e1) {
+       }
+       return bitmap;              
+       
+   }
+                   
+   public Bitmap LoadFromAssets(String strName)
+   {
+       AssetManager assetManager = controls.activity.getAssets();
+       InputStream istr = null;
+       try {
+           istr = assetManager.open(strName);
+       } catch (IOException e) {
+           e.printStackTrace();
+       }
+       Bitmap bitmap = BitmapFactory.decodeStream(istr);
+       return bitmap;
+   }
+   
+   public Bitmap LoadFromFile(String _filename) {	   
+	   Bitmap bmap=null;	  
+	   File fDir = this.controls.activity.getFilesDir();  //Result : /data/data/com/MyApp/files
+	   File file = new File(fDir, _filename);	   
+	   InputStream fileInputStream = null;	   
+  	   try {
+		 fileInputStream = new FileInputStream(file);
+		 BitmapFactory.Options bitmapOptions = new BitmapFactory.Options();
+		 bitmapOptions.inSampleSize = 1; //original image size :: 4 --> size 1/4!
+		 bitmapOptions.inJustDecodeBounds = false; //If set to true, the decoder will return null (no bitmap), 
+		 bmap = BitmapFactory.decodeStream(fileInputStream, null, bitmapOptions);		 
+	   } catch (FileNotFoundException e) {
+		// TODO Auto-generated catch block
+		 e.printStackTrace();
+	   }  	   
+  	   return bmap;  	   
+   }
+   
+   public Bitmap LoadFromFile(String _path, String _filename) {	   
+	      String imageIn = _path+"/"+_filename;	      
+	      Bitmap bitmap = BitmapFactory.decodeFile(imageIn);	      
+	      return bitmap; 
+   }
+   
+   public void SaveToFile(Bitmap _image, String _filename) {	   	    
+	    String root = this.controls.activity.getFilesDir().getAbsolutePath();	      	    	    
+	    File file = new File (root +"/"+ _filename);	    
+	    if (file.exists ()) file.delete (); 
+	    try {
+	        FileOutputStream out = new FileOutputStream(file);	  
+	        
+	        if ( _filename.toLowerCase().contains(".jpg") ) _image.compress(Bitmap.CompressFormat.JPEG, 90, out);
+	        if ( _filename.toLowerCase().contains(".png") ) _image.compress(Bitmap.CompressFormat.JPEG, 100, out);
+	        
+	         out.flush();
+	         out.close();
+	    } catch (Exception e) {
+	         e.printStackTrace();
+	    }  	     	   
+   }
+   
+   
+   public void SaveToFile(Bitmap _image,String _path, String _filename) {	   	    
+	       	    	    
+	    File file = new File (_path +"/"+ _filename);	    
+	    if (file.exists ()) file.delete (); 
+	    try {
+	        FileOutputStream out = new FileOutputStream(file);	  
+	        
+	        if ( _filename.toLowerCase().contains(".jpg") ) _image.compress(Bitmap.CompressFormat.JPEG, 90, out);
+	        if ( _filename.toLowerCase().contains(".png") ) _image.compress(Bitmap.CompressFormat.JPEG, 100, out);
+	        
+	         out.flush();
+	         out.close();
+	    } catch (Exception e) {
+	         e.printStackTrace();
+	    }  	     	   
+  }
+   
+}
+
+//by jmpessoa
+class jActionBarTab {
+		
+    private long     pascalObj = 0;      // Pascal Object
+    private Controls controls  = null;   // Control Class -> Java/Pascal Interface ...
+    private Context  context   = null;
+    private int mCountTab = 0;
+    
+    //Warning: please, preferentially init your news params names with "_", ex: int _flag, String _hello ...
+    public jActionBarTab(Controls _ctrls, long _Self) { //Add more here new "_xxx" params if needed!
+       //super(contrls.activity);
+       context   = _ctrls.activity;
+       pascalObj = _Self;
+       controls  = _ctrls;                   
+    }
+
+    public void jFree() {
+      //free local objects...        	
+    }
+
+	public ActionBar GetActionBar() { 
+	    return this.controls.activity.getActionBar();
+	}
+
+	/*
+	 * To disableAction-bar Icon and Title, you must do two things:
+	 setDisplayShowHomeEnabled(false);  // hides action bar icon
+	 setDisplayShowTitleEnabled(false); // hides action bar title
+	 */
+
+	private class TabListener implements ActionBar.TabListener {
+		
+		TabContentFragment mFragment;
+		
+		/*.*/public TabListener(TabContentFragment v) {
+			mFragment = v;
+		}
+		//http://www.grokkingandroid.com/adding-action-items-from-within-fragments/
+		//http://www.j2eebrain.com/java-J2ee-android-menus-and-action-bar.html
+		//http://www.thesparkmen.com/2013/2/15/dynamic-action-bar-buttons.aspx
+		//https://github.com/codepath/android_guides/wiki/Creating-and-Using-Fragments  otimo!
+		//http://www.lucazanini.eu/2012/android/tab-layout-in-android-with-actionbar-and-fragment/?lang=en
+	    @Override
+	    /*.*/public void onTabSelected(ActionBar.Tab tab, FragmentTransaction ft) {    	  
+	    	mFragment.getView().setVisibility(View.VISIBLE);
+	    	//mFragment.getView().refreshDrawableState();	    	
+	    	controls.pOnActionBarTabSelected(pascalObj, mFragment.getView(), mFragment.getText());    	    	
+	    	if(mFragment.isAdded()){
+	    	    ft.show(mFragment);
+	    	}  
+	    	else {
+	    		ft.add(0, mFragment, mFragment.getText()); //0=null container!
+	    	}     	   	
+	    }
+	 
+	    @Override
+	    /*.*/public void onTabUnselected(ActionBar.Tab tab, FragmentTransaction ft) {	    	
+	    	//mFragment.getView().setVisibility(View.GONE);	    	
+	    	controls.pOnActionBarTabUnSelected(pascalObj, mFragment.getView(), mFragment.getText());	    		    
+	    	if (mFragment != null) {
+	             ft.hide(mFragment);
+	         }	    	
+	    }
+	 
+	    @Override
+	    /*.*/public void onTabReselected(ActionBar.Tab tab, FragmentTransaction ft) {
+	    }
+	}
+
+	private class TabContentFragment extends Fragment {
+	    private View mView;
+	    private String mText;
+	    /*.*/public TabContentFragment(View v, String tag) {
+	        mView = v;
+	        mText = tag;
+	    }
+
+	    /*.*/public String getText() {
+	        return mText;
+	    }
+	    
+	    /*.*/public View getView() {
+	        return mView;
+	    }
+	        
+	    @Override
+	    /*.*/public void onActivityCreated(Bundle savedInstanceState) {
+	       super.onActivityCreated(savedInstanceState);   
+	    }
+	    
+	    @Override
+	    /*.*/public View onCreateView(LayoutInflater inflater, ViewGroup container,
+	            Bundle savedInstanceState) {    	    	     	 
+	    	    /*
+	    	     * You can access the container's id by calling
+	               ((ViewGroup)getView().getParent()).getId();
+	    	     */
+	         return mView;
+	    }
+	}
+
+	private ActionBar.Tab CreateTab(String title, View v) {	  	
+	  ActionBar actionBar = this.controls.activity.getActionBar();
+	  ActionBar.Tab tab = actionBar.newTab();           
+	  tab.setText(title); //
+	  if (mCountTab != 0) {
+	     v.setVisibility(View.INVISIBLE);
+	  }   
+	  TabContentFragment content = new TabContentFragment(v, title);
+	  tab.setTabListener(new TabListener(content)); // All tabs must have a TabListener set before being added to the ActionBar.
+	  mCountTab= mCountTab + 1;
+	  return tab; 
+	}
+
+	//This method adds a tab for use in tabbed navigation mode
+	public void Add(String _title, View _panel, String _iconIdentifier){
+		  ActionBar.Tab tab = CreateTab(_title, _panel);  
+		  if (!_iconIdentifier.equals("")) {
+		      tab.setIcon(GetDrawableResourceById(GetDrawableResourceId(_iconIdentifier))); //_iconIdentifier
+		  }
+		  ActionBar actionBar = this.controls.activity.getActionBar();
+		  actionBar.addTab(tab, false);	  
+	}
+
+	public void Add(String _title, View _panel){
+		  ActionBar.Tab tab = CreateTab(_title, _panel);  	 
+		  ActionBar actionBar = this.controls.activity.getActionBar();	
+	  	  actionBar.addTab(tab, false);  	    	 
+	}
+
+	public void Add(String _title, View _panel, View _customTabView){
+		  ActionBar.Tab tab = CreateTab(_title, _panel);  	 
+		  tab.setCustomView(_customTabView);	//This overrides values set by setText(CharSequence) and setIcon(Drawable).	  
+		  ActionBar actionBar = this.controls.activity.getActionBar();
+		  actionBar.addTab(tab, false);	  
+	}
+
+	public void SetTabNavigationMode(){
+		ActionBar actionBar = this.controls.activity.getActionBar();
+		actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);	//API 11
+		actionBar.setSelectedNavigationItem(0);
+	}
+
+	//This method remove all tabs from the action bar and deselect the current tab
+	public void RemoveAllTabs() {
+		ActionBar actionBar = this.controls.activity.getActionBar();
+		actionBar.removeAllTabs();
+	}
+
+	//This method returns the currently selected tab if in tabbed navigation mode and there is at least one tab present
+	/*.*/public Tab GetSelectedTab() {
+		ActionBar actionBar = this.controls.activity.getActionBar();
+		ActionBar.Tab tab = actionBar.getSelectedTab();
+		return tab;
+	}
+
+	//This method select the specified tab
+	/*.*/public void SelectTab(ActionBar.Tab tab){
+		ActionBar actionBar = this.controls.activity.getActionBar();
+		actionBar.selectTab(tab);
+	}
+
+	//http://daniel-codes.blogspot.com.br/2009/12/dynamically-retrieving-resources-in.html
+	/*
+	*Given that you can access R.java just fine normally in code.
+	*As long as you are retrieving data from your application's R.java - Use reflection!
+	*/
+
+	//by jmpessoa
+	private int GetDrawableResourceId(String _resName) {
+		  try {
+		     Class<?> res = R.drawable.class;
+		     Field field = res.getField(_resName);  //"drawableName"
+		     int drawableId = field.getInt(null);
+		     return drawableId;
+		  }
+		  catch (Exception e) {
+		     Log.e("jForm", "Failure to get drawable id.", e);
+		     return 0;
+		  }
+	}
+	
+	//by jmpessoa
+	private Drawable GetDrawableResourceById(int _resID) {
+		return (Drawable)( this.controls.activity.getResources().getDrawable(_resID));	
+	}
+	
+}
+
+
 //Javas/Pascal Interface Class 
 
 public class Controls {          // <<--------- 
@@ -7977,7 +8939,7 @@ public  native void pAppOnCreateOptionsMenu(Menu menu);
 public  native void pAppOnClickOptionMenuItem(MenuItem menuItem,int itemID,String itemCaption,boolean checked);
 
 //by jmpessoa: support Context Menu
-public  native void pAppOnCreateContextMenu(Menu menu);
+public  native void pAppOnCreateContextMenu(ContextMenu menu);
 public  native void pAppOnClickContextMenuItem(MenuItem menuItem,int itemID,String itemCaption,boolean checked);
 
 //
@@ -8030,6 +8992,9 @@ public  native void pOnLocationProviderDisabled(long pasobj, String provider);
 public  native void pAppOnViewClick(View view, int id);
 public  native void pAppOnListItemClick(AdapterView adapter, View view, int position, int id);
 
+public native void pOnActionBarTabSelected(long pasobj, View view, String title);
+public native void pOnActionBarTabUnSelected(long pasobj, View view, String title);
+
 
 //Load Pascal Library
 static {
@@ -8056,6 +9021,9 @@ public  void jAppOnStart()                { pAppOnStart();                 }    
 public  void jAppOnStop()                 { pAppOnStop();                  }   
 public  void jAppOnBackPressed()          { pAppOnBackPressed();           }   
 public  int  jAppOnRotate(int rotate)     {  return(pAppOnRotate(rotate)); }
+
+//rotate=1 --> device on vertical/default position ; 2 --> device on horizontal position      //tips by jmpessoa
+
 public  void jAppOnConfigurationChanged() { pAppOnConfigurationChanged();  }
 
 public  void jAppOnActivityResult(int requestCode, int resultCode, Intent data) 
@@ -8066,15 +9034,15 @@ public  void jAppOnCreateOptionsMenu(Menu m) {pAppOnCreateOptionsMenu(m);}
 public  void jAppOnClickOptionMenuItem(MenuItem item,int itemID, String itemCaption, boolean checked){pAppOnClickOptionMenuItem(item,itemID,itemCaption,checked);}
 
 //By jmpessoa: supportContextMenu
-public  void jAppOnCreateContextMenu(Menu m) {pAppOnCreateContextMenu(m);}
+public  void jAppOnCreateContextMenu(ContextMenu m) {pAppOnCreateContextMenu(m);}
 public  void jAppOnClickContextMenuItem(MenuItem item,int itemID, String itemCaption, boolean checked) {pAppOnClickContextMenuItem(item,itemID,itemCaption,checked);}
 
 public void jAppOnViewClick(View view, int id){ pAppOnViewClick(view,id);}
 
 public void jAppOnListItemClick(AdapterView adapter, View view, int position, int id){ pAppOnListItemClick(adapter, view,position,id);}
 
-//rotate=1 --> device on vertical/default position ; 2 --> device on horizontal position      //tips by jmpessoa
-
+//public void jAppOnActionBarTabSelected(View view, String title){pOnActionBarTabSelected(view,title);}
+//public void jAppOnActionBarTabUnSelected(View view, String title){pOnActionBarTabUnSelected(view,title);}
 
 //// -------------------------------------------------------------------------
 //  System, Class
@@ -8110,6 +9078,21 @@ public Context GetContext() {
 }
 
 
+//by  thierrydijoux
+public String getQuantityStringByName(String _resName, int _quantity) {
+	int id = this.activity.getResources().getIdentifier(_resName, "plurals", this.activity.getPackageName());
+    String value = id == 0 ? "" : (String) this.activity.getResources().getQuantityString(id, _quantity, _quantity);
+	return value;
+}
+
+//by thierrydijoux
+public String getStringResourceByName(String _resName) {
+	int id = this.activity.getResources().getIdentifier(_resName, "string", this.activity.getPackageName());
+    String value = id == 0 ? "" : (String) this.activity.getResources().getText(id);
+	return value;
+}   
+
+
 // -------------------------------------------------------------------------
 //  App Related
 // -------------------------------------------------------------------------
@@ -8134,6 +9117,7 @@ public  void appKillProcess() {
 
 // src : codedata.txt
 // tgt : /data/data/com.kredix.control/data/codedata.txt
+
 public  boolean assetSaveToFile(String src, String tgt) {
   InputStream is = null;
   FileOutputStream fos = null;
@@ -8322,10 +9306,27 @@ public  int getStrLength(String Txt) {  //fix by jmpessoa
   return ( len );
 }
 
-// LORDMAN - 2013-07-30
-public  String getStrDateTime() {
+//----------------------------------------------
+// Controls Version Info
+//-------------------------------------------
+
+/*LORDMAN - 2013-07-30
+public  String getStrDateTime() { 
   SimpleDateFormat formatter = new SimpleDateFormat ( "yyyy-MM-dd HH:mm:ss", Locale.KOREA );
   return( formatter.format ( new Date () ) );
+}
+*/
+
+//GetControlsVersionFeatures ...  //Controls.java version-revision info! [0.6-04]
+public  String getStrDateTime() {  //hacked by jmpessoa!! sorry, was for a good cause! please, use the  jForm_GetDateTime!!
+  String listVersionInfo = "6$4=GetControlsVersionInfo;" +
+  		   "6$4=getLocale;";  
+  return listVersionInfo;
+}
+
+//by jmpessoa:  Class controls version info
+public String GetControlsVersionInfo() { 
+  return "6$5";  //version$revision  [0.6$5]
 }
 
 public long getTick() {
@@ -8366,7 +9367,7 @@ public  String getPathExt() {
 
 // Result : /storage/emulated/0/DCIM
 public  String getPathDCIM() {
-  File FileDCIM =  Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM);
+  File FileDCIM =  Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM);  
   return ( FileDCIM.getPath() );
 }
 
@@ -8376,6 +9377,37 @@ public  String getPathDataBase(android.content.Context context) {
    destPath = destPath.substring(0, destPath.lastIndexOf("/")) + "/databases";
    return destPath;
 }
+
+// -------------------------------------------------------------------------
+//  Android Locale
+// -------------------------------------------------------------------------
+
+// thierrydijoux - get locale info
+public String getLocale(int localeType) {
+        Context context = this.activity;
+  	String value = "";	
+   	switch (localeType) {
+   		case 0: value = context.getResources().getConfiguration().locale.getCountry();
+				break;
+		case 1: value = context.getResources().getConfiguration().locale.getDisplayCountry();
+				break;
+   		case 2: value = context.getResources().getConfiguration().locale.getDisplayLanguage();
+				break;
+   		case 3: value = context.getResources().getConfiguration().locale.getDisplayName();
+				break;
+   		case 4: value = context.getResources().getConfiguration().locale.getDisplayVariant();
+				break;
+   		case 5: value = context.getResources().getConfiguration().locale.getISO3Country();
+				break;
+   		case 6: value = context.getResources().getConfiguration().locale.getISO3Language();
+				break;
+   		case 7: value = context.getResources().getConfiguration().locale.getVariant();
+				break;
+   	}
+
+   	return value;
+}
+
 
 // -------------------------------------------------------------------------
 //  Android Device
@@ -10668,6 +11700,30 @@ public  java.lang.Object jSqliteDataAccess_Create(long pasobj, String databaseNa
   
    public java.lang.Object jPreferences_jCreate(long _Self, boolean _IsShared) {
       return (java.lang.Object)(new jPreferences(this,_Self,_IsShared));
+   }
+  
+
+  
+   public java.lang.Object jShareFile_jCreate(long _Self) {
+      return (java.lang.Object)(new jShareFile(this,_Self));
+   }
+  
+
+  
+   public java.lang.Object jImageFileManager_jCreate(long _Self) {
+      return (java.lang.Object)(new jImageFileManager(this,_Self));
+   }
+  
+
+  
+   public java.lang.Object jContextMenu_jCreate(long _Self) {
+      return (java.lang.Object)(new jContextMenu(this,_Self));
+   }
+  
+
+  
+   public java.lang.Object jActionBarTab_jCreate(long _Self) {
+      return (java.lang.Object)(new jActionBarTab(this,_Self));
    }
   
 

@@ -1,0 +1,300 @@
+unit actionbartab;
+
+{$mode delphi}
+
+interface
+
+uses
+  Classes, SysUtils, And_jni, And_jni_Bridge, AndroidWidget, Laz_And_Controls;
+
+type
+
+{Draft Component code by "Lazarus Android Module Wizard" [12/2/2014 22:24:11]}
+{https://github.com/jmpessoa/lazandroidmodulewizard}
+
+{jControl template}
+
+jActionBarTab = class(jControl)
+ private
+    FTitles: TStrings;
+    FIconIdentifiers: TStrings;
+
+    FOnActionBarTabSelected: TActionBarTabSelected;
+    FOnActionBarTabUnSelected: TActionBarTabSelected;
+
+    procedure SetTitles(Value: TStrings);
+    procedure SetIconIdentifiers(Value: TStrings);
+ protected
+
+ public
+    constructor Create(AOwner: TComponent); override;
+    destructor  Destroy; override;
+    procedure Init(refApp: jApp); override;
+    function jCreate(): jObject;
+    procedure jFree();
+    function GetActionBar(): jObject;
+
+    procedure Add(_title: string; _panel: jObject; _iconIdentifier: string);  overload;
+    procedure Add(_title: string; _panel: jObject);    overload;
+    procedure Add(_title: string; _panel: jObject; _customTabView: jObject);  overload;
+    procedure SetTabNavigationMode();
+    procedure RemoveAllTabs();
+
+    procedure GenEvent_OnActionBarTabSelected(Obj: TObject; view: jObject; title: string);
+    procedure GenEvent_OnActionBarTabUnSelected(Obj: TObject; view: jObject; title: string);
+
+ published
+    property Titles: TStrings read FTitles write SetTitles;
+    property IconIdentifiers: TStrings read FIconIdentifiers write SetIconIdentifiers;
+    property OnTabSelected: TActionBarTabSelected read FOnActionBarTabSelected write FOnActionBarTabSelected;
+    property OnUnSelected: TActionBarTabSelected read FOnActionBarTabUnSelected write FOnActionBarTabUnSelected;
+
+end;
+
+function jActionBarTab_jCreate(env: PJNIEnv; this: JObject;_Self: int64): jObject;
+procedure jActionBarTab_jFree(env: PJNIEnv; this: JObject; _jActionBarTab: JObject);
+function jActionBarTab_GetActionBar(env: PJNIEnv; this: JObject; _jActionBarTab: JObject): jObject;
+
+procedure jActionBarTab_Add(env: PJNIEnv; this: JObject; _jActionBarTab: JObject; _title: string; _panel: jObject; _iconIdentifier: string);  overload;
+procedure jActionBarTab_Add(env: PJNIEnv; this: JObject; _jActionBarTab: JObject; _title: string; _panel: jObject);    overload;
+procedure jActionBarTab_Add(env: PJNIEnv; this: JObject; _jActionBarTab: JObject; _title: string; _panel: jObject; _customTabView: jObject);  overload;
+procedure jActionBarTab_SetTabNavigationMode(env: PJNIEnv; this: JObject; _jActionBarTab: JObject);
+procedure jActionBarTab_RemoveAllTabs(env: PJNIEnv; this: JObject; _jActionBarTab: JObject);
+
+
+implementation
+
+{---------  jActionBarTab  --------------}
+
+constructor jActionBarTab.Create(AOwner: TComponent);
+begin
+  inherited Create(AOwner);
+  //your code here....
+  FTitles:= TStringList.Create;
+  FIconIdentifiers:= TStringList.Create;
+end;
+
+destructor jActionBarTab.Destroy;
+begin
+  if not (csDesigning in ComponentState) then
+  begin
+    if jForm(Owner).App <> nil then
+    begin
+      if jForm(Owner).App.Initialized then
+      begin
+        if FjObject <> nil then
+        begin
+           jFree();
+           FjObject:= nil;
+        end;
+      end;
+    end;
+  end;
+  //you others free code here...'
+  FTitles.Free;
+  FIconIdentifiers.Free;
+  inherited Destroy;
+end;
+
+procedure jActionBarTab.Init(refApp: jApp);
+begin
+  if FInitialized  then Exit;
+  inherited Init(refApp);
+  //your code here: set/initialize create params....
+  FjObject:= jCreate();
+  FInitialized:= True;
+end;
+
+function jActionBarTab.jCreate(): jObject;
+begin
+   Result:= jActionBarTab_jCreate(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis , int64(Self));
+end;
+
+procedure jActionBarTab.jFree();
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jActionBarTab_jFree(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject);
+end;
+
+function jActionBarTab.GetActionBar(): jObject;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jActionBarTab_GetActionBar(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject);
+end;
+
+procedure jActionBarTab.Add(_title: string; _panel: jObject; _iconIdentifier: string);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jActionBarTab_Add(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, _title ,_panel ,_iconIdentifier);
+end;
+
+procedure jActionBarTab.Add(_title: string; _panel: jObject);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jActionBarTab_Add(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, _title ,_panel);
+end;
+
+procedure jActionBarTab.Add(_title: string; _panel: jObject; _customTabView: jObject);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jActionBarTab_Add(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, _title ,_panel ,_customTabView);
+end;
+
+procedure jActionBarTab.SetTabNavigationMode();
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jActionBarTab_SetTabNavigationMode(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject);
+end;
+
+procedure jActionBarTab.RemoveAllTabs();
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jActionBarTab_RemoveAllTabs(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject);
+end;
+
+procedure jActionBarTab.SetTitles(Value: TStrings);
+begin
+  FTitles.Assign(Value);
+end;
+
+procedure jActionBarTab.SetIconIdentifiers(Value: TStrings);
+begin
+  FIconIdentifiers.Assign(Value);
+end;
+
+
+procedure jActionBarTab.GenEvent_OnActionBarTabSelected(Obj: TObject; view: jObject; title: string);
+begin
+   if Assigned(OnTabSelected) then OnTabSelected(Obj, view, title);
+end;
+
+procedure jActionBarTab.GenEvent_OnActionBarTabUnSelected(Obj: TObject; view: jObject; title: string);
+begin
+   if Assigned(OnUnSelected) then OnUnSelected(Obj, view, title);
+end;
+
+
+{-------- jActionBarTab_JNI_Bridge ----------}
+
+function jActionBarTab_jCreate(env: PJNIEnv; this: JObject;_Self: int64): jObject;
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].j:= _Self;
+  jCls:= Get_gjClass(env);
+  jMethod:= env^.GetMethodID(env, jCls, 'jActionBarTab_jCreate', '(J)Ljava/lang/Object;');
+  Result:= env^.CallObjectMethodA(env, this, jMethod, @jParams);
+  Result:= env^.NewGlobalRef(env, Result);
+end;
+
+(*
+//Please, you need insert:
+
+   public java.lang.Object jActionBarTab_jCreate(long _Self) {
+      return (java.lang.Object)(new jActionBarTab(this,_Self));
+   }
+
+//to end of "public class Controls" in "Controls.java"
+*)
+
+
+procedure jActionBarTab_jFree(env: PJNIEnv; this: JObject; _jActionBarTab: JObject);
+var
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jActionBarTab);
+  jMethod:= env^.GetMethodID(env, jCls, 'jFree', '()V');
+  env^.CallVoidMethod(env, _jActionBarTab, jMethod);
+end;
+
+
+function jActionBarTab_GetActionBar(env: PJNIEnv; this: JObject; _jActionBarTab: JObject): jObject;
+var
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jActionBarTab);
+  jMethod:= env^.GetMethodID(env, jCls, 'GetActionBar', '()Landroid/app/ActionBar;');
+  Result:= env^.CallObjectMethod(env, _jActionBarTab, jMethod);
+end;
+
+
+procedure jActionBarTab_Add(env: PJNIEnv; this: JObject; _jActionBarTab: JObject; _title: string; _panel: jObject; _iconIdentifier: string);
+var
+  jParams: array[0..2] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_title));
+  jParams[1].l:= _panel;
+  jParams[2].l:= env^.NewStringUTF(env, PChar(_iconIdentifier));
+  jCls:= env^.GetObjectClass(env, _jActionBarTab);
+  jMethod:= env^.GetMethodID(env, jCls, 'Add', '(Ljava/lang/String;Landroid/view/View;Ljava/lang/String;)V');
+  env^.CallVoidMethodA(env, _jActionBarTab, jMethod, @jParams);
+env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env,jParams[2].l);
+end;
+
+
+procedure jActionBarTab_Add(env: PJNIEnv; this: JObject; _jActionBarTab: JObject; _title: string; _panel: jObject);
+var
+  jParams: array[0..1] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_title));
+  jParams[1].l:= _panel;
+  jCls:= env^.GetObjectClass(env, _jActionBarTab);
+  jMethod:= env^.GetMethodID(env, jCls, 'Add', '(Ljava/lang/String;Landroid/view/View;)V');
+  env^.CallVoidMethodA(env, _jActionBarTab, jMethod, @jParams);
+env^.DeleteLocalRef(env,jParams[0].l);
+end;
+
+procedure jActionBarTab_Add(env: PJNIEnv; this: JObject; _jActionBarTab: JObject; _title: string; _panel: jObject; _customTabView: jObject);
+var
+  jParams: array[0..2] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_title));
+  jParams[1].l:= _panel;
+  jParams[2].l:= _customTabView;
+  jCls:= env^.GetObjectClass(env, _jActionBarTab);
+  jMethod:= env^.GetMethodID(env, jCls, 'Add', '(Ljava/lang/String;Landroid/view/View;Landroid/view/View;)V');
+  env^.CallVoidMethodA(env, _jActionBarTab, jMethod, @jParams);
+env^.DeleteLocalRef(env,jParams[0].l);
+end;
+
+
+procedure jActionBarTab_SetTabNavigationMode(env: PJNIEnv; this: JObject; _jActionBarTab: JObject);
+var
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jActionBarTab);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetTabNavigationMode', '()V');
+  env^.CallVoidMethod(env, _jActionBarTab, jMethod);
+end;
+
+
+procedure jActionBarTab_RemoveAllTabs(env: PJNIEnv; this: JObject; _jActionBarTab: JObject);
+var
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jActionBarTab);
+  jMethod:= env^.GetMethodID(env, jCls, 'RemoveAllTabs', '()V');
+  env^.CallVoidMethod(env, _jActionBarTab, jMethod);
+end;
+
+end.

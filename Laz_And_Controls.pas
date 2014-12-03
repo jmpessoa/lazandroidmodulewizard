@@ -534,7 +534,8 @@ type
 
   protected
     Procedure SetText(Value: string ); override;
-    Function  GetText: string;
+    Function  GetText: string;   override;
+    procedure SetTextTypeFace(Value: TTextTypeFace); override;
     procedure SetjParent(Value: jObject);
     Procedure GenEvent_OnClick(Obj: TObject);
   public
@@ -549,6 +550,7 @@ type
     property BackgroundColor     : TARGBColorBridge read FColor     write SetColor;
     property FontColor : TARGBColorBridge  read FFontColor write SetFontColor;
     property FontSize  : DWord   read FFontSize  write SetFontSize;
+    property TextTypeFace: TTextTypeFace read FTextTypeFace write SetTextTypeFace; //by jmpessoa
     // Event - if enabled!
     property OnClick : TOnNotify read FOnClick   write FOnClick;
   end;
@@ -636,8 +638,7 @@ type
   private
     Procedure SetVisible  (Value : Boolean);
     Procedure SetColor    (Value : TARGBColorBridge);
-    Function  GetText            : string;
-    Procedure SetText     (Value   : string );
+
     Procedure SetFontColor(Value : TARGBColorBridge);
     Procedure SetFontSize (Value : DWord  );
     procedure UpdateLParamHeight;
@@ -645,6 +646,8 @@ type
   protected
     procedure SetjParent(Value: jObject);
     Procedure GenEvent_OnClick(Obj: TObject);
+    Function  GetText            : string;   override;
+    Procedure SetText     (Value   : string );  override;
   public
     constructor Create(AOwner: TComponent); override;
     Destructor  Destroy; override;
@@ -668,9 +671,7 @@ type
     FChecked   : boolean;
     Procedure SetVisible  (Value : Boolean);
     Procedure SetColor    (Value : TARGBColorBridge);
-    Function  GetText            : string;
-    Procedure SetText     (Value   : string );
-    Procedure SetFontColor(Value : TARGBColorBridge);
+
     Procedure SetFontSize (Value : DWord  );
     Function  GetChecked         : boolean;
     Procedure SetChecked  (Value : boolean);
@@ -680,6 +681,9 @@ type
   protected
     procedure SetjParent(Value: jObject);
     Procedure GenEvent_OnClick(Obj: TObject);
+    Function  GetText            : string;    override;   //by thierry
+    Procedure SetText     (Value   : string );   override; //by thierry
+    Procedure SetFontColor(Value : TARGBColorBridge);
   public
     constructor Create(AOwner: TComponent); override;
     Destructor Destroy; override;
@@ -705,8 +709,7 @@ type
     //FOnClick   : TOnNotify;
     Procedure SetVisible  (Value : Boolean);
     Procedure SetColor    (Value : TARGBColorBridge);
-    Function  GetText            : string;
-    Procedure SetText     (Value : string );
+
     Procedure SetFontColor(Value : TARGBColorBridge);
     Procedure SetFontSize (Value : DWord  );
     Function  GetChecked         : boolean;
@@ -717,6 +720,8 @@ type
   protected
     procedure SetjParent(Value: jObject);
     Procedure GenEvent_OnClick(Obj: TObject);
+    Function  GetText            : string; override;
+    Procedure SetText     (Value : string ); override;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -781,6 +786,7 @@ type
     //FCount: integer;
     FIsBackgroundImage     : boolean;
     FFilePath: TFilePath;
+    //FImageIdentifier: string;
 
     Procedure SetVisible  (Value : Boolean);
     Procedure SetColor    (Value : TARGBColorBridge);
@@ -810,6 +816,7 @@ type
     Procedure SetImageByName(Value : string);
     Procedure SetImageByIndex(Value : integer);
     procedure SetImageBitmap(bitmap: jObject);
+    procedure SetImageByIdentifier(_imageIdentifier: string);
     // Property
     //property Width: integer Read GetWidth;
     //property Height: integer Read GetHeight;
@@ -823,6 +830,7 @@ type
     //property Visible   : Boolean   read FVisible     write SetVisible;
     property BackgroundColor     : TARGBColorBridge read FColor       write SetColor;
     property IsBackgroundImage   : boolean read FIsBackgroundImage    write FIsBackgroundImage;
+    //property ImageIdentifier: string read FImageIdentifier write SetImageByIdentifier;
      // Event
      property OnClick: TOnNotify read FOnClick write FOnClick;
   end;
@@ -1242,6 +1250,11 @@ type
   Function  Java_Event_pAppOnRotate              (env: PJNIEnv; this: jobject; rotate : Integer) : integer;
   Procedure Java_Event_pAppOnConfigurationChanged(env: PJNIEnv; this: jobject);
   Procedure Java_Event_pAppOnActivityResult      (env: PJNIEnv; this: jobject; requestCode,resultCode : Integer; jData : jObject);
+
+  //Procedure Java_Event_pOnActionBarTabSelected(env: PJNIEnv; this: jobject; view: jObject; title: jString);
+  //Procedure Java_Event_pOnActionBarTabUnSelected(env: PJNIEnv; this: jobject; view:jObject; title: jString);
+
+
   //by jmpessoa: support to Option Menu
   procedure Java_Event_pAppOnCreateOptionsMenu(env: PJNIEnv; this: jobject; jObjMenu: jObject);
   Procedure Java_Event_pAppOnClickOptionMenuItem(env: PJNIEnv; this: jobject; jObjMenuItem: jObject;
@@ -1278,6 +1291,8 @@ type
 
   procedure Java_Event_pAppOnViewClick(env: PJNIEnv; this: jobject; jObjView: jObject; id: integer);
   procedure Java_Event_pAppOnListItemClick(env: PJNIEnv; this: jobject;jObjAdapterView: jObject; jObjView: jObject; position: integer; id: integer);
+
+
 
 // Helper Function
 Function  xy  (x, y: integer): TXY;
@@ -1787,6 +1802,49 @@ begin
   if Assigned(Form.OnActivityRst) then Form.OnActivityRst(Form,requestCode,resultCode,jData);
 end;
 
+(*
+Procedure Java_Event_pOnActionBarTabSelected(env: PJNIEnv; this: jobject; view: jObject; title: jString);
+var
+  Form: jForm;
+  pasStr: string;
+  _jBoolean: JBoolean;
+begin
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+  Form:= gApp.Forms.Stack[gApp.TopIndex].Form;
+  if not Assigned(Form) then Exit;
+  Form.UpdateJNI(gApp);
+
+  pasStr := '';
+  if title <> nil then
+  begin
+    _jBoolean := JNI_False;
+    pasStr    := String( env^.GetStringUTFChars(Env,title,@_jBoolean) );
+  end;
+  if Assigned(Form.OnActionBarTabSelected) then Form.OnActionBarTabSelected(Form,view,pasStr);
+end;
+
+Procedure Java_Event_pOnActionBarTabUnSelected(env: PJNIEnv; this: jobject; view:jObject; title: jString);
+var
+  Form: jForm;
+  pasStr: string;
+  _jBoolean: JBoolean;
+begin
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+  Form:= gApp.Forms.Stack[gApp.TopIndex].Form;
+  if not Assigned(Form) then Exit;
+  Form.UpdateJNI(gApp);
+
+  pasStr := '';
+  if title <> nil then
+  begin
+    _jBoolean := JNI_False;
+    pasStr    := String( env^.GetStringUTFChars(Env,title,@_jBoolean) );
+  end;
+  if Assigned(Form.OnActionBarTabUnSelected) then Form.OnActionBarTabUnSelected(Form,view,pasStr);
+end;
+ *)
 //
 procedure Java_Event_pAppOnViewClick(env: PJNIEnv; this: jobject; jObjView: jObject; id: integer);
 var
@@ -2149,6 +2207,7 @@ begin
   inherited Create(AOwner);
   FTextAlignment:= taLeft;
   FText:= '';
+  FTextTypeFace:= tfNormal;
   //FFontColor:= colbrDefault; //colbrSilver;
   FMarginLeft   := 5;
   FMarginTop    := 5;
@@ -2324,33 +2383,12 @@ begin
     jTextView_setTextSize2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject , FFontSize);
 end;
 
-{
-procedure jTextView.UpdateLParamWidth;
-var
-   side: TSide;
+procedure jTextView.SetTextTypeFace(Value: TTextTypeFace);
 begin
-   if jForm(Owner).Orientation = jForm(Owner).App.Orientation then
-      side:= sdW
-   else
-      side:= sdH;
-
-   if FInitialized then
-      jTextView_setLParamWidth2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject , GetLayoutParams(gApp, FLParamWidth, side));
+  inherited SetTextTypeFace(Value);
+  if FInitialized  then
+    jTextView_SetTextTypeFace(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, Ord(Value));
 end;
-
-procedure jTextView.UpdateLParamHeight;
-var
-   side: TSide;
-begin
-  if jForm(Owner).Orientation = gApp.Orientation then
-     side:= sdH
-  else
-     side:= sdW;
-
-  if FInitialized then
-     jTextView_setLParamHeight2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject , GetLayoutParams(gApp, FLParamHeight, side));
-end;
-}
 
 procedure jTextView.UpdateLParamWidth;
 var
@@ -3017,9 +3055,10 @@ end;
 
 Procedure jButton.SetText(Value: string);
 begin
-  FText:= Value;
+  inherited SetText(Value); //by thierry
+  //FText:= Value;
   if FInitialized then
-    jButton_setText2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject , FText);
+    jButton_setText2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject , Value{FText}); //by thierry
 end;
 
 Procedure jButton.SetFontColor(Value : TARGBColorBridge);
@@ -3238,9 +3277,11 @@ end;
 
 Procedure jCheckBox.SetText(Value: string);
 begin
-  FText:= Value;
-  if FInitialized then
-     jCheckBox_setText2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject , FText);
+  inherited SetText(Value);
+  //FText:= Value;
+  if FInitialized then //by thierry
+     jCheckBox_setText2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject , Value);
+     //jCheckBox_setText(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject , FText);
 end;
 
 Procedure jCheckBox.SetFontColor(Value: TARGBColorBridge);
@@ -3501,9 +3542,11 @@ end;
 
 Procedure jRadioButton.SetText(Value: string);
 begin
-  FText:= Value;
-  if FInitialized then
-     jRadioButton_setText2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject , FText);
+   inherited SetText(Value);
+  //FText:= Value;
+  if FInitialized then   //by thierry
+     jRadioButton_setText2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject ,Value{ FText});
+      //jRadioButton_setText(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject , FText);
 end;
 
 Procedure jRadioButton.SetFontColor(Value: TARGBColorBridge);
@@ -3927,7 +3970,9 @@ var
 begin
   if FInitialized  then Exit;
   inherited Init(refApp);
+
   FjObject := jImageView_Create2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, Self);
+
   if FParent is jPanel then
   begin
     jPanel(FParent).Init(refApp);
@@ -4083,33 +4128,11 @@ begin
      jImageView_setBitmapImage2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject , bitmap);
 end;
 
-{
-procedure jImageView.UpdateLParamWidth;
-var
-   side: TSide;
+procedure jImageView.SetImageByIdentifier(_imageIdentifier: string);
 begin
-  if jForm(Owner).Orientation = gApp.Orientation then
-     side:= sdW
-  else
-     side:= sdH;
-
   if FInitialized then
-     jImageView_setLParamWidth2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject , GetLayoutParams(gApp, FLParamWidth, side));
+     jImageView_SetImageByIdentifier(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject , _imageIdentifier);
 end;
-
-procedure jImageView.UpdateLParamHeight;
-var
-   side: TSide;
-begin
-  if jForm(Owner).Orientation = gApp.Orientation then
-     side:= sdH
-  else
-     side:= sdW;
-
-  if FInitialized then
-    jImageView_setLParamHeight2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject , GetLayoutParams(gApp, FLParamHeight, side));
-end;
-}
 
 procedure jImageView.UpdateLParamWidth;
 var
@@ -7731,7 +7754,7 @@ begin
   inherited Init(refApp);
 
   FjObject := jPanel_Create2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, Self);
-
+  FInitialized:= True; //**
   FjRLayout{View}:= jPanel_getView(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject ); // Java : Self Layout
 
   if FParent <> nil then
@@ -7749,13 +7772,14 @@ begin
   end;
 
   jPanel_setParent(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject , FjPRLayout);
+
   jPanel_setId(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject , Self.Id);
 
   jPanel_setLeftTopRightBottomWidthHeight(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject ,
                                           FMarginLeft,FMarginTop,FMarginRight,FMarginBottom,
                                           GetLayoutParams(gApp, FLParamWidth, sdW),
                                           GetLayoutParams(gApp, FLParamHeight, sdH));
-  FInitialized:= True;
+
   if FParent is jPanel then
   begin
      Self.UpdateLayout;
@@ -7768,6 +7792,7 @@ begin
      jPanel_addlParamsAnchorRule(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject , GetPositionRelativeToAnchor(rToA));
    end;
   end;
+
   for rToP := rpBottom to rpCenterVertical do
   begin
     if rToP in FPositionRelativeToParent then
@@ -7785,7 +7810,6 @@ begin
     jView_SetBackGroundColor(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjRLayout{!}, GetARGB(FColor));
 
   jView_SetVisible(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject , FVisible);
-
 end;
 
 procedure jPanel.SetjParent(Value: jObject);
@@ -7814,34 +7838,6 @@ begin
   if FInitialized then
     jView_Invalidate(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject );
 end;
-
-(*
-procedure jPanel.UpdateLParamWidth;
-var
-  side: TSide;
-begin
-  //FLParamWidth:= Value;
-  if FInitialized then
-  begin
-    if jForm(Owner).Orientation = gApp.Orientation then side:= sdW
-    else side:= sdH;
-    jPanel_setLParamWidth2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject , GetLayoutParams(gApp, FLParamWidth, side));
-  end;
-end;
-
-procedure jPanel.UpdateLParamHeight;
-var
-  side: TSide;
-begin
-  //FLParamHeight:= Value;
-  if FInitialized then
-  begin
-    if jForm(Owner).Orientation = gApp.Orientation then side:= sdH
-    else side:= sdW;
-    jPanel_setLParamHeight2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject , GetLayoutParams(gApp, FLParamHeight, side));
-  end;
-end;
-*)
 
 procedure jPanel.UpdateLParamWidth;
 var
@@ -7940,7 +7936,6 @@ begin
   if FInitialized then
   begin
     inherited UpdateLayout;
-    //ResetAllRules;
     UpdateLParamWidth;
     UpdateLParamHeight;
     jPanel_setLayoutAll2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject , Self.AnchorId);

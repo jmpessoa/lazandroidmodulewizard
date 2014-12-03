@@ -1009,6 +1009,15 @@ begin
       if IOResult <> 0 then MkDir(FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'values');
 
       strList.LoadFromFile(FPathToJavaTemplates+DirectorySeparator+'values'+DirectorySeparator+'strings.xml');
+
+      {
+      <?xml version="1.0" encoding="utf-8"?>
+      <resources>
+         <string name="app_name">LazAndroidWizard</string>
+         <string name="hello_world">Hello world!</string>
+      </resources>
+      }
+
       strList.Strings[2]:='<string name="app_name">'+projName+'</string>';
       strList.SaveToFile(FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'values'+DirectorySeparator+'strings.xml');
 

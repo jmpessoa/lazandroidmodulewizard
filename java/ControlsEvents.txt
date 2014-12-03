@@ -48,3 +48,5 @@ pOnLocationProviderEnabled=Java_Event_pOnLocationProviderEnabled(PEnv,this,TObje
 pOnLocationProviderDisabled=Java_Event_pOnLocationProviderDisabled(PEnv,this,TObject(pasobj),provider);
 pAppOnViewClick=Java_Event_pAppOnViewClick(PEnv,this,view,id);
 pAppOnListItemClick=Java_Event_pAppOnListItemClick(PEnv,this,adapter,view,position,id);
+pOnActionBarTabSelected=Java_Event_pOnActionBarTabSelected(PEnv,this,TObject(pasobj),view,title);
+pOnActionBarTabUnSelected=Java_Event_pOnActionBarTabUnSelected(PEnv,this,TObject(pasobj),view,title);

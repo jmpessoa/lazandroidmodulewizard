@@ -236,6 +236,15 @@ const
 
 type
 
+  TMenuItemShowAsAction = (misNever,
+                        misIfRoom,
+                        misAlways,
+                        misNone,    //dummy
+                        misIfRoomWithText,
+                        misAlwaysWithText);
+
+  TMenuItemType = (mitDefault, mitCheckable);
+
   TColorRGB=packed record {copy from  ...\fcl-image\src\BMPcomn.pp}
      B,G,R:Byte;
   end;
@@ -436,6 +445,8 @@ type
 
   TActivityMode = (actMain, actRecyclable, actSplash); //actDisposable
 
+  TTextTypeFace = (tfNormal, tfBold, tfItalic, tfBoldItalic); //by jmpessoa
+
   //...
 
   TOnNotify = Procedure(Sender: TObject) of object;
@@ -465,6 +476,9 @@ type
                                      itemID: integer; itemCaption: string; checked: boolean) of Object;
 
   TOnActivityRst     = Procedure(Sender: TObject; requestCode,resultCode : Integer; jData : jObject) of Object;
+
+  TActionBarTabSelected = Procedure(Sender: TObject; view: jObject; title: string) of Object;
+
   TOnGLChange        = Procedure(Sender: TObject; W, H: integer) of object;
 
   TOnClickYN         = Procedure(Sender: TObject; YN  : TClickYN) of object;
@@ -567,7 +581,6 @@ type
     Procedure SetClassName(Value : String);
   protected
     //
-
   public
     Jni           : TEnvJni;
     Path          : TEnvPath;
@@ -784,6 +797,7 @@ type
     FOnRotate      : TOnRotate;
 
     FOnActivityRst : TOnActivityRst;
+
     FOnJNIPrompt   : TOnNotify;
     FOnBackButton  : TOnNotify;
 
@@ -791,7 +805,6 @@ type
     FOnClickOptionMenuItem: TOnClickOptionMenuItem;
     FOnContextMenuCreate: TOnContextMenuItemCreate;
     FOnClickContextMenuItem: TOnClickContextMenuItem;
-
 
     //---------------  dummies for compatibility----
    {  FHorizontalOffset: integer;
@@ -875,6 +888,28 @@ type
     function IsExternalStorageEmulated(): boolean;  //API level 11
     function IsExternalStorageRemovable(): boolean; //API level 9
 
+    function GetjFormVersionFeatures(): string;
+
+    //Action bar was introduced in Android 3.0 (API level 11)
+    function GetActionBar(): jObject;    //Set targetSdkVersion to >= 14, then test your app on Android 4.0.
+    procedure HideActionBar();
+    procedure ShowActionBar();
+    procedure ShowTitleActionBar(_value: boolean);
+    procedure HideLogoActionBar(_value: boolean);
+    procedure SetTitleActionBar(_title: string);
+    procedure SetSubTitleActionBar(_subtitle: string);
+
+    procedure SetIconActionBar(_iconIdentifier: string);
+    procedure SetTabNavigationModeActionBar;
+    procedure RemoveAllTabsActionBar();
+
+    function GetStringResourceId(_resName: string): integer;
+    function GetStringResourceById(_resID: integer): string;
+    function GetDrawableResourceId(_resName: string): integer;
+    function GetDrawableResourceById(_resID: integer): jObject;
+    function GetQuantityStringByName(_resName: string; _quantity: integer): string;
+    function GetStringResourceByName(_resName: string): string;
+
     // Property
     property View         : jObject        read FjRLayout {GetView } write FjRLayout;
     property ScreenStyle  : TScreenStyle   read FScreenStyle    write FScreenStyle;
@@ -908,6 +943,7 @@ type
     property OnRotate     : TOnRotate      read FOnRotate      write FOnRotate;
     property OnClick      : TOnNotify      read FOnClick       write FOnClick;
     property OnActivityRst: TOnActivityRst read FOnActivityRst write FOnActivityRst;
+
     property OnJNIPrompt  : TOnNotify read FOnJNIPrompt write FOnJNIPrompt;
     property OnBackButton : TOnNotify read FOnBackButton write FOnBackButton;
     property OnClose      : TOnNotify read FOnClose write FOnClose;
@@ -941,6 +977,8 @@ type
     FOrientation : integer;
     FTextAlignment: TTextAlignment;
     FFontSize     : DWord;
+    FTextTypeFace: TTextTypeFace;
+
     FAnchorId     : integer;
     FAnchor       : jVisualControl;  //http://www.semurjengkol.com/android-relative-layout-example/
 
@@ -959,6 +997,7 @@ type
     procedure SetParentComponent(Value: TComponent); override;
     procedure SetParamHeight(Value: TLayoutParams);
     procedure SetParamWidth(Value: TLayoutParams);
+    procedure SetTextTypeFace(Value: TTextTypeFace); virtual;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -970,6 +1009,7 @@ type
     property Orientation: integer read FOrientation write FOrientation;
     property jParent: jObject  read  FjPRLayout write SetjParent; // Java : Parent Relative Layout
     property Id: DWord read FId write FId;                        //Must be published for data persistence!!!
+    property TextTypeFace: TTextTypeFace read FTextTypeFace write SetTextTypeFace;
   published
     property Visible: boolean read FVisible write FVisible;
     property Anchor  : jVisualControl read FAnchor write SetAnchor;
@@ -980,7 +1020,6 @@ type
                                                                  write FPositionRelativeToParent;
     property LayoutParamWidth: TLayoutParams read FLParamWidth write SetParamWidth;
     property LayoutParamHeight: TLayoutParams read FLParamHeight write SetParamHeight;
-
 end;
 
 
@@ -1009,7 +1048,6 @@ end;
   function GetDesignerLayoutParams(lpParam: TLayoutParams; L: integer): DWord;
   function GetDesignerLayoutByWH(Value: DWord; L: integer): TLayoutParams;
 
-
   function GetParamBySide(App: jApp; side: TSide): DWord;
   function GetParamByParentSide(paren: TAndroidWidget; side: TSide): DWord;
 
@@ -1032,6 +1070,28 @@ end;
   function jForm_CreateDir(env: PJNIEnv; this: JObject; _jform: JObject; _fullPath: string; _dirName: string): string;  overload;
   function jForm_IsExternalStorageEmulated(env: PJNIEnv; this: JObject; _jform: JObject): boolean;
   function jForm_IsExternalStorageRemovable(env: PJNIEnv; this: JObject; _jform: JObject): boolean;
+  function jForm_GetjFormVersionFeatures(env: PJNIEnv; this: JObject; _jform: JObject): string;
+
+  function jForm_GetActionBar(env: PJNIEnv; this: JObject; _jform: JObject): jObject;
+  procedure jForm_HideActionBar(env: PJNIEnv; this: JObject; _jform: JObject);
+  procedure jForm_ShowActionBar(env: PJNIEnv; this: JObject; _jform: JObject);
+  procedure jForm_ShowTitleActionBar(env: PJNIEnv; this: JObject; _jform: JObject; _value: boolean);
+  procedure jForm_HideLogoActionBar(env: PJNIEnv; this: JObject; _jform: JObject; _value: boolean);
+  procedure jForm_SetTitleActionBar(env: PJNIEnv; this: JObject; _jform: JObject; _title: string);
+  procedure jForm_SetSubTitleActionBar(env: PJNIEnv; this: JObject; _jform: JObject; _subtitle: string);
+
+  procedure jForm_SetIconActionBar(env: PJNIEnv; this: JObject; _jform: JObject; _iconIdentifier: string);
+
+  procedure jForm_SetTabNavigationModeActionBar(env: PJNIEnv; this: JObject; _jform: JObject);
+  procedure jForm_RemoveAllTabsActionBar(env: PJNIEnv; this: JObject; _jform: JObject);
+
+  function jForm_GetStringResourceId(env: PJNIEnv; this: JObject; _jform: JObject; _resName: string): integer;
+
+  function jForm_GetStringResourceById(env: PJNIEnv; this: JObject; _jform: JObject; _resID: integer): string;
+  function jForm_GetDrawableResourceId(env: PJNIEnv; this: JObject; _jform: JObject; _resName: string): integer;
+  function jForm_GetDrawableResourceById(env: PJNIEnv; this: JObject; _jform: JObject; _resID: integer): jObject;
+  function jForm_GetQuantityStringByName(env: PJNIEnv; this: JObject; _jform: JObject; _resName: string; _quantity: integer): string;
+  function jForm_GetStringResourceByName(env: PJNIEnv; this: JObject; _jform: JObject; _resName: string): string;
 
 
 //jni API Bridge
@@ -1254,6 +1314,11 @@ begin
   FLParamHeight:= Value;
   if (csDesigning in ComponentState) and (Value <> lpMatchParent) and (Value <> lpWrapContent) then
      FLParamHeight:= GetDesignerLayoutByWH(Self.Height, Self.Parent.Height);
+end;
+
+procedure jVisualControl.SetTextTypeFace(Value: TTextTypeFace);
+begin
+  FTextTypeFace:= Value;
 end;
 
 { TAndroidWidget }
@@ -2110,7 +2175,7 @@ begin
   if FInitialized then
   begin
     UpdateJNI(gApp);
-    Result:= jForm_isSdCardMounted(Self.App.Jni.jEnv, Self.App.Jni.jThis, FjObject);
+    Result:= jForm_IsSdCardMounted(Self.App.Jni.jEnv, Self.App.Jni.jThis, FjObject);
   end;
 end;
 
@@ -2176,6 +2241,126 @@ begin
   UpdateJNI(gApp);
   if FInitialized then
    Result:= jForm_IsExternalStorageRemovable(Self.App.Jni.jEnv, Self.App.Jni.jThis, FjObject);
+end;
+
+function jForm.GetjFormVersionFeatures(): string;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jForm_GetjFormVersionFeatures(Self.App.Jni.jEnv, Self.App.Jni.jThis, FjObject);
+end;
+
+function jForm.GetActionBar(): jObject;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jForm_GetActionBar(Self.App.Jni.jEnv, Self.App.Jni.jThis, FjObject);
+end;
+
+procedure jForm.HideActionBar();
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jForm_HideActionBar(Self.App.Jni.jEnv, Self.App.Jni.jThis, FjObject);
+end;
+
+procedure jForm.ShowActionBar();
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jForm_ShowActionBar(Self.App.Jni.jEnv, Self.App.Jni.jThis, FjObject);
+end;
+
+procedure jForm.ShowTitleActionBar(_value: boolean);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jForm_ShowTitleActionBar(Self.App.Jni.jEnv, Self.App.Jni.jThis, FjObject, _value);
+end;
+
+procedure jForm.HideLogoActionBar(_value: boolean);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jForm_HideLogoActionBar(Self.App.Jni.jEnv, Self.App.Jni.jThis, FjObject, _value);
+end;
+
+procedure jForm.SetTitleActionBar(_title: string);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jForm_SetTitleActionBar(Self.App.Jni.jEnv, Self.App.Jni.jThis, FjObject, _title);
+end;
+
+procedure jForm.SetSubTitleActionBar(_subtitle: string);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jForm_SetSubTitleActionBar(Self.App.Jni.jEnv, Self.App.Jni.jThis, FjObject, _subtitle);
+end;
+
+procedure jForm.SetIconActionBar(_iconIdentifier: string);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jForm_SetIconActionBar(Self.App.Jni.jEnv, Self.App.Jni.jThis, FjObject, _iconIdentifier);
+end;
+
+
+procedure jForm.SetTabNavigationModeActionBar();
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jForm_SetTabNavigationModeActionBar(Self.App.Jni.jEnv, Self.App.Jni.jThis, FjObject);
+end;
+
+procedure jForm.RemoveAllTabsActionBar();
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jForm_RemoveAllTabsActionBar(Self.App.Jni.jEnv, Self.App.Jni.jThis, FjObject);
+end;
+
+function jForm.GetStringResourceId(_resName: string): integer;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jForm_GetStringResourceId(Self.App.Jni.jEnv, Self.App.Jni.jThis, FjObject, _resName);
+end;
+
+function jForm.GetStringResourceById(_resID: integer): string;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jForm_GetStringResourceById(Self.App.Jni.jEnv, Self.App.Jni.jThis, FjObject, _resID);
+end;
+
+function jForm.GetDrawableResourceId(_resName: string): integer;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jForm_GetDrawableResourceId(Self.App.Jni.jEnv, Self.App.Jni.jThis, FjObject, _resName);
+end;
+
+function jForm.GetDrawableResourceById(_resID: integer): jObject;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jForm_GetDrawableResourceById(Self.App.Jni.jEnv, Self.App.Jni.jThis, FjObject, _resID);
+end;
+
+function jForm.GetQuantityStringByName(_resName: string; _quantity: integer): string;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jForm_GetQuantityStringByName(Self.App.Jni.jEnv, Self.App.Jni.jThis, FjObject, _resName ,_quantity);
+end;
+
+function jForm.GetStringResourceByName(_resName: string): string;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jForm_GetStringResourceByName(Self.App.Jni.jEnv, Self.App.Jni.jThis, FjObject, _resName);
 end;
 
 {-------- jForm_JNI_Bridge ----------}
@@ -2375,6 +2560,248 @@ begin
   jMethod:= env^.GetMethodID(env, jCls, 'IsExternalStorageRemovable', '()Z');
   jBoo:= env^.CallBooleanMethod(env, _jform, jMethod);
   Result:= boolean(jBoo);
+end;
+
+function jForm_GetjFormVersionFeatures(env: PJNIEnv; this: JObject; _jform: JObject): string;
+var
+  jStr: JString;
+  jBoo: JBoolean;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jform);
+  jMethod:= env^.GetMethodID(env, jCls, 'GetjFormVersionFeatures', '()Ljava/lang/String;');
+  jStr:= env^.CallObjectMethod(env, _jform, jMethod);
+  case jStr = nil of
+     True : Result:= '';
+     False: begin
+              jBoo:= JNI_False;
+              Result:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
+            end;
+  end;
+end;
+
+
+function jForm_GetActionBar(env: PJNIEnv; this: JObject; _jform: JObject): jObject;
+var
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jform);
+  jMethod:= env^.GetMethodID(env, jCls, 'GetActionBar', '()Landroid/app/ActionBar;');
+  Result:= env^.CallObjectMethod(env, _jform, jMethod);
+end;
+
+procedure jForm_HideActionBar(env: PJNIEnv; this: JObject; _jform: JObject);
+var
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jform);
+  jMethod:= env^.GetMethodID(env, jCls, 'HideActionBar', '()V');
+  env^.CallVoidMethod(env, _jform, jMethod);
+end;
+
+procedure jForm_ShowActionBar(env: PJNIEnv; this: JObject; _jform: JObject);
+var
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jform);
+  jMethod:= env^.GetMethodID(env, jCls, 'ShowActionBar', '()V');
+  env^.CallVoidMethod(env, _jform, jMethod);
+end;
+
+procedure jForm_ShowTitleActionBar(env: PJNIEnv; this: JObject; _jform: JObject; _value: boolean);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].z:= JBool(_value);
+  jCls:= env^.GetObjectClass(env, _jform);
+  jMethod:= env^.GetMethodID(env, jCls, 'ShowTitleActionBar', '(Z)V');
+  env^.CallVoidMethodA(env, _jform, jMethod, @jParams);
+end;
+
+procedure jForm_HideLogoActionBar(env: PJNIEnv; this: JObject; _jform: JObject; _value: boolean);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].z:= JBool(_value);
+  jCls:= env^.GetObjectClass(env, _jform);
+  jMethod:= env^.GetMethodID(env, jCls, 'HideLogoActionBar', '(Z)V');
+  env^.CallVoidMethodA(env, _jform, jMethod, @jParams);
+end;
+
+procedure jForm_SetTitleActionBar(env: PJNIEnv; this: JObject; _jform: JObject; _title: string);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_title));
+  jCls:= env^.GetObjectClass(env, _jform);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetTitleActionBar', '(Ljava/lang/String;)V');
+  env^.CallVoidMethodA(env, _jform, jMethod, @jParams);
+env^.DeleteLocalRef(env,jParams[0].l);
+end;
+
+procedure jForm_SetSubTitleActionBar(env: PJNIEnv; this: JObject; _jform: JObject; _subtitle: string);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_subtitle));
+  jCls:= env^.GetObjectClass(env, _jform);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetSubTitleActionBar', '(Ljava/lang/String;)V');
+  env^.CallVoidMethodA(env, _jform, jMethod, @jParams);
+env^.DeleteLocalRef(env,jParams[0].l);
+end;
+
+procedure jForm_SetIconActionBar(env: PJNIEnv; this: JObject; _jform: JObject; _iconIdentifier: string);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_iconIdentifier));
+  jCls:= env^.GetObjectClass(env, _jform);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetIconActionBar', '(Ljava/lang/String;)V');
+  env^.CallVoidMethodA(env, _jform, jMethod, @jParams);
+env^.DeleteLocalRef(env,jParams[0].l);
+end;
+
+
+procedure jForm_SetTabNavigationModeActionBar(env: PJNIEnv; this: JObject; _jform: JObject);
+var
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jform);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetTabNavigationModeActionBar', '()V');
+  env^.CallVoidMethod(env, _jform, jMethod);
+end;
+
+procedure jForm_RemoveAllTabsActionBar(env: PJNIEnv; this: JObject; _jform: JObject);
+var
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jform);
+  jMethod:= env^.GetMethodID(env, jCls, 'RemoveAllTabsActionBar', '()V');
+  env^.CallVoidMethod(env, _jform, jMethod);
+end;
+
+function jForm_GetStringResourceId(env: PJNIEnv; this: JObject; _jform: JObject; _resName: string): integer;
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_resName));
+  jCls:= env^.GetObjectClass(env, _jform);
+  jMethod:= env^.GetMethodID(env, jCls, 'GetStringResourceId', '(Ljava/lang/String;)I');
+  Result:= env^.CallIntMethodA(env, _jform, jMethod, @jParams);
+env^.DeleteLocalRef(env,jParams[0].l);
+end;
+
+
+function jForm_GetStringResourceById(env: PJNIEnv; this: JObject; _jform: JObject; _resID: integer): string;
+var
+  jStr: JString;
+  jBoo: JBoolean;
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].i:= _resID;
+  jCls:= env^.GetObjectClass(env, _jform);
+  jMethod:= env^.GetMethodID(env, jCls, 'GetStringResourceById', '(I)Ljava/lang/String;');
+  jStr:= env^.CallObjectMethodA(env, _jform, jMethod, @jParams);
+  case jStr = nil of
+     True : Result:= '';
+     False: begin
+              jBoo:= JNI_False;
+              Result:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
+            end;
+  end;
+end;
+
+
+function jForm_GetDrawableResourceId(env: PJNIEnv; this: JObject; _jform: JObject; _resName: string): integer;
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_resName));
+  jCls:= env^.GetObjectClass(env, _jform);
+  jMethod:= env^.GetMethodID(env, jCls, 'GetDrawableResourceId', '(Ljava/lang/String;)I');
+  Result:= env^.CallIntMethodA(env, _jform, jMethod, @jParams);
+env^.DeleteLocalRef(env,jParams[0].l);
+end;
+
+function jForm_GetDrawableResourceById(env: PJNIEnv; this: JObject; _jform: JObject; _resID: integer): jObject;
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].i:= _resID;
+  jCls:= env^.GetObjectClass(env, _jform);
+  jMethod:= env^.GetMethodID(env, jCls, 'GetDrawableResourceById', '(I)Landroid/graphics/drawable/Drawable;');
+  Result:= env^.CallObjectMethodA(env, _jform, jMethod, @jParams);
+end;
+
+
+function jForm_GetQuantityStringByName(env: PJNIEnv; this: JObject; _jform: JObject; _resName: string; _quantity: integer): string;
+var
+  jStr: JString;
+  jBoo: JBoolean;
+  jParams: array[0..1] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_resName));
+  jParams[1].i:= _quantity;
+  jCls:= env^.GetObjectClass(env, _jform);
+  jMethod:= env^.GetMethodID(env, jCls, 'GetQuantityStringByName', '(Ljava/lang/String;I)Ljava/lang/String;');
+  jStr:= env^.CallObjectMethodA(env, _jform, jMethod, @jParams);
+  case jStr = nil of
+     True : Result:= '';
+     False: begin
+              jBoo:= JNI_False;
+              Result:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
+            end;
+  end;
+  env^.DeleteLocalRef(env,jParams[0].l);
+end;
+
+
+function jForm_GetStringResourceByName(env: PJNIEnv; this: JObject; _jform: JObject; _resName: string): string;
+var
+  jStr: JString;
+  jBoo: JBoolean;
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_resName));
+  jCls:= env^.GetObjectClass(env, _jform);
+  jMethod:= env^.GetMethodID(env, jCls, 'GetStringResourceByName', '(Ljava/lang/String;)Ljava/lang/String;');
+  jStr:= env^.CallObjectMethodA(env, _jform, jMethod, @jParams);
+  case jStr = nil of
+     True : Result:= '';
+     False: begin
+              jBoo:= JNI_False;
+              Result:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
+            end;
+  end;
+  env^.DeleteLocalRef(env,jParams[0].l);
 end;
 
   {jApp by jmpessoa}

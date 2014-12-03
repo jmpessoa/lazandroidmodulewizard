@@ -3,10 +3,13 @@ object FormPathMissing: TFormPathMissing
   Height = 123
   Top = 190
   Width = 465
+  BorderIcons = [biSystemMenu]
+  BorderStyle = bsToolWindow
   Caption = 'FormPathMissing'
   ClientHeight = 123
   ClientWidth = 465
   OnClose = FormClose
+  Position = poScreenCenter
   LCLVersion = '1.3'
   object Edit1: TEdit
     Left = 8

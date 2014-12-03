@@ -47,13 +47,55 @@
 		Ant	http://ant.apache.org/bindownload.cgi 
 			Simply extract the zip file to a convenient location...
                                 
+Version 0.6 - rev. 06 - 03 December 2014 -
+		
+	NEW!
+		.Add sub entry "Resource Editor" ["Android Module Wizard" to Lazarus IDE "Tools" menu] <<---- by Thierry Dijoux 
+		.LATE [IDE Tools]: Improve logcat support:
+			--> TAG Fielter log
+			--> Run Time Error log
+		
+	NEW!	.jContextMenu component [Android Bridges Extra]  -->> Improve the support to Android Menus....
+		.jMenu - Improve support --> Icons and ActionBar support!
+
+			UPDATE Demo: AppMenuDemo 
+			ref. images: 
+				https://jmpessoa.opendrive.com/files?Ml82OTk0MjAzNV9VekM1dA
+				https://jmpessoa.opendrive.com/files?Ml82OTk0MjE2MF9QS1dTaQ
+				https://jmpessoa.opendrive.com/files?Ml82OTk0MjI2OF9jU3ZwSg
+
+		.jActionBarTab component [Android Bridges Extra] - ActionBar TAB Support!
+
+			NEW! Demo: AppActionBarTabDemo1 - 
+			ref. Images:
+				https://jmpessoa.opendrive.com/files?Ml82OTk0MjI2OF9jU3ZwSg
+				https://jmpessoa.opendrive.com/files?Ml82OTk0MjQ3Ml96N1ZTMg
+				https://jmpessoa.opendrive.com/files?Ml82OTk0MjU5MF82VlRrNA
+
+		.Add new methods to jForm  [ActionBar Support!]:
+		
+			GetActionBar;    
+			HideActionBar;
+			ShowActionBar;
+			ShowTitleActionBar;
+			HideLogoActionBar;
+			SetTitleActionBar;
+			SetSubTitleActionBar;
+			SetIconActionBar;
+			RemoveAllTabsActionBar();
+
+			SetTabNavigationModeActionBar;  --- Need for ActionBar TAB Support!
+
+
+		WARNING: Action bar was introduced in Android 3.0 (API level 11)
+		[Set targetSdkVersion to >= 14, then test your app on Android 4.0]
 
 
 Version 0.6 - rev. 05 - 13 November 2014 -
 
 	NEW! Lazarus Package "amw_ide_tools.lpk" (*) [..\LazAndroidWizard\ide_tools]
 
-		.Add entry "Android Module Wizard" to Lazarus IDE "Tools" menu <<--- by Thierry Dijoux! 
+		.Add entry  <<--- by Thierry Dijoux! 
 		ref. image: https://jmpessoa.opendrive.com/files?Ml82Nzg4MzAyNF9leGVIVg
 
 		.Add sub entry "Late: Apk Expert Tools [Build, Install, ...]" <<---- by Thierry Dijoux! 
