@@ -149,7 +149,7 @@ type
 
  jPanel = class(jVisualControl)
    private
-     FjRLayout: jObject; // Java : Self Layout
+    // FjRLayout: jObject; // Java : Self Layout
      Procedure SetColor(Value : TARGBColorBridge); //background
      procedure UpdateLParamHeight;
      procedure UpdateLParamWidth;
@@ -157,7 +157,7 @@ type
    protected
      function GetWidth: integer;  override;
      function GetHeight: integer; override;
-     procedure SetjParent(Value: jObject);
+     procedure SetViewParent(Value: jObject);
      Procedure SetVisible  (Value : Boolean);
 
    public
@@ -169,8 +169,8 @@ type
 
      procedure ResetAllRules;
 
-     // Property
-     property View: jObject read FjRLayout write FjRLayout;
+     procedure RemoveParent;
+
    published
      property BackgroundColor     : TARGBColorBridge read FColor write SetColor;
    end;
@@ -536,7 +536,7 @@ type
     Procedure SetText(Value: string ); override;
     Function  GetText: string;   override;
     procedure SetTextTypeFace(Value: TTextTypeFace); override;
-    procedure SetjParent(Value: jObject);
+    procedure SetViewParent(Value: jObject);
     Procedure GenEvent_OnClick(Obj: TObject);
   public
     constructor Create(AOwner: TComponent); override;
@@ -596,7 +596,7 @@ type
   protected
     Procedure SetText(Value: string ); override;
     Function  GetText: string; override;
-    procedure SetjParent(Value: jObject);
+    procedure SetViewParent(Value: jObject);
     Procedure GenEvent_OnEnter (Obj: TObject);
     Procedure GenEvent_OnChange(Obj: TObject; EventType : Integer);
   public
@@ -644,7 +644,7 @@ type
     procedure UpdateLParamHeight;
     procedure UpdateLParamWidth;
   protected
-    procedure SetjParent(Value: jObject);
+    procedure SetViewParent(Value: jObject);
     Procedure GenEvent_OnClick(Obj: TObject);
     Function  GetText            : string;   override;
     Procedure SetText     (Value   : string );  override;
@@ -679,7 +679,7 @@ type
     procedure UpdateLParamWidth;
 
   protected
-    procedure SetjParent(Value: jObject);
+    procedure SetViewParent(Value: jObject);
     Procedure GenEvent_OnClick(Obj: TObject);
     Function  GetText            : string;    override;   //by thierry
     Procedure SetText     (Value   : string );   override; //by thierry
@@ -718,7 +718,7 @@ type
     procedure UpdateLParamWidth;
 
   protected
-    procedure SetjParent(Value: jObject);
+    procedure SetViewParent(Value: jObject);
     Procedure GenEvent_OnClick(Obj: TObject);
     Function  GetText            : string; override;
     Procedure SetText     (Value : string ); override;
@@ -759,7 +759,7 @@ type
     procedure UpdateLParamHeight;
     procedure UpdateLParamWidth;
   protected
-    procedure SetjParent(Value: jObject);
+    procedure SetViewParent(Value: jObject);
   public
     Constructor Create(AOwner: TComponent); override;
     Destructor Destroy; override;
@@ -800,7 +800,7 @@ type
     procedure UpdateLParamHeight;
     procedure UpdateLParamWidth;
   protected
-    procedure SetjParent(Value: jObject);
+    procedure SetViewParent(Value: jObject);
     function GetHeight: integer;
     function GetWidth: integer;
     Procedure GenEvent_OnClick(Obj: TObject);
@@ -854,7 +854,7 @@ type
 
   jListView = class(jVisualControl)
   private
-    FjRLayout     : jObject; // Java : Self Layout
+    //FjRLayout {view}    : jObject; // Java : Self Layout
     FOnClickItem  : TOnClickItem;
     FOnClickWidgetItem: TOnClickWidgetItem;
     FOnClickCaptionItem: TOnClickCaptionItem;
@@ -891,7 +891,7 @@ type
     procedure UpdateLParamHeight;
     procedure UpdateLParamWidth;
   protected
-    procedure SetjParent(Value: jObject);
+    procedure SetViewParent(Value: jObject);
     Procedure GenEvent_OnClick(Obj: TObject; Value: integer);
     procedure GenEvent_OnClickWidgetItem(Obj: TObject; index: integer; checked: boolean);
     procedure GenEvent_OnClickCaptionItem(Obj: TObject; index: integer; caption: string);
@@ -927,7 +927,7 @@ type
 
     // Property
     //property Parent: jObject  read  FjPRLayout write SetParent; // Java: Parent Relative Layout
-    property View      : jObject   read FjRLayout  write FjRLayout; //self View
+   // property View      : jObject   read FjRLayout  write FjRLayout; //self View
     property setItemIndex: TXY write SetItemPosition;
     property Count: integer read GetCount;
   published
@@ -956,7 +956,7 @@ type
 
   jScrollView = class(jVisualControl)
   private
-    FjRLayout    : jObject; // Java : Self Layout
+   // FjRLayout    : jObject; // Java : Self Layout
     FScrollSize : integer;
     Procedure SetVisible    (Value : Boolean);
     Procedure SetColor      (Value : TARGBColorBridge);
@@ -964,7 +964,7 @@ type
     procedure UpdateLParamHeight;
     procedure UpdateLParamWidth;
   protected
-    procedure SetjParent(Value: jObject);
+    procedure SetViewParent(Value: jObject);
   public
     constructor Create(AOwner: TComponent); override;
     Destructor  Destroy; override;
@@ -973,7 +973,7 @@ type
     procedure Init(refApp: jApp);  override;
     // Property
     //property Parent: jObject  read  FjPRLayout write SetParent; // Java : Parent Relative Layout
-    property View      : jObject read FjRLayout   write FjRLayout;
+   // property View      : jObject read FjRLayout   write FjRLayout;
   published
     property ScrollSize: integer read FScrollSize write SetScrollSize;
     //property Visible   : Boolean read FVisible    write SetVisible;
@@ -984,7 +984,7 @@ type
 
   jHorizontalScrollView = class(jVisualControl)
   private
-    FjRLayout    : jObject; // Java : Self Layout
+   // FjRLayout    : jObject; // Java : Self Layout
     FScrollSize : integer;
     Procedure SetVisible    (Value : Boolean);
     Procedure SetColor      (Value : TARGBColorBridge);
@@ -992,7 +992,7 @@ type
     procedure UpdateLParamHeight;
     procedure UpdateLParamWidth;
   protected
-    procedure SetjParent(Value: jObject);
+    procedure SetViewParent(Value: jObject);
   public
     constructor Create(AOwner: TComponent); override;
     Destructor  Destroy; override;
@@ -1001,7 +1001,7 @@ type
     procedure Init(refApp: jApp);  override;
     // Property
     //property Parent: jObject  read  FjPRLayout write SetParent; // Java : Parent Relative Layout
-    property View      : jObject read FjRLayout   write FjRLayout;
+   // property View      : jObject read FjRLayout   write FjRLayout;
   published
     property ScrollSize: integer read FScrollSize write SetScrollSize;
     //property Visible   : Boolean read FVisible    write SetVisible;
@@ -1017,7 +1017,7 @@ type
     procedure UpdateLParamHeight;
     procedure UpdateLParamWidth;
   protected
-    procedure SetjParent(Value: jObject);
+    procedure SetViewParent(Value: jObject);
   public
     constructor Create(AOwner: TComponent); override;
     Destructor  Destroy; override;
@@ -1043,7 +1043,7 @@ type
     procedure UpdateLParamHeight;
     procedure UpdateLParamWidth;
   protected
-    procedure SetjParent(Value: jObject);
+    procedure SetViewParent(Value: jObject);
   public
     constructor Create(AOwner: TComponent); override;
     Destructor  Destroy; override;
@@ -1080,7 +1080,7 @@ type
     procedure UpdateLParamHeight;
     procedure UpdateLParamWidth;
   protected
-    procedure SetjParent(Value: jObject);
+    procedure SetViewParent(Value: jObject);
     function GetWidth: integer;  override;
     function GetHeight: integer; override;
     Procedure GenEvent_OnTouch(Obj: TObject; Act,Cnt: integer; X1,Y1,X2,Y2: single);
@@ -1126,7 +1126,7 @@ type
     procedure UpdateLParamHeight;
     procedure UpdateLParamWidth;
   protected
-    procedure SetjParent(Value: jObject);
+    procedure SetViewParent(Value: jObject);
     Procedure GenEvent_OnClick(Obj: TObject);
     procedure Notification(AComponent: TComponent; Operation: TOperation); override;
   public
@@ -1336,6 +1336,9 @@ Procedure VHandler_touchesEnded_withEvent(Sender         : TObject;
 
 
 implementation
+
+uses
+  customdialog;
 
 // Event id for Pascal & Java
 const
@@ -2258,6 +2261,11 @@ begin
     jScrollView(FParent).Init(refApp);
     FjPRLayout:= jScrollView(FParent).View;
   end;
+  if FParent is jCustomDialog then
+  begin
+    jScrollView(FParent).Init(refApp);
+    FjPRLayout:= jScrollView(FParent).View;
+  end;
 
   jTextView_setParent(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject , FjPRLayout);
 
@@ -2327,7 +2335,7 @@ begin
 
 end;
 
-Procedure jTextView.SetjParent(Value: jObject);
+Procedure jTextView.SetViewParent(Value: jObject);
 begin
   FjPRLayout:= Value;
   if FInitialized then
@@ -2540,7 +2548,11 @@ begin
     jScrollView(FParent).Init(refApp);
     FjPRLayout:= jScrollView(FParent).View;
   end;
-
+  if FParent is jCustomDialog then
+  begin
+    jScrollView(FParent).Init(refApp);
+    FjPRLayout:= jScrollView(FParent).View;
+  end;
   jEditText_setParent(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject , FjPRLayout);
 
   jEditText_setId(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject , Self.Id);
@@ -2627,7 +2639,7 @@ begin
 
 end;
 
-Procedure jEditText.SetjParent(Value: jObject);
+Procedure jEditText.SetViewParent(Value: jObject);
 begin
   FjPRLayout:= Value;
   if FInitialized then
@@ -2968,6 +2980,11 @@ begin
      jScrollView(FParent).Init(refApp);
      FjPRLayout:= jScrollView(FParent).View;
   end;
+  if FParent is jCustomDialog then
+  begin
+    jScrollView(FParent).Init(refApp);
+    FjPRLayout:= jScrollView(FParent).View;
+  end;
 
   jButton_setParent(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject , FjPRLayout);
 
@@ -3019,7 +3036,7 @@ begin
 
 end;
 
-Procedure jButton.SetjParent(Value: jObject);
+Procedure jButton.SetViewParent(Value: jObject);
 begin
   FjPRLayout:= Value;
   if FInitialized then
@@ -3195,6 +3212,11 @@ begin
     jScrollView(FParent).Init(refApp);
     FjPRLayout:= jScrollView(FParent).View;
   end;
+  if FParent is jCustomDialog then
+  begin
+    jScrollView(FParent).Init(refApp);
+    FjPRLayout:= jScrollView(FParent).View;
+  end;
 
   jCheckBox_setParent(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject , FjPRLayout);
   jCheckBox_setId(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject , Self.Id);
@@ -3241,7 +3263,7 @@ begin
 
 end;
 
-Procedure jCheckBox.SetjParent(Value: jObject);
+Procedure jCheckBox.SetViewParent(Value: jObject);
 begin
   FjPRLayout:= Value;
   if FInitialized then
@@ -3458,6 +3480,11 @@ begin
     jScrollView(FParent).Init(refApp);
     FjPRLayout:= jScrollView(FParent).View;
   end;
+  if FParent is jCustomDialog then
+  begin
+    jScrollView(FParent).Init(refApp);
+    FjPRLayout:= jScrollView(FParent).View;
+  end;
 
   jRadioButton_setParent(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject , FjPRLayout);
   jRadioButton_setId(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject , Self.Id);
@@ -3506,7 +3533,7 @@ begin
 
 end;
 
-Procedure jRadioButton.SetjParent(Value: jObject);
+Procedure jRadioButton.SetViewParent(Value: jObject);
 begin
   FjPRLayout:= Value;
   if FInitialized then
@@ -3728,6 +3755,11 @@ begin
       jScrollView(FParent).Init(refApp);
       FjPRLayout:= jScrollView(FParent).View;
     end;
+    if FParent is jCustomDialog then
+    begin
+      jScrollView(FParent).Init(refApp);
+      FjPRLayout:= jScrollView(FParent).View;
+    end;
   end;
   jProgressBar_setParent(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject , FjPRLayout);
   jProgressBar_setId(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject , Self.Id);
@@ -3769,7 +3801,7 @@ begin
   FInitialized:= True;
 end;
 
-Procedure jProgressBar.SetjParent(Value: jObject);
+Procedure jProgressBar.SetViewParent(Value: jObject);
 begin
   FjPRLayout:= Value;
   if FInitialized then
@@ -3983,6 +4015,11 @@ begin
     jScrollView(FParent).Init(refApp);
     FjPRLayout:= jScrollView(FParent).View;
   end;
+  if FParent is jCustomDialog then
+  begin
+    jScrollView(FParent).Init(refApp);
+    FjPRLayout:= jScrollView(FParent).View;
+  end;
 
   jImageView_setParent(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis,FjObject , FjPRLayout);
   jImageView_setId(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject , Self.Id);
@@ -4030,7 +4067,7 @@ begin
   jView_SetVisible(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject , FVisible);
 end;
 
-procedure jImageView.SetjParent(Value: jObject);
+procedure jImageView.SetViewParent(Value: jObject);
 begin
   FjPRLayout:= Value;
   if FInitialized then
@@ -4711,6 +4748,11 @@ begin
       jScrollView(FParent).Init(refApp);
       FjPRLayout:= jScrollView(FParent).View;
     end;
+    if FParent is jCustomDialog then
+    begin
+      jScrollView(FParent).Init(refApp);
+      FjPRLayout:= jScrollView(FParent).View;
+    end;
   end;
   jListView_setParent(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject , FjPRLayout);
   jListView_setId(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject , Self.Id);
@@ -4816,7 +4858,7 @@ begin
     Result:= jListView_IsItemChecked(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject , index);
 end;
 
-procedure jListView.SetjParent(Value: jObject);
+procedure jListView.SetViewParent(Value: jObject);
 begin
   FjPRLayout:= Value;
   if FInitialized then
@@ -5158,7 +5200,8 @@ begin
   inherited Init(refApp);
 
   FjObject := jScrollView_Create2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, Self);
-  FjRLayout:= jScrollView_getView(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject ); // Java : Self Layout
+  FjRLayout:= jScrollView_getView(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject ); //Self.View
+
   if FParent <> nil then
   begin
     if FParent is jPanel then
@@ -5167,6 +5210,11 @@ begin
       FjPRLayout:= jPanel(FParent).View;
     end;
     if FParent is jScrollView then
+    begin
+      jScrollView(FParent).Init(refApp);
+      FjPRLayout:= jScrollView(FParent).View;
+    end;
+    if FParent is jCustomDialog then
     begin
       jScrollView(FParent).Init(refApp);
       FjPRLayout:= jScrollView(FParent).View;
@@ -5212,7 +5260,7 @@ begin
   FInitialized:= True;
 end;
 
-procedure jScrollView.SetjParent(Value: jObject);
+procedure jScrollView.SetViewParent(Value: jObject);
 begin
   FjPRLayout:= Value;
   if FInitialized then
@@ -5376,7 +5424,7 @@ begin
   if FInitialized  then Exit;
   inherited Init(refApp);                   //fix create
   FjObject  := jHorizontalScrollView_Create2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, Self);
-  FjRLayout:= jHorizontalScrollView_getView(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject ); //self layout!
+  FjRLayout:= jHorizontalScrollView_getView(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject ); //self.View
   if FParent <> nil then
   begin
     if FParent is jPanel then
@@ -5385,6 +5433,11 @@ begin
       FjPRLayout:= jPanel(FParent).View;
     end;
     if FParent is jScrollView then
+    begin
+      jScrollView(FParent).Init(refApp);
+      FjPRLayout:= jScrollView(FParent).View;
+    end;
+    if FParent is jCustomDialog then
     begin
       jScrollView(FParent).Init(refApp);
       FjPRLayout:= jScrollView(FParent).View;
@@ -5421,7 +5474,7 @@ begin
   FInitialized:= True;
 end;
 
-procedure jHorizontalScrollView.SetjParent(Value: jObject);
+procedure jHorizontalScrollView.SetViewParent(Value: jObject);
 begin
   FjPRLayout:= Value;
   if FInitialized then
@@ -5589,6 +5642,11 @@ begin
       jScrollView(FParent).Init(refApp);
       FjPRLayout:= jScrollView(FParent).View;
     end;
+    if FParent is jCustomDialog then
+    begin
+      jScrollView(FParent).Init(refApp);
+      FjPRLayout:= jScrollView(FParent).View;
+    end;
   end;
   jViewFlipper_setParent(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject , FjPRLayout);
   jViewFlipper_setId(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject , Self.Id);
@@ -5626,7 +5684,7 @@ begin
   FInitialized:= True;
 end;
 
-procedure jViewFlipper.SetjParent(Value: jObject);
+procedure jViewFlipper.SetViewParent(Value: jObject);
 begin
   FjPRLayout:= Value;
   if FInitialized then
@@ -5788,6 +5846,11 @@ begin
       jScrollView(FParent).Init(refApp);
       FjPRLayout:= jScrollView(FParent).View;
     end;
+    if FParent is jCustomDialog then
+    begin
+      jScrollView(FParent).Init(refApp);
+      FjPRLayout:= jScrollView(FParent).View;
+    end;
   end;
   jWebView_setParent(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject , FjPRLayout);
   jWebView_setId(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject , Self.Id);
@@ -5825,7 +5888,7 @@ begin
   FInitialized:= True;
 end;
 
-procedure jWebView.SetjParent(Value: jObject);
+procedure jWebView.SetViewParent(Value: jObject);
 begin
   FjPRLayout:= Value;
   if FInitialized then
@@ -6501,6 +6564,11 @@ begin
       jScrollView(FParent).Init(refApp);
       FjPRLayout:= jScrollView(FParent).View;
     end;
+    if FParent is jCustomDialog then
+    begin
+      jScrollView(FParent).Init(refApp);
+      FjPRLayout:= jScrollView(FParent).View;
+    end;
   end;
   jView_setParent(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis,FjObject , FjPRLayout);
   jView_setId(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject , Self.Id);
@@ -6537,7 +6605,7 @@ begin
 
 end;
 
-procedure jView.SetjParent(Value: jObject);
+procedure jView.SetViewParent(Value: jObject);
 begin
   FjPRLayout:= Value;
   if FInitialized then
@@ -6972,6 +7040,11 @@ begin
       jScrollView(FParent).Init(refApp);
       FjPRLayout:= jScrollView(FParent).View;
     end;
+    if FParent is jCustomDialog then
+    begin
+      jScrollView(FParent).Init(refApp);
+      FjPRLayout:= jScrollView(FParent).View;
+    end;
   end;
 
   jImageBtn_setParent(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject , FjPRLayout);
@@ -7024,7 +7097,7 @@ begin
   jView_SetVisible(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject , FVisible);
 end;
 
-procedure jImageBtn.SetjParent(Value: jObject);
+procedure jImageBtn.SetViewParent(Value: jObject);
 begin
   FjPRLayout:= Value;
   if FInitialized then
@@ -7753,7 +7826,8 @@ begin
   if FInitialized  then Exit;
   inherited Init(refApp);
 
-  FjObject := jPanel_Create2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, Self);
+  FjObject := jPanel_Create2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, Self); //jSelf !
+
   FInitialized:= True; //**
   FjRLayout{View}:= jPanel_getView(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject ); // Java : Self Layout
 
@@ -7769,6 +7843,16 @@ begin
       jScrollView(FParent).Init(refApp);
       FjPRLayout:= jScrollView(FParent).View;
     end;
+    if FParent is jCustomDialog then
+    begin
+      jScrollView(FParent).Init(refApp);
+      FjPRLayout:= jScrollView(FParent).View;
+    end;
+    if FParent is jCustomDialog then
+    begin
+      jScrollView(FParent).Init(refApp);
+      FjPRLayout:= jScrollView(FParent).View;
+    end;
   end;
 
   jPanel_setParent(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject , FjPRLayout);
@@ -7779,7 +7863,6 @@ begin
                                           FMarginLeft,FMarginTop,FMarginRight,FMarginBottom,
                                           GetLayoutParams(gApp, FLParamWidth, sdW),
                                           GetLayoutParams(gApp, FLParamHeight, sdH));
-
   if FParent is jPanel then
   begin
      Self.UpdateLayout;
@@ -7810,9 +7893,10 @@ begin
     jView_SetBackGroundColor(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjRLayout{!}, GetARGB(FColor));
 
   jView_SetVisible(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject , FVisible);
+
 end;
 
-procedure jPanel.SetjParent(Value: jObject);
+procedure jPanel.SetViewParent(Value: jObject);
 begin
   FjPRLayout:= Value;
   if FInitialized then
@@ -7830,7 +7914,7 @@ Procedure jPanel.SetColor(Value: TARGBColorBridge);
 begin
   FColor:= Value;
   if (FInitialized = True) and (FColor <> colbrDefault) then
-    jView_SetBackGroundColor(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjRLayout{!}, GetARGB(FColor));
+    jView_SetBackGroundColor(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjRLayout{view!}, GetARGB(FColor));
 end;
 
 Procedure jPanel.Refresh;
@@ -7940,6 +8024,12 @@ begin
     UpdateLParamHeight;
     jPanel_setLayoutAll2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject , Self.AnchorId);
   end;
+end;
+
+procedure jPanel.RemoveParent;
+begin
+if FInitialized then
+   jPanel_RemoveParent(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject);
 end;
 
 end.

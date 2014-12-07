@@ -478,6 +478,7 @@ type
   TOnActivityRst     = Procedure(Sender: TObject; requestCode,resultCode : Integer; jData : jObject) of Object;
 
   TActionBarTabSelected = Procedure(Sender: TObject; view: jObject; title: string) of Object;
+  TCustomDialogShow = Procedure(Sender: TObject; dialog: jObject; title: string) of Object;
 
   TOnGLChange        = Procedure(Sender: TObject; W, H: integer) of object;
 
@@ -973,7 +974,10 @@ type
   protected
     // Java
     FId: DWord;
-    FjPRLayout   : jObject; //Java: jParent RelativeLayout
+
+    FjPRLayout   : jObject; //Java: Parent Layout {parent View)
+    FjRLayout: jObject; // Java : Self Layout  {Self.View}
+
     FOrientation : integer;
     FTextAlignment: TTextAlignment;
     FFontSize     : DWord;
@@ -993,7 +997,15 @@ type
     procedure SetAnchor(Value: jVisualControl);
     procedure DefineProperties(Filer: TFiler); override;
     procedure Notification(AComponent: TComponent; Operation: TOperation); override;
-    procedure SetjParent(Value: jObject);
+
+    procedure SetViewParent(Value: jObject);  virtual;
+    function GetViewParent: jObject;  virtual;
+
+
+    procedure SetView(Value: jObject);  virtual;
+    function GetView: jObject;  virtual;
+
+
     procedure SetParentComponent(Value: TComponent); override;
     procedure SetParamHeight(Value: TLayoutParams);
     procedure SetParamWidth(Value: TLayoutParams);
@@ -1007,7 +1019,11 @@ type
     procedure UpdateLayout; virtual;
     property AnchorId: integer read FAnchorId write FAnchorId;
     property Orientation: integer read FOrientation write FOrientation;
-    property jParent: jObject  read  FjPRLayout write SetjParent; // Java : Parent Relative Layout
+
+    property ViewParent {ViewParent}: jObject  read  GetViewParent write SetViewParent; // Java : Parent Relative Layout
+
+    property View: jObject read GetView write SetView; // Java : Self View/Layout
+
     property Id: DWord read FId write FId;                        //Must be published for data persistence!!!
     property TextTypeFace: TTextTypeFace read FTextTypeFace write SetTextTypeFace;
   published
@@ -1169,7 +1185,7 @@ var
 implementation
 
 uses
-  Laz_And_Controls, Laz_And_GLESv2_Canvas, Laz_And_GLESv1_Canvas, Spinner;
+  Laz_And_Controls, Laz_And_GLESv2_Canvas, Laz_And_GLESv1_Canvas, Spinner, customdialog;
 
 constructor jControl.Create(AOwner: TComponent);
 begin
@@ -1225,7 +1241,7 @@ end;
 procedure jVisualControl.Init(refApp: jApp);
 begin
   inherited Init(refApp);
-  FjPRLayout:= jForm(Owner).View;  //set default jParent/FjPRLayout as jForm.View!
+  FjPRLayout:= jForm(Owner).View;  //set default ViewParent/FjPRLayout as jForm.View!
   FOrientation:= jForm(Owner).Orientation;
 end;
 
@@ -1274,9 +1290,24 @@ begin
   inherited SetParentComponent(Value);
 end;
 
-procedure jVisualControl.SetjParent(Value: jObject);
+procedure jVisualControl.SetViewParent(Value: jObject);
 begin
   FjPRLayout:= Value;
+end;
+
+function jVisualControl.GetViewParent: jObject;
+begin
+  Result:= FjPRLayout;
+end;
+
+procedure jVisualControl.SetView(Value: jObject);
+begin
+  FjRLayout:= Value;
+end;
+
+function jVisualControl.GetView: jObject;
+begin
+  Result:= FjRLayout;
 end;
 
 procedure jVisualControl.DefineProperties(Filer: TFiler);
@@ -1492,7 +1523,7 @@ begin
     if Self.Width < 51 then
        Self.Width:= Trunc(TAndroidWidget(Parent).Width/2) - 15;//Trunc(2.0*(Parent.MarginLeft+Parent.MarginRight))-2;
 
-    if (Self is jListView)    or (Self is jPanel)   or (Self is jCanvasES1) or
+    if (Self is jListView)    or (Self is jPanel) or (Self is jCustomDialog)  or (Self is jCanvasES1) or
        (Self is jCanvasES2)   or (Self is jWebView) or
        (Self is jViewFlipper) or (Self is jSpinner) or
        (Self is jHorizontalScrollView) then
@@ -1544,9 +1575,14 @@ begin
       Self.Height:= 40;
     end;
 
-    if (Self is jPanel)  then
+    if (Self is jPanel) or (Self is jCustomDialog) then
     begin
       Self.Height:= 48;
+    end;
+
+    if Self is jCustomDialog then
+    begin
+      Self.Height:= 96;
     end;
 
   end;

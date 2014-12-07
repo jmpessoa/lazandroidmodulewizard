@@ -986,6 +986,8 @@ Procedure jPanel_addLParamsAnchorRule2(env:PJNIEnv;this:jobject; Panel : jObject
 Procedure jPanel_setLayoutAll(env:PJNIEnv;this:jobject; Panel : jObject;  idAnchor: DWord);
 Procedure jPanel_setLayoutAll2(env:PJNIEnv;this:jobject; Panel : jObject;  idAnchor: DWord);
 
+Procedure jPanel_RemoveParent(env:PJNIEnv;this:jobject; Panel : jObject);
+
 function jPanel_getLParamHeight(env:PJNIEnv;this:jobject; Panel : jObject ): integer;
 function jPanel_getLParamWidth(env:PJNIEnv;this:jobject; Panel : jObject): integer;
 
@@ -8026,6 +8028,16 @@ begin
  cls := env^.GetObjectClass(env, Panel);
 _jMethod:= env^.GetMethodID(env, cls, 'setLayoutAll', '(I)V');
  env^.CallVoidMethodA(env,Panel,_jMethod,@_jParams);
+end;
+
+Procedure jPanel_RemoveParent(env:PJNIEnv;this:jobject; Panel : jObject);
+var
+ _jMethod : jMethodID = nil;
+ cls: jClass;
+begin
+ cls := env^.GetObjectClass(env, Panel);
+_jMethod:= env^.GetMethodID(env, cls, 'RemoveParent', '()V');
+ env^.CallVoidMethod(env,Panel,_jMethod);
 end;
 
 //------------------------------------------------------------------------------

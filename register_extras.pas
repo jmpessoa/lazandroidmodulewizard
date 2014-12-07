@@ -8,6 +8,7 @@ interface
 
 uses 
   Classes,
+  customdialog,
   actionbartab,
   menu,
   contextmenu,
@@ -34,6 +35,7 @@ implementation
   
 Procedure Register;
 begin
+  {$I jcustomdialog_icon.lrs}
   {$I jactionbartab_icon.lrs}
   {$I jmenu_icon.lrs}
   {$I jcontextmenu_icon.lrs}
@@ -51,6 +53,7 @@ begin
   {$I jmyhello_icon.lrs}
   RegisterComponents('Android Bridges Extra',
     [
+      jCustomDialog,
       jActionBarTab,
       jMenu,
       jContextMenu,    

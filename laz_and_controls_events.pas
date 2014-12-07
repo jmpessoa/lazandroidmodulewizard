@@ -6,7 +6,7 @@ interface
 
 uses
    Classes, SysUtils, And_jni, And_jni_Bridge, Laz_And_Controls, AndroidWidget, bluetooth, bluetoothclientsocket,
-   bluetoothserversocket, spinner, location, actionbartab;
+   bluetoothserversocket, spinner, location, actionbartab, customdialog;
 
    procedure Java_Event_pOnBluetoothEnabled(env: PJNIEnv; this: jobject; Obj: TObject);
    procedure Java_Event_pOnBluetoothDisabled(env: PJNIEnv; this: jobject; Obj: TObject);
@@ -33,6 +33,7 @@ uses
 
   Procedure Java_Event_pOnActionBarTabSelected(env: PJNIEnv; this: jobject; Obj: TObject; view: jObject; title: jString);
   Procedure Java_Event_pOnActionBarTabUnSelected(env: PJNIEnv; this: jobject; Obj: TObject; view:jObject; title: jString);
+  Procedure Java_Event_pOnCustomDialogShow(env: PJNIEnv; this: jobject; Obj: TObject; dialog:jObject; title: jString);
 
 
 
@@ -463,6 +464,26 @@ begin
       pastitle:= string(env^.GetStringUTFChars(Env, title,@_jBoolean) );
     end;
     jActionBarTab(Obj).GenEvent_OnActionBarTabUnSelected(Obj, view, pastitle);
+  end;
+end;
+
+Procedure Java_Event_pOnCustomDialogShow(env: PJNIEnv; this: jobject; Obj: TObject; dialog:jObject; title: jString);
+var
+   pastitle: string;
+  _jBoolean: JBoolean;
+begin
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+  if Obj is jCustomDialog then
+  begin
+    jForm(jCustomDialog(Obj).Owner).UpdateJNI(gApp);
+    pastitle:= '';
+    if title <> nil then
+    begin
+      _jBoolean:= JNI_False;
+      pastitle:= string(env^.GetStringUTFChars(Env, title,@_jBoolean) );
+    end;
+    jCustomDialog(Obj).GenEvent_OnCustomDialogShow(Obj, dialog, pastitle);
   end;
 end;
 

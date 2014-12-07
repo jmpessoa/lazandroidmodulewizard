@@ -50,3 +50,4 @@ pAppOnViewClick=Java_Event_pAppOnViewClick(PEnv,this,view,id);
 pAppOnListItemClick=Java_Event_pAppOnListItemClick(PEnv,this,adapter,view,position,id);
 pOnActionBarTabSelected=Java_Event_pOnActionBarTabSelected(PEnv,this,TObject(pasobj),view,title);
 pOnActionBarTabUnSelected=Java_Event_pOnActionBarTabUnSelected(PEnv,this,TObject(pasobj),view,title);
+pOnCustomDialogShow=Java_Event_pOnCustomDialogShow(PEnv,this,TObject(pasobj),dialog,title);

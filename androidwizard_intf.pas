@@ -263,7 +263,7 @@ function ToTFPColor(colbrColor: TARGBColorBridge):  TFPColor;
 implementation
 
 uses
-   Laz_And_GLESv2_Canvas, Laz_And_GLESv1_Canvas, Spinner;
+   Laz_And_GLESv2_Canvas, Laz_And_GLESv1_Canvas, Spinner, customdialog;
 
 procedure Register;
 begin
@@ -439,7 +439,25 @@ procedure TAndroidWidgetMediator.Paint;
         end;
         Rectangle(0,0,AWidget.Width,AWidget.Height);    // outer frame
         Font.Color:= clMedGray;
-        //TextOut(6,4,(AWidget as TAndroidWidget).Text);
+        //TextOut(6,4,(AWidget as jVisualControl).Text);
+
+      end else if (AWidget is jCustomDialog) then
+      begin
+        if (AWidget as jCustomDialog).BackgroundColor <> colbrDefault then
+        begin
+          fpcolor:= ToTFPColor((AWidget as jCustomDialog).BackgroundColor);
+          Brush.Color:= FPColorToTColor(fpcolor);
+        end;
+        {
+        else
+        begin
+          Brush.Color:= clNone;
+          Brush.Style:= bsClear;
+        end;
+        }
+        Rectangle(0,0,AWidget.Width,AWidget.Height);    // outer frame
+        Font.Color:= clMedGray;
+        TextOut(6,4,(AWidget as jVisualControl).Text);
 
       end else if (AWidget is jScrollView)  then
       begin
@@ -457,6 +475,12 @@ procedure TAndroidWidgetMediator.Paint;
            if (AWidget as jScrollView).BackgroundColor = colbrDefault then
               fWidget.Color:= ((AWidget as jScrollView).Parent as jPanel).BackgroundColor;
          end;
+
+        if (AWidget as jScrollView).Parent is jCustomDialog  then
+        begin
+          if (AWidget as jScrollView).BackgroundColor = colbrDefault then
+             fWidget.Color:= ((AWidget as jScrollView).Parent as jCustomDialog).BackgroundColor;
+        end;
 
         fWidget.Draw(LCLForm.Canvas, (AWidget as jScrollView).Text);
         fWidget.Free;
@@ -599,6 +623,12 @@ procedure TAndroidWidgetMediator.Paint;
               fWidget.Color:= ((AWidget as jButton).Parent as jPanel).BackgroundColor;
          end;
 
+        if (AWidget as jButton).Parent is jCustomDialog  then
+        begin
+          if (AWidget as jButton).BackgroundColor = colbrDefault then
+             fWidget.Color:= ((AWidget as jButton).Parent as jCustomDialog).BackgroundColor;
+        end;
+
          fWidget.Draw(LCLForm.Canvas, (AWidget as jVisualControl).Text);
          fWidget.Free;
 
@@ -636,6 +666,12 @@ procedure TAndroidWidgetMediator.Paint;
               fWidget.Color:= ((AWidget as jListView).Parent as jPanel).BackgroundColor;
          end;
 
+        if (AWidget as jListView).Parent is jCustomDialog  then
+        begin
+          if (AWidget as jListView).BackgroundColor = colbrDefault then
+             fWidget.Color:= ((AWidget as jListView).Parent as jCustomDialog).BackgroundColor;
+        end;
+
          fWidget.Draw(LCLForm.Canvas, (AWidget as jVisualControl).Text);
          fWidget.Free;
       end else if (AWidget is jSpinner) then
@@ -660,6 +696,12 @@ procedure TAndroidWidgetMediator.Paint;
               fWidget.Color:= ((AWidget as jSpinner).Parent as jPanel).BackgroundColor;
          end;
 
+        if (AWidget as jSpinner).Parent is jCustomDialog  then
+        begin
+          if (AWidget as jSpinner).BackgroundColor = colbrDefault then
+             fWidget.Color:= ((AWidget as jSpinner).Parent as jCustomDialog).BackgroundColor;
+        end;
+
          fWidget.Draw(LCLForm.Canvas, (AWidget as jVisualControl).Text);
          fWidget.Free;
       end else if (AWidget is jProgressBar) then
@@ -680,6 +722,12 @@ procedure TAndroidWidgetMediator.Paint;
                fWidget.Color:= ((AWidget as jProgressBar).Parent as jPanel).BackgroundColor;
          end;
 
+        if (AWidget as jProgressBar).Parent is jCustomDialog  then
+        begin
+          if (AWidget as jProgressBar).BackgroundColor = colbrDefault then
+              fWidget.Color:= ((AWidget as jProgressBar).Parent as jCustomDialog).BackgroundColor;
+        end;
+
          fWidget.Draw(LCLForm.Canvas, (AWidget as jVisualControl).Text);
          fWidget.Free
       end else if (AWidget is jVisualControl) then     ////generic
@@ -695,6 +743,11 @@ procedure TAndroidWidgetMediator.Paint;
       if AWidget.AcceptChildrenAtDesignTime then
       begin       //inner rect...
         if (AWidget is jPanel) then
+        begin
+          Pen.Color:= clSilver; //clWhite;
+          Frame(4,4,AWidget.Width-4,AWidget.Height-4); // inner frame
+        end
+        else if (AWidget is jCustomDialog) then
         begin
           Pen.Color:= clSilver; //clWhite;
           Frame(4,4,AWidget.Width-4,AWidget.Height-4); // inner frame

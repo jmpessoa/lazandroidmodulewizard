@@ -47,6 +47,16 @@
 		Ant	http://ant.apache.org/bindownload.cgi 
 			Simply extract the zip file to a convenient location...
                                 
+Version 0.6 - rev. 07 - 07 December 2014 -
+
+		
+	NEW!	.jCustomDialog component [Android Bridges Extra]  <<---- A suggestion and request by Leledumbo
+
+			NEW! Demo: AppCustomDialogDemo1
+			ref. image: 
+				https://jmpessoa.opendrive.com/files?Ml83MDgwNTQxMl9jTEJkcA
+				
+
 Version 0.6 - rev. 06 - 03 December 2014 -
 		
 	NEW!

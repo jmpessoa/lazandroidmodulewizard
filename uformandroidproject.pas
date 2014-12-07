@@ -669,7 +669,7 @@ begin
           paramJava:= SplitStr(paramJava, ' ');
 
           paramType:= '';
-          paramName:= GetParamNameHack(funcParam, paramType);
+          paramName:= GetParamNameHack(funcParam, {var}paramType);
 
           paramCount:= 1;
 
@@ -1641,7 +1641,7 @@ begin
   listPascal.Add('{Draft Component code by "Lazarus Android Module Wizard" ['+DateTimeToStr(Now)+']}');
   listPascal.Add('{https://github.com/jmpessoa/lazandroidmodulewizard} ');
   listPascal.Add(' ');
-  if FProjectModel = 'jVisualControl' then
+  if Pos('jVisualControl', FProjectModel) > 0  then
   begin
     listPascal.Add('{jVisualControl template}');
     listPascal.Add(' ');
@@ -1671,7 +1671,7 @@ begin
     end;
   end;
 
-  if FProjectModel = 'jVisualControl' then
+  if Pos('jVisualControl', FProjectModel) > 0  then
   begin
    listPascal.Add('    procedure SetVisible(Value: Boolean);');
    listPascal.Add('    procedure SetColor(Value: TARGBColorBridge); //background');
@@ -1688,10 +1688,11 @@ begin
   listPascal.Add('    destructor  Destroy; override;');
   listPascal.Add('    procedure Init(refApp: jApp); override;');
 
-  if FProjectModel = 'jVisualControl' then
+  if Pos('jVisualControl', FProjectModel) > 0  then
   begin
     listPascal.Add('    procedure Refresh;');
     listPascal.Add('    procedure UpdateLayout; override;');
+    listPascal.Add('    procedure ClearLayout;');
     listPascal.Add('    ');
     listPascal.Add('    procedure GenEvent_OnClick(Obj: TObject);');
   end;
@@ -1726,9 +1727,9 @@ begin
 
   listProperties.Free;
 
-  if FProjectModel = 'jVisualControl' then
+  if Pos('jVisualControl', FProjectModel) > 0  then
   begin
-    listPascal.Add('    property Visible: boolean read FVisible write SetVisible;');
+    //listPascal.Add('    property Visible: boolean read FVisible write SetVisible;');
     listPascal.Add('    property BackgroundColor: TARGBColorBridge read FColor write SetColor;');
     listPascal.Add('    property OnClick: TOnNotify read FOnClick write FOnClick;');
   end;
@@ -1748,7 +1749,7 @@ begin
   listPascal.Add('begin');
   listPascal.Add('  inherited Create(AOwner);');
 
-  if FProjectModel = 'jVisualControl' then
+  if Pos('jVisualControl', FProjectModel) > 0  then
   begin
     listPascal.Add('  FMarginLeft   := 10;');
     listPascal.Add('  FMarginTop    := 10;');
@@ -1756,6 +1757,7 @@ begin
     listPascal.Add('  FMarginRight  := 10;');
     listPascal.Add('  FLParamWidth  := lpMatchParent;  //lpWrapContent');
     listPascal.Add('  FLParamHeight := lpWrapContent; //lpMatchParent');
+    listPascal.Add('  FAcceptChildrenAtDesignTime:= False;');
   end;
 
   listPascal.Add('  //your code here....');
@@ -1783,7 +1785,7 @@ begin
   listPascal.Add(' ');
   listPascal.Add('procedure '+FJavaClassName+'.Init(refApp: jApp);');
 
-  if FProjectModel = 'jVisualControl' then
+  if Pos('jVisualControl', FProjectModel) > 0  then
   begin
    listPascal.Add('var');
    listPascal.Add('  rToP: TPositionRelativeToParent;');
@@ -1792,14 +1794,14 @@ begin
 
   listPascal.Add('begin');
   listPascal.Add('  if FInitialized  then Exit;');
-  listPascal.Add('  inherited Init(refApp);');
+  listPascal.Add('  inherited Init(refApp); //set default ViewParent/FjPRLayout as jForm.View!');
   listPascal.Add('  //your code here: set/initialize create params....');
 
 
   listProperties:= TStringList.Create;
 
   if Pos('_', FHackCreateParam) > 0 then
-    listPascal.Add('  FjObject:= jCreate('+StringReplace(FHackCreateParam,'_','F',[rfReplaceAll])+');')   //** add F
+    listPascal.Add('  FjObject:= jCreate('+StringReplace(FHackCreateParam,'_','F',[rfReplaceAll])+'); //jSelf !')   //** add F
   else
   begin
     listProperties.StrictDelimiter:= True;
@@ -1809,37 +1811,31 @@ begin
     begin
       listProperties.Strings[i]:= 'FP'+Trim(listProperties.Strings[i]); //ReplaceCharFirst(Trim(listProperties.Strings[i]),'F')+';'; //** Add F
     end;
-    listPascal.Add('  FjObject:= jCreate('+listProperties.DelimitedText+');');   //** add F
+    listPascal.Add('  FjObject:= jCreate('+listProperties.DelimitedText+'); //jSelf !');   //** add F
   end;
 
   listProperties.Free;
 
   listPascal.Add('  FInitialized:= True;');
 
-  if FProjectModel = 'jVisualControl' then
+  if Pos('jVisualControl', FProjectModel) > 0  then
   begin
-(*
-   listPascal.Add('  if FParentPanel <> nil then');
-   listPascal.Add('  begin');
-   listPascal.Add('    FParentPanel.Init;');
-   listPascal.Add('    FjPRLayout:= FParentPanel.View;');
-   listPascal.Add('  end;');
-*)
-    listPascal.Add('if FParent <> nil then');
-    listPascal.Add('begin');
-    listPascal.Add('  if FParent is jPanel then');
+    //listPascal.Add('  FjRLayout{View}:= '+FJavaClassName+'_GetView(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject ); // Java : Self layout!');
+    listPascal.Add('  if FParent <> nil then');
     listPascal.Add('  begin');
-    listPascal.Add('    jPanel(FParent).Init(refApp);');
-    listPascal.Add('    FjPRLayout:= jPanel(FParent).View;');
+    listPascal.Add('    if FParent is jPanel then');
+    listPascal.Add('    begin');
+    listPascal.Add('      jPanel(FParent).Init(refApp);');
+    listPascal.Add('      FjPRLayout:= jPanel(FParent).View;');
+    listPascal.Add('    end;');
+    listPascal.Add('    if FParent is jScrollView then');
+    listPascal.Add('    begin');
+    listPascal.Add('      jScrollView(FParent).Init(refApp);');
+    listPascal.Add('      FjPRLayout:= jScrollView(FParent).View;');
+    listPascal.Add('    end;');
     listPascal.Add('  end;');
-    listPascal.Add('  if FParent is jScrollView then');
-    listPascal.Add('  begin');
-    listPascal.Add('    jScrollView(FParent).Init(refApp);');
-    listPascal.Add('    FjPRLayout:= jScrollView(FParent).View;');
-    listPascal.Add('  end;');
-    listPascal.Add('end;');
 
-   listPascal.Add('  '+FJavaClassName+'_SetjParent(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, FjPRLayout);');
+   listPascal.Add('  '+FJavaClassName+'_SetViewParent(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, FjPRLayout);');
    listPascal.Add('  '+FJavaClassName+'_SetId(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, Self.Id);');
    listPascal.Add('  '+FJavaClassName+'_SetLeftTopRightBottomWidthHeight(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject,');
    listPascal.Add('                        FMarginLeft,FMarginTop,FMarginRight,FMarginBottom,');
@@ -1847,10 +1843,10 @@ begin
    listPascal.Add('                        GetLayoutParams(gApp, FLParamHeight, sdH));');
 
    listPascal.Add('  ');
-   listPascal.Add('if FParent is jPanel then');
-   listPascal.Add('begin');
-   listPascal.Add('  Self.UpdateLayout;');
-   listPascal.Add('end;');
+   listPascal.Add('  if FParent is jPanel then');
+   listPascal.Add('  begin');
+   listPascal.Add('    Self.UpdateLayout;');
+   listPascal.Add('  end;');
    listPascal.Add('  ');
 
    listPascal.Add('  for rToA := raAbove to raAlignRight do');
@@ -1876,7 +1872,7 @@ begin
   end;
   listPascal.Add('end;');
   listPascal.Add('  ');
-  if FProjectModel = 'jVisualControl' then
+  if Pos('jVisualControl', FProjectModel) > 0  then
   begin
    listPascal.Add('procedure '+FJavaClassName+'.SetColor(Value: TARGBColorBridge);');
    listPascal.Add('begin');
@@ -1915,7 +1911,6 @@ begin
    listPascal.Add('  end;');
    listPascal.Add('end;');
    listPascal.Add('   ');
-
    listPascal.Add('procedure '+FJavaClassName+'.UpdateLParamHeight;');
    listPascal.Add('var');
    listPascal.Add('  side: TSide;');
@@ -1939,7 +1934,6 @@ begin
    listPascal.Add('  end;');
    listPascal.Add('end;');
    listPascal.Add('   ');
-
    listPascal.Add('procedure '+FJavaClassName+'.UpdateLayout;');
    listPascal.Add('begin');
    listPascal.Add('  if FInitialized then');
@@ -1957,6 +1951,24 @@ begin
    listPascal.Add('    jView_Invalidate(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject);');
    listPascal.Add('end;');
    listPascal.Add('   ');
+   listPascal.Add('procedure '+FJavaClassName+'.ClearLayout;');
+   listPascal.Add('var');
+   listPascal.Add('   rToP: TPositionRelativeToParent;');
+   listPascal.Add('   rToA: TPositionRelativeToAnchorID;');
+   listPascal.Add('begin');
+   listPascal.Add(' '+FJavaClassName+'_ClearLayoutAll(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject );');
+   listPascal.Add('   for rToP := rpBottom to rpCenterVertical do');
+   listPascal.Add('   begin');
+   listPascal.Add('      if rToP in FPositionRelativeToParent then');
+   listPascal.Add('        '+FJavaClassName+'_AddLParamsParentRule(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject , GetPositionRelativeToParent(rToP));');
+   listPascal.Add('   end;');
+   listPascal.Add('   for rToA := raAbove to raAlignRight do');
+   listPascal.Add('   begin');
+   listPascal.Add('     if rToA in FPositionRelativeToAnchor then');
+   listPascal.Add('       '+FJavaClassName+'_AddLParamsAnchorRule(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject , GetPositionRelativeToAnchor(rToA));');
+   listPascal.Add('   end;');
+   listPascal.Add('end;');
+   listPascal.Add(' ');
    listPascal.Add('//Event : Java -> Pascal');
    listPascal.Add('procedure '+FJavaClassName+'.GenEvent_OnClick(Obj: TObject);');
    listPascal.Add('begin');
@@ -2006,7 +2018,7 @@ begin
 
     SplitStr(strCaption, ' ');
 
-    FProjectModel:= strCaption;
+    FProjectModel:= strCaption;   //ex. Write  "[Draft] Pascal jVisualControl Interface"
 
     selList:= TStringList.Create;
     selList.Text:= SynMemo1.SelText; //java class code...
@@ -2071,12 +2083,13 @@ procedure TFormAndroidProject.InsertJControlCodeTemplate(txt: string);
 var
   strList: TStringList;
   clipBoard: TClipboard;
-  txtCaption, projectName: string;
+  txtCaption, projectName, newJavaClassName: string;
+
 begin
    txtCaption:= txt;
    if Pos('jControl', txtCaption) > 0 then
    begin
-     projectName:= 'MyControl';
+     newJavaClassName:= 'MyControl';
      strList:= TStringList.Create;
      clipBoard:= TClipboard.Create;
      strList.Add(' ');
@@ -2084,7 +2097,7 @@ begin
      strList.Add('/*https://github.com/jmpessoa/lazandroidmodulewizard*/');
      strList.Add('/*jControl template*/');
      strList.Add(' ');
-     strList.Add('class j'+projectName+' /*extends ...*/ {');
+     strList.Add('class j'+newJavaClassName+' /*extends ...*/ {');
      strList.Add('  ');
      strList.Add('    private long     pascalObj = 0;      // Pascal Object');
      strList.Add('    private Controls controls  = null;   // Control Class -> Java/Pascal Interface ...');
@@ -2092,7 +2105,7 @@ begin
      strList.Add('  ');
      strList.Add('    //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...');
      strList.Add('  ');
-     strList.Add('    public j'+projectName+'(Controls _ctrls, long _Self) { //Add more others news "_xxx" params if needed!');
+     strList.Add('    public j'+newJavaClassName+'(Controls _ctrls, long _Self) { //Add more others news "_xxx" params if needed!');
      strList.Add('       //super(_ctrls.activity);');
      strList.Add('       context   = _ctrls.activity;');
      strList.Add('       pascalObj = _Self;');
@@ -2174,7 +2187,7 @@ begin
 
    if Pos('jVisualControl', txtCaption) > 0 then
    begin
-     projectName:= 'MyVisualControl';
+     newJavaClassName:= 'MyNewVisualControl';
      strList:= TStringList.Create;
      clipBoard:= TClipboard.Create;
      strList.Add(' ');
@@ -2182,7 +2195,7 @@ begin
      strList.Add('/*https://github.com/jmpessoa/lazandroidmodulewizard*/');
      strList.Add('/*jVisualControl template*/');
      strList.Add('  ');
-     strList.Add('class j'+projectName+' extends TextView /*dummy*/ { //please, fix what GUI object will be extended!');
+     strList.Add('class j'+newJavaClassName+' extends RelativeLayout /*dummy*/ { //please, fix what GUI object will be extended!');
      strList.Add('   ');
      strList.Add('   private long       pascalObj = 0;    // Pascal Object');
      strList.Add('   private Controls   controls  = null; // Control Class for events');
@@ -2202,10 +2215,11 @@ begin
      strList.Add('   private int marginTop = 0;');
      strList.Add('   private int marginRight = 0;');
      strList.Add('   private int marginBottom = 0;');
+     strList.Add('   private boolean mRemovedFromParent = false;');
      strList.Add('  ');
      strList.Add('  //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...');
      strList.Add('  ');
-     strList.Add('   public j'+projectName+'(Controls _ctrls, long _Self) { //Add more others news "_xxx"p arams if needed!');
+     strList.Add('   public j'+newJavaClassName+'(Controls _ctrls, long _Self) { //Add more others news "_xxx"p arams if needed!');
      strList.Add('      super(_ctrls.activity);');
      strList.Add('      context   = _ctrls.activity;');
      strList.Add('      pascalObj = _Self;');
@@ -2227,13 +2241,28 @@ begin
      strList.Add('      if (parent != null) { parent.removeView(this); }');
      strList.Add('      //free local objects...');
      strList.Add('      lparams = null;');
+     //strList.Add('      parent = null;');
      strList.Add('      setOnClickListener(null);');
      strList.Add('   }');
      strList.Add('  ');
-     strList.Add('   public void SetjParent(ViewGroup _viewgroup) {');
+     strList.Add('   public void SetViewParent(ViewGroup _viewgroup) {');
      strList.Add('      if (parent != null) { parent.removeView(this); }');
      strList.Add('      parent = _viewgroup;');
-     strList.Add('      _viewgroup.addView(this,lparams);');
+     strList.Add('      parent.addView(this,lparams);');
+     strList.Add('      mRemovedFromParent = false;');
+     strList.Add('   }');
+     strList.Add('   ');
+     strList.Add('   public void RemoveFromViewParent() {');
+     strList.Add('      if (!mRemovedFromParent) {');
+     strList.Add('         this.setVisibility(android.view.View.INVISIBLE);');
+     strList.Add('         if (parent != null)');
+     strList.Add('    	       parent.removeView(this);');
+     strList.Add('	   mRemovedFromParent = true;');
+     strList.Add('	}');
+     strList.Add('   }');
+     strList.Add('  ');
+     strList.Add('   public View GetView() {');
+     strList.Add('      return this;');
      strList.Add('   }');
      strList.Add('  ');
      strList.Add('   public void SetLParamWidth(int _w) {');
@@ -2278,6 +2307,18 @@ begin
      strList.Add('      this.setLayoutParams(lparams);');
      strList.Add('   }');
      strList.Add('  ');
+     strList.Add('   public void ClearLayoutAll() {');
+     strList.Add('	for (int i=0; i < countAnchorRule; i++) {');
+     strList.Add('  	   lparams.removeRule(lparamsAnchorRule[i]);');
+     strList.Add('    	}');
+     strList.Add('  ');
+     strList.Add('	for (int j=0; j < countParentRule; j++) {');
+     strList.Add('   	   lparams.removeRule(lparamsParentRule[j]);');
+     strList.Add('	}');
+     strList.Add('	countAnchorRule = 0;');
+     strList.Add('	countParentRule = 0;');
+     strList.Add('   }');
+     strList.Add(' ');
      strList.Add('   public void SetId(int _id) { //wrapper method pattern ...');
      strList.Add('      this.setId(_id);');
      strList.Add('   }');

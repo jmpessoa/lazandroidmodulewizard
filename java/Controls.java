@@ -1,6 +1,6 @@
 package com.example.dummyapp;
 
-//[LazAndroidModuleWizard - Version 0.6 - rev 06 - 03 December - 2014 
+//[LazAndroidModuleWizard - Version 0.6 - rev. 07 - 07 December - 2014 
 
 //[https://github.com/jmpessoa/lazandroidmodulewizard]
 //
@@ -63,6 +63,7 @@ import android.app.ActivityManager.RunningAppProcessInfo;
 import android.app.ActivityManager.RunningServiceInfo;
 import android.app.ActivityManager;
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
@@ -457,6 +458,7 @@ if (visible) { if (layout.getParent() == null)
 else         { if (layout.getParent() != null)
                { controls.appLayout.removeView(layout); } };
 }
+
 
 //
 public  void SetEnabled ( boolean enabled ) {
@@ -2969,7 +2971,7 @@ int marginBottom = 5;
 
 //by jmpessoa
 public void setMarginRight(int x) {
-	marginRight = x;
+	marginRight = x;	
 }
 
 //by jmpessoa
@@ -3119,23 +3121,19 @@ setId(id);
 //-----------------------------------------
 //----- jPanel by jmpessoa
 //-----------------------------------------
-class jPanel  extends RelativeLayout {
+class jPanel extends RelativeLayout {
 	//Java-Pascal Interface
 	private long             PasObj   = 0;      // Pascal Obj
 	private Controls        controls = null;   // Control Class for Event
 	private ViewGroup       parent   = null;
 
 	private RelativeLayout.LayoutParams lparams;           // layout XYWH
-	
-	private RelativeLayout  layout   = null;
-	private LayoutParams    layparam = null;
-	
+		
 	private int lparamsAnchorRule[] = new int[40]; 
 	int countAnchorRule = 0;
 
 	private int lparamsParentRule[] = new int[40]; 
 	int countParentRule = 0;
-
 	
 	int lpH = RelativeLayout.LayoutParams.MATCH_PARENT;
 	int lpW = RelativeLayout.LayoutParams.MATCH_PARENT; //w
@@ -3144,7 +3142,9 @@ class jPanel  extends RelativeLayout {
 	int MarginTop    = 0;
 	int marginRight  = 0;
 	int marginBottom = 0;
-    	
+	
+	boolean mRemovedFromParent = false;
+	    	
 	public void setMarginRight(int x) {
 		marginRight = x;
 	}
@@ -3169,23 +3169,13 @@ class jPanel  extends RelativeLayout {
 	   controls = ctrls;
        lparams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);		
 	   //
-	   layout   = new RelativeLayout(context);
-	   layparam = new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
-	   layout.setLayoutParams(layparam);
 	}
 	
-	public  void setXYWH ( int x, int y, int w, int h ) {
-		
+	public  void setXYWH ( int x, int y, int w, int h ) {		
 		lparams.width  = w;
 		lparams.height = h;
 		lparams.setMargins(x,y,0,0);
-		//
-		setLayoutParams(lparams);
-		
-		layparam.setMargins(x,y,0,0);
-		layparam.width = w;
-		layparam.height = h;
-	    layout.setLayoutParams(layparam);
+		setLayoutParams(lparams);		
 	}
 	
 	public void setLeftTopRightBottomWidthHeight(int left, int top, int right, int bottom, int w, int h) {
@@ -3215,12 +3205,10 @@ class jPanel  extends RelativeLayout {
 
 	public void resetLParamsRules() {
 		for (int i=0; i < countAnchorRule; i++) {  
-				layparam.removeRule(lparamsAnchorRule[i]);
 				lparams.removeRule(lparamsAnchorRule[i]);		
 		}
 				
 		for (int j=0; j < countParentRule; j++) {  
-			layparam.removeRule(lparamsParentRule[j]);		
 			lparams.removeRule(lparamsParentRule[j]);		
 	    }		
 		countAnchorRule = 0;
@@ -3238,58 +3226,51 @@ class jPanel  extends RelativeLayout {
 	}
 
 	//by jmpessoa
-	public void setLayoutAll(int idAnchor) {
-		
+	public void setLayoutAll(int idAnchor) {		
 		lparams.width  = lpW; 
 		lparams.height = lpH; 
-		lparams.setMargins(MarginLeft,MarginTop,marginRight,marginBottom);
-
-		
-		layparam.height = lpH;
-	 	layparam.width =  lpW;
-	 	layparam.setMargins(MarginLeft,MarginTop,marginRight,marginBottom);
-	 	
+		lparams.setMargins(MarginLeft,MarginTop,marginRight,marginBottom);		
 		if (idAnchor > 0) {    	
 			for (int i=0; i < countAnchorRule; i++) {  
-				layparam.addRule(lparamsAnchorRule[i], idAnchor);
 				lparams.addRule(lparamsAnchorRule[i], idAnchor);		
-		    }
-			
+		    }			
 		} 
 		
 		for (int j=0; j < countParentRule; j++) {  
-			layparam.addRule(lparamsParentRule[j]);		
 			lparams.addRule(lparamsParentRule[j]);		
 	    }
-		//
-		setLayoutParams(lparams);
-		layout.setLayoutParams(layparam); 		
+		setLayoutParams(lparams); 		
  	}
 
 	public void setIdEx(int id) {
 	   setId(id);	
 	}
 	
-	public  android.widget.RelativeLayout getView() {
-	   return layout;
+	//GetView!
+	public  RelativeLayout getView() {
+	   return this;
 	}
-
+	
 	public  void setParent( android.view.ViewGroup viewgroup ) {
     	if (parent != null) { parent.removeView(this); }
 	    parent = viewgroup;
 	    parent.addView(this,lparams);
-	    parent.addView(layout);
-	}
-	
+	    mRemovedFromParent=false;
+	}	
 	// Free object except Self, Pascal Code Free the class.
 	public  void Free() {
 		if (parent != null) { parent.removeView(this); }
-		layparam = null;
-		this.removeView(layout);
-		layout = null;
-		layparam = null;
+		lparams = null;   
 	}
+	
+	public void RemoveParent() {
+	   if (!mRemovedFromParent) {
+		  	 parent.removeView(this);
+		  	mRemovedFromParent = true;
+	   } 		   
+	}		 
 }
+
 
 
 //-------------------------------------------------------------------------
@@ -8764,8 +8745,7 @@ class jActionBarTab {
 		//http://www.lucazanini.eu/2012/android/tab-layout-in-android-with-actionbar-and-fragment/?lang=en
 	    @Override
 	    /*.*/public void onTabSelected(ActionBar.Tab tab, FragmentTransaction ft) {    	  
-	    	mFragment.getView().setVisibility(View.VISIBLE);
-	    	//mFragment.getView().refreshDrawableState();	    	
+	    	mFragment.getView().setVisibility(View.VISIBLE);	    	
 	    	controls.pOnActionBarTabSelected(pascalObj, mFragment.getView(), mFragment.getText());    	    	
 	    	if(mFragment.isAdded()){
 	    	    ft.show(mFragment);
@@ -8910,6 +8890,205 @@ class jActionBarTab {
 }
 
 
+/*Draft java code by "Lazarus Android Module Wizard" [12/4/2014 23:21:31]*/
+/*https://github.com/jmpessoa/lazandroidmodulewizard*/
+/*jVisualControl template*/
+
+class jCustomDialog extends RelativeLayout {
+
+   private long       pascalObj = 0;    // Pascal Object
+   private Controls   controls  = null; // Control Class for events
+
+   private Context context = null;
+   private ViewGroup parent   = null;         // parent view
+   private LayoutParams lparams;              // layout XYWH
+   //private OnClickListener onClickListener;   // click event
+   //private Boolean enabled  = true;           // click-touch enabled!
+   private int lparamsAnchorRule[] = new int[30];
+   private int countAnchorRule = 0;
+   private int lparamsParentRule[] = new int[30];
+   private int countParentRule = 0;
+   private int lparamH = 100;
+   private int lparamW = 100;
+   private int marginLeft = 0;
+   private int marginTop = 0;
+   private int marginRight = 0;
+   private int marginBottom = 0;
+
+   Dialog mDialog = null;
+   private String mIconIdentifier = "ic_launcher";   //default icon  ../res/drawable
+   private String mTitle = "Information";
+   boolean mRemovedFromParent = false; //no parent!   
+
+  //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
+
+   public jCustomDialog(Controls _ctrls, long _Self) { //Add more others news "_xxx"p arams if needed!
+      super(_ctrls.activity);
+      context   = _ctrls.activity;
+      pascalObj = _Self;
+      controls  = _ctrls;
+      lparams = new LayoutParams(lparamW, lparamH);
+      //lparams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);		
+   } //end constructor
+
+   public void jFree() {
+      if (parent != null) { parent.removeView(this); }
+      //free local objects...      
+  	  if (mDialog != null) mDialog.dismiss();
+	  mDialog = null;		
+      lparams = null;
+      //parent = null;  //?!
+      //setOnClickListener(null);
+   }
+
+   public void SetViewParent(ViewGroup _viewgroup) {
+      if (parent != null) { parent.removeView(this); }
+      parent = _viewgroup;
+      parent.addView(this,lparams);
+      mRemovedFromParent = false; //now there is a parent!    	
+   }
+
+   public void RemoveFromViewParent() {
+      if (!mRemovedFromParent) {
+    	 this.setVisibility(android.view.View.INVISIBLE);
+    	 if (parent != null) {
+            parent.removeView(this);
+            mRemovedFromParent = true; //no more parent!
+            //Log.i("jCustomDialog", "...RemoveFromViewParent...");
+    	 }          
+       }
+   }
+   
+   public View GetView() {
+      return this;
+   }
+   
+
+   public void SetLParamWidth(int _w) {
+      lparamW = _w;
+   }
+
+   public void SetLParamHeight(int _h) {
+      lparamH = _h;
+   }
+
+   public void SetLeftTopRightBottomWidthHeight(int _left, int _top, int _right, int _bottom, int _w, int _h) {
+      marginLeft = _left;
+      marginTop = _top;
+      marginRight = _right;
+      marginBottom = _bottom;
+      lparamH = _h;
+      lparamW = _w;
+   }
+
+   public void AddLParamsAnchorRule(int _rule) {
+      lparamsAnchorRule[countAnchorRule] = _rule;
+      countAnchorRule = countAnchorRule + 1;
+   }
+
+   public void AddLParamsParentRule(int _rule) {
+      lparamsParentRule[countParentRule] = _rule;
+      countParentRule = countParentRule + 1;
+   }
+
+   public void SetLayoutAll(int _idAnchor) {
+  	lparams.width  = lparamW;
+	lparams.height = lparamH;
+	lparams.setMargins(marginLeft,marginTop,marginRight,marginBottom);
+	if (_idAnchor > 0) {
+	    for (int i=0; i < countAnchorRule; i++) {
+		lparams.addRule(lparamsAnchorRule[i], _idAnchor);
+	    }
+	}
+      for (int j=0; j < countParentRule; j++) {
+         lparams.addRule(lparamsParentRule[j]);
+      }
+      this.setLayoutParams(lparams);
+   }
+
+   public void ClearLayoutAll() {
+	 for (int i=0; i < countAnchorRule; i++) {
+  	   lparams.removeRule(lparamsAnchorRule[i]);
+     }
+
+	 for (int j=0; j < countParentRule; j++) {
+   	   lparams.removeRule(lparamsParentRule[j]);
+	 }
+	 countAnchorRule = 0;
+	 countParentRule = 0;
+   }
+
+   public void SetId(int _id) { //wrapper method pattern ...
+      this.setId(_id);
+   }
+   
+   //write others [public] methods code here......
+   //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...   
+	private int GetDrawableResourceId(String _resName) {   //    ../res/drawable
+		  try {
+		     Class<?> res = R.drawable.class;
+		     Field field = res.getField(_resName);  //"drawableName"
+		     int drawableId = field.getInt(null);
+		     return drawableId;
+		  }
+		  catch (Exception e) {
+		     Log.e("jForm", "Failure to get drawable id.", e);
+		     return 0;
+		  }
+	}
+	
+	public void Show() {	//0: vis; 4: inv; 8: gone
+		Show(mTitle, mIconIdentifier);
+	}
+	
+	public void Show(String _title) {	//0: vis; 4: inv; 8: gone
+		Show(_title, mIconIdentifier);
+	}
+		
+	public void Show(String _title, String _iconIdentifier) {	//0: vis; 4: inv; 8: gone
+		mTitle = _title;
+		mIconIdentifier = _iconIdentifier;
+		if (mDialog != null) {
+			mDialog.setTitle(mTitle);
+		    controls.pOnCustomDialogShow(pascalObj, mDialog, _title);
+			mDialog.show();
+		}	
+		else {			
+		  if (this.getVisibility()==0) { //visible   
+			this.setVisibility(android.view.View.INVISIBLE); //4
+		  }	  		   
+		  if (!mRemovedFromParent) {
+		  	 parent.removeView(this);
+		     mRemovedFromParent = true;
+		  }					   
+	      mDialog = new Dialog(this.controls.activity);	      
+	      mDialog.requestWindowFeature(Window.FEATURE_LEFT_ICON);	     	     
+	      mDialog.setContentView(this);	      
+	      mDialog.setFeatureDrawableResource(Window.FEATURE_LEFT_ICON, GetDrawableResourceId(mIconIdentifier));	      
+	      mDialog.setTitle(mTitle);
+	      this.setVisibility(android.view.View.VISIBLE);
+	 	  controls.pOnCustomDialogShow(pascalObj, mDialog, mTitle);	      
+	      mDialog.show();							
+		}		   
+	}
+	
+	public void SetTitle(String _title) { 
+	   mTitle = _title;
+	   mDialog.setTitle(mTitle);
+	}
+	
+	public void SetIconIdentifier(String _iconIdentifier) {   // ../res/drawable
+		mIconIdentifier = _iconIdentifier;
+		mDialog.requestWindowFeature(Window.FEATURE_LEFT_ICON);
+		mDialog.setFeatureDrawableResource(Window.FEATURE_LEFT_ICON, GetDrawableResourceId(mIconIdentifier));
+	}
+	
+	public void Close() { 
+		if (mDialog != null) mDialog.dismiss();    
+	}	
+} //end class
+
+
 //Javas/Pascal Interface Class 
 
 public class Controls {          // <<--------- 
@@ -8994,6 +9173,7 @@ public  native void pAppOnListItemClick(AdapterView adapter, View view, int posi
 
 public native void pOnActionBarTabSelected(long pasobj, View view, String title);
 public native void pOnActionBarTabUnSelected(long pasobj, View view, String title);
+public native void pOnCustomDialogShow(long pasobj, Dialog dialog, String title);
 
 
 //Load Pascal Library
@@ -11720,10 +11900,13 @@ public  java.lang.Object jSqliteDataAccess_Create(long pasobj, String databaseNa
       return (java.lang.Object)(new jContextMenu(this,_Self));
    }
   
-
   
    public java.lang.Object jActionBarTab_jCreate(long _Self) {
       return (java.lang.Object)(new jActionBarTab(this,_Self));
+   }
+  
+   public java.lang.Object jCustomDialog_jCreate(long _Self) {
+      return (java.lang.Object)(new jCustomDialog(this,_Self));
    }
   
 
