@@ -964,6 +964,9 @@ var
 
   linuxPathToAdbBin: string;
   linuxPathToAntBin: string;
+
+  dummy: string;
+
 begin
   Result:= False;
   frm:= TFormWorkspace.Create(nil);
@@ -1061,17 +1064,12 @@ begin
       ChDir(FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'values');
       if IOResult <> 0 then MkDir(FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'values');
 
-      strList.LoadFromFile(FPathToJavaTemplates+DirectorySeparator+'values'+DirectorySeparator+'strings.xml');
-
-      {
-      <?xml version="1.0" encoding="utf-8"?>
-      <resources>
-         <string name="app_name">LazAndroidWizard</string>
-         <string name="hello_world">Hello world!</string>
-      </resources>
-      }
-
-      strList.Strings[2]:='<string name="app_name">'+projName+'</string>';
+      strList.Clear;
+      strList.Add('<?xml version="1.0" encoding="utf-8"?>');
+      strList.Add('<resources>');
+      strList.Add('   <string name="app_name">'+projName+'</string>');
+      strList.Add('   <string name="hello_world">Hello world!</string>');
+      strList.Add('</resources>');
       strList.SaveToFile(FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'values'+DirectorySeparator+'strings.xml');
 
       CopyFile(FPathToJavaTemplates+DirectorySeparator+'values'+DirectorySeparator+'styles.xml',
@@ -1195,27 +1193,23 @@ begin
       end;
     end; //just Ant project
 
-    //*.bat utils...
-    ChDir(FAndroidProjectName+DirectorySeparator+ 'utils');
-    if IOResult <> 0 then MkDir(FAndroidProjectName+ DirectorySeparator + 'utils');
+    strList.Clear;
+    strList.Add('set path='+FPathToAntBin);        //set path=C:\adt32\ant\bin
+    strList.Add('set JAVA_HOME='+FPathToJavaJDK);  //set JAVA_HOME=C:\Program Files (x86)\Java\jdk1.7.0_21
+    strList.Add('cd '+FAndroidProjectName);
+    strList.Add('ant clean -Dtouchtest.enabled=true debug');
+    strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'build-debug.bat'); //build Apk using "Ant"
 
     strList.Clear;
     strList.Add('set path='+FPathToAntBin);        //set path=C:\adt32\ant\bin
     strList.Add('set JAVA_HOME='+FPathToJavaJDK);  //set JAVA_HOME=C:\Program Files (x86)\Java\jdk1.7.0_21
     strList.Add('cd '+FAndroidProjectName);
+    strList.Add('ant clean release');
+    strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'build-release.bat'); //build Apk using "Ant"
 
-    if FAntBuildMode = 'debug' then
-    begin
-      if FTouchtestEnabled='' then
-         strList.Add('ant debug')
-      else
-        strList.Add('ant -Dtouchtest.enabled=true debug');
-    end
-    else
-    begin
-     strList.Add('ant release');
-    end;
-    strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'build.bat'); //build Apk using "Ant"
+        //*.bat utils...
+    ChDir(FAndroidProjectName+DirectorySeparator+ 'utils');
+    if IOResult <> 0 then MkDir(FAndroidProjectName+ DirectorySeparator + 'utils');
 
     {"android list targets" to see the available targets...}
     strList.Clear;
@@ -1272,7 +1266,7 @@ begin
                DirectorySeparator+'adb logcat');
     strList.Add('cd ..');
     strList.Add('pause');
-    strList.SaveToFile(FAndroidProjectName+DirectorySeparator+{'utils'+}DirectorySeparator+'logcat.bat');
+    strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'logcat.bat');
 
     strList.Clear;
     strList.Add('cd '+FAndroidProjectName+DirectorySeparator+'bin');
@@ -1322,10 +1316,10 @@ begin
     strList.Clear;
     strList.Add('Tutorial: How to get your Android Application [Apk] using "Ant":');
     strList.Add(' ');
-    strList.Add('1. Double click "build.bat" to build Apk');
+    strList.Add('1. Double click "build-debug.bat  [.sh]" to build Apk');
     strList.Add(' ');
     strList.Add('2. If Android Virtual Device[AVD]/Emulator [or real device] is running then:');
-    strList.Add('   2.1 double click "install.bat" to install the Apk on the Emulator');
+    strList.Add('   2.1 double click "install.bat" to install the Apk on the Emulator [or real device]');
     strList.Add('   2.2 look for the App "'+projName+'" in the Emulator and click it!');
     strList.Add(' ');
     strList.Add('3. If AVD/Emulator is NOT running:');
@@ -1358,19 +1352,100 @@ begin
     strList.Add('12. Linux users: use "build.sh" , "install.sh" , "uninstall.sh" and "logcat.sh" [thanks to Stephano!]');
     strList.Add('    WARNING: All demos Apps was generate on windows system! So, please,  edit the *.sh to correct paths one!');
     strList.Add(' ');
-    strList.Add('13. PLEASE, look for "How to use the Demos" in "readme.txt"!!');
+    strList.Add('13. WARNING, before to execute "build-release.bat [.sh]"  you need execute "'+dummy+'-release.keystore.bat [.sh]"!');
+    strList.Add('    Please, read "readme-keytool-input.txt!"');
+    strList.Add(' ');
+    strList.Add('14. PLEASE, for more info, look for "How to use the Demos" in "Laz Android Module Wizard" readme.txt!!');
+
     strList.Add(' ');
     strList.Add('....  Thank you!');
     strList.Add(' ');
     strList.Add('....  by jmpessoa_hotmail_com');
     strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'readme.txt');
 
+    dummy:= LowerCase(projName);
+    strList.Clear;
+    strList.Add('key.store='+dummy+'-release.keystore');
+    strList.Add('key.alias='+dummy+'aliaskey');
+    strList.Add('key.store.password='+dummy+'passw');
+    strList.Add('key.alias.password='+dummy+'passw');
+    strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'ant.properties');
+
+    //keytool input [dammy] data!
+    strList.Clear;
+    strList.Add('123456');             //Enter keystore password:
+    strList.Add('123456');             //Re-enter new password:
+    strList.Add('MyFirstName MyLastName'); //What is your first and last name?
+    strList.Add('MyDevelopmentUnit');        //What is the name of your organizational unit?
+    strList.Add('MyExampleCompany');   //What is the name of your organization?
+    strList.Add('MyCity');             //What is the name of your City or Locality?
+    strList.Add('AA');                 //What is the name of your State or Province?
+    strList.Add('BB');                 //What is the two-letter country code for this unit?
+    strList.Add('y');  //Is <CN=FirstName LastName, OU=Development, O=MyExampleCompany, L=MyCity, ST=AK, C=WZ> correct?[no]:  y
+    strList.Add('123456'); //Enter key password for <aliasKey> <RETURN if same as keystore password>:
+    strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'keytool_input.txt');
+
+    strList.Clear;
+    strList.Add('set JAVA_HOME='+FPathToJavaJDK);  //set JAVA_HOME=C:\Program Files (x86)\Java\jdk1.7.0_21
+    strList.Add('cd '+FAndroidProjectName);
+    strList.Add('keytool -genkey -v -keystore '+projName+'-release.keystore -alias '+dummy+'aliaskey -keyalg RSA -keysize 2048 -validity 10000 < '+
+                FAndroidProjectName+DirectorySeparator+'keytool_input.txt');
+    strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'release-keystore.bat');
+
+    strList.Clear;
+    strList.Add('set JAVA_HOME='+FPathToJavaJDK);  //set JAVA_HOME=C:\Program Files (x86)\Java\jdk1.7.0_21
+    strList.Add('cd '+FAndroidProjectName);
+    strList.Add('jarsigner -verify -verbose -certs '+FAndroidProjectName+DirectorySeparator+'bin'+DirectorySeparator+projName+'-release.apk');
+    strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'jarsigner-verify.bat');
+
+    strList.Clear;
+
+    strList.Add('Tutorial: How to get your keystore to Apk release:');
+    strList.Add(' ');
+    strList.Add('1. Edit "keytool_input.txt" to more representative information!"');
+    strList.Add('2. You need answer the prompts:');
+    strList.Add(' ');
+    strList.Add('Enter keystore password: 123456');
+    strList.Add('Re-enter new password: 123456');
+    strList.Add('What is your first and last name?');
+    strList.Add('  [Unknown]:  MyFirstName MyLastName');
+    strList.Add('What is the name of your organizational unit?');
+    strList.Add('  [Unknown]:  MyDevelopmentUnit');
+    strList.Add('What is the name of your organization?');
+    strList.Add('  [Unknown]:  MyExampleCompany');
+    strList.Add('What is the name of your City or Locality?');
+    strList.Add('  [Unknown]:  MyCity');
+    strList.Add('What is the name of your State or Province?');
+    strList.Add('  [Unknown]:  AA');
+    strList.Add('What is the two-letter country code for this unit?');
+    strList.Add('  [Unknown]:  BB');
+    strList.Add('Is <CN=MyFirstName MyLastName, OU=MyDevelopmentUnit, O=MyExampleCompany,');
+    strList.Add('    L=MyCity, ST=AA, C=BB> correct?');
+    strList.Add('  [no]:  y');
+    strList.Add('Enter key password for <'+dummy+'aliaskey> <RETURN if same as keystore password>: 123456');
+    strList.Add(' ');
+    strList.Add('3. Execute "release-keystore.bat" [.sh]');
+    strList.Add('            warning: well, before execute, you can change/edit the [param] -alias '+dummy+'aliaskey');
+    strList.Add('              ex.  -alias www.mycompany.com ');
+    strList.Add('              Please, change/edit/Sync [key.alias='+dummy+'aliaskey] "ant.properties" too!');
+    strList.Add(' ');
+    strList.Add('4. Edit [notepad like] "ant.properties" to more representative information!"');
+    strList.Add('        warning: "key.alias='+dummy+'aliaskey" need be the same as in "release-keystore.bat [.sh]"');
+    strList.Add(' ');
+
+    strList.Add('Yes, you got his [renowned] keystore!');
+    strList.Add(' ');
+    strList.Add('....  Thank you!');
+    strList.Add(' ');
+    strList.Add('....  by jmpessoa_hotmail_com');
+    strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'readme-keytool-input.txt');
 
     linuxDirSeparator:=  DirectorySeparator;    //  C:\adt32\eclipse\workspace\AppTest1
     linuxPathToJavaJDK:=  FPathToJavaJDK;       //  C:\adt32\sdk
     linuxAndroidProjectName:= FAndroidProjectName;
     linuxPathToAntBin:= FPathToAntBin;
     linuxPathToAndroidSdk:= FPathToAndroidSDK;
+
     {$IFDEF WINDOWS}
        linuxDirSeparator:= '/';
        tempStr:= FPathToJavaJDK;
@@ -1397,19 +1472,17 @@ begin
 
     strList.Add('export JAVA_HOME='+linuxPathToJavaJDK);     //export JAVA_HOME=/usr/lib/jvm/java-6-openjdk
     strList.Add('cd '+linuxAndroidProjectName);
+    strList.Add('ant clean -Dtouchtest.enabled=true debug');
+    strList.SaveToFile(linuxAndroidProjectName+linuxDirSeparator+'build-debug.sh');
 
-    if FAntBuildMode = 'debug' then
-    begin
-      if FTouchtestEnabled='' then
-         strList.Add('ant debug')
-      else
-        strList.Add('ant -Dtouchtest.enabled=true debug');
-    end
-    else
-    begin
-     strList.Add('ant release');
-    end;
-    strList.SaveToFile(linuxAndroidProjectName+linuxDirSeparator+'build.sh');
+    strList.Clear;
+    if FPathToAntBin <> '' then
+       strList.Add('export PATH='+linuxPathToAntBin+':PATH'); //export PATH=/usr/bin/ant:PATH
+
+    strList.Add('export JAVA_HOME='+linuxPathToJavaJDK);     //export JAVA_HOME=/usr/lib/jvm/java-6-openjdk
+    strList.Add('cd '+linuxAndroidProjectName);
+    strList.Add('ant clean release');
+    strList.SaveToFile(linuxAndroidProjectName+linuxDirSeparator+'build-release.sh');
 
     linuxPathToAdbBin:= linuxPathToAndroidSdk+linuxDirSeparator+'platform-tools';
 
@@ -1430,8 +1503,22 @@ begin
     strList.Add(linuxPathToAdbBin+linuxDirSeparator+'adb logcat');
     strList.SaveToFile(linuxAndroidProjectName+linuxDirSeparator+'logcat.sh');
 
+    strList.Clear;
+    strList.Add('export JAVA_HOME='+linuxPathToJavaJDK);     //export JAVA_HOME=/usr/lib/jvm/java-6-openjdk
+    strList.Add('cd '+linuxAndroidProjectName);
+    strList.Add('keytool -genkey -v -keystore '+projName+'-release.keystore -alias '+dummy+'aliaskey -keyalg RSA -keysize 2048 -validity 10000 < '+
+                 linuxAndroidProjectName+linuxDirSeparator+dummy+'keytool_input.txt');
+    strList.SaveToFile(linuxAndroidProjectName+linuxDirSeparator+'release-keystore.sh');
+
+    strList.Clear;
+    strList.Add('export JAVA_HOME='+linuxPathToJavaJDK);     //export JAVA_HOME=/usr/lib/jvm/java-6-openjdk
+    strList.Add('cd '+linuxAndroidProjectName);
+    strList.Add('jarsigner -verify -verbose -certs '+linuxAndroidProjectName+linuxDirSeparator+'bin'+linuxDirSeparator+projName+'-release.apk');
+    strList.SaveToFile(linuxAndroidProjectName+linuxDirSeparator+'jarsigner-verify.sh');
+
     strList.Free;
     Result := True;
+
   end;
   frm.Free;
 
