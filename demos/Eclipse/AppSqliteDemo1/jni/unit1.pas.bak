@@ -6,7 +6,7 @@ unit unit1;
 interface
   
 uses
-  Classes, SysUtils, And_jni, And_jni_Bridge, Laz_And_Controls;
+  Classes, SysUtils, And_jni, And_jni_Bridge, Laz_And_Controls, AndroidWidget;
   
 type
 
@@ -55,7 +55,7 @@ implementation
 
 procedure TAndroidModule1.DataModuleCreate(Sender: TObject);
 begin
-  Self.OnJNIPrompt:= DataModuleJNIPrompt;
+  //Self.OnJNIPrompt:= DataModuleJNIPrompt;
 end;
 
 procedure TAndroidModule1.DataModuleJNIPrompt(Sender: TObject);
@@ -63,7 +63,7 @@ begin
   FInsertInto:= False;
   FTableName:= 'myTable';
   FDatabaseName:= jSqliteDataAccess1.DataBaseName;
-  Self.Show;
+  //Self.Show;
 end;
 
 procedure TAndroidModule1.jButton1Click(Sender: TObject);
@@ -74,10 +74,29 @@ end;
 
 procedure TAndroidModule1.jButton2Click(Sender: TObject);
 begin
-   jSqliteDataAccess1.CreateTable('CREATE TABLE IF  NOT EXISTS '+ FTableName +
-                                  '(_ID INTEGER PRIMARY KEY AUTOINCREMENT, TITLE TEXT, AUTHOR TEXT, COUNT INTEGER, FIGURE BLOB);');
-   ShowMessage('table created!');
+  jSqliteDataAccess1.CreateTable('CREATE TABLE IF  NOT EXISTS '+ FTableName +'(_ID INTEGER PRIMARY KEY AUTOINCREMENT, TITLE   TEXT,AUTHOR TEXT, COUNT INTEGER, FIGURE BLOB);');
+  ShowMessage('table created!');
 end;
+
+(* http://stackoverflow.com/questions/8147440/android-database-transaction
+Now there are two main points
+If you want to set transaction successful you need to write setTransactionSuccessful() and then endTransaction() after beginTransaction()
+If you want to rollback your transaction then you need to endTransaction() without committing the transaction by setTransactionSuccessful().
+
+  jSqliteDataAccess1.BeginTransaction();
+  try {
+      saveCustomer();
+      jSqliteDataAccess1.SetTransactionSuccessful();
+
+  }catch {
+      //Error in between database transaction
+  }finally {
+          jSqliteDataAccess1.EndTransaction();
+
+  }
+
+*)
+
 
 procedure TAndroidModule1.jButton3Click(Sender: TObject);
 begin
@@ -114,8 +133,9 @@ begin
      jBitmap1.ImageIndex:= 7;
      jSqliteDataAccess1.UpdateImage(FTableName, 'FIGURE', '_ID', jBitmap1.GetJavaBitmap, 7);
 
-    FInsertInto:= True;
-    ShowMessage('Ok. Table Inserted!');
+     FInsertInto:= True;
+     ShowMessage('Ok. Table Inserted!');
+
   end else  ShowMessage('warning: table was inserted!');
 end;
 

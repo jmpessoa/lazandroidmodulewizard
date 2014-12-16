@@ -1194,14 +1194,14 @@ begin
     end; //just Ant project
 
     strList.Clear;
-    strList.Add('set path='+FPathToAntBin);        //set path=C:\adt32\ant\bin
+    strList.Add('set path=%path%;'+FPathToAntBin); //<--- thanks to andersonscinfo !  [set path=%path%;C:\and32\ant\bin]
     strList.Add('set JAVA_HOME='+FPathToJavaJDK);  //set JAVA_HOME=C:\Program Files (x86)\Java\jdk1.7.0_21
     strList.Add('cd '+FAndroidProjectName);
-    strList.Add('ant clean -Dtouchtest.enabled=true debug');
+    strList.Add('ant -Dtouchtest.enabled=true debug');
     strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'build-debug.bat'); //build Apk using "Ant"
 
     strList.Clear;
-    strList.Add('set path='+FPathToAntBin);        //set path=C:\adt32\ant\bin
+    strList.Add('set path=%path%;'+FPathToAntBin); //<--- thanks to andersonscinfo !
     strList.Add('set JAVA_HOME='+FPathToJavaJDK);  //set JAVA_HOME=C:\Program Files (x86)\Java\jdk1.7.0_21
     strList.Add('cd '+FAndroidProjectName);
     strList.Add('ant clean release');
@@ -1320,7 +1320,7 @@ begin
     strList.Add(' ');
     strList.Add('2. If Android Virtual Device[AVD]/Emulator [or real device] is running then:');
     strList.Add('   2.1 double click "install.bat" to install the Apk on the Emulator [or real device]');
-    strList.Add('   2.2 look for the App "'+projName+'" in the Emulator and click it!');
+    strList.Add('   2.2 look for the App "'+projName+'" in the Emulator [or real device] and click it!');
     strList.Add(' ');
     strList.Add('3. If AVD/Emulator is NOT running:');
     strList.Add('   3.1 If AVD/Emulator NOT exist:');
@@ -1329,12 +1329,12 @@ begin
     strList.Add('   3.3 look for the App "'+projName+'" in the Emulator and click it!');
     strList.Add(' ');
     strList.Add('4. Log/Debug');
-    strList.Add('   4.1 double click "logcat*.bat" to read Emulator logs and bugs! ['+DirectorySeparator+'utils folder]');
+    strList.Add('   4.1 double click "logcat*.bat" to read logs and bugs! ['+DirectorySeparator+'utils folder]');
     strList.Add(' ');
     strList.Add('5. Uninstall Apk');
-    strList.Add('   5.1 double click "uninstall.bat" to remove Apk from the Emulator!');
+    strList.Add('   5.1 double click "uninstall.bat" to remove Apk from the Emulator [or real device]!');
     strList.Add(' ');
-    strList.Add('6. To find your app Look for the "'+projName+'-'+FAntBuildMode+'.apk" in '+DirectorySeparator+'bin folder!');
+    strList.Add('6. To find your Apk look for the "'+projName+'-'+FAntBuildMode+'.apk" in '+DirectorySeparator+'bin folder!');
     strList.Add(' ');
     strList.Add('7. Android Asset Packaging Tool: to know which files were packed in "'+projName+'-'+FAntBuildMode+'.apk"');
     strList.Add('   7.1 double click "aapt.bat" ['+DirectorySeparator+'utils folder]' );
@@ -1344,18 +1344,19 @@ begin
     strList.Add(' ');
     strList.Add('9. Hint 1: you can edit "*.bat" to extend/modify some command or to fix some incorrect info/path!');
     strList.Add(' ');
-    strList.Add('10.Hint 2: you can edit "build.xml" to set another Android target ex. "android-18" or "android-19" etc.');
+    strList.Add('10.Hint 2: you can edit "build.xml" to set another Android target. ex. "android-18" or "android-19" etc.');
     strList.Add('   WARNING: Yes, if after run  "build.*" the folder "...\bin" is still empty then try another target!' );
+    strList.Add('   WARNING: If you changed the target in "build.xml" change it in "AndroidManifest.xml" too!' );
     strList.Add(' ');
     strList.Add('11.WARNING: After a new [Lazarus IDE]-> "run->build" do not forget to run again: "build.bat" and "install.bat" !');
     strList.Add(' ');
     strList.Add('12. Linux users: use "build.sh" , "install.sh" , "uninstall.sh" and "logcat.sh" [thanks to Stephano!]');
-    strList.Add('    WARNING: All demos Apps was generate on windows system! So, please,  edit the *.sh to correct paths one!');
+    strList.Add('    WARNING: All demos Apps was generate on my windows system! So, please,  edit its to correct paths...!');
     strList.Add(' ');
     strList.Add('13. WARNING, before to execute "build-release.bat [.sh]"  you need execute "'+dummy+'-release.keystore.bat [.sh]"!');
     strList.Add('    Please, read "readme-keytool-input.txt!"');
     strList.Add(' ');
-    strList.Add('14. PLEASE, for more info, look for "How to use the Demos" in "Laz Android Module Wizard" readme.txt!!');
+    strList.Add('14. Please, for more info, look for "How to use the Demos" in "Laz Android Module Wizard" readme.txt!!');
 
     strList.Add(' ');
     strList.Add('....  Thank you!');
@@ -1472,7 +1473,7 @@ begin
 
     strList.Add('export JAVA_HOME='+linuxPathToJavaJDK);     //export JAVA_HOME=/usr/lib/jvm/java-6-openjdk
     strList.Add('cd '+linuxAndroidProjectName);
-    strList.Add('ant clean -Dtouchtest.enabled=true debug');
+    strList.Add('ant -Dtouchtest.enabled=true debug');
     strList.SaveToFile(linuxAndroidProjectName+linuxDirSeparator+'build-debug.sh');
 
     strList.Clear;

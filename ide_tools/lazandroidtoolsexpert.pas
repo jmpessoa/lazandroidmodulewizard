@@ -45,6 +45,8 @@ type
     MemoLogError: TMemo;
     MenuItem1: TMenuItem;
     MenuItem2: TMenuItem;
+    MenuItem3: TMenuItem;
+    MenuItem4: TMenuItem;
     PageControlLog: TPageControl;
     PageControlMain: TPageControl;
     Panel1: TPanel;
@@ -78,11 +80,13 @@ type
     procedure FormCreate(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure MemoLogDblClick(Sender: TObject);     //clear...
+
     procedure PageControlLogChange(Sender: TObject);
     procedure PopupMenu1Close(Sender: TObject);
     procedure SpBPathToWorkspaceClick(Sender: TObject);
     procedure SpBLazBuildPathClick(Sender: TObject);
     procedure SpBSelectProjectClick(Sender: TObject);
+
   private
     { private declarations }
     ProjectPath: string;
@@ -104,6 +108,7 @@ type
 
     APKProcess: TThreadProcess;
 
+    function ApkProcessRunning: boolean;
     procedure LoadSettings;
     procedure SaveSettings;
     procedure ShowProcOutput(AOutput: TStrings);
@@ -111,16 +116,18 @@ type
     procedure ShowProcOutputFilter(AOutput: TStrings); //by jmpessoa
     procedure ShowProcOutputError(AOutput: TStrings);  //by jmpessoa
 
-    function ApkProcessRunning: boolean;
     procedure ChangeBuildMode(ABuildMode: TBuildMode);
 
     procedure RebuildLibrary; //by jmpessoa
     function GetDefaultBuildModeIndex: integer; //by jmpessoa
     function GetDefaultBuildModeIndex2: integer;  //by jmpessoa
 
+    procedure ExecuteTagQuery(strTAG: string); //by jmpessoa
+
   public
     { public declarations }
   end;
+
 
   procedure GetSubDirectories(const directory : string; list : TStrings);
   function ReplaceChar(query: string; oldchar, newchar: char):string;
@@ -337,7 +344,7 @@ begin
         ProjectPath:= ReadString('NewProject', 'FullProjectName', '');      //by jmpessoa
 
         EditAndroidNDKPath.Text:= NdkPath;
-        EditAndroidNDKPath.Text:= SdkPath;
+        EditAndroidSDKPath.Text:= SdkPath;
         EditJDKPath.Text:= JdkPath;
         EditAntBinaryPath.Text:= AntPath;
 
@@ -403,7 +410,7 @@ end;
 
 procedure TfrmLazAndroidToolsExpert.PageControlLogChange(Sender: TObject);    //by jmpessoa
 begin
-    if PageControlLog.ActivePage = TabSheetRunTimeErrorLog then
+  if PageControlLog.ActivePage = TabSheetRunTimeErrorLog then
   begin
     begin
       if Assigned(APKProcess) then
@@ -416,7 +423,7 @@ begin
       begin
         Dir:= ProjectPath + DirectorySeparator + 'bin';
         CommandLine:= CmdShell + IncludeTrailingBackslash(SdkPath) + 'platform-tools' +
-                       DirectorySeparator + 'adb logcat AndroidRuntime:E *:S';     //TODO: : [by jmpessoa] need fix: deprecated!
+                       DirectorySeparator + 'adb logcat AndroidRuntime:E *:S';     //TODO: : [by jmpessoa] CommandLine need fix: deprecated!
         (* TODO: [by jmpessoa]  test it!
          Executable:= 'lazbuild'
          Parameters.Add('controls.lpi');
@@ -426,36 +433,49 @@ begin
       end;
     end;
   end;
+
+  //adb logcat ActivityManager:I AppSqliteDemo2-debug.apk:D *:S
+
 end;
+
+procedure TfrmLazAndroidToolsExpert.ExecuteTagQuery(strTAG: string);
+begin
+  if Assigned(APKProcess) then
+  begin
+    if not APKProcess.IsTerminated then APKProcess.Terminate;
+    APKProcess:= TThreadProcess.Create(True);
+    MemoLogFilter.Clear;
+    With APKProcess do
+    begin
+      Dir:= ProjectPath + DirectorySeparator + 'bin';
+      CommandLine:= CmdShell + IncludeTrailingBackslash(SdkPath) + 'platform-tools' +
+                     DirectorySeparator + 'adb logcat -s ' + strTAG;     //TODO: : [by jmpessoa] CommandLine need fix: deprecated!
+      (* TODO: [by jmpessoa]  test it!
+       Executable:= 'lazbuild'
+       Parameters.Add('controls.lpi');
+      *)
+      OnDisplayOutput:= @ShowProcOutputFilter;
+      Start;
+    end;
+  end;
+end;
+
 
 procedure TfrmLazAndroidToolsExpert.PopupMenu1Close(Sender: TObject);
 var
   strFilterTAG: string;
+  strCaption: string;
 begin
-    if (Sender as TMenuItem).Caption <> 'Help' then
+    strCaption:= (Sender as TMenuItem).Caption;
+    if Pos('DalvikVM', strCaption) > 0then
+       ExecuteTagQuery('dalvikvm')
+    else if Pos('libC', strCaption) > 0then
+          ExecuteTagQuery('libc')
+    else if Pos('Enter TAG', strCaption) > 0 then
     begin
-      strFilterTAG:= 'TAG_CLICK';
+      strFilterTAG:= 'TAG_CLICK';  //demo Button click
       if InputQuery('Logcat Filter','Please, enter a "TAG"', strFilterTAG) then
-      begin
-        if Assigned(APKProcess) then
-        begin
-          if not APKProcess.IsTerminated then APKProcess.Terminate;
-        end;
-        APKProcess:= TThreadProcess.Create(True);
-        MemoLogFilter.Clear;
-        With APKProcess do
-        begin
-          Dir:= ProjectPath + DirectorySeparator + 'bin';
-          CommandLine:= CmdShell + IncludeTrailingBackslash(SdkPath) + 'platform-tools' +
-                         DirectorySeparator + 'adb logcat -s ' + strFilterTAG;     //TODO: : [by jmpessoa] need fix: deprecated!
-          (* TODO: [by jmpessoa]  test it!
-           Executable:= 'lazbuild'
-           Parameters.Add('controls.lpi');
-          *)
-          OnDisplayOutput:= @ShowProcOutputFilter;
-          Start;
-        end;
-      end;
+         if strFilterTAG <> '' then ExecuteTagQuery(strFilterTAG)
     end
     else
     begin
@@ -465,16 +485,18 @@ begin
        MemoLogFilter.Lines.Add(' ');
        MemoLogFilter.Lines.Add('"How to"');
        MemoLogFilter.Lines.Add(' ');
+       MemoLogFilter.Lines.Add('1. Select System TAG [ex. "dalvikvm", "libc", etc...]');
+       MemoLogFilter.Lines.Add(' ');
+       MemoLogFilter.Lines.Add('2. Use the java Log.(x) to output customized TAG:');
+       MemoLogFilter.Lines.Add(' ');
        MemoLogFilter.Lines.Add('Use the java Log.(x) to output:');
        MemoLogFilter.Lines.Add(' ');
        MemoLogFilter.Lines.Add('Log.i(String TAG, String MESSAGE);');
        MemoLogFilter.Lines.Add(' ');
        MemoLogFilter.Lines.Add('.the first string is an [easy for search]  TAG that will appear in the logcat output');
-       MemoLogFilter.Lines.Add('.the second string is the message printed to log');
+       MemoLogFilter.Lines.Add('.the second string is the message printed to log [output]');
        MemoLogFilter.Lines.Add(' ');
-       MemoLogFilter.Lines.Add('You can also change to:');
-       MemoLogFilter.Lines.Add(' ');
-       MemoLogFilter.Lines.Add('[TODO: different color!]');
+       MemoLogFilter.Lines.Add('You can also change to:       [TODO: different color!]');
        MemoLogFilter.Lines.Add(' ');
        MemoLogFilter.Lines.Add('Log.d (debug)');
        MemoLogFilter.Lines.Add('Log.i (Information)');
@@ -577,6 +599,7 @@ begin
     EditJDKPath.Text:= SelDirDlgPath.FileName;
 end;
 
+
 procedure TfrmLazAndroidToolsExpert.RebuildLibrary; //by jmpessoa
 begin
 
@@ -595,7 +618,7 @@ begin
 
   MemoLog.Clear;
   APKProcess:= TThreadProcess.Create(True);
-  With APKProcess do
+  with APKProcess do
   begin
     Dir:= Self.JNIProjectPath;
     Env.Add('path=' + PathToLazbuild);
@@ -709,7 +732,6 @@ begin
   MemoLogError.Lines.Add(AOutput.Text);
 end;
 
-
 function TfrmLazAndroidToolsExpert.ApkProcessRunning: boolean;
 begin
   Result:= False;
@@ -723,8 +745,9 @@ begin
     end;
 end;
 
-
 procedure TfrmLazAndroidToolsExpert.BitBtnBuildClick(Sender: TObject);
+var
+  antkMode: string;
 begin
 
   if ProjectPath = '' then
@@ -732,6 +755,8 @@ begin
      ShowMessage('Fail! Please, select a Project!');
      Exit;
   end;
+
+  antkMode:= '-Dtouchtest.enabled=true debug';
 
   if ApkProcessRunning then
     if Assigned(APKProcess) then
@@ -744,9 +769,7 @@ begin
     Dir:= ProjectPath;
     Env.Add('path=' + AntPath);
     Env.Add('JAVA_HOME=' + JdkPath);
-
-    CommandLine:= CmdShell + ' ant -Dtouchtest.enabled=true debug';    //TODO: : [by jmpessoa] need fix: deprecated!
-
+    CommandLine:= CmdShell + ' ant '+ antkMode;    //TODO: : [by jmpessoa] CommandLine need fix: deprecated!
     (* TODO: [by jmpessoa]  test it!
      Executable:= 'ant'
      Parameters.Add('-Dtouchtest.enabled=true');
@@ -895,6 +918,5 @@ begin
       Result:= Trim(auxStr);
   end;
 end;
-
 
 end.

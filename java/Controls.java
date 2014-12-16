@@ -1,6 +1,6 @@
 package com.example.dummyapp;
 
-//[LazAndroidModuleWizard - Version 0.6 - rev. 07 - 07 December - 2014 
+//[LazAndroidModuleWizard - Version 0.6 - rev. 08 - 15 December - 2014 
 
 //[https://github.com/jmpessoa/lazandroidmodulewizard]
 //
@@ -98,6 +98,7 @@ import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
+import android.graphics.drawable.BitmapDrawable;
 import android.opengl.GLES10;
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView.Renderer;
@@ -202,6 +203,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.StringTokenizer;
 import java.util.UUID;
 import java.util.regex.Pattern;
 
@@ -2177,8 +2179,8 @@ public Drawable GetDrawableResourceById(int _resID) {
 	return (Drawable)( this.controls.activity.getResources().getDrawable(_resID));	
 }
         
-public void SetImageByIdentifier(String _imageIdentifier) {
-	this.setImageDrawable(GetDrawableResourceById(GetDrawableResourceId(_imageIdentifier)));
+public void SetImageByResIdentifier(String _imageResIdentifier) {
+	this.setImageDrawable(GetDrawableResourceById(GetDrawableResourceId(_imageResIdentifier)));
 }
 
 //by jmpessoa
@@ -5297,8 +5299,8 @@ class jSqliteDataAccess {
         private long PasObj   = 0;           // Pascal Obj
         private Controls controls = null;   // Control Class for Event
         
-        private String[] storeTableCreateQuery = new String[10]; //max 10 create tables scripts
-        private String[] storeTableName = new String[10];       //max 10  tables name
+        private String[] storeTableCreateQuery = new String[30]; //max (30) create tables scripts
+        private String[] storeTableName = new String[30];       //max (30)  tables name
        
         private int countTableName = 0;
         private int countTableQuery = 0;
@@ -5366,33 +5368,99 @@ class jSqliteDataAccess {
 	           
         public void ExecSQL(String execQuery){
 	        try{ 	
-	           mydb = this.Open();	
-	           mydb.execSQL(execQuery);
-	           mydb.close();
+	           if (mydb!= null) {
+	        	   if (!mydb.isOpen()) {
+	        	      mydb = this.Open();
+	        	   }
+	           }	           	           
+	           mydb.beginTransaction();
+	           try {
+	            	mydb.execSQL(execQuery); //Execute a single SQL statement that is NOT a SELECT or any other SQL statement that returns data.
+	                //Set the transaction flag is successful, the transaction will be submitted when the end of the transaction
+	                mydb.setTransactionSuccessful();
+	           } catch (Exception e) {
+	                e.printStackTrace();
+	           } finally {
+	                // transaction over
+	            	mydb.endTransaction();
+	            	mydb.close();
+	           }	           	           	            	           
 	        }catch(SQLiteException se){
 	        	Log.e(getClass().getSimpleName(), "Could not execute: "+ execQuery);
 	        	
 	        }
 	    }
         
+      //by jmpessoa
+        private int GetDrawableResourceId(String _resName) {
+        	  try {
+        	     Class<?> res = R.drawable.class;
+        	     Field field = res.getField(_resName);  //"drawableName"
+        	     int drawableId = field.getInt(null);
+        	     return drawableId;
+        	  }
+        	  catch (Exception e) {
+        	     Log.e("jForm", "Failure to get drawable id.", e);
+        	     return 0;
+        	  }
+        }
+
+        //by jmpessoa
+        private Drawable GetDrawableResourceById(int _resID) {
+          return (Drawable)( this.controls.activity.getResources().getDrawable(_resID));	
+        }        
+                
         public void UpdateImage(String tabName, String imageFieldName, String keyFieldName, Bitmap imageValue, int keyValue) {
         	ByteArrayOutputStream stream = new ByteArrayOutputStream();
         	bufBmp = imageValue;
         	bufBmp.compress(CompressFormat.PNG, 0, stream);            
             byte[] image_byte = stream.toByteArray();
-            Log.i("UpdateImage","UPDATE " + tabName + " SET "+imageFieldName+" = ? WHERE "+keyFieldName+" = ?");
-            mydb = this.Open();
-        	mydb.execSQL("UPDATE " + tabName + " SET "+imageFieldName+" = ? WHERE "+keyFieldName+" = ?", new Object[] {image_byte, keyValue} );
-        	mydb.close();
-        	Log.i("UpdateImage", "Ok. Image Updated!");
+            //Log.i("UpdateImage","UPDATE " + tabName + " SET "+imageFieldName+" = ? WHERE "+keyFieldName+" = ?");
+	        if (mydb!= null) {
+	          if (!mydb.isOpen()) {
+	             mydb = this.Open();
+	          }
+	        }
+	        
+            mydb.beginTransaction();
+            try {
+            	mydb.execSQL("UPDATE " + tabName + " SET "+imageFieldName+" = ? WHERE "+keyFieldName+" = ?", new Object[] {image_byte, keyValue} );
+                //Set the transaction flag is successful, the transaction will be submitted when the end of the transaction
+                mydb.setTransactionSuccessful();
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
+                // transaction over
+            	mydb.endTransaction();
+            	mydb.close();
+            }	                	        	
+        	//mydb.close();
+        	//Log.i("UpdateImage", "Ok. Image Updated!");
         	bufBmp = null;
         }
         
         public void UpdateImage(String tabName, String imageFieldName, String keyFieldName, byte[] imageValue, int keyValue) {
-        	mydb.execSQL("UPDATE " + tabName + " SET "+imageFieldName+" = ? WHERE "+keyFieldName+" = ?", new Object[] {imageValue, keyValue} );
+	        if (mydb!= null) {
+	           if (!mydb.isOpen()) {
+	               mydb = this.Open();
+	           }
+	        }
+	        
+            mydb.beginTransaction();
+            try {
+            	mydb.execSQL("UPDATE " + tabName + " SET "+imageFieldName+" = ? WHERE "+keyFieldName+" = ?", new Object[] {imageValue, keyValue} );
+                //Set the transaction flag is successful, the transaction will be submitted when the end of the transaction
+                mydb.setTransactionSuccessful();
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
+                // transaction over
+            	mydb.endTransaction();
+            	mydb.close();
+            }	        	        	               	
         }
                 
-	    public String SelectS(String selectQuery) {	 
+	    public String SelectS(String selectQuery) {	 //return String
 	    	
 		     String row = "";
 		     String rows = "";
@@ -5403,8 +5471,12 @@ class jSqliteDataAccess {
 		     String allRows = null;
 		      		     		     
 		     try{
-		       mydb = this.Open();	            
-		       cursor  = mydb.rawQuery(selectQuery, null);		       
+		           if (mydb!= null) {
+		               if (!mydb.isOpen()) {
+		                  mydb = this.Open();
+		               }
+		            }
+		            cursor  = mydb.rawQuery(selectQuery, null);		       
 		        	
 		            colCount = cursor.getColumnCount();
 		        
@@ -5433,25 +5505,25 @@ class jSqliteDataAccess {
 		                      
 		                }
 		                while(cursor.moveToNext());
-		            }
-		            
-		            
+		            }		            		           
 		            mydb.close();
-		            cursor.moveToFirst();
-		            
+		            cursor.moveToFirst();		            
 		            allRows = headerRow + selectRowDelimiter + rows;
 		          		      
 		     }catch(SQLiteException se){
-		         	 Log.e(getClass().getSimpleName(), "Could not select:" + selectQuery);
-		     }	    
-		      
+		         Log.e(getClass().getSimpleName(), "Could not select:" + selectQuery);
+		     }	    		      
 		     return allRows; 
 	    }
 	    	    
-	    public void SelectV(String selectQuery) {
+	    public void SelectV(String selectQuery) {   //just set the cursor! return void..
 	    	    this.cursor = null;
-		        try{  //controls.activity.openOrCreateDatabase(DATABASE_NAME, Context.MODE_PRIVATE, null); //
-			     	mydb = this.Open();	            
+		        try{  		        	
+			        if (mydb!= null) {
+			           if (!mydb.isOpen()) {
+			              mydb = this.Open(); //controls.activity.openOrCreateDatabase(DATABASE_NAME, Context.MODE_PRIVATE, null); 
+			           }
+			        }		        			        				     	         
 			     	this.cursor  = mydb.rawQuery(selectQuery, null);			    			        
 			        mydb.close();			       
 			     }catch(SQLiteException se){
@@ -5504,13 +5576,118 @@ class jSqliteDataAccess {
 		}
 	     
 		public void Close() {
-		   if (mydb.isOpen()) { mydb.close();}			  
+		   if (mydb != null)  { 	
+		       if (mydb.isOpen()) { mydb.close();}
+		   }
 		}
 		   
 		public void Free() {
-		   if (mydb.isOpen()) { mydb.close();}
-		   mydb = null;
+		   if (mydb != null) {	
+		      if (mydb.isOpen()) { mydb.close();}
+		      mydb = null;
+		   }
 		}		
+						
+		//news! version 06 rev. 08 15 december 2014.........................
+		
+		public void SetForeignKeyConstraintsEnabled(boolean _value) {
+			if (mydb!=null)
+		  	  mydb.setForeignKeyConstraintsEnabled(_value);			
+		}
+		
+		public void SetDefaultLocale() {
+			if (mydb!=null)
+			   mydb.setLocale(Locale.getDefault());			
+		}
+						
+		public void DeleteDatabase(String _dbName) {
+		   controls.activity.deleteDatabase(_dbName);
+		}
+		
+		/*
+		 * ref, http://www.informit.com/articles/article.aspx?p=1928230
+           Because SQLite is a single file, it makes little sense to try to store binary data in the database. 
+           Instead store the location of data, as a file path or a URI in the database, and access it appropriately.           
+		 */
+        public void UpdateImage(String _tabName, String _imageFieldName, String _keyFieldName, String _imageResIdentifier, int _keyValue) {
+        	ByteArrayOutputStream stream = new ByteArrayOutputStream();
+        	Drawable d = GetDrawableResourceById(GetDrawableResourceId(_imageResIdentifier));        	
+        	bufBmp = ((BitmapDrawable)d).getBitmap();       	        	       
+        	bufBmp.compress(CompressFormat.PNG, 0, stream); 
+        	//bitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);        	
+            byte[] image_byte = stream.toByteArray();
+            //Log.i("UpdateImage","UPDATE " + tabName + " SET "+imageFieldName+" = ? WHERE "+keyFieldName+" = ?");                       
+	        if (mydb!= null) {
+		         if (!mydb.isOpen()) {
+		              mydb = this.Open();
+		         }
+		     }
+            mydb.beginTransaction();
+            try {
+            	mydb.execSQL("UPDATE " + _tabName + " SET "+_imageFieldName+" = ? WHERE "+_keyFieldName+" = ?", new Object[] {image_byte, _keyValue} );
+                //Set the transaction flag is successful, the transaction will be submitted when the end of the transaction
+                mydb.setTransactionSuccessful();
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
+                // transaction over
+            	mydb.endTransaction();
+            	mydb.close();
+            }	                	       
+        	//Log.i("UpdateImage", "Ok. Image Updated!");
+        	bufBmp = null;
+        }	
+                 
+        public void InsertIntoTableBatch(String[] _insertQueries) {
+        	int i; 
+        	int len = _insertQueries.length;               
+        	for (i=0; i < len; i++) {
+                	this.ExecSQL(_insertQueries[i]);
+            }
+        }
+        
+        public void UpdateTableBatch(String[] _updateQueries) {
+        	int i; 
+        	int len = _updateQueries.length;               
+        	for (i=0; i < len; i++) {
+               	this.ExecSQL(_updateQueries[i]);
+            }
+        }
+        
+		//Check if the database exist... 
+		public boolean CheckDataBaseExistsByName(String _dbName) {   
+		      SQLiteDatabase checkDB = null; 
+		      try {
+		    	  String absPath = this.controls.activity.getFilesDir().getPath();
+	              absPath = absPath.substring(0, absPath.lastIndexOf("/")) + "/databases/"+_dbName;		         
+		          checkDB = SQLiteDatabase.openDatabase(absPath, null, SQLiteDatabase.OPEN_READONLY);
+		      } catch (SQLiteException e) {
+		    	  Log.e("jSqliteDataAccess","database does't exist yet!");
+		      } 
+		      if (checkDB != null) {
+	             checkDB.close();
+		      }      	         
+		      return checkDB != null ? true : false;
+		}
+		
+		//ex. 'tablebook|FIGURE|_ID|ic_t1|1'
+        private void SplitUpdateImageData(String _imageResIdentifierData, String _delimiter) {
+        	String[] tokens = _imageResIdentifierData.split("\\"+_delimiter);  //ex. "|"        	        
+        	String _tabName = tokens[0];
+        	String _imageFieldName = tokens[1]; 
+        	String _keyFieldName = tokens[2];
+        	String _imageResIdentifier = tokens[3];         	        
+        	int _keyValue = Integer.parseInt(tokens[4]);
+        	UpdateImage(_tabName, _imageFieldName, _keyFieldName, _imageResIdentifier, _keyValue) ;
+        }
+        
+        public void UpdateImageBatch(String[] _imageResIdentifierDataArray, String _delimiter) {
+        	int i; 
+        	int len = _imageResIdentifierDataArray.length;        	
+        	for (i=0; i < len; i++) {
+               	this.SplitUpdateImageData(_imageResIdentifierDataArray[i], _delimiter);
+            }
+        }		
 }
 
 

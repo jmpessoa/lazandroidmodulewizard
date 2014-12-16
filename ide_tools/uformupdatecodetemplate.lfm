@@ -2,12 +2,12 @@ object FormUpdateCodeTemplate: TFormUpdateCodeTemplate
   Left = 418
   Height = 234
   Top = 202
-  Width = 500
+  Width = 498
   AutoSize = True
   BorderStyle = bsSizeToolWin
   Caption = 'Android Module Wizard : Upgrade Code Templates'
   ClientHeight = 234
-  ClientWidth = 500
+  ClientWidth = 498
   Color = clWhite
   OnClose = FormClose
   OnCreate = FormCreate
@@ -21,7 +21,7 @@ object FormUpdateCodeTemplate: TFormUpdateCodeTemplate
     Left = 0
     Height = 16
     Top = 218
-    Width = 500
+    Width = 498
     Anchors = [akTop, akLeft, akRight, akBottom]
     Panels = <>
   end
@@ -33,7 +33,7 @@ object FormUpdateCodeTemplate: TFormUpdateCodeTemplate
     Left = 8
     Height = 23
     Top = 31
-    Width = 453
+    Width = 451
     Anchors = [akTop, akLeft, akRight]
     BorderSpacing.Around = 8
     TabOrder = 1
@@ -43,7 +43,7 @@ object FormUpdateCodeTemplate: TFormUpdateCodeTemplate
     AnchorSideTop.Side = asrCenter
     AnchorSideRight.Control = Owner
     AnchorSideRight.Side = asrBottom
-    Left = 469
+    Left = 467
     Height = 22
     Top = 31
     Width = 23
@@ -60,7 +60,7 @@ object FormUpdateCodeTemplate: TFormUpdateCodeTemplate
     Left = 8
     Height = 23
     Top = 85
-    Width = 416
+    Width = 451
     Anchors = [akTop, akLeft, akRight]
     BorderSpacing.Around = 8
     ItemHeight = 15
@@ -72,11 +72,11 @@ object FormUpdateCodeTemplate: TFormUpdateCodeTemplate
     AnchorSideTop.Side = asrCenter
     AnchorSideRight.Control = Owner
     AnchorSideRight.Side = asrBottom
-    Left = 432
+    Left = 467
     Height = 22
     Top = 85
-    Width = 60
-    Anchors = [akTop, akLeft, akRight]
+    Width = 23
+    Anchors = [akTop, akRight]
     BorderSpacing.Around = 8
     Glyph.Data = {
       36040000424D3604000000000000360000002800000010000000100000000100
@@ -142,7 +142,7 @@ object FormUpdateCodeTemplate: TFormUpdateCodeTemplate
     Left = 228
     Height = 30
     Top = 180
-    Width = 264
+    Width = 262
     Anchors = [akTop, akLeft, akRight]
     BorderSpacing.Around = 8
     DefaultCaption = True
@@ -159,7 +159,7 @@ object FormUpdateCodeTemplate: TFormUpdateCodeTemplate
     Left = 8
     Height = 56
     Top = 116
-    Width = 484
+    Width = 482
     Anchors = [akTop, akLeft, akRight]
     AutoFill = True
     BorderSpacing.Around = 8
@@ -173,7 +173,7 @@ object FormUpdateCodeTemplate: TFormUpdateCodeTemplate
     ChildSizing.Layout = cclLeftToRightThenTopToBottom
     ChildSizing.ControlsPerLine = 3
     ClientHeight = 36
-    ClientWidth = 480
+    ClientWidth = 478
     Columns = 3
     Items.Strings = (
       '"App.java"'

@@ -1,0 +1,3 @@
+# view AndroidManifest.xml #generated:46
+-keep class com.example.appsqlitedemo2.App { <init>(...); }
+

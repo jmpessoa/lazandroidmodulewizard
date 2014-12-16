@@ -183,7 +183,7 @@ procedure TFormWorkspace.ListBoxTargetAPIClick(Sender: TObject);
 begin
   case ListBoxTargetAPI.ItemIndex of
       0: FTargetApi:= '8';
-      1: FTargetApi:= '10';
+      1: FTargetApi:= '11';
       2: FTargetApi:= '14';
       3: FTargetApi:= '15';
       4: FTargetApi:= '16';
@@ -215,13 +215,13 @@ begin
    else if ListBoxPlatform.ItemIndex = 1 then
    begin
      ListBoxMinSDK.Items.Add('8');
-     ListBoxMinSDK.Items.Add('10');
+     ListBoxMinSDK.Items.Add('11');
      //ListBoxMinSDK.Items.Add('14');
    end
    else
    begin
      ListBoxMinSDK.Items.Add('8');
-     ListBoxMinSDK.Items.Add('10');
+     ListBoxMinSDK.Items.Add('11');
      //ListBoxMinSDK.Items.Add('14');
      ListBoxMinSDK.Items.Add('15');
      ListBoxMinSDK.Items.Add('16');
@@ -235,7 +235,7 @@ begin
    else
       ListBoxMinSDK.ItemIndex:= ListBoxMinSDK.Count-1;
 
-   ListBoxPlatformClick(nil);
+   ListBoxMinSDKClick(nil);
 end;
 
 

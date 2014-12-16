@@ -31,6 +31,7 @@ C:\adt32\eclipse\workspace\AppActionBarTabDemo1\bin\classes\com\example\appactio
 C:\adt32\eclipse\workspace\AppActionBarTabDemo1\bin\classes\com\example\appactionbartabdemo1\jCheckBox$1.class \
 C:\adt32\eclipse\workspace\AppActionBarTabDemo1\bin\classes\com\example\appactionbartabdemo1\jCheckBox.class \
 C:\adt32\eclipse\workspace\AppActionBarTabDemo1\bin\classes\com\example\appactionbartabdemo1\jContextMenu.class \
+C:\adt32\eclipse\workspace\AppActionBarTabDemo1\bin\classes\com\example\appactionbartabdemo1\jCustomDialog.class \
 C:\adt32\eclipse\workspace\AppActionBarTabDemo1\bin\classes\com\example\appactionbartabdemo1\jDialogProgress.class \
 C:\adt32\eclipse\workspace\AppActionBarTabDemo1\bin\classes\com\example\appactionbartabdemo1\jDialogYN$1.class \
 C:\adt32\eclipse\workspace\AppActionBarTabDemo1\bin\classes\com\example\appactionbartabdemo1\jDialogYN.class \
@@ -58,6 +59,7 @@ C:\adt32\eclipse\workspace\AppActionBarTabDemo1\bin\classes\com\example\appactio
 C:\adt32\eclipse\workspace\AppActionBarTabDemo1\bin\classes\com\example\appactionbartabdemo1\jListItemRow.class \
 C:\adt32\eclipse\workspace\AppActionBarTabDemo1\bin\classes\com\example\appactionbartabdemo1\jListView$1.class \
 C:\adt32\eclipse\workspace\AppActionBarTabDemo1\bin\classes\com\example\appactionbartabdemo1\jListView.class \
+C:\adt32\eclipse\workspace\AppActionBarTabDemo1\bin\classes\com\example\appactionbartabdemo1\jLocation$1.class \
 C:\adt32\eclipse\workspace\AppActionBarTabDemo1\bin\classes\com\example\appactionbartabdemo1\jLocation$MyLocationListener.class \
 C:\adt32\eclipse\workspace\AppActionBarTabDemo1\bin\classes\com\example\appactionbartabdemo1\jLocation.class \
 C:\adt32\eclipse\workspace\AppActionBarTabDemo1\bin\classes\com\example\appactionbartabdemo1\jMediaPlayer.class \

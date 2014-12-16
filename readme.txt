@@ -47,6 +47,46 @@
 		Ant	http://ant.apache.org/bindownload.cgi 
 			Simply extract the zip file to a convenient location...
                                 
+Version 0.6 - rev. 08 - 15 December 2014 -
+
+	NEW! Add Support to build release Apk! 
+		[win  -->> build-release.bat]
+		[linux ->> build-release.sh]
+
+		Please, look for:
+			readme.txt [Project Folder]
+			readme-keytool-input.txt [Project Folder]
+
+	IMPROVEMENTS: 
+
+	Component "jSqliteDataAccess" [.pas]
+		
+		News Methods:
+
+			SetForeignKeyConstraintsEnabled;
+			SetDefaultLocale;
+
+			DeleteDatabase;    		
+			CheckDataBaseExistsByName
+
+			InsertIntoTableBatch
+			UpdateTableBatch	
+			UpdateImageBatch
+
+	Class "jSqliteDataAccess" [java wrapper]
+
+	Added Safe operation:
+
+ 		beginTransaction();
+			....
+		setTransactionSuccessful()
+			....
+		endTransaction();
+
+	NEW!	App Demo: AppSqliteDemo2
+
+	FIXs	Some minor fixs!
+		
 Version 0.6 - rev. 07 - 07 December 2014 -
 
 		

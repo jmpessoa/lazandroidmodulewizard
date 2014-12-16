@@ -1,6 +1,6 @@
 package com.example.appactionbartabdemo1;
 
-//[LazAndroidModuleWizard - Version 0.6 - rev 06 - 03 December - 2014
+//[LazAndroidModuleWizard - Version 0.6 - rev. 08 - 15 December - 2014
 //
 //[https://github.com/jmpessoa/lazandroidmodulewizard]
 

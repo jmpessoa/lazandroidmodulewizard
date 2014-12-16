@@ -505,9 +505,19 @@ type
     procedure InsertIntoTable(insertQuery: string);
     procedure DeleteFromTable(deleteQuery: string);
     procedure UpdateTable(updateQuery: string);
-    procedure UpdateImage(tableName: string;imageFieldName: string;keyFieldName: string; imageValue: jObject;keyValue: integer);
+    procedure UpdateImage(tableName: string;imageFieldName: string;keyFieldName: string; imageValue: jObject;keyValue: integer); overload;
     procedure Close;
     function  GetCursor: jObject; overload;
+
+    procedure SetForeignKeyConstraintsEnabled(_value: boolean);
+    procedure SetDefaultLocale();
+    procedure DeleteDatabase(_dbName: string);
+    procedure UpdateImage(_tabName: string; _imageFieldName: string; _keyFieldName: string; _imageResIdentifier: string; _keyValue: integer); overload;
+    procedure InsertIntoTableBatch(var _insertQueries: TDynArrayOfString);
+    procedure UpdateTableBatch(var _updateQueries: TDynArrayOfString);
+    function CheckDataBaseExistsByName(_dbName: string): boolean;
+    procedure UpdateImageBatch(var _imageResIdentifierDataArray: TDynArrayOfString; _delimiter: string);
+
   published
     property Cursor    : jSqliteCursor read FjSqliteCursor write SetjSqliteCursor;
     property ColDelimiter: char read FColDelimiter write FColDelimiter;
@@ -816,7 +826,7 @@ type
     Procedure SetImageByName(Value : string);
     Procedure SetImageByIndex(Value : integer);
     procedure SetImageBitmap(bitmap: jObject);
-    procedure SetImageByIdentifier(_imageIdentifier: string);
+    procedure SetImageByResIdentifier(_imageResIdentifier: string);    // ../res/drawable
     // Property
     //property Width: integer Read GetWidth;
     //property Height: integer Read GetHeight;
@@ -4165,10 +4175,10 @@ begin
      jImageView_setBitmapImage2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject , bitmap);
 end;
 
-procedure jImageView.SetImageByIdentifier(_imageIdentifier: string);
+procedure jImageView.SetImageByResIdentifier(_imageResIdentifier: string);
 begin
   if FInitialized then
-     jImageView_SetImageByIdentifier(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject , _imageIdentifier);
+     jImageView_SetImageByResIdentifier(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject , _imageResIdentifier);
 end;
 
 procedure jImageView.UpdateLParamWidth;
@@ -7783,6 +7793,62 @@ begin
        Value.FreeNotification(self);
     end;
   end;
+end;
+
+procedure jSqliteDataAccess.SetForeignKeyConstraintsEnabled(_value: boolean);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jSqliteDataAccess_SetForeignKeyConstraintsEnabled(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, _value);
+end;
+
+procedure jSqliteDataAccess.SetDefaultLocale();
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jSqliteDataAccess_SetDefaultLocale(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject);
+end;
+
+procedure jSqliteDataAccess.DeleteDatabase(_dbName: string);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jSqliteDataAccess_DeleteDatabase(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, _dbName);
+end;
+
+procedure jSqliteDataAccess.UpdateImage(_tabName: string; _imageFieldName: string; _keyFieldName: string; _imageResIdentifier: string; _keyValue: integer);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jSqliteDataAccess_UpdateImage(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, _tabName ,_imageFieldName ,_keyFieldName ,_imageResIdentifier ,_keyValue);
+end;
+
+procedure jSqliteDataAccess.InsertIntoTableBatch(var _insertQueries: TDynArrayOfString);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jSqliteDataAccess_InsertIntoTableBatch(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, _insertQueries);
+end;
+
+procedure jSqliteDataAccess.UpdateTableBatch(var _updateQueries: TDynArrayOfString);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jSqliteDataAccess_UpdateTableBatch(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, _updateQueries);
+end;
+
+function jSqliteDataAccess.CheckDataBaseExistsByName(_dbName: string): boolean;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jSqliteDataAccess_CheckDataBaseExistsByName(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, _dbName);
+end;
+
+procedure jSqliteDataAccess.UpdateImageBatch(var _imageResIdentifierDataArray: TDynArrayOfString; _delimiter: string);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jSqliteDataAccess_UpdateImageBatch(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, _imageResIdentifierDataArray ,_delimiter);
 end;
 
    {jPanel}

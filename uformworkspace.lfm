@@ -472,7 +472,7 @@ object FormWorkspace: TFormWorkspace
       Width = 194
       Items.Strings = (
         '8'
-        '10'
+        '11'
         '15'
         '16'
         '17'
@@ -493,7 +493,7 @@ object FormWorkspace: TFormWorkspace
       Width = 194
       Items.Strings = (
         '8'
-        '10'
+        '11'
         '14'
         '15'
         '16'

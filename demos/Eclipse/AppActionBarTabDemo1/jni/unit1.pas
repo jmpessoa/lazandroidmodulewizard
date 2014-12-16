@@ -55,16 +55,17 @@ implementation
 
 procedure TAndroidModule1.AndroidModule1JNIPrompt(Sender: TObject);
 begin
-   //prepare custom tab view - jPanel3
+
+    //prepare custom tab view - jPanel3
     jTextView3.TextTypeFace:= tfBold;
-    jImageView1.SetImageByIdentifier('ic_bullet_red');                                  //...\res\drawable-xxx
+    jImageView1.SetImageByResIdentifier('ic_bullet_red');    //...\res\drawable-xxx
 
     Self.SetIconActionBar('ic_bullets');
 
-    jActionBarTab1.Add('NAME', jPanel1.View{sheet view}, 'ic_bullet_green');            // ...\res\drawable-xxx
-    jActionBarTab1.Add('ADDRESS', jPanel2.View {sheet view}, 'ic_bullet_yellow');       //...\res\drawable-xxx
+    jActionBarTab1.Add('NAME', jPanel1.View{sheet view}, 'ic_bullet_green');    // ...\res\drawable-xxx
+    jActionBarTab1.Add('ADDRESS', jPanel2.View {sheet view}, 'ic_bullet_yellow'); //...\res\drawable-xxx
 
-    jActionBarTab1.Add('ADDLIST', jPanel4.View {sheet view}, jPanel3.View {custom tab view!});
+    jActionBarTab1.Add('ADDLIST', jPanel4.View{sheet view}, jPanel3.View {custom tab view!});
 
     Self.SetTabNavigationModeActionBar;  //this is needed!!!
 

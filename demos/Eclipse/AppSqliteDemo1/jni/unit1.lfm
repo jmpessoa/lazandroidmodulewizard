@@ -32,6 +32,7 @@ object AndroidModule1: TAndroidModule1
     BackgroundColor = colbrDefault
     FontColor = colbrSilver
     FontSize = 0
+    TextTypeFace = tfNormal
     Id = 4672521
   end
   object jButton1: jButton
@@ -147,7 +148,7 @@ object AndroidModule1: TAndroidModule1
   object jEditText1: jEditText
     Left = 8
     Top = 344
-    Width = 146
+    Width = 138
     Height = 40
     MarginLeft = 10
     MarginTop = 10
@@ -194,12 +195,13 @@ object AndroidModule1: TAndroidModule1
     BackgroundColor = colbrDefault
     FontColor = colbrSilver
     FontSize = 0
+    TextTypeFace = tfNormal
     Id = 9513098
   end
   object jButton6: jButton
     Left = 160
     Top = 344
-    Width = 136
+    Width = 128
     Height = 40
     MarginLeft = 5
     MarginTop = 5

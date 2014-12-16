@@ -1,6 +1,6 @@
 package com.example.appactionbartabdemo1;
 
-//[LazAndroidModuleWizard - Version 0.6 - rev 06 - 03 December - 2014 
+//[LazAndroidModuleWizard - Version 0.6 - rev. 08 - 15 December - 2014 
 
 //[https://github.com/jmpessoa/lazandroidmodulewizard]
 //
@@ -63,6 +63,7 @@ import android.app.ActivityManager.RunningAppProcessInfo;
 import android.app.ActivityManager.RunningServiceInfo;
 import android.app.ActivityManager;
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
@@ -97,6 +98,7 @@ import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
+import android.graphics.drawable.BitmapDrawable;
 import android.opengl.GLES10;
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView.Renderer;
@@ -201,6 +203,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.StringTokenizer;
 import java.util.UUID;
 import java.util.regex.Pattern;
 
@@ -457,6 +460,7 @@ if (visible) { if (layout.getParent() == null)
 else         { if (layout.getParent() != null)
                { controls.appLayout.removeView(layout); } };
 }
+
 
 //
 public  void SetEnabled ( boolean enabled ) {
@@ -2175,8 +2179,8 @@ public Drawable GetDrawableResourceById(int _resID) {
 	return (Drawable)( this.controls.activity.getResources().getDrawable(_resID));	
 }
         
-public void SetImageByIdentifier(String _imageIdentifier) {
-	this.setImageDrawable(GetDrawableResourceById(GetDrawableResourceId(_imageIdentifier)));
+public void SetImageByResIdentifier(String _imageResIdentifier) {
+	this.setImageDrawable(GetDrawableResourceById(GetDrawableResourceId(_imageResIdentifier)));
 }
 
 //by jmpessoa
@@ -2969,7 +2973,7 @@ int marginBottom = 5;
 
 //by jmpessoa
 public void setMarginRight(int x) {
-	marginRight = x;
+	marginRight = x;	
 }
 
 //by jmpessoa
@@ -3119,23 +3123,19 @@ setId(id);
 //-----------------------------------------
 //----- jPanel by jmpessoa
 //-----------------------------------------
-class jPanel  extends RelativeLayout {
+class jPanel extends RelativeLayout {
 	//Java-Pascal Interface
 	private long             PasObj   = 0;      // Pascal Obj
 	private Controls        controls = null;   // Control Class for Event
 	private ViewGroup       parent   = null;
 
 	private RelativeLayout.LayoutParams lparams;           // layout XYWH
-	
-	private RelativeLayout  layout   = null;
-	private LayoutParams    layparam = null;
-	
+		
 	private int lparamsAnchorRule[] = new int[40]; 
 	int countAnchorRule = 0;
 
 	private int lparamsParentRule[] = new int[40]; 
 	int countParentRule = 0;
-
 	
 	int lpH = RelativeLayout.LayoutParams.MATCH_PARENT;
 	int lpW = RelativeLayout.LayoutParams.MATCH_PARENT; //w
@@ -3144,7 +3144,9 @@ class jPanel  extends RelativeLayout {
 	int MarginTop    = 0;
 	int marginRight  = 0;
 	int marginBottom = 0;
-    	
+	
+	boolean mRemovedFromParent = false;
+	    	
 	public void setMarginRight(int x) {
 		marginRight = x;
 	}
@@ -3169,23 +3171,13 @@ class jPanel  extends RelativeLayout {
 	   controls = ctrls;
        lparams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);		
 	   //
-	   layout   = new RelativeLayout(context);
-	   layparam = new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
-	   layout.setLayoutParams(layparam);
 	}
 	
-	public  void setXYWH ( int x, int y, int w, int h ) {
-		
+	public  void setXYWH ( int x, int y, int w, int h ) {		
 		lparams.width  = w;
 		lparams.height = h;
 		lparams.setMargins(x,y,0,0);
-		//
-		setLayoutParams(lparams);
-		
-		layparam.setMargins(x,y,0,0);
-		layparam.width = w;
-		layparam.height = h;
-	    layout.setLayoutParams(layparam);
+		setLayoutParams(lparams);		
 	}
 	
 	public void setLeftTopRightBottomWidthHeight(int left, int top, int right, int bottom, int w, int h) {
@@ -3215,12 +3207,10 @@ class jPanel  extends RelativeLayout {
 
 	public void resetLParamsRules() {
 		for (int i=0; i < countAnchorRule; i++) {  
-				layparam.removeRule(lparamsAnchorRule[i]);
 				lparams.removeRule(lparamsAnchorRule[i]);		
 		}
 				
 		for (int j=0; j < countParentRule; j++) {  
-			layparam.removeRule(lparamsParentRule[j]);		
 			lparams.removeRule(lparamsParentRule[j]);		
 	    }		
 		countAnchorRule = 0;
@@ -3238,58 +3228,51 @@ class jPanel  extends RelativeLayout {
 	}
 
 	//by jmpessoa
-	public void setLayoutAll(int idAnchor) {
-		
+	public void setLayoutAll(int idAnchor) {		
 		lparams.width  = lpW; 
 		lparams.height = lpH; 
-		lparams.setMargins(MarginLeft,MarginTop,marginRight,marginBottom);
-
-		
-		layparam.height = lpH;
-	 	layparam.width =  lpW;
-	 	layparam.setMargins(MarginLeft,MarginTop,marginRight,marginBottom);
-	 	
+		lparams.setMargins(MarginLeft,MarginTop,marginRight,marginBottom);		
 		if (idAnchor > 0) {    	
 			for (int i=0; i < countAnchorRule; i++) {  
-				layparam.addRule(lparamsAnchorRule[i], idAnchor);
 				lparams.addRule(lparamsAnchorRule[i], idAnchor);		
-		    }
-			
+		    }			
 		} 
 		
 		for (int j=0; j < countParentRule; j++) {  
-			layparam.addRule(lparamsParentRule[j]);		
 			lparams.addRule(lparamsParentRule[j]);		
 	    }
-		//
-		setLayoutParams(lparams);
-		layout.setLayoutParams(layparam); 		
+		setLayoutParams(lparams); 		
  	}
 
 	public void setIdEx(int id) {
 	   setId(id);	
 	}
 	
-	public  android.widget.RelativeLayout getView() {
-	   return layout;
+	//GetView!
+	public  RelativeLayout getView() {
+	   return this;
 	}
-
+	
 	public  void setParent( android.view.ViewGroup viewgroup ) {
     	if (parent != null) { parent.removeView(this); }
 	    parent = viewgroup;
 	    parent.addView(this,lparams);
-	    parent.addView(layout);
-	}
-	
+	    mRemovedFromParent=false;
+	}	
 	// Free object except Self, Pascal Code Free the class.
 	public  void Free() {
 		if (parent != null) { parent.removeView(this); }
-		layparam = null;
-		this.removeView(layout);
-		layout = null;
-		layparam = null;
+		lparams = null;   
 	}
+	
+	public void RemoveParent() {
+	   if (!mRemovedFromParent) {
+		  	 parent.removeView(this);
+		  	mRemovedFromParent = true;
+	   } 		   
+	}		 
 }
+
 
 
 //-------------------------------------------------------------------------
@@ -5316,8 +5299,8 @@ class jSqliteDataAccess {
         private long PasObj   = 0;           // Pascal Obj
         private Controls controls = null;   // Control Class for Event
         
-        private String[] storeTableCreateQuery = new String[10]; //max 10 create tables scripts
-        private String[] storeTableName = new String[10];       //max 10  tables name
+        private String[] storeTableCreateQuery = new String[30]; //max (30) create tables scripts
+        private String[] storeTableName = new String[30];       //max (30)  tables name
        
         private int countTableName = 0;
         private int countTableQuery = 0;
@@ -5385,33 +5368,99 @@ class jSqliteDataAccess {
 	           
         public void ExecSQL(String execQuery){
 	        try{ 	
-	           mydb = this.Open();	
-	           mydb.execSQL(execQuery);
-	           mydb.close();
+	           if (mydb!= null) {
+	        	   if (!mydb.isOpen()) {
+	        	      mydb = this.Open();
+	        	   }
+	           }	           	           
+	           mydb.beginTransaction();
+	           try {
+	            	mydb.execSQL(execQuery); //Execute a single SQL statement that is NOT a SELECT or any other SQL statement that returns data.
+	                //Set the transaction flag is successful, the transaction will be submitted when the end of the transaction
+	                mydb.setTransactionSuccessful();
+	           } catch (Exception e) {
+	                e.printStackTrace();
+	           } finally {
+	                // transaction over
+	            	mydb.endTransaction();
+	            	mydb.close();
+	           }	           	           	            	           
 	        }catch(SQLiteException se){
 	        	Log.e(getClass().getSimpleName(), "Could not execute: "+ execQuery);
 	        	
 	        }
 	    }
         
+      //by jmpessoa
+        private int GetDrawableResourceId(String _resName) {
+        	  try {
+        	     Class<?> res = R.drawable.class;
+        	     Field field = res.getField(_resName);  //"drawableName"
+        	     int drawableId = field.getInt(null);
+        	     return drawableId;
+        	  }
+        	  catch (Exception e) {
+        	     Log.e("jForm", "Failure to get drawable id.", e);
+        	     return 0;
+        	  }
+        }
+
+        //by jmpessoa
+        private Drawable GetDrawableResourceById(int _resID) {
+          return (Drawable)( this.controls.activity.getResources().getDrawable(_resID));	
+        }        
+                
         public void UpdateImage(String tabName, String imageFieldName, String keyFieldName, Bitmap imageValue, int keyValue) {
         	ByteArrayOutputStream stream = new ByteArrayOutputStream();
         	bufBmp = imageValue;
         	bufBmp.compress(CompressFormat.PNG, 0, stream);            
             byte[] image_byte = stream.toByteArray();
-            Log.i("UpdateImage","UPDATE " + tabName + " SET "+imageFieldName+" = ? WHERE "+keyFieldName+" = ?");
-            mydb = this.Open();
-        	mydb.execSQL("UPDATE " + tabName + " SET "+imageFieldName+" = ? WHERE "+keyFieldName+" = ?", new Object[] {image_byte, keyValue} );
-        	mydb.close();
-        	Log.i("UpdateImage", "Ok. Image Updated!");
+            //Log.i("UpdateImage","UPDATE " + tabName + " SET "+imageFieldName+" = ? WHERE "+keyFieldName+" = ?");
+	        if (mydb!= null) {
+	          if (!mydb.isOpen()) {
+	             mydb = this.Open();
+	          }
+	        }
+	        
+            mydb.beginTransaction();
+            try {
+            	mydb.execSQL("UPDATE " + tabName + " SET "+imageFieldName+" = ? WHERE "+keyFieldName+" = ?", new Object[] {image_byte, keyValue} );
+                //Set the transaction flag is successful, the transaction will be submitted when the end of the transaction
+                mydb.setTransactionSuccessful();
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
+                // transaction over
+            	mydb.endTransaction();
+            	mydb.close();
+            }	                	        	
+        	//mydb.close();
+        	//Log.i("UpdateImage", "Ok. Image Updated!");
         	bufBmp = null;
         }
         
         public void UpdateImage(String tabName, String imageFieldName, String keyFieldName, byte[] imageValue, int keyValue) {
-        	mydb.execSQL("UPDATE " + tabName + " SET "+imageFieldName+" = ? WHERE "+keyFieldName+" = ?", new Object[] {imageValue, keyValue} );
+	        if (mydb!= null) {
+	           if (!mydb.isOpen()) {
+	               mydb = this.Open();
+	           }
+	        }
+	        
+            mydb.beginTransaction();
+            try {
+            	mydb.execSQL("UPDATE " + tabName + " SET "+imageFieldName+" = ? WHERE "+keyFieldName+" = ?", new Object[] {imageValue, keyValue} );
+                //Set the transaction flag is successful, the transaction will be submitted when the end of the transaction
+                mydb.setTransactionSuccessful();
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
+                // transaction over
+            	mydb.endTransaction();
+            	mydb.close();
+            }	        	        	               	
         }
                 
-	    public String SelectS(String selectQuery) {	 
+	    public String SelectS(String selectQuery) {	 //return String
 	    	
 		     String row = "";
 		     String rows = "";
@@ -5422,8 +5471,12 @@ class jSqliteDataAccess {
 		     String allRows = null;
 		      		     		     
 		     try{
-		       mydb = this.Open();	            
-		       cursor  = mydb.rawQuery(selectQuery, null);		       
+		           if (mydb!= null) {
+		               if (!mydb.isOpen()) {
+		                  mydb = this.Open();
+		               }
+		            }
+		            cursor  = mydb.rawQuery(selectQuery, null);		       
 		        	
 		            colCount = cursor.getColumnCount();
 		        
@@ -5452,25 +5505,25 @@ class jSqliteDataAccess {
 		                      
 		                }
 		                while(cursor.moveToNext());
-		            }
-		            
-		            
+		            }		            		           
 		            mydb.close();
-		            cursor.moveToFirst();
-		            
+		            cursor.moveToFirst();		            
 		            allRows = headerRow + selectRowDelimiter + rows;
 		          		      
 		     }catch(SQLiteException se){
-		         	 Log.e(getClass().getSimpleName(), "Could not select:" + selectQuery);
-		     }	    
-		      
+		         Log.e(getClass().getSimpleName(), "Could not select:" + selectQuery);
+		     }	    		      
 		     return allRows; 
 	    }
 	    	    
-	    public void SelectV(String selectQuery) {
+	    public void SelectV(String selectQuery) {   //just set the cursor! return void..
 	    	    this.cursor = null;
-		        try{  //controls.activity.openOrCreateDatabase(DATABASE_NAME, Context.MODE_PRIVATE, null); //
-			     	mydb = this.Open();	            
+		        try{  		        	
+			        if (mydb!= null) {
+			           if (!mydb.isOpen()) {
+			              mydb = this.Open(); //controls.activity.openOrCreateDatabase(DATABASE_NAME, Context.MODE_PRIVATE, null); 
+			           }
+			        }		        			        				     	         
 			     	this.cursor  = mydb.rawQuery(selectQuery, null);			    			        
 			        mydb.close();			       
 			     }catch(SQLiteException se){
@@ -5523,13 +5576,118 @@ class jSqliteDataAccess {
 		}
 	     
 		public void Close() {
-		   if (mydb.isOpen()) { mydb.close();}			  
+		   if (mydb != null)  { 	
+		       if (mydb.isOpen()) { mydb.close();}
+		   }
 		}
 		   
 		public void Free() {
-		   if (mydb.isOpen()) { mydb.close();}
-		   mydb = null;
+		   if (mydb != null) {	
+		      if (mydb.isOpen()) { mydb.close();}
+		      mydb = null;
+		   }
 		}		
+						
+		//news! version 06 rev. 08 15 december 2014.........................
+		
+		public void SetForeignKeyConstraintsEnabled(boolean _value) {
+			if (mydb!=null)
+		  	  mydb.setForeignKeyConstraintsEnabled(_value);			
+		}
+		
+		public void SetDefaultLocale() {
+			if (mydb!=null)
+			   mydb.setLocale(Locale.getDefault());			
+		}
+						
+		public void DeleteDatabase(String _dbName) {
+		   controls.activity.deleteDatabase(_dbName);
+		}
+		
+		/*
+		 * ref, http://www.informit.com/articles/article.aspx?p=1928230
+           Because SQLite is a single file, it makes little sense to try to store binary data in the database. 
+           Instead store the location of data, as a file path or a URI in the database, and access it appropriately.           
+		 */
+        public void UpdateImage(String _tabName, String _imageFieldName, String _keyFieldName, String _imageResIdentifier, int _keyValue) {
+        	ByteArrayOutputStream stream = new ByteArrayOutputStream();
+        	Drawable d = GetDrawableResourceById(GetDrawableResourceId(_imageResIdentifier));        	
+        	bufBmp = ((BitmapDrawable)d).getBitmap();       	        	       
+        	bufBmp.compress(CompressFormat.PNG, 0, stream); 
+        	//bitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);        	
+            byte[] image_byte = stream.toByteArray();
+            //Log.i("UpdateImage","UPDATE " + tabName + " SET "+imageFieldName+" = ? WHERE "+keyFieldName+" = ?");                       
+	        if (mydb!= null) {
+		         if (!mydb.isOpen()) {
+		              mydb = this.Open();
+		         }
+		     }
+            mydb.beginTransaction();
+            try {
+            	mydb.execSQL("UPDATE " + _tabName + " SET "+_imageFieldName+" = ? WHERE "+_keyFieldName+" = ?", new Object[] {image_byte, _keyValue} );
+                //Set the transaction flag is successful, the transaction will be submitted when the end of the transaction
+                mydb.setTransactionSuccessful();
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
+                // transaction over
+            	mydb.endTransaction();
+            	mydb.close();
+            }	                	       
+        	//Log.i("UpdateImage", "Ok. Image Updated!");
+        	bufBmp = null;
+        }	
+                 
+        public void InsertIntoTableBatch(String[] _insertQueries) {
+        	int i; 
+        	int len = _insertQueries.length;               
+        	for (i=0; i < len; i++) {
+                	this.ExecSQL(_insertQueries[i]);
+            }
+        }
+        
+        public void UpdateTableBatch(String[] _updateQueries) {
+        	int i; 
+        	int len = _updateQueries.length;               
+        	for (i=0; i < len; i++) {
+               	this.ExecSQL(_updateQueries[i]);
+            }
+        }
+        
+		//Check if the database exist... 
+		public boolean CheckDataBaseExistsByName(String _dbName) {   
+		      SQLiteDatabase checkDB = null; 
+		      try {
+		    	  String absPath = this.controls.activity.getFilesDir().getPath();
+	              absPath = absPath.substring(0, absPath.lastIndexOf("/")) + "/databases/"+_dbName;		         
+		          checkDB = SQLiteDatabase.openDatabase(absPath, null, SQLiteDatabase.OPEN_READONLY);
+		      } catch (SQLiteException e) {
+		    	  Log.e("jSqliteDataAccess","database does't exist yet!");
+		      } 
+		      if (checkDB != null) {
+	             checkDB.close();
+		      }      	         
+		      return checkDB != null ? true : false;
+		}
+		
+		//ex. 'tablebook|FIGURE|_ID|ic_t1|1'
+        private void SplitUpdateImageData(String _imageResIdentifierData, String _delimiter) {
+        	String[] tokens = _imageResIdentifierData.split("\\"+_delimiter);  //ex. "|"        	        
+        	String _tabName = tokens[0];
+        	String _imageFieldName = tokens[1]; 
+        	String _keyFieldName = tokens[2];
+        	String _imageResIdentifier = tokens[3];         	        
+        	int _keyValue = Integer.parseInt(tokens[4]);
+        	UpdateImage(_tabName, _imageFieldName, _keyFieldName, _imageResIdentifier, _keyValue) ;
+        }
+        
+        public void UpdateImageBatch(String[] _imageResIdentifierDataArray, String _delimiter) {
+        	int i; 
+        	int len = _imageResIdentifierDataArray.length;        	
+        	for (i=0; i < len; i++) {
+               	this.SplitUpdateImageData(_imageResIdentifierDataArray[i], _delimiter);
+            }
+        }		
 }
 
 
@@ -8764,8 +8922,7 @@ class jActionBarTab {
 		//http://www.lucazanini.eu/2012/android/tab-layout-in-android-with-actionbar-and-fragment/?lang=en
 	    @Override
 	    /*.*/public void onTabSelected(ActionBar.Tab tab, FragmentTransaction ft) {    	  
-	    	mFragment.getView().setVisibility(View.VISIBLE);
-	    	//mFragment.getView().refreshDrawableState();	    	
+	    	mFragment.getView().setVisibility(View.VISIBLE);	    	
 	    	controls.pOnActionBarTabSelected(pascalObj, mFragment.getView(), mFragment.getText());    	    	
 	    	if(mFragment.isAdded()){
 	    	    ft.show(mFragment);
@@ -8908,6 +9065,207 @@ class jActionBarTab {
 	}
 	
 }
+
+
+/*Draft java code by "Lazarus Android Module Wizard" [12/4/2014 23:21:31]*/
+/*https://github.com/jmpessoa/lazandroidmodulewizard*/
+/*jVisualControl template*/
+
+class jCustomDialog extends RelativeLayout {
+
+   private long       pascalObj = 0;    // Pascal Object
+   private Controls   controls  = null; // Control Class for events
+
+   private Context context = null;
+   private ViewGroup parent   = null;         // parent view
+   private LayoutParams lparams;              // layout XYWH
+   //private OnClickListener onClickListener;   // click event
+   //private Boolean enabled  = true;           // click-touch enabled!
+   private int lparamsAnchorRule[] = new int[30];
+   private int countAnchorRule = 0;
+   private int lparamsParentRule[] = new int[30];
+   private int countParentRule = 0;
+   private int lparamH = 100;
+   private int lparamW = 100;
+   private int marginLeft = 0;
+   private int marginTop = 0;
+   private int marginRight = 0;
+   private int marginBottom = 0;
+
+   Dialog mDialog = null;
+   private String mIconIdentifier = "ic_launcher";   //default icon  ../res/drawable
+   private String mTitle = "Information";
+   boolean mRemovedFromParent = false; //no parent!   
+
+  //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
+
+   public jCustomDialog(Controls _ctrls, long _Self) { //Add more others news "_xxx"p arams if needed!
+      super(_ctrls.activity);
+      context   = _ctrls.activity;
+      pascalObj = _Self;
+      controls  = _ctrls;
+      lparams = new LayoutParams(lparamW, lparamH);
+      //lparams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);		
+   } //end constructor
+
+   public void jFree() {
+      if (parent != null) { parent.removeView(this); }
+      //free local objects...      
+  	  if (mDialog != null) mDialog.dismiss();
+	  mDialog = null;		
+      lparams = null;
+      //parent = null;  //?!
+      //setOnClickListener(null);
+   }
+
+   public void SetViewParent(ViewGroup _viewgroup) {
+      if (parent != null) { parent.removeView(this); }
+      parent = _viewgroup;
+      parent.addView(this,lparams);
+      mRemovedFromParent = false; //now there is a parent!    	
+   }
+
+   public void RemoveFromViewParent() {
+      if (!mRemovedFromParent) {
+    	 this.setVisibility(android.view.View.INVISIBLE);
+    	 if (parent != null) {
+            parent.removeView(this);
+            mRemovedFromParent = true; //no more parent!
+            //Log.i("jCustomDialog", "...RemoveFromViewParent...");
+    	 }          
+       }
+   }
+   
+   public View GetView() {
+      return this;
+   }
+   
+
+   public void SetLParamWidth(int _w) {
+      lparamW = _w;
+   }
+
+   public void SetLParamHeight(int _h) {
+      lparamH = _h;
+   }
+
+   public void SetLeftTopRightBottomWidthHeight(int _left, int _top, int _right, int _bottom, int _w, int _h) {
+      marginLeft = _left;
+      marginTop = _top;
+      marginRight = _right;
+      marginBottom = _bottom;
+      lparamH = _h;
+      lparamW = _w;
+   }
+
+   public void AddLParamsAnchorRule(int _rule) {
+      lparamsAnchorRule[countAnchorRule] = _rule;
+      countAnchorRule = countAnchorRule + 1;
+   }
+
+   public void AddLParamsParentRule(int _rule) {
+      lparamsParentRule[countParentRule] = _rule;
+      countParentRule = countParentRule + 1;
+   }
+
+   public void SetLayoutAll(int _idAnchor) {
+  	lparams.width  = lparamW;
+	lparams.height = lparamH;
+	lparams.setMargins(marginLeft,marginTop,marginRight,marginBottom);
+	if (_idAnchor > 0) {
+	    for (int i=0; i < countAnchorRule; i++) {
+		lparams.addRule(lparamsAnchorRule[i], _idAnchor);
+	    }
+	}
+      for (int j=0; j < countParentRule; j++) {
+         lparams.addRule(lparamsParentRule[j]);
+      }
+      this.setLayoutParams(lparams);
+   }
+
+   public void ClearLayoutAll() {
+	 for (int i=0; i < countAnchorRule; i++) {
+  	   lparams.removeRule(lparamsAnchorRule[i]);
+     }
+
+	 for (int j=0; j < countParentRule; j++) {
+   	   lparams.removeRule(lparamsParentRule[j]);
+	 }
+	 countAnchorRule = 0;
+	 countParentRule = 0;
+   }
+
+   public void SetId(int _id) { //wrapper method pattern ...
+      this.setId(_id);
+   }
+   
+   //write others [public] methods code here......
+   //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...   
+	private int GetDrawableResourceId(String _resName) {   //    ../res/drawable
+		  try {
+		     Class<?> res = R.drawable.class;
+		     Field field = res.getField(_resName);  //"drawableName"
+		     int drawableId = field.getInt(null);
+		     return drawableId;
+		  }
+		  catch (Exception e) {
+		     Log.e("jForm", "Failure to get drawable id.", e);
+		     return 0;
+		  }
+	}
+	
+	public void Show() {	//0: vis; 4: inv; 8: gone
+		Show(mTitle, mIconIdentifier);
+	}
+	
+	public void Show(String _title) {	//0: vis; 4: inv; 8: gone
+		Show(_title, mIconIdentifier);
+	}
+		
+	public void Show(String _title, String _iconIdentifier) {	//0: vis; 4: inv; 8: gone
+		mTitle = _title;
+		mIconIdentifier = _iconIdentifier;
+		if (mDialog != null) {
+			mDialog.setTitle(mTitle);
+		    controls.pOnCustomDialogShow(pascalObj, mDialog, _title);
+			mDialog.show();
+		}	
+		else {			
+		  if (this.getVisibility()==0) { //visible   
+			this.setVisibility(android.view.View.INVISIBLE); //4
+		  }	  		   
+		  if (!mRemovedFromParent) {
+		  	 parent.removeView(this);
+		     mRemovedFromParent = true;
+		  }					   
+	      mDialog = new Dialog(this.controls.activity);	      
+	      mDialog.requestWindowFeature(Window.FEATURE_LEFT_ICON);	     	     
+	      mDialog.setContentView(this);	      
+	      mDialog.setFeatureDrawableResource(Window.FEATURE_LEFT_ICON, GetDrawableResourceId(mIconIdentifier));	      
+	      mDialog.setTitle(mTitle);
+	      this.setVisibility(android.view.View.VISIBLE);
+	 	  controls.pOnCustomDialogShow(pascalObj, mDialog, mTitle);	      
+	      mDialog.show();							
+		}		   
+	}
+	
+	public void SetTitle(String _title) { 
+	   mTitle = _title;
+	   mDialog.setTitle(mTitle);
+	}
+	
+	public void SetIconIdentifier(String _iconIdentifier) {   // ../res/drawable
+		mIconIdentifier = _iconIdentifier;
+		mDialog.requestWindowFeature(Window.FEATURE_LEFT_ICON);
+		mDialog.setFeatureDrawableResource(Window.FEATURE_LEFT_ICON, GetDrawableResourceId(mIconIdentifier));
+	}
+	
+	public void Close() { 
+		if (mDialog != null) mDialog.dismiss();    
+	}	
+} //end class
+
+
 //Javas/Pascal Interface Class 
 
 public class Controls {          // <<--------- 
@@ -8992,6 +9350,7 @@ public  native void pAppOnListItemClick(AdapterView adapter, View view, int posi
 
 public native void pOnActionBarTabSelected(long pasobj, View view, String title);
 public native void pOnActionBarTabUnSelected(long pasobj, View view, String title);
+public native void pOnCustomDialogShow(long pasobj, Dialog dialog, String title);
 
 
 //Load Pascal Library
@@ -11718,10 +12077,13 @@ public  java.lang.Object jSqliteDataAccess_Create(long pasobj, String databaseNa
       return (java.lang.Object)(new jContextMenu(this,_Self));
    }
   
-
   
    public java.lang.Object jActionBarTab_jCreate(long _Self) {
       return (java.lang.Object)(new jActionBarTab(this,_Self));
+   }
+  
+   public java.lang.Object jCustomDialog_jCreate(long _Self) {
+      return (java.lang.Object)(new jCustomDialog(this,_Self));
    }
   
 

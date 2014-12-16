@@ -42,7 +42,7 @@ object frmLazAndroidToolsExpert: TfrmLazAndroidToolsExpert
           Left = 8
           Height = 30
           Top = 8
-          Width = 247
+          Width = 232
           Anchors = [akTop, akLeft, akRight]
           BorderSpacing.Around = 8
           Caption = 'Install Android Apk'
@@ -54,10 +54,10 @@ object frmLazAndroidToolsExpert: TfrmLazAndroidToolsExpert
           AnchorSideTop.Side = asrCenter
           AnchorSideRight.Control = TabSheetAction
           AnchorSideRight.Side = asrBottom
-          Left = 263
+          Left = 248
           Height = 30
           Top = 8
-          Width = 221
+          Width = 236
           Anchors = [akTop, akRight]
           BorderSpacing.Around = 8
           DefaultCaption = True
@@ -83,9 +83,9 @@ object frmLazAndroidToolsExpert: TfrmLazAndroidToolsExpert
           Height = 219
           Top = 0
           Width = 492
-          ActivePage = TabSheetRunTimeErrorLog
+          ActivePage = TabSheetBuildInstallLog
           Align = alClient
-          TabIndex = 2
+          TabIndex = 0
           TabOrder = 0
           OnChange = PageControlLogChange
           object TabSheetBuildInstallLog: TTabSheet
@@ -121,16 +121,16 @@ object frmLazAndroidToolsExpert: TfrmLazAndroidToolsExpert
                 ''
                 '"How to"'''
                 ''
-                '   Use the java Log.(x) to output:'
+                '   1. Select System TAG [ex. "dalvikvm", "libc", etc...]'
+                ''
+                '   2. Use the java Log.(x) to output customized TAG:'
                 ''
                 '   Log.i(String TAG, String MESSAGE)'
                 ''
                 '   .the first string is an [easy for search]  TAG that will appear in the logcat output'
                 '   .the second string is the message printed to log'
                 ''
-                'You can also change to:'
-                ''
-                '[TODO: different color!]'
+                'You can also change to:     [TODO: different color!]'
                 ''
                 '  Log.d (debug)'
                 '  Log.i (Information)'
@@ -145,7 +145,7 @@ object frmLazAndroidToolsExpert: TfrmLazAndroidToolsExpert
                 '  Log.i(TAG_NAME, MESSAGE);'
                 ''
                 'PS.1: To get the string for an int, use Integer.toString(intValue)'
-                'PS.2: You should not use LogCat messages in release App a [bad performance!]'
+                'PS.2: You should not use Logcat messages in release Apk [bad performance!]'
               )
               ParentFont = False
               PopupMenu = PopupMenu1
@@ -320,7 +320,7 @@ object frmLazAndroidToolsExpert: TfrmLazAndroidToolsExpert
           Left = 8
           Height = 23
           Top = 139
-          Width = 250
+          Width = 232
           Anchors = [akTop, akLeft, akRight]
           BorderSpacing.Around = 8
           ItemHeight = 15
@@ -337,10 +337,10 @@ object frmLazAndroidToolsExpert: TfrmLazAndroidToolsExpert
           AnchorSideTop.Side = asrCenter
           AnchorSideRight.Control = TabSheetAction
           AnchorSideRight.Side = asrBottom
-          Left = 266
+          Left = 248
           Height = 30
           Top = 135
-          Width = 222
+          Width = 240
           Anchors = [akTop, akRight]
           BorderSpacing.Around = 8
           Caption = 'Build Android Apk'
@@ -351,7 +351,7 @@ object frmLazAndroidToolsExpert: TfrmLazAndroidToolsExpert
     end
     object TabSheetSettings: TTabSheet
       Caption = 'Settings'
-      ClientHeight = 593
+      ClientHeight = 453
       ClientWidth = 492
       object LabelAndroidSDKPath: TLabel
         AnchorSideLeft.Control = TabSheetSettings
@@ -564,13 +564,13 @@ object frmLazAndroidToolsExpert: TfrmLazAndroidToolsExpert
     end
     object TabSheetAbout: TTabSheet
       Caption = 'About'
-      ClientHeight = 346
-      ClientWidth = 438
+      ClientHeight = 453
+      ClientWidth = 492
       object LabelAboutInfo: TLabel
         Left = 0
-        Height = 346
+        Height = 453
         Top = 0
-        Width = 438
+        Width = 492
         Align = alClient
         Alignment = taCenter
         Caption = 'LATE: Apk Tools Expert for Android Module Wizard'#10'by Thierry'
@@ -592,10 +592,18 @@ object frmLazAndroidToolsExpert: TfrmLazAndroidToolsExpert
     top = 48
   end
   object PopupMenu1: TPopupMenu
-    left = 144
-    top = 312
+    left = 328
+    top = 264
     object MenuItem1: TMenuItem
       Caption = 'Enter TAG...'
+      OnClick = PopupMenu1Close
+    end
+    object MenuItem3: TMenuItem
+      Caption = 'DalvikVM'
+      OnClick = PopupMenu1Close
+    end
+    object MenuItem4: TMenuItem
+      Caption = 'libC'
       OnClick = PopupMenu1Close
     end
     object MenuItem2: TMenuItem

@@ -742,7 +742,7 @@ Procedure jImageView_setBitmapImage(env:PJNIEnv;this:jobject;
 Procedure jImageView_setBitmapImage2(env:PJNIEnv;this:jobject;
                                     ImageView : jObject; bitmap : jObject);
 
-Procedure jImageView_SetImageByIdentifier(env:PJNIEnv;this:jobject; ImageView : jObject; _imageIdentifier: string);
+Procedure jImageView_SetImageByResIdentifier(env:PJNIEnv;this:jobject; ImageView : jObject; _imageResIdentifier: string);
 
 
 //by jmpessoa
@@ -1456,28 +1456,21 @@ procedure jSqliteDataAccess_DeleteFromTable(env:PJNIEnv;this:jobject; SqliteData
 
 procedure jSqliteDataAccess_UpdateTable(env:PJNIEnv;this:jobject; SqliteDataBase: jObject; updateQuery: string);
 procedure jSqliteDataAccess_UpdateImage(env:PJNIEnv;this:jobject; SqliteDataBase: jObject;
-                                        tableName: string; imageFieldName: string; keyFieldName: string; imageValue: jObject; keyValue: integer);
+                                        tableName: string; imageFieldName: string; keyFieldName: string; imageValue: jObject; keyValue: integer); overload;
 
 procedure jSqliteDataAccess_Close(env:PJNIEnv;this:jobject; SqliteDataBase: jObject);
 
-{jMediaPlayer :by jmpessoa}
-(*
-function jMediaPlayer_Create(env:  PJNIEnv; this: jObject; selfPas: TObject; pathToFileName: string): jObject;
-procedure jMediaPlayer_Free (env: PJNIEnv; this: jObject; MediaPlayer: jObject);
-procedure jMediaPlayer_SetVolume(env: PJNIEnv; this: JObject; MediaPlayer: jObject; leftVolume: JFloat; rightVolume: JFloat);
-function jMediaPlayer_GetDuration(env: PJNIEnv; this: JObject; MediaPlayer: jObject): JInt;
-function jMediaPlayer_GetCurrentPosition(env: PJNIEnv; this: JObject; MediaPlayer: jObject): JInt;
-procedure jMediaPlayer_SelectTrack(env: PJNIEnv; this: JObject; MediaPlayer: jObject; index: JInt);
-function jMediaPlayer_IsLooping(env: PJNIEnv; this: JObject; MediaPlayer: jObject): boolean;
-procedure jMediaPlayer_SetLooping(env: PJNIEnv; this: JObject; MediaPlayer: jObject; looping: boolean);
-procedure jMediaPlayer_SeekTo(env: PJNIEnv; this: JObject; MediaPlayer: jObject; millis: JInt);
-function jMediaPlayer_IsPlaying(env: PJNIEnv; this: JObject; MediaPlayer: jObject): boolean;
-procedure jMediaPlayer_Pause(env: PJNIEnv; this: JObject; MediaPlayer: jObject);
-procedure jMediaPlayer_Stop(env: PJNIEnv; this: JObject; MediaPlayer: jObject);
-procedure jMediaPlayer_Start(env: PJNIEnv; this: JObject; MediaPlayer: jObject);
-procedure jMediaPlayer_Prepare(env: PJNIEnv; this: JObject; MediaPlayer: jObject);
-procedure jMediaPlayer_SetDataSource(env: PJNIEnv; this: JObject; MediaPlayer: jObject; path: string);
-  *)
+procedure jSqliteDataAccess_SetForeignKeyConstraintsEnabled(env: PJNIEnv; this: JObject; _jsqlitedataaccess: JObject; _value: boolean);
+procedure jSqliteDataAccess_SetDefaultLocale(env: PJNIEnv; this: JObject; _jsqlitedataaccess: JObject);
+procedure jSqliteDataAccess_DeleteDatabase(env: PJNIEnv; this: JObject; _jsqlitedataaccess: JObject; _dbName: string);
+procedure jSqliteDataAccess_UpdateImage(env: PJNIEnv; this: JObject; _jsqlitedataaccess: JObject; _tabName: string; _imageFieldName: string; _keyFieldName: string; _imageResIdentifier: string; _keyValue: integer); overload;
+procedure jSqliteDataAccess_InsertIntoTableBatch(env: PJNIEnv; this: JObject; _jsqlitedataaccess: JObject; var _insertQueries: TDynArrayOfString);
+procedure jSqliteDataAccess_UpdateTableBatch(env: PJNIEnv; this: JObject; _jsqlitedataaccess: JObject; var _updateQueries: TDynArrayOfString);
+function jSqliteDataAccess_CheckDataBaseExistsByName(env: PJNIEnv; this: JObject; _jsqlitedataaccess: JObject; _dbName: string): boolean;
+
+procedure jSqliteDataAccess_UpdateImageBatch(env: PJNIEnv; this: JObject; _jsqlitedataaccess: JObject; var _imageResIdentifierDataArray: TDynArrayOfString; _delimiter: string);
+
+
 // Http
 Function  jHttp_Get(env:PJNIEnv; this:jobject; URL: String) : String;
 
@@ -6195,15 +6188,15 @@ Procedure jImageView_setBitmapImage2(env:PJNIEnv;this:jobject;
   env^.CallVoidMethodA(env,ImageView,_jMethod,@_jParams);
  end;
 
-Procedure jImageView_SetImageByIdentifier(env:PJNIEnv;this:jobject; ImageView : jObject; _imageIdentifier: string);
+Procedure jImageView_SetImageByResIdentifier(env:PJNIEnv;this:jobject; ImageView : jObject; _imageResIdentifier: string);
  var
   _jMethod : jMethodID = nil;
   _jParams : array[0..0] of jValue;
   cls: jClass;
  begin
-  _jParams[0].l := env^.NewStringUTF(env, PChar(_imageIdentifier) );
+  _jParams[0].l := env^.NewStringUTF(env, PChar(_imageResIdentifier) );
   cls := env^.GetObjectClass(env, ImageView);
- _jMethod:= env^.GetMethodID(env, cls, 'SetImageByIdentifier', '(Ljava/lang/String;)V');
+ _jMethod:= env^.GetMethodID(env, cls, 'SetImageByResIdentifier', '(Ljava/lang/String;)V');
   env^.CallVoidMethodA(env,ImageView,_jMethod,@_jParams);
   env^.DeleteLocalRef(env,_jParams[0].l);
  end;
@@ -11737,6 +11730,150 @@ begin
    cls:= env^.GetObjectClass(env, SqliteDataBase);
   _methodID:= env^.GetMethodID(env, cls, 'Close', '()V');
   env^.CallVoidMethod(env, SqliteDataBase, _methodID);
+end;
+
+procedure jSqliteDataAccess_SetForeignKeyConstraintsEnabled(env: PJNIEnv; this: JObject; _jsqlitedataaccess: JObject; _value: boolean);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].z:= JBool(_value);
+  jCls:= env^.GetObjectClass(env, _jsqlitedataaccess);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetForeignKeyConstraintsEnabled', '(Z)V');
+  env^.CallVoidMethodA(env, _jsqlitedataaccess, jMethod, @jParams);
+end;
+
+
+procedure jSqliteDataAccess_SetDefaultLocale(env: PJNIEnv; this: JObject; _jsqlitedataaccess: JObject);
+var
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jsqlitedataaccess);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetDefaultLocale', '()V');
+  env^.CallVoidMethod(env, _jsqlitedataaccess, jMethod);
+end;
+
+
+procedure jSqliteDataAccess_DeleteDatabase(env: PJNIEnv; this: JObject; _jsqlitedataaccess: JObject; _dbName: string);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_dbName));
+  jCls:= env^.GetObjectClass(env, _jsqlitedataaccess);
+  jMethod:= env^.GetMethodID(env, jCls, 'DeleteDatabase', '(Ljava/lang/String;)V');
+  env^.CallVoidMethodA(env, _jsqlitedataaccess, jMethod, @jParams);
+env^.DeleteLocalRef(env,jParams[0].l);
+end;
+
+
+procedure jSqliteDataAccess_UpdateImage(env: PJNIEnv; this: JObject; _jsqlitedataaccess: JObject; _tabName: string; _imageFieldName: string; _keyFieldName: string; _imageResIdentifier: string; _keyValue: integer);
+var
+  jParams: array[0..4] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_tabName));
+  jParams[1].l:= env^.NewStringUTF(env, PChar(_imageFieldName));
+  jParams[2].l:= env^.NewStringUTF(env, PChar(_keyFieldName));
+  jParams[3].l:= env^.NewStringUTF(env, PChar(_imageResIdentifier));
+  jParams[4].i:= _keyValue;
+  jCls:= env^.GetObjectClass(env, _jsqlitedataaccess);
+  jMethod:= env^.GetMethodID(env, jCls, 'UpdateImage', '(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;I)V');
+  env^.CallVoidMethodA(env, _jsqlitedataaccess, jMethod, @jParams);
+env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env,jParams[1].l);
+  env^.DeleteLocalRef(env,jParams[2].l);
+  env^.DeleteLocalRef(env,jParams[3].l);
+end;
+
+
+procedure jSqliteDataAccess_InsertIntoTableBatch(env: PJNIEnv; this: JObject; _jsqlitedataaccess: JObject; var _insertQueries: TDynArrayOfString);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+  newSize0: integer;
+  jNewArray0: jObject=nil;
+  i: integer;
+begin
+  newSize0:= Length(_insertQueries);
+  jNewArray0:= env^.NewObjectArray(env, newSize0, env^.FindClass(env,'java/lang/String'),env^.NewStringUTF(env, PChar('')));
+  for i:= 0 to newSize0 - 1 do
+  begin
+     env^.SetObjectArrayElement(env,jNewArray0,i,env^.NewStringUTF(env, PChar(_insertQueries[i])));
+  end;
+  jParams[0].l:= jNewArray0;
+  jCls:= env^.GetObjectClass(env, _jsqlitedataaccess);
+  jMethod:= env^.GetMethodID(env, jCls, 'InsertIntoTableBatch', '([Ljava/lang/String;)V');
+  env^.CallVoidMethodA(env, _jsqlitedataaccess, jMethod, @jParams);
+env^.DeleteLocalRef(env,jParams[0].l);
+end;
+
+
+procedure jSqliteDataAccess_UpdateTableBatch(env: PJNIEnv; this: JObject; _jsqlitedataaccess: JObject; var _updateQueries: TDynArrayOfString);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+  newSize0: integer;
+  jNewArray0: jObject=nil;
+  i: integer;
+begin
+  newSize0:= Length(_updateQueries);
+  jNewArray0:= env^.NewObjectArray(env, newSize0, env^.FindClass(env,'java/lang/String'),env^.NewStringUTF(env, PChar('')));
+  for i:= 0 to newSize0 - 1 do
+  begin
+     env^.SetObjectArrayElement(env,jNewArray0,i,env^.NewStringUTF(env, PChar(_updateQueries[i])));
+  end;
+  jParams[0].l:= jNewArray0;
+  jCls:= env^.GetObjectClass(env, _jsqlitedataaccess);
+  jMethod:= env^.GetMethodID(env, jCls, 'UpdateTableBatch', '([Ljava/lang/String;)V');
+  env^.CallVoidMethodA(env, _jsqlitedataaccess, jMethod, @jParams);
+env^.DeleteLocalRef(env,jParams[0].l);
+end;
+
+
+function jSqliteDataAccess_CheckDataBaseExistsByName(env: PJNIEnv; this: JObject; _jsqlitedataaccess: JObject; _dbName: string): boolean;
+var
+  jBoo: JBoolean;
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_dbName));
+  jCls:= env^.GetObjectClass(env, _jsqlitedataaccess);
+  jMethod:= env^.GetMethodID(env, jCls, 'CheckDataBaseExistsByName', '(Ljava/lang/String;)Z');
+  jBoo:= env^.CallBooleanMethodA(env, _jsqlitedataaccess, jMethod, @jParams);
+  Result:= boolean(jBoo);
+   env^.DeleteLocalRef(env,jParams[0].l);
+end;
+
+procedure jSqliteDataAccess_UpdateImageBatch(env: PJNIEnv; this: JObject; _jsqlitedataaccess: JObject; var _imageResIdentifierDataArray: TDynArrayOfString; _delimiter: string);
+var
+  jParams: array[0..1] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+  newSize0: integer;
+  jNewArray0: jObject=nil;
+  i: integer;
+begin
+  newSize0:= Length(_imageResIdentifierDataArray);
+  jNewArray0:= env^.NewObjectArray(env, newSize0, env^.FindClass(env,'java/lang/String'),env^.NewStringUTF(env, PChar('')));
+  for i:= 0 to newSize0 - 1 do
+  begin
+     env^.SetObjectArrayElement(env,jNewArray0,i,env^.NewStringUTF(env, PChar(_imageResIdentifierDataArray[i])));
+  end;
+  jParams[0].l:= jNewArray0;
+  jParams[1].l:= env^.NewStringUTF(env, PChar(_delimiter));
+  jCls:= env^.GetObjectClass(env, _jsqlitedataaccess);
+  jMethod:= env^.GetMethodID(env, jCls, 'UpdateImageBatch', '([Ljava/lang/String;Ljava/lang/String;)V');
+  env^.CallVoidMethodA(env, _jsqlitedataaccess, jMethod, @jParams);
+  env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env,jParams[1].l);
 end;
 
 //------------------------------------------------------------------------------
