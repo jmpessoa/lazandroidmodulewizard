@@ -1194,14 +1194,15 @@ begin
     end; //just Ant project
 
     strList.Clear;
-    strList.Add('set path=%path%;'+FPathToAntBin); //<--- thanks to andersonscinfo !  [set path=%path%;C:\and32\ant\bin]
+
+    strList.Add('set Path=%PATH%;'+FPathToAntBin); //<--- thanks to andersonscinfo !  [set path=%path%;C:\and32\ant\bin]
     strList.Add('set JAVA_HOME='+FPathToJavaJDK);  //set JAVA_HOME=C:\Program Files (x86)\Java\jdk1.7.0_21
     strList.Add('cd '+FAndroidProjectName);
     strList.Add('ant -Dtouchtest.enabled=true debug');
     strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'build-debug.bat'); //build Apk using "Ant"
 
     strList.Clear;
-    strList.Add('set path=%path%;'+FPathToAntBin); //<--- thanks to andersonscinfo !
+    strList.Add('set Path=%PATH%;'+FPathToAntBin); //<--- thanks to andersonscinfo !
     strList.Add('set JAVA_HOME='+FPathToJavaJDK);  //set JAVA_HOME=C:\Program Files (x86)\Java\jdk1.7.0_21
     strList.Add('cd '+FAndroidProjectName);
     strList.Add('ant clean release');
@@ -1233,7 +1234,7 @@ begin
 
     //need to pause on double-click use...
     strList.Clear;
-    strList.Add('cmd /K create_avd_default.bat');
+    strList.Add('cmd /k create_avd_default.bat');
     strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'utils'+DirectorySeparator+'paused_create_avd_default.bat');
 
     strList.Clear;
@@ -1353,7 +1354,7 @@ begin
     strList.Add('12. Linux users: use "build.sh" , "install.sh" , "uninstall.sh" and "logcat.sh" [thanks to Stephano!]');
     strList.Add('    WARNING: All demos Apps was generate on my windows system! So, please,  edit its to correct paths...!');
     strList.Add(' ');
-    strList.Add('13. WARNING, before to execute "build-release.bat [.sh]"  you need execute "'+dummy+'-release.keystore.bat [.sh]"!');
+    strList.Add('13. WARNING, before to execute "build-release.bat [.sh]"  you need execute "release.keystore.bat [.sh]"!');
     strList.Add('    Please, read "readme-keytool-input.txt!"');
     strList.Add(' ');
     strList.Add('14. Please, for more info, look for "How to use the Demos" in "Laz Android Module Wizard" readme.txt!!');
@@ -1468,8 +1469,8 @@ begin
 
     //linux build Apk using "Ant"  ---- Thanks to Stephano!
     strList.Clear;
-    if FPathToAntBin <> '' then
-      strList.Add('export PATH='+linuxPathToAntBin+':PATH'); //export PATH=/usr/bin/ant:PATH
+    if FPathToAntBin <> '' then //PATH=$PATH:/data/myscripts
+      strList.Add('export PATH='+linuxPathToAntBin+':$PATH'); //export PATH=/usr/bin/ant:PATH
 
     strList.Add('export JAVA_HOME='+linuxPathToJavaJDK);     //export JAVA_HOME=/usr/lib/jvm/java-6-openjdk
     strList.Add('cd '+linuxAndroidProjectName);
@@ -1478,7 +1479,7 @@ begin
 
     strList.Clear;
     if FPathToAntBin <> '' then
-       strList.Add('export PATH='+linuxPathToAntBin+':PATH'); //export PATH=/usr/bin/ant:PATH
+       strList.Add('export PATH='+linuxPathToAntBin+':$PATH'); //export PATH=/usr/bin/ant:PATH
 
     strList.Add('export JAVA_HOME='+linuxPathToJavaJDK);     //export JAVA_HOME=/usr/lib/jvm/java-6-openjdk
     strList.Add('cd '+linuxAndroidProjectName);

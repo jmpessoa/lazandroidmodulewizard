@@ -447,7 +447,7 @@ begin
     MemoLogFilter.Clear;
     With APKProcess do
     begin
-      Dir:= ProjectPath + DirectorySeparator + 'bin';
+      //Dir:= ProjectPath + DirectorySeparator + 'bin';
       CommandLine:= CmdShell + IncludeTrailingBackslash(SdkPath) + 'platform-tools' +
                      DirectorySeparator + 'adb logcat -s ' + strTAG;     //TODO: : [by jmpessoa] CommandLine need fix: deprecated!
       (* TODO: [by jmpessoa]  test it!
@@ -601,6 +601,8 @@ end;
 
 
 procedure TfrmLazAndroidToolsExpert.RebuildLibrary; //by jmpessoa
+var
+  envVarPath: string;
 begin
 
   if PathToLazbuild = '' then
@@ -608,7 +610,6 @@ begin
      ShowMessage('Fail! PathToLazbuild not found!' );
      Exit;
   end;
-
 
   //if ApkProcessRunning then Exit;
   if Assigned(APKProcess) then
@@ -620,14 +621,15 @@ begin
   APKProcess:= TThreadProcess.Create(True);
   with APKProcess do
   begin
-    Dir:= Self.JNIProjectPath;
-    Env.Add('path=' + PathToLazbuild);
-    CommandLine:= CmdShell + IncludeTrailingBackslash(PathToLazbuild)+
-                  {DirectorySeparator +} 'lazbuild controls.lpi';  //TODO: : [by jmpessoa] need fix: deprecated!
-    (* TODO: [by jmpessoa]  test it!
+    Dir:= Self.JNIProjectPath;  //controls.lpi
+    CommandLine:= CmdShell + IncludeTrailingBackslash(PathToLazbuild) +
+                       DirectorySeparator + 'lazbuild controls.lpi';     //TODO: : [by jmpessoa] CommandLine need fix: deprecated!
+
+   (* TODO: [by jmpessoa]  test it!
      Executable:= 'lazbuild'
      Parameters.Add('controls.lpi');
-    *)
+   *)
+
     OnDisplayOutput:= @ShowProcOutput;
     Start;
   end;
@@ -748,11 +750,18 @@ end;
 procedure TfrmLazAndroidToolsExpert.BitBtnBuildClick(Sender: TObject);
 var
   antkMode: string;
+  envVarPath: string;
 begin
 
   if ProjectPath = '' then
   begin
      ShowMessage('Fail! Please, select a Project!');
+     Exit;
+  end;
+
+  if AntPath = '' then
+  begin
+     ShowMessage('Fail! PathToAnt not found!' );
      Exit;
   end;
 
@@ -766,10 +775,18 @@ begin
   APKProcess:= TThreadProcess.Create(True);
   with APKProcess do
   begin
-    Dir:= ProjectPath;
-    Env.Add('path=' + AntPath);
+
+    {
+    set path=C:\adt32\ant\bin
+    set JAVA_HOME=C:\Program Files (x86)\Java\jdk1.7.0_21
+    cd C:\adt32\eclipse\workspace\AppSqliteDemo2
+    ant -Dtouchtest.enabled=true debug
+    }
+
     Env.Add('JAVA_HOME=' + JdkPath);
-    CommandLine:= CmdShell + ' ant '+ antkMode;    //TODO: : [by jmpessoa] CommandLine need fix: deprecated!
+    Dir:= ProjectPath;
+    CommandLine:= CmdShell + IncludeTrailingBackslash(AntPath) +
+                       DirectorySeparator + 'ant '+ antkMode;     //TODO: : [by jmpessoa] CommandLine need fix: deprecated!
     (* TODO: [by jmpessoa]  test it!
      Executable:= 'ant'
      Parameters.Add('-Dtouchtest.enabled=true');
@@ -779,6 +796,7 @@ begin
     OnDisplayOutput:= @ShowProcOutput;
     Start;
   end;
+
 end;
 
 procedure TfrmLazAndroidToolsExpert.BitBtnInstallClick(Sender: TObject);
