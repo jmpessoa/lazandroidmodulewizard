@@ -1,8 +1,8 @@
 
 	Lazarus Android Module Wizard 
 		
-	"A wizard for create JNI Android loadable module (.so) in Lazarus/Free Pascal using DataModule like form
-         and Components" 
+	"A wizard for create JNI Android loadable module (.so) in Lazarus/Free Pascal using 
+	DataModule like form and Components!" 
 
 	Author: Jose Marques Pessoa : jmpessoa__hotmail_com
 
@@ -356,6 +356,7 @@ Version 0.6 - 15 October 2014 -
 			and new added properties: "HighLightSelectedItem" [True/False] and "HighLightSelectedItemColor" 
 			                          
 Version 0.5 - rev. 03 - 17 august 2014 -
+
 	:: New jLocation Component: Add Partial Support for Location Object //<<---- A suggestion and request by Fatih KILIÇ
 	:: New jPreference Component: Add Partial Support for Preferences Object //<<---- A suggestion and request by Fatih KILIÇ
 	:: NEW AppLocationDemo [Eclipse Project] 
@@ -368,11 +369,13 @@ Version 0.5 - rev. 02 - 14 june 2014 -
 	:: Warning: Bluetooth support yet unfinished! [BUG?]!
 
 Version 0.5 - rev. 01 - 06 May 2014 -
+
 	:: NEW Add Partial Support for Menu Object [Option Menu/SubMenu and Context Menu]! 
 	:: NEW jMenu Component [Android Bridges EXtra]
 	:: NEW AppMenuDemo [Eclipse Project]
 
 Version 0.5 - 05 May 2014 -
+
 	:: NEW Add Component Create Wizard!
 		:: It Now offers two new aid/assistance to increase the productivity of coding.
 
@@ -389,24 +392,29 @@ Version 0.5 - 05 May 2014 -
  
 
 version 0.4 - revision: 05 - 02 March - 2014 -
+
 	:: Added NEW method GetText to jListView [and minor bug fix]
 	:: Update [Eclipse] AppDemo1 [List View Demo]
 
 version 0.4 - revision: 04 - 01 March - 2014 -
+
 	:: New Add Custom Row Support to jListView
 	:: Update [Eclipse] AppDemo1 [List View Demo]
 
 version 0.4 - revision: 03 - 19 February - 2014 -
+
 	:: New Add Image/BLOB Support to SQLite: jSqliteDataAccess, jSqliteCursor
 
 version 0.4 - revision: 02 - 17 February - 2014 - Minor update...
 
 version 0.4 - revision: 01 - 16 February - 2014 -
+
 	:: New Add [Partial] Support to SQLite: jSqliteDataAccess, jSqliteCursor
 		Supported FIELD_TYPE: [INTEGER, STRING, FLOAT] 
         ::New Eclipse project demo:  AppSqliteDemo1
 
 version 0.4 - 08 February - 2014 -
+
  	:: NEW! Add Support for Android API > 13. 
          	1.A new code architecture! 
 		2.A lot of code lines was fix/changed/Add!
@@ -436,9 +444,11 @@ version 0.4 - 08 February - 2014 -
                                             
 
 version 0.3 - revision 0.3 - 30 December 2013 -
+
 	:: New! Add Option to Select Android Platform 
 
 version 0.3 - revision 0.2 - 29 December 2013 -
+
 	:: New! Support for Linux! Thanks to Leledumbo! 
 		by Leledumbo for Linux users:
 		1. Build all libraries in the  ../LazAndroidWizard/linux/dummylibs
@@ -451,21 +461,26 @@ version 0.3 - revision 0.2 - 29 December 2013 -
        
 
 version 0.3 - revision 0.1 - 28 December 2013 -
+
  	:: New! Introduces Support for multi build modes [ArmV6, ArmV7a, x86]
                 
 version 0.3 - 22 December 2013 
+
 	:: NEW! Introduces Support to Ant Project  
 
 		ref. http://ant.apache.org/bindownload.cgi 
 			Then simply extract the zip file to a convenient location...
 
 version 0.2 - 14 December 2013 -
+
 	:: NEW! Introduces Android [GUI] Android Components Bridges - Based on Simonsayz's controls 
 
 version 0.1 - revision 0.1 - 09 September - 2013 -	 
+
 	:: Bugs fixs!
 
 version 0.1 - August 2013 -
+
 	:: Warning: at the moment this code is just a *proof-of-concept*
               
 II.  Ant Projec Development: please, read "fast_tutorial_ant_users.txt"
@@ -477,6 +492,7 @@ IV. Technical Notes: dependencies on laz4android [win32] IDE cross compiler:
 	--> About Package, Components, LCL  and NDK libs: *.so 
 
 1. About Package creation: just LCLBase is permitted! not "LCL"! 
+
 	- You will nedd  LCLBase Required Package for register procedure.
 	- yes, other No GUI stuff is permitted.
 
