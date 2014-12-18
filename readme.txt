@@ -1,7 +1,8 @@
 
 	Lazarus Android Module Wizard 
 		
-	"A wizard for create JNI Android loadable module (.so) in Lazarus/Free Pascal using DataModule like form" 
+	"A wizard for create JNI Android loadable module (.so) in Lazarus/Free Pascal using DataModule like form
+         and Components" 
 
 	Author: Jose Marques Pessoa : jmpessoa__hotmail_com
 
