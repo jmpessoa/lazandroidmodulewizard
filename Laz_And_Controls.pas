@@ -1,10 +1,12 @@
 ﻿//------------------------------------------------------------------------------
 //
 //   Native Android Controls for Pascal
-//
+
+//   [Lazarus Support by jmpessoa@hotmail.com - december 2013]
+//    https://github.com/jmpessoa/lazandroidmodulewizard
+
 //   Compiler   Free Pascal Compiler FPC 2.7.1, ( XE5 in near future )
 //
-//   [and Lazarus by jmpessoa@hotmail.com - december 2013]
 //
 //   Developer
 //              Simon,Choi / Choi,Won-sik , 최원식옹
@@ -334,10 +336,11 @@ type
     procedure SetImages(Value: jImageList);   //by jmpessoa
 
     procedure SetImageIndex(Value: integer);
-    procedure SetImageName(Value: string);
 
     procedure SetImageByIndex(Value: integer);
-    procedure SetImageByName(Value: string);
+
+    procedure SetImageIdentifier(Value: string);  // ...res/drawable
+
     function TryPath(path: string; fileName: string): boolean;
 
   protected
@@ -348,6 +351,8 @@ type
     procedure Init(refApp: jApp) override;
 
     Procedure LoadFromFile(fileName : String);
+    Procedure LoadFromRes( imgResIdenfier: String);  // ..res/drawable
+
     Procedure CreateJavaBitmap(w,h : Integer);
     Function  GetJavaBitmap: jObject;
 
@@ -367,11 +372,15 @@ type
     function  GetRatio: Single;
 
     //property  JavaObj : jObject   read FjObject;
-    property ImageName: string read FImageName write SetImageName;
+
   published
     property FilePath: TFilePath read FFilePath write FFilePath;
     property ImageIndex: integer read FImageIndex write SetImageIndex;
     property Images    : jImageList read FImageList write SetImages;     //by jmpessoa
+
+    property ImageIdentifier: string read FImageName write SetImageIdentifier;
+    //property ImageName: string read FImageName write SetImageName;
+
     property  Width   : integer           read FWidth      write FWidth;
     property  Height  : integer           read FHeight     write FHeight;
   end;
@@ -805,14 +814,13 @@ type
     function GetCount: integer;
     procedure SetImageName(Value: string);
     procedure SetImageIndex(Value: integer);
-    function  GetImageName       : string;
     function  GetImageIndex      : integer;
     procedure UpdateLParamHeight;
     procedure UpdateLParamWidth;
   protected
-    procedure SetViewParent(Value: jObject);
-    function GetHeight: integer;
-    function GetWidth: integer;
+    procedure SetViewParent(Value: jObject);  override;
+    function GetHeight: integer;   override;
+    function GetWidth: integer;     override;
     Procedure GenEvent_OnClick(Obj: TObject);
     procedure Notification(AComponent: TComponent; Operation: TOperation); override;
   public
@@ -827,20 +835,19 @@ type
     Procedure SetImageByIndex(Value : integer);
     procedure SetImageBitmap(bitmap: jObject);
     procedure SetImageByResIdentifier(_imageResIdentifier: string);    // ../res/drawable
-    // Property
-    //property Width: integer Read GetWidth;
-    //property Height: integer Read GetHeight;
 
-    //property Parent: jObject  read  FjPRLayout write SetParent; // Java : Parent Relative Layout
+    function GetBitmapHeight: integer;
+    function GetBitmapWidth: integer;
+
     property Count: integer read GetCount;
-    property ImageName : string read GetImageName write SetImageName;
   published
     property ImageIndex: integer read GetImageIndex write SetImageIndex;
     property Images    : jImageList read FImageList write SetImages;     //by jmpessoa
-    //property Visible   : Boolean   read FVisible     write SetVisible;
+
     property BackgroundColor     : TARGBColorBridge read FColor       write SetColor;
     property IsBackgroundImage   : boolean read FIsBackgroundImage    write FIsBackgroundImage;
-    //property ImageIdentifier: string read FImageIdentifier write SetImageByIdentifier;
+    property ImageIdentifier : string read FImageName write SetImageByResIdentifier;
+
      // Event
      property OnClick: TOnNotify read FOnClick write FOnClick;
   end;
@@ -927,7 +934,9 @@ type
     procedure SetWidgetByIndex(Value: TWidgetItem; txt: string; index: integer); overload;
     procedure SetWidgetTextByIndex(txt: string; index: integer);
 
-    procedure SetImageByIndex(Value: jObject; index: integer);
+    procedure SetImageByIndex(Value: jObject; index: integer);  overload;
+
+    procedure SetImageByIndex(imgResIdentifier: string; index: integer);  overload; // ..res/drawable
 
     procedure SetTextDecoratedByIndex(Value: TTextDecorated; index: integer);
     procedure SetTextSizeDecoratedByIndex(value: TTextSizeDecorated; index: integer);
@@ -1131,8 +1140,13 @@ type
     Procedure SetVisible  (Value : Boolean);
     Procedure SetColor    (Value : TARGBColorBridge);
     Procedure SetEnabled  (Value : Boolean);
+
     procedure SetImageDownByIndex(Value: integer);
     procedure SetImageUpByIndex(Value: integer);
+
+    procedure SetImageDownByRes(imgResIdentifief: string); //  ../res/drawable
+    procedure SetImageUpByRes(imgResIdentifief: string);   //  ../res/drawable
+
     procedure UpdateLParamHeight;
     procedure UpdateLParamWidth;
   protected
@@ -1154,6 +1168,9 @@ type
     property Images    : jImageList read FImageList write SetImages;     //by jmpessoa
     property IndexImageUp: integer read FImageUpIndex write FImageUpIndex;
     property IndexImageDown: integer read FImageDownIndex write FImageDownIndex;
+
+    property ImageUpIdentifier: string read FImageUpName write SetImageUpByRes;
+    property ImageDownIdentifier: string read FImageDownName write SetImageDownByRes;
     // Event
     property OnClick : TOnNotify read FOnClick   write FOnClick;
   end;
@@ -4014,6 +4031,7 @@ begin
   inherited Init(refApp);
 
   FjObject := jImageView_Create2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, Self);
+  FInitialized:= True;
 
   if FParent is jPanel then
   begin
@@ -4038,7 +4056,6 @@ begin
                                            FMarginLeft,FMarginTop,FMarginRight,FMarginBottom,
                                            GetLayoutParams(gApp, FLParamWidth, sdW),
                                            GetLayoutParams(gApp, FLParamHeight, sdH));
-  FInitialized:= True;
   if FParent is jPanel then
   begin
      Self.UpdateLayout;
@@ -4063,6 +4080,9 @@ begin
 
   if FColor <> colbrDefault then
       jView_SetBackGroundColor(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject , GetARGB(FColor));
+
+  if FImageName <> '' then
+     jImageView_SetImageByResIdentifier(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject , FImageName);
 
   if FImageList <> nil then
   begin
@@ -4140,11 +4160,6 @@ end;
 function jImageView.GetCount: integer;
 begin
   Result:= FImageList.Images.Count;
-end;
-
-Function jImageView.GetImageName: string;
-begin
-  Result:= FImageName;
 end;
 
 Procedure jImageView.SetImageName(Value: string);
@@ -4285,6 +4300,21 @@ begin
     end;
   end;
 end;
+
+function jImageView.GetBitmapHeight: integer;
+begin
+ Result:= 0;
+ if FInitialized then
+   Result:= jImageView_GetBitmapHeight(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject );
+end;
+
+function jImageView.GetBitmapWidth: integer;
+begin
+ Result:= 0;
+ if FInitialized then
+   Result:= jImageView_GetBitmapWidth(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject );
+end;
+
 
 //  new by jmpessoa
 {jImageList}
@@ -4850,10 +4880,16 @@ end;
 
 procedure jListView.SetImageByIndex(Value: jObject; index: integer);
 begin
-  //FHasWidgetItem:= Value;
   if FInitialized then
      jListView_SetImageItem(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject , Value, index);
 end;
+
+procedure jListView.SetImageByIndex(imgResIdentifier: string; index: integer);  overload;
+begin
+  if FInitialized then
+     jListView_SetImageItem(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject , imgResIdentifier, index);
+end;
+
 
 procedure jListView.SetTextAlignByIndex(Value: TTextAlign; index: integer);
 begin
@@ -6035,7 +6071,7 @@ begin
   FHeight   := 0;
   FImageName:='';
   FImageIndex:= -1;
-    { TFilePath = (pathjForm(Owner).App, pathData, pathExt, pathDCIM); }
+
   FFilePath:= fpathData;
   //
   FjObject   := nil;
@@ -6066,6 +6102,9 @@ begin
   inherited Init(refApp);
   FjObject  := jBitmap_Create(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, Self);
   FInitialized:= True;  //neded here....
+
+  if FImageName <> '' then LoadFromRes(FImageName);
+
   if FImageList <> nil then
   begin
     FImageList.Init(refApp);
@@ -6074,6 +6113,7 @@ begin
        if FImageIndex >=0 then SetImageByIndex(FImageIndex);
     end;
   end;
+
 end;
 
 function jBitmap.TryPath(path: string; fileName: string): boolean;
@@ -6100,12 +6140,22 @@ begin
        if path <> '' then FImageName:= ExtractFileName(fileName)
        else  FImageName:= fileName;
 
-       jBitmap_loadFile(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject , GetFilePath(FFilePath)+'/'+FImageName);
+       jBitmap_loadFile2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject , GetFilePath(FFilePath)+'/'+FImageName);
        //jBitmap_getWH2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject ,FWidth,FHeight);
        FWidth:= jBitmap_GetWidth(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject );
        FHeight:= jBitmap_GetHeight(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject );
      end;
   end;
+end;
+
+Procedure jBitmap.LoadFromRes(imgResIdenfier: String);  // ..res/drawable
+begin
+   if FInitialized then
+   begin
+       jBitmap_loadRes(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject , imgResIdenfier);
+       FWidth:= jBitmap_GetWidth(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject );
+       FHeight:= jBitmap_GetHeight(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject );
+   end;
 end;
 
 Procedure jBitmap.CreateJavaBitmap(w, h: Integer);
@@ -6209,7 +6259,7 @@ begin
       FImageName:= Trim(FImageList.Images.Strings[Value]);
       if  (FImageName <> '') then
       begin
-        jBitmap_loadFile2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject , GetFilePath(FFilePath){jForm(Owner).App.Path.Dat}+'/'+FImageName);
+        jBitmap_loadFile2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject , GetFilePath(FFilePath)+'/'+FImageName);
         jBitmap_getWH2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject , integer(FWidth),integer(FHeight));
       end;
    end;
@@ -6226,6 +6276,7 @@ begin
   end;
 end;
 
+(*
 Procedure jBitmap.SetImageByName(Value: string);
 var
    i: integer;
@@ -6251,6 +6302,13 @@ procedure jBitmap.SetImageName(Value: string);
 begin
   FImageName:= Value;
   if FInitialized then SetImageByName(FImageName);
+end;
+*)
+
+procedure jBitmap.SetImageIdentifier(Value: string);
+begin
+    FImageName:= Value;
+    if FInitialized then LoadFromRes(Value);
 end;
 
 procedure jBitmap.LockPixels(var PDWordPixel : PScanLine);
@@ -7038,6 +7096,8 @@ begin
   if FInitialized  then Exit;
   inherited Init(refApp);
   FjObject := jImageBtn_Create2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, Self);
+  FInitialized:= True;
+
   if FParent <> nil then
   begin
     if FParent is jPanel then
@@ -7064,7 +7124,6 @@ begin
                                            GetLayoutParams(gApp, FLParamWidth, sdW),
                                            GetLayoutParams(gApp, FLParamHeight, sdH));
 
-  FInitialized:= True;
   if FParent is jPanel then
   begin
      Self.UpdateLayout;
@@ -7088,6 +7147,12 @@ begin
   if Self.Anchor <> nil then Self.AnchorId:= Self.Anchor.Id
   else Self.AnchorId:= -1;
   jImageBtn_setLayoutAll(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject , Self.AnchorId);
+
+  if FImageDownName <> '' then
+      jImageBtn_setButtonDownByRes(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject , FImageDownName);
+
+  if FImageUpName <> '' then
+     jImageBtn_setButtonUpByRes(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject , FImageUpName);
 
   if FImageList <> nil then
   begin
@@ -7168,33 +7233,19 @@ begin
    end;
 end;
 
-{
-procedure jImageBtn.UpdateLParamWidth;
-var
-   side: TSide;
+procedure jImageBtn.SetImageDownByRes(imgResIdentifief: string);
 begin
-   if jForm(Owner).Orientation = gApp.Orientation then
-      side:= sdW
-   else
-      side:= sdH;
-
-  if FInitialized then
-     jImageBtn_setLParamWidth2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject , GetLayoutParams(gApp, FLParamWidth, side));
-end;
-
-procedure jImageBtn.UpdateLParamHeight;
-var
-   side: TSide;
-begin
-   if jForm(Owner).Orientation = gApp.Orientation then
-      side:= sdH
-   else
-      side:= sdW;
-
+   FImageUpName:= imgResIdentifief;
    if FInitialized then
-     jImageBtn_setLParamHeight2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject , GetLayoutParams(gApp, FLParamHeight, side));
+     jImageBtn_setButtonDownByRes(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject , imgResIdentifief);
 end;
-}
+
+procedure jImageBtn.SetImageUpByRes(imgResIdentifief: string);
+begin
+  FImageDownName:=  imgResIdentifief;
+  if FInitialized then
+    jImageBtn_setButtonUpByRes(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject , imgResIdentifief);
+end;
 
 procedure jImageBtn.UpdateLParamWidth;
 var

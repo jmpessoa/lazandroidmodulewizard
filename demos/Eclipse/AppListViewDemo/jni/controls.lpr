@@ -1,12 +1,12 @@
-{hint: save all files to location: C:\adt32\eclipse\workspace\AppListViewDemo\jni }
-library controls;
-
+{hint: save all files to location: C:\adt32\eclipse\workspace\AppListViewDemo\jni}
+library controls;  //[by LazAndroidWizard: 12/18/2014 22:26:48]
+ 
 {$mode delphi}
-
+ 
 uses
-  Classes, SysUtils, And_jni, AndroidWidget, And_jni_Bridge, Laz_And_Controls,
-  Laz_And_Controls_Events, Unit1;
-
+  Classes, SysUtils, And_jni, And_jni_Bridge, AndroidWidget, Laz_And_Controls,
+  Laz_And_Controls_Events, unit1;
+ 
 { Class:     com_example_applistviewdemo_Controls
   Method:    pAppOnScreenStyle
   Signature: ()I }
@@ -129,7 +129,7 @@ end;
 
 { Class:     com_example_applistviewdemo_Controls
   Method:    pAppOnCreateContextMenu
-  Signature: (Landroid/view/Menu;)V }
+  Signature: (Landroid/view/ContextMenu;)V }
 procedure pAppOnCreateContextMenu(PEnv: PJNIEnv; this: JObject; menu: JObject); cdecl;
 begin
   Java_Event_pAppOnCreateContextMenu(PEnv,this,menu);
@@ -399,7 +399,31 @@ begin
   Java_Event_pAppOnListItemClick(PEnv,this,adapter,view,position,id);
 end;
 
-const NativeMethods:array[0..48] of JNINativeMethod = (
+{ Class:     com_example_applistviewdemo_Controls
+  Method:    pOnActionBarTabSelected
+  Signature: (JLandroid/view/View;Ljava/lang/String;)V }
+procedure pOnActionBarTabSelected(PEnv: PJNIEnv; this: JObject; pasobj: JLong; view: JObject; title: JString); cdecl;
+begin
+  Java_Event_pOnActionBarTabSelected(PEnv,this,TObject(pasobj),view,title);
+end;
+
+{ Class:     com_example_applistviewdemo_Controls
+  Method:    pOnActionBarTabUnSelected
+  Signature: (JLandroid/view/View;Ljava/lang/String;)V }
+procedure pOnActionBarTabUnSelected(PEnv: PJNIEnv; this: JObject; pasobj: JLong; view: JObject; title: JString); cdecl;
+begin
+  Java_Event_pOnActionBarTabUnSelected(PEnv,this,TObject(pasobj),view,title);
+end;
+
+{ Class:     com_example_applistviewdemo_Controls
+  Method:    pOnCustomDialogShow
+  Signature: (JLandroid/app/Dialog;Ljava/lang/String;)V }
+procedure pOnCustomDialogShow(PEnv: PJNIEnv; this: JObject; pasobj: JLong; dialog: JObject; title: JString); cdecl;
+begin
+  Java_Event_pOnCustomDialogShow(PEnv,this,TObject(pasobj),dialog,title);
+end;
+
+const NativeMethods:array[0..51] of JNINativeMethod = (
    (name:'pAppOnScreenStyle';
     signature:'()I';
     fnPtr:@pAppOnScreenStyle;),
@@ -446,7 +470,7 @@ const NativeMethods:array[0..48] of JNINativeMethod = (
     signature:'(Landroid/view/MenuItem;ILjava/lang/String;Z)V';
     fnPtr:@pAppOnClickOptionMenuItem;),
    (name:'pAppOnCreateContextMenu';
-    signature:'(Landroid/view/Menu;)V';
+    signature:'(Landroid/view/ContextMenu;)V';
     fnPtr:@pAppOnCreateContextMenu;),
    (name:'pAppOnClickContextMenuItem';
     signature:'(Landroid/view/MenuItem;ILjava/lang/String;Z)V';
@@ -546,7 +570,16 @@ const NativeMethods:array[0..48] of JNINativeMethod = (
     fnPtr:@pAppOnViewClick;),
    (name:'pAppOnListItemClick';
     signature:'(Landroid/widget/AdapterView;Landroid/view/View;II)V';
-    fnPtr:@pAppOnListItemClick;)
+    fnPtr:@pAppOnListItemClick;),
+   (name:'pOnActionBarTabSelected';
+    signature:'(JLandroid/view/View;Ljava/lang/String;)V';
+    fnPtr:@pOnActionBarTabSelected;),
+   (name:'pOnActionBarTabUnSelected';
+    signature:'(JLandroid/view/View;Ljava/lang/String;)V';
+    fnPtr:@pOnActionBarTabUnSelected;),
+   (name:'pOnCustomDialogShow';
+    signature:'(JLandroid/app/Dialog;Ljava/lang/String;)V';
+    fnPtr:@pOnCustomDialogShow;)
 );
 
 function RegisterNativeMethodsArray(PEnv: PJNIEnv; className: PChar; methods: PJNINativeMethod; countMethods:integer):integer;
@@ -560,12 +593,12 @@ begin
     if (PEnv^).RegisterNatives(PEnv, curClass, methods, countMethods) > 0 then Result:= JNI_TRUE;
   end;
 end;
-
+ 
 function RegisterNativeMethods(PEnv: PJNIEnv; className: PChar): integer;
 begin
   Result:= RegisterNativeMethodsArray(PEnv, className, @NativeMethods[0], Length(NativeMethods));
 end;
-
+ 
 function JNI_OnLoad(VM: PJavaVM; reserved: pointer): JInt; cdecl;
 var
   PEnv: PPointer;
@@ -581,7 +614,7 @@ begin
   end;
   gVM:= VM;{And_jni_Bridge}
 end;
-
+ 
 procedure JNI_OnUnload(VM: PJavaVM; reserved: pointer); cdecl;
 var
   PEnv: PPointer;
@@ -650,7 +683,10 @@ exports
   pOnLocationProviderEnabled name 'Java_com_example_applistviewdemo_Controls_pOnLocationProviderEnabled',
   pOnLocationProviderDisabled name 'Java_com_example_applistviewdemo_Controls_pOnLocationProviderDisabled',
   pAppOnViewClick name 'Java_com_example_applistviewdemo_Controls_pAppOnViewClick',
-  pAppOnListItemClick name 'Java_com_example_applistviewdemo_Controls_pAppOnListItemClick';
+  pAppOnListItemClick name 'Java_com_example_applistviewdemo_Controls_pAppOnListItemClick',
+  pOnActionBarTabSelected name 'Java_com_example_applistviewdemo_Controls_pOnActionBarTabSelected',
+  pOnActionBarTabUnSelected name 'Java_com_example_applistviewdemo_Controls_pOnActionBarTabUnSelected',
+  pOnCustomDialogShow name 'Java_com_example_applistviewdemo_Controls_pOnCustomDialogShow';
 
 begin
   gApp:= jApp.Create(nil);{Laz_And_Controls}

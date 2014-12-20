@@ -1,6 +1,6 @@
-package com.example.dummyapp;
+package com.example.applistviewdemo;
 
-//[LazAndroidModuleWizard - Version 0.6 - rev. 08 - 15 December - 2014 
+//[LazAndroidModuleWizard - Version 0.6 - rev. 09 - 20 December - 2014 
 
 //[https://github.com/jmpessoa/lazandroidmodulewizard]
 //
@@ -2062,7 +2062,6 @@ private LayoutParams    lparams;           // layout XYWH
 private OnClickListener onClickListener;   //
 public  Bitmap          bmp      = null;   //
 
-
 //by jmpessoa
 private int lparamsAnchorRule[] = new int[20]; 
 int countAnchorRule = 0;
@@ -2147,15 +2146,14 @@ if (parent != null) { parent.removeView(this); }
 
 //by jmpessoa
 public void setBitmapImage(Bitmap bm) {
+	if (bmp    != null) { bmp.recycle(); }
+	bmp = bm; 
 	this.setImageBitmap(bm);
 }
 
 public  void setImage(String str) {
-	  Bitmap bmp;
-	  bmp = this.bmp;
 	  if (bmp != null)        { bmp.recycle(); }
-	  if (str.equals("null")) { this.setImageBitmap(null);
-	                            return; };
+	  if (str.equals("null")) { this.setImageBitmap(null); return; };
 	  bmp = BitmapFactory.decodeFile( str );
 	  this.setImageBitmap(bmp);
 }
@@ -2180,7 +2178,9 @@ public Drawable GetDrawableResourceById(int _resID) {
 }
         
 public void SetImageByResIdentifier(String _imageResIdentifier) {
-	this.setImageDrawable(GetDrawableResourceById(GetDrawableResourceId(_imageResIdentifier)));
+	Drawable d = GetDrawableResourceById(GetDrawableResourceId(_imageResIdentifier));
+	bmp = ((BitmapDrawable)d).getBitmap();
+	this.setImageDrawable(d);
 }
 
 //by jmpessoa
@@ -2203,14 +2203,36 @@ public void setLParamHeight(int h) {
 
 //by jmpessoa
 public int getLParamHeight() {	
-	
-    return this.getHeight();
+  return  this.getHeight();
+ /*	
+  if (bmp != null) {
+     return this.bmp.getHeight();  //  ???  
+  } else return 0;
+  */  
 }  
 
 //by jmpessoa
 public int getLParamWidth() {
+  return this.getWidth();
+  /*
+  if (bmp != null) {
+	return this.bmp.getWidth(); //  ??? 
+  } else return 0;
+  */  
+}
 
-	return this.getWidth();
+//by jmpessoa
+public int GetBitmapHeight() {		
+  if (bmp != null) {
+     return this.bmp.getHeight();   
+  } else return 0;
+}  
+
+//by jmpessoa
+public int GetBitmapWidth() {
+  if (bmp != null) {
+	 return this.bmp.getWidth();  
+  } else return 0;
 }
 
 public void addLParamsAnchorRule(int rule) {
@@ -2876,6 +2898,33 @@ public  void setImageItem(Bitmap bm, int index) {
 	alist.get(index).bmp = bm;
 	aadapter.notifyDataSetChanged();
 }
+
+
+//by jmpessoa
+private int GetDrawableResourceId(String _resName) {
+	  try {
+	     Class<?> res = R.drawable.class;
+	     Field field = res.getField(_resName);  //"drawableName"
+	     int drawableId = field.getInt(null);
+	     return drawableId;
+	  }
+	  catch (Exception e) {
+	     Log.e("jForm", "Failure to get drawable id.", e);
+	     return 0;
+	  }
+}
+
+//by jmpessoa
+private Drawable GetDrawableResourceById(int _resID) {
+	return (Drawable)( this.controls.activity.getResources().getDrawable(_resID));	
+}
+//by jmpessoa
+public  void setImageItem(String imgResIdentifier, int index) {	   // ..res/drawable
+	Drawable d = GetDrawableResourceById(GetDrawableResourceId(imgResIdentifier));        	
+	alist.get(index).bmp = ((BitmapDrawable)d).getBitmap();
+	aadapter.notifyDataSetChanged();	
+}
+
 
 //by jmpessoa
 public void setTextDecorated(int value, int index){
@@ -4719,6 +4768,40 @@ bmpDn = BitmapFactory.decodeFile(filedn);
 invalidate();
 }
 
+
+//by jmpessoa
+private int GetDrawableResourceId(String _resName) {
+	  try {
+	     Class<?> res = R.drawable.class;
+	     Field field = res.getField(_resName);  //"drawableName"
+	     int drawableId = field.getInt(null);
+	     return drawableId;
+	  }
+	  catch (Exception e) {
+	     Log.e("jForm", "Failure to get drawable id.", e);
+	     return 0;
+	  }
+}
+
+//by jmpessoa
+private Drawable GetDrawableResourceById(int _resID) {
+	return (Drawable)( this.controls.activity.getResources().getDrawable(_resID));	
+}
+
+public  void setButtonUpByRes(String resup) {   // ..res/drawable
+ if (bmpUp  != null) { bmpUp.recycle(); }
+  Drawable d = GetDrawableResourceById(GetDrawableResourceId(resup));
+  bmpUp = ((BitmapDrawable)d).getBitmap();
+  invalidate();
+}
+
+public  void setButtonDownByRes(String resdn) {   // ..res/drawable
+  if (bmpDn  != null) { bmpDn.recycle(); }
+   Drawable d = GetDrawableResourceById(GetDrawableResourceId(resdn));
+   bmpDn = ((BitmapDrawable)d).getBitmap();
+   invalidate();
+}
+
 //
 @Override
 public  boolean onTouchEvent( MotionEvent event) {
@@ -5065,6 +5148,34 @@ public  void loadFile(String filename) {  //full file name!
   //if (bmp != null) { bmp.recycle(); }
   bmp = BitmapFactory.decodeFile(filename);
 }
+
+
+//by jmpessoa
+private int GetDrawableResourceId(String _resName) {
+	  try {
+	     Class<?> res = R.drawable.class;
+	     Field field = res.getField(_resName);  //"drawableName"
+	     int drawableId = field.getInt(null);
+	     return drawableId;
+	  }
+	  catch (Exception e) {
+	     Log.e("jForm", "Failure to get drawable id.", e);
+	     return 0;
+	  }
+}
+
+//by jmpessoa
+private Drawable GetDrawableResourceById(int _resID) {
+	return (Drawable)( this.controls.activity.getResources().getDrawable(_resID));	
+}
+
+//by jmpessoa
+public  void loadRes(String imgResIdentifier) {  //full file name!
+	  //if (bmp != null) { bmp.recycle(); }
+	  Drawable d = GetDrawableResourceById(GetDrawableResourceId(imgResIdentifier));
+	  bmp =	  ((BitmapDrawable)d).getBitmap();
+}
+
 
 //by jmpessoa
 //BitmapFactory.Options options = new BitmapFactory.Options();
@@ -6348,8 +6459,7 @@ class jTextFileManager /*extends ...*/ {
 
      return retStr;
    }
-   
-   
+     
    public String LoadFromFile(String _path, String _filename) {
 	     char buf[] = new char[512];
 	     FileReader rdr;
@@ -8815,6 +8925,32 @@ class jImageFileManager /*extends ...*/ {
        }
        Bitmap bitmap = BitmapFactory.decodeStream(istr);
        return bitmap;
+   }
+  
+   
+ 
+   private int GetDrawableResourceId(String _resName) {
+   	  try {
+   	     Class<?> res = R.drawable.class;
+   	     Field field = res.getField(_resName);  //"drawableName"
+   	     int drawableId = field.getInt(null);
+   	     return drawableId;
+   	  }
+   	  catch (Exception e) {
+   	     Log.e("jImageFileManager", "Failure to get drawable id.", e);
+   	     return 0;
+   	  }
+   }
+
+   private Drawable GetDrawableResourceById(int _resID) {
+   	return (Drawable)( this.controls.activity.getResources().getDrawable(_resID));	
+   }
+             
+   public Bitmap LoadFromResources(String _imageResIdentifier)
+   {
+	  Drawable d = GetDrawableResourceById(GetDrawableResourceId(_imageResIdentifier));
+	  Bitmap bmap = ((BitmapDrawable)d).getBitmap();
+      return bmap;
    }
    
    public Bitmap LoadFromFile(String _filename) {	   

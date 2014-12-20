@@ -43,7 +43,6 @@
       <Unit0>
         <Filename Value="controls.lpr"/>
         <IsPartOfProject Value="True"/>
-        <UnitName Value="controls"/>
       </Unit0>
       <Unit1>
         <Filename Value="unit1.pas"/>
@@ -84,11 +83,7 @@
       </Options>
     </Linking>
     <Other>
-      <CompilerMessages>
-        <MsgFileName Value=""/>
-      </CompilerMessages>
       <CustomOptions Value="-dANDROID -Xd -CpARMv6 -CfSoft -FLC:\adt32\ndk7\platforms\android-14\arch-arm\usr\lib\libdl.so -FUC:\adt32\eclipse\workspace\AppListViewDemo\obj\Controls -oC:\adt32\eclipse\workspace\AppListViewDemo\libs\armeabi\libcontrols.so"/>
-      <CompilerPath Value="$(CompPath)"/>
     </Other>
   </CompilerOptions>
   <Debugging>

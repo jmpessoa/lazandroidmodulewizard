@@ -126,6 +126,15 @@ public class App extends Activity {
    @Override
    public boolean onCreateOptionsMenu(Menu menu) {
     	controls.jAppOnCreateOptionsMenu(menu);
+    	/*
+    	if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+    		ActionBar actionBar = getActionBar();
+    		//actionBar.setDisplayHomeAsUpEnabled(true);
+    		//actionBar.show();
+    		Log.i("actionBar","show");
+    		
+    	}
+    	*/    	
         return true;
    }
 

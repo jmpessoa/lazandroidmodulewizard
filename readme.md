@@ -2,7 +2,7 @@
 	Lazarus Android Module Wizard 
 		
 	"A wizard for create JNI Android loadable module (.so) in Lazarus/Free Pascal using 
-	DataModule like form and Components!" 
+	[datamodule like] Form Designer and Components!" 
 
 	Author: Jose Marques Pessoa : jmpessoa__hotmail_com
 
@@ -47,7 +47,17 @@
 
 		Ant	http://ant.apache.org/bindownload.cgi 
 			Simply extract the zip file to a convenient location...
+
                                 
+Version 0.6 - rev. 09 - 20 December 2014 -
+
+	NEW! Improve/Add support to res/drawable to [many] components:
+					.jBitmap 
+					.jImageView
+					.jImageBtn
+					.jListView
+					.jImageFileManager
+
 Version 0.6 - rev. 08 - 15 December 2014 -
 
 	NEW! Add Support to build release Apk! 

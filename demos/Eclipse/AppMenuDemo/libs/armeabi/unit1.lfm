@@ -91,7 +91,7 @@ object AndroidModule1: TAndroidModule1
       'Blue...'
       'Purple'
     )
-    Icons.Strings = (
+    IconIdentifiers.Strings = (
       'ic_bullet_orange'
       'ic_bullet_blue'
       'ic_bullet_purple'

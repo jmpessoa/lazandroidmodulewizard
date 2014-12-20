@@ -7,7 +7,7 @@ interface
   
 uses
   Classes, SysUtils, And_jni, And_jni_Bridge, Laz_And_Controls, 
-  Laz_And_Controls_Events, AndroidWidget;
+  Laz_And_Controls_Events, AndroidWidget, actionbartab, menu, contextmenu;
   
 type
 
@@ -48,8 +48,11 @@ begin
 end;
 
 procedure TAndroidModule1.DataModuleJNIPrompt(Sender: TObject);
-begin
-  //
+var
+  i: integer;
+begin    //jListView1
+  for i:=0 to jListView1.Count-1 do
+     if jListView1.SetImageByIndex('ic_bullets',i);
 end;
 
 procedure TAndroidModule1.jButton1Click(Sender: TObject);
@@ -91,7 +94,7 @@ begin
   if jListView1.IsItemChecked(Item) then
      ShowMessage('index = ['+intToStr(Item)+'/'+caption+'] is Cheched!')
   else
-     ShowMessage('index = ['+intToStr(Item)+'/'+caption+'] is Not Cheched!')
+     ShowMessage('index = ['+intToStr(Item)+'/'+caption+'] is Not Cheched!');
 end;
 
 procedure TAndroidModule1.jListView1ClickWidgetItem(Sender: TObject;

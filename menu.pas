@@ -51,7 +51,7 @@ jMenu = class(jControl)
 
  published
     property Options: TStrings read FOptions write SetOptions;
-    property Icons: TStrings read FIcons write SetIcons;
+    property IconIdentifiers: TStrings read FIcons write SetIcons;
 end;
 
 function jMenu_jCreate(env: PJNIEnv; this: JObject;_Self: int64): jObject;

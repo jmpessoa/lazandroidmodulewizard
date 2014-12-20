@@ -1,6 +1,6 @@
 package com.example.dummyapp;
 
-//[LazAndroidModuleWizard - Version 0.6 - rev. 08 - 15 December - 2014
+//[LazAndroidModuleWizard - Version 0.6 - rev. 09 - 20 December - 2014
 //
 //[https://github.com/jmpessoa/lazandroidmodulewizard]
 

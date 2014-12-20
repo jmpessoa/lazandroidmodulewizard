@@ -73,11 +73,11 @@ begin
       if i <> 1 then
       begin
         //0:mitDefault; 1:misIfRoom
-        jMenu1.AddItem(jObjMenu, 10+i {itemID}, jMenu1.Options.Strings[i], jMenu1.Icons.Strings[i] {..res/drawable-xxx}, mitDefault, misIfRoomWithText);
+        jMenu1.AddItem(jObjMenu, 10+i {itemID}, jMenu1.Options.Strings[i], jMenu1.IconIdentifiers.Strings[i] {..res/drawable-xxx}, mitDefault, misIfRoomWithText);
       end
       else  //i=1 --> add sub menu to "Blue..." item...
       begin
-        jSubMenu:= jMenu1.AddSubMenu(jObjMenu, jMenu1.Options.Strings[i], jMenu1.Icons.Strings[i] {header icon!});  //from ..res/drawable-xxx
+        jSubMenu:= jMenu1.AddSubMenu(jObjMenu, jMenu1.Options.Strings[i], jMenu1.IconIdentifiers.Strings[i] {header icon!});  //from ..res/drawable-xxx
 
         //Sub menus Items: Do not support item icons, or nested sub menus.
         jMenu1.AddItem(jSubMenu, 100 {itemID}, 'LightSlateBlue', mitCheckable);

@@ -49,7 +49,7 @@ jContextMenu = class(jControl)
  published
     property Options: TStrings read FOptions write SetOptions;
     property HeaderTitle: string read FHeaderTitle write SetHeaderTitle;
-    property HeaderIcon: string read FHeaderIcon write SetHeaderIcon;
+    property HeaderIconIdentifier: string read FHeaderIcon write SetHeaderIcon;
 
 end;
 

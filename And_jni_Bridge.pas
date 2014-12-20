@@ -1,8 +1,10 @@
 //------------------------------------------------------------------------------
 //
 // Android JNI Interface for Pascal/Delphi
-//[and Lazarus by jmpessoa@hotmail.com - december 2013]
-//
+
+//   [Lazarus Support by jmpessoa@hotmail.com - december 2013]
+//    https://github.com/jmpessoa/lazandroidmodulewizard
+
 //   Developer
 //              Simon,Choi / Choi,Won-sik ,
 //                           simonsayz@naver.com   
@@ -775,6 +777,9 @@ function jImageView_getLParamWidth(env:PJNIEnv;this:jobject; ImageView : jObject
 function jImageView_getLParamHeight2(env:PJNIEnv;this:jobject; ImageView : jObject ): integer;
 function jImageView_getLParamWidth2(env:PJNIEnv;this:jobject; ImageView : jObject): integer;
 
+function jImageView_GetBitmapHeight(env:PJNIEnv;this:jobject; ImageView : jObject ): integer;
+function jImageView_GetBitmapWidth(env:PJNIEnv;this:jobject; ImageView : jObject): integer;
+
 // ListView
 Function  jListView_Create             (env:PJNIEnv;this:jobject;
                                         context : jObject; SelfObj : TObject;
@@ -860,7 +865,8 @@ Procedure jListView_setTextSizeDecorated(env:PJNIEnv;this:jobject; ListView : jO
 Procedure jListView_setItemLayout(env:PJNIEnv;this:jobject; ListView : jObject; value: integer; index: integer);
 
 
-Procedure jListView_setImageItem(env:PJNIEnv;this:jobject; ListView : jObject; bitmap: jObject; index: integer);
+Procedure jListView_setImageItem(env:PJNIEnv;this:jobject; ListView : jObject; bitmap: jObject; index: integer); overload;
+Procedure jListView_setImageItem(env:PJNIEnv;this:jobject; ListView : jObject; imgResIdentifier: string; index: integer); overload;
 
 Procedure jListView_setTextAlign(env:PJNIEnv;this:jobject; ListView : jObject; value: integer; index: integer);
 
@@ -1187,6 +1193,10 @@ Procedure jBitmap_Free2                 (env:PJNIEnv;this:jobject; jbitmap : jOb
 Procedure jBitmap_loadFile             (env:PJNIEnv;this:jobject;
                                         jbitmap : jObject; filename : String);
 
+Procedure jBitmap_loadRes             (env:PJNIEnv;this:jobject;
+                                        jbitmap : jObject; imgResIdentifier : String);
+
+
 Procedure jBitmap_loadFile2             (env:PJNIEnv;this:jobject;
                                         jbitmap : jObject; filename : String);
 
@@ -1349,9 +1359,17 @@ Procedure jImageBtn_setButtonDown       (env:PJNIEnv;this:jobject;
 //by jmpessoa
 Procedure jImageBtn_setButtonUp2        (env:PJNIEnv;this:jobject;
                                         ImageBtn : jObject; up: String);
+
 //by jmpessoa
 Procedure jImageBtn_setButtonDown2       (env:PJNIEnv;this:jobject;
                                         ImageBtn : jObject; dn: String);
+
+//by jmpessoa
+Procedure jImageBtn_setButtonDownByRes       (env:PJNIEnv;this:jobject;
+                                        ImageBtn : jObject; imgResIdentifief: String);
+//by jmpessoa
+Procedure jImageBtn_setButtonUpByRes       (env:PJNIEnv;this:jobject;
+                                        ImageBtn : jObject; imgResIdentifief: String);
 
 
 Procedure jImageBtn_SetEnabled         (env:PJNIEnv;this:jobject; 
@@ -6435,6 +6453,26 @@ begin
   Result:= env^.CallIntMethod(env,ImageView,_jMethod);
 end;
 
+function jImageView_GetBitmapHeight(env:PJNIEnv;this:jobject; ImageView : jObject ): integer;
+var
+ _jMethod : jMethodID = nil;
+ cls: jClass;
+begin
+   cls := env^.GetObjectClass(env, ImageView);
+ _jMethod:= env^.GetMethodID(env, cls, 'GetBitmapHeight', '()I');
+ Result:= env^.CallIntMethod(env,ImageView,_jMethod);
+end;
+
+
+function jImageView_GetBitmapWidth(env:PJNIEnv;this:jobject; ImageView : jObject): integer;
+var
+  _jMethod : jMethodID = nil;
+  cls: jClass;
+begin
+  cls := env^.GetObjectClass(env, ImageView);
+ _jMethod:= env^.GetMethodID(env, cls, 'GetBitmapWidth', '()I');
+  Result:= env^.CallIntMethod(env,ImageView,_jMethod);
+end;
 //------------------------------------------------------------------------------
 // ListView
 //------------------------------------------------------------------------------
@@ -6873,6 +6911,20 @@ begin
  cls := env^.GetObjectClass(env, ListView);
  _jMethod:= env^.GetMethodID(env, cls, 'setImageItem', '(Landroid/graphics/Bitmap;I)V');
  env^.CallVoidMethodA(env,ListView,_jMethod,@_jParams);
+end;
+
+Procedure jListView_setImageItem(env:PJNIEnv;this:jobject; ListView : jObject; imgResIdentifier: string; index: integer); overload;
+var
+ _jMethod : jMethodID = nil;
+ _jParams : array[0..1] of jValue;
+   cls: jClass;
+begin
+ _jParams[0].l := env^.NewStringUTF(env, PChar(imgResIdentifier) );;
+ _jParams[1].i := index;
+ cls := env^.GetObjectClass(env, ListView);
+ _jMethod:= env^.GetMethodID(env, cls, 'setImageItem', '(Ljava/lang/String;I)V');
+ env^.CallVoidMethodA(env,ListView,_jMethod,@_jParams);
+   env^.DeleteLocalRef(env,_jParams[0].l);
 end;
 
 //by jmpessoa
@@ -9436,6 +9488,21 @@ var
   env^.DeleteLocalRef(env,_jParams[0].l);
  end;
 
+//by jmpessoa
+Procedure jBitmap_loadRes(env:PJNIEnv;this:jobject;
+                           jbitmap : jObject; imgResIdentifier : String);
+var
+  _jMethod : jMethodID = nil;
+  _jParams : array[0..0] of jValue;
+  cls: jClass;
+ begin
+  _jParams[0].l := env^.NewStringUTF(env, pchar(imgResIdentifier) );
+  cls := env^.GetObjectClass(env, jbitmap);
+  _jMethod:= env^.GetMethodID(env, cls, 'loadRes', '(Ljava/lang/String;)V');
+  env^.CallVoidMethodA(env,jbitmap,_jMethod,@_jParams);
+  env^.DeleteLocalRef(env,_jParams[0].l);
+ end;
+
 //
 Procedure jBitmap_createBitmap(env:PJNIEnv;this:jobject;
                                jbitmap : jObject; w,h : integer);
@@ -10887,11 +10954,39 @@ var
 begin
  _jParams[0].l := env^.NewStringUTF(env, pchar(dn) );
   cls := env^.GetObjectClass(env, ImageBtn);
-
 _jMethod:= env^.GetMethodID(env, cls, 'setButtonDown', '(Ljava/lang/String;)V');
  env^.CallVoidMethodA(env,ImageBtn,_jMethod,@_jParams);
  env^.DeleteLocalRef(env,_jParams[0].l);
 end;
+
+Procedure jImageBtn_setButtonDownByRes(env:PJNIEnv;this:jobject;
+                                        ImageBtn : jObject; imgResIdentifief: String);
+var
+ _jMethod : jMethodID = nil;
+ _jParams : array[0..0] of jValue;
+ cls: jClass;
+begin
+ _jParams[0].l := env^.NewStringUTF(env, pchar(imgResIdentifief) );
+  cls := env^.GetObjectClass(env, ImageBtn);
+_jMethod:= env^.GetMethodID(env, cls, 'setButtonDownByRes', '(Ljava/lang/String;)V');
+ env^.CallVoidMethodA(env,ImageBtn,_jMethod,@_jParams);
+ env^.DeleteLocalRef(env,_jParams[0].l);
+end;
+
+Procedure jImageBtn_setButtonUpByRes(env:PJNIEnv;this:jobject;
+                                        ImageBtn : jObject; imgResIdentifief: String);
+var
+ _jMethod : jMethodID = nil;
+ _jParams : array[0..0] of jValue;
+ cls: jClass;
+begin
+ _jParams[0].l := env^.NewStringUTF(env, pchar(imgResIdentifief) );
+  cls := env^.GetObjectClass(env, ImageBtn);
+_jMethod:= env^.GetMethodID(env, cls, 'setButtonUpByRes', '(Ljava/lang/String;)V');
+ env^.CallVoidMethodA(env,ImageBtn,_jMethod,@_jParams);
+ env^.DeleteLocalRef(env,_jParams[0].l);
+end;
+
 
 // LORDMAN 2013-08-16
 Procedure jImageBtn_SetEnabled (env:PJNIEnv;this:jobject; 

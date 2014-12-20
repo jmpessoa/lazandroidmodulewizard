@@ -30,6 +30,7 @@ jImageFileManager = class(jControl)
     function LoadFromSdCard(_filename: string): jObject;
     function LoadFromURL(_imageURL: string): jObject;
     function LoadFromAssets(strName: string): jObject;
+    function LoadFromResources(_imageResIdentifier: string): jObject;
     function LoadFromFile(_filename: string): jObject; overload;
     function LoadFromFile(_path: string; _filename: string): jObject; overload;
     procedure SaveToFile(_image: jObject; _filename: string); overload;
@@ -46,6 +47,7 @@ procedure jImageFileManager_ShowImagesFromGallery(env: PJNIEnv; this: JObject; _
 function jImageFileManager_LoadFromSdCard(env: PJNIEnv; this: JObject; _jimagefilemanager: JObject; _filename: string): jObject;
 function jImageFileManager_LoadFromURL(env: PJNIEnv; this: JObject; _jimagefilemanager: JObject; _imageURL: string): jObject;
 function jImageFileManager_LoadFromAssets(env: PJNIEnv; this: JObject; _jimagefilemanager: JObject; strName: string): jObject;
+function jImageFileManager_LoadFromResources(env: PJNIEnv; this: JObject; _jimagefilemanager: JObject; _imageResIdentifier: string): jObject;
 function jImageFileManager_LoadFromFile(env: PJNIEnv; this: JObject; _jimagefilemanager: JObject; _filename: string): jObject; overload;
 function jImageFileManager_LoadFromFile(env: PJNIEnv; this: JObject; _jimagefilemanager: JObject; _path: string; _filename: string): jObject; overload;
 procedure jImageFileManager_SaveToFile(env: PJNIEnv; this: JObject; _jimagefilemanager: JObject; _image: jObject; _filename: string); overload;
@@ -138,6 +140,14 @@ begin
   if FInitialized then
    Result:= jImageFileManager_LoadFromAssets(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, strName);
 end;
+
+function jImageFileManager.LoadFromResources(_imageResIdentifier: string): jObject;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jImageFileManager_LoadFromResources(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, _imageResIdentifier);
+end;
+
 
 function jImageFileManager.LoadFromFile(_filename: string): jObject;
 begin
@@ -271,6 +281,18 @@ begin
 env^.DeleteLocalRef(env,jParams[0].l);
 end;
 
+function jImageFileManager_LoadFromResources(env: PJNIEnv; this: JObject; _jimagefilemanager: JObject; _imageResIdentifier: string): jObject;
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_imageResIdentifier));
+  jCls:= env^.GetObjectClass(env, _jimagefilemanager);
+  jMethod:= env^.GetMethodID(env, jCls, 'LoadFromResources', '(Ljava/lang/String;)Landroid/graphics/Bitmap;');
+  Result:= env^.CallObjectMethodA(env, _jimagefilemanager, jMethod, @jParams);
+  env^.DeleteLocalRef(env,jParams[0].l);
+end;
 
 function jImageFileManager_LoadFromFile(env: PJNIEnv; this: JObject; _jimagefilemanager: JObject; _filename: string): jObject;
 var
