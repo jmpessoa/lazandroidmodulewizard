@@ -1,6 +1,17 @@
-
    "Lazarus Android Module Wizard"
-     Version 0.5 - 14 May 2014
+
+	!!Please, for complete [UPDATED !!] reference read "readme.txt"       
+    
+	Version 0.6 - rev. 09 - 20 December 2014 -				
+
+	Lazarus Android Module Wizard: Form Designer and Components development model! 		
+	"A wizard to create JNI Android loadable module (.so) in Lazarus/Free Pascal using 
+	[datamodule like] Form Designer and Components!" 
+
+	Author: Jose Marques Pessoa : jmpessoa__hotmail_com
+
+		https://github.com/jmpessoa/lazandroidmodulewizard
+		http://forum.lazarus.freepascal.org/index.php/topic,21919.0.html
 
 
 ** Tutorial: JNI Bridge Component Create ** 

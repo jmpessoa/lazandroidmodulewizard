@@ -1,18 +1,19 @@
 
 ** Tutorial: Lazarus Android Module Wizard For Eclipse Users ** 
-       
-     
-    Version 6 - rev. 05 - 13 November 2014 -
-				
 
-"A wizard for create JNI Android loadable module (.so) in Lazarus/Free Pascal using DataModule like form" 
+	!!Please, for complete [UPDATED !!] reference read "readme.txt"       
+    
+	Version 0.6 - rev. 09 - 20 December 2014 -				
 
+	Lazarus Android Module Wizard: Form Designer and Components development model! 		
+	"A wizard to create JNI Android loadable module (.so) in Lazarus/Free Pascal using 
+	[datamodule like] Form Designer and Components!" 
 
-      Author: Jose Marques Pessoa : jmpessoa__hotmail_com
+	Author: Jose Marques Pessoa : jmpessoa__hotmail_com
 
-
-      Please, for complete [UPDATED !!] reference read "readme.txt"
-
+		https://github.com/jmpessoa/lazandroidmodulewizard
+		http://forum.lazarus.freepascal.org/index.php/topic,21919.0.html
+  
 
 I. INSTALL Laz4Android [win32]
 			
