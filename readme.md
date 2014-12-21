@@ -51,12 +51,35 @@
                                 
 Version 0.6 - rev. 09 - 20 December 2014 -
 
-	NEW! Improve/Add support to res/drawable to [many] components:
-					.jBitmap 
-					.jImageView
-					.jImageBtn
-					.jListView
-					.jImageFileManager
+	NEW! Improve/Add support to ../res/drawable to [many] components:
+
+					.jListView [method]
+						ex. jListView1.SetImageByIndex('ic_launcher',0);
+
+					.jImageFileManager [method] 
+						ex. jImageFileManager1.LoadFromResources('ic_launcher');
+
+					.jBitmap [property]
+						ex. jBitmap1.ImageIdentifier:= 'ic_launcher';
+
+					.jImageView [property]
+						ex. jImageView1.ImageIdentifier:= 'ic_launcher';
+
+					.jImageBtn [properties]
+						ex. jImageBtn1.ImageDownIdentifier:= 'ic_down';
+						ex. jImageBtn1.ImageUpIdentifier:= 'ic_up';
+
+					.jCustomDialog [property]
+						ex. jCustomDialog1.IconIdentifier:='ic_launcher';	
+
+					.jActionBarTab1 [property: TStrings]	
+						ex. jActionBarTab1.IconIdentifiers
+
+					.jMenu [property: TStrings]	
+						ex. jMenu1.IconIdentifiers
+
+					.jContextMenu [property]
+						ex. jContextMenu1.HeaderIconIdentifier:= 'ic_launcher';
 
 Version 0.6 - rev. 08 - 15 December 2014 -
 
@@ -391,7 +414,7 @@ Version 0.5 - 05 May 2014 -
 
 		1.You can now produce a almost complete pascal component code from a java wrapper class!
 		2.You can now get assistance for produce the java warapper class!
-		:: Please, read "fast_tutorial_jni_bridges_component_create.txt"
+		:: Please, read "how_to_create_new_components.txt"
 
 	:: New Components[Android Bridges Extra] and Demos [Eclipse Projects]: 
 
@@ -493,9 +516,9 @@ version 0.1 - August 2013 -
 
 	:: Warning: at the moment this code is just a *proof-of-concept*
               
-II.  Ant Projec Development: please, read "fast_tutorial_ant_users.txt"
+II.  Ant Projec Development: please, read "install_tutorial_ant_users.txt"
 
-III. Eclipse Project Development: please, read "fast_tutorial_eclipse_users.txt"
+III. Eclipse Project Development: please, read "install_tutorial_eclipse_users.txt"
 
 IV. Technical Notes: dependencies on laz4android [win32] IDE cross compiler: 
     
@@ -568,7 +591,7 @@ IV. Technical Notes: dependencies on laz4android [win32] IDE cross compiler:
 
 	end.   
 
-	:: [Edited 04-May-2014] :: WARNING:  Please, read the  NEW "fast_tutorial_jni_bridges_component_create.txt" - 
+	:: [Edited 04-May-2014] :: WARNING:  Please, read the  NEW ""how_to_create_new_components.txt" - 
 
 3. About NDK libs (.so) dependency on laz4android [win32] IDE cross compiler
      
