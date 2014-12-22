@@ -26,11 +26,18 @@
 			:To Install, please, read the "Laz4Android_readme.txt"
 
       		-Simonsayz for the great work on Android [GUI] Controls
+			Simon,Choi / Choi,Won-sik
+			simonsayz@naver.com
+			http://blog.naver.com/simonsayz
 			http://forum.lazarus.freepascal.org/index.php/topic,22079.0.html
 
 			-warning:	
 				.We use a modified and expanded version of Simonsayz's "Controls.java" 
 				.We use a modified and expanded version of Simonsayz's "App.java" 
+
+		-Leledumbo - Many collaborations and suggestions!
+
+		-Stephano  - Many collaborations and suggestions!
 
 		-x2nie for Lazarus 1.3 patch [No LCL form design!] 
 			http://github.com/x2nie/LiteZarus
@@ -39,6 +46,7 @@
                   http://www.youtube.com/watch?v=sQnFYJyltwY&list=UUkQrLhaIXrKY4eq9zTymxpQ
 
 		-Thierry Dijoux - Late: Apk Expert Tools [Build, Install, ...]
+
 		
 		-Lazarus forum community!
 
@@ -49,6 +57,36 @@
 			Simply extract the zip file to a convenient location...
 
                                 
+Version 0.6 - rev. 10 - 21 December 2014 -
+
+	Important Code Reorganization: A sugestion by Leledumbo [Thank you very much Leledumbo!]
+
+	Significantly reducing the final size of "controls.so"  [just about half!]
+
+	.....................................
+	Typical example:
+
+	TAndroidModule1 = class(jForm)
+		jButton1: jButton;
+		jEditText1: jEditText;
+		jListView1: jListView;
+		jSpinner1: jSpinner;
+		jTextView1: jTextView;
+      		procedure jButton1Click(Sender: TObject);
+	private
+	      	{private declarations}
+	public
+      		{public declarations}
+	end;
+	..............................
+
+	Before:
+		controls.so  --------- 2768 KB 
+
+	After code reorganization:
+		controls.so ---------- 1371 KB
+
+
 Version 0.6 - rev. 09 - 20 December 2014 -
 
 	NEW! Improve/Add support to ../res/drawable to [many] components:

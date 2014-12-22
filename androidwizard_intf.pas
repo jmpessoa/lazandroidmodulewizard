@@ -1766,13 +1766,15 @@ begin
   {Code Generation}
   AProject.LazCompilerOptions.TargetOS:= 'android'; {-T}
 
-  AProject.LazCompilerOptions.OptimizationLevel:= 1;
+  AProject.LazCompilerOptions.OptimizationLevel:= 3; //1;  //changed 21-december-2014
   AProject.LazCompilerOptions.Win32GraphicApp:= False;
 
   {Link}
   AProject.LazCompilerOptions.StripSymbols:= True; {-Xs}
   AProject.LazCompilerOptions.LinkSmart:= True {-XX};
   AProject.LazCompilerOptions.GenerateDebugInfo:= False;
+  AProject.LazCompilerOptions.SmallerCode:= True;    //added 21-december-2014
+  AProject.LazCompilerOptions.SmartLinkUnit:= True;  //added 21-december-2014
 
   {Verbose}
       //.....................
@@ -1790,7 +1792,7 @@ begin
   end
   else
   begin
-     customOptions_default:= '-Xd';
+     customOptions_default:='-Xd';
   end;
 
   customOptions_armV6:= '-Xd'+' -Cf'+ FFPUSet+ ' -CpARMV6';  //until laz bug fix for ARMV7A

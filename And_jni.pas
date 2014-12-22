@@ -15,6 +15,8 @@ unit And_jni;
  {$packrecords c}
 {$endif}
 
+{$SMARTLINK ON}
+
 interface
 
 (*
