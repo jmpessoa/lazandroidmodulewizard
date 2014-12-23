@@ -252,6 +252,9 @@ end;
 procedure TFormWorkspace.RGProjectTypeClick(Sender: TObject);
 begin
   FProjectModel:= RGProjectType.Items[RGProjectType.ItemIndex];  //fix 15-december-2013
+
+  if RGProjectType.ItemIndex = 1 then
+     if EditPackagePrefaceName.Text = '' then EditPackagePrefaceName.Text:= 'org.lazarus';
 end;
 
 function TFormWorkspace.GetNDKPlatform(identName: string): string;
@@ -453,9 +456,16 @@ end;
 
 procedure TFormWorkspace.FormActivate(Sender: TObject);
 begin
-  ComboSelectProjectName.SetFocus;
+
+  if EditPathToWorkspace.Text <> '' then
+     ComboSelectProjectName.SetFocus
+  else EditPathToWorkspace.SetFocus;
+
+  if EditPackagePrefaceName.Text = '' then EditPackagePrefaceName.Text:= 'org.lazarus';
+
   StatusBarInfo.Panels.Items[0].Text:= 'MinSdk Api: '+GetTextByListIndex(ListBoxMinSDK.ItemIndex);
   StatusBarInfo.Panels.Items[1].Text:= 'Target Api: '+GetTextByList2Index(ListBoxTargetAPI.ItemIndex);
+
 end;
 
 procedure TFormWorkspace.CheckBox1Click(Sender: TObject);
@@ -474,15 +484,13 @@ begin
     GetSubDirectories(FPathToWorkspace, ComboSelectProjectName.Items);
 
     //try some guesswork:
-    if Pos('eclipse', LowerCase(FPathToWorkspace) ) > 0 then
-    begin
-      RGProjectType.ItemIndex:= 0;
-      EditPackagePrefaceName.Text:='';
-    end;
+    if Pos('eclipse', LowerCase(FPathToWorkspace) ) > 0 then RGProjectType.ItemIndex:= 0;
 
     if Pos('ant', LowerCase(FPathToWorkspace) ) > 0 then
+    begin
        RGProjectType.ItemIndex:= 1;
-
+       if EditPackagePrefaceName.Text = '' then EditPackagePrefaceName.Text:= 'org.lazarus';
+    end;
   end;
 end;
 
@@ -496,11 +504,13 @@ begin
   if Pos('eclipse', LowerCase(FPathToWorkspace) ) > 0 then
   begin
     RGProjectType.ItemIndex:= 0;
-    EditPackagePrefaceName.Text:='';
   end;
 
   if Pos('ant', LowerCase(FPathToWorkspace) ) > 0 then
+  begin
      RGProjectType.ItemIndex:= 1;
+     if EditPackagePrefaceName.Text = '' then EditPackagePrefaceName.Text:= 'org.lazarus';
+  end;
 end;
 
 procedure TFormWorkspace.LoadSettings(const pFilename: string);
