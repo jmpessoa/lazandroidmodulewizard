@@ -2290,8 +2290,8 @@ begin
   end;
   if FParent is jCustomDialog then
   begin
-    jScrollView(FParent).Init(refApp);
-    FjPRLayout:= jScrollView(FParent).View;
+    jCustomDialog(FParent).Init(refApp);
+    FjPRLayout:= jCustomDialog(FParent).View;
   end;
 
   jTextView_setParent(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject , FjPRLayout);
@@ -2577,8 +2577,8 @@ begin
   end;
   if FParent is jCustomDialog then
   begin
-    jScrollView(FParent).Init(refApp);
-    FjPRLayout:= jScrollView(FParent).View;
+    jCustomDialog(FParent).Init(refApp);
+    FjPRLayout:= jCustomDialog(FParent).View;
   end;
   jEditText_setParent(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject , FjPRLayout);
 
@@ -3009,8 +3009,8 @@ begin
   end;
   if FParent is jCustomDialog then
   begin
-    jScrollView(FParent).Init(refApp);
-    FjPRLayout:= jScrollView(FParent).View;
+    jCustomDialog(FParent).Init(refApp);
+    FjPRLayout:= jCustomDialog(FParent).View;
   end;
 
   jButton_setParent(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject , FjPRLayout);
@@ -3241,8 +3241,8 @@ begin
   end;
   if FParent is jCustomDialog then
   begin
-    jScrollView(FParent).Init(refApp);
-    FjPRLayout:= jScrollView(FParent).View;
+    jCustomDialog(FParent).Init(refApp);
+    FjPRLayout:= jCustomDialog(FParent).View;
   end;
 
   jCheckBox_setParent(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject , FjPRLayout);
@@ -3509,8 +3509,8 @@ begin
   end;
   if FParent is jCustomDialog then
   begin
-    jScrollView(FParent).Init(refApp);
-    FjPRLayout:= jScrollView(FParent).View;
+    jCustomDialog(FParent).Init(refApp);
+    FjPRLayout:= jCustomDialog(FParent).View;
   end;
 
   jRadioButton_setParent(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject , FjPRLayout);
@@ -3784,8 +3784,8 @@ begin
     end;
     if FParent is jCustomDialog then
     begin
-      jScrollView(FParent).Init(refApp);
-      FjPRLayout:= jScrollView(FParent).View;
+      jCustomDialog(FParent).Init(refApp);
+      FjPRLayout:= jCustomDialog(FParent).View;
     end;
   end;
   jProgressBar_setParent(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject , FjPRLayout);
@@ -4045,8 +4045,8 @@ begin
   end;
   if FParent is jCustomDialog then
   begin
-    jScrollView(FParent).Init(refApp);
-    FjPRLayout:= jScrollView(FParent).View;
+    jCustomDialog(FParent).Init(refApp);
+    FjPRLayout:= jCustomDialog(FParent).View;
   end;
 
   jImageView_setParent(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis,FjObject , FjPRLayout);
@@ -4790,8 +4790,8 @@ begin
     end;
     if FParent is jCustomDialog then
     begin
-      jScrollView(FParent).Init(refApp);
-      FjPRLayout:= jScrollView(FParent).View;
+      jCustomDialog(FParent).Init(refApp);
+      FjPRLayout:= jCustomDialog(FParent).View;
     end;
   end;
   jListView_setParent(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject , FjPRLayout);
@@ -5262,8 +5262,8 @@ begin
     end;
     if FParent is jCustomDialog then
     begin
-      jScrollView(FParent).Init(refApp);
-      FjPRLayout:= jScrollView(FParent).View;
+      jCustomDialog(FParent).Init(refApp);
+      FjPRLayout:= jCustomDialog(FParent).View;
     end;
   end;
   jScrollView_setParent(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject , FjPRLayout);
@@ -5485,8 +5485,8 @@ begin
     end;
     if FParent is jCustomDialog then
     begin
-      jScrollView(FParent).Init(refApp);
-      FjPRLayout:= jScrollView(FParent).View;
+      jCustomDialog(FParent).Init(refApp);
+      FjPRLayout:= jCustomDialog(FParent).View;
     end;
   end;
   jHorizontalScrollView_setParent(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject , FjPRLayout);
@@ -5690,8 +5690,8 @@ begin
     end;
     if FParent is jCustomDialog then
     begin
-      jScrollView(FParent).Init(refApp);
-      FjPRLayout:= jScrollView(FParent).View;
+      jCustomDialog(FParent).Init(refApp);
+      FjPRLayout:= jCustomDialog(FParent).View;
     end;
   end;
   jViewFlipper_setParent(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject , FjPRLayout);
@@ -5894,8 +5894,8 @@ begin
     end;
     if FParent is jCustomDialog then
     begin
-      jScrollView(FParent).Init(refApp);
-      FjPRLayout:= jScrollView(FParent).View;
+      jCustomDialog(FParent).Init(refApp);
+      FjPRLayout:= jCustomDialog(FParent).View;
     end;
   end;
   jWebView_setParent(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject , FjPRLayout);
@@ -6634,8 +6634,8 @@ begin
     end;
     if FParent is jCustomDialog then
     begin
-      jScrollView(FParent).Init(refApp);
-      FjPRLayout:= jScrollView(FParent).View;
+      jCustomDialog(FParent).Init(refApp);
+      FjPRLayout:= jCustomDialog(FParent).View;
     end;
   end;
   jView_setParent(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis,FjObject , FjPRLayout);
@@ -7112,8 +7112,8 @@ begin
     end;
     if FParent is jCustomDialog then
     begin
-      jScrollView(FParent).Init(refApp);
-      FjPRLayout:= jScrollView(FParent).View;
+      jCustomDialog(FParent).Init(refApp);
+      FjPRLayout:= jCustomDialog(FParent).View;
     end;
   end;
 
@@ -7962,13 +7962,8 @@ begin
     end;
     if FParent is jCustomDialog then
     begin
-      jScrollView(FParent).Init(refApp);
-      FjPRLayout:= jScrollView(FParent).View;
-    end;
-    if FParent is jCustomDialog then
-    begin
-      jScrollView(FParent).Init(refApp);
-      FjPRLayout:= jScrollView(FParent).View;
+      jCustomDialog(FParent).Init(refApp);
+      FjPRLayout:= jCustomDialog(FParent).View;
     end;
   end;
 

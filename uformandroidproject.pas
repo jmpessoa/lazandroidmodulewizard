@@ -7,7 +7,7 @@ interface
 uses
   Classes, SysUtils, FileUtil, SynMemo, SynHighlighterJava, SynHighlighterPas, SynEditTypes,
   Forms, Controls, Graphics, Dialogs, Buttons, ExtCtrls, ComCtrls,
-  EditBtn, ShellCtrls, Menus, Clipbrd, StdCtrls, types,Process, uRegisterForm;
+  ShellCtrls, Menus, Clipbrd, StdCtrls, types,Process, uRegisterForm;
 
 type
 
@@ -2083,7 +2083,7 @@ procedure TFormAndroidProject.InsertJControlCodeTemplate(txt: string);
 var
   strList: TStringList;
   clipBoard: TClipboard;
-  txtCaption, projectName, newJavaClassName: string;
+  txtCaption, newJavaClassName: string;
 
 begin
    txtCaption:= txt;

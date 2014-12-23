@@ -7,7 +7,7 @@ unit AndroidWidget;   //by jmpessoa
 interface
 
 uses
-  Classes, SysUtils, Math, types, And_jni,  CustApp;
+  Classes, SysUtils, Math, types, And_jni, CustApp;
 
 const
 
@@ -1168,9 +1168,9 @@ function Call_jCallStaticBooleanMethodA(fullClassName: string;
 procedure Call_jCallStaticVoidMethod(fullClassName: string; funcName: string; funcSignature: string);
 procedure Call_jCallStaticVoidMethodA(fullClassName: string; funcName: string; funcSignature: string; var jParams: array of jValue);
 
-//-----
-
-// App - Activity
+//------------------------------------------------------------------------------
+// App - Main Activity
+//------------------------------------------------------------------------------
 
 //Please, use jForm_getDateTime...
 Function jApp_GetControlsVersionFeatures          (env:PJNIEnv;this:jobject): String;
@@ -1197,6 +1197,10 @@ function  jApp_GetStringResourceById(env:PJNIEnv;this:jobject; _resId: integer )
 // thierrydijoux - get a resource quantity string by name
 function  jApp_GetStringResourceByName(env:PJNIEnv;this:jobject; _resName: string): string;
 function  jApp_GetQuantityStringByName(env:PJNIEnv;this:jobject; _resName: string; _Quantity: integer): string;
+
+//------------------------------------------------------------------------------
+// Form
+//------------------------------------------------------------------------------
 
 Function  jForm_Create                 (env:PJNIEnv;this:jobject; SelfObj : TObject) : jObject;
 
@@ -1246,7 +1250,9 @@ function jForm_CopyFile(env: PJNIEnv; this: JObject; _jform: JObject; _srcFullNa
 function jForm_LoadFromAssets(env: PJNIEnv; this: JObject; _jform: JObject; _fileName: string): string;
 function jForm_IsSdCardMounted(env: PJNIEnv; this: JObject; _jform: JObject): boolean;
 
-//------
+//------------------------------------------------------------------------------
+// View
+//------------------------------------------------------------------------------
 
 // View
 Procedure jView_SetVisible             (env:PJNIEnv;this:jobject; view : jObject; visible : Boolean);
@@ -1352,7 +1358,6 @@ Function  jSysInfo_DeviceID            (env:PJNIEnv;this:jobject) : String;
 
 var
   gApp: jApp; //global App !
-
   gVM         : PJavaVM;
   gjClass     : jClass = nil;
   gDbgMode    : Boolean;
@@ -3730,7 +3735,6 @@ begin
   Delete_jLocalRef(cls);
 end;
 
-
 procedure Call_jCallStaticVoidMethodA(fullClassName: string; funcName: string; funcSignature: string; var jParams: array of jValue);
 var
   cls: jClass;
@@ -3785,8 +3789,6 @@ begin
      Result:= query;
   end;
 end;
-
-//---------------
 
 //hacked by jmpessoa!! sorry, was for a good cause!
 //please, use the  jForm_GetDateTime!!
@@ -3999,7 +4001,6 @@ end;
 // Form
 //------------------------------------------------------------------------------
 
-//
 Function  jForm_Create (env:PJNIEnv;this:jobject; SelfObj : TObject) : jObject;
 const
  _cFuncName = 'jForm_Create';
@@ -4094,7 +4095,6 @@ begin
   env^.CallVoidMethodA(env,this,_jMethod,@_jParams);
 end;
 
-//
 Function  jForm_GetLayout (env:PJNIEnv;this:jobject; Form    : jObject) : jObject;
 Const
  _cFuncName = 'jForm_GetLayout';
@@ -4120,7 +4120,6 @@ begin
     Result := env^.NewGlobalRef(env,Result);   //<---- need here for ap1 > 13 - by jmpessoa
 end;
 
-
 //by jmpessoa
 Function jForm_GetClickListener(env:PJNIEnv; this:jobject; Form: jObject): jObject;
 var
@@ -4138,7 +4137,6 @@ begin
   env^.DeleteGlobalRef(env, Layout);
 end;
 
-//
 Procedure jForm_SetVisibility (env:PJNIEnv; this:jobject; Form : jObject; visible : boolean);
 Const
  _cFuncName = 'jForm_SetVisible';
@@ -4165,7 +4163,6 @@ begin
     env^.CallVoidMethodA(env, Form, method, @_jParams);
 end;
 
-//
 Procedure jForm_SetEnabled(env:PJNIEnv;this:jobject; Form : jObject; enabled : Boolean);
 Const
  _cFuncName = 'jForm_SetEnabled';
@@ -4343,13 +4340,10 @@ begin
   Result:= boolean(_jBoo);
 end;
 
-//---------
-
 //------------------------------------------------------------------------------
 // View
 //------------------------------------------------------------------------------
 
-//
 Procedure jView_SetVisible(env:PJNIEnv;this:jobject; view : jObject; visible : Boolean);
 Const
  _cFuncName = 'view_SetVisible';
@@ -4497,8 +4491,6 @@ function JBool( Bool : Boolean ) : byte;
    False : Result := 0;
   End;
  end;
-
-//---------
 
 //------------------------------------------------------------------------------
 // System Info
@@ -4768,13 +4760,10 @@ begin
   Result:= gjClass;
 end;
 
-//------
-
 //------------------------------------------------------------------------------
 // View
 //------------------------------------------------------------------------------
 
-//
 Function  jView_Create  (env:PJNIEnv;this:jobject;
                          context : jObject; SelfObj : TObject) : jObject;
  Const

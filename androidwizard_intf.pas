@@ -1652,10 +1652,10 @@ begin
   sourceList.Add('begin');
   if FModuleType = 0 then  //Android Bridges ontrols...
   begin
-    sourceList.Add('  gApp:= jApp.Create(nil);{Laz_And_Controls}');
-    sourceList.Add('  gApp.Title:= ''My Android Bridges Library'';');
-    sourceList.Add('  gjAppName:= '''+GetAppName(FPathToClassName)+''';{And_jni_Bridge}');
-    sourceList.Add('  gjClassName:= '''+FPathToClassName+''';{And_jni_Bridge}');
+    sourceList.Add('  gApp:= jApp.Create(nil);{AndroidWidget.pas}');
+    sourceList.Add('  gApp.Title:= ''JNI Android Bridges Library'';');
+    sourceList.Add('  gjAppName:= '''+GetAppName(FPathToClassName)+''';{AndroidWidget.pas}');
+    sourceList.Add('  gjClassName:= '''+FPathToClassName+''';{AndroidWidget.pas}');
     sourceList.Add('  gApp.AppName:=gjAppName;');
     sourceList.Add('  gApp.ClassName:=gjClassName;');
     sourceList.Add('  gApp.Initialize;');

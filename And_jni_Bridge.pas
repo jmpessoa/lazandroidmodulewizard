@@ -1351,18 +1351,6 @@ function jCamera_takePhoto(env:PJNIEnv; this:jobject;  path: string;  filename :
 Procedure jBenchMark1_Java             (env:PJNIEnv;this:jobject;var mSec : Integer;var value : single);
 Procedure jBenchMark1_Pascal           (env:PJNIEnv;this:jobject;var mSec : Integer;var value : single);
 
-//function Get_gjClass(env: PJNIEnv): jClass; //by jmpessoa
-//function JBool( Bool : Boolean ) : byte;
-
-{
-Var
-  gVM         : PJavaVM;
-  gjClass     : jClass = nil;
-  gDbgMode    : Boolean;
-  gjAppName   : PChar; // Ex 'com.kredix';
-  gjClassName : PChar; // Ex 'com/kredix/Controls';
- }
-
 implementation
 
 (* {commented by jmpessoa}
@@ -1408,27 +1396,6 @@ function JBool( Bool : Boolean ) : byte;
   End;
  end;
 
-
-//------------------------------------------------------------------------------
-// JNI_OnLoad, Unload
-//------------------------------------------------------------------------------
-
-//
-(*  {commented by jmpessoa}
-function JNI_OnLoad(vm:PJavaVM;reserved:pointer):jint; cdecl;
- begin
-  dbg('JNI_OnLoad called');
-  gVM := vm;
-  result:=JNI_VERSION_1_6;
- end;
-
-procedure JNI_OnUnload(vm:PJavaVM;reserved:pointer); cdecl;
- begin
-  dbg('JNI_OnUnload called');
- end;
-
- *)
-
 //------------------------------------------------------------------------------
 // Base Conversion
 //------------------------------------------------------------------------------
@@ -1438,7 +1405,6 @@ procedure JNI_OnUnload(vm:PJavaVM;reserved:pointer); cdecl;
 // ref. http://android-developers.blogspot.cz/2011/11/jni-local-reference-changes-in-ics.html
 
 // http://stackoverflow.com/questions/14765776/jni-error-app-bug-accessed-stale-local-reference-0xbc00021-index-8-in-a-tabl
-
 
 Procedure jClassMethod(FuncName, FuncSig : PChar;
                        env : PJNIEnv; var Class_ : jClass; var Method_ :jMethodID);
@@ -1460,49 +1426,6 @@ begin
   end;
 end;
 
-//----------------------------------------------------------------
-
-(*
-// LORDMAN - 2013-07-28
-Function jStr_getLength (env:PJNIEnv; this:jobject; Str : String): Integer;
- Const
-  _cFuncName = 'getStrLength';
-  _cFuncSig  = '(Ljava/lang/String;)I';
- Var
-  _jMethod : jMethodID = nil;
-  _jParams : jValue;
- begin
-  jClassMethod(_cFuncName,_cFuncSig, env, gjClass, _jMethod);
-  _jParams.l := env^.NewStringUTF(env, pchar(Str) );
-  Result     := env^.CallIntMethodA(env, this ,_jMethod,@_jParams);
- end;
-*)
-
-// LORDMAN - 2013-07-30 //
-(*
-Function  jStr_GetDateTime(env:PJNIEnv; this:jobject): String;  //return Controls "version-revision"!
- Const
-  _cFuncName = 'getStrDateTime';
-  _cFuncSig  = '()Ljava/lang/String;';
- Var
-  _jMethod : jMethodID = nil;
-  _jString : jString;
-  _jBoolean: jBoolean;
- begin
-  jClassMethod(_cFuncName,_cFuncSig,env,gjClass,_jMethod);
-  _jString  := env^.CallObjectMethod(env,this,_jMethod);
-  case _jString = nil of
-   True : Result    := '';
-   False: begin
-           _jBoolean := JNI_False;
-           Result    := String( env^.GetStringUTFChars(env,_jString,@_jBoolean) );
-          end;
-  end;
- end;
-*)
-
-
-//
 Function  jgetTick (env:PJNIEnv;this:jobject) : LongInt;
 Const
  _cFuncName = 'getTick';
@@ -1513,10 +1436,6 @@ begin
  jClassMethod(_cFuncName,_cFuncSig,env,gjClass,_jMethod);
  Result     := env^.CallLongMethod(env,this,_jMethod);
 end;
-
-//------------------------------------------------------------------------------
-// View
-//------------------------------------------------------------------------------
 
 //------------------------------------------------------------------------------
 // System
@@ -1575,10 +1494,6 @@ begin
  _jParam.l := ClassObj;
  env^.CallVoidMethodA(env,this,_jMethod,@_jParam);
 end;
-
-//------------------------------------------------------------------------------
-// App
-//------------------------------------------------------------------------------
 
 
 //------------------------------------------------------------------------------

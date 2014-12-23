@@ -107,6 +107,9 @@ procedure jSpinner_SetItem(env: PJNIEnv; this: JObject; _jspinner: JObject; _ind
 
 implementation
 
+uses
+  customdialog;
+
 {---------  jSpinner  --------------}
 
 constructor jSpinner.Create(AOwner: TComponent);
@@ -171,6 +174,11 @@ begin
       jScrollView(FParent).Init(refApp);
       FjPRLayout:= jScrollView(FParent).View;
     end;
+  end;
+  if FParent is jCustomDialog then
+  begin
+    jCustomDialog(FParent).Init(refApp);
+    FjPRLayout:= jCustomDialog(FParent).View;
   end;
   jSpinner_SetjParent(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject , FjPRLayout);
   jSpinner_SetId(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject , Self.Id);
