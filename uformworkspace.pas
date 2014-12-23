@@ -350,8 +350,16 @@ begin
 end;
 
 procedure TFormWorkspace.FormCreate(Sender: TObject);
+var
+  fileName: string;
 begin
-  Self.LoadPathsSettings(AppendPathDelim(LazarusIDE.GetPrimaryConfigPath) + 'JNIAndroidProject.ini');
+  fileName:= AppendPathDelim(LazarusIDE.GetPrimaryConfigPath) + 'JNIAndroidProject.ini';
+  if not FileExists(fileName) then
+  begin
+    if EditPackagePrefaceName.Text = '' then EditPackagePrefaceName.Text:= 'org.lazarus';
+    SaveSettings(fileName);
+  end;
+  Self.LoadPathsSettings(fileName);
 end;
 
 procedure TFormWorkspace.LoadPathsSettings(const fileName: string);
@@ -428,7 +436,7 @@ begin
       if  FPathToLazbuild = '' then
       begin
           frm:= TFormPathMissing.Create(nil);
-          frm.LabelPathTo.Caption:= 'WARNING! Path to "lazbuild": [ex. C:\lazarus {or Laz4Android)]';
+          frm.LabelPathTo.Caption:= 'WARNING! Path to "lazbuild": [ex. C:\lazarus {or C:\Laz4Android}]';
           if frm.ShowModal = mrOK then  FPathToLazbuild:= frm.PathMissing;
           frm.Free;
       end;
@@ -609,6 +617,9 @@ begin
       WriteString('NewProject', 'FPUSet', IntToStr(RGFPU.ItemIndex));
 
       WriteString('NewProject', 'ProjectModel',IntToStr(RGProjectType.ItemIndex));  //Eclipse or Ant
+
+
+      if EditPackagePrefaceName.Text = '' then EditPackagePrefaceName.Text:= 'org.lazarus';
       WriteString('NewProject', 'AntPackageName', LowerCase(Trim(EditPackagePrefaceName.Text)));
 
       WriteString('NewProject', 'AndroidPlataform', IntToStr(ListBoxPlatform.ItemIndex));
@@ -616,10 +627,11 @@ begin
       WriteString('NewProject', 'TargetApi', IntToStr(ListBoxTargetAPI.ItemIndex));
 
       WriteString('NewProject', 'AntBuildMode', 'debug'); //default...
+
+      if FMainActivity = '' then FMainActivity:= 'App';
       WriteString('NewProject', 'MainActivity', FMainActivity); //dummy
 
       WriteString('NewProject', 'SupportV4', FSupportV4); //dummy
-
 
       Free;
    end;

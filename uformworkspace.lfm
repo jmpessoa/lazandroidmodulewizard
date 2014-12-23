@@ -191,7 +191,7 @@ object FormWorkspace: TFormWorkspace
       ChildSizing.ControlsPerLine = 1
       ClientHeight = 93
       ClientWidth = 187
-      ItemIndex = 0
+      ItemIndex = 1
       Items.Strings = (
         'Eclipse'
         'Ant'
@@ -379,7 +379,7 @@ object FormWorkspace: TFormWorkspace
         Left = 8
         Height = 23
         Top = 0
-        Width = 366
+        Width = 352
         Anchors = [akTop, akLeft, akRight]
         BorderSpacing.Around = 8
         TabOrder = 0
@@ -462,6 +462,7 @@ object FormWorkspace: TFormWorkspace
         'Lollipop 5.0'
       )
       ItemHeight = 15
+      ItemIndex = 1
       OnClick = ListBoxPlatformClick
       TabOrder = 0
     end
@@ -482,6 +483,7 @@ object FormWorkspace: TFormWorkspace
         '21'
       )
       ItemHeight = 15
+      ItemIndex = 1
       OnClick = ListBoxMinSDKClick
       OnSelectionChange = ListBoxMinSDKSelectionChange
       TabOrder = 1
@@ -504,6 +506,7 @@ object FormWorkspace: TFormWorkspace
         '21'
       )
       ItemHeight = 15
+      ItemIndex = 5
       OnClick = ListBoxTargetAPIClick
       OnSelectionChange = ListBoxTargetAPISelectionChange
       TabOrder = 2
