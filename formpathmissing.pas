@@ -46,7 +46,7 @@ end;
 
 procedure TFormPathMissing.SpeedButton1Click(Sender: TObject);
 begin
-  SelectDirectoryDialog1.Title:= '[Android Wizard] WARNING! Missing Path!';
+  SelectDirectoryDialog1.Title:= '[Android Wizard] Path Missing:';
   if SelectDirectoryDialog1.Execute then
   begin
     Edit1.Text := SelectDirectoryDialog1.FileName;

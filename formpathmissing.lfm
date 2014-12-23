@@ -5,7 +5,7 @@ object FormPathMissing: TFormPathMissing
   Width = 465
   BorderIcons = [biSystemMenu]
   BorderStyle = bsToolWindow
-  Caption = 'Android Wizard: FormPathMissing'
+  Caption = 'Android Wizard: Path Missing!'
   ClientHeight = 123
   ClientWidth = 465
   OnClose = FormClose

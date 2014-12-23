@@ -173,7 +173,7 @@ type
      FPathToClassName: string;
      FPathToJavaClass: string;
      FPathToJNIFolder: string;
-     FPathToNdkPlataforms: string; {C:\adt32\ndk\platforms\android-14\arch-arm\usr\lib}
+     FPathToNdkPlatforms: string; {C:\adt32\ndk\platforms\android-14\arch-arm\usr\lib}
      FPathToNdkToolchains: string;
      {C:\adt32\ndk7\toolchains\arm-linux-androideabi-4.4.3\prebuilt\windows\lib\gcc\arm-linux-androideabi\4.4.3}
      FInstructionSet: string;    {ArmV6}
@@ -1570,8 +1570,8 @@ var
 
   customOptions_armV7a: string;
 
-  pathToNdkPlataformsArm: string;
-  pathToNdkPlataformsX86: string;
+  PathToNdkPlatformsArm: string;
+  PathToNdkPlatformsX86: string;
 
   pathToNdkToolchainsX86: string;
   pathToNdkToolchainsArm: string;
@@ -1684,7 +1684,7 @@ begin
 
   {Set compiler options for Android requirements}
 
-  pathToNdkPlataformsArm:= FPathToAndroidNDK+DirectorySeparator+'platforms'+DirectorySeparator+
+  PathToNdkPlatformsArm:= FPathToAndroidNDK+DirectorySeparator+'platforms'+DirectorySeparator+
                                                 FAndroidPlatform +DirectorySeparator+'arch-arm'+DirectorySeparator+
                                                 'usr'+DirectorySeparator+'lib';
 
@@ -1712,9 +1712,9 @@ begin
                                                  'prebuilt'+DirectorySeparator+osys+DirectorySeparator+
                                                  'bin';
 
-  libraries_arm:= pathToNdkPlataformsArm+';'+pathToNdkToolchainsArm;
+  libraries_arm:= PathToNdkPlatformsArm+';'+pathToNdkToolchainsArm;
 
-  pathToNdkPlataformsX86:= FPathToAndroidNDK+DirectorySeparator+'platforms'+DirectorySeparator+
+  PathToNdkPlatformsX86:= FPathToAndroidNDK+DirectorySeparator+'platforms'+DirectorySeparator+
                                              FAndroidPlatform+DirectorySeparator+'arch-x86'+DirectorySeparator+
                                              'usr'+DirectorySeparator+'lib';
   if FNdk = '7' then
@@ -1737,20 +1737,20 @@ begin
                                                  'x86-4.6'+DirectorySeparator+'prebuilt'+DirectorySeparator+
                                                  osys+DirectorySeparator+'bin';
 
-  libraries_x86:= pathToNdkPlataformsX86+';'+pathToNdkToolchainsX86;
+  libraries_x86:= PathToNdkPlatformsX86+';'+pathToNdkToolchainsX86;
 
   if Pos('x86', FInstructionSet) > 0 then
   begin
      AProject.LazCompilerOptions.TargetCPU:= 'i386';    {-P}
      AProject.LazCompilerOptions.Libraries:= libraries_x86;
-     FPathToNdkPlataforms:= pathToNdkPlataformsX86;
+     FPathToNdkPlatforms:= PathToNdkPlatformsX86;
      FPathToNdkToolchains:= pathToNdkToolchainsX86;
   end
   else
   begin
      AProject.LazCompilerOptions.TargetCPU:= 'arm';    {-P}
      AProject.LazCompilerOptions.Libraries:= libraries_arm;
-     FPathToNdkPlataforms:= pathToNdkPlataformsArm;
+     FPathToNdkPlatforms:= PathToNdkPlatformsArm;
      FPathToNdkToolchains:= pathToNdkToolchainsArm
   end;
 

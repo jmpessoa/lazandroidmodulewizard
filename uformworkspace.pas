@@ -63,7 +63,6 @@ type
     { private declarations }
     FFilename: string;
     FPathToWorkspace: string; {C:\adt32\eclipse\workspace}
-    FPathToNdkPlataforms: string; {C:\adt32\ndk\platforms\android-14\arch-arm\usr\lib}
 
     FInstructionSet: string;      {ArmV6}
     FFPUSet: string;              {Soft}
@@ -100,9 +99,7 @@ type
     procedure LoadPathsSettings(const fileName: string);
 
     property PathToWorkspace: string read FPathToWorkspace write FPathToWorkspace;
-    property PathToNdkPlataforms: string
-                                                      read FPathToNdkPlataforms
-                                                      write FPathToNdkPlataforms;
+
     property InstructionSet: string read FInstructionSet write FInstructionSet;
     property FPUSet: string  read FFPUSet write FFPUSet;
     property PathToJavaTemplates: string read FPathToJavaTemplates write FPathToJavaTemplates;
@@ -276,6 +273,7 @@ var
    count, i, j: integer;
    path: string;
 begin
+  SaveSettings(FFileName);
   if ModalResult = mrCancel  then Exit;
 
   if EditPathToWorkspace.Text = '' then
@@ -293,8 +291,6 @@ begin
   end;
 
   if EditPackagePrefaceName.Text = '' then EditPackagePrefaceName.Text:= 'org.lazarus';
-
-  //Self.LoadPathsSettings(AppendPathDelim(LazarusIDE.GetPrimaryConfigPath) + 'JNIAndroidProject.ini');
 
   FMainActivity:= 'App'; {dummy for Simon template} //TODO: need name flexibility here...
 
@@ -348,8 +344,6 @@ begin
      end;
   end;
 
-  SaveSettings(FFileName);
-
 end;
 
 procedure TFormWorkspace.FormCreate(Sender: TObject);
@@ -360,58 +354,85 @@ begin
   if not FileExists(fileName) then
   begin
     if EditPackagePrefaceName.Text = '' then EditPackagePrefaceName.Text:= 'org.lazarus';
-    SaveSettings(fileName);
+    SaveSettings(fileName);  //force to create empty/initial file!
   end;
-  Self.LoadPathsSettings(fileName);
 end;
 
 procedure TFormWorkspace.LoadPathsSettings(const fileName: string);
 var
-   indexNdk: integer;
-   frm: TFormPathMissing;
+  indexNdk: integer;
+  frm: TFormPathMissing;
 begin
   if FileExists(fileName) then
   begin
     with TIniFile.Create(fileName) do
     begin
       FPathToJavaJDK:= ReadString('NewProject','PathToJavaJDK', '');
-
       if  FPathToJavaJDK = '' then
       begin
           frm:= TFormPathMissing.Create(nil);
           frm.LabelPathTo.Caption:= 'WARNING! Path to Java JDK: [ex. C:\Program Files (x86)\Java\jdk1.7.0_21]';
-          if frm.ShowModal = mrOK then  FPathToJavaJDK:= frm.PathMissing;
-          frm.Free;
+          if frm.ShowModal = mrOK then
+          begin
+             FPathToJavaJDK:= frm.PathMissing;
+             frm.Free;
+          end
+          else
+          begin
+             frm.Free;
+             Exit;
+          end;
       end;
 
       FPathToAntBin:= ReadString('NewProject','PathToAntBin', '');
-
       if  FPathToAntBin = '' then
       begin
           frm:= TFormPathMissing.Create(nil);
           frm.LabelPathTo.Caption:= 'WARNING! Path to Ant bin: [ex. C:\adt32\ant\bin]';
-          if frm.ShowModal = mrOK then  FPathToAntBin:= frm.PathMissing;
-          frm.Free;
+          if frm.ShowModal = mrOK then
+          begin
+             FPathToAntBin:= frm.PathMissing;
+             frm.Free;
+          end
+          else
+          begin
+             frm.Free;
+             Exit;
+          end;
       end;
 
       FPathToAndroidSDK:= ReadString('NewProject','PathToAndroidSDK', '');
-
       if  FPathToAndroidSDK = '' then
       begin
           frm:= TFormPathMissing.Create(nil);
           frm.LabelPathTo.Caption:= 'WARNING! Path to Android SDK: [ex. C:\adt32\sdk]';
-          if frm.ShowModal = mrOK then  FPathToAndroidSDK:= frm.PathMissing;
-          frm.Free;
+          if frm.ShowModal = mrOK then
+          begin
+             FPathToAndroidSDK:= frm.PathMissing;
+             frm.Free;
+          end
+          else
+          begin
+             frm.Free;
+             Exit;
+          end;
       end;
 
       FPathToAndroidNDK:= ReadString('NewProject','PathToAndroidNDK', '');
-
       if  FPathToAndroidNDK = '' then
       begin
           frm:= TFormPathMissing.Create(nil);
           frm.LabelPathTo.Caption:= 'WARNING! Path to Android NDK:  [ex. C:\adt32\ndk10]';
-          if frm.ShowModal = mrOK then  FPathToAndroidNDK:= frm.PathMissing;
-          frm.Free;
+          if frm.ShowModal = mrOK then
+          begin
+             FPathToAndroidNDK:= frm.PathMissing;
+             frm.Free;
+          end
+          else
+          begin
+             frm.Free;
+             Exit;
+          end;
       end;
 
       if ReadString('NewProject','NDK', '') <> '' then
@@ -430,18 +451,33 @@ begin
       begin
           frm:= TFormPathMissing.Create(nil);
           frm.LabelPathTo.Caption:= 'WARNING! Path to Java templates: [ex. ..\LazAndroidWizard\java]';
-          if frm.ShowModal = mrOK then  FPathToJavaTemplates:= frm.PathMissing;
-          frm.Free;
+          if frm.ShowModal = mrOK then
+          begin
+             FPathToJavaTemplates:= frm.PathMissing;
+             frm.Free;
+          end
+          else
+          begin
+             frm.Free;
+             Exit;
+          end;
       end;
 
       FPathToLazbuild:= ReadString('NewProject','PathToLazbuild', '');
-
       if  FPathToLazbuild = '' then
       begin
           frm:= TFormPathMissing.Create(nil);
           frm.LabelPathTo.Caption:= 'WARNING! Path to "lazbuild": [ex. C:\lazarus {or C:\Laz4Android}]';
-          if frm.ShowModal = mrOK then  FPathToLazbuild:= frm.PathMissing;
-          frm.Free;
+          if frm.ShowModal = mrOK then
+          begin
+             FPathToLazbuild:= frm.PathMissing;
+             frm.Free;
+          end
+          else
+          begin
+             frm.Free;
+             Exit;
+          end;
       end;
 
       CheckBox1.Checked:= False;
@@ -513,7 +549,7 @@ begin
   end;
 end;
 
-procedure TFormWorkspace.LoadSettings(const pFilename: string);
+procedure TFormWorkspace.LoadSettings(const pFilename: string);  //called by
 var
   i1, i2, i3, i5, j1, j2, j3: integer;
 begin
@@ -614,6 +650,10 @@ begin
   EditPathToWorkspace.Text := FPathToWorkspace;
 
   EditPackagePrefaceName.Text := FAntPackageName;
+
+  //verify if some was not load!
+  Self.LoadPathsSettings(FFileName);
+
 end;
 
 procedure TFormWorkspace.SaveSettings(const pFilename: string);
@@ -632,7 +672,7 @@ begin
       if EditPackagePrefaceName.Text = '' then EditPackagePrefaceName.Text:= 'org.lazarus';
       WriteString('NewProject', 'AntPackageName', LowerCase(Trim(EditPackagePrefaceName.Text)));
 
-      WriteString('NewProject', 'AndroidPlataform', IntToStr(ListBoxPlatform.ItemIndex));
+      WriteString('NewProject', 'AndroidPlatform', IntToStr(ListBoxPlatform.ItemIndex));
       WriteString('NewProject', 'MinApi', IntToStr(ListBoxMinSDK.ItemIndex));
       WriteString('NewProject', 'TargetApi', IntToStr(ListBoxTargetAPI.ItemIndex));
 
@@ -642,6 +682,13 @@ begin
       WriteString('NewProject', 'MainActivity', FMainActivity); //dummy
 
       WriteString('NewProject', 'SupportV4', FSupportV4); //dummy
+
+      WriteString('NewProject', 'PathToJavaTemplates', FPathToJavaTemplates);
+      WriteString('NewProject', 'PathToJavaJDK', FPathToJavaJDK);
+      WriteString('NewProject', 'PathToAndroidNDK', FPathToAndroidNDK);
+      WriteString('NewProject', 'PathToAndroidSDK', FPathToAndroidSDK);
+      WriteString('NewProject', 'PathToAntBin', FPathToAntBin);
+      WriteString('NewProject', 'PathToLazbuild', FPathToLazbuild);
 
       Free;
    end;
