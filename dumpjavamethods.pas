@@ -56,28 +56,28 @@ jDumpJavaMethods = class(jControl)
 end;
 
 function jDumpJavaMethods_jCreate(env: PJNIEnv; this: JObject;_Self: int64; _fullJavaClassName: string): jObject;
-procedure jDumpJavaMethods_jFree(env: PJNIEnv; this: JObject; _jdumpjavamethods: JObject);
-function jDumpJavaMethods_GetMethodFullSignatureList(env: PJNIEnv; this: JObject; _jdumpjavamethods: JObject): string;
-function jDumpJavaMethods_GetMethodImplementationList(env: PJNIEnv; this: JObject; _jdumpjavamethods: JObject): string;
-procedure jDumpJavaMethods_SetStripFullTypeName(env: PJNIEnv; this: JObject; _jdumpjavamethods: JObject; _stripFullTypeName: boolean);
-function jDumpJavaMethods_GetStripFullTypeName(env: PJNIEnv; this: JObject; _jdumpjavamethods: JObject): boolean;
-procedure jDumpJavaMethods_SetFullJavaClassName(env: PJNIEnv; this: JObject; _jdumpjavamethods: JObject; _fullJavaClassName: string);
-function jDumpJavaMethods_GetFullJavaClassName(env: PJNIEnv; this: JObject; _jdumpjavamethods: JObject): string;
-procedure jDumpJavaMethods_SetObjReferenceName(env: PJNIEnv; this: JObject; _jdumpjavamethods: JObject; _objReferenceName: string);
-function jDumpJavaMethods_GetObjReferenceName(env: PJNIEnv; this: JObject; _jdumpjavamethods: JObject): string;
-procedure jDumpJavaMethods_SetDelimiter(env: PJNIEnv; this: JObject; _jdumpjavamethods: JObject; _delimiter: string);
-function jDumpJavaMethods_GetDelimiter(env: PJNIEnv; this: JObject; _jdumpjavamethods: JObject): string;
-function jDumpJavaMethods_GetMethodHeaderList(env: PJNIEnv; this: JObject; _jdumpjavamethods: JObject): string;
-function jDumpJavaMethods_GetMethodHeaderListSize(env: PJNIEnv; this: JObject; _jdumpjavamethods: JObject): integer;
-function jDumpJavaMethods_GetMethodHeaderByIndex(env: PJNIEnv; this: JObject; _jdumpjavamethods: JObject; _index: integer): string;
-procedure jDumpJavaMethods_MaskMethodHeaderByIndex(env: PJNIEnv; this: JObject; _jdumpjavamethods: JObject; _index: integer);
-procedure jDumpJavaMethods_UnMaskMethodHeaderByIndex(env: PJNIEnv; this: JObject; _jdumpjavamethods: JObject; _index: integer);
-function jDumpJavaMethods_GetNoMaskedMethodHeaderList(env: PJNIEnv; this: JObject; _jdumpjavamethods: JObject): string;
-function jDumpJavaMethods_Extract(env: PJNIEnv; this: JObject; _jdumpjavamethods: JObject): string;  overload;
-function jDumpJavaMethods_Extract(env: PJNIEnv; this: JObject; _jdumpjavamethods: JObject; _fullJavaClassName: string; _delimiter: string): string; overload;
-function jDumpJavaMethods_GetNoMaskedMethodImplementationByIndex(env: PJNIEnv; this: JObject; _jdumpjavamethods: JObject; _index: integer): string;
-function jDumpJavaMethods_GetNoMaskedMethodImplementationListSize(env: PJNIEnv; this: JObject; _jdumpjavamethods: JObject): integer;
-function jDumpJavaMethods_GetNoMaskedMethodImplementationList(env: PJNIEnv; this: JObject; _jdumpjavamethods: JObject): string;
+procedure jDumpJavaMethods_jFree(env: PJNIEnv; _jdumpjavamethods: JObject);
+function jDumpJavaMethods_GetMethodFullSignatureList(env: PJNIEnv; _jdumpjavamethods: JObject): string;
+function jDumpJavaMethods_GetMethodImplementationList(env: PJNIEnv; _jdumpjavamethods: JObject): string;
+procedure jDumpJavaMethods_SetStripFullTypeName(env: PJNIEnv; _jdumpjavamethods: JObject; _stripFullTypeName: boolean);
+function jDumpJavaMethods_GetStripFullTypeName(env: PJNIEnv; _jdumpjavamethods: JObject): boolean;
+procedure jDumpJavaMethods_SetFullJavaClassName(env: PJNIEnv; _jdumpjavamethods: JObject; _fullJavaClassName: string);
+function jDumpJavaMethods_GetFullJavaClassName(env: PJNIEnv; _jdumpjavamethods: JObject): string;
+procedure jDumpJavaMethods_SetObjReferenceName(env: PJNIEnv; _jdumpjavamethods: JObject; _objReferenceName: string);
+function jDumpJavaMethods_GetObjReferenceName(env: PJNIEnv; _jdumpjavamethods: JObject): string;
+procedure jDumpJavaMethods_SetDelimiter(env: PJNIEnv; _jdumpjavamethods: JObject; _delimiter: string);
+function jDumpJavaMethods_GetDelimiter(env: PJNIEnv; _jdumpjavamethods: JObject): string;
+function jDumpJavaMethods_GetMethodHeaderList(env: PJNIEnv; _jdumpjavamethods: JObject): string;
+function jDumpJavaMethods_GetMethodHeaderListSize(env: PJNIEnv; _jdumpjavamethods: JObject): integer;
+function jDumpJavaMethods_GetMethodHeaderByIndex(env: PJNIEnv; _jdumpjavamethods: JObject; _index: integer): string;
+procedure jDumpJavaMethods_MaskMethodHeaderByIndex(env: PJNIEnv; _jdumpjavamethods: JObject; _index: integer);
+procedure jDumpJavaMethods_UnMaskMethodHeaderByIndex(env: PJNIEnv; _jdumpjavamethods: JObject; _index: integer);
+function jDumpJavaMethods_GetNoMaskedMethodHeaderList(env: PJNIEnv; _jdumpjavamethods: JObject): string;
+function jDumpJavaMethods_Extract(env: PJNIEnv; _jdumpjavamethods: JObject): string;  overload;
+function jDumpJavaMethods_Extract(env: PJNIEnv; _jdumpjavamethods: JObject; _fullJavaClassName: string; _delimiter: string): string; overload;
+function jDumpJavaMethods_GetNoMaskedMethodImplementationByIndex(env: PJNIEnv; _jdumpjavamethods: JObject; _index: integer): string;
+function jDumpJavaMethods_GetNoMaskedMethodImplementationListSize(env: PJNIEnv; _jdumpjavamethods: JObject): integer;
+function jDumpJavaMethods_GetNoMaskedMethodImplementationList(env: PJNIEnv; _jdumpjavamethods: JObject): string;
 
 
 implementation
@@ -95,17 +95,11 @@ destructor jDumpJavaMethods.Destroy;
 begin
   if not (csDesigning in ComponentState) then
   begin
-    if jForm(Owner).App <> nil then
-    begin
-      if jForm(Owner).App.Initialized then
-      begin
         if FjObject <> nil then
         begin
            jFree();
            FjObject:= nil;
         end;
-      end;
-    end;
   end;
   //you others free code here...'
   inherited Destroy;
@@ -128,42 +122,42 @@ end;
 
 function jDumpJavaMethods.jCreate( _fullJavaClassName: string): jObject;
 begin
-   Result:= jDumpJavaMethods_jCreate(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis , int64(Self) ,_fullJavaClassName);
+   Result:= jDumpJavaMethods_jCreate(FjEnv, FjThis , int64(Self) ,_fullJavaClassName);
 end;
 
 procedure jDumpJavaMethods.jFree();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jDumpJavaMethods_jFree(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject);
+     jDumpJavaMethods_jFree(FjEnv, FjObject);
 end;
 
 function jDumpJavaMethods.GetMethodFullSignatureList(): string;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jDumpJavaMethods_GetMethodFullSignatureList(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject);
+   Result:= jDumpJavaMethods_GetMethodFullSignatureList(FjEnv, FjObject);
 end;
 
 function jDumpJavaMethods.GetMethodImplementationList(): string;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jDumpJavaMethods_GetMethodImplementationList(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject);
+   Result:= jDumpJavaMethods_GetMethodImplementationList(FjEnv, FjObject);
 end;
 
 procedure jDumpJavaMethods.SetStripFullTypeName(_stripFullTypeName: boolean);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jDumpJavaMethods_SetStripFullTypeName(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, _stripFullTypeName);
+     jDumpJavaMethods_SetStripFullTypeName(FjEnv, FjObject, _stripFullTypeName);
 end;
 
 function jDumpJavaMethods.GetStripFullTypeName(): boolean;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jDumpJavaMethods_GetStripFullTypeName(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject);
+   Result:= jDumpJavaMethods_GetStripFullTypeName(FjEnv, FjObject);
 end;
 
 procedure jDumpJavaMethods.SetFullJavaClassName(_fullJavaClassName: string);
@@ -171,7 +165,7 @@ begin
   //in designing component state: set value here...
   FfullJavaClassName:= _fullJavaClassName;
   if FInitialized then
-     jDumpJavaMethods_SetFullJavaClassName(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, _fullJavaClassName);
+     jDumpJavaMethods_SetFullJavaClassName(FjEnv, FjObject, _fullJavaClassName);
 end;
 
 function jDumpJavaMethods.GetFullJavaClassName(): string;
@@ -179,7 +173,7 @@ begin
   //in designing component state: result value here...
   Result:= FfullJavaClassName;
   if FInitialized then
-   Result:= jDumpJavaMethods_GetFullJavaClassName(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject);
+   Result:= jDumpJavaMethods_GetFullJavaClassName(FjEnv, FjObject);
 end;
 
 procedure jDumpJavaMethods.SetObjReferenceName(_objReferenceName: string);
@@ -187,7 +181,7 @@ begin
   //in designing component state: set value here...
   FObjReferenceName:= _objReferenceName;
   if FInitialized then
-     jDumpJavaMethods_SetObjReferenceName(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, _objReferenceName);
+     jDumpJavaMethods_SetObjReferenceName(FjEnv, FjObject, _objReferenceName);
 end;
 
 function jDumpJavaMethods.GetObjReferenceName(): string;
@@ -195,98 +189,98 @@ begin
   //in designing component state: result value here...
   Result:= FObjReferenceName;
   if FInitialized then
-   Result:= jDumpJavaMethods_GetObjReferenceName(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject);
+   Result:= jDumpJavaMethods_GetObjReferenceName(FjEnv, FjObject);
 end;
 
 procedure jDumpJavaMethods.SetDelimiter(_delimiter: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jDumpJavaMethods_SetDelimiter(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, _delimiter);
+     jDumpJavaMethods_SetDelimiter(FjEnv, FjObject, _delimiter);
 end;
 
 function jDumpJavaMethods.GetDelimiter(): string;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jDumpJavaMethods_GetDelimiter(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject);
+   Result:= jDumpJavaMethods_GetDelimiter(FjEnv, FjObject);
 end;
 
 function jDumpJavaMethods.GetMethodHeaderList(): string;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jDumpJavaMethods_GetMethodHeaderList(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject);
+   Result:= jDumpJavaMethods_GetMethodHeaderList(FjEnv, FjObject);
 end;
 
 function jDumpJavaMethods.GetMethodHeaderListSize(): integer;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jDumpJavaMethods_GetMethodHeaderListSize(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject);
+   Result:= jDumpJavaMethods_GetMethodHeaderListSize(FjEnv, FjObject);
 end;
 
 function jDumpJavaMethods.GetMethodHeaderByIndex(_index: integer): string;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jDumpJavaMethods_GetMethodHeaderByIndex(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, _index);
+   Result:= jDumpJavaMethods_GetMethodHeaderByIndex(FjEnv, FjObject, _index);
 end;
 
 procedure jDumpJavaMethods.MaskMethodHeaderByIndex(_index: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jDumpJavaMethods_MaskMethodHeaderByIndex(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, _index);
+     jDumpJavaMethods_MaskMethodHeaderByIndex(FjEnv, FjObject, _index);
 end;
 
 procedure jDumpJavaMethods.UnMaskMethodHeaderByIndex(_index: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jDumpJavaMethods_UnMaskMethodHeaderByIndex(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, _index);
+     jDumpJavaMethods_UnMaskMethodHeaderByIndex(FjEnv, FjObject, _index);
 end;
 
 function jDumpJavaMethods.GetNoMaskedMethodHeaderList(): string;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jDumpJavaMethods_GetNoMaskedMethodHeaderList(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject);
+   Result:= jDumpJavaMethods_GetNoMaskedMethodHeaderList(FjEnv, FjObject);
 end;
 
 function jDumpJavaMethods.Extract(): string;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jDumpJavaMethods_Extract(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject);
+   Result:= jDumpJavaMethods_Extract(FjEnv, FjObject);
 end;
 
 function jDumpJavaMethods.Extract(_fullJavaClassName: string; _delimiter: string): string;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jDumpJavaMethods_Extract(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, _fullJavaClassName ,_delimiter);
+   Result:= jDumpJavaMethods_Extract(FjEnv, FjObject, _fullJavaClassName ,_delimiter);
 end;
 
 function jDumpJavaMethods.GetNoMaskedMethodImplementationByIndex(_index: integer): string;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jDumpJavaMethods_GetNoMaskedMethodImplementationByIndex(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, _index);
+   Result:= jDumpJavaMethods_GetNoMaskedMethodImplementationByIndex(FjEnv, FjObject, _index);
 end;
 
 function jDumpJavaMethods.GetNoMaskedMethodImplementationListSize(): integer;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jDumpJavaMethods_GetNoMaskedMethodImplementationListSize(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject);
+   Result:= jDumpJavaMethods_GetNoMaskedMethodImplementationListSize(FjEnv, FjObject);
 end;
 
 function jDumpJavaMethods.GetNoMaskedMethodImplementationList(): string;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jDumpJavaMethods_GetNoMaskedMethodImplementationList(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject);
+   Result:= jDumpJavaMethods_GetNoMaskedMethodImplementationList(FjEnv, FjObject);
 end;
 
 {-------- jDumpJavaMethods_JNI_Bridge ----------}
@@ -316,7 +310,7 @@ end;
 //to end of "public class Controls" in "Controls.java"
 *)
 
-procedure jDumpJavaMethods_jFree(env: PJNIEnv; this: JObject; _jdumpjavamethods: JObject);
+procedure jDumpJavaMethods_jFree(env: PJNIEnv; _jdumpjavamethods: JObject);
 var
   jMethod: jMethodID=nil;
   jCls: jClass=nil;
@@ -326,7 +320,7 @@ begin
   env^.CallVoidMethod(env, _jdumpjavamethods, jMethod);
 end;
 
-function jDumpJavaMethods_GetMethodFullSignatureList(env: PJNIEnv; this: JObject; _jdumpjavamethods: JObject): string;
+function jDumpJavaMethods_GetMethodFullSignatureList(env: PJNIEnv; _jdumpjavamethods: JObject): string;
 var
   jStr: JString;
   jBoo: JBoolean;
@@ -345,7 +339,7 @@ begin
   end;
 end;
 
-function jDumpJavaMethods_GetMethodImplementationList(env: PJNIEnv; this: JObject; _jdumpjavamethods: JObject): string;
+function jDumpJavaMethods_GetMethodImplementationList(env: PJNIEnv; _jdumpjavamethods: JObject): string;
 var
   jStr: JString;
   jBoo: JBoolean;
@@ -364,7 +358,7 @@ begin
   end;
 end;
 
-procedure jDumpJavaMethods_SetStripFullTypeName(env: PJNIEnv; this: JObject; _jdumpjavamethods: JObject; _stripFullTypeName: boolean);
+procedure jDumpJavaMethods_SetStripFullTypeName(env: PJNIEnv; _jdumpjavamethods: JObject; _stripFullTypeName: boolean);
 var
   jParams: array[0..0] of jValue;
   jMethod: jMethodID=nil;
@@ -376,7 +370,7 @@ begin
   env^.CallVoidMethodA(env, _jdumpjavamethods, jMethod, @jParams);
 end;
 
-function jDumpJavaMethods_GetStripFullTypeName(env: PJNIEnv; this: JObject; _jdumpjavamethods: JObject): boolean;
+function jDumpJavaMethods_GetStripFullTypeName(env: PJNIEnv; _jdumpjavamethods: JObject): boolean;
 var
   jBoo: JBoolean;
   jMethod: jMethodID=nil;
@@ -388,7 +382,7 @@ begin
   Result:= boolean(jBoo);
 end;
 
-procedure jDumpJavaMethods_SetFullJavaClassName(env: PJNIEnv; this: JObject; _jdumpjavamethods: JObject; _fullJavaClassName: string);
+procedure jDumpJavaMethods_SetFullJavaClassName(env: PJNIEnv; _jdumpjavamethods: JObject; _fullJavaClassName: string);
 var
   jParams: array[0..0] of jValue;
   jMethod: jMethodID=nil;
@@ -401,7 +395,7 @@ begin
   env^.DeleteLocalRef(env,jParams[0].l);
 end;
 
-function jDumpJavaMethods_GetFullJavaClassName(env: PJNIEnv; this: JObject; _jdumpjavamethods: JObject): string;
+function jDumpJavaMethods_GetFullJavaClassName(env: PJNIEnv; _jdumpjavamethods: JObject): string;
 var
   jStr: JString;
   jBoo: JBoolean;
@@ -420,7 +414,7 @@ begin
   end;
 end;
 
-procedure jDumpJavaMethods_SetObjReferenceName(env: PJNIEnv; this: JObject; _jdumpjavamethods: JObject; _objReferenceName: string);
+procedure jDumpJavaMethods_SetObjReferenceName(env: PJNIEnv; _jdumpjavamethods: JObject; _objReferenceName: string);
 var
   jParams: array[0..0] of jValue;
   jMethod: jMethodID=nil;
@@ -433,7 +427,7 @@ begin
   env^.DeleteLocalRef(env,jParams[0].l);
 end;
 
-function jDumpJavaMethods_GetObjReferenceName(env: PJNIEnv; this: JObject; _jdumpjavamethods: JObject): string;
+function jDumpJavaMethods_GetObjReferenceName(env: PJNIEnv; _jdumpjavamethods: JObject): string;
 var
   jStr: JString;
   jBoo: JBoolean;
@@ -452,7 +446,7 @@ begin
   end;
 end;
 
-procedure jDumpJavaMethods_SetDelimiter(env: PJNIEnv; this: JObject; _jdumpjavamethods: JObject; _delimiter: string);
+procedure jDumpJavaMethods_SetDelimiter(env: PJNIEnv; _jdumpjavamethods: JObject; _delimiter: string);
 var
   jParams: array[0..0] of jValue;
   jMethod: jMethodID=nil;
@@ -465,7 +459,7 @@ begin
   env^.DeleteLocalRef(env,jParams[0].l);
 end;
 
-function jDumpJavaMethods_GetDelimiter(env: PJNIEnv; this: JObject; _jdumpjavamethods: JObject): string;
+function jDumpJavaMethods_GetDelimiter(env: PJNIEnv; _jdumpjavamethods: JObject): string;
 var
   jStr: JString;
   jBoo: JBoolean;
@@ -484,7 +478,7 @@ begin
   end;
 end;
 
-function jDumpJavaMethods_GetMethodHeaderList(env: PJNIEnv; this: JObject; _jdumpjavamethods: JObject): string;
+function jDumpJavaMethods_GetMethodHeaderList(env: PJNIEnv; _jdumpjavamethods: JObject): string;
 var
   jStr: JString;
   jBoo: JBoolean;
@@ -503,7 +497,7 @@ begin
   end;
 end;
 
-function jDumpJavaMethods_GetMethodHeaderListSize(env: PJNIEnv; this: JObject; _jdumpjavamethods: JObject): integer;
+function jDumpJavaMethods_GetMethodHeaderListSize(env: PJNIEnv; _jdumpjavamethods: JObject): integer;
 var
   jMethod: jMethodID=nil;
   jCls: jClass=nil;
@@ -513,7 +507,7 @@ begin
   Result:= env^.CallIntMethod(env, _jdumpjavamethods, jMethod);
 end;
 
-function jDumpJavaMethods_GetMethodHeaderByIndex(env: PJNIEnv; this: JObject; _jdumpjavamethods: JObject; _index: integer): string;
+function jDumpJavaMethods_GetMethodHeaderByIndex(env: PJNIEnv; _jdumpjavamethods: JObject; _index: integer): string;
 var
   jStr: JString;
   jBoo: JBoolean;
@@ -534,7 +528,7 @@ begin
   end;
 end;
 
-procedure jDumpJavaMethods_MaskMethodHeaderByIndex(env: PJNIEnv; this: JObject; _jdumpjavamethods: JObject; _index: integer);
+procedure jDumpJavaMethods_MaskMethodHeaderByIndex(env: PJNIEnv; _jdumpjavamethods: JObject; _index: integer);
 var
   jParams: array[0..0] of jValue;
   jMethod: jMethodID=nil;
@@ -546,7 +540,7 @@ begin
   env^.CallVoidMethodA(env, _jdumpjavamethods, jMethod, @jParams);
 end;
 
-procedure jDumpJavaMethods_UnMaskMethodHeaderByIndex(env: PJNIEnv; this: JObject; _jdumpjavamethods: JObject; _index: integer);
+procedure jDumpJavaMethods_UnMaskMethodHeaderByIndex(env: PJNIEnv; _jdumpjavamethods: JObject; _index: integer);
 var
   jParams: array[0..0] of jValue;
   jMethod: jMethodID=nil;
@@ -558,7 +552,7 @@ begin
   env^.CallVoidMethodA(env, _jdumpjavamethods, jMethod, @jParams);
 end;
 
-function jDumpJavaMethods_GetNoMaskedMethodHeaderList(env: PJNIEnv; this: JObject; _jdumpjavamethods: JObject): string;
+function jDumpJavaMethods_GetNoMaskedMethodHeaderList(env: PJNIEnv; _jdumpjavamethods: JObject): string;
 var
   jStr: JString;
   jBoo: JBoolean;
@@ -577,7 +571,7 @@ begin
   end;
 end;
 
-function jDumpJavaMethods_Extract(env: PJNIEnv; this: JObject; _jdumpjavamethods: JObject): string;
+function jDumpJavaMethods_Extract(env: PJNIEnv; _jdumpjavamethods: JObject): string;
 var
   jStr: JString;
   jBoo: JBoolean;
@@ -596,7 +590,7 @@ begin
   end;
 end;
 
-function jDumpJavaMethods_Extract(env: PJNIEnv; this: JObject; _jdumpjavamethods: JObject; _fullJavaClassName: string; _delimiter: string): string;
+function jDumpJavaMethods_Extract(env: PJNIEnv; _jdumpjavamethods: JObject; _fullJavaClassName: string; _delimiter: string): string;
 var
   jStr: JString;
   jBoo: JBoolean;
@@ -620,7 +614,7 @@ begin
   env^.DeleteLocalRef(env,jParams[1].l);
 end;
 
-function jDumpJavaMethods_GetNoMaskedMethodImplementationByIndex(env: PJNIEnv; this: JObject; _jdumpjavamethods: JObject; _index: integer): string;
+function jDumpJavaMethods_GetNoMaskedMethodImplementationByIndex(env: PJNIEnv; _jdumpjavamethods: JObject; _index: integer): string;
 var
   jStr: JString;
   jBoo: JBoolean;
@@ -641,7 +635,7 @@ begin
   end;
 end;
 
-function jDumpJavaMethods_GetNoMaskedMethodImplementationListSize(env: PJNIEnv; this: JObject; _jdumpjavamethods: JObject): integer;
+function jDumpJavaMethods_GetNoMaskedMethodImplementationListSize(env: PJNIEnv; _jdumpjavamethods: JObject): integer;
 var
   jMethod: jMethodID=nil;
   jCls: jClass=nil;
@@ -651,7 +645,7 @@ begin
   Result:= env^.CallIntMethod(env, _jdumpjavamethods, jMethod);
 end;
 
-function jDumpJavaMethods_GetNoMaskedMethodImplementationList(env: PJNIEnv; this: JObject; _jdumpjavamethods: JObject): string;
+function jDumpJavaMethods_GetNoMaskedMethodImplementationList(env: PJNIEnv; _jdumpjavamethods: JObject): string;
 var
   jStr: JString;
   jBoo: JBoolean;

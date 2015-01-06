@@ -34,6 +34,7 @@ object AndroidModule7: TAndroidModule7
     BackgroundColor = colbrDefault
     FontColor = colbrSilver
     FontSize = 0
+    TextTypeFace = tfNormal
     Id = 69181
   end
   object jScrollView1: jScrollView
@@ -56,6 +57,7 @@ object AndroidModule7: TAndroidModule7
     BackgroundColor = colbrLightSlateBlue
     Id = 23460
     object jImageView1: jImageView
+      Tag = 1
       Left = 94
       Top = -2
       Width = 48
@@ -69,10 +71,10 @@ object AndroidModule7: TAndroidModule7
       ImageIndex = 0
       Images = jImageList1
       BackgroundColor = colbrDefault
-      IsBackgroundImage = False
       Id = 7100012
     end
     object jImageView2: jImageView
+      Tag = 1
       Left = 94
       Top = 54
       Width = 48
@@ -87,10 +89,10 @@ object AndroidModule7: TAndroidModule7
       ImageIndex = 1
       Images = jImageList1
       BackgroundColor = colbrDefault
-      IsBackgroundImage = False
       Id = 3953947
     end
     object jImageView3: jImageView
+      Tag = 1
       Left = 94
       Top = 118
       Width = 48
@@ -105,10 +107,10 @@ object AndroidModule7: TAndroidModule7
       ImageIndex = 2
       Images = jImageList1
       BackgroundColor = colbrDefault
-      IsBackgroundImage = False
       Id = 7668691
     end
     object jImageView4: jImageView
+      Tag = 1
       Left = 94
       Top = 174
       Width = 48
@@ -123,10 +125,10 @@ object AndroidModule7: TAndroidModule7
       ImageIndex = 3
       Images = jImageList1
       BackgroundColor = colbrDefault
-      IsBackgroundImage = False
       Id = 3535108
     end
     object jImageView5: jImageView
+      Tag = 1
       Left = 94
       Top = 238
       Width = 48
@@ -141,7 +143,6 @@ object AndroidModule7: TAndroidModule7
       ImageIndex = 4
       Images = jImageList1
       BackgroundColor = colbrDefault
-      IsBackgroundImage = False
       Id = 0
     end
   end
@@ -166,6 +167,7 @@ object AndroidModule7: TAndroidModule7
     BackgroundColor = colbrDefault
     FontColor = colbrSilver
     FontSize = 0
+    TextTypeFace = tfNormal
     Id = 10102
   end
   object jTextView3: jTextView
@@ -189,6 +191,7 @@ object AndroidModule7: TAndroidModule7
     BackgroundColor = colbrDefault
     FontColor = colbrSilver
     FontSize = 0
+    TextTypeFace = tfNormal
     Id = 0
   end
   object jImageBtn1: jImageBtn

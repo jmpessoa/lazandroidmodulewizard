@@ -64,7 +64,7 @@ end;
 
 procedure TAndroidModule2.AndroidModule2JNIPrompt(Sender: TObject);
 begin
-  //ShowMessage('Hello form 2');  //ok!
+  jEditText1.SetFocus;
 end;
 
 end.

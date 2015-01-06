@@ -36,9 +36,11 @@ object AndroidModule1: TAndroidModule1
     BackgroundColor = colbrDefault
     FontColor = colbrMidnightBlue
     FontSize = 0
+    TextTypeFace = tfNormal
     Id = 0
   end
   object jImageView1: jImageView
+    Tag = 1
     Left = 128
     Top = 208
     Width = 48
@@ -56,15 +58,14 @@ object AndroidModule1: TAndroidModule1
     ImageIndex = 0
     Images = jImageList1
     BackgroundColor = colbrDefault
-    IsBackgroundImage = False
     Id = 11952
   end
   object jTimer1: jTimer
     Enabled = False
     Interval = 20
     OnTimer = jTimer1Timer
-    left = 216
-    top = 168
+    left = 104
+    top = 128
   end
   object jImageList1: jImageList
     Images.Strings = (
@@ -77,7 +78,7 @@ object AndroidModule1: TAndroidModule1
       't7.png'
       't8.png'
     )
-    left = 216
-    top = 216
+    left = 184
+    top = 128
   end
 end

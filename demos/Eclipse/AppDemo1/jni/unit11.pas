@@ -24,7 +24,6 @@ type
       jTextView3: jTextView;
       jTimer1: jTimer;
       procedure DataModuleCloseQuery(Sender: TObject; var CanClose: boolean);
-      procedure DataModuleCreate(Sender: TObject);
       procedure DataModuleJNIPrompt(Sender: TObject);
       procedure DataModuleRotate(Sender: TObject; rotate: integer;
         var rstRotate: integer);
@@ -36,7 +35,6 @@ type
       procedure jCanvasES2_1GLDown(Sender: TObject; Touch: TMouch);
       procedure jCanvasES2_1GLDraw(Sender: TObject);
       procedure jCanvasES2_1GLMove(Sender: TObject; Touch: TMouch);
-      procedure jCanvasES2_1GLThread(Sender: TObject);
       procedure jCanvasES2_1GLUp(Sender: TObject; Touch: TMouch);
       procedure jTimer1Timer(Sender: TObject);
     private
@@ -51,7 +49,6 @@ type
       gArcBall  : TxgArcBall;
       gW        : integer;
       gH        : integer;
-      gRunning   : boolean;
       procedure DoDraw(Angle,Zoom : Single; scrW: integer; scrH: integer);
   end;
   
@@ -203,18 +200,15 @@ begin
                            ZDepth-0.01,
                            cAlpha_1,
                            Shader_Texture);
-  //dbg('d9');
-  jCanvasES2_1.Update;
-  //dbg('d10');
+  //jCanvasES2_1.Update;
 end;
 
 procedure TAndroidModule11.DataModuleJNIPrompt(Sender: TObject);
 begin
   gAngle  := 0;
   gSpeed  := 1.0;
-  gWork   := False;
+  gWork   := True;
   gZoom   := 1.0;
-  gRunning:= True;
   ArcBall_Init(gArcBall);
 end;
 
@@ -229,26 +223,24 @@ begin
    jTimer1.Enabled:= not jTimer1.Enabled;
    if jTimer1.Enabled then
    begin
+     jTextView2.Text:= 'Auto: On';
      gWork:= True;
-     jTextView2.Text:= 'Auto: On'
    end
    else
    begin
-     jTextView2.Text:= 'Auto: Off';
      gWork:= False;
+     jTextView2.Text:= 'Auto: Off';
    end;
 end;
 
 procedure TAndroidModule11.jButton2Click(Sender: TObject);
 begin
-  gSpeed := gSpeed + 0.3;
-  ShowMessage('Speed ++')
+  gSpeed:= gSpeed + 0.3;
 end;
 
 procedure TAndroidModule11.jButton3Click(Sender: TObject);
 begin
-  jCanvasES2_1.Request_GLThread;
-  jCanvasEs2_1.Refresh;
+  ShowMessage('Hello World!');
 end;
 
 procedure TAndroidModule11.jCanvasES2_1GLChange(Sender: TObject; W, H: integer);
@@ -262,8 +254,6 @@ begin
   jCanvasES2_1.Texture_Load_All;
   jCanvasES2_1.Shader_Compile('simon_Vert','simon_Frag');
   jCanvasES2_1.Shader_Link;
-  //
-  gWork := True;
 end;
 
 procedure TAndroidModule11.jCanvasES2_1GLDown(Sender: TObject; Touch: TMouch);
@@ -273,7 +263,7 @@ end;
 
 procedure TAndroidModule11.jCanvasES2_1GLDraw(Sender: TObject);
 begin
-  DoDraw(gAngle*gSpeed, gZoom, gW, gH);
+   DoDraw(gAngle*gSpeed, gZoom, gW, gH);
 end;
 
 procedure TAndroidModule11.jCanvasES2_1GLMove(Sender: TObject; Touch: TMouch);
@@ -286,21 +276,6 @@ begin
   jCanvasES2_1.Refresh;
 end;
 
-procedure TAndroidModule11.jCanvasES2_1GLThread(Sender: TObject);
-begin
-  gWork:= False;
-  case jCanvasES2_1.Textures[0].Active of
-   True  : begin
-             jCanvasES2_1.Texture_Unload_All;
-           end;
-   False : begin
-             jCanvasES2_1.Texture_Load_All;
-           end;
-  end;
-  gWork := True;
-  jCanvasES2_1.Refresh;
-end;
-
 procedure TAndroidModule11.jCanvasES2_1GLUp(Sender: TObject; Touch: TMouch);
 begin
   ArcBall_Up(gArcBall);
@@ -309,21 +284,15 @@ end;
 procedure TAndroidModule11.jTimer1Timer(Sender: TObject);
 begin
   gAngle := gAngle + 4;
-  if gAngle > 360 then gAngle := 0;
+  if gAngle > 360 then gAngle:= 0;
   if gWork then jCanvasES2_1.Refresh;
-end;
-
-procedure TAndroidModule11.DataModuleCreate(Sender: TObject);
-begin
-  //
 end;
 
 procedure TAndroidModule11.DataModuleCloseQuery(Sender: TObject; var CanClose: boolean);
 begin
-   CanClose:= True;
-   jTimer1.Enabled := False;
-   gRunning:= False;
+  gWork:= false;
+  jTimer1.Enabled := False;
+  CanClose:= True;
 end;
-
 
 end.

@@ -247,7 +247,7 @@ Type
  //
 
  // ------------------------------------------------------------------
- jCanvasES2 = class(jGLViewEvent{jVisualControl})
+ jCanvasES2 = class(jGLViewEvent)
  private
    FAutoRefresh: boolean;  // 60Frame/s Refresh
 
@@ -262,12 +262,9 @@ Type
 
    procedure SetImages(Value: jImageList);   //by jmpessoa
 
-   Procedure SetjParent     (Value : jObject);
-   function  GetjParent: jObject;
    Procedure SetVisible    (Value : Boolean);
    function GetVisible: Boolean;
    Procedure SetAutoRefresh(Value : boolean);
-
 
    Procedure Texture_Load  ( var Texture : TxgElement; filename : String; TileMode : Boolean = False);
    Procedure Texture_UnLoad( var Texture : TxgElement);
@@ -275,6 +272,7 @@ Type
    procedure UpdateLParamWidth;
 
  protected
+   procedure SetParentComponent(Value: TComponent); override;
    Function  Shader_Build  ( sType : TxgShaderType; Name : String ) : GLuint;
    //
    Procedure SetShader  ( value : TxgShader );
@@ -285,8 +283,8 @@ Type
    //
    Procedure BindTexture( const Texture : TxgElement );
    procedure Notification(AComponent: TComponent; Operation: TOperation); override;
-   function GetWidth: integer;
-   function GetHeight: integer;
+   function GetWidth: integer;  override;
+   function GetHeight: integer;  override;
  public
    Textures : TxgTextures; // Texture
    MVP      : TM4x4;       // MVP Matrix
@@ -341,8 +339,6 @@ Type
    Procedure Update;
    Procedure Refresh;
    // Property
-   property Parent      : jObject       read GetjParent   write SetjParent;
-   //
    Property Shader      : TxgShader     read FShader      write SetShader;
    Property Alpha       : Single        read FAlpha       write SetAlpha;
  published
@@ -1133,10 +1129,6 @@ Function _glTexture_Free(Var Img : GLuint) : Boolean;
  end;
 
 //-----------------------------------------------------------------------------
-//
-//
-//
-//-----------------------------------------------------------------------------
 
 Const
  cShaderHelp     = '//';
@@ -1240,21 +1232,27 @@ begin
 
 end;
 
+procedure jCanvasES2.SetParentComponent(Value: TComponent);
+begin
+   inherited SetParentComponent(Value);
+   Self.Height:= 96;
+   Self.Width:= 96;
+   if Value <> nil then
+   begin
+      Parent:= TAndroidWidget(Value);
+      Self.Width:= Trunc(TAndroidWidget(Parent).Width) - 13;
+   end;
+end;
+
 Destructor jCanvasES2.Destroy;
 begin
   if not (csDesigning in ComponentState) then
   begin
-    if jForm(Owner).App <> nil then
-    begin
-      if jForm(Owner).App.Initialized then
-      begin
         if FjObject  <> nil then
         begin
-          jGLSurfaceView_Free2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject );
+          jGLSurfaceView_Free(FjEnv, FjObject );
           FjObject := nil;
         end;
-      end;
-    end;
   end;
   // --------------------------------------------------------------------------
   //  Tip. Android do not require Delete Program & Texture
@@ -1291,20 +1289,22 @@ begin
 
   inherited Init(refApp);
 
-  FjObject  := jGLSurfaceView_Create2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, Self,cjOpenGLESv2);
-  jGLSurfaceView_setParent(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject , FjPRLayout);
-  jGLSurfaceView_setId(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject , Self.Id);
+  FjObject:= jGLSurfaceView_Create(FjEnv, FjThis, Self,cjOpenGLESv2);
 
-  jGLSurfaceView_setLeftTopRightBottomWidthHeight(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject ,
+  FInitialized:= True;
+
+  jGLSurfaceView_setParent(FjEnv, FjObject , FjPRLayout);
+  jGLSurfaceView_setId(FjEnv, FjObject , Self.Id);
+
+  jGLSurfaceView_setLeftTopRightBottomWidthHeight(FjEnv, FjObject ,
                                                  FMarginLeft,FMarginTop,FMarginRight,FMarginBottom,
                                                  GetLayoutParams(gApp, FLParamWidth, sdW),
                                                  GetLayoutParams(gApp, FLParamHeight, sdH));
-
   for rToA := raAbove to raAlignRight do
   begin
     if rToA in FPositionRelativeToAnchor then
     begin
-      jGLSurfaceView_addlParamsAnchorRule(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject , GetPositionRelativeToAnchor(rToA));
+      jGLSurfaceView_addlParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
     end;
   end;
 
@@ -1312,35 +1312,22 @@ begin
   begin
      if rToP in FPositionRelativeToParent then
      begin
-       jGLSurfaceView_addlParamsParentRule(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject , GetPositionRelativeToParent(rToP));
+       jGLSurfaceView_addlParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
      end;
   end;
 
   if Self.Anchor <> nil then Self.AnchorId:= Self.Anchor.Id;
-  jGLSurfaceView_setLayoutAll(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject , Self.AnchorId);
+  jGLSurfaceView_setLayoutAll(FjEnv, FjObject , Self.AnchorId);
 
-  jGLSurfaceView_SetAutoRefresh(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject , FAutoRefresh);
-  jView_SetVisible(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject , FVisible);
-  FInitialized:= True;
-end;
-
-Procedure jCanvasES2.SetjParent(Value: jObject);
- begin
-  FjPRLayout := Value;
-  if FInitialized then
-     jGLSurfaceView_setParent2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject , FjPRLayout);
- end;
-
-function jCanvasES2.GetjParent: jObject;
-begin
-  Result:= FjPRLayout;
+  jGLSurfaceView_SetAutoRefresh(FjEnv, FjObject , FAutoRefresh);
+  View_SetVisible(FjEnv, FjThis, FjObject , FVisible);
 end;
 
 Procedure jCanvasES2.SetVisible  (Value : Boolean);
 begin
   FVisible := Value;
   if FInitialized then
-     jView_SetVisible(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject , FVisible);
+     View_SetVisible(FjEnv, FjObject , FVisible);
 end;
 
 function jCanvasES2.GetVisible: Boolean;
@@ -1351,14 +1338,14 @@ end;
 Procedure jCanvasES2.Refresh;
 begin
   if FInitialized then
-    jGLSurfaceView_Refresh2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject );
+    jGLSurfaceView_Refresh(FjEnv, FjObject );
 end;
 
 Procedure jCanvasES2.SetAutoRefresh(Value: boolean);
 begin
   FAutoRefresh := Value;
   if FInitialized then
-     jGLSurfaceView_SetAutoRefresh2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject , FAutoRefresh);
+     jGLSurfaceView_SetAutoRefresh(FjEnv, FjObject , FAutoRefresh);
 end;
 
 //
@@ -1936,15 +1923,20 @@ Procedure jCanvasES2.Texture_Load( var Texture : TxgElement; filename : String;
                                    TileMode : Boolean = False);
 begin
   if not FInitialized then Exit;
+
   Case TileMode of
-   True : Texture.Active := _glTexture_Load_wJava(jForm(Owner).App.Jni.jEnv,jForm(Owner).App.Jni.jThis, jForm(Owner).App.Path.Dat+'/'+filename,Texture.ID,_cAlpha_MaskOff,_cTile_On );
-   False: Texture.Active := _glTexture_Load_wJava(jForm(Owner).App.Jni.jEnv,jForm(Owner).App.Jni.jThis, jForm(Owner).App.Path.Dat+'/'+filename,Texture.ID,_cAlpha_MaskOn ,_cTile_Off);
+
+   True : Texture.Active := _glTexture_Load_wJava(FjEnv, gApp.jni.jThis, gApp.Path.Dat+'/'+filename,Texture.ID,_cAlpha_MaskOff,_cTile_On );
+   False: Texture.Active := _glTexture_Load_wJava(FjEnv, gApp.jni.jThis, gApp.Path.Dat+'/'+filename,Texture.ID,_cAlpha_MaskOn ,_cTile_Off);
+
   End;
+
+
   {
   Case TileMode of
    True : Texture.Active := _glTexture_Load_wPascal(
                                 filename,Texture.ID,_cAlpha_MaskOff,_cTile_On );
-   False: Texture.Active := _glTexture_Load_wPascal(jForm(Owner).App.Jni.jEnv,jForm(Owner).App.Jni.jThis,
+   False: Texture.Active := _glTexture_Load_wPascal(FjEnv,gApp.jni.jThis,
                                 filename,Texture.ID,_cAlpha_MaskOn ,_cTile_Off);
   End;
   }
@@ -1956,7 +1948,7 @@ var
 begin
   if not FInitialized then Exit;
   if TexturesCount > 0 then Texture_Clear;
-  if FImageList <> nil then FImageList.Init(FApplication);
+  if FImageList <> nil then FImageList.Init(gApp);  //***
   for i:= 0 to FImageList.Images.Count - 1 do
   begin
      if (FImageList.Images.Strings[i] <> '') and (FImageList.Images.Strings[i] <> 'null') then
@@ -1973,9 +1965,8 @@ begin
   if not FInitialized then Exit;
   Case Texture.Active of
    True : begin
-           //dbg('Delete Texture ' + IntToStr(Texture.ID) );
            glDeleteTextures(1, @Texture.ID );
-           //jGLSurfaceView_deleteTexture2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject ,Texture.Id);
+           //jGLSurfaceView_deleteTexture(FjEnv, FjObject ,Texture.Id);
           end;
    False:  ; //dbg('Delete Texture Skip ' + IntToStr(Texture.ID) );
   end;
@@ -2015,7 +2006,7 @@ end;
 Procedure jCanvasES2.Request_GLThread;
 begin
   if FInitialized then
-     jGLSurfaceView_requestGLThread2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject );
+     jGLSurfaceView_requestGLThread(FjEnv, FjObject);
 end;
 
 //
@@ -2056,11 +2047,12 @@ procedure jCanvasES2.UpdateLParamWidth;
 var
    side: TSide;
 begin
-  if jForm(Owner).Orientation = jForm(Owner).App.Orientation then
+  if jForm(Owner).Orientation = gApp.Orientation then
       side:= sdW
   else
       side:= sdH;
-  jGLSurfaceView_setLParamWidth2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject , GetLayoutParams(gApp, FLParamWidth, side));
+
+  jGLSurfaceView_setLParamWidth(FjEnv, FjObject , GetLayoutParams(gApp, FLParamWidth, side));
 end;
 
 procedure jCanvasES2.UpdateLParamHeight;
@@ -2071,21 +2063,21 @@ begin
     side:= sdH
   else
     side:= sdW;
-  jGLSurfaceView_setLParamHeight2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject , GetLayoutParams(gApp, FLParamHeight, side));
+  jGLSurfaceView_setLParamHeight(FjEnv, FjObject , GetLayoutParams(gApp, FLParamHeight, side));
 end;
 
 function jCanvasES2.GetWidth: integer;
 begin
    Result:= FWidth;
    if FInitialized then
-      Result:= jGLSurfaceView_getLParamWidth2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject )
+      Result:= jGLSurfaceView_getLParamWidth(FjEnv, FjObject )
 end;
 
 function jCanvasES2.GetHeight: integer;
 begin
    Result:= FHeight;
    if FInitialized then
-      Result:= jGLSurfaceView_getLParamHeight2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject );
+      Result:= jGLSurfaceView_getLParamHeight(FjEnv, FjObject );
 end;
 
 procedure jCanvasES2.UpdateLayout;
@@ -2093,7 +2085,7 @@ begin
    inherited UpdateLayout;
    UpdateLParamWidth;
    UpdateLParamHeight;
-   jGLSurfaceView_setLayoutAll2(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject , Self.AnchorId);
+   jGLSurfaceView_setLayoutAll(FjEnv, FjObject , Self.AnchorId);
 end;
 
 end.

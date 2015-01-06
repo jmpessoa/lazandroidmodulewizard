@@ -8,9 +8,9 @@
       <Unit0>
         <Filename Value="controls.lpr"/>
         <IsPartOfProject Value="True"/>
-        <EditorIndex Value="2"/>
+        <EditorIndex Value="1"/>
         <TopLine Value="409"/>
-        <CursorPos X="25" Y="417"/>
+        <CursorPos X="8" Y="419"/>
         <UsageCount Value="68"/>
         <Loaded Value="True"/>
         <DefaultSyntaxHighlighter Value="Delphi"/>
@@ -22,8 +22,8 @@
         <HasResources Value="True"/>
         <UnitName Value="unit1"/>
         <IsVisibleTab Value="True"/>
-        <TopLine Value="49"/>
-        <CursorPos X="52" Y="21"/>
+        <TopLine Value="48"/>
+        <CursorPos X="55" Y="59"/>
         <UsageCount Value="68"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -52,12 +52,10 @@
       </Unit4>
       <Unit5>
         <Filename Value="C:\laz4android1346592\components\LazAndroidWizard\customdialog.pas"/>
-        <UnitName Value="customdialog"/>
-        <EditorIndex Value="1"/>
+        <EditorIndex Value="-1"/>
         <TopLine Value="12"/>
         <CursorPos X="105" Y="20"/>
         <UsageCount Value="25"/>
-        <Loaded Value="True"/>
       </Unit5>
       <Unit6>
         <Filename Value="C:\laz4android1346592\components\LazAndroidWizard\register_extras.pas"/>

@@ -33,6 +33,7 @@ object AndroidModule1: TAndroidModule1
     BackgroundColor = colbrDefault
     FontColor = colbrSpringGreen
     FontSize = 0
+    TextTypeFace = tfNormal
     Id = 5650871
   end
   object jTextView2: jTextView
@@ -56,9 +57,11 @@ object AndroidModule1: TAndroidModule1
     BackgroundColor = colbrDefault
     FontColor = colbrSilver
     FontSize = 0
+    TextTypeFace = tfNormal
     Id = 1679131
   end
   object jEditText1: jEditText
+    Tag = 1
     Left = 8
     Top = 128
     Width = 280
@@ -76,7 +79,7 @@ object AndroidModule1: TAndroidModule1
     LayoutParamHeight = lpWrapContent
     Alignment = taLeft
     InputTypeEx = itxText
-    LineMaxLength = 300
+    MaxTextLength = 300
     BackgroundColor = colbrWhite
     FontColor = colbrDefault
     FontSize = 0
@@ -181,6 +184,7 @@ object AndroidModule1: TAndroidModule1
     BackgroundColor = colbrDefault
     FontColor = colbrSilver
     FontSize = 0
+    TextTypeFace = tfNormal
     Id = 588674
   end
   object jRadioButton1: jRadioButton

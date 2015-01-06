@@ -58,10 +58,10 @@
     <Version Value="11"/>
     <PathDelim Value="\"/>
     <Target>
-      <Filename Value="C:\adt32\eclipse\workspace\AppLocationDemo1\libs\armeabi\controls"/>
+      <Filename Value="..\libs\armeabi\libcontrols.so"/>
     </Target>
     <SearchPaths>
-      <Libraries Value="C:\adt32\ndk7\platforms\android-14\arch-arm\usr\lib\;C:\adt32\ndk7\toolchains\arm-linux-androideabi-4.4.3\prebuilt\windows\lib\gcc\arm-linux-androideabi\4.4.3\"/>
+      <Libraries Value="C:\adt32\ndk9\platforms\android-14\arch-arm\usr\lib;"/>
     </SearchPaths>
     <Parsing>
       <SyntaxOptions>
@@ -87,7 +87,7 @@
       <CompilerMessages>
         <MsgFileName Value=""/>
       </CompilerMessages>
-      <CustomOptions Value="-dANDROID -Xd -CpARMv6 -CfSoft -FLC:\adt32\ndk7\platforms\android-14\arch-arm\usr\lib\libdl.so -FUC:\adt32\eclipse\workspace\AppLocationDemo1\obj\Controls -oC:\adt32\eclipse\workspace\AppLocationDemo1\libs\armeabi\libcontrols.so"/>
+      <CustomOptions Value="-dANDROID -Xd -CpArmV6 -CfSoft -FLC:\adt32\ndk9\platforms\android-14\arch-arm\usr\lib\libdl.so -FUC:\adt32\eclipse\workspace\AppLocationDemo1\obj\Controls -oC:\adt32\eclipse\workspace\AppLocationDemo1\libs\armeabi\libcontrols.so"/>
       <CompilerPath Value="$(CompPath)"/>
     </Other>
   </CompilerOptions>

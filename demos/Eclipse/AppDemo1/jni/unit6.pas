@@ -101,7 +101,9 @@ begin
   //jListView1.SetWidgetByIndex(wgTextView,'hello!',2);
 
   //or
-  jListView1.SetWidgetByIndex(wgRadioButton, 2);
+  //jListView1.SetWidgetByIndex(wgRadioButton, 2); //BUG!
+
+  jListView1.SetWidgetByIndex(wgCheckBox, 2);
 
   jListView1.SetTextAlignByIndex(alCenter, 2);
 

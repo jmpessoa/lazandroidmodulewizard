@@ -65,8 +65,7 @@ begin
   jTimer1.Enabled:= True
 end;
 
-procedure TAndroidModule1.DataModuleRotate(Sender: TObject; rotate: integer;
-var rstRotate: integer);
+procedure TAndroidModule1.DataModuleRotate(Sender: TObject; rotate: integer; var rstRotate: integer);
 begin
   Self.UpdateLayout;
 end;
@@ -75,17 +74,12 @@ procedure TAndroidModule1.jTimer1Timer(Sender: TObject);
 begin
   //jTextView1.Text:= IntToStr(Cnt_Timer) + '%';
   Inc(cnt_Timer, 5);
-
   Inc(cnt_Image);
   if cnt_Image = jImageView1.Count then cnt_Image:= 0;
   jImageView1.ImageIndex:= cnt_Image;
-
   if cnt_timer < 200 then Exit;
-
   jTimer1.Enabled:= False;   //Stop Timer
-
   Self.Close;
-
 end;
 
 end.

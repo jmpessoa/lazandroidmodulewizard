@@ -1,12 +1,12 @@
 object FormUpdateCodeTemplate: TFormUpdateCodeTemplate
   Left = 418
-  Height = 234
+  Height = 244
   Top = 202
   Width = 498
   AutoSize = True
   BorderStyle = bsSizeToolWin
   Caption = 'Android Module Wizard : Upgrade Code Templates'
-  ClientHeight = 234
+  ClientHeight = 244
   ClientWidth = 498
   Color = clWhite
   OnClose = FormClose
@@ -19,7 +19,7 @@ object FormUpdateCodeTemplate: TFormUpdateCodeTemplate
     AnchorSideTop.Control = BitBtnOK
     AnchorSideTop.Side = asrBottom
     Left = 0
-    Height = 16
+    Height = 26
     Top = 218
     Width = 498
     Anchors = [akTop, akLeft, akRight, akBottom]

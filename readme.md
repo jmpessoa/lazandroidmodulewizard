@@ -56,7 +56,70 @@
 		Ant	http://ant.apache.org/bindownload.cgi 
 			Simply extract the zip file to a convenient location...
 
-                                
+
+	*****************************************
+	* To start:				*
+	*					*
+	* "install_tutorial_ant_users.txt"	*
+	* "install_tutorial_eclipse_users.txt"	*                                
+	*					*
+	*****************************************
+	
+Version 0.6 - rev. 11 - 03 January 2015 -
+
+	.Major Code Reorganization/Cleanup [Pascal and Java sides]: 
+	
+	.WARNIG! you need [must] upgrade your existing code/application!
+		Please, use the IDE "tools" -> "Android Module Wizard" -> "Upgrade Code Templates"
+
+	.Reducing the final size of "controls.so"  [now less than half!!]
+		
+	Typical example:
+
+	TAndroidModule1 = class(jForm)
+		jButton1: jButton;
+		jEditText1: jEditText;
+		jListView1: jListView;
+		jSpinner1: jSpinner;
+		jTextView1: jTextView;
+      		procedure jButton1Click(Sender: TObject);
+	private
+	      	{private declarations}
+	public
+      		{public declarations}
+	end;
+	..............................
+
+	Before [Typical example]:
+		controls.so  --------- 2768 KB 
+
+	After first code reorganization [Typical example]:
+		controls.so ---------- 1371 KB 
+
+	Now [Typical example]:
+		controls.so ---------- 1206 KB  [!!]
+
+	How it scale? The "AppDemo1" uses 14 forms and many, many components and code: 
+		controls.so ---------- 1379 KB  [Added only 14% !!]
+
+	FIX/NEW! jEditText
+		:: New! Added event property "OnChanged"			
+		:: FIX/NEW! Event handles now is OK with help of the news methods 
+			"DispatchOnChangeEvent" and "DispatchOnChangedEvent"!
+		:: FIX! InputTypeEx property now is ok!
+
+	NEW! Demo AppEditTextDemo1 [Eclipse Project...]  		
+		                          
+	WARNIG! jEditText property name "LineMaxLength" changed to the correct "MaxTextLength" !
+		.Please, no panic! When prompt "Read error" [Unknown Property] just choice "Continue Loading"!
+		(simulates some component property change e save it!)
+	
+	WARNIG! jImageView lost the property "IsBackgroundImage" 
+		.Please, no panic! When prompt "Read error" [Unknown Property] just choice "Continue Loading"!
+		(Simulates some component property change e save it!)
+		.Just puts the jImageView "first" on jForm and set LayoutParams [H/W] to lpMatchParent
+			(Form Background Image is done!) 
+
 Version 0.6 - rev. 10 - 21 December 2014 -
 
 	Important Code Reorganization: A sugestion by Leledumbo [Thank you very much Leledumbo!]
@@ -553,10 +616,16 @@ version 0.1 - revision 0.1 - 09 September - 2013 -
 version 0.1 - August 2013 -
 
 	:: Warning: at the moment this code is just a *proof-of-concept*
-              
+     
+
+------------x-----------------------------x------------------------------x-------------   
+      
 II.  Ant Projec Development: please, read "install_tutorial_ant_users.txt"
 
+
 III. Eclipse Project Development: please, read "install_tutorial_eclipse_users.txt"
+
+-----------x------------------------------x------------------------------x--------------
 
 IV. Technical Notes: dependencies on laz4android [win32] IDE cross compiler: 
     

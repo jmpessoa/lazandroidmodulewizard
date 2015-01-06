@@ -47,23 +47,23 @@ jMediaPlayer = class(jControl)
 end;
 
 function jMediaPlayer_jCreate(env: PJNIEnv; this: JObject;_Self: int64): jObject;
-procedure jMediaPlayer_jFree(env: PJNIEnv; this: JObject; _jmediaplayer: JObject);
-procedure jMediaPlayer_DeselectTrack(env: PJNIEnv; this: JObject; _jmediaplayer: JObject; _index: integer);
-procedure jMediaPlayer_Release(env: PJNIEnv; this: JObject; _jmediaplayer: JObject);
-procedure jMediaPlayer_Reset(env: PJNIEnv; this: JObject; _jmediaplayer: JObject);
-procedure jMediaPlayer_SetDataSource(env: PJNIEnv; this: JObject; _jmediaplayer: JObject; _path: string);
-procedure jMediaPlayer_Prepare(env: PJNIEnv; this: JObject; _jmediaplayer: JObject);
-procedure jMediaPlayer_Start(env: PJNIEnv; this: JObject; _jmediaplayer: JObject);
-procedure jMediaPlayer_Stop(env: PJNIEnv; this: JObject; _jmediaplayer: JObject);
-procedure jMediaPlayer_Pause(env: PJNIEnv; this: JObject; _jmediaplayer: JObject);
-function jMediaPlayer_IsPlaying(env: PJNIEnv; this: JObject; _jmediaplayer: JObject): boolean;
-procedure jMediaPlayer_SeekTo(env: PJNIEnv; this: JObject; _jmediaplayer: JObject; _millis: integer);
-procedure jMediaPlayer_SetLooping(env: PJNIEnv; this: JObject; _jmediaplayer: JObject; _looping: boolean);
-function jMediaPlayer_IsLooping(env: PJNIEnv; this: JObject; _jmediaplayer: JObject): boolean;
-procedure jMediaPlayer_SelectTrack(env: PJNIEnv; this: JObject; _jmediaplayer: JObject; _index: integer);
-function jMediaPlayer_GetCurrentPosition(env: PJNIEnv; this: JObject; _jmediaplayer: JObject): integer;
-function jMediaPlayer_GetDuration(env: PJNIEnv; this: JObject; _jmediaplayer: JObject): integer;
-procedure jMediaPlayer_SetVolume(env: PJNIEnv; this: JObject; _jmediaplayer: JObject; _leftVolume: single; _rightVolume: single);
+procedure jMediaPlayer_jFree(env: PJNIEnv; _jmediaplayer: JObject);
+procedure jMediaPlayer_DeselectTrack(env: PJNIEnv; _jmediaplayer: JObject; _index: integer);
+procedure jMediaPlayer_Release(env: PJNIEnv; _jmediaplayer: JObject);
+procedure jMediaPlayer_Reset(env: PJNIEnv; _jmediaplayer: JObject);
+procedure jMediaPlayer_SetDataSource(env: PJNIEnv; _jmediaplayer: JObject; _path: string);
+procedure jMediaPlayer_Prepare(env: PJNIEnv; _jmediaplayer: JObject);
+procedure jMediaPlayer_Start(env: PJNIEnv; _jmediaplayer: JObject);
+procedure jMediaPlayer_Stop(env: PJNIEnv; _jmediaplayer: JObject);
+procedure jMediaPlayer_Pause(env: PJNIEnv; _jmediaplayer: JObject);
+function jMediaPlayer_IsPlaying(env: PJNIEnv; _jmediaplayer: JObject): boolean;
+procedure jMediaPlayer_SeekTo(env: PJNIEnv; _jmediaplayer: JObject; _millis: integer);
+procedure jMediaPlayer_SetLooping(env: PJNIEnv; _jmediaplayer: JObject; _looping: boolean);
+function jMediaPlayer_IsLooping(env: PJNIEnv; _jmediaplayer: JObject): boolean;
+procedure jMediaPlayer_SelectTrack(env: PJNIEnv; _jmediaplayer: JObject; _index: integer);
+function jMediaPlayer_GetCurrentPosition(env: PJNIEnv; _jmediaplayer: JObject): integer;
+function jMediaPlayer_GetDuration(env: PJNIEnv; _jmediaplayer: JObject): integer;
+procedure jMediaPlayer_SetVolume(env: PJNIEnv; _jmediaplayer: JObject; _leftVolume: single; _rightVolume: single);
 
 
 implementation
@@ -80,17 +80,11 @@ destructor jMediaPlayer.Destroy;
 begin
   if not (csDesigning in ComponentState) then
   begin
-    if jForm(Owner).App <> nil then
-    begin
-      if jForm(Owner).App.Initialized then
-      begin
         if FjObject <> nil then
         begin
            jFree();
            FjObject:= nil;
         end;
-      end;
-    end;
   end;
   //you others free code here...'
   inherited Destroy;
@@ -108,126 +102,126 @@ end;
 
 function jMediaPlayer.jCreate(): jObject;
 begin
-   Result:= jMediaPlayer_jCreate(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis , int64(Self));
+   Result:= jMediaPlayer_jCreate(FjEnv, FjThis , int64(Self));
 end;
 
 procedure jMediaPlayer.jFree();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jMediaPlayer_jFree(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject);
+     jMediaPlayer_jFree(FjEnv, FjObject);
 end;
 
 procedure jMediaPlayer.DeselectTrack(_index: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jMediaPlayer_DeselectTrack(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, _index);
+     jMediaPlayer_DeselectTrack(FjEnv, FjObject, _index);
 end;
 
 procedure jMediaPlayer.Release();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jMediaPlayer_Release(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject);
+     jMediaPlayer_Release(FjEnv, FjObject);
 end;
 
 procedure jMediaPlayer.Reset();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jMediaPlayer_Reset(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject);
+     jMediaPlayer_Reset(FjEnv, FjObject);
 end;
 
 procedure jMediaPlayer.SetDataSource(_path: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jMediaPlayer_SetDataSource(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, _path);
+     jMediaPlayer_SetDataSource(FjEnv, FjObject, _path);
 end;
 
 procedure jMediaPlayer.Prepare();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jMediaPlayer_Prepare(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject);
+     jMediaPlayer_Prepare(FjEnv, FjObject);
 end;
 
 procedure jMediaPlayer.Start();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jMediaPlayer_Start(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject);
+     jMediaPlayer_Start(FjEnv, FjObject);
 end;
 
 procedure jMediaPlayer.Stop();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jMediaPlayer_Stop(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject);
+     jMediaPlayer_Stop(FjEnv, FjObject);
 end;
 
 procedure jMediaPlayer.Pause();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jMediaPlayer_Pause(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject);
+     jMediaPlayer_Pause(FjEnv, FjObject);
 end;
 
 function jMediaPlayer.IsPlaying(): boolean;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jMediaPlayer_IsPlaying(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject);
+   Result:= jMediaPlayer_IsPlaying(FjEnv, FjObject);
 end;
 
 procedure jMediaPlayer.SeekTo(_millis: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jMediaPlayer_SeekTo(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, _millis);
+     jMediaPlayer_SeekTo(FjEnv, FjObject, _millis);
 end;
 
 procedure jMediaPlayer.SetLooping(_looping: boolean);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jMediaPlayer_SetLooping(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, _looping);
+     jMediaPlayer_SetLooping(FjEnv, FjObject, _looping);
 end;
 
 function jMediaPlayer.IsLooping(): boolean;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jMediaPlayer_IsLooping(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject);
+   Result:= jMediaPlayer_IsLooping(FjEnv, FjObject);
 end;
 
 procedure jMediaPlayer.SelectTrack(_index: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jMediaPlayer_SelectTrack(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, _index);
+     jMediaPlayer_SelectTrack(FjEnv, FjObject, _index);
 end;
 
 function jMediaPlayer.GetCurrentPosition(): integer;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jMediaPlayer_GetCurrentPosition(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject);
+   Result:= jMediaPlayer_GetCurrentPosition(FjEnv, FjObject);
 end;
 
 function jMediaPlayer.GetDuration(): integer;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jMediaPlayer_GetDuration(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject);
+   Result:= jMediaPlayer_GetDuration(FjEnv, FjObject);
 end;
 
 procedure jMediaPlayer.SetVolume(_leftVolume: single; _rightVolume: single);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jMediaPlayer_SetVolume(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, _leftVolume ,_rightVolume);
+     jMediaPlayer_SetVolume(FjEnv, FjObject, _leftVolume ,_rightVolume);
 end;
 
 {-------- jMediaPlayer_JNI_Bridge ----------}
@@ -255,7 +249,7 @@ end;
 //to end of "public class Controls" in "Controls.java"
 *)
 
-procedure jMediaPlayer_jFree(env: PJNIEnv; this: JObject; _jmediaplayer: JObject);
+procedure jMediaPlayer_jFree(env: PJNIEnv; _jmediaplayer: JObject);
 var
   jMethod: jMethodID=nil;
   jCls: jClass=nil;
@@ -265,7 +259,7 @@ begin
   env^.CallVoidMethod(env, _jmediaplayer, jMethod);
 end;
 
-procedure jMediaPlayer_DeselectTrack(env: PJNIEnv; this: JObject; _jmediaplayer: JObject; _index: integer);
+procedure jMediaPlayer_DeselectTrack(env: PJNIEnv; _jmediaplayer: JObject; _index: integer);
 var
   jParams: array[0..0] of jValue;
   jMethod: jMethodID=nil;
@@ -277,7 +271,7 @@ begin
   env^.CallVoidMethodA(env, _jmediaplayer, jMethod, @jParams);
 end;
 
-procedure jMediaPlayer_Release(env: PJNIEnv; this: JObject; _jmediaplayer: JObject);
+procedure jMediaPlayer_Release(env: PJNIEnv; _jmediaplayer: JObject);
 var
   jMethod: jMethodID=nil;
   jCls: jClass=nil;
@@ -287,7 +281,7 @@ begin
   env^.CallVoidMethod(env, _jmediaplayer, jMethod);
 end;
 
-procedure jMediaPlayer_Reset(env: PJNIEnv; this: JObject; _jmediaplayer: JObject);
+procedure jMediaPlayer_Reset(env: PJNIEnv; _jmediaplayer: JObject);
 var
   jMethod: jMethodID=nil;
   jCls: jClass=nil;
@@ -297,7 +291,7 @@ begin
   env^.CallVoidMethod(env, _jmediaplayer, jMethod);
 end;
 
-procedure jMediaPlayer_SetDataSource(env: PJNIEnv; this: JObject; _jmediaplayer: JObject; _path: string);
+procedure jMediaPlayer_SetDataSource(env: PJNIEnv; _jmediaplayer: JObject; _path: string);
 var
   jParams: array[0..0] of jValue;
   jMethod: jMethodID=nil;
@@ -310,7 +304,7 @@ begin
   env^.DeleteLocalRef(env,jParams[0].l);
 end;
 
-procedure jMediaPlayer_Prepare(env: PJNIEnv; this: JObject; _jmediaplayer: JObject);
+procedure jMediaPlayer_Prepare(env: PJNIEnv; _jmediaplayer: JObject);
 var
   jMethod: jMethodID=nil;
   jCls: jClass=nil;
@@ -320,7 +314,7 @@ begin
   env^.CallVoidMethod(env, _jmediaplayer, jMethod);
 end;
 
-procedure jMediaPlayer_Start(env: PJNIEnv; this: JObject; _jmediaplayer: JObject);
+procedure jMediaPlayer_Start(env: PJNIEnv; _jmediaplayer: JObject);
 var
   jMethod: jMethodID=nil;
   jCls: jClass=nil;
@@ -330,7 +324,7 @@ begin
   env^.CallVoidMethod(env, _jmediaplayer, jMethod);
 end;
 
-procedure jMediaPlayer_Stop(env: PJNIEnv; this: JObject; _jmediaplayer: JObject);
+procedure jMediaPlayer_Stop(env: PJNIEnv; _jmediaplayer: JObject);
 var
   jMethod: jMethodID=nil;
   jCls: jClass=nil;
@@ -340,7 +334,7 @@ begin
   env^.CallVoidMethod(env, _jmediaplayer, jMethod);
 end;
 
-procedure jMediaPlayer_Pause(env: PJNIEnv; this: JObject; _jmediaplayer: JObject);
+procedure jMediaPlayer_Pause(env: PJNIEnv; _jmediaplayer: JObject);
 var
   jMethod: jMethodID=nil;
   jCls: jClass=nil;
@@ -350,7 +344,7 @@ begin
   env^.CallVoidMethod(env, _jmediaplayer, jMethod);
 end;
 
-function jMediaPlayer_IsPlaying(env: PJNIEnv; this: JObject; _jmediaplayer: JObject): boolean;
+function jMediaPlayer_IsPlaying(env: PJNIEnv; _jmediaplayer: JObject): boolean;
 var
   jBoo: JBoolean;
   jMethod: jMethodID=nil;
@@ -362,7 +356,7 @@ begin
   Result:= boolean(jBoo);
 end;
 
-procedure jMediaPlayer_SeekTo(env: PJNIEnv; this: JObject; _jmediaplayer: JObject; _millis: integer);
+procedure jMediaPlayer_SeekTo(env: PJNIEnv; _jmediaplayer: JObject; _millis: integer);
 var
   jParams: array[0..0] of jValue;
   jMethod: jMethodID=nil;
@@ -374,7 +368,7 @@ begin
   env^.CallVoidMethodA(env, _jmediaplayer, jMethod, @jParams);
 end;
 
-procedure jMediaPlayer_SetLooping(env: PJNIEnv; this: JObject; _jmediaplayer: JObject; _looping: boolean);
+procedure jMediaPlayer_SetLooping(env: PJNIEnv; _jmediaplayer: JObject; _looping: boolean);
 var
   jParams: array[0..0] of jValue;
   jMethod: jMethodID=nil;
@@ -386,7 +380,7 @@ begin
   env^.CallVoidMethodA(env, _jmediaplayer, jMethod, @jParams);
 end;
 
-function jMediaPlayer_IsLooping(env: PJNIEnv; this: JObject; _jmediaplayer: JObject): boolean;
+function jMediaPlayer_IsLooping(env: PJNIEnv; _jmediaplayer: JObject): boolean;
 var
   jBoo: JBoolean;
   jMethod: jMethodID=nil;
@@ -398,7 +392,7 @@ begin
   Result:= boolean(jBoo);
 end;
 
-procedure jMediaPlayer_SelectTrack(env: PJNIEnv; this: JObject; _jmediaplayer: JObject; _index: integer);
+procedure jMediaPlayer_SelectTrack(env: PJNIEnv; _jmediaplayer: JObject; _index: integer);
 var
   jParams: array[0..0] of jValue;
   jMethod: jMethodID=nil;
@@ -410,7 +404,7 @@ begin
   env^.CallVoidMethodA(env, _jmediaplayer, jMethod, @jParams);
 end;
 
-function jMediaPlayer_GetCurrentPosition(env: PJNIEnv; this: JObject; _jmediaplayer: JObject): integer;
+function jMediaPlayer_GetCurrentPosition(env: PJNIEnv; _jmediaplayer: JObject): integer;
 var
   jMethod: jMethodID=nil;
   jCls: jClass=nil;
@@ -420,7 +414,7 @@ begin
   Result:= env^.CallIntMethod(env, _jmediaplayer, jMethod);
 end;
 
-function jMediaPlayer_GetDuration(env: PJNIEnv; this: JObject; _jmediaplayer: JObject): integer;
+function jMediaPlayer_GetDuration(env: PJNIEnv; _jmediaplayer: JObject): integer;
 var
   jMethod: jMethodID=nil;
   jCls: jClass=nil;
@@ -430,7 +424,7 @@ begin
   Result:= env^.CallIntMethod(env, _jmediaplayer, jMethod);
 end;
 
-procedure jMediaPlayer_SetVolume(env: PJNIEnv; this: JObject; _jmediaplayer: JObject; _leftVolume: single; _rightVolume: single);
+procedure jMediaPlayer_SetVolume(env: PJNIEnv; _jmediaplayer: JObject; _leftVolume: single; _rightVolume: single);
 var
   jParams: array[0..1] of jValue;
   jMethod: jMethodID=nil;

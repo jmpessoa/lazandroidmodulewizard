@@ -29,13 +29,14 @@ Tutorial: How to get your Android Application [Apk] using "Ant":
 9. Hint 1: you can edit "*.bat" to extend/modify some command or to fix some incorrect info/path!
  
 10.Hint 2: you can edit "build.xml" to set another Android target ex. "android-18" or "android-19" etc.
-   Yes, if after run  "build.*" the folder "...\bin" is still empty then try another target!
+   WARNING: Yes, if after run  "build.*" the folder "...\bin" is still empty then try another target!
  
-11.Warning: After a new [Lazarus IDE]-> "run->build" do not forget to run again: "build.bat" and "install.bat" !
+11.WARNING: After a new [Lazarus IDE]-> "run->build" do not forget to run again: "build.bat" and "install.bat" !
  
 12. Linux users: use "build.sh" , "install.sh" , "uninstall.sh" and "logcat.sh" [thanks to Stephano!]
-    WARNING: All demos Apps was generate on windows system! So, please,  edit the *.sh to correct one!
-12. Linux users: use "build.sh" , "install.sh" , "uninstall.sh" and "logcat.sh" [thanks to Stephano!]
+    WARNING: All demos Apps was generate on windows system! So, please,  edit the *.sh to correct paths one!
+ 
+13. PLEASE, look for "How to use the Demos" in "readme.txt"!!
  
 ....  Thank you!
  

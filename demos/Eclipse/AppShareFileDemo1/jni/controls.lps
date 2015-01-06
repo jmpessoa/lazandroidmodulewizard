@@ -9,6 +9,7 @@
         <Filename Value="controls.lpr"/>
         <IsPartOfProject Value="True"/>
         <EditorIndex Value="1"/>
+        <CursorPos X="10" Y="9"/>
         <UsageCount Value="25"/>
         <Loaded Value="True"/>
         <DefaultSyntaxHighlighter Value="Delphi"/>
@@ -21,7 +22,7 @@
         <UnitName Value="unit1"/>
         <IsVisibleTab Value="True"/>
         <TopLine Value="135"/>
-        <CursorPos X="38" Y="148"/>
+        <CursorPos X="8" Y="140"/>
         <UsageCount Value="25"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -29,7 +30,6 @@
       </Unit1>
       <Unit2>
         <Filename Value="C:\laz4android1346592\components\LazAndroidWizard\textfilemanager.pas"/>
-        <UnitName Value="textfilemanager"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="257"/>
         <CursorPos Y="257"/>
@@ -37,7 +37,6 @@
       </Unit2>
       <Unit3>
         <Filename Value="C:\laz4android1346592\components\LazAndroidWizard\androidwidget.pas"/>
-        <UnitName Value="AndroidWidget"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="385"/>
         <CursorPos X="21" Y="395"/>

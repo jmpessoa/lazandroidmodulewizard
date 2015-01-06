@@ -26,7 +26,7 @@ object AndroidModule13: TAndroidModule13
     Text = 'OpenGLES2 3D Demo'
     Visible = True
     PosRelativeToAnchor = []
-    PosRelativeToParent = [rpCenterHorizontal]
+    PosRelativeToParent = [rpTop, rpCenterHorizontal]
     LayoutParamWidth = lpWrapContent
     LayoutParamHeight = lpWrapContent
     Alignment = taLeft
@@ -34,6 +34,7 @@ object AndroidModule13: TAndroidModule13
     BackgroundColor = colbrDefault
     FontColor = colbrSilver
     FontSize = 0
+    TextTypeFace = tfNormal
     Id = 60950
   end
   object jButton1: jButton
@@ -58,34 +59,9 @@ object AndroidModule13: TAndroidModule13
     OnClick = jButton1Click
     Id = 21192
   end
-  object jCanvasES2_1: jCanvasES2
-    Left = 8
-    Top = 118
-    Width = 287
-    Height = 242
-    MarginLeft = 10
-    MarginTop = 10
-    MarginRight = 10
-    MarginBottom = 10
-    Text = 'jCanvasES2_1'
-    Visible = True
-    Anchor = jButton1
-    PosRelativeToAnchor = [raBelow]
-    PosRelativeToParent = []
-    LayoutParamWidth = lpMatchParent
-    LayoutParamHeight = lpHalfOfParent
-    OnGLCreate = jCanvasES2_1GLCreate
-    OnGLChange = jCanvasES2_1GLChange
-    OnGLDraw = jCanvasES2_1GLDraw
-    OnGLDown = jCanvasES2_1GLDown
-    OnGLMove = jCanvasES2_1GLMove
-    OnGLUp = jCanvasES2_1GLUp
-    AutoRefresh = False
-    Id = 18974
-  end
   object jTextView2: jTextView
-    Left = 112
-    Top = 368
+    Left = 8
+    Top = 360
     Width = 135
     Height = 25
     MarginLeft = 10
@@ -104,6 +80,7 @@ object AndroidModule13: TAndroidModule13
     BackgroundColor = colbrDefault
     FontColor = colbrSilver
     FontSize = 0
+    TextTypeFace = tfNormal
     Id = 41110
   end
   object jTextView3: jTextView
@@ -127,7 +104,33 @@ object AndroidModule13: TAndroidModule13
     BackgroundColor = colbrDefault
     FontColor = colbrSilver
     FontSize = 0
+    TextTypeFace = tfNormal
     Id = 0
+  end
+  object jCanvasES2_1: jCanvasES2
+    Left = 8
+    Top = 120
+    Width = 287
+    Height = 216
+    MarginLeft = 10
+    MarginTop = 10
+    MarginRight = 10
+    MarginBottom = 10
+    Text = 'jCanvasES2_1'
+    Visible = True
+    Anchor = jButton1
+    PosRelativeToAnchor = [raBelow]
+    PosRelativeToParent = []
+    LayoutParamWidth = lpMatchParent
+    LayoutParamHeight = lpTwoFifthOfParent
+    OnGLCreate = jCanvasES2_1GLCreate
+    OnGLChange = jCanvasES2_1GLChange
+    OnGLDraw = jCanvasES2_1GLDraw
+    OnGLDown = jCanvasES2_1GLDown
+    OnGLMove = jCanvasES2_1GLMove
+    OnGLUp = jCanvasES2_1GLUp
+    AutoRefresh = False
+    Id = 7797798
   end
   object jTimer1: jTimer
     Enabled = False

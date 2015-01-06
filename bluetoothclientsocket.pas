@@ -52,15 +52,15 @@ jBluetoothClientSocket = class(jControl)
 end;
 
 function jBluetoothClientSocket_jCreate(env: PJNIEnv; this: JObject;_Self: int64): jObject;
-procedure jBluetoothClientSocket_jFree(env: PJNIEnv; this: JObject; _jbluetoothclientsocket: JObject);
-procedure jBluetoothClientSocket_SetDevice(env: PJNIEnv; this: JObject; _jbluetoothclientsocket: JObject; _device: jObject);
-procedure jBluetoothClientSocket_SetUUID(env: PJNIEnv; this: JObject; _jbluetoothclientsocket: JObject; _strUUID: string);
-procedure jBluetoothClientSocket_Connect(env: PJNIEnv; this: JObject; _jbluetoothclientsocket: JObject);
-procedure jBluetoothClientSocket_Write(env: PJNIEnv; this: JObject; _jbluetoothclientsocket: JObject; var _buffer: TDynArrayOfJByte);
-procedure jBluetoothClientSocket_WriteMessage(env: PJNIEnv; this: JObject; _jbluetoothclientsocket: JObject; _message: string);
-function jBluetoothClientSocket_Read(env: PJNIEnv; this: JObject; _jbluetoothclientsocket: JObject): TDynArrayOfJByte;
-function jBluetoothClientSocket_IsConnected(env: PJNIEnv; this: JObject; _jbluetoothclientsocket: JObject): boolean;
-procedure jBluetoothClientSocket_Disconnect(env: PJNIEnv; this: JObject; _jbluetoothclientsocket: JObject);
+procedure jBluetoothClientSocket_jFree(env: PJNIEnv; _jbluetoothclientsocket: JObject);
+procedure jBluetoothClientSocket_SetDevice(env: PJNIEnv; _jbluetoothclientsocket: JObject; _device: jObject);
+procedure jBluetoothClientSocket_SetUUID(env: PJNIEnv; _jbluetoothclientsocket: JObject; _strUUID: string);
+procedure jBluetoothClientSocket_Connect(env: PJNIEnv; _jbluetoothclientsocket: JObject);
+procedure jBluetoothClientSocket_Write(env: PJNIEnv; _jbluetoothclientsocket: JObject; var _buffer: TDynArrayOfJByte);
+procedure jBluetoothClientSocket_WriteMessage(env: PJNIEnv; _jbluetoothclientsocket: JObject; _message: string);
+function jBluetoothClientSocket_Read(env: PJNIEnv; _jbluetoothclientsocket: JObject): TDynArrayOfJByte;
+function jBluetoothClientSocket_IsConnected(env: PJNIEnv; _jbluetoothclientsocket: JObject): boolean;
+procedure jBluetoothClientSocket_Disconnect(env: PJNIEnv; _jbluetoothclientsocket: JObject);
 
 
 implementation
@@ -80,17 +80,11 @@ destructor jBluetoothClientSocket.Destroy;
 begin
   if not (csDesigning in ComponentState) then
   begin
-    if jForm(Owner).App <> nil then
-    begin
-      if jForm(Owner).App.Initialized then
-      begin
         if FjObject <> nil then
         begin
            jFree();
            FjObject:= nil;
         end;
-      end;
-    end;
   end;
   //you others free code here...'
   inherited Destroy;
@@ -108,21 +102,21 @@ end;
 
 function jBluetoothClientSocket.jCreate(): jObject;
 begin
-  Result:= jBluetoothClientSocket_jCreate(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis , int64(Self));
+  Result:= jBluetoothClientSocket_jCreate(FjEnv, FjThis , int64(Self));
 end;
 
 procedure jBluetoothClientSocket.jFree();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jBluetoothClientSocket_jFree(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject);
+     jBluetoothClientSocket_jFree(FjEnv, FjObject);
 end;
 
 procedure jBluetoothClientSocket.SetDevice(_device: jObject);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jBluetoothClientSocket_SetDevice(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, _device);
+     jBluetoothClientSocket_SetDevice(FjEnv, FjObject, _device);
 end;
 
 procedure jBluetoothClientSocket.SetUUID(_strUUID: string);
@@ -130,42 +124,42 @@ begin
   //in designing component state: set value here...
   FUUID:= _strUUID;
   if FInitialized then
-     jBluetoothClientSocket_SetUUID(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, _strUUID);
+     jBluetoothClientSocket_SetUUID(FjEnv, FjObject, _strUUID);
 end;
 
 function jBluetoothClientSocket.IsConnected(): boolean;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jBluetoothClientSocket_IsConnected(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject);
+   Result:= jBluetoothClientSocket_IsConnected(FjEnv, FjObject);
 end;
 
 procedure jBluetoothClientSocket.Connect();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jBluetoothClientSocket_Connect(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject);
+     jBluetoothClientSocket_Connect(FjEnv, FjObject);
 end;
 
 procedure jBluetoothClientSocket.Write(var _buffer: TDynArrayOfJByte);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jBluetoothClientSocket_Write(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, _buffer);
+     jBluetoothClientSocket_Write(FjEnv, FjObject, _buffer);
 end;
 
 procedure jBluetoothClientSocket.WriteMessage(_message: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jBluetoothClientSocket_WriteMessage(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, _message);
+     jBluetoothClientSocket_WriteMessage(FjEnv, FjObject, _message);
 end;
 
 function jBluetoothClientSocket.Read(): TDynArrayOfJByte;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jBluetoothClientSocket_Read(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject);
+   Result:= jBluetoothClientSocket_Read(FjEnv, FjObject);
 end;
 
 procedure jBluetoothClientSocket.GenEvent_OnBluetoothClientSocketConnected(Obj: TObject; _deviceName: string; _deviceAddress: string);
@@ -187,7 +181,7 @@ procedure jBluetoothClientSocket.Disconnect();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jBluetoothClientSocket_Disconnect(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject);
+     jBluetoothClientSocket_Disconnect(FjEnv, FjObject);
 end;
 
 {-------- jBluetoothClientSocket_JNI_Bridge ----------}
@@ -216,7 +210,7 @@ end;
 *)
 
 
-procedure jBluetoothClientSocket_jFree(env: PJNIEnv; this: JObject; _jbluetoothclientsocket: JObject);
+procedure jBluetoothClientSocket_jFree(env: PJNIEnv; _jbluetoothclientsocket: JObject);
 var
   jMethod: jMethodID=nil;
   jCls: jClass=nil;
@@ -227,7 +221,7 @@ begin
 end;
 
 
-procedure jBluetoothClientSocket_SetDevice(env: PJNIEnv; this: JObject; _jbluetoothclientsocket: JObject; _device: jObject);
+procedure jBluetoothClientSocket_SetDevice(env: PJNIEnv; _jbluetoothclientsocket: JObject; _device: jObject);
 var
   jParams: array[0..0] of jValue;
   jMethod: jMethodID=nil;
@@ -240,7 +234,7 @@ begin
 end;
 
 
-procedure jBluetoothClientSocket_SetUUID(env: PJNIEnv; this: JObject; _jbluetoothclientsocket: JObject; _strUUID: string);
+procedure jBluetoothClientSocket_SetUUID(env: PJNIEnv; _jbluetoothclientsocket: JObject; _strUUID: string);
 var
   jParams: array[0..0] of jValue;
   jMethod: jMethodID=nil;
@@ -254,7 +248,7 @@ env^.DeleteLocalRef(env,jParams[0].l);
 end;
 
 
-procedure jBluetoothClientSocket_Connect(env: PJNIEnv; this: JObject; _jbluetoothclientsocket: JObject);
+procedure jBluetoothClientSocket_Connect(env: PJNIEnv; _jbluetoothclientsocket: JObject);
 var
   jMethod: jMethodID=nil;
   jCls: jClass=nil;
@@ -264,7 +258,7 @@ begin
   env^.CallVoidMethod(env, _jbluetoothclientsocket, jMethod);
 end;
 
-procedure jBluetoothClientSocket_Write(env: PJNIEnv; this: JObject; _jbluetoothclientsocket: JObject; var _buffer: TDynArrayOfJByte);
+procedure jBluetoothClientSocket_Write(env: PJNIEnv; _jbluetoothclientsocket: JObject; var _buffer: TDynArrayOfJByte);
 var
   jParams: array[0..0] of jValue;
   jMethod: jMethodID=nil;
@@ -283,7 +277,7 @@ env^.DeleteLocalRef(env,jParams[0].l);
 end;
 
 
-procedure jBluetoothClientSocket_WriteMessage(env: PJNIEnv; this: JObject; _jbluetoothclientsocket: JObject; _message: string);
+procedure jBluetoothClientSocket_WriteMessage(env: PJNIEnv; _jbluetoothclientsocket: JObject; _message: string);
 var
   jParams: array[0..0] of jValue;
   jMethod: jMethodID=nil;
@@ -296,7 +290,7 @@ begin
   env^.DeleteLocalRef(env,jParams[0].l);
 end;
 
-function jBluetoothClientSocket_Read(env: PJNIEnv; this: JObject; _jbluetoothclientsocket: JObject): TDynArrayOfJByte;
+function jBluetoothClientSocket_Read(env: PJNIEnv; _jbluetoothclientsocket: JObject): TDynArrayOfJByte;
 var
   resultSize: integer;
   jResultArray: jObject;
@@ -311,7 +305,7 @@ begin
   env^.GetByteArrayRegion(env, jResultArray, 0, resultSize, @Result[0] {target});
 end;
 
-function jBluetoothClientSocket_IsConnected(env: PJNIEnv; this: JObject; _jbluetoothclientsocket: JObject): boolean;
+function jBluetoothClientSocket_IsConnected(env: PJNIEnv; _jbluetoothclientsocket: JObject): boolean;
 var
   jBoo: JBoolean;
   jMethod: jMethodID=nil;
@@ -324,7 +318,7 @@ begin
 end;
 
 
-procedure jBluetoothClientSocket_Disconnect(env: PJNIEnv; this: JObject; _jbluetoothclientsocket: JObject);
+procedure jBluetoothClientSocket_Disconnect(env: PJNIEnv; _jbluetoothclientsocket: JObject);
 var
   jMethod: jMethodID=nil;
   jCls: jClass=nil;

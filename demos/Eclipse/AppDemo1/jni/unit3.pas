@@ -177,6 +177,7 @@ end;
 procedure TAndroidModule3.DataModuleJNIPrompt(Sender: TObject);
 begin
   //Self.Show;
+  jEditText1.SetFocus;
 end;
 
 procedure TAndroidModule3.DataModuleRotate(Sender: TObject; rotate: integer; var rstRotate: integer);

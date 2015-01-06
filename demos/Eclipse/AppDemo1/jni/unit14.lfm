@@ -34,6 +34,7 @@ object AndroidModule14: TAndroidModule14
     BackgroundColor = colbrDefault
     FontColor = colbrOrange
     FontSize = 0
+    TextTypeFace = tfNormal
     Id = 41380
   end
   object jButton1: jButton
@@ -45,7 +46,7 @@ object AndroidModule14: TAndroidModule14
     MarginTop = 5
     MarginRight = 5
     MarginBottom = 5
-    Text = 'Get/Start'
+    Text = 'Http Get/Asyn Start'
     Visible = True
     Anchor = jCheckBox1
     PosRelativeToAnchor = [raBelow]
@@ -101,9 +102,11 @@ object AndroidModule14: TAndroidModule14
     BackgroundColor = colbrDefault
     FontColor = colbrSilver
     FontSize = 0
+    TextTypeFace = tfNormal
     Id = 69640
   end
   object jEditText1: jEditText
+    Tag = 1
     Left = 8
     Top = 192
     Width = 288
@@ -121,12 +124,12 @@ object AndroidModule14: TAndroidModule14
     LayoutParamHeight = lpOneQuarterOfParent
     Alignment = taLeft
     InputTypeEx = itxMultiLine
-    LineMaxLength = 5000
+    MaxTextLength = 3000
     BackgroundColor = colbrLightSlateGray
     FontColor = colbrDefault
     FontSize = 0
     ScrollBarStyle = scrlInsideInset
-    MaxLines = 1000
+    MaxLines = 50
     HorScrollBar = False
     VerScrollBar = True
     WrappingLine = True
@@ -153,6 +156,7 @@ object AndroidModule14: TAndroidModule14
     BackgroundColor = colbrDefault
     FontColor = colbrSilver
     FontSize = 0
+    TextTypeFace = tfNormal
     Id = 47102
   end
   object jScrollView1: jScrollView
@@ -187,12 +191,12 @@ object AndroidModule14: TAndroidModule14
       LayoutParamHeight = lpMatchParent
       Alignment = taLeft
       InputTypeEx = itxMultiLine
-      LineMaxLength = 5000
+      MaxTextLength = 3000
       BackgroundColor = colbrLightSlateGray
       FontColor = colbrDefault
       FontSize = 0
       ScrollBarStyle = scrNone
-      MaxLines = 1
+      MaxLines = 50
       HorScrollBar = False
       VerScrollBar = False
       WrappingLine = False

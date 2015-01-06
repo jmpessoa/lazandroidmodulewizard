@@ -146,6 +146,7 @@ object AndroidModule1: TAndroidModule1
     Id = 2266437
   end
   object jEditText1: jEditText
+    Tag = 1
     Left = 8
     Top = 344
     Width = 138
@@ -163,7 +164,7 @@ object AndroidModule1: TAndroidModule1
     LayoutParamHeight = lpWrapContent
     Alignment = taLeft
     InputTypeEx = itxText
-    LineMaxLength = 300
+    MaxTextLength = 300
     BackgroundColor = colbrDefault
     FontColor = colbrDefault
     FontSize = 0
@@ -221,6 +222,7 @@ object AndroidModule1: TAndroidModule1
     Id = 1300451
   end
   object jImageView1: jImageView
+    Tag = 1
     Left = 128
     Top = 400
     Width = 48
@@ -239,7 +241,6 @@ object AndroidModule1: TAndroidModule1
     ImageIndex = 3
     Images = jImageList1
     BackgroundColor = colbrGreenYellow
-    IsBackgroundImage = False
     Id = 0
   end
   object jSqliteDataAccess1: jSqliteDataAccess

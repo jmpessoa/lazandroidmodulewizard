@@ -39,13 +39,13 @@ jPreferences = class(jControl)
 end;
 
 function jPreferences_jCreate(env: PJNIEnv; this: JObject;_Self: int64; _IsShared: boolean): jObject;
-procedure jPreferences_jFree(env: PJNIEnv; this: JObject; _jPreferences: JObject);
-function jPreferences_GetIntData(env: PJNIEnv; this: JObject; _jPreferences: JObject; _key: string; _defaultValue: integer): integer;
-procedure jPreferences_SetIntData(env: PJNIEnv; this: JObject; _jPreferences: JObject; _key: string; _value: integer);
-function jPreferences_GetStringData(env: PJNIEnv; this: JObject; _jPreferences: JObject; _key: string; _defaultValue: string): string;
-procedure jPreferences_SetStringData(env: PJNIEnv; this: JObject; _jPreferences: JObject; _key: string; _value: string);
-function jPreferences_GetBoolData(env: PJNIEnv; this: JObject; _jPreferences: JObject; _key: string; _defaultValue: boolean): boolean;
-procedure jPreferences_SetBoolData(env: PJNIEnv; this: JObject; _jPreferences: JObject; _key: string; _value: boolean);
+procedure jPreferences_jFree(env: PJNIEnv; _jPreferences: JObject);
+function jPreferences_GetIntData(env: PJNIEnv; _jPreferences: JObject; _key: string; _defaultValue: integer): integer;
+procedure jPreferences_SetIntData(env: PJNIEnv; _jPreferences: JObject; _key: string; _value: integer);
+function jPreferences_GetStringData(env: PJNIEnv; _jPreferences: JObject; _key: string; _defaultValue: string): string;
+procedure jPreferences_SetStringData(env: PJNIEnv; _jPreferences: JObject; _key: string; _value: string);
+function jPreferences_GetBoolData(env: PJNIEnv; _jPreferences: JObject; _key: string; _defaultValue: boolean): boolean;
+procedure jPreferences_SetBoolData(env: PJNIEnv; _jPreferences: JObject; _key: string; _value: boolean);
 
 
 implementation
@@ -63,17 +63,11 @@ destructor jPreferences.Destroy;
 begin
   if not (csDesigning in ComponentState) then
   begin
-    if jForm(Owner).App <> nil then
-    begin
-      if jForm(Owner).App.Initialized then
-      begin
         if FjObject  <> nil then
         begin
            jFree();
            FjObject := nil;
         end;
-      end;
-    end;
   end;
   //you others free code here...
   inherited Destroy;
@@ -91,56 +85,56 @@ end;
 
 function jPreferences.jCreate( _IsShared: boolean): jObject;
 begin
-   Result:= jPreferences_jCreate(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis , int64(Self) ,_IsShared);
+   Result:= jPreferences_jCreate(FjEnv, FjThis , int64(Self) ,_IsShared);
 end;
 
 procedure jPreferences.jFree();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jPreferences_jFree(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject );
+     jPreferences_jFree(FjEnv, FjObject );
 end;
 
 function jPreferences.GetIntData(_key: string; _defaultValue: integer): integer;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jPreferences_GetIntData(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject , _key ,_defaultValue);
+   Result:= jPreferences_GetIntData(FjEnv, FjObject , _key ,_defaultValue);
 end;
 
 procedure jPreferences.SetIntData(_key: string; _value: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jPreferences_SetIntData(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject , _key ,_value);
+     jPreferences_SetIntData(FjEnv, FjObject , _key ,_value);
 end;
 
 function jPreferences.GetStringData(_key: string; _defaultValue: string): string;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jPreferences_GetStringData(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject , _key ,_defaultValue);
+   Result:= jPreferences_GetStringData(FjEnv, FjObject , _key ,_defaultValue);
 end;
 
 procedure jPreferences.SetStringData(_key: string; _value: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jPreferences_SetStringData(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject , _key ,_value);
+     jPreferences_SetStringData(FjEnv, FjObject , _key ,_value);
 end;
 
 function jPreferences.GetBoolData(_key: string; _defaultValue: boolean): boolean;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jPreferences_GetBoolData(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject , _key ,_defaultValue);
+   Result:= jPreferences_GetBoolData(FjEnv, FjObject , _key ,_defaultValue);
 end;
 
 procedure jPreferences.SetBoolData(_key: string; _value: boolean);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jPreferences_SetBoolData(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject , _key ,_value);
+     jPreferences_SetBoolData(FjEnv, FjObject , _key ,_value);
 end;
 
 {-------- jPreferences_JNI_Bridge ----------}
@@ -170,7 +164,7 @@ end;
 *)
 
 
-procedure jPreferences_jFree(env: PJNIEnv; this: JObject; _jPreferences: JObject);
+procedure jPreferences_jFree(env: PJNIEnv; _jPreferences: JObject);
 var
   jMethod: jMethodID=nil;
   jCls: jClass=nil;
@@ -181,7 +175,7 @@ begin
 end;
 
 
-function jPreferences_GetIntData(env: PJNIEnv; this: JObject; _jPreferences: JObject; _key: string; _defaultValue: integer): integer;
+function jPreferences_GetIntData(env: PJNIEnv; _jPreferences: JObject; _key: string; _defaultValue: integer): integer;
 var
   jParams: array[0..1] of jValue;
   jMethod: jMethodID=nil;
@@ -196,7 +190,7 @@ env^.DeleteLocalRef(env,jParams[0].l);
 end;
 
 
-procedure jPreferences_SetIntData(env: PJNIEnv; this: JObject; _jPreferences: JObject; _key: string; _value: integer);
+procedure jPreferences_SetIntData(env: PJNIEnv; _jPreferences: JObject; _key: string; _value: integer);
 var
   jParams: array[0..1] of jValue;
   jMethod: jMethodID=nil;
@@ -211,7 +205,7 @@ env^.DeleteLocalRef(env,jParams[0].l);
 end;
 
 
-function jPreferences_GetStringData(env: PJNIEnv; this: JObject; _jPreferences: JObject; _key: string; _defaultValue: string): string;
+function jPreferences_GetStringData(env: PJNIEnv; _jPreferences: JObject; _key: string; _defaultValue: string): string;
 var
   jStr: JString;
   jBoo: JBoolean;
@@ -236,7 +230,7 @@ env^.DeleteLocalRef(env,jParams[0].l);
 end;
 
 
-procedure jPreferences_SetStringData(env: PJNIEnv; this: JObject; _jPreferences: JObject; _key: string; _value: string);
+procedure jPreferences_SetStringData(env: PJNIEnv; _jPreferences: JObject; _key: string; _value: string);
 var
   jParams: array[0..1] of jValue;
   jMethod: jMethodID=nil;
@@ -252,7 +246,7 @@ env^.DeleteLocalRef(env,jParams[0].l);
 end;
 
 
-function jPreferences_GetBoolData(env: PJNIEnv; this: JObject; _jPreferences: JObject; _key: string; _defaultValue: boolean): boolean;
+function jPreferences_GetBoolData(env: PJNIEnv; _jPreferences: JObject; _key: string; _defaultValue: boolean): boolean;
 var
   jBoo: JBoolean;
   jParams: array[0..1] of jValue;
@@ -269,7 +263,7 @@ env^.DeleteLocalRef(env,jParams[0].l);
 end;
 
 
-procedure jPreferences_SetBoolData(env: PJNIEnv; this: JObject; _jPreferences: JObject; _key: string; _value: boolean);
+procedure jPreferences_SetBoolData(env: PJNIEnv; _jPreferences: JObject; _key: string; _value: boolean);
 var
   jParams: array[0..1] of jValue;
   jMethod: jMethodID=nil;

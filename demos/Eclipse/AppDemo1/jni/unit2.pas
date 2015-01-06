@@ -148,7 +148,7 @@ begin
     gApp.CreateForm(TAndroidModule8, AndroidModule8);
     AndroidModule8.Init(gApp);
   end
-  else AndroidModule8.Show; //actRecyclable
+  else AndroidModule8.Show;
 end;
 
 procedure TAndroidModule2.jButton7Click(Sender: TObject);
@@ -158,7 +158,7 @@ begin
     gApp.CreateForm(TAndroidModule9, AndroidModule9);
     AndroidModule9.Init(gApp);
   end
-  else AndroidModule9.Show;         //actRecyclable
+  else AndroidModule9.Show;
 end;
 
 procedure TAndroidModule2.jButton8Click(Sender: TObject);  //gl_1 2D
@@ -174,12 +174,13 @@ end;
 
 procedure TAndroidModule2.jButton9Click(Sender: TObject); //gl_2 2D
 begin
-  if AndroidModule11 = nil then
-  begin
-    gApp.CreateForm(TAndroidModule11, AndroidModule11);
+
+ if AndroidModule11 = nil then
+ begin
+   gApp.CreateForm(TAndroidModule11, AndroidModule11);
     //AndroidModule11:= TAndroidModule11.Create(Self);
-    AndroidModule11.Init(gApp);
-  end else AndroidModule11.Show;
+   AndroidModule11.Init(gApp);
+ end else AndroidModule11.Show;
 end;
 
 procedure TAndroidModule2.jButton10Click(Sender: TObject);  //gl_1 3D

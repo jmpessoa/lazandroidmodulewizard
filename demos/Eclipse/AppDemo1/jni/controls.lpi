@@ -43,7 +43,6 @@
       <Unit0>
         <Filename Value="controls.lpr"/>
         <IsPartOfProject Value="True"/>
-        <UnitName Value="controls"/>
       </Unit0>
       <Unit1>
         <Filename Value="unit1.pas"/>
@@ -146,7 +145,6 @@
       <Unit15>
         <Filename Value="unitglobal.pas"/>
         <IsPartOfProject Value="True"/>
-        <UnitName Value="UnitGlobal"/>
       </Unit15>
     </Units>
   </ProjectOptions>
@@ -180,11 +178,7 @@
       </Options>
     </Linking>
     <Other>
-      <CompilerMessages>
-        <MsgFileName Value=""/>
-      </CompilerMessages>
       <CustomOptions Value="-dANDROID -Xd -CpArmV6 -CfSoft -FLC:\adt32\ndk7\platforms\android-8\arch-arm\usr\lib\libdl.so -FUC:\adt32\eclipse\workspace\AppDemo1\obj\Controls -oC:\adt32\eclipse\workspace\AppDemo1\libs\armeabi\libcontrols.so"/>
-      <CompilerPath Value="$(CompPath)"/>
     </Other>
   </CompilerOptions>
   <Debugging>

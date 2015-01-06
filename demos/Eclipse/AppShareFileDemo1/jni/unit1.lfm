@@ -74,6 +74,7 @@ object AndroidModule1: TAndroidModule1
     BackgroundColor = colbrDefault
     FontColor = colbrLime
     FontSize = 0
+    TextTypeFace = tfNormal
     Id = 2106793
   end
   object jButton3: jButton
@@ -165,6 +166,7 @@ object AndroidModule1: TAndroidModule1
     Id = 9882314
   end
   object jImageView1: jImageView
+    Tag = 1
     Left = 128
     Top = 432
     Width = 48
@@ -178,7 +180,6 @@ object AndroidModule1: TAndroidModule1
     LayoutParamHeight = lpWrapContent
     ImageIndex = -1
     BackgroundColor = colbrDefault
-    IsBackgroundImage = False
     Id = 1233699
   end
   object jButton7: jButton
@@ -204,6 +205,7 @@ object AndroidModule1: TAndroidModule1
     Id = 4929774
   end
   object jImageView2: jImageView
+    Tag = 1
     Left = 128
     Top = 496
     Width = 48
@@ -217,7 +219,6 @@ object AndroidModule1: TAndroidModule1
     LayoutParamHeight = lpWrapContent
     ImageIndex = -1
     BackgroundColor = colbrDefault
-    IsBackgroundImage = False
     Id = 0
   end
   object jTextFileManager1: jTextFileManager

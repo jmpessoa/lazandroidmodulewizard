@@ -1,13 +1,13 @@
 package com.example.appspinnerdemo;
 
-//[LazAndroidModuleWizard - Version 0.6 - 12 October 2014 // Add FORM Designer and more!
-//
-//[https://github.com/jmpessoa/lazandroidmodulewizard]
-//
+//Lazarus Android Module Wizard - Version 0.6 - rev. 11 - 03 January- 2014
+//[Form Designer and Components development model!]
+//Author: jmpessoa@hotmail.com
+//https://github.com/jmpessoa/lazandroidmodulewizard
+//http://forum.lazarus.freepascal.org/index.php/topic,21919.0.html
 
-//Android Java Interface for Pascal/Delphi XE5  - 
-//[And LAZARUS by jmpessoa@hotmail.com - december 2013]
-
+//Android Java Interface for Pascal/Delphi XE5
+//[And LAZARUS by jmpessoa@hotmail.com - december 2013
 //
 //Developer
 //          Simon,Choi / Choi,Won-sik
@@ -54,12 +54,19 @@ package com.example.appspinnerdemo;
 //
 
 import android.annotation.SuppressLint;
+import android.annotation.TargetApi;
 import android.app.ActionBar;
+import android.app.ActionBar.Tab;
+import android.app.ActionBar.TabListener;
 import android.app.Activity;
 import android.app.ActivityManager.RunningAppProcessInfo;
 import android.app.ActivityManager.RunningServiceInfo;
 import android.app.ActivityManager;
 import android.app.AlertDialog;
+import android.app.Dialog;
+import android.app.Fragment;
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
 import android.app.PendingIntent;
 import android.app.ProgressDialog;
 import android.bluetooth.BluetoothAdapter;
@@ -80,6 +87,7 @@ import android.content.pm.PackageManager.NameNotFoundException;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.content.res.AssetFileDescriptor;
+import android.content.res.AssetManager;
 import android.database.Cursor;
 import android.graphics.Bitmap.CompressFormat;
 import android.graphics.Bitmap;
@@ -89,6 +97,8 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.Typeface;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.BitmapDrawable;
 import android.opengl.GLES10;
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView.Renderer;
@@ -110,6 +120,7 @@ import android.text.Editable;
 import android.text.InputFilter;
 import android.text.InputType;
 import android.text.TextWatcher;
+import android.text.method.NumberKeyListener;
 import android.text.method.ScrollingMovementMethod;
 import android.util.DisplayMetrics;
 import android.location.Address;
@@ -125,6 +136,7 @@ import android.net.Uri;
 import android.net.wifi.WifiManager;
 import android.util.Log;
 import android.util.TypedValue;
+import android.view.ContextMenu;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.Gravity;
@@ -192,6 +204,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.StringTokenizer;
 import java.util.UUID;
 import java.util.regex.Pattern;
 
@@ -206,6 +219,8 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.ByteArrayBuffer;
 import org.apache.http.util.EntityUtils;
+
+//import com.example.appmenudemo.R.drawable;
 
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -335,10 +350,12 @@ private OnClickListener onClickListener;   // event
 
 private OnClickListener onViewClickListener;   // generic delegate event
 
-private OnItemClickListener onListItemClickListener;
+private OnItemClickListener onListItemClickListener; 
 
 private Boolean         enabled  = true;   //
 private Intent intent;
+
+private int mCountTab = 0;
 
 // Constructor
 public  jForm(Controls ctrls, long pasobj) {
@@ -366,20 +383,21 @@ onClickListener = new OnClickListener() {
   }; 
 };
 
-//Init Event
+//geric list item click Event
 onListItemClickListener = new OnItemClickListener() {
 @Override
 public  void onItemClick(AdapterView<?> parent, View v, int position, long id) {	   
-	 Log.i("Form_App_ItemListClicklistener","ItemClick!");
+	 //Log.i("Form_App_ItemListClicklistener","ItemClick!");
      controls.jAppOnListItemClick(parent, v, position, v.getId());
 }
 };
+
 
 //Init Event
 onViewClickListener = new OnClickListener() {
 public  void onClick(View view) {
  if (enabled) {
-   Log.i("Form_App_Clicklistener","Click!");
+   //Log.i("Form_App_Clicklistener","Click!");
    controls.jAppOnViewClick(view, view.getId());
  }
 };
@@ -396,8 +414,7 @@ public  RelativeLayout GetLayout() {
 }
 
 //
-public  void Show(int effect) {
-		
+public  void Show(int effect) {		
    //Log.i("Form:","Show");	
    controls.appLayout.addView( layout );
    parent = controls.appLayout;
@@ -405,8 +422,7 @@ public  void Show(int effect) {
    if (effect != Const.Eft_None) {
      layout.startAnimation(controls.Ani_Effect(effect,250));
    };
-
-   Log.i("Form:","Show --> OnJNIPrompt");
+   //Log.i("Form:","Show --> OnJNIPrompt");
 }
 
 //
@@ -446,6 +462,7 @@ else         { if (layout.getParent() != null)
                { controls.appLayout.removeView(layout); } };
 }
 
+
 //
 public  void SetEnabled ( boolean enabled ) {
 //Log.i("Form:","Parent Form Enabled "+ Integer.toString(layout.getChildCount()));
@@ -469,14 +486,14 @@ public String GetDateTime() {
 }
 
 //Free object except Self, Pascal Code Free the class.
- public  void Free() {	
+ public void Free() {	
    if (parent != null) { controls.appLayout.removeView(layout); }  
    onClickListener = null;
    layout.setOnClickListener(null);
    layparam = null;
    layout   = null;
   
-   Log.i("jForm:", "Free");
+   //Log.i("jForm:", "Free");
  }
   
  //http://startandroid.ru/en/lessons/complete-list/250-lesson-29-invoking-activity-and-getting-a-result-startactivityforresult-method.html
@@ -507,12 +524,6 @@ public double GetDoubleExtra(Intent data, String extraName, double defaultValue)
     return value;  
 }
 
-/*
-public ActionBar GetActionBar() {   
-	   return this.actionbar; 
-}
-
-*/
                         
 public  OnClickListener GetOnViewClickListener () {   
 	return this.onViewClickListener; 
@@ -522,6 +533,339 @@ public  OnClickListener GetOnViewClickListener () {
 public  OnItemClickListener  GetOnListItemClickListener  () {   
 	return this.onListItemClickListener; 
 }
+
+public void SetWifiEnabled(boolean _status) {
+    WifiManager wifiManager = (WifiManager)this.controls.activity.getSystemService(Context.WIFI_SERVICE);             
+    wifiManager.setWifiEnabled(_status);
+ }
+
+ public boolean IsWifiEnabled() {
+    WifiManager wifiManager = (WifiManager)this.controls.activity.getSystemService(Context.WIFI_SERVICE);
+    return  wifiManager.isWifiEnabled();	
+ }
+              
+public String GetEnvironmentDirectoryPath(int _directory) {
+	
+	File filePath= null;
+	String absPath="";   //fail!
+	  
+	//Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS);break; //only Api 19!
+	if (_directory != 8) {		  	   	 
+	  switch(_directory) {	                       
+	    case 0:  filePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS); break;	   
+	    case 1:  filePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM); break;
+	    case 2:  filePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MUSIC); break;
+	    case 3:  filePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES); break;
+	    case 4:  filePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_NOTIFICATIONS); break;
+	    case 5:  filePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MOVIES); break;
+	    case 6:  filePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PODCASTS); break;
+	    case 7:  filePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_RINGTONES); break;
+	    
+	    case 9: absPath  = this.controls.activity.getFilesDir().getAbsolutePath(); break;      //Result : /data/data/com/MyApp/files	    	    
+	    case 10: absPath = this.controls.activity.getFilesDir().getPath();
+	             absPath = absPath.substring(0, absPath.lastIndexOf("/")) + "/databases"; break;
+	    case 11: absPath = this.controls.activity.getFilesDir().getPath();
+                 absPath = absPath.substring(0, absPath.lastIndexOf("/")) + "/shared_prefs"; break;	             
+	           
+	  }
+	  	  
+	  //Make sure the directory exists.
+      if (_directory < 8) { 
+    	 filePath.mkdirs();
+    	 absPath= filePath.getPath(); 
+      }	        
+      
+	}else {  //== 8 
+	    if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED) == true) {
+	    	filePath = Environment.getExternalStorageDirectory();  //sdcard!
+	    	// Make sure the directory exists.
+	    	filePath.mkdirs();
+	   	    absPath= filePath.getPath();
+	    }
+	}    	
+	    		  
+	return absPath;
+}
+
+public String GetInternalAppStoragePath() { //GetAbsoluteDirectoryPath 
+   String PathDat = this.controls.activity.getFilesDir().getAbsolutePath();       //Result : /data/data/com/MyApp/files
+   return PathDat;
+}
+
+
+private void copyFileUsingFileStreams(File source, File dest)
+		throws IOException {
+	InputStream input = null;
+	OutputStream output = null;
+	try {
+		input = new FileInputStream(source);
+		output = new FileOutputStream(dest);
+		byte[] buf = new byte[1024];
+		int bytesRead;
+		while ((bytesRead = input.read(buf)) > 0) {
+			output.write(buf, 0, bytesRead);
+		}
+	} finally {
+		input.close();
+		output.close();
+	}
+}
+
+public boolean CopyFile(String _scrFullFileName, String _destFullFileName) {
+	File src= new File(_scrFullFileName);
+	File dest= new File(_destFullFileName);
+	try {
+		copyFileUsingFileStreams(src, dest);
+		return true;
+	} catch (IOException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+		return false;
+	}
+}
+
+//ref. https://xjaphx.wordpress.com/2011/10/02/store-and-use-files-in-assets/
+//result: path to new storage [Internal App Storage]
+
+public String LoadFromAssets(String _filename){
+	    
+	    String pathRes="";
+	    
+		InputStream is = null;
+		FileOutputStream fos = null;					    		           			
+		String PathDat = controls.activity.getFilesDir().getAbsolutePath();		
+		try {		   		     			
+			File outfile = new File(PathDat, _filename);				
+							
+			fos = new FileOutputStream(outfile);  //save to data/data/your_package/files/your_file_name										
+			is = controls.activity.getAssets().open(_filename);	     
+			int size = is.available();	     
+			byte[] buffer = new byte[size];
+			
+			for (int c = is.read(buffer); c != -1; c = is.read(buffer)){
+		      fos.write(buffer, 0, c);
+			}	     								
+			is.close();								
+			fos.close();
+			pathRes= PathDat +"/"+ _filename;
+			
+		}catch (IOException e) {
+		     e.printStackTrace();		     
+		}
+		
+		return pathRes;
+}
+
+public boolean IsSdCardMounted() {		  
+   return Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED); 
+}
+
+public void DeleteFile(String _filename) {
+   this.controls.activity.deleteFile(_filename);
+}
+
+public void DeleteFile(String _fullPath, String _filename) {	
+   File file;
+   if ( _fullPath.equalsIgnoreCase("") ) {	
+      file = new File(Environment.getExternalStorageDirectory()+"/"+ _filename); // root
+   }
+   else {
+	  file = new File(_fullPath+"/"+ _filename);   
+   }  
+   file.delete();   
+}
+
+public void DeleteFile(int _environmentDir, String _filename) {		  
+	String baseDir = GetEnvironmentDirectoryPath(_environmentDir);
+	if (!baseDir.equalsIgnoreCase("")) {
+   	    File file = new File(baseDir, _filename);    	    
+	    file.delete();	   
+	}
+}
+
+public String CreateDir(String _dirName) {
+	this.controls.activity.getDir(_dirName, 0); //if not exist -->> CREATE!
+    String absPath = this.controls.activity.getFilesDir().getPath();
+    absPath = absPath.substring(0, absPath.lastIndexOf("/")) + "/"+_dirName; 
+	return absPath;
+}
+
+public String CreateDir(int _environmentDir, String _dirName) {	
+    String baseDir = GetEnvironmentDirectoryPath(_environmentDir);
+    if (!baseDir.equalsIgnoreCase("")) {
+       File file = new File(baseDir, _dirName);    
+       file.mkdirs();        
+  	  return file.getPath(); 
+    }else return "";
+}
+
+public String CreateDir(String _fullPath, String _dirName) {	
+    File file = new File(_fullPath, _dirName);    
+    file.mkdirs();      
+    return file.getPath();
+}
+
+/*
+Added in API level 11
+Returns whether the primary "external" storage device is emulated. If true, 
+data stored on this device will be stored on a portion of the internal storage system.
+*/
+public boolean IsExternalStorageEmulated () {
+  return  Environment.isExternalStorageEmulated();
+}	
+
+/*
+Added in API level 9
+Returns whether the primary "external" storage device is removable.
+*/
+public boolean IsExternalStorageRemovable() {
+	return  Environment.isExternalStorageRemovable();
+}	
+
+//
+public  String GetjFormVersionFeatures() { 
+    String listVersionInfo = 
+		   "6$5=SetWifiEnabled;" +  //[0.6-05]
+		   "6$5=IsWifiEnabled;" +
+		   "6$5=GetEnvironmentDirectoryPath;" +
+		   "6$5=GetInternalAppStoragePath;" +
+		   "6$5=CopyFile;" +
+		   "6$5=LoadFromAssets;" +  		         
+		   "6$5=IsSdCardMounted;" +
+		   "6$5=DeleteFile;" +
+		   "6$5=CreateDir;" +
+		   "6$5=IsExternalStorageEmulated;" +
+		   "6$5=IsExternalStorageRemovable";  
+    return listVersionInfo;
+}
+
+
+//http://daniel-codes.blogspot.com.br/2009/12/dynamically-retrieving-resources-in.html
+
+/*
+*Given that you can access R.java just fine normally in code.
+*As long as you are retrieving data from your application's R.java - Use reflection!
+*/
+public int GetStringResourceId(String _resName) {
+	  try {
+	     Class<?> res = R.string.class;
+	     Field field = res.getField(_resName); 
+	     int strId = field.getInt(null);
+	     return strId;
+	   }
+	   catch (Exception e) {
+	     Log.e("jForm", "Failure to Get String  Resource", e);
+	     return 0;
+	   }   
+}
+
+//by jmpessoa
+public String GetStringResourceById(int _resID) {   	
+   return (String)( this.controls.activity.getResources().getText(_resID));
+}
+
+//by jmpessoa
+public int GetDrawableResourceId(String _resName) {
+	  try {
+	     Class<?> res = R.drawable.class;
+	     Field field = res.getField(_resName);  //"drawableName"
+	     int drawableId = field.getInt(null);
+	     return drawableId;
+	  }
+	  catch (Exception e) {
+	     Log.e("jForm", "Failure to get drawable id.", e);
+	     return 0;
+	  }
+}
+
+//by jmpessoa
+public Drawable GetDrawableResourceById(int _resID) {
+	return (Drawable)( this.controls.activity.getResources().getDrawable(_resID));	
+}
+
+//by  thierrydijoux
+public String GetQuantityStringByName(String _resName, int _quantity) {
+	int id = this.controls.activity.getResources().getIdentifier(_resName, "plurals", this.controls.activity.getPackageName());
+  String value = id == 0 ? "" : (String) this.controls.activity.getResources().getQuantityString(id, _quantity, _quantity);
+	return value;
+}
+
+//by thierrydijoux
+public String GetStringResourceByName(String _resName) {
+	int id = this.controls.activity.getResources().getIdentifier(_resName, "string", this.controls.activity.getPackageName());
+  String value = id == 0 ? "" : (String) this.controls.activity.getResources().getText(id);
+	return value;
+}   
+
+
+public ActionBar GetActionBar() { 
+    return this.controls.activity.getActionBar();
+}
+
+/*
+ * To disableAction-bar Icon and Title, you must do two things:
+ setDisplayShowHomeEnabled(false);  // hides action bar icon
+ setDisplayShowTitleEnabled(false); // hides action bar title
+ */
+
+public void HideActionBar() {
+ ActionBar actionBar = this.controls.activity.getActionBar(); 
+ actionBar.hide();          
+}
+
+public void ShowActionBar() {	         
+	ActionBar actionBar = this.controls.activity.getActionBar();
+	actionBar.show();
+}
+
+//Hide the title label
+public void ShowTitleActionBar(boolean _value) {
+	ActionBar actionBar = this.controls.activity.getActionBar();
+    actionBar.setDisplayShowTitleEnabled(_value);
+}
+
+//Hide the logo
+public void HideLogoActionBar(boolean _value) { 
+   ActionBar actionBar = this.controls.activity.getActionBar();	    
+   actionBar.setDisplayShowHomeEnabled(_value);
+}
+
+//set a title and subtitle to the Action bar as shown in the code snippet.
+public void SetTitleActionBar(String _title) {
+	ActionBar actionBar = this.controls.activity.getActionBar();   	
+    actionBar.setTitle(_title);    
+}
+
+//set a title and subtitle to the Action bar as shown in the code snippet.
+public void SetSubTitleActionBar(String _subtitle) {
+   ActionBar actionBar = this.controls.activity.getActionBar();    
+   actionBar.setSubtitle(_subtitle);
+   //actionBar.setDisplayHomeAsUpEnabled(true);  
+}
+
+//forward [<] activity! // If your minSdkVersion is 11 or higher!
+/*.*/public void SetDisplayHomeAsUpEnabledActionBar(boolean _value) {
+   ActionBar actionBar = this.controls.activity.getActionBar();    
+   actionBar.setDisplayHomeAsUpEnabled(_value);
+}	
+
+public void SetIconActionBar(String _iconIdentifier) {
+	ActionBar actionBar = this.controls.activity.getActionBar();   	
+    actionBar.setIcon(GetDrawableResourceById(GetDrawableResourceId(_iconIdentifier)));
+}
+
+public void SetTabNavigationModeActionBar(){
+	ActionBar actionBar = this.controls.activity.getActionBar();
+	actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);	//API 11
+	actionBar.setSelectedNavigationItem(0);
+}
+
+//This method remove all tabs from the action bar and deselect the current tab
+public void RemoveAllTabsActionBar() {
+	ActionBar actionBar = this.controls.activity.getActionBar();
+	actionBar.removeAllTabs();
+}
+
 
 
 }
@@ -559,25 +903,6 @@ int MarginTop = 5;
 int marginRight = 5;
 int marginBottom = 5;
 
-//by jmpessoa
-public void setMarginRight(int x) {
-	marginRight = x;
-}
-
-//by jmpessoa
-public void setMarginBottom(int y) {
-	marginBottom = y;
-}
-//by jmpessoa
-public void setMarginLeft(int x) {
-	MarginLeft = x;
-}
-
-//by jmpessoa
-public void setMarginTop(int y) {
-	MarginTop = y;
-}
-
 // Constructor
 public  jTextView(android.content.Context context,
                Controls ctrls,long pasobj ) {                    //jTextView(this.activity,this,pasobj));
@@ -599,15 +924,7 @@ onClickListener = new OnClickListener() {
 setOnClickListener(onClickListener);
 }
 
-//
-public  void setXYWH ( int x, int y, int w, int h ) {
-lparams.width  = w;
-lparams.height = h;
-lparams.setMargins(x,y,10,10);
-//
-this.setLayoutParams(lparams);
-}
-
+//by jmpessoa
 public void setLeftTopRightBottomWidthHeight(int left, int top, int right, int bottom, int w, int h) {
 	MarginLeft = left;
 	MarginTop = top;
@@ -656,23 +973,6 @@ public void addLParamsParentRule(int rule) {
 	countParentRule = countParentRule + 1;
 }
 
-//by jmpessoa
-public void setIdEx(int id) {
-	setId(id);   
-}
-
-public void setText2(String txt) {
-	   this.setText(txt);
-}
-
-public String getText2() {
-	return this.getText().toString();
-}
-
-public void setTextColor2(int value) {
-	this.setTextColor(value);  
-}
-
 // LORDMAN 2013-08-13
 public  void setTextAlignment( int align ) {
   switch ( align ) {
@@ -686,48 +986,41 @@ public  void setTextAlignment( int align ) {
      default : { setGravity( Gravity.LEFT              ); }; break;
   };
 }
-
-//by jmpessoa
-public  void setParent3( android.view.ViewGroup viewgroup ) {
+             
+public void setParent3( android.view.ViewGroup viewgroup ) {  //deprec...
 if (parent != null) { parent.removeView(this); }
    parent = viewgroup;
    viewgroup.addView(this,lparams);
 }
 
-//
-public  void setParent2( android.view.ViewGroup viewgroup ) {
+public void setParent( android.view.ViewGroup viewgroup ) {
 if (parent != null) { parent.removeView(this); }
-parent = viewgroup;
-viewgroup.addView(this,lparams);
-//
-Animation animation;
-animation = controls.Ani_iR2L(250); // In  (Left  to Right)
-startAnimation(animation);
-Log.i("Java","animation###############################");
+   parent = viewgroup;
+   viewgroup.addView(this,lparams);
 }
 
-//
 public  void setEnabled( boolean value ) {
   enabled = value;
 }
 
-//by jmpessoa
-public  void SetVisible( int value ) {
-	  this.setVisibility(value);
-}
 // Free object except Self, Pascal Code Free the class.
 public  void Free() {
-if (parent != null) { parent.removeView(this); }
-setText("");
-lparams = null;
-setOnClickListener(null);
+   if (parent != null) { parent.removeView(this); }
+   setText("");
+   lparams = null;
+   setOnClickListener(null);
 }
 
-//by jmpessoa
-public void setTextSize2(int value) {
-	this.setTextSize(value);
-}
+/*
+ * 	this.setTypeface(null, Typeface.BOLD_ITALIC);
+	this.setTypeface(null, Typeface.BOLD);
+    this.setTypeface(null, Typeface.ITALIC);
+    this.setTypeface(null, Typeface.NORMAL);
+ */
 
+public void SetTextTypeFace(int _typeface) {
+  this.setTypeface(null, _typeface);
+}
 
 }
 
@@ -766,100 +1059,63 @@ int MarginTop = 5;
 int marginRight = 5;
 int marginBottom = 5;
 
-boolean changeFlag;
 String bufStr;
-
-//by jmpessoa
-public void setMarginRight(int x) {
-	marginRight = x;
-}
-
-//by jmpessoa
-public void setMarginBottom(int y) {
-	marginBottom = y;
-}
-
-//by jmpessoa
-public void setMarginLeft(int x) {
-	MarginLeft = x;
-}
-
-//by jmpessoa
-public void setMarginTop(int y) {
-	MarginTop = y;
-}
+private boolean canDispatchChangeEvent = false;
+private boolean canDispatchChangedEvent = false;
 
 // Constructor
 public  jEditText(android.content.Context context,
                Controls ctrls,long pasobj ) {
-
 super(context);
-
+canDispatchChangeEvent = false;
+canDispatchChangedEvent = false;
 // Connect Pascal I/F
 PasObj   = pasobj;
 controls = ctrls;
 // Init Class
 lparams = new RelativeLayout.LayoutParams(100,100);
 lparams.setMargins(5, 5,5,5);
-
-changeFlag = false;
-
-// 1 Line
- //this.setSingleLine(); //commented by jmpessoa
  
 // Init Event : http://socome.tistory.com/15
-
-onKeyListener = new OnKeyListener() {
-  public  boolean onKey(View v, int keyCode, KeyEvent event) {
-    if ((keyCode           == KeyEvent.KEYCODE_ENTER) &&
-        (event.getAction() == KeyEvent.ACTION_UP    )    ) {
-        InputMethodManager imm = (InputMethodManager) controls.activity.getSystemService(Context.INPUT_METHOD_SERVICE);
-        imm.hideSoftInputFromWindow(getWindowToken(), 0);
-        //
-        Log.i("JNI_Java","OnEnter, Hide KeyBoard");
-        // LoadMan
-        controls.pOnEnter(PasObj);
-        return true;
-    }
+onKeyListener = new OnKeyListener() {	
+  public  boolean onKey(View v, int keyCode, KeyEvent event) { //Called when a hardware key is dispatched to a view	
+    if (event.getAction() == KeyEvent.ACTION_UP) {	
+    	if (keyCode == KeyEvent.KEYCODE_ENTER) {
+            InputMethodManager imm = (InputMethodManager) controls.activity.getSystemService(Context.INPUT_METHOD_SERVICE);
+            imm.hideSoftInputFromWindow(getWindowToken(), 0);       
+            //Log.i("OnKeyListener","OnEnter, Hide KeyBoard");
+            // LoadMan
+            controls.pOnEnter(PasObj);  //just Enter/Done/Next/backbutton ....!      
+            return true;    		
+    	}    
+    }   
     return false;
-  }
-  
+  }  
 };
+
 setOnKeyListener(onKeyListener);
 // Event
 textwatcher = new TextWatcher() {
   @Override
-  public  void beforeTextChanged(CharSequence s, int start, int count, int after) {
-	  if (changeFlag) {
-         controls.pOnChange(PasObj,0);
-	  }
+  public  void beforeTextChanged(CharSequence s, int start, int count, int after) {	  
+	  if (canDispatchChangeEvent) {
+		controls.pOnChange(PasObj, s.toString(), (s.toString()).length());
+	  }	 
   }
-
   @Override
   public  void onTextChanged(CharSequence s, int start, int before, int count) {
-	  if (changeFlag) { 
-        controls.pOnChange(PasObj,1);
-	 }		  
+	  if (canDispatchChangedEvent) {		 
+		controls.pOnChanged(PasObj,s.toString(), (s.toString()).length());
+	  }   		  	  
   }
-
   @Override
-  public  void afterTextChanged(Editable s) {
-	if (changeFlag) { 
-        controls.pOnChange(PasObj,2);
-    }
+  public  void afterTextChanged(Editable s) {	  
+    //
   }
 };
 
 addTextChangedListener(textwatcher);
-}
-
-//
-public  void setXYWH ( int x, int y, int w, int h ) {
-lparams.width  = w;
-lparams.height = h;
-lparams.setMargins(x,y,0,0);
-//
-setLayoutParams(lparams);
+  
 }
 
 public void setLeftTopRightBottomWidthHeight(int left, int top, int right, int bottom, int w, int h) {
@@ -879,9 +1135,10 @@ public void setLParamHeight(int h) {
   lpH = h;
 }
 
+
 public void addLParamsAnchorRule(int rule) {
- lparamsAnchorRule[countAnchorRule] = rule;
- countAnchorRule = countAnchorRule + 1;
+   lparamsAnchorRule[countAnchorRule] = rule;
+   countAnchorRule = countAnchorRule + 1;
 }
 
 public void addLParamsParentRule(int rule) {
@@ -894,45 +1151,16 @@ public void setLayoutAll(int idAnchor) {
 	lparams.width  = lpW; //matchParent; 
 	lparams.height = lpH; //wrapContent;
 	lparams.setMargins(MarginLeft,MarginTop,marginRight,marginBottom);
-
 	if (idAnchor > 0) {    	
 		for (int i=0; i < countAnchorRule; i++) {  
 			lparams.addRule(lparamsAnchorRule[i], idAnchor);		
-	    }
-		
+	    }		
 	} 
 	for (int j=0; j < countParentRule; j++) {  
 		lparams.addRule(lparamsParentRule[j]);		
     }
-	//
 	setLayoutParams(lparams);
 }
-
-//by jmpessoa
-public void setIdEx(int id) {
-  this.setId(id);	
-}
-
-public void setTextEx(String txt) {
-   changeFlag = false;
-   this.setText(txt);
-   changeFlag = true; 
-}
-
-public String getTextEx() {
-  //Log.i("getTextEx",this.getText().toString());	
-  return this.getText().toString();
-}
-            
-public void setSingleLineEx(boolean value) {
-  this.setSingleLine(value);
-}
-
-/*
-public void setInputTypeEx(int value) {
-	this.setInputType(value);
-}
-*/
 
 public  void setInputTypeEx(String str) {
 	  bufStr = new String(str.toString());
@@ -954,7 +1182,6 @@ public  void setInputTypeEx(String str) {
 	  else                                 {this.setInputType(android.text.InputType.TYPE_CLASS_TEXT);};
 	    
 	}
-
 
 // LORDMAN 2013-08-13
 public  void setTextAlignment( int align ) {
@@ -988,16 +1215,8 @@ lparams = null;
 }
 
 //by jmpessoa
-public void setScrollerEx(android.content.Context context) {
-	setScroller(new Scroller(controls.activity)); 
-}
-
-public void setTextColor2(int value) {
-	this.setTextColor(value);  
-}
-
-public void setTextSize2(int value) {
-	this.setTextSize(value);  
+public void setScrollerEx() {
+	this.setScroller(new Scroller(controls.activity)); 
 }
 
 public void setFocus2() {
@@ -1015,18 +1234,10 @@ public  void immHide2() {
 	  imm.hideSoftInputFromWindow(this.getWindowToken(), 0);
 }
 
-
-public void setHint2(String hint) {
-   this.setHint(hint);
-}
-
 public  int[] getCursorPos() {
-
 	  int[] vals = new int[2];
-
 	  vals[0] = this.getSelectionStart();
 	  vals[1] = this.getSelectionEnd();
-
 	  return vals;
 }
 
@@ -1035,6 +1246,60 @@ public  void setCursorPos(int startPos, int endPos) {
 	  this.setSelection(startPos,endPos);
 }
 
+//LORDMAN - 2013-07-26
+public  void maxLength(int mLength) { //Edit not to make the length of the text greater than the specified length
+  InputFilter[] FilterArray = new InputFilter[1];
+  FilterArray[0] = new InputFilter.LengthFilter(mLength);
+  this.setFilters(FilterArray);
+}
+
+//LORDMAN 2013-08-27
+public  void SetEnabled(boolean enabled ) {
+ this.setClickable            (enabled);
+ this.setEnabled              (enabled);
+ this.setFocusable            (enabled);
+ this.setFocusableInTouchMode (enabled);
+}
+
+//LORDMAN 2013-08-27
+public  void SetEditable(boolean enabled ) {
+    this.setClickable(enabled);
+    
+    if (enabled) {this.setEnabled(enabled); }
+    
+    this.setFocusable(enabled);
+    this.setFocusableInTouchMode (enabled);
+}
+
+//by jmpessoa  :: bug! why?
+public  void SetMovementMethod() {
+    this.setMovementMethod(new ScrollingMovementMethod());//ScrollingMovementMethod.getInstance()
+}
+ //by jmpessoa
+public String GetText() {
+	return this.getText().toString();	
+}
+
+//by jmpessoa
+public  void AllCaps() {
+	InputFilter[] FilterArray = new InputFilter[1];
+	FilterArray[0] = new InputFilter.AllCaps();
+	this.setFilters(FilterArray);
+}
+
+public void DispatchOnChangeEvent(boolean value) {
+	canDispatchChangeEvent = value;
+}
+
+public void DispatchOnChangedEvent(boolean value) {
+	canDispatchChangedEvent = value;
+}
+
+
+public void SetInputType(int ipt){  //TODO!
+	this.setInputType(0);
+}
+	
 }
 
 //-------------------------------------------------------------------------
@@ -1066,25 +1331,6 @@ int marginRight = 5;
 int marginBottom = 5;
 int textColor;
 
-//by jmpessoa
-public void setMarginRight(int x) {
-	marginRight = x;
-}
-
-//by jmpessoa
-public void setMarginBottom(int y) {
-	marginBottom = y;
-}
-//by jmpessoa
-public void setMarginLeft(int x) {
-	MarginLeft = x;
-}
-
-//by jmpessoa
-public void setMarginTop(int y) {
-	MarginTop = y;
-}
-
 public void setLeftTopRightBottomWidthHeight(int left, int top, int right, int bottom, int w, int h) {
 	MarginLeft = left;
 	MarginTop = top;
@@ -1106,32 +1352,20 @@ lparams = new LayoutParams(100,100);     // W,H
 lparams.setMargins(5,5,5,5); // L,T,
 // Init Event
 onClickListener = new OnClickListener() {
-  public  void onClick(View view) {	
-     controls.pOnClick(PasObj,Const.Click_Default); 
+  public  void onClick(View view) {	  
+	//Log.i("TAG_CLICK", "jButton_Clicked!"); //just demo for LATE logcat filter!
+    controls.pOnClick(PasObj,Const.Click_Default); 
   }
 };
-
 setOnClickListener(onClickListener);
-
 //Log.i("jButton","created!");
 }
 
 //
-public  void setXYWH ( int x, int y, int w, int h ) {
-lparams.width  = w;
-lparams.height = h;
-lparams.setMargins(x,y,0,0);
-//
-setLayoutParams(lparams);
-}
-
-//
 public  void setParent( android.view.ViewGroup viewgroup ) {
-if (parent != null) { parent.removeView(this); }
-parent = viewgroup;
-viewgroup.addView(this,lparams);
-
-//Log.i("jButton","setParent!");
+   if (parent != null) { parent.removeView(this); }
+   parent = viewgroup;
+   viewgroup.addView(this,lparams);
 }
 
 // Free object except Self, Pascal Code Free the class.
@@ -1183,24 +1417,18 @@ public void setLayoutAll(int idAnchor) {
 		this.setLayoutParams(lparams);
 	}
 
+/*
+ * If i set android:focusable="true" then button is highlighted and focused, 
+ * but then at the same time, 
+ * i need to click twice on the button to perform the actual click event.
+ */
 //by jmpessoa
-public void setIdEx(int id) {
-	  setId(id);
-	  Log.i("jButton","setIdEx!");	  
-}
-
-//by jmpessoa
-public void setTextEx(String txt) {
-	this.setText(txt);	
-}
-
-public void setTextColor2(int value) {
-	textColor = value;
-	this.setTextColor(value);  	
-}
-
-public void SetBackgroundColor(int color) {	
-	this.setBackgroundColor(color);	
+public  void SetFocusable(boolean enabled ) {	
+  this.setClickable            (enabled);
+  this.setEnabled              (enabled);
+  this.setFocusable            (enabled);//*
+  this.setFocusableInTouchMode (enabled);//*
+  //obj.requestFocus(); 
 }
 
 
@@ -1292,15 +1520,15 @@ public void setLeftTopRightBottomWidthHeight(int left, int top, int right, int b
 //
 public  void setParent( android.view.ViewGroup viewgroup ) {
 if (parent != null) { parent.removeView(this); }
-parent = viewgroup;
-viewgroup.addView(this,lparams);
+  parent = viewgroup;
+  viewgroup.addView(this,lparams);
 }
 
 // Free object except Self, Pascal Code Free the class.
 public  void Free() {
-if (parent != null) { parent.removeView(this); }
-setText("");
-lparams = null;
+  if (parent != null) { parent.removeView(this); }
+  this.setText("");
+  lparams = null;
 }
 
 //by jmpessoa
@@ -1361,6 +1589,19 @@ public  void setChecked2(boolean value) {
    this.setChecked(value);
 }
 
+
+public void SetText(String txt) {
+	this.setText(txt);
+}
+
+public String GetText() {
+	return this.getText().toString();
+}
+
+public void SetTextSize(int size) {
+	this.setTextSize(size);
+}
+
 }
 
 //-------------------------------------------------------------------------
@@ -1391,26 +1632,6 @@ int MarginTop = 5;
 int marginRight = 5;
 int marginBottom = 5;
 
-//by jmpessoa
-public void setMarginRight(int x) {
-	marginRight = x;
-}
-
-//by jmpessoa
-public void setMarginBottom(int y) {
-	
-	marginBottom = y;
-}
-//by jmpessoa
-public void setMarginLeft(int x) {
-	MarginLeft = x;
-}
-
-//by jmpessoa
-public void setMarginTop(int y) {
-	MarginTop = y;
-}
-
 // Constructor
 public  jRadioButton(android.content.Context context,
                   Controls ctrls,long pasobj ) {
@@ -1428,15 +1649,6 @@ onClickListener = new OnClickListener() {
   }
 };
 setOnClickListener(onClickListener);
-}
-
-//
-public  void setXYWH ( int x, int y, int w, int h ) {
-lparams.width  = w;
-lparams.height = h;
-lparams.setMargins(x,y,0,0);
-//
-setLayoutParams(lparams);
 }
 
 public void setLeftTopRightBottomWidthHeight(int left, int top, int right, int bottom, int w, int h) {
@@ -1503,15 +1715,6 @@ public void setLayoutAll(int idAnchor) {
 		setLayoutParams(lparams);
 }
 
-	//by jmpessoa
-public void setIdEx(int id) {
-	  setId(id);	
-}
-
-public void setTextColor2(int value) {
-	this.setTextColor(value);  
-}
-
 }
 
 //-------------------------------------------------------------------------
@@ -1556,25 +1759,6 @@ int MarginTop = 5;
 int marginRight = 5;
 int marginBottom = 5;
 
-//by jmpessoa
-public void setMarginRight(int x) {
-	marginRight = x;
-}
-
-//by jmpessoa
-public void setMarginBottom(int y) {
-	marginBottom = y;
-}
-//by jmpessoa
-public void setMarginLeft(int x) {
-	MarginLeft = x;
-}
-
-//by jmpessoa
-public void setMarginTop(int y) {
-	MarginTop = y;
-}
-
 // Constructor
 public  jProgressBar(android.content.Context context,
                   Controls ctrls,long pasobj,int style ) {
@@ -1587,15 +1771,6 @@ controls = ctrls;
 lparams = new LayoutParams(100,100);     // W,H
 lparams.setMargins        ( 50, 50,0,0); // L,T,
 setMax(100);
-}
-
-//
-public  void setXYWH ( int x, int y, int w, int h ) {
-lparams.width  = w;
-lparams.height = h;
-lparams.setMargins(x,y,0,0);
-//
-setLayoutParams(lparams);
 }
 
 public void setLeftTopRightBottomWidthHeight(int left, int top, int right, int bottom, int w, int h) {
@@ -1661,33 +1836,6 @@ public void setLayoutAll(int idAnchor) {
 	setLayoutParams(lparams);
 }
 
-//by jmpessoa
-public void setIdEx(int id) {
-  setId(id);	
-}
-
-//by jmpessoa
-public void setProgressEx(int value) {
-	Log.i("jProgressBar Value","=" + value);
-	this.setProgress(value);
-}
-
-//by jmpessoa
-public int getProgress2() {
-	return this.getProgress();
-}
-
-//by jmpessoa
-public void setMax2(int value) {
-	this.setMax(value);
-}
-
-//by jmpessoa
-public int getMax2() {
-	return this.getMax();
-}
-
-
 }
 
 //-------------------------------------------------------------------------
@@ -1704,7 +1852,6 @@ private ViewGroup       parent   = null;   // parent view
 private LayoutParams    lparams;           // layout XYWH
 private OnClickListener onClickListener;   //
 public  Bitmap          bmp      = null;   //
-
 
 //by jmpessoa
 private int lparamsAnchorRule[] = new int[20]; 
@@ -1751,15 +1898,6 @@ onClickListener = new OnClickListener() {
 setOnClickListener(onClickListener);
 }
 
-//
-public  void setXYWH ( int x, int y, int w, int h ) {
-lparams.width  = w;
-lparams.height = h;
-lparams.setMargins(x,y,0,0);
-//
-setLayoutParams(lparams);
-}
-
 public void setLeftTopRightBottomWidthHeight(int left, int top, int right, int bottom, int w, int h) {
 	MarginLeft = left;
 	MarginTop = top;
@@ -1790,26 +1928,41 @@ if (parent != null) { parent.removeView(this); }
 
 //by jmpessoa
 public void setBitmapImage(Bitmap bm) {
+	//if (bmp    != null) { bmp.recycle(); }
+	bmp = bm; 
 	this.setImageBitmap(bm);
 }
 
 public  void setImage(String str) {
-	  Bitmap bmp;
-	  bmp = this.bmp;
-	  if (bmp != null)        { bmp.recycle(); }
-	  if (str.equals("null")) { this.setImageBitmap(null);
-	                            return; };
+	  //if (bmp != null)        { bmp.recycle(); }
+	  if (str.equals("null")) { this.setImageBitmap(null); return; };
 	  bmp = BitmapFactory.decodeFile( str );
 	  this.setImageBitmap(bmp);
 }
 
 //by jmpessoa
-public void setMarginLeft(int x) {
-	MarginLeft = x;
+public int GetDrawableResourceId(String _resName) {
+	  try {
+	     Class<?> res = R.drawable.class;
+	     Field field = res.getField(_resName);  //"drawableName"
+	     int drawableId = field.getInt(null);
+	     return drawableId;
+	  }
+	  catch (Exception e) {
+	     Log.e("jForm", "Failure to get drawable id.", e);
+	     return 0;
+	  }
 }
 
-public void setMarginTop(int y) {
-	MarginTop = y;
+//by jmpessoa
+public Drawable GetDrawableResourceById(int _resID) {
+	return (Drawable)( this.controls.activity.getResources().getDrawable(_resID));	
+}
+        
+public void SetImageByResIdentifier(String _imageResIdentifier) {
+	Drawable d = GetDrawableResourceById(GetDrawableResourceId(_imageResIdentifier));
+	bmp = ((BitmapDrawable)d).getBitmap();
+	this.setImageDrawable(d);
 }
 
 //by jmpessoa
@@ -1823,14 +1976,36 @@ public void setLParamHeight(int h) {
 
 //by jmpessoa
 public int getLParamHeight() {	
-	
-    return this.getHeight();
+  return  this.getHeight();
+ /*	
+  if (bmp != null) {
+     return this.bmp.getHeight();  //  ???  
+  } else return 0;
+  */  
 }  
 
 //by jmpessoa
 public int getLParamWidth() {
+  return this.getWidth();
+  /*
+  if (bmp != null) {
+	return this.bmp.getWidth(); //  ??? 
+  } else return 0;
+  */  
+}
 
-	return this.getWidth();
+//by jmpessoa
+public int GetBitmapHeight() {		
+  if (bmp != null) {
+     return this.bmp.getHeight();   
+  } else return 0;
+}  
+
+//by jmpessoa
+public int GetBitmapWidth() {
+  if (bmp != null) {
+	 return this.bmp.getWidth();  
+  } else return 0;
 }
 
 public void addLParamsAnchorRule(int rule) {
@@ -1860,11 +2035,6 @@ public void setLayoutAll(int idAnchor) {
   }
 	//
 	setLayoutParams(lparams);
-}
-
-//by jmpessoa
-public void setIdEx(int id) {
-   setId(id);	
 }
 
 }
@@ -1981,7 +2151,7 @@ public  View getView(int position, View v, ViewGroup parent) {
 	   itemText[i] = new TextView(ctx);
 	   
 	   if (items.get(position).textSize != 0){
-		   itemText[i].setTextSize(TypedValue.COMPLEX_UNIT_PX,items.get(position).textSize);
+		   itemText[i].setTextSize(items.get(position).textSize); //TypedValue.COMPLEX_UNIT_PX,
 	   }
 	   
 	   if (i == 0) {		   
@@ -1990,7 +2160,7 @@ public  View getView(int position, View v, ViewGroup parent) {
 		else{			
 		   itemText[i].setTypeface(null,faceBody);
 		   if (items.get(position).textSizeDecorated == 1) {
-			     itemText[i].setTextSize(TypedValue.COMPLEX_UNIT_PX, itemText[i].getTextSize() - 2*i);
+			     itemText[i].setTextSize(itemText[i].getTextSize() - 2*i); //TypedValue.COMPLEX_UNIT_PX, 
 		   }		   
 		}
 	   
@@ -2242,34 +2412,6 @@ public boolean isItemChecked(int index) {
 }
 
 //by jmpessoa
-public void setMarginRight(int x) {
-	marginRight = x;
-}
-
-//by jmpessoa
-public void setMarginBottom(int y) {
-	marginBottom = y;
-}
-//by jmpessoa
-public void setMarginLeft(int x) {
-	MarginLeft = x;
-}
-
-//by jmpessoa
-public void setMarginTop(int y) {
-	MarginTop = y;
-}
-
-//
-public  void setXYWH ( int x, int y, int w, int h ) {
-  lparams.width  = w;
-  lparams.height = h;
-  lparams.setMargins(x,y,0,0);
-  //
-  setLayoutParams(lparams);
-}
-
-//by jmpessoa
 public void setLeftTopRightBottomWidthHeight(int left, int top, int right, int bottom, int w, int h) {
 	MarginLeft = left;
 	MarginTop = top;
@@ -2375,11 +2517,6 @@ public void setLayoutAll(int idAnchor) {
   }
   //
   setLayoutParams(lparams);
-}
-
-//by jmpessoa
-public void setIdEx(int id) {
-   setId(id);	
 }
 
 //by jmpessoa
@@ -2497,6 +2634,32 @@ public  void setImageItem(Bitmap bm, int index) {
 	aadapter.notifyDataSetChanged();
 }
 
+
+//by jmpessoa
+private int GetDrawableResourceId(String _resName) {
+	  try {
+	     Class<?> res = R.drawable.class;
+	     Field field = res.getField(_resName);  //"drawableName"
+	     int drawableId = field.getInt(null);
+	     return drawableId;
+	  }
+	  catch (Exception e) {
+	     Log.e("jForm", "Failure to get drawable id.", e);
+	     return 0;
+	  }
+}
+
+//by jmpessoa
+private Drawable GetDrawableResourceById(int _resID) {
+	return (Drawable)( this.controls.activity.getResources().getDrawable(_resID));	
+}
+//by jmpessoa
+public  void setImageItem(String imgResIdentifier, int index) {	   // ..res/drawable
+	Drawable d = GetDrawableResourceById(GetDrawableResourceId(imgResIdentifier));        	
+	alist.get(index).bmp = ((BitmapDrawable)d).getBitmap();
+	aadapter.notifyDataSetChanged();	
+}
+
 //by jmpessoa
 public void setTextDecorated(int value, int index){
 	alist.get(index).textDecorated = value;
@@ -2591,25 +2754,6 @@ int MarginTop = 5;
 int marginRight = 5;
 int marginBottom = 5;
 
-//by jmpessoa
-public void setMarginRight(int x) {
-	marginRight = x;
-}
-
-//by jmpessoa
-public void setMarginBottom(int y) {
-	marginBottom = y;
-}
-//by jmpessoa
-public void setMarginLeft(int x) {
-	MarginLeft = x;
-}
-
-//by jmpessoa
-public void setMarginTop(int y) {
-	MarginTop = y;
-}
-
 // Constructor
 public  jScrollView(android.content.Context context,
                  Controls ctrls,long pasobj ) {
@@ -2629,19 +2773,6 @@ scrollxywh = new LayoutParams(100,100);
 scrollxywh.setMargins(0,0,0,0);
 scrollview.setLayoutParams(scrollxywh);
 this.addView(scrollview);
-}
-
-//
-public  void setXYWH ( int x, int y, int w, int h ) {
-Log.i("java","setXYWH-> jScrollView1");
-lparams.width  = w;
-lparams.height = h;
-lparams.setMargins(x,y,0,0);
-//
-setLayoutParams(lparams);
-//
-scrollxywh.width = w;
-scrollview.setLayoutParams(scrollxywh);
 }
 
 public void setLeftTopRightBottomWidthHeight(int left, int top, int right, int bottom, int w, int h) {
@@ -2733,33 +2864,24 @@ public void setLayoutAll(int idAnchor) {
 	
 }
 
-//by jmpessoa
-public void setIdEx(int id) {
-setId(id);	
-}
-
 }
 
 //-----------------------------------------
 //----- jPanel by jmpessoa
 //-----------------------------------------
-class jPanel  extends RelativeLayout {
+class jPanel extends RelativeLayout {
 	//Java-Pascal Interface
 	private long             PasObj   = 0;      // Pascal Obj
 	private Controls        controls = null;   // Control Class for Event
 	private ViewGroup       parent   = null;
 
 	private RelativeLayout.LayoutParams lparams;           // layout XYWH
-	
-	private RelativeLayout  layout   = null;
-	private LayoutParams    layparam = null;
-	
+		
 	private int lparamsAnchorRule[] = new int[40]; 
 	int countAnchorRule = 0;
 
 	private int lparamsParentRule[] = new int[40]; 
 	int countParentRule = 0;
-
 	
 	int lpH = RelativeLayout.LayoutParams.MATCH_PARENT;
 	int lpW = RelativeLayout.LayoutParams.MATCH_PARENT; //w
@@ -2768,23 +2890,9 @@ class jPanel  extends RelativeLayout {
 	int MarginTop    = 0;
 	int marginRight  = 0;
 	int marginBottom = 0;
-    	
-	public void setMarginRight(int x) {
-		marginRight = x;
-	}
-
-	public void setMarginBottom(int y) {
-		marginBottom = y;
-	}
-
-	public void setMarginLeft(int x) {
-		MarginLeft = x;
-	}
-
-	public void setMarginTop(int y) {
-		MarginTop = y;
-	}
-
+	
+	boolean mRemovedFromParent = false;
+	    	
 	//Constructor
 	public  jPanel(android.content.Context context, Controls ctrls,long pasobj ) {
 	   super(context);	
@@ -2793,25 +2901,8 @@ class jPanel  extends RelativeLayout {
 	   controls = ctrls;
        lparams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);		
 	   //
-	   layout   = new RelativeLayout(context);
-	   layparam = new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
-	   layout.setLayoutParams(layparam);
 	}
-	
-	public  void setXYWH ( int x, int y, int w, int h ) {
 		
-		lparams.width  = w;
-		lparams.height = h;
-		lparams.setMargins(x,y,0,0);
-		//
-		setLayoutParams(lparams);
-		
-		layparam.setMargins(x,y,0,0);
-		layparam.width = w;
-		layparam.height = h;
-	    layout.setLayoutParams(layparam);
-	}
-	
 	public void setLeftTopRightBottomWidthHeight(int left, int top, int right, int bottom, int w, int h) {
 		MarginLeft = left;
 		MarginTop = top;
@@ -2839,12 +2930,10 @@ class jPanel  extends RelativeLayout {
 
 	public void resetLParamsRules() {
 		for (int i=0; i < countAnchorRule; i++) {  
-				layparam.removeRule(lparamsAnchorRule[i]);
 				lparams.removeRule(lparamsAnchorRule[i]);		
 		}
 				
 		for (int j=0; j < countParentRule; j++) {  
-			layparam.removeRule(lparamsParentRule[j]);		
 			lparams.removeRule(lparamsParentRule[j]);		
 	    }		
 		countAnchorRule = 0;
@@ -2862,58 +2951,47 @@ class jPanel  extends RelativeLayout {
 	}
 
 	//by jmpessoa
-	public void setLayoutAll(int idAnchor) {
-		
+	public void setLayoutAll(int idAnchor) {		
 		lparams.width  = lpW; 
 		lparams.height = lpH; 
-		lparams.setMargins(MarginLeft,MarginTop,marginRight,marginBottom);
-
-		
-		layparam.height = lpH;
-	 	layparam.width =  lpW;
-	 	layparam.setMargins(MarginLeft,MarginTop,marginRight,marginBottom);
-	 	
+		lparams.setMargins(MarginLeft,MarginTop,marginRight,marginBottom);		
 		if (idAnchor > 0) {    	
 			for (int i=0; i < countAnchorRule; i++) {  
-				layparam.addRule(lparamsAnchorRule[i], idAnchor);
 				lparams.addRule(lparamsAnchorRule[i], idAnchor);		
-		    }
-			
+		    }			
 		} 
 		
 		for (int j=0; j < countParentRule; j++) {  
-			layparam.addRule(lparamsParentRule[j]);		
 			lparams.addRule(lparamsParentRule[j]);		
 	    }
-		//
-		setLayoutParams(lparams);
-		layout.setLayoutParams(layparam); 		
+		setLayoutParams(lparams); 		
  	}
-
-	public void setIdEx(int id) {
-	   setId(id);	
+	
+	//GetView!-android.widget.RelativeLayout
+	public  RelativeLayout getView() {
+	   return this;
 	}
 	
-	public  android.widget.RelativeLayout getView() {
-	   return layout;
-	}
-
 	public  void setParent( android.view.ViewGroup viewgroup ) {
     	if (parent != null) { parent.removeView(this); }
 	    parent = viewgroup;
 	    parent.addView(this,lparams);
-	    parent.addView(layout);
-	}
-	
+	    mRemovedFromParent=false;
+	}	
 	// Free object except Self, Pascal Code Free the class.
 	public  void Free() {
 		if (parent != null) { parent.removeView(this); }
-		layparam = null;
-		this.removeView(layout);
-		layout = null;
-		layparam = null;
+		lparams = null;   
 	}
+	
+	public void RemoveParent() {
+	   if (!mRemovedFromParent) {
+		  	 parent.removeView(this);
+		  	mRemovedFromParent = true;
+	   } 		   
+	}		 
 }
+
 
 
 //-------------------------------------------------------------------------
@@ -2947,24 +3025,6 @@ int MarginTop = 5;
 int marginRight = 5;
 int marginBottom = 5;
 
-//by jmpessoa
-public void setMarginRight(int x) {
-	marginRight = x;
-}
-
-//by jmpessoa
-public void setMarginBottom(int y) {
-	marginBottom = y;
-}
-//by jmpessoa
-public void setMarginLeft(int x) {
-	MarginLeft = x;
-}
-
-//by jmpessoa
-public void setMarginTop(int y) {
-	MarginTop = y;
-}
 
 // Constructor
 public  jHorizontalScrollView(android.content.Context context,
@@ -2986,20 +3046,6 @@ scrollxywh = new LayoutParams(100,100);
 scrollxywh.setMargins(0,0,0,0);
 scrollview.setLayoutParams(scrollxywh);
 this.addView(scrollview);
-}
-
-//
-public  void setXYWH ( int x, int y, int w, int h ) {
-Log.i("java","setXYWH-> jHorizontalScrollView");
-lparams.width  = w;
-lparams.height = h;
-
-lparams.setMargins(x,y,0,0);
-//
-setLayoutParams(lparams);
-//
-scrollxywh.width = w;
-scrollview.setLayoutParams(scrollxywh);
 }
 
 public void setLeftTopRightBottomWidthHeight(int left, int top, int right, int bottom, int w, int h) {
@@ -3093,11 +3139,6 @@ public void setLayoutAll(int idAnchor) {
 	scrollview.setLayoutParams(scrollxywh);
 }
 
-//by jmpessoa
-public void setIdEx(int id) {
-setId(id);	
-}
-
 }
 
 //-------------------------------------------------------------------------
@@ -3144,24 +3185,6 @@ int MarginTop = 5;
 int marginRight = 5;
 int marginBottom = 5;
 
-//by jmpessoa
-public void setMarginRight(int x) {
-	marginRight = x;
-}
-
-//by jmpessoa
-public void setMarginBottom(int y) {
-	marginBottom = y;
-}
-//by jmpessoa
-public void setMarginLeft(int x) {
-	MarginLeft = x;
-}
-
-//by jmpessoa
-public void setMarginTop(int y) {
-	MarginTop = y;
-}
 
 // Constructor
 public  jViewFlipper(android.content.Context context,
@@ -3213,7 +3236,7 @@ setBackgroundColor(0x80FFFFFF);
 // Init Event
 onTouchListener = new OnTouchListener() {
   public  boolean onTouch(final View view, final MotionEvent event) {
-    Log.i("ViewFlipper","ViewFlipper OnTouch");
+    //Log.i("ViewFlipper","ViewFlipper OnTouch");
     switch(event.getAction())  {
       case MotionEvent.ACTION_DOWN :
            { Xdn = event.getX();
@@ -3221,7 +3244,7 @@ onTouchListener = new OnTouchListener() {
       case MotionEvent.ACTION_UP   :
            { Xup   = event.getX();
              if(Xup < Xdn) { // Right Direction
-                             Log.i("ViewFlipper","Right Dir.");
+                            // Log.i("ViewFlipper","Right Dir.");
                              setInAnimation (iR2L);
                              setOutAnimation(oR2L);
                              showNext();
@@ -3229,7 +3252,7 @@ onTouchListener = new OnTouchListener() {
                            //                            inxcur++;  }
                            }
              else if (Xup > Xdn) { // Left Direction
-                                   Log.i("ViewFlipper","Left Dir.");
+                                  // Log.i("ViewFlipper","Left Dir.");
                              setInAnimation (iL2R);
                              setOutAnimation(oL2R);
                              showPrevious();
@@ -3243,15 +3266,6 @@ onTouchListener = new OnTouchListener() {
   }
 };
 setOnTouchListener(onTouchListener);
-}
-
-//
-public  void setXYWH ( int x, int y, int w, int h ) {
-lparams.width  = w;
-lparams.height = h;
-lparams.setMargins(x,y,0,0);
-//
-setLayoutParams(lparams);
 }
 
 public void setLeftTopRightBottomWidthHeight(int left, int top, int right, int bottom, int w, int h) {
@@ -3322,11 +3336,6 @@ public void setLayoutAll(int idAnchor) {
 	setLayoutParams(lparams);
 }
 
-//by jmpessoa
-public void setIdEx(int id) {
-setId(id);	
-}
-
 }
 
 //-------------------------------------------------------------------------
@@ -3388,24 +3397,6 @@ int MarginTop = 5;
 int marginRight = 5;
 int marginBottom = 5;
 
-//by jmpessoa
-public void setMarginRight(int x) {
-	marginRight = x;
-}
-
-//by jmpessoa
-public void setMarginBottom(int y) {
-	marginBottom = y;
-}
-//by jmpessoa
-public void setMarginLeft(int x) {
-	MarginLeft = x;
-}
-
-//by jmpessoa
-public void setMarginTop(int y) {
-	MarginTop = y;
-}
 
 // Constructor
 public  jWebView(android.content.Context context,
@@ -3426,15 +3417,6 @@ getSettings().setJavaScriptEnabled(true);
 lparams = new RelativeLayout.LayoutParams  (300,300);
 lparams.setMargins( 50, 50,0,0);
 //
-}
-
-//
-public  void setXYWH ( int x, int y, int w, int h ) {
-lparams.width  = w;
-lparams.height = h;
-lparams.setMargins(x,y,0,0);
-//
-setLayoutParams(lparams);
 }
 
 public void setLeftTopRightBottomWidthHeight(int left, int top, int right, int bottom, int w, int h) {
@@ -3502,21 +3484,9 @@ public void setLayoutAll(int idAnchor) {
 	setLayoutParams(lparams);
 }
 
-//by jmpessoa
-public void setIdEx(int id) {
-setId(id);	
-}
-
-
 public  void setJavaScript(boolean javascript) {
 	  this.getSettings().setJavaScriptEnabled(javascript);
 }
-
-public  void loadURL2(String str) {
-	  this.loadUrl("about:blank");
-	  this.loadUrl(str);
-}
-
 
 }
 
@@ -3620,24 +3590,6 @@ int MarginTop = 5;
 int marginRight = 5;
 int marginBottom = 5;
 
-//by jmpessoa
-public void setMarginRight(int x) {
-	marginRight = x;
-}
-
-//by jmpessoa
-public void setMarginBottom(int y) {
-	marginBottom = y;
-}
-//by jmpessoa
-public void setMarginLeft(int x) {
-	MarginLeft = x;
-}
-
-//by jmpessoa
-public void setMarginTop(int y) {
-	MarginTop = y;
-}
 
 // Constructor
 public  jView(android.content.Context context,
@@ -3649,15 +3601,6 @@ controls = ctrls;
 // Init Class
 lparams = new LayoutParams(300,300);
 lparams.setMargins( 50, 50,0,0);
-}
-
-//
-public  void setXYWH ( int x, int y, int w, int h ) {
-lparams.width  = w;
-lparams.height = h;
-lparams.setMargins(x,y,0,0);
-//
-setLayoutParams(lparams);
 }
 
 public void setLeftTopRightBottomWidthHeight(int left, int top, int right, int bottom, int w, int h) {
@@ -3677,12 +3620,8 @@ if (parent != null) { parent.removeView(this); }
 }
 
 //
-public  void setjCanvas( jCanvas canvas ) {
-  jcanvas = canvas;
-}
-
-public  void saveView2(String filename) {
-	  this.saveView(filename);
+public  void setjCanvas(java.lang.Object canvas) {   
+   jcanvas = (jCanvas)canvas;
 }
 
 //
@@ -3751,7 +3690,7 @@ switch(act) {
         }
        break;}
   case MotionEvent.ACTION_POINTER_UP  : {
-  	    Log.i("Java","PUp");
+  	   // Log.i("Java","PUp");
         switch (event.getPointerCount()) {
         	case 1 : { controls.pOnTouch (PasObj,Const.TouchUp  ,1,
         		                            event.getX(0),event.getY(0),0,0); break; }
@@ -3841,11 +3780,6 @@ public void setLayoutAll(int idAnchor) {
    setLayoutParams(lparams);
 }
 
-//by jmpessoa
-public void setIdEx(int id) {
-  setId(id);	
-}
-
 }
 
 //-------------------------------------------------------------------------
@@ -3883,25 +3817,6 @@ int MarginTop = 5;
 int marginRight = 5;
 int marginBottom = 5;
 
-//by jmpessoa
-public void setMarginRight(int x) {
-	marginRight = x;
-}
-
-//by jmpessoa
-public void setMarginBottom(int y) {
-	marginBottom = y;
-}
-//by jmpessoa
-public void setMarginLeft(int x) {
-	MarginLeft = x;
-}
-
-//by jmpessoa
-public void setMarginTop(int y) {
-	MarginTop = y;
-}
-
 //
 class jRenderer implements GLSurfaceView.Renderer {
   public  void onSurfaceCreated(GL10 gl, EGLConfig config) {
@@ -3909,9 +3824,10 @@ class jRenderer implements GLSurfaceView.Renderer {
   public  void onSurfaceChanged(GL10 gl, int w, int h) {
              controls.pOnGLRenderer(PasObj,Const.Renderer_onSurfaceChanged,w,h); }
   public  void onDrawFrame     (GL10 gl) {
-	             Log.i("Java","Draw before");
+	             //Log.i("Java","Draw before");
              controls.pOnGLRenderer(PasObj,Const.Renderer_onDrawFrame,0,0);    
-             Log.i("Java","Draw after");  }
+             //Log.i("Java","Draw after");  
+             }
 }
 
 // Constructor
@@ -3938,12 +3854,6 @@ public  jGLSurfaceView (android.content.Context context,
 
 }
 
-//
-public  void setXYWH ( int x, int y, int w, int h ) {
-  lparams.width  = w;
-  lparams.height = h;
-  lparams.setMargins(x,y,0,0);
-}
 
 public void setLeftTopRightBottomWidthHeight(int left, int top, int right, int bottom, int w, int h) {
 	MarginLeft = left;
@@ -4029,7 +3939,7 @@ return true;
 //
 @Override
 public void surfaceDestroyed(SurfaceHolder holder) {
-	Log.i("Java","surfaceDestroyed");
+	//Log.i("Java","surfaceDestroyed");
 	queueEvent(new Runnable() {
     	@Override
 	    public void run() {
@@ -4133,14 +4043,10 @@ public void setLayoutAll(int idAnchor) {
 	setLayoutParams(lparams);
 }
 
-//by jmpessoa
-public void setIdEx(int id) {
-  setId(id);	
-}
 
 //by jmpessoa
 public void Refresh() {
-   requestRender();
+   this.requestRender();
 }
 
 //by jmpessoa
@@ -4277,25 +4183,6 @@ int MarginTop = 5;
 int marginRight = 5;
 int marginBottom = 5;
 
-//by jmpessoa
-public void setMarginRight(int x) {
-	marginRight = x;
-}
-
-//by jmpessoa
-public void setMarginBottom(int y) {
-	marginBottom = y;
-}
-//by jmpessoa
-public void setMarginLeft(int x) {
-	MarginLeft = x;
-}
-
-//by jmpessoa
-public void setMarginTop(int y) {
-	MarginTop = y;
-}
-
 // Constructor
 public  jImageBtn(android.content.Context context,
                 Controls ctrls,long pasobj ) {
@@ -4311,17 +4198,6 @@ lparams.setMargins( 50, 50,0,0);
 //
 mPaint = new Paint();
 rect   = new Rect(0,0,100,100);
-}
-
-//
-public  void setXYWH ( int x, int y, int w, int h ) {
-lparams.width  = w;
-lparams.height = h;
-lparams.setMargins(x,y,0,0);
-rect.right     = w;
-rect.bottom    = h;
-//
-setLayoutParams(lparams);
 }
 
 public void setLeftTopRightBottomWidthHeight(int left, int top, int right, int bottom, int w, int h) {
@@ -4360,6 +4236,40 @@ bmpDn = BitmapFactory.decodeFile(filedn);
 invalidate();
 }
 
+
+//by jmpessoa
+private int GetDrawableResourceId(String _resName) {
+	  try {
+	     Class<?> res = R.drawable.class;
+	     Field field = res.getField(_resName);  //"drawableName"
+	     int drawableId = field.getInt(null);
+	     return drawableId;
+	  }
+	  catch (Exception e) {
+	     Log.e("jForm", "Failure to get drawable id.", e);
+	     return 0;
+	  }
+}
+
+//by jmpessoa
+private Drawable GetDrawableResourceById(int _resID) {
+	return (Drawable)( this.controls.activity.getResources().getDrawable(_resID));	
+}
+
+public  void setButtonUpByRes(String resup) {   // ..res/drawable
+ if (bmpUp  != null) { bmpUp.recycle(); }
+  Drawable d = GetDrawableResourceById(GetDrawableResourceId(resup));
+  bmpUp = ((BitmapDrawable)d).getBitmap();
+  invalidate();
+}
+
+public  void setButtonDownByRes(String resdn) {   // ..res/drawable
+  if (bmpDn  != null) { bmpDn.recycle(); }
+   Drawable d = GetDrawableResourceById(GetDrawableResourceId(resdn));
+   bmpDn = ((BitmapDrawable)d).getBitmap();
+   invalidate();
+}
+
 //
 @Override
 public  boolean onTouchEvent( MotionEvent event) {
@@ -4368,7 +4278,9 @@ if (enabled == false) { return(false); }
 
 int actType = event.getAction() &MotionEvent.ACTION_MASK;
 switch(actType) {
-  case MotionEvent.ACTION_DOWN: { btnState = 1; invalidate(); Log.i("Java","jImageBtn Here"); break; }
+  case MotionEvent.ACTION_DOWN: { btnState = 1; invalidate(); 
+                                 //Log.i("Java","jImageBtn Here"); 
+                                 break; }
   case MotionEvent.ACTION_MOVE: {                             break; }
   case MotionEvent.ACTION_UP  : { btnState = 0; invalidate();
                                   controls.pOnClick(PasObj,Const.Click_Default);
@@ -4442,11 +4354,6 @@ public void setLayoutAll(int idAnchor) {
   setLayoutParams(lparams);
 }
 
-//by jmpessoa
-public void setIdEx(int id) {
-setId(id);	
-}
-
 }
 
 /*
@@ -4508,7 +4415,7 @@ execute(urlfile);
 @Override
 protected void onPreExecute() {
 super.onPreExecute();
-Log.i("Java","Before Download");
+//Log.i("Java","Before Download");
 //progress.show();
 }
 
@@ -4524,7 +4431,7 @@ super.onProgressUpdate();
 @Override
 protected void onPostExecute(File result) {
 super.onPostExecute(result);
-Log.i("Java","Finish");
+//Log.i("Java","Finish");
 }
 
 // Step #2. Downloading
@@ -4563,7 +4470,7 @@ try {
      fos.flush();
      fos.close();
      //
-     Log.d("Java", "Downloaded " + ((System.currentTimeMillis() - startTime) / 1000) + "s");
+     //Log.d("Java", "Downloaded " + ((System.currentTimeMillis() - startTime) / 1000) + "s");
      // return -> onPostExecute
      return file;  }
 catch (IOException e) {
@@ -4635,7 +4542,7 @@ protected void onPostExecute(Void result) {
 }
 
 public void setProgress(int progress ) {
-   Log.i("jAsyncTask","setProgress "+progress );
+   //Log.i("jAsyncTask","setProgress "+progress );
    publishProgress(progress);
 }
 
@@ -4644,13 +4551,15 @@ public void SetAutoPublishProgress(boolean value){
     autoPublishProgress = value;
 }
 
-//by jmpessoa
+/*
 public void Execute2(){
-  execute();
+  this.execute();
 }
+*/
 
 //Free object except Self, Pascal Code Free the class.
 public  void Free() {
+	
 }
 
 }
@@ -4673,7 +4582,7 @@ asynctask = new jAsyncTask(ctrls,pasobj);
 }
 
 public void setProgress(int progress ) {
-Log.i("jTask","setProgress " );
+//Log.i("jTask","setProgress " );
 
 }
 
@@ -4702,10 +4611,38 @@ controls = ctrls;
 
 }
 
-public  void loadFile(String filename) {
+public  void loadFile(String filename) {  //full file name!
   //if (bmp != null) { bmp.recycle(); }
   bmp = BitmapFactory.decodeFile(filename);
 }
+
+
+//by jmpessoa
+private int GetDrawableResourceId(String _resName) {
+	  try {
+	     Class<?> res = R.drawable.class;
+	     Field field = res.getField(_resName);  //"drawableName"
+	     int drawableId = field.getInt(null);
+	     return drawableId;
+	  }
+	  catch (Exception e) {
+	     Log.e("jForm", "Failure to get drawable id.", e);
+	     return 0;
+	  }
+}
+
+//by jmpessoa
+private Drawable GetDrawableResourceById(int _resID) {
+	return (Drawable)( this.controls.activity.getResources().getDrawable(_resID));	
+}
+
+//by jmpessoa
+public  void loadRes(String imgResIdentifier) {  //full file name!
+	  //if (bmp != null) { bmp.recycle(); }
+	  Drawable d = GetDrawableResourceById(GetDrawableResourceId(imgResIdentifier));
+	  bmp =	  ((BitmapDrawable)d).getBitmap();
+}
+
 
 //by jmpessoa
 //BitmapFactory.Options options = new BitmapFactory.Options();
@@ -4765,15 +4702,15 @@ public  Bitmap jInstance() {
 //by jmpessoa
 public byte[] GetByteArrayFromBitmap() {
     ByteArrayOutputStream stream = new ByteArrayOutputStream();
-    this.bmp.compress(CompressFormat.PNG, 0, stream);
-    Log.i("GetByteArrayFromBitmap","size="+ stream.size());
+    this.bmp.compress(CompressFormat.PNG, 0, stream); //O: PNG will ignore the quality setting...
+    //Log.i("GetByteArrayFromBitmap","size="+ stream.size());
     return stream.toByteArray();
 }
 
 //by jmpessoa
 public void SetByteArrayToBitmap(byte[] image) {
 	this.bmp = BitmapFactory.decodeByteArray(image, 0, image.length);
-	Log.i("SetByteArrayToBitmap","size="+ image.length);
+	//Log.i("SetByteArrayToBitmap","size="+ image.length);
 }
 
 }
@@ -4940,8 +4877,8 @@ class jSqliteDataAccess {
         private long PasObj   = 0;           // Pascal Obj
         private Controls controls = null;   // Control Class for Event
         
-        private String[] storeTableCreateQuery = new String[10]; //max 10 create tables scripts
-        private String[] storeTableName = new String[10];       //max 10  tables name
+        private String[] storeTableCreateQuery = new String[30]; //max (30) create tables scripts
+        private String[] storeTableName = new String[30];       //max (30)  tables name
        
         private int countTableName = 0;
         private int countTableQuery = 0;
@@ -5009,33 +4946,99 @@ class jSqliteDataAccess {
 	           
         public void ExecSQL(String execQuery){
 	        try{ 	
-	           mydb = this.Open();	
-	           mydb.execSQL(execQuery);
-	           mydb.close();
+	           if (mydb!= null) {
+	        	   if (!mydb.isOpen()) {
+	        	      mydb = this.Open();
+	        	   }
+	           }	           	           
+	           mydb.beginTransaction();
+	           try {
+	            	mydb.execSQL(execQuery); //Execute a single SQL statement that is NOT a SELECT or any other SQL statement that returns data.
+	                //Set the transaction flag is successful, the transaction will be submitted when the end of the transaction
+	                mydb.setTransactionSuccessful();
+	           } catch (Exception e) {
+	                e.printStackTrace();
+	           } finally {
+	                // transaction over
+	            	mydb.endTransaction();
+	            	mydb.close();
+	           }	           	           	            	           
 	        }catch(SQLiteException se){
 	        	Log.e(getClass().getSimpleName(), "Could not execute: "+ execQuery);
 	        	
 	        }
 	    }
         
+      //by jmpessoa
+        private int GetDrawableResourceId(String _resName) {
+        	  try {
+        	     Class<?> res = R.drawable.class;
+        	     Field field = res.getField(_resName);  //"drawableName"
+        	     int drawableId = field.getInt(null);
+        	     return drawableId;
+        	  }
+        	  catch (Exception e) {
+        	     Log.e("jForm", "Failure to get drawable id.", e);
+        	     return 0;
+        	  }
+        }
+
+        //by jmpessoa
+        private Drawable GetDrawableResourceById(int _resID) {
+          return (Drawable)( this.controls.activity.getResources().getDrawable(_resID));	
+        }        
+                
         public void UpdateImage(String tabName, String imageFieldName, String keyFieldName, Bitmap imageValue, int keyValue) {
         	ByteArrayOutputStream stream = new ByteArrayOutputStream();
         	bufBmp = imageValue;
         	bufBmp.compress(CompressFormat.PNG, 0, stream);            
             byte[] image_byte = stream.toByteArray();
-            Log.i("UpdateImage","UPDATE " + tabName + " SET "+imageFieldName+" = ? WHERE "+keyFieldName+" = ?");
-            mydb = this.Open();
-        	mydb.execSQL("UPDATE " + tabName + " SET "+imageFieldName+" = ? WHERE "+keyFieldName+" = ?", new Object[] {image_byte, keyValue} );
-        	mydb.close();
-        	Log.i("UpdateImage", "Ok. Image Updated!");
+            //Log.i("UpdateImage","UPDATE " + tabName + " SET "+imageFieldName+" = ? WHERE "+keyFieldName+" = ?");
+	        if (mydb!= null) {
+	          if (!mydb.isOpen()) {
+	             mydb = this.Open();
+	          }
+	        }
+	        
+            mydb.beginTransaction();
+            try {
+            	mydb.execSQL("UPDATE " + tabName + " SET "+imageFieldName+" = ? WHERE "+keyFieldName+" = ?", new Object[] {image_byte, keyValue} );
+                //Set the transaction flag is successful, the transaction will be submitted when the end of the transaction
+                mydb.setTransactionSuccessful();
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
+                // transaction over
+            	mydb.endTransaction();
+            	mydb.close();
+            }	                	        	
+        	//mydb.close();
+        	//Log.i("UpdateImage", "Ok. Image Updated!");
         	bufBmp = null;
         }
         
         public void UpdateImage(String tabName, String imageFieldName, String keyFieldName, byte[] imageValue, int keyValue) {
-        	mydb.execSQL("UPDATE " + tabName + " SET "+imageFieldName+" = ? WHERE "+keyFieldName+" = ?", new Object[] {imageValue, keyValue} );
+	        if (mydb!= null) {
+	           if (!mydb.isOpen()) {
+	               mydb = this.Open();
+	           }
+	        }
+	        
+            mydb.beginTransaction();
+            try {
+            	mydb.execSQL("UPDATE " + tabName + " SET "+imageFieldName+" = ? WHERE "+keyFieldName+" = ?", new Object[] {imageValue, keyValue} );
+                //Set the transaction flag is successful, the transaction will be submitted when the end of the transaction
+                mydb.setTransactionSuccessful();
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
+                // transaction over
+            	mydb.endTransaction();
+            	mydb.close();
+            }	        	        	               	
         }
                 
-	    public String SelectS(String selectQuery) {	 
+	    public String SelectS(String selectQuery) {	 //return String
 	    	
 		     String row = "";
 		     String rows = "";
@@ -5046,8 +5049,12 @@ class jSqliteDataAccess {
 		     String allRows = null;
 		      		     		     
 		     try{
-		       mydb = this.Open();	            
-		       cursor  = mydb.rawQuery(selectQuery, null);		       
+		           if (mydb!= null) {
+		               if (!mydb.isOpen()) {
+		                  mydb = this.Open();
+		               }
+		            }
+		            cursor  = mydb.rawQuery(selectQuery, null);		       
 		        	
 		            colCount = cursor.getColumnCount();
 		        
@@ -5076,25 +5083,25 @@ class jSqliteDataAccess {
 		                      
 		                }
 		                while(cursor.moveToNext());
-		            }
-		            
-		            
+		            }		            		           
 		            mydb.close();
-		            cursor.moveToFirst();
-		            
+		            cursor.moveToFirst();		            
 		            allRows = headerRow + selectRowDelimiter + rows;
 		          		      
 		     }catch(SQLiteException se){
-		         	 Log.e(getClass().getSimpleName(), "Could not select:" + selectQuery);
-		     }	    
-		      
+		         Log.e(getClass().getSimpleName(), "Could not select:" + selectQuery);
+		     }	    		      
 		     return allRows; 
 	    }
 	    	    
-	    public void SelectV(String selectQuery) {
+	    public void SelectV(String selectQuery) {   //just set the cursor! return void..
 	    	    this.cursor = null;
-		        try{  //controls.activity.openOrCreateDatabase(DATABASE_NAME, Context.MODE_PRIVATE, null); //
-			     	mydb = this.Open();	            
+		        try{  		        	
+			        if (mydb!= null) {
+			           if (!mydb.isOpen()) {
+			              mydb = this.Open(); //controls.activity.openOrCreateDatabase(DATABASE_NAME, Context.MODE_PRIVATE, null); 
+			           }
+			        }		        			        				     	         
 			     	this.cursor  = mydb.rawQuery(selectQuery, null);			    			        
 			        mydb.close();			       
 			     }catch(SQLiteException se){
@@ -5147,13 +5154,118 @@ class jSqliteDataAccess {
 		}
 	     
 		public void Close() {
-		   if (mydb.isOpen()) { mydb.close();}			  
+		   if (mydb != null)  { 	
+		       if (mydb.isOpen()) { mydb.close();}
+		   }
 		}
 		   
 		public void Free() {
-		   if (mydb.isOpen()) { mydb.close();}
-		   mydb = null;
+		   if (mydb != null) {	
+		      if (mydb.isOpen()) { mydb.close();}
+		      mydb = null;
+		   }
 		}		
+						
+		//news! version 06 rev. 08 15 december 2014.........................
+		
+		public void SetForeignKeyConstraintsEnabled(boolean _value) {
+			if (mydb!=null)
+		  	  mydb.setForeignKeyConstraintsEnabled(_value);			
+		}
+		
+		public void SetDefaultLocale() {
+			if (mydb!=null)
+			   mydb.setLocale(Locale.getDefault());			
+		}
+						
+		public void DeleteDatabase(String _dbName) {
+		   controls.activity.deleteDatabase(_dbName);
+		}
+		
+		/*
+		 * ref, http://www.informit.com/articles/article.aspx?p=1928230
+           Because SQLite is a single file, it makes little sense to try to store binary data in the database. 
+           Instead store the location of data, as a file path or a URI in the database, and access it appropriately.           
+		 */
+        public void UpdateImage(String _tabName, String _imageFieldName, String _keyFieldName, String _imageResIdentifier, int _keyValue) {
+        	ByteArrayOutputStream stream = new ByteArrayOutputStream();
+        	Drawable d = GetDrawableResourceById(GetDrawableResourceId(_imageResIdentifier));        	
+        	bufBmp = ((BitmapDrawable)d).getBitmap();       	        	       
+        	bufBmp.compress(CompressFormat.PNG, 0, stream); 
+        	//bitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);        	
+            byte[] image_byte = stream.toByteArray();
+            //Log.i("UpdateImage","UPDATE " + tabName + " SET "+imageFieldName+" = ? WHERE "+keyFieldName+" = ?");                       
+	        if (mydb!= null) {
+		         if (!mydb.isOpen()) {
+		              mydb = this.Open();
+		         }
+		     }
+            mydb.beginTransaction();
+            try {
+            	mydb.execSQL("UPDATE " + _tabName + " SET "+_imageFieldName+" = ? WHERE "+_keyFieldName+" = ?", new Object[] {image_byte, _keyValue} );
+                //Set the transaction flag is successful, the transaction will be submitted when the end of the transaction
+                mydb.setTransactionSuccessful();
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
+                // transaction over
+            	mydb.endTransaction();
+            	mydb.close();
+            }	                	       
+        	//Log.i("UpdateImage", "Ok. Image Updated!");
+        	bufBmp = null;
+        }	
+                 
+        public void InsertIntoTableBatch(String[] _insertQueries) {
+        	int i; 
+        	int len = _insertQueries.length;               
+        	for (i=0; i < len; i++) {
+                	this.ExecSQL(_insertQueries[i]);
+            }
+        }
+        
+        public void UpdateTableBatch(String[] _updateQueries) {
+        	int i; 
+        	int len = _updateQueries.length;               
+        	for (i=0; i < len; i++) {
+               	this.ExecSQL(_updateQueries[i]);
+            }
+        }
+        
+		//Check if the database exist... 
+		public boolean CheckDataBaseExistsByName(String _dbName) {   
+		      SQLiteDatabase checkDB = null; 
+		      try {
+		    	  String absPath = this.controls.activity.getFilesDir().getPath();
+	              absPath = absPath.substring(0, absPath.lastIndexOf("/")) + "/databases/"+_dbName;		         
+		          checkDB = SQLiteDatabase.openDatabase(absPath, null, SQLiteDatabase.OPEN_READONLY);
+		      } catch (SQLiteException e) {
+		    	  Log.e("jSqliteDataAccess","database does't exist yet!");
+		      } 
+		      if (checkDB != null) {
+	             checkDB.close();
+		      }      	         
+		      return checkDB != null ? true : false;
+		}
+		
+		//ex. 'tablebook|FIGURE|_ID|ic_t1|1'
+        private void SplitUpdateImageData(String _imageResIdentifierData, String _delimiter) {
+        	String[] tokens = _imageResIdentifierData.split("\\"+_delimiter);  //ex. "|"        	        
+        	String _tabName = tokens[0];
+        	String _imageFieldName = tokens[1]; 
+        	String _keyFieldName = tokens[2];
+        	String _imageResIdentifier = tokens[3];         	        
+        	int _keyValue = Integer.parseInt(tokens[4]);
+        	UpdateImage(_tabName, _imageFieldName, _keyFieldName, _imageResIdentifier, _keyValue) ;
+        }
+        
+        public void UpdateImageBatch(String[] _imageResIdentifierDataArray, String _delimiter) {
+        	int i; 
+        	int len = _imageResIdentifierDataArray.length;        	
+        	for (i=0; i < len; i++) {
+               	this.SplitUpdateImageData(_imageResIdentifierDataArray[i], _delimiter);
+            }
+        }		
 }
 
 
@@ -5181,7 +5293,7 @@ class jMyHello /*extends ...*/ {
           mFlag = _flag;
           mMsgHello = _hello;
           mBufArray = null;
-          Log.i("jMyHello", "Create!");          
+          //Log.i("jMyHello", "Create!");          
         }
 
         public void jFree() {
@@ -5297,7 +5409,7 @@ class jDumpJavaMethods /*extends ...*/ {
       mObjReferenceName = "this";
       mStripFullTypeName = true;
       
-      Log.i("jDumpJavaMethods", "Created!");                
+      //Log.i("jDumpJavaMethods", "Created!");                
     }
 
     public void jFree() {
@@ -5379,7 +5491,7 @@ class jDumpJavaMethods /*extends ...*/ {
     			 }else {
     				strRet = strRet + mListMethodHeader.get(i); 
     			 }
-    		     Log.i("Dump_List_Header", mListMethodHeader.get(i));
+    		     //Log.i("Dump_List_Header", mListMethodHeader.get(i));
     		 }
     	 }
     	 if ( strRet.length() == 0 ) {strRet = mDelimiter;}
@@ -5551,7 +5663,7 @@ class jDumpJavaMethods /*extends ...*/ {
 
     		  	sbHeader.append(head+" "+tail1);            		  	
             	sbHeader.append(_delimiter);
-            	Log.i("Dump_Header::", head+" "+tail1);
+            	//Log.i("Dump_Header::", head+" "+tail1);
             	mListMethodHeader.add(head+" "+tail1);
         	 }        	 
          }  
@@ -5575,7 +5687,7 @@ class jDumpJavaMethods /*extends ...*/ {
       }
       catch (Throwable e) {
          //System.err.println(e);
-    	  Log.i("Dump_error", e.toString());
+    	  //Log.i("Dump_error", e.toString());
       }
 	  
 	  return mMethodImplementation;
@@ -5692,7 +5804,7 @@ class jDumpJavaMethods /*extends ...*/ {
        		
        		sbImplementation.append(finalStr2);        		
        		sbImplementation.append(mDelimiter);
-       		Log.i("Dump_Produce", finalStr2);
+       		//Log.i("Dump_Produce", finalStr2);
        		
        		mListNoMaskedMethodImplementation.add(finalStr2);
        	 }        	 
@@ -5701,7 +5813,7 @@ class jDumpJavaMethods /*extends ...*/ {
      }
      catch (Throwable e) {
         //System.err.println(e);
-   	  Log.i("Dump_NoMaskedImpl_error", e.toString());
+   	  //Log.i("Dump_NoMaskedImpl_error", e.toString());
      }
 	 return mNoMaskedMethodImplementation;
    }
@@ -5742,36 +5854,12 @@ class jTextFileManager /*extends ...*/ {
     	intent = null;
     }
     
-  //Once you choose bluetooth, the android bluetooth application will launch and let you pick the device to send it too.
-    public void ShareFromSdCardFile(String _filename) {        	
-    	//File externalFile = new File(Environment.getExternalStorageDirectory().getPath() +"/"+ _filename);
-    	File file = new File(Environment.getExternalStorageDirectory(), _filename);    	    	    	 
-    	intent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(file));
-    	controls.activity.startActivity(intent);    	
-    }
-        
-   //Once you choose bluetooth, the android bluetooth application will launch and let you pick the device to send it too.
-    public void ShareFromFile(String _filename) {    	    	    	
-    	//String PathDat = context.getFilesDir().getAbsolutePath();   //   //Result : /data/data/com/MyApp/files 	
-    	//File file = new File(PathDat+"/"+ _filename);
-    	File file = new File(context.getFilesDir().getAbsolutePath(),_filename);
-    	intent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(file));
-    	controls.activity.startActivity(intent);    	
-    }
-        
-    public String GetPathToExternalStorage() {    	
-      return Environment.getExternalStorageDirectory().getPath();
-    }
-        
-    public String GetPathToFile() {    	       	    
-      return context.getFilesDir().getAbsolutePath(); //Result : /data/data/com/MyApp/files 
-    }
     
     public void CopyToClipboard(String _text) {
     	mClipData = ClipData.newPlainText("text", _text);
         mClipBoard.setPrimaryClip(mClipData);
     }
-    
+       
     public String PasteFromClipboard() {
         ClipData cdata = mClipBoard.getPrimaryClip();
         ClipData.Item item = cdata.getItemAt(0);
@@ -5796,11 +5884,21 @@ class jTextFileManager /*extends ...*/ {
          outputStreamWriter.close();
      }
      catch (IOException e) {
-         Log.i("jTextFileManager", "File write failed: " + e.toString());
+        // Log.i("jTextFileManager", "SaveToFile failed: " + e.toString());
      }
-
    }
 
+   public void SaveToFile(String _txtContent, String _path, String _filename){
+	     FileWriter fWriter;     
+	     try{ // Environment.getExternalStorageDirectory().getPath()
+	          fWriter = new FileWriter(_path +"/"+ _filename);
+	          fWriter.write(_txtContent);
+	          fWriter.flush();
+	          fWriter.close();
+	      }catch(Exception e){
+	          e.printStackTrace();
+	      }
+	   }   
    public String LoadFromFile(String _filename) {
 
      String retStr = "";
@@ -5823,39 +5921,34 @@ class jTextFileManager /*extends ...*/ {
          }
      }
      catch (IOException e) {
-         Log.i("jTextFileManager", "Can not read file: " + e.toString());
+        // Log.i("jTextFileManager", "LoadFromFile error: " + e.toString());
      }
 
      return retStr;
    }
+     
+   public String LoadFromFile(String _path, String _filename) {
+	     char buf[] = new char[512];
+	     FileReader rdr;
+	     String contents = "";  //new File(Environment.getExternalStorageDirectory(), "alert.txt");
+	     try {                  // Environment.getExternalStorageDirectory().getPath() --> /sdcard
+	         rdr = new FileReader(_path+"/"+_filename);
+	         int s = rdr.read(buf);
+	         for(int k = 0; k < s; k++){
+	             contents+=buf[k];
+	         }
+	         
+	         rdr.close();
+	     } catch (Exception e) {
+	         e.printStackTrace();
+	     }
+	     return contents;
+	   }
    
    //http://manojprasaddevelopers.blogspot.com.br/search/label/Write%20and%20ReadFile
-   /*.*/public String ReadTextFile(String _filename)
-   {
-      String json = "";
-      try
-      {
-        InputStream is = context.getAssets().open(_filename);
-        int size = is.available();
-        
-        
-       
-        byte[] buffer = new byte[size];
-        is.read(buffer);
-        is.close();
-       
-        json = new String(buffer, "UTF-8");
-       
-      } catch (IOException e){
-    	 //
-      }
-      
-      return json.toString();
-     
-   }
       
    //http://www.coderzheaven.com/2012/01/29/saving-textfile-to-sdcard-in-android/
-   public void SaveToSdCardFile(String _txtContent, String _filename){
+   public void SaveToSdCard(String _txtContent, String _filename){
      FileWriter fWriter;     
      try{ // Environment.getExternalStorageDirectory().getPath()
           fWriter = new FileWriter(Environment.getExternalStorageDirectory().getPath() +"/"+ _filename);
@@ -5867,7 +5960,7 @@ class jTextFileManager /*extends ...*/ {
       }
    }
    
-   public String LoadFromSdCardFile(String _filename){
+   public String LoadFromSdCard(String _filename){
      char buf[] = new char[512];
      FileReader rdr;
      String contents = "";  //new File(Environment.getExternalStorageDirectory(), "alert.txt");
@@ -5877,6 +5970,7 @@ class jTextFileManager /*extends ...*/ {
          for(int k = 0; k < s; k++){
              contents+=buf[k];
          }
+         
          rdr.close();
      } catch (Exception e) {
          e.printStackTrace();
@@ -5884,31 +5978,50 @@ class jTextFileManager /*extends ...*/ {
      return contents;
    }
    
-   public String LoadFromAssetsFile(String _filename) {  
-	   InputStream is = null;
-	   FileOutputStream fos = null;	  	   
-	   String path = '/' + _filename.substring(1,_filename.lastIndexOf("/"));	   
-	   String scrFilename = _filename.substring(_filename.lastIndexOf("/")+1);	   	   	   	  
-	   File outDir = new File(path);	   
-	   outDir.mkdirs();	   
-	   try {		   
-	     is = controls.activity.getAssets().open(scrFilename);	     
-	     int size = is.available();	     
-	     byte[] buffer = new byte[size];	     
-	     File outfile = new File(_filename);
-	     fos = new FileOutputStream(outfile);  //save to data/data/your_package/files/your_file_name
-	     for (int c = is.read(buffer); c != -1; c = is.read(buffer)){
-	       fos.write(buffer, 0, c);
-	     }	     
-	     is.close();
-	     fos.close();
-	   }
-	   catch (IOException e) {
-	      e.printStackTrace();       
-	   }	   	 
-       return  this.LoadFromFile(scrFilename);
-   }    
+   //https://xjaphx.wordpress.com/2011/10/02/store-and-use-files-in-assets/    
+   public String LoadFromAssets(String _filename) {
+	   String str;
+       // load text
+       try {
+    	   //Log.i("loadFromAssets", "name: "+_filename);
+           // get input stream for text
+           InputStream is = controls.activity.getAssets().open(_filename);
+           // check size
+           int size = is.available();
+           // create buffer for IO
+           byte[] buffer = new byte[size];
+           // get data to buffer
+           is.read(buffer);
+           // close stream
+           is.close();
+           // set result to TextView
+           str = new String(buffer);
+           //Log.i("loadFromAssets", ":: "+ str);
+           return str.toString();
+       }
+       catch (IOException ex) {
+    	   //Log.i("loadFromAssets", "error!");
+           return "";
+       }       
+   }
+   
+   public void CopyContentToClipboard(String _filename) {
+   	 String txt = LoadFromFile(_filename);
+   	 mClipData = ClipData.newPlainText("text", txt);
+     mClipBoard.setPrimaryClip(mClipData);
+   }
+   
+   public void PasteContentFromClipboard(String _filename) {
+      ClipData cdata = mClipBoard.getPrimaryClip();
+      ClipData.Item item = cdata.getItemAt(0);
+      String txt = item.getText().toString();
+      SaveToFile(txt, _filename);
+   }   
+
 }
+
+
+
 
 /*Draft java code by "Lazarus Android Module Wizard"*/
 /*https://github.com/jmpessoa/lazandroidmodulewizard*/
@@ -5936,7 +6049,7 @@ class jMediaPlayer {
 		   
 		 this.mplayer = new MediaPlayer();
 		 	 
-		 Log.i("jMediaPlayer", "Created!");
+		 //Log.i("jMediaPlayer", "Created!");
 	  }
 	  
 	  public void jFree() {
@@ -5980,12 +6093,12 @@ class jMediaPlayer {
 			  }
 		 }else if (_path.indexOf("DEFAULT_RINGTONE_URI") >= 0){
 			 
-			 Log.i("jMediaPlayer", "DEFAULT_RINGTONE_URI");
+			 //Log.i("jMediaPlayer", "DEFAULT_RINGTONE_URI");
 			 
 	         try{ 
 	              this.mplayer.setDataSource(context, Settings.System.DEFAULT_RINGTONE_URI);
 	         }catch (IOException e){
-	        	  Log.i("jMediaPlayer", "RINGTONE ERROR");
+	        	  //Log.i("jMediaPlayer", "RINGTONE ERROR");
 	  	          e.printStackTrace();  	         
 	         }
 	         
@@ -6004,7 +6117,7 @@ class jMediaPlayer {
 		           e.printStackTrace();	
 	            }
 	           		   
-	  		    Log.i("jMediaPlayer", newPath);
+	  		   // Log.i("jMediaPlayer", newPath);
 	  		   
 		      } else {	    	 
 		    	 String initChar = _path.substring(0,1);	    	 
@@ -6018,7 +6131,7 @@ class jMediaPlayer {
 		         }
 	     	 }		 	
 		 }else {
-			 Log.i("jMediaPlayer", "loadFromAssets: "+ _path);
+			// Log.i("jMediaPlayer", "loadFromAssets: "+ _path);
 			 AssetFileDescriptor afd;
 			 try {
 			 	afd = controls.activity.getAssets().openFd(_path);
@@ -6032,7 +6145,7 @@ class jMediaPlayer {
 	  //for files, it is OK to call prepare(), which blocks until MediaPlayer is ready for playback...
 	  public void Prepare(){	 //prepares the player for playback synchronously.
 	  	try {
-	  		   Log.i("jMediaPlayer", "Prepare");
+	  		   //Log.i("jMediaPlayer", "Prepare");
 	  		   this.mplayer.prepare();		
 			} catch (IOException e) {
 				e.printStackTrace();		
@@ -6117,34 +6230,50 @@ class jMenu /*extends ...*/ {
        pascalObj = _Self;
        controls  = _ctrls;
        mMenu     = null;
-       mSubMenus = new SubMenu[8];
+       mSubMenus = new SubMenu[9]; //max sub menus number = 10!
     }
   
     public void jFree() {
         //free local objects...
+        if (mMenu != null){	
+        	  for(int i=0; i < mCountSubMenu; i++){
+        		 mSubMenus[i] = null;
+        	  }    	 
+        }
     	mMenu = null;
     }
   
+    
+    //http://android-developers.blogspot.com.br/2012/01/say-goodbye-to-menu-button.html 
+    /*
+     * ... if you do not want an action bar: set targetSdkVersi to 13 or below ....!! 
+     */
+    
     //write others [public] methods code here......
-    //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...       
-    public void Add(Menu _menu, int _itemID, String _caption){
-	  _menu.add(0,_itemID,0 ,(CharSequence)_caption);
-	  if (mMenu == null) mMenu = _menu;
-	  Log.i("jMenu_add", _caption);
+    //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ... 
+    
+    /*
+     * The overflow icon [...] only appears on phones that have no menu hardware keys. 
+     * Phones with menu keys display the action overflow when the user presses the key.
+     */
+    
+    public void Add(Menu _menu, int _itemID, String _caption){    	
+      _menu.add(0,_itemID,0 ,(CharSequence)_caption); //return MenuItem
+      if (mMenu == null) mMenu = _menu; 
+    }
+        
+    //TODO: ic_launcher.png just for test!
+    public void AddDrawable(Menu _menu, int _itemID, String _caption){    	     	
+       String _resName = "ic_launcher"; //ok       
+       MenuItem item = _menu.add(0,_itemID,0 ,(CharSequence)_caption);       
+       item.setIcon(GetDrawableResourceId(_resName));
+       if (mMenu == null) mMenu = _menu;
     }
     
     public void AddCheckable(Menu _menu, int _itemID, String _caption){
-	   _menu.add(0,_itemID,0 ,(CharSequence)_caption).setCheckable(true);
-	   if (mMenu == null) mMenu = _menu;
-	   Log.i("jMenu_AddCheckable", _caption);
-    }
-    
-    //TODO: ic_launcher.png just for test!
-    public void AddDrawable(Menu _menu, int _itemID, String _caption){    	
- 	   _menu.add(0,_itemID,0 ,(CharSequence)_caption).setIcon(R.drawable.ic_launcher);
- 	   if (mMenu == null) mMenu = _menu;
- 	   Log.i("jMenu_AddDrawable", _caption);
-    }
+        _menu.add(0,_itemID,0 ,(CharSequence)_caption).setCheckable(true);
+        if (mMenu == null) mMenu = _menu;
+     }
     
     public void CheckItemCommute(MenuItem _item){
     	int flag = 0;
@@ -6153,61 +6282,42 @@ class jMenu /*extends ...*/ {
     	  case 0: _item.setChecked(false); 
     	  case 1: _item.setChecked(true);
         }
-  	   Log.i("jMenu_CheckItemCommute", _item.getTitle().toString());
+  	    //Log.i("jMenu_CheckItemCommute", _item.getTitle().toString());
     }
     
     public void CheckItem(MenuItem _item){
        _item.setChecked(true);
-       Log.i("jMenu_CheckItem", _item.getTitle().toString());
+       //Log.i("jMenu_CheckItem", _item.getTitle().toString());
     }
     
     public void UnCheckItem(MenuItem _item){
        _item.setChecked(false);       
-   	   Log.i("jMenu_UnCheckItem", _item.getTitle().toString());
+   	   //Log.i("jMenu_UnCheckItem", _item.getTitle().toString());
     }    
     
-    public void AddSubMenu(Menu _menu, int _startItemID, String[] _captions){
-    	
+    public void AddSubMenu(Menu _menu, int _startItemID, String[] _captions){    	
     	int size = _captions.length;
-    	if (size > 1) {
-    			
-     	   mSubMenus[mCountSubMenu] = _menu.addSubMenu((CharSequence)_captions[0]); //main title
-     	   
-     	   //int resID = context.getResources().getIdentifier("ic_launcher", "drawable", context.getPackageName());
-     	   //ex: Read the resource:
-     	   // InputStream inputStream = context.getResources().openRawResource(resID);
-     	   mSubMenus[mCountSubMenu].setHeaderIcon(R.drawable.ic_launcher);  
-     	   
-    	   Log.i("jMenu_addSubMenu", _captions[0]);
-    	   
+    	if (size > 1) {    		    	     	   
+    	   mSubMenus[mCountSubMenu] = _menu.addSubMenu((CharSequence)_captions[0]); //main title      	  
+     	   mSubMenus[mCountSubMenu].setHeaderIcon(R.drawable.ic_launcher);      	       	   
     	   for(int i=1; i < size; i++) {    	
-    		   mSubMenus[mCountSubMenu].add(0,_startItemID+(i-1),0,(CharSequence)_captions[i]); //sub titles...
-    	     Log.i("jMenu_addSubMenu", _captions[i]);
-    	   }
-    	   
-    	   mCountSubMenu++;
-    	   
-    	   if (mMenu == null) mMenu = _menu;
+    		   MenuItem item = mSubMenus[mCountSubMenu].add(0,_startItemID+(i-1),0,(CharSequence)_captions[i]); //sub titles...    		       	    
+    	   }    	   
+    	   mCountSubMenu++;    	       	   
     	}    	    	
     }
 
    //TODO: ic_launcher.png just for test!
-    public void AddCheckableSubMenu(Menu _menu, int _startItemID, String[] _captions){
-    	
+    public void AddCheckableSubMenu(Menu _menu, int _startItemID, String[] _captions){    	
     	int size = _captions.length;
-    	if (size > 1) {
-    		
+    	if (size > 1) {    		
     	   mSubMenus[mCountSubMenu] = _menu.addSubMenu((CharSequence)_captions[0]); //main title
-    	   mSubMenus[mCountSubMenu].setHeaderIcon(R.drawable.ic_launcher);  
-     	   
-    	   Log.i("jMenu_AddCheckableSubMenu", _captions[0]);
+    	   mSubMenus[mCountSubMenu].setHeaderIcon(R.drawable.ic_launcher);       	   
+    	   //Log.i("jMenu_AddCheckableSubMenu", _captions[0]);
     	   for(int i=1; i < size; i++) {    	
     		  mSubMenus[mCountSubMenu].add(0,_startItemID+(i-1),0,(CharSequence)_captions[i]).setCheckable(true); //sub titles...
-    	      Log.i("jMenu_addSubMenu", _captions[i]);
-    	   }
-    	   
-    	   mCountSubMenu++;
-    	   if (mMenu == null) mMenu = _menu;	   
+    	   }    	   
+    	   mCountSubMenu++;	   
     	}
     }
     
@@ -6252,7 +6362,222 @@ class jMenu /*extends ...*/ {
     public void RegisterForContextMenu(View _view){
        controls.activity.registerForContextMenu(_view);
     }
+        
+    //http://daniel-codes.blogspot.com.br/2009/12/dynamically-retrieving-resources-in.html
+   //Just note that in case you want to retrieve Views (Buttons, TextViews, etc.) 
+    //you must implement R.id.class instead of R.drawable.
+    private int GetDrawableResourceId(String _resName) {
+    	  try {
+    	     Class<?> res = R.drawable.class;
+    	     Field field = res.getField(_resName);  //"drawableName"
+    	     int drawableId = field.getInt(null);
+    	     return drawableId;
+    	  }
+    	  catch (Exception e) {
+    	     Log.e("MyTag", "Failure to get drawable id.", e);
+    	     return 0;
+    	  }
+    }
     
+    private Drawable GetDrawableResourceById(int _resID) {   	    	 
+    	 return (Drawable)( this.controls.activity.getResources().getDrawable(_resID));
+    }
+    
+    //_itemType --> 0:Default, 1:Checkable
+    public void AddItem(Menu _menu, int _itemID, String _caption, String _iconIdentifier, int _itemType, int _showAsAction){    	     	
+    	MenuItem item = _menu.add(0,_itemID,0 ,(CharSequence)_caption);
+    			
+    	switch  (_itemType) {
+    	case 1:  item.setCheckable(true); break;    	
+    	}
+    	
+        if (!_iconIdentifier.equals("")) {
+           item.setIcon(GetDrawableResourceId(_iconIdentifier));
+        }
+                      
+        switch (_showAsAction) {
+          case 0: item.setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER); break;
+          case 1: item.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM); break;
+          case 2: item.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS); break;
+          case 4: item.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM|MenuItem.SHOW_AS_ACTION_WITH_TEXT); 
+                  item.setTitleCondensed("ok0"); break;                    
+          case 5: item.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS|MenuItem.SHOW_AS_ACTION_WITH_TEXT);
+                  item.setTitleCondensed("ok1");break;
+        } 	
+        
+  	   if (mMenu == null) mMenu = _menu;
+  	   
+     }
+    
+    ////Sub menus Items: Do not support item icons, or nested sub menus.    
+    public void AddItem(SubMenu _subMenu, int _itemID, String _caption, int _itemType){    	     	        
+        MenuItem item = _subMenu.add(0,_itemID,0 ,(CharSequence)_caption);        
+    	switch  (_itemType) {
+    	case 1:  item.setCheckable(true); break;    	
+    	}                            
+     }
+    
+    public SubMenu AddSubMenu(Menu _menu, String _title, String _headerIconIdentifier){  
+     	   SubMenu sm =_menu.addSubMenu((CharSequence)_title); //main title     	        	       	  
+     	   sm.setHeaderIcon(GetDrawableResourceId(_headerIconIdentifier));
+    	   mSubMenus[mCountSubMenu] = sm;      	       	     	       	       	   
+    	   mCountSubMenu++;    	   
+    	   return sm;  	    	
+    }  
+}
+
+
+/*Draft java code by "Lazarus Android Module Wizard" [4-5-14 20:46:56]*/
+/*https://github.com/jmpessoa/lazandroidmodulewizard*/
+/*jControl template*/
+
+class jContextMenu /*extends ...*/ {
+  
+    private long pascalObj = 0;      // Pascal Object
+    private Controls controls  = null;   // Control Class -> Java/Pascal Interface ...
+    private Context  context   = null;
+    private ContextMenu  mMenu = null;
+    private ArrayList<String>    mItemList;
+    
+    private String mHeaderTitle;
+    private String mHeaderIconIdentifier;
+    
+    //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
+  
+    public jContextMenu(Controls _ctrls, long _Self) { //Add more others news "_xxx" params if needed!
+       //super(_ctrls.activity);
+       context   = _ctrls.activity;
+       pascalObj = _Self;
+       controls  = _ctrls;
+       mMenu     = null;
+       mItemList = new ArrayList<String>();
+    }
+  
+    public void jFree() {
+        //free local objects...
+    	mMenu = null;
+    	mItemList.clear();
+    	mItemList = null;    	    	
+    }
+      
+    public int CheckItemCommute(MenuItem _item){
+    	int flag = 0;
+    	
+    	int id = _item.getItemId();
+    	if (_item.isChecked()) flag = 1;
+    	switch (flag) {
+    	  case 0: _item.setChecked(false);
+    	           mItemList.remove(Integer.toString(id));                   
+    	  break; 
+    	  case 1: _item.setChecked(true);
+    	          mItemList.remove(Integer.toString(id));
+    	          mItemList.add(Integer.toString(id)); 
+    	  break;
+        }
+  	   return id;
+    }
+    
+    public int CheckItem(MenuItem _item){
+       _item.setChecked(true);
+       int id = _item.getItemId();
+       mItemList.remove(Integer.toString(id));
+       mItemList.add(Integer.toString(id));
+       return  id;
+    }
+    
+    public int UnCheckItem(MenuItem _item){
+      _item.setChecked(false);       
+      int id =_item.getItemId();
+      mItemList.remove(Integer.toString(id));
+      return id;
+    }    
+        
+    public int Size(){
+    	if (mMenu != null)
+    	   return mMenu.size();
+    	else 
+    	  return 0;   			
+    }
+    
+    public MenuItem FindMenuItemByID(int _itemID){
+    	if (mMenu != null) return mMenu.findItem(_itemID);
+    	else return null;
+    }
+
+    public MenuItem GetMenuItemByIndex(int _index){
+    	if (mMenu != null)
+    	   return mMenu.getItem(_index);
+    	else return null;
+    }
+    
+    public void UnCheckAllMenuItem(){
+      if (mMenu != null){	
+    	 for(int index=0; index < mMenu.size(); index++){
+    		mMenu.getItem(index).setChecked(false);
+    	 }    	 
+    	 mItemList.clear();
+      } 	
+    }
+        
+    public void RegisterForContextMenu(View _view){
+       controls.activity.registerForContextMenu(_view);
+    }   
+    
+    //_itemType --> 0:Default, 1:Checkable
+    public MenuItem AddItem(ContextMenu _menu, int _itemID, String _caption, int _itemType){    	     	
+    	MenuItem item = _menu.add(0,_itemID,0 ,(CharSequence)_caption);
+    	
+    	switch  (_itemType) {
+    	case 1:  item.setCheckable(true); break;    	
+    	}
+    	                      
+  	    if (mMenu == null) mMenu = _menu;
+  	   
+  	    return item;
+    }
+    
+    private int GetDrawableResourceId(String _resName) {
+  	  try {
+  	     Class<?> res = R.drawable.class;
+  	     Field field = res.getField(_resName);  //"drawableName"
+  	     int drawableId = field.getInt(null);
+  	     return drawableId;
+  	  }
+  	  catch (Exception e) {
+  	     Log.e("jContextMenu_error", "Failure to get drawable id.", e);
+  	     return 0;
+  	  }
+    }
+    
+    public void SetHeader(ContextMenu _menu, String _title, String _iconIdentifier){
+    	mHeaderTitle = _title;
+    	mHeaderIconIdentifier = _iconIdentifier;
+  	   _menu.setHeaderTitle((CharSequence)_title);
+  	   _menu.setHeaderIcon(GetDrawableResourceId(_iconIdentifier));
+  	   if (mMenu == null) mMenu = _menu;
+    }
+    
+    public void SetHeaderTitle(String _title){    	     	  
+   	   mHeaderTitle = _title;
+   	   if (mMenu != null) {
+   		   mMenu.setHeaderTitle((CharSequence)_title);
+   	   }   	   
+     }
+    
+    public void SetHeaderIconByIdentifier(String _iconIdentifier){    	     	  
+   	   mHeaderIconIdentifier = _iconIdentifier;
+   	   if (mMenu != null) {
+   		  mMenu.setHeaderIcon(GetDrawableResourceId(_iconIdentifier));
+   	   }
+     }    
+    public boolean IsItemChecked(int _itemID) {
+    	boolean res = false; 
+    	if (mItemList.size() > 0)  {
+    		if ( mItemList.indexOf( Integer.toString(_itemID)) >= 0  ) res = true; 	
+    	}    	
+    	return res;
+    }
+           
 }
 
 //ref. http://stackoverflow.com/questions/19395970/android-bluetooth-background-listner?rq=1
@@ -6291,7 +6616,7 @@ class jBluetoothServerSocket {
           	    HandleInput();
            }else if (msg.what == 2){  //qet as text....
         	    controls.pOnBluetoothClientSocketIncomingMessage(pascalObj, msg.getData().getString("text"));
-        	    Log.i("mHandler",msg.getData().getString("text"));	                
+        	    //Log.i("mHandler",msg.getData().getString("text"));	                
            }else if (msg.what == 3){ //QUIT
         	   mConnected = false;
            }	           
@@ -6446,7 +6771,7 @@ class jBluetoothServerSocket {
                 }
              }
           };
-         sender.start(); // Inicialização
+         sender.start(); // Init
 	   }
 	}
 
@@ -6466,7 +6791,7 @@ class jBluetoothServerSocket {
 	                 }
 	           }	          
 	       };
-	       sender.start(); // Inicialização
+	       sender.start(); // Init
 		}    
 	}
 	
@@ -6575,7 +6900,7 @@ class jBluetoothClientSocket {
 	        	     HandleInput();        	   
 	           }else if (msg.what == 2){  //qet as  text
 	        	    controls.pOnBluetoothClientSocketIncomingMessage(pascalObj, msg.getData().getString("text"));	        	    
-	        	    Log.i("mHandler",msg.getData().getString("text"));	                
+	        	   // Log.i("mHandler",msg.getData().getString("text"));	                
 	           }else if (msg.what == 3){ //QUIT
 	        	   mmConnected = false;
 	           }	           
@@ -6609,7 +6934,7 @@ class jBluetoothClientSocket {
 	}
 	
 	public void SetDevice(BluetoothDevice _device) {
-		Log.i("SetDevice","SetDevice...");
+		//Log.i("SetDevice","SetDevice...");
 		mmDevice = _device;
 	}
 	
@@ -6858,6 +7183,7 @@ class jBluetoothClientSocket {
 //ref. http://examples.javacodegeeks.com/android/core/bluetooth/bluetoothadapter/android-bluetooth-example/
 //ref. http://www.javacodegeeks.com/2013/09/bluetooth-data-transfer-with-android.html
 //ref. http://www.bravenewgeek.com/bluetooth-blues/
+       
 class jBluetooth /*extends ...*/ {
 
     private long     pascalObj = 0;      // Pascal Object
@@ -6885,7 +7211,7 @@ class jBluetooth /*extends ...*/ {
 	        	   mListReachablePairedDevices.add(device);	               
 	           }
 			   mListFoundedDevices.add( device.getName() + "|" + device.getAddress() );
-			   Log.i("jBluetooth_onReceive",device.getName() + "|" + device.getAddress());	        	   
+			  // Log.i("jBluetooth_onReceive",device.getName() + "|" + device.getAddress());	        	   
 	           	           
 	           controls.pOnBluetoothDeviceFound(pascalObj,device.getName(),device.getAddress());
 	           
@@ -6998,7 +7324,7 @@ class jBluetooth /*extends ...*/ {
               
               for(BluetoothDevice device : Devices) {        	
          	     listBondedDevices.add(device.getName()+"|"+ device.getAddress());
-           	     Log.i("Bluetooch_devices",device.getName());  //device.getAddress()            
+           	     //Log.i("Bluetooch_devices",device.getName());  //device.getAddress()            
               }
               
            }  
@@ -7057,78 +7383,6 @@ class jBluetooth /*extends ...*/ {
       }
     }       
                          
-    //Once you choose bluetooth, the android bluetooth application will launch and let you pick the device to send it too.
-    public void ShareFromSdCardFile(String  _filename) {
-    	
-       PackageManager pm = controls.activity.getPackageManager();
-       List<ResolveInfo>  appsList = pm.queryIntentActivities(intent, 0);
-     
-       if(appsList.size() > 0) {
-    	   String packageName = null;
-    	   String className = null;
-    	   boolean found = false;
-    	    
-    	   for(int i=0; i<  appsList.size()-1;i++){    		       		 
-    		 ResolveInfo info = appsList.get(i); //(ResolveInfo)    
-    	     packageName = info.activityInfo.packageName;
-    	     if( packageName.equals("com.android.bluetooth")){
-    	        className = info.activityInfo.name;
-    	        found = true;
-    	        break;// found
-    	     }
-    	   }
-    	   
-    	   if(found){
-    		 //set our intent to launch Bluetooth
-    		 intent.setClassName(packageName, className);
-    		 File file = new File(Environment.getExternalStorageDirectory().getPath() +"/"+ _filename);
-    		 
-    		 intent.setType("*/*");
-    	     intent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(file)); /* "/sdcard/test.txt" result : "file:///sdcard/test.txt" */
-    	     controls.activity.startActivity(intent);      		       		       	
-    	   }else{
-    		  Toast.makeText(controls.activity.getApplicationContext(),"com.android.bluetooth Not Found!" ,Toast.LENGTH_LONG).show();  
-    	   }    
-    	   
-       }       
-    }
-    
-    //Once you choose bluetooth, the android bluetooth application will launch and let you pick the device to send it too.
-    public void ShareFromFile(String _filename) {
-    	
-        PackageManager pm = controls.activity.getPackageManager();
-        List<ResolveInfo>  appsList = pm.queryIntentActivities(intent, 0);
-      
-        if(appsList.size() > 0) {
-     	   String packageName = null;
-     	   String className = null;
-     	   boolean found = false;
-     	    
-     	   for(int i=0; i<  appsList.size()-1;i++){    		       		 
-     		 ResolveInfo info = appsList.get(i);     
-     	     packageName = info.activityInfo.packageName;
-     	     if( packageName.equals("com.android.bluetooth")){
-     	        className = info.activityInfo.name;
-     	        found = true;
-     	        break;// found
-     	     }
-     	   }    	   
-     	   if(found){
-     		 //set our intent to launch Bluetooth
-    		 intent.setClassName(packageName, className);     		      		
-       		 
-          	 String PathDat = context.getFilesDir().getAbsolutePath();   //   //Result : /data/data/com/MyApp/files 	
-        	 File file = new File(PathDat+"/"+ _filename);
-        	 
-        	 intent.setType("*/*");
-        	 intent.putExtra(Intent.EXTRA_STREAM,Uri.fromFile(file)); /* "/sdcard/test.txt" result : "file:///sdcard/test.txt" */
-        	 controls.activity.startActivity(intent);    	
-       		 
-     	   }else{
-     		  Toast.makeText(controls.activity.getApplicationContext(),"com.android.bluetooth Not Found!" ,Toast.LENGTH_LONG).show();  
-     	   }    		   
-        }
-    }
     
     public BluetoothDevice GetReachablePairedDeviceByName(String _deviceName) {
     	
@@ -7193,7 +7447,7 @@ class jBluetooth /*extends ...*/ {
     	for(int i=0; i < mListFoundedDevices.size(); i++) {
     	    device = mListFoundedDevices.get(i);    	   
     	    devAddr = device.substring(device.indexOf("|")+1);
-    	    Log.i("devAddr",devAddr);
+    	   // Log.i("devAddr",devAddr);
     	    if (devAddr.equals(_deviceAddress)) {
     	    	break;
     	    }    	       	    	    
@@ -7208,7 +7462,7 @@ class jBluetooth /*extends ...*/ {
     	for(int i=0; i < mListFoundedDevices.size(); i++) {
     	    device = mListFoundedDevices.get(i);    	   
     	    devName = device.substring(0, device.indexOf("|")-1);
-    	    Log.i("devName",devName);
+    	   // Log.i("devName",devName);
     	    if (devName.equals(_deviceName)) {
     	    	break;
     	    }    	       	    	    
@@ -7217,23 +7471,30 @@ class jBluetooth /*extends ...*/ {
     }    
 }
 
+//by jmpessoa
 class jShareFile /*extends ...*/ {
 
     private long     pascalObj = 0;      // Pascal Object
     private Controls controls  = null;   // Control Class -> Java/Pascal Interface ...
     private Context  context   = null;
+    private String mTransitoryEnvironmentDirectoryPath;
     
-    Intent intent = null;
-	        
+    private Intent intent = null;
+        	        
     //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
-
     public jShareFile(Controls _ctrls, long _Self) { //Add more others news "_xxx" params if needed!
        //super(_ctrls.activity);
        context   = _ctrls.activity;
        pascalObj = _Self;
        controls  = _ctrls;
+       
+       mTransitoryEnvironmentDirectoryPath = GetEnvironmentDirectoryPath(1); //download!
+       
        intent = new Intent();
 	   intent.setAction(Intent.ACTION_SEND);
+       //intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+  	   intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+
     }
 
     public void jFree() {
@@ -7243,52 +7504,135 @@ class jShareFile /*extends ...*/ {
 
     //write others [public] methods code here......
     //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
+    private static void copyFileUsingFileStreams(File source, File dest)
+    		throws IOException {
+    	InputStream input = null;
+    	OutputStream output = null;
+    	try {
+    		input = new FileInputStream(source);
+    		output = new FileOutputStream(dest);
+    		byte[] buf = new byte[1024];
+    		int bytesRead;
+    		while ((bytesRead = input.read(buf)) > 0) {
+    			output.write(buf, 0, bytesRead);
+    		}
+    	} finally {
+    		input.close();
+    		output.close();
+    	}
+    }
+
+    private boolean CopyFile(String _scrFullFileName, String _destFullFileName) {
+    	File src= new File(_scrFullFileName);
+    	File dest= new File(_destFullFileName);
+    	try {
+    		copyFileUsingFileStreams(src, dest);
+    		return true;
+    	} catch (IOException e) {
+    		// TODO Auto-generated catch block
+    		e.printStackTrace();
+    		return false;
+    	}
+    }
     
-	public void SendFromSdCard(String _filename, String _mimetype){			 		 
+	public void ShareFromSdCard(String _filename, String _mimetype){			 		 
 		intent.setType(_mimetype);		
 	    File file = new File(Environment.getExternalStorageDirectory().getPath() +"/"+ _filename);
-	    intent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(file)); /* "/sdcard/test.txt" result : "file:///sdcard/test.txt" */			 	         		 		 			 		
-		controls.activity.startActivity(intent);
+	    intent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(file)); /* "/sdcard/test.txt" result : "file:///sdcard/test.txt" */			 	         		 		 			 				
+		controls.activity.startActivity(Intent.createChooser(intent, "Share ["+_filename+"] by:"));
 	}
 	
-	public void SendFromAssets(String _filename, String _mimetype){
-		    intent.setType(_mimetype);
+	//https://xjaphx.wordpress.com/2011/10/02/store-and-use-files-in-assets/
+	public void ShareFromAssets(String _filename, String _mimetype){				    		   
 			InputStream is = null;
-			FileOutputStream fos = null;	  	   
-			String path = '/' + _filename.substring(1,_filename.lastIndexOf("/"));	   
-			String scrFilename = _filename.substring(_filename.lastIndexOf("/")+1);	   	   	   	  
-			File outDir = new File(path);	   
-			outDir.mkdirs();	   
-			try {		   
-				is = controls.activity.getAssets().open(scrFilename);	     
+			FileOutputStream fos = null;			
+			String PathDat = controls.activity.getFilesDir().getAbsolutePath();			 			
+			try {		   		     			
+				File outfile = new File(PathDat+"/"+_filename);								
+				// if file doesnt exists, then create it
+				if (!outfile.exists()) {
+					outfile.createNewFile();
+				
+				}												
+				fos = new FileOutputStream(outfile);  //save to data/data/your_package/files/your_file_name														
+				is = controls.activity.getAssets().open(_filename);																				
 				int size = is.available();	     
-				byte[] buffer = new byte[size];	     
-				File outfile = new File(_filename);
-				fos = new FileOutputStream(outfile);  //save to data/data/your_package/files/your_file_name
+				byte[] buffer = new byte[size];												
 				for (int c = is.read(buffer); c != -1; c = is.read(buffer)){
 			      fos.write(buffer, 0, c);
-				}	     
-				is.close();
-				fos.close();
+				}																
+				is.close();								
+				fos.close();								
+				ShareFromInternalAppStorage(_filename,_mimetype);				
 			}catch (IOException e) {
-			     e.printStackTrace();       
-			}	   	 
-			//LoadFromFile(scrFilename);		 		
-       	    String PathDat = context.getFilesDir().getAbsolutePath();  //Result : /data/data/com/MyApp/files       	           	           	   
-       	    File file = new File(PathDat+"/"+ _filename);       	    
-			intent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(file)); 		 			            	     			    	
-			controls.activity.startActivity(intent);
+				// Log.i("ShareFromAssets","fail!!");
+			     e.printStackTrace();			     
+			}									
 	}	
 	
-	public void SendFromFile(File _filename, String _mimetype) {	    		     
-	   String PathDat = context.getFilesDir().getAbsolutePath();       //Result : /data/data/com/MyApp/files 	
-	   File file = new File(PathDat+"/"+ _filename);	        	 
-	   intent.setType(_mimetype);
-	   intent.putExtra(Intent.EXTRA_STREAM,Uri.fromFile(file));
-	   controls.activity.startActivity(intent);    		       		 	     
-	}		
+	public void ShareFromInternalAppStorage(String _filename, String _mimetype) {	 
+	  String srcPath = controls.activity.getFilesDir().getAbsolutePath()+"/"+ _filename;       //Result : /data/data/com/MyApp/files	 
+	  String destPath = mTransitoryEnvironmentDirectoryPath + "/" + _filename;	  
+	  CopyFile(srcPath, destPath);	  
+	  ShareFrom(destPath, _mimetype);	  	   
+	}
+		
+	public void ShareFrom(String _fullFilename, String _mimetype) {
+		   int p1 = _fullFilename.lastIndexOf("/");
+		   String filename = _fullFilename.substring(p1+1, _fullFilename.length());		   		   
+		   File file = new File(_fullFilename);	        	 
+		   intent.setType(_mimetype);
+		   intent.putExtra(Intent.EXTRA_STREAM,Uri.fromFile(file));    		       		 	     
+		   controls.activity.startActivity(Intent.createChooser(intent, "Share ["+filename+"] by:")); 		   
+	}	
+		
+	private String GetEnvironmentDirectoryPath(int _directory) {
+		
+		File filePath= null;
+		String absPath="";   //fail!
+		  
+		//Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS);break; //API 19!
+		if (_directory != 8) {		  	   	 
+		  switch(_directory) {	                       
+		    
+		    case 0:  filePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS); break; //hack		    
+		    case 1:  filePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM); break;
+		    case 2:  filePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MUSIC); break;
+		    case 3:  filePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES); break;
+		    case 4:  filePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_NOTIFICATIONS); break;
+		    case 5:  filePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MOVIES); break;
+		    case 6:  filePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PODCASTS); break;
+		    case 7:  filePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_RINGTONES); break;
+		    
+		    case 9: absPath  = this.controls.activity.getFilesDir().getAbsolutePath(); break;      //Result : /data/data/com/MyApp/files	    	    
+		    case 10: absPath = this.controls.activity.getFilesDir().getPath();
+		             absPath = absPath.substring(0, absPath.lastIndexOf("/")) + "/databases"; break;
+		    case 11: absPath = this.controls.activity.getFilesDir().getPath();
+	                 absPath = absPath.substring(0, absPath.lastIndexOf("/")) + "/shared_prefs"; break;	             		           
+		  }
+		  	  
+		  //Make sure the directory exists.
+	      if (_directory < 8) { 
+	    	 filePath.mkdirs();
+	    	 absPath= filePath.getPath(); 
+	      }	        
+	      
+		}else {  //== 8
+		    if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED) == true) {
+		    	filePath = Environment.getExternalStorageDirectory();  //sdcard!
+		    	// Make sure the directory exists.
+		    	filePath.mkdirs();
+		   	    absPath= filePath.getPath();
+		    }
+		}    			    		 
+		return absPath;
+	}	
+	
+    public void SetTransitoryEnvironmentDirectory(int _index) {   
+    	mTransitoryEnvironmentDirectoryPath = GetEnvironmentDirectoryPath(_index);
+    }
+	
 }
-
 
 //by jmpessoa
 class CustomSpinnerArrayAdapter<T> extends ArrayAdapter<String>{
@@ -7666,7 +8010,7 @@ class jLocation /*extends ...*/ {
           result = true;
         }            
         else {
-        	 Log.i("jLocation", "Wait... No Location Yet!!");                	        
+        	// Log.i("jLocation", "Wait... No Location Yet!!");                	        
         	 result = false;
         }    
         
@@ -7832,7 +8176,7 @@ class jLocation /*extends ...*/ {
              
              mAddress = GetAddress(mLat, mLng);
              
-             Log.i("jLocation", "Latitude: "+ mLatitude+ " ... Longitude: "+mLongitude+" ... Altitude: " + mAltitude);
+            // Log.i("jLocation", "Latitude: "+ mLatitude+ " ... Longitude: "+mLongitude+" ... Altitude: " + mAltitude);
                           
         	 controls.pOnLocationChanged(pascalObj,mLat,mLng,mAlt,mAddress);        		
         }
@@ -7851,21 +8195,21 @@ class jLocation /*extends ...*/ {
     			 mStatus="Available";    		
               break;
     		}        	        	
-        	Log.i("jLocation", "mStatus: "+mStatus);
+        	//Log.i("jLocation", "mStatus: "+mStatus);
         	
         	controls.pOnLocationStatusChanged(pascalObj, status, provider, mStatus);
         }
 
         @Override
         /*.*/public void onProviderEnabled(String provider) {
-        	Log.i("jLocation", "Enabled: "+provider);
+        	//Log.i("jLocation", "Enabled: "+provider);
         	controls.pOnLocationProviderEnabled(pascalObj, provider);
         }
         
         @Override
         /*.*/public void onProviderDisabled(String provider) {        
         	///* this is called if/when the GPS is disabled in settings */
-        	Log.i("jLocation", "Disabled: "+provider);
+        	//Log.i("jLocation", "Disabled: "+provider);
         	controls.pOnLocationProviderDisabled(pascalObj, provider);        	
         }
                 
@@ -7944,6 +8288,587 @@ class jPreferences /*extends ...*/ {
 	}
 }
 
+//by jmpessoa
+class jImageFileManager /*extends ...*/ {
+
+    private long     pascalObj = 0;      // Pascal Object
+    private Controls controls  = null;   // Control Class -> Java/Pascal Interface ...
+    private Context  context   = null;
+    
+    //Warning: please, preferentially init your news params names with "_", ex: int _flag, String _hello ...
+    public jImageFileManager(Controls _ctrls, long _Self) { //Add more here new "_xxx" params if needed!
+       //super(contrls.activity);
+       context   = _ctrls.activity;
+       pascalObj = _Self;
+       controls  = _ctrls;                   
+    }
+
+    public void jFree() {
+      //free local objects...        	
+    }
+
+   public void SaveToSdCard(Bitmap _image, String _filename) {	
+	   	  	   
+	    File file;
+	    String root = Environment.getExternalStorageDirectory().toString();
+	    
+	    file = new File (root+"/"+_filename);	
+	    
+	    if (file.exists ()) file.delete (); 
+	    try {
+	       FileOutputStream out = new FileOutputStream(file);	           	           	         
+	     
+           if ( _filename.toLowerCase().contains(".jpg") ) _image.compress(Bitmap.CompressFormat.JPEG, 90, out);
+	       if ( _filename.toLowerCase().contains(".png") ) _image.compress(Bitmap.CompressFormat.JPEG, 100, out);	       
+	       
+	       out.flush();
+	       out.close();
+	    } catch (Exception e) {
+           e.printStackTrace();
+	    }
+	    
+   }
+   
+   // By using this line you can able to see saved images in the gallery view.
+   public void ShowImagesFromGallery () {	   
+	   controls.activity.sendBroadcast(new Intent(
+		   Intent.ACTION_MEDIA_MOUNTED,
+		               Uri.parse("file://" + Environment.getExternalStorageDirectory())));
+   }
+   
+   public Bitmap LoadFromSdCard(String _filename) {	   
+	      String imageInSD = Environment.getExternalStorageDirectory().getPath()+"/"+_filename;	      
+	      Bitmap bitmap = BitmapFactory.decodeFile(imageInSD);	      
+	      return bitmap; 
+   }
+      
+   //http://android-er.blogspot.com.br/2010/07/save-file-to-sd-card.html
+   private InputStream OpenHttpConnection(String strURL) throws IOException{
+	   InputStream inputStream = null;
+	   URL url = new URL(strURL);
+	   URLConnection conn = url.openConnection();
+
+	   try{
+	    HttpURLConnection httpConn = (HttpURLConnection)conn;
+	    httpConn.setRequestMethod("GET");
+	    httpConn.connect();
+
+	    if (httpConn.getResponseCode() == HttpURLConnection.HTTP_OK) {
+	     inputStream = httpConn.getInputStream();
+	    }
+	   }
+	   catch (Exception ex)
+	   {
+	   }
+	   return inputStream;
+   }
+   
+   public Bitmap LoadFromURL(String _imageURL) {
+	   
+    BitmapFactory.Options bmOptions;
+	bmOptions = new BitmapFactory.Options();
+	bmOptions.inSampleSize = 1;
+	   
+    Bitmap bitmap = null;
+    InputStream in = null;      
+       try {
+           in = OpenHttpConnection(_imageURL);
+           bitmap = BitmapFactory.decodeStream(in, null, bmOptions);
+           in.close();
+       } catch (IOException e1) {
+       }
+       return bitmap;              
+       
+   }
+                   
+   public Bitmap LoadFromAssets(String strName)
+   {
+       AssetManager assetManager = controls.activity.getAssets();
+       InputStream istr = null;
+       try {
+           istr = assetManager.open(strName);
+       } catch (IOException e) {
+           e.printStackTrace();
+       }
+       Bitmap bitmap = BitmapFactory.decodeStream(istr);
+       return bitmap;
+   }
+  
+   
+ 
+   private int GetDrawableResourceId(String _resName) {
+   	  try {
+   	     Class<?> res = R.drawable.class;
+   	     Field field = res.getField(_resName);  //"drawableName"
+   	     int drawableId = field.getInt(null);
+   	     return drawableId;
+   	  }
+   	  catch (Exception e) {
+   	     Log.e("jImageFileManager", "Failure to get drawable id.", e);
+   	     return 0;
+   	  }
+   }
+
+   private Drawable GetDrawableResourceById(int _resID) {
+   	return (Drawable)( this.controls.activity.getResources().getDrawable(_resID));	
+   }
+             
+   public Bitmap LoadFromResources(String _imageResIdentifier)
+   {
+	  Drawable d = GetDrawableResourceById(GetDrawableResourceId(_imageResIdentifier));
+	  Bitmap bmap = ((BitmapDrawable)d).getBitmap();
+      return bmap;
+   }
+   
+   public Bitmap LoadFromFile(String _filename) {	   
+	   Bitmap bmap=null;	  
+	   File fDir = this.controls.activity.getFilesDir();  //Result : /data/data/com/MyApp/files
+	   File file = new File(fDir, _filename);	   
+	   InputStream fileInputStream = null;	   
+  	   try {
+		 fileInputStream = new FileInputStream(file);
+		 BitmapFactory.Options bitmapOptions = new BitmapFactory.Options();
+		 bitmapOptions.inSampleSize = 1; //original image size :: 4 --> size 1/4!
+		 bitmapOptions.inJustDecodeBounds = false; //If set to true, the decoder will return null (no bitmap), 
+		 bmap = BitmapFactory.decodeStream(fileInputStream, null, bitmapOptions);		 
+	   } catch (FileNotFoundException e) {
+		// TODO Auto-generated catch block
+		 e.printStackTrace();
+	   }  	   
+  	   return bmap;  	   
+   }
+   
+   public Bitmap LoadFromFile(String _path, String _filename) {	   
+	      String imageIn = _path+"/"+_filename;	      
+	      Bitmap bitmap = BitmapFactory.decodeFile(imageIn);	      
+	      return bitmap; 
+   }
+   
+   public void SaveToFile(Bitmap _image, String _filename) {	   	    
+	    String root = this.controls.activity.getFilesDir().getAbsolutePath();	      	    	    
+	    File file = new File (root +"/"+ _filename);	    
+	    if (file.exists ()) file.delete (); 
+	    try {
+	        FileOutputStream out = new FileOutputStream(file);	  
+	        
+	        if ( _filename.toLowerCase().contains(".jpg") ) _image.compress(Bitmap.CompressFormat.JPEG, 90, out);
+	        if ( _filename.toLowerCase().contains(".png") ) _image.compress(Bitmap.CompressFormat.JPEG, 100, out);
+	        
+	         out.flush();
+	         out.close();
+	    } catch (Exception e) {
+	         e.printStackTrace();
+	    }  	     	   
+   }
+   
+   
+   public void SaveToFile(Bitmap _image,String _path, String _filename) {	   	    
+	       	    	    
+	    File file = new File (_path +"/"+ _filename);	    
+	    if (file.exists ()) file.delete (); 
+	    try {
+	        FileOutputStream out = new FileOutputStream(file);	  
+	        
+	        if ( _filename.toLowerCase().contains(".jpg") ) _image.compress(Bitmap.CompressFormat.JPEG, 90, out);
+	        if ( _filename.toLowerCase().contains(".png") ) _image.compress(Bitmap.CompressFormat.JPEG, 100, out);
+	        
+	         out.flush();
+	         out.close();
+	    } catch (Exception e) {
+	         e.printStackTrace();
+	    }  	     	   
+  }
+   
+}
+
+//by jmpessoa
+class jActionBarTab {
+		
+    private long     pascalObj = 0;      // Pascal Object
+    private Controls controls  = null;   // Control Class -> Java/Pascal Interface ...
+    private Context  context   = null;
+    private int mCountTab = 0;
+    
+    //Warning: please, preferentially init your news params names with "_", ex: int _flag, String _hello ...
+    public jActionBarTab(Controls _ctrls, long _Self) { //Add more here new "_xxx" params if needed!
+       //super(contrls.activity);
+       context   = _ctrls.activity;
+       pascalObj = _Self;
+       controls  = _ctrls;                   
+    }
+
+    public void jFree() {
+      //free local objects...        	
+    }
+
+	public ActionBar GetActionBar() { 
+	    return this.controls.activity.getActionBar();
+	}
+
+	/*
+	 * To disableAction-bar Icon and Title, you must do two things:
+	 setDisplayShowHomeEnabled(false);  // hides action bar icon
+	 setDisplayShowTitleEnabled(false); // hides action bar title
+	 */
+
+	private class TabListener implements ActionBar.TabListener {
+		
+		TabContentFragment mFragment;
+		
+		/*.*/public TabListener(TabContentFragment v) {
+			mFragment = v;
+		}
+		//http://www.grokkingandroid.com/adding-action-items-from-within-fragments/
+		//http://www.j2eebrain.com/java-J2ee-android-menus-and-action-bar.html
+		//http://www.thesparkmen.com/2013/2/15/dynamic-action-bar-buttons.aspx
+		//https://github.com/codepath/android_guides/wiki/Creating-and-Using-Fragments  otimo!
+		//http://www.lucazanini.eu/2012/android/tab-layout-in-android-with-actionbar-and-fragment/?lang=en
+	    @Override
+	    /*.*/public void onTabSelected(ActionBar.Tab tab, FragmentTransaction ft) {    	  
+	    	mFragment.getView().setVisibility(View.VISIBLE);	    	
+	    	controls.pOnActionBarTabSelected(pascalObj, mFragment.getView(), mFragment.getText());    	    	
+	    	if(mFragment.isAdded()){
+	    	    ft.show(mFragment);
+	    	}  
+	    	else {
+	    		ft.add(0, mFragment, mFragment.getText()); //0=null container!
+	    	}     	   	
+	    }
+	 
+	    @Override
+	    /*.*/public void onTabUnselected(ActionBar.Tab tab, FragmentTransaction ft) {	    	
+	    	//mFragment.getView().setVisibility(View.GONE);	    	
+	    	controls.pOnActionBarTabUnSelected(pascalObj, mFragment.getView(), mFragment.getText());	    		    
+	    	if (mFragment != null) {
+	             ft.hide(mFragment);
+	         }	    	
+	    }
+	 
+	    @Override
+	    /*.*/public void onTabReselected(ActionBar.Tab tab, FragmentTransaction ft) {
+	    }
+	}
+
+	private class TabContentFragment extends Fragment {
+	    private View mView;
+	    private String mText;
+	    /*.*/public TabContentFragment(View v, String tag) {
+	        mView = v;
+	        mText = tag;
+	    }
+
+	    /*.*/public String getText() {
+	        return mText;
+	    }
+	    
+	    /*.*/public View getView() {
+	        return mView;
+	    }
+	        
+	    @Override
+	    /*.*/public void onActivityCreated(Bundle savedInstanceState) {
+	       super.onActivityCreated(savedInstanceState);   
+	    }
+	    
+	    @Override
+	    /*.*/public View onCreateView(LayoutInflater inflater, ViewGroup container,
+	            Bundle savedInstanceState) {    	    	     	 
+	    	    /*
+	    	     * You can access the container's id by calling
+	               ((ViewGroup)getView().getParent()).getId();
+	    	     */
+	         return mView;
+	    }
+	}
+
+	private ActionBar.Tab CreateTab(String title, View v) {	  	
+	  ActionBar actionBar = this.controls.activity.getActionBar();
+	  ActionBar.Tab tab = actionBar.newTab();           
+	  tab.setText(title); //
+	  if (mCountTab != 0) {
+	     v.setVisibility(View.INVISIBLE);
+	  }   
+	  TabContentFragment content = new TabContentFragment(v, title);
+	  tab.setTabListener(new TabListener(content)); // All tabs must have a TabListener set before being added to the ActionBar.
+	  mCountTab= mCountTab + 1;
+	  return tab; 
+	}
+
+	//This method adds a tab for use in tabbed navigation mode
+	public void Add(String _title, View _panel, String _iconIdentifier){
+		  ActionBar.Tab tab = CreateTab(_title, _panel);  
+		  if (!_iconIdentifier.equals("")) {
+		      tab.setIcon(GetDrawableResourceById(GetDrawableResourceId(_iconIdentifier))); //_iconIdentifier
+		  }
+		  ActionBar actionBar = this.controls.activity.getActionBar();
+		  actionBar.addTab(tab, false);	  
+	}
+
+	public void Add(String _title, View _panel){
+		  ActionBar.Tab tab = CreateTab(_title, _panel);  	 
+		  ActionBar actionBar = this.controls.activity.getActionBar();	
+	  	  actionBar.addTab(tab, false);  	    	 
+	}
+
+	public void Add(String _title, View _panel, View _customTabView){
+		  ActionBar.Tab tab = CreateTab(_title, _panel);  	 
+		  tab.setCustomView(_customTabView);	//This overrides values set by setText(CharSequence) and setIcon(Drawable).	  
+		  ActionBar actionBar = this.controls.activity.getActionBar();
+		  actionBar.addTab(tab, false);	  
+	}
+
+	public void SetTabNavigationMode(){
+		ActionBar actionBar = this.controls.activity.getActionBar();
+		actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);	//API 11
+		actionBar.setSelectedNavigationItem(0);
+	}
+
+	//This method remove all tabs from the action bar and deselect the current tab
+	public void RemoveAllTabs() {
+		ActionBar actionBar = this.controls.activity.getActionBar();
+		actionBar.removeAllTabs();
+	}
+
+	//This method returns the currently selected tab if in tabbed navigation mode and there is at least one tab present
+	/*.*/public Tab GetSelectedTab() {
+		ActionBar actionBar = this.controls.activity.getActionBar();
+		ActionBar.Tab tab = actionBar.getSelectedTab();
+		return tab;
+	}
+
+	//This method select the specified tab
+	/*.*/public void SelectTab(ActionBar.Tab tab){
+		ActionBar actionBar = this.controls.activity.getActionBar();
+		actionBar.selectTab(tab);
+	}
+
+	//http://daniel-codes.blogspot.com.br/2009/12/dynamically-retrieving-resources-in.html
+	/*
+	*Given that you can access R.java just fine normally in code.
+	*As long as you are retrieving data from your application's R.java - Use reflection!
+	*/
+
+	//by jmpessoa
+	private int GetDrawableResourceId(String _resName) {
+		  try {
+		     Class<?> res = R.drawable.class;
+		     Field field = res.getField(_resName);  //"drawableName"
+		     int drawableId = field.getInt(null);
+		     return drawableId;
+		  }
+		  catch (Exception e) {
+		     Log.e("jForm", "Failure to get drawable id.", e);
+		     return 0;
+		  }
+	}
+	
+	//by jmpessoa
+	private Drawable GetDrawableResourceById(int _resID) {
+		return (Drawable)( this.controls.activity.getResources().getDrawable(_resID));	
+	}
+	
+}
+
+
+/*Draft java code by "Lazarus Android Module Wizard" [12/4/2014 23:21:31]*/
+/*https://github.com/jmpessoa/lazandroidmodulewizard*/
+/*jVisualControl template*/
+
+class jCustomDialog extends RelativeLayout {
+
+   private long       pascalObj = 0;    // Pascal Object
+   private Controls   controls  = null; // Control Class for events
+
+   private Context context = null;
+   private ViewGroup parent   = null;         // parent view
+   private LayoutParams lparams;              // layout XYWH
+   //private OnClickListener onClickListener;   // click event
+   //private Boolean enabled  = true;           // click-touch enabled!
+   private int lparamsAnchorRule[] = new int[30];
+   private int countAnchorRule = 0;
+   private int lparamsParentRule[] = new int[30];
+   private int countParentRule = 0;
+   private int lparamH = 100;
+   private int lparamW = 100;
+   private int marginLeft = 0;
+   private int marginTop = 0;
+   private int marginRight = 0;
+   private int marginBottom = 0;
+
+   Dialog mDialog = null;
+   private String mIconIdentifier = "ic_launcher";   //default icon  ../res/drawable
+   private String mTitle = "Information";
+   boolean mRemovedFromParent = false; //no parent!   
+
+  //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
+
+   public jCustomDialog(Controls _ctrls, long _Self) { //Add more others news "_xxx"p arams if needed!
+      super(_ctrls.activity);
+      context   = _ctrls.activity;
+      pascalObj = _Self;
+      controls  = _ctrls;
+      lparams = new LayoutParams(lparamW, lparamH);
+      //lparams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);		
+   } //end constructor
+
+   public void jFree() {
+      if (parent != null) { parent.removeView(this); }
+      //free local objects...      
+  	  if (mDialog != null) mDialog.dismiss();
+	  mDialog = null;		
+      lparams = null;
+      //parent = null;  //?!
+      //setOnClickListener(null);
+   }
+
+   public void SetViewParent(ViewGroup _viewgroup) {
+      if (parent != null) { parent.removeView(this); }
+      parent = _viewgroup;
+      parent.addView(this,lparams);
+      mRemovedFromParent = false; //now there is a parent!    	
+   }
+
+   public void RemoveFromViewParent() {
+      if (!mRemovedFromParent) {
+    	 this.setVisibility(android.view.View.INVISIBLE);
+    	 if (parent != null) {
+            parent.removeView(this);
+            mRemovedFromParent = true; //no more parent!
+            //Log.i("jCustomDialog", "...RemoveFromViewParent...");
+    	 }          
+       }
+   }
+   
+   public View GetView() {
+      return this;
+   }
+   
+
+   public void SetLParamWidth(int _w) {
+      lparamW = _w;
+   }
+
+   public void SetLParamHeight(int _h) {
+      lparamH = _h;
+   }
+
+   public void SetLeftTopRightBottomWidthHeight(int _left, int _top, int _right, int _bottom, int _w, int _h) {
+      marginLeft = _left;
+      marginTop = _top;
+      marginRight = _right;
+      marginBottom = _bottom;
+      lparamH = _h;
+      lparamW = _w;
+   }
+
+   public void AddLParamsAnchorRule(int _rule) {
+      lparamsAnchorRule[countAnchorRule] = _rule;
+      countAnchorRule = countAnchorRule + 1;
+   }
+
+   public void AddLParamsParentRule(int _rule) {
+      lparamsParentRule[countParentRule] = _rule;
+      countParentRule = countParentRule + 1;
+   }
+
+   public void SetLayoutAll(int _idAnchor) {
+  	lparams.width  = lparamW;
+	lparams.height = lparamH;
+	lparams.setMargins(marginLeft,marginTop,marginRight,marginBottom);
+	if (_idAnchor > 0) {
+	    for (int i=0; i < countAnchorRule; i++) {
+		lparams.addRule(lparamsAnchorRule[i], _idAnchor);
+	    }
+	}
+      for (int j=0; j < countParentRule; j++) {
+         lparams.addRule(lparamsParentRule[j]);
+      }
+      this.setLayoutParams(lparams);
+   }
+
+   public void ClearLayoutAll() {
+	 for (int i=0; i < countAnchorRule; i++) {
+  	   lparams.removeRule(lparamsAnchorRule[i]);
+     }
+
+	 for (int j=0; j < countParentRule; j++) {
+   	   lparams.removeRule(lparamsParentRule[j]);
+	 }
+	 countAnchorRule = 0;
+	 countParentRule = 0;
+   }
+
+   public void SetId(int _id) { //wrapper method pattern ...
+      this.setId(_id);
+   }
+   
+   //write others [public] methods code here......
+   //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...   
+	private int GetDrawableResourceId(String _resName) {   //    ../res/drawable
+		  try {
+		     Class<?> res = R.drawable.class;
+		     Field field = res.getField(_resName);  //"drawableName"
+		     int drawableId = field.getInt(null);
+		     return drawableId;
+		  }
+		  catch (Exception e) {
+		     Log.e("jForm", "Failure to get drawable id.", e);
+		     return 0;
+		  }
+	}
+	
+	public void Show() {	//0: vis; 4: inv; 8: gone
+		Show(mTitle, mIconIdentifier);
+	}
+	
+	public void Show(String _title) {	//0: vis; 4: inv; 8: gone
+		Show(_title, mIconIdentifier);
+	}
+		
+	public void Show(String _title, String _iconIdentifier) {	//0: vis; 4: inv; 8: gone
+		mTitle = _title;
+		mIconIdentifier = _iconIdentifier;
+		if (mDialog != null) {
+			mDialog.setTitle(mTitle);
+		    controls.pOnCustomDialogShow(pascalObj, mDialog, _title);
+			mDialog.show();
+		}	
+		else {			
+		  if (this.getVisibility()==0) { //visible   
+			this.setVisibility(android.view.View.INVISIBLE); //4
+		  }	  		   
+		  if (!mRemovedFromParent) {
+		  	 parent.removeView(this);
+		     mRemovedFromParent = true;
+		  }					   
+	      mDialog = new Dialog(this.controls.activity);	      
+	      mDialog.requestWindowFeature(Window.FEATURE_LEFT_ICON);	     	     
+	      mDialog.setContentView(this);	      
+	      mDialog.setFeatureDrawableResource(Window.FEATURE_LEFT_ICON, GetDrawableResourceId(mIconIdentifier));	      
+	      mDialog.setTitle(mTitle);
+	      this.setVisibility(android.view.View.VISIBLE);
+	 	  controls.pOnCustomDialogShow(pascalObj, mDialog, mTitle);	      
+	      mDialog.show();							
+		}		   
+	}
+	
+	public void SetTitle(String _title) { 
+	   mTitle = _title;
+	   mDialog.setTitle(mTitle);
+	}
+	
+	public void SetIconIdentifier(String _iconIdentifier) {   // ../res/drawable
+		mIconIdentifier = _iconIdentifier;
+		mDialog.requestWindowFeature(Window.FEATURE_LEFT_ICON);
+		mDialog.setFeatureDrawableResource(Window.FEATURE_LEFT_ICON, GetDrawableResourceId(mIconIdentifier));
+	}
+	
+	public void Close() { 
+		if (mDialog != null) mDialog.dismiss();    
+	}	
+} //end class
+
+
 //Javas/Pascal Interface Class 
 
 public class Controls {          // <<--------- 
@@ -7951,7 +8876,6 @@ public class Controls {          // <<---------
 public Activity        activity;  // Activity
 public RelativeLayout  appLayout; // Base Layout
 public int screenStyle=0;         // Screen Style [Dev:0 , Portrait: 1, Landscape : 2]
-
 
 // Jave -> Pascal Function ( Pascal Side = Event )
 public  native int  pAppOnScreenStyle(); 
@@ -7973,24 +8897,25 @@ public  native void pAppOnCreateOptionsMenu(Menu menu);
 public  native void pAppOnClickOptionMenuItem(MenuItem menuItem,int itemID,String itemCaption,boolean checked);
 
 //by jmpessoa: support Context Menu
-public  native void pAppOnCreateContextMenu(Menu menu);
+public  native void pAppOnCreateContextMenu(ContextMenu menu);
 public  native void pAppOnClickContextMenuItem(MenuItem menuItem,int itemID,String itemCaption,boolean checked);
 
-//
 public  native void pOnClick     (long pasobj, int value);
-public  native void pOnChange    (long pasobj, int EventType);
-public  native void pOnEnter     (long pasobj);
+
+public  native void pOnChange    (long pasobj, String txt, int count);
+public  native void pOnChanged   (long pasobj, String txt, int count);
+public  native void pOnEnter     (long pasobj);                    
+
+
 public  native void pOnTimer     (long pasobj);
-//
+
 public  native void pOnDraw      (long pasobj, Canvas canvas);
 
 public  native void pOnTouch     (long pasobj, int act, int cnt,float x1, float y1,float x2, float y2);
 public  native void pOnGLRenderer(long pasobj, int EventType, int w, int h);
-//
+
 public  native void pOnClose     (long pasobj);    
 
-//public  native void pOnActive     (long pasobj); //new by jmpessoa
-//
 public  native int  pOnWebViewStatus (long pasobj, int EventType, String url);
 public  native void pOnAsyncEvent    (long pasobj, int EventType, int progress);
 
@@ -8026,13 +8951,16 @@ public  native void pOnLocationProviderDisabled(long pasobj, String provider);
 public  native void pAppOnViewClick(View view, int id);
 public  native void pAppOnListItemClick(AdapterView adapter, View view, int position, int id);
 
+public native void pOnActionBarTabSelected(long pasobj, View view, String title);
+public native void pOnActionBarTabUnSelected(long pasobj, View view, String title);
+public native void pOnCustomDialogShow(long pasobj, Dialog dialog, String title);
+
 
 //Load Pascal Library
 static {
-    Log.i("JNI_Java", "1.load libcontrols.so");
+   // Log.i("JNI_Java", "1.load libcontrols.so");
     System.loadLibrary("controls");
-    Log.i("JNI_Java", "2.load libcontrols.so");
-    
+    //Log.i("JNI_Java", "2.load libcontrols.so");  
 }
 
 // -------------------------------------------------------------------------
@@ -8052,6 +8980,9 @@ public  void jAppOnStart()                { pAppOnStart();                 }    
 public  void jAppOnStop()                 { pAppOnStop();                  }   
 public  void jAppOnBackPressed()          { pAppOnBackPressed();           }   
 public  int  jAppOnRotate(int rotate)     {  return(pAppOnRotate(rotate)); }
+
+//rotate=1 --> device on vertical/default position ; 2 --> device on horizontal position      //tips by jmpessoa
+
 public  void jAppOnConfigurationChanged() { pAppOnConfigurationChanged();  }
 
 public  void jAppOnActivityResult(int requestCode, int resultCode, Intent data) 
@@ -8062,15 +8993,14 @@ public  void jAppOnCreateOptionsMenu(Menu m) {pAppOnCreateOptionsMenu(m);}
 public  void jAppOnClickOptionMenuItem(MenuItem item,int itemID, String itemCaption, boolean checked){pAppOnClickOptionMenuItem(item,itemID,itemCaption,checked);}
 
 //By jmpessoa: supportContextMenu
-public  void jAppOnCreateContextMenu(Menu m) {pAppOnCreateContextMenu(m);}
+public  void jAppOnCreateContextMenu(ContextMenu m) {pAppOnCreateContextMenu(m);}
 public  void jAppOnClickContextMenuItem(MenuItem item,int itemID, String itemCaption, boolean checked) {pAppOnClickContextMenuItem(item,itemID,itemCaption,checked);}
 
 public void jAppOnViewClick(View view, int id){ pAppOnViewClick(view,id);}
-
 public void jAppOnListItemClick(AdapterView adapter, View view, int position, int id){ pAppOnListItemClick(adapter, view,position,id);}
 
-//rotate=1 --> device on vertical/default position ; 2 --> device on horizontal position      //tips by jmpessoa
-
+//public void jAppOnActionBarTabSelected(View view, String title){pOnActionBarTabSelected(view,title);}
+//public void jAppOnActionBarTabUnSelected(View view, String title){pOnActionBarTabUnSelected(view,title);}
 
 //// -------------------------------------------------------------------------
 //  System, Class
@@ -8106,6 +9036,21 @@ public Context GetContext() {
 }
 
 
+//by  thierrydijoux
+public String getQuantityStringByName(String _resName, int _quantity) {
+	int id = this.activity.getResources().getIdentifier(_resName, "plurals", this.activity.getPackageName());
+    String value = id == 0 ? "" : (String) this.activity.getResources().getQuantityString(id, _quantity, _quantity);
+	return value;
+}
+
+//by thierrydijoux
+public String getStringResourceByName(String _resName) {
+	int id = this.activity.getResources().getIdentifier(_resName, "string", this.activity.getPackageName());
+    String value = id == 0 ? "" : (String) this.activity.getResources().getText(id);
+	return value;
+}   
+
+
 // -------------------------------------------------------------------------
 //  App Related
 // -------------------------------------------------------------------------
@@ -8130,6 +9075,7 @@ public  void appKillProcess() {
 
 // src : codedata.txt
 // tgt : /data/data/com.kredix.control/data/codedata.txt
+
 public  boolean assetSaveToFile(String src, String tgt) {
   InputStream is = null;
   FileOutputStream fos = null;
@@ -8248,7 +9194,7 @@ public  AnimationSet Ani_Effect(int effect, int duration) {
 }
 
 // -------------------------------------------------------------------------
-//  View Related
+//  View Related - Generic! --> AndroidWidget.pas
 // -------------------------------------------------------------------------
 
 //
@@ -8264,7 +9210,6 @@ public  void view_Invalidate(View view) {
   view.invalidate();
 }
 
-
 // -------------------------------------------------------------------------
 //  Form Related
 // -------------------------------------------------------------------------
@@ -8274,28 +9219,6 @@ public  java.lang.Object jForm_Create(long pasobj ) {
   return (java.lang.Object)( new jForm(this,pasobj));
 }
 
-public  void jForm_Free(java.lang.Object form) {
- jForm obj = (jForm)form;
- obj.Free();
- //obj = null;
-}
-
-public  RelativeLayout jForm_GetLayout(java.lang.Object form) {
-  return ((jForm)form).GetLayout();
-}
-
-public  void jForm_Show (java.lang.Object form, int effect) {
-  ((jForm)form).Show(effect);
-}
-
-public  void jForm_Close(java.lang.Object form, int effect) {
-  ((jForm)form).Close(effect);
-}
-
-
-public  void jForm_SetEnabled (java.lang.Object form, boolean enabled) {
-  ((jForm)form).SetEnabled(enabled);
-}
 
 // -------------------------------------------------------------------------
 //  System Info
@@ -8318,10 +9241,27 @@ public  int getStrLength(String Txt) {  //fix by jmpessoa
   return ( len );
 }
 
-// LORDMAN - 2013-07-30
-public  String getStrDateTime() {
+//----------------------------------------------
+// Controls Version Info
+//-------------------------------------------
+
+/*LORDMAN - 2013-07-30
+public  String getStrDateTime() { 
   SimpleDateFormat formatter = new SimpleDateFormat ( "yyyy-MM-dd HH:mm:ss", Locale.KOREA );
   return( formatter.format ( new Date () ) );
+}
+*/
+
+//GetControlsVersionFeatures ...  //Controls.java version-revision info! [0.6-04]
+public  String getStrDateTime() {  //hacked by jmpessoa!! sorry, was for a good cause! please, use the  jForm_GetDateTime!!
+  String listVersionInfo = "6$4=GetControlsVersionInfo;" +
+  		   "6$4=getLocale;";  
+  return listVersionInfo;
+}
+
+//by jmpessoa:  Class controls version info
+public String GetControlsVersionInfo() { 
+  return "6$5";  //version$revision  [0.6$5]
 }
 
 public long getTick() {
@@ -8347,7 +9287,7 @@ public  String getPathApp (android.content.Context context,String pkgName) {
 public  String getPathDat (android.content.Context context) {
   //http://developer.android.com/reference/android/os/Build.html
   String version = Build.VERSION.RELEASE;
-  Log.i("JAVA:",version);
+  //Log.i("JAVA:",version);
   //
   String PathDat = context.getFilesDir().getAbsolutePath();
   
@@ -8362,7 +9302,7 @@ public  String getPathExt() {
 
 // Result : /storage/emulated/0/DCIM
 public  String getPathDCIM() {
-  File FileDCIM =  Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM);
+  File FileDCIM =  Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM);  
   return ( FileDCIM.getPath() );
 }
 
@@ -8372,6 +9312,37 @@ public  String getPathDataBase(android.content.Context context) {
    destPath = destPath.substring(0, destPath.lastIndexOf("/")) + "/databases";
    return destPath;
 }
+
+// -------------------------------------------------------------------------
+//  Android Locale
+// -------------------------------------------------------------------------
+
+// thierrydijoux - get locale info
+public String getLocale(int localeType) {
+        Context context = this.activity;
+  	String value = "";	
+   	switch (localeType) {
+   		case 0: value = context.getResources().getConfiguration().locale.getCountry();
+				break;
+		case 1: value = context.getResources().getConfiguration().locale.getDisplayCountry();
+				break;
+   		case 2: value = context.getResources().getConfiguration().locale.getDisplayLanguage();
+				break;
+   		case 3: value = context.getResources().getConfiguration().locale.getDisplayName();
+				break;
+   		case 4: value = context.getResources().getConfiguration().locale.getDisplayVariant();
+				break;
+   		case 5: value = context.getResources().getConfiguration().locale.getISO3Country();
+				break;
+   		case 6: value = context.getResources().getConfiguration().locale.getISO3Language();
+				break;
+   		case 7: value = context.getResources().getConfiguration().locale.getVariant();
+				break;
+   	}
+
+   	return value;
+}
+
 
 // -------------------------------------------------------------------------
 //  Android Device
@@ -8399,8 +9370,8 @@ public  int Image_getWH (String filename ) {
   BitmapFactory.Options options = new BitmapFactory.Options();
   options.inJustDecodeBounds = true;
   BitmapFactory.decodeFile(filename, options);
-  Log.i("JNI_Java", "wh:" + Integer.toString(options.outWidth ) +
-                      "x" + Integer.toString(options.outHeight) );
+  //Log.i("JNI_Java", "wh:" + Integer.toString(options.outWidth ) +
+  //                    "x" + Integer.toString(options.outHeight) );
   return ( (options.outWidth << 16) | (options.outHeight) );
 }
 
@@ -8446,933 +9417,57 @@ public  void Image_save(Bitmap bmp, String filename) {
 }
 
 // -------------------------------------------------------------------------
-//  TextView
+//  TextView: Create
 // -------------------------------------------------------------------------
-
-public  java.lang.Object jTextView_Create(android.content.Context context, long pasobj) {
-  return (java.lang.Object)( new jTextView(context,this,pasobj));
-}
-
-//by jmpessoa
-public  java.lang.Object jTextView_Create2(long pasobj) {
+public  java.lang.Object jTextView_Create(long pasobj) {
   return (java.lang.Object)( new jTextView(this.activity,this,pasobj));
 }
 
-public  void jTextView_Free(java.lang.Object textview) {
-  jTextView obj = (jTextView)textview;
-  obj.Free();
-  //obj = null;
-}
-
-public  void jTextView_setXYWH (java.lang.Object textview,
-                               int x, int y, int w, int h ) {
-  ((jTextView)textview).setXYWH(x,y,w,h);
-}
-
-public void jTextView_setLeftTopRightBottomWidthHeight(java.lang.Object textview,
-        int left, int top, int right, int bottom, int w, int h) {
-((jTextView)textview).setLeftTopRightBottomWidthHeight(left,top,right,bottom,w,h);	
-}
-
-
-public  void jTextView_setParent(java.lang.Object textview,
-                                android.view.ViewGroup viewgroup) {
-  ((jTextView)textview).setParent3(viewgroup);
-}
-
-public  void jTextView_setParent2(java.lang.Object textview,
-                                 android.view.ViewGroup viewgroup) {
-  ((jTextView)textview).setParent2(viewgroup);
-}
-
-public  void jTextView_setEnabled(java.lang.Object textview, boolean enabled) {
-  ((jTextView)textview).setEnabled(enabled);
-}
-
-public  void jTextView_setText(java.lang.Object textview, String str) {
-  ((jTextView)textview).setText(str);
-}
-
-public  void jTextView_setTextColor(java.lang.Object textview, int color) {
-  ((jTextView)textview).setTextColor(color);
-}
-
-public  void jTextView_setTextSize(java.lang.Object textview, int pxSize) {
-  ((jTextView)textview).setTextSize(TypedValue.COMPLEX_UNIT_PX,pxSize);
-}
-
-public  String jTextView_getText(java.lang.Object textview) {
-  return ((jTextView)textview).getText().toString();
-}
-
-// LORDMAN 2013-08-12
-public  void jTextView_setTextAlignment(java.lang.Object textview, int align) {
-  ((jTextView)textview).setTextAlignment(align);
-}
-
-
-//by jmpessoa
-public  void jTextView_setId(java.lang.Object textview, int id) {
-	  ((jTextView)textview).setIdEx(id);
-}
-
-//by jmpessoa
-public void jTextView_setLParamWidth(java.lang.Object textview, int w) {
-	((jTextView)textview).setLParamWidth(w);
-}
-
-//by jmpessoa
-public void jTextView_setLParamHeight(java.lang.Object textview, int h) {
-	((jTextView)textview).setLParamHeight(h);
-}
-
-//by jmpessoa
-public void jTextView_addLParamsParentRule(java.lang.Object textview, int rule) {
-	((jTextView)textview).addLParamsParentRule(rule);
-}
-
-public void jTextView_addLParamsAnchorRule(java.lang.Object textview, int rule) {
-	((jTextView)textview).addLParamsAnchorRule(rule);
-}
-//by jmpessoa
-public  void jTextView_setLayoutAll(java.lang.Object textview, int idAnchor) {
-	  ((jTextView)textview).setLayoutAll(idAnchor);
-}
-
-//by jmpessoa
-public void jTextView_setMarginLeft(java.lang.Object textview, int x) {
-	((jTextView)textview).setMarginLeft(x);
-}
-
-//by jmpessoa
-public void jTextView_setMarginTop(java.lang.Object textview, int y) {
-	((jTextView)textview).setMarginTop(y);
-}
-
-//by jmpessoa
-public void jTextView_setMarginRight(java.lang.Object textview, int x) {
-	((jTextView)textview).setMarginRight(x);
-}
-
-//by jmpessoa
-public void jTextView_setMarginBottom(java.lang.Object textview, int y) {
-	((jTextView)textview).setMarginBottom(y);
-}
-
 //-------------------------------------------------------------------------
-//EditText
+//EditText: Create
 //-------------------------------------------------------------------------
-
-// LORDMAN 2013-08-27
-public  void jEditText_setEnabled(java.lang.Object edittext, boolean enabled ) {
-  jEditText obj = (jEditText)edittext;
-  obj.setClickable            (enabled);
-  obj.setEnabled              (enabled);
-  obj.setFocusable            (enabled);
-  obj.setFocusableInTouchMode (enabled);
-}
-
-// LORDMAN 2013-08-27
-public  void jEditText_setEditable(java.lang.Object edittext, boolean enabled ) {
-  jEditText obj = (jEditText)edittext;
-  obj.setClickable            (enabled);
-  if (enabled) {
-    obj.setEnabled              (enabled); } //<--- ReadOnly
-  obj.setFocusable            (enabled);
-  obj.setFocusableInTouchMode (enabled);
-}
-
-
-public  java.lang.Object jEditText_Create(android.content.Context context,
-                                         long pasobj ) {
-  return (java.lang.Object)( new jEditText(context,this,pasobj));
-}
-
-//by jmpessoa
-public  java.lang.Object jEditText_Create2(long pasobj ) {
+public  java.lang.Object jEditText_Create(long pasobj ) {
    return (java.lang.Object)( new jEditText(this.activity,this,pasobj));
 }
 
-public  void jEditText_Free(java.lang.Object edittext) {
-  jEditText obj = (jEditText)edittext;
-  obj.Free();
-  //obj = null;
-}
-
-public  void jEditText_setXYWH (java.lang.Object edittext,
-                               int x, int y, int w, int h ) {
-  ((jEditText)edittext).setXYWH(x,y,w,h);
-}
-
-public void jEditText_setLeftTopRightBottomWidthHeight(java.lang.Object edittext,
-        int left, int top, int right, int bottom, int w, int h) {
-((jEditText)edittext).setLeftTopRightBottomWidthHeight(left,top,right,bottom,w,h);	
-}
-
-
-public  void jEditText_setParent(java.lang.Object edittext,
-                                android.view.ViewGroup viewgroup) {
-  ((jEditText)edittext).setParent(viewgroup);
-}
-
-public  void jEditText_setText(java.lang.Object edittext, String str) {
-  ((jEditText)edittext).setText(str);
-}
-
-public  String jEditText_getText(java.lang.Object edittext) {
-  return ((jEditText)edittext).getText().toString();
-}
-
-public  void jEditText_setTextColor(java.lang.Object edittext, int color) {
-  ((jEditText)edittext).setTextColor(color);
-}
-
-public  void jEditText_setTextSize(java.lang.Object edittext, int pxSize) {
-  ((jEditText)edittext).setTextSize(TypedValue.COMPLEX_UNIT_PX,pxSize);
-}
-
-public  void jEditText_setHint(java.lang.Object edittext, String hint) {
-  ((jEditText)edittext).setHint(hint);
-}
-
-// LORDMAN - 2013-07-26
-public  void jEditText_SetFocus(java.lang.Object edittext) {
-  ((jEditText)edittext).requestFocus();
-}
-
-// LORDMAN - 2013-07-26
-public  void jEditText_immShow(java.lang.Object edittext) {
-  InputMethodManager imm = (InputMethodManager) activity.getSystemService(Context.INPUT_METHOD_SERVICE);
-  imm.toggleSoftInput(0, InputMethodManager.SHOW_IMPLICIT);
-}
-
-// LORDMAN - 2013-07-26
-public  void jEditText_immHide(java.lang.Object edittext) {
-  InputMethodManager imm = (InputMethodManager) activity.getSystemService(Context.INPUT_METHOD_SERVICE);
-  imm.hideSoftInputFromWindow(((jEditText)edittext).getWindowToken(), 0);
-}
-
-// LORDMAN - 2013-07-26
-public  void jEditText_InputType(java.lang.Object edittext, String str) {
-	
-  if      (str.equals("NUMBER"))     { ((jEditText)edittext).setInputType(android.text.InputType.TYPE_CLASS_NUMBER);}
-  else if (str.equals("TEXT"))       { 
-	  Log.i("EditText","1.setInputType..1");  
-	  ((jEditText)edittext).setInputType(android.text.InputType.TYPE_CLASS_TEXT);  
-	  Log.i("EditText","2.setInputType..2");  
-      }
-  else if (str.equals("PHONE"))      { ((jEditText)edittext).setInputType(android.text.InputType.TYPE_CLASS_PHONE); }
-  else if (str.equals("PASSNUMBER")) { ((jEditText)edittext).setInputType(android.text.InputType.TYPE_CLASS_NUMBER);
-                                       ((jEditText)edittext).setTransformationMethod(android.text.method.PasswordTransformationMethod.getInstance()); }
-  else if (str.equals("PASSTEXT"))   { ((jEditText)edittext).setInputType(android.text.InputType.TYPE_CLASS_TEXT);
-                                       ((jEditText)edittext).setTransformationMethod(android.text.method.PasswordTransformationMethod.getInstance()); }
-  
-  else if (str.equals("TEXTMULTILINE")){((jEditText)edittext).setInputType(android.text.InputType.TYPE_CLASS_TEXT|android.text.InputType.TYPE_TEXT_FLAG_MULTI_LINE);}
-                                    
-  
-  else                               { ((jEditText)edittext).setInputType(android.text.InputType.TYPE_CLASS_TEXT); };
-    
-}
-
-//by jmpessoa
-public  void jEditText_InputTypeEx(java.lang.Object edittext, int inputType) {
-	Log.i("EditText","1.setInputTypeEx");
-	   ((jEditText)edittext).setInputType(inputType);
-	Log.i("EditText","2.setInputTypeEx");
-}
-
-//The attribute maxLines corresponds to the maximum height of the EditText, 
-//it controls the outer boundaries and not inner text lines.
-public  void jEditText_setMaxLines(java.lang.Object edittext, int maxlines) {
-	Log.i("EditText","1.setMaxLines");
-	  ((jEditText)edittext).setMaxLines(maxlines);
-	Log.i("EditText","2.setMaxLines");
-}
-
-//by jmpessoa
-public  void jEditText_setSingleLine(java.lang.Object edittext, boolean isSingLine) {
-	Log.i("EditText","1.setSingleLine");
-	  ((jEditText)edittext).setSingleLine(isSingLine);	
-	Log.i("EditText","2.setSingleLine");
-}
-
-//by jmpessoa
-public  void jEditText_setVerticalScrollBarEnabled(java.lang.Object edittext, boolean Value) {
-	  ((jEditText)edittext).setVerticalScrollBarEnabled(Value);
-}
-
-//by jmpessoa
-public  void jEditText_setHorizontalScrollBarEnabled(java.lang.Object edittext, boolean Value) {
-	  ((jEditText)edittext).setHorizontalScrollBarEnabled(Value);
-}
-
-
-//by jmpessoa
-public  void jEditText_setScrollbarFadingEnabled(java.lang.Object edittext, boolean Value) {
-	  ((jEditText)edittext).setScrollbarFadingEnabled(Value);
-}
-
-//by jmpessoa
-public  void jEditText_setScrollBarStyle(java.lang.Object edittext, int Value) {
-	  ((jEditText)edittext).setScrollBarStyle(Value);
-}
-
-//by jmpessoa
-public  void jEditText_setMovementMethod(java.lang.Object edittext) {
-	  ((jEditText)edittext).setMovementMethod(new ScrollingMovementMethod());//ScrollingMovementMethod.getInstance()
-}
-
-//by jmpessoa
-public  void jEditText_setScroller(android.content.Context context, java.lang.Object edittext) {
-	((jEditText)edittext).setScrollerEx(context); 
-}
-
-//by jmpessoa
-public  void jEditText_setScroller2(java.lang.Object edittext) {	  
-	((jEditText)edittext).setScrollerEx(this.activity);	  
-}
-
-//by jmpessoa
-public  void jEditText_setId(java.lang.Object edittext, int id) {
-	  ((jEditText)edittext).setIdEx(id);
-}
-
-//by jmpessoa
-public void jEditText_setLParamWidth(java.lang.Object edittext, int w) {
-	((jEditText)edittext).setLParamWidth(w);
-}
-
-//by jmpessoa
-public void jEditText_setLParamHeight(java.lang.Object edittext, int h) {
-	((jEditText)edittext).setLParamHeight(h);
-}
-
-//by jmpessoa
-public void jEditText_addLParamsAnchorRule(java.lang.Object edittext, int rule) {
-	((jEditText)edittext).addLParamsAnchorRule(rule);
-}
-
-public void jEditText_addLParamsParentRule(java.lang.Object edittext, int rule) {
-	((jEditText)edittext).addLParamsParentRule(rule);
-}
-
-//by jmpessoa
-public  void jEditText_setLayoutAll(java.lang.Object edittext, int idAnchor) {
-	  ((jEditText)edittext).setLayoutAll(idAnchor);
-}
-
-//by jmpessoa
-public void jEditText_setMarginLeft(java.lang.Object edittext, int x) {
-	((jEditText)edittext).setMarginLeft(x);
-}
-
-//by jmpessoa
-public void jEditText_setMarginTop(java.lang.Object edittext, int y) {
-	((jEditText)edittext).setMarginTop(y);
-}
-
-//by jmpessoa
-public void jEditText_setMarginRight(java.lang.Object edittext, int x) {
-	((jEditText)edittext).setMarginRight(x);
-}
-
-//by jmpessoa
-public void jEditText_setMarginBottom(java.lang.Object edittext, int y) {
-	((jEditText)edittext).setMarginBottom(y);
-}
-
-// LORDMAN - 2013-07-26
-public  void jEditText_maxLength(java.lang.Object edittext, int mLength) {
-  InputFilter[] FilterArray = new InputFilter[1];
-  FilterArray[0] = new InputFilter.LengthFilter(mLength);
-  ((jEditText)edittext).setFilters(FilterArray);
-  Log.i("EditText","SetMaxLen");
-}
-
-// LORDMAN - 2013-07-26 , 2013-08-05
-public  int[] jEditText_GetCursorPos(java.lang.Object edittext) {
-
-  int[] vals = new int[2];
-
-  vals[0] = ((jEditText)edittext).getSelectionStart();
-  vals[1] = ((jEditText)edittext).getSelectionEnd();
-
-  return vals;
-}
-
-// LORDMAN - 2013-07-26, 2013-08-05
-public  void jEditText_SetCursorPos(java.lang.Object edittext, int startPos, int endPos) {
-  if (endPos == 0) { endPos = startPos; };
-  ((jEditText)edittext).setSelection(startPos,endPos);
-}
-
-// LORDMAN 2013-08-12
-public  void jEditText_setTextAlignment(java.lang.Object edittext, int align) {
-((jEditText)edittext).setTextAlignment(align);
-}
-
-//by jmpessoa   ... for wrapping text --> True
-public  void jEditText_setHorizontallyScrolling(java.lang.Object edittext, boolean value) {
- ((jEditText)edittext).setHorizontallyScrolling(value);;
-}
-
-
 // -------------------------------------------------------------------------
-//  Button
+//  Button: Create
 // -------------------------------------------------------------------------
-
-public  java.lang.Object jButton_Create(android.content.Context context,
-                                       long pasobj ) {
-  return (java.lang.Object)( new jButton(context,this,pasobj));
-}
-
-//by jmpessoa
-public  java.lang.Object jButton_Create2(long pasobj ) {
-    return (java.lang.Object)( new jButton(this.activity,this,pasobj));
-}
-
-public  void jButton_Free(java.lang.Object button) {
-  jButton obj = (jButton)button;
-  obj.Free();
-  //obj = null;
-}
-
-public  void jButton_setXYWH  (java.lang.Object button,
-                              int x, int y, int w, int h ) {
-  ((jButton)button).setXYWH(x,y,w,h);
-}
-
-public void jButton_setLeftTopRightBottomWidthHeight(java.lang.Object button,
-        int left, int top, int right, int bottom, int w, int h) {
-((jButton)button).setLeftTopRightBottomWidthHeight(left,top,right,bottom,w,h);	
-}
-
-
-public  void jButton_setParent(java.lang.Object button,
-                              android.view.ViewGroup viewgroup) {
-  ((jButton)button).setParent(viewgroup);
-}
-
-public  void jButton_setText(java.lang.Object button, String str) {
-  ((jButton)button).setText(str);
-}
-
-public  String jButton_getText(java.lang.Object button) {
-  return ((jButton)button).getText().toString();
-}
-
-public  void jButton_setTextColor(java.lang.Object button, int color) {
-  ((jButton)button).setTextColor(color);
-}
-
-public  void jButton_setTextSize(java.lang.Object button, int pxSize) {
-  ((jButton)button).setTextSize(TypedValue.COMPLEX_UNIT_PX,pxSize);
-}
-
-//by jmpessoa
-public  void jButton_setId(java.lang.Object button, int id) {
-	  ((jButton)button).setIdEx(id);
-}
-
-//by jmpessoa
-public void jButton_setLParamWidth(java.lang.Object button, int w) {
-	((jButton)button).setLParamWidth(w);
-}
-
-//by jmpessoa
-public void jButton_setLParamHeight(java.lang.Object button, int h) {
-	((jButton)button).setLParamHeight(h);
-}
-
-//by jmpessoa
-public void jButton_addLParamsAnchorRule(java.lang.Object button, int rule) {
-	((jButton)button).addLParamsAnchorRule(rule);
-}
-
-public void jButton_addLParamsParentRule(java.lang.Object button, int rule) {
-	((jButton)button).addLParamsParentRule(rule);
-}
-
-//by jmpessoa
-public  void jButton_setLayoutAll(java.lang.Object button, int idAnchor) {
-	  ((jButton)button).setLayoutAll(idAnchor);
-}
-
-//by jmpessoa
-public void jButton_setMarginLeft(java.lang.Object button, int x) {
-	((jButton)button).setMarginLeft(x);
-}
-
-//by jmpessoa
-public void jButton_setMarginTop(java.lang.Object button, int y) {
-	((jButton)button).setMarginTop(y);
-}
-
-//by jmpessoa
-public void jButton_setMarginRight(java.lang.Object button, int x) {
-	((jButton)button).setMarginRight(x);
-}
-
-//by jmpessoa
-public void jButton_setMarginBottom(java.lang.Object button, int y) {
-	((jButton)button).setMarginBottom(y);
-}
-
-/*
- * If i set android:focusable="true" then button is highlighted and focused, 
- * but then at the same time, 
- * i need to click twice on the button to perform the actual click event.
- */
-//by jmpessoa
-public  void jButton_setFocusable(java.lang.Object button, boolean enabled ) {
-	jButton obj = (jButton)button;
-obj.setClickable            (enabled);
-obj.setEnabled              (enabled);
-obj.setFocusable            (enabled);//*
-obj.setFocusableInTouchMode (enabled);//*
-//obj.requestFocus(); //*
+public  java.lang.Object jButton_Create(long pasobj ) {
+   return (java.lang.Object)( new jButton(this.activity,this,pasobj));
 }
 
 // -------------------------------------------------------------------------
-//  CheckBox
+//  CheckBox: Create
 // -------------------------------------------------------------------------
-
-public  java.lang.Object jCheckBox_Create(android.content.Context context,
-                                         long pasobj ) {
-  return (java.lang.Object)( new jCheckBox(context,this,pasobj));
-}
-
-//by jmpessoa
-public  java.lang.Object jCheckBox_Create2(long pasobj ) {
-return (java.lang.Object)( new jCheckBox(this.activity,this,pasobj));
-}
-
-public  void jCheckBox_Free(java.lang.Object checkbox) {
-  jCheckBox obj = (jCheckBox)checkbox;
-  obj.Free();
-  //obj = null;
-}
-
-public  void jCheckBox_setXYWH (java.lang.Object checkbox,
-                               int x, int y, int w, int h ) {
-  ((jCheckBox)checkbox).setXYWH(x,y,w,h);
-}
-
-public void jCheckBox_setLeftTopRightBottomWidthHeight(java.lang.Object checkbox,
-        int left, int top, int right, int bottom, int w, int h) {
-((jCheckBox)checkbox).setLeftTopRightBottomWidthHeight(left,top,right,bottom,w,h);	
-}
-
-public  void jCheckBox_setParent(java.lang.Object checkbox,
-                                android.view.ViewGroup viewgroup) {
-  ((jCheckBox)checkbox).setParent(viewgroup);
-}
-
-public  void jCheckBox_setText(java.lang.Object checkbox, String str) {
-  ((jCheckBox)checkbox).setText(str);
-}
-
-public  void jCheckBox_setTextColor(java.lang.Object checkbox, int color) {
-  ((jCheckBox)checkbox).setTextColor(color);
-}
-
-public  void jCheckBox_setTextSize(java.lang.Object checkbox, int pxSize) {
-  ((jCheckBox)checkbox).setTextSize(TypedValue.COMPLEX_UNIT_PX,pxSize);
-}
-
-public  String jCheckBox_getText(java.lang.Object checkbox) {
-  return ((jCheckBox)checkbox).getText().toString();
-}
-
-public  boolean jCheckBox_isChecked( java.lang.Object checkbox) {
-  return ((jCheckBox)checkbox).isChecked();
-}
-
-public  void jCheckBox_setChecked( java.lang.Object checkbox, boolean value) {
-  ((jCheckBox)checkbox).setChecked(value);
-}
-
-//by jmpessoa
-public  void jCheckBox_setId(java.lang.Object checkbox, int id) {
-	  ((jCheckBox)checkbox).setIdEx(id);
-}
-
-//by jmpessoa
-public void jCheckBox_setLParamWidth(java.lang.Object checkbox, int w) {
-	((jCheckBox)checkbox).setLParamWidth(w);
-}
-
-//by jmpessoa
-public void jCheckBox_setLParamHeight(java.lang.Object checkbox, int h) {
-	((jCheckBox)checkbox).setLParamHeight(h);
-}
-
-//by jmpessoa
-public void jCheckBox_addLParamsAnchorRule(java.lang.Object checkbox, int rule) {
-	((jCheckBox)checkbox).addLParamsAnchorRule(rule);
-}
-
-public void jCheckBox_addLParamsParentRule(java.lang.Object checkbox, int rule) {
-	((jCheckBox)checkbox).addLParamsParentRule(rule);
-}
-
-//by jmpessoa
-public  void jCheckBox_setLayoutAll(java.lang.Object checkbox, int idAnchor) {
-	  ((jCheckBox)checkbox).setLayoutAll(idAnchor);
-}
-
-//by jmpessoa
-public void jCheckBox_setMarginLeft(java.lang.Object checkbox, int x) {
-	((jCheckBox)checkbox).setMarginLeft(x);
-}
-
-//by jmpessoa
-public void jCheckBox_setMarginTop(java.lang.Object checkbox, int y) {
-	((jCheckBox)checkbox).setMarginTop(y);
-}
-
-//by jmpessoa
-public void jCheckBox_setMarginRight(java.lang.Object checkbox, int x) {
-	((jCheckBox)checkbox).setMarginRight(x);
-}
-
-//by jmpessoa
-public void jCheckBox_setMarginBottom(java.lang.Object checkbox, int y) {
-	((jCheckBox)checkbox).setMarginBottom(y);
+public  java.lang.Object jCheckBox_Create(long pasobj ) {
+   return (java.lang.Object)( new jCheckBox(this.activity,this,pasobj));
 }
 
 // -------------------------------------------------------------------------
-//  RadioButton
+//  RadioButton: Create
 // -------------------------------------------------------------------------
-
-public  java.lang.Object jRadioButton_Create(android.content.Context context,
-                                            long pasobj ) {
-  return (java.lang.Object)( new jRadioButton(context,this,pasobj));
-}
-
-//by jmpessoa
-public  java.lang.Object jRadioButton_Create2(long pasobj ) {
+public  java.lang.Object jRadioButton_Create(long pasobj ) {
    return (java.lang.Object)( new jRadioButton(this.activity,this,pasobj));
 }
 
-public  void jRadioButton_Free(java.lang.Object radiobutton) {
-  jRadioButton obj = (jRadioButton)radiobutton;
-  obj.Free();
-  //obj = null;
-}
-
-public  void jRadioButton_setXYWH (java.lang.Object radiobutton,
-                               int x, int y, int w, int h ) {
-  ((jRadioButton)radiobutton).setXYWH(x,y,w,h);
-}
-
-public void jRadioButton_setLeftTopRightBottomWidthHeight(java.lang.Object radiobutton,
-        int left, int top, int right, int bottom, int w, int h) {
-((jRadioButton)radiobutton).setLeftTopRightBottomWidthHeight(left,top,right,bottom,w,h);	
-}
-
-public  void jRadioButton_setParent(java.lang.Object radiobutton,
-                                android.view.ViewGroup viewgroup) {
-  ((jRadioButton)radiobutton).setParent(viewgroup);
-}
-
-public  void jRadioButton_setText(java.lang.Object radiobutton, String str) {
-  ((jRadioButton)radiobutton).setText(str);
-}
-
-public  void jRadioButton_setTextColor(java.lang.Object radiobutton, int color) {
-  ((jRadioButton)radiobutton).setTextColor(color);
-}
-
-public  void jRadioButton_setTextSize(java.lang.Object radiobutton, int pxSize) {
-  ((jRadioButton)radiobutton).setTextSize(TypedValue.COMPLEX_UNIT_PX,pxSize);
-}
-
-public  String jRadioButton_getText(java.lang.Object radiobutton) {
-  return ((jRadioButton)radiobutton).getText().toString();
-}
-
-public  boolean jRadioButton_isChecked( java.lang.Object radiobutton) {
-  return ((jRadioButton)radiobutton).isChecked();
-}
-
-public  void jRadioButton_setChecked( java.lang.Object radiobutton, boolean value) {
-  ((jRadioButton)radiobutton).setChecked(value);
-}
-
-//by jmpessoa
-public  void jRadioButton_setId(java.lang.Object radiobutton, int id) {
-	  ((jRadioButton)radiobutton).setIdEx(id);
-}
-
-//by jmpessoa
-public void jRadioButton_setLParamWidth(java.lang.Object radiobutton, int w) {
-	((jRadioButton)radiobutton).setLParamWidth(w);
-}
-
-//by jmpessoa
-public void jRadioButton_setLParamHeight(java.lang.Object radiobutton, int h) {
-	((jRadioButton)radiobutton).setLParamHeight(h);
-}
-
-//by jmpessoa
-public void jRadioButton_addLParamsAnchorRule(java.lang.Object radiobutton, int rule) {
-	((jRadioButton)radiobutton).addLParamsAnchorRule(rule);
-}
-
-public void jRadioButton_addLParamsParentRule(java.lang.Object radiobutton, int rule) {
-	((jRadioButton)radiobutton).addLParamsParentRule(rule);
-}
-
-//by jmpessoa
-public  void jRadioButton_setLayoutAll(java.lang.Object radiobutton, int idAnchor) {
-	  ((jRadioButton)radiobutton).setLayoutAll(idAnchor);
-}
-
-//by jmpessoa
-public void jRadioButton_setMarginLeft(java.lang.Object radiobutton, int x) {
-	((jRadioButton)radiobutton).setMarginLeft(x);
-}
-
-//by jmpessoa
-public void jRadioButton_setMarginTop(java.lang.Object radiobutton, int y) {
-	((jRadioButton)radiobutton).setMarginTop(y);
-}
-
-//by jmpessoa
-public void jRadioButton_setMarginRight(java.lang.Object radiobutton, int x) {
-	((jRadioButton)radiobutton).setMarginRight(x);
-}
-
-//by jmpessoa
-public void jRadioButton_setMarginBottom(java.lang.Object radiobutton, int y) {
-	((jRadioButton)radiobutton).setMarginBottom(y);
-}
 // -------------------------------------------------------------------------
-//  ProgressBar
+//  ProgressBar: Create
 // -------------------------------------------------------------------------
-
-public  java.lang.Object jProgressBar_Create(android.content.Context context,
-                                            long pasobj, int style ) {
-  return (java.lang.Object)( new jProgressBar(context,this,pasobj,style));
-}
-
-
-//by jmpessoa
-public  java.lang.Object jProgressBar_Create2(long pasobj, int style ) {
+public  java.lang.Object jProgressBar_Create(long pasobj, int style ) {
   return (java.lang.Object)( new jProgressBar(this.activity,this,pasobj,style));
 }
 
-public  void jProgressBar_Free(java.lang.Object progressbar) {
-  jProgressBar obj = (jProgressBar)progressbar;
-  obj.Free();
-  //obj = null;
-}
-
-public  void jProgressBar_setXYWH (java.lang.Object progressbar,
-                               int x, int y, int w, int h ) {
-  ((jProgressBar)progressbar).setXYWH(x,y,w,h);
-}
-
-public void jProgressBar_setLeftTopRightBottomWidthHeight(java.lang.Object progressbar,
-        int left, int top, int right, int bottom, int w, int h) {
-((jProgressBar)progressbar).setLeftTopRightBottomWidthHeight(left,top,right,bottom,w,h);	
-}
-
-public  void jProgressBar_setParent(java.lang.Object progressbar,
-                                android.view.ViewGroup viewgroup) {
-  ((jProgressBar)progressbar).setParent(viewgroup);
-}
-
-public  int jProgressBar_getProgress(java.lang.Object progressbar) {
-  return ( ((jProgressBar)progressbar).getProgress() );
-}
-
-public  void jProgressBar_setProgress(java.lang.Object progressbar, int progress) {
-  ((jProgressBar)progressbar).setProgress(progress);
-}
-
-//by jmpessoa
-public  void jProgressBar_setMax(java.lang.Object progressbar, int progress) {
-  ((jProgressBar)progressbar).setMax(progress);
-}
-
-//by jmpessoa
-public  int jProgressBar_getMax(java.lang.Object progressbar) {
-  return ( ((jProgressBar)progressbar).getMax() ); 
-}
-
-//by jmpessoa
-public  void jProgressBar_setId(java.lang.Object progressbar, int id) {
-	  ((jProgressBar)progressbar).setIdEx(id);
-}
-
-//by jmpessoa
-public void jProgressBar_setLParamWidth(java.lang.Object progressbar, int w) {
-	((jProgressBar)progressbar).setLParamWidth(w);
-}
-
-//by jmpessoa
-public void jProgressBar_setLParamHeight(java.lang.Object progressbar, int h) {
-	((jProgressBar)progressbar).setLParamHeight(h);
-}
-
-//by jmpessoa
-public void jProgressBar_addLParamsAnchorRule(java.lang.Object progressbar, int rule) {
-	((jProgressBar)progressbar).addLParamsAnchorRule(rule);
-}
-
-public void jProgressBar_addLParamsParentRule(java.lang.Object progressbar, int rule) {
-	((jProgressBar)progressbar).addLParamsParentRule(rule);
-}
-
-//by jmpessoa
-public  void jProgressBar_setLayoutAll(java.lang.Object progressbar, int idAnchor) {
-	  ((jProgressBar)progressbar).setLayoutAll(idAnchor);
-}
-
-//by jmpessoa
-public void jProgressBar_setMarginLeft(java.lang.Object progressbar, int x) {
-	((jProgressBar)progressbar).setMarginLeft(x);
-}
-
-//by jmpessoa
-public void jProgressBar_setMarginTop(java.lang.Object progressbar, int y) {
-	((jProgressBar)progressbar).setMarginTop(y);
-}
-
-//by jmpessoa
-public void jProgressBar_setMarginRight(java.lang.Object progressbar, int x) {
-	((jProgressBar)progressbar).setMarginRight(x);
-}
-
-//by jmpessoa
-public void jProgressBar_setMarginBottom(java.lang.Object progressbar, int y) {
-	((jProgressBar)progressbar).setMarginBottom(y);
-}
-
 // -------------------------------------------------------------------------
-//  ImageView
+//  ImageView: Create
 // -------------------------------------------------------------------------
-
-public  java.lang.Object jImageView_Create(android.content.Context context,
-                                          long pasobj ) {
-  return (java.lang.Object)( new jImageView(context,this,pasobj));
-}
-
-//by jmpessoa
-public  java.lang.Object jImageView_Create2(long pasobj ) {
+public  java.lang.Object jImageView_Create(long pasobj ) {
   return (java.lang.Object)( new jImageView(this.activity,this,pasobj));
 }
 
-public  void jImageView_Free(java.lang.Object imageview) {
- jImageView obj = (jImageView)imageview;
- obj.Free();
- //obj = null;
-}
-
-public  void jImageView_setXYWH  (java.lang.Object imageview,
-                                 int x, int y, int w, int h ) {
-  ((jImageView)imageview).setXYWH(x,y,w,h);
-}
-
-public void jImageView_setLeftTopRightBottomWidthHeight(java.lang.Object imageview,
-        int left, int top, int right, int bottom, int w, int h) {
-((jImageView)imageview).setLeftTopRightBottomWidthHeight(left,top,right,bottom,w,h);	
-}
-
-public  void jImageView_setParent(java.lang.Object imageview,
-                                 android.view.ViewGroup viewgroup) {
-  ((jImageView)imageview).setParent(viewgroup);
-}
-
-public  void jImageView_setImage(java.lang.Object imageview, String str) {
-  Bitmap bmp;
-  bmp = ((jImageView)imageview).bmp;
-  if (bmp != null)        { bmp.recycle(); }
-  if (str.equals("null")) { ((jImageView)imageview).setImageBitmap(null);
-                            return; };
-  bmp = BitmapFactory.decodeFile( str );
-  ((jImageView)imageview).setImageBitmap(bmp);
-}
-
-//by jmpessoa
-public  void jImageView_setId(java.lang.Object imageview, int id) {
-	  ((jImageView)imageview).setIdEx(id);
-}
-
-//by jmpessoa
-//http://www.techrepublic.com/blog/software-engineer/androids-camera-intent-makes-taking-pics-a-snap/
-public void jImageView_setBitmapImage(java.lang.Object imageview,  android.graphics.Bitmap bm) {
-	((jImageView)imageview).setBitmapImage(bm);
-}
-
-//by jmpessoa
-public void jImageView_setMarginLeft(java.lang.Object imageview, int x) {
-	((jImageView)imageview).setMarginLeft(x);
-}
-
-//by jmpessoa
-public void jImageView_setMarginTop(java.lang.Object imageview, int y) {
-	((jImageView)imageview).setMarginTop(y);
-}
-
-//by jmpessoa
-public void jImageView_setMarginRight(java.lang.Object imageview, int x) {
-	((jImageView)imageview).setMarginRight(x);
-}
-
-//by jmpessoa
-public void jImageView_setMarginBottom(java.lang.Object imageview, int y) {
-	((jImageView)imageview).setMarginBottom(y);
-}
-
-//by jmpessoa
-public void jImageView_setLParamWidth(java.lang.Object imageview, int w) {
-	((jImageView)imageview).setLParamWidth(w);
-}
-
-//by jmpessoa
-public void jImageView_setLParamHeight(java.lang.Object imageview, int h) {
-	((jImageView)imageview).setLParamHeight(h);
-}
-
-//by jmpessoa
-public void jImageView_addLParamsAnchorRule(java.lang.Object imageview, int rule) {
-	((jImageView)imageview).addLParamsAnchorRule(rule);
-}
-
-public void jImageView_addLParamsParentRule(java.lang.Object imageview, int rule) {
-	((jImageView)imageview).addLParamsParentRule(rule);
-}
-
-//by jmpessoa
-public  void jImageView_setLayoutAll(java.lang.Object imageview, int idAnchor) {
-	  ((jImageView)imageview).setLayoutAll(idAnchor);
-}
-
-//by jmpessoa
-public int jImageView_getLParamHeight(java.lang.Object imageview) {
-	  return ((jImageView)imageview).getLParamHeight();
-}
-
-//by jmpessoa           
-public int jImageView_getLParamWidth(java.lang.Object imageview) {
-	return ((jImageView)imageview).getLParamWidth();	
-}
-
 // -------------------------------------------------------------------------
-//  ListView
+//  ListView: Create
 // -------------------------------------------------------------------------
-
-/*
-public  java.lang.Object jListView_Create(android.content.Context context,
-                                         long pasobj, int hasWidget, String delim) {
-  return (java.lang.Object)( new jListView(context,this,pasobj, hasWidget, delim));
-}
-*/
-
-//by jmpessoa
 public  java.lang.Object jListView_Create2(long pasobj,  int widget, String widgetTxt, Bitmap bmp, 
 		int txtDecorated, int itemLay, int textSizeDecorated, int textAlign) {
    return (java.lang.Object)(new jListView(this.activity,this,pasobj,widget,widgetTxt,bmp,
@@ -9385,518 +9480,41 @@ public  java.lang.Object jListView_Create3(long pasobj,  int widget, String widg
 			   txtDecorated,itemLay,textSizeDecorated, textAlign));
 }
 
-public  void jListView_Free(java.lang.Object listview) {
-  jListView obj = (jListView)listview;
-  obj.Free();
-  //obj = null;
-}
-
-public  void jListView_setXYWH  (java.lang.Object listview,
-                                  int x, int y, int w, int h ) {
-  ((jListView)listview).setXYWH(x,y,w,h);
-}
-
-public void jListView_setLeftTopRightBottomWidthHeight(java.lang.Object listview,
-        int left, int top, int right, int bottom, int w, int h) {
-((jListView)listview).setLeftTopRightBottomWidthHeight(left,top,right,bottom,w,h);	
-}
-
-public  void jListView_setParent(java.lang.Object listview,
-                                android.view.ViewGroup viewgroup) {
-  ((jListView)listview).setParent(viewgroup);
-}
-
-public  void jListView_setTextColor(java.lang.Object listview, int color) {
-  ((jListView)listview).setTextColor(color);
-}
-
-public  void jListView_setTextSize(java.lang.Object listview, int pxSize) {
-  ((jListView)listview).setTextSize(pxSize);
-}
-
-// LORDMAN - 2013-08-07
-public void jListView_setItemPosition (java.lang.Object listview, int position, int y)  {
-  ((jListView)listview).setItemPosition(position, y);
-}
-
-/*
-public  void jListView_add(java.lang.Object listview, String item) {
-  ((jListView)listview).add(item);
-}*/
-
-// Item.delete
-public  void jListView_delete   (java.lang.Object listview, int index)  {
-  ((jListView)listview).delete(index);
-}
-
-// Item.clear
-public  void jListView_clear    (java.lang.Object listview) {
-  ((jListView)listview).clear();
-}
-
-//by jmpessoa
-public  void jListView_setId(java.lang.Object listview, int id) {
-	  ((jListView)listview).setIdEx(id);
-}
-
-//by jmpessoa
-public void jListView_setLParamWidth(java.lang.Object listview, int w) {
-	((jListView)listview).setLParamWidth(w);
-}
-
-//by jmpessoa
-public void jListView_setLParamHeight(java.lang.Object listview, int h) {
-	((jListView)listview).setLParamHeight(h);
-}
-
-//by jmpessoa
-public void jListView_addLParamsAnchorRule(java.lang.Object listview, int rule) {
-	((jListView)listview).addLParamsAnchorRule(rule);
-}
-
-public void jListView_addLParamsParentRule(java.lang.Object listview, int rule) {
-	((jListView)listview).addLParamsParentRule(rule);
-}
-
-//by jmpessoa
-public  void jListView_setLayoutAll(java.lang.Object listview, int idAnchor) {
-	  ((jListView)listview).setLayoutAll(idAnchor);
-}
-
-//by jmpessoa
-public void jListView_setMarginLeft(java.lang.Object listview, int x) {
-	((jListView)listview).setMarginLeft(x);
-}
-
-//by jmpessoa
-public void jListView_setMarginTop(java.lang.Object listview, int y) {
-	((jListView)listview).setMarginTop(y);
-}
-
-//by jmpessoa
-public void jListView_setMarginRight(java.lang.Object listview, int x) {
-	((jListView)listview).setMarginRight(x);
-}
-
-//by jmpessoa
-public void jListView_setMarginBottom(java.lang.Object listview, int y) {
-	((jListView)listview).setMarginBottom(y);
-}
 // -------------------------------------------------------------------------
-//  ScrollView
+//  ScrollView: Create
 // -------------------------------------------------------------------------
-
-public  java.lang.Object jScrollView_Create(android.content.Context context,
-                                           long pasobj ) {
-  return (java.lang.Object)( new jScrollView(context,this,pasobj));
-}
-
-
-//by jmpessoa
-public  java.lang.Object jScrollView_Create2(long pasobj ) {
+public  java.lang.Object jScrollView_Create(long pasobj ) {
    return (java.lang.Object)( new jScrollView(this.activity,this,pasobj));
 }
 
-public  void jScrollView_Free(java.lang.Object scrollview) {
-  jScrollView obj = (jScrollView)scrollview;
-  obj.Free();
-  //obj = null;
-}
-
-public  void jScrollView_setXYWH  (java.lang.Object scrollview,
-                                  int x, int y, int w, int h ) {
-  ((jScrollView)scrollview).setXYWH(x,y,w,h);
-}
-
-public void jScrollView_setLeftTopRightBottomWidthHeight(java.lang.Object scrollview,
-        int left, int top, int right, int bottom, int w, int h) {
-((jScrollView)scrollview).setLeftTopRightBottomWidthHeight(left,top,right,bottom,w,h);	
-}
-
-public  void jScrollView_setParent(java.lang.Object scrollview,
-                                  android.view.ViewGroup viewgroup) {
-  ((jScrollView)scrollview).setParent(viewgroup);
-}
-
-public  void jScrollView_setScrollSize(java.lang.Object scrollview, int size) {
-  ((jScrollView)scrollview).setScrollSize(size);
-}
-
-public  android.view.ViewGroup jScrollView_getView(java.lang.Object scrollview) {
-  return (android.view.ViewGroup)( ((jScrollView)scrollview).getView() );
-}
-
-//by jmpessoa
-public  void jScrollView_setId(java.lang.Object scrollview, int id) {
-	  ((jScrollView)scrollview).setIdEx(id);
-}
-
-//by jmpessoa
-public void jScrollView_setLParamWidth(java.lang.Object scrollview, int w) {
-	((jScrollView)scrollview).setLParamWidth(w);
-}
-
-//by jmpessoa
-public void jScrollView_setLParamHeight(java.lang.Object scrollview, int h) {
-	((jScrollView)scrollview).setLParamHeight(h);
-}
-
-//by jmpessoa
-public void jScrollView_addLParamsAnchorRule(java.lang.Object scrollview, int rule) {
-	((jScrollView)scrollview).addLParamsAnchorRule(rule);
-}
-
-public void jScrollView_addLParamsParentRule(java.lang.Object scrollview, int rule) {
-	((jScrollView)scrollview).addLParamsParentRule(rule);
-}
-
-//by jmpessoa
-public  void jScrollView_setLayoutAll(java.lang.Object scrollview, int idAnchor) {
-	  ((jScrollView)scrollview).setLayoutAll(idAnchor);
-}
-
-//by jmpessoa
-public void jScrollView_setMarginLeft(java.lang.Object scrollview, int x) {
-	((jScrollView)scrollview).setMarginLeft(x);
-}
-
-//by jmpessoa
-public void jScrollView_setMarginTop(java.lang.Object scrollview, int y) {
-	((jScrollView)scrollview).setMarginTop(y);
-}
-
-//by jmpessoa
-public void jScrollView_setMarginRight(java.lang.Object scrollview, int x) {
-	((jScrollView)scrollview).setMarginRight(x);
-}
-
-//by jmpessoa
-public void jScrollView_setMarginBottom(java.lang.Object scrollview, int y) {
-	((jScrollView)scrollview).setMarginBottom(y);
-}
-
-
 //-------------------------------------------------------------------------
-//jPanel - new by jmpessoa
+//Panel: Create - new by jmpessoa
 //-------------------------------------------------------------------------
-
-public  java.lang.Object jPanel_Create(android.content.Context context,
-                                       long pasobj ) {
-return (java.lang.Object)(new jPanel(context,this,pasobj));
-}
-
-
-public  java.lang.Object jPanel_Create2(long pasobj ) {
+public  java.lang.Object jPanel_Create(long pasobj ) {
    return (java.lang.Object)(new jPanel(this.activity,this,pasobj));
 }
-
-public  void jPanel_Free(java.lang.Object panel) {
-	jPanel obj = (jPanel)panel;
-    obj.Free();
-//obj = null;
-}
-
-public  void jPanel_setXYWH  (java.lang.Object panel,
-                              int x, int y, int w, int h ) {
-((jPanel)panel).setXYWH(x,y,w,h);
-}
-
-public void jPanel_setLeftTopRightBottomWidthHeight(java.lang.Object panel,
-        int left, int top, int right, int bottom, int w, int h) {
-((jPanel)panel).setLeftTopRightBottomWidthHeight(left,top,right,bottom,w,h);	
-}
-
-
-public  void jPanel_setParent(java.lang.Object panel,
-                              android.view.ViewGroup viewgroup) {
-((jPanel)panel).setParent(viewgroup);
-}
-
-public  android.widget.RelativeLayout jPanel_getView(java.lang.Object panel) {
-   return (android.widget.RelativeLayout)(((jPanel)panel).getView());
-}
-
-//by jmpessoa
-public  void jPanel_setId(java.lang.Object panel, int id) {
-  ((jPanel)panel).setIdEx(id);
-}
-
-//by jmpessoa
-public void jPanel_setLParamWidth(java.lang.Object panel, int w) {
-((jPanel)panel).setLParamWidth(w);
-}
-
-//by jmpessoa
-public void jPanel_setLParamHeight(java.lang.Object panel, int h) {
-((jPanel)panel).setLParamHeight(h);
-}
-
-//by jmpessoa
-public int jPanel_getLParamHeight(java.lang.Object panel) {
-	  return ((jPanel)panel).getLParamHeight();
-}
-
-//by jmpessoa           
-public int jPanel_getLParamWidth(java.lang.Object panel) {
-	return ((jPanel)panel).getLParamWidth();	
-}
-
-//by jmpessoa
-public void jPanel_resetLParamsRules(java.lang.Object panel) {
-((jPanel)panel).resetLParamsRules();
-}
-
-//by jmpessoa
-public void jPanel_addLParamsAnchorRule(java.lang.Object panel, int rule) {
-((jPanel)panel).addLParamsAnchorRule(rule);
-}
-
-public void jPanel_addLParamsParentRule(java.lang.Object panel, int rule) {
-((jPanel)panel).addLParamsParentRule(rule);
-}
-
-//by jmpessoa
-public  void jPanel_setLayoutAll(java.lang.Object panel, int idAnchor) {
-  ((jPanel)panel).setLayoutAll(idAnchor);
-}
-
-//by jmpessoa
-public void jPanel_setMarginLeft(java.lang.Object panel, int x) {
-((jPanel)panel).setMarginLeft(x);
-}
-
-//by jmpessoa
-public void jPanel_setMarginTop(java.lang.Object panel, int y) {
-((jPanel)panel).setMarginTop(y);
-}
-
-//by jmpessoa
-public void jPanel_setMarginRight(java.lang.Object panel, int x) {
-((jPanel)panel).setMarginRight(x);
-}
-
-//by jmpessoa
-public void jPanel_setMarginBottom(java.lang.Object panel, int y) {
-((jPanel)panel).setMarginBottom(y);
-}
-
 // -------------------------------------------------------------------------
 //  ViewFlipper
 // -------------------------------------------------------------------------
 
-public  java.lang.Object jViewFlipper_Create(android.content.Context context,
-                                            long pasobj ) {
-  return (java.lang.Object)( new jViewFlipper(context,this,pasobj));
-}
-
-public  java.lang.Object jViewFlipper_Create2(long pasobj ) {
+public  java.lang.Object jViewFlipper_Create(long pasobj ) {
    return (java.lang.Object)( new jViewFlipper(this.activity,this,pasobj));
 }
 
-public  void jViewFlipper_Free(java.lang.Object viewflipper) {
-  jViewFlipper obj = (jViewFlipper)viewflipper;
-  obj.Free();
-  //obj = null;
-}
 
-public  void jViewFlipper_setXYWH  (java.lang.Object viewflipper,
-                                  int x, int y, int w, int h ) {
-  ((jViewFlipper)viewflipper).setXYWH(x,y,w,h);
-}
-
-public void jViewFlipper_setLeftTopRightBottomWidthHeight(java.lang.Object viewflipper,
-        int left, int top, int right, int bottom, int w, int h) {
-((jViewFlipper)viewflipper).setLeftTopRightBottomWidthHeight(left,top,right,bottom,w,h);	
-}
-
-
-public  void jViewFlipper_setParent(java.lang.Object viewflipper,
-                                  android.view.ViewGroup viewgroup) {
-  ((jViewFlipper)viewflipper).setParent(viewgroup);
-}
-
-//by jmpessoa
-public  void jViewFlipper_setId(java.lang.Object viewflipper, int id) {
-	  ((jViewFlipper)viewflipper).setIdEx(id);
-}
-
-//by jmpessoa
-public void jViewFlipper_setLParamWidth(java.lang.Object viewflipper, int w) {
-	((jViewFlipper)viewflipper).setLParamWidth(w);
-}
-
-//by jmpessoa
-public void jViewFlipper_setLParamHeight(java.lang.Object viewflipper, int h) {
-	((jViewFlipper)viewflipper).setLParamHeight(h);
-}
-
-//by jmpessoa
-public void jViewFlipper_addLParamsAnchorRule(java.lang.Object viewflipper, int rule) {
-	((jViewFlipper)viewflipper).addLParamsAnchorRule(rule);
-}
-
-public void jViewFlipper_addLParamsParentRule(java.lang.Object viewflipper, int rule) {
-	((jViewFlipper)viewflipper).addLParamsParentRule(rule);
-}
-
-//by jmpessoa
-public  void jViewFlipper_setLayoutAll(java.lang.Object viewflipper, int idAnchor) {
-	  ((jViewFlipper)viewflipper).setLayoutAll(idAnchor);
-}
-
-//by jmpessoa
-public void jViewFlipper_setMarginLeft(java.lang.Object viewflipper, int x) {
-	((jViewFlipper)viewflipper).setMarginLeft(x);
-}
-
-//by jmpessoa
-public void jViewFlipper_setMarginTop(java.lang.Object viewflipper, int y) {
-	((jViewFlipper)viewflipper).setMarginTop(y);
-}
-
-//by jmpessoa
-public void jViewFlipper_setMarginRight(java.lang.Object viewflipper, int x) {
-	((jViewFlipper)viewflipper).setMarginRight(x);
-}
-
-//by jmpessoa
-public void jViewFlipper_setMarginBottom(java.lang.Object viewflipper, int y) {
-	((jViewFlipper)viewflipper).setMarginBottom(y);
-}
 // -------------------------------------------------------------------------
 //  WebView
 // -------------------------------------------------------------------------
-
-public  java.lang.Object jWebView_Create(android.content.Context context,
-                                           long pasobj ) {
-  return (java.lang.Object)( new jWebView(context,this,pasobj));
-}
-
-//by jmpessoa
-public  java.lang.Object jWebView_Create2(long pasobj ) {
+public  java.lang.Object jWebView_Create(long pasobj ) {
   return (java.lang.Object)( new jWebView(this.activity,this,pasobj));
 }
 
-public  void jWebView_Free(java.lang.Object webview) {
-  jWebView obj = (jWebView)webview;
-  obj.Free();
-  //obj = null;
-}
-
-public  void jWebView_setXYWH  (java.lang.Object webview,
-                                  int x, int y, int w, int h ) {
-  ((jWebView)webview).setXYWH(x,y,w,h);
-}
-
-public void jWebView_setLeftTopRightBottomWidthHeight(java.lang.Object webview,
-        int left, int top, int right, int bottom, int w, int h) {
-((jWebView)webview).setLeftTopRightBottomWidthHeight(left,top,right,bottom,w,h);	
-}
-
-
-public  void jWebView_setParent(java.lang.Object webview,
-                                  android.view.ViewGroup viewgroup) {
-  ((jWebView)webview).setParent(viewgroup);
-}
-
-public  void jWebView_setJavaScript(java.lang.Object webview,boolean javascript) {
-  Log.i("Java","Here");
-  ((jWebView)webview).getSettings().setJavaScriptEnabled(javascript);
-}
-
-public  void jWebView_loadURL(java.lang.Object webview, String str) {
-  ((jWebView)webview).loadUrl("about:blank");
-  ((jWebView)webview).loadUrl(str);
-}
-
-//by jmpessoa
-public  void jWebView_setId(java.lang.Object webview, int id) {
-	  ((jWebView)webview).setIdEx(id);
-}
-
-//by jmpessoa
-public void jWebView_setLParamWidth(java.lang.Object webview, int w) {
-	((jWebView)webview).setLParamWidth(w);
-}
-
-//by jmpessoa
-public void jWebView_setLParamHeight(java.lang.Object webview, int h) {
-	((jWebView)webview).setLParamHeight(h);
-}
-
-//by jmpessoa
-public void jWebView_addLParamsAnchorRule(java.lang.Object webview, int rule) {
-	((jWebView)webview).addLParamsAnchorRule(rule);
-}
-
-public void jWebView_addLParamsParentRule(java.lang.Object webview, int rule) {
-	((jWebView)webview).addLParamsParentRule(rule);
-}
-
-//by jmpessoa
-public  void jWebView_setLayoutAll(java.lang.Object webview, int idAnchor) {
-	  ((jWebView)webview).setLayoutAll(idAnchor);
-}
-
-//by jmpessoa
-public void jWebView_setMarginLeft(java.lang.Object webview, int x) {
-	((jWebView)webview).setMarginLeft(x);
-}
-
-//by jmpessoa
-public void jWebView_setMarginTop(java.lang.Object webview, int y) {
-	((jWebView)webview).setMarginTop(y);
-}
-
-//by jmpessoa
-public void jWebView_setMarginRight(java.lang.Object webview, int x) {
-	((jWebView)webview).setMarginRight(x);
-}
-
-//by jmpessoa
-public void jWebView_setMarginBottom(java.lang.Object webview, int y) {
-	((jWebView)webview).setMarginBottom(y);
-}
 // -------------------------------------------------------------------------
 //  Canvas : canvas + paint
 // -------------------------------------------------------------------------
 
 public  java.lang.Object jCanvas_Create( long pasobj) {
   return (java.lang.Object)( new jCanvas(this,pasobj));
-}
-
-public  void jCanvas_Free(java.lang.Object canvas) {
-  jCanvas obj = (jCanvas)canvas;
-  obj.Free();
-  //obj = null;
-}
-
-public  void jCanvas_setStrokeWidth (java.lang.Object canvas,float width ) {
-  ((jCanvas)canvas).setStrokeWidth(width);
-}
-
-public  void jCanvas_setStyle(java.lang.Object canvas, int style ) {
-  ((jCanvas)canvas).setStyle(style);
-}
-
-public  void jCanvas_setColor(java.lang.Object canvas, int color) {
-  ((jCanvas)canvas).setColor(color);
-}
-
-public  void jCanvas_setTextSize(java.lang.Object canvas, float textsize) {
-  ((jCanvas)canvas).setTextSize(textsize);
-}
-
-public  void jCanvas_drawLine(java.lang.Object canvas, float x1, float y1, float x2, float y2) {
-  ((jCanvas)canvas).drawLine(x1,y1,x2,y2);
-}
-
-public  void jCanvas_drawText(java.lang.Object canvas, String text, float x, float y) {
-  ((jCanvas)canvas).drawText(text,x,y);
-}
-
-public  void jCanvas_drawBitmap(java.lang.Object canvas, Bitmap bmp, int b, int l, int r, int t) {
-  ((jCanvas)canvas).drawBitmap(bmp,b,l,r,t);
 }
 
 // -------------------------------------------------------------------------
@@ -9907,281 +9525,27 @@ public  java.lang.Object jBitmap_Create( long pasobj ) {
   return (java.lang.Object)( new jBitmap(this,pasobj));
 }
 
-public  void jBitmap_Free(java.lang.Object bitmap) {
-  jBitmap obj = (jBitmap)bitmap;
-  obj.Free();
-  //obj = null;
-}
-
-public  void jBitmap_loadFile(java.lang.Object bitmap, String filename) {
-  ((jBitmap)bitmap).loadFile(filename);
-}
-
-public  void jBitmap_saveFile(java.lang.Object bitmap, String filename, int format) {
-  try{
-    File file = new File(filename);
-    FileOutputStream fos = activity.openFileOutput(filename , Context.MODE_PRIVATE);
-    //
-    if (format == Const.CompressFormat_PNG)
-         { ((jBitmap)bitmap).bmp.compress(CompressFormat.PNG, 100 , fos); }
-    else { ((jBitmap)bitmap).bmp.compress(CompressFormat.JPEG, 95 , fos); };
-    fos.flush();
-    fos.close(); }
-  catch(Exception e)
-    { };
-}
-
-public  void jBitmap_createBitmap (java.lang.Object bitmap,int w, int h) {
-  ((jBitmap)bitmap).createBitmap(w,h);
-}
-
-public  int[] jBitmap_getWH( java.lang.Object bitmap) {
-  return ( ((jBitmap)bitmap).getWH() );
-}
-
-public  Bitmap jBitmap_jInstance( java.lang.Object bitmap) {
-  return ( ((jBitmap)bitmap).bmp );
-}
-
 // -------------------------------------------------------------------------
 //  View
 // -------------------------------------------------------------------------
-
-public  java.lang.Object jView_Create(android.content.Context context, long pasobj ) {
-  return (java.lang.Object)( new jView(context,this,pasobj));
-}
-
 //by jmpessoa
-public  java.lang.Object jView_Create2(long pasobj ) {
+public  java.lang.Object jView_Create(long pasobj ) {
   return (java.lang.Object)( new jView(this.activity,this,pasobj));
-}
-
-public  void jView_Free(java.lang.Object view) {
-  jView obj = (jView)view;
-  obj.Free();
-  //obj = null;
-}
-
-public  void jView_setXYWH  (java.lang.Object view,int x, int y, int w, int h ) {
-  ((jView)view).setXYWH(x,y,w,h);
-}
-
-public void jView_setLeftTopRightBottomWidthHeight(java.lang.Object view,
-        int left, int top, int right, int bottom, int w, int h) {
-((jView)view).setLeftTopRightBottomWidthHeight(left,top,right,bottom,w,h);	
-}
-
-
-public  void jView_setParent(java.lang.Object view, android.view.ViewGroup viewgroup) {
-  ((jView)view).setParent(viewgroup);
-}
-
-public  void jView_setjCanvas(java.lang.Object view, java.lang.Object canvas) {
-  ((jView)view).setjCanvas( (jCanvas)canvas );
-}
-
-public  void jView_saveView(java.lang.Object view, String filename) {
-  ((jView)view).saveView(filename);
-}
-
-//by jmpessoa
-public  void jView_setId(java.lang.Object view, int id) {
-	  ((jView)view).setIdEx(id);
-}
-
-//by jmpessoa
-public void jView_setLParamWidth(java.lang.Object view, int w) {
-	((jView)view).setLParamWidth(w);
-}
-
-//by jmpessoa
-public void jView_setLParamHeight(java.lang.Object view, int h) {
-	((jView)view).setLParamHeight(h);
-}
-
-//by jmpessoa
-public void jView_addLParamsAnchorRule(java.lang.Object view, int rule) {
-	((jView)view).addLParamsAnchorRule(rule);
-}
-
-public void jView_addLParamsParentRule(java.lang.Object view, int rule) {
-	((jView)view).addLParamsParentRule(rule);
-}
-
-//by jmpessoa
-public  void jView_setLayoutAll(java.lang.Object view, int idAnchor) {
-	  ((jView)view).setLayoutAll(idAnchor);
-}
-
-//by jmpessoa
-public void jView_setMarginLeft(java.lang.Object view, int x) {
-	((jView)view).setMarginLeft(x);
-}
-
-//by jmpessoa
-public void jView_setMarginTop(java.lang.Object view, int y) {
-	((jView)view).setMarginTop(y);
-}
-
-//by jmpessoa
-public void jView_setMarginRight(java.lang.Object view, int x) {
-	((jView)view).setMarginRight(x);
-}
-
-//by jmpessoa
-public void jView_setMarginBottom(java.lang.Object view, int y) {
-	((jView)view).setMarginBottom(y);
-}
-
-//by jmpessoa
-public int jView_getLParamHeight(java.lang.Object view) {
-	  return ((jView)view).getLParamHeight();
-}
-
-//by jmpessoa           
-public int jView_getLParamWidth(java.lang.Object view) {
-	return ((jView)view).getLParamWidth();	
 }
 
 // -------------------------------------------------------------------------
 //  GLView
 // -------------------------------------------------------------------------
 
-public  java.lang.Object jGLSurfaceView_Create(android.content.Context context,
-                                              long pasobj, int version ) {
-  return (java.lang.Object)( new jGLSurfaceView(context,this,pasobj,version));
-}
-
-//by jmpessoa
-public  java.lang.Object jGLSurfaceView_Create2(long pasobj, int version ) {
+public  java.lang.Object jGLSurfaceView_Create(long pasobj, int version ) {
   return (java.lang.Object)( new jGLSurfaceView(this.activity,this,pasobj,version));
 }
-
-public  void jGLSurfaceView_Free(java.lang.Object surfaceview) {
-  jGLSurfaceView obj = (jGLSurfaceView)surfaceview;
-  obj.Free();
-  //obj = null;
-}
-
-public  void jGLSurfaceView_setXYWH  (java.lang.Object surfaceview,
-                                     int x, int y, int w, int h ) {
-  ((jGLSurfaceView)surfaceview).setXYWH(x,y,w,h);
-}
-
-public void jGLSurfaceView_setLeftTopRightBottomWidthHeight(java.lang.Object surfaceview,
-        int left, int top, int right, int bottom, int w, int h) {
-((jGLSurfaceView)surfaceview).setLeftTopRightBottomWidthHeight(left,top,right,bottom,w,h);	
-}
-
-
-public  void jGLSurfaceView_setParent(java.lang.Object surfaceview,
-                                     android.view.ViewGroup viewgroup) {
-  ((jGLSurfaceView)surfaceview).setParent(viewgroup);
-}
-
-
-public  void jGLSurfaceView_SetAutoRefresh(java.lang.Object glView, boolean active ) {
-  if (active) { ((jGLSurfaceView)glView).setRenderMode( GLSurfaceView.RENDERMODE_CONTINUOUSLY ); }
-        else  { ((jGLSurfaceView)glView).setRenderMode( GLSurfaceView.RENDERMODE_WHEN_DIRTY   ); }
-}
-
-public  void jGLSurfaceView_Refresh(java.lang.Object glView) {
-  ((GLSurfaceView)glView).requestRender();
-}
-
-// public  void jGLSurfaceView_Refresh(java.lang.Object surfaceview) {
-//   ((jGLSurfaceView)surfaceview).genRender(); //requestRender();
-// }
-
-public  void jGLSurfaceView_deleteTexture(java.lang.Object surfaceview, int id) {
-  ((jGLSurfaceView)surfaceview).deleteTexture(id);
-}
-
-public  void jGLSurfaceView_glThread(java.lang.Object surfaceview) {
-  ((jGLSurfaceView)surfaceview).glThread();
-}
-
-//by jmpessoa
-public  void jGLSurfaceView_setId(java.lang.Object surfaceview, int id) {
-	  ((jGLSurfaceView)surfaceview).setIdEx(id);
-}
-
-//by jmpessoa
-public void jGLSurfaceView_setLParamWidth(java.lang.Object surfaceview, int w) {
-	((jGLSurfaceView)surfaceview).setLParamWidth(w);
-}
-
-//by jmpessoa
-public void jGLSurfaceView_setLParamHeight(java.lang.Object surfaceview, int h) {
-	((jGLSurfaceView)surfaceview).setLParamHeight(h);
-}
-
-//by jmpessoa
-public int jGLSurfaceView_getLParamHeight(java.lang.Object surfaceview) {
-	  return ((jGLSurfaceView)surfaceview).getLParamHeight();
-}
-
-//by jmpessoa           
-public int jGLSurfaceView_getLParamWidth(java.lang.Object surfaceview) {
-	return ((jGLSurfaceView)surfaceview).getLParamWidth();	
-}
-
-
-//by jmpessoa
-public void jGLSurfaceView_addLParamsAnchorRule(java.lang.Object surfaceview, int rule) {
-	((jGLSurfaceView)surfaceview).addLParamsAnchorRule(rule);
-}
-
-public void jGLSurfaceView_addLParamsParentRule(java.lang.Object surfaceview, int rule) {
-	((jGLSurfaceView)surfaceview).addLParamsParentRule(rule);
-}
-
-//by jmpessoa
-public  void jGLSurfaceView_setLayoutAll(java.lang.Object surfaceview, int idAnchor) {
-	  ((jGLSurfaceView)surfaceview).setLayoutAll(idAnchor);
-}
-
-//by jmpessoa
-public void jGLSurfaceView_setMarginLeft(java.lang.Object surfaceview, int x) {
-	((jGLSurfaceView)surfaceview).setMarginLeft(x);
-}
-
-//by jmpessoa
-public void jGLSurfaceView_setMarginTop(java.lang.Object surfaceview, int y) {
-	((jGLSurfaceView)surfaceview).setMarginTop(y);
-}
-
-//by jmpessoa
-public void jGLSurfaceView_setMarginRight(java.lang.Object surfaceview, int x) {
-	((jGLSurfaceView)surfaceview).setMarginRight(x);
-}
-
-//by jmpessoa
-public void jGLSurfaceView_setMarginBottom(java.lang.Object surfaceview, int y) {
-	((jGLSurfaceView)surfaceview).setMarginBottom(y);
-}
-
 // -------------------------------------------------------------------------
 //  Timer
 // -------------------------------------------------------------------------
 public  java.lang.Object jTimer_Create(long pasobj) {
   return (jTimer)(new jTimer(this,pasobj) );
 }
-
-public  void jTimer_Free(java.lang.Object timer) {
-  jTimer obj = (jTimer)timer;
-  obj.Free();
-  //obj = null;
-}
-
-public  void jTimer_SetInterval(java.lang.Object timer, int interval ) {
-  ((jTimer)timer).SetInterval(interval);
-}
-
-public  void jTimer_SetEnabled(java.lang.Object timer, boolean active ) {
-  ((jTimer)timer).SetEnabled(active);
-}
-
 // -------------------------------------------------------------------------
 //  Dialog YN
 // -------------------------------------------------------------------------
@@ -10196,19 +9560,6 @@ public  java.lang.Object jDialogYN_Create(long pasobj,
   //return DialogYNSav;
 }
 
-public  void jDialogYN_Free(java.lang.Object dialog) {
-  jDialogYN obj = (jDialogYN)dialog;
-  obj.Free();
-  //obj = null;
-}
-
-public  void jDialogYN_Show(java.lang.Object dialog ) {
-  Log.i("Java","jDialogYN_Show");
-  if ( dialog instanceof jDialogYN ) { Log.i("Java","jDialogYN -> YES"); }
-  else                               { Log.i("Java","jDialogYN -> No" ); }
-  ((jDialogYN)dialog).show();
-}
-
 // -------------------------------------------------------------------------
 //  Dialog Progress
 // -------------------------------------------------------------------------
@@ -10218,145 +9569,30 @@ public  java.lang.Object jDialogProgress_Create(long pasobj,
   return (jDialogProgress)(new jDialogProgress(activity,this,pasobj,title,msg ) );
 }
 
-public  void jDialogProgress_Free(java.lang.Object dialog) {
-  jDialogProgress obj = (jDialogProgress)dialog;
-  obj.Free();
-  //obj = null;
-}
-
 // -------------------------------------------------------------------------
 //  Toast
 // -------------------------------------------------------------------------
 
 //
 public  void jToast( String str ) {
-  Toast.makeText(activity, str, Toast.LENGTH_SHORT).show();
-}
-
-//by jmpessoa
-public  void jToast2(android.content.Context context,  String str ) {
-	  Toast.makeText(context, str, Toast.LENGTH_SHORT).show();
+   Toast.makeText(activity, str, Toast.LENGTH_SHORT).show();
 }
 
 // -------------------------------------------------------------------------
 //  jImageBtn
 // -------------------------------------------------------------------------
 
-public  java.lang.Object jImageBtn_Create(android.content.Context context, long pasobj ) {
-  return (java.lang.Object)( new jImageBtn(context,this,pasobj));
-}
-
 //by jmpessoa
-public  java.lang.Object jImageBtn_Create2(long pasobj ) {
+public  java.lang.Object jImageBtn_Create(long pasobj ) {
 	return (java.lang.Object)( new jImageBtn(this.activity,this,pasobj));
 }
 
-public  void jImageBtn_Free(java.lang.Object imagebtn) {
-  jImageBtn obj = (jImageBtn)imagebtn;
-  obj.Free();
-  //obj = null;
-}
-
-public  void jImageBtn_setXYWH  (java.lang.Object imagebtn,int x, int y, int w, int h ) {
-  ((jImageBtn)imagebtn).setXYWH(x,y,w,h);
-}
-
-public void jImageBtn_setLeftTopRightBottomWidthHeight(java.lang.Object imagebtn,
-        int left, int top, int right, int bottom, int w, int h) {
-((jImageBtn)imagebtn).setLeftTopRightBottomWidthHeight(left,top,right,bottom,w,h);	
-}
-
-public  void jImageBtn_setParent(java.lang.Object imagebtn, android.view.ViewGroup viewgroup) {
-  ((jImageBtn)imagebtn).setParent(viewgroup);
-}
-
-public  void jImageBtn_setButton(java.lang.Object imagebtn, String bmpup, String bmpdn ) {
-  ((jImageBtn)imagebtn).setButton(bmpup,bmpdn);
-}
-
-//by jmpessoa
-public  void jImageBtn_setButtonUp(java.lang.Object imagebtn, String bmpup) {
-	  ((jImageBtn)imagebtn).setButtonUp(bmpup);
-}
-
-//by jmpessoa
-public  void jImageBtn_setButtonDown(java.lang.Object imagebtn, String bmpdn ) {
-	  ((jImageBtn)imagebtn).setButtonDown(bmpdn);
-}
-
-// LORDMAN 2013-08-16
-public  void jImageBtn_setEnabled(java.lang.Object imagebtn, boolean enabled ) {
-  ((jImageBtn)imagebtn).setEnabled(enabled);
-}
-
-//by jmpessoa
-public  void jImageBtn_setId(java.lang.Object imagebtn, int id) {
-	  ((jImageBtn)imagebtn).setIdEx(id);
-}
-
-//by jmpessoa
-public void jImageBtn_setLParamWidth(java.lang.Object imagebtn, int w) {
-	((jImageBtn)imagebtn).setLParamWidth(w);
-}
-
-//by jmpessoa
-public void jImageBtn_setLParamHeight(java.lang.Object imagebtn, int h) {
-	((jImageBtn)imagebtn).setLParamHeight(h);
-}
-
-//by jmpessoa
-public void jImageBtn_addLParamsAnchorRule(java.lang.Object imagebtn, int rule) {
-	((jImageBtn)imagebtn).addLParamsAnchorRule(rule);
-}
-
-public void jImageBtn_addLParamsParentRule(java.lang.Object imagebtn, int rule) {
-	((jImageBtn)imagebtn).addLParamsParentRule(rule);
-}
-
-//by jmpessoa
-public  void jImageBtn_setLayoutAll(java.lang.Object imagebtn, int idAnchor) {
-	  ((jImageBtn)imagebtn).setLayoutAll(idAnchor);
-}
-
-//by jmpessoa
-public void jImageBtn_setMarginLeft(java.lang.Object imagebtn, int x) {
-	((jImageBtn)imagebtn).setMarginLeft(x);
-}
-
-//by jmpessoa
-public void jImageBtn_setMarginTop(java.lang.Object imagebtn, int y) {
-	((jImageBtn)imagebtn).setMarginTop(y);
-}
-
-//by jmpessoa
-public void jImageBtn_setMarginRight(java.lang.Object imagebtn, int x) {
-	((jImageBtn)imagebtn).setMarginRight(x);
-}
-
-//by jmpessoa
-public void jImageBtn_setMarginBottom(java.lang.Object imagebtn, int y) {
-	((jImageBtn)imagebtn).setMarginBottom(y);
-}
 // -------------------------------------------------------------------------
 //  jAsyncTask
 // -------------------------------------------------------------------------
 
 public  java.lang.Object jAsyncTask_Create(long pasobj ) {
   return (java.lang.Object)( new jAsyncTask(this,pasobj));
-}
-
-public  void jAsyncTask_Free(java.lang.Object asynctask) {
-  jAsyncTask obj = (jAsyncTask)asynctask;
-  obj.Free();
-}
-
-public  void jAsyncTask_Execute(java.lang.Object asynctask) {
-  ((jAsyncTask)asynctask).execute();
-}
-
-
-public  void jAsyncTask_setProgress(java.lang.Object asynctask, int progress) {
-  ((jAsyncTask)asynctask).setProgress(progress);
 }
 
 // -------------------------------------------------------------------------
@@ -10374,7 +9610,6 @@ public  void jAsyncTask_setProgress(java.lang.Object asynctask, int progress) {
 //
 //
 // -------------------------------------------------------------------------
-
 
 public  String jHttp_get(String url) {
   String rst = "";
@@ -10476,6 +9711,7 @@ public int jSend_SMS(String phoneNumber, String msg) {
 
 //by jmpessoa
 //http://eagle.phys.utk.edu/guidry/android/readContacts.html
+@SuppressLint("DefaultLocale")
 public String jContact_getMobileNumberByDisplayName(String contactName){
 	                                                        
 	   String matchNumber = "";
@@ -10604,15 +9840,17 @@ public float[] benchMark1 () {
   return ( vals );
 }
 
-//by jmpessoa
-public  java.lang.Object jSqliteCursor_Create( long pasobj ) {
-	return (java.lang.Object)( new jSqliteCursor(this,pasobj) );
-}
+//-------------------------------------------------------------------------------------------------------
+//NEWS by jmpessoa
+//-------------------------------------------------------------------------------------------------------
 
-//by jmpessoa
-public  java.lang.Object jSqliteDataAccess_Create(long pasobj, String databaseName, char colDelim, char rowDelim) {
-	return (java.lang.Object)( new jSqliteDataAccess(this,pasobj,databaseName,colDelim,rowDelim) );
-}
+   public  java.lang.Object jSqliteCursor_Create( long pasobj ) {
+	 return (java.lang.Object)( new jSqliteCursor(this,pasobj) );
+   }
+
+   public  java.lang.Object jSqliteDataAccess_Create(long pasobj, String databaseName, char colDelim, char rowDelim) {
+	 return (java.lang.Object)( new jSqliteDataAccess(this,pasobj,databaseName,colDelim,rowDelim) );
+   }
    
    public java.lang.Object jMyHello_jCreate(long _Self, int _flag, String _hello) {
       return (java.lang.Object)(new jMyHello(this,_Self,_flag,_hello));
@@ -10630,24 +9868,18 @@ public  java.lang.Object jSqliteDataAccess_Create(long pasobj, String databaseNa
       return (java.lang.Object)(new jTextFileManager(this,_Self));
    }
   
-
-  
    public java.lang.Object jMenu_jCreate(long _Self) {
       return (java.lang.Object)(new jMenu(this,_Self));
    }
-  
   
    public java.lang.Object jBluetooth_jCreate(long _Self) {
       return (java.lang.Object)(new jBluetooth(this,_Self));
    }
   
-  
    public java.lang.Object jBluetoothServerSocket_jCreate(long _Self) {
       return (java.lang.Object)(new jBluetoothServerSocket(this,_Self));
    }
-  
-
-  
+    
    public java.lang.Object jBluetoothClientSocket_jCreate(long _Self) {
       return (java.lang.Object)(new jBluetoothClientSocket(this,_Self));
    }
@@ -10656,15 +9888,32 @@ public  java.lang.Object jSqliteDataAccess_Create(long pasobj, String databaseNa
 	      return (java.lang.Object)(new jSpinner(this,_Self));
    }    
 
-
    public java.lang.Object jLocation_jCreate(long _Self, long _TimeForUpdates, long _DistanceForUpdates, int _CriteriaAccuracy, int _MapType) {
       return (java.lang.Object)(new jLocation(this,_Self,_TimeForUpdates,_DistanceForUpdates,_CriteriaAccuracy, _MapType));
    }
 
-  
    public java.lang.Object jPreferences_jCreate(long _Self, boolean _IsShared) {
       return (java.lang.Object)(new jPreferences(this,_Self,_IsShared));
    }
   
-
+   public java.lang.Object jShareFile_jCreate(long _Self) {
+      return (java.lang.Object)(new jShareFile(this,_Self));
+   }
+  
+   public java.lang.Object jImageFileManager_jCreate(long _Self) {
+      return (java.lang.Object)(new jImageFileManager(this,_Self));
+   }
+  
+   public java.lang.Object jContextMenu_jCreate(long _Self) {
+      return (java.lang.Object)(new jContextMenu(this,_Self));
+   }
+  
+   public java.lang.Object jActionBarTab_jCreate(long _Self) {
+      return (java.lang.Object)(new jActionBarTab(this,_Self));
+   }
+  
+   public java.lang.Object jCustomDialog_jCreate(long _Self) {
+      return (java.lang.Object)(new jCustomDialog(this,_Self));
+   }
+  
 }

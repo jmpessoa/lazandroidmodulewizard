@@ -6,8 +6,7 @@ unit unit1;
 interface
   
 uses
-  Classes, SysUtils, And_jni, And_jni_Bridge, Laz_And_Controls, 
-  Laz_And_Controls_Events, AndroidWidget, actionbartab, menu, contextmenu;
+  Classes, SysUtils, {And_jni, And_jni_Bridge,} Laz_And_Controls, AndroidWidget;
   
 type
 
@@ -50,7 +49,7 @@ end;
 procedure TAndroidModule1.DataModuleJNIPrompt(Sender: TObject);
 var
   i: integer;
-begin    //jListView1
+begin
   for i:=0 to jListView1.Count-1 do
     jListView1.SetImageByIndex('ic_bullets',i);
 end;
@@ -67,7 +66,6 @@ procedure TAndroidModule1.jButton2Click(Sender: TObject);
 var
   i, itemChecked: integer;
 begin
-
   itemChecked:= -1;
   for i:=0 to jListView1.Count-1 do
   begin
@@ -85,7 +83,6 @@ begin
   end
   else
     ShowMessage('Item Checked not found!');
-
 end;
 
 procedure TAndroidModule1.jListView1ClickCaptionItem(Sender: TObject;

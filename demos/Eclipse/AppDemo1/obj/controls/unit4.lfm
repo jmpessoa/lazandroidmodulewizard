@@ -56,9 +56,11 @@ object AndroidModule4: TAndroidModule4
     BackgroundColor = colbrDefault
     FontColor = colbrSilver
     FontSize = 0
+    TextTypeFace = tfNormal
     Id = 9880053
   end
   object jEditText1: jEditText
+    Tag = 1
     Left = 8
     Top = 104
     Width = 279
@@ -76,7 +78,7 @@ object AndroidModule4: TAndroidModule4
     LayoutParamHeight = lpOneFifthOfParent
     Alignment = taLeft
     InputTypeEx = itxMultiLine
-    LineMaxLength = 300
+    MaxTextLength = 800
     BackgroundColor = colbrCyan
     FontColor = colbrDefault
     FontSize = 0
@@ -103,6 +105,7 @@ object AndroidModule4: TAndroidModule4
     BackgroundColor = colbrLightSlateBlue
     Id = 0
     object jEditText2: jEditText
+      Tag = 1
       Left = 5
       Top = 5
       Width = 248
@@ -119,12 +122,12 @@ object AndroidModule4: TAndroidModule4
       LayoutParamHeight = lpMatchParent
       Alignment = taLeft
       InputTypeEx = itxMultiLine
-      LineMaxLength = 300
+      MaxTextLength = 300
       BackgroundColor = colbrLightSlateBlue
       FontColor = colbrDefault
       FontSize = 0
       ScrollBarStyle = scrNone
-      MaxLines = 300
+      MaxLines = 800
       HorScrollBar = False
       VerScrollBar = False
       WrappingLine = False

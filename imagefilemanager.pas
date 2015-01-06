@@ -41,17 +41,17 @@ jImageFileManager = class(jControl)
 end;
 
 function jImageFileManager_jCreate(env: PJNIEnv; this: JObject;_Self: int64): jObject;
-procedure jImageFileManager_jFree(env: PJNIEnv; this: JObject; _jimagefilemanager: JObject);
-procedure jImageFileManager_SaveToSdCard(env: PJNIEnv; this: JObject; _jimagefilemanager: JObject; _image: jObject; _filename: string);
-procedure jImageFileManager_ShowImagesFromGallery(env: PJNIEnv; this: JObject; _jimagefilemanager: JObject);
-function jImageFileManager_LoadFromSdCard(env: PJNIEnv; this: JObject; _jimagefilemanager: JObject; _filename: string): jObject;
-function jImageFileManager_LoadFromURL(env: PJNIEnv; this: JObject; _jimagefilemanager: JObject; _imageURL: string): jObject;
-function jImageFileManager_LoadFromAssets(env: PJNIEnv; this: JObject; _jimagefilemanager: JObject; strName: string): jObject;
-function jImageFileManager_LoadFromResources(env: PJNIEnv; this: JObject; _jimagefilemanager: JObject; _imageResIdentifier: string): jObject;
-function jImageFileManager_LoadFromFile(env: PJNIEnv; this: JObject; _jimagefilemanager: JObject; _filename: string): jObject; overload;
-function jImageFileManager_LoadFromFile(env: PJNIEnv; this: JObject; _jimagefilemanager: JObject; _path: string; _filename: string): jObject; overload;
-procedure jImageFileManager_SaveToFile(env: PJNIEnv; this: JObject; _jimagefilemanager: JObject; _image: jObject; _filename: string); overload;
-procedure jImageFileManager_SaveToFile(env: PJNIEnv; this: JObject; _jimagefilemanager: JObject; _image: jObject;_path:string; _filename: string); overload;
+procedure jImageFileManager_jFree(env: PJNIEnv; _jimagefilemanager: JObject);
+procedure jImageFileManager_SaveToSdCard(env: PJNIEnv; _jimagefilemanager: JObject; _image: jObject; _filename: string);
+procedure jImageFileManager_ShowImagesFromGallery(env: PJNIEnv; _jimagefilemanager: JObject);
+function jImageFileManager_LoadFromSdCard(env: PJNIEnv; _jimagefilemanager: JObject; _filename: string): jObject;
+function jImageFileManager_LoadFromURL(env: PJNIEnv; _jimagefilemanager: JObject; _imageURL: string): jObject;
+function jImageFileManager_LoadFromAssets(env: PJNIEnv; _jimagefilemanager: JObject; strName: string): jObject;
+function jImageFileManager_LoadFromResources(env: PJNIEnv; _jimagefilemanager: JObject; _imageResIdentifier: string): jObject;
+function jImageFileManager_LoadFromFile(env: PJNIEnv; _jimagefilemanager: JObject; _filename: string): jObject; overload;
+function jImageFileManager_LoadFromFile(env: PJNIEnv; _jimagefilemanager: JObject; _path: string; _filename: string): jObject; overload;
+procedure jImageFileManager_SaveToFile(env: PJNIEnv; _jimagefilemanager: JObject; _image: jObject; _filename: string); overload;
+procedure jImageFileManager_SaveToFile(env: PJNIEnv; _jimagefilemanager: JObject; _image: jObject;_path:string; _filename: string); overload;
 
 
 implementation
@@ -68,17 +68,11 @@ destructor jImageFileManager.Destroy;
 begin
   if not (csDesigning in ComponentState) then
   begin
-    if jForm(Owner).App <> nil then
-    begin
-      if jForm(Owner).App.Initialized then
-      begin
         if FjObject <> nil then
         begin
            jFree();
            FjObject:= nil;
         end;
-      end;
-    end;
   end;
   //you others free code here...'
   inherited Destroy;
@@ -96,56 +90,56 @@ end;
 
 function jImageFileManager.jCreate(): jObject;
 begin
-   Result:= jImageFileManager_jCreate(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis , int64(Self));
+   Result:= jImageFileManager_jCreate(FjEnv, FjThis , int64(Self));
 end;
 
 procedure jImageFileManager.jFree();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jImageFileManager_jFree(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject);
+     jImageFileManager_jFree(FjEnv, FjObject);
 end;
 
 procedure jImageFileManager.SaveToSdCard(_image: jObject; _filename: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jImageFileManager_SaveToSdCard(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, _image ,_filename);
+     jImageFileManager_SaveToSdCard(FjEnv, FjObject, _image ,_filename);
 end;
 
 procedure jImageFileManager.ShowImagesFromGallery();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jImageFileManager_ShowImagesFromGallery(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject);
+     jImageFileManager_ShowImagesFromGallery(FjEnv, FjObject);
 end;
 
 function jImageFileManager.LoadFromSdCard(_filename: string): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jImageFileManager_LoadFromSdCard(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, _filename);
+   Result:= jImageFileManager_LoadFromSdCard(FjEnv, FjObject, _filename);
 end;
 
 function jImageFileManager.LoadFromURL(_imageURL: string): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jImageFileManager_LoadFromURL(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, _imageURL);
+   Result:= jImageFileManager_LoadFromURL(FjEnv, FjObject, _imageURL);
 end;
 
 function jImageFileManager.LoadFromAssets(strName: string): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jImageFileManager_LoadFromAssets(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, strName);
+   Result:= jImageFileManager_LoadFromAssets(FjEnv, FjObject, strName);
 end;
 
 function jImageFileManager.LoadFromResources(_imageResIdentifier: string): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jImageFileManager_LoadFromResources(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, _imageResIdentifier);
+   Result:= jImageFileManager_LoadFromResources(FjEnv, FjObject, _imageResIdentifier);
 end;
 
 
@@ -153,28 +147,28 @@ function jImageFileManager.LoadFromFile(_filename: string): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jImageFileManager_LoadFromFile(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, _filename);
+   Result:= jImageFileManager_LoadFromFile(FjEnv, FjObject, _filename);
 end;
 
 function jImageFileManager.LoadFromFile(_path: string; _filename: string): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-    Result:= jImageFileManager_LoadFromFile(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject,_path, _filename);
+    Result:= jImageFileManager_LoadFromFile(FjEnv, FjObject,_path, _filename);
 end;
 
 procedure jImageFileManager.SaveToFile(_image: jObject; _filename: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jImageFileManager_SaveToFile(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, _image ,_filename);
+     jImageFileManager_SaveToFile(FjEnv, FjObject, _image ,_filename);
 end;
 
 procedure jImageFileManager.SaveToFile(_image: jObject; _path:string;  _filename: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jImageFileManager_SaveToFile(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, _image ,_path, _filename);
+     jImageFileManager_SaveToFile(FjEnv, FjObject, _image ,_path, _filename);
 end;
 
 {-------- jImageFileManager_JNI_Bridge ----------}
@@ -203,7 +197,7 @@ end;
 *)
 
 
-procedure jImageFileManager_jFree(env: PJNIEnv; this: JObject; _jimagefilemanager: JObject);
+procedure jImageFileManager_jFree(env: PJNIEnv; _jimagefilemanager: JObject);
 var
   jMethod: jMethodID=nil;
   jCls: jClass=nil;
@@ -214,7 +208,7 @@ begin
 end;
 
 
-procedure jImageFileManager_SaveToSdCard(env: PJNIEnv; this: JObject; _jimagefilemanager: JObject; _image: jObject; _filename: string);
+procedure jImageFileManager_SaveToSdCard(env: PJNIEnv; _jimagefilemanager: JObject; _image: jObject; _filename: string);
 var
   jParams: array[0..1] of jValue;
   jMethod: jMethodID=nil;
@@ -229,7 +223,7 @@ env^.DeleteLocalRef(env,jParams[1].l);
 end;
 
 
-procedure jImageFileManager_ShowImagesFromGallery(env: PJNIEnv; this: JObject; _jimagefilemanager: JObject);
+procedure jImageFileManager_ShowImagesFromGallery(env: PJNIEnv; _jimagefilemanager: JObject);
 var
   jMethod: jMethodID=nil;
   jCls: jClass=nil;
@@ -240,7 +234,7 @@ begin
 end;
 
 
-function jImageFileManager_LoadFromSdCard(env: PJNIEnv; this: JObject; _jimagefilemanager: JObject; _filename: string): jObject;
+function jImageFileManager_LoadFromSdCard(env: PJNIEnv; _jimagefilemanager: JObject; _filename: string): jObject;
 var
   jParams: array[0..0] of jValue;
   jMethod: jMethodID=nil;
@@ -254,7 +248,7 @@ env^.DeleteLocalRef(env,jParams[0].l);
 end;
 
 
-function jImageFileManager_LoadFromURL(env: PJNIEnv; this: JObject; _jimagefilemanager: JObject; _imageURL: string): jObject;
+function jImageFileManager_LoadFromURL(env: PJNIEnv; _jimagefilemanager: JObject; _imageURL: string): jObject;
 var
   jParams: array[0..0] of jValue;
   jMethod: jMethodID=nil;
@@ -268,7 +262,7 @@ env^.DeleteLocalRef(env,jParams[0].l);
 end;
 
 
-function jImageFileManager_LoadFromAssets(env: PJNIEnv; this: JObject; _jimagefilemanager: JObject; strName: string): jObject;
+function jImageFileManager_LoadFromAssets(env: PJNIEnv; _jimagefilemanager: JObject; strName: string): jObject;
 var
   jParams: array[0..0] of jValue;
   jMethod: jMethodID=nil;
@@ -281,7 +275,7 @@ begin
 env^.DeleteLocalRef(env,jParams[0].l);
 end;
 
-function jImageFileManager_LoadFromResources(env: PJNIEnv; this: JObject; _jimagefilemanager: JObject; _imageResIdentifier: string): jObject;
+function jImageFileManager_LoadFromResources(env: PJNIEnv; _jimagefilemanager: JObject; _imageResIdentifier: string): jObject;
 var
   jParams: array[0..0] of jValue;
   jMethod: jMethodID=nil;
@@ -294,7 +288,7 @@ begin
   env^.DeleteLocalRef(env,jParams[0].l);
 end;
 
-function jImageFileManager_LoadFromFile(env: PJNIEnv; this: JObject; _jimagefilemanager: JObject; _filename: string): jObject;
+function jImageFileManager_LoadFromFile(env: PJNIEnv; _jimagefilemanager: JObject; _filename: string): jObject;
 var
   jParams: array[0..0] of jValue;
   jMethod: jMethodID=nil;
@@ -307,7 +301,7 @@ begin
 env^.DeleteLocalRef(env,jParams[0].l);
 end;
 
-function jImageFileManager_LoadFromFile(env: PJNIEnv; this: JObject; _jimagefilemanager: JObject;_path: string; _filename: string): jObject;
+function jImageFileManager_LoadFromFile(env: PJNIEnv; _jimagefilemanager: JObject;_path: string; _filename: string): jObject;
 var
   jParams: array[0..1] of jValue;
   jMethod: jMethodID=nil;
@@ -322,7 +316,7 @@ begin
   env^.DeleteLocalRef(env,jParams[1].l);
 end;
 
-procedure jImageFileManager_SaveToFile(env: PJNIEnv; this: JObject; _jimagefilemanager: JObject; _image: jObject; _filename: string);
+procedure jImageFileManager_SaveToFile(env: PJNIEnv; _jimagefilemanager: JObject; _image: jObject; _filename: string);
 var
   jParams: array[0..1] of jValue;
   jMethod: jMethodID=nil;
@@ -337,7 +331,7 @@ env^.DeleteLocalRef(env,jParams[1].l);
 end;
 
 
-procedure jImageFileManager_SaveToFile(env: PJNIEnv; this: JObject; _jimagefilemanager: JObject; _image: jObject; _path: string; _filename: string);
+procedure jImageFileManager_SaveToFile(env: PJNIEnv; _jimagefilemanager: JObject; _image: jObject; _path: string; _filename: string);
 var
   jParams: array[0..2] of jValue;
   jMethod: jMethodID=nil;

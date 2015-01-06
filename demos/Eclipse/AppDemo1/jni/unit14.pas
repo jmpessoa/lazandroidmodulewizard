@@ -24,7 +24,7 @@ type
       jTextView1: jTextView;
       jTextView2: jTextView;
       jTextView3: jTextView;
-      procedure DataModuleActive(Sender: TObject);
+
       procedure DataModuleCloseQuery(Sender: TObject; var CanClose: boolean);
       procedure DataModuleCreate(Sender: TObject);
       procedure DataModuleJNIPrompt(Sender: TObject);
@@ -52,13 +52,8 @@ implementation
 { TAndroidModule14 }
 
 procedure TAndroidModule14.DataModuleCreate(Sender: TObject);
-begin //this initialization code is need here to fix Laz4Andoid  *.lfm parse.... why parse fails?
-(*  Self.ActivityMode:= actRecyclable;
-  Self.BackgroundColor:= colbrBlack;
-    //mode delphi
-  Self.OnJNIPrompt:= DataModuleJNIPrompt;
-  Self.OnRotate:= DataModuleRotate;
-  Self.OnCloseQuery:= DataModuleCloseQuery;  *)
+begin
+  //
 end;
 
 procedure TAndroidModule14.DataModuleCloseQuery(Sender: TObject;
@@ -67,15 +62,10 @@ begin
   CanClose:= True;
 end;
 
-procedure TAndroidModule14.DataModuleActive(Sender: TObject);
-begin
-  //
-end;
 
 procedure TAndroidModule14.DataModuleJNIPrompt(Sender: TObject);
 begin
- // jEditText2.Parent:= jScrollView1.View;    //change the parent here!
- // Self.Show;
+  if Self.IsWifiEnabled() then jCheckBox1.Checked:= True;
 end;
 
 procedure TAndroidModule14.DataModuleRotate(Sender: TObject; rotate: integer;

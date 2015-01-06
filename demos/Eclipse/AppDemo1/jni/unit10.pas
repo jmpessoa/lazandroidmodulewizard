@@ -20,12 +20,11 @@ type
       jCanvasES1_1: jCanvasES1;
       jImageList1: jImageList;
       jTextView1: jTextView;
-      jTextView2: jTextView;
-      jTimer1: jTimer;
 
-      procedure DataModuleCloseQuery(Sender: TObject; var CanClose: boolean);
+      procedure AndroidModule10CloseQuery(Sender: TObject; var CanClose: boolean
+        );
+      procedure AndroidModule10JNIPrompt(Sender: TObject);
       procedure DataModuleCreate(Sender: TObject);
-      procedure DataModuleJNIPrompt(Sender: TObject);
       procedure DataModuleRotate(Sender: TObject; rotate: integer;
         var rstRotate: integer);
       procedure jButton1Click(Sender: TObject);
@@ -33,25 +32,18 @@ type
       procedure jButton3Click(Sender: TObject);
       procedure jCanvasES1_1GLChange(Sender: TObject; W, H: integer);
       procedure jCanvasES1_1GLCreate(Sender: TObject);
-      procedure jCanvasES1_1GLDown(Sender: TObject; Touch: TMouch);
       procedure jCanvasES1_1GLDraw(Sender: TObject);
-      procedure jCanvasES1_1GLMove(Sender: TObject; Touch: TMouch);
-      procedure jCanvasES1_1GLThread(Sender: TObject);
-      procedure jCanvasES1_1GLUp(Sender: TObject; Touch: TMouch);
-      procedure jTimer1Timer(Sender: TObject);
+
     private
       {private declarations}
     public
       {public declarations}
       gAngle  : Single;
       gSpeed  : Single;
-      gWork   : Boolean;
-      gX      : Single;
-      gY      : Single;
       gToggle : Boolean;
-      gBusy   : Boolean;
       gH      : integer; //get scrW
       gW      : integer; //get scrH
+
       Procedure DoDraw(Angle : Single; scrW: integer; scrH: integer);
   end;
   
@@ -99,15 +91,15 @@ var
   i      : integer;
 begin
   if Self.FormState = fsFormClose then Exit;
+
   gAngle := gAngle + 4;
   if gAngle > 360 then gAngle := 0;
 
-  jCanvasES1_1.Screen_Setup (scrW, scrH, xp2D , cCull_Yes);
-
+  jCanvasES1_1.Screen_Setup(scrW, scrH, xp2D , cCull_Yes);
   jCanvasES1_1.Screen_Clear(1,1,1,1);
+
   If gToggle then
   begin
-    //
      case jCanvasES1_1.Textures[0].Active of
        True  : begin
                 jCanvasES1_1.Texture_Unload_All;
@@ -116,8 +108,7 @@ begin
                 jCanvasES1_1.Texture_Load_All;
                end;
      end;
-    //
-     gToggle := False;
+    gToggle := False;
   end;
 
   ZDepth := 0;
@@ -125,7 +116,7 @@ begin
   // Draw BackGround
   //-------------------------------------------------------------------------
   jCanvasES1_1.Alpha  := 1;
-  glBlendFunc      (GL_ONE,GL_ZERO);
+  glBlendFunc(GL_ONE,GL_ZERO);
   jCanvasES1_1.idModelView;
   jCanvasES1_1.Translate(0,0,ZDepth);
 
@@ -203,52 +194,34 @@ begin
   jCanvasES1_1.Rotate   (Angle,0,0,1);
   jCanvasES1_1.Scale    (0.3,0.3,0.3);
   jCanvasES1_1.DrawArray(@VRXQ1,nil,@TXRQ1,@jCanvasES1_1.Textures[4],4);
-  jCanvasES1_1.Update;
-end;
-
-procedure TAndroidModule10.jTimer1Timer(Sender: TObject);
-begin
-  gAngle := gAngle + 4;
-  if gAngle > 360 then gAngle := 0;
-  if gWork then jCanvasES1_1.Refresh;
+  //jCanvasES1_1.Update;
 end;
 
 procedure TAndroidModule10.jButton1Click(Sender: TObject);
 begin
-   jTimer1.Enabled:= not jTimer1.Enabled;
-   if jTimer1.Enabled then
-   begin
-     gWork:= True;
-     jTextView2.Text:= 'Auto: On'
-   end
-   else
-   begin
-     jTextView2.Text:= 'Auto: Off';
-     gWork:= False;
-   end;
+   gSpeed := gSpeed - 0.3;
+   if gSpeed < 0 then gSpeed:= 0;
 end;
 
 procedure TAndroidModule10.DataModuleCreate(Sender: TObject);
 begin
-   //
-end;
-
-procedure TAndroidModule10.DataModuleCloseQuery(Sender: TObject; var CanClose: boolean);
-begin
-  jTimer1.Enabled:= False;
-  CanClose:= True;
-end;
-
-
-procedure TAndroidModule10.DataModuleJNIPrompt(Sender: TObject);
-begin
   gAngle  := 0.1;
   gSpeed  := 1.0;
-  gWork   := False;
   gToggle := False;
   gH:= 150;
   gW:= 300;
- // Self.Show;
+end;
+
+procedure TAndroidModule10.AndroidModule10JNIPrompt(Sender: TObject);
+begin
+  //
+end;
+
+procedure TAndroidModule10.AndroidModule10CloseQuery(Sender: TObject;
+  var CanClose: boolean);
+begin
+   gSpeed:= 0;
+   CanClose:= True;
 end;
 
 procedure TAndroidModule10.DataModuleRotate(Sender: TObject; rotate: integer;
@@ -260,14 +233,11 @@ end;
 procedure TAndroidModule10.jButton2Click(Sender: TObject);
 begin
   gSpeed := gSpeed + 0.3;
-  ShowMessage('Speed ++')
 end;
 
 procedure TAndroidModule10.jButton3Click(Sender: TObject);
 begin
-  jCanvasES1_1.Request_GLThread;
-  gToggle := True;
-  jCanvasEs1_1.Refresh;
+  ShowMessage('Hello World!!');
 end;
        //we needed handle this event for perfect layout --> W x H !
 procedure TAndroidModule10.jCanvasES1_1GLChange(Sender: TObject; W, H: integer);
@@ -279,38 +249,6 @@ end;
 procedure TAndroidModule10.jCanvasES1_1GLCreate(Sender: TObject);
 begin
   jCanvasES1_1.Texture_Load_All;
-end;
-
-procedure TAndroidModule10.jCanvasES1_1GLDown(Sender: TObject; Touch: TMouch);
-begin
-  //
-end;
-
-procedure TAndroidModule10.jCanvasES1_1GLMove(Sender: TObject; Touch: TMouch);
-begin
-  gX:= Touch.Pt.x;
-  gY:= Touch.Pt.y;
-  jCanvasES1_1.Refresh;
-end;
-
-procedure TAndroidModule10.jCanvasES1_1GLThread(Sender: TObject); // un/load texture
-begin
-  gWork:= False;
-  case jCanvasES1_1.Textures[0].Active of
-   True  : begin
-             jCanvasES1_1.Texture_Unload_All;
-           end;
-   False : begin
-             jCanvasES1_1.Texture_Load_All;
-           end;
-  end;
-  gWork := True;
-  jCanvasES1_1.Refresh;
-end;
-
-procedure TAndroidModule10.jCanvasES1_1GLUp(Sender: TObject; Touch: TMouch);
-begin
-  //
 end;
 
 procedure TAndroidModule10.jCanvasES1_1GLDraw(Sender: TObject);

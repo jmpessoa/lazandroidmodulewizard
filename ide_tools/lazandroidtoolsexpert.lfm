@@ -17,9 +17,9 @@ object frmLazAndroidToolsExpert: TfrmLazAndroidToolsExpert
     Height = 481
     Top = 0
     Width = 500
-    ActivePage = TabSheetAction
+    ActivePage = TabSheetAbout
     Align = alClient
-    TabIndex = 0
+    TabIndex = 2
     TabOrder = 0
     object TabSheetAction: TTabSheet
       Caption = 'Action'
@@ -573,7 +573,7 @@ object frmLazAndroidToolsExpert: TfrmLazAndroidToolsExpert
         Width = 492
         Align = alClient
         Alignment = taCenter
-        Caption = 'LATE: Apk Tools Expert for Android Module Wizard'#10'by Thierry'
+        Caption = 'LATE: Apk Tools Expert for Android Module Wizard'#13#10'by Thierry Dijoux'
         Layout = tlCenter
         ParentColor = False
       end

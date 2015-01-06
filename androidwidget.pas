@@ -1,4 +1,9 @@
-unit AndroidWidget;   //by jmpessoa
+unit AndroidWidget;
+
+//Lazarus Android Module Wizard: Form Designer and Components development model!
+//Author: jmpessoa@hotmail.com
+//https://github.com/jmpessoa/lazandroidmodulewizard
+//http://forum.lazarus.freepascal.org/index.php/topic,21919.0.html
 
 {$mode delphi}
 
@@ -10,6 +15,19 @@ uses
   Classes, SysUtils, Math, types, And_jni, CustApp;
 
 const
+
+  // Event id for Pascal & Java
+
+  cTouchDown            = 0;
+  cTouchMove            = 1;
+  cTouchUp              = 2;
+
+  cRenderer_onGLCreate  = 0;
+  cRenderer_onGLChange  = 1;
+  cRenderer_onGLDraw    = 2;
+  cRenderer_onGLDestroy = 3;
+  cRenderer_onGLThread  = 4;
+
 
   cjFormsMax = 40; // Max Form Stack Count
 
@@ -238,6 +256,8 @@ const
 
 type
 
+  TWidgetItem = (wgNone,wgCheckBox,wgRadioButton,wgButton,wgTextView);
+
   // thierrydijoux - locale type def
  TLocaleType = (ltCountry = 0, ltDisplayCountry = 1, ltDisplayLanguage = 2,
                 ltDisplayName = 3, ltDisplayVariant = 4, ltIso3Country = 5,
@@ -350,8 +370,8 @@ type
   TInputTypeEx  =(  itxText,
                     itxNumber,
                     itxPhone,
-                    itxPassNumber,
-                    itxPassText,
+                    itxNumberPassword,
+                    itxTextPassword,
                     itxMultiLine);
 
   //by jmpessoa
@@ -459,18 +479,19 @@ type
   TActivityMode = (actMain, actRecyclable, actSplash); //actDisposable
 
   TTextTypeFace = (tfNormal, tfBold, tfItalic, tfBoldItalic); //by jmpessoa
+  TFontFace = (ffNormal, ffSans, ffSerif, ffMonospace);
 
   //...
 
   TOnNotify = Procedure(Sender: TObject) of object;
-
   TViewClick = Procedure(jObjView: jObject; Id: integer) of object;
   TListItemClick = Procedure(jObjAdapterView: jObject; jObjView: jObject; position: integer; Id: integer) of object;
 
   TOnCallBackData = Procedure(Sender: TObject; strData: string; intData: integer; doubleData: double) of object;
 
   TOnClickEx         = Procedure(Sender: TObject; Value: integer) of object;
-  TOnChange          = Procedure(Sender: TObject; EventType : TChangeType) of object;
+
+  TOnChange         = Procedure(Sender: TObject; txt: string; count: integer) of object;
 
   TOnTouch           = Procedure(Sender: TObject; ID: integer; X, Y: single) of object;
   TOnTouchEvent      = Procedure(Sender: TObject; Touch : TMouch ) of Object;
@@ -510,7 +531,7 @@ type
   // App
   TEnvJni     = record
                  jEnv        : PJNIEnv;  // a pointer reference to the JNI environment,
-                 jThis       : jObject;  // a reference to the object making this call (or class if static).
+                 jThis       : jObject;  // a reference to the object making this call (or class if static-> controls.java).
                  jActivity   : jObject;  // Java Activity / android.content.Context -
                  jRLayout    : jObject;  // Java Base Layout
                 end;
@@ -608,7 +629,6 @@ type
 
     ControlsVersionInfo: string; //by jmpessoa
 
-
     TopIndex: integer;
     BaseIndex: integer;
 
@@ -619,7 +639,6 @@ type
 
     procedure Finish;
     function  GetContext: jObject;
-
     function GetControlsVersionInfo: string;
     function GetControlsVersionFeatures: string; //sorry!
 
@@ -648,49 +667,42 @@ type
 
   jControl = class(TComponent)
   protected
-    FApplication: jApp;
     FjClass: jObject;
-    FClassPath: string;
+    FClassPath: string; //need by new pure jni model! -->> initialized by widget.Create
     FjObject      : jObject; //jSelf
     FEnabled     : boolean;
     FInitialized : boolean;
+    FjEnv: PJNIEnv;
+    FjThis: jObject;
     procedure SetEnabled(Value: boolean);
   public
+    procedure UpdateJNI(refApp: jApp);
     property Enabled     : boolean read FEnabled  write SetEnabled;
     property Initialized : boolean read FInitialized write FInitialized;
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
     procedure Init(refApp: jApp); virtual;
-
     property jSelf: jObject read FjObject ;
   end;
 
-
   TAndroidWidget = class(jControl)
   private
-
     FLeft: integer;
     FTop: integer;
-
     FChilds: TFPList; // list of TAndroidWidget
-
     function GetChilds(Index: integer): TAndroidWidget;
-
     procedure SetMarginBottom(const AValue: integer);
     procedure SetMarginLeft(const AValue: integer);
     procedure SetMarginRight(const AValue: integer);
     procedure SetMarginTop(const AValue: integer);
-
     procedure SetLeft(const AValue: integer);
     procedure SetTop(const AValue: integer);
-
-  {
+    {
     procedure ReadIntHeightData(Reader: TReader);
     procedure ReadIntWidthData(Reader: TReader);
     procedure WriteIntHeightData(Writer: TWriter);
     procedure WriteIntWidthData(Writer: TWriter);
-   }
-
+    }
   protected
     FColor       : TARGBColorBridge; //background ... needed by design...
     FFontColor   : TARGBColorBridge;  //needed by design...
@@ -700,12 +712,9 @@ type
     FMarginLeft: integer;
     FMarginRight: integer;
     FMarginTop: integer;
-
     FHeight: integer;
     FWidth: integer;
-
     FVisible: boolean;
-
     FAcceptChildrenAtDesignTime: boolean;
 
     procedure SetParent(const AValue: TAndroidWidget);
@@ -717,13 +726,10 @@ type
 
     procedure SetText(Value: string); virtual;
     function GetText: string; virtual;
-
     procedure SetWidth(const AValue: integer);
     procedure SetHeight(const AValue: integer);
-
     function GetWidth: integer;  virtual;
     function GetHeight: integer; virtual;
-
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -737,10 +743,9 @@ type
     procedure InvalidateRect(ARect: TRect; Erase: boolean);
     procedure Invalidate;
 
-    property  AcceptChildrenAtDesignTime:boolean read FAcceptChildrenAtDesignTime;
+    property AcceptChildrenAtDesignTime:boolean read FAcceptChildrenAtDesignTime;
     property Parent: TAndroidWidget read FParent write SetParent;
     property Visible: boolean read FVisible write FVisible;
-
   published
     property Left: integer read FLeft write SetLeft;
     property Top: integer read FTop write SetTop;
@@ -867,7 +872,6 @@ type
     Procedure Show;
     Procedure Close;
     Procedure Refresh;
-    procedure UpdateJNI(refApp: jApp);
     procedure ShowMessage(msg: string);
     function GetDateTime: String;
 
@@ -929,7 +933,7 @@ type
     property ScreenStyle  : TScreenStyle   read FScreenStyle    write FScreenStyle;
     property Animation    : TAnimation     read FAnimation      write FAnimation;
     property Orientation   : integer read FOrientation write SetOrientation;
-    property App: jApp read FApplication write FApplication;
+    //property App: jApp read FApplication write FApplication;
     property ScreenWH      : TWH read FScreenWH;
 
     property CallBackDataString: string read FCBDataString write FCBDataString;
@@ -970,12 +974,10 @@ type
 
   end;
 
-
     {jVisualControl - NEW by jmpessoa}
 
   jVisualControl = class(TAndroidWidget)
   private
-
     procedure ReadIntId(Reader: TReader);
     procedure WriteIntId(Writer: TWriter);
     {
@@ -983,25 +985,20 @@ type
     procedure WriteIntOrdLParamWidth(Writer: TWriter);
     procedure ReadIntOrdLParamHeight(Reader: TReader);
     procedure WriteIntOrdLParamHeight(Writer: TWriter);
-     }
+    }
   protected
     // Java
     FId: DWord;
-
     FjPRLayout   : jObject; //Java: Parent Layout {parent View)
     FjRLayout: jObject; // Java : Self Layout  {Self.View}
-
     FOrientation : integer;
     FTextAlignment: TTextAlignment;
     FFontSize     : DWord;
     FTextTypeFace: TTextTypeFace;
-
     FAnchorId     : integer;
     FAnchor       : jVisualControl;  //http://www.semurjengkol.com/android-relative-layout-example/
-
     FPositionRelativeToAnchor: TPositionRelativeToAnchorIDSet;
     FPositionRelativeToParent: TPositionRelativeToParentSet;
-
     //FGravity      : TGravitySet;    TODO: by jmpessoa  - java "setGravity"
     FLParamWidth: TLayoutParams;
     FLParamHeight: TLayoutParams;
@@ -1014,10 +1011,8 @@ type
     procedure SetViewParent(Value: jObject);  virtual;
     function GetViewParent: jObject;  virtual;
 
-
     procedure SetView(Value: jObject);  virtual;
     function GetView: jObject;  virtual;
-
 
     procedure SetParentComponent(Value: TComponent); override;
     procedure SetParamHeight(Value: TLayoutParams);
@@ -1028,16 +1023,12 @@ type
     destructor Destroy; override;
     //procedure Init;  override;
     procedure Init(refApp: jApp); override;
-
     procedure UpdateLayout; virtual;
     property AnchorId: integer read FAnchorId write FAnchorId;
     property Orientation: integer read FOrientation write FOrientation;
-
     property ViewParent {ViewParent}: jObject  read  GetViewParent write SetViewParent; // Java : Parent Relative Layout
-
     property View: jObject read GetView write SetView; // Java : Self View/Layout
-
-    property Id: DWord read FId write FId;                        //Must be published for data persistence!!!
+    property Id: DWord read FId write FId;
     property TextTypeFace: TTextTypeFace read FTextTypeFace write SetTextTypeFace;
   published
     property Visible: boolean read FVisible write FVisible;
@@ -1054,6 +1045,7 @@ end;
 
   //by jmpessoa
   Function InputTypeToStrEx ( InputType : TInputTypeEx ) : String;
+
   function SplitStr(var theString: string; delimiter: string): string;
   function ReplaceChar(query: string; oldchar, newchar: char):string;
 
@@ -1087,40 +1079,40 @@ end;
   //Form Event
   Procedure Java_Event_pOnClose(env: PJNIEnv; this: jobject; Form : TObject);
 
-  function jForm_GetStringExtra(env: PJNIEnv; this: JObject; _jform: JObject; data: jObject; extraName: string): string;
-  function jForm_GetIntExtra(env: PJNIEnv; this: JObject; _jform: JObject; data: jObject; extraName: string; defaultValue: integer): integer;
-  function jForm_GetDoubleExtra(env: PJNIEnv; this: JObject; _jform: JObject; data: jObject; extraName: string; defaultValue: double): double;
+  function jForm_GetStringExtra(env: PJNIEnv; _jform: JObject; data: jObject; extraName: string): string;
+  function jForm_GetIntExtra(env: PJNIEnv; _jform: JObject; data: jObject; extraName: string; defaultValue: integer): integer;
+  function jForm_GetDoubleExtra(env: PJNIEnv; _jform: JObject; data: jObject; extraName: string; defaultValue: double): double;
 
-  procedure jForm_DeleteFile(env: PJNIEnv; this: JObject; _jform: JObject; _filename: string); overload;
-  procedure jForm_DeleteFile(env: PJNIEnv; this: JObject; _jform: JObject; _fullPath: string; _filename: string);  overload;
-  procedure jForm_DeleteFile(env: PJNIEnv; this: JObject; _jform: JObject; _environmentDir: integer; _filename: string);  overload;
-  function jForm_CreateDir(env: PJNIEnv; this: JObject; _jform: JObject; _dirName: string): string;  overload;
-  function jForm_CreateDir(env: PJNIEnv; this: JObject; _jform: JObject; _environmentDir: integer; _dirName: string): string;  overload;
-  function jForm_CreateDir(env: PJNIEnv; this: JObject; _jform: JObject; _fullPath: string; _dirName: string): string;  overload;
-  function jForm_IsExternalStorageEmulated(env: PJNIEnv; this: JObject; _jform: JObject): boolean;
-  function jForm_IsExternalStorageRemovable(env: PJNIEnv; this: JObject; _jform: JObject): boolean;
-  function jForm_GetjFormVersionFeatures(env: PJNIEnv; this: JObject; _jform: JObject): string;
+  procedure jForm_DeleteFile(env: PJNIEnv; _jform: JObject; _filename: string); overload;
+  procedure jForm_DeleteFile(env: PJNIEnv; _jform: JObject; _fullPath: string; _filename: string);  overload;
+  procedure jForm_DeleteFile(env: PJNIEnv; _jform: JObject; _environmentDir: integer; _filename: string);  overload;
+  function jForm_CreateDir(env: PJNIEnv; _jform: JObject; _dirName: string): string;  overload;
+  function jForm_CreateDir(env: PJNIEnv; _jform: JObject; _environmentDir: integer; _dirName: string): string;  overload;
+  function jForm_CreateDir(env: PJNIEnv; _jform: JObject; _fullPath: string; _dirName: string): string;  overload;
+  function jForm_IsExternalStorageEmulated(env: PJNIEnv; _jform: JObject): boolean;
+  function jForm_IsExternalStorageRemovable(env: PJNIEnv; _jform: JObject): boolean;
+  function jForm_GetjFormVersionFeatures(env: PJNIEnv; _jform: JObject): string;
 
-  function jForm_GetActionBar(env: PJNIEnv; this: JObject; _jform: JObject): jObject;
-  procedure jForm_HideActionBar(env: PJNIEnv; this: JObject; _jform: JObject);
-  procedure jForm_ShowActionBar(env: PJNIEnv; this: JObject; _jform: JObject);
-  procedure jForm_ShowTitleActionBar(env: PJNIEnv; this: JObject; _jform: JObject; _value: boolean);
-  procedure jForm_HideLogoActionBar(env: PJNIEnv; this: JObject; _jform: JObject; _value: boolean);
-  procedure jForm_SetTitleActionBar(env: PJNIEnv; this: JObject; _jform: JObject; _title: string);
-  procedure jForm_SetSubTitleActionBar(env: PJNIEnv; this: JObject; _jform: JObject; _subtitle: string);
+  function jForm_GetActionBar(env: PJNIEnv; _jform: JObject): jObject;
+  procedure jForm_HideActionBar(env: PJNIEnv; _jform: JObject);
+  procedure jForm_ShowActionBar(env: PJNIEnv; _jform: JObject);
+  procedure jForm_ShowTitleActionBar(env: PJNIEnv; _jform: JObject; _value: boolean);
+  procedure jForm_HideLogoActionBar(env: PJNIEnv; _jform: JObject; _value: boolean);
+  procedure jForm_SetTitleActionBar(env: PJNIEnv; _jform: JObject; _title: string);
+  procedure jForm_SetSubTitleActionBar(env: PJNIEnv; _jform: JObject; _subtitle: string);
 
-  procedure jForm_SetIconActionBar(env: PJNIEnv; this: JObject; _jform: JObject; _iconIdentifier: string);
+  procedure jForm_SetIconActionBar(env: PJNIEnv; _jform: JObject; _iconIdentifier: string);
 
-  procedure jForm_SetTabNavigationModeActionBar(env: PJNIEnv; this: JObject; _jform: JObject);
-  procedure jForm_RemoveAllTabsActionBar(env: PJNIEnv; this: JObject; _jform: JObject);
+  procedure jForm_SetTabNavigationModeActionBar(env: PJNIEnv; _jform: JObject);
+  procedure jForm_RemoveAllTabsActionBar(env: PJNIEnv; _jform: JObject);
 
-  function jForm_GetStringResourceId(env: PJNIEnv; this: JObject; _jform: JObject; _resName: string): integer;
+  function jForm_GetStringResourceId(env: PJNIEnv; _jform: JObject; _resName: string): integer;
 
-  function jForm_GetStringResourceById(env: PJNIEnv; this: JObject; _jform: JObject; _resID: integer): string;
-  function jForm_GetDrawableResourceId(env: PJNIEnv; this: JObject; _jform: JObject; _resName: string): integer;
-  function jForm_GetDrawableResourceById(env: PJNIEnv; this: JObject; _jform: JObject; _resID: integer): jObject;
-  function jForm_GetQuantityStringByName(env: PJNIEnv; this: JObject; _jform: JObject; _resName: string; _quantity: integer): string;
-  function jForm_GetStringResourceByName(env: PJNIEnv; this: JObject; _jform: JObject; _resName: string): string;
+  function jForm_GetStringResourceById(env: PJNIEnv; _jform: JObject; _resID: integer): string;
+  function jForm_GetDrawableResourceId(env: PJNIEnv; _jform: JObject; _resName: string): integer;
+  function jForm_GetDrawableResourceById(env: PJNIEnv; _jform: JObject; _resID: integer): jObject;
+  function jForm_GetQuantityStringByName(env: PJNIEnv; _jform: JObject; _resName: string; _quantity: integer): string;
+  function jForm_GetStringResourceByName(env: PJNIEnv; _jform: JObject; _resName: string): string;
 
 
 //jni API Bridge
@@ -1182,8 +1174,8 @@ Procedure jApp_Finish2                  (env:PJNIEnv;this:jobject);
 function  jApp_GetContext               (env:PJNIEnv;this:jobject): jObject;
 function jApp_GetControlsVersionInfo(env:PJNIEnv;this:jobject): string;
 
-function  jForm_GetOnViewClickListener        (env:PJNIEnv; this:jobject; Form: jObject): jObject;
-function  jForm_GetOnListItemClickListener    (env:PJNIEnv; this:jobject; Form: jObject): jObject;
+function  jForm_GetOnViewClickListener        (env:PJNIEnv; Form: jObject): jObject;
+function  jForm_GetOnListItemClickListener    (env:PJNIEnv; Form: jObject): jObject;
 
 Procedure jApp_KillProcess             (env:PJNIEnv;this:jobject);
 Procedure jApp_ScreenStyle             (env:PJNIEnv;this:jobject; screenstyle : integer);
@@ -1203,123 +1195,36 @@ function  jApp_GetQuantityStringByName(env:PJNIEnv;this:jobject; _resName: strin
 //------------------------------------------------------------------------------
 
 Function  jForm_Create                 (env:PJNIEnv;this:jobject; SelfObj : TObject) : jObject;
-
-Procedure jForm_Free                   (env:PJNIEnv;this:jobject; Form    : jObject);
-
-//by jmpessoa
-Procedure jForm_Free2                   (env:PJNIEnv;this:jobject; Form    : jObject);
-
-Procedure jForm_Show                   (env:PJNIEnv;this:jobject; Form    : jObject; effect : Integer);
-
-Procedure jForm_Show2                   (env:PJNIEnv;this:jobject; Form    : jObject; effect : Integer);
-
-Procedure jForm_Close                  (env:PJNIEnv;this:jobject; Form    : jObject; effect : Integer);
-
-//by jmpessoa
-Procedure jForm_Close2                  (env:PJNIEnv; this:jobject; Form: jObject);
-
-Function  jForm_GetLayout              (env:PJNIEnv;this:jobject; Form    : jObject) : jObject;
-
-//by jmpessoa
-Function  jForm_GetLayout2              (env:PJNIEnv;this:jobject; Form    : jObject) : jObject;
-
-Function jForm_GetClickListener(env:PJNIEnv; this:jobject; Form: jObject): jObject;
-
-//by jmpessoa
-Procedure jForm_FreeLayout              (env:PJNIEnv;this:jobject; Layout    : jObject);
-
-Procedure jForm_SetVisibility          (env:PJNIEnv;this:jobject; Form    : jObject; visible : boolean);
-
-//by jmpessoa
-Procedure jForm_SetVisibility2          (env:PJNIEnv;this:jobject; Form    : jObject; visible : boolean);
-
-Procedure jForm_SetEnabled             (env:PJNIEnv;this:jobject; Form    : jObject; enabled : Boolean);
-
-//by jmpessoa
-Procedure jForm_SetEnabled2             (env:PJNIEnv;this:jobject; Form    : jObject; enabled : Boolean);
-
-//by jmpessoa
-procedure jForm_ShowMessage(env:PJNIEnv; this:jobject; Form:jObject; msg: string);
-function jForm_GetDateTime(env:PJNIEnv; this:jobject; Form:jObject): string;
-
-procedure jForm_SetWifiEnabled(env: PJNIEnv; this: JObject; _jform: JObject; _status: boolean);
-function jForm_IsWifiEnabled              (env: PJNIEnv; this: JObject; _jform: JObject): boolean;
-function jForm_GetEnvironmentDirectoryPath(env: PJNIEnv; this: JObject; _jform: JObject; _directory: integer): string;
-function jForm_GetInternalAppStoragePath(env: PJNIEnv; this: JObject; _jform: JObject): string;
-function jForm_CopyFile(env: PJNIEnv; this: JObject; _jform: JObject; _srcFullName: string; _destFullName: string): boolean;
-function jForm_LoadFromAssets(env: PJNIEnv; this: JObject; _jform: JObject; _fileName: string): string;
-function jForm_IsSdCardMounted(env: PJNIEnv; this: JObject; _jform: JObject): boolean;
+Procedure jForm_Free2                   (env:PJNIEnv; Form    : jObject);
+Procedure jForm_Show2                   (env:PJNIEnv; Form    : jObject; effect : Integer);
+Procedure jForm_Close2                  (env:PJNIEnv;  Form: jObject);
+Function  jForm_GetLayout2              (env:PJNIEnv; Form    : jObject) : jObject;
+Function jForm_GetClickListener(env:PJNIEnv;  Form: jObject): jObject;
+Procedure jForm_FreeLayout              (env:PJNIEnv; Layout    : jObject);
+Procedure jForm_SetVisibility2          (env:PJNIEnv; Form    : jObject; visible : boolean);
+Procedure jForm_SetEnabled2             (env:PJNIEnv;Form    : jObject; enabled : Boolean);
+procedure jForm_ShowMessage(env:PJNIEnv; Form:jObject; msg: string);
+function jForm_GetDateTime(env:PJNIEnv; Form:jObject): string;
+procedure jForm_SetWifiEnabled(env: PJNIEnv;  _jform: JObject; _status: boolean);
+function jForm_IsWifiEnabled              (env: PJNIEnv;  _jform: JObject): boolean;
+function jForm_GetEnvironmentDirectoryPath(env: PJNIEnv;  _jform: JObject; _directory: integer): string;
+function jForm_GetInternalAppStoragePath(env: PJNIEnv;  _jform: JObject): string;
+function jForm_CopyFile(env: PJNIEnv;  _jform: JObject; _srcFullName: string; _destFullName: string): boolean;
+function jForm_LoadFromAssets(env: PJNIEnv;  _jform: JObject; _fileName: string): string;
+function jForm_IsSdCardMounted(env: PJNIEnv;  _jform: JObject): boolean;
 
 //------------------------------------------------------------------------------
-// View
+// View  - Generics
 //------------------------------------------------------------------------------
 
-// View
-Procedure jView_SetVisible             (env:PJNIEnv;this:jobject; view : jObject; visible : Boolean);
+Procedure View_SetVisible             (env:PJNIEnv;this:jobject; view : jObject; visible : Boolean); overload;
+Procedure View_SetVisible             (env:PJNIEnv;view : jObject; visible : Boolean); overload;
 
-//by jmpessoa
-Procedure jView_SetVisible2             (env:PJNIEnv;this:jobject; view : jObject; visible : Boolean);
+Procedure View_SetBackGroundColor     (env:PJNIEnv;this:jobject; view : jObject; color : DWord);  overload;
+Procedure View_SetBackGroundColor     (env:PJNIEnv;view : jObject; color : DWord);  overload;
 
-
-Procedure jView_SetBackGroundColor     (env:PJNIEnv;this:jobject; view : jObject; color   : DWord  );
-
-//by jmpessoa2
-Procedure jView_SetBackGroundColor2     (env:PJNIEnv;this:jobject; view : jObject; color : DWord);
-
-Procedure jView_Invalidate             (env:PJNIEnv;this:jobject; view : jObject);
-
-Procedure jView_Invalidate2             (env:PJNIEnv;this:jobject; view : jObject);
-
-
-Function  jView_Create                 (env:PJNIEnv;this:jobject;
-                                        context : jObject; SelfObj : TObject) : jObject;
-//by jmpessoa
-Function  jView_Create2                 (env:PJNIEnv;this:jobject; SelfObj: TObject): jObject;
-
-Procedure jView_Free                   (env:PJNIEnv;this:jobject; View : jObject);
-
-//by jmpessoa
-Procedure jView_Free2                   (env:PJNIEnv;this:jobject; View : jObject);
-//
-Procedure jView_setXYWH                (env:PJNIEnv;this:jobject;
-                                        View : jObject;x,y,w,h : integer);
-Procedure jView_setParent              (env:PJNIEnv;this:jobject;
-                                        View : jObject;ViewGroup : jObject);
-Procedure jView_setjCanvas             (env:PJNIEnv;this:jobject;
-                                        View : jObject;jCanvas   : jObject);
-Procedure jView_viewSave               (env:PJNIEnv;this:jobject;
-                                        View : jObject; Filename: String );
-
-Procedure jView_viewSave2               (env:PJNIEnv;this:jobject;
-                                        View : jObject; Filename: String );
-//by jmpessoa
-Procedure jView_setId(env:PJNIEnv;this:jobject; View : jObject; id: DWord);
-Procedure jView_setMarginLeft(env:PJNIEnv;this:jobject; View : jObject; x: DWord);
-Procedure jView_setMarginTop(env:PJNIEnv;this:jobject; View : jObject; y: DWord);
-
-Procedure jView_setMarginRight(env:PJNIEnv;this:jobject; View : jObject; x: DWord);
-Procedure jView_setMarginBottom(env:PJNIEnv;this:jobject; View : jObject; y: DWord);
-
-Procedure jView_setLParamWidth(env:PJNIEnv;this:jobject; View : jObject; w: DWord);
-Procedure jView_setLParamHeight(env:PJNIEnv;this:jobject; View : jObject; h: DWord);
-
-Procedure jView_setLParamWidth2(env:PJNIEnv;this:jobject; View : jObject; w: DWord);
-Procedure jView_setLParamHeight2(env:PJNIEnv;this:jobject; View : jObject; h: DWord);
-
-Procedure jView_setLeftTopRightBottomWidthHeight(env:PJNIEnv;this:jobject;
-                                        View : jObject; ml,mt,mr,mb,w,h: integer);
-
-Procedure jView_addLParamsParentRule(env:PJNIEnv;this:jobject; View : jObject; rule: DWord);
-Procedure jView_addLParamsAnchorRule(env:PJNIEnv;this:jobject; View : jObject; rule: DWord);
-Procedure jView_setLayoutAll(env:PJNIEnv;this:jobject; View : jObject;  idAnchor: DWord);
-Procedure jView_setLayoutAll2(env:PJNIEnv;this:jobject; View : jObject;  idAnchor: DWord);
-
-
-function jView_getLParamHeight(env:PJNIEnv;this:jobject; View : jObject ): integer;
-function jView_getLParamWidth(env:PJNIEnv;this:jobject; View : jObject): integer;
-
-function jView_getLParamHeight2(env:PJNIEnv;this:jobject; View : jObject ): integer;
-function jView_getLParamWidth2(env:PJNIEnv;this:jobject; View : jObject): integer;
+Procedure View_Invalidate             (env:PJNIEnv;this:jobject; view : jObject); overload;
+Procedure View_Invalidate             (env:PJNIEnv; view : jObject); overload;
 
 //------------
   function JBool( Bool : Boolean ) : byte;
@@ -1331,33 +1236,56 @@ Function  jSysInfo_PathApp             (env:PJNIEnv;this:jobject;context : jObje
 Function  jSysInfo_PathDat             (env:PJNIEnv;this:jobject;context : jObject) : String;
 Function  jSysInfo_PathExt             (env:PJNIEnv;this:jobject) : String;
 Function  jSysInfo_PathDCIM            (env:PJNIEnv;this:jobject) : String;
-
 //by thierrydijoux
 Function jSysInfo_Language (env:PJNIEnv; this: jobject; localeType: TLocaleType): String;
-
 //by jmpessoa
 Function  jSysInfo_PathDataBase             (env:PJNIEnv;this:jobject;context : jObject) : String;
-
-
 // Device Info
 Function  jSysInfo_DevicePhoneNumber   (env:PJNIEnv;this:jobject) : String;
 Function  jSysInfo_DeviceID            (env:PJNIEnv;this:jobject) : String;
 
 //-------------
-
   Procedure jSystem_SetOrientation       (env:PJNIEnv;this:jobject; orientation : Integer);
-
   //by jmpessoa
   function jSystem_GetOrientation        (env:PJNIEnv;this:jobject): integer;
-
   Procedure jClassMethod(FuncName, FuncSig : PChar;
                        env : PJNIEnv; var Class_ : jClass; var Method_ :jMethodID);
-
   function Get_gjClass(env: PJNIEnv): jClass; //by jmpessoa
+//-----
+// Helper Function
+Function  xy  (x, y: integer): TXY;
+Function  xyWH(x, y, w, h: integer): TXYWH;
+Function  fxy (x, y: Single ): TfXY;
+Function  getAnimation(i,o : TEffect ): TAnimation;
 
+// App
+Procedure App_Lock; {just for Object Orientad model!}
+Procedure App_UnLock;
+Function  App_IsLock: Boolean;
+// Touch
+Procedure VHandler_touchesBegan_withEvent(Sender        : TObject;
+                                          TouchCnt      : Integer;
+                                          Touch1        : TfXY;
+                                          Touch2        : TfXY;
+                                          Var TouchDown : TOnTouchEvent;
+                                          Var Mouches   : TMouches);
+
+Procedure VHandler_touchesMoved_withEvent(Sender        : TObject;
+                                          TouchCnt      : Integer;
+                                          Touch1        : TfXY;
+                                          Touch2        : TfXY;
+                                          Var TouchMove : TOnTouchEvent;
+                                          Var Mouches   : TMouches);
+
+Procedure VHandler_touchesEnded_withEvent(Sender         : TObject;
+                                          TouchCnt       : Integer;
+                                          Touch1         : TfXY;
+                                          Touch2         : TfXY;
+                                          Var TouchUp    : TOnTouchEvent;
+                                          Var Mouches    : TMouches);
 
 var
-  gApp: jApp; //global App !
+  gApp:       jApp;       //global App !
   gVM         : PJavaVM;
   gjClass     : jClass = nil;
   gDbgMode    : Boolean;
@@ -1366,8 +1294,222 @@ var
 
 implementation
 
-uses
-  Laz_And_Controls, Laz_And_GLESv2_Canvas, Laz_And_GLESv1_Canvas, Spinner, customdialog;
+//------------------------------------------------------------------------------
+//  Helper Function
+//------------------------------------------------------------------------------
+Function  xy(x, y: integer): TXY;
+ begin
+  Result.x := x;
+  Result.y := y;
+ end;
+
+Function XYWH(x, y, w, h: integer): TXYWH;
+ begin
+  Result.x := x;
+  Result.y := y;
+  Result.w := w;
+  Result.h := h;
+ end;
+
+Function  fxy(x, y: single): TfXY;
+ begin
+  Result.x := x;
+  Result.y := y;
+ end;
+
+Function  getAnimation(i,o : TEffect ): TAnimation;
+ begin
+  Result.In_  := i;
+  Result.Out_ := o;
+ end;
+
+Function InputTypeToStr ( InputType : TInputType ) : String;
+ begin
+  Result := 'TEXT';
+  Case InputType of
+   itText       : Result := 'TEXT';
+   itNumber     : Result := 'NUMBER';
+   itPhone      : Result := 'PHONE';
+   itPassNumber : Result := 'PASSNUMBER';
+   itPassText   : Result := 'PASSTEXT';
+   itMultiLine  : Result:= 'TEXTMULTILINE';
+  end;
+ end;
+
+//------------------------------------------------------------------------------
+//  App Lock
+//------------------------------------------------------------------------------
+
+Procedure App_Lock;
+ begin
+  gApp.Lock := True;
+ end;
+
+Procedure App_UnLock;
+ begin
+  gApp.Lock := False;
+ end;
+
+Function  App_IsLock: Boolean;
+ begin
+  Result := gApp.Lock;
+ end;
+
+//----------------------------------------------------------------------------
+// Multi Touch
+//----------------------------------------------------------------------------
+function  csAvg(const A,B : TfXY) : TfXY;
+begin
+  Result.X := (A.X + B.X) / 2;
+  Result.Y := (A.Y + B.Y) / 2;
+end;
+
+function  csLen(const A,B : TfXY) : Single;
+begin
+  Result := Sqrt( (A.X - B.X)*(A.X - B.X) +
+                  (A.Y - B.Y)*(A.Y - B.Y) );
+end;
+
+function  csAngle(const A,B : TfXY) : Single;
+var
+  Pt    : TfXY;
+  Len   : Single;
+  Angle : Single;
+begin
+  Angle := 0;
+  Pt.X  := B.X-A.X;
+  Pt.Y  := B.Y-A.Y;
+  // Prevent Div Zero
+  If (Pt.X = 0) and (Pt.Y = 0) then
+  begin
+    Pt.X := 1;
+    Pt.Y := 1;
+  end;
+  Len := Sqrt( (Pt.X*Pt.X) + (Pt.Y*Pt.Y) );
+  //
+  Case (Pt.X > 0) of
+   True : Case (Pt.Y > 0) of
+           False: Angle :=      ArcSin( Pt.Y *-1/ Len ) * (180/pi);
+           True : Angle := 360- ArcSin( Pt.Y    / Len ) * (180/pi);
+          End;
+   False: Case (Pt.Y > 0) of
+           False: Angle := (90 -ArcSin( Pt.Y*-1 / Len ) * (180/pi))+90;
+           True : Angle :=      ArcSin( Pt.Y    / Len ) * (180/pi)+180;
+          End;
+end;
+  //
+  Angle := 360-Angle;
+  While Angle >= 360 do Angle := Angle - 360;
+  While Angle <    0 do Angle := Angle + 360;
+
+  Result := Angle;
+ end;
+
+// Input  Touches
+// Output MTouch
+Procedure MultiTouch_Calc(Var Mouches : TMouches );
+ begin
+  //
+  If Mouches.Cnt > 1 then
+   begin
+    If Not(Mouches.Mouch.Active) then
+     begin
+      Mouches.sPt    := csAvg  ( Mouches.XYs[0], Mouches.XYs[1] );
+      Mouches.sLen   := csLen  ( Mouches.XYs[0], Mouches.XYs[1] );
+      Mouches.sAngle := csAngle( Mouches.XYs[0], Mouches.XYs[1] );
+      Mouches.Mouch.Active := True;
+     end;
+    Inc(Mouches.sCount);
+    Mouches.Mouch.Start  := (Mouches.sCount = 1);
+    //If Touches.MTouch.Start then dbg('Start###################################');
+    Mouches.Mouch.Pt    :=  csAvg  ( Mouches.XYs[0],Mouches.XYs[1] );
+    Mouches.Mouch.Zoom  :=  csLen  ( Mouches.XYs[0],Mouches.XYs[1] ) / Mouches.sLen;
+    Mouches.Mouch.Angle :=  csAngle( Mouches.XYs[0],Mouches.XYs[1] ) - Mouches.sAngle;
+   end
+  else
+   begin
+    Mouches.Mouch.Pt    :=  Mouches.XYs[0];
+   end;
+ end;
+
+Procedure MultiTouch_End(Var Mouches : TMouches);
+ begin
+  //If Touches.Cnt = 2 then
+  Mouches.Mouch.Active := False;
+  Mouches.sCount       := 0;
+ end;
+
+//------------------------------------------------------------------------------
+// Touch Event
+//------------------------------------------------------------------------------
+Procedure VHandler_touchesBegan_withEvent(Sender        : TObject;
+                                          TouchCnt      : Integer;
+                                          Touch1        : TfXY;
+                                          Touch2        : TfXY;
+                                          Var TouchDown : TOnTouchEvent;
+                                          Var Mouches   : TMouches);
+
+begin
+  //
+  If not Assigned(TouchDown) then Exit;
+  //
+  Mouches.Cnt    := Min(TouchCnt,cjMouchMax);
+  Mouches.XYs[0] := Touch1;
+  Mouches.XYs[1] := Touch2;
+
+  MultiTouch_Calc(Mouches);
+  TouchDown(Sender, Mouches.Mouch);
+end;
+
+//
+Procedure VHandler_touchesMoved_withEvent(Sender        : TObject;
+                                          TouchCnt      : Integer;
+                                          Touch1        : TfXY;
+                                          Touch2        : TfXY;
+                                          Var TouchMove : TOnTouchEvent;
+                                          Var Mouches   : TMouches);
+begin
+  //
+ If not(Assigned(TouchMove)) then Exit;
+  //
+  Mouches.Cnt    := Min(TouchCnt,cjMouchMax);
+  Mouches.XYs[0] := Touch1;
+  Mouches.XYs[1] := Touch2;
+  MultiTouch_Calc(Mouches);
+  TouchMove(Sender,Mouches.Mouch);
+end;
+
+//
+Procedure VHandler_touchesEnded_withEvent(Sender         : TObject;
+                                          TouchCnt       : Integer;
+                                          Touch1         : TfXY;
+                                          Touch2         : TfXY;
+                                          Var TouchUp    : TOnTouchEvent;
+                                          Var Mouches    : TMouches);
+ begin
+  //
+  If not(Assigned(TouchUp)) then Exit;
+  //
+  Mouches.Cnt    := Min(TouchCnt,cjMouchMax);
+  Mouches.XYs[0] := Touch1;
+  Mouches.XYs[1] := Touch2;
+
+  MultiTouch_End(Mouches);
+  TouchUp(Sender,Mouches.Mouch);
+ end;
+
+//by jmpessoa
+function Get_gjClass(env: PJNIEnv): jClass;
+begin
+  if gjClass {global} = nil then
+  begin
+     gjClass:= jClass(env^.FindClass(env, gjClassName {global class name: "../Controls"}));
+     if gjClass <> nil then gjClass := env^.NewGlobalRef(env, gjClass); //needed for Appi > 13
+  end;
+  Result:= gjClass;
+end;
+
+   {jControl: by jmpessoa}
 
 constructor jControl.Create(AOwner: TComponent);
 begin
@@ -1384,8 +1526,9 @@ end;
 
 procedure jControl.Init(refApp: jApp);
 begin
-  FApplication:= refApp;
-  FjClass:= Get_jClassLocalRef(FClassPath);
+  FjEnv:= refApp.Jni.jEnv;
+  FjThis:= refApp.Jni.jThis;
+  FjClass:= Get_jClassLocalRef(FClassPath);  //needed by new direct jni component model...
 end;
 
 procedure jControl.SetEnabled(Value: boolean);
@@ -1393,146 +1536,12 @@ begin
   FEnabled:= Value;
 end;
 
-{jVisualControl}
-
-constructor jVisualControl.Create(AOwner: TComponent);
+procedure jControl.UpdateJNI(refApp: jApp);
 begin
-inherited Create(AOwner);
-  FjPRLayout := nil;  //java parent
-  FjObject    := nil; //java object
-  FEnabled   := True;
-  FVisible   := True;
-  FColor     := colbrDefault;
-  FFontColor := colbrDefault;
-  FFontSize  := 0; //default size!
-  FId        := 0; //0: no control anchored on this control!
-  FAnchorId  := -1;  //dummy
-  FAnchor    := nil;
-  //FGravity:=[];      TODO!
-  FPositionRelativeToAnchor:= [];
-  FPositionRelativeToParent:= [];
+  FjEnv:= refApp.Jni.jEnv;
+  FjThis:= refApp.Jni.jThis;;
 end;
 
-//
-Destructor jVisualControl.Destroy;
-begin
-  inherited Destroy;
-end;
-
-
-procedure jVisualControl.Init(refApp: jApp);
-begin
-  inherited Init(refApp);
-  FjPRLayout:= jForm(Owner).View;  //set default ViewParent/FjPRLayout as jForm.View!
-  FOrientation:= jForm(Owner).Orientation;
-end;
-
-procedure jVisualControl.Notification(AComponent: TComponent; Operation: TOperation);
-begin
- inherited Notification(AComponent, Operation);
- if Operation = opRemove then
- begin
-   {checks whether the AComponent parameter is a jVisualControl or any type descending from jVisualControl}
-   if (AComponent is jVisualControl) then
-   begin
-     if AComponent = FAnchor then
-     begin
-       FAnchor:= nil;
-       FAnchorId:= -1;  //dummy
-     end;
-   end
- end;
-end;
-
-procedure jVisualControl.SetAnchor(Value: jVisualControl);
-begin
-  if Value <> FAnchor then
-  begin
-     if Assigned(FAnchor) then
-     begin
-       FAnchor.RemoveFreeNotification(Self); //remove free notification...
-     end;
-     FAnchor:= Value;
-     if Value <> nil then  //re- add free notification...
-     begin
-        Value.FreeNotification(Self);
-        if not (csDesigning in ComponentState) then Exit;
-        if (csLoading in ComponentState) then Exit;
-        if  Value.Id = 0 then   //Id must be published for data persistence!
-        begin
-          Randomize;
-          Value.Id:= Random(10000000);  //warning: remember the law of Murphi...
-        end;
-     end;
-  end;
-end;
-
-procedure jVisualControl.SetParentComponent(Value: TComponent);
-begin
-  inherited SetParentComponent(Value);
-end;
-
-procedure jVisualControl.SetViewParent(Value: jObject);
-begin
-  FjPRLayout:= Value;
-end;
-
-function jVisualControl.GetViewParent: jObject;
-begin
-  Result:= FjPRLayout;
-end;
-
-procedure jVisualControl.SetView(Value: jObject);
-begin
-  FjRLayout:= Value;
-end;
-
-function jVisualControl.GetView: jObject;
-begin
-  Result:= FjRLayout;
-end;
-
-procedure jVisualControl.DefineProperties(Filer: TFiler);
-begin
- inherited DefineProperties(Filer);
-  {Define new properties and reader/writer methods }
-  Filer.DefineProperty('Id', ReadIntId, WriteIntId, True);
-end;
-
-procedure jVisualControl.ReadIntId(Reader: TReader);
-begin
-  FId:= Reader.ReadInteger;
-end;
-
-procedure jVisualControl.WriteIntId(Writer: TWriter);
-begin
-  Writer.WriteInteger(FId);
-end;
-
-// needed by jForm process logic ...
-procedure jVisualControl.UpdateLayout;
-begin
-  //dummy...
-end;
-
-procedure jVisualControl.SetParamWidth(Value: TLayoutParams);   //***********
-begin
-  FLParamWidth:= Value;
-  if (csDesigning in ComponentState) and (Value <> lpMatchParent) and (Value <> lpWrapContent) then
-    FLParamWidth:= GetDesignerLayoutByWH(Self.Width, Self.Parent.Width);
-end;
-
-procedure jVisualControl.SetParamHeight(Value: TLayoutParams);
-begin
-  FLParamHeight:= Value;
-  if (csDesigning in ComponentState) and (Value <> lpMatchParent) and (Value <> lpWrapContent) then
-     FLParamHeight:= GetDesignerLayoutByWH(Self.Height, Self.Parent.Height);
-end;
-
-procedure jVisualControl.SetTextTypeFace(Value: TTextTypeFace);
-begin
-  FTextTypeFace:= Value;
-end;
 
 { TAndroidWidget }
 
@@ -1691,84 +1700,7 @@ end;
 
 procedure TAndroidWidget.SetParentComponent(Value: TComponent);
 begin
-
-  if Value = nil then Exit;
-
-  if Value is TAndroidWidget then
-  begin
-
-    Parent:= TAndroidWidget(Value);
-
-    if Self.Height < 50 then
-       Self.Height:= 50;
-
-    if Self.Width < 51 then
-       Self.Width:= Trunc(TAndroidWidget(Parent).Width/2) - 15;//Trunc(2.0*(Parent.MarginLeft+Parent.MarginRight))-2;
-
-    if (Self is jListView)    or (Self is jPanel) or (Self is jCustomDialog)  or (Self is jCanvasES1) or
-       (Self is jCanvasES2)   or (Self is jWebView) or
-       (Self is jViewFlipper) or (Self is jSpinner) or
-       (Self is jHorizontalScrollView) then
-    begin
-      Self.Width:= Trunc(TAndroidWidget(Parent).Width) - 13;//2*(Parent.MarginLeft+Parent.MarginRight)-2;
-    end;
-
-    if (Self is jWebView) then
-    begin
-      Self.Height:= 100;
-      Self.Width:= Trunc(TAndroidWidget(Parent).Width) - 13; //2*(Parent.MarginLeft+Parent.MarginRight)-2;
-    end;
-
-    if (Self is jScrollView) then
-    begin
-      Self.Height:= 100;
-      Self.Width:= Trunc(TAndroidWidget(Parent).Width) - 13; //2*(Parent.MarginLeft+Parent.MarginRight)-2;
-    end;
-
-    if (Self is jProgressBar) then
-    begin
-      Self.Height:= 30;
-      Self.Width:= Trunc(TAndroidWidget(Parent).Width) - 13; //2*(Parent.MarginLeft+Parent.MarginRight)-2;
-    end;
-
-    if (Self is jCheckBox) or (Self is jRadioButton) or (Self is jTextView) then
-       Self.Height:= 25;
-
-    if (Self is jImageBtn) then
-    begin
-      Self.Height:= 48;
-      Self.Width:=  48;
-    end;
-
-    if (Self is jImageView)   then
-    begin
-      Self.Height:= 48;
-      Self.Width:=  48;
-    end;
-
-    if (Self is jView) then
-    begin
-      Self.Height:= 96;
-      Self.Width:=  96;
-    end;
-
-    if (Self is jButton) or (Self is jEditText) or (Self is jSpinner)   then
-    begin
-      Self.Height:= 40;
-    end;
-
-    if (Self is jPanel) or (Self is jCustomDialog) then
-    begin
-      Self.Height:= 48;
-    end;
-
-    if Self is jCustomDialog then
-    begin
-      Self.Height:= 96;
-    end;
-
-  end;
-
+   inherited SetParentComponent(Value);
 end;
 
 function TAndroidWidget.HasParent: Boolean;
@@ -1838,6 +1770,147 @@ end;
 procedure TAndroidWidget.Invalidate;
 begin
   InvalidateRect(Rect(0,0,Width,Height),False);
+end;
+
+{jVisualControl}
+
+constructor jVisualControl.Create(AOwner: TComponent);
+begin
+inherited Create(AOwner);
+  FjPRLayout := nil;  //java parent
+  FjObject    := nil; //java object
+  FEnabled   := True;
+  FVisible   := True;
+  FColor     := colbrDefault;
+  FFontColor := colbrDefault;
+  FFontSize  := 0; //default size!
+  FId        := 0; //0: no control anchored on this control!
+  FAnchorId  := -1;  //dummy
+  FAnchor    := nil;
+  //FGravity:=[];      TODO!
+  FPositionRelativeToAnchor:= [];
+  FPositionRelativeToParent:= [];
+end;
+
+//
+Destructor jVisualControl.Destroy;
+begin
+  inherited Destroy;
+end;
+
+
+procedure jVisualControl.Init(refApp: jApp);
+begin
+  inherited Init(refApp);
+  FjPRLayout:= jForm(Owner).View;  //set default ViewParent/FjPRLayout as jForm.View!
+  FOrientation:= jForm(Owner).Orientation;
+end;
+
+procedure jVisualControl.Notification(AComponent: TComponent; Operation: TOperation);
+begin
+ inherited Notification(AComponent, Operation);
+ if Operation = opRemove then
+ begin
+   {checks whether the AComponent parameter is a jVisualControl or any type descending from jVisualControl}
+   if (AComponent is jVisualControl) then
+   begin
+     if AComponent = FAnchor then
+     begin
+       FAnchor:= nil;
+       FAnchorId:= -1;  //dummy
+     end;
+   end
+ end;
+end;
+
+procedure jVisualControl.SetAnchor(Value: jVisualControl);
+begin
+  if Value <> FAnchor then
+  begin
+     if Assigned(FAnchor) then
+     begin
+       FAnchor.RemoveFreeNotification(Self); //remove free notification...
+     end;
+     FAnchor:= Value;
+     if Value <> nil then  //re- add free notification...
+     begin
+        Value.FreeNotification(Self);
+        if not (csDesigning in ComponentState) then Exit;
+        if (csLoading in ComponentState) then Exit;
+        if  Value.Id = 0 then   //Id must be published for data persistence!
+        begin
+          Randomize;
+          Value.Id:= Random(10000000);  //warning: remember the law of Murphi...
+        end;
+     end;
+  end;
+end;
+
+procedure jVisualControl.SetParentComponent(Value: TComponent);
+begin
+  inherited SetParentComponent(Value);
+end;
+
+procedure jVisualControl.SetViewParent(Value: jObject);
+begin
+  FjPRLayout:= Value;
+end;
+
+function jVisualControl.GetViewParent: jObject;
+begin
+  Result:= FjPRLayout;
+end;
+
+procedure jVisualControl.SetView(Value: jObject);
+begin
+  FjRLayout:= Value;
+end;
+
+function jVisualControl.GetView: jObject;
+begin
+  Result:= FjRLayout;
+end;
+
+procedure jVisualControl.DefineProperties(Filer: TFiler);
+begin
+ inherited DefineProperties(Filer);
+  {Define new properties and reader/writer methods }
+  Filer.DefineProperty('Id', ReadIntId, WriteIntId, True);
+end;
+
+procedure jVisualControl.ReadIntId(Reader: TReader);
+begin
+  FId:= Reader.ReadInteger;
+end;
+
+procedure jVisualControl.WriteIntId(Writer: TWriter);
+begin
+  Writer.WriteInteger(FId);
+end;
+
+// needed by jForm process logic ...
+procedure jVisualControl.UpdateLayout;
+begin
+  //dummy...
+end;
+
+procedure jVisualControl.SetParamWidth(Value: TLayoutParams);
+begin
+  FLParamWidth:= Value;
+  if (csDesigning in ComponentState) and (Value <> lpMatchParent) and (Value <> lpWrapContent) then
+    FLParamWidth:= GetDesignerLayoutByWH(Self.Width, Self.Parent.Width);
+end;
+
+procedure jVisualControl.SetParamHeight(Value: TLayoutParams);
+begin
+  FLParamHeight:= Value;
+  if (csDesigning in ComponentState) and (Value <> lpMatchParent) and (Value <> lpWrapContent) then
+     FLParamHeight:= GetDesignerLayoutByWH(Self.Height, Self.Parent.Height);
+end;
+
+procedure jVisualControl.SetTextTypeFace(Value: TTextTypeFace);
+begin
+  FTextTypeFace:= Value;
 end;
 
   { TAndroidForm }
@@ -1913,7 +1986,7 @@ begin
 
   FjObject              := nil;
   FjRLayout{View}       := nil;
-  FApplication            := nil;
+  //FApplication            := nil;
 
   FScreenWH.Height      := 100; //dummy
   FScreenWH.Width       := 100;
@@ -1947,16 +2020,13 @@ end;
 
 procedure jForm.Finish;
 begin
-  UpdateJNI(gApp);
-  jForm_FreeLayout(App.Jni.jEnv, App.Jni.jThis, FjRLayout);
-  //jSystem_GC2(App.Jni.jEnv, App.Jni.jThis);
-  jForm_Free2(App.Jni.jEnv, App.Jni.jThis, FjObject);
+  jForm_FreeLayout(FjEnv, FjRLayout);
+  jForm_Free2(FjEnv, FjObject);
 end;
 
 procedure jForm.Init(refApp: jApp);
 var
   i: integer;
-  bkImgIndex: integer;
 begin
   if FInitialized  then Exit;
   if refApp = nil then Exit;
@@ -1964,21 +2034,18 @@ begin
 
   Inherited Init(refApp);
 
-  FScreenWH:= App.Screen.WH;
-  FOrientation:= App.Orientation;   //on start ...
-  //FActivity:= App.Jni.jActivity;
+  FScreenWH:= refApp.Screen.WH;
+  FOrientation:= refApp.Orientation;   //on start ...
 
-  FjObject:=  jForm_Create(App.Jni.jEnv, App.Jni.jThis, Self); {jSef}
+  FjObject:=  jForm_Create(refApp.Jni.jEnv, refApp.Jni.jThis, Self); {jSef}
 
-  FjRLayout:= jForm_Getlayout2(App.Jni.jEnv, App.Jni.jThis, FjObject);  {view/RelativeLayout}
+  FjRLayout:= jForm_Getlayout2(refApp.Jni.jEnv, FjObject);  {view/RelativeLayout}
 
   //thierrydijoux - if backgroundColor is set to black, no theme ...
   if  FColor <> colbrDefault then
-     jView_SetBackGroundColor(App.Jni.jEnv, App.Jni.jThis, FjRLayout, GetARGB(FColor));
+     View_SetBackGroundColor(refApp.Jni.jEnv, refApp.Jni.jThis, FjRLayout, GetARGB(FColor));
   //else
      //jView_SetBackGroundColor(App.Jni.jEnv, App.Jni.jThis, FjRLayout, GetARGB(colbrBlack));
-
-  bkImgIndex:= -1;
 
   FInitialized:= True;
 
@@ -1986,31 +2053,11 @@ begin
   begin
     if (Self.Components[i] is jControl) then
     begin
-       if (Self.Components[i] as jControl).ClassName = 'jImageView' then
-       begin
-
-          if (Self.Components[i] as jImageView).IsBackgroundImage = True then
-          begin
-             bkImgIndex:= i;
-            (Self.Components[i] as jControl).Init(App); //init just background image
-          end;
-
-       end;
+       (Self.Components[i] as jControl).Init(refApp);
     end;
   end;
 
-  for i:= (Self.ComponentCount-1) downto 0 do
-  begin
-    if (Self.Components[i] is jControl) then
-    begin
-      if i <> bkImgIndex then
-      begin
-         (Self.Components[i] as jControl).Init(App);
-      end;
-    end;
-  end;
-
-  jForm_SetEnabled2(App.Jni.jEnv, App.Jni.jThis, FjObject, FEnabled);
+  jForm_SetEnabled2(refApp.Jni.jEnv, FjObject, FEnabled);
 
   if gApp.GetCurrentFormsIndex = (cjFormsMax-1) then Exit; //no more form is possible!
 
@@ -2023,34 +2070,21 @@ begin
   FormState := fsFormWork;
   FormIndex:= gApp.TopIndex;
   FVisible:= True;
-
   //inc Index..
-  gApp.IncFormsIndex;  //prepare next index...
-
+  gApp.IncFormsIndex;  //prepare the next index...
   //Show ...
-  jForm_Show2(App.Jni.jEnv,App.Jni.jThis,FjObject, FAnimation.In_);
-
+  jForm_Show2(refApp.Jni.jEnv, FjObject, FAnimation.In_);
   if Assigned(FOnJNIPrompt) then FOnJNIPrompt(Self);
-
-end;
-
-procedure jForm.UpdateJNI(refApp: jApp);
-begin
-  Self.App.Jni.jEnv:= refApp.Jni.jEnv;
-  Self.App.Jni.jThis:= refApp.Jni.jThis;
-  //Self.App.Jni.jActivity:= refApp.Jni.jActivity;
 end;
 
 procedure jForm.ShowMessage(msg: string);
 begin
-  UpdateJNI(gApp);
-  jForm_ShowMessage(Self.App.Jni.jEnv, Self.App.Jni.jThis,  FjObject, msg);
+  jForm_ShowMessage(FjEnv, FjObject, msg);
 end;
 
 function jForm.GetDateTime: String;
 begin
-  UpdateJNI(gApp);
-  Result:= jForm_GetDateTime(Self.App.Jni.jEnv, Self.App.Jni.jThis, FjObject);
+  Result:= jForm_GetDateTime(FjEnv,FjObject);
 end;
 
 procedure jForm.SetOrientation(Value: integer);
@@ -2062,58 +2096,39 @@ Procedure jForm.SetEnabled(Value: Boolean);
 begin
   FEnabled:= Value;
   if FInitialized then
-  begin
-    UpdateJNI(gApp);
-    jForm_SetEnabled2(App.Jni.jEnv, App.Jni.jThis, FjObject, FEnabled);
-  end;
+    jForm_SetEnabled2(FjEnv, FjObject, FEnabled);
 end;
 
 Procedure jForm.SetVisible(Value: Boolean);
 begin
  FVisible:= Value;
  if FInitialized then
- begin
-   UpdateJNI(gApp);
-   jForm_SetVisibility2(App.Jni.jEnv, App.Jni.jThis, FjObject, FVisible);
- end;
+   jForm_SetVisibility2(FjEnv, FjObject, FVisible);
 end;
 
 Procedure jForm.SetColor(Value: TARGBColorBridge);
 begin
   FColor:= Value;
   if (FInitialized = True) and (FColor <> colbrDefault)  then
-  begin
-    UpdateJNI(gApp);
-    jView_SetBackGroundColor(App.Jni.jEnv, App.Jni.jThis, FjRLayout,GetARGB(FColor));
-  end;
+      View_SetBackGroundColor(FjEnv, FjRLayout,GetARGB(FColor));
 end;
 
 Procedure jForm.Show;
 begin
-
-  UpdateJNI(gApp);
-
   if not FInitialized then Exit;
   if FVisible then Exit;
-
   FormState := fsFormWork;
   FVisible:= True;
-
   gApp.BaseIndex := gApp.TopIndex;
-
   gApp.TopIndex:= Self.FormIndex;
-
-  jForm_Show2(App.Jni.jEnv,App.Jni.jThis,FjObject, FAnimation.In_);
-
+  jForm_Show2(FjEnv,FjObject,FAnimation.In_);
   if Assigned(FOnJNIPrompt) then FOnJNIPrompt(Self);    //*****
-
 end;
 
 Procedure jForm.UpdateLayout;
 var
   i: integer;
 begin
-  UpdateJNI(gApp);
   for i := 0 to  (Self.ComponentCount - 1) do   //********
   begin
      if Self.Components[i] is jVisualControl then
@@ -2130,8 +2145,7 @@ begin
  // --------------------------------------------------------------------------
  // Java           Java          Java-> Pascal
  // jForm_Close -> RemoveView -> Java_Event_pOnClose
-  UpdateJNI(gApp);
-  jForm_Close2(App.Jni.jEnv, App.Jni.jThis, FjObject);  //close java form...
+  jForm_Close2(FjEnv, FjObject);  //close java form...
 end;
 
 //after java form close......
@@ -2150,8 +2164,6 @@ begin
 
   if Assigned(jForm(Form).OnClose) then
   begin
-   // jForm(Form).ShowMessage('OnQuery: '+ IntTostr(Inx)); //ok...
-   // jForm(Form).ShowMessage('BaseIndex: '+ IntTostr(gApp.BaseIndex));
     jForm(Form).OnClose(jForm(Form));
   end;
 
@@ -2186,10 +2198,7 @@ end;
 Procedure jForm.Refresh;
 begin
   if FInitialized then
-  begin
-    UpdateJNI(gApp);
-    jView_Invalidate(Self.App.Jni.jEnv, Self.App.Jni.jThis, Self.View);
-  end;
+    View_Invalidate(FjEnv, Self.View);
 end;
 
 Procedure jForm.SetCloseCallBack(func : TOnNotify; Sender : TObject);
@@ -2218,19 +2227,13 @@ end;
 function  jForm.GetOnViewClickListener(jObjForm: jObject): jObject;
 begin
   if FInitialized then
-  begin
-    UpdateJNI(gApp);
-    Result:= jForm_GetOnViewClickListener(Self.App.Jni.jEnv, Self.App.Jni.jThis, jObjForm);
-  end;
+    Result:= jForm_GetOnViewClickListener(FjEnv, jObjForm);
 end;
 
 function  jForm.GetOnListItemClickListener(jObjForm: jObject): jObject;
 begin
   if FInitialized then
-  begin
-    UpdateJNI(gApp);
-    Result:= jForm_GetOnListItemClickListener(Self.App.Jni.jEnv, Self.App.Jni.jThis, jObjForm);
-  end;
+    Result:= jForm_GetOnListItemClickListener(FjEnv, jObjForm);
 end;
 
 Procedure jForm.GenEvent_OnListItemClick(jObjAdapterView: jObject; jObjView: jObject; position: integer; Id: integer);
@@ -2299,291 +2302,222 @@ end;
 
 function jForm.GetStringExtra(data: jObject; extraName: string): string;
 begin
-  //in designing component state: result value here...
    if FInitialized then
-   begin
-     UpdateJNI(gApp);
-     Result:= jForm_GetStringExtra(Self.App.Jni.jEnv, Self.App.Jni.jThis, FjObject, data ,extraName);
-   end;
+     Result:= jForm_GetStringExtra(FjEnv, FjObject, data ,extraName);
 end;
 
 function jForm.GetIntExtra(data: jObject; extraName: string; defaultValue: integer): integer;
 begin
-  //in designing component state: result value here...
   if FInitialized then
-  begin
-    UpdateJNI(gApp);
-    Result:= jForm_GetIntExtra(Self.App.Jni.jEnv, Self.App.Jni.jThis, FjObject, data ,extraName ,defaultValue);
-  end;
+    Result:= jForm_GetIntExtra(FjEnv, FjObject, data ,extraName ,defaultValue);
 end;
 
 function jForm.GetDoubleExtra(data: jObject; extraName: string; defaultValue: double): double;
 begin
-  //in designing component state: result value here...
   if FInitialized then
-  begin
-    UpdateJNI(gApp);
-    Result:= jForm_GetDoubleExtra(Self.App.Jni.jEnv, Self.App.Jni.jThis, FjObject, data ,extraName ,defaultValue);
-  end;
+    Result:= jForm_GetDoubleExtra(FjEnv, FjObject, data ,extraName ,defaultValue);
 end;
 
 procedure jForm.SetWifiEnabled(_status: boolean);
 begin
-  //in designing component state: set value here...
   if FInitialized then
-  begin
-     UpdateJNI(gApp);
-     jForm_SetWifiEnabled(Self.App.Jni.jEnv, Self.App.Jni.jThis, FjObject, _status);
-  end;
+   jForm_SetWifiEnabled(FjEnv, FjObject, _status);
 end;
 
 function jForm.IsWifiEnabled(): boolean;
 begin
-  //in designing component state: result value here...
    if FInitialized then
-   begin
-      UpdateJNI(gApp);
-      Result:= jForm_IsWifiEnabled(Self.App.Jni.jEnv, Self.App.Jni.jThis, FjObject);
-   end;
+      Result:= jForm_IsWifiEnabled(FjEnv, FjObject);
 end;
 
 function jForm.GetEnvironmentDirectoryPath(_directory: TEnvDirectory): string;
 begin
   Result:='';
   if FInitialized then
-  begin
-    UpdateJNI(gApp);
-    Result:= jForm_GetEnvironmentDirectoryPath(Self.App.Jni.jEnv, Self.App.Jni.jThis, FjObject, Ord(_directory))
-  end;
+    Result:= jForm_GetEnvironmentDirectoryPath(FjEnv, FjObject, Ord(_directory))
 end;
 
 function jForm.GetInternalAppStoragePath: string;
 begin
   Result:='';
   if FInitialized then
-  begin
-    UpdateJNI(gApp);
-    Result:= jForm_GetInternalAppStoragePath(Self.App.Jni.jEnv, Self.App.Jni.jThis, FjObject);
-  end;
+    Result:= jForm_GetInternalAppStoragePath(FjEnv, FjObject);
 end;
 
 function jForm.CopyFile(srcFullFilename: string; destFullFilename: string): boolean;
 begin
   Result:= False;
   if FInitialized then
-  begin
-    UpdateJNI(gApp);
-    Result:= jForm_CopyFile(Self.App.Jni.jEnv, Self.App.Jni.jThis, FjObject, srcFullFilename, destFullFilename);
-  end;
+    Result:= jForm_CopyFile(FjEnv, FjObject, srcFullFilename, destFullFilename);
 end;
 
 function jForm.LoadFromAssets(fileName: string): string;
 begin
   Result:= '';
   if FInitialized then
-  begin
-    UpdateJNI(gApp);
-    Result:= jForm_LoadFromAssets(Self.App.Jni.jEnv, Self.App.Jni.jThis, FjObject, fileName);
-  end;
+    Result:= jForm_LoadFromAssets(FjEnv,  FjObject, fileName);
 end;
 
 function jForm.IsSdCardMounted: boolean;
 begin
   Result:= False;
   if FInitialized then
-  begin
-    UpdateJNI(gApp);
-    Result:= jForm_IsSdCardMounted(Self.App.Jni.jEnv, Self.App.Jni.jThis, FjObject);
-  end;
+    Result:= jForm_IsSdCardMounted(FjEnv, FjObject);
 end;
 
 procedure jForm.DeleteFile(_filename: string);
 begin
-  //in designing component state: set value here...
-  UpdateJNI(gApp);
   if FInitialized then
-     jForm_DeleteFile(Self.App.Jni.jEnv, Self.App.Jni.jThis, FjObject, _filename);
+     jForm_DeleteFile(FjEnv, FjObject, _filename);
 end;
 
 procedure jForm.DeleteFile(_fullPath: string; _filename: string);
 begin
-  //in designing component state: set value here...
-  UpdateJNI(gApp);
   if FInitialized then
-     jForm_DeleteFile(Self.App.Jni.jEnv, Self.App.Jni.jThis, FjObject, _fullPath ,_filename);
+     jForm_DeleteFile(FjEnv,FjObject, _fullPath ,_filename);
 end;
 
 procedure jForm.DeleteFile(_environmentDir: TEnvDirectory; _filename: string);
 begin
-  //in designing component state: set value here...
-  UpdateJNI(gApp);
   if FInitialized then
-     jForm_DeleteFile(Self.App.Jni.jEnv, Self.App.Jni.jThis, FjObject, Ord(_environmentDir) ,_filename);
+     jForm_DeleteFile(FjEnv, FjObject, Ord(_environmentDir) ,_filename);
 end;
 
 function jForm.CreateDir(_dirName: string): string;
 begin
-  //in designing component state: result value here...
-  UpdateJNI(gApp);
   if FInitialized then
-   Result:= jForm_CreateDir(Self.App.Jni.jEnv, Self.App.Jni.jThis, FjObject, _dirName);
+    Result:= jForm_CreateDir(FjEnv,FjObject, _dirName);
 end;
 
 function jForm.CreateDir(_environmentDir: TEnvDirectory; _dirName: string): string;
 begin
-  //in designing component state: result value here...
-  UpdateJNI(gApp);
   if FInitialized then
-   Result:= jForm_CreateDir(Self.App.Jni.jEnv, Self.App.Jni.jThis, FjObject, Ord(_environmentDir) ,_dirName);
+    Result:= jForm_CreateDir(FjEnv, FjObject, Ord(_environmentDir) ,_dirName);
 end;
 
 function jForm.CreateDir(_fullPath: string; _dirName: string): string;
 begin
-  //in designing component state: result value here...
-  UpdateJNI(gApp);
   if FInitialized then
-   Result:= jForm_CreateDir(Self.App.Jni.jEnv, Self.App.Jni.jThis, FjObject, _fullPath ,_dirName);
+    Result:= jForm_CreateDir(FjEnv, FjObject, _fullPath ,_dirName);
 end;
 
 function jForm.IsExternalStorageEmulated(): boolean;
 begin
-  //in designing component state: result value here...
-  UpdateJNI(gApp);
   if FInitialized then
-   Result:= jForm_IsExternalStorageEmulated(Self.App.Jni.jEnv, Self.App.Jni.jThis, FjObject);
+    Result:= jForm_IsExternalStorageEmulated(FjEnv, FjObject);
 end;
 
 function jForm.IsExternalStorageRemovable(): boolean;
 begin
-  //in designing component state: result value here...
-  UpdateJNI(gApp);
   if FInitialized then
-   Result:= jForm_IsExternalStorageRemovable(Self.App.Jni.jEnv, Self.App.Jni.jThis, FjObject);
+    Result:= jForm_IsExternalStorageRemovable(FjEnv, FjObject);
 end;
 
 function jForm.GetjFormVersionFeatures(): string;
 begin
-  //in designing component state: result value here...
   if FInitialized then
-   Result:= jForm_GetjFormVersionFeatures(Self.App.Jni.jEnv, Self.App.Jni.jThis, FjObject);
+    Result:= jForm_GetjFormVersionFeatures(FjEnv, FjObject);
 end;
 
 function jForm.GetActionBar(): jObject;
 begin
-  //in designing component state: result value here...
   if FInitialized then
-   Result:= jForm_GetActionBar(Self.App.Jni.jEnv, Self.App.Jni.jThis, FjObject);
+    Result:= jForm_GetActionBar(FjEnv, FjObject);
 end;
 
 procedure jForm.HideActionBar();
 begin
-  //in designing component state: set value here...
   if FInitialized then
-     jForm_HideActionBar(Self.App.Jni.jEnv, Self.App.Jni.jThis, FjObject);
+     jForm_HideActionBar(FjEnv, FjObject);
 end;
 
 procedure jForm.ShowActionBar();
 begin
-  //in designing component state: set value here...
   if FInitialized then
-     jForm_ShowActionBar(Self.App.Jni.jEnv, Self.App.Jni.jThis, FjObject);
+     jForm_ShowActionBar(FjEnv, FjObject);
 end;
 
 procedure jForm.ShowTitleActionBar(_value: boolean);
 begin
-  //in designing component state: set value here...
   if FInitialized then
-     jForm_ShowTitleActionBar(Self.App.Jni.jEnv, Self.App.Jni.jThis, FjObject, _value);
+     jForm_ShowTitleActionBar(FjEnv, FjObject, _value);
 end;
 
 procedure jForm.HideLogoActionBar(_value: boolean);
 begin
-  //in designing component state: set value here...
   if FInitialized then
-     jForm_HideLogoActionBar(Self.App.Jni.jEnv, Self.App.Jni.jThis, FjObject, _value);
+     jForm_HideLogoActionBar(FjEnv, FjObject, _value);
 end;
 
 procedure jForm.SetTitleActionBar(_title: string);
 begin
-  //in designing component state: set value here...
   if FInitialized then
-     jForm_SetTitleActionBar(Self.App.Jni.jEnv, Self.App.Jni.jThis, FjObject, _title);
+     jForm_SetTitleActionBar(FjEnv, FjObject, _title);
 end;
 
 procedure jForm.SetSubTitleActionBar(_subtitle: string);
 begin
-  //in designing component state: set value here...
   if FInitialized then
-     jForm_SetSubTitleActionBar(Self.App.Jni.jEnv, Self.App.Jni.jThis, FjObject, _subtitle);
+     jForm_SetSubTitleActionBar(FjEnv, FjObject, _subtitle);
 end;
 
 procedure jForm.SetIconActionBar(_iconIdentifier: string);
 begin
-  //in designing component state: set value here...
   if FInitialized then
-     jForm_SetIconActionBar(Self.App.Jni.jEnv, Self.App.Jni.jThis, FjObject, _iconIdentifier);
+     jForm_SetIconActionBar(FjEnv, FjObject, _iconIdentifier);
 end;
-
 
 procedure jForm.SetTabNavigationModeActionBar();
 begin
-  //in designing component state: set value here...
   if FInitialized then
-     jForm_SetTabNavigationModeActionBar(Self.App.Jni.jEnv, Self.App.Jni.jThis, FjObject);
+     jForm_SetTabNavigationModeActionBar(FjEnv, FjObject);
 end;
 
 procedure jForm.RemoveAllTabsActionBar();
 begin
-  //in designing component state: set value here...
   if FInitialized then
-     jForm_RemoveAllTabsActionBar(Self.App.Jni.jEnv, Self.App.Jni.jThis, FjObject);
+     jForm_RemoveAllTabsActionBar(FjEnv, FjObject);
 end;
 
 function jForm.GetStringResourceId(_resName: string): integer;
 begin
-  //in designing component state: result value here...
   if FInitialized then
-   Result:= jForm_GetStringResourceId(Self.App.Jni.jEnv, Self.App.Jni.jThis, FjObject, _resName);
+   Result:= jForm_GetStringResourceId(FjEnv, FjObject, _resName);
 end;
 
 function jForm.GetStringResourceById(_resID: integer): string;
 begin
-  //in designing component state: result value here...
   if FInitialized then
-   Result:= jForm_GetStringResourceById(Self.App.Jni.jEnv, Self.App.Jni.jThis, FjObject, _resID);
+   Result:= jForm_GetStringResourceById(FjEnv, FjObject, _resID);
 end;
 
 function jForm.GetDrawableResourceId(_resName: string): integer;
 begin
-  //in designing component state: result value here...
   if FInitialized then
-   Result:= jForm_GetDrawableResourceId(Self.App.Jni.jEnv, Self.App.Jni.jThis, FjObject, _resName);
+    Result:= jForm_GetDrawableResourceId(FjEnv, FjObject, _resName);
 end;
 
 function jForm.GetDrawableResourceById(_resID: integer): jObject;
 begin
-  //in designing component state: result value here...
   if FInitialized then
-   Result:= jForm_GetDrawableResourceById(Self.App.Jni.jEnv, Self.App.Jni.jThis, FjObject, _resID);
+   Result:= jForm_GetDrawableResourceById(FjEnv, FjObject, _resID);
 end;
 
 function jForm.GetQuantityStringByName(_resName: string; _quantity: integer): string;
 begin
-  //in designing component state: result value here...
   if FInitialized then
-   Result:= jForm_GetQuantityStringByName(Self.App.Jni.jEnv, Self.App.Jni.jThis, FjObject, _resName ,_quantity);
+   Result:= jForm_GetQuantityStringByName(FjEnv, FjObject, _resName ,_quantity);
 end;
 
 function jForm.GetStringResourceByName(_resName: string): string;
 begin
-  //in designing component state: result value here...
   if FInitialized then
-   Result:= jForm_GetStringResourceByName(Self.App.Jni.jEnv, Self.App.Jni.jThis, FjObject, _resName);
+   Result:= jForm_GetStringResourceByName(FjEnv, FjObject, _resName);
 end;
 
 {-------- jForm_JNI_Bridge ----------}
 
-function jForm_GetStringExtra(env: PJNIEnv; this: JObject; _jform: JObject; data: jObject; extraName: string): string;
+function jForm_GetStringExtra(env: PJNIEnv; _jform: JObject; data: jObject; extraName: string): string;
 var
   jStr: JString;
   jBoo: JBoolean;
@@ -2607,7 +2541,7 @@ begin
 end;
 
 
-function jForm_GetIntExtra(env: PJNIEnv; this: JObject; _jform: JObject; data: jObject; extraName: string; defaultValue: integer): integer;
+function jForm_GetIntExtra(env: PJNIEnv; _jform: JObject; data: jObject; extraName: string; defaultValue: integer): integer;
 var
   jParams: array[0..2] of jValue;
   jMethod: jMethodID=nil;
@@ -2622,7 +2556,7 @@ begin
   env^.DeleteLocalRef(env,jParams[1].l);
 end;
 
-function jForm_GetDoubleExtra(env: PJNIEnv; this: JObject; _jform: JObject; data: jObject; extraName: string; defaultValue: double): double;
+function jForm_GetDoubleExtra(env: PJNIEnv; _jform: JObject; data: jObject; extraName: string; defaultValue: double): double;
 var
   jParams: array[0..2] of jValue;
   jMethod: jMethodID=nil;
@@ -2638,7 +2572,7 @@ begin
 end;
 
 
-procedure jForm_DeleteFile(env: PJNIEnv; this: JObject; _jform: JObject; _filename: string);
+procedure jForm_DeleteFile(env: PJNIEnv; _jform: JObject; _filename: string);
 var
   jParams: array[0..0] of jValue;
   jMethod: jMethodID=nil;
@@ -2652,7 +2586,7 @@ env^.DeleteLocalRef(env,jParams[0].l);
 end;
 
 
-procedure jForm_DeleteFile(env: PJNIEnv; this: JObject; _jform: JObject; _fullPath: string; _filename: string);
+procedure jForm_DeleteFile(env: PJNIEnv; _jform: JObject; _fullPath: string; _filename: string);
 var
   jParams: array[0..1] of jValue;
   jMethod: jMethodID=nil;
@@ -2668,7 +2602,7 @@ env^.DeleteLocalRef(env,jParams[0].l);
 end;
 
 
-procedure jForm_DeleteFile(env: PJNIEnv; this: JObject; _jform: JObject; _environmentDir: integer; _filename: string);
+procedure jForm_DeleteFile(env: PJNIEnv; _jform: JObject; _environmentDir: integer; _filename: string);
 var
   jParams: array[0..1] of jValue;
   jMethod: jMethodID=nil;
@@ -2683,7 +2617,7 @@ env^.DeleteLocalRef(env,jParams[1].l);
 end;
 
 
-function jForm_CreateDir(env: PJNIEnv; this: JObject; _jform: JObject; _dirName: string): string;
+function jForm_CreateDir(env: PJNIEnv; _jform: JObject; _dirName: string): string;
 var
   jStr: JString;
   jBoo: JBoolean;
@@ -2706,7 +2640,7 @@ env^.DeleteLocalRef(env,jParams[0].l);
 end;
 
 
-function jForm_CreateDir(env: PJNIEnv; this: JObject; _jform: JObject; _environmentDir: integer; _dirName: string): string;
+function jForm_CreateDir(env: PJNIEnv; _jform: JObject; _environmentDir: integer; _dirName: string): string;
 var
   jStr: JString;
   jBoo: JBoolean;
@@ -2730,7 +2664,7 @@ env^.DeleteLocalRef(env,jParams[1].l);
 end;
 
 
-function jForm_CreateDir(env: PJNIEnv; this: JObject; _jform: JObject; _fullPath: string; _dirName: string): string;
+function jForm_CreateDir(env: PJNIEnv; _jform: JObject; _fullPath: string; _dirName: string): string;
 var
   jStr: JString;
   jBoo: JBoolean;
@@ -2755,7 +2689,7 @@ env^.DeleteLocalRef(env,jParams[0].l);
 end;
 
 
-function jForm_IsExternalStorageEmulated(env: PJNIEnv; this: JObject; _jform: JObject): boolean;
+function jForm_IsExternalStorageEmulated(env: PJNIEnv; _jform: JObject): boolean;
 var
   jBoo: JBoolean;
   jMethod: jMethodID=nil;
@@ -2768,7 +2702,7 @@ begin
 end;
 
 
-function jForm_IsExternalStorageRemovable(env: PJNIEnv; this: JObject; _jform: JObject): boolean;
+function jForm_IsExternalStorageRemovable(env: PJNIEnv; _jform: JObject): boolean;
 var
   jBoo: JBoolean;
   jMethod: jMethodID=nil;
@@ -2780,7 +2714,7 @@ begin
   Result:= boolean(jBoo);
 end;
 
-function jForm_GetjFormVersionFeatures(env: PJNIEnv; this: JObject; _jform: JObject): string;
+function jForm_GetjFormVersionFeatures(env: PJNIEnv; _jform: JObject): string;
 var
   jStr: JString;
   jBoo: JBoolean;
@@ -2800,7 +2734,7 @@ begin
 end;
 
 
-function jForm_GetActionBar(env: PJNIEnv; this: JObject; _jform: JObject): jObject;
+function jForm_GetActionBar(env: PJNIEnv; _jform: JObject): jObject;
 var
   jMethod: jMethodID=nil;
   jCls: jClass=nil;
@@ -2810,7 +2744,7 @@ begin
   Result:= env^.CallObjectMethod(env, _jform, jMethod);
 end;
 
-procedure jForm_HideActionBar(env: PJNIEnv; this: JObject; _jform: JObject);
+procedure jForm_HideActionBar(env: PJNIEnv; _jform: JObject);
 var
   jMethod: jMethodID=nil;
   jCls: jClass=nil;
@@ -2820,7 +2754,7 @@ begin
   env^.CallVoidMethod(env, _jform, jMethod);
 end;
 
-procedure jForm_ShowActionBar(env: PJNIEnv; this: JObject; _jform: JObject);
+procedure jForm_ShowActionBar(env: PJNIEnv; _jform: JObject);
 var
   jMethod: jMethodID=nil;
   jCls: jClass=nil;
@@ -2830,7 +2764,7 @@ begin
   env^.CallVoidMethod(env, _jform, jMethod);
 end;
 
-procedure jForm_ShowTitleActionBar(env: PJNIEnv; this: JObject; _jform: JObject; _value: boolean);
+procedure jForm_ShowTitleActionBar(env: PJNIEnv; _jform: JObject; _value: boolean);
 var
   jParams: array[0..0] of jValue;
   jMethod: jMethodID=nil;
@@ -2842,7 +2776,7 @@ begin
   env^.CallVoidMethodA(env, _jform, jMethod, @jParams);
 end;
 
-procedure jForm_HideLogoActionBar(env: PJNIEnv; this: JObject; _jform: JObject; _value: boolean);
+procedure jForm_HideLogoActionBar(env: PJNIEnv; _jform: JObject; _value: boolean);
 var
   jParams: array[0..0] of jValue;
   jMethod: jMethodID=nil;
@@ -2854,7 +2788,7 @@ begin
   env^.CallVoidMethodA(env, _jform, jMethod, @jParams);
 end;
 
-procedure jForm_SetTitleActionBar(env: PJNIEnv; this: JObject; _jform: JObject; _title: string);
+procedure jForm_SetTitleActionBar(env: PJNIEnv; _jform: JObject; _title: string);
 var
   jParams: array[0..0] of jValue;
   jMethod: jMethodID=nil;
@@ -2867,7 +2801,7 @@ begin
 env^.DeleteLocalRef(env,jParams[0].l);
 end;
 
-procedure jForm_SetSubTitleActionBar(env: PJNIEnv; this: JObject; _jform: JObject; _subtitle: string);
+procedure jForm_SetSubTitleActionBar(env: PJNIEnv; _jform: JObject; _subtitle: string);
 var
   jParams: array[0..0] of jValue;
   jMethod: jMethodID=nil;
@@ -2880,7 +2814,7 @@ begin
 env^.DeleteLocalRef(env,jParams[0].l);
 end;
 
-procedure jForm_SetIconActionBar(env: PJNIEnv; this: JObject; _jform: JObject; _iconIdentifier: string);
+procedure jForm_SetIconActionBar(env: PJNIEnv; _jform: JObject; _iconIdentifier: string);
 var
   jParams: array[0..0] of jValue;
   jMethod: jMethodID=nil;
@@ -2894,7 +2828,7 @@ env^.DeleteLocalRef(env,jParams[0].l);
 end;
 
 
-procedure jForm_SetTabNavigationModeActionBar(env: PJNIEnv; this: JObject; _jform: JObject);
+procedure jForm_SetTabNavigationModeActionBar(env: PJNIEnv; _jform: JObject);
 var
   jMethod: jMethodID=nil;
   jCls: jClass=nil;
@@ -2904,7 +2838,7 @@ begin
   env^.CallVoidMethod(env, _jform, jMethod);
 end;
 
-procedure jForm_RemoveAllTabsActionBar(env: PJNIEnv; this: JObject; _jform: JObject);
+procedure jForm_RemoveAllTabsActionBar(env: PJNIEnv; _jform: JObject);
 var
   jMethod: jMethodID=nil;
   jCls: jClass=nil;
@@ -2914,7 +2848,7 @@ begin
   env^.CallVoidMethod(env, _jform, jMethod);
 end;
 
-function jForm_GetStringResourceId(env: PJNIEnv; this: JObject; _jform: JObject; _resName: string): integer;
+function jForm_GetStringResourceId(env: PJNIEnv; _jform: JObject; _resName: string): integer;
 var
   jParams: array[0..0] of jValue;
   jMethod: jMethodID=nil;
@@ -2928,7 +2862,7 @@ env^.DeleteLocalRef(env,jParams[0].l);
 end;
 
 
-function jForm_GetStringResourceById(env: PJNIEnv; this: JObject; _jform: JObject; _resID: integer): string;
+function jForm_GetStringResourceById(env: PJNIEnv; _jform: JObject; _resID: integer): string;
 var
   jStr: JString;
   jBoo: JBoolean;
@@ -2950,7 +2884,7 @@ begin
 end;
 
 
-function jForm_GetDrawableResourceId(env: PJNIEnv; this: JObject; _jform: JObject; _resName: string): integer;
+function jForm_GetDrawableResourceId(env: PJNIEnv; _jform: JObject; _resName: string): integer;
 var
   jParams: array[0..0] of jValue;
   jMethod: jMethodID=nil;
@@ -2963,7 +2897,7 @@ begin
 env^.DeleteLocalRef(env,jParams[0].l);
 end;
 
-function jForm_GetDrawableResourceById(env: PJNIEnv; this: JObject; _jform: JObject; _resID: integer): jObject;
+function jForm_GetDrawableResourceById(env: PJNIEnv; _jform: JObject; _resID: integer): jObject;
 var
   jParams: array[0..0] of jValue;
   jMethod: jMethodID=nil;
@@ -2976,7 +2910,7 @@ begin
 end;
 
 
-function jForm_GetQuantityStringByName(env: PJNIEnv; this: JObject; _jform: JObject; _resName: string; _quantity: integer): string;
+function jForm_GetQuantityStringByName(env: PJNIEnv; _jform: JObject; _resName: string; _quantity: integer): string;
 var
   jStr: JString;
   jBoo: JBoolean;
@@ -3000,7 +2934,7 @@ begin
 end;
 
 
-function jForm_GetStringResourceByName(env: PJNIEnv; this: JObject; _jform: JObject; _resName: string): string;
+function jForm_GetStringResourceByName(env: PJNIEnv; _jform: JObject; _resName: string): string;
 var
   jStr: JString;
   jBoo: JBoolean;
@@ -3027,7 +2961,6 @@ end;
 constructor jApp.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
-
   //
   FAppName         := ''; //gjAppName;
   FClassName       := ''; //gjClassName;
@@ -3052,16 +2985,12 @@ begin
   //
   FForm            := nil;
   StopOnException  :=True;
-
   Device.PhoneNumber := '';
   Device.ID          := '';
-
   FInitialized     := False;
-
   Forms.Index      := 0; //dummy
   TopIndex:= 0;
   BaseIndex:= 0;
-
 end;
 
 Destructor jApp.Destroy;
@@ -3070,22 +2999,21 @@ begin
 end;
 
 Procedure jApp.Init(env: PJNIEnv; this: jObject; activity: jObject; layout: jObject);
-//var
-  //version, revision: string;
-  //intVer: integer;
-  //intRev: integer;
-
 begin
   if FInitialized  then Exit;
   // Setting Global Environment -----------------------------------------------
   FillChar(Forms,SizeOf(Forms),#0);
   //
   Screen.Style  := ssSensor;     // Screen Style [Device,Portrait,Lanscape]
+
   // Jni
   Jni.jEnv      := env;  //a reference to the JNI environment
-  Jni.jThis     := this; //a reference to the object making this call (or class if static).
-  Jni.jActivity := activity;  //[by jmpessoa: for API > 13 STALED!!! do not use!
+
+  //[by jmpessoa: for API > 13 "STALED"!!! do not use its!
+  Jni.jThis     := this; //[controls lib]a reference to the object making this call (or class if static).
+  Jni.jActivity := activity;
   Jni.jRLayout  := layout;
+
   // Screen
   Screen.WH     := jSysInfo_ScreenWH(env, this, activity);
   Orientation   := jSystem_GetOrientation(env, this);
@@ -3111,12 +3039,10 @@ begin
          Variant         := jSysInfo_Language(env, this, ltVariant);
       end;
   end;
-
   // Phone
   Device.PhoneNumber := jSysInfo_DevicePhoneNumber(env, this);
   Device.ID          := jSysInfo_DeviceID(env, this);
   FInitialized       := True;
-
 end;
 
 procedure jApp.CreateForm(InstanceClass: TComponentClass; out Reference);
@@ -3207,7 +3133,6 @@ begin
   Result:= jApp_GetQuantityStringByName(Self.Jni.jEnv, Self.Jni.jThis, _resName, _Quantity);
 end;
 
-
 Function InputTypeToStrEx ( InputType : TInputTypeEx ) : String;
  begin
   Result := 'TEXT';
@@ -3215,8 +3140,8 @@ Function InputTypeToStrEx ( InputType : TInputTypeEx ) : String;
    itxText       : Result := 'TEXT';
    itxNumber     : Result := 'NUMBER';
    itxPhone      : Result := 'PHONE';
-   itxPassNumber : Result := 'PASSNUMBER';
-   itxPassText   : Result := 'PASSTEXT';
+   itxNumberPassword : Result := 'PASSNUMBER';
+   itxTextPassword   : Result := 'PASSTEXT';
    itxMultiLine  : Result := 'TEXTMULTILINE';
   end;
  end;
@@ -3298,16 +3223,12 @@ begin
 end;
 
 function GetParamByParentSide(paren: TAndroidWidget; side: TSide): DWord;
-//var
-// l: TLayoutParams;
 begin
    case side of
      sdW: begin
-            //l:= (paren as jVisualControl).LayoutParamWidth;
             Result:= paren.Width;
           end;
      sdH: begin
-            //l:= (paren as jVisualControl).LayoutParamHeight;
             Result:= paren.Height;
            end;
    end;
@@ -3343,7 +3264,6 @@ function GetLayoutParamsOrd(lpParam: TLayoutParams): DWord;
 begin
    Result:= Ord(lpParam);
 end;
-
 
 function GetLayoutParamsByParent(paren: TAndroidWidget; lpParam: TLayoutParams;  side: TSide): DWord;
 begin
@@ -3477,7 +3397,11 @@ begin
   Result:= TGravityArray[index];
 end;
 
-//JNI API Bridge: by jmpessoa
+
+//-----------------------------------------------------------------
+//JNI API Bridges: by jmpessoa
+//-----------------------------------------------------------------
+
 function Get_jClassLocalRef(fullClassName: string): jClass;
 begin
  Result:= nil;
@@ -3504,9 +3428,7 @@ begin
   try
     //Get its default constructor
     Mid := gApp.Jni.jEnv^.GetMethodID(gApp.Jni.jEnv, cls, '<init>', '()V');
-
     if Mid = nil then exit;
-
     //Create the object
     Result := gApp.Jni.jEnv^.NewObjectA(gApp.Jni.jEnv, cls, Mid, nil);
   except
@@ -3519,7 +3441,6 @@ begin
   Result := gApp.Jni.jEnv^.NewGlobalRef(gApp.Jni.jEnv,jObj);
 end;
 
-
 function Create_jObjectLocalRefA(cls: JClass;
                         paramFullSignature: string; paramValues: array of jValue): JObject;
 var
@@ -3530,18 +3451,13 @@ begin
   try
     //Get its default constructor
     Mid := gApp.Jni.jEnv^.GetMethodID(gApp.Jni.jEnv, cls, '<init>', PChar('('+paramFullSignature+')V'));
-
     if Mid = nil then exit;
-
     //Create the object
     Result := gApp.Jni.jEnv^.NewObjectA(gApp.Jni.jEnv, cls, Mid, @paramValues);
   except
     on E: Exception do Exit;
   end;
 end;
-
-
-//NewObjectArray:function(Env:PJNIEnv; Len:JSize;AClass:JClass; Init:JObject):JObjectArray;
 
 function Create_jObjectArray(Len: integer; cls: jClass; initialElement: jObject): jObject;
 begin
@@ -3553,7 +3469,6 @@ begin
   end;
 end;
 
-//void SetObjectArrayElement(JNIEnv *env, jobjectArray array,jsize index, jobject value);
 procedure Set_jObjectArrayElement(jobjectArray: jObject; index: integer; element: jObject);
 begin
   gApp.Jni.jEnv^.SetObjectArrayElement(gApp.Jni.jEnv, jobjectArray, index, element);
@@ -3578,18 +3493,15 @@ begin
   end;
 end;
 
-//jobject GetObjectArrayElement(JNIEnv *env,jobjectArray array, jsize index);
 function Get_jObjectArrayElement(jobjectArray: jObject; index: integer): jObject;
 begin
   Result:= gApp.Jni.jEnv^.GetObjectArrayElement(gApp.Jni.jEnv, jobjectArray, index);
 end;
 
-//jsize GetArrayLength(JNIEnv *env, jarray array);
 function Get_jArrayLength(jobjectArray: jObject): integer;
 begin
   Result:= gApp.Jni.jEnv^.GetArrayLength(gApp.Jni.jEnv, jobjectArray);
 end;
-
 
 function Get_jMethodID(cls: jClass; funcName, funcSignature : string): jMethodID;
 begin
@@ -3608,13 +3520,11 @@ begin
   Result:= gApp.Jni.jEnv^.CallIntMethodA(gApp.Jni.jEnv, jObj, method, @jParams);
 end;
 
-// ...
 function Call_jDoubleMethodA(jObj:jObject; method: jMethodID; var jParams: array of jValue): double;
 begin
   Result:= gApp.Jni.jEnv^.CallDoubleMethodA(gApp.Jni.jEnv, jObj, method, @jParams);
 end;
 
-// ...
 function Call_jDoubleMethod(jObj:jObject; method: jMethodID): double;
 begin
   Result:= gApp.Jni.jEnv^.CallDoubleMethod(gApp.Jni.jEnv, jObj, method);
@@ -3681,10 +3591,10 @@ var
   _jBoolean: jBoolean;
 begin
  case jStr = nil of
-  True : Result    := '';
+  True : Result:= '';
   False: begin
           _jBoolean := JNI_False;
-          Result    := String( gApp.Jni.jEnv^.GetStringUTFChars(gApp.Jni.jEnv,jStr,@_jBoolean) );
+          Result    := String(gApp.Jni.jEnv^.GetStringUTFChars(gApp.Jni.jEnv,jStr,@_jBoolean) );
          end;
  end;
 end;
@@ -3862,7 +3772,7 @@ begin
   end;
 end;
 
-function  jForm_GetOnViewClickListener(env:PJNIEnv; this:jobject; Form: jObject): jObject;
+function  jForm_GetOnViewClickListener(env:PJNIEnv; Form: jObject): jObject;
 var
   cls: jClass;
   method: jmethodID;
@@ -3870,10 +3780,9 @@ begin
   cls := env^.GetObjectClass(env, Form);
   method:= env^.GetMethodID(env, cls, 'GetOnViewClickListener', '()Landroid/view/View$OnClickListener;');
   Result:= env^.CallObjectMethod(env, Form, method);
-  //Result := env^.NewGlobalRef(env,Result);
 end;
 
-function  jForm_GetOnListItemClickListener(env:PJNIEnv; this:jobject; Form: jObject): jObject;
+function  jForm_GetOnListItemClickListener(env:PJNIEnv; Form: jObject): jObject;
 var
   cls: jClass;
   method: jmethodID;
@@ -3881,7 +3790,6 @@ begin
   cls := env^.GetObjectClass(env, Form);
   method:= env^.GetMethodID(env, cls, 'GetOnListItemClickListener', '()Landroid/widget/AdapterView$OnItemClickListener;');
   Result:= env^.CallObjectMethod(env, Form, method);
-  //Result := env^.NewGlobalRef(env,Result);
 end;
 
 Procedure jApp_KillProcess(env:PJNIEnv;this:jobject);
@@ -4002,37 +3910,20 @@ end;
 //------------------------------------------------------------------------------
 
 Function  jForm_Create (env:PJNIEnv;this:jobject; SelfObj : TObject) : jObject;
-const
- _cFuncName = 'jForm_Create';
- _cFuncSig  = '(J)Ljava/lang/Object;';
 var
  _jMethod : jMethodID = nil;
  _jParam  : jValue;
+  _cls: jClass;
 begin
- //gVM^.AttachCurrentThread(gVm,@env,nil);
- jClassMethod(_cFuncName,_cFuncSig,env,gjClass,_jMethod);
+  _cls:= Get_gjClass(env);
+ _jMethod:= env^.GetMethodID(env, _cls, 'jForm_Create', '(J)Ljava/lang/Object;');
  _jParam.j := Int64(SelfObj);
  Result := env^.CallObjectMethodA(env,this,_jMethod,@_jParam);
  Result := env^.NewGlobalRef(env,Result);
 end;
 
-//
-Procedure jForm_Free(env:PJNIEnv; this:jobject; Form    : jObject);
-Const
- _cFuncName = 'jForm_Free';
- _cFuncSig  = '(Ljava/lang/Object;)V';
-Var
- _jMethod : jMethodID = nil;
- _jParam  : jValue;
-begin
- jClassMethod(_cFuncName,_cFuncSig,env,gjClass,_jMethod);
- _jParam.l := Form;
- env^.CallVoidMethodA(env,this,_jMethod,@_jParam);
- env^.DeleteGlobalRef(env,Form);
-end;
-
 //by jmpessoa
-Procedure jForm_Free2(env:PJNIEnv; this:jobject; Form: jObject);
+Procedure jForm_Free2(env:PJNIEnv; Form: jObject);
 var
   cls: jClass;
   method: jmethodID;
@@ -4043,23 +3934,8 @@ begin
   env^.DeleteGlobalRef(env,Form);
 end;
 
-//
-Procedure jForm_Show (env:PJNIEnv;this:jobject; Form    : jObject; effect : Integer);
-Const
- _cFuncName = 'jForm_Show';
- _cFuncSig  = '(Ljava/lang/Object;I)V';
-Var
- _jMethod : jMethodID = nil;
- _jParams : Array[0..1] of jValue;
-begin
- jClassMethod(_cFuncName,_cFuncSig,env,gjClass,_jMethod);
- _jParams[0].l := Form;
- _jParams[1].i := effect;
- env^.CallVoidMethodA(env,this,_jMethod,@_jParams);
-end;
-
 //by jmpessoa
-Procedure jForm_Show2(env:PJNIEnv;this:jobject; Form    : jObject; effect : Integer);
+Procedure jForm_Show2(env:PJNIEnv; Form: jObject; effect : Integer);
 var
    cls: jClass;
    method: jmethodID;
@@ -4071,7 +3947,7 @@ begin
     env^.CallVoidMethodA(env, Form, method,@_jParams);
 end;
 
-Procedure jForm_Close2(env:PJNIEnv; this:jobject; Form: jObject);
+Procedure jForm_Close2(env:PJNIEnv; Form: jObject);
 var
   cls: jClass;
   method: jmethodID;
@@ -4081,47 +3957,20 @@ begin
   env^.CallVoidMethod(env, Form, method);
 end;
 
-Procedure jForm_Close(env:PJNIEnv;this:jobject; Form: jObject; effect : Integer);
-Const
-  _cFuncName = 'jForm_Close';
-  _cFuncSig  = '(Ljava/lang/Object;I)V';
-Var
-  _jMethod : jMethodID = nil;
-  _jParams : Array[0..1] of jValue;
-begin
-  jClassMethod(_cFuncName,_cFuncSig,env,gjClass,_jMethod);    //GetObjectClass(env, obj);"?
-  _jParams[0].l := Form;
-  _jParams[1].i := effect;
-  env^.CallVoidMethodA(env,this,_jMethod,@_jParams);
-end;
-
-Function  jForm_GetLayout (env:PJNIEnv;this:jobject; Form    : jObject) : jObject;
-Const
- _cFuncName = 'jForm_GetLayout';
- _cFuncSig  = '(Ljava/lang/Object;)Landroid/widget/RelativeLayout;';
-Var
- _jMethod : jMethodID = nil;
- _jParam  : jValue;
-begin
- jClassMethod(_cFuncName,_cFuncSig,env,gjClass,_jMethod);
- _jParam.l := Form;
- Result := env^.CallObjectMethodA(env,this,_jMethod,@_jParam);
-end;
-
 //by jmpessoa
-Function jForm_GetLayout2(env:PJNIEnv; this:jobject; Form: jObject): jObject;
+Function jForm_GetLayout2(env:PJNIEnv; Form: jObject): jObject;
 var
-   cls: jClass;
-   method: jmethodID;
+  cls: jClass;
+  method: jmethodID;
 begin
-    cls := env^.GetObjectClass(env, Form);
-    method:= env^.GetMethodID(env, cls, 'GetLayout', '()Landroid/widget/RelativeLayout;');
-    Result:= env^.CallObjectMethod(env, Form, method);
-    Result := env^.NewGlobalRef(env,Result);   //<---- need here for ap1 > 13 - by jmpessoa
+  cls := env^.GetObjectClass(env, Form);
+  method:= env^.GetMethodID(env, cls, 'GetLayout', '()Landroid/widget/RelativeLayout;');
+  Result:= env^.CallObjectMethod(env, Form, method);
+  Result := env^.NewGlobalRef(env,Result);   //<---- need here for ap1 > 13 - by jmpessoa
 end;
 
 //by jmpessoa
-Function jForm_GetClickListener(env:PJNIEnv; this:jobject; Form: jObject): jObject;
+Function jForm_GetClickListener(env:PJNIEnv; Form: jObject): jObject;
 var
    cls: jClass;
    method: jmethodID;
@@ -4132,26 +3981,12 @@ begin
 end;
 
 //by jmpessoa
-Procedure jForm_FreeLayout(env:PJNIEnv;this:jobject; Layout: jObject);
+Procedure jForm_FreeLayout(env:PJNIEnv;Layout: jObject);
 begin
   env^.DeleteGlobalRef(env, Layout);
 end;
 
-Procedure jForm_SetVisibility (env:PJNIEnv; this:jobject; Form : jObject; visible : boolean);
-Const
- _cFuncName = 'jForm_SetVisible';
- _cFuncSig  = '(Ljava/lang/Object;Z)V';
-Var
- _jMethod : jMethodID = nil;
- _jParams : array[0..1] of jValue;
-begin
- jClassMethod(_cFuncName,_cFuncSig,env,gjClass,_jMethod);
- _jParams[0].l := Form;
- _jParams[1].z := JBool(visible);
- env^.CallVoidMethodA(env,this,_jMethod,@_jParams);
-end;
-
-Procedure jForm_SetVisibility2(env:PJNIEnv;this:jobject; Form : jObject; visible : boolean);
+Procedure jForm_SetVisibility2(env:PJNIEnv;Form : jObject; visible : boolean);
 var
    cls: jClass;
    method: jmethodID;
@@ -4163,22 +3998,8 @@ begin
     env^.CallVoidMethodA(env, Form, method, @_jParams);
 end;
 
-Procedure jForm_SetEnabled(env:PJNIEnv;this:jobject; Form : jObject; enabled : Boolean);
-Const
- _cFuncName = 'jForm_SetEnabled';
- _cFuncSig  = '(Ljava/lang/Object;Z)V';
-Var
- _jMethod : jMethodID = nil;
- _jParams : array[0..1] of jValue;
-begin
- jClassMethod(_cFuncName,_cFuncSig,env,gjClass,_jMethod);
- _jParams[0].l := Form;
- _jParams[1].z := JBool(enabled);
- env^.CallVoidMethodA(env,this,_jMethod,@_jParams);
-end;
-
  //by jmpessoa
-Procedure jForm_SetEnabled2(env:PJNIEnv;this:jobject; Form : jObject; enabled : Boolean);
+Procedure jForm_SetEnabled2(env:PJNIEnv;Form : jObject; enabled : Boolean);
 var
    cls: jClass;
    method: jmethodID;
@@ -4191,7 +4012,7 @@ begin
 end;
 
 //by jmpessoa
-procedure jForm_ShowMessage(env:PJNIEnv; this:jobject; Form:jObject; msg: string);
+procedure jForm_ShowMessage(env:PJNIEnv; Form:jObject; msg: string);
 var
    cls: jClass;
    method: jmethodID;
@@ -4205,7 +4026,7 @@ begin
 end;
 
 //by jmpessoa
-function jForm_GetDateTime(env:PJNIEnv; this:jobject; Form:jObject): string;
+function jForm_GetDateTime(env:PJNIEnv; Form:jObject): string;
 var
   _jString: jString;
   _jBoolean: jBoolean;
@@ -4224,7 +4045,7 @@ begin
   end;
 end;
 
-procedure jForm_SetWifiEnabled(env: PJNIEnv; this: JObject; _jform: JObject; _status: boolean);
+procedure jForm_SetWifiEnabled(env: PJNIEnv; _jform: JObject; _status: boolean);
 var
   jParams: array[0..0] of jValue;
   jMethod: jMethodID=nil;
@@ -4236,8 +4057,7 @@ begin
   env^.CallVoidMethodA(env, _jform, jMethod, @jParams);
 end;
 
-
-function jForm_IsWifiEnabled(env: PJNIEnv; this: JObject; _jform: JObject): boolean;
+function jForm_IsWifiEnabled(env: PJNIEnv; _jform: JObject): boolean;
 var
   jBoo: JBoolean;
   jMethod: jMethodID=nil;
@@ -4249,7 +4069,7 @@ begin
   Result:= boolean(jBoo);
 end;
 
-function jForm_GetEnvironmentDirectoryPath(env: PJNIEnv; this: JObject; _jform: JObject; _directory: integer): string;
+function jForm_GetEnvironmentDirectoryPath(env: PJNIEnv; _jform: JObject; _directory: integer): string;
 var
   _jParams: array[0..0] of jValue;
  _cls: jClass;
@@ -4270,7 +4090,7 @@ begin
   end;
 end;
 
-function jForm_GetInternalAppStoragePath(env: PJNIEnv; this: JObject; _jform: JObject): string;
+function jForm_GetInternalAppStoragePath(env: PJNIEnv; _jform: JObject): string;
 var
  _cls: jClass;
  _jMethod : jMethodID = nil;
@@ -4289,7 +4109,7 @@ begin
   end;
 end;
 
-function jForm_CopyFile(env: PJNIEnv; this: JObject; _jform: JObject; _srcFullName: string; _destFullName: string): boolean;
+function jForm_CopyFile(env: PJNIEnv; _jform: JObject; _srcFullName: string; _destFullName: string): boolean;
 var
    _jBoo: JBoolean;
    _jCls: jClass;
@@ -4306,7 +4126,7 @@ begin
   Result:= boolean(_jBoo);
 end;
 
-function jForm_LoadFromAssets(env: PJNIEnv; this: JObject; _jform: JObject; _fileName: string): string;
+function jForm_LoadFromAssets(env: PJNIEnv; _jform: JObject; _fileName: string): string;
 var
    _jString: jString;
    _jBoolean: JBoolean;
@@ -4328,7 +4148,7 @@ begin
   env^.DeleteLocalRef(env,_jParams[0].l);
 end;
 
-function jForm_IsSdCardMounted(env: PJNIEnv; this: JObject; _jform: JObject): boolean;
+function jForm_IsSdCardMounted(env: PJNIEnv; _jform: JObject): boolean;
 var
    _jBoo: JBoolean;
    _jCls: jClass;
@@ -4341,28 +4161,11 @@ begin
 end;
 
 //------------------------------------------------------------------------------
-// View
+// View  - generics - "controls.java"
 //------------------------------------------------------------------------------
 
-Procedure jView_SetVisible(env:PJNIEnv;this:jobject; view : jObject; visible : Boolean);
-Const
- _cFuncName = 'view_SetVisible';
- _cFuncSig  = '(Landroid/view/View;I)V';
-Var
- _jMethod : jMethodID = nil;
- _jParams : Array[0..1] of jValue;
-begin
- jClassMethod(_cFuncName,_cFuncSig,env,gjClass,_jMethod);
- _jParams[0].l := view;
- case visible of
-   True  : _jParams[1].i := 0; //
-   False : _jParams[1].i := 4; //
- end;
- env^.CallVoidMethodA(env,this,_jMethod,@_jParams);
-end;
-
 //by jmpessoa
-Procedure jView_SetVisible2(env:PJNIEnv; this:jobject; view : jObject; visible : Boolean);
+Procedure View_SetVisible(env:PJNIEnv; this:jobject; view : jObject; visible : Boolean);
 var
   method: jmethodID;
   _jParams : array[0..1] of jValue;
@@ -4374,27 +4177,28 @@ begin
     False : _jParams[1].i := 4; //
   end;
   cls:= Get_gjClass(env);
-  method:= env^.GetMethodID(env, cls, 'jView_SetVisible2', '(Landroid/view/View;I)V');
+  method:= env^.GetMethodID(env, cls, 'view_SetVisible', '(Landroid/view/View;I)V');
+  env^.CallVoidMethodA(env, this, method, @_jParams);
+end;
+
+Procedure View_SetVisible(env:PJNIEnv; view: jObject; visible: Boolean);
+var
+  method: jmethodID;
+  _jParams : array[0..0] of jValue;
+    cls: jClass;
+begin
+  case visible of
+    True  : _jParams[0].i := 0; //
+    False : _jParams[0].i := 4; //
+  end;
+  cls:= env^.GetObjectClass(env, view);
+  method:= env^.GetMethodID(env, cls, 'setVisibility', '(I)V');
   env^.CallVoidMethodA(env, view, method, @_jParams);
 end;
 
-//
-Procedure jView_SetBackGroundColor (env:PJNIEnv;this:jobject; view : jObject; color : DWord);
-Const
- _cFuncName = 'view_SetBackGroundColor';
- _cFuncSig  = '(Landroid/view/View;I)V';
-Var
- _jMethod : jMethodID = nil;
- _jParams : Array[0..1] of jValue;
-begin
- jClassMethod(_cFuncName,_cFuncSig,env,gjClass,_jMethod);
- _jParams[0].l := view;
- _jParams[1].i := color;
- env^.CallVoidMethodA(env,this,_jMethod,@_jParams);
-end;
 
 //by jmpessoa
-Procedure jView_SetBackGroundColor2(env:PJNIEnv;this:jobject; view : jObject; color : DWord);
+Procedure View_SetBackGroundColor(env:PJNIEnv;this:jobject; view : jObject; color : DWord);
 var
  _jMethod : jMethodID = nil;
  _jParams : Array[0..1] of jValue;
@@ -4407,22 +4211,19 @@ begin
  env^.CallVoidMethodA(env,this,_jMethod,@_jParams);
 end;
 
-//
-Procedure jView_Invalidate (env:PJNIEnv;this:jobject; view : jObject);
-Const
- _cFuncName = 'view_Invalidate';
- _cFuncSig  = '(Landroid/view/View;)V';
-Var
+Procedure View_SetBackGroundColor(env:PJNIEnv; view : jObject; color : DWord);
+var
  _jMethod : jMethodID = nil;
- _jParam  : jValue;
+ _jParams : Array[0..0] of jValue;
+  cls: jClass;
 begin
- jClassMethod(_cFuncName,_cFuncSig,env,gjClass,_jMethod);
- _jParam.l := view;
- env^.CallVoidMethodA(env,this,_jMethod,@_jParam);
+ _jParams[0].i := color;
+ cls:= env^.GetObjectClass(env, view);
+ _jMethod:= env^.GetMethodID(env, cls, 'setBackgroundColor', '(I)V');
+ env^.CallVoidMethodA(env,view,_jMethod,@_jParams);
 end;
 
-//by jmpessoa
-Procedure jView_Invalidate2(env:PJNIEnv;this:jobject; view : jObject);
+Procedure View_Invalidate(env:PJNIEnv;this:jobject; view : jObject);
 var
  _jMethod : jMethodID = nil;
  _jParam  : jValue;
@@ -4434,56 +4235,17 @@ begin
  env^.CallVoidMethodA(env,this,_jMethod,@_jParam);
 end;
 
-//by jmpessoa
-function jView_getLParamHeight(env:PJNIEnv;this:jobject; View : jObject ): integer;
-Const
- _cFuncName = 'jView_getLParamHeight';
- _cFuncSig  = '(Ljava/lang/Object;)I';
-Var
- _jMethod : jMethodID = nil;
- _jParams : jValue;
-begin
- jClassMethod(_cFuncName,_cFuncSig,env,gjClass,_jMethod);
- _jParams.l := View;
- Result     := env^.CallIntMethodA(env,this,_jMethod,@_jParams);
-end;
-
-//by jmpessoa
-function jView_getLParamHeight2(env:PJNIEnv;this:jobject; View : jObject ): integer;
+Procedure View_Invalidate(env:PJNIEnv;  view : jObject);
 var
- _jMethod: jMethodID = nil;
- cls: jClass;
-begin
-  cls:= env^.GetObjectClass(env, View);
- _jMethod:= env^.GetMethodID(env, cls, 'getLParamHeight', '()I');
- Result:= env^.CallIntMethod(env,View,_jMethod);
-end;
-
-//by jmpessoa
-function jView_getLParamWidth(env:PJNIEnv;this:jobject; View : jObject): integer;
-Const
- _cFuncName = 'jView_getLParamWidth';
- _cFuncSig  = '(Ljava/lang/Object;)I';
-Var
- _jMethod : jMethodID = nil;
- _jParams : jValue;
-begin
- jClassMethod(_cFuncName,_cFuncSig,env,gjClass,_jMethod);
- _jParams.l := View;
- Result     := env^.CallIntMethodA(env,this,_jMethod,@_jParams);
-end;
-
-function jView_getLParamWidth2(env:PJNIEnv;this:jobject; View : jObject): integer;
-Var
  _jMethod : jMethodID = nil;
  cls: jClass;
 begin
-  cls := env^.GetObjectClass(env, View);
-_jMethod:= env^.GetMethodID(env, cls, 'getLParamWidth', '()I');
- Result     := env^.CallIntMethod(env,View,_jMethod);
+  cls:= env^.GetObjectClass(env, view);
+ _jMethod:= env^.GetMethodID(env, cls, 'invalidate', '()V');
+ env^.CallVoidMethod(env,view,_jMethod);
 end;
 
-//--------
+//------------------------------
 function JBool( Bool : Boolean ) : byte;
  begin
   Case Bool of
@@ -4511,7 +4273,6 @@ Function  jSysInfo_ScreenWH (env:PJNIEnv;this:jobject;context : jObject) : TWH;
   _wh           := env^.CallIntMethodA(env,this,_jMethod,@_jParam);
   Result.Width  := (_wh shr 16);
   Result.Height := (_wh and $0000FFFF);
-  //dbg('Screen : ' + IntToStr(Result.Width) + 'x' + IntTostr(Result.Height));
  end;
 
 // "/data/app/com.kredix-1.apk"
@@ -4537,7 +4298,6 @@ Function  jSysInfo_PathApp(env:PJNIEnv; this:jobject; context : jObject; AppName
            Result    := String( env^.GetStringUTFChars(Env,_jString,@_jBoolean) );
           end;
   end;
- // dbg('PathApp:'+ Result);
  end;
 
 // "/data/data/com.kredix/files"
@@ -4561,7 +4321,6 @@ Function  jSysInfo_PathDat  (env:PJNIEnv; this:jobject; context : jObject) : Str
            Result    := String( env^.GetStringUTFChars(Env,_jString,@_jBoolean) );
           end;
   end;
-  //dbg('PathDat:'+ Result);
  end;
 
 //by jmpessoa
@@ -4585,7 +4344,6 @@ begin
           Result    := String( env^.GetStringUTFChars(Env,_jString,@_jBoolean) );
          end;
  end;
- //dbg('PathDataBase:'+ Result);
 end;
 
 Function  jSysInfo_PathExt             (env:PJNIEnv;this:jobject) : String;
@@ -4606,7 +4364,6 @@ Function  jSysInfo_PathExt             (env:PJNIEnv;this:jobject) : String;
            Result    := String( env^.GetStringUTFChars(Env,_jString,@_jBoolean) );
           end;
   end;
-  //dbg('PathExt:'+ Result);
  end;
 
 Function  jSysInfo_PathDCIM            (env:PJNIEnv;this:jobject) : String;
@@ -4627,7 +4384,6 @@ Function  jSysInfo_PathDCIM            (env:PJNIEnv;this:jobject) : String;
            Result    := String( env^.GetStringUTFChars(Env,_jString,@_jBoolean) );
           end;
   end;
- // dbg('PathDCIM:'+ Result);
  end;
 
 //by thierrydijoux
@@ -4650,7 +4406,6 @@ begin
           Result    := String( env^.GetStringUTFChars(Env,_jString,@_jBoolean) );
          end;
  end;
- //dbg('Language:'+ Result);
 end;
 
 //------------------------------------------------------------------------------
@@ -4675,7 +4430,6 @@ Function  jSysInfo_DevicePhoneNumber(env:PJNIEnv;this:jobject) : String;
            Result    := string( env^.GetStringUTFChars(Env,_jString, @_jBoolean) );
           end;
   end;
- // dbg('PhoneNumber:'+ Result);
  end;
 
 Function  jSysInfo_DeviceID(env:PJNIEnv;this:jobject) : String;
@@ -4696,10 +4450,7 @@ Function  jSysInfo_DeviceID(env:PJNIEnv;this:jobject) : String;
            Result    := String( env^.GetStringUTFChars(Env,_jString,@_jBoolean) );
           end;
   end;
-  //dbg('DeviceID:'+ Result);
  end;
-
-//-------------
 
 Procedure jSystem_SetOrientation(env:PJNIEnv; this:jobject; orientation : Integer);
 const
@@ -4712,7 +4463,6 @@ begin
  jClassMethod(_cFuncName,_cFuncSig,env,gjClass,_jMethod);
  _jParam.i := orientation;
  env^.CallVoidMethodA(env,this,_jMethod,@_jParam);
- //dbg('loasdf');
 end;
 
 //by jmpessoa
@@ -4747,378 +4497,6 @@ begin
   begin       //a jmethodID is not an object. So don't need to convert it to a GlobalRef!
     Method_:= env^.GetMethodID( env, Class_ , FuncName, FuncSig);
   end;
-end;
-
-//by jmpessoa
-function Get_gjClass(env: PJNIEnv): jClass;
-begin
-  if gjClass {global} = nil then
-  begin
-     gjClass:= jClass(env^.FindClass(env, gjClassName {global}));
-     if gjClass <> nil then gjClass := env^.NewGlobalRef(env, gjClass); //needed for Appi > 13
-  end;
-  Result:= gjClass;
-end;
-
-//------------------------------------------------------------------------------
-// View
-//------------------------------------------------------------------------------
-
-Function  jView_Create  (env:PJNIEnv;this:jobject;
-                         context : jObject; SelfObj : TObject) : jObject;
- Const
-  _cFuncName = 'jView_Create';
-  _cFuncSig  = '(Landroid/content/Context;J)Ljava/lang/Object;';
- Var
-  _jMethod : jMethodID = nil;
-  _jParams : array[0..1] of jValue;
- begin
-  jClassMethod(_cFuncName,_cFuncSig,env,gjClass,_jMethod);
-  _jParams[0].l := context;
-  _jParams[1].j := Int64(SelfObj);
-  Result := env^.CallObjectMethodA(env,this,_jMethod,@_jParams);
-  Result := env^.NewGlobalRef(env,Result);
- end;
-
-//by jmpessoa
-function jView_Create2(env: PJNIEnv; this:jobject;  SelfObj: TObject): jObject;
-var
- _jMethod : jMethodID = nil;
- _jParams : array[0..0] of jValue;
- cls: jClass;
-begin
-  cls:= Get_gjClass(env); {global}          {warning: a jmethodID is not an object. So don't need to convert it to a GlobalRef!}
-  _jMethod:= env^.GetMethodID(env, cls, 'jView_Create2', '(J)Ljava/lang/Object;');
-  _jParams[0].j := Int64(SelfObj);
-  Result := env^.CallObjectMethodA(env, this, _jMethod,@_jParams);
-  Result := env^.NewGlobalRef(env,Result);
-end;
-
-//
-Procedure jView_Free   (env:PJNIEnv;this:jobject; View : jObject);
-  Const
-   _cFuncName = 'jView_Free';
-   _cFuncSig  = '(Ljava/lang/Object;)V';
-  Var
-   _jMethod : jMethodID = nil;
-   _jParams : jValue;
-  begin
-   jClassMethod(_cFuncName,_cFuncSig,env,gjClass,_jMethod);
-   _jParams.l := View;
-   env^.CallVoidMethodA(env,this,_jMethod,@_jParams);
-   env^.DeleteGlobalRef(env,View);
-  end;
-
-//by jmpessoa
-Procedure jView_Free2(env:PJNIEnv;this:jobject; View : jObject);
-var
-   _jMethod : jMethodID = nil;
-   cls: jClass;
-begin
-    cls := env^.GetObjectClass(env, View);
-   _jMethod:= env^.GetMethodID(env, cls, 'Free', '()V');
-   env^.CallVoidMethod(env,View,_jMethod);
-   env^.DeleteGlobalRef(env,View);
-end;
-
-//
-Procedure jView_setXYWH(env:PJNIEnv;this:jobject;
-                        View : jObject;x,y,w,h : integer);
- Const
-  _cFuncName = 'jView_setXYWH';
-  _cFuncSig  = '(Ljava/lang/Object;IIII)V';
- Var
-  _jMethod : jMethodID = nil;
-  _jParams : array[0..4] of jValue;
- begin
-  jClassMethod(_cFuncName,_cFuncSig,env,gjClass,_jMethod);
-  _jParams[0].l := View;
-  _jParams[1].i := x;
-  _jParams[2].i := y;
-  _jParams[3].i := w;
-  _jParams[4].i := h;
-  env^.CallVoidMethodA(env,this,_jMethod,@_jParams);
- end;
-
-Procedure jView_setLeftTopRightBottomWidthHeight(env:PJNIEnv;this:jobject;
-                                        View : jObject; ml,mt,mr,mb,w,h: integer);
-Const
- _cFuncName = 'jView_setLeftTopRightBottomWidthHeight';
- _cFuncSig  = '(Ljava/lang/Object;IIIIII)V';
-Var
- _jMethod : jMethodID = nil;
- _jParams : array[0..6] of jValue;
-begin
- jClassMethod(_cFuncName,_cFuncSig,env,gjClass,_jMethod);
- _jParams[0].l := View;
- _jParams[1].i := ml;
- _jParams[2].i := mt;
- _jParams[3].i := mr;
- _jParams[4].i := mb;
- _jParams[5].i := w;
- _jParams[6].i := h;
- env^.CallVoidMethodA(env,this,_jMethod,@_jParams);
-end;
-
-//
-Procedure jView_setParent(env:PJNIEnv;this:jobject;
-                          View : jObject;ViewGroup : jObject);
- Const
-  _cFuncName = 'jView_setParent';
-  _cFuncSig  = '(Ljava/lang/Object;Landroid/view/ViewGroup;)V';
- Var
-  _jMethod : jMethodID = nil;
-  _jParams : array[0..1] of jValue;
- begin
-  jClassMethod(_cFuncName,_cFuncSig,env,gjClass,_jMethod);
-  _jParams[0].l := View;
-  _jParams[1].l := ViewGroup;
-  env^.CallVoidMethodA(env,this,_jMethod,@_jParams);
- end;
-
-//
-Procedure jView_setjCanvas(env:PJNIEnv; this:jobject;
-                           View : jObject;jCanvas : jObject);
- Const
-  _cFuncName = 'jView_setjCanvas';
-  _cFuncSig  = '(Ljava/lang/Object;Ljava/lang/Object;)V';
- Var
-  _jMethod : jMethodID = nil;
-  _jParams : array[0..1] of jValue;
- begin
-  jClassMethod(_cFuncName,_cFuncSig,env,gjClass,_jMethod);
-  _jParams[0].l := View;
-  _jParams[1].l := jCanvas;
-  env^.CallVoidMethodA(env,this,_jMethod,@_jParams);
- end;
-
-Procedure jView_setjCanvas2(env:PJNIEnv; this:jobject;
-                           View : jObject;jCanvas : jObject);
-var
-  _jMethod : jMethodID = nil;
-  _jParams : array[0..0] of jValue;
-  cls: jClass;
-begin
-  _jParams[0].l := jCanvas;
-   cls := env^.GetObjectClass(env, View);
- _jMethod:= env^.GetMethodID(env, cls, 'setjCanvas', '(Ljava/lang/Object;)V');
-  env^.CallVoidMethodA(env,View,_jMethod,@_jParams);
-end;
-
-// LORDMAN 2013-08-14
-Procedure jView_viewSave (env:PJNIEnv; this:jobject;
-                          View : jObject; Filename : String);
-Const
- _cFuncName = 'jView_saveView';
- _cFuncSig  = '(Ljava/lang/Object;Ljava/lang/String;)V';
-Var
- _jMethod : jMethodID = nil;
- _jParams : Array[0..1] of jValue;
-begin
- jClassMethod(_cFuncName,_cFuncSig,env,gjClass,_jMethod);
- _jParams[0].l := View;
- _jParams[1].l := env^.NewStringUTF(env, pchar(Filename) );
- env^.CallVoidMethodA(env,this,_jMethod,@_jParams);
- env^.DeleteLocalRef(env,_jParams[1].l);
-end;
-
-Procedure jView_viewSave2(env:PJNIEnv; this:jobject;
-                          View : jObject; Filename : String);
-var
- _jMethod : jMethodID = nil;
- _jParams : Array[0..0] of jValue;
- cls: jClass;
-begin
- _jParams[0].l := env^.NewStringUTF(env, pchar(Filename) );
-   cls := env^.GetObjectClass(env, View);
- _jMethod:= env^.GetMethodID(env, cls, 'saveView2', '(Ljava/lang/String;)V');
- env^.CallVoidMethodA(env,View,_jMethod,@_jParams);
- env^.DeleteLocalRef(env,_jParams[0].l);
-end;
-
-
-//by jmpessoa
-Procedure jView_setId(env:PJNIEnv;this:jobject; View : jObject; id: DWord);
-Const
- _cFuncName = 'jView_setId';
- _cFuncSig  = '(Ljava/lang/Object;I)V';
-Var
- _jMethod : jMethodID = nil;
- _jParams : array[0..1] of jValue;
-begin
- jClassMethod(_cFuncName,_cFuncSig,env,gjClass,_jMethod);
- _jParams[0].l := View;
- _jParams[1].i := id;
- env^.CallVoidMethodA(env,this,_jMethod,@_jParams);
-end;
-
-Procedure jView_setMarginLeft(env:PJNIEnv;this:jobject; View: jObject; x: DWord);
-Const
- _cFuncName = 'jView_setMarginLeft';
- _cFuncSig  = '(Ljava/lang/Object;I)V';
-Var
- _jMethod : jMethodID = nil;
- _jParams : array[0..1] of jValue;
-begin
- jClassMethod(_cFuncName,_cFuncSig,env,gjClass,_jMethod);
- _jParams[0].l := View;
- _jParams[1].i := x;
- env^.CallVoidMethodA(env,this,_jMethod,@_jParams);
-end;
-
-//by jmpessoa
-Procedure jView_setMarginTop(env:PJNIEnv;this:jobject; View: jObject; y: DWord);
-Const
- _cFuncName = 'jView_setMarginTop';
- _cFuncSig  = '(Ljava/lang/Object;I)V';
-Var
- _jMethod : jMethodID = nil;
- _jParams : array[0..1] of jValue;
-begin
- jClassMethod(_cFuncName,_cFuncSig,env,gjClass,_jMethod);
- _jParams[0].l := View;
- _jParams[1].i := y;
- env^.CallVoidMethodA(env,this,_jMethod,@_jParams);
-end;
-
-Procedure jView_setMarginRight(env:PJNIEnv;this:jobject; View: jObject; x: DWord);
-Const
- _cFuncName = 'jView_setMarginRight';
- _cFuncSig  = '(Ljava/lang/Object;I)V';
-Var
- _jMethod : jMethodID = nil;
- _jParams : array[0..1] of jValue;
-begin
- jClassMethod(_cFuncName,_cFuncSig,env,gjClass,_jMethod);
- _jParams[0].l := View;
- _jParams[1].i := x;
- env^.CallVoidMethodA(env,this,_jMethod,@_jParams);
-end;
-
-//by jmpessoa
-Procedure jView_setMarginBottom(env:PJNIEnv;this:jobject; View: jObject; y: DWord);
-Const
- _cFuncName = 'jView_setMarginBottom';
- _cFuncSig  = '(Ljava/lang/Object;I)V';
-Var
- _jMethod : jMethodID = nil;
- _jParams : array[0..1] of jValue;
-begin
- jClassMethod(_cFuncName,_cFuncSig,env,gjClass,_jMethod);
- _jParams[0].l := View;
- _jParams[1].i := y;
- env^.CallVoidMethodA(env,this,_jMethod,@_jParams);
-end;
-
-//by jmpessoa
-Procedure jView_setLParamWidth2(env:PJNIEnv;this:jobject; View : jObject; w: DWord);
-var
- _jMethod : jMethodID = nil;
- _jParams : array[0..0] of jValue;
- cls: jClass;
-begin
- _jParams[0].i := w;
- cls := env^.GetObjectClass(env, View);
-  _jMethod:= env^.GetMethodID(env, cls, 'setLParamWidth', '(I)V');
- env^.CallVoidMethodA(env,View,_jMethod,@_jParams);
-end;
-
-Procedure jView_setLParamWidth(env:PJNIEnv;this:jobject; View : jObject; w: DWord);
-Const
- _cFuncName = 'jView_setLParamWidth';
- _cFuncSig  = '(Ljava/lang/Object;I)V';
-Var
- _jMethod : jMethodID = nil;
- _jParams : array[0..1] of jValue;
-begin
- jClassMethod(_cFuncName,_cFuncSig,env,gjClass,_jMethod);
- _jParams[0].l := View;
- _jParams[1].i := w;
- env^.CallVoidMethodA(env,this,_jMethod,@_jParams);
-end;
-
-//by jmpessoa
-Procedure jView_setLParamHeight(env:PJNIEnv;this:jobject; View : jObject; h: DWord);
-Const
- _cFuncName = 'jView_setLParamHeight';
- _cFuncSig  = '(Ljava/lang/Object;I)V';
-Var
- _jMethod : jMethodID = nil;
- _jParams : array[0..1] of jValue;
-begin
- jClassMethod(_cFuncName,_cFuncSig,env,gjClass,_jMethod);
- _jParams[0].l := View;
- _jParams[1].i := h;
- env^.CallVoidMethodA(env,this,_jMethod,@_jParams);
-end;
-
-Procedure jView_setLParamHeight2(env:PJNIEnv;this:jobject; View : jObject; h: DWord);
-var
- _jMethod : jMethodID = nil;
- _jParams : array[0..0] of jValue;
- cls: jClass;
-begin
- _jParams[0].i := h;
-  cls := env^.GetObjectClass(env, View);
-_jMethod:= env^.GetMethodID(env, cls, 'setLParamHeight', '(I)V');
- env^.CallVoidMethodA(env,View,_jMethod,@_jParams);
-end;
-
-//by jmpessoa
-Procedure jView_addLParamsParentRule(env:PJNIEnv;this:jobject; View : jObject; rule: DWord);
-Const
- _cFuncName = 'jView_addLParamsParentRule';
- _cFuncSig  = '(Ljava/lang/Object;I)V';
-Var
- _jMethod : jMethodID = nil;
- _jParams : array[0..1] of jValue;
-begin
- jClassMethod(_cFuncName,_cFuncSig,env,gjClass,_jMethod);
- _jParams[0].l := View;
- _jParams[1].i := rule;
- env^.CallVoidMethodA(env,this,_jMethod,@_jParams);
-end;
-
-//by jmpessoa
-procedure jView_addLParamsAnchorRule(env:PJNIEnv;this:jobject; View : jObject; rule: DWord);
-const
- _cFuncName = 'jView_addLParamsAnchorRule';
- _cFuncSig  = '(Ljava/lang/Object;I)V';
-var
- _jMethod : jMethodID = nil;
- _jParams : array[0..1] of jValue;
-begin
- jClassMethod(_cFuncName,_cFuncSig,env,gjClass,_jMethod);
- _jParams[0].l := View;
- _jParams[1].i := rule;
- env^.CallVoidMethodA(env,this,_jMethod,@_jParams);
-end;
-
-//by jmpessoa
-procedure jView_setLayoutAll(env:PJNIEnv;this:jobject; View : jObject;  idAnchor: DWord);
-const
- _cFuncName = 'jView_setLayoutAll';
- _cFuncSig  = '(Ljava/lang/Object;I)V';
-var
- _jMethod : jMethodID = nil;
- _jParams : array[0..1] of jValue;
-begin
- jClassMethod(_cFuncName,_cFuncSig,env,gjClass,_jMethod);
- _jParams[0].l := View;
- _jParams[1].i := idAnchor;
- env^.CallVoidMethodA(env,this,_jMethod,@_jParams);
-end;
-
-procedure jView_setLayoutAll2(env:PJNIEnv;this:jobject; View : jObject;  idAnchor: DWord);
-var
- _jMethod : jMethodID = nil;
- _jParams : array[0..0] of jValue;
- cls: jClass;
-begin
- _jParams[0].i := idAnchor;
- cls := env^.GetObjectClass(env, View);
-_jMethod:= env^.GetMethodID(env, cls, 'setLayoutAll', '(I)V');
- env^.CallVoidMethodA(env,View,_jMethod,@_jParams);
 end;
 
 end.

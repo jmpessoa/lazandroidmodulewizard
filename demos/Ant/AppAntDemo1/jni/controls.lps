@@ -8,11 +8,8 @@
       <Unit0>
         <Filename Value="controls.lpr"/>
         <IsPartOfProject Value="True"/>
-        <UnitName Value="controls"/>
         <EditorIndex Value="1"/>
-        <WindowIndex Value="0"/>
-        <TopLine Value="1"/>
-        <CursorPos X="1" Y="1"/>
+        <CursorPos X="3" Y="9"/>
         <UsageCount Value="20"/>
         <Loaded Value="True"/>
         <DefaultSyntaxHighlighter Value="Delphi"/>
@@ -21,31 +18,17 @@
         <Filename Value="unit1.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="AndroidModule1"/>
+        <HasResources Value="True"/>
         <UnitName Value="unit1"/>
         <IsVisibleTab Value="True"/>
-        <EditorIndex Value="0"/>
-        <WindowIndex Value="0"/>
-        <TopLine Value="28"/>
-        <CursorPos X="32" Y="45"/>
+        <TopLine Value="29"/>
+        <CursorPos X="20" Y="36"/>
         <UsageCount Value="20"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
         <DefaultSyntaxHighlighter Value="Delphi"/>
       </Unit1>
     </Units>
-    <General>
-      <ActiveWindowIndexAtStart Value="0"/>
-    </General>
-    <JumpHistory Count="2" HistoryIndex="1">
-      <Position1>
-        <Filename Value="unit1.pas"/>
-        <Caret Line="4" Column="8" TopLine="1"/>
-      </Position1>
-      <Position2>
-        <Filename Value="unit1.pas"/>
-        <Caret Line="40" Column="1" TopLine="20"/>
-      </Position2>
-    </JumpHistory>
+    <JumpHistory HistoryIndex="-1"/>
   </ProjectSession>
-  <EditorMacros Count="0"/>
 </CONFIG>

@@ -37,7 +37,7 @@ jSpinner = class(jVisualControl)
     procedure UpdateLParamWidth;
 
  protected
-    //
+    procedure SetParentComponent(Value: TComponent); override;
  public
     constructor Create(AOwner: TComponent); override;
     destructor  Destroy; override;
@@ -83,26 +83,26 @@ jSpinner = class(jVisualControl)
 end;
 
 function jSpinner_jCreate(env: PJNIEnv; this: JObject;_Self: int64): jObject;
-procedure jSpinner_jFree(env: PJNIEnv; this: JObject; _jspinner: JObject);
-procedure jSpinner_SetjParent(env: PJNIEnv; this: JObject; _jspinner: JObject; _viewgroup: jObject);
-procedure jSpinner_SetLParamWidth(env: PJNIEnv; this: JObject; _jspinner: JObject; _w: integer);
-procedure jSpinner_SetLParamHeight(env: PJNIEnv; this: JObject; _jspinner: JObject; _h: integer);
-procedure jSpinner_SetLeftTopRightBottomWidthHeight(env: PJNIEnv; this: JObject; _jspinner: JObject; _left: integer; _top: integer; _right: integer; _bottom: integer; _w: integer; _h: integer);
-procedure jSpinner_AddLParamsAnchorRule(env: PJNIEnv; this: JObject; _jspinner: JObject; _rule: integer);
-procedure jSpinner_AddLParamsParentRule(env: PJNIEnv; this: JObject; _jspinner: JObject; _rule: integer);
-procedure jSpinner_SetLayoutAll(env: PJNIEnv; this: JObject; _jspinner: JObject; _idAnchor: integer);
-procedure jSpinner_SetId(env: PJNIEnv; this: JObject; _jspinner: JObject; _id: integer);
-function jSpinner_GetSelectedItemPosition(env: PJNIEnv; this: JObject; _jspinner: JObject): integer;
-function jSpinner_GetSelectedItem(env: PJNIEnv; this: JObject; _jspinner: JObject): string;
-procedure jSpinner_Add(env: PJNIEnv; this: JObject; _jspinner: JObject; _item: string);
-procedure jSpinner_SetSelectedTextColor(env: PJNIEnv; this: JObject; _jspinner: JObject; _color: integer);
-procedure jSpinner_SetDropListTextColor(env: PJNIEnv; this: JObject; _jspinner: JObject; _color: integer);
-procedure jSpinner_SetDropListBackgroundColor(env: PJNIEnv; this: JObject; _jspinner: JObject; _color: integer);
-procedure jSpinner_SetLastItemAsPrompt(env: PJNIEnv; this: JObject; _jspinner: JObject; _hasPrompt: boolean);
-function jSpinner_GetSize(env: PJNIEnv; this: JObject; _jspinner: JObject): integer;
-procedure jSpinner_Delete(env: PJNIEnv; this: JObject; _jspinner: JObject; _index: integer);
-procedure jSpinner_SetSelection(env: PJNIEnv; this: JObject; _jspinner: JObject; _index: integer);
-procedure jSpinner_SetItem(env: PJNIEnv; this: JObject; _jspinner: JObject; _index: integer; _item: string);
+procedure jSpinner_jFree(env: PJNIEnv; _jspinner: JObject);
+procedure jSpinner_SetjParent(env: PJNIEnv; _jspinner: JObject; _viewgroup: jObject);
+procedure jSpinner_SetLParamWidth(env: PJNIEnv; _jspinner: JObject; _w: integer);
+procedure jSpinner_SetLParamHeight(env: PJNIEnv; _jspinner: JObject; _h: integer);
+procedure jSpinner_SetLeftTopRightBottomWidthHeight(env: PJNIEnv; _jspinner: JObject; _left: integer; _top: integer; _right: integer; _bottom: integer; _w: integer; _h: integer);
+procedure jSpinner_AddLParamsAnchorRule(env: PJNIEnv; _jspinner: JObject; _rule: integer);
+procedure jSpinner_AddLParamsParentRule(env: PJNIEnv; _jspinner: JObject; _rule: integer);
+procedure jSpinner_SetLayoutAll(env: PJNIEnv; _jspinner: JObject; _idAnchor: integer);
+procedure jSpinner_SetId(env: PJNIEnv; _jspinner: JObject; _id: integer);
+function jSpinner_GetSelectedItemPosition(env: PJNIEnv; _jspinner: JObject): integer;
+function jSpinner_GetSelectedItem(env: PJNIEnv; _jspinner: JObject): string;
+procedure jSpinner_Add(env: PJNIEnv; _jspinner: JObject; _item: string);
+procedure jSpinner_SetSelectedTextColor(env: PJNIEnv; _jspinner: JObject; _color: integer);
+procedure jSpinner_SetDropListTextColor(env: PJNIEnv; _jspinner: JObject; _color: integer);
+procedure jSpinner_SetDropListBackgroundColor(env: PJNIEnv; _jspinner: JObject; _color: integer);
+procedure jSpinner_SetLastItemAsPrompt(env: PJNIEnv; _jspinner: JObject; _hasPrompt: boolean);
+function jSpinner_GetSize(env: PJNIEnv; _jspinner: JObject): integer;
+procedure jSpinner_Delete(env: PJNIEnv; _jspinner: JObject; _index: integer);
+procedure jSpinner_SetSelection(env: PJNIEnv; _jspinner: JObject; _index: integer);
+procedure jSpinner_SetItem(env: PJNIEnv; _jspinner: JObject; _index: integer; _item: string);
 
 
 implementation
@@ -129,21 +129,27 @@ begin
   FLastItemAsPrompt:= False;
 end;
 
+procedure jSpinner.SetParentComponent(Value: TComponent);
+begin
+   inherited SetParentComponent(Value);
+   Self.Height:= 40;
+   Self.Width:= 96;
+   if Value <> nil then
+   begin
+      Parent:= TAndroidWidget(Value);
+      Self.Width:= Trunc(TAndroidWidget(Parent).Width) - 13;
+   end;
+end;
+
 destructor jSpinner.Destroy;
 begin
   if not (csDesigning in ComponentState) then
   begin
-    if jForm(Owner).App <> nil then
-    begin
-      if jForm(Owner).App.Initialized then
-      begin
         if FjObject  <> nil then
         begin
            jFree();
            FjObject := nil;
         end;
-      end;
-    end;
   end;
   //you others free code here...'
   FItems.Free;
@@ -180,9 +186,9 @@ begin
     jCustomDialog(FParent).Init(refApp);
     FjPRLayout:= jCustomDialog(FParent).View;
   end;
-  jSpinner_SetjParent(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject , FjPRLayout);
-  jSpinner_SetId(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject , Self.Id);
-  jSpinner_SetLeftTopRightBottomWidthHeight(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject ,
+  jSpinner_SetjParent(FjEnv, FjObject , FjPRLayout);
+  jSpinner_SetId(FjEnv, FjObject , Self.Id);
+  jSpinner_SetLeftTopRightBottomWidthHeight(FjEnv, FjObject ,
                         FMarginLeft,FMarginTop,FMarginRight,FMarginBottom,
                         GetLayoutParams(gApp, FLParamWidth, sdW),
                         GetLayoutParams(gApp, FLParamHeight, sdH));
@@ -196,24 +202,24 @@ begin
   begin
     if rToA in FPositionRelativeToAnchor then
     begin
-      jSpinner_AddlParamsAnchorRule(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject , GetPositionRelativeToAnchor(rToA));
+      jSpinner_AddlParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
     end;
   end;
   for rToP := rpBottom to rpCenterVertical do
   begin
     if rToP in FPositionRelativeToParent then
     begin
-      jSpinner_AddlParamsParentRule(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject , GetPositionRelativeToParent(rToP));
+      jSpinner_AddlParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
     end;
   end;
 
   if Self.Anchor <> nil then Self.AnchorId:= Self.Anchor.Id
   else Self.AnchorId:= -1;
 
-  jSpinner_setLayoutAll(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject , Self.AnchorId);
+  jSpinner_setLayoutAll(FjEnv, FjObject , Self.AnchorId);
 
   if  FColor <> colbrDefault then
-    jView_SetBackGroundColor(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject , GetARGB(FColor));
+    View_SetBackGroundColor(FjEnv, FjThis, FjObject , GetARGB(FColor));
 
   if FSelectedFontColor <> colbrDefault then
      Self.SetSelectedTextColor(GetARGB(FSelectedFontColor))
@@ -230,21 +236,21 @@ begin
 
   if (FLastItemAsPrompt) then Self.SetLastItemAsPrompt(FLastItemAsPrompt);
 
-  jView_SetVisible(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject , FVisible);
+  View_SetVisible(FjEnv, FjThis, FjObject , FVisible);
 end;
 
 procedure jSpinner.SetColor(Value: TARGBColorBridge);
 begin
   FColor:= Value;
   if (FInitialized = True) and (FColor <> colbrDefault)  then
-    jView_SetBackGroundColor(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject , GetARGB(FColor));
+    View_SetBackGroundColor(FjEnv, FjObject , GetARGB(FColor));
 end;
 
 procedure jSpinner.SetVisible(Value : Boolean);
 begin
   FVisible:= Value;
   if FInitialized then
-  jView_SetVisible(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject , FVisible);
+    View_SetVisible(FjEnv, FjObject , FVisible);
 end;
 
 {
@@ -258,7 +264,7 @@ begin
       side:= sdW
     else
       side:= sdH;
-    jSpinner_SetLParamWidth(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject , GetLayoutParams(gApp, FLParamWidth, side));
+    jSpinner_SetLParamWidth(FjEnv, FjObject , GetLayoutParams(gApp, FLParamWidth, side));
   end;
 end;
 
@@ -272,7 +278,7 @@ begin
       side:= sdH
     else
       side:= sdW;
-    jSpinner_SetLParamHeight(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject , GetLayoutParams(gApp, FLParamHeight, side));
+    jSpinner_SetLParamHeight(FjEnv, FjObject , GetLayoutParams(gApp, FLParamHeight, side));
   end;
 end;
 }
@@ -286,16 +292,16 @@ begin
     if Self.Parent is jForm then
     begin
       if jForm(Owner).Orientation = gApp.Orientation then side:= sdW else side:= sdH;
-      jSpinner_SetLParamWidth(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject , GetLayoutParams(gApp, FLParamWidth, side));
+      jSpinner_SetLParamWidth(FjEnv, FjObject , GetLayoutParams(gApp, FLParamWidth, side));
     end
     else
     begin
       if (Self.Parent as jVisualControl).LayoutParamWidth = lpMatchParent then
-        jSpinner_SetLParamWidth(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject , GetLayoutParams(gApp, FLParamWidth, sdW))
+        jSpinner_SetLParamWidth(FjEnv, FjObject , GetLayoutParams(gApp, FLParamWidth, sdW))
       else if (Self.Parent as jVisualControl).LayoutParamWidth = lpWrapContent then
-        jSpinner_SetLParamWidth(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject , GetLayoutParams(gApp, FLParamWidth, sdW))
+        jSpinner_SetLParamWidth(FjEnv, FjObject , GetLayoutParams(gApp, FLParamWidth, sdW))
       else
-        jSpinner_SetLParamWidth(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject , GetLayoutParamsByParent(Self.Parent, FLParamWidth, sdW))
+        jSpinner_SetLParamWidth(FjEnv, FjObject , GetLayoutParamsByParent(Self.Parent, FLParamWidth, sdW))
     end;
   end;
 end;
@@ -309,16 +315,16 @@ begin
     if Self.Parent is jForm then
     begin
       if jForm(Owner).Orientation = gApp.Orientation then side:= sdH else side:= sdW;
-      jSpinner_SetLParamHeight(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject , GetLayoutParams(gApp, FLParamHeight, side));
+      jSpinner_SetLParamHeight(FjEnv, FjObject , GetLayoutParams(gApp, FLParamHeight, side));
     end
     else
     begin
       if (Self.Parent as jVisualControl).LayoutParamHeight = lpMatchParent then
-        jSpinner_SetLParamHeight(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject , GetLayoutParams(gApp, FLParamHeight, sdH))
+        jSpinner_SetLParamHeight(FjEnv, FjObject , GetLayoutParams(gApp, FLParamHeight, sdH))
       else if (Self.Parent as jVisualControl).LayoutParamHeight = lpWrapContent then
-        jSpinner_SetLParamHeight(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject , GetLayoutParams(gApp, FLParamHeight, sdH))
+        jSpinner_SetLParamHeight(FjEnv, FjObject , GetLayoutParams(gApp, FLParamHeight, sdH))
       else
-        jSpinner_SetLParamHeight(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject , GetLayoutParamsByParent(Self.Parent, FLParamHeight, sdH))
+        jSpinner_SetLParamHeight(FjEnv, FjObject , GetLayoutParamsByParent(Self.Parent, FLParamHeight, sdH))
     end;
   end;
 end;
@@ -328,25 +334,25 @@ begin
   inherited UpdateLayout;
   UpdateLParamWidth;
   UpdateLParamHeight;
-  jSpinner_SetLayoutAll(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject , Self.AnchorId);
+  jSpinner_SetLayoutAll(FjEnv, FjObject , Self.AnchorId);
 end;
 
 procedure jSpinner.Refresh;
 begin
   if FInitialized then
-    jView_Invalidate(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject );
+    View_Invalidate(FjEnv, FjObject );
 end;
 
 function jSpinner.jCreate(): jObject;
 begin
-   Result:= jSpinner_jCreate(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis , int64(Self));
+   Result:= jSpinner_jCreate(FjEnv, FjThis , int64(Self));
 end;
 
 procedure jSpinner.jFree();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jSpinner_jFree(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject );
+     jSpinner_jFree(FjEnv, FjObject );
 end;
 
 procedure jSpinner.SetjParent(_viewgroup: jObject);
@@ -354,84 +360,84 @@ begin
   //in designing component state: set value here...
   FjPRLayout:= _viewgroup;
   if FInitialized then
-     jSpinner_SetjParent(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject , _viewgroup);
+     jSpinner_SetjParent(FjEnv, FjObject , _viewgroup);
 end;
 
 procedure jSpinner.SetLParamWidth(_w: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jSpinner_SetLParamWidth(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject , _w);
+     jSpinner_SetLParamWidth(FjEnv, FjObject , _w);
 end;
 
 procedure jSpinner.SetLParamHeight(_h: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jSpinner_SetLParamHeight(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject , _h);
+     jSpinner_SetLParamHeight(FjEnv, FjObject , _h);
 end;
 
 procedure jSpinner.SetLeftTopRightBottomWidthHeight(_left: integer; _top: integer; _right: integer; _bottom: integer; _w: integer; _h: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jSpinner_SetLeftTopRightBottomWidthHeight(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject , _left ,_top ,_right ,_bottom ,_w ,_h);
+     jSpinner_SetLeftTopRightBottomWidthHeight(FjEnv, FjObject , _left ,_top ,_right ,_bottom ,_w ,_h);
 end;
 
 procedure jSpinner.AddLParamsAnchorRule(_rule: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jSpinner_AddLParamsAnchorRule(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject , _rule);
+     jSpinner_AddLParamsAnchorRule(FjEnv, FjObject , _rule);
 end;
 
 procedure jSpinner.AddLParamsParentRule(_rule: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jSpinner_AddLParamsParentRule(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject , _rule);
+     jSpinner_AddLParamsParentRule(FjEnv, FjObject , _rule);
 end;
 
 procedure jSpinner.SetLayoutAll(_idAnchor: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jSpinner_SetLayoutAll(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject , _idAnchor);
+     jSpinner_SetLayoutAll(FjEnv, FjObject , _idAnchor);
 end;
 
 procedure jSpinner.SetId(_id: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jSpinner_SetId(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject , _id);
+     jSpinner_SetId(FjEnv, FjObject , _id);
 end;
 
 function jSpinner.GetSelectedItemPosition(): integer;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jSpinner_GetSelectedItemPosition(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject );
+   Result:= jSpinner_GetSelectedItemPosition(FjEnv, FjObject );
 end;
 
 function jSpinner.GetSelectedItem(): string;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jSpinner_GetSelectedItem(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject );
+   Result:= jSpinner_GetSelectedItem(FjEnv, FjObject );
 end;
 
 procedure jSpinner.Add(_item: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jSpinner_Add(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject , _item);
+     jSpinner_Add(FjEnv, FjObject , _item);
 end;
 
 procedure jSpinner.SetSelectedTextColor(_color: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jSpinner_SetSelectedTextColor(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject , _color);
+     jSpinner_SetSelectedTextColor(FjEnv, FjObject , _color);
 end;
 
 procedure jSpinner.SetDropListTextColor(_color: TARGBColorBridge{integer});
@@ -439,7 +445,7 @@ begin
   //in designing component state: set value here...
   FDropListTextColor:= _color;
   if FInitialized then
-     jSpinner_SetDropListTextColor(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject , GetARGB(_color));
+     jSpinner_SetDropListTextColor(FjEnv, FjObject , GetARGB(_color));
 end;
 
 procedure jSpinner.SetDropListBackgroundColor(_color: TARGBColorBridge{integer});
@@ -447,7 +453,7 @@ begin
   //in designing component state: set value here...
   FDropListBackgroundColor:= _color;
   if FInitialized then
-     jSpinner_SetDropListBackgroundColor(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject , GetARGB(_color));
+     jSpinner_SetDropListBackgroundColor(FjEnv, FjObject , GetARGB(_color));
 end;
 
 procedure jSpinner.SetLastItemAsPrompt(_hasPrompt: boolean);
@@ -455,35 +461,35 @@ begin
   //in designing component state: set value here...
   FLastItemAsPrompt:= _hasPrompt;
   if FInitialized then
-     jSpinner_SetLastItemAsPrompt(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject , _hasPrompt);
+     jSpinner_SetLastItemAsPrompt(FjEnv, FjObject , _hasPrompt);
 end;
 
 function jSpinner.GetSize(): integer;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jSpinner_GetSize(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject );
+   Result:= jSpinner_GetSize(FjEnv, FjObject );
 end;
 
 procedure jSpinner.Delete(_index: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jSpinner_Delete(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject , _index);
+     jSpinner_Delete(FjEnv, FjObject , _index);
 end;
 
 procedure jSpinner.SetSelection(_index: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jSpinner_SetSelection(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject , _index);
+     jSpinner_SetSelection(FjEnv, FjObject , _index);
 end;
 
 procedure jSpinner.SetItem(_index: integer; _item: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jSpinner_SetItem(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject , _index ,_item);
+     jSpinner_SetItem(FjEnv, FjObject , _index ,_item);
 end;
 
 procedure jSpinner.SetItems(Value: TStrings);
@@ -530,7 +536,7 @@ end;
 *)
 
 
-procedure jSpinner_jFree(env: PJNIEnv; this: JObject; _jspinner: JObject);
+procedure jSpinner_jFree(env: PJNIEnv; _jspinner: JObject);
 var
   jMethod: jMethodID=nil;
   jCls: jClass=nil;
@@ -541,7 +547,7 @@ begin
 end;
 
 
-procedure jSpinner_SetjParent(env: PJNIEnv; this: JObject; _jspinner: JObject; _viewgroup: jObject);
+procedure jSpinner_SetjParent(env: PJNIEnv; _jspinner: JObject; _viewgroup: jObject);
 var
   jParams: array[0..0] of jValue;
   jMethod: jMethodID=nil;
@@ -554,7 +560,7 @@ begin
 end;
 
 
-procedure jSpinner_SetLParamWidth(env: PJNIEnv; this: JObject; _jspinner: JObject; _w: integer);
+procedure jSpinner_SetLParamWidth(env: PJNIEnv; _jspinner: JObject; _w: integer);
 var
   jParams: array[0..0] of jValue;
   jMethod: jMethodID=nil;
@@ -567,7 +573,7 @@ begin
 end;
 
 
-procedure jSpinner_SetLParamHeight(env: PJNIEnv; this: JObject; _jspinner: JObject; _h: integer);
+procedure jSpinner_SetLParamHeight(env: PJNIEnv; _jspinner: JObject; _h: integer);
 var
   jParams: array[0..0] of jValue;
   jMethod: jMethodID=nil;
@@ -580,7 +586,7 @@ begin
 end;
 
 
-procedure jSpinner_SetLeftTopRightBottomWidthHeight(env: PJNIEnv; this: JObject; _jspinner: JObject; _left: integer; _top: integer; _right: integer; _bottom: integer; _w: integer; _h: integer);
+procedure jSpinner_SetLeftTopRightBottomWidthHeight(env: PJNIEnv; _jspinner: JObject; _left: integer; _top: integer; _right: integer; _bottom: integer; _w: integer; _h: integer);
 var
   jParams: array[0..5] of jValue;
   jMethod: jMethodID=nil;
@@ -598,7 +604,7 @@ begin
 end;
 
 
-procedure jSpinner_AddLParamsAnchorRule(env: PJNIEnv; this: JObject; _jspinner: JObject; _rule: integer);
+procedure jSpinner_AddLParamsAnchorRule(env: PJNIEnv; _jspinner: JObject; _rule: integer);
 var
   jParams: array[0..0] of jValue;
   jMethod: jMethodID=nil;
@@ -611,7 +617,7 @@ begin
 end;
 
 
-procedure jSpinner_AddLParamsParentRule(env: PJNIEnv; this: JObject; _jspinner: JObject; _rule: integer);
+procedure jSpinner_AddLParamsParentRule(env: PJNIEnv; _jspinner: JObject; _rule: integer);
 var
   jParams: array[0..0] of jValue;
   jMethod: jMethodID=nil;
@@ -624,7 +630,7 @@ begin
 end;
 
 
-procedure jSpinner_SetLayoutAll(env: PJNIEnv; this: JObject; _jspinner: JObject; _idAnchor: integer);
+procedure jSpinner_SetLayoutAll(env: PJNIEnv; _jspinner: JObject; _idAnchor: integer);
 var
   jParams: array[0..0] of jValue;
   jMethod: jMethodID=nil;
@@ -637,7 +643,7 @@ begin
 end;
 
 
-procedure jSpinner_SetId(env: PJNIEnv; this: JObject; _jspinner: JObject; _id: integer);
+procedure jSpinner_SetId(env: PJNIEnv; _jspinner: JObject; _id: integer);
 var
   jParams: array[0..0] of jValue;
   jMethod: jMethodID=nil;
@@ -650,7 +656,7 @@ begin
 end;
 
 
-function jSpinner_GetSelectedItemPosition(env: PJNIEnv; this: JObject; _jspinner: JObject): integer;
+function jSpinner_GetSelectedItemPosition(env: PJNIEnv; _jspinner: JObject): integer;
 var
   jMethod: jMethodID=nil;
   jCls: jClass=nil;
@@ -661,7 +667,7 @@ begin
 end;
 
 
-function jSpinner_getSelectedItem(env: PJNIEnv; this: JObject; _jspinner: JObject): string;
+function jSpinner_getSelectedItem(env: PJNIEnv; _jspinner: JObject): string;
 var
   jStr: JString;
   jBoo: JBoolean;
@@ -680,7 +686,7 @@ begin
   end;
 end;
 
-procedure jSpinner_Add(env: PJNIEnv; this: JObject; _jspinner: JObject; _item: string);
+procedure jSpinner_Add(env: PJNIEnv; _jspinner: JObject; _item: string);
 var
   jParams: array[0..0] of jValue;
   jMethod: jMethodID=nil;
@@ -695,7 +701,7 @@ begin
 end;
 
 
-procedure jSpinner_SetSelectedTextColor(env: PJNIEnv; this: JObject; _jspinner: JObject; _color: integer);
+procedure jSpinner_SetSelectedTextColor(env: PJNIEnv; _jspinner: JObject; _color: integer);
 var
   jParams: array[0..0] of jValue;
   jMethod: jMethodID=nil;
@@ -708,7 +714,7 @@ begin
 end;
 
 
-procedure jSpinner_SetDropListTextColor(env: PJNIEnv; this: JObject; _jspinner: JObject; _color: integer);
+procedure jSpinner_SetDropListTextColor(env: PJNIEnv; _jspinner: JObject; _color: integer);
 var
   jParams: array[0..0] of jValue;
   jMethod: jMethodID=nil;
@@ -720,7 +726,7 @@ begin
   env^.CallVoidMethodA(env, _jspinner, jMethod, @jParams);
 end;
 
-procedure jSpinner_SetDropListBackgroundColor(env: PJNIEnv; this: JObject; _jspinner: JObject; _color: integer);
+procedure jSpinner_SetDropListBackgroundColor(env: PJNIEnv; _jspinner: JObject; _color: integer);
 var
   jParams: array[0..0] of jValue;
   jMethod: jMethodID=nil;
@@ -733,7 +739,7 @@ begin
 end;
 
 
-procedure jSpinner_SetLastItemAsPrompt(env: PJNIEnv; this: JObject; _jspinner: JObject; _hasPrompt: boolean);
+procedure jSpinner_SetLastItemAsPrompt(env: PJNIEnv; _jspinner: JObject; _hasPrompt: boolean);
 var
   jParams: array[0..0] of jValue;
   jMethod: jMethodID=nil;
@@ -746,7 +752,7 @@ begin
 end;
 
 
-function jSpinner_GetSize(env: PJNIEnv; this: JObject; _jspinner: JObject): integer;
+function jSpinner_GetSize(env: PJNIEnv; _jspinner: JObject): integer;
 var
   jMethod: jMethodID=nil;
   jCls: jClass=nil;
@@ -757,7 +763,7 @@ begin
 end;
 
 
-procedure jSpinner_Delete(env: PJNIEnv; this: JObject; _jspinner: JObject; _index: integer);
+procedure jSpinner_Delete(env: PJNIEnv; _jspinner: JObject; _index: integer);
 var
   jParams: array[0..0] of jValue;
   jMethod: jMethodID=nil;
@@ -770,7 +776,7 @@ begin
 end;
 
 
-procedure jSpinner_SetSelection(env: PJNIEnv; this: JObject; _jspinner: JObject; _index: integer);
+procedure jSpinner_SetSelection(env: PJNIEnv; _jspinner: JObject; _index: integer);
 var
   jParams: array[0..0] of jValue;
   jMethod: jMethodID=nil;
@@ -782,7 +788,7 @@ begin
   env^.CallVoidMethodA(env, _jspinner, jMethod, @jParams);
 end;
 
-procedure jSpinner_SetItem(env: PJNIEnv; this: JObject; _jspinner: JObject; _index: integer; _item: string);
+procedure jSpinner_SetItem(env: PJNIEnv; _jspinner: JObject; _index: integer; _item: string);
 var
   jParams: array[0..1] of jValue;
   jMethod: jMethodID=nil;

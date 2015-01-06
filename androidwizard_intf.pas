@@ -6,8 +6,8 @@ interface
 
 uses
  Classes, SysUtils, FileUtil, Controls, Forms, Dialogs, Graphics,
- LCLProc, LCLType, LCLIntf, LazIDEIntf, ProjectIntf, FormEditingIntf, AndroidWidget, uFormAndroidProject,
- uformworkspace,Laz_And_Controls, FPimage;
+ LCLProc, LCLType, LCLIntf, LazIDEIntf, ProjectIntf, FormEditingIntf, uFormAndroidProject,
+ uformworkspace, FPimage, AndroidWidget;
 
 type
 
@@ -257,13 +257,10 @@ function SplitStr(var theString: string; delimiter: string): string;
 procedure GetRedGreenBlue(rgb: longInt; out Red, Green, Blue: word);
 function ToTFPColor(colbrColor: TARGBColorBridge):  TFPColor;
 
-
-
-
 implementation
 
 uses
-   Laz_And_GLESv2_Canvas, Laz_And_GLESv1_Canvas, Spinner, customdialog;
+   Laz_And_Controls, Laz_And_GLESv2_Canvas, Laz_And_GLESv1_Canvas, Spinner, customdialog;
 
 procedure Register;
 begin
@@ -420,11 +417,10 @@ procedure TAndroidWidgetMediator.Paint;
           Brush.Color:= FPColorToTColor(fpcolor);
         end
         else
+        begin
           Brush.Color:= clBlack;
-
+        end;
         Rectangle(0,0,AWidget.Width,AWidget.Height); // outer frame
-        //Font.Color:= clMedGray;
-        //TextOut(5,4,(AWidget as TAndroidWidget).Text);
       end else if (AWidget is jPanel) then
       begin
         if (AWidget as jPanel).BackgroundColor <> colbrDefault then
@@ -497,7 +493,6 @@ procedure TAndroidWidgetMediator.Paint;
           Brush.Color:= clNone; //clMoneyGreen;
           Brush.Style:= bsClear;
         end;
-
         Pen.Color:= clMedGray;
         //FillRect(0,0,AWidget.Width,AWidget.Height);
         Rectangle(0,0,AWidget.Width,AWidget.Height); // outer frame
@@ -505,7 +500,6 @@ procedure TAndroidWidgetMediator.Paint;
         TextOut(5,4,(AWidget as jVisualControl).Text);
       end else if (AWidget is jWebView) then
       begin
-
         fWidget:= TDraftWebView.Create;
         fWidget.Height:= AWidget.Height;
         fWidget.Width:= AWidget.Width;
@@ -536,20 +530,22 @@ procedure TAndroidWidgetMediator.Paint;
         //TextOut(5,4,(AWidget as jVisualControl).Text);
       end else if (AWidget is jCanvasES1) then
       begin
-         Brush.Color:= clNone;
+        Brush.Color:= clMoneyGreen; //clNone;
+        Brush.Style:= bsClear;
+        Pen.Color:= clMedGray;
+        Rectangle(0,0,AWidget.Width,AWidget.Height); // outer frame
+        Font.Color:= clMedGray;
+        TextOut(5,4,(AWidget as jVisualControl).Text);
+
+      end else if (AWidget is jCanvasES2) then
+      begin
+         Brush.Color:= clMoneyGreen;//clNone;
          Brush.Style:= bsClear;
          Pen.Color:= clMedGray;
          Rectangle(0,0,AWidget.Width,AWidget.Height); // outer frame
          Font.Color:= clMedGray;
          TextOut(5,4,(AWidget as jVisualControl).Text);
-       end else if (AWidget is jCanvasES2) then
-       begin
-         Brush.Color:= clNone;
-         Brush.Style:= bsClear;
-         Pen.Color:= clMedGray;
-         Rectangle(0,0,AWidget.Width,AWidget.Height); // outer frame
-         Font.Color:= clMedGray;
-         TextOut(5,4,(AWidget as jVisualControl).Text);
+
       end else if (AWidget is jTextView) then
       begin
         fWidget:= TDraftTextView.Create;
@@ -830,7 +826,7 @@ var
   i: integer;
 begin
   //fix by Leledumbo - for linux compatility
-  i:= Pos('src',fullPath);
+  i:= Pos('src'+DirectorySeparator,fullPath);
   if i > 2 then
     Result:= Copy(fullPath,1,i - 2)// we don't need the trailing slash
   else raise Exception.Create('src folder not found...');

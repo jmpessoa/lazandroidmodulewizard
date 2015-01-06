@@ -622,8 +622,9 @@ begin
   with APKProcess do
   begin
     Dir:= Self.JNIProjectPath;  //controls.lpi
-    CommandLine:= CmdShell + IncludeTrailingBackslash(PathToLazbuild) +
-                       DirectorySeparator + 'lazbuild controls.lpi';     //TODO: : [by jmpessoa] CommandLine need fix: deprecated!
+
+    //TODO: : [by jmpessoa] CommandLine need fix: deprecated!
+    CommandLine:= CmdShell + IncludeTrailingBackslash(PathToLazbuild) + 'lazbuild controls.lpi';
 
    (* TODO: [by jmpessoa]  test it!
      Executable:= 'lazbuild'
@@ -716,7 +717,6 @@ begin
   if Assigned(APKProcess) then
     if not APKProcess.IsTerminated then
       APKProcess.Terminate;
-
 end;
 
 procedure TfrmLazAndroidToolsExpert.ShowProcOutput(AOutput: TStrings);
@@ -785,8 +785,7 @@ begin
 
     Env.Add('JAVA_HOME=' + JdkPath);
     Dir:= ProjectPath;
-    CommandLine:= CmdShell + IncludeTrailingBackslash(AntPath) +
-                       DirectorySeparator + 'ant '+ antkMode;     //TODO: : [by jmpessoa] CommandLine need fix: deprecated!
+    CommandLine:= CmdShell + IncludeTrailingBackslash(AntPath) +'ant '+ antkMode;     //TODO: : [by jmpessoa] CommandLine need fix: deprecated!
     (* TODO: [by jmpessoa]  test it!
      Executable:= 'ant'
      Parameters.Add('-Dtouchtest.enabled=true');

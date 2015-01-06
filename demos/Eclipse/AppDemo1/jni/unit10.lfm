@@ -11,9 +11,9 @@ object AndroidModule10: TAndroidModule10
   OnCreate = DataModuleCreate
   ActivityMode = actRecyclable
   BackgroundColor = colbrBlack
-  OnCloseQuery = DataModuleCloseQuery
+  OnCloseQuery = AndroidModule10CloseQuery
   OnRotate = DataModuleRotate
-  OnJNIPrompt = DataModuleJNIPrompt
+  OnJNIPrompt = AndroidModule10JNIPrompt
   object jTextView1: jTextView
     Left = 96
     Top = 16
@@ -34,6 +34,7 @@ object AndroidModule10: TAndroidModule10
     BackgroundColor = colbrDefault
     FontColor = colbrSilver
     FontSize = 0
+    TextTypeFace = tfNormal
     Id = 19240
   end
   object jCanvasES1_1: jCanvasES1
@@ -55,10 +56,6 @@ object AndroidModule10: TAndroidModule10
     OnGLCreate = jCanvasES1_1GLCreate
     OnGLChange = jCanvasES1_1GLChange
     OnGLDraw = jCanvasES1_1GLDraw
-    OnGLThread = jCanvasES1_1GLThread
-    OnGLDown = jCanvasES1_1GLDown
-    OnGLMove = jCanvasES1_1GLMove
-    OnGLUp = jCanvasES1_1GLUp
     AutoRefresh = True
     Images = jImageList1
     Id = 31633
@@ -72,7 +69,7 @@ object AndroidModule10: TAndroidModule10
     MarginTop = 5
     MarginRight = 5
     MarginBottom = 5
-    Text = 'Start/Stop'
+    Text = 'Fast--'
     Visible = True
     Anchor = jTextView1
     PosRelativeToAnchor = [raBelow]
@@ -116,7 +113,7 @@ object AndroidModule10: TAndroidModule10
     MarginTop = 5
     MarginRight = 5
     MarginBottom = 5
-    Text = 'Request GLThread'
+    Text = 'Say Hello...'
     Visible = True
     Anchor = jCanvasES1_1
     PosRelativeToAnchor = [raBelow]
@@ -129,29 +126,6 @@ object AndroidModule10: TAndroidModule10
     OnClick = jButton3Click
     Id = 34322
   end
-  object jTextView2: jTextView
-    Left = 104
-    Top = 432
-    Width = 135
-    Height = 25
-    MarginLeft = 10
-    MarginTop = 10
-    MarginRight = 10
-    MarginBottom = 10
-    Text = 'Auto: Off'
-    Visible = True
-    Anchor = jButton3
-    PosRelativeToAnchor = [raBelow]
-    PosRelativeToParent = [rpLeft]
-    LayoutParamWidth = lpWrapContent
-    LayoutParamHeight = lpWrapContent
-    Alignment = taLeft
-    Enabled = True
-    BackgroundColor = colbrDefault
-    FontColor = colbrSilver
-    FontSize = 0
-    Id = 0
-  end
   object jImageList1: jImageList
     Images.Strings = (
       'texture_background.png'
@@ -162,12 +136,5 @@ object AndroidModule10: TAndroidModule10
     )
     left = 224
     top = 168
-  end
-  object jTimer1: jTimer
-    Enabled = False
-    Interval = 20
-    OnTimer = jTimer1Timer
-    left = 13
-    top = 14
   end
 end

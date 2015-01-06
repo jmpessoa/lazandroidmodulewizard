@@ -58,6 +58,7 @@ object AndroidModule1: TAndroidModule1
     BackgroundColor = colbrDefault
     FontColor = colbrSpringGreen
     FontSize = 0
+    TextTypeFace = tfNormal
     Id = 7951916
   end
   object jTextView2: jTextView
@@ -81,29 +82,30 @@ object AndroidModule1: TAndroidModule1
     BackgroundColor = colbrDefault
     FontColor = colbrSilver
     FontSize = 0
+    TextTypeFace = tfNormal
     Id = 0
   end
   object jMenu1: jMenu
     Options.Strings = (
-      'Red'
+      'Orange'
       'Blue...'
-      'Olive'
+      'Purple'
     )
-    Icons.Strings = (
-      'ic_action_cloud'
-      'ic_action_person'
-      'ic_action_picture'
+    IconIdentifiers.Strings = (
+      'ic_bullet_orange'
+      'ic_bullet_blue'
+      'ic_bullet_purple'
     )
-    left = 144
-    top = 224
+    left = 192
+    top = 408
   end
   object jContextMenu1: jContextMenu
     Options.Strings = (
       'Green'
-      'Blue'
+      'Red'
       'Yellow'
     )
-    left = 76
-    top = 322
+    left = 88
+    top = 408
   end
 end

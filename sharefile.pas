@@ -38,12 +38,12 @@ jShareFile = class(jControl)
 end;
 
 function jShareFile_jCreate(env: PJNIEnv; this: JObject;_Self: int64): jObject;
-procedure jShareFile_jFree(env: PJNIEnv; this: JObject; _jsharefile: JObject);
-procedure jShareFile_ShareFromSdCard(env: PJNIEnv; this: JObject; _jsharefile: JObject; _filename: string; _mimetype: string);
-procedure jShareFile_ShareFromAssets(env: PJNIEnv; this: JObject; _jsharefile: JObject; _filename: string; _mimetype: string);
-procedure jShareFile_ShareFromInternalAppStorage(env: PJNIEnv; this: JObject; _jsharefile: JObject; _filename: string; _mimetype: string);
-procedure jShareFile_ShareFrom(env: PJNIEnv; this: JObject; _jsharefile: JObject; _fullFilename: string; _mimetype: string);
-procedure jShareFile_SetTransitoryEnvironmentDirectory(env: PJNIEnv; this: JObject; _jsharefile: JObject;_index: integer);
+procedure jShareFile_jFree(env: PJNIEnv; _jsharefile: JObject);
+procedure jShareFile_ShareFromSdCard(env: PJNIEnv; _jsharefile: JObject; _filename: string; _mimetype: string);
+procedure jShareFile_ShareFromAssets(env: PJNIEnv; _jsharefile: JObject; _filename: string; _mimetype: string);
+procedure jShareFile_ShareFromInternalAppStorage(env: PJNIEnv; _jsharefile: JObject; _filename: string; _mimetype: string);
+procedure jShareFile_ShareFrom(env: PJNIEnv; _jsharefile: JObject; _fullFilename: string; _mimetype: string);
+procedure jShareFile_SetTransitoryEnvironmentDirectory(env: PJNIEnv; _jsharefile: JObject;_index: integer);
 
 
 implementation
@@ -61,17 +61,11 @@ destructor jShareFile.Destroy;
 begin
   if not (csDesigning in ComponentState) then
   begin
-    if jForm(Owner).App <> nil then
-    begin
-      if jForm(Owner).App.Initialized then
-      begin
         if FjObject <> nil then
         begin
            jFree();
            FjObject:= nil;
         end;
-      end;
-    end;
   end;
   //you others free code here...'
   inherited Destroy;
@@ -90,42 +84,42 @@ end;
 
 function jShareFile.jCreate(): jObject;
 begin
-   Result:= jShareFile_jCreate(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis , int64(Self));
+   Result:= jShareFile_jCreate(FjEnv, FjThis , int64(Self));
 end;
 
 procedure jShareFile.jFree();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jShareFile_jFree(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject);
+     jShareFile_jFree(FjEnv, FjObject);
 end;
 
 procedure jShareFile.ShareFromSdCard(_filename: string; _mimetype: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jShareFile_ShareFromSdCard(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, _filename ,LowerCase(_mimetype));
+     jShareFile_ShareFromSdCard(FjEnv, FjObject, _filename ,LowerCase(_mimetype));
 end;
 
 procedure jShareFile.ShareFromAssets(_filename: string; _mimetype: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jShareFile_ShareFromAssets(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, _filename ,LowerCase(_mimetype));
+     jShareFile_ShareFromAssets(FjEnv, FjObject, _filename ,LowerCase(_mimetype));
 end;
 
 procedure jShareFile.ShareFromInternalAppStorage(_filename: string; _mimetype: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jShareFile_ShareFromInternalAppStorage(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, _filename ,LowerCase(_mimetype));
+     jShareFile_ShareFromInternalAppStorage(FjEnv, FjObject, _filename ,LowerCase(_mimetype));
 end;
 
 procedure jShareFile.ShareFrom(_fullFilename: string; _mimetype: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jShareFile_ShareFrom(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, _fullFilename ,LowerCase(_mimetype));
+     jShareFile_ShareFrom(FjEnv, FjObject, _fullFilename ,LowerCase(_mimetype));
 end;
 
 procedure jShareFile.SetTransitoryEnvironmentDirectory(_index: TEnvDirectory);
@@ -137,8 +131,7 @@ begin
     FTransitoryEnvironmentDirectory:= dirDownloads;
 
   if FInitialized then
-     jShareFile_SetTransitoryEnvironmentDirectory(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis,
-                                                  FjObject, Ord(FTransitoryEnvironmentDirectory));
+     jShareFile_SetTransitoryEnvironmentDirectory(FjEnv, FjObject, Ord(FTransitoryEnvironmentDirectory));
 end;
 
 {-------- jShareFile_JNI_Bridge ----------}
@@ -167,7 +160,7 @@ end;
 *)
 
 
-procedure jShareFile_jFree(env: PJNIEnv; this: JObject; _jsharefile: JObject);
+procedure jShareFile_jFree(env: PJNIEnv; _jsharefile: JObject);
 var
   jMethod: jMethodID=nil;
   jCls: jClass=nil;
@@ -178,7 +171,7 @@ begin
 end;
 
 
-procedure jShareFile_ShareFromSdCard(env: PJNIEnv; this: JObject; _jsharefile: JObject; _filename: string; _mimetype: string);
+procedure jShareFile_ShareFromSdCard(env: PJNIEnv; _jsharefile: JObject; _filename: string; _mimetype: string);
 var
   jParams: array[0..1] of jValue;
   jMethod: jMethodID=nil;
@@ -194,7 +187,7 @@ env^.DeleteLocalRef(env,jParams[0].l);
 end;
 
 
-procedure jShareFile_ShareFromAssets(env: PJNIEnv; this: JObject; _jsharefile: JObject; _filename: string; _mimetype: string);
+procedure jShareFile_ShareFromAssets(env: PJNIEnv; _jsharefile: JObject; _filename: string; _mimetype: string);
 var
   jParams: array[0..1] of jValue;
   jMethod: jMethodID=nil;
@@ -210,7 +203,7 @@ env^.DeleteLocalRef(env,jParams[0].l);
 end;
 
 
-procedure jShareFile_ShareFromInternalAppStorage(env: PJNIEnv; this: JObject; _jsharefile: JObject; _filename: string; _mimetype: string);
+procedure jShareFile_ShareFromInternalAppStorage(env: PJNIEnv; _jsharefile: JObject; _filename: string; _mimetype: string);
 var
   jParams: array[0..1] of jValue;
   jMethod: jMethodID=nil;
@@ -225,7 +218,7 @@ begin
   env^.DeleteLocalRef(env,jParams[1].l);
 end;
 
-procedure jShareFile_ShareFrom(env: PJNIEnv; this: JObject; _jsharefile: JObject; _fullFilename: string; _mimetype: string);
+procedure jShareFile_ShareFrom(env: PJNIEnv; _jsharefile: JObject; _fullFilename: string; _mimetype: string);
 var
   jParams: array[0..1] of jValue;
   jMethod: jMethodID=nil;
@@ -240,7 +233,7 @@ begin
   env^.DeleteLocalRef(env,jParams[1].l);
 end;
 
-procedure jShareFile_SetTransitoryEnvironmentDirectory(env: PJNIEnv; this: JObject; _jsharefile: JObject;_index: integer);
+procedure jShareFile_SetTransitoryEnvironmentDirectory(env: PJNIEnv; _jsharefile: JObject;_index: integer);
 var
   jParams: array[0..0] of jValue;
   jMethod: jMethodID=nil;

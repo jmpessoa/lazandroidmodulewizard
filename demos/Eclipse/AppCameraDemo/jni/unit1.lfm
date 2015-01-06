@@ -51,6 +51,7 @@ object AndroidModule1: TAndroidModule1
       BackgroundColor = colbrDefault
       FontColor = colbrGold
       FontSize = 0
+      TextTypeFace = tfNormal
       Id = 6566773
     end
     object jTextView2: jTextView
@@ -74,6 +75,7 @@ object AndroidModule1: TAndroidModule1
       BackgroundColor = colbrDefault
       FontColor = colbrLimeGreen
       FontSize = 0
+      TextTypeFace = tfNormal
       Id = 3033113
     end
     object jPanel4: jPanel
@@ -95,6 +97,7 @@ object AndroidModule1: TAndroidModule1
       BackgroundColor = colbrOrange
       Id = 0
       object jEditText1: jEditText
+        Tag = 1
         Left = 0
         Top = 0
         Width = 273
@@ -111,8 +114,8 @@ object AndroidModule1: TAndroidModule1
         LayoutParamHeight = lpWrapContent
         Alignment = taLeft
         InputTypeEx = itxText
-        LineMaxLength = 300
-        BackgroundColor = colbrDefault
+        MaxTextLength = 300
+        BackgroundColor = colbrWhite
         FontColor = colbrDefault
         FontSize = 0
         ScrollBarStyle = scrNone
@@ -217,6 +220,7 @@ object AndroidModule1: TAndroidModule1
     BackgroundColor = colbrLemonChiffon
     Id = 0
     object jImageView1: jImageView
+      Tag = 1
       Left = 117
       Top = 112
       Width = 48
@@ -229,7 +233,6 @@ object AndroidModule1: TAndroidModule1
       LayoutParamHeight = lpMatchParent
       ImageIndex = -1
       BackgroundColor = colbrDefault
-      IsBackgroundImage = False
       Id = 0
     end
   end

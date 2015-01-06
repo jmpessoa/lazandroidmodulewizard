@@ -9,8 +9,7 @@
         <Filename Value="controls.lpr"/>
         <IsPartOfProject Value="True"/>
         <EditorIndex Value="1"/>
-        <TopLine Value="604"/>
-        <CursorPos X="11" Y="608"/>
+        <CursorPos X="51" Y="11"/>
         <UsageCount Value="96"/>
         <Loaded Value="True"/>
         <DefaultSyntaxHighlighter Value="Delphi"/>
@@ -22,8 +21,8 @@
         <HasResources Value="True"/>
         <UnitName Value="unit1"/>
         <IsVisibleTab Value="True"/>
-        <TopLine Value="68"/>
-        <CursorPos X="82" Y="80"/>
+        <TopLine Value="113"/>
+        <CursorPos X="30" Y="131"/>
         <UsageCount Value="96"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>

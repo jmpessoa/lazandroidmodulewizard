@@ -46,17 +46,17 @@ jMyHello = class(jControl)
 end;
 
 function jMyHello_jCreate(env: PJNIEnv; this: JObject;_Self: int64; _flag: integer; _hello: string): jObject;
-procedure jMyHello_jFree(env: PJNIEnv; this: JObject; _jmyhello: JObject);
-procedure jMyHello_SetFlag(env: PJNIEnv; this: JObject; _jmyhello: JObject; _flag: integer);
-function jMyHello_GetFlag(env: PJNIEnv; this: JObject; _jmyhello: JObject): integer;
-procedure jMyHello_SetHello(env: PJNIEnv; this: JObject; _jmyhello: JObject; _hello: string);
-function jMyHello_GetHello(env: PJNIEnv; this: JObject; _jmyhello: JObject): string;
-function jMyHello_GetStringArray(env: PJNIEnv; this: JObject; _jmyhello: JObject): TDynArrayOfString;
-function jMyHello_ToUpperStringArray(env: PJNIEnv; this: JObject; _jmyhello: JObject; var _msgArray: TDynArrayOfString): TDynArrayOfString;
-function jMyHello_ConcatStringArray(env: PJNIEnv; this: JObject; _jmyhello: JObject; var _strArrayA: TDynArrayOfString; var _strArrayB: TDynArrayOfString): TDynArrayOfString;
-function jMyHello_GetIntArray(env: PJNIEnv; this: JObject; _jmyhello: JObject): TDynArrayOfInteger;
-function jMyHello_GetSumIntArray(env: PJNIEnv; this: JObject; _jmyhello: JObject; var _vA: TDynArrayOfInteger; var _vB: TDynArrayOfInteger; _size: integer): TDynArrayOfInteger;
-procedure jMyHello_ShowHello(env: PJNIEnv; this: JObject; _jmyhello: JObject);
+procedure jMyHello_jFree(env: PJNIEnv; _jmyhello: JObject);
+procedure jMyHello_SetFlag(env: PJNIEnv; _jmyhello: JObject; _flag: integer);
+function jMyHello_GetFlag(env: PJNIEnv; _jmyhello: JObject): integer;
+procedure jMyHello_SetHello(env: PJNIEnv; _jmyhello: JObject; _hello: string);
+function jMyHello_GetHello(env: PJNIEnv; _jmyhello: JObject): string;
+function jMyHello_GetStringArray(env: PJNIEnv; _jmyhello: JObject): TDynArrayOfString;
+function jMyHello_ToUpperStringArray(env: PJNIEnv; _jmyhello: JObject; var _msgArray: TDynArrayOfString): TDynArrayOfString;
+function jMyHello_ConcatStringArray(env: PJNIEnv; _jmyhello: JObject; var _strArrayA: TDynArrayOfString; var _strArrayB: TDynArrayOfString): TDynArrayOfString;
+function jMyHello_GetIntArray(env: PJNIEnv; _jmyhello: JObject): TDynArrayOfInteger;
+function jMyHello_GetSumIntArray(env: PJNIEnv; _jmyhello: JObject; var _vA: TDynArrayOfInteger; var _vB: TDynArrayOfInteger; _size: integer): TDynArrayOfInteger;
+procedure jMyHello_ShowHello(env: PJNIEnv; _jmyhello: JObject);
 
 
 implementation
@@ -73,17 +73,11 @@ destructor jMyHello.Destroy;
 begin
   if not (csDesigning in ComponentState) then
   begin
-    if jForm(Owner).App <> nil then
-    begin
-      if jForm(Owner).App.Initialized then
-      begin
         if FjObject <> nil then
         begin
            jFree();
            FjObject:= nil;
         end;
-      end;
-    end;
   end;
   //you others free code here...'
   inherited Destroy;
@@ -101,14 +95,14 @@ end;
 
 function jMyHello.jCreate( _flag: integer; _hello: string): jObject;
 begin
-  Result:= jMyHello_jCreate(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis , int64(Self) ,_flag ,_hello);
+  Result:= jMyHello_jCreate(FjEnv, FjThis , int64(Self) ,_flag ,_hello);
 end;
 
 procedure jMyHello.jFree();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jMyHello_jFree(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject);
+     jMyHello_jFree(FjEnv, FjObject);
 end;
 
 procedure jMyHello.SetFlag(_flag: integer);
@@ -116,7 +110,7 @@ begin
   //in designing component state: set value here...
   Fflag:= _flag;
   if FInitialized then
-     jMyHello_SetFlag(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, _flag);
+     jMyHello_SetFlag(FjEnv, FjObject, _flag);
 end;
 
 function jMyHello.GetFlag(): integer;
@@ -124,7 +118,7 @@ begin
   //in designing component state: result value here...
   Result:= Fflag;
   if FInitialized then
-   Result:= jMyHello_GetFlag(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject);
+   Result:= jMyHello_GetFlag(FjEnv, FjObject);
 end;
 
 procedure jMyHello.SetHello(_hello: string);
@@ -132,7 +126,7 @@ begin
   //in designing component state: set value here...
   Fhello:= _hello;
   if FInitialized then
-     jMyHello_SetHello(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, _hello);
+     jMyHello_SetHello(FjEnv, FjObject, _hello);
 end;
 
 function jMyHello.GetHello(): string;
@@ -140,49 +134,49 @@ begin
   //in designing component state: result value here...
   Result:= Fhello;
   if FInitialized then
-   Result:= jMyHello_GetHello(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject);
+   Result:= jMyHello_GetHello(FjEnv, FjObject);
 end;
 
 function jMyHello.GetStringArray(): TDynArrayOfString;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jMyHello_GetStringArray(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject);
+   Result:= jMyHello_GetStringArray(FjEnv, FjObject);
 end;
 
 function jMyHello.ToUpperStringArray(var _msgArray: TDynArrayOfString): TDynArrayOfString;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jMyHello_ToUpperStringArray(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, _msgArray);
+   Result:= jMyHello_ToUpperStringArray(FjEnv, FjObject, _msgArray);
 end;
 
 function jMyHello.ConcatStringArray(var _strArrayA: TDynArrayOfString; var _strArrayB: TDynArrayOfString): TDynArrayOfString;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jMyHello_ConcatStringArray(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, _strArrayA ,_strArrayB);
+   Result:= jMyHello_ConcatStringArray(FjEnv, FjObject, _strArrayA ,_strArrayB);
 end;
 
 function jMyHello.GetIntArray(): TDynArrayOfInteger;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jMyHello_GetIntArray(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject);
+   Result:= jMyHello_GetIntArray(FjEnv, FjObject);
 end;
 
 function jMyHello.GetSumIntArray(var _vA: TDynArrayOfInteger; var _vB: TDynArrayOfInteger; _size: integer): TDynArrayOfInteger;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jMyHello_GetSumIntArray(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, _vA ,_vB ,_size);
+   Result:= jMyHello_GetSumIntArray(FjEnv, FjObject, _vA ,_vB ,_size);
 end;
 
 procedure jMyHello.ShowHello();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jMyHello_ShowHello(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject);
+     jMyHello_ShowHello(FjEnv, FjObject);
 end;
 
 {-------- jMyHello_JNI_Bridge ----------}
@@ -213,7 +207,7 @@ end;
 //to end of "public class Controls" in "Controls.java"
 *)
 
-procedure jMyHello_jFree(env: PJNIEnv; this: JObject; _jmyhello: JObject);
+procedure jMyHello_jFree(env: PJNIEnv; _jmyhello: JObject);
 var
   jMethod: jMethodID=nil;
   jCls: jClass=nil;
@@ -223,7 +217,7 @@ begin
   env^.CallVoidMethod(env, _jmyhello, jMethod);
 end;
 
-procedure jMyHello_SetFlag(env: PJNIEnv; this: JObject; _jmyhello: JObject; _flag: integer);
+procedure jMyHello_SetFlag(env: PJNIEnv; _jmyhello: JObject; _flag: integer);
 var
   jParams: array[0..0] of jValue;
   jMethod: jMethodID=nil;
@@ -235,7 +229,7 @@ begin
   env^.CallVoidMethodA(env, _jmyhello, jMethod, @jParams);
 end;
 
-function jMyHello_GetFlag(env: PJNIEnv; this: JObject; _jmyhello: JObject): integer;
+function jMyHello_GetFlag(env: PJNIEnv; _jmyhello: JObject): integer;
 var
   jMethod: jMethodID=nil;
   jCls: jClass=nil;
@@ -245,7 +239,7 @@ begin
   Result:= env^.CallIntMethod(env, _jmyhello, jMethod);
 end;
 
-procedure jMyHello_SetHello(env: PJNIEnv; this: JObject; _jmyhello: JObject; _hello: string);
+procedure jMyHello_SetHello(env: PJNIEnv; _jmyhello: JObject; _hello: string);
 var
   jParams: array[0..0] of jValue;
   jMethod: jMethodID=nil;
@@ -258,7 +252,7 @@ begin
   env^.DeleteLocalRef(env,jParams[0].l);
 end;
 
-function jMyHello_GetHello(env: PJNIEnv; this: JObject; _jmyhello: JObject): string;
+function jMyHello_GetHello(env: PJNIEnv; _jmyhello: JObject): string;
 var
   jStr: JString;
   jBoo: JBoolean;
@@ -277,7 +271,7 @@ begin
   end;
 end;
 
-function jMyHello_GetStringArray(env: PJNIEnv; this: JObject; _jmyhello: JObject): TDynArrayOfString;
+function jMyHello_GetStringArray(env: PJNIEnv; _jmyhello: JObject): TDynArrayOfString;
 var
   jStr: JString;
   jBoo: JBoolean;
@@ -305,7 +299,7 @@ begin
   end;
 end;
 
-function jMyHello_ToUpperStringArray(env: PJNIEnv; this: JObject; _jmyhello: JObject; var _msgArray: TDynArrayOfString): TDynArrayOfString;
+function jMyHello_ToUpperStringArray(env: PJNIEnv; _jmyhello: JObject; var _msgArray: TDynArrayOfString): TDynArrayOfString;
 var
   jStr: JString;
   jBoo: JBoolean;
@@ -344,7 +338,7 @@ begin
   env^.DeleteLocalRef(env,jParams[0].l);
 end;
 
-function jMyHello_ConcatStringArray(env: PJNIEnv; this: JObject; _jmyhello: JObject; var _strArrayA: TDynArrayOfString; var _strArrayB: TDynArrayOfString): TDynArrayOfString;
+function jMyHello_ConcatStringArray(env: PJNIEnv; _jmyhello: JObject; var _strArrayA: TDynArrayOfString; var _strArrayB: TDynArrayOfString): TDynArrayOfString;
 var
   jStr: JString;
   jBoo: JBoolean;
@@ -393,7 +387,7 @@ begin
   env^.DeleteLocalRef(env,jParams[1].l);
 end;
 
-function jMyHello_GetIntArray(env: PJNIEnv; this: JObject; _jmyhello: JObject): TDynArrayOfInteger;
+function jMyHello_GetIntArray(env: PJNIEnv; _jmyhello: JObject): TDynArrayOfInteger;
 var
   resultSize: integer;
   jResultArray: jObject;
@@ -408,7 +402,7 @@ begin
   env^.GetIntArrayRegion(env, jResultArray, 0, resultSize, @Result[0] {target});
 end;
 
-function jMyHello_GetSumIntArray(env: PJNIEnv; this: JObject; _jmyhello: JObject; var _vA: TDynArrayOfInteger; var _vB: TDynArrayOfInteger; _size: integer): TDynArrayOfInteger;
+function jMyHello_GetSumIntArray(env: PJNIEnv; _jmyhello: JObject; var _vA: TDynArrayOfInteger; var _vB: TDynArrayOfInteger; _size: integer): TDynArrayOfInteger;
 var
   resultSize: integer;
   jResultArray: jObject;
@@ -439,7 +433,7 @@ begin
   env^.DeleteLocalRef(env,jParams[1].l);
 end;
 
-procedure jMyHello_ShowHello(env: PJNIEnv; this: JObject; _jmyhello: JObject);
+procedure jMyHello_ShowHello(env: PJNIEnv; _jmyhello: JObject);
 var
   jMethod: jMethodID=nil;
   jCls: jClass=nil;

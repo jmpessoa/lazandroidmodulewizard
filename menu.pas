@@ -55,26 +55,26 @@ jMenu = class(jControl)
 end;
 
 function jMenu_jCreate(env: PJNIEnv; this: JObject;_Self: int64): jObject;
-procedure jMenu_jFree(env: PJNIEnv; this: JObject; _jmenu: JObject);
-procedure jMenu_Add(env: PJNIEnv; this: JObject; _jmenu: JObject; _menu: jObject; _itemID: integer; _caption: string);
-procedure jMenu_AddCheckable(env: PJNIEnv; this: JObject; _jmenu: JObject; _menu: jObject; _itemID: integer; _caption: string);
-procedure jMenu_AddDrawable(env: PJNIEnv; this: JObject; _jmenu: JObject; _menu: jObject; _itemID: integer; _caption: string);
-procedure jMenu_CheckItemCommute(env: PJNIEnv; this: JObject; _jmenu: JObject; _item: jObject);
-procedure jMenu_CheckItem(env: PJNIEnv; this: JObject; _jmenu: JObject; _item: jObject);
-procedure jMenu_UnCheckItem(env: PJNIEnv; this: JObject; _jmenu: JObject; _item: jObject);
-procedure jMenu_AddSubMenu(env: PJNIEnv; this: JObject; _jmenu: JObject; _menu: jObject; _startItemID: integer; var _captions: TDynArrayOfString);overload;
-procedure jMenu_AddCheckableSubMenu(env: PJNIEnv; this: JObject; _jmenu: JObject; _menu: jObject; _startItemID: integer; var _captions: TDynArrayOfString);
-function jMenu_Size(env: PJNIEnv; this: JObject; _jmenu: JObject): integer;
-function jMenu_FindMenuItemByID(env: PJNIEnv; this: JObject; _jmenu: JObject; _itemID: integer): jObject;
-function jMenu_GetMenuItemByIndex(env: PJNIEnv; this: JObject; _jmenu: JObject; _index: integer): jObject;
-procedure jMenu_UnCheckAllMenuItem(env: PJNIEnv; this: JObject; _jmenu: JObject);
-function jMenu_CountSubMenus(env: PJNIEnv; this: JObject; _jmenu: JObject): integer;
-procedure jMenu_UnCheckAllSubMenuItemByIndex(env: PJNIEnv; this: JObject; _jmenu: JObject; _subMenuIndex: integer);
-procedure jMenu_RegisterForContextMenu(env: PJNIEnv; this: JObject; _jmenu: JObject; _view: jObject);
+procedure jMenu_jFree(env: PJNIEnv; _jmenu: JObject);
+procedure jMenu_Add(env: PJNIEnv; _jmenu: JObject; _menu: jObject; _itemID: integer; _caption: string);
+procedure jMenu_AddCheckable(env: PJNIEnv; _jmenu: JObject; _menu: jObject; _itemID: integer; _caption: string);
+procedure jMenu_AddDrawable(env: PJNIEnv; _jmenu: JObject; _menu: jObject; _itemID: integer; _caption: string);
+procedure jMenu_CheckItemCommute(env: PJNIEnv; _jmenu: JObject; _item: jObject);
+procedure jMenu_CheckItem(env: PJNIEnv; _jmenu: JObject; _item: jObject);
+procedure jMenu_UnCheckItem(env: PJNIEnv; _jmenu: JObject; _item: jObject);
+procedure jMenu_AddSubMenu(env: PJNIEnv; _jmenu: JObject; _menu: jObject; _startItemID: integer; var _captions: TDynArrayOfString);overload;
+procedure jMenu_AddCheckableSubMenu(env: PJNIEnv; _jmenu: JObject; _menu: jObject; _startItemID: integer; var _captions: TDynArrayOfString);
+function jMenu_Size(env: PJNIEnv; _jmenu: JObject): integer;
+function jMenu_FindMenuItemByID(env: PJNIEnv; _jmenu: JObject; _itemID: integer): jObject;
+function jMenu_GetMenuItemByIndex(env: PJNIEnv; _jmenu: JObject; _index: integer): jObject;
+procedure jMenu_UnCheckAllMenuItem(env: PJNIEnv; _jmenu: JObject);
+function jMenu_CountSubMenus(env: PJNIEnv; _jmenu: JObject): integer;
+procedure jMenu_UnCheckAllSubMenuItemByIndex(env: PJNIEnv; _jmenu: JObject; _subMenuIndex: integer);
+procedure jMenu_RegisterForContextMenu(env: PJNIEnv; _jmenu: JObject; _view: jObject);
 
-procedure jMenu_AddItem(env: PJNIEnv; this: JObject; _jmenu: JObject; _menu: jObject; _itemID: integer; _caption: string; _iconIdentifier: string; _itemType: integer; _showAsAction: integer); overload;
-procedure jMenu_AddItem(env: PJNIEnv; this: JObject; _jmenu: JObject; _subMenu: jObject; _itemID: integer; _caption: string; _itemType: integer); overload;
-function jMenu_AddSubMenu(env: PJNIEnv; this: JObject; _jmenu: JObject; _menu: jObject; _title: string; _headerIconIdentifier: string): jObject; overload;
+procedure jMenu_AddItem(env: PJNIEnv; _jmenu: JObject; _menu: jObject; _itemID: integer; _caption: string; _iconIdentifier: string; _itemType: integer; _showAsAction: integer); overload;
+procedure jMenu_AddItem(env: PJNIEnv; _jmenu: JObject; _subMenu: jObject; _itemID: integer; _caption: string; _itemType: integer); overload;
+function jMenu_AddSubMenu(env: PJNIEnv; _jmenu: JObject; _menu: jObject; _title: string; _headerIconIdentifier: string): jObject; overload;
 
 implementation
 
@@ -92,17 +92,11 @@ destructor jMenu.Destroy;
 begin
   if not (csDesigning in ComponentState) then
   begin
-    if jForm(Owner).App <> nil then
-    begin
-      if jForm(Owner).App.Initialized then
-      begin
         if FjObject <> nil then
         begin
            jFree();
            FjObject:= nil;
         end;
-      end;
-    end;
   end;
   //you others free code here...
   FOptions.Free;
@@ -122,35 +116,35 @@ end;
 
 function jMenu.jCreate(): jObject;
 begin
-   Result:= jMenu_jCreate(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis , int64(Self));
+   Result:= jMenu_jCreate(FjEnv, FjThis , int64(Self));
 end;
 
 procedure jMenu.jFree();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jMenu_jFree(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject);
+     jMenu_jFree(FjEnv, FjObject);
 end;
 
 procedure jMenu.Add(_menu: jObject; _itemID: integer; _caption: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jMenu_Add(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, _menu ,_itemID ,_caption);
+     jMenu_Add(FjEnv, FjObject, _menu ,_itemID ,_caption);
 end;
 
 procedure jMenu.AddCheckable(_menu: jObject; _itemID: integer; _caption: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jMenu_AddCheckable(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, _menu ,_itemID ,_caption);
+     jMenu_AddCheckable(FjEnv, FjObject, _menu ,_itemID ,_caption);
 end;
 
 procedure jMenu.AddDrawable(_menu: jObject; _itemID: integer; _caption: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jMenu_AddDrawable(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, _menu ,_itemID ,_caption);
+     jMenu_AddDrawable(FjEnv, FjObject, _menu ,_itemID ,_caption);
 end;
 
 procedure jMenu.SetOptions(Value: TStrings);
@@ -167,105 +161,105 @@ procedure jMenu.CheckItemCommute(_item: jObject);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jMenu_CheckItemCommute(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, _item);
+     jMenu_CheckItemCommute(FjEnv, FjObject, _item);
 end;
 
 procedure jMenu.CheckItem(_item: jObject);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jMenu_CheckItem(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, _item);
+     jMenu_CheckItem(FjEnv, FjObject, _item);
 end;
 
 procedure jMenu.UnCheckItem(_item: jObject);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jMenu_UnCheckItem(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, _item);
+     jMenu_UnCheckItem(FjEnv, FjObject, _item);
 end;
 
 procedure jMenu.AddSubMenu(_menu: jObject; _startItemID: integer; var _captions: TDynArrayOfString);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jMenu_AddSubMenu(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, _menu ,_startItemID ,_captions);
+     jMenu_AddSubMenu(FjEnv, FjObject, _menu ,_startItemID ,_captions);
 end;
 
 procedure jMenu.AddCheckableSubMenu(_menu: jObject; _startItemID: integer; var _captions: TDynArrayOfString);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jMenu_AddCheckableSubMenu(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, _menu ,_startItemID ,_captions);
+     jMenu_AddCheckableSubMenu(FjEnv, FjObject, _menu ,_startItemID ,_captions);
 end;
 
 function jMenu.Size(): integer;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jMenu_Size(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject);
+   Result:= jMenu_Size(FjEnv, FjObject);
 end;
 
 function jMenu.FindMenuItemByID(_itemID: integer): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jMenu_FindMenuItemByID(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, _itemID);
+   Result:= jMenu_FindMenuItemByID(FjEnv, FjObject, _itemID);
 end;
 
 function jMenu.GetMenuItemByIndex(_index: integer): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jMenu_GetMenuItemByIndex(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, _index);
+   Result:= jMenu_GetMenuItemByIndex(FjEnv, FjObject, _index);
 end;
 
 procedure jMenu.UnCheckAllMenuItem();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jMenu_UnCheckAllMenuItem(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject);
+     jMenu_UnCheckAllMenuItem(FjEnv, FjObject);
 end;
 
 function jMenu.CountSubMenus(): integer;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jMenu_CountSubMenus(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject);
+   Result:= jMenu_CountSubMenus(FjEnv, FjObject);
 end;
 
 procedure jMenu.UnCheckAllSubMenuItemByIndex(_subMenuIndex: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jMenu_UnCheckAllSubMenuItemByIndex(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, _subMenuIndex);
+     jMenu_UnCheckAllSubMenuItemByIndex(FjEnv, FjObject, _subMenuIndex);
 end;
 
 procedure jMenu.RegisterForContextMenu(_view: jObject);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jMenu_RegisterForContextMenu(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, _view);
+     jMenu_RegisterForContextMenu(FjEnv, FjObject, _view);
 end;
 
 procedure jMenu.AddItem(_menu: jObject; _itemID: integer; _caption: string; _iconIdentifier: string; _itemType: TMenuItemType; _showAsAction: TMenuItemShowAsAction);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jMenu_AddItem(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, _menu ,_itemID ,_caption ,_iconIdentifier ,Ord(_itemType),Ord(_showAsAction));
+     jMenu_AddItem(FjEnv, FjObject, _menu ,_itemID ,_caption ,_iconIdentifier ,Ord(_itemType),Ord(_showAsAction));
 end;
 
 procedure jMenu.AddItem(_subMenu: jObject; _itemID: integer; _caption: string;  _itemType: TMenuItemType);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jMenu_AddItem(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, _subMenu ,_itemID ,_caption ,Ord(_itemType));
+     jMenu_AddItem(FjEnv, FjObject, _subMenu ,_itemID ,_caption ,Ord(_itemType));
 end;
 
 function jMenu.AddSubMenu(_menu: jObject; _title: string; _headerIconIdentifier: string): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jMenu_AddSubMenu(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, _menu ,_title ,_headerIconIdentifier);
+   Result:= jMenu_AddSubMenu(FjEnv, FjObject, _menu ,_title ,_headerIconIdentifier);
 end;
 
 {-------- jMenu_JNI_Bridge ----------}
@@ -293,7 +287,7 @@ end;
 //to end of "public class Controls" in "Controls.java"
 *)
 
-procedure jMenu_jFree(env: PJNIEnv; this: JObject; _jmenu: JObject);
+procedure jMenu_jFree(env: PJNIEnv; _jmenu: JObject);
 var
   jMethod: jMethodID=nil;
   jCls: jClass=nil;
@@ -303,7 +297,7 @@ begin
   env^.CallVoidMethod(env, _jmenu, jMethod);
 end;
 
-procedure jMenu_Add(env: PJNIEnv; this: JObject; _jmenu: JObject; _menu: jObject; _itemID: integer; _caption: string);
+procedure jMenu_Add(env: PJNIEnv; _jmenu: JObject; _menu: jObject; _itemID: integer; _caption: string);
 var
   jParams: array[0..2] of jValue;
   jMethod: jMethodID=nil;
@@ -318,7 +312,7 @@ begin
   env^.DeleteLocalRef(env,jParams[2].l);
 end;
 
-procedure jMenu_AddCheckable(env: PJNIEnv; this: JObject; _jmenu: JObject; _menu: jObject; _itemID: integer; _caption: string);
+procedure jMenu_AddCheckable(env: PJNIEnv; _jmenu: JObject; _menu: jObject; _itemID: integer; _caption: string);
 var
   jParams: array[0..2] of jValue;
   jMethod: jMethodID=nil;
@@ -333,7 +327,7 @@ begin
   env^.DeleteLocalRef(env,jParams[2].l);
 end;
 
-procedure jMenu_AddDrawable(env: PJNIEnv; this: JObject; _jmenu: JObject; _menu: jObject; _itemID: integer; _caption: string);
+procedure jMenu_AddDrawable(env: PJNIEnv; _jmenu: JObject; _menu: jObject; _itemID: integer; _caption: string);
 var
   jParams: array[0..2] of jValue;
   jMethod: jMethodID=nil;
@@ -348,7 +342,7 @@ begin
   env^.DeleteLocalRef(env,jParams[2].l);
 end;
 
-procedure jMenu_CheckItemCommute(env: PJNIEnv; this: JObject; _jmenu: JObject; _item: jObject);
+procedure jMenu_CheckItemCommute(env: PJNIEnv; _jmenu: JObject; _item: jObject);
 var
   jParams: array[0..0] of jValue;
   jMethod: jMethodID=nil;
@@ -361,7 +355,7 @@ begin
 end;
 
 
-procedure jMenu_CheckItem(env: PJNIEnv; this: JObject; _jmenu: JObject; _item: jObject);
+procedure jMenu_CheckItem(env: PJNIEnv; _jmenu: JObject; _item: jObject);
 var
   jParams: array[0..0] of jValue;
   jMethod: jMethodID=nil;
@@ -374,7 +368,7 @@ begin
 end;
 
 
-procedure jMenu_UnCheckItem(env: PJNIEnv; this: JObject; _jmenu: JObject; _item: jObject);
+procedure jMenu_UnCheckItem(env: PJNIEnv; _jmenu: JObject; _item: jObject);
 var
   jParams: array[0..0] of jValue;
   jMethod: jMethodID=nil;
@@ -386,7 +380,7 @@ begin
   env^.CallVoidMethodA(env, _jmenu, jMethod, @jParams);
 end;
 
-procedure jMenu_AddSubMenu(env: PJNIEnv; this: JObject; _jmenu: JObject; _menu: jObject; _startItemID: integer; var _captions: TDynArrayOfString);
+procedure jMenu_AddSubMenu(env: PJNIEnv; _jmenu: JObject; _menu: jObject; _startItemID: integer; var _captions: TDynArrayOfString);
 var
   jParams: array[0..2] of jValue;
   jMethod: jMethodID=nil;
@@ -410,7 +404,7 @@ begin
   env^.DeleteLocalRef(env,jParams[2].l);
 end;
 
-procedure jMenu_AddCheckableSubMenu(env: PJNIEnv; this: JObject; _jmenu: JObject; _menu: jObject; _startItemID: integer; var _captions: TDynArrayOfString);
+procedure jMenu_AddCheckableSubMenu(env: PJNIEnv; _jmenu: JObject; _menu: jObject; _startItemID: integer; var _captions: TDynArrayOfString);
 var
   jParams: array[0..2] of jValue;
   jMethod: jMethodID=nil;
@@ -434,7 +428,7 @@ begin
   env^.DeleteLocalRef(env,jParams[2].l);
 end;
 
-function jMenu_Size(env: PJNIEnv; this: JObject; _jmenu: JObject): integer;
+function jMenu_Size(env: PJNIEnv; _jmenu: JObject): integer;
 var
   jMethod: jMethodID=nil;
   jCls: jClass=nil;
@@ -444,7 +438,7 @@ begin
   Result:= env^.CallIntMethod(env, _jmenu, jMethod);
 end;
 
-function jMenu_FindMenuItemByID(env: PJNIEnv; this: JObject; _jmenu: JObject; _itemID: integer): jObject;
+function jMenu_FindMenuItemByID(env: PJNIEnv; _jmenu: JObject; _itemID: integer): jObject;
 var
   jParams: array[0..0] of jValue;
   jMethod: jMethodID=nil;
@@ -456,7 +450,7 @@ begin
   Result:= env^.CallObjectMethodA(env, _jmenu, jMethod, @jParams);
 end;
 
-function jMenu_GetMenuItemByIndex(env: PJNIEnv; this: JObject; _jmenu: JObject; _index: integer): jObject;
+function jMenu_GetMenuItemByIndex(env: PJNIEnv; _jmenu: JObject; _index: integer): jObject;
 var
   jParams: array[0..0] of jValue;
   jMethod: jMethodID=nil;
@@ -468,7 +462,7 @@ begin
   Result:= env^.CallObjectMethodA(env, _jmenu, jMethod, @jParams);
 end;
 
-procedure jMenu_UnCheckAllMenuItem(env: PJNIEnv; this: JObject; _jmenu: JObject);
+procedure jMenu_UnCheckAllMenuItem(env: PJNIEnv; _jmenu: JObject);
 var
   jMethod: jMethodID=nil;
   jCls: jClass=nil;
@@ -478,7 +472,7 @@ begin
   env^.CallVoidMethod(env, _jmenu, jMethod);
 end;
 
-function jMenu_CountSubMenus(env: PJNIEnv; this: JObject; _jmenu: JObject): integer;
+function jMenu_CountSubMenus(env: PJNIEnv; _jmenu: JObject): integer;
 var
   jMethod: jMethodID=nil;
   jCls: jClass=nil;
@@ -488,7 +482,7 @@ begin
   Result:= env^.CallIntMethod(env, _jmenu, jMethod);
 end;
 
-procedure jMenu_UnCheckAllSubMenuItemByIndex(env: PJNIEnv; this: JObject; _jmenu: JObject; _subMenuIndex: integer);
+procedure jMenu_UnCheckAllSubMenuItemByIndex(env: PJNIEnv; _jmenu: JObject; _subMenuIndex: integer);
 var
   jParams: array[0..0] of jValue;
   jMethod: jMethodID=nil;
@@ -500,7 +494,7 @@ begin
   env^.CallVoidMethodA(env, _jmenu, jMethod, @jParams);
 end;
 
-procedure jMenu_RegisterForContextMenu(env: PJNIEnv; this: JObject; _jmenu: JObject; _view: jObject);
+procedure jMenu_RegisterForContextMenu(env: PJNIEnv; _jmenu: JObject; _view: jObject);
 var
   jParams: array[0..0] of jValue;
   jMethod: jMethodID=nil;
@@ -512,7 +506,7 @@ begin
   env^.CallVoidMethodA(env, _jmenu, jMethod, @jParams);
 end;
 
-procedure jMenu_AddItem(env: PJNIEnv; this: JObject; _jmenu: JObject; _menu: jObject; _itemID: integer; _caption: string; _iconIdentifier: string; _itemType: integer; _showAsAction: integer);
+procedure jMenu_AddItem(env: PJNIEnv; _jmenu: JObject; _menu: jObject; _itemID: integer; _caption: string; _iconIdentifier: string; _itemType: integer; _showAsAction: integer);
 var
   jParams: array[0..5] of jValue;
   jMethod: jMethodID=nil;
@@ -532,7 +526,7 @@ env^.DeleteLocalRef(env,jParams[2].l);
 end;
 
 
-procedure jMenu_AddItem(env: PJNIEnv; this: JObject; _jmenu: JObject; _subMenu: jObject; _itemID: integer; _caption: string; _itemType: integer);
+procedure jMenu_AddItem(env: PJNIEnv; _jmenu: JObject; _subMenu: jObject; _itemID: integer; _caption: string; _itemType: integer);
 var
   jParams: array[0..3] of jValue;
   jMethod: jMethodID=nil;
@@ -549,7 +543,7 @@ begin
 end;
 
 
-function jMenu_AddSubMenu(env: PJNIEnv; this: JObject; _jmenu: JObject; _menu: jObject; _title: string; _headerIconIdentifier: string): jObject;
+function jMenu_AddSubMenu(env: PJNIEnv; _jmenu: JObject; _menu: jObject; _title: string; _headerIconIdentifier: string): jObject;
 var
   jParams: array[0..2] of jValue;
   jMethod: jMethodID=nil;

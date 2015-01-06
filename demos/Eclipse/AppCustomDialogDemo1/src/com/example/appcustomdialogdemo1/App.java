@@ -1,6 +1,6 @@
 package com.example.appcustomdialogdemo1;
 
-//[LazAndroidModuleWizard - Version 0.6 - rev. 07 - 07 December - 2014
+//[LazAndroidModuleWizard - Version 0.6 - rev. 11 - 03 January- 2014
 //
 //[https://github.com/jmpessoa/lazandroidmodulewizard]
 

@@ -48,12 +48,12 @@ var
 begin
    str:= TStringList.Create;
 
-   str.Add('Screen: '+ IntToStr(Self.App.Screen.WH.Width) + 'x' + IntToStr(Self.App.Screen.WH.Height));
-   str.Add('App Path: '+Self.App.Path.App);
-   str.Add('App Path Dat: '+Self.App.Path.Dat);
-   str.Add('App Path DataBase: '+Self.App.Path.DataBase);
-   str.Add('Phone Number: '+Self.App.Device.PhoneNumber);
-   str.Add('Device ID: '+Self.App.Device.ID);
+   str.Add('Screen: '+ IntToStr(gApp.Screen.WH.Width) + 'x' + IntToStr(gApp.Screen.WH.Height));
+   str.Add('App Path: '+gApp.Path.App);
+   str.Add('App Path Dat: '+gApp.Path.Dat);
+   str.Add('App Path DataBase: '+gApp.Path.DataBase);
+   str.Add('Phone Number: '+gApp.Device.PhoneNumber);
+   str.Add('Device ID: '+gApp.Device.ID);
    str.Add('Date Time: '+Self.GetDateTime);
 
    jEditText1.Text:= str.Text;

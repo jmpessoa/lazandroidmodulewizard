@@ -1,13 +1,13 @@
 package com.example.appsqlitedemo2;
 
-//[LazAndroidModuleWizard - Version 0.6 - rev. 08 - 15 December - 2014 
+//Lazarus Android Module Wizard - Version 0.6 - rev. 11 - 03 January- 2014
+//[Form Designer and Components development model!]
+//Author: jmpessoa@hotmail.com
+//https://github.com/jmpessoa/lazandroidmodulewizard
+//http://forum.lazarus.freepascal.org/index.php/topic,21919.0.html
 
-//[https://github.com/jmpessoa/lazandroidmodulewizard]
-//
-
-//Android Java Interface for Pascal/Delphi XE5  - 
-//[And LAZARUS by jmpessoa@hotmail.com - december 2013]
-
+//Android Java Interface for Pascal/Delphi XE5
+//[And LAZARUS by jmpessoa@hotmail.com - december 2013
 //
 //Developer
 //          Simon,Choi / Choi,Won-sik
@@ -120,6 +120,7 @@ import android.text.Editable;
 import android.text.InputFilter;
 import android.text.InputType;
 import android.text.TextWatcher;
+import android.text.method.NumberKeyListener;
 import android.text.method.ScrollingMovementMethod;
 import android.util.DisplayMetrics;
 import android.location.Address;
@@ -902,25 +903,6 @@ int MarginTop = 5;
 int marginRight = 5;
 int marginBottom = 5;
 
-//by jmpessoa
-public void setMarginRight(int x) {
-	marginRight = x;
-}
-
-//by jmpessoa
-public void setMarginBottom(int y) {
-	marginBottom = y;
-}
-//by jmpessoa
-public void setMarginLeft(int x) {
-	MarginLeft = x;
-}
-
-//by jmpessoa
-public void setMarginTop(int y) {
-	MarginTop = y;
-}
-
 // Constructor
 public  jTextView(android.content.Context context,
                Controls ctrls,long pasobj ) {                    //jTextView(this.activity,this,pasobj));
@@ -942,15 +924,7 @@ onClickListener = new OnClickListener() {
 setOnClickListener(onClickListener);
 }
 
-//
-public  void setXYWH ( int x, int y, int w, int h ) {
-lparams.width  = w;
-lparams.height = h;
-lparams.setMargins(x,y,10,10);
-//
-this.setLayoutParams(lparams);
-}
-
+//by jmpessoa
 public void setLeftTopRightBottomWidthHeight(int left, int top, int right, int bottom, int w, int h) {
 	MarginLeft = left;
 	MarginTop = top;
@@ -999,23 +973,6 @@ public void addLParamsParentRule(int rule) {
 	countParentRule = countParentRule + 1;
 }
 
-//by jmpessoa
-public void setIdEx(int id) {
-	setId(id);   
-}
-
-public void setText2(String txt) {
-	   this.setText(txt);
-}
-
-public String getText2() {
-	return this.getText().toString();
-}
-
-public void setTextColor2(int value) {
-	this.setTextColor(value);  
-}
-
 // LORDMAN 2013-08-13
 public  void setTextAlignment( int align ) {
   switch ( align ) {
@@ -1029,46 +986,29 @@ public  void setTextAlignment( int align ) {
      default : { setGravity( Gravity.LEFT              ); }; break;
   };
 }
-
-//by jmpessoa
-public  void setParent3( android.view.ViewGroup viewgroup ) {
+             
+public void setParent3( android.view.ViewGroup viewgroup ) {  //deprec...
 if (parent != null) { parent.removeView(this); }
    parent = viewgroup;
    viewgroup.addView(this,lparams);
 }
 
-//
-public  void setParent2( android.view.ViewGroup viewgroup ) {
+public void setParent( android.view.ViewGroup viewgroup ) {
 if (parent != null) { parent.removeView(this); }
-parent = viewgroup;
-viewgroup.addView(this,lparams);
-//
-Animation animation;
-animation = controls.Ani_iR2L(250); // In  (Left  to Right)
-startAnimation(animation);
-Log.i("Java","animation###############################");
+   parent = viewgroup;
+   viewgroup.addView(this,lparams);
 }
 
-//
 public  void setEnabled( boolean value ) {
   enabled = value;
 }
 
-//by jmpessoa
-public  void SetVisible( int value ) {
-	  this.setVisibility(value);
-}
 // Free object except Self, Pascal Code Free the class.
 public  void Free() {
-if (parent != null) { parent.removeView(this); }
-setText("");
-lparams = null;
-setOnClickListener(null);
-}
-
-//by jmpessoa
-public void setTextSize2(int value) {
-	this.setTextSize(value);
+   if (parent != null) { parent.removeView(this); }
+   setText("");
+   lparams = null;
+   setOnClickListener(null);
 }
 
 /*
@@ -1077,11 +1017,10 @@ public void setTextSize2(int value) {
     this.setTypeface(null, Typeface.ITALIC);
     this.setTypeface(null, Typeface.NORMAL);
  */
-public void SetTextTypeFace(int _typeface) { //by jmpessoa
-	 this.setTypeface(null, _typeface);
+
+public void SetTextTypeFace(int _typeface) {
+  this.setTypeface(null, _typeface);
 }
-
-
 
 }
 
@@ -1120,100 +1059,63 @@ int MarginTop = 5;
 int marginRight = 5;
 int marginBottom = 5;
 
-boolean changeFlag;
 String bufStr;
-
-//by jmpessoa
-public void setMarginRight(int x) {
-	marginRight = x;
-}
-
-//by jmpessoa
-public void setMarginBottom(int y) {
-	marginBottom = y;
-}
-
-//by jmpessoa
-public void setMarginLeft(int x) {
-	MarginLeft = x;
-}
-
-//by jmpessoa
-public void setMarginTop(int y) {
-	MarginTop = y;
-}
+private boolean canDispatchChangeEvent = false;
+private boolean canDispatchChangedEvent = false;
 
 // Constructor
 public  jEditText(android.content.Context context,
                Controls ctrls,long pasobj ) {
-
 super(context);
-
+canDispatchChangeEvent = false;
+canDispatchChangedEvent = false;
 // Connect Pascal I/F
 PasObj   = pasobj;
 controls = ctrls;
 // Init Class
 lparams = new RelativeLayout.LayoutParams(100,100);
 lparams.setMargins(5, 5,5,5);
-
-changeFlag = false;
-
-// 1 Line
- //this.setSingleLine(); //commented by jmpessoa
  
 // Init Event : http://socome.tistory.com/15
-
-onKeyListener = new OnKeyListener() {
-  public  boolean onKey(View v, int keyCode, KeyEvent event) {
-    if ((keyCode           == KeyEvent.KEYCODE_ENTER) &&
-        (event.getAction() == KeyEvent.ACTION_UP    )    ) {
-        InputMethodManager imm = (InputMethodManager) controls.activity.getSystemService(Context.INPUT_METHOD_SERVICE);
-        imm.hideSoftInputFromWindow(getWindowToken(), 0);
-        //
-        Log.i("JNI_Java","OnEnter, Hide KeyBoard");
-        // LoadMan
-        controls.pOnEnter(PasObj);
-        return true;
-    }
+onKeyListener = new OnKeyListener() {	
+  public  boolean onKey(View v, int keyCode, KeyEvent event) { //Called when a hardware key is dispatched to a view	
+    if (event.getAction() == KeyEvent.ACTION_UP) {	
+    	if (keyCode == KeyEvent.KEYCODE_ENTER) {
+            InputMethodManager imm = (InputMethodManager) controls.activity.getSystemService(Context.INPUT_METHOD_SERVICE);
+            imm.hideSoftInputFromWindow(getWindowToken(), 0);       
+            //Log.i("OnKeyListener","OnEnter, Hide KeyBoard");
+            // LoadMan
+            controls.pOnEnter(PasObj);  //just Enter/Done/Next/backbutton ....!      
+            return true;    		
+    	}    
+    }   
     return false;
-  }
-  
+  }  
 };
+
 setOnKeyListener(onKeyListener);
 // Event
 textwatcher = new TextWatcher() {
   @Override
-  public  void beforeTextChanged(CharSequence s, int start, int count, int after) {
-	  if (changeFlag) {
-         controls.pOnChange(PasObj,0);
-	  }
+  public  void beforeTextChanged(CharSequence s, int start, int count, int after) {	  
+	  if (canDispatchChangeEvent) {
+		controls.pOnChange(PasObj, s.toString(), (s.toString()).length());
+	  }	 
   }
-
   @Override
   public  void onTextChanged(CharSequence s, int start, int before, int count) {
-	  if (changeFlag) { 
-        controls.pOnChange(PasObj,1);
-	 }		  
+	  if (canDispatchChangedEvent) {		 
+		controls.pOnChanged(PasObj,s.toString(), (s.toString()).length());
+	  }   		  	  
   }
-
   @Override
-  public  void afterTextChanged(Editable s) {
-	if (changeFlag) { 
-        controls.pOnChange(PasObj,2);
-    }
+  public  void afterTextChanged(Editable s) {	  
+    //
   }
 };
 
 addTextChangedListener(textwatcher);
-}
-
-//
-public  void setXYWH ( int x, int y, int w, int h ) {
-lparams.width  = w;
-lparams.height = h;
-lparams.setMargins(x,y,0,0);
-//
-setLayoutParams(lparams);
+  
 }
 
 public void setLeftTopRightBottomWidthHeight(int left, int top, int right, int bottom, int w, int h) {
@@ -1233,9 +1135,10 @@ public void setLParamHeight(int h) {
   lpH = h;
 }
 
+
 public void addLParamsAnchorRule(int rule) {
- lparamsAnchorRule[countAnchorRule] = rule;
- countAnchorRule = countAnchorRule + 1;
+   lparamsAnchorRule[countAnchorRule] = rule;
+   countAnchorRule = countAnchorRule + 1;
 }
 
 public void addLParamsParentRule(int rule) {
@@ -1248,45 +1151,16 @@ public void setLayoutAll(int idAnchor) {
 	lparams.width  = lpW; //matchParent; 
 	lparams.height = lpH; //wrapContent;
 	lparams.setMargins(MarginLeft,MarginTop,marginRight,marginBottom);
-
 	if (idAnchor > 0) {    	
 		for (int i=0; i < countAnchorRule; i++) {  
 			lparams.addRule(lparamsAnchorRule[i], idAnchor);		
-	    }
-		
+	    }		
 	} 
 	for (int j=0; j < countParentRule; j++) {  
 		lparams.addRule(lparamsParentRule[j]);		
     }
-	//
 	setLayoutParams(lparams);
 }
-
-//by jmpessoa
-public void setIdEx(int id) {
-  this.setId(id);	
-}
-
-public void setTextEx(String txt) {
-   changeFlag = false;
-   this.setText(txt);
-   changeFlag = true; 
-}
-
-public String getTextEx() {
-  //Log.i("getTextEx",this.getText().toString());	
-  return this.getText().toString();
-}
-            
-public void setSingleLineEx(boolean value) {
-  this.setSingleLine(value);
-}
-
-/*
-public void setInputTypeEx(int value) {
-	this.setInputType(value);
-}
-*/
 
 public  void setInputTypeEx(String str) {
 	  bufStr = new String(str.toString());
@@ -1308,7 +1182,6 @@ public  void setInputTypeEx(String str) {
 	  else                                 {this.setInputType(android.text.InputType.TYPE_CLASS_TEXT);};
 	    
 	}
-
 
 // LORDMAN 2013-08-13
 public  void setTextAlignment( int align ) {
@@ -1342,16 +1215,8 @@ lparams = null;
 }
 
 //by jmpessoa
-public void setScrollerEx(android.content.Context context) {
-	setScroller(new Scroller(controls.activity)); 
-}
-
-public void setTextColor2(int value) {
-	this.setTextColor(value);  
-}
-
-public void setTextSize2(int value) {
-	this.setTextSize(value);  
+public void setScrollerEx() {
+	this.setScroller(new Scroller(controls.activity)); 
 }
 
 public void setFocus2() {
@@ -1369,18 +1234,10 @@ public  void immHide2() {
 	  imm.hideSoftInputFromWindow(this.getWindowToken(), 0);
 }
 
-
-public void setHint2(String hint) {
-   this.setHint(hint);
-}
-
 public  int[] getCursorPos() {
-
 	  int[] vals = new int[2];
-
 	  vals[0] = this.getSelectionStart();
 	  vals[1] = this.getSelectionEnd();
-
 	  return vals;
 }
 
@@ -1389,6 +1246,60 @@ public  void setCursorPos(int startPos, int endPos) {
 	  this.setSelection(startPos,endPos);
 }
 
+//LORDMAN - 2013-07-26
+public  void maxLength(int mLength) { //Edit not to make the length of the text greater than the specified length
+  InputFilter[] FilterArray = new InputFilter[1];
+  FilterArray[0] = new InputFilter.LengthFilter(mLength);
+  this.setFilters(FilterArray);
+}
+
+//LORDMAN 2013-08-27
+public  void SetEnabled(boolean enabled ) {
+ this.setClickable            (enabled);
+ this.setEnabled              (enabled);
+ this.setFocusable            (enabled);
+ this.setFocusableInTouchMode (enabled);
+}
+
+//LORDMAN 2013-08-27
+public  void SetEditable(boolean enabled ) {
+    this.setClickable(enabled);
+    
+    if (enabled) {this.setEnabled(enabled); }
+    
+    this.setFocusable(enabled);
+    this.setFocusableInTouchMode (enabled);
+}
+
+//by jmpessoa  :: bug! why?
+public  void SetMovementMethod() {
+    this.setMovementMethod(new ScrollingMovementMethod());//ScrollingMovementMethod.getInstance()
+}
+ //by jmpessoa
+public String GetText() {
+	return this.getText().toString();	
+}
+
+//by jmpessoa
+public  void AllCaps() {
+	InputFilter[] FilterArray = new InputFilter[1];
+	FilterArray[0] = new InputFilter.AllCaps();
+	this.setFilters(FilterArray);
+}
+
+public void DispatchOnChangeEvent(boolean value) {
+	canDispatchChangeEvent = value;
+}
+
+public void DispatchOnChangedEvent(boolean value) {
+	canDispatchChangedEvent = value;
+}
+
+
+public void SetInputType(int ipt){  //TODO!
+	this.setInputType(0);
+}
+	
 }
 
 //-------------------------------------------------------------------------
@@ -1420,25 +1331,6 @@ int marginRight = 5;
 int marginBottom = 5;
 int textColor;
 
-//by jmpessoa
-public void setMarginRight(int x) {
-	marginRight = x;
-}
-
-//by jmpessoa
-public void setMarginBottom(int y) {
-	marginBottom = y;
-}
-//by jmpessoa
-public void setMarginLeft(int x) {
-	MarginLeft = x;
-}
-
-//by jmpessoa
-public void setMarginTop(int y) {
-	MarginTop = y;
-}
-
 public void setLeftTopRightBottomWidthHeight(int left, int top, int right, int bottom, int w, int h) {
 	MarginLeft = left;
 	MarginTop = top;
@@ -1460,35 +1352,20 @@ lparams = new LayoutParams(100,100);     // W,H
 lparams.setMargins(5,5,5,5); // L,T,
 // Init Event
 onClickListener = new OnClickListener() {
-  public  void onClick(View view) {
-	  
-	Log.i("TAG_CLICK", "jButton_Clicked!"); //just demo for LATE logcat filter!
-	
+  public  void onClick(View view) {	  
+	//Log.i("TAG_CLICK", "jButton_Clicked!"); //just demo for LATE logcat filter!
     controls.pOnClick(PasObj,Const.Click_Default); 
   }
 };
-
 setOnClickListener(onClickListener);
-
 //Log.i("jButton","created!");
 }
 
 //
-public  void setXYWH ( int x, int y, int w, int h ) {
-lparams.width  = w;
-lparams.height = h;
-lparams.setMargins(x,y,0,0);
-//
-setLayoutParams(lparams);
-}
-
-//
 public  void setParent( android.view.ViewGroup viewgroup ) {
-if (parent != null) { parent.removeView(this); }
-parent = viewgroup;
-viewgroup.addView(this,lparams);
-
-//Log.i("jButton","setParent!");
+   if (parent != null) { parent.removeView(this); }
+   parent = viewgroup;
+   viewgroup.addView(this,lparams);
 }
 
 // Free object except Self, Pascal Code Free the class.
@@ -1540,24 +1417,18 @@ public void setLayoutAll(int idAnchor) {
 		this.setLayoutParams(lparams);
 	}
 
+/*
+ * If i set android:focusable="true" then button is highlighted and focused, 
+ * but then at the same time, 
+ * i need to click twice on the button to perform the actual click event.
+ */
 //by jmpessoa
-public void setIdEx(int id) {
-	  setId(id);
-	  //Log.i("jButton","setIdEx!");	  
-}
-
-//by jmpessoa
-public void setTextEx(String txt) {
-	this.setText(txt);	
-}
-
-public void setTextColor2(int value) {
-	textColor = value;
-	this.setTextColor(value);  	
-}
-
-public void SetBackgroundColor(int color) {	
-	this.setBackgroundColor(color);	
+public  void SetFocusable(boolean enabled ) {	
+  this.setClickable            (enabled);
+  this.setEnabled              (enabled);
+  this.setFocusable            (enabled);//*
+  this.setFocusableInTouchMode (enabled);//*
+  //obj.requestFocus(); 
 }
 
 
@@ -1649,15 +1520,15 @@ public void setLeftTopRightBottomWidthHeight(int left, int top, int right, int b
 //
 public  void setParent( android.view.ViewGroup viewgroup ) {
 if (parent != null) { parent.removeView(this); }
-parent = viewgroup;
-viewgroup.addView(this,lparams);
+  parent = viewgroup;
+  viewgroup.addView(this,lparams);
 }
 
 // Free object except Self, Pascal Code Free the class.
 public  void Free() {
-if (parent != null) { parent.removeView(this); }
-setText("");
-lparams = null;
+  if (parent != null) { parent.removeView(this); }
+  this.setText("");
+  lparams = null;
 }
 
 //by jmpessoa
@@ -1718,6 +1589,19 @@ public  void setChecked2(boolean value) {
    this.setChecked(value);
 }
 
+
+public void SetText(String txt) {
+	this.setText(txt);
+}
+
+public String GetText() {
+	return this.getText().toString();
+}
+
+public void SetTextSize(int size) {
+	this.setTextSize(size);
+}
+
 }
 
 //-------------------------------------------------------------------------
@@ -1748,26 +1632,6 @@ int MarginTop = 5;
 int marginRight = 5;
 int marginBottom = 5;
 
-//by jmpessoa
-public void setMarginRight(int x) {
-	marginRight = x;
-}
-
-//by jmpessoa
-public void setMarginBottom(int y) {
-	
-	marginBottom = y;
-}
-//by jmpessoa
-public void setMarginLeft(int x) {
-	MarginLeft = x;
-}
-
-//by jmpessoa
-public void setMarginTop(int y) {
-	MarginTop = y;
-}
-
 // Constructor
 public  jRadioButton(android.content.Context context,
                   Controls ctrls,long pasobj ) {
@@ -1785,15 +1649,6 @@ onClickListener = new OnClickListener() {
   }
 };
 setOnClickListener(onClickListener);
-}
-
-//
-public  void setXYWH ( int x, int y, int w, int h ) {
-lparams.width  = w;
-lparams.height = h;
-lparams.setMargins(x,y,0,0);
-//
-setLayoutParams(lparams);
 }
 
 public void setLeftTopRightBottomWidthHeight(int left, int top, int right, int bottom, int w, int h) {
@@ -1860,15 +1715,6 @@ public void setLayoutAll(int idAnchor) {
 		setLayoutParams(lparams);
 }
 
-	//by jmpessoa
-public void setIdEx(int id) {
-	  setId(id);	
-}
-
-public void setTextColor2(int value) {
-	this.setTextColor(value);  
-}
-
 }
 
 //-------------------------------------------------------------------------
@@ -1913,25 +1759,6 @@ int MarginTop = 5;
 int marginRight = 5;
 int marginBottom = 5;
 
-//by jmpessoa
-public void setMarginRight(int x) {
-	marginRight = x;
-}
-
-//by jmpessoa
-public void setMarginBottom(int y) {
-	marginBottom = y;
-}
-//by jmpessoa
-public void setMarginLeft(int x) {
-	MarginLeft = x;
-}
-
-//by jmpessoa
-public void setMarginTop(int y) {
-	MarginTop = y;
-}
-
 // Constructor
 public  jProgressBar(android.content.Context context,
                   Controls ctrls,long pasobj,int style ) {
@@ -1944,15 +1771,6 @@ controls = ctrls;
 lparams = new LayoutParams(100,100);     // W,H
 lparams.setMargins        ( 50, 50,0,0); // L,T,
 setMax(100);
-}
-
-//
-public  void setXYWH ( int x, int y, int w, int h ) {
-lparams.width  = w;
-lparams.height = h;
-lparams.setMargins(x,y,0,0);
-//
-setLayoutParams(lparams);
 }
 
 public void setLeftTopRightBottomWidthHeight(int left, int top, int right, int bottom, int w, int h) {
@@ -2018,33 +1836,6 @@ public void setLayoutAll(int idAnchor) {
 	setLayoutParams(lparams);
 }
 
-//by jmpessoa
-public void setIdEx(int id) {
-  setId(id);	
-}
-
-//by jmpessoa
-public void setProgressEx(int value) {
-	Log.i("jProgressBar Value","=" + value);
-	this.setProgress(value);
-}
-
-//by jmpessoa
-public int getProgress2() {
-	return this.getProgress();
-}
-
-//by jmpessoa
-public void setMax2(int value) {
-	this.setMax(value);
-}
-
-//by jmpessoa
-public int getMax2() {
-	return this.getMax();
-}
-
-
 }
 
 //-------------------------------------------------------------------------
@@ -2061,7 +1852,6 @@ private ViewGroup       parent   = null;   // parent view
 private LayoutParams    lparams;           // layout XYWH
 private OnClickListener onClickListener;   //
 public  Bitmap          bmp      = null;   //
-
 
 //by jmpessoa
 private int lparamsAnchorRule[] = new int[20]; 
@@ -2108,15 +1898,6 @@ onClickListener = new OnClickListener() {
 setOnClickListener(onClickListener);
 }
 
-//
-public  void setXYWH ( int x, int y, int w, int h ) {
-lparams.width  = w;
-lparams.height = h;
-lparams.setMargins(x,y,0,0);
-//
-setLayoutParams(lparams);
-}
-
 public void setLeftTopRightBottomWidthHeight(int left, int top, int right, int bottom, int w, int h) {
 	MarginLeft = left;
 	MarginTop = top;
@@ -2147,15 +1928,14 @@ if (parent != null) { parent.removeView(this); }
 
 //by jmpessoa
 public void setBitmapImage(Bitmap bm) {
+	//if (bmp    != null) { bmp.recycle(); }
+	bmp = bm; 
 	this.setImageBitmap(bm);
 }
 
 public  void setImage(String str) {
-	  Bitmap bmp;
-	  bmp = this.bmp;
-	  if (bmp != null)        { bmp.recycle(); }
-	  if (str.equals("null")) { this.setImageBitmap(null);
-	                            return; };
+	  //if (bmp != null)        { bmp.recycle(); }
+	  if (str.equals("null")) { this.setImageBitmap(null); return; };
 	  bmp = BitmapFactory.decodeFile( str );
 	  this.setImageBitmap(bmp);
 }
@@ -2180,16 +1960,9 @@ public Drawable GetDrawableResourceById(int _resID) {
 }
         
 public void SetImageByResIdentifier(String _imageResIdentifier) {
-	this.setImageDrawable(GetDrawableResourceById(GetDrawableResourceId(_imageResIdentifier)));
-}
-
-//by jmpessoa
-public void setMarginLeft(int x) {
-	MarginLeft = x;
-}
-
-public void setMarginTop(int y) {
-	MarginTop = y;
+	Drawable d = GetDrawableResourceById(GetDrawableResourceId(_imageResIdentifier));
+	bmp = ((BitmapDrawable)d).getBitmap();
+	this.setImageDrawable(d);
 }
 
 //by jmpessoa
@@ -2203,14 +1976,36 @@ public void setLParamHeight(int h) {
 
 //by jmpessoa
 public int getLParamHeight() {	
-	
-    return this.getHeight();
+  return  this.getHeight();
+ /*	
+  if (bmp != null) {
+     return this.bmp.getHeight();  //  ???  
+  } else return 0;
+  */  
 }  
 
 //by jmpessoa
 public int getLParamWidth() {
+  return this.getWidth();
+  /*
+  if (bmp != null) {
+	return this.bmp.getWidth(); //  ??? 
+  } else return 0;
+  */  
+}
 
-	return this.getWidth();
+//by jmpessoa
+public int GetBitmapHeight() {		
+  if (bmp != null) {
+     return this.bmp.getHeight();   
+  } else return 0;
+}  
+
+//by jmpessoa
+public int GetBitmapWidth() {
+  if (bmp != null) {
+	 return this.bmp.getWidth();  
+  } else return 0;
 }
 
 public void addLParamsAnchorRule(int rule) {
@@ -2240,11 +2035,6 @@ public void setLayoutAll(int idAnchor) {
   }
 	//
 	setLayoutParams(lparams);
-}
-
-//by jmpessoa
-public void setIdEx(int id) {
-   setId(id);	
 }
 
 }
@@ -2361,7 +2151,7 @@ public  View getView(int position, View v, ViewGroup parent) {
 	   itemText[i] = new TextView(ctx);
 	   
 	   if (items.get(position).textSize != 0){
-		   itemText[i].setTextSize(TypedValue.COMPLEX_UNIT_PX,items.get(position).textSize);
+		   itemText[i].setTextSize(items.get(position).textSize); //TypedValue.COMPLEX_UNIT_PX,
 	   }
 	   
 	   if (i == 0) {		   
@@ -2370,7 +2160,7 @@ public  View getView(int position, View v, ViewGroup parent) {
 		else{			
 		   itemText[i].setTypeface(null,faceBody);
 		   if (items.get(position).textSizeDecorated == 1) {
-			     itemText[i].setTextSize(TypedValue.COMPLEX_UNIT_PX, itemText[i].getTextSize() - 2*i);
+			     itemText[i].setTextSize(itemText[i].getTextSize() - 2*i); //TypedValue.COMPLEX_UNIT_PX, 
 		   }		   
 		}
 	   
@@ -2622,34 +2412,6 @@ public boolean isItemChecked(int index) {
 }
 
 //by jmpessoa
-public void setMarginRight(int x) {
-	marginRight = x;
-}
-
-//by jmpessoa
-public void setMarginBottom(int y) {
-	marginBottom = y;
-}
-//by jmpessoa
-public void setMarginLeft(int x) {
-	MarginLeft = x;
-}
-
-//by jmpessoa
-public void setMarginTop(int y) {
-	MarginTop = y;
-}
-
-//
-public  void setXYWH ( int x, int y, int w, int h ) {
-  lparams.width  = w;
-  lparams.height = h;
-  lparams.setMargins(x,y,0,0);
-  //
-  setLayoutParams(lparams);
-}
-
-//by jmpessoa
 public void setLeftTopRightBottomWidthHeight(int left, int top, int right, int bottom, int w, int h) {
 	MarginLeft = left;
 	MarginTop = top;
@@ -2755,11 +2517,6 @@ public void setLayoutAll(int idAnchor) {
   }
   //
   setLayoutParams(lparams);
-}
-
-//by jmpessoa
-public void setIdEx(int id) {
-   setId(id);	
 }
 
 //by jmpessoa
@@ -2877,6 +2634,32 @@ public  void setImageItem(Bitmap bm, int index) {
 	aadapter.notifyDataSetChanged();
 }
 
+
+//by jmpessoa
+private int GetDrawableResourceId(String _resName) {
+	  try {
+	     Class<?> res = R.drawable.class;
+	     Field field = res.getField(_resName);  //"drawableName"
+	     int drawableId = field.getInt(null);
+	     return drawableId;
+	  }
+	  catch (Exception e) {
+	     Log.e("jForm", "Failure to get drawable id.", e);
+	     return 0;
+	  }
+}
+
+//by jmpessoa
+private Drawable GetDrawableResourceById(int _resID) {
+	return (Drawable)( this.controls.activity.getResources().getDrawable(_resID));	
+}
+//by jmpessoa
+public  void setImageItem(String imgResIdentifier, int index) {	   // ..res/drawable
+	Drawable d = GetDrawableResourceById(GetDrawableResourceId(imgResIdentifier));        	
+	alist.get(index).bmp = ((BitmapDrawable)d).getBitmap();
+	aadapter.notifyDataSetChanged();	
+}
+
 //by jmpessoa
 public void setTextDecorated(int value, int index){
 	alist.get(index).textDecorated = value;
@@ -2971,25 +2754,6 @@ int MarginTop = 5;
 int marginRight = 5;
 int marginBottom = 5;
 
-//by jmpessoa
-public void setMarginRight(int x) {
-	marginRight = x;	
-}
-
-//by jmpessoa
-public void setMarginBottom(int y) {
-	marginBottom = y;
-}
-//by jmpessoa
-public void setMarginLeft(int x) {
-	MarginLeft = x;
-}
-
-//by jmpessoa
-public void setMarginTop(int y) {
-	MarginTop = y;
-}
-
 // Constructor
 public  jScrollView(android.content.Context context,
                  Controls ctrls,long pasobj ) {
@@ -3009,19 +2773,6 @@ scrollxywh = new LayoutParams(100,100);
 scrollxywh.setMargins(0,0,0,0);
 scrollview.setLayoutParams(scrollxywh);
 this.addView(scrollview);
-}
-
-//
-public  void setXYWH ( int x, int y, int w, int h ) {
-Log.i("java","setXYWH-> jScrollView1");
-lparams.width  = w;
-lparams.height = h;
-lparams.setMargins(x,y,0,0);
-//
-setLayoutParams(lparams);
-//
-scrollxywh.width = w;
-scrollview.setLayoutParams(scrollxywh);
 }
 
 public void setLeftTopRightBottomWidthHeight(int left, int top, int right, int bottom, int w, int h) {
@@ -3113,11 +2864,6 @@ public void setLayoutAll(int idAnchor) {
 	
 }
 
-//by jmpessoa
-public void setIdEx(int id) {
-setId(id);	
-}
-
 }
 
 //-----------------------------------------
@@ -3147,22 +2893,6 @@ class jPanel extends RelativeLayout {
 	
 	boolean mRemovedFromParent = false;
 	    	
-	public void setMarginRight(int x) {
-		marginRight = x;
-	}
-
-	public void setMarginBottom(int y) {
-		marginBottom = y;
-	}
-
-	public void setMarginLeft(int x) {
-		MarginLeft = x;
-	}
-
-	public void setMarginTop(int y) {
-		MarginTop = y;
-	}
-
 	//Constructor
 	public  jPanel(android.content.Context context, Controls ctrls,long pasobj ) {
 	   super(context);	
@@ -3172,14 +2902,7 @@ class jPanel extends RelativeLayout {
        lparams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);		
 	   //
 	}
-	
-	public  void setXYWH ( int x, int y, int w, int h ) {		
-		lparams.width  = w;
-		lparams.height = h;
-		lparams.setMargins(x,y,0,0);
-		setLayoutParams(lparams);		
-	}
-	
+		
 	public void setLeftTopRightBottomWidthHeight(int left, int top, int right, int bottom, int w, int h) {
 		MarginLeft = left;
 		MarginTop = top;
@@ -3243,12 +2966,8 @@ class jPanel extends RelativeLayout {
 	    }
 		setLayoutParams(lparams); 		
  	}
-
-	public void setIdEx(int id) {
-	   setId(id);	
-	}
 	
-	//GetView!
+	//GetView!-android.widget.RelativeLayout
 	public  RelativeLayout getView() {
 	   return this;
 	}
@@ -3306,24 +3025,6 @@ int MarginTop = 5;
 int marginRight = 5;
 int marginBottom = 5;
 
-//by jmpessoa
-public void setMarginRight(int x) {
-	marginRight = x;
-}
-
-//by jmpessoa
-public void setMarginBottom(int y) {
-	marginBottom = y;
-}
-//by jmpessoa
-public void setMarginLeft(int x) {
-	MarginLeft = x;
-}
-
-//by jmpessoa
-public void setMarginTop(int y) {
-	MarginTop = y;
-}
 
 // Constructor
 public  jHorizontalScrollView(android.content.Context context,
@@ -3345,20 +3046,6 @@ scrollxywh = new LayoutParams(100,100);
 scrollxywh.setMargins(0,0,0,0);
 scrollview.setLayoutParams(scrollxywh);
 this.addView(scrollview);
-}
-
-//
-public  void setXYWH ( int x, int y, int w, int h ) {
-Log.i("java","setXYWH-> jHorizontalScrollView");
-lparams.width  = w;
-lparams.height = h;
-
-lparams.setMargins(x,y,0,0);
-//
-setLayoutParams(lparams);
-//
-scrollxywh.width = w;
-scrollview.setLayoutParams(scrollxywh);
 }
 
 public void setLeftTopRightBottomWidthHeight(int left, int top, int right, int bottom, int w, int h) {
@@ -3452,11 +3139,6 @@ public void setLayoutAll(int idAnchor) {
 	scrollview.setLayoutParams(scrollxywh);
 }
 
-//by jmpessoa
-public void setIdEx(int id) {
-setId(id);	
-}
-
 }
 
 //-------------------------------------------------------------------------
@@ -3503,24 +3185,6 @@ int MarginTop = 5;
 int marginRight = 5;
 int marginBottom = 5;
 
-//by jmpessoa
-public void setMarginRight(int x) {
-	marginRight = x;
-}
-
-//by jmpessoa
-public void setMarginBottom(int y) {
-	marginBottom = y;
-}
-//by jmpessoa
-public void setMarginLeft(int x) {
-	MarginLeft = x;
-}
-
-//by jmpessoa
-public void setMarginTop(int y) {
-	MarginTop = y;
-}
 
 // Constructor
 public  jViewFlipper(android.content.Context context,
@@ -3572,7 +3236,7 @@ setBackgroundColor(0x80FFFFFF);
 // Init Event
 onTouchListener = new OnTouchListener() {
   public  boolean onTouch(final View view, final MotionEvent event) {
-    Log.i("ViewFlipper","ViewFlipper OnTouch");
+    //Log.i("ViewFlipper","ViewFlipper OnTouch");
     switch(event.getAction())  {
       case MotionEvent.ACTION_DOWN :
            { Xdn = event.getX();
@@ -3580,7 +3244,7 @@ onTouchListener = new OnTouchListener() {
       case MotionEvent.ACTION_UP   :
            { Xup   = event.getX();
              if(Xup < Xdn) { // Right Direction
-                             Log.i("ViewFlipper","Right Dir.");
+                            // Log.i("ViewFlipper","Right Dir.");
                              setInAnimation (iR2L);
                              setOutAnimation(oR2L);
                              showNext();
@@ -3588,7 +3252,7 @@ onTouchListener = new OnTouchListener() {
                            //                            inxcur++;  }
                            }
              else if (Xup > Xdn) { // Left Direction
-                                   Log.i("ViewFlipper","Left Dir.");
+                                  // Log.i("ViewFlipper","Left Dir.");
                              setInAnimation (iL2R);
                              setOutAnimation(oL2R);
                              showPrevious();
@@ -3602,15 +3266,6 @@ onTouchListener = new OnTouchListener() {
   }
 };
 setOnTouchListener(onTouchListener);
-}
-
-//
-public  void setXYWH ( int x, int y, int w, int h ) {
-lparams.width  = w;
-lparams.height = h;
-lparams.setMargins(x,y,0,0);
-//
-setLayoutParams(lparams);
 }
 
 public void setLeftTopRightBottomWidthHeight(int left, int top, int right, int bottom, int w, int h) {
@@ -3681,11 +3336,6 @@ public void setLayoutAll(int idAnchor) {
 	setLayoutParams(lparams);
 }
 
-//by jmpessoa
-public void setIdEx(int id) {
-setId(id);	
-}
-
 }
 
 //-------------------------------------------------------------------------
@@ -3747,24 +3397,6 @@ int MarginTop = 5;
 int marginRight = 5;
 int marginBottom = 5;
 
-//by jmpessoa
-public void setMarginRight(int x) {
-	marginRight = x;
-}
-
-//by jmpessoa
-public void setMarginBottom(int y) {
-	marginBottom = y;
-}
-//by jmpessoa
-public void setMarginLeft(int x) {
-	MarginLeft = x;
-}
-
-//by jmpessoa
-public void setMarginTop(int y) {
-	MarginTop = y;
-}
 
 // Constructor
 public  jWebView(android.content.Context context,
@@ -3785,15 +3417,6 @@ getSettings().setJavaScriptEnabled(true);
 lparams = new RelativeLayout.LayoutParams  (300,300);
 lparams.setMargins( 50, 50,0,0);
 //
-}
-
-//
-public  void setXYWH ( int x, int y, int w, int h ) {
-lparams.width  = w;
-lparams.height = h;
-lparams.setMargins(x,y,0,0);
-//
-setLayoutParams(lparams);
 }
 
 public void setLeftTopRightBottomWidthHeight(int left, int top, int right, int bottom, int w, int h) {
@@ -3861,21 +3484,9 @@ public void setLayoutAll(int idAnchor) {
 	setLayoutParams(lparams);
 }
 
-//by jmpessoa
-public void setIdEx(int id) {
-setId(id);	
-}
-
-
 public  void setJavaScript(boolean javascript) {
 	  this.getSettings().setJavaScriptEnabled(javascript);
 }
-
-public  void loadURL2(String str) {
-	  this.loadUrl("about:blank");
-	  this.loadUrl(str);
-}
-
 
 }
 
@@ -3979,24 +3590,6 @@ int MarginTop = 5;
 int marginRight = 5;
 int marginBottom = 5;
 
-//by jmpessoa
-public void setMarginRight(int x) {
-	marginRight = x;
-}
-
-//by jmpessoa
-public void setMarginBottom(int y) {
-	marginBottom = y;
-}
-//by jmpessoa
-public void setMarginLeft(int x) {
-	MarginLeft = x;
-}
-
-//by jmpessoa
-public void setMarginTop(int y) {
-	MarginTop = y;
-}
 
 // Constructor
 public  jView(android.content.Context context,
@@ -4008,15 +3601,6 @@ controls = ctrls;
 // Init Class
 lparams = new LayoutParams(300,300);
 lparams.setMargins( 50, 50,0,0);
-}
-
-//
-public  void setXYWH ( int x, int y, int w, int h ) {
-lparams.width  = w;
-lparams.height = h;
-lparams.setMargins(x,y,0,0);
-//
-setLayoutParams(lparams);
 }
 
 public void setLeftTopRightBottomWidthHeight(int left, int top, int right, int bottom, int w, int h) {
@@ -4036,12 +3620,8 @@ if (parent != null) { parent.removeView(this); }
 }
 
 //
-public  void setjCanvas( jCanvas canvas ) {
-  jcanvas = canvas;
-}
-
-public  void saveView2(String filename) {
-	  this.saveView(filename);
+public  void setjCanvas(java.lang.Object canvas) {   
+   jcanvas = (jCanvas)canvas;
 }
 
 //
@@ -4110,7 +3690,7 @@ switch(act) {
         }
        break;}
   case MotionEvent.ACTION_POINTER_UP  : {
-  	    Log.i("Java","PUp");
+  	   // Log.i("Java","PUp");
         switch (event.getPointerCount()) {
         	case 1 : { controls.pOnTouch (PasObj,Const.TouchUp  ,1,
         		                            event.getX(0),event.getY(0),0,0); break; }
@@ -4200,11 +3780,6 @@ public void setLayoutAll(int idAnchor) {
    setLayoutParams(lparams);
 }
 
-//by jmpessoa
-public void setIdEx(int id) {
-  setId(id);	
-}
-
 }
 
 //-------------------------------------------------------------------------
@@ -4242,25 +3817,6 @@ int MarginTop = 5;
 int marginRight = 5;
 int marginBottom = 5;
 
-//by jmpessoa
-public void setMarginRight(int x) {
-	marginRight = x;
-}
-
-//by jmpessoa
-public void setMarginBottom(int y) {
-	marginBottom = y;
-}
-//by jmpessoa
-public void setMarginLeft(int x) {
-	MarginLeft = x;
-}
-
-//by jmpessoa
-public void setMarginTop(int y) {
-	MarginTop = y;
-}
-
 //
 class jRenderer implements GLSurfaceView.Renderer {
   public  void onSurfaceCreated(GL10 gl, EGLConfig config) {
@@ -4268,9 +3824,10 @@ class jRenderer implements GLSurfaceView.Renderer {
   public  void onSurfaceChanged(GL10 gl, int w, int h) {
              controls.pOnGLRenderer(PasObj,Const.Renderer_onSurfaceChanged,w,h); }
   public  void onDrawFrame     (GL10 gl) {
-	             Log.i("Java","Draw before");
+	             //Log.i("Java","Draw before");
              controls.pOnGLRenderer(PasObj,Const.Renderer_onDrawFrame,0,0);    
-             Log.i("Java","Draw after");  }
+             //Log.i("Java","Draw after");  
+             }
 }
 
 // Constructor
@@ -4297,12 +3854,6 @@ public  jGLSurfaceView (android.content.Context context,
 
 }
 
-//
-public  void setXYWH ( int x, int y, int w, int h ) {
-  lparams.width  = w;
-  lparams.height = h;
-  lparams.setMargins(x,y,0,0);
-}
 
 public void setLeftTopRightBottomWidthHeight(int left, int top, int right, int bottom, int w, int h) {
 	MarginLeft = left;
@@ -4388,7 +3939,7 @@ return true;
 //
 @Override
 public void surfaceDestroyed(SurfaceHolder holder) {
-	Log.i("Java","surfaceDestroyed");
+	//Log.i("Java","surfaceDestroyed");
 	queueEvent(new Runnable() {
     	@Override
 	    public void run() {
@@ -4492,14 +4043,10 @@ public void setLayoutAll(int idAnchor) {
 	setLayoutParams(lparams);
 }
 
-//by jmpessoa
-public void setIdEx(int id) {
-  setId(id);	
-}
 
 //by jmpessoa
 public void Refresh() {
-   requestRender();
+   this.requestRender();
 }
 
 //by jmpessoa
@@ -4636,25 +4183,6 @@ int MarginTop = 5;
 int marginRight = 5;
 int marginBottom = 5;
 
-//by jmpessoa
-public void setMarginRight(int x) {
-	marginRight = x;
-}
-
-//by jmpessoa
-public void setMarginBottom(int y) {
-	marginBottom = y;
-}
-//by jmpessoa
-public void setMarginLeft(int x) {
-	MarginLeft = x;
-}
-
-//by jmpessoa
-public void setMarginTop(int y) {
-	MarginTop = y;
-}
-
 // Constructor
 public  jImageBtn(android.content.Context context,
                 Controls ctrls,long pasobj ) {
@@ -4670,17 +4198,6 @@ lparams.setMargins( 50, 50,0,0);
 //
 mPaint = new Paint();
 rect   = new Rect(0,0,100,100);
-}
-
-//
-public  void setXYWH ( int x, int y, int w, int h ) {
-lparams.width  = w;
-lparams.height = h;
-lparams.setMargins(x,y,0,0);
-rect.right     = w;
-rect.bottom    = h;
-//
-setLayoutParams(lparams);
 }
 
 public void setLeftTopRightBottomWidthHeight(int left, int top, int right, int bottom, int w, int h) {
@@ -4719,6 +4236,40 @@ bmpDn = BitmapFactory.decodeFile(filedn);
 invalidate();
 }
 
+
+//by jmpessoa
+private int GetDrawableResourceId(String _resName) {
+	  try {
+	     Class<?> res = R.drawable.class;
+	     Field field = res.getField(_resName);  //"drawableName"
+	     int drawableId = field.getInt(null);
+	     return drawableId;
+	  }
+	  catch (Exception e) {
+	     Log.e("jForm", "Failure to get drawable id.", e);
+	     return 0;
+	  }
+}
+
+//by jmpessoa
+private Drawable GetDrawableResourceById(int _resID) {
+	return (Drawable)( this.controls.activity.getResources().getDrawable(_resID));	
+}
+
+public  void setButtonUpByRes(String resup) {   // ..res/drawable
+ if (bmpUp  != null) { bmpUp.recycle(); }
+  Drawable d = GetDrawableResourceById(GetDrawableResourceId(resup));
+  bmpUp = ((BitmapDrawable)d).getBitmap();
+  invalidate();
+}
+
+public  void setButtonDownByRes(String resdn) {   // ..res/drawable
+  if (bmpDn  != null) { bmpDn.recycle(); }
+   Drawable d = GetDrawableResourceById(GetDrawableResourceId(resdn));
+   bmpDn = ((BitmapDrawable)d).getBitmap();
+   invalidate();
+}
+
 //
 @Override
 public  boolean onTouchEvent( MotionEvent event) {
@@ -4727,7 +4278,9 @@ if (enabled == false) { return(false); }
 
 int actType = event.getAction() &MotionEvent.ACTION_MASK;
 switch(actType) {
-  case MotionEvent.ACTION_DOWN: { btnState = 1; invalidate(); Log.i("Java","jImageBtn Here"); break; }
+  case MotionEvent.ACTION_DOWN: { btnState = 1; invalidate(); 
+                                 //Log.i("Java","jImageBtn Here"); 
+                                 break; }
   case MotionEvent.ACTION_MOVE: {                             break; }
   case MotionEvent.ACTION_UP  : { btnState = 0; invalidate();
                                   controls.pOnClick(PasObj,Const.Click_Default);
@@ -4801,11 +4354,6 @@ public void setLayoutAll(int idAnchor) {
   setLayoutParams(lparams);
 }
 
-//by jmpessoa
-public void setIdEx(int id) {
-setId(id);	
-}
-
 }
 
 /*
@@ -4867,7 +4415,7 @@ execute(urlfile);
 @Override
 protected void onPreExecute() {
 super.onPreExecute();
-Log.i("Java","Before Download");
+//Log.i("Java","Before Download");
 //progress.show();
 }
 
@@ -4883,7 +4431,7 @@ super.onProgressUpdate();
 @Override
 protected void onPostExecute(File result) {
 super.onPostExecute(result);
-Log.i("Java","Finish");
+//Log.i("Java","Finish");
 }
 
 // Step #2. Downloading
@@ -4922,7 +4470,7 @@ try {
      fos.flush();
      fos.close();
      //
-     Log.d("Java", "Downloaded " + ((System.currentTimeMillis() - startTime) / 1000) + "s");
+     //Log.d("Java", "Downloaded " + ((System.currentTimeMillis() - startTime) / 1000) + "s");
      // return -> onPostExecute
      return file;  }
 catch (IOException e) {
@@ -4994,7 +4542,7 @@ protected void onPostExecute(Void result) {
 }
 
 public void setProgress(int progress ) {
-   Log.i("jAsyncTask","setProgress "+progress );
+   //Log.i("jAsyncTask","setProgress "+progress );
    publishProgress(progress);
 }
 
@@ -5003,13 +4551,15 @@ public void SetAutoPublishProgress(boolean value){
     autoPublishProgress = value;
 }
 
-//by jmpessoa
+/*
 public void Execute2(){
-  execute();
+  this.execute();
 }
+*/
 
 //Free object except Self, Pascal Code Free the class.
 public  void Free() {
+	
 }
 
 }
@@ -5032,7 +4582,7 @@ asynctask = new jAsyncTask(ctrls,pasobj);
 }
 
 public void setProgress(int progress ) {
-Log.i("jTask","setProgress " );
+//Log.i("jTask","setProgress " );
 
 }
 
@@ -5065,6 +4615,34 @@ public  void loadFile(String filename) {  //full file name!
   //if (bmp != null) { bmp.recycle(); }
   bmp = BitmapFactory.decodeFile(filename);
 }
+
+
+//by jmpessoa
+private int GetDrawableResourceId(String _resName) {
+	  try {
+	     Class<?> res = R.drawable.class;
+	     Field field = res.getField(_resName);  //"drawableName"
+	     int drawableId = field.getInt(null);
+	     return drawableId;
+	  }
+	  catch (Exception e) {
+	     Log.e("jForm", "Failure to get drawable id.", e);
+	     return 0;
+	  }
+}
+
+//by jmpessoa
+private Drawable GetDrawableResourceById(int _resID) {
+	return (Drawable)( this.controls.activity.getResources().getDrawable(_resID));	
+}
+
+//by jmpessoa
+public  void loadRes(String imgResIdentifier) {  //full file name!
+	  //if (bmp != null) { bmp.recycle(); }
+	  Drawable d = GetDrawableResourceById(GetDrawableResourceId(imgResIdentifier));
+	  bmp =	  ((BitmapDrawable)d).getBitmap();
+}
+
 
 //by jmpessoa
 //BitmapFactory.Options options = new BitmapFactory.Options();
@@ -5125,14 +4703,14 @@ public  Bitmap jInstance() {
 public byte[] GetByteArrayFromBitmap() {
     ByteArrayOutputStream stream = new ByteArrayOutputStream();
     this.bmp.compress(CompressFormat.PNG, 0, stream); //O: PNG will ignore the quality setting...
-    Log.i("GetByteArrayFromBitmap","size="+ stream.size());
+    //Log.i("GetByteArrayFromBitmap","size="+ stream.size());
     return stream.toByteArray();
 }
 
 //by jmpessoa
 public void SetByteArrayToBitmap(byte[] image) {
 	this.bmp = BitmapFactory.decodeByteArray(image, 0, image.length);
-	Log.i("SetByteArrayToBitmap","size="+ image.length);
+	//Log.i("SetByteArrayToBitmap","size="+ image.length);
 }
 
 }
@@ -5715,7 +5293,7 @@ class jMyHello /*extends ...*/ {
           mFlag = _flag;
           mMsgHello = _hello;
           mBufArray = null;
-          Log.i("jMyHello", "Create!");          
+          //Log.i("jMyHello", "Create!");          
         }
 
         public void jFree() {
@@ -5831,7 +5409,7 @@ class jDumpJavaMethods /*extends ...*/ {
       mObjReferenceName = "this";
       mStripFullTypeName = true;
       
-      Log.i("jDumpJavaMethods", "Created!");                
+      //Log.i("jDumpJavaMethods", "Created!");                
     }
 
     public void jFree() {
@@ -5913,7 +5491,7 @@ class jDumpJavaMethods /*extends ...*/ {
     			 }else {
     				strRet = strRet + mListMethodHeader.get(i); 
     			 }
-    		     Log.i("Dump_List_Header", mListMethodHeader.get(i));
+    		     //Log.i("Dump_List_Header", mListMethodHeader.get(i));
     		 }
     	 }
     	 if ( strRet.length() == 0 ) {strRet = mDelimiter;}
@@ -6085,7 +5663,7 @@ class jDumpJavaMethods /*extends ...*/ {
 
     		  	sbHeader.append(head+" "+tail1);            		  	
             	sbHeader.append(_delimiter);
-            	Log.i("Dump_Header::", head+" "+tail1);
+            	//Log.i("Dump_Header::", head+" "+tail1);
             	mListMethodHeader.add(head+" "+tail1);
         	 }        	 
          }  
@@ -6109,7 +5687,7 @@ class jDumpJavaMethods /*extends ...*/ {
       }
       catch (Throwable e) {
          //System.err.println(e);
-    	  Log.i("Dump_error", e.toString());
+    	  //Log.i("Dump_error", e.toString());
       }
 	  
 	  return mMethodImplementation;
@@ -6226,7 +5804,7 @@ class jDumpJavaMethods /*extends ...*/ {
        		
        		sbImplementation.append(finalStr2);        		
        		sbImplementation.append(mDelimiter);
-       		Log.i("Dump_Produce", finalStr2);
+       		//Log.i("Dump_Produce", finalStr2);
        		
        		mListNoMaskedMethodImplementation.add(finalStr2);
        	 }        	 
@@ -6235,7 +5813,7 @@ class jDumpJavaMethods /*extends ...*/ {
      }
      catch (Throwable e) {
         //System.err.println(e);
-   	  Log.i("Dump_NoMaskedImpl_error", e.toString());
+   	  //Log.i("Dump_NoMaskedImpl_error", e.toString());
      }
 	 return mNoMaskedMethodImplementation;
    }
@@ -6306,7 +5884,7 @@ class jTextFileManager /*extends ...*/ {
          outputStreamWriter.close();
      }
      catch (IOException e) {
-         Log.i("jTextFileManager", "SaveToFile failed: " + e.toString());
+        // Log.i("jTextFileManager", "SaveToFile failed: " + e.toString());
      }
    }
 
@@ -6343,13 +5921,12 @@ class jTextFileManager /*extends ...*/ {
          }
      }
      catch (IOException e) {
-         Log.i("jTextFileManager", "LoadFromFile error: " + e.toString());
+        // Log.i("jTextFileManager", "LoadFromFile error: " + e.toString());
      }
 
      return retStr;
    }
-   
-   
+     
    public String LoadFromFile(String _path, String _filename) {
 	     char buf[] = new char[512];
 	     FileReader rdr;
@@ -6472,7 +6049,7 @@ class jMediaPlayer {
 		   
 		 this.mplayer = new MediaPlayer();
 		 	 
-		 Log.i("jMediaPlayer", "Created!");
+		 //Log.i("jMediaPlayer", "Created!");
 	  }
 	  
 	  public void jFree() {
@@ -6516,12 +6093,12 @@ class jMediaPlayer {
 			  }
 		 }else if (_path.indexOf("DEFAULT_RINGTONE_URI") >= 0){
 			 
-			 Log.i("jMediaPlayer", "DEFAULT_RINGTONE_URI");
+			 //Log.i("jMediaPlayer", "DEFAULT_RINGTONE_URI");
 			 
 	         try{ 
 	              this.mplayer.setDataSource(context, Settings.System.DEFAULT_RINGTONE_URI);
 	         }catch (IOException e){
-	        	  Log.i("jMediaPlayer", "RINGTONE ERROR");
+	        	  //Log.i("jMediaPlayer", "RINGTONE ERROR");
 	  	          e.printStackTrace();  	         
 	         }
 	         
@@ -6540,7 +6117,7 @@ class jMediaPlayer {
 		           e.printStackTrace();	
 	            }
 	           		   
-	  		    Log.i("jMediaPlayer", newPath);
+	  		   // Log.i("jMediaPlayer", newPath);
 	  		   
 		      } else {	    	 
 		    	 String initChar = _path.substring(0,1);	    	 
@@ -6554,7 +6131,7 @@ class jMediaPlayer {
 		         }
 	     	 }		 	
 		 }else {
-			 Log.i("jMediaPlayer", "loadFromAssets: "+ _path);
+			// Log.i("jMediaPlayer", "loadFromAssets: "+ _path);
 			 AssetFileDescriptor afd;
 			 try {
 			 	afd = controls.activity.getAssets().openFd(_path);
@@ -6568,7 +6145,7 @@ class jMediaPlayer {
 	  //for files, it is OK to call prepare(), which blocks until MediaPlayer is ready for playback...
 	  public void Prepare(){	 //prepares the player for playback synchronously.
 	  	try {
-	  		   Log.i("jMediaPlayer", "Prepare");
+	  		   //Log.i("jMediaPlayer", "Prepare");
 	  		   this.mplayer.prepare();		
 			} catch (IOException e) {
 				e.printStackTrace();		
@@ -6705,17 +6282,17 @@ class jMenu /*extends ...*/ {
     	  case 0: _item.setChecked(false); 
     	  case 1: _item.setChecked(true);
         }
-  	    Log.i("jMenu_CheckItemCommute", _item.getTitle().toString());
+  	    //Log.i("jMenu_CheckItemCommute", _item.getTitle().toString());
     }
     
     public void CheckItem(MenuItem _item){
        _item.setChecked(true);
-       Log.i("jMenu_CheckItem", _item.getTitle().toString());
+       //Log.i("jMenu_CheckItem", _item.getTitle().toString());
     }
     
     public void UnCheckItem(MenuItem _item){
        _item.setChecked(false);       
-   	   Log.i("jMenu_UnCheckItem", _item.getTitle().toString());
+   	   //Log.i("jMenu_UnCheckItem", _item.getTitle().toString());
     }    
     
     public void AddSubMenu(Menu _menu, int _startItemID, String[] _captions){    	
@@ -6736,7 +6313,7 @@ class jMenu /*extends ...*/ {
     	if (size > 1) {    		
     	   mSubMenus[mCountSubMenu] = _menu.addSubMenu((CharSequence)_captions[0]); //main title
     	   mSubMenus[mCountSubMenu].setHeaderIcon(R.drawable.ic_launcher);       	   
-    	   Log.i("jMenu_AddCheckableSubMenu", _captions[0]);
+    	   //Log.i("jMenu_AddCheckableSubMenu", _captions[0]);
     	   for(int i=1; i < size; i++) {    	
     		  mSubMenus[mCountSubMenu].add(0,_startItemID+(i-1),0,(CharSequence)_captions[i]).setCheckable(true); //sub titles...
     	   }    	   
@@ -7039,7 +6616,7 @@ class jBluetoothServerSocket {
           	    HandleInput();
            }else if (msg.what == 2){  //qet as text....
         	    controls.pOnBluetoothClientSocketIncomingMessage(pascalObj, msg.getData().getString("text"));
-        	    Log.i("mHandler",msg.getData().getString("text"));	                
+        	    //Log.i("mHandler",msg.getData().getString("text"));	                
            }else if (msg.what == 3){ //QUIT
         	   mConnected = false;
            }	           
@@ -7323,7 +6900,7 @@ class jBluetoothClientSocket {
 	        	     HandleInput();        	   
 	           }else if (msg.what == 2){  //qet as  text
 	        	    controls.pOnBluetoothClientSocketIncomingMessage(pascalObj, msg.getData().getString("text"));	        	    
-	        	    Log.i("mHandler",msg.getData().getString("text"));	                
+	        	   // Log.i("mHandler",msg.getData().getString("text"));	                
 	           }else if (msg.what == 3){ //QUIT
 	        	   mmConnected = false;
 	           }	           
@@ -7357,7 +6934,7 @@ class jBluetoothClientSocket {
 	}
 	
 	public void SetDevice(BluetoothDevice _device) {
-		Log.i("SetDevice","SetDevice...");
+		//Log.i("SetDevice","SetDevice...");
 		mmDevice = _device;
 	}
 	
@@ -7634,7 +7211,7 @@ class jBluetooth /*extends ...*/ {
 	        	   mListReachablePairedDevices.add(device);	               
 	           }
 			   mListFoundedDevices.add( device.getName() + "|" + device.getAddress() );
-			   Log.i("jBluetooth_onReceive",device.getName() + "|" + device.getAddress());	        	   
+			  // Log.i("jBluetooth_onReceive",device.getName() + "|" + device.getAddress());	        	   
 	           	           
 	           controls.pOnBluetoothDeviceFound(pascalObj,device.getName(),device.getAddress());
 	           
@@ -7747,7 +7324,7 @@ class jBluetooth /*extends ...*/ {
               
               for(BluetoothDevice device : Devices) {        	
          	     listBondedDevices.add(device.getName()+"|"+ device.getAddress());
-           	     Log.i("Bluetooch_devices",device.getName());  //device.getAddress()            
+           	     //Log.i("Bluetooch_devices",device.getName());  //device.getAddress()            
               }
               
            }  
@@ -7870,7 +7447,7 @@ class jBluetooth /*extends ...*/ {
     	for(int i=0; i < mListFoundedDevices.size(); i++) {
     	    device = mListFoundedDevices.get(i);    	   
     	    devAddr = device.substring(device.indexOf("|")+1);
-    	    Log.i("devAddr",devAddr);
+    	   // Log.i("devAddr",devAddr);
     	    if (devAddr.equals(_deviceAddress)) {
     	    	break;
     	    }    	       	    	    
@@ -7885,7 +7462,7 @@ class jBluetooth /*extends ...*/ {
     	for(int i=0; i < mListFoundedDevices.size(); i++) {
     	    device = mListFoundedDevices.get(i);    	   
     	    devName = device.substring(0, device.indexOf("|")-1);
-    	    Log.i("devName",devName);
+    	   // Log.i("devName",devName);
     	    if (devName.equals(_deviceName)) {
     	    	break;
     	    }    	       	    	    
@@ -7988,7 +7565,7 @@ class jShareFile /*extends ...*/ {
 				fos.close();								
 				ShareFromInternalAppStorage(_filename,_mimetype);				
 			}catch (IOException e) {
-				 Log.i("ShareFromAssets","fail!!");
+				// Log.i("ShareFromAssets","fail!!");
 			     e.printStackTrace();			     
 			}									
 	}	
@@ -8433,7 +8010,7 @@ class jLocation /*extends ...*/ {
           result = true;
         }            
         else {
-        	 Log.i("jLocation", "Wait... No Location Yet!!");                	        
+        	// Log.i("jLocation", "Wait... No Location Yet!!");                	        
         	 result = false;
         }    
         
@@ -8599,7 +8176,7 @@ class jLocation /*extends ...*/ {
              
              mAddress = GetAddress(mLat, mLng);
              
-             Log.i("jLocation", "Latitude: "+ mLatitude+ " ... Longitude: "+mLongitude+" ... Altitude: " + mAltitude);
+            // Log.i("jLocation", "Latitude: "+ mLatitude+ " ... Longitude: "+mLongitude+" ... Altitude: " + mAltitude);
                           
         	 controls.pOnLocationChanged(pascalObj,mLat,mLng,mAlt,mAddress);        		
         }
@@ -8618,21 +8195,21 @@ class jLocation /*extends ...*/ {
     			 mStatus="Available";    		
               break;
     		}        	        	
-        	Log.i("jLocation", "mStatus: "+mStatus);
+        	//Log.i("jLocation", "mStatus: "+mStatus);
         	
         	controls.pOnLocationStatusChanged(pascalObj, status, provider, mStatus);
         }
 
         @Override
         /*.*/public void onProviderEnabled(String provider) {
-        	Log.i("jLocation", "Enabled: "+provider);
+        	//Log.i("jLocation", "Enabled: "+provider);
         	controls.pOnLocationProviderEnabled(pascalObj, provider);
         }
         
         @Override
         /*.*/public void onProviderDisabled(String provider) {        
         	///* this is called if/when the GPS is disabled in settings */
-        	Log.i("jLocation", "Disabled: "+provider);
+        	//Log.i("jLocation", "Disabled: "+provider);
         	controls.pOnLocationProviderDisabled(pascalObj, provider);        	
         }
                 
@@ -8815,6 +8392,32 @@ class jImageFileManager /*extends ...*/ {
        }
        Bitmap bitmap = BitmapFactory.decodeStream(istr);
        return bitmap;
+   }
+  
+   
+ 
+   private int GetDrawableResourceId(String _resName) {
+   	  try {
+   	     Class<?> res = R.drawable.class;
+   	     Field field = res.getField(_resName);  //"drawableName"
+   	     int drawableId = field.getInt(null);
+   	     return drawableId;
+   	  }
+   	  catch (Exception e) {
+   	     Log.e("jImageFileManager", "Failure to get drawable id.", e);
+   	     return 0;
+   	  }
+   }
+
+   private Drawable GetDrawableResourceById(int _resID) {
+   	return (Drawable)( this.controls.activity.getResources().getDrawable(_resID));	
+   }
+             
+   public Bitmap LoadFromResources(String _imageResIdentifier)
+   {
+	  Drawable d = GetDrawableResourceById(GetDrawableResourceId(_imageResIdentifier));
+	  Bitmap bmap = ((BitmapDrawable)d).getBitmap();
+      return bmap;
    }
    
    public Bitmap LoadFromFile(String _filename) {	   
@@ -9274,7 +8877,6 @@ public Activity        activity;  // Activity
 public RelativeLayout  appLayout; // Base Layout
 public int screenStyle=0;         // Screen Style [Dev:0 , Portrait: 1, Landscape : 2]
 
-
 // Jave -> Pascal Function ( Pascal Side = Event )
 public  native int  pAppOnScreenStyle(); 
 public  native void pAppOnCreate     (Context context,RelativeLayout layout);
@@ -9298,21 +8900,22 @@ public  native void pAppOnClickOptionMenuItem(MenuItem menuItem,int itemID,Strin
 public  native void pAppOnCreateContextMenu(ContextMenu menu);
 public  native void pAppOnClickContextMenuItem(MenuItem menuItem,int itemID,String itemCaption,boolean checked);
 
-//
 public  native void pOnClick     (long pasobj, int value);
-public  native void pOnChange    (long pasobj, int EventType);
-public  native void pOnEnter     (long pasobj);
+
+public  native void pOnChange    (long pasobj, String txt, int count);
+public  native void pOnChanged   (long pasobj, String txt, int count);
+public  native void pOnEnter     (long pasobj);                    
+
+
 public  native void pOnTimer     (long pasobj);
-//
+
 public  native void pOnDraw      (long pasobj, Canvas canvas);
 
 public  native void pOnTouch     (long pasobj, int act, int cnt,float x1, float y1,float x2, float y2);
 public  native void pOnGLRenderer(long pasobj, int EventType, int w, int h);
-//
+
 public  native void pOnClose     (long pasobj);    
 
-//public  native void pOnActive     (long pasobj); //new by jmpessoa
-//
 public  native int  pOnWebViewStatus (long pasobj, int EventType, String url);
 public  native void pOnAsyncEvent    (long pasobj, int EventType, int progress);
 
@@ -9355,10 +8958,9 @@ public native void pOnCustomDialogShow(long pasobj, Dialog dialog, String title)
 
 //Load Pascal Library
 static {
-    Log.i("JNI_Java", "1.load libcontrols.so");
+   // Log.i("JNI_Java", "1.load libcontrols.so");
     System.loadLibrary("controls");
-    Log.i("JNI_Java", "2.load libcontrols.so");
-    
+    //Log.i("JNI_Java", "2.load libcontrols.so");  
 }
 
 // -------------------------------------------------------------------------
@@ -9395,7 +8997,6 @@ public  void jAppOnCreateContextMenu(ContextMenu m) {pAppOnCreateContextMenu(m);
 public  void jAppOnClickContextMenuItem(MenuItem item,int itemID, String itemCaption, boolean checked) {pAppOnClickContextMenuItem(item,itemID,itemCaption,checked);}
 
 public void jAppOnViewClick(View view, int id){ pAppOnViewClick(view,id);}
-
 public void jAppOnListItemClick(AdapterView adapter, View view, int position, int id){ pAppOnListItemClick(adapter, view,position,id);}
 
 //public void jAppOnActionBarTabSelected(View view, String title){pOnActionBarTabSelected(view,title);}
@@ -9593,7 +9194,7 @@ public  AnimationSet Ani_Effect(int effect, int duration) {
 }
 
 // -------------------------------------------------------------------------
-//  View Related
+//  View Related - Generic! --> AndroidWidget.pas
 // -------------------------------------------------------------------------
 
 //
@@ -9609,7 +9210,6 @@ public  void view_Invalidate(View view) {
   view.invalidate();
 }
 
-
 // -------------------------------------------------------------------------
 //  Form Related
 // -------------------------------------------------------------------------
@@ -9619,28 +9219,6 @@ public  java.lang.Object jForm_Create(long pasobj ) {
   return (java.lang.Object)( new jForm(this,pasobj));
 }
 
-public  void jForm_Free(java.lang.Object form) {
- jForm obj = (jForm)form;
- obj.Free();
- //obj = null;
-}
-
-public  RelativeLayout jForm_GetLayout(java.lang.Object form) {
-  return ((jForm)form).GetLayout();
-}
-
-public  void jForm_Show (java.lang.Object form, int effect) {
-  ((jForm)form).Show(effect);
-}
-
-public  void jForm_Close(java.lang.Object form, int effect) {
-  ((jForm)form).Close(effect);
-}
-
-
-public  void jForm_SetEnabled (java.lang.Object form, boolean enabled) {
-  ((jForm)form).SetEnabled(enabled);
-}
 
 // -------------------------------------------------------------------------
 //  System Info
@@ -9709,7 +9287,7 @@ public  String getPathApp (android.content.Context context,String pkgName) {
 public  String getPathDat (android.content.Context context) {
   //http://developer.android.com/reference/android/os/Build.html
   String version = Build.VERSION.RELEASE;
-  Log.i("JAVA:",version);
+  //Log.i("JAVA:",version);
   //
   String PathDat = context.getFilesDir().getAbsolutePath();
   
@@ -9792,8 +9370,8 @@ public  int Image_getWH (String filename ) {
   BitmapFactory.Options options = new BitmapFactory.Options();
   options.inJustDecodeBounds = true;
   BitmapFactory.decodeFile(filename, options);
-  Log.i("JNI_Java", "wh:" + Integer.toString(options.outWidth ) +
-                      "x" + Integer.toString(options.outHeight) );
+  //Log.i("JNI_Java", "wh:" + Integer.toString(options.outWidth ) +
+  //                    "x" + Integer.toString(options.outHeight) );
   return ( (options.outWidth << 16) | (options.outHeight) );
 }
 
@@ -9839,933 +9417,57 @@ public  void Image_save(Bitmap bmp, String filename) {
 }
 
 // -------------------------------------------------------------------------
-//  TextView
+//  TextView: Create
 // -------------------------------------------------------------------------
-
-public  java.lang.Object jTextView_Create(android.content.Context context, long pasobj) {
-  return (java.lang.Object)( new jTextView(context,this,pasobj));
-}
-
-//by jmpessoa
-public  java.lang.Object jTextView_Create2(long pasobj) {
+public  java.lang.Object jTextView_Create(long pasobj) {
   return (java.lang.Object)( new jTextView(this.activity,this,pasobj));
 }
 
-public  void jTextView_Free(java.lang.Object textview) {
-  jTextView obj = (jTextView)textview;
-  obj.Free();
-  //obj = null;
-}
-
-public  void jTextView_setXYWH (java.lang.Object textview,
-                               int x, int y, int w, int h ) {
-  ((jTextView)textview).setXYWH(x,y,w,h);
-}
-
-public void jTextView_setLeftTopRightBottomWidthHeight(java.lang.Object textview,
-        int left, int top, int right, int bottom, int w, int h) {
-((jTextView)textview).setLeftTopRightBottomWidthHeight(left,top,right,bottom,w,h);	
-}
-
-
-public  void jTextView_setParent(java.lang.Object textview,
-                                android.view.ViewGroup viewgroup) {
-  ((jTextView)textview).setParent3(viewgroup);
-}
-
-public  void jTextView_setParent2(java.lang.Object textview,
-                                 android.view.ViewGroup viewgroup) {
-  ((jTextView)textview).setParent2(viewgroup);
-}
-
-public  void jTextView_setEnabled(java.lang.Object textview, boolean enabled) {
-  ((jTextView)textview).setEnabled(enabled);
-}
-
-public  void jTextView_setText(java.lang.Object textview, String str) {
-  ((jTextView)textview).setText(str);
-}
-
-public  void jTextView_setTextColor(java.lang.Object textview, int color) {
-  ((jTextView)textview).setTextColor(color);
-}
-
-public  void jTextView_setTextSize(java.lang.Object textview, int pxSize) {
-  ((jTextView)textview).setTextSize(TypedValue.COMPLEX_UNIT_PX,pxSize);
-}
-
-public  String jTextView_getText(java.lang.Object textview) {
-  return ((jTextView)textview).getText().toString();
-}
-
-// LORDMAN 2013-08-12
-public  void jTextView_setTextAlignment(java.lang.Object textview, int align) {
-  ((jTextView)textview).setTextAlignment(align);
-}
-
-
-//by jmpessoa
-public  void jTextView_setId(java.lang.Object textview, int id) {
-	  ((jTextView)textview).setIdEx(id);
-}
-
-//by jmpessoa
-public void jTextView_setLParamWidth(java.lang.Object textview, int w) {
-	((jTextView)textview).setLParamWidth(w);
-}
-
-//by jmpessoa
-public void jTextView_setLParamHeight(java.lang.Object textview, int h) {
-	((jTextView)textview).setLParamHeight(h);
-}
-
-//by jmpessoa
-public void jTextView_addLParamsParentRule(java.lang.Object textview, int rule) {
-	((jTextView)textview).addLParamsParentRule(rule);
-}
-
-public void jTextView_addLParamsAnchorRule(java.lang.Object textview, int rule) {
-	((jTextView)textview).addLParamsAnchorRule(rule);
-}
-//by jmpessoa
-public  void jTextView_setLayoutAll(java.lang.Object textview, int idAnchor) {
-	  ((jTextView)textview).setLayoutAll(idAnchor);
-}
-
-//by jmpessoa
-public void jTextView_setMarginLeft(java.lang.Object textview, int x) {
-	((jTextView)textview).setMarginLeft(x);
-}
-
-//by jmpessoa
-public void jTextView_setMarginTop(java.lang.Object textview, int y) {
-	((jTextView)textview).setMarginTop(y);
-}
-
-//by jmpessoa
-public void jTextView_setMarginRight(java.lang.Object textview, int x) {
-	((jTextView)textview).setMarginRight(x);
-}
-
-//by jmpessoa
-public void jTextView_setMarginBottom(java.lang.Object textview, int y) {
-	((jTextView)textview).setMarginBottom(y);
-}
-
 //-------------------------------------------------------------------------
-//EditText
+//EditText: Create
 //-------------------------------------------------------------------------
-
-// LORDMAN 2013-08-27
-public  void jEditText_setEnabled(java.lang.Object edittext, boolean enabled ) {
-  jEditText obj = (jEditText)edittext;
-  obj.setClickable            (enabled);
-  obj.setEnabled              (enabled);
-  obj.setFocusable            (enabled);
-  obj.setFocusableInTouchMode (enabled);
-}
-
-// LORDMAN 2013-08-27
-public  void jEditText_setEditable(java.lang.Object edittext, boolean enabled ) {
-  jEditText obj = (jEditText)edittext;
-  obj.setClickable            (enabled);
-  if (enabled) {
-    obj.setEnabled              (enabled); } //<--- ReadOnly
-  obj.setFocusable            (enabled);
-  obj.setFocusableInTouchMode (enabled);
-}
-
-
-public  java.lang.Object jEditText_Create(android.content.Context context,
-                                         long pasobj ) {
-  return (java.lang.Object)( new jEditText(context,this,pasobj));
-}
-
-//by jmpessoa
-public  java.lang.Object jEditText_Create2(long pasobj ) {
+public  java.lang.Object jEditText_Create(long pasobj ) {
    return (java.lang.Object)( new jEditText(this.activity,this,pasobj));
 }
 
-public  void jEditText_Free(java.lang.Object edittext) {
-  jEditText obj = (jEditText)edittext;
-  obj.Free();
-  //obj = null;
-}
-
-public  void jEditText_setXYWH (java.lang.Object edittext,
-                               int x, int y, int w, int h ) {
-  ((jEditText)edittext).setXYWH(x,y,w,h);
-}
-
-public void jEditText_setLeftTopRightBottomWidthHeight(java.lang.Object edittext,
-        int left, int top, int right, int bottom, int w, int h) {
-((jEditText)edittext).setLeftTopRightBottomWidthHeight(left,top,right,bottom,w,h);	
-}
-
-
-public  void jEditText_setParent(java.lang.Object edittext,
-                                android.view.ViewGroup viewgroup) {
-  ((jEditText)edittext).setParent(viewgroup);
-}
-
-public  void jEditText_setText(java.lang.Object edittext, String str) {
-  ((jEditText)edittext).setText(str);
-}
-
-public  String jEditText_getText(java.lang.Object edittext) {
-  return ((jEditText)edittext).getText().toString();
-}
-
-public  void jEditText_setTextColor(java.lang.Object edittext, int color) {
-  ((jEditText)edittext).setTextColor(color);
-}
-
-public  void jEditText_setTextSize(java.lang.Object edittext, int pxSize) {
-  ((jEditText)edittext).setTextSize(TypedValue.COMPLEX_UNIT_PX,pxSize);
-}
-
-public  void jEditText_setHint(java.lang.Object edittext, String hint) {
-  ((jEditText)edittext).setHint(hint);
-}
-
-// LORDMAN - 2013-07-26
-public  void jEditText_SetFocus(java.lang.Object edittext) {
-  ((jEditText)edittext).requestFocus();
-}
-
-// LORDMAN - 2013-07-26
-public  void jEditText_immShow(java.lang.Object edittext) {
-  InputMethodManager imm = (InputMethodManager) activity.getSystemService(Context.INPUT_METHOD_SERVICE);
-  imm.toggleSoftInput(0, InputMethodManager.SHOW_IMPLICIT);
-}
-
-// LORDMAN - 2013-07-26
-public  void jEditText_immHide(java.lang.Object edittext) {
-  InputMethodManager imm = (InputMethodManager) activity.getSystemService(Context.INPUT_METHOD_SERVICE);
-  imm.hideSoftInputFromWindow(((jEditText)edittext).getWindowToken(), 0);
-}
-
-// LORDMAN - 2013-07-26
-public  void jEditText_InputType(java.lang.Object edittext, String str) {
-	
-  if      (str.equals("NUMBER"))     { ((jEditText)edittext).setInputType(android.text.InputType.TYPE_CLASS_NUMBER);}
-  else if (str.equals("TEXT"))       { 
-	  Log.i("EditText","1.setInputType..1");  
-	  ((jEditText)edittext).setInputType(android.text.InputType.TYPE_CLASS_TEXT);  
-	  Log.i("EditText","2.setInputType..2");  
-      }
-  else if (str.equals("PHONE"))      { ((jEditText)edittext).setInputType(android.text.InputType.TYPE_CLASS_PHONE); }
-  else if (str.equals("PASSNUMBER")) { ((jEditText)edittext).setInputType(android.text.InputType.TYPE_CLASS_NUMBER);
-                                       ((jEditText)edittext).setTransformationMethod(android.text.method.PasswordTransformationMethod.getInstance()); }
-  else if (str.equals("PASSTEXT"))   { ((jEditText)edittext).setInputType(android.text.InputType.TYPE_CLASS_TEXT);
-                                       ((jEditText)edittext).setTransformationMethod(android.text.method.PasswordTransformationMethod.getInstance()); }
-  
-  else if (str.equals("TEXTMULTILINE")){((jEditText)edittext).setInputType(android.text.InputType.TYPE_CLASS_TEXT|android.text.InputType.TYPE_TEXT_FLAG_MULTI_LINE);}
-                                    
-  
-  else                               { ((jEditText)edittext).setInputType(android.text.InputType.TYPE_CLASS_TEXT); };
-    
-}
-
-//by jmpessoa
-public  void jEditText_InputTypeEx(java.lang.Object edittext, int inputType) {
-	Log.i("EditText","1.setInputTypeEx");
-	   ((jEditText)edittext).setInputType(inputType);
-	Log.i("EditText","2.setInputTypeEx");
-}
-
-//The attribute maxLines corresponds to the maximum height of the EditText, 
-//it controls the outer boundaries and not inner text lines.
-public  void jEditText_setMaxLines(java.lang.Object edittext, int maxlines) {
-	Log.i("EditText","1.setMaxLines");
-	  ((jEditText)edittext).setMaxLines(maxlines);
-	Log.i("EditText","2.setMaxLines");
-}
-
-//by jmpessoa
-public  void jEditText_setSingleLine(java.lang.Object edittext, boolean isSingLine) {
-	Log.i("EditText","1.setSingleLine");
-	  ((jEditText)edittext).setSingleLine(isSingLine);	
-	Log.i("EditText","2.setSingleLine");
-}
-
-//by jmpessoa
-public  void jEditText_setVerticalScrollBarEnabled(java.lang.Object edittext, boolean Value) {
-	  ((jEditText)edittext).setVerticalScrollBarEnabled(Value);
-}
-
-//by jmpessoa
-public  void jEditText_setHorizontalScrollBarEnabled(java.lang.Object edittext, boolean Value) {
-	  ((jEditText)edittext).setHorizontalScrollBarEnabled(Value);
-}
-
-
-//by jmpessoa
-public  void jEditText_setScrollbarFadingEnabled(java.lang.Object edittext, boolean Value) {
-	  ((jEditText)edittext).setScrollbarFadingEnabled(Value);
-}
-
-//by jmpessoa
-public  void jEditText_setScrollBarStyle(java.lang.Object edittext, int Value) {
-	  ((jEditText)edittext).setScrollBarStyle(Value);
-}
-
-//by jmpessoa
-public  void jEditText_setMovementMethod(java.lang.Object edittext) {
-	  ((jEditText)edittext).setMovementMethod(new ScrollingMovementMethod());//ScrollingMovementMethod.getInstance()
-}
-
-//by jmpessoa
-public  void jEditText_setScroller(android.content.Context context, java.lang.Object edittext) {
-	((jEditText)edittext).setScrollerEx(context); 
-}
-
-//by jmpessoa
-public  void jEditText_setScroller2(java.lang.Object edittext) {	  
-	((jEditText)edittext).setScrollerEx(this.activity);	  
-}
-
-//by jmpessoa
-public  void jEditText_setId(java.lang.Object edittext, int id) {
-	  ((jEditText)edittext).setIdEx(id);
-}
-
-//by jmpessoa
-public void jEditText_setLParamWidth(java.lang.Object edittext, int w) {
-	((jEditText)edittext).setLParamWidth(w);
-}
-
-//by jmpessoa
-public void jEditText_setLParamHeight(java.lang.Object edittext, int h) {
-	((jEditText)edittext).setLParamHeight(h);
-}
-
-//by jmpessoa
-public void jEditText_addLParamsAnchorRule(java.lang.Object edittext, int rule) {
-	((jEditText)edittext).addLParamsAnchorRule(rule);
-}
-
-public void jEditText_addLParamsParentRule(java.lang.Object edittext, int rule) {
-	((jEditText)edittext).addLParamsParentRule(rule);
-}
-
-//by jmpessoa
-public  void jEditText_setLayoutAll(java.lang.Object edittext, int idAnchor) {
-	  ((jEditText)edittext).setLayoutAll(idAnchor);
-}
-
-//by jmpessoa
-public void jEditText_setMarginLeft(java.lang.Object edittext, int x) {
-	((jEditText)edittext).setMarginLeft(x);
-}
-
-//by jmpessoa
-public void jEditText_setMarginTop(java.lang.Object edittext, int y) {
-	((jEditText)edittext).setMarginTop(y);
-}
-
-//by jmpessoa
-public void jEditText_setMarginRight(java.lang.Object edittext, int x) {
-	((jEditText)edittext).setMarginRight(x);
-}
-
-//by jmpessoa
-public void jEditText_setMarginBottom(java.lang.Object edittext, int y) {
-	((jEditText)edittext).setMarginBottom(y);
-}
-
-// LORDMAN - 2013-07-26
-public  void jEditText_maxLength(java.lang.Object edittext, int mLength) {
-  InputFilter[] FilterArray = new InputFilter[1];
-  FilterArray[0] = new InputFilter.LengthFilter(mLength);
-  ((jEditText)edittext).setFilters(FilterArray);
-  Log.i("EditText","SetMaxLen");
-}
-
-// LORDMAN - 2013-07-26 , 2013-08-05
-public  int[] jEditText_GetCursorPos(java.lang.Object edittext) {
-
-  int[] vals = new int[2];
-
-  vals[0] = ((jEditText)edittext).getSelectionStart();
-  vals[1] = ((jEditText)edittext).getSelectionEnd();
-
-  return vals;
-}
-
-// LORDMAN - 2013-07-26, 2013-08-05
-public  void jEditText_SetCursorPos(java.lang.Object edittext, int startPos, int endPos) {
-  if (endPos == 0) { endPos = startPos; };
-  ((jEditText)edittext).setSelection(startPos,endPos);
-}
-
-// LORDMAN 2013-08-12
-public  void jEditText_setTextAlignment(java.lang.Object edittext, int align) {
-((jEditText)edittext).setTextAlignment(align);
-}
-
-//by jmpessoa   ... for wrapping text --> True
-public  void jEditText_setHorizontallyScrolling(java.lang.Object edittext, boolean value) {
- ((jEditText)edittext).setHorizontallyScrolling(value);;
-}
-
-
 // -------------------------------------------------------------------------
-//  Button
+//  Button: Create
 // -------------------------------------------------------------------------
-
-public  java.lang.Object jButton_Create(android.content.Context context,
-                                       long pasobj ) {
-  return (java.lang.Object)( new jButton(context,this,pasobj));
-}
-
-//by jmpessoa
-public  java.lang.Object jButton_Create2(long pasobj ) {
-    return (java.lang.Object)( new jButton(this.activity,this,pasobj));
-}
-
-public  void jButton_Free(java.lang.Object button) {
-  jButton obj = (jButton)button;
-  obj.Free();
-  //obj = null;
-}
-
-public  void jButton_setXYWH  (java.lang.Object button,
-                              int x, int y, int w, int h ) {
-  ((jButton)button).setXYWH(x,y,w,h);
-}
-
-public void jButton_setLeftTopRightBottomWidthHeight(java.lang.Object button,
-        int left, int top, int right, int bottom, int w, int h) {
-((jButton)button).setLeftTopRightBottomWidthHeight(left,top,right,bottom,w,h);	
-}
-
-
-public  void jButton_setParent(java.lang.Object button,
-                              android.view.ViewGroup viewgroup) {
-  ((jButton)button).setParent(viewgroup);
-}
-
-public  void jButton_setText(java.lang.Object button, String str) {
-  ((jButton)button).setText(str);
-}
-
-public  String jButton_getText(java.lang.Object button) {
-  return ((jButton)button).getText().toString();
-}
-
-public  void jButton_setTextColor(java.lang.Object button, int color) {
-  ((jButton)button).setTextColor(color);
-}
-
-public  void jButton_setTextSize(java.lang.Object button, int pxSize) {
-  ((jButton)button).setTextSize(TypedValue.COMPLEX_UNIT_PX,pxSize);
-}
-
-//by jmpessoa
-public  void jButton_setId(java.lang.Object button, int id) {
-	  ((jButton)button).setIdEx(id);
-}
-
-//by jmpessoa
-public void jButton_setLParamWidth(java.lang.Object button, int w) {
-	((jButton)button).setLParamWidth(w);
-}
-
-//by jmpessoa
-public void jButton_setLParamHeight(java.lang.Object button, int h) {
-	((jButton)button).setLParamHeight(h);
-}
-
-//by jmpessoa
-public void jButton_addLParamsAnchorRule(java.lang.Object button, int rule) {
-	((jButton)button).addLParamsAnchorRule(rule);
-}
-
-public void jButton_addLParamsParentRule(java.lang.Object button, int rule) {
-	((jButton)button).addLParamsParentRule(rule);
-}
-
-//by jmpessoa
-public  void jButton_setLayoutAll(java.lang.Object button, int idAnchor) {
-	  ((jButton)button).setLayoutAll(idAnchor);
-}
-
-//by jmpessoa
-public void jButton_setMarginLeft(java.lang.Object button, int x) {
-	((jButton)button).setMarginLeft(x);
-}
-
-//by jmpessoa
-public void jButton_setMarginTop(java.lang.Object button, int y) {
-	((jButton)button).setMarginTop(y);
-}
-
-//by jmpessoa
-public void jButton_setMarginRight(java.lang.Object button, int x) {
-	((jButton)button).setMarginRight(x);
-}
-
-//by jmpessoa
-public void jButton_setMarginBottom(java.lang.Object button, int y) {
-	((jButton)button).setMarginBottom(y);
-}
-
-/*
- * If i set android:focusable="true" then button is highlighted and focused, 
- * but then at the same time, 
- * i need to click twice on the button to perform the actual click event.
- */
-//by jmpessoa
-public  void jButton_setFocusable(java.lang.Object button, boolean enabled ) {
-	jButton obj = (jButton)button;
-obj.setClickable            (enabled);
-obj.setEnabled              (enabled);
-obj.setFocusable            (enabled);//*
-obj.setFocusableInTouchMode (enabled);//*
-//obj.requestFocus(); //*
+public  java.lang.Object jButton_Create(long pasobj ) {
+   return (java.lang.Object)( new jButton(this.activity,this,pasobj));
 }
 
 // -------------------------------------------------------------------------
-//  CheckBox
+//  CheckBox: Create
 // -------------------------------------------------------------------------
-
-public  java.lang.Object jCheckBox_Create(android.content.Context context,
-                                         long pasobj ) {
-  return (java.lang.Object)( new jCheckBox(context,this,pasobj));
-}
-
-//by jmpessoa
-public  java.lang.Object jCheckBox_Create2(long pasobj ) {
-return (java.lang.Object)( new jCheckBox(this.activity,this,pasobj));
-}
-
-public  void jCheckBox_Free(java.lang.Object checkbox) {
-  jCheckBox obj = (jCheckBox)checkbox;
-  obj.Free();
-  //obj = null;
-}
-
-public  void jCheckBox_setXYWH (java.lang.Object checkbox,
-                               int x, int y, int w, int h ) {
-  ((jCheckBox)checkbox).setXYWH(x,y,w,h);
-}
-
-public void jCheckBox_setLeftTopRightBottomWidthHeight(java.lang.Object checkbox,
-        int left, int top, int right, int bottom, int w, int h) {
-((jCheckBox)checkbox).setLeftTopRightBottomWidthHeight(left,top,right,bottom,w,h);	
-}
-
-public  void jCheckBox_setParent(java.lang.Object checkbox,
-                                android.view.ViewGroup viewgroup) {
-  ((jCheckBox)checkbox).setParent(viewgroup);
-}
-
-public  void jCheckBox_setText(java.lang.Object checkbox, String str) {
-  ((jCheckBox)checkbox).setText(str);
-}
-
-public  void jCheckBox_setTextColor(java.lang.Object checkbox, int color) {
-  ((jCheckBox)checkbox).setTextColor(color);
-}
-
-public  void jCheckBox_setTextSize(java.lang.Object checkbox, int pxSize) {
-  ((jCheckBox)checkbox).setTextSize(TypedValue.COMPLEX_UNIT_PX,pxSize);
-}
-
-public  String jCheckBox_getText(java.lang.Object checkbox) {
-  return ((jCheckBox)checkbox).getText().toString();
-}
-
-public  boolean jCheckBox_isChecked( java.lang.Object checkbox) {
-  return ((jCheckBox)checkbox).isChecked();
-}
-
-public  void jCheckBox_setChecked( java.lang.Object checkbox, boolean value) {
-  ((jCheckBox)checkbox).setChecked(value);
-}
-
-//by jmpessoa
-public  void jCheckBox_setId(java.lang.Object checkbox, int id) {
-	  ((jCheckBox)checkbox).setIdEx(id);
-}
-
-//by jmpessoa
-public void jCheckBox_setLParamWidth(java.lang.Object checkbox, int w) {
-	((jCheckBox)checkbox).setLParamWidth(w);
-}
-
-//by jmpessoa
-public void jCheckBox_setLParamHeight(java.lang.Object checkbox, int h) {
-	((jCheckBox)checkbox).setLParamHeight(h);
-}
-
-//by jmpessoa
-public void jCheckBox_addLParamsAnchorRule(java.lang.Object checkbox, int rule) {
-	((jCheckBox)checkbox).addLParamsAnchorRule(rule);
-}
-
-public void jCheckBox_addLParamsParentRule(java.lang.Object checkbox, int rule) {
-	((jCheckBox)checkbox).addLParamsParentRule(rule);
-}
-
-//by jmpessoa
-public  void jCheckBox_setLayoutAll(java.lang.Object checkbox, int idAnchor) {
-	  ((jCheckBox)checkbox).setLayoutAll(idAnchor);
-}
-
-//by jmpessoa
-public void jCheckBox_setMarginLeft(java.lang.Object checkbox, int x) {
-	((jCheckBox)checkbox).setMarginLeft(x);
-}
-
-//by jmpessoa
-public void jCheckBox_setMarginTop(java.lang.Object checkbox, int y) {
-	((jCheckBox)checkbox).setMarginTop(y);
-}
-
-//by jmpessoa
-public void jCheckBox_setMarginRight(java.lang.Object checkbox, int x) {
-	((jCheckBox)checkbox).setMarginRight(x);
-}
-
-//by jmpessoa
-public void jCheckBox_setMarginBottom(java.lang.Object checkbox, int y) {
-	((jCheckBox)checkbox).setMarginBottom(y);
+public  java.lang.Object jCheckBox_Create(long pasobj ) {
+   return (java.lang.Object)( new jCheckBox(this.activity,this,pasobj));
 }
 
 // -------------------------------------------------------------------------
-//  RadioButton
+//  RadioButton: Create
 // -------------------------------------------------------------------------
-
-public  java.lang.Object jRadioButton_Create(android.content.Context context,
-                                            long pasobj ) {
-  return (java.lang.Object)( new jRadioButton(context,this,pasobj));
-}
-
-//by jmpessoa
-public  java.lang.Object jRadioButton_Create2(long pasobj ) {
+public  java.lang.Object jRadioButton_Create(long pasobj ) {
    return (java.lang.Object)( new jRadioButton(this.activity,this,pasobj));
 }
 
-public  void jRadioButton_Free(java.lang.Object radiobutton) {
-  jRadioButton obj = (jRadioButton)radiobutton;
-  obj.Free();
-  //obj = null;
-}
-
-public  void jRadioButton_setXYWH (java.lang.Object radiobutton,
-                               int x, int y, int w, int h ) {
-  ((jRadioButton)radiobutton).setXYWH(x,y,w,h);
-}
-
-public void jRadioButton_setLeftTopRightBottomWidthHeight(java.lang.Object radiobutton,
-        int left, int top, int right, int bottom, int w, int h) {
-((jRadioButton)radiobutton).setLeftTopRightBottomWidthHeight(left,top,right,bottom,w,h);	
-}
-
-public  void jRadioButton_setParent(java.lang.Object radiobutton,
-                                android.view.ViewGroup viewgroup) {
-  ((jRadioButton)radiobutton).setParent(viewgroup);
-}
-
-public  void jRadioButton_setText(java.lang.Object radiobutton, String str) {
-  ((jRadioButton)radiobutton).setText(str);
-}
-
-public  void jRadioButton_setTextColor(java.lang.Object radiobutton, int color) {
-  ((jRadioButton)radiobutton).setTextColor(color);
-}
-
-public  void jRadioButton_setTextSize(java.lang.Object radiobutton, int pxSize) {
-  ((jRadioButton)radiobutton).setTextSize(TypedValue.COMPLEX_UNIT_PX,pxSize);
-}
-
-public  String jRadioButton_getText(java.lang.Object radiobutton) {
-  return ((jRadioButton)radiobutton).getText().toString();
-}
-
-public  boolean jRadioButton_isChecked( java.lang.Object radiobutton) {
-  return ((jRadioButton)radiobutton).isChecked();
-}
-
-public  void jRadioButton_setChecked( java.lang.Object radiobutton, boolean value) {
-  ((jRadioButton)radiobutton).setChecked(value);
-}
-
-//by jmpessoa
-public  void jRadioButton_setId(java.lang.Object radiobutton, int id) {
-	  ((jRadioButton)radiobutton).setIdEx(id);
-}
-
-//by jmpessoa
-public void jRadioButton_setLParamWidth(java.lang.Object radiobutton, int w) {
-	((jRadioButton)radiobutton).setLParamWidth(w);
-}
-
-//by jmpessoa
-public void jRadioButton_setLParamHeight(java.lang.Object radiobutton, int h) {
-	((jRadioButton)radiobutton).setLParamHeight(h);
-}
-
-//by jmpessoa
-public void jRadioButton_addLParamsAnchorRule(java.lang.Object radiobutton, int rule) {
-	((jRadioButton)radiobutton).addLParamsAnchorRule(rule);
-}
-
-public void jRadioButton_addLParamsParentRule(java.lang.Object radiobutton, int rule) {
-	((jRadioButton)radiobutton).addLParamsParentRule(rule);
-}
-
-//by jmpessoa
-public  void jRadioButton_setLayoutAll(java.lang.Object radiobutton, int idAnchor) {
-	  ((jRadioButton)radiobutton).setLayoutAll(idAnchor);
-}
-
-//by jmpessoa
-public void jRadioButton_setMarginLeft(java.lang.Object radiobutton, int x) {
-	((jRadioButton)radiobutton).setMarginLeft(x);
-}
-
-//by jmpessoa
-public void jRadioButton_setMarginTop(java.lang.Object radiobutton, int y) {
-	((jRadioButton)radiobutton).setMarginTop(y);
-}
-
-//by jmpessoa
-public void jRadioButton_setMarginRight(java.lang.Object radiobutton, int x) {
-	((jRadioButton)radiobutton).setMarginRight(x);
-}
-
-//by jmpessoa
-public void jRadioButton_setMarginBottom(java.lang.Object radiobutton, int y) {
-	((jRadioButton)radiobutton).setMarginBottom(y);
-}
 // -------------------------------------------------------------------------
-//  ProgressBar
+//  ProgressBar: Create
 // -------------------------------------------------------------------------
-
-public  java.lang.Object jProgressBar_Create(android.content.Context context,
-                                            long pasobj, int style ) {
-  return (java.lang.Object)( new jProgressBar(context,this,pasobj,style));
-}
-
-
-//by jmpessoa
-public  java.lang.Object jProgressBar_Create2(long pasobj, int style ) {
+public  java.lang.Object jProgressBar_Create(long pasobj, int style ) {
   return (java.lang.Object)( new jProgressBar(this.activity,this,pasobj,style));
 }
 
-public  void jProgressBar_Free(java.lang.Object progressbar) {
-  jProgressBar obj = (jProgressBar)progressbar;
-  obj.Free();
-  //obj = null;
-}
-
-public  void jProgressBar_setXYWH (java.lang.Object progressbar,
-                               int x, int y, int w, int h ) {
-  ((jProgressBar)progressbar).setXYWH(x,y,w,h);
-}
-
-public void jProgressBar_setLeftTopRightBottomWidthHeight(java.lang.Object progressbar,
-        int left, int top, int right, int bottom, int w, int h) {
-((jProgressBar)progressbar).setLeftTopRightBottomWidthHeight(left,top,right,bottom,w,h);	
-}
-
-public  void jProgressBar_setParent(java.lang.Object progressbar,
-                                android.view.ViewGroup viewgroup) {
-  ((jProgressBar)progressbar).setParent(viewgroup);
-}
-
-public  int jProgressBar_getProgress(java.lang.Object progressbar) {
-  return ( ((jProgressBar)progressbar).getProgress() );
-}
-
-public  void jProgressBar_setProgress(java.lang.Object progressbar, int progress) {
-  ((jProgressBar)progressbar).setProgress(progress);
-}
-
-//by jmpessoa
-public  void jProgressBar_setMax(java.lang.Object progressbar, int progress) {
-  ((jProgressBar)progressbar).setMax(progress);
-}
-
-//by jmpessoa
-public  int jProgressBar_getMax(java.lang.Object progressbar) {
-  return ( ((jProgressBar)progressbar).getMax() ); 
-}
-
-//by jmpessoa
-public  void jProgressBar_setId(java.lang.Object progressbar, int id) {
-	  ((jProgressBar)progressbar).setIdEx(id);
-}
-
-//by jmpessoa
-public void jProgressBar_setLParamWidth(java.lang.Object progressbar, int w) {
-	((jProgressBar)progressbar).setLParamWidth(w);
-}
-
-//by jmpessoa
-public void jProgressBar_setLParamHeight(java.lang.Object progressbar, int h) {
-	((jProgressBar)progressbar).setLParamHeight(h);
-}
-
-//by jmpessoa
-public void jProgressBar_addLParamsAnchorRule(java.lang.Object progressbar, int rule) {
-	((jProgressBar)progressbar).addLParamsAnchorRule(rule);
-}
-
-public void jProgressBar_addLParamsParentRule(java.lang.Object progressbar, int rule) {
-	((jProgressBar)progressbar).addLParamsParentRule(rule);
-}
-
-//by jmpessoa
-public  void jProgressBar_setLayoutAll(java.lang.Object progressbar, int idAnchor) {
-	  ((jProgressBar)progressbar).setLayoutAll(idAnchor);
-}
-
-//by jmpessoa
-public void jProgressBar_setMarginLeft(java.lang.Object progressbar, int x) {
-	((jProgressBar)progressbar).setMarginLeft(x);
-}
-
-//by jmpessoa
-public void jProgressBar_setMarginTop(java.lang.Object progressbar, int y) {
-	((jProgressBar)progressbar).setMarginTop(y);
-}
-
-//by jmpessoa
-public void jProgressBar_setMarginRight(java.lang.Object progressbar, int x) {
-	((jProgressBar)progressbar).setMarginRight(x);
-}
-
-//by jmpessoa
-public void jProgressBar_setMarginBottom(java.lang.Object progressbar, int y) {
-	((jProgressBar)progressbar).setMarginBottom(y);
-}
-
 // -------------------------------------------------------------------------
-//  ImageView
+//  ImageView: Create
 // -------------------------------------------------------------------------
-
-public  java.lang.Object jImageView_Create(android.content.Context context,
-                                          long pasobj ) {
-  return (java.lang.Object)( new jImageView(context,this,pasobj));
-}
-
-//by jmpessoa
-public  java.lang.Object jImageView_Create2(long pasobj ) {
+public  java.lang.Object jImageView_Create(long pasobj ) {
   return (java.lang.Object)( new jImageView(this.activity,this,pasobj));
 }
 
-public  void jImageView_Free(java.lang.Object imageview) {
- jImageView obj = (jImageView)imageview;
- obj.Free();
- //obj = null;
-}
-
-public  void jImageView_setXYWH  (java.lang.Object imageview,
-                                 int x, int y, int w, int h ) {
-  ((jImageView)imageview).setXYWH(x,y,w,h);
-}
-
-public void jImageView_setLeftTopRightBottomWidthHeight(java.lang.Object imageview,
-        int left, int top, int right, int bottom, int w, int h) {
-((jImageView)imageview).setLeftTopRightBottomWidthHeight(left,top,right,bottom,w,h);	
-}
-
-public  void jImageView_setParent(java.lang.Object imageview,
-                                 android.view.ViewGroup viewgroup) {
-  ((jImageView)imageview).setParent(viewgroup);
-}
-
-public  void jImageView_setImage(java.lang.Object imageview, String str) {
-  Bitmap bmp;
-  bmp = ((jImageView)imageview).bmp;
-  if (bmp != null)        { bmp.recycle(); }
-  if (str.equals("null")) { ((jImageView)imageview).setImageBitmap(null);
-                            return; };
-  bmp = BitmapFactory.decodeFile( str );
-  ((jImageView)imageview).setImageBitmap(bmp);
-}
-
-//by jmpessoa
-public  void jImageView_setId(java.lang.Object imageview, int id) {
-	  ((jImageView)imageview).setIdEx(id);
-}
-
-//by jmpessoa
-//http://www.techrepublic.com/blog/software-engineer/androids-camera-intent-makes-taking-pics-a-snap/
-public void jImageView_setBitmapImage(java.lang.Object imageview,  android.graphics.Bitmap bm) {
-	((jImageView)imageview).setBitmapImage(bm);
-}
-
-//by jmpessoa
-public void jImageView_setMarginLeft(java.lang.Object imageview, int x) {
-	((jImageView)imageview).setMarginLeft(x);
-}
-
-//by jmpessoa
-public void jImageView_setMarginTop(java.lang.Object imageview, int y) {
-	((jImageView)imageview).setMarginTop(y);
-}
-
-//by jmpessoa
-public void jImageView_setMarginRight(java.lang.Object imageview, int x) {
-	((jImageView)imageview).setMarginRight(x);
-}
-
-//by jmpessoa
-public void jImageView_setMarginBottom(java.lang.Object imageview, int y) {
-	((jImageView)imageview).setMarginBottom(y);
-}
-
-//by jmpessoa
-public void jImageView_setLParamWidth(java.lang.Object imageview, int w) {
-	((jImageView)imageview).setLParamWidth(w);
-}
-
-//by jmpessoa
-public void jImageView_setLParamHeight(java.lang.Object imageview, int h) {
-	((jImageView)imageview).setLParamHeight(h);
-}
-
-//by jmpessoa
-public void jImageView_addLParamsAnchorRule(java.lang.Object imageview, int rule) {
-	((jImageView)imageview).addLParamsAnchorRule(rule);
-}
-
-public void jImageView_addLParamsParentRule(java.lang.Object imageview, int rule) {
-	((jImageView)imageview).addLParamsParentRule(rule);
-}
-
-//by jmpessoa
-public  void jImageView_setLayoutAll(java.lang.Object imageview, int idAnchor) {
-	  ((jImageView)imageview).setLayoutAll(idAnchor);
-}
-
-//by jmpessoa
-public int jImageView_getLParamHeight(java.lang.Object imageview) {
-	  return ((jImageView)imageview).getLParamHeight();
-}
-
-//by jmpessoa           
-public int jImageView_getLParamWidth(java.lang.Object imageview) {
-	return ((jImageView)imageview).getLParamWidth();	
-}
-
 // -------------------------------------------------------------------------
-//  ListView
+//  ListView: Create
 // -------------------------------------------------------------------------
-
-/*
-public  java.lang.Object jListView_Create(android.content.Context context,
-                                         long pasobj, int hasWidget, String delim) {
-  return (java.lang.Object)( new jListView(context,this,pasobj, hasWidget, delim));
-}
-*/
-
-//by jmpessoa
 public  java.lang.Object jListView_Create2(long pasobj,  int widget, String widgetTxt, Bitmap bmp, 
 		int txtDecorated, int itemLay, int textSizeDecorated, int textAlign) {
    return (java.lang.Object)(new jListView(this.activity,this,pasobj,widget,widgetTxt,bmp,
@@ -10778,518 +9480,41 @@ public  java.lang.Object jListView_Create3(long pasobj,  int widget, String widg
 			   txtDecorated,itemLay,textSizeDecorated, textAlign));
 }
 
-public  void jListView_Free(java.lang.Object listview) {
-  jListView obj = (jListView)listview;
-  obj.Free();
-  //obj = null;
-}
-
-public  void jListView_setXYWH  (java.lang.Object listview,
-                                  int x, int y, int w, int h ) {
-  ((jListView)listview).setXYWH(x,y,w,h);
-}
-
-public void jListView_setLeftTopRightBottomWidthHeight(java.lang.Object listview,
-        int left, int top, int right, int bottom, int w, int h) {
-((jListView)listview).setLeftTopRightBottomWidthHeight(left,top,right,bottom,w,h);	
-}
-
-public  void jListView_setParent(java.lang.Object listview,
-                                android.view.ViewGroup viewgroup) {
-  ((jListView)listview).setParent(viewgroup);
-}
-
-public  void jListView_setTextColor(java.lang.Object listview, int color) {
-  ((jListView)listview).setTextColor(color);
-}
-
-public  void jListView_setTextSize(java.lang.Object listview, int pxSize) {
-  ((jListView)listview).setTextSize(pxSize);
-}
-
-// LORDMAN - 2013-08-07
-public void jListView_setItemPosition (java.lang.Object listview, int position, int y)  {
-  ((jListView)listview).setItemPosition(position, y);
-}
-
-/*
-public  void jListView_add(java.lang.Object listview, String item) {
-  ((jListView)listview).add(item);
-}*/
-
-// Item.delete
-public  void jListView_delete   (java.lang.Object listview, int index)  {
-  ((jListView)listview).delete(index);
-}
-
-// Item.clear
-public  void jListView_clear    (java.lang.Object listview) {
-  ((jListView)listview).clear();
-}
-
-//by jmpessoa
-public  void jListView_setId(java.lang.Object listview, int id) {
-	  ((jListView)listview).setIdEx(id);
-}
-
-//by jmpessoa
-public void jListView_setLParamWidth(java.lang.Object listview, int w) {
-	((jListView)listview).setLParamWidth(w);
-}
-
-//by jmpessoa
-public void jListView_setLParamHeight(java.lang.Object listview, int h) {
-	((jListView)listview).setLParamHeight(h);
-}
-
-//by jmpessoa
-public void jListView_addLParamsAnchorRule(java.lang.Object listview, int rule) {
-	((jListView)listview).addLParamsAnchorRule(rule);
-}
-
-public void jListView_addLParamsParentRule(java.lang.Object listview, int rule) {
-	((jListView)listview).addLParamsParentRule(rule);
-}
-
-//by jmpessoa
-public  void jListView_setLayoutAll(java.lang.Object listview, int idAnchor) {
-	  ((jListView)listview).setLayoutAll(idAnchor);
-}
-
-//by jmpessoa
-public void jListView_setMarginLeft(java.lang.Object listview, int x) {
-	((jListView)listview).setMarginLeft(x);
-}
-
-//by jmpessoa
-public void jListView_setMarginTop(java.lang.Object listview, int y) {
-	((jListView)listview).setMarginTop(y);
-}
-
-//by jmpessoa
-public void jListView_setMarginRight(java.lang.Object listview, int x) {
-	((jListView)listview).setMarginRight(x);
-}
-
-//by jmpessoa
-public void jListView_setMarginBottom(java.lang.Object listview, int y) {
-	((jListView)listview).setMarginBottom(y);
-}
 // -------------------------------------------------------------------------
-//  ScrollView
+//  ScrollView: Create
 // -------------------------------------------------------------------------
-
-public  java.lang.Object jScrollView_Create(android.content.Context context,
-                                           long pasobj ) {
-  return (java.lang.Object)( new jScrollView(context,this,pasobj));
-}
-
-
-//by jmpessoa
-public  java.lang.Object jScrollView_Create2(long pasobj ) {
+public  java.lang.Object jScrollView_Create(long pasobj ) {
    return (java.lang.Object)( new jScrollView(this.activity,this,pasobj));
 }
 
-public  void jScrollView_Free(java.lang.Object scrollview) {
-  jScrollView obj = (jScrollView)scrollview;
-  obj.Free();
-  //obj = null;
-}
-
-public  void jScrollView_setXYWH  (java.lang.Object scrollview,
-                                  int x, int y, int w, int h ) {
-  ((jScrollView)scrollview).setXYWH(x,y,w,h);
-}
-
-public void jScrollView_setLeftTopRightBottomWidthHeight(java.lang.Object scrollview,
-        int left, int top, int right, int bottom, int w, int h) {
-((jScrollView)scrollview).setLeftTopRightBottomWidthHeight(left,top,right,bottom,w,h);	
-}
-
-public  void jScrollView_setParent(java.lang.Object scrollview,
-                                  android.view.ViewGroup viewgroup) {
-  ((jScrollView)scrollview).setParent(viewgroup);
-}
-
-public  void jScrollView_setScrollSize(java.lang.Object scrollview, int size) {
-  ((jScrollView)scrollview).setScrollSize(size);
-}
-
-public  android.view.ViewGroup jScrollView_getView(java.lang.Object scrollview) {
-  return (android.view.ViewGroup)( ((jScrollView)scrollview).getView() );
-}
-
-//by jmpessoa
-public  void jScrollView_setId(java.lang.Object scrollview, int id) {
-	  ((jScrollView)scrollview).setIdEx(id);
-}
-
-//by jmpessoa
-public void jScrollView_setLParamWidth(java.lang.Object scrollview, int w) {
-	((jScrollView)scrollview).setLParamWidth(w);
-}
-
-//by jmpessoa
-public void jScrollView_setLParamHeight(java.lang.Object scrollview, int h) {
-	((jScrollView)scrollview).setLParamHeight(h);
-}
-
-//by jmpessoa
-public void jScrollView_addLParamsAnchorRule(java.lang.Object scrollview, int rule) {
-	((jScrollView)scrollview).addLParamsAnchorRule(rule);
-}
-
-public void jScrollView_addLParamsParentRule(java.lang.Object scrollview, int rule) {
-	((jScrollView)scrollview).addLParamsParentRule(rule);
-}
-
-//by jmpessoa
-public  void jScrollView_setLayoutAll(java.lang.Object scrollview, int idAnchor) {
-	  ((jScrollView)scrollview).setLayoutAll(idAnchor);
-}
-
-//by jmpessoa
-public void jScrollView_setMarginLeft(java.lang.Object scrollview, int x) {
-	((jScrollView)scrollview).setMarginLeft(x);
-}
-
-//by jmpessoa
-public void jScrollView_setMarginTop(java.lang.Object scrollview, int y) {
-	((jScrollView)scrollview).setMarginTop(y);
-}
-
-//by jmpessoa
-public void jScrollView_setMarginRight(java.lang.Object scrollview, int x) {
-	((jScrollView)scrollview).setMarginRight(x);
-}
-
-//by jmpessoa
-public void jScrollView_setMarginBottom(java.lang.Object scrollview, int y) {
-	((jScrollView)scrollview).setMarginBottom(y);
-}
-
-
 //-------------------------------------------------------------------------
-//jPanel - new by jmpessoa
+//Panel: Create - new by jmpessoa
 //-------------------------------------------------------------------------
-
-public  java.lang.Object jPanel_Create(android.content.Context context,
-                                       long pasobj ) {
-return (java.lang.Object)(new jPanel(context,this,pasobj));
-}
-
-
-public  java.lang.Object jPanel_Create2(long pasobj ) {
+public  java.lang.Object jPanel_Create(long pasobj ) {
    return (java.lang.Object)(new jPanel(this.activity,this,pasobj));
 }
-
-public  void jPanel_Free(java.lang.Object panel) {
-	jPanel obj = (jPanel)panel;
-    obj.Free();
-//obj = null;
-}
-
-public  void jPanel_setXYWH  (java.lang.Object panel,
-                              int x, int y, int w, int h ) {
-((jPanel)panel).setXYWH(x,y,w,h);
-}
-
-public void jPanel_setLeftTopRightBottomWidthHeight(java.lang.Object panel,
-        int left, int top, int right, int bottom, int w, int h) {
-((jPanel)panel).setLeftTopRightBottomWidthHeight(left,top,right,bottom,w,h);	
-}
-
-
-public  void jPanel_setParent(java.lang.Object panel,
-                              android.view.ViewGroup viewgroup) {
-((jPanel)panel).setParent(viewgroup);
-}
-
-public  android.widget.RelativeLayout jPanel_getView(java.lang.Object panel) {
-   return (android.widget.RelativeLayout)(((jPanel)panel).getView());
-}
-
-//by jmpessoa
-public  void jPanel_setId(java.lang.Object panel, int id) {
-  ((jPanel)panel).setIdEx(id);
-}
-
-//by jmpessoa
-public void jPanel_setLParamWidth(java.lang.Object panel, int w) {
-((jPanel)panel).setLParamWidth(w);
-}
-
-//by jmpessoa
-public void jPanel_setLParamHeight(java.lang.Object panel, int h) {
-((jPanel)panel).setLParamHeight(h);
-}
-
-//by jmpessoa
-public int jPanel_getLParamHeight(java.lang.Object panel) {
-	  return ((jPanel)panel).getLParamHeight();
-}
-
-//by jmpessoa           
-public int jPanel_getLParamWidth(java.lang.Object panel) {
-	return ((jPanel)panel).getLParamWidth();	
-}
-
-//by jmpessoa
-public void jPanel_resetLParamsRules(java.lang.Object panel) {
-((jPanel)panel).resetLParamsRules();
-}
-
-//by jmpessoa
-public void jPanel_addLParamsAnchorRule(java.lang.Object panel, int rule) {
-((jPanel)panel).addLParamsAnchorRule(rule);
-}
-
-public void jPanel_addLParamsParentRule(java.lang.Object panel, int rule) {
-((jPanel)panel).addLParamsParentRule(rule);
-}
-
-//by jmpessoa
-public  void jPanel_setLayoutAll(java.lang.Object panel, int idAnchor) {
-  ((jPanel)panel).setLayoutAll(idAnchor);
-}
-
-//by jmpessoa
-public void jPanel_setMarginLeft(java.lang.Object panel, int x) {
-((jPanel)panel).setMarginLeft(x);
-}
-
-//by jmpessoa
-public void jPanel_setMarginTop(java.lang.Object panel, int y) {
-((jPanel)panel).setMarginTop(y);
-}
-
-//by jmpessoa
-public void jPanel_setMarginRight(java.lang.Object panel, int x) {
-((jPanel)panel).setMarginRight(x);
-}
-
-//by jmpessoa
-public void jPanel_setMarginBottom(java.lang.Object panel, int y) {
-((jPanel)panel).setMarginBottom(y);
-}
-
 // -------------------------------------------------------------------------
 //  ViewFlipper
 // -------------------------------------------------------------------------
 
-public  java.lang.Object jViewFlipper_Create(android.content.Context context,
-                                            long pasobj ) {
-  return (java.lang.Object)( new jViewFlipper(context,this,pasobj));
-}
-
-public  java.lang.Object jViewFlipper_Create2(long pasobj ) {
+public  java.lang.Object jViewFlipper_Create(long pasobj ) {
    return (java.lang.Object)( new jViewFlipper(this.activity,this,pasobj));
 }
 
-public  void jViewFlipper_Free(java.lang.Object viewflipper) {
-  jViewFlipper obj = (jViewFlipper)viewflipper;
-  obj.Free();
-  //obj = null;
-}
 
-public  void jViewFlipper_setXYWH  (java.lang.Object viewflipper,
-                                  int x, int y, int w, int h ) {
-  ((jViewFlipper)viewflipper).setXYWH(x,y,w,h);
-}
-
-public void jViewFlipper_setLeftTopRightBottomWidthHeight(java.lang.Object viewflipper,
-        int left, int top, int right, int bottom, int w, int h) {
-((jViewFlipper)viewflipper).setLeftTopRightBottomWidthHeight(left,top,right,bottom,w,h);	
-}
-
-
-public  void jViewFlipper_setParent(java.lang.Object viewflipper,
-                                  android.view.ViewGroup viewgroup) {
-  ((jViewFlipper)viewflipper).setParent(viewgroup);
-}
-
-//by jmpessoa
-public  void jViewFlipper_setId(java.lang.Object viewflipper, int id) {
-	  ((jViewFlipper)viewflipper).setIdEx(id);
-}
-
-//by jmpessoa
-public void jViewFlipper_setLParamWidth(java.lang.Object viewflipper, int w) {
-	((jViewFlipper)viewflipper).setLParamWidth(w);
-}
-
-//by jmpessoa
-public void jViewFlipper_setLParamHeight(java.lang.Object viewflipper, int h) {
-	((jViewFlipper)viewflipper).setLParamHeight(h);
-}
-
-//by jmpessoa
-public void jViewFlipper_addLParamsAnchorRule(java.lang.Object viewflipper, int rule) {
-	((jViewFlipper)viewflipper).addLParamsAnchorRule(rule);
-}
-
-public void jViewFlipper_addLParamsParentRule(java.lang.Object viewflipper, int rule) {
-	((jViewFlipper)viewflipper).addLParamsParentRule(rule);
-}
-
-//by jmpessoa
-public  void jViewFlipper_setLayoutAll(java.lang.Object viewflipper, int idAnchor) {
-	  ((jViewFlipper)viewflipper).setLayoutAll(idAnchor);
-}
-
-//by jmpessoa
-public void jViewFlipper_setMarginLeft(java.lang.Object viewflipper, int x) {
-	((jViewFlipper)viewflipper).setMarginLeft(x);
-}
-
-//by jmpessoa
-public void jViewFlipper_setMarginTop(java.lang.Object viewflipper, int y) {
-	((jViewFlipper)viewflipper).setMarginTop(y);
-}
-
-//by jmpessoa
-public void jViewFlipper_setMarginRight(java.lang.Object viewflipper, int x) {
-	((jViewFlipper)viewflipper).setMarginRight(x);
-}
-
-//by jmpessoa
-public void jViewFlipper_setMarginBottom(java.lang.Object viewflipper, int y) {
-	((jViewFlipper)viewflipper).setMarginBottom(y);
-}
 // -------------------------------------------------------------------------
 //  WebView
 // -------------------------------------------------------------------------
-
-public  java.lang.Object jWebView_Create(android.content.Context context,
-                                           long pasobj ) {
-  return (java.lang.Object)( new jWebView(context,this,pasobj));
-}
-
-//by jmpessoa
-public  java.lang.Object jWebView_Create2(long pasobj ) {
+public  java.lang.Object jWebView_Create(long pasobj ) {
   return (java.lang.Object)( new jWebView(this.activity,this,pasobj));
 }
 
-public  void jWebView_Free(java.lang.Object webview) {
-  jWebView obj = (jWebView)webview;
-  obj.Free();
-  //obj = null;
-}
-
-public  void jWebView_setXYWH  (java.lang.Object webview,
-                                  int x, int y, int w, int h ) {
-  ((jWebView)webview).setXYWH(x,y,w,h);
-}
-
-public void jWebView_setLeftTopRightBottomWidthHeight(java.lang.Object webview,
-        int left, int top, int right, int bottom, int w, int h) {
-((jWebView)webview).setLeftTopRightBottomWidthHeight(left,top,right,bottom,w,h);	
-}
-
-
-public  void jWebView_setParent(java.lang.Object webview,
-                                  android.view.ViewGroup viewgroup) {
-  ((jWebView)webview).setParent(viewgroup);
-}
-
-public  void jWebView_setJavaScript(java.lang.Object webview,boolean javascript) {
-  Log.i("Java","Here");
-  ((jWebView)webview).getSettings().setJavaScriptEnabled(javascript);
-}
-
-public  void jWebView_loadURL(java.lang.Object webview, String str) {
-  ((jWebView)webview).loadUrl("about:blank");
-  ((jWebView)webview).loadUrl(str);
-}
-
-//by jmpessoa
-public  void jWebView_setId(java.lang.Object webview, int id) {
-	  ((jWebView)webview).setIdEx(id);
-}
-
-//by jmpessoa
-public void jWebView_setLParamWidth(java.lang.Object webview, int w) {
-	((jWebView)webview).setLParamWidth(w);
-}
-
-//by jmpessoa
-public void jWebView_setLParamHeight(java.lang.Object webview, int h) {
-	((jWebView)webview).setLParamHeight(h);
-}
-
-//by jmpessoa
-public void jWebView_addLParamsAnchorRule(java.lang.Object webview, int rule) {
-	((jWebView)webview).addLParamsAnchorRule(rule);
-}
-
-public void jWebView_addLParamsParentRule(java.lang.Object webview, int rule) {
-	((jWebView)webview).addLParamsParentRule(rule);
-}
-
-//by jmpessoa
-public  void jWebView_setLayoutAll(java.lang.Object webview, int idAnchor) {
-	  ((jWebView)webview).setLayoutAll(idAnchor);
-}
-
-//by jmpessoa
-public void jWebView_setMarginLeft(java.lang.Object webview, int x) {
-	((jWebView)webview).setMarginLeft(x);
-}
-
-//by jmpessoa
-public void jWebView_setMarginTop(java.lang.Object webview, int y) {
-	((jWebView)webview).setMarginTop(y);
-}
-
-//by jmpessoa
-public void jWebView_setMarginRight(java.lang.Object webview, int x) {
-	((jWebView)webview).setMarginRight(x);
-}
-
-//by jmpessoa
-public void jWebView_setMarginBottom(java.lang.Object webview, int y) {
-	((jWebView)webview).setMarginBottom(y);
-}
 // -------------------------------------------------------------------------
 //  Canvas : canvas + paint
 // -------------------------------------------------------------------------
 
 public  java.lang.Object jCanvas_Create( long pasobj) {
   return (java.lang.Object)( new jCanvas(this,pasobj));
-}
-
-public  void jCanvas_Free(java.lang.Object canvas) {
-  jCanvas obj = (jCanvas)canvas;
-  obj.Free();
-  //obj = null;
-}
-
-public  void jCanvas_setStrokeWidth (java.lang.Object canvas,float width ) {
-  ((jCanvas)canvas).setStrokeWidth(width);
-}
-
-public  void jCanvas_setStyle(java.lang.Object canvas, int style ) {
-  ((jCanvas)canvas).setStyle(style);
-}
-
-public  void jCanvas_setColor(java.lang.Object canvas, int color) {
-  ((jCanvas)canvas).setColor(color);
-}
-
-public  void jCanvas_setTextSize(java.lang.Object canvas, float textsize) {
-  ((jCanvas)canvas).setTextSize(textsize);
-}
-
-public  void jCanvas_drawLine(java.lang.Object canvas, float x1, float y1, float x2, float y2) {
-  ((jCanvas)canvas).drawLine(x1,y1,x2,y2);
-}
-
-public  void jCanvas_drawText(java.lang.Object canvas, String text, float x, float y) {
-  ((jCanvas)canvas).drawText(text,x,y);
-}
-
-public  void jCanvas_drawBitmap(java.lang.Object canvas, Bitmap bmp, int b, int l, int r, int t) {
-  ((jCanvas)canvas).drawBitmap(bmp,b,l,r,t);
 }
 
 // -------------------------------------------------------------------------
@@ -11300,281 +9525,27 @@ public  java.lang.Object jBitmap_Create( long pasobj ) {
   return (java.lang.Object)( new jBitmap(this,pasobj));
 }
 
-public  void jBitmap_Free(java.lang.Object bitmap) {
-  jBitmap obj = (jBitmap)bitmap;
-  obj.Free();
-  //obj = null;
-}
-
-public  void jBitmap_loadFile(java.lang.Object bitmap, String filename) {
-  ((jBitmap)bitmap).loadFile(filename);
-}
-
-public  void jBitmap_saveFile(java.lang.Object bitmap, String filename, int format) {
-  try{
-    File file = new File(filename);
-    FileOutputStream fos = activity.openFileOutput(filename , Context.MODE_PRIVATE);
-    //
-    if (format == Const.CompressFormat_PNG)
-         { ((jBitmap)bitmap).bmp.compress(CompressFormat.PNG, 100 , fos); }
-    else { ((jBitmap)bitmap).bmp.compress(CompressFormat.JPEG, 95 , fos); };
-    fos.flush();
-    fos.close(); }
-  catch(Exception e)
-    { };
-}
-
-public  void jBitmap_createBitmap (java.lang.Object bitmap,int w, int h) {
-  ((jBitmap)bitmap).createBitmap(w,h);
-}
-
-public  int[] jBitmap_getWH( java.lang.Object bitmap) {
-  return ( ((jBitmap)bitmap).getWH() );
-}
-
-public  Bitmap jBitmap_jInstance( java.lang.Object bitmap) {
-  return ( ((jBitmap)bitmap).bmp );
-}
-
 // -------------------------------------------------------------------------
 //  View
 // -------------------------------------------------------------------------
-
-public  java.lang.Object jView_Create(android.content.Context context, long pasobj ) {
-  return (java.lang.Object)( new jView(context,this,pasobj));
-}
-
 //by jmpessoa
-public  java.lang.Object jView_Create2(long pasobj ) {
+public  java.lang.Object jView_Create(long pasobj ) {
   return (java.lang.Object)( new jView(this.activity,this,pasobj));
-}
-
-public  void jView_Free(java.lang.Object view) {
-  jView obj = (jView)view;
-  obj.Free();
-  //obj = null;
-}
-
-public  void jView_setXYWH  (java.lang.Object view,int x, int y, int w, int h ) {
-  ((jView)view).setXYWH(x,y,w,h);
-}
-
-public void jView_setLeftTopRightBottomWidthHeight(java.lang.Object view,
-        int left, int top, int right, int bottom, int w, int h) {
-((jView)view).setLeftTopRightBottomWidthHeight(left,top,right,bottom,w,h);	
-}
-
-
-public  void jView_setParent(java.lang.Object view, android.view.ViewGroup viewgroup) {
-  ((jView)view).setParent(viewgroup);
-}
-
-public  void jView_setjCanvas(java.lang.Object view, java.lang.Object canvas) {
-  ((jView)view).setjCanvas( (jCanvas)canvas );
-}
-
-public  void jView_saveView(java.lang.Object view, String filename) {
-  ((jView)view).saveView(filename);
-}
-
-//by jmpessoa
-public  void jView_setId(java.lang.Object view, int id) {
-	  ((jView)view).setIdEx(id);
-}
-
-//by jmpessoa
-public void jView_setLParamWidth(java.lang.Object view, int w) {
-	((jView)view).setLParamWidth(w);
-}
-
-//by jmpessoa
-public void jView_setLParamHeight(java.lang.Object view, int h) {
-	((jView)view).setLParamHeight(h);
-}
-
-//by jmpessoa
-public void jView_addLParamsAnchorRule(java.lang.Object view, int rule) {
-	((jView)view).addLParamsAnchorRule(rule);
-}
-
-public void jView_addLParamsParentRule(java.lang.Object view, int rule) {
-	((jView)view).addLParamsParentRule(rule);
-}
-
-//by jmpessoa
-public  void jView_setLayoutAll(java.lang.Object view, int idAnchor) {
-	  ((jView)view).setLayoutAll(idAnchor);
-}
-
-//by jmpessoa
-public void jView_setMarginLeft(java.lang.Object view, int x) {
-	((jView)view).setMarginLeft(x);
-}
-
-//by jmpessoa
-public void jView_setMarginTop(java.lang.Object view, int y) {
-	((jView)view).setMarginTop(y);
-}
-
-//by jmpessoa
-public void jView_setMarginRight(java.lang.Object view, int x) {
-	((jView)view).setMarginRight(x);
-}
-
-//by jmpessoa
-public void jView_setMarginBottom(java.lang.Object view, int y) {
-	((jView)view).setMarginBottom(y);
-}
-
-//by jmpessoa
-public int jView_getLParamHeight(java.lang.Object view) {
-	  return ((jView)view).getLParamHeight();
-}
-
-//by jmpessoa           
-public int jView_getLParamWidth(java.lang.Object view) {
-	return ((jView)view).getLParamWidth();	
 }
 
 // -------------------------------------------------------------------------
 //  GLView
 // -------------------------------------------------------------------------
 
-public  java.lang.Object jGLSurfaceView_Create(android.content.Context context,
-                                              long pasobj, int version ) {
-  return (java.lang.Object)( new jGLSurfaceView(context,this,pasobj,version));
-}
-
-//by jmpessoa
-public  java.lang.Object jGLSurfaceView_Create2(long pasobj, int version ) {
+public  java.lang.Object jGLSurfaceView_Create(long pasobj, int version ) {
   return (java.lang.Object)( new jGLSurfaceView(this.activity,this,pasobj,version));
 }
-
-public  void jGLSurfaceView_Free(java.lang.Object surfaceview) {
-  jGLSurfaceView obj = (jGLSurfaceView)surfaceview;
-  obj.Free();
-  //obj = null;
-}
-
-public  void jGLSurfaceView_setXYWH  (java.lang.Object surfaceview,
-                                     int x, int y, int w, int h ) {
-  ((jGLSurfaceView)surfaceview).setXYWH(x,y,w,h);
-}
-
-public void jGLSurfaceView_setLeftTopRightBottomWidthHeight(java.lang.Object surfaceview,
-        int left, int top, int right, int bottom, int w, int h) {
-((jGLSurfaceView)surfaceview).setLeftTopRightBottomWidthHeight(left,top,right,bottom,w,h);	
-}
-
-
-public  void jGLSurfaceView_setParent(java.lang.Object surfaceview,
-                                     android.view.ViewGroup viewgroup) {
-  ((jGLSurfaceView)surfaceview).setParent(viewgroup);
-}
-
-
-public  void jGLSurfaceView_SetAutoRefresh(java.lang.Object glView, boolean active ) {
-  if (active) { ((jGLSurfaceView)glView).setRenderMode( GLSurfaceView.RENDERMODE_CONTINUOUSLY ); }
-        else  { ((jGLSurfaceView)glView).setRenderMode( GLSurfaceView.RENDERMODE_WHEN_DIRTY   ); }
-}
-
-public  void jGLSurfaceView_Refresh(java.lang.Object glView) {
-  ((GLSurfaceView)glView).requestRender();
-}
-
-// public  void jGLSurfaceView_Refresh(java.lang.Object surfaceview) {
-//   ((jGLSurfaceView)surfaceview).genRender(); //requestRender();
-// }
-
-public  void jGLSurfaceView_deleteTexture(java.lang.Object surfaceview, int id) {
-  ((jGLSurfaceView)surfaceview).deleteTexture(id);
-}
-
-public  void jGLSurfaceView_glThread(java.lang.Object surfaceview) {
-  ((jGLSurfaceView)surfaceview).glThread();
-}
-
-//by jmpessoa
-public  void jGLSurfaceView_setId(java.lang.Object surfaceview, int id) {
-	  ((jGLSurfaceView)surfaceview).setIdEx(id);
-}
-
-//by jmpessoa
-public void jGLSurfaceView_setLParamWidth(java.lang.Object surfaceview, int w) {
-	((jGLSurfaceView)surfaceview).setLParamWidth(w);
-}
-
-//by jmpessoa
-public void jGLSurfaceView_setLParamHeight(java.lang.Object surfaceview, int h) {
-	((jGLSurfaceView)surfaceview).setLParamHeight(h);
-}
-
-//by jmpessoa
-public int jGLSurfaceView_getLParamHeight(java.lang.Object surfaceview) {
-	  return ((jGLSurfaceView)surfaceview).getLParamHeight();
-}
-
-//by jmpessoa           
-public int jGLSurfaceView_getLParamWidth(java.lang.Object surfaceview) {
-	return ((jGLSurfaceView)surfaceview).getLParamWidth();	
-}
-
-
-//by jmpessoa
-public void jGLSurfaceView_addLParamsAnchorRule(java.lang.Object surfaceview, int rule) {
-	((jGLSurfaceView)surfaceview).addLParamsAnchorRule(rule);
-}
-
-public void jGLSurfaceView_addLParamsParentRule(java.lang.Object surfaceview, int rule) {
-	((jGLSurfaceView)surfaceview).addLParamsParentRule(rule);
-}
-
-//by jmpessoa
-public  void jGLSurfaceView_setLayoutAll(java.lang.Object surfaceview, int idAnchor) {
-	  ((jGLSurfaceView)surfaceview).setLayoutAll(idAnchor);
-}
-
-//by jmpessoa
-public void jGLSurfaceView_setMarginLeft(java.lang.Object surfaceview, int x) {
-	((jGLSurfaceView)surfaceview).setMarginLeft(x);
-}
-
-//by jmpessoa
-public void jGLSurfaceView_setMarginTop(java.lang.Object surfaceview, int y) {
-	((jGLSurfaceView)surfaceview).setMarginTop(y);
-}
-
-//by jmpessoa
-public void jGLSurfaceView_setMarginRight(java.lang.Object surfaceview, int x) {
-	((jGLSurfaceView)surfaceview).setMarginRight(x);
-}
-
-//by jmpessoa
-public void jGLSurfaceView_setMarginBottom(java.lang.Object surfaceview, int y) {
-	((jGLSurfaceView)surfaceview).setMarginBottom(y);
-}
-
 // -------------------------------------------------------------------------
 //  Timer
 // -------------------------------------------------------------------------
 public  java.lang.Object jTimer_Create(long pasobj) {
   return (jTimer)(new jTimer(this,pasobj) );
 }
-
-public  void jTimer_Free(java.lang.Object timer) {
-  jTimer obj = (jTimer)timer;
-  obj.Free();
-  //obj = null;
-}
-
-public  void jTimer_SetInterval(java.lang.Object timer, int interval ) {
-  ((jTimer)timer).SetInterval(interval);
-}
-
-public  void jTimer_SetEnabled(java.lang.Object timer, boolean active ) {
-  ((jTimer)timer).SetEnabled(active);
-}
-
 // -------------------------------------------------------------------------
 //  Dialog YN
 // -------------------------------------------------------------------------
@@ -11589,19 +9560,6 @@ public  java.lang.Object jDialogYN_Create(long pasobj,
   //return DialogYNSav;
 }
 
-public  void jDialogYN_Free(java.lang.Object dialog) {
-  jDialogYN obj = (jDialogYN)dialog;
-  obj.Free();
-  //obj = null;
-}
-
-public  void jDialogYN_Show(java.lang.Object dialog ) {
-  Log.i("Java","jDialogYN_Show");
-  if ( dialog instanceof jDialogYN ) { Log.i("Java","jDialogYN -> YES"); }
-  else                               { Log.i("Java","jDialogYN -> No" ); }
-  ((jDialogYN)dialog).show();
-}
-
 // -------------------------------------------------------------------------
 //  Dialog Progress
 // -------------------------------------------------------------------------
@@ -11611,145 +9569,30 @@ public  java.lang.Object jDialogProgress_Create(long pasobj,
   return (jDialogProgress)(new jDialogProgress(activity,this,pasobj,title,msg ) );
 }
 
-public  void jDialogProgress_Free(java.lang.Object dialog) {
-  jDialogProgress obj = (jDialogProgress)dialog;
-  obj.Free();
-  //obj = null;
-}
-
 // -------------------------------------------------------------------------
 //  Toast
 // -------------------------------------------------------------------------
 
 //
 public  void jToast( String str ) {
-  Toast.makeText(activity, str, Toast.LENGTH_SHORT).show();
-}
-
-//by jmpessoa
-public  void jToast2(android.content.Context context,  String str ) {
-	  Toast.makeText(context, str, Toast.LENGTH_SHORT).show();
+   Toast.makeText(activity, str, Toast.LENGTH_SHORT).show();
 }
 
 // -------------------------------------------------------------------------
 //  jImageBtn
 // -------------------------------------------------------------------------
 
-public  java.lang.Object jImageBtn_Create(android.content.Context context, long pasobj ) {
-  return (java.lang.Object)( new jImageBtn(context,this,pasobj));
-}
-
 //by jmpessoa
-public  java.lang.Object jImageBtn_Create2(long pasobj ) {
+public  java.lang.Object jImageBtn_Create(long pasobj ) {
 	return (java.lang.Object)( new jImageBtn(this.activity,this,pasobj));
 }
 
-public  void jImageBtn_Free(java.lang.Object imagebtn) {
-  jImageBtn obj = (jImageBtn)imagebtn;
-  obj.Free();
-  //obj = null;
-}
-
-public  void jImageBtn_setXYWH  (java.lang.Object imagebtn,int x, int y, int w, int h ) {
-  ((jImageBtn)imagebtn).setXYWH(x,y,w,h);
-}
-
-public void jImageBtn_setLeftTopRightBottomWidthHeight(java.lang.Object imagebtn,
-        int left, int top, int right, int bottom, int w, int h) {
-((jImageBtn)imagebtn).setLeftTopRightBottomWidthHeight(left,top,right,bottom,w,h);	
-}
-
-public  void jImageBtn_setParent(java.lang.Object imagebtn, android.view.ViewGroup viewgroup) {
-  ((jImageBtn)imagebtn).setParent(viewgroup);
-}
-
-public  void jImageBtn_setButton(java.lang.Object imagebtn, String bmpup, String bmpdn ) {
-  ((jImageBtn)imagebtn).setButton(bmpup,bmpdn);
-}
-
-//by jmpessoa
-public  void jImageBtn_setButtonUp(java.lang.Object imagebtn, String bmpup) {
-	  ((jImageBtn)imagebtn).setButtonUp(bmpup);
-}
-
-//by jmpessoa
-public  void jImageBtn_setButtonDown(java.lang.Object imagebtn, String bmpdn ) {
-	  ((jImageBtn)imagebtn).setButtonDown(bmpdn);
-}
-
-// LORDMAN 2013-08-16
-public  void jImageBtn_setEnabled(java.lang.Object imagebtn, boolean enabled ) {
-  ((jImageBtn)imagebtn).setEnabled(enabled);
-}
-
-//by jmpessoa
-public  void jImageBtn_setId(java.lang.Object imagebtn, int id) {
-	  ((jImageBtn)imagebtn).setIdEx(id);
-}
-
-//by jmpessoa
-public void jImageBtn_setLParamWidth(java.lang.Object imagebtn, int w) {
-	((jImageBtn)imagebtn).setLParamWidth(w);
-}
-
-//by jmpessoa
-public void jImageBtn_setLParamHeight(java.lang.Object imagebtn, int h) {
-	((jImageBtn)imagebtn).setLParamHeight(h);
-}
-
-//by jmpessoa
-public void jImageBtn_addLParamsAnchorRule(java.lang.Object imagebtn, int rule) {
-	((jImageBtn)imagebtn).addLParamsAnchorRule(rule);
-}
-
-public void jImageBtn_addLParamsParentRule(java.lang.Object imagebtn, int rule) {
-	((jImageBtn)imagebtn).addLParamsParentRule(rule);
-}
-
-//by jmpessoa
-public  void jImageBtn_setLayoutAll(java.lang.Object imagebtn, int idAnchor) {
-	  ((jImageBtn)imagebtn).setLayoutAll(idAnchor);
-}
-
-//by jmpessoa
-public void jImageBtn_setMarginLeft(java.lang.Object imagebtn, int x) {
-	((jImageBtn)imagebtn).setMarginLeft(x);
-}
-
-//by jmpessoa
-public void jImageBtn_setMarginTop(java.lang.Object imagebtn, int y) {
-	((jImageBtn)imagebtn).setMarginTop(y);
-}
-
-//by jmpessoa
-public void jImageBtn_setMarginRight(java.lang.Object imagebtn, int x) {
-	((jImageBtn)imagebtn).setMarginRight(x);
-}
-
-//by jmpessoa
-public void jImageBtn_setMarginBottom(java.lang.Object imagebtn, int y) {
-	((jImageBtn)imagebtn).setMarginBottom(y);
-}
 // -------------------------------------------------------------------------
 //  jAsyncTask
 // -------------------------------------------------------------------------
 
 public  java.lang.Object jAsyncTask_Create(long pasobj ) {
   return (java.lang.Object)( new jAsyncTask(this,pasobj));
-}
-
-public  void jAsyncTask_Free(java.lang.Object asynctask) {
-  jAsyncTask obj = (jAsyncTask)asynctask;
-  obj.Free();
-}
-
-public  void jAsyncTask_Execute(java.lang.Object asynctask) {
-  ((jAsyncTask)asynctask).execute();
-}
-
-
-public  void jAsyncTask_setProgress(java.lang.Object asynctask, int progress) {
-  ((jAsyncTask)asynctask).setProgress(progress);
 }
 
 // -------------------------------------------------------------------------
@@ -11767,7 +9610,6 @@ public  void jAsyncTask_setProgress(java.lang.Object asynctask, int progress) {
 //
 //
 // -------------------------------------------------------------------------
-
 
 public  String jHttp_get(String url) {
   String rst = "";
@@ -11869,6 +9711,7 @@ public int jSend_SMS(String phoneNumber, String msg) {
 
 //by jmpessoa
 //http://eagle.phys.utk.edu/guidry/android/readContacts.html
+@SuppressLint("DefaultLocale")
 public String jContact_getMobileNumberByDisplayName(String contactName){
 	                                                        
 	   String matchNumber = "";
@@ -11997,15 +9840,17 @@ public float[] benchMark1 () {
   return ( vals );
 }
 
-//by jmpessoa
-public  java.lang.Object jSqliteCursor_Create( long pasobj ) {
-	return (java.lang.Object)( new jSqliteCursor(this,pasobj) );
-}
+//-------------------------------------------------------------------------------------------------------
+//NEWS by jmpessoa
+//-------------------------------------------------------------------------------------------------------
 
-//by jmpessoa
-public  java.lang.Object jSqliteDataAccess_Create(long pasobj, String databaseName, char colDelim, char rowDelim) {
-	return (java.lang.Object)( new jSqliteDataAccess(this,pasobj,databaseName,colDelim,rowDelim) );
-}
+   public  java.lang.Object jSqliteCursor_Create( long pasobj ) {
+	 return (java.lang.Object)( new jSqliteCursor(this,pasobj) );
+   }
+
+   public  java.lang.Object jSqliteDataAccess_Create(long pasobj, String databaseName, char colDelim, char rowDelim) {
+	 return (java.lang.Object)( new jSqliteDataAccess(this,pasobj,databaseName,colDelim,rowDelim) );
+   }
    
    public java.lang.Object jMyHello_jCreate(long _Self, int _flag, String _hello) {
       return (java.lang.Object)(new jMyHello(this,_Self,_flag,_hello));
@@ -12023,24 +9868,18 @@ public  java.lang.Object jSqliteDataAccess_Create(long pasobj, String databaseNa
       return (java.lang.Object)(new jTextFileManager(this,_Self));
    }
   
-
-  
    public java.lang.Object jMenu_jCreate(long _Self) {
       return (java.lang.Object)(new jMenu(this,_Self));
    }
-  
   
    public java.lang.Object jBluetooth_jCreate(long _Self) {
       return (java.lang.Object)(new jBluetooth(this,_Self));
    }
   
-  
    public java.lang.Object jBluetoothServerSocket_jCreate(long _Self) {
       return (java.lang.Object)(new jBluetoothServerSocket(this,_Self));
    }
-  
-
-  
+    
    public java.lang.Object jBluetoothClientSocket_jCreate(long _Self) {
       return (java.lang.Object)(new jBluetoothClientSocket(this,_Self));
    }
@@ -12049,34 +9888,25 @@ public  java.lang.Object jSqliteDataAccess_Create(long pasobj, String databaseNa
 	      return (java.lang.Object)(new jSpinner(this,_Self));
    }    
 
-
    public java.lang.Object jLocation_jCreate(long _Self, long _TimeForUpdates, long _DistanceForUpdates, int _CriteriaAccuracy, int _MapType) {
       return (java.lang.Object)(new jLocation(this,_Self,_TimeForUpdates,_DistanceForUpdates,_CriteriaAccuracy, _MapType));
    }
 
-  
    public java.lang.Object jPreferences_jCreate(long _Self, boolean _IsShared) {
       return (java.lang.Object)(new jPreferences(this,_Self,_IsShared));
    }
-  
-
   
    public java.lang.Object jShareFile_jCreate(long _Self) {
       return (java.lang.Object)(new jShareFile(this,_Self));
    }
   
-
-  
    public java.lang.Object jImageFileManager_jCreate(long _Self) {
       return (java.lang.Object)(new jImageFileManager(this,_Self));
    }
   
-
-  
    public java.lang.Object jContextMenu_jCreate(long _Self) {
       return (java.lang.Object)(new jContextMenu(this,_Self));
    }
-  
   
    public java.lang.Object jActionBarTab_jCreate(long _Self) {
       return (java.lang.Object)(new jActionBarTab(this,_Self));
@@ -12086,5 +9916,4 @@ public  java.lang.Object jSqliteDataAccess_Create(long pasobj, String databaseNa
       return (java.lang.Object)(new jCustomDialog(this,_Self));
    }
   
-
 }

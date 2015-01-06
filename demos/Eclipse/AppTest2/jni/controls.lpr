@@ -1,12 +1,12 @@
-{hint: save all files to location: C:\adt32\eclipse\workspace\AppTest2\jni }
-library controls;
-
+{hint: save all files to location: C:\adt32\eclipse\workspace\AppTest2\jni}
+library controls;  //[by LazAndroidWizard: 1/2/2015 23:48:10]
+ 
 {$mode delphi}
-
+ 
 uses
-  Classes, SysUtils, And_jni, AndroidWidget, And_jni_Bridge, Laz_And_Controls,
-  Laz_And_Controls_Events, Unit1;
-
+  Classes, SysUtils, And_jni, And_jni_Bridge, AndroidWidget, Laz_And_Controls,
+  Laz_And_Controls_Events, unit1;
+ 
 { Class:     com_example_apptest2_Controls
   Method:    pAppOnScreenStyle
   Signature: ()I }
@@ -129,7 +129,7 @@ end;
 
 { Class:     com_example_apptest2_Controls
   Method:    pAppOnCreateContextMenu
-  Signature: (Landroid/view/Menu;)V }
+  Signature: (Landroid/view/ContextMenu;)V }
 procedure pAppOnCreateContextMenu(PEnv: PJNIEnv; this: JObject; menu: JObject); cdecl;
 begin
   Java_Event_pAppOnCreateContextMenu(PEnv,this,menu);
@@ -153,10 +153,18 @@ end;
 
 { Class:     com_example_apptest2_Controls
   Method:    pOnChange
-  Signature: (JI)V }
-procedure pOnChange(PEnv: PJNIEnv; this: JObject; pasobj: JLong; EventType: JInt); cdecl;
+  Signature: (JLjava/lang/String;I)V }
+procedure pOnChange(PEnv: PJNIEnv; this: JObject; pasobj: JLong; txt: JString; count: JInt); cdecl;
 begin
-  Java_Event_pOnChange(PEnv,this,TObject(pasobj),EventType);
+  Java_Event_pOnChange(PEnv,this,TObject(pasobj),txt,count);
+end;
+
+{ Class:     com_example_apptest2_Controls
+  Method:    pOnChanged
+  Signature: (JLjava/lang/String;I)V }
+procedure pOnChanged(PEnv: PJNIEnv; this: JObject; pasobj: JLong; txt: JString; count: JInt); cdecl;
+begin
+  Java_Event_pOnChanged(PEnv,this,TObject(pasobj),txt,count);
 end;
 
 { Class:     com_example_apptest2_Controls
@@ -399,7 +407,31 @@ begin
   Java_Event_pAppOnListItemClick(PEnv,this,adapter,view,position,id);
 end;
 
-const NativeMethods:array[0..48] of JNINativeMethod = (
+{ Class:     com_example_apptest2_Controls
+  Method:    pOnActionBarTabSelected
+  Signature: (JLandroid/view/View;Ljava/lang/String;)V }
+procedure pOnActionBarTabSelected(PEnv: PJNIEnv; this: JObject; pasobj: JLong; view: JObject; title: JString); cdecl;
+begin
+  Java_Event_pOnActionBarTabSelected(PEnv,this,TObject(pasobj),view,title);
+end;
+
+{ Class:     com_example_apptest2_Controls
+  Method:    pOnActionBarTabUnSelected
+  Signature: (JLandroid/view/View;Ljava/lang/String;)V }
+procedure pOnActionBarTabUnSelected(PEnv: PJNIEnv; this: JObject; pasobj: JLong; view: JObject; title: JString); cdecl;
+begin
+  Java_Event_pOnActionBarTabUnSelected(PEnv,this,TObject(pasobj),view,title);
+end;
+
+{ Class:     com_example_apptest2_Controls
+  Method:    pOnCustomDialogShow
+  Signature: (JLandroid/app/Dialog;Ljava/lang/String;)V }
+procedure pOnCustomDialogShow(PEnv: PJNIEnv; this: JObject; pasobj: JLong; dialog: JObject; title: JString); cdecl;
+begin
+  Java_Event_pOnCustomDialogShow(PEnv,this,TObject(pasobj),dialog,title);
+end;
+
+const NativeMethods:array[0..52] of JNINativeMethod = (
    (name:'pAppOnScreenStyle';
     signature:'()I';
     fnPtr:@pAppOnScreenStyle;),
@@ -446,7 +478,7 @@ const NativeMethods:array[0..48] of JNINativeMethod = (
     signature:'(Landroid/view/MenuItem;ILjava/lang/String;Z)V';
     fnPtr:@pAppOnClickOptionMenuItem;),
    (name:'pAppOnCreateContextMenu';
-    signature:'(Landroid/view/Menu;)V';
+    signature:'(Landroid/view/ContextMenu;)V';
     fnPtr:@pAppOnCreateContextMenu;),
    (name:'pAppOnClickContextMenuItem';
     signature:'(Landroid/view/MenuItem;ILjava/lang/String;Z)V';
@@ -455,8 +487,11 @@ const NativeMethods:array[0..48] of JNINativeMethod = (
     signature:'(JI)V';
     fnPtr:@pOnClick;),
    (name:'pOnChange';
-    signature:'(JI)V';
+    signature:'(JLjava/lang/String;I)V';
     fnPtr:@pOnChange;),
+   (name:'pOnChanged';
+    signature:'(JLjava/lang/String;I)V';
+    fnPtr:@pOnChanged;),
    (name:'pOnEnter';
     signature:'(J)V';
     fnPtr:@pOnEnter;),
@@ -546,7 +581,16 @@ const NativeMethods:array[0..48] of JNINativeMethod = (
     fnPtr:@pAppOnViewClick;),
    (name:'pAppOnListItemClick';
     signature:'(Landroid/widget/AdapterView;Landroid/view/View;II)V';
-    fnPtr:@pAppOnListItemClick;)
+    fnPtr:@pAppOnListItemClick;),
+   (name:'pOnActionBarTabSelected';
+    signature:'(JLandroid/view/View;Ljava/lang/String;)V';
+    fnPtr:@pOnActionBarTabSelected;),
+   (name:'pOnActionBarTabUnSelected';
+    signature:'(JLandroid/view/View;Ljava/lang/String;)V';
+    fnPtr:@pOnActionBarTabUnSelected;),
+   (name:'pOnCustomDialogShow';
+    signature:'(JLandroid/app/Dialog;Ljava/lang/String;)V';
+    fnPtr:@pOnCustomDialogShow;)
 );
 
 function RegisterNativeMethodsArray(PEnv: PJNIEnv; className: PChar; methods: PJNINativeMethod; countMethods:integer):integer;
@@ -560,12 +604,12 @@ begin
     if (PEnv^).RegisterNatives(PEnv, curClass, methods, countMethods) > 0 then Result:= JNI_TRUE;
   end;
 end;
-
+ 
 function RegisterNativeMethods(PEnv: PJNIEnv; className: PChar): integer;
 begin
   Result:= RegisterNativeMethodsArray(PEnv, className, @NativeMethods[0], Length(NativeMethods));
 end;
-
+ 
 function JNI_OnLoad(VM: PJavaVM; reserved: pointer): JInt; cdecl;
 var
   PEnv: PPointer;
@@ -579,9 +623,9 @@ begin
      curEnv:= PJNIEnv(PEnv);
      RegisterNativeMethods(curEnv, 'com/example/apptest2/Controls');
   end;
-  gVM:= VM;{And_jni_Bridge}
+  gVM:= VM;{AndroidWidget.pas}
 end;
-
+ 
 procedure JNI_OnUnload(VM: PJavaVM; reserved: pointer); cdecl;
 var
   PEnv: PPointer;
@@ -592,8 +636,8 @@ begin
   if PEnv <> nil then
   begin
     curEnv:= PJNIEnv(PEnv);
-    (curEnv^).DeleteGlobalRef(curEnv, gjClass{And_jni_Bridge});
-    gVM:= nil;{And_jni_Bridge}
+    (curEnv^).DeleteGlobalRef(curEnv, gjClass);   {AndroidWidget.pas}
+    gVM:= nil;{AndroidWidget.pas}
   end;
   gApp.Terminate;
   FreeAndNil(gApp);
@@ -621,6 +665,7 @@ exports
   pAppOnClickContextMenuItem name 'Java_com_example_apptest2_Controls_pAppOnClickContextMenuItem',
   pOnClick name 'Java_com_example_apptest2_Controls_pOnClick',
   pOnChange name 'Java_com_example_apptest2_Controls_pOnChange',
+  pOnChanged name 'Java_com_example_apptest2_Controls_pOnChanged',
   pOnEnter name 'Java_com_example_apptest2_Controls_pOnEnter',
   pOnTimer name 'Java_com_example_apptest2_Controls_pOnTimer',
   pOnDraw name 'Java_com_example_apptest2_Controls_pOnDraw',
@@ -650,13 +695,16 @@ exports
   pOnLocationProviderEnabled name 'Java_com_example_apptest2_Controls_pOnLocationProviderEnabled',
   pOnLocationProviderDisabled name 'Java_com_example_apptest2_Controls_pOnLocationProviderDisabled',
   pAppOnViewClick name 'Java_com_example_apptest2_Controls_pAppOnViewClick',
-  pAppOnListItemClick name 'Java_com_example_apptest2_Controls_pAppOnListItemClick';
+  pAppOnListItemClick name 'Java_com_example_apptest2_Controls_pAppOnListItemClick',
+  pOnActionBarTabSelected name 'Java_com_example_apptest2_Controls_pOnActionBarTabSelected',
+  pOnActionBarTabUnSelected name 'Java_com_example_apptest2_Controls_pOnActionBarTabUnSelected',
+  pOnCustomDialogShow name 'Java_com_example_apptest2_Controls_pOnCustomDialogShow';
 
 begin
-  gApp:= jApp.Create(nil);{Laz_And_Controls}
+  gApp:= jApp.Create(nil);{AndroidWidget.pas}
   gApp.Title:= 'My Android Bridges Library';
-  gjAppName:= 'com.example.apptest2';{And_jni_Bridge}
-  gjClassName:= 'com/example/apptest2/Controls';{And_jni_Bridge}
+  gjAppName:= 'com.example.apptest2';{AndroidWidget.pas}
+  gjClassName:= 'com/example/apptest2/Controls';{AndroidWidget.pas}
   gApp.AppName:=gjAppName;
   gApp.ClassName:=gjClassName;
   gApp.Initialize;

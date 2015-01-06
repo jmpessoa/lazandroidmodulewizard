@@ -34,6 +34,7 @@ object AndroidModule12: TAndroidModule12
     BackgroundColor = colbrDefault
     FontColor = colbrSilver
     FontSize = 0
+    TextTypeFace = tfNormal
     Id = 21393
   end
   object jButton1: jButton
@@ -105,6 +106,7 @@ object AndroidModule12: TAndroidModule12
     BackgroundColor = colbrDefault
     FontColor = colbrSilver
     FontSize = 0
+    TextTypeFace = tfNormal
     Id = 0
   end
   object jImageList1: jImageList

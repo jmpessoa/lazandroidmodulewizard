@@ -9,6 +9,8 @@ uses
 
 Type
 
+  TOnTerminated = procedure(Sender: TObject) of Object;
+
   TDisplayOutputEvent = procedure(Output: TStrings) of Object;
 
   TThreadProcess = class(TThread)
@@ -20,6 +22,7 @@ Type
     FDir: string;
     FIsTerminated: boolean;
     FDelay: integer;
+    FOnTerminated: TOnTerminated;
 
     FProcess: TProcess;
 
@@ -44,6 +47,7 @@ Type
     property Env: TStringList read FEnv write FEnv;
     property Dir: string read FDir write FDir;
     property OnDisplayOutput: TDisplayOutputEvent read FOnDisplayOutput write FOnDisplayOutput;
+    property OnTerminated: TOnTerminated read FOnTerminated write FOnTerminated;
 
     (*TODO: by jmpessoa
     property Parameters: TStringList read FParameters write FParameters;
@@ -123,6 +127,7 @@ begin
   OutPut.Free;
   FEnv.Free;
   FIsTerminated:= True;
+  if Assigned(FOnTerminated) then FOnTerminated(Self);
 end;
 
 procedure TThreadProcess.Terminate;

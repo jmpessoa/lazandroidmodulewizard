@@ -10,7 +10,7 @@ object AndroidModule3: TAndroidModule3
   Text = 'AndroidModule3'
   OnCreate = DataModuleCreate
   ActivityMode = actRecyclable
-  BackgroundColor = colbrDefault
+  BackgroundColor = colbrBlack
   OnCloseQuery = DataModuleCloseQuery
   OnRotate = DataModuleRotate
   OnJNIPrompt = DataModuleJNIPrompt
@@ -57,6 +57,7 @@ object AndroidModule3: TAndroidModule3
     BackgroundColor = colbrNone
     FontColor = colbrWhite
     FontSize = 0
+    TextTypeFace = tfNormal
     Id = 92902
   end
   object jButton2: jButton
@@ -126,6 +127,7 @@ object AndroidModule3: TAndroidModule3
     Id = 70807
   end
   object jEditText1: jEditText
+    Tag = 1
     Left = 8
     Top = 264
     Width = 140
@@ -143,9 +145,9 @@ object AndroidModule3: TAndroidModule3
     LayoutParamHeight = lpWrapContent
     Alignment = taLeft
     InputTypeEx = itxMultiLine
-    LineMaxLength = 360
+    MaxTextLength = 300
     BackgroundColor = colbrDefault
-    FontColor = colbrDefault
+    FontColor = colbrSilver
     FontSize = 0
     ScrollBarStyle = scrNone
     MaxLines = 1
@@ -243,9 +245,11 @@ object AndroidModule3: TAndroidModule3
     BackgroundColor = colbrDefault
     FontColor = colbrSilver
     FontSize = 0
+    TextTypeFace = tfNormal
     Id = 62160
   end
   object jImageView1: jImageView
+    Tag = 1
     Left = 120
     Top = 432
     Width = 48
@@ -264,7 +268,6 @@ object AndroidModule3: TAndroidModule3
     ImageIndex = 0
     Images = jImageList1
     BackgroundColor = colbrDefault
-    IsBackgroundImage = False
     Id = 0
   end
   object jDialogYN1: jDialogYN

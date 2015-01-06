@@ -32,6 +32,8 @@ Tutorial: How to get your Android Application [Apk] using "Ant":
  
 11.Warning: After a new [Lazarus IDE]-> "run->build" do not forget to run again: "build.bat" and "install.bat" !
  
+12. Linux users: use "build.sh" , "install.sh" , "uninstall.sh" and "logcat.sh" [thanks to Stephano!]
+ 
 ....  Thank you!
  
 ....  by jmpessoa_hotmail_com

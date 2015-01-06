@@ -34,6 +34,7 @@ object AndroidModule6: TAndroidModule6
     BackgroundColor = colbrDefault
     FontColor = colbrYellow
     FontSize = 0
+    TextTypeFace = tfNormal
     Id = 26515
   end
   object jTextView2: jTextView
@@ -57,13 +58,19 @@ object AndroidModule6: TAndroidModule6
     BackgroundColor = colbrDefault
     FontColor = colbrSilver
     FontSize = 0
+    TextTypeFace = tfNormal
     Id = 36024
   end
   object jEditText1: jEditText
+    Tag = 1
     Left = 8
     Top = 80
     Width = 137
     Height = 40
+    MarginLeft = 5
+    MarginTop = 10
+    MarginRight = 5
+    MarginBottom = 10
     Text = 'Hello|Android|World!'
     Visible = True
     Anchor = jTextView2
@@ -73,7 +80,7 @@ object AndroidModule6: TAndroidModule6
     LayoutParamHeight = lpWrapContent
     Alignment = taLeft
     InputTypeEx = itxText
-    LineMaxLength = 360
+    MaxTextLength = 300
     BackgroundColor = colbrWhite
     FontColor = colbrDefault
     FontSize = 0
@@ -107,10 +114,15 @@ object AndroidModule6: TAndroidModule6
     Id = 0
   end
   object jEditText2: jEditText
+    Tag = 1
     Left = 8
     Top = 160
     Width = 137
     Height = 40
+    MarginLeft = 5
+    MarginTop = 10
+    MarginRight = 5
+    MarginBottom = 10
     Text = 'jEditText2'
     Visible = True
     Anchor = jTextView3
@@ -120,7 +132,7 @@ object AndroidModule6: TAndroidModule6
     LayoutParamHeight = lpWrapContent
     Alignment = taLeft
     InputTypeEx = itxText
-    LineMaxLength = 360
+    MaxTextLength = 300
     BackgroundColor = colbrWhite
     FontColor = colbrDefault
     FontSize = 0
@@ -152,6 +164,7 @@ object AndroidModule6: TAndroidModule6
     BackgroundColor = colbrDefault
     FontColor = colbrSilver
     FontSize = 0
+    TextTypeFace = tfNormal
     Id = 5036
   end
   object jButton2: jButton
@@ -209,6 +222,8 @@ object AndroidModule6: TAndroidModule6
     TextAlign = alLeft
     OnClickItem = jListView1ClickItem
     OnClickWidgetItem = jListView1ClickWidgetItem
+    HighLightSelectedItem = True
+    HighLightSelectedItemColor = colbrRed
     Id = 8951
   end
   object jButton3: jButton

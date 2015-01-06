@@ -7,7 +7,7 @@ interface
 uses
   Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, ComCtrls,
   StdCtrls, Buttons, IDEIntf, ProjectIntf, LazIDEIntf, LCLIntf, ExtCtrls,
-  IniFiles;
+  IniFiles, ThreadProcess, Clipbrd;
 
 type
 
@@ -35,26 +35,30 @@ type
     procedure SpBSelectProjectClick(Sender: TObject);
   private
     { private declarations }
-    ProjectPath: string;
-
-    JNIProjectPath: string;    //by jmpessoa
-
-    PathToWorkspace: string;   //by jmpessoa
-
-    PathToJavaTemplates: string; //by jmpessoa
-    PathToJavaClass: string;
-
+    MemoLog: TStringList;
     ImportsList: TStringList;
     SynMemo1: TStringList;
     SynMemo2: TStringList;
+
     ListJNIBridge: TStringList;
+
+    ProjectPath: string;
+
+    JNIProjectPath: string;
+    PathToLazbuild: string;
+
+    PathToWorkspace: string;
+    PathToJavaTemplates: string;
+    PathToJavaClass: string;
 
     PackageName: string;
     JNIDecoratedMethodName: string;
     JavaClassName: string;  //"Controls"
 
+    CmdShell: string;
+    APKProcess: TThreadProcess;
 
-    procedure GetImportsList; //by jmpessoa
+    procedure GetImportsList;
     function DoJavaParse: string;
     function GetJSignature(params, res: string): string;
     function GetParamSignature(param: string): string;
@@ -64,6 +68,11 @@ type
     function GetParam(param: string): string;
     function GetPascalJType(jType: string): string;
     function GetFuncResult(funcResult: string): string;
+
+    procedure RebuildLibrary; //by jmpessoa
+    procedure ShowProcOutput(AOutput: TStrings);
+    function ApkProcessRunning: boolean;
+    procedure DoTerminated(Sender: TObject);
 
   public
     { public declarations }
@@ -85,6 +94,12 @@ implementation
 
 { TFormUpdateCodeTemplate }
 
+procedure TFormUpdateCodeTemplate.DoTerminated(Sender: TObject);
+begin
+  Clipboard.AsText:=(MemoLog.Text);
+  ShowMessage('The Upgrade is Done! Please, Get the Log from Clipboard!');
+end;
+
 procedure TFormUpdateCodeTemplate.FormClose(Sender: TObject;
   var CloseAction: TCloseAction);
 var
@@ -97,6 +112,60 @@ begin
       WriteString('NewProject', 'PathToWorkspace', PathToWorkspace);
       Free;
    end;
+
+  if Assigned(APKProcess) then
+    if not APKProcess.IsTerminated then APKProcess.Terminate;
+end;
+
+procedure TFormUpdateCodeTemplate.ShowProcOutput(AOutput: TStrings);
+begin
+   MemoLog.Add(AOutput.Text);
+end;
+
+function TFormUpdateCodeTemplate.ApkProcessRunning: boolean;
+begin
+  Result:= False;
+  if Assigned(APKProcess) then
+    if not APKProcess.IsTerminated then
+      Result:= True
+    else
+    begin
+      APKProcess:= nil;
+      Result:= False;
+    end;
+end;
+
+procedure TFormUpdateCodeTemplate.RebuildLibrary; //by jmpessoa
+begin
+  if PathToLazbuild = '' then
+  begin
+    ShowMessage('Fail! PathToLazbuild not found!' );
+    Exit;
+  end;
+  if JNIProjectPath = '' then
+  begin
+    ShowMessage('Fail! PathToLazbuild not found!' );
+    Exit;
+  end;
+  if Assigned(APKProcess) then
+  begin
+    if not APKProcess.IsTerminated then APKProcess.Terminate;
+  end;
+  //MemoLog.Clear;
+  APKProcess:= TThreadProcess.Create(True);
+  with APKProcess do
+  begin
+    OnTerminated:= @DoTerminated;
+    Dir:= Self.JNIProjectPath;  //controls.lpi
+    //TODO: : [by jmpessoa] CommandLine need fix: deprecated!
+    CommandLine:= CmdShell + IncludeTrailingBackslash(PathToLazbuild)+ 'lazbuild controls.lpi';
+   (* TODO: [by jmpessoa]  test it!
+     Executable:= 'lazbuild'
+     Parameters.Add('controls.lpi');
+   *)
+    OnDisplayOutput:= @ShowProcOutput;
+    Start;
+  end;
 end;
 
 procedure TFormUpdateCodeTemplate.BitBtnOKClick(Sender: TObject);
@@ -106,6 +175,7 @@ var
   pk, i: integer;
   strAux, strApp, strControls, strProject: string;
 begin
+  MemoLog.Clear;
   if ProjectPath = '' then
   begin
      ShowMessage('Fail! Please, select a Project!');
@@ -152,6 +222,7 @@ begin
     packList.LoadFromFile(PathToJavaTemplates+DirectorySeparator+'App.java');
     packList.Strings[0]:= 'package '+ PackageName+';'; //ex. package com.example.appbuttondemo1;
     packList.SaveToFile(PathToJavaClass+DirectorySeparator+'App.java');
+    MemoLog.Add('["App.java"  :: update!]');
   end;
 
   //upgrade "Controls.java"
@@ -168,6 +239,7 @@ begin
     packList.LoadFromFile(PathToJavaTemplates+DirectorySeparator+'Controls.java');
     packList.Strings[0]:= 'package '+ PackageName+';'; //ex. package com.example.appbuttondemo1;
     packList.SaveToFile(PathToJavaClass+DirectorySeparator+'Controls.java');
+    MemoLog.Add('["Controls.java"  :: update!]');
   end;
   packList.Free;
 
@@ -193,10 +265,10 @@ begin
     SynMemo2.Add(DoJavaParse);
 
     SynMemo2.Add('begin');
-    SynMemo2.Add('  gApp:= jApp.Create(nil);{Laz_And_Controls}');
+    SynMemo2.Add('  gApp:= jApp.Create(nil);{AndroidWidget.pas}');
     SynMemo2.Add('  gApp.Title:= ''My Android Bridges Library'';');
-    SynMemo2.Add('  gjAppName:= '''+PackageName+''';{And_jni_Bridge}');
-    SynMemo2.Add('  gjClassName:= '''+ReplaceChar(PackageName, '.','/')+'/Controls'';{And_jni_Bridge}');
+    SynMemo2.Add('  gjAppName:= '''+PackageName+''';{AndroidWidget.pas}');
+    SynMemo2.Add('  gjClassName:= '''+ReplaceChar(PackageName, '.','/')+'/Controls'';{AndroidWidget.pas}');
     SynMemo2.Add('  gApp.AppName:=gjAppName;');
     SynMemo2.Add('  gApp.ClassName:=gjClassName;');
     SynMemo2.Add('  gApp.Initialize;');
@@ -210,21 +282,23 @@ begin
       fileList.Free;
     end;
     SynMemo2.SaveToFile(JNIProjectPath+DirectorySeparator+'controls.lpr');
+    MemoLog.Add('["controls.lpr"  :: update!--> ".so" :: rebuilding!]');
+    RebuildLibrary;
   end;
-
+  (*
   strApp:='';
   if (CheckGroupUpgradeTemplates.Checked[0]) then
-     strApp:=' [App.java]';
+     strApp:=' ["App.java"  :: update!]';
 
   strControls:='';
   if (CheckGroupUpgradeTemplates.Checked[1]) then
-     strControls:=' [Controls.java]';
+     strControls:=' ["Controls.java" :: update!]';
 
   strProject:='';
   if (CheckGroupUpgradeTemplates.Checked[2]) then
-     strProject:=' [controls.lpr]';
-
-  ShowMessage('The code templates'+strApp+strControls+strProject+' was updated!');
+     strProject:=' ["controls.lpr" :: update!]->[".so" :: rebuild!]';
+  ShowMessage('The code templates'+strApp+strControls+strProject);
+  *)
 
 end;
 
@@ -244,6 +318,15 @@ var
   AmwFile: string;
 begin
 
+  {$IFDEF WINDOWS}
+    CmdShell:= 'cmd /c ';
+  {$ENDIF}
+  {$IFDEF LINUX}
+    CmdShell:= 'sh -c ';
+  {$ENDIF}
+
+  MemoLog:= TStringList.Create;
+
   JavaClassName:= 'Controls';
 
   SynMemo1:= TStringList.Create;
@@ -256,16 +339,17 @@ begin
   begin
       with TIniFile.Create(AmwFile) do  // Try to use settings from Android module wizard
       begin
-        ProjectPath:= ReadString('NewProject', 'FullProjectName', '');      //by jmpessoa
-        PathToWorkspace:=  ReadString('NewProject', 'PathToWorkspace', ''); //by jmpessoa
-        PathToJavaTemplates:= ReadString('NewProject', 'PathToJavaTemplates', ''); //by jmpessoa
+        ProjectPath:= ReadString('NewProject', 'FullProjectName', '');
+        PathToWorkspace:=  ReadString('NewProject', 'PathToWorkspace', '');
+        PathToJavaTemplates:= ReadString('NewProject', 'PathToJavaTemplates', '');
+        PathToLazbuild:= ReadString('NewProject', 'PathToLazbuild', '');
       end;
   end
-
 end;
 
 procedure TFormUpdateCodeTemplate.FormDestroy(Sender: TObject);
 begin
+  MemoLog.Free;
   SynMemo1.Free;
   SynMemo2.Free;
   ImportsList.Free;
@@ -723,7 +807,7 @@ begin
     strOnLoadList.Add('     curEnv:= PJNIEnv(PEnv);');
     strOnLoadList.Add('     RegisterNativeMethods(curEnv, '''+pathToClassName+''');');
     strOnLoadList.Add('  end;');
-    strOnLoadList.Add('  gVM:= VM;{And_jni_Bridge}');
+    strOnLoadList.Add('  gVM:= VM;{AndroidWidget.pas}');
     strOnLoadList.Add('end;');
 
     strOnLoadList.Add(' ');
@@ -737,8 +821,8 @@ begin
     strOnLoadList.Add('  if PEnv <> nil then');
     strOnLoadList.Add('  begin');
     strOnLoadList.Add('    curEnv:= PJNIEnv(PEnv);');
-    strOnLoadList.Add('    (curEnv^).DeleteGlobalRef(curEnv, gjClass{And_jni_Bridge});');
-    strOnLoadList.Add('    gVM:= nil;{And_jni_Bridge}');
+    strOnLoadList.Add('    (curEnv^).DeleteGlobalRef(curEnv, gjClass);   {AndroidWidget.pas}');
+    strOnLoadList.Add('    gVM:= nil;{AndroidWidget.pas}');
     strOnLoadList.Add('  end;');
     strOnLoadList.Add('  gApp.Terminate;');
     strOnLoadList.Add('  FreeAndNil(gApp);');

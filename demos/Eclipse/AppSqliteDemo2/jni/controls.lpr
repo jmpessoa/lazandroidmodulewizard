@@ -1,5 +1,5 @@
-{hint: save all files to location: C:\adt32\eclipse\workspace\AppSqliteDemo2\jni }
-library controls;  //[by LazAndroidWizard: 12/15/2014 23:31:08]
+{hint: save all files to location: C:\adt32\eclipse\workspace\AppSqliteDemo2\jni}
+library controls;  //[by LazAndroidWizard: 1/2/2015 22:28:52]
  
 {$mode delphi}
  
@@ -153,10 +153,18 @@ end;
 
 { Class:     com_example_appsqlitedemo2_Controls
   Method:    pOnChange
-  Signature: (JI)V }
-procedure pOnChange(PEnv: PJNIEnv; this: JObject; pasobj: JLong; EventType: JInt); cdecl;
+  Signature: (JLjava/lang/String;I)V }
+procedure pOnChange(PEnv: PJNIEnv; this: JObject; pasobj: JLong; txt: JString; count: JInt); cdecl;
 begin
-  Java_Event_pOnChange(PEnv,this,TObject(pasobj),EventType);
+  Java_Event_pOnChange(PEnv,this,TObject(pasobj),txt,count);
+end;
+
+{ Class:     com_example_appsqlitedemo2_Controls
+  Method:    pOnChanged
+  Signature: (JLjava/lang/String;I)V }
+procedure pOnChanged(PEnv: PJNIEnv; this: JObject; pasobj: JLong; txt: JString; count: JInt); cdecl;
+begin
+  Java_Event_pOnChanged(PEnv,this,TObject(pasobj),txt,count);
 end;
 
 { Class:     com_example_appsqlitedemo2_Controls
@@ -423,7 +431,7 @@ begin
   Java_Event_pOnCustomDialogShow(PEnv,this,TObject(pasobj),dialog,title);
 end;
 
-const NativeMethods:array[0..51] of JNINativeMethod = (
+const NativeMethods:array[0..52] of JNINativeMethod = (
    (name:'pAppOnScreenStyle';
     signature:'()I';
     fnPtr:@pAppOnScreenStyle;),
@@ -479,8 +487,11 @@ const NativeMethods:array[0..51] of JNINativeMethod = (
     signature:'(JI)V';
     fnPtr:@pOnClick;),
    (name:'pOnChange';
-    signature:'(JI)V';
+    signature:'(JLjava/lang/String;I)V';
     fnPtr:@pOnChange;),
+   (name:'pOnChanged';
+    signature:'(JLjava/lang/String;I)V';
+    fnPtr:@pOnChanged;),
    (name:'pOnEnter';
     signature:'(J)V';
     fnPtr:@pOnEnter;),
@@ -654,6 +665,7 @@ exports
   pAppOnClickContextMenuItem name 'Java_com_example_appsqlitedemo2_Controls_pAppOnClickContextMenuItem',
   pOnClick name 'Java_com_example_appsqlitedemo2_Controls_pOnClick',
   pOnChange name 'Java_com_example_appsqlitedemo2_Controls_pOnChange',
+  pOnChanged name 'Java_com_example_appsqlitedemo2_Controls_pOnChanged',
   pOnEnter name 'Java_com_example_appsqlitedemo2_Controls_pOnEnter',
   pOnTimer name 'Java_com_example_appsqlitedemo2_Controls_pOnTimer',
   pOnDraw name 'Java_com_example_appsqlitedemo2_Controls_pOnDraw',
@@ -687,7 +699,7 @@ exports
   pOnActionBarTabSelected name 'Java_com_example_appsqlitedemo2_Controls_pOnActionBarTabSelected',
   pOnActionBarTabUnSelected name 'Java_com_example_appsqlitedemo2_Controls_pOnActionBarTabUnSelected',
   pOnCustomDialogShow name 'Java_com_example_appsqlitedemo2_Controls_pOnCustomDialogShow';
- 
+
 begin
   gApp:= jApp.Create(nil);{Laz_And_Controls}
   gApp.Title:= 'My Android Bridges Library';

@@ -15,15 +15,15 @@ object AndroidModule2: TAndroidModule2
   OnBackButton = AndroidModule2BackButton
   OnClose = AndroidModule2Close
   object jTextView1: jTextView
-    Left = 80
+    Left = 48
     Top = 16
-    Width = 163
+    Width = 227
     Height = 25
     MarginLeft = 10
     MarginTop = 10
     MarginRight = 10
     MarginBottom = 10
-    Text = 'Lazarus Android Wizard'
+    Text = 'Lazarus Android Wizard [by jmpessoa]'
     Visible = True
     PosRelativeToAnchor = []
     PosRelativeToParent = [rpCenterHorizontal]
@@ -34,6 +34,7 @@ object AndroidModule2: TAndroidModule2
     BackgroundColor = colbrDefault
     FontColor = colbrBlue
     FontSize = 0
+    TextTypeFace = tfNormal
     Id = 41266
   end
   object jButton1: jButton
@@ -81,7 +82,7 @@ object AndroidModule2: TAndroidModule2
     Id = 0
   end
   object jTextView2: jTextView
-    Left = 40
+    Left = 56
     Top = 40
     Width = 232
     Height = 25
@@ -89,7 +90,7 @@ object AndroidModule2: TAndroidModule2
     MarginTop = 0
     MarginRight = 10
     MarginBottom = 10
-    Text = 'Simon''s Controls for Lazarus by jmpessoa'
+    Text = 'Welcome to  Simon''s Controls!'
     Visible = True
     Anchor = jTextView1
     PosRelativeToAnchor = [raBelow]
@@ -101,6 +102,7 @@ object AndroidModule2: TAndroidModule2
     BackgroundColor = colbrDefault
     FontColor = colbrBlue
     FontSize = 0
+    TextTypeFace = tfNormal
     Id = 93524
   end
   object jButton3: jButton
@@ -324,6 +326,7 @@ object AndroidModule2: TAndroidModule2
     Id = 0
   end
   object jImageView1: jImageView
+    Tag = 1
     Left = 104
     Top = 416
     Width = 72
@@ -337,7 +340,6 @@ object AndroidModule2: TAndroidModule2
     ImageIndex = 0
     Images = jImageList1
     BackgroundColor = colbrDefault
-    IsBackgroundImage = True
     Id = 0
   end
   object jImageList1: jImageList

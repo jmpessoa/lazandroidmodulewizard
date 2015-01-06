@@ -34,6 +34,7 @@ object AndroidModule5: TAndroidModule5
     BackgroundColor = colbrDefault
     FontColor = colbrTomato
     FontSize = 0
+    TextTypeFace = tfNormal
     Id = 72543
   end
   object jPanel1: jPanel
@@ -55,6 +56,7 @@ object AndroidModule5: TAndroidModule5
     BackgroundColor = colbrLightSteelBlue
     Id = 7980347
     object jEditText1: jEditText
+      Tag = 1
       Left = 8
       Top = 40
       Width = 272
@@ -72,7 +74,7 @@ object AndroidModule5: TAndroidModule5
       LayoutParamHeight = lpWrapContent
       Alignment = taLeft
       InputTypeEx = itxText
-      LineMaxLength = 300
+      MaxTextLength = 300
       BackgroundColor = colbrDefault
       FontColor = colbrDefault
       FontSize = 0
@@ -103,6 +105,7 @@ object AndroidModule5: TAndroidModule5
       BackgroundColor = colbrDefault
       FontColor = colbrDefault
       FontSize = 0
+      TextTypeFace = tfNormal
       Id = 3092999
     end
     object jPanel3: jPanel

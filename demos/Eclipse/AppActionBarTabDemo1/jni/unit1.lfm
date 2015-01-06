@@ -52,6 +52,7 @@ object AndroidModule1: TAndroidModule1
       Id = 7271715
     end
     object jEditText1: jEditText
+      Tag = 1
       Left = 12
       Top = 44
       Width = 264
@@ -69,7 +70,7 @@ object AndroidModule1: TAndroidModule1
       LayoutParamHeight = lpWrapContent
       Alignment = taLeft
       InputTypeEx = itxText
-      LineMaxLength = 300
+      MaxTextLength = 300
       BackgroundColor = colbrDefault
       FontColor = colbrDefault
       FontSize = 0
@@ -144,6 +145,7 @@ object AndroidModule1: TAndroidModule1
       Id = 506422
     end
     object jEditText2: jEditText
+      Tag = 1
       Left = 12
       Top = 44
       Width = 264
@@ -161,7 +163,7 @@ object AndroidModule1: TAndroidModule1
       LayoutParamHeight = lpWrapContent
       Alignment = taLeft
       InputTypeEx = itxText
-      LineMaxLength = 300
+      MaxTextLength = 300
       BackgroundColor = colbrDefault
       FontColor = colbrDefault
       FontSize = 0
@@ -229,7 +231,7 @@ object AndroidModule1: TAndroidModule1
       LayoutParamHeight = lpWrapContent
       BackgroundColor = colbrDefault
       FontColor = colbrTomato
-      FontSize = 18
+      FontSize = 12
       Checked = False
       Id = 3232535
     end
@@ -253,11 +255,12 @@ object AndroidModule1: TAndroidModule1
       Enabled = True
       BackgroundColor = colbrDefault
       FontColor = colbrWhite
-      FontSize = 24
+      FontSize = 12
       TextTypeFace = tfNormal
       Id = 0
     end
     object jImageView1: jImageView
+      Tag = 1
       Left = 64
       Top = 24
       Width = 32
@@ -274,7 +277,6 @@ object AndroidModule1: TAndroidModule1
       LayoutParamHeight = lpWrapContent
       ImageIndex = 0
       BackgroundColor = colbrDefault
-      IsBackgroundImage = False
       Id = 7721927
     end
   end
@@ -308,7 +310,7 @@ object AndroidModule1: TAndroidModule1
       LayoutParamHeight = lpMatchParent
       BackgroundColor = colbrLightSteelBlue
       FontColor = colbrRed
-      FontSize = 0
+      FontSize = 20
       WidgetItem = wgNone
       Delimiter = '|'
       TextDecorated = txtNormal

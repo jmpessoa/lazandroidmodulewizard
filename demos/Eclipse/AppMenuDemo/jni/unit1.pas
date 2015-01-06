@@ -117,6 +117,7 @@ begin
       case itemID of
 
           10: jTextView2.FontColor:= colbrOrange;
+          //11: --> sub menu!
           12: jTextView2.FontColor:= colbrPurple;
 
           //sub menu "Blue..."

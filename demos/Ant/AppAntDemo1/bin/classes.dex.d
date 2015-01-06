@@ -4,6 +4,9 @@ C:\adt32\ant\workspace\AppAntDemo1\bin\classes\org\lazarus\appantdemo1\BuildConf
 C:\adt32\ant\workspace\AppAntDemo1\bin\classes\org\lazarus\appantdemo1\Const.class \
 C:\adt32\ant\workspace\AppAntDemo1\bin\classes\org\lazarus\appantdemo1\Controls.class \
 C:\adt32\ant\workspace\AppAntDemo1\bin\classes\org\lazarus\appantdemo1\CustomSpinnerArrayAdapter.class \
+C:\adt32\ant\workspace\AppAntDemo1\bin\classes\org\lazarus\appantdemo1\jActionBarTab$TabContentFragment.class \
+C:\adt32\ant\workspace\AppAntDemo1\bin\classes\org\lazarus\appantdemo1\jActionBarTab$TabListener.class \
+C:\adt32\ant\workspace\AppAntDemo1\bin\classes\org\lazarus\appantdemo1\jActionBarTab.class \
 C:\adt32\ant\workspace\AppAntDemo1\bin\classes\org\lazarus\appantdemo1\jArrayAdapter$1.class \
 C:\adt32\ant\workspace\AppAntDemo1\bin\classes\org\lazarus\appantdemo1\jArrayAdapter.class \
 C:\adt32\ant\workspace\AppAntDemo1\bin\classes\org\lazarus\appantdemo1\jAsyncTask.class \
@@ -27,6 +30,8 @@ C:\adt32\ant\workspace\AppAntDemo1\bin\classes\org\lazarus\appantdemo1\jButton.c
 C:\adt32\ant\workspace\AppAntDemo1\bin\classes\org\lazarus\appantdemo1\jCanvas.class \
 C:\adt32\ant\workspace\AppAntDemo1\bin\classes\org\lazarus\appantdemo1\jCheckBox$1.class \
 C:\adt32\ant\workspace\AppAntDemo1\bin\classes\org\lazarus\appantdemo1\jCheckBox.class \
+C:\adt32\ant\workspace\AppAntDemo1\bin\classes\org\lazarus\appantdemo1\jContextMenu.class \
+C:\adt32\ant\workspace\AppAntDemo1\bin\classes\org\lazarus\appantdemo1\jCustomDialog.class \
 C:\adt32\ant\workspace\AppAntDemo1\bin\classes\org\lazarus\appantdemo1\jDialogProgress.class \
 C:\adt32\ant\workspace\AppAntDemo1\bin\classes\org\lazarus\appantdemo1\jDialogYN$1.class \
 C:\adt32\ant\workspace\AppAntDemo1\bin\classes\org\lazarus\appantdemo1\jDialogYN.class \
@@ -48,6 +53,7 @@ C:\adt32\ant\workspace\AppAntDemo1\bin\classes\org\lazarus\appantdemo1\jGLSurfac
 C:\adt32\ant\workspace\AppAntDemo1\bin\classes\org\lazarus\appantdemo1\jHorizontalScrollView.class \
 C:\adt32\ant\workspace\AppAntDemo1\bin\classes\org\lazarus\appantdemo1\jHttp_DownLoad.class \
 C:\adt32\ant\workspace\AppAntDemo1\bin\classes\org\lazarus\appantdemo1\jImageBtn.class \
+C:\adt32\ant\workspace\AppAntDemo1\bin\classes\org\lazarus\appantdemo1\jImageFileManager.class \
 C:\adt32\ant\workspace\AppAntDemo1\bin\classes\org\lazarus\appantdemo1\jImageView$1.class \
 C:\adt32\ant\workspace\AppAntDemo1\bin\classes\org\lazarus\appantdemo1\jImageView.class \
 C:\adt32\ant\workspace\AppAntDemo1\bin\classes\org\lazarus\appantdemo1\jListItemRow.class \

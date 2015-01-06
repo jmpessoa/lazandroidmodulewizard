@@ -1,6 +1,6 @@
 package com.example.appsharefiledemo1;
 
-//[LazAndroidModuleWizard - Version 0.6 - rev 05 - 13 November 2014
+//[LazAndroidModuleWizard - Version 0.6 - rev. 11 - 03 January- 2014
 //
 //[https://github.com/jmpessoa/lazandroidmodulewizard]
 
@@ -18,6 +18,9 @@ package com.example.appsharefiledemo1;
 
 
 import java.lang.Override;
+import java.lang.reflect.Method;
+
+import android.app.ActionBar;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -29,7 +32,9 @@ import android.view.ContextMenu.ContextMenuInfo;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
 import android.view.WindowManager;
+import android.os.Build;
 //import android.view.View;
 import android.os.Bundle;
 import android.os.StrictMode;
@@ -147,5 +152,22 @@ public class App extends Activity {
    	  controls.jAppOnClickContextMenuItem(item, item.getItemId(), caption, item.isChecked());
       return false;
    }
+   
+   
+   /*by jmpessoa: TODO :Handles prepare menu item*/
+   @Override
+   public boolean onPrepareOptionsMenu(Menu menu) {
+       super.onPrepareOptionsMenu(menu);
+       //TODO!!!!
+       return true;
+   }
+   
+   /*by jmpessoa: TODO :Handles opened menu */
+   @Override     
+   public boolean onMenuOpened(int featureId, Menu menu) {
+	   //TODO!!!!
+     return super.onMenuOpened(featureId, menu);
+   }
+   
    
 }

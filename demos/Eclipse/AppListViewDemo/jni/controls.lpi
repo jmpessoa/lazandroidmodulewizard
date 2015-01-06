@@ -60,17 +60,22 @@
       <Filename Value="..\libs\armeabi\libcontrols.so"/>
     </Target>
     <SearchPaths>
-      <Libraries Value="C:\adt32\ndk9\platforms\android-14\arch-arm\usr\lib;"/>
+      <Libraries Value="C:\adt32\ndk9\platforms\android-14\arch-arm\usr\lib\"/>
     </SearchPaths>
     <Parsing>
       <SyntaxOptions>
-        <SyntaxMode Value="delphi"/>
+        <SyntaxMode Value="Delphi"/>
         <CStyleMacros Value="True"/>
       </SyntaxOptions>
     </Parsing>
     <CodeGeneration>
+      <SmartLinkUnit Value="True"/>
       <TargetCPU Value="arm"/>
       <TargetOS Value="android"/>
+      <Optimizations>
+        <OptimizationLevel Value="3"/>
+      </Optimizations>
+      <SmallerCode Value="True"/>
     </CodeGeneration>
     <Linking>
       <Debugging>

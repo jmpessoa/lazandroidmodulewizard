@@ -87,20 +87,20 @@ jBluetooth = class(jControl)
 end;
 
 function jBluetooth_jCreate(env: PJNIEnv; this: JObject;_Self: int64): jObject;
-procedure jBluetooth_jFree(env: PJNIEnv; this: JObject; _jbluetooth: JObject);
-procedure jBluetooth_Enabled(env: PJNIEnv; this: JObject; _jbluetooth: JObject);
-procedure jBluetooth_Discovery(env: PJNIEnv; this: JObject; _jbluetooth: JObject);
-procedure jBluetooth_CancelDiscovery(env: PJNIEnv; this: JObject; _jbluetooth: JObject);
-function jBluetooth_GetPairedDevices(env: PJNIEnv; this: JObject; _jbluetooth: JObject): TDynArrayOfString;
-function jBluetooth_GetFoundedDevices(env: PJNIEnv; this: JObject; _jbluetooth: JObject): TDynArrayOfString;
-function jBluetooth_GetReachablePairedDevices(env: PJNIEnv; this: JObject; _jbluetooth: JObject): TDynArrayOfString;
-procedure jBluetooth_Disable(env: PJNIEnv; this: JObject; _jbluetooth: JObject);
-function jBluetooth_IsEnable(env: PJNIEnv; this: JObject; _jbluetooth: JObject): boolean;
-function jBluetooth_GetState(env: PJNIEnv; this: JObject; _jbluetooth: JObject): integer;
-function jBluetooth_GetReachablePairedDeviceByName(env: PJNIEnv; this: JObject; _jbluetooth: JObject; _deviceName: string): jObject;
-function jBluetooth_GetReachablePairedDeviceByAddress(env: PJNIEnv; this: JObject; _jbluetooth: JObject; _deviceAddress: string): jObject;
-function jBluetooth_IsReachablePairedDevice(env: PJNIEnv; this: JObject; _jbluetooth: JObject; _macAddress: string): boolean;
-function jBluetooth_GetRemoteDevice(env: PJNIEnv; this: JObject; _jbluetooth: JObject; _macAddress: string): jObject;
+procedure jBluetooth_jFree(env: PJNIEnv; _jbluetooth: JObject);
+procedure jBluetooth_Enabled(env: PJNIEnv; _jbluetooth: JObject);
+procedure jBluetooth_Discovery(env: PJNIEnv; _jbluetooth: JObject);
+procedure jBluetooth_CancelDiscovery(env: PJNIEnv; _jbluetooth: JObject);
+function jBluetooth_GetPairedDevices(env: PJNIEnv; _jbluetooth: JObject): TDynArrayOfString;
+function jBluetooth_GetFoundedDevices(env: PJNIEnv; _jbluetooth: JObject): TDynArrayOfString;
+function jBluetooth_GetReachablePairedDevices(env: PJNIEnv; _jbluetooth: JObject): TDynArrayOfString;
+procedure jBluetooth_Disable(env: PJNIEnv; _jbluetooth: JObject);
+function jBluetooth_IsEnable(env: PJNIEnv; _jbluetooth: JObject): boolean;
+function jBluetooth_GetState(env: PJNIEnv; _jbluetooth: JObject): integer;
+function jBluetooth_GetReachablePairedDeviceByName(env: PJNIEnv; _jbluetooth: JObject; _deviceName: string): jObject;
+function jBluetooth_GetReachablePairedDeviceByAddress(env: PJNIEnv; _jbluetooth: JObject; _deviceAddress: string): jObject;
+function jBluetooth_IsReachablePairedDevice(env: PJNIEnv; _jbluetooth: JObject; _macAddress: string): boolean;
+function jBluetooth_GetRemoteDevice(env: PJNIEnv; _jbluetooth: JObject; _macAddress: string): jObject;
 
 
 implementation
@@ -117,17 +117,11 @@ destructor jBluetooth.Destroy;
 begin
   if not (csDesigning in ComponentState) then
   begin
-    if jForm(Owner).App <> nil then
-    begin
-      if jForm(Owner).App.Initialized then
-      begin
         if FjObject <> nil then
         begin
            jFree();
            FjObject:= nil;
         end;
-      end;
-    end;
   end;
   //you others free code here...'
   inherited Destroy;
@@ -145,91 +139,91 @@ end;
 
 function jBluetooth.jCreate(): jObject;
 begin
-   Result:= jBluetooth_jCreate(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis , int64(Self));
+   Result:= jBluetooth_jCreate(FjEnv, FjThis, int64(Self));
 end;
 
 procedure jBluetooth.jFree();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jBluetooth_jFree(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject);
+     jBluetooth_jFree(FjEnv, FjObject);
 end;
 
 procedure jBluetooth.Enabled();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jBluetooth_Enabled(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject);
+     jBluetooth_Enabled(FjEnv, FjObject);
 end;
 
 procedure jBluetooth.Discovery();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jBluetooth_Discovery(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject);
+     jBluetooth_Discovery(FjEnv, FjObject);
 end;
 
 procedure jBluetooth.CancelDiscovery();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jBluetooth_CancelDiscovery(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject);
+     jBluetooth_CancelDiscovery(FjEnv, FjObject);
 end;
 
 function jBluetooth.GetPairedDevices(): TDynArrayOfString;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jBluetooth_GetPairedDevices(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject);
+   Result:= jBluetooth_GetPairedDevices(FjEnv, FjObject);
 end;
 
 function jBluetooth.GetFoundedDevices(): TDynArrayOfString;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jBluetooth_GetFoundedDevices(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject);
+   Result:= jBluetooth_GetFoundedDevices(FjEnv, FjObject);
 end;
 
 function jBluetooth.GetReachablePairedDevices(): TDynArrayOfString;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jBluetooth_GetReachablePairedDevices(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject);
+   Result:= jBluetooth_GetReachablePairedDevices(FjEnv, FjObject);
 end;
 
 procedure jBluetooth.Disable();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jBluetooth_Disable(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject);
+     jBluetooth_Disable(FjEnv, FjObject);
 end;
 
 function jBluetooth.IsEnable(): boolean;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jBluetooth_IsEnable(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject);
+   Result:= jBluetooth_IsEnable(FjEnv, FjObject);
 end;
 
 function jBluetooth.GetState(): integer;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jBluetooth_GetState(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject);
+   Result:= jBluetooth_GetState(FjEnv, FjObject);
 end;
 
 function jBluetooth.GetReachablePairedDeviceByName(_deviceName: string): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-    Result:= jBluetooth_GetReachablePairedDeviceByName(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, _deviceName);
+    Result:= jBluetooth_GetReachablePairedDeviceByName(FjEnv, FjObject, _deviceName);
 end;
 
 function jBluetooth.GetReachablePairedDeviceByAddress(_deviceAddress: string): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jBluetooth_GetReachablePairedDeviceByAddress(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, _deviceAddress);
+   Result:= jBluetooth_GetReachablePairedDeviceByAddress(FjEnv, FjObject, _deviceAddress);
 end;
 
 
@@ -237,14 +231,14 @@ function jBluetooth.IsReachablePairedDevice(_macAddress: string): boolean;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jBluetooth_IsReachablePairedDevice(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, _macAddress);
+   Result:= jBluetooth_IsReachablePairedDevice(FjEnv, FjObject, _macAddress);
 end;
 
 function jBluetooth.GetRemoteDevice(_macAddress: string): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jBluetooth_GetRemoteDevice(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, _macAddress);
+   Result:= jBluetooth_GetRemoteDevice(FjEnv, FjObject, _macAddress);
 end;
 
 procedure jBluetooth.SetDeviceByName(_deviceName: string);
@@ -353,7 +347,7 @@ end;
 //to end of "public class Controls" in "Controls.java"
 *)
 
-procedure jBluetooth_jFree(env: PJNIEnv; this: JObject; _jbluetooth: JObject);
+procedure jBluetooth_jFree(env: PJNIEnv; _jbluetooth: JObject);
 var
   jMethod: jMethodID=nil;
   jCls: jClass=nil;
@@ -363,7 +357,7 @@ begin
   env^.CallVoidMethod(env, _jbluetooth, jMethod);
 end;
 
-procedure jBluetooth_Enabled(env: PJNIEnv; this: JObject; _jbluetooth: JObject);
+procedure jBluetooth_Enabled(env: PJNIEnv; _jbluetooth: JObject);
 var
   jMethod: jMethodID=nil;
   jCls: jClass=nil;
@@ -373,7 +367,7 @@ begin
   env^.CallVoidMethod(env, _jbluetooth, jMethod);
 end;
 
-procedure jBluetooth_Discovery(env: PJNIEnv; this: JObject; _jbluetooth: JObject);
+procedure jBluetooth_Discovery(env: PJNIEnv; _jbluetooth: JObject);
 var
   jMethod: jMethodID=nil;
   jCls: jClass=nil;
@@ -383,7 +377,7 @@ begin
   env^.CallVoidMethod(env, _jbluetooth, jMethod);
 end;
 
-procedure jBluetooth_CancelDiscovery(env: PJNIEnv; this: JObject; _jbluetooth: JObject);
+procedure jBluetooth_CancelDiscovery(env: PJNIEnv; _jbluetooth: JObject);
 var
   jMethod: jMethodID=nil;
   jCls: jClass=nil;
@@ -393,7 +387,7 @@ begin
   env^.CallVoidMethod(env, _jbluetooth, jMethod);
 end;
 
-function jBluetooth_GetPairedDevices(env: PJNIEnv; this: JObject; _jbluetooth: JObject): TDynArrayOfString;
+function jBluetooth_GetPairedDevices(env: PJNIEnv; _jbluetooth: JObject): TDynArrayOfString;
 var
   jStr: JString;
   jBoo: JBoolean;
@@ -421,7 +415,7 @@ begin
   end;
 end;
 
-function jBluetooth_GetFoundedDevices(env: PJNIEnv; this: JObject; _jbluetooth: JObject): TDynArrayOfString;
+function jBluetooth_GetFoundedDevices(env: PJNIEnv; _jbluetooth: JObject): TDynArrayOfString;
 var
   jStr: JString;
   jBoo: JBoolean;
@@ -449,7 +443,7 @@ begin
   end;
 end;
 
-function jBluetooth_GetReachablePairedDevices(env: PJNIEnv; this: JObject; _jbluetooth: JObject): TDynArrayOfString;
+function jBluetooth_GetReachablePairedDevices(env: PJNIEnv; _jbluetooth: JObject): TDynArrayOfString;
 var
   jStr: JString;
   jBoo: JBoolean;
@@ -477,7 +471,7 @@ begin
   end;
 end;
 
-procedure jBluetooth_Disable(env: PJNIEnv; this: JObject; _jbluetooth: JObject);
+procedure jBluetooth_Disable(env: PJNIEnv; _jbluetooth: JObject);
 var
   jMethod: jMethodID=nil;
   jCls: jClass=nil;
@@ -487,7 +481,7 @@ begin
   env^.CallVoidMethod(env, _jbluetooth, jMethod);
 end;
 
-function jBluetooth_IsEnable(env: PJNIEnv; this: JObject; _jbluetooth: JObject): boolean;
+function jBluetooth_IsEnable(env: PJNIEnv; _jbluetooth: JObject): boolean;
 var
   jBoo: JBoolean;
   jMethod: jMethodID=nil;
@@ -499,7 +493,7 @@ begin
   Result:= boolean(jBoo);
 end;
 
-function jBluetooth_GetState(env: PJNIEnv; this: JObject; _jbluetooth: JObject): integer;
+function jBluetooth_GetState(env: PJNIEnv; _jbluetooth: JObject): integer;
 var
   jMethod: jMethodID=nil;
   jCls: jClass=nil;
@@ -509,7 +503,7 @@ begin
   Result:= env^.CallIntMethod(env, _jbluetooth, jMethod);
 end;
 
-function jBluetooth_GetReachablePairedDeviceByName(env: PJNIEnv; this: JObject; _jbluetooth: JObject; _deviceName: string): jObject;
+function jBluetooth_GetReachablePairedDeviceByName(env: PJNIEnv; _jbluetooth: JObject; _deviceName: string): jObject;
 var
   jParams: array[0..0] of jValue;
   jMethod: jMethodID=nil;
@@ -522,7 +516,7 @@ begin
   env^.DeleteLocalRef(env,jParams[0].l);
 end;
 
-function jBluetooth_GetReachablePairedDeviceByAddress(env: PJNIEnv; this: JObject; _jbluetooth: JObject; _deviceAddress: string): jObject;
+function jBluetooth_GetReachablePairedDeviceByAddress(env: PJNIEnv; _jbluetooth: JObject; _deviceAddress: string): jObject;
 var
   jParams: array[0..0] of jValue;
   jMethod: jMethodID=nil;
@@ -535,7 +529,7 @@ begin
   env^.DeleteLocalRef(env,jParams[0].l);
 end;
 
-function jBluetooth_IsReachablePairedDevice(env: PJNIEnv; this: JObject; _jbluetooth: JObject; _macAddress: string): boolean;
+function jBluetooth_IsReachablePairedDevice(env: PJNIEnv; _jbluetooth: JObject; _macAddress: string): boolean;
 var
   jBoo: JBoolean;
   jParams: array[0..0] of jValue;
@@ -551,7 +545,7 @@ env^.DeleteLocalRef(env,jParams[0].l);
 end;
 
 
-function jBluetooth_GetRemoteDevice(env: PJNIEnv; this: JObject; _jbluetooth: JObject; _macAddress: string): jObject;
+function jBluetooth_GetRemoteDevice(env: PJNIEnv; _jbluetooth: JObject; _macAddress: string): jObject;
 var
   jParams: array[0..0] of jValue;
   jMethod: jMethodID=nil;

@@ -23,12 +23,11 @@ jCustomDialog = class(jVisualControl)
     procedure SetColor(Value: TARGBColorBridge); //background
     procedure UpdateLParamHeight;
     procedure UpdateLParamWidth;
-
-    procedure SetText(_title: string); override;
     procedure SetIconIdentifier(_iconIdentifier: string);
 
  protected
-
+    procedure SetParentComponent(Value: TComponent); override;
+    procedure SetText(_title: string); override;   //****
  public
     constructor Create(AOwner: TComponent); override;
     destructor  Destroy; override;
@@ -66,26 +65,26 @@ jCustomDialog = class(jVisualControl)
 end;
 
 function jCustomDialog_jCreate(env: PJNIEnv; this: JObject;_Self: int64): jObject;
-procedure jCustomDialog_jFree(env: PJNIEnv; this: JObject; _jcustomdialog: JObject);
-procedure jCustomDialog_SetViewParent(env: PJNIEnv; this: JObject; _jcustomdialog: JObject; _viewgroup: jObject);
-procedure jCustomDialog_RemoveFromViewParent(env: PJNIEnv; this: JObject; _jcustomdialog: JObject);
-function jCustomDialog_GetView(env: PJNIEnv; this: JObject; _jcustomdialog: JObject): jObject;
-procedure jCustomDialog_SetLParamWidth(env: PJNIEnv; this: JObject; _jcustomdialog: JObject; _w: integer);
-procedure jCustomDialog_SetLParamHeight(env: PJNIEnv; this: JObject; _jcustomdialog: JObject; _h: integer);
-procedure jCustomDialog_SetLeftTopRightBottomWidthHeight(env: PJNIEnv; this: JObject; _jcustomdialog: JObject; _left: integer; _top: integer; _right: integer; _bottom: integer; _w: integer; _h: integer);
-procedure jCustomDialog_AddLParamsAnchorRule(env: PJNIEnv; this: JObject; _jcustomdialog: JObject; _rule: integer);
-procedure jCustomDialog_AddLParamsParentRule(env: PJNIEnv; this: JObject; _jcustomdialog: JObject; _rule: integer);
-procedure jCustomDialog_SetLayoutAll(env: PJNIEnv; this: JObject; _jcustomdialog: JObject; _idAnchor: integer);
-procedure jCustomDialog_ClearLayoutAll(env: PJNIEnv; this: JObject; _jcustomdialog: JObject);
-procedure jCustomDialog_SetId(env: PJNIEnv; this: JObject; _jcustomdialog: JObject; _id: integer);
+procedure jCustomDialog_jFree(env: PJNIEnv; _jcustomdialog: JObject);
+procedure jCustomDialog_SetViewParent(env: PJNIEnv; _jcustomdialog: JObject; _viewgroup: jObject);
+procedure jCustomDialog_RemoveFromViewParent(env: PJNIEnv; _jcustomdialog: JObject);
+function jCustomDialog_GetView(env: PJNIEnv; _jcustomdialog: JObject): jObject;
+procedure jCustomDialog_SetLParamWidth(env: PJNIEnv; _jcustomdialog: JObject; _w: integer);
+procedure jCustomDialog_SetLParamHeight(env: PJNIEnv; _jcustomdialog: JObject; _h: integer);
+procedure jCustomDialog_SetLeftTopRightBottomWidthHeight(env: PJNIEnv; _jcustomdialog: JObject; _left: integer; _top: integer; _right: integer; _bottom: integer; _w: integer; _h: integer);
+procedure jCustomDialog_AddLParamsAnchorRule(env: PJNIEnv; _jcustomdialog: JObject; _rule: integer);
+procedure jCustomDialog_AddLParamsParentRule(env: PJNIEnv; _jcustomdialog: JObject; _rule: integer);
+procedure jCustomDialog_SetLayoutAll(env: PJNIEnv; _jcustomdialog: JObject; _idAnchor: integer);
+procedure jCustomDialog_ClearLayoutAll(env: PJNIEnv; _jcustomdialog: JObject);
+procedure jCustomDialog_SetId(env: PJNIEnv; _jcustomdialog: JObject; _id: integer);
 
-procedure jCustomDialog_Show(env: PJNIEnv; this: JObject; _jcustomdialog: JObject);overload;
-procedure jCustomDialog_Show(env: PJNIEnv; this: JObject; _jcustomdialog: JObject; _title: string);overload;
-procedure jCustomDialog_Show(env: PJNIEnv; this: JObject; _jcustomdialog: JObject; _title: string; _iconIdentifier: string);overload;
+procedure jCustomDialog_Show(env: PJNIEnv; _jcustomdialog: JObject);overload;
+procedure jCustomDialog_Show(env: PJNIEnv; _jcustomdialog: JObject; _title: string);overload;
+procedure jCustomDialog_Show(env: PJNIEnv; _jcustomdialog: JObject; _title: string; _iconIdentifier: string);overload;
 
-procedure jCustomDialog_SetTitle(env: PJNIEnv; this: JObject; _jcustomdialog: JObject; _title: string);
-procedure jCustomDialog_SetIconIdentifier(env: PJNIEnv; this: JObject; _jcustomdialog: JObject; _iconIdentifier: string);
-procedure jCustomDialog_Close(env: PJNIEnv; this: JObject; _jcustomdialog: JObject);
+procedure jCustomDialog_SetTitle(env: PJNIEnv; _jcustomdialog: JObject; _title: string);
+procedure jCustomDialog_SetIconIdentifier(env: PJNIEnv; _jcustomdialog: JObject; _iconIdentifier: string);
+procedure jCustomDialog_Close(env: PJNIEnv; _jcustomdialog: JObject);
 
 
 implementation
@@ -106,21 +105,27 @@ begin
   FVisible:= False;
 end;
 
+procedure jCustomDialog.SetParentComponent(Value: TComponent);
+begin
+   inherited SetParentComponent(Value);
+   Self.Height:= 96;
+   Self.Width:= 96;
+   if Value <> nil then
+   begin
+      Parent:= TAndroidWidget(Value);
+      Self.Width:= Trunc(TAndroidWidget(Parent).Width) - 13;
+   end;
+end;
+
 destructor jCustomDialog.Destroy;
 begin
   if not (csDesigning in ComponentState) then
   begin
-    if jForm(Owner).App <> nil then
-    begin
-      if jForm(Owner).App.Initialized then
-      begin
-        if FjObject <> nil then
-        begin
-           jFree();
-           FjObject:= nil;
-        end;
-      end;
-    end;
+     if FjObject <> nil then
+     begin
+        jFree();
+        FjObject:= nil;
+     end;
   end;
   //you others free code here...'
   inherited Destroy;
@@ -138,7 +143,7 @@ begin
   FjObject:= jCreate();   //jSelf
   FInitialized:= True;
 
-  FjRLayout{View}:= jCustomDialog_GetView(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject ); // Java : Self Layout
+  FjRLayout{View}:= jCustomDialog_GetView(FjEnv, FjObject ); //Java Self Layout
 
   if FParent <> nil then
   begin
@@ -154,10 +159,9 @@ begin
     end;
   end;
 
-  jCustomDialog_SetViewParent(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, FjPRLayout);
-
-  jCustomDialog_SetId(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, Self.Id);
-  jCustomDialog_SetLeftTopRightBottomWidthHeight(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject,
+  jCustomDialog_SetViewParent(FjEnv, FjObject, FjPRLayout);
+  jCustomDialog_SetId(FjEnv, FjObject, Self.Id);
+  jCustomDialog_SetLeftTopRightBottomWidthHeight(FjEnv, FjObject,
                         FMarginLeft,FMarginTop,FMarginRight,FMarginBottom,
                         GetLayoutParams(gApp, FLParamWidth, sdW),
                         GetLayoutParams(gApp, FLParamHeight, sdH));
@@ -171,38 +175,38 @@ begin
   begin
     if rToA in FPositionRelativeToAnchor then
     begin
-      jCustomDialog_AddLParamsAnchorRule(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, GetPositionRelativeToAnchor(rToA));
+      jCustomDialog_AddLParamsAnchorRule(FjEnv, FjObject, GetPositionRelativeToAnchor(rToA));
     end;
   end;
   for rToP := rpBottom to rpCenterVertical do
   begin
     if rToP in FPositionRelativeToParent then
     begin
-      jCustomDialog_AddLParamsParentRule(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, GetPositionRelativeToParent(rToP));
+      jCustomDialog_AddLParamsParentRule(FjEnv, FjObject, GetPositionRelativeToParent(rToP));
     end;
   end;
   if Self.Anchor <> nil then Self.AnchorId:= Self.Anchor.Id
   else Self.AnchorId:= -1; //dummy
 
-  jCustomDialog_SetLayoutAll(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, Self.AnchorId);
+  jCustomDialog_SetLayoutAll(FjEnv, FjObject, Self.AnchorId);
 
   if  FColor <> colbrDefault then
-    jView_SetBackGroundColor(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjRLayout{wiew!}, GetARGB(FColor));
+    View_SetBackGroundColor(FjEnv, FjThis, FjRLayout{wiew!}, GetARGB(FColor));
 
-  jView_SetVisible(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, FVisible);
+  View_SetVisible(FjEnv, FjThis, FjObject, FVisible);
 end;
 
 procedure jCustomDialog.SetColor(Value: TARGBColorBridge);
 begin
   FColor:= Value;
   if (FInitialized = True) and (FColor <> colbrDefault)  then
-    jView_SetBackGroundColor(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjRLayout{view!}, GetARGB(FColor));
+    View_SetBackGroundColor(FjEnv, FjRLayout{view!}, GetARGB(FColor));
 end;
 procedure jCustomDialog.SetVisible(Value : Boolean);
 begin
   FVisible:= Value;
   if FInitialized then
-    jView_SetVisible(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, FVisible);
+    View_SetVisible(FjEnv, FjObject, FVisible);
 end;
 procedure jCustomDialog.UpdateLParamWidth;
 var
@@ -213,16 +217,16 @@ begin
     if Self.Parent is jForm then
     begin
       if jForm(Owner).Orientation = gApp.Orientation then side:= sdW else side:= sdH;
-      jCustomDialog_SetLParamWidth(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, GetLayoutParams(gApp, FLParamWidth, side));
+      jCustomDialog_SetLParamWidth(FjEnv, FjObject, GetLayoutParams(gApp, FLParamWidth, side));
     end
     else
     begin
       if (Self.Parent as jVisualControl).LayoutParamWidth = lpMatchParent then
-        jCustomDialog_SetLParamWidth(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, GetLayoutParams(gApp, FLParamWidth, sdW))
+        jCustomDialog_SetLParamWidth(FjEnv, FjObject, GetLayoutParams(gApp, FLParamWidth, sdW))
       else if (Self.Parent as jVisualControl).LayoutParamWidth = lpWrapContent then
-        jCustomDialog_SetLParamWidth(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, GetLayoutParams(gApp, FLParamWidth, sdW))
+        jCustomDialog_SetLParamWidth(FjEnv, FjObject, GetLayoutParams(gApp, FLParamWidth, sdW))
       else
-        jCustomDialog_SetLParamWidth(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, GetLayoutParamsByParent(Self.Parent, FLParamWidth, sdW))
+        jCustomDialog_SetLParamWidth(FjEnv, FjObject, GetLayoutParamsByParent(Self.Parent, FLParamWidth, sdW))
     end;
   end;
 end;
@@ -236,16 +240,16 @@ begin
     if Self.Parent is jForm then
     begin
       if jForm(Owner).Orientation = gApp.Orientation then side:= sdH else side:= sdW;
-      jCustomDialog_SetLParamHeight(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, GetLayoutParams(gApp, FLParamHeight, side));
+      jCustomDialog_SetLParamHeight(FjEnv, FjObject, GetLayoutParams(gApp, FLParamHeight, side));
     end
     else
     begin
       if (Self.Parent as jVisualControl).LayoutParamHeight = lpMatchParent then
-        jCustomDialog_SetLParamHeight(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, GetLayoutParams(gApp, FLParamHeight, sdH))
+        jCustomDialog_SetLParamHeight(FjEnv, FjObject, GetLayoutParams(gApp, FLParamHeight, sdH))
       else if (Self.Parent as jVisualControl).LayoutParamHeight = lpWrapContent then
-        jCustomDialog_SetLParamHeight(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, GetLayoutParams(gApp, FLParamHeight, sdH))
+        jCustomDialog_SetLParamHeight(FjEnv, FjObject, GetLayoutParams(gApp, FLParamHeight, sdH))
       else
-        jCustomDialog_SetLParamHeight(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, GetLayoutParamsByParent(Self.Parent, FLParamHeight, sdH))
+        jCustomDialog_SetLParamHeight(FjEnv, FjObject, GetLayoutParamsByParent(Self.Parent, FLParamHeight, sdH))
     end;
   end;
 end;
@@ -257,14 +261,14 @@ begin
     inherited UpdateLayout;
     UpdateLParamWidth;
     UpdateLParamHeight;
-  jCustomDialog_SetLayoutAll(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, Self.AnchorId);
+  jCustomDialog_SetLayoutAll(FjEnv, FjObject, Self.AnchorId);
   end;
 end;
 
 procedure jCustomDialog.Refresh;
 begin
   if FInitialized then
-    jView_Invalidate(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject);
+    View_Invalidate(FjEnv, FjObject);
 end;
 
 procedure jCustomDialog.ClearLayout;
@@ -272,16 +276,16 @@ var
    rToP: TPositionRelativeToParent;
    rToA: TPositionRelativeToAnchorID;
 begin
- jCustomDialog_ClearLayoutAll(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject );
+ jCustomDialog_ClearLayoutAll(FjEnv, FjObject );
    for rToP := rpBottom to rpCenterVertical do
    begin
       if rToP in FPositionRelativeToParent then
-        jCustomDialog_AddLParamsParentRule(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject , GetPositionRelativeToParent(rToP));
+        jCustomDialog_AddLParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
    end;
    for rToA := raAbove to raAlignRight do
    begin
      if rToA in FPositionRelativeToAnchor then
-       jCustomDialog_AddLParamsAnchorRule(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject , GetPositionRelativeToAnchor(rToA));
+       jCustomDialog_AddLParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
    end;
 end;
 
@@ -293,14 +297,14 @@ end;
 
 function jCustomDialog.jCreate(): jObject;
 begin
-   Result:= jCustomDialog_jCreate(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis , int64(Self));
+   Result:= jCustomDialog_jCreate(FjEnv, FjThis , int64(Self));
 end;
 
 procedure jCustomDialog.jFree();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jCustomDialog_jFree(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject);
+     jCustomDialog_jFree(FjEnv, FjObject);
 end;
 
 procedure jCustomDialog.SetViewParent(_viewgroup: jObject);
@@ -309,14 +313,14 @@ begin
   //inherited SetViewParent(_viewgroup);
   FjPRLayout:= _viewgroup;
   if FInitialized then
-     jCustomDialog_SetViewParent(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, _viewgroup);
+     jCustomDialog_SetViewParent(FjEnv, FjObject, _viewgroup);
 end;
 
 procedure jCustomDialog.RemoveFromViewParent();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jCustomDialog_RemoveFromViewParent(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject);
+     jCustomDialog_RemoveFromViewParent(FjEnv, FjObject);
 end;
 
 function jCustomDialog.GetView(): jObject;
@@ -324,63 +328,63 @@ begin
   //in designing component state: result value here...
   Result:=  FjRLayout; //inherited GetView();
   if FInitialized then
-     Result:= jCustomDialog_GetView(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject);
+     Result:= jCustomDialog_GetView(FjEnv, FjObject);
 end;
 
 procedure jCustomDialog.SetLParamWidth(_w: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jCustomDialog_SetLParamWidth(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, _w);
+     jCustomDialog_SetLParamWidth(FjEnv, FjObject, _w);
 end;
 
 procedure jCustomDialog.SetLParamHeight(_h: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jCustomDialog_SetLParamHeight(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, _h);
+     jCustomDialog_SetLParamHeight(FjEnv, FjObject, _h);
 end;
 
 procedure jCustomDialog.SetLeftTopRightBottomWidthHeight(_left: integer; _top: integer; _right: integer; _bottom: integer; _w: integer; _h: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jCustomDialog_SetLeftTopRightBottomWidthHeight(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, _left ,_top ,_right ,_bottom ,_w ,_h);
+     jCustomDialog_SetLeftTopRightBottomWidthHeight(FjEnv, FjObject, _left ,_top ,_right ,_bottom ,_w ,_h);
 end;
 
 procedure jCustomDialog.AddLParamsAnchorRule(_rule: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jCustomDialog_AddLParamsAnchorRule(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, _rule);
+     jCustomDialog_AddLParamsAnchorRule(FjEnv, FjObject, _rule);
 end;
 
 procedure jCustomDialog.AddLParamsParentRule(_rule: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jCustomDialog_AddLParamsParentRule(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, _rule);
+     jCustomDialog_AddLParamsParentRule(FjEnv, FjObject, _rule);
 end;
 
 procedure jCustomDialog.SetLayoutAll(_idAnchor: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jCustomDialog_SetLayoutAll(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, _idAnchor);
+     jCustomDialog_SetLayoutAll(FjEnv, FjObject, _idAnchor);
 end;
 
 procedure jCustomDialog.ClearLayoutAll();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jCustomDialog_ClearLayoutAll(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject);
+     jCustomDialog_ClearLayoutAll(FjEnv, FjObject);
 end;
 
 procedure jCustomDialog.SetId(_id: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jCustomDialog_SetId(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, _id);
+     jCustomDialog_SetId(FjEnv, FjObject, _id);
 end;
 
 procedure jCustomDialog.Show();
@@ -388,11 +392,11 @@ begin
   //in designing component state: set value here...
   if FInitialized then
   begin
-     //jCustomDialog_RemoveFromViewParent(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject);
+     //jCustomDialog_RemoveFromViewParent(FjEnv, FjObject);
      if FText <> '' then
-       jCustomDialog_Show(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, FText)
+       jCustomDialog_Show(FjEnv, FjObject, FText)
      else
-       jCustomDialog_Show(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject);
+       jCustomDialog_Show(FjEnv, FjObject);
   end;
 end;
 
@@ -402,11 +406,11 @@ begin
   FText:= _title;
   if FInitialized then
   begin
-     //jCustomDialog_RemoveFromViewParent(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject);
+     //jCustomDialog_RemoveFromViewParent(FjEnv, FjObject);
      if FIconIdentifier <> '' then
-        jCustomDialog_Show(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, _title, FIconIdentifier)
+        jCustomDialog_Show(FjEnv, FjObject, _title, FIconIdentifier)
      else
-        jCustomDialog_Show(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, _title)
+        jCustomDialog_Show(FjEnv, FjObject, _title)
   end;
 end;
 
@@ -417,8 +421,8 @@ begin
   FIconIdentifier:= _iconIdentifier;
   if FInitialized then
   begin
-     //jCustomDialog_RemoveFromViewParent(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject);
-     jCustomDialog_Show(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, _title, _iconIdentifier);
+     //jCustomDialog_RemoveFromViewParent(FjEnv, FjObject);
+     jCustomDialog_Show(FjEnv, FjObject, _title, _iconIdentifier);
   end;
 end;
 
@@ -427,21 +431,21 @@ begin
   //in designing component state: set value here...
   inherited SetText(_title);
   if FInitialized then
-    jCustomDialog_SetTitle(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, _title);
+    jCustomDialog_SetTitle(FjEnv, FjObject, _title);
 end;
 
 procedure jCustomDialog.SetIconIdentifier(_iconIdentifier: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-    jCustomDialog_SetIconIdentifier(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, _iconIdentifier);
+    jCustomDialog_SetIconIdentifier(FjEnv, FjObject, _iconIdentifier);
 end;
 
 procedure jCustomDialog.Close();
 begin
   //in designing component state: set value here...
   if FInitialized then
-    jCustomDialog_Close(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject);
+    jCustomDialog_Close(FjEnv, FjObject);
 end;
 
 procedure jCustomDialog.GenEvent_OnCustomDialogShow(Obj: TObject; dialog: jObject; title: string);
@@ -475,7 +479,7 @@ end;
 *)
 
 
-procedure jCustomDialog_jFree(env: PJNIEnv; this: JObject; _jcustomdialog: JObject);
+procedure jCustomDialog_jFree(env: PJNIEnv; _jcustomdialog: JObject);
 var
   jMethod: jMethodID=nil;
   jCls: jClass=nil;
@@ -486,7 +490,7 @@ begin
 end;
 
 
-procedure jCustomDialog_SetViewParent(env: PJNIEnv; this: JObject; _jcustomdialog: JObject; _viewgroup: jObject);
+procedure jCustomDialog_SetViewParent(env: PJNIEnv; _jcustomdialog: JObject; _viewgroup: jObject);
 var
   jParams: array[0..0] of jValue;
   jMethod: jMethodID=nil;
@@ -499,7 +503,7 @@ begin
 end;
 
 
-procedure jCustomDialog_RemoveFromViewParent(env: PJNIEnv; this: JObject; _jcustomdialog: JObject);
+procedure jCustomDialog_RemoveFromViewParent(env: PJNIEnv; _jcustomdialog: JObject);
 var
   jMethod: jMethodID=nil;
   jCls: jClass=nil;
@@ -510,7 +514,7 @@ begin
 end;
 
 
-function jCustomDialog_GetView(env: PJNIEnv; this: JObject; _jcustomdialog: JObject): jObject;
+function jCustomDialog_GetView(env: PJNIEnv; _jcustomdialog: JObject): jObject;
 var
   jMethod: jMethodID=nil;
   jCls: jClass=nil;
@@ -521,7 +525,7 @@ begin
 end;
 
 
-procedure jCustomDialog_SetLParamWidth(env: PJNIEnv; this: JObject; _jcustomdialog: JObject; _w: integer);
+procedure jCustomDialog_SetLParamWidth(env: PJNIEnv; _jcustomdialog: JObject; _w: integer);
 var
   jParams: array[0..0] of jValue;
   jMethod: jMethodID=nil;
@@ -534,7 +538,7 @@ begin
 end;
 
 
-procedure jCustomDialog_SetLParamHeight(env: PJNIEnv; this: JObject; _jcustomdialog: JObject; _h: integer);
+procedure jCustomDialog_SetLParamHeight(env: PJNIEnv; _jcustomdialog: JObject; _h: integer);
 var
   jParams: array[0..0] of jValue;
   jMethod: jMethodID=nil;
@@ -547,7 +551,7 @@ begin
 end;
 
 
-procedure jCustomDialog_SetLeftTopRightBottomWidthHeight(env: PJNIEnv; this: JObject; _jcustomdialog: JObject; _left: integer; _top: integer; _right: integer; _bottom: integer; _w: integer; _h: integer);
+procedure jCustomDialog_SetLeftTopRightBottomWidthHeight(env: PJNIEnv; _jcustomdialog: JObject; _left: integer; _top: integer; _right: integer; _bottom: integer; _w: integer; _h: integer);
 var
   jParams: array[0..5] of jValue;
   jMethod: jMethodID=nil;
@@ -565,7 +569,7 @@ begin
 end;
 
 
-procedure jCustomDialog_AddLParamsAnchorRule(env: PJNIEnv; this: JObject; _jcustomdialog: JObject; _rule: integer);
+procedure jCustomDialog_AddLParamsAnchorRule(env: PJNIEnv; _jcustomdialog: JObject; _rule: integer);
 var
   jParams: array[0..0] of jValue;
   jMethod: jMethodID=nil;
@@ -578,7 +582,7 @@ begin
 end;
 
 
-procedure jCustomDialog_AddLParamsParentRule(env: PJNIEnv; this: JObject; _jcustomdialog: JObject; _rule: integer);
+procedure jCustomDialog_AddLParamsParentRule(env: PJNIEnv; _jcustomdialog: JObject; _rule: integer);
 var
   jParams: array[0..0] of jValue;
   jMethod: jMethodID=nil;
@@ -591,7 +595,7 @@ begin
 end;
 
 
-procedure jCustomDialog_SetLayoutAll(env: PJNIEnv; this: JObject; _jcustomdialog: JObject; _idAnchor: integer);
+procedure jCustomDialog_SetLayoutAll(env: PJNIEnv; _jcustomdialog: JObject; _idAnchor: integer);
 var
   jParams: array[0..0] of jValue;
   jMethod: jMethodID=nil;
@@ -604,7 +608,7 @@ begin
 end;
 
 
-procedure jCustomDialog_ClearLayoutAll(env: PJNIEnv; this: JObject; _jcustomdialog: JObject);
+procedure jCustomDialog_ClearLayoutAll(env: PJNIEnv; _jcustomdialog: JObject);
 var
   jMethod: jMethodID=nil;
   jCls: jClass=nil;
@@ -615,7 +619,7 @@ begin
 end;
 
 
-procedure jCustomDialog_SetId(env: PJNIEnv; this: JObject; _jcustomdialog: JObject; _id: integer);
+procedure jCustomDialog_SetId(env: PJNIEnv; _jcustomdialog: JObject; _id: integer);
 var
   jParams: array[0..0] of jValue;
   jMethod: jMethodID=nil;
@@ -627,7 +631,7 @@ begin
   env^.CallVoidMethodA(env, _jcustomdialog, jMethod, @jParams);
 end;
 
-procedure jCustomDialog_Show(env: PJNIEnv; this: JObject; _jcustomdialog: JObject);
+procedure jCustomDialog_Show(env: PJNIEnv; _jcustomdialog: JObject);
 var
   jMethod: jMethodID=nil;
   jCls: jClass=nil;
@@ -637,7 +641,7 @@ begin
   env^.CallVoidMethod(env, _jcustomdialog, jMethod);
 end;
 
-procedure jCustomDialog_Show(env: PJNIEnv; this: JObject; _jcustomdialog: JObject; _title: string);
+procedure jCustomDialog_Show(env: PJNIEnv; _jcustomdialog: JObject; _title: string);
 var
   jParams: array[0..0] of jValue;
   jMethod: jMethodID=nil;
@@ -650,7 +654,7 @@ begin
   env^.DeleteLocalRef(env,jParams[0].l);
 end;
 
-procedure jCustomDialog_Show(env: PJNIEnv; this: JObject; _jcustomdialog: JObject; _title: string; _iconIdentifier: string);
+procedure jCustomDialog_Show(env: PJNIEnv; _jcustomdialog: JObject; _title: string; _iconIdentifier: string);
 var
   jParams: array[0..1] of jValue;
   jMethod: jMethodID=nil;
@@ -665,7 +669,7 @@ begin
   env^.DeleteLocalRef(env,jParams[1].l);
 end;
 
-procedure jCustomDialog_SetTitle(env: PJNIEnv; this: JObject; _jcustomdialog: JObject; _title: string);
+procedure jCustomDialog_SetTitle(env: PJNIEnv; _jcustomdialog: JObject; _title: string);
 var
   jParams: array[0..0] of jValue;
   jMethod: jMethodID=nil;
@@ -678,7 +682,7 @@ begin
   env^.DeleteLocalRef(env,jParams[0].l);
 end;
 
-procedure jCustomDialog_SetIconIdentifier(env: PJNIEnv; this: JObject; _jcustomdialog: JObject; _iconIdentifier: string);
+procedure jCustomDialog_SetIconIdentifier(env: PJNIEnv; _jcustomdialog: JObject; _iconIdentifier: string);
 var
   jParams: array[0..0] of jValue;
   jMethod: jMethodID=nil;
@@ -691,7 +695,7 @@ begin
   env^.DeleteLocalRef(env,jParams[0].l);
 end;
 
-procedure jCustomDialog_Close(env: PJNIEnv; this: JObject; _jcustomdialog: JObject);
+procedure jCustomDialog_Close(env: PJNIEnv; _jcustomdialog: JObject);
 var
   jMethod: jMethodID=nil;
   jCls: jClass=nil;

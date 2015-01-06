@@ -31,6 +31,7 @@ object AndroidModule1: TAndroidModule1
     BackgroundColor = colbrDefault
     FontColor = colbrGold
     FontSize = 0
+    TextTypeFace = tfNormal
     Id = 3714447
   end
   object jTextView2: jTextView
@@ -54,9 +55,11 @@ object AndroidModule1: TAndroidModule1
     BackgroundColor = colbrDefault
     FontColor = colbrLightCoral
     FontSize = 0
+    TextTypeFace = tfNormal
     Id = 7625621
   end
   object jEditText1: jEditText
+    Tag = 1
     Left = 8
     Top = 72
     Width = 280
@@ -74,7 +77,7 @@ object AndroidModule1: TAndroidModule1
     LayoutParamHeight = lpWrapContent
     Alignment = taLeft
     InputTypeEx = itxText
-    LineMaxLength = 300
+    MaxTextLength = 300
     BackgroundColor = colbrDefault
     FontColor = colbrDefault
     FontSize = 0

@@ -98,28 +98,28 @@ jLocation = class(jControl)
 end;
 
 function jLocation_jCreate(env: PJNIEnv; this: JObject;_Self: int64; _TimeForUpdates: int64; _DistanceForUpdates: int64; _CriteriaAccuracy: integer; _MapType: integer): jObject;
-procedure jLocation_jFree(env: PJNIEnv; this: JObject; _jlocation: JObject);
-function jLocation_StartTracker(env: PJNIEnv; this: JObject; _jlocation: JObject): boolean;
-procedure jLocation_ShowLocationSouceSettings(env: PJNIEnv; this: JObject; _jlocation: JObject);
-procedure jLocation_RequestLocationUpdates(env: PJNIEnv; this: JObject; _jlocation: JObject);
-procedure jLocation_StopTracker(env: PJNIEnv; this: JObject; _jlocation: JObject);
-procedure jLocation_SetCriteriaAccuracy(env: PJNIEnv; this: JObject; _jlocation: JObject; _accuracy: integer);
-function jLocation_IsGPSProvider(env: PJNIEnv; this: JObject; _jlocation: JObject): boolean;
-function jLocation_IsNetProvider(env: PJNIEnv; this: JObject; _jlocation: JObject): boolean;
-procedure jLocation_SetTimeForUpdates(env: PJNIEnv; this: JObject; _jlocation: JObject; _time: int64);
-procedure jLocation_SetDistanceForUpdades(env: PJNIEnv; this: JObject; _jlocation: JObject; _distance: int64);
-function jLocation_GetLatitude(env: PJNIEnv; this: JObject; _jlocation: JObject): double;
-function jLocation_GetLongitude(env: PJNIEnv; this: JObject; _jlocation: JObject): double;
-function jLocation_GetAltitude(env: PJNIEnv; this: JObject; _jlocation: JObject): double;
-function jLocation_IsWifiEnabled(env: PJNIEnv; this: JObject; _jlocation: JObject): boolean;
-procedure jLocation_SetWifiEnabled(env: PJNIEnv; this: JObject; _jlocation: JObject; _status: boolean);
-function jLocation_GetGoogleMapsUrl(env: PJNIEnv; this: JObject; _jlocation: JObject; _latitude: double; _longitude: double): string;
-procedure jLocation_SetMapWidth(env: PJNIEnv; this: JObject; _jlocation: JObject; _mapwidth: integer);
-procedure jLocation_SetMapHeight(env: PJNIEnv; this: JObject; _jlocation: JObject; _mapheight: integer);
-procedure jLocation_SetMapZoom(env: PJNIEnv; this: JObject; _jlocation: JObject; _mapzoom: integer);
-procedure jLocation_SetMapType(env: PJNIEnv; this: JObject; _jlocation: JObject; _maptype: integer);
-function jLocation_GetAddress(env: PJNIEnv; this: JObject; _jlocation: JObject): string; overload;
-function jLocation_GetAddress(env: PJNIEnv; this: JObject; _jlocation: JObject; _latitude: double; _longitude: double): string; overload;
+procedure jLocation_jFree(env: PJNIEnv; _jlocation: JObject);
+function jLocation_StartTracker(env: PJNIEnv; _jlocation: JObject): boolean;
+procedure jLocation_ShowLocationSouceSettings(env: PJNIEnv; _jlocation: JObject);
+procedure jLocation_RequestLocationUpdates(env: PJNIEnv; _jlocation: JObject);
+procedure jLocation_StopTracker(env: PJNIEnv; _jlocation: JObject);
+procedure jLocation_SetCriteriaAccuracy(env: PJNIEnv; _jlocation: JObject; _accuracy: integer);
+function jLocation_IsGPSProvider(env: PJNIEnv; _jlocation: JObject): boolean;
+function jLocation_IsNetProvider(env: PJNIEnv; _jlocation: JObject): boolean;
+procedure jLocation_SetTimeForUpdates(env: PJNIEnv; _jlocation: JObject; _time: int64);
+procedure jLocation_SetDistanceForUpdades(env: PJNIEnv; _jlocation: JObject; _distance: int64);
+function jLocation_GetLatitude(env: PJNIEnv; _jlocation: JObject): double;
+function jLocation_GetLongitude(env: PJNIEnv; _jlocation: JObject): double;
+function jLocation_GetAltitude(env: PJNIEnv; _jlocation: JObject): double;
+function jLocation_IsWifiEnabled(env: PJNIEnv; _jlocation: JObject): boolean;
+procedure jLocation_SetWifiEnabled(env: PJNIEnv; _jlocation: JObject; _status: boolean);
+function jLocation_GetGoogleMapsUrl(env: PJNIEnv; _jlocation: JObject; _latitude: double; _longitude: double): string;
+procedure jLocation_SetMapWidth(env: PJNIEnv; _jlocation: JObject; _mapwidth: integer);
+procedure jLocation_SetMapHeight(env: PJNIEnv; _jlocation: JObject; _mapheight: integer);
+procedure jLocation_SetMapZoom(env: PJNIEnv; _jlocation: JObject; _mapzoom: integer);
+procedure jLocation_SetMapType(env: PJNIEnv; _jlocation: JObject; _maptype: integer);
+function jLocation_GetAddress(env: PJNIEnv; _jlocation: JObject): string; overload;
+function jLocation_GetAddress(env: PJNIEnv; _jlocation: JObject; _latitude: double; _longitude: double): string; overload;
 
 implementation
 
@@ -140,17 +140,11 @@ destructor jLocation.Destroy;
 begin
   if not (csDesigning in ComponentState) then
   begin
-    if jForm(Owner).App <> nil then
-    begin
-      if jForm(Owner).App.Initialized then
-      begin
         if FjObject  <> nil then
         begin
            jFree();
            FjObject := nil;
         end;
-      end;
-    end;
   end;
   //you others free code here...
   inherited Destroy;
@@ -168,7 +162,7 @@ end;
 
 function jLocation.jCreate( _TimeForUpdates: int64; _DistanceForUpdates: int64; _CriteriaAccuracy: integer; _MapType: integer): jObject;
 begin
-   Result:= jLocation_jCreate(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis , int64(Self) ,_TimeForUpdates ,_DistanceForUpdates ,_CriteriaAccuracy ,_MapType);
+   Result:= jLocation_jCreate(FjEnv, FjThis , int64(Self) ,_TimeForUpdates ,_DistanceForUpdates ,_CriteriaAccuracy ,_MapType);
 end;
 
 
@@ -176,7 +170,7 @@ procedure jLocation.jFree();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jLocation_jFree(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject );
+     jLocation_jFree(FjEnv, FjObject );
 end;
 
 function jLocation.StartTracker(): boolean;
@@ -184,28 +178,28 @@ begin
   //in designing component state: result value here...
   Result:= False;
   if FInitialized then
-   Result:= jLocation_StartTracker(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject );
+   Result:= jLocation_StartTracker(FjEnv, FjObject );
 end;
 
 procedure jLocation.ShowLocationSouceSettings();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jLocation_ShowLocationSouceSettings(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject );
+     jLocation_ShowLocationSouceSettings(FjEnv, FjObject );
 end;
 
 procedure jLocation.RequestLocationUpdates();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jLocation_RequestLocationUpdates(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject );
+     jLocation_RequestLocationUpdates(FjEnv, FjObject );
 end;
 
 procedure jLocation.StopTracker();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jLocation_StopTracker(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject );
+     jLocation_StopTracker(FjEnv, FjObject );
 end;
 
 procedure jLocation.SetCriteriaAccuracy(_accuracy: TCriteriaAccuracy);
@@ -213,21 +207,21 @@ begin
   //in designing component state: set value here...
   FCriteriaAccuracy:= _accuracy;
   if FInitialized then
-     jLocation_SetCriteriaAccuracy(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject , Ord(_accuracy));
+     jLocation_SetCriteriaAccuracy(FjEnv, FjObject , Ord(_accuracy));
 end;
 
 function jLocation.IsGPSProvider(): boolean;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jLocation_IsGPSProvider(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject );
+   Result:= jLocation_IsGPSProvider(FjEnv, FjObject );
 end;
 
 function jLocation.IsNetProvider(): boolean;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jLocation_IsNetProvider(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject );
+   Result:= jLocation_IsNetProvider(FjEnv, FjObject );
 end;
 
 procedure jLocation.SetTimeForUpdates(_time: int64);
@@ -235,7 +229,7 @@ begin
   //in designing component state: set value here...
   FTimeForUpdates:= _time;
   if FInitialized then
-     jLocation_SetTimeForUpdates(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject , _time);
+     jLocation_SetTimeForUpdates(FjEnv, FjObject , _time);
 end;
 
 procedure jLocation.SetDistanceForUpdates(_distance: int64);
@@ -243,49 +237,49 @@ begin
   //in designing component state: set value here...
   FDistanceForUpdates:= _distance;
   if FInitialized then
-     jLocation_SetDistanceForUpdades(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject , _distance);
+     jLocation_SetDistanceForUpdades(FjEnv, FjObject , _distance);
 end;
 
 function jLocation.GetLatitude(): double;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jLocation_GetLatitude(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject );
+   Result:= jLocation_GetLatitude(FjEnv, FjObject );
 end;
 
 function jLocation.GetLongitude(): double;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jLocation_GetLongitude(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject );
+   Result:= jLocation_GetLongitude(FjEnv, FjObject );
 end;
 
 function jLocation.GetAltitude(): double;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jLocation_GetAltitude(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject );
+   Result:= jLocation_GetAltitude(FjEnv, FjObject );
 end;
 
 function jLocation.IsWifiEnabled(): boolean;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jLocation_IsWifiEnabled(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject );
+   Result:= jLocation_IsWifiEnabled(FjEnv, FjObject );
 end;
 
 procedure jLocation.SetWifiEnabled(_status: boolean);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jLocation_SetWifiEnabled(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject , _status);
+     jLocation_SetWifiEnabled(FjEnv, FjObject , _status);
 end;
 
 function jLocation.GetGoogleMapsUrl(_latitude: double; _longitude: double): string;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jLocation_GetGoogleMapsUrl(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject , _latitude ,_longitude);
+   Result:= jLocation_GetGoogleMapsUrl(FjEnv, FjObject , _latitude ,_longitude);
 end;
 
 procedure jLocation.SetMapWidth(_mapwidth: integer);
@@ -293,7 +287,7 @@ begin
   //in designing component state: set value here...
   FMapWidth:= _mapwidth;
   if FInitialized then
-     jLocation_SetMapWidth(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject , _mapwidth);
+     jLocation_SetMapWidth(FjEnv, FjObject , _mapwidth);
 end;
 
 procedure jLocation.SetMapHeight(_mapheight: integer);
@@ -301,7 +295,7 @@ begin
   //in designing component state: set value here...
   FMapHeight:=_mapheight;
   if FInitialized then
-     jLocation_SetMapHeight(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject , _mapheight);
+     jLocation_SetMapHeight(FjEnv, FjObject , _mapheight);
 end;
 
 procedure jLocation.SetMapZoom(_mapzoom: integer);
@@ -309,7 +303,7 @@ begin
   //in designing component state: set value here...
   FMapZoom:= _mapzoom;
   if FInitialized then
-     jLocation_SetMapZoom(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject , _mapzoom);
+     jLocation_SetMapZoom(FjEnv, FjObject , _mapzoom);
 end;
 
 procedure jLocation.SetMapType(_maptype: TMapType);
@@ -317,21 +311,21 @@ begin
   //in designing component state: set value here...
   FMapType:= _maptype;
   if FInitialized then
-     jLocation_SetMapType(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject , Ord(_maptype));
+     jLocation_SetMapType(FjEnv, FjObject , Ord(_maptype));
 end;
 
 function jLocation.GetAddress(): string;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jLocation_GetAddress(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject );
+   Result:= jLocation_GetAddress(FjEnv, FjObject );
 end;
 
 function jLocation.GetAddress(_latitude: double; _longitude: double): string;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jLocation_GetAddress(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject , _latitude ,_longitude);
+   Result:= jLocation_GetAddress(FjEnv, FjObject , _latitude ,_longitude);
 end;
 
 procedure jLocation.GenEvent_OnLocationChanged(Obj: TObject; latitude: double; longitude: double; altitude: double; address: string);
@@ -383,7 +377,7 @@ end;
 //to end of "public class Controls" in "Controls.java"
 *)
 
-procedure jLocation_jFree(env: PJNIEnv; this: JObject; _jlocation: JObject);
+procedure jLocation_jFree(env: PJNIEnv; _jlocation: JObject);
 var
   jMethod: jMethodID=nil;
   jCls: jClass=nil;
@@ -393,7 +387,7 @@ begin
   env^.CallVoidMethod(env, _jlocation, jMethod);
 end;
 
-function jLocation_StartTracker(env: PJNIEnv; this: JObject; _jlocation: JObject): boolean;
+function jLocation_StartTracker(env: PJNIEnv; _jlocation: JObject): boolean;
 var
   jBoo: JBoolean;
   jMethod: jMethodID=nil;
@@ -405,7 +399,7 @@ begin
   Result:= boolean(jBoo);
 end;
 
-procedure jLocation_ShowLocationSouceSettings(env: PJNIEnv; this: JObject; _jlocation: JObject);
+procedure jLocation_ShowLocationSouceSettings(env: PJNIEnv; _jlocation: JObject);
 var
   jMethod: jMethodID=nil;
   jCls: jClass=nil;
@@ -416,7 +410,7 @@ begin
 end;
 
 
-procedure jLocation_RequestLocationUpdates(env: PJNIEnv; this: JObject; _jlocation: JObject);
+procedure jLocation_RequestLocationUpdates(env: PJNIEnv; _jlocation: JObject);
 var
   jMethod: jMethodID=nil;
   jCls: jClass=nil;
@@ -427,7 +421,7 @@ begin
 end;
 
 
-procedure jLocation_StopTracker(env: PJNIEnv; this: JObject; _jlocation: JObject);
+procedure jLocation_StopTracker(env: PJNIEnv; _jlocation: JObject);
 var
   jMethod: jMethodID=nil;
   jCls: jClass=nil;
@@ -438,7 +432,7 @@ begin
 end;
 
 
-procedure jLocation_SetCriteriaAccuracy(env: PJNIEnv; this: JObject; _jlocation: JObject; _accuracy: integer);
+procedure jLocation_SetCriteriaAccuracy(env: PJNIEnv; _jlocation: JObject; _accuracy: integer);
 var
   jParams: array[0..0] of jValue;
   jMethod: jMethodID=nil;
@@ -450,7 +444,7 @@ begin
   env^.CallVoidMethodA(env, _jlocation, jMethod, @jParams);
 end;
 
-function jLocation_IsGPSProvider(env: PJNIEnv; this: JObject; _jlocation: JObject): boolean;
+function jLocation_IsGPSProvider(env: PJNIEnv; _jlocation: JObject): boolean;
 var
   jBoo: JBoolean;
   jMethod: jMethodID=nil;
@@ -462,7 +456,7 @@ begin
   Result:= boolean(jBoo);
 end;
 
-function jLocation_IsNetProvider(env: PJNIEnv; this: JObject; _jlocation: JObject): boolean;
+function jLocation_IsNetProvider(env: PJNIEnv; _jlocation: JObject): boolean;
 var
   jBoo: JBoolean;
   jMethod: jMethodID=nil;
@@ -475,7 +469,7 @@ begin
 end;
 
 
-procedure jLocation_SetTimeForUpdates(env: PJNIEnv; this: JObject; _jlocation: JObject; _time: int64);
+procedure jLocation_SetTimeForUpdates(env: PJNIEnv; _jlocation: JObject; _time: int64);
 var
   jParams: array[0..0] of jValue;
   jMethod: jMethodID=nil;
@@ -487,7 +481,7 @@ begin
   env^.CallVoidMethodA(env, _jlocation, jMethod, @jParams);
 end;
 
-procedure jLocation_SetDistanceForUpdades(env: PJNIEnv; this: JObject; _jlocation: JObject; _distance: int64);
+procedure jLocation_SetDistanceForUpdades(env: PJNIEnv; _jlocation: JObject; _distance: int64);
 var
   jParams: array[0..0] of jValue;
   jMethod: jMethodID=nil;
@@ -499,7 +493,7 @@ begin
   env^.CallVoidMethodA(env, _jlocation, jMethod, @jParams);
 end;
 
-function jLocation_GetLatitude(env: PJNIEnv; this: JObject; _jlocation: JObject): double;
+function jLocation_GetLatitude(env: PJNIEnv; _jlocation: JObject): double;
 var
   jMethod: jMethodID=nil;
   jCls: jClass=nil;
@@ -509,7 +503,7 @@ begin
   Result:= env^.CallDoubleMethod(env, _jlocation, jMethod);
 end;
 
-function jLocation_GetLongitude(env: PJNIEnv; this: JObject; _jlocation: JObject): double;
+function jLocation_GetLongitude(env: PJNIEnv; _jlocation: JObject): double;
 var
   jMethod: jMethodID=nil;
   jCls: jClass=nil;
@@ -519,7 +513,7 @@ begin
   Result:= env^.CallDoubleMethod(env, _jlocation, jMethod);
 end;
 
-function jLocation_GetAltitude(env: PJNIEnv; this: JObject; _jlocation: JObject): double;
+function jLocation_GetAltitude(env: PJNIEnv; _jlocation: JObject): double;
 var
   jMethod: jMethodID=nil;
   jCls: jClass=nil;
@@ -529,7 +523,7 @@ begin
   Result:= env^.CallDoubleMethod(env, _jlocation, jMethod);
 end;
 
-function jLocation_IsWifiEnabled(env: PJNIEnv; this: JObject; _jlocation: JObject): boolean;
+function jLocation_IsWifiEnabled(env: PJNIEnv; _jlocation: JObject): boolean;
 var
   jBoo: JBoolean;
   jMethod: jMethodID=nil;
@@ -541,7 +535,7 @@ begin
   Result:= boolean(jBoo);
 end;
 
-procedure jLocation_SetWifiEnabled(env: PJNIEnv; this: JObject; _jlocation: JObject; _status: boolean);
+procedure jLocation_SetWifiEnabled(env: PJNIEnv; _jlocation: JObject; _status: boolean);
 var
   jParams: array[0..0] of jValue;
   jMethod: jMethodID=nil;
@@ -554,7 +548,7 @@ begin
 end;
 
 
-function jLocation_GetGoogleMapsUrl(env: PJNIEnv; this: JObject; _jlocation: JObject; _latitude: double; _longitude: double): string;
+function jLocation_GetGoogleMapsUrl(env: PJNIEnv; _jlocation: JObject; _latitude: double; _longitude: double): string;
 var
   jStr: JString;
   jBoo: JBoolean;
@@ -576,7 +570,7 @@ begin
   end;
 end;
 
-procedure jLocation_SetMapWidth(env: PJNIEnv; this: JObject; _jlocation: JObject; _mapwidth: integer);
+procedure jLocation_SetMapWidth(env: PJNIEnv; _jlocation: JObject; _mapwidth: integer);
 var
   jParams: array[0..0] of jValue;
   jMethod: jMethodID=nil;
@@ -589,7 +583,7 @@ begin
 end;
 
 
-procedure jLocation_SetMapHeight(env: PJNIEnv; this: JObject; _jlocation: JObject; _mapheight: integer);
+procedure jLocation_SetMapHeight(env: PJNIEnv; _jlocation: JObject; _mapheight: integer);
 var
   jParams: array[0..0] of jValue;
   jMethod: jMethodID=nil;
@@ -602,7 +596,7 @@ begin
 end;
 
 
-procedure jLocation_SetMapZoom(env: PJNIEnv; this: JObject; _jlocation: JObject; _mapzoom: integer);
+procedure jLocation_SetMapZoom(env: PJNIEnv; _jlocation: JObject; _mapzoom: integer);
 var
   jParams: array[0..0] of jValue;
   jMethod: jMethodID=nil;
@@ -615,7 +609,7 @@ begin
 end;
 
 
-procedure jLocation_SetMapType(env: PJNIEnv; this: JObject; _jlocation: JObject; _maptype: integer);
+procedure jLocation_SetMapType(env: PJNIEnv; _jlocation: JObject; _maptype: integer);
 var
   jParams: array[0..0] of jValue;
   jMethod: jMethodID=nil;
@@ -627,7 +621,7 @@ begin
   env^.CallVoidMethodA(env, _jlocation, jMethod, @jParams);
 end;
 
-function jLocation_GetAddress(env: PJNIEnv; this: JObject; _jlocation: JObject): string;
+function jLocation_GetAddress(env: PJNIEnv; _jlocation: JObject): string;
 var
   jStr: JString;
   jBoo: JBoolean;
@@ -647,7 +641,7 @@ begin
 end;
 
 
-function jLocation_GetAddress(env: PJNIEnv; this: JObject; _jlocation: JObject; _latitude: double; _longitude: double): string;
+function jLocation_GetAddress(env: PJNIEnv; _jlocation: JObject; _latitude: double; _longitude: double): string;
 var
   jStr: JString;
   jBoo: JBoolean;

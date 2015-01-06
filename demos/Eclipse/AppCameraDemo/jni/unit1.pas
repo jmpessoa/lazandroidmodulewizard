@@ -112,17 +112,14 @@ begin
     if FPhotoExist then
     begin
 
-       //jTextView3.Text:= jCamera1.FullPathToBitmapFile;
-       //jBitmap1.LoadFromFile(jCamera1.FullPathToBitmapFile);
 
-       (*
        w:= jBitmap1.Width;       //ex. Width: 640   ... Height: 480
        h:= jBitmap1.Height;
 
        //Ratio > 1 !
        if w > h then Ratio:= w/h
        else  Ratio:= h/w;
-       *)
+
 
        if FSaveRotate = 2 then
        begin
@@ -159,10 +156,6 @@ end;
 
 procedure TAndroidModule1.AndroidModule1JNIPrompt(Sender: TObject);
 begin
-
- // jTextView3.Text:= jCamera1.Filename;
- // jTextView4.Text:= jCamera1.Filename;
-
   if Self.Orientation = 2 then   // device is on horizontal...
   begin               //reconfigure....
 
@@ -188,6 +181,7 @@ begin
 
      Self.UpdateLayout;
   end;
+  jEditText1.SetFocus;
 end;
 
 procedure TAndroidModule1.AndroidModule1ActivityRst(Sender: TObject; requestCode, resultCode: Integer; jData: jObject);

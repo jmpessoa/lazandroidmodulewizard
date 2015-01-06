@@ -52,14 +52,14 @@ jActionBarTab = class(jControl)
 end;
 
 function jActionBarTab_jCreate(env: PJNIEnv; this: JObject;_Self: int64): jObject;
-procedure jActionBarTab_jFree(env: PJNIEnv; this: JObject; _jActionBarTab: JObject);
-function jActionBarTab_GetActionBar(env: PJNIEnv; this: JObject; _jActionBarTab: JObject): jObject;
+procedure jActionBarTab_jFree(env: PJNIEnv; _jActionBarTab: JObject);
+function jActionBarTab_GetActionBar(env: PJNIEnv; _jActionBarTab: JObject): jObject;
 
-procedure jActionBarTab_Add(env: PJNIEnv; this: JObject; _jActionBarTab: JObject; _title: string; _panel: jObject; _iconIdentifier: string);  overload;
-procedure jActionBarTab_Add(env: PJNIEnv; this: JObject; _jActionBarTab: JObject; _title: string; _panel: jObject);    overload;
-procedure jActionBarTab_Add(env: PJNIEnv; this: JObject; _jActionBarTab: JObject; _title: string; _panel: jObject; _customTabView: jObject);  overload;
-procedure jActionBarTab_SetTabNavigationMode(env: PJNIEnv; this: JObject; _jActionBarTab: JObject);
-procedure jActionBarTab_RemoveAllTabs(env: PJNIEnv; this: JObject; _jActionBarTab: JObject);
+procedure jActionBarTab_Add(env: PJNIEnv; _jActionBarTab: JObject; _title: string; _panel: jObject; _iconIdentifier: string);  overload;
+procedure jActionBarTab_Add(env: PJNIEnv; _jActionBarTab: JObject; _title: string; _panel: jObject);    overload;
+procedure jActionBarTab_Add(env: PJNIEnv; _jActionBarTab: JObject; _title: string; _panel: jObject; _customTabView: jObject);  overload;
+procedure jActionBarTab_SetTabNavigationMode(env: PJNIEnv; _jActionBarTab: JObject);
+procedure jActionBarTab_RemoveAllTabs(env: PJNIEnv; _jActionBarTab: JObject);
 
 
 implementation
@@ -78,17 +78,11 @@ destructor jActionBarTab.Destroy;
 begin
   if not (csDesigning in ComponentState) then
   begin
-    if jForm(Owner).App <> nil then
-    begin
-      if jForm(Owner).App.Initialized then
-      begin
         if FjObject <> nil then
         begin
            jFree();
            FjObject:= nil;
         end;
-      end;
-    end;
   end;
   //you others free code here...'
   FTitles.Free;
@@ -107,56 +101,56 @@ end;
 
 function jActionBarTab.jCreate(): jObject;
 begin
-   Result:= jActionBarTab_jCreate(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis , int64(Self));
+   Result:= jActionBarTab_jCreate(FjEnv, FjThis , int64(Self));
 end;
 
 procedure jActionBarTab.jFree();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jActionBarTab_jFree(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject);
+     jActionBarTab_jFree(FjEnv, FjObject);
 end;
 
 function jActionBarTab.GetActionBar(): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jActionBarTab_GetActionBar(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject);
+   Result:= jActionBarTab_GetActionBar(FjEnv, FjObject);
 end;
 
 procedure jActionBarTab.Add(_title: string; _panel: jObject; _iconIdentifier: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jActionBarTab_Add(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, _title ,_panel ,_iconIdentifier);
+     jActionBarTab_Add(FjEnv, FjObject, _title ,_panel ,_iconIdentifier);
 end;
 
 procedure jActionBarTab.Add(_title: string; _panel: jObject);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jActionBarTab_Add(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, _title ,_panel);
+     jActionBarTab_Add(FjEnv, FjObject, _title ,_panel);
 end;
 
 procedure jActionBarTab.Add(_title: string; _panel: jObject; _customTabView: jObject);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jActionBarTab_Add(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, _title ,_panel ,_customTabView);
+     jActionBarTab_Add(FjEnv, FjObject, _title ,_panel ,_customTabView);
 end;
 
 procedure jActionBarTab.SetTabNavigationMode();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jActionBarTab_SetTabNavigationMode(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject);
+     jActionBarTab_SetTabNavigationMode(FjEnv, FjObject);
 end;
 
 procedure jActionBarTab.RemoveAllTabs();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jActionBarTab_RemoveAllTabs(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject);
+     jActionBarTab_RemoveAllTabs(FjEnv, FjObject);
 end;
 
 procedure jActionBarTab.SetTitles(Value: TStrings);
@@ -207,7 +201,7 @@ end;
 *)
 
 
-procedure jActionBarTab_jFree(env: PJNIEnv; this: JObject; _jActionBarTab: JObject);
+procedure jActionBarTab_jFree(env: PJNIEnv; _jActionBarTab: JObject);
 var
   jMethod: jMethodID=nil;
   jCls: jClass=nil;
@@ -218,7 +212,7 @@ begin
 end;
 
 
-function jActionBarTab_GetActionBar(env: PJNIEnv; this: JObject; _jActionBarTab: JObject): jObject;
+function jActionBarTab_GetActionBar(env: PJNIEnv; _jActionBarTab: JObject): jObject;
 var
   jMethod: jMethodID=nil;
   jCls: jClass=nil;
@@ -229,7 +223,7 @@ begin
 end;
 
 
-procedure jActionBarTab_Add(env: PJNIEnv; this: JObject; _jActionBarTab: JObject; _title: string; _panel: jObject; _iconIdentifier: string);
+procedure jActionBarTab_Add(env: PJNIEnv; _jActionBarTab: JObject; _title: string; _panel: jObject; _iconIdentifier: string);
 var
   jParams: array[0..2] of jValue;
   jMethod: jMethodID=nil;
@@ -246,7 +240,7 @@ env^.DeleteLocalRef(env,jParams[0].l);
 end;
 
 
-procedure jActionBarTab_Add(env: PJNIEnv; this: JObject; _jActionBarTab: JObject; _title: string; _panel: jObject);
+procedure jActionBarTab_Add(env: PJNIEnv; _jActionBarTab: JObject; _title: string; _panel: jObject);
 var
   jParams: array[0..1] of jValue;
   jMethod: jMethodID=nil;
@@ -260,7 +254,7 @@ begin
 env^.DeleteLocalRef(env,jParams[0].l);
 end;
 
-procedure jActionBarTab_Add(env: PJNIEnv; this: JObject; _jActionBarTab: JObject; _title: string; _panel: jObject; _customTabView: jObject);
+procedure jActionBarTab_Add(env: PJNIEnv; _jActionBarTab: JObject; _title: string; _panel: jObject; _customTabView: jObject);
 var
   jParams: array[0..2] of jValue;
   jMethod: jMethodID=nil;
@@ -276,7 +270,7 @@ env^.DeleteLocalRef(env,jParams[0].l);
 end;
 
 
-procedure jActionBarTab_SetTabNavigationMode(env: PJNIEnv; this: JObject; _jActionBarTab: JObject);
+procedure jActionBarTab_SetTabNavigationMode(env: PJNIEnv; _jActionBarTab: JObject);
 var
   jMethod: jMethodID=nil;
   jCls: jClass=nil;
@@ -287,7 +281,7 @@ begin
 end;
 
 
-procedure jActionBarTab_RemoveAllTabs(env: PJNIEnv; this: JObject; _jActionBarTab: JObject);
+procedure jActionBarTab_RemoveAllTabs(env: PJNIEnv; _jActionBarTab: JObject);
 var
   jMethod: jMethodID=nil;
   jCls: jClass=nil;

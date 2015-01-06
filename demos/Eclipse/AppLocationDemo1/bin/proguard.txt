@@ -1,0 +1,3 @@
+# view AndroidManifest.xml #generated:42
+-keep class com.example.applocationdemo1.App { <init>(...); }
+

@@ -1,5 +1,5 @@
-{hint: save all files to location: C:\adt32\ant\workspace\AppAntDemo1\jni }
-library controls;  //[by LazAndroidWizard: 10/17/2014 15:28:15]
+{hint: save all files to location: C:\adt32\ant\workspace\AppAntDemo1\jni}
+library controls;  //[by LazAndroidWizard: 1/5/2015 20:50:23]
  
 {$mode delphi}
  
@@ -129,7 +129,7 @@ end;
 
 { Class:     org_lazarus_appantdemo1_Controls
   Method:    pAppOnCreateContextMenu
-  Signature: (Landroid/view/Menu;)V }
+  Signature: (Landroid/view/ContextMenu;)V }
 procedure pAppOnCreateContextMenu(PEnv: PJNIEnv; this: JObject; menu: JObject); cdecl;
 begin
   Java_Event_pAppOnCreateContextMenu(PEnv,this,menu);
@@ -153,10 +153,18 @@ end;
 
 { Class:     org_lazarus_appantdemo1_Controls
   Method:    pOnChange
-  Signature: (JI)V }
-procedure pOnChange(PEnv: PJNIEnv; this: JObject; pasobj: JLong; EventType: JInt); cdecl;
+  Signature: (JLjava/lang/String;I)V }
+procedure pOnChange(PEnv: PJNIEnv; this: JObject; pasobj: JLong; txt: JString; count: JInt); cdecl;
 begin
-  Java_Event_pOnChange(PEnv,this,TObject(pasobj),EventType);
+  Java_Event_pOnChange(PEnv,this,TObject(pasobj),txt,count);
+end;
+
+{ Class:     org_lazarus_appantdemo1_Controls
+  Method:    pOnChanged
+  Signature: (JLjava/lang/String;I)V }
+procedure pOnChanged(PEnv: PJNIEnv; this: JObject; pasobj: JLong; txt: JString; count: JInt); cdecl;
+begin
+  Java_Event_pOnChanged(PEnv,this,TObject(pasobj),txt,count);
 end;
 
 { Class:     org_lazarus_appantdemo1_Controls
@@ -399,7 +407,31 @@ begin
   Java_Event_pAppOnListItemClick(PEnv,this,adapter,view,position,id);
 end;
 
-const NativeMethods:array[0..48] of JNINativeMethod = (
+{ Class:     org_lazarus_appantdemo1_Controls
+  Method:    pOnActionBarTabSelected
+  Signature: (JLandroid/view/View;Ljava/lang/String;)V }
+procedure pOnActionBarTabSelected(PEnv: PJNIEnv; this: JObject; pasobj: JLong; view: JObject; title: JString); cdecl;
+begin
+  Java_Event_pOnActionBarTabSelected(PEnv,this,TObject(pasobj),view,title);
+end;
+
+{ Class:     org_lazarus_appantdemo1_Controls
+  Method:    pOnActionBarTabUnSelected
+  Signature: (JLandroid/view/View;Ljava/lang/String;)V }
+procedure pOnActionBarTabUnSelected(PEnv: PJNIEnv; this: JObject; pasobj: JLong; view: JObject; title: JString); cdecl;
+begin
+  Java_Event_pOnActionBarTabUnSelected(PEnv,this,TObject(pasobj),view,title);
+end;
+
+{ Class:     org_lazarus_appantdemo1_Controls
+  Method:    pOnCustomDialogShow
+  Signature: (JLandroid/app/Dialog;Ljava/lang/String;)V }
+procedure pOnCustomDialogShow(PEnv: PJNIEnv; this: JObject; pasobj: JLong; dialog: JObject; title: JString); cdecl;
+begin
+  Java_Event_pOnCustomDialogShow(PEnv,this,TObject(pasobj),dialog,title);
+end;
+
+const NativeMethods:array[0..52] of JNINativeMethod = (
    (name:'pAppOnScreenStyle';
     signature:'()I';
     fnPtr:@pAppOnScreenStyle;),
@@ -446,7 +478,7 @@ const NativeMethods:array[0..48] of JNINativeMethod = (
     signature:'(Landroid/view/MenuItem;ILjava/lang/String;Z)V';
     fnPtr:@pAppOnClickOptionMenuItem;),
    (name:'pAppOnCreateContextMenu';
-    signature:'(Landroid/view/Menu;)V';
+    signature:'(Landroid/view/ContextMenu;)V';
     fnPtr:@pAppOnCreateContextMenu;),
    (name:'pAppOnClickContextMenuItem';
     signature:'(Landroid/view/MenuItem;ILjava/lang/String;Z)V';
@@ -455,8 +487,11 @@ const NativeMethods:array[0..48] of JNINativeMethod = (
     signature:'(JI)V';
     fnPtr:@pOnClick;),
    (name:'pOnChange';
-    signature:'(JI)V';
+    signature:'(JLjava/lang/String;I)V';
     fnPtr:@pOnChange;),
+   (name:'pOnChanged';
+    signature:'(JLjava/lang/String;I)V';
+    fnPtr:@pOnChanged;),
    (name:'pOnEnter';
     signature:'(J)V';
     fnPtr:@pOnEnter;),
@@ -546,7 +581,16 @@ const NativeMethods:array[0..48] of JNINativeMethod = (
     fnPtr:@pAppOnViewClick;),
    (name:'pAppOnListItemClick';
     signature:'(Landroid/widget/AdapterView;Landroid/view/View;II)V';
-    fnPtr:@pAppOnListItemClick;)
+    fnPtr:@pAppOnListItemClick;),
+   (name:'pOnActionBarTabSelected';
+    signature:'(JLandroid/view/View;Ljava/lang/String;)V';
+    fnPtr:@pOnActionBarTabSelected;),
+   (name:'pOnActionBarTabUnSelected';
+    signature:'(JLandroid/view/View;Ljava/lang/String;)V';
+    fnPtr:@pOnActionBarTabUnSelected;),
+   (name:'pOnCustomDialogShow';
+    signature:'(JLandroid/app/Dialog;Ljava/lang/String;)V';
+    fnPtr:@pOnCustomDialogShow;)
 );
 
 function RegisterNativeMethodsArray(PEnv: PJNIEnv; className: PChar; methods: PJNINativeMethod; countMethods:integer):integer;
@@ -579,7 +623,7 @@ begin
      curEnv:= PJNIEnv(PEnv);
      RegisterNativeMethods(curEnv, 'org/lazarus/appantdemo1/Controls');
   end;
-  gVM:= VM;{And_jni_Bridge}
+  gVM:= VM;{AndroidWidget.pas}
 end;
  
 procedure JNI_OnUnload(VM: PJavaVM; reserved: pointer); cdecl;
@@ -592,8 +636,8 @@ begin
   if PEnv <> nil then
   begin
     curEnv:= PJNIEnv(PEnv);
-    (curEnv^).DeleteGlobalRef(curEnv, gjClass{And_jni_Bridge});
-    gVM:= nil;{And_jni_Bridge}
+    (curEnv^).DeleteGlobalRef(curEnv, gjClass);   {AndroidWidget.pas}
+    gVM:= nil;{AndroidWidget.pas}
   end;
   gApp.Terminate;
   FreeAndNil(gApp);
@@ -621,6 +665,7 @@ exports
   pAppOnClickContextMenuItem name 'Java_org_lazarus_appantdemo1_Controls_pAppOnClickContextMenuItem',
   pOnClick name 'Java_org_lazarus_appantdemo1_Controls_pOnClick',
   pOnChange name 'Java_org_lazarus_appantdemo1_Controls_pOnChange',
+  pOnChanged name 'Java_org_lazarus_appantdemo1_Controls_pOnChanged',
   pOnEnter name 'Java_org_lazarus_appantdemo1_Controls_pOnEnter',
   pOnTimer name 'Java_org_lazarus_appantdemo1_Controls_pOnTimer',
   pOnDraw name 'Java_org_lazarus_appantdemo1_Controls_pOnDraw',
@@ -650,13 +695,16 @@ exports
   pOnLocationProviderEnabled name 'Java_org_lazarus_appantdemo1_Controls_pOnLocationProviderEnabled',
   pOnLocationProviderDisabled name 'Java_org_lazarus_appantdemo1_Controls_pOnLocationProviderDisabled',
   pAppOnViewClick name 'Java_org_lazarus_appantdemo1_Controls_pAppOnViewClick',
-  pAppOnListItemClick name 'Java_org_lazarus_appantdemo1_Controls_pAppOnListItemClick';
- 
+  pAppOnListItemClick name 'Java_org_lazarus_appantdemo1_Controls_pAppOnListItemClick',
+  pOnActionBarTabSelected name 'Java_org_lazarus_appantdemo1_Controls_pOnActionBarTabSelected',
+  pOnActionBarTabUnSelected name 'Java_org_lazarus_appantdemo1_Controls_pOnActionBarTabUnSelected',
+  pOnCustomDialogShow name 'Java_org_lazarus_appantdemo1_Controls_pOnCustomDialogShow';
+
 begin
-  gApp:= jApp.Create(nil);{Laz_And_Controls}
+  gApp:= jApp.Create(nil);{AndroidWidget.pas}
   gApp.Title:= 'My Android Bridges Library';
-  gjAppName:= 'org.lazarus.appantdemo1';{And_jni_Bridge}
-  gjClassName:= 'org/lazarus/appantdemo1/Controls';{And_jni_Bridge}
+  gjAppName:= 'org.lazarus.appantdemo1';{AndroidWidget.pas}
+  gjClassName:= 'org/lazarus/appantdemo1/Controls';{AndroidWidget.pas}
   gApp.AppName:=gjAppName;
   gApp.ClassName:=gjClassName;
   gApp.Initialize;

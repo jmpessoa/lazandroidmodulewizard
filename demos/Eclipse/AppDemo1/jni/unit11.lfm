@@ -8,7 +8,6 @@ object AndroidModule11: TAndroidModule11
   MarginRight = 0
   MarginBottom = 0
   Text = 'AndroidModule11'
-  OnCreate = DataModuleCreate
   ActivityMode = actRecyclable
   BackgroundColor = colbrBlack
   OnCloseQuery = DataModuleCloseQuery
@@ -34,6 +33,7 @@ object AndroidModule11: TAndroidModule11
     BackgroundColor = colbrDefault
     FontColor = colbrSilver
     FontSize = 0
+    TextTypeFace = tfNormal
     Id = 44776
   end
   object jButton1: jButton
@@ -99,7 +99,6 @@ object AndroidModule11: TAndroidModule11
     OnGLCreate = jCanvasES2_1GLCreate
     OnGLChange = jCanvasES2_1GLChange
     OnGLDraw = jCanvasES2_1GLDraw
-    OnGLThread = jCanvasES2_1GLThread
     OnGLDown = jCanvasES2_1GLDown
     OnGLMove = jCanvasES2_1GLMove
     OnGLUp = jCanvasES2_1GLUp
@@ -116,7 +115,7 @@ object AndroidModule11: TAndroidModule11
     MarginTop = 5
     MarginRight = 5
     MarginBottom = 5
-    Text = 'Request GLThread'
+    Text = 'Say Hello...'
     Visible = True
     Anchor = jCanvasES2_1
     PosRelativeToAnchor = [raBelow]
@@ -150,6 +149,7 @@ object AndroidModule11: TAndroidModule11
     BackgroundColor = colbrDefault
     FontColor = colbrSilver
     FontSize = 0
+    TextTypeFace = tfNormal
     Id = 98715
   end
   object jTextView3: jTextView
@@ -173,14 +173,8 @@ object AndroidModule11: TAndroidModule11
     BackgroundColor = colbrDefault
     FontColor = colbrSilver
     FontSize = 0
+    TextTypeFace = tfNormal
     Id = 0
-  end
-  object jTimer1: jTimer
-    Enabled = False
-    Interval = 20
-    OnTimer = jTimer1Timer
-    left = 16
-    top = 11
   end
   object jImageList1: jImageList
     Images.Strings = (
@@ -192,5 +186,12 @@ object AndroidModule11: TAndroidModule11
     )
     left = 208
     top = 136
+  end
+  object jTimer1: jTimer
+    Enabled = False
+    Interval = 20
+    OnTimer = jTimer1Timer
+    left = 14
+    top = 14
   end
 end

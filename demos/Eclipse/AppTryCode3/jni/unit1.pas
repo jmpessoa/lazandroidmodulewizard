@@ -157,7 +157,7 @@ begin
   FListClassImpl.Delimiter:= '|';
   FListClassImpl.DelimitedText:= jDumpJavaMethods1.GetNoMaskedMethodImplementationList();
   InsertJControlCodeTemplate(FBaseControlType, FBaseClassName, FObjectModel);
-  jTextFileManager1.SaveToSdCardFile(FListDrafJavaClass.Text, 'j'+FBaseClassName+'.java');
+  jTextFileManager1.SaveToSdCard(FListDrafJavaClass.Text, 'j'+FBaseClassName+'.java');
   jTextFileManager1.CopyToClipboard(FListDrafJavaClass.Text);
   ShowMessage('Saved to sdcard/jMediaPlayer.java');
   ShowMessage('Copied To Device Clipboard');  //jTextFileManager1.PasteFromClipboard()

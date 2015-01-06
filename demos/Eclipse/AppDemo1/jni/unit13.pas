@@ -20,7 +20,6 @@ type
       jTextView2: jTextView;
       jTextView3: jTextView;
       jTimer1: jTimer;
-      procedure DataModuleActive(Sender: TObject);
       procedure DataModuleCloseQuery(Sender: TObject; var CanClose: boolean);
       procedure DataModuleCreate(Sender: TObject);
       procedure DataModuleJNIPrompt(Sender: TObject);
@@ -97,17 +96,16 @@ begin
      jCanvasES2_1.DrawArray(@cVertex[i*3*4],@cColor[i*4*4],nil,nil,4);
 
    // Update -------------------------------------------------------------------
-    jCanvasES2_1.Update;
+   // jCanvasES2_1.Update;
 end;
 
 procedure TAndroidModule13.DataModuleCreate(Sender: TObject);
-begin  //this initialization code is need here to fix Laz4Andoid  *.lfm parse.... why parse fails?
- (* Self.ActivityMode:= actRecyclable;
-  Self.BackgroundColor:= colbrBlack;
-    //mode delphi
-  Self.OnJNIPrompt:= DataModuleJNIPrompt;
-  Self.OnRotate:= DataModuleRotate;
-  Self.OnCloseQuery:= DataModuleCloseQuery;  *)
+begin
+  gZoom  := 1.0;
+  gSpeed := 1.0;
+  gW     := 300; //just dammy
+  gH     := 150; //just dammy
+  gWorking:= False;
 end;
 
 procedure TAndroidModule13.DataModuleCloseQuery(Sender: TObject;
@@ -118,22 +116,11 @@ begin
    CanClose:= True;
 end;
 
-procedure TAndroidModule13.DataModuleActive(Sender: TObject);
-begin
-  //jCanvasES2_1.Refresh;
-  gWorking:= True;
-  jTimer1.Enabled:= True;
-end;
-
 procedure TAndroidModule13.DataModuleJNIPrompt(Sender: TObject);
 begin
-  gZoom  := 1.0;
-  gSpeed := 1.0;
-  gW     := 300; //just dammy
-  gH     := 150; //just dammy
-  gWorking:= False;
+  gWorking:= True;
+  jTimer1.Enabled:= False;
   ArcBall_Init(gArcBall);
- // Self.Show;
 end;
 
 procedure TAndroidModule13.DataModuleRotate(Sender: TObject; rotate: integer;
@@ -144,7 +131,7 @@ end;
 
 procedure TAndroidModule13.jButton1Click(Sender: TObject);
 begin
-   jTimer1.Enabled:= not (jTimer1.Enabled);
+   jTimer1.Enabled:= not jTimer1.Enabled;
    if jTimer1.Enabled then
    begin
      gWorking:= True;
@@ -167,7 +154,7 @@ procedure TAndroidModule13.jCanvasES2_1GLCreate(Sender: TObject);
 begin
   jCanvasES2_1.Shader_Compile('simon_Vert','simon_Frag');
   jCanvasES2_1.Shader_Link;
-  gWorking := True;
+  //gWorking := True;
 end;
 
 procedure TAndroidModule13.jCanvasES2_1GLDown(Sender: TObject; Touch: TMouch);
@@ -198,13 +185,11 @@ procedure TAndroidModule13.jTimer1Timer(Sender: TObject);
 begin
   gZoom  := gZoom + 0.01;
   if  gZoom > 1.5 then gZoom:= 1.0;
-
   if gWorking then
   begin
     ArcBall_Move(gArcBall,gX,gY);
     jCanvasES2_1.Refresh;
   end;
-
 end;
 
 end.
