@@ -58,12 +58,11 @@ implementation
 
 procedure TAndroidModule1.DataModuleCreate(Sender: TObject);
 begin
-  Self.OnJNIPrompt:= DataModuleJNIPrompt;
+  //
 end;
 
 procedure TAndroidModule1.DataModuleJNIPrompt(Sender: TObject);
 begin
-  Self.Show;
   if jLocation1.IsWifiEnabled() then  jCheckBox1.Checked:= True;
 end;
 

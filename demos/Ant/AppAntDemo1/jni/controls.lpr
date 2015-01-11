@@ -1,5 +1,5 @@
 {hint: save all files to location: C:\adt32\ant\workspace\AppAntDemo1\jni}
-library controls;  //[by LazAndroidWizard: 1/5/2015 20:50:23]
+library controls;  //[by LazAndroidWizard: 1/11/2015 18:00:03]
  
 {$mode delphi}
  
@@ -431,7 +431,31 @@ begin
   Java_Event_pOnCustomDialogShow(PEnv,this,TObject(pasobj),dialog,title);
 end;
 
-const NativeMethods:array[0..52] of JNINativeMethod = (
+{ Class:     org_lazarus_appantdemo1_Controls
+  Method:    pOnClickToggleButton
+  Signature: (JZ)V }
+procedure pOnClickToggleButton(PEnv: PJNIEnv; this: JObject; pasobj: JLong; state: JBoolean); cdecl;
+begin
+  Java_Event_pOnClickToggleButton(PEnv,this,TObject(pasobj),Boolean(state));
+end;
+
+{ Class:     org_lazarus_appantdemo1_Controls
+  Method:    pOnChangeSwitchButton
+  Signature: (JZ)V }
+procedure pOnChangeSwitchButton(PEnv: PJNIEnv; this: JObject; pasobj: JLong; state: JBoolean); cdecl;
+begin
+  Java_Event_pOnChangeSwitchButton(PEnv,this,TObject(pasobj),Boolean(state));
+end;
+
+{ Class:     org_lazarus_appantdemo1_Controls
+  Method:    pOnClickGridItem
+  Signature: (JILjava/lang/String;)V }
+procedure pOnClickGridItem(PEnv: PJNIEnv; this: JObject; pasobj: JLong; position: JInt; caption: JString); cdecl;
+begin
+  Java_Event_pOnClickGridItem(PEnv,this,TObject(pasobj),position,caption);
+end;
+
+const NativeMethods:array[0..55] of JNINativeMethod = (
    (name:'pAppOnScreenStyle';
     signature:'()I';
     fnPtr:@pAppOnScreenStyle;),
@@ -590,7 +614,16 @@ const NativeMethods:array[0..52] of JNINativeMethod = (
     fnPtr:@pOnActionBarTabUnSelected;),
    (name:'pOnCustomDialogShow';
     signature:'(JLandroid/app/Dialog;Ljava/lang/String;)V';
-    fnPtr:@pOnCustomDialogShow;)
+    fnPtr:@pOnCustomDialogShow;),
+   (name:'pOnClickToggleButton';
+    signature:'(JZ)V';
+    fnPtr:@pOnClickToggleButton;),
+   (name:'pOnChangeSwitchButton';
+    signature:'(JZ)V';
+    fnPtr:@pOnChangeSwitchButton;),
+   (name:'pOnClickGridItem';
+    signature:'(JILjava/lang/String;)V';
+    fnPtr:@pOnClickGridItem;)
 );
 
 function RegisterNativeMethodsArray(PEnv: PJNIEnv; className: PChar; methods: PJNINativeMethod; countMethods:integer):integer;
@@ -698,7 +731,10 @@ exports
   pAppOnListItemClick name 'Java_org_lazarus_appantdemo1_Controls_pAppOnListItemClick',
   pOnActionBarTabSelected name 'Java_org_lazarus_appantdemo1_Controls_pOnActionBarTabSelected',
   pOnActionBarTabUnSelected name 'Java_org_lazarus_appantdemo1_Controls_pOnActionBarTabUnSelected',
-  pOnCustomDialogShow name 'Java_org_lazarus_appantdemo1_Controls_pOnCustomDialogShow';
+  pOnCustomDialogShow name 'Java_org_lazarus_appantdemo1_Controls_pOnCustomDialogShow',
+  pOnClickToggleButton name 'Java_org_lazarus_appantdemo1_Controls_pOnClickToggleButton',
+  pOnChangeSwitchButton name 'Java_org_lazarus_appantdemo1_Controls_pOnChangeSwitchButton',
+  pOnClickGridItem name 'Java_org_lazarus_appantdemo1_Controls_pOnClickGridItem';
 
 begin
   gApp:= jApp.Create(nil);{AndroidWidget.pas}

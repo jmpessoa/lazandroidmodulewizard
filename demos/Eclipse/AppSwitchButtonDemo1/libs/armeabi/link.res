@@ -1,0 +1,189 @@
+SEARCH_DIR(C:\adt32\ndk10\platforms\android-13\arch-arm\usr\lib\)
+SEARCH_DIR(C:\adt32\ndk10\toolchains\arm-linux-androideabi-4.6\prebuilt\windows\lib\gcc\arm-linux-androideabi\4.6\)
+SEARCH_DIR(C:\laz4android1346592\components\LazAndroidWizard\lib\arm-android\)
+SEARCH_DIR(C:\laz4android1346592\lcl\units\arm-android\)
+SEARCH_DIR(C:\laz4android1346592\components\lazutils\lib\arm-android\)
+SEARCH_DIR(C:\laz4android1346592\packager\units\arm-android\)
+SEARCH_DIR(.\)
+SEARCH_DIR(C:\laz4android1346592\fpc\2.7.1\units\arm-android\httpd22\)
+SEARCH_DIR(C:\laz4android1346592\fpc\2.7.1\units\arm-android\rtl\)
+SEARCH_DIR(C:\laz4android1346592\fpc\2.7.1\units\arm-android\zlib\)
+SEARCH_DIR(C:\laz4android1346592\fpc\2.7.1\units\arm-android\unzip\)
+SEARCH_DIR(C:\laz4android1346592\fpc\2.7.1\units\arm-android\tcl\)
+SEARCH_DIR(C:\laz4android1346592\fpc\2.7.1\units\arm-android\symbolic\)
+SEARCH_DIR(C:\laz4android1346592\fpc\2.7.1\units\arm-android\sqlite\)
+SEARCH_DIR(C:\laz4android1346592\fpc\2.7.1\units\arm-android\rtl-unicode\)
+SEARCH_DIR(C:\laz4android1346592\fpc\2.7.1\units\arm-android\rtl-objpas\)
+SEARCH_DIR(C:\laz4android1346592\fpc\2.7.1\units\arm-android\rtl-extra\)
+SEARCH_DIR(C:\laz4android1346592\fpc\2.7.1\units\arm-android\rtl-console\)
+SEARCH_DIR(C:\laz4android1346592\fpc\2.7.1\units\arm-android\regexpr\)
+SEARCH_DIR(C:\laz4android1346592\fpc\2.7.1\units\arm-android\postgres\)
+SEARCH_DIR(C:\laz4android1346592\fpc\2.7.1\units\arm-android\pcap\)
+SEARCH_DIR(C:\laz4android1346592\fpc\2.7.1\units\arm-android\paszlib\)
+SEARCH_DIR(C:\laz4android1346592\fpc\2.7.1\units\arm-android\pasjpeg\)
+SEARCH_DIR(C:\laz4android1346592\fpc\2.7.1\units\arm-android\oracle\)
+SEARCH_DIR(C:\laz4android1346592\fpc\2.7.1\units\arm-android\openssl\)
+SEARCH_DIR(C:\laz4android1346592\fpc\2.7.1\units\arm-android\odbc\)
+SEARCH_DIR(C:\laz4android1346592\fpc\2.7.1\units\arm-android\numlib\)
+SEARCH_DIR(C:\laz4android1346592\fpc\2.7.1\units\arm-android\mysql\)
+SEARCH_DIR(C:\laz4android1346592\fpc\2.7.1\units\arm-android\libtar\)
+SEARCH_DIR(C:\laz4android1346592\fpc\2.7.1\units\arm-android\libpng\)
+SEARCH_DIR(C:\laz4android1346592\fpc\2.7.1\units\arm-android\libgd\)
+SEARCH_DIR(C:\laz4android1346592\fpc\2.7.1\units\arm-android\jni\)
+SEARCH_DIR(C:\laz4android1346592\fpc\2.7.1\units\arm-android\imagemagick\)
+SEARCH_DIR(C:\laz4android1346592\fpc\2.7.1\units\arm-android\ibase\)
+SEARCH_DIR(C:\laz4android1346592\fpc\2.7.1\units\arm-android\httpd24\)
+SEARCH_DIR(C:\laz4android1346592\fpc\2.7.1\units\arm-android\hermes\)
+SEARCH_DIR(C:\laz4android1346592\fpc\2.7.1\units\arm-android\hash\)
+SEARCH_DIR(C:\laz4android1346592\fpc\2.7.1\units\arm-android\gdbm\)
+SEARCH_DIR(C:\laz4android1346592\fpc\2.7.1\units\arm-android\fppkg\)
+SEARCH_DIR(C:\laz4android1346592\fpc\2.7.1\units\arm-android\fpmkunit\)
+SEARCH_DIR(C:\laz4android1346592\fpc\2.7.1\units\arm-android\fftw\)
+SEARCH_DIR(C:\laz4android1346592\fpc\2.7.1\units\arm-android\fcl-xml\)
+SEARCH_DIR(C:\laz4android1346592\fpc\2.7.1\units\arm-android\fcl-stl\)
+SEARCH_DIR(C:\laz4android1346592\fpc\2.7.1\units\arm-android\fcl-sound\)
+SEARCH_DIR(C:\laz4android1346592\fpc\2.7.1\units\arm-android\fcl-sdo\)
+SEARCH_DIR(C:\laz4android1346592\fpc\2.7.1\units\arm-android\fcl-res\)
+SEARCH_DIR(C:\laz4android1346592\fpc\2.7.1\units\arm-android\fcl-registry\)
+SEARCH_DIR(C:\laz4android1346592\fpc\2.7.1\units\arm-android\fcl-process\)
+SEARCH_DIR(C:\laz4android1346592\fpc\2.7.1\units\arm-android\fcl-passrc\)
+SEARCH_DIR(C:\laz4android1346592\fpc\2.7.1\units\arm-android\fcl-net\)
+SEARCH_DIR(C:\laz4android1346592\fpc\2.7.1\units\arm-android\fcl-json\)
+SEARCH_DIR(C:\laz4android1346592\fpc\2.7.1\units\arm-android\fcl-js\)
+SEARCH_DIR(C:\laz4android1346592\fpc\2.7.1\units\arm-android\fcl-image\)
+SEARCH_DIR(C:\laz4android1346592\fpc\2.7.1\units\arm-android\fcl-fpcunit\)
+SEARCH_DIR(C:\laz4android1346592\fpc\2.7.1\units\arm-android\fcl-extra\)
+SEARCH_DIR(C:\laz4android1346592\fpc\2.7.1\units\arm-android\fcl-db\)
+SEARCH_DIR(C:\laz4android1346592\fpc\2.7.1\units\arm-android\fcl-base\)
+SEARCH_DIR(C:\laz4android1346592\fpc\2.7.1\units\arm-android\fcl-async\)
+SEARCH_DIR(C:\laz4android1346592\fpc\2.7.1\units\arm-android\fastcgi\)
+SEARCH_DIR(C:\laz4android1346592\fpc\2.7.1\units\arm-android\dblib\)
+SEARCH_DIR(C:\laz4android1346592\fpc\2.7.1\units\arm-android\chm\)
+SEARCH_DIR(C:\laz4android1346592\fpc\2.7.1\units\arm-android\bzip2\)
+SEARCH_DIR(C:\laz4android1346592\fpc\2.7.1\units\arm-android\)
+SEARCH_DIR(C:\laz4android1346592\fpc\2.7.1\bin\i386-win32\)
+VERSION
+{
+  {
+    global:
+      Java_com_example_appswitchbuttondemo1_Controls_pOnWebViewStatus;
+      Java_com_example_appswitchbuttondemo1_Controls_pOnTouch;
+      Java_com_example_appswitchbuttondemo1_Controls_pOnTimer;
+      Java_com_example_appswitchbuttondemo1_Controls_pOnSpinnerItemSeleceted;
+      Java_com_example_appswitchbuttondemo1_Controls_pOnLocationStatusChanged;
+      Java_com_example_appswitchbuttondemo1_Controls_pOnLocationProviderEnabled;
+      Java_com_example_appswitchbuttondemo1_Controls_pOnLocationProviderDisabled;
+      Java_com_example_appswitchbuttondemo1_Controls_pOnLocationChanged;
+      Java_com_example_appswitchbuttondemo1_Controls_pOnGLRenderer;
+      Java_com_example_appswitchbuttondemo1_Controls_pOnEnter;
+      Java_com_example_appswitchbuttondemo1_Controls_pOnDraw;
+      Java_com_example_appswitchbuttondemo1_Controls_pOnCustomDialogShow;
+      Java_com_example_appswitchbuttondemo1_Controls_pOnClose;
+      Java_com_example_appswitchbuttondemo1_Controls_pOnClickWidgetItem;
+      Java_com_example_appswitchbuttondemo1_Controls_pOnClickToggleButton;
+      Java_com_example_appswitchbuttondemo1_Controls_pOnClickGridItem;
+      Java_com_example_appswitchbuttondemo1_Controls_pOnClickCaptionItem;
+      Java_com_example_appswitchbuttondemo1_Controls_pOnClick;
+      Java_com_example_appswitchbuttondemo1_Controls_pOnChanged;
+      Java_com_example_appswitchbuttondemo1_Controls_pOnChangeSwitchButton;
+      Java_com_example_appswitchbuttondemo1_Controls_pOnChange;
+      Java_com_example_appswitchbuttondemo1_Controls_pOnBluetoothServerSocketWritingMessage;
+      Java_com_example_appswitchbuttondemo1_Controls_pOnBluetoothServerSocketListen;
+      Java_com_example_appswitchbuttondemo1_Controls_pOnBluetoothServerSocketIncomingMessage;
+      Java_com_example_appswitchbuttondemo1_Controls_pOnBluetoothServerSocketConnected;
+      Java_com_example_appswitchbuttondemo1_Controls_pOnBluetoothEnabled;
+      Java_com_example_appswitchbuttondemo1_Controls_pOnBluetoothDiscoveryStarted;
+      Java_com_example_appswitchbuttondemo1_Controls_pOnBluetoothDiscoveryFinished;
+      Java_com_example_appswitchbuttondemo1_Controls_pOnBluetoothDisabled;
+      Java_com_example_appswitchbuttondemo1_Controls_pOnBluetoothDeviceFound;
+      Java_com_example_appswitchbuttondemo1_Controls_pOnBluetoothDeviceBondStateChanged;
+      Java_com_example_appswitchbuttondemo1_Controls_pOnBluetoothClientSocketWritingMessage;
+      Java_com_example_appswitchbuttondemo1_Controls_pOnBluetoothClientSocketIncomingMessage;
+      Java_com_example_appswitchbuttondemo1_Controls_pOnBluetoothClientSocketConnected;
+      Java_com_example_appswitchbuttondemo1_Controls_pOnAsyncEvent;
+      Java_com_example_appswitchbuttondemo1_Controls_pOnActionBarTabUnSelected;
+      Java_com_example_appswitchbuttondemo1_Controls_pOnActionBarTabSelected;
+      Java_com_example_appswitchbuttondemo1_Controls_pAppOnViewClick;
+      Java_com_example_appswitchbuttondemo1_Controls_pAppOnStop;
+      Java_com_example_appswitchbuttondemo1_Controls_pAppOnStart;
+      Java_com_example_appswitchbuttondemo1_Controls_pAppOnScreenStyle;
+      Java_com_example_appswitchbuttondemo1_Controls_pAppOnRotate;
+      Java_com_example_appswitchbuttondemo1_Controls_pAppOnResume;
+      Java_com_example_appswitchbuttondemo1_Controls_pAppOnRestart;
+      Java_com_example_appswitchbuttondemo1_Controls_pAppOnPause;
+      Java_com_example_appswitchbuttondemo1_Controls_pAppOnNewIntent;
+      Java_com_example_appswitchbuttondemo1_Controls_pAppOnListItemClick;
+      Java_com_example_appswitchbuttondemo1_Controls_pAppOnDestroy;
+      Java_com_example_appswitchbuttondemo1_Controls_pAppOnCreateOptionsMenu;
+      Java_com_example_appswitchbuttondemo1_Controls_pAppOnCreateContextMenu;
+      Java_com_example_appswitchbuttondemo1_Controls_pAppOnCreate;
+      Java_com_example_appswitchbuttondemo1_Controls_pAppOnConfigurationChanged;
+      Java_com_example_appswitchbuttondemo1_Controls_pAppOnClickOptionMenuItem;
+      Java_com_example_appswitchbuttondemo1_Controls_pAppOnClickContextMenuItem;
+      Java_com_example_appswitchbuttondemo1_Controls_pAppOnBackPressed;
+      Java_com_example_appswitchbuttondemo1_Controls_pAppOnActivityResult;
+      JNI_OnUnload;
+      JNI_OnLoad;
+    local:
+      *;
+  };
+}
+INPUT(
+C:\laz4android1346592\fpc\2.7.1\units\arm-android\rtl\dllprt0.o
+C:\adt32\ndk10\platforms\android-13\arch-arm\usr\lib\crtbegin_so.o
+C:\adt32\eclipse\workspace\AppSwitchButtonDemo1\obj\controls\controls.o
+C:\adt32\eclipse\workspace\AppSwitchButtonDemo1\obj\controls\controls.or
+C:\laz4android1346592\fpc\2.7.1\units\arm-android\rtl\system.o
+C:\laz4android1346592\fpc\2.7.1\units\arm-android\rtl\fpintres.o
+C:\laz4android1346592\fpc\2.7.1\units\arm-android\rtl\objpas.o
+C:\laz4android1346592\fpc\2.7.1\units\arm-android\rtl\classes.o
+C:\laz4android1346592\fpc\2.7.1\units\arm-android\rtl\sysutils.o
+C:\laz4android1346592\components\LazAndroidWizard\lib\arm-android\And_jni.o
+C:\laz4android1346592\components\LazAndroidWizard\lib\arm-android\And_jni_Bridge.o
+C:\laz4android1346592\components\LazAndroidWizard\lib\arm-android\androidwidget.o
+C:\laz4android1346592\components\LazAndroidWizard\lib\arm-android\Laz_And_Controls.o
+C:\laz4android1346592\components\LazAndroidWizard\lib\arm-android\laz_and_controls_events.o
+C:\adt32\eclipse\workspace\AppSwitchButtonDemo1\obj\controls\unit1.o
+C:\laz4android1346592\fpc\2.7.1\units\arm-android\rtl\types.o
+C:\laz4android1346592\fpc\2.7.1\units\arm-android\rtl\typinfo.o
+C:\laz4android1346592\fpc\2.7.1\units\arm-android\rtl\rtlconsts.o
+C:\laz4android1346592\fpc\2.7.1\units\arm-android\rtl\unix.o
+C:\laz4android1346592\fpc\2.7.1\units\arm-android\rtl\errors.o
+C:\laz4android1346592\fpc\2.7.1\units\arm-android\rtl\sysconst.o
+C:\laz4android1346592\fpc\2.7.1\units\arm-android\rtl\unixtype.o
+C:\laz4android1346592\fpc\2.7.1\units\arm-android\rtl\baseunix.o
+C:\laz4android1346592\fpc\2.7.1\units\arm-android\rtl\unixutil.o
+C:\laz4android1346592\fpc\2.7.1\units\arm-android\rtl\math.o
+C:\laz4android1346592\fpc\2.7.1\units\arm-android\fcl-base\custapp.o
+C:\laz4android1346592\components\LazAndroidWizard\lib\arm-android\And_lib_Unzip.o
+C:\laz4android1346592\components\LazAndroidWizard\lib\arm-android\And_bitmap_h.o
+C:\laz4android1346592\fpc\2.7.1\units\arm-android\rtl\ctypes.o
+C:\laz4android1346592\components\LazAndroidWizard\lib\arm-android\customdialog.o
+C:\laz4android1346592\components\LazAndroidWizard\lib\arm-android\bluetooth.o
+C:\laz4android1346592\components\LazAndroidWizard\lib\arm-android\bluetoothclientsocket.o
+C:\laz4android1346592\components\LazAndroidWizard\lib\arm-android\bluetoothserversocket.o
+C:\laz4android1346592\components\LazAndroidWizard\lib\arm-android\spinner.o
+C:\laz4android1346592\components\LazAndroidWizard\lib\arm-android\location.o
+C:\laz4android1346592\components\LazAndroidWizard\lib\arm-android\actionbartab.o
+C:\laz4android1346592\components\LazAndroidWizard\lib\arm-android\togglebutton.o
+C:\laz4android1346592\components\LazAndroidWizard\lib\arm-android\switchbutton.o
+C:\laz4android1346592\components\LazAndroidWizard\lib\arm-android\gridview.o
+)
+INPUT(
+-ljnigraphics
+-lc
+)
+GROUP(
+-lc
+)
+INPUT(
+C:\adt32\ndk10\platforms\android-13\arch-arm\usr\lib\crtend_so.o
+)
+SECTIONS
+{
+  .data           :
+  {
+    KEEP (*(.fpc .fpc.n_version .fpc.n_links))
+  }
+}
+INSERT BEFORE .data1

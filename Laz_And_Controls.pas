@@ -566,6 +566,7 @@ type
     Procedure Refresh;
     Procedure UpdateLayout; override;
   published
+    property Text: string read GetText write SetText;
     property Alignment : TTextAlignment read FTextAlignment write SetTextAlignment;
     property Enabled   : Boolean read FEnabled   write SetEnabled;
     property BackgroundColor     : TARGBColorBridge read FColor     write SetColor;
@@ -644,6 +645,7 @@ type
     property CursorPos : TXY        read GetCursorPos  write SetCursorPos;
     //property Scroller: boolean  read FScroller write SetScroller;
   published
+    property Text: string read GetText write SetText;
     property Alignment: TTextAlignment read FTextAlignment write SetTextAlignment;
     property InputTypeEx : TInputTypeEx read FInputTypeEx write SetInputTypeEx;
     property MaxTextLength : DWord read FMaxTextLength write SetTextMaxLength;
@@ -687,6 +689,7 @@ type
 
     //property jParent: jObject  read  FjPRLayout write SetParent; // Java : Parent Relative Layout
   published
+    property Text: string read GetText write SetText;
     //property Visible   : boolean   read FVisible   write SetVisible;
     property BackgroundColor     : TARGBColorBridge read FColor     write SetColor;
     //property Text      : string    read GetText    write SetText;
@@ -724,6 +727,7 @@ type
 
     //property Parent: jObject  read  FjPRLayout write SetParent; // Java : Parent Relative Layout
   published
+    property Text: string read GetText write SetText;
     //property Visible   : boolean   read FVisible   write SetVisible;
     property BackgroundColor     : TARGBColorBridge read FColor     write SetColor;
     property FontColor : TARGBColorBridge read FFontColor write SetFontColor;
@@ -763,6 +767,7 @@ type
 
     //property Parent: jObject  read  FjPRLayout write SetParent; // Java : Parent Relative Layout
   published
+    property Text: string read GetText write SetText;
     //property Visible   : boolean   read FVisible   write SetVisible;
     property BackgroundColor     : TARGBColorBridge read FColor     write SetColor;
     property FontColor : TARGBColorBridge read FFontColor write SetFontColor;
@@ -877,8 +882,6 @@ type
                     txtItalic,
                     txtItalicAndNormal,
                     txtItalicAndBold);
-
-  TItemLayout = (layImageTextWidget, layWidgetTextImage);
 
   TTextAlign= (alLeft, alCenter, alRight);
 
@@ -2387,6 +2390,9 @@ begin
 
   if  FText <> '' then
     jEditText_setText(FjEnv, FjObject , FText);
+
+  jEditText_DispatchOnChangeEvent(FjEnv, FjObject , True);
+  jEditText_DispatchOnChangedEvent(FjEnv, FjObject , True);
 
 end;
 
@@ -6824,6 +6830,7 @@ Procedure jAsyncTask.Execute;
 begin
   if (FjObject  = nil) and (FInitialized = True) and (FRunning = False) then
   begin
+    Self.UpdateJNI(gApp);
     FjObject := jAsyncTask_Create(FjEnv, FjThis, Self);
     jAsyncTask_SetAutoPublishProgress(FjEnv, FjObject , FAutoPublishProgress);
     jAsyncTask_Execute(FjEnv, FjObject );

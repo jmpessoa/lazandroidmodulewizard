@@ -65,6 +65,24 @@
 	*					*
 	*****************************************
 	
+Version 0.6 - rev. 12 - 10 January 2015 -
+
+	NEW! Added component jToggleButton [Android Bridges Extras]
+	NEW! Demo AppToggleButtonDemo1 [Eclipse project]
+
+	NEW! Added component jSwitchButton [Android Bridges Extras]
+	NEW! Demo AppSwitchButtonDemo1 [Eclipse project]
+
+	NEW! Added component jGridView [Android Bridges Extras] //<<-A suggestion and request by Valmadson
+	NEW! Demo AppGridViewDemo1 [Eclipse project]
+
+	FIXs : Some component lost needless published property "Text"
+		.Please, no panic! When prompt "Read error" [Unknown Property] just choice "Continue Loading"
+		(simulates just one component property change e save it!)
+
+	UPDATED! All Demos updated!
+	
+
 Version 0.6 - rev. 11 - 03 January 2015 -
 
 	.Major Code Reorganization/Cleanup [Pascal and Java sides]: 

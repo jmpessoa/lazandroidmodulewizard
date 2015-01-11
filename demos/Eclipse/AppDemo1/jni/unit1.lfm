@@ -7,8 +7,8 @@ object AndroidModule1: TAndroidModule1
   MarginTop = 0
   MarginRight = 0
   MarginBottom = 0
-  Text = 'AndroidModule1'
   OnCreate = DataModuleCreate
+  Text = 'AndroidModule1'
   ActivityMode = actSplash
   BackgroundColor = colbrWhite
   OnCloseQuery = AndroidModule1CloseQuery
@@ -24,13 +24,13 @@ object AndroidModule1: TAndroidModule1
     MarginTop = 40
     MarginRight = 5
     MarginBottom = 5
-    Text = 'Powered by FPC/Lazarus!'
     Visible = True
     Anchor = jImageView1
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = [rpCenterHorizontal]
     LayoutParamWidth = lpWrapContent
     LayoutParamHeight = lpWrapContent
+    Text = 'Powered by FPC/Lazarus!'
     Alignment = taLeft
     Enabled = True
     BackgroundColor = colbrDefault
@@ -40,7 +40,6 @@ object AndroidModule1: TAndroidModule1
     Id = 0
   end
   object jImageView1: jImageView
-    Tag = 1
     Left = 128
     Top = 208
     Width = 48
@@ -49,7 +48,6 @@ object AndroidModule1: TAndroidModule1
     MarginTop = 0
     MarginRight = 0
     MarginBottom = 0
-    Text = 'jImageView1'
     Visible = True
     PosRelativeToAnchor = []
     PosRelativeToParent = [rpCenterInParent]

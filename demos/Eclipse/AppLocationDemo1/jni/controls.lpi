@@ -43,7 +43,6 @@
       <Unit0>
         <Filename Value="controls.lpr"/>
         <IsPartOfProject Value="True"/>
-        <UnitName Value="controls"/>
       </Unit0>
       <Unit1>
         <Filename Value="unit1.pas"/>
@@ -61,7 +60,7 @@
       <Filename Value="..\libs\armeabi\libcontrols.so"/>
     </Target>
     <SearchPaths>
-      <Libraries Value="C:\adt32\ndk9\platforms\android-14\arch-arm\usr\lib;"/>
+      <Libraries Value="C:\adt32\ndk9\platforms\android-14\arch-arm\usr\lib\"/>
     </SearchPaths>
     <Parsing>
       <SyntaxOptions>
@@ -84,11 +83,7 @@
       </Options>
     </Linking>
     <Other>
-      <CompilerMessages>
-        <MsgFileName Value=""/>
-      </CompilerMessages>
       <CustomOptions Value="-dANDROID -Xd -CpArmV6 -CfSoft -FLC:\adt32\ndk9\platforms\android-14\arch-arm\usr\lib\libdl.so -FUC:\adt32\eclipse\workspace\AppLocationDemo1\obj\Controls -oC:\adt32\eclipse\workspace\AppLocationDemo1\libs\armeabi\libcontrols.so"/>
-      <CompilerPath Value="$(CompPath)"/>
     </Other>
   </CompilerOptions>
   <Debugging>

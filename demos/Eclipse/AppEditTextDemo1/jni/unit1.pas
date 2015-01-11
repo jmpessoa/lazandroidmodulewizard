@@ -44,8 +44,8 @@ end;
 
 procedure TAndroidModule1.AndroidModule1JNIPrompt(Sender: TObject);
 begin
-  jEditText1.DispatchOnChangeEvent(True);   //the trick!
-  jEditText1.DispatchOnChangedEvent(True);   //the trick!
+  //jEditText1.DispatchOnChangeEvent(False);   //the trick!  stop event!
+  //jEditText1.DispatchOnChangedEvent(False);   //the trick! stop event!
 end;
 
 procedure TAndroidModule1.jEditText1Change(Sender: TObject; txt: string;

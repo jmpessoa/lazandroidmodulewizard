@@ -8,6 +8,9 @@ interface
 
 uses 
   Classes,
+  gridview,
+  switchbutton,
+  togglebutton,
   customdialog,
   actionbartab,
   menu,
@@ -35,6 +38,9 @@ implementation
   
 Procedure Register;
 begin
+  {$I jgridview_icon.lrs}
+  {$I jswitchbutton_icon.lrs}
+  {$I jtogglebutton_icon.lrs}
   {$I jcustomdialog_icon.lrs}
   {$I jactionbartab_icon.lrs}
   {$I jmenu_icon.lrs}
@@ -53,6 +59,9 @@ begin
   {$I jmyhello_icon.lrs}
   RegisterComponents('Android Bridges Extra',
     [
+      jGridView,
+      jSwitchButton,
+      jToggleButton,
       jCustomDialog,
       jActionBarTab,
       jMenu,

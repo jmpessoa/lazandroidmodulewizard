@@ -7,8 +7,8 @@ object AndroidModule8: TAndroidModule8
   MarginTop = 0
   MarginRight = 0
   MarginBottom = 0
-  Text = 'AndroidModule8'
   OnCreate = DataModuleCreate
+  Text = 'AndroidModule8'
   ActivityMode = actRecyclable
   BackgroundColor = colbrBlack
   OnCloseQuery = DataModuleCloseQuery
@@ -23,17 +23,18 @@ object AndroidModule8: TAndroidModule8
     MarginTop = 10
     MarginRight = 10
     MarginBottom = 10
-    Text = 'Custom View Demo: Drag the cube'
     Visible = True
     PosRelativeToAnchor = []
     PosRelativeToParent = [rpCenterHorizontal]
     LayoutParamWidth = lpWrapContent
     LayoutParamHeight = lpWrapContent
+    Text = 'Custom View Demo: Drag the cube'
     Alignment = taLeft
     Enabled = True
     BackgroundColor = colbrDefault
     FontColor = colbrMediumSpringGreen
     FontSize = 0
+    TextTypeFace = tfNormal
     Id = 22765
   end
   object jButton1: jButton
@@ -45,13 +46,13 @@ object AndroidModule8: TAndroidModule8
     MarginTop = 5
     MarginRight = 5
     MarginBottom = 5
-    Text = 'Save Image'
     Visible = True
     Anchor = jView1
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = []
     LayoutParamWidth = lpMatchParent
     LayoutParamHeight = lpWrapContent
+    Text = 'Save Image'
     BackgroundColor = colbrDefault
     FontColor = colbrMediumSpringGreen
     FontSize = 0
@@ -59,6 +60,7 @@ object AndroidModule8: TAndroidModule8
     Id = 0
   end
   object jView1: jView
+    Tag = 1
     Left = 8
     Top = 48
     Width = 280
@@ -67,7 +69,6 @@ object AndroidModule8: TAndroidModule8
     MarginTop = 10
     MarginRight = 10
     MarginBottom = 10
-    Text = 'jView1'
     Visible = True
     Anchor = jTextView1
     PosRelativeToAnchor = [raBelow]

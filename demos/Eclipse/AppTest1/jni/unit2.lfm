@@ -21,12 +21,12 @@ object AndroidModule2: TAndroidModule2
     MarginTop = 10
     MarginRight = 10
     MarginBottom = 10
-    Text = 'jScrollView And jImageView demo'
     Visible = True
     PosRelativeToAnchor = []
     PosRelativeToParent = [rpTop, rpCenterHorizontal]
     LayoutParamWidth = lpWrapContent
     LayoutParamHeight = lpWrapContent
+    Text = 'jScrollView And jImageView demo'
     Alignment = taLeft
     Enabled = True
     BackgroundColor = colbrDefault
@@ -40,7 +40,6 @@ object AndroidModule2: TAndroidModule2
     Top = 32
     Width = 287
     Height = 200
-    Text = 'jScrollView1'
     Visible = True
     Anchor = jTextView1
     PosRelativeToAnchor = [raBelow]
@@ -56,7 +55,6 @@ object AndroidModule2: TAndroidModule2
       Top = 5
       Width = 48
       Height = 48
-      Text = 'jImageView1'
       Visible = True
       PosRelativeToAnchor = []
       PosRelativeToParent = [rpTop, rpCenterHorizontal]
@@ -73,7 +71,6 @@ object AndroidModule2: TAndroidModule2
       Top = 61
       Width = 48
       Height = 48
-      Text = 'jImageView2'
       Visible = True
       Anchor = jImageView1
       PosRelativeToAnchor = [raBelow]
@@ -91,7 +88,6 @@ object AndroidModule2: TAndroidModule2
       Top = 117
       Width = 48
       Height = 48
-      Text = 'jImageView3'
       Visible = True
       Anchor = jImageView2
       PosRelativeToAnchor = [raBelow]
@@ -109,7 +105,6 @@ object AndroidModule2: TAndroidModule2
       Top = 173
       Width = 48
       Height = 48
-      Text = 'jImageView4'
       Visible = True
       Anchor = jImageView3
       PosRelativeToAnchor = [raBelow]
@@ -127,7 +122,6 @@ object AndroidModule2: TAndroidModule2
       Top = 229
       Width = 48
       Height = 48
-      Text = 'jImageView5'
       Visible = True
       Anchor = jImageView4
       PosRelativeToAnchor = [raBelow]
@@ -149,13 +143,13 @@ object AndroidModule2: TAndroidModule2
     MarginTop = 4
     MarginRight = 2
     MarginBottom = 4
-    Text = 'Close [Call Back]'
     Visible = True
     Anchor = jEditText1
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = [rpCenterHorizontal]
     LayoutParamWidth = lpHalfOfParent
     LayoutParamHeight = lpWrapContent
+    Text = 'Close [Call Back]'
     BackgroundColor = colbrDefault
     FontColor = colbrDefault
     FontSize = 0
@@ -171,13 +165,13 @@ object AndroidModule2: TAndroidModule2
     MarginTop = 5
     MarginRight = 5
     MarginBottom = 5
-    Text = 'Say Hello:'
     Visible = True
     Anchor = jScrollView1
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = [rpLeft]
     LayoutParamWidth = lpWrapContent
     LayoutParamHeight = lpWrapContent
+    Text = 'Say Hello:'
     Alignment = taLeft
     Enabled = True
     BackgroundColor = colbrDefault
@@ -187,7 +181,6 @@ object AndroidModule2: TAndroidModule2
     Id = 7177152
   end
   object jEditText1: jEditText
-    Tag = 1
     Left = 5
     Top = 264
     Width = 135
@@ -196,13 +189,13 @@ object AndroidModule2: TAndroidModule2
     MarginTop = 10
     MarginRight = 5
     MarginBottom = 10
-    Text = 'Hello!'
     Visible = True
     Anchor = jTextView2
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = [rpLeft]
     LayoutParamWidth = lpHalfOfParent
     LayoutParamHeight = lpWrapContent
+    Text = 'Hello!'
     Alignment = taLeft
     InputTypeEx = itxText
     MaxTextLength = 300
@@ -226,13 +219,13 @@ object AndroidModule2: TAndroidModule2
     MarginTop = 10
     MarginRight = 5
     MarginBottom = 10
-    Text = '144'
     Visible = True
     Anchor = jTextView2
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = [rpRight]
     LayoutParamWidth = lpHalfOfParent
     LayoutParamHeight = lpWrapContent
+    Text = '144'
     Alignment = taLeft
     InputTypeEx = itxText
     MaxTextLength = 300
@@ -255,13 +248,13 @@ object AndroidModule2: TAndroidModule2
     MarginTop = 5
     MarginRight = 5
     MarginBottom = 5
-    Text = 'Number: [Integer]'
     Visible = True
     Anchor = jEditText2
     PosRelativeToAnchor = [raAbove, raAlignLeft]
     PosRelativeToParent = []
     LayoutParamWidth = lpWrapContent
     LayoutParamHeight = lpWrapContent
+    Text = 'Number: [Integer]'
     Alignment = taLeft
     Enabled = True
     BackgroundColor = colbrDefault

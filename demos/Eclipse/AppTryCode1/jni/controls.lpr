@@ -1,5 +1,5 @@
 {hint: save all files to location: C:\adt32\eclipse\workspace\AppTryCode1\jni}
-library controls;  //[by LazAndroidWizard: 1/2/2015 23:13:10]
+library controls;  //[by LazAndroidWizard: 1/11/2015 16:17:16]
  
 {$mode delphi}
  
@@ -431,7 +431,31 @@ begin
   Java_Event_pOnCustomDialogShow(PEnv,this,TObject(pasobj),dialog,title);
 end;
 
-const NativeMethods:array[0..52] of JNINativeMethod = (
+{ Class:     com_example_apptrycode1_Controls
+  Method:    pOnClickToggleButton
+  Signature: (JZ)V }
+procedure pOnClickToggleButton(PEnv: PJNIEnv; this: JObject; pasobj: JLong; state: JBoolean); cdecl;
+begin
+  Java_Event_pOnClickToggleButton(PEnv,this,TObject(pasobj),Boolean(state));
+end;
+
+{ Class:     com_example_apptrycode1_Controls
+  Method:    pOnChangeSwitchButton
+  Signature: (JZ)V }
+procedure pOnChangeSwitchButton(PEnv: PJNIEnv; this: JObject; pasobj: JLong; state: JBoolean); cdecl;
+begin
+  Java_Event_pOnChangeSwitchButton(PEnv,this,TObject(pasobj),Boolean(state));
+end;
+
+{ Class:     com_example_apptrycode1_Controls
+  Method:    pOnClickGridItem
+  Signature: (JILjava/lang/String;)V }
+procedure pOnClickGridItem(PEnv: PJNIEnv; this: JObject; pasobj: JLong; position: JInt; caption: JString); cdecl;
+begin
+  Java_Event_pOnClickGridItem(PEnv,this,TObject(pasobj),position,caption);
+end;
+
+const NativeMethods:array[0..55] of JNINativeMethod = (
    (name:'pAppOnScreenStyle';
     signature:'()I';
     fnPtr:@pAppOnScreenStyle;),
@@ -590,7 +614,16 @@ const NativeMethods:array[0..52] of JNINativeMethod = (
     fnPtr:@pOnActionBarTabUnSelected;),
    (name:'pOnCustomDialogShow';
     signature:'(JLandroid/app/Dialog;Ljava/lang/String;)V';
-    fnPtr:@pOnCustomDialogShow;)
+    fnPtr:@pOnCustomDialogShow;),
+   (name:'pOnClickToggleButton';
+    signature:'(JZ)V';
+    fnPtr:@pOnClickToggleButton;),
+   (name:'pOnChangeSwitchButton';
+    signature:'(JZ)V';
+    fnPtr:@pOnChangeSwitchButton;),
+   (name:'pOnClickGridItem';
+    signature:'(JILjava/lang/String;)V';
+    fnPtr:@pOnClickGridItem;)
 );
 
 function RegisterNativeMethodsArray(PEnv: PJNIEnv; className: PChar; methods: PJNINativeMethod; countMethods:integer):integer;
@@ -623,7 +656,7 @@ begin
      curEnv:= PJNIEnv(PEnv);
      RegisterNativeMethods(curEnv, 'com/example/apptrycode1/Controls');
   end;
-  gVM:= VM;{And_jni_Bridge}
+  gVM:= VM;{AndroidWidget.pas}
 end;
  
 procedure JNI_OnUnload(VM: PJavaVM; reserved: pointer); cdecl;
@@ -636,8 +669,8 @@ begin
   if PEnv <> nil then
   begin
     curEnv:= PJNIEnv(PEnv);
-    (curEnv^).DeleteGlobalRef(curEnv, gjClass{And_jni_Bridge});
-    gVM:= nil;{And_jni_Bridge}
+    (curEnv^).DeleteGlobalRef(curEnv, gjClass);   {AndroidWidget.pas}
+    gVM:= nil;{AndroidWidget.pas}
   end;
   gApp.Terminate;
   FreeAndNil(gApp);
@@ -698,13 +731,16 @@ exports
   pAppOnListItemClick name 'Java_com_example_apptrycode1_Controls_pAppOnListItemClick',
   pOnActionBarTabSelected name 'Java_com_example_apptrycode1_Controls_pOnActionBarTabSelected',
   pOnActionBarTabUnSelected name 'Java_com_example_apptrycode1_Controls_pOnActionBarTabUnSelected',
-  pOnCustomDialogShow name 'Java_com_example_apptrycode1_Controls_pOnCustomDialogShow';
+  pOnCustomDialogShow name 'Java_com_example_apptrycode1_Controls_pOnCustomDialogShow',
+  pOnClickToggleButton name 'Java_com_example_apptrycode1_Controls_pOnClickToggleButton',
+  pOnChangeSwitchButton name 'Java_com_example_apptrycode1_Controls_pOnChangeSwitchButton',
+  pOnClickGridItem name 'Java_com_example_apptrycode1_Controls_pOnClickGridItem';
 
 begin
-  gApp:= jApp.Create(nil);{Laz_And_Controls}
+  gApp:= jApp.Create(nil);{AndroidWidget.pas}
   gApp.Title:= 'My Android Bridges Library';
-  gjAppName:= 'com.example.apptrycode1';{And_jni_Bridge}
-  gjClassName:= 'com/example/apptrycode1/Controls';{And_jni_Bridge}
+  gjAppName:= 'com.example.apptrycode1';{AndroidWidget.pas}
+  gjClassName:= 'com/example/apptrycode1/Controls';{AndroidWidget.pas}
   gApp.AppName:=gjAppName;
   gApp.ClassName:=gjClassName;
   gApp.Initialize;

@@ -7,14 +7,15 @@ object AndroidModule9: TAndroidModule9
   MarginTop = 0
   MarginRight = 0
   MarginBottom = 0
-  Text = 'AndroidModule9'
   OnCreate = DataModuleCreate
+  Text = 'AndroidModule9'
   ActivityMode = actRecyclable
   BackgroundColor = colbrBlack
   OnCloseQuery = DataModuleCloseQuery
   OnRotate = DataModuleRotate
   OnJNIPrompt = DataModuleJNIPrompt
   object jView1: jView
+    Tag = 1
     Left = 8
     Top = 120
     Width = 280
@@ -23,7 +24,6 @@ object AndroidModule9: TAndroidModule9
     MarginTop = 0
     MarginRight = 0
     MarginBottom = 0
-    Text = 'jView1'
     Visible = True
     Anchor = jButton1
     PosRelativeToAnchor = [raBelow]
@@ -45,17 +45,18 @@ object AndroidModule9: TAndroidModule9
     MarginTop = 10
     MarginRight = 10
     MarginBottom = 10
-    Text = 'Direct Bitmap Pixel Access Demo'
     Visible = True
     PosRelativeToAnchor = []
     PosRelativeToParent = [rpCenterHorizontal]
     LayoutParamWidth = lpWrapContent
     LayoutParamHeight = lpWrapContent
+    Text = 'Direct Bitmap Pixel Access Demo'
     Alignment = taLeft
     Enabled = True
     BackgroundColor = colbrDefault
     FontColor = colbrSilver
     FontSize = 0
+    TextTypeFace = tfNormal
     Id = 35711
   end
   object jButton1: jButton
@@ -67,13 +68,13 @@ object AndroidModule9: TAndroidModule9
     MarginTop = 5
     MarginRight = 5
     MarginBottom = 5
-    Text = 'Swap Image'
     Visible = True
     Anchor = jTextView1
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = []
     LayoutParamWidth = lpMatchParent
     LayoutParamHeight = lpWrapContent
+    Text = 'Swap Image'
     BackgroundColor = colbrDefault
     FontColor = colbrDefault
     FontSize = 0

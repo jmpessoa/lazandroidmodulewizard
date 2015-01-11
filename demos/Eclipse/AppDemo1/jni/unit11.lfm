@@ -22,12 +22,12 @@ object AndroidModule11: TAndroidModule11
     MarginTop = 10
     MarginRight = 10
     MarginBottom = 10
-    Text = 'OpenGLES2 Demo'
     Visible = True
     PosRelativeToAnchor = []
     PosRelativeToParent = [rpCenterHorizontal]
     LayoutParamWidth = lpWrapContent
     LayoutParamHeight = lpWrapContent
+    Text = 'OpenGLES2 Demo'
     Alignment = taLeft
     Enabled = True
     BackgroundColor = colbrDefault
@@ -45,13 +45,13 @@ object AndroidModule11: TAndroidModule11
     MarginTop = 5
     MarginRight = 5
     MarginBottom = 5
-    Text = 'Start/Stop'
     Visible = True
     Anchor = jTextView1
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = []
     LayoutParamWidth = lpHalfOfParent
     LayoutParamHeight = lpWrapContent
+    Text = 'Start/Stop'
     BackgroundColor = colbrDefault
     FontColor = colbrDefault
     FontSize = 0
@@ -67,13 +67,13 @@ object AndroidModule11: TAndroidModule11
     MarginTop = 5
     MarginRight = 5
     MarginBottom = 5
-    Text = 'Fast++'
     Visible = True
     Anchor = jButton1
     PosRelativeToAnchor = [raToRightOf, raAlignBaseline]
     PosRelativeToParent = []
     LayoutParamWidth = lpHalfOfParent
     LayoutParamHeight = lpWrapContent
+    Text = 'Fast++'
     BackgroundColor = colbrDefault
     FontColor = colbrDefault
     FontSize = 0
@@ -81,6 +81,7 @@ object AndroidModule11: TAndroidModule11
     Id = 0
   end
   object jCanvasES2_1: jCanvasES2
+    Tag = 1
     Left = 8
     Top = 120
     Width = 287
@@ -89,7 +90,6 @@ object AndroidModule11: TAndroidModule11
     MarginTop = 10
     MarginRight = 10
     MarginBottom = 10
-    Text = 'jCanvasES2_1'
     Visible = True
     Anchor = jButton1
     PosRelativeToAnchor = [raBelow]
@@ -115,13 +115,13 @@ object AndroidModule11: TAndroidModule11
     MarginTop = 5
     MarginRight = 5
     MarginBottom = 5
-    Text = 'Say Hello...'
     Visible = True
     Anchor = jCanvasES2_1
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = []
     LayoutParamWidth = lpMatchParent
     LayoutParamHeight = lpWrapContent
+    Text = 'Say Hello...'
     BackgroundColor = colbrDefault
     FontColor = colbrDefault
     FontSize = 0
@@ -137,13 +137,13 @@ object AndroidModule11: TAndroidModule11
     MarginTop = 10
     MarginRight = 10
     MarginBottom = 10
-    Text = 'Auto: Off'
     Visible = True
     Anchor = jButton3
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = []
     LayoutParamWidth = lpWrapContent
     LayoutParamHeight = lpWrapContent
+    Text = 'Auto: Off'
     Alignment = taLeft
     Enabled = True
     BackgroundColor = colbrDefault
@@ -161,13 +161,13 @@ object AndroidModule11: TAndroidModule11
     MarginTop = 10
     MarginRight = 10
     MarginBottom = 10
-    Text = 'Hint: touch  to move... or Start/Stop'
     Visible = True
     Anchor = jTextView2
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = [rpCenterHorizontal]
     LayoutParamWidth = lpWrapContent
     LayoutParamHeight = lpWrapContent
+    Text = 'Hint: touch  to move... or Start/Stop'
     Alignment = taLeft
     Enabled = True
     BackgroundColor = colbrDefault

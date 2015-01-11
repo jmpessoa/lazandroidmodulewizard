@@ -7,8 +7,8 @@ object AndroidModule1: TAndroidModule1
   MarginTop = 0
   MarginRight = 0
   MarginBottom = 0
-  Text = 'AndroidModule1'
   OnCreate = DataModuleCreate
+  Text = 'AndroidModule1'
   ActivityMode = actMain
   BackgroundColor = colbrBlack
   OnJNIPrompt = DataModuleJNIPrompt
@@ -21,13 +21,13 @@ object AndroidModule1: TAndroidModule1
     MarginTop = 5
     MarginRight = 5
     MarginBottom = 5
-    Text = 'Hello!'
     Visible = True
     Anchor = jTextView1
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = [rpLeft]
     LayoutParamWidth = lpMatchParent
     LayoutParamHeight = lpWrapContent
+    Text = 'Hello!'
     BackgroundColor = colbrDefault
     FontColor = colbrDefault
     FontSize = 0
@@ -35,25 +35,26 @@ object AndroidModule1: TAndroidModule1
     Id = 8505388
   end
   object jTextView1: jTextView
-    Left = 120
-    Top = 40
-    Width = 100
+    Left = 80
+    Top = 32
+    Width = 200
     Height = 40
     MarginLeft = 10
     MarginTop = 10
     MarginRight = 10
     MarginBottom = 10
-    Text = 'jMyHello Demo1'
     Visible = True
     PosRelativeToAnchor = []
     PosRelativeToParent = [rpTop, rpCenterHorizontal]
     LayoutParamWidth = lpWrapContent
     LayoutParamHeight = lpWrapContent
+    Text = 'jMyHello  [Wrapper Java] Demo'
     Alignment = taLeft
     Enabled = True
     BackgroundColor = colbrDefault
     FontColor = colbrSlateBlue
     FontSize = 0
+    TextTypeFace = tfNormal
     Id = 1639469
   end
   object jButton2: jButton
@@ -65,13 +66,13 @@ object AndroidModule1: TAndroidModule1
     MarginTop = 5
     MarginRight = 5
     MarginBottom = 5
-    Text = 'SUM Array of Integer'
     Visible = True
     Anchor = jButton1
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = []
     LayoutParamWidth = lpMatchParent
     LayoutParamHeight = lpWrapContent
+    Text = 'SUM Array of Integer'
     BackgroundColor = colbrDefault
     FontColor = colbrDefault
     FontSize = 0
@@ -87,13 +88,13 @@ object AndroidModule1: TAndroidModule1
     MarginTop = 5
     MarginRight = 5
     MarginBottom = 5
-    Text = 'Uppercase Array of String'
     Visible = True
     Anchor = jButton2
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = []
     LayoutParamWidth = lpMatchParent
     LayoutParamHeight = lpWrapContent
+    Text = 'Uppercase Array of String'
     BackgroundColor = colbrDefault
     FontColor = colbrDefault
     FontSize = 0
@@ -109,13 +110,13 @@ object AndroidModule1: TAndroidModule1
     MarginTop = 5
     MarginRight = 5
     MarginBottom = 5
-    Text = 'Concat Array of String'
     Visible = True
     Anchor = jButton3
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = []
     LayoutParamWidth = lpMatchParent
     LayoutParamHeight = lpWrapContent
+    Text = 'Concat Array of String'
     BackgroundColor = colbrDefault
     FontColor = colbrDefault
     FontSize = 0

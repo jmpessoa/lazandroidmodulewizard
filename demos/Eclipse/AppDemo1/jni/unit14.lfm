@@ -7,8 +7,8 @@ object AndroidModule14: TAndroidModule14
   MarginTop = 0
   MarginRight = 0
   MarginBottom = 0
-  Text = 'AndroidModule14'
   OnCreate = DataModuleCreate
+  Text = 'AndroidModule14'
   ActivityMode = actRecyclable
   BackgroundColor = colbrBlack
   OnCloseQuery = DataModuleCloseQuery
@@ -23,12 +23,12 @@ object AndroidModule14: TAndroidModule14
     MarginTop = 10
     MarginRight = 10
     MarginBottom = 10
-    Text = 'Http/Asyn Task Demo'
     Visible = True
     PosRelativeToAnchor = []
     PosRelativeToParent = [rpCenterHorizontal]
     LayoutParamWidth = lpWrapContent
     LayoutParamHeight = lpWrapContent
+    Text = 'Http/Asyn Task Demo'
     Alignment = taLeft
     Enabled = True
     BackgroundColor = colbrDefault
@@ -46,13 +46,13 @@ object AndroidModule14: TAndroidModule14
     MarginTop = 5
     MarginRight = 5
     MarginBottom = 5
-    Text = 'Http Get/Asyn Start'
     Visible = True
     Anchor = jCheckBox1
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = []
     LayoutParamWidth = lpMatchParent
     LayoutParamHeight = lpWrapContent
+    Text = 'Http Get/Asyn Start'
     BackgroundColor = colbrDefault
     FontColor = colbrLightSteelBlue
     FontSize = 0
@@ -68,7 +68,6 @@ object AndroidModule14: TAndroidModule14
     MarginTop = 10
     MarginRight = 10
     MarginBottom = 10
-    Text = 'jProgressBar1'
     Visible = False
     Anchor = jButton1
     PosRelativeToAnchor = [raBelow]
@@ -90,13 +89,13 @@ object AndroidModule14: TAndroidModule14
     MarginTop = 10
     MarginRight = 10
     MarginBottom = 10
-    Text = 'Memo auto scroll:'
     Visible = True
     Anchor = jProgressBar1
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = [rpLeft]
     LayoutParamWidth = lpWrapContent
     LayoutParamHeight = lpWrapContent
+    Text = 'Memo auto scroll:'
     Alignment = taLeft
     Enabled = True
     BackgroundColor = colbrDefault
@@ -106,7 +105,6 @@ object AndroidModule14: TAndroidModule14
     Id = 69640
   end
   object jEditText1: jEditText
-    Tag = 1
     Left = 8
     Top = 192
     Width = 288
@@ -115,13 +113,13 @@ object AndroidModule14: TAndroidModule14
     MarginTop = 10
     MarginRight = 10
     MarginBottom = 10
-    Text = 'jEditText1'
     Visible = True
     Anchor = jTextView2
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = []
     LayoutParamWidth = lpMatchParent
     LayoutParamHeight = lpOneQuarterOfParent
+    Text = 'jEditText1'
     Alignment = taLeft
     InputTypeEx = itxMultiLine
     MaxTextLength = 3000
@@ -144,13 +142,13 @@ object AndroidModule14: TAndroidModule14
     MarginTop = 10
     MarginRight = 10
     MarginBottom = 10
-    Text = 'Memo with ScrollView'
     Visible = True
     Anchor = jEditText1
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = [rpLeft]
     LayoutParamWidth = lpWrapContent
     LayoutParamHeight = lpWrapContent
+    Text = 'Memo with ScrollView'
     Alignment = taLeft
     Enabled = True
     BackgroundColor = colbrDefault
@@ -164,7 +162,6 @@ object AndroidModule14: TAndroidModule14
     Top = 376
     Width = 288
     Height = 144
-    Text = 'jScrollView1'
     Visible = True
     Anchor = jTextView3
     PosRelativeToAnchor = [raBelow]
@@ -183,12 +180,12 @@ object AndroidModule14: TAndroidModule14
       MarginTop = 10
       MarginRight = 5
       MarginBottom = 10
-      Text = 'jEditText2'
       Visible = True
       PosRelativeToAnchor = []
       PosRelativeToParent = [rpCenterInParent]
       LayoutParamWidth = lpMatchParent
       LayoutParamHeight = lpMatchParent
+      Text = 'jEditText2'
       Alignment = taLeft
       InputTypeEx = itxMultiLine
       MaxTextLength = 3000
@@ -212,13 +209,13 @@ object AndroidModule14: TAndroidModule14
     MarginTop = 5
     MarginRight = 5
     MarginBottom = 5
-    Text = 'Enable Wifi'
     Visible = True
     Anchor = jTextView1
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = [rpLeft]
     LayoutParamWidth = lpWrapContent
     LayoutParamHeight = lpWrapContent
+    Text = 'Enable Wifi'
     BackgroundColor = colbrDefault
     FontColor = colbrLightBlue
     FontSize = 0

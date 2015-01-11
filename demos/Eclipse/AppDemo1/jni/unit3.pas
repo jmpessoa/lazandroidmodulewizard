@@ -30,7 +30,7 @@ type
       jTimer1: jTimer;
       jTimer2: jTimer;
       jTimer3: jTimer;
-      procedure DataModuleActive(Sender: TObject);
+
       procedure DataModuleClose(Sender: TObject);
       procedure DataModuleCloseQuery(Sender: TObject; var CanClose: boolean);
       procedure DataModuleCreate(Sender: TObject);
@@ -164,11 +164,6 @@ begin
   ShowMessage('close form 3');
 end;
 
-procedure TAndroidModule3.DataModuleActive(Sender: TObject);
-begin
-  jTimer3.Enabled:= True;
-end;
-
 procedure TAndroidModule3.DataModuleClose(Sender: TObject);
 begin
   jTimer3.Enabled:= False;
@@ -176,7 +171,7 @@ end;
 
 procedure TAndroidModule3.DataModuleJNIPrompt(Sender: TObject);
 begin
-  //Self.Show;
+  jTimer3.Enabled:= True;
   jEditText1.SetFocus;
 end;
 

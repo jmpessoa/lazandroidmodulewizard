@@ -5,8 +5,7 @@ unit Laz_And_Controls_Events;    //by jmpessoa
 interface
 
 uses
-   Classes, SysUtils, And_jni, And_jni_Bridge, Laz_And_Controls, AndroidWidget, bluetooth, bluetoothclientsocket,
-   bluetoothserversocket, spinner, location, actionbartab, customdialog;
+   Classes, SysUtils, And_jni;
 
    procedure Java_Event_pOnBluetoothEnabled(env: PJNIEnv; this: jobject; Obj: TObject);
    procedure Java_Event_pOnBluetoothDisabled(env: PJNIEnv; this: jobject; Obj: TObject);
@@ -35,9 +34,17 @@ uses
   Procedure Java_Event_pOnActionBarTabUnSelected(env: PJNIEnv; this: jobject; Obj: TObject; view:jObject; title: jString);
   Procedure Java_Event_pOnCustomDialogShow(env: PJNIEnv; this: jobject; Obj: TObject; dialog:jObject; title: jString);
 
+  Procedure Java_Event_pOnClickToggleButton(env: PJNIEnv; this: jobject; Obj: TObject; state: boolean);
 
+  Procedure Java_Event_pOnChangeSwitchButton(env: PJNIEnv; this: jobject; Obj: TObject; state: boolean);
+  Procedure Java_Event_pOnClickGridItem(env: PJNIEnv; this: jobject; Obj: TObject; position: integer; caption: JString);
 
 implementation
+
+uses
+
+   AndroidWidget, bluetooth, bluetoothclientsocket, bluetoothserversocket,
+   spinner, location, actionbartab, customdialog, togglebutton, switchbutton, gridview;
 
 procedure Java_Event_pOnBluetoothEnabled(env: PJNIEnv; this: jobject; Obj: TObject);
 begin
@@ -484,6 +491,48 @@ begin
       pastitle:= string(env^.GetStringUTFChars(Env, title,@_jBoolean) );
     end;
     jCustomDialog(Obj).GenEvent_OnCustomDialogShow(Obj, dialog, pastitle);
+  end;
+end;
+
+Procedure Java_Event_pOnClickToggleButton(env: PJNIEnv; this: jobject; Obj: TObject; state: boolean);
+begin
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+  if Obj is jToggleButton then
+  begin
+    jToggleButton(Obj).UpdateJNI(gApp);
+    jToggleButton(Obj).GenEvent_OnClickToggleButton(Obj, state);
+  end;
+end;
+
+Procedure Java_Event_pOnChangeSwitchButton(env: PJNIEnv; this: jobject; Obj: TObject; state: boolean);
+begin
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+  if Obj is jSwitchButton then
+  begin
+    jSwitchButton(Obj).UpdateJNI(gApp);
+    jSwitchButton(Obj).GenEvent_OnChangeSwitchButton(Obj, state);
+  end;
+end;
+
+Procedure Java_Event_pOnClickGridItem(env: PJNIEnv; this: jobject; Obj: TObject; position: integer; caption: JString);
+var
+   pasCaption: string;
+  _jBoolean: JBoolean;
+begin
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+  if Obj is jGridView then
+  begin
+    jGridView(Obj).UpdateJNI(gApp);
+    pasCaption:= '';
+    if caption <> nil then
+    begin
+      _jBoolean:= JNI_False;
+      pasCaption:= string(env^.GetStringUTFChars(Env, caption,@_jBoolean) );
+    end;
+    jGridView(Obj).GenEvent_OnClickGridItem(Obj, position, pasCaption);
   end;
 end;
 

@@ -65,12 +65,12 @@ end;
 
 procedure TAndroidModule1.DataModuleCreate(Sender: TObject);
 begin
-   Self.OnJNIPrompt:= DataModuleJNIPrompt;
+   //
 end;
 
 procedure TAndroidModule1.DataModuleJNIPrompt(Sender: TObject);
 begin
-  Self.Show;
+  //
 end;
 
 end.

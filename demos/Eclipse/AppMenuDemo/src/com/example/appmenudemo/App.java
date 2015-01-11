@@ -1,6 +1,6 @@
 package com.example.appmenudemo;
 
-//[LazAndroidModuleWizard - Version 0.6 - rev. 11 - 03 January- 2014
+//[LazAndroidModuleWizard - Version 0.6 - rev. 12 - 10 January- 2014
 //
 //[https://github.com/jmpessoa/lazandroidmodulewizard]
 

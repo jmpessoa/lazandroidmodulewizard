@@ -17,6 +17,7 @@ type
       jButton1: jButton;
       jButton2: jButton;
       jButton3: jButton;
+      jButton4: jButton;
       jMediaPlayer1: jMediaPlayer;
       jTextView1: jTextView;
       procedure DataModuleCreate(Sender: TObject);
@@ -24,9 +25,12 @@ type
       procedure jButton1Click(Sender: TObject);
       procedure jButton2Click(Sender: TObject);
       procedure jButton3Click(Sender: TObject);
+      procedure jButton4Click(Sender: TObject);
     private
       {private declarations}
       FIsLoaded: boolean;
+      FVolumeR: real;
+      FVolumeL: real;
     public
       {public declarations}
   end;
@@ -42,6 +46,8 @@ implementation
 
 procedure TAndroidModule1.DataModuleCreate(Sender: TObject);
 begin
+   FVolumeR:= 0.6;
+   FVolumeL:= 0.6;
    FIsLoaded:= False;
    Self.OnJNIPrompt:= DataModuleJNIPrompt;
 end;
@@ -69,13 +75,26 @@ procedure TAndroidModule1.jButton2Click(Sender: TObject);
 begin
    //jMediaPlayer1.SeekTo(0);  //    // play sound from beginning
    jMediaPlayer1.Start();
-   //jMediaPlayer1.SetVolume(1.0, 1.0); //[0.0 ... 1.0]
    ShowMessage('Playing...');
 end;
 
+// 0.0 is silent and 1.0 is maximum volume
 procedure TAndroidModule1.jButton3Click(Sender: TObject);
 begin
-   if jMediaPlayer1.IsPlaying() then jMediaPlayer1.Pause();
+  ShowMessage('Volume ++');
+
+  FVolumeL:= FVolumeL + 0.1;
+  if FVolumeL > 1.0 then FVolumeL:= 1.0;
+
+  FVolumeR:= FVolumeR + 0.1;
+  if FVolumeR > 1.0 then FVolumeR:= 1.0;
+
+  jMediaPlayer1.SetVolume(FVolumeL, FVolumeR);
+end;
+
+procedure TAndroidModule1.jButton4Click(Sender: TObject);
+begin
+  if jMediaPlayer1.IsPlaying() then jMediaPlayer1.Pause();
    ShowMessage('Paused...');
 end;
 

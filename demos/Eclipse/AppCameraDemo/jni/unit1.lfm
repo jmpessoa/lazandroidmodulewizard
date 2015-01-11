@@ -7,8 +7,8 @@ object AndroidModule1: TAndroidModule1
   MarginTop = 0
   MarginRight = 0
   MarginBottom = 0
-  Text = 'AndroidModule1'
   OnCreate = AndroidModule1Create
+  Text = 'AndroidModule1'
   ActivityMode = actMain
   BackgroundColor = colbrDefault
   OnRotate = AndroidModule1Rotate
@@ -23,7 +23,6 @@ object AndroidModule1: TAndroidModule1
     MarginTop = 0
     MarginRight = 0
     MarginBottom = 0
-    Text = 'jPanel1'
     Visible = True
     PosRelativeToAnchor = []
     PosRelativeToParent = [rpTop]
@@ -40,12 +39,12 @@ object AndroidModule1: TAndroidModule1
       MarginTop = 5
       MarginRight = 5
       MarginBottom = 5
-      Text = 'jCamera & jPanel Demo'
       Visible = True
       PosRelativeToAnchor = []
       PosRelativeToParent = [rpTop, rpCenterHorizontal]
       LayoutParamWidth = lpWrapContent
       LayoutParamHeight = lpWrapContent
+      Text = 'jCamera & jPanel Demo'
       Alignment = taLeft
       Enabled = True
       BackgroundColor = colbrDefault
@@ -63,13 +62,13 @@ object AndroidModule1: TAndroidModule1
       MarginTop = 5
       MarginRight = 5
       MarginBottom = 5
-      Text = 'File Name: [*.jpg]'
       Visible = True
       Anchor = jTextView1
       PosRelativeToAnchor = [raBelow]
       PosRelativeToParent = [rpLeft]
       LayoutParamWidth = lpWrapContent
       LayoutParamHeight = lpWrapContent
+      Text = 'File Name: [*.jpg]'
       Alignment = taLeft
       Enabled = True
       BackgroundColor = colbrDefault
@@ -87,7 +86,6 @@ object AndroidModule1: TAndroidModule1
       MarginTop = 4
       MarginRight = 4
       MarginBottom = 4
-      Text = 'jPanel4'
       Visible = True
       Anchor = jTextView2
       PosRelativeToAnchor = [raBelow]
@@ -106,12 +104,12 @@ object AndroidModule1: TAndroidModule1
         MarginTop = 10
         MarginRight = 5
         MarginBottom = 10
-        Text = 'photo1.jpg'
         Visible = True
         PosRelativeToAnchor = []
         PosRelativeToParent = [rpCenterInParent]
         LayoutParamWidth = lpMatchParent
         LayoutParamHeight = lpWrapContent
+        Text = 'photo1.jpg'
         Alignment = taLeft
         InputTypeEx = itxText
         MaxTextLength = 300
@@ -135,7 +133,6 @@ object AndroidModule1: TAndroidModule1
       MarginTop = 4
       MarginRight = 4
       MarginBottom = 4
-      Text = 'jPanel5'
       Visible = True
       PosRelativeToAnchor = []
       PosRelativeToParent = [rpBottom]
@@ -152,12 +149,12 @@ object AndroidModule1: TAndroidModule1
         MarginTop = 4
         MarginRight = 2
         MarginBottom = 4
-        Text = 'Click!'
         Visible = True
         PosRelativeToAnchor = []
         PosRelativeToParent = [rpCenterInParent]
         LayoutParamWidth = lpMatchParent
         LayoutParamHeight = lpWrapContent
+        Text = 'Click!'
         BackgroundColor = colbrDefault
         FontColor = colbrDefault
         FontSize = 0
@@ -175,7 +172,6 @@ object AndroidModule1: TAndroidModule1
     MarginTop = 0
     MarginRight = 0
     MarginBottom = 0
-    Text = 'jPanel2'
     Visible = True
     Anchor = jPanel1
     PosRelativeToAnchor = [raBelow]
@@ -189,7 +185,6 @@ object AndroidModule1: TAndroidModule1
       Top = 48
       Width = 96
       Height = 96
-      Text = 'jView1'
       Visible = True
       PosRelativeToAnchor = []
       PosRelativeToParent = [rpCenterInParent]
@@ -210,7 +205,6 @@ object AndroidModule1: TAndroidModule1
     MarginTop = 0
     MarginRight = 0
     MarginBottom = 0
-    Text = 'jPanel3'
     Visible = True
     Anchor = jPanel2
     PosRelativeToAnchor = [raBelow]
@@ -220,12 +214,10 @@ object AndroidModule1: TAndroidModule1
     BackgroundColor = colbrLemonChiffon
     Id = 0
     object jImageView1: jImageView
-      Tag = 1
       Left = 117
       Top = 112
       Width = 48
       Height = 48
-      Text = 'jImageView1'
       Visible = True
       PosRelativeToAnchor = []
       PosRelativeToParent = []

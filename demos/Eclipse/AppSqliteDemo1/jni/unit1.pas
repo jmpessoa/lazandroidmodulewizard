@@ -55,15 +55,13 @@ implementation
 
 procedure TAndroidModule1.DataModuleCreate(Sender: TObject);
 begin
-  //Self.OnJNIPrompt:= DataModuleJNIPrompt;
+   FInsertInto:= False;
+   FTableName:= 'myTable';
 end;
 
 procedure TAndroidModule1.DataModuleJNIPrompt(Sender: TObject);
 begin
-  FInsertInto:= False;
-  FTableName:= 'myTable';
-  FDatabaseName:= jSqliteDataAccess1.DataBaseName;
-  //Self.Show;
+   FDatabaseName:= jSqliteDataAccess1.DataBaseName;
 end;
 
 procedure TAndroidModule1.jButton1Click(Sender: TObject);

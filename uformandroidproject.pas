@@ -1748,7 +1748,12 @@ begin
   listPascal.Add(' ');
 
   listPascal.Add('implementation');
-
+  listPascal.Add(' ');
+  if Pos('jVisualControl', FProjectModel) > 0  then
+  begin
+  listPascal.Add('uses');
+  listPascal.Add('   customdialog;');
+  end;
   listPascal.Add('  ');
   listPascal.Add('{---------  '+  FJavaClassName +'  --------------}');
   listPascal.Add(' ');
@@ -1880,11 +1885,15 @@ begin
    listPascal.Add('      '+FJavaClassName+'_AddLParamsParentRule(FjEnv, FjObject, GetPositionRelativeToParent(rToP));');
    listPascal.Add('    end;');
    listPascal.Add('  end;');
+   listPascal.Add('  ');
    listPascal.Add('  if Self.Anchor <> nil then Self.AnchorId:= Self.Anchor.Id');
    listPascal.Add('  else Self.AnchorId:= -1; //dummy');
+   listPascal.Add('  ');
    listPascal.Add('  '+FJavaClassName+'_SetLayoutAll(FjEnv, FjObject, Self.AnchorId);');
+   listPascal.Add('  ');
    listPascal.Add('  if  FColor <> colbrDefault then');
    listPascal.Add('    View_SetBackGroundColor(FjEnv, FjObject, GetARGB(FColor));');
+   listPascal.Add('  ');
    listPascal.Add('  View_SetVisible(FjEnv, FjObject, FVisible);');
   end;
   listPascal.Add('end;');
@@ -1965,7 +1974,7 @@ begin
    listPascal.Add('procedure '+FJavaClassName+'.Refresh;');
    listPascal.Add('begin');
    listPascal.Add('  if FInitialized then');
-   listPascal.Add('    jView_Invalidate(FjEnv, FjObject);');
+   listPascal.Add('    View_Invalidate(FjEnv, FjObject);');
    listPascal.Add('end;');
    listPascal.Add('   ');
    listPascal.Add('procedure '+FJavaClassName+'.ClearLayout;');
@@ -2196,7 +2205,7 @@ begin
        strList.Add('   }'); *)
 
      strList.Add('}');
-
+     clipBoard.Clear;
      clipBoard.AsText:= strList.Text;
      strList.Free;
      clipBoard.Free;
@@ -2219,7 +2228,7 @@ begin
      strList.Add('   ');
      strList.Add('   private Context context = null;');
      strList.Add('   private ViewGroup parent   = null;         // parent view');
-     strList.Add('   private LayoutParams lparams;              // layout XYWH ');
+     strList.Add('   private RelativeLayout.LayoutParams lparams;              // layout XYWH ');
      strList.Add('   private OnClickListener onClickListener;   // click event');
      strList.Add('   private Boolean enabled  = true;           // click-touch enabled!');
      strList.Add('   private int lparamsAnchorRule[] = new int[30];');
@@ -2242,7 +2251,7 @@ begin
      strList.Add('      pascalObj = _Self;');
      strList.Add('      controls  = _ctrls;');
      strList.Add('   ');
-     strList.Add('      lparams = new LayoutParams(lparamW, lparamH);');
+     strList.Add('      lparams = new RelativeLayout.LayoutParams(lparamW, lparamH);');
      strList.Add('   ');
      strList.Add('      onClickListener = new OnClickListener(){');
      strList.Add('      /*.*/public void onClick(View view){  //please, do not remove /*.*/ mask for parse invisibility!');
@@ -2344,6 +2353,8 @@ begin
      strList.Add('  //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...');
      strList.Add('  ');
      strList.Add('} //end class');
+     clipBoard.Clear;
+     //ShowMessage(strList.Text);
      clipBoard.AsText:= strList.Text;
      strList.Free;
      clipBoard.Free;

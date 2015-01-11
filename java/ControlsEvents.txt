@@ -52,3 +52,6 @@ pOnActionBarTabUnSelected=Java_Event_pOnActionBarTabUnSelected(PEnv,this,TObject
 pOnCustomDialogShow=Java_Event_pOnCustomDialogShow(PEnv,this,TObject(pasobj),dialog,title);
 pOnChange=Java_Event_pOnChange(PEnv,this,TObject(pasobj),txt,count);
 pOnChanged=Java_Event_pOnChanged(PEnv,this,TObject(pasobj),txt,count);
+pOnClickToggleButton=Java_Event_pOnClickToggleButton(PEnv,this,TObject(pasobj),Boolean(state));
+pOnChangeSwitchButton=Java_Event_pOnChangeSwitchButton(PEnv,this,TObject(pasobj),Boolean(state));
+pOnClickGridItem=Java_Event_pOnClickGridItem(PEnv,this,TObject(pasobj),position,caption);

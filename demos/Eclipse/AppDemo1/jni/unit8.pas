@@ -88,9 +88,7 @@ end;
 
 procedure TAndroidModule8.DataModuleJNIPrompt(Sender: TObject);
 begin
-  P.X:= 135;
-  P.Y:= 135;
- // Self.Show;
+   //
 end;
 
 procedure TAndroidModule8.DataModuleRotate(Sender: TObject; rotate: integer;
@@ -101,12 +99,8 @@ end;
 
 procedure TAndroidModule8.DataModuleCreate(Sender: TObject);
 begin
- (* Self.ActivityMode:= actRecyclable;
-  Self.BackgroundColor:= colbrBlack;
-  //mode delphi
-  Self.OnJNIPrompt:= DataModuleJNIPrompt;
-  Self.OnRotate:= DataModuleRotate;
-  Self.OnCloseQuery:= DataModuleCloseQuery;  *)
+  P.X:= 135;
+  P.Y:= 135;
 end;
 
 procedure TAndroidModule8.DataModuleCloseQuery(Sender: TObject; var CanClose: boolean);

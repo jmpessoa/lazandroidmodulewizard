@@ -7,12 +7,13 @@ object AndroidModule1: TAndroidModule1
   MarginTop = 0
   MarginRight = 0
   MarginBottom = 0
-  Text = 'AndroidModule1'
   OnCreate = DataModuleCreate
+  Text = 'AndroidModule1'
   ActivityMode = actMain
   BackgroundColor = colbrDefault
   OnJNIPrompt = DataModuleJNIPrompt
   object jSpinner1: jSpinner
+    Tag = 1
     Left = 8
     Top = 128
     Width = 287
@@ -21,7 +22,6 @@ object AndroidModule1: TAndroidModule1
     MarginTop = 10
     MarginRight = 10
     MarginBottom = 10
-    Text = 'jSpinner1'
     Visible = True
     Anchor = jTextView2
     PosRelativeToAnchor = [raBelow]
@@ -50,17 +50,18 @@ object AndroidModule1: TAndroidModule1
     MarginTop = 10
     MarginRight = 10
     MarginBottom = 10
-    Text = 'App jSpinner Demo'
     Visible = True
     PosRelativeToAnchor = []
     PosRelativeToParent = [rpTop, rpCenterHorizontal]
     LayoutParamWidth = lpWrapContent
     LayoutParamHeight = lpWrapContent
+    Text = 'App jSpinner Demo'
     Alignment = taLeft
     Enabled = True
     BackgroundColor = colbrDefault
     FontColor = colbrSilver
     FontSize = 0
+    TextTypeFace = tfNormal
     Id = 1581953
   end
   object jButton1: jButton
@@ -72,13 +73,13 @@ object AndroidModule1: TAndroidModule1
     MarginTop = 5
     MarginRight = 5
     MarginBottom = 5
-    Text = 'Show Selected  Item [Spinner 1]'
     Visible = True
     Anchor = jTextView1
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = []
     LayoutParamWidth = lpMatchParent
     LayoutParamHeight = lpWrapContent
+    Text = 'Show Selected  Item [Spinner 1]'
     BackgroundColor = colbrDefault
     FontColor = colbrDefault
     FontSize = 0
@@ -94,7 +95,6 @@ object AndroidModule1: TAndroidModule1
     MarginTop = 10
     MarginRight = 10
     MarginBottom = 10
-    Text = 'jSpinner2'
     Visible = True
     Anchor = jTextView3
     PosRelativeToAnchor = [raBelow]
@@ -125,18 +125,19 @@ object AndroidModule1: TAndroidModule1
     MarginTop = 10
     MarginRight = 10
     MarginBottom = 10
-    Text = 'Last Item as Prompt [False]:'
     Visible = True
     Anchor = jButton1
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = []
     LayoutParamWidth = lpWrapContent
     LayoutParamHeight = lpWrapContent
+    Text = 'Last Item as Prompt [False]:'
     Alignment = taLeft
     Enabled = True
     BackgroundColor = colbrDefault
     FontColor = colbrSilver
     FontSize = 0
+    TextTypeFace = tfNormal
     Id = 2832611
   end
   object jTextView3: jTextView
@@ -148,18 +149,19 @@ object AndroidModule1: TAndroidModule1
     MarginTop = 10
     MarginRight = 10
     MarginBottom = 10
-    Text = 'Last Item as Prompt [True]:'
     Visible = True
     Anchor = jSpinner1
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = []
     LayoutParamWidth = lpWrapContent
     LayoutParamHeight = lpWrapContent
+    Text = 'Last Item as Prompt [True]:'
     Alignment = taLeft
     Enabled = True
     BackgroundColor = colbrDefault
     FontColor = colbrSilver
     FontSize = 0
+    TextTypeFace = tfNormal
     Id = 7712776
   end
 end

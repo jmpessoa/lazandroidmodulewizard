@@ -222,7 +222,8 @@ begin
     packList.LoadFromFile(PathToJavaTemplates+DirectorySeparator+'App.java');
     packList.Strings[0]:= 'package '+ PackageName+';'; //ex. package com.example.appbuttondemo1;
     packList.SaveToFile(PathToJavaClass+DirectorySeparator+'App.java');
-    MemoLog.Add('["App.java"  :: update!]');
+    MemoLog.Add('["App.java"  :: updated!]');
+    ShowMessage('"App.java"  :: updated!');
   end;
 
   //upgrade "Controls.java"
@@ -239,7 +240,8 @@ begin
     packList.LoadFromFile(PathToJavaTemplates+DirectorySeparator+'Controls.java');
     packList.Strings[0]:= 'package '+ PackageName+';'; //ex. package com.example.appbuttondemo1;
     packList.SaveToFile(PathToJavaClass+DirectorySeparator+'Controls.java');
-    MemoLog.Add('["Controls.java"  :: update!]');
+    MemoLog.Add('["Controls.java"  :: updated!]');
+    ShowMessage('"Controls.java"  :: updated!');
   end;
   packList.Free;
 
@@ -274,6 +276,7 @@ begin
     SynMemo2.Add('  gApp.Initialize;');
     SynMemo2.Add('  gApp.CreateForm(TAndroidModule1, AndroidModule1);');
     SynMemo2.Add('end.');
+
     if FileExists(JNIProjectPath+DirectorySeparator+'controls.lpr') then
     begin
       fileList:= TStringList.Create;
@@ -282,24 +285,14 @@ begin
       fileList.Free;
     end;
     SynMemo2.SaveToFile(JNIProjectPath+DirectorySeparator+'controls.lpr');
-    MemoLog.Add('["controls.lpr"  :: update!--> ".so" :: rebuilding!]');
-    RebuildLibrary;
+
+    if MessageDlg('Question', 'Do you wish to re-build ".so" library?', mtConfirmation,[mbYes, mbNo],0) = mrYes then
+    begin
+      MemoLog.Add('["controls.lpr"  :: update!--> ".so" :: rebuilding!]');
+      RebuildLibrary;
+    end;
+
   end;
-  (*
-  strApp:='';
-  if (CheckGroupUpgradeTemplates.Checked[0]) then
-     strApp:=' ["App.java"  :: update!]';
-
-  strControls:='';
-  if (CheckGroupUpgradeTemplates.Checked[1]) then
-     strControls:=' ["Controls.java" :: update!]';
-
-  strProject:='';
-  if (CheckGroupUpgradeTemplates.Checked[2]) then
-     strProject:=' ["controls.lpr" :: update!]->[".so" :: rebuild!]';
-  ShowMessage('The code templates'+strApp+strControls+strProject);
-  *)
-
 end;
 
 procedure TFormUpdateCodeTemplate.ComboBoxSelectProjectChange(Sender: TObject);

@@ -21,8 +21,8 @@
         <HasResources Value="True"/>
         <UnitName Value="unit1"/>
         <IsVisibleTab Value="True"/>
-        <TopLine Value="113"/>
-        <CursorPos X="30" Y="131"/>
+        <TopLine Value="76"/>
+        <CursorPos X="13" Y="117"/>
         <UsageCount Value="96"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>

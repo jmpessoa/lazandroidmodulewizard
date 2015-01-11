@@ -1,6 +1,6 @@
 package com.example.applistviewdemo;
 
-//Lazarus Android Module Wizard - Version 0.6 - rev. 11 - 03 January- 2014
+//Lazarus Android Module Wizard - Version 0.6 - rev. 12 - 10 January - 2014
 //[Form Designer and Components development model!]
 //Author: jmpessoa@hotmail.com
 //https://github.com/jmpessoa/lazandroidmodulewizard
@@ -166,8 +166,10 @@ import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.FrameLayout;
+import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -176,6 +178,8 @@ import android.widget.RadioButton;
 import android.widget.Spinner;
 import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.RelativeLayout.LayoutParams;
+import android.widget.Switch;
+import android.widget.ToggleButton;
 //import android.view.ViewGroup.LayoutParams;
 import android.widget.RelativeLayout;
 import android.widget.ScrollView;
@@ -230,7 +234,8 @@ import android.database.sqlite.SQLiteException;
 import java.lang.reflect.*;
 
 //-------------------------------------------------------------------------
-//Constants
+//Constantstogg
+
 //-------------------------------------------------------------------------
 class Const {
 public static final int TouchDown                   =  0;
@@ -383,12 +388,12 @@ onClickListener = new OnClickListener() {
   }; 
 };
 
-//geric list item click Event
+//geric list item click Event - New Model
 onListItemClickListener = new OnItemClickListener() {
 @Override
 public  void onItemClick(AdapterView<?> parent, View v, int position, long id) {	   
 	 //Log.i("Form_App_ItemListClicklistener","ItemClick!");
-     controls.jAppOnListItemClick(parent, v, position, v.getId());
+     controls.jAppOnListItemClick(parent, v, position, v.getId()); 
 }
 };
 
@@ -2092,7 +2097,7 @@ public  jArrayAdapter(Context context, Controls ctrls,long pasobj, int textViewR
 public  View getView(int position, View v, ViewGroup parent) {
  	
  //new code: by jmpessoa: custom row!	
- if (position >= 0 && (!items.get(position).label.equals("")) ) {
+ if (position >= 0 && ( !items.get(position).label.equals("") ) ) {
 		  
    LinearLayout listLayout = new LinearLayout(ctx);
    
@@ -2389,17 +2394,14 @@ setChoiceMode(ListView.CHOICE_MODE_SINGLE);
 //Init Event
 onItemClickListener = new OnItemClickListener() {
    @Override
-   public  void onItemClick(AdapterView<?> parent, View v, int position, long id) {
-	   
-		 if (highLightSelectedItem) {		 
-			 if (lastSelectedItem > -1) {highlight(lastSelectedItem, textColor);}
-			 highlight(position, highLightColor);
-		 }
-		 
-		 lastSelectedItem = position;
-		 
-     controls.pOnClick(PasObj, (int)id );
-     controls.pOnClickCaptionItem(PasObj, (int)id , alist.get((int)id).label);
+   public  void onItemClick(AdapterView<?> parent, View v, int position, long id) {	   
+	   if (highLightSelectedItem) {		 
+		   if (lastSelectedItem > -1) {highlight(lastSelectedItem, textColor);}
+		   highlight(position, highLightColor);
+	   }		 
+	   lastSelectedItem = position;		
+       controls.pOnClick(PasObj, (int)position );
+       controls.pOnClickCaptionItem(PasObj, (int)position , alist.get((int)position).label);
    }
 };
 
@@ -4551,11 +4553,11 @@ public void SetAutoPublishProgress(boolean value){
     autoPublishProgress = value;
 }
 
-/*
-public void Execute2(){
+
+public void Execute(){
   this.execute();
 }
-*/
+
 
 //Free object except Self, Pascal Code Free the class.
 public  void Free() {
@@ -8869,6 +8871,685 @@ class jCustomDialog extends RelativeLayout {
 } //end class
 
 
+/*Draft java code by "Lazarus Android Module Wizard" [1/6/2015 22:13:32]*/
+/*https://github.com/jmpessoa/lazandroidmodulewizard*/
+/*jVisualControl template*/
+
+class jToggleButton extends ToggleButton /*dummy*/ { //please, fix what GUI object will be extended!
+
+   private long       pascalObj = 0;    // Pascal Object
+   private Controls   controls  = null; // Control Class for events
+
+   private Context context = null;
+   private ViewGroup parent   = null;         // parent view
+   private LayoutParams lparams;              // layout XYWH
+   private OnClickListener onClickListener;   // click event
+   
+   private Boolean enabled  = false;           // click-touch enabled!
+   
+   private int lparamsAnchorRule[] = new int[30];
+   private int countAnchorRule = 0;
+   private int lparamsParentRule[] = new int[30];
+   private int countParentRule = 0;
+   private int lparamH = 100;
+   private int lparamW = 100;
+   private int marginLeft = 0;
+   private int marginTop = 0;
+   private int marginRight = 0;
+   private int marginBottom = 0;
+   private boolean mRemovedFromParent = false;
+   
+   boolean mState = false;   
+
+  //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
+
+   public jToggleButton(Controls _ctrls, long _Self) { //Add more others news "_xxx"p arams if needed!
+      super(_ctrls.activity);
+      context   = _ctrls.activity;
+      pascalObj = _Self;
+      controls  = _ctrls;
+
+      lparams = new LayoutParams(lparamW, lparamH);
+
+      onClickListener = new OnClickListener(){
+    	   
+      /*.*/public void onClick(View view){  //please, do not remove /*.*/ mask for parse invisibility!
+    	      mState = !mState;
+              if (enabled) {
+            	  controls.pOnClickToggleButton(pascalObj, mState);            	
+              }
+           };
+      };
+      setOnClickListener(onClickListener);
+      
+   } //end constructor
+
+   public void jFree() {
+      if (parent != null) { parent.removeView(this); }
+      //free local objects...
+      lparams = null;
+      setOnClickListener(null);
+   }
+
+   public void SetViewParent(ViewGroup _viewgroup) {
+      if (parent != null) { parent.removeView(this); }
+      parent = _viewgroup;
+      parent.addView(this,lparams);
+      mRemovedFromParent = false;
+   }
+
+   public void RemoveFromViewParent() {
+      if (!mRemovedFromParent) {
+         this.setVisibility(android.view.View.INVISIBLE);
+         if (parent != null)
+    	       parent.removeView(this);
+	   mRemovedFromParent = true;
+	}
+      
+   }
+
+   public View GetView() {
+      return this;
+   }
+
+   public void SetLParamWidth(int _w) {
+      lparamW = _w;
+   }
+
+   public void SetLParamHeight(int _h) {
+      lparamH = _h;
+   }
+
+   public void SetLeftTopRightBottomWidthHeight(int _left, int _top, int _right, int _bottom, int _w, int _h) {
+      marginLeft = _left;
+      marginTop = _top;
+      marginRight = _right;
+      marginBottom = _bottom;
+      lparamH = _h;
+      lparamW = _w;
+   }
+
+   public void AddLParamsAnchorRule(int _rule) {
+      lparamsAnchorRule[countAnchorRule] = _rule;
+      countAnchorRule = countAnchorRule + 1;
+   }
+
+   public void AddLParamsParentRule(int _rule) {
+      lparamsParentRule[countParentRule] = _rule;
+      countParentRule = countParentRule + 1;
+   }
+
+   public void SetLayoutAll(int _idAnchor) {
+  	lparams.width  = lparamW;
+	lparams.height = lparamH;
+	lparams.setMargins(marginLeft,marginTop,marginRight,marginBottom);
+	if (_idAnchor > 0) {
+	    for (int i=0; i < countAnchorRule; i++) {
+		lparams.addRule(lparamsAnchorRule[i], _idAnchor);
+	    }
+	}
+      for (int j=0; j < countParentRule; j++) {
+         lparams.addRule(lparamsParentRule[j]);
+      }
+      this.setLayoutParams(lparams);
+   }
+
+   public void ClearLayoutAll() {
+	for (int i=0; i < countAnchorRule; i++) {
+  	   lparams.removeRule(lparamsAnchorRule[i]);
+    	}
+
+	for (int j=0; j < countParentRule; j++) {
+   	   lparams.removeRule(lparamsParentRule[j]);
+	}
+	countAnchorRule = 0;
+	countParentRule = 0;
+   }
+
+   public void SetId(int _id) { //wrapper method pattern ...
+      this.setId(_id);
+   }
+
+  //write others [public] methods code here......
+  //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
+
+   public void SetChecked(boolean _value) {
+	 mState = _value;  
+     this.setChecked(_value);
+   }
+
+   public void SetTextOn(String _caption) {
+     this.setTextOn(_caption);
+   }
+
+   public void SetTextOff(String _caption) {
+     this.setTextOff(_caption);
+   }
+
+   public void Toggle() { //reset toggle button value.
+	 mState = !mState;  
+     this.toggle();
+   }
+   
+   public boolean IsChecked(){
+	  return this.IsChecked();
+  }
+  
+  private int GetDrawableResourceId(String _resName) {   //    ../res/drawable
+		  try {
+		     Class<?> res = R.drawable.class;
+		     Field field = res.getField(_resName);  //"drawableName"
+		     int drawableId = field.getInt(null);
+		     return drawableId;
+		  }
+		  catch (Exception e) {
+		     Log.e("toglebutton", "Failure to get drawable id.", e);
+		     return 0;
+		  }
+  }
+
+  private Drawable GetDrawableResourceById(int _resID) {
+		return (Drawable)( this.controls.activity.getResources().getDrawable(_resID));	
+  } 
+
+  public void SetBackgroundDrawable(String _imageIdentifier) {	  
+     this.setBackgroundDrawable(GetDrawableResourceById(GetDrawableResourceId(_imageIdentifier)));
+  } 
+  
+  public void DispatchOnToggleEvent(boolean _value) {
+	   enabled = _value;
+  }
+
+} //end class
+
+/*Draft java code by "Lazarus Android Module Wizard" [1/8/2015 22:10:35]*/
+/*https://github.com/jmpessoa/lazandroidmodulewizard*/
+/*jVisualControl template*/
+
+class jSwitchButton extends Switch /*API 14*/ { //please, fix what GUI object will be extended!
+
+   private long       pascalObj = 0;    // Pascal Object
+   private Controls   controls  = null; // Control Class for events
+
+   private Context context = null;
+   private ViewGroup parent   = null;         // parent view
+   private LayoutParams lparams;              // layout XYWH
+   
+   private OnCheckedChangeListener onClickListener ;   // click event
+   
+   private Boolean enabled  = false;           // click-touch not enabled!
+   
+   private int lparamsAnchorRule[] = new int[30];
+   private int countAnchorRule = 0;
+   private int lparamsParentRule[] = new int[30];
+   private int countParentRule = 0;
+   private int lparamH = 100;
+   private int lparamW = 100;
+   private int marginLeft = 0;
+   private int marginTop = 0;
+   private int marginRight = 0;
+   private int marginBottom = 0;
+   private boolean mRemovedFromParent = false;
+
+  //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
+
+   public jSwitchButton(Controls _ctrls, long _Self) { //Add more others news "_xxx"p arams if needed!
+      super(_ctrls.activity);
+      context   = _ctrls.activity;
+      pascalObj = _Self;
+      controls  = _ctrls;
+
+      lparams = new LayoutParams(lparamW, lparamH);
+
+      onClickListener = new OnCheckedChangeListener(){
+      /*.*/public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {  //please, do not remove /*.*/ mask for parse invisibility!
+              if (enabled) {
+                 controls.pOnChangeSwitchButton(pascalObj, isChecked); //JNI event onClick!
+              }
+           };
+      };
+      setOnCheckedChangeListener(onClickListener);
+   } //end constructor
+
+   public void jFree() {
+      if (parent != null) { parent.removeView(this); }
+      //free local objects...
+      lparams = null;
+      setOnClickListener(null);
+   }
+
+   public void SetViewParent(ViewGroup _viewgroup) {
+      if (parent != null) { parent.removeView(this); }
+      parent = _viewgroup;
+      parent.addView(this,lparams);
+      mRemovedFromParent = false;
+   }
+
+   public void RemoveFromViewParent() {
+      if (!mRemovedFromParent) {
+         this.setVisibility(android.view.View.INVISIBLE);
+         if (parent != null)
+    	       parent.removeView(this);
+	   mRemovedFromParent = true;
+	}
+   }
+
+   public View GetView() {
+      return this;
+   }
+
+   public void SetLParamWidth(int _w) {
+      lparamW = _w;
+   }
+
+   public void SetLParamHeight(int _h) {
+      lparamH = _h;
+   }
+
+   public void SetLeftTopRightBottomWidthHeight(int _left, int _top, int _right, int _bottom, int _w, int _h) {
+      marginLeft = _left;
+      marginTop = _top;
+      marginRight = _right;
+      marginBottom = _bottom;
+      lparamH = _h;
+      lparamW = _w;
+   }
+
+   public void AddLParamsAnchorRule(int _rule) {
+      lparamsAnchorRule[countAnchorRule] = _rule;
+      countAnchorRule = countAnchorRule + 1;
+   }
+
+   public void AddLParamsParentRule(int _rule) {
+      lparamsParentRule[countParentRule] = _rule;
+      countParentRule = countParentRule + 1;
+   }
+
+   public void SetLayoutAll(int _idAnchor) {
+  	lparams.width  = lparamW;
+	lparams.height = lparamH;
+	lparams.setMargins(marginLeft,marginTop,marginRight,marginBottom);
+	if (_idAnchor > 0) {
+	    for (int i=0; i < countAnchorRule; i++) {
+		lparams.addRule(lparamsAnchorRule[i], _idAnchor);
+	    }
+	}
+      for (int j=0; j < countParentRule; j++) {
+         lparams.addRule(lparamsParentRule[j]);
+      }
+      this.setLayoutParams(lparams);
+   }
+
+   public void ClearLayoutAll() {
+	for (int i=0; i < countAnchorRule; i++) {
+  	   lparams.removeRule(lparamsAnchorRule[i]);
+    	}
+
+	for (int j=0; j < countParentRule; j++) {
+   	   lparams.removeRule(lparamsParentRule[j]);
+	}
+	countAnchorRule = 0;
+	countParentRule = 0;
+   }
+
+   public void SetId(int _id) { //wrapper method pattern ...
+      this.setId(_id);
+   }	   
+   
+  //write others [public] methods code here......
+  //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
+   public void SetTextOff(String _caption) {
+      this.setTextOff(_caption);
+   }	   
+
+   public void SetTextOn(String _caption) {
+	   this.setTextOn(_caption);
+   }
+   
+   public void SetChecked(boolean _state) { 
+      this.setChecked(_state);
+   }
+   
+   public void Toggle() {
+	   this.toggle();
+   }
+   
+   public boolean IsChecked(){
+	  return this.IsChecked();
+   }
+   
+   /*
+   private Drawable GetDrawableResourceById(int _resID) {
+		return (Drawable)( this.controls.activity.getResources().getDrawable(_resID));	
+   }
+   */
+   
+   private int GetDrawableResourceId(String _resName) {   //    ../res/drawable
+		  try {
+		     Class<?> res = R.drawable.class;
+		     Field field = res.getField(_resName);  //"drawableName"
+		     int drawableId = field.getInt(null);
+		     return drawableId;
+		  }
+		  catch (Exception e) {
+		     Log.e("toglebutton", "Failure to get drawable id.", e);
+		     return 0;
+		  }
+   }
+   
+   public void SetThumbIcon(String _thumbIconIdentifier) {	   //Api  16
+	   this.setThumbResource(GetDrawableResourceId(_thumbIconIdentifier));
+   }
+   
+   public void DispatchOnToggleEvent(boolean _value) {
+	   enabled = _value;
+   }
+   
+   /*
+   public void SetShowText(boolean _state) {  //Api 21
+	  this.setShowText(_state);
+   }
+   */
+   
+} //end class
+
+
+class jGridItem{
+	
+	Context ctx;
+	String label;
+	int id;
+	String drawableIdentifier;
+	
+	public  jGridItem(Context context) {
+		ctx = context;
+	}
+}
+
+class jGridViewCustomAdapter extends ArrayAdapter {
+     Context context;
+     
+     private int itemsLayout; 
+     private List <jGridItem> items ;
+     
+     public jGridViewCustomAdapter(Context context, int ResourceId, int itemslayout, List<jGridItem> list) {
+        super(context, ResourceId, list);  //ResourceId/0 or android.R.layout.simple_list_item_1;
+        this.context=context;       
+        items = list;
+        itemsLayout = itemslayout; 
+     }
+      
+     @Override
+     public int getCount() {
+    	//Log.i("count",": "+items.size()); 
+        return items.size();
+     }
+      
+    @Override
+ 	public Object getItem(int position) {
+ 		return null;
+ 	}
+  
+ 	@Override
+ 	public long getItemId(int position) {
+ 		return 0;
+ 	}
+     
+     @Override
+     public View getView(int position, View convertView, ViewGroup parent) {
+    	    	     	
+    	LinearLayout listLayout = new LinearLayout(context);    	
+    	listLayout.setLayoutParams(new GridView.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
+    	      	   
+        RelativeLayout itemLayout = new RelativeLayout(context);            
+        itemLayout.setLayoutParams(new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
+                        
+        TextView textViewTitle = new TextView(context);        
+        
+        ImageView imageViewItem = new ImageView(context);
+        LayoutParams imgParam = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT); //w,h
+        
+        LayoutParams txtParam = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT); //w,h        
+        txtParam.addRule(RelativeLayout.CENTER_HORIZONTAL);
+        if ( this.itemsLayout == 0 ) {
+           imageViewItem.setPadding(25,20,25,40);               	
+           txtParam.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);           
+        }
+        else {
+           imageViewItem.setPadding(25,45,25,20);              
+           txtParam.addRule(RelativeLayout.ALIGN_PARENT_TOP);
+        } 	
+                
+        if ( ! items.get(position).drawableIdentifier.equals("") ) {        	
+        	imageViewItem.setImageResource(GetDrawableResourceId( items.get(position).drawableIdentifier ));        	 
+        	itemLayout.addView(imageViewItem, imgParam);
+        }                
+        
+        if (!items.get(position).label.equals("")) {
+            textViewTitle.setText( items.get(position).label ); //+""+ items.get(position).id          
+            itemLayout.addView(textViewTitle, txtParam);
+        }
+        
+        listLayout.addView(itemLayout);
+        
+        return listLayout;        
+     }
+     
+     private int GetDrawableResourceId(String _resName) {   //    ../res/drawable
+		  try {
+		     Class<?> res = R.drawable.class;
+		     Field field = res.getField(_resName);  //"drawableName"
+		     int drawableId = field.getInt(null);
+		     return drawableId;
+		  }
+		  catch (Exception e) {
+		     Log.e("gridViewItem", "Failure to get drawable id.", e);
+		     return 0;
+		  }
+     }
+     
+     public void SetItemsLayout(int value) {
+    	 itemsLayout = value;
+     }
+
+}
+ 
+/*Draft java code by "Lazarus Android Module Wizard" [1/9/2015 18:20:04]*/
+/*https://github.com/jmpessoa/lazandroidmodulewizard*/
+/*jVisualControl template*/
+
+class jGridView extends GridView /*dummy*/ { //please, fix what GUI object will be extended!
+
+   private long       pascalObj = 0;    // Pascal Object
+   private Controls   controls  = null; // Control Class for events
+
+   private Context context = null;
+   private ViewGroup parent   = null;         // parent view
+   
+   private RelativeLayout.LayoutParams lparams;              // layout XYWH
+   
+   private  OnItemClickListener onItemClickListener;   // click event
+   private Boolean enabled  = true;           // click-touch enabled!
+   private int lparamsAnchorRule[] = new int[30];
+   private int countAnchorRule = 0;
+   private int lparamsParentRule[] = new int[30];
+   private int countParentRule = 0;
+   private int lparamH = 100;
+   private int lparamW = 100;
+   private int marginLeft = 0;
+   private int marginTop = 0;
+   private int marginRight = 0;
+   private int marginBottom = 0;
+   private boolean mRemovedFromParent = false;
+
+   private jGridViewCustomAdapter gridViewCustomeAdapter;
+   private ArrayList<jGridItem>  alist;
+  
+   //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
+   public jGridView(Controls _ctrls, long _Self) { //Add more others news "_xxx"p arams if needed!
+      super(_ctrls.activity);
+      context   = _ctrls.activity;
+      pascalObj = _Self;
+      controls  = _ctrls;
+
+      lparams = new RelativeLayout.LayoutParams(lparamW, lparamH);            
+      alist = new ArrayList<jGridItem>();
+            
+      //Create the Custom Adapter Object      
+      gridViewCustomeAdapter = new jGridViewCustomAdapter(this.controls.activity, android.R.layout.simple_list_item_1, 0, alist);
+      
+      // Set the Adapter to GridView
+      this.setAdapter(gridViewCustomeAdapter);
+
+      onItemClickListener = new  OnItemClickListener(){
+    	  
+      /*.*/public void onItemClick(AdapterView<?> parent, View v, int position, long id){  //please, do not remove /*.*/ mask for parse invisibility!
+              if (enabled) {            	  
+                 controls.pOnClickGridItem(pascalObj, (int)position , alist.get((int)position).label);
+              }
+           };
+      };      
+      
+      this.setOnItemClickListener(onItemClickListener);     
+      this.setNumColumns(android.widget.GridView.AUTO_FIT);  //android.widget.GridView.AUTO_FIT --> -1      
+
+   } //end constructor
+   
+   public void jFree() {
+      if (parent != null) { parent.removeView(this); }
+      //free local objects...
+      lparams = null;      
+      alist.clear();      
+      alist    = null;
+      setAdapter(null);     
+      gridViewCustomeAdapter = null;
+      setOnItemClickListener(null);
+   }
+
+   public void SetViewParent(ViewGroup _viewgroup) {
+      if (parent != null) { parent.removeView(this); }
+      parent = _viewgroup;
+      parent.addView(this,lparams);
+      mRemovedFromParent = false;
+   }
+
+   public void RemoveFromViewParent() {
+      if (!mRemovedFromParent) {
+         this.setVisibility(android.view.View.INVISIBLE);
+         if (parent != null)
+    	       parent.removeView(this);
+	   mRemovedFromParent = true;
+	}
+   }
+
+   public View GetView() {
+      return this;
+   }
+
+   public void SetLParamWidth(int _w) {
+      lparamW = _w;
+   }
+
+   public void SetLParamHeight(int _h) {
+      lparamH = _h;
+   }
+
+   public void SetLeftTopRightBottomWidthHeight(int _left, int _top, int _right, int _bottom, int _w, int _h) {
+      marginLeft = _left;
+      marginTop = _top;
+      marginRight = _right;
+      marginBottom = _bottom;
+      lparamH = _h;
+      lparamW = _w;
+   }
+
+   public void AddLParamsAnchorRule(int _rule) {
+      lparamsAnchorRule[countAnchorRule] = _rule;
+      countAnchorRule = countAnchorRule + 1;
+   }
+
+   public void AddLParamsParentRule(int _rule) {
+      lparamsParentRule[countParentRule] = _rule;
+      countParentRule = countParentRule + 1;
+   }
+
+   public void SetLayoutAll(int _idAnchor) {
+  	 lparams.width  = lparamW;
+	 lparams.height = lparamH;
+	 lparams.setMargins(marginLeft,marginTop,marginRight,marginBottom);
+	 if (_idAnchor > 0) {
+	    for (int i=0; i < countAnchorRule; i++) {
+		lparams.addRule(lparamsAnchorRule[i], _idAnchor);
+	    }
+	 }
+     for (int j=0; j < countParentRule; j++) {
+         lparams.addRule(lparamsParentRule[j]);
+     }
+     this.setLayoutParams(lparams);
+   }
+
+   public void ClearLayoutAll() {
+	   
+	 for (int i=0; i < countAnchorRule; i++) {
+  	   lparams.removeRule(lparamsAnchorRule[i]);
+     }
+
+	 for (int j=0; j < countParentRule; j++) {
+   	   lparams.removeRule(lparamsParentRule[j]);
+	 }
+	
+	 countAnchorRule = 0;
+	 countParentRule = 0;
+   }
+
+   public void SetId(int _id) { //wrapper method pattern ...
+      this.setId(_id);
+   }
+
+  //write others [public] methods code here......
+  //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
+      
+ //by jmpessoa
+   public  void Add(String _item, String _imgIdentifier) {
+   	  jGridItem info = new jGridItem(controls.activity);
+   	  info.label = _item;
+   	  info.drawableIdentifier = _imgIdentifier;
+   	  info.id = alist.size();
+   	  alist.add(info);
+   	  gridViewCustomeAdapter.notifyDataSetChanged();
+   }
+   
+   public void SetNumColumns(int _value) {
+	   if (_value <= 0) 
+          this.setNumColumns(android.widget.GridView.AUTO_FIT);
+	   else
+		   this.setNumColumns(_value);  
+   }
+   
+   public void SetColumnWidth(int _value) {
+	   if (_value > 0) 
+          this.setColumnWidth(_value);
+	   else
+		   this.setNumColumns(40);  
+   }
+      
+   public  void Clear() {
+	   alist.clear();
+	   gridViewCustomeAdapter.notifyDataSetChanged();
+   }
+  
+   public  void Delete(int _index) {
+	   alist.remove(_index);
+	   gridViewCustomeAdapter.notifyDataSetChanged();
+   }
+
+   public void SetItemsLayout(int _value){
+	     //0: image-text  ; 1: text-image
+	   gridViewCustomeAdapter.SetItemsLayout(_value);
+   }
+
+} //end class
+
 //Javas/Pascal Interface Class 
 
 public class Controls {          // <<--------- 
@@ -8955,6 +9636,10 @@ public native void pOnActionBarTabSelected(long pasobj, View view, String title)
 public native void pOnActionBarTabUnSelected(long pasobj, View view, String title);
 public native void pOnCustomDialogShow(long pasobj, Dialog dialog, String title);
 
+public native void pOnClickToggleButton(long pasobj, boolean state);
+public native void pOnChangeSwitchButton(long pasobj, boolean state);
+
+public native void pOnClickGridItem(long pasobj, int position, String caption);
 
 //Load Pascal Library
 static {
@@ -9916,4 +10601,22 @@ public float[] benchMark1 () {
       return (java.lang.Object)(new jCustomDialog(this,_Self));
    }
   
+  
+   public java.lang.Object jToggleButton_jCreate(long _Self) {
+      return (java.lang.Object)(new jToggleButton(this,_Self));
+   }
+  
+
+  
+   public java.lang.Object jSwitchButton_jCreate(long _Self) {
+      return (java.lang.Object)(new jSwitchButton(this,_Self));
+   }
+  
+
+  
+   public java.lang.Object jGridView_jCreate(long _Self) {
+      return (java.lang.Object)(new jGridView(this,_Self));
+   }
+  
+
 }

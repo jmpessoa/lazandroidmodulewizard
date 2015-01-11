@@ -256,6 +256,12 @@ const
 
 type
 
+  TItemLayout = (layImageTextWidget, layWidgetTextImage);
+
+  TToggleState = (tsOff, tsOn);
+
+  TOnClickToggleButton = procedure (Sender: TObject; state: boolean) of Object;
+
   TWidgetItem = (wgNone,wgCheckBox,wgRadioButton,wgButton,wgTextView);
 
   // thierrydijoux - locale type def
@@ -746,6 +752,7 @@ type
     property AcceptChildrenAtDesignTime:boolean read FAcceptChildrenAtDesignTime;
     property Parent: TAndroidWidget read FParent write SetParent;
     property Visible: boolean read FVisible write FVisible;
+    property Text: string read GetText write SetText;
   published
     property Left: integer read FLeft write SetLeft;
     property Top: integer read FTop write SetTop;
@@ -756,8 +763,6 @@ type
     property MarginTop: integer read FMarginTop write SetMarginTop default 3;
     property MarginRight: integer read FMarginRight write SetMarginRight default 3;
     property MarginBottom: integer read FMarginBottom write SetMarginBottom default 3;
-
-    property Text: string read GetText write SetText;  //not here!
   end;
 
   IAndroidWidgetDesigner = interface(IUnknown)
@@ -952,7 +957,7 @@ type
     }
     //--------------------
   published
-
+    property Text: string read GetText write SetText;
     property ActivityMode  : TActivityMode read FActivityMode write FActivityMode;
     property BackgroundColor: TARGBColorBridge  read FColor write SetColor;
 

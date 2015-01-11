@@ -12,7 +12,7 @@ uses
 type
 
 
-  TAndroidModule = class(jForm)            //GUI Module
+  TAndroidModule = class(jForm)            //support Adroid Bridges [components]
   end;
 
   TNoGUIAndroidModule = class(TDataModule) //raw ".so"
@@ -22,26 +22,19 @@ type
   private
     FColor: TARGBColorBridge;
     FFontColor: TARGBColorBridge;
-
     procedure SetColor(color: TARGBColorBridge);
     procedure SetFontColor(color: TARGBColorBridge);
   public
-
     BackGroundColor: TColor;
     TextColor: TColor;
-
-
     MarginBottom: integer;
     MarginLeft: integer;
     MarginRight: integer;
     MarginTop: integer;
-
     Height: integer;
     Width: integer;
-
     constructor Create; virtual;
     procedure Draw(canvas: TCanvas;  txt: string); virtual;
-
     property Color: TARGBColorBridge read FColor write SetColor;
     property FontColor: TARGBColorBridge read FFontColor write SetFontColor;
   end;
@@ -125,6 +118,26 @@ type
   end;
 
   TDraftScrollView = class(TDraftWidget)
+  public
+     constructor Create; override;
+     procedure Draw(canvas: TCanvas; txt: string); override;
+  end;
+
+  TDraftToggleButton = class(TDraftWidget)
+  public
+     OnOff: boolean;
+     constructor Create; override;
+     procedure Draw(canvas: TCanvas; txt: string); override;
+  end;
+
+  TDraftSwitchButton = class(TDraftWidget)
+  public
+     OnOff: boolean;
+     constructor Create; override;
+     procedure Draw(canvas: TCanvas; txt: string); override;
+  end;
+
+  TDraftGridView = class(TDraftWidget)
   public
      constructor Create; override;
      procedure Draw(canvas: TCanvas; txt: string); override;
@@ -260,7 +273,8 @@ function ToTFPColor(colbrColor: TARGBColorBridge):  TFPColor;
 implementation
 
 uses
-   Laz_And_Controls, Laz_And_GLESv2_Canvas, Laz_And_GLESv1_Canvas, Spinner, customdialog;
+   Laz_And_Controls, Laz_And_GLESv2_Canvas, Laz_And_GLESv1_Canvas, Spinner,
+   customdialog, togglebutton, switchbutton, gridview;
 
 procedure Register;
 begin
@@ -477,8 +491,53 @@ procedure TAndroidWidgetMediator.Paint;
           if (AWidget as jScrollView).BackgroundColor = colbrDefault then
              fWidget.Color:= ((AWidget as jScrollView).Parent as jCustomDialog).BackgroundColor;
         end;
-
         fWidget.Draw(LCLForm.Canvas, (AWidget as jScrollView).Text);
+        fWidget.Free;
+      end else if (AWidget is jToggleButton) then
+      begin
+        fWidget:= TDraftToggleButton.Create;
+        fWidget.Height:= AWidget.Height;
+        fWidget.Width:= AWidget.Width;
+        fWidget.MarginLeft:= AWidget.MarginLeft;
+        fWidget.MarginTop:= AWidget.MarginTop;
+        fWidget.MarginRight:= AWidget.MarginRight;
+        fWidget.MarginBottom:= AWidget.MarginBottom;
+        fWidget.Color:= (AWidget as jToggleButton).BackgroundColor;
+        fWidget.FontColor:= colbrGray;
+
+        if (AWidget as jToggleButton).State = tsOff then
+        begin
+         (fWidget as TDraftToggleButton).OnOff:= False;
+          fWidget.Draw(LCLForm.Canvas, (AWidget as jToggleButton).TextOff)
+        end
+        else
+        begin
+          (fWidget as TDraftToggleButton).OnOff:= True;
+          fWidget.Draw(LCLForm.Canvas, (AWidget as jToggleButton).TextOn);
+        end;
+        fWidget.Free;
+      end else if (AWidget is jSwitchButton) then
+      begin
+        fWidget:= TDraftSwitchButton.Create;
+        fWidget.Height:= AWidget.Height;
+        fWidget.Width:= AWidget.Width;
+        fWidget.MarginLeft:= AWidget.MarginLeft;
+        fWidget.MarginTop:= AWidget.MarginTop;
+        fWidget.MarginRight:= AWidget.MarginRight;
+        fWidget.MarginBottom:= AWidget.MarginBottom;
+        fWidget.Color:= (AWidget as jSwitchButton).BackgroundColor;
+        fWidget.FontColor:= colbrGray;
+
+        if (AWidget as jSwitchButton).State = tsOff then
+        begin
+         (fWidget as TDraftSwitchButton).OnOff:= False;
+          fWidget.Draw(LCLForm.Canvas, (AWidget as jSwitchButton).TextOff)
+        end
+        else
+        begin
+          (fWidget as TDraftSwitchButton).OnOff:= True;
+          fWidget.Draw(LCLForm.Canvas, (AWidget as jSwitchButton).TextOn);
+        end;
         fWidget.Free;
 
       end else if (AWidget is jView) then
@@ -496,8 +555,8 @@ procedure TAndroidWidgetMediator.Paint;
         Pen.Color:= clMedGray;
         //FillRect(0,0,AWidget.Width,AWidget.Height);
         Rectangle(0,0,AWidget.Width,AWidget.Height); // outer frame
-        Font.Color:= clMedGray;
-        TextOut(5,4,(AWidget as jVisualControl).Text);
+        //Font.Color:= clMedGray;
+        //TextOut(5,4,(AWidget as jVisualControl).Text);
       end else if (AWidget is jWebView) then
       begin
         fWidget:= TDraftWebView.Create;
@@ -526,7 +585,7 @@ procedure TAndroidWidgetMediator.Paint;
         end;
         Pen.Color:= clMedGray;
         Rectangle(0,0,AWidget.Width,AWidget.Height); // outer frame
-        Font.Color:= clMedGray;
+        //Font.Color:= clMedGray;
         //TextOut(5,4,(AWidget as jVisualControl).Text);
       end else if (AWidget is jCanvasES1) then
       begin
@@ -534,8 +593,8 @@ procedure TAndroidWidgetMediator.Paint;
         Brush.Style:= bsClear;
         Pen.Color:= clMedGray;
         Rectangle(0,0,AWidget.Width,AWidget.Height); // outer frame
-        Font.Color:= clMedGray;
-        TextOut(5,4,(AWidget as jVisualControl).Text);
+        //Font.Color:= clMedGray;
+        //TextOut(5,4,(AWidget as jVisualControl).Text);
 
       end else if (AWidget is jCanvasES2) then
       begin
@@ -543,8 +602,8 @@ procedure TAndroidWidgetMediator.Paint;
          Brush.Style:= bsClear;
          Pen.Color:= clMedGray;
          Rectangle(0,0,AWidget.Width,AWidget.Height); // outer frame
-         Font.Color:= clMedGray;
-         TextOut(5,4,(AWidget as jVisualControl).Text);
+         //Font.Color:= clMedGray;
+         //TextOut(5,4,(AWidget as jVisualControl).Text);
 
       end else if (AWidget is jTextView) then
       begin
@@ -619,11 +678,11 @@ procedure TAndroidWidgetMediator.Paint;
               fWidget.Color:= ((AWidget as jButton).Parent as jPanel).BackgroundColor;
          end;
 
-        if (AWidget as jButton).Parent is jCustomDialog  then
-        begin
-          if (AWidget as jButton).BackgroundColor = colbrDefault then
+         if (AWidget as jButton).Parent is jCustomDialog  then
+         begin
+           if (AWidget as jButton).BackgroundColor = colbrDefault then
              fWidget.Color:= ((AWidget as jButton).Parent as jCustomDialog).BackgroundColor;
-        end;
+         end;
 
          fWidget.Draw(LCLForm.Canvas, (AWidget as jVisualControl).Text);
          fWidget.Free;
@@ -655,19 +714,42 @@ procedure TAndroidWidgetMediator.Paint;
 
          fWidget.Color:= (AWidget as jListView).BackgroundColor;
          fWidget.FontColor:= (AWidget as jListView).FontColor;
-
          if (AWidget as jListView).Parent is jPanel  then
          begin
            if (AWidget as jListView).BackgroundColor = colbrDefault then
               fWidget.Color:= ((AWidget as jListView).Parent as jPanel).BackgroundColor;
          end;
-
-        if (AWidget as jListView).Parent is jCustomDialog  then
-        begin
+         if (AWidget as jListView).Parent is jCustomDialog  then
+         begin
           if (AWidget as jListView).BackgroundColor = colbrDefault then
              fWidget.Color:= ((AWidget as jListView).Parent as jCustomDialog).BackgroundColor;
-        end;
+         end;
+         fWidget.Draw(LCLForm.Canvas, (AWidget as jVisualControl).Text);
+         fWidget.Free;
 
+      end else if (AWidget is jGridView)  then
+      begin
+         fWidget:= TDraftGridView.Create;
+         fWidget.Height:= AWidget.Height;
+         fWidget.Width:= AWidget.Width;
+         fWidget.MarginLeft:= AWidget.MarginLeft;
+         fWidget.MarginTop:= AWidget.MarginTop;
+         fWidget.MarginRight:= AWidget.MarginRight;
+         fWidget.MarginBottom:= AWidget.MarginBottom;
+
+         fWidget.Color:= (AWidget as jGridView).BackgroundColor;
+         //fWidget.FontColor:= (AWidget as jGridView).FontColor;
+
+         if (AWidget as jGridView).Parent is jPanel  then
+         begin
+           if (AWidget as jGridView).BackgroundColor = colbrDefault then
+              fWidget.Color:= ((AWidget as jGridView).Parent as jPanel).BackgroundColor;
+         end;
+         if (AWidget as jGridView).Parent is jCustomDialog  then
+         begin
+          if (AWidget as jGridView).BackgroundColor = colbrDefault then
+             fWidget.Color:= ((AWidget as jGridView).Parent as jCustomDialog).BackgroundColor;
+         end;
          fWidget.Draw(LCLForm.Canvas, (AWidget as jVisualControl).Text);
          fWidget.Free;
       end else if (AWidget is jSpinner) then
@@ -2370,8 +2452,8 @@ begin
   canvas.Pen.Color:= FPColorToTColor(fpcolor);
   // outer frame
   canvas.Rectangle(0,0,Self.Width,Self.Height);
-  canvas.Font.Color:= clBlack;
-  canvas.TextOut(12,8, txt);
+  //canvas.Font.Color:= clBlack;
+  //canvas.TextOut(12,8, txt);
 
 end;
       {TDraftListView}
@@ -2406,9 +2488,9 @@ begin
     canvas.LineTo(Self.MarginLeft-10,Self.MarginTop+i*20);  {x1, y1}
   end;
 
-  canvas.Brush.Style:= bsClear;
-  canvas.Font.Color:= Self.TextColor;
-  canvas.TextOut(5,4, txt);
+  //canvas.Brush.Style:= bsClear;
+  //canvas.Font.Color:= Self.TextColor;
+  //canvas.TextOut(5,4, txt);
 
 end;
       {TDraftImageBtn}
@@ -2538,7 +2620,7 @@ begin
   if SelectedTextColor = clNone then
      canvas.Font.Color:= clMedGray;
 
-  canvas.TextOut(5,4,txt);
+  //canvas.TextOut(5,4,txt);
 
 end;
 
@@ -2575,7 +2657,7 @@ begin
 
  //canvas.Font.Color:= Self.FontColor;
 
- canvas.TextOut(10,6,txt);
+ //canvas.TextOut(10,6,txt);
 end;
 
 {TDraftScrollView}
@@ -2616,9 +2698,252 @@ begin
   canvas.LineTo(Self.Width-20+5,Self.Height-5-25);
 
   //-----
-  canvas.Brush.Style:= bsClear;
-  canvas.TextOut(10,6,txt);
+  //canvas.Brush.Style:= bsClear;
+ // canvas.TextOut(10,6,txt);
 
+end;
+
+  {TDraftToggleButton}
+
+constructor TDraftToggleButton.Create;
+begin
+  inherited Create;
+  BackGroundColor:= clActiveCaption;; //clMenuHighlight;
+end;
+
+procedure TDraftToggleButton.Draw(canvas: TCanvas; txt: string);
+begin
+  canvas.Brush.Color:= Self.BackGroundColor;
+  canvas.Pen.Color:= clWhite;
+  canvas.Font.Color:= Self.TextColor;
+
+  if Self.BackGroundColor = clNone then
+     canvas.Brush.Color:= clSilver; //clMedGray;
+
+  if Self.TextColor = clNone then
+      canvas.Font.Color:= clBlack;
+
+  canvas.FillRect(0,0,Self.Width,Self.Height);
+      // outer frame
+  canvas.Rectangle(0,0,Self.Width,Self.Height);
+
+  canvas.Pen.Color:= clWindowFrame;
+  if Self.OnOff = True then  //on
+  begin
+
+    canvas.Brush.Style:= bsSolid;
+    canvas.Brush.Color:= clSkyBlue;
+    canvas.FillRect(Self.MarginRight-4,
+                    Self.MarginTop-3,
+                    Self.Width-Self.MarginLeft+2,
+                    Self.Height-Self.MarginBottom+3);
+
+    canvas.Brush.Style:= bsClear;
+    canvas.Pen.Color:= clWindowFrame;
+
+     canvas.Line(Self.Width-Self.MarginRight+3, {x2}
+             Self.MarginTop-3,  {y1}
+             Self.Width-Self.MarginRight+3,  {x2}
+             Self.Height-Self.MarginBottom+3); {y2}
+
+     canvas.Line(Self.Width-Self.MarginRight+3, {x2}
+             Self.Height-Self.MarginBottom+3,{y2}
+             Self.MarginLeft-4,                {x1}
+             Self.Height-Self.MarginBottom+3);  {y2}
+
+
+     canvas.Pen.Color:= clWhite;
+     canvas.Line(Self.MarginLeft-4, {x1}
+                   Self.MarginTop-3,  {y1}
+                   Self.MarginLeft-4, {x1}
+                   Self.Height-Self.MarginBottom+3); {y2}
+
+     canvas.Line(Self.Width-Self.MarginRight+3, {x2}
+                Self.MarginTop-3,  {y1}
+                Self.MarginLeft-4, {x1}
+                Self.MarginTop-3);{y1}
+  end
+  else  //off
+  begin
+
+    (*
+    canvas.Brush.Style:= bsSolid;
+    canvas.Brush.Color:= clSkyBlue;
+    canvas.FillRect(Self.MarginRight-4,
+                    Self.MarginTop-3,
+                    Self.Width-Self.MarginLeft+2,
+                    Self.Height-Self.MarginBottom+3);
+
+    *)
+    canvas.Brush.Style:= bsClear;
+    canvas.Pen.Color:= clWindowFrame;
+
+    //V
+    canvas.Line(Self.MarginLeft-4, {x1}
+               Self.MarginTop-3,  {y1}
+               Self.MarginLeft-4, {x1}
+               Self.Height-Self.MarginBottom+3); {y2}
+
+     //H
+    canvas.Line(Self.Width-Self.MarginRight+3, {x2}
+            Self.MarginTop-3,  {y1}
+            Self.MarginLeft-4, {x1}
+            Self.MarginTop-3);{y1}
+
+    canvas.Pen.Color:= clWhite;
+    canvas.Line(Self.Width-Self.MarginRight+3, {x2}
+            Self.MarginTop-3,  {y1}
+            Self.Width-Self.MarginRight+3,  {x2}
+            Self.Height-Self.MarginBottom+3); {y2}
+
+    canvas.Line(Self.Width-Self.MarginRight+3, {x2}
+            Self.Height-Self.MarginBottom+3,{y2}
+            Self.MarginLeft-4,                {x1}
+            Self.Height-Self.MarginBottom+3);  {y2}
+
+
+  end;
+  //canvas.Font.Color:= Self.TextColor;
+  //canvas.TextOut(5,4,txt);
+end;
+
+
+      {TDraftSwitchButton}
+
+constructor TDraftSwitchButton.Create;
+begin
+  inherited Create;
+  BackGroundColor:= clActiveCaption;; //clMenuHighlight;
+end;
+
+procedure TDraftSwitchButton.Draw(canvas: TCanvas; txt: string);
+begin
+  canvas.Brush.Color:= Self.BackGroundColor;
+  canvas.Pen.Color:= clWhite;
+  canvas.Font.Color:= Self.TextColor;
+
+  if Self.BackGroundColor = clNone then
+     canvas.Brush.Color:= clSilver; //clMedGray;
+
+  if Self.TextColor = clNone then
+      canvas.Font.Color:= clBlack;
+
+  canvas.FillRect(0,0,Self.Width,Self.Height);
+      // outer frame
+  canvas.Rectangle(0,0,Self.Width,Self.Height);
+
+  canvas.Pen.Color:= clWindowFrame;
+    //V
+  canvas.Line(Self.MarginLeft-4, {x1}
+               Self.MarginTop-3,  {y1}
+               Self.MarginLeft-4, {x1}
+               Self.Height-Self.MarginBottom+3); {y2}
+
+     //H
+  canvas.Line(Self.Width-Self.MarginRight+3, {x2}
+            Self.MarginTop-3,  {y1}
+            Self.MarginLeft-4, {x1}
+            Self.MarginTop-3);{y1}
+
+  canvas.Pen.Color:= clWhite;
+  canvas.Line(Self.Width-Self.MarginRight+3, {x2}
+            Self.MarginTop-3,  {y1}
+            Self.Width-Self.MarginRight+3,  {x2}
+            Self.Height-Self.MarginBottom+3); {y2}
+
+   canvas.Line(Self.Width-Self.MarginRight+3, {x2}
+            Self.Height-Self.MarginBottom+3,{y2}
+            Self.MarginLeft-4,                {x1}
+            Self.Height-Self.MarginBottom+3);  {y2}
+
+   //tumbl
+  if Self.OnOff = False then  //on
+  begin
+    canvas.Brush.Style:= bsSolid;
+    canvas.FillRect(
+               Self.MarginLeft-1, {x1}
+               Self.MarginTop,
+               Trunc(Self.Width/2),
+               Self.Height-Self.MarginBottom+1);
+
+    canvas.Brush.Style:= bsClear;
+    canvas.Pen.Color:= clWhite; //clWindowFrame
+
+    canvas.Rectangle(
+               Self.MarginLeft-1, {x1}
+               Self.MarginTop,
+               Trunc(Self.Width/2),
+               Self.Height-Self.MarginBottom+1);
+  end
+  else  //True
+  begin
+    canvas.Brush.Style:= bsSolid;
+    canvas.Brush.Color:= clSkyBlue;
+
+    canvas.FillRect(
+               Trunc(Self.Width/2), {x1}
+               Self.MarginTop,
+               Self.Width - Self.MarginRight,
+               Self.Height - Self.MarginBottom+1);
+
+    canvas.Pen.Color:= clWhite; //clWindowFrame
+    canvas.Brush.Style:= bsClear;
+
+    canvas.Rectangle(
+               Trunc(Self.Width/2), {x1}
+               Self.MarginTop,
+               Self.Width - Self.MarginRight,
+               Self.Height - Self.MarginBottom+1);
+  end;
+  //canvas.Font.Color:= Self.TextColor;
+  //canvas.TextOut(5,4,txt);
+end;
+
+
+{TDraftGridView}
+
+constructor TDraftGridView.Create;
+begin
+  inherited Create;
+end;
+
+procedure TDraftGridView.Draw(canvas: TCanvas; txt: string);
+var
+  i, k: integer;
+begin
+
+  canvas.Brush.Color:= Self.BackGroundColor;
+  canvas.Pen.Color:= clActiveCaption;
+
+  if  Self.BackGroundColor = clNone then canvas.Brush.Style:= bsClear;
+
+  canvas.FillRect(0,0,Self.Width,Self.Height);
+  // outer frame
+  canvas.Rectangle(0,0,Self.Width,Self.Height);
+
+  canvas.Brush.Style:= bsSolid;
+
+  canvas.Pen.Color:= clSilver;
+
+  //H lines
+  k:= Trunc((Self.Height-Self.MarginTop-Self.MarginBottom)/70);
+  for i:= 1 to k do
+  begin
+    canvas.MoveTo(Self.Width-Self.MarginRight+10, {x2} Self.MarginTop+i*70); {y1}
+    canvas.LineTo(Self.MarginLeft-10,Self.MarginTop+i*70);  {x1, y1}
+  end;
+
+  //V  lines
+  k:= Trunc((Self.Width-Self.MarginLeft-Self.MarginRight)/70);
+  for i:= 1 to k do
+  begin
+    canvas.MoveTo((Self.MarginLeft-10)+i*70, Self.MarginTop-10);  {x1, y1}
+    canvas.LineTo((Self.MarginLeft-10)+i*70, Self.Height); {y1}
+  end;
+
+  //canvas.Brush.Style:= bs
+  //canvas.Font.Color:= Self.TextColor;
+  //canvas.TextOut(5,4, txt);
 end;
 
 end.

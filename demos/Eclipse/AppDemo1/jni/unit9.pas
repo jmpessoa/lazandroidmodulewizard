@@ -68,21 +68,14 @@ begin
 end;
 
 procedure TAndroidModule9.DataModuleCreate(Sender: TObject);
-begin  //this initialization code is needed here to fix Laz4Andoid  *.lfm parse.... why parse fails?
- (* Self.ActivityMode:= actRecyclable;
-  Self.BackgroundColor:= colbrBlack;
-   //mode delphi
-  Self.OnJNIPrompt:= DataModuleJNIPrompt;
-  Self.OnRotate:= DataModuleRotate;
-  Self.OnCloseQuery:= DataModuleCloseQuery;    *)
-end;
-
-procedure TAndroidModule9.DataModuleJNIPrompt(Sender: TObject);
 begin
   P.X:= 30;
   P.Y:= 30;
   SwapCanMode:= 0;
-  //Self.Show;
+end;
+
+procedure TAndroidModule9.DataModuleJNIPrompt(Sender: TObject);
+begin
   Ratio:= jBitmap1.GetRatio;
 end;
 

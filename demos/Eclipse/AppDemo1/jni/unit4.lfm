@@ -7,8 +7,8 @@ object AndroidModule4: TAndroidModule4
   MarginTop = 0
   MarginRight = 0
   MarginBottom = 0
-  Text = 'AndroidModule4'
   OnCreate = DataModuleCreate
+  Text = 'AndroidModule4'
   ActivityMode = actRecyclable
   BackgroundColor = colbrBlack
   OnCloseQuery = DataModuleCloseQuery
@@ -23,13 +23,13 @@ object AndroidModule4: TAndroidModule4
     MarginTop = 5
     MarginRight = 5
     MarginBottom = 5
-    Text = 'Show System Info'
     Visible = True
     Anchor = jTextView1
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = []
     LayoutParamWidth = lpMatchParent
     LayoutParamHeight = lpWrapContent
+    Text = 'Show System Info'
     BackgroundColor = colbrDefault
     FontColor = colbrLightGrey
     FontSize = 0
@@ -45,12 +45,12 @@ object AndroidModule4: TAndroidModule4
     MarginTop = 10
     MarginRight = 10
     MarginBottom = 10
-    Text = 'Memo and ScrollView Demo'
     Visible = True
     PosRelativeToAnchor = []
     PosRelativeToParent = [rpCenterHorizontal]
     LayoutParamWidth = lpWrapContent
     LayoutParamHeight = lpWrapContent
+    Text = 'Memo and ScrollView Demo'
     Alignment = taLeft
     Enabled = True
     BackgroundColor = colbrDefault
@@ -60,7 +60,6 @@ object AndroidModule4: TAndroidModule4
     Id = 9880053
   end
   object jEditText1: jEditText
-    Tag = 1
     Left = 8
     Top = 104
     Width = 279
@@ -69,13 +68,13 @@ object AndroidModule4: TAndroidModule4
     MarginTop = 10
     MarginRight = 10
     MarginBottom = 10
-    Text = 'jEditText1'
     Visible = True
     Anchor = jButton1
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = []
     LayoutParamWidth = lpMatchParent
     LayoutParamHeight = lpOneFifthOfParent
+    Text = 'jEditText1'
     Alignment = taLeft
     InputTypeEx = itxMultiLine
     MaxTextLength = 800
@@ -94,7 +93,6 @@ object AndroidModule4: TAndroidModule4
     Top = 221
     Width = 279
     Height = 152
-    Text = 'jScrollView1'
     Visible = True
     Anchor = jEditText1
     PosRelativeToAnchor = [raBelow]
@@ -114,12 +112,12 @@ object AndroidModule4: TAndroidModule4
       MarginTop = 10
       MarginRight = 5
       MarginBottom = 10
-      Text = 'jEditText2'
       Visible = True
       PosRelativeToAnchor = []
       PosRelativeToParent = [rpTop]
       LayoutParamWidth = lpMatchParent
       LayoutParamHeight = lpMatchParent
+      Text = 'jEditText2'
       Alignment = taLeft
       InputTypeEx = itxMultiLine
       MaxTextLength = 300

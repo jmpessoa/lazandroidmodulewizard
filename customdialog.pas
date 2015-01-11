@@ -58,6 +58,7 @@ jCustomDialog = class(jVisualControl)
  published
     //property Visible: boolean read FVisible write SetVisible;
     //property Title: string read FTitle write SetTitle;
+    property Text: string read GetText write SetText;
     property IconIdentifier: string read FIconIdentifier write SetIconIdentifier;
     property BackgroundColor: TARGBColorBridge read FColor write SetColor;
     //property OnClick: TOnNotify read FOnClick write FOnClick;

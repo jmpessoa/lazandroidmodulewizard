@@ -7,8 +7,8 @@ object AndroidModule1: TAndroidModule1
   MarginTop = 0
   MarginRight = 0
   MarginBottom = 0
-  Text = 'AndroidModule1'
   OnCreate = DataModuleCreate
+  Text = 'AndroidModule1'
   ActivityMode = actMain
   BackgroundColor = colbrBlack
   object jTextView1: jTextView
@@ -20,17 +20,18 @@ object AndroidModule1: TAndroidModule1
     MarginTop = 10
     MarginRight = 10
     MarginBottom = 10
-    Text = 'jMediaPlayer Demo'
     Visible = True
     PosRelativeToAnchor = []
     PosRelativeToParent = [rpCenterHorizontal]
     LayoutParamWidth = lpWrapContent
     LayoutParamHeight = lpWrapContent
+    Text = 'jMediaPlayer Demo'
     Alignment = taLeft
     Enabled = True
     BackgroundColor = colbrDefault
     FontColor = colbrSilver
     FontSize = 0
+    TextTypeFace = tfNormal
     Id = 2120193
   end
   object jButton1: jButton
@@ -42,13 +43,13 @@ object AndroidModule1: TAndroidModule1
     MarginTop = 5
     MarginRight = 5
     MarginBottom = 5
-    Text = 'Load Music File From Assets'
     Visible = True
     Anchor = jTextView1
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = []
     LayoutParamWidth = lpMatchParent
     LayoutParamHeight = lpWrapContent
+    Text = 'Load Music File From Assets'
     BackgroundColor = colbrDefault
     FontColor = colbrDefault
     FontSize = 0
@@ -64,13 +65,13 @@ object AndroidModule1: TAndroidModule1
     MarginTop = 5
     MarginRight = 5
     MarginBottom = 5
-    Text = 'Play'
     Visible = True
     Anchor = jButton1
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = []
     LayoutParamWidth = lpMatchParent
     LayoutParamHeight = lpWrapContent
+    Text = 'Play'
     BackgroundColor = colbrDefault
     FontColor = colbrDefault
     FontSize = 0
@@ -79,25 +80,47 @@ object AndroidModule1: TAndroidModule1
   end
   object jButton3: jButton
     Left = 8
-    Top = 176
+    Top = 168
     Width = 280
     Height = 40
     MarginLeft = 5
     MarginTop = 5
     MarginRight = 5
     MarginBottom = 5
-    Text = 'Pause'
     Visible = True
     Anchor = jButton2
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = []
     LayoutParamWidth = lpMatchParent
     LayoutParamHeight = lpWrapContent
+    Text = 'Volume ++'
     BackgroundColor = colbrDefault
     FontColor = colbrDefault
     FontSize = 0
     OnClick = jButton3Click
     Id = 1646716
+  end
+  object jButton4: jButton
+    Left = 8
+    Top = 224
+    Width = 280
+    Height = 40
+    MarginLeft = 2
+    MarginTop = 4
+    MarginRight = 2
+    MarginBottom = 4
+    Visible = True
+    Anchor = jButton3
+    PosRelativeToAnchor = [raBelow]
+    PosRelativeToParent = []
+    LayoutParamWidth = lpMatchParent
+    LayoutParamHeight = lpWrapContent
+    Text = 'Pause'
+    BackgroundColor = colbrDefault
+    FontColor = colbrDefault
+    FontSize = 0
+    OnClick = jButton4Click
+    Id = 0
   end
   object jMediaPlayer1: jMediaPlayer
     left = 32

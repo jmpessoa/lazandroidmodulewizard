@@ -7,8 +7,8 @@ object AndroidModule7: TAndroidModule7
   MarginTop = 0
   MarginRight = 0
   MarginBottom = 0
-  Text = 'AndroidModule7'
   OnCreate = DataModuleCreate
+  Text = 'AndroidModule7'
   ActivityMode = actRecyclable
   BackgroundColor = colbrBlack
   OnCloseQuery = DataModuleCloseQuery
@@ -23,12 +23,12 @@ object AndroidModule7: TAndroidModule7
     MarginTop = 10
     MarginRight = 10
     MarginBottom = 10
-    Text = 'Extends Controls Demo'
     Visible = True
     PosRelativeToAnchor = []
     PosRelativeToParent = [rpTop, rpCenterHorizontal]
     LayoutParamWidth = lpWrapContent
     LayoutParamHeight = lpWrapContent
+    Text = 'Extends Controls Demo'
     Alignment = taLeft
     Enabled = True
     BackgroundColor = colbrDefault
@@ -46,7 +46,6 @@ object AndroidModule7: TAndroidModule7
     MarginTop = 10
     MarginRight = 10
     MarginBottom = 10
-    Text = 'jScrollView1'
     Visible = True
     Anchor = jTextView1
     PosRelativeToAnchor = [raBelow]
@@ -62,7 +61,6 @@ object AndroidModule7: TAndroidModule7
       Top = -2
       Width = 48
       Height = 48
-      Text = 'jImageView1'
       Visible = True
       PosRelativeToAnchor = []
       PosRelativeToParent = [rpCenterHorizontal]
@@ -74,12 +72,10 @@ object AndroidModule7: TAndroidModule7
       Id = 7100012
     end
     object jImageView2: jImageView
-      Tag = 1
       Left = 94
       Top = 54
       Width = 48
       Height = 48
-      Text = 'jImageView2'
       Visible = True
       Anchor = jImageView1
       PosRelativeToAnchor = [raBelow]
@@ -97,7 +93,6 @@ object AndroidModule7: TAndroidModule7
       Top = 118
       Width = 48
       Height = 48
-      Text = 'jImageView3'
       Visible = True
       Anchor = jImageView2
       PosRelativeToAnchor = [raBelow]
@@ -115,7 +110,6 @@ object AndroidModule7: TAndroidModule7
       Top = 174
       Width = 48
       Height = 48
-      Text = 'jImageView4'
       Visible = True
       Anchor = jImageView3
       PosRelativeToAnchor = [raBelow]
@@ -133,7 +127,6 @@ object AndroidModule7: TAndroidModule7
       Top = 238
       Width = 48
       Height = 48
-      Text = 'jImageView5'
       Visible = True
       Anchor = jImageView4
       PosRelativeToAnchor = [raBelow]
@@ -155,13 +148,13 @@ object AndroidModule7: TAndroidModule7
     MarginTop = 10
     MarginRight = 10
     MarginBottom = 10
-    Text = 'hint: Scroll to see more images!'
     Visible = True
     Anchor = jScrollView1
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = [rpCenterHorizontal]
     LayoutParamWidth = lpWrapContent
     LayoutParamHeight = lpWrapContent
+    Text = 'hint: Scroll to see more images!'
     Alignment = taLeft
     Enabled = True
     BackgroundColor = colbrDefault
@@ -179,13 +172,13 @@ object AndroidModule7: TAndroidModule7
     MarginTop = 10
     MarginRight = 10
     MarginBottom = 10
-    Text = '<<---- Click it!'
     Visible = True
     Anchor = jImageBtn1
     PosRelativeToAnchor = [raToRightOf, raAlignBottom]
     PosRelativeToParent = []
     LayoutParamWidth = lpWrapContent
     LayoutParamHeight = lpWrapContent
+    Text = '<<---- Click it!'
     Alignment = taLeft
     Enabled = True
     BackgroundColor = colbrDefault
@@ -203,7 +196,6 @@ object AndroidModule7: TAndroidModule7
     MarginTop = 5
     MarginRight = 5
     MarginBottom = 5
-    Text = 'jImageBtn1'
     Visible = True
     Anchor = jTextView2
     PosRelativeToAnchor = [raBelow]

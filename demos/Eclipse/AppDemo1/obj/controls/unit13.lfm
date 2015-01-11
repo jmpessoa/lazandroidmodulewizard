@@ -7,8 +7,8 @@ object AndroidModule13: TAndroidModule13
   MarginTop = 0
   MarginRight = 0
   MarginBottom = 0
-  Text = 'AndroidModule13'
   OnCreate = DataModuleCreate
+  Text = 'AndroidModule13'
   ActivityMode = actRecyclable
   BackgroundColor = colbrBlack
   OnCloseQuery = DataModuleCloseQuery
@@ -23,12 +23,12 @@ object AndroidModule13: TAndroidModule13
     MarginTop = 10
     MarginRight = 10
     MarginBottom = 10
-    Text = 'OpenGLES2 3D Demo'
     Visible = True
     PosRelativeToAnchor = []
     PosRelativeToParent = [rpTop, rpCenterHorizontal]
     LayoutParamWidth = lpWrapContent
     LayoutParamHeight = lpWrapContent
+    Text = 'OpenGLES2 3D Demo'
     Alignment = taLeft
     Enabled = True
     BackgroundColor = colbrDefault
@@ -46,13 +46,13 @@ object AndroidModule13: TAndroidModule13
     MarginTop = 5
     MarginRight = 5
     MarginBottom = 5
-    Text = 'Start/Stop Zoom'
     Visible = True
     Anchor = jTextView1
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = []
     LayoutParamWidth = lpMatchParent
     LayoutParamHeight = lpWrapContent
+    Text = 'Start/Stop Zoom'
     BackgroundColor = colbrDefault
     FontColor = colbrDefault
     FontSize = 0
@@ -68,13 +68,13 @@ object AndroidModule13: TAndroidModule13
     MarginTop = 10
     MarginRight = 10
     MarginBottom = 10
-    Text = 'Auto: Off'
     Visible = True
     Anchor = jCanvasES2_1
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = [rpLeft]
     LayoutParamWidth = lpWrapContent
     LayoutParamHeight = lpWrapContent
+    Text = 'Auto: Off'
     Alignment = taLeft
     Enabled = True
     BackgroundColor = colbrDefault
@@ -92,13 +92,13 @@ object AndroidModule13: TAndroidModule13
     MarginTop = 10
     MarginRight = 10
     MarginBottom = 10
-    Text = 'Hint: touch  to move...'
     Visible = True
     Anchor = jTextView2
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = [rpCenterHorizontal]
     LayoutParamWidth = lpWrapContent
     LayoutParamHeight = lpWrapContent
+    Text = 'Hint: touch  to move...'
     Alignment = taLeft
     Enabled = True
     BackgroundColor = colbrDefault
@@ -108,6 +108,7 @@ object AndroidModule13: TAndroidModule13
     Id = 0
   end
   object jCanvasES2_1: jCanvasES2
+    Tag = 1
     Left = 8
     Top = 120
     Width = 287
@@ -116,7 +117,6 @@ object AndroidModule13: TAndroidModule13
     MarginTop = 10
     MarginRight = 10
     MarginBottom = 10
-    Text = 'jCanvasES2_1'
     Visible = True
     Anchor = jButton1
     PosRelativeToAnchor = [raBelow]

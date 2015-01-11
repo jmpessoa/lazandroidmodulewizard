@@ -7,8 +7,8 @@ object AndroidModule10: TAndroidModule10
   MarginTop = 0
   MarginRight = 0
   MarginBottom = 0
-  Text = 'AndroidModule10'
   OnCreate = DataModuleCreate
+  Text = 'AndroidModule10'
   ActivityMode = actRecyclable
   BackgroundColor = colbrBlack
   OnCloseQuery = AndroidModule10CloseQuery
@@ -23,12 +23,12 @@ object AndroidModule10: TAndroidModule10
     MarginTop = 10
     MarginRight = 10
     MarginBottom = 10
-    Text = 'OpenGLES_v1 *2D* Demo'
     Visible = True
     PosRelativeToAnchor = []
     PosRelativeToParent = [rpCenterHorizontal]
     LayoutParamWidth = lpWrapContent
     LayoutParamHeight = lpWrapContent
+    Text = 'OpenGLES_v1 *2D* Demo'
     Alignment = taLeft
     Enabled = True
     BackgroundColor = colbrDefault
@@ -38,6 +38,7 @@ object AndroidModule10: TAndroidModule10
     Id = 19240
   end
   object jCanvasES1_1: jCanvasES1
+    Tag = 1
     Left = 8
     Top = 120
     Width = 287
@@ -46,7 +47,6 @@ object AndroidModule10: TAndroidModule10
     MarginTop = 10
     MarginRight = 10
     MarginBottom = 10
-    Text = 'jCanvasES1_1'
     Visible = True
     Anchor = jButton1
     PosRelativeToAnchor = [raBelow]
@@ -69,13 +69,13 @@ object AndroidModule10: TAndroidModule10
     MarginTop = 5
     MarginRight = 5
     MarginBottom = 5
-    Text = 'Fast--'
     Visible = True
     Anchor = jTextView1
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = [rpLeft]
     LayoutParamWidth = lpHalfOfParent
     LayoutParamHeight = lpWrapContent
+    Text = 'Fast--'
     BackgroundColor = colbrDefault
     FontColor = colbrDefault
     FontSize = 0
@@ -91,13 +91,13 @@ object AndroidModule10: TAndroidModule10
     MarginTop = 5
     MarginRight = 5
     MarginBottom = 5
-    Text = 'Fast++'
     Visible = True
     Anchor = jButton1
     PosRelativeToAnchor = [raToRightOf, raAlignBaseline]
     PosRelativeToParent = []
     LayoutParamWidth = lpHalfOfParent
     LayoutParamHeight = lpWrapContent
+    Text = 'Fast++'
     BackgroundColor = colbrDefault
     FontColor = colbrDefault
     FontSize = 0
@@ -113,13 +113,13 @@ object AndroidModule10: TAndroidModule10
     MarginTop = 5
     MarginRight = 5
     MarginBottom = 5
-    Text = 'Say Hello...'
     Visible = True
     Anchor = jCanvasES1_1
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = []
     LayoutParamWidth = lpMatchParent
     LayoutParamHeight = lpWrapContent
+    Text = 'Say Hello...'
     BackgroundColor = colbrDefault
     FontColor = colbrDefault
     FontSize = 0

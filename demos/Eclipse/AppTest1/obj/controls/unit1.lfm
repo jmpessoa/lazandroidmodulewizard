@@ -21,7 +21,6 @@ object AndroidModule1: TAndroidModule1
     MarginTop = 0
     MarginRight = 0
     MarginBottom = 0
-    Text = 'jPanel1'
     Visible = True
     PosRelativeToAnchor = []
     PosRelativeToParent = [rpTop]
@@ -38,12 +37,12 @@ object AndroidModule1: TAndroidModule1
       MarginTop = 5
       MarginRight = 5
       MarginBottom = 5
-      Text = 'GUI form designer Demo'
       Visible = True
       PosRelativeToAnchor = []
       PosRelativeToParent = [rpTop, rpCenterHorizontal]
       LayoutParamWidth = lpWrapContent
       LayoutParamHeight = lpWrapContent
+      Text = 'GUI form designer Demo'
       Alignment = taLeft
       Enabled = True
       BackgroundColor = colbrDefault
@@ -61,13 +60,13 @@ object AndroidModule1: TAndroidModule1
       MarginTop = 5
       MarginRight = 5
       MarginBottom = 5
-      Text = 'Item Name:'
       Visible = True
       Anchor = jTextView1
       PosRelativeToAnchor = [raBelow]
       PosRelativeToParent = [rpLeft]
       LayoutParamWidth = lpMatchParent
       LayoutParamHeight = lpWrapContent
+      Text = 'Item Name:'
       Alignment = taLeft
       Enabled = True
       BackgroundColor = colbrDefault
@@ -85,7 +84,6 @@ object AndroidModule1: TAndroidModule1
       MarginTop = 4
       MarginRight = 4
       MarginBottom = 4
-      Text = 'jPanel3'
       Visible = True
       Anchor = jTextView2
       PosRelativeToAnchor = [raBelow]
@@ -95,7 +93,6 @@ object AndroidModule1: TAndroidModule1
       BackgroundColor = colbrOrange
       Id = 8563928
       object jEditText1: jEditText
-        Tag = 1
         Left = -1
         Top = 1
         Width = 268
@@ -104,12 +101,12 @@ object AndroidModule1: TAndroidModule1
         MarginTop = 10
         MarginRight = 4
         MarginBottom = 10
-        Text = 'Item 1'
         Visible = True
         PosRelativeToAnchor = []
         PosRelativeToParent = [rpCenterInParent]
         LayoutParamWidth = lpMatchParent
         LayoutParamHeight = lpWrapContent
+        Text = 'Item 1'
         Alignment = taLeft
         InputTypeEx = itxText
         MaxTextLength = 300
@@ -133,7 +130,6 @@ object AndroidModule1: TAndroidModule1
       MarginTop = 4
       MarginRight = 4
       MarginBottom = 4
-      Text = 'jPanel4'
       Visible = True
       PosRelativeToAnchor = []
       PosRelativeToParent = [rpBottom, rpLeft]
@@ -150,12 +146,12 @@ object AndroidModule1: TAndroidModule1
         MarginTop = 4
         MarginRight = 2
         MarginBottom = 4
-        Text = 'Add Item'
         Visible = True
         PosRelativeToAnchor = []
         PosRelativeToParent = [rpCenterInParent]
         LayoutParamWidth = lpMatchParent
         LayoutParamHeight = lpWrapContent
+        Text = 'Add Item'
         BackgroundColor = colbrDefault
         FontColor = colbrDefault
         FontSize = 0
@@ -172,7 +168,6 @@ object AndroidModule1: TAndroidModule1
       MarginTop = 4
       MarginRight = 4
       MarginBottom = 4
-      Text = 'jPanel5'
       Visible = True
       PosRelativeToAnchor = []
       PosRelativeToParent = [rpBottom, rpRight]
@@ -189,12 +184,12 @@ object AndroidModule1: TAndroidModule1
         MarginTop = 4
         MarginRight = 2
         MarginBottom = 4
-        Text = 'Open Form 2'
         Visible = True
         PosRelativeToAnchor = []
         PosRelativeToParent = [rpCenterInParent]
         LayoutParamWidth = lpMatchParent
         LayoutParamHeight = lpWrapContent
+        Text = 'Open Form 2'
         BackgroundColor = colbrDefault
         FontColor = colbrDefault
         FontSize = 0
@@ -212,7 +207,6 @@ object AndroidModule1: TAndroidModule1
     MarginTop = 4
     MarginRight = 4
     MarginBottom = 1
-    Text = 'jPanel2'
     Visible = True
     Anchor = jPanel1
     PosRelativeToAnchor = [raBelow]
@@ -226,7 +220,6 @@ object AndroidModule1: TAndroidModule1
       Top = 5
       Width = 274
       Height = 130
-      Text = 'jListView1'
       Visible = True
       PosRelativeToAnchor = []
       PosRelativeToParent = [rpTop]

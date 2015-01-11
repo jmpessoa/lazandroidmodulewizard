@@ -27,8 +27,7 @@ type
       procedure DataModuleJNIPrompt(Sender: TObject);
       procedure DataModuleRotate(Sender: TObject; rotate: integer; var rstRotate: integer);
       procedure jButton1Click(Sender: TObject);
-      procedure jEditText1Change(Sender: TObject; EventType: TChangeType);
-      procedure jEditText1Enter(Sender: TObject);
+
       procedure jWebView1Status(Sender: TObject; Status: TWebViewStatus; URL: String; var CanNavi: Boolean);
     private
       {private declarations}
@@ -98,20 +97,6 @@ begin
    begin
      ShowMessage('Warning: URL Text is empty!');
    end;
-end;
-
-procedure TAndroidModule5.jEditText1Change(Sender: TObject; EventType: TChangeType);
-begin
-   case EventType of
-     ctChangeBefore: ShowMessage('Before..');
-     ctChange: ShowMessage('Changing...');
-     ctChangeAfter: ShowMessage('After...');
-   end
-end;
-
-procedure TAndroidModule5.jEditText1Enter(Sender: TObject);
-begin
-   ShowMessage('Enter...');
 end;
 
 

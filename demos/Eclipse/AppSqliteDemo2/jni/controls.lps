@@ -8,10 +8,9 @@
       <Unit0>
         <Filename Value="controls.lpr"/>
         <IsPartOfProject Value="True"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="1"/>
         <TopLine Value="169"/>
-        <CursorPos X="13" Y="181"/>
+        <CursorPos X="49" Y="175"/>
         <UsageCount Value="26"/>
         <Loaded Value="True"/>
         <DefaultSyntaxHighlighter Value="Delphi"/>
@@ -22,8 +21,8 @@
         <ComponentName Value="AndroidModule1"/>
         <HasResources Value="True"/>
         <UnitName Value="unit1"/>
-        <TopLine Value="18"/>
-        <CursorPos X="19" Y="22"/>
+        <IsVisibleTab Value="True"/>
+        <CursorPos X="20" Y="15"/>
         <UsageCount Value="26"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>

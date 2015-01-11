@@ -7,8 +7,8 @@ object AndroidModule5: TAndroidModule5
   MarginTop = 0
   MarginRight = 0
   MarginBottom = 0
-  Text = 'AndroidModule5'
   OnCreate = DataModuleCreate
+  Text = 'AndroidModule5'
   ActivityMode = actRecyclable
   BackgroundColor = colbrBlack
   OnCloseQuery = DataModuleCloseQuery
@@ -23,12 +23,12 @@ object AndroidModule5: TAndroidModule5
     MarginTop = 10
     MarginRight = 10
     MarginBottom = 10
-    Text = 'WebView Demo'
     Visible = True
     PosRelativeToAnchor = []
     PosRelativeToParent = [rpLeft]
     LayoutParamWidth = lpWrapContent
     LayoutParamHeight = lpWrapContent
+    Text = 'WebView Demo'
     Alignment = taLeft
     Enabled = True
     BackgroundColor = colbrDefault
@@ -46,7 +46,6 @@ object AndroidModule5: TAndroidModule5
     MarginTop = 0
     MarginRight = 0
     MarginBottom = 0
-    Text = 'jPanel1'
     Visible = True
     Anchor = jTextView1
     PosRelativeToAnchor = [raBelow]
@@ -65,13 +64,13 @@ object AndroidModule5: TAndroidModule5
       MarginTop = 10
       MarginRight = 5
       MarginBottom = 10
-      Text = 'http://www.freepascal.org'
       Visible = True
       Anchor = jTextView2
       PosRelativeToAnchor = [raBelow]
       PosRelativeToParent = [rpCenterHorizontal]
       LayoutParamWidth = lpMatchParent
       LayoutParamHeight = lpWrapContent
+      Text = 'http://www.freepascal.org'
       Alignment = taLeft
       InputTypeEx = itxText
       MaxTextLength = 300
@@ -94,12 +93,12 @@ object AndroidModule5: TAndroidModule5
       MarginTop = 5
       MarginRight = 5
       MarginBottom = 5
-      Text = 'Enter URL:'
       Visible = True
       PosRelativeToAnchor = []
       PosRelativeToParent = [rpTop, rpLeft]
       LayoutParamWidth = lpWrapContent
       LayoutParamHeight = lpWrapContent
+      Text = 'Enter URL:'
       Alignment = taLeft
       Enabled = True
       BackgroundColor = colbrDefault
@@ -117,7 +116,6 @@ object AndroidModule5: TAndroidModule5
       MarginTop = 4
       MarginRight = 4
       MarginBottom = 4
-      Text = 'jPanel3'
       Visible = True
       Anchor = jEditText1
       PosRelativeToAnchor = [raBelow]
@@ -135,12 +133,12 @@ object AndroidModule5: TAndroidModule5
         MarginTop = 4
         MarginRight = 2
         MarginBottom = 4
-        Text = 'Go!'
         Visible = True
         PosRelativeToAnchor = []
         PosRelativeToParent = [rpCenterInParent]
         LayoutParamWidth = lpMatchParent
         LayoutParamHeight = lpWrapContent
+        Text = 'Go!'
         BackgroundColor = colbrDefault
         FontColor = colbrDefault
         FontSize = 0
@@ -158,7 +156,6 @@ object AndroidModule5: TAndroidModule5
     MarginTop = 0
     MarginRight = 0
     MarginBottom = 0
-    Text = 'jPanel2'
     Visible = True
     Anchor = jPanel1
     PosRelativeToAnchor = [raBelow]
@@ -168,11 +165,11 @@ object AndroidModule5: TAndroidModule5
     BackgroundColor = colbrLightSalmon
     Id = 0
     object jWebView1: jWebView
+      Tag = 1
       Left = 4
       Top = 8
       Width = 278
       Height = 404
-      Text = 'jWebView1'
       Visible = True
       PosRelativeToAnchor = []
       PosRelativeToParent = []

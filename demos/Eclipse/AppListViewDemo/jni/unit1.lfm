@@ -7,8 +7,8 @@ object AndroidModule1: TAndroidModule1
   MarginTop = 0
   MarginRight = 0
   MarginBottom = 0
-  Text = 'AndroidModule1'
   OnCreate = DataModuleCreate
+  Text = 'AndroidModule1'
   ActivityMode = actMain
   BackgroundColor = colbrBlack
   OnJNIPrompt = DataModuleJNIPrompt
@@ -21,12 +21,12 @@ object AndroidModule1: TAndroidModule1
     MarginTop = 10
     MarginRight = 10
     MarginBottom = 10
-    Text = 'jListView Demo'
     Visible = True
     PosRelativeToAnchor = []
     PosRelativeToParent = [rpTop, rpCenterHorizontal]
     LayoutParamWidth = lpWrapContent
     LayoutParamHeight = lpWrapContent
+    Text = 'jListView Demo'
     Alignment = taLeft
     Enabled = True
     BackgroundColor = colbrDefault
@@ -44,13 +44,13 @@ object AndroidModule1: TAndroidModule1
     MarginTop = 5
     MarginRight = 2
     MarginBottom = 4
-    Text = 'Add Item'
     Visible = True
     Anchor = jEditText1
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = []
     LayoutParamWidth = lpHalfOfParent
     LayoutParamHeight = lpWrapContent
+    Text = 'Add Item'
     BackgroundColor = colbrDefault
     FontColor = colbrDefault
     FontSize = 0
@@ -66,13 +66,13 @@ object AndroidModule1: TAndroidModule1
     MarginTop = 5
     MarginRight = 2
     MarginBottom = 4
-    Text = 'Del Checked!'
     Visible = True
     Anchor = jButton1
     PosRelativeToAnchor = [raToRightOf, raAlignBaseline]
     PosRelativeToParent = []
     LayoutParamWidth = lpHalfOfParent
     LayoutParamHeight = lpWrapContent
+    Text = 'Del Checked!'
     BackgroundColor = colbrDefault
     FontColor = colbrDefault
     FontSize = 0
@@ -89,13 +89,13 @@ object AndroidModule1: TAndroidModule1
     MarginTop = 10
     MarginRight = 10
     MarginBottom = 10
-    Text = 'jEditText1'
     Visible = True
     Anchor = jTextView1
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = []
     LayoutParamWidth = lpMatchParent
     LayoutParamHeight = lpWrapContent
+    Text = 'jEditText1'
     Alignment = taLeft
     InputTypeEx = itxText
     MaxTextLength = 300
@@ -110,11 +110,11 @@ object AndroidModule1: TAndroidModule1
     Id = 9565430
   end
   object jListView1: jListView
+    Tag = 1
     Left = 8
     Top = 168
     Width = 280
     Height = 120
-    Text = 'jListView1'
     Visible = True
     Anchor = jButton1
     PosRelativeToAnchor = [raBelow]

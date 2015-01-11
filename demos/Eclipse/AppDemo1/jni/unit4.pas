@@ -18,7 +18,7 @@ type
       jEditText2: jEditText;
       jScrollView1: jScrollView;
       jTextView1: jTextView;
-      procedure DataModuleActive(Sender: TObject);
+
       procedure DataModuleCloseQuery(Sender: TObject; var CanClose: boolean);
       procedure DataModuleCreate(Sender: TObject);
       procedure DataModuleJNIPrompt(Sender: TObject);
@@ -63,14 +63,8 @@ begin
 end;
 
 procedure TAndroidModule4.DataModuleCreate(Sender: TObject);
-begin  //this initialization code is need here to fix Laz4Andoid  *.lfm parse.... why parse fails?
-(*  Self.ActivityMode:= actRecyclable;
-  //Self.BackgroundColor:= colbrBlack;
-  //mode delphi
-  Self.OnJNIPrompt:= DataModuleJNIPrompt;
-  Self.OnRotate:= DataModuleRotate;
-  Self.OnCloseQuery:= DataModuleCloseQuery;
- // Self.OnActive:= DataModuleActive; *)
+begin
+   //
 end;
 
 procedure TAndroidModule4.DataModuleCloseQuery(Sender: TObject; var CanClose: boolean);
@@ -78,15 +72,9 @@ begin
   CanClose:= True;
 end;
 
-procedure TAndroidModule4.DataModuleActive(Sender: TObject);
-begin
-  //
-end;
-
 procedure TAndroidModule4.DataModuleJNIPrompt(Sender: TObject);
 begin
-  //jEditText2.Parent:= jScrollView1.View;  //change the parent here!
-  //Self.Show;
+  //
 end;
 
 procedure TAndroidModule4.DataModuleRotate(Sender: TObject; rotate: integer;
