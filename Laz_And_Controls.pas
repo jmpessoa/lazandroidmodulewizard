@@ -282,13 +282,17 @@ type
   private
    FFilename : string;
    FFilePath: TFilePath;
+   FRequestCode: integer;
   public
    FullPathToBitmapFile: string;
    constructor Create(AOwner: TComponent); override;
    destructor Destroy; override;
    procedure Init(refApp: jApp) override;
-   procedure TakePhoto;
+   procedure TakePhoto; overload;
+   procedure TakePhoto(_filename: string ; _requestCode: integer); overload;
+
    // Property
+   property RequestCode: integer read FRequestCode write FRequestCode;
   published
     property Filename: string read FFilename write FFilename;
     property FilePath: TFilePath read FFilePath write FFilePath;
@@ -370,9 +374,10 @@ type
     procedure ScanPixel(PBytePixel: PScanByte; notByteIndex: integer); overload;   //TODO - just draft
     procedure ScanPixel(PDWordPixel: PScanLine);  overload; //TODO - just draft
     function GetInfo: boolean;
-    function  GetRatio: Single;
+    function GetRatio: Single;
 
-    //property  JavaObj : jObject   read FjObject;
+    function ClockWise(_bmp: jObject; _imageView: jObject): jObject;
+    function AntiClockWise(_bmp: jObject; _imageView: jObject): jObject;
 
   published
     property FilePath: TFilePath read FFilePath write FFilePath;
@@ -1302,7 +1307,7 @@ type
   Procedure Java_Event_pAppOnBackPressed         (env: PJNIEnv; this: jobject);
   Function  Java_Event_pAppOnRotate              (env: PJNIEnv; this: jobject; rotate : Integer) : integer;
   Procedure Java_Event_pAppOnConfigurationChanged(env: PJNIEnv; this: jobject);
-  Procedure Java_Event_pAppOnActivityResult      (env: PJNIEnv; this: jobject; requestCode,resultCode : Integer; jData : jObject);
+  Procedure Java_Event_pAppOnActivityResult      (env: PJNIEnv; this: jobject; requestCode,resultCode : Integer; jIntent : jObject);
 
   //Procedure Java_Event_pOnActionBarTabSelected(env: PJNIEnv; this: jobject; view: jObject; title: jString);
   //Procedure Java_Event_pOnActionBarTabUnSelected(env: PJNIEnv; this: jobject; view:jObject; title: jString);
@@ -1545,7 +1550,7 @@ end;
 
 Procedure Java_Event_pAppOnActivityResult(env: PJNIEnv; this: jobject;
                                                 requestCode, resultCode : Integer;
-                                               jData : jObject);
+                                               jIntent : jObject);
 var
   Form: jForm;
 begin
@@ -1554,7 +1559,7 @@ begin
   Form:= gApp.Forms.Stack[gApp.TopIndex].Form;
   if not Assigned(Form) then Exit;
   Form.UpdateJNI(gApp);
-  if Assigned(Form.OnActivityRst) then Form.OnActivityRst(Form,requestCode,resultCode,jData);
+  if Assigned(Form.OnActivityRst) then Form.OnActivityRst(Form,requestCode,resultCode,jIntent);
 end;
 
 //
@@ -4268,6 +4273,7 @@ begin
   // Init
   FFilePath:= fpathDCIM;
   FFilename:= 'photo1.jpg';
+  FRequestCode:= 12345;
 end;
 
 destructor jCamera.Destroy;
@@ -4292,6 +4298,7 @@ var
 begin
   if FInitialized then
   begin
+     if FFileName = '' then FFileName:= 'photo1.jpg';
      if Pos('.', FFileName) < 0 then
           FFileName:= FFileName + '.jpg'
      else if Pos('.jpg', FFileName)  < 0 then
@@ -4301,8 +4308,31 @@ begin
        FFileName:= SplitStr(strExt, '.');
        FFileName:= FFileName + '.jpg';
      end;
-     Self.FullPathToBitmapFile:= jCamera_takePhoto(gApp.Jni.jEnv, gApp.Jni.jThis,
-                                                   GetFilePath(FFilePath), FFileName);
+     Self.UpdateJNI(gApp);
+     Self.FullPathToBitmapFile:= jCamera_takePhoto(FjEnv, FjThis,
+                                                   GetFilePath(FFilePath), FFileName, FRequestCode);
+  end;
+end;
+
+procedure jCamera.TakePhoto(_filename: string ; _requestCode: integer);
+var
+  strExt: string;
+begin
+  if FInitialized then
+  begin
+     FRequestCode:= _requestCode;
+     if Pos('.', _filename) < 0 then
+          _filename:= _filename + '.jpg'
+     else if Pos('.jpg', _filename)  < 0 then
+     begin
+       //force jpg extension....
+       strExt:= _filename;
+       _filename:= SplitStr(strExt, '.');
+       _filename:= _filename + '.jpg';
+     end;
+     Self.UpdateJNI(gApp);
+     Self.FullPathToBitmapFile:= jCamera_takePhoto(FjEnv, FjThis,
+                                                   GetFilePath(FFilePath), _filename, _requestCode);
   end;
 end;
 
@@ -5932,6 +5962,20 @@ begin     //API LockPixels... parameter is "PScanLine"
     for k:= 0 to Self.Width*Self.Height-1 do
         PDWordPixel^[k]:= not PDWordPixel^[k];  //ok
     Self.UnlockPixels;
+end;
+
+function jBitmap.ClockWise(_bmp: jObject; _imageView: jObject): jObject;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jBitmap_ClockWise(FjEnv, FjObject, _bmp ,_imageView);
+end;
+
+function jBitmap.AntiClockWise(_bmp: jObject; _imageView: jObject): jObject;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jBitmap_AntiClockWise(FjEnv, FjObject, _bmp ,_imageView);
 end;
 
 //------------------------------------------------------------------------------

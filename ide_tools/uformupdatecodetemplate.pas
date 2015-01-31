@@ -173,7 +173,7 @@ var
   packList: TstringList;
   fileList: TStringList;
   pk, i: integer;
-  strAux, strApp, strControls, strProject: string;
+  strAux: string;
 begin
   MemoLog.Clear;
   if ProjectPath = '' then
@@ -255,7 +255,7 @@ begin
 
     SynMemo2.Clear;
     SynMemo2.Add('{hint: save all files to location: '+ProjectPath+DirectorySeparator+'jni}');
-    SynMemo2.Add('library controls;  //[by LazAndroidWizard: '+DateTimeToStr(Now)+']');
+    SynMemo2.Add('library controls;  //by Lamw: Lazarus Android Module Wizard: '+DateTimeToStr(Now)+']');
     SynMemo2.Add(' ');
     SynMemo2.Add('{$mode delphi}');
     SynMemo2.Add(' ');

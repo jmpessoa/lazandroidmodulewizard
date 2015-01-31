@@ -4,14 +4,13 @@
     <PathDelim Value="\"/>
     <Version Value="9"/>
     <BuildModes Active="Default"/>
-    <Units Count="7">
+    <Units Count="9">
       <Unit0>
         <Filename Value="controls.lpr"/>
         <IsPartOfProject Value="True"/>
         <EditorIndex Value="1"/>
-        <TopLine Value="99"/>
-        <CursorPos X="13" Y="104"/>
-        <UsageCount Value="33"/>
+        <CursorPos X="11" Y="9"/>
+        <UsageCount Value="36"/>
         <Loaded Value="True"/>
         <DefaultSyntaxHighlighter Value="Delphi"/>
       </Unit0>
@@ -22,8 +21,9 @@
         <HasResources Value="True"/>
         <UnitName Value="unit1"/>
         <IsVisibleTab Value="True"/>
-        <CursorPos X="12" Y="9"/>
-        <UsageCount Value="33"/>
+        <TopLine Value="101"/>
+        <CursorPos X="12" Y="112"/>
+        <UsageCount Value="36"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
         <DefaultSyntaxHighlighter Value="Delphi"/>
@@ -48,28 +48,42 @@
         <Filename Value="C:\laz4android1346592\components\LazAndroidWizard\Laz_And_Controls.pas"/>
         <UnitName Value="Laz_And_Controls"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="2388"/>
-        <CursorPos Y="2396"/>
+        <TopLine Value="4297"/>
+        <CursorPos X="40" Y="4312"/>
         <UsageCount Value="13"/>
       </Unit4>
       <Unit5>
         <Filename Value="C:\laz4android1346592\components\LazAndroidWizard\And_jni_Bridge.pas"/>
         <UnitName Value="And_jni_Bridge"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="2766"/>
-        <CursorPos X="47" Y="2780"/>
+        <TopLine Value="6358"/>
+        <CursorPos X="23" Y="6366"/>
         <UsageCount Value="13"/>
       </Unit5>
       <Unit6>
         <Filename Value="C:\laz4android1346592\components\LazAndroidWizard\androidwidget.pas"/>
-        <UnitName Value="AndroidWidget"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="1222"/>
-        <CursorPos X="53" Y="1239"/>
+        <TopLine Value="1551"/>
+        <CursorPos X="8" Y="1570"/>
         <UsageCount Value="11"/>
       </Unit6>
+      <Unit7>
+        <Filename Value="C:\laz4android1346592\components\LazAndroidWizard\ide_tools\uformupdatecodetemplate.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="242"/>
+        <CursorPos X="43" Y="258"/>
+        <UsageCount Value="10"/>
+      </Unit7>
+      <Unit8>
+        <Filename Value="unit1.lfm"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="61"/>
+        <CursorPos X="11" Y="69"/>
+        <UsageCount Value="10"/>
+        <DefaultSyntaxHighlighter Value="LFM"/>
+      </Unit8>
     </Units>
-    <JumpHistory Count="2" HistoryIndex="1">
+    <JumpHistory Count="20" HistoryIndex="19">
       <Position1>
         <Filename Value="unit1.pas"/>
         <Caret Line="190" Column="46" TopLine="181"/>
@@ -78,6 +92,78 @@
         <Filename Value="unit1.pas"/>
         <Caret Line="191" Column="46" TopLine="182"/>
       </Position2>
+      <Position3>
+        <Filename Value="unit1.pas"/>
+        <Caret Line="12" Column="27"/>
+      </Position3>
+      <Position4>
+        <Filename Value="unit1.pas"/>
+        <Caret Line="113" Column="9" TopLine="102"/>
+      </Position4>
+      <Position5>
+        <Filename Value="unit1.pas"/>
+        <Caret Line="104" Column="18" TopLine="102"/>
+      </Position5>
+      <Position6>
+        <Filename Value="unit1.pas"/>
+        <Caret Line="115" Column="17" TopLine="102"/>
+      </Position6>
+      <Position7>
+        <Filename Value="unit1.pas"/>
+        <Caret Line="6" Column="8"/>
+      </Position7>
+      <Position8>
+        <Filename Value="unit1.pas"/>
+        <Caret Line="16" Column="14" TopLine="5"/>
+      </Position8>
+      <Position9>
+        <Filename Value="unit1.pas"/>
+        <Caret Line="186" Column="14" TopLine="175"/>
+      </Position9>
+      <Position10>
+        <Filename Value="unit1.pas"/>
+        <Caret Line="104" Column="4" TopLine="101"/>
+      </Position10>
+      <Position11>
+        <Filename Value="unit1.pas"/>
+        <Caret Line="165" Column="24" TopLine="152"/>
+      </Position11>
+      <Position12>
+        <Filename Value="unit1.pas"/>
+        <Caret Line="194" Column="5" TopLine="182"/>
+      </Position12>
+      <Position13>
+        <Filename Value="unit1.pas"/>
+        <Caret Line="104" Column="4" TopLine="102"/>
+      </Position13>
+      <Position14>
+        <Filename Value="unit1.pas"/>
+        <Caret Line="140" Column="16" TopLine="140"/>
+      </Position14>
+      <Position15>
+        <Filename Value="unit1.pas"/>
+        <Caret Line="173" Column="24" TopLine="153"/>
+      </Position15>
+      <Position16>
+        <Filename Value="unit1.pas"/>
+        <Caret Line="126" Column="3" TopLine="118"/>
+      </Position16>
+      <Position17>
+        <Filename Value="unit1.pas"/>
+        <Caret Line="104" Column="19" TopLine="101"/>
+      </Position17>
+      <Position18>
+        <Filename Value="unit1.pas"/>
+        <Caret Line="177" Column="14" TopLine="177"/>
+      </Position18>
+      <Position19>
+        <Filename Value="unit1.pas"/>
+        <Caret Line="104" Column="16" TopLine="101"/>
+      </Position19>
+      <Position20>
+        <Filename Value="unit1.pas"/>
+        <Caret Line="105" Column="17" TopLine="101"/>
+      </Position20>
     </JumpHistory>
   </ProjectSession>
 </CONFIG>

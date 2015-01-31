@@ -6,7 +6,7 @@ interface
 
 uses
   inifiles, Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, LazIDEIntf,
-  StdCtrls, Buttons, ExtCtrls, ComCtrls, FormPathMissing;
+  StdCtrls, Buttons, ExtCtrls, ComCtrls, FormPathMissing, uFormOSystem;
 
 type
 
@@ -88,6 +88,8 @@ type
     FAndroidPlatform: string;
     FSupportV4: string;
 
+    FPrebuildOSYS: string;
+
   public
     { public declarations }
     procedure LoadSettings(const pFilename: string);
@@ -119,6 +121,7 @@ type
     property NDK: string read FNDK write FNDK;
     property AndroidPlatform: string read FAndroidPlatform write FAndroidPlatform;
     property SupportV4: string read FSupportV4 write FSupportV4;
+    property PrebuildOSYS: string read FPrebuildOSYS write FPrebuildOSYS;
   end;
 
   procedure GetSubDirectories(const directory : string; list : TStrings);
@@ -362,6 +365,7 @@ procedure TFormWorkspace.LoadPathsSettings(const fileName: string);
 var
   indexNdk: integer;
   frm: TFormPathMissing;
+  frmSys: TFormOSystem;
 begin
   if FileExists(fileName) then
   begin
@@ -414,6 +418,23 @@ begin
           else
           begin
              frm.Free;
+             Exit;
+          end;
+      end;
+
+      FPrebuildOSYS:= ReadString('NewProject','PrebuildOSYS', '');
+      if FPrebuildOSYS = '' then
+      begin
+          frmSys:= TFormOSystem.Create(nil);
+          //frm.LabelPathTo.Caption:= 'WARNING! Enter Your System:  [ex. windows or linux-x86 or linux-x86_64 ...]';
+          if frmSys.ShowModal = mrOK then
+          begin
+             FPrebuildOSYS:= frmSys.PrebuildOSYS;
+             frmSys.Free;
+          end
+          else
+          begin
+             frmSys.Free;
              Exit;
           end;
       end;
@@ -631,6 +652,8 @@ begin
     ComboSelectProjectName.Items.Clear;
     GetSubDirectories(FPathToWorkspace, ComboSelectProjectName.Items);
 
+    FPrebuildOSYS:= ReadString('NewProject','PrebuildOSYS', '');
+
     Free;
   end;
 
@@ -689,6 +712,8 @@ begin
       WriteString('NewProject', 'PathToAndroidSDK', FPathToAndroidSDK);
       WriteString('NewProject', 'PathToAntBin', FPathToAntBin);
       WriteString('NewProject', 'PathToLazbuild', FPathToLazbuild);
+
+      WriteString('NewProject', 'PrebuildOSYS', FPrebuildOSYS);
 
       Free;
    end;

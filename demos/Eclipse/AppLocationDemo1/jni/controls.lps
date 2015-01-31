@@ -11,7 +11,7 @@
         <EditorIndex Value="1"/>
         <TopLine Value="644"/>
         <CursorPos X="40" Y="655"/>
-        <UsageCount Value="48"/>
+        <UsageCount Value="53"/>
         <Loaded Value="True"/>
         <DefaultSyntaxHighlighter Value="Delphi"/>
       </Unit0>
@@ -22,9 +22,9 @@
         <HasResources Value="True"/>
         <UnitName Value="unit1"/>
         <IsVisibleTab Value="True"/>
-        <TopLine Value="145"/>
-        <CursorPos X="5" Y="164"/>
-        <UsageCount Value="48"/>
+        <TopLine Value="144"/>
+        <CursorPos X="8" Y="152"/>
+        <UsageCount Value="53"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
         <DefaultSyntaxHighlighter Value="Delphi"/>
@@ -33,33 +33,33 @@
         <Filename Value="C:\laz4android\components\LazAndroidWizard\And_jni.pas"/>
         <TopLine Value="41"/>
         <CursorPos X="6" Y="51"/>
-        <UsageCount Value="8"/>
+        <UsageCount Value="7"/>
       </Unit2>
       <Unit3>
         <Filename Value="C:\laz4android\components\LazAndroidWizard\laz_and_controls_events.pas"/>
         <TopLine Value="19"/>
         <CursorPos X="14" Y="29"/>
-        <UsageCount Value="10"/>
+        <UsageCount Value="9"/>
       </Unit3>
       <Unit4>
         <Filename Value="C:\laz4android\components\LazAndroidWizard\location.pas"/>
         <TopLine Value="291"/>
         <CursorPos X="53" Y="308"/>
-        <UsageCount Value="8"/>
+        <UsageCount Value="7"/>
       </Unit4>
       <Unit5>
         <Filename Value="C:\laz4android1346592\components\LazAndroidWizard\Laz_And_Controls.pas"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="5960"/>
         <CursorPos X="14" Y="5976"/>
-        <UsageCount Value="10"/>
+        <UsageCount Value="9"/>
       </Unit5>
       <Unit6>
         <Filename Value="C:\laz4android1346592\components\LazAndroidWizard\And_jni_Bridge.pas"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="4337"/>
         <CursorPos X="51" Y="4356"/>
-        <UsageCount Value="10"/>
+        <UsageCount Value="9"/>
       </Unit6>
     </Units>
     <JumpHistory Count="24" HistoryIndex="23">

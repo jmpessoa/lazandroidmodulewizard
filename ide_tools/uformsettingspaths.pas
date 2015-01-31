@@ -30,6 +30,7 @@ type
     LabelPathToJavaJDK: TLabel;
     LabelPathToAndroidSDK: TLabel;
     LabelPathToAntBinary: TLabel;
+    RadioGroupPrebuildOSys: TRadioGroup;
     RGNDKVersion: TRadioGroup;
     SelDirDlgPathToLazBuild: TSelectDirectoryDialog;
     SelDirDlgPathToAndroidNDK: TSelectDirectoryDialog;
@@ -55,6 +56,7 @@ type
     procedure SpBPathToJavaJDKClick(Sender: TObject);
     procedure SpBPathToAndroidSDKClick(Sender: TObject);
     procedure SpBPathToAntBinaryClick(Sender: TObject);
+    function GetRadioGroupPrebuildOSysIndex(prebuildSys: string): integer;
   private
     { private declarations }
     FPathToJavaTemplates: string;
@@ -62,6 +64,7 @@ type
     FPathToAndroidSDK: string;
     FPathToAndroidNDK: string;
     FPathToAntBin: string;
+    FPrebuildOSYS: string;
   public
     { public declarations }
     FOk: boolean;
@@ -161,6 +164,14 @@ begin
   end;
 end;
 
+function TFormSettingsPaths.GetRadioGroupPrebuildOSysIndex(prebuildSys: string): integer;
+begin
+   if Pos('windows', prebuildSys) > 0 then Result:= 0
+   else if Pos('_64', prebuildSys) > 0 then Result:= 3
+   else if Pos('linux-x86', prebuildSys) > 0 then Result:= 1
+   else if Pos('osx', prebuildSys) > 0 then Result:= 2;
+end;
+
 procedure TFormSettingsPaths.LoadSettings(const fileName: string);
 var
    indexNdk: integer;
@@ -184,6 +195,11 @@ begin
 
       RGNDKVersion.ItemIndex:= indexNdk;
 
+      FPrebuildOSYS:= ReadString('NewProject','PrebuildOSYS', '');
+      if  FPrebuildOSYS <> '' then
+         RadioGroupPrebuildOSys.ItemIndex:= GetRadioGroupPrebuildOSysIndex(FPrebuildOSYS)
+      else RadioGroupPrebuildOSys.ItemIndex:= 0;
+
       Free;
     end;
   end;
@@ -201,6 +217,16 @@ begin
       WriteString('NewProject', 'PathToAntBin', EditPathToAntBinary.Text);
       WriteString('NewProject', 'NDK', IntToStr(RGNDKVersion.ItemIndex));
       WriteString('NewProject', 'PathToLazbuild', EditPathToLazBuild.Text);
+
+     case RadioGroupPrebuildOSys.ItemIndex of
+       0: FPrebuildOSYS:= 'windows';
+       1: FPrebuildOSYS:= 'linux-x86';
+       2: FPrebuildOSYS:= 'osx';   //TODO: fix here!
+       3: FPrebuildOSYS:= 'linux-x86_64';
+     end;
+
+     WriteString('NewProject', 'PrebuildOSYS', FPrebuildOSYS);
+
       Free;
   end;
 end;

@@ -8,6 +8,9 @@ interface
 
 uses 
   Classes,
+  intentmanager,
+  broadcastreceiver,
+  sensormanager,
   gridview,
   switchbutton,
   togglebutton,
@@ -38,6 +41,9 @@ implementation
   
 Procedure Register;
 begin
+  {$I jintentmanager_icon.lrs}
+  {$I jbroadcastreceiver_icon.lrs}
+  {$I jsensormanager_icon.lrs}
   {$I jgridview_icon.lrs}
   {$I jswitchbutton_icon.lrs}
   {$I jtogglebutton_icon.lrs}
@@ -59,6 +65,9 @@ begin
   {$I jmyhello_icon.lrs}
   RegisterComponents('Android Bridges Extra',
     [
+      jIntentManager,
+      jBroadcastReceiver,
+      jSensorManager,
       jGridView,
       jSwitchButton,
       jToggleButton,

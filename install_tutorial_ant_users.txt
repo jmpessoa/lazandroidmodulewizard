@@ -148,6 +148,11 @@ II. [Android Project]
 		ref. image https://jmpessoa.opendrive.com/files?Ml82Nzg4MzA2N184VWZaWg 		
 
 		:: Plug your device to usb port -> go to "build apk" -> go to "install apk" -- enjoy it!
+
+	
+	HINT: All eclipse projects support Ant!
+			You can build/install all eclipse projects just with "Ant"... 
+			see "build.bat" [or .sh] and "install.bat" or [.sh]
 	  
 III. [Generic Project Support] - just a basic android ".so" - 
 

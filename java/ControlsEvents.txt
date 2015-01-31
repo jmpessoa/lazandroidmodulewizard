@@ -55,3 +55,7 @@ pOnChanged=Java_Event_pOnChanged(PEnv,this,TObject(pasobj),txt,count);
 pOnClickToggleButton=Java_Event_pOnClickToggleButton(PEnv,this,TObject(pasobj),Boolean(state));
 pOnChangeSwitchButton=Java_Event_pOnChangeSwitchButton(PEnv,this,TObject(pasobj),Boolean(state));
 pOnClickGridItem=Java_Event_pOnClickGridItem(PEnv,this,TObject(pasobj),position,caption);
+pOnChangedSensor=Java_Event_pOnChangedSensor(PEnv,this,TObject(pasobj),sensor,sensorType,values,timestamp);
+pOnListeningSensor=Java_Event_pOnListeningSensor(PEnv,this,TObject(pasobj),sensor,sensorType);
+pOnUnregisterListeningSensor=Java_Event_pOnUnregisterListeningSensor(PEnv,this,TObject(pasobj),sensorType,sensorName);
+pOnBroadcastReceiver=Java_Event_pOnBroadcastReceiver(PEnv,this,TObject(pasobj),intent);

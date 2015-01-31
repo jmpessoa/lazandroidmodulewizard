@@ -25,7 +25,7 @@ object AndroidModule1: TAndroidModule1
     PosRelativeToParent = [rpTop, rpCenterHorizontal]
     LayoutParamWidth = lpWrapContent
     LayoutParamHeight = lpWrapContent
-    Text = 'Sqlite demo 2'
+    Text = 'App Sqlite demo 2'
     Alignment = taLeft
     Enabled = True
     BackgroundColor = colbrDefault

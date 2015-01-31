@@ -6,12 +6,13 @@ interface
 
 uses
   Classes, SysUtils, Dialogs, IDECommands, MenuIntf, Forms,
-  uformsettingspaths, lazandroidtoolsexpert, uformupdatecodetemplate, ufrmEditor;
+  uformsettingspaths, lazandroidtoolsexpert, uformupdatecodetemplate, ufrmEditor, ufrmCompCreate;
 
 procedure StartPathTool(Sender: TObject);
 procedure StartLateTool(Sender: TObject);   //By Thierrydijoux!
 procedure StartUpdateCodeTemplateTool(Sender: TObject);
 procedure StartResEditor(Sender: TObject);   //By Thierrydijoux!
+procedure StartComponentCreate(Sender: TObject);
 
 procedure Register;
 
@@ -45,6 +46,14 @@ begin
   frmEditor.Show;
 end;
 
+procedure StartComponentCreate(Sender: TObject);
+begin
+  // Call componente create expert
+  FrmCompCreate:= TFrmCompCreate.Create(Application);
+  FrmCompCreate.Show;
+     //ShowMessage('Component create assistencie...');	
+end;
+
 procedure Register;
 Var
   ideMnuAMW: TIDEMenuSection;
@@ -64,6 +73,8 @@ begin
   RegisterIDEMenuCommand(ideSubMnuAMW, 'PathUpdateCmd','Upgrade Code Templates [*.lpr, *.java]', nil,@StartUpdateCodeTemplateTool);
   // Adding fourth entry
   RegisterIDEMenuCommand(ideSubMnuAMW, 'PathToolCmd', 'Path Settings [Jdk, Sdk, Ndk, ...]', nil,@StartPathTool);
+  //Adding 5a. entry
+  RegisterIDEMenuCommand(ideSubMnuAMW, 'PathCompCreateCmd', 'New jComponent [Create]', nil,@StartComponentCreate);
   // And so on...
 
 end;

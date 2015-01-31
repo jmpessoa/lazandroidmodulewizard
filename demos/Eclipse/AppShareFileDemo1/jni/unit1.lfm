@@ -10,9 +10,10 @@ object AndroidModule1: TAndroidModule1
   Text = 'AndroidModule1'
   ActivityMode = actMain
   BackgroundColor = colbrDefault
+  OnJNIPrompt = AndroidModule1JNIPrompt
   object jButton1: jButton
     Left = 16
-    Top = 48
+    Top = 56
     Width = 272
     Height = 40
     MarginLeft = 2
@@ -20,7 +21,7 @@ object AndroidModule1: TAndroidModule1
     MarginRight = 2
     MarginBottom = 4
     Visible = True
-    Anchor = jTextView1
+    Anchor = jCheckBox1
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = []
     LayoutParamWidth = lpMatchParent
@@ -55,8 +56,8 @@ object AndroidModule1: TAndroidModule1
     Id = 8260831
   end
   object jTextView1: jTextView
-    Left = 104
-    Top = 16
+    Left = 88
+    Top = 8
     Width = 272
     Height = 25
     MarginLeft = 5
@@ -68,13 +69,13 @@ object AndroidModule1: TAndroidModule1
     PosRelativeToParent = [rpTop, rpCenterHorizontal]
     LayoutParamWidth = lpWrapContent
     LayoutParamHeight = lpWrapContent
-    Text = 'jShareFile Demo'
+    Text = 'App ShareFile Demo'
     Alignment = taLeft
     Enabled = True
     BackgroundColor = colbrDefault
-    FontColor = colbrLime
+    FontColor = colbrTomato
     FontSize = 0
-    TextTypeFace = tfNormal
+    TextTypeFace = tfBold
     Id = 2106793
   end
   object jButton3: jButton
@@ -218,17 +219,40 @@ object AndroidModule1: TAndroidModule1
     BackgroundColor = colbrDefault
     Id = 0
   end
+  object jCheckBox1: jCheckBox
+    Left = 8
+    Top = 29
+    Width = 135
+    Height = 25
+    MarginLeft = 5
+    MarginTop = 5
+    MarginRight = 5
+    MarginBottom = 5
+    Visible = True
+    Anchor = jTextView1
+    PosRelativeToAnchor = [raBelow]
+    PosRelativeToParent = [rpLeft]
+    LayoutParamWidth = lpWrapContent
+    LayoutParamHeight = lpWrapContent
+    Text = 'Wifi'
+    BackgroundColor = colbrDefault
+    FontColor = colbrDefault
+    FontSize = 0
+    Checked = False
+    OnClick = jCheckBox1Click
+    Id = 6706055
+  end
   object jTextFileManager1: jTextFileManager
-    left = 24
-    top = 440
+    left = 40
+    top = 432
   end
   object jShareFile1: jShareFile
     TransitoryEnvironmentDirectory = dirDownloads
-    left = 24
-    top = 496
+    left = 32
+    top = 504
   end
   object jImageFileManager1: jImageFileManager
-    left = 48
-    top = 552
+    left = 232
+    top = 440
   end
 end

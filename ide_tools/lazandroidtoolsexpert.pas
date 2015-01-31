@@ -601,8 +601,6 @@ end;
 
 
 procedure TfrmLazAndroidToolsExpert.RebuildLibrary; //by jmpessoa
-var
-  envVarPath: string;
 begin
 
   if PathToLazbuild = '' then
@@ -750,7 +748,6 @@ end;
 procedure TfrmLazAndroidToolsExpert.BitBtnBuildClick(Sender: TObject);
 var
   antkMode: string;
-  envVarPath: string;
 begin
 
   if ProjectPath = '' then

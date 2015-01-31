@@ -229,7 +229,7 @@ procedure jBluetoothServerSocket.GenEvent_OnBluetoothServerSocketAccept(Obj: TOb
 var
   accept: boolean;
 begin
-
+  accept:= True;
   if Assigned(FOnAccept) then FOnAccept(Obj, _deviceName, _deviceAddress, accept);
   if not accept then  Self.SetAccept(False);
 end;
@@ -415,9 +415,12 @@ begin
   jCls:= env^.GetObjectClass(env, _jbluetoothserversocket);
   jMethod:= env^.GetMethodID(env, jCls, 'Read', '()[B');
   jresultArray:= env^.CallObjectMethod(env, _jbluetoothserversocket, jMethod);
-  resultsize:= env^.GetArrayLength(env, jresultArray);
-  SetLength(Result, resultsize);
-  env^.GetByteArrayRegion(env, jResultArray, 0, resultSize, @Result[0] {target});
+  if jresultArray <> nil then
+  begin
+    resultsize:= env^.GetArrayLength(env, jresultArray);
+    SetLength(Result, resultsize);
+    env^.GetByteArrayRegion(env, jResultArray, 0, resultSize, @Result[0] {target});
+  end;
 end;
 
 

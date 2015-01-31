@@ -400,17 +400,20 @@ begin
   jCls:= env^.GetObjectClass(env, _jbluetooth);
   jMethod:= env^.GetMethodID(env, jCls, 'GetPairedDevices', '()[Ljava/lang/String;');
   jresultArray:= env^.CallObjectMethod(env, _jbluetooth, jMethod);
-  resultsize:= env^.GetArrayLength(env, jresultArray);
-  SetLength(Result, resultsize);
-  for i:= 0 to resultsize - 1 do
+  if jresultArray <> nil then
   begin
-    jStr:= env^.GetObjectArrayElement(env, jresultArray, i);
-    case jStr = nil of
-       True : Result[i]:= '';
-       False: begin
-               jBoo:= JNI_False;
-               Result[i]:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
-              end;
+    resultsize:= env^.GetArrayLength(env, jresultArray);
+    SetLength(Result, resultsize);
+    for i:= 0 to resultsize - 1 do
+    begin
+      jStr:= env^.GetObjectArrayElement(env, jresultArray, i);
+      case jStr = nil of
+         True : Result[i]:= '';
+         False: begin
+                 jBoo:= JNI_False;
+                 Result[i]:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
+                end;
+      end;
     end;
   end;
 end;
@@ -428,17 +431,20 @@ begin
   jCls:= env^.GetObjectClass(env, _jbluetooth);
   jMethod:= env^.GetMethodID(env, jCls, 'GetFoundedDevices', '()[Ljava/lang/String;');
   jresultArray:= env^.CallObjectMethod(env, _jbluetooth, jMethod);
-  resultsize:= env^.GetArrayLength(env, jresultArray);
-  SetLength(Result, resultsize);
-  for i:= 0 to resultsize - 1 do
+  if jresultArray <> nil then
   begin
-    jStr:= env^.GetObjectArrayElement(env, jresultArray, i);
-    case jStr = nil of
-       True : Result[i]:= '';
-       False: begin
-               jBoo:= JNI_False;
-               Result[i]:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
-              end;
+    resultsize:= env^.GetArrayLength(env, jresultArray);
+    SetLength(Result, resultsize);
+    for i:= 0 to resultsize - 1 do
+    begin
+      jStr:= env^.GetObjectArrayElement(env, jresultArray, i);
+      case jStr = nil of
+         True : Result[i]:= '';
+         False: begin
+                 jBoo:= JNI_False;
+                 Result[i]:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
+                end;
+      end;
     end;
   end;
 end;
@@ -456,17 +462,20 @@ begin
   jCls:= env^.GetObjectClass(env, _jbluetooth);
   jMethod:= env^.GetMethodID(env, jCls, 'GetReachablePairedDevices', '()[Ljava/lang/String;');
   jresultArray:= env^.CallObjectMethod(env, _jbluetooth, jMethod);
-  resultsize:= env^.GetArrayLength(env, jresultArray);
-  SetLength(Result, resultsize);
-  for i:= 0 to resultsize - 1 do
+  if jresultArray <> nil then
   begin
-    jStr:= env^.GetObjectArrayElement(env, jresultArray, i);
-    case jStr = nil of
-       True : Result[i]:= '';
-       False: begin
-               jBoo:= JNI_False;
-               Result[i]:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
-              end;
+    resultsize:= env^.GetArrayLength(env, jresultArray);
+    SetLength(Result, resultsize);
+    for i:= 0 to resultsize - 1 do
+    begin
+      jStr:= env^.GetObjectArrayElement(env, jresultArray, i);
+      case jStr = nil of
+         True : Result[i]:= '';
+         False: begin
+                 jBoo:= JNI_False;
+                 Result[i]:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
+                end;
+      end;
     end;
   end;
 end;

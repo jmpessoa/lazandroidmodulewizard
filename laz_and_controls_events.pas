@@ -30,21 +30,28 @@ uses
    procedure Java_Event_pOnLocationProviderEnabled(env: PJNIEnv; this: jobject; Obj: TObject; provider:JString);
    procedure Java_Event_pOnLocationProviderDisabled(env: PJNIEnv; this: jobject; Obj: TObject; provider: JString);
 
-  Procedure Java_Event_pOnActionBarTabSelected(env: PJNIEnv; this: jobject; Obj: TObject; view: jObject; title: jString);
-  Procedure Java_Event_pOnActionBarTabUnSelected(env: PJNIEnv; this: jobject; Obj: TObject; view:jObject; title: jString);
-  Procedure Java_Event_pOnCustomDialogShow(env: PJNIEnv; this: jobject; Obj: TObject; dialog:jObject; title: jString);
+   Procedure Java_Event_pOnActionBarTabSelected(env: PJNIEnv; this: jobject; Obj: TObject; view: jObject; title: jString);
+   Procedure Java_Event_pOnActionBarTabUnSelected(env: PJNIEnv; this: jobject; Obj: TObject; view:jObject; title: jString);
+   Procedure Java_Event_pOnCustomDialogShow(env: PJNIEnv; this: jobject; Obj: TObject; dialog:jObject; title: jString);
 
-  Procedure Java_Event_pOnClickToggleButton(env: PJNIEnv; this: jobject; Obj: TObject; state: boolean);
+   Procedure Java_Event_pOnClickToggleButton(env: PJNIEnv; this: jobject; Obj: TObject; state: boolean);
 
-  Procedure Java_Event_pOnChangeSwitchButton(env: PJNIEnv; this: jobject; Obj: TObject; state: boolean);
-  Procedure Java_Event_pOnClickGridItem(env: PJNIEnv; this: jobject; Obj: TObject; position: integer; caption: JString);
+   Procedure Java_Event_pOnChangeSwitchButton(env: PJNIEnv; this: jobject; Obj: TObject; state: boolean);
+   Procedure Java_Event_pOnClickGridItem(env: PJNIEnv; this: jobject; Obj: TObject; position: integer; caption: JString);
+
+   Procedure Java_Event_pOnChangedSensor(env: PJNIEnv; this: jobject; Obj: TObject; sensor: JObject; sensorType: integer; values: JObject; timestamp: jLong);
+   Procedure Java_Event_pOnListeningSensor(env: PJNIEnv; this: jobject; Obj: TObject; sensor: jObject; sensorType: integer);
+
+   Procedure Java_Event_pOnUnregisterListeningSensor(env: PJNIEnv; this: jobject; Obj: TObject; sensorType: integer; sensorName: JString);
+   Procedure Java_Event_pOnBroadcastReceiver(env: PJNIEnv; this: jobject; Obj: TObject; intent:jObject);
 
 implementation
 
 uses
 
    AndroidWidget, bluetooth, bluetoothclientsocket, bluetoothserversocket,
-   spinner, location, actionbartab, customdialog, togglebutton, switchbutton, gridview;
+   spinner, location, actionbartab, customdialog, togglebutton, switchbutton, gridview,
+   sensormanager, broadcastreceiver;
 
 procedure Java_Event_pOnBluetoothEnabled(env: PJNIEnv; this: jobject; Obj: TObject);
 begin
@@ -535,6 +542,70 @@ begin
     jGridView(Obj).GenEvent_OnClickGridItem(Obj, position, pasCaption);
   end;
 end;
+
+
+Procedure Java_Event_pOnChangedSensor(env: PJNIEnv; this: jobject; Obj: TObject; sensor: JObject; sensorType: integer; values: JObject; timestamp: jLong);
+var
+  sizeArray: integer;
+  arrayResult: array of single;
+begin
+
+  sizeArray:=  env^.GetArrayLength(env, values);
+  SetLength(arrayResult, sizeArray);
+  env^.GetFloatArrayRegion(env, values, 0, sizeArray, @arrayResult[0] {target});
+
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+  if Obj is jSensorManager then
+  begin
+    jSensorManager(Obj).UpdateJNI(gApp);
+    jSensorManager(Obj).GenEvent_OnChangedSensor(Obj, sensor, sensorType, arrayResult, timestamp{sizeArray});
+  end;
+
+end;
+
+Procedure Java_Event_pOnListeningSensor(env: PJNIEnv; this: jobject; Obj: TObject; sensor: jObject; sensorType: integer);
+begin
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+  if Obj is jSensorManager then
+  begin
+    jSensorManager(Obj).UpdateJNI(gApp);
+    jSensorManager(Obj).GenEvent_OnListeningSensor(Obj, sensor, sensorType);
+  end;
+end;
+
+Procedure Java_Event_pOnUnregisterListeningSensor(env: PJNIEnv; this: jobject; Obj: TObject; sensorType: integer; sensorName: JString);
+var
+   pasSensorName: string;
+  _jBoolean: JBoolean;
+begin
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+  if Obj is jSensorManager then
+  begin
+    jSensorManager(Obj).UpdateJNI(gApp);
+    pasSensorName:= '';
+    if sensorName <> nil then
+    begin
+      _jBoolean:= JNI_False;
+      pasSensorName:= string(env^.GetStringUTFChars(Env, sensorName,@_jBoolean) );
+    end;
+    jSensorManager(Obj).GenEvent_OnUnregisterListeningSensor(Obj, sensorType, pasSensorName);
+  end;
+end;
+
+Procedure Java_Event_pOnBroadcastReceiver(env: PJNIEnv; this: jobject; Obj: TObject; intent:jObject);
+begin
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+  if Obj is jBroadcastReceiver then
+  begin
+    jBroadcastReceiver(Obj).UpdateJNI(gApp);
+    jBroadcastReceiver(Obj).GenEvent_OnBroadcastReceiver(Obj,  intent);
+  end;
+end;
+
 
 end.
 

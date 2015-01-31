@@ -284,17 +284,20 @@ begin
   jCls:= env^.GetObjectClass(env, _jmyhello);
   jMethod:= env^.GetMethodID(env, jCls, 'GetStringArray', '()[Ljava/lang/String;');
   jresultArray:= env^.CallObjectMethod(env, _jmyhello, jMethod);
-  resultsize:= env^.GetArrayLength(env, jresultArray);
-  SetLength(Result, resultsize);
-  for i:= 0 to resultsize - 1 do
+  if jresultArray <> nil then
   begin
-    jStr:= env^.GetObjectArrayElement(env, jresultArray, i);
-    case jStr = nil of
-       True : Result[i]:= '';
-       False: begin
-               jBoo:= JNI_False;
-               Result[i]:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
-              end;
+    resultsize:= env^.GetArrayLength(env, jresultArray);
+    SetLength(Result, resultsize);
+    for i:= 0 to resultsize - 1 do
+    begin
+      jStr:= env^.GetObjectArrayElement(env, jresultArray, i);
+      case jStr = nil of
+         True : Result[i]:= '';
+         False: begin
+                 jBoo:= JNI_False;
+                 Result[i]:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
+                end;
+      end;
     end;
   end;
 end;

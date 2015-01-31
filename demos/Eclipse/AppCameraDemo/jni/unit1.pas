@@ -101,7 +101,9 @@ end;
 
 procedure TAndroidModule1.jButton1Click(Sender: TObject);
 begin
+   jCamera1.RequestCode:= 12345;
    jCamera1.TakePhoto;
+   //ShowMessage('clicked ...');
 end;
 
 procedure TAndroidModule1.jView1Draw(Sender: TObject; Canvas: jCanvas);
@@ -189,11 +191,14 @@ begin
    if resultCode = 0 then ShowMessage('Photo Canceled!')
    else if resultCode = -1 then //ok...
         begin
-           ShowMessage('Ok!');
-           jBitmap1.LoadFromFile(jCamera1.FullPathToBitmapFile);
-           FPhotoExist:= True;
-           jView1.Refresh;
-           jImageView1.Refresh;
+           if  requestCode = jCamera1.RequestCode then
+           begin
+             ShowMessage('Ok!');
+             jBitmap1.LoadFromFile(jCamera1.FullPathToBitmapFile);
+             FPhotoExist:= True;
+             jView1.Refresh;
+             jImageView1.Refresh;
+           end;
         end
         else ShowMessage('Photo Fail!');
 end;

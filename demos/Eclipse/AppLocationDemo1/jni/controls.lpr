@@ -1,5 +1,5 @@
 {hint: save all files to location: C:\adt32\eclipse\workspace\AppLocationDemo1\jni}
-library controls;  //[by LazAndroidWizard: 1/11/2015 15:13:53]
+library controls;  //by Lamw: Lazarus Android Module Wizard: 1/29/2015 20:26:31]
  
 {$mode delphi}
  
@@ -455,7 +455,47 @@ begin
   Java_Event_pOnClickGridItem(PEnv,this,TObject(pasobj),position,caption);
 end;
 
-const NativeMethods:array[0..55] of JNINativeMethod = (
+{ Class:     com_example_applocationdemo1_Controls
+  Method:    pOnChangedSensor
+  Signature: (JLandroid/hardware/Sensor;I[FJ)V }
+procedure pOnChangedSensor(PEnv: PJNIEnv; this: JObject; pasobj: JLong; sensor: JObject; sensorType: JInt; values: JFloatArray; timestamp: JLong); cdecl;
+begin
+  Java_Event_pOnChangedSensor(PEnv,this,TObject(pasobj),sensor,sensorType,values,timestamp);
+end;
+
+{ Class:     com_example_applocationdemo1_Controls
+  Method:    pOnListeningSensor
+  Signature: (JLandroid/hardware/Sensor;I)V }
+procedure pOnListeningSensor(PEnv: PJNIEnv; this: JObject; pasobj: JLong; sensor: JObject; sensorType: JInt); cdecl;
+begin
+  Java_Event_pOnListeningSensor(PEnv,this,TObject(pasobj),sensor,sensorType);
+end;
+
+{ Class:     com_example_applocationdemo1_Controls
+  Method:    pOnStopedListeningSensors
+  Signature: (J)V }
+procedure pOnStopedListeningSensors(PEnv: PJNIEnv; this: JObject; pasobj: JLong); cdecl;
+begin
+  
+end;
+
+{ Class:     com_example_applocationdemo1_Controls
+  Method:    pOnUnregisterListeningSensor
+  Signature: (JILjava/lang/String;)V }
+procedure pOnUnregisterListeningSensor(PEnv: PJNIEnv; this: JObject; pasobj: JLong; sensorType: JInt; sensorName: JString); cdecl;
+begin
+  Java_Event_pOnUnregisterListeningSensor(PEnv,this,TObject(pasobj),sensorType,sensorName);
+end;
+
+{ Class:     com_example_applocationdemo1_Controls
+  Method:    pOnBroadcastReceiver
+  Signature: (JLandroid/content/Intent;)V }
+procedure pOnBroadcastReceiver(PEnv: PJNIEnv; this: JObject; pasobj: JLong; intent: JObject); cdecl;
+begin
+  Java_Event_pOnBroadcastReceiver(PEnv,this,TObject(pasobj),intent);
+end;
+
+const NativeMethods:array[0..60] of JNINativeMethod = (
    (name:'pAppOnScreenStyle';
     signature:'()I';
     fnPtr:@pAppOnScreenStyle;),
@@ -623,7 +663,22 @@ const NativeMethods:array[0..55] of JNINativeMethod = (
     fnPtr:@pOnChangeSwitchButton;),
    (name:'pOnClickGridItem';
     signature:'(JILjava/lang/String;)V';
-    fnPtr:@pOnClickGridItem;)
+    fnPtr:@pOnClickGridItem;),
+   (name:'pOnChangedSensor';
+    signature:'(JLandroid/hardware/Sensor;I[FJ)V';
+    fnPtr:@pOnChangedSensor;),
+   (name:'pOnListeningSensor';
+    signature:'(JLandroid/hardware/Sensor;I)V';
+    fnPtr:@pOnListeningSensor;),
+   (name:'pOnStopedListeningSensors';
+    signature:'(J)V';
+    fnPtr:@pOnStopedListeningSensors;),
+   (name:'pOnUnregisterListeningSensor';
+    signature:'(JILjava/lang/String;)V';
+    fnPtr:@pOnUnregisterListeningSensor;),
+   (name:'pOnBroadcastReceiver';
+    signature:'(JLandroid/content/Intent;)V';
+    fnPtr:@pOnBroadcastReceiver;)
 );
 
 function RegisterNativeMethodsArray(PEnv: PJNIEnv; className: PChar; methods: PJNINativeMethod; countMethods:integer):integer;
@@ -734,7 +789,12 @@ exports
   pOnCustomDialogShow name 'Java_com_example_applocationdemo1_Controls_pOnCustomDialogShow',
   pOnClickToggleButton name 'Java_com_example_applocationdemo1_Controls_pOnClickToggleButton',
   pOnChangeSwitchButton name 'Java_com_example_applocationdemo1_Controls_pOnChangeSwitchButton',
-  pOnClickGridItem name 'Java_com_example_applocationdemo1_Controls_pOnClickGridItem';
+  pOnClickGridItem name 'Java_com_example_applocationdemo1_Controls_pOnClickGridItem',
+  pOnChangedSensor name 'Java_com_example_applocationdemo1_Controls_pOnChangedSensor',
+  pOnListeningSensor name 'Java_com_example_applocationdemo1_Controls_pOnListeningSensor',
+  pOnStopedListeningSensors name 'Java_com_example_applocationdemo1_Controls_pOnStopedListeningSensors',
+  pOnUnregisterListeningSensor name 'Java_com_example_applocationdemo1_Controls_pOnUnregisterListeningSensor',
+  pOnBroadcastReceiver name 'Java_com_example_applocationdemo1_Controls_pOnBroadcastReceiver';
 
 begin
   gApp:= jApp.Create(nil);{AndroidWidget.pas}

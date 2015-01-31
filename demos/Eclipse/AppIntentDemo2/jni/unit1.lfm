@@ -1,0 +1,107 @@
+object AndroidModule1: TAndroidModule1
+  Left = 280
+  Top = 118
+  Width = 300
+  Height = 600
+  MarginLeft = 0
+  MarginTop = 0
+  MarginRight = 0
+  MarginBottom = 0
+  Text = 'AndroidModule1'
+  ActivityMode = actMain
+  BackgroundColor = colbrDefault
+  OnActivityRst = AndroidModule1ActivityRst
+  object jTextView1: jTextView
+    Left = 112
+    Top = 24
+    Width = 135
+    Height = 25
+    MarginLeft = 5
+    MarginTop = 5
+    MarginRight = 5
+    MarginBottom = 5
+    Visible = True
+    PosRelativeToAnchor = []
+    PosRelativeToParent = [rpTop, rpCenterHorizontal]
+    LayoutParamWidth = lpWrapContent
+    LayoutParamHeight = lpWrapContent
+    Text = 'jTextView1'
+    Alignment = taLeft
+    Enabled = True
+    BackgroundColor = colbrDefault
+    FontColor = colbrDefault
+    FontSize = 0
+    TextTypeFace = tfNormal
+    Id = 253746
+  end
+  object jButton1: jButton
+    Left = 8
+    Top = 56
+    Width = 282
+    Height = 40
+    MarginLeft = 2
+    MarginTop = 4
+    MarginRight = 2
+    MarginBottom = 4
+    Visible = True
+    Anchor = jTextView1
+    PosRelativeToAnchor = [raBelow]
+    PosRelativeToParent = []
+    LayoutParamWidth = lpMatchParent
+    LayoutParamHeight = lpWrapContent
+    Text = '[intent.action.VIEW] Go Lazarus Forum'
+    BackgroundColor = colbrDefault
+    FontColor = colbrDefault
+    FontSize = 0
+    OnClick = jButton1Click
+    Id = 5570504
+  end
+  object jButton2: jButton
+    Left = 11
+    Top = 114
+    Width = 279
+    Height = 40
+    MarginLeft = 2
+    MarginTop = 4
+    MarginRight = 2
+    MarginBottom = 4
+    Visible = True
+    Anchor = jButton1
+    PosRelativeToAnchor = [raBelow]
+    PosRelativeToParent = []
+    LayoutParamWidth = lpMatchParent
+    LayoutParamHeight = lpWrapContent
+    Text = 'Send Mail [+Attachment from download folder]'
+    BackgroundColor = colbrDefault
+    FontColor = colbrDefault
+    FontSize = 0
+    OnClick = jButton2Click
+    Id = 1192376
+  end
+  object jButton3: jButton
+    Left = 11
+    Top = 168
+    Width = 277
+    Height = 40
+    MarginLeft = 2
+    MarginTop = 4
+    MarginRight = 2
+    MarginBottom = 4
+    Visible = True
+    Anchor = jButton2
+    PosRelativeToAnchor = [raBelow]
+    PosRelativeToParent = []
+    LayoutParamWidth = lpMatchParent
+    LayoutParamHeight = lpWrapContent
+    Text = 'Send Mail [+Attachment from Gallery]'
+    BackgroundColor = colbrDefault
+    FontColor = colbrDefault
+    FontSize = 0
+    OnClick = jButton3Click
+    Id = 9710961
+  end
+  object jIntentManager1: jIntentManager
+    left = 136
+    top = 320
+  end
+end

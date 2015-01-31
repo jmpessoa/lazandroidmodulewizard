@@ -256,6 +256,30 @@ const
 
 type
 
+   //by jmpessoa
+ TDynArrayOfSmallint = array of smallint;
+
+ TDynArrayOfInteger = array of integer;
+
+ TDynArrayOfLongint = array of longint;
+ TDynArrayOfDouble = array of double;
+ TDynArrayOfSingle = array of single;
+ TDynArrayOfInt64  = array of int64;
+ TDynArrayOfString = array of string;
+
+ TDynArrayOfJChar = array of JChar;
+ TDynArrayOfJBoolean = array of JBoolean;
+ TDynArrayOfJByte = array of JByte;
+
+ TArrayOfByte = array of JByte;
+
+ TScanByte = Array[0..0] of JByte;  //by jmpessoa
+ PScanByte = ^TScanByte;
+
+ TScanLine = Array[0..0] of DWord;
+ PScanLine = ^TScanline;
+
+
   TItemLayout = (layImageTextWidget, layWidgetTextImage);
 
   TToggleState = (tsOff, tsOn);
@@ -515,7 +539,7 @@ type
   TOnClickContextMenuItem = Procedure(Sender: TObject; jObjMenuItem: jObject;
                                      itemID: integer; itemCaption: string; checked: boolean) of Object;
 
-  TOnActivityRst     = Procedure(Sender: TObject; requestCode,resultCode : Integer; jData : jObject) of Object;
+  TOnActivityRst     = Procedure(Sender: TObject; requestCode,resultCode : Integer; jIntent : jObject) of Object;
 
   TActionBarTabSelected = Procedure(Sender: TObject; view: jObject; title: string) of Object;
   TCustomDialogShow = Procedure(Sender: TObject; dialog: jObject; title: string) of Object;

@@ -12,9 +12,9 @@ object AndroidModule1: TAndroidModule1
   BackgroundColor = colbrDefault
   OnJNIPrompt = AndroidModule1JNIPrompt
   object jTextView1: jTextView
-    Left = 99
+    Left = 56
     Top = 28
-    Width = 135
+    Width = 178
     Height = 25
     MarginLeft = 5
     MarginTop = 5
@@ -25,7 +25,7 @@ object AndroidModule1: TAndroidModule1
     PosRelativeToParent = [rpTop, rpCenterHorizontal]
     LayoutParamWidth = lpWrapContent
     LayoutParamHeight = lpWrapContent
-    Text = 'jTextView1'
+    Text = 'App EditText Demo1 [Events]'
     Alignment = taLeft
     Enabled = True
     BackgroundColor = colbrDefault

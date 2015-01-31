@@ -10,7 +10,7 @@
         <UnitOutputDirectory Value="lib\$(TargetCPU)-$(TargetOS)"/>
       </SearchPaths>
     </CompilerOptions>
-    <Files Count="9">
+    <Files Count="11">
       <Item1>
         <Filename Value="androidwizard_intf.pas"/>
         <HasRegisterProc Value="True"/>
@@ -48,6 +48,14 @@
         <Filename Value="formpathmissing.pas"/>
         <UnitName Value="FormPathMissing"/>
       </Item9>
+      <Item10>
+        <Filename Value="uformosystem.lfm"/>
+        <Type Value="LFM"/>
+      </Item10>
+      <Item11>
+        <Filename Value="uformosystem.pas"/>
+        <UnitName Value="uFormOSystem"/>
+      </Item11>
     </Files>
     <Type Value="RunAndDesignTime"/>
     <RequiredPkgs Count="3">

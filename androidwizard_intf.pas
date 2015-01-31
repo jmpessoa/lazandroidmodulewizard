@@ -213,6 +213,8 @@ type
      FPathToJavaSrc: string;
      FAndroidPlatform: string;
 
+     FPrebuildOSys: string;
+
      function SettingsFilename: string;
      function TryNewJNIAndroidInterfaceCode: boolean;
      function GetPathToJNIFolder(fullPath: string): string;
@@ -1065,6 +1067,8 @@ begin
     FPathToJavaJDK:= frm.PathToJavaJDK;
     FPathToAndroidSDK:= frm.PathToAndroidSDK;
     FPathToAndroidNDK:= frm.PathToAndroidNDK;
+    FPrebuildOSys:= frm.PrebuildOSys;
+
     FNDK:= frm.NDK;
     FAndroidPlatform:= frm.AndroidPlatform;
     FPathToAntBin:= frm.PathToAntBin;
@@ -1569,7 +1573,11 @@ begin
     //linux install - thanks to Stephano!
     strList.Clear;
     strList.Add(linuxPathToAdbBin+linuxDirSeparator+'adb uninstall '+FAntPackageName+'.'+LowerCase(projName));
-    strList.Add(linuxPathToAdbBin+linuxDirSeparator+'adb install -r '+linuxDirSeparator+'bin'+linuxDirSeparator+projName+'-'+FAntBuildMode+'.apk');
+
+    //strList.Add(linuxPathToAdbBin+linuxDirSeparator+'adb install -r '+linuxDirSeparator+'bin'+linuxDirSeparator+projName+'-'+FAntBuildMode+'.apk');
+    //fix/sugestion by OsvaldoTCF - clear slash from /bin
+    strList.Add(linuxPathToAdbBin+linuxDirSeparator+'adb install -r bin'+linuxDirSeparator+projName+'-'+FAntBuildMode+'.apk');
+
     strList.Add(linuxPathToAdbBin+linuxDirSeparator+'adb logcat');
     strList.SaveToFile(linuxAndroidProjectName+linuxDirSeparator+'install.sh');
 
@@ -1658,7 +1666,7 @@ var
   pathToNdkToolchainsBinX86: string;
   pathToNdkToolchainsBinArm: string;
 
-  osys: string;      {windows or linux-x86}
+  osys: string;      {windows or linux-x86 or linux-x86_64}
 begin
 
   inherited InitProject(AProject);
@@ -1757,7 +1765,9 @@ begin
   AProject.UseManifest:= False;
   AProject.UseAppBundle:= False;
 
-  if (Pos('\', FPathToAndroidNDK) > 0) or (Pos(':', FPathToAndroidNDK) > 0) then osys:= 'windows'
+  if (Pos('\', FPathToAndroidNDK) > 0) or (Pos(':', FPathToAndroidNDK) > 0) then
+     osys:= 'windows'
+  else if FPrebuildOSYS='linux-x86_64' then osys:= 'linux-x86_64'
   else osys:= 'linux-x86';
 
   {Set compiler options for Android requirements}

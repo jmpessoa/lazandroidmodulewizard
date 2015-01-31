@@ -1,11 +1,11 @@
 package com.example.applistviewdemo;
 
-//[LazAndroidModuleWizard - Version 0.6 - rev. 12 - 10 January- 2014
+//Lamw: Lazarus Android Module Wizard - Version 0.6 - rev. 13 - 29 January - 2015
 //
-//[https://github.com/jmpessoa/lazandroidmodulewizard]
+//https://github.com/jmpessoa/lazandroidmodulewizard
 
 //Android Java Interface for Pascal/Delphi XE5 
-//[and Lazarus by jmpessoa@hotmail.com - december/2013]
+//and Lazarus by jmpessoa@hotmail.com - december/2013
 
 //Developers
 //          Simon,Choi / Choi,Won-sik
@@ -55,7 +55,7 @@ public class App extends Activity {
          StrictMode.setThreadPolicy(policy);
      }
      
-      Log.i("jApp","01.Activity.onCreate");
+      //Log.i("jApp","01.Activity.onCreate");
       controls             = new Controls();
       controls.activity    = this; 
       controls.appLayout   = new RelativeLayout(this);
@@ -71,7 +71,7 @@ public class App extends Activity {
       
       
       // Event : Java -> Pascal
-      Log.i("jApp","02.Controls.jAppOnCreate");
+      //Log.i("jApp","02.Controls.jAppOnCreate");
       controls.jAppOnCreate(this, controls.appLayout);
       
     }
@@ -86,12 +86,12 @@ public class App extends Activity {
     
     @Override
     protected void onPause()                  { super.onPause();
-                                                Log.i("jApp","onPause");
+                                                //Log.i("jApp","onPause");
     	                                        controls.jAppOnPause();         }    
     
     @Override
     protected void onRestart()                { super.onRestart();
-                                                Log.i("jApp","onRestart");
+                                                //Log.i("jApp","onRestart");
     	                                        controls.jAppOnRestart();    	  }
 
     @Override
@@ -100,7 +100,7 @@ public class App extends Activity {
 
     @Override
     protected void onStart()                  { super.onStart();
-                                                Log.i("jApp","onStart");
+                                                //Log.i("jApp","onStart");
     	                                        controls.jAppOnStart();        }
     @Override
     protected void onStop()                   { super.onStop(); 

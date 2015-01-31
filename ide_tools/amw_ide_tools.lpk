@@ -7,10 +7,12 @@
       <Version Value="11"/>
       <PathDelim Value="\"/>
       <SearchPaths>
+        <IncludeFiles Value="."/>
+        <OtherUnitFiles Value="."/>
         <UnitOutputDirectory Value="lib\$(TargetCPU)-$(TargetOS)"/>
       </SearchPaths>
     </CompilerOptions>
-    <Files Count="10">
+    <Files Count="14">
       <Item1>
         <Filename Value="amw_ide_menu_items.pas"/>
         <HasRegisterProc Value="True"/>
@@ -52,15 +54,34 @@
         <Filename Value="ufrmEditor.pas"/>
         <UnitName Value="ufrmEditor"/>
       </Item10>
+      <Item11>
+        <Filename Value="ufrmcompcreate.pas"/>
+        <UnitName Value="ufrmCompCreate"/>
+      </Item11>
+      <Item12>
+        <Filename Value="ufrmcompcreate.lfm"/>
+        <Type Value="LFM"/>
+      </Item12>
+      <Item13>
+        <Filename Value="uregistercompform.pas"/>
+        <UnitName Value="uregistercompform"/>
+      </Item13>
+      <Item14>
+        <Filename Value="uregistercompform.lfm"/>
+        <Type Value="LFM"/>
+      </Item14>
     </Files>
     <Type Value="RunAndDesignTime"/>
-    <RequiredPkgs Count="2">
+    <RequiredPkgs Count="3">
       <Item1>
-        <PackageName Value="IDEIntf"/>
+        <PackageName Value="SynEdit"/>
       </Item1>
       <Item2>
-        <PackageName Value="FCL"/>
+        <PackageName Value="IDEIntf"/>
       </Item2>
+      <Item3>
+        <PackageName Value="FCL"/>
+      </Item3>
     </RequiredPkgs>
     <UsageOptions>
       <UnitPath Value="$(PkgOutDir)"/>

@@ -179,7 +179,7 @@ begin
   begin
     if not ResXml.Saved then
     begin
-      Response:= MessageDlg('Save', 'Do you want to save your chabges ?', mtConfirmation,
+      Response:= MessageDlg('Save', 'Do you want to save your changes ?', mtConfirmation,
                             [mbYes, mbNo, mbCancel],0);
       if Response = mrYes then ResXml.Save;
     end;
@@ -450,7 +450,6 @@ begin
 end;
 
 //helper... by jmpessoa
-
 //http://delphi.about.com/od/delphitips2008/qt/subdirectories.htm
 //fils the "list" TStrings with the subdirectories of the "directory" directory
 //Warning: if not  subdirectories was found return empty list [list.count = 0]!

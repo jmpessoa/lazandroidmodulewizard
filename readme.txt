@@ -64,6 +64,29 @@
 	* "install_tutorial_eclipse_users.txt"	*                                
 	*					*
 	*****************************************
+
+Version 0.6 - rev. 13 - 29 January 2015 -
+
+	NEW! Added component jBroadcatReceiver [Android Bridges Extras]
+	NEW! Demo AppBroadcatReceiverDemo1 [Eclipse Compatible Project]
+
+	NEW! Added component jSensorManager [Android Bridges Extras]
+	NEW! Demo AppSensorManagerDemo1 [Eclipse Compatible Project]
+	NEW! Demo AppSensorManagerDemo3 [Eclipse Compatible Project]
+
+	NEW! Added component jIntentManager [Android Bridges Extras]
+	NEW! Demo AppIntentManagerDemo1 [Eclipse Compatible Project]
+	NEW! Demo AppIntentManagerDemo2 [Eclipse Compatible Project]
+	NEW! Demo AppIntentManagerDemo3 [Eclipse Compatible Project]
+
+	NEW! New jComponent [Create] Expert 
+		IDE "tools" -> "Android Module Wizard" -> "New jComponent [Create]"
+			Please, read the Tab "Help" ....
+
+	New! Added Options to Select[prebuilt] System = (Windows, Linux-x86, Mac, Linux-x86_64) 
+		:: A suggestion by @osvaldotcf [Thank you!]
+
+	UPDATED! All Demos updated! 
 	
 Version 0.6 - rev. 12 - 10 January 2015 -
 

@@ -81,28 +81,6 @@ type
      jdouble=double;       // 64-bit IEEE 754
  }
 
- //by jmpessoa
- TDynArrayOfSmallint = array of smallint;
-
- TDynArrayOfInteger = array of integer;
-
- TDynArrayOfLongint = array of longint;
- TDynArrayOfDouble = array of double;
- TDynArrayOfSingle = array of single;
- TDynArrayOfInt64  = array of int64;
- TDynArrayOfString = array of string;
-
- TDynArrayOfJChar = array of JChar;
- TDynArrayOfJBoolean = array of JBoolean;
- TDynArrayOfJByte = array of JByte;
-
- TArrayOfByte = array of JByte;
-
- TScanByte = Array[0..0] of JByte;  //by jmpessoa
- PScanByte = ^TScanByte;
-
- TScanLine = Array[0..0] of DWord;
- PScanLine = ^TScanline;
 
 // Utility
 
@@ -673,6 +651,10 @@ function jBitmap_GetHeight(env: PJNIEnv; bmap: JObject): integer;
 
 Function  jBitmap_jInstance(env:PJNIEnv;  bmap: jObject): jObject;
 
+function jBitmap_ClockWise(env: PJNIEnv; _jbitmap: JObject; _bmp: jObject; _imageView: jObject): jObject;
+function jBitmap_AntiClockWise(env: PJNIEnv; _jbitmap: JObject; _bmp: jObject; _imageView: jObject): jObject;
+
+
 //by jmpessoa
 function jBitmap_GetByteArrayFromBitmap(env:PJNIEnv;  bmap: jObject;
                                                    var bufferImage: TArrayOfByte): integer;
@@ -925,7 +907,8 @@ function jContact_getDisplayNameList(env:PJNIEnv; this:jobject; delimiter: char)
 Procedure jTakePhoto(env:PJNIEnv;  this:jobject; filename : String);
 
 //by jmpessoa
-function jCamera_takePhoto(env:PJNIEnv; this:jobject;  path: string;  filename : String): string;
+function jCamera_takePhoto(env:PJNIEnv; this:jobject;  path: string;  filename : String): string; overload;
+function jCamera_takePhoto(env:PJNIEnv; this:jobject;  path: string;  filename : String; requestCode: integer): string; overload;
 
 // BenchMark
 Procedure jBenchMark1_Java             (env:PJNIEnv; this:jobject; var mSec : Integer;var value : single);
@@ -4628,6 +4611,35 @@ begin
   Result := env^.CallObjectMethod(env,bmap,_jMethod);
 end;
 
+function jBitmap_ClockWise(env: PJNIEnv; _jbitmap: JObject; _bmp: jObject; _imageView: jObject): jObject;
+var
+  jParams: array[0..1] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= _bmp;
+  jParams[1].l:= _imageView;
+  jCls:= env^.GetObjectClass(env, _jbitmap);
+  jMethod:= env^.GetMethodID(env, jCls, 'ClockWise', '(Landroid/graphics/Bitmap;Landroid/widget/ImageView;)Landroid/graphics/Bitmap;');
+  Result:= env^.CallObjectMethodA(env, _jbitmap, jMethod, @jParams);
+end;
+
+
+function jBitmap_AntiClockWise(env: PJNIEnv; _jbitmap: JObject; _bmp: jObject; _imageView: jObject): jObject;
+var
+  jParams: array[0..1] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= _bmp;
+  jParams[1].l:= _imageView;
+  jCls:= env^.GetObjectClass(env, _jbitmap);
+  jMethod:= env^.GetMethodID(env, jCls, 'AntiClockWise', '(Landroid/graphics/Bitmap;Landroid/widget/ImageView;)Landroid/graphics/Bitmap;');
+  Result:= env^.CallObjectMethodA(env, _jbitmap, jMethod, @jParams);
+end;
+
+
+
 //by jmpessoa
 procedure jBitmap_SetByteArrayToBitmap(env:PJNIEnv;  bmap: jObject; var bufferImage: TArrayOfByte; size: integer);
 var
@@ -6348,6 +6360,30 @@ begin
  env^.DeleteLocalRef(env,_jParams[1].l);
 end;
 
+function jCamera_takePhoto(env:PJNIEnv; this:jobject;  path: string;  filename : String; requestCode: integer): string;
+var
+ _jMethod  : jMethodID = nil;
+ _jParams : array[0..2] of jValue;
+ _jString  : jString;
+ _jBoolean : jBoolean;
+  jCls: jClass=nil;
+begin
+ jCls:= Get_gjClass(env);
+ _jMethod:= env^.GetMethodID(env, jCls, 'jCamera_takePhoto', '(Ljava/lang/String;Ljava/lang/String;I)Ljava/lang/String;');
+ _jParams[0].l := env^.NewStringUTF(env, pchar(path) );
+ _jParams[1].l := env^.NewStringUTF(env, pchar(filename) );
+ _jParams[2].i := requestCode;
+ _jString   := env^.CallObjectMethodA(env,this,_jMethod,@_jParams);
+ case _jString = nil of
+  True : Result    := '';
+  False: begin
+          _jBoolean := JNI_False;
+          Result    := string( env^.GetStringUTFChars(Env,_jString,@_jBoolean) );
+         end;
+ end;
+ env^.DeleteLocalRef(env,_jParams[0].l);
+ env^.DeleteLocalRef(env,_jParams[1].l);
+end;
 //------------------------------------------------------------------------------
 // jBenchMark
 //------------------------------------------------------------------------------

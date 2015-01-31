@@ -22,12 +22,14 @@ type
       jButton5: jButton;
       jButton6: jButton;
       jButton7: jButton;
+      jCheckBox1: jCheckBox;
       jImageFileManager1: jImageFileManager;
       jImageView1: jImageView;
       jImageView2: jImageView;
       jShareFile1: jShareFile;
       jTextFileManager1: jTextFileManager;
       jTextView1: jTextView;
+      procedure AndroidModule1JNIPrompt(Sender: TObject);
       procedure jButton1Click(Sender: TObject);
       procedure jButton2Click(Sender: TObject);
       procedure jButton3Click(Sender: TObject);
@@ -35,6 +37,7 @@ type
       procedure jButton5Click(Sender: TObject);
       procedure jButton6Click(Sender: TObject);
       procedure jButton7Click(Sender: TObject);
+      procedure jCheckBox1Click(Sender: TObject);
     private
       {private declarations}
     public
@@ -67,6 +70,15 @@ begin
    if Self.IsWifiEnabled ...
    *)
 
+end;
+
+procedure TAndroidModule1.AndroidModule1JNIPrompt(Sender: TObject);
+begin
+    if not Self.IsWifiEnabled() then
+    begin
+       Self.SetWifiEnabled(True);
+       jCheckBox1.Checked:= True;
+    end;
 end;
 
 //Load 'hello.txt' from Assets -> Add "new" content to 'hello.txt' and save to App.../files
@@ -148,6 +160,14 @@ begin
     jImageView2.SetImageBitmap(jimage3);
   end;
 
+end;
+
+procedure TAndroidModule1.jCheckBox1Click(Sender: TObject);
+begin
+   if jCheckBox1.Checked then
+      Self.SetWifiEnabled(True)
+   else
+     Self.SetWifiEnabled(False);
 end;
 
 

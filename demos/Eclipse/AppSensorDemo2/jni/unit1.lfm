@@ -1,0 +1,102 @@
+object AndroidModule1: TAndroidModule1
+  Left = 280
+  Top = 118
+  Width = 300
+  Height = 600
+  MarginLeft = 0
+  MarginTop = 0
+  MarginRight = 0
+  MarginBottom = 0
+  Text = 'AndroidModule1'
+  ActivityMode = actMain
+  BackgroundColor = colbrDefault
+  OnCloseQuery = AndroidModule1CloseQuery
+  OnClose = AndroidModule1Close
+  object jTextView1: jTextView
+    Left = 88
+    Top = 24
+    Width = 175
+    Height = 25
+    MarginLeft = 5
+    MarginTop = 5
+    MarginRight = 5
+    MarginBottom = 5
+    Visible = True
+    PosRelativeToAnchor = []
+    PosRelativeToParent = [rpTop, rpCenterHorizontal]
+    LayoutParamWidth = lpWrapContent
+    LayoutParamHeight = lpWrapContent
+    Text = 'App SensorManager Demo 2'
+    Alignment = taLeft
+    Enabled = True
+    BackgroundColor = colbrDefault
+    FontColor = colbrDefault
+    FontSize = 0
+    TextTypeFace = tfNormal
+    Id = 635628
+  end
+  object jTextView2: jTextView
+    Left = 8
+    Top = 48
+    Width = 288
+    Height = 25
+    MarginLeft = 5
+    MarginTop = 5
+    MarginRight = 5
+    MarginBottom = 5
+    Visible = True
+    Anchor = jTextView1
+    PosRelativeToAnchor = [raBelow]
+    PosRelativeToParent = [rpLeft]
+    LayoutParamWidth = lpMatchParent
+    LayoutParamHeight = lpWrapContent
+    Text = 'Select a Sensor:'
+    Alignment = taLeft
+    Enabled = True
+    BackgroundColor = colbrYellow
+    FontColor = colbrGreen
+    FontSize = 0
+    TextTypeFace = tfNormal
+    Id = 6158346
+  end
+  object jListView1: jListView
+    Left = 8
+    Top = 80
+    Width = 287
+    Height = 96
+    Visible = True
+    Anchor = jTextView2
+    PosRelativeToAnchor = [raBelow]
+    PosRelativeToParent = []
+    LayoutParamWidth = lpMatchParent
+    LayoutParamHeight = lpWrapContent
+    Items.Strings = (
+      'Accelerometer'
+      'Light'
+      'Pressure'
+      'Proximity'
+      'Relative Humidity'
+      'Ambient Temperature'
+    )
+    BackgroundColor = colbrDefault
+    FontColor = colbrDefault
+    FontSize = 0
+    WidgetItem = wgNone
+    Delimiter = '|'
+    TextDecorated = txtNormal
+    ItemLayout = layImageTextWidget
+    TextSizeDecorated = sdNone
+    TextAlign = alLeft
+    OnClickCaptionItem = jListView1ClickCaptionItem
+    HighLightSelectedItem = True
+    HighLightSelectedItemColor = colbrRed
+    Id = 0
+  end
+  object jSensorManager1: jSensorManager
+    OnChanged = jSensorManager1Changed
+    OnListening = jSensorManager1Listening
+    OnUnListening = jSensorManager1UnListening
+    left = 86
+    top = 219
+  end
+end

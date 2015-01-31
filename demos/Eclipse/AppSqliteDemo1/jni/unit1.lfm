@@ -26,13 +26,13 @@ object AndroidModule1: TAndroidModule1
     PosRelativeToParent = [rpTop, rpCenterHorizontal]
     LayoutParamWidth = lpWrapContent
     LayoutParamHeight = lpWrapContent
-    Text = 'Sqlite Demo 1'
+    Text = 'App Sqlite Demo 1'
     Alignment = taLeft
     Enabled = True
     BackgroundColor = colbrDefault
-    FontColor = colbrLime
+    FontColor = colbrTomato
     FontSize = 0
-    TextTypeFace = tfNormal
+    TextTypeFace = tfBold
     Id = 4672521
   end
   object jButton1: jButton

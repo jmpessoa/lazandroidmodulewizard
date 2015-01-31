@@ -168,9 +168,21 @@ II. [Android Project]
 
           -double click your project //that is: open the project...
 
-          -right click your  project: -> Refresh
+          -right click your  project: -> Refresh (*)
 	
           -right click your  project: -> Run as -> Android Application
+
+	
+	(*) Refresh do not refresh "AndroidManifest.xml" you need do it by hand!
+	SOLUTION: simulates some change/edition of "AndroidManifest.xml" and save it!
+
+	ERROR: 06-11 22:32:12.939: I/dalvikvm(3114): 
+	java.lang.SecurityException: Requires READ_PHONE_STATE: 
+	Neither user 10039 nor current process has android.permission.READ_PHONE_STATE.
+
+	OR "App Stop"
+
+	SOLUTION: [for Eclipse]: simulates some change/edition of "AndroidManifest.xml" and save it!
 	  
 III. [Generic Project Support] - just a basic android ".so" - 
 
@@ -257,7 +269,7 @@ III. [Generic Project Support] - just a basic android ".so" -
 		
 	  -Pick a real device or Emulador
 
-	3.2 PANIC: 
+	3.2 PANIC: [Apk Stop :(( ]
 		06-11 22:32:12.939: I/dalvikvm(3114): 
 		java.lang.SecurityException: 
 		Requires READ_PHONE_STATE: Neither user 10039 nor current process has android.permission.READ_PHONE_STATE.
@@ -295,6 +307,10 @@ IV. How to use the Demos:
 		[C:\adt32\Ndk10]
 
 		according to your system ..
+
+		HINT: All eclipse projects support Ant!
+			You can build/install all eclipse projects just with "Ant"... 
+			see "build.bat" [or .sh] and "install.bat" or [.sh]
                             	
 V. Yes! Lazarus/Free Pascal does RAD on Android!
 

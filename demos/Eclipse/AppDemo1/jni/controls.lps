@@ -8,8 +8,7 @@
       <Unit0>
         <Filename Value="controls.lpr"/>
         <IsPartOfProject Value="True"/>
-        <TopLine Value="248"/>
-        <CursorPos X="23" Y="254"/>
+        <CursorPos X="14" Y="8"/>
         <UsageCount Value="201"/>
         <Loaded Value="True"/>
         <DefaultSyntaxHighlighter Value="Delphi"/>
@@ -34,9 +33,10 @@
         <ComponentName Value="AndroidModule2"/>
         <HasResources Value="True"/>
         <UnitName Value="unit2"/>
+        <IsVisibleTab Value="True"/>
         <EditorIndex Value="2"/>
-        <TopLine Value="197"/>
-        <CursorPos X="50" Y="155"/>
+        <TopLine Value="196"/>
+        <CursorPos X="39" Y="206"/>
         <UsageCount Value="200"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -201,7 +201,6 @@
         <ComponentName Value="AndroidModule14"/>
         <HasResources Value="True"/>
         <UnitName Value="unit14"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="14"/>
         <TopLine Value="116"/>
         <CursorPos X="19" Y="128"/>
@@ -396,7 +395,6 @@
       </Unit40>
       <Unit41>
         <Filename Value="C:\laz4android1346592\components\LazAndroidWizard\And_jni_Bridge.pas"/>
-        <UnitName Value="And_jni_Bridge"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="5493"/>
         <CursorPos X="43" Y="5502"/>
@@ -411,7 +409,6 @@
       </Unit42>
       <Unit43>
         <Filename Value="C:\laz4android1346592\components\LazAndroidWizard\Laz_And_Controls.pas"/>
-        <UnitName Value="Laz_And_Controls"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="6821"/>
         <CursorPos X="19" Y="6836"/>

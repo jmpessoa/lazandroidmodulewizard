@@ -300,9 +300,12 @@ begin
   jCls:= env^.GetObjectClass(env, _jbluetoothclientsocket);
   jMethod:= env^.GetMethodID(env, jCls, 'Read', '()[B');
   jresultArray:= env^.CallObjectMethod(env, _jbluetoothclientsocket, jMethod);
-  resultsize:= env^.GetArrayLength(env, jresultArray);
-  SetLength(Result, resultsize);
-  env^.GetByteArrayRegion(env, jResultArray, 0, resultSize, @Result[0] {target});
+  if jresultArray <> nil then
+  begin
+    resultsize:= env^.GetArrayLength(env, jresultArray);
+    SetLength(Result, resultsize);
+    env^.GetByteArrayRegion(env, jResultArray, 0, resultSize, @Result[0] {target});
+  end;
 end;
 
 function jBluetoothClientSocket_IsConnected(env: PJNIEnv; _jbluetoothclientsocket: JObject): boolean;

@@ -1,0 +1,87 @@
+object AndroidModule1: TAndroidModule1
+  Left = 377
+  Top = 118
+  Width = 300
+  Height = 600
+  MarginLeft = 0
+  MarginTop = 0
+  MarginRight = 0
+  MarginBottom = 0
+  Text = 'AndroidModule1'
+  ActivityMode = actMain
+  BackgroundColor = colbrDefault
+  object jTextView1: jTextView
+    Left = 80
+    Top = 24
+    Width = 168
+    Height = 25
+    MarginLeft = 5
+    MarginTop = 5
+    MarginRight = 5
+    MarginBottom = 5
+    Visible = True
+    PosRelativeToAnchor = []
+    PosRelativeToParent = [rpTop, rpCenterHorizontal]
+    LayoutParamWidth = lpWrapContent
+    LayoutParamHeight = lpWrapContent
+    Text = 'App SensorManager Demo1'
+    Alignment = taLeft
+    Enabled = True
+    BackgroundColor = colbrDefault
+    FontColor = colbrDefault
+    FontSize = 0
+    TextTypeFace = tfNormal
+    Id = 7408134
+  end
+  object jButton1: jButton
+    Left = 8
+    Top = 64
+    Width = 288
+    Height = 40
+    MarginLeft = 2
+    MarginTop = 4
+    MarginRight = 2
+    MarginBottom = 4
+    Visible = True
+    Anchor = jTextView1
+    PosRelativeToAnchor = [raBelow]
+    PosRelativeToParent = []
+    LayoutParamWidth = lpMatchParent
+    LayoutParamHeight = lpWrapContent
+    Text = 'List Device Sensors [Name and Type]'
+    BackgroundColor = colbrDefault
+    FontColor = colbrDefault
+    FontSize = 0
+    OnClick = jButton1Click
+    Id = 5675812
+  end
+  object jListView1: jListView
+    Left = 8
+    Top = 112
+    Width = 287
+    Height = 96
+    Visible = True
+    Anchor = jButton1
+    PosRelativeToAnchor = [raBelow]
+    PosRelativeToParent = []
+    LayoutParamWidth = lpMatchParent
+    LayoutParamHeight = lpWrapContent
+    BackgroundColor = colbrDefault
+    FontColor = colbrDefault
+    FontSize = 0
+    WidgetItem = wgNone
+    Delimiter = '|'
+    TextDecorated = txtNormal
+    ItemLayout = layImageTextWidget
+    TextSizeDecorated = sdNone
+    TextAlign = alLeft
+    OnClickCaptionItem = jListView1ClickCaptionItem
+    HighLightSelectedItem = True
+    HighLightSelectedItemColor = colbrRed
+    Id = 0
+  end
+  object jSensorManager1: jSensorManager
+    left = 122
+    top = 273
+  end
+end
