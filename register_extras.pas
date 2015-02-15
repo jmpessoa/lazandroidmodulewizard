@@ -8,6 +8,9 @@ interface
 
 uses 
   Classes,
+  datepickerdialog,
+  timepickerdialog,
+  notificationmanager,
   intentmanager,
   broadcastreceiver,
   sensormanager,
@@ -41,6 +44,9 @@ implementation
   
 Procedure Register;
 begin
+  {$I jdatepickerdialog_icon.lrs}
+  {$I jtimepickerdialog_icon.lrs}
+  {$I jnotificationmanager_icon.lrs}
   {$I jintentmanager_icon.lrs}
   {$I jbroadcastreceiver_icon.lrs}
   {$I jsensormanager_icon.lrs}
@@ -65,6 +71,9 @@ begin
   {$I jmyhello_icon.lrs}
   RegisterComponents('Android Bridges Extra',
     [
+      jDatePickerDialog,
+      jTimePickerDialog,
+      jNotificationManager,
       jIntentManager,
       jBroadcastReceiver,
       jSensorManager,

@@ -21,6 +21,7 @@ type
       jTextView1: jTextView;
       procedure AndroidModule1ActivityRst(Sender: TObject; requestCode,
         resultCode: Integer; jData: jObject);
+      procedure AndroidModule1JNIPrompt(Sender: TObject);
       procedure jButton1Click(Sender: TObject);
       procedure jButton2Click(Sender: TObject);
       procedure jButton3Click(Sender: TObject);
@@ -165,7 +166,7 @@ begin
           jIntentManager1.PutExtraMailSubject('Lamw: Android Send Mail + Image....');
           jIntentManager1.PutExtraMailBody('Lamw: This is the text in email body: Android Send Mail + Image from Gallery....');
 
-          //try this: put some file in /Download ...
+          //try this: put some file in ../Download ...
           jIntentManager1.PutExtraFile(FjUri);
 
           if jIntentManager1.ResolveActivity then
@@ -177,6 +178,11 @@ begin
 
     end else ShowMessage('Fail/cancel to pick a image ....');
   end;
+end;
+
+procedure TAndroidModule1.AndroidModule1JNIPrompt(Sender: TObject);
+begin
+  if not Self.IsWifiEnabled() then Self.SetWifiEnabled(True);
 end;
 
 end.

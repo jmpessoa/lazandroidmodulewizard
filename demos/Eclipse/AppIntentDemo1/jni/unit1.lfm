@@ -69,6 +69,7 @@ object AndroidModule1: TAndroidModule1
     LayoutParamHeight = lpOneQuarterOfParent
     ImageIndex = -1
     BackgroundColor = colbrDefault
+    ImageScaleType = scaleCenterInside
     Id = 0
   end
   object jImageFileManager1: jImageFileManager
@@ -76,6 +77,7 @@ object AndroidModule1: TAndroidModule1
     top = 184
   end
   object jIntentManager1: jIntentManager
+    IntentAction = iaNone
     left = 136
     top = 280
   end

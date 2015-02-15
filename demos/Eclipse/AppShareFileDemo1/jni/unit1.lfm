@@ -180,6 +180,7 @@ object AndroidModule1: TAndroidModule1
     LayoutParamHeight = lpWrapContent
     ImageIndex = -1
     BackgroundColor = colbrDefault
+    ImageScaleType = scaleCenter
     Id = 1233699
   end
   object jButton7: jButton
@@ -217,6 +218,7 @@ object AndroidModule1: TAndroidModule1
     LayoutParamHeight = lpWrapContent
     ImageIndex = -1
     BackgroundColor = colbrDefault
+    ImageScaleType = scaleCenter
     Id = 0
   end
   object jCheckBox1: jCheckBox

@@ -79,6 +79,7 @@ object AndroidModule1: TAndroidModule1
     Id = 3962920
   end
   object jIntentManager1: jIntentManager
+    IntentAction = iaNone
     left = 144
     top = 176
   end

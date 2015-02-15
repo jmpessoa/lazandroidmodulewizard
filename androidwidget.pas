@@ -64,7 +64,7 @@ const
     $90EE90,$9370D8,$9400D3, $000000); //colbrDefault
 
   //by jmpessoa
-  TARGBColorBridgeArray: array[0..143] of DWord = (
+  TARGBColorBridgeArray: array[0..144] of DWord = (
     $FF000000,$FF98FB98,$FF9932CC,$FF9ACD32,$FFA0522D,
     $FFA52A2A,$FFA9A9A9,$FFADD8E6,$FFADFF2F,$FFAFEEEE,
     $FFB0C4DE,$FFB0E0E6,$FFB22222,$FFB8860B,$FFBA55D3,
@@ -93,7 +93,7 @@ const
     $FF7CFC00,$FF7FFF00,$FF7FFFD4,$FF800000,$FF800080,
     $FF808000,$FF808080,$FF8470FF,$FF87CEEB,$FF87CEFA,
     $FF8A2BE2,$FF8B0000,$FF8B008B,$FF8B4513,$FF8FBC8F,
-    $FF90EE90,$FF9370D8,$FF9400D3,$00000000);
+    $FF90EE90,$FF9370D8,$FF9400D3,$00000000,$00000000);
 
   //by jmpessoa
   TProgressBarStyleArray: array[0..7] of DWord = ($01010077,
@@ -256,7 +256,15 @@ const
 
 type
 
-   //by jmpessoa
+ TImageScaleType = (scaleCenter, scaleCenterCrop, scaleCenterInside, scaleFitCenter,
+                scaleFitEnd, scaleFitStart, scaleFitXY, scaleMatrix);
+
+ TPinchZoomScaleState = (pzScaleBegin, pzScaling, pzScaleEnd);
+ TFlingGesture = (fliRightToLeft, fliLeftToRight, fliBottomToTop, fliTopToBottom);  // on swipe!
+
+ TOnFling = procedure(Sender: TObject; flingGesture: TFlingGesture) of Object;
+ TOnPinchZoom = procedure(Sender: TObject; scaleFactor: single; scaleState: TPinchZoomScaleState) of Object;
+
  TDynArrayOfSmallint = array of smallint;
 
  TDynArrayOfInteger = array of integer;
@@ -273,7 +281,7 @@ type
 
  TArrayOfByte = array of JByte;
 
- TScanByte = Array[0..0] of JByte;  //by jmpessoa
+ TScanByte = Array[0..0] of JByte;
  PScanByte = ^TScanByte;
 
  TScanLine = Array[0..0] of DWord;
@@ -349,7 +357,7 @@ type
   colbrLawnGreen,colbrChartreuse,colbrAquamarine,colbrMaroon,colbrPurple,
   colbrOlive,colbrGray,colbrLightSlateBlue,colbrSkyBlue,colbrLightSkyBlue,
   colbrBlueViolet,colbrDarkRed,colbrDarkMagenta,colbrSaddleBrown,colbrDarkSeaGreen,
-  colbrLightGreen,colbrMediumPurple,colbrDarkViolet,colbrNone, colbrDefault);  //default=transparent!
+  colbrLightGreen,colbrMediumPurple,colbrDarkViolet,colbrNone, colbrDefault, colbrCustom);  //default=transparent!
 
   //by jmpessoa
   TProgressBarStyle = (cjProgressBarStyle,
@@ -704,6 +712,7 @@ type
     FInitialized : boolean;
     FjEnv: PJNIEnv;
     FjThis: jObject;
+    FCustomColor: DWord;
     procedure SetEnabled(Value: boolean);
   public
     procedure UpdateJNI(refApp: jApp);
@@ -736,6 +745,7 @@ type
   protected
     FColor       : TARGBColorBridge; //background ... needed by design...
     FFontColor   : TARGBColorBridge;  //needed by design...
+
     FParent: TAndroidWidget;
     FText: string;
     FMarginBottom: integer;
@@ -777,6 +787,7 @@ type
     property Parent: TAndroidWidget read FParent write SetParent;
     property Visible: boolean read FVisible write FVisible;
     property Text: string read GetText write SetText;
+    property CustomColor: DWord read FCustomColor write FCustomColor;
   published
     property Left: integer read FLeft write SetLeft;
     property Top: integer read FTop write SetTop;
@@ -1078,7 +1089,7 @@ end;
   function SplitStr(var theString: string; delimiter: string): string;
   function ReplaceChar(query: string; oldchar, newchar: char):string;
 
-  function GetARGB(colbrColor: TARGBColorBridge): DWord;
+  function GetARGB(customColor: Dword; colbrColor: TARGBColorBridge): DWord;
 
 
   function GetProgressBarStyle(cjProgressBarStyle: TProgressBarStyle ): DWord;
@@ -1586,6 +1597,7 @@ begin
   FAcceptChildrenAtDesignTime:= False;
   FColor:= colbrDefault;
   FFontColor:= colbrDefault;
+  FCustomColor:= $FF2C2F3E;    // <<--- thanks to Ps
 end;
 
 destructor TAndroidWidget.Destroy;
@@ -2072,7 +2084,7 @@ begin
 
   //thierrydijoux - if backgroundColor is set to black, no theme ...
   if  FColor <> colbrDefault then
-     View_SetBackGroundColor(refApp.Jni.jEnv, refApp.Jni.jThis, FjRLayout, GetARGB(FColor));
+     View_SetBackGroundColor(refApp.Jni.jEnv, refApp.Jni.jThis, FjRLayout, GetARGB(FCustomColor, FColor));
   //else
      //jView_SetBackGroundColor(App.Jni.jEnv, App.Jni.jThis, FjRLayout, GetARGB(colbrBlack));
 
@@ -2139,7 +2151,7 @@ Procedure jForm.SetColor(Value: TARGBColorBridge);
 begin
   FColor:= Value;
   if (FInitialized = True) and (FColor <> colbrDefault)  then
-      View_SetBackGroundColor(FjEnv, FjRLayout,GetARGB(FColor));
+      View_SetBackGroundColor(FjEnv, FjRLayout,GetARGB(FCustomColor, FColor));
 end;
 
 Procedure jForm.Show;
@@ -3197,12 +3209,16 @@ begin
 end;
 
 //by jmpessoa
-function GetARGB(colbrColor: TARGBColorBridge):  DWord;
+function GetARGB(customColor: DWord; colbrColor: TARGBColorBridge):  DWord;
 var
   index: integer;
 begin
-  index:= (Ord(colbrColor));
-  Result:= TARGBColorBridgeArray[index];
+  if colbrColor <> colbrCustom then
+  begin
+    index:= (Ord(colbrColor));
+    Result:= TARGBColorBridgeArray[index];
+  end
+  else Result:= customColor;
 end;
 
 //by jmpessoa

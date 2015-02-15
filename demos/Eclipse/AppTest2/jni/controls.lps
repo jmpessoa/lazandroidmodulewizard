@@ -4,12 +4,11 @@
     <PathDelim Value="\"/>
     <Version Value="9"/>
     <BuildModes Active="Default"/>
-    <Units Count="27">
+    <Units Count="28">
       <Unit0>
         <Filename Value="controls.lpr"/>
         <IsPartOfProject Value="True"/>
-        <IsVisibleTab Value="True"/>
-        <EditorIndex Value="1"/>
+        <EditorIndex Value="2"/>
         <CursorPos X="64" Y="14"/>
         <UsageCount Value="200"/>
         <Loaded Value="True"/>
@@ -21,7 +20,9 @@
         <ComponentName Value="AndroidModule1"/>
         <HasResources Value="True"/>
         <UnitName Value="unit1"/>
-        <CursorPos X="41" Y="6"/>
+        <IsVisibleTab Value="True"/>
+        <TopLine Value="236"/>
+        <CursorPos X="5" Y="242"/>
         <UsageCount Value="200"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -182,8 +183,17 @@
         <CursorPos X="48" Y="94"/>
         <UsageCount Value="9"/>
       </Unit26>
+      <Unit27>
+        <Filename Value="C:\laz4android1346592\components\LazAndroidWizard\androidwidget.pas"/>
+        <UnitName Value="AndroidWidget"/>
+        <EditorIndex Value="1"/>
+        <TopLine Value="1583"/>
+        <CursorPos X="27" Y="1600"/>
+        <UsageCount Value="10"/>
+        <Loaded Value="True"/>
+      </Unit27>
     </Units>
-    <JumpHistory Count="13" HistoryIndex="12">
+    <JumpHistory Count="18" HistoryIndex="17">
       <Position1>
         <Filename Value="controls.lpr"/>
         <Caret Line="664" Column="5" TopLine="644"/>
@@ -236,6 +246,26 @@
         <Filename Value="unit1.pas"/>
         <Caret Line="314" Column="38" TopLine="304"/>
       </Position13>
+      <Position14>
+        <Filename Value="unit1.pas"/>
+        <Caret Line="6" Column="41"/>
+      </Position14>
+      <Position15>
+        <Filename Value="unit1.pas"/>
+        <Caret Line="126" Column="29" TopLine="117"/>
+      </Position15>
+      <Position16>
+        <Filename Value="unit1.pas"/>
+        <Caret Line="128" Column="29" TopLine="117"/>
+      </Position16>
+      <Position17>
+        <Filename Value="C:\laz4android1346592\components\LazAndroidWizard\androidwidget.pas"/>
+        <Caret Line="1092" Column="31" TopLine="1082"/>
+      </Position17>
+      <Position18>
+        <Filename Value="unit1.pas"/>
+        <Caret Line="123" Column="27" TopLine="117"/>
+      </Position18>
     </JumpHistory>
   </ProjectSession>
 </CONFIG>

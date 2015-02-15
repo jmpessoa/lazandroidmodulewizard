@@ -1,5 +1,5 @@
-{hint: save all files to location: C:\adt32\eclipse\workspace\AppIntentDemo2\jni }
-library controls;  //[by LazAndroidWizard: 1/21/2015 21:49:48]
+{hint: save all files to location: C:\adt32\eclipse\workspace\AppIntentDemo2\jni}
+library controls;  //by Lamw: Lazarus Android Module Wizard: 2/13/2015 1:12:15]
  
 {$mode delphi}
  
@@ -495,7 +495,39 @@ begin
   Java_Event_pOnBroadcastReceiver(PEnv,this,TObject(pasobj),intent);
 end;
 
-const NativeMethods:array[0..60] of JNINativeMethod = (
+{ Class:     com_example_appintentdemo2_Controls
+  Method:    pOnTimePicker
+  Signature: (JII)V }
+procedure pOnTimePicker(PEnv: PJNIEnv; this: JObject; pasobj: JLong; hourOfDay: JInt; minute: JInt); cdecl;
+begin
+  Java_Event_pOnTimePicker(PEnv,this,TObject(pasobj),hourOfDay,minute);
+end;
+
+{ Class:     com_example_appintentdemo2_Controls
+  Method:    pOnDatePicker
+  Signature: (JIII)V }
+procedure pOnDatePicker(PEnv: PJNIEnv; this: JObject; pasobj: JLong; year: JInt; monthOfYear: JInt; dayOfMonth: JInt); cdecl;
+begin
+  Java_Event_pOnDatePicker(PEnv,this,TObject(pasobj),year,monthOfYear,dayOfMonth);
+end;
+
+{ Class:     com_example_appintentdemo2_Controls
+  Method:    pOnFlingGestureDetected
+  Signature: (JI)V }
+procedure pOnFlingGestureDetected(PEnv: PJNIEnv; this: JObject; pasobj: JLong; direction: JInt); cdecl;
+begin
+  Java_Event_pOnFlingGestureDetected(PEnv,this,TObject(pasobj),direction);
+end;
+
+{ Class:     com_example_appintentdemo2_Controls
+  Method:    pOnPinchZoomGestureDetected
+  Signature: (JFI)V }
+procedure pOnPinchZoomGestureDetected(PEnv: PJNIEnv; this: JObject; pasobj: JLong; scaleFactor: JFloat; state: JInt); cdecl;
+begin
+  Java_Event_pOnPinchZoomGestureDetected(PEnv,this,TObject(pasobj),scaleFactor,state);
+end;
+
+const NativeMethods:array[0..64] of JNINativeMethod = (
    (name:'pAppOnScreenStyle';
     signature:'()I';
     fnPtr:@pAppOnScreenStyle;),
@@ -678,7 +710,19 @@ const NativeMethods:array[0..60] of JNINativeMethod = (
     fnPtr:@pOnUnregisterListeningSensor;),
    (name:'pOnBroadcastReceiver';
     signature:'(JLandroid/content/Intent;)V';
-    fnPtr:@pOnBroadcastReceiver;)
+    fnPtr:@pOnBroadcastReceiver;),
+   (name:'pOnTimePicker';
+    signature:'(JII)V';
+    fnPtr:@pOnTimePicker;),
+   (name:'pOnDatePicker';
+    signature:'(JIII)V';
+    fnPtr:@pOnDatePicker;),
+   (name:'pOnFlingGestureDetected';
+    signature:'(JI)V';
+    fnPtr:@pOnFlingGestureDetected;),
+   (name:'pOnPinchZoomGestureDetected';
+    signature:'(JFI)V';
+    fnPtr:@pOnPinchZoomGestureDetected;)
 );
 
 function RegisterNativeMethodsArray(PEnv: PJNIEnv; className: PChar; methods: PJNINativeMethod; countMethods:integer):integer;
@@ -711,7 +755,7 @@ begin
      curEnv:= PJNIEnv(PEnv);
      RegisterNativeMethods(curEnv, 'com/example/appintentdemo2/Controls');
   end;
-  gVM:= VM;{And_jni_Bridge}
+  gVM:= VM;{AndroidWidget.pas}
 end;
  
 procedure JNI_OnUnload(VM: PJavaVM; reserved: pointer); cdecl;
@@ -724,8 +768,8 @@ begin
   if PEnv <> nil then
   begin
     curEnv:= PJNIEnv(PEnv);
-    (curEnv^).DeleteGlobalRef(curEnv, gjClass{And_jni_Bridge});
-    gVM:= nil;{And_jni_Bridge}
+    (curEnv^).DeleteGlobalRef(curEnv, gjClass);   {AndroidWidget.pas}
+    gVM:= nil;{AndroidWidget.pas}
   end;
   gApp.Terminate;
   FreeAndNil(gApp);
@@ -794,11 +838,15 @@ exports
   pOnListeningSensor name 'Java_com_example_appintentdemo2_Controls_pOnListeningSensor',
   pOnStopedListeningSensors name 'Java_com_example_appintentdemo2_Controls_pOnStopedListeningSensors',
   pOnUnregisterListeningSensor name 'Java_com_example_appintentdemo2_Controls_pOnUnregisterListeningSensor',
-  pOnBroadcastReceiver name 'Java_com_example_appintentdemo2_Controls_pOnBroadcastReceiver';
- 
+  pOnBroadcastReceiver name 'Java_com_example_appintentdemo2_Controls_pOnBroadcastReceiver',
+  pOnTimePicker name 'Java_com_example_appintentdemo2_Controls_pOnTimePicker',
+  pOnDatePicker name 'Java_com_example_appintentdemo2_Controls_pOnDatePicker',
+  pOnFlingGestureDetected name 'Java_com_example_appintentdemo2_Controls_pOnFlingGestureDetected',
+  pOnPinchZoomGestureDetected name 'Java_com_example_appintentdemo2_Controls_pOnPinchZoomGestureDetected';
+
 begin
   gApp:= jApp.Create(nil);{AndroidWidget.pas}
-  gApp.Title:= 'JNI Android Bridges Library';
+  gApp.Title:= 'My Android Bridges Library';
   gjAppName:= 'com.example.appintentdemo2';{AndroidWidget.pas}
   gjClassName:= 'com/example/appintentdemo2/Controls';{AndroidWidget.pas}
   gApp.AppName:=gjAppName;

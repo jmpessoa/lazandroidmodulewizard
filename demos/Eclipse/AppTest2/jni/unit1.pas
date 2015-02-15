@@ -118,12 +118,14 @@ var
   jClass_button: jClass;
   jMethodId_setTextColor: jMethodID; //not is an object reference, not need cleanup ...
   jMethodId_setText: jMethodID;
+  customColor: DWord;
 begin
+  customColor:= $FF2C2F3E;
 
   jClass_button:= Get_jClassLocalRef('android/widget/Button');
 
   jMethodId_setTextColor:= Get_jMethodID(jClass_button, 'setTextColor','(I)V');
-  jParamsColor[0].i:= GetARGB(colbrPaleGreen); // integer ..
+  jParamsColor[0].i:= GetARGB(customColor, colbrPaleGreen); // integer ..
   Call_jVoidMethodA(jButton1.jSelf, jMethodId_setTextColor, jParamsColor);
 
   jMethodId_setText:= Get_jMethodID(jClass_button, 'setText','(Ljava/lang/CharSequence;)V');
@@ -244,7 +246,10 @@ var
   jObj_button: jObject;
   anchorID: integer;
   list: array of string;
+  customColor: DWord;
 begin
+
+   customColor:= $FF2C2F3E;
 
    jParamsContext[0].l:= gApp.GetContext; //get Activity/Context object
 
@@ -263,7 +268,7 @@ begin
 
    //set sTextColor
    jMethodId_setTextColor:= Get_jMethodID(jClass_button, 'setTextColor','(I)V');
-   jParamsColor[0].i:= GetARGB(colbrPaleGreen); // integer ..
+   jParamsColor[0].i:= GetARGB(customColor, colbrPaleGreen); // integer ..
    Call_jVoidMethodA(jObj_button, jMethodId_setTextColor, jParamsColor);
 
    //get method  setId

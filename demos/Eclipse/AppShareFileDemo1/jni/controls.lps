@@ -9,7 +9,7 @@
         <Filename Value="controls.lpr"/>
         <IsPartOfProject Value="True"/>
         <EditorIndex Value="1"/>
-        <CursorPos X="10" Y="9"/>
+        <CursorPos X="14" Y="16"/>
         <UsageCount Value="28"/>
         <Loaded Value="True"/>
         <DefaultSyntaxHighlighter Value="Delphi"/>
@@ -21,8 +21,8 @@
         <HasResources Value="True"/>
         <UnitName Value="unit1"/>
         <IsVisibleTab Value="True"/>
-        <TopLine Value="155"/>
-        <CursorPos X="32" Y="168"/>
+        <TopLine Value="74"/>
+        <CursorPos X="36" Y="82"/>
         <UsageCount Value="28"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -43,7 +43,7 @@
         <UsageCount Value="10"/>
       </Unit3>
     </Units>
-    <JumpHistory Count="21" HistoryIndex="20">
+    <JumpHistory Count="22" HistoryIndex="21">
       <Position1>
         <Filename Value="unit1.pas"/>
         <Caret Line="10" Column="13"/>
@@ -128,6 +128,10 @@
         <Filename Value="unit1.pas"/>
         <Caret Line="170" Column="3" TopLine="155"/>
       </Position21>
+      <Position22>
+        <Filename Value="unit1.pas"/>
+        <Caret Line="163" Column="11" TopLine="155"/>
+      </Position22>
     </JumpHistory>
   </ProjectSession>
 </CONFIG>

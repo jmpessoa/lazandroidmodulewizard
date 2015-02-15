@@ -11,6 +11,7 @@ object AndroidModule1: TAndroidModule1
   ActivityMode = actMain
   BackgroundColor = colbrDefault
   OnActivityRst = AndroidModule1ActivityRst
+  OnJNIPrompt = AndroidModule1JNIPrompt
   object jTextView1: jTextView
     Left = 112
     Top = 24
@@ -101,6 +102,7 @@ object AndroidModule1: TAndroidModule1
     Id = 9710961
   end
   object jIntentManager1: jIntentManager
+    IntentAction = iaNone
     left = 136
     top = 320
   end

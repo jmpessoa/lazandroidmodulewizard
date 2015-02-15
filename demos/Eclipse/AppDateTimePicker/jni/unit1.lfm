@@ -1,0 +1,90 @@
+object AndroidModule1: TAndroidModule1
+  Left = 289
+  Top = 79
+  Width = 300
+  Height = 600
+  MarginLeft = 0
+  MarginTop = 0
+  MarginRight = 0
+  MarginBottom = 0
+  Text = 'AndroidModule1'
+  ActivityMode = actMain
+  BackgroundColor = colbrDefault
+  object jTextView1: jTextView
+    Left = 112
+    Top = 24
+    Width = 135
+    Height = 25
+    MarginLeft = 5
+    MarginTop = 5
+    MarginRight = 5
+    MarginBottom = 5
+    Visible = True
+    PosRelativeToAnchor = []
+    PosRelativeToParent = [rpTop, rpCenterHorizontal]
+    LayoutParamWidth = lpWrapContent
+    LayoutParamHeight = lpWrapContent
+    Text = 'jTextView1'
+    Alignment = taLeft
+    Enabled = True
+    BackgroundColor = colbrDefault
+    FontColor = colbrDefault
+    FontSize = 0
+    TextTypeFace = tfNormal
+    Id = 7303042
+  end
+  object jButton1: jButton
+    Left = 8
+    Top = 56
+    Width = 288
+    Height = 40
+    MarginLeft = 2
+    MarginTop = 4
+    MarginRight = 2
+    MarginBottom = 4
+    Visible = True
+    Anchor = jTextView1
+    PosRelativeToAnchor = [raBelow]
+    PosRelativeToParent = []
+    LayoutParamWidth = lpMatchParent
+    LayoutParamHeight = lpWrapContent
+    Text = 'Show Time Picker Dialog'
+    BackgroundColor = colbrDefault
+    FontColor = colbrDefault
+    FontSize = 0
+    OnClick = jButton1Click
+    Id = 6613246
+  end
+  object jButton2: jButton
+    Left = 8
+    Top = 120
+    Width = 288
+    Height = 40
+    MarginLeft = 2
+    MarginTop = 4
+    MarginRight = 2
+    MarginBottom = 4
+    Visible = True
+    Anchor = jButton1
+    PosRelativeToAnchor = [raBelow]
+    PosRelativeToParent = []
+    LayoutParamWidth = lpMatchParent
+    LayoutParamHeight = lpWrapContent
+    Text = 'Show Date Picker Dialog'
+    BackgroundColor = colbrDefault
+    FontColor = colbrDefault
+    FontSize = 0
+    OnClick = jButton2Click
+    Id = 0
+  end
+  object jDatePickerDialog1: jDatePickerDialog
+    OnDatePicker = jDatePickerDialog1DatePicker
+    left = 64
+    top = 199
+  end
+  object jTimePickerDialog1: jTimePickerDialog
+    OnTimePicker = jTimePickerDialog1TimePicker
+    left = 208
+    top = 200
+  end
+end

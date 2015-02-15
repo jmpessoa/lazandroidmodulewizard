@@ -29,6 +29,8 @@ object AndroidModule1: TAndroidModule1
     LayoutParamWidth = lpMatchParent
     LayoutParamHeight = lpOneQuarterOfParent
     BackgroundColor = colbrDefault
+    MinPinchZoomFactor = 0.25
+    MaxPinchZoomFactor = 4
     Id = 7730789
     object jTextView1: jTextView
       Left = 84
@@ -93,6 +95,8 @@ object AndroidModule1: TAndroidModule1
       LayoutParamWidth = lpMatchParent
       LayoutParamHeight = lpWrapContent
       BackgroundColor = colbrOrange
+      MinPinchZoomFactor = 0.25
+      MaxPinchZoomFactor = 4
       Id = 0
       object jEditText1: jEditText
         Tag = 1
@@ -139,6 +143,8 @@ object AndroidModule1: TAndroidModule1
       LayoutParamWidth = lpMatchParent
       LayoutParamHeight = lpWrapContent
       BackgroundColor = colbrLightGrey
+      MinPinchZoomFactor = 0.25
+      MaxPinchZoomFactor = 4
       Id = 0
       object jButton1: jButton
         Left = 0
@@ -179,6 +185,8 @@ object AndroidModule1: TAndroidModule1
     LayoutParamWidth = lpMatchParent
     LayoutParamHeight = lpOneThirdOfParent
     BackgroundColor = colbrLightSteelBlue
+    MinPinchZoomFactor = 0.25
+    MaxPinchZoomFactor = 4
     Id = 6970869
     object jView1: jView
       Left = 92
@@ -212,6 +220,8 @@ object AndroidModule1: TAndroidModule1
     LayoutParamWidth = lpMatchParent
     LayoutParamHeight = lpMatchParent
     BackgroundColor = colbrLemonChiffon
+    MinPinchZoomFactor = 0.25
+    MaxPinchZoomFactor = 4
     Id = 0
     object jImageView1: jImageView
       Left = 117
@@ -225,6 +235,7 @@ object AndroidModule1: TAndroidModule1
       LayoutParamHeight = lpMatchParent
       ImageIndex = -1
       BackgroundColor = colbrDefault
+      ImageScaleType = scaleCenterInside
       Id = 0
     end
   end

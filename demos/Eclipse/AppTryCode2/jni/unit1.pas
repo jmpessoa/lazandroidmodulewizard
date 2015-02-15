@@ -49,12 +49,11 @@ begin
    FVolumeR:= 0.6;
    FVolumeL:= 0.6;
    FIsLoaded:= False;
-   Self.OnJNIPrompt:= DataModuleJNIPrompt;
 end;
 
 procedure TAndroidModule1.DataModuleJNIPrompt(Sender: TObject);
 begin
-   Self.Show;
+   //
 end;
 
 procedure TAndroidModule1.jButton1Click(Sender: TObject);
@@ -64,7 +63,7 @@ begin
   {/sdcard/localfile.mp3}
   if not FIsLoaded then
   begin
-     jMediaPlayer1.SetDataSource('pipershut2.mp3');  //from Assets...
+     jMediaPlayer1.SetDataSource('pipershut2.mp3');  //from  .../assets...
      jMediaPlayer1.Prepare();
      FIsLoaded:= True;
   end;

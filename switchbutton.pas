@@ -200,7 +200,7 @@ begin
   else Self.AnchorId:= -1; //dummy
   jSwitchButton_SetLayoutAll(FjEnv, FjObject, Self.AnchorId);
   if  FColor <> colbrDefault then
-    View_SetBackGroundColor(FjEnv, FjObject, GetARGB(FColor));
+    View_SetBackGroundColor(FjEnv, FjObject, GetARGB(FCustomColor, FColor));
 
   if FTextOff <> 'OFF' then
     jSwitchButton_SetTextOff(FjEnv, FjObject, FTextOff);
@@ -220,7 +220,7 @@ procedure jSwitchButton.SetColor(Value: TARGBColorBridge);
 begin
   FColor:= Value;
   if (FInitialized = True) and (FColor <> colbrDefault)  then
-    View_SetBackGroundColor(FjEnv, FjObject, GetARGB(FColor));
+    View_SetBackGroundColor(FjEnv, FjObject, GetARGB(FCustomColor, FColor));
 end;
 procedure jSwitchButton.SetVisible(Value : Boolean);
 begin

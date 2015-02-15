@@ -45,6 +45,7 @@ jImageFileManager = class(jControl)
     function SetByteArrayToBitmap(var _imageArray: TDynArrayOfJByte): jObject;
     function ClockWise(_bitmap: jObject; _imageView: jObject): jObject;
     function AntiClockWise(_bitmap: jObject; _imageView: jObject): jObject;
+    function SetScale(_bmp: jObject; _imageView: jObject; _scaleX: single; _scaleY: single): jObject;
 
  published
 
@@ -72,7 +73,7 @@ function jImageFileManager_GetByteArrayFromBitmap(env: PJNIEnv; _jimagefilemanag
 function jImageFileManager_SetByteArrayToBitmap(env: PJNIEnv; _jimagefilemanager: JObject; var _imageArray: TDynArrayOfJByte): jObject;
 function jImageFileManager_Clockwise(env: PJNIEnv; _jimagefilemanager: JObject; _bitmap: jObject; _imageView: jObject): jObject;
 function jImageFileManager_AntiClockWise(env: PJNIEnv; _jimagefilemanager: JObject; _bitmap: jObject; _imageView: jObject): jObject;
-
+function jImageFileManager_SetScale(env: PJNIEnv; _jimagefilemanager: JObject; _bmp: jObject; _imageView: jObject; _scaleX: single; _scaleY: single): jObject;
 
 
 implementation
@@ -253,6 +254,13 @@ begin
   //in designing component state: result value here...
   if FInitialized then
    Result:= jImageFileManager_AntiClockWise(FjEnv, FjObject, _bitmap ,_imageView);
+end;
+
+function jImageFileManager.SetScale(_bmp: jObject; _imageView: jObject; _scaleX: single; _scaleY: single): jObject;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jImageFileManager_SetScale(FjEnv, FjObject, _bmp ,_imageView ,_scaleX ,_scaleY);
 end;
 
 {-------- jImageFileManager_JNI_Bridge ----------}
@@ -564,6 +572,21 @@ begin
   jParams[1].l:= _imageView;
   jCls:= env^.GetObjectClass(env, _jimagefilemanager);
   jMethod:= env^.GetMethodID(env, jCls, 'AntiClockWise', '(Landroid/graphics/Bitmap;Landroid/widget/ImageView;)Landroid/graphics/Bitmap;');
+  Result:= env^.CallObjectMethodA(env, _jimagefilemanager, jMethod, @jParams);
+end;
+
+function jImageFileManager_SetScale(env: PJNIEnv; _jimagefilemanager: JObject; _bmp: jObject; _imageView: jObject; _scaleX: single; _scaleY: single): jObject;
+var
+  jParams: array[0..3] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= _bmp;
+  jParams[1].l:= _imageView;
+  jParams[2].f:= _scaleX;
+  jParams[3].f:= _scaleY;
+  jCls:= env^.GetObjectClass(env, _jimagefilemanager);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetScale', '(Landroid/graphics/Bitmap;Landroid/widget/ImageView;FF)Landroid/graphics/Bitmap;');
   Result:= env^.CallObjectMethodA(env, _jimagefilemanager, jMethod, @jParams);
 end;
 

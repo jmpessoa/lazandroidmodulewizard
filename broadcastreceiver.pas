@@ -9,6 +9,16 @@ uses
 
 type
 
+TIntentActionFiter = (afTimeTick,
+                   afTimeChanged,
+                   afTimeZoneChanged,
+                   afBootCompleted,
+                   afBatteryChanged,
+                   afPowerConnected,
+                   afPowerDisconnected,
+                   afShutDown, afNone);
+
+
 TOnReceiver = procedure(Sender: TObject;  intent: jObject) of Object;
 
 {Draft Component code by "Lazarus Android Module Wizard" [1/18/2015 2:13:27]}
@@ -18,7 +28,7 @@ TOnReceiver = procedure(Sender: TObject;  intent: jObject) of Object;
 
 jBroadcastReceiver = class(jControl)
  private
-    FIntentAction: string;
+    FIntentActionFilter: TIntentActionFiter;
     FOnReceiver: TOnReceiver;
     FRegistered: boolean;
 
@@ -30,21 +40,27 @@ jBroadcastReceiver = class(jControl)
     procedure Init(refApp: jApp); override;
     function jCreate(): jObject;
     procedure jFree();
-    procedure RegisterIntentAction(_intentAction: string);
+
+    procedure RegisterIntentActionFilter(_intentAction: string); overload;
+    procedure SetIntentActionFilter(_intentAction: TIntentActionFiter);
+
     procedure Unregister();
 
     procedure GenEvent_OnBroadcastReceiver(Obj: TObject;  intent: jObject);
 
     property Registered: boolean read FRegistered write FRegistered;
+
  published
-    property IntentAction: string read FIntentAction write FIntentAction;
+    property IntentActionFilter: TIntentActionFiter read FIntentActionFilter write SetIntentActionFilter;
     property OnReceiver: TOnReceiver read FOnReceiver write FOnReceiver;
 end;
 
 function jBroadcastReceiver_jCreate(env: PJNIEnv;_Self: int64; this: jObject): jObject;
 procedure jBroadcastReceiver_jFree(env: PJNIEnv; _jbroadcastreceiver: JObject);
-procedure jBroadcastReceiver_RegisterIntentAction(env: PJNIEnv; _jbroadcastreceiver: JObject; _intentAction: string);
+procedure jBroadcastReceiver_RegisterIntentActionFilter(env: PJNIEnv; _jbroadcastreceiver: JObject; _intentAction: string); overload;
+procedure jBroadcastReceiver_RegisterIntentActionFilter(env: PJNIEnv; _jbroadcastreceiver: JObject; _intentAction: integer);  overload;
 procedure jBroadcastReceiver_Unregister(env: PJNIEnv; _jbroadcastreceiver: JObject);
+
 
 
 implementation
@@ -57,6 +73,7 @@ begin
   inherited Create(AOwner);
 //your code here....
   FRegistered:= False;
+  FIntentActionFilter:= afNone;
 end;
 
 destructor jBroadcastReceiver.Destroy;
@@ -80,6 +97,11 @@ begin
   //your code here: set/initialize create params....
   FjObject:= jCreate(); //jSelf !
   FInitialized:= True;
+  if FIntentActionFilter <> afNone then
+  begin
+     jBroadcastReceiver_RegisterIntentActionFilter(FjEnv, FjObject, Ord(FIntentActionFilter));
+     FRegistered:= True;
+  end;
 end;
 
 
@@ -95,13 +117,24 @@ begin
      jBroadcastReceiver_jFree(FjEnv, FjObject);
 end;
 
-procedure jBroadcastReceiver.RegisterIntentAction(_intentAction: string);
+procedure jBroadcastReceiver.RegisterIntentActionFilter(_intentAction: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
   begin
      FRegistered:= True;
-     jBroadcastReceiver_RegisterIntentAction(FjEnv, FjObject, _intentAction);
+     jBroadcastReceiver_RegisterIntentActionFilter(FjEnv, FjObject, _intentAction);
+  end;
+end;
+
+procedure jBroadcastReceiver.SetIntentActionFilter(_intentAction: TIntentActionFiter);
+begin
+  //in designing component state: set value here...
+  FIntentActionFilter:= _intentAction;
+  if FInitialized then
+  begin
+     FRegistered:= True;
+     jBroadcastReceiver_RegisterIntentActionFilter(FjEnv, FjObject, Ord(_intentAction));
   end;
 end;
 
@@ -160,7 +193,7 @@ begin
 end;
 
 
-procedure jBroadcastReceiver_RegisterIntentAction(env: PJNIEnv; _jbroadcastreceiver: JObject; _intentAction: string);
+procedure jBroadcastReceiver_RegisterIntentActionFilter(env: PJNIEnv; _jbroadcastreceiver: JObject; _intentAction: string);
 var
   jParams: array[0..0] of jValue;
   jMethod: jMethodID=nil;
@@ -168,9 +201,21 @@ var
 begin
   jParams[0].l:= env^.NewStringUTF(env, PChar(_intentAction));
   jCls:= env^.GetObjectClass(env, _jbroadcastreceiver);
-  jMethod:= env^.GetMethodID(env, jCls, 'RegisterIntentAction', '(Ljava/lang/String;)V');
+  jMethod:= env^.GetMethodID(env, jCls, 'RegisterIntentActionFilter', '(Ljava/lang/String;)V');
   env^.CallVoidMethodA(env, _jbroadcastreceiver, jMethod, @jParams);
 env^.DeleteLocalRef(env,jParams[0].l);
+end;
+
+procedure jBroadcastReceiver_RegisterIntentActionFilter(env: PJNIEnv; _jbroadcastreceiver: JObject; _intentAction: integer);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].i:= _intentAction;
+  jCls:= env^.GetObjectClass(env, _jbroadcastreceiver);
+  jMethod:= env^.GetMethodID(env, jCls, 'RegisterIntentActionFilter', '(I)V');
+  env^.CallVoidMethodA(env, _jbroadcastreceiver, jMethod, @jParams);
 end;
 
 
@@ -183,7 +228,5 @@ begin
   jMethod:= env^.GetMethodID(env, jCls, 'Unregister', '()V');
   env^.CallVoidMethod(env, _jbroadcastreceiver, jMethod);
 end;
-
-
 
 end.

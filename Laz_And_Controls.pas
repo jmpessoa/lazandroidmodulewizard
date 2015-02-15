@@ -143,6 +143,15 @@ uses
 
 type
 
+  TImeOptions = (imeFlagNoFullScreen,
+                 imeActionNone,
+                 imeActionGo,
+                 imeActionSearch,
+                 imeActionSend,
+                 imeActionNext,
+                 imeActionDone,
+                 imeActionPrevious,
+                 imeFlagForceASCII);
 
   jCanvas = class;
   TOnDraw  = Procedure(Sender: TObject; Canvas: jCanvas) of object;
@@ -153,7 +162,11 @@ type
 
  jPanel = class(jVisualControl)
    private
-     //FjRLayout: jObject; // Java : Self Layout
+     FOnFling: TOnFling;
+     FOnPinchGesture: TOnPinchZoom;
+     FMinZoomFactor: single;
+     FMaxZoomFactor: single;
+
      Procedure SetColor(Value : TARGBColorBridge); //background
      procedure UpdateLParamHeight;
      procedure UpdateLParamWidth;
@@ -171,11 +184,21 @@ type
      procedure Init(refApp: jApp);  override;
 
      procedure ResetAllRules;
-
      procedure RemoveParent;
+     procedure GenEvent_OnFlingGestureDetected(Obj: TObject; direction: integer);
+     procedure GenEvent_OnPinchZoomGestureDetected(Obj: TObject; scaleFactor: single; state: integer);
+
+    procedure SetMinZoomFactor(_minZoomFactor: single);
+    procedure SetMaxZoomFactor(_maxZoomFactor: single);
 
    published
      property BackgroundColor     : TARGBColorBridge read FColor write SetColor;
+     property MinPinchZoomFactor: single read FMinZoomFactor write FMinZoomFactor;
+     property MaxPinchZoomFactor: single read FMaxZoomFactor write FMaxZoomFactor;
+
+     property OnFlingGesture: TOnFling read FOnFling write FOnFling;
+     property OnPinchZoomGesture: TOnPinchZoom read FOnPinchGesture write FOnPinchGesture;
+
    end;
 
    //NEW by jmpessoa
@@ -378,6 +401,12 @@ type
 
     function ClockWise(_bmp: jObject; _imageView: jObject): jObject;
     function AntiClockWise(_bmp: jObject; _imageView: jObject): jObject;
+    function SetScale(_bmp: jObject; _imageView: jObject; _scaleX: single; _scaleY: single): jObject; overload;
+    function SetScale(_imageView: jObject; _scaleX: single; _scaleY: single): jObject; overload;
+    function LoadFromAssets(strName: string): jObject;
+    function GetResizedBitmap(_bmp: jObject; _newWidth: integer; _newHeight: integer): jObject; overload;
+    function GetResizedBitmap(_newWidth: integer; _newHeight: integer): jObject; overload;
+    function GetResizedBitmap(_factorScaleX: single; _factorScaleY: single): jObject; overload;
 
   published
     property FilePath: TFilePath read FFilePath write FFilePath;
@@ -570,6 +599,7 @@ type
     procedure Init(refApp: jApp); override;
     Procedure Refresh;
     Procedure UpdateLayout; override;
+    procedure Append(_txt: string);
   published
     property Text: string read GetText write SetText;
     property Alignment : TTextAlignment read FTextAlignment write SetTextAlignment;
@@ -646,6 +676,9 @@ type
     procedure AllCaps;
     procedure DispatchOnChangeEvent(value: boolean);
     procedure DispatchOnChangedEvent(value: boolean);
+
+    procedure Append(_txt: string);
+    procedure SetImeOptions(_imeOption: TImeOptions);
     // Property
     property CursorPos : TXY        read GetCursorPos  write SetCursorPos;
     //property Scroller: boolean  read FScroller write SetScroller;
@@ -830,6 +863,7 @@ type
     //FIsBackgroundImage     : boolean;
     FFilePath: TFilePath;
     //FImageIdentifier: string;
+    FImageScaleType: TImageScaleType;
 
     Procedure SetVisible  (Value : Boolean);
     Procedure SetColor    (Value : TARGBColorBridge);
@@ -863,6 +897,9 @@ type
 
     function GetBitmapHeight: integer;
     function GetBitmapWidth: integer;
+    procedure SetImageMatrixScale(_scaleX: single; _scaleY: single);
+    procedure SetScaleType(_scaleType: TImageScaleType);
+    function GetBitmapImage(): jObject;
 
     property Count: integer read GetCount;
   published
@@ -872,7 +909,7 @@ type
     property BackgroundColor     : TARGBColorBridge read FColor       write SetColor;
     //property IsBackgroundImage   : boolean read FIsBackgroundImage    write FIsBackgroundImage;
     property ImageIdentifier : string read FImageName write SetImageByResIdentifier;
-
+    property ImageScaleType: TImageScaleType read FImageScaleType write SetScaleType;
      // Event
      property OnClick: TOnNotify read FOnClick write FOnClick;
   end;
@@ -1352,6 +1389,8 @@ type
   procedure Java_Event_pAppOnViewClick(env: PJNIEnv; this: jobject; jObjView: jObject; id: integer);
   procedure Java_Event_pAppOnListItemClick(env: PJNIEnv; this: jobject;jObjAdapterView: jObject; jObjView: jObject; position: integer; id: integer);
 
+  Procedure Java_Event_pOnFlingGestureDetected(env: PJNIEnv; this: jobject; Obj: TObject; direction: integer);
+  Procedure Java_Event_pOnPinchZoomGestureDetected(env: PJNIEnv; this: jobject; Obj: TObject; scaleFactor: single; state: integer);
 
   // Asset Function (P : Pascal Native)
   Function  Asset_SaveToFile (srcFile,outFile : String; SkipExists : Boolean = False) : Boolean;
@@ -2048,10 +2087,10 @@ begin
 
   for rToP := rpBottom to rpCenterVertical do
   begin
-     if rToP in FPositionRelativeToParent then
-     begin
-       jTextView_addlParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
-     end;
+    if rToP in FPositionRelativeToParent then
+    begin
+      jTextView_addlParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
+    end;
   end;
 
   if Self.Anchor <> nil then Self.AnchorId:= Self.Anchor.Id
@@ -2062,20 +2101,20 @@ begin
   jTextView_setText(FjEnv, FjObject , FText);
 
   if  FFontColor <> colbrDefault then
-     jTextView_setTextColor(FjEnv, FjObject , GetARGB(FFontColor));
+    jTextView_setTextColor(FjEnv, FjObject , GetARGB(FCustomColor, FFontColor));
 
   if FFontSize > 0 then
-     jTextView_setTextSize(FjEnv, FjObject , FFontSize);
+    jTextView_setTextSize(FjEnv, FjObject , FFontSize);
 
   jTextView_setTextAlignment(FjEnv, FjObject , Ord(FTextAlignment));
 
-  if  FColor <> colbrDefault then
-     View_SetBackGroundColor(FjEnv, FjThis, FjObject , GetARGB(FColor));
+  if FColor <> colbrDefault then
+    View_SetBackGroundColor(FjEnv, FjThis, FjObject , GetARGB(FCustomColor, FColor));
 
   jTextView_setEnabled(FjEnv, FjObject , FEnabled);
 
   if FTextTypeFace <>  tfNormal then   //TODO: TFontFace=(ffNormal,ffSans,ffSerif,ffMonospace);
-     jTextView_SetTextTypeFace(FjEnv, FjObject, Ord(FTextTypeFace));
+    jTextView_SetTextTypeFace(FjEnv, FjObject, Ord(FTextTypeFace));
 
   View_SetVisible(FjEnv, FjThis, FjObject , FVisible);
 
@@ -2099,7 +2138,7 @@ Procedure jTextView.SetColor(Value: TARGBColorBridge);
 begin
   FColor:= Value;
   if (FInitialized = True) and (FColor <> colbrDefault)  then
-    View_SetBackGroundColor(FjEnv, FjObject , GetARGB(FColor));
+    View_SetBackGroundColor(FjEnv, FjObject , GetARGB(FCustomColor, FColor));
 end;
 
 Procedure jTextView.SetEnabled(Value: Boolean);
@@ -2125,9 +2164,9 @@ end;
 
 Procedure jTextView.SetFontColor(Value: TARGBColorBridge);
 begin
-  FFontColor:= Value;
-  if (FInitialized = True) and (FFontColor <> colbrDefault) then
-    jTextView_setTextColor(FjEnv, FjObject , GetARGB(FFontColor));
+ FFontColor:= Value;
+ if (FInitialized = True) and (FFontColor <> colbrDefault) then
+     jTextView_setTextColor(FjEnv, FjObject, GetARGB(FCustomColor, FFontColor))
 end;
 
 Procedure jTextView.SetFontSize(Value: DWord);
@@ -2219,6 +2258,13 @@ end;
 Procedure jTextView.GenEvent_OnClick(Obj: TObject);
 begin
   if Assigned(FOnClick) then FOnClick(Obj);
+end;
+
+procedure jTextView.Append(_txt: string);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jTextView_Append(FjEnv, FjObject, _txt);
 end;
 
 //------------------------------------------------------------------------------
@@ -2346,7 +2392,7 @@ begin
     jEditText_setHint(FjEnv, FjObject , FHint);
 
   if FFontColor <> colbrDefault then
-    jEditText_setTextColor(FjEnv, FjObject , GetARGB(FFontColor));
+    jEditText_setTextColor(FjEnv, FjObject , GetARGB(FCustomColor, FFontColor));
 
   if FFontSize > 0 then
     jEditText_setTextSize(FjEnv, FjObject , FFontSize);
@@ -2388,8 +2434,8 @@ begin
 
   //thierrydijoux - if SetBackGroundColor to black, no theme
   if FColor <> colbrDefault then
-     View_SetBackGroundColor(FjEnv,  FjThis, FjObject , GetARGB(FColor));
-  //else  View_SetBackGroundColor(FjEnv, FjThis, FjObject , GetARGB(colbrWhite));
+     View_SetBackGroundColor(FjEnv,  FjThis, FjObject , GetARGB(FCustomColor, FColor));
+  //else  View_SetBackGroundColor(FjEnv, FjThis, FjObject , GetARGB(FCustomColor, colbrWhite));
 
   View_SetVisible(FjEnv, FjThis, FjObject , FVisible);
 
@@ -2419,7 +2465,7 @@ Procedure jEditText.setColor(Value: TARGBColorBridge);
 begin
   FColor := Value;
   if (FInitialized = True) and (FColor <> colbrDefault)  then
-    View_SetBackGroundColor(FjEnv, FjObject , GetARGB(FColor));
+    View_SetBackGroundColor(FjEnv, FjObject , GetARGB(FCustomColor, FColor));
 end;
 
 Procedure jEditText.Refresh;
@@ -2447,7 +2493,7 @@ procedure jEditText.SetFontColor(Value: TARGBColorBridge);
 begin
   FFontColor:= Value;
   if (FInitialized = True) and (FFontColor <> colbrDefault) then
-     jEditText_setTextColor(FjEnv, FjObject , GetARGB(FFontColor));
+     jEditText_setTextColor(FjEnv, FjObject , GetARGB(FCustomColor, FFontColor));
 end;
 
 Procedure jEditText.SetFontSize(Value: DWord);
@@ -2678,6 +2724,20 @@ begin
     jEditText_DispatchOnChangedEvent(FjEnv, FjObject, value);
 end;
 
+procedure jEditText.Append(_txt: string);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jEditText_Append(FjEnv, FjObject, _txt);
+end;
+
+procedure jEditText.SetImeOptions(_imeOption: TImeOptions);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jEditText_SetImeOptions(FjEnv, FjObject, Ord(_imeOption));
+end;
+
 //------------------------------------------------------------------------------
 // jButton
 //------------------------------------------------------------------------------
@@ -2784,13 +2844,13 @@ begin
   jButton_setText(FjEnv, FjObject , FText);
 
   if FFontColor <> colbrDefault then
-     jButton_setTextColor(FjEnv, FjObject , GetARGB(FFontColor));
+     jButton_setTextColor(FjEnv, FjObject , GetARGB(FCustomColor, FFontColor));
 
   if FFontSize > 0 then //not default...
      jButton_setTextSize(FjEnv, FjObject , FFontSize);
 
   if FColor <> colbrDefault then
-    View_SetBackGroundColor(FjEnv, FjThis, FjObject , GetARGB(FColor));
+    View_SetBackGroundColor(FjEnv, FjThis, FjObject , GetARGB(FCustomColor, FColor));
 
   View_SetVisible(FjEnv, FjThis, FjObject , FVisible);
 
@@ -2814,7 +2874,7 @@ Procedure jButton.SetColor(Value: TARGBColorBridge);
 begin
   FColor:= Value;
   if (FInitialized = True) and (FColor <> colbrDefault)  then
-     View_SetBackGroundColor(FjEnv, FjObject , GetARGB(FColor));
+     View_SetBackGroundColor(FjEnv, FjObject , GetARGB(FCustomColor, FColor));
 end;
 
 Procedure jButton.Refresh;
@@ -2841,7 +2901,7 @@ Procedure jButton.SetFontColor(Value : TARGBColorBridge);
 begin
   FFontColor:= Value;
   if (FInitialized = True) and (FFontColor <> colbrDefault) then
-     jButton_setTextColor(FjEnv, FjObject , GetARGB(FFontColor));
+     jButton_setTextColor(FjEnv, FjObject , GetARGB(FCustomColor, FFontColor));
 end;
 
 Procedure jButton.SetFontSize (Value : DWord);
@@ -3016,13 +3076,13 @@ begin
   jCheckBox_setText(FjEnv, FjObject , FText);
 
   if FFontColor <> colbrDefault then
-     jCheckBox_setTextColor(FjEnv, FjObject , GetARGB(FFontColor));
+     jCheckBox_setTextColor(FjEnv, FjObject , GetARGB(FCustomColor, FFontColor));
 
   if FFontSize > 0 then
      jCheckBox_setTextSize(FjEnv, FjObject , FFontSize);
 
   if FColor <> colbrDefault then
-     View_SetBackGroundColor(FjEnv, FjThis, FjObject , GetARGB(FColor));
+     View_SetBackGroundColor(FjEnv, FjThis, FjObject , GetARGB(FCustomColor, FColor));
 
   View_SetVisible(FjEnv, FjThis, FjObject , FVisible);
 
@@ -3046,7 +3106,7 @@ Procedure jCheckBox.SetColor(Value: TARGBColorBridge);
 begin
   FColor := Value;
   if (FInitialized = True) and (FColor <> colbrDefault) then
-     View_SetBackGroundColor(FjEnv, FjObject , GetARGB(FColor));
+     View_SetBackGroundColor(FjEnv, FjObject , GetARGB(FCustomColor, FColor));
 end;
 
 Procedure jCheckBox.Refresh;
@@ -3073,7 +3133,7 @@ Procedure jCheckBox.SetFontColor(Value: TARGBColorBridge);
 begin
   FFontColor:= Value;
   if (FInitialized = True) and (FFontColor <> colbrDefault) then
-     jCheckBox_setTextColor(FjEnv, FjObject , GetARGB(FFontColor));
+     jCheckBox_setTextColor(FjEnv, FjObject , GetARGB(FCustomColor, FFontColor));
 end;
 
 Procedure jCheckBox.SetFontSize(Value: DWord);
@@ -3262,7 +3322,7 @@ begin
   jRadioButton_setText(FjEnv, FjObject , FText);
 
   if FFontColor <> colbrDefault then
-     jRadioButton_setTextColor(FjEnv, FjObject , GetARGB(FFontColor));
+     jRadioButton_setTextColor(FjEnv, FjObject , GetARGB(FCustomColor, FFontColor));
 
   if FFontSize > 0 then
      jRadioButton_setTextSize(FjEnv, FjObject , FFontSize);
@@ -3270,7 +3330,7 @@ begin
   jRadioButton_setChecked(FjEnv, FjObject , FChecked);
 
   if FColor <> colbrDefault then
-     View_SetBackGroundColor(FjEnv, FjThis, FjObject , GetARGB(FColor));
+     View_SetBackGroundColor(FjEnv, FjThis, FjObject , GetARGB(FCustomColor, FColor));
 
   View_SetVisible(FjEnv, FjThis, FjObject , FVisible);
 
@@ -3294,7 +3354,7 @@ Procedure jRadioButton.SetColor(Value: TARGBColorBridge);
 begin
   FColor:= Value;
   if (FInitialized = True) and (FColor <> colbrDefault) then
-     View_SetBackGroundColor(FjEnv, FjObject , GetARGB(FColor));
+     View_SetBackGroundColor(FjEnv, FjObject , GetARGB(FCustomColor, FColor));
 end;
 
 Procedure jRadioButton.Refresh;
@@ -3321,7 +3381,7 @@ Procedure jRadioButton.SetFontColor(Value: TARGBColorBridge);
 begin
   FFontColor:= Value;
   if (FInitialized = True) and (FFontColor <> colbrDefault) then
-     jRadioButton_setTextColor(FjEnv, FjObject , GetARGB(FFontColor));
+     jRadioButton_setTextColor(FjEnv, FjObject , GetARGB(FCustomColor, FFontColor));
 end;
 
 Procedure jRadioButton.SetFontSize(Value: DWord);
@@ -3516,7 +3576,7 @@ begin
   jProgressBar_setMax(FjEnv, FjObject , FMax);  //by jmpessoa
 
   if FColor <> colbrDefault then
-    View_SetBackGroundColor(FjEnv, FjThis, FjObject , GetARGB(FColor));
+    View_SetBackGroundColor(FjEnv, FjThis, FjObject , GetARGB(FCustomColor, FColor));
   View_SetVisible(FjEnv, FjThis, FjObject , FVisible);
   FInitialized:= True;
 end;
@@ -3556,7 +3616,7 @@ Procedure jProgressBar.SetColor(Value: TARGBColorBridge);
 begin
   FColor := Value;
   if (FInitialized = True) and (FColor <> colbrDefault) then
-     View_SetBackGroundColor(FjEnv, FjObject , GetARGB(FColor));
+     View_SetBackGroundColor(FjEnv, FjObject , GetARGB(FCustomColor, FColor));
 end;
 
 Procedure jProgressBar.Refresh;
@@ -3667,6 +3727,7 @@ begin
   FLParamHeight:= lpWrapContent;
   //FIsBackgroundImage:= False;
   FFilePath:= fpathData;
+  FImageScaleType:= scaleCenter;
 end;
 
 procedure jImageView.SetParentComponent(Value: TComponent);
@@ -3747,7 +3808,7 @@ begin
   else Self.AnchorId:= -1;
 
   if FColor <> colbrDefault then
-      View_SetBackGroundColor(FjEnv, FjThis, FjObject , GetARGB(FColor));
+      View_SetBackGroundColor(FjEnv, FjThis, FjObject , GetARGB(FCustomColor, FColor));
 
   if FImageName <> '' then
      jImageView_SetImageByResIdentifier(FjEnv, FjObject , FImageName);
@@ -3760,6 +3821,9 @@ begin
        if FImageIndex >=0 then SetImageByIndex(FImageIndex);
     end;
   end;
+
+  if  FImageScaleType <> scaleCenter  then
+     jImageView_SetScaleType(FjEnv, FjObject, Ord(FImageScaleType));;
 
   jImageView_setLayoutAll(FjEnv, FjObject , Self.AnchorId);
   View_SetVisible(FjEnv, FjThis, FjObject , FVisible);
@@ -3783,7 +3847,7 @@ Procedure jImageView.SetColor(Value: TARGBColorBridge);
 begin
   FColor := Value;
   if (FInitialized = True) and (FColor <> colbrDefault) then
-     View_SetBackGroundColor(FjEnv, FjObject , GetARGB(FColor));
+     View_SetBackGroundColor(FjEnv, FjObject , GetARGB(FCustomColor, FColor));
 end;
 
 Procedure jImageView.Refresh;
@@ -3983,6 +4047,28 @@ begin
    Result:= jImageView_GetBitmapWidth(FjEnv, FjObject );
 end;
 
+
+procedure jImageView.SetImageMatrixScale(_scaleX: single; _scaleY: single);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jImageView_SetImageMatrixScale(FjEnv, FjObject, _scaleX ,_scaleY);
+end;
+
+procedure jImageView.SetScaleType(_scaleType: TImageScaleType);
+begin
+  //in designing component state: set value here...
+  FImageScaleType:= _scaleType;
+  if FInitialized then
+     jImageView_SetScaleType(FjEnv, FjObject, Ord(_scaleType));
+end;
+
+function jImageView.GetBitmapImage(): jObject;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jImageView_GetBitmapImage(FjEnv, FjObject);
+end;
 
 //  new by jmpessoa
 {jImageList}
@@ -4410,13 +4496,13 @@ begin
                                Ord(FWidgetItem), FWidgetText, FImageItem.GetJavaBitmap,
                                Ord(FTextDecorated),Ord(FItemLayout), Ord(FTextSizeDecorated), Ord(FTextAlign));
     if FFontColor <> colbrDefault then
-       jListView_setTextColor(FjEnv, FjObject , GetARGB(FFontColor));
+       jListView_setTextColor(FjEnv, FjObject , GetARGB(FCustomColor, FFontColor));
 
     if FFontSize > 0 then
        jListView_setTextSize(FjEnv, FjObject , FFontSize);
 
     if FColor <> colbrDefault then
-       View_SetBackGroundColor(FjEnv, FjThis, FjObject , GetARGB(FColor));
+       View_SetBackGroundColor(FjEnv, FjThis, FjObject , GetARGB(FCustomColor, FColor));
 
      for i:= 0 to Self.Items.Count-1 do
      begin
@@ -4430,13 +4516,13 @@ begin
                                Ord(FWidgetItem), FWidgetText,
                                Ord(FTextDecorated),Ord(FItemLayout), Ord(FTextSizeDecorated), Ord(FTextAlign));
      if FFontColor <> colbrDefault then
-        jListView_setTextColor(FjEnv, FjObject , GetARGB(FFontColor));
+        jListView_setTextColor(FjEnv, FjObject , GetARGB(FCustomColor, FFontColor));
 
      if FFontSize > 0 then
         jListView_setTextSize(FjEnv, FjObject , FFontSize);
 
      if FColor <> colbrDefault then
-        View_SetBackGroundColor(FjEnv, FjThis, FjObject , GetARGB(FColor));
+        View_SetBackGroundColor(FjEnv, FjThis, FjObject , GetARGB(FCustomColor, FColor));
 
      for i:= 0 to Self.Items.Count-1 do
         jListView_add2(FjEnv, FjObject , Self.Items.Strings[i], FDelimiter);
@@ -4588,7 +4674,7 @@ Procedure jListView.SetColor (Value: TARGBColorBridge);
 begin
   FColor:= Value;
   if (FInitialized = True) and (FColor <> colbrDefault) then
-     View_SetBackGroundColor(FjEnv, FjObject , GetARGB(FColor));
+     View_SetBackGroundColor(FjEnv, FjObject , GetARGB(FCustomColor, FColor));
 end;
 
 Procedure jListView.Refresh;
@@ -4601,14 +4687,14 @@ Procedure jListView.SetFontColor(Value: TARGBColorBridge);
 begin
   FFontColor:= Value;
   //if (FInitialized = True) and (FFontColor <> colbrDefault ) then
-    // jListView_setTextColor2(FjEnv, FjObject , GetARGB(FFontColor), index);
+    // jListView_setTextColor2(FjEnv, FjObject , GetARGB(FCustomColor, FFontColor), index);
 end;
 
 Procedure jListView.SetFontColorByIndex(Value: TARGBColorBridge; index: integer);
 begin
   //FFontColor:= Value;
   if FInitialized  and (Value <> colbrDefault) then
-     jListView_setTextColor2(FjEnv, FjObject , GetARGB(Value), index);
+     jListView_setTextColor2(FjEnv, FjObject , GetARGB(FCustomColor, Value), index);
 end;
 
 Procedure jListView.SetFontSize(Value: DWord);
@@ -4662,7 +4748,7 @@ begin
      if delim = '' then delim:= '+';
      if item = '' then delim:= 'dummy';
      jListView_add3(FjEnv, FjObject , item,
-     delim, GetARGB(fColor), fSize, Ord(hasWidget), widgetText, image);
+     delim, GetARGB(FCustomColor, fColor), fSize, Ord(hasWidget), widgetText, image);
      Self.Items.Add(item);
   end;
 end;
@@ -4720,7 +4806,7 @@ begin
     for i:= 0 to FItems.Count - 1 do
     begin
        jListView_add2(FjEnv, FjObject , FItems.Strings[i],
-                                    FDelimiter, GetARGB(FFontColor), FFontSize, FWidgetText, Ord(FWidgetItem));
+                                    FDelimiter, GetARGB(FCustomColor, FFontColor), FFontSize, FWidgetText, Ord(FWidgetItem));
     end;
   end; }
 end;
@@ -4841,7 +4927,7 @@ begin
   //in designing component state: set value here...
   FHighLightSelectedItemColor:= _color;
   if FInitialized then
-     jListView_SetHighLightSelectedItemColor(FjEnv, FjObject, GetARGB(_color));
+     jListView_SetHighLightSelectedItemColor(FjEnv, FjObject, GetARGB(FCustomColor, _color));
 end;
 
 //------------------------------------------------------------------------------
@@ -4946,7 +5032,7 @@ begin
   jScrollView_setScrollSize(FjEnv,FjObject , FScrollSize);
 
   if FColor <> colbrDefault then
-     View_SetBackGroundColor(FjEnv, FjThis, FjObject , GetARGB(FColor));
+     View_SetBackGroundColor(FjEnv, FjThis, FjObject , GetARGB(FCustomColor, FColor));
 
   View_SetVisible(FjEnv, FjThis, FjObject , FVisible);
   FInitialized:= True;
@@ -4970,7 +5056,7 @@ Procedure jScrollView.SetColor(Value: TARGBColorBridge);
 begin
   FColor:= Value;
   if (FInitialized = True) and (FColor <> colbrDefault) then
-     View_SetBackGroundColor(FjEnv, FjObject , GetARGB(FColor));
+     View_SetBackGroundColor(FjEnv, FjObject , GetARGB(FCustomColor, FColor));
 end;
 
 Procedure jScrollView.Refresh;
@@ -5139,7 +5225,7 @@ begin
   jHorizontalScrollView_setLayoutAll(FjEnv, FjObject , Self.AnchorId);
   jHorizontalScrollView_setScrollSize(FjEnv,FjObject , FScrollSize);
   if FColor <> colbrDefault then
-     View_SetBackGroundColor(FjEnv, FjThis, FjObject , GetARGB(FColor));
+     View_SetBackGroundColor(FjEnv, FjThis, FjObject , GetARGB(FCustomColor, FColor));
   View_SetVisible(FjEnv, FjThis, FjObject , FVisible);
   FInitialized:= True;
 end;
@@ -5162,7 +5248,7 @@ Procedure jHorizontalScrollView.SetColor(Value: TARGBColorBridge);
 begin
   FColor := Value;
   if (FInitialized = True) and (FColor <> colbrDefault) then
-     View_SetBackGroundColor(FjEnv, FjObject , GetARGB(FColor));
+     View_SetBackGroundColor(FjEnv, FjObject , GetARGB(FCustomColor, FColor));
 end;
 
 Procedure jHorizontalScrollView.Refresh;
@@ -5328,7 +5414,7 @@ begin
   else Self.AnchorId:= -1;
   jViewFlipper_setLayoutAll(FjEnv, FjObject , Self.AnchorId);
   if FColor <> colbrDefault then
-    View_SetBackGroundColor(FjEnv, FjThis, FjObject , GetARGB(FColor));
+    View_SetBackGroundColor(FjEnv, FjThis, FjObject , GetARGB(FCustomColor, FColor));
   View_SetVisible(FjEnv, FjThis, FjObject , FVisible);
   FInitialized:= True;
 end;
@@ -5351,7 +5437,7 @@ Procedure jViewFlipper.SetColor(Value: TARGBColorBridge);
 begin
   FColor:= Value;
   if (FInitialized = True) and (FColor <> colbrDefault) then
-     View_SetBackGroundColor(FjEnv, FjObject , GetARGB(FColor));
+     View_SetBackGroundColor(FjEnv, FjObject , GetARGB(FCustomColor, FColor));
 end;
 
 Procedure jViewFlipper.Refresh;
@@ -5512,7 +5598,7 @@ begin
   jWebView_setLayoutAll(FjEnv, FjObject , Self.AnchorId);
   jWebView_SetJavaScript(FjEnv, FjObject , FJavaScript);
   if FColor <> colbrDefault then
-    View_SetBackGroundColor(FjEnv, FjThis, FjObject , GetARGB(FColor));
+    View_SetBackGroundColor(FjEnv, FjThis, FjObject , GetARGB(FCustomColor, FColor));
   View_SetVisible(FjEnv, FjThis, FjObject , FVisible);
   FInitialized:= True;
 end;
@@ -5535,7 +5621,7 @@ Procedure jWebView.SetColor(Value: TARGBColorBridge);
 begin
   FColor := Value;
   if (FInitialized = True) and (FColor <> colbrDefault) then
-     View_SetBackGroundColor(FjEnv, FjObject , GetARGB(FColor));
+     View_SetBackGroundColor(FjEnv, FjObject , GetARGB(FCustomColor, FColor));
 end;
 
 Procedure jWebView.Refresh;
@@ -5978,6 +6064,48 @@ begin
    Result:= jBitmap_AntiClockWise(FjEnv, FjObject, _bmp ,_imageView);
 end;
 
+function jBitmap.SetScale(_bmp: jObject; _imageView: jObject; _scaleX: single; _scaleY: single): jObject;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jBitmap_SetScale(FjEnv, FjObject, _bmp ,_imageView ,_scaleX ,_scaleY);
+end;
+
+function jBitmap.SetScale(_imageView: jObject; _scaleX: single; _scaleY: single): jObject;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jBitmap_SetScale(FjEnv, FjObject, _imageView ,_scaleX ,_scaleY);
+end;
+
+function jBitmap.LoadFromAssets(strName: string): jObject;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jBitmap_LoadFromAssets(FjEnv, FjObject, strName);
+end;
+
+function jBitmap.GetResizedBitmap(_bmp: jObject; _newWidth: integer; _newHeight: integer): jObject;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jBitmap_GetResizedBitmap(FjEnv, FjObject, _bmp ,_newWidth ,_newHeight);
+end;
+
+function jBitmap.GetResizedBitmap(_newWidth: integer; _newHeight: integer): jObject;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jBitmap_GetResizedBitmap(FjEnv, FjObject,_newWidth ,_newHeight);
+end;
+
+function jBitmap.GetResizedBitmap(_factorScaleX: single; _factorScaleY: single): jObject;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jBitmap_GetResizedBitmap(FjEnv, FjObject, _factorScaleX ,_factorScaleY);
+end;
+
 //------------------------------------------------------------------------------
 // jCanvas
 //------------------------------------------------------------------------------
@@ -6013,7 +6141,7 @@ begin
   FjObject := jCanvas_Create(FjEnv, FjThis, Self);
   jCanvas_setStrokeWidth(FjEnv, FjObject ,FPaintStrokeWidth);
   jCanvas_setStyle(FjEnv, FjObject ,ord(FPaintStyle));
-  jCanvas_setColor(FjEnv, FjObject ,GetARGB(FPaintColor));
+  jCanvas_setColor(FjEnv, FjObject ,GetARGB(FCustomColor, FPaintColor));
   jCanvas_setTextSize(FjEnv, FjObject ,FPaintTextSize);
   FInitialized:= True;
 end;
@@ -6036,7 +6164,7 @@ Procedure jCanvas.SetColor(Value : TARGBColorBridge);
 begin
   FPaintColor:= Value;
   if FInitialized then
-     jCanvas_setColor(FjEnv, FjObject ,GetARGB(FPaintColor));
+     jCanvas_setColor(FjEnv, FjObject ,GetARGB(FCustomColor, FPaintColor));
 end;
 
 Procedure jCanvas.SetTextSize(Value: single);
@@ -6204,7 +6332,7 @@ begin
   else Self.AnchorId:= -1;
   jView_setLayoutAll(FjEnv, FjObject , Self.AnchorId);
   if FColor <> colbrDefault then
-     View_SetBackGroundColor(FjEnv, FjThis, FjObject , GetARGB(FColor));
+     View_SetBackGroundColor(FjEnv, FjThis, FjObject , GetARGB(FCustomColor, FColor));
   View_SetVisible(FjEnv, FjThis, FjObject , FVisible);
 
 end;
@@ -6227,7 +6355,7 @@ Procedure jView.SetColor(Value: TARGBColorBridge);
 begin
   FColor:= Value;
   if (FInitialized = True) and (FColor <> colbrDefault) then
-     View_SetBackGroundColor(FjEnv, FjObject , GetARGB(FColor));
+     View_SetBackGroundColor(FjEnv, FjObject , GetARGB(FCustomColor, FColor));
 end;
 
 // LORDMAN 2013-08-14
@@ -6653,7 +6781,7 @@ begin
   jImageBtn_SetEnabled(FjEnv, FjObject ,FEnabled);
 
   if FColor <> colbrDefault then
-     View_SetBackGroundColor(FjEnv, FjThis, FjObject , GetARGB(FColor));
+     View_SetBackGroundColor(FjEnv, FjThis, FjObject , GetARGB(FCustomColor, FColor));
 
   View_SetVisible(FjEnv, FjThis, FjObject , FVisible);
 end;
@@ -6676,7 +6804,7 @@ Procedure jImageBtn.SetColor(Value: TARGBColorBridge);
 begin
   FColor := Value;
   if (FInitialized = True) and (FColor <> colbrDefault) then
-     View_SetBackGroundColor(FjEnv, FjObject , GetARGB(FColor));
+     View_SetBackGroundColor(FjEnv, FjObject , GetARGB(FCustomColor, FColor));
 end;
  
 // LORDMAN 2013-08-16
@@ -7382,6 +7510,8 @@ begin
   FMarginLeft:= 4;
   FMarginRight:= 4;
   FMarginBottom:= 4;
+  FMinZoomFactor:= 1/4;
+  FMaxZoomFactor:= 8/2;
 end;
 
 procedure jPanel.SetParentComponent(Value: TComponent);
@@ -7473,10 +7603,13 @@ begin
   if Self.Anchor <> nil then Self.AnchorId:= Self.Anchor.Id
   else Self.AnchorId:= -1;
 
+  if FMinZoomFactor <> 0.25 then jPanel_SetMinZoomFactor(FjEnv, FjObject, FMinZoomFactor);
+  if FMaxZoomFactor <> 4.00 then jPanel_SetMaxZoomFactor(FjEnv, FjObject, FMaxZoomFactor);
+
   jPanel_setLayoutAll(FjEnv, FjObject , Self.AnchorId);
 
   if FColor <> colbrDefault then
-    View_SetBackGroundColor(FjEnv, FjThis, FjRLayout{!}, GetARGB(FColor));
+    View_SetBackGroundColor(FjEnv, FjThis, FjRLayout{!}, GetARGB(FCustomColor, FColor));
 
   View_SetVisible(FjEnv, FjThis, FjObject, FVisible);
 
@@ -7500,7 +7633,7 @@ Procedure jPanel.SetColor(Value: TARGBColorBridge);
 begin
   FColor:= Value;
   if (FInitialized = True) and (FColor <> colbrDefault) then
-    View_SetBackGroundColor(FjEnv, FjRLayout{view!}, GetARGB(FColor));
+    View_SetBackGroundColor(FjEnv, FjRLayout{view!}, GetARGB(FCustomColor, FColor));
 end;
 
 Procedure jPanel.Refresh;
@@ -7618,5 +7751,53 @@ if FInitialized then
    jPanel_RemoveParent(FjEnv, FjObject);
 end;
 
+procedure jPanel.GenEvent_OnFlingGestureDetected(Obj: TObject; direction: integer);
+begin
+  if Assigned(FOnFling) then  FOnFling(Obj, TFlingGesture(direction));
+end;
+
+Procedure Java_Event_pOnFlingGestureDetected(env: PJNIEnv; this: jobject; Obj: TObject; direction: integer);
+begin
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+  if Obj is jPanel then
+  begin
+    jPanel(Obj).UpdateJNI(gApp);
+    jPanel(Obj).GenEvent_OnFlingGestureDetected(Obj, direction);
+  end;
+end;
+
+procedure jPanel.GenEvent_OnPinchZoomGestureDetected(Obj: TObject; scaleFactor: single; state: integer);
+begin
+  if Assigned(FOnPinchGesture) then  FOnPinchGesture(Obj, scaleFactor, TPinchZoomScaleState(state));
+end;
+
+Procedure Java_Event_pOnPinchZoomGestureDetected(env: PJNIEnv; this: jobject; Obj: TObject; scaleFactor: single; state: integer);
+begin
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+  if Obj is jPanel then
+  begin
+    jPanel(Obj).UpdateJNI(gApp);
+    jPanel(Obj).GenEvent_OnPinchZoomGestureDetected(Obj,  scaleFactor, state);
+  end;
+end;
+
+
+procedure jPanel.SetMinZoomFactor(_minZoomFactor: single);
+begin
+  //in designing component state: set value here...
+  FMinZoomFactor:= _minZoomFactor;
+  if FInitialized then
+     jPanel_SetMinZoomFactor(FjEnv, FjObject, _minZoomFactor);
+end;
+
+procedure jPanel.SetMaxZoomFactor(_maxZoomFactor: single);
+begin
+  //in designing component state: set value here...
+  FMaxZoomFactor:= _maxZoomFactor;
+  if FInitialized then
+     jPanel_SetMaxZoomFactor(FjEnv, FjObject, _maxZoomFactor);
+end;
 
 end.

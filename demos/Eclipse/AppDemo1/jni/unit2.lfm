@@ -327,22 +327,23 @@ object AndroidModule2: TAndroidModule2
   end
   object jImageView1: jImageView
     Left = 104
-    Top = 400
+    Top = 424
     Width = 72
     Height = 72
     Visible = True
     PosRelativeToAnchor = []
-    PosRelativeToParent = []
+    PosRelativeToParent = [rpBottom, rpCenterHorizontal]
     LayoutParamWidth = lpMatchParent
-    LayoutParamHeight = lpMatchParent
+    LayoutParamHeight = lpWrapContent
     ImageIndex = 0
     Images = jImageList1
     BackgroundColor = colbrDefault
+    ImageScaleType = scaleFitCenter
     Id = 0
   end
   object jImageList1: jImageList
     Images.Strings = (
-      'bg_gr.png'
+      'lamw_logo1.png'
     )
     left = 208
     top = 432

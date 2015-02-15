@@ -59,3 +59,7 @@ pOnChangedSensor=Java_Event_pOnChangedSensor(PEnv,this,TObject(pasobj),sensor,se
 pOnListeningSensor=Java_Event_pOnListeningSensor(PEnv,this,TObject(pasobj),sensor,sensorType);
 pOnUnregisterListeningSensor=Java_Event_pOnUnregisterListeningSensor(PEnv,this,TObject(pasobj),sensorType,sensorName);
 pOnBroadcastReceiver=Java_Event_pOnBroadcastReceiver(PEnv,this,TObject(pasobj),intent);
+pOnTimePicker=Java_Event_pOnTimePicker(PEnv,this,TObject(pasobj),hourOfDay,minute);
+pOnDatePicker=Java_Event_pOnDatePicker(PEnv,this,TObject(pasobj),year,monthOfYear,dayOfMonth);
+pOnFlingGestureDetected=Java_Event_pOnFlingGestureDetected(PEnv,this,TObject(pasobj),direction);
+pOnPinchZoomGestureDetected=Java_Event_pOnPinchZoomGestureDetected(PEnv,this,TObject(pasobj),scaleFactor,state);

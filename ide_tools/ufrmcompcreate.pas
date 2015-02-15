@@ -901,7 +901,7 @@ begin
    listPascal.Add('  '+FJavaClassName+'_SetLayoutAll(FjEnv, FjObject, Self.AnchorId);');
    listPascal.Add('  ');
    listPascal.Add('  if  FColor <> colbrDefault then');
-   listPascal.Add('    View_SetBackGroundColor(FjEnv, FjObject, GetARGB(FColor));');
+   listPascal.Add('    View_SetBackGroundColor(FjEnv, FjObject, GetARGB(FCustomColor, FColor));');
    listPascal.Add('  ');
    listPascal.Add('  View_SetVisible(FjEnv, FjObject, FVisible);');
   end;
@@ -913,7 +913,7 @@ begin
    listPascal.Add('begin');
    listPascal.Add('  FColor:= Value;');
    listPascal.Add('  if (FInitialized = True) and (FColor <> colbrDefault)  then');
-   listPascal.Add('    View_SetBackGroundColor(FjEnv, FjObject, GetARGB(FColor));');
+   listPascal.Add('    View_SetBackGroundColor(FjEnv, FjObject, GetARGB(FCustomColor, FColor));');
    listPascal.Add('end;');
 
    listPascal.Add('procedure '+FJavaClassName+'.SetVisible(Value : Boolean);');

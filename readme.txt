@@ -1,5 +1,6 @@
 
-	Lazarus Android Module Wizard: Form Designer and Components development model! 
+	Lamw: Lazarus Android Module Wizard: 
+		:: Form Designer and Components development model! 
 		
 	"A wizard to create JNI Android loadable module (.so) in Lazarus/Free Pascal using 
 	[datamodule like] Form Designer and Components!" 
@@ -14,9 +15,9 @@
 		-Eny and Phil for the Project wizard hints...
 		http://forum.lazarus.freepascal.org/index.php/topic,20763.msg120823.html#msg120823
 
-		-Felipe for the Android support...
+		-Felipemdc [Android support...]
 
-		-TrueTom for the Laz4Android Package
+		-TrueTom [Laz4Android Package]
 
 			Date:2014-10-18
 			FPC: 2.7.1 SVN 28863  win32/arm-android/i386-android/jvm-android
@@ -25,10 +26,11 @@
 			http://sourceforge.net/projects/laz4android/files/?source=navbar
 			:To Install, please, read the "Laz4Android_readme.txt"
 
-      		-Simonsayz for the great work on Android [GUI] Controls
+      		-Simonsayz [great work on Android [GUI] Controls!]
 			Simon,Choi / Choi,Won-sik
 			simonsayz@naver.com
 			http://blog.naver.com/simonsayz
+			http://blog.naver.com/simonsayz/220216715675
 			http://forum.lazarus.freepascal.org/index.php/topic,22079.0.html
 
 			-warning:	
@@ -39,17 +41,15 @@
 
 		-Stephano  - Many collaborations and suggestions!
 
-		-x2nie for Lazarus 1.3 patch [No LCL form design!] 
+		-x2nie [Lazarus 1.3 patch :: No LCL form design!] 
 			http://github.com/x2nie/LiteZarus
 
                 -Fatih KILIÇ - How To Install!       
                   http://www.youtube.com/watch?v=sQnFYJyltwY&list=UUkQrLhaIXrKY4eq9zTymxpQ
 
 		-Thierry Dijoux - Late: Apk Expert Tools [Build, Install, ...]
-
 		
 		-Lazarus forum community!
-
 		
 	References:
 
@@ -65,14 +65,42 @@
 	*					*
 	*****************************************
 
+Version 0.6 - rev. 14 - 13 February 2015 -
+
+	NEW! Added support to Touch Gesture: Pinch/Zoom and Fling[Swipe]!
+		:: [jPanel] Added/News events support:  OnFlingGesture and OnPinchZoomGesture
+
+	NEW! Demo AppPinchZoomGestureDemo1 [Eclipse Compatible Project]
+	NEW! Demo AppFlingGestureDemo1     [Eclipse Compatible Project]
+
+	UPDATED! Demo AppActionBarTabDemo1 [Eclipse Compatible Project] 
+		:: Added support to gesture OnFlingGesture [swipe] //<<-A suggestion and request by Derit Agustin
+
+	NEW! Added component jNotificationManager[Android Bridges Extras]
+	NEW! Demo AppNotificationManagerDemo1[Eclipse Compatible Project]
+
+	NEW! Added component jDatePicker[Android Bridges Extras]
+	NEW! Added component jTimePicker[Android Bridges Extras]
+	NEW! Demo AppDateTimePicker[Eclipse Compatible Project]
+
+	IMPROVEMENTS:	jEditText :: Added/New method: SetImeOptions   //Thanks to @Ps 
+			All jVisualControl: Added Custom Color Support //Thanks to @Ps 					
+	UPDATED! Demo AppEditTextDemo1[Eclipse Compatible Project] 
+
+	
+	UPDATED! All Demos updated!
+
+
 Version 0.6 - rev. 13 - 29 January 2015 -
+
+	NEW! Added support to "core" Android!
 
 	NEW! Added component jBroadcatReceiver [Android Bridges Extras]
 	NEW! Demo AppBroadcatReceiverDemo1 [Eclipse Compatible Project]
 
 	NEW! Added component jSensorManager [Android Bridges Extras]
 	NEW! Demo AppSensorManagerDemo1 [Eclipse Compatible Project]
-	NEW! Demo AppSensorManagerDemo3 [Eclipse Compatible Project]
+	NEW! Demo AppSensorManagerDemo2 [Eclipse Compatible Project]
 
 	NEW! Added component jIntentManager [Android Bridges Extras]
 	NEW! Demo AppIntentManagerDemo1 [Eclipse Compatible Project]
@@ -83,10 +111,7 @@ Version 0.6 - rev. 13 - 29 January 2015 -
 		IDE "tools" -> "Android Module Wizard" -> "New jComponent [Create]"
 			Please, read the Tab "Help" ....
 
-	New! Added Options to Select[prebuilt] System = (Windows, Linux-x86, Mac, Linux-x86_64) 
-		:: A suggestion by @osvaldotcf [Thank you!]
-
-	UPDATED! All Demos updated! 
+	UPDATED! All Demos updated!
 	
 Version 0.6 - rev. 12 - 10 January 2015 -
 

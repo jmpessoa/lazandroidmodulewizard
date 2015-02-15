@@ -151,6 +151,8 @@ Procedure jTextView_setId(env:PJNIEnv; TextView : jObject; id: DWord);
 
 Procedure jTextView_setLeftTopRightBottomWidthHeight(env:PJNIEnv; TextView : jObject; ml,mt,mr,mb,w,h: integer);
 
+procedure jTextView_Append(env: PJNIEnv; _jtextview: JObject; _txt: string);
+
 //-----------------------------------
 // EditText  :: changed by jmpessoa [support Api > 13]
 //--------------------------------------
@@ -213,7 +215,9 @@ Procedure jEditText_setTextAlignment   (env:PJNIEnv; EditText : jObject; align :
 
 Procedure jEditText_SetEnabled         (env:PJNIEnv; EditText : jObject; enabled : Boolean);
 Procedure jEditText_SetEditable        (env:PJNIEnv; EditText : jObject; enabled : Boolean);
+procedure jEditText_Append(env: PJNIEnv; _jedittext: JObject; _txt: string);
 
+procedure jEditText_SetImeOptions(env: PJNIEnv; _jedittext: JObject; _imeOption: integer);
 
 // Button
 Function jButton_Create(env: PJNIEnv;   this:jobject; SelfObj: TObject): jObject;
@@ -374,6 +378,12 @@ function jImageView_GetBitmapWidth(env:PJNIEnv; ImageView : jObject): integer;
 
 Procedure jImageView_setId(env:PJNIEnv; ImageView : jObject; id: DWord);
 
+procedure jImageView_SetImageMatrixScale(env: PJNIEnv; _jimageview: JObject; _scaleX: single; _scaleY: single);
+
+procedure jImageView_SetScaleType(env: PJNIEnv; _jimageview: JObject; _scaleType: integer);
+
+function jImageView_GetBitmapImage(env: PJNIEnv; _jimageview: JObject): jObject;
+
 // ListView
 Function  jListView_Create2             (env:PJNIEnv;  this:jobject; SelfObj: TObject;
                                          widget: integer;
@@ -527,6 +537,9 @@ Procedure jPanel_RemoveParent(env:PJNIEnv; Panel : jObject);
 function jPanel_getLParamHeight(env:PJNIEnv; Panel : jObject ): integer;
 function jPanel_getLParamWidth(env:PJNIEnv; Panel : jObject): integer;
 
+procedure jPanel_SetMinZoomFactor(env: PJNIEnv; _jpanel: JObject; _minZoomFactor: single);
+procedure jPanel_SetMaxZoomFactor(env: PJNIEnv; _jpanel: JObject; _maxZoomFactor: single);
+
 //-----------------
 // HorizontalScrollView
 //by jmpessoa
@@ -654,13 +667,19 @@ Function  jBitmap_jInstance(env:PJNIEnv;  bmap: jObject): jObject;
 function jBitmap_ClockWise(env: PJNIEnv; _jbitmap: JObject; _bmp: jObject; _imageView: jObject): jObject;
 function jBitmap_AntiClockWise(env: PJNIEnv; _jbitmap: JObject; _bmp: jObject; _imageView: jObject): jObject;
 
-
+function jBitmap_SetScale(env: PJNIEnv; _jbitmap: JObject; _bmp: jObject; _imageView: jObject; _scaleX: single; _scaleY: single): jObject; overload;
+function jBitmap_SetScale(env: PJNIEnv; _jbitmap: JObject; _imageView: jObject; _scaleX: single; _scaleY: single): jObject; overload;
+function jBitmap_LoadFromAssets(env: PJNIEnv; _jbitmap: JObject; strName: string): jObject;
 //by jmpessoa
 function jBitmap_GetByteArrayFromBitmap(env:PJNIEnv;  bmap: jObject;
                                                    var bufferImage: TArrayOfByte): integer;
 //by jmpessoa
-procedure jBitmap_SetByteArrayToBitmap(env:PJNIEnv;  bmap: jObject;
-                                                                        var bufferImage: TArrayOfByte; size: integer);
+procedure jBitmap_SetByteArrayToBitmap(env:PJNIEnv;  bmap: jObject; var bufferImage: TArrayOfByte; size: integer);
+
+function jBitmap_GetResizedBitmap(env: PJNIEnv; _jbitmap: JObject; _bmp: jObject; _newWidth: integer; _newHeight: integer): jObject; overload;
+function jBitmap_GetResizedBitmap(env: PJNIEnv; _jbitmap: JObject; _newWidth: integer; _newHeight: integer): jObject; overload;
+function jBitmap_GetResizedBitmap(env: PJNIEnv; _jbitmap: JObject; _factorScaleX: single; _factorScaleY: single): jObject; overload;
+
 //GLSurfaceView
 Function  jGLSurfaceView_Create       (env:PJNIEnv;  this:jobject; SelfObj: TObject; version: integer): jObject;
 Procedure jGLSurfaceView_Free          (env:PJNIEnv; GLSurfaceView : jObject);
@@ -1373,6 +1392,19 @@ begin
  env^.CallVoidMethodA(env,TextView,_jMethod,@_jParams);
 end;
 
+procedure jTextView_Append(env: PJNIEnv; _jtextview: JObject; _txt: string);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_txt));
+  jCls:= env^.GetObjectClass(env, _jtextview);
+  jMethod:= env^.GetMethodID(env, jCls, 'Append', '(Ljava/lang/String;)V');
+  env^.CallVoidMethodA(env, _jtextview, jMethod, @jParams);
+env^.DeleteLocalRef(env,jParams[0].l);
+end;
+
 //------------------------------------------------------------------------------
 // EditText
 //------------------------------------------------------------------------------
@@ -1881,7 +1913,30 @@ begin
    env^.CallVoidMethodA(env,EditText,_jMethod,@_jParams);
 end;
 
+procedure jEditText_Append(env: PJNIEnv; _jedittext: JObject; _txt: string);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_txt));
+  jCls:= env^.GetObjectClass(env, _jedittext);
+  jMethod:= env^.GetMethodID(env, jCls, 'Append', '(Ljava/lang/String;)V');
+  env^.CallVoidMethodA(env, _jedittext, jMethod, @jParams);
+env^.DeleteLocalRef(env,jParams[0].l);
+end;
 
+procedure jEditText_SetImeOptions(env: PJNIEnv; _jedittext: JObject; _imeOption: integer);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].i:= _imeOption;
+  jCls:= env^.GetObjectClass(env, _jedittext);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetImeOptions', '(I)V');
+  env^.CallVoidMethodA(env, _jedittext, jMethod, @jParams);
+end;
 //------------------------------------------------------------------------------
 // Button
 //------------------------------------------------------------------------------
@@ -2945,6 +3000,40 @@ begin
   Result:= env^.CallIntMethod(env,ImageView,_jMethod);
 end;
 
+procedure jImageView_SetImageMatrixScale(env: PJNIEnv; _jimageview: JObject; _scaleX: single; _scaleY: single);
+var
+  jParams: array[0..1] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].f:= _scaleX;
+  jParams[1].f:= _scaleY;
+  jCls:= env^.GetObjectClass(env, _jimageview);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetImageMatrixScale', '(FF)V');
+  env^.CallVoidMethodA(env, _jimageview, jMethod, @jParams);
+end;
+
+procedure jImageView_SetScaleType(env: PJNIEnv; _jimageview: JObject; _scaleType: integer);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].i:= _scaleType;
+  jCls:= env^.GetObjectClass(env, _jimageview);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetScaleType', '(I)V');
+  env^.CallVoidMethodA(env, _jimageview, jMethod, @jParams);
+end;
+
+function jImageView_GetBitmapImage(env: PJNIEnv; _jimageview: JObject): jObject;
+var
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jimageview);
+  jMethod:= env^.GetMethodID(env, jCls, 'GetBitmapImage', '()Landroid/graphics/Bitmap;');
+  Result:= env^.CallObjectMethod(env, _jimageview, jMethod);
+end;
 //------------------------------------------------------------------------------
 // ListView
 //------------------------------------------------------------------------------
@@ -3878,6 +3967,32 @@ _jMethod:= env^.GetMethodID(env, cls, 'RemoveParent', '()V');
  env^.CallVoidMethod(env,Panel,_jMethod);
 end;
 
+
+procedure jPanel_SetMinZoomFactor(env: PJNIEnv; _jpanel: JObject; _minZoomFactor: single);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].f:= _minZoomFactor;
+  jCls:= env^.GetObjectClass(env, _jpanel);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetMinZoomFactor', '(F)V');
+  env^.CallVoidMethodA(env, _jpanel, jMethod, @jParams);
+end;
+
+
+procedure jPanel_SetMaxZoomFactor(env: PJNIEnv; _jpanel: JObject; _maxZoomFactor: single);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].f:= _maxZoomFactor;
+  jCls:= env^.GetObjectClass(env, _jpanel);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetMaxZoomFactor', '(F)V');
+  env^.CallVoidMethodA(env, _jpanel, jMethod, @jParams);
+end;
+
 //------------------------------------------------------------------------------
 // HorizontalScrollView
 // LORDMAN 2013-09-03
@@ -4638,7 +4753,49 @@ begin
   Result:= env^.CallObjectMethodA(env, _jbitmap, jMethod, @jParams);
 end;
 
+function jBitmap_SetScale(env: PJNIEnv; _jbitmap: JObject; _bmp: jObject; _imageView: jObject; _scaleX: single; _scaleY: single): jObject;
+var
+  jParams: array[0..3] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= _bmp;
+  jParams[1].l:= _imageView;
+  jParams[2].f:= _scaleX;
+  jParams[3].f:= _scaleY;
+  jCls:= env^.GetObjectClass(env, _jbitmap);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetScale', '(Landroid/graphics/Bitmap;Landroid/widget/ImageView;FF)Landroid/graphics/Bitmap;');
+  Result:= env^.CallObjectMethodA(env, _jbitmap, jMethod, @jParams);
+end;
 
+
+function jBitmap_SetScale(env: PJNIEnv; _jbitmap: JObject; _imageView: jObject; _scaleX: single; _scaleY: single): jObject;
+var
+  jParams: array[0..2] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= _imageView;
+  jParams[1].f:= _scaleX;
+  jParams[2].f:= _scaleY;
+  jCls:= env^.GetObjectClass(env, _jbitmap);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetScale', '(Landroid/widget/ImageView;FF)Landroid/graphics/Bitmap;');
+  Result:= env^.CallObjectMethodA(env, _jbitmap, jMethod, @jParams);
+end;
+
+
+function jBitmap_LoadFromAssets(env: PJNIEnv; _jbitmap: JObject; strName: string): jObject;
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(strName));
+  jCls:= env^.GetObjectClass(env, _jbitmap);
+  jMethod:= env^.GetMethodID(env, jCls, 'LoadFromAssets', '(Ljava/lang/String;)Landroid/graphics/Bitmap;');
+  Result:= env^.CallObjectMethodA(env, _jbitmap, jMethod, @jParams);
+env^.DeleteLocalRef(env,jParams[0].l);
+end;
 
 //by jmpessoa
 procedure jBitmap_SetByteArrayToBitmap(env:PJNIEnv;  bmap: jObject; var bufferImage: TArrayOfByte; size: integer);
@@ -4671,6 +4828,46 @@ begin
   Result:= env^.GetArrayLength(env,_jbyteArray);
   SetLength(bufferImage, Result);
   env^.GetByteArrayRegion(env, _jbyteArray, 0, Result, @bufferImage[0] {target});
+end;
+
+function jBitmap_GetResizedBitmap(env: PJNIEnv; _jbitmap: JObject; _bmp: jObject; _newWidth: integer; _newHeight: integer): jObject;
+var
+  jParams: array[0..2] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= _bmp;
+  jParams[1].i:= _newWidth;
+  jParams[2].i:= _newHeight;
+  jCls:= env^.GetObjectClass(env, _jbitmap);
+  jMethod:= env^.GetMethodID(env, jCls, 'GetResizedBitmap', '(Landroid/graphics/Bitmap;II)Landroid/graphics/Bitmap;');
+  Result:= env^.CallObjectMethodA(env, _jbitmap, jMethod, @jParams);
+end;
+
+function jBitmap_GetResizedBitmap(env: PJNIEnv; _jbitmap: JObject; _newWidth: integer; _newHeight: integer): jObject;
+var
+  jParams: array[0..1] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].i:= _newWidth;
+  jParams[1].i:= _newHeight;
+  jCls:= env^.GetObjectClass(env, _jbitmap);
+  jMethod:= env^.GetMethodID(env, jCls, 'GetResizedBitmap', '(II)Landroid/graphics/Bitmap;');
+  Result:= env^.CallObjectMethodA(env, _jbitmap, jMethod, @jParams);
+end;
+
+function jBitmap_GetResizedBitmap(env: PJNIEnv; _jbitmap: JObject; _factorScaleX: single; _factorScaleY: single): jObject;
+var
+  jParams: array[0..1] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].f:= _factorScaleX;
+  jParams[1].f:= _factorScaleY;
+  jCls:= env^.GetObjectClass(env, _jbitmap);
+  jMethod:= env^.GetMethodID(env, jCls, 'GetResizedBitmap', '(FF)Landroid/graphics/Bitmap;');
+  Result:= env^.CallObjectMethodA(env, _jbitmap, jMethod, @jParams);
 end;
 
 //------------------------------------------------------------------------------

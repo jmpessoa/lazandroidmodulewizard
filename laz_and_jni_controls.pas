@@ -249,7 +249,7 @@ begin
   begin
    //get method :: class ref, method name, (param segnature)return type
    jMethodId_setBackgroundColor:= Get_jMethodID(FjClass, 'setBackgroundColor','(I)V');
-   jParams_setBackgroundColor[0].i:= GetARGB(FColor); // integer ..
+   jParams_setBackgroundColor[0].i:= GetARGB(FCustomColor, FColor); // integer ..
    Call_jVoidMethodA(FjObject , jMethodId_setBackgroundColor, jParams_setBackgroundColor);
   end;
 end;
@@ -367,7 +367,7 @@ begin
   begin
    //get method :: class ref, method name, (param segnature)return type
    jMethodId_setTextColor:= Get_jMethodID(FjClass, 'setTextColor','(I)V');
-   jParams_setTextColor[0].i:= GetARGB(Value); // integer ..
+   jParams_setTextColor[0].i:= GetARGB(FCustomcolor, Value); // integer ..
    Call_jVoidMethodA(FjObject , jMethodId_setTextColor, jParams_setTextColor);
   end;
 end;

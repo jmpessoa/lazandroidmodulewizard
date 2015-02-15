@@ -197,7 +197,7 @@ begin
   jToggleButton_SetLayoutAll(FjEnv, FjObject, Self.AnchorId);
 
   if  FColor <> colbrDefault then
-    View_SetBackGroundColor(FjEnv, FjObject, GetARGB(FColor));
+    View_SetBackGroundColor(FjEnv, FjObject, GetARGB(FCustomColor, FColor));
 
   if FTextOff <> 'OFF' then
     jToggleButton_SetTextOff(FjEnv, FjObject, FTextOff);
@@ -217,7 +217,7 @@ procedure jToggleButton.SetColor(Value: TARGBColorBridge);
 begin
   FColor:= Value;
   if (FInitialized = True) and (FColor <> colbrDefault)  then
-    View_SetBackGroundColor(FjEnv, FjObject, GetARGB(FColor));
+    View_SetBackGroundColor(FjEnv, FjObject, GetARGB(FCustomColor, FColor));
 end;
 procedure jToggleButton.SetVisible(Value : Boolean);
 begin

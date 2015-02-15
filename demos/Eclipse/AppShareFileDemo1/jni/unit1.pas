@@ -78,7 +78,8 @@ begin
     begin
        Self.SetWifiEnabled(True);
        jCheckBox1.Checked:= True;
-    end;
+    end
+    else jCheckBox1.Checked:= True;
 end;
 
 //Load 'hello.txt' from Assets -> Add "new" content to 'hello.txt' and save to App.../files

@@ -41,6 +41,7 @@
       <Unit0>
         <Filename Value="controls.lpr"/>
         <IsPartOfProject Value="True"/>
+        <UnitName Value="controls"/>
       </Unit0>
       <Unit1>
         <Filename Value="unit1.pas"/>

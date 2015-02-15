@@ -192,7 +192,7 @@ begin
   jCustomDialog_SetLayoutAll(FjEnv, FjObject, Self.AnchorId);
 
   if  FColor <> colbrDefault then
-    View_SetBackGroundColor(FjEnv, FjThis, FjRLayout{wiew!}, GetARGB(FColor));
+    View_SetBackGroundColor(FjEnv, FjThis, FjRLayout{wiew!}, GetARGB(FCustomColor, FColor));
 
   View_SetVisible(FjEnv, FjThis, FjObject, FVisible);
 end;
@@ -201,7 +201,7 @@ procedure jCustomDialog.SetColor(Value: TARGBColorBridge);
 begin
   FColor:= Value;
   if (FInitialized = True) and (FColor <> colbrDefault)  then
-    View_SetBackGroundColor(FjEnv, FjRLayout{view!}, GetARGB(FColor));
+    View_SetBackGroundColor(FjEnv, FjRLayout{view!}, GetARGB(FCustomColor, FColor));
 end;
 procedure jCustomDialog.SetVisible(Value : Boolean);
 begin

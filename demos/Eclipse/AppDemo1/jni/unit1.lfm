@@ -16,9 +16,9 @@ object AndroidModule1: TAndroidModule1
   OnJNIPrompt = DataModuleJNIPrompt
   OnClose = DataModuleClose
   object jTextView1: jTextView
-    Left = 88
+    Left = 72
     Top = 272
-    Width = 135
+    Width = 184
     Height = 25
     MarginLeft = 40
     MarginTop = 40
@@ -30,14 +30,14 @@ object AndroidModule1: TAndroidModule1
     PosRelativeToParent = [rpCenterHorizontal]
     LayoutParamWidth = lpWrapContent
     LayoutParamHeight = lpWrapContent
-    Text = 'Powered by FPC/Lazarus!'
+    Text = 'Powered by FPC/Lazarus/Lamw'
     Alignment = taLeft
     Enabled = True
     BackgroundColor = colbrDefault
     FontColor = colbrMidnightBlue
     FontSize = 0
     TextTypeFace = tfNormal
-    Id = 0
+    Id = 855478
   end
   object jImageView1: jImageView
     Left = 128
@@ -56,7 +56,25 @@ object AndroidModule1: TAndroidModule1
     ImageIndex = 0
     Images = jImageList1
     BackgroundColor = colbrDefault
+    ImageScaleType = scaleCenter
     Id = 11952
+  end
+  object jImageView2: jImageView
+    Left = 128
+    Top = 320
+    Width = 48
+    Height = 48
+    Visible = True
+    Anchor = jTextView1
+    PosRelativeToAnchor = [raBelow]
+    PosRelativeToParent = [rpCenterHorizontal]
+    LayoutParamWidth = lpWrapContent
+    LayoutParamHeight = lpWrapContent
+    ImageIndex = 8
+    Images = jImageList1
+    BackgroundColor = colbrDefault
+    ImageScaleType = scaleFitCenter
+    Id = 0
   end
   object jTimer1: jTimer
     Enabled = False
@@ -75,6 +93,7 @@ object AndroidModule1: TAndroidModule1
       't6.png'
       't7.png'
       't8.png'
+      'lamw_logo1.png'
     )
     left = 184
     top = 128

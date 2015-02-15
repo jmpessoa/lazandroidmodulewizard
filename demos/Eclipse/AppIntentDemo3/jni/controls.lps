@@ -9,8 +9,8 @@
         <Filename Value="controls.lpr"/>
         <IsPartOfProject Value="True"/>
         <EditorIndex Value="1"/>
-        <TopLine Value="468"/>
-        <CursorPos X="7" Y="474"/>
+        <TopLine Value="456"/>
+        <CursorPos X="10" Y="476"/>
         <UsageCount Value="32"/>
         <Loaded Value="True"/>
         <DefaultSyntaxHighlighter Value="Delphi"/>
@@ -22,8 +22,7 @@
         <HasResources Value="True"/>
         <UnitName Value="unit1"/>
         <IsVisibleTab Value="True"/>
-        <TopLine Value="38"/>
-        <CursorPos X="62" Y="48"/>
+        <CursorPos X="10" Y="9"/>
         <UsageCount Value="32"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -31,9 +30,10 @@
       </Unit1>
       <Unit2>
         <Filename Value="C:\laz4android1346592\components\LazAndroidWizard\intentmanager.pas"/>
+        <UnitName Value="intentmanager"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="1718"/>
-        <CursorPos X="10" Y="1700"/>
+        <TopLine Value="23"/>
+        <CursorPos X="15" Y="32"/>
         <UsageCount Value="10"/>
       </Unit2>
       <Unit3>
@@ -47,7 +47,7 @@
         <UsageCount Value="10"/>
       </Unit3>
     </Units>
-    <JumpHistory Count="22" HistoryIndex="21">
+    <JumpHistory Count="24" HistoryIndex="23">
       <Position1>
         <Filename Value="unit1.pas"/>
         <Caret Line="2" Column="4"/>
@@ -136,6 +136,14 @@
         <Filename Value="unit1.pas"/>
         <Caret Line="9" Column="14"/>
       </Position22>
+      <Position23>
+        <Filename Value="unit1.pas"/>
+        <Caret Line="42" Column="27" TopLine="37"/>
+      </Position23>
+      <Position24>
+        <Filename Value="unit1.pas"/>
+        <Caret Line="42" Column="26" TopLine="37"/>
+      </Position24>
     </JumpHistory>
   </ProjectSession>
 </CONFIG>

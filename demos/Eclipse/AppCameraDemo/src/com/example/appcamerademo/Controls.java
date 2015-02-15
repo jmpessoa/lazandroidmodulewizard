@@ -1,10 +1,10 @@
 package com.example.appcamerademo;
 
-//Lamw: Lazarus Android Module Wizard - Version 0.6 - rev. 13 - 29 January - 2015
+//Lamw: Lazarus Android Module Wizard - Version 0.6 - rev. 14 - 13 February - 2015
 //Form Designer and Components development model!
 //Author: jmpessoa@hotmail.com
 //https://github.com/jmpessoa/lazandroidmodulewizard
-//http://forum.lazarus.freepascal.org/index.php/topic,21919.0.html
+//http://forum.lazarus.freepascal.org/index.php/topic,21919.270.html
 
 //Android Java Interface for Pascal/Delphi XE5
 //And LAZARUS by jmpessoa@hotmail.com - december 2013
@@ -54,21 +54,19 @@ package com.example.appcamerademo;
 //
 
 import android.annotation.SuppressLint;
-import android.annotation.TargetApi;
+
 import android.app.ActionBar;
 import android.app.ActionBar.Tab;
-import android.app.ActionBar.TabListener;
 import android.app.Activity;
-import android.app.ActivityManager.RunningAppProcessInfo;
-import android.app.ActivityManager.RunningServiceInfo;
-import android.app.ActivityManager;
 import android.app.AlertDialog;
+import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.app.Fragment;
-import android.app.FragmentManager;
 import android.app.FragmentTransaction;
-import android.app.PendingIntent;
+import android.app.Notification;
+import android.app.NotificationManager;
 import android.app.ProgressDialog;
+import android.app.TimePickerDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothServerSocket;
@@ -76,16 +74,12 @@ import android.bluetooth.BluetoothSocket;
 import android.content.BroadcastReceiver;
 import android.content.ClipData;
 import android.content.ClipboardManager;
-import android.content.ContentValues;
 import android.content.Context;
-import android.content.ContextWrapper;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager.NameNotFoundException;
-import android.content.pm.PackageManager;
-import android.content.pm.ResolveInfo;
 import android.content.res.AssetFileDescriptor;
 import android.content.res.AssetManager;
 import android.database.Cursor;
@@ -104,11 +98,7 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
-import android.opengl.GLES10;
-import android.opengl.GLES20;
-import android.opengl.GLSurfaceView.Renderer;
 import android.opengl.GLSurfaceView;
-import android.opengl.GLU;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
@@ -138,18 +128,19 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.location.LocationProvider;
 import android.media.MediaPlayer;
-
 import android.net.Uri;
 import android.net.wifi.WifiManager;
 import android.util.Log;
-import android.util.TypedValue;
 import android.view.ContextMenu;
+import android.view.GestureDetector;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
+import android.view.ScaleGestureDetector;
+import android.view.ScaleGestureDetector.SimpleOnScaleGestureListener;
 import android.view.SubMenu;
 import android.view.SurfaceHolder;
 import android.view.View.OnClickListener;
@@ -163,6 +154,7 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationSet;
 import android.view.animation.AnimationUtils;
 import android.view.animation.TranslateAnimation;
+import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
@@ -170,12 +162,11 @@ import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
-import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
+import android.widget.DatePicker;
 import android.widget.EditText;
-import android.widget.FrameLayout;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -183,9 +174,9 @@ import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.RadioButton;
 import android.widget.Spinner;
-import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.RelativeLayout.LayoutParams;
 import android.widget.Switch;
+import android.widget.TimePicker;
 import android.widget.ToggleButton;
 //import android.view.ViewGroup.LayoutParams;
 import android.widget.RelativeLayout;
@@ -211,6 +202,7 @@ import java.nio.FloatBuffer;
 import java.text.Format;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
@@ -1037,6 +1029,10 @@ public void SetTextTypeFace(int _typeface) {
   this.setTypeface(null, _typeface);
 }
 
+public void Append(String _txt) {
+  this.append( _txt);
+}
+
 }
 
 //-------------------------------------------------------------------------
@@ -1313,6 +1309,24 @@ public void DispatchOnChangedEvent(boolean value) {
 
 public void SetInputType(int ipt){  //TODO!
 	this.setInputType(0);
+}
+
+public void Append(String _txt) {
+	this.append(_txt);
+}
+
+public void SetImeOptions(int _imeOption) {
+  switch(_imeOption ) {
+	 case 0: this.setImeOptions(EditorInfo.IME_FLAG_NO_FULLSCREEN); break;
+	 case 1: this.setImeOptions(EditorInfo.IME_MASK_ACTION|EditorInfo.IME_ACTION_NONE); break;
+	 case 2: this.setImeOptions(EditorInfo.IME_MASK_ACTION|EditorInfo.IME_ACTION_GO); break;
+	 case 3: this.setImeOptions(EditorInfo.IME_MASK_ACTION|EditorInfo.IME_ACTION_SEARCH); break;
+	 case 4: this.setImeOptions(EditorInfo.IME_MASK_ACTION|EditorInfo.IME_ACTION_SEND); break;
+	 case 5: this.setImeOptions(EditorInfo.IME_MASK_ACTION|EditorInfo.IME_ACTION_NEXT); break;		
+	 case 6: this.setImeOptions(EditorInfo.IME_MASK_ACTION|EditorInfo.IME_ACTION_DONE); break;		 
+	 case 7: this.setImeOptions(EditorInfo.IME_MASK_ACTION|EditorInfo.IME_ACTION_PREVIOUS ); break;  
+	 case 8: this.setImeOptions(EditorInfo.IME_FLAG_FORCE_ASCII); break;
+  }   
 }
 	
 }
@@ -1882,6 +1896,8 @@ int MarginTop = 5;
 int marginRight = 5;
 int marginBottom = 5;
 
+Matrix mMatrix;	
+
 //by jmpessoa
 public void setMarginRight(int x) {
 	marginRight = x;
@@ -1903,7 +1919,8 @@ lparams = new LayoutParams(100,100);
 lparams.setMargins( 50, 50,0,0);
 //
 //setAdjustViewBounds(false);
-setScaleType(ImageView.ScaleType.FIT_XY);
+setScaleType(ImageView.ScaleType.CENTER);
+mMatrix = new Matrix();
 // Init Event
 onClickListener = new OnClickListener() {
   public  void onClick(View view) {
@@ -1929,7 +1946,7 @@ if (parent != null) { parent.removeView(this); }
    viewgroup.addView(this,lparams);
 }
 
-// Free object except Self, Pascal Code Free the class.
+//Free object except Self, Pascal Code Free the class.
 public  void Free() {
 if (parent != null) { parent.removeView(this); }
    if (bmp    != null) { bmp.recycle(); }
@@ -1939,12 +1956,13 @@ if (parent != null) { parent.removeView(this); }
    setImageResource(0); //android.R.color.transparent;
    onClickListener = null;
    setOnClickListener(null);
+   mMatrix = null;
 }
 
 //by jmpessoa
 public void setBitmapImage(Bitmap bm) {
 	//if (bmp    != null) { bmp.recycle(); }
-	bmp = bm; 
+	bmp = bm;
 	this.setImageBitmap(bm);
 }
 
@@ -1992,21 +2010,12 @@ public void setLParamHeight(int h) {
 //by jmpessoa
 public int getLParamHeight() {	
   return  this.getHeight();
- /*	
-  if (bmp != null) {
-     return this.bmp.getHeight();  //  ???  
-  } else return 0;
-  */  
+  
 }  
 
 //by jmpessoa
 public int getLParamWidth() {
-  return this.getWidth();
-  /*
-  if (bmp != null) {
-	return this.bmp.getWidth(); //  ??? 
-  } else return 0;
-  */  
+  return this.getWidth();  
 }
 
 //by jmpessoa
@@ -2047,10 +2056,45 @@ public void setLayoutAll(int idAnchor) {
 	} 
 	for (int j=0; j < countParentRule; j++) {  
 		lparams.addRule(lparamsParentRule[j]);		
-  }
+    }
 	//
 	setLayoutParams(lparams);
 }
+
+
+/*
+ * TScaleType = (scaleCenter, scaleCenterCrop, scaleCenterInside, scaleFitCenter,
+                scaleFitEnd, scaleFitStart, scaleFitXY, scaleMatrix);
+  ref. http://www.peachpit.com/articles/article.aspx?p=1846580&seqNum=2
+       hint: If you’re creating a photo-viewing application, 
+             you will probably want to use the center or fitCenter scale types.                  
+ */
+public void SetScaleType(int _scaleType) { //TODO! 	
+	switch(_scaleType) {
+  	   case 0: setScaleType(ImageView.ScaleType.CENTER); break;
+  	   case 1: setScaleType(ImageView.ScaleType.CENTER_CROP); break;
+  	   case 2: setScaleType(ImageView.ScaleType.CENTER_INSIDE); break;
+  	   case 3: setScaleType(ImageView.ScaleType.FIT_CENTER); break;
+  	   case 4: setScaleType(ImageView.ScaleType.FIT_END); break;
+  	   case 5: setScaleType(ImageView.ScaleType.FIT_START); break;
+  	   case 6: setScaleType(ImageView.ScaleType.FIT_XY); break;
+  	   case 7: setScaleType(ImageView.ScaleType.MATRIX); break;
+	}
+}
+
+public void SetImageMatrixScale(float _scaleX, float _scaleY ) {        
+    if ( this.getScaleType() != ImageView.ScaleType.MATRIX)  this.setScaleType(ImageView.ScaleType.MATRIX);        
+    //Log.i("scaleX=" + _scaleX, "    scaleY= " + _scaleY);
+    mMatrix.setScale(_scaleX, _scaleY);        
+    //mMatrix.postScale(_scaleX, _scaleX);
+    this.setImageMatrix(mMatrix);
+}
+
+//by jmpessoa
+public Bitmap GetBitmapImage() {		
+   return bmp; 	
+}
+
 
 }
  
@@ -2906,6 +2950,13 @@ class jPanel extends RelativeLayout {
 	int marginBottom = 0;
 	
 	boolean mRemovedFromParent = false;
+	
+    private GestureDetector gDetect;
+    private ScaleGestureDetector scaleGestureDetector;
+    
+    private float mScaleFactor = 1.0f;
+    private float MIN_ZOOM = 0.25f;	  
+	private float MAX_ZOOM = 4.0f;	 	 
 	    	
 	//Constructor
 	public  jPanel(android.content.Context context, Controls ctrls,long pasobj ) {
@@ -2915,6 +2966,9 @@ class jPanel extends RelativeLayout {
 	   controls = ctrls;
        lparams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);		
 	   //
+       gDetect = new GestureDetector(controls.activity, new GestureListener());
+       
+       scaleGestureDetector = new ScaleGestureDetector(controls.activity, new simpleOnScaleGestureListener());
 	}
 		
 	public void setLeftTopRightBottomWidthHeight(int left, int top, int right, int bottom, int w, int h) {
@@ -3004,6 +3058,91 @@ class jPanel extends RelativeLayout {
 		  	mRemovedFromParent = true;
 	   } 		   
 	}		 
+	
+    @Override
+	public boolean onTouchEvent(MotionEvent event) {
+	    return super.onTouchEvent(event);
+	}
+    
+    @Override
+	public boolean dispatchTouchEvent(MotionEvent e) {
+	        super.dispatchTouchEvent(e);
+	        this.gDetect.onTouchEvent(e);
+	        this.scaleGestureDetector.onTouchEvent(e);
+	        return true;
+	}
+    
+    //ref1. http://code.tutsplus.com/tutorials/android-sdk-detecting-gestures--mobile-21161
+    //ref2. http://stackoverflow.com/questions/9313607/simpleongesturelistener-never-goes-in-to-the-onfling-method
+    //ref3. http://x-tutorials.blogspot.com.br/2011/11/detect-pinch-zoom-using.html
+    private class GestureListener extends GestureDetector.SimpleOnGestureListener {
+
+       private static final int SWIPE_MIN_DISTANCE = 60;
+       private static final int SWIPE_THRESHOLD_VELOCITY = 100;
+      
+ 	   @Override
+ 	   public boolean onDown(MotionEvent event) {
+ 		  //Log.i("Down", "------------");
+ 	      return true;
+ 	   }
+ 	   
+ 	   @Override
+ 	   public boolean onFling(MotionEvent event1, MotionEvent event2, float velocityX, float velocityY) { 
+ 		   
+ 	      if(event1.getX() - event2.getX() > SWIPE_MIN_DISTANCE && Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY) {
+               controls.pOnFlingGestureDetected(PasObj, 0);                //onRightToLeft;
+               return  true;
+           } else if (event2.getX() - event1.getX() > SWIPE_MIN_DISTANCE && Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY) {
+        	   controls.pOnFlingGestureDetected(PasObj, 1);//onLeftToRight();
+        	   return true;
+           }
+           if(event1.getY() - event2.getY() > SWIPE_MIN_DISTANCE && Math.abs(velocityY) > SWIPE_THRESHOLD_VELOCITY) {
+        	   controls.pOnFlingGestureDetected(PasObj, 2);//onBottomToTop();
+        	   return true;
+           } else if (event2.getY() - event1.getY() > SWIPE_MIN_DISTANCE && Math.abs(velocityY) > SWIPE_THRESHOLD_VELOCITY) {
+        	   controls.pOnFlingGestureDetected(PasObj, 3); //onTopToBottom();
+        	   return true;
+           } 		   
+ 		   return false;
+ 	   }
+    }
+    
+    
+   //ref. http://vivin.net/2011/12/04/implementing-pinch-zoom-and-pandrag-in-an-android-view-on-the-canvas/ 
+   private class simpleOnScaleGestureListener extends SimpleOnScaleGestureListener {
+	  
+      @Override
+      public boolean onScale(ScaleGestureDetector detector) {         
+    	  mScaleFactor *= detector.getScaleFactor();    
+    	  mScaleFactor = Math.max(MIN_ZOOM, Math.min(mScaleFactor, MAX_ZOOM));    	    	  
+    	// Log.i("tag", "onScale = "+ mScaleFactor);    	 
+    	 controls.pOnPinchZoomGestureDetected(PasObj, mScaleFactor, 1); //scalefactor->float    	
+         return true;
+      }
+
+      @Override
+      public boolean onScaleBegin(ScaleGestureDetector detector) {                
+    	controls.pOnPinchZoomGestureDetected(PasObj, detector.getScaleFactor(), 0); //scalefactor->float
+     	//Log.i("tag", "onScaleBegin");
+        return true;
+      }
+
+      @Override
+      public void onScaleEnd(ScaleGestureDetector detector) {
+         controls.pOnPinchZoomGestureDetected(PasObj, detector.getScaleFactor(), 2); //scalefactor->float
+     	//Log.i("tag", "onScaleEnd");
+        super.onScaleEnd(detector);	  
+      }
+
+  }
+   
+   public void SetMinZoomFactor(float _minZoomFactor) {
+        MIN_ZOOM = _minZoomFactor;	
+   }
+   
+   public void SetMaxZoomFactor(float _maxZoomFactor) {
+	   MAX_ZOOM = _maxZoomFactor;
+   }
 }
 
 
@@ -4601,10 +4740,7 @@ public void setProgress(int progress ) {
 }
 
 //------------------------------------------------------------------------------
-//
 //Graphic API
-//
-//
 //------------------------------------------------------------------------------
 //http://forum.lazarus.freepascal.org/index.php?topic=21568.0
 //https://github.com/alrieckert/lazarus/blob/master/lcl/interfaces/customdrawn/android/bitmap.pas
@@ -4741,6 +4877,72 @@ public Bitmap AntiClockWise(Bitmap _bmp, ImageView _imageView){
     mMatrix.set(mat);
     mMatrix.setRotate(-90);
     return Bitmap.createBitmap(_bmp , 0, 0, _bmp.getWidth(), _bmp.getHeight(), mMatrix, false);    
+}
+
+public Bitmap SetScale(Bitmap _bmp, ImageView _imageView, float _scaleX, float _scaleY ) {  
+    Matrix mMatrix = new Matrix();
+    Matrix mat= _imageView.getImageMatrix();    
+    mMatrix.set(mat);        
+	mMatrix.setScale(_scaleX, _scaleY);
+	return Bitmap.createBitmap(_bmp , 0, 0, _bmp.getWidth(), _bmp.getHeight(), mMatrix, false);	   
+}
+
+public Bitmap SetScale(ImageView _imageView, float _scaleX, float _scaleY ) {      
+	/*Matrix mMatrix = new Matrix();
+    Matrix mat= _imageView.getImageMatrix();    
+    mMatrix.set(mat);        
+	mMatrix.setScale(_scaleX, _scaleY);		
+	bmp = Bitmap.createBitmap(bmp , 0, 0, bmp.getWidth(), bmp.getHeight(), mMatrix, false);
+	return bmp;*/
+	// CREATE A MATRIX FOR THE MANIPULATION	 
+	Matrix matrix = new Matrix();
+	// RESIZE THE BIT MAP
+	matrix.postScale(_scaleX, _scaleY);
+	// RECREATE THE NEW BITMAP
+	Bitmap resizedBitmap = Bitmap.createBitmap(bmp, 0, 0, bmp.getWidth(), bmp.getHeight(), matrix, false);
+	return resizedBitmap;
+}
+
+public Bitmap LoadFromAssets(String strName)
+{
+    AssetManager assetManager = controls.activity.getAssets();
+    InputStream istr = null;
+    try {
+        istr = assetManager.open(strName);
+    } catch (IOException e) {
+        e.printStackTrace();
+    }
+    bmp = BitmapFactory.decodeStream(istr);    
+    return bmp;
+}
+
+// ref http://sunil-android.blogspot.com.br/2013/03/resize-bitmap-bitmapcreatescaledbitmap.html
+public Bitmap GetResizedBitmap(Bitmap _bmp, int _newWidth, int _newHeight){
+   float factorH = _newHeight / (float)_bmp.getHeight();
+   float factorW = _newWidth / (float)_bmp.getWidth();
+   float factorToUse = (factorH > factorW) ? factorW : factorH;
+   Bitmap bm = Bitmap.createScaledBitmap(_bmp,
+     (int) (_bmp.getWidth() * factorToUse),
+     (int) (_bmp.getHeight() * factorToUse),false);     
+   return bm;
+}
+
+public Bitmap GetResizedBitmap(int _newWidth, int _newHeight){
+   float factorH = _newHeight / (float)bmp.getHeight();
+   float factorW = _newWidth / (float)bmp.getWidth();
+   float factorToUse = (factorH > factorW) ? factorW : factorH;
+   Bitmap bm = Bitmap.createScaledBitmap(bmp,
+     (int) (bmp.getWidth() * factorToUse),
+     (int) (bmp.getHeight() * factorToUse),false);     
+   return bm;
+}
+
+public Bitmap GetResizedBitmap(float _factorScaleX, float _factorScaleY ){
+   float factorToUse = (_factorScaleY > _factorScaleX) ? _factorScaleX : _factorScaleY;
+   Bitmap bm = Bitmap.createScaledBitmap(bmp,
+     (int) (bmp.getWidth() * factorToUse),
+     (int) (bmp.getHeight() * factorToUse),false);     
+   return bm;
 }
 
 }
@@ -8578,6 +8780,15 @@ class jImageFileManager /*extends ...*/ {
 	     mMatrix.setRotate(-90);
 	     return Bitmap.createBitmap(_bitmap, 0, 0, _bitmap.getWidth(), _bitmap.getHeight(), mMatrix, false);    
 	}
+	
+	public Bitmap SetScale(Bitmap _bmp, ImageView _imageView, float _scaleX, float _scaleY ) {  
+	    Matrix mMatrix = new Matrix();
+	    Matrix mat= _imageView.getImageMatrix();    
+	    mMatrix.set(mat);        
+		mMatrix.setScale(_scaleX, _scaleY);
+		return Bitmap.createBitmap(_bmp , 0, 0, _bmp.getWidth(), _bmp.getHeight(), mMatrix, false);	   
+	}
+
       
 }
 
@@ -8729,19 +8940,7 @@ class jActionBarTab {
 		actionBar.removeAllTabs();
 	}
 
-	//This method returns the currently selected tab if in tabbed navigation mode and there is at least one tab present
-	/*.*/public Tab GetSelectedTab() {
-		ActionBar actionBar = this.controls.activity.getActionBar();
-		ActionBar.Tab tab = actionBar.getSelectedTab();
-		return tab;
-	}
-
-	//This method select the specified tab
-	/*.*/public void SelectTab(ActionBar.Tab tab){
-		ActionBar actionBar = this.controls.activity.getActionBar();
-		actionBar.selectTab(tab);
-	}
-
+			
 	//http://daniel-codes.blogspot.com.br/2009/12/dynamically-retrieving-resources-in.html
 	/*
 	*Given that you can access R.java just fine normally in code.
@@ -8765,6 +8964,32 @@ class jActionBarTab {
 	//by jmpessoa
 	private Drawable GetDrawableResourceById(int _resID) {
 		return (Drawable)( this.controls.activity.getResources().getDrawable(_resID));	
+	}
+	
+
+	//This method returns the currently selected tab if in tabbed navigation mode and there is at least one tab present
+	public Tab GetSelectedTab() {
+		ActionBar actionBar = this.controls.activity.getActionBar();
+		ActionBar.Tab tab = actionBar.getSelectedTab();
+		return tab;
+	}
+
+	//This method select the specified tab
+	public void SelectTab(ActionBar.Tab tab){
+		ActionBar actionBar = this.controls.activity.getActionBar();
+		actionBar.selectTab(tab);
+	}	
+	
+	public Tab GetTabAtIndex(int _index){
+		ActionBar actionBar = this.controls.activity.getActionBar();
+		actionBar.setSelectedNavigationItem(_index);
+		return actionBar.getTabAt(_index); 
+	}
+	
+	
+	public void SelectTabByIndex(int _index){
+		ActionBar actionBar = this.controls.activity.getActionBar();
+		actionBar.setSelectedNavigationItem(_index);		 
 	}
 	
 }
@@ -10065,7 +10290,7 @@ class jBroadcastReceiver extends BroadcastReceiver {
     * broadcasted Once The battery level has fallen below a threshold
     */
    
-   public void RegisterIntentAction(String _intentAction) {
+   public void RegisterIntentActionFilter(String _intentAction) {
 	   //intentFilter.addDataScheme("http"); 
 	   //intentFilter.addDataScheme("ftp"); 
 	   //intentFilter.addAction(BluetoothDevice.ACTION_FOUND);
@@ -10073,13 +10298,29 @@ class jBroadcastReceiver extends BroadcastReceiver {
 	   //Log.i("receiver","Register ....");
    }
    
+      	   	  	   
+      
    /*
     * This method disables the Broadcast receiver
     */
    public void Unregister() {   
 	   controls.activity.unregisterReceiver(this);
 	   //Log.i("receiver","UnRegister ...");
-   }   
+   }
+   
+   public void RegisterIntentActionFilter(int _intentAction) {
+	   switch(_intentAction) {
+	     case 0: controls.activity.registerReceiver(this, new IntentFilter(Intent.ACTION_TIME_TICK));
+	     case 1: controls.activity.registerReceiver(this, new IntentFilter(Intent.ACTION_TIME_CHANGED));
+	     case 2: controls.activity.registerReceiver(this, new IntentFilter(Intent.ACTION_TIMEZONE_CHANGED));
+	     case 3: controls.activity.registerReceiver(this, new IntentFilter(Intent.ACTION_BOOT_COMPLETED));
+	     case 4: controls.activity.registerReceiver(this, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
+	     case 5: controls.activity.registerReceiver(this, new IntentFilter(Intent.ACTION_POWER_CONNECTED));
+	     case 6: controls.activity.registerReceiver(this, new IntentFilter(Intent.ACTION_POWER_DISCONNECTED));
+	     case 7: controls.activity.registerReceiver(this, new IntentFilter(Intent.ACTION_SHUTDOWN));	  
+	   }
+   }
+
       
 }
 
@@ -10451,7 +10692,13 @@ Sending Data: Extras vs. URI Parameters
 	  return Uri.parse(_uriAsString);
    }
    
+   /*
+    * The caller may pass an extra EXTRA_OUTPUT to control where this image will be written. 
+    * If the EXTRA_OUTPUT is not present, then a small sized image is returned as a 
+    * Bitmap object in the extra field. This is useful for applications that only need a small image. 
+    */
    public String GetActionViewAsString(){
+	 String c = MediaStore.ACTION_IMAGE_CAPTURE;  //"android.media.action.IMAGE_CAPTURE"
      return "android.intent.action.VIEW";
    }	   
    
@@ -10479,6 +10726,19 @@ Sending Data: Extras vs. URI Parameters
 	  //String s =  Intent.ACTION_CALL_BUTTON; 
       return "android.intent.action.CALL_BUTTON";
    }	   
+   
+      
+   public void SetAction(int  _intentAction) {	 
+	  switch(_intentAction) { 
+	    case 0: mIntent.setAction("android.intent.action.VIEW"); //
+	    case 1: mIntent.setAction("android.intent.action.PICK"); //
+	    case 2: mIntent.setAction("android.intent.action.SENDTO"); //
+	    case 3: mIntent.setAction("android.intent.action.DIAL"); //
+	    case 4: mIntent.setAction("android.intent.action.CALL_BUTTON"); //
+	    case 5: mIntent.setAction( "android.intent.action.CALL");
+	    case 6: mIntent.setAction("android.media.action.IMAGE_CAPTURE"); //
+	  }
+   }
    
    public boolean ResolveActivity() {
       if (mIntent.resolveActivity(controls.activity.getPackageManager()) != null) {
@@ -10578,8 +10838,189 @@ Sending Data: Extras vs. URI Parameters
      } else return null;   
      
    }
+   
+   public String GetActionImageCaptureAsString(){
+		 String c = MediaStore.ACTION_IMAGE_CAPTURE;
+	     return "android.media.action.IMAGE_CAPTURE";
+   }
+
      
 }
+
+/*Draft java code by "Lazarus Android Module Wizard" [2/3/2015 16:12:53]*/
+/*https://github.com/jmpessoa/lazandroidmodulewizard*/
+/*jControl template*/
+ 
+class jNotificationManager /*extends ...*/ {
+  
+    private long     pascalObj = 0;      // Pascal Object
+    private Controls controls  = null;   // Control Class -> Java/Pascal Interface ...
+    private Context  context   = null;
+
+    NotificationManager mNotificationManager;
+    String one,two,three;
+  
+    //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
+  
+    public jNotificationManager(Controls _ctrls, long _Self) { //Add more others news "_xxx" params if needed!
+       //super(_ctrls.activity);
+       context   = _ctrls.activity;
+       pascalObj = _Self;
+       controls  = _ctrls;
+    }
+  
+    public void jFree() {
+      //free local objects...
+    	mNotificationManager = null;
+    }
+  
+  //write others [public] methods code here......
+  //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
+
+  //by jmpessoa
+    public int GetDrawableResourceId(String _resName) {
+    	  try {
+    	     Class<?> res = R.drawable.class;
+    	     Field field = res.getField(_resName);  //"drawableName"
+    	     int drawableId = field.getInt(null);
+    	     return drawableId;
+    	  }
+    	  catch (Exception e) {
+    	     Log.e("jNotificationManager", "Failure to get drawable id.", e);
+    	     return 0;
+    	  }
+    }
+    
+    public void Notify(int _id, String _title, String _subject, String _body, String _iconIdentifier){
+    	
+    	int icon;
+    	
+    	if (_iconIdentifier.equals("")) 
+    	   icon = android.R.drawable.ic_dialog_info;    	
+    	else
+    	   icon = GetDrawableResourceId(_iconIdentifier) ;
+    	
+    	mNotificationManager=(NotificationManager)controls.activity.getSystemService(Context.NOTIFICATION_SERVICE);    	
+       Notification notif = new Notification.Builder(controls.activity)         
+       .setContentTitle(_title)        
+       .setContentText(_subject)
+       .setContentInfo(_body)
+       .setSmallIcon(icon)         
+       .build();       
+       mNotificationManager.notify(_id, notif);
+    }
+    
+    //This method cancel a previously shown notification.
+    public void Cancel(int _id) {
+      mNotificationManager.cancel(_id);    
+    }
+    
+    public void CancelAll() {
+      mNotificationManager.cancelAll();    
+    }    
+}
+
+
+
+/*Draft java code by "Lazarus Android Module Wizard" [2/3/2015 22:24:25]*/
+/*https://github.com/jmpessoa/lazandroidmodulewizard*/
+/*jControl template*/
+
+class jTimePickerDialog /*extends ...*/ {
+ 
+   private long     pascalObj = 0;      // Pascal Object
+   private Controls controls  = null;   // Control Class -> Java/Pascal Interface ...
+   private Context  context   = null;
+ 
+   // Variable for storing current time
+   private int mHour, mMinute;
+   
+   //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
+ 
+   public jTimePickerDialog(Controls _ctrls, long _Self) { //Add more others news "_xxx" params if needed!
+      //super(_ctrls.activity);
+      context   = _ctrls.activity;
+      pascalObj = _Self;
+      controls  = _ctrls;
+   }
+ 
+   public void jFree() {
+     //free local objects...
+   }
+ 
+ //write others [public] methods code here......
+ //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
+ 
+   public void Show() {
+	   
+       // Process to get Current Time
+       final Calendar c = Calendar.getInstance();
+       mHour = c.get(Calendar.HOUR_OF_DAY);
+       mMinute = c.get(Calendar.MINUTE);
+
+       // Launch Time Picker Dialog
+       TimePickerDialog tpd = new TimePickerDialog(controls.activity,new TimePickerDialog.OnTimeSetListener() {
+                   @Override
+                   /*.*/public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+                       // Display Selected time in textbox
+                       //Log.i("TimePicker", hourOfDay + ":" + minute);
+                       controls.pOnTimePicker(pascalObj, hourOfDay, minute);
+                   }
+               }, mHour, mMinute, false);
+       
+       tpd.show();      
+   }
+   
+}
+
+/*Draft java code by "Lazarus Android Module Wizard" [2/3/2015 22:24:25]*/
+/*https://github.com/jmpessoa/lazandroidmodulewizard*/
+/*jControl template*/
+
+class jDatePickerDialog /*extends ...*/ {
+ 
+   private long     pascalObj = 0;      // Pascal Object
+   private Controls controls  = null;   // Control Class -> Java/Pascal Interface ...
+   private Context  context   = null;
+ 
+   // Variable for storing current date and time
+   private int mYear, mMonth, mDay;
+   //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
+ 
+   public jDatePickerDialog(Controls _ctrls, long _Self) { //Add more others news "_xxx" params if needed!
+      //super(_ctrls.activity);
+      context   = _ctrls.activity;
+      pascalObj = _Self;
+      controls  = _ctrls;
+   }
+ 
+   public void jFree() {
+     //free local objects...
+   }
+ 
+   //write others [public] methods code here......
+   //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
+   public void Show() {
+	   
+       // Process to get Current Date
+       final Calendar c = Calendar.getInstance();
+       mYear = c.get(Calendar.YEAR);
+       mMonth = c.get(Calendar.MONTH);
+       mDay = c.get(Calendar.DAY_OF_MONTH);
+
+       // Launch Date Picker Dialog
+       DatePickerDialog dpd = new DatePickerDialog(controls.activity, new DatePickerDialog.OnDateSetListener() {
+                   @Override
+                   /*.*/public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
+                       // Display Selected date in textbox
+                       //Log.i("DatePicker",dayOfMonth + "-" + (monthOfYear + 1) + "-" + year);
+                       controls.pOnDatePicker(pascalObj, year, monthOfYear+1, dayOfMonth);
+                   }
+               }, mYear, mMonth, mDay);
+       dpd.show();
+   }    
+}
+
 
 //**new jclass entrypoint**//please, do not remove/change this line!
 
@@ -10680,6 +11121,12 @@ public native void pOnStopedListeningSensors(long pasobj);
 public native void pOnUnregisterListeningSensor(long pasobj, int sensorType, String sensorName);
 public native void pOnBroadcastReceiver(long pasobj, Intent intent);
 
+public native void pOnTimePicker(long pasobj, int hourOfDay, int minute);
+public native void pOnDatePicker(long pasobj, int year, int monthOfYear, int dayOfMonth);
+
+public native void pOnFlingGestureDetected(long pasobj, int direction);
+public native void pOnPinchZoomGestureDetected(long pasobj, float scaleFactor, int state); 
+
 //Load Pascal Library
 static {
    // Log.i("JNI_Java", "1.load libcontrols.so");
@@ -10722,7 +11169,6 @@ public  void jAppOnClickContextMenuItem(MenuItem item,int itemID, String itemCap
 
 public void jAppOnViewClick(View view, int id){ pAppOnViewClick(view,id);}
 public void jAppOnListItemClick(AdapterView adapter, View view, int position, int id){ pAppOnListItemClick(adapter, view,position,id);}
-
 
 //// -------------------------------------------------------------------------
 //  System, Class
@@ -11523,7 +11969,7 @@ public  int[] getBmpArray(String file) {
    * you take with the device's built-in camera. When you open the Android Gallery app, 
    * you are browsing the files saved in the DCIM folder....
    */
-  //by jmpessoa
+  //by jmpessoa  
 public String jCamera_takePhoto(String path, String filename) {
  	  Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
 	
@@ -11681,5 +12127,16 @@ public float[] benchMark1 () {
 	      return (java.lang.Object)(new jIntentManager(this,_Self));
 	   }      
   
+   public java.lang.Object jNotificationManager_jCreate(long _Self) {
+	      return (java.lang.Object)(new jNotificationManager(this,_Self));
+   }   
+   
+   public java.lang.Object jTimePickerDialog_jCreate(long _Self) {
+	      return (java.lang.Object)(new jTimePickerDialog(this,_Self));
+   }
+   
+   public java.lang.Object jDatePickerDialog_jCreate(long _Self) {
+	      return (java.lang.Object)(new jDatePickerDialog(this,_Self));
+   }
 
 }

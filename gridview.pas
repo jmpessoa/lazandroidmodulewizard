@@ -197,7 +197,7 @@ begin
   else Self.AnchorId:= -1; //dummy
   jGridView_SetLayoutAll(FjEnv, FjObject, Self.AnchorId);
   if  FColor <> colbrDefault then
-    View_SetBackGroundColor(FjEnv, FjObject, GetARGB(FColor));
+    View_SetBackGroundColor(FjEnv, FjObject, GetARGB(FCustomColor, FColor));
 
   if FItemsLayout <> ilImageText then
       jGridView_SetItemsLayout(FjEnv, FjObject, Ord(FItemsLayout));
@@ -212,7 +212,7 @@ procedure jGridView.SetColor(Value: TARGBColorBridge);
 begin
   FColor:= Value;
   if (FInitialized = True) and (FColor <> colbrDefault)  then
-    View_SetBackGroundColor(FjEnv, FjObject, GetARGB(FColor));
+    View_SetBackGroundColor(FjEnv, FjObject, GetARGB(FCustomColor, FColor));
 end;
 procedure jGridView.SetVisible(Value : Boolean);
 begin

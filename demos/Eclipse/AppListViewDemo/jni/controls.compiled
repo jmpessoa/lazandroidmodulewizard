@@ -1,5 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<CONFIG>
-  <Compiler Value="C:\laz4android1346592\fpc\2.7.1\bin\i386-win32\fpc.exe" Date="1163026138"/>
-  <Params Value=" -MDelphi -Scghim -CX -Os3 -Tandroid -Parm -Xs -XX -vewnhibq -FlC:\adt32\ndk9\platforms\android-14\arch-arm\usr\lib -FuC:\laz4android1346592\components\LazAndroidWizard\lib\arm-android -FuC:\laz4android1346592\lcl\units\arm-android -FuC:\laz4android1346592\components\lazutils\lib\arm-android -FuC:\laz4android1346592\packager\units\arm-android -FuC:\adt32\eclipse\workspace\AppListViewDemo\jni\ -l -FEC:\adt32\eclipse\workspace\AppListViewDemo\libs\armeabi\ -olibcontrols.so -dANDROID -Xd -CpArmV6 -CfSoft -FLC:\adt32\ndk9\platforms\android-14\arch-arm\usr\lib\libdl.so -FUC:\adt32\eclipse\workspace\AppListViewDemo\obj\Controls -oC:\adt32\eclipse\workspace\AppListViewDemo\libs\armeabi\libcontrols.so controls.lpr"/>
-</CONFIG>

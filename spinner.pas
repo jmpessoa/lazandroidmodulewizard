@@ -219,12 +219,12 @@ begin
   jSpinner_setLayoutAll(FjEnv, FjObject , Self.AnchorId);
 
   if  FColor <> colbrDefault then
-    View_SetBackGroundColor(FjEnv, FjThis, FjObject , GetARGB(FColor));
+    View_SetBackGroundColor(FjEnv, FjThis, FjObject , GetARGB(FCustomColor, FColor));
 
   if FSelectedFontColor <> colbrDefault then
-     Self.SetSelectedTextColor(GetARGB(FSelectedFontColor))
+     Self.SetSelectedTextColor(GetARGB(FCustomColor, FSelectedFontColor))
   else
-     Self.SetSelectedTextColor(GetARGB(colbrSilver));
+     Self.SetSelectedTextColor(GetARGB(FCustomColor, colbrSilver));
 
   if FDropListTextColor <> colbrDefault then self.SetDropListTextColor(FDropListTextColor);
   if FDropListBackgroundColor <> colbrDefault then  Self.SetDropListBackgroundColor(FDropListBackgroundColor);
@@ -243,7 +243,7 @@ procedure jSpinner.SetColor(Value: TARGBColorBridge);
 begin
   FColor:= Value;
   if (FInitialized = True) and (FColor <> colbrDefault)  then
-    View_SetBackGroundColor(FjEnv, FjObject , GetARGB(FColor));
+    View_SetBackGroundColor(FjEnv, FjObject , GetARGB(FCustomColor, FColor));
 end;
 
 procedure jSpinner.SetVisible(Value : Boolean);
@@ -445,7 +445,7 @@ begin
   //in designing component state: set value here...
   FDropListTextColor:= _color;
   if FInitialized then
-     jSpinner_SetDropListTextColor(FjEnv, FjObject , GetARGB(_color));
+     jSpinner_SetDropListTextColor(FjEnv, FjObject , GetARGB(FCustomColor, _color));
 end;
 
 procedure jSpinner.SetDropListBackgroundColor(_color: TARGBColorBridge{integer});
@@ -453,7 +453,7 @@ begin
   //in designing component state: set value here...
   FDropListBackgroundColor:= _color;
   if FInitialized then
-     jSpinner_SetDropListBackgroundColor(FjEnv, FjObject , GetARGB(_color));
+     jSpinner_SetDropListBackgroundColor(FjEnv, FjObject , GetARGB(FCustomColor, _color));
 end;
 
 procedure jSpinner.SetLastItemAsPrompt(_hasPrompt: boolean);
@@ -507,7 +507,7 @@ Procedure jSpinner.SetSelectedFontColor(Value: TARGBColorBridge);
 begin
   FSelectedFontColor:= Value;
   if (FInitialized = True) and (FFontColor <> colbrDefault) then
-    SetSelectedTextColor(GetARGB(FSelectedFontColor));
+    SetSelectedTextColor(GetARGB(FCustomColor, FSelectedFontColor));
 end;
 
 {-------- jSpinner_JNI_Bridge ----------}

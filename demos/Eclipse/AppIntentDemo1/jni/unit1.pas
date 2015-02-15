@@ -46,8 +46,11 @@ begin
   //android.intent.action.EDIT
   //android.intent.action.DIAL
   //android.intent.action.CALL_BUTTON
+
   jIntentManager1.SetAction('android.intent.action.PICK');
-  jIntentManager1.SetMimeType('image/*');  //or 'image/png' etc..  mime here must be lowercase!
+  //or jIntentManager1.IntentAction:= iaPick;
+
+  jIntentManager1.SetMimeType('image/*');            //or 'image/png' etc..  mime here must be lowercase!
   jIntentManager1.StartActivityForResult(1001);      //user-defined requestCode=1001
 end;
 

@@ -40,8 +40,7 @@ implementation
 procedure TAndroidModule1.jButton1Click(Sender: TObject);
 begin
      jIntentManager1.SetAction(jIntentManager1.GetActionDialAsString());
-    //or: jIntentManager1.SetAction(jIntentManager1.GetActionCallAsString());
-    //or: jIntentManager1.SetAction(jIntentManager1.GetActionCallButtonAsString());
+     //or jIntentManager1.IntentAction:= idDial;
 
     //Please, change de fone number!
     ShowMessage('Please, Edit de fone number .... ');

@@ -15,6 +15,7 @@ type
   TAndroidModule1 = class(jForm)
       jImageList1: jImageList;
       jImageView1: jImageView;
+      jImageView2: jImageView;
       jTextView1: jTextView;
       jTimer1: jTimer;
       procedure AndroidModule1CloseQuery(Sender: TObject; var CanClose: boolean
@@ -75,7 +76,7 @@ begin
   //jTextView1.Text:= IntToStr(Cnt_Timer) + '%';
   Inc(cnt_Timer, 5);
   Inc(cnt_Image);
-  if cnt_Image = jImageView1.Count then cnt_Image:= 0;
+  if cnt_Image = jImageView1.Count-1 then cnt_Image:= 0;
   jImageView1.ImageIndex:= cnt_Image;
   if cnt_timer < 200 then Exit;
   jTimer1.Enabled:= False;   //Stop Timer

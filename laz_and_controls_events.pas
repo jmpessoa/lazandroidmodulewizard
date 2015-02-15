@@ -45,13 +45,16 @@ uses
    Procedure Java_Event_pOnUnregisterListeningSensor(env: PJNIEnv; this: jobject; Obj: TObject; sensorType: integer; sensorName: JString);
    Procedure Java_Event_pOnBroadcastReceiver(env: PJNIEnv; this: jobject; Obj: TObject; intent:jObject);
 
+   Procedure Java_Event_pOnTimePicker(env: PJNIEnv; this: jobject; Obj: TObject; hourOfDay: integer; minute: integer);
+   Procedure Java_Event_pOnDatePicker(env: PJNIEnv; this: jobject; Obj: TObject; year: integer; monthOfYear: integer; dayOfMonth: integer);
+
 implementation
 
 uses
 
    AndroidWidget, bluetooth, bluetoothclientsocket, bluetoothserversocket,
    spinner, location, actionbartab, customdialog, togglebutton, switchbutton, gridview,
-   sensormanager, broadcastreceiver;
+   sensormanager, broadcastreceiver, datepickerdialog, timepickerdialog;
 
 procedure Java_Event_pOnBluetoothEnabled(env: PJNIEnv; this: jobject; Obj: TObject);
 begin
@@ -603,6 +606,29 @@ begin
   begin
     jBroadcastReceiver(Obj).UpdateJNI(gApp);
     jBroadcastReceiver(Obj).GenEvent_OnBroadcastReceiver(Obj,  intent);
+  end;
+end;
+
+
+Procedure Java_Event_pOnTimePicker(env: PJNIEnv; this: jobject; Obj: TObject; hourOfDay: integer; minute: integer);
+begin
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+  if Obj is jTimePickerDialog then
+  begin
+    jTimePickerDialog(Obj).UpdateJNI(gApp);
+    jTimePickerDialog(Obj).GenEvent_OnTimePicker(Obj, hourOfDay, minute);
+  end;
+end;
+
+Procedure Java_Event_pOnDatePicker(env: PJNIEnv; this: jobject; Obj: TObject; year: integer; monthOfYear: integer; dayOfMonth: integer);
+begin
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+  if Obj is jDatePickerDialog then
+  begin
+    jDatePickerDialog(Obj).UpdateJNI(gApp);
+    jDatePickerDialog(Obj).GenEvent_OnDatePicker(Obj,  year, monthOfYear, dayOfMonth);
   end;
 end;
 

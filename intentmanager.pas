@@ -9,6 +9,8 @@ uses
 
 type
 
+TIntentAction = (iaView, iaPick, iaSendto, idDial, iaCallbutton, iaCall, iaImageCapture, iaNone);
+
 {Draft Component code by "Lazarus Android Module Wizard" [1/27/2015 0:43:07]}
 {https://github.com/jmpessoa/lazandroidmodulewizard}
 
@@ -16,7 +18,7 @@ type
 
 jIntentManager = class(jControl)
  private
-
+   FIntentAction: TIntentAction;
  protected
 
  public
@@ -28,6 +30,7 @@ jIntentManager = class(jControl)
     function GetIntent(): jObject;
     function GetActivityStartedIntent(): jObject;
     procedure SetAction(_intentAction: string);
+    procedure SetIntentAction(_intentAction: TIntentAction);
     procedure SetMimeType(_mimeType: string);
     procedure SetDataUriAsString(_uriAsString: string);
     procedure StartActivityForResult(_requestCode: integer); overload;
@@ -90,6 +93,7 @@ jIntentManager = class(jControl)
     function GetBundleContent(_intent: jObject): TDynArrayOfString;
 
  published
+    property IntentAction: TIntentAction read FIntentAction write SetIntentAction;
 
 end;
 
@@ -97,7 +101,7 @@ function jIntentManager_jCreate(env: PJNIEnv;_Self: int64; this: jObject): jObje
 procedure jIntentManager_jFree(env: PJNIEnv; _jintentmanager: JObject);
 function jIntentManager_GetIntent(env: PJNIEnv; _jintentmanager: JObject): jObject;
 function jIntentManager_GetActivityStartedIntent(env: PJNIEnv; _jintentmanager: JObject): jObject;
-procedure jIntentManager_SetAction(env: PJNIEnv; _jintentmanager: JObject; _intentAction: string);
+procedure jIntentManager_SetAction(env: PJNIEnv; _jintentmanager: JObject; _intentAction: string);  overload;
 procedure jIntentManager_SetMimeType(env: PJNIEnv; _jintentmanager: JObject; _mimeType: string);
 procedure jIntentManager_SetDataUriAsString(env: PJNIEnv; _jintentmanager: JObject; _uriAsString: string);
 procedure jIntentManager_StartActivityForResult(env: PJNIEnv; _jintentmanager: JObject; _requestCode: integer); overload;
@@ -159,6 +163,8 @@ function jIntentManager_GetContactNumber(env: PJNIEnv; _jintentmanager: JObject;
 function jIntentManager_GetContactEmail(env: PJNIEnv; _jintentmanager: JObject; _contactUri: jObject): string;
 function jIntentManager_GetBundleContent(env: PJNIEnv; _jintentmanager: JObject; _intent: jObject): TDynArrayOfString;
 
+procedure jIntentManager_SetAction(env: PJNIEnv; _jintentmanager: JObject; _intentAction: integer); overload;
+
 
 implementation
 
@@ -169,6 +175,7 @@ constructor jIntentManager.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
 //your code here....
+  FIntentAction:= iaNone;
 end;
 
 destructor jIntentManager.Destroy;
@@ -192,6 +199,8 @@ begin
   //your code here: set/initialize create params....
   FjObject:= jCreate(); //jSelf !
   FInitialized:= True;
+  if FIntentAction <> iaNone then
+      jIntentManager_SetAction(FjEnv, FjObject, Ord(FIntentAction));
 end;
 
 
@@ -226,6 +235,14 @@ begin
   //in designing component state: set value here...
   if FInitialized then
      jIntentManager_SetAction(FjEnv, FjObject, _intentAction);
+end;
+
+procedure jIntentManager.SetIntentAction(_intentAction: TIntentAction);
+begin
+  //in designing component state: set value here...
+  FIntentAction:= _intentAction;
+  if FInitialized then
+     jIntentManager_SetAction(FjEnv, FjObject, Ord(_intentAction));
 end;
 
 procedure jIntentManager.SetMimeType(_mimeType: string);
@@ -1774,6 +1791,18 @@ begin
       end;
     end;
   end;
+end;
+
+procedure jIntentManager_SetAction(env: PJNIEnv; _jintentmanager: JObject; _intentAction: integer);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].i:= _intentAction;
+  jCls:= env^.GetObjectClass(env, _jintentmanager);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetAction', '(I)V');
+  env^.CallVoidMethodA(env, _jintentmanager, jMethod, @jParams);
 end;
 
 end.

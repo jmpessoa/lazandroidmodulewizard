@@ -42,10 +42,29 @@ begin
    ShowMessage(jEditText1.Text);
 end;
 
+{
+TImeOptions = (imeFlagNoFullScreen,
+               imeActionNone,
+               imeActionGo,
+               imeActionSearch,
+               imeActionSend,
+               imeActionNext,
+               imeActionDone,
+               imeActionPrevious,
+               imeFlagForceASCII);
+}
+
 procedure TAndroidModule1.AndroidModule1JNIPrompt(Sender: TObject);
 begin
   //jEditText1.DispatchOnChangeEvent(False);   //the trick!  stop event!
   //jEditText1.DispatchOnChangedEvent(False);   //the trick! stop event!
+
+  jEditText1.SetImeOptions(imeFlagNoFullScreen); //Thanks to @Ps !!
+                                                   //IMEs will never go into full screen mode,
+                                                   //and always leave some space to display the application UI
+  jTextView1.TextTypeFace:= tfBold;
+  jTextView1.CustomColor:= $FF2C2F3E;   //Thanks to @Ps  !!
+  jTextView1.FontColor:= colbrCustom;
 end;
 
 procedure TAndroidModule1.jEditText1Change(Sender: TObject; txt: string;

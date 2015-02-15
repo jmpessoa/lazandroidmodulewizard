@@ -8,6 +8,7 @@
       <Unit0>
         <Filename Value="controls.lpr"/>
         <IsPartOfProject Value="True"/>
+        <IsVisibleTab Value="True"/>
         <CursorPos X="10" Y="9"/>
         <UsageCount Value="89"/>
         <Loaded Value="True"/>
@@ -19,7 +20,6 @@
         <ComponentName Value="AndroidModule1"/>
         <HasResources Value="True"/>
         <UnitName Value="unit1"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="1"/>
         <TopLine Value="51"/>
         <CursorPos X="6" Y="53"/>

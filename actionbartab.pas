@@ -40,6 +40,11 @@ jActionBarTab = class(jControl)
     procedure SetTabNavigationMode();
     procedure RemoveAllTabs();
 
+    function GetSelectedTab(): jObject;
+    procedure SelectTab(tab: jObject);
+    function GetTabAtIndex(_index: integer): jObject;
+    procedure SelectTabByIndex(_index: integer);
+
     procedure GenEvent_OnActionBarTabSelected(Obj: TObject; view: jObject; title: string);
     procedure GenEvent_OnActionBarTabUnSelected(Obj: TObject; view: jObject; title: string);
 
@@ -60,6 +65,12 @@ procedure jActionBarTab_Add(env: PJNIEnv; _jActionBarTab: JObject; _title: strin
 procedure jActionBarTab_Add(env: PJNIEnv; _jActionBarTab: JObject; _title: string; _panel: jObject; _customTabView: jObject);  overload;
 procedure jActionBarTab_SetTabNavigationMode(env: PJNIEnv; _jActionBarTab: JObject);
 procedure jActionBarTab_RemoveAllTabs(env: PJNIEnv; _jActionBarTab: JObject);
+
+function jActionBarTab_GetSelectedTab(env: PJNIEnv; _jactionbartab: JObject): jObject;
+procedure jActionBarTab_SelectTab(env: PJNIEnv; _jactionbartab: JObject; tab: jObject);
+function jActionBarTab_GetTabAtIndex(env: PJNIEnv; _jactionbartab: JObject; _index: integer): jObject;
+procedure jActionBarTab_SelectTabByIndex(env: PJNIEnv; _jactionbartab: JObject; _index: integer);
+
 
 
 implementation
@@ -161,6 +172,35 @@ end;
 procedure jActionBarTab.SetIconIdentifiers(Value: TStrings);
 begin
   FIconIdentifiers.Assign(Value);
+end;
+
+
+function jActionBarTab.GetSelectedTab(): jObject;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jActionBarTab_GetSelectedTab(FjEnv, FjObject);
+end;
+
+procedure jActionBarTab.SelectTab(tab: jObject);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jActionBarTab_SelectTab(FjEnv, FjObject, tab);
+end;
+
+function jActionBarTab.GetTabAtIndex(_index: integer): jObject;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jActionBarTab_GetTabAtIndex(FjEnv, FjObject, _index);
+end;
+
+procedure jActionBarTab.SelectTabByIndex(_index: integer);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jActionBarTab_SelectTabByIndex(FjEnv, FjObject, _index);
 end;
 
 
@@ -290,5 +330,55 @@ begin
   jMethod:= env^.GetMethodID(env, jCls, 'RemoveAllTabs', '()V');
   env^.CallVoidMethod(env, _jActionBarTab, jMethod);
 end;
+
+function jActionBarTab_GetSelectedTab(env: PJNIEnv; _jactionbartab: JObject): jObject;
+var
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jactionbartab);
+  jMethod:= env^.GetMethodID(env, jCls, 'GetSelectedTab', '()Landroid/app/ActionBar/Tab;');
+  Result:= env^.CallObjectMethod(env, _jactionbartab, jMethod);
+end;
+
+
+procedure jActionBarTab_SelectTab(env: PJNIEnv; _jactionbartab: JObject; tab: jObject);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= tab;
+  jCls:= env^.GetObjectClass(env, _jactionbartab);
+  jMethod:= env^.GetMethodID(env, jCls, 'SelectTab', '(LActionBar/Tab;)V');
+  env^.CallVoidMethodA(env, _jactionbartab, jMethod, @jParams);
+end;
+
+
+function jActionBarTab_GetTabAtIndex(env: PJNIEnv; _jactionbartab: JObject; _index: integer): jObject;
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].i:= _index;
+  jCls:= env^.GetObjectClass(env, _jactionbartab);
+  jMethod:= env^.GetMethodID(env, jCls, 'GetTabAtIndex', '(I)Landroid/app/ActionBar/Tab;');
+  Result:= env^.CallObjectMethodA(env, _jactionbartab, jMethod, @jParams);
+end;
+
+
+procedure jActionBarTab_SelectTabByIndex(env: PJNIEnv; _jactionbartab: JObject; _index: integer);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].i:= _index;
+  jCls:= env^.GetObjectClass(env, _jactionbartab);
+  jMethod:= env^.GetMethodID(env, jCls, 'SelectTabByIndex', '(I)V');
+  env^.CallVoidMethodA(env, _jactionbartab, jMethod, @jParams);
+end;
+
 
 end.

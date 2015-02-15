@@ -26,6 +26,9 @@ object AndroidModule1: TAndroidModule1
     LayoutParamWidth = lpMatchParent
     LayoutParamHeight = lpMatchParent
     BackgroundColor = colbrDefault
+    MinPinchZoomFactor = 0.25
+    MaxPinchZoomFactor = 4
+    OnFlingGesture = jPanel1FlingGesture
     Id = 0
     object jTextView1: jTextView
       Left = 12
@@ -118,6 +121,9 @@ object AndroidModule1: TAndroidModule1
     LayoutParamWidth = lpMatchParent
     LayoutParamHeight = lpMatchParent
     BackgroundColor = colbrDefault
+    MinPinchZoomFactor = 0.25
+    MaxPinchZoomFactor = 4
+    OnFlingGesture = jPanel2FlingGesture
     Id = 0
     object jTextView2: jTextView
       Left = 120
@@ -210,6 +216,8 @@ object AndroidModule1: TAndroidModule1
     LayoutParamWidth = lpMatchParent
     LayoutParamHeight = lpWrapContent
     BackgroundColor = colbrDefault
+    MinPinchZoomFactor = 0.25
+    MaxPinchZoomFactor = 4
     Id = 0
     object jCheckBox1: jCheckBox
       Left = 144
@@ -273,6 +281,7 @@ object AndroidModule1: TAndroidModule1
       LayoutParamHeight = lpWrapContent
       ImageIndex = 0
       BackgroundColor = colbrDefault
+      ImageScaleType = scaleCenter
       Id = 7721927
     end
   end
@@ -291,6 +300,9 @@ object AndroidModule1: TAndroidModule1
     LayoutParamWidth = lpMatchParent
     LayoutParamHeight = lpMatchParent
     BackgroundColor = colbrDefault
+    MinPinchZoomFactor = 0.25
+    MaxPinchZoomFactor = 4
+    OnFlingGesture = jPanel4FlingGesture
     Id = 0
     object jListView1: jListView
       Tag = 1
