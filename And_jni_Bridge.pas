@@ -600,6 +600,8 @@ Procedure jWebView_setParent           (env:PJNIEnv;
 Procedure jWebView_setJavaScript       (env:PJNIEnv;
                                         WebView : jObject; javascript : boolean);
 
+procedure jWebView_SetZoomControl(env: PJNIEnv; WebView: jObject; ZoomControl: Boolean);
+
 Procedure jWebView_loadURL(env:PJNIEnv; WebView : jObject; Str : String);
 
 Procedure jWebView_setId(env:PJNIEnv; WebView : jObject; id: DWord);
@@ -1534,7 +1536,9 @@ var
 begin
  _jParams[0].l := env^.NewStringUTF(env, pchar(Str) );
  cls := env^.GetObjectClass(env, EditText);
-_jMethod:= env^.GetMethodID(env, cls, 'setHint', '(Ljava/lang/String;)V');
+ // Changed: String -> CharSequence - Fatih
+ //_jMethod:= env^.GetMethodID(env, cls, 'setHint', '(Ljava/lang/String;)V');
+ _jMethod:= env^.GetMethodID(env, cls, 'setHint', '(Ljava/lang/CharSequence;)V');
  env^.CallVoidMethodA(env,EditText,_jMethod,@_jParams);
  env^.DeleteLocalRef(env,_jParams[0].l);
 end;
@@ -4363,6 +4367,19 @@ begin
  cls := env^.GetObjectClass(env, WebView);
 _jMethod:= env^.GetMethodID(env, cls, 'setJavaScript', '(Z)V');
  env^.CallVoidMethodA(env,WebView,_jMethod,@_jParams);
+end;
+
+procedure jWebView_SetZoomControl(env: PJNIEnv; WebView: jObject; ZoomControl: Boolean);
+  var
+  _jMethod : jMethodID = nil;
+  _jParams : Array[0..0] of jValue;
+  cls: jClass;
+begin
+
+  _jParams[0].z := JBool(ZoomControl);
+  cls := env^.GetObjectClass(env, WebView);
+  _jMethod:= env^.GetMethodID(env, cls, 'setZoomControl', '(Z)V');
+  env^.CallVoidMethodA(env,WebView,_jMethod,@_jParams);
 end;
 
 Procedure jWebView_loadURL(env:PJNIEnv;

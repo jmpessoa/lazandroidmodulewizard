@@ -3641,6 +3641,10 @@ public  void setJavaScript(boolean javascript) {
 	  this.getSettings().setJavaScriptEnabled(javascript);
 }
 
+	// Fatih - ZoomControl
+	public  void setZoomControl(boolean zoomControl) {		
+		this.getSettings().setBuiltInZoomControls(zoomControl);
+	}
 }
 
 //-------------------------------------------------------------------------
