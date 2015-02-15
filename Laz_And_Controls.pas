@@ -1120,8 +1120,12 @@ type
     //
     FOnStatus   : TOnWebViewStatus;
 
+    // Fatih - ZoomControl
+    FZoomControl : Boolean;
+
     Procedure SetVisible   (Value : Boolean);
     Procedure SetColor     (Value : TARGBColorBridge);
+    Procedure SetZoomControl(Value : Boolean);
     Procedure SetJavaScript(Value : Boolean);
     procedure UpdateLParamHeight;
     procedure UpdateLParamWidth;
@@ -1144,6 +1148,7 @@ type
     property BackgroundColor     : TARGBColorBridge read FColor      write SetColor;
     // Event
     property OnStatus  : TOnWebViewStatus read FOnStatus   write FOnStatus;
+    property ZoomControl: Boolean read FZoomControl write SetZoomControl;
   end;
 
   jView = class(jVisualControl)
@@ -5511,6 +5516,7 @@ constructor jWebView.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
   FJavaScript := False;
+  FZoomControl := False;
   FOnStatus   := nil;
   FLParamWidth:= lpMatchParent;
   FLParamHeight:= lpWrapContent;
@@ -5573,6 +5579,9 @@ begin
                                            FMarginLeft,FMarginTop,FMarginRight,FMarginBottom,
                                            GetLayoutParams(gApp, FLParamWidth, sdW),
                                            GetLayoutParams(gApp, FLParamHeight, sdH));
+
+  jWebView_SetZoomControl(FjEnv, FjObject, FZoomControl);
+
   FInitialized:= True;
   if FParent is jPanel then
   begin
@@ -5635,6 +5644,17 @@ begin
   FJavaScript:= Value;
   if FInitialized then
      jWebView_SetJavaScript(FjEnv, FjObject , FJavaScript);
+end;
+
+procedure jWebView.SetZoomControl(Value: Boolean);
+begin
+
+  if(Value <> FZoomControl) then
+  begin
+
+    FZoomControl := Value;
+    if FInitialized then jWebView_SetZoomControl(FjEnv, FjObject, FZoomControl);
+  end;
 end;
 
 Procedure jWebView.Navigate(url: string);
