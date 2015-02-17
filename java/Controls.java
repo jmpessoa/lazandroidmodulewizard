@@ -1025,9 +1025,21 @@ public  void Free() {
     this.setTypeface(null, Typeface.NORMAL);
  */
 
-public void SetTextTypeFace(int _typeface) {
+/*public void SetTextTypeFace(int _typeface) {
   this.setTypeface(null, _typeface);
-}
+}*/
+
+	public void setFontAndTextTypeFace(int fontFace, int fontStyle) {
+	
+		Typeface t = null;
+		switch (fontFace) {
+			case 0: t = Typeface.DEFAULT; break;
+			case 1: t = Typeface.SANS_SERIF; break;
+			case 2: t = Typeface.SERIF; break;
+			case 3: t = Typeface.MONOSPACE; break;
+		}
+		this.setTypeface(t, fontStyle);
+	}
 
 public void Append(String _txt) {
   this.append( _txt);
@@ -1329,6 +1341,18 @@ public void SetImeOptions(int _imeOption) {
   }   
 }
 	
+	public void setFontAndTextTypeFace(int fontFace, int fontStyle) {
+	
+		Typeface t = null;
+		switch (fontFace) {
+			case 0: t = Typeface.DEFAULT; break;
+			case 1: t = Typeface.SANS_SERIF; break;
+			case 2: t = Typeface.SERIF; break;
+			case 3: t = Typeface.MONOSPACE; break;
+		}
+		this.setTypeface(t, fontStyle);
+	}
+
 }
 
 //-------------------------------------------------------------------------

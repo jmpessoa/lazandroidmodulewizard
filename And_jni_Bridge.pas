@@ -135,7 +135,8 @@ Procedure jTextView_setText(env:PJNIEnv; TextView : jObject; Str : String);
 Procedure jTextView_setTextColor(env:PJNIEnv; TextView : jObject; color : DWord);
 Procedure jTextView_setTextSize(env:PJNIEnv; TextView : jObject; size  : DWord);
 
-Procedure jTextView_SetTextTypeFace(env:PJNIEnv; TextView : jObject; textStyle: DWord);
+//Procedure jTextView_SetTextTypeFace(env:PJNIEnv; TextView : jObject; textStyle: DWord);
+procedure jTextView_setFontAndTextTypeFace(env: PJNIEnv; TextView: jObject; FontFace, TextTypeFace: DWord);
 
 Procedure jTextView_setTextAlignment(env:PJNIEnv; TextView : jObject; align : DWord);
 
@@ -168,6 +169,8 @@ Procedure jEditText_setText            (env:PJNIEnv; EditText : jObject; Str : S
 
 Procedure jEditText_setTextColor       (env:PJNIEnv; EditText : jObject; color : DWord);
 Procedure jEditText_setTextSize        (env:PJNIEnv; EditText : jObject; size  : DWord);
+
+procedure jEditText_setFontAndTextTypeFace(env: PJNIEnv; EditText: jObject; FontFace, TextTypeFace: DWord);
 
 Procedure jEditText_setHint            (env:PJNIEnv; EditText : jObject; Str : String);
 Procedure jEditText_SetFocus          (env:PJNIEnv; EditText : jObject);
@@ -1295,16 +1298,18 @@ begin
   env^.CallVoidMethodA(env,TextView,_jMethod,@_jParams);
 end;
 
-Procedure jTextView_SetTextTypeFace(env:PJNIEnv; TextView : jObject; textStyle  : DWord);
-var
+//Procedure jTextView_SetTextTypeFace(env:PJNIEnv; TextView : jObject; textStyle  : DWord);
+procedure jTextView_setFontAndTextTypeFace(env: PJNIEnv; TextView: jObject; FontFace, TextTypeFace: DWord);
+  var
   _jMethod : jMethodID = nil;
-  _jParams : array[0..0] of jValue;
+  _jParams : array[0..1] of jValue;
   cls: jClass;
 begin
-  _jParams[0].i := textStyle;
+  _jParams[0].i := FontFace;
+  _jParams[1].i := TextTypeFace;
   cls := env^.GetObjectClass(env, TextView);
-  _jMethod:= env^.GetMethodID(env, cls, 'SetTextTypeFace', '(I)V');
-  env^.CallVoidMethodA(env,TextView,_jMethod,@_jParams);
+  _jMethod:= env^.GetMethodID(env, cls, 'setFontAndTextTypeFace', '(II)V');
+  env^.CallVoidMethodA(env, TextView, _jMethod, @_jParams);
 end;
 
 //by jmpessoa
@@ -1525,6 +1530,19 @@ begin
  cls := env^.GetObjectClass(env, EditText);
  _jMethod:= env^.GetMethodID(env, cls, 'setTextSize', '(F)V');
  env^.CallVoidMethodA(env,EditText,_jMethod,@_jParams);
+end;
+
+procedure jEditText_setFontAndTextTypeFace(env: PJNIEnv; EditText: jObject; FontFace, TextTypeFace: DWord);
+  var
+  _jMethod : jMethodID = nil;
+  _jParams : array[0..1] of jValue;
+  cls: jClass;
+begin
+  _jParams[0].i := FontFace;
+  _jParams[1].i := TextTypeFace;
+  cls := env^.GetObjectClass(env, EditText);
+  _jMethod:= env^.GetMethodID(env, cls, 'setFontAndTextTypeFace', '(II)V');
+  env^.CallVoidMethodA(env, EditText, _jMethod, @_jParams);
 end;
 
 Procedure jEditText_setHint(env:PJNIEnv; EditText : jObject;

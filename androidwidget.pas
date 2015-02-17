@@ -1034,6 +1034,7 @@ type
     FOrientation : integer;
     FTextAlignment: TTextAlignment;
     FFontSize     : DWord;
+    FFontFace: TFontFace;
     FTextTypeFace: TTextTypeFace;
     FAnchorId     : integer;
     FAnchor       : jVisualControl;  //http://www.semurjengkol.com/android-relative-layout-example/
@@ -1057,6 +1058,7 @@ type
     procedure SetParentComponent(Value: TComponent); override;
     procedure SetParamHeight(Value: TLayoutParams);
     procedure SetParamWidth(Value: TLayoutParams);
+    procedure SetFontFace(AValue: TFontFace); virtual;
     procedure SetTextTypeFace(Value: TTextTypeFace); virtual;
   public
     constructor Create(AOwner: TComponent); override;
@@ -1069,6 +1071,7 @@ type
     property ViewParent {ViewParent}: jObject  read  GetViewParent write SetViewParent; // Java : Parent Relative Layout
     property View: jObject read GetView write SetView; // Java : Self View/Layout
     property Id: DWord read FId write FId;
+    property FontFace: TFontFace read FFontFace write SetFontFace;
     property TextTypeFace: TTextTypeFace read FTextTypeFace write SetTextTypeFace;
   published
     property Visible: boolean read FVisible write FVisible;
@@ -1947,6 +1950,11 @@ begin
   FLParamHeight:= Value;
   if (csDesigning in ComponentState) and (Value <> lpMatchParent) and (Value <> lpWrapContent) then
      FLParamHeight:= GetDesignerLayoutByWH(Self.Height, Self.Parent.Height);
+end;
+
+procedure jVisualControl.SetFontFace(AValue: TFontFace);
+begin
+  FFontFace := AValue;
 end;
 
 procedure jVisualControl.SetTextTypeFace(Value: TTextTypeFace);

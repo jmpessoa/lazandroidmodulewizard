@@ -590,6 +590,7 @@ type
     procedure SetParentComponent(Value: TComponent); override;
     Procedure SetText(Value: string ); override;
     Function  GetText: string;   override;
+    procedure SetFontFace(AValue: TFontFace); override;
     procedure SetTextTypeFace(Value: TTextTypeFace); override;
     procedure SetViewParent(Value: jObject);  override;
     Procedure GenEvent_OnClick(Obj: TObject);
@@ -607,7 +608,8 @@ type
     property BackgroundColor     : TARGBColorBridge read FColor     write SetColor;
     property FontColor : TARGBColorBridge  read FFontColor write SetFontColor;
     property FontSize  : DWord   read FFontSize  write SetFontSize;
-    property TextTypeFace: TTextTypeFace read FTextTypeFace write SetTextTypeFace; //by jmpessoa
+    property FontFace: TFontFace read FFontFace write SetFontFace default ffNormal;
+    property TextTypeFace: TTextTypeFace read FTextTypeFace write SetTextTypeFace default tfNormal; //by jmpessoa
     // Event - if enabled!
     property OnClick : TOnNotify read FOnClick   write FOnClick;
   end;
@@ -655,6 +657,8 @@ type
     procedure SetParentComponent(Value: TComponent); override;
     Procedure SetText(Value: string ); override;
     Function  GetText: string; override;
+    procedure SetFontFace(AValue: TFontFace); override;
+    procedure SetTextTypeFace(Value: TTextTypeFace); override;
     procedure SetViewParent(Value: jObject);  override;
     Procedure GenEvent_OnEnter (Obj: TObject);
     Procedure GenEvent_OnChange(Obj: TObject; txt: string; count : Integer);
@@ -690,6 +694,8 @@ type
     property BackgroundColor: TARGBColorBridge read FColor write SetColor;
     property FontColor : TARGBColorBridge      read FFontColor    write SetFontColor;
     property FontSize  : DWord      read FFontSize     write SetFontSize;
+    property FontFace: TFontFace read FFontFace write SetFontFace default ffNormal;
+    property TextTypeFace: TTextTypeFace read FTextTypeFace write SetTextTypeFace default tfNormal;
     property Hint      : string     read FHint         write SetHint;
     //property SingleLine: boolean read FSingleLine write SetSingleLine;
     property ScrollBarStyle: TScrollBarStyle read FScrollBarStyle write SetScrollBarStyle;
@@ -1991,6 +1997,7 @@ begin
   inherited Create(AOwner);
   FTextAlignment:= taLeft;
   FText:= '';
+  FFontFace := ffNormal;
   FTextTypeFace:= tfNormal;
   //FFontColor:= colbrDefault; //colbrSilver;
   FMarginLeft   := 5;
@@ -2118,8 +2125,10 @@ begin
 
   jTextView_setEnabled(FjEnv, FjObject , FEnabled);
 
-  if FTextTypeFace <>  tfNormal then   //TODO: TFontFace=(ffNormal,ffSans,ffSerif,ffMonospace);
-    jTextView_SetTextTypeFace(FjEnv, FjObject, Ord(FTextTypeFace));
+  jTextView_setFontAndTextTypeFace(FjEnv, FjObject, Ord(FFontFace), Ord(FTextTypeFace));
+
+{  if FTextTypeFace <>  tfNormal then   //TODO: TFontFace=(ffNormal,ffSans,ffSerif,ffMonospace);
+    jTextView_SetTextTypeFace(FjEnv, FjObject, Ord(FTextTypeFace)); }
 
   View_SetVisible(FjEnv, FjThis, FjObject , FVisible);
 
@@ -2181,11 +2190,22 @@ begin
     jTextView_setTextSize(FjEnv, FjObject , FFontSize);
 end;
 
+procedure jTextView.SetFontFace(AValue: TFontFace);
+begin
+  inherited SetFontFace(AValue);
+
+  if(FInitialized) then
+    jTextView_setFontAndTextTypeFace(FjEnv, FjObject, Ord(FFontFace), Ord(FTextTypeFace));
+end;
+
 procedure jTextView.SetTextTypeFace(Value: TTextTypeFace);
 begin
   inherited SetTextTypeFace(Value);
-  if FInitialized  then
-    jTextView_SetTextTypeFace(FjEnv, FjObject, Ord(Value));
+{  if FInitialized  then
+    jTextView_SetTextTypeFace(FjEnv, FjObject, Ord(Value)); }
+
+  if(FInitialized) then
+    jTextView_setFontAndTextTypeFace(FjEnv, FjObject, Ord(FFontFace), Ord(FTextTypeFace));
 end;
 
 procedure jTextView.UpdateLParamWidth;
@@ -2393,6 +2413,8 @@ begin
 
   jEditText_setLayoutAll(FjEnv, FjObject , Self.AnchorId);
 
+  jEditText_setFontAndTextTypeFace(FjEnv, FjObject, Ord(FFontFace), Ord(FTextTypeFace));
+
   if  FHint <> '' then
     jEditText_setHint(FjEnv, FjObject , FHint);
 
@@ -2506,6 +2528,22 @@ begin
   FFontSize:= Value;
   if FInitialized and (FFontSize > 0) then
      jEditText_setTextSize(FjEnv, FjObject , FFontSize);
+end;
+
+procedure jEditText.SetFontFace(AValue: TFontFace);
+begin
+  inherited SetFontFace(AValue);
+
+  if(FInitialized) then
+    jEditText_setFontAndTextTypeFace(FjEnv, FjObject, Ord(FFontFace), Ord(FTextTypeFace));
+end;
+
+procedure jEditText.SetTextTypeFace(Value: TTextTypeFace);
+begin
+  inherited SetTextTypeFace(Value);
+
+  if(FInitialized) then
+    jEditText_setFontAndTextTypeFace(FjEnv, FjObject, Ord(FFontFace), Ord(FTextTypeFace));
 end;
 
 Procedure jEditText.SetHint(Value : String);
