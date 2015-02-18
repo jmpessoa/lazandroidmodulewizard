@@ -65,6 +65,51 @@
 	*					*
 	*****************************************
 
+Version 0.6 - rev. 15 - 17 February 2015 -
+
+	MINOR IMPROVEMENTS:
+
+	jApp:
+		LOST property: // <<--A suggestion and request by rx3.fireproof	
+			Device.PhoneNumber
+			Device.ID;
+	jForm: 
+		NEWS methods:	
+			.GetDevicePhoneNumber;
+			.GetDeviceID;
+			.[warning] "must have" [AndroidManifest.xml]: 
+				<uses-permission android:name="android.permission.READ_PHONE_STATE"/>			
+	jTextView:
+		NEW property: // <<--- Thanks to Fatih!		
+			FontFace;
+
+	jEditText:
+		NEW property: // <<--- Thanks to Fatih!		
+			TextTypeFace;
+			FontFace;
+			Editable; <<-A suggestion and request by rx3.fireproof
+	jSpinner:
+		NEW properties:	<<-A suggestion and request by rx3.fireproof
+			FontSize; 
+ 			Count;
+	jHttpClient:
+		NEWS methods: <<-A suggestion and request by rx3.fireproof 	
+			.SetAuthenticationUser(...); 	 	
+			.SetAuthenticationHost(...); 
+		NEW property:	
+			AuthenticationMode [just basic... yet] 
+
+	jWebView:
+		NEW property: // <<--- Thanks to Fatih!	
+			ZoomControl;	
+		NEWS method: <<-A suggestion and request by rx3.fireproof	
+			SetHttpAuthUsernamePassword(...); 
+		
+	jListView: FIXs [radio group mode]
+		LOST property:	
+			HighLightSelectedItem;
+			::Please, no panic! When prompt "Read error" [Unknown Property] just choice "Continue Loading"
+	
 Version 0.6 - rev. 14 - 13 February 2015 -
 
 	NEW! Added support to Touch Gesture: Pinch/Zoom and Fling[Swipe]!

@@ -21,6 +21,7 @@ type
     EditPathToWorkspace: TEdit;
     edProjectName: TEdit;
     GroupBox1: TGroupBox;
+    Image1: TImage;
     LabelTargetAPI: TLabel;
     LabelPathToWorkspace: TLabel;
     LabelPlatform: TLabel;

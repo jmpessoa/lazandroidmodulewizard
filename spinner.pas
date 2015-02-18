@@ -24,8 +24,9 @@ jSpinner = class(jVisualControl)
     FSelectedFontColor: TARGBColorBridge;
     FDropListTextColor: TARGBColorBridge;
     FDropListBackgroundColor: TARGBColorBridge;
-
     FLastItemAsPrompt: boolean;
+
+    FFontSize: integer;
 
     procedure SetVisible(Value: Boolean);
     procedure SetColor(Value: TARGBColorBridge);
@@ -65,10 +66,12 @@ jSpinner = class(jVisualControl)
     procedure Delete(_index: integer);
     procedure SetSelection(_index: integer);
     procedure SetItem(_index: integer; _item: string);
+    procedure SetTextFontSize(_txtFontSize: integer);
 
     property jParent: jObject  read  FjPRLayout write SetjParent; // Java : Parent Relative Layout
 
     procedure GenEvent_OnSpinnerItemSeleceted(Obj: TObject; caption: string; position: integer);
+    property Count: integer read GetSize;
  published
 
     property Items: TStrings read FItems write SetItems;
@@ -80,6 +83,7 @@ jSpinner = class(jVisualControl)
     property DropListTextColor: TARGBColorBridge read FDropListTextColor write SetDropListTextColor;
     property DropListBackgroundColor: TARGBColorBridge  read FDropListBackgroundColor write SetDropListBackgroundColor;
     property LastItemAsPrompt: boolean read FLastItemAsPrompt write SetLastItemAsPrompt;
+    property FontSize: integer read FFontSize write SetTextFontSize;
 end;
 
 function jSpinner_jCreate(env: PJNIEnv; this: JObject;_Self: int64): jObject;
@@ -104,6 +108,8 @@ procedure jSpinner_Delete(env: PJNIEnv; _jspinner: JObject; _index: integer);
 procedure jSpinner_SetSelection(env: PJNIEnv; _jspinner: JObject; _index: integer);
 procedure jSpinner_SetItem(env: PJNIEnv; _jspinner: JObject; _index: integer; _item: string);
 
+procedure jSpinner_SetTextFontSize(env: PJNIEnv; _jspinner: JObject; _txtFontSize: integer);
+
 
 implementation
 
@@ -127,6 +133,7 @@ begin
   FDropListTextColor:=  colbrDefault;
   FDropListBackgroundColor:=  colbrDefault;
   FLastItemAsPrompt:= False;
+  FFontSize:= 0;
 end;
 
 procedure jSpinner.SetParentComponent(Value: TComponent);
@@ -235,6 +242,9 @@ begin
   end;
 
   if (FLastItemAsPrompt) then Self.SetLastItemAsPrompt(FLastItemAsPrompt);
+
+  if FFontSize <> 0 then
+     jSpinner_SetTextFontSize(FjEnv, FjObject , FFontSize);
 
   View_SetVisible(FjEnv, FjThis, FjObject , FVisible);
 end;
@@ -509,6 +519,15 @@ begin
   if (FInitialized = True) and (FFontColor <> colbrDefault) then
     SetSelectedTextColor(GetARGB(FCustomColor, FSelectedFontColor));
 end;
+
+procedure jSpinner.SetTextFontSize(_txtFontSize: integer);
+begin
+  //in designing component state: set value here...
+  FFontSize:= _txtFontSize;
+  if FInitialized then
+     jSpinner_SetTextFontSize(FjEnv, FjObject, _txtFontSize);
+end;
+
 
 {-------- jSpinner_JNI_Bridge ----------}
 
@@ -800,6 +819,18 @@ begin
   jMethod:= env^.GetMethodID(env, jCls, 'SetItem', '(ILjava/lang/String;)V');
   env^.CallVoidMethodA(env, _jspinner, jMethod, @jParams);
   env^.DeleteLocalRef(env,jParams[1].l);
+end;
+
+procedure jSpinner_SetTextFontSize(env: PJNIEnv; _jspinner: JObject; _txtFontSize: integer);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].i:= _txtFontSize;
+  jCls:= env^.GetObjectClass(env, _jspinner);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetTextFontSize', '(I)V');
+  env^.CallVoidMethodA(env, _jspinner, jMethod, @jParams);
 end;
 
 end.

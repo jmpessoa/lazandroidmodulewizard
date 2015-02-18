@@ -1,6 +1,6 @@
 package com.example.dummyapp;
 
-//Lamw: Lazarus Android Module Wizard - Version 0.6 - rev. 14 - 13 February - 2015
+//Lamw: Lazarus Android Module Wizard - Version 0.6 - rev. 15 - 17 February - 2015
 //Form Designer and Components development model!
 //Author: jmpessoa@hotmail.com
 //https://github.com/jmpessoa/lazandroidmodulewizard
@@ -119,6 +119,7 @@ import android.text.InputType;
 import android.text.TextWatcher;
 import android.text.method.NumberKeyListener;
 import android.text.method.ScrollingMovementMethod;
+import android.util.Base64;
 import android.util.DisplayMetrics;
 import android.location.Address;
 import android.location.Criteria;
@@ -156,6 +157,7 @@ import android.view.animation.AnimationUtils;
 import android.view.animation.TranslateAnimation;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
+import android.webkit.HttpAuthHandler;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.AbsListView;
@@ -192,14 +194,14 @@ import java.io.*;
 import java.lang.*;
 
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
+//import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
-import java.nio.IntBuffer;
-import java.nio.FloatBuffer;
-import java.text.Format;
+//import java.nio.ByteBuffer;
+//import java.nio.ByteOrder;
+//import java.nio.IntBuffer;
+//import java.nio.FloatBuffer;
+//import java.text.Format;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -207,10 +209,10 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
-import java.util.Random;
+//import java.util.Map;
+//import java.util.Random;
 import java.util.Set;
-import java.util.StringTokenizer;
+//import java.util.StringTokenizer;
 import java.util.UUID;
 import java.util.regex.Pattern;
 
@@ -220,9 +222,15 @@ import javax.microedition.khronos.egl.EGLContext;
 import javax.microedition.khronos.egl.EGL10;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
+import org.apache.http.auth.AuthScope;
+import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
+//import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.params.BasicHttpParams;
+import org.apache.http.params.HttpConnectionParams;
+import org.apache.http.params.HttpParams;
 import org.apache.http.util.ByteArrayBuffer;
 import org.apache.http.util.EntityUtils;
 
@@ -1025,25 +1033,24 @@ public  void Free() {
     this.setTypeface(null, Typeface.NORMAL);
  */
 
-/*public void SetTextTypeFace(int _typeface) {
+public void SetTextTypeFace(int _typeface) {
   this.setTypeface(null, _typeface);
-}*/
-
-	public void setFontAndTextTypeFace(int fontFace, int fontStyle) {
-	
-		Typeface t = null;
-		switch (fontFace) {
-			case 0: t = Typeface.DEFAULT; break;
-			case 1: t = Typeface.SANS_SERIF; break;
-			case 2: t = Typeface.SERIF; break;
-			case 3: t = Typeface.MONOSPACE; break;
-		}
-		this.setTypeface(t, fontStyle);
-	}
+}
 
 public void Append(String _txt) {
   this.append( _txt);
 }
+
+public void setFontAndTextTypeFace(int fontFace, int fontStyle) { 
+  Typeface t = null; 
+  switch (fontFace) { 
+    case 0: t = Typeface.DEFAULT; break; 
+    case 1: t = Typeface.SANS_SERIF; break; 
+    case 2: t = Typeface.SERIF; break; 
+    case 3: t = Typeface.MONOSPACE; break; 
+  } 
+  this.setTypeface(t, fontStyle); 		
+} 
 
 }
 
@@ -1340,19 +1347,18 @@ public void SetImeOptions(int _imeOption) {
 	 case 8: this.setImeOptions(EditorInfo.IME_FLAG_FORCE_ASCII); break;
   }   
 }
-	
-	public void setFontAndTextTypeFace(int fontFace, int fontStyle) {
-	
-		Typeface t = null;
-		switch (fontFace) {
-			case 0: t = Typeface.DEFAULT; break;
-			case 1: t = Typeface.SANS_SERIF; break;
-			case 2: t = Typeface.SERIF; break;
-			case 3: t = Typeface.MONOSPACE; break;
-		}
-		this.setTypeface(t, fontStyle);
-	}
 
+public void setFontAndTextTypeFace(int fontFace, int fontStyle) { 
+  Typeface t = null; 
+  switch (fontFace) { 
+    case 0: t = Typeface.DEFAULT; break; 
+    case 1: t = Typeface.SANS_SERIF; break; 
+    case 2: t = Typeface.SERIF; break; 
+    case 3: t = Typeface.MONOSPACE; break; 
+  } 
+  this.setTypeface(t, fontStyle); 		
+} 
+	
 }
 
 //-------------------------------------------------------------------------
@@ -2160,6 +2166,7 @@ private Controls        controls = null;   // Control Class for Event
 private Context       ctx;
 private int           id;
 private List <jListItemRow> items ;
+private ArrayAdapter thisAdapter;
 
 public  jArrayAdapter(Context context, Controls ctrls,long pasobj, int textViewResourceId , 
 		               List<jListItemRow> list) {
@@ -2169,6 +2176,8 @@ public  jArrayAdapter(Context context, Controls ctrls,long pasobj, int textViewR
    ctx   = context;
    id    = textViewResourceId;
    items = list;
+   thisAdapter = this;
+		   
 }
 
 @Override
@@ -2362,15 +2371,19 @@ View.OnClickListener getOnCheckItem(final View cb, final int position) {
 	               else if (cb.getClass().getName().equals("android.widget.RadioButton")) {
 	            	   
 	            	     //new code: fix to RadioButton Group  default behavior: thanks to Leledumbo.
-	            	      boolean doCheck = ((RadioButton)cb).isChecked(); //new code	            	    		            	     		            	      
+	            	      boolean doCheck = ((RadioButton)cb).isChecked(); //new code
+	            	      
 	            	      for (int i=0; i < items.size(); i++) {
 	            	    	  ((RadioButton)items.get(i).jWidget).setChecked(false);
-	            	    	  items.get(i).checked = false;	            	    	  
-	            	      }	            	      
+	            	    	  items.get(i).checked = false;	 	            	    	 
+	            	    	  thisAdapter.notifyDataSetChanged(); //fix 16-febr-2015 
+	            	      }	            	
+	            	      
 		                  items.get(position).checked = doCheck;
-		                  //items.get(position).jWidget = ((RadioButton)cb); 
-		                  ((RadioButton)cb).setChecked(doCheck);		                  		                  
-		                  controls.pOnClickWidgetItem(PasObj, position, ((RadioButton)cb).isChecked());
+		                   
+		                  ((RadioButton)items.get(position).jWidget).setChecked(doCheck);
+		                  
+		                  controls.pOnClickWidgetItem(PasObj, position, doCheck);
 		                  
 		           }
 	               else if (cb.getClass().getName().equals("android.widget.Button")) { //button	            	      	            	        
@@ -2430,7 +2443,7 @@ int MarginTop = 5;
 int marginRight = 5;
 int marginBottom = 5;
 
-boolean highLightSelectedItem = true;
+boolean highLightSelectedItem = false;
 int highLightColor = Color.RED;
 int lastSelectedItem = -1;
 
@@ -2474,11 +2487,23 @@ setChoiceMode(ListView.CHOICE_MODE_SINGLE);
 //Init Event
 onItemClickListener = new OnItemClickListener() {
    @Override
-   public  void onItemClick(AdapterView<?> parent, View v, int position, long id) {	   
+   public  void onItemClick(AdapterView<?> parent, View v, int position, long id) {
+	   
 	   if (highLightSelectedItem) {		 
-		   if (lastSelectedItem > -1) {highlight(lastSelectedItem, textColor);}
-		   highlight(position, highLightColor);
+		   if (lastSelectedItem > -1) {
+			   DoHighlight(lastSelectedItem, textColor);	   
+		   } 		   
+		   DoHighlight(position, highLightColor);
 	   }		 
+	   
+	   if (alist.get(position).widget == 2 /*radio*/) { //fix 16-febr-2015
+		  for (int i=0; i < alist.size(); i++) { 
+		    alist.get(i).checked = false;
+		  }
+		  alist.get(position).checked = true;
+		  aadapter.notifyDataSetChanged();
+	   }	   
+	   	   
 	   lastSelectedItem = position;		
        controls.pOnClick(PasObj, (int)position );
        controls.pOnClickCaptionItem(PasObj, (int)position , alist.get((int)position).label);
@@ -2596,9 +2621,8 @@ public void setLayoutAll(int idAnchor) {
 	} 
 	for (int j=0; j < countParentRule; j++) {  
 		lparams.addRule(lparamsParentRule[j]);		
-  }
-  //
-  setLayoutParams(lparams);
+    }
+    setLayoutParams(lparams);
 }
 
 //by jmpessoa
@@ -2726,7 +2750,7 @@ private int GetDrawableResourceId(String _resName) {
 	     return drawableId;
 	  }
 	  catch (Exception e) {
-	     Log.e("jForm", "Failure to get drawable id.", e);
+	     Log.e("ListView", "Failure to get drawable id.", e);
 	     return 0;
 	  }
 }
@@ -2791,8 +2815,8 @@ public void setWidgetCheck(boolean value, int index){
 	aadapter.notifyDataSetChanged();
 }
 
-private void highlight(int position, int _color) {
-   	alist.get(position).textColor = _color;    	
+private void DoHighlight(int position, int _color) {
+   	alist.get(position).textColor = _color;
     aadapter.notifyDataSetChanged();		
 }
 
@@ -3525,6 +3549,19 @@ class jWebClient extends WebViewClient {
 public  long            PasObj   = 0;      // Pascal Obj
 public  Controls        controls = null;   // Control Class for Event
 
+public String mUsername = ""; 
+public String mPassword = "";
+
+public jWebClient(){
+	//
+}
+
+
+@Override
+public void onReceivedHttpAuthRequest(WebView view, HttpAuthHandler handler, String host, String realm) {
+	handler.proceed(mUsername, mPassword);
+}
+
 @Override
 public  boolean shouldOverrideUrlLoading(WebView view, String url) {
 int rtn = controls.pOnWebViewStatus(PasObj,Const.WebView_OnBefore,url);
@@ -3536,17 +3573,26 @@ else { return true; }
 
 @Override
 public  void onLoadResource(WebView view, String url) {
+	//
 }
 
 @Override
 public  void onPageFinished(WebView view, String url) {
-controls.pOnWebViewStatus(PasObj,Const.WebView_OnFinish,url);
+   controls.pOnWebViewStatus(PasObj,Const.WebView_OnFinish,url);
 }
 
 @Override
 public  void onReceivedError(WebView view, int errorCode, String description, String failingUrl)  {
-super.onReceivedError(view, errorCode, description, failingUrl);
-controls.pOnWebViewStatus(PasObj,Const.WebView_OnError, description);
+super.onReceivedError(view, errorCode, description, failingUrl);      
+   if (errorCode == 401) {
+       // alert to username and password
+       // set it through the setHttpAuthUsernamePassword(...) 
+	   controls.pOnWebViewStatus(PasObj, 401 , "login/password");
+   }
+   else{
+       controls.pOnWebViewStatus(PasObj,Const.WebView_OnError, description);
+   }
+   
 }
 
 }
@@ -3574,7 +3620,6 @@ int MarginTop = 5;
 int marginRight = 5;
 int marginBottom = 5;
 
-
 // Constructor
 public  jWebView(android.content.Context context,
               Controls ctrls,long pasobj ) {
@@ -3583,18 +3628,21 @@ super(context);
 PasObj   = pasobj;
 controls = ctrls;
 // Init Class
-webclient          = new jWebClient();
+webclient = new jWebClient();
+
 webclient.PasObj   = pasobj;
 webclient.controls = ctrls;
 //
 setWebViewClient(webclient); // Prevent to run External Browser
 //
-getSettings().setJavaScriptEnabled(true);
+this.getSettings().setJavaScriptEnabled(true);
 //
 lparams = new RelativeLayout.LayoutParams  (300,300);
 lparams.setMargins( 50, 50,0,0);
+ 
 //
 }
+
 
 public void setLeftTopRightBottomWidthHeight(int left, int top, int right, int bottom, int w, int h) {
 	MarginLeft = left;
@@ -3615,8 +3663,8 @@ viewgroup.addView(this,lparams);
 // Free object except Self, Pascal Code Free the class.
 public  void Free() {
 if (parent != null) { parent.removeView(this); }
-webclient = null;
 setWebViewClient(null);
+webclient = null;
 lparams = null;
 }
 
@@ -3646,9 +3694,6 @@ public void setLayoutAll(int idAnchor) {
 	lparams.setMargins(MarginLeft,MarginTop,marginRight,marginBottom);
 
 	if (idAnchor > 0) {    	
-		//lparams.addRule(RelativeLayout.BELOW, id); 
-		//lparams.addRule(RelativeLayout.ALIGN_BASELINE, id)
-	    //lparams.addRule(RelativeLayout.LEFT_OF, id); //lparams.addRule(RelativeLayout.RIGHT_OF, id)
 		for (int i=0; i < countAnchorRule; i++) {  
 			lparams.addRule(lparamsAnchorRule[i], idAnchor);		
 	    }
@@ -3668,6 +3713,14 @@ public  void setJavaScript(boolean javascript) {
 	// Fatih - ZoomControl
 	public  void setZoomControl(boolean zoomControl) {		
 		this.getSettings().setBuiltInZoomControls(zoomControl);
+	}
+
+	//TODO: http://www.learn2crack.com/2014/01/android-oauth2-webview.html
+	//Stores HTTP authentication credentials for a given host and realm. This method is intended to be used with
+	public void SetHttpAuthUsernamePassword(String _hostName, String  _hostDomain, String _username, String _password) {
+	   this.setHttpAuthUsernamePassword(_hostName, _hostDomain, _username, _password);
+	   webclient.mUsername = _username; 
+	   webclient.mPassword = _password;
 	}
 }
 
@@ -7903,6 +7956,7 @@ class CustomSpinnerArrayAdapter<T> extends ArrayAdapter<String>{
 	private int mSelectedTextColor = Color.LTGRAY; 
 	private int flag = 0;
 	private boolean mLastItemAsPrompt = false;
+	private int mTextFontSize = 0;
 	
   public CustomSpinnerArrayAdapter(Context context, int simpleSpinnerItem, ArrayList<String> alist) {
      super(context, simpleSpinnerItem, alist);
@@ -7916,7 +7970,13 @@ class CustomSpinnerArrayAdapter<T> extends ArrayAdapter<String>{
       View view = super.getView(position, convertView, parent);        
       //we know that simple_spinner_item has android.R.id.text1 TextView:         
       TextView text = (TextView)view.findViewById(android.R.id.text1);
+      
+      text.setPadding(10, 15, 10, 15);      
       text.setTextColor(mTextColor);
+                 
+      if (mTextFontSize != 0)
+          text.setTextSize(mTextFontSize);
+      
       text.setBackgroundColor(mTexBackgroundtColor);
       return view;        
   }
@@ -7928,9 +7988,11 @@ class CustomSpinnerArrayAdapter<T> extends ArrayAdapter<String>{
 	  View view = super.getView(pos, cnvtView, prnt);	    
 	  TextView text = (TextView)view.findViewById(android.R.id.text1);
 	       
-	  text.setPadding(10, 15, 10, 15); //improve here.... 17-jan-2015
-	  
+	  text.setPadding(10, 15, 10, 15); //improve here.... 17-jan-2015	  
       text.setTextColor(mSelectedTextColor);      
+      
+      if (mTextFontSize != 0)
+          text.setTextSize(mTextFontSize);  
       
       if (mLastItemAsPrompt) flag = 1;
       return view; 
@@ -7958,6 +8020,10 @@ class CustomSpinnerArrayAdapter<T> extends ArrayAdapter<String>{
 	 public void SetLastItemAsPrompt(boolean _hasPrompt) {
 	    mLastItemAsPrompt = _hasPrompt;	   
 	 }
+	 
+	    public void SetTextFontSize(int txtFontSize) {
+	    	mTextFontSize = txtFontSize;	
+	    }
 	
 }
 
@@ -8097,6 +8163,7 @@ class jSpinner extends Spinner /*dummy*/ { //please, fix what GUI object will be
   
    public void Add(String _item) {	  	 
 	 mStrList.add(_item);    
+	 Log.i("Spinner_Add: ",_item);
      mSpAdapter.notifyDataSetChanged();
    }
    
@@ -8142,6 +8209,10 @@ class jSpinner extends Spinner /*dummy*/ { //please, fix what GUI object will be
 	   else if (_index > (mStrList.size()-1)) mStrList.set(mStrList.size()-1,_item);
 	   else mStrList.set(_index,_item);	 
 	   mSpAdapter.notifyDataSetChanged();
+   }
+   
+   public void SetTextFontSize(int _txtFontSize) {
+	  mSpAdapter.SetTextFontSize(_txtFontSize);
    }
    
 }  //end class
@@ -11050,6 +11121,115 @@ class jDatePickerDialog /*extends ...*/ {
 }
 
 
+/*Draft java code by "Lazarus Android Module Wizard" [2/16/2015 20:17:59]*/
+/*https://github.com/jmpessoa/lazandroidmodulewizard*/
+/*jControl template*/
+
+//ref. http://www.javacodegeeks.com/2013/06/android-http-client-get-post-download-upload-multipart-request.html
+//ref http://lethargicpanda.tumblr.com/post/14784695735/oauth-login-on-your-android-app-the-github
+class jHttpClient /*extends ...*/ {
+ 
+   private long     pascalObj = 0;      // Pascal Object
+   private Controls controls  = null;   // Control Class -> Java/Pascal Interface ...
+   private Context  context   = null;
+   
+   private String mUSERNAME = "USERNAME";
+   private String mPASSWORD = "PASSWORD";
+   private int mAuthenticationMode = 0; //0: none. 1: basic; 2= OAuth
+   private String mHOSTNAME = AuthScope.ANY_HOST; // null; 
+   private int mPORT = AuthScope.ANY_PORT; //-1;
+ 
+   //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
+   public jHttpClient(Controls _ctrls, long _Self) { //Add more others news "_xxx" params if needed!
+      //super(_ctrls.activity);
+      context   = _ctrls.activity;
+      pascalObj = _Self;
+      controls  = _ctrls;
+   }
+ 
+   public void jFree() {
+     //free local objects...
+   }
+ 
+ //write others [public] methods code here......
+ //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
+   
+   //ref. http://blog.leocad.io/basic-http-authentication-on-android/
+   //ref. http://simpleprogrammer.com/2011/05/25/oauth-and-rest-in-android-part-1/
+   //ref. http://jan.horneck.info/blog/androidhttpclientwithbasicauthentication
+   public String Get(String _stringUrl) {
+	   
+       //ref. http://jan.horneck.info/blog/androidhttpclientwithbasicauthentication
+	   HttpParams httpParams = new BasicHttpParams();
+	   int connection_Timeout = 5000;
+	   HttpConnectionParams.setConnectionTimeout(httpParams, connection_Timeout);
+	   HttpConnectionParams.setSoTimeout(httpParams, connection_Timeout);
+	    
+	    /*ref. http://blog.leocad.io/basic-http-authentication-on-android/
+	    String credentials = mUSERNAME + ":" + mPASSWORD;  
+	    String base64EncodedCredentials = Base64.encodeToString(credentials.getBytes(), Base64.NO_WRAP);  
+	    request.addHeader("Authorization", "Basic " + base64EncodedCredentials);
+	    client = new DefaultHttpClient();
+	   */
+	   
+	   DefaultHttpClient httpclient = new DefaultHttpClient(httpParams);
+       String strResult="";
+       
+       try {
+    	   
+		    //AuthScope:
+		    //host  the host the credentials apply to. May be set to null if credenticals are applicable to any host. 
+		    //port  the port the credentials apply to. May be set to negative value if credenticals are applicable to any port.
+    	   if (mAuthenticationMode != 0) {    		   
+              httpclient.getCredentialsProvider().setCredentials(
+                               new AuthScope(mHOSTNAME,mPORT),  // 
+                               new UsernamePasswordCredentials(mUSERNAME, mPASSWORD));
+    	   }
+    	   
+           HttpGet httpget = new HttpGet(_stringUrl);
+
+           //System.out.println("executing request" + httpget.getRequestLine());
+           HttpResponse response = httpclient.execute(httpget);
+           HttpEntity entity = response.getEntity();
+
+           //System.out.println("----------------------------------------");
+           //System.out.println(response.getStatusLine());
+           if (entity != null) {
+               //System.out.println("Response content length: " + entity.getContentLength());
+        	   strResult = EntityUtils.toString(entity);
+           }
+       } catch(Exception e){
+       	    e.printStackTrace();
+       }finally {
+           // When HttpClient instance is no longer needed,
+           // shut down the connection manager to ensure
+           // immediate deallocation of all system resources
+           httpclient.getConnectionManager().shutdown();
+       }
+       return strResult;
+
+   }
+	 
+     public void SetAuthenticationUser(String _userName, String _password) {       	 
+	   mUSERNAME = _userName;
+	   mPASSWORD =_password;
+     }
+     
+     public void SetAuthenticationHost(String _hostName, int _port) {
+    	 if ( _hostName.equals("") ) {
+    		 mHOSTNAME = null;
+    	 } 
+    	 else {
+    		 mHOSTNAME = _hostName;
+    	 }
+    	 mPORT = _port;	 
+     }
+               
+     public void SetAuthenticationMode(int _authenticationMode) {    	 
+        mAuthenticationMode = _authenticationMode; //0: none. 1: basic; 2= OAuth	 	                
+     }
+}
+
 //**new jclass entrypoint**//please, do not remove/change this line!
 
 //Javas/Pascal Interface Class 
@@ -11791,76 +11971,6 @@ public  java.lang.Object jAsyncTask_Create(long pasobj ) {
   return (java.lang.Object)( new jAsyncTask(this,pasobj));
 }
 
-// -------------------------------------------------------------------------
-//  Http API
-//  Why ?
-//        android:minSdkVersion       = "9"   ---> OK
-//        android:minSdkVersion       = "10"  ---> Not OK
-//
-//  Ref. http://theeye.pe.kr/entry/how-to-get-and-multipart-post-on-android-platform
-//       http://cafe.naver.com/securitycommunity/56
-//       http://stackoverflow.com/questions/8179658/urlconnection-getcontent-return-null
-//       http://blog.naver.com/since201109?Redirect=Log&logNo=150169407558
-//       http://www.java-samples.com/showtutorial.php?tutorialid=1521
-//
-//
-//
-// -------------------------------------------------------------------------
-
-public  String jHttp_get(String url) {
-  String rst = "";
-  try {
-    HttpClient client = new DefaultHttpClient();
-    HttpGet    get    = new HttpGet(url);
-    HttpResponse resp = client.execute(get);
-    /*
-    BufferedReader br = new BufferedReader(new InputStreamReader(resp.getEntity().getContent()));
-    String str = null;
-    StringBuilder sb = new StringBuilder();
-    while ((rst = br.readLine()) != null) {
-      sb.append(str).append("\n"); }
-    br.close();
-    rst = sb.toString();
-    */
-    HttpEntity resEntityGet = resp.getEntity();
-    if (resp != null) {
-      rst = EntityUtils.toString(resEntityGet);  }
-
-    Log.i("RESPONSE", rst);  }
-  catch (Exception e) {
-    Log.i("Java","Error");
-    e.printStackTrace();
-  };
-  return(rst);
-};
-
-//by jmpessoa
-//http://blog.dahanne.net/2009/08/16/how-to-access-http-resources-from-android/
-public String jHttp_get2(String location) throws Throwable {
-	HttpURLConnection con = null;
-	URL url;
-	InputStream is=null;
-		url = new URL(location);
-		con = (HttpURLConnection) url.openConnection();
-		//con.setReadTimeout(10000 /* milliseconds */);
-		//con.setConnectTimeout(15000 /* milliseconds */);
-		con.setRequestMethod("GET");
-		con.setDoInput(true);
-		//con.addRequestProperty("Referer", location);
-		// Start the query
-		con.connect();
-		is = con.getInputStream();
-	
-    BufferedReader rd = new BufferedReader(new InputStreamReader(is), 4096);
-    String line;
-    StringBuilder sb =  new StringBuilder();
-	while ((line = rd.readLine()) != null) {
-		    sb.append(line);
-	}
-	rd.close();
-    return  sb.toString();
-}
-
 //by jmpessoa
 //you need a real android device (not emulator!)
 //http://www.androidaspect.com/2013/09/how-to-send-email-from-android.html
@@ -12165,6 +12275,10 @@ public float[] benchMark1 () {
    
    public java.lang.Object jDatePickerDialog_jCreate(long _Self) {
 	      return (java.lang.Object)(new jDatePickerDialog(this,_Self));
+   }
+   
+   public java.lang.Object jHttpClient_jCreate(long _Self) {
+	      return (java.lang.Object)(new jHttpClient(this,_Self));
    }
 
 }

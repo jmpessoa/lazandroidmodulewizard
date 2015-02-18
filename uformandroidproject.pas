@@ -18,6 +18,7 @@ type
   TFormAndroidProject = class(TForm)
     BitBtn1: TBitBtn;
     BitBtn2: TBitBtn;
+    Image1: TImage;
     ImageList1: TImageList;
     MainMenu1: TMainMenu;
     MenuItem1: TMenuItem;
@@ -1537,12 +1538,7 @@ begin
    if Pos('About', txtCaption) > 0 then
    begin
       //02-december-2013 Add support to simonsayz's controls: http://blog.naver.com/simonsayz
-      //ShowMessage('LazAndroidModuleWizard ver. 0.3 - revision 0.1 - 28 dec. 2013 - by jmpessoa');
-      //Add jniBridge Wizard - aka jBridge
-      //ShowMessage('LazAndroidModuleWizard ver. 0.4 - 05 mar. 2014 - by jmpessoa');
-      //ShowMessage('LazAndroidModuleWizard ver. 0.5 - 14 Abril 2014 - by jmpessoa');
-     //Add Form Designer
-      ShowMessage('LazAndroidModuleWizard ver. 0.6 - 12 October 2014 - by jmpessoa');
+      ShowMessage('Lamw: Lazarus Android Module Wizard [ver. 0.6 - 17 February 2015 - by jmpessoa]');
    end;
 end;
 
@@ -1550,7 +1546,6 @@ procedure TFormAndroidProject.MenuItem20Click(Sender: TObject);
 begin
   Self.ModalResult:= mrCancel;
 end;
-
 
 procedure TFormAndroidProject.FormDeactivate(Sender: TObject);
 begin

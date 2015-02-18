@@ -658,7 +658,7 @@ type
     Jni           : TEnvJni;
     Path          : TEnvPath;
     Screen        : TEnvScreen;
-    Device        : TEnvDevice;
+    //Device        : TEnvDevice;
     Forms         : TjForms;     // Form Stack
     Lock          : Boolean;     //
     Orientation   : integer;   //orientation on app start....
@@ -968,6 +968,10 @@ type
     function GetQuantityStringByName(_resName: string; _quantity: integer): string;
     function GetStringResourceByName(_resName: string): string;
 
+    //needed: <uses-permission android:name="android.permission.READ_PHONE_STATE"/>
+    function GetDevicePhoneNumber: String;
+    function GetDeviceID: String;
+
     // Property
     property View         : jObject        read FjRLayout {GetView } write FjRLayout;
     property ScreenStyle  : TScreenStyle   read FScreenStyle    write FScreenStyle;
@@ -1058,8 +1062,8 @@ type
     procedure SetParentComponent(Value: TComponent); override;
     procedure SetParamHeight(Value: TLayoutParams);
     procedure SetParamWidth(Value: TLayoutParams);
-    procedure SetFontFace(AValue: TFontFace); virtual;
     procedure SetTextTypeFace(Value: TTextTypeFace); virtual;
+    procedure SetFontFace(AValue: TFontFace); virtual;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -1952,14 +1956,14 @@ begin
      FLParamHeight:= GetDesignerLayoutByWH(Self.Height, Self.Parent.Height);
 end;
 
-procedure jVisualControl.SetFontFace(AValue: TFontFace);
-begin
-  FFontFace := AValue;
-end;
-
 procedure jVisualControl.SetTextTypeFace(Value: TTextTypeFace);
 begin
   FTextTypeFace:= Value;
+end;
+
+procedure jVisualControl.SetFontFace(AValue: TFontFace);
+begin
+  FFontFace := AValue;
 end;
 
   { TAndroidForm }
@@ -2564,6 +2568,18 @@ begin
    Result:= jForm_GetStringResourceByName(FjEnv, FjObject, _resName);
 end;
 
+function jForm.GetDevicePhoneNumber: String;
+begin
+   if FInitialized then
+     Result:= jSysInfo_DevicePhoneNumber(FjEnv, gApp.Jni.jThis);
+end;
+
+function jForm.GetDeviceID: String;
+begin
+   if FInitialized then
+      Result:= jSysInfo_DeviceID(FjEnv, gApp.Jni.jThis);
+end;
+
 {-------- jForm_JNI_Bridge ----------}
 
 function jForm_GetStringExtra(env: PJNIEnv; _jform: JObject; data: jObject; extraName: string): string;
@@ -3034,8 +3050,8 @@ begin
   //
   FForm            := nil;
   StopOnException  :=True;
-  Device.PhoneNumber := '';
-  Device.ID          := '';
+  //Device.PhoneNumber := '';
+  //Device.ID          := '';
   FInitialized     := False;
   Forms.Index      := 0; //dummy
   TopIndex:= 0;
@@ -3059,7 +3075,7 @@ begin
   Jni.jEnv      := env;  //a reference to the JNI environment
 
   //[by jmpessoa: for API > 13 "STALED"!!! do not use its!
-  Jni.jThis     := this; //[controls lib]a reference to the object making this call (or class if static).
+  Jni.jThis     := this; //["libcontrols.so"] a reference to the object making this call (or class if static).
   Jni.jActivity := activity;
   Jni.jRLayout  := layout;
 
@@ -3089,8 +3105,8 @@ begin
       end;
   end;
   // Phone
-  Device.PhoneNumber := jSysInfo_DevicePhoneNumber(env, this);
-  Device.ID          := jSysInfo_DeviceID(env, this);
+  //Device.PhoneNumber := jSysInfo_DevicePhoneNumber(env, this);
+  //Device.ID          := jSysInfo_DeviceID(env, this);
   FInitialized       := True;
 end;
 
