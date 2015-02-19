@@ -65,7 +65,7 @@
 	*					*
 	*****************************************
 
-Version 0.6 - rev. 15 - 17 February 2015 -
+Version 0.6 - rev. 16 - 18 February 2015 -
 
 	MINOR IMPROVEMENT:
 
