@@ -1047,6 +1047,7 @@ type
     //FGravity      : TGravitySet;    TODO: by jmpessoa  - java "setGravity"
     FLParamWidth: TLayoutParams;
     FLParamHeight: TLayoutParams;
+    FHintTextColor: TARGBColorBridge;
 
     FOnClick: TOnNotify;
     procedure SetAnchor(Value: jVisualControl);
@@ -1064,6 +1065,7 @@ type
     procedure SetParamWidth(Value: TLayoutParams);
     procedure SetTextTypeFace(Value: TTextTypeFace); virtual;
     procedure SetFontFace(AValue: TFontFace); virtual;
+    procedure SetHintTextColor(Value: TARGBColorBridge); virtual;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -1077,6 +1079,7 @@ type
     property Id: DWord read FId write FId;
     property FontFace: TFontFace read FFontFace write SetFontFace;
     property TextTypeFace: TTextTypeFace read FTextTypeFace write SetTextTypeFace;
+    property HintTextColor: TARGBColorBridge read FHintTextColor write SetHintTextColor;
   published
     property Visible: boolean read FVisible write FVisible;
     property Anchor  : jVisualControl read FAnchor write SetAnchor;
@@ -1838,6 +1841,7 @@ inherited Create(AOwner);
   //FGravity:=[];      TODO!
   FPositionRelativeToAnchor:= [];
   FPositionRelativeToParent:= [];
+  FHintTextColor:= colbrSilver;
 end;
 
 //
@@ -1964,6 +1968,11 @@ end;
 procedure jVisualControl.SetFontFace(AValue: TFontFace);
 begin
   FFontFace := AValue;
+end;
+
+procedure jVisualControl.SetHintTextColor(Value: TARGBColorBridge);
+begin
+  FHintTextColor:= Value;
 end;
 
   { TAndroidForm }

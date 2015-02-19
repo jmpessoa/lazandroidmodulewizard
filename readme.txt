@@ -67,10 +67,18 @@
 
 Version 0.6 - rev. 15 - 17 February 2015 -
 
+	MINOR IMPROVEMENT:
+
+	jEditText:
+		NEW property: 
+			HintTextColor; <<-A suggestion and request by Ps
+
+Version 0.6 - rev. 15 - 17 February 2015 -
+
 	MINOR IMPROVEMENTS:
 
 	jApp:
-		LOST property: // <<--A suggestion and request by rx3.fireproof	
+		LOST properties: // <<--A suggestion and request by rx3.fireproof	
 			Device.PhoneNumber
 			Device.ID;
 	jForm: 
@@ -84,7 +92,7 @@ Version 0.6 - rev. 15 - 17 February 2015 -
 			FontFace;
 
 	jEditText:
-		NEW property: // <<--- Thanks to Fatih!		
+		NEWS properties: // <<--- Thanks to Fatih!		
 			TextTypeFace;
 			FontFace;
 			Editable; <<-A suggestion and request by rx3.fireproof
@@ -93,7 +101,7 @@ Version 0.6 - rev. 15 - 17 February 2015 -
 			FontSize; 
  			Count;
 	jHttpClient:
-		NEWS methods: <<-A suggestion and request by rx3.fireproof 	
+		NEWS methods: <<-A suggestion and request by Ps
 			.SetAuthenticationUser(...); 	 	
 			.SetAuthenticationHost(...); 
 		NEW property:	
@@ -102,7 +110,7 @@ Version 0.6 - rev. 15 - 17 February 2015 -
 	jWebView:
 		NEW property: // <<--- Thanks to Fatih!	
 			ZoomControl;	
-		NEWS method: <<-A suggestion and request by rx3.fireproof	
+		NEW method: <<-A suggestion and request by Ps
 			SetHttpAuthUsernamePassword(...); 
 		
 	jListView: FIXs [radio group mode]

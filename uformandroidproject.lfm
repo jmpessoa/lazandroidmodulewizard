@@ -1962,8 +1962,8 @@ object FormAndroidProject: TFormAndroidProject
     }
   end
   object PopupMenu1: TPopupMenu
-    left = 384
-    top = 88
+    left = 248
+    top = 72
     object MenuItem1: TMenuItem
       Caption = 'Get Simonsayz''s Templates'
       OnClick = PopupMenu1Close

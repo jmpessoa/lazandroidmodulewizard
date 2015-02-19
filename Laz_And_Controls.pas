@@ -647,6 +647,7 @@ type
     FOnChanged : TOnChange;
     FEditable: boolean;
 
+
     Procedure SetVisible  (Value : Boolean);
     Procedure SetColor    (Value : TARGBColorBridge);
 
@@ -677,6 +678,7 @@ type
     procedure SetFontFace(AValue: TFontFace); override; 
     procedure SetTextTypeFace(Value: TTextTypeFace); override; 
     procedure SetEditable(enabled: boolean);
+    procedure SetHintTextColor(Value: TARGBColorBridge); override;
 
     procedure SetViewParent(Value: jObject);  override;
     Procedure GenEvent_OnEnter (Obj: TObject);
@@ -718,6 +720,8 @@ type
     property TextTypeFace: TTextTypeFace read FTextTypeFace write SetTextTypeFace default tfNormal; 
 
     property Hint      : string     read FHint         write SetHint;
+    property HintTextColor: TARGBColorBridge read FHintTextColor write SetHintTextColor;
+
     //property SingleLine: boolean read FSingleLine write SetSingleLine;
     property ScrollBarStyle: TScrollBarStyle read FScrollBarStyle write SetScrollBarStyle;
     property MaxLines: DWord read FMaxLines write SetMaxLines;
@@ -2155,8 +2159,6 @@ begin
 
   jTextView_setFontAndTextTypeFace(FjEnv, FjObject, Ord(FFontFace), Ord(FTextTypeFace)); 
 
-  {if FTextTypeFace <>  tfNormal then   //TODO: TFontFace=(ffNormal,ffSans,ffSerif,ffMonospace);
-    jTextView_SetTextTypeFace(FjEnv, FjObject, Ord(FTextTypeFace));}
 
   View_SetVisible(FjEnv, FjThis, FjObject , FVisible);
 
@@ -2501,6 +2503,8 @@ begin
   if FEditable = False then
      jEditText_SetEditable(FjEnv, FjObject, FEditable);
 
+  jEditText_setHintTextColor(FjEnv, FjObject, GetARGB(FCustomColor, FHintTextColor));
+
   jEditText_DispatchOnChangeEvent(FjEnv, FjObject , True);
   jEditText_DispatchOnChangedEvent(FjEnv, FjObject , True);
 
@@ -2575,6 +2579,13 @@ begin
  if(FInitialized) then 
    jEditText_setFontAndTextTypeFace(FjEnv, FjObject, Ord(FFontFace), Ord(FTextTypeFace)); 
 end; 
+
+procedure jEditText.SetHintTextColor(Value: TARGBColorBridge);
+begin
+ inherited SetHintTextColor(Value);
+ if(FInitialized) then
+   jEditText_setHintTextColor(FjEnv, FjObject, GetARGB(FCustomColor, Value));
+end;
 
 Procedure jEditText.SetHint(Value : String);
 begin

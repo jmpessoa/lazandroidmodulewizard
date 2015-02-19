@@ -1538,7 +1538,7 @@ begin
    if Pos('About', txtCaption) > 0 then
    begin
       //02-december-2013 Add support to simonsayz's controls: http://blog.naver.com/simonsayz
-      ShowMessage('Lamw: Lazarus Android Module Wizard [ver. 0.6 - 17 February 2015 - by jmpessoa]');
+      ShowMessage('Lamw: Lazarus Android Module Wizard [ver. 0.6 - rev. 16 - 18 February 2015 - by jmpessoa]');
    end;
 end;
 

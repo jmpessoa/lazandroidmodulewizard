@@ -172,6 +172,9 @@ Procedure jEditText_setTextColor       (env:PJNIEnv; EditText : jObject; color :
 Procedure jEditText_setTextSize        (env:PJNIEnv; EditText : jObject; size  : DWord);
 
 Procedure jEditText_setHint            (env:PJNIEnv; EditText : jObject; Str : String);
+
+procedure jEditText_setHintTextColor(env: PJNIEnv; _jedittext: JObject; _color: integer);
+
 Procedure jEditText_SetFocus          (env:PJNIEnv; EditText : jObject);
 
 Procedure jEditText_immShow            (env:PJNIEnv; EditText : jObject );
@@ -1567,6 +1570,18 @@ begin
  _jMethod:= env^.GetMethodID(env, cls, 'setHint', '(Ljava/lang/CharSequence;)V');
  env^.CallVoidMethodA(env,EditText,_jMethod,@_jParams);
  env^.DeleteLocalRef(env,_jParams[0].l);
+end;
+
+procedure jEditText_setHintTextColor(env: PJNIEnv; _jedittext: JObject; _color: integer);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].i:= _color;
+  jCls:= env^.GetObjectClass(env, _jedittext);
+  jMethod:= env^.GetMethodID(env, jCls, 'setHintTextColor', '(I)V');
+  env^.CallVoidMethodA(env, _jedittext, jMethod, @jParams);
 end;
 
 // LORDMAN - 2013-07-26
