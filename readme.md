@@ -65,6 +65,15 @@
 	*					*
 	*****************************************
 
+Version 0.6 - rev. 17 - 19 February 2015 -
+
+	MINOR IMPROVEMENT:
+
+	jEditText:
+		Change property behavior : 
+			MaxTextLength = -1 {default/reset: no limited!}
+				in fact:  "MaxTextLength < 0" --->  "default/reset"
+
 Version 0.6 - rev. 16 - 18 February 2015 -
 
 	MINOR IMPROVEMENT:

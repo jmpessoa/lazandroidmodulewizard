@@ -633,7 +633,7 @@ type
   private
     FInputTypeEx: TInputTypeEx;
     FHint     : string;
-    FMaxTextLength : DWord;
+    FMaxTextLength : integer;
     FSingleLine: boolean;
     FMaxLines:  DWord;  //visibles lines!
 
@@ -656,7 +656,7 @@ type
     Procedure SetHint     (Value : String );
 
     Procedure SetInputTypeEx(Value : TInputTypeEx);
-    Procedure SetTextMaxLength(Value     : DWord     );
+    Procedure SetTextMaxLength(Value     : integer     );
     Function  GetCursorPos           : TXY;
     Procedure SetCursorPos(Value     : TXY       );
     Procedure SetTextAlignment(Value: TTextAlignment);
@@ -711,7 +711,7 @@ type
     property Text: string read GetText write SetText;
     property Alignment: TTextAlignment read FTextAlignment write SetTextAlignment;
     property InputTypeEx : TInputTypeEx read FInputTypeEx write SetInputTypeEx;
-    property MaxTextLength : DWord read FMaxTextLength write SetTextMaxLength;
+    property MaxTextLength : integer read FMaxTextLength write SetTextMaxLength;
     property BackgroundColor: TARGBColorBridge read FColor write SetColor;
     property FontColor : TARGBColorBridge      read FFontColor    write SetFontColor;
     property FontSize  : DWord      read FFontSize     write SetFontSize;
@@ -2336,7 +2336,7 @@ begin
   FOnChange  := nil;
   FInputTypeEx := itxText;
   FHint      := '';
-  FMaxTextLength := 300;
+  FMaxTextLength := -1; //300;
   FSingleLine:= True;
   FMaxLines:= 1;
 
@@ -2459,7 +2459,8 @@ begin
   jEditText_setTextAlignment(FjEnv, FjObject , Ord(FTextAlignment));
 
   //
-  jEditText_maxLength(FjEnv, FjObject , FMaxTextLength);
+  if FMaxTextLength >= 0 then
+    jEditText_maxLength(FjEnv, FjObject , FMaxTextLength);
 
   jEditText_setScroller(FjEnv, FjObject );
 
@@ -2630,11 +2631,11 @@ begin
 end;
 
 // LORDMAN - 2013-07-26
-Procedure jEditText.SetTextMaxLength(Value: DWord);
+Procedure jEditText.SetTextMaxLength(Value: integer);
 begin
   FMaxTextLength:= Value;
   if FInitialized then
-     jEditText_maxLength(FjEnv, FjObject , Value);
+        jEditText_maxLength(FjEnv, FjObject , Value);
 end;
 
 //by jmpessoa

@@ -1,6 +1,6 @@
 package com.example.dummyapp;
 
-//Lamw: Lazarus Android Module Wizard - Version 0.6 - rev. 15 - 17 February - 2015
+//Lamw: Lazarus Android Module Wizard - Version 0.6 - rev. 17 - 19 February - 2015
 //Form Designer and Components development model!
 //Author: jmpessoa@hotmail.com
 //https://github.com/jmpessoa/lazandroidmodulewizard
@@ -116,6 +116,8 @@ import android.provider.Settings;
 import android.text.Editable;
 import android.text.InputFilter;
 import android.text.InputType;
+import android.text.TextUtils;
+import android.text.TextUtils.TruncateAt;
 import android.text.TextWatcher;
 import android.text.method.NumberKeyListener;
 import android.text.method.ScrollingMovementMethod;
@@ -1105,6 +1107,8 @@ controls = ctrls;
 // Init Class
 lparams = new RelativeLayout.LayoutParams(100,100);
 lparams.setMargins(5, 5,5,5);
+this.setHintTextColor(Color.LTGRAY);
+
  
 // Init Event : http://socome.tistory.com/15
 onKeyListener = new OnKeyListener() {	
@@ -1277,10 +1281,15 @@ public  void setCursorPos(int startPos, int endPos) {
 }
 
 //LORDMAN - 2013-07-26
-public  void maxLength(int mLength) { //Edit not to make the length of the text greater than the specified length
-  InputFilter[] FilterArray = new InputFilter[1];
-  FilterArray[0] = new InputFilter.LengthFilter(mLength);
-  this.setFilters(FilterArray);
+public  void maxLength(int mLength) { //not make the length of the text greater than the specified length		
+  if (mLength >= 0) { 
+    InputFilter[] FilterArray = new InputFilter[1];
+    FilterArray[0] = new InputFilter.LengthFilter(mLength);
+    this.setFilters(FilterArray);
+  }
+  else { 
+	  this.setFilters(new InputFilter[] {});  //reset to default!!!
+  }	  
 }
 
 //LORDMAN 2013-08-27

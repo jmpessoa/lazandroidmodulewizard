@@ -184,7 +184,7 @@ Procedure jEditText_editInputType2      (env:PJNIEnv; EditText : jObject; Str : 
 
 Procedure jEditText_setInputType(env:PJNIEnv;  EditText: jObject; itType: DWord);
 
-Procedure jEditText_maxLength          (env:PJNIEnv; EditText : jObject; size  : DWord);
+Procedure jEditText_maxLength          (env:PJNIEnv; EditText : jObject; size  : integer);
 
 Procedure jEditText_AllCaps(env:PJNIEnv; EditText : jObject);
 
@@ -1647,7 +1647,7 @@ end;
 
 //force edits not to make the length of the text greater than the specified length
 // LORDMAN - 2013-07-26
-Procedure jEditText_maxLength(env:PJNIEnv; EditText : jObject; size  : DWord);
+Procedure jEditText_maxLength(env:PJNIEnv; EditText : jObject; size  : integer);
 var
  _jMethod : jMethodID = nil;
  _jParams : array[0..0] of jValue;
