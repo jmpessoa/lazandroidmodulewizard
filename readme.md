@@ -106,6 +106,9 @@ Version 0.6 - rev. 18 - 22 February 2015 -
 
 		9. Paste the "jhelloadder.java" into Tab "java" ...
 
+                        WARNING: after paste, remove de word "public" from class definition!
+                        [TODO: need fix the parse ...]
+
 		10. Read the content of Tab "help" ... [follow the instructions!]
 			Do not forget:
 
