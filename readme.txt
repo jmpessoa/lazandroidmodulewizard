@@ -73,11 +73,11 @@ Version 0.6 - rev. 18 - 22 February 2015 -
 
 		1. Create a new "Lamw" project as usual [save all to ../jni] 
 
-		2. Add to ../src the new java class code [ex. jhelloadder.pava]
+		2. Add to ../src the new java class code [ex. jhelloadder.java]
 
 		3. Go to [again] IDE->Project->New Project select [again] "JNI Android Module" Project
 
-		4. But, NOW double click the added java class code [jhelloadder.pava] 
+		4. But, NOW double click the added java class code [jhelloadder.java] 
 
 		5. Ok
 
@@ -104,7 +104,7 @@ Version 0.6 - rev. 18 - 22 February 2015 -
 
 		8. Go to [again] IDE->Tools->Android Module Wizard->New jComponent [Create]
 
-		9. Paste the "jhelloadder.pava" into Tab "java" ...
+		9. Paste the "jhelloadder.java" into Tab "java" ...
 
 		10. Read the content of Tab "help" ... [follow the instructions!]
 			Do not forget:
