@@ -12289,9 +12289,5 @@ public float[] benchMark1 () {
    public java.lang.Object jHttpClient_jCreate(long _Self) {
 	      return (java.lang.Object)(new jHttpClient(this,_Self));
    }
-
-   //Stephano Question 1 - Case B
-   public java.lang.Object jHelloAdder_jCreate(long _Self) {
-	      return (java.lang.Object)(new jHelloAdder(this,_Self));
-   }       
+  
 }
