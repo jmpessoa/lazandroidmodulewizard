@@ -1318,13 +1318,15 @@ begin
       strOnLoadList.Add('  begin');
       strOnLoadList.Add('     curEnv:= PJNIEnv(PEnv);');
       strOnLoadList.Add('     RegisterNativeMethods(curEnv, '''+PathToClassName+''');');
-      if FModuleType = 1 then
+
+      if FModuleType = 1 then //NoGUI
       begin
-        strOnLoadList.Add('     gPDalvikVM:= VM;{PJavaVM}{unit1}');
-        strOnLoadList.Add('     gjClassPath:= '''+PathToClassName+''';{unit1}');
-        strOnLoadList.Add('     gjClass:= (curEnv^).FindClass(curEnv, '''+PathToClassName+''');{unit1}');
-        strOnLoadList.Add('     gjClass:= (curEnv^).NewGlobalRef(curEnv, gjClass);{unit1}');
+        strOnLoadList.Add('     gNoGUIPDalvikVM:= VM;{PJavaVM}');
+        strOnLoadList.Add('     gNoGUIjClassPath:= '''+PathToClassName+''';');
+        strOnLoadList.Add('     gNoGUIjClass:= (curEnv^).FindClass(curEnv, '''+PathToClassName+''');');
+        strOnLoadList.Add('     gNoGUIjClass:= (curEnv^).NewGlobalRef(curEnv, gNoGUIjClass);');
       end;
+
       strOnLoadList.Add('  end;');
       if FModuleType = 0 then
       begin
@@ -1344,21 +1346,33 @@ begin
       strOnLoadList.Add('  begin');
       strOnLoadList.Add('    curEnv:= PJNIEnv(PEnv);');
 
-      if FModuleType = 1 then
+      if FModuleType = 1 then  //Not Android Bridges  Controls...
       begin
-      strOnLoadList.Add('    (curEnv^).UnregisterNatives(curEnv, gjClass{unit1});');
-      strOnLoadList.Add('    (curEnv^).DeleteGlobalRef(curEnv, gjClass{unit1});');
-      strOnLoadList.Add('    gjClass:= nil;');
-      strOnLoadList.Add('    gPDalvikVM:= nil;');
+      //strOnLoadList.Add('    (curEnv^).UnregisterNatives(curEnv, gNoGUIjClass);');
+      strOnLoadList.Add('    (curEnv^).DeleteGlobalRef(curEnv, gNoGUIjClass);');
+      strOnLoadList.Add('    gNoGUIjClass:= nil;');
+      strOnLoadList.Add('    gNoGUIPDalvikVM:= nil;');
       end;
+
       if FModuleType = 0 then
       begin
-        strOnLoadList.Add('    (curEnv^).DeleteGlobalRef(curEnv, gjClass{And_jni_Bridge});');
-        strOnLoadList.Add('    gVM:= nil;{And_jni_Bridge}');
+        strOnLoadList.Add('    (curEnv^).DeleteGlobalRef(curEnv, gjClass);');
+        strOnLoadList.Add('    gjClass:= nil;');
+        strOnLoadList.Add('    gVM:= nil;');
       end;
+
       strOnLoadList.Add('  end;');
+
+      if FModuleType = 0 then
+      begin
       strOnLoadList.Add('  gApp.Terminate;');
       strOnLoadList.Add('  FreeAndNil(gApp);');
+      end
+      else  //NoGUI -->> Not Android Bridges  Controls...
+      begin
+        strOnLoadList.Add('  gNoGUIApp.Terminate;');
+        strOnLoadList.Add('  FreeAndNil(gNoGUIApp);');
+      end;
       strOnLoadList.Add('end;');
     end;
 

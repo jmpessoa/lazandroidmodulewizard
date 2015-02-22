@@ -1700,14 +1700,16 @@ begin
     sourceList.Add(' ');
     sourceList.Add('type');
     sourceList.Add(' ');
-    sourceList.Add('  jApp = class(TCustomApplication)');
+    sourceList.Add('  TNoGUIApp = class(TCustomApplication)');
     sourceList.Add('  public');
+    sourceList.Add('     jClassName: string;');
+    sourceList.Add('     jAppName: string;');
     sourceList.Add('     procedure CreateForm(InstanceClass: TComponentClass; out Reference);');
     sourceList.Add('     constructor Create(TheOwner: TComponent); override;');
     sourceList.Add('     destructor Destroy; override;');
     sourceList.Add('  end;');
     sourceList.Add(' ');
-    sourceList.Add('procedure jApp.CreateForm(InstanceClass: TComponentClass; out Reference);');
+    sourceList.Add('procedure TNoGUIApp.CreateForm(InstanceClass: TComponentClass; out Reference);');
     sourceList.Add('var');
     sourceList.Add('  Instance: TComponent;');
     sourceList.Add('begin');
@@ -1716,19 +1718,22 @@ begin
     sourceList.Add('  Instance.Create(Self);');
     sourceList.Add('end;');
     sourceList.Add(' ');
-    sourceList.Add('constructor jApp.Create(TheOwner: TComponent);');
+    sourceList.Add('constructor TNoGUIApp.Create(TheOwner: TComponent);');
     sourceList.Add('begin');
     sourceList.Add('  inherited Create(TheOwner);');
     sourceList.Add('  StopOnException:=True;');
     sourceList.Add('end;');
     sourceList.Add(' ');
-    sourceList.Add('destructor jApp.Destroy;');
+    sourceList.Add('destructor TNoGUIApp.Destroy;');
     sourceList.Add('begin');
     sourceList.Add('  inherited Destroy;');
     sourceList.Add('end;');
     sourceList.Add(' ');
     sourceList.Add('var');
-    sourceList.Add('  gApp: jApp;');
+    sourceList.Add('  gNoGUIApp: TNoGUIApp;');
+    sourceList.Add('  gNoGUIjAppName: string;');
+    sourceList.Add('  gNoGUIAppjClassName: string;');
+
     sourceList.Add(' ');
   end;
 
@@ -1738,10 +1743,10 @@ begin
   sourceList.Add('begin');
   if FModuleType = 0 then  //Android Bridges ontrols...
   begin
-    sourceList.Add('  gApp:= jApp.Create(nil);{AndroidWidget.pas}');
+    sourceList.Add('  gApp:= jApp.Create(nil);');
     sourceList.Add('  gApp.Title:= ''JNI Android Bridges Library'';');
-    sourceList.Add('  gjAppName:= '''+GetAppName(FPathToClassName)+''';{AndroidWidget.pas}');
-    sourceList.Add('  gjClassName:= '''+FPathToClassName+''';{AndroidWidget.pas}');
+    sourceList.Add('  gjAppName:= '''+GetAppName(FPathToClassName)+''';');
+    sourceList.Add('  gjClassName:= '''+FPathToClassName+''';');
     sourceList.Add('  gApp.AppName:=gjAppName;');
     sourceList.Add('  gApp.ClassName:=gjClassName;');
     sourceList.Add('  gApp.Initialize;');
@@ -1749,10 +1754,16 @@ begin
   end
   else
   begin
-     sourceList.Add('  gApp:= jApp.Create(nil);');
-     sourceList.Add('  gApp.Title:= ''My Android Pure Library'';');
-     sourceList.Add('  gApp.Initialize;');
-     sourceList.Add('  gApp.CreateForm(TNoGUIAndroidModule1, NoGUIAndroidModule1);');
+     sourceList.Add('  gNoGUIApp:= TNoGUIApp.Create(nil);');
+     sourceList.Add('  gNoGUIApp.Title:= ''My Android Pure Library'';');
+     sourceList.Add('  gNoGUIjAppName:= '''+GetAppName(FPathToClassName)+''';');
+     sourceList.Add('  gNoGUIAppjClassName:= '''+FPathToClassName+''';');
+
+     sourceList.Add('  gNoGUIApp.jAppName:=gNoGUIjAppName;');
+     sourceList.Add('  gNoGUIApp.jClassName:=gNoGUIAppjClassName;');
+
+     sourceList.Add('  gNoGUIApp.Initialize;');
+     sourceList.Add('  gNoGUIApp.CreateForm(TNoGUIAndroidModule1, NoGUIAndroidModule1);');
   end;
 
   sourceList.Add('end.');
@@ -2081,9 +2092,9 @@ begin
    begin
     sourceList.Add(' ');
     sourceList.Add('const');
-    sourceList.Add('  gjClassPath: string='''';');
-    sourceList.Add('  gjClass: JClass=nil;');
-    sourceList.Add('  gPDalvikVM: PJavaVM=nil;');
+    sourceList.Add('  gNoGUIjClassPath: string='''';');
+    sourceList.Add('  gNoGUIjClass: JClass=nil;');
+    sourceList.Add('  gNoGUIPDalvikVM: PJavaVM=nil;');
    end;
    sourceList.Add(GetInterfaceSource(Filename, SourceName, ResourceName));
    sourceList.Add('implementation');
@@ -2098,7 +2109,7 @@ end;
 function TAndroidFileDescPascalUnitWithResource.GetInterfaceUsesSection: string;
 begin
   if ModuleType = 1 then //generic module: No GUI Controls
-    Result := 'Classes, SysUtils, jni, AndroidWidget;'
+    Result := 'Classes, SysUtils, jni;'
   else  //GUI controls module
     Result := 'Classes, SysUtils, And_jni, And_jni_Bridge, Laz_And_Controls, Laz_And_Controls_Events, AndroidWidget;';
 

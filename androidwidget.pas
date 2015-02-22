@@ -647,11 +647,11 @@ type
   private
     FInitialized : boolean;
     FAppName     : string;
-    FClassName   : string;
+    FjClassName   : string;
     FForm        : jForm;       // Main/Initial Form
     //
     Procedure SetAppName  (Value : String);
-    Procedure SetClassName(Value : String);
+    Procedure SetjClassName(Value : String);
   protected
     //
   public
@@ -698,7 +698,7 @@ type
     property Initialized : boolean read FInitialized;
     property Form: jForm read FForm write FForm; // Main Form
     property AppName    : string     read FAppName    write SetAppName;
-    property ClassName  : string     read FClassName  write SetClassName;
+    property ClassName  : string     read FjClassName  write SetjClassName;
   end;
 
  {jControl by jmpessoa}
@@ -3037,7 +3037,7 @@ begin
   inherited Create(AOwner);
   //
   FAppName         := ''; //gjAppName;
-  FClassName       := ''; //gjClassName;
+  FjClassName       := ''; //gjClassName;
   FillChar(Forms,SizeOf(Forms),#0);
   //
   Jni.jEnv         := nil;
@@ -3159,9 +3159,9 @@ begin
   FAppName:= Value;
 end;
 
-Procedure jApp.SetClassName(Value : String);
+Procedure jApp.SetjClassName(Value : String);
 begin
-  FClassName:= Value;
+  FjClassName:= Value;
 end;
 
 Procedure jApp.Finish;

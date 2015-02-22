@@ -33,6 +33,7 @@ uses
   mediaplayer,
   dumpjavamethods,
   myhello,
+  helloadder,
   SysUtils,
   LResources;
   
@@ -69,6 +70,7 @@ begin
   {$I jmediaplayer_icon.lrs}
   {$I jdumpjavamethods_icon.lrs}
   {$I jmyhello_icon.lrs}
+  {$I jhelloadder_icon.lrs}
   RegisterComponents('Android Bridges Extra',
     [
       jDatePickerDialog,
@@ -95,7 +97,8 @@ begin
       jSharefile,
       jMediaPlayer,
       jDumpJavaMethods,
-      jMyHello
+      jMyHello,
+      jHelloAdder
     ]
   );
 end;

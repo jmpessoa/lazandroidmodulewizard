@@ -5798,7 +5798,7 @@ var
  _jMethod : jMethodID = nil;
  cls: jClass;
 begin
-  cls := env^.GetObjectClass(env, AsyncTask);
+  cls := env^.GetObjectClass(env, AsyncTask); //GetObjectClass
   _jMethod:= env^.GetMethodID(env, cls, 'Execute', '()V');
  env^.CallVoidMethod(env,AsyncTask,_jMethod);
 end;

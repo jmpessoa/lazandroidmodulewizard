@@ -1,6 +1,6 @@
 package com.example.dummyapp;
 
-//Lamw: Lazarus Android Module Wizard - Version 0.6 - rev. 17 - 19 February - 2015
+//Lamw: Lazarus Android Module Wizard - Version 0.6 - rev. 18 - 22 February - 2015
 //Form Designer and Components development model!
 //Author: jmpessoa@hotmail.com
 //https://github.com/jmpessoa/lazandroidmodulewizard
@@ -2105,7 +2105,7 @@ public void setLayoutAll(int idAnchor) {
  * TScaleType = (scaleCenter, scaleCenterCrop, scaleCenterInside, scaleFitCenter,
                 scaleFitEnd, scaleFitStart, scaleFitXY, scaleMatrix);
   ref. http://www.peachpit.com/articles/article.aspx?p=1846580&seqNum=2
-       hint: If you’re creating a photo-viewing application, 
+       hint: If you are creating a photo-viewing application, 
              you will probably want to use the center or fitCenter scale types.                  
  */
 public void SetScaleType(int _scaleType) { //TODO! 	
@@ -10506,12 +10506,12 @@ class jIntentManager  {
    }
    
 /*http://courses.coreservlets.com/Course-Materials/pdf/android/Android-Intents-2.pdf
- >> Java (original Activity)
-   String address ="loan://coreservlets.com/calc?loanAmount=xxx&…";
+   Java (original Activity)
+   String address ="loan://coreservlets.com/calc?loanAmount=xxx";
    Uri uri = Uri.parse(address);
    Intent intent = new Intent(Intent.ACTION_VIEW, uri);
    startActivity(activityIntent);
->>Java (new Activity – can be different project)
+  Java (new Activity - can be different project)
   Uri uri = getIntent().getData();
   String loanAmountString = uri.getQueryParameter("loanAmount");
   //Convert String to double, handle bad data   
@@ -10519,10 +10519,10 @@ class jIntentManager  {
      
 /*
  * Intents Starting a new Activity Dial a number 
- *    Intent intent = new Intent (Intent.ACTION_DIAL, Uri.parse(“tel:93675359”)); 
+ *    Intent intent = new Intent (Intent.ACTION_DIAL, Uri.parse("tel:93675359")); 
  *    startActivity(intent);       
  * Launch a website 
- * Intent intent = new Intent (Intent.ACTION_VIEW, Uri.parse(“http://codeandroid.org”)); 
+ * Intent intent = new Intent (Intent.ACTION_VIEW, Uri.parse("http://codeandroid.org")); 
  *   startActivity(intent);   
  */
       
@@ -10612,7 +10612,7 @@ Sending Data: Extras vs. URI Parameters
    
    /*
     * Intents Broadcast Intents 
-    * Intent intent = new Intent(“org.codeandroid.intentstest.TestBroadcastReceiver”); 
+    * Intent intent = new Intent("org.codeandroid.intentstest.TestBroadcastReceiver"); 
     * sendBroadcast(intent);
     */
    
@@ -12290,4 +12290,8 @@ public float[] benchMark1 () {
 	      return (java.lang.Object)(new jHttpClient(this,_Self));
    }
 
+   //Stephano Question 1 - Case B
+   public java.lang.Object jHelloAdder_jCreate(long _Self) {
+	      return (java.lang.Object)(new jHelloAdder(this,_Self));
+   }       
 }

@@ -2005,9 +2005,8 @@ begin
   if not Assigned(Obj) then Exit;
   if Obj is jAsyncTask then
   begin
-    jForm(jAsyncTask(Obj).Owner).UpdateJNI(gApp);
+    jAsyncTask(Obj).UpdateJNI(gApp); //jForm(jAsyncTask(Obj).Owner).UpdateJNI(gApp);
     jAsyncTask(Obj).GenEvent_OnAsyncEvent(Obj,EventType,Progress);
-    Exit;
   end;
 
 end;
@@ -2634,8 +2633,9 @@ end;
 Procedure jEditText.SetTextMaxLength(Value: integer);
 begin
   FMaxTextLength:= Value;
+  if FMaxTextLength < -1 then  FMaxTextLength:= -1; // reset/default: no limited !!
   if FInitialized then
-        jEditText_maxLength(FjEnv, FjObject , Value);
+        jEditText_maxLength(FjEnv, FjObject , FMaxTextLength);
 end;
 
 //by jmpessoa
@@ -4319,7 +4319,6 @@ function jHttpClient.Get: string;
 begin
  if FInitialized then
    Result:= jHttpClient_Get(FjEnv, FjObject, FUrl);
-   //jHttp_get(gApp.Jni.jEnv, gApp.Jni.jThis, FUrl);
 end;
 
 (*
@@ -7176,30 +7175,27 @@ begin
   begin
     Self.UpdateJNI(gApp);
     FjObject := jAsyncTask_Create(FjEnv, FjThis, Self);
-    jAsyncTask_SetAutoPublishProgress(FjEnv, FjObject , FAutoPublishProgress);
-    jAsyncTask_Execute(FjEnv, FjObject );
+    //jAsyncTask_SetAutoPublishProgress(FjEnv, FjObject , FAutoPublishProgress);
     FRunning:= True;
+    Self.UpdateJNI(gApp);
+    jAsyncTask_Execute(FjEnv, FjObject );
   end;
 end;
 
 Procedure jAsyncTask.UpdateUI(Progress : Integer);
 begin
   if FInitialized then
-  begin
     jAsyncTask_setProgress(FjEnv, FjObject ,Progress);
-  end;
 end;
 
 procedure jAsyncTask.SetAutoPublishProgress(Value: boolean);
 begin
   FAutoPublishProgress:= Value;
   if FInitialized then
-  begin
-    jAsyncTask_SetAutoPublishProgress(FjEnv, FjObject , Value);
-  end;
+     jAsyncTask_SetAutoPublishProgress(FjEnv, FjObject , Value);
 end;
 
-Procedure jAsyncTask.GenEvent_OnAsyncEvent(Obj: TObject;EventType, Progress:Integer);
+Procedure jAsyncTask.GenEvent_OnAsyncEvent(Obj: TObject; EventType, Progress:Integer);
 begin
   if Assigned(FOnAsyncEvent) then FOnAsyncEvent(Obj,EventType,Progress);
 end;
