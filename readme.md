@@ -104,7 +104,7 @@ Version 0.6 - rev. 18 - 22 February 2015 -
 
 		8. Go to [again] IDE->Tools->Android Module Wizard->New jComponent [Create]
 
-		9. Paste the "jhelloadder.java" into Tab "java" ...
+		9. Paste the "jhelloadder.java" into Tab "java" ...			
 
                         WARNING: after paste, remove de word "public" from class definition!
                         [TODO: need fix the parse ...]

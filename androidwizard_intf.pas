@@ -1046,7 +1046,7 @@ var
   linuxPathToAntBin: string;
 
   dummy: string;
-
+  fileList: TStringList;
 begin
   Result:= False;
   frm:= TFormWorkspace.Create(nil);
@@ -1187,86 +1187,96 @@ begin
 
       if FModuleType = 0 then     //Android Bridges Controls...
       begin
-        strList.Clear;    //dummy App.java - will be replaced with simonsayz's "App.java" template!
-        strList.Add('package '+FAntPackageName+'.'+LowerCase(projName)+';');
-        strList.Add('public class App extends Activity {');
-        strList.Add('     //dummy app');
-        strList.Add('}');
-        strList.SaveToFile(FPathToJavaSrc+DirectorySeparator+'App.java');
+        if not FileExists(FPathToJavaSrc+DirectorySeparator+'App.java') then
+        begin
+           strList.Clear;    //dummy App.java - will be replaced with simonsayz's "App.java" template!
+           strList.Add('package '+FAntPackageName+'.'+LowerCase(projName)+';');
+           strList.Add('public class App extends Activity {');
+           strList.Add('     //dummy app');
+           strList.Add('}');
+           strList.SaveToFile(FPathToJavaSrc+DirectorySeparator+'App.java');
+        end;
       end;
 
       if FModuleType = 1 then     //Not Android Bridges  Controls...
       begin
-         strList.Clear;    //dummy App.java - will be replaced with simonsayz's "App.java" template!
-         strList.Add('package '+FAntPackageName+'.'+LowerCase(projName)+';');
-         strList.Add(' ');
-         strList.Add('import android.os.Bundle;');
-         strList.Add('import android.app.Activity;');
-         strList.Add('import android.widget.Toast;');
-         strList.Add(' ');
-         strList.Add('public class App extends Activity {');
-         strList.Add('  ');
-         strList.Add('   JNIHello myHello;  //just for demo...');
-         strList.Add('  ');
-         strList.Add('   @Override');
-         strList.Add('   protected void onCreate(Bundle savedInstanceState) {');
-         strList.Add('       super.onCreate(savedInstanceState);');
-         strList.Add('       setContentView(R.layout.activity_app);');
-         strList.Add(' ');
-         strList.Add('       myHello = new JNIHello(); //just for demo...');
-         strList.Add(' ');
-         strList.Add('       int sum = myHello.getSum(2,3); //just for demo...');
-         strList.Add(' ');
-         strList.Add('       String mens = myHello.getString(1); //just for demo...');
-         strList.Add(' ');
-         strList.Add('       Toast.makeText(getApplicationContext(), mens, Toast.LENGTH_SHORT).show();');
-         strList.Add('       Toast.makeText(getApplicationContext(), "Total = " + sum, Toast.LENGTH_SHORT).show();');
-         strList.Add('   }');
-         strList.Add('}');
-         strList.SaveToFile(FPathToJavaSrc+DirectorySeparator+'App.java');
+         if not FileExists(FPathToJavaSrc+DirectorySeparator+'App.java') then
+         begin
+           strList.Clear;    //dummy App.java - will be replaced with simonsayz's "App.java" template!
+           strList.Add('package '+FAntPackageName+'.'+LowerCase(projName)+';');
+           strList.Add(' ');
+           strList.Add('import android.os.Bundle;');
+           strList.Add('import android.app.Activity;');
+           strList.Add('import android.widget.Toast;');
+           strList.Add(' ');
+           strList.Add('public class App extends Activity {');
+           strList.Add('  ');
+           strList.Add('   JNIHello myHello;  //just for demo...');
+           strList.Add('  ');
+           strList.Add('   @Override');
+           strList.Add('   protected void onCreate(Bundle savedInstanceState) {');
+           strList.Add('       super.onCreate(savedInstanceState);');
+           strList.Add('       setContentView(R.layout.activity_app);');
+           strList.Add(' ');
+           strList.Add('       myHello = new JNIHello(); //just for demo...');
+           strList.Add(' ');
+           strList.Add('       int sum = myHello.getSum(2,3); //just for demo...');
+           strList.Add(' ');
+           strList.Add('       String mens = myHello.getString(1); //just for demo...');
+           strList.Add(' ');
+           strList.Add('       Toast.makeText(getApplicationContext(), mens, Toast.LENGTH_SHORT).show();');
+           strList.Add('       Toast.makeText(getApplicationContext(), "Total = " + sum, Toast.LENGTH_SHORT).show();');
+           strList.Add('   }');
+           strList.Add('}');
+           strList.SaveToFile(FPathToJavaSrc+DirectorySeparator+'App.java');
+
+           strList.Clear;
+           strList.Add('package '+FAntPackageName+'.'+LowerCase(projName)+';');
+           strList.Add(' ');
+           strList.Add('public class JNIHello { //just for demo...');
+           strList.Add(' ');
+	   strList.Add('  public native String getString(int flag);');
+	   strList.Add('  public native int getSum(int x, int y);');
+           strList.Add(' ');
+           strList.Add('  static {');
+	   strList.Add('	  try {');
+     	   strList.Add('	      System.loadLibrary("jnihello");');
+	   strList.Add('	  } catch(UnsatisfiedLinkError ule) {');
+ 	   strList.Add('	      ule.printStackTrace();');
+ 	   strList.Add('	  }');
+           strList.Add('  }');
+           strList.Add(' ');
+           strList.Add('}');
+           strList.SaveToFile(FPathToJavaSrc+DirectorySeparator+'JNIHello.java');
+         end;
 
          strList.Clear;
-         strList.Add('package '+FAntPackageName+'.'+LowerCase(projName)+';');
-         strList.Add(' ');
-         strList.Add('public class JNIHello { //just for demo...');
-         strList.Add(' ');
-	 strList.Add('  public native String getString(int flag);');
-	 strList.Add('  public native int getSum(int x, int y);');
-         strList.Add(' ');
-         strList.Add('  static {');
-	 strList.Add('	  try {');
-     	 strList.Add('	      System.loadLibrary("jnihello");');
-	 strList.Add('	  } catch(UnsatisfiedLinkError ule) {');
- 	 strList.Add('	      ule.printStackTrace();');
- 	 strList.Add('	  }');
-         strList.Add('  }');
-         strList.Add(' ');
-         strList.Add('}');
-         strList.SaveToFile(FPathToJavaSrc+DirectorySeparator+'JNIHello.java');
 
-         strList.Clear;
-         strList.Add('<?xml version="1.0" encoding="utf-8"?>');
-         strList.Add('<manifest xmlns:android="http://schemas.android.com/apk/res/android"');
-         strList.Add('    package="'+FAntPackageName+'.'+LowerCase(projName)+'"');
-         strList.Add('    android:versionCode="1"');
-         strList.Add('    android:versionName="1.0" >');
-         strList.Add('    <uses-sdk android:minSdkVersion="10"/>');
-         strList.Add('    <application');
-         strList.Add('        android:allowBackup="true"');
-         strList.Add('        android:icon="@drawable/ic_launcher"');
-         strList.Add('        android:label="@string/app_name"');
-         strList.Add('        android:theme="@style/AppTheme" >');
-         strList.Add('        <activity');
-         strList.Add('            android:name="'+FAntPackageName+'.'+LowerCase(projName)+'.App"');
-         strList.Add('            android:label="@string/app_name" >');
-         strList.Add('            <intent-filter>');
-         strList.Add('                <action android:name="android.intent.action.MAIN" />');
-         strList.Add('                <category android:name="android.intent.category.LAUNCHER" />');
-         strList.Add('            </intent-filter>');
-         strList.Add('        </activity>');
-         strList.Add('    </application>');
-         strList.Add('</manifest>');
-         strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'AndroidManifest.xml');
+         if not FileExists(FAndroidProjectName+DirectorySeparator+'AndroidManifest.xml') then
+         begin
+           strList.Add('<?xml version="1.0" encoding="utf-8"?>');
+           strList.Add('<manifest xmlns:android="http://schemas.android.com/apk/res/android"');
+           strList.Add('    package="'+FAntPackageName+'.'+LowerCase(projName)+'"');
+           strList.Add('    android:versionCode="1"');
+           strList.Add('    android:versionName="1.0" >');
+           strList.Add('    <uses-sdk android:minSdkVersion="10"/>');
+           strList.Add('    <application');
+           strList.Add('        android:allowBackup="true"');
+           strList.Add('        android:icon="@drawable/ic_launcher"');
+           strList.Add('        android:label="@string/app_name"');
+           strList.Add('        android:theme="@style/AppTheme" >');
+           strList.Add('        <activity');
+           strList.Add('            android:name="'+FAntPackageName+'.'+LowerCase(projName)+'.App"');
+           strList.Add('            android:label="@string/app_name" >');
+           strList.Add('            <intent-filter>');
+           strList.Add('                <action android:name="android.intent.action.MAIN" />');
+           strList.Add('                <category android:name="android.intent.category.LAUNCHER" />');
+           strList.Add('            </intent-filter>');
+           strList.Add('        </activity>');
+           strList.Add('    </application>');
+           strList.Add('</manifest>');
+           strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'AndroidManifest.xml');
+         end;
 
          strList.Clear;
          strList.Add(FAntPackageName+'.'+LowerCase(projName));
