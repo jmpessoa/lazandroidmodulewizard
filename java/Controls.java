@@ -82,6 +82,7 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.content.res.AssetFileDescriptor;
 import android.content.res.AssetManager;
+import android.content.res.Resources;
 import android.database.Cursor;
 import android.graphics.Bitmap.CompressFormat;
 import android.graphics.Bitmap;
@@ -1201,6 +1202,10 @@ public  void setInputTypeEx(String str) {
 	  if(str.equals("NUMBER")) {
 		  this.setInputType(android.text.InputType.TYPE_CLASS_NUMBER);
 	  }
+	  else if (str.equals("CAPCHARACTERS"))
+	  {
+		  this.setInputType(android.text.InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS);
+	  }	  	  
 	  else if (str.equals("TEXT")) { 
 		  this.setInputType(android.text.InputType.TYPE_CLASS_TEXT);
 	  }
@@ -11642,6 +11647,26 @@ public  String getStrDateTime() {  //hacked by jmpessoa!! sorry, was for a good 
   String listVersionInfo = "6$4=GetControlsVersionInfo;" +
   		   "6$4=getLocale;";  
   return listVersionInfo;
+}
+
+//Fatih: Path = '' = Asset Root Folder
+//Path Example: gunlukler/2015/02/28/001
+public String[] getAssetContentList(String Path) throws IOException {
+	
+	ArrayList<String> Folders = new ArrayList<String>();
+	      
+	Resources r = this.activity.getResources(); 
+	AssetManager am = r.getAssets();
+	String fileList[] = am.list(Path);
+	if (fileList != null)
+	{   
+		for (int i = 0; i < fileList.length; i++)
+		{
+			Folders.add(fileList[i]);
+		}
+	}
+	String sFolders[] = Folders.toArray(new String[Folders.size()]);    	  
+	return sFolders;
 }
 
 //by jmpessoa:  Class controls version info

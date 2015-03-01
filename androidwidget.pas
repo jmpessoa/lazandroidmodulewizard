@@ -399,6 +399,7 @@ type
                     ClickNo);
 
   TInputType     = (itText,
+                    itCapCharacters,
                     itNumber,
                     itPhone,
                     itPassNumber,
@@ -406,6 +407,7 @@ type
                     itMultiLine);
   //by jmpessoa
   TInputTypeEx  =(  itxText,
+                    itxCapCharacters,
                     itxNumber,
                     itxPhone,
                     itxNumberPassword,
@@ -1217,6 +1219,8 @@ procedure Call_jCallStaticVoidMethodA(fullClassName: string; funcName: string; f
 //Please, use jForm_getDateTime...
 Function jApp_GetControlsVersionFeatures          (env:PJNIEnv;this:jobject): String;
 
+function jApp_GetAssetContentList(env: PJNIEnv; this: JObject; Path: string): TDynArrayOfString;
+
 Procedure jApp_Finish                  (env:PJNIEnv;this:jobject);
 
 //by jmpessoa
@@ -1378,6 +1382,7 @@ Function InputTypeToStr ( InputType : TInputType ) : String;
   Result := 'TEXT';
   Case InputType of
    itText       : Result := 'TEXT';
+   itCapCharacters: Result := 'CAPCHARACTERS';
    itNumber     : Result := 'NUMBER';
    itPhone      : Result := 'PHONE';
    itPassNumber : Result := 'PASSNUMBER';
@@ -3212,6 +3217,7 @@ Function InputTypeToStrEx ( InputType : TInputTypeEx ) : String;
   Result := 'TEXT';
   Case InputType of
    itxText       : Result := 'TEXT';
+   itxCapCharacters: Result := 'CAPCHARACTERS';
    itxNumber     : Result := 'NUMBER';
    itxPhone      : Result := 'PHONE';
    itxNumberPassword : Result := 'PASSNUMBER';
@@ -3797,6 +3803,41 @@ begin
            _jBoolean := JNI_False;
            Result    := String( env^.GetStringUTFChars(Env,_jString,@_jBoolean) );
           end;
+  end;
+end;
+
+function jApp_GetAssetContentList(env: PJNIEnv; this: JObject; Path: string): TDynArrayOfString;
+  var
+  JCls: JClass = nil;
+  JMethod: JMethodID = nil;
+  DataArray: JObject;
+  JParams: array[0..0] of JValue;
+  StrX: JString;
+  ResB: JBoolean;
+  SizeArr, i: Integer;
+begin
+
+  JCls := env^.GetObjectClass(env, this);
+  JParams[0].l := env^.NewStringUTF(env, PChar(Path));
+  JMethod := env^.GetMethodID(env, JCls, 'getAssetContentList', '(Ljava/lang/String;)[Ljava/lang/String;');
+  DataArray := env^.CallObjectMethodA(env, this, JMethod, @JParams);
+  if(DataArray <> nil) then
+  begin
+
+    SizeArr := env^.GetArrayLength(env, DataArray);
+    SetLength(Result, SizeArr);
+    for i := 0 to SizeArr - 1 do
+    begin
+      StrX := env^.GetObjectArrayElement(env, DataArray, i);
+      case StrX = nil of
+        True: Result[i] := '';
+        False:
+        begin
+          ResB := JNI_False;
+          Result[i] := string(env^.GetStringUTFChars(env, StrX, @ResB));
+        end;
+      end;
+    end;
   end;
 end;
 
