@@ -6689,7 +6689,11 @@ class jMenu /*extends ...*/ {
     public void RegisterForContextMenu(View _view){
        controls.activity.registerForContextMenu(_view);
     }
-        
+     
+    public void UnRegisterForContextMenu(View _view){
+    	// TODO
+     }       
+    
     //http://daniel-codes.blogspot.com.br/2009/12/dynamically-retrieving-resources-in.html
    //Just note that in case you want to retrieve Views (Buttons, TextViews, etc.) 
     //you must implement R.id.class instead of R.drawable.
@@ -6849,6 +6853,10 @@ class jContextMenu /*extends ...*/ {
     public void RegisterForContextMenu(View _view){
        controls.activity.registerForContextMenu(_view);
     }   
+    
+    public void UnRegisterForContextMenu(View _view){
+        controls.activity.unregisterForContextMenu(_view);
+     }       
     
     //_itemType --> 0:Default, 1:Checkable
     public MenuItem AddItem(ContextMenu _menu, int _itemID, String _caption, int _itemType){    	     	
@@ -8179,6 +8187,13 @@ class jSpinner extends Spinner /*dummy*/ { //please, fix what GUI object will be
 	 mStrList.add(_item);    
 	 Log.i("Spinner_Add: ",_item);
      mSpAdapter.notifyDataSetChanged();
+   }
+   
+   // ELERA_04032015
+   public void Clear() {
+	   
+	   mStrList.clear();
+	   mSpAdapter.notifyDataSetChanged();
    }
    
    public void SetSelectedTextColor(int _color) {

@@ -43,7 +43,7 @@ jMenu = class(jControl)
     function CountSubMenus(): integer;
     procedure UnCheckAllSubMenuItemByIndex(_subMenuIndex: integer);
     procedure RegisterForContextMenu(_view: jObject);
-
+    procedure UnRegisterForContextMenu(_View: JObject);
     procedure AddItem(_menu: jObject; _itemID: integer; _caption: string; _iconIdentifier: string; _itemType: TMenuItemType; _showAsAction: TMenuItemShowAsAction); overload;
     procedure AddItem(_subMenu: jObject; _itemID: integer; _caption: string; _itemType: TMenuItemType); overload;
     function AddSubMenu(_menu: jObject; _title: string; _headerIconIdentifier: string): jObject; overload;
@@ -71,7 +71,7 @@ procedure jMenu_UnCheckAllMenuItem(env: PJNIEnv; _jmenu: JObject);
 function jMenu_CountSubMenus(env: PJNIEnv; _jmenu: JObject): integer;
 procedure jMenu_UnCheckAllSubMenuItemByIndex(env: PJNIEnv; _jmenu: JObject; _subMenuIndex: integer);
 procedure jMenu_RegisterForContextMenu(env: PJNIEnv; _jmenu: JObject; _view: jObject);
-
+procedure JMenu_UnRegisterForContextMenu(env: PJNIEnv; _JMenu: JObject; _View: JObject);
 procedure jMenu_AddItem(env: PJNIEnv; _jmenu: JObject; _menu: jObject; _itemID: integer; _caption: string; _iconIdentifier: string; _itemType: integer; _showAsAction: integer); overload;
 procedure jMenu_AddItem(env: PJNIEnv; _jmenu: JObject; _subMenu: jObject; _itemID: integer; _caption: string; _itemType: integer); overload;
 function jMenu_AddSubMenu(env: PJNIEnv; _jmenu: JObject; _menu: jObject; _title: string; _headerIconIdentifier: string): jObject; overload;
@@ -239,6 +239,12 @@ begin
   //in designing component state: set value here...
   if FInitialized then
      jMenu_RegisterForContextMenu(FjEnv, FjObject, _view);
+end;
+
+procedure jMenu.UnRegisterForContextMenu(_View: JObject);
+begin
+  if(FInitialized) then
+    JMenu_UnRegisterForContextMenu(FjEnv, FjObject, _View);
 end;
 
 procedure jMenu.AddItem(_menu: jObject; _itemID: integer; _caption: string; _iconIdentifier: string; _itemType: TMenuItemType; _showAsAction: TMenuItemShowAsAction);
@@ -504,6 +510,18 @@ begin
   jCls:= env^.GetObjectClass(env, _jmenu);
   jMethod:= env^.GetMethodID(env, jCls, 'RegisterForContextMenu', '(Landroid/view/View;)V');
   env^.CallVoidMethodA(env, _jmenu, jMethod, @jParams);
+end;
+
+procedure JMenu_UnRegisterForContextMenu(env: PJNIEnv; _JMenu: JObject; _View: JObject);
+  var
+  JParams: array[0..0] of JValue;
+  JMethod: JMethodID = nil;
+  JCls: JClass = nil;
+begin
+  JParams[0].l := _View;
+  JCls := env^.GetObjectClass(env, _JMenu);
+  JMethod := env^.GetMethodID(env, JCls, 'UnRegisterForContextMenu', '(Landroid/view/View;)V');
+  env^.CallVoidMethodA(env, _JMenu, JMethod, @JParams);
 end;
 
 procedure jMenu_AddItem(env: PJNIEnv; _jmenu: JObject; _menu: jObject; _itemID: integer; _caption: string; _iconIdentifier: string; _itemType: integer; _showAsAction: integer);
