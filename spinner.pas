@@ -58,6 +58,7 @@ jSpinner = class(jVisualControl)
     function GetSelectedItemPosition(): integer;
     function GetSelectedItem(): string;
     procedure Add(_item: string);
+    procedure Clear;
     procedure SetSelectedTextColor(_color: integer);
     procedure SetDropListTextColor(_color: TARGBColorBridge {integer});
     procedure SetDropListBackgroundColor(_color: TARGBColorBridge {integer});
@@ -99,6 +100,7 @@ procedure jSpinner_SetId(env: PJNIEnv; _jspinner: JObject; _id: integer);
 function jSpinner_GetSelectedItemPosition(env: PJNIEnv; _jspinner: JObject): integer;
 function jSpinner_GetSelectedItem(env: PJNIEnv; _jspinner: JObject): string;
 procedure jSpinner_Add(env: PJNIEnv; _jspinner: JObject; _item: string);
+procedure jSpinner_Clear(env: PJNIEnv; _JSpinner: JObject);
 procedure jSpinner_SetSelectedTextColor(env: PJNIEnv; _jspinner: JObject; _color: integer);
 procedure jSpinner_SetDropListTextColor(env: PJNIEnv; _jspinner: JObject; _color: integer);
 procedure jSpinner_SetDropListBackgroundColor(env: PJNIEnv; _jspinner: JObject; _color: integer);
@@ -443,6 +445,12 @@ begin
      jSpinner_Add(FjEnv, FjObject , _item);
 end;
 
+procedure jSpinner.Clear;
+begin
+
+  JSpinner_Clear(FjEnv, FjObject);
+end;
+
 procedure jSpinner.SetSelectedTextColor(_color: integer);
 begin
   //in designing component state: set value here...
@@ -719,6 +727,16 @@ begin
   env^.DeleteLocalRef(env,jCls);
 end;
 
+procedure jSpinner_Clear(env: PJNIEnv; _JSpinner: JObject);
+  var
+  JCls: JClass = nil;
+  JMethod: jMethodID = nil;
+begin
+  JCls := env^.GetObjectClass(env, _jspinner);
+  JMethod := env^.GetMethodID(env, jCls, 'Clear', '()V');
+  env^.CallVoidMethod(env, _JSpinner, JMethod);
+  env^.DeleteLocalRef(env, JCls);
+end;
 
 procedure jSpinner_SetSelectedTextColor(env: PJNIEnv; _jspinner: JObject; _color: integer);
 var
