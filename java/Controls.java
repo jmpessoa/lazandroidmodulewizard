@@ -1,6 +1,6 @@
 package com.example.dummyapp;
 
-//Lamw: Lazarus Android Module Wizard - Version 0.6 - rev. 18 - 22 February - 2015
+//Lamw: Lazarus Android Module Wizard - Version 0.6 - rev. 19 - 09 March - 2015
 //Form Designer and Components development model!
 //Author: jmpessoa@hotmail.com
 //https://github.com/jmpessoa/lazandroidmodulewizard
@@ -212,6 +212,7 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
+import java.util.StringTokenizer;
 //import java.util.Map;
 //import java.util.Random;
 import java.util.Set;
@@ -225,12 +226,17 @@ import javax.microedition.khronos.egl.EGLContext;
 import javax.microedition.khronos.egl.EGL10;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
+import org.apache.http.NameValuePair;
+import org.apache.http.StatusLine;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
 //import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
@@ -493,7 +499,7 @@ for (int i = 0; i < layout.getChildCount(); i++) {
 
 //by jmpessoa
 public void ShowMessage(String msg){
-  Log.i("ShowMessage:", msg);
+  Log.i("ShowMessage As:", msg);
   Toast.makeText(controls.activity, msg, Toast.LENGTH_SHORT).show();	
 }
 
@@ -1095,6 +1101,11 @@ int marginBottom = 5;
 String bufStr;
 private boolean canDispatchChangeEvent = false;
 private boolean canDispatchChangedEvent = false;
+private boolean mFlagSuggestion = false;
+
+private ClipboardManager mClipBoard = null;
+private ClipData mClipData = null;
+
 
 // Constructor
 public  jEditText(android.content.Context context,
@@ -1110,6 +1121,7 @@ lparams = new RelativeLayout.LayoutParams(100,100);
 lparams.setMargins(5, 5,5,5);
 this.setHintTextColor(Color.LTGRAY);
 
+mClipBoard = (ClipboardManager) controls.activity.getSystemService(Context.CLIPBOARD_SERVICE);
  
 // Init Event : http://socome.tistory.com/15
 onKeyListener = new OnKeyListener() {	
@@ -1202,12 +1214,17 @@ public  void setInputTypeEx(String str) {
 	  if(str.equals("NUMBER")) {
 		  this.setInputType(android.text.InputType.TYPE_CLASS_NUMBER);
 	  }
-	  else if (str.equals("CAPCHARACTERS"))
-	  {
-		  this.setInputType(android.text.InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS);
-	  }	  	  
+      else if (str.equals("CAPCHARACTERS")) {
+    	  if (!mFlagSuggestion) 
+            this.setInputType(android.text.InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS|InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);
+    	  else
+            this.setInputType(android.text.InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS);
+      }
 	  else if (str.equals("TEXT")) { 
-		  this.setInputType(android.text.InputType.TYPE_CLASS_TEXT);
+		  if (!mFlagSuggestion) 
+		      this.setInputType(android.text.InputType.TYPE_CLASS_TEXT|InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);
+		  else
+			  this.setInputType(android.text.InputType.TYPE_CLASS_TEXT);
 	  }
 	  else if (str.equals("PHONE"))       {this.setInputType(android.text.InputType.TYPE_CLASS_PHONE); }
 	  else if (str.equals("PASSNUMBER"))  {this.setInputType(android.text.InputType.TYPE_CLASS_NUMBER);
@@ -1215,10 +1232,14 @@ public  void setInputTypeEx(String str) {
 	  else if (str.equals("PASSTEXT"))    {this.setInputType(android.text.InputType.TYPE_CLASS_TEXT);
 	                                       this.setTransformationMethod(android.text.method.PasswordTransformationMethod.getInstance()); }
 	  
-	  else if (str.equals("TEXTMULTILINE")){this.setInputType(android.text.InputType.TYPE_CLASS_TEXT|android.text.InputType.TYPE_TEXT_FLAG_MULTI_LINE);}
-	                                    
-	  
-	  else                                 {this.setInputType(android.text.InputType.TYPE_CLASS_TEXT);};
+	  else if (str.equals("TEXTMULTILINE")){
+		  if (!mFlagSuggestion)
+		      this.setInputType(android.text.InputType.TYPE_CLASS_TEXT|android.text.InputType.TYPE_TEXT_FLAG_MULTI_LINE|InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);
+		   else  
+		      this.setInputType(android.text.InputType.TYPE_CLASS_TEXT|android.text.InputType.TYPE_TEXT_FLAG_MULTI_LINE);
+		  }
+	                                    	  
+	  else {this.setInputType(android.text.InputType.TYPE_CLASS_TEXT|InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);};
 	    
 	}
 
@@ -1372,6 +1393,25 @@ public void setFontAndTextTypeFace(int fontFace, int fontStyle) {
   } 
   this.setTypeface(t, fontStyle); 		
 } 
+
+public void SetAcceptSuggestion(boolean _value) { 
+    mFlagSuggestion = _value;
+}
+
+public void CopyToClipboard() {
+	mClipData = ClipData.newPlainText("text", this.getText().toString());
+    mClipBoard.setPrimaryClip(mClipData);
+}
+   
+public void PasteFromClipboard() {
+    ClipData cdata = mClipBoard.getPrimaryClip();
+    ClipData.Item item = cdata.getItemAt(0);
+    this.setText(item.getText().toString());
+}
+
+public void Clear() {
+	this.setText("");
+}
 	
 }
 
@@ -2026,7 +2066,7 @@ public int GetDrawableResourceId(String _resName) {
 	     return drawableId;
 	  }
 	  catch (Exception e) {
-	     Log.e("jForm", "Failure to get drawable id.", e);
+	     Log.e("jImageView", "Failure to get drawable id.", e);
 	     return 0;
 	  }
 }
@@ -4494,7 +4534,7 @@ private int GetDrawableResourceId(String _resName) {
 	     return drawableId;
 	  }
 	  catch (Exception e) {
-	     Log.e("jForm", "Failure to get drawable id.", e);
+	     Log.e("jImageBtn", "Failure to get drawable id.", e);
 	     return 0;
 	  }
 }
@@ -4757,23 +4797,17 @@ protected void onPreExecute() {
 //Step #2. Task
 @Override
 protected Void doInBackground(Void... params) {
-   int i;
    
-   if (autoPublishProgress) {
-      for (i = 0; i < 25; i++) {
-         publishProgress(i);	
-      }
-   }
+   if (autoPublishProgress) 
+         publishProgress(25);	
    
    controls.pOnAsyncEvent(PasObj, Const.Task_BackGround, 100); // Pascal Event
    
-   if (autoPublishProgress) {
-      for (i = 25; i < 100; i++) {
-	     publishProgress(i);	
-      }
-   }  
+   if (autoPublishProgress) 
+	     publishProgress(100);
+	     
    return null;
-};
+}
 
 // Step #3. Progress
 @Override
@@ -4870,7 +4904,7 @@ private int GetDrawableResourceId(String _resName) {
 	     return drawableId;
 	  }
 	  catch (Exception e) {
-	     Log.e("jForm", "Failure to get drawable id.", e);
+	     Log.e("jBitmap", "Failure to get drawable id.", e);
 	     return 0;
 	  }
 }
@@ -5305,7 +5339,7 @@ class jSqliteDataAccess {
         	     return drawableId;
         	  }
         	  catch (Exception e) {
-        	     Log.e("jForm", "Failure to get drawable id.", e);
+        	     Log.e("jSqliteDataAccess", "Failure to get drawable id.", e);
         	     return 0;
         	  }
         }
@@ -5606,7 +5640,7 @@ class jMyHello /*extends ...*/ {
         private Controls controls  = null;   // Control Class for events
         private Context  context   = null;
 
-        private int    mFlag;          // <<----- custom property
+        private int    mFlag = 0;          // <<----- custom property
         private String mMsgHello = ""; // <<----- custom property 
         private int[]  mBufArray;      // <<----- custom property
 
@@ -6689,12 +6723,12 @@ class jMenu /*extends ...*/ {
     public void RegisterForContextMenu(View _view){
        controls.activity.registerForContextMenu(_view);
     }
-     
-    public void UnRegisterForContextMenu(View _view){
-    	// TODO
-     }       
+        
+    public void UnRegisterForContextMenu(View _view){ 
+      controls.activity.unregisterForContextMenu(_view); 
+    }  
     
-    //http://daniel-codes.blogspot.com.br/2009/12/dynamically-retrieving-resources-in.html
+//http://daniel-codes.blogspot.com.br/2009/12/dynamically-retrieving-resources-in.html
    //Just note that in case you want to retrieve Views (Buttons, TextViews, etc.) 
     //you must implement R.id.class instead of R.drawable.
     private int GetDrawableResourceId(String _resName) {
@@ -6854,10 +6888,10 @@ class jContextMenu /*extends ...*/ {
        controls.activity.registerForContextMenu(_view);
     }   
     
-    public void UnRegisterForContextMenu(View _view){
-        controls.activity.unregisterForContextMenu(_view);
-     }       
-    
+    public void UnRegisterForContextMenu(View _view){ 
+      controls.activity.unregisterForContextMenu(_view); 
+   }        
+ 
     //_itemType --> 0:Default, 1:Checkable
     public MenuItem AddItem(ContextMenu _menu, int _itemID, String _caption, int _itemType){    	     	
     	MenuItem item = _menu.add(0,_itemID,0 ,(CharSequence)_caption);
@@ -8189,13 +8223,12 @@ class jSpinner extends Spinner /*dummy*/ { //please, fix what GUI object will be
      mSpAdapter.notifyDataSetChanged();
    }
    
-   // ELERA_04032015
-   public void Clear() {
-	   
-	   mStrList.clear();
-	   mSpAdapter.notifyDataSetChanged();
-   }
-   
+   //ELERA_04032015 
+   public void Clear() { 
+     mStrList.clear(); 
+     mSpAdapter.notifyDataSetChanged(); 
+   } 
+
    public void SetSelectedTextColor(int _color) {
 	  mSpAdapter.SetSelectedTextColor(_color);
    }
@@ -9084,7 +9117,7 @@ class jActionBarTab {
 		     return drawableId;
 		  }
 		  catch (Exception e) {
-		     Log.e("jForm", "Failure to get drawable id.", e);
+		     Log.e("jActionBarTab", "Failure to get drawable id.", e);
 		     return 0;
 		  }
 	}
@@ -9265,7 +9298,7 @@ class jCustomDialog extends RelativeLayout {
 		     return drawableId;
 		  }
 		  catch (Exception e) {
-		     Log.e("jForm", "Failure to get drawable id.", e);
+		     Log.e("jCustomDialog", "Failure to get drawable id.", e);
 		     return 0;
 		  }
 	}
@@ -11189,6 +11222,8 @@ class jHttpClient /*extends ...*/ {
    public String Get(String _stringUrl) {
 	   
        //ref. http://jan.horneck.info/blog/androidhttpclientwithbasicauthentication
+	   HttpEntity entity = null;
+	   
 	   HttpParams httpParams = new BasicHttpParams();
 	   int connection_Timeout = 5000;
 	   HttpConnectionParams.setConnectionTimeout(httpParams, connection_Timeout);
@@ -11219,12 +11254,17 @@ class jHttpClient /*extends ...*/ {
 
            //System.out.println("executing request" + httpget.getRequestLine());
            HttpResponse response = httpclient.execute(httpget);
-           HttpEntity entity = response.getEntity();
-
-           //System.out.println("----------------------------------------");
-           //System.out.println(response.getStatusLine());
+           entity = response.getEntity();
+           
+           /*TODO
+           StatusLine statusLine = response.getStatusLine();
+           int statusCode = statusLine.getStatusCode();
+           if (statusCode == 200) {           
+               entity = response.getEntity();
+           }    
+            */
+           
            if (entity != null) {
-               //System.out.println("Response content length: " + entity.getContentLength());
         	   strResult = EntityUtils.toString(entity);
            }
        } catch(Exception e){
@@ -11257,6 +11297,86 @@ class jHttpClient /*extends ...*/ {
      public void SetAuthenticationMode(int _authenticationMode) {    	 
         mAuthenticationMode = _authenticationMode; //0: none. 1: basic; 2= OAuth	 	                
      }
+     
+     //ref. http://mobiledevtuts.com/android/android-http-with-asynctask-example/ 
+	public int PostNameValueData(String _stringUrl, String _name, String _value) {
+			// Create a new HttpClient and Post Header
+			int statusCode = 0;						
+			HttpParams httpParams = new BasicHttpParams();
+			int connection_Timeout = 5000;
+			HttpConnectionParams.setConnectionTimeout(httpParams, connection_Timeout);
+			HttpConnectionParams.setSoTimeout(httpParams, connection_Timeout);
+			
+			DefaultHttpClient httpclient = new DefaultHttpClient();					 	   
+		    //AuthScope:
+		    //host  the host the credentials apply to. May be set to null if credenticals are applicable to any host. 
+		    //port  the port the credentials apply to. May be set to negative value if credenticals are applicable to any port.
+			try {				
+    	        if (mAuthenticationMode != 0) {    		   
+                  httpclient.getCredentialsProvider().setCredentials(
+                               new AuthScope(mHOSTNAME,mPORT),  // 
+                               new UsernamePasswordCredentials(mUSERNAME, mPASSWORD));
+    	        }						
+			    HttpPost httppost = new HttpPost(_stringUrl);
+				// Add your data
+				List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();								
+				nameValuePairs.add(new BasicNameValuePair(_name, _value));								
+				httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
+				// Execute HTTP Post Request
+				HttpResponse response = httpclient.execute(httppost);
+				StatusLine statusLine = response.getStatusLine();  
+				statusCode = statusLine.getStatusCode();
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+			} 
+			return statusCode;
+	}
+	
+	public int PostNameValueData(String _stringUrl, String _listNameValue) {
+		// Create a new HttpClient and Post Header
+		int statusCode = 0; 
+		
+		HttpParams httpParams = new BasicHttpParams();
+		int connection_Timeout = 5000;
+		HttpConnectionParams.setConnectionTimeout(httpParams, connection_Timeout);
+		HttpConnectionParams.setSoTimeout(httpParams, connection_Timeout);
+		
+		DefaultHttpClient httpclient = new DefaultHttpClient();			 	   
+	    //AuthScope:
+	    //host  the host the credentials apply to. May be set to null if credenticals are applicable to any host. 
+	    //port  the port the credentials apply to. May be set to negative value if credenticals are applicable to any port.
+		try {
+			
+	        if (mAuthenticationMode != 0) {    		   
+              httpclient.getCredentialsProvider().setCredentials(
+                           new AuthScope(mHOSTNAME,mPORT),  // 
+                           new UsernamePasswordCredentials(mUSERNAME, mPASSWORD));
+	        }
+					
+		    HttpPost httppost = new HttpPost(_stringUrl);
+
+			// Add your data
+			List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();						
+			StringTokenizer st = new StringTokenizer(_listNameValue, "=&");		
+			
+			while(st.hasMoreTokens()) { 
+			  String key = st.nextToken(); 
+			  String val = st.nextToken(); 
+			  //Log.i("name ->", key);
+			  //Log.i("value ->", val);
+			  nameValuePairs.add(new BasicNameValuePair(key, val));
+			}					
+			httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
+			// Execute HTTP Post Request
+			HttpResponse response = httpclient.execute(httppost);
+			StatusLine statusLine = response.getStatusLine();  
+			statusCode = statusLine.getStatusCode();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+		}		 
+		return statusCode;
+    }
+
 }
 
 //**new jclass entrypoint**//please, do not remove/change this line!
@@ -11664,25 +11784,24 @@ public  String getStrDateTime() {  //hacked by jmpessoa!! sorry, was for a good 
   return listVersionInfo;
 }
 
-//Fatih: Path = '' = Asset Root Folder
-//Path Example: gunlukler/2015/02/28/001
-public String[] getAssetContentList(String Path) throws IOException {
-	
-	ArrayList<String> Folders = new ArrayList<String>();
-	      
-	Resources r = this.activity.getResources(); 
-	AssetManager am = r.getAssets();
-	String fileList[] = am.list(Path);
-	if (fileList != null)
-	{   
-		for (int i = 0; i < fileList.length; i++)
-		{
-			Folders.add(fileList[i]);
-		}
-	}
-	String sFolders[] = Folders.toArray(new String[Folders.size()]);    	  
-	return sFolders;
-}
+//Fatih: Path = '' = Asset Root Folder 
+//Path Example: gunlukler/2015/02/28/001 
+public String[] getAssetContentList(String Path) throws IOException { 
+   ArrayList<String> Folders = new ArrayList<String>(); 
+
+   Resources r = this.activity.getResources();  
+   AssetManager am = r.getAssets(); 
+   String fileList[] = am.list(Path); 
+   if (fileList != null) 
+  {    
+     for (int i = 0; i < fileList.length; i++) 
+     { 
+ 	Folders.add(fileList[i]); 
+     } 
+  } 
+  String sFolders[] = Folders.toArray(new String[Folders.size()]);    	   
+  return sFolders; 
+} 
 
 //by jmpessoa:  Class controls version info
 public String GetControlsVersionInfo() { 

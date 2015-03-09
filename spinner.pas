@@ -445,11 +445,10 @@ begin
      jSpinner_Add(FjEnv, FjObject , _item);
 end;
 
-procedure jSpinner.Clear;
-begin
-
-  JSpinner_Clear(FjEnv, FjObject);
-end;
+procedure jSpinner.Clear; 
+begin 
+  JSpinner_Clear(FjEnv, FjObject); 
+end; 
 
 procedure jSpinner.SetSelectedTextColor(_color: integer);
 begin
@@ -727,16 +726,16 @@ begin
   env^.DeleteLocalRef(env,jCls);
 end;
 
-procedure jSpinner_Clear(env: PJNIEnv; _JSpinner: JObject);
-  var
-  JCls: JClass = nil;
-  JMethod: jMethodID = nil;
-begin
-  JCls := env^.GetObjectClass(env, _jspinner);
-  JMethod := env^.GetMethodID(env, jCls, 'Clear', '()V');
-  env^.CallVoidMethod(env, _JSpinner, JMethod);
-  env^.DeleteLocalRef(env, JCls);
-end;
+procedure jSpinner_Clear(env: PJNIEnv; _JSpinner: JObject); 
+var 
+ JCls: JClass = nil; 
+ JMethod: jMethodID = nil; 
+begin 
+ JCls := env^.GetObjectClass(env, _jspinner); 
+ JMethod := env^.GetMethodID(env, jCls, 'Clear', '()V'); 
+ env^.CallVoidMethod(env, _JSpinner, JMethod); 
+ env^.DeleteLocalRef(env, JCls); 
+end; 
 
 procedure jSpinner_SetSelectedTextColor(env: PJNIEnv; _jspinner: JObject; _color: integer);
 var

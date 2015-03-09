@@ -19,14 +19,14 @@
 
 		-TrueTom [Laz4Android Package]
 
-			Date:2014-10-18
-			FPC: 2.7.1 SVN 28863  win32/arm-android/i386-android/jvm-android
-			Lazarus:1.3 trunk svn 46592
+			Last update:2015-02-25
+			FPC: 3.1.1 trunk svn 29987 win32/arm-android/i386-android/jvm-android
+			Lazarus:1.5 trunk svn 47987
 			Android NDK: r10c (arm-linux-androideabi-4.6 + x86-4.6)
 			http://sourceforge.net/projects/laz4android/files/?source=navbar
-			:To Install, please, read the "Laz4Android_readme.txt"
+			:To Install [*.7z], please, read the "Laz4Android_readme.txt"
 
-      		-Simonsayz [great work on Android [GUI] Controls!]
+		-Simonsayz [great work on Android [GUI] Controls!]
 			Simon,Choi / Choi,Won-sik
 			simonsayz@naver.com
 			http://blog.naver.com/simonsayz
@@ -65,6 +65,23 @@
 	*					*
 	*****************************************
 
+Version 0.6 - rev. 19 - 09 March 2015 -
+	
+	NEWS
+		jControl: Added Method AttachCurrentThread
+		jHttpClient: Added Methods: PostNameValueData	
+		jEditText: Added Methods:	
+				SetAcceptSuggestion 
+				CopyToClipboard
+				PasteFromClipboard
+				Clear
+		
+	NEW! Demo AppAsyncTaskDemo1	[Eclipse Compatible Project]	
+	NEW! Demo AppHttpClientDemo1	[Eclipse Compatible Project]	
+
+	FIXs:	jAsyncTaskDemo
+			jHttpClient
+		
 Version 0.6 - rev. 18 - 22 February 2015 -
 
 	::Tutorial to Stephano Questions: 
@@ -76,6 +93,7 @@ Version 0.6 - rev. 18 - 22 February 2015 -
 		2. Add to ../src the new java class code [ex. jhelloadder.java]
 
 		3. Go to [again] IDE->Project->New Project select [again] "JNI Android Module" Project
+                   and [again] Select the same project [form workspace]
 
 		4. But, NOW double click the added java class code [jhelloadder.java] 
 

@@ -43,7 +43,8 @@ jMenu = class(jControl)
     function CountSubMenus(): integer;
     procedure UnCheckAllSubMenuItemByIndex(_subMenuIndex: integer);
     procedure RegisterForContextMenu(_view: jObject);
-    procedure UnRegisterForContextMenu(_View: JObject);
+    procedure UnRegisterForContextMenu(_View: JObject); 
+
     procedure AddItem(_menu: jObject; _itemID: integer; _caption: string; _iconIdentifier: string; _itemType: TMenuItemType; _showAsAction: TMenuItemShowAsAction); overload;
     procedure AddItem(_subMenu: jObject; _itemID: integer; _caption: string; _itemType: TMenuItemType); overload;
     function AddSubMenu(_menu: jObject; _title: string; _headerIconIdentifier: string): jObject; overload;
@@ -241,11 +242,11 @@ begin
      jMenu_RegisterForContextMenu(FjEnv, FjObject, _view);
 end;
 
-procedure jMenu.UnRegisterForContextMenu(_View: JObject);
-begin
-  if(FInitialized) then
-    JMenu_UnRegisterForContextMenu(FjEnv, FjObject, _View);
-end;
+procedure jMenu.UnRegisterForContextMenu(_View: JObject); 
+begin 
+  if(FInitialized) then 
+   JMenu_UnRegisterForContextMenu(FjEnv, FjObject, _View); 
+end; 
 
 procedure jMenu.AddItem(_menu: jObject; _itemID: integer; _caption: string; _iconIdentifier: string; _itemType: TMenuItemType; _showAsAction: TMenuItemShowAsAction);
 begin
@@ -512,17 +513,17 @@ begin
   env^.CallVoidMethodA(env, _jmenu, jMethod, @jParams);
 end;
 
-procedure JMenu_UnRegisterForContextMenu(env: PJNIEnv; _JMenu: JObject; _View: JObject);
-  var
-  JParams: array[0..0] of JValue;
-  JMethod: JMethodID = nil;
-  JCls: JClass = nil;
-begin
-  JParams[0].l := _View;
-  JCls := env^.GetObjectClass(env, _JMenu);
-  JMethod := env^.GetMethodID(env, JCls, 'UnRegisterForContextMenu', '(Landroid/view/View;)V');
-  env^.CallVoidMethodA(env, _JMenu, JMethod, @JParams);
-end;
+procedure JMenu_UnRegisterForContextMenu(env: PJNIEnv; _JMenu: JObject; _View: JObject); 
+var 
+  JParams: array[0..0] of JValue; 
+  JMethod: JMethodID = nil; 
+  JCls: JClass = nil; 
+begin 
+  JParams[0].l := _View; 
+  JCls := env^.GetObjectClass(env, _JMenu); 
+  JMethod := env^.GetMethodID(env, JCls, 'UnRegisterForContextMenu', '(Landroid/view/View;)V'); 
+  env^.CallVoidMethodA(env, _JMenu, JMethod, @JParams); 
+end; 	
 
 procedure jMenu_AddItem(env: PJNIEnv; _jmenu: JObject; _menu: jObject; _itemID: integer; _caption: string; _iconIdentifier: string; _itemType: integer; _showAsAction: integer);
 var

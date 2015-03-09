@@ -256,6 +256,8 @@ const
 
 type
 
+ TAsyncTaskState = (atsBefore, atsProgress, atsPost, atsInBackground);
+
  TImageScaleType = (scaleCenter, scaleCenterCrop, scaleCenterInside, scaleFitCenter,
                 scaleFitEnd, scaleFitStart, scaleFitXY, scaleMatrix);
 
@@ -709,11 +711,11 @@ type
   protected
     FjClass: jObject;
     FClassPath: string; //need by new pure jni model! -->> initialized by widget.Create
-    FjObject      : jObject; //jSelf
+    FjObject      : jObject; //jSelf - java object
     FEnabled     : boolean;
     FInitialized : boolean;
     FjEnv: PJNIEnv;
-    FjThis: jObject;
+    FjThis: jObject;  //java class Controls\libcontrols
     FCustomColor: DWord;
     procedure SetEnabled(Value: boolean);
   public
@@ -723,6 +725,8 @@ type
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
     procedure Init(refApp: jApp); virtual;
+    procedure AttachCurrentThread();  overload;
+    procedure AttachCurrentThread(env: PJNIEnv); overload;
     property jSelf: jObject read FjObject ;
   end;
 
@@ -1338,6 +1342,8 @@ Procedure VHandler_touchesEnded_withEvent(Sender         : TObject;
                                           Var TouchUp    : TOnTouchEvent;
                                           Var Mouches    : TMouches);
 
+  procedure jForm_ShowMessageAsync(env:PJNIEnv; Form:jObject; msg: string);
+
 var
   gApp:       jApp;       //global App !
   gVM         : PJavaVM;
@@ -1382,7 +1388,7 @@ Function InputTypeToStr ( InputType : TInputType ) : String;
   Result := 'TEXT';
   Case InputType of
    itText       : Result := 'TEXT';
-   itCapCharacters: Result := 'CAPCHARACTERS';
+   itCapCharacters: Result := 'CAPCHARACTERS'; 
    itNumber     : Result := 'NUMBER';
    itPhone      : Result := 'PHONE';
    itPassNumber : Result := 'PASSNUMBER';
@@ -1595,6 +1601,16 @@ procedure jControl.UpdateJNI(refApp: jApp);
 begin
   FjEnv:= refApp.Jni.jEnv;
   FjThis:= refApp.Jni.jThis;;
+end;
+
+procedure jControl.AttachCurrentThread();
+begin
+  gVM^.AttachCurrentThread(gVm,@FjEnv,nil);
+end;
+
+procedure jControl.AttachCurrentThread(env: PJNIEnv);
+begin
+  gVM^.AttachCurrentThread(gVm,@env,nil);
 end;
 
 
@@ -3217,7 +3233,7 @@ Function InputTypeToStrEx ( InputType : TInputTypeEx ) : String;
   Result := 'TEXT';
   Case InputType of
    itxText       : Result := 'TEXT';
-   itxCapCharacters: Result := 'CAPCHARACTERS';
+   itxCapCharacters: Result := 'CAPCHARACTERS'; 
    itxNumber     : Result := 'NUMBER';
    itxPhone      : Result := 'PHONE';
    itxNumberPassword : Result := 'PASSNUMBER';
@@ -3806,40 +3822,39 @@ begin
   end;
 end;
 
-function jApp_GetAssetContentList(env: PJNIEnv; this: JObject; Path: string): TDynArrayOfString;
-  var
-  JCls: JClass = nil;
-  JMethod: JMethodID = nil;
-  DataArray: JObject;
-  JParams: array[0..0] of JValue;
-  StrX: JString;
-  ResB: JBoolean;
-  SizeArr, i: Integer;
-begin
-
-  JCls := env^.GetObjectClass(env, this);
-  JParams[0].l := env^.NewStringUTF(env, PChar(Path));
-  JMethod := env^.GetMethodID(env, JCls, 'getAssetContentList', '(Ljava/lang/String;)[Ljava/lang/String;');
-  DataArray := env^.CallObjectMethodA(env, this, JMethod, @JParams);
-  if(DataArray <> nil) then
-  begin
-
-    SizeArr := env^.GetArrayLength(env, DataArray);
-    SetLength(Result, SizeArr);
-    for i := 0 to SizeArr - 1 do
-    begin
-      StrX := env^.GetObjectArrayElement(env, DataArray, i);
-      case StrX = nil of
-        True: Result[i] := '';
-        False:
-        begin
-          ResB := JNI_False;
-          Result[i] := string(env^.GetStringUTFChars(env, StrX, @ResB));
-        end;
-      end;
-    end;
-  end;
+function jApp_GetAssetContentList(env: PJNIEnv; this: JObject; Path: string): TDynArrayOfString; 
+var 
+JCls: JClass = nil; 
+JMethod: JMethodID = nil; 
+DataArray: JObject; 
+JParams: array[0..0] of JValue; 
+StrX: JString; 
+ResB: JBoolean; 
+SizeArr, i: Integer; 
+begin  
+  JCls := env^.GetObjectClass(env, this); 
+  JParams[0].l := env^.NewStringUTF(env, PChar(Path)); 
+  JMethod := env^.GetMethodID(env, JCls, 'getAssetContentList', '(Ljava/lang/String;)[Ljava/lang/String;'); 
+  DataArray := env^.CallObjectMethodA(env, this, JMethod, @JParams); 
+  if(DataArray <> nil) then 
+  begin 
+    SizeArr := env^.GetArrayLength(env, DataArray); 
+    SetLength(Result, SizeArr); 
+    for i := 0 to SizeArr - 1 do 
+    begin 
+      StrX := env^.GetObjectArrayElement(env, DataArray, i); 
+      case StrX = nil of 
+         True: Result[i] := ''; 
+         False: 
+ 	 begin 
+           ResB := JNI_False; 
+           Result[i] := string(env^.GetStringUTFChars(env, StrX, @ResB)); 
+ 	 end; 
+       end; 
+    end; 
+  end; 
 end;
+
 
 Procedure jApp_Finish(env:PJNIEnv;this:jobject);
 Const
@@ -4137,6 +4152,23 @@ var
    method: jmethodID;
     _jParams : Array[0..0] of jValue;
 begin
+ _jParams[0].l:= env^.NewStringUTF(env, pchar(msg) );
+  cls := env^.GetObjectClass(env, Form);
+  method:= env^.GetMethodID(env, cls, 'ShowMessage', '(Ljava/lang/String;)V');
+  env^.CallVoidMethodA(env, Form, method,@_jParams);
+  env^.DeleteLocalRef(env,_jParams[0].l);
+end;
+
+
+//by jmpessoa
+
+procedure jForm_ShowMessageAsync(env:PJNIEnv; Form:jObject; msg: string);
+var
+   cls: jClass;
+   method: jmethodID;
+    _jParams : Array[0..0] of jValue;
+begin
+ gVM^.AttachCurrentThread(gVm,@env,nil); //fix here!
  _jParams[0].l:= env^.NewStringUTF(env, pchar(msg) );
   cls := env^.GetObjectClass(env, Form);
   method:= env^.GetMethodID(env, cls, 'ShowMessage', '(Ljava/lang/String;)V');

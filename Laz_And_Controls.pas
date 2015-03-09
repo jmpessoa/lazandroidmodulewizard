@@ -225,13 +225,13 @@ type
   //NEW by jmpessoa
   jHttpClient = class(jControl)
   private
-   FUrl : string;
-   FUrls: TStrings;
-   FIndexUrl: integer;
-   FAuthenticationMode: THttpClientAuthenticationMode;
-   procedure SetIndexUrl(Value: integer);
-   procedure SetUrlByIndex(Value: integer);
-   procedure SetUrls(Value: TStrings);
+    FUrl : string;
+    FUrls: TStrings;
+    FIndexUrl: integer;
+    FAuthenticationMode: THttpClientAuthenticationMode;
+    procedure SetIndexUrl(Value: integer);
+    procedure SetUrlByIndex(Value: integer);
+    procedure SetUrls(Value: TStrings);
   public
     constructor Create(AOwner: TComponent); override;
     destructor  Destroy; override;
@@ -242,12 +242,15 @@ type
     function Get(_stringUrl: string): string; overload;
     function Get: string; overload; overload;
 
+
     procedure SetAuthenticationUser(_userName: string; _password: string);
     procedure SetAuthenticationMode(_authenticationMode: THttpClientAuthenticationMode);
     procedure SetAuthenticationHost(_hostName: string; _port: integer);
+    function  PostNameValueData(_stringUrl: string; _name: string; _value: string): integer; overload;
+    function  PostNameValueData(_stringUrl: string; _listNameValue: string): integer;  overload;
 
-   // Property
-   property Url: string read FUrl;
+    // Property
+    property Url: string read FUrl;
   published
     property IndexUrl: integer read  FIndexUrl write SetIndexUrl;
     property Urls: TStrings read FUrls write SetUrls;
@@ -478,6 +481,7 @@ type
 
   jAsyncTask = class(jControl)
   private
+    FAsyncTaskState: TAsyncTaskState;
     FRunning: boolean;
     FOnAsyncEvent : TOnAsyncEvent;
     FAutoPublishProgress: boolean;
@@ -492,6 +496,7 @@ type
     Procedure Execute;
     Procedure UpdateUI(Progress : Integer);
     property Running: boolean read FRunning  write FRunning;
+    property AsyncTaskState: TAsyncTaskState read FAsyncTaskState write FAsyncTaskState;
   published
     // Event
     property  OnAsyncEvent : TOnAsyncEvent read FOnAsyncEvent write FOnAsyncEvent;
@@ -704,6 +709,11 @@ type
 
     procedure Append(_txt: string);
     procedure SetImeOptions(_imeOption: TImeOptions);
+
+    procedure SetAcceptSuggestion(_value: boolean);
+    procedure CopyToClipboard();
+    procedure PasteFromClipboard();
+    procedure Clear;
     // Property
     property CursorPos : TXY        read GetCursorPos  write SetCursorPos;
     //property Scroller: boolean  read FScroller write SetScroller;
@@ -2005,10 +2015,15 @@ begin
   if not Assigned(Obj) then Exit;
   if Obj is jAsyncTask then
   begin
-    jAsyncTask(Obj).UpdateJNI(gApp); //jForm(jAsyncTask(Obj).Owner).UpdateJNI(gApp);
-    jAsyncTask(Obj).GenEvent_OnAsyncEvent(Obj,EventType,Progress);
-  end;
-
+     case EventType of
+       cjTask_Before: jAsyncTask(Obj).AsyncTaskState:= atsBefore;
+       cjTask_Progress: jAsyncTask(Obj).AsyncTaskState:= atsProgress;
+       cjTask_Post: jAsyncTask(Obj).AsyncTaskState:= atsPost ;
+       cjTask_BackGround: jAsyncTask(Obj).AsyncTaskState:= atsInBackground;
+     end;
+     jAsyncTask(Obj).UpdateJNI(gApp);
+     jAsyncTask(Obj).GenEvent_OnAsyncEvent(Obj,EventType,Progress);
+  end
 end;
 
 //------------------------------------------------------------------------------
@@ -2546,7 +2561,6 @@ end;
 
 procedure jEditText.SetText(Value: string);
 begin
-  //FText:= Value;
   inherited SetText(Value);
   if FInitialized then
      jEditText_setText(FjEnv, FjObject , Value);
@@ -2605,8 +2619,8 @@ end;
 //InputMethodManager
 mgr = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
 mgr.hideSoftInputFromWindow(myView.getWindowToken(), 0);
-
 }
+
 // LORDMAN - 2013-07-26
 Procedure jEditText.immShow;
 begin
@@ -2831,6 +2845,31 @@ begin
      jEditText_SetEditable(FjEnv, FjObject, enabled);
 end;
 
+procedure jEditText.SetAcceptSuggestion(_value: boolean);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jEditText_SetAcceptSuggestion(FjEnv, FjObject, _value);
+end;
+
+procedure jEditText.CopyToClipboard();
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jEditText_CopyToClipboard(FjEnv, FjObject);
+end;
+
+procedure jEditText.PasteFromClipboard();
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jEditText_PasteFromClipboard(FjEnv, FjObject);
+end;
+
+procedure jEditText.Clear;
+begin
+  jEditText_setText(FjEnv, FjObject , '');
+end;
 
 //------------------------------------------------------------------------------
 // jButton
@@ -4261,7 +4300,7 @@ end;
 procedure jHttpClient.Init(refApp: jApp);
 begin
   if FInitialized  then Exit;
-  inherited Init(refApp); //set default ViewParent/FjPRLayout as jForm.View!
+  inherited Init(refApp);
   //your code here: set/initialize create params....
   FjObject:= jCreate(); //jSelf !
   FInitialized:= True;
@@ -4278,13 +4317,6 @@ begin
   //in designing component state: set value here...
   if FInitialized then
      jHttpClient_jFree(FjEnv, FjObject);
-end;
-
-function jHttpClient.Get(_stringUrl: string): string;
-begin
-  //in designing component state: result value here...
-  if FInitialized then
-   Result:= jHttpClient_Get(FjEnv, FjObject, _stringUrl);
 end;
 
 procedure jHttpClient.SetAuthenticationUser(_userName: string; _password: string);
@@ -4321,14 +4353,13 @@ begin
    Result:= jHttpClient_Get(FjEnv, FjObject, FUrl);
 end;
 
-(*
-function jHttpClient.Get(location: string): string;
+function jHttpClient.Get(_stringUrl: string): string;
 begin
-  FUrl:= location;
+  //in designing component state: result value here...
   if FInitialized then
-     Result:= jHttp_get(gApp.Jni.jEnv, gApp.Jni.jThis, location);
+      Result:= jHttpClient_Get(FjEnv, FjObject, _stringUrl);
 end;
-*)
+
 
 Procedure jHttpClient.SetUrlByIndex(Value: integer);
 begin
@@ -4342,6 +4373,21 @@ begin
   FIndexUrl:= Value;
   if FInitialized then SetUrlByIndex(Value);
 end;
+
+function jHttpClient.PostNameValueData(_stringUrl: string; _name: string; _value: string): integer;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jHttpClient_PostNameValueData(FjEnv, FjObject, _stringUrl ,_name ,_value);
+end;
+
+function jHttpClient.PostNameValueData(_stringUrl: string; _listNameValue: string): integer;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jHttpClient_PostNameValueData(FjEnv, FjObject, _stringUrl ,_listNameValue);
+end;
+
 
 {jSMTPClient by jmpessoa: warning: not tested!}
 
@@ -7134,7 +7180,7 @@ begin
   inherited Create(AOwner);
   // Init
   FOnAsyncEvent := nil;
-  FjObject       := nil;
+  FjObject:= nil;
   FRunning:= False;
   FAutoPublishProgress:= False;
 end;
@@ -7175,9 +7221,8 @@ begin
   begin
     Self.UpdateJNI(gApp);
     FjObject := jAsyncTask_Create(FjEnv, FjThis, Self);
-    //jAsyncTask_SetAutoPublishProgress(FjEnv, FjObject , FAutoPublishProgress);
+    jAsyncTask_SetAutoPublishProgress(FjEnv, FjObject , FAutoPublishProgress);
     FRunning:= True;
-    Self.UpdateJNI(gApp);
     jAsyncTask_Execute(FjEnv, FjObject );
   end;
 end;
@@ -7185,7 +7230,9 @@ end;
 Procedure jAsyncTask.UpdateUI(Progress : Integer);
 begin
   if FInitialized then
-    jAsyncTask_setProgress(FjEnv, FjObject ,Progress);
+  begin
+     jAsyncTask_setProgress(FjEnv, FjObject ,Progress);
+  end;
 end;
 
 procedure jAsyncTask.SetAutoPublishProgress(Value: boolean);
