@@ -151,6 +151,8 @@ type
     FDefaultBrushColor: TColor;
     FDefaultPenColor: TColor;
     FDefaultFontColor: TColor;
+  protected
+    procedure Notification(AComponent: TComponent; Operation: TOperation); override;
   public
     //needed by the lazarus form editor
     class function CreateMediator(TheOwner, TheForm: TComponent): TDesignerMediator; override;
@@ -310,6 +312,14 @@ begin
   inherited Destroy;
 end;
 
+procedure TAndroidWidgetMediator.Notification(AComponent: TComponent;
+  Operation: TOperation);
+begin
+  inherited Notification(AComponent, Operation);
+  if (Operation = opRemove) and (AComponent = FAndroidForm) then
+    FAndroidForm := nil;
+end;
+
 class function TAndroidWidgetMediator.CreateMediator(TheOwner, TheForm: TComponent): TDesignerMediator;
 var
   Mediator: TAndroidWidgetMediator;
@@ -323,6 +333,7 @@ begin
   Mediator.FDefaultFontColor:= clMedGray;
 
   Mediator.FAndroidForm:= TheForm as jForm;
+  TheForm.FreeNotification(Mediator);
   Mediator.FAndroidForm.Designer:= Mediator;
 end;
 
