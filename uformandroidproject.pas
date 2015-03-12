@@ -5,9 +5,9 @@ unit uFormAndroidProject;
 interface
 
 uses
-  Classes, SysUtils, FileUtil, SynMemo, SynHighlighterJava, SynHighlighterPas, SynEditTypes,
-  Forms, Controls, Graphics, Dialogs, Buttons, ExtCtrls, ComCtrls,
-  ShellCtrls, Menus, Clipbrd, StdCtrls, types,Process, uRegisterForm;
+  Classes, SysUtils, FileUtil, SynMemo, SynHighlighterJava, SynHighlighterPas,
+  SynEditTypes, Forms, Controls, Graphics, Dialogs, Buttons, ExtCtrls, ComCtrls,
+  ShellCtrls, Menus, Clipbrd, types, Process, uRegisterForm;
 
 type
 
@@ -1608,9 +1608,8 @@ begin
       auxList.SaveToFile(auxPath + 'Controls.java');
       auxList.Free;
 
-      ShellTreeView1.Selected:= nil;
-      ShellTreeView1.Selected:= NodeSelected;
-      ShellListView1.Update;
+      ShellListView1.Root := '';
+      ShellListView1.Root := auxPath;
 
       strPack:= TrimChar(strPack,';');
       SplitStr(strPack, ' ');
