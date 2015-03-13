@@ -1103,7 +1103,6 @@ end;
   Function InputTypeToStrEx ( InputType : TInputTypeEx ) : String;
 
   function SplitStr(var theString: string; delimiter: string): string;
-  function ReplaceChar(query: string; oldchar, newchar: char):string;
 
   function GetARGB(customColor: Dword; colbrColor: TARGBColorBridge): DWord;
 
@@ -3789,15 +3788,6 @@ begin
   Mid:= Get_jStaticMethodID(cls, funcName, funcSignature);
   Result:= boolean(gApp.Jni.jEnv^.CallStaticBooleanMethod(gApp.Jni.jEnv, cls, Mid));
   Delete_jLocalRef(cls);
-end;
-
-function ReplaceChar(query: string; oldchar, newchar: char):string;
-begin
-  if query <> '' then
-  begin
-     while Pos(oldchar,query) > 0 do query[pos(oldchar,query)]:= newchar;
-     Result:= query;
-  end;
 end;
 
 //hacked by jmpessoa!! sorry, was for a good cause!
