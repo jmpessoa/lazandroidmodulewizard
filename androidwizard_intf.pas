@@ -1663,7 +1663,7 @@ end;
 function TAndroidProjectDescriptor.InitProject(AProject: TLazProject): TModalResult;
 var
   MainFile: TLazProjectFile;
-  projName, auxStr: string;
+  projName, projDir, auxStr: string;
   sourceList: TStringList;
   auxList: TStringList;
 
@@ -1696,7 +1696,10 @@ begin
 
   projName:= LowerCase(FJavaClassName) + '.lpr';
 
-  MainFile := AProject.CreateProjectFile(projName);
+  projDir := FPathToJNIFolder+DirectorySeparator+'jni'+DirectorySeparator;
+  AProject.ProjectInfoFile := projDir + ChangeFileExt(projName, '.lpi');
+
+  MainFile := AProject.CreateProjectFile(projDir + projName);
   MainFile.IsPartOfProject := True;
   AProject.AddFile(MainFile, False);
   AProject.MainFileID := 0;
@@ -1704,7 +1707,7 @@ begin
   if FModuleType = 0 then
     AProject.AddPackageDependency('tfpandroidbridge_pack'); //GUI controls
 
-  sourceList.Add('{hint: save all files to location: ' +FPathToJNIFolder+DirectorySeparator+'jni }');
+  sourceList.Add('{hint: save all files to location: ' + projDir + ' }');
   sourceList.Add('library '+ LowerCase(FJavaClassName) +'; '+ ' //[by LazAndroidWizard: '+DateTimeToStr(Now)+']');
   sourceList.Add('');
   sourceList.Add('{$mode delphi}');
@@ -2050,6 +2053,7 @@ begin
 
   LazarusIDE.DoNewEditorFile(AndroidFileDescriptor, '', '',
                              [nfIsPartOfProject,nfOpenInEditor,nfCreateDefaultSrc]);
+  LazarusIDE.DoSaveProject([sfSaveAs]);
   Result := mrOK;
 end;
 
