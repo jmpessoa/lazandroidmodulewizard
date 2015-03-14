@@ -38,6 +38,7 @@ jContextMenu = class(jControl)
     function GetMenuItemByIndex(_index: integer): jObject;
     procedure UnCheckAllMenuItem();
     procedure RegisterForContextMenu(_view: jObject);
+    procedure UnRegisterForContextMenu(_View: JObject); 
     function AddItem(_menu: jObject; _itemID: integer; _caption: string; _itemType: TMenuItemType): jObject;
     procedure SetHeader(_menu: jObject; _title: string; _headerIconIdentifier: string);
 
@@ -63,6 +64,7 @@ function jContextMenu_FindMenuItemByID(env: PJNIEnv; _jcontextmenu: JObject; _it
 function jContextMenu_GetMenuItemByIndex(env: PJNIEnv; _jcontextmenu: JObject; _index: integer): jObject;
 procedure jContextMenu_UnCheckAllMenuItem(env: PJNIEnv; _jcontextmenu: JObject);
 procedure jContextMenu_RegisterForContextMenu(env: PJNIEnv; _jcontextmenu: JObject; _view: jObject);
+procedure JContextMenu_UnRegisterForContextMenu(env: PJNIEnv; _JContextMenu: JObject; _View: JObject); 
 function jContextMenu_AddItem(env: PJNIEnv; _jcontextmenu: JObject; _menu: jObject; _itemID: integer; _caption: string; _itemType: integer): jObject;
 procedure jContextMenu_SetHeader(env: PJNIEnv; _jcontextmenu: JObject; _menu: jObject; _title: string; _headerIconIdentifier: string);
 
@@ -182,6 +184,12 @@ begin
   if FInitialized then
      jContextMenu_RegisterForContextMenu(FjEnv, FjObject, _view);
 end;
+
+procedure jContextMenu.UnRegisterForContextMenu(_View: JObject); 
+begin 
+if(FInitialized) then 
+  JContextMenu_UnRegisterForContextMenu(FjEnv, FjObject, _View); 
+end; 
 
 function jContextMenu.AddItem(_menu: jObject; _itemID: integer; _caption: string; _itemType: TMenuItemType): jObject;
 begin
@@ -359,6 +367,17 @@ begin
   env^.CallVoidMethodA(env, _jcontextmenu, jMethod, @jParams);
 end;
 
+procedure JContextMenu_UnRegisterForContextMenu(env: PJNIEnv; _JContextMenu: JObject; _View: JObject); 
+var 
+  JParams: array[0..0] of JValue; 
+  JMethod: JMethodID = nil; 
+  JCls: JClass = nil; 
+begin 
+  JParams[0].l := _View; 
+  JCls := env^.GetObjectClass(env, _JContextMenu); 
+  JMethod := env^.GetMethodID(env, JCls, 'UnRegisterForContextMenu', '(Landroid/view/View;)V'); 
+  env^.CallVoidMethodA(env, _JContextMenu, JMethod, @JParams); 
+end; 
 
 function jContextMenu_AddItem(env: PJNIEnv; _jcontextmenu: JObject; _menu: jObject; _itemID: integer; _caption: string; _itemType: integer): jObject;
 var

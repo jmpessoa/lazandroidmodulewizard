@@ -221,26 +221,40 @@ type
     property Images: TStrings read FImages write SetImages;
   end;
 
+  THttpClientAuthenticationMode = (autNone, autBasic{, autOAuth}); //TODO: autOAuth
   //NEW by jmpessoa
   jHttpClient = class(jControl)
   private
-   FUrl : string;
-   FUrls: TStrings;
-   FIndexUrl: integer;
-   procedure SetIndexUrl(Value: integer);
-   procedure SetUrlByIndex(Value: integer);
-   procedure SetUrls(Value: TStrings);
+    FUrl : string;
+    FUrls: TStrings;
+    FIndexUrl: integer;
+    FAuthenticationMode: THttpClientAuthenticationMode;
+    procedure SetIndexUrl(Value: integer);
+    procedure SetUrlByIndex(Value: integer);
+    procedure SetUrls(Value: TStrings);
   public
-   constructor Create(AOwner: TComponent); override;
-   destructor Destroy; override;
-   procedure Init(refApp: jApp) override;
-   function Get: string; overload;
-   function Get(location: string): string; overload;
-   // Property
-   property Url: string read FUrl;
+    constructor Create(AOwner: TComponent); override;
+    destructor  Destroy; override;
+    procedure Init(refApp: jApp); override;
+    function jCreate(): jObject;
+    procedure jFree();
+
+    function Get(_stringUrl: string): string; overload;
+    function Get: string; overload; overload;
+
+
+    procedure SetAuthenticationUser(_userName: string; _password: string);
+    procedure SetAuthenticationMode(_authenticationMode: THttpClientAuthenticationMode);
+    procedure SetAuthenticationHost(_hostName: string; _port: integer);
+    function  PostNameValueData(_stringUrl: string; _name: string; _value: string): integer; overload;
+    function  PostNameValueData(_stringUrl: string; _listNameValue: string): integer;  overload;
+
+    // Property
+    property Url: string read FUrl;
   published
     property IndexUrl: integer read  FIndexUrl write SetIndexUrl;
     property Urls: TStrings read FUrls write SetUrls;
+    property AuthenticationMode: THttpClientAuthenticationMode read FAuthenticationMode write SetAuthenticationMode;
   end;
 
   //NEW by jmpessoa
@@ -467,6 +481,7 @@ type
 
   jAsyncTask = class(jControl)
   private
+    FAsyncTaskState: TAsyncTaskState;
     FRunning: boolean;
     FOnAsyncEvent : TOnAsyncEvent;
     FAutoPublishProgress: boolean;
@@ -481,6 +496,7 @@ type
     Procedure Execute;
     Procedure UpdateUI(Progress : Integer);
     property Running: boolean read FRunning  write FRunning;
+    property AsyncTaskState: TAsyncTaskState read FAsyncTaskState write FAsyncTaskState;
   published
     // Event
     property  OnAsyncEvent : TOnAsyncEvent read FOnAsyncEvent write FOnAsyncEvent;
@@ -590,6 +606,9 @@ type
     procedure SetParentComponent(Value: TComponent); override;
     Procedure SetText(Value: string ); override;
     Function  GetText: string;   override;
+
+    procedure SetFontFace(AValue: TFontFace); override;
+
     procedure SetTextTypeFace(Value: TTextTypeFace); override;
     procedure SetViewParent(Value: jObject);  override;
     Procedure GenEvent_OnClick(Obj: TObject);
@@ -607,6 +626,9 @@ type
     property BackgroundColor     : TARGBColorBridge read FColor     write SetColor;
     property FontColor : TARGBColorBridge  read FFontColor write SetFontColor;
     property FontSize  : DWord   read FFontSize  write SetFontSize;
+
+    property FontFace: TFontFace read FFontFace write SetFontFace default ffNormal; 
+
     property TextTypeFace: TTextTypeFace read FTextTypeFace write SetTextTypeFace; //by jmpessoa
     // Event - if enabled!
     property OnClick : TOnNotify read FOnClick   write FOnClick;
@@ -616,7 +638,7 @@ type
   private
     FInputTypeEx: TInputTypeEx;
     FHint     : string;
-    FMaxTextLength : DWord;
+    FMaxTextLength : integer;
     FSingleLine: boolean;
     FMaxLines:  DWord;  //visibles lines!
 
@@ -628,6 +650,8 @@ type
     FOnEnter  : TOnNotify;
     FOnChange : TOnChange;
     FOnChanged : TOnChange;
+    FEditable: boolean;
+
 
     Procedure SetVisible  (Value : Boolean);
     Procedure SetColor    (Value : TARGBColorBridge);
@@ -637,7 +661,7 @@ type
     Procedure SetHint     (Value : String );
 
     Procedure SetInputTypeEx(Value : TInputTypeEx);
-    Procedure SetTextMaxLength(Value     : DWord     );
+    Procedure SetTextMaxLength(Value     : integer     );
     Function  GetCursorPos           : TXY;
     Procedure SetCursorPos(Value     : TXY       );
     Procedure SetTextAlignment(Value: TTextAlignment);
@@ -655,6 +679,12 @@ type
     procedure SetParentComponent(Value: TComponent); override;
     Procedure SetText(Value: string ); override;
     Function  GetText: string; override;
+
+    procedure SetFontFace(AValue: TFontFace); override; 
+    procedure SetTextTypeFace(Value: TTextTypeFace); override; 
+    procedure SetEditable(enabled: boolean);
+    procedure SetHintTextColor(Value: TARGBColorBridge); override;
+
     procedure SetViewParent(Value: jObject);  override;
     Procedure GenEvent_OnEnter (Obj: TObject);
     Procedure GenEvent_OnChange(Obj: TObject; txt: string; count : Integer);
@@ -679,6 +709,11 @@ type
 
     procedure Append(_txt: string);
     procedure SetImeOptions(_imeOption: TImeOptions);
+
+    procedure SetAcceptSuggestion(_value: boolean);
+    procedure CopyToClipboard();
+    procedure PasteFromClipboard();
+    procedure Clear;
     // Property
     property CursorPos : TXY        read GetCursorPos  write SetCursorPos;
     //property Scroller: boolean  read FScroller write SetScroller;
@@ -686,17 +721,25 @@ type
     property Text: string read GetText write SetText;
     property Alignment: TTextAlignment read FTextAlignment write SetTextAlignment;
     property InputTypeEx : TInputTypeEx read FInputTypeEx write SetInputTypeEx;
-    property MaxTextLength : DWord read FMaxTextLength write SetTextMaxLength;
+    property MaxTextLength : integer read FMaxTextLength write SetTextMaxLength;
     property BackgroundColor: TARGBColorBridge read FColor write SetColor;
     property FontColor : TARGBColorBridge      read FFontColor    write SetFontColor;
     property FontSize  : DWord      read FFontSize     write SetFontSize;
+
+    property FontFace: TFontFace read FFontFace write SetFontFace default ffNormal; 
+    property TextTypeFace: TTextTypeFace read FTextTypeFace write SetTextTypeFace default tfNormal; 
+
     property Hint      : string     read FHint         write SetHint;
+    property HintTextColor: TARGBColorBridge read FHintTextColor write SetHintTextColor;
+
     //property SingleLine: boolean read FSingleLine write SetSingleLine;
     property ScrollBarStyle: TScrollBarStyle read FScrollBarStyle write SetScrollBarStyle;
     property MaxLines: DWord read FMaxLines write SetMaxLines;
     property HorScrollBar: boolean read FHorizontalScrollBar write SetHorizontalScrollBar;
     property VerScrollBar: boolean read FVerticalScrollBar write SetVerticalScrollBar;
     property WrappingLine: boolean read FWrappingLine write FWrappingLine;
+    property Editable: boolean read FEditable write SetEditable;
+
     // Event
     property OnEnter: TOnNotify  read FOnEnter write FOnEnter;
     property OnChange: TOnChange read FOnChange write FOnChange;
@@ -1010,6 +1053,7 @@ type
    // property View      : jObject   read FjRLayout  write FjRLayout; //self View
     property setItemIndex: TXY write SetItemPosition;
     property Count: integer read GetCount;
+    property HighLightSelectedItem: boolean read FHighLightSelectedItem write SetHighLightSelectedItem;
   published
     property Items: TStrings read FItems write SetItems;
     //property Visible: Boolean   read FVisible   write SetVisible;
@@ -1029,7 +1073,6 @@ type
     property OnClickWidgetItem: TOnClickWidgetItem read FOnClickWidgetItem write FOnClickWidgetItem;
     property OnClickCaptionItem: TOnClickCaptionItem read FOnClickCaptionItem write FOnClickCaptionItem;
 
-    property HighLightSelectedItem: boolean read FHighLightSelectedItem write SetHighLightSelectedItem;
     property HighLightSelectedItemColor: TARGBColorBridge read FHighLightSelectedItemColor write SetHighLightSelectedItemColor;
 
   end;
@@ -1107,6 +1150,7 @@ type
     Procedure Refresh;
     Procedure UpdateLayout; override;
     procedure Init(refApp: jApp);  override;
+
     // Property
     //property Parent: jObject  read  FjPRLayout write SetParent; // Java : Parent Relative Layout
   published
@@ -1140,6 +1184,7 @@ type
     Procedure UpdateLayout; override;
 
     Procedure Navigate(url: string);
+    procedure SetHttpAuthUsernamePassword(_hostName: string; _domain: string; _username: string; _password: string);
     //Property
     //property Parent: jObject  read  FjPRLayout write SetParent; // Java : Parent Relative Layout
   published
@@ -1970,11 +2015,15 @@ begin
   if not Assigned(Obj) then Exit;
   if Obj is jAsyncTask then
   begin
-    jForm(jAsyncTask(Obj).Owner).UpdateJNI(gApp);
-    jAsyncTask(Obj).GenEvent_OnAsyncEvent(Obj,EventType,Progress);
-    Exit;
-  end;
-
+     case EventType of
+       cjTask_Before: jAsyncTask(Obj).AsyncTaskState:= atsBefore;
+       cjTask_Progress: jAsyncTask(Obj).AsyncTaskState:= atsProgress;
+       cjTask_Post: jAsyncTask(Obj).AsyncTaskState:= atsPost ;
+       cjTask_BackGround: jAsyncTask(Obj).AsyncTaskState:= atsInBackground;
+     end;
+     jAsyncTask(Obj).UpdateJNI(gApp);
+     jAsyncTask(Obj).GenEvent_OnAsyncEvent(Obj,EventType,Progress);
+  end
 end;
 
 //------------------------------------------------------------------------------
@@ -1991,7 +2040,10 @@ begin
   inherited Create(AOwner);
   FTextAlignment:= taLeft;
   FText:= '';
+  FFontFace := ffNormal; 
+ 
   FTextTypeFace:= tfNormal;
+ 
   //FFontColor:= colbrDefault; //colbrSilver;
   FMarginLeft   := 5;
   FMarginTop    := 5;
@@ -2118,8 +2170,9 @@ begin
 
   jTextView_setEnabled(FjEnv, FjObject , FEnabled);
 
-  if FTextTypeFace <>  tfNormal then   //TODO: TFontFace=(ffNormal,ffSans,ffSerif,ffMonospace);
-    jTextView_SetTextTypeFace(FjEnv, FjObject, Ord(FTextTypeFace));
+
+  jTextView_setFontAndTextTypeFace(FjEnv, FjObject, Ord(FFontFace), Ord(FTextTypeFace)); 
+
 
   View_SetVisible(FjEnv, FjThis, FjObject , FVisible);
 
@@ -2181,11 +2234,23 @@ begin
     jTextView_setTextSize(FjEnv, FjObject , FFontSize);
 end;
 
+procedure jTextView.SetFontFace(AValue: TFontFace); 
+begin 
+ inherited SetFontFace(AValue); 
+ if(FInitialized) then 
+   jTextView_setFontAndTextTypeFace(FjEnv, FjObject, Ord(FFontFace), Ord(FTextTypeFace)); 
+end;
+
 procedure jTextView.SetTextTypeFace(Value: TTextTypeFace);
 begin
   inherited SetTextTypeFace(Value);
-  if FInitialized  then
-    jTextView_SetTextTypeFace(FjEnv, FjObject, Ord(Value));
+
+{  if FInitialized  then
+    jTextView_SetTextTypeFace(FjEnv, FjObject, Ord(Value));}
+
+  if(FInitialized) then 
+    jTextView_setFontAndTextTypeFace(FjEnv, FjObject, Ord(FFontFace), Ord(FTextTypeFace)); 
+
 end;
 
 procedure jTextView.UpdateLParamWidth;
@@ -2285,7 +2350,7 @@ begin
   FOnChange  := nil;
   FInputTypeEx := itxText;
   FHint      := '';
-  FMaxTextLength := 300;
+  FMaxTextLength := -1; //300;
   FSingleLine:= True;
   FMaxLines:= 1;
 
@@ -2302,7 +2367,7 @@ begin
 
   FLParamWidth  := lpHalfOfParent;
   FLParamHeight := lpWrapContent;
-
+  FEditable:= True;
 end;
 
 procedure jEditText.SetParentComponent(Value: TComponent);
@@ -2393,6 +2458,8 @@ begin
 
   jEditText_setLayoutAll(FjEnv, FjObject , Self.AnchorId);
 
+  jEditText_setFontAndTextTypeFace(FjEnv, FjObject, Ord(FFontFace), Ord(FTextTypeFace));
+
   if  FHint <> '' then
     jEditText_setHint(FjEnv, FjObject , FHint);
 
@@ -2406,7 +2473,8 @@ begin
   jEditText_setTextAlignment(FjEnv, FjObject , Ord(FTextAlignment));
 
   //
-  jEditText_maxLength(FjEnv, FjObject , FMaxTextLength);
+  if FMaxTextLength >= 0 then
+    jEditText_maxLength(FjEnv, FjObject , FMaxTextLength);
 
   jEditText_setScroller(FjEnv, FjObject );
 
@@ -2446,6 +2514,11 @@ begin
 
   if  FText <> '' then
     jEditText_setText(FjEnv, FjObject , FText);
+
+  if FEditable = False then
+     jEditText_SetEditable(FjEnv, FjObject, FEditable);
+
+  jEditText_setHintTextColor(FjEnv, FjObject, GetARGB(FCustomColor, FHintTextColor));
 
   jEditText_DispatchOnChangeEvent(FjEnv, FjObject , True);
   jEditText_DispatchOnChangedEvent(FjEnv, FjObject , True);
@@ -2488,7 +2561,6 @@ end;
 
 procedure jEditText.SetText(Value: string);
 begin
-  //FText:= Value;
   inherited SetText(Value);
   if FInitialized then
      jEditText_setText(FjEnv, FjObject , Value);
@@ -2506,6 +2578,27 @@ begin
   FFontSize:= Value;
   if FInitialized and (FFontSize > 0) then
      jEditText_setTextSize(FjEnv, FjObject , FFontSize);
+end;
+
+procedure jEditText.SetFontFace(AValue: TFontFace); 
+begin 
+  inherited SetFontFace(AValue); 
+  if(FInitialized) then 
+   jEditText_setFontAndTextTypeFace(FjEnv, FjObject, Ord(FFontFace), Ord(FTextTypeFace)); 
+end; 
+
+procedure jEditText.SetTextTypeFace(Value: TTextTypeFace); 
+begin 
+ inherited SetTextTypeFace(Value); 	 
+ if(FInitialized) then 
+   jEditText_setFontAndTextTypeFace(FjEnv, FjObject, Ord(FFontFace), Ord(FTextTypeFace)); 
+end; 
+
+procedure jEditText.SetHintTextColor(Value: TARGBColorBridge);
+begin
+ inherited SetHintTextColor(Value);
+ if(FInitialized) then
+   jEditText_setHintTextColor(FjEnv, FjObject, GetARGB(FCustomColor, Value));
 end;
 
 Procedure jEditText.SetHint(Value : String);
@@ -2526,8 +2619,8 @@ end;
 //InputMethodManager
 mgr = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
 mgr.hideSoftInputFromWindow(myView.getWindowToken(), 0);
-
 }
+
 // LORDMAN - 2013-07-26
 Procedure jEditText.immShow;
 begin
@@ -2551,11 +2644,12 @@ begin
 end;
 
 // LORDMAN - 2013-07-26
-Procedure jEditText.SetTextMaxLength(Value: DWord);
+Procedure jEditText.SetTextMaxLength(Value: integer);
 begin
   FMaxTextLength:= Value;
+  if FMaxTextLength < -1 then  FMaxTextLength:= -1; // reset/default: no limited !!
   if FInitialized then
-     jEditText_maxLength(FjEnv, FjObject , Value);
+        jEditText_maxLength(FjEnv, FjObject , FMaxTextLength);
 end;
 
 //by jmpessoa
@@ -2741,6 +2835,40 @@ begin
   //in designing component state: set value here...
   if FInitialized then
      jEditText_SetImeOptions(FjEnv, FjObject, Ord(_imeOption));
+end;
+
+procedure jEditText.SetEditable(enabled: boolean);
+begin
+  //in designing component state: set value here...
+  FEditable:= enabled;
+  if FInitialized then
+     jEditText_SetEditable(FjEnv, FjObject, enabled);
+end;
+
+procedure jEditText.SetAcceptSuggestion(_value: boolean);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jEditText_SetAcceptSuggestion(FjEnv, FjObject, _value);
+end;
+
+procedure jEditText.CopyToClipboard();
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jEditText_CopyToClipboard(FjEnv, FjObject);
+end;
+
+procedure jEditText.PasteFromClipboard();
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jEditText_PasteFromClipboard(FjEnv, FjObject);
+end;
+
+procedure jEditText.Clear;
+begin
+  jEditText_setText(FjEnv, FjObject , '');
 end;
 
 //------------------------------------------------------------------------------
@@ -4141,32 +4269,77 @@ begin
    //TODO
 end;
 
-{jHttpClient}
+
+{---------  jHttpClient  --------------}
+
 constructor jHttpClient.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
-  // Init
+//your code here....
   FUrls:= TStringList.Create;
   FUrl:= '';
   FIndexUrl:= -1;
+  FAuthenticationMode:= autNone;
 end;
 
 destructor jHttpClient.Destroy;
 begin
- if not (csDesigning in ComponentState) then
- begin
-  //
- end;
- FUrls.Free;
- inherited Destroy;
+  if not (csDesigning in ComponentState) then
+  begin
+     if FjObject <> nil then
+     begin
+       jFree();
+       FjObject:= nil;
+     end;
+  end;
+  //you others free code here...'
+  FUrls.Free;
+  inherited Destroy;
 end;
 
 procedure jHttpClient.Init(refApp: jApp);
 begin
- if FInitialized  then Exit;
- inherited Init(refApp);
- SetUrlByIndex(FIndexUrl);
- FInitialized:= True;
+  if FInitialized  then Exit;
+  inherited Init(refApp);
+  //your code here: set/initialize create params....
+  FjObject:= jCreate(); //jSelf !
+  FInitialized:= True;
+  SetUrlByIndex(FIndexUrl);
+end;
+
+function jHttpClient.jCreate(): jObject;
+begin
+   Result:= jHttpClient_jCreate(FjEnv, int64(Self), FjThis);
+end;
+
+procedure jHttpClient.jFree();
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jHttpClient_jFree(FjEnv, FjObject);
+end;
+
+procedure jHttpClient.SetAuthenticationUser(_userName: string; _password: string);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jHttpClient_SetAuthenticationUser(FjEnv, FjObject, _userName ,_password);
+end;
+
+procedure jHttpClient.SetAuthenticationMode(_authenticationMode: THttpClientAuthenticationMode);
+begin
+  //in designing component state: set value here...
+  FAuthenticationMode:= _authenticationMode;
+  if FInitialized then
+     jHttpClient_SetAuthenticationMode(FjEnv, FjObject, Ord(_authenticationMode));
+end;
+
+
+procedure jHttpClient.SetAuthenticationHost(_hostName: string; _port: integer);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jHttpClient_SetAuthenticationHost(FjEnv, FjObject, _hostName ,_port);
 end;
 
 procedure jHttpClient.SetUrls(Value: TStrings);
@@ -4177,15 +4350,16 @@ end;
 function jHttpClient.Get: string;
 begin
  if FInitialized then
-   Result:= jHttp_get(gApp.Jni.jEnv, gApp.Jni.jThis, FUrl);
+   Result:= jHttpClient_Get(FjEnv, FjObject, FUrl);
 end;
 
-function jHttpClient.Get(location: string): string;
+function jHttpClient.Get(_stringUrl: string): string;
 begin
-  FUrl:= location;
+  //in designing component state: result value here...
   if FInitialized then
-     Result:= jHttp_get(gApp.Jni.jEnv, gApp.Jni.jThis, location);
+      Result:= jHttpClient_Get(FjEnv, FjObject, _stringUrl);
 end;
+
 
 Procedure jHttpClient.SetUrlByIndex(Value: integer);
 begin
@@ -4199,6 +4373,21 @@ begin
   FIndexUrl:= Value;
   if FInitialized then SetUrlByIndex(Value);
 end;
+
+function jHttpClient.PostNameValueData(_stringUrl: string; _name: string; _value: string): integer;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jHttpClient_PostNameValueData(FjEnv, FjObject, _stringUrl ,_name ,_value);
+end;
+
+function jHttpClient.PostNameValueData(_stringUrl: string; _listNameValue: string): integer;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jHttpClient_PostNameValueData(FjEnv, FjObject, _stringUrl ,_listNameValue);
+end;
+
 
 {jSMTPClient by jmpessoa: warning: not tested!}
 
@@ -4452,8 +4641,8 @@ begin
   FLParamWidth:= lpMatchParent;
   FLParamHeight:= lpWrapContent;
 
-  FHighLightSelectedItem:= True;
-  FHighLightSelectedItemColor:= colbrRed;
+  FHighLightSelectedItem:= False;
+  FHighLightSelectedItemColor:= colbrDefault;
 
 end;
 
@@ -4491,15 +4680,13 @@ var
 begin
   if FInitialized  then Exit;
   inherited Init(refApp);
-
-  //if Self.Items.Count = 0 then Self.Items.Add('------Select------');  Items//FWidgetItem:= wgNone;
-
   if FImageItem <> nil then
   begin
      FImageItem.Init(refApp);
      FjObject := jListView_Create2(FjEnv, FjThis, Self,
                                Ord(FWidgetItem), FWidgetText, FImageItem.GetJavaBitmap,
                                Ord(FTextDecorated),Ord(FItemLayout), Ord(FTextSizeDecorated), Ord(FTextAlign));
+
     if FFontColor <> colbrDefault then
        jListView_setTextColor(FjEnv, FjObject , GetARGB(FCustomColor, FFontColor));
 
@@ -4520,6 +4707,7 @@ begin
      FjObject := jListView_Create3(FjEnv, FjThis, Self,
                                Ord(FWidgetItem), FWidgetText,
                                Ord(FTextDecorated),Ord(FItemLayout), Ord(FTextSizeDecorated), Ord(FTextAlign));
+
      if FFontColor <> colbrDefault then
         jListView_setTextColor(FjEnv, FjObject , GetARGB(FCustomColor, FFontColor));
 
@@ -4587,8 +4775,11 @@ begin
 
   View_SetVisible(FjEnv, FjThis, FjObject , FVisible);
 
-  Self.SetHighLightSelectedItem(FHighLightSelectedItem);
-  Self.SetHighLightSelectedItemColor(FHighLightSelectedItemColor);
+  if FHighLightSelectedItemColor <> colbrDefault then
+  begin
+    Self.SetHighLightSelectedItem(True);
+    Self.SetHighLightSelectedItemColor(FHighLightSelectedItemColor);
+  end;
 
 end;
 
@@ -4596,7 +4787,7 @@ procedure jListView.SetWidget(Value: TWidgetItem);
 begin
   FWidgetItem:= Value;
   //if FInitialized then
-  //jListView_setHasWidgetItem(FjEnv, FjObject , ord(FHasWidgetItem));
+  //jListView_setHasWidgetItem(FjEnv, FjObject , Ord(FHasWidgetItem));
 end;
 
 procedure jListView.SetWidgetByIndex(Value: TWidgetItem; index: integer);
@@ -5648,10 +5839,8 @@ end;
 
 procedure jWebView.SetZoomControl(Value: Boolean);
 begin
-
   if(Value <> FZoomControl) then
   begin
-
     FZoomControl := Value;
     if FInitialized then jWebView_SetZoomControl(FjEnv, FjObject, FZoomControl);
   end;
@@ -5718,6 +5907,14 @@ begin
     UpdateLParamHeight;
     jWebView_setLayoutAll(FjEnv, FjObject , Self.AnchorId);
   end;
+end;
+
+
+procedure jWebView.SetHttpAuthUsernamePassword(_hostName: string; _domain: string; _username: string; _password: string);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jWebView_SetHttpAuthUsernamePassword(FjEnv, FjObject, _hostName ,_domain ,_username ,_password);
 end;
 
 //------------------------------------------------------------------------------
@@ -6983,7 +7180,7 @@ begin
   inherited Create(AOwner);
   // Init
   FOnAsyncEvent := nil;
-  FjObject       := nil;
+  FjObject:= nil;
   FRunning:= False;
   FAutoPublishProgress:= False;
 end;
@@ -7025,8 +7222,8 @@ begin
     Self.UpdateJNI(gApp);
     FjObject := jAsyncTask_Create(FjEnv, FjThis, Self);
     jAsyncTask_SetAutoPublishProgress(FjEnv, FjObject , FAutoPublishProgress);
-    jAsyncTask_Execute(FjEnv, FjObject );
     FRunning:= True;
+    jAsyncTask_Execute(FjEnv, FjObject );
   end;
 end;
 
@@ -7034,7 +7231,7 @@ Procedure jAsyncTask.UpdateUI(Progress : Integer);
 begin
   if FInitialized then
   begin
-    jAsyncTask_setProgress(FjEnv, FjObject ,Progress);
+     jAsyncTask_setProgress(FjEnv, FjObject ,Progress);
   end;
 end;
 
@@ -7042,12 +7239,10 @@ procedure jAsyncTask.SetAutoPublishProgress(Value: boolean);
 begin
   FAutoPublishProgress:= Value;
   if FInitialized then
-  begin
-    jAsyncTask_SetAutoPublishProgress(FjEnv, FjObject , Value);
-  end;
+     jAsyncTask_SetAutoPublishProgress(FjEnv, FjObject , Value);
 end;
 
-Procedure jAsyncTask.GenEvent_OnAsyncEvent(Obj: TObject;EventType, Progress:Integer);
+Procedure jAsyncTask.GenEvent_OnAsyncEvent(Obj: TObject; EventType, Progress:Integer);
 begin
   if Assigned(FOnAsyncEvent) then FOnAsyncEvent(Obj,EventType,Progress);
 end;

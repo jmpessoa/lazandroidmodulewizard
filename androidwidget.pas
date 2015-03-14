@@ -256,6 +256,8 @@ const
 
 type
 
+ TAsyncTaskState = (atsBefore, atsProgress, atsPost, atsInBackground);
+
  TImageScaleType = (scaleCenter, scaleCenterCrop, scaleCenterInside, scaleFitCenter,
                 scaleFitEnd, scaleFitStart, scaleFitXY, scaleMatrix);
 
@@ -399,6 +401,7 @@ type
                     ClickNo);
 
   TInputType     = (itText,
+                    itCapCharacters,
                     itNumber,
                     itPhone,
                     itPassNumber,
@@ -406,6 +409,7 @@ type
                     itMultiLine);
   //by jmpessoa
   TInputTypeEx  =(  itxText,
+                    itxCapCharacters,
                     itxNumber,
                     itxPhone,
                     itxNumberPassword,
@@ -647,18 +651,18 @@ type
   private
     FInitialized : boolean;
     FAppName     : string;
-    FClassName   : string;
+    FjClassName   : string;
     FForm        : jForm;       // Main/Initial Form
     //
     Procedure SetAppName  (Value : String);
-    Procedure SetClassName(Value : String);
+    Procedure SetjClassName(Value : String);
   protected
     //
   public
     Jni           : TEnvJni;
     Path          : TEnvPath;
     Screen        : TEnvScreen;
-    Device        : TEnvDevice;
+    //Device        : TEnvDevice;
     Forms         : TjForms;     // Form Stack
     Lock          : Boolean;     //
     Orientation   : integer;   //orientation on app start....
@@ -698,7 +702,7 @@ type
     property Initialized : boolean read FInitialized;
     property Form: jForm read FForm write FForm; // Main Form
     property AppName    : string     read FAppName    write SetAppName;
-    property ClassName  : string     read FClassName  write SetClassName;
+    property ClassName  : string     read FjClassName  write SetjClassName;
   end;
 
  {jControl by jmpessoa}
@@ -707,11 +711,11 @@ type
   protected
     FjClass: jObject;
     FClassPath: string; //need by new pure jni model! -->> initialized by widget.Create
-    FjObject      : jObject; //jSelf
+    FjObject      : jObject; //jSelf - java object
     FEnabled     : boolean;
     FInitialized : boolean;
     FjEnv: PJNIEnv;
-    FjThis: jObject;
+    FjThis: jObject;  //java class Controls\libcontrols
     FCustomColor: DWord;
     procedure SetEnabled(Value: boolean);
   public
@@ -721,6 +725,8 @@ type
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
     procedure Init(refApp: jApp); virtual;
+    procedure AttachCurrentThread();  overload;
+    procedure AttachCurrentThread(env: PJNIEnv); overload;
     property jSelf: jObject read FjObject ;
   end;
 
@@ -968,6 +974,10 @@ type
     function GetQuantityStringByName(_resName: string; _quantity: integer): string;
     function GetStringResourceByName(_resName: string): string;
 
+    //needed: <uses-permission android:name="android.permission.READ_PHONE_STATE"/>
+    function GetDevicePhoneNumber: String;
+    function GetDeviceID: String;
+
     // Property
     property View         : jObject        read FjRLayout {GetView } write FjRLayout;
     property ScreenStyle  : TScreenStyle   read FScreenStyle    write FScreenStyle;
@@ -1034,6 +1044,7 @@ type
     FOrientation : integer;
     FTextAlignment: TTextAlignment;
     FFontSize     : DWord;
+    FFontFace: TFontFace;
     FTextTypeFace: TTextTypeFace;
     FAnchorId     : integer;
     FAnchor       : jVisualControl;  //http://www.semurjengkol.com/android-relative-layout-example/
@@ -1042,6 +1053,7 @@ type
     //FGravity      : TGravitySet;    TODO: by jmpessoa  - java "setGravity"
     FLParamWidth: TLayoutParams;
     FLParamHeight: TLayoutParams;
+    FHintTextColor: TARGBColorBridge;
 
     FOnClick: TOnNotify;
     procedure SetAnchor(Value: jVisualControl);
@@ -1058,6 +1070,8 @@ type
     procedure SetParamHeight(Value: TLayoutParams);
     procedure SetParamWidth(Value: TLayoutParams);
     procedure SetTextTypeFace(Value: TTextTypeFace); virtual;
+    procedure SetFontFace(AValue: TFontFace); virtual;
+    procedure SetHintTextColor(Value: TARGBColorBridge); virtual;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -1069,7 +1083,9 @@ type
     property ViewParent {ViewParent}: jObject  read  GetViewParent write SetViewParent; // Java : Parent Relative Layout
     property View: jObject read GetView write SetView; // Java : Self View/Layout
     property Id: DWord read FId write FId;
+    property FontFace: TFontFace read FFontFace write SetFontFace;
     property TextTypeFace: TTextTypeFace read FTextTypeFace write SetTextTypeFace;
+    property HintTextColor: TARGBColorBridge read FHintTextColor write SetHintTextColor;
   published
     property Visible: boolean read FVisible write FVisible;
     property Anchor  : jVisualControl read FAnchor write SetAnchor;
@@ -1087,7 +1103,6 @@ end;
   Function InputTypeToStrEx ( InputType : TInputTypeEx ) : String;
 
   function SplitStr(var theString: string; delimiter: string): string;
-  function ReplaceChar(query: string; oldchar, newchar: char):string;
 
   function GetARGB(customColor: Dword; colbrColor: TARGBColorBridge): DWord;
 
@@ -1207,6 +1222,8 @@ procedure Call_jCallStaticVoidMethodA(fullClassName: string; funcName: string; f
 //Please, use jForm_getDateTime...
 Function jApp_GetControlsVersionFeatures          (env:PJNIEnv;this:jobject): String;
 
+function jApp_GetAssetContentList(env: PJNIEnv; this: JObject; Path: string): TDynArrayOfString;
+
 Procedure jApp_Finish                  (env:PJNIEnv;this:jobject);
 
 //by jmpessoa
@@ -1324,6 +1341,8 @@ Procedure VHandler_touchesEnded_withEvent(Sender         : TObject;
                                           Var TouchUp    : TOnTouchEvent;
                                           Var Mouches    : TMouches);
 
+  procedure jForm_ShowMessageAsync(env:PJNIEnv; Form:jObject; msg: string);
+
 var
   gApp:       jApp;       //global App !
   gVM         : PJavaVM;
@@ -1368,6 +1387,7 @@ Function InputTypeToStr ( InputType : TInputType ) : String;
   Result := 'TEXT';
   Case InputType of
    itText       : Result := 'TEXT';
+   itCapCharacters: Result := 'CAPCHARACTERS'; 
    itNumber     : Result := 'NUMBER';
    itPhone      : Result := 'PHONE';
    itPassNumber : Result := 'PASSNUMBER';
@@ -1580,6 +1600,16 @@ procedure jControl.UpdateJNI(refApp: jApp);
 begin
   FjEnv:= refApp.Jni.jEnv;
   FjThis:= refApp.Jni.jThis;;
+end;
+
+procedure jControl.AttachCurrentThread();
+begin
+  gVM^.AttachCurrentThread(gVm,@FjEnv,nil);
+end;
+
+procedure jControl.AttachCurrentThread(env: PJNIEnv);
+begin
+  gVM^.AttachCurrentThread(gVm,@env,nil);
 end;
 
 
@@ -1831,6 +1861,7 @@ inherited Create(AOwner);
   //FGravity:=[];      TODO!
   FPositionRelativeToAnchor:= [];
   FPositionRelativeToParent:= [];
+  FHintTextColor:= colbrSilver;
 end;
 
 //
@@ -1952,6 +1983,16 @@ end;
 procedure jVisualControl.SetTextTypeFace(Value: TTextTypeFace);
 begin
   FTextTypeFace:= Value;
+end;
+
+procedure jVisualControl.SetFontFace(AValue: TFontFace);
+begin
+  FFontFace := AValue;
+end;
+
+procedure jVisualControl.SetHintTextColor(Value: TARGBColorBridge);
+begin
+  FHintTextColor:= Value;
 end;
 
   { TAndroidForm }
@@ -2556,6 +2597,18 @@ begin
    Result:= jForm_GetStringResourceByName(FjEnv, FjObject, _resName);
 end;
 
+function jForm.GetDevicePhoneNumber: String;
+begin
+   if FInitialized then
+     Result:= jSysInfo_DevicePhoneNumber(FjEnv, gApp.Jni.jThis);
+end;
+
+function jForm.GetDeviceID: String;
+begin
+   if FInitialized then
+      Result:= jSysInfo_DeviceID(FjEnv, gApp.Jni.jThis);
+end;
+
 {-------- jForm_JNI_Bridge ----------}
 
 function jForm_GetStringExtra(env: PJNIEnv; _jform: JObject; data: jObject; extraName: string): string;
@@ -3004,7 +3057,7 @@ begin
   inherited Create(AOwner);
   //
   FAppName         := ''; //gjAppName;
-  FClassName       := ''; //gjClassName;
+  FjClassName       := ''; //gjClassName;
   FillChar(Forms,SizeOf(Forms),#0);
   //
   Jni.jEnv         := nil;
@@ -3026,8 +3079,8 @@ begin
   //
   FForm            := nil;
   StopOnException  :=True;
-  Device.PhoneNumber := '';
-  Device.ID          := '';
+  //Device.PhoneNumber := '';
+  //Device.ID          := '';
   FInitialized     := False;
   Forms.Index      := 0; //dummy
   TopIndex:= 0;
@@ -3051,7 +3104,7 @@ begin
   Jni.jEnv      := env;  //a reference to the JNI environment
 
   //[by jmpessoa: for API > 13 "STALED"!!! do not use its!
-  Jni.jThis     := this; //[controls lib]a reference to the object making this call (or class if static).
+  Jni.jThis     := this; //["libcontrols.so"] a reference to the object making this call (or class if static).
   Jni.jActivity := activity;
   Jni.jRLayout  := layout;
 
@@ -3081,8 +3134,8 @@ begin
       end;
   end;
   // Phone
-  Device.PhoneNumber := jSysInfo_DevicePhoneNumber(env, this);
-  Device.ID          := jSysInfo_DeviceID(env, this);
+  //Device.PhoneNumber := jSysInfo_DevicePhoneNumber(env, this);
+  //Device.ID          := jSysInfo_DeviceID(env, this);
   FInitialized       := True;
 end;
 
@@ -3126,9 +3179,9 @@ begin
   FAppName:= Value;
 end;
 
-Procedure jApp.SetClassName(Value : String);
+Procedure jApp.SetjClassName(Value : String);
 begin
-  FClassName:= Value;
+  FjClassName:= Value;
 end;
 
 Procedure jApp.Finish;
@@ -3179,6 +3232,7 @@ Function InputTypeToStrEx ( InputType : TInputTypeEx ) : String;
   Result := 'TEXT';
   Case InputType of
    itxText       : Result := 'TEXT';
+   itxCapCharacters: Result := 'CAPCHARACTERS'; 
    itxNumber     : Result := 'NUMBER';
    itxPhone      : Result := 'PHONE';
    itxNumberPassword : Result := 'PASSNUMBER';
@@ -3736,15 +3790,6 @@ begin
   Delete_jLocalRef(cls);
 end;
 
-function ReplaceChar(query: string; oldchar, newchar: char):string;
-begin
-  if query <> '' then
-  begin
-     while Pos(oldchar,query) > 0 do query[pos(oldchar,query)]:= newchar;
-     Result:= query;
-  end;
-end;
-
 //hacked by jmpessoa!! sorry, was for a good cause!
 //please, use the  jForm_GetDateTime!!
 //return GetControlsVersionFeatures ... "6$4=GetControlsVersionInfo;6$4=getLocale"
@@ -3766,6 +3811,40 @@ begin
           end;
   end;
 end;
+
+function jApp_GetAssetContentList(env: PJNIEnv; this: JObject; Path: string): TDynArrayOfString; 
+var 
+JCls: JClass = nil; 
+JMethod: JMethodID = nil; 
+DataArray: JObject; 
+JParams: array[0..0] of JValue; 
+StrX: JString; 
+ResB: JBoolean; 
+SizeArr, i: Integer; 
+begin  
+  JCls := env^.GetObjectClass(env, this); 
+  JParams[0].l := env^.NewStringUTF(env, PChar(Path)); 
+  JMethod := env^.GetMethodID(env, JCls, 'getAssetContentList', '(Ljava/lang/String;)[Ljava/lang/String;'); 
+  DataArray := env^.CallObjectMethodA(env, this, JMethod, @JParams); 
+  if(DataArray <> nil) then 
+  begin 
+    SizeArr := env^.GetArrayLength(env, DataArray); 
+    SetLength(Result, SizeArr); 
+    for i := 0 to SizeArr - 1 do 
+    begin 
+      StrX := env^.GetObjectArrayElement(env, DataArray, i); 
+      case StrX = nil of 
+         True: Result[i] := ''; 
+         False: 
+ 	 begin 
+           ResB := JNI_False; 
+           Result[i] := string(env^.GetStringUTFChars(env, StrX, @ResB)); 
+ 	 end; 
+       end; 
+    end; 
+  end; 
+end;
+
 
 Procedure jApp_Finish(env:PJNIEnv;this:jobject);
 Const
@@ -4063,6 +4142,23 @@ var
    method: jmethodID;
     _jParams : Array[0..0] of jValue;
 begin
+ _jParams[0].l:= env^.NewStringUTF(env, pchar(msg) );
+  cls := env^.GetObjectClass(env, Form);
+  method:= env^.GetMethodID(env, cls, 'ShowMessage', '(Ljava/lang/String;)V');
+  env^.CallVoidMethodA(env, Form, method,@_jParams);
+  env^.DeleteLocalRef(env,_jParams[0].l);
+end;
+
+
+//by jmpessoa
+
+procedure jForm_ShowMessageAsync(env:PJNIEnv; Form:jObject; msg: string);
+var
+   cls: jClass;
+   method: jmethodID;
+    _jParams : Array[0..0] of jValue;
+begin
+ gVM^.AttachCurrentThread(gVm,@env,nil); //fix here!
  _jParams[0].l:= env^.NewStringUTF(env, pchar(msg) );
   cls := env^.GetObjectClass(env, Form);
   method:= env^.GetMethodID(env, cls, 'ShowMessage', '(Ljava/lang/String;)V');

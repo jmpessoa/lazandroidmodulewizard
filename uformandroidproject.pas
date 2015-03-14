@@ -5,9 +5,9 @@ unit uFormAndroidProject;
 interface
 
 uses
-  Classes, SysUtils, FileUtil, SynMemo, SynHighlighterJava, SynHighlighterPas, SynEditTypes,
-  Forms, Controls, Graphics, Dialogs, Buttons, ExtCtrls, ComCtrls,
-  ShellCtrls, Menus, Clipbrd, StdCtrls, types,Process, uRegisterForm;
+  Classes, SysUtils, FileUtil, SynMemo, SynHighlighterJava, SynHighlighterPas,
+  SynEditTypes, Forms, Controls, Graphics, Dialogs, Buttons, ExtCtrls, ComCtrls,
+  ShellCtrls, Menus, Clipbrd, types, Process, uRegisterForm;
 
 type
 
@@ -18,6 +18,7 @@ type
   TFormAndroidProject = class(TForm)
     BitBtn1: TBitBtn;
     BitBtn2: TBitBtn;
+    Image1: TImage;
     ImageList1: TImageList;
     MainMenu1: TMainMenu;
     MenuItem1: TMenuItem;
@@ -162,7 +163,6 @@ var
   FormAndroidProject: TFormAndroidProject;
 
 function TrimChar(query: string; delimiter: char): string;
-function ReplaceChar(query: string; oldchar, newchar: char):string;
 function SplitStr(var theString: string; delimiter: string): string;
 function LastPos(delimiter: string; str: string): integer;
 function DeleteLineBreaks(const S: string): string;
@@ -382,7 +382,7 @@ begin
          if Pos('.', jType) > 0 then
          begin
             auxStr:= jType;
-            Result:= 'L'+ ReplaceChar(auxStr,'.','/')+';';
+            Result:= 'L'+StringReplace(auxStr,'.','/',[rfReplaceAll])+';';
          end
     else if Pos('String', jType) > 0 then
     begin
@@ -473,7 +473,7 @@ var
   k, count: integer;
   auxParam: string;
 begin
-  auxParam:= ReplaceChar(Trim(funcParam),' ','~');
+  auxParam:= StringReplace(Trim(funcParam),' ','~',[rfReplaceAll]);
   paramList:= TStringList.Create;
   if Pos(',', auxParam) > 0 then
   begin
@@ -1106,7 +1106,7 @@ var
   auxParam: string;
 begin
   Result:='(';
-  auxParam:= ReplaceChar(Trim(params),' ','~');
+  auxParam:= StringReplace(Trim(params),' ','~',[rfReplaceAll]);
   paramList:= TStringList.Create;
   if Pos(',', auxParam) > 0 then
   begin
@@ -1298,7 +1298,7 @@ begin
       strOnLoadList.Add('  end;');
       strOnLoadList.Add('end;');
       strOnLoadList.Add(' ');
-      PathToClassName:= ReplaceChar(auxPathJNI, '_', '/');
+      PathToClassName:= StringReplace(auxPathJNI, '_', '/',[rfReplaceAll]);
       strOnLoadList.Add('function RegisterNativeMethods(PEnv: PJNIEnv; className: PChar): integer;');
       strOnLoadList.Add('begin');
       strOnLoadList.Add('  Result:= RegisterNativeMethodsArray(PEnv, className, @NativeMethods[0], Length(NativeMethods));');
@@ -1317,13 +1317,15 @@ begin
       strOnLoadList.Add('  begin');
       strOnLoadList.Add('     curEnv:= PJNIEnv(PEnv);');
       strOnLoadList.Add('     RegisterNativeMethods(curEnv, '''+PathToClassName+''');');
-      if FModuleType = 1 then
+
+      if FModuleType = 1 then //NoGUI
       begin
-        strOnLoadList.Add('     gPDalvikVM:= VM;{PJavaVM}{unit1}');
-        strOnLoadList.Add('     gjClassPath:= '''+PathToClassName+''';{unit1}');
-        strOnLoadList.Add('     gjClass:= (curEnv^).FindClass(curEnv, '''+PathToClassName+''');{unit1}');
-        strOnLoadList.Add('     gjClass:= (curEnv^).NewGlobalRef(curEnv, gjClass);{unit1}');
+        strOnLoadList.Add('     gNoGUIPDalvikVM:= VM;{PJavaVM}');
+        strOnLoadList.Add('     gNoGUIjClassPath:= '''+PathToClassName+''';');
+        strOnLoadList.Add('     gNoGUIjClass:= (curEnv^).FindClass(curEnv, '''+PathToClassName+''');');
+        strOnLoadList.Add('     gNoGUIjClass:= (curEnv^).NewGlobalRef(curEnv, gNoGUIjClass);');
       end;
+
       strOnLoadList.Add('  end;');
       if FModuleType = 0 then
       begin
@@ -1343,26 +1345,38 @@ begin
       strOnLoadList.Add('  begin');
       strOnLoadList.Add('    curEnv:= PJNIEnv(PEnv);');
 
-      if FModuleType = 1 then
+      if FModuleType = 1 then  //Not Android Bridges  Controls...
       begin
-      strOnLoadList.Add('    (curEnv^).UnregisterNatives(curEnv, gjClass{unit1});');
-      strOnLoadList.Add('    (curEnv^).DeleteGlobalRef(curEnv, gjClass{unit1});');
-      strOnLoadList.Add('    gjClass:= nil;');
-      strOnLoadList.Add('    gPDalvikVM:= nil;');
+      //strOnLoadList.Add('    (curEnv^).UnregisterNatives(curEnv, gNoGUIjClass);');
+      strOnLoadList.Add('    (curEnv^).DeleteGlobalRef(curEnv, gNoGUIjClass);');
+      strOnLoadList.Add('    gNoGUIjClass:= nil;');
+      strOnLoadList.Add('    gNoGUIPDalvikVM:= nil;');
       end;
+
       if FModuleType = 0 then
       begin
-        strOnLoadList.Add('    (curEnv^).DeleteGlobalRef(curEnv, gjClass{And_jni_Bridge});');
-        strOnLoadList.Add('    gVM:= nil;{And_jni_Bridge}');
+        strOnLoadList.Add('    (curEnv^).DeleteGlobalRef(curEnv, gjClass);');
+        strOnLoadList.Add('    gjClass:= nil;');
+        strOnLoadList.Add('    gVM:= nil;');
       end;
+
       strOnLoadList.Add('  end;');
+
+      if FModuleType = 0 then
+      begin
       strOnLoadList.Add('  gApp.Terminate;');
       strOnLoadList.Add('  FreeAndNil(gApp);');
+      end
+      else  //NoGUI -->> Not Android Bridges  Controls...
+      begin
+        strOnLoadList.Add('  gNoGUIApp.Terminate;');
+        strOnLoadList.Add('  FreeAndNil(gNoGUIApp);');
+      end;
       strOnLoadList.Add('end;');
     end;
 
     auxStr:= Memo6List.Strings[Memo6List.Count-1];
-    Memo6List.Strings[Memo6List.Count-1]:= ReplaceChar(auxStr,',',';');
+    Memo6List.Strings[Memo6List.Count-1]:= StringReplace(auxStr,',',';',[rfReplaceAll]);
 
     if not FHackJNIMethod then
        FPascalJNIInterfaceCode:= Memo5List.Text + strNativeMethodsHeader + LineEnding+
@@ -1457,7 +1471,7 @@ begin
           if Pos('import ', auxStr) > 0 then
           begin
              SplitStr(auxStr,' ');
-             auxStr:= ReplaceChar(auxStr,'.','/');
+             auxStr:= StringReplace(auxStr,'.','/',[rfReplaceAll]);
              FImportsList.Add('L'+trim(auxStr));
           end;
         end;
@@ -1537,12 +1551,7 @@ begin
    if Pos('About', txtCaption) > 0 then
    begin
       //02-december-2013 Add support to simonsayz's controls: http://blog.naver.com/simonsayz
-      //ShowMessage('LazAndroidModuleWizard ver. 0.3 - revision 0.1 - 28 dec. 2013 - by jmpessoa');
-      //Add jniBridge Wizard - aka jBridge
-      //ShowMessage('LazAndroidModuleWizard ver. 0.4 - 05 mar. 2014 - by jmpessoa');
-      //ShowMessage('LazAndroidModuleWizard ver. 0.5 - 14 Abril 2014 - by jmpessoa');
-     //Add Form Designer
-      ShowMessage('LazAndroidModuleWizard ver. 0.6 - 12 October 2014 - by jmpessoa');
+      ShowMessage('Lamw: Lazarus Android Module Wizard [ver. 0.6 - rev. 16 - 18 February 2015 - by jmpessoa]');
    end;
 end;
 
@@ -1550,7 +1559,6 @@ procedure TFormAndroidProject.MenuItem20Click(Sender: TObject);
 begin
   Self.ModalResult:= mrCancel;
 end;
-
 
 procedure TFormAndroidProject.FormDeactivate(Sender: TObject);
 begin
@@ -1599,9 +1607,8 @@ begin
       auxList.SaveToFile(auxPath + 'Controls.java');
       auxList.Free;
 
-      ShellTreeView1.Selected:= nil;
-      ShellTreeView1.Selected:= NodeSelected;
-      ShellListView1.Update;
+      ShellListView1.Root := '';
+      ShellListView1.Root := auxPath;
 
       strPack:= TrimChar(strPack,';');
       SplitStr(strPack, ' ');
@@ -2411,9 +2418,9 @@ begin
              if Pos('_Template', regFile) > 0 then
              begin
                userTab:= InputBox('Register [Tab] Component', 'Tab Name', 'myTab');
-               regFile:= StringReplace(regFile,'_Template', '_'+ReplaceChar(userTab,' ','_'),[]);
+               regFile:= StringReplace(regFile,'_Template','_'+StringReplace(userTab,' ','_',[rfReplaceAll]),[]);
 
-               strList.Strings[0]:= 'unit register_'+ReplaceChar(userTab,' ','_')+';';
+               strList.Strings[0]:= 'unit register_'+StringReplace(userTab,' ','_',[rfReplaceAll])+';';
                strList.Text:= StringReplace(strList.Text,'Template', userTab,[]);
              end;
              i:= 0;
@@ -2518,15 +2525,6 @@ begin
          if auxStr[count] = delimiter then  auxStr[count] := newchar;
       end;
       Result:= Trim(auxStr);
-  end;
-end;
-
-function ReplaceChar(query: string; oldchar, newchar: char):string;
-begin
-  if query <> '' then
-  begin
-     while Pos(oldchar,query) > 0 do query[pos(oldchar,query)]:= newchar;
-     Result:= query;
   end;
 end;
 

@@ -19,14 +19,14 @@
 
 		-TrueTom [Laz4Android Package]
 
-			Date:2014-10-18
-			FPC: 2.7.1 SVN 28863  win32/arm-android/i386-android/jvm-android
-			Lazarus:1.3 trunk svn 46592
+			Last update:2015-02-25
+			FPC: 3.1.1 trunk svn 29987 win32/arm-android/i386-android/jvm-android
+			Lazarus:1.5 trunk svn 47987
 			Android NDK: r10c (arm-linux-androideabi-4.6 + x86-4.6)
 			http://sourceforge.net/projects/laz4android/files/?source=navbar
-			:To Install, please, read the "Laz4Android_readme.txt"
+			:To Install [*.7z], please, read the "Laz4Android_readme.txt"
 
-      		-Simonsayz [great work on Android [GUI] Controls!]
+		-Simonsayz [great work on Android [GUI] Controls!]
 			Simon,Choi / Choi,Won-sik
 			simonsayz@naver.com
 			http://blog.naver.com/simonsayz
@@ -65,6 +65,151 @@
 	*					*
 	*****************************************
 
+Version 0.6 - rev. 19 - 09 March 2015 -
+	
+	NEWS
+		jControl: Added Method AttachCurrentThread
+		jHttpClient: Added Methods: PostNameValueData	
+		jEditText: Added Methods:	
+				SetAcceptSuggestion 
+				CopyToClipboard
+				PasteFromClipboard
+				Clear
+		
+	NEW! Demo AppAsyncTaskDemo1	[Eclipse Compatible Project]	
+	NEW! Demo AppHttpClientDemo1	[Eclipse Compatible Project]	
+
+	FIXs:	jAsyncTaskDemo
+			jHttpClient
+		
+Version 0.6 - rev. 18 - 22 February 2015 -
+
+	::Tutorial to Stephano Questions: 
+
+		ref. http://forum.lazarus.freepascal.org/index.php/topic,21919.msg169783/topicseen.html#new
+
+		1. Create a new "Lamw" project as usual [save all to ../jni] 
+
+		2. Add to ../src the new java class code [ex. jhelloadder.java]
+
+		3. Go to [again] IDE->Project->New Project select [again] "JNI Android Module" Project
+                   and [again] Select the same project [form workspace]
+
+		4. But, NOW double click the added java class code [jhelloadder.java] 
+
+		5. Ok
+
+		6. Save all new project to ../jni [warning: keep the project name [jhelloadder.lpr],
+		   but change the unit name :: ex. "unithelloadder.pas"]
+
+
+		7. Yes, the new "jhelloadder.lpr" have the "drafts" code for all native methods!
+
+			function Add(PEnv: PJNIEnv; this: JObject; _a: JInt; _b: JInt): JInt; cdecl;
+			begin
+  			  {your code....}
+  			  {Result:= ;}
+			end;
+
+			function StringUpperCase(PEnv: PJNIEnv; this: JObject; _str: JString): JString; cdecl;
+			begin
+  			  {your code....}
+  			  {Result:= ;}
+			end;
+
+		8. Yes, you have a new form [datamodule]: You can put there any "pure/fcl" TComponent descendant 
+			[not LCL component, not Lamw component] --->> TODO: need more test
+
+		8. Go to [again] IDE->Tools->Android Module Wizard->New jComponent [Create]
+
+		9. Paste the "jhelloadder.java" into Tab "java" ...			
+
+                        WARNING: after paste, remove de word "public" from class definition!
+                        [TODO: need fix the parse ...]
+
+		10. Read the content of Tab "help" ... [follow the instructions!]
+			Do not forget:
+
+			//Please, you need insert:
+				public java.lang.Object jHelloAdder_jCreate(long _Self) {
+      				  return (java.lang.Object)(new jHelloAdder(this,_Self));
+   				}
+			//to end of "public class Controls" in "Controls.java"
+
+		11. Open "tfpandroidbridge_pack.lpk --> More -> Recompile Clean -> Use -> Install !!
+		12. Use Case 1: Pascal call Java :: drop the new component to jForm [main app] and use it!
+		13. Use case 2. Java call Java   :: declare and use it! ex.:
+
+			jHelloAdder helloadder;
+			helloadder = new jHelloAdder(controls, 1010); //controsl=reference to main "controls" object :: 1010 = dummy
+			Log.i("jHelloAdder_Add","Add(7,11)="+ helloadder.Add(7,11));
+
+		14. Please,  see the new project demo ...	
+		
+	NEW! Demo AppAddSingleLibraryDemo1     [Eclipse Compatible Project]	
+
+Version 0.6 - rev. 17 - 19 February 2015 -
+
+	MINOR IMPROVEMENT:
+
+	jEditText:
+		Change property behavior : 
+			MaxTextLength = -1 {default/reset: no limited!}
+				in fact:  "MaxTextLength < 0" --->  "default/reset"
+
+Version 0.6 - rev. 16 - 18 February 2015 -
+
+	MINOR IMPROVEMENT:
+
+	jEditText:
+		NEW property: 
+			HintTextColor; <<-A suggestion and request by Ps
+
+Version 0.6 - rev. 15 - 17 February 2015 -
+
+	MINOR IMPROVEMENTS:
+
+	jApp:
+		LOST properties: // <<--A suggestion and request by rx3.fireproof	
+			Device.PhoneNumber
+			Device.ID;
+	jForm: 
+		NEWS methods:	
+			.GetDevicePhoneNumber;
+			.GetDeviceID;
+			.[warning] "must have" [AndroidManifest.xml]: 
+				<uses-permission android:name="android.permission.READ_PHONE_STATE"/>			
+	jTextView:
+		NEW property: // <<--- Thanks to Fatih!		
+			FontFace;
+
+	jEditText:
+		NEWS properties: // <<--- Thanks to Fatih!		
+			TextTypeFace;
+			FontFace;
+			Editable; <<-A suggestion and request by rx3.fireproof
+	jSpinner:
+		NEW properties:	<<-A suggestion and request by rx3.fireproof
+			FontSize; 
+ 			Count;
+	jHttpClient:
+		NEWS methods: <<-A suggestion and request by Ps
+			.SetAuthenticationUser(...); 	 	
+			.SetAuthenticationHost(...); 
+		NEW property:	
+			AuthenticationMode [just basic... yet] 
+
+	jWebView:
+		NEW property: // <<--- Thanks to Fatih!	
+			ZoomControl;	
+		NEW method: <<-A suggestion and request by Ps
+			SetHttpAuthUsernamePassword(...); 
+		
+	jListView: FIXs [radio group mode]
+		LOST property:	
+			HighLightSelectedItem;
+			::Please, no panic! When prompt "Read error" [Unknown Property] just choice "Continue Loading"
+	
 Version 0.6 - rev. 14 - 13 February 2015 -
 
 	NEW! Added support to Touch Gesture: Pinch/Zoom and Fling[Swipe]!

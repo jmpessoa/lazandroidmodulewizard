@@ -137,6 +137,8 @@ Procedure jTextView_setTextSize(env:PJNIEnv; TextView : jObject; size  : DWord);
 
 Procedure jTextView_SetTextTypeFace(env:PJNIEnv; TextView : jObject; textStyle: DWord);
 
+procedure jTextView_setFontAndTextTypeFace(env: PJNIEnv; TextView: jObject; FontFace, TextTypeFace: DWord); 
+
 Procedure jTextView_setTextAlignment(env:PJNIEnv; TextView : jObject; align : DWord);
 
 Procedure jTextView_setLParamWidth(env:PJNIEnv; TextView : jObject; w: DWord);
@@ -170,6 +172,9 @@ Procedure jEditText_setTextColor       (env:PJNIEnv; EditText : jObject; color :
 Procedure jEditText_setTextSize        (env:PJNIEnv; EditText : jObject; size  : DWord);
 
 Procedure jEditText_setHint            (env:PJNIEnv; EditText : jObject; Str : String);
+
+procedure jEditText_setHintTextColor(env: PJNIEnv; _jedittext: JObject; _color: integer);
+
 Procedure jEditText_SetFocus          (env:PJNIEnv; EditText : jObject);
 
 Procedure jEditText_immShow            (env:PJNIEnv; EditText : jObject );
@@ -179,7 +184,7 @@ Procedure jEditText_editInputType2      (env:PJNIEnv; EditText : jObject; Str : 
 
 Procedure jEditText_setInputType(env:PJNIEnv;  EditText: jObject; itType: DWord);
 
-Procedure jEditText_maxLength          (env:PJNIEnv; EditText : jObject; size  : DWord);
+Procedure jEditText_maxLength          (env:PJNIEnv; EditText : jObject; size  : integer);
 
 Procedure jEditText_AllCaps(env:PJNIEnv; EditText : jObject);
 
@@ -218,6 +223,12 @@ Procedure jEditText_SetEditable        (env:PJNIEnv; EditText : jObject; enabled
 procedure jEditText_Append(env: PJNIEnv; _jedittext: JObject; _txt: string);
 
 procedure jEditText_SetImeOptions(env: PJNIEnv; _jedittext: JObject; _imeOption: integer);
+
+procedure jEditText_setFontAndTextTypeFace(env: PJNIEnv; EditText: jObject; FontFace, TextTypeFace: DWord); 
+
+procedure jEditText_SetAcceptSuggestion(env: PJNIEnv; _jedittext: JObject; _value: boolean);
+procedure jEditText_CopyToClipboard(env: PJNIEnv; _jedittext: JObject);
+procedure jEditText_PasteFromClipboard(env: PJNIEnv; _jedittext: JObject);
 
 // Button
 Function jButton_Create(env: PJNIEnv;   this:jobject; SelfObj: TObject): jObject;
@@ -615,6 +626,8 @@ Procedure jWebView_setLeftTopRightBottomWidthHeight(env:PJNIEnv;
 Procedure jWebView_addLParamsParentRule(env:PJNIEnv; WebView : jObject; rule: DWord);
 Procedure jWebView_addLParamsAnchorRule(env:PJNIEnv; WebView : jObject; rule: DWord);
 Procedure jWebView_setLayoutAll(env:PJNIEnv; WebView : jObject;  idAnchor: DWord);
+procedure jWebView_SetHttpAuthUsernamePassword(env: PJNIEnv; _jwebview: JObject; _hostName: string; _hostDomain: string; _username: string; _password: string);
+
 
 // Canvas
 Function  jCanvas_Create               (env:PJNIEnv;
@@ -904,7 +917,18 @@ function jSqliteDataAccess_CheckDataBaseExistsByName(env: PJNIEnv; _jsqlitedataa
 procedure jSqliteDataAccess_UpdateImageBatch(env: PJNIEnv; _jsqlitedataaccess: JObject; var _imageResIdentifierDataArray: TDynArrayOfString; _delimiter: string);
 
 // Http
-Function  jHttp_Get(env:PJNIEnv;  this:jobject; URL: String) : String;
+//Function  jHttp_Get(env:PJNIEnv;  this:jobject; URL: String) : String;
+
+function jHttpClient_jCreate(env: PJNIEnv;_Self: int64; this: jObject): jObject;
+procedure jHttpClient_jFree(env: PJNIEnv; _jhttpclient: JObject);
+function jHttpClient_Get(env: PJNIEnv; _jhttpclient: JObject; _stringUrl: string): string; overload;
+//procedure jHttpClient_Get(env: PJNIEnv; _jhttpclient: JObject; _stringUrl: string); overload;
+procedure jHttpClient_SetAuthenticationUser(env: PJNIEnv; _jhttpclient: JObject; _userName: string; _password: string);
+procedure jHttpClient_SetAuthenticationMode(env: PJNIEnv; _jhttpclient: JObject; _authenticationMode: integer);
+procedure jHttpClient_SetAuthenticationHost(env: PJNIEnv; _jhttpclient: JObject; _hostName: string; _port: integer);
+function jHttpClient_PostNameValueData(env: PJNIEnv; _jhttpclient: JObject; _stringUrl: string; _name: string; _value: string): integer; overload;
+function jHttpClient_PostNameValueData(env: PJNIEnv; _jhttpclient: JObject; _stringUrl: string; _listNameValue: string): integer; overload;
+
 
 //by jmpessoa
 procedure jSend_Email(env:PJNIEnv; this:jobject;
@@ -1307,6 +1331,19 @@ begin
   env^.CallVoidMethodA(env,TextView,_jMethod,@_jParams);
 end;
 
+procedure jTextView_setFontAndTextTypeFace(env: PJNIEnv; TextView: jObject; FontFace, TextTypeFace: DWord); 
+var
+  _jMethod : jMethodID = nil;
+  _jParams : array[0..1] of jValue;
+  cls: jClass;
+begin
+  _jParams[0].i := FontFace;
+  _jParams[1].i := TextTypeFace;
+  cls := env^.GetObjectClass(env, TextView);
+  _jMethod:= env^.GetMethodID(env, cls, 'setFontAndTextTypeFace', '(II)V');
+  env^.CallVoidMethodA(env,TextView,_jMethod,@_jParams);
+end;
+
 //by jmpessoa
 Procedure jTextView_setTextAlignment(env:PJNIEnv; TextView : jObject; align : DWord);
 Var
@@ -1493,11 +1530,19 @@ var
    cls: jClass;
    method: jmethodID;
 begin
-  _jParams[0].l:= env^.NewStringUTF(env, PChar(Str));
   cls := env^.GetObjectClass(env, EditText);
-  method:= env^.GetMethodID(env, cls, 'setText', '(Ljava/lang/CharSequence;)V');
-  env^.CallVoidMethodA(env, EditText,method, @_jParams);
-  env^.DeleteLocalRef(env, _jParams[0].l);
+  if Str <> '' then
+  begin
+    _jParams[0].l:= env^.NewStringUTF(env, PChar(Str));
+    method:= env^.GetMethodID(env, cls, 'setText', '(Ljava/lang/CharSequence;)V');
+    env^.CallVoidMethodA(env, EditText,method, @_jParams);
+    env^.DeleteLocalRef(env, _jParams[0].l);
+  end
+  else
+  begin
+    method:= env^.GetMethodID(env, cls, 'Clear', '()V');
+    env^.CallVoidMethod(env, EditText,method);
+  end;
 end;
 
 Procedure jEditText_setTextColor(env:PJNIEnv;
@@ -1541,6 +1586,18 @@ begin
  _jMethod:= env^.GetMethodID(env, cls, 'setHint', '(Ljava/lang/CharSequence;)V');
  env^.CallVoidMethodA(env,EditText,_jMethod,@_jParams);
  env^.DeleteLocalRef(env,_jParams[0].l);
+end;
+
+procedure jEditText_setHintTextColor(env: PJNIEnv; _jedittext: JObject; _color: integer);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].i:= _color;
+  jCls:= env^.GetObjectClass(env, _jedittext);
+  jMethod:= env^.GetMethodID(env, jCls, 'setHintTextColor', '(I)V');
+  env^.CallVoidMethodA(env, _jedittext, jMethod, @jParams);
 end;
 
 // LORDMAN - 2013-07-26
@@ -1606,7 +1663,7 @@ end;
 
 //force edits not to make the length of the text greater than the specified length
 // LORDMAN - 2013-07-26
-Procedure jEditText_maxLength(env:PJNIEnv; EditText : jObject; size  : DWord);
+Procedure jEditText_maxLength(env:PJNIEnv; EditText : jObject; size  : integer);
 var
  _jMethod : jMethodID = nil;
  _jParams : array[0..0] of jValue;
@@ -1941,6 +1998,54 @@ begin
   jMethod:= env^.GetMethodID(env, jCls, 'SetImeOptions', '(I)V');
   env^.CallVoidMethodA(env, _jedittext, jMethod, @jParams);
 end;
+
+procedure jEditText_setFontAndTextTypeFace(env: PJNIEnv; EditText: jObject; FontFace, TextTypeFace: DWord);
+var
+  _jMethod : jMethodID = nil;
+  _jParams : array[0..1] of jValue;
+  cls: jClass;
+begin
+  _jParams[0].i := FontFace;
+  _jParams[1].i := TextTypeFace;
+  cls := env^.GetObjectClass(env, EditText);
+  _jMethod:= env^.GetMethodID(env, cls, 'setFontAndTextTypeFace', '(II)V');
+  env^.CallVoidMethodA(env,EditText,_jMethod,@_jParams);
+end;
+
+procedure jEditText_SetAcceptSuggestion(env: PJNIEnv; _jedittext: JObject; _value: boolean);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].z:= JBool(_value);
+  jCls:= env^.GetObjectClass(env, _jedittext);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetAcceptSuggestion', '(Z)V');
+  env^.CallVoidMethodA(env, _jedittext, jMethod, @jParams);
+end;
+
+
+procedure jEditText_CopyToClipboard(env: PJNIEnv; _jedittext: JObject);
+var
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jedittext);
+  jMethod:= env^.GetMethodID(env, jCls, 'CopyToClipboard', '()V');
+  env^.CallVoidMethod(env, _jedittext, jMethod);
+end;
+
+
+procedure jEditText_PasteFromClipboard(env: PJNIEnv; _jedittext: JObject);
+var
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jedittext);
+  jMethod:= env^.GetMethodID(env, jCls, 'PasteFromClipboard', '()V');
+  env^.CallVoidMethod(env, _jedittext, jMethod);
+end;
+
 //------------------------------------------------------------------------------
 // Button
 //------------------------------------------------------------------------------
@@ -4375,7 +4480,6 @@ procedure jWebView_SetZoomControl(env: PJNIEnv; WebView: jObject; ZoomControl: B
   _jParams : Array[0..0] of jValue;
   cls: jClass;
 begin
-
   _jParams[0].z := JBool(ZoomControl);
   cls := env^.GetObjectClass(env, WebView);
   _jMethod:= env^.GetMethodID(env, cls, 'setZoomControl', '(Z)V');
@@ -4470,6 +4574,26 @@ begin
  cls := env^.GetObjectClass(env, WebView);
 _jMethod:= env^.GetMethodID(env, cls, 'setLayoutAll', '(I)V');
  env^.CallVoidMethodA(env,WebView,_jMethod,@_jParams);
+end;
+
+
+procedure jWebView_SetHttpAuthUsernamePassword(env: PJNIEnv; _jwebview: JObject; _hostName: string; _hostDomain: string; _username: string; _password: string);
+var
+  jParams: array[0..3] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_hostName));
+  jParams[1].l:= env^.NewStringUTF(env, PChar(_hostDomain));
+  jParams[2].l:= env^.NewStringUTF(env, PChar(_username));
+  jParams[3].l:= env^.NewStringUTF(env, PChar(_password));
+  jCls:= env^.GetObjectClass(env, _jwebview);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetHttpAuthUsernamePassword', '(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V');
+  env^.CallVoidMethodA(env, _jwebview, jMethod, @jParams);
+env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env,jParams[1].l);
+  env^.DeleteLocalRef(env,jParams[2].l);
+  env^.DeleteLocalRef(env,jParams[3].l);
 end;
 
 //------------------------------------------------------------------------------
@@ -5724,7 +5848,7 @@ var
  _jMethod : jMethodID = nil;
  cls: jClass;
 begin
-  cls := env^.GetObjectClass(env, AsyncTask);
+  cls := env^.GetObjectClass(env, AsyncTask); //GetObjectClass
   _jMethod:= env^.GetMethodID(env, cls, 'Execute', '()V');
  env^.CallVoidMethod(env,AsyncTask,_jMethod);
 end;
@@ -5735,7 +5859,6 @@ var
  _jParams : Array[0..0] of jValue;
   cls: jClass;
 begin
-  //gVM^.AttachCurrentThread(gVm,@env,nil);   //commented by jmpessoa
  _jParams[0].i := progress;
   cls := env^.GetObjectClass(env, AsyncTask);
   _jMethod:= env^.GetMethodID(env, cls, 'setProgress', '(I)V');
@@ -6408,34 +6531,138 @@ begin
   env^.DeleteLocalRef(env,jParams[1].l);
 end;
 
-//------------------------------------------------------------------------------
-// jHttp_Get
-//------------------------------------------------------------------------------
-Function  jHttp_Get(env:PJNIEnv;  this:jobject; URL : String) : String;
-var
- _jMethod  : jMethodID = nil;
- _jString  : jString;
- _jBoolean : jBoolean;
- _jParam   : jValue;
- jCls: jClass=nil;
-begin
- //gVM^.AttachCurrentThread(gVm,@env,nil);   //fix/Commented by jmpessoa
- jCls:= Get_gjClass(env);
- _jMethod:= env^.GetMethodID(env, jCls, 'jHttp_get', '(Ljava/lang/String;)Ljava/lang/String;');
- _jParam.l  := env^.NewStringUTF(env, pchar(URL) );
- _jString   := env^.CallObjectMethodA(env,this,_jMethod,@_jParam);
+{-------- jHttpClient_JNI_Bridge ----------}
 
- Case _jString = nil of
-  True : Result    := '';
-  False: begin
-          _jBoolean := JNI_False;
-          Result    := String( env^.GetStringUTFChars(Env,_jString,@_jBoolean) );
-         end;
- end;
- env^.DeleteLocalRef(env,_jParam.l);
- //dbg('Http_Get:'+ Result);
+function jHttpClient_jCreate(env: PJNIEnv;_Self: int64; this: jObject): jObject;
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].j:= _Self;
+  jCls:= Get_gjClass(env);
+  jMethod:= env^.GetMethodID(env, jCls, 'jHttpClient_jCreate', '(J)Ljava/lang/Object;');
+  Result:= env^.CallObjectMethodA(env, this, jMethod, @jParams);
+  Result:= env^.NewGlobalRef(env, Result);
 end;
 
+(*
+//Please, you need insert:
+
+   public java.lang.Object jHttpClient_jCreate(long _Self) {
+      return (java.lang.Object)(new jHttpClient(this,_Self));
+   }
+
+//to end of "public class Controls" in "Controls.java"
+*)
+
+procedure jHttpClient_jFree(env: PJNIEnv; _jhttpclient: JObject);
+var
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jhttpclient);
+  jMethod:= env^.GetMethodID(env, jCls, 'jFree', '()V');
+  env^.CallVoidMethod(env, _jhttpclient, jMethod);
+end;
+
+
+function  jHttpClient_Get(env: PJNIEnv; _jhttpclient: JObject; _stringUrl: string): string;
+var
+  jStr: JString;
+  jBoo: JBoolean;
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_stringUrl));
+  jCls:= env^.GetObjectClass(env, _jhttpclient);
+  jMethod:= env^.GetMethodID(env, jCls, 'Get', '(Ljava/lang/String;)Ljava/lang/String;');
+  jStr:= env^.CallObjectMethodA(env, _jhttpclient, jMethod, @jParams);
+  case jStr = nil of
+     True : Result:= '';
+     False: begin
+              jBoo:= JNI_False;
+              Result:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
+            end;
+  end;
+  env^.DeleteLocalRef(env,jParams[0].l);
+end;
+
+
+procedure jHttpClient_SetAuthenticationUser(env: PJNIEnv; _jhttpclient: JObject; _userName: string; _password: string);
+var
+  jParams: array[0..1] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_userName));
+  jParams[1].l:= env^.NewStringUTF(env, PChar(_password));
+  jCls:= env^.GetObjectClass(env, _jhttpclient);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetAuthenticationUser', '(Ljava/lang/String;Ljava/lang/String;)V');
+  env^.CallVoidMethodA(env, _jhttpclient, jMethod, @jParams);
+env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env,jParams[1].l);
+end;
+
+
+procedure jHttpClient_SetAuthenticationMode(env: PJNIEnv; _jhttpclient: JObject; _authenticationMode: integer);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].i:= _authenticationMode;
+  jCls:= env^.GetObjectClass(env, _jhttpclient);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetAuthenticationMode', '(I)V');
+  env^.CallVoidMethodA(env, _jhttpclient, jMethod, @jParams);
+end;
+
+procedure jHttpClient_SetAuthenticationHost(env: PJNIEnv; _jhttpclient: JObject; _hostName: string; _port: integer);
+var
+  jParams: array[0..1] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_hostName));
+  jParams[1].i:= _port;
+  jCls:= env^.GetObjectClass(env, _jhttpclient);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetAuthenticationHost', '(Ljava/lang/String;I)V');
+  env^.CallVoidMethodA(env, _jhttpclient, jMethod, @jParams);
+env^.DeleteLocalRef(env,jParams[0].l);
+end;
+
+function jHttpClient_PostNameValueData(env: PJNIEnv; _jhttpclient: JObject; _stringUrl: string; _name: string; _value: string): integer;
+var
+  jParams: array[0..2] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_stringUrl));
+  jParams[1].l:= env^.NewStringUTF(env, PChar(_name));
+  jParams[2].l:= env^.NewStringUTF(env, PChar(_value));
+  jCls:= env^.GetObjectClass(env, _jhttpclient);
+  jMethod:= env^.GetMethodID(env, jCls, 'PostNameValueData', '(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)I');
+  Result:= env^.CallIntMethodA(env, _jhttpclient, jMethod, @jParams);
+env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env,jParams[1].l);
+  env^.DeleteLocalRef(env,jParams[2].l);
+end;
+
+function jHttpClient_PostNameValueData(env: PJNIEnv; _jhttpclient: JObject; _stringUrl: string; _listNameValue: string): integer;
+var
+  jParams: array[0..1] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_stringUrl));
+  jParams[1].l:= env^.NewStringUTF(env, PChar(_listNameValue));
+  jCls:= env^.GetObjectClass(env, _jhttpclient);
+  jMethod:= env^.GetMethodID(env, jCls, 'PostNameValueData', '(Ljava/lang/String;Ljava/lang/String;)I');
+  Result:= env^.CallIntMethodA(env, _jhttpclient, jMethod, @jParams);
+  env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env,jParams[1].l);
+end;
 
 //by jmpessoa
 procedure jSend_Email(env:PJNIEnv; this:jobject;

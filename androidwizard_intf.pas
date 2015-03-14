@@ -151,6 +151,8 @@ type
     FDefaultBrushColor: TColor;
     FDefaultPenColor: TColor;
     FDefaultFontColor: TColor;
+  protected
+    procedure Notification(AComponent: TComponent; Operation: TOperation); override;
   public
     //needed by the lazarus form editor
     class function CreateMediator(TheOwner, TheForm: TComponent): TDesignerMediator; override;
@@ -266,7 +268,6 @@ var
 
 procedure Register;
 
-function ReplaceChar(query: string; oldchar, newchar: char):string;
 function SplitStr(var theString: string; delimiter: string): string;
 
 procedure GetRedGreenBlue(rgb: longInt; out Red, Green, Blue: word);
@@ -310,6 +311,14 @@ begin
   inherited Destroy;
 end;
 
+procedure TAndroidWidgetMediator.Notification(AComponent: TComponent;
+  Operation: TOperation);
+begin
+  inherited Notification(AComponent, Operation);
+  if (Operation = opRemove) and (AComponent = FAndroidForm) then
+    FAndroidForm := nil;
+end;
+
 class function TAndroidWidgetMediator.CreateMediator(TheOwner, TheForm: TComponent): TDesignerMediator;
 var
   Mediator: TAndroidWidgetMediator;
@@ -323,6 +332,7 @@ begin
   Mediator.FDefaultFontColor:= clMedGray;
 
   Mediator.FAndroidForm:= TheForm as jForm;
+  TheForm.FreeNotification(Mediator);
   Mediator.FAndroidForm.Designer:= Mediator;
 end;
 
@@ -1046,7 +1056,7 @@ var
   linuxPathToAntBin: string;
 
   dummy: string;
-
+  fileList: TStringList;
 begin
   Result:= False;
   frm:= TFormWorkspace.Create(nil);
@@ -1187,86 +1197,96 @@ begin
 
       if FModuleType = 0 then     //Android Bridges Controls...
       begin
-        strList.Clear;    //dummy App.java - will be replaced with simonsayz's "App.java" template!
-        strList.Add('package '+FAntPackageName+'.'+LowerCase(projName)+';');
-        strList.Add('public class App extends Activity {');
-        strList.Add('     //dummy app');
-        strList.Add('}');
-        strList.SaveToFile(FPathToJavaSrc+DirectorySeparator+'App.java');
+        if not FileExists(FPathToJavaSrc+DirectorySeparator+'App.java') then
+        begin
+           strList.Clear;    //dummy App.java - will be replaced with simonsayz's "App.java" template!
+           strList.Add('package '+FAntPackageName+'.'+LowerCase(projName)+';');
+           strList.Add('public class App extends Activity {');
+           strList.Add('     //dummy app');
+           strList.Add('}');
+           strList.SaveToFile(FPathToJavaSrc+DirectorySeparator+'App.java');
+        end;
       end;
 
       if FModuleType = 1 then     //Not Android Bridges  Controls...
       begin
-         strList.Clear;    //dummy App.java - will be replaced with simonsayz's "App.java" template!
-         strList.Add('package '+FAntPackageName+'.'+LowerCase(projName)+';');
-         strList.Add(' ');
-         strList.Add('import android.os.Bundle;');
-         strList.Add('import android.app.Activity;');
-         strList.Add('import android.widget.Toast;');
-         strList.Add(' ');
-         strList.Add('public class App extends Activity {');
-         strList.Add('  ');
-         strList.Add('   JNIHello myHello;  //just for demo...');
-         strList.Add('  ');
-         strList.Add('   @Override');
-         strList.Add('   protected void onCreate(Bundle savedInstanceState) {');
-         strList.Add('       super.onCreate(savedInstanceState);');
-         strList.Add('       setContentView(R.layout.activity_app);');
-         strList.Add(' ');
-         strList.Add('       myHello = new JNIHello(); //just for demo...');
-         strList.Add(' ');
-         strList.Add('       int sum = myHello.getSum(2,3); //just for demo...');
-         strList.Add(' ');
-         strList.Add('       String mens = myHello.getString(1); //just for demo...');
-         strList.Add(' ');
-         strList.Add('       Toast.makeText(getApplicationContext(), mens, Toast.LENGTH_SHORT).show();');
-         strList.Add('       Toast.makeText(getApplicationContext(), "Total = " + sum, Toast.LENGTH_SHORT).show();');
-         strList.Add('   }');
-         strList.Add('}');
-         strList.SaveToFile(FPathToJavaSrc+DirectorySeparator+'App.java');
+         if not FileExists(FPathToJavaSrc+DirectorySeparator+'App.java') then
+         begin
+           strList.Clear;    //dummy App.java - will be replaced with simonsayz's "App.java" template!
+           strList.Add('package '+FAntPackageName+'.'+LowerCase(projName)+';');
+           strList.Add('');
+           strList.Add('import android.os.Bundle;');
+           strList.Add('import android.app.Activity;');
+           strList.Add('import android.widget.Toast;');
+           strList.Add('');
+           strList.Add('public class App extends Activity {');
+           strList.Add('  ');
+           strList.Add('   JNIHello myHello;  //just for demo...');
+           strList.Add('  ');
+           strList.Add('   @Override');
+           strList.Add('   protected void onCreate(Bundle savedInstanceState) {');
+           strList.Add('       super.onCreate(savedInstanceState);');
+           strList.Add('       setContentView(R.layout.activity_app);');
+           strList.Add('');
+           strList.Add('       myHello = new JNIHello(); //just for demo...');
+           strList.Add('');
+           strList.Add('       int sum = myHello.getSum(2,3); //just for demo...');
+           strList.Add('');
+           strList.Add('       String mens = myHello.getString(1); //just for demo...');
+           strList.Add('');
+           strList.Add('       Toast.makeText(getApplicationContext(), mens, Toast.LENGTH_SHORT).show();');
+           strList.Add('       Toast.makeText(getApplicationContext(), "Total = " + sum, Toast.LENGTH_SHORT).show();');
+           strList.Add('   }');
+           strList.Add('}');
+           strList.SaveToFile(FPathToJavaSrc+DirectorySeparator+'App.java');
+
+           strList.Clear;
+           strList.Add('package '+FAntPackageName+'.'+LowerCase(projName)+';');
+           strList.Add('');
+           strList.Add('public class JNIHello { //just for demo...');
+           strList.Add('');
+	   strList.Add('  public native String getString(int flag);');
+	   strList.Add('  public native int getSum(int x, int y);');
+           strList.Add('');
+           strList.Add('  static {');
+	   strList.Add('	  try {');
+     	   strList.Add('	      System.loadLibrary("jnihello");');
+	   strList.Add('	  } catch(UnsatisfiedLinkError ule) {');
+ 	   strList.Add('	      ule.printStackTrace();');
+ 	   strList.Add('	  }');
+           strList.Add('  }');
+           strList.Add('');
+           strList.Add('}');
+           strList.SaveToFile(FPathToJavaSrc+DirectorySeparator+'JNIHello.java');
+         end;
 
          strList.Clear;
-         strList.Add('package '+FAntPackageName+'.'+LowerCase(projName)+';');
-         strList.Add(' ');
-         strList.Add('public class JNIHello { //just for demo...');
-         strList.Add(' ');
-	 strList.Add('  public native String getString(int flag);');
-	 strList.Add('  public native int getSum(int x, int y);');
-         strList.Add(' ');
-         strList.Add('  static {');
-	 strList.Add('	  try {');
-     	 strList.Add('	      System.loadLibrary("jnihello");');
-	 strList.Add('	  } catch(UnsatisfiedLinkError ule) {');
- 	 strList.Add('	      ule.printStackTrace();');
- 	 strList.Add('	  }');
-         strList.Add('  }');
-         strList.Add(' ');
-         strList.Add('}');
-         strList.SaveToFile(FPathToJavaSrc+DirectorySeparator+'JNIHello.java');
 
-         strList.Clear;
-         strList.Add('<?xml version="1.0" encoding="utf-8"?>');
-         strList.Add('<manifest xmlns:android="http://schemas.android.com/apk/res/android"');
-         strList.Add('    package="'+FAntPackageName+'.'+LowerCase(projName)+'"');
-         strList.Add('    android:versionCode="1"');
-         strList.Add('    android:versionName="1.0" >');
-         strList.Add('    <uses-sdk android:minSdkVersion="10"/>');
-         strList.Add('    <application');
-         strList.Add('        android:allowBackup="true"');
-         strList.Add('        android:icon="@drawable/ic_launcher"');
-         strList.Add('        android:label="@string/app_name"');
-         strList.Add('        android:theme="@style/AppTheme" >');
-         strList.Add('        <activity');
-         strList.Add('            android:name="'+FAntPackageName+'.'+LowerCase(projName)+'.App"');
-         strList.Add('            android:label="@string/app_name" >');
-         strList.Add('            <intent-filter>');
-         strList.Add('                <action android:name="android.intent.action.MAIN" />');
-         strList.Add('                <category android:name="android.intent.category.LAUNCHER" />');
-         strList.Add('            </intent-filter>');
-         strList.Add('        </activity>');
-         strList.Add('    </application>');
-         strList.Add('</manifest>');
-         strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'AndroidManifest.xml');
+         if not FileExists(FAndroidProjectName+DirectorySeparator+'AndroidManifest.xml') then
+         begin
+           strList.Add('<?xml version="1.0" encoding="utf-8"?>');
+           strList.Add('<manifest xmlns:android="http://schemas.android.com/apk/res/android"');
+           strList.Add('    package="'+FAntPackageName+'.'+LowerCase(projName)+'"');
+           strList.Add('    android:versionCode="1"');
+           strList.Add('    android:versionName="1.0" >');
+           strList.Add('    <uses-sdk android:minSdkVersion="10"/>');
+           strList.Add('    <application');
+           strList.Add('        android:allowBackup="true"');
+           strList.Add('        android:icon="@drawable/ic_launcher"');
+           strList.Add('        android:label="@string/app_name"');
+           strList.Add('        android:theme="@style/AppTheme" >');
+           strList.Add('        <activity');
+           strList.Add('            android:name="'+FAntPackageName+'.'+LowerCase(projName)+'.App"');
+           strList.Add('            android:label="@string/app_name" >');
+           strList.Add('            <intent-filter>');
+           strList.Add('                <action android:name="android.intent.action.MAIN" />');
+           strList.Add('                <category android:name="android.intent.category.LAUNCHER" />');
+           strList.Add('            </intent-filter>');
+           strList.Add('        </activity>');
+           strList.Add('    </application>');
+           strList.Add('</manifest>');
+           strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'AndroidManifest.xml');
+         end;
 
          strList.Clear;
          strList.Add(FAntPackageName+'.'+LowerCase(projName));
@@ -1398,52 +1418,52 @@ begin
 
     strList.Clear;
     strList.Add('Tutorial: How to get your Android Application [Apk] using "Ant":');
-    strList.Add(' ');
+    strList.Add('');
     strList.Add('1. Double click "build-debug.bat  [.sh]" to build Apk');
-    strList.Add(' ');
+    strList.Add('');
     strList.Add('2. If Android Virtual Device[AVD]/Emulator [or real device] is running then:');
     strList.Add('   2.1 double click "install.bat" to install the Apk on the Emulator [or real device]');
     strList.Add('   2.2 look for the App "'+projName+'" in the Emulator [or real device] and click it!');
-    strList.Add(' ');
+    strList.Add('');
     strList.Add('3. If AVD/Emulator is NOT running:');
     strList.Add('   3.1 If AVD/Emulator NOT exist:');
     strList.Add('        3.1.1 double click "paused_create_avd_default.bat" to create the AVD ['+DirectorySeparator+'utils folder]');
     strList.Add('   3.2 double click "launch_avd_default.bat" to launch the Emulator ['+DirectorySeparator+'utils  folder]');
     strList.Add('   3.3 look for the App "'+projName+'" in the Emulator and click it!');
-    strList.Add(' ');
+    strList.Add('');
     strList.Add('4. Log/Debug');
     strList.Add('   4.1 double click "logcat*.bat" to read logs and bugs! ['+DirectorySeparator+'utils folder]');
-    strList.Add(' ');
+    strList.Add('');
     strList.Add('5. Uninstall Apk');
     strList.Add('   5.1 double click "uninstall.bat" to remove Apk from the Emulator [or real device]!');
-    strList.Add(' ');
+    strList.Add('');
     strList.Add('6. To find your Apk look for the "'+projName+'-'+FAntBuildMode+'.apk" in '+DirectorySeparator+'bin folder!');
-    strList.Add(' ');
+    strList.Add('');
     strList.Add('7. Android Asset Packaging Tool: to know which files were packed in "'+projName+'-'+FAntBuildMode+'.apk"');
     strList.Add('   7.1 double click "aapt.bat" ['+DirectorySeparator+'utils folder]' );
-    strList.Add(' ');
+    strList.Add('');
     strList.Add('8. To see all available Android targets in your system ['+DirectorySeparator+'utils folder]');
     strList.Add('   8.1 double click "paused_list_target.bat" ');
-    strList.Add(' ');
+    strList.Add('');
     strList.Add('9. Hint 1: you can edit "*.bat" to extend/modify some command or to fix some incorrect info/path!');
-    strList.Add(' ');
+    strList.Add('');
     strList.Add('10.Hint 2: you can edit "build.xml" to set another Android target. ex. "android-18" or "android-19" etc.');
     strList.Add('   WARNING: Yes, if after run  "build.*" the folder "...\bin" is still empty then try another target!' );
     strList.Add('   WARNING: If you changed the target in "build.xml" change it in "AndroidManifest.xml" too!' );
-    strList.Add(' ');
+    strList.Add('');
     strList.Add('11.WARNING: After a new [Lazarus IDE]-> "run->build" do not forget to run again: "build.bat" and "install.bat" !');
-    strList.Add(' ');
+    strList.Add('');
     strList.Add('12. Linux users: use "build.sh" , "install.sh" , "uninstall.sh" and "logcat.sh" [thanks to Stephano!]');
     strList.Add('    WARNING: All demos Apps was generate on my windows system! So, please,  edit its to correct paths...!');
-    strList.Add(' ');
+    strList.Add('');
     strList.Add('13. WARNING, before to execute "build-release.bat [.sh]"  you need execute "release.keystore.bat [.sh]"!');
     strList.Add('    Please, read "readme-keytool-input.txt!"');
-    strList.Add(' ');
+    strList.Add('');
     strList.Add('14. Please, for more info, look for "How to use the Demos" in "Laz Android Module Wizard" readme.txt!!');
 
-    strList.Add(' ');
+    strList.Add('');
     strList.Add('....  Thank you!');
-    strList.Add(' ');
+    strList.Add('');
     strList.Add('....  by jmpessoa_hotmail_com');
     strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'readme.txt');
 
@@ -1485,10 +1505,10 @@ begin
     strList.Clear;
 
     strList.Add('Tutorial: How to get your keystore to Apk release:');
-    strList.Add(' ');
+    strList.Add('');
     strList.Add('1. Edit "keytool_input.txt" to more representative information!"');
     strList.Add('2. You need answer the prompts:');
-    strList.Add(' ');
+    strList.Add('');
     strList.Add('Enter keystore password: 123456');
     strList.Add('Re-enter new password: 123456');
     strList.Add('What is your first and last name?');
@@ -1507,20 +1527,20 @@ begin
     strList.Add('    L=MyCity, ST=AA, C=BB> correct?');
     strList.Add('  [no]:  y');
     strList.Add('Enter key password for <'+dummy+'aliaskey> <RETURN if same as keystore password>: 123456');
-    strList.Add(' ');
+    strList.Add('');
     strList.Add('3. Execute "release-keystore.bat" [.sh]');
     strList.Add('            warning: well, before execute, you can change/edit the [param] -alias '+dummy+'aliaskey');
     strList.Add('              ex.  -alias www.mycompany.com ');
     strList.Add('              Please, change/edit/Sync [key.alias='+dummy+'aliaskey] "ant.properties" too!');
-    strList.Add(' ');
+    strList.Add('');
     strList.Add('4. Edit [notepad like] "ant.properties" to more representative information!"');
     strList.Add('        warning: "key.alias='+dummy+'aliaskey" need be the same as in "release-keystore.bat [.sh]"');
-    strList.Add(' ');
+    strList.Add('');
 
     strList.Add('Yes, you got his [renowned] keystore!');
-    strList.Add(' ');
+    strList.Add('');
     strList.Add('....  Thank you!');
-    strList.Add(' ');
+    strList.Add('');
     strList.Add('....  by jmpessoa_hotmail_com');
     strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'readme-keytool-input.txt');
 
@@ -1534,19 +1554,19 @@ begin
        linuxDirSeparator:= '/';
        tempStr:= FPathToJavaJDK;
        SplitStr(tempStr, ':');
-       linuxPathToJavaJDK:= ReplaceChar (tempStr, '\', '/');
+       linuxPathToJavaJDK:= StringReplace(tempStr, '\', '/', [rfReplaceAll]);
 
        tempStr:= FAndroidProjectName;
        SplitStr(tempStr, ':');
-       linuxAndroidProjectName:= ReplaceChar (tempStr, '\', '/');
+       linuxAndroidProjectName:= StringReplace(tempStr, '\', '/', [rfReplaceAll]);
 
        tempStr:= FPathToAntBin;
        SplitStr(tempStr, ':');
-       linuxPathToAntBin:= ReplaceChar (tempStr, '\', '/');
+       linuxPathToAntBin:= StringReplace(tempStr, '\', '/', [rfReplaceAll]);
 
        tempStr:= FPathToAndroidSDK;
        SplitStr(tempStr, ':');
-       linuxPathToAndroidSdk:= ReplaceChar (tempStr, '\', '/');
+       linuxPathToAndroidSdk:= StringReplace(tempStr, '\', '/', [rfReplaceAll]);
     {$ENDIF}
 
     //linux build Apk using "Ant"  ---- Thanks to Stephano!
@@ -1633,16 +1653,17 @@ begin
   listAux:= TStringList.Create;
   listAux.StrictDelimiter:= True;
   listAux.Delimiter:= '.';
-  listAux.DelimitedText:= ReplaceChar(className,'/','.');
+  listAux.DelimitedText:= StringReplace(className,'/','.',[rfReplaceAll]);
   lastIndex:= listAux.Count-1;
   listAux.Delete(lastIndex);
   Result:= listAux.DelimitedText;
+  listAux.Free;
 end;
 
 function TAndroidProjectDescriptor.InitProject(AProject: TLazProject): TModalResult;
 var
   MainFile: TLazProjectFile;
-  projName, auxStr: string;
+  projName, projDir, auxStr: string;
   sourceList: TStringList;
   auxList: TStringList;
 
@@ -1675,7 +1696,10 @@ begin
 
   projName:= LowerCase(FJavaClassName) + '.lpr';
 
-  MainFile := AProject.CreateProjectFile(projName);
+  projDir := FPathToJNIFolder+DirectorySeparator+'jni'+DirectorySeparator;
+  AProject.ProjectInfoFile := projDir + ChangeFileExt(projName, '.lpi');
+
+  MainFile := AProject.CreateProjectFile(projDir + projName);
   MainFile.IsPartOfProject := True;
   AProject.AddFile(MainFile, False);
   AProject.MainFileID := 0;
@@ -1683,31 +1707,33 @@ begin
   if FModuleType = 0 then
     AProject.AddPackageDependency('tfpandroidbridge_pack'); //GUI controls
 
-  sourceList.Add('{hint: save all files to location: ' +FPathToJNIFolder+DirectorySeparator+'jni }');
+  sourceList.Add('{hint: save all files to location: ' + projDir + ' }');
   sourceList.Add('library '+ LowerCase(FJavaClassName) +'; '+ ' //[by LazAndroidWizard: '+DateTimeToStr(Now)+']');
-  sourceList.Add(' ');
+  sourceList.Add('');
   sourceList.Add('{$mode delphi}');
-  sourceList.Add(' ');
+  sourceList.Add('');
   sourceList.Add('uses');
   if FModuleType = 0 then  //GUI controls
   begin
     sourceList.Add('  Classes, SysUtils, And_jni, And_jni_Bridge, AndroidWidget, Laz_And_Controls, Laz_And_Controls_Events;');
-    sourceList.Add(' ');
+    sourceList.Add('');
   end
   else //generic module :  Not Android Bridges Controls
   begin
     sourceList.Add('  Classes, SysUtils, CustApp, jni;');
-    sourceList.Add(' ');
+    sourceList.Add('');
     sourceList.Add('type');
-    sourceList.Add(' ');
-    sourceList.Add('  jApp = class(TCustomApplication)');
+    sourceList.Add('');
+    sourceList.Add('  TNoGUIApp = class(TCustomApplication)');
     sourceList.Add('  public');
+    sourceList.Add('     jClassName: string;');
+    sourceList.Add('     jAppName: string;');
     sourceList.Add('     procedure CreateForm(InstanceClass: TComponentClass; out Reference);');
     sourceList.Add('     constructor Create(TheOwner: TComponent); override;');
     sourceList.Add('     destructor Destroy; override;');
     sourceList.Add('  end;');
-    sourceList.Add(' ');
-    sourceList.Add('procedure jApp.CreateForm(InstanceClass: TComponentClass; out Reference);');
+    sourceList.Add('');
+    sourceList.Add('procedure TNoGUIApp.CreateForm(InstanceClass: TComponentClass; out Reference);');
     sourceList.Add('var');
     sourceList.Add('  Instance: TComponent;');
     sourceList.Add('begin');
@@ -1715,33 +1741,36 @@ begin
     sourceList.Add('  TComponent(Reference):= Instance;');
     sourceList.Add('  Instance.Create(Self);');
     sourceList.Add('end;');
-    sourceList.Add(' ');
-    sourceList.Add('constructor jApp.Create(TheOwner: TComponent);');
+    sourceList.Add('');
+    sourceList.Add('constructor TNoGUIApp.Create(TheOwner: TComponent);');
     sourceList.Add('begin');
     sourceList.Add('  inherited Create(TheOwner);');
     sourceList.Add('  StopOnException:=True;');
     sourceList.Add('end;');
-    sourceList.Add(' ');
-    sourceList.Add('destructor jApp.Destroy;');
+    sourceList.Add('');
+    sourceList.Add('destructor TNoGUIApp.Destroy;');
     sourceList.Add('begin');
     sourceList.Add('  inherited Destroy;');
     sourceList.Add('end;');
-    sourceList.Add(' ');
+    sourceList.Add('');
     sourceList.Add('var');
-    sourceList.Add('  gApp: jApp;');
-    sourceList.Add(' ');
+    sourceList.Add('  gNoGUIApp: TNoGUIApp;');
+    sourceList.Add('  gNoGUIjAppName: string;');
+    sourceList.Add('  gNoGUIAppjClassName: string;');
+
+    sourceList.Add('');
   end;
 
   sourceList.Add(Trim(FPascalJNIInterfaceCode));  {from form...}
 
-  sourceList.Add(' ');
+  sourceList.Add('');
   sourceList.Add('begin');
   if FModuleType = 0 then  //Android Bridges ontrols...
   begin
-    sourceList.Add('  gApp:= jApp.Create(nil);{AndroidWidget.pas}');
+    sourceList.Add('  gApp:= jApp.Create(nil);');
     sourceList.Add('  gApp.Title:= ''JNI Android Bridges Library'';');
-    sourceList.Add('  gjAppName:= '''+GetAppName(FPathToClassName)+''';{AndroidWidget.pas}');
-    sourceList.Add('  gjClassName:= '''+FPathToClassName+''';{AndroidWidget.pas}');
+    sourceList.Add('  gjAppName:= '''+GetAppName(FPathToClassName)+''';');
+    sourceList.Add('  gjClassName:= '''+FPathToClassName+''';');
     sourceList.Add('  gApp.AppName:=gjAppName;');
     sourceList.Add('  gApp.ClassName:=gjClassName;');
     sourceList.Add('  gApp.Initialize;');
@@ -1749,10 +1778,16 @@ begin
   end
   else
   begin
-     sourceList.Add('  gApp:= jApp.Create(nil);');
-     sourceList.Add('  gApp.Title:= ''My Android Pure Library'';');
-     sourceList.Add('  gApp.Initialize;');
-     sourceList.Add('  gApp.CreateForm(TNoGUIAndroidModule1, NoGUIAndroidModule1);');
+     sourceList.Add('  gNoGUIApp:= TNoGUIApp.Create(nil);');
+     sourceList.Add('  gNoGUIApp.Title:= ''My Android Pure Library'';');
+     sourceList.Add('  gNoGUIjAppName:= '''+GetAppName(FPathToClassName)+''';');
+     sourceList.Add('  gNoGUIAppjClassName:= '''+FPathToClassName+''';');
+
+     sourceList.Add('  gNoGUIApp.jAppName:=gNoGUIjAppName;');
+     sourceList.Add('  gNoGUIApp.jClassName:=gNoGUIAppjClassName;');
+
+     sourceList.Add('  gNoGUIApp.Initialize;');
+     sourceList.Add('  gNoGUIApp.CreateForm(TNoGUIAndroidModule1, NoGUIAndroidModule1);');
   end;
 
   sourceList.Add('end.');
@@ -1937,43 +1972,43 @@ begin
 
   auxList.Clear;
   auxList.Add('How To Get More Builds:');
-  auxList.Add(' ');
+  auxList.Add('');
   auxList.Add('   :: Warning: Your system [Laz4Android ?] needs to be prepared for the various builds!');
-  auxList.Add(' ');
+  auxList.Add('');
   auxList.Add('1. Edit Lazarus project file "*.lpi": [use notepad like editor]');
-  auxList.Add(' ');
+  auxList.Add('');
   auxList.Add('   > Open the "*.lpi" project file');
-  auxList.Add(' ');
+  auxList.Add('');
   auxList.Add('       -If needed replace the line <Libraries ..... /> in the "*.lpi" by line from "build_*.txt"');
   auxList.Add('       -If needed replace the line <TargetCPU ..... /> in the "*.lpi" by line from "build_*.txt"');
   auxList.Add('       -If needed replace the line <CustomOptions ..... /> in the "*.lpi" by line from "build_*.txt"');
   auxList.Add('       -If needed replace the line <TargetProcessor...../> in the "*.lpi" by line from "build_*.txt"');
-  auxList.Add(' ');
+  auxList.Add('');
   auxList.Add('   > Save the modified "*.lpi" project file ');
-  auxList.Add(' ');
+  auxList.Add('');
   auxList.Add('2. From Laz4Android IDE');
-  auxList.Add(' ');
+  auxList.Add('');
   auxList.Add('   >Reopen the Project');
-  auxList.Add(' ');
+  auxList.Add('');
   auxList.Add('   > Run -> Build');
-  auxList.Add(' ');
+  auxList.Add('');
   auxList.Add('4. Repeat for others "build_*.txt" if needed...');
-  auxList.Add(' ');
+  auxList.Add('');
 
   if FProjectModel = 'Ant' then
     auxList.Add('4. Execute [double click] the "build.bat" file to get the Apk !')
   else
   begin
     auxList.Add('4. From Eclipse IDE:');
-    auxList.Add(' ');
+    auxList.Add('');
     auxList.Add('   -right click your  project: -> Refresh');
-    auxList.Add(' ');
+    auxList.Add('');
     auxList.Add('   -right click your  project: -> Run as -> Android Application');
   end;
 
-  auxList.Add(' ');
-  auxList.Add(' ');
-  auxList.Add(' ');
+  auxList.Add('');
+  auxList.Add('');
+  auxList.Add('');
   auxList.Add('      Thank you!');
   auxList.Add('      By  ___jmpessoa_hotmail.com_____');
 
@@ -2018,6 +2053,7 @@ begin
 
   LazarusIDE.DoNewEditorFile(AndroidFileDescriptor, '', '',
                              [nfIsPartOfProject,nfOpenInEditor,nfCreateDefaultSrc]);
+  LazarusIDE.DoSaveProject([sfSaveAs]);
   Result := mrOK;
 end;
 
@@ -2067,27 +2103,27 @@ begin
    sourceList:= TStringList.Create;
    sourceList.Add('{Hint: save all files to location: ' +PathToJNIFolder+DirectorySeparator+'jni }');
    sourceList.Add('unit '+uName+';');
-   sourceList.Add(' ');
+   sourceList.Add('');
    if SyntaxMode = smDelphi then
       sourceList.Add('{$mode delphi}');
    if SyntaxMode = smObjFpc then
      sourceList.Add('{$mode objfpc}{$H+}');
-   sourceList.Add(' ');
+   sourceList.Add('');
    sourceList.Add('interface');
-   sourceList.Add(' ');
+   sourceList.Add('');
    sourceList.Add('uses');
    sourceList.Add('  ' + GetInterfaceUsesSection);
    if ModuleType = 1 then //no GUI
    begin
-    sourceList.Add(' ');
+    sourceList.Add('');
     sourceList.Add('const');
-    sourceList.Add('  gjClassPath: string='''';');
-    sourceList.Add('  gjClass: JClass=nil;');
-    sourceList.Add('  gPDalvikVM: PJavaVM=nil;');
+    sourceList.Add('  gNoGUIjClassPath: string='''';');
+    sourceList.Add('  gNoGUIjClass: JClass=nil;');
+    sourceList.Add('  gNoGUIPDalvikVM: PJavaVM=nil;');
    end;
    sourceList.Add(GetInterfaceSource(Filename, SourceName, ResourceName));
    sourceList.Add('implementation');
-   sourceList.Add(' ');
+   sourceList.Add('');
    sourceList.Add(GetImplementationSource(Filename, SourceName, ResourceName));
    sourceList.Add('end.');
    Result:= sourceList.Text;
@@ -2098,7 +2134,7 @@ end;
 function TAndroidFileDescPascalUnitWithResource.GetInterfaceUsesSection: string;
 begin
   if ModuleType = 1 then //generic module: No GUI Controls
-    Result := 'Classes, SysUtils, jni, AndroidWidget;'
+    Result := 'Classes, SysUtils, jni;'
   else  //GUI controls module
     Result := 'Classes, SysUtils, And_jni, And_jni_Bridge, Laz_And_Controls, Laz_And_Controls_Events, AndroidWidget;';
 
@@ -2112,7 +2148,7 @@ var
   strList: TStringList;
 begin
   strList:= TStringList.Create;
-  strList.Add(' ');
+  strList.Add('');
   strList.Add('type');
   if ModuleType = 0 then //GUI controls module
   begin
@@ -2133,7 +2169,7 @@ begin
   strList.Add('   public');
   strList.Add('     {public declarations}');
   strList.Add('  end;');
-  strList.Add(' ');
+  strList.Add('');
   strList.Add('var');
   //strList.Add('  ' + ResourceName + ': T' + ResourceName + ';');
   if ModuleType = 0 then //GUI controls module
@@ -2163,19 +2199,9 @@ var
 begin
   sttList:= TStringList.Create;
   sttList.Add('{$R *.lfm}');
- // sttList.Add(' ');
+ // sttList.Add('');
   Result:= sttList.Text;
   sttList.Free;
-end;
-
-//helper...
-function ReplaceChar(query: string; oldchar, newchar: char):string;
-begin
-  if query <> '' then
-  begin
-     while Pos(oldchar,query) > 0 do query[pos(oldchar,query)]:= newchar;
-     Result:= query;
-  end;
 end;
 
 function SplitStr(var theString: string; delimiter: string): string;

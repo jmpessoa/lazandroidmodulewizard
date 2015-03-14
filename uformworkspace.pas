@@ -21,6 +21,7 @@ type
     EditPathToWorkspace: TEdit;
     edProjectName: TEdit;
     GroupBox1: TGroupBox;
+    Image1: TImage;
     LabelTargetAPI: TLabel;
     LabelPathToWorkspace: TLabel;
     LabelPlatform: TLabel;
@@ -125,7 +126,6 @@ type
   end;
 
   procedure GetSubDirectories(const directory : string; list : TStrings);
-  function ReplaceChar(query: string; oldchar, newchar: char):string;
   function TrimChar(query: string; delimiter: char): string;
 
 var
@@ -717,16 +717,6 @@ begin
 
       Free;
    end;
-end;
-
-//helper...
-function ReplaceChar(query: string; oldchar, newchar: char):string;
-begin
-  if query <> '' then
-  begin
-     while Pos(oldchar,query) > 0 do query[pos(oldchar,query)]:= newchar;
-     Result:= query;
-  end;
 end;
 
 function TrimChar(query: string; delimiter: char): string;
