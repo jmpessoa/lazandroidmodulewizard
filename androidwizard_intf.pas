@@ -268,7 +268,6 @@ var
 
 procedure Register;
 
-function ReplaceChar(query: string; oldchar, newchar: char):string;
 function SplitStr(var theString: string; delimiter: string): string;
 
 procedure GetRedGreenBlue(rgb: longInt; out Red, Green, Blue: word);
@@ -1555,19 +1554,19 @@ begin
        linuxDirSeparator:= '/';
        tempStr:= FPathToJavaJDK;
        SplitStr(tempStr, ':');
-       linuxPathToJavaJDK:= ReplaceChar (tempStr, '\', '/');
+       linuxPathToJavaJDK:= StringReplace(tempStr, '\', '/', [rfReplaceAll]);
 
        tempStr:= FAndroidProjectName;
        SplitStr(tempStr, ':');
-       linuxAndroidProjectName:= ReplaceChar (tempStr, '\', '/');
+       linuxAndroidProjectName:= StringReplace(tempStr, '\', '/', [rfReplaceAll]);
 
        tempStr:= FPathToAntBin;
        SplitStr(tempStr, ':');
-       linuxPathToAntBin:= ReplaceChar (tempStr, '\', '/');
+       linuxPathToAntBin:= StringReplace(tempStr, '\', '/', [rfReplaceAll]);
 
        tempStr:= FPathToAndroidSDK;
        SplitStr(tempStr, ':');
-       linuxPathToAndroidSdk:= ReplaceChar (tempStr, '\', '/');
+       linuxPathToAndroidSdk:= StringReplace(tempStr, '\', '/', [rfReplaceAll]);
     {$ENDIF}
 
     //linux build Apk using "Ant"  ---- Thanks to Stephano!
@@ -1654,10 +1653,11 @@ begin
   listAux:= TStringList.Create;
   listAux.StrictDelimiter:= True;
   listAux.Delimiter:= '.';
-  listAux.DelimitedText:= ReplaceChar(className,'/','.');
+  listAux.DelimitedText:= StringReplace(className,'/','.',[rfReplaceAll]);
   lastIndex:= listAux.Count-1;
   listAux.Delete(lastIndex);
   Result:= listAux.DelimitedText;
+  listAux.Free;
 end;
 
 function TAndroidProjectDescriptor.InitProject(AProject: TLazProject): TModalResult;
@@ -2198,16 +2198,6 @@ begin
  // sttList.Add(' ');
   Result:= sttList.Text;
   sttList.Free;
-end;
-
-//helper...
-function ReplaceChar(query: string; oldchar, newchar: char):string;
-begin
-  if query <> '' then
-  begin
-     while Pos(oldchar,query) > 0 do query[pos(oldchar,query)]:= newchar;
-     Result:= query;
-  end;
 end;
 
 function SplitStr(var theString: string; delimiter: string): string;

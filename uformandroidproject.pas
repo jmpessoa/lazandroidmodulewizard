@@ -163,7 +163,6 @@ var
   FormAndroidProject: TFormAndroidProject;
 
 function TrimChar(query: string; delimiter: char): string;
-function ReplaceChar(query: string; oldchar, newchar: char):string;
 function SplitStr(var theString: string; delimiter: string): string;
 function LastPos(delimiter: string; str: string): integer;
 function DeleteLineBreaks(const S: string): string;
@@ -383,7 +382,7 @@ begin
          if Pos('.', jType) > 0 then
          begin
             auxStr:= jType;
-            Result:= 'L'+ ReplaceChar(auxStr,'.','/')+';';
+            Result:= 'L'+StringReplace(auxStr,'.','/',[rfReplaceAll])+';';
          end
     else if Pos('String', jType) > 0 then
     begin
@@ -474,7 +473,7 @@ var
   k, count: integer;
   auxParam: string;
 begin
-  auxParam:= ReplaceChar(Trim(funcParam),' ','~');
+  auxParam:= StringReplace(Trim(funcParam),' ','~',[rfReplaceAll]);
   paramList:= TStringList.Create;
   if Pos(',', auxParam) > 0 then
   begin
@@ -1107,7 +1106,7 @@ var
   auxParam: string;
 begin
   Result:='(';
-  auxParam:= ReplaceChar(Trim(params),' ','~');
+  auxParam:= StringReplace(Trim(params),' ','~',[rfReplaceAll]);
   paramList:= TStringList.Create;
   if Pos(',', auxParam) > 0 then
   begin
@@ -1299,7 +1298,7 @@ begin
       strOnLoadList.Add('  end;');
       strOnLoadList.Add('end;');
       strOnLoadList.Add(' ');
-      PathToClassName:= ReplaceChar(auxPathJNI, '_', '/');
+      PathToClassName:= StringReplace(auxPathJNI, '_', '/',[rfReplaceAll]);
       strOnLoadList.Add('function RegisterNativeMethods(PEnv: PJNIEnv; className: PChar): integer;');
       strOnLoadList.Add('begin');
       strOnLoadList.Add('  Result:= RegisterNativeMethodsArray(PEnv, className, @NativeMethods[0], Length(NativeMethods));');
@@ -1377,7 +1376,7 @@ begin
     end;
 
     auxStr:= Memo6List.Strings[Memo6List.Count-1];
-    Memo6List.Strings[Memo6List.Count-1]:= ReplaceChar(auxStr,',',';');
+    Memo6List.Strings[Memo6List.Count-1]:= StringReplace(auxStr,',',';',[rfReplaceAll]);
 
     if not FHackJNIMethod then
        FPascalJNIInterfaceCode:= Memo5List.Text + strNativeMethodsHeader + LineEnding+
@@ -1472,7 +1471,7 @@ begin
           if Pos('import ', auxStr) > 0 then
           begin
              SplitStr(auxStr,' ');
-             auxStr:= ReplaceChar(auxStr,'.','/');
+             auxStr:= StringReplace(auxStr,'.','/',[rfReplaceAll]);
              FImportsList.Add('L'+trim(auxStr));
           end;
         end;
@@ -2419,9 +2418,9 @@ begin
              if Pos('_Template', regFile) > 0 then
              begin
                userTab:= InputBox('Register [Tab] Component', 'Tab Name', 'myTab');
-               regFile:= StringReplace(regFile,'_Template', '_'+ReplaceChar(userTab,' ','_'),[]);
+               regFile:= StringReplace(regFile,'_Template','_'+StringReplace(userTab,' ','_',[rfReplaceAll]),[]);
 
-               strList.Strings[0]:= 'unit register_'+ReplaceChar(userTab,' ','_')+';';
+               strList.Strings[0]:= 'unit register_'+StringReplace(userTab,' ','_',[rfReplaceAll])+';';
                strList.Text:= StringReplace(strList.Text,'Template', userTab,[]);
              end;
              i:= 0;
@@ -2526,15 +2525,6 @@ begin
          if auxStr[count] = delimiter then  auxStr[count] := newchar;
       end;
       Result:= Trim(auxStr);
-  end;
-end;
-
-function ReplaceChar(query: string; oldchar, newchar: char):string;
-begin
-  if query <> '' then
-  begin
-     while Pos(oldchar,query) > 0 do query[pos(oldchar,query)]:= newchar;
-     Result:= query;
   end;
 end;
 
