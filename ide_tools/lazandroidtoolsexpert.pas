@@ -223,7 +223,7 @@ end;
 procedure TfrmLazAndroidToolsExpert.LoadSettings;
 begin
   With TIniFile.Create(LatSettingFile) do
-  begin
+  try
     SdkPath:= ReadString('PATH', 'SDK', '');
     NdkPath:= ReadString('PATH', 'NDK', '');
     JdkPath:= ReadString('PATH', 'JDK', '');
@@ -235,6 +235,7 @@ begin
     Self.Height:= ReadInteger('POS', 'h', Self.Height);
     Self.Left:= ReadInteger('POS', 'l', Self.Left);
     Self.Top:= ReadInteger('POS', 't', Self.Top);
+  finally
     Free;
   end;
 end;
@@ -244,7 +245,7 @@ var
   AmwFile: string;
 begin
   With TIniFile.Create(LatSettingFile) do
-  begin
+  try
     if Trim(SdkPath) <> '' then
       WriteString('PATH', 'SDK', SdkPath);
     if Trim(NdkPath) <> '' then
@@ -262,15 +263,17 @@ begin
     WriteInteger('POS', 'h', Self.Height);
     WriteInteger('POS', 'l', Self.Left);
     WriteInteger('POS', 't', Self.Top);
+  finally
     Free;
   end;
 
   //by jmpessoa
   AmwFile:= AppendPathDelim(LazarusIDE.GetPrimaryConfigPath) + 'JNIAndroidProject.ini';
   with TInifile.Create(AmwFile) do
-  begin
+  try
       WriteString('NewProject', 'FullProjectName', ProjectPath);
       WriteString('NewProject', 'PathToWorkspace', PathToWorkspace);
+  finally
       Free;
   end;
 
@@ -323,8 +326,7 @@ begin
   if FileExists(AmwFile) then
   begin
       with TIniFile.Create(AmwFile) do  // Try to use settings from Android module wizard
-      begin
-
+      try
         SdkPath:= ReadString('NewProject', 'PathToAndroidSDK', '');
         NdkPath:= ReadString('NewProject', 'PathToAndroidNDK', '');
         JdkPath:= ReadString('NewProject', 'PathToJavaJDK', '');
@@ -339,6 +341,8 @@ begin
         EditAntBinaryPath.Text:= AntPath;
 
         SaveSettings;
+      finally
+        Free
       end;
   end
   else

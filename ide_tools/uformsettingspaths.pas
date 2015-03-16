@@ -165,7 +165,7 @@ begin
   if FileExists(fileName) then
   begin
     with TIniFile.Create(fileName) do
-    begin
+    try
       EditPathToAndroidNDK.Text := ReadString('NewProject','PathToAndroidNDK', '');
       EditPathToSimonsayzTemplate.Text := ReadString('NewProject','PathToJavaTemplates', '');
       EditPathToJavaJDK.Text := ReadString('NewProject','PathToJavaJDK', '');
@@ -184,7 +184,7 @@ begin
       if  FPrebuildOSYS <> '' then
          RadioGroupPrebuildOSys.ItemIndex:= GetRadioGroupPrebuildOSysIndex(FPrebuildOSYS)
       else RadioGroupPrebuildOSys.ItemIndex:= 0;
-
+    finally
       Free;
     end;
   end;
@@ -193,7 +193,7 @@ end;
 procedure TFormSettingsPaths.SaveSettings(const fileName: string);
 begin
   with TInifile.Create(fileName) do
-  begin
+  try
       WriteString('NewProject', 'PathToNdkPlataforms', EditPathToAndroidNDK.Text);
       WriteString('NewProject', 'PathToJavaTemplates', EditPathToSimonsayzTemplate.Text);
       WriteString('NewProject', 'PathToJavaJDK', EditPathToJavaJDK.Text);
@@ -210,8 +210,8 @@ begin
      end;
 
      WriteString('NewProject', 'PrebuildOSYS', FPrebuildOSYS);
-
-      Free;
+  finally
+     Free;
   end;
 end;
 

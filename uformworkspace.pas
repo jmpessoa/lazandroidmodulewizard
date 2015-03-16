@@ -369,7 +369,7 @@ begin
   if FileExists(fileName) then
   begin
     with TIniFile.Create(fileName) do
-    begin
+    try
       FPathToJavaJDK:= ReadString('NewProject','PathToJavaJDK', '');
       if  FPathToJavaJDK = '' then
       begin
@@ -487,7 +487,7 @@ begin
       FSupportV4:= ReadString('NewProject','SupportV4', '');
       if FSupportV4 = 'yes' then CheckBox1.Checked:= True
       else FSupportV4 := 'no';
-
+    finally
       Free;
     end;
   end;
@@ -558,7 +558,7 @@ var
 begin
   FFileName:= pFilename;
   with TIniFile.Create(pFilename) do
-  begin
+  try
     FPathToWorkspace:= ReadString('NewProject','PathToWorkspace', '');
     FAntPackageName:= ReadString('NewProject','AntPackageName', '');
 
@@ -635,7 +635,7 @@ begin
     GetSubDirectories(FPathToWorkspace, ComboSelectProjectName.Items);
 
     FPrebuildOSYS:= ReadString('NewProject','PrebuildOSYS', '');
-
+  finally
     Free;
   end;
 
@@ -664,7 +664,7 @@ end;
 procedure TFormWorkspace.SaveSettings(const pFilename: string);
 begin
    with TInifile.Create(pFilename) do
-   begin
+   try
       WriteString('NewProject', 'PathToWorkspace', EditPathToWorkspace.Text);
 
       WriteString('NewProject', 'FullProjectName', FAndroidProjectName);
@@ -695,7 +695,7 @@ begin
       WriteString('NewProject', 'PathToAntBin', FPathToAntBin);
 
       WriteString('NewProject', 'PrebuildOSYS', FPrebuildOSYS);
-
+   finally
       Free;
    end;
 end;

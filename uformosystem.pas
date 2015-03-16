@@ -61,11 +61,12 @@ begin
   if FileExists(fileName) then
   begin
     with TIniFile.Create(fileName) do
-    begin
+    try
       PrebuildOSYS:= ReadString('NewProject','PrebuildOSYS', '');
       if  PrebuildOSYS <> '' then
          RadioGroup1.ItemIndex:= GetIndex(PrebuildOSYS)
       else RadioGroup1.ItemIndex:= 0;
+    finally
       Free;
     end;
   end;

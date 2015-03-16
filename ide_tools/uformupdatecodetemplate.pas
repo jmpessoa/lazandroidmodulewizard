@@ -106,9 +106,10 @@ var
 begin
    AmwFile:= AppendPathDelim(LazarusIDE.GetPrimaryConfigPath) + 'JNIAndroidProject.ini';
    with TInifile.Create(AmwFile) do
-   begin
+   try
       WriteString('NewProject', 'FullProjectName', ProjectPath);
       WriteString('NewProject', 'PathToWorkspace', PathToWorkspace);
+   finally
       Free;
    end;
 
@@ -328,10 +329,12 @@ begin
   if FileExists(AmwFile) then
   begin
       with TIniFile.Create(AmwFile) do  // Try to use settings from Android module wizard
-      begin
+      try
         ProjectPath:= ReadString('NewProject', 'FullProjectName', '');
         PathToWorkspace:=  ReadString('NewProject', 'PathToWorkspace', '');
         PathToJavaTemplates:= ReadString('NewProject', 'PathToJavaTemplates', '');
+      finally
+        Free
       end;
   end
 end;

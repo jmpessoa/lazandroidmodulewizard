@@ -1901,8 +1901,9 @@ begin
   if FileExists(fileName) then
   begin
     with TIniFile.Create(fileName) do
-    begin
+    try
       FPathToJavaTemplates := ReadString('NewProject','PathToJavaTemplates', '');
+    finally
       Free;
     end;
   end;

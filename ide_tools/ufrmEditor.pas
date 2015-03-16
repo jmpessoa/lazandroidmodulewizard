@@ -200,9 +200,11 @@ begin
    if FileExists(AmwFile) then
    begin
        with TIniFile.Create(AmwFile) do  // Try to use settings from Android module wizard
-       begin
+       try
          PathToWorkspace:=  ReadString('NewProject', 'PathToWorkspace', ''); //by jmpessoa
          ProjectPath:= ReadString('NewProject', 'FullProjectName', '');      //by jmpessoa
+       finally
+         Free
        end;
    end
 end;
