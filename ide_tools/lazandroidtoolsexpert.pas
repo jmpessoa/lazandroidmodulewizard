@@ -6,7 +6,7 @@ interface
 
 uses
   Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs,
-  StdCtrls, ComCtrls, IDEIntf, ProjectIntf, LazIDEIntf, LCLIntf,
+  StdCtrls, ComCtrls, IDEIntf, ProjectIntf, LazIDEIntf, MacroIntf, LCLIntf,
   Buttons, Menus, ExtCtrls, ThreadProcess;
 
 type
@@ -29,12 +29,10 @@ type
     BtnAntBinaryPath: TButton;
     BtnJDKPath: TButton;
     chkbxUseAntBuild: TCheckBox;
-    EditLazBuildPath: TEdit;
     EditAndroidNDKPath: TEdit;
     EditAndroidSDKPath: TEdit;
     EditAntBinaryPath: TEdit;
     EditJDKPath: TEdit;
-    LabelLazBuildPath: TLabel;
     LabelAntBinaryPath: TLabel;
     LabelJDKPath: TLabel;
     LabelPathToWorkspace: TLabel;
@@ -54,7 +52,6 @@ type
     PanelLogs: TPanel;
     PopupMenu1: TPopupMenu;
     SelDirDlgPath: TSelectDirectoryDialog;
-    SpBLazBuildPath: TSpeedButton;
     SpBPathToWorkspace: TSpeedButton;
     SpBSelectProject: TSpeedButton;
     StatusBarMain: TStatusBar;
@@ -84,7 +81,6 @@ type
     procedure PageControlLogChange(Sender: TObject);
     procedure PopupMenu1Close(Sender: TObject);
     procedure SpBPathToWorkspaceClick(Sender: TObject);
-    procedure SpBLazBuildPathClick(Sender: TObject);
     procedure SpBSelectProjectClick(Sender: TObject);
 
   private
@@ -92,7 +88,6 @@ type
     ProjectPath: string;
     JNIProjectPath: string;    //by jmpessoa
     PathToWorkspace: string;   //by jmpessoa
-    PathToLazbuild: string;    //by jmpessoa
 
     //InstructionSet: string;    //by jmpessoa     //aka TBuildMode
 
@@ -233,7 +228,6 @@ begin
     NdkPath:= ReadString('PATH', 'NDK', '');
     JdkPath:= ReadString('PATH', 'JDK', '');
     AntPath:= ReadString('PATH', 'Ant', '');
-    PathToLazbuild:= ReadString('PATH', 'PathToLazbuild', ''); //by jmpessoa
     PathToWorkspace:= ReadString('PATH', 'PathToWorkspace', ''); //by jmpessoa
 
     UseAnt:= ReadBool('PATH', 'UseAnt', True);
@@ -259,9 +253,6 @@ begin
       WriteString('PATH', 'JDK', JdkPath);
     if Trim(AntPath) <> '' then
       WriteString('PATH', 'Ant', AntPath);
-
-    if Trim(PathToLazbuild) <> '' then     //by jmpessoa
-      WriteString('PATH', 'PathToLazbuild', PathToLazbuild);
 
     if Trim(PathToWorkspace) <> '' then     //by jmpessoa
       WriteString('PATH', 'PathToWorkspace', PathToWorkspace);
@@ -339,7 +330,6 @@ begin
         JdkPath:= ReadString('NewProject', 'PathToJavaJDK', '');
         AntPath:= ReadString('NewProject', 'PathToAntBin', '');
         PathToWorkspace:=  ReadString('NewProject', 'PathToWorkspace', ''); //by jmpessoa
-        PathToLazbuild:= ReadString('NewProject', 'PathToLazbuild', '');    //by jmpessoa
 
         ProjectPath:= ReadString('NewProject', 'FullProjectName', '');      //by jmpessoa
 
@@ -377,7 +367,6 @@ begin
   EditJDKPath.Text:= JdkPath;
   EditAntBinaryPath.Text:= AntPath;
   EditPathToWorkspace.Text:= PathToWorkspace; //by jmpessoa
-  EditLazBuildPath.Text:= PathToLazbuild;  //by jmpessoa
   chkbxUseAntBuild.Checked:= UseAnt;
   PageControlMain.ActivePage:= TabSheetAction;
 
@@ -534,19 +523,6 @@ begin
   end;
 end;
 
-procedure TfrmLazAndroidToolsExpert.SpBLazBuildPathClick(Sender: TObject);
-begin
-  SelDirDlgPath.Title:= 'Select Lazbuild path';
-  if Trim(EditLazBuildPath.Text) <> '' then
-    if DirPathExists(EditLazBuildPath.Text) then
-      SelDirDlgPath.InitialDir:= EditLazBuildPath.Text;
-  if SelDirDlgPath.Execute then
-  begin
-    PathToLazbuild:= SelDirDlgPath.FileName;    //by jmpessoa
-    EditLazBuildPath.Text:= PathToLazbuild;
-  end;
-end;
-
 procedure TfrmLazAndroidToolsExpert.SpBSelectProjectClick(Sender: TObject);
 begin
   PathToWorkspace:= EditPathToWorkspace.Text;   //change Workspace...
@@ -601,14 +577,8 @@ end;
 
 
 procedure TfrmLazAndroidToolsExpert.RebuildLibrary; //by jmpessoa
+var s: string;
 begin
-
-  if PathToLazbuild = '' then
-  begin
-     ShowMessage('Fail! PathToLazbuild not found!' );
-     Exit;
-  end;
-
   //if ApkProcessRunning then Exit;
   if Assigned(APKProcess) then
   begin
@@ -622,7 +592,9 @@ begin
     Dir:= Self.JNIProjectPath;  //controls.lpi
 
     //TODO: : [by jmpessoa] CommandLine need fix: deprecated!
-    CommandLine:= CmdShell + IncludeTrailingBackslash(PathToLazbuild) + 'lazbuild controls.lpi';
+    s := CmdShell + '$Path($(LazarusDir))lazbuild controls.lpi';
+    IDEMacros.SubstituteMacros(s);
+    CommandLine := s;
 
    (* TODO: [by jmpessoa]  test it!
      Executable:= 'lazbuild'

@@ -18,13 +18,11 @@ type
     BevelSDKNDKAndSimonsayzTemplateLazBuild: TBevel;
     BevelJDKAntAndSDKNDK: TBevel;
     BitBtnCancel: TBitBtn;
-    EditPathToLazBuild: TEdit;
     EditPathToAndroidNDK: TEdit;
     EditPathToSimonsayzTemplate: TEdit;
     EditPathToJavaJDK: TEdit;
     EditPathToAndroidSDK: TEdit;
     EditPathToAntBinary: TEdit;
-    LabelPathToLazBuild: TLabel;
     LabelPathToAndroidNDK: TLabel;
     LabelPathToSimonsayzTemplate: TLabel;
     LabelPathToJavaJDK: TLabel;
@@ -32,13 +30,11 @@ type
     LabelPathToAntBinary: TLabel;
     RadioGroupPrebuildOSys: TRadioGroup;
     RGNDKVersion: TRadioGroup;
-    SelDirDlgPathToLazBuild: TSelectDirectoryDialog;
     SelDirDlgPathToAndroidNDK: TSelectDirectoryDialog;
     SelDirDlgPathToSimonsayzTemplate: TSelectDirectoryDialog;
     SelDirDlgPathToJavaJDK: TSelectDirectoryDialog;
     SelDirDlgPathToAndroidSDK: TSelectDirectoryDialog;
     SelDirDlgPathToAntBinary: TSelectDirectoryDialog;
-    SpBPathToLazBuild: TSpeedButton;
     SpBPathToAndroidNDK: TSpeedButton;
     SpBPathToSimonsayzTemplate: TSpeedButton;
     SpBPathToJavaJDK: TSpeedButton;
@@ -49,8 +45,6 @@ type
     procedure FormActivate(Sender: TObject);
     procedure FormClose(Sender: TObject; var CloseAction: TCloseAction);
     procedure FormShow(Sender: TObject);
-    procedure SpBPathToLazBuildClick(Sender: TObject);
-
     procedure SpBPathToAndroidNDKClick(Sender: TObject);
     procedure SpBPathToSimonsayzTemplateClick(Sender: TObject);
     procedure SpBPathToJavaJDKClick(Sender: TObject);
@@ -92,14 +86,6 @@ procedure TFormSettingsPaths.FormShow(Sender: TObject);
 begin
    FOk:= False;
    Self.LoadSettings(AppendPathDelim(LazarusIDE.GetPrimaryConfigPath) + 'JNIAndroidProject.ini');
-end;
-
-procedure TFormSettingsPaths.SpBPathToLazBuildClick(Sender: TObject);
-begin
-  if SelDirDlgPathToLazBuild.Execute then
-  begin
-    EditPathToLazBuild.Text := SelDirDlgPathToLazBuild.FileName;
-  end;
 end;
 
 procedure TFormSettingsPaths.FormActivate(Sender: TObject);
@@ -186,7 +172,6 @@ begin
       EditPathToAndroidSDK.Text := ReadString('NewProject','PathToAndroidSDK', '');
 
       EditPathToAntBinary.Text := ReadString('NewProject','PathToAntBin', '');
-      EditPathToLazBuild.Text:=  ReadString('NewProject','PathToLazbuild', '');
 
       if ReadString('NewProject','NDK', '') <> '' then
           indexNdk:= StrToInt(ReadString('NewProject','NDK', ''))
@@ -216,7 +201,6 @@ begin
       WriteString('NewProject', 'PathToAndroidSDK', EditPathToAndroidSDK.Text);
       WriteString('NewProject', 'PathToAntBin', EditPathToAntBinary.Text);
       WriteString('NewProject', 'NDK', IntToStr(RGNDKVersion.ItemIndex));
-      WriteString('NewProject', 'PathToLazbuild', EditPathToLazBuild.Text);
 
      case RadioGroupPrebuildOSys.ItemIndex of
        0: FPrebuildOSYS:= 'windows';

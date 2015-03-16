@@ -99,10 +99,6 @@ II. [Android Project]
      	
 		  ex. C:\Laz4Android\components\LazAndroidWizard\java
 
-		-Path to Lazbuild 
-
-		  ex. C:\Laz4Android
-
 	2.1 Project -> New Project 
         
 	2.2. On "Create a new project" Dialog select: <JNI Android Module> 

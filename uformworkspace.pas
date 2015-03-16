@@ -74,7 +74,6 @@ type
     FPathToAndroidSDK: string;
     FPathToAndroidNDK: string;
     FPathToAntBin: string;
-    FPathToLazbuild: string;
 
     FProjectModel: string;
     FAntPackageName: string;
@@ -484,23 +483,6 @@ begin
           end;
       end;
 
-      FPathToLazbuild:= ReadString('NewProject','PathToLazbuild', '');
-      if  FPathToLazbuild = '' then
-      begin
-          frm:= TFormPathMissing.Create(nil);
-          frm.LabelPathTo.Caption:= 'WARNING! Path to "lazbuild": [ex. C:\lazarus {or C:\Laz4Android}]';
-          if frm.ShowModal = mrOK then
-          begin
-             FPathToLazbuild:= frm.PathMissing;
-             frm.Free;
-          end
-          else
-          begin
-             frm.Free;
-             Exit;
-          end;
-      end;
-
       CheckBox1.Checked:= False;
       FSupportV4:= ReadString('NewProject','SupportV4', '');
       if FSupportV4 = 'yes' then CheckBox1.Checked:= True
@@ -711,7 +693,6 @@ begin
       WriteString('NewProject', 'PathToAndroidNDK', FPathToAndroidNDK);
       WriteString('NewProject', 'PathToAndroidSDK', FPathToAndroidSDK);
       WriteString('NewProject', 'PathToAntBin', FPathToAntBin);
-      WriteString('NewProject', 'PathToLazbuild', FPathToLazbuild);
 
       WriteString('NewProject', 'PrebuildOSYS', FPrebuildOSYS);
 

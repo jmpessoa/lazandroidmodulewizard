@@ -6,8 +6,8 @@ interface
 
 uses
   Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, ComCtrls,
-  StdCtrls, Buttons, IDEIntf, ProjectIntf, LazIDEIntf, LCLIntf, ExtCtrls,
-  IniFiles, ThreadProcess, Clipbrd;
+  StdCtrls, Buttons, IDEIntf, ProjectIntf, LazIDEIntf, MacroIntf, LCLIntf,
+  ExtCtrls, IniFiles, ThreadProcess, Clipbrd;
 
 type
 
@@ -45,7 +45,6 @@ type
     ProjectPath: string;
 
     JNIProjectPath: string;
-    PathToLazbuild: string;
 
     PathToWorkspace: string;
     PathToJavaTemplates: string;
@@ -136,12 +135,8 @@ begin
 end;
 
 procedure TFormUpdateCodeTemplate.RebuildLibrary; //by jmpessoa
+var str: string;
 begin
-  if PathToLazbuild = '' then
-  begin
-    ShowMessage('Fail! PathToLazbuild not found!' );
-    Exit;
-  end;
   if JNIProjectPath = '' then
   begin
     ShowMessage('Fail! PathToLazbuild not found!' );
@@ -158,7 +153,9 @@ begin
     OnTerminated:= @DoTerminated;
     Dir:= Self.JNIProjectPath;  //controls.lpi
     //TODO: : [by jmpessoa] CommandLine need fix: deprecated!
-    CommandLine:= CmdShell + IncludeTrailingBackslash(PathToLazbuild)+ 'lazbuild controls.lpi';
+    str := CmdShell + '$Path($(LazarusDir))lazbuild controls.lpi';
+    IDEMacros.SubstituteMacros(str);
+    CommandLine := str;
    (* TODO: [by jmpessoa]  test it!
      Executable:= 'lazbuild'
      Parameters.Add('controls.lpi');
@@ -335,7 +332,6 @@ begin
         ProjectPath:= ReadString('NewProject', 'FullProjectName', '');
         PathToWorkspace:=  ReadString('NewProject', 'PathToWorkspace', '');
         PathToJavaTemplates:= ReadString('NewProject', 'PathToJavaTemplates', '');
-        PathToLazbuild:= ReadString('NewProject', 'PathToLazbuild', '');
       end;
   end
 end;
