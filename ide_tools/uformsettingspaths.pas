@@ -162,7 +162,7 @@ procedure TFormSettingsPaths.LoadSettings(const fileName: string);
 var
    indexNdk: integer;
 begin
-  if FileExists(fileName) then
+  if FileExistsUTF8(fileName) then
   begin
     with TIniFile.Create(fileName) do
     try

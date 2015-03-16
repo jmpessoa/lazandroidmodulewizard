@@ -197,7 +197,7 @@ begin
 
   SetButtonMode;
   AmwFile:= AppendPathDelim(LazarusIDE.GetPrimaryConfigPath) + 'JNIAndroidProject.ini';
-   if FileExists(AmwFile) then
+   if FileExistsUTF8(AmwFile) then
    begin
        with TIniFile.Create(AmwFile) do  // Try to use settings from Android module wizard
        try

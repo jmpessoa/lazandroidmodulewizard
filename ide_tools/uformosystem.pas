@@ -58,7 +58,7 @@ var
   fileName: string;
 begin
   fileName:= AppendPathDelim(LazarusIDE.GetPrimaryConfigPath) + 'JNIAndroidProject.ini';
-  if FileExists(fileName) then
+  if FileExistsUTF8(fileName) then
   begin
     with TIniFile.Create(fileName) do
     try

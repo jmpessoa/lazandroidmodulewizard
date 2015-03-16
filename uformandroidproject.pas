@@ -619,7 +619,7 @@ begin
 
  if FPathToJavaClass <> '' then
  begin
-   if FileExists(FPathToJavaClass) then
+   if FileExistsUTF8(FPathToJavaClass) then
    begin
       fileList:= TStringList.Create;
       fileList.LoadFromFile(FPathToJavaClass);
@@ -1493,7 +1493,7 @@ begin
       FPascalJNIInterfaceCode:= SynMemo2.Lines.Text;
       if FPathToJavaClass <> '' then
       begin
-        if FileExists(FPathToJavaClass) then
+        if FileExistsUTF8(FPathToJavaClass) then
         begin
           fileList:= TStringList.Create;
           fileList.LoadFromFile(FPathToJavaClass);
@@ -1595,7 +1595,7 @@ begin
 
       auxList.Clear;
 
-      if FileExists(auxPath + 'Controls.java') then
+      if FileExistsUTF8(auxPath + 'Controls.java') then
       begin
         fileList:= TStringList.Create;
         fileList.LoadFromFile(auxPath + 'Controls.java');

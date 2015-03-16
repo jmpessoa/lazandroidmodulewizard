@@ -123,7 +123,7 @@ begin
 
  if FPathToJavaClass <> '' then
  begin
-   if FileExists(FPathToJavaClass) then
+   if FileExistsUTF8(FPathToJavaClass) then
    begin
       fileList:= TStringList.Create;
       fileList.LoadFromFile(FPathToJavaClass);
@@ -1898,7 +1898,7 @@ procedure TFrmCompCreate.LoadSettings(const fileName: string);
 var
   k: integer;
 begin
-  if FileExists(fileName) then
+  if FileExistsUTF8(fileName) then
   begin
     with TIniFile.Create(fileName) do
     try

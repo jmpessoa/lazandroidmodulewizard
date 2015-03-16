@@ -1197,7 +1197,7 @@ begin
 
       if FModuleType = 0 then     //Android Bridges Controls...
       begin
-        if not FileExists(FPathToJavaSrc+DirectorySeparator+'App.java') then
+        if not FileExistsUTF8(FPathToJavaSrc+DirectorySeparator+'App.java') then
         begin
            strList.Clear;    //dummy App.java - will be replaced with simonsayz's "App.java" template!
            strList.Add('package '+FAntPackageName+'.'+LowerCase(projName)+';');
@@ -1210,7 +1210,7 @@ begin
 
       if FModuleType = 1 then     //Not Android Bridges  Controls...
       begin
-         if not FileExists(FPathToJavaSrc+DirectorySeparator+'App.java') then
+         if not FileExistsUTF8(FPathToJavaSrc+DirectorySeparator+'App.java') then
          begin
            strList.Clear;    //dummy App.java - will be replaced with simonsayz's "App.java" template!
            strList.Add('package '+FAntPackageName+'.'+LowerCase(projName)+';');
@@ -1262,7 +1262,7 @@ begin
 
          strList.Clear;
 
-         if not FileExists(FAndroidProjectName+DirectorySeparator+'AndroidManifest.xml') then
+         if not FileExistsUTF8(FAndroidProjectName+DirectorySeparator+'AndroidManifest.xml') then
          begin
            strList.Add('<?xml version="1.0" encoding="utf-8"?>');
            strList.Add('<manifest xmlns:android="http://schemas.android.com/apk/res/android"');

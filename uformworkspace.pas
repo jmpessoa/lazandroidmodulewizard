@@ -353,7 +353,7 @@ var
   fileName: string;
 begin
   fileName:= AppendPathDelim(LazarusIDE.GetPrimaryConfigPath) + 'JNIAndroidProject.ini';
-  if not FileExists(fileName) then
+  if not FileExistsUTF8(fileName) then
   begin
     if EditPackagePrefaceName.Text = '' then EditPackagePrefaceName.Text:= 'org.lazarus';
     SaveSettings(fileName);  //force to create empty/initial file!
@@ -366,7 +366,7 @@ var
   frm: TFormPathMissing;
   frmSys: TFormOSystem;
 begin
-  if FileExists(fileName) then
+  if FileExistsUTF8(fileName) then
   begin
     with TIniFile.Create(fileName) do
     try

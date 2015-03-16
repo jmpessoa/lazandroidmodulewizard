@@ -182,7 +182,7 @@ begin
 
   packList:= TstringList.Create;
 
-  if FileExists(ComboBoxSelectProject.Text+DirectorySeparator+'packagename.txt') then //for release >= 0.6/05
+  if FileExistsUTF8(ComboBoxSelectProject.Text+DirectorySeparator+'packagename.txt') then //for release >= 0.6/05
   begin
     packList.LoadFromFile(ComboBoxSelectProject.Text+DirectorySeparator+'packagename.txt');
     PackageName:= Trim(packList.Strings[0]);  //ex. com.example.appbuttondemo1
@@ -209,7 +209,7 @@ begin
   //upgrade "App.java"
   if  CheckGroupUpgradeTemplates.Checked[0] then
   begin
-    if FileExists(PathToJavaClass+DirectorySeparator+'App.java') then
+    if FileExistsUTF8(PathToJavaClass+DirectorySeparator+'App.java') then
     begin
       fileList:= TStringList.Create;
       fileList.LoadFromFile(PathToJavaClass+DirectorySeparator+'App.java');
@@ -227,7 +227,7 @@ begin
   //upgrade "Controls.java"
   if  CheckGroupUpgradeTemplates.Checked[1] then
   begin
-    if FileExists(PathToJavaClass+DirectorySeparator+'Controls.java') then
+    if FileExistsUTF8(PathToJavaClass+DirectorySeparator+'Controls.java') then
     begin
       fileList:= TStringList.Create;
       fileList.LoadFromFile(PathToJavaClass+DirectorySeparator+'Controls.java');
@@ -275,7 +275,7 @@ begin
     SynMemo2.Add('  gApp.CreateForm(TAndroidModule1, AndroidModule1);');
     SynMemo2.Add('end.');
 
-    if FileExists(JNIProjectPath+DirectorySeparator+'controls.lpr') then
+    if FileExistsUTF8(JNIProjectPath+DirectorySeparator+'controls.lpr') then
     begin
       fileList:= TStringList.Create;
       fileList.LoadFromFile(JNIProjectPath+DirectorySeparator+'controls.lpr');
@@ -326,7 +326,7 @@ begin
   ListJNIBridge:= TStringList.Create;
 
   AmwFile:= AppendPathDelim(LazarusIDE.GetPrimaryConfigPath) + 'JNIAndroidProject.ini';
-  if FileExists(AmwFile) then
+  if FileExistsUTF8(AmwFile) then
   begin
       with TIniFile.Create(AmwFile) do  // Try to use settings from Android module wizard
       try
