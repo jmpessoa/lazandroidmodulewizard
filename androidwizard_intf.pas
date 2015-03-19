@@ -1830,7 +1830,8 @@ begin
   sourceList.Add('uses');
   if FModuleType = 0 then  //GUI controls
   begin
-    sourceList.Add('  Classes, SysUtils, And_jni, And_jni_Bridge, AndroidWidget, Laz_And_Controls, Laz_And_Controls_Events;');
+    sourceList.Add('  Classes, SysUtils, And_jni, And_jni_Bridge, AndroidWidget, Laz_And_Controls,');
+    sourceList.Add('  Laz_And_Controls_Events;');
     sourceList.Add('');
   end
   else //generic module :  Not Android Bridges Controls
@@ -1907,7 +1908,7 @@ begin
 
   sourceList.Add('end.');
 
-  AProject.MainFile.SetSourceText(sourceList.Text);
+  AProject.MainFile.SetSourceText(sourceList.Text, True);
 
   AProject.Flags := AProject.Flags - [pfMainUnitHasCreateFormStatements,
                                       pfMainUnitHasTitleStatement,
