@@ -234,6 +234,16 @@ type
      function CreateStartFiles(AProject: TLazProject): TModalResult; override;
   end;
 
+  { TAndroidGUIProjectDescriptor }
+
+  TAndroidGUIProjectDescriptor = class(TAndroidProjectDescriptor)
+  public
+    constructor Create; override;
+    function GetLocalizedName: string; override;
+    function GetLocalizedDescription: string; override;
+    function DoInitDescriptor: TModalResult; override;
+  end;
+
   TAndroidFileDescPascalUnitWithResource = class(TFileDescPascalUnitWithResource)
   private
     //
@@ -277,7 +287,7 @@ implementation
 
 uses
    Laz_And_Controls, Laz_And_GLESv2_Canvas, Laz_And_GLESv1_Canvas, Spinner,
-   customdialog, togglebutton, switchbutton, gridview;
+   customdialog, togglebutton, switchbutton, gridview, uJavaParser;
 
 procedure Register;
 begin
@@ -288,10 +298,115 @@ begin
 
   AndroidProjectDescriptor:= TAndroidProjectDescriptor.Create;
   RegisterProjectDescriptor(AndroidProjectDescriptor);
+  RegisterProjectDescriptor(TAndroidGUIProjectDescriptor.Create);
 
   FormEditingHook.RegisterDesignerBaseClass(TAndroidModule);
   FormEditingHook.RegisterDesignerBaseClass(TNoGUIAndroidModule);
 
+end;
+
+{ TAndroidGUIProjectDescriptor }
+
+constructor TAndroidGUIProjectDescriptor.Create;
+begin
+  inherited Create;
+  Name := 'Create new GUI JNI Android Module (.so)';
+end;
+
+function TAndroidGUIProjectDescriptor.GetLocalizedName: string;
+begin
+  Result := 'JNI Android Module (GUI)';
+end;
+
+function TAndroidGUIProjectDescriptor.GetLocalizedDescription: string;
+begin
+  Result := 'A JNI Android loadable module (.so)'+ LineEnding +
+            'with GUI based on Simonsayz''s Templates'+ LineEnding +
+            'in Free Pascal using datamodule like form.'+ LineEnding +
+            'The library file is maintained by Lazarus.'
+end;
+
+function TAndroidGUIProjectDescriptor.DoInitDescriptor: TModalResult;
+var
+  projName, strAfterReplace, strPack: string;
+  i: Integer;
+begin
+  try
+    if GetWorkSpaceFromForm then
+    begin
+      with TStringList.Create do
+      try
+        LoadFromFile(FPathToJavaTemplates + DirectorySeparator + 'Controls.java');
+        projName := FAndroidProjectName;
+        i := Pos(DirectorySeparator, projName);
+        while i > 0 do
+        begin
+          System.Delete(projName, 1, i);
+          i := Pos(DirectorySeparator, projName);
+        end;
+        strPack := FAntPackageName + '.' + LowerCase(projName);
+        Strings[0] := 'package ' + strPack + ';';
+        SaveToFile(FPathToJavaSrc + DirectorySeparator + 'Controls.java');
+        LoadFromFile(FPathToJavaTemplates + DirectorySeparator + 'App.java');
+        Strings[0] := 'package ' + strPack + ';';
+        SaveToFile(FPathToJavaSrc + DirectorySeparator + 'App.java');
+      finally
+        Free;
+      end;
+      with TJavaParser.Create(FPathToJavaSrc + DirectorySeparator + 'Controls.java') do
+      try
+        FPascalJNIInterfaceCode := GetPascalJNIInterfaceCode(FPathToJavaTemplates + DirectorySeparator + 'ControlsEvents.txt');
+      finally
+        Free;
+      end;
+      FModuleType := 0;
+      FJavaClassName := 'Controls';
+      FPathToClassName := StringReplace(FAntPackageName, '.', '/', [rfReplaceAll])
+        + '/' + LowerCase(projName) + '/' + FJavaClassName;
+      FPathToJNIFolder := GetPathToJNIFolder(FPathToJavaSrc);
+      AndroidFileDescriptor.PathToJNIFolder:= FPathToJNIFolder;
+      CreateDirUTF8(FAndroidProjectName+DirectorySeparator+ 'jni');
+      CreateDirUTF8(FAndroidProjectName+DirectorySeparator+ 'jni'+DirectorySeparator+'build-modes');
+      CreateDirUTF8(FAndroidProjectName+DirectorySeparator+'libs');
+      CreateDirUTF8(FAndroidProjectName+DirectorySeparator+'libs'+DirectorySeparator+'armeabi');
+      CreateDirUTF8(FAndroidProjectName+DirectorySeparator+'libs'+DirectorySeparator+'armeabi-v7a');
+      CreateDirUTF8(FAndroidProjectName+DirectorySeparator+'libs'+DirectorySeparator+'x86');
+      CreateDirUTF8(FAndroidProjectName+DirectorySeparator+'obj');
+      CreateDirUTF8(FAndroidProjectName+DirectorySeparator+'obj'+DirectorySeparator+'controls');
+      if FSupportV4 = 'yes' then  //add android 4.0 support to olds devices ...
+        CopyFile(FPathToJavaTemplates+DirectorySeparator+'libs'+DirectorySeparator+'android-support-v4.jar',
+                 FAndroidProjectName+DirectorySeparator+'libs'+DirectorySeparator+'android-support-v4.jar');
+
+      // AndroidManifest.xml creation:
+      with TStringList.Create do
+      try
+        LoadFromFile(FPathToJavaTemplates + DirectorySeparator + 'AndroidManifest.txt');
+        strAfterReplace  := StringReplace(Text, 'dummyPackage',strPack, [rfReplaceAll, rfIgnoreCase]);
+
+        strPack:= strPack+'.'+FMainActivity; {gApp}
+        strAfterReplace  := StringReplace(strAfterReplace, 'dummyAppName',strPack, [rfReplaceAll, rfIgnoreCase]);
+
+        {fix bug  - 04 jan 2014}
+        strAfterReplace  := StringReplace(strAfterReplace, 'dummySdkApi', FMinApi, [rfReplaceAll, rfIgnoreCase]);
+        strAfterReplace  := StringReplace(strAfterReplace, 'dummyTargetApi', FTargetApi, [rfReplaceAll, rfIgnoreCase]);
+
+        Clear;
+        Text:= strAfterReplace;
+        SaveToFile(FAndroidProjectName+DirectorySeparator+'AndroidManifest.xml');
+      finally
+        Free;
+      end;
+
+      Result := mrOK
+    end else
+      Result := mrAbort;
+  except
+    on e: Exception do
+    begin
+      MessageDlg('Error', e.Message, mtError, [mbOk], 0);
+      Result := mrAbort;
+    end;
+  end;
 end;
 
 { TAndroidWidgetMediator }
