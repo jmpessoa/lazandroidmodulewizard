@@ -7,7 +7,7 @@ interface
 uses
   Classes, SysUtils, FileUtil, SynMemo, SynHighlighterJava, SynHighlighterPas,
   SynEditTypes, Forms, Controls, Graphics, Dialogs, Buttons, ExtCtrls, ComCtrls,
-  ShellCtrls, Menus, Clipbrd, types, Process, uRegisterForm;
+  ShellCtrls, Menus, Clipbrd, ActnList, types, Process, uRegisterForm;
 
 type
 
@@ -16,6 +16,8 @@ type
   { TFormAndroidProject }
 
   TFormAndroidProject = class(TForm)
+    acOk: TAction;
+    ActionList1: TActionList;
     BitBtn1: TBitBtn;
     BitBtn2: TBitBtn;
     Image1: TImage;
@@ -59,6 +61,7 @@ type
     SynMemo2: TSynMemo;
     TabSheet1: TTabSheet;
     TabSheet2: TTabSheet;
+    procedure acOkUpdate(Sender: TObject);
     procedure FormDeactivate(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure MenuItem18Click(Sender: TObject);
@@ -1563,6 +1566,11 @@ end;
 procedure TFormAndroidProject.FormDeactivate(Sender: TObject);
 begin
   Close;
+end;
+
+procedure TFormAndroidProject.acOkUpdate(Sender: TObject);
+begin
+  TAction(Sender).Enabled := FPathToJavaClass <> '';
 end;
 
 procedure TFormAndroidProject.PopupMenu1Close(Sender: TObject);

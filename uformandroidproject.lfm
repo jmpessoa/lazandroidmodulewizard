@@ -76,7 +76,7 @@ object FormAndroidProject: TFormAndroidProject
   OnDeactivate = FormDeactivate
   OnShow = FormShow
   Position = poScreenCenter
-  LCLVersion = '1.3'
+  LCLVersion = '1.5'
   object Panel2: TPanel
     Left = 0
     Height = 477
@@ -622,11 +622,12 @@ object FormAndroidProject: TFormAndroidProject
               ShortCut = 57379
             end>
           MouseActions = <>
+          MouseTextActions = <>
           MouseSelActions = <>
           Lines.Strings = (
             'SynMemo1'
           )
-          SelectedColor.FrameEdges = sfeAround
+          VisibleSpecialChars = [vscSpace, vscTabAtLast]
           SelectedColor.BackPriority = 50
           SelectedColor.ForePriority = 50
           SelectedColor.FramePriority = 50
@@ -644,7 +645,6 @@ object FormAndroidProject: TFormAndroidProject
               MouseActions = <>
               MarkupInfo.Background = clBtnFace
               MarkupInfo.Foreground = clNone
-              MarkupInfo.FrameEdges = sfeAround
               DigitCount = 2
               ShowOnlyLineNumbersMultiplesOf = 1
               ZeroStart = False
@@ -661,13 +661,11 @@ object FormAndroidProject: TFormAndroidProject
               MouseActions = <>
               MarkupInfo.Background = clWhite
               MarkupInfo.Foreground = clGray
-              MarkupInfo.FrameEdges = sfeAround
             end
             object SynGutterCodeFolding1: TSynGutterCodeFolding
               MouseActions = <>
               MarkupInfo.Background = clNone
               MarkupInfo.Foreground = clGray
-              MarkupInfo.FrameEdges = sfeAround
               MouseActionsExpanded = <>
               MouseActionsCollapsed = <>
             end
@@ -1118,11 +1116,12 @@ object FormAndroidProject: TFormAndroidProject
               ShortCut = 57379
             end>
           MouseActions = <>
+          MouseTextActions = <>
           MouseSelActions = <>
           Lines.Strings = (
             'SynMemo2'
           )
-          SelectedColor.FrameEdges = sfeAround
+          VisibleSpecialChars = [vscSpace, vscTabAtLast]
           SelectedColor.BackPriority = 50
           SelectedColor.ForePriority = 50
           SelectedColor.FramePriority = 50
@@ -1140,7 +1139,6 @@ object FormAndroidProject: TFormAndroidProject
               MouseActions = <>
               MarkupInfo.Background = clBtnFace
               MarkupInfo.Foreground = clNone
-              MarkupInfo.FrameEdges = sfeAround
               DigitCount = 2
               ShowOnlyLineNumbersMultiplesOf = 1
               ZeroStart = False
@@ -1157,13 +1155,11 @@ object FormAndroidProject: TFormAndroidProject
               MouseActions = <>
               MarkupInfo.Background = clWhite
               MarkupInfo.Foreground = clGray
-              MarkupInfo.FrameEdges = sfeAround
             end
             object SynGutterCodeFolding1: TSynGutterCodeFolding
               MouseActions = <>
               MarkupInfo.Background = clNone
               MarkupInfo.Foreground = clGray
-              MarkupInfo.FrameEdges = sfeAround
               MouseActionsExpanded = <>
               MouseActionsCollapsed = <>
             end
@@ -1199,9 +1195,45 @@ object FormAndroidProject: TFormAndroidProject
       Height = 30
       Top = 420
       Width = 75
+      Action = acOk
       Anchors = [akRight, akBottom]
       Default = True
-      DefaultCaption = True
+      Glyph.Data = {
+        36040000424D3604000000000000360000002800000010000000100000000100
+        2000000000000004000064000000640000000000000000000000FFFFFF00FFFF
+        FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+        FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+        FF00FFFFFF00FFFFFF00FFFFFF00317A360A2D753207FFFFFF00FFFFFF00FFFF
+        FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+        FF00FFFFFF00FFFFFF003985400A37833DFF317B37FB2E763307FFFFFF00FFFF
+        FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+        FF00FFFFFF004292490A408E47FF54A35CFF4F9F57FF327C38FE2E773408FFFF
+        FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+        FF004B9E530A499A51FF5BAC64FF77CA82FF74C87EFF51A059FF337D39FE2F78
+        3508FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF0053A9
+        5C0A51A65AFF63B56DFF7ECE89FF7BCC87FF76CA81FF76C981FF52A25AFF347E
+        3AFE30793508FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF005AB4650959B0
+        63FF6BBD76FF84D290FF7AC985FF60B26AFF63B46DFF78C983FF78CB82FF53A3
+        5CFF347F3AFD317A3608FFFFFF00FFFFFF00FFFFFF00FFFFFF005EB969465BB5
+        66E479C986FF80CE8DFF51A65AFC4DA1566F499C518B5CAD67FF7CCC86FF79CB
+        85FF54A45DFF35803BFC317B3708FFFFFF00FFFFFF00FFFFFF00FFFFFF005FBA
+        6A3C5CB666E66DC079FF55AC5F6FFFFFFF00FFFFFF004A9D52915EAE68FF7DCD
+        89FF7CCD87FF56A55FFF36813CFC327C3808FFFFFF00FFFFFF00FFFFFF00FFFF
+        FF005FBB6A435CB76765FFFFFF00FFFFFF00FFFFFF00FFFFFF004B9E53915FAF
+        69FF7FCE8AFF7ECE89FF57A660FF37823DFC337D3908FFFFFF00FFFFFF00FFFF
+        FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF004B9F
+        549160B06AFF81CF8DFF7FCF8BFF58A761FF398540FF347E3A08FFFFFF00FFFF
+        FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+        FF004CA0559162B26CFF82D18FFF7AC885FF57A660FF38843F7BFFFFFF00FFFF
+        FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+        FF00FFFFFF004DA1569163B36DFF5FAF69FF41914979FFFFFF00FFFFFF00FFFF
+        FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+        FF00FFFFFF00FFFFFF004EA257914A9D527FFFFFFF00FFFFFF00FFFFFF00FFFF
+        FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+        FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+        FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+        FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00
+      }
       Kind = bkOK
       ModalResult = 1
       TabOrder = 1
@@ -1849,42 +1881,21 @@ object FormAndroidProject: TFormAndroidProject
   object SynJavaSyn1: TSynJavaSyn
     DefaultFilter = 'Java Files (*.java)|*.java'
     Enabled = False
-    AnnotationAttri.FrameEdges = sfeAround
     CommentAttri.Foreground = clTeal
-    CommentAttri.FrameEdges = sfeAround
-    DocumentAttri.FrameEdges = sfeAround
-    IdentifierAttri.FrameEdges = sfeAround
-    InvalidAttri.FrameEdges = sfeAround
-    KeyAttri.FrameEdges = sfeAround
     NumberAttri.Foreground = clBlue
-    NumberAttri.FrameEdges = sfeAround
-    SpaceAttri.FrameEdges = sfeAround
     StringAttri.Foreground = clBlue
-    StringAttri.FrameEdges = sfeAround
     SymbolAttri.Foreground = clRed
-    SymbolAttri.FrameEdges = sfeAround
     left = 464
     top = 288
   end
   object SynFreePascalSyn1: TSynFreePascalSyn
     Enabled = False
-    AsmAttri.FrameEdges = sfeAround
     CommentAttri.Foreground = clTeal
-    CommentAttri.FrameEdges = sfeAround
     IDEDirectiveAttri.Foreground = clRed
-    IDEDirectiveAttri.FrameEdges = sfeAround
-    IdentifierAttri.FrameEdges = sfeAround
-    KeyAttri.FrameEdges = sfeAround
     NumberAttri.Foreground = clBlue
-    NumberAttri.FrameEdges = sfeAround
-    SpaceAttri.FrameEdges = sfeAround
     StringAttri.Foreground = clBlue
-    StringAttri.FrameEdges = sfeAround
     SymbolAttri.Foreground = clRed
-    SymbolAttri.FrameEdges = sfeAround
-    CaseLabelAttri.FrameEdges = sfeAround
     DirectiveAttri.Foreground = clRed
-    DirectiveAttri.FrameEdges = sfeAround
     CompilerMode = pcmObjFPC
     NestedComments = True
     left = 592
@@ -2074,6 +2085,14 @@ object FormAndroidProject: TFormAndroidProject
         Caption = 'Exit'
         OnClick = MenuItem20Click
       end
+    end
+  end
+  object ActionList1: TActionList
+    left = 565
+    top = 97
+    object acOk: TAction
+      Caption = 'OK'
+      OnUpdate = acOkUpdate
     end
   end
 end
