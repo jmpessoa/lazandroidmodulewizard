@@ -299,6 +299,7 @@ object FormWorkspace: TFormWorkspace
       BorderSpacing.Left = 8
       BorderSpacing.Top = 4
       ItemHeight = 13
+      OnKeyPress = ComboSelectProjectNameKeyPress
       ParentShowHint = False
       ShowHint = True
       TabOrder = 1

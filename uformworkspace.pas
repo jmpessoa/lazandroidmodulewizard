@@ -44,6 +44,7 @@ type
     StatusBarInfo: TStatusBar;
 
     procedure CheckBox1Click(Sender: TObject);
+    procedure ComboSelectProjectNameKeyPress(Sender: TObject; var Key: char);
     procedure FormActivate(Sender: TObject);
     procedure FormClose(Sender: TObject; var CloseAction: TCloseAction);
     procedure FormCreate(Sender: TObject);
@@ -511,6 +512,16 @@ procedure TFormWorkspace.CheckBox1Click(Sender: TObject);
 begin
     if  CheckBox1.Checked then FSupportV4:= 'yes'
     else FSupportV4:= 'no';
+end;
+
+procedure TFormWorkspace.ComboSelectProjectNameKeyPress(Sender: TObject;
+  var Key: char);
+begin
+  if (ComboSelectProjectName.Text <> '') and (Key = #13) then
+  begin
+    Key := #0;
+    BitBtnOK.SetFocus;
+  end;
 end;
 
 procedure TFormWorkspace.SpdBtnPathToWorkspaceClick(Sender: TObject);
