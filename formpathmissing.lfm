@@ -1,60 +1,76 @@
 object FormPathMissing: TFormPathMissing
   Left = 426
-  Height = 123
+  Height = 102
   Top = 190
-  Width = 465
+  Width = 443
+  AutoSize = True
   BorderIcons = [biSystemMenu]
   BorderStyle = bsToolWindow
   Caption = 'Android Wizard: Path Missing!'
-  ClientHeight = 123
-  ClientWidth = 465
+  ClientHeight = 102
+  ClientWidth = 443
+  Constraints.MinWidth = 400
   OnClose = FormClose
   Position = poScreenCenter
-  LCLVersion = '1.3'
+  LCLVersion = '1.5'
   object Edit1: TEdit
+    AnchorSideLeft.Control = Owner
+    AnchorSideTop.Control = LabelPathTo
+    AnchorSideTop.Side = asrBottom
+    AnchorSideRight.Control = SpeedButton1
     Left = 8
-    Height = 23
-    Top = 33
-    Width = 408
+    Height = 21
+    Top = 29
+    Width = 396
+    Anchors = [akTop, akLeft, akRight]
+    BorderSpacing.Bottom = 8
+    BorderSpacing.Around = 8
     TabOrder = 0
   end
   object LabelPathTo: TLabel
-    Left = 10
-    Height = 15
-    Top = 16
-    Width = 41
+    AnchorSideLeft.Control = Owner
+    AnchorSideTop.Control = Owner
+    Left = 8
+    Height = 13
+    Top = 8
+    Width = 39
+    BorderSpacing.Around = 8
     Caption = 'Path to:'
     ParentColor = False
   end
   object SpeedButton1: TSpeedButton
-    Left = 424
+    AnchorSideTop.Control = Edit1
+    AnchorSideTop.Side = asrCenter
+    AnchorSideRight.Control = Owner
+    AnchorSideRight.Side = asrBottom
+    Left = 412
     Height = 22
-    Top = 32
+    Top = 28
     Width = 23
+    Anchors = [akTop, akRight]
+    BorderSpacing.Around = 8
     Caption = '...'
     OnClick = SpeedButton1Click
   end
-  object BitBtn1: TBitBtn
-    Left = 280
+  object ButtonPanel1: TButtonPanel
+    AnchorSideTop.Control = Edit1
+    AnchorSideTop.Side = asrBottom
+    Left = 6
     Height = 30
-    Top = 77
-    Width = 75
-    Cancel = True
-    DefaultCaption = True
-    Kind = bkCancel
-    ModalResult = 2
+    Top = 66
+    Width = 431
+    Anchors = [akTop, akLeft, akRight]
+    OKButton.Name = 'OKButton'
+    OKButton.DefaultCaption = True
+    HelpButton.Name = 'HelpButton'
+    HelpButton.DefaultCaption = True
+    CloseButton.Name = 'CloseButton'
+    CloseButton.DefaultCaption = True
+    CancelButton.Name = 'CancelButton'
+    CancelButton.DefaultCaption = True
     TabOrder = 1
-  end
-  object BitBtn2: TBitBtn
-    Left = 372
-    Height = 30
-    Top = 77
-    Width = 75
-    Default = True
-    DefaultCaption = True
-    Kind = bkOK
-    ModalResult = 1
-    TabOrder = 2
+    ShowButtons = [pbOK, pbCancel]
+    ShowBevel = False
   end
   object SelectDirectoryDialog1: TSelectDirectoryDialog
     left = 288

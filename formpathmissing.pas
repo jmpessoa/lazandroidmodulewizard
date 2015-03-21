@@ -6,15 +6,14 @@ interface
 
 uses
   Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, StdCtrls,
-  Buttons;
+  Buttons, ButtonPanel;
 
 type
 
   { TFormPathMissing }
 
   TFormPathMissing = class(TForm)
-    BitBtn1: TBitBtn;
-    BitBtn2: TBitBtn;
+    ButtonPanel1: TButtonPanel;
     Edit1: TEdit;
     LabelPathTo: TLabel;
     SelectDirectoryDialog1: TSelectDirectoryDialog;
