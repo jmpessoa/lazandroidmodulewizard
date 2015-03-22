@@ -11473,7 +11473,6 @@ public native void pOnClickGridItem(long pasobj, int position, String caption);
  
 public native void pOnChangedSensor(long pasobj, Sensor sensor, int sensorType, float[] values, long timestamp);
 public native void pOnListeningSensor(long pasobj, Sensor sensor, int sensorType);
-public native void pOnStopedListeningSensors(long pasobj);
 
 public native void pOnUnregisterListeningSensor(long pasobj, int sensorType, String sensorName);
 public native void pOnBroadcastReceiver(long pasobj, Intent intent);
