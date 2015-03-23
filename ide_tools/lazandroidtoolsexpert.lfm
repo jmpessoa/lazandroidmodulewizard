@@ -98,7 +98,7 @@ object frmLazAndroidToolsExpert: TfrmLazAndroidToolsExpert
               Top = 0
               Width = 484
               Align = alClient
-              Color = clBackground
+              Color = 10841658
               Font.Color = clYellow
               ParentFont = False
               TabOrder = 0
@@ -114,7 +114,7 @@ object frmLazAndroidToolsExpert: TfrmLazAndroidToolsExpert
               Top = 0
               Width = 484
               Align = alClient
-              Color = clBackground
+              Color = 10841658
               Font.Color = clYellow
               Lines.Strings = (
                 '[Right Click to enter a filter TAG ...]'
@@ -163,7 +163,7 @@ object frmLazAndroidToolsExpert: TfrmLazAndroidToolsExpert
               Top = 0
               Width = 484
               Align = alClient
-              Color = clBackground
+              Color = 10841658
               Font.Color = clYellow
               Lines.Strings = (
                 ''
