@@ -22,35 +22,35 @@ procedure StartPathTool(Sender: TObject);  //by jmpessoa
 begin
   // Call path tool Code
   FormSettingsPaths:=  TFormSettingsPaths.Create(Application);
-  FormSettingsPaths.Show;
+  FormSettingsPaths.ShowModal;
 end;
 
 procedure StartLateTool(Sender: TObject);
 begin
   // Call Late code
   frmLazAndroidToolsExpert:= TfrmLazAndroidToolsExpert.Create(Application);
-  frmLazAndroidToolsExpert.Show;
+  frmLazAndroidToolsExpert.ShowModal;
 end;
 
 procedure StartUpdateCodeTemplateTool(Sender: TObject);  //by jmpessoa
 begin
   //Call Update code
   FormUpdateCodeTemplate:= TFormUpdateCodeTemplate.Create(Application);
-  FormUpdateCodeTemplate.Show;
+  FormUpdateCodeTemplate.ShowModal;
 end;
 
 procedure StartResEditor(Sender: TObject);
 begin
   // Call res editor
   frmEditor:= TfrmEditor.Create(etResString, nil);
-  frmEditor.Show;
+  frmEditor.ShowModal;
 end;
 
 procedure StartComponentCreate(Sender: TObject);
 begin
   // Call componente create expert
   FrmCompCreate:= TFrmCompCreate.Create(Application);
-  FrmCompCreate.Show;
+  FrmCompCreate.ShowModal;
      //ShowMessage('Component create assistencie...');	
 end;
 
