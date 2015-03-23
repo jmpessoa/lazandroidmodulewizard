@@ -2169,7 +2169,7 @@ begin
 
   LazarusIDE.DoNewEditorFile(AndroidFileDescriptor, '', '',
                              [nfIsPartOfProject,nfOpenInEditor,nfCreateDefaultSrc]);
-  LazarusIDE.DoSaveProject([sfSaveAs]);
+  LazarusIDE.DoSaveProject([]); // TODO: hardcoded "controls"
   Result := mrOK;
 end;
 
