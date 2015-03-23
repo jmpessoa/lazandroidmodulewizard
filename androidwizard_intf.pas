@@ -2169,7 +2169,8 @@ begin
 
   LazarusIDE.DoNewEditorFile(AndroidFileDescriptor, '', '',
                              [nfIsPartOfProject,nfOpenInEditor,nfCreateDefaultSrc]);
-  LazarusIDE.DoSaveProject([]); // TODO: hardcoded "controls"
+  if FModuleType = 0 then  //GUI Controls
+    LazarusIDE.DoSaveProject([]); // TODO: hardcoded "controls"
   Result := mrOK;
 end;
 
