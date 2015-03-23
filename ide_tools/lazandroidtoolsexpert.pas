@@ -94,7 +94,6 @@ type
     DefaultBuildModeIndex: integer; //by jmpessoa
 
     LatSettingFile: string;
-    CmdShell: string;
     SdkPath: string;
     NdkPath: string;
     AntPath: string;
@@ -349,14 +348,6 @@ begin
   begin
      if FileExists(LatSettingFile) then LoadSettings;
   end;
-
-  {$IFDEF WINDOWS}
-    CmdShell:= 'cmd /c ';
-  {$ENDIF}
-  {$IFDEF LINUX}
-    CmdShell:= 'sh -c ';
-  {$ENDIF}
-
 end;
 
 procedure TfrmLazAndroidToolsExpert.FormShow(Sender: TObject);
@@ -415,12 +406,11 @@ begin
       With APKProcess do
       begin
         Dir:= ProjectPath + DirectorySeparator + 'bin';
-        CommandLine:= CmdShell + IncludeTrailingBackslash(SdkPath) + 'platform-tools' +
-                       DirectorySeparator + 'adb logcat AndroidRuntime:E *:S';     //TODO: : [by jmpessoa] CommandLine need fix: deprecated!
-        (* TODO: [by jmpessoa]  test it!
-         Executable:= 'lazbuild'
-         Parameters.Add('controls.lpi');
-        *)
+        Executable:= IncludeTrailingBackslash(SdkPath) + 'platform-tools'
+          + DirectorySeparator + 'adb';
+        Parameters.Add('logcat');
+        Parameters.Add('AndroidRuntime:E');
+        Parameters.Add('*:S');
         OnDisplayOutput:= @ShowProcOutputError;
         Start;
       end;
@@ -441,12 +431,11 @@ begin
     With APKProcess do
     begin
       //Dir:= ProjectPath + DirectorySeparator + 'bin';
-      CommandLine:= CmdShell + IncludeTrailingBackslash(SdkPath) + 'platform-tools' +
-                     DirectorySeparator + 'adb logcat -s ' + strTAG;     //TODO: : [by jmpessoa] CommandLine need fix: deprecated!
-      (* TODO: [by jmpessoa]  test it!
-       Executable:= 'lazbuild'
-       Parameters.Add('controls.lpi');
-      *)
+      Executable:= IncludeTrailingBackslash(SdkPath) + 'platform-tools'
+        + DirectorySeparator + 'adb';
+      Parameters.Add('logcat');
+      Parameters.Add('-s');
+      Parameters.Add(strTAG);
       OnDisplayOutput:= @ShowProcOutputFilter;
       Start;
     end;
@@ -595,15 +584,10 @@ begin
   begin
     Dir:= Self.JNIProjectPath;  //controls.lpi
 
-    //TODO: : [by jmpessoa] CommandLine need fix: deprecated!
-    s := CmdShell + '$Path($(LazarusDir))lazbuild controls.lpi';
+    s := '$MakeDir($(LazarusDir))lazbuild';
     IDEMacros.SubstituteMacros(s);
-    CommandLine := s;
-
-   (* TODO: [by jmpessoa]  test it!
-     Executable:= 'lazbuild'
-     Parameters.Add('controls.lpi');
-   *)
+    Executable := s;
+    Parameters.Add('controls.lpi');
 
     OnDisplayOutput:= @ShowProcOutput;
     Start;
@@ -722,10 +706,7 @@ begin
 end;
 
 procedure TfrmLazAndroidToolsExpert.BitBtnBuildClick(Sender: TObject);
-var
-  antkMode: string;
 begin
-
   if ProjectPath = '' then
   begin
      ShowMessage('Fail! Please, select a Project!');
@@ -737,8 +718,6 @@ begin
      ShowMessage('Fail! PathToAnt not found!' );
      Exit;
   end;
-
-  antkMode:= '-Dtouchtest.enabled=true debug';
 
   if ApkProcessRunning then
     if Assigned(APKProcess) then
@@ -758,17 +737,13 @@ begin
 
     Env.Add('JAVA_HOME=' + JdkPath);
     Dir:= ProjectPath;
-    CommandLine:= CmdShell + IncludeTrailingBackslash(AntPath) +'ant '+ antkMode;     //TODO: : [by jmpessoa] CommandLine need fix: deprecated!
-    (* TODO: [by jmpessoa]  test it!
-     Executable:= 'ant'
-     Parameters.Add('-Dtouchtest.enabled=true');
-     Parameters.Add('debug');
-    *)
+    Executable:= IncludeTrailingBackslash(AntPath) + 'ant'{$ifdef windows}+'.bat'{$endif};
+    Parameters.Add('-Dtouchtest.enabled=true');
+    Parameters.Add('debug');
 
     OnDisplayOutput:= @ShowProcOutput;
     Start;
   end;
-
 end;
 
 procedure TfrmLazAndroidToolsExpert.BitBtnInstallClick(Sender: TObject);
@@ -798,15 +773,12 @@ begin
   With APKProcess do
   begin
     Dir:= ProjectPath + DirectorySeparator + 'bin';
-    CommandLine:= CmdShell + IncludeTrailingBackslash(SdkPath) + 'platform-tools' +
-                  DirectorySeparator + 'adb install -r ' + ApkName;     //TODO: : [by jmpessoa] need fix: deprecated!
 
-   (* TODO: [by jmpessoa]  test it!
-     Executable:= 'adb'
-     Parameters.Add('install');
-     Parameters.Add('-r');
-     Parameters.Add(ApkName);
-    *)
+    Executable:= IncludeTrailingBackslash(SdkPath) + 'platform-tools'
+      + DirectorySeparator + 'adb';
+    Parameters.Add('install');
+    Parameters.Add('-r');
+    Parameters.Add(ApkName);
 
     OnDisplayOutput:= @ShowProcOutput;
     Start;

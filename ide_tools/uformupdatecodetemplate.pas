@@ -153,14 +153,10 @@ begin
   begin
     OnTerminated:= @DoTerminated;
     Dir:= Self.JNIProjectPath;  //controls.lpi
-    //TODO: : [by jmpessoa] CommandLine need fix: deprecated!
-    str := CmdShell + '$Path($(LazarusDir))lazbuild controls.lpi';
+    str := '$MakeDir($(LazarusDir))lazbuild';
     IDEMacros.SubstituteMacros(str);
-    CommandLine := str;
-   (* TODO: [by jmpessoa]  test it!
-     Executable:= 'lazbuild'
-     Parameters.Add('controls.lpi');
-   *)
+    Executable:= str;
+    Parameters.Add('controls.lpi');
     OnDisplayOutput:= @ShowProcOutput;
     Start;
   end;
