@@ -2285,10 +2285,10 @@ begin
     else
       strList.Add('  TNoGUIAndroidModuleXX  = class(TDataModule)');
   end;
-  strList.Add('   private');
-  strList.Add('     {private declarations}');
-  strList.Add('   public');
-  strList.Add('     {public declarations}');
+  strList.Add('  private');
+  strList.Add('    {private declarations}');
+  strList.Add('  public');
+  strList.Add('    {public declarations}');
   strList.Add('  end;');
   strList.Add('');
   strList.Add('var');
