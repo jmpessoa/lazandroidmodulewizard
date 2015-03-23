@@ -496,7 +496,6 @@ end;
 
 procedure TFormWorkspace.FormActivate(Sender: TObject);
 begin
-
   if EditPathToWorkspace.Text <> '' then
      ComboSelectProjectName.SetFocus
   else EditPathToWorkspace.SetFocus;
@@ -506,6 +505,9 @@ begin
   StatusBarInfo.Panels.Items[0].Text:= 'MinSdk Api: '+GetTextByListIndex(ListBoxMinSDK.ItemIndex);
   StatusBarInfo.Panels.Items[1].Text:= 'Target Api: '+GetTextByList2Index(ListBoxTargetAPI.ItemIndex);
 
+  ListBoxPlatform.MakeCurrentVisible;
+  ListBoxMinSDK.MakeCurrentVisible;
+  ListBoxTargetAPI.MakeCurrentVisible;
 end;
 
 procedure TFormWorkspace.CheckBox1Click(Sender: TObject);
