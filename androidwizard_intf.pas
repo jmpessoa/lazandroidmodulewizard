@@ -1812,9 +1812,13 @@ begin
   projName:= LowerCase(FJavaClassName) + '.lpr';
 
   projDir := FPathToJNIFolder+DirectorySeparator+'jni'+DirectorySeparator;
-  AProject.ProjectInfoFile := projDir + ChangeFileExt(projName, '.lpi');
+  if FModuleType = 0 then
+  begin
+    AProject.ProjectInfoFile := projDir + ChangeFileExt(projName, '.lpi');
+    MainFile := AProject.CreateProjectFile(projDir + projName);
+  end else
+    MainFile := AProject.CreateProjectFile(projName);
 
-  MainFile := AProject.CreateProjectFile(projDir + projName);
   MainFile.IsPartOfProject := True;
   AProject.AddFile(MainFile, False);
   AProject.MainFileID := 0;
