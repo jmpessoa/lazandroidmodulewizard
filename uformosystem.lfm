@@ -53,7 +53,7 @@ object FormOSystem: TFormOSystem
     CancelButton.Name = 'CancelButton'
     CancelButton.DefaultCaption = True
     TabOrder = 1
-    ShowButtons = [pbClose]
+    ShowButtons = [pbOK]
     ShowBevel = False
   end
 end
