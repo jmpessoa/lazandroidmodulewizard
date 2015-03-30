@@ -54,19 +54,27 @@ implementation
 { TThreadProcess }
 
 procedure TThreadProcess.Execute;
-Var
-  i: integer;
 begin
   With FProcess do
   begin
-    for i:= 0 To FEnv.Count -1 do
-      Environment.add(FEnv.Strings[i]);
+    Environment.Assign(FEnv);
     CurrentDirectory:= FDir;
     Options := FProcess.Options + [poUsePipes {$IFDEF UNIX},poNoConsole {$ENDIF}];
     Executable:= FExecutable;
     Parameters.Assign(FParameters);
     FParameters.Clear;
-    Execute;
+    try
+      Execute;
+    except
+      on e: Exception do
+      begin
+        Parameters.Delimiter := ' ';
+        Self.OutPut.Text := Executable + ' ' + Parameters.DelimitedText;
+        Self.OutPut.Add(e.ClassName + ': ' + e.Message);
+        Synchronize(@DisplayOutput);
+        Exit;
+      end;
+    end;
   end;
 
   FActive:= True;
