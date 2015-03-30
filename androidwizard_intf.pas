@@ -1168,7 +1168,7 @@ function TAndroidProjectDescriptor.GetLocalizedDescription: string;
 begin
   Result := 'A JNI Android loadable module (.so)'+ LineEnding +
             'using DataModule (not GUI Form Designer/Android Components Bridges).'+ LineEnding +
-            'The project and library file is maintained by Lazarus.'
+            'The project and library file is maintained by Lazarus. [under devolopment! Sorry!]'
 end;
 
 
