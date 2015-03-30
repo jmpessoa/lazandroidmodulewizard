@@ -21,18 +21,18 @@ type
     EditPathToWorkspace: TEdit;
     edProjectName: TEdit;
     GroupBox1: TGroupBox;
+    GroupBox2: TGroupBox;
+    GroupBox3: TGroupBox;
+    GroupBox4: TGroupBox;
     Image1: TImage;
-    LabelTargetAPI: TLabel;
     LabelPathToWorkspace: TLabel;
-    LabelPlatform: TLabel;
     LabelSelectProjectName: TLabel;
-    LabelSdkMin: TLabel;
     ListBoxMinSDK: TListBox;
     ListBoxPlatform: TListBox;
     ListBoxTargetAPI: TListBox;
     Panel1: TPanel;
     Panel2: TPanel;
-    PanelListBox: TPanel;
+    PanelPlatform: TPanel;
     PanelButtons: TPanel;
     PanelRadioGroup: TPanel;
     RGInstruction: TRadioGroup;
@@ -251,7 +251,9 @@ end;
 
 procedure TFormWorkspace.RGProjectTypeClick(Sender: TObject);
 begin
+   //"Ant" or "Eclipse"
   FProjectModel:= RGProjectType.Items[RGProjectType.ItemIndex];  //fix 15-december-2013
+
 
   if RGProjectType.ItemIndex = 1 then
      if EditPackagePrefaceName.Text = '' then EditPackagePrefaceName.Text:= 'org.lazarus';
@@ -657,6 +659,9 @@ begin
 
   if i3 > 1 then i3:= 0;
   RGProjectType.ItemIndex:= i3;
+
+  if i3 = 0 then FProjectModel:= 'Eclipse'
+  else FProjectModel:= 'Ant';
 
   FInstructionSet:= RGInstruction.Items[RGInstruction.ItemIndex];
   FFPUSet:= RGFPU.Items[RGFPU.ItemIndex];

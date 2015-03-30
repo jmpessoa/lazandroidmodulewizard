@@ -17,7 +17,6 @@ type
 
   TFormAndroidProject = class(TForm)
     acOk: TAction;
-    ActionList1: TActionList;
     BitBtn1: TBitBtn;
     BitBtn2: TBitBtn;
     Image1: TImage;
@@ -115,6 +114,8 @@ type
     FHackCreateParam: string;
 
     FHackCreateProperties: string;
+    FFullPackageName: string;
+    FFullJavaSrcPath: string;
 
     procedure DoJavaParse;
 
@@ -159,6 +160,8 @@ type
     property MainActivity: string read FMainActivity write FMainActivity;
     property MinApi: string  read FMinApi write FMinApi;
     property TargetApi: string  read FTargetApi write FTargetApi;
+    property FullPackageName: string read FFullPackageName write FFullPackageName;
+    property FullJavaSrcPath: string read FFullJavaSrcPath write FFullJavaSrcPath;
 
   end;
 
@@ -1599,6 +1602,7 @@ begin
       auxList.Clear;
       auxList.LoadFromFile(FPathToJavaTemplates + DirectorySeparator + FMainActivity+'.java'); //App.Java
       auxList.Strings[0]:= strPack;
+
       auxList.SaveToFile(auxPath + FMainActivity+'.java' );
 
       auxList.Clear;
@@ -1613,6 +1617,7 @@ begin
       auxList.LoadFromFile(FPathToJavaTemplates + DirectorySeparator + 'Controls.java');
       auxList.Strings[0]:= strPack;
       auxList.SaveToFile(auxPath + 'Controls.java');
+      FFullJavaSrcPath:=  auxPath;
       auxList.Free;
 
       ShellListView1.Root := '';
@@ -1622,6 +1627,9 @@ begin
       SplitStr(strPack, ' ');
       strPack:= Trim(strPack);
 
+      FFullPackageName:= strPack;
+
+      (*
       ListManifest:= TStringList.Create;
 
       ListManifest.LoadFromFile(FPathToJavaTemplates + DirectorySeparator + 'AndroidManifest.txt');
@@ -1638,6 +1646,8 @@ begin
       ListManifest.Text:= strAfterReplace;
       ListManifest.SaveToFile(FAndroidProjectName+DirectorySeparator+'AndroidManifest.xml');
       ListManifest.Free;
+      *)
+
     end;
 
   end;

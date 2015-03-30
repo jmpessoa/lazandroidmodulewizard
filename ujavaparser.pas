@@ -201,7 +201,7 @@ begin
   FPascalJNI.Clear;
   cls := StringReplace(FRootClass, '.', '_', [rfReplaceAll]);
   if FNativeMethods.Count = 0 then
-    raise Exception.Create('[MakePascalJNI] No native metods in public class!');
+    raise Exception.Create('[MakePascalJNI] No native methods in public class!');
   for i := 0 to FNativeMethods.Count - 1 do
     with TNativeMetodDesc(FNativeMethods[i]) do
     begin

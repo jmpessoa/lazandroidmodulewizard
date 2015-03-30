@@ -217,6 +217,9 @@ type
 
      FPrebuildOSys: string;
 
+     FFullPackageName: string;
+     FFullJavaSrcPath: string;
+
      function SettingsFilename: string;
      function TryNewJNIAndroidInterfaceCode: boolean;
      function GetPathToJNIFolder(fullPath: string): string;
@@ -334,37 +337,61 @@ begin
   try
     if GetWorkSpaceFromForm then
     begin
-      with TStringList.Create do
-      try
-        LoadFromFile(FPathToJavaTemplates + DirectorySeparator + 'Controls.java');
-        projName := FAndroidProjectName;
-        i := Pos(DirectorySeparator, projName);
-        while i > 0 do
-        begin
-          System.Delete(projName, 1, i);
+
+      if FProjectModel = 'Eclipse' then
+      begin
+         if not TryNewJNIAndroidInterfaceCode then Exit;
+         strPack:= FFullPackageName;
+         FPathToJavaSrc:= FFullJavaSrcPath;
+      end
+      else //Ant project
+      begin
+        with TStringList.Create do
+        try
+          LoadFromFile(FPathToJavaTemplates + DirectorySeparator + 'Controls.java');
+          projName := FAndroidProjectName;
           i := Pos(DirectorySeparator, projName);
+          while i > 0 do
+          begin
+            System.Delete(projName, 1, i);
+            i := Pos(DirectorySeparator, projName);
+          end;
+          strPack := FAntPackageName + '.' + LowerCase(projName);
+          Strings[0] := 'package ' + strPack + ';';
+
+          SaveToFile(FPathToJavaSrc + DirectorySeparator + 'Controls.java');
+
+          LoadFromFile(FPathToJavaTemplates + DirectorySeparator + 'App.java');
+          Strings[0] := 'package ' + strPack + ';';
+          SaveToFile(FPathToJavaSrc + DirectorySeparator + 'App.java');
+
+        finally
+          Free;
         end;
-        strPack := FAntPackageName + '.' + LowerCase(projName);
-        Strings[0] := 'package ' + strPack + ';';
-        SaveToFile(FPathToJavaSrc + DirectorySeparator + 'Controls.java');
-        LoadFromFile(FPathToJavaTemplates + DirectorySeparator + 'App.java');
-        Strings[0] := 'package ' + strPack + ';';
-        SaveToFile(FPathToJavaSrc + DirectorySeparator + 'App.java');
-      finally
-        Free;
       end;
+
+      FModuleType := 0;
+      FJavaClassName := 'Controls';
+      if FProjectModel = 'Ant' then
+      begin
+         FPathToJNIFolder :=  GetPathToJNIFolder(FPathToJavaSrc);
+         FPathToClassName := StringReplace(FAntPackageName, '.', '/', [rfReplaceAll])
+           + '/' + LowerCase(projName) + '/' + FJavaClassName;
+      end
+      else
+      begin  //Eclipse project
+         FPathToJNIFolder := FAndroidProjectName;
+      end;
+
+      AndroidFileDescriptor.PathToJNIFolder:= FPathToJNIFolder;
+
       with TJavaParser.Create(FPathToJavaSrc + DirectorySeparator + 'Controls.java') do
       try
         FPascalJNIInterfaceCode := GetPascalJNIInterfaceCode(FPathToJavaTemplates + DirectorySeparator + 'ControlsEvents.txt');
       finally
         Free;
       end;
-      FModuleType := 0;
-      FJavaClassName := 'Controls';
-      FPathToClassName := StringReplace(FAntPackageName, '.', '/', [rfReplaceAll])
-        + '/' + LowerCase(projName) + '/' + FJavaClassName;
-      FPathToJNIFolder := GetPathToJNIFolder(FPathToJavaSrc);
-      AndroidFileDescriptor.PathToJNIFolder:= FPathToJNIFolder;
+
       CreateDirUTF8(FAndroidProjectName+DirectorySeparator+ 'jni');
       CreateDirUTF8(FAndroidProjectName+DirectorySeparator+ 'jni'+DirectorySeparator+'build-modes');
       CreateDirUTF8(FAndroidProjectName+DirectorySeparator+'libs');
@@ -373,9 +400,13 @@ begin
       CreateDirUTF8(FAndroidProjectName+DirectorySeparator+'libs'+DirectorySeparator+'x86');
       CreateDirUTF8(FAndroidProjectName+DirectorySeparator+'obj');
       CreateDirUTF8(FAndroidProjectName+DirectorySeparator+'obj'+DirectorySeparator+'controls');
-      if FSupportV4 = 'yes' then  //add android 4.0 support to olds devices ...
-        CopyFile(FPathToJavaTemplates+DirectorySeparator+'libs'+DirectorySeparator+'android-support-v4.jar',
-                 FAndroidProjectName+DirectorySeparator+'libs'+DirectorySeparator+'android-support-v4.jar');
+
+      if FProjectModel = 'Ant' then
+      begin
+        if FSupportV4 = 'yes' then  //add android 4.0 support to olds devices ...
+           CopyFile(FPathToJavaTemplates+DirectorySeparator+'libs'+DirectorySeparator+'android-support-v4.jar',
+                  FAndroidProjectName+DirectorySeparator+'libs'+DirectorySeparator+'android-support-v4.jar');
+      end;
 
       // AndroidManifest.xml creation:
       with TStringList.Create do
@@ -1046,6 +1077,8 @@ var
   frm: TFormAndroidProject;
 begin
 
+  //ShowMessage('try = '+ FAndroidProjectName);
+
   Result := False;
   frm:= TFormAndroidProject.Create(nil);
 
@@ -1067,8 +1100,11 @@ begin
     FSyntaxMode:= frm.SyntaxMode;
 
     FPathToJavaClass:= frm.PathToJavaClass;
-    FPathToJNIFolder:=GetPathToJNIFolder(FPathToJavaClass);
+    //ShowMessage('FPathToJavaClass = '+ FPathToJavaClass);
 
+    FPathToJNIFolder:= FAndroidProjectName +DirectorySeparator+ 'jni';  //GetPathToJNIFolder(FPathToJavaClass);
+
+    //ShowMessage('jni folder = '+ FPathToJNIFolder);
     FModuleType:= frm.ModuleType;  //fix bug - 09-June-2014!
 
     AndroidFileDescriptor.PathToJNIFolder:= FPathToJNIFolder;
@@ -1077,7 +1113,12 @@ begin
 
     FJavaClassName:= frm.JavaClassName;
     FPathToClassName:= frm.PathToClassName;
+
     FPascalJNIInterfaceCode:= frm.PascalJNIInterfaceCode;
+
+    FFullPackageName:= frm.FullPackageName;
+    FFullJavaSrcPath:= frm.FullJavaSrcPath;
+
     {$I-}
     ChDir(FAndroidProjectName+DirectorySeparator+ 'jni');
     if IOResult <> 0 then MkDir(FAndroidProjectName+ DirectorySeparator + 'jni');
@@ -1091,8 +1132,6 @@ begin
     if FSupportV4 = 'yes' then  //add android 4.0 support to olds devices ...
           CopyFile(FPathToJavaTemplates+DirectorySeparator+'libs'+DirectorySeparator+'android-support-v4.jar',
                FAndroidProjectName+DirectorySeparator+'libs'+DirectorySeparator+'android-support-v4.jar');
-
-
 
     ChDir(FAndroidProjectName+DirectorySeparator+ 'obj');
     if IOResult <> 0 then MkDir(FAndroidProjectName+ DirectorySeparator + 'obj');
@@ -1188,6 +1227,9 @@ begin
 
     FAndroidProjectName:= frm.AndroidProjectName;    //warning: full project name = path + name !
 
+    //ShowMessage('AndroidProjectName = '+FAndroidProjectName);
+    FPathToJavaSrc:= FAndroidProjectName+DirectorySeparator+ 'src';
+
     FPathToJavaTemplates:= frm.PathToJavaTemplates;
     FPathToJavaJDK:= frm.PathToJavaJDK;
     FPathToAndroidSDK:= frm.PathToAndroidSDK;
@@ -1212,6 +1254,8 @@ begin
     FAntBuildMode:= frm.AntBuildMode;
 
     FProjectModel:= frm.ProjectModel; //Eclipse Project or Ant Project
+
+    //ShowMessage('ProjectModel = '+FProjectModel);
 
     strList.StrictDelimiter:= True;
     strList.Delimiter:= DirectorySeparator;
@@ -1752,6 +1796,7 @@ begin
    //MessageDlg('Welcome to Lazarus JNI Android module Wizard!',mtInformation, [mbOK], 0);
    if GetWorkSpaceFromForm then
    begin
+      //ShowMessage('Try');
       if TryNewJNIAndroidInterfaceCode then
         Result := mrOK
       else
