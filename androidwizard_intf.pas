@@ -324,9 +324,9 @@ end;
 function TAndroidGUIProjectDescriptor.GetLocalizedDescription: string;
 begin
   Result := 'A JNI Android loadable module (.so)'+ LineEnding +
-            'with GUI based on Simonsayz''s Templates'+ LineEnding +
-            'in Free Pascal using datamodule like form.'+ LineEnding +
-            'The library file is maintained by Lazarus.'
+            'with GUI based on Simonsayz''s templates'+ LineEnding +
+            'using Form Designer and Android Components Bridges.'+ LineEnding +
+            'The project and library file is maintained by Lazarus.'
 end;
 
 function TAndroidGUIProjectDescriptor.DoInitDescriptor: TModalResult;
@@ -1152,6 +1152,7 @@ begin
   frm.Free;
 end;
 
+
 constructor TAndroidProjectDescriptor.Create;
 begin
   inherited Create;
@@ -1160,15 +1161,16 @@ end;
 
 function TAndroidProjectDescriptor.GetLocalizedName: string;
 begin
-  Result := 'JNI Android Module'; //fix thanks to Stephano!
+  Result := 'JNI Android Module (not GUI)'; //fix thanks to Stephano!
 end;
 
 function TAndroidProjectDescriptor.GetLocalizedDescription: string;
 begin
   Result := 'A JNI Android loadable module (.so)'+ LineEnding +
-            'in Free Pascal using datamodule like form.'+ LineEnding +
-            'The library file is maintained by Lazarus.'
+            'using DataModule (not GUI Form Designer/Android Components Bridges).'+ LineEnding +
+            'The project and library file is maintained by Lazarus.'
 end;
+
 
      //just for test! not realistic!
 function TAndroidProjectDescriptor.GetIdFromApi(api: integer): string;
@@ -1791,6 +1793,7 @@ begin
 
 end;
 
+
 function TAndroidProjectDescriptor.DoInitDescriptor: TModalResult;
 begin
    //MessageDlg('Welcome to Lazarus JNI Android module Wizard!',mtInformation, [mbOK], 0);
@@ -1804,6 +1807,7 @@ begin
    end
    else Result := mrAbort;
 end;
+
 
 function TAndroidProjectDescriptor.GetAppName(className: string): string;
 var
