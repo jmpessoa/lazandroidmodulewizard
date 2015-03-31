@@ -12,7 +12,7 @@ uses
 type
 
 
-  TAndroidModule = class(jForm)            //support Adroid Bridges [components]
+  TAndroidModule = class(jForm)            //support to Adroid Bridges [components]
   end;
 
   TNoGUIAndroidModule = class(TDataModule) //raw ".so"
@@ -221,9 +221,9 @@ type
      FFullJavaSrcPath: string;
 
      function SettingsFilename: string;
-     function TryNewJNIAndroidInterfaceCode: boolean;
+     function TryNewJNIAndroidInterfaceCode(projectType: integer): boolean; //0: GUI  project --- 1:NoGUI project
      function GetPathToJNIFolder(fullPath: string): string;
-     function GetWorkSpaceFromForm: boolean;
+     function GetWorkSpaceFromForm(projectType: integer): boolean;
      function GetAppName(className: string): string;
      function GetIdFromApi(api: integer): string;
      function GetFolderFromApi(api: integer): string;
@@ -313,20 +313,20 @@ end;
 constructor TAndroidGUIProjectDescriptor.Create;
 begin
   inherited Create;
-  Name := 'Create new GUI JNI Android Module (.so)';
+  Name := 'Create new [GUI] JNI Android Module (.so)';
 end;
 
 function TAndroidGUIProjectDescriptor.GetLocalizedName: string;
 begin
-  Result := 'JNI Android Module (GUI)';
+  Result:= 'JNI Android Module [Lamw GUI]';
 end;
 
 function TAndroidGUIProjectDescriptor.GetLocalizedDescription: string;
 begin
-  Result := 'A JNI Android loadable module (.so)'+ LineEnding +
-            'with GUI based on Simonsayz''s templates'+ LineEnding +
-            'using Form Designer and Android Components Bridges.'+ LineEnding +
-            'The project and library file is maintained by Lazarus.'
+  Result:= 'A [GUI] JNI Android loadable module (.so)'+ LineEnding +
+            'based on Simonsayz''s templates'+ LineEnding +
+            'with Form Designer and Android Components Bridges.'+ LineEnding +
+            'The project and library file is maintained by Lazarus [Lamw].'
 end;
 
 function TAndroidGUIProjectDescriptor.DoInitDescriptor: TModalResult;
@@ -335,12 +335,12 @@ var
   i: Integer;
 begin
   try
-    if GetWorkSpaceFromForm then
+    if GetWorkSpaceFromForm(0) then
     begin
 
       if FProjectModel = 'Eclipse' then
       begin
-         if not TryNewJNIAndroidInterfaceCode then Exit;
+         if not TryNewJNIAndroidInterfaceCode(0) then Exit; //0: GUI project
          strPack:= FFullPackageName;
          FPathToJavaSrc:= FFullJavaSrcPath;
       end
@@ -370,7 +370,7 @@ begin
         end;
       end;
 
-      FModuleType := 0;
+      FModuleType := 0; //0: GUI --- 1:NoGUI
       FJavaClassName := 'Controls';
       if FProjectModel = 'Ant' then
       begin
@@ -1072,14 +1072,15 @@ begin
   else raise Exception.Create('src folder not found...');
 end;
 
-function TAndroidProjectDescriptor.TryNewJNIAndroidInterfaceCode: boolean;
+function TAndroidProjectDescriptor.TryNewJNIAndroidInterfaceCode(projectType: integer): boolean;
 var
   frm: TFormAndroidProject;
 begin
 
-  //ShowMessage('try = '+ FAndroidProjectName);
-
   Result := False;
+
+  FModuleType:= projectType; //0:GUI -- 1:NoGUI
+
   frm:= TFormAndroidProject.Create(nil);
 
   frm.ShellTreeView1.ShowRoot:= False;
@@ -1092,7 +1093,7 @@ begin
   frm.MinApi:= FMinApi;
   frm.TargetApi:= FTargetApi;
 
-  frm.ProjectModel:= FProjectModel;
+  frm.ProjectModel:= FProjectModel; //'Ant'  or 'Eclipse'
 
   if frm.ShowModal = mrOK then
   begin
@@ -1102,12 +1103,10 @@ begin
     FPathToJavaClass:= frm.PathToJavaClass;
     //ShowMessage('FPathToJavaClass = '+ FPathToJavaClass);
 
-    FPathToJNIFolder:= FAndroidProjectName +DirectorySeparator+ 'jni';  //GetPathToJNIFolder(FPathToJavaClass);
+    FPathToJNIFolder:= FAndroidProjectName;  //+DirectorySeparator+ 'jni';  //GetPathToJNIFolder(FPathToJavaClass);
 
-    //ShowMessage('jni folder = '+ FPathToJNIFolder);
-    FModuleType:= frm.ModuleType;  //fix bug - 09-June-2014!
+    AndroidFileDescriptor.PathToJNIFolder:= FAndroidProjectName;//FPathToJNIFolder;
 
-    AndroidFileDescriptor.PathToJNIFolder:= FPathToJNIFolder;
     AndroidFileDescriptor.ModuleType:= FModuleType;
     AndroidFileDescriptor.SyntaxMode:= FSyntaxMode;
 
@@ -1156,19 +1155,19 @@ end;
 constructor TAndroidProjectDescriptor.Create;
 begin
   inherited Create;
-  Name := 'Create new JNI Android Module (.so)';
+  Name := 'Create new [NoGUI] JNI Android Module (.so)';
 end;
 
 function TAndroidProjectDescriptor.GetLocalizedName: string;
 begin
-  Result := 'JNI Android Module (not GUI)'; //fix thanks to Stephano!
+  Result := 'JNI Android Module [Lamw NoGUI]'; //fix thanks to Stephano!
 end;
 
 function TAndroidProjectDescriptor.GetLocalizedDescription: string;
 begin
-  Result := 'A JNI Android loadable module (.so)'+ LineEnding +
-            'using DataModule (not GUI Form Designer/Android Components Bridges).'+ LineEnding +
-            'The project and library file is maintained by Lazarus. [under devolopment! Sorry!]'
+  Result := 'A [NoGUI] JNI Android loadable module (.so)'+ LineEnding +
+            'using DataModule (NO Form Designer/Android Components Bridges!).'+ LineEnding +
+            'The project and library file is maintained by Lazarus [Lamw].'
 end;
 
 
@@ -1194,7 +1193,7 @@ begin
   end;
 end;
 
-function TAndroidProjectDescriptor.GetWorkSpaceFromForm: boolean;
+function TAndroidProjectDescriptor.GetWorkSpaceFromForm(projectType: integer): boolean;
 var
   frm: TFormWorkspace;
   projName: string;
@@ -1215,21 +1214,26 @@ var
   fileList: TStringList;
 begin
   Result:= False;
+  FModuleType:= projectType; //0:GUI  1:noGUI
   frm:= TFormWorkspace.Create(nil);
   frm.LoadSettings(SettingsFilename);
+
+  if projectType = 1 then //No GUI
+  begin
+    frm.Color:= clWhite;
+    frm.LabelModuleType.Caption:= 'Project Type: NoGUI';
+  end;
+
   if frm.ShowModal = mrOK then
   begin
     frm.SaveSettings(SettingsFilename);
     strList:= TStringList.Create;
-
-    FPathToJNIFolder:= frm.PathToWorkspace;
 
     FInstructionSet:= frm.InstructionSet;{ ex. ArmV6}
     FFPUSet:= frm.FPUSet; {ex. Soft}
 
     FAndroidProjectName:= frm.AndroidProjectName;    //warning: full project name = path + name !
 
-    //ShowMessage('AndroidProjectName = '+FAndroidProjectName);
     FPathToJavaSrc:= FAndroidProjectName+DirectorySeparator+ 'src';
 
     FPathToJavaTemplates:= frm.PathToJavaTemplates;
@@ -1256,8 +1260,6 @@ begin
     FAntBuildMode:= frm.AntBuildMode;
 
     FProjectModel:= frm.ProjectModel; //Eclipse Project or Ant Project
-
-    //ShowMessage('ProjectModel = '+FProjectModel);
 
     strList.StrictDelimiter:= True;
     strList.Delimiter:= DirectorySeparator;
@@ -1369,11 +1371,11 @@ begin
         end;
       end;
 
-      if FModuleType = 1 then     //Not Android Bridges  Controls...
+      if FModuleType = 1 then     //Not Android Bridges  Controls... [not GUI]
       begin
          if not FileExistsUTF8(FPathToJavaSrc+DirectorySeparator+'App.java') then
          begin
-           strList.Clear;    //dummy App.java - will be replaced with simonsayz's "App.java" template!
+           strList.Clear;
            strList.Add('package '+FAntPackageName+'.'+LowerCase(projName)+';');
            strList.Add('');
            strList.Add('import android.os.Bundle;');
@@ -1382,21 +1384,21 @@ begin
            strList.Add('');
            strList.Add('public class App extends Activity {');
            strList.Add('  ');
-           strList.Add('   JNIHello myHello;  //just for demo...');
+
+           strList.Add('   j'+projName+' m'+projName+';  //just for demo...');
            strList.Add('  ');
            strList.Add('   @Override');
            strList.Add('   protected void onCreate(Bundle savedInstanceState) {');
            strList.Add('       super.onCreate(savedInstanceState);');
            strList.Add('       setContentView(R.layout.activity_app);');
            strList.Add('');
-           strList.Add('       myHello = new JNIHello(); //just for demo...');
+
+           strList.Add('       m'+projName+' = new j'+projName+'+(); //just for demo...');
            strList.Add('');
-           strList.Add('       int sum = myHello.getSum(2,3); //just for demo...');
+           strList.Add('       int sum = m'+projName+'.getSum(2,3); //just for demo...');
            strList.Add('');
-           strList.Add('       String mens = myHello.getString(1); //just for demo...');
+           strList.Add('       String mens = m'+projName+'.getString(1); //just for demo...');
            strList.Add('');
-           strList.Add('       Toast.makeText(getApplicationContext(), mens, Toast.LENGTH_SHORT).show();');
-           strList.Add('       Toast.makeText(getApplicationContext(), "Total = " + sum, Toast.LENGTH_SHORT).show();');
            strList.Add('   }');
            strList.Add('}');
            strList.SaveToFile(FPathToJavaSrc+DirectorySeparator+'App.java');
@@ -1404,21 +1406,21 @@ begin
            strList.Clear;
            strList.Add('package '+FAntPackageName+'.'+LowerCase(projName)+';');
            strList.Add('');
-           strList.Add('public class JNIHello { //just for demo...');
+           strList.Add('public class j'+projName+' { //just for demo...');
            strList.Add('');
 	   strList.Add('  public native String getString(int flag);');
 	   strList.Add('  public native int getSum(int x, int y);');
            strList.Add('');
            strList.Add('  static {');
 	   strList.Add('	  try {');
-     	   strList.Add('	      System.loadLibrary("jnihello");');
+     	   strList.Add('	      System.loadLibrary("j'+LowerCase(projName)+'");');
 	   strList.Add('	  } catch(UnsatisfiedLinkError ule) {');
  	   strList.Add('	      ule.printStackTrace();');
  	   strList.Add('	  }');
            strList.Add('  }');
            strList.Add('');
            strList.Add('}');
-           strList.SaveToFile(FPathToJavaSrc+DirectorySeparator+'JNIHello.java');
+           strList.SaveToFile(FPathToJavaSrc+DirectorySeparator+'j'+projName+'.java');
          end;
 
          strList.Clear;
@@ -1796,11 +1798,9 @@ end;
 
 function TAndroidProjectDescriptor.DoInitDescriptor: TModalResult;
 begin
-   //MessageDlg('Welcome to Lazarus JNI Android module Wizard!',mtInformation, [mbOK], 0);
-   if GetWorkSpaceFromForm then
+   if GetWorkSpaceFromForm(1) then //1: noGUI project
    begin
-      //ShowMessage('Try');
-      if TryNewJNIAndroidInterfaceCode then
+      if TryNewJNIAndroidInterfaceCode(1) then //1: noGUI project
         Result := mrOK
       else
         Result := mrAbort;

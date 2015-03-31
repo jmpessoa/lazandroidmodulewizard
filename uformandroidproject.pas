@@ -1629,24 +1629,25 @@ begin
 
       FFullPackageName:= strPack;
 
-      (*
-      ListManifest:= TStringList.Create;
+      if (FModuleType = 1) and (FProjectModel = 'Ant') then  //noGUI and 'Ant' project
+      begin
+        ListManifest:= TStringList.Create;
 
-      ListManifest.LoadFromFile(FPathToJavaTemplates + DirectorySeparator + 'AndroidManifest.txt');
-      strAfterReplace  := StringReplace(ListManifest.Text, 'dummyPackage',strPack, [rfReplaceAll, rfIgnoreCase]);
+        ListManifest.LoadFromFile(FPathToJavaTemplates + DirectorySeparator + 'AndroidManifest.txt');
+        strAfterReplace  := StringReplace(ListManifest.Text, 'dummyPackage',strPack, [rfReplaceAll, rfIgnoreCase]);
 
-      strPack:= strPack+'.'+FMainActivity; {gApp}
-      strAfterReplace  := StringReplace(strAfterReplace, 'dummyAppName',strPack, [rfReplaceAll, rfIgnoreCase]);
+        strPack:= strPack+'.'+FMainActivity; {gApp}
+        strAfterReplace  := StringReplace(strAfterReplace, 'dummyAppName',strPack, [rfReplaceAll, rfIgnoreCase]);
 
-      {fix bug  - 04 jan 2014}
-      strAfterReplace  := StringReplace(strAfterReplace, 'dummySdkApi', FMinApi, [rfReplaceAll, rfIgnoreCase]);
-      strAfterReplace  := StringReplace(strAfterReplace, 'dummyTargetApi', FTargetApi, [rfReplaceAll, rfIgnoreCase]);
+        {fix bug  - 04 jan 2014}
+        strAfterReplace  := StringReplace(strAfterReplace, 'dummySdkApi', FMinApi, [rfReplaceAll, rfIgnoreCase]);
+        strAfterReplace  := StringReplace(strAfterReplace, 'dummyTargetApi', FTargetApi, [rfReplaceAll, rfIgnoreCase]);
 
-      ListManifest.Clear;
-      ListManifest.Text:= strAfterReplace;
-      ListManifest.SaveToFile(FAndroidProjectName+DirectorySeparator+'AndroidManifest.xml');
-      ListManifest.Free;
-      *)
+        ListManifest.Clear;
+        ListManifest.Text:= strAfterReplace;
+        ListManifest.SaveToFile(FAndroidProjectName+DirectorySeparator+'AndroidManifest.xml');
+        ListManifest.Free;
+      end;
 
     end;
 
