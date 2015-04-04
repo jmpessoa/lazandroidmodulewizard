@@ -16,8 +16,8 @@ TOnItemSelected = procedure(Sender: TObject; caption: string; position: integer)
 
 {jVisualControl template}
 
-jSpinner = class(jVisualControl)
- private
+  jSpinner = class(jVisualControl)
+  private
     FItems: TStrings;
     FOnItemSelected: TOnItemSelected;
 
@@ -36,10 +36,9 @@ jSpinner = class(jVisualControl)
     procedure UpdateLParamHeight;
     procedure UpdateLParamWidth;
 
- protected
+  protected
     procedure SetParentComponent(Value: TComponent); override;
-    procedure SetVisible(Value: Boolean);  override;
- public
+  public
     constructor Create(AOwner: TComponent); override;
     destructor  Destroy; override;
     procedure Init(refApp: jApp); override;
@@ -73,7 +72,7 @@ jSpinner = class(jVisualControl)
 
     procedure GenEvent_OnSpinnerItemSeleceted(Obj: TObject; caption: string; position: integer);
     property Count: integer read GetSize;
- published
+  published
 
     property Items: TStrings read FItems write SetItems;
     property OnItemSelected: TOnItemSelected  read FOnItemSelected write FOnItemSelected;
@@ -85,7 +84,7 @@ jSpinner = class(jVisualControl)
     property DropListBackgroundColor: TARGBColorBridge  read FDropListBackgroundColor write SetDropListBackgroundColor;
     property LastItemAsPrompt: boolean read FLastItemAsPrompt write SetLastItemAsPrompt;
     property FontSize: integer read FFontSize write SetTextFontSize;
-end;
+  end;
 
 function jSpinner_jCreate(env: PJNIEnv; this: JObject;_Self: int64): jObject;
 procedure jSpinner_jFree(env: PJNIEnv; _jspinner: JObject);
@@ -256,13 +255,6 @@ begin
   FColor:= Value;
   if (FInitialized = True) and (FColor <> colbrDefault)  then
     View_SetBackGroundColor(FjEnv, FjObject , GetARGB(FCustomColor, FColor));
-end;
-
-procedure jSpinner.SetVisible(Value : Boolean);
-begin
-  FVisible:= Value;
-  if FInitialized then
-    View_SetVisible(FjEnv, FjObject , FVisible);
 end;
 
 {

@@ -175,7 +175,6 @@ type
      function GetWidth: integer;  override;
      function GetHeight: integer; override;
      procedure SetViewParent(Value: jObject); override;
-     Procedure SetVisible  (Value : Boolean);
    public
      constructor Create(AOwner: TComponent); override;
      Destructor  Destroy; override;
@@ -593,7 +592,6 @@ type
 
   jTextView = class(jVisualControl)
   private
-    Procedure SetVisible  (Value : Boolean); override;
     Procedure SetColor    (Value : TARGBColorBridge);
     Procedure SetEnabled  (Value : Boolean);
     Procedure SetFontColor(Value : TARGBColorBridge);
@@ -652,7 +650,6 @@ type
     FOnChanged : TOnChange;
     FEditable: boolean;
 
-    Procedure SetVisible  (Value : Boolean); override;
     Procedure SetColor    (Value : TARGBColorBridge);
 
     Procedure SetFontColor(Value : TARGBColorBridge);
@@ -759,7 +756,6 @@ type
     Procedure GenEvent_OnClick(Obj: TObject);
     Function  GetText            : string;   override;
     Procedure SetText     (Value   : string );  override;
-    Procedure SetVisible(Value : Boolean);  override;
   public
     constructor Create(AOwner: TComponent); override;
     Destructor  Destroy; override;
@@ -779,7 +775,6 @@ type
   jCheckBox = class(jVisualControl)
   private
     FChecked   : boolean;
-    Procedure SetVisible  (Value : Boolean);  override;
     Procedure SetColor    (Value : TARGBColorBridge);
 
     Procedure SetFontSize (Value : DWord  );
@@ -834,7 +829,6 @@ type
     Procedure GenEvent_OnClick(Obj: TObject);
     Function  GetText            : string; override;
     Procedure SetText     (Value : string ); override;
-    Procedure SetVisible(Value : Boolean);  override;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -873,7 +867,6 @@ type
   protected
     procedure SetParentComponent(Value: TComponent); override;
     procedure SetViewParent(Value: jObject);  override;
-    Procedure SetVisible(Value : Boolean);  override;
   public
     Constructor Create(AOwner: TComponent); override;
     Destructor Destroy; override;
@@ -917,7 +910,6 @@ type
     procedure SetViewParent(Value: jObject);  override;
     function GetHeight: integer;   override;
     function GetWidth: integer;     override;
-    Procedure SetVisible(Value : Boolean);  override;
     Procedure GenEvent_OnClick(Obj: TObject);
     procedure Notification(AComponent: TComponent; Operation: TOperation); override;
   public
@@ -1006,7 +998,6 @@ type
   protected
     procedure SetParentComponent(Value: TComponent); override;
     procedure SetViewParent(Value: jObject);  override;
-    Procedure SetVisible(Value : Boolean);  override;
     Procedure GenEvent_OnClick(Obj: TObject; Value: integer);
     procedure GenEvent_OnClickWidgetItem(Obj: TObject; index: integer; checked: boolean);
     procedure GenEvent_OnClickCaptionItem(Obj: TObject; index: integer; caption: string);
@@ -1082,7 +1073,6 @@ type
   protected
     procedure SetParentComponent(Value: TComponent); override;
     procedure SetViewParent(Value: jObject);  override;
-    Procedure SetVisible(Value : Boolean);  override;
   public
     constructor Create(AOwner: TComponent); override;
     Destructor  Destroy; override;
@@ -1111,7 +1101,6 @@ type
   protected
     procedure SetParentComponent(Value: TComponent); override;
     procedure SetViewParent(Value: jObject); override;
-    Procedure SetVisible(Value : Boolean);  override;
   public
     constructor Create(AOwner: TComponent); override;
     Destructor  Destroy; override;
@@ -1137,7 +1126,6 @@ type
   protected
     procedure SetParentComponent(Value: TComponent); override;
     procedure SetViewParent(Value: jObject);  override;
-    Procedure SetVisible(Value : Boolean);  override;
   public
     constructor Create(AOwner: TComponent); override;
     Destructor  Destroy; override;
@@ -1169,7 +1157,6 @@ type
   protected
     procedure SetParentComponent(Value: TComponent); override;
     procedure SetViewParent(Value: jObject); override;
-    Procedure SetVisible(Value : Boolean);  override;
   public
     constructor Create(AOwner: TComponent); override;
     Destructor  Destroy; override;
@@ -1211,7 +1198,6 @@ type
     procedure SetViewParent(Value: jObject);   override;
     function GetWidth: integer;  override;
     function GetHeight: integer; override;
-    Procedure SetVisible(Value : Boolean);  override;
     Procedure GenEvent_OnTouch(Obj: TObject; Act,Cnt: integer; X1,Y1,X2,Y2: single);
     Procedure GenEvent_OnDraw (Obj: TObject; jCanvas: jObject);
     procedure Notification(AComponent: TComponent; Operation: TOperation); override;
@@ -1261,7 +1247,6 @@ type
   protected
     procedure SetParentComponent(Value: TComponent); override;
     procedure SetViewParent(Value: jObject); override;
-    Procedure SetVisible(Value : Boolean);  override;
     Procedure GenEvent_OnClick(Obj: TObject);
     procedure Notification(AComponent: TComponent; Operation: TOperation); override;
   public
@@ -2181,13 +2166,6 @@ begin
      jTextView_setParent(FjEnv, FjObject, FjPRLayout);
 end;
 
-Procedure jTextView.SetVisible(Value : Boolean);
-begin
-  FVisible:= Value;
-  if FInitialized then
-    View_SetVisible(FjEnv, FjObject , FVisible);
-end;
-
 Procedure jTextView.SetColor(Value: TARGBColorBridge);
 begin
   FColor:= Value;
@@ -2526,13 +2504,6 @@ begin
   FjPRLayout:= Value;
   if FInitialized then
     jEditText_setParent(FjEnv, FjObject , FjPRLayout);
-end;
-
-Procedure jEditText.SetVisible(Value : Boolean);
-begin
-  FVisible:= Value;
-  if FInitialized then
-    View_SetVisible(FjEnv, FjObject , FVisible);
 end;
 
 Procedure jEditText.setColor(Value: TARGBColorBridge);
@@ -2992,13 +2963,6 @@ begin
     jButton_setParent(FjEnv, FjObject , FjPRLayout);
 end;
 
-Procedure jButton.SetVisible(Value : Boolean);
-begin
-  FVisible:= Value;
-  if FInitialized then
-     View_SetVisible(FjEnv, FjObject , FVisible);
-end;
-
 Procedure jButton.SetColor(Value: TARGBColorBridge);
 begin
   FColor:= Value;
@@ -3224,13 +3188,6 @@ begin
   FjPRLayout:= Value;
   if FInitialized then
     jCheckBox_setParent(FjEnv, FjObject , FjPRLayout);
-end;
-
-Procedure jCheckBox.SetVisible(Value : Boolean);
-begin
-  FVisible := Value;
-  if FInitialized then
-    View_SetVisible(FjEnv, FjObject , FVisible);
 end;
 
 Procedure jCheckBox.SetColor(Value: TARGBColorBridge);
@@ -3473,13 +3430,6 @@ begin
   FjPRLayout:= Value;
   if FInitialized then
     jRadioButton_setParent(FjEnv, FjObject , FjPRLayout);
-end;
-
-Procedure jRadioButton.SetVisible  (Value : Boolean);
-begin
-  FVisible:= Value;
-  if FInitialized then
-    View_SetVisible(FjEnv, FjObject , FVisible);
 end;
 
 Procedure jRadioButton.SetColor(Value: TARGBColorBridge);
@@ -3737,13 +3687,6 @@ begin
   if csDesigning in ComponentState then FStyle:= Value;
 end;
 
-Procedure jProgressBar.SetVisible(Value: Boolean);
-begin
-  FVisible:= Value;
-  if FInitialized then
-    View_SetVisible(FjEnv, FjObject , FVisible);
-end;
-
 Procedure jProgressBar.SetColor(Value: TARGBColorBridge);
 begin
   FColor := Value;
@@ -3967,13 +3910,6 @@ begin
   FjPRLayout:= Value;
   if FInitialized then
     jImageView_setParent(FjEnv,FjObject , FjPRLayout);
-end;
-
-Procedure jImageView.SetVisible  (Value : Boolean);
-begin
-  FVisible:= Value;
-  if FInitialized then
-    View_SetVisible(FjEnv, FjObject , FVisible);
 end;
 
 Procedure jImageView.SetColor(Value: TARGBColorBridge);
@@ -4859,13 +4795,6 @@ begin
     jListView_setParent(FjEnv, FjObject , FjPRLayout);
 end;
 
-Procedure jListView.SetVisible  (Value : Boolean);
-begin
-  FVisible := Value;
-  if FInitialized then
-    View_SetVisible(FjEnv, FjObject , FVisible);
-end;
-
 Procedure jListView.SetColor (Value: TARGBColorBridge);
 begin
   FColor:= Value;
@@ -5241,13 +5170,6 @@ begin
     jScrollView_setParent(FjEnv, FjObject , FjPRLayout);
 end;
 
-Procedure jScrollView.SetVisible  (Value : Boolean);
-begin
-  FVisible:= Value;
-  if FInitialized then
-    View_SetVisible(FjEnv, FjObject , FVisible);
-end;
-
 Procedure jScrollView.SetColor(Value: TARGBColorBridge);
 begin
   FColor:= Value;
@@ -5433,13 +5355,6 @@ begin
     jHorizontalScrollView_setParent(FjEnv, FjObject , FjPRLayout);
 end;
 
-Procedure jHorizontalScrollView.SetVisible(Value : Boolean);
-begin
-  FVisible:= Value;
-  if FInitialized then
-     View_SetVisible(FjEnv, FjObject , FVisible);
-end;
-
 Procedure jHorizontalScrollView.SetColor(Value: TARGBColorBridge);
 begin
   FColor := Value;
@@ -5622,13 +5537,6 @@ begin
     jViewFlipper_setParent(FjEnv, FjObject , FjPRLayout);
 end;
 
-Procedure jViewFlipper.SetVisible  (Value : Boolean);
-begin
-  FVisible := Value;
-  if FInitialized then
-    View_SetVisible(FjEnv, FjObject , FVisible);
-end;
-
 Procedure jViewFlipper.SetColor(Value: TARGBColorBridge);
 begin
   FColor:= Value;
@@ -5808,13 +5716,6 @@ begin
   FjPRLayout:= Value;
   if FInitialized then
     jWebView_setParent(FjEnv, FjObject , FjPRLayout);
-end;
-
-Procedure jWebView.SetVisible  (Value : Boolean);
-begin
-  FVisible := Value;
-  if FInitialized then
-    View_SetVisible(FjEnv, FjObject , FVisible);
 end;
 
 Procedure jWebView.SetColor(Value: TARGBColorBridge);
@@ -6561,13 +6462,6 @@ begin
     jView_setParent(FjEnv,FjObject , FjPRLayout);
 end;
 
-Procedure jView.SetVisible  (Value : Boolean);
-begin
-  FVisible := Value;
-  if FInitialized then
-    View_SetVisible(FjEnv, FjObject , FVisible);
-end;
-
 Procedure jView.SetColor(Value: TARGBColorBridge);
 begin
   FColor:= Value;
@@ -7008,13 +6902,6 @@ begin
   FjPRLayout:= Value;
   if FInitialized then
      jImageBtn_setParent(FjEnv, FjObject , FjPRLayout);
-end;
-
-Procedure jImageBtn.SetVisible(Value : Boolean);
-begin
-  FVisible:= Value;
-  if FInitialized then
-     View_SetVisible(FjEnv, FjObject , FVisible);
 end;
 
 Procedure jImageBtn.SetColor(Value: TARGBColorBridge);
@@ -7835,13 +7722,6 @@ begin
   FjPRLayout:= Value;
   if FInitialized then
    jPanel_setParent(FjEnv, FjObject , FjPRLayout);
-end;
-
-Procedure jPanel.SetVisible  (Value : Boolean);
-begin
-  FVisible:= Value;
-  if FInitialized then
-   View_SetVisible(FjEnv, FjObject , FVisible);
 end;
 
 Procedure jPanel.SetColor(Value: TARGBColorBridge);

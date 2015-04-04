@@ -17,8 +17,8 @@ TGridItemLayout = (ilImageText, ilTextImage);
 
 {jVisualControl template}
 
-jGridView = class(jVisualControl)
- private
+  jGridView = class(jVisualControl)
+  private
     FOnClickGridItem: TOnClickGridItem;
     FColumns: integer;
     FItemsLayout: TGridItemLayout;
@@ -27,10 +27,9 @@ jGridView = class(jVisualControl)
     procedure UpdateLParamHeight;
     procedure UpdateLParamWidth;
 
- protected
+  protected
     procedure SetParentComponent(Value: TComponent); override;
-    procedure SetVisible(Value: Boolean);  override;
- public
+  public
     constructor Create(AOwner: TComponent); override;
     destructor  Destroy; override;
     procedure Init(refApp: jApp); override;
@@ -61,13 +60,13 @@ jGridView = class(jVisualControl)
     procedure Delete(_index: integer);
     procedure SetItemsLayout(_value: TGridItemLayout);
 
- published
+  published
     property BackgroundColor: TARGBColorBridge read FColor write SetColor;
     property Columns: integer read FColumns write SetNumColumns;
     property ItemsLayout: TGridItemLayout read FItemsLayout write SetItemsLayout;
     property OnClick: TOnClickGridItem read FOnClickGridItem write FOnClickGridItem;
 
-end;
+  end;
 
 function jGridView_jCreate(env: PJNIEnv;_Self: int64; this: jObject): jObject;
 procedure jGridView_jFree(env: PJNIEnv; _jgridview: JObject);
@@ -213,12 +212,7 @@ begin
   if (FInitialized = True) and (FColor <> colbrDefault)  then
     View_SetBackGroundColor(FjEnv, FjObject, GetARGB(FCustomColor, FColor));
 end;
-procedure jGridView.SetVisible(Value : Boolean);
-begin
-  FVisible:= Value;
-  if FInitialized then
-    View_SetVisible(FjEnv, FjObject, FVisible);
-end;
+
 procedure jGridView.UpdateLParamWidth;
 var
   side: TSide;

@@ -15,8 +15,8 @@ type
 
 {jVisualControl template}
 
-jSwitchButton = class(jVisualControl)
- private
+  jSwitchButton = class(jVisualControl)
+  private
     FTextOff: string;
     FTextOn: string;
     FSwitchState: TToggleState;
@@ -26,10 +26,9 @@ jSwitchButton = class(jVisualControl)
     procedure SetColor(Value: TARGBColorBridge); //background
     procedure UpdateLParamHeight;
     procedure UpdateLParamWidth;
- protected
+  protected
     procedure SetParentComponent(Value: TComponent); override;
-    procedure SetVisible(Value: Boolean);  override;
- public
+  public
     constructor Create(AOwner: TComponent); override;
     destructor  Destroy; override;
     procedure Init(refApp: jApp); override;
@@ -62,13 +61,13 @@ jSwitchButton = class(jVisualControl)
     procedure SetSwitchState(_state: TToggleState);
     function IsChecked(): boolean;
 
- published
+  published
     property BackgroundColor: TARGBColorBridge read FColor write SetColor;
     property TextOff: string read FTextOff write SetTextOff;
     property TextOn: string read FTextOn write SetTextOn;
     property State: TToggleState read FSwitchState write SetSwitchState;
     property OnToggle: TOnClickToggleButton read FOnToggle write FOnToggle;
-end;
+  end;
 
 function jSwitchButton_jCreate(env: PJNIEnv;_Self: int64; this: jObject): jObject;
 procedure jSwitchButton_jFree(env: PJNIEnv; _jswitchbutton: JObject);
@@ -222,12 +221,7 @@ begin
   if (FInitialized = True) and (FColor <> colbrDefault)  then
     View_SetBackGroundColor(FjEnv, FjObject, GetARGB(FCustomColor, FColor));
 end;
-procedure jSwitchButton.SetVisible(Value : Boolean);
-begin
-  FVisible:= Value;
-  if FInitialized then
-    View_SetVisible(FjEnv, FjObject, FVisible);
-end;
+
 procedure jSwitchButton.UpdateLParamWidth;
 var
   side: TSide;

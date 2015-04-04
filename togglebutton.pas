@@ -14,8 +14,8 @@ type
 
 {jVisualControl template}
 
-jToggleButton = class(jVisualControl)
- private
+  jToggleButton = class(jVisualControl)
+  private
     FTextOff: string;
     FTextOn: string;
     FToggleState: TToggleState;
@@ -24,10 +24,9 @@ jToggleButton = class(jVisualControl)
     procedure UpdateLParamHeight;
     procedure UpdateLParamWidth;
 
- protected
+  protected
     procedure SetParentComponent(Value: TComponent); override;
-    procedure SetVisible(Value: Boolean);  override;
- public
+  public
     constructor Create(AOwner: TComponent); override;
     destructor  Destroy; override;
     procedure Init(refApp: jApp); override;
@@ -57,13 +56,13 @@ jToggleButton = class(jVisualControl)
     function IsChecked(): boolean;
     procedure SetBackgroundDrawable(_imageIdentifier: string);
 
- published
+  published
     property BackgroundColor: TARGBColorBridge read FColor write SetColor;
     property TextOff: string read FTextOff write SetTextOff;
     property TextOn: string read FTextOn write SetTextOn;
     property State: TToggleState read FToggleState write SetToggleState;
     property OnToggle: TOnClickToggleButton read FOnToggle write FOnToggle;
-end;
+  end;
 
 function jToggleButton_jCreate(env: PJNIEnv;_Self: int64; this: jObject): jObject;
 procedure jToggleButton_jFree(env: PJNIEnv; _jtogglebutton: JObject);
@@ -218,12 +217,7 @@ begin
   if (FInitialized = True) and (FColor <> colbrDefault)  then
     View_SetBackGroundColor(FjEnv, FjObject, GetARGB(FCustomColor, FColor));
 end;
-procedure jToggleButton.SetVisible(Value : Boolean);
-begin
-  FVisible:= Value;
-  if FInitialized then
-    View_SetVisible(FjEnv, FjObject, FVisible);
-end;
+
 procedure jToggleButton.UpdateLParamWidth;
 var
   side: TSide;

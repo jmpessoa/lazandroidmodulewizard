@@ -1066,7 +1066,7 @@ type
     procedure SetView(Value: jObject);  virtual;
     function GetView: jObject;  virtual;
 
-    procedure SetVisible(Value: boolean); virtual;
+    procedure SetVisible(Value: boolean);
 
     procedure SetParentComponent(Value: TComponent); override;
     procedure SetParamHeight(Value: TLayoutParams);
@@ -1957,6 +1957,8 @@ end;
 procedure jVisualControl.SetVisible(Value: boolean);
 begin
   FVisible:= Value;
+  if FInitialized then
+    View_SetVisible(FjEnv, FjObject, FVisible);
 end;
 
 procedure jVisualControl.DefineProperties(Filer: TFiler);

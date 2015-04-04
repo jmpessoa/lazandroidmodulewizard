@@ -14,8 +14,8 @@ type
 
 {jVisualControl template}
 
-jCustomDialog = class(jVisualControl)
- private
+  jCustomDialog = class(jVisualControl)
+  private
     //FTitle: string;
     FIconIdentifier: string;    // -->>  ../res/drawable  ex: just 'ic_launcher' [not 'ic_launcher.png']
     FOnShow: TCustomDialogShow;
@@ -24,11 +24,10 @@ jCustomDialog = class(jVisualControl)
     procedure UpdateLParamWidth;
     procedure SetIconIdentifier(_iconIdentifier: string);
 
- protected
+  protected
     procedure SetParentComponent(Value: TComponent); override;
     procedure SetText(_title: string); override;   //****
-    procedure SetVisible(Value: Boolean);  override;
- public
+  public
     constructor Create(AOwner: TComponent); override;
     destructor  Destroy; override;
     procedure Init(refApp: jApp); override;
@@ -55,7 +54,7 @@ jCustomDialog = class(jVisualControl)
     procedure Show(_title: string; _iconIdentifier: string); overload;
     procedure Close();
     procedure GenEvent_OnCustomDialogShow(Obj: TObject; dialog: jObject; title: string);
- published
+  published
     //property Visible: boolean read FVisible write SetVisible;
     //property Title: string read FTitle write SetTitle;
     property Text: string read GetText write SetText;
@@ -63,7 +62,7 @@ jCustomDialog = class(jVisualControl)
     property BackgroundColor: TARGBColorBridge read FColor write SetColor;
     //property OnClick: TOnNotify read FOnClick write FOnClick;
     property OnShow: TCustomDialogShow read FOnShow write FOnShow;
-end;
+  end;
 
 function jCustomDialog_jCreate(env: PJNIEnv; this: JObject;_Self: int64): jObject;
 procedure jCustomDialog_jFree(env: PJNIEnv; _jcustomdialog: JObject);
@@ -203,12 +202,7 @@ begin
   if (FInitialized = True) and (FColor <> colbrDefault)  then
     View_SetBackGroundColor(FjEnv, FjRLayout{view!}, GetARGB(FCustomColor, FColor)); // @@
 end;
-procedure jCustomDialog.SetVisible(Value : Boolean);
-begin
-  FVisible:= Value;
-  if FInitialized then
-    View_SetVisible(FjEnv, FjObject, FVisible);
-end;
+
 procedure jCustomDialog.UpdateLParamWidth;
 var
   side: TSide;
