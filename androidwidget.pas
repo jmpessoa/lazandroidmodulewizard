@@ -1688,13 +1688,17 @@ end;
 procedure TAndroidWidget.SetLeft(const AValue: integer);
 begin
   if (csDesigning in ComponentState) then
-    SetBounds(AValue,Top,Width,Height);
+    SetBounds(AValue,Top,Width,Height)
+  else
+    FLeft := AValue;
 end;
 
 procedure TAndroidWidget.SetTop(const AValue: integer);
 begin
   if (csDesigning in ComponentState) then
-    SetBounds(Left,AValue,Width,Height);
+    SetBounds(Left,AValue,Width,Height)
+  else
+    FTop := AValue;
 end;
 
 procedure TAndroidWidget.SetWidth(const AValue: integer);
@@ -1878,6 +1882,11 @@ begin
   inherited Init(refApp);
   FjPRLayout:= jForm(Owner).View;  //set default ViewParent/FjPRLayout as jForm.View!
   FOrientation:= jForm(Owner).Orientation;
+  if (PosRelativeToAnchor = []) and (PosRelativeToParent = []) then
+  begin
+    FMarginLeft := FLeft;
+    FMarginTop := FTop;
+  end;
 end;
 
 procedure jVisualControl.Notification(AComponent: TComponent; Operation: TOperation);
