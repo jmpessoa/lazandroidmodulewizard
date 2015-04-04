@@ -105,7 +105,7 @@ begin
   RegisterIDEMenuCommand(ideSubMnuAMW, 'PathCompCreateCmd', 'New jComponent [Create]', nil,@StartComponentCreate);
   // And so on...
 
-  RegisterIDEMenuCommand(itmRunBuilding, 'BuildAPKandRun', 'Build APK and Run',
+  RegisterIDEMenuCommand(itmRunBuilding, 'BuildAPKandRun', 'Lamw: Build Apk and Run',
     nil, @BuildAPKandRun);
 end;
 
