@@ -874,6 +874,14 @@ object FormWorkspace: TFormWorkspace
       ModalResult = 2
       TabOrder = 1
     end
+    object LabelModuleType: TLabel
+      Left = 8
+      Height = 15
+      Top = 48
+      Width = 91
+      Caption = 'Project Type: GUI'
+      ParentColor = False
+    end
   end
   object Panel1: TPanel
     Left = 0

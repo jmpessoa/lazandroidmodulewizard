@@ -23,14 +23,13 @@ jGridView = class(jVisualControl)
     FColumns: integer;
     FItemsLayout: TGridItemLayout;
 
-    procedure SetVisible(Value: Boolean);
     procedure SetColor(Value: TARGBColorBridge); //background
     procedure UpdateLParamHeight;
     procedure UpdateLParamWidth;
 
  protected
     procedure SetParentComponent(Value: TComponent); override;
-
+    procedure SetVisible(Value: Boolean);  override;
  public
     constructor Create(AOwner: TComponent); override;
     destructor  Destroy; override;

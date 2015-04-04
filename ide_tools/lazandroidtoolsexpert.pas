@@ -197,26 +197,24 @@ begin
       Free;
   end;
 
-  Project:= TXMLDocument.Create;
-
   ReadXMLFile(Project, JNIProjectPath + DirectorySeparator + 'controls.lpi');
-
-  Child:= Project.DocumentElement.FindNode('CompilerOptions');
-  if Assigned(Child) then
-  begin
-    with Child.FindNode('CodeGeneration').FindNode('TargetCPU') do
-      Attributes.Item[0].NodeValue:= NewTargetCPU;
-    with Child.FindNode('SearchPaths').FindNode('Libraries') do
-      Attributes.Item[0].NodeValue:= NewLib;
-    with Child.FindNode('Other').FindNode('CustomOptions') do
-      Attributes.Item[0].NodeValue:= NewCustomOptions;
-    with Child.FindNode('Target').FindNode('Filename') do
-      Attributes.Item[0].NodeValue:= GetOutput(ABuildMode);
+  try
+    Child:= Project.DocumentElement.FindNode('CompilerOptions');
+    if Assigned(Child) then
+    begin
+      with Child.FindNode('CodeGeneration').FindNode('TargetCPU') do
+        Attributes.Item[0].NodeValue:= NewTargetCPU;
+      with Child.FindNode('SearchPaths').FindNode('Libraries') do
+        Attributes.Item[0].NodeValue:= NewLib;
+      with Child.FindNode('Other').FindNode('CustomOptions') do
+        Attributes.Item[0].NodeValue:= NewCustomOptions;
+      with Child.FindNode('Target').FindNode('Filename') do
+        Attributes.Item[0].NodeValue:= GetOutput(ABuildMode);
+    end;
+    WriteXMLFile(Project, JNIProjectPath + DirectorySeparator + 'controls.lpi');
+  finally
+    Project.Free;
   end;
-
-  WriteXMLFile(Project, JNIProjectPath + DirectorySeparator + 'controls.lpi');
-
-  Project.Free;
 end;
 
 procedure TfrmLazAndroidToolsExpert.LoadSettings;
@@ -285,21 +283,23 @@ Var
   strBuildMode: string;
 begin
   Result:= 0;
-  Project:= TXMLDocument.Create;
   ReadXMLFile(Project, JNIProjectPath + DirectorySeparator + 'controls.lpi');
-  Child:= Project.DocumentElement.FindNode('CompilerOptions');
-  if Assigned(Child) then
-  begin
-    with Child.FindNode('Target').FindNode('Filename') do
-      strBuildMode:= Attributes.Item[0].NodeValue;
+  try
+    Child:= Project.DocumentElement.FindNode('CompilerOptions');
+    if Assigned(Child) then
+    begin
+      with Child.FindNode('Target').FindNode('Filename') do
+        strBuildMode:= Attributes.Item[0].NodeValue;
+    end;
+    if strBuildMode <> '' then
+    begin
+      if  Pos('armeabi-v7a',strBuildMode) > 0 then Result:= 1
+      else if  Pos('armeabi',strBuildMode) > 0 then Result:= 0
+      else if  Pos('x86',strBuildMode) > 0 then Result:= 2;
+    end;
+  finally
+    Project.Free;
   end;
-  if strBuildMode <> '' then
-  begin
-    if  Pos('armeabi-v7a',strBuildMode) > 0 then Result:= 1
-    else if  Pos('armeabi',strBuildMode) > 0 then Result:= 0
-    else if  Pos('x86',strBuildMode) > 0 then Result:= 2;
-  end;
-  Project.Free;
 end;
 
 procedure TfrmLazAndroidToolsExpert.FormCreate(Sender: TObject);
@@ -634,22 +634,23 @@ Var
   customOptions: string;
 begin
   Result:= -1;
-  Project:= TXMLDocument.Create;
   ReadXMLFile(Project, JNIProjectPath + DirectorySeparator + 'controls.lpi');
-  Child:= Project.DocumentElement.FindNode('CompilerOptions');
-  if Assigned(Child) then
-  begin
-     with Child.FindNode('Other').FindNode('CustomOptions') do
-       customOptions:= UpperCase(Attributes.Item[0].NodeValue);
+  try
+    Child:= Project.DocumentElement.FindNode('CompilerOptions');
+    if Assigned(Child) then
+    begin
+       with Child.FindNode('Other').FindNode('CustomOptions') do
+         customOptions:= UpperCase(Attributes.Item[0].NodeValue);
+    end;
+    if customOptions <> '' then
+    begin
+      if Pos('ARMV6', customOptions) > 0 then Result:= 0
+      else if Pos('ARMV7A', customOptions) > 0 then Result:= 1
+      else if Pos('I686', customOptions) > 0 then Result:= 2;
+    end;
+  finally
+    Project.Free;
   end;
-  if customOptions <> '' then
-  begin
-    if Pos('ARMV6', customOptions) > 0 then Result:= 0
-    else if Pos('ARMV7A', customOptions) > 0 then Result:= 1
-    else if Pos('I686', customOptions) > 0 then Result:= 2;
-  end;
-  Project.Free;
-
 end;
 
 procedure TfrmLazAndroidToolsExpert.ComboBoxSelectProjectChange(Sender: TObject);
@@ -675,6 +676,7 @@ begin
   if Assigned(APKProcess) then
     if not APKProcess.IsTerminated then
       APKProcess.Terminate;
+  CloseAction := caFree
 end;
 
 procedure TfrmLazAndroidToolsExpert.ShowProcOutput(AOutput: TStrings);

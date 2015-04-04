@@ -25,6 +25,7 @@ type
     GroupBox3: TGroupBox;
     GroupBox4: TGroupBox;
     Image1: TImage;
+    LabelModuleType: TLabel;
     LabelPathToWorkspace: TLabel;
     LabelSelectProjectName: TLabel;
     ListBoxMinSDK: TListBox;
@@ -77,6 +78,9 @@ type
     FPathToAntBin: string;
 
     FProjectModel: string;
+
+    //FModuleType: integer;  //0: GUI project   1: NoGui project
+
     FAntPackageName: string;
 
     FMinApi: string;
@@ -112,7 +116,7 @@ type
     property PathToAndroidSDK: string read FPathToAndroidSDK write FPathToAndroidSDK;
     property PathToAndroidNDK: string read FPathToAndroidNDK write FPathToAndroidNDK;
     property PathToAntBin: string read FPathToAntBin write FPathToAntBin;
-    property ProjectModel: string read FProjectModel write FProjectModel; {eclipse/ant/jbridge}
+    property ProjectModel: string read FProjectModel write FProjectModel; {eclipse or ant}
     property AntPackageName: string read FAntPackageName write FAntPackageName;
     property MinApi: string read FMinApi write FMinApi;
     property TargetApi: string read FTargetApi write FTargetApi;
@@ -123,6 +127,7 @@ type
     property AndroidPlatform: string read FAndroidPlatform write FAndroidPlatform;
     property SupportV4: string read FSupportV4 write FSupportV4;
     property PrebuildOSYS: string read FPrebuildOSYS write FPrebuildOSYS;
+    //property ModuleType: integer read FModuleType write FModuleType;
   end;
 
   procedure GetSubDirectories(const directory : string; list : TStrings);

@@ -593,7 +593,7 @@ type
 
   jTextView = class(jVisualControl)
   private
-    Procedure SetVisible  (Value : Boolean);
+    Procedure SetVisible  (Value : Boolean); override;
     Procedure SetColor    (Value : TARGBColorBridge);
     Procedure SetEnabled  (Value : Boolean);
     Procedure SetFontColor(Value : TARGBColorBridge);
@@ -652,8 +652,7 @@ type
     FOnChanged : TOnChange;
     FEditable: boolean;
 
-
-    Procedure SetVisible  (Value : Boolean);
+    Procedure SetVisible  (Value : Boolean); override;
     Procedure SetColor    (Value : TARGBColorBridge);
 
     Procedure SetFontColor(Value : TARGBColorBridge);
@@ -748,7 +747,6 @@ type
 
   jButton = class(jVisualControl)
   private
-    Procedure SetVisible  (Value : Boolean);
     Procedure SetColor    (Value : TARGBColorBridge);
 
     Procedure SetFontColor(Value : TARGBColorBridge);
@@ -761,6 +759,7 @@ type
     Procedure GenEvent_OnClick(Obj: TObject);
     Function  GetText            : string;   override;
     Procedure SetText     (Value   : string );  override;
+    Procedure SetVisible(Value : Boolean);  override;
   public
     constructor Create(AOwner: TComponent); override;
     Destructor  Destroy; override;
@@ -768,12 +767,9 @@ type
     Procedure Refresh;
     Procedure UpdateLayout; override;
 
-    //property jParent: jObject  read  FjPRLayout write SetParent; // Java : Parent Relative Layout
   published
     property Text: string read GetText write SetText;
-    //property Visible   : boolean   read FVisible   write SetVisible;
     property BackgroundColor     : TARGBColorBridge read FColor     write SetColor;
-    //property Text      : string    read GetText    write SetText;
     property FontColor : TARGBColorBridge read FFontColor write SetFontColor;
     property FontSize  : DWord     read FFontSize  write SetFontSize;
     // Event
@@ -783,7 +779,7 @@ type
   jCheckBox = class(jVisualControl)
   private
     FChecked   : boolean;
-    Procedure SetVisible  (Value : Boolean);
+    Procedure SetVisible  (Value : Boolean);  override;
     Procedure SetColor    (Value : TARGBColorBridge);
 
     Procedure SetFontSize (Value : DWord  );
@@ -798,6 +794,7 @@ type
     Procedure GenEvent_OnClick(Obj: TObject);
     Function  GetText            : string;    override;   //by thierry
     Procedure SetText     (Value   : string );   override; //by thierry
+
     Procedure SetFontColor(Value : TARGBColorBridge);
   public
     constructor Create(AOwner: TComponent); override;
@@ -823,9 +820,7 @@ type
   private
     FChecked   : Boolean;
     //FOnClick   : TOnNotify;
-    Procedure SetVisible  (Value : Boolean);
     Procedure SetColor    (Value : TARGBColorBridge);
-
     Procedure SetFontColor(Value : TARGBColorBridge);
     Procedure SetFontSize (Value : DWord  );
     Function  GetChecked         : boolean;
@@ -839,6 +834,7 @@ type
     Procedure GenEvent_OnClick(Obj: TObject);
     Function  GetText            : string; override;
     Procedure SetText     (Value : string ); override;
+    Procedure SetVisible(Value : Boolean);  override;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -864,8 +860,6 @@ type
     FProgress  : integer;
     FMax       : integer;
     FStyle     : TProgressBarStyle;
-
-    Procedure SetVisible  (Value : Boolean);
     Procedure SetColor    (Value : TARGBColorBridge);
 
     function  GetProgress: integer;
@@ -879,6 +873,7 @@ type
   protected
     procedure SetParentComponent(Value: TComponent); override;
     procedure SetViewParent(Value: jObject);  override;
+    Procedure SetVisible(Value : Boolean);  override;
   public
     Constructor Create(AOwner: TComponent); override;
     Destructor Destroy; override;
@@ -908,7 +903,6 @@ type
     //FImageIdentifier: string;
     FImageScaleType: TImageScaleType;
 
-    Procedure SetVisible  (Value : Boolean);
     Procedure SetColor    (Value : TARGBColorBridge);
 
     procedure SetImages(Value: jImageList);   //by jmpessoa
@@ -923,6 +917,7 @@ type
     procedure SetViewParent(Value: jObject);  override;
     function GetHeight: integer;   override;
     function GetWidth: integer;     override;
+    Procedure SetVisible(Value : Boolean);  override;
     Procedure GenEvent_OnClick(Obj: TObject);
     procedure Notification(AComponent: TComponent; Operation: TOperation); override;
   public
@@ -995,13 +990,11 @@ type
     procedure SetHighLightSelectedItem(_value: boolean);
     procedure SetHighLightSelectedItemColor(_color: TARGBColorBridge);
 
-    Procedure SetVisible      (Value : Boolean);
     Procedure SetColor        (Value : TARGBColorBridge);
     Procedure SetItemPosition (Value : TXY);
     procedure ListViewChange  (Sender: TObject);
 
     procedure SetItems(Value: TStrings);
-
 
     Procedure SetFontColor    (Value : TARGBColorBridge);
     Procedure SetFontSize     (Value : DWord);
@@ -1013,6 +1006,7 @@ type
   protected
     procedure SetParentComponent(Value: TComponent); override;
     procedure SetViewParent(Value: jObject);  override;
+    Procedure SetVisible(Value : Boolean);  override;
     Procedure GenEvent_OnClick(Obj: TObject; Value: integer);
     procedure GenEvent_OnClickWidgetItem(Obj: TObject; index: integer; checked: boolean);
     procedure GenEvent_OnClickCaptionItem(Obj: TObject; index: integer; caption: string);
@@ -1081,7 +1075,6 @@ type
   private
    // FjRLayout    : jObject; // Java : Self Layout
     FScrollSize : integer;
-    Procedure SetVisible    (Value : Boolean);
     Procedure SetColor      (Value : TARGBColorBridge);
     Procedure SetScrollSize (Value : integer);
     procedure UpdateLParamHeight;
@@ -1089,6 +1082,7 @@ type
   protected
     procedure SetParentComponent(Value: TComponent); override;
     procedure SetViewParent(Value: jObject);  override;
+    Procedure SetVisible(Value : Boolean);  override;
   public
     constructor Create(AOwner: TComponent); override;
     Destructor  Destroy; override;
@@ -1110,7 +1104,6 @@ type
   private
    // FjRLayout    : jObject; // Java : Self Layout
     FScrollSize : integer;
-    Procedure SetVisible    (Value : Boolean);
     Procedure SetColor      (Value : TARGBColorBridge);
     Procedure SetScrollSize (Value : integer);
     procedure UpdateLParamHeight;
@@ -1118,6 +1111,7 @@ type
   protected
     procedure SetParentComponent(Value: TComponent); override;
     procedure SetViewParent(Value: jObject); override;
+    Procedure SetVisible(Value : Boolean);  override;
   public
     constructor Create(AOwner: TComponent); override;
     Destructor  Destroy; override;
@@ -1137,13 +1131,13 @@ type
   jViewFlipper = class(jVisualControl)
   private
     //FOnClick  : TOnNotify;
-    Procedure SetVisible  (Value : Boolean);
     Procedure SetColor    (Value : TARGBColorBridge);
     procedure UpdateLParamHeight;
     procedure UpdateLParamWidth;
   protected
     procedure SetParentComponent(Value: TComponent); override;
     procedure SetViewParent(Value: jObject);  override;
+    Procedure SetVisible(Value : Boolean);  override;
   public
     constructor Create(AOwner: TComponent); override;
     Destructor  Destroy; override;
@@ -1167,7 +1161,6 @@ type
     // Fatih - ZoomControl
     FZoomControl : Boolean;
 
-    Procedure SetVisible   (Value : Boolean);
     Procedure SetColor     (Value : TARGBColorBridge);
     Procedure SetZoomControl(Value : Boolean);
     Procedure SetJavaScript(Value : Boolean);
@@ -1176,6 +1169,7 @@ type
   protected
     procedure SetParentComponent(Value: TComponent); override;
     procedure SetViewParent(Value: jObject); override;
+    Procedure SetVisible(Value : Boolean);  override;
   public
     constructor Create(AOwner: TComponent); override;
     Destructor  Destroy; override;
@@ -1208,7 +1202,6 @@ type
     FOnTouchUp   : TOnTouchEvent;
     FFilePath    : TFilePath;
 
-    Procedure SetVisible  (Value : Boolean);
     Procedure SetColor    (Value : TARGBColorBridge);
     procedure SetjCanvas(Value: jCanvas);
     procedure UpdateLParamHeight;
@@ -1218,6 +1211,7 @@ type
     procedure SetViewParent(Value: jObject);   override;
     function GetWidth: integer;  override;
     function GetHeight: integer; override;
+    Procedure SetVisible(Value : Boolean);  override;
     Procedure GenEvent_OnTouch(Obj: TObject; Act,Cnt: integer; X1,Y1,X2,Y2: single);
     Procedure GenEvent_OnDraw (Obj: TObject; jCanvas: jObject);
     procedure Notification(AComponent: TComponent; Operation: TOperation); override;
@@ -1253,7 +1247,6 @@ type
     FFilePath: TFilePath;
 
     procedure SetImages(Value: jImageList);   //by jmpessoa
-    Procedure SetVisible  (Value : Boolean);
     Procedure SetColor    (Value : TARGBColorBridge);
     Procedure SetEnabled  (Value : Boolean);
 
@@ -1268,6 +1261,7 @@ type
   protected
     procedure SetParentComponent(Value: TComponent); override;
     procedure SetViewParent(Value: jObject); override;
+    Procedure SetVisible(Value : Boolean);  override;
     Procedure GenEvent_OnClick(Obj: TObject);
     procedure Notification(AComponent: TComponent; Operation: TOperation); override;
   public
@@ -1449,7 +1443,7 @@ type
 implementation
 
 uses
-  customdialog;
+  customdialog, customlistviewrow;
 
 
 //-----------------------------------------------------------------------------
@@ -2099,15 +2093,23 @@ begin
     jPanel(FParent).Init(refApp);
     FjPRLayout:= jPanel(FParent).View;
   end;
+
   if FParent is jScrollView then
   begin
     jScrollView(FParent).Init(refApp);
     FjPRLayout:= jScrollView(FParent).View;
   end;
+
   if FParent is jCustomDialog then
   begin
     jCustomDialog(FParent).Init(refApp);
     FjPRLayout:= jCustomDialog(FParent).View;
+  end;
+
+  if FParent is jCustomListViewRow then
+  begin
+      jCustomListViewRow(FParent).Init(refApp);
+      FjPRLayout:= jCustomListViewRow(FParent).View;
   end;
 
   jTextView_setParent(FjEnv, FjObject , FjPRLayout);
@@ -2421,6 +2423,12 @@ begin
   begin
     jCustomDialog(FParent).Init(refApp);
     FjPRLayout:= jCustomDialog(FParent).View;
+  end;
+
+  if FParent is jCustomListViewRow then
+  begin
+      jCustomListViewRow(FParent).Init(refApp);
+      FjPRLayout:= jCustomListViewRow(FParent).View;
   end;
 
   jEditText_setParent(FjEnv, FjObject , FjPRLayout);
@@ -2939,6 +2947,12 @@ begin
     FjPRLayout:= jCustomDialog(FParent).View;
   end;
 
+  if FParent is jCustomListViewRow then
+  begin
+      jCustomListViewRow(FParent).Init(refApp);
+      FjPRLayout:= jCustomListViewRow(FParent).View;
+  end;
+
   jButton_setParent(FjEnv, FjObject , FjPRLayout);
 
   jButton_setId(FjEnv, FjObject , Self.Id);
@@ -2996,7 +3010,7 @@ begin
     jButton_setParent(FjEnv, FjObject , FjPRLayout);
 end;
 
-Procedure jButton.SetVisible  (Value : Boolean);
+Procedure jButton.SetVisible(Value : Boolean);
 begin
   FVisible:= Value;
   if FInitialized then
@@ -3170,10 +3184,17 @@ begin
     jScrollView(FParent).Init(refApp);
     FjPRLayout:= jScrollView(FParent).View;
   end;
+
   if FParent is jCustomDialog then
   begin
     jCustomDialog(FParent).Init(refApp);
     FjPRLayout:= jCustomDialog(FParent).View;
+  end;
+
+  if FParent is jCustomListViewRow then
+  begin
+    jCustomListViewRow(FParent).Init(refApp);
+    FjPRLayout:= jCustomListViewRow(FParent).View;
   end;
 
   jCheckBox_setParent(FjEnv, FjObject , FjPRLayout);
@@ -3420,6 +3441,12 @@ begin
   begin
     jCustomDialog(FParent).Init(refApp);
     FjPRLayout:= jCustomDialog(FParent).View;
+  end;
+
+  if FParent is jCustomListViewRow then
+  begin
+    jCustomListViewRow(FParent).Init(refApp);
+    FjPRLayout:= jCustomListViewRow(FParent).View;
   end;
 
   jRadioButton_setParent(FjEnv, FjObject , FjPRLayout);
@@ -3909,6 +3936,12 @@ begin
   begin
     jCustomDialog(FParent).Init(refApp);
     FjPRLayout:= jCustomDialog(FParent).View;
+  end;
+
+  if FParent is jCustomListViewRow then
+  begin
+      jCustomListViewRow(FParent).Init(refApp);
+      FjPRLayout:= jCustomListViewRow(FParent).View;
   end;
 
   jImageView_setParent(FjEnv,FjObject , FjPRLayout);
@@ -7747,7 +7780,7 @@ begin
   begin
    if FjObject  <> nil then
    begin
-     jPanel_Free(FjEnv, FjObject );
+     jPanel_Free(FjEnv, FjObject);
      FjObject := nil;
    end;
   end;
@@ -7783,6 +7816,11 @@ begin
     begin
       jCustomDialog(FParent).Init(refApp);
       FjPRLayout:= jCustomDialog(FParent).View;
+    end;
+    if FParent is jCustomListViewRow then
+    begin
+      jCustomListViewRow(FParent).Init(refApp);
+      FjPRLayout:= jCustomListViewRow(FParent).View;
     end;
   end;
 
@@ -7848,7 +7886,7 @@ Procedure jPanel.SetColor(Value: TARGBColorBridge);
 begin
   FColor:= Value;
   if (FInitialized = True) and (FColor <> colbrDefault) then
-    View_SetBackGroundColor(FjEnv, FjRLayout{view!}, GetARGB(FCustomColor, FColor));
+    View_SetBackGroundColor(FjEnv, FjRLayout{view!}, GetARGB(FCustomColor, FColor)); //@@
 end;
 
 Procedure jPanel.Refresh;

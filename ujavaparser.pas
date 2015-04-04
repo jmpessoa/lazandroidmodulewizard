@@ -529,6 +529,8 @@ end;
 
 destructor TJavaParser.Destroy;
 begin
+  ClearNativeMethods;
+  FNativeMethods.Free;
   FMemStream.Free;
   FImports.Free;
   FPascalJNI.Free;
