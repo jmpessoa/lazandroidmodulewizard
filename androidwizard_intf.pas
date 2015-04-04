@@ -1127,7 +1127,7 @@ begin
       MkDir(FAndroidProjectName+DirectorySeparator+ 'jni'+DirectorySeparator+'build-modes');
       ChDir(FAndroidProjectName+DirectorySeparator+ 'jni'+DirectorySeparator+'build-modes');
 
-      MkDir(FAndroidProjectName+ DirectorySeparator + 'libs');
+      //MkDir(FAndroidProjectName+ DirectorySeparator + 'libs');
       ChDir(FAndroidProjectName+DirectorySeparator+ 'libs');
 
       if FSupportV4 = 'yes' then  //add android 4.0 support to olds devices ...
@@ -1287,7 +1287,7 @@ begin
           strList.DelimitedText:= FAntPackageName+'.'+LowerCase(projName);
           if strList.Count < 3 then strList.DelimitedText:= 'org.'+FAntPackageName+'.'+LowerCase(projName);
 
-          MkDir(FAndroidProjectName);
+          //MkDir(FAndroidProjectName);
           ChDir(FAndroidProjectName);
 
           MkDir(FAndroidProjectName+ DirectorySeparator + 'src');
