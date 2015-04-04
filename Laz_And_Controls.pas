@@ -1443,7 +1443,7 @@ type
 implementation
 
 uses
-  customdialog, customlistviewrow;
+  customdialog;
 
 
 //-----------------------------------------------------------------------------
@@ -2106,12 +2106,6 @@ begin
     FjPRLayout:= jCustomDialog(FParent).View;
   end;
 
-  if FParent is jCustomListViewRow then
-  begin
-      jCustomListViewRow(FParent).Init(refApp);
-      FjPRLayout:= jCustomListViewRow(FParent).View;
-  end;
-
   jTextView_setParent(FjEnv, FjObject , FjPRLayout);
 
   jTextView_setId(FjEnv, FjObject , Self.Id);
@@ -2423,12 +2417,6 @@ begin
   begin
     jCustomDialog(FParent).Init(refApp);
     FjPRLayout:= jCustomDialog(FParent).View;
-  end;
-
-  if FParent is jCustomListViewRow then
-  begin
-      jCustomListViewRow(FParent).Init(refApp);
-      FjPRLayout:= jCustomListViewRow(FParent).View;
   end;
 
   jEditText_setParent(FjEnv, FjObject , FjPRLayout);
@@ -2947,12 +2935,6 @@ begin
     FjPRLayout:= jCustomDialog(FParent).View;
   end;
 
-  if FParent is jCustomListViewRow then
-  begin
-      jCustomListViewRow(FParent).Init(refApp);
-      FjPRLayout:= jCustomListViewRow(FParent).View;
-  end;
-
   jButton_setParent(FjEnv, FjObject , FjPRLayout);
 
   jButton_setId(FjEnv, FjObject , Self.Id);
@@ -3191,11 +3173,6 @@ begin
     FjPRLayout:= jCustomDialog(FParent).View;
   end;
 
-  if FParent is jCustomListViewRow then
-  begin
-    jCustomListViewRow(FParent).Init(refApp);
-    FjPRLayout:= jCustomListViewRow(FParent).View;
-  end;
 
   jCheckBox_setParent(FjEnv, FjObject , FjPRLayout);
   jCheckBox_setId(FjEnv, FjObject , Self.Id);
@@ -3443,11 +3420,6 @@ begin
     FjPRLayout:= jCustomDialog(FParent).View;
   end;
 
-  if FParent is jCustomListViewRow then
-  begin
-    jCustomListViewRow(FParent).Init(refApp);
-    FjPRLayout:= jCustomListViewRow(FParent).View;
-  end;
 
   jRadioButton_setParent(FjEnv, FjObject , FjPRLayout);
   jRadioButton_setId(FjEnv, FjObject , Self.Id);
@@ -3938,11 +3910,6 @@ begin
     FjPRLayout:= jCustomDialog(FParent).View;
   end;
 
-  if FParent is jCustomListViewRow then
-  begin
-      jCustomListViewRow(FParent).Init(refApp);
-      FjPRLayout:= jCustomListViewRow(FParent).View;
-  end;
 
   jImageView_setParent(FjEnv,FjObject , FjPRLayout);
   jImageView_setId(FjEnv, FjObject , Self.Id);
@@ -7816,11 +7783,6 @@ begin
     begin
       jCustomDialog(FParent).Init(refApp);
       FjPRLayout:= jCustomDialog(FParent).View;
-    end;
-    if FParent is jCustomListViewRow then
-    begin
-      jCustomListViewRow(FParent).Init(refApp);
-      FjPRLayout:= jCustomListViewRow(FParent).View;
     end;
   end;
 
