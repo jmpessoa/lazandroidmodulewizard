@@ -3,6 +3,7 @@
   <Package Version="4">
     <PathDelim Value="\"/>
     <Name Value="amw_ide_tools"/>
+    <Type Value="RunAndDesignTime"/>
     <CompilerOptions>
       <Version Value="11"/>
       <PathDelim Value="\"/>
@@ -12,7 +13,7 @@
         <UnitOutputDirectory Value="lib\$(TargetCPU)-$(TargetOS)"/>
       </SearchPaths>
     </CompilerOptions>
-    <Files Count="14">
+    <Files Count="17">
       <Item1>
         <Filename Value="amw_ide_menu_items.pas"/>
         <HasRegisterProc Value="True"/>
@@ -70,8 +71,19 @@
         <Filename Value="uregistercompform.lfm"/>
         <Type Value="LFM"/>
       </Item14>
+      <Item15>
+        <Filename Value="apkbuild.pas"/>
+        <UnitName Value="ApkBuild"/>
+      </Item15>
+      <Item16>
+        <Filename Value="uformstartemulator.lfm"/>
+        <Type Value="LFM"/>
+      </Item16>
+      <Item17>
+        <Filename Value="uformstartemulator.pas"/>
+        <UnitName Value="uFormStartEmulator"/>
+      </Item17>
     </Files>
-    <Type Value="RunAndDesignTime"/>
     <RequiredPkgs Count="3">
       <Item1>
         <PackageName Value="SynEdit"/>

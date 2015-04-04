@@ -18,6 +18,9 @@ procedure Register;
 
 implementation
 
+uses LazIDEIntf, CompOptsIntf, IDEMsgIntf, IDEExternToolIntf, ProjectIntf,
+  Controls, ApkBuild;
+
 procedure StartPathTool(Sender: TObject);  //by jmpessoa
 begin
   // Call path tool Code
@@ -54,6 +57,31 @@ begin
      //ShowMessage('Component create assistencie...');	
 end;
 
+procedure BuildAPKandRun(Sender: TObject);
+var
+  Project: TLazProject;
+begin
+  Project := LazarusIDE.ActiveProject;
+  if Assigned(Project) and (Project.CustomData.Values['LAMW'] <> '') then
+  try
+    IDEMessagesWindow.BringToFront;
+    if LazarusIDE.DoBuildProject(crRun, [pbfOnlyIfNeeded]) <> mrOK then
+      raise Exception.Create('Cannot build project');
+    with TApkBuilder.Create(Project) do
+    try
+      if BuildAPK then
+        if InstallAPK then
+          RunAPK;
+    finally
+      Free;
+    end;
+  except
+    on e: Exception do
+      IDEMessagesWindow.AddCustomMessage(mluFatal, '[' + e.ClassName + '] Failed: ' + e.Message, '', 0);
+  end else
+    ShowMessage('The active project is not LAMW project!');
+end;
+
 procedure Register;
 Var
   ideMnuAMW: TIDEMenuSection;
@@ -77,6 +105,8 @@ begin
   RegisterIDEMenuCommand(ideSubMnuAMW, 'PathCompCreateCmd', 'New jComponent [Create]', nil,@StartComponentCreate);
   // And so on...
 
+  RegisterIDEMenuCommand(itmRunBuilding, 'BuildAPKandRun', 'Build APK and Run',
+    nil, @BuildAPKandRun);
 end;
 
 end.

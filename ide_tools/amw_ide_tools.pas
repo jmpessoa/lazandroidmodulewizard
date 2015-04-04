@@ -9,7 +9,7 @@ interface
 uses
   amw_ide_menu_items, lazandroidtoolsexpert, uformsettingspaths, 
   uformupdatecodetemplate, AndroidXMLResString, ufrmEditor, ufrmCompCreate, 
-  uregistercompform, LazarusPackageIntf;
+  uregistercompform, ApkBuild, uFormStartEmulator, LazarusPackageIntf;
 
 implementation
 

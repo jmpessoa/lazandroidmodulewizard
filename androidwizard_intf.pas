@@ -1882,8 +1882,11 @@ begin
   begin
     AProject.ProjectInfoFile := projDir + ChangeFileExt(projName, '.lpi');
     MainFile := AProject.CreateProjectFile(projDir + projName);
-  end else
+    AProject.CustomData.Values['LAMW'] := 'GUI';
+  end else begin
     MainFile := AProject.CreateProjectFile(projName);
+    AProject.CustomData.Values['LAMW'] := 'NoGUI';
+  end;
 
   MainFile.IsPartOfProject := True;
   AProject.AddFile(MainFile, False);
