@@ -28,7 +28,6 @@ jSpinner = class(jVisualControl)
 
     FFontSize: integer;
 
-    procedure SetVisible(Value: Boolean);
     procedure SetColor(Value: TARGBColorBridge);
 
     procedure SetItems(Value: TStrings);
@@ -39,6 +38,7 @@ jSpinner = class(jVisualControl)
 
  protected
     procedure SetParentComponent(Value: TComponent); override;
+    procedure SetVisible(Value: Boolean);  override;
  public
     constructor Create(AOwner: TComponent); override;
     destructor  Destroy; override;

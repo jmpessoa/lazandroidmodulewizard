@@ -1066,6 +1066,8 @@ type
     procedure SetView(Value: jObject);  virtual;
     function GetView: jObject;  virtual;
 
+    procedure SetVisible(Value: boolean); virtual;
+
     procedure SetParentComponent(Value: TComponent); override;
     procedure SetParamHeight(Value: TLayoutParams);
     procedure SetParamWidth(Value: TLayoutParams);
@@ -1087,7 +1089,7 @@ type
     property TextTypeFace: TTextTypeFace read FTextTypeFace write SetTextTypeFace;
     property HintTextColor: TARGBColorBridge read FHintTextColor write SetHintTextColor;
   published
-    property Visible: boolean read FVisible write FVisible;
+    property Visible: boolean read FVisible write SetVisible;
     property Anchor  : jVisualControl read FAnchor write SetAnchor;
     //property Gravity      : TGravitySet read FGravity write FGravity;   TODO: by jmpessoa
     property PosRelativeToAnchor: TPositionRelativeToAnchorIDSet read FPositionRelativeToAnchor
@@ -1941,6 +1943,11 @@ end;
 function jVisualControl.GetView: jObject;
 begin
   Result:= FjRLayout;
+end;
+
+procedure jVisualControl.SetVisible(Value: boolean);
+begin
+  FVisible:= Value;
 end;
 
 procedure jVisualControl.DefineProperties(Filer: TFiler);
@@ -4329,8 +4336,8 @@ var
     cls: jClass;
 begin
   case visible of
-    True  : _jParams[0].i := 0; //
-    False : _jParams[0].i := 4; //
+    True  : _jParams[0].i := 0; // visible
+    False : _jParams[0].i := 4; // invisible
   end;
   cls:= env^.GetObjectClass(env, view);
   method:= env^.GetMethodID(env, cls, 'setVisibility', '(I)V');

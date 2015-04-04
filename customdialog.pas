@@ -19,7 +19,6 @@ jCustomDialog = class(jVisualControl)
     //FTitle: string;
     FIconIdentifier: string;    // -->>  ../res/drawable  ex: just 'ic_launcher' [not 'ic_launcher.png']
     FOnShow: TCustomDialogShow;
-    procedure SetVisible(Value: Boolean);
     procedure SetColor(Value: TARGBColorBridge); //background
     procedure UpdateLParamHeight;
     procedure UpdateLParamWidth;
@@ -28,6 +27,7 @@ jCustomDialog = class(jVisualControl)
  protected
     procedure SetParentComponent(Value: TComponent); override;
     procedure SetText(_title: string); override;   //****
+    procedure SetVisible(Value: Boolean);  override;
  public
     constructor Create(AOwner: TComponent); override;
     destructor  Destroy; override;
@@ -201,7 +201,7 @@ procedure jCustomDialog.SetColor(Value: TARGBColorBridge);
 begin
   FColor:= Value;
   if (FInitialized = True) and (FColor <> colbrDefault)  then
-    View_SetBackGroundColor(FjEnv, FjRLayout{view!}, GetARGB(FCustomColor, FColor));
+    View_SetBackGroundColor(FjEnv, FjRLayout{view!}, GetARGB(FCustomColor, FColor)); // @@
 end;
 procedure jCustomDialog.SetVisible(Value : Boolean);
 begin
