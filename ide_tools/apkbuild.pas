@@ -134,16 +134,34 @@ end;
 
 function TApkBuilder.RunAndGetOutput(const cmd, params: string;
   Aout: TStrings): Integer;
+var
+  i: Integer;
+  ms: TMemoryStream;
 begin
   with TProcessUTF8.Create(nil) do
   try
-    Options := [poUsePipes, poStderrToOutPut, poWaitOnExit];
+    Options := [poUsePipes, poStderrToOutPut];
     Executable := cmd;
     Parameters.Text := params;
     ShowWindow := swoHIDE;
     Execute;
-    if Assigned(Aout) then
-      Aout.LoadFromStream(Output);
+    Sleep(100);
+    ms := TMemoryStream.Create;
+    try
+      repeat
+        i := Output.NumBytesAvailable;
+        while i > 0 do
+        begin
+          if i > 0 then
+            ms.CopyFrom(Output, i);
+          i := Output.NumBytesAvailable;
+        end;
+      until not Running;
+      ms.Position := 0;
+      Aout.LoadFromStream(ms);
+    finally
+      ms.Free;
+    end;
     Result := ExitCode;
   finally
     Free;

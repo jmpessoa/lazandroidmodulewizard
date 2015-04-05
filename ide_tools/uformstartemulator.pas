@@ -49,6 +49,8 @@ var
 
 {$ifdef Windows}
 function FindEmulatorWindows(_para1: HWND; _para2: LPARAM): WINBOOL; stdcall;
+{$else}
+procedure GetEmulatorWindows(RunProc: TRunAndGetOutputProc; emul_wnds: TStrings);
 {$endif}
 
 implementation
@@ -72,6 +74,36 @@ begin
   end;
   Result := True;
 end;
+{$else}
+procedure GetEmulatorWindows(RunProc: TRunAndGetOutputProc; emul_wnds: TStrings);
+var
+  i: Integer;
+  str: string;
+  sl: TStringList;
+  hwnd: PtrUInt;
+begin
+  try
+    sl := TStringList.Create;
+    try
+      RunProc('xwininfo', '-root' + sLineBreak + '-tree', sl);
+      for i := 0 to sl.Count - 1 do
+      begin
+        str := sl[i];
+        if Pos('("emulator', str) > 0 then
+        begin
+          Delete(str, 1, Pos('0x', str) + 1);
+          hwnd := PtrUInt(StrToInt64('$' + Copy(str, 1, Pos(' ', str) - 1)));
+          Delete(str, 1, Pos('"', str));
+          emul_wnds.AddObject(Copy(str, 1, Pos('"', str) - 1), TObject(hwnd));
+        end;
+      end;
+    finally
+      sl.Free;
+    end;
+  except
+    emul_wnds.Clear;
+  end;
+end;
 {$endif}
 
 procedure TfrmStartEmulator.DrawGrid1DrawCell(Sender: TObject;
@@ -82,11 +114,7 @@ procedure TfrmStartEmulator.DrawGrid1DrawCell(Sender: TObject;
     str: string;
     i, j: Integer;
   begin
-    {$ifdef windows}
     Result := 'off-line';
-    {$else}
-    Result := 'unknown';
-    {$endif}
     str := ':' + avds[Index];
     for i := 0 to emul_wnds.Count - 1 do
       if Pos(str, emul_wnds[i]) > 0 then
@@ -194,6 +222,8 @@ begin
   DrawGrid1.RowCount := avds.Count + 1 + Ord(avds.Count = 0);
   {$ifdef WINDOWS}
   EnumWindows(@FindEmulatorWindows, LPARAM(emul_wnds));
+  {$else}
+  GetEmulatorWindows(FRun, emul_wnds);
   {$endif}
   DrawGrid1.Invalidate;
 end;
