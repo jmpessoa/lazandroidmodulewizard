@@ -156,7 +156,7 @@ begin
             ms.CopyFrom(Output, i);
           i := Output.NumBytesAvailable;
         end;
-      until not Running;
+      until not Running and (Output.NumBytesAvailable = 0);
       ms.Position := 0;
       Aout.LoadFromStream(ms);
     finally
