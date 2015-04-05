@@ -11,7 +11,7 @@
         <UnitOutputDirectory Value="lib\$(TargetCPU)-$(TargetOS)"/>
       </SearchPaths>
     </CompilerOptions>
-    <Files Count="12">
+    <Files Count="13">
       <Item1>
         <Filename Value="androidwizard_intf.pas"/>
         <HasRegisterProc Value="True"/>
@@ -61,6 +61,10 @@
         <Filename Value="ujavaparser.pas"/>
         <UnitName Value="ujavaparser"/>
       </Item12>
+      <Item13>
+        <Filename Value="lamwdesigner.pas"/>
+        <UnitName Value="lamwdesigner"/>
+      </Item13>
     </Files>
     <RequiredPkgs Count="3">
       <Item1>
