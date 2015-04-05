@@ -5,7 +5,8 @@ unit LamwDesigner;
 interface
 
 uses
-  Classes, SysUtils, Graphics, FormEditingIntf, AndroidWidget;
+  Classes, SysUtils, Graphics, FormEditingIntf, PropEdits, GraphPropEdits,
+  AndroidWidget;
 
 type
 
@@ -171,11 +172,24 @@ type
      procedure Draw(canvas: TCanvas; txt: string); override;
   end;
 
+  { TARGBColorBridgePropertyEditor }
+
+  TARGBColorBridgePropertyEditor = class(TEnumPropertyEditor)
+  public
+    function GetAttributes: TPropertyAttributes; override;
+    //procedure ListMeasureWidth(const {%H-}CurValue: ansistring; {%H-}Index: integer;
+    //  ACanvas: TCanvas; var AWidth: Integer);  override;
+    procedure ListDrawValue(const CurValue: ansistring; Index: integer;
+      ACanvas: TCanvas; const ARect:TRect; AState: TPropEditDrawState); override;
+    procedure PropDrawValue(ACanvas: TCanvas; const ARect: TRect;
+      AState: TPropEditDrawState); override;
+  end;
+
 implementation
 
 uses LCLIntf, LCLType, Laz_And_Controls, customdialog, togglebutton,
   switchbutton, Laz_And_GLESv1_Canvas, Laz_And_GLESv2_Canvas, gridview, Spinner,
-  FPimage;
+  FPimage, typinfo;
 
 procedure GetRedGreenBlue(rgb: longInt; out Red, Green, Blue: word); inline;
 begin
@@ -195,6 +209,66 @@ begin
     Result.Green:= green;
     Result.Blue:=  blue;
     Result.Alpha:= AlphaOpaque;
+end;
+
+{ TARGBColorBridgePropertyEditor }
+
+function TARGBColorBridgePropertyEditor.GetAttributes: TPropertyAttributes;
+begin
+  Result := [paMultiSelect,paValueList,paCustomDrawn];
+end;
+
+procedure TARGBColorBridgePropertyEditor.ListDrawValue(const CurValue: ansistring;
+  Index: integer; ACanvas: TCanvas; const ARect: TRect;
+  AState: TPropEditDrawState);
+var
+  h: Integer;
+  r: TRect;
+  bc: TColor;
+begin
+  h := ARect.Bottom - ARect.Top;
+  with ACanvas do
+  begin
+    FillRect(ARect);
+    bc := Pen.Color;
+    Pen.Color := clBlack;
+    r := ARect;
+    r.Right := r.Left + h;
+    InflateRect(r, -2, -2);
+    Rectangle(r);
+    if (TARGBColorBridge(Index) in [colbrDefault, colbrCustom]) then
+    begin
+      InflateRect(r, -1, -1);
+      MoveTo(r.Left, r.Top); LineTo(r.Right, r.Bottom);
+      MoveTo(r.Right - 1, r.Top); LineTo(r.Left - 1, r.Bottom);
+      Pen.Color := bc;
+    end else begin
+      Pen.Color := bc;
+      bc := Brush.Color;
+      Brush.Color := FPColorToTColor(ToTFPColor(TARGBColorBridge(Index)));
+      InflateRect(r, -1, -1);
+      FillRect(r);
+      Brush.Color := bc;
+    end;
+  end;
+  r := ARect;
+  r.Left := r.Left + h + 2;
+  inherited ListDrawValue(CurValue, Index, ACanvas, r, AState);
+end;
+
+procedure TARGBColorBridgePropertyEditor.PropDrawValue(ACanvas: TCanvas;
+  const ARect: TRect; AState: TPropEditDrawState);
+var
+  s: string;
+  i: Integer;
+begin
+  s := GetVisualValue;
+  for i := 0 to Ord(High(TARGBColorBridge)) do
+    if GetEnumName(TypeInfo(TARGBColorBridge), i) = s then
+    begin
+      ListDrawValue(s, i, ACanvas, ARect, [pedsInEdit]);
+      Exit;
+    end;
 end;
 
 { TAndroidWidgetMediator }
@@ -1537,6 +1611,11 @@ begin
   //canvas.Font.Color:= Self.TextColor;
   //canvas.TextOut(5,4, txt);
 end;
+
+initialization
+  RegisterPropertyEditor(TypeInfo(TARGBColorBridge), nil, '', TARGBColorBridgePropertyEditor);
+
+finalization
 
 end.
 
