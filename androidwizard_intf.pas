@@ -2250,9 +2250,12 @@ end;
 procedure TAndroidProjectDescriptor.ChDir(const Dir: String);
 begin
   try
-    if FileExists(Dir) then raise Exception.Create('Path is a file, not directory');
-    if not DirectoryExists(Dir) then raise Exception.Create('Directory not exists');
-    System.ChDir(Dir);
+    if DirectoryExists(Dir) then
+      System.ChDir(Dir)
+    else begin
+      if FileExists(Dir) then raise Exception.Create('Path is a file, not directory');
+      if not DirectoryExists(Dir) then raise Exception.Create('Directory not exists');
+    end;
   except
     on e: Exception do begin
       e.Message := 'Cannot change directory to "' + Dir + '"' + LineEnding + e.Message;
