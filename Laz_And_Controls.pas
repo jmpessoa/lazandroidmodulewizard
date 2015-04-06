@@ -3180,7 +3180,7 @@ begin
      View_SetBackGroundColor(FjEnv, FjThis, FjObject , GetARGB(FCustomColor, FColor));
 
   View_SetVisible(FjEnv, FjThis, FjObject , FVisible);
-
+  jCheckBox_setChecked(FjEnv, FjObject, FChecked);
 end;
 
 Procedure jCheckBox.SetViewParent(Value: jObject);
