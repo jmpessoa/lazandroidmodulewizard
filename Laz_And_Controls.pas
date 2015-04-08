@@ -3560,7 +3560,7 @@ begin
   FProgress  := 0;
   FMax       := 100;  //default...
   FStyle     := cjProgressBarStyleHorizontal;
-  FVisible   := False;
+  FVisible   := True;
   FMarginLeft   := 10;
   FMarginTop    := 10;
   FMarginBottom := 10;
