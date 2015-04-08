@@ -1,6 +1,6 @@
 unit LamwDesigner;
 
-{$mode delphi}
+{$mode objfpc}{$h+}
 
 interface
 
@@ -34,6 +34,7 @@ type
   { TAndroidWidgetMediator :: thanks to x2nie !}
 
   TAndroidWidgetMediator = class(TDesignerMediator,IAndroidWidgetDesigner)
+    procedure OnDesignerModified(Sender: TObject);
   private
     FAndroidForm: jForm;
     FDefaultBrushColor: TColor;
@@ -170,9 +171,9 @@ type
     FSelectedFontColor: TARGBColorBridge;
     SelectedTextColor: TColor;
 
-    procedure SetDropListTextColor(color: TARGBColorBridge);
-    procedure SetDropListBackgroundColor(color: TARGBColorBridge);
-    procedure SetSelectedFontColor(color: TARGBColorBridge);
+    procedure SetDropListTextColor(Acolor: TARGBColorBridge);
+    procedure SetDropListBackgroundColor(Acolor: TARGBColorBridge);
+    procedure SetSelectedFontColor(Acolor: TARGBColorBridge);
 
   public
      constructor Create(AWidget: TAndroidWidget); override;
@@ -399,13 +400,38 @@ begin
   FDefaultBrushColor:= clForm;
   FDefaultPenColor:= clMedGray;
   FDefaultFontColor:= clMedGray;
+  GlobalDesignHook.AddHandlerModified(@OnDesignerModified);
 end;
 
 destructor TAndroidWidgetMediator.Destroy;
 begin
   if FAndroidForm<>nil then FAndroidForm.Designer:=nil;
   FAndroidForm:=nil;
+  if GlobalDesignHook <> nil then
+    GlobalDesignHook.RemoveAllHandlersForObject(Self);
   inherited Destroy;
+end;
+
+procedure TAndroidWidgetMediator.OnDesignerModified(Sender: TObject);
+var
+  Instance: TPersistent;
+  InvalidateNeeded: Boolean;
+  i: Integer;
+begin
+  if not (Sender is TPropertyEditor) or (LCLForm = nil) then Exit;
+  InvalidateNeeded := False;
+  for i := 0 to TPropertyEditor(Sender).PropCount - 1 do
+  begin
+    Instance := TPropertyEditor(Sender).GetComponent(i);
+    if (Instance is jVisualControl)
+    and (jVisualControl(Instance).Owner = FAndroidForm) then
+    begin
+      InvalidateNeeded := True;
+      Break;
+    end;
+  end;
+  if InvalidateNeeded then
+    LCLForm.Invalidate;
 end;
 
 procedure TAndroidWidgetMediator.Notification(AComponent: TComponent;
@@ -1335,36 +1361,36 @@ begin
   //BackGroundColor:= clInactiveBorder; //clActiveCaption;
 end;
 
-procedure TDraftSpinner.SetDropListBackgroundColor(color: TARGBColorBridge);
+procedure TDraftSpinner.SetDropListBackgroundColor(Acolor: TARGBColorBridge);
 begin
-  FDropListBackgroundColor:= color;
-  if color <> colbrDefault then
-    DropListColor:= FPColorToTColor(ToTFPColor(color))
+  FDropListBackgroundColor:= Acolor;
+  if Acolor <> colbrDefault then
+    DropListColor:= FPColorToTColor(ToTFPColor(Acolor))
   else
     DropListColor:= clNone;
 end;
 
-procedure TDraftSpinner.SetDropListTextColor(color: TARGBColorBridge);
+procedure TDraftSpinner.SetDropListTextColor(Acolor: TARGBColorBridge);
 var
   fpColor: TFPColor;
 begin
-  FDropListTextColor:= color;
-  if color <> colbrDefault then
+  FDropListTextColor:= Acolor;
+  if Acolor <> colbrDefault then
   begin
-    fpColor:= ToTFPColor(color);
+    fpColor:= ToTFPColor(Acolor);
     DropListFontColor:= FPColorToTColor(fpColor);
   end
   else DropListFontColor:= clNone;
 end;
 
-procedure TDraftSpinner.SetSelectedFontColor(color: TARGBColorBridge);
+procedure TDraftSpinner.SetSelectedFontColor(Acolor: TARGBColorBridge);
 var
   fpColor: TFPColor;
 begin
-  FSelectedFontColor:= color;
-  if color <> colbrDefault then
+  FSelectedFontColor:= Acolor;
+  if Acolor <> colbrDefault then
   begin
-    fpColor:= ToTFPColor(color);
+    fpColor:= ToTFPColor(Acolor);
     SelectedTextColor:= FPColorToTColor(fpColor);
   end
   else SelectedTextColor:= clNone;
