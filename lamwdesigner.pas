@@ -753,36 +753,6 @@ procedure TAndroidWidgetMediator.Paint;
         fWidget.FontColor:= colbrGray;
         fWidget.Draw(LCLForm.Canvas);
         fWidget.Free;
-      end
-      else if (AWidget is jButton) then
-      begin
-         fWidget:= TDraftButton.Create(AWidget);
-         fWidget.Height:= AWidget.Height;
-         fWidget.Width:= AWidget.Width;
-         fWidget.MarginLeft:= AWidget.MarginLeft;
-         fWidget.MarginTop:= AWidget.MarginTop;
-         fWidget.MarginRight:= AWidget.MarginRight;
-         fWidget.MarginBottom:= AWidget.MarginBottom;
-
-         fWidget.FontColor:= (AWidget as jButton).FontColor;
-         fWidget.Color:= (AWidget as jButton).BackgroundColor;
-
-
-         if (AWidget as jButton).Parent is jPanel  then
-         begin
-           if (AWidget as jButton).BackgroundColor = colbrDefault then
-              fWidget.Color:= ((AWidget as jButton).Parent as jPanel).BackgroundColor;
-         end;
-
-         if (AWidget as jButton).Parent is jCustomDialog  then
-         begin
-           if (AWidget as jButton).BackgroundColor = colbrDefault then
-             fWidget.Color:= ((AWidget as jButton).Parent as jCustomDialog).BackgroundColor;
-         end;
-
-         fWidget.Draw(LCLForm.Canvas);
-         fWidget.Free;
-
       end else if (AWidget is jEditText) then
       begin
          fWidget:= TDraftEditText.Create(AWidget);
@@ -1009,31 +979,69 @@ end;
 constructor TDraftButton.Create(AWidget: TAndroidWidget);
 begin
   inherited;
-  //BackGroundColor:= clActiveCaption;
+  Height := AWidget.Height;
+  Width := AWidget.Width;
+  MarginLeft := AWidget.MarginLeft;
+  MarginTop := AWidget.MarginTop;
+  MarginRight := AWidget.MarginRight;
+  MarginBottom := AWidget.MarginBottom;
+  FontColor := jButton(AWidget).FontColor;
+  Color := jButton(AWidget).BackgroundColor;
+
+  if AWidget.Parent is jPanel then
+  begin
+    if jButton(AWidget).BackgroundColor = colbrDefault then
+      Color := jPanel(AWidget.Parent).BackgroundColor;
+  end else
+  if AWidget.Parent is jCustomDialog then
+  begin
+    if jButton(AWidget).BackgroundColor = colbrDefault then
+      Color := jCustomDialog(AWidget.Parent).BackgroundColor;
+  end;
 end;
 
 procedure TDraftButton.Draw(canvas: TCanvas);
+var
+  r: TRect;
+  ts: TTextStyle;
+  lastFontSize: Integer;
 begin
+  with canvas do
+  begin
+    Brush.Color := BackGroundColor;
+    Pen.Color := clForm;
+    Font.Color := TextColor;
 
-  canvas.Brush.Color:= Self.BackGroundColor;
-  canvas.Pen.Color:= clForm; //clWindowFrame; //clWhite;
-  canvas.Font.Color:= Self.TextColor;
+    if BackGroundColor = clNone then
+      Brush.Color := RGBToColor($cc, $cc, $cc);
 
-  if Self.BackGroundColor = clNone then
-    canvas.Brush.Color:= clGray; //clMedGray;
+    if TextColor = clNone then
+      Font.Color:= clBlack;
+    lastFontSize := Font.Size;
+    if jButton(FAndroidWidget).FontSize = 0 then
+      Font.Size := 13
+    else
+    if jButton(FAndroidWidget).FontSize <= 4 then
+      Font.Size := 1
+    else
+      Font.Size := jButton(FAndroidWidget).FontSize - 4;
 
-  if Self.TextColor = clNone then
-     canvas.Font.Color:= clBlack;
+    r := Rect(0, 0, Self.Width, Self.Height);
+    FillRect(r);
+    //outer frame
+    Rectangle(r);
 
-  canvas.FillRect(0,0,Self.Width,Self.Height);
-  //outer frame
-  canvas.Rectangle(0,0,Self.Width,Self.Height);
+    Pen.Color := clMedGray;
+    Brush.Style := bsClear;
+    InflateRect(r, -1, -1);
+    Rectangle(r);
 
-  canvas.Pen.Color:= clMedGray; //clForm; //clWhite; //clWindowFrame; //clWindowFrame; //clBlack;//clGray; //Self.FDefaultPenColor;
-  canvas.Brush.Style:= bsClear;
-  canvas.Rectangle(3,3,Self.Width-3,Self.Height-3);
-
-  canvas.TextOut(5, 4, FAndroidWidget.Text);
+    ts := TextStyle;
+    ts.Layout := tlCenter;
+    ts.Alignment := Classes.taCenter;
+    TextRect(r, r.Left, r.Top, FAndroidWidget.Text, ts);
+    Font.Size := lastFontSize;
+  end;
 end;
 
 { TDraftTextView }
@@ -1731,6 +1739,7 @@ initialization
 
   // registering DraftClasses:
   RegisterAndroidWidgetDraftClass(jProgressBar, TDraftProgressBar);
+  RegisterAndroidWidgetDraftClass(jButton, TDraftButton);
 
 finalization
   DraftClassesMap.Free;
