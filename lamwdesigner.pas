@@ -266,6 +266,15 @@ begin
     Result.Alpha:= AlphaOpaque;
 end;
 
+function AndroidToLCLFontSize(asize: DWord): Integer; inline;
+begin
+  case asize of
+  0: Result := 13;
+  1: Result := 1;
+  else Result := asize * 3 div 4;
+  end;
+end;
+
 procedure RegisterAndroidWidgetDraftClass(AWidgetClass: jVisualControlClass;
   ADraftClass: TDraftWidgetClass);
 begin
@@ -1018,13 +1027,7 @@ begin
     if TextColor = clNone then
       Font.Color:= clBlack;
     lastFontSize := Font.Size;
-    if jButton(FAndroidWidget).FontSize = 0 then
-      Font.Size := 13
-    else
-    if jButton(FAndroidWidget).FontSize <= 4 then
-      Font.Size := 1
-    else
-      Font.Size := jButton(FAndroidWidget).FontSize - 4;
+    Font.Size := AndroidToLCLFontSize(jButton(FAndroidWidget).FontSize);
 
     r := Rect(0, 0, Self.Width, Self.Height);
     FillRect(r);
