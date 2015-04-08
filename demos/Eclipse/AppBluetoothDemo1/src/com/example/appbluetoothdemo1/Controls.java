@@ -1,4 +1,4 @@
-package com.example.dummyapp;
+package com.example.appbluetoothdemo1;
 
 //Lamw: Lazarus Android Module Wizard - Version 0.6 - rev. 20 - 07 April - 2015
 //Form Designer and Components development model!

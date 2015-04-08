@@ -48,6 +48,8 @@
                   http://www.youtube.com/watch?v=sQnFYJyltwY&list=UUkQrLhaIXrKY4eq9zTymxpQ
 
 		-Thierry Dijoux - Late: Apk Expert Tools [Build, Install, ...]
+
+		-Anton [at github/odisey1245] - many many contributions!
 		
 		-Lazarus forum community!
 		
@@ -64,6 +66,32 @@
 	* "install_tutorial_eclipse_users.txt"	*                                
 	*					*
 	*****************************************
+
+Version 0.6 - rev. 20 - 07 April 2015 - 
+
+	NEWS: 
+		IDE menu entry "Run --> [Lamw] Build Apk and Run" ::by Anton
+
+		IDE "New project" now has two entries [thanks to Anton!]:
+
+			1. JNI Android Module [Lamw NoGUI]
+				A [NoGUI] JNI Android loadable module (.so)
+				using DataModule (NO Form Designer/Android Components Bridges)!
+
+			2. JNI Android Module [Lamw GUI]
+				A [GUI] JNI Android loadable module (.so)
+				based on Simonsayz's templates
+				with Form Designer and Android Components Bridges!
+				
+		New native method java Parse ::by Anton
+		New property color editor ::by Anton
+
+	NEW! Demo AppBluetoothDemo1 [Eclipse Compatible Project] <<---A suggestion and request by m4u_hoahoctro
+
+		Note: to transfer via Bluetooth,
+		you need to do some common user's tasks: 
+		activate bluetooth, detect neighbors devices and pair neighbors devices.... 	
+
 
 Version 0.6 - rev. 19 - 09 March 2015 -
 	

@@ -90,11 +90,11 @@ begin
   // Register main menu
   ideMnuAMW:= RegisterIDEMenuSection(mnuTools,'AMW');
   // Register submenu
-  ideSubMnuAMW:= RegisterIDESubMenu(ideMnuAMW, 'AMW', 'Android Module Wizard');
+  ideSubMnuAMW:= RegisterIDESubMenu(ideMnuAMW, 'AMW', '[Lamw] Android Module Wizard');
 
 
   // Adding first entry
-  RegisterIDEMenuCommand(ideSubMnuAMW, 'PathLateCmd', 'LATE: "Apk" Expert Tools [Build, Install, ...]', nil,@StartLateTool);
+  RegisterIDEMenuCommand(ideSubMnuAMW, 'PathLateCmd', 'LATE: Apk Expert Tools [Build, Install, ...]', nil,@StartLateTool);
   // Adding second entry
    RegisterIDEMenuCommand(ideSubMnuAMW, 'PathResEditorCmd', 'Resource Editor [strings.xml] ', nil,@StartResEditor);
    // Adding third entry
@@ -105,7 +105,7 @@ begin
   RegisterIDEMenuCommand(ideSubMnuAMW, 'PathCompCreateCmd', 'New jComponent [Create]', nil,@StartComponentCreate);
   // And so on...
 
-  RegisterIDEMenuCommand(itmRunBuilding, 'BuildAPKandRun', 'Lamw: Build Apk and Run',
+  RegisterIDEMenuCommand(itmRunBuilding, 'BuildAPKandRun', '[Lamw] Build Apk and Run',
     nil, @BuildAPKandRun);
 end;
 
