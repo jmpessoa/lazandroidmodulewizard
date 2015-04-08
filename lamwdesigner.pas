@@ -269,6 +269,7 @@ end;
 procedure RegisterAndroidWidgetDraftClass(AWidgetClass: jVisualControlClass;
   ADraftClass: TDraftWidgetClass);
 begin
+  DraftClassesMap.Add(AWidgetClass, ADraftClass);
 end;
 
 { TDraftControlHash }
@@ -492,6 +493,7 @@ procedure TAndroidWidgetMediator.Paint;
     fpcolor: TFPColor;
     //fpFontColor: TFPColor;
     fWidget: TDraftWidget;
+    fWidgetClass: TDraftWidgetClass;
   begin
 
     with LCLForm.Canvas do begin
@@ -876,40 +878,24 @@ procedure TAndroidWidgetMediator.Paint;
 
          fWidget.Draw(LCLForm.Canvas);
          fWidget.Free;
-      end else if (AWidget is jProgressBar) then
+      end else
       begin
-         fWidget:= TDraftProgressBar.Create(AWidget);
-         fWidget.Height:= AWidget.Height;
-         fWidget.Width:= AWidget.Width;
-         fWidget.MarginLeft:= AWidget.MarginLeft;
-         fWidget.MarginTop:= AWidget.MarginTop;
-         fWidget.MarginRight:= AWidget.MarginRight;
-         fWidget.MarginBottom:= AWidget.MarginBottom;
-         fWidget.Color:= (AWidget as jProgressBar).BackgroundColor;
-         fWidget.FontColor:= colbrBlack;
-
-         if (AWidget as jProgressBar).Parent is jPanel  then
-         begin
-           if (AWidget as jProgressBar).BackgroundColor = colbrDefault then
-               fWidget.Color:= ((AWidget as jProgressBar).Parent as jPanel).BackgroundColor;
-         end;
-
-        if (AWidget as jProgressBar).Parent is jCustomDialog  then
+        fWidgetClass := DraftClassesMap.Find(AWidget.ClassType);
+        if Assigned(fWidgetClass) then
         begin
-          if (AWidget as jProgressBar).BackgroundColor = colbrDefault then
-              fWidget.Color:= ((AWidget as jProgressBar).Parent as jCustomDialog).BackgroundColor;
+          fWidget := fWidgetClass.Create(AWidget);
+          fWidget.Draw(LCLForm.Canvas);
+          fWidget.Free;
+        end
+        else if (AWidget is jVisualControl) then     ////generic
+        begin
+          Brush.Color:= Self.FDefaultBrushColor;
+          FillRect(0,0,AWidget.Width,AWidget.Height);
+          Rectangle(0,0,AWidget.Width,AWidget.Height);    // outer frame
+          //generic
+          Font.Color:= clMedGray;
+          TextOut(5,4,(AWidget as TAndroidWidget).Text);
         end;
-
-         fWidget.Draw(LCLForm.Canvas);
-         fWidget.Free
-      end else if (AWidget is jVisualControl) then     ////generic
-      begin
-        Brush.Color:= Self.FDefaultBrushColor;
-        FillRect(0,0,AWidget.Width,AWidget.Height);
-        Rectangle(0,0,AWidget.Width,AWidget.Height);    // outer frame
-        //generic
-        Font.Color:= clMedGray;
-        TextOut(5,4,(AWidget as TAndroidWidget).Text);
       end;
 
       if AWidget.AcceptChildrenAtDesignTime then
@@ -1201,6 +1187,25 @@ end;
 constructor TDraftProgressBar.Create(AWidget: TAndroidWidget);
 begin
   inherited;
+  Height := AWidget.Height;
+  Width := AWidget.Width;
+  MarginLeft := AWidget.MarginLeft;
+  MarginTop := AWidget.MarginTop;
+  MarginRight := AWidget.MarginRight;
+  MarginBottom := AWidget.MarginBottom;
+  Color := jProgressBar(AWidget).BackgroundColor;
+  FontColor := colbrBlack;
+
+  if AWidget.Parent is jPanel then
+  begin
+    if jProgressBar(AWidget).BackgroundColor = colbrDefault then
+      Color := jPanel(AWidget.Parent).BackgroundColor;
+  end else
+  if AWidget.Parent is jCustomDialog then
+  begin
+    if jProgressBar(AWidget).BackgroundColor = colbrDefault then
+      Color := jCustomDialog(AWidget.Parent).BackgroundColor;
+  end;
 end;
 
 procedure TDraftProgressBar.Draw(canvas: TCanvas);
