@@ -9,6 +9,27 @@ uses
   AndroidWidget;
 
 type
+  TDraftWidget = class;
+
+  jVisualControlClass = class of jVisualControl;
+  TDraftWidgetClass = class of TDraftWidget;
+
+  { TDraftControlHash }
+
+  TDraftControlHash = class
+  private
+    FFreeLeft: Integer;
+    FItems: array of record
+      VisualControl: jVisualControlClass;
+      Draft: TDraftWidgetClass;
+    end;
+    function Hash1(c: TClass): PtrUInt; inline;
+    function Hash2(i: PtrUInt): PtrUInt; inline;
+  public
+    constructor Create(MaxCapacity: Integer);
+    procedure Add(VisualControlClass: jVisualControlClass; DraftWidgetClass: TDraftWidgetClass);
+    function Find(VisualControlClass: TClass): TDraftWidgetClass;
+  end;
 
   { TAndroidWidgetMediator :: thanks to x2nie !}
 
@@ -222,6 +243,9 @@ uses
   togglebutton, switchbutton, Laz_And_GLESv1_Canvas, Laz_And_GLESv2_Canvas,
   gridview, Spinner;
 
+var
+  DraftClassesMap: TDraftControlHash;
+
 procedure GetRedGreenBlue(rgb: longInt; out Red, Green, Blue: word); inline;
 begin
     red:=   ( (rgb and $ff0000)  shr 16) shl 8;
@@ -240,6 +264,61 @@ begin
     Result.Green:= green;
     Result.Blue:=  blue;
     Result.Alpha:= AlphaOpaque;
+end;
+
+procedure RegisterAndroidWidgetDraftClass(AWidgetClass: jVisualControlClass;
+  ADraftClass: TDraftWidgetClass);
+begin
+end;
+
+{ TDraftControlHash }
+
+function TDraftControlHash.Hash1(c: TClass): PtrUInt;
+begin
+  Result := (PtrUInt(c) + PtrUInt(c) shr 7) mod PtrUInt(Length(FItems));
+end;
+
+function TDraftControlHash.Hash2(i: PtrUInt): PtrUInt;
+begin
+  Result := (i + 7) mod PtrUInt(Length(FItems));
+end;
+
+constructor TDraftControlHash.Create(MaxCapacity: Integer);
+begin
+  SetLength(FItems, MaxCapacity);
+  FFreeLeft := MaxCapacity;
+end;
+
+procedure TDraftControlHash.Add(VisualControlClass: jVisualControlClass;
+  DraftWidgetClass: TDraftWidgetClass);
+var
+  i: PtrUInt;
+begin
+  if FFreeLeft = 0 then
+    raise Exception.Create('[DraftControlHash] Overfull!');
+  i := Hash1(VisualControlClass);
+  while FItems[i].VisualControl <> nil do
+    i := Hash2(i);
+  with FItems[i] do
+  begin
+    VisualControl := VisualControlClass;
+    Draft := DraftWidgetClass;
+  end;
+  Dec(FFreeLeft);
+end;
+
+function TDraftControlHash.Find(VisualControlClass: TClass): TDraftWidgetClass;
+var i: PtrUInt;
+begin
+  Result := nil;
+  i := Hash1(VisualControlClass);
+  if FItems[i].VisualControl = nil then Exit;
+  while FItems[i].VisualControl <> VisualControlClass do
+  begin
+    i := Hash2(i);
+    if FItems[i].VisualControl = nil then Exit;
+  end;
+  Result := FItems[i].Draft;
 end;
 
 { TARGBColorBridgePropertyEditor }
@@ -1642,9 +1721,13 @@ begin
 end;
 
 initialization
+  DraftClassesMap := TDraftControlHash.Create(64); // power of 2 for efficiency
   RegisterPropertyEditor(TypeInfo(TARGBColorBridge), nil, '', TARGBColorBridgePropertyEditor);
 
-finalization
+  // registering DraftClasses:
+  RegisterAndroidWidgetDraftClass(jProgressBar, TDraftProgressBar);
 
+finalization
+  DraftClassesMap.Free;
 end.
 
