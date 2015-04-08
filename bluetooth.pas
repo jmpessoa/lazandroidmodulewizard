@@ -277,7 +277,7 @@ procedure jBluetooth.SendFile(_filePath: string; _fileName: string; _mimeType: s
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jBluetooth_SendFile(FjEnv, FjObject, _filePath ,_fileName ,_mimeType);
+     jBluetooth_SendFile(FjEnv, FjObject, _filePath ,_fileName ,LowerCase(_mimeType));
 end;
 
 {-------- jBluetooth_JNI_Bridge ----------}

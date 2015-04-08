@@ -72,6 +72,21 @@ Version 0.6 - rev. 20 - 07 April 2015 -
 	NEWS: 
 		IDE menu entry "Run --> [Lamw] Build Apk and Run" ::by Anton
 
+
+			Note: for old projecs, please change "controls.lpi":
+
+			after:
+
+			<VersionInfo>
+		    		<StringTable ProductVersion=""/>
+			</VersionInfo>
+
+			Add this new entry:
+
+			<CustomData Count="1">
+		    		<Item0 Name="LAMW" Value="GUI"/>
+			</CustomData>
+
 		IDE "New project" now has two entries [thanks to Anton!]:
 
 			1. JNI Android Module [Lamw NoGUI]
