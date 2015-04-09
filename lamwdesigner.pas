@@ -750,19 +750,6 @@ procedure TAndroidWidgetMediator.Paint;
         fWidget.FontColor:= (AWidget as jTextView).FontColor;
         fWidget.Draw(LCLForm.Canvas);
         fWidget.Free;
-      end else if (AWidget is jCheckBox) then
-      begin
-        fWidget:= TDraftCheckBox.Create(AWidget);
-        fWidget.Height:= AWidget.Height;
-        fWidget.Width:= AWidget.Width;
-        fWidget.MarginLeft:= AWidget.MarginLeft;
-        fWidget.MarginTop:= AWidget.MarginTop;
-        fWidget.MarginRight:= AWidget.MarginRight;
-        fWidget.MarginBottom:= AWidget.MarginBottom;
-        fWidget.Color:= (AWidget as jCheckBox).BackgroundColor;
-        fWidget.FontColor:= (AWidget as jCheckBox).FontColor;
-        fWidget.Draw(LCLForm.Canvas);
-        fWidget.Free;
       end else if (AWidget is jRadioButton) then
       begin
         fWidget:= TDraftRadioButton.Create(AWidget);
@@ -1158,33 +1145,57 @@ constructor TDraftCheckBox.Create(AWidget: TAndroidWidget);
 begin
   inherited;
   BackGroundColor:= clNone; //clActiveCaption;
+  Height:= AWidget.Height;
+  Width:= AWidget.Width;
+  MarginLeft:= AWidget.MarginLeft;
+  MarginTop:= AWidget.MarginTop;
+  MarginRight:= AWidget.MarginRight;
+  MarginBottom:= AWidget.MarginBottom;
+  Color:= jCheckBox(AWidget).BackgroundColor;
+  FontColor:= jCheckBox(AWidget).FontColor;
 end;
 
 procedure TDraftCheckBox.Draw(canvas: TCanvas);
+var
+  lastSize: Integer;
+  ts: TTextStyle;
 begin
-  canvas.Brush.Color:= Self.BackGroundColor;
-  canvas.Font.Color:= Self.TextColor;
-  if Self.BackGroundColor <>  clNone then
+  with canvas do
   begin
-    canvas.FillRect(0,0,Self.Width,Self.Height);
-  end
-  else
-  begin
-    canvas.Brush.Style:= bsClear;
-       //outer frame
+    Brush.Color := Self.BackGroundColor;
+    if BackGroundColor <> clNone then
+      FillRect(0, 0, Self.Width, Self.Height)
+    else
+      Brush.Style := bsClear;
+
+    if TextColor = clNone then
+      Font.Color := clSilver
+    else
+      Font.Color := TextColor;
+
+    lastSize := Font.Size;
+    Font.Size := AndroidToLCLFontSize(jCheckBox(FAndroidWidget).FontSize);
+    ts := TextStyle;
+    ts.Layout := tlCenter;
+    TextRect(Rect(30, 0, Self.Width, Self.Height), 30, 0, FAndroidWidget.Text, ts);
+    Font.Size := lastSize;
+
+    Brush.Color := clWhite;
+    Brush.Style := bsClear;
+    Pen.Color := RGBToColor($A1,$A1,$A1);
+    Rectangle(MarginLeft + 1,  MarginTop + 1,
+              MarginLeft + 18, MarginTop + 18);
+    if jCheckBox(FAndroidWidget).Checked then
+    begin
+      lastSize := Pen.Width;
+      Pen.Width := 4;
+      Pen.Color := RGBToColor($44,$B3,$DD);
+      MoveTo(MarginLeft + 5,  MarginTop + 7);
+      LineTo(MarginLeft + 9,  MarginTop + 12);
+      LineTo(MarginLeft + 19, MarginTop + 1);
+      Pen.Width := lastSize;
+    end;
   end;
-
-  if Self.TextColor = clNone then
-       canvas.Font.Color:= clSilver;
-
-  canvas.TextOut(28, 8, FAndroidWidget.Text);
-
-  canvas.Brush.Style:= bsSolid;
-  canvas.Brush.Color:= clWhite;
-  canvas.Pen.Color:= canvas.Font.Color;
-  canvas.Rectangle(Self.MarginLeft+1,Self.MarginTop+1,
-            Self.MarginLeft+18,
-            Self.MarginTop+18);
 end;
 
 { TDraftRadioButton }
@@ -1767,6 +1778,7 @@ initialization
   // registering DraftClasses:
   RegisterAndroidWidgetDraftClass(jProgressBar, TDraftProgressBar);
   RegisterAndroidWidgetDraftClass(jButton, TDraftButton);
+  RegisterAndroidWidgetDraftClass(jCheckBox, TDraftCheckBox);
 
 finalization
   DraftClassesMap.Free;
