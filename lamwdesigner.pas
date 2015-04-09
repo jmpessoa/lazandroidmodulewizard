@@ -34,7 +34,6 @@ type
   { TAndroidWidgetMediator :: thanks to x2nie !}
 
   TAndroidWidgetMediator = class(TDesignerMediator,IAndroidWidgetDesigner)
-    procedure OnDesignerModified(Sender: TObject);
   private
     FAndroidForm: jForm;
     FDefaultBrushColor: TColor;
@@ -42,6 +41,7 @@ type
     FDefaultFontColor: TColor;
   protected
     procedure Notification(AComponent: TComponent; Operation: TOperation); override;
+    procedure OnDesignerModified(Sender: TObject);
   public
     //needed by the lazarus form editor
     class function CreateMediator(TheOwner, TheForm: TComponent): TDesignerMediator; override;
