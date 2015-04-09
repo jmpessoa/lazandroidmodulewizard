@@ -1254,11 +1254,11 @@ begin
   with canvas do
   begin
     Brush.Color := RGBToColor($ad,$ad,$ad);
-    r := Rect(0, 1, Self.Width, 5);
+    r := Rect(0, 1, Self.Width, 4);
     FillRect(r);
     Brush.Color := RGBToColor($44,$B3,$DD);
-    r.Top := 1;
-    r.Bottom := 4;
+    r.Top := 0;
+    r.Bottom := 3;
     if jProgressBar(FAndroidWidget).Max <= 0 then
       jProgressBar(FAndroidWidget).Max := 100;
     x := Self.Width * jProgressBar(FAndroidWidget).Progress
