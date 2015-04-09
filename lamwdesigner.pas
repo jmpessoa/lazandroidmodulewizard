@@ -555,17 +555,18 @@ procedure TAndroidWidgetMediator.Paint;
 
       if (AWidget is jForm) then
       begin
-
         if (AWidget as jForm).BackgroundColor <> colbrDefault then
         begin
           fpcolor:= ToTFPColor((AWidget as jForm).BackgroundColor);
           Brush.Color:= FPColorToTColor(fpcolor);
+          Rectangle(0,0,AWidget.Width,AWidget.Height); // outer frame
         end
         else
         begin
-          Brush.Color:= clBlack;
+          Brush.Color := clWhite;
+          GradientFill(Rect(0,0,AWidget.Width,AWidget.Height),
+            RGBToColor($EC,$EC,$EC), clWhite, gdVertical);
         end;
-        Rectangle(0,0,AWidget.Width,AWidget.Height); // outer frame
       end else if (AWidget is jPanel) then
       begin
         if (AWidget as jPanel).BackgroundColor <> colbrDefault then
