@@ -1247,35 +1247,32 @@ end;
 
 procedure TDraftProgressBar.Draw(canvas: TCanvas);
 var
-  i, k: integer;
-  fpcolor: TFPColor;
+  x: integer;
+  r: TRect;
 begin
-  fpcolor:= ToTFPColor(colbrLightSlateBlue);
-
-  canvas.Brush.Color:= Self.BackGroundColor;
-  canvas.Pen.Color:= clWhite;
-
-  if Self.BackGroundColor = clNone then canvas.Brush.Style:= bsClear;
-
-  canvas.FillRect(0,0,Self.Width,Self.Height);
-  canvas.Brush.Color:= FPColorToTColor(fpcolor);
-  canvas.FillRect(0,10,Trunc(2*Self.Width/3),Self.Height-10);
-
-  canvas.Brush.Style:= bsSolid;
-
-  k:= Trunc(Self.Width/25) - 1;
-  for i:= 1 to k-1 do
+  with canvas do
   begin
-    canvas.MoveTo(0+i*20, 0+10);  {x1, y1}
-    canvas.LineTo(0+i*20,Self.Height-10); {x1, y2}
+    Brush.Color := RGBToColor($ad,$ad,$ad);
+    r := Rect(0, 1, Self.Width, 5);
+    FillRect(r);
+    Brush.Color := RGBToColor($44,$B3,$DD);
+    r.Top := 1;
+    r.Bottom := 4;
+    if jProgressBar(FAndroidWidget).Max <= 0 then
+      jProgressBar(FAndroidWidget).Max := 100;
+    x := Self.Width * jProgressBar(FAndroidWidget).Progress
+         div jProgressBar(FAndroidWidget).Max;
+    { "inverse" does not work... yet?
+    if not (jProgressBar(FAndroidWidget).Style
+            in [cjProgressBarStyleInverse, cjProgressBarStyleLargeInverse])
+    then}
+      r.Right := x
+    {else begin
+      r.Right := Self.Width;
+      r.Left := Self.Width - x;
+    end};
+    FillRect(r);
   end;
-
-  canvas.Brush.Style:= bsClear;
-  canvas.Pen.Color:= FPColorToTColor(fpcolor);
-  // outer frame
-  canvas.Rectangle(0,0,Self.Width,Self.Height);
-  //canvas.Font.Color:= clBlack;
-  //canvas.TextOut(12,8, txt);
 end;
 
 { TDraftListView }
