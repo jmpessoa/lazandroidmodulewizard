@@ -1158,7 +1158,6 @@ end;
 procedure TDraftCheckBox.Draw(canvas: TCanvas);
 var
   lastSize: Integer;
-  ts: TTextStyle;
 begin
   with canvas do
   begin
@@ -1175,9 +1174,7 @@ begin
 
     lastSize := Font.Size;
     Font.Size := AndroidToLCLFontSize(jCheckBox(FAndroidWidget).FontSize);
-    ts := TextStyle;
-    ts.Layout := tlCenter;
-    TextRect(Rect(30, 0, Self.Width, Self.Height), 30, 0, FAndroidWidget.Text, ts);
+    TextOut(MarginLeft + 25, MarginTop + 16 - Abs(Font.Height), FAndroidWidget.Text);
     Font.Size := lastSize;
 
     Brush.Color := clWhite;
