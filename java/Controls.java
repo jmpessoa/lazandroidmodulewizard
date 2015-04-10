@@ -1,6 +1,6 @@
 package com.example.dummyapp;
 
-//Lamw: Lazarus Android Module Wizard - Version 0.6 - rev. 19 - 09 March - 2015
+//Lamw: Lazarus Android Module Wizard - Version 0.6 - rev. 20 - 07 April - 2015
 //Form Designer and Components development model!
 //Author: jmpessoa@hotmail.com
 //https://github.com/jmpessoa/lazandroidmodulewizard
@@ -74,6 +74,8 @@ import android.bluetooth.BluetoothSocket;
 import android.content.BroadcastReceiver;
 import android.content.ClipData;
 import android.content.ClipboardManager;
+import android.content.ContentResolver;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -109,6 +111,7 @@ import android.os.Message;
 import android.telephony.SmsManager;
 import android.telephony.TelephonyManager;
 import android.preference.PreferenceManager;
+import android.provider.BaseColumns;
 import android.provider.ContactsContract;
 import android.provider.ContactsContract.CommonDataKinds.Email;
 import android.provider.ContactsContract.CommonDataKinds.Phone;
@@ -6949,6 +6952,8 @@ class jContextMenu /*extends ...*/ {
            
 }
 
+
+
 //ref. http://stackoverflow.com/questions/19395970/android-bluetooth-background-listner?rq=1
 //ref. http://androidcookbook.com/Recipe.seam;jsessionid=6C1411AB8CCAFBA9384A5EC295B44525?recipeId=1991
 class jBluetoothServerSocket {
@@ -7231,6 +7236,7 @@ class jBluetoothServerSocket {
        }else return null;
       
     }  
+  
 }
 
 //ref. http://androidcookbook.com/Recipe.seam;jsessionid=9B476BA317AA36E2CB0D6517ABE60A5E?recipeId=1665
@@ -7561,7 +7567,7 @@ class jBluetooth /*extends ...*/ {
 
     private BluetoothAdapter mBA = null;
     
-    Intent intent = null;
+    private Intent intent = null;
     
     ArrayList<String> mListFoundedDevices = new ArrayList<String>();
     ArrayList<BluetoothDevice> mListReachablePairedDevices  = new ArrayList<BluetoothDevice>();
@@ -7837,7 +7843,21 @@ class jBluetooth /*extends ...*/ {
     	    }    	       	    	    
     	}    	
     	return devName;
-    }    
+    }
+        
+    //http://stackoverflow.com/questions/15697601/automate-file-transfer-to-a-paired-device-in-android-using-bluetooth
+    public void SendFile(String _filePath, String _fileName, String _mimeType){
+      
+        File file = new File(_filePath, "/" + _fileName);
+        Uri uri = Uri.fromFile(file);
+        String mtype = _mimeType; //"image/*";
+
+        Intent sharingIntent = new Intent(android.content.Intent.ACTION_SEND);
+        sharingIntent.setType(mtype);
+        sharingIntent.setClassName("com.android.bluetooth", "com.android.bluetooth.opp.BluetoothOppLauncherActivity");
+        sharingIntent.putExtra(Intent.EXTRA_STREAM, uri);
+        controls.activity.startActivity(sharingIntent);       
+    }
 }
 
 //by jmpessoa

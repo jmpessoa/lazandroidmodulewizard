@@ -31,13 +31,8 @@ jBluetooth = class(jControl)
     FOnDiscoveryStarted: TOnNotify;
     FOnDiscoveryFinished: TOnDiscoveryFinished;
     FOnDeviceBondStateChanged: TOnDeviceBondStateChanged;
-
-    FSocket: jBluetoothClientSocket;
-
-    procedure SetSocket(Value: jBluetoothClientSocket);
-
  protected
-    procedure Notification(AComponent: TComponent; Operation: TOperation); override;
+    //
  public
     constructor Create(AOwner: TComponent); override;
     destructor  Destroy; override;
@@ -69,13 +64,9 @@ jBluetooth = class(jControl)
     procedure GenEvent_OnBluetoothDeviceBondStateChanged(Obj: TObject; state: integer; _deviceName: string; _deviceAddress: string);
 
     function GetBondState(state: integer):TBondState;
-
-    procedure SetDeviceByAddress(_deviceAddress: string);
-    procedure SetDeviceByName(_deviceName: string);
+    procedure SendFile(_filePath: string; _fileName: string; _mimeType: string);
 
  published
-    property Socket: jBluetoothClientSocket read FSocket write SetSocket;
-
     property OnEnabled: TOnNotify read FOnEnabled write FOnEnabled;
     property OnDisabled: TOnNotify read FOnDisabled write FOnDisabled;
 
@@ -101,6 +92,7 @@ function jBluetooth_GetReachablePairedDeviceByName(env: PJNIEnv; _jbluetooth: JO
 function jBluetooth_GetReachablePairedDeviceByAddress(env: PJNIEnv; _jbluetooth: JObject; _deviceAddress: string): jObject;
 function jBluetooth_IsReachablePairedDevice(env: PJNIEnv; _jbluetooth: JObject; _macAddress: string): boolean;
 function jBluetooth_GetRemoteDevice(env: PJNIEnv; _jbluetooth: JObject; _macAddress: string): jObject;
+procedure jBluetooth_SendFile(env: PJNIEnv; _jbluetooth: JObject; _filePath: string; _fileName: string; _mimeType: string);
 
 
 implementation
@@ -241,19 +233,6 @@ begin
    Result:= jBluetooth_GetRemoteDevice(FjEnv, FjObject, _macAddress);
 end;
 
-procedure jBluetooth.SetDeviceByName(_deviceName: string);
-begin
-   if FSocket <> nil then
-   begin
-     FSocket.SetDevice(Self.GetReachablePairedDeviceByName(_deviceName));
-   end;
-end;
-
-procedure jBluetooth.SetDeviceByAddress(_deviceAddress: string);
-begin
-   if FSocket <> nil then FSocket.SetDevice(Self.GetReachablePairedDeviceByAddress(_deviceAddress));
-end;
-
 procedure jBluetooth.GenEvent_OnBluetoothEnabled(Obj: TObject);
 begin
    if Assigned(FOnEnabled) then FOnEnabled(Obj);
@@ -294,32 +273,11 @@ begin
   end;
 end;
 
-procedure jBluetooth.Notification(AComponent: TComponent; Operation: TOperation);
+procedure jBluetooth.SendFile(_filePath: string; _fileName: string; _mimeType: string);
 begin
-  inherited;
-  if Operation = opRemove then
-  begin
-      if AComponent = FSocket then
-      begin
-        FSocket:= nil;
-      end
-  end;
-end;
-
-procedure jBluetooth.SetSocket(Value: jBluetoothClientSocket);
-begin
-  if Value <> FSocket then
-  begin
-    if Assigned(FSocket) then
-    begin
-       FSocket.RemoveFreeNotification(Self); //remove free notification...
-    end;
-    FSocket:= Value;
-    if Value <> nil then  //re- add free notification...
-    begin
-       Value.FreeNotification(self);
-    end;
-  end;
+  //in designing component state: set value here...
+  if FInitialized then
+     jBluetooth_SendFile(FjEnv, FjObject, _filePath ,_fileName ,LowerCase(_mimeType));
 end;
 
 {-------- jBluetooth_JNI_Bridge ----------}
@@ -565,6 +523,23 @@ begin
   jMethod:= env^.GetMethodID(env, jCls, 'GetRemoteDevice', '(Ljava/lang/String;)Landroid/bluetooth/BluetoothDevice;');
   Result:= env^.CallObjectMethodA(env, _jbluetooth, jMethod, @jParams);
   env^.DeleteLocalRef(env,jParams[0].l);
+end;
+
+procedure jBluetooth_SendFile(env: PJNIEnv; _jbluetooth: JObject; _filePath: string; _fileName: string; _mimeType: string);
+var
+  jParams: array[0..2] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_filePath));
+  jParams[1].l:= env^.NewStringUTF(env, PChar(_fileName));
+  jParams[2].l:= env^.NewStringUTF(env, PChar(_mimeType));
+  jCls:= env^.GetObjectClass(env, _jbluetooth);
+  jMethod:= env^.GetMethodID(env, jCls, 'SendFile', '(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V');
+  env^.CallVoidMethodA(env, _jbluetooth, jMethod, @jParams);
+  env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env,jParams[1].l);
+  env^.DeleteLocalRef(env,jParams[2].l);
 end;
 
 end.
