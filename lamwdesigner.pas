@@ -1155,7 +1155,7 @@ begin
       Brush.Style := bsClear;
 
     if TextColor = clNone then
-      Font.Color := clSilver
+      Font.Color := clBlack
     else
       Font.Color := TextColor;
 
@@ -1227,7 +1227,7 @@ begin
     if jRadioButton(FAndroidWidget).Checked then
     begin
       Brush.Color := RGBToColor(0,$99,$CC);
-      Ellipse(6+3, 5+3, 23-3, 23-3);
+      Ellipse(6+3, 6+3, 23-3, 23-3);
     end;
   end;
 end;
