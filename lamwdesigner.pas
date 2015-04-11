@@ -1161,22 +1161,21 @@ begin
 
     lastSize := Font.Size;
     Font.Size := AndroidToLCLFontSize(jCheckBox(FAndroidWidget).FontSize);
-    TextOut(MarginLeft + 25, MarginTop + 16 - Abs(Font.Height), FAndroidWidget.Text);
+    TextOut(30, 21 - Abs(Font.Height), FAndroidWidget.Text);
     Font.Size := lastSize;
 
     Brush.Color := clWhite;
     Brush.Style := bsClear;
     Pen.Color := RGBToColor($A1,$A1,$A1);
-    Rectangle(MarginLeft + 1,  MarginTop + 1,
-              MarginLeft + 18, MarginTop + 18);
+    Rectangle(6, 6, 23, 23);
     if jCheckBox(FAndroidWidget).Checked then
     begin
       lastSize := Pen.Width;
       Pen.Width := 4;
       Pen.Color := RGBToColor($44,$B3,$DD);
-      MoveTo(MarginLeft + 5,  MarginTop + 7);
-      LineTo(MarginLeft + 9,  MarginTop + 12);
-      LineTo(MarginLeft + 19, MarginTop + 1);
+      MoveTo(10, 12);
+      LineTo(14, 17);
+      LineTo(24, 6);
       Pen.Width := lastSize;
     end;
   end;
@@ -1218,19 +1217,17 @@ begin
 
     lastSize := Font.Size;
     Font.Size := AndroidToLCLFontSize(jCheckBox(FAndroidWidget).FontSize);
-    TextOut(MarginLeft + 25, MarginTop + 16 - Abs(Font.Height), FAndroidWidget.Text);
+    TextOut(30, 21 - Abs(Font.Height), FAndroidWidget.Text);
     Font.Size := lastSize;
 
     Brush.Style := bsClear;
     Pen.Color := RGBToColor(155,155,155);
-    Ellipse(MarginLeft + 1,  MarginTop + 1,
-            MarginLeft + 18, MarginTop + 18);
+    Ellipse(6, 6, 23, 23);
 
     if jRadioButton(FAndroidWidget).Checked then
     begin
       Brush.Color := RGBToColor(0,$99,$CC);
-      Ellipse(MarginLeft + 1+3,  MarginTop + 1+3,
-              MarginLeft + 18-3, MarginTop + 18-3);
+      Ellipse(6+3, 5+3, 23-3, 23-3);
     end;
   end;
 end;
