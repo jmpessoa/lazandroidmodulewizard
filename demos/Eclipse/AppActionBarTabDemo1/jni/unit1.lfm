@@ -76,11 +76,13 @@ object AndroidModule1: TAndroidModule1
       BackgroundColor = colbrDefault
       FontColor = colbrDefault
       FontSize = 0
+      HintTextColor = colbrSilver
       ScrollBarStyle = scrNone
       MaxLines = 1
       HorScrollBar = True
       VerScrollBar = False
       WrappingLine = False
+      Editable = True
       Id = 4813408
     end
     object jButton1: jButton
@@ -171,11 +173,13 @@ object AndroidModule1: TAndroidModule1
       BackgroundColor = colbrDefault
       FontColor = colbrDefault
       FontSize = 0
+      HintTextColor = colbrSilver
       ScrollBarStyle = scrNone
       MaxLines = 1
       HorScrollBar = True
       VerScrollBar = False
       WrappingLine = False
+      Editable = True
       Id = 3792120
     end
     object jButton2: jButton
@@ -305,7 +309,6 @@ object AndroidModule1: TAndroidModule1
     OnFlingGesture = jPanel4FlingGesture
     Id = 0
     object jListView1: jListView
-      Tag = 1
       Left = 4
       Top = 4
       Width = 274
@@ -324,7 +327,6 @@ object AndroidModule1: TAndroidModule1
       ItemLayout = layImageTextWidget
       TextSizeDecorated = sdNone
       TextAlign = alLeft
-      HighLightSelectedItem = True
       HighLightSelectedItemColor = colbrRed
       Id = 0
     end

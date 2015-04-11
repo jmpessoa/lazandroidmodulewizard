@@ -83,11 +83,13 @@ object AndroidModule1: TAndroidModule1
     BackgroundColor = colbrWhite
     FontColor = colbrDefault
     FontSize = 0
+    HintTextColor = colbrSilver
     ScrollBarStyle = scrNone
     MaxLines = 1
     HorScrollBar = True
     VerScrollBar = False
     WrappingLine = False
+    Editable = True
     Id = 289992
   end
   object jButton1: jButton
@@ -113,7 +115,6 @@ object AndroidModule1: TAndroidModule1
     Id = 8028721
   end
   object jListView1: jListView
-    Tag = 1
     Left = 8
     Top = 256
     Width = 280
@@ -137,7 +138,6 @@ object AndroidModule1: TAndroidModule1
     ItemLayout = layImageTextWidget
     TextSizeDecorated = sdNone
     TextAlign = alLeft
-    HighLightSelectedItem = True
     HighLightSelectedItemColor = colbrRed
     Id = 5691155
   end
