@@ -137,6 +137,7 @@ function TApkBuilder.RunAndGetOutput(const cmd, params: string;
 var
   i: Integer;
   ms: TMemoryStream;
+  buf: array [0..255] of Byte;
 begin
   with TProcessUTF8.Create(nil) do
   try
@@ -145,18 +146,12 @@ begin
     Parameters.Text := params;
     ShowWindow := swoHIDE;
     Execute;
-    Sleep(100);
     ms := TMemoryStream.Create;
     try
       repeat
-        i := Output.NumBytesAvailable;
-        while i > 0 do
-        begin
-          if i > 0 then
-            ms.CopyFrom(Output, i);
-          i := Output.NumBytesAvailable;
-        end;
-      until not Running and (Output.NumBytesAvailable = 0);
+        i := Output.Read(buf, SizeOf(buf));
+        if i > 0 then ms.Write(buf, i);
+      until not Running and (i <= 0);
       ms.Position := 0;
       Aout.LoadFromStream(ms);
     finally
