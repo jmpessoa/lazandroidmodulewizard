@@ -59,13 +59,41 @@
 			Simply extract the zip file to a convenient location...
 
 
-	*****************************************
-	* To start:				*
-	*					*
-	* "install_tutorial_ant_users.txt"	*
-	* "install_tutorial_eclipse_users.txt"	*                                
-	*					*
-	*****************************************
+	***************************************************************************************************
+	* To start:				
+	*					
+	* "install_tutorial_ant_users.txt"	
+	* "install_tutorial_eclipse_users.txt"	                                
+	*					
+	***************************************************************************************************
+
+
+	****************************************************************************************************
+	*How to use the Demos:
+	*
+	*1. Open the lazarus project "controls.lpi" [...\jni] 
+	*
+	*	Lazarus IDE menu:  "Project" --> "View Project Source" 
+	*	Lazarus IDE menu:  "Project" --> "Forms...."
+	*
+	*2. Change this informations in "controls.lpi" to correct one!
+	*
+	*	"C:\adt32\ndk10"   -- just my system NDK path
+	*	"C:\adt32\eclipse\workspace"  -- just my system eclipse workspace 
+	*
+	*	Option 1: Go to Lazarus IDE:
+	*			->Project
+	*			->Project -> Option
+	*			->Path -->> change/modify paths according to your system ..
+	*
+	*     	Option 2: Open/edit the "controls.lpi" [...\jni],  you can use Notepad like editor....
+	*			
+	*
+	*3. All [compatible] Eclipse projects support Ant!
+	*			You can build/install/Run all Eclipse projects just with "Ant"... 
+	*			see "build.bat" [or .sh] and "install.bat" or [.sh]
+	*			or Go To: Lazarus IDE menu "Run--> [Lamw] Build and Run"! Thanks to Anton!!!
+	****************************************************************************************************
 
 Version 0.6 - rev. 20 - 07 April 2015 - 
 

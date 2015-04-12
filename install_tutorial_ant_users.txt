@@ -6,7 +6,7 @@
 		ref. http://ant.apache.org/bindownload.cgi 
 			:: Simply extract the zip file to a convenient location...
 
-	Version 0.6 - rev. 09 - 20 December 2014 -				
+	Version 0.6 -  rev. 20 - 07 April 2015 -				
 
 	Lazarus Android Module Wizard: Form Designer and Components development model! 		
 	"A wizard to create JNI Android loadable module (.so) in Lazarus/Free Pascal using 
@@ -21,12 +21,12 @@
 I. INSTALL Laz4Android and Android Module Wizard
 			
 		NEW! Laz4Android [by TrueTom]
-			Date:2014-10-18
-			FPC: 2.7.1 SVN 28863  win32/arm-android/i386-android/jvm-android
-			Lazarus:1.3 trunk svn 46592
+			Last update:2015-02-25
+			FPC: 3.1.1 trunk svn 29987 win32/arm-android/i386-android/jvm-android
+			Lazarus:1.5 trunk svn 47987
 			Android NDK: r10c (arm-linux-androideabi-4.6 + x86-4.6)
 			http://sourceforge.net/projects/laz4android/files/?source=navbar
-			:To Install, please, read the "Laz4Android_readme.txt"
+			:To Install [*.7z], please, read the "Laz4Android_readme.txt"
 
 
 			1. From Laz4Android IDE - Install Wizard Packages
@@ -196,13 +196,37 @@ III. [Generic Project Support] - just a basic android ".so" -
 		:: Thanks to Thierry Dijoux! 
 		ref. https://jmpessoa.opendrive.com/files?Ml82NzAyMTYwMl9pUDV3RQ  		
 
+	
+   2.1 NEW! Lazarus IDE menu "Run--> [Lamw] Build and Run" 
+
+         Note: for old projecs [before rev. 20 - 07 April 2015], please change "controls.lpi":
+
+         after:
+			<VersionInfo>
+		    		<StringTable ProductVersion=""/>
+			</VersionInfo>
+
+         Add this new entry:
+			<CustomData Count="1">
+		    		<Item0 Name="LAMW" Value="GUI"/>
+			</CustomData>
+
 IV. How to use the Demos:
 
 	1. Open the lazarus project "controls.lpi" [...\jni] 
 
+		Go to:
+
+		Lazarus IDE menu:  "Project" --> "View Project Source" 
+
+		Go to:
+
+		Lazarus IDE menu:  "Project" --> "Forms...."
+
+
 	Change this informations to correct one!
 
-	"C:\adt32\ndk7"   -- just my system NDK path
+	"C:\adt32\ndk10"   -- just my system NDK path
 	"C:\adt32\eclipse\workspace"  -- just my system eclipse workspace 
 
 	2. Go to Lazarus IDE
