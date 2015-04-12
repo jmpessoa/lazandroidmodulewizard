@@ -6,7 +6,7 @@ interface
 
 uses
   {$ifdef Windows}Windows,{$endif}
-  Classes, SysUtils, ProjectIntf;
+  Classes, SysUtils, ProjectIntf, Forms;
 
 type
 
@@ -15,13 +15,14 @@ type
   TApkBuilder = class
   private
     FProj: TLazProject;
-    FSdkPath, FAntPath, FJdkPath: string;
+    FSdkPath, FAntPath, FJdkPath, FNdkPath: string;
     FProjPath: string;
     FDevice: string;
     procedure BringToFrontEmulator;
     function CheckAvailableDevices: Boolean;
     procedure LoadPaths;
     function RunAndGetOutput(const cmd, params: string; Aout: TStrings): Integer;
+    function TryFixPaths: TModalResult;
   public
     constructor Create(AProj: TLazProject);
     function BuildAPK(Install: Boolean = False): Boolean;
@@ -32,8 +33,8 @@ type
 implementation
 
 uses IDEExternToolIntf, LazIDEIntf, LazFileUtils, UTF8Process, Controls,
-  EditBtn, Forms, StdCtrls, ButtonPanel, uFormStartEmulator, IniFiles, process,
-  laz2_XMLRead, Laz2_DOM;
+  EditBtn, StdCtrls, ButtonPanel, Dialogs, uFormStartEmulator, IniFiles,
+  process, laz2_XMLRead, Laz2_DOM, FileUtil, laz2_XMLWrite;
 
 function QueryPath(APrompt: string; out Path: string;
   ACaption: string = 'Android Wizard: Path Missing!'): Boolean;
@@ -106,6 +107,7 @@ begin
     FSdkPath := ReadString('PATH', 'SDK', '');
     FAntPath := ReadString('PATH', 'Ant', '');
     FJdkPath := ReadString('PATH', 'JDK', '');
+    FNdkPath := ReadString('PATH', 'NDK', '');
   finally
     Free;
   end;
@@ -118,6 +120,8 @@ begin
       FAntPath := ReadString('NewProject', 'PathToAntBin', '');
     if FJdkPath = '' then
       FJdkPath := ReadString('NewProject', 'PathToJavaJDK', '');
+    if FNdkPath = '' then
+      FNdkPath := ReadString('NewProject', 'PathToAndroidNDK', '');
   finally
     Free
   end;
@@ -129,6 +133,9 @@ begin
       Exit;
   if FJdkPath = '' then
     if not QueryPath('Path to Java JDK: [ex. C:\Program Files (x86)\Java\jdk1.7.0_21]', FJdkPath) then
+      Exit;
+  if FNdkPath = '' then
+    if not QueryPath('Path to Android NDK: [ex. C:\adt32\ndk10]', FNdkPath) then
       Exit;
 end;
 
@@ -160,6 +167,146 @@ begin
     Result := ExitCode;
   finally
     Free;
+  end;
+end;
+
+function TApkBuilder.TryFixPaths: TModalResult;
+
+  function FixPath(var path: string; const truncBy, newPath: string): Boolean;
+  var
+    s, p: string;
+    i: Integer;
+    dir: TSearchRec;
+  begin
+    if Pos(PathDelim, path) = 0 then
+      if PathDelim <> '/' then
+        path := StringReplace(path, '/', PathDelim, [rfReplaceAll])
+      else
+        path := StringReplace(path, '\', PathDelim, [rfReplaceAll]);
+    Delete(path, 1, Pos(PathDelim + truncBy, path));
+    Delete(path, 1, Pos(PathDelim, path));
+    path := AppendPathDelim(newPath) + path;
+    Result := DirectoryExistsUTF8(path);
+    if not Result then
+    begin
+      i := Pos('arm-linux-androideabi-', path);
+      if i = 0 then Exit;
+      p := path;
+      Delete(p, 1, i + 21);
+      p := Copy(p, 1, Pos(PathDelim, p) - 1);
+      if p = '' then Exit;
+      s := Copy(path, 1, i - 1);
+      if FindFirstUTF8(s + 'arm-linux-androideabi-*', faDirectory, dir) = 0 then
+      begin
+        s := dir.Name;
+        Delete(s, 1, 22);
+        path := StringReplace(path, p, s, [rfReplaceAll]);
+        Result := DirectoryExistsUTF8(path);
+      end;
+      FindCloseUTF8(dir);
+    end;
+  end;
+
+var
+  sl: TStringList;
+  i: Integer;
+  ForceFixPaths: Boolean;
+  str, prev, pref: string;
+  xml: TXMLDocument;
+  n: TDOMNode;
+begin
+  Result := mrAbort;
+  ForceFixPaths := False;
+  if not DirectoryExistsUTF8(FNdkPath) then Exit;
+  sl := TStringList.Create;
+  try
+    // Libraries
+    sl.Delimiter := ';';
+    sl.DelimitedText := FProj.LazCompilerOptions.Libraries;
+    for i := 0 to sl.Count - 1 do
+    begin
+      if not DirectoryExistsUTF8(sl[i]) then
+      begin
+        str := sl[i];
+        if not FixPath(str, 'ndk', FNdkPath) then Exit;
+        if not ForceFixPaths then
+        begin
+          case MessageDlg('Path "' + sl[i] + '" does not exist.' + sLineBreak +
+                        'Change it to "' + str + '"?',
+                        mtConfirmation, [mbYes, mbYesToAll, mbCancel], 0) of
+            mrYesToAll: ForceFixPaths := True;
+            mrYes:
+            else Exit;
+          end;
+        end;
+        sl[i] := str;
+      end;
+    end;
+    FProj.LazCompilerOptions.Libraries := sl.DelimitedText;
+
+    // Custom options:
+    sl.Delimiter := ' ';
+    sl.DelimitedText := FProj.LazCompilerOptions.CustomOptions;
+    for i := 0 to sl.Count - 1 do
+    begin
+      str := sl[i];
+      pref := Copy(str, 1, 3);
+      if pref = '-FD' then
+      begin
+        Delete(str, 1, 3);
+        prev := str;
+        if Pos(';', str) > 0 then Exit;
+        if not DirectoryExistsUTF8(str) then
+        begin
+          if not FixPath(str, 'ndk', FNdkPath) then Exit;
+          if not ForceFixPaths then
+          begin
+            case MessageDlg('Path "' + prev + '" does not exist.' + sLineBreak +
+                          'Change it to "' + str + '"?',
+                          mtConfirmation, [mbYes, mbYesToAll, mbCancel], 0) of
+              mrYesToAll: ForceFixPaths := True;
+              mrYes:
+              else Exit;
+            end;
+          end;
+          sl[i] := pref + str;
+        end;
+      end;
+    end;
+    FProj.LazCompilerOptions.CustomOptions := sl.DelimitedText;
+  finally
+    sl.Free;
+  end;
+
+  // build.xml
+  prev := FProjPath + 'build.xml';
+  ReadXMLFile(xml, prev);
+  try
+    with xml.DocumentElement.ChildNodes do
+      for i := 0 to Count - 1 do
+        if Item[i].NodeName = 'property' then
+        begin
+          n := Item[i].Attributes.GetNamedItem('name');
+          if Assigned(n) and (n.TextContent = 'sdk.dir') then
+          begin
+            n := Item[i].Attributes.GetNamedItem('location');
+            if not assigned(n) then Continue;
+            str := n.TextContent;
+            if not DirectoryExistsUTF8(str) and DirectoryExistsUTF8(FSdkPath) then
+            begin
+              if not ForceFixPaths
+              and (MessageDlg('build.xml',
+                             'Path "' + str + '" does not exist.' + sLineBreak +
+                             'Change it to "' + FSdkPath + '"?', mtConfirmation,
+                             [mbYes, mbNo], 0) <> mrYes) then Exit;
+              Item[i].Attributes.GetNamedItem('location').TextContent := FSdkPath;
+              WriteXMLFile(xml, prev);
+            end;
+            Break;
+          end;
+        end;
+  finally
+    xml.Free;
   end;
 end;
 
@@ -240,6 +387,7 @@ begin
   FProj := AProj;
   FProjPath := ExtractFilePath(ChompPathDelim(ExtractFilePath(FProj.MainFile.Filename)));
   LoadPaths;
+  TryFixPaths;
 end;
 
 function TApkBuilder.BuildAPK(Install: Boolean): Boolean;

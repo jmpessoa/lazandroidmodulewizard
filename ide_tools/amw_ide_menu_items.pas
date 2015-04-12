@@ -65,10 +65,10 @@ begin
   if Assigned(Project) and (Project.CustomData.Values['LAMW'] <> '') then
   try
     IDEMessagesWindow.BringToFront;
-    if LazarusIDE.DoBuildProject(crRun, [pbfOnlyIfNeeded]) <> mrOK then
-      raise Exception.Create('Cannot build project');
     with TApkBuilder.Create(Project) do
     try
+      if LazarusIDE.DoBuildProject(crRun, [pbfOnlyIfNeeded]) <> mrOK then
+        raise Exception.Create('Cannot build project');
       if BuildAPK then
         if InstallAPK then
           RunAPK;
