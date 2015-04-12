@@ -34,7 +34,7 @@ implementation
 
 uses IDEExternToolIntf, LazIDEIntf, LazFileUtils, UTF8Process, Controls,
   EditBtn, StdCtrls, ButtonPanel, Dialogs, uFormStartEmulator, IniFiles,
-  process, laz2_XMLRead, Laz2_DOM, FileUtil, laz2_XMLWrite;
+  process, strutils, laz2_XMLRead, Laz2_DOM, FileUtil, laz2_XMLWrite;
 
 function QueryPath(APrompt: string; out Path: string;
   ACaption: string = 'Android Wizard: Path Missing!'): Boolean;
@@ -156,7 +156,7 @@ begin
     ms := TMemoryStream.Create;
     try
       repeat
-        i := Output.Read(buf, SizeOf(buf));
+        i := Output.Read(buf{%H-}, SizeOf(buf));
         if i > 0 then ms.Write(buf, i);
       until not Running and (i <= 0);
       ms.Position := 0;
@@ -172,39 +172,116 @@ end;
 
 function TApkBuilder.TryFixPaths: TModalResult;
 
-  function FixPath(var path: string; const truncBy, newPath: string): Boolean;
+  procedure FixArmLinuxAndroidEabiVersion(var path: string);
   var
-    s, p: string;
     i: Integer;
+    s, p: string;
     dir: TSearchRec;
+    sl: TStringList;
+    f: TForm;
+    lb: TListBox;
+  begin
+    if DirectoryExistsUTF8(path) then Exit;
+    i := Pos('arm-linux-androideabi-', path);
+    if i = 0 then Exit;
+    p := Copy(path, 1, PosEx(PathDelim, path, i));
+    if DirectoryExistsUTF8(p) then Exit;
+    Delete(p, 1, i + 21);
+    p := Copy(p, 1, Pos(PathDelim, p) - 1);
+    if p = '' then Exit;
+    s := Copy(path, 1, i - 1);
+    if FindFirstUTF8(s + 'arm-linux-androideabi-*', faDirectory, dir) = 0 then
+    begin
+      sl := TStringList.Create;
+      try
+        repeat
+          sl.Add(dir.Name);
+        until (FindNextUTF8(dir) <> 0);
+        if sl.Count > 1 then
+        begin
+          sl.Sort;
+          f := TForm.Create(nil);
+          try
+            f.Position := poScreenCenter;
+            f.Caption := 'arm-linux-androideabi';
+            f.AutoSize := True;
+            f.BorderIcons := [biSystemMenu];
+            with TLabel.Create(f) do
+            begin
+              Parent := f;
+              Align := alTop;
+              BorderSpacing.Around := 6;
+              Caption := 'Choose arm-linux-androideabi version:';
+            end;
+            lb := TListBox.Create(f);
+            lb.Parent := f;
+            lb.Align := alClient;
+            lb.Items.Assign(sl);
+            lb.BorderSpacing.Around := 6;
+            lb.Constraints.MinHeight := 200;
+            i := 0;
+            while (i < sl.Count) and (Length(sl[i]) >= 23)
+            and not (sl[i][23] in ['0'..'9']) do
+              Inc(i);
+            lb.ItemIndex := i;
+            with TButtonPanel.Create(f) do
+            begin
+              Parent := f;
+              ShowButtons := [pbOK, pbCancel];
+              ShowBevel := False;
+            end;
+            if f.ShowModal <> mrOk then Exit;
+            s := lb.Items[lb.ItemIndex];
+          finally
+            f.Free;
+          end;
+        end else
+          s := sl[0];
+      finally
+        sl.Free;
+      end;
+      Delete(s, 1, 22);
+      if s = '' then Exit;
+      path := StringReplace(path, p, s, [rfReplaceAll]);
+    end;
+    FindCloseUTF8(dir);
+  end;
+
+  procedure FixPrebuiltSys(var path: string);
+  var
+    i: Integer;
+    p, s: string;
+    dir: TSearchRec;
+  begin
+    if DirectoryExistsUTF8(path) then Exit;
+    i := Pos(PathDelim + 'prebuilt' + PathDelim, path);
+    if i = 0 then Exit;
+    p := path;
+    Delete(p, 1, i + 9);
+    p := Copy(p, 1, Pos(PathDelim, p) - 1);
+    if p = '' then Exit;
+    s := Copy(path, 1, i + 9);
+    if FindFirstUTF8(s + '*', faDirectory, dir) = 0 then
+    begin
+      s := dir.Name;
+      path := StringReplace(path, p, s, [rfReplaceAll]);
+    end;
+    FindCloseUTF8(dir);
+  end;
+
+  function FixPath(var path: string; const truncBy, newPath: string): Boolean;
   begin
     if Pos(PathDelim, path) = 0 then
       if PathDelim <> '/' then
-        path := StringReplace(path, '/', PathDelim, [rfReplaceAll])
+        {%H-}path := StringReplace(path, '/', PathDelim, [rfReplaceAll])
       else
-        path := StringReplace(path, '\', PathDelim, [rfReplaceAll]);
+        {%H-}path := StringReplace(path, '\', PathDelim, [rfReplaceAll]);
     Delete(path, 1, Pos(PathDelim + truncBy, path));
     Delete(path, 1, Pos(PathDelim, path));
     path := AppendPathDelim(newPath) + path;
+    FixArmLinuxAndroidEabiVersion(path);
+    FixPrebuiltSys(path);
     Result := DirectoryExistsUTF8(path);
-    if not Result then
-    begin
-      i := Pos('arm-linux-androideabi-', path);
-      if i = 0 then Exit;
-      p := path;
-      Delete(p, 1, i + 21);
-      p := Copy(p, 1, Pos(PathDelim, p) - 1);
-      if p = '' then Exit;
-      s := Copy(path, 1, i - 1);
-      if FindFirstUTF8(s + 'arm-linux-androideabi-*', faDirectory, dir) = 0 then
-      begin
-        s := dir.Name;
-        Delete(s, 1, 22);
-        path := StringReplace(path, p, s, [rfReplaceAll]);
-        Result := DirectoryExistsUTF8(path);
-      end;
-      FindCloseUTF8(dir);
-    end;
   end;
 
 var
