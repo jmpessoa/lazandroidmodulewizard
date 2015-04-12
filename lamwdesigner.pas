@@ -736,20 +736,6 @@ procedure TAndroidWidgetMediator.Paint;
          Rectangle(0,0,AWidget.Width,AWidget.Height); // outer frame
          //Font.Color:= clMedGray;
          //TextOut(5,4,(AWidget as jVisualControl).Text);
-
-      end else if (AWidget is jTextView) then
-      begin
-        fWidget:= TDraftTextView.Create(AWidget);
-        fWidget.Height:= AWidget.Height;
-        fWidget.Width:= AWidget.Width;
-        fWidget.MarginLeft:= AWidget.MarginLeft;
-        fWidget.MarginTop:= AWidget.MarginTop;
-        fWidget.MarginRight:= AWidget.MarginRight;
-        fWidget.MarginBottom:= AWidget.MarginBottom;
-        fWidget.Color:= (AWidget as jTextView).BackgroundColor;
-        fWidget.FontColor:= (AWidget as jTextView).FontColor;
-        fWidget.Draw(LCLForm.Canvas);
-        fWidget.Free;
       end else if (AWidget is jImageBtn) then
       begin
         fWidget:= TDraftImageBtn.Create(AWidget);
@@ -1053,39 +1039,45 @@ end;
 constructor TDraftTextView.Create(AWidget: TAndroidWidget);
 begin
   inherited;
-  BackGroundColor:= clNone; //clForm; //clActiveCaption;
+  BackGroundColor := clNone;
+  Height := AWidget.Height;
+  Width := AWidget.Width;
+  MarginLeft := AWidget.MarginLeft;
+  MarginTop := AWidget.MarginTop;
+  MarginRight := AWidget.MarginRight;
+  MarginBottom := AWidget.MarginBottom;
+  Color := jTextView(AWidget).BackgroundColor;
+  FontColor := jTextView(AWidget).FontColor;
 end;
 
 procedure TDraftTextView.Draw(canvas: TCanvas);
-//var
-  //txtW: integer;
-  //txtH: integer;
+var
+  lastSize, ps: Integer;
 begin
-  canvas.Brush.Color:= Self.BackGroundColor;
-  canvas.Pen.Color:=  Self.TextColor;
-  //txtH:= canvas.TextHeight(txt);
-  //txtW:= canvas.TextWidth(txt);
-  if Self.BackGroundColor <>  clNone then
+  with canvas do
   begin
-    canvas.FillRect(0,0,Self.Width,Self.Height);
-    //canvas.FillRect(0,0,txtW{Self.Width}+2,txtH{Self.Height}+2);
-  end
-  else
-  begin
-    canvas.Brush.Style:= bsClear;
-     //outer frame
-    //canvas.Rectangle(0,0,Self.Width,Self.Height);
+    Brush.Color := BackGroundColor;
+    Pen.Color := TextColor;
+    if BackGroundColor <> clNone then
+      FillRect(0, 0, Self.Width, Self.Height)
+    else
+      Brush.Style := bsClear;
+
+    if TextColor = clNone then
+      Font.Color := RGBToColor($3A,$3A,$3A)
+    else
+      Font.Color := TextColor;
+
+    ps := jTextView(FAndroidWidget).FontSize;
+    if ps = 0 then
+      ps := 10
+    else
+      ps := AndroidToLCLFontSize(ps);
+    lastSize := Font.Size;
+    Font.Size := ps;
+    TextOut((ps + 5) div 20, (ps + 5) div 10, FAndroidWidget.Text);
+    Font.Size := lastSize;
   end;
-
-
-  canvas.Font.Color:=  Self.TextColor;
-
-  if Self.TextColor = clNone then
-     canvas.Font.Color:= clSilver;
-
-  canvas.TextOut(5, 4, FAndroidWidget.Text);
-
-  canvas.Brush.Style:= bsSolid;
 end;
 
 { TDraftEditText }
@@ -1776,11 +1768,12 @@ initialization
   DraftClassesMap := TDraftControlHash.Create(64); // power of 2 for efficiency
   RegisterPropertyEditor(TypeInfo(TARGBColorBridge), nil, '', TARGBColorBridgePropertyEditor);
 
-  // registering DraftClasses:
+  // DraftClasses registeration:
   RegisterAndroidWidgetDraftClass(jProgressBar, TDraftProgressBar);
   RegisterAndroidWidgetDraftClass(jButton, TDraftButton);
   RegisterAndroidWidgetDraftClass(jCheckBox, TDraftCheckBox);
   RegisterAndroidWidgetDraftClass(jRadioButton, TDraftRadioButton);
+  RegisterAndroidWidgetDraftClass(jTextView, TDraftTextView);
 
 finalization
   DraftClassesMap.Free;
