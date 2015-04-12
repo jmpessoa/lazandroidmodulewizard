@@ -1,11 +1,13 @@
 package org.lazarus.appantdemo1;
 
-//[LazAndroidModuleWizard - Version 0.6 - rev. 12 - 10 January- 2014
-//
-//[https://github.com/jmpessoa/lazandroidmodulewizard]
+//Lamw: Lazarus Android Module Wizard - Version 0.6 - rev. 20 - 07 April - 2015
+//Form Designer and Components development model!
+//Author: jmpessoa@hotmail.com
+//https://github.com/jmpessoa/lazandroidmodulewizard
+//http://forum.lazarus.freepascal.org/index.php/topic,21919.270.html
 
-//Android Java Interface for Pascal/Delphi XE5 
-//[and Lazarus by jmpessoa@hotmail.com - december/2013]
+//Android Java Interface for Pascal/Delphi XE5
+//And LAZARUS by jmpessoa@hotmail.com - december 2013
 
 //Developers
 //          Simon,Choi / Choi,Won-sik
@@ -18,23 +20,25 @@ package org.lazarus.appantdemo1;
 
 
 import java.lang.Override;
-import java.lang.reflect.Method;
 
-import android.app.ActionBar;
+
+
 import android.app.Activity;
-import android.content.Context;
+
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.content.pm.ActivityInfo; 
 import android.widget.RelativeLayout;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
+
 import android.view.Menu;
 import android.view.MenuItem;
+
 import android.view.View;
-import android.view.Window;
+
 import android.view.WindowManager;
-import android.os.Build;
+
 //import android.view.View;
 import android.os.Bundle;
 import android.os.StrictMode;
@@ -42,7 +46,9 @@ import android.util.Log;
 
 // http://stackoverflow.com/questions/16282294/show-title-bar-from-code
 public class App extends Activity {
-    private Controls       controls;
+    
+	private Controls       controls;    
+   
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -55,7 +61,7 @@ public class App extends Activity {
          StrictMode.setThreadPolicy(policy);
      }
      
-      Log.i("jApp","01.Activity.onCreate");
+      //Log.i("jApp","01.Activity.onCreate");
       controls             = new Controls();
       controls.activity    = this; 
       controls.appLayout   = new RelativeLayout(this);
@@ -68,14 +74,13 @@ public class App extends Activity {
       } 	
       this.setContentView(controls.appLayout);
       this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
-      
-      
+               
       // Event : Java -> Pascal
-      Log.i("jApp","02.Controls.jAppOnCreate");
+      //Log.i("jApp","02.Controls.jAppOnCreate");
       controls.jAppOnCreate(this, controls.appLayout);
       
     }
-    
+       
     @Override    
     protected void onNewIntent(Intent intent) { super.onNewIntent(intent);
     	                                        controls.jAppOnNewIntent();     }
@@ -86,12 +91,12 @@ public class App extends Activity {
     
     @Override
     protected void onPause()                  { super.onPause();
-                                                Log.i("jApp","onPause");
+                                                //Log.i("jApp","onPause");
     	                                        controls.jAppOnPause();         }    
     
     @Override
     protected void onRestart()                { super.onRestart();
-                                                Log.i("jApp","onRestart");
+                                                //Log.i("jApp","onRestart");
     	                                        controls.jAppOnRestart();    	  }
 
     @Override
@@ -100,7 +105,7 @@ public class App extends Activity {
 
     @Override
     protected void onStart()                  { super.onStart();
-                                                Log.i("jApp","onStart");
+                                                //Log.i("jApp","onStart");
     	                                        controls.jAppOnStart();        }
     @Override
     protected void onStop()                   { super.onStop(); 
@@ -168,6 +173,5 @@ public class App extends Activity {
 	   //TODO!!!!
      return super.onMenuOpened(featureId, menu);
    }
-   
-   
+        
 }
