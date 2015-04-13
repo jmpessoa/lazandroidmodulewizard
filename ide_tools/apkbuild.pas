@@ -1,5 +1,8 @@
 unit ApkBuild;
 
+{ TODO:
+    - implement TApkBuilder.BringToFrontEmulator for linux }
+
 {$mode objfpc}{$H+}
 
 interface
@@ -219,11 +222,7 @@ function TApkBuilder.TryFixPaths: TModalResult;
             lb.Items.Assign(sl);
             lb.BorderSpacing.Around := 6;
             lb.Constraints.MinHeight := 200;
-            i := 0;
-            while (i < sl.Count) and (Length(sl[i]) >= 23)
-            and not (sl[i][23] in ['0'..'9']) do
-              Inc(i);
-            lb.ItemIndex := i;
+            lb.ItemIndex := 0;
             with TButtonPanel.Create(f) do
             begin
               Parent := f;
