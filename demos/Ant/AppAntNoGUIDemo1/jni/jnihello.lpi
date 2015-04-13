@@ -1,4 +1,4 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <CONFIG>
   <ProjectOptions>
     <Version Value="9"/>
@@ -21,6 +21,9 @@
     <VersionInfo>
       <StringTable ProductVersion=""/>
     </VersionInfo>
+    <CustomData Count="1">
+      <Item0 Name="LAMW" Value="NoGUI"/>
+    </CustomData>
     <BuildModes Count="1">
       <Item1 Name="Default" Default="True"/>
     </BuildModes>
@@ -53,10 +56,11 @@
     <Version Value="11"/>
     <PathDelim Value="\"/>
     <Target>
-      <Filename Value="C:\adt32\ant\workspace\AppAntNoGUIDemo1\libs\armeabi\jnihello"/>
+      <Filename Value="..\libs\armeabi\jnihello"/>
     </Target>
     <SearchPaths>
-      <Libraries Value="C:\adt32\ndk7\platforms\android-14\arch-arm\usr\lib;C:\adt32\ndk7\toolchains\arm-linux-androideabi-4.4.3\prebuilt\windows\lib\gcc\arm-linux-androideabi\4.4.3"/>
+      <Libraries Value="C:\adt32\ndk7\platforms\android-14\arch-arm\usr\lib\;C:\adt32\ndk7\toolchains\arm-linux-androideabi-4.4.3\prebuilt\windows\lib\gcc\arm-linux-androideabi\4.4.3\"/>
+      <UnitOutputDirectory Value="..\obj\JNIHello"/>
     </SearchPaths>
     <Parsing>
       <SyntaxOptions>
@@ -79,11 +83,7 @@
       </Options>
     </Linking>
     <Other>
-      <CompilerMessages>
-        <MsgFileName Value=""/>
-      </CompilerMessages>
-      <CustomOptions Value="-dANDROID -Xd -CpARMv6 -CfSoft -FLC:\adt32\ndk7\platforms\android-14\arch-arm\usr\lib\libdl.so -FUC:\adt32\ant\workspace\AppAntNoGUIDemo1\obj\JNIHello -oC:\adt32\ant\workspace\AppAntNoGUIDemo1\libs\armeabi\libjnihello.so"/>
-      <CompilerPath Value="$(CompPath)"/>
+      <CustomOptions Value="-dANDROID -Xd -CpARMv6 -CfSoft -XParm-linux-androideabi- -FDC:\adt32\ndk7\toolchains\arm-linux-androideabi-4.4.3\prebuilt\windows\bin -o..\libs\armeabi\libjnihello.so"/>
     </Other>
   </CompilerOptions>
   <Debugging>

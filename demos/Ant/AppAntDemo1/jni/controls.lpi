@@ -21,6 +21,9 @@
     <VersionInfo>
       <StringTable ProductVersion=""/>
     </VersionInfo>
+    <CustomData Count="1">
+      <Item0 Name="LAMW" Value="GUI"/>
+    </CustomData>
     <BuildModes Count="1">
       <Item1 Name="Default" Default="True"/>
     </BuildModes>
@@ -82,7 +85,7 @@
       </Options>
     </Linking>
     <Other>
-      <CustomOptions Value="-dANDROID -Xd -CpARMv6 -CfSoft -FLC:\adt32\ndk9\platforms\android-14\arch-arm\usr\lib\libdl.so -FUC:\adt32\ant\workspace\AppAntDemo1\obj\Controls -oC:\adt32\ant\workspace\AppAntDemo1\libs\armeabi\libcontrols.so"/>
+      <CustomOptions Value="-Xd -CpARMv6 -CfSoft -XParm-linux-androideabi- -FDC:\adt32\ndk9\toolchains\arm-linux-androideabi-4.4.3\prebuilt\windows\bin -o..\libs\armeabi\libcontrols.so"/>
     </Other>
   </CompilerOptions>
   <Debugging>

@@ -108,7 +108,6 @@
         <IsPartOfProject Value="True"/>
         <ComponentName Value="AndroidModule9"/>
         <HasResources Value="True"/>
-        <UnitName Value="unit9"/>
       </Unit9>
       <Unit10>
         <Filename Value="unit10.pas"/>

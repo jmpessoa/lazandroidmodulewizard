@@ -27,6 +27,8 @@ object AndroidModule1: TAndroidModule1
     LayoutParamWidth = lpMatchParent
     LayoutParamHeight = lpOneQuarterOfParent
     BackgroundColor = colbrDefault
+    MinPinchZoomFactor = 0.25
+    MaxPinchZoomFactor = 4
     Id = 5157644
     object jTextView1: jTextView
       Left = 77
@@ -91,6 +93,8 @@ object AndroidModule1: TAndroidModule1
       LayoutParamWidth = lpMatchParent
       LayoutParamHeight = lpWrapContent
       BackgroundColor = colbrOrange
+      MinPinchZoomFactor = 0.25
+      MaxPinchZoomFactor = 4
       Id = 8563928
       object jEditText1: jEditText
         Left = -1
@@ -113,11 +117,13 @@ object AndroidModule1: TAndroidModule1
         BackgroundColor = colbrWhite
         FontColor = colbrDefault
         FontSize = 0
+        HintTextColor = colbrSilver
         ScrollBarStyle = scrNone
         MaxLines = 1
         HorScrollBar = True
         VerScrollBar = False
         WrappingLine = False
+        Editable = True
         Id = 9498139
       end
     end
@@ -136,6 +142,8 @@ object AndroidModule1: TAndroidModule1
       LayoutParamWidth = lpHalfOfParent
       LayoutParamHeight = lpWrapContent
       BackgroundColor = colbrGainsboro
+      MinPinchZoomFactor = 0.25
+      MaxPinchZoomFactor = 4
       Id = 0
       object jButton1: jButton
         Left = 0
@@ -174,6 +182,8 @@ object AndroidModule1: TAndroidModule1
       LayoutParamWidth = lpHalfOfParent
       LayoutParamHeight = lpWrapContent
       BackgroundColor = colbrGainsboro
+      MinPinchZoomFactor = 0.25
+      MaxPinchZoomFactor = 4
       Id = 0
       object jButton2: jButton
         Left = 0
@@ -214,6 +224,8 @@ object AndroidModule1: TAndroidModule1
     LayoutParamWidth = lpMatchParent
     LayoutParamHeight = lpOneThirdOfParent
     BackgroundColor = colbrLightCyan
+    MinPinchZoomFactor = 0.25
+    MaxPinchZoomFactor = 4
     Id = 945929
     object jListView1: jListView
       Left = 3
@@ -234,7 +246,6 @@ object AndroidModule1: TAndroidModule1
       ItemLayout = layImageTextWidget
       TextSizeDecorated = sdNone
       TextAlign = alLeft
-      HighLightSelectedItem = True
       HighLightSelectedItemColor = colbrRed
       Id = 3721116
     end

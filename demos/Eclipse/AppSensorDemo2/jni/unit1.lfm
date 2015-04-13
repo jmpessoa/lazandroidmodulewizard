@@ -88,7 +88,6 @@ object AndroidModule1: TAndroidModule1
     TextSizeDecorated = sdNone
     TextAlign = alLeft
     OnClickCaptionItem = jListView1ClickCaptionItem
-    HighLightSelectedItem = True
     HighLightSelectedItemColor = colbrRed
     Id = 0
   end

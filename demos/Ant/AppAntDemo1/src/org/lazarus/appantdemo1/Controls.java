@@ -1,13 +1,13 @@
 package org.lazarus.appantdemo1;
 
-//Lazarus Android Module Wizard - Version 0.6 - rev. 12 - 10 January - 2014
-//[Form Designer and Components development model!]
+//Lamw: Lazarus Android Module Wizard - Version 0.6 - rev. 20 - 07 April - 2015
+//Form Designer and Components development model!
 //Author: jmpessoa@hotmail.com
 //https://github.com/jmpessoa/lazandroidmodulewizard
-//http://forum.lazarus.freepascal.org/index.php/topic,21919.0.html
+//http://forum.lazarus.freepascal.org/index.php/topic,21919.270.html
 
 //Android Java Interface for Pascal/Delphi XE5
-//[And LAZARUS by jmpessoa@hotmail.com - december 2013
+//And LAZARUS by jmpessoa@hotmail.com - december 2013
 //
 //Developer
 //          Simon,Choi / Choi,Won-sik
@@ -54,21 +54,19 @@ package org.lazarus.appantdemo1;
 //
 
 import android.annotation.SuppressLint;
-import android.annotation.TargetApi;
+
 import android.app.ActionBar;
 import android.app.ActionBar.Tab;
-import android.app.ActionBar.TabListener;
 import android.app.Activity;
-import android.app.ActivityManager.RunningAppProcessInfo;
-import android.app.ActivityManager.RunningServiceInfo;
-import android.app.ActivityManager;
 import android.app.AlertDialog;
+import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.app.Fragment;
-import android.app.FragmentManager;
 import android.app.FragmentTransaction;
-import android.app.PendingIntent;
+import android.app.Notification;
+import android.app.NotificationManager;
 import android.app.ProgressDialog;
+import android.app.TimePickerDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothServerSocket;
@@ -76,34 +74,34 @@ import android.bluetooth.BluetoothSocket;
 import android.content.BroadcastReceiver;
 import android.content.ClipData;
 import android.content.ClipboardManager;
+import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
-import android.content.ContextWrapper;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager.NameNotFoundException;
-import android.content.pm.PackageManager;
-import android.content.pm.ResolveInfo;
 import android.content.res.AssetFileDescriptor;
 import android.content.res.AssetManager;
+import android.content.res.Resources;
 import android.database.Cursor;
 import android.graphics.Bitmap.CompressFormat;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.BitmapDrawable;
-import android.opengl.GLES10;
-import android.opengl.GLES20;
-import android.opengl.GLSurfaceView.Renderer;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.opengl.GLSurfaceView;
-import android.opengl.GLU;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
@@ -113,15 +111,21 @@ import android.os.Message;
 import android.telephony.SmsManager;
 import android.telephony.TelephonyManager;
 import android.preference.PreferenceManager;
+import android.provider.BaseColumns;
 import android.provider.ContactsContract;
+import android.provider.ContactsContract.CommonDataKinds.Email;
+import android.provider.ContactsContract.CommonDataKinds.Phone;
 import android.provider.MediaStore;
 import android.provider.Settings;
 import android.text.Editable;
 import android.text.InputFilter;
 import android.text.InputType;
+import android.text.TextUtils;
+import android.text.TextUtils.TruncateAt;
 import android.text.TextWatcher;
 import android.text.method.NumberKeyListener;
 import android.text.method.ScrollingMovementMethod;
+import android.util.Base64;
 import android.util.DisplayMetrics;
 import android.location.Address;
 import android.location.Criteria;
@@ -131,18 +135,19 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.location.LocationProvider;
 import android.media.MediaPlayer;
-
 import android.net.Uri;
 import android.net.wifi.WifiManager;
 import android.util.Log;
-import android.util.TypedValue;
 import android.view.ContextMenu;
+import android.view.GestureDetector;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
+import android.view.ScaleGestureDetector;
+import android.view.ScaleGestureDetector.SimpleOnScaleGestureListener;
 import android.view.SubMenu;
 import android.view.SurfaceHolder;
 import android.view.View.OnClickListener;
@@ -156,19 +161,20 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationSet;
 import android.view.animation.AnimationUtils;
 import android.view.animation.TranslateAnimation;
+import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
+import android.webkit.HttpAuthHandler;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
-import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
+import android.widget.DatePicker;
 import android.widget.EditText;
-import android.widget.FrameLayout;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -176,9 +182,9 @@ import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.RadioButton;
 import android.widget.Spinner;
-import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.RelativeLayout.LayoutParams;
 import android.widget.Switch;
+import android.widget.TimePicker;
 import android.widget.ToggleButton;
 //import android.view.ViewGroup.LayoutParams;
 import android.widget.RelativeLayout;
@@ -194,21 +200,26 @@ import java.io.*;
 import java.lang.*;
 
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
+//import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
-import java.nio.IntBuffer;
-import java.nio.FloatBuffer;
+//import java.nio.ByteBuffer;
+//import java.nio.ByteOrder;
+//import java.nio.IntBuffer;
+//import java.nio.FloatBuffer;
+//import java.text.Format;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
 import java.util.StringTokenizer;
+//import java.util.Map;
+//import java.util.Random;
+import java.util.Set;
+//import java.util.StringTokenizer;
 import java.util.UUID;
 import java.util.regex.Pattern;
 
@@ -218,9 +229,20 @@ import javax.microedition.khronos.egl.EGLContext;
 import javax.microedition.khronos.egl.EGL10;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
+import org.apache.http.NameValuePair;
+import org.apache.http.StatusLine;
+import org.apache.http.auth.AuthScope;
+import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
+//import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.params.BasicHttpParams;
+import org.apache.http.params.HttpConnectionParams;
+import org.apache.http.params.HttpParams;
 import org.apache.http.util.ByteArrayBuffer;
 import org.apache.http.util.EntityUtils;
 
@@ -454,7 +476,7 @@ switch ( effect ) {
  }
 
 //by jmpessoa
-public  void Close2() {
+public  void Close2() {  
   controls.appLayout.removeView(layout);
   controls.pOnClose(PasObj);
 }
@@ -480,7 +502,7 @@ for (int i = 0; i < layout.getChildCount(); i++) {
 
 //by jmpessoa
 public void ShowMessage(String msg){
-  Log.i("ShowMessage:", msg);
+  Log.i("ShowMessage As:", msg);
   Toast.makeText(controls.activity, msg, Toast.LENGTH_SHORT).show();	
 }
 
@@ -1027,6 +1049,21 @@ public void SetTextTypeFace(int _typeface) {
   this.setTypeface(null, _typeface);
 }
 
+public void Append(String _txt) {
+  this.append( _txt);
+}
+
+public void setFontAndTextTypeFace(int fontFace, int fontStyle) { 
+  Typeface t = null; 
+  switch (fontFace) { 
+    case 0: t = Typeface.DEFAULT; break; 
+    case 1: t = Typeface.SANS_SERIF; break; 
+    case 2: t = Typeface.SERIF; break; 
+    case 3: t = Typeface.MONOSPACE; break; 
+  } 
+  this.setTypeface(t, fontStyle); 		
+} 
+
 }
 
 //-------------------------------------------------------------------------
@@ -1067,6 +1104,11 @@ int marginBottom = 5;
 String bufStr;
 private boolean canDispatchChangeEvent = false;
 private boolean canDispatchChangedEvent = false;
+private boolean mFlagSuggestion = false;
+
+private ClipboardManager mClipBoard = null;
+private ClipData mClipData = null;
+
 
 // Constructor
 public  jEditText(android.content.Context context,
@@ -1080,6 +1122,9 @@ controls = ctrls;
 // Init Class
 lparams = new RelativeLayout.LayoutParams(100,100);
 lparams.setMargins(5, 5,5,5);
+this.setHintTextColor(Color.LTGRAY);
+
+mClipBoard = (ClipboardManager) controls.activity.getSystemService(Context.CLIPBOARD_SERVICE);
  
 // Init Event : http://socome.tistory.com/15
 onKeyListener = new OnKeyListener() {	
@@ -1172,8 +1217,17 @@ public  void setInputTypeEx(String str) {
 	  if(str.equals("NUMBER")) {
 		  this.setInputType(android.text.InputType.TYPE_CLASS_NUMBER);
 	  }
+      else if (str.equals("CAPCHARACTERS")) {
+    	  if (!mFlagSuggestion) 
+            this.setInputType(android.text.InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS|InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);
+    	  else
+            this.setInputType(android.text.InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS);
+      }
 	  else if (str.equals("TEXT")) { 
-		  this.setInputType(android.text.InputType.TYPE_CLASS_TEXT);
+		  if (!mFlagSuggestion) 
+		      this.setInputType(android.text.InputType.TYPE_CLASS_TEXT|InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);
+		  else
+			  this.setInputType(android.text.InputType.TYPE_CLASS_TEXT);
 	  }
 	  else if (str.equals("PHONE"))       {this.setInputType(android.text.InputType.TYPE_CLASS_PHONE); }
 	  else if (str.equals("PASSNUMBER"))  {this.setInputType(android.text.InputType.TYPE_CLASS_NUMBER);
@@ -1181,10 +1235,14 @@ public  void setInputTypeEx(String str) {
 	  else if (str.equals("PASSTEXT"))    {this.setInputType(android.text.InputType.TYPE_CLASS_TEXT);
 	                                       this.setTransformationMethod(android.text.method.PasswordTransformationMethod.getInstance()); }
 	  
-	  else if (str.equals("TEXTMULTILINE")){this.setInputType(android.text.InputType.TYPE_CLASS_TEXT|android.text.InputType.TYPE_TEXT_FLAG_MULTI_LINE);}
-	                                    
-	  
-	  else                                 {this.setInputType(android.text.InputType.TYPE_CLASS_TEXT);};
+	  else if (str.equals("TEXTMULTILINE")){
+		  if (!mFlagSuggestion)
+		      this.setInputType(android.text.InputType.TYPE_CLASS_TEXT|android.text.InputType.TYPE_TEXT_FLAG_MULTI_LINE|InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);
+		   else  
+		      this.setInputType(android.text.InputType.TYPE_CLASS_TEXT|android.text.InputType.TYPE_TEXT_FLAG_MULTI_LINE);
+		  }
+	                                    	  
+	  else {this.setInputType(android.text.InputType.TYPE_CLASS_TEXT|InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);};
 	    
 	}
 
@@ -1252,10 +1310,15 @@ public  void setCursorPos(int startPos, int endPos) {
 }
 
 //LORDMAN - 2013-07-26
-public  void maxLength(int mLength) { //Edit not to make the length of the text greater than the specified length
-  InputFilter[] FilterArray = new InputFilter[1];
-  FilterArray[0] = new InputFilter.LengthFilter(mLength);
-  this.setFilters(FilterArray);
+public  void maxLength(int mLength) { //not make the length of the text greater than the specified length		
+  if (mLength >= 0) { 
+    InputFilter[] FilterArray = new InputFilter[1];
+    FilterArray[0] = new InputFilter.LengthFilter(mLength);
+    this.setFilters(FilterArray);
+  }
+  else { 
+	  this.setFilters(new InputFilter[] {});  //reset to default!!!
+  }	  
 }
 
 //LORDMAN 2013-08-27
@@ -1303,6 +1366,54 @@ public void DispatchOnChangedEvent(boolean value) {
 
 public void SetInputType(int ipt){  //TODO!
 	this.setInputType(0);
+}
+
+public void Append(String _txt) {
+	this.append(_txt);
+}
+
+public void SetImeOptions(int _imeOption) {
+  switch(_imeOption ) {
+	 case 0: this.setImeOptions(EditorInfo.IME_FLAG_NO_FULLSCREEN); break;
+	 case 1: this.setImeOptions(EditorInfo.IME_MASK_ACTION|EditorInfo.IME_ACTION_NONE); break;
+	 case 2: this.setImeOptions(EditorInfo.IME_MASK_ACTION|EditorInfo.IME_ACTION_GO); break;
+	 case 3: this.setImeOptions(EditorInfo.IME_MASK_ACTION|EditorInfo.IME_ACTION_SEARCH); break;
+	 case 4: this.setImeOptions(EditorInfo.IME_MASK_ACTION|EditorInfo.IME_ACTION_SEND); break;
+	 case 5: this.setImeOptions(EditorInfo.IME_MASK_ACTION|EditorInfo.IME_ACTION_NEXT); break;		
+	 case 6: this.setImeOptions(EditorInfo.IME_MASK_ACTION|EditorInfo.IME_ACTION_DONE); break;		 
+	 case 7: this.setImeOptions(EditorInfo.IME_MASK_ACTION|EditorInfo.IME_ACTION_PREVIOUS ); break;  
+	 case 8: this.setImeOptions(EditorInfo.IME_FLAG_FORCE_ASCII); break;
+  }   
+}
+
+public void setFontAndTextTypeFace(int fontFace, int fontStyle) { 
+  Typeface t = null; 
+  switch (fontFace) { 
+    case 0: t = Typeface.DEFAULT; break; 
+    case 1: t = Typeface.SANS_SERIF; break; 
+    case 2: t = Typeface.SERIF; break; 
+    case 3: t = Typeface.MONOSPACE; break; 
+  } 
+  this.setTypeface(t, fontStyle); 		
+} 
+
+public void SetAcceptSuggestion(boolean _value) { 
+    mFlagSuggestion = _value;
+}
+
+public void CopyToClipboard() {
+	mClipData = ClipData.newPlainText("text", this.getText().toString());
+    mClipBoard.setPrimaryClip(mClipData);
+}
+   
+public void PasteFromClipboard() {
+    ClipData cdata = mClipBoard.getPrimaryClip();
+    ClipData.Item item = cdata.getItemAt(0);
+    this.setText(item.getText().toString());
+}
+
+public void Clear() {
+	this.setText("");
 }
 	
 }
@@ -1872,6 +1983,8 @@ int MarginTop = 5;
 int marginRight = 5;
 int marginBottom = 5;
 
+Matrix mMatrix;	
+
 //by jmpessoa
 public void setMarginRight(int x) {
 	marginRight = x;
@@ -1893,7 +2006,8 @@ lparams = new LayoutParams(100,100);
 lparams.setMargins( 50, 50,0,0);
 //
 //setAdjustViewBounds(false);
-setScaleType(ImageView.ScaleType.FIT_XY);
+setScaleType(ImageView.ScaleType.CENTER);
+mMatrix = new Matrix();
 // Init Event
 onClickListener = new OnClickListener() {
   public  void onClick(View view) {
@@ -1919,7 +2033,7 @@ if (parent != null) { parent.removeView(this); }
    viewgroup.addView(this,lparams);
 }
 
-// Free object except Self, Pascal Code Free the class.
+//Free object except Self, Pascal Code Free the class.
 public  void Free() {
 if (parent != null) { parent.removeView(this); }
    if (bmp    != null) { bmp.recycle(); }
@@ -1929,12 +2043,13 @@ if (parent != null) { parent.removeView(this); }
    setImageResource(0); //android.R.color.transparent;
    onClickListener = null;
    setOnClickListener(null);
+   mMatrix = null;
 }
 
 //by jmpessoa
 public void setBitmapImage(Bitmap bm) {
 	//if (bmp    != null) { bmp.recycle(); }
-	bmp = bm; 
+	bmp = bm;
 	this.setImageBitmap(bm);
 }
 
@@ -1954,7 +2069,7 @@ public int GetDrawableResourceId(String _resName) {
 	     return drawableId;
 	  }
 	  catch (Exception e) {
-	     Log.e("jForm", "Failure to get drawable id.", e);
+	     Log.e("jImageView", "Failure to get drawable id.", e);
 	     return 0;
 	  }
 }
@@ -1982,21 +2097,12 @@ public void setLParamHeight(int h) {
 //by jmpessoa
 public int getLParamHeight() {	
   return  this.getHeight();
- /*	
-  if (bmp != null) {
-     return this.bmp.getHeight();  //  ???  
-  } else return 0;
-  */  
+  
 }  
 
 //by jmpessoa
 public int getLParamWidth() {
-  return this.getWidth();
-  /*
-  if (bmp != null) {
-	return this.bmp.getWidth(); //  ??? 
-  } else return 0;
-  */  
+  return this.getWidth();  
 }
 
 //by jmpessoa
@@ -2037,10 +2143,45 @@ public void setLayoutAll(int idAnchor) {
 	} 
 	for (int j=0; j < countParentRule; j++) {  
 		lparams.addRule(lparamsParentRule[j]);		
-  }
+    }
 	//
 	setLayoutParams(lparams);
 }
+
+
+/*
+ * TScaleType = (scaleCenter, scaleCenterCrop, scaleCenterInside, scaleFitCenter,
+                scaleFitEnd, scaleFitStart, scaleFitXY, scaleMatrix);
+  ref. http://www.peachpit.com/articles/article.aspx?p=1846580&seqNum=2
+       hint: If you are creating a photo-viewing application, 
+             you will probably want to use the center or fitCenter scale types.                  
+ */
+public void SetScaleType(int _scaleType) { //TODO! 	
+	switch(_scaleType) {
+  	   case 0: setScaleType(ImageView.ScaleType.CENTER); break;
+  	   case 1: setScaleType(ImageView.ScaleType.CENTER_CROP); break;
+  	   case 2: setScaleType(ImageView.ScaleType.CENTER_INSIDE); break;
+  	   case 3: setScaleType(ImageView.ScaleType.FIT_CENTER); break;
+  	   case 4: setScaleType(ImageView.ScaleType.FIT_END); break;
+  	   case 5: setScaleType(ImageView.ScaleType.FIT_START); break;
+  	   case 6: setScaleType(ImageView.ScaleType.FIT_XY); break;
+  	   case 7: setScaleType(ImageView.ScaleType.MATRIX); break;
+	}
+}
+
+public void SetImageMatrixScale(float _scaleX, float _scaleY ) {        
+    if ( this.getScaleType() != ImageView.ScaleType.MATRIX)  this.setScaleType(ImageView.ScaleType.MATRIX);        
+    //Log.i("scaleX=" + _scaleX, "    scaleY= " + _scaleY);
+    mMatrix.setScale(_scaleX, _scaleY);        
+    //mMatrix.postScale(_scaleX, _scaleX);
+    this.setImageMatrix(mMatrix);
+}
+
+//by jmpessoa
+public Bitmap GetBitmapImage() {		
+   return bmp; 	
+}
+
 
 }
  
@@ -2082,6 +2223,7 @@ private Controls        controls = null;   // Control Class for Event
 private Context       ctx;
 private int           id;
 private List <jListItemRow> items ;
+private ArrayAdapter thisAdapter;
 
 public  jArrayAdapter(Context context, Controls ctrls,long pasobj, int textViewResourceId , 
 		               List<jListItemRow> list) {
@@ -2091,6 +2233,8 @@ public  jArrayAdapter(Context context, Controls ctrls,long pasobj, int textViewR
    ctx   = context;
    id    = textViewResourceId;
    items = list;
+   thisAdapter = this;
+		   
 }
 
 @Override
@@ -2154,6 +2298,8 @@ public  View getView(int position, View v, ViewGroup parent) {
         
    for (int i=0; i < lines.length; i++) {
 	   itemText[i] = new TextView(ctx);
+	   
+	   itemText[i].setPadding(10, 15, 10, 15);  //improve here 17-Jan-2015
 	   
 	   if (items.get(position).textSize != 0){
 		   itemText[i].setTextSize(items.get(position).textSize); //TypedValue.COMPLEX_UNIT_PX,
@@ -2282,15 +2428,19 @@ View.OnClickListener getOnCheckItem(final View cb, final int position) {
 	               else if (cb.getClass().getName().equals("android.widget.RadioButton")) {
 	            	   
 	            	     //new code: fix to RadioButton Group  default behavior: thanks to Leledumbo.
-	            	      boolean doCheck = ((RadioButton)cb).isChecked(); //new code	            	    		            	     		            	      
+	            	      boolean doCheck = ((RadioButton)cb).isChecked(); //new code
+	            	      
 	            	      for (int i=0; i < items.size(); i++) {
 	            	    	  ((RadioButton)items.get(i).jWidget).setChecked(false);
-	            	    	  items.get(i).checked = false;	            	    	  
-	            	      }	            	      
+	            	    	  items.get(i).checked = false;	 	            	    	 
+	            	    	  thisAdapter.notifyDataSetChanged(); //fix 16-febr-2015 
+	            	      }	            	
+	            	      
 		                  items.get(position).checked = doCheck;
-		                  //items.get(position).jWidget = ((RadioButton)cb); 
-		                  ((RadioButton)cb).setChecked(doCheck);		                  		                  
-		                  controls.pOnClickWidgetItem(PasObj, position, ((RadioButton)cb).isChecked());
+		                   
+		                  ((RadioButton)items.get(position).jWidget).setChecked(doCheck);
+		                  
+		                  controls.pOnClickWidgetItem(PasObj, position, doCheck);
 		                  
 		           }
 	               else if (cb.getClass().getName().equals("android.widget.Button")) { //button	            	      	            	        
@@ -2350,7 +2500,7 @@ int MarginTop = 5;
 int marginRight = 5;
 int marginBottom = 5;
 
-boolean highLightSelectedItem = true;
+boolean highLightSelectedItem = false;
 int highLightColor = Color.RED;
 int lastSelectedItem = -1;
 
@@ -2394,11 +2544,23 @@ setChoiceMode(ListView.CHOICE_MODE_SINGLE);
 //Init Event
 onItemClickListener = new OnItemClickListener() {
    @Override
-   public  void onItemClick(AdapterView<?> parent, View v, int position, long id) {	   
+   public  void onItemClick(AdapterView<?> parent, View v, int position, long id) {
+	   
 	   if (highLightSelectedItem) {		 
-		   if (lastSelectedItem > -1) {highlight(lastSelectedItem, textColor);}
-		   highlight(position, highLightColor);
+		   if (lastSelectedItem > -1) {
+			   DoHighlight(lastSelectedItem, textColor);	   
+		   } 		   
+		   DoHighlight(position, highLightColor);
 	   }		 
+	   
+	   if (alist.get(position).widget == 2 /*radio*/) { //fix 16-febr-2015
+		  for (int i=0; i < alist.size(); i++) { 
+		    alist.get(i).checked = false;
+		  }
+		  alist.get(position).checked = true;
+		  aadapter.notifyDataSetChanged();
+	   }	   
+	   	   
 	   lastSelectedItem = position;		
        controls.pOnClick(PasObj, (int)position );
        controls.pOnClickCaptionItem(PasObj, (int)position , alist.get((int)position).label);
@@ -2516,9 +2678,8 @@ public void setLayoutAll(int idAnchor) {
 	} 
 	for (int j=0; j < countParentRule; j++) {  
 		lparams.addRule(lparamsParentRule[j]);		
-  }
-  //
-  setLayoutParams(lparams);
+    }
+    setLayoutParams(lparams);
 }
 
 //by jmpessoa
@@ -2646,7 +2807,7 @@ private int GetDrawableResourceId(String _resName) {
 	     return drawableId;
 	  }
 	  catch (Exception e) {
-	     Log.e("jForm", "Failure to get drawable id.", e);
+	     Log.e("ListView", "Failure to get drawable id.", e);
 	     return 0;
 	  }
 }
@@ -2711,8 +2872,8 @@ public void setWidgetCheck(boolean value, int index){
 	aadapter.notifyDataSetChanged();
 }
 
-private void highlight(int position, int _color) {
-   	alist.get(position).textColor = _color;    	
+private void DoHighlight(int position, int _color) {
+   	alist.get(position).textColor = _color;
     aadapter.notifyDataSetChanged();		
 }
 
@@ -2894,6 +3055,13 @@ class jPanel extends RelativeLayout {
 	int marginBottom = 0;
 	
 	boolean mRemovedFromParent = false;
+	
+    private GestureDetector gDetect;
+    private ScaleGestureDetector scaleGestureDetector;
+    
+    private float mScaleFactor = 1.0f;
+    private float MIN_ZOOM = 0.25f;	  
+	private float MAX_ZOOM = 4.0f;	 	 
 	    	
 	//Constructor
 	public  jPanel(android.content.Context context, Controls ctrls,long pasobj ) {
@@ -2903,6 +3071,9 @@ class jPanel extends RelativeLayout {
 	   controls = ctrls;
        lparams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);		
 	   //
+       gDetect = new GestureDetector(controls.activity, new GestureListener());
+       
+       scaleGestureDetector = new ScaleGestureDetector(controls.activity, new simpleOnScaleGestureListener());
 	}
 		
 	public void setLeftTopRightBottomWidthHeight(int left, int top, int right, int bottom, int w, int h) {
@@ -2992,6 +3163,91 @@ class jPanel extends RelativeLayout {
 		  	mRemovedFromParent = true;
 	   } 		   
 	}		 
+	
+    @Override
+	public boolean onTouchEvent(MotionEvent event) {
+	    return super.onTouchEvent(event);
+	}
+    
+    @Override
+	public boolean dispatchTouchEvent(MotionEvent e) {
+	        super.dispatchTouchEvent(e);
+	        this.gDetect.onTouchEvent(e);
+	        this.scaleGestureDetector.onTouchEvent(e);
+	        return true;
+	}
+    
+    //ref1. http://code.tutsplus.com/tutorials/android-sdk-detecting-gestures--mobile-21161
+    //ref2. http://stackoverflow.com/questions/9313607/simpleongesturelistener-never-goes-in-to-the-onfling-method
+    //ref3. http://x-tutorials.blogspot.com.br/2011/11/detect-pinch-zoom-using.html
+    private class GestureListener extends GestureDetector.SimpleOnGestureListener {
+
+       private static final int SWIPE_MIN_DISTANCE = 60;
+       private static final int SWIPE_THRESHOLD_VELOCITY = 100;
+      
+ 	   @Override
+ 	   public boolean onDown(MotionEvent event) {
+ 		  //Log.i("Down", "------------");
+ 	      return true;
+ 	   }
+ 	   
+ 	   @Override
+ 	   public boolean onFling(MotionEvent event1, MotionEvent event2, float velocityX, float velocityY) { 
+ 		   
+ 	      if(event1.getX() - event2.getX() > SWIPE_MIN_DISTANCE && Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY) {
+               controls.pOnFlingGestureDetected(PasObj, 0);                //onRightToLeft;
+               return  true;
+           } else if (event2.getX() - event1.getX() > SWIPE_MIN_DISTANCE && Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY) {
+        	   controls.pOnFlingGestureDetected(PasObj, 1);//onLeftToRight();
+        	   return true;
+           }
+           if(event1.getY() - event2.getY() > SWIPE_MIN_DISTANCE && Math.abs(velocityY) > SWIPE_THRESHOLD_VELOCITY) {
+        	   controls.pOnFlingGestureDetected(PasObj, 2);//onBottomToTop();
+        	   return true;
+           } else if (event2.getY() - event1.getY() > SWIPE_MIN_DISTANCE && Math.abs(velocityY) > SWIPE_THRESHOLD_VELOCITY) {
+        	   controls.pOnFlingGestureDetected(PasObj, 3); //onTopToBottom();
+        	   return true;
+           } 		   
+ 		   return false;
+ 	   }
+    }
+    
+    
+   //ref. http://vivin.net/2011/12/04/implementing-pinch-zoom-and-pandrag-in-an-android-view-on-the-canvas/ 
+   private class simpleOnScaleGestureListener extends SimpleOnScaleGestureListener {
+	  
+      @Override
+      public boolean onScale(ScaleGestureDetector detector) {         
+    	  mScaleFactor *= detector.getScaleFactor();    
+    	  mScaleFactor = Math.max(MIN_ZOOM, Math.min(mScaleFactor, MAX_ZOOM));    	    	  
+    	// Log.i("tag", "onScale = "+ mScaleFactor);    	 
+    	 controls.pOnPinchZoomGestureDetected(PasObj, mScaleFactor, 1); //scalefactor->float    	
+         return true;
+      }
+
+      @Override
+      public boolean onScaleBegin(ScaleGestureDetector detector) {                
+    	controls.pOnPinchZoomGestureDetected(PasObj, detector.getScaleFactor(), 0); //scalefactor->float
+     	//Log.i("tag", "onScaleBegin");
+        return true;
+      }
+
+      @Override
+      public void onScaleEnd(ScaleGestureDetector detector) {
+         controls.pOnPinchZoomGestureDetected(PasObj, detector.getScaleFactor(), 2); //scalefactor->float
+     	//Log.i("tag", "onScaleEnd");
+        super.onScaleEnd(detector);	  
+      }
+
+  }
+   
+   public void SetMinZoomFactor(float _minZoomFactor) {
+        MIN_ZOOM = _minZoomFactor;	
+   }
+   
+   public void SetMaxZoomFactor(float _maxZoomFactor) {
+	   MAX_ZOOM = _maxZoomFactor;
+   }
 }
 
 
@@ -3128,9 +3384,9 @@ public void setLayoutAll(int idAnchor) {
 	    //lparams.addRule(RelativeLayout.LEFT_OF, id); //lparams.addRule(RelativeLayout.RIGHT_OF, id)
 		for (int i=0; i < countAnchorRule; i++) {  
 			lparams.addRule(lparamsAnchorRule[i], idAnchor);		
-	    }
-		
-	} 
+	    }		
+	}
+	
 	for (int j=0; j < countParentRule; j++) {  
 		lparams.addRule(lparamsParentRule[j]);		
   }
@@ -3350,6 +3606,19 @@ class jWebClient extends WebViewClient {
 public  long            PasObj   = 0;      // Pascal Obj
 public  Controls        controls = null;   // Control Class for Event
 
+public String mUsername = ""; 
+public String mPassword = "";
+
+public jWebClient(){
+	//
+}
+
+
+@Override
+public void onReceivedHttpAuthRequest(WebView view, HttpAuthHandler handler, String host, String realm) {
+	handler.proceed(mUsername, mPassword);
+}
+
 @Override
 public  boolean shouldOverrideUrlLoading(WebView view, String url) {
 int rtn = controls.pOnWebViewStatus(PasObj,Const.WebView_OnBefore,url);
@@ -3361,17 +3630,26 @@ else { return true; }
 
 @Override
 public  void onLoadResource(WebView view, String url) {
+	//
 }
 
 @Override
 public  void onPageFinished(WebView view, String url) {
-controls.pOnWebViewStatus(PasObj,Const.WebView_OnFinish,url);
+   controls.pOnWebViewStatus(PasObj,Const.WebView_OnFinish,url);
 }
 
 @Override
 public  void onReceivedError(WebView view, int errorCode, String description, String failingUrl)  {
-super.onReceivedError(view, errorCode, description, failingUrl);
-controls.pOnWebViewStatus(PasObj,Const.WebView_OnError, description);
+super.onReceivedError(view, errorCode, description, failingUrl);      
+   if (errorCode == 401) {
+       // alert to username and password
+       // set it through the setHttpAuthUsernamePassword(...) 
+	   controls.pOnWebViewStatus(PasObj, 401 , "login/password");
+   }
+   else{
+       controls.pOnWebViewStatus(PasObj,Const.WebView_OnError, description);
+   }
+   
 }
 
 }
@@ -3399,7 +3677,6 @@ int MarginTop = 5;
 int marginRight = 5;
 int marginBottom = 5;
 
-
 // Constructor
 public  jWebView(android.content.Context context,
               Controls ctrls,long pasobj ) {
@@ -3408,18 +3685,21 @@ super(context);
 PasObj   = pasobj;
 controls = ctrls;
 // Init Class
-webclient          = new jWebClient();
+webclient = new jWebClient();
+
 webclient.PasObj   = pasobj;
 webclient.controls = ctrls;
 //
 setWebViewClient(webclient); // Prevent to run External Browser
 //
-getSettings().setJavaScriptEnabled(true);
+this.getSettings().setJavaScriptEnabled(true);
 //
 lparams = new RelativeLayout.LayoutParams  (300,300);
 lparams.setMargins( 50, 50,0,0);
+ 
 //
 }
+
 
 public void setLeftTopRightBottomWidthHeight(int left, int top, int right, int bottom, int w, int h) {
 	MarginLeft = left;
@@ -3440,8 +3720,8 @@ viewgroup.addView(this,lparams);
 // Free object except Self, Pascal Code Free the class.
 public  void Free() {
 if (parent != null) { parent.removeView(this); }
-webclient = null;
 setWebViewClient(null);
+webclient = null;
 lparams = null;
 }
 
@@ -3471,9 +3751,6 @@ public void setLayoutAll(int idAnchor) {
 	lparams.setMargins(MarginLeft,MarginTop,marginRight,marginBottom);
 
 	if (idAnchor > 0) {    	
-		//lparams.addRule(RelativeLayout.BELOW, id); 
-		//lparams.addRule(RelativeLayout.ALIGN_BASELINE, id)
-	    //lparams.addRule(RelativeLayout.LEFT_OF, id); //lparams.addRule(RelativeLayout.RIGHT_OF, id)
 		for (int i=0; i < countAnchorRule; i++) {  
 			lparams.addRule(lparamsAnchorRule[i], idAnchor);		
 	    }
@@ -3490,6 +3767,18 @@ public  void setJavaScript(boolean javascript) {
 	  this.getSettings().setJavaScriptEnabled(javascript);
 }
 
+	// Fatih - ZoomControl
+	public  void setZoomControl(boolean zoomControl) {		
+		this.getSettings().setBuiltInZoomControls(zoomControl);
+	}
+
+	//TODO: http://www.learn2crack.com/2014/01/android-oauth2-webview.html
+	//Stores HTTP authentication credentials for a given host and realm. This method is intended to be used with
+	public void SetHttpAuthUsernamePassword(String _hostName, String  _hostDomain, String _username, String _password) {
+	   this.setHttpAuthUsernamePassword(_hostName, _hostDomain, _username, _password);
+	   webclient.mUsername = _username; 
+	   webclient.mPassword = _password;
+	}
 }
 
 //-------------------------------------------------------------------------
@@ -4248,7 +4537,7 @@ private int GetDrawableResourceId(String _resName) {
 	     return drawableId;
 	  }
 	  catch (Exception e) {
-	     Log.e("jForm", "Failure to get drawable id.", e);
+	     Log.e("jImageBtn", "Failure to get drawable id.", e);
 	     return 0;
 	  }
 }
@@ -4511,23 +4800,17 @@ protected void onPreExecute() {
 //Step #2. Task
 @Override
 protected Void doInBackground(Void... params) {
-   int i;
    
-   if (autoPublishProgress) {
-      for (i = 0; i < 25; i++) {
-         publishProgress(i);	
-      }
-   }
+   if (autoPublishProgress) 
+         publishProgress(25);	
    
    controls.pOnAsyncEvent(PasObj, Const.Task_BackGround, 100); // Pascal Event
    
-   if (autoPublishProgress) {
-      for (i = 25; i < 100; i++) {
-	     publishProgress(i);	
-      }
-   }  
+   if (autoPublishProgress) 
+	     publishProgress(100);
+	     
    return null;
-};
+}
 
 // Step #3. Progress
 @Override
@@ -4589,13 +4872,11 @@ public void setProgress(int progress ) {
 }
 
 //------------------------------------------------------------------------------
-//
 //Graphic API
-//
-//
 //------------------------------------------------------------------------------
 //http://forum.lazarus.freepascal.org/index.php?topic=21568.0
 //https://github.com/alrieckert/lazarus/blob/master/lcl/interfaces/customdrawn/android/bitmap.pas
+
 class jBitmap {
 // Java-Pascal Interface
 private long             PasObj   = 0;      // Pascal Obj
@@ -4626,7 +4907,7 @@ private int GetDrawableResourceId(String _resName) {
 	     return drawableId;
 	  }
 	  catch (Exception e) {
-	     Log.e("jForm", "Failure to get drawable id.", e);
+	     Log.e("jBitmap", "Failure to get drawable id.", e);
 	     return 0;
 	  }
 }
@@ -4711,6 +4992,89 @@ public byte[] GetByteArrayFromBitmap() {
 public void SetByteArrayToBitmap(byte[] image) {
 	this.bmp = BitmapFactory.decodeByteArray(image, 0, image.length);
 	//Log.i("SetByteArrayToBitmap","size="+ image.length);
+}
+
+//http://androidtrainningcenter.blogspot.com.br/2012/05/bitmap-operations-like-re-sizing.html
+public Bitmap ClockWise(Bitmap _bmp, ImageView _imageView){
+    Matrix mMatrix = new Matrix();
+    Matrix mat= _imageView.getImageMatrix();    
+    mMatrix.set(mat);
+    mMatrix.setRotate(90);
+    return Bitmap.createBitmap(_bmp , 0, 0, _bmp.getWidth(), _bmp.getHeight(), mMatrix, false);    
+} 
+
+public Bitmap AntiClockWise(Bitmap _bmp, ImageView _imageView){
+    Matrix mMatrix = new Matrix();
+    Matrix mat= _imageView.getImageMatrix();    
+    mMatrix.set(mat);
+    mMatrix.setRotate(-90);
+    return Bitmap.createBitmap(_bmp , 0, 0, _bmp.getWidth(), _bmp.getHeight(), mMatrix, false);    
+}
+
+public Bitmap SetScale(Bitmap _bmp, ImageView _imageView, float _scaleX, float _scaleY ) {  
+    Matrix mMatrix = new Matrix();
+    Matrix mat= _imageView.getImageMatrix();    
+    mMatrix.set(mat);        
+	mMatrix.setScale(_scaleX, _scaleY);
+	return Bitmap.createBitmap(_bmp , 0, 0, _bmp.getWidth(), _bmp.getHeight(), mMatrix, false);	   
+}
+
+public Bitmap SetScale(ImageView _imageView, float _scaleX, float _scaleY ) {      
+	/*Matrix mMatrix = new Matrix();
+    Matrix mat= _imageView.getImageMatrix();    
+    mMatrix.set(mat);        
+	mMatrix.setScale(_scaleX, _scaleY);		
+	bmp = Bitmap.createBitmap(bmp , 0, 0, bmp.getWidth(), bmp.getHeight(), mMatrix, false);
+	return bmp;*/
+	// CREATE A MATRIX FOR THE MANIPULATION	 
+	Matrix matrix = new Matrix();
+	// RESIZE THE BIT MAP
+	matrix.postScale(_scaleX, _scaleY);
+	// RECREATE THE NEW BITMAP
+	Bitmap resizedBitmap = Bitmap.createBitmap(bmp, 0, 0, bmp.getWidth(), bmp.getHeight(), matrix, false);
+	return resizedBitmap;
+}
+
+public Bitmap LoadFromAssets(String strName)
+{
+    AssetManager assetManager = controls.activity.getAssets();
+    InputStream istr = null;
+    try {
+        istr = assetManager.open(strName);
+    } catch (IOException e) {
+        e.printStackTrace();
+    }
+    bmp = BitmapFactory.decodeStream(istr);    
+    return bmp;
+}
+
+// ref http://sunil-android.blogspot.com.br/2013/03/resize-bitmap-bitmapcreatescaledbitmap.html
+public Bitmap GetResizedBitmap(Bitmap _bmp, int _newWidth, int _newHeight){
+   float factorH = _newHeight / (float)_bmp.getHeight();
+   float factorW = _newWidth / (float)_bmp.getWidth();
+   float factorToUse = (factorH > factorW) ? factorW : factorH;
+   Bitmap bm = Bitmap.createScaledBitmap(_bmp,
+     (int) (_bmp.getWidth() * factorToUse),
+     (int) (_bmp.getHeight() * factorToUse),false);     
+   return bm;
+}
+
+public Bitmap GetResizedBitmap(int _newWidth, int _newHeight){
+   float factorH = _newHeight / (float)bmp.getHeight();
+   float factorW = _newWidth / (float)bmp.getWidth();
+   float factorToUse = (factorH > factorW) ? factorW : factorH;
+   Bitmap bm = Bitmap.createScaledBitmap(bmp,
+     (int) (bmp.getWidth() * factorToUse),
+     (int) (bmp.getHeight() * factorToUse),false);     
+   return bm;
+}
+
+public Bitmap GetResizedBitmap(float _factorScaleX, float _factorScaleY ){
+   float factorToUse = (_factorScaleY > _factorScaleX) ? _factorScaleX : _factorScaleY;
+   Bitmap bm = Bitmap.createScaledBitmap(bmp,
+     (int) (bmp.getWidth() * factorToUse),
+     (int) (bmp.getHeight() * factorToUse),false);     
+   return bm;
 }
 
 }
@@ -4978,7 +5342,7 @@ class jSqliteDataAccess {
         	     return drawableId;
         	  }
         	  catch (Exception e) {
-        	     Log.e("jForm", "Failure to get drawable id.", e);
+        	     Log.e("jSqliteDataAccess", "Failure to get drawable id.", e);
         	     return 0;
         	  }
         }
@@ -5279,7 +5643,7 @@ class jMyHello /*extends ...*/ {
         private Controls controls  = null;   // Control Class for events
         private Context  context   = null;
 
-        private int    mFlag;          // <<----- custom property
+        private int    mFlag = 0;          // <<----- custom property
         private String mMsgHello = ""; // <<----- custom property 
         private int[]  mBufArray;      // <<----- custom property
 
@@ -6363,7 +6727,11 @@ class jMenu /*extends ...*/ {
        controls.activity.registerForContextMenu(_view);
     }
         
-    //http://daniel-codes.blogspot.com.br/2009/12/dynamically-retrieving-resources-in.html
+    public void UnRegisterForContextMenu(View _view){ 
+      controls.activity.unregisterForContextMenu(_view); 
+    }  
+    
+//http://daniel-codes.blogspot.com.br/2009/12/dynamically-retrieving-resources-in.html
    //Just note that in case you want to retrieve Views (Buttons, TextViews, etc.) 
     //you must implement R.id.class instead of R.drawable.
     private int GetDrawableResourceId(String _resName) {
@@ -6523,6 +6891,10 @@ class jContextMenu /*extends ...*/ {
        controls.activity.registerForContextMenu(_view);
     }   
     
+    public void UnRegisterForContextMenu(View _view){ 
+      controls.activity.unregisterForContextMenu(_view); 
+   }        
+ 
     //_itemType --> 0:Default, 1:Checkable
     public MenuItem AddItem(ContextMenu _menu, int _itemID, String _caption, int _itemType){    	     	
     	MenuItem item = _menu.add(0,_itemID,0 ,(CharSequence)_caption);
@@ -6579,6 +6951,8 @@ class jContextMenu /*extends ...*/ {
     }
            
 }
+
+
 
 //ref. http://stackoverflow.com/questions/19395970/android-bluetooth-background-listner?rq=1
 //ref. http://androidcookbook.com/Recipe.seam;jsessionid=6C1411AB8CCAFBA9384A5EC295B44525?recipeId=1991
@@ -6862,6 +7236,7 @@ class jBluetoothServerSocket {
        }else return null;
       
     }  
+  
 }
 
 //ref. http://androidcookbook.com/Recipe.seam;jsessionid=9B476BA317AA36E2CB0D6517ABE60A5E?recipeId=1665
@@ -7192,7 +7567,7 @@ class jBluetooth /*extends ...*/ {
 
     private BluetoothAdapter mBA = null;
     
-    Intent intent = null;
+    private Intent intent = null;
     
     ArrayList<String> mListFoundedDevices = new ArrayList<String>();
     ArrayList<BluetoothDevice> mListReachablePairedDevices  = new ArrayList<BluetoothDevice>();
@@ -7468,7 +7843,21 @@ class jBluetooth /*extends ...*/ {
     	    }    	       	    	    
     	}    	
     	return devName;
-    }    
+    }
+        
+    //http://stackoverflow.com/questions/15697601/automate-file-transfer-to-a-paired-device-in-android-using-bluetooth
+    public void SendFile(String _filePath, String _fileName, String _mimeType){
+      
+        File file = new File(_filePath, "/" + _fileName);
+        Uri uri = Uri.fromFile(file);
+        String mtype = _mimeType; //"image/*";
+
+        Intent sharingIntent = new Intent(android.content.Intent.ACTION_SEND);
+        sharingIntent.setType(mtype);
+        sharingIntent.setClassName("com.android.bluetooth", "com.android.bluetooth.opp.BluetoothOppLauncherActivity");
+        sharingIntent.putExtra(Intent.EXTRA_STREAM, uri);
+        controls.activity.startActivity(sharingIntent);       
+    }
 }
 
 //by jmpessoa
@@ -7643,6 +8032,7 @@ class CustomSpinnerArrayAdapter<T> extends ArrayAdapter<String>{
 	private int mSelectedTextColor = Color.LTGRAY; 
 	private int flag = 0;
 	private boolean mLastItemAsPrompt = false;
+	private int mTextFontSize = 0;
 	
   public CustomSpinnerArrayAdapter(Context context, int simpleSpinnerItem, ArrayList<String> alist) {
      super(context, simpleSpinnerItem, alist);
@@ -7656,7 +8046,13 @@ class CustomSpinnerArrayAdapter<T> extends ArrayAdapter<String>{
       View view = super.getView(position, convertView, parent);        
       //we know that simple_spinner_item has android.R.id.text1 TextView:         
       TextView text = (TextView)view.findViewById(android.R.id.text1);
+      
+      text.setPadding(10, 15, 10, 15);      
       text.setTextColor(mTextColor);
+                 
+      if (mTextFontSize != 0)
+          text.setTextSize(mTextFontSize);
+      
       text.setBackgroundColor(mTexBackgroundtColor);
       return view;        
   }
@@ -7668,7 +8064,11 @@ class CustomSpinnerArrayAdapter<T> extends ArrayAdapter<String>{
 	  View view = super.getView(pos, cnvtView, prnt);	    
 	  TextView text = (TextView)view.findViewById(android.R.id.text1);
 	       
+	  text.setPadding(10, 15, 10, 15); //improve here.... 17-jan-2015	  
       text.setTextColor(mSelectedTextColor);      
+      
+      if (mTextFontSize != 0)
+          text.setTextSize(mTextFontSize);  
       
       if (mLastItemAsPrompt) flag = 1;
       return view; 
@@ -7696,6 +8096,10 @@ class CustomSpinnerArrayAdapter<T> extends ArrayAdapter<String>{
 	 public void SetLastItemAsPrompt(boolean _hasPrompt) {
 	    mLastItemAsPrompt = _hasPrompt;	   
 	 }
+	 
+	    public void SetTextFontSize(int txtFontSize) {
+	    	mTextFontSize = txtFontSize;	
+	    }
 	
 }
 
@@ -7835,9 +8239,16 @@ class jSpinner extends Spinner /*dummy*/ { //please, fix what GUI object will be
   
    public void Add(String _item) {	  	 
 	 mStrList.add(_item);    
+	 Log.i("Spinner_Add: ",_item);
      mSpAdapter.notifyDataSetChanged();
    }
    
+   //ELERA_04032015 
+   public void Clear() { 
+     mStrList.clear(); 
+     mSpAdapter.notifyDataSetChanged(); 
+   } 
+
    public void SetSelectedTextColor(int _color) {
 	  mSpAdapter.SetSelectedTextColor(_color);
    }
@@ -7880,6 +8291,10 @@ class jSpinner extends Spinner /*dummy*/ { //please, fix what GUI object will be
 	   else if (_index > (mStrList.size()-1)) mStrList.set(mStrList.size()-1,_item);
 	   else mStrList.set(_index,_item);	 
 	   mSpAdapter.notifyDataSetChanged();
+   }
+   
+   public void SetTextFontSize(int _txtFontSize) {
+	  mSpAdapter.SetTextFontSize(_txtFontSize);
    }
    
 }  //end class
@@ -8394,8 +8809,6 @@ class jImageFileManager /*extends ...*/ {
        return bitmap;
    }
   
-   
- 
    private int GetDrawableResourceId(String _resName) {
    	  try {
    	     Class<?> res = R.drawable.class;
@@ -8410,7 +8823,7 @@ class jImageFileManager /*extends ...*/ {
    }
 
    private Drawable GetDrawableResourceById(int _resID) {
-   	return (Drawable)( this.controls.activity.getResources().getDrawable(_resID));	
+   	  return (Drawable)( this.controls.activity.getResources().getDrawable(_resID));	
    }
              
    public Bitmap LoadFromResources(String _imageResIdentifier)
@@ -8439,9 +8852,9 @@ class jImageFileManager /*extends ...*/ {
    }
    
    public Bitmap LoadFromFile(String _path, String _filename) {	   
-	      String imageIn = _path+"/"+_filename;	      
-	      Bitmap bitmap = BitmapFactory.decodeFile(imageIn);	      
-	      return bitmap; 
+	   String imageIn = _path+"/"+_filename;	      
+	   Bitmap bitmap = BitmapFactory.decodeFile(imageIn);	      
+	   return bitmap; 
    }
    
    public void SaveToFile(Bitmap _image, String _filename) {	   	    
@@ -8460,8 +8873,7 @@ class jImageFileManager /*extends ...*/ {
 	         e.printStackTrace();
 	    }  	     	   
    }
-   
-   
+      
    public void SaveToFile(Bitmap _image,String _path, String _filename) {	   	    
 	       	    	    
 	    File file = new File (_path +"/"+ _filename);	    
@@ -8478,7 +8890,87 @@ class jImageFileManager /*extends ...*/ {
 	         e.printStackTrace();
 	    }  	     	   
   }
+  
+   public Bitmap LoadFromUri(Uri _imageUri) {
+        InputStream imageStream;
+        Bitmap selectedImage= null;
+		try {
+			imageStream = controls.activity.getContentResolver().openInputStream(_imageUri);
+			selectedImage = BitmapFactory.decodeStream(imageStream);
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}        
+        return selectedImage;
+   }
    
+   public  Bitmap LoadFromFile(String _filename, int _scale) {
+	   BitmapFactory.Options options = new BitmapFactory.Options();
+	   options.inSampleSize = _scale; // --> 1/4
+	   return BitmapFactory.decodeFile(_filename, options);
+   }
+
+   public Bitmap CreateBitmap(int _width, int _height) {
+	    return Bitmap.createBitmap(_width, _height, Bitmap.Config.ARGB_8888 );
+   }
+   
+   public int GetBitmapWidth(Bitmap _bitmap) {	 	 
+	 	if ( _bitmap != null ) {
+	 	   return _bitmap.getWidth();	 	  
+	 	} else return 0;	 	 
+    }
+
+    public  int GetBitmapHeight(Bitmap _bitmap) {	 
+	 	if ( _bitmap != null ) {
+	 	   return _bitmap.getHeight();	  
+	 	} else return 0;	 
+    }
+	 
+	public byte[] GetByteArrayFromBitmap(Bitmap _bitmap, String _compressFormat) {
+	     
+		ByteArrayOutputStream stream = new ByteArrayOutputStream();
+		String strUpper = _compressFormat.toUpperCase();		
+	     
+	     if (  strUpper.equals("WEBP") ) { 
+	        _bitmap.compress(CompressFormat.WEBP, 0, stream); //O: PNG will ignore the quality setting...
+	     } else if (  strUpper.equals("JPEG") ){
+	    	 _bitmap.compress(CompressFormat.JPEG, 0, stream); //O: PNG will ignore the quality setting... 
+	     } else {
+	    	 _bitmap.compress(CompressFormat.PNG, 0, stream); //O: PNG will ignore the quality setting... 
+	     }
+	     return stream.toByteArray();
+	 }
+
+	public Bitmap SetByteArrayToBitmap(byte[] _imageArray) {
+	    return BitmapFactory.decodeByteArray(_imageArray, 0, _imageArray.length);
+	}
+
+	 //http://androidtrainningcenter.blogspot.com.br/2012/05/bitmap-operations-like-re-sizing.html
+	public Bitmap ClockWise(Bitmap _bitmap, ImageView _imageView){
+	     Matrix mMatrix = new Matrix();
+	     Matrix mat= _imageView.getImageMatrix();    
+	     mMatrix.set(mat);
+	     mMatrix.setRotate(90);
+	     return Bitmap.createBitmap(_bitmap , 0, 0, _bitmap.getWidth(), _bitmap.getHeight(), mMatrix, false);    
+	} 
+
+	public Bitmap AntiClockWise(Bitmap _bitmap, ImageView _imageView){
+	     Matrix mMatrix = new Matrix();
+	     Matrix mat= _imageView.getImageMatrix();    
+	     mMatrix.set(mat);
+	     mMatrix.setRotate(-90);
+	     return Bitmap.createBitmap(_bitmap, 0, 0, _bitmap.getWidth(), _bitmap.getHeight(), mMatrix, false);    
+	}
+	
+	public Bitmap SetScale(Bitmap _bmp, ImageView _imageView, float _scaleX, float _scaleY ) {  
+	    Matrix mMatrix = new Matrix();
+	    Matrix mat= _imageView.getImageMatrix();    
+	    mMatrix.set(mat);        
+		mMatrix.setScale(_scaleX, _scaleY);
+		return Bitmap.createBitmap(_bmp , 0, 0, _bmp.getWidth(), _bmp.getHeight(), mMatrix, false);	   
+	}
+
+      
 }
 
 //by jmpessoa
@@ -8629,19 +9121,7 @@ class jActionBarTab {
 		actionBar.removeAllTabs();
 	}
 
-	//This method returns the currently selected tab if in tabbed navigation mode and there is at least one tab present
-	/*.*/public Tab GetSelectedTab() {
-		ActionBar actionBar = this.controls.activity.getActionBar();
-		ActionBar.Tab tab = actionBar.getSelectedTab();
-		return tab;
-	}
-
-	//This method select the specified tab
-	/*.*/public void SelectTab(ActionBar.Tab tab){
-		ActionBar actionBar = this.controls.activity.getActionBar();
-		actionBar.selectTab(tab);
-	}
-
+			
 	//http://daniel-codes.blogspot.com.br/2009/12/dynamically-retrieving-resources-in.html
 	/*
 	*Given that you can access R.java just fine normally in code.
@@ -8657,7 +9137,7 @@ class jActionBarTab {
 		     return drawableId;
 		  }
 		  catch (Exception e) {
-		     Log.e("jForm", "Failure to get drawable id.", e);
+		     Log.e("jActionBarTab", "Failure to get drawable id.", e);
 		     return 0;
 		  }
 	}
@@ -8665,6 +9145,32 @@ class jActionBarTab {
 	//by jmpessoa
 	private Drawable GetDrawableResourceById(int _resID) {
 		return (Drawable)( this.controls.activity.getResources().getDrawable(_resID));	
+	}
+	
+
+	//This method returns the currently selected tab if in tabbed navigation mode and there is at least one tab present
+	public Tab GetSelectedTab() {
+		ActionBar actionBar = this.controls.activity.getActionBar();
+		ActionBar.Tab tab = actionBar.getSelectedTab();
+		return tab;
+	}
+
+	//This method select the specified tab
+	public void SelectTab(ActionBar.Tab tab){
+		ActionBar actionBar = this.controls.activity.getActionBar();
+		actionBar.selectTab(tab);
+	}	
+	
+	public Tab GetTabAtIndex(int _index){
+		ActionBar actionBar = this.controls.activity.getActionBar();
+		actionBar.setSelectedNavigationItem(_index);
+		return actionBar.getTabAt(_index); 
+	}
+	
+	
+	public void SelectTabByIndex(int _index){
+		ActionBar actionBar = this.controls.activity.getActionBar();
+		actionBar.setSelectedNavigationItem(_index);		 
 	}
 	
 }
@@ -8812,7 +9318,7 @@ class jCustomDialog extends RelativeLayout {
 		     return drawableId;
 		  }
 		  catch (Exception e) {
-		     Log.e("jForm", "Failure to get drawable id.", e);
+		     Log.e("jCustomDialog", "Failure to get drawable id.", e);
 		     return 0;
 		  }
 	}
@@ -9302,7 +9808,9 @@ class jGridViewCustomAdapter extends ArrayAdapter {
         RelativeLayout itemLayout = new RelativeLayout(context);            
         itemLayout.setLayoutParams(new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
                         
-        TextView textViewTitle = new TextView(context);        
+        TextView textViewTitle = new TextView(context);
+        
+        textViewTitle.setPadding(10, 10, 10, 10); //try improve here ... 17-jan-2015
         
         ImageView imageViewItem = new ImageView(context);
         LayoutParams imgParam = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT); //w,h
@@ -9548,6 +10056,1351 @@ class jGridView extends GridView /*dummy*/ { //please, fix what GUI object will 
 
 } //end class
 
+
+/*Draft java code by "Lazarus Android Module Wizard" [1/13/2015 22:20:02]*/
+/*https://github.com/jmpessoa/lazandroidmodulewizard*/
+/*jControl template*/
+
+//refs.
+//http://android-er.blogspot.com.br/2010/08/simple-compass-sensormanager-and.html
+//http://www.coders-hub.com/2013/10/how-to-use-sensor-in-android.html#.VLWwqCvF_pA
+
+class jSensorManager /*extends ...*/ {
+  
+    private long     pascalObj = 0;      // Pascal Object
+    private Controls controls  = null;   // Control Class -> Java/Pascal Interface ...
+    private Context  context   = null;
+        
+    private static SensorManager mSensorManager;
+
+    private SensorEventListener mSensorEventListener;
+
+    private List<Sensor> mListSensors;
+    
+    private Sensor mCurrSensor;
+    
+    private int mSensorType;
+        
+    //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
+  
+    public jSensorManager(Controls _ctrls, long _Self) { //Add more others news "_xxx" params if needed!
+       //super(_ctrls.activity);
+       context   = _ctrls.activity;
+       pascalObj = _Self;
+       controls  = _ctrls;
+
+       mSensorType = 1;  //TYPE_ACCELEROMETER
+        
+       //get sensor service
+       mSensorManager=(SensorManager)controls.activity.getSystemService(Context.SENSOR_SERVICE);
+       
+       mListSensors = mSensorManager.getSensorList(Sensor.TYPE_ALL);
+            
+       mSensorEventListener = new SensorEventListener(){
+         @Override
+         /*.*/public void onAccuracyChanged(Sensor sensor, int accuracy) {
+           //---->>>pascal handle event
+         }  
+      
+         //This method is called when your mobile moves any direction 
+         @Override  //ref. http://developer.android.com/reference/android/hardware/SensorEvent.html
+         /*.*/public void onSensorChanged(SensorEvent event) {
+         	 
+        	   //get x, y, z values
+        	   // Always use the "length" of the values array while performing operations on it.        	           	                	  
+          	   int length = event.values.length;          	   
+          	   float x,y,z;
+          	   float[] values;          	 
+          	         	             	      
+      	  switch ( event.sensor.getType() ) {     
+      	  case 1: //Sensor.TYPE_ACCELEROMETER:   //1 - acceleration applied to the device  
+        	     values = event.values;
+        		/*All values are in SI units (m/s^2)
+        		  x: Acceleration minus Gx on the x-axis
+        		  y: Acceleration minus Gy on the y-axis
+        		  z: Acceleration minus Gz on the z-axis
+        	    */        		
+        	    /* ref. http://code.tutsplus.com/tutorials/using-the-accelerometer-on-android--mobile-22125
+        	    * the onSensorChanged method is invoked several times per second. 
+        	    * We don't need all this data so we need to make sure we only sample 
+        	    * a subset of the data we get from the device's accelerometer.
+        	    */        	   
+                controls.pOnChangedSensor(pascalObj, event.sensor, 1,values,event.timestamp); //nanosecond
+            break;
+        	
+      	  case 2://Sensor.TYPE_MAGNETIC_FIELD: //2        	//SensorManager.SENSOR_DELAY_UI
+     		    values = event.values;
+        		//x - Geomagnetic field strength along the x axis. [nanoteslas]
+        		//y - Geomagnetic field strength along the y axis. [nanoteslas]
+        		//z - Geomagnetic field strength along the z axis. [nanoteslas]
+        	    controls.pOnChangedSensor(pascalObj, event.sensor, 2,values,event.timestamp); 
+          break;
+        	
+          case 3: //Sensor.TYPE_ORIENTATION: //3 This constant was deprecated in API level 8. use SensorManager.getOrientation() instead.
+        	  values = event.values;         	    
+      		  controls.pOnChangedSensor(pascalObj, event.sensor, 3,values,event.timestamp);
+          break;
+          
+          case 4: //Sensor.TYPE_GYROSCOPE: //4 - The gyroscope measures the rate or rotation in rad/s around a device's x, y, and z axis.
+        	     values = event.values;
+        		//x - rad/s - Rate of rotation around the x axis.
+        		//y- rad/s - Rate of rotation around the y axis.
+        		//z- rad/s - Rate of rotation around the z axis.
+        		controls.pOnChangedSensor(pascalObj, event.sensor, 4,values,event.timestamp);
+          break;       	
+        	
+          case 5: //Sensor.TYPE_LIGHT://5
+    		   values= new float[1];
+         	   values[0] = event.values[0]; //x table plane       	       
+        		//x - values[0]: Ambient light level in SI lux units
+        	   controls.pOnChangedSensor(pascalObj, event.sensor, 5,values,event.timestamp);
+          break;
+
+          case 6: //Sensor.TYPE_PRESSURE://6
+    		   values= new float[1];
+         	   values[0] = event.values[0];        	       
+        	   //x - values[0]: Atmospheric pressure in hPa (millibar)
+        	   controls.pOnChangedSensor(pascalObj, event.sensor, 6,values,event.timestamp);
+          break;         
+          
+          case 7: //Sensor.TYPE_TEMPERATURE: //7 This constant was deprecated in API level 14. use TYPE_AMBIENT_TEMPERATURE instead.
+      		 //x - values[0]: Atmospheric pressure in hPa (millibar)
+   		     values= new float[1];
+     	     values[0] = event.values[0];
+      		 controls.pOnChangedSensor(pascalObj, event.sensor, 7,values,event.timestamp);
+          break;
+          
+          case 8: //Sensor.TYPE_PROXIMITY: //8        	   
+        		//values[0]: Proximity sensor distance measured in centimeters
+        	    //x Distance from object - cm  
+        	    //Some proximity sensors provide only binary values representing near/0 and "other" far:  getMaximumRange() ]
+   		        values= new float[1];
+     	        values[0] = event.values[0];  //0 = near
+        	    controls.pOnChangedSensor(pascalObj, event.sensor, 8,values,event.timestamp);
+          break;
+        	
+          case 9: //Sensor.TYPE_GRAVITY://9        		
+        		 /*   
+        		 * A three dimensional vector indicating the direction and magnitude of gravity. Units are m/s^2. 
+        		 * The coordinate system is the same as is used by the acceleration sensor.
+                   Note: When the device is at rest, the output of the gravity sensor should be identical to that of the accelerometer.
+        		 */        		
+        	    values = event.values;
+        		controls.pOnChangedSensor(pascalObj, event.sensor, 9,values,event.timestamp);
+           break;
+
+        	//ref http://developer.android.com/guide/topics/sensors/sensors_motion.html#sensors-motion-gyro
+        	// you could use this sensor to see how fast your car is going
+           case 10: //Sensor.TYPE_LINEAR_ACCELERATION: //10
+        	   values = event.values;
+        		//Conceptually, this sensor provides you with acceleration data according to the following relationship:
+                //linear acceleration = acceleration - acceleration due to gravity
+        		//The sensor coordinate system is the same as the one used by the acceleration sensor, as are the units of measure (m/s2).
+        		controls.pOnChangedSensor(pascalObj, event.sensor, 10,values,event.timestamp);
+        	break;
+        	
+            case 11: //Sensor.TYPE_ROTATION_VECTOR: //11
+              values = event.values;
+       		  controls.pOnChangedSensor(pascalObj, event.sensor, 11,values,event.timestamp);
+       	    break;
+         	
+            case 12: //Sensor.TYPE_RELATIVE_HUMIDITY: //12
+        		//values[0]: Relative ambient air humidity in percent
+        		//When relative ambient air humidity and ambient temperature are measured 
+        		//the dew point and absolute humidity can be calculated.        		
+        		//Absolute Humidity
+        		//The absolute humidity is the mass of water vapor in a particular volume of dry air. The unit is g/m3.        	
+        		//x
+       		    values = new float[1];
+         	    values[0] = event.values[0];
+        		controls.pOnChangedSensor(pascalObj, event.sensor, 12,values,event.timestamp);
+        	break;
+
+            case 13: //Sensor.TYPE_AMBIENT_TEMPERATURE: //13
+        		//values[0]: ambient (room) temperature in degree Celsius.        		
+        		//x
+       		    values = new float[1];
+         	    values[0] = event.values[0];
+        		controls.pOnChangedSensor(pascalObj, event.sensor, 13,values,event.timestamp);        		 
+            break;
+            
+            case 14: //Sensor.TYPE_MAGNETIC_FIELD_UNCALIBRATED: //14
+            	values = event.values;
+        		controls.pOnChangedSensor(pascalObj, event.sensor, 14,values,event.timestamp);        		
+            break;            
+        	
+            case 15: //Sensor.TYPE_GAME_ROTATION_VECTOR: //15
+        		//x - Rotation vector component along the x axis (x * sin(Ang/2)).
+        		//y - Rotation vector component along the y axis (y * sin(Ang/2)).
+        		//z - Rotation vector component along the z axis (z * sin(Ang/2)).
+            	values = event.values;
+        		controls.pOnChangedSensor(pascalObj, event.sensor, 15,values,event.timestamp);
+        	break;
+        	
+            case 16://Sensor.TYPE_GYROSCOPE_UNCALIBRATED: //16
+            	values = event.values;
+        		controls.pOnChangedSensor(pascalObj, event.sensor, 16,values,event.timestamp);        		
+            break;        	
+        	
+            case 17: //Sensor.TYPE_SIGNIFICANT_MOTION: //17
+            	values = event.values;
+        		controls.pOnChangedSensor(pascalObj, event.sensor, 17,values,event.timestamp);        		
+            break;
+            
+            case 18: //Sensor.TYPE_STEP_DETECTOR: //18
+            	values = event.values;
+        		controls.pOnChangedSensor(pascalObj, event.sensor, 18,values,event.timestamp);        		
+            break;            
+            
+          
+            case 19: //Sensor.TYPE_STEP_COUNTER://19  //is reset to zero only on a system reboot! -  
+            	values = new float[1];
+         	    values[0] = event.values[0];
+         		//SensorEvent.values[0]
+        		//Number of steps taken by the user since the last reboot while the sensor was activated.
+        		         		
+        	 	controls.pOnChangedSensor(pascalObj, event.sensor, 19,values,event.timestamp);
+        	break;
+        	            
+            case 20: //Sensor.TYPE_GEOMAGNETIC_ROTATION_VECTOR: //20
+        		//x - Rotation vector component along the x axis (x * sin(Ang/2)).
+        		//y - Rotation vector component along the y axis (y * sin(Ang/2)).
+        		//z - Rotation vector component along the z axis (z * sin(Ang/2)).
+       	        values = event.values;
+        		controls.pOnChangedSensor(pascalObj, event.sensor, 20,values,event.timestamp);
+        	break;        	        	        
+        	
+        	// Api >= 19;
+            case 21: //Sensor.TYPE_HEART_RATE: //21
+                values = event.values;         		
+        		controls.pOnChangedSensor(pascalObj, event.sensor, 21,values,event.timestamp);
+        	break;        	        	                	        	
+        	
+           // Api >= 19;
+            case 22: //Sensor.TYPE_AUTO_ROTATION: //22        		
+                values = event.values; 
+        		controls.pOnChangedSensor(pascalObj, event.sensor, 22,values,event.timestamp);
+        	break;
+               	        	        	
+      	  } //switch		
+        }        
+     };                
+   }       
+       
+   public void jFree() {
+      //free local objects...
+      mSensorManager.unregisterListener(mSensorEventListener);
+      mListSensors.clear();
+      mListSensors = null;
+	  mSensorEventListener = null;
+	  mSensorManager = null;
+	  mCurrSensor  = null;
+   }
+  
+   //write others [public] methods code here......
+   //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
+	 
+   public int[] GetDeviceSensorsTypes() {	   
+	 int[] intArray = new int[mListSensors.size()];	   	 	          
+     for(int i=0; i < mListSensors.size(); i++){        
+        intArray[i] = mListSensors.get(i).getType();
+     }     
+     return intArray;     
+   }
+      
+   public String[] GetDeviceSensorsNames() {	   	 	   
+	 String[] strArray = new String[mListSensors.size()];       
+     for(int i=0; i < mListSensors.size(); i++){ 
+    	strArray[i] = mListSensors.get(i).getName();        
+     }     
+     return strArray;  
+   }
+   
+   public void RegisterListeningSensor(int _sensorType) {	   
+       //Tell which sensor you are going to use
+       //And declare delay of sensor    	     	  
+	   if (SensorExists(_sensorType)) {		              
+		   mCurrSensor = mSensorManager.getDefaultSensor(_sensorType);                      
+           mSensorManager.registerListener(mSensorEventListener, mCurrSensor, SensorManager.SENSOR_DELAY_NORMAL);           
+           controls.pOnListeningSensor(pascalObj, mCurrSensor, mCurrSensor.getType());           
+	   }        
+   }
+      
+   public void RegisterListeningSensor(int _sensorType, int _delayType) {	   
+       //Tell which sensor you are going to use
+       //And declare delay of sensor           	     	  
+	   if (SensorExists(_sensorType)) { 
+           mCurrSensor = mSensorManager.getDefaultSensor(_sensorType);
+           mSensorManager.registerListener(mSensorEventListener, mCurrSensor, _delayType);
+           controls.pOnListeningSensor(pascalObj, mCurrSensor , mCurrSensor.getType()); //fail....
+	   } 
+       
+   }
+   
+   public void StopListeningAll() {
+	   mSensorManager.unregisterListener(mSensorEventListener);
+   }   
+      
+   public boolean SensorExists(int _sensorType) {
+	   List<Sensor> listType =	mSensorManager.getSensorList(_sensorType);
+	   if (listType.size() > 0) return true;
+	   else return false;	      
+   }
+   
+   public String[] GetSensorsNames(int _sensorType) {	 
+       List<Sensor> listType =	mSensorManager.getSensorList(_sensorType);      
+  	   String[] strArray = new String[listType.size()];       
+       for(int i=0; i < listType.size(); i++){ 
+    	 strArray[i] = listType.get(i).toString();        
+       }       
+       return strArray;   
+      //Use this method to get the list of available sensors of a certain type.
+   }
+   
+   public Sensor GetSensor(int _sensorType) {  //android.hardware.Sensor
+	   return mSensorManager.getDefaultSensor(_sensorType);
+   }
+   
+   public float GetSensorMaximumRange(Sensor _sensor) { //maximum range of the sensor in the sensor's unit.
+        return 	_sensor.getMaximumRange();
+   }
+   
+   public String GetSensorVendor (Sensor _sensor) {
+	   return _sensor.getVendor();	   
+   }
+   
+   public int GetSensorMinDelay(Sensor _sensor) {
+	   return _sensor.getMinDelay(); 	   	   
+   }
+   
+   public String GetSensorName(Sensor _sensor) {	    
+	   return _sensor.getName();	   
+   }
+   
+   public int GetSensorType(Sensor _sensor) {	    
+	   return _sensor.getType();	   
+   }
+      
+   public void UnregisterListenerSensor(Sensor _sensor) {
+	   mSensorManager.unregisterListener (mSensorEventListener, _sensor);	   
+	   controls.pOnUnregisterListeningSensor(pascalObj, _sensor.getType(), _sensor.getName());
+   }   
+   
+   public float GetGravityEarth(){
+	 return SensorManager.GRAVITY_EARTH;  	 
+   }
+
+   public float GetAltitude(float _localPressure) {
+       return mSensorManager.getAltitude(SensorManager.PRESSURE_STANDARD_ATMOSPHERE, _localPressure);
+   }
+   
+   public float GetAltitude(float _pressureAtSeaLevel, float _localPressure) {
+	   return mSensorManager.getAltitude(_pressureAtSeaLevel, _localPressure);
+   }
+      
+   public Sensor GetSensor(String _sensorName) {	   
+     Sensor sensor = null;      
+     for(int i=0; i < mListSensors.size(); i++){    	
+     	if ((mListSensors.get(i).getName()).equals(_sensorName)){
+    	   sensor= mListSensors.get(i); 	
+    	}    		
+     }            
+     return sensor;
+   }
+    
+   public float GetSensorPower(Sensor _sensor) {
+      return _sensor.getPower();
+   }
+   
+   public float GetSensorResolution(Sensor _sensor) {
+     return _sensor.getResolution();
+   }
+   
+   public void RegisterListeningSensor(Sensor _sensor) {	   
+       //Tell which sensor you are going to use
+       //And declare delay of sensor    	     	  
+	   mSensorManager.registerListener(mSensorEventListener,_sensor, SensorManager.SENSOR_DELAY_NORMAL);
+	   controls.pOnListeningSensor(pascalObj, _sensor, _sensor.getType());
+   }
+   
+   public void RegisterListeningSensor(Sensor _sensor, int _delayType) {	   
+       //Tell which sensor you are going to use
+       //And declare delay of sensor    	     	  
+	   mSensorManager.registerListener(mSensorEventListener,_sensor, _delayType);     
+	   controls.pOnListeningSensor(pascalObj, _sensor, _sensor.getType());
+   }
+
+}
+
+
+/*Draft java code by "Lazarus Android Module Wizard" [1/18/2015 1:40:32]*/
+/*https://github.com/jmpessoa/lazandroidmodulewizard*/
+/*jControl template*/
+
+class jBroadcastReceiver extends BroadcastReceiver {
+ 
+   private long     pascalObj = 0;      // Pascal Object
+   private Controls controls  = null;   // Control Class -> Java/Pascal Interface ...
+   private Context  context   = null;
+ 
+   //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
+ 
+   public jBroadcastReceiver(Controls _ctrls, long _Self) { //Add more others news "_xxx" params if needed!
+      //super(_ctrls.activity);
+      context   = _ctrls.activity;
+      pascalObj = _Self;
+      controls  = _ctrls;
+   }
+ 
+   public void jFree() {
+     //free local objects...
+   }
+
+   @Override
+   /*.*/public void onReceive(Context arg0, Intent intent) {
+	// TODO Auto-generated method stub
+	    controls.pOnBroadcastReceiver(pascalObj,  intent);
+   }
+   
+  //write others [public] methods code here......
+  //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
+ 
+   /*
+    * This method enables the Broadcast receiver for
+    * "android.intent.action.TIME_TICK"  This intent get
+    * broadcasted Once The battery level has fallen below a threshold
+    */
+   
+   public void RegisterIntentActionFilter(String _intentAction) {
+	   //intentFilter.addDataScheme("http"); 
+	   //intentFilter.addDataScheme("ftp"); 
+	   //intentFilter.addAction(BluetoothDevice.ACTION_FOUND);
+	   controls.activity.registerReceiver(this, new IntentFilter(_intentAction));
+	   //Log.i("receiver","Register ....");
+   }
+   
+      	   	  	   
+      
+   /*
+    * This method disables the Broadcast receiver
+    */
+   public void Unregister() {   
+	   controls.activity.unregisterReceiver(this);
+	   //Log.i("receiver","UnRegister ...");
+   }
+   
+   public void RegisterIntentActionFilter(int _intentAction) {
+	   switch(_intentAction) {
+	     case 0: controls.activity.registerReceiver(this, new IntentFilter(Intent.ACTION_TIME_TICK));
+	     case 1: controls.activity.registerReceiver(this, new IntentFilter(Intent.ACTION_TIME_CHANGED));
+	     case 2: controls.activity.registerReceiver(this, new IntentFilter(Intent.ACTION_TIMEZONE_CHANGED));
+	     case 3: controls.activity.registerReceiver(this, new IntentFilter(Intent.ACTION_BOOT_COMPLETED));
+	     case 4: controls.activity.registerReceiver(this, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
+	     case 5: controls.activity.registerReceiver(this, new IntentFilter(Intent.ACTION_POWER_CONNECTED));
+	     case 6: controls.activity.registerReceiver(this, new IntentFilter(Intent.ACTION_POWER_DISCONNECTED));
+	     case 7: controls.activity.registerReceiver(this, new IntentFilter(Intent.ACTION_SHUTDOWN));	  
+	   }
+   }
+
+      
+}
+
+/*Draft java code by "Lazarus Android Module Wizard" [1/18/2015 19:10:57]*/
+/*https://github.com/jmpessoa/lazandroidmodulewizard*/
+/*jControl template*/
+
+class jBundlerManager/*extends ...*/ {
+ 
+   private long     pascalObj = 0;      // Pascal Object
+   private Controls controls  = null;   // Control Class -> Java/Pascal Interface ...
+   private Context  context   = null;
+ 
+   //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
+ 
+   public jBundlerManager(Controls _ctrls, long _Self) { //Add more others news "_xxx" params if needed!
+      //super(_ctrls.activity);
+      context   = _ctrls.activity;
+      pascalObj = _Self;
+      controls  = _ctrls;
+   }
+ 
+   public void jFree() {
+     //free local objects...
+   }
+ 
+ //write others [public] methods code here......
+ //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
+   public Bundle CreateNew() {
+	   return new Bundle();
+   }
+   
+   public Bundle GetExtras(Intent _intent) {
+      return  _intent.getExtras();
+   }
+   
+}
+
+/*Draft java code by "Lazarus Android Module Wizard" [1/18/2015 3:49:46]*/
+/*https://github.com/jmpessoa/lazandroidmodulewizard*/
+/*jControl template*/
+
+class jIntentManager  {
+ 
+   private long     pascalObj = 0;      // Pascal Object
+   private Controls controls  = null;   // Control Class -> Java/Pascal Interface ...
+   private Context  context   = null;
+   
+   private Intent mIntent;
+   
+   //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
+ 
+   public jIntentManager(Controls _ctrls, long _Self) { //Add more others news "_xxx" params if needed!
+      //super(_ctrls.activity);
+      context   = _ctrls.activity;
+      pascalObj = _Self;
+      controls  = _ctrls;      
+      mIntent = new Intent();
+   }
+ 
+   public void jFree() {
+     //free local objects...
+	  mIntent = null;
+   }
+ 
+   //write others [public] methods code here......
+   //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
+         
+   public Intent GetIntent() {	 
+	 return mIntent;
+   }
+   
+   public Intent GetActivityStartedIntent() {
+     return controls.activity.getIntent();   //Return the intent that started this activity. 
+   }
+   
+/*http://courses.coreservlets.com/Course-Materials/pdf/android/Android-Intents-2.pdf
+   Java (original Activity)
+   String address ="loan://coreservlets.com/calc?loanAmount=xxx";
+   Uri uri = Uri.parse(address);
+   Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+   startActivity(activityIntent);
+  Java (new Activity - can be different project)
+  Uri uri = getIntent().getData();
+  String loanAmountString = uri.getQueryParameter("loanAmount");
+  //Convert String to double, handle bad data   
+ */
+     
+/*
+ * Intents Starting a new Activity Dial a number 
+ *    Intent intent = new Intent (Intent.ACTION_DIAL, Uri.parse("tel:93675359")); 
+ *    startActivity(intent);       
+ * Launch a website 
+ * Intent intent = new Intent (Intent.ACTION_VIEW, Uri.parse("http://codeandroid.org")); 
+ *   startActivity(intent);   
+ */
+      
+   public void SetAction(String _intentAction) {	                                              
+	  mIntent.setAction(_intentAction); //
+   }
+      
+   //This method automatically clears any data that was previously set (for example by setData(Uri)). 
+   public void SetMimeType(String _mimeType) {
+	  mIntent.setType(_mimeType);  //"image/*";
+   }
+
+/*http://courses.coreservlets.com/Course-Materials/pdf/android/Android-Intents-2.pdf
+Sending Data: Extras vs. URI Parameters
+>>Extras Bundle
+.Pros
+    Can send data of different types.
+    No parsing required in Activity that receives the data.
+.Cons
+   More complex for originating Activity
+   Requires parsing in originating Activity if values come from EditText
+
+>>URI parameters
+.Pros
+   Simpler for originating Activity, especially if EditText used
+   More consistent with URI usage
+.Cons
+   Can send Strings only
+   Requires parsing in receiving Activity
+*/  
+  
+   /*
+   If the action is performed on some data, then one more Intent-attribute is specified - data. 
+   Inside it we can specify any object we need: user in the address book, map coordinates, phone number etc. 
+   That is action specifies what to do and data - with what to do it.
+   */
+     
+   /*
+    * Set the data this intent is operating on. 
+    * This method automatically clears any type that was previously set by setType(String) 
+    * or setTypeAndNormalize(String). Note: scheme matching in the Android framework is case-sensitive, 
+    * unlike the formal RFC. As a result, you should always write your Uri with a lower case scheme, 
+    * or use normalizeScheme() or setDataAndNormalize(Uri) to ensure that the scheme is converted to lower case.
+    */
+   
+   public void SetDataUriAsString(String _uriAsString) { //Uri.parse(fileUrl) - just Strings!
+	   
+	   mIntent.setData(Uri.parse(_uriAsString));  //just Strings!
+	   /*
+	    * Parameters
+             data  The Uri of the data this intent is now targeting. 
+          Returns
+             Returns the same Intent object, for chaining multiple calls into a single statement.
+	    */
+   }
+   
+   public void StartActivityForResult(int _requestCode) {
+	   controls.activity.startActivityForResult(mIntent,_requestCode);
+	   // //startActivityForResult(photoPickerIntent, SELECT_PHOTO);
+   }
+      
+   /*
+    * String url = "http://www.vogella.com";
+      Intent i = new Intent(Intent.ACTION_VIEW);
+      i.setData(Uri.parse(url));
+      startActivity(i); 
+   */
+      
+   public void StartActivity() {
+	   //intent.putExtras .... etc
+	  controls.activity.startActivity(mIntent);
+   }
+   
+   public void StartActivity(String _chooserTitle) {	  
+	   controls.activity.startActivity(Intent.createChooser(mIntent, _chooserTitle));
+   }
+   
+   public void StartActivityForResult(int _requestCode, String _chooserTitle) {	  
+	   controls.activity.startActivityForResult(Intent.createChooser(mIntent, _chooserTitle),_requestCode);
+   }
+         
+   /*
+    * The _dataName must include a package prefix, 
+    * for example the app com.android.contacts 
+    * would use names like "com.android.contacts.ShowAll".
+    */
+   
+   /*
+    * Intents Broadcast Intents 
+    * Intent intent = new Intent("org.codeandroid.intentstest.TestBroadcastReceiver"); 
+    * sendBroadcast(intent);
+    */
+   
+   public void SendBroadcast(){    //This call is asynchronous; it returns immediately    	               
+      controls.activity.sendBroadcast(mIntent); //The Intent to broadcast; all receivers matching this Intent will receive the broadcast.       
+   }
+   
+   public String GetAction(Intent _intent) {	 
+      return _intent.getAction();
+   }
+      
+   public boolean HasExtra(Intent _intent, String _dataName) {
+	  return _intent.hasExtra(_dataName);
+   }
+   
+   public void PutExtraBundle(Bundle _bundleExtra) {
+	  mIntent.putExtras(_bundleExtra);
+   }
+   
+   public Bundle GetExtraBundle(Intent _intent) {  //the map of all extras previously added with putExtra(), or null if none have been added. 
+	   return _intent.getExtras();
+   }
+   
+   public double[] GetExtraDoubleArray(Intent _intent, String _dataName) {
+       return _intent.getDoubleArrayExtra(_dataName);
+   }
+      
+   /*
+    * The _dataName must include a package prefix, 
+    * for example the app com.android.contacts 
+    * would use names like "com.android.contacts.ShowAll".
+    */
+   
+   public void PutExtraDoubleArray(String _dataName, double[] _values) {
+	  mIntent.putExtra(_dataName, _values);
+   }
+   
+   public double GetExtraDouble(Intent _intent, String _dataName) {
+	  return _intent.getDoubleExtra(_dataName, 0);//defaultValue
+   }
+   
+   public void PutExtraDouble(String _dataName, double _value) {
+	   mIntent.putExtra(_dataName, _value);
+   }
+   
+   public float[] GetExtraFloatArray(Intent _intent, String _dataName) {
+	   return _intent.getFloatArrayExtra(_dataName);
+   }
+   
+   public void PutExtraFloatArray(String _dataName, float[] _values) {
+	   mIntent.putExtra(_dataName, _values);
+   }
+   
+   public float GetExtraFloat(Intent _intent, String _dataName) { 
+	   return _intent.getFloatExtra(_dataName, 0);
+   }
+   
+   public void PutExtraFloat(String _dataName, float _value) {
+	   mIntent.putExtra(_dataName, _value);
+   }
+   
+   public int[] GetExtraIntArray(Intent _intent, String _dataName) {
+	   return _intent.getIntArrayExtra(_dataName);
+   }
+   
+   public void PutExtraIntArray(String _dataName, int[] _values) {
+	  mIntent.putExtra(_dataName, _values);
+   }
+   
+   public int GetExtraInt(Intent _intent, String _dataName) {
+	  return _intent.getIntExtra(_dataName, 0);
+   }
+  
+   public void PutExtraInt(String _dataName, int _value) {
+	  mIntent.putExtra(_dataName, _value);
+   }
+   
+   public String[] GetExtraStringArray(Intent _intent, String _dataName) {	  
+	  return _intent.getStringArrayExtra(_dataName);
+   }
+         
+   public void PutExtraStringArray(String _dataName, String[] _values) {
+	  mIntent.putExtra(_dataName, _values);
+   }
+   
+   public String GetExtraString(Intent _intent, String _dataName) {
+	  return _intent.getStringExtra(_dataName);
+   }
+   
+   public void PutExtraString(String _dataName, String _value) {
+	  mIntent.putExtra(_dataName, _value);
+   }
+            
+   public void SetDataUri(Uri _dataUri) { //Uri.parse(fileUrl) - just Strings!
+		  //final Uri uriContact = ContactsContract.Contacts.CONTENT_URI;
+		  //android.provider.ContactsContract.Contacts.CONTENT_URI
+		   mIntent.setData(_dataUri);  //just Strings!
+   }
+	   
+   public Uri GetDataUri(Intent _intent) {
+	  return _intent.getData(); //name of data ...
+   }
+ 
+   public String GetDataUriAsString(Intent _intent) { //The same as getData(), but returns the URI as an encoded String.	   
+ 	  return _intent.getDataString();               //inverse: Uri.parse(...) creates a Uri which parses the given encoded URI string.
+   }
+
+   /*OnResult ...
+    * Uri contactUri = intent.getData();
+      You can also fetch the selected Contact name from intent extras.
+      String contactName = intent.getStringExtra("android.intent.extra.shortcut.NAME");
+   */ 
+          
+   /*
+    * For example: you have a share picture option in your application.
+      You define an intent like this:
+      Intent picMessageIntent = new Intent(android.content.Intent.ACTION_SEND);
+      picMessageIntent.setType("image/jpeg");
+
+    File downloadedPic =  new File(
+    Environment.getExternalStoragePublicDirectory(
+    Environment.DIRECTORY_DOWNLOADS),
+    "q.jpeg");
+    picMessageIntent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(downloadedPic));
+    Than when you call:
+    startActivity(picMessageIntent);  
+    all applications on your phone capable of getting this picture will be listed.    
+    */
+      
+   public void PutExtraFile(String _environmentDirectoryPath, String _fileName) { //Environment.DIRECTORY_DOWNLOADS
+      mIntent.putExtra(Intent.EXTRA_STREAM, Uri.parse("file://"+_environmentDirectoryPath+"/"+ _fileName)); //android.intent.extra.STREAM
+   }
+          
+   public void PutExtraMailSubject(String  _mailSubject) {
+	   mIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, _mailSubject);
+   }
+   
+   public void PutExtraMailBody(String _mailBody) {	  
+	   mIntent.putExtra(android.content.Intent.EXTRA_TEXT, _mailBody);
+   }
+      
+   public void PutExtraMailCCs(String[] _mailCCs) {	  
+	   mIntent.putExtra(android.content.Intent.EXTRA_CC, _mailCCs);
+   }
+       
+   public void PutExtraMailBCCs(String[] _mailBCCs) {	  
+	   mIntent.putExtra(android.content.Intent.EXTRA_BCC, _mailBCCs);
+   }
+   
+   public void PutExtraMailTos(String[]  _mailTos) {	  
+	   mIntent.putExtra(android.content.Intent.EXTRA_EMAIL, _mailTos);
+   }
+   
+   public void PutExtraPhoneNumbers(String[]  _callPhoneNumbers) {	  
+	   mIntent.putExtra(android.content.Intent.EXTRA_PHONE_NUMBER, _callPhoneNumbers); //used with Action_Call	   	   
+   }
+   
+   public Uri GetContactsContentUri(){
+	  return ContactsContract.Contacts.CONTENT_URI;
+	  /*
+	   * * This will display a list of all the contacts in the device to pick from.
+      In onActivityResult, you can fetch the selected Contact URI from the intent.
+	   */
+   }
+
+   /*
+	final Uri uriContact = ContactsContract.Contacts.CONTENT_URI;
+	Intent intentPickContact = new Intent(Intent.ACTION_PICK, uriContact);
+   */
+   
+   public Uri GetContactsPhoneUri(){
+      return ContactsContract.CommonDataKinds.Phone.CONTENT_URI;
+      //If you need to pick from only contacts with a phone number,
+   }
+   
+   public Uri GetAudioExternContentUri(){
+      return android.provider.MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
+   }
+   
+   public Uri GetVideoExternContentUri(){
+	  return android.provider.MediaStore.Video.Media.EXTERNAL_CONTENT_URI;
+   }
+   
+   public Uri ParseUri(String _uriAsString) {	   	   
+	  return Uri.parse(_uriAsString);
+   }
+   
+   /*
+    * The caller may pass an extra EXTRA_OUTPUT to control where this image will be written. 
+    * If the EXTRA_OUTPUT is not present, then a small sized image is returned as a 
+    * Bitmap object in the extra field. This is useful for applications that only need a small image. 
+    */
+   public String GetActionViewAsString(){
+	 String c = MediaStore.ACTION_IMAGE_CAPTURE;  //"android.media.action.IMAGE_CAPTURE"
+     return "android.intent.action.VIEW";
+   }	   
+   
+   public String GetActionPickAsString() {
+	   return "android.intent.action.PICK";
+   }  	   
+   
+   public String GetActionSendtoAsString() {
+      return "android.intent.action.SENDTO";
+   }	   
+   
+   public String GetActionSendAsString() {
+	   return "android.intent.action.SEND";
+   }
+   
+   public String GetActionEditAsString() {
+      return "android.intent.action.EDIT";
+   }
+   
+   public String GetActionDialAsString() {
+      return "android.intent.action.DIAL";
+   }	   
+   
+   public String GetActionCallButtonAsString() {
+	  //String s =  Intent.ACTION_CALL_BUTTON; 
+      return "android.intent.action.CALL_BUTTON";
+   }	   
+   
+      
+   public void SetAction(int  _intentAction) {	 
+	  switch(_intentAction) { 
+	    case 0: mIntent.setAction("android.intent.action.VIEW"); //
+	    case 1: mIntent.setAction("android.intent.action.PICK"); //
+	    case 2: mIntent.setAction("android.intent.action.SENDTO"); //
+	    case 3: mIntent.setAction("android.intent.action.DIAL"); //
+	    case 4: mIntent.setAction("android.intent.action.CALL_BUTTON"); //
+	    case 5: mIntent.setAction( "android.intent.action.CALL");
+	    case 6: mIntent.setAction("android.media.action.IMAGE_CAPTURE"); //
+	  }
+   }
+   
+   public boolean ResolveActivity() {
+      if (mIntent.resolveActivity(controls.activity.getPackageManager()) != null) {
+    	  return true;
+      } else return false;
+   }
+   
+   public Uri GetMailtoUri(){		  	      
+      return Uri.parse("mailto:");
+   }
+	   
+   public Uri GetMailtoUri(String _email){		  	      
+	  return Uri.parse("mailto:"+_email);
+   }
+   
+   
+   public Uri GetTelUri(){		  	      
+	  return Uri.parse("tel:");
+   }
+		   
+   public Uri GetTelUri(String _telNumber){		  	      
+	  return Uri.parse("tel:"+_telNumber);
+   }
+   
+   /* Pick image from Gallery
+    Intent intent = new Intent();
+    intent.setType("image/*");
+    intent.setAction(Intent.ACTION_GET_CONTENT);
+ 
+    ACTION_GET_CONTENT with MIME type vnd.android.cursor.item/phone -- 
+    Display the list of people's phone numbers,
+    allowing the user to browse through them and pick one and return it to the parent activity.
+    
+    */
+   
+   public String GetActionGetContentUri(){	        
+	  return "android.intent.action.GET_CONTENT";
+   }
+   
+   public void PutExtraFile(Uri _uri) { 
+	   mIntent.putExtra(Intent.EXTRA_STREAM, _uri); //android.intent.extra.STREAM
+   }
+   
+   
+   /* String s =Intent.ACTION_CALL;
+    * Activity Action: Perform a call to someone specified by the data. 
+      Input: If nothing, an empty dialer is started; 
+             else getData() is URI of a phone number to be dialed  or a tel: URI of an explicit phone number. 
+             Note: there will be restrictions on which applications can initiate a call; 
+             most applications should use the ACTION_DIAL. 
+    */
+   
+   public String GetActionCallAsString() {
+	   //String s = Intent.ACTION_CALL;
+	   return "android.intent.action.CALL";
+   }
+   
+   public String GetContactNumber(Uri _contactUri) { 
+      String[] projection = {Phone.NUMBER};
+      Cursor cursor = controls.activity.getContentResolver().query(_contactUri, projection, null, null, null);
+      cursor.moveToFirst();
+      // Retrieve the phone number from the NUMBER column
+       int column = cursor.getColumnIndex(Phone.NUMBER);
+       String number = cursor.getString(column);
+       return number;
+   }
+   
+   
+   public String GetContactEmail(Uri _contactUri) { 
+	      String[] projection = {Email.DATA};
+	      Cursor cursor = controls.activity.getContentResolver().query(_contactUri, projection, null, null, null);
+	      cursor.moveToFirst();
+	      // Retrieve the phone number from the DATA column
+	       int column = cursor.getColumnIndex(Email.DATA);
+	       String email = cursor.getString(column);
+	       return email;
+   }
+   
+   //ref. http://code.tutsplus.com/tutorials/android-essentials-using-the-contact-picker--mobile-2017
+   public String[] GetBundleContent(Intent _intent) {
+	 		
+     Bundle extras = _intent.getExtras();
+     
+     if (extras != null) {
+    	 int i;
+    	 Set keys = extras.keySet();
+         String[] strKeys = new String[keys.size()];
+         Iterator iterate = keys.iterator();
+         i = 0;
+         while (iterate.hasNext()) {
+           String key = (String) iterate.next();
+           strKeys[i] = key + "[" + extras.get(key) + "]";
+           i++;		   
+         }    
+         return strKeys;
+         
+     } else return null;   
+     
+   }
+   
+   public String GetActionImageCaptureAsString(){
+		 String c = MediaStore.ACTION_IMAGE_CAPTURE;
+	     return "android.media.action.IMAGE_CAPTURE";
+   }
+
+     
+}
+
+/*Draft java code by "Lazarus Android Module Wizard" [2/3/2015 16:12:53]*/
+/*https://github.com/jmpessoa/lazandroidmodulewizard*/
+/*jControl template*/
+ 
+class jNotificationManager /*extends ...*/ {
+  
+    private long     pascalObj = 0;      // Pascal Object
+    private Controls controls  = null;   // Control Class -> Java/Pascal Interface ...
+    private Context  context   = null;
+
+    NotificationManager mNotificationManager;
+    String one,two,three;
+  
+    //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
+  
+    public jNotificationManager(Controls _ctrls, long _Self) { //Add more others news "_xxx" params if needed!
+       //super(_ctrls.activity);
+       context   = _ctrls.activity;
+       pascalObj = _Self;
+       controls  = _ctrls;
+    }
+  
+    public void jFree() {
+      //free local objects...
+    	mNotificationManager = null;
+    }
+  
+  //write others [public] methods code here......
+  //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
+
+  //by jmpessoa
+    public int GetDrawableResourceId(String _resName) {
+    	  try {
+    	     Class<?> res = R.drawable.class;
+    	     Field field = res.getField(_resName);  //"drawableName"
+    	     int drawableId = field.getInt(null);
+    	     return drawableId;
+    	  }
+    	  catch (Exception e) {
+    	     Log.e("jNotificationManager", "Failure to get drawable id.", e);
+    	     return 0;
+    	  }
+    }
+    
+    public void Notify(int _id, String _title, String _subject, String _body, String _iconIdentifier){
+    	
+    	int icon;
+    	
+    	if (_iconIdentifier.equals("")) 
+    	   icon = android.R.drawable.ic_dialog_info;    	
+    	else
+    	   icon = GetDrawableResourceId(_iconIdentifier) ;
+    	
+    	mNotificationManager=(NotificationManager)controls.activity.getSystemService(Context.NOTIFICATION_SERVICE);    	
+       Notification notif = new Notification.Builder(controls.activity)         
+       .setContentTitle(_title)        
+       .setContentText(_subject)
+       .setContentInfo(_body)
+       .setSmallIcon(icon)         
+       .build();       
+       mNotificationManager.notify(_id, notif);
+    }
+    
+    //This method cancel a previously shown notification.
+    public void Cancel(int _id) {
+      mNotificationManager.cancel(_id);    
+    }
+    
+    public void CancelAll() {
+      mNotificationManager.cancelAll();    
+    }    
+}
+
+
+
+/*Draft java code by "Lazarus Android Module Wizard" [2/3/2015 22:24:25]*/
+/*https://github.com/jmpessoa/lazandroidmodulewizard*/
+/*jControl template*/
+
+class jTimePickerDialog /*extends ...*/ {
+ 
+   private long     pascalObj = 0;      // Pascal Object
+   private Controls controls  = null;   // Control Class -> Java/Pascal Interface ...
+   private Context  context   = null;
+ 
+   // Variable for storing current time
+   private int mHour, mMinute;
+   
+   //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
+ 
+   public jTimePickerDialog(Controls _ctrls, long _Self) { //Add more others news "_xxx" params if needed!
+      //super(_ctrls.activity);
+      context   = _ctrls.activity;
+      pascalObj = _Self;
+      controls  = _ctrls;
+   }
+ 
+   public void jFree() {
+     //free local objects...
+   }
+ 
+ //write others [public] methods code here......
+ //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
+ 
+   public void Show() {
+	   
+       // Process to get Current Time
+       final Calendar c = Calendar.getInstance();
+       mHour = c.get(Calendar.HOUR_OF_DAY);
+       mMinute = c.get(Calendar.MINUTE);
+
+       // Launch Time Picker Dialog
+       TimePickerDialog tpd = new TimePickerDialog(controls.activity,new TimePickerDialog.OnTimeSetListener() {
+                   @Override
+                   /*.*/public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+                       // Display Selected time in textbox
+                       //Log.i("TimePicker", hourOfDay + ":" + minute);
+                       controls.pOnTimePicker(pascalObj, hourOfDay, minute);
+                   }
+               }, mHour, mMinute, false);
+       
+       tpd.show();      
+   }
+   
+}
+
+/*Draft java code by "Lazarus Android Module Wizard" [2/3/2015 22:24:25]*/
+/*https://github.com/jmpessoa/lazandroidmodulewizard*/
+/*jControl template*/
+
+class jDatePickerDialog /*extends ...*/ {
+ 
+   private long     pascalObj = 0;      // Pascal Object
+   private Controls controls  = null;   // Control Class -> Java/Pascal Interface ...
+   private Context  context   = null;
+ 
+   // Variable for storing current date and time
+   private int mYear, mMonth, mDay;
+   //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
+ 
+   public jDatePickerDialog(Controls _ctrls, long _Self) { //Add more others news "_xxx" params if needed!
+      //super(_ctrls.activity);
+      context   = _ctrls.activity;
+      pascalObj = _Self;
+      controls  = _ctrls;
+   }
+ 
+   public void jFree() {
+     //free local objects...
+   }
+ 
+   //write others [public] methods code here......
+   //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
+   public void Show() {
+	   
+       // Process to get Current Date
+       final Calendar c = Calendar.getInstance();
+       mYear = c.get(Calendar.YEAR);
+       mMonth = c.get(Calendar.MONTH);
+       mDay = c.get(Calendar.DAY_OF_MONTH);
+
+       // Launch Date Picker Dialog
+       DatePickerDialog dpd = new DatePickerDialog(controls.activity, new DatePickerDialog.OnDateSetListener() {
+                   @Override
+                   /*.*/public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
+                       // Display Selected date in textbox
+                       //Log.i("DatePicker",dayOfMonth + "-" + (monthOfYear + 1) + "-" + year);
+                       controls.pOnDatePicker(pascalObj, year, monthOfYear+1, dayOfMonth);
+                   }
+               }, mYear, mMonth, mDay);
+       dpd.show();
+   }    
+}
+
+
+/*Draft java code by "Lazarus Android Module Wizard" [2/16/2015 20:17:59]*/
+/*https://github.com/jmpessoa/lazandroidmodulewizard*/
+/*jControl template*/
+
+//ref. http://www.javacodegeeks.com/2013/06/android-http-client-get-post-download-upload-multipart-request.html
+//ref http://lethargicpanda.tumblr.com/post/14784695735/oauth-login-on-your-android-app-the-github
+class jHttpClient /*extends ...*/ {
+ 
+   private long     pascalObj = 0;      // Pascal Object
+   private Controls controls  = null;   // Control Class -> Java/Pascal Interface ...
+   private Context  context   = null;
+   
+   private String mUSERNAME = "USERNAME";
+   private String mPASSWORD = "PASSWORD";
+   private int mAuthenticationMode = 0; //0: none. 1: basic; 2= OAuth
+   private String mHOSTNAME = AuthScope.ANY_HOST; // null; 
+   private int mPORT = AuthScope.ANY_PORT; //-1;
+ 
+   //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
+   public jHttpClient(Controls _ctrls, long _Self) { //Add more others news "_xxx" params if needed!
+      //super(_ctrls.activity);
+      context   = _ctrls.activity;
+      pascalObj = _Self;
+      controls  = _ctrls;
+   }
+ 
+   public void jFree() {
+     //free local objects...
+   }
+ 
+ //write others [public] methods code here......
+ //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
+   
+   //ref. http://blog.leocad.io/basic-http-authentication-on-android/
+   //ref. http://simpleprogrammer.com/2011/05/25/oauth-and-rest-in-android-part-1/
+   //ref. http://jan.horneck.info/blog/androidhttpclientwithbasicauthentication
+   public String Get(String _stringUrl) {
+	   
+       //ref. http://jan.horneck.info/blog/androidhttpclientwithbasicauthentication
+	   HttpEntity entity = null;
+	   
+	   HttpParams httpParams = new BasicHttpParams();
+	   int connection_Timeout = 5000;
+	   HttpConnectionParams.setConnectionTimeout(httpParams, connection_Timeout);
+	   HttpConnectionParams.setSoTimeout(httpParams, connection_Timeout);
+	    
+	    /*ref. http://blog.leocad.io/basic-http-authentication-on-android/
+	    String credentials = mUSERNAME + ":" + mPASSWORD;  
+	    String base64EncodedCredentials = Base64.encodeToString(credentials.getBytes(), Base64.NO_WRAP);  
+	    request.addHeader("Authorization", "Basic " + base64EncodedCredentials);
+	    client = new DefaultHttpClient();
+	   */
+	   
+	   DefaultHttpClient httpclient = new DefaultHttpClient(httpParams);
+       String strResult="";
+       
+       try {
+    	   
+		    //AuthScope:
+		    //host  the host the credentials apply to. May be set to null if credenticals are applicable to any host. 
+		    //port  the port the credentials apply to. May be set to negative value if credenticals are applicable to any port.
+    	   if (mAuthenticationMode != 0) {    		   
+              httpclient.getCredentialsProvider().setCredentials(
+                               new AuthScope(mHOSTNAME,mPORT),  // 
+                               new UsernamePasswordCredentials(mUSERNAME, mPASSWORD));
+    	   }
+    	   
+           HttpGet httpget = new HttpGet(_stringUrl);
+
+           //System.out.println("executing request" + httpget.getRequestLine());
+           HttpResponse response = httpclient.execute(httpget);
+           entity = response.getEntity();
+           
+           /*TODO
+           StatusLine statusLine = response.getStatusLine();
+           int statusCode = statusLine.getStatusCode();
+           if (statusCode == 200) {           
+               entity = response.getEntity();
+           }    
+            */
+           
+           if (entity != null) {
+        	   strResult = EntityUtils.toString(entity);
+           }
+       } catch(Exception e){
+       	    e.printStackTrace();
+       }finally {
+           // When HttpClient instance is no longer needed,
+           // shut down the connection manager to ensure
+           // immediate deallocation of all system resources
+           httpclient.getConnectionManager().shutdown();
+       }
+       return strResult;
+
+   }
+	 
+     public void SetAuthenticationUser(String _userName, String _password) {       	 
+	   mUSERNAME = _userName;
+	   mPASSWORD =_password;
+     }
+     
+     public void SetAuthenticationHost(String _hostName, int _port) {
+    	 if ( _hostName.equals("") ) {
+    		 mHOSTNAME = null;
+    	 } 
+    	 else {
+    		 mHOSTNAME = _hostName;
+    	 }
+    	 mPORT = _port;	 
+     }
+               
+     public void SetAuthenticationMode(int _authenticationMode) {    	 
+        mAuthenticationMode = _authenticationMode; //0: none. 1: basic; 2= OAuth	 	                
+     }
+     
+     //ref. http://mobiledevtuts.com/android/android-http-with-asynctask-example/ 
+	public int PostNameValueData(String _stringUrl, String _name, String _value) {
+			// Create a new HttpClient and Post Header
+			int statusCode = 0;						
+			HttpParams httpParams = new BasicHttpParams();
+			int connection_Timeout = 5000;
+			HttpConnectionParams.setConnectionTimeout(httpParams, connection_Timeout);
+			HttpConnectionParams.setSoTimeout(httpParams, connection_Timeout);
+			
+			DefaultHttpClient httpclient = new DefaultHttpClient();					 	   
+		    //AuthScope:
+		    //host  the host the credentials apply to. May be set to null if credenticals are applicable to any host. 
+		    //port  the port the credentials apply to. May be set to negative value if credenticals are applicable to any port.
+			try {				
+    	        if (mAuthenticationMode != 0) {    		   
+                  httpclient.getCredentialsProvider().setCredentials(
+                               new AuthScope(mHOSTNAME,mPORT),  // 
+                               new UsernamePasswordCredentials(mUSERNAME, mPASSWORD));
+    	        }						
+			    HttpPost httppost = new HttpPost(_stringUrl);
+				// Add your data
+				List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();								
+				nameValuePairs.add(new BasicNameValuePair(_name, _value));								
+				httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
+				// Execute HTTP Post Request
+				HttpResponse response = httpclient.execute(httppost);
+				StatusLine statusLine = response.getStatusLine();  
+				statusCode = statusLine.getStatusCode();
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+			} 
+			return statusCode;
+	}
+	
+	public int PostNameValueData(String _stringUrl, String _listNameValue) {
+		// Create a new HttpClient and Post Header
+		int statusCode = 0; 
+		
+		HttpParams httpParams = new BasicHttpParams();
+		int connection_Timeout = 5000;
+		HttpConnectionParams.setConnectionTimeout(httpParams, connection_Timeout);
+		HttpConnectionParams.setSoTimeout(httpParams, connection_Timeout);
+		
+		DefaultHttpClient httpclient = new DefaultHttpClient();			 	   
+	    //AuthScope:
+	    //host  the host the credentials apply to. May be set to null if credenticals are applicable to any host. 
+	    //port  the port the credentials apply to. May be set to negative value if credenticals are applicable to any port.
+		try {
+			
+	        if (mAuthenticationMode != 0) {    		   
+              httpclient.getCredentialsProvider().setCredentials(
+                           new AuthScope(mHOSTNAME,mPORT),  // 
+                           new UsernamePasswordCredentials(mUSERNAME, mPASSWORD));
+	        }
+					
+		    HttpPost httppost = new HttpPost(_stringUrl);
+
+			// Add your data
+			List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();						
+			StringTokenizer st = new StringTokenizer(_listNameValue, "=&");		
+			
+			while(st.hasMoreTokens()) { 
+			  String key = st.nextToken(); 
+			  String val = st.nextToken(); 
+			  //Log.i("name ->", key);
+			  //Log.i("value ->", val);
+			  nameValuePairs.add(new BasicNameValuePair(key, val));
+			}					
+			httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
+			// Execute HTTP Post Request
+			HttpResponse response = httpclient.execute(httppost);
+			StatusLine statusLine = response.getStatusLine();  
+			statusCode = statusLine.getStatusCode();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+		}		 
+		return statusCode;
+    }
+
+}
+
+//**new jclass entrypoint**//please, do not remove/change this line!
+
 //Javas/Pascal Interface Class 
 
 public class Controls {          // <<--------- 
@@ -9584,7 +11437,6 @@ public  native void pOnClick     (long pasobj, int value);
 public  native void pOnChange    (long pasobj, String txt, int count);
 public  native void pOnChanged   (long pasobj, String txt, int count);
 public  native void pOnEnter     (long pasobj);                    
-
 
 public  native void pOnTimer     (long pasobj);
 
@@ -9638,6 +11490,18 @@ public native void pOnClickToggleButton(long pasobj, boolean state);
 public native void pOnChangeSwitchButton(long pasobj, boolean state);
 
 public native void pOnClickGridItem(long pasobj, int position, String caption);
+ 
+public native void pOnChangedSensor(long pasobj, Sensor sensor, int sensorType, float[] values, long timestamp);
+public native void pOnListeningSensor(long pasobj, Sensor sensor, int sensorType);
+
+public native void pOnUnregisterListeningSensor(long pasobj, int sensorType, String sensorName);
+public native void pOnBroadcastReceiver(long pasobj, Intent intent);
+
+public native void pOnTimePicker(long pasobj, int hourOfDay, int minute);
+public native void pOnDatePicker(long pasobj, int year, int monthOfYear, int dayOfMonth);
+
+public native void pOnFlingGestureDetected(long pasobj, int direction);
+public native void pOnPinchZoomGestureDetected(long pasobj, float scaleFactor, int state); 
 
 //Load Pascal Library
 static {
@@ -9681,9 +11545,6 @@ public  void jAppOnClickContextMenuItem(MenuItem item,int itemID, String itemCap
 
 public void jAppOnViewClick(View view, int id){ pAppOnViewClick(view,id);}
 public void jAppOnListItemClick(AdapterView adapter, View view, int position, int id){ pAppOnListItemClick(adapter, view,position,id);}
-
-//public void jAppOnActionBarTabSelected(View view, String title){pOnActionBarTabSelected(view,title);}
-//public void jAppOnActionBarTabUnSelected(View view, String title){pOnActionBarTabUnSelected(view,title);}
 
 //// -------------------------------------------------------------------------
 //  System, Class
@@ -9941,6 +11802,25 @@ public  String getStrDateTime() {  //hacked by jmpessoa!! sorry, was for a good 
   		   "6$4=getLocale;";  
   return listVersionInfo;
 }
+
+//Fatih: Path = '' = Asset Root Folder 
+//Path Example: gunlukler/2015/02/28/001 
+public String[] getAssetContentList(String Path) throws IOException { 
+   ArrayList<String> Folders = new ArrayList<String>(); 
+
+   Resources r = this.activity.getResources();  
+   AssetManager am = r.getAssets(); 
+   String fileList[] = am.list(Path); 
+   if (fileList != null) 
+  {    
+     for (int i = 0; i < fileList.length; i++) 
+     { 
+ 	Folders.add(fileList[i]); 
+     } 
+  } 
+  String sFolders[] = Folders.toArray(new String[Folders.size()]);    	   
+  return sFolders; 
+} 
 
 //by jmpessoa:  Class controls version info
 public String GetControlsVersionInfo() { 
@@ -10278,76 +12158,6 @@ public  java.lang.Object jAsyncTask_Create(long pasobj ) {
   return (java.lang.Object)( new jAsyncTask(this,pasobj));
 }
 
-// -------------------------------------------------------------------------
-//  Http API
-//  Why ?
-//        android:minSdkVersion       = "9"   ---> OK
-//        android:minSdkVersion       = "10"  ---> Not OK
-//
-//  Ref. http://theeye.pe.kr/entry/how-to-get-and-multipart-post-on-android-platform
-//       http://cafe.naver.com/securitycommunity/56
-//       http://stackoverflow.com/questions/8179658/urlconnection-getcontent-return-null
-//       http://blog.naver.com/since201109?Redirect=Log&logNo=150169407558
-//       http://www.java-samples.com/showtutorial.php?tutorialid=1521
-//
-//
-//
-// -------------------------------------------------------------------------
-
-public  String jHttp_get(String url) {
-  String rst = "";
-  try {
-    HttpClient client = new DefaultHttpClient();
-    HttpGet    get    = new HttpGet(url);
-    HttpResponse resp = client.execute(get);
-    /*
-    BufferedReader br = new BufferedReader(new InputStreamReader(resp.getEntity().getContent()));
-    String str = null;
-    StringBuilder sb = new StringBuilder();
-    while ((rst = br.readLine()) != null) {
-      sb.append(str).append("\n"); }
-    br.close();
-    rst = sb.toString();
-    */
-    HttpEntity resEntityGet = resp.getEntity();
-    if (resp != null) {
-      rst = EntityUtils.toString(resEntityGet);  }
-
-    Log.i("RESPONSE", rst);  }
-  catch (Exception e) {
-    Log.i("Java","Error");
-    e.printStackTrace();
-  };
-  return(rst);
-};
-
-//by jmpessoa
-//http://blog.dahanne.net/2009/08/16/how-to-access-http-resources-from-android/
-public String jHttp_get2(String location) throws Throwable {
-	HttpURLConnection con = null;
-	URL url;
-	InputStream is=null;
-		url = new URL(location);
-		con = (HttpURLConnection) url.openConnection();
-		//con.setReadTimeout(10000 /* milliseconds */);
-		//con.setConnectTimeout(15000 /* milliseconds */);
-		con.setRequestMethod("GET");
-		con.setDoInput(true);
-		//con.addRequestProperty("Referer", location);
-		// Start the query
-		con.connect();
-		is = con.getInputStream();
-	
-    BufferedReader rd = new BufferedReader(new InputStreamReader(is), 4096);
-    String line;
-    StringBuilder sb =  new StringBuilder();
-	while ((line = rd.readLine()) != null) {
-		    sb.append(line);
-	}
-	rd.close();
-    return  sb.toString();
-}
-
 //by jmpessoa
 //you need a real android device (not emulator!)
 //http://www.androidaspect.com/2013/09/how-to-send-email-from-android.html
@@ -10484,7 +12294,7 @@ public  int[] getBmpArray(String file) {
    * you take with the device's built-in camera. When you open the Android Gallery app, 
    * you are browsing the files saved in the DCIM folder....
    */
-  //by jmpessoa
+  //by jmpessoa  
 public String jCamera_takePhoto(String path, String filename) {
  	  Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
 	
@@ -10500,6 +12310,23 @@ public String jCamera_takePhoto(String path, String filename) {
 	    
 	  return (path+'/'+filename);	  
 }
+
+public String jCamera_takePhoto(String path, String filename, int requestCode) {
+	  Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+	
+	  //Environment.getExternalStorageDirectory()
+	  //Environment.getExternalStorageDirectory().getAbsoluteFile()
+	  
+	  Uri mImageCaptureUri = Uri.fromFile(new File(path, '/'+filename)); // get Android.Uri from file
+	  
+	  intent.putExtra(android.provider.MediaStore.EXTRA_OUTPUT, mImageCaptureUri);
+	  intent.putExtra("return-data", true);
+	  
+	  this.activity.startActivityForResult(intent, requestCode); //12345 = requestCode
+	    
+	  return (path+'/'+filename);	  
+}
+
 // -------------------------------------------------------------------------
 //  BenchMark [Java/Pascal]
 // -------------------------------------------------------------------------
@@ -10604,17 +12431,41 @@ public float[] benchMark1 () {
       return (java.lang.Object)(new jToggleButton(this,_Self));
    }
   
-
-  
    public java.lang.Object jSwitchButton_jCreate(long _Self) {
       return (java.lang.Object)(new jSwitchButton(this,_Self));
    }
   
-
   
    public java.lang.Object jGridView_jCreate(long _Self) {
-      return (java.lang.Object)(new jGridView(this,_Self));
+      return (java.lang.Object)(new jGridView(this,_Self));      
+   }
+   
+   public java.lang.Object jSensorManager_jCreate(long _Self) {
+	      return (java.lang.Object)(new jSensorManager(this,_Self));
+   }      
+   
+   public java.lang.Object jBroadcastReceiver_jCreate(long _Self) {
+	      return (java.lang.Object)(new jBroadcastReceiver(this,_Self));
+   }   
+   
+   public java.lang.Object jIntentManager_jCreate(long _Self) {
+	      return (java.lang.Object)(new jIntentManager(this,_Self));
+	   }      
+  
+   public java.lang.Object jNotificationManager_jCreate(long _Self) {
+	      return (java.lang.Object)(new jNotificationManager(this,_Self));
+   }   
+   
+   public java.lang.Object jTimePickerDialog_jCreate(long _Self) {
+	      return (java.lang.Object)(new jTimePickerDialog(this,_Self));
+   }
+   
+   public java.lang.Object jDatePickerDialog_jCreate(long _Self) {
+	      return (java.lang.Object)(new jDatePickerDialog(this,_Self));
+   }
+   
+   public java.lang.Object jHttpClient_jCreate(long _Self) {
+	      return (java.lang.Object)(new jHttpClient(this,_Self));
    }
   
-
 }

@@ -57,7 +57,6 @@
         <IsPartOfProject Value="True"/>
         <ComponentName Value="AndroidModule2"/>
         <HasResources Value="True"/>
-        <UnitName Value="unit2"/>
       </Unit2>
     </Units>
   </ProjectOptions>

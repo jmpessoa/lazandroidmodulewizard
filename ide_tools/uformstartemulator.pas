@@ -7,7 +7,7 @@ interface
 uses
   {$ifdef Windows}Windows,{$endif}
   Classes, SysUtils, process, FileUtil, Forms, Controls, Graphics, Dialogs,
-  ComCtrls, Grids, ButtonPanel, ExtCtrls, Buttons, ActnList;
+  Grids, ExtCtrls, Buttons, ActnList;
 
 type
   TRunAndGetOutputProc = function (const cmd, params: string; Aout: TStrings): Integer of object;
@@ -29,7 +29,7 @@ type
     procedure acStartExecute(Sender: TObject);
     procedure acStartUpdate(Sender: TObject);
     procedure DrawGrid1DrawCell(Sender: TObject; aCol, aRow: Integer;
-      aRect: TRect; aState: TGridDrawState);
+      aRect: TRect; {%H-}aState: TGridDrawState);
     procedure Timer1Timer(Sender: TObject);
   private
     { private declarations }

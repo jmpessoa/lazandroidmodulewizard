@@ -84,11 +84,13 @@ object AndroidModule6: TAndroidModule6
     BackgroundColor = colbrWhite
     FontColor = colbrDefault
     FontSize = 0
+    HintTextColor = colbrSilver
     ScrollBarStyle = scrNone
     MaxLines = 1
     HorScrollBar = False
     VerScrollBar = False
     WrappingLine = True
+    Editable = True
     Id = 53166
   end
   object jButton1: jButton
@@ -108,7 +110,7 @@ object AndroidModule6: TAndroidModule6
     LayoutParamHeight = lpWrapContent
     Text = 'Add'
     BackgroundColor = colbrDefault
-    FontColor = colbrLightSteelBlue
+    FontColor = colbrCornflowerBlue
     FontSize = 0
     OnClick = jButton1Click
     Id = 0
@@ -135,11 +137,13 @@ object AndroidModule6: TAndroidModule6
     BackgroundColor = colbrWhite
     FontColor = colbrDefault
     FontSize = 0
+    HintTextColor = colbrSilver
     ScrollBarStyle = scrNone
     MaxLines = 1
     HorScrollBar = False
     VerScrollBar = False
     WrappingLine = True
+    Editable = True
     Id = 80017
   end
   object jTextView3: jTextView
@@ -183,12 +187,13 @@ object AndroidModule6: TAndroidModule6
     LayoutParamHeight = lpWrapContent
     Text = 'Delete'
     BackgroundColor = colbrDefault
-    FontColor = colbrLightSteelBlue
+    FontColor = colbrCornflowerBlue
     FontSize = 0
     OnClick = jButton2Click
     Id = 63804
   end
   object jListView1: jListView
+    Tag = 1
     Left = 8
     Top = 264
     Width = 283
@@ -208,7 +213,7 @@ object AndroidModule6: TAndroidModule6
       'Lazarus|The Best IDE'
       'Android|The Smart SO'
     )
-    BackgroundColor = colbrLightSteelBlue
+    BackgroundColor = colbrCornflowerBlue
     FontColor = colbrRed
     FontSize = 0
     WidgetItem = wgCheckBox
@@ -220,7 +225,6 @@ object AndroidModule6: TAndroidModule6
     TextAlign = alLeft
     OnClickItem = jListView1ClickItem
     OnClickWidgetItem = jListView1ClickWidgetItem
-    HighLightSelectedItem = True
     HighLightSelectedItemColor = colbrRed
     Id = 8951
   end
@@ -241,7 +245,7 @@ object AndroidModule6: TAndroidModule6
     LayoutParamHeight = lpWrapContent
     Text = 'ListView Items Clear '
     BackgroundColor = colbrDefault
-    FontColor = colbrLightSteelBlue
+    FontColor = colbrCornflowerBlue
     FontSize = 0
     OnClick = jButton3Click
     Id = 3040099
