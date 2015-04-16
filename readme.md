@@ -5,10 +5,21 @@
 	"A wizard to create JNI Android loadable module (.so) in Lazarus/Free Pascal using 
 	[datamodule like] Form Designer and Components!" 
 
-	Author: Jose Marques Pessoa : jmpessoa__hotmail_com
+	Authors: 
 
-		https://github.com/jmpessoa/lazandroidmodulewizard
-		http://forum.lazarus.freepascal.org/index.php/topic,21919.0.html
+		Jose Marques Pessoa : 
+			jmpessoa_hotmail_com
+			https://github.com/jmpessoa/lazandroidmodulewizard
+			http://forum.lazarus.freepascal.org/index.php/topic,21919.0.html
+
+		Simon,Choi / Choi,Won-sik
+			simonsayz@naver.com
+			http://blog.naver.com/simonsayz
+
+        	Anton A. Panferov 
+			ast.a_s@mail dot ru 
+                	https://github.com/odisey1245
+
 
 	Acknowledgements: 
               
@@ -94,6 +105,14 @@
 	*			see "build.bat" [or .sh] and "install.bat" or [.sh]
 	*			or Go To: Lazarus IDE menu "Run--> [Lamw] Build and Run"! Thanks to Anton!!!
 	****************************************************************************************************
+
+Version 0.6 - rev. 21 - 16 April 2015 - 
+
+	NEWS!  
+		jForm added method: IsPackageInstalled
+		jIntentManager added method: IsCallable 
+
+	NEW! Demo AppIntentDemoZXing1 [Eclipse Compatible Project] <<---A suggestion and request by  Liuzg2
 
 Version 0.6 - rev. 20 - 07 April 2015 - 
 
