@@ -91,6 +91,8 @@ jIntentManager = class(jControl)
     function GetContactNumber(_contactUri: jObject): string;
     function GetContactEmail(_contactUri: jObject): string;
     function GetBundleContent(_intent: jObject): TDynArrayOfString;
+    function IsCallable(_intent: jObject): boolean;
+
 
  published
     property IntentAction: TIntentAction read FIntentAction write SetIntentAction;
@@ -164,6 +166,7 @@ function jIntentManager_GetContactEmail(env: PJNIEnv; _jintentmanager: JObject; 
 function jIntentManager_GetBundleContent(env: PJNIEnv; _jintentmanager: JObject; _intent: jObject): TDynArrayOfString;
 
 procedure jIntentManager_SetAction(env: PJNIEnv; _jintentmanager: JObject; _intentAction: integer); overload;
+function jIntentManager_IsCallable(env: PJNIEnv; _jintentmanager: JObject; _intent: jObject): boolean;
 
 
 implementation
@@ -663,6 +666,13 @@ begin
   //in designing component state: result value here...
   if FInitialized then
    Result:= jIntentManager_GetBundleContent(FjEnv, FjObject, _intent);
+end;
+
+function jIntentManager.IsCallable(_intent: jObject): boolean;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jIntentManager_IsCallable(FjEnv, FjObject, _intent);
 end;
 
 {-------- jIntentManager_JNI_Bridge ----------}
@@ -1803,6 +1813,20 @@ begin
   jCls:= env^.GetObjectClass(env, _jintentmanager);
   jMethod:= env^.GetMethodID(env, jCls, 'SetAction', '(I)V');
   env^.CallVoidMethodA(env, _jintentmanager, jMethod, @jParams);
+end;
+
+function jIntentManager_IsCallable(env: PJNIEnv; _jintentmanager: JObject; _intent: jObject): boolean;
+var
+  jBoo: JBoolean;
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= _intent;
+  jCls:= env^.GetObjectClass(env, _jintentmanager);
+  jMethod:= env^.GetMethodID(env, jCls, 'IsCallable', '(Landroid/content/Intent;)Z');
+  jBoo:= env^.CallBooleanMethodA(env, _jintentmanager, jMethod, @jParams);
+  Result:= boolean(jBoo);
 end;
 
 end.

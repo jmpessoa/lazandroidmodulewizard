@@ -978,6 +978,8 @@ type
     function GetDevicePhoneNumber: String;
     function GetDeviceID: String;
 
+    function IsPackageInstalled(_packagename: string): boolean;
+
     // Property
     property View         : jObject        read FjRLayout {GetView } write FjRLayout;
     property ScreenStyle  : TScreenStyle   read FScreenStyle    write FScreenStyle;
@@ -1170,6 +1172,8 @@ end;
   function jForm_GetDrawableResourceById(env: PJNIEnv; _jform: JObject; _resID: integer): jObject;
   function jForm_GetQuantityStringByName(env: PJNIEnv; _jform: JObject; _resName: string; _quantity: integer): string;
   function jForm_GetStringResourceByName(env: PJNIEnv; _jform: JObject; _resName: string): string;
+
+  function jForm_IsPackageInstalled(env: PJNIEnv; _jform: JObject; _packagename: string): boolean;
 
 
 //jni API Bridge
@@ -2627,6 +2631,13 @@ begin
       Result:= jSysInfo_DeviceID(FjEnv, gApp.Jni.jThis);
 end;
 
+function jForm.IsPackageInstalled(_packagename: string): boolean;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jForm_IsPackageInstalled(FjEnv, FjObject, _packagename);
+end;
+
 {-------- jForm_JNI_Bridge ----------}
 
 function jForm_GetStringExtra(env: PJNIEnv; _jform: JObject; data: jObject; extraName: string): string;
@@ -3065,6 +3076,21 @@ begin
               Result:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
             end;
   end;
+  env^.DeleteLocalRef(env,jParams[0].l);
+end;
+
+function jForm_IsPackageInstalled(env: PJNIEnv; _jform: JObject; _packagename: string): boolean;
+var
+  jBoo: JBoolean;
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_packagename));
+  jCls:= env^.GetObjectClass(env, _jform);
+  jMethod:= env^.GetMethodID(env, jCls, 'IsPackageInstalled', '(Ljava/lang/String;)Z');
+  jBoo:= env^.CallBooleanMethodA(env, _jform, jMethod, @jParams);
+  Result:= boolean(jBoo);
   env^.DeleteLocalRef(env,jParams[0].l);
 end;
 
