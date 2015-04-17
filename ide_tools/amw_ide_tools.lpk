@@ -13,7 +13,7 @@
         <UnitOutputDirectory Value="lib\$(TargetCPU)-$(TargetOS)"/>
       </SearchPaths>
     </CompilerOptions>
-    <Files Count="17">
+    <Files Count="19">
       <Item1>
         <Filename Value="amw_ide_menu_items.pas"/>
         <HasRegisterProc Value="True"/>
@@ -83,6 +83,14 @@
         <Filename Value="uformstartemulator.pas"/>
         <UnitName Value="uFormStartEmulator"/>
       </Item17>
+      <Item18>
+        <Filename Value="androidmanifesteditor.lfm"/>
+        <Type Value="LFM"/>
+      </Item18>
+      <Item19>
+        <Filename Value="androidmanifesteditor.pas"/>
+        <UnitName Value="AndroidManifestEditor"/>
+      </Item19>
     </Files>
     <RequiredPkgs Count="3">
       <Item1>
