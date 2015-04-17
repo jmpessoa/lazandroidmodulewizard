@@ -259,15 +259,14 @@ begin
   // permissions
   r := FUsesSDKNode.NextSibling;
   for i := 0 to FPermissions.Count - 1 do
-    if FPermissions.Objects[i] <> nil then
-    begin
-      n := xml.CreateElement('uses-permission');
-      n.AttribStrings['android:name'] := FPermissions[i];
-      if Assigned(r) then
-        xml.ChildNodes[0].InsertBefore(n, r)
-      else
-        xml.ChildNodes[0].AppendChild(n);
-    end;
+  begin
+    n := xml.CreateElement('uses-permission');
+    n.AttribStrings['android:name'] := FPermissions[i];
+    if Assigned(r) then
+      xml.ChildNodes[0].InsertBefore(n, r)
+    else
+      xml.ChildNodes[0].AppendChild(n);
+  end;
   WriteXMLFile(xml, FFileName);
 end;
 
