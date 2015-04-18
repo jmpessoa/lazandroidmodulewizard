@@ -7,7 +7,7 @@
 
 	Authors: 
 
-		Jose Marques Pessoa : 
+		Jose Marques Pessoa
 			jmpessoa_hotmail_com
 			https://github.com/jmpessoa/lazandroidmodulewizard
 			http://forum.lazarus.freepascal.org/index.php/topic,21919.0.html
@@ -106,6 +106,76 @@
 	*			or Go To: Lazarus IDE menu "Run--> [Lamw] Build and Run"! Thanks to Anton!!!
 	****************************************************************************************************
 
+Version 0.6 - rev. 22 - 18 April 2015 - 
+	NEWS!  
+		jBitmap added methods: 
+				GetByteBuffer
+				GetBitmapFromByteBuffer
+				GetBitmapFromByteArray	
+
+
+	NEW! Demo AppTFPNoGUIGraphicsBridgeDemo1 [Eclipse Compatible Project] 
+		warning: Need Packages:
+				"tfpdxfwritebridge_pack.lpk"		ref. https://github.com/jmpessoa/tfpdxfwritebridge
+				"tfpnoguigraphicsbridge_pack.lpk"	ref. https://github.com/jmpessoa/tfpnoguigraphicsbridge
+
+Hint: TFPNoGuiGraphicsBridge on Android
+
+	--->>> Cross compile [Lamw/arm-android] project fail .... NO PANIC!
+
+PANIC I: Compiling ... [please, read lazarus or/as laz4android and ...\fpc\2.7.1 or/as ...\fpc\3.1.1 etc..]
+
+	"(FTFont.PPU and freetype.PPU) units NOT FOUND in "...\lazarus\fpc\2.7.1\units\arm-android\fcl-image" ???
+
+	Solution:
+
+	1. Goto "...\lazarus\fpc\2.7.1\source\packages\fcl-image\src" and copy
+
+		ftfont.pp (if need change to .pas)
+		freetype.pp (if need change to .pas)
+		freetypeh.pp (if need change to .pas)
+
+		to folder "...\tfpnoguigraphicsbridge" package folder and build AGAIN your project!
+
+		Yes, now you got ftfont.ppu, ftfont.o, freetype.ppu etc... to "arm-android" !
+
+	2. Copy THEM to folder  "...\lazarus\fpc\2.7.1\units\arm-android\fcl-image"
+		So, others [future] projects will find its there!  [solved to "arm-android" !!!]
+
+PANIC II: [building Lamw project cross-arm]::
+
+	".... : cannot find -lfreetype"
+
+	Solution:
+
+		Copy "libfreetype.so" to NDK location    "....\platforms\android-XX\arch-arm\usr\lib" 
+		where XX = 14 or 15 or 16... or 21 .. etc
+
+		For Lamw project you can look for "XX" value in menu: 
+		"Project" --->> "Project Options" ---> "Compile Options" -->> "Paths" --->> Libraries [-Fl]
+
+
+PANIC III. Where I find a "libfreetype.so" for arm-android ?
+
+	Go to demo "...\AppTFPNoGUIGraphicsBridgeDemo1\libs\armeabi" [Eclipse compatible Project]
+
+	You will find an "all ready" there! 
+
+PANIC IV.  Where "libfreetype.so" will be load in java code?
+
+	Go to "Controls.java" [\src\...\..] and uncomment this line:
+
+		--->> System.loadLibrary("freetype");
+
+	The code now will be:
+
+	//Load Pascal Library
+	static {   		
+      		System.loadLibrary("freetype");  // <<---uncommented here!
+      		System.loadLibrary("controls");    		
+	}
+	
+
 Version 0.6 - rev. 21 - 16 April 2015 - 
 
 	NEWS!  
@@ -113,6 +183,7 @@ Version 0.6 - rev. 21 - 16 April 2015 -
 		jIntentManager added method: IsCallable 
 
 	NEW! Demo AppIntentDemoZXing1 [Eclipse Compatible Project] <<---A suggestion and request by  Liuzg2
+
 
 Version 0.6 - rev. 20 - 07 April 2015 - 
 

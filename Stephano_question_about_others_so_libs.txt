@@ -1,0 +1,133 @@
+@Stephano Question:
+
+http://forum.lazarus.freepascal.org/index.php/topic,21919.300.html
+
+Quote
+...let's say somebody sends me a libcontrols1.so (produced using lawm) and I want to use it either with lawm (or some other tool). My question is how to use it with lawm ....
+
+Quote
+a- the java code make the calls to libcontrols1.so
+b- the pascal code make the calls to libcontrols1.so ...
+
+After some tests, I can share/show my findings:
+
+1. As case study [simplification!] I make use of a very simple "libMyLib.so"  
+[Ok, it was made by pure NDK using "C"]
+
+You can get from here: https://jmpessoa.opendrive.com/files?Ml83NzE5Mjk1NV95QmRpUw  
+
+The produce project [.rar] is here: https://jmpessoa.opendrive.com/files?Ml83NzE5MzU4OV9MTFZjMg
+
+Why not a ".so" made by Lamw? Only because at the moment [as is] Lamw can not do a very very "raw" .so  [TODO list!] --- but everything written here works with a ".so"produced by Pascal/Lamw!
+
+2. Here is the "MyLib.java" code:
+
+Code: [Select]
+package jmpessoa.ndktest;
+
+public class MyLib {
+
+   static {
+        System.loadLibrary("MyLib");
+    }
+
+    public native int add(int x, int y);
+    public native String getHello();	
+}
+
+And here is the JNI "C" export  signature : [by libMyLib.so]
+Code: [Select]
+JNIEXPORT jint JNICALL Java_jmpessoa_ndktest_MyLib_add(JNIEnv *, jobject, jint, jint);
+JNIEXPORT jstring JNICALL Java_jmpessoa_ndktest_MyLib_getHello(JNIEnv *, jobject);
+
+And here is the JNI "Pascal/Lamw" equivalent exports signature:
+Code: [Select]
+function Java_jmpessoa_ndktest_MyLib_add(PEnv: PJNIEnv; this: JObject;  x:jInt, y:jInt): jInt;
+function Java_jmpessoa_ndktest_MyLib_getHello(PEnv: PJNIEnv; this: JObject): jString;
+
+Yes, this method name format is mandatory for JNI "Java_pagckagename_classname_methodname"
+
+Question b [SOLVED!!!]: the Pascal/Lamw code can make calls to "libMyLib.so" !!
+
+b.1 - Prepare to Linker [-Fl] 
+
+In my system I  Copied the "libMyLib.so" to C:\adt32\ndk10\platforms\android-13\arch-arm\usr\lib\
+
+b.2 - Prepare to Apk
+
+Copy "libMyLib.so"   to  "..\libs" yes, together with "libcontrols.so"
+
+b.3 - Declare the library and methods in your Pascal/Lamw code:
+
+Quote
+const NATIVE_LIB = 'libMyLib.so';
+
+function Add(PEnv: PJNIEnv; this: jObject; x: jInt; y:jInt): jInt; cdecl; external NATIVE_LIB name 'Java_jmpessoa_ndktest_MyLib_add';
+
+function GetHello(PEnv: PJNIEnv; this: jObject): jString; cdecl; external NATIVE_LIB name 'Java_jmpessoa_ndktest_MyLib_getHello';
+
+b.3 - Use it!
+
+Code: [Select]
+procedure TAndroidModule1.jButton1Click(Sender: TObject);
+var
+  sum: integer;
+  hello: string;
+begin
+   sum:= Add(gApp.Jni.jEnv,gApp.Jni.jThis,10,20);
+   ShowMessage(IntTostr(sum));
+   
+   hello:= Get_pString( GetHello(gApp.Jni.jEnv,gApp.Jni.jThis) ); 
+   ShowMessage(hello);
+
+   //Get_pString <--> convert java string to pascal string    
+end;
+
+Yes!! Pascal/Lamw can use it!!
+
+Considerations: in fact Pacal/Lamw no matter how the function name/signature was "designate" [exports],  so we can use any ".so" compiled to android/arm/x86 etc... even more complex made by Lamw!
+
+Question a:  the java code make the calls to libMyLib.so
+
+a.1 In the same/"natural" package [ no problem ....] just copy it to "...\libs"    and use it!
+
+Code: [Select]
+package jmpessoa.ndktest;
+
+public class MainActivity extends Activity {
+	
+       //From JNI
+       MyLib mylib = new MyLib();        
+   
+    String helloFromC = mylib.getHello();
+    int sum = mylib.add(2,5);
+
+    ...........................
+}
+
+a.2 In the "strange" package: NOT!!!
+
+why? the original exported name JNI preface: "Java_jmpessoa_ndktest_"  need match!
+
+Code: [Select]
+package strange.test;
+
+public class MyLib {
+
+   static {
+        System.loadLibrary("MyLib");
+    }
+
+    public native int add(int x, int y);
+    public native String getHello();	
+}
+
+Fail! Native method not found! 
+because: "Java_strange_test_MyLib_add"  and "Java_strange_test_MyLib_getHello" was expected but "Java_jmpessoa_ndktest_*" was found!
+
+[workaround] You can force and design [your new project]  package "preface.name" as expected, that is: "jmpessoa.ndktest"!
+
+conclusion: native Pascal/Lamw can do! java? need a workaround...
+
+
+Thank you! 

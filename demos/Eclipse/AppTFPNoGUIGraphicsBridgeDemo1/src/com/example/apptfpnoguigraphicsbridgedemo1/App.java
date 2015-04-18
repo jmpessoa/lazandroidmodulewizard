@@ -1,6 +1,6 @@
-package com.example.dummyapp;
+package com.example.apptfpnoguigraphicsbridgedemo1;
 
-//Lamw: Lazarus Android Module Wizard - Version 0.6 - rev. 22 - 18 April - 2015
+//Lamw: Lazarus Android Module Wizard - Version 0.6 - rev. 21 - 16 April - 2015
 //Form Designer and Components development model!
 //Author: jmpessoa@hotmail.com
 //https://github.com/jmpessoa/lazandroidmodulewizard

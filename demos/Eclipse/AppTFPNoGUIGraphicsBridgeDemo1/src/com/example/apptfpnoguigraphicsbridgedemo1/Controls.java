@@ -1,4 +1,4 @@
-package com.example.dummyapp;
+package com.example.apptfpnoguigraphicsbridgedemo1;
 
 //Lamw: Lazarus Android Module Wizard - Version 0.6 - rev. 22 - 18 April - 2015
 //Form Designer and Components development model!
@@ -4898,8 +4898,6 @@ private Controls        controls = null;   // Control Class for Event
 
 //
 public  Bitmap bmp    = null;
-
-
 
 // Constructor
 public  jBitmap(Controls ctrls, long pasobj ) {
@@ -11549,12 +11547,9 @@ public native void pOnPinchZoomGestureDetected(long pasobj, float scaleFactor, i
 
 //Load Pascal Library
 static {
-    //Log.i("JNI_Java", "1.load libcontrols.so");
-
-    //System.loadLibrary("freetype"); // need by TFPNoGUIGraphicsBrige
-
+   // Log.i("JNI_Java", "1.load libcontrols.so");
+	System.loadLibrary("freetype");
     System.loadLibrary("controls");
-
     //Log.i("JNI_Java", "2.load libcontrols.so");  
 }
 
