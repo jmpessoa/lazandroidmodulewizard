@@ -21,15 +21,18 @@ object LamwAndroidManifestEditor: TLamwAndroidManifestEditor
     Top = 66
     Width = 308
     Anchors = [akTop, akLeft, akRight, akBottom]
+    AutoFillColumns = True
     BorderSpacing.Around = 6
     ColCount = 2
     Columns = <    
       item
         ReadOnly = True
         Title.Caption = 'Permissions'
+        Width = 240
       end    
       item
         ButtonStyle = cbsCheckboxColumn
+        SizePriority = 0
         Title.Alignment = taCenter
         Title.Caption = 'Enabled'
       end>
@@ -37,7 +40,10 @@ object LamwAndroidManifestEditor: TLamwAndroidManifestEditor
     Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goRangeSelect, goEditing, goThumbTracking, goSmoothScroll]
     RowCount = 1
     TabOrder = 0
-    OnResize = PermissonGridResize
+    ColWidths = (
+      240
+      64
+    )
   end
   object ErrorPanel: TPanel
     AnchorSideLeft.Control = Owner

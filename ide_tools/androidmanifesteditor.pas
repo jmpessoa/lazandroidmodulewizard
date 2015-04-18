@@ -45,7 +45,6 @@ type
     seMinSdkVersion: TSpinEdit;
     seTargetSdkVersion: TSpinEdit;
     PermissonGrid: TStringGrid;
-    procedure PermissonGridResize(Sender: TObject);
   private
     { private declarations }
     FOptions: TLamwAndroidManifestOptions;
@@ -271,12 +270,6 @@ begin
 end;
 
 { TLamwAndroidManifestEditor }
-
-procedure TLamwAndroidManifestEditor.PermissonGridResize(Sender: TObject);
-begin
-  with PermissonGrid do
-    ColWidths[0] := ClientWidth - ColWidths[1];
-end;
 
 procedure TLamwAndroidManifestEditor.SetControlsEnabled(en: Boolean);
 var
