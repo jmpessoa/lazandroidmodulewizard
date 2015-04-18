@@ -37,7 +37,7 @@
     </RunParams>
     <RequiredPackages Count="2">
       <Item1>
-        <PackageName Value="tfpnoguigraphicsbridge_lazarus_pack"/>
+        <PackageName Value="tfpnoguigraphicsbridge_pack"/>
       </Item1>
       <Item2>
         <PackageName Value="tfpandroidbridge_pack"/>

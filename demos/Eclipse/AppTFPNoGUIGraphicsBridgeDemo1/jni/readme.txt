@@ -65,7 +65,7 @@ PANIC IV.  Where "libfreetype.so" will be load in java code?
 
 		--->> System.loadLibrary("freetype");
 
-	The code now will be:
+	The code now will stay that way:
 
 	//Load Pascal Library
 	static {   		
