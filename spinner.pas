@@ -335,10 +335,13 @@ end;
 
 procedure jSpinner.UpdateLayout;
 begin
-  inherited UpdateLayout;
-  UpdateLParamWidth;
-  UpdateLParamHeight;
-  jSpinner_SetLayoutAll(FjEnv, FjObject , Self.AnchorId);
+  if FInitialized then
+  begin
+    inherited UpdateLayout;
+    UpdateLParamWidth;
+    UpdateLParamHeight;
+    jSpinner_SetLayoutAll(FjEnv, FjObject, Self.AnchorId);
+  end;
 end;
 
 procedure jSpinner.Refresh;
