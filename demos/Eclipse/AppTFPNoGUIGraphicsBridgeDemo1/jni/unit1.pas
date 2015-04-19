@@ -66,18 +66,17 @@ begin
    w:= jPanel2.Width;
    h:= jPanel2.Height;
 
+   FPNoGUIGraphicsBridge1.SetSurfaceSize(w,h);
+   FPNoGUIGraphicsBridge1.PathToFontFile:= '/system/fonts/Roboto-Regular.ttf'; //DroidSerif-Bold.ttf
+
    ViewPort1.Width:= w;
    ViewPort1.Height:= h;
    ViewPort1.DrawAxis:= True;
    ViewPort1.DrawGrid:= True;
-
-   //ViewPort1.FontColor:= colbrGreen;
-
    ViewPort1.SetScaleXY(-1.6 {xmin},1.6{xmax}, -2.0{ymin}, 6.0{ymax}); //real world!!!
 
-   FPNoGUIGraphicsBridge1.SetSize(w,h);
-                                                              //DroidSerif-Bold.ttf
-   FPNoGUIGraphicsBridge1.PathToFontFile:= '/system/fonts/Roboto-Regular.ttf';
+   //warning/reminder: active viewport --->> ViewPort1
+   //FPNoGUIGraphicsBridge1.ViewPort:= ViewPort1; //set in Object inspector!
 
    FPNoGUIGraphicsBridge1.AddEntity('blue_layer','Circle',[Point(0.0,1.0){left/top},
                                                            Point(1.0,0.0){right/botom}],'This is a Circle!','foo');
