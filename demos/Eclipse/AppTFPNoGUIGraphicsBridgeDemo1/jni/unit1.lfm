@@ -135,7 +135,7 @@ object AndroidModule1: TAndroidModule1
     EntityData.TagLabel = 'Label1'
     EntityData.FieldSeparator = ';'
     EntityData.NameValueSeparator = '#'
-    ViewPort = ViewPort1
+    ActiveViewPort = ViewPort1
     left = 64
     top = 440
   end

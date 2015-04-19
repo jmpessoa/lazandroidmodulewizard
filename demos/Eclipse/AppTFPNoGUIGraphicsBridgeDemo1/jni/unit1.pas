@@ -59,57 +59,50 @@ end;
 
 procedure TAndroidModule1.jButton1Click(Sender: TObject);
 var
- jGraphicsBuffer: jObject;
- w, h: integer;
+  jGraphicsBuffer: jObject;
+  w, h: integer;
 begin
+  w:= jPanel2.Width;
+  h:= jPanel2.Height;
 
-   w:= jPanel2.Width;
-   h:= jPanel2.Height;
+  FPNoGUIGraphicsBridge1.SetSurfaceSize(w,h);
+  FPNoGUIGraphicsBridge1.PathToFontFile:= '/system/fonts/Roboto-Regular.ttf'; //DroidSerif-Bold.ttf
+  FPNoGUIGraphicsBridge1.ActiveViewPort:= ViewPort1; //set in Object inspector!
 
-   FPNoGUIGraphicsBridge1.SetSurfaceSize(w,h);
-   FPNoGUIGraphicsBridge1.PathToFontFile:= '/system/fonts/Roboto-Regular.ttf'; //DroidSerif-Bold.ttf
+  ViewPort1.SetSize(w,h);
+  ViewPort1.DrawAxis:= True;
+  ViewPort1.DrawGrid:= True;
+  ViewPort1.SetScaleXY(-1.6 {xmin},1.6{xmax}, -2.0{ymin}, 6.0{ymax}); //real world!!
 
-   ViewPort1.Width:= w;
-   ViewPort1.Height:= h;
-   ViewPort1.DrawAxis:= True;
-   ViewPort1.DrawGrid:= True;
-   ViewPort1.SetScaleXY(-1.6 {xmin},1.6{xmax}, -2.0{ymin}, 6.0{ymax}); //real world!!!
-
-   //warning/reminder: active viewport --->> ViewPort1
-   //FPNoGUIGraphicsBridge1.ViewPort:= ViewPort1; //set in Object inspector!
-
-   FPNoGUIGraphicsBridge1.AddEntity('blue_layer','Circle',[Point(0.0,1.0){left/top},
+  FPNoGUIGraphicsBridge1.AddEntity('blue_layer','Circle',[Point(0.0,1.0){left/top},
                                                            Point(1.0,0.0){right/botom}],'This is a Circle!','foo');
 
-   FPNoGUIGraphicsBridge1.AddEntity('blue_layer','Line',[Point(0.0,1.5),Point(1.0, 3.6)],'','foo');
-   FPNoGUIGraphicsBridge1.AddEntity('blue_layer','Polyline',[Point(0.0,1.5),Point(0.5,1),
+  FPNoGUIGraphicsBridge1.AddEntity('blue_layer','Line',[Point(0.0,1.5),Point(1.0, 3.6)],'','foo');
+  FPNoGUIGraphicsBridge1.AddEntity('blue_layer','Polyline',[Point(0.0,1.5),Point(0.5,1),
                                                              Point(1.0,1.5), Point(0.5,2)],'','');
 
-   FPNoGUIGraphicsBridge1.AddEntity('blue_layer','Text',[Point(0.0,0.5)],'Hello World!','');
+  FPNoGUIGraphicsBridge1.AddEntity('blue_layer','Text',[Point(0.0,0.5)],'Hello World!','');
 
-   FPNoGUIGraphicsBridge1.AddFunction(@GenericFunction1,-1.6,1.6);
-   FPNoGUIGraphicsBridge1.AddFunction(@GenericFunction2,-1.6,1.6);
+  FPNoGUIGraphicsBridge1.AddFunction(@GenericFunction1,-1.6,1.6);
+  FPNoGUIGraphicsBridge1.AddFunction(@GenericFunction2,-1.6,1.6);
 
-   FPNoGUIGraphicsBridge1.PaintViewPort;
-   FPNoGUIGraphicsBridge1.PaintGrid(True);
+  FPNoGUIGraphicsBridge1.PaintViewPort;
+  FPNoGUIGraphicsBridge1.PaintGrid(True);
 
-   ViewPort1.PenColor:= colbrBlue;
-   FPNoGUIGraphicsBridge1.DrawEntities('blue_layer');
+  ViewPort1.PenColor:= colbrBlue;
+  FPNoGUIGraphicsBridge1.DrawEntities('blue_layer');
 
-   //ViewPort1.PenColor:= colbrGreen;
-   //FPNoGUIGraphicsBridge1.DrawEntities('green_layer');   //from "datagraph.txt"
+  ViewPort1.PenColor:= colbrRed;
+  FPNoGUIGraphicsBridge1.DrawFunction(False, 0);
+  FPNoGUIGraphicsBridge1.DrawFunction(False, 1);
 
-   ViewPort1.PenColor:= colbrRed;
-   FPNoGUIGraphicsBridge1.DrawFunction(False, 0);
-   FPNoGUIGraphicsBridge1.DrawFunction(False, 1);
+  jGraphicsBuffer:= jBitmap1.GetByteBuffer(w,h);
 
-   jGraphicsBuffer:= jBitmap1.GetByteBuffer(w,h);
+  PGlobalDirectImagePixel:= jBitmap1.GetDirectBufferAddress(jGraphicsBuffer);
 
-   PGlobalDirectImagePixel:= jBitmap1.GetDirectBufferAddress(jGraphicsBuffer);
+  FPNoGUIGraphicsBridge1.Surface.GetRGBAGraphics(PGlobalDirectImagePixel);
 
-   FPNoGUIGraphicsBridge1.Surface.GetRGBAGraphics(PGlobalDirectImagePixel);
-
-   jImageView1.SetImageBitmap(jBitmap1.GetBitmapFromByteBuffer(jGraphicsBuffer, w, h));
+  jImageView1.SetImageBitmap(jBitmap1.GetBitmapFromByteBuffer(jGraphicsBuffer, w, h));
 end;
 
 { Android:
