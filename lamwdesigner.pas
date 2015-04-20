@@ -35,14 +35,13 @@ type
 
   TAndroidWidgetMediator = class(TDesignerMediator,IAndroidWidgetDesigner)
   private
-    FAndroidForm: jForm;
     FDefaultBrushColor: TColor;
     FDefaultPenColor: TColor;
     FDefaultFontColor: TColor;
     FIgnoreLayout: Boolean;
     FStarted, FDone: TFPList;
+    function GetAndroidForm: jForm;
   protected
-    procedure Notification(AComponent: TComponent; Operation: TOperation); override;
     procedure OnDesignerModified(Sender: TObject);
   public
     //needed by the lazarus form editor
@@ -65,7 +64,7 @@ type
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
     procedure InvalidateRect(Sender: TObject; ARect: TRect; Erase: boolean);
-    property AndroidForm: jForm read FAndroidForm;
+    property AndroidForm: jForm read GetAndroidForm;
   public
     procedure GetObjInspNodeImageIndex(APersistent: TPersistent; var AIndex: integer); override;
   end;
@@ -464,8 +463,6 @@ destructor TAndroidWidgetMediator.Destroy;
 begin
   FStarted.Free;
   FDone.Free;
-  if FAndroidForm<>nil then FAndroidForm.Designer:=nil;
-  FAndroidForm:=nil;
   if GlobalDesignHook <> nil then
     GlobalDesignHook.RemoveAllHandlersForObject(Self);
   inherited Destroy;
@@ -483,7 +480,7 @@ begin
   begin
     Instance := TPropertyEditor(Sender).GetComponent(i);
     if (Instance is jVisualControl)
-    and (jVisualControl(Instance).Owner = FAndroidForm) then
+    and (jVisualControl(Instance).Owner = AndroidForm) then
     begin
       InvalidateNeeded := True;
       Break;
@@ -493,12 +490,9 @@ begin
     LCLForm.Invalidate;
 end;
 
-procedure TAndroidWidgetMediator.Notification(AComponent: TComponent;
-  Operation: TOperation);
+function TAndroidWidgetMediator.GetAndroidForm: jForm;
 begin
-  inherited Notification(AComponent, Operation);
-  if (Operation = opRemove) and (AComponent = FAndroidForm) then
-    FAndroidForm := nil;
+  Result := jForm(Root);
 end;
 
 class function TAndroidWidgetMediator.CreateMediator(TheOwner, TheForm: TComponent): TDesignerMediator;
@@ -513,9 +507,7 @@ begin
   Mediator.FDefaultPenColor:= clMedGray;
   Mediator.FDefaultFontColor:= clMedGray;
 
-  Mediator.FAndroidForm:= jForm(TheForm);
-  TheForm.FreeNotification(Mediator);
-  Mediator.FAndroidForm.Designer:= Mediator;
+  Mediator.AndroidForm.Designer:= Mediator;
 end;
 
 class function TAndroidWidgetMediator.FormClass: TComponentClass;
@@ -579,7 +571,7 @@ end;
 procedure TAndroidWidgetMediator.InitComponent(AComponent, NewParent: TComponent;
   NewBounds: TRect);
 begin
-  if AComponent <> FAndroidForm then // to preserve size
+  if AComponent <> AndroidForm then // to preserve size
     inherited InitComponent(AComponent, NewParent, NewBounds);
 end;
 
