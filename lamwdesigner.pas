@@ -1322,9 +1322,9 @@ begin
       lastSize := Pen.Width;
       Pen.Width := 4;
       Pen.Color := RGBToColor($44,$B3,$DD);
-      MoveTo(10, 12);
-      LineTo(14, 17);
-      LineTo(24, 6);
+      MoveTo(12, 13);
+      LineTo(16, 18);
+      LineTo(26, 7);
       Pen.Width := lastSize;
     end;
   end;
