@@ -1396,7 +1396,7 @@ begin
     if jRadioButton(FAndroidWidget).Checked then
     begin
       Brush.Color := RGBToColor(0,$99,$CC);
-      Ellipse(6+3, 6+3, 23-3, 23-3);
+      Ellipse(7+3, 6+3, 25-3, 24-3);
     end;
   end;
 end;
