@@ -121,6 +121,7 @@ type
   public
     constructor Create(AWidget: TAndroidWidget; Canvas: TCanvas); override;
     procedure Draw; override;
+    procedure UpdateLayout; override;
   end;
 
   { TDraftCheckBox }
@@ -1168,6 +1169,17 @@ begin
     TextRect(r, r.Left, r.Top, FAndroidWidget.Text, ts);
     Font.Size := lastFontSize;
   end;
+end;
+
+procedure TDraftButton.UpdateLayout;
+begin
+  with jButton(FAndroidWidget) do
+    if LayoutParamHeight = lpWrapContent then
+    begin
+      FnewH := 14 + AndroidToLCLFontSize(jButton(FAndroidWidget).FontSize, 13) + 13;
+      if FnewH < 40 then FnewH := 40;
+    end;
+  inherited UpdateLayout;
 end;
 
 { TDraftTextView }
