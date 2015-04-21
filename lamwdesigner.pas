@@ -147,6 +147,7 @@ type
   public
     constructor Create(AWidget: TAndroidWidget; Canvas: TCanvas); override;
     procedure Draw; override;
+    procedure UpdateLayout; override;
   end;
 
   { TDraftListView }
@@ -1454,11 +1455,11 @@ begin
   with Fcanvas do
   begin
     Brush.Color := RGBToColor($ad,$ad,$ad);
-    r := Rect(0, 1, Self.Width, 4);
+    r := Rect(0, 10, Self.Width, 13);
     FillRect(r);
     Brush.Color := RGBToColor($44,$B3,$DD);
-    r.Top := 0;
-    r.Bottom := 3;
+    r.Top := 9;
+    r.Bottom := 12;
     if jProgressBar(FAndroidWidget).Max <= 0 then
       jProgressBar(FAndroidWidget).Max := 100;
     x := Self.Width * jProgressBar(FAndroidWidget).Progress
@@ -1474,6 +1475,14 @@ begin
     end};
     FillRect(r);
   end;
+end;
+
+procedure TDraftProgressBar.UpdateLayout;
+begin
+  with jProgressBar(FAndroidWidget) do
+    if LayoutParamHeight = lpWrapContent then
+      FnewH := 23;
+  inherited UpdateLayout;
 end;
 
 { TDraftListView }
