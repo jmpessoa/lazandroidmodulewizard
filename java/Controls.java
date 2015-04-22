@@ -1,6 +1,6 @@
-package com.example.appintentdemozxing1;
+package com.example.dummyapp;
 
-//Lamw: Lazarus Android Module Wizard - Version 0.6 - rev. 21 - 16 April - 2015
+//Lamw: Lazarus Android Module Wizard - Version 0.6 - rev. 22 - 18 April - 2015
 //Form Designer and Components development model!
 //Author: jmpessoa@hotmail.com
 //https://github.com/jmpessoa/lazandroidmodulewizard
@@ -205,6 +205,7 @@ import java.net.HttpURLConnection;
 //import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.nio.ByteBuffer;
 //import java.nio.ByteBuffer;
 //import java.nio.ByteOrder;
 //import java.nio.IntBuffer;
@@ -4894,8 +4895,11 @@ class jBitmap {
 // Java-Pascal Interface
 private long             PasObj   = 0;      // Pascal Obj
 private Controls        controls = null;   // Control Class for Event
+
 //
 public  Bitmap bmp    = null;
+
+
 
 // Constructor
 public  jBitmap(Controls ctrls, long pasobj ) {
@@ -5082,13 +5086,31 @@ public Bitmap GetResizedBitmap(int _newWidth, int _newHeight){
    return bm;
 }
 
-public Bitmap GetResizedBitmap(float _factorScaleX, float _factorScaleY ){
+ public Bitmap GetResizedBitmap(float _factorScaleX, float _factorScaleY ){
    float factorToUse = (_factorScaleY > _factorScaleX) ? _factorScaleX : _factorScaleY;
    Bitmap bm = Bitmap.createScaledBitmap(bmp,
      (int) (bmp.getWidth() * factorToUse),
      (int) (bmp.getHeight() * factorToUse),false);     
    return bm;
-}
+ }
+
+  public ByteBuffer GetByteBuffer(int _width, int _height) {	  
+	ByteBuffer graphicBuffer = ByteBuffer.allocateDirect(_width*_height*4);    
+    return graphicBuffer;    
+  }
+
+  public Bitmap GetBitmapFromByteBuffer(ByteBuffer _byteBuffer, int _width, int _height) {	  
+	  Bitmap bm = Bitmap.createBitmap(_width, _height, Bitmap.Config.ARGB_8888);					 
+      bm.copyPixelsFromBuffer(_byteBuffer);  	
+      return bm;
+  }
+  
+  //by jmpessoa
+  public Bitmap GetBitmapFromByteArray(byte[] _image) {
+	Bitmap bm = BitmapFactory.decodeByteArray(_image, 0, _image.length);
+	return bm;
+	//Log.i("SetByteArrayToBitmap","size="+ image.length);
+  }
 
 }
 
@@ -11527,8 +11549,12 @@ public native void pOnPinchZoomGestureDetected(long pasobj, float scaleFactor, i
 
 //Load Pascal Library
 static {
-   // Log.i("JNI_Java", "1.load libcontrols.so");
+    //Log.i("JNI_Java", "1.load libcontrols.so");
+
+    //System.loadLibrary("freetype"); // need by TFPNoGUIGraphicsBrige
+
     System.loadLibrary("controls");
+
     //Log.i("JNI_Java", "2.load libcontrols.so");  
 }
 

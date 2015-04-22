@@ -1815,17 +1815,15 @@ end;
 procedure TAndroidWidget.SetBounds(NewLeft, NewTop, NewWidth, NewHeight: integer);
 begin
   if (Left=NewLeft) and (Top=NewTop) and (Width=NewWidth) and (Height=NewHeight) then Exit;
-  if (csDesigning in ComponentState) then Invalidate;;
   FLeft:=NewLeft;
   FTop:=NewTop;
   FWidth:=NewWidth;
   FHeight:=NewHeight;
-  if (Self is jForm) then
-  begin
-    if FWidth < 300 then FWidth:= 300;
-    if FHeight < 600 then FHeight:= 600;
-  end;
-  if (csDesigning in ComponentState) then Invalidate;;
+  if (csDesigning in ComponentState) then
+    if Assigned(Parent) then
+      Parent.Invalidate
+    else
+      Invalidate
 end;
 
 procedure TAndroidWidget.InvalidateRect(ARect: TRect; Erase: boolean);
@@ -2104,6 +2102,9 @@ begin
   FMarginLeft:= 0;
   FMarginRight:= 0;
   FMarginTop:= 0;
+
+  FWidth := 320;
+  FHeight := 400;
 
   //-------------- dummies for compatibility----
   //FOldCreateOrder:= False;

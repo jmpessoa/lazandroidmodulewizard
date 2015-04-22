@@ -421,6 +421,12 @@ type
     function GetResizedBitmap(_newWidth: integer; _newHeight: integer): jObject; overload;
     function GetResizedBitmap(_factorScaleX: single; _factorScaleY: single): jObject; overload;
 
+    function GetByteBuffer(_width: integer; _height: integer): jObject;
+    function GetBitmapFromByteBuffer(_byteBuffer: jObject; _width: integer; _height: integer): jObject;
+    function GetBitmapFromByteArray(var _image: TDynArrayOfJByte): jObject;
+
+    function GetDirectBufferAddress(byteBuffer: jObject): PJByte;
+
   published
     property FilePath: TFilePath read FFilePath write FFilePath;
     property ImageIndex: integer read FImageIndex write SetImageIndex;
@@ -6222,6 +6228,32 @@ begin
   //in designing component state: result value here...
   if FInitialized then
    Result:= jBitmap_GetResizedBitmap(FjEnv, FjObject, _factorScaleX ,_factorScaleY);
+end;
+
+function jBitmap.GetByteBuffer(_width: integer; _height: integer): jObject;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jBitmap_GetByteBuffer(FjEnv, FjObject, _width ,_height);
+end;
+
+function jBitmap.GetBitmapFromByteBuffer(_byteBuffer: jObject; _width: integer; _height: integer): jObject;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jBitmap_GetBitmapFromByteBuffer(FjEnv, FjObject, _byteBuffer ,_width ,_height);
+end;
+
+function jBitmap.GetBitmapFromByteArray(var _image: TDynArrayOfJByte): jObject;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jBitmap_GetBitmapFromByteArray(FjEnv, FjObject, _image);
+end;
+
+function jBitmap.GetDirectBufferAddress(byteBuffer: jObject): PJByte;
+begin
+   Result:= PJByte((FjEnv^).GetDirectBufferAddress(FjEnv,byteBuffer));
 end;
 
 //------------------------------------------------------------------------------
