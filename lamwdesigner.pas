@@ -113,6 +113,7 @@ type
   public
     constructor Create(AWidget: TAndroidWidget; Canvas: TCanvas); override;
     procedure Draw; override;
+    procedure UpdateLayout; override;
   end;
 
   { TDraftButton }
@@ -797,22 +798,6 @@ procedure TAndroidWidgetMediator.Paint;
         fWidget.Draw;
         fWidget.Free;
       end else
-      if (AWidget is jEditText) then
-      begin
-         fWidget:= TDraftEditText.Create(AWidget, LCLForm.Canvas);
-         fWidget.Height:= AWidget.Height;
-         fWidget.Width:= AWidget.Width;
-         fWidget.MarginLeft:= AWidget.MarginLeft;
-         fWidget.MarginTop:= AWidget.MarginTop;
-         fWidget.MarginRight:= AWidget.MarginRight;
-         fWidget.MarginBottom:= AWidget.MarginBottom;
-
-         fWidget.Color:= (AWidget as jEditText).BackgroundColor;
-         fWidget.FontColor:= (AWidget as jEditText).FontColor;
-
-         fWidget.Draw;
-         fWidget.Free;
-      end else
       if (AWidget is jListView)  then
       begin
          fWidget:= TDraftListView.Create(AWidget, LCLForm.Canvas);
@@ -1253,37 +1238,56 @@ end;
 constructor TDraftEditText.Create(AWidget: TAndroidWidget; Canvas: TCanvas);
 begin
   inherited;
-  BackGroundColor:= clNone; //clActiveCaption;
+  Color := jEditText(AWidget).BackgroundColor;
+  FontColor := jEditText(AWidget).FontColor;
 end;
 
 procedure TDraftEditText.Draw;
+var
+  ls: Integer;
 begin
-  Fcanvas.Brush.Color:= Self.BackGroundColor;
-  Fcanvas.Pen.Color:= clActiveCaption;
-  Fcanvas.Font.Color:= Self.TextColor;
+  with FCanvas do
+  begin
+    if BackgroundColor <> clNone then
+    begin
+      Brush.Color := BackGroundColor;
+      FillRect(0, 0, FAndroidWidget.Width, FAndroidWidget.Height);
+    end else
+      Brush.Style := bsClear;
+    if TextColor = clNone then
+      Font.Color := clBlack
+    else
+      Font.Color := TextColor;
+    ls := Font.Size;
+    Font.Size := AndroidToLCLFontSize(jEditText(FAndroidWidget).FontSize, 13);
+    TextOut(12, 9, jEditText(FAndroidWidget).Text);
+    Font.Size := ls;
+    if BackgroundColor = clNone then
+    begin
+      Pen.Color := RGBToColor(175,175,175);
+      with FAndroidWidget do
+      begin
+        MoveTo(4, Height - 8);
+        Lineto(4, Height - 5);
+        Lineto(Width - 4, Height - 5);
+        Lineto(Width - 4, Height - 8);
+      end;
+    end;
+  end;
+end;
 
-  if Self.BackGroundColor = clNone then
-    Fcanvas.Brush.Color:= clWhite;
-
-  if Self.TextColor = clNone then
-     Fcanvas.Font.Color:= clBlack;
-
-  Fcanvas.FillRect(0,0,Self.Width,Self.Height);
-      // outer frame
-  Fcanvas.Rectangle(0,0,Self.Width,Self.Height);
-
- (* canvas.Pen.Color:= clBlack;
-  canvas.MoveTo(Self.Width-Self.MarginRight+9, {x2}Self.MarginTop-9); {y1}
-  canvas.LineTo(Self.MarginLeft-9,Self.MarginTop-9);  {x1, y1}
-  canvas.LineTo(Self.MarginLeft-9,Self.Height-Self.MarginBottom+9); {x1, y2}*)
-
-  Fcanvas.Pen.Color:= clBlack; //clWindowFrame; //clBlack;//clGray; //Self.FDefaultPenColor;
-
-  Fcanvas.Brush.Style:= bsClear;
-  Fcanvas.Rectangle(2,2,Self.Width-2,Self.Height-2);
-
-
-  Fcanvas.TextOut(5, 4, FAndroidWidget.Text);
+procedure TDraftEditText.UpdateLayout;
+var
+  fs: Integer;
+begin
+  with jEditText(FAndroidWidget) do
+    if LayoutParamHeight = lpWrapContent then
+    begin
+      fs := FontSize;
+      if fs = 0 then fs := 18;
+      FnewH := 29 + (fs - 10) * 4 div 3; // todo: multile
+    end;
+  inherited UpdateLayout;
 end;
 
 { TDraftCheckBox }
@@ -1992,6 +1996,7 @@ initialization
   RegisterAndroidWidgetDraftClass(jRadioButton, TDraftRadioButton);
   RegisterAndroidWidgetDraftClass(jTextView, TDraftTextView);
   RegisterAndroidWidgetDraftClass(jPanel, TDraftPanel);
+  RegisterAndroidWidgetDraftClass(jEditText, TDraftEditText);
 
 finalization
   DraftClassesMap.Free;
