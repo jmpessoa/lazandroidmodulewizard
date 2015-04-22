@@ -1989,8 +1989,9 @@ end;
 procedure jVisualControl.SetParamWidth(Value: TLayoutParams);
 begin
   FLParamWidth:= Value;
-  if (csDesigning in ComponentState) and (Value <> lpMatchParent) and (Value <> lpWrapContent) then
-    FLParamWidth:= GetDesignerLayoutByWH(Self.Width, Self.Parent.Width);
+  if (csDesigning in ComponentState) and Assigned(Parent)
+  and (Value <> lpMatchParent) and (Value <> lpWrapContent) then
+    FLParamWidth:= GetDesignerLayoutByWH(Width, Parent.Width);
 end;
 
 procedure jVisualControl.SetParamHeight(Value: TLayoutParams);

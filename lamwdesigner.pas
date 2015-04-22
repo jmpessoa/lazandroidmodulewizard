@@ -43,6 +43,7 @@ type
     function GetAndroidForm: jForm;
   protected
     procedure OnDesignerModified(Sender: TObject);
+    procedure OnPersistentAdded(APersistent: TPersistent; Select: boolean);
   public
     //needed by the lazarus form editor
     class function CreateMediator(TheOwner, TheForm: TComponent): TDesignerMediator; override;
@@ -458,6 +459,7 @@ begin
   FDefaultPenColor:= clMedGray;
   FDefaultFontColor:= clMedGray;
   GlobalDesignHook.AddHandlerModified(@OnDesignerModified);
+  GlobalDesignHook.AddHandlerPersistentAdded(@OnPersistentAdded);
   FStarted := TFPList.Create;
   FDone := TFPList.Create;
 end;
@@ -491,6 +493,16 @@ begin
   end;
   if InvalidateNeeded then
     LCLForm.Invalidate;
+end;
+
+procedure TAndroidWidgetMediator.OnPersistentAdded(APersistent: TPersistent;
+  Select: boolean);
+begin
+  if (APersistent is jVisualControl)
+  and (jVisualControl(APersistent).Parent = nil)
+  and (jVisualControl(APersistent).Owner = AndroidForm)
+  then
+    jVisualControl(APersistent).Parent := AndroidForm;
 end;
 
 function TAndroidWidgetMediator.GetAndroidForm: jForm;
