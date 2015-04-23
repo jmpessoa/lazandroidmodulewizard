@@ -258,12 +258,19 @@ type
       {%H-}AState: TPropEditDrawState); override;
   end;
 
+  { TAnchorPropertyEditor }
+
+  TAnchorPropertyEditor = class(TComponentOneFormPropertyEditor)
+  public
+    procedure GetValues(Proc: TGetStrProc); override;
+  end;
+
 implementation
 
 uses
-  LCLIntf, LCLType, FPimage, typinfo, Laz_And_Controls, customdialog,
-  togglebutton, switchbutton, Laz_And_GLESv1_Canvas, Laz_And_GLESv2_Canvas,
-  gridview, Spinner;
+  LCLIntf, LCLType, ObjInspStrConsts, FPimage, typinfo, Laz_And_Controls,
+  customdialog, togglebutton, switchbutton, Laz_And_GLESv1_Canvas,
+  Laz_And_GLESv2_Canvas, gridview, Spinner;
 
 var
   DraftClassesMap: TDraftControlHash;
@@ -304,6 +311,36 @@ procedure RegisterAndroidWidgetDraftClass(AWidgetClass: jVisualControlClass;
   ADraftClass: TDraftWidgetClass);
 begin
   DraftClassesMap.Add(AWidgetClass, ADraftClass);
+end;
+
+{ TAnchorPropertyEditor }
+
+procedure TAnchorPropertyEditor.GetValues(Proc: TGetStrProc);
+var
+  i, j: Integer;
+  p: TAndroidWidget;
+  sl: TStringList;
+begin
+  Proc(oisNone);
+  p := jVisualControl(GetComponent(0)).Parent;
+  for i := 1 to PropCount - 1 do
+    if jVisualControl(GetComponent(i)).Parent <> p then
+      Exit;
+  sl := TStringList.Create;
+  try
+    for i := 0 to p.ChildCount - 1 do
+      sl.Add(p.Children[i].Name);
+    sl.Sorted := True;
+    for i := 0 to PropCount - 1 do
+    begin
+      j := sl.IndexOf(TComponent(GetComponent(i)).Name);
+      if j >= 0 then sl.Delete(j);
+    end;
+    for i := 0 to sl.Count - 1 do
+      Proc(sl[i]);
+  finally
+    sl.Free;
+  end;
 end;
 
 { TDraftPanel }
@@ -2015,6 +2052,7 @@ end;
 initialization
   DraftClassesMap := TDraftControlHash.Create(64); // power of 2 for efficiency
   RegisterPropertyEditor(TypeInfo(TARGBColorBridge), nil, '', TARGBColorBridgePropertyEditor);
+  RegisterPropertyEditor(TypeInfo(jVisualControl), jVisualControl, 'Anchor', TAnchorPropertyEditor);
 
   // DraftClasses registeration:
   RegisterAndroidWidgetDraftClass(jProgressBar, TDraftProgressBar);
