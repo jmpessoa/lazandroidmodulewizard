@@ -40,10 +40,12 @@ type
     FDefaultFontColor: TColor;
     FIgnoreLayout: Boolean;
     FStarted, FDone: TFPList;
+    FLastSelectedContainer: jVisualControl;
     function GetAndroidForm: jForm;
   protected
     procedure OnDesignerModified(Sender: TObject);
     procedure OnPersistentAdded(APersistent: TPersistent; Select: boolean);
+    procedure OnSetSelection(const ASelection: TPersistentSelectionList);
   public
     //needed by the lazarus form editor
     class function CreateMediator(TheOwner, TheForm: TComponent): TDesignerMediator; override;
@@ -460,6 +462,7 @@ begin
   FDefaultFontColor:= clMedGray;
   GlobalDesignHook.AddHandlerModified(@OnDesignerModified);
   GlobalDesignHook.AddHandlerPersistentAdded(@OnPersistentAdded);
+  GlobalDesignHook.AddHandlerSetSelection(@OnSetSelection);
   FStarted := TFPList.Create;
   FDone := TFPList.Create;
 end;
@@ -502,7 +505,19 @@ begin
   and (jVisualControl(APersistent).Parent = nil)
   and (jVisualControl(APersistent).Owner = AndroidForm)
   then
-    jVisualControl(APersistent).Parent := AndroidForm;
+    if Assigned(FLastSelectedContainer) then
+      jVisualControl(APersistent).Parent := FLastSelectedContainer
+    else
+      jVisualControl(APersistent).Parent := AndroidForm;
+end;
+
+procedure TAndroidWidgetMediator.OnSetSelection(const ASelection: TPersistentSelectionList);
+begin
+  FLastSelectedContainer := nil;
+  if (ASelection.Count = 1) and (ASelection[0] is jVisualControl) then
+    with jVisualControl(ASelection[0]) do
+      if (Owner = AndroidForm) and AcceptChildrenAtDesignTime then
+        FLastSelectedContainer := jVisualControl(ASelection[0]);
 end;
 
 function TAndroidWidgetMediator.GetAndroidForm: jForm;
