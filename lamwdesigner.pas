@@ -85,6 +85,7 @@ type
     FAndroidWidget: TAndroidWidget;      // original
     FCanvas: TCanvas;                    // canvas to draw onto
     FnewW, FnewH, FnewL, FnewT: Integer; // layout
+    FminW, FminH: Integer;
   public
     BackGroundColor: TColor;
     TextColor: TColor;
@@ -226,9 +227,8 @@ type
 
   TDraftSwitchButton = class(TDraftWidget)
   public
-     OnOff: boolean;
-     constructor Create(AWidget: TAndroidWidget; Canvas: TCanvas); override;
-     procedure Draw; override;
+    procedure Draw; override;
+    procedure UpdateLayout; override;
   end;
 
   { TDraftGridView }
@@ -305,6 +305,16 @@ begin
   1: Result := 1;
   else Result := asize * 3 div 4;
   end;
+end;
+
+function BlendColors(c: TColor; alpha: Double; r, g, b: Byte): TColor; inline;
+var
+  r1, g1, b1: Byte;
+begin
+  RedGreenBlue(c, r1, g1, b1);
+  Result := RGBToColor(Byte(Trunc(r1 * alpha + r * (1 - alpha))),
+                       Byte(Trunc(g1 * alpha + g * (1 - alpha))),
+                       Byte(Trunc(b1 * alpha + b * (1 - alpha))));
 end;
 
 procedure RegisterAndroidWidgetDraftClass(AWidgetClass: jVisualControlClass;
@@ -761,25 +771,6 @@ procedure TAndroidWidgetMediator.Paint;
         fWidget.Draw;
         fWidget.Free;
       end else
-      if (AWidget is jSwitchButton) then
-      begin
-        fWidget:= TDraftSwitchButton.Create(AWidget, LCLForm.Canvas);
-        fWidget.Height:= AWidget.Height;
-        fWidget.Width:= AWidget.Width;
-        fWidget.MarginLeft:= AWidget.MarginLeft;
-        fWidget.MarginTop:= AWidget.MarginTop;
-        fWidget.MarginRight:= AWidget.MarginRight;
-        fWidget.MarginBottom:= AWidget.MarginBottom;
-        fWidget.Color:= (AWidget as jSwitchButton).BackgroundColor;
-        fWidget.FontColor:= colbrGray;
-
-        if (AWidget as jSwitchButton).State = tsOff then
-          TDraftSwitchButton(fWidget).OnOff := False
-        else
-          TDraftSwitchButton(fWidget).OnOff := True;
-        fWidget.Draw;
-        fWidget.Free;
-      end else
       if (AWidget is jView) then
       begin
         if (AWidget as jView).BackgroundColor <> colbrDefault then
@@ -1081,6 +1072,8 @@ begin
       else
       if LayoutParamHeight <> lpWrapContent then
         FnewH := GetLayoutParamsByParent(Parent, LayoutParamHeight, sdH);
+      if FnewW < FminW then FnewW := FminW;
+      if FnewH < FminH then FnewH := FminH;
       if (PosRelativeToParent <> []) or (PosRelativeToAnchor <> []) then
       begin
         FnewL := MarginLeft;
@@ -1915,93 +1908,87 @@ end;
 
 { TDraftSwitchButton }
 
-constructor TDraftSwitchButton.Create(AWidget: TAndroidWidget; Canvas: TCanvas);
+procedure TDraftSwitchButton.Draw;
+var
+  x, y, z, i, ps: Integer;
+  r, rb: TRect;
+  ts: TTextStyle;
+  s: string;
 begin
-  inherited;
-  BackGroundColor:= clActiveCaption;; //clMenuHighlight;
+  with FCanvas do
+  begin
+    Color := jSwitchButton(FAndroidWidget).BackgroundColor;
+    if BackGroundColor = clNone then
+      BackGroundColor := clWhite
+    else begin
+      Brush.Color := BackGroundColor;
+      FillRect(0, 0, FAndroidWidget.Width, FAndroidWidget.Height);
+    end;
+    x := FAndroidWidget.Height div 2 - 12;
+    Brush.Color := BlendColors(BackGroundColor, 0.7, 153,153,153);
+    ps := Font.Size;
+    Font.Size := 10;
+    with jSwitchButton(FAndroidWidget) do
+    begin
+      y := TextWidth(TextOn);
+      z := TextWidth(TextOff);
+      if y < z then y := z;
+      y := y + 22; // button width
+
+      i := 2 * (y + 2);
+      if i < 92 then i := 92;
+      z := FAndroidWidget.Width - 2 - i;
+      rb := Rect(z, x, z + i, x + 24);
+
+      FillRect(rb);
+      if State = tsOff then
+      begin
+        z := rb.Left + 1;
+        Brush.Color := BlendColors(Self.BackgroundColor, 0.414, 153,153,153);
+        Font.Color := RGBToColor(234,234,234);
+        s := TextOff;
+      end else begin
+        z := rb.Right - 1 - y;
+        Brush.Color := BlendColors(Self.BackgroundColor, 0.14, 11,153,200);
+        Font.Color := clWhite;
+        s := TextOn;
+      end;
+    end;
+    r := Rect(z, x + 1, z + y, x + 23);
+    FillRect(r);
+    ts := TextStyle;
+    ts.Layout := tlCenter;
+    ts.Alignment := Classes.taCenter;
+    TextRect(r, 0, 0, s, ts);
+    Font.Size := ps;
+  end;
 end;
 
-procedure TDraftSwitchButton.Draw;
+procedure TDraftSwitchButton.UpdateLayout;
+var
+  ps, x, y: Integer;
 begin
-  Fcanvas.Brush.Color:= Self.BackGroundColor;
-  Fcanvas.Pen.Color:= clWhite;
-  Fcanvas.Font.Color:= Self.TextColor;
-
-  if Self.BackGroundColor = clNone then
-     Fcanvas.Brush.Color:= clSilver; //clMedGray;
-
-  if Self.TextColor = clNone then
-      Fcanvas.Font.Color:= clBlack;
-
-  Fcanvas.FillRect(0,0,Self.Width,Self.Height);
-      // outer frame
-  Fcanvas.Rectangle(0,0,Self.Width,Self.Height);
-
-  Fcanvas.Pen.Color:= clWindowFrame;
-    //V
-  Fcanvas.Line(Self.MarginLeft-4, {x1}
-               Self.MarginTop-3,  {y1}
-               Self.MarginLeft-4, {x1}
-               Self.Height-Self.MarginBottom+3); {y2}
-
-     //H
-  Fcanvas.Line(Self.Width-Self.MarginRight+3, {x2}
-            Self.MarginTop-3,  {y1}
-            Self.MarginLeft-4, {x1}
-            Self.MarginTop-3);{y1}
-
-  Fcanvas.Pen.Color:= clWhite;
-  Fcanvas.Line(Self.Width-Self.MarginRight+3, {x2}
-            Self.MarginTop-3,  {y1}
-            Self.Width-Self.MarginRight+3,  {x2}
-            Self.Height-Self.MarginBottom+3); {y2}
-
-   Fcanvas.Line(Self.Width-Self.MarginRight+3, {x2}
-            Self.Height-Self.MarginBottom+3,{y2}
-            Self.MarginLeft-4,                {x1}
-            Self.Height-Self.MarginBottom+3);  {y2}
-
-   //tumbl
-  if Self.OnOff = False then  //on
+  FminH := 28;
+  with jSwitchButton(FAndroidWidget) do
   begin
-    Fcanvas.Brush.Style:= bsSolid;
-    Fcanvas.FillRect(
-               Self.MarginLeft-1, {x1}
-               Self.MarginTop,
-               Trunc(Self.Width/2),
-               Self.Height-Self.MarginBottom+1);
-
-    Fcanvas.Brush.Style:= bsClear;
-    Fcanvas.Pen.Color:= clWhite; //clWindowFrame
-
-    Fcanvas.Rectangle(
-               Self.MarginLeft-1, {x1}
-               Self.MarginTop,
-               Trunc(Self.Width/2),
-               Self.Height-Self.MarginBottom+1);
-  end
-  else  //True
-  begin
-    Fcanvas.Brush.Style:= bsSolid;
-    Fcanvas.Brush.Color:= clSkyBlue;
-
-    Fcanvas.FillRect(
-               Trunc(Self.Width/2), {x1}
-               Self.MarginTop,
-               Self.Width - Self.MarginRight,
-               Self.Height - Self.MarginBottom+1);
-
-    Fcanvas.Pen.Color:= clWhite; //clWindowFrame
-    Fcanvas.Brush.Style:= bsClear;
-
-    Fcanvas.Rectangle(
-               Trunc(Self.Width/2), {x1}
-               Self.MarginTop,
-               Self.Width - Self.MarginRight,
-               Self.Height - Self.MarginBottom+1);
+    if LayoutParamWidth = lpWrapContent then
+      with FCanvas do
+      begin
+        ps := Font.Size;
+        Font.Size := 10;
+        x := TextWidth(TextOn);
+        y := TextWidth(TextOff);
+        if y > x then x := y;
+        x := 2 * (x + 22 + 2);
+        if x < 92 then x := 92;
+        x := x + 4;
+        FnewW := x;
+        Font.Size := ps;
+      end;
+    if LayoutParamHeight = lpWrapContent then
+      FnewH := 28
   end;
-  //Fcanvas.Font.Color:= Self.TextColor;
-  //Fcanvas.TextOut(5,4,txt);
+  inherited;
 end;
 
 {TDraftGridView}
@@ -2062,6 +2049,7 @@ initialization
   RegisterAndroidWidgetDraftClass(jTextView, TDraftTextView);
   RegisterAndroidWidgetDraftClass(jPanel, TDraftPanel);
   RegisterAndroidWidgetDraftClass(jEditText, TDraftEditText);
+  RegisterAndroidWidgetDraftClass(jSwitchButton, TDraftSwitchButton);
 
 finalization
   DraftClassesMap.Free;
