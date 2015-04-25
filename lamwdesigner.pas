@@ -6,7 +6,7 @@ interface
 
 uses
   Classes, SysUtils, Graphics, Controls, FormEditingIntf, PropEdits,
-  AndroidWidget;
+  ComponentEditors, AndroidWidget;
 
 type
   TDraftWidget = class;
@@ -265,12 +265,24 @@ type
     procedure GetValues(Proc: TGetStrProc); override;
   end;
 
+  { TAndroidFormComponentEditor }
+
+  TAndroidFormComponentEditor = class(TDefaultComponentEditor)
+  private
+    procedure ChangeSize(AWidth, AHeight: Integer);
+    procedure ShowSelectSizeDialog;
+  public
+    procedure ExecuteVerb(Index: Integer); override;
+    function GetVerb(Index: Integer): string; override;
+    function GetVerbCount: Integer; override;
+  end;
+
 implementation
 
 uses
   LCLIntf, LCLType, ObjInspStrConsts, FPimage, typinfo, Laz_And_Controls,
   customdialog, togglebutton, switchbutton, Laz_And_GLESv1_Canvas,
-  Laz_And_GLESv2_Canvas, gridview, Spinner;
+  Laz_And_GLESv2_Canvas, gridview, Spinner, uFormSizeSelect;
 
 var
   DraftClassesMap: TDraftControlHash;
@@ -321,6 +333,59 @@ procedure RegisterAndroidWidgetDraftClass(AWidgetClass: jVisualControlClass;
   ADraftClass: TDraftWidgetClass);
 begin
   DraftClassesMap.Add(AWidgetClass, ADraftClass);
+end;
+
+{ TAndroidFormComponentEditor }
+
+procedure TAndroidFormComponentEditor.ChangeSize(AWidth, AHeight: Integer);
+begin
+  with jForm(Component) do
+  begin
+    if Assigned(Designer) then
+      with Designer as TAndroidWidgetMediator, LCLForm do
+        SetBounds(Left, Top, AWidth, AHeight);
+    SetBounds(Left, Top, AWidth, AHeight);
+  end;
+end;
+
+procedure TAndroidFormComponentEditor.ShowSelectSizeDialog;
+begin
+  with TfrmFormSizeSelect.Create(nil) do
+  try
+    with jForm(Component) do
+      SetInitSize(Width, Height);
+    if ShowModal = mrOk then
+      ChangeSize(seWidth.Value, seHeight.Value);
+  finally
+    Free
+  end;
+end;
+
+procedure TAndroidFormComponentEditor.ExecuteVerb(Index: Integer);
+begin
+  case Index of
+  0: // Rotate
+    with jForm(Component) do
+      ChangeSize(Height, Width);
+  1: ShowSelectSizeDialog; // Select size
+  else
+    inherited ExecuteVerb(Index);
+  end;
+end;
+
+function TAndroidFormComponentEditor.GetVerb(Index: Integer): string;
+begin
+  case Index of
+  0: Result := 'Rotate';
+  1: Result := 'Select size...';
+  else
+    Result := inherited;
+  end
+end;
+
+function TAndroidFormComponentEditor.GetVerbCount: Integer;
+begin
+  Result := 2;
 end;
 
 { TAnchorPropertyEditor }
@@ -2041,6 +2106,7 @@ initialization
   DraftClassesMap := TDraftControlHash.Create(64); // power of 2 for efficiency
   RegisterPropertyEditor(TypeInfo(TARGBColorBridge), nil, '', TARGBColorBridgePropertyEditor);
   RegisterPropertyEditor(TypeInfo(jVisualControl), jVisualControl, 'Anchor', TAnchorPropertyEditor);
+  RegisterComponentEditor(jForm, TAndroidFormComponentEditor);
 
   // DraftClasses registeration:
   RegisterAndroidWidgetDraftClass(jProgressBar, TDraftProgressBar);
