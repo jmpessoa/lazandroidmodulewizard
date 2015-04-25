@@ -1989,16 +1989,11 @@ end;
 procedure jVisualControl.SetParamWidth(Value: TLayoutParams);
 begin
   FLParamWidth:= Value;
-  if (csDesigning in ComponentState) and Assigned(Parent)
-  and (Value <> lpMatchParent) and (Value <> lpWrapContent) then
-    FLParamWidth:= GetDesignerLayoutByWH(Width, Parent.Width);
 end;
 
 procedure jVisualControl.SetParamHeight(Value: TLayoutParams);
 begin
   FLParamHeight:= Value;
-  if (csDesigning in ComponentState) and (Value <> lpMatchParent) and (Value <> lpWrapContent) then
-     FLParamHeight:= GetDesignerLayoutByWH(Self.Height, Self.Parent.Height);
 end;
 
 procedure jVisualControl.SetTextTypeFace(Value: TTextTypeFace);
