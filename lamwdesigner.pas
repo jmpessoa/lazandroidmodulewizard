@@ -1046,11 +1046,12 @@ begin
     FnewH := Height;
     FnewL := Left;
     FnewT := Top;
-    if Parent <> nil then
+    if (TAndroidForm(Owner).Designer as TAndroidWidgetMediator).FIgnoreLayout
+    and (Parent <> nil) then
     begin
-      if not (LayoutParamWidth in [lpWrapContent{, lpMatchParent}]) then
+      if not (LayoutParamWidth in [lpWrapContent]) then
         LayoutParamWidth := GetDesignerLayoutByWH(Width, Parent.Width);
-      if not (LayoutParamHeight in [lpWrapContent{, lpMatchParent}]) then
+      if not (LayoutParamHeight in [lpWrapContent]) then
         LayoutParamHeight := GetDesignerLayoutByWH(Height, Parent.Height);
     end;
   end;
