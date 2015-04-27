@@ -25,7 +25,6 @@ type
     procedure SetIconIdentifier(_iconIdentifier: string);
 
   protected
-    procedure SetParentComponent(Value: TComponent); override;
     procedure SetText(_title: string); override;   //****
   public
     constructor Create(AOwner: TComponent); override;
@@ -98,23 +97,13 @@ begin
   FMarginTop    := 10;
   FMarginBottom := 10;
   FMarginRight  := 10;
+  FHeight       := 96;
+  FWidth        := 96;
   FLParamWidth  := lpMatchParent;  //lpWrapContent
   FLParamHeight := lpWrapContent; //lpMatchParent
   FAcceptChildrenAtDesignTime:= True;
     //your code here....
   FVisible:= False;
-end;
-
-procedure jCustomDialog.SetParentComponent(Value: TComponent);
-begin
-   inherited SetParentComponent(Value);
-   Self.Height:= 96;
-   Self.Width:= 96;
-   if Value <> nil then
-   begin
-      Parent:= TAndroidWidget(Value);
-      Self.Width:= Trunc(TAndroidWidget(Parent).Width) - 13;
-   end;
 end;
 
 destructor jCustomDialog.Destroy;

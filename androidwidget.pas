@@ -767,7 +767,6 @@ type
     procedure Notification(AComponent: TComponent; Operation: TOperation); override;
     procedure InternalInvalidateRect({%H-}ARect: TRect; {%H-}Erase: boolean); virtual;
     procedure SetName(const NewName: TComponentName); override;
-    procedure SetParentComponent(Value: TComponent); override;
     procedure GetChildren(Proc: TGetChildProc; Root: TComponent); override;
 
     procedure SetText(Value: string); virtual;
@@ -1779,11 +1778,6 @@ begin
   end;
 end;
 
-procedure TAndroidWidget.SetParentComponent(Value: TComponent);
-begin
-   inherited SetParentComponent(Value);
-end;
-
 function TAndroidWidget.HasParent: Boolean;
 begin
   Result:=Parent<>nil;
@@ -1822,8 +1816,6 @@ begin
   if (csDesigning in ComponentState) then
     if Assigned(Parent) then
       Parent.Invalidate
-    else
-      Invalidate
 end;
 
 procedure TAndroidWidget.InvalidateRect(ARect: TRect; Erase: boolean);
@@ -1933,6 +1925,7 @@ end;
 
 procedure jVisualControl.SetParentComponent(Value: TComponent);
 begin
+  Parent := TAndroidWidget(Value);
   inherited SetParentComponent(Value);
 end;
 

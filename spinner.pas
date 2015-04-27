@@ -35,9 +35,6 @@ TOnItemSelected = procedure(Sender: TObject; caption: string; position: integer)
 
     procedure UpdateLParamHeight;
     procedure UpdateLParamWidth;
-
-  protected
-    procedure SetParentComponent(Value: TComponent); override;
   public
     constructor Create(AOwner: TComponent); override;
     destructor  Destroy; override;
@@ -126,6 +123,8 @@ begin
   FMarginTop    := 10;
   FMarginBottom := 10;
   FMarginRight  := 5;
+  FHeight       := 40;
+  FWidth        := 96;
   FLParamWidth  := lpMatchParent;  //lpWrapContent
   FLParamHeight := lpWrapContent; //lpMatchParent
   //your code here....
@@ -135,18 +134,6 @@ begin
   FDropListBackgroundColor:=  colbrDefault;
   FLastItemAsPrompt:= False;
   FFontSize:= 0;
-end;
-
-procedure jSpinner.SetParentComponent(Value: TComponent);
-begin
-   inherited SetParentComponent(Value);
-   Self.Height:= 40;
-   Self.Width:= 96;
-   if Value <> nil then
-   begin
-      Parent:= TAndroidWidget(Value);
-      Self.Width:= Trunc(TAndroidWidget(Parent).Width) - 13;
-   end;
 end;
 
 destructor jSpinner.Destroy;
