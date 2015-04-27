@@ -713,8 +713,27 @@ end;
 procedure TAndroidWidgetMediator.InitComponent(AComponent, NewParent: TComponent;
   NewBounds: TRect);
 begin
-  if AComponent <> AndroidForm then // to preserve size
+  if AComponent <> AndroidForm then // to preserve jForm size
+  begin
+    if AComponent is TAndroidWidget then
+      with NewBounds do
+        if (Right - Left = 50) and (Bottom - Top = 50) then // ugly check, but IDE makes 50x50 default size for non TControl
+        begin
+          // restore default size
+          Right := Left + TAndroidWidget(AComponent).Width;
+          Bottom := Top + TAndroidWidget(AComponent).Height
+        end;
     inherited InitComponent(AComponent, NewParent, NewBounds);
+    if (AComponent is jVisualControl)
+    and Assigned(jVisualControl(AComponent).Parent) then
+      with jVisualControl(AComponent) do
+      begin
+        if not (LayoutParamWidth in [lpWrapContent]) then
+          LayoutParamWidth := GetDesignerLayoutByWH(Width, Parent.Width);
+        if not (LayoutParamHeight in [lpWrapContent]) then
+          LayoutParamHeight := GetDesignerLayoutByWH(Height, Parent.Height);
+      end;
+  end;
 end;
 
 procedure TAndroidWidgetMediator.Paint;
