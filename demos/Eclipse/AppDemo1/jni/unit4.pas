@@ -52,8 +52,8 @@ begin
    str.Add('App Path: '+gApp.Path.App);
    str.Add('App Path Dat: '+gApp.Path.Dat);
    str.Add('App Path DataBase: '+gApp.Path.DataBase);
-   str.Add('Phone Number: '+gApp.Device.PhoneNumber);
-   str.Add('Device ID: '+gApp.Device.ID);
+   //str.Add('Phone Number: '+gApp.Device.PhoneNumber);
+   //str.Add('Device ID: '+gApp.Device.ID);
    str.Add('Date Time: '+Self.GetDateTime);
 
    jEditText1.Text:= str.Text;

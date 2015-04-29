@@ -154,14 +154,15 @@
     <Version Value="11"/>
     <PathDelim Value="\"/>
     <Target>
-      <Filename Value="C:\adt32\eclipse\workspace\AppDemo1\libs\controls"/>
+      <Filename Value="..\libs\armeabi\controls"/>
     </Target>
     <SearchPaths>
-      <Libraries Value="C:\adt32\ndk7\platforms\android-8\arch-arm\usr\lib\;C:\adt32\ndk7\toolchains\arm-linux-androideabi-4.4.3\prebuilt\windows\lib\gcc\arm-linux-androideabi\4.4.3\"/>
+      <Libraries Value="C:\adt32\ndk9\platforms\android-14\arch-arm\usr\lib\"/>
+      <UnitOutputDirectory Value="..\obj\controls"/>
     </SearchPaths>
     <Parsing>
       <SyntaxOptions>
-        <SyntaxMode Value="Delphi"/>
+        <SyntaxMode Value="delphi"/>
         <CStyleMacros Value="True"/>
       </SyntaxOptions>
     </Parsing>
@@ -180,7 +181,7 @@
       </Options>
     </Linking>
     <Other>
-      <CustomOptions Value="-dANDROID -Xd -CpArmV6 -CfSoft -FLC:\adt32\ndk7\platforms\android-8\arch-arm\usr\lib\libdl.so -FUC:\adt32\eclipse\workspace\AppDemo1\obj\Controls -oC:\adt32\eclipse\workspace\AppDemo1\libs\armeabi\libcontrols.so"/>
+      <CustomOptions Value="-Xd -CpARMv6 -CfSoft -XParm-linux-androideabi- -FDC:\adt32\ndk9\toolchains\arm-linux-androideabi-4.4.3\prebuilt\windows\bin -o..\libs\armeabi\libcontrols.so"/>
     </Other>
   </CompilerOptions>
   <Debugging>
