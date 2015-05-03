@@ -38,9 +38,10 @@ type
     FDefaultBrushColor: TColor;
     FDefaultPenColor: TColor;
     FDefaultFontColor: TColor;
-    FIgnoreLayout: Boolean;
+    FSizing: Boolean;
     FStarted, FDone: TFPList;
     FLastSelectedContainer: jVisualControl;
+    FSelection: TFPList;
     function GetAndroidForm: jForm;
   protected
     procedure OnDesignerModified(Sender: TObject);
@@ -81,6 +82,7 @@ type
     FFontColor: TARGBColorBridge;
     procedure SetColor(color: TARGBColorBridge);
     procedure SetFontColor(color: TARGBColorBridge);
+    function Designer: TAndroidWidgetMediator;
   protected
     FAndroidWidget: TAndroidWidget;      // original
     FCanvas: TCanvas;                    // canvas to draw onto
@@ -577,10 +579,12 @@ begin
   GlobalDesignHook.AddHandlerSetSelection(@OnSetSelection);
   FStarted := TFPList.Create;
   FDone := TFPList.Create;
+  FSelection := TFPList.Create;
 end;
 
 destructor TAndroidWidgetMediator.Destroy;
 begin
+  FSelection.Free;
   FStarted.Free;
   FDone.Free;
   if GlobalDesignHook <> nil then
@@ -624,12 +628,17 @@ begin
 end;
 
 procedure TAndroidWidgetMediator.OnSetSelection(const ASelection: TPersistentSelectionList);
+var
+  i: Integer;
 begin
   FLastSelectedContainer := nil;
   if (ASelection.Count = 1) and (ASelection[0] is jVisualControl) then
     with jVisualControl(ASelection[0]) do
       if (Owner = AndroidForm) and AcceptChildrenAtDesignTime then
         FLastSelectedContainer := jVisualControl(ASelection[0]);
+  FSelection.Clear;
+  for i := 0 to ASelection.Count - 1 do
+    FSelection.Add(ASelection[i]);
 end;
 
 function TAndroidWidgetMediator.GetAndroidForm: jForm;
@@ -1025,7 +1034,7 @@ procedure TAndroidWidgetMediator.Paint;
         if Assigned(fWidgetClass) then
         begin
           fWidget := fWidgetClass.Create(AWidget, LCLForm.Canvas);
-          if not FIgnoreLayout then
+          if not FSizing or (FSelection.IndexOf(AWidget) < 0) then
             fWidget.UpdateLayout;
           fWidget.Draw;
           fWidget.Free;
@@ -1103,7 +1112,7 @@ end;
 procedure TAndroidWidgetMediator.MouseDown(Button: TMouseButton;
   Shift: TShiftState; p: TPoint; var Handled: boolean);
 begin
-  FIgnoreLayout := True;
+  FSizing := True;
   inherited MouseDown(Button, Shift, p, Handled);
 end;
 
@@ -1111,7 +1120,7 @@ procedure TAndroidWidgetMediator.MouseUp(Button: TMouseButton;
   Shift: TShiftState; p: TPoint; var Handled: boolean);
 begin
   inherited MouseUp(Button, Shift, p, Handled);
-  FIgnoreLayout := False;
+  FSizing := False;
   LCLForm.Invalidate;
 end;
 
@@ -1130,14 +1139,15 @@ begin
     FnewH := Height;
     FnewL := Left;
     FnewT := Top;
-    if (TAndroidForm(Owner).Designer as TAndroidWidgetMediator).FIgnoreLayout
-    and (Parent <> nil) then
-    begin
-      if not (LayoutParamWidth in [lpWrapContent]) then
-        LayoutParamWidth := GetDesignerLayoutByWH(Width, Parent.Width);
-      if not (LayoutParamHeight in [lpWrapContent]) then
-        LayoutParamHeight := GetDesignerLayoutByWH(Height, Parent.Height);
-    end;
+    with Designer do
+      if FSizing and (FSelection.IndexOf(AWidget) >= 0)
+      and (Parent <> nil) then
+      begin
+        if not (LayoutParamWidth in [lpWrapContent]) then
+          LayoutParamWidth := GetDesignerLayoutByWH(Width, Parent.Width);
+        if not (LayoutParamHeight in [lpWrapContent]) then
+          LayoutParamHeight := GetDesignerLayoutByWH(Height, Parent.Height);
+      end;
   end;
 end;
 
@@ -1232,6 +1242,18 @@ begin
     TextColor:= FPColorToTColor(ToTFPColor(color));
   end
   else TextColor:= clNone;
+end;
+
+function TDraftWidget.Designer: TAndroidWidgetMediator;
+var
+  t: TAndroidWidget;
+begin
+  Result := nil;
+  if FAndroidWidget = nil then Exit;
+  t := FAndroidWidget;
+  while Assigned(t.Parent) do t := t.Parent;
+  if t is TAndroidForm then
+    Result := TAndroidForm(t).Designer as TAndroidWidgetMediator;
 end;
 
 { TDraftButton }
