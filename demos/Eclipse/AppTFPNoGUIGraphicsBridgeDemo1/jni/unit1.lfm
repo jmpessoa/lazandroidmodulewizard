@@ -11,10 +11,10 @@ object AndroidModule1: TAndroidModule1
   ActivityMode = actMain
   BackgroundColor = colbrDefault
   object jPanel1: jPanel
-    Left = 6
-    Top = 8
-    Width = 287
-    Height = 152
+    Left = 4
+    Top = 4
+    Width = 292
+    Height = 186
     MarginLeft = 4
     MarginTop = 4
     MarginRight = 4
@@ -29,9 +29,9 @@ object AndroidModule1: TAndroidModule1
     MaxPinchZoomFactor = 4
     Id = 8023441
     object jButton1: jButton
-      Left = 4
-      Top = 51
-      Width = 272
+      Left = 2
+      Top = 73
+      Width = 288
       Height = 40
       MarginLeft = 2
       MarginTop = 4
@@ -50,10 +50,10 @@ object AndroidModule1: TAndroidModule1
       Id = 0
     end
     object jTextView1: jTextView
-      Left = 30
-      Top = 12
-      Width = 224
-      Height = 25
+      Left = 38
+      Top = 5
+      Width = 215
+      Height = 20
       MarginLeft = 5
       MarginTop = 5
       MarginRight = 5
@@ -74,10 +74,10 @@ object AndroidModule1: TAndroidModule1
     end
   end
   object jPanel2: jPanel
-    Left = 8
-    Top = 160
-    Width = 287
-    Height = 264
+    Left = 4
+    Top = 198
+    Width = 292
+    Height = 286
     MarginLeft = 4
     MarginTop = 4
     MarginRight = 4
@@ -140,10 +140,10 @@ object AndroidModule1: TAndroidModule1
     top = 440
   end
   object ViewPort1: TViewPort
+    Tag = 1
     PenThickness = 1
     PenColor = colbrRed
     FontSize = 12
-    FontAntiAliased = True
     FontColor = colbrBlack
     BackgroundColor = colbrLavender
     DrawGrid = True
@@ -158,24 +158,17 @@ object AndroidModule1: TAndroidModule1
     MarginRight = 40
     MarginBottom = 40
     Cliping = False
-    GridData = GridData1
+    GridData.AxisColor = colbrLime
+    GridData.Color = colbrLightSteelBlue
+    GridData.BackgroundColor = colbrGreenYellow
+    GridData.XInterval = 10
+    GridData.YInterval = 10
+    GridData.XLegendInterval = 1
+    GridData.YLegendInterval = 2
+    GridData.XShowLengend = False
+    GridData.YShowLengend = False
     OnChangeFontColor = ViewPort1ChangeFontColor
     left = 64
     top = 501
-  end
-  object GridData1: TGridData
-    XTitle = 'X'
-    YTitle = 'Y'
-    AxisColor = colbrBlack
-    Color = colbrLightSteelBlue
-    BackgroundColor = colbrGreenYellow
-    XInterval = 10
-    YInterval = 10
-    XLegendInterval = 2
-    YLegendInterval = 2
-    XShowLengend = True
-    YShowLengend = True
-    left = 160
-    top = 504
   end
 end
