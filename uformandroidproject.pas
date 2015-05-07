@@ -1713,10 +1713,10 @@ begin
   end;
 
   listPascal.Add(' ');
-  listPascal.Add(' protected');
-  if Pos('jVisualControl', FProjectModel) > 0  then
-     listPascal.Add('    procedure SetParentComponent(Value: TComponent); override;');
-  listPascal.Add(' ');
+  //listPascal.Add(' protected');
+  //if Pos('jVisualControl', FProjectModel) > 0  then
+  //   listPascal.Add('    procedure SetParentComponent(Value: TComponent); override;');
+  //listPascal.Add(' ');
   listPascal.Add(' public');
   listPascal.Add('    constructor Create(AOwner: TComponent); override;');
   listPascal.Add('    destructor  Destroy; override;');
@@ -1793,6 +1793,8 @@ begin
     listPascal.Add('  FMarginTop    := 10;');
     listPascal.Add('  FMarginBottom := 10;');
     listPascal.Add('  FMarginRight  := 10;');
+    listPascal.Add('  FHeight       := 96; //??');
+    listPascal.Add('  FWidth        := 96; //??');
     listPascal.Add('  FLParamWidth  := lpMatchParent;  //lpWrapContent');
     listPascal.Add('  FLParamHeight := lpWrapContent; //lpMatchParent');
     listPascal.Add('  FAcceptChildrenAtDesignTime:= False;');
@@ -1800,13 +1802,11 @@ begin
   listPascal.Add('//your code here....');
   listPascal.Add('end;');
   listPascal.Add(' ');
-  if Pos('jVisualControl', FProjectModel) > 0  then
+{  if Pos('jVisualControl', FProjectModel) > 0  then
   begin
     listPascal.Add('procedure '+FJavaClassName+'.SetParentComponent(Value: TComponent);');
     listPascal.Add('begin');
     listPascal.Add('  inherited SetParentComponent(Value);');
-    listPascal.Add('  Self.Height:= 96; //??');
-    listPascal.Add('  Self.Width:= 96; //??');
     listPascal.Add('  if Value <> nil then');
     listPascal.Add('  begin');
     listPascal.Add('      Parent:= TAndroidWidget(Value);');
@@ -1814,7 +1814,7 @@ begin
     listPascal.Add('  end;');
     listPascal.Add('end;');
     listPascal.Add(' ');
-  end;
+  end;}
   listPascal.Add('destructor '+FJavaClassName+'.Destroy;');
   listPascal.Add('begin');
   listPascal.Add('  if not (csDesigning in ComponentState) then');

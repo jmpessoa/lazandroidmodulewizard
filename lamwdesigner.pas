@@ -6,7 +6,7 @@ interface
 
 uses
   Classes, SysUtils, Graphics, Controls, FormEditingIntf, PropEdits,
-  AndroidWidget;
+  ComponentEditors, AndroidWidget;
 
 type
   TDraftWidget = class;
@@ -38,11 +38,15 @@ type
     FDefaultBrushColor: TColor;
     FDefaultPenColor: TColor;
     FDefaultFontColor: TColor;
-    FIgnoreLayout: Boolean;
+    FSizing: Boolean;
     FStarted, FDone: TFPList;
+    FLastSelectedContainer: jVisualControl;
+    FSelection: TFPList;
     function GetAndroidForm: jForm;
   protected
     procedure OnDesignerModified(Sender: TObject);
+    procedure OnPersistentAdded(APersistent: TPersistent; Select: boolean);
+    procedure OnSetSelection(const ASelection: TPersistentSelectionList);
   public
     //needed by the lazarus form editor
     class function CreateMediator(TheOwner, TheForm: TComponent): TDesignerMediator; override;
@@ -78,10 +82,12 @@ type
     FFontColor: TARGBColorBridge;
     procedure SetColor(color: TARGBColorBridge);
     procedure SetFontColor(color: TARGBColorBridge);
+    function Designer: TAndroidWidgetMediator;
   protected
     FAndroidWidget: TAndroidWidget;      // original
     FCanvas: TCanvas;                    // canvas to draw onto
     FnewW, FnewH, FnewL, FnewT: Integer; // layout
+    FminW, FminH: Integer;
   public
     BackGroundColor: TColor;
     TextColor: TColor;
@@ -113,6 +119,7 @@ type
   public
     constructor Create(AWidget: TAndroidWidget; Canvas: TCanvas); override;
     procedure Draw; override;
+    procedure UpdateLayout; override;
   end;
 
   { TDraftButton }
@@ -222,9 +229,8 @@ type
 
   TDraftSwitchButton = class(TDraftWidget)
   public
-     OnOff: boolean;
-     constructor Create(AWidget: TAndroidWidget; Canvas: TCanvas); override;
-     procedure Draw; override;
+    procedure Draw; override;
+    procedure UpdateLayout; override;
   end;
 
   { TDraftGridView }
@@ -254,12 +260,31 @@ type
       {%H-}AState: TPropEditDrawState); override;
   end;
 
+  { TAnchorPropertyEditor }
+
+  TAnchorPropertyEditor = class(TComponentOneFormPropertyEditor)
+  public
+    procedure GetValues(Proc: TGetStrProc); override;
+  end;
+
+  { TAndroidFormComponentEditor }
+
+  TAndroidFormComponentEditor = class(TDefaultComponentEditor)
+  private
+    procedure ChangeSize(AWidth, AHeight: Integer);
+    procedure ShowSelectSizeDialog;
+  public
+    procedure ExecuteVerb(Index: Integer); override;
+    function GetVerb(Index: Integer): string; override;
+    function GetVerbCount: Integer; override;
+  end;
+
 implementation
 
 uses
-  LCLIntf, LCLType, FPimage, typinfo, Laz_And_Controls, customdialog,
-  togglebutton, switchbutton, Laz_And_GLESv1_Canvas, Laz_And_GLESv2_Canvas,
-  gridview, Spinner;
+  LCLIntf, LCLType, ObjInspStrConsts, FPimage, typinfo, Laz_And_Controls,
+  customdialog, togglebutton, switchbutton, Laz_And_GLESv1_Canvas,
+  Laz_And_GLESv2_Canvas, gridview, Spinner, uFormSizeSelect;
 
 var
   DraftClassesMap: TDraftControlHash;
@@ -296,10 +321,103 @@ begin
   end;
 end;
 
+function BlendColors(c: TColor; alpha: Double; r, g, b: Byte): TColor; inline;
+var
+  r1, g1, b1: Byte;
+begin
+  RedGreenBlue(c, r1, g1, b1);
+  Result := RGBToColor(Byte(Trunc(r1 * alpha + r * (1 - alpha))),
+                       Byte(Trunc(g1 * alpha + g * (1 - alpha))),
+                       Byte(Trunc(b1 * alpha + b * (1 - alpha))));
+end;
+
 procedure RegisterAndroidWidgetDraftClass(AWidgetClass: jVisualControlClass;
   ADraftClass: TDraftWidgetClass);
 begin
   DraftClassesMap.Add(AWidgetClass, ADraftClass);
+end;
+
+{ TAndroidFormComponentEditor }
+
+procedure TAndroidFormComponentEditor.ChangeSize(AWidth, AHeight: Integer);
+begin
+  with jForm(Component) do
+  begin
+    if Assigned(Designer) then
+      with Designer as TAndroidWidgetMediator, LCLForm do
+        SetBounds(Left, Top, AWidth, AHeight);
+    SetBounds(Left, Top, AWidth, AHeight);
+  end;
+end;
+
+procedure TAndroidFormComponentEditor.ShowSelectSizeDialog;
+begin
+  with TfrmFormSizeSelect.Create(nil) do
+  try
+    with jForm(Component) do
+      SetInitSize(Width, Height);
+    if ShowModal = mrOk then
+      ChangeSize(seWidth.Value, seHeight.Value);
+  finally
+    Free
+  end;
+end;
+
+procedure TAndroidFormComponentEditor.ExecuteVerb(Index: Integer);
+begin
+  case Index of
+  0: // Rotate
+    with jForm(Component) do
+      ChangeSize(Height, Width);
+  1: ShowSelectSizeDialog; // Select size
+  else
+    inherited ExecuteVerb(Index);
+  end;
+end;
+
+function TAndroidFormComponentEditor.GetVerb(Index: Integer): string;
+begin
+  case Index of
+  0: Result := 'Rotate';
+  1: Result := 'Select size...';
+  else
+    Result := inherited;
+  end
+end;
+
+function TAndroidFormComponentEditor.GetVerbCount: Integer;
+begin
+  Result := 2;
+end;
+
+{ TAnchorPropertyEditor }
+
+procedure TAnchorPropertyEditor.GetValues(Proc: TGetStrProc);
+var
+  i, j: Integer;
+  p: TAndroidWidget;
+  sl: TStringList;
+begin
+  Proc(oisNone);
+  p := jVisualControl(GetComponent(0)).Parent;
+  for i := 1 to PropCount - 1 do
+    if jVisualControl(GetComponent(i)).Parent <> p then
+      Exit;
+  sl := TStringList.Create;
+  try
+    for i := 0 to p.ChildCount - 1 do
+      sl.Add(p.Children[i].Name);
+    sl.Sorted := True;
+    for i := 0 to PropCount - 1 do
+    begin
+      j := sl.IndexOf(TComponent(GetComponent(i)).Name);
+      if j >= 0 then sl.Delete(j);
+    end;
+    for i := 0 to sl.Count - 1 do
+      Proc(sl[i]);
+  finally
+    sl.Free;
+  end;
 end;
 
 { TDraftPanel }
@@ -457,12 +575,16 @@ begin
   FDefaultPenColor:= clMedGray;
   FDefaultFontColor:= clMedGray;
   GlobalDesignHook.AddHandlerModified(@OnDesignerModified);
+  GlobalDesignHook.AddHandlerPersistentAdded(@OnPersistentAdded);
+  GlobalDesignHook.AddHandlerSetSelection(@OnSetSelection);
   FStarted := TFPList.Create;
   FDone := TFPList.Create;
+  FSelection := TFPList.Create;
 end;
 
 destructor TAndroidWidgetMediator.Destroy;
 begin
+  FSelection.Free;
   FStarted.Free;
   FDone.Free;
   if GlobalDesignHook <> nil then
@@ -490,6 +612,33 @@ begin
   end;
   if InvalidateNeeded then
     LCLForm.Invalidate;
+end;
+
+procedure TAndroidWidgetMediator.OnPersistentAdded(APersistent: TPersistent;
+  Select: boolean);
+begin
+  if (APersistent is jVisualControl)
+  and (jVisualControl(APersistent).Parent = nil)
+  and (jVisualControl(APersistent).Owner = AndroidForm)
+  then
+    if Assigned(FLastSelectedContainer) then
+      jVisualControl(APersistent).Parent := FLastSelectedContainer
+    else
+      jVisualControl(APersistent).Parent := AndroidForm;
+end;
+
+procedure TAndroidWidgetMediator.OnSetSelection(const ASelection: TPersistentSelectionList);
+var
+  i: Integer;
+begin
+  FLastSelectedContainer := nil;
+  if (ASelection.Count = 1) and (ASelection[0] is jVisualControl) then
+    with jVisualControl(ASelection[0]) do
+      if (Owner = AndroidForm) and AcceptChildrenAtDesignTime then
+        FLastSelectedContainer := jVisualControl(ASelection[0]);
+  FSelection.Clear;
+  for i := 0 to ASelection.Count - 1 do
+    FSelection.Add(ASelection[i]);
 end;
 
 function TAndroidWidgetMediator.GetAndroidForm: jForm;
@@ -573,8 +722,27 @@ end;
 procedure TAndroidWidgetMediator.InitComponent(AComponent, NewParent: TComponent;
   NewBounds: TRect);
 begin
-  if AComponent <> AndroidForm then // to preserve size
+  if AComponent <> AndroidForm then // to preserve jForm size
+  begin
+    if AComponent is TAndroidWidget then
+      with NewBounds do
+        if (Right - Left = 50) and (Bottom - Top = 50) then // ugly check, but IDE makes 50x50 default size for non TControl
+        begin
+          // restore default size
+          Right := Left + TAndroidWidget(AComponent).Width;
+          Bottom := Top + TAndroidWidget(AComponent).Height
+        end;
     inherited InitComponent(AComponent, NewParent, NewBounds);
+    if (AComponent is jVisualControl)
+    and Assigned(jVisualControl(AComponent).Parent) then
+      with jVisualControl(AComponent) do
+      begin
+        if not (LayoutParamWidth in [lpWrapContent]) then
+          LayoutParamWidth := GetDesignerLayoutByWH(Width, Parent.Width);
+        if not (LayoutParamHeight in [lpWrapContent]) then
+          LayoutParamHeight := GetDesignerLayoutByWH(Height, Parent.Height);
+      end;
+  end;
 end;
 
 procedure TAndroidWidgetMediator.Paint;
@@ -696,25 +864,6 @@ procedure TAndroidWidgetMediator.Paint;
         fWidget.Draw;
         fWidget.Free;
       end else
-      if (AWidget is jSwitchButton) then
-      begin
-        fWidget:= TDraftSwitchButton.Create(AWidget, LCLForm.Canvas);
-        fWidget.Height:= AWidget.Height;
-        fWidget.Width:= AWidget.Width;
-        fWidget.MarginLeft:= AWidget.MarginLeft;
-        fWidget.MarginTop:= AWidget.MarginTop;
-        fWidget.MarginRight:= AWidget.MarginRight;
-        fWidget.MarginBottom:= AWidget.MarginBottom;
-        fWidget.Color:= (AWidget as jSwitchButton).BackgroundColor;
-        fWidget.FontColor:= colbrGray;
-
-        if (AWidget as jSwitchButton).State = tsOff then
-          TDraftSwitchButton(fWidget).OnOff := False
-        else
-          TDraftSwitchButton(fWidget).OnOff := True;
-        fWidget.Draw;
-        fWidget.Free;
-      end else
       if (AWidget is jView) then
       begin
         if (AWidget as jView).BackgroundColor <> colbrDefault then
@@ -796,22 +945,6 @@ procedure TAndroidWidgetMediator.Paint;
         fWidget.FontColor:= colbrGray;
         fWidget.Draw;
         fWidget.Free;
-      end else
-      if (AWidget is jEditText) then
-      begin
-         fWidget:= TDraftEditText.Create(AWidget, LCLForm.Canvas);
-         fWidget.Height:= AWidget.Height;
-         fWidget.Width:= AWidget.Width;
-         fWidget.MarginLeft:= AWidget.MarginLeft;
-         fWidget.MarginTop:= AWidget.MarginTop;
-         fWidget.MarginRight:= AWidget.MarginRight;
-         fWidget.MarginBottom:= AWidget.MarginBottom;
-
-         fWidget.Color:= (AWidget as jEditText).BackgroundColor;
-         fWidget.FontColor:= (AWidget as jEditText).FontColor;
-
-         fWidget.Draw;
-         fWidget.Free;
       end else
       if (AWidget is jListView)  then
       begin
@@ -901,7 +1034,7 @@ procedure TAndroidWidgetMediator.Paint;
         if Assigned(fWidgetClass) then
         begin
           fWidget := fWidgetClass.Create(AWidget, LCLForm.Canvas);
-          if not FIgnoreLayout then
+          if not FSizing or (FSelection.IndexOf(AWidget) < 0) then
             fWidget.UpdateLayout;
           fWidget.Draw;
           fWidget.Free;
@@ -979,7 +1112,7 @@ end;
 procedure TAndroidWidgetMediator.MouseDown(Button: TMouseButton;
   Shift: TShiftState; p: TPoint; var Handled: boolean);
 begin
-  FIgnoreLayout := True;
+  FSizing := True;
   inherited MouseDown(Button, Shift, p, Handled);
 end;
 
@@ -987,7 +1120,7 @@ procedure TAndroidWidgetMediator.MouseUp(Button: TMouseButton;
   Shift: TShiftState; p: TPoint; var Handled: boolean);
 begin
   inherited MouseUp(Button, Shift, p, Handled);
-  FIgnoreLayout := False;
+  FSizing := False;
   LCLForm.Invalidate;
 end;
 
@@ -1006,13 +1139,15 @@ begin
     FnewH := Height;
     FnewL := Left;
     FnewT := Top;
-    if Parent <> nil then
-    begin
-      if not (LayoutParamWidth in [lpWrapContent{, lpMatchParent}]) then
-        LayoutParamWidth := GetDesignerLayoutByWH(Width, Parent.Width);
-      if not (LayoutParamHeight in [lpWrapContent{, lpMatchParent}]) then
-        LayoutParamHeight := GetDesignerLayoutByWH(Height, Parent.Height);
-    end;
+    with Designer do
+      if FSizing and (FSelection.IndexOf(AWidget) >= 0)
+      and (Parent <> nil) then
+      begin
+        if not (LayoutParamWidth in [lpWrapContent]) then
+          LayoutParamWidth := GetDesignerLayoutByWH(Width, Parent.Width);
+        if not (LayoutParamHeight in [lpWrapContent]) then
+          LayoutParamHeight := GetDesignerLayoutByWH(Height, Parent.Height);
+      end;
   end;
 end;
 
@@ -1032,6 +1167,8 @@ begin
       else
       if LayoutParamHeight <> lpWrapContent then
         FnewH := GetLayoutParamsByParent(Parent, LayoutParamHeight, sdH);
+      if FnewW < FminW then FnewW := FminW;
+      if FnewH < FminH then FnewH := FminH;
       if (PosRelativeToParent <> []) or (PosRelativeToAnchor <> []) then
       begin
         FnewL := MarginLeft;
@@ -1105,6 +1242,18 @@ begin
     TextColor:= FPColorToTColor(ToTFPColor(color));
   end
   else TextColor:= clNone;
+end;
+
+function TDraftWidget.Designer: TAndroidWidgetMediator;
+var
+  t: TAndroidWidget;
+begin
+  Result := nil;
+  if FAndroidWidget = nil then Exit;
+  t := FAndroidWidget;
+  while Assigned(t.Parent) do t := t.Parent;
+  if t is TAndroidForm then
+    Result := TAndroidForm(t).Designer as TAndroidWidgetMediator;
 end;
 
 { TDraftButton }
@@ -1253,37 +1402,56 @@ end;
 constructor TDraftEditText.Create(AWidget: TAndroidWidget; Canvas: TCanvas);
 begin
   inherited;
-  BackGroundColor:= clNone; //clActiveCaption;
+  Color := jEditText(AWidget).BackgroundColor;
+  FontColor := jEditText(AWidget).FontColor;
 end;
 
 procedure TDraftEditText.Draw;
+var
+  ls: Integer;
 begin
-  Fcanvas.Brush.Color:= Self.BackGroundColor;
-  Fcanvas.Pen.Color:= clActiveCaption;
-  Fcanvas.Font.Color:= Self.TextColor;
+  with FCanvas do
+  begin
+    if BackgroundColor <> clNone then
+    begin
+      Brush.Color := BackGroundColor;
+      FillRect(0, 0, FAndroidWidget.Width, FAndroidWidget.Height);
+    end else
+      Brush.Style := bsClear;
+    if TextColor = clNone then
+      Font.Color := clBlack
+    else
+      Font.Color := TextColor;
+    ls := Font.Size;
+    Font.Size := AndroidToLCLFontSize(jEditText(FAndroidWidget).FontSize, 13);
+    TextOut(12, 9, jEditText(FAndroidWidget).Text);
+    Font.Size := ls;
+    if BackgroundColor = clNone then
+    begin
+      Pen.Color := RGBToColor(175,175,175);
+      with FAndroidWidget do
+      begin
+        MoveTo(4, Height - 8);
+        Lineto(4, Height - 5);
+        Lineto(Width - 4, Height - 5);
+        Lineto(Width - 4, Height - 8);
+      end;
+    end;
+  end;
+end;
 
-  if Self.BackGroundColor = clNone then
-    Fcanvas.Brush.Color:= clWhite;
-
-  if Self.TextColor = clNone then
-     Fcanvas.Font.Color:= clBlack;
-
-  Fcanvas.FillRect(0,0,Self.Width,Self.Height);
-      // outer frame
-  Fcanvas.Rectangle(0,0,Self.Width,Self.Height);
-
- (* canvas.Pen.Color:= clBlack;
-  canvas.MoveTo(Self.Width-Self.MarginRight+9, {x2}Self.MarginTop-9); {y1}
-  canvas.LineTo(Self.MarginLeft-9,Self.MarginTop-9);  {x1, y1}
-  canvas.LineTo(Self.MarginLeft-9,Self.Height-Self.MarginBottom+9); {x1, y2}*)
-
-  Fcanvas.Pen.Color:= clBlack; //clWindowFrame; //clBlack;//clGray; //Self.FDefaultPenColor;
-
-  Fcanvas.Brush.Style:= bsClear;
-  Fcanvas.Rectangle(2,2,Self.Width-2,Self.Height-2);
-
-
-  Fcanvas.TextOut(5, 4, FAndroidWidget.Text);
+procedure TDraftEditText.UpdateLayout;
+var
+  fs: Integer;
+begin
+  with jEditText(FAndroidWidget) do
+    if LayoutParamHeight = lpWrapContent then
+    begin
+      fs := FontSize;
+      if fs = 0 then fs := 18;
+      FnewH := 29 + (fs - 10) * 4 div 3; // todo: multile
+    end;
+  inherited UpdateLayout;
 end;
 
 { TDraftCheckBox }
@@ -1847,93 +2015,87 @@ end;
 
 { TDraftSwitchButton }
 
-constructor TDraftSwitchButton.Create(AWidget: TAndroidWidget; Canvas: TCanvas);
+procedure TDraftSwitchButton.Draw;
+var
+  x, y, z, i, ps: Integer;
+  r, rb: TRect;
+  ts: TTextStyle;
+  s: string;
 begin
-  inherited;
-  BackGroundColor:= clActiveCaption;; //clMenuHighlight;
+  with FCanvas do
+  begin
+    Color := jSwitchButton(FAndroidWidget).BackgroundColor;
+    if BackGroundColor = clNone then
+      BackGroundColor := clWhite
+    else begin
+      Brush.Color := BackGroundColor;
+      FillRect(0, 0, FAndroidWidget.Width, FAndroidWidget.Height);
+    end;
+    x := FAndroidWidget.Height div 2 - 12;
+    Brush.Color := BlendColors(BackGroundColor, 0.7, 153,153,153);
+    ps := Font.Size;
+    Font.Size := 10;
+    with jSwitchButton(FAndroidWidget) do
+    begin
+      y := TextWidth(TextOn);
+      z := TextWidth(TextOff);
+      if y < z then y := z;
+      y := y + 22; // button width
+
+      i := 2 * (y + 2);
+      if i < 92 then i := 92;
+      z := FAndroidWidget.Width - 2 - i;
+      rb := Rect(z, x, z + i, x + 24);
+
+      FillRect(rb);
+      if State = tsOff then
+      begin
+        z := rb.Left + 1;
+        Brush.Color := BlendColors(Self.BackgroundColor, 0.414, 153,153,153);
+        Font.Color := RGBToColor(234,234,234);
+        s := TextOff;
+      end else begin
+        z := rb.Right - 1 - y;
+        Brush.Color := BlendColors(Self.BackgroundColor, 0.14, 11,153,200);
+        Font.Color := clWhite;
+        s := TextOn;
+      end;
+    end;
+    r := Rect(z, x + 1, z + y, x + 23);
+    FillRect(r);
+    ts := TextStyle;
+    ts.Layout := tlCenter;
+    ts.Alignment := Classes.taCenter;
+    TextRect(r, 0, 0, s, ts);
+    Font.Size := ps;
+  end;
 end;
 
-procedure TDraftSwitchButton.Draw;
+procedure TDraftSwitchButton.UpdateLayout;
+var
+  ps, x, y: Integer;
 begin
-  Fcanvas.Brush.Color:= Self.BackGroundColor;
-  Fcanvas.Pen.Color:= clWhite;
-  Fcanvas.Font.Color:= Self.TextColor;
-
-  if Self.BackGroundColor = clNone then
-     Fcanvas.Brush.Color:= clSilver; //clMedGray;
-
-  if Self.TextColor = clNone then
-      Fcanvas.Font.Color:= clBlack;
-
-  Fcanvas.FillRect(0,0,Self.Width,Self.Height);
-      // outer frame
-  Fcanvas.Rectangle(0,0,Self.Width,Self.Height);
-
-  Fcanvas.Pen.Color:= clWindowFrame;
-    //V
-  Fcanvas.Line(Self.MarginLeft-4, {x1}
-               Self.MarginTop-3,  {y1}
-               Self.MarginLeft-4, {x1}
-               Self.Height-Self.MarginBottom+3); {y2}
-
-     //H
-  Fcanvas.Line(Self.Width-Self.MarginRight+3, {x2}
-            Self.MarginTop-3,  {y1}
-            Self.MarginLeft-4, {x1}
-            Self.MarginTop-3);{y1}
-
-  Fcanvas.Pen.Color:= clWhite;
-  Fcanvas.Line(Self.Width-Self.MarginRight+3, {x2}
-            Self.MarginTop-3,  {y1}
-            Self.Width-Self.MarginRight+3,  {x2}
-            Self.Height-Self.MarginBottom+3); {y2}
-
-   Fcanvas.Line(Self.Width-Self.MarginRight+3, {x2}
-            Self.Height-Self.MarginBottom+3,{y2}
-            Self.MarginLeft-4,                {x1}
-            Self.Height-Self.MarginBottom+3);  {y2}
-
-   //tumbl
-  if Self.OnOff = False then  //on
+  FminH := 28;
+  with jSwitchButton(FAndroidWidget) do
   begin
-    Fcanvas.Brush.Style:= bsSolid;
-    Fcanvas.FillRect(
-               Self.MarginLeft-1, {x1}
-               Self.MarginTop,
-               Trunc(Self.Width/2),
-               Self.Height-Self.MarginBottom+1);
-
-    Fcanvas.Brush.Style:= bsClear;
-    Fcanvas.Pen.Color:= clWhite; //clWindowFrame
-
-    Fcanvas.Rectangle(
-               Self.MarginLeft-1, {x1}
-               Self.MarginTop,
-               Trunc(Self.Width/2),
-               Self.Height-Self.MarginBottom+1);
-  end
-  else  //True
-  begin
-    Fcanvas.Brush.Style:= bsSolid;
-    Fcanvas.Brush.Color:= clSkyBlue;
-
-    Fcanvas.FillRect(
-               Trunc(Self.Width/2), {x1}
-               Self.MarginTop,
-               Self.Width - Self.MarginRight,
-               Self.Height - Self.MarginBottom+1);
-
-    Fcanvas.Pen.Color:= clWhite; //clWindowFrame
-    Fcanvas.Brush.Style:= bsClear;
-
-    Fcanvas.Rectangle(
-               Trunc(Self.Width/2), {x1}
-               Self.MarginTop,
-               Self.Width - Self.MarginRight,
-               Self.Height - Self.MarginBottom+1);
+    if LayoutParamWidth = lpWrapContent then
+      with FCanvas do
+      begin
+        ps := Font.Size;
+        Font.Size := 10;
+        x := TextWidth(TextOn);
+        y := TextWidth(TextOff);
+        if y > x then x := y;
+        x := 2 * (x + 22 + 2);
+        if x < 92 then x := 92;
+        x := x + 4;
+        FnewW := x;
+        Font.Size := ps;
+      end;
+    if LayoutParamHeight = lpWrapContent then
+      FnewH := 28
   end;
-  //Fcanvas.Font.Color:= Self.TextColor;
-  //Fcanvas.TextOut(5,4,txt);
+  inherited;
 end;
 
 {TDraftGridView}
@@ -1984,6 +2146,8 @@ end;
 initialization
   DraftClassesMap := TDraftControlHash.Create(64); // power of 2 for efficiency
   RegisterPropertyEditor(TypeInfo(TARGBColorBridge), nil, '', TARGBColorBridgePropertyEditor);
+  RegisterPropertyEditor(TypeInfo(jVisualControl), jVisualControl, 'Anchor', TAnchorPropertyEditor);
+  RegisterComponentEditor(jForm, TAndroidFormComponentEditor);
 
   // DraftClasses registeration:
   RegisterAndroidWidgetDraftClass(jProgressBar, TDraftProgressBar);
@@ -1992,6 +2156,8 @@ initialization
   RegisterAndroidWidgetDraftClass(jRadioButton, TDraftRadioButton);
   RegisterAndroidWidgetDraftClass(jTextView, TDraftTextView);
   RegisterAndroidWidgetDraftClass(jPanel, TDraftPanel);
+  RegisterAndroidWidgetDraftClass(jEditText, TDraftEditText);
+  RegisterAndroidWidgetDraftClass(jSwitchButton, TDraftSwitchButton);
 
 finalization
   DraftClassesMap.Free;

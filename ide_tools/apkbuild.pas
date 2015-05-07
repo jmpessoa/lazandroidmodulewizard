@@ -283,6 +283,30 @@ function TApkBuilder.TryFixPaths: TModalResult;
     Result := DirectoryExistsUTF8(path);
   end;
 
+  function GetManifestSdkTarget(Manifest: string; out SdkTarget: string): Boolean;
+  var
+    ManifestXML: TXMLDocument;
+    n: TDOMNode;
+  begin
+    Result := False;
+    if not FileExistsUTF8(Manifest) then Exit;
+    try
+      ReadXMLFile(ManifestXML, Manifest);
+      try
+        n := ManifestXML.DocumentElement.FindNode('uses-sdk');
+        if not Assigned(n) then Exit;
+        n := n.Attributes.GetNamedItem('android:targetSdkVersion');
+        if not Assigned(n) then Exit;
+        SdkTarget := n.TextContent;
+        Result := True;
+      finally
+        ManifestXML.Free
+      end;
+    except
+      Exit;
+    end;
+  end;
+
 var
   sl: TStringList;
   i: Integer;
@@ -363,22 +387,40 @@ begin
         if Item[i].NodeName = 'property' then
         begin
           n := Item[i].Attributes.GetNamedItem('name');
-          if Assigned(n) and (n.TextContent = 'sdk.dir') then
+          if Assigned(n) then
           begin
-            n := Item[i].Attributes.GetNamedItem('location');
-            if not assigned(n) then Continue;
-            str := n.TextContent;
-            if not DirectoryExistsUTF8(str) and DirectoryExistsUTF8(FSdkPath) then
+            if n.TextContent = 'sdk.dir' then
             begin
-              if not ForceFixPaths
-              and (MessageDlg('build.xml',
-                             'Path "' + str + '" does not exist.' + sLineBreak +
-                             'Change it to "' + FSdkPath + '"?', mtConfirmation,
-                             [mbYes, mbNo], 0) <> mrYes) then Exit;
-              Item[i].Attributes.GetNamedItem('location').TextContent := FSdkPath;
-              WriteXMLFile(xml, prev);
+              n := Item[i].Attributes.GetNamedItem('location');
+              if not Assigned(n) then Continue;
+              str := n.TextContent;
+              if not DirectoryExistsUTF8(str) and DirectoryExistsUTF8(FSdkPath) then
+              begin
+                if not ForceFixPaths
+                and (MessageDlg('build.xml',
+                               'Path "' + str + '" does not exist.' + sLineBreak +
+                               'Change it to "' + FSdkPath + '"?', mtConfirmation,
+                               [mbYes, mbNo], 0) <> mrYes) then Exit;
+                Item[i].Attributes.GetNamedItem('location').TextContent := FSdkPath;
+                WriteXMLFile(xml, prev);
+              end;
+            end else
+            if n.TextContent = 'target' then
+            begin
+              // fix "target" according to AndroidManifest
+              n := Item[i].Attributes.GetNamedItem('value');
+              if not Assigned(n) then Continue;
+              if not GetManifestSdkTarget(FProjPath + 'AndroidManifest.xml', str) then Continue;
+              if n.TextContent <> 'android-' + str then
+              begin
+                if not ForceFixPaths
+                and (MessageDlg('build.xml',
+                               'Change target to "android-' + str + '"?',
+                               mtConfirmation, [mbYes, mbNo], 0) <> mrYes) then Exit;
+                Item[i].Attributes.GetNamedItem('value').TextContent := 'android-' + str;
+                WriteXMLFile(xml, prev);
+              end;
             end;
-            Break;
           end;
         end;
   finally

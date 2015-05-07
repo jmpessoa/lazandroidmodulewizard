@@ -272,7 +272,6 @@ Type
    procedure UpdateLParamWidth;
 
  protected
-   procedure SetParentComponent(Value: TComponent); override;
    Function  Shader_Build  ( sType : TxgShaderType; Name : String ) : GLuint;
    //
    Procedure SetShader  ( value : TxgShader );
@@ -1227,21 +1226,11 @@ begin
   FMarginTop    := 10;
   FMarginBottom := 10;
   FMarginRight  := 10;
+  FHeight       := 96;
+  FWidth        := 96;
   FLParamWidth  := lpMatchParent;  //lpWrapContent
   FLParamHeight := lpWrapContent; //lpMatchParent
 
-end;
-
-procedure jCanvasES2.SetParentComponent(Value: TComponent);
-begin
-   inherited SetParentComponent(Value);
-   Self.Height:= 96;
-   Self.Width:= 96;
-   if Value <> nil then
-   begin
-      Parent:= TAndroidWidget(Value);
-      Self.Width:= Trunc(TAndroidWidget(Parent).Width) - 13;
-   end;
 end;
 
 Destructor jCanvasES2.Destroy;

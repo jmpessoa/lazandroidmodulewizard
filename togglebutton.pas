@@ -23,9 +23,6 @@ type
     procedure SetColor(Value: TARGBColorBridge); //background
     procedure UpdateLParamHeight;
     procedure UpdateLParamWidth;
-
-  protected
-    procedure SetParentComponent(Value: TComponent); override;
   public
     constructor Create(AOwner: TComponent); override;
     destructor  Destroy; override;
@@ -100,6 +97,8 @@ begin
   FMarginTop    := 10;
   FMarginBottom := 10;
   FMarginRight  := 10;
+  FHeight       := 40; //??
+  FWidth        := 75; //??
   FLParamWidth  := lpWrapContent;  //lpWrapContent
   FLParamHeight := lpWrapContent; //lpMatchParent
   FAcceptChildrenAtDesignTime:= False;
@@ -107,18 +106,6 @@ begin
   FTextOff:= 'OFF';
   FTextOn:= 'ON';
   FToggleState:= tsOff;
-end;
-
-procedure jToggleButton.SetParentComponent(Value: TComponent);
-begin
-  inherited SetParentComponent(Value);
-  Self.Height:= 40; //??
-  Self.Width:= 75; //??
-  if Value <> nil then
-  begin
-      Parent:= TAndroidWidget(Value);
-      Self.Width:= Trunc(TAndroidWidget(Parent).Width/5) - 13; //??
-  end;
 end;
 
 destructor jToggleButton.Destroy;

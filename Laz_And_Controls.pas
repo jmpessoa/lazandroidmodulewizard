@@ -171,7 +171,6 @@ type
      procedure UpdateLParamHeight;
      procedure UpdateLParamWidth;
    protected
-     procedure SetParentComponent(Value: TComponent); override;
      function GetWidth: integer;  override;
      function GetHeight: integer; override;
      procedure SetViewParent(Value: jObject); override;
@@ -607,7 +606,6 @@ type
     procedure UpdateLParamWidth;
 
   protected
-    procedure SetParentComponent(Value: TComponent); override;
     Procedure SetText(Value: string ); override;
     Function  GetText: string;   override;
 
@@ -678,7 +676,6 @@ type
     procedure UpdateLParamWidth;
 
   protected
-    procedure SetParentComponent(Value: TComponent); override;
     Procedure SetText(Value: string ); override;
     Function  GetText: string; override;
 
@@ -757,7 +754,6 @@ type
     procedure UpdateLParamHeight;
     procedure UpdateLParamWidth;
   protected
-    procedure SetParentComponent(Value: TComponent); override;
     procedure SetViewParent(Value: jObject);  override;
     Procedure GenEvent_OnClick(Obj: TObject);
     Function  GetText            : string;   override;
@@ -790,7 +786,6 @@ type
     procedure UpdateLParamWidth;
 
   protected
-    procedure SetParentComponent(Value: TComponent); override;
     procedure SetViewParent(Value: jObject);  override;
     Procedure GenEvent_OnClick(Obj: TObject);
     Function  GetText            : string;    override;   //by thierry
@@ -830,7 +825,6 @@ type
     procedure UpdateLParamWidth;
 
   protected
-    procedure SetParentComponent(Value: TComponent); override;
     procedure SetViewParent(Value: jObject);  override;
     Procedure GenEvent_OnClick(Obj: TObject);
     Function  GetText            : string; override;
@@ -871,7 +865,6 @@ type
     procedure UpdateLParamHeight;
     procedure UpdateLParamWidth;
   protected
-    procedure SetParentComponent(Value: TComponent); override;
     procedure SetViewParent(Value: jObject);  override;
   public
     Constructor Create(AOwner: TComponent); override;
@@ -912,7 +905,6 @@ type
     procedure UpdateLParamHeight;
     procedure UpdateLParamWidth;
   protected
-    procedure SetParentComponent(Value: TComponent); override;
     procedure SetViewParent(Value: jObject);  override;
     function GetHeight: integer;   override;
     function GetWidth: integer;     override;
@@ -1002,7 +994,6 @@ type
     procedure UpdateLParamHeight;
     procedure UpdateLParamWidth;
   protected
-    procedure SetParentComponent(Value: TComponent); override;
     procedure SetViewParent(Value: jObject);  override;
     Procedure GenEvent_OnClick(Obj: TObject; Value: integer);
     procedure GenEvent_OnClickWidgetItem(Obj: TObject; index: integer; checked: boolean);
@@ -1077,7 +1068,6 @@ type
     procedure UpdateLParamHeight;
     procedure UpdateLParamWidth;
   protected
-    procedure SetParentComponent(Value: TComponent); override;
     procedure SetViewParent(Value: jObject);  override;
   public
     constructor Create(AOwner: TComponent); override;
@@ -1105,7 +1095,6 @@ type
     procedure UpdateLParamHeight;
     procedure UpdateLParamWidth;
   protected
-    procedure SetParentComponent(Value: TComponent); override;
     procedure SetViewParent(Value: jObject); override;
   public
     constructor Create(AOwner: TComponent); override;
@@ -1130,7 +1119,6 @@ type
     procedure UpdateLParamHeight;
     procedure UpdateLParamWidth;
   protected
-    procedure SetParentComponent(Value: TComponent); override;
     procedure SetViewParent(Value: jObject);  override;
   public
     constructor Create(AOwner: TComponent); override;
@@ -1161,7 +1149,6 @@ type
     procedure UpdateLParamHeight;
     procedure UpdateLParamWidth;
   protected
-    procedure SetParentComponent(Value: TComponent); override;
     procedure SetViewParent(Value: jObject); override;
   public
     constructor Create(AOwner: TComponent); override;
@@ -1200,7 +1187,6 @@ type
     procedure UpdateLParamHeight;
     procedure UpdateLParamWidth;
   protected
-    procedure SetParentComponent(Value: TComponent); override;
     procedure SetViewParent(Value: jObject);   override;
     function GetWidth: integer;  override;
     function GetHeight: integer; override;
@@ -1251,7 +1237,6 @@ type
     procedure UpdateLParamHeight;
     procedure UpdateLParamWidth;
   protected
-    procedure SetParentComponent(Value: TComponent); override;
     procedure SetViewParent(Value: jObject); override;
     Procedure GenEvent_OnClick(Obj: TObject);
     procedure Notification(AComponent: TComponent; Operation: TOperation); override;
@@ -1339,8 +1324,6 @@ type
     FOnGLDown : TOnTouchEvent;
     FOnGLMove : TOnTouchEvent;
     FOnGLUp   : TOnTouchEvent;
-  protected
-    procedure SetParentComponent(Value: TComponent);  override;
     //
   public
     constructor Create(AOwner: TComponent); override;
@@ -2034,21 +2017,11 @@ begin
   FMarginTop    := 5;
   FMarginBottom := 5;
   FMarginRight  := 5;
+  FHeight       := 25;
+  FWidth        := 51;
   FLParamWidth  := lpWrapContent;
   FLParamHeight := lpWrapContent;
   FEnabled:= True;
-end;
-
-procedure jTextView.SetParentComponent(Value: TComponent);
-begin
-   inherited SetParentComponent(Value);
-   Self.Height:= 25;
-   Self.Width:= 51;
-   if Value <> nil then
-   begin
-      Parent:= TAndroidWidget(Value);
-      Self.Width:= Trunc(TAndroidWidget(Parent).Width/2) - 15;
-   end;
 end;
 
 //
@@ -2344,22 +2317,12 @@ begin
   FMarginLeft   := 5;
   FMarginRight  := 5;
   FMarginTop    := 10;
+  FHeight       := 40;
+  FWidth        := 100;
 
   FLParamWidth  := lpHalfOfParent;
   FLParamHeight := lpWrapContent;
   FEditable:= True;
-end;
-
-procedure jEditText.SetParentComponent(Value: TComponent);
-begin
-   inherited SetParentComponent(Value);
-   Self.Height:= 40;
-   Self.Width:= 100;
-   if Value <> nil then
-   begin
-      Parent:= TAndroidWidget(Value);
-      Self.Width:= Trunc(TAndroidWidget(Parent).Width/2) - 15;
-   end;
 end;
 
 Destructor jEditText.Destroy;
@@ -2855,20 +2818,10 @@ begin
   FMarginTop    := 4;
   FMarginBottom := 4;
   FMarginRight  := 2;
+  FHeight       := 40;
+  FWidth        := 100;
   FLParamWidth  := lpHalfOfParent;
   FLParamHeight := lpWrapContent;
-end;
-
-procedure jButton.SetParentComponent(Value: TComponent);
-begin
-   inherited SetParentComponent(Value);
-   Self.Height:= 40;
-   Self.Width:= 100;
-   if Value <> nil then
-   begin
-      Parent:= TAndroidWidget(Value);
-      Self.Width:= Trunc(TAndroidWidget(Parent).Width/2) - 15;
-   end;
 end;
 
 destructor jButton.Destroy;
@@ -3086,21 +3039,11 @@ begin
   FMarginTop    := 5;
   FMarginBottom := 5;
   FMarginRight  := 5;
+  FHeight       := 25;
+  FWidth        := 100;
   FFontColor    := colbrDefault;
   FLParamWidth:= lpWrapContent;
   FLParamHeight:= lpWrapContent;
-end;
-
-procedure jCheckBox.SetParentComponent(Value: TComponent);
-begin
-   inherited SetParentComponent(Value);
-   Self.Height:= 25;
-   Self.Width:= 100;
-   if Value <> nil then
-   begin
-      Parent:= TAndroidWidget(Value);
-      Self.Width:= Trunc(TAndroidWidget(Parent).Width/2) - 15;
-   end;
 end;
 
 destructor jCheckBox.Destroy;
@@ -3327,21 +3270,11 @@ begin
   FMarginTop    := 5;
   FMarginBottom := 5;
   FMarginRight  := 5;
+  FHeight       := 25;
+  FWidth        := 100;
   FFontColor    := colbrDefault;
   FLParamWidth:= lpWrapContent;
   FLParamHeight:= lpWrapContent;
-end;
-
-procedure jRadioButton.SetParentComponent(Value: TComponent);
-begin
-   inherited SetParentComponent(Value);
-   Self.Height:= 25;
-   Self.Width:= 100;
-   if Value <> nil then
-   begin
-      Parent:= TAndroidWidget(Value);
-      Self.Width:= Trunc(TAndroidWidget(Parent).Width/2) - 15;
-   end;
 end;
 
 destructor jRadioButton.Destroy;
@@ -3571,23 +3504,13 @@ begin
   FMarginTop    := 10;
   FMarginBottom := 10;
   FMarginRight  := 10;
+  FHeight       := 30;
+  FWidth        := 100;
   FEnabled:= False;
 
   FLParamWidth  := lpMatchParent;
   FLParamHeight := lpWrapContent;
 
-end;
-
-procedure jProgressBar.SetParentComponent(Value: TComponent);
-begin
-   inherited SetParentComponent(Value);
-   Self.Height:= 30;
-   Self.Width:= 100;
-   if Value <> nil then
-   begin
-      Parent:= TAndroidWidget(Value);
-      Self.Width:= Trunc(TAndroidWidget(Parent).Width) - 13;
-   end;
 end;
 
 Destructor jProgressBar.Destroy;
@@ -3806,17 +3729,11 @@ begin
   FImageIndex:= -1;
   FLParamWidth := lpWrapContent; //lpMatchParent;
   FLParamHeight:= lpWrapContent;
+  FHeight:= 48;
+  FWidth:= 48;
   //FIsBackgroundImage:= False;
   FFilePath:= fpathData;
   FImageScaleType:= scaleCenter;
-end;
-
-procedure jImageView.SetParentComponent(Value: TComponent);
-begin
-   inherited SetParentComponent(Value);
-   Self.Height:= 48;
-   Self.Width:= 48;
-   if Value <> nil then Parent:= TAndroidWidget(Value);
 end;
 
 destructor jImageView.Destroy;
@@ -4582,22 +4499,12 @@ begin
 
   FLParamWidth:= lpMatchParent;
   FLParamHeight:= lpWrapContent;
+  FHeight:= 96;
+  FWidth:= 100;
 
   FHighLightSelectedItem:= False;
   FHighLightSelectedItemColor:= colbrDefault;
 
-end;
-
-procedure jListView.SetParentComponent(Value: TComponent);
-begin
-   inherited SetParentComponent(Value);
-   Self.Height:= 96;
-   Self.Width:= 100;
-   if Value <> nil then
-   begin
-      Parent:= TAndroidWidget(Value);
-      Self.Width:= Trunc(TAndroidWidget(Parent).Width) - 13;
-   end;
 end;
 
 destructor jListView.Destroy;
@@ -5071,20 +4978,10 @@ begin
   FScrollSize := 800; //to scrolling images this number could be higher....
   FLParamWidth:= lpMatchParent;
   FLParamHeight:= lpWrapContent;
+  FHeight:= 96;
+  FWidth:= 100;
   //FAcceptChildsAtDesignTime:= True;
   FAcceptChildrenAtDesignTime:= True;
-end;
-
-procedure jScrollView.SetParentComponent(Value: TComponent);
-begin
-   inherited SetParentComponent(Value);
-   Self.Height:= 96;
-   Self.Width:= 100;
-   if Value <> nil then
-   begin
-      Parent:= TAndroidWidget(Value);
-      Self.Width:= Trunc(TAndroidWidget(Parent).Width) - 13;
-   end;
 end;
 
 Destructor jScrollView.Destroy;
@@ -5268,20 +5165,9 @@ Constructor jHorizontalScrollView.Create(AOwner: TComponent);
 
   FLParamWidth:= lpMatchParent;
   FLParamHeight:= lpWrapContent;
-
+  FHeight:= 96;
+  FWidth:= 100;
  end;
-
-procedure jHorizontalScrollView.SetParentComponent(Value: TComponent);
-begin
-   inherited SetParentComponent(Value);
-   Self.Height:= 96;
-   Self.Width:= 100;
-   if Value <> nil then
-   begin
-      Parent:= TAndroidWidget(Value);
-      Self.Width:= Trunc(TAndroidWidget(Parent).Width) - 13;
-   end;
-end;
 
 Destructor jHorizontalScrollView.Destroy;
 begin
@@ -5447,18 +5333,8 @@ begin
   inherited Create(AOwner);
   FLParamWidth:= lpMatchParent;
   FLParamHeight:= lpWrapContent;
-end;
-
-procedure jViewFlipper.SetParentComponent(Value: TComponent);
-begin
-   inherited SetParentComponent(Value);
-   Self.Height:= 96;
-   Self.Width:= 100;
-   if Value <> nil then
-   begin
-      Parent:= TAndroidWidget(Value);
-      Self.Width:= Trunc(TAndroidWidget(Parent).Width) - 13;
-   end;
+  FHeight:= 96;
+  FWidth:= 100;
 end;
 
 Destructor jViewFlipper.Destroy;
@@ -5625,18 +5501,8 @@ begin
   FOnStatus   := nil;
   FLParamWidth:= lpMatchParent;
   FLParamHeight:= lpWrapContent;
-end;
-
-procedure jWebView.SetParentComponent(Value: TComponent);
-begin
-   inherited SetParentComponent(Value);
-   Self.Height:= 96;
-   Self.Width:= 100;
-   if Value <> nil then
-   begin
-      Parent:= TAndroidWidget(Value);
-      Self.Width:= Trunc(TAndroidWidget(Parent).Width) - 13;
-   end;
+  FHeight:= 96;
+  FWidth:= 100;
 end;
 
 destructor jWebView.Destroy;
@@ -6391,15 +6257,8 @@ begin
 
   FLParamWidth:= lpWrapContent; //lpMatchParent;
   FLParamHeight:= lpWrapContent;
-
-end;
-
-procedure jView.SetParentComponent(Value: TComponent);
-begin
-   inherited SetParentComponent(Value);
-   Self.Height:= 96;
-   Self.Width:= 96;
-   if Value <> nil then Parent:= TAndroidWidget(Value);
+  FHeight:= 96;
+  FWidth:= 96;
 end;
 
 Destructor jView.Destroy;
@@ -6822,14 +6681,8 @@ begin
   FMarginTop    := 5;
   FMarginBottom := 5;
   FMarginRight  := 5;
-end;
-
-procedure jImageBtn.SetParentComponent(Value: TComponent);
-begin
-   inherited SetParentComponent(Value);
-   Self.Width:= 48;
-   Self.Height:=48;
-   if Value <> nil then Parent:= TAndroidWidget(Value);
+  FWidth        := 48;
+  FHeight       :=48;
 end;
 
 Destructor jImageBtn.Destroy;
@@ -7187,11 +7040,6 @@ begin
   FMouches.Mouch.Zoom   := 1.0;
   FMouches.Mouch.Angle  := 0.0;
   FInitialized:= False;
-end;
-
-procedure jGLViewEvent.SetParentComponent(Value: TComponent);
-begin
-   inherited SetParentComponent(Value);
 end;
 
 Destructor jGLViewEvent.Destroy;
@@ -7646,18 +7494,8 @@ begin
   FMarginBottom:= 4;
   FMinZoomFactor:= 1/4;
   FMaxZoomFactor:= 8/2;
-end;
-
-procedure jPanel.SetParentComponent(Value: TComponent);
-begin
-   inherited SetParentComponent(Value);
-   Self.Height:= 48;
-   Self.Width:= 96;
-   if Value <> nil then
-   begin
-      Parent:= TAndroidWidget(Value);
-      Self.Width:= Trunc(TAndroidWidget(Parent).Width) - 13;
-   end;
+  FHeight:= 48;
+  FWidth:= 96;
 end;
 
 destructor jPanel.Destroy;

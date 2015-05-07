@@ -166,7 +166,6 @@ jCanvasES1 = class(jGLViewEvent)
   procedure UpdateLParamHeight;
   procedure UpdateLParamWidth;
  protected
-  procedure SetParentComponent(Value: TComponent);  override;
   Procedure SetAlpha      ( alpha : Single      );
   Procedure SetVertex     ( ptr : Pointer       );
   Procedure SetColor      ( ptr : Pointer       );
@@ -655,20 +654,10 @@ begin
   FMarginTop    := 10;
   FMarginBottom := 10;
   FMarginRight  := 10;
+  FHeight       := 96;
+  FWidth        := 96;
   FLParamWidth  := lpMatchParent;  //lpWrapContent
   FLParamHeight := lpWrapContent; //lpMatchParent
-end;
-
-procedure jCanvasES1.SetParentComponent(Value: TComponent);
-begin
-   inherited SetParentComponent(Value);
-   Self.Height:= 96;
-   Self.Width:= 96;
-   if Value <> nil then
-   begin
-      Parent:= TAndroidWidget(Value);
-      Self.Width:= Trunc(TAndroidWidget(Parent).Width) - 13;
-   end;
 end;
 
 Destructor jCanvasES1.Destroy;

@@ -26,9 +26,6 @@ TGridItemLayout = (ilImageText, ilTextImage);
     procedure SetColor(Value: TARGBColorBridge); //background
     procedure UpdateLParamHeight;
     procedure UpdateLParamWidth;
-
-  protected
-    procedure SetParentComponent(Value: TComponent); override;
   public
     constructor Create(AOwner: TComponent); override;
     destructor  Destroy; override;
@@ -105,22 +102,12 @@ begin
   FMarginRight  := 10;
   FLParamWidth  := lpMatchParent;  //lpWrapContent
   FLParamHeight := lpMatchParent;
+  FHeight       := 160; //??
+  FWidth        := 96; //??
   FAcceptChildrenAtDesignTime:= False;
 //your code here....
   FColumns:= -1; //AUTO_FIT
   FItemsLayout:= ilImageText;
-end;
-
-procedure jGridView.SetParentComponent(Value: TComponent);
-begin
-  inherited SetParentComponent(Value);
-  Self.Height:= 160; //??
-  Self.Width:= 96; //??
-  if Value <> nil then
-  begin
-      Parent:= TAndroidWidget(Value);
-      Self.Width:= Trunc(TAndroidWidget(Parent).Width) - 13; //??
-  end;
 end;
 
 destructor jGridView.Destroy;

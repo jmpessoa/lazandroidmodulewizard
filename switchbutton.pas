@@ -26,8 +26,6 @@ type
     procedure SetColor(Value: TARGBColorBridge); //background
     procedure UpdateLParamHeight;
     procedure UpdateLParamWidth;
-  protected
-    procedure SetParentComponent(Value: TComponent); override;
   public
     constructor Create(AOwner: TComponent); override;
     destructor  Destroy; override;
@@ -106,6 +104,8 @@ begin
   FMarginTop    := 7;
   FMarginBottom := 7;
   FMarginRight  := 7;
+  FHeight       := 30; //??
+  FWidth        := 75; //??
   FLParamWidth  := lpWrapContent;  //lpWrapContent
   FLParamHeight := lpWrapContent; //lpMatchParent
   FAcceptChildrenAtDesignTime:= False;
@@ -113,18 +113,6 @@ begin
   FTextOff:= 'OFF';
   FTextOn:= 'ON';
   FSwitchState:= tsOff;
-end;
-
-procedure jSwitchButton.SetParentComponent(Value: TComponent);
-begin
-  inherited SetParentComponent(Value);
-  Self.Height:= 30; //??
-  Self.Width:= 75; //??
-  if Value <> nil then
-  begin
-      Parent:= TAndroidWidget(Value);
-      Self.Width:= Trunc(TAndroidWidget(Parent).Width/4) - 13; //??
-  end;
 end;
 
 destructor jSwitchButton.Destroy;
