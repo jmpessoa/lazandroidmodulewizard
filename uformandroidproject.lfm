@@ -5,7 +5,7 @@ object FormAndroidProject: TFormAndroidProject
   Width = 1066
   BorderIcons = [biSystemMenu]
   BorderStyle = bsSizeToolWin
-  Caption = 'Android Module Wizard: Select Java Source'
+  Caption = 'Lamw: Lazarus Android Module Wizard: Select Java Source'
   ClientHeight = 550
   ClientWidth = 1066
   Icon.Data = {

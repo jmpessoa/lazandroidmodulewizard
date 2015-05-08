@@ -1418,11 +1418,27 @@ var
   i, j, k: integer;
   pathList: TStringList;
   fileName, pathPack: string;
-  auxStr: string;
+  auxStr, pathPlusFileName, strPack: string;
+  auxList: TStringList;
 begin
 
   if ShellListView1.Selected <> nil then
   begin
+
+     if  FFullJavaSrcPath = '' then
+     begin
+       pathPlusFileName:= ShellListView1.GetPathFromItem(ShellListView1.Selected);
+       FFullJavaSrcPath:= ExtractFilePath(pathPlusFileName);
+
+       auxList:= TStringList.Create;
+       auxList.LoadFromFile(pathPlusFileName);
+       strPack:= Trim(auxList.Strings[0]); // ex: package com.template.appdummy;
+       strPack:= TrimChar(strPack,';');
+       SplitStr(strPack, ' ');
+       strPack:= Trim(strPack);
+       FFullPackageName:= strPack;
+       auxList.Free;
+     end;
 
      i:= LastPos(DirectorySeparator, FPathToJavaTemplates);
      FPathToWizardCode:= Copy(FPathToJavaTemplates, 1, i-1);

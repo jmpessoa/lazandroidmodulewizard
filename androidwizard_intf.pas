@@ -116,6 +116,8 @@ type
 var
   AndroidProjectDescriptor: TAndroidProjectDescriptor;
   AndroidFileDescriptor: TAndroidFileDescPascalUnitWithResource;
+  AndroidGUIProjectDescriptor: TAndroidGUIProjectDescriptor;
+
 
 procedure Register;
 
@@ -135,7 +137,10 @@ begin
 
   AndroidProjectDescriptor:= TAndroidProjectDescriptor.Create;
   RegisterProjectDescriptor(AndroidProjectDescriptor);
-  RegisterProjectDescriptor(TAndroidGUIProjectDescriptor.Create);
+
+  AndroidGUIProjectDescriptor:= TAndroidGUIProjectDescriptor.Create;
+  //RegisterProjectDescriptor(TAndroidGUIProjectDescriptor.Create); //original
+  RegisterProjectDescriptor(AndroidGUIProjectDescriptor);
 
   FormEditingHook.RegisterDesignerBaseClass(TAndroidModule);
   FormEditingHook.RegisterDesignerBaseClass(TNoGUIAndroidModule);
@@ -165,7 +170,7 @@ end;
 
 function TAndroidGUIProjectDescriptor.DoInitDescriptor: TModalResult;
 var
-  projName, strAfterReplace, strPack: string;
+  projName, strAfterReplace, strPack, fullPathToJavaSrc: string;
   i: Integer;
 begin
   try
@@ -216,10 +221,15 @@ begin
       begin  //Eclipse project
          FPathToJNIFolder := FAndroidProjectName;
       end;
-
       AndroidFileDescriptor.PathToJNIFolder:= FPathToJNIFolder;
+      AndroidFileDescriptor.ModuleType:= 0;
 
-      with TJavaParser.Create(FPathToJavaSrc + DirectorySeparator + 'Controls.java') do
+      if FProjectModel =  'Ant' then
+         fullPathToJavaSrc:= FPathToJavaSrc + DirectorySeparator+ 'Controls.java'
+      else
+         fullPathToJavaSrc:= FPathToJavaSrc +  'Controls.java';
+
+      with TJavaParser.Create(fullPathToJavaSrc) do
       try
         FPascalJNIInterfaceCode := GetPascalJNIInterfaceCode(FPathToJavaTemplates + DirectorySeparator + 'ControlsEvents.txt');
       finally
@@ -242,7 +252,7 @@ begin
                   FAndroidProjectName+DirectorySeparator+'libs'+DirectorySeparator+'android-support-v4.jar');
       end;
 
-      // AndroidManifest.xml creation:
+      //AndroidManifest.xml creation:
       with TStringList.Create do
       try
         LoadFromFile(FPathToJavaTemplates + DirectorySeparator + 'AndroidManifest.txt');
@@ -261,7 +271,6 @@ begin
       finally
         Free;
       end;
-
       Result := mrOK
     end else
       Result := mrAbort;
@@ -320,12 +329,10 @@ begin
     FSyntaxMode:= frm.SyntaxMode;
 
     FPathToJavaClass:= frm.PathToJavaClass;
-    //ShowMessage('FPathToJavaClass = '+ FPathToJavaClass);
 
     FPathToJNIFolder:= FAndroidProjectName;  //+DirectorySeparator+ 'jni';  //GetPathToJNIFolder(FPathToJavaClass);
 
     AndroidFileDescriptor.PathToJNIFolder:= FAndroidProjectName;//FPathToJNIFolder;
-
     AndroidFileDescriptor.ModuleType:= FModuleType;
     AndroidFileDescriptor.SyntaxMode:= FSyntaxMode;
 
@@ -337,6 +344,7 @@ begin
     FFullPackageName:= frm.FullPackageName;
     FFullJavaSrcPath:= frm.FullJavaSrcPath;
 
+
     try
       MkDir(FAndroidProjectName+ DirectorySeparator + 'jni');
       ChDir(FAndroidProjectName+DirectorySeparator+ 'jni');
@@ -344,7 +352,7 @@ begin
       MkDir(FAndroidProjectName+DirectorySeparator+ 'jni'+DirectorySeparator+'build-modes');
       ChDir(FAndroidProjectName+DirectorySeparator+ 'jni'+DirectorySeparator+'build-modes');
 
-      //MkDir(FAndroidProjectName+ DirectorySeparator + 'libs');
+      MkDir(FAndroidProjectName+ DirectorySeparator + 'libs');
       ChDir(FAndroidProjectName+DirectorySeparator+ 'libs');
 
       if FSupportV4 = 'yes' then  //add android 4.0 support to olds devices ...
@@ -458,7 +466,6 @@ begin
       FFPUSet:= frm.FPUSet; {ex. Soft}
 
       FAndroidProjectName:= frm.AndroidProjectName;    //warning: full project name = path + name !
-
       FPathToJavaSrc:= FAndroidProjectName+DirectorySeparator+ 'src';
 
       FPathToJavaTemplates:= frm.PathToJavaTemplates;
@@ -1094,14 +1101,17 @@ begin
   projName:= LowerCase(FJavaClassName) + '.lpr';
 
   projDir := FPathToJNIFolder+DirectorySeparator+'jni'+DirectorySeparator;
+
   if FModuleType = 0 then
   begin
+    AProject.CustomData.Values['LAMW'] := 'GUI';
     AProject.ProjectInfoFile := projDir + ChangeFileExt(projName, '.lpi');
     MainFile := AProject.CreateProjectFile(projDir + projName);
-    AProject.CustomData.Values['LAMW'] := 'GUI';
-  end else begin
-    MainFile := AProject.CreateProjectFile(projName);
+  end
+  else
+  begin
     AProject.CustomData.Values['LAMW'] := 'NoGUI';
+    MainFile := AProject.CreateProjectFile(projName);
   end;
 
   MainFile.IsPartOfProject := True;
@@ -1170,7 +1180,7 @@ begin
 
   sourceList.Add('');
   sourceList.Add('begin');
-  if FModuleType = 0 then  //Android Bridges ontrols...
+  if FModuleType = 0 then  //Android Bridges controls...
   begin
     sourceList.Add('  gApp:= jApp.Create(nil);');
     sourceList.Add('  gApp.Title:= ''JNI Android Bridges Library'';');
@@ -1419,8 +1429,6 @@ begin
 
   auxList.SaveToFile(FPathToJNIFolder+DirectorySeparator+'jni'+DirectorySeparator+'build-modes'+DirectorySeparator+'readme.txt');
 
-  auxList.Free;
-
   AProject.LazCompilerOptions.TargetFilename:=
           '..'+DirectorySeparator+'libs'+DirectorySeparator+auxStr+DirectorySeparator+'lib'+LowerCase(FJavaClassName){+'.so'};
 
@@ -1437,29 +1445,30 @@ begin
   {Others}
   AProject.LazCompilerOptions.CustomOptions:= customOptions_default;
 
+  auxList.Free;
   sourceList.Free;
   Result := mrOK;
 end;
 
 function TAndroidProjectDescriptor.CreateStartFiles(AProject: TLazProject): TModalResult;
 begin
-  //AndroidFileDescriptor.ResourceClass:= TAndroidForm;
-
-  //ShowMessage('ModuleType = '+ IntToStr(FModuleType));
   if FModuleType = 0 then  //GUI Controls
   begin
     AndroidFileDescriptor.ResourceClass:= TAndroidModule;
   end
-  else // =1 -> No GUI Controls
+  else // =1 -> NoGUI Controls
   begin
     AndroidFileDescriptor.ResourceClass:= TNoGUIAndroidModule;
   end;
 
-
   LazarusIDE.DoNewEditorFile(AndroidFileDescriptor, '', '',
                              [nfIsPartOfProject,nfOpenInEditor,nfCreateDefaultSrc]);
+
   if FModuleType = 0 then  //GUI Controls
+  begin
     LazarusIDE.DoSaveProject([]); // TODO: hardcoded "controls"
+  end;
+
   Result := mrOK;
 end;
 
@@ -1483,9 +1492,9 @@ end;
 procedure TAndroidProjectDescriptor.Mkdir(const Dir: String);
 begin
   try
-    if FileExists(Dir) then raise Exception.Create('A file of the same name exists');
-    if DirectoryExists(Dir) then raise Exception.Create('Directory already exists');
-    System.MkDir(Dir);
+    //if FileExists(Dir) then raise Exception.Create('A file of the same name exists');
+    if not DirectoryExists(Dir) then //raise Exception.Create('Directory already exists');
+       System.MkDir(Dir);
   except
     on e: Exception do begin
       e.Message := 'Cannot create directory "' + Dir + '"' + LineEnding + e.Message;
@@ -1494,20 +1503,20 @@ begin
   end;
 end;
 
-{ TAndroidFileDescriptor}
+{TAndroidFileDescPascalUnitWithResource}
 
 constructor TAndroidFileDescPascalUnitWithResource.Create;
 begin
   inherited Create;
 
-  Name := 'Android DataModule';
+  Name:= 'AndroidDataModule';
 
   if ModuleType = 0 then
     ResourceClass := TAndroidModule
   else
     ResourceClass := TNoGUIAndroidModule;
 
-  UseCreateFormStatements:=true;
+  UseCreateFormStatements:= True;
 
 end;
 
@@ -1519,7 +1528,6 @@ end;
 function TAndroidFileDescPascalUnitWithResource.GetLocalizedName: string;
 begin
    Result := 'Android DataModule'
-   //Result:='AndroidForm';
 end;
 
 function TAndroidFileDescPascalUnitWithResource.GetLocalizedDescription: string;
@@ -1636,7 +1644,6 @@ var
 begin
   sttList:= TStringList.Create;
   sttList.Add('{$R *.lfm}');
- // sttList.Add('');
   Result:= sttList.Text;
   sttList.Free;
 end;
