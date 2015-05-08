@@ -584,6 +584,8 @@ end;
 
 destructor TAndroidWidgetMediator.Destroy;
 begin
+  if Assigned(AndroidForm) then
+    AndroidForm.Designer := nil;
   FSelection.Free;
   FStarted.Free;
   FDone.Free;
@@ -650,9 +652,10 @@ class function TAndroidWidgetMediator.CreateMediator(TheOwner, TheForm: TCompone
 var
   Mediator: TAndroidWidgetMediator;
 begin
-  Result:=inherited CreateMediator(TheOwner,TheForm);
+  Result:=inherited CreateMediator(TheOwner,nil);
 
   Mediator:= TAndroidWidgetMediator(Result);
+  Mediator.Root := TheForm;
 
   Mediator.FDefaultBrushColor:= clForm;
   Mediator.FDefaultPenColor:= clMedGray;
