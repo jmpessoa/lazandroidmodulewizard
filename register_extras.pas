@@ -8,6 +8,7 @@ interface
 
 uses 
   Classes,
+  shellcommand,
   datepickerdialog,
   timepickerdialog,
   notificationmanager,
@@ -45,6 +46,7 @@ implementation
   
 Procedure Register;
 begin
+  {$I jshellcommand_icon.lrs}
   {$I jdatepickerdialog_icon.lrs}
   {$I jtimepickerdialog_icon.lrs}
   {$I jnotificationmanager_icon.lrs}
@@ -73,6 +75,7 @@ begin
   {$I jhelloadder_icon.lrs}
   RegisterComponents('Android Bridges Extra',
     [
+      jShellCommand,
       jDatePickerDialog,
       jTimePickerDialog,
       jNotificationManager,

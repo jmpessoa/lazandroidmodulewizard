@@ -48,13 +48,15 @@ uses
    Procedure Java_Event_pOnTimePicker(env: PJNIEnv; this: jobject; Obj: TObject; hourOfDay: integer; minute: integer);
    Procedure Java_Event_pOnDatePicker(env: PJNIEnv; this: jobject; Obj: TObject; year: integer; monthOfYear: integer; dayOfMonth: integer);
 
+   Procedure Java_Event_pOnShellCommandExecuted(env: PJNIEnv; this: jobject; Obj: TObject; cmdResult: jString);
+
 implementation
 
 uses
 
    AndroidWidget, bluetooth, bluetoothclientsocket, bluetoothserversocket,
    spinner, location, actionbartab, customdialog, togglebutton, switchbutton, gridview,
-   sensormanager, broadcastreceiver, datepickerdialog, timepickerdialog;
+   sensormanager, broadcastreceiver, datepickerdialog, timepickerdialog, shellcommand;
 
 procedure Java_Event_pOnBluetoothEnabled(env: PJNIEnv; this: jobject; Obj: TObject);
 begin
@@ -629,6 +631,26 @@ begin
   begin
     jDatePickerDialog(Obj).UpdateJNI(gApp);
     jDatePickerDialog(Obj).GenEvent_OnDatePicker(Obj,  year, monthOfYear, dayOfMonth);
+  end;
+end;
+
+Procedure Java_Event_pOnShellCommandExecuted(env: PJNIEnv; this: jobject; Obj: TObject; cmdResult: jString);
+var
+   pascmdResult: string;
+  _jBoolean: JBoolean;
+begin
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+  if Obj is jShellCommand then
+  begin
+    jShellCommand(Obj).UpdateJNI(gApp);
+    pascmdResult:= '';
+    if cmdResult <> nil then
+    begin
+      _jBoolean:= JNI_False;
+      pascmdResult:= string(env^.GetStringUTFChars(Env, cmdResult,@_jBoolean) );
+    end;
+    jShellCommand(Obj).GenEvent_OnShellCommandExecuted(Obj, pascmdResult);
   end;
 end;
 

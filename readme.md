@@ -16,9 +16,9 @@
 			simonsayz@naver.com
 			http://blog.naver.com/simonsayz
 
-        	Anton A. Panferov 
-			ast.a_s@mail dot ru 
-                	https://github.com/odisey1245
+		Anton A. Panferov [@A.S.]
+			ast.a_s@mail dot ru
+			https://github.com/odisey1245
 
 
 	Acknowledgements: 
@@ -106,7 +106,20 @@
 	*			or Go To: Lazarus IDE menu "Run--> [Lamw] Build and Run"! Thanks to Anton!!!
 	****************************************************************************************************
 
+Version 0.6 - rev. 23 - 09 May 2015 - 
+
+	NEW!  
+		jShellCommand component <<---A suggestion and request @greenzyzyzy 
+
+	NEW! Demo AppExecuteShellCommandDemo1 [Eclipse Compatible Project] 
+
+	NEW! Android Manifest Editor: 
+		Lazarus IDE: "Project' --> "Project Option" --> "[Lamw] Android Manifest" [Thanks to  @A.S.]
+
+	IMPROVEMENTS! components visual design 	[Thanks to @A.S.]
+
 Version 0.6 - rev. 22 - 18 April 2015 - 
+
 	NEWS!  
 		jBitmap added methods: 
 				GetByteBuffer
@@ -119,34 +132,34 @@ Version 0.6 - rev. 22 - 18 April 2015 -
 				"tfpdxfwritebridge_pack.lpk"		ref. https://github.com/jmpessoa/tfpdxfwritebridge
 				"tfpnoguigraphicsbridge_pack.lpk"	ref. https://github.com/jmpessoa/tfpnoguigraphicsbridge
 
-Hint: TFPNoGuiGraphicsBridge on Android
+	Hint: TFPNoGuiGraphicsBridge on Android
 
 	--->>> Cross compile [Lamw/arm-android] project fail .... NO PANIC!
 
-PANIC I: Compiling ... [please, read lazarus or/as laz4android and ...\fpc\2.7.1 or/as ...\fpc\3.1.1 etc..]
+	PANIC I: Compiling ... [please, read lazarus or/as laz4android and ...\fpc\2.7.1 or/as ...\fpc\3.1.1 etc..]
 
-	"(FTFont.PPU and freetype.PPU) units NOT FOUND in "...\lazarus\fpc\2.7.1\units\arm-android\fcl-image" ???
+		"(FTFont.PPU and freetype.PPU) units NOT FOUND in "...\lazarus\fpc\2.7.1\units\arm-android\fcl-image" ???
 
-	Solution:
+		Solution:
 
-	1. Goto "...\lazarus\fpc\2.7.1\source\packages\fcl-image\src" and copy
+		1. Goto "...\lazarus\fpc\2.7.1\source\packages\fcl-image\src" and copy
 
-		ftfont.pp (if need change to .pas)
-		freetype.pp (if need change to .pas)
-		freetypeh.pp (if need change to .pas)
+			ftfont.pp (if need change to .pas)
+			freetype.pp (if need change to .pas)
+			freetypeh.pp (if need change to .pas)
 
-		to folder "...\tfpnoguigraphicsbridge" package folder and build AGAIN your project!
+			to folder "...\tfpnoguigraphicsbridge" package folder and build AGAIN your project!
 
 		Yes, now you got ftfont.ppu, ftfont.o, freetype.ppu etc... to "arm-android" !
 
-	2. Copy THEM to folder  "...\lazarus\fpc\2.7.1\units\arm-android\fcl-image"
-		So, others [future] projects will find its there!  [solved to "arm-android" !!!]
+		2. Copy THEM to folder  "...\lazarus\fpc\2.7.1\units\arm-android\fcl-image"
+			So, others [future] projects will find its there!  [solved to "arm-android" !!!]
 
-PANIC II: [building Lamw project cross-arm]::
+	PANIC II: [building Lamw project cross-arm]::
 
-	".... : cannot find -lfreetype"
+		".... : cannot find -lfreetype"
 
-	Solution:
+		Solution:
 
 		Copy "libfreetype.so" to NDK location    "....\platforms\android-XX\arch-arm\usr\lib" 
 		where XX = 14 or 15 or 16... or 21 .. etc
@@ -155,26 +168,25 @@ PANIC II: [building Lamw project cross-arm]::
 		"Project" --->> "Project Options" ---> "Compile Options" -->> "Paths" --->> Libraries [-Fl]
 
 
-PANIC III. Where I find a "libfreetype.so" for arm-android ?
+	PANIC III. Where I find a "libfreetype.so" for arm-android ?
+	
+		Go to demo "...\AppTFPNoGUIGraphicsBridgeDemo1\libs\armeabi" [Eclipse compatible Project]
 
-	Go to demo "...\AppTFPNoGUIGraphicsBridgeDemo1\libs\armeabi" [Eclipse compatible Project]
+		You will find an "all ready" there! 
 
-	You will find an "all ready" there! 
+	PANIC IV.  Where "libfreetype.so" will be load in java code?
 
-PANIC IV.  Where "libfreetype.so" will be load in java code?
-
-	Go to "Controls.java" [\src\...\..] and uncomment this line:
+		Go to "Controls.java" [\src\...\..] and uncomment this line:
 
 		--->> System.loadLibrary("freetype");
 
-	The code now will be:
+		The code now will be:
 
-	//Load Pascal Library
-	static {   		
-      		System.loadLibrary("freetype");  // <<---uncommented here!
-      		System.loadLibrary("controls");    		
-	}
-	
+		//Load Pascal Library
+		static {   		
+      			System.loadLibrary("freetype");  // <<---uncommented here!
+      			System.loadLibrary("controls");    		
+		}
 
 Version 0.6 - rev. 21 - 16 April 2015 - 
 

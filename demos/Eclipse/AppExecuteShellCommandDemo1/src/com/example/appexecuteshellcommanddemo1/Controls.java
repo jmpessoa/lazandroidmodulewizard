@@ -1,6 +1,6 @@
-package com.example.dummyapp;
+package com.example.appexecuteshellcommanddemo1;
 
-//Lamw: Lazarus Android Module Wizard 
+//Lamw: Lazarus Android Module Wizard
 //Form Designer and Components development model!
 //version 0.6 - revision 23 - 09 May - 2015
 //

@@ -1410,6 +1410,7 @@ type
   Procedure Java_Event_pOnFlingGestureDetected(env: PJNIEnv; this: jobject; Obj: TObject; direction: integer);
   Procedure Java_Event_pOnPinchZoomGestureDetected(env: PJNIEnv; this: jobject; Obj: TObject; scaleFactor: single; state: integer);
 
+
   // Asset Function (P : Pascal Native)
   Function  Asset_SaveToFile (srcFile,outFile : String; SkipExists : Boolean = False) : Boolean;
   Function  Asset_SaveToFileP(srcFile,outFile : String; SkipExists : Boolean = False) : Boolean;
@@ -1971,7 +1972,6 @@ begin
   if not(pasCanNavi) then Result := cjWebView_Act_Break;
 
 end;
-
 
 Procedure Java_Event_pOnAsyncEvent(env: PJNIEnv; this: jobject;
                                       Obj: TObject; EventType,Progress : integer);
