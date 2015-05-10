@@ -16,7 +16,7 @@ TIntentActionFiter = (afTimeTick,
                    afBatteryChanged,
                    afPowerConnected,
                    afPowerDisconnected,
-                   afShutDown, afNone);
+                   afShutDown, afSMSReceived, afNone);
 
 
 TOnReceiver = procedure(Sender: TObject;  intent: jObject) of Object;
@@ -42,6 +42,8 @@ jBroadcastReceiver = class(jControl)
     procedure jFree();
 
     procedure RegisterIntentActionFilter(_intentAction: string); overload;
+    procedure RegisterIntentActionFilter(_intentAction: TIntentActionFiter); overload;
+
     procedure SetIntentActionFilter(_intentAction: TIntentActionFiter);
 
     procedure Unregister();
@@ -124,6 +126,16 @@ begin
   begin
      FRegistered:= True;
      jBroadcastReceiver_RegisterIntentActionFilter(FjEnv, FjObject, _intentAction);
+  end;
+end;
+
+procedure jBroadcastReceiver.RegisterIntentActionFilter(_intentAction: TIntentActionFiter);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+  begin
+     FRegistered:= True;
+     jBroadcastReceiver_RegisterIntentActionFilter(FjEnv, FjObject, Ord(_intentAction));
   end;
 end;
 

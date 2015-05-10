@@ -300,9 +300,10 @@ type
    constructor Create(AOwner: TComponent); override;
    destructor Destroy; override;
    procedure Init(refApp: jApp) override;
-   procedure Send; overload;
-   procedure Send(toNumber: string;  msg: string); overload;
-   procedure Send(toName: string); overload;
+   function Send: integer; overload;
+   function Send(toNumber: string;  msg: string): integer; overload;
+   function Send(toName: string): integer; overload;
+   function Read(intentReceiver: jObject; addressBodyDelimiter: string): string;
    // Property
   published
    property MobileNumber: string read FMobileNumber write FMobileNumber;
@@ -621,6 +622,7 @@ type
     Procedure Refresh;
     Procedure UpdateLayout; override;
     procedure Append(_txt: string);
+    procedure AppendLn(_txt: string);
   published
     property Text: string read GetText write SetText;
     property Alignment : TTextAlignment read FTextAlignment write SetTextAlignment;
@@ -707,6 +709,8 @@ type
     procedure DispatchOnChangedEvent(value: boolean);
 
     procedure Append(_txt: string);
+    procedure AppendLn(_txt: string);
+
     procedure SetImeOptions(_imeOption: TImeOptions);
 
     procedure SetAcceptSuggestion(_value: boolean);
@@ -2290,6 +2294,13 @@ begin
      jTextView_Append(FjEnv, FjObject, _txt);
 end;
 
+procedure jTextView.AppendLn(_txt: string);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jTextView_AppendLn(FjEnv, FjObject, _txt);
+end;
+
 //------------------------------------------------------------------------------
 // jEditText
 //------------------------------------------------------------------------------
@@ -2451,7 +2462,6 @@ begin
   //thierrydijoux - if SetBackGroundColor to black, no theme
   if FColor <> colbrDefault then
      View_SetBackGroundColor(FjEnv,  FjThis, FjObject , GetARGB(FCustomColor, FColor));
-  //else  View_SetBackGroundColor(FjEnv, FjThis, FjObject , GetARGB(FCustomColor, colbrWhite));
 
   View_SetVisible(FjEnv, FjThis, FjObject , FVisible);
 
@@ -2764,6 +2774,13 @@ begin
   //in designing component state: set value here...
   if FInitialized then
      jEditText_Append(FjEnv, FjObject, _txt);
+end;
+
+procedure jEditText.AppendLn(_txt: string);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jEditText_AppendLn(FjEnv, FjObject, _txt);
 end;
 
 procedure jEditText.SetImeOptions(_imeOption: TImeOptions);
@@ -4367,20 +4384,20 @@ begin
   FSMSMessage.Assign(Value);
 end;
 
-procedure jSMS.Send;
+function jSMS.Send: integer;
 begin
   if FInitialized then
   begin
     if (FMobileNumber = '') and (FContactName <> '') then
       FMobileNumber:= jContact_getMobileNumberByDisplayName(gApp.Jni.jEnv, gApp.Jni.jThis, FContactName);
     if FMobileNumber <> '' then
-        jSend_SMS(gApp.Jni.jEnv, gApp.Jni.jThis,
+        Result:= jSend_SMS(gApp.Jni.jEnv, gApp.Jni.jThis,
                   FMobileNumber,     //to
                   FSMSMessage.Text);  //message
   end;
 end;
 
-procedure jSMS.Send(toName: string);
+function jSMS.Send(toName: string): integer;
 begin
   if FInitialized then
   begin
@@ -4388,21 +4405,27 @@ begin
       FMobileNumber:= jContact_getMobileNumberByDisplayName(gApp.Jni.jEnv, gApp.Jni.jThis,
                                                             toName);
     if FMobileNumber <> '' then
-        jSend_SMS(gApp.Jni.jEnv, gApp.Jni.jThis,
+        Result:= jSend_SMS(gApp.Jni.jEnv, gApp.Jni.jThis,
                   FMobileNumber,     //to
                   FSMSMessage.Text);  //message
   end;
 end;
 
-procedure jSMS.Send(toNumber: string;  msg: string);
+function jSMS.Send(toNumber: string;  msg: string): integer;
 begin
  if FInitialized then
  begin
     if toNumber <> '' then
-        jSend_SMS(gApp.Jni.jEnv, gApp.Jni.jThis,
+        Result:= jSend_SMS(gApp.Jni.jEnv, gApp.Jni.jThis,
                   toNumber,     //to
                   msg);  //message
   end;
+end;
+
+function jSMS.Read(intentReceiver: jObject; addressBodyDelimiter: string): string;
+begin
+if FInitialized then
+   Result:= jRead_SMS(gApp.Jni.jEnv, gApp.Jni.jThis,intentReceiver, addressBodyDelimiter);  //message
 end;
 
   {jCamera warning by jmpessoa: not tested!}

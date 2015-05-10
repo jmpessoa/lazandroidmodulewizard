@@ -2,7 +2,7 @@ package com.example.dummyapp;
 
 //Lamw: Lazarus Android Module Wizard 
 //Form Designer and Components development model!
-//version 0.6 - revision 23 - 09 May - 2015
+//version 0.6 - revision 24 - 10 May - 2015
 //
 //https://github.com/jmpessoa/lazandroidmodulewizard
 //http://forum.lazarus.freepascal.org/index.php/topic,21919.270.html
@@ -115,6 +115,7 @@ import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.telephony.SmsManager;
+import android.telephony.SmsMessage;
 import android.telephony.TelephonyManager;
 import android.preference.PreferenceManager;
 import android.provider.BaseColumns;
@@ -175,11 +176,13 @@ import android.webkit.WebViewClient;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.AnalogClock;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.DatePicker;
+import android.widget.DigitalClock;
 import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.ImageView;
@@ -1071,6 +1074,10 @@ public void Append(String _txt) {
   this.append( _txt);
 }
 
+public void AppendLn(String _txt) {
+ this.append( _txt+ "\n");
+}
+
 public void setFontAndTextTypeFace(int fontFace, int fontStyle) { 
   Typeface t = null; 
   switch (fontFace) { 
@@ -1388,6 +1395,10 @@ public void SetInputType(int ipt){  //TODO!
 
 public void Append(String _txt) {
 	this.append(_txt);
+}
+
+public void AppendLn(String _txt) {
+	this.append(_txt+"\n");
 }
 
 public void SetImeOptions(int _imeOption) {
@@ -10504,22 +10515,15 @@ class jBroadcastReceiver extends BroadcastReceiver {
   //write others [public] methods code here......
   //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
  
-   /*
-    * This method enables the Broadcast receiver for
-    * "android.intent.action.TIME_TICK"  This intent get
-    * broadcasted Once The battery level has fallen below a threshold
-    */
    
-   public void RegisterIntentActionFilter(String _intentAction) {
+   public void RegisterIntentActionFilter(String _intentAction) { //android.provider.Telephony.SMS_RECEIVED
 	   //intentFilter.addDataScheme("http"); 
 	   //intentFilter.addDataScheme("ftp"); 
 	   //intentFilter.addAction(BluetoothDevice.ACTION_FOUND);
 	   controls.activity.registerReceiver(this, new IntentFilter(_intentAction));
 	   //Log.i("receiver","Register ....");
    }
-   
-      	   	  	   
-      
+         	   	  	         
    /*
     * This method disables the Broadcast receiver
     */
@@ -10537,11 +10541,11 @@ class jBroadcastReceiver extends BroadcastReceiver {
 	     case 4: controls.activity.registerReceiver(this, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
 	     case 5: controls.activity.registerReceiver(this, new IntentFilter(Intent.ACTION_POWER_CONNECTED));
 	     case 6: controls.activity.registerReceiver(this, new IntentFilter(Intent.ACTION_POWER_DISCONNECTED));
-	     case 7: controls.activity.registerReceiver(this, new IntentFilter(Intent.ACTION_SHUTDOWN));	  
+	     case 7: controls.activity.registerReceiver(this, new IntentFilter(Intent.ACTION_SHUTDOWN));
+	     case 8: controls.activity.registerReceiver(this, new IntentFilter("android.provider.Telephony.SMS_RECEIVED"));
 	   }
    }
-
-      
+             
 }
 
 /*Draft java code by "Lazarus Android Module Wizard" [1/18/2015 19:10:57]*/
@@ -11063,7 +11067,7 @@ Sending Data: Extras vs. URI Parameters
 		 //String c = MediaStore.ACTION_IMAGE_CAPTURE;
 	     return "android.media.action.IMAGE_CAPTURE";
    }
-   
+      
    //http://www.coderanch.com/t/492490/Android/Mobile/Check-application-installed
    public boolean IsCallable(Intent _intent) {  
        List<ResolveInfo> list = controls.activity.getPackageManager().queryIntentActivities(_intent, PackageManager.MATCH_DEFAULT_ONLY);  
@@ -11072,8 +11076,11 @@ Sending Data: Extras vs. URI Parameters
        else
           return false;
     }
-
      
+   public boolean IsActionEqual(Intent _intent, String _intentAction) { //'android.provider.Telephony.SMS_RECEIVED'
+	   return _intent.getAction().equals(_intentAction);
+   }
+      
 }
 
 /*Draft java code by "Lazarus Android Module Wizard" [2/3/2015 16:12:53]*/
@@ -11513,6 +11520,275 @@ class jShellCommand extends AsyncTask<String, String, String>  {
 	   this.execute(_shellCmd);
    }   
 }
+
+/*Draft java code by "Lazarus Android Module Wizard" [5/9/2015 3:06:34]*/
+/*https://github.com/jmpessoa/lazandroidmodulewizard*/
+/*jVisualControl template*/
+  
+class jAnalogClock extends AnalogClock /*dummy*/ { //please, fix what GUI object will be extended!
+   
+   private long       pascalObj = 0;    // Pascal Object
+   private Controls   controls  = null; // Control Class for events
+   
+   private Context context = null;
+   private ViewGroup parent   = null;         // parent view
+   private RelativeLayout.LayoutParams lparams;              // layout XYWH 
+   private OnClickListener onClickListener;   // click event
+   private Boolean enabled  = true;           // click-touch enabled!
+   private int lparamsAnchorRule[] = new int[30];
+   private int countAnchorRule = 0;
+   private int lparamsParentRule[] = new int[30];
+   private int countParentRule = 0;
+   private int lparamH = 100;
+   private int lparamW = 100;
+   private int marginLeft = 0;
+   private int marginTop = 0;
+   private int marginRight = 0;
+   private int marginBottom = 0;
+   private boolean mRemovedFromParent = false;
+  
+  //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
+  
+   public jAnalogClock(Controls _ctrls, long _Self) { //Add more others news "_xxx"p arams if needed!
+      super(_ctrls.activity);
+      context   = _ctrls.activity;
+      pascalObj = _Self;
+      controls  = _ctrls;
+   
+      lparams = new RelativeLayout.LayoutParams(lparamW, lparamH);
+   
+      onClickListener = new OnClickListener(){
+      /*.*/public void onClick(View view){  //please, do not remove /*.*/ mask for parse invisibility!
+              if (enabled) {
+                 controls.pOnClick(pascalObj, Const.Click_Default); //JNI event onClick!
+              }
+           };
+      };
+      setOnClickListener(onClickListener);
+   } //end constructor
+   
+   public void jFree() {
+      if (parent != null) { parent.removeView(this); }
+      //free local objects...
+      lparams = null;
+      setOnClickListener(null);
+   }
+  
+   public void SetViewParent(ViewGroup _viewgroup) {
+      if (parent != null) { parent.removeView(this); }
+      parent = _viewgroup;
+      parent.addView(this,lparams);
+      mRemovedFromParent = false;
+   }
+   
+   public void RemoveFromViewParent() {
+      if (!mRemovedFromParent) {
+         this.setVisibility(android.view.View.INVISIBLE);
+         if (parent != null)
+    	       parent.removeView(this);
+	   mRemovedFromParent = true;
+	}
+   }
+  
+   public View GetView() {
+      return this;
+   }
+  
+   public void SetLParamWidth(int _w) {
+      lparamW = _w;
+   }
+  
+   public void SetLParamHeight(int _h) {
+      lparamH = _h;
+   }
+  
+   public void SetLeftTopRightBottomWidthHeight(int _left, int _top, int _right, int _bottom, int _w, int _h) {
+      marginLeft = _left;
+      marginTop = _top;
+      marginRight = _right;
+      marginBottom = _bottom;
+      lparamH = _h;
+      lparamW = _w;
+   }
+  
+   public void AddLParamsAnchorRule(int _rule) {
+      lparamsAnchorRule[countAnchorRule] = _rule;
+      countAnchorRule = countAnchorRule + 1;
+   }
+  
+   public void AddLParamsParentRule(int _rule) {
+      lparamsParentRule[countParentRule] = _rule;
+      countParentRule = countParentRule + 1;
+   }
+  
+   public void SetLayoutAll(int _idAnchor) {
+  	lparams.width  = lparamW;
+	lparams.height = lparamH;
+	lparams.setMargins(marginLeft,marginTop,marginRight,marginBottom);
+	if (_idAnchor > 0) {
+	    for (int i=0; i < countAnchorRule; i++) {
+		lparams.addRule(lparamsAnchorRule[i], _idAnchor);
+	    }
+	}
+      for (int j=0; j < countParentRule; j++) {
+         lparams.addRule(lparamsParentRule[j]);
+      }
+      this.setLayoutParams(lparams);
+   }
+  
+   public void ClearLayoutAll() {
+	for (int i=0; i < countAnchorRule; i++) {
+  	   lparams.removeRule(lparamsAnchorRule[i]);
+    	}
+  
+	for (int j=0; j < countParentRule; j++) {
+   	   lparams.removeRule(lparamsParentRule[j]);
+	}
+	countAnchorRule = 0;
+	countParentRule = 0;
+   }
+ 
+   public void SetId(int _id) { //wrapper method pattern ...
+      this.setId(_id);
+   }
+  
+  //write others [public] methods code here......
+  //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
+  
+} //end class
+
+class jDigitalClock extends DigitalClock /*TextClock*/ { //please, fix what GUI object will be extended!
+	   
+	   private long       pascalObj = 0;    // Pascal Object
+	   private Controls   controls  = null; // Control Class for events
+	   
+	   private Context context = null;
+	   private ViewGroup parent   = null;         // parent view
+	   private RelativeLayout.LayoutParams lparams;              // layout XYWH 
+	   private OnClickListener onClickListener;   // click event
+	   private Boolean enabled  = true;           // click-touch enabled!
+	   private int lparamsAnchorRule[] = new int[30];
+	   private int countAnchorRule = 0;
+	   private int lparamsParentRule[] = new int[30];
+	   private int countParentRule = 0;
+	   private int lparamH = 100;
+	   private int lparamW = 100;
+	   private int marginLeft = 0;
+	   private int marginTop = 0;
+	   private int marginRight = 0;
+	   private int marginBottom = 0;
+	   private boolean mRemovedFromParent = false;
+	  
+	  //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
+	  
+	   public jDigitalClock(Controls _ctrls, long _Self) { //Add more others news "_xxx"p arams if needed!
+	      super(_ctrls.activity);
+	      context   = _ctrls.activity;
+	      pascalObj = _Self;
+	      controls  = _ctrls;
+	   
+	      lparams = new RelativeLayout.LayoutParams(lparamW, lparamH);
+	   
+	      onClickListener = new OnClickListener(){
+	      /*.*/public void onClick(View view){  //please, do not remove /*.*/ mask for parse invisibility!
+	              if (enabled) {
+	                 controls.pOnClick(pascalObj, Const.Click_Default); //JNI event onClick!
+	              }
+	           };
+	      };
+	      setOnClickListener(onClickListener);
+	   } //end constructor
+	   
+	   public void jFree() {
+	      if (parent != null) { parent.removeView(this); }
+	      //free local objects...
+	      lparams = null;
+	      setOnClickListener(null);
+	   }
+	  
+	   public void SetViewParent(ViewGroup _viewgroup) {
+	      if (parent != null) { parent.removeView(this); }
+	      parent = _viewgroup;
+	      parent.addView(this,lparams);
+	      mRemovedFromParent = false;
+	   }
+	   
+	   public void RemoveFromViewParent() {
+	      if (!mRemovedFromParent) {
+	         this.setVisibility(android.view.View.INVISIBLE);
+	         if (parent != null)
+	    	       parent.removeView(this);
+		   mRemovedFromParent = true;
+		}
+	   }
+	  
+	   public View GetView() {
+	      return this;
+	   }
+	  
+	   public void SetLParamWidth(int _w) {
+	      lparamW = _w;
+	   }
+	  
+	   public void SetLParamHeight(int _h) {
+	      lparamH = _h;
+	   }
+	  
+	   public void SetLeftTopRightBottomWidthHeight(int _left, int _top, int _right, int _bottom, int _w, int _h) {
+	      marginLeft = _left;
+	      marginTop = _top;
+	      marginRight = _right;
+	      marginBottom = _bottom;
+	      lparamH = _h;
+	      lparamW = _w;
+	   }
+	  
+	   public void AddLParamsAnchorRule(int _rule) {
+	      lparamsAnchorRule[countAnchorRule] = _rule;
+	      countAnchorRule = countAnchorRule + 1;
+	   }
+	  
+	   public void AddLParamsParentRule(int _rule) {
+	      lparamsParentRule[countParentRule] = _rule;
+	      countParentRule = countParentRule + 1;
+	   }
+	  
+	   public void SetLayoutAll(int _idAnchor) {
+	  	lparams.width  = lparamW;
+		lparams.height = lparamH;
+		lparams.setMargins(marginLeft,marginTop,marginRight,marginBottom);
+		if (_idAnchor > 0) {
+		    for (int i=0; i < countAnchorRule; i++) {
+			lparams.addRule(lparamsAnchorRule[i], _idAnchor);
+		    }
+		}
+	      for (int j=0; j < countParentRule; j++) {
+	         lparams.addRule(lparamsParentRule[j]);
+	      }
+	      this.setLayoutParams(lparams);
+	   }
+	  
+	   public void ClearLayoutAll() {
+		for (int i=0; i < countAnchorRule; i++) {
+	  	   lparams.removeRule(lparamsAnchorRule[i]);
+	    	}
+	  
+		for (int j=0; j < countParentRule; j++) {
+	   	   lparams.removeRule(lparamsParentRule[j]);
+		}
+		countAnchorRule = 0;
+		countParentRule = 0;
+	   }
+	 
+	   public void SetId(int _id) { //wrapper method pattern ...
+	      this.setId(_id);
+	   }
+	  
+	  //write others [public] methods code here......
+	  //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
+	  
+} //end class
+
 //**new jclass entrypoint**//please, do not remove/change this line!
 
 //Javas/Pascal Interface Class 
@@ -12316,10 +12592,38 @@ public void jSend_Email(
 public int jSend_SMS(String phoneNumber, String msg) {
 	  try {
 	      SmsManager.getDefault().sendTextMessage(phoneNumber, null, msg, null, null);
-	      return 1; //ok
+	      //Log.i("Send_SMS",phoneNumber+": "+ msg);
+	      return 1; //ok	      
 	  }catch (Exception e) {
+		  //Log.i("Send_SMS Fail",e.toString());
 	      return 0; //fail
 	  }
+}
+
+public String jRead_SMS(Intent intent, String addressBodyDelimiter)  {
+  //---get the SMS message passed in---	
+  SmsMessage[] msgs = null;
+  String str = "";
+	   
+  if (intent.getAction().equals("android.provider.Telephony.SMS_RECEIVED")) {	  
+    Bundle bundle = intent.getExtras();               
+    if (bundle != null)
+    {
+        //---retrieve the SMS message received---
+        Object[] pdus = (Object[]) bundle.get("pdus");
+        msgs = new SmsMessage[pdus.length];            
+        for (int i=0; i<msgs.length; i++){
+            msgs[i] = SmsMessage.createFromPdu((byte[])pdus[i]);                
+            str += msgs[i].getOriginatingAddress();                     
+            str += addressBodyDelimiter;
+            str += msgs[i].getMessageBody().toString();
+            str += " ";        
+        }         
+        //Log.i("Read_SMS", str);
+    }
+    
+  } 
+  return str;                         
 }
 
 //by jmpessoa
@@ -12591,4 +12895,12 @@ public float[] benchMark1 () {
    public java.lang.Object jShellCommand_jCreate(long _Self) {
 	      return (java.lang.Object)(new jShellCommand(this,_Self));
    }
+   
+   public java.lang.Object jAnalogClock_jCreate(long _Self) {
+	      return (java.lang.Object)(new jAnalogClock(this,_Self));
+   }   
+   
+   public java.lang.Object jDigitalClock_jCreate(long _Self) {
+	      return (java.lang.Object)(new jDigitalClock(this,_Self));
+   }     
 }

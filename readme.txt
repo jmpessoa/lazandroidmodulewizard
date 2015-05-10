@@ -106,10 +106,25 @@
 	*			or Go To: Lazarus IDE menu "Run--> [Lamw] Build and Run"! Thanks to Anton!!!
 	****************************************************************************************************
 
+Version 0.6 - rev. 24 - 10 May 2015 - 
+
+	NEWS!  
+		jAnalogClock component
+		jDigitalClock component
+
+	IMPROVED! 
+		jSMS Added new "Read" method // <<--- A suggestion and request by @m4u_hoahoctro 
+		jEditText Added new "AppendLn" method 
+		jTextView Added new "AppendLn" method 
+
+	NEWS! 
+		Demo AppClockDemo1 [Eclipse Compatible Project] 
+		Demo AppSMSDemo1 [Eclipse Compatible Project] 
+	
 Version 0.6 - rev. 23 - 09 May 2015 - 
 
 	NEW!  
-		jShellCommand component <<---A suggestion and request @greenzyzyzy 
+		jShellCommand component <<---A suggestion and request by @greenzyzyzy 
 
 	NEW! Demo AppExecuteShellCommandDemo1 [Eclipse Compatible Project] 
 

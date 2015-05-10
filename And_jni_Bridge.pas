@@ -154,6 +154,7 @@ Procedure jTextView_setId(env:PJNIEnv; TextView : jObject; id: DWord);
 Procedure jTextView_setLeftTopRightBottomWidthHeight(env:PJNIEnv; TextView : jObject; ml,mt,mr,mb,w,h: integer);
 
 procedure jTextView_Append(env: PJNIEnv; _jtextview: JObject; _txt: string);
+procedure jTextView_AppendLn(env: PJNIEnv; _jtextview: JObject; _txt: string);
 
 //-----------------------------------
 // EditText  :: changed by jmpessoa [support Api > 13]
@@ -221,6 +222,7 @@ Procedure jEditText_setTextAlignment   (env:PJNIEnv; EditText : jObject; align :
 Procedure jEditText_SetEnabled         (env:PJNIEnv; EditText : jObject; enabled : Boolean);
 Procedure jEditText_SetEditable        (env:PJNIEnv; EditText : jObject; enabled : Boolean);
 procedure jEditText_Append(env: PJNIEnv; _jedittext: JObject; _txt: string);
+procedure jEditText_AppendLn(env: PJNIEnv; _jedittext: JObject; _txt: string);
 
 procedure jEditText_SetImeOptions(env: PJNIEnv; _jedittext: JObject; _imeOption: integer);
 
@@ -946,6 +948,8 @@ function jSend_SMS(env:PJNIEnv; this:jobject;
                        toNumber: string;
                        smessage:string): integer;
 
+function jRead_SMS(env:PJNIEnv; this:jobject; intentReceiver: jObject; addressBodyDelimiter: string): string;  //message
+
 //by jmpessoa
 function jContact_getMobileNumberByDisplayName(env:PJNIEnv; this:jobject;
                                                contactName: string): string;
@@ -1444,6 +1448,19 @@ begin
   jParams[0].l:= env^.NewStringUTF(env, PChar(_txt));
   jCls:= env^.GetObjectClass(env, _jtextview);
   jMethod:= env^.GetMethodID(env, jCls, 'Append', '(Ljava/lang/String;)V');
+  env^.CallVoidMethodA(env, _jtextview, jMethod, @jParams);
+env^.DeleteLocalRef(env,jParams[0].l);
+end;
+
+procedure jTextView_AppendLn(env: PJNIEnv; _jtextview: JObject; _txt: string);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_txt));
+  jCls:= env^.GetObjectClass(env, _jtextview);
+  jMethod:= env^.GetMethodID(env, jCls, 'AppendLn', '(Ljava/lang/String;)V');
   env^.CallVoidMethodA(env, _jtextview, jMethod, @jParams);
 env^.DeleteLocalRef(env,jParams[0].l);
 end;
@@ -1987,6 +2004,20 @@ begin
   jParams[0].l:= env^.NewStringUTF(env, PChar(_txt));
   jCls:= env^.GetObjectClass(env, _jedittext);
   jMethod:= env^.GetMethodID(env, jCls, 'Append', '(Ljava/lang/String;)V');
+  env^.CallVoidMethodA(env, _jedittext, jMethod, @jParams);
+env^.DeleteLocalRef(env,jParams[0].l);
+end;
+
+
+procedure jEditText_AppendLn(env: PJNIEnv; _jedittext: JObject; _txt: string);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_txt));
+  jCls:= env^.GetObjectClass(env, _jedittext);
+  jMethod:= env^.GetMethodID(env, jCls, 'AppendLn', '(Ljava/lang/String;)V');
   env^.CallVoidMethodA(env, _jedittext, jMethod, @jParams);
 env^.DeleteLocalRef(env,jParams[0].l);
 end;
@@ -6763,6 +6794,30 @@ begin
  env^.DeleteLocalRef(env,_jParams[0].l);
  env^.DeleteLocalRef(env,_jParams[1].l);
 end;
+
+function jRead_SMS(env:PJNIEnv; this:jobject; intentReceiver: jObject; addressBodyDelimiter: string): string;  //message
+var
+ _jMethod  : jMethodID = nil;
+ _jString  : jString;
+ _jBoolean : jBoolean;
+ _jParams : array[0..1] of jValue;
+ jCls: jClass=nil;
+begin
+ jCls:= Get_gjClass(env);
+ _jMethod:= env^.GetMethodID(env, jCls, 'jRead_SMS', '(Landroid/content/Intent;Ljava/lang/String;)Ljava/lang/String;');
+ _jParams[0].l :=  intentReceiver;
+ _jParams[1].l := env^.NewStringUTF(env, pchar(addressBodyDelimiter) );
+ _jString   := env^.CallObjectMethodA(env,this,_jMethod,@_jParams);
+ case _jString = nil of
+  True : Result:= '';
+  False: begin
+          _jBoolean := JNI_False;
+          Result    := string( env^.GetStringUTFChars(Env,_jString,@_jBoolean) );
+         end;
+ end;
+ env^.DeleteLocalRef(env,_jParams[1].l);
+end;
+
 
 //by jmpessoa
 function jContact_getMobileNumberByDisplayName(env:PJNIEnv; this:jobject;
