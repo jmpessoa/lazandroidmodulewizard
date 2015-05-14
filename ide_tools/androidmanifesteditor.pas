@@ -113,6 +113,7 @@ begin
   AddPerm('Write external storage');
   AddPerm('Write owner data');
   AddPerm('Write user dictionary');
+  AddPerm('Receive SMS');
   { todo:
   Access location extra commands
   Access mock location
@@ -153,7 +154,6 @@ begin
   Read user dictionary
   Receive boot completed
   Receive MMS
-  Receive SMS
   Receive WAP push
   Record audio
   Reorder tasks
