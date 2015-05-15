@@ -1,0 +1,179 @@
+object AndroidModule1: TAndroidModule1
+  Left = 287
+  Top = 163
+  Width = 320
+  Height = 400
+  MarginLeft = 0
+  MarginTop = 0
+  MarginRight = 0
+  MarginBottom = 0
+  Text = 'AndroidModule1'
+  ActivityMode = actMain
+  BackgroundColor = colbrDefault
+  OnJNIPrompt = AndroidModule1JNIPrompt
+  object jTextView1: jTextView
+    Left = 57
+    Top = 5
+    Width = 206
+    Height = 20
+    MarginLeft = 5
+    MarginTop = 5
+    MarginRight = 5
+    MarginBottom = 5
+    Visible = True
+    PosRelativeToAnchor = []
+    PosRelativeToParent = [rpTop, rpCenterHorizontal]
+    LayoutParamWidth = lpWrapContent
+    LayoutParamHeight = lpWrapContent
+    Text = 'App Custom ShowMessage Demo1'
+    Alignment = taLeft
+    Enabled = True
+    BackgroundColor = colbrDefault
+    FontColor = colbrDefault
+    FontSize = 0
+    TextTypeFace = tfNormal
+    Id = 6984139
+  end
+  object jButton1: jButton
+    Left = 2
+    Top = 34
+    Width = 316
+    Height = 40
+    MarginLeft = 2
+    MarginTop = 4
+    MarginRight = 2
+    MarginBottom = 4
+    Visible = True
+    Anchor = jTextView1
+    PosRelativeToAnchor = [raBelow]
+    PosRelativeToParent = []
+    LayoutParamWidth = lpMatchParent
+    LayoutParamHeight = lpWrapContent
+    Text = 'Show Custom Message '
+    BackgroundColor = colbrDefault
+    FontColor = colbrDefault
+    FontSize = 0
+    OnClick = jButton1Click
+    Id = 0
+  end
+  object jPanel1: jPanel
+    Left = 4
+    Top = 144
+    Width = 312
+    Height = 102
+    MarginLeft = 4
+    MarginTop = 4
+    MarginRight = 4
+    MarginBottom = 4
+    Visible = False
+    PosRelativeToAnchor = []
+    PosRelativeToParent = []
+    LayoutParamWidth = lpWrapContent
+    LayoutParamHeight = lpWrapContent
+    BackgroundColor = colbrLightCyan
+    MinPinchZoomFactor = 0.25
+    MaxPinchZoomFactor = 4
+    Id = 0
+    object jImageView1: jImageView
+      Left = 6
+      Top = 7
+      Width = 48
+      Height = 48
+      Visible = True
+      PosRelativeToAnchor = []
+      PosRelativeToParent = [rpTop, rpLeft]
+      LayoutParamWidth = lpWrapContent
+      LayoutParamHeight = lpWrapContent
+      ImageIndex = -1
+      BackgroundColor = colbrDefault
+      ImageIdentifier = 'ic_launcher'
+      ImageScaleType = scaleCenter
+      Id = 9575071
+    end
+    object jTextView2: jTextView
+      Left = 111
+      Top = 5
+      Width = 90
+      Height = 20
+      MarginLeft = 5
+      MarginTop = 5
+      MarginRight = 5
+      MarginBottom = 5
+      Visible = True
+      PosRelativeToAnchor = []
+      PosRelativeToParent = [rpTop, rpCenterHorizontal]
+      LayoutParamWidth = lpWrapContent
+      LayoutParamHeight = lpWrapContent
+      Text = 'Hello World !!  '
+      Alignment = taLeft
+      Enabled = True
+      BackgroundColor = colbrDefault
+      FontColor = colbrDefault
+      FontSize = 0
+      TextTypeFace = tfNormal
+      Id = 5647856
+    end
+    object jDigitalClock1: jDigitalClock
+      Left = 206
+      Top = 7
+      Width = 96
+      Height = 48
+      MarginLeft = 10
+      MarginTop = 10
+      MarginRight = 10
+      MarginBottom = 10
+      Visible = True
+      PosRelativeToAnchor = []
+      PosRelativeToParent = [rpTop, rpRight]
+      LayoutParamWidth = lpWrapContent
+      LayoutParamHeight = lpWrapContent
+      BackgroundColor = colbrDefault
+      Id = 0
+    end
+    object jButton2: jButton
+      Left = 2
+      Top = 62
+      Width = 308
+      Height = 40
+      MarginLeft = 2
+      MarginTop = 4
+      MarginRight = 2
+      MarginBottom = 4
+      Visible = True
+      Anchor = jImageView1
+      PosRelativeToAnchor = [raBelow]
+      PosRelativeToParent = []
+      LayoutParamWidth = lpMatchParent
+      LayoutParamHeight = lpWrapContent
+      Text = 'Fly App Title'
+      BackgroundColor = colbrDefault
+      FontColor = colbrDefault
+      FontSize = 0
+      OnClick = jButton2Click
+      Id = 0
+    end
+    object jCheckBox1: jCheckBox
+      Left = 103
+      Top = 35
+      Width = 105
+      Height = 32
+      MarginLeft = 5
+      MarginTop = 5
+      MarginRight = 5
+      MarginBottom = 5
+      Visible = True
+      Anchor = jTextView2
+      PosRelativeToAnchor = [raBelow]
+      PosRelativeToParent = [rpCenterHorizontal]
+      LayoutParamWidth = lpWrapContent
+      LayoutParamHeight = lpWrapContent
+      Text = 'Fly "Hello"'
+      BackgroundColor = colbrDefault
+      FontColor = colbrDefault
+      FontSize = 0
+      Checked = False
+      OnClick = jCheckBox1Click
+      Id = 0
+    end
+  end
+end

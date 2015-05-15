@@ -56,22 +56,20 @@ implementation
 
 procedure TAndroidModule1.AndroidModule1JNIPrompt(Sender: TObject);
 begin
+    Self.SetIconActionBar('ic_bullets');
 
     //prepare custom tab view - jPanel3
+     jPanel3.MatchParent();
+    //jPanel3.CenterInParent();
     jTextView3.TextTypeFace:= tfBold;
     jImageView1.SetImageByResIdentifier('ic_bullet_red');    //...\res\drawable-xxx
-
-    Self.SetIconActionBar('ic_bullets');
+    jCheckBox1.Checked:= True;
 
     jActionBarTab1.Add('NAME', jPanel1.View{sheet view}, 'ic_bullet_green');    // ...\res\drawable-xxx
     jActionBarTab1.Add('ADDRESS', jPanel2.View {sheet view}, 'ic_bullet_yellow'); //...\res\drawable-xxx
-
     jActionBarTab1.Add('ADDLIST', jPanel4.View{sheet view}, jPanel3.View {custom tab view!});
 
     Self.SetTabNavigationModeActionBar;  //this is needed!!!
-
-    //prepare custom tab view - jPanel3
-    jCheckBox1.Checked:= True;
 
 end;
 

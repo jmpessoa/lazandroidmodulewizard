@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CONFIG>
+  <ProjectSession>
+    <PathDelim Value="\"/>
+    <Version Value="9"/>
+    <BuildModes Active="Default"/>
+    <Units Count="12">
+      <Unit0>
+        <Filename Value="controls.lpr"/>
+        <IsPartOfProject Value="True"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="409"/>
+        <CursorPos X="8" Y="419"/>
+        <UsageCount Value="68"/>
+        <DefaultSyntaxHighlighter Value="Delphi"/>
+      </Unit0>
+      <Unit1>
+        <Filename Value="unit1.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="AndroidModule1"/>
+        <HasResources Value="True"/>
+        <UnitName Value="unit1"/>
+        <IsVisibleTab Value="True"/>
+        <TopLine Value="22"/>
+        <CursorPos X="50" Y="32"/>
+        <UsageCount Value="68"/>
+        <Loaded Value="True"/>
+        <LoadedDesigner Value="True"/>
+        <DefaultSyntaxHighlighter Value="Delphi"/>
+      </Unit1>
+      <Unit2>
+        <Filename Value="C:\laz4android1346592\components\LazAndroidWizard\Laz_And_Controls.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="968"/>
+        <CursorPos X="16" Y="977"/>
+        <UsageCount Value="10"/>
+      </Unit2>
+      <Unit3>
+        <Filename Value="C:\laz4android1346592\components\LazAndroidWizard\androidwidget.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="1070"/>
+        <CursorPos X="11" Y="1079"/>
+        <UsageCount Value="12"/>
+      </Unit3>
+      <Unit4>
+        <Filename Value="C:\laz4android1346592\components\LazAndroidWizard\And_jni_Bridge.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="2260"/>
+        <CursorPos X="47" Y="2272"/>
+        <UsageCount Value="7"/>
+      </Unit4>
+      <Unit5>
+        <Filename Value="C:\laz4android1346592\components\LazAndroidWizard\customdialog.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="294"/>
+        <CursorPos X="21" Y="310"/>
+        <UsageCount Value="25"/>
+      </Unit5>
+      <Unit6>
+        <Filename Value="C:\laz4android1346592\components\LazAndroidWizard\register_extras.pas"/>
+        <EditorIndex Value="-1"/>
+        <CursorPos X="12" Y="12"/>
+        <UsageCount Value="8"/>
+      </Unit6>
+      <Unit7>
+        <Filename Value="C:\laz4android1346592\components\LazAndroidWizard\location.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="591"/>
+        <UsageCount Value="8"/>
+      </Unit7>
+      <Unit8>
+        <Filename Value="C:\laz4android1346592\components\LazAndroidWizard\androidwizard_intf.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="1778"/>
+        <CursorPos X="58" Y="1794"/>
+        <UsageCount Value="7"/>
+      </Unit8>
+      <Unit9>
+        <Filename Value="C:\laz4android1346592\components\LazAndroidWizard\uformandroidproject.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="2244"/>
+        <CursorPos X="19" Y="2251"/>
+        <UsageCount Value="7"/>
+      </Unit9>
+      <Unit10>
+        <Filename Value="C:\laz4android1346592\components\LazAndroidWizard\laz_and_controls_events.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="472"/>
+        <CursorPos X="56" Y="491"/>
+        <UsageCount Value="8"/>
+      </Unit10>
+      <Unit11>
+        <Filename Value="C:\laz4android1346592\components\LazAndroidWizard\actionbartab.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="15"/>
+        <CursorPos X="37" Y="22"/>
+        <UsageCount Value="8"/>
+      </Unit11>
+    </Units>
+    <JumpHistory HistoryIndex="-1"/>
+  </ProjectSession>
+</CONFIG>

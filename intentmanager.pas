@@ -92,7 +92,7 @@ jIntentManager = class(jControl)
     function GetContactEmail(_contactUri: jObject): string;
     function GetBundleContent(_intent: jObject): TDynArrayOfString;
     function IsCallable(_intent: jObject): boolean;
-
+    function IsActionEqual(_intent: jObject; _intentAction: string): boolean;
 
  published
     property IntentAction: TIntentAction read FIntentAction write SetIntentAction;
@@ -168,6 +168,7 @@ function jIntentManager_GetBundleContent(env: PJNIEnv; _jintentmanager: JObject;
 procedure jIntentManager_SetAction(env: PJNIEnv; _jintentmanager: JObject; _intentAction: integer); overload;
 function jIntentManager_IsCallable(env: PJNIEnv; _jintentmanager: JObject; _intent: jObject): boolean;
 
+function jIntentManager_IsActionEqual(env: PJNIEnv; _jintentmanager: JObject; _intent: jObject; _intentAction: string): boolean;
 
 implementation
 
@@ -675,6 +676,12 @@ begin
    Result:= jIntentManager_IsCallable(FjEnv, FjObject, _intent);
 end;
 
+function jIntentManager.IsActionEqual(_intent: jObject; _intentAction: string): boolean;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jIntentManager_IsActionEqual(FjEnv, FjObject, _intent ,_intentAction);
+end;
 {-------- jIntentManager_JNI_Bridge ----------}
 
 function jIntentManager_jCreate(env: PJNIEnv;_Self: int64; this: jObject): jObject;
@@ -1828,5 +1835,22 @@ begin
   jBoo:= env^.CallBooleanMethodA(env, _jintentmanager, jMethod, @jParams);
   Result:= boolean(jBoo);
 end;
+
+function jIntentManager_IsActionEqual(env: PJNIEnv; _jintentmanager: JObject; _intent: jObject; _intentAction: string): boolean;
+var
+  jBoo: JBoolean;
+  jParams: array[0..1] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= _intent;
+  jParams[1].l:= env^.NewStringUTF(env, PChar(_intentAction));
+  jCls:= env^.GetObjectClass(env, _jintentmanager);
+  jMethod:= env^.GetMethodID(env, jCls, 'IsActionEqual', '(Landroid/content/Intent;Ljava/lang/String;)Z');
+  jBoo:= env^.CallBooleanMethodA(env, _jintentmanager, jMethod, @jParams);
+  Result:= boolean(jBoo);
+  env^.DeleteLocalRef(env,jParams[1].l);
+end;
+
 
 end.

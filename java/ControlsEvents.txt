@@ -63,3 +63,4 @@ pOnTimePicker=Java_Event_pOnTimePicker(PEnv,this,TObject(pasobj),hourOfDay,minut
 pOnDatePicker=Java_Event_pOnDatePicker(PEnv,this,TObject(pasobj),year,monthOfYear,dayOfMonth);
 pOnFlingGestureDetected=Java_Event_pOnFlingGestureDetected(PEnv,this,TObject(pasobj),direction);
 pOnPinchZoomGestureDetected=Java_Event_pOnPinchZoomGestureDetected(PEnv,this,TObject(pasobj),scaleFactor,state);
+pOnShellCommandExecuted=Java_Event_pOnShellCommandExecuted(PEnv,this,TObject(pasobj),cmdResult);

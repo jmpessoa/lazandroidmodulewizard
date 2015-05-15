@@ -196,8 +196,8 @@ const
   }
 
   //
-  cjORIENTATION_LANDSCAPE                =  2;
   cjORIENTATION_PORTRAIT                 =  1;
+  cjORIENTATION_LANDSCAPE                =  2;
   cjORIENTATION_SQUARE                   =  3; // Deprecated API 16
   cjORIENTATION_UNDEFINED                =  0; //
   //
@@ -457,9 +457,9 @@ type
 
   TSide = (sdW, sdH);
 
-  TScreenStyle   = (ssSensor,       // by Device Status
-                    ssPortrait,     // Force Portrait
-                    ssLandScape);   // Force LandScape
+  TScreenStyle   = (ssPortrait = 1,     // Force Portrait
+                    ssLandScape = 2,    // Force LandScape
+                    ssSensor = 4); // by Device Status
 
   TWebViewStatus = (wvOnUnknown,    // WebView
                     wvOnBefore,
@@ -878,8 +878,6 @@ type
     //---------------
 
     Procedure SetColor   (Value : TARGBColorBridge);
-    function GetView: jObject;
-
     {
     procedure ReadIntHorizontalOffset(Reader: TReader);
     procedure WriteIntHorizontalOffset(Writer: TWriter);
@@ -917,7 +915,7 @@ type
     Procedure Show;
     Procedure Close;
     Procedure Refresh;
-    procedure ShowMessage(msg: string);
+    procedure ShowMessage(msg: string);  overload;
     function GetDateTime: String;
 
     function GetStringExtra(data: jObject; extraName: string): string;
@@ -978,9 +976,16 @@ type
     function GetDeviceID: String;
 
     function IsPackageInstalled(_packagename: string): boolean;
+    procedure ShowCustomMessage(_panel: jObject; _gravity: TGravity);
+    procedure SetScreenOrientation(_orientation: TScreenStyle);
+    function  GetScreenOrientation(): integer;
+
+    function GetScreenSize(): string;
+    function GetScreenDensity(): string;
 
     // Property
-    property View         : jObject        read FjRLayout {GetView } write FjRLayout;
+    property View         : jObject        read FjRLayout; //layout!
+
     property ScreenStyle  : TScreenStyle   read FScreenStyle    write FScreenStyle;
     property Animation    : TAnimation     read FAnimation      write FAnimation;
     property Orientation   : integer read FOrientation write SetOrientation;
@@ -1064,13 +1069,10 @@ type
     procedure SetViewParent(Value: jObject);  virtual;
     function GetViewParent: jObject;  virtual;
 
-    procedure SetView(Value: jObject);  virtual;
-    function GetView: jObject;  virtual;
-
     procedure SetVisible(Value: boolean);
 
     procedure SetParentComponent(Value: TComponent); override;
-    procedure SetParamHeight(Value: TLayoutParams);
+    procedure SetParamHeight(Value: TLayoutParams); virtual;
     procedure SetParamWidth(Value: TLayoutParams);
     procedure SetTextTypeFace(Value: TTextTypeFace); virtual;
     procedure SetFontFace(AValue: TFontFace); virtual;
@@ -1084,7 +1086,9 @@ type
     property AnchorId: integer read FAnchorId write FAnchorId;
     property Orientation: integer read FOrientation write FOrientation;
     property ViewParent {ViewParent}: jObject  read  GetViewParent write SetViewParent; // Java : Parent Relative Layout
-    property View: jObject read GetView write SetView; // Java : Self View/Layout
+
+    property View: jObject read FjObject; //View/Layout
+
     property Id: DWord read FId write FId;
     property FontFace: TFontFace read FFontFace write SetFontFace;
     property TextTypeFace: TTextTypeFace read FTextTypeFace write SetTextTypeFace;
@@ -1173,6 +1177,13 @@ end;
   function jForm_GetStringResourceByName(env: PJNIEnv; _jform: JObject; _resName: string): string;
 
   function jForm_IsPackageInstalled(env: PJNIEnv; _jform: JObject; _packagename: string): boolean;
+  procedure jForm_ShowCustomMessage(env: PJNIEnv; _jform: JObject; _layout: jObject; _gravity: integer);
+
+  procedure jForm_SetScreenOrientation(env: PJNIEnv; _jform: JObject; _orientation: integer);
+  function jForm_GetScreenOrientation(env: PJNIEnv; _jform: JObject): integer;
+
+  function jForm_GetScreenDensity(env: PJNIEnv; _jform: JObject): string;
+  function jForm_GetScreenSize(env: PJNIEnv; _jform: JObject): string;
 
 
 //jni API Bridge
@@ -1260,12 +1271,15 @@ Function  jForm_Create                 (env:PJNIEnv;this:jobject; SelfObj : TObj
 Procedure jForm_Free2                   (env:PJNIEnv; Form    : jObject);
 Procedure jForm_Show2                   (env:PJNIEnv; Form    : jObject; effect : Integer);
 Procedure jForm_Close2                  (env:PJNIEnv;  Form: jObject);
-Function  jForm_GetLayout2              (env:PJNIEnv; Form    : jObject) : jObject;
+
+Function  jForm_GetLayout2(env:PJNIEnv; Form    : jObject) : jObject;
+Function jForm_GetView(env:PJNIEnv; Form: jObject): jObject;
+
 Function jForm_GetClickListener(env:PJNIEnv;  Form: jObject): jObject;
 Procedure jForm_FreeLayout              (env:PJNIEnv; Layout    : jObject);
 Procedure jForm_SetVisibility2          (env:PJNIEnv; Form    : jObject; visible : boolean);
 Procedure jForm_SetEnabled2             (env:PJNIEnv;Form    : jObject; enabled : Boolean);
-procedure jForm_ShowMessage(env:PJNIEnv; Form:jObject; msg: string);
+procedure jForm_ShowMessage(env:PJNIEnv; Form:jObject; msg: string); overload;
 function jForm_GetDateTime(env:PJNIEnv; Form:jObject): string;
 procedure jForm_SetWifiEnabled(env: PJNIEnv;  _jform: JObject; _status: boolean);
 function jForm_IsWifiEnabled              (env: PJNIEnv;  _jform: JObject): boolean;
@@ -1939,16 +1953,6 @@ begin
   Result:= FjPRLayout;
 end;
 
-procedure jVisualControl.SetView(Value: jObject);
-begin
-  FjRLayout:= Value;
-end;
-
-function jVisualControl.GetView: jObject;
-begin
-  Result:= FjRLayout;
-end;
-
 procedure jVisualControl.SetVisible(Value: boolean);
 begin
   FVisible:= Value;
@@ -2133,7 +2137,7 @@ begin
 
   FjObject:=  jForm_Create(refApp.Jni.jEnv, refApp.Jni.jThis, Self); {jSef}
 
-  FjRLayout:= jForm_Getlayout2(refApp.Jni.jEnv, FjObject);  {view/RelativeLayout}
+  FjRLayout:= jForm_Getlayout2(refApp.Jni.jEnv, FjObject);  {form view/RelativeLayout}
 
   //thierrydijoux - if backgroundColor is set to black, no theme ...
   if  FColor <> colbrDefault then
@@ -2311,11 +2315,6 @@ end;
 Procedure jForm.GenEvent_OnClick(Obj: TObject);
 begin
    if Assigned(FOnClick) then FOnClick(Obj);
-end;
-
-function jForm.GetView: jObject;
-begin
-  Result:= FjRLayout;
 end;
 
 function  jForm.GetOnViewClickListener(jObjForm: jObject): jObject;
@@ -2626,6 +2625,41 @@ begin
   //in designing component state: result value here...
   if FInitialized then
    Result:= jForm_IsPackageInstalled(FjEnv, FjObject, _packagename);
+end;
+
+procedure jForm.ShowCustomMessage(_panel: jObject; _gravity: TGravity);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jForm_ShowCustomMessage(FjEnv, FjObject, _panel, GetGravity(_gravity) );
+end;
+
+procedure jForm.SetScreenOrientation(_orientation: TScreenStyle);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jForm_SetScreenOrientation(FjEnv, FjObject, Ord(_orientation));
+end;
+
+function jForm.GetScreenOrientation(): integer;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jForm_GetScreenOrientation(FjEnv, FjObject);
+end;
+
+function jForm.GetScreenDensity(): string;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jForm_GetScreenDensity(FjEnv, FjObject);
+end;
+
+function jForm.GetScreenSize(): string;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jForm_GetScreenSize(FjEnv, FjObject);
 end;
 
 {-------- jForm_JNI_Bridge ----------}
@@ -3082,6 +3116,80 @@ begin
   jBoo:= env^.CallBooleanMethodA(env, _jform, jMethod, @jParams);
   Result:= boolean(jBoo);
   env^.DeleteLocalRef(env,jParams[0].l);
+end;
+
+procedure jForm_ShowCustomMessage(env: PJNIEnv; _jform: JObject; _layout: jObject; _gravity: integer);
+var
+  jParams: array[0..1] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= _layout;
+  jParams[1].i:= _gravity;
+  jCls:= env^.GetObjectClass(env, _jform);
+  jMethod:= env^.GetMethodID(env, jCls, 'ShowCustomMessage', '(Landroid/widget/RelativeLayout;I)V');
+  env^.CallVoidMethodA(env, _jform, jMethod, @jParams);
+end;
+
+procedure jForm_SetScreenOrientation(env: PJNIEnv; _jform: JObject; _orientation: integer);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].i:= _orientation;
+  jCls:= env^.GetObjectClass(env, _jform);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetScreenOrientation', '(I)V');
+  env^.CallVoidMethodA(env, _jform, jMethod, @jParams);
+end;
+
+function jForm_GetScreenOrientation(env: PJNIEnv; _jform: JObject): integer;
+var
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jform);
+  jMethod:= env^.GetMethodID(env, jCls, 'GetScreenOrientation', '()I');
+  Result:= env^.CallIntMethod(env, _jform, jMethod);
+end;
+
+function jForm_GetScreenDensity(env: PJNIEnv; _jform: JObject): string;
+var
+  jStr: JString;
+  jBoo: JBoolean;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jform);
+  jMethod:= env^.GetMethodID(env, jCls, 'GetScreenDensity', '()Ljava/lang/String;');
+  jStr:= env^.CallObjectMethod(env, _jform, jMethod);
+  case jStr = nil of
+     True : Result:= '';
+     False: begin
+              jBoo:= JNI_False;
+              Result:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
+            end;
+  end;
+end;
+
+
+function jForm_GetScreenSize(env: PJNIEnv; _jform: JObject): string;
+var
+  jStr: JString;
+  jBoo: JBoolean;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jform);
+  jMethod:= env^.GetMethodID(env, jCls, 'GetScreenSize', '()Ljava/lang/String;');
+  jStr:= env^.CallObjectMethod(env, _jform, jMethod);
+  case jStr = nil of
+     True : Result:= '';
+     False: begin
+              jBoo:= JNI_False;
+              Result:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
+            end;
+  end;
 end;
 
   {jApp by jmpessoa}
@@ -4123,6 +4231,17 @@ var
 begin
   cls := env^.GetObjectClass(env, Form);
   method:= env^.GetMethodID(env, cls, 'GetLayout', '()Landroid/widget/RelativeLayout;');
+  Result:= env^.CallObjectMethod(env, Form, method);
+  Result := env^.NewGlobalRef(env,Result);   //<---- need here for ap1 > 13 - by jmpessoa
+end;
+
+Function jForm_GetView(env:PJNIEnv; Form: jObject): jObject;
+var
+  cls: jClass;
+  method: jmethodID;
+begin
+  cls := env^.GetObjectClass(env, Form);
+  method:= env^.GetMethodID(env, cls, 'GetView', '()Landroid/widget/RelativeLayout;');
   Result:= env^.CallObjectMethod(env, Form, method);
   Result := env^.NewGlobalRef(env,Result);   //<---- need here for ap1 > 13 - by jmpessoa
 end;

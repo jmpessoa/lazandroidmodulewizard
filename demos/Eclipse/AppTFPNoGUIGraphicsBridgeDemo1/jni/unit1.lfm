@@ -93,8 +93,8 @@ object AndroidModule1: TAndroidModule1
     MaxPinchZoomFactor = 4
     Id = 0
     object jImageView1: jImageView
-      Left = 13
-      Top = 12
+      Left = 20
+      Top = 26
       Width = 255
       Height = 232
       Visible = True
@@ -114,7 +114,7 @@ object AndroidModule1: TAndroidModule1
     Width = 0
     Height = 0
     left = 129
-    top = 279
+    top = 240
   end
   object FPNoGUIGraphicsBridge1: TFPNoGUIGraphicsBridge
     Width = 800
@@ -136,19 +136,19 @@ object AndroidModule1: TAndroidModule1
     EntityData.FieldSeparator = ';'
     EntityData.NameValueSeparator = '#'
     ActiveViewPort = ViewPort1
-    left = 64
-    top = 440
+    left = 96
+    top = 344
   end
   object ViewPort1: TViewPort
     Tag = 1
     PenThickness = 1
     PenColor = colbrRed
-    FontSize = 12
+    FontSize = 14
     FontColor = colbrBlack
     BackgroundColor = colbrLavender
     DrawGrid = True
     DrawAxis = True
-    Title = 'ViewPort'
+    Title = 'Fcl-Image + FreeType'
     XLeft = 0
     YTop = 0
     Width = 800
@@ -158,17 +158,19 @@ object AndroidModule1: TAndroidModule1
     MarginRight = 40
     MarginBottom = 40
     Cliping = False
+    GridData.XTitle = 'X'
+    GridData.YTitle = 'Y'
     GridData.AxisColor = colbrLime
     GridData.Color = colbrLightSteelBlue
     GridData.BackgroundColor = colbrGreenYellow
     GridData.XInterval = 10
     GridData.YInterval = 10
     GridData.XLegendInterval = 1
-    GridData.YLegendInterval = 2
-    GridData.XShowLengend = False
-    GridData.YShowLengend = False
+    GridData.YLegendInterval = 1
+    GridData.XShowLengend = True
+    GridData.YShowLengend = True
     OnChangeFontColor = ViewPort1ChangeFontColor
-    left = 64
-    top = 501
+    left = 208
+    top = 344
   end
 end

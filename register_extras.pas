@@ -8,6 +8,9 @@ interface
 
 uses 
   Classes,
+  digitalclock,
+  analogclock,
+  shellcommand,
   datepickerdialog,
   timepickerdialog,
   notificationmanager,
@@ -45,6 +48,9 @@ implementation
   
 Procedure Register;
 begin
+  {$I jdigitalclock_icon.lrs}
+  {$I janalogclock_icon.lrs}
+  {$I jshellcommand_icon.lrs}
   {$I jdatepickerdialog_icon.lrs}
   {$I jtimepickerdialog_icon.lrs}
   {$I jnotificationmanager_icon.lrs}
@@ -73,6 +79,9 @@ begin
   {$I jhelloadder_icon.lrs}
   RegisterComponents('Android Bridges Extra',
     [
+      jDigitalClock,
+      jAnalogClock,
+      jShellCommand,
       jDatePickerDialog,
       jTimePickerDialog,
       jNotificationManager,

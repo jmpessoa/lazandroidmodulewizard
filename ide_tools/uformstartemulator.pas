@@ -210,12 +210,24 @@ end;
 
 procedure TfrmStartEmulator.GetAVDList;
 var
-  i: Integer;
+  i, j: Integer;
 begin
-  avds.Clear;
   devs.Clear;
   emul_wnds.Clear;
-  FRun(AppendPathDelim(FSDKPath) + 'tools' + PathDelim + 'emulator', '-list-avds', avds);
+
+  avds.Sorted := False;
+  FRun(AppendPathDelim(FSDKPath) + 'tools' + PathDelim + 'android'
+    {$ifdef Windows} + '.bat'{$endif}, 'list' + sLineBreak + 'avds', avds);
+  for i := avds.Count - 1 downto 0 do
+  begin
+    j := Pos(' Name: ', avds[i]);
+    if j > 0 then
+      avds[i] := Trim(Copy(avds[i], j + 7, MaxInt))
+    else
+      avds.Delete(i);
+  end;
+  avds.Sorted := True;
+
   for i := avds.Count - 1 downto 0 do
     if Trim(avds[i]) = '' then avds.Delete(i);
   FRun(AppendPathDelim(FSDKPath) + 'platform-tools' + PathDelim + 'adb', 'devices', devs);
