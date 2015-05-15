@@ -174,6 +174,7 @@ type
      function GetWidth: integer;  override;
      function GetHeight: integer; override;
      procedure SetViewParent(Value: jObject); override;
+     procedure SetParamHeight(Value: TLayoutParams); override;
    public
      constructor Create(AOwner: TComponent); override;
      Destructor  Destroy; override;
@@ -186,8 +187,12 @@ type
      procedure GenEvent_OnFlingGestureDetected(Obj: TObject; direction: integer);
      procedure GenEvent_OnPinchZoomGestureDetected(Obj: TObject; scaleFactor: single; state: integer);
 
-    procedure SetMinZoomFactor(_minZoomFactor: single);
-    procedure SetMaxZoomFactor(_maxZoomFactor: single);
+     procedure SetMinZoomFactor(_minZoomFactor: single);
+     procedure SetMaxZoomFactor(_maxZoomFactor: single);
+
+     procedure CenterInParent();
+     procedure MatchParent();
+     procedure WrapContent();
 
    published
      property BackgroundColor     : TARGBColorBridge read FColor write SetColor;
@@ -301,8 +306,13 @@ type
    destructor Destroy; override;
    procedure Init(refApp: jApp) override;
    function Send: integer; overload;
+
    function Send(toNumber: string;  msg: string): integer; overload;
+   function Send(toNumber: string;  msg: string; packageDeliveredAction: string): integer; overload;
+
    function Send(toName: string): integer; overload;
+
+
    function Read(intentReceiver: jObject; addressBodyDelimiter: string): string;
    // Property
   published
@@ -710,6 +720,7 @@ type
 
     procedure Append(_txt: string);
     procedure AppendLn(_txt: string);
+    procedure AppendTab();
 
     procedure SetImeOptions(_imeOption: TImeOptions);
 
@@ -963,7 +974,6 @@ type
 
   jListView = class(jVisualControl)
   private
-    //FjRLayout {view}    : jObject; // Java : Self Layout
     FOnClickItem  : TOnClickItem;
     FOnClickWidgetItem: TOnClickWidgetItem;
     FOnClickCaptionItem: TOnClickCaptionItem;
@@ -1035,8 +1045,6 @@ type
     procedure SetLayoutByIndex(Value: TItemLayout; index: integer);
 
     // Property
-    //property Parent: jObject  read  FjPRLayout write SetParent; // Java: Parent Relative Layout
-   // property View      : jObject   read FjRLayout  write FjRLayout; //self View
     property setItemIndex: TXY write SetItemPosition;
     property Count: integer read GetCount;
     property HighLightSelectedItem: boolean read FHighLightSelectedItem write SetHighLightSelectedItem;
@@ -1065,7 +1073,6 @@ type
 
   jScrollView = class(jVisualControl)
   private
-   // FjRLayout    : jObject; // Java : Self Layout
     FScrollSize : integer;
     Procedure SetColor      (Value : TARGBColorBridge);
     Procedure SetScrollSize (Value : integer);
@@ -1080,11 +1087,8 @@ type
     Procedure UpdateLayout; override;
     procedure Init(refApp: jApp);  override;
     // Property
-    //property Parent: jObject  read  FjPRLayout write SetParent; // Java : Parent Relative Layout
-   // property View      : jObject read FjRLayout   write FjRLayout;
   published
     property ScrollSize: integer read FScrollSize write SetScrollSize;
-    //property Visible   : Boolean read FVisible    write SetVisible;
     property BackgroundColor     : TARGBColorBridge read FColor      write SetColor;
   end;
 
@@ -1092,7 +1096,6 @@ type
 
   jHorizontalScrollView = class(jVisualControl)
   private
-   // FjRLayout    : jObject; // Java : Self Layout
     FScrollSize : integer;
     Procedure SetColor      (Value : TARGBColorBridge);
     Procedure SetScrollSize (Value : integer);
@@ -1107,11 +1110,8 @@ type
     Procedure UpdateLayout; override;
     procedure Init(refApp: jApp);  override;
     // Property
-    //property Parent: jObject  read  FjPRLayout write SetParent; // Java : Parent Relative Layout
-   // property View      : jObject read FjRLayout   write FjRLayout;
   published
     property ScrollSize: integer read FScrollSize write SetScrollSize;
-    //property Visible   : Boolean read FVisible    write SetVisible;
     property BackgroundColor     : TARGBColorBridge read FColor      write SetColor;
   end;
 
@@ -2783,6 +2783,14 @@ begin
      jEditText_AppendLn(FjEnv, FjObject, _txt);
 end;
 
+procedure jEditText.AppendTab();
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jEditText_AppendTab(FjEnv, FjObject);
+end;
+
+
 procedure jEditText.SetImeOptions(_imeOption: TImeOptions);
 begin
   //in designing component state: set value here...
@@ -3933,6 +3941,7 @@ end;
 
 procedure jImageView.SetImageByResIdentifier(_imageResIdentifier: string);
 begin
+  FImageName:= _imageResIdentifier;
   if FInitialized then
      jImageView_SetImageByResIdentifier(FjEnv, FjObject , _imageResIdentifier);
 end;
@@ -4419,6 +4428,17 @@ begin
         Result:= jSend_SMS(gApp.Jni.jEnv, gApp.Jni.jThis,
                   toNumber,     //to
                   msg);  //message
+  end;
+end;
+
+function jSMS.Send(toNumber: string;  msg: string; packageDeliveredAction: string): integer;
+begin
+ if FInitialized then
+ begin
+    if toNumber <> '' then
+        Result:= jSend_SMS(gApp.Jni.jEnv, gApp.Jni.jThis,
+                  toNumber,     //to
+                  msg, packageDeliveredAction);  //message
   end;
 end;
 
@@ -7543,9 +7563,9 @@ begin
   inherited Init(refApp);
 
   FjObject := jPanel_Create(FjEnv, FjThis, Self); //jSelf !
+  FInitialized:= True;
 
-  FInitialized:= True; //**
-  FjRLayout{View}:= jPanel_getView(FjEnv, FjObject ); // Java : Self Layout
+  //FjRLayout{View}:= jPanel_getView(FjEnv, FjObject ); //jSelf = View !!!
 
   if FParent <> nil then
   begin
@@ -7604,7 +7624,7 @@ begin
   jPanel_setLayoutAll(FjEnv, FjObject , Self.AnchorId);
 
   if FColor <> colbrDefault then
-    View_SetBackGroundColor(FjEnv, FjThis, FjRLayout{!}, GetARGB(FCustomColor, FColor));
+    View_SetBackGroundColor(FjEnv, FjThis, FjObject{FjRLayout}{!}, GetARGB(FCustomColor, FColor));
 
   View_SetVisible(FjEnv, FjThis, FjObject, FVisible);
 
@@ -7621,7 +7641,7 @@ Procedure jPanel.SetColor(Value: TARGBColorBridge);
 begin
   FColor:= Value;
   if (FInitialized = True) and (FColor <> colbrDefault) then
-    View_SetBackGroundColor(FjEnv, FjRLayout{view!}, GetARGB(FCustomColor, FColor)); //@@
+    View_SetBackGroundColor(FjEnv, FjObject{FjRLayout}{view!}, GetARGB(FCustomColor, FColor)); //@@
 end;
 
 Procedure jPanel.Refresh;
@@ -7651,6 +7671,18 @@ begin
         jPanel_setLParamWidth(FjEnv, FjObject , GetLayoutParamsByParent(Self.Parent, FLParamWidth, sdW))
     end;
   end;
+end;
+
+procedure jPanel.SetParamHeight(Value: TLayoutParams);
+var
+  side: TSide;
+begin
+   inherited  SetParamHeight(Value);
+   if FInitialized then
+   begin
+     if jForm(Owner).Orientation = gApp.Orientation then side:= sdH else side:= sdW;
+        jPanel_setLParamHeight(FjEnv, FjObject , GetLayoutParams(gApp, {FLParamHeight}Value, side));
+   end;
 end;
 
 procedure jPanel.UpdateLParamHeight;
@@ -7786,6 +7818,27 @@ begin
   FMaxZoomFactor:= _maxZoomFactor;
   if FInitialized then
      jPanel_SetMaxZoomFactor(FjEnv, FjObject, _maxZoomFactor);
+end;
+
+procedure jPanel.CenterInParent();
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jPanel_CenterInParent(FjEnv, FjObject);
+end;
+
+procedure jPanel.MatchParent();
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jPanel_MatchParent(FjEnv, FjObject);
+end;
+
+procedure jPanel.WrapContent();
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jPanel_WrapContent(FjEnv, FjObject);
 end;
 
 end.

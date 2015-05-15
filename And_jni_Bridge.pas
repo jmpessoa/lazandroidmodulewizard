@@ -223,6 +223,7 @@ Procedure jEditText_SetEnabled         (env:PJNIEnv; EditText : jObject; enabled
 Procedure jEditText_SetEditable        (env:PJNIEnv; EditText : jObject; enabled : Boolean);
 procedure jEditText_Append(env: PJNIEnv; _jedittext: JObject; _txt: string);
 procedure jEditText_AppendLn(env: PJNIEnv; _jedittext: JObject; _txt: string);
+procedure jEditText_AppendTab(env: PJNIEnv; _jedittext: JObject);
 
 procedure jEditText_SetImeOptions(env: PJNIEnv; _jedittext: JObject; _imeOption: integer);
 
@@ -552,6 +553,9 @@ function jPanel_getLParamWidth(env:PJNIEnv; Panel : jObject): integer;
 
 procedure jPanel_SetMinZoomFactor(env: PJNIEnv; _jpanel: JObject; _minZoomFactor: single);
 procedure jPanel_SetMaxZoomFactor(env: PJNIEnv; _jpanel: JObject; _maxZoomFactor: single);
+procedure jPanel_CenterInParent(env: PJNIEnv; _jpanel: JObject);
+procedure jPanel_MatchParent(env: PJNIEnv; _jpanel: JObject);
+procedure jPanel_WrapContent(env: PJNIEnv; _jpanel: JObject);
 
 //-----------------
 // HorizontalScrollView
@@ -946,7 +950,11 @@ procedure jSend_Email(env:PJNIEnv; this:jobject;
 //by jmpessoa
 function jSend_SMS(env:PJNIEnv; this:jobject;
                        toNumber: string;
-                       smessage:string): integer;
+                       smessage:string): integer; overload;
+
+function jSend_SMS(env:PJNIEnv; this:jobject;
+                       toNumber: string;
+                       smessage:string; packageDeliveredAction: string): integer; overload;
 
 function jRead_SMS(env:PJNIEnv; this:jobject; intentReceiver: jObject; addressBodyDelimiter: string): string;  //message
 
@@ -2020,6 +2028,16 @@ begin
   jMethod:= env^.GetMethodID(env, jCls, 'AppendLn', '(Ljava/lang/String;)V');
   env^.CallVoidMethodA(env, _jedittext, jMethod, @jParams);
 env^.DeleteLocalRef(env,jParams[0].l);
+end;
+
+procedure jEditText_AppendTab(env: PJNIEnv; _jedittext: JObject);
+var
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jedittext);
+  jMethod:= env^.GetMethodID(env, jCls, 'AppendTab', '()V');
+  env^.CallVoidMethod(env, _jedittext, jMethod);
 end;
 
 procedure jEditText_SetImeOptions(env: PJNIEnv; _jedittext: JObject; _imeOption: integer);
@@ -4135,6 +4153,36 @@ begin
   jCls:= env^.GetObjectClass(env, _jpanel);
   jMethod:= env^.GetMethodID(env, jCls, 'SetMaxZoomFactor', '(F)V');
   env^.CallVoidMethodA(env, _jpanel, jMethod, @jParams);
+end;
+
+procedure jPanel_CenterInParent(env: PJNIEnv; _jpanel: JObject);
+var
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jpanel);
+  jMethod:= env^.GetMethodID(env, jCls, 'CenterInParent', '()V');
+  env^.CallVoidMethod(env, _jpanel, jMethod);
+end;
+
+procedure jPanel_MatchParent(env: PJNIEnv; _jpanel: JObject);
+var
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jpanel);
+  jMethod:= env^.GetMethodID(env, jCls, 'MatchParent', '()V');
+  env^.CallVoidMethod(env, _jpanel, jMethod);
+end;
+
+procedure jPanel_WrapContent(env: PJNIEnv; _jpanel: JObject);
+var
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jpanel);
+  jMethod:= env^.GetMethodID(env, jCls, 'WrapContent', '()V');
+  env^.CallVoidMethod(env, _jpanel, jMethod);
 end;
 
 //------------------------------------------------------------------------------
@@ -6793,6 +6841,25 @@ begin
  Result:= env^.CallIntMethodA(env,this,_jMethod,@_jParams);
  env^.DeleteLocalRef(env,_jParams[0].l);
  env^.DeleteLocalRef(env,_jParams[1].l);
+end;
+
+function jSend_SMS(env:PJNIEnv; this:jobject;
+                       toNumber: string;
+                       smessage:string; packageDeliveredAction: string): integer;
+var
+ _jMethod : jMethodID = nil;
+ _jParams : array[0..2] of jValue;
+ jCls: jClass=nil;
+begin
+ jCls:= Get_gjClass(env);
+ _jMethod:= env^.GetMethodID(env, jCls, 'jSend_SMS', '(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)I');
+ _jParams[0].l := env^.NewStringUTF(env, pchar(toNumber) );
+ _jParams[1].l := env^.NewStringUTF(env, pchar(smessage) );
+ _jParams[2].l := env^.NewStringUTF(env, pchar(packageDeliveredAction) );
+ Result:= env^.CallIntMethodA(env,this,_jMethod,@_jParams);
+ env^.DeleteLocalRef(env,_jParams[0].l);
+ env^.DeleteLocalRef(env,_jParams[1].l);
+ env^.DeleteLocalRef(env,_jParams[2].l);
 end;
 
 function jRead_SMS(env:PJNIEnv; this:jobject; intentReceiver: jObject; addressBodyDelimiter: string): string;  //message

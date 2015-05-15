@@ -39,7 +39,7 @@ type
     procedure jFree();
     procedure SetViewParent(_viewgroup: jObject); override;
     procedure RemoveFromViewParent();
-    function GetView(): jObject;  override;
+
     procedure SetLParamWidth(_w: integer);
     procedure SetLParamHeight(_h: integer);
     procedure SetLeftTopRightBottomWidthHeight(_left: integer; _top: integer; _right: integer; _bottom: integer; _w: integer; _h: integer);
@@ -54,12 +54,9 @@ type
     procedure Close();
     procedure GenEvent_OnCustomDialogShow(Obj: TObject; dialog: jObject; title: string);
   published
-    //property Visible: boolean read FVisible write SetVisible;
-    //property Title: string read FTitle write SetTitle;
     property Text: string read GetText write SetText;
     property IconIdentifier: string read FIconIdentifier write SetIconIdentifier;
     property BackgroundColor: TARGBColorBridge read FColor write SetColor;
-    //property OnClick: TOnNotify read FOnClick write FOnClick;
     property OnShow: TCustomDialogShow read FOnShow write FOnShow;
   end;
 
@@ -67,7 +64,7 @@ function jCustomDialog_jCreate(env: PJNIEnv; this: JObject;_Self: int64): jObjec
 procedure jCustomDialog_jFree(env: PJNIEnv; _jcustomdialog: JObject);
 procedure jCustomDialog_SetViewParent(env: PJNIEnv; _jcustomdialog: JObject; _viewgroup: jObject);
 procedure jCustomDialog_RemoveFromViewParent(env: PJNIEnv; _jcustomdialog: JObject);
-function jCustomDialog_GetView(env: PJNIEnv; _jcustomdialog: JObject): jObject;
+
 procedure jCustomDialog_SetLParamWidth(env: PJNIEnv; _jcustomdialog: JObject; _w: integer);
 procedure jCustomDialog_SetLParamHeight(env: PJNIEnv; _jcustomdialog: JObject; _h: integer);
 procedure jCustomDialog_SetLeftTopRightBottomWidthHeight(env: PJNIEnv; _jcustomdialog: JObject; _left: integer; _top: integer; _right: integer; _bottom: integer; _w: integer; _h: integer);
@@ -129,10 +126,8 @@ begin
   inherited Init(refApp); //set default ViewParent/FjPRLayout as jForm.View!
   //your code here: set/initialize create params....
 
-  FjObject:= jCreate();   //jSelf
+  FjObject:= jCreate();   //jSelf/View
   FInitialized:= True;
-
-  FjRLayout{View}:= jCustomDialog_GetView(FjEnv, FjObject ); //Java Self Layout
 
   if FParent <> nil then
   begin
@@ -180,7 +175,7 @@ begin
   jCustomDialog_SetLayoutAll(FjEnv, FjObject, Self.AnchorId);
 
   if  FColor <> colbrDefault then
-    View_SetBackGroundColor(FjEnv, FjThis, FjRLayout{wiew!}, GetARGB(FCustomColor, FColor));
+    View_SetBackGroundColor(FjEnv, FjThis, FjObject{FjRLayout}{wiew!}, GetARGB(FCustomColor, FColor));
 
   View_SetVisible(FjEnv, FjThis, FjObject, FVisible);
 end;
@@ -189,7 +184,7 @@ procedure jCustomDialog.SetColor(Value: TARGBColorBridge);
 begin
   FColor:= Value;
   if (FInitialized = True) and (FColor <> colbrDefault)  then
-    View_SetBackGroundColor(FjEnv, FjRLayout{view!}, GetARGB(FCustomColor, FColor)); // @@
+    View_SetBackGroundColor(FjEnv, FjObject {FjRLayout}{view!}, GetARGB(FCustomColor, FColor)); // @@
 end;
 
 procedure jCustomDialog.UpdateLParamWidth;
@@ -305,14 +300,6 @@ begin
   //in designing component state: set value here...
   if FInitialized then
      jCustomDialog_RemoveFromViewParent(FjEnv, FjObject);
-end;
-
-function jCustomDialog.GetView(): jObject;
-begin
-  //in designing component state: result value here...
-  Result:=  FjRLayout; //inherited GetView();
-  if FInitialized then
-     Result:= jCustomDialog_GetView(FjEnv, FjObject);
 end;
 
 procedure jCustomDialog.SetLParamWidth(_w: integer);
@@ -496,18 +483,6 @@ begin
   jMethod:= env^.GetMethodID(env, jCls, 'RemoveFromViewParent', '()V');
   env^.CallVoidMethod(env, _jcustomdialog, jMethod);
 end;
-
-
-function jCustomDialog_GetView(env: PJNIEnv; _jcustomdialog: JObject): jObject;
-var
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jCls:= env^.GetObjectClass(env, _jcustomdialog);
-  jMethod:= env^.GetMethodID(env, jCls, 'GetView', '()Landroid/view/View;');
-  Result:= env^.CallObjectMethod(env, _jcustomdialog, jMethod);
-end;
-
 
 procedure jCustomDialog_SetLParamWidth(env: PJNIEnv; _jcustomdialog: JObject; _w: integer);
 var

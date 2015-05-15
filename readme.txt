@@ -106,6 +106,14 @@
 	*			or Go To: Lazarus IDE menu "Run--> [Lamw] Build and Run"! Thanks to Anton!!!
 	****************************************************************************************************
 
+Version 0.6 - rev. 25 - 14 May 2015 - 
+
+	NEW!  
+		jForm "ShowCustomMessage" method
+
+	NEW! 	
+		Demo AppCustomShowMessageDemo1 [Eclipse Compatible Project] 
+
 Version 0.6 - rev. 24 - 10 May 2015 - 
 
 	NEWS!  

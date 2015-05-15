@@ -48,6 +48,10 @@ jBroadcastReceiver = class(jControl)
 
     procedure Unregister();
 
+    function GetResultCode(): integer;
+    function GetResultData(): string;
+    function GetResultExtras(): jObject;
+
     procedure GenEvent_OnBroadcastReceiver(Obj: TObject;  intent: jObject);
 
     property Registered: boolean read FRegistered write FRegistered;
@@ -62,6 +66,10 @@ procedure jBroadcastReceiver_jFree(env: PJNIEnv; _jbroadcastreceiver: JObject);
 procedure jBroadcastReceiver_RegisterIntentActionFilter(env: PJNIEnv; _jbroadcastreceiver: JObject; _intentAction: string); overload;
 procedure jBroadcastReceiver_RegisterIntentActionFilter(env: PJNIEnv; _jbroadcastreceiver: JObject; _intentAction: integer);  overload;
 procedure jBroadcastReceiver_Unregister(env: PJNIEnv; _jbroadcastreceiver: JObject);
+
+function jBroadcastReceiver_GetResultCode(env: PJNIEnv; _jbroadcastreceiver: JObject): integer;
+function jBroadcastReceiver_GetResultData(env: PJNIEnv; _jbroadcastreceiver: JObject): string;
+function jBroadcastReceiver_GetResultExtras(env: PJNIEnv; _jbroadcastreceiver: JObject): jObject;
 
 
 
@@ -168,6 +176,27 @@ begin
   if Assigned(FOnReceiver) then FOnReceiver(Obj, intent);
 end;
 
+function jBroadcastReceiver.GetResultCode(): integer;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jBroadcastReceiver_GetResultCode(FjEnv, FjObject);
+end;
+
+function jBroadcastReceiver.GetResultData(): string;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jBroadcastReceiver_GetResultData(FjEnv, FjObject);
+end;
+
+function jBroadcastReceiver.GetResultExtras(): jObject;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jBroadcastReceiver_GetResultExtras(FjEnv, FjObject);
+end;
+
 {-------- jBroadcastReceiver_JNI_Bridge ----------}
 
 function jBroadcastReceiver_jCreate(env: PJNIEnv;_Self: int64; this: jObject): jObject;
@@ -239,6 +268,47 @@ begin
   jCls:= env^.GetObjectClass(env, _jbroadcastreceiver);
   jMethod:= env^.GetMethodID(env, jCls, 'Unregister', '()V');
   env^.CallVoidMethod(env, _jbroadcastreceiver, jMethod);
+end;
+
+function jBroadcastReceiver_GetResultCode(env: PJNIEnv; _jbroadcastreceiver: JObject): integer;
+var
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jbroadcastreceiver);
+  jMethod:= env^.GetMethodID(env, jCls, 'GetResultCode', '()I');
+  Result:= env^.CallIntMethod(env, _jbroadcastreceiver, jMethod);
+end;
+
+
+function jBroadcastReceiver_GetResultData(env: PJNIEnv; _jbroadcastreceiver: JObject): string;
+var
+  jStr: JString;
+  jBoo: JBoolean;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jbroadcastreceiver);
+  jMethod:= env^.GetMethodID(env, jCls, 'GetResultData', '()Ljava/lang/String;');
+  jStr:= env^.CallObjectMethod(env, _jbroadcastreceiver, jMethod);
+  case jStr = nil of
+     True : Result:= '';
+     False: begin
+              jBoo:= JNI_False;
+              Result:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
+            end;
+  end;
+end;
+
+
+function jBroadcastReceiver_GetResultExtras(env: PJNIEnv; _jbroadcastreceiver: JObject): jObject;
+var
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jbroadcastreceiver);
+  jMethod:= env^.GetMethodID(env, jCls, 'GetResultExtras', '()Landroid/os/Bundle;');
+  Result:= env^.CallObjectMethod(env, _jbroadcastreceiver, jMethod);
 end;
 
 end.
