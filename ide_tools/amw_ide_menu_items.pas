@@ -77,7 +77,9 @@ begin
     end;
   except
     on e: Exception do
-      IDEMessagesWindow.AddCustomMessage(mluFatal, '[' + e.ClassName + '] Failed: ' + e.Message, '', 0);
+      IDEMessagesWindow.SelectMsgLine(
+        IDEMessagesWindow.AddCustomMessage(mluFatal,
+          '[' + e.ClassName + '] Failed: ' + e.Message, '', 0, 0, 'Exception'));
   end else
     ShowMessage('The active project is not LAMW project!');
 end;
