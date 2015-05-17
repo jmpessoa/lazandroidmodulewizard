@@ -13083,8 +13083,4 @@ public float[] benchMark1 () {
 	      return (java.lang.Object)(new jDigitalClock(this,_Self));
    }
    
-   public java.lang.Object jCustomViewLayout_jCreate(long _Self) {
-	      return (java.lang.Object)(new jCustomViewLayout(this,_Self));
-   }
-   
 }
