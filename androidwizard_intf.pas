@@ -858,12 +858,14 @@ begin
         strList.Add('13. WARNING, before to execute "build-release.bat [.sh]"  you need execute "release.keystore.bat [.sh]"!');
         strList.Add('    Please, read "readme-keytool-input.txt!"');
         strList.Add('');
-        strList.Add('14. Please, for more info, look for "How to use the Demos" in "Laz Android Module Wizard" readme.txt!!');
+        strList.Add('14. Please, for more info, look for "How to use the Demos" in "Lamw: Lazarus Android Module Wizard" readme.txt!!');
 
         strList.Add('');
         strList.Add('....  Thank you!');
         strList.Add('');
         strList.Add('....  by jmpessoa_hotmail_com');
+        strList.Add(' ');
+        strList.Add('System Path to Android NDK='+FPathToAndroidNDK);
         strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'readme.txt');
 
         dummy:= LowerCase(projName);
@@ -1610,9 +1612,9 @@ begin
       strList.Add('  TNoGUIAndroidModuleXX  = class(TDataModule)');
   end;
   strList.Add('  private');
-  strList.Add('    { private declarations }');
+  strList.Add('    {private declarations}');
   strList.Add('  public');
-  strList.Add('    { public declarations }');
+  strList.Add('    {public declarations}');
   strList.Add('  end;');
   strList.Add('');
   strList.Add('var');
