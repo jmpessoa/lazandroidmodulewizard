@@ -1,15 +1,17 @@
 package com.example.apptrycode2;
 
-//Lamw: Lazarus Android Module Wizard - Version 0.6 - rev. 14 - 13 February - 2015
+//Lamw: Lazarus Android Module Wizard 
 //Form Designer and Components development model!
-//Author: jmpessoa@hotmail.com
+//version 0.6 - revision 25 - 14 May - 2015
+//
 //https://github.com/jmpessoa/lazandroidmodulewizard
 //http://forum.lazarus.freepascal.org/index.php/topic,21919.270.html
-
-//Android Java Interface for Pascal/Delphi XE5
-//And LAZARUS by jmpessoa@hotmail.com - december 2013
 //
-//Developer
+//Android Java Interface for Pascal/Delphi XE5 and FreePacal/LAZARUS[december 2013]
+//
+//
+//Developers:
+//
 //          Simon,Choi / Choi,Won-sik
 //                       simonsayz@naver.com
 //                       http://blog.naver.com/simonsayz
@@ -17,6 +19,8 @@ package com.example.apptrycode2;
 //          LoadMan    / Jang,Yang-Ho
 //                       wkddidgh@naver.com
 //                       http://blog.naver.com/wkddidgh
+//
+//          JMPessoa   / josemarquespessoa@gmail.com
 //
 //Version
 //History
@@ -65,6 +69,7 @@ import android.app.Fragment;
 import android.app.FragmentTransaction;
 import android.app.Notification;
 import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.ProgressDialog;
 import android.app.TimePickerDialog;
 import android.bluetooth.BluetoothAdapter;
@@ -74,14 +79,21 @@ import android.bluetooth.BluetoothSocket;
 import android.content.BroadcastReceiver;
 import android.content.ClipData;
 import android.content.ClipboardManager;
+import android.content.ContentResolver;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.content.pm.ActivityInfo;
+import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
+import android.content.pm.ResolveInfo;
 import android.content.res.AssetFileDescriptor;
 import android.content.res.AssetManager;
+import android.content.res.Configuration;
+import android.content.res.Resources;
 import android.database.Cursor;
 import android.graphics.Bitmap.CompressFormat;
 import android.graphics.Bitmap;
@@ -106,8 +118,10 @@ import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.telephony.SmsManager;
+import android.telephony.SmsMessage;
 import android.telephony.TelephonyManager;
 import android.preference.PreferenceManager;
+import android.provider.BaseColumns;
 import android.provider.ContactsContract;
 import android.provider.ContactsContract.CommonDataKinds.Email;
 import android.provider.ContactsContract.CommonDataKinds.Phone;
@@ -116,9 +130,12 @@ import android.provider.Settings;
 import android.text.Editable;
 import android.text.InputFilter;
 import android.text.InputType;
+import android.text.TextUtils;
+import android.text.TextUtils.TruncateAt;
 import android.text.TextWatcher;
 import android.text.method.NumberKeyListener;
 import android.text.method.ScrollingMovementMethod;
+import android.util.Base64;
 import android.util.DisplayMetrics;
 import android.location.Address;
 import android.location.Criteria;
@@ -132,6 +149,7 @@ import android.net.Uri;
 import android.net.wifi.WifiManager;
 import android.util.Log;
 import android.view.ContextMenu;
+import android.view.Display;
 import android.view.GestureDetector;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -142,6 +160,7 @@ import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.view.ScaleGestureDetector.SimpleOnScaleGestureListener;
 import android.view.SubMenu;
+import android.view.Surface;
 import android.view.SurfaceHolder;
 import android.view.View.OnClickListener;
 import android.view.View;
@@ -156,16 +175,20 @@ import android.view.animation.AnimationUtils;
 import android.view.animation.TranslateAnimation;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
+import android.view.WindowManager;
+import android.webkit.HttpAuthHandler;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.AnalogClock;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.DatePicker;
+import android.widget.DigitalClock;
 import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.ImageView;
@@ -187,19 +210,21 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ViewFlipper;
 
+
 import java.io.*;
 
 import java.lang.*;
 
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
+//import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
-import java.nio.IntBuffer;
-import java.nio.FloatBuffer;
-import java.text.Format;
+//import java.nio.ByteBuffer;
+//import java.nio.ByteOrder;
+//import java.nio.IntBuffer;
+//import java.nio.FloatBuffer;
+//import java.text.Format;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -207,10 +232,11 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
-import java.util.Random;
-import java.util.Set;
 import java.util.StringTokenizer;
+//import java.util.Map;
+//import java.util.Random;
+import java.util.Set;
+//import java.util.StringTokenizer;
 import java.util.UUID;
 import java.util.regex.Pattern;
 
@@ -220,9 +246,20 @@ import javax.microedition.khronos.egl.EGLContext;
 import javax.microedition.khronos.egl.EGL10;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
+import org.apache.http.NameValuePair;
+import org.apache.http.StatusLine;
+import org.apache.http.auth.AuthScope;
+import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
+//import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.params.BasicHttpParams;
+import org.apache.http.params.HttpConnectionParams;
+import org.apache.http.params.HttpParams;
 import org.apache.http.util.ByteArrayBuffer;
 import org.apache.http.util.EntityUtils;
 
@@ -236,7 +273,7 @@ import android.database.sqlite.SQLiteException;
 import java.lang.reflect.*;
 
 //-------------------------------------------------------------------------
-//Constantstogg
+//Constants
 
 //-------------------------------------------------------------------------
 class Const {
@@ -420,6 +457,11 @@ public  RelativeLayout GetLayout() {
   return layout;
 }
 
+public  RelativeLayout GetView() {
+	  //Log.i("Form:", "getLayout");
+	  return layout;
+}
+
 //
 public  void Show(int effect) {		
    //Log.i("Form:","Show");	
@@ -482,7 +524,7 @@ for (int i = 0; i < layout.getChildCount(); i++) {
 
 //by jmpessoa
 public void ShowMessage(String msg){
-  Log.i("ShowMessage:", msg);
+  Log.i("ShowMessage", msg);
   Toast.makeText(controls.activity, msg, Toast.LENGTH_SHORT).show();	
 }
 
@@ -498,8 +540,7 @@ public String GetDateTime() {
    onClickListener = null;
    layout.setOnClickListener(null);
    layparam = null;
-   layout   = null;
-  
+   layout   = null;  
    //Log.i("jForm:", "Free");
  }
   
@@ -874,6 +915,95 @@ public void RemoveAllTabsActionBar() {
 }
 
 
+public boolean IsPackageInstalled(String _packagename) {
+    PackageManager pm = controls.activity.getPackageManager();
+    try {
+        pm.getPackageInfo(_packagename, PackageManager.GET_ACTIVITIES);
+        return true;
+    } catch (NameNotFoundException e) {
+        return false;
+    }
+}
+
+public void ShowCustomMessage(RelativeLayout _layout,  int _gravity) {
+    //controls.pOnShowCustomMessage(PasObj);
+    Toast toast = new Toast(controls.activity);   
+    toast.setGravity(_gravity, 0, 0);    
+    toast.setDuration(Toast.LENGTH_LONG);    
+    RelativeLayout par = (RelativeLayout)_layout.getParent();
+	if (par != null) {
+	    par.removeView(_layout);        	    
+	}    
+    _layout.setVisibility(0);
+    toast.setView(_layout);
+    toast.show();
+}
+
+public void SetScreenOrientation(int _orientation) {
+	//Log.i("Screen","Orientation "+ _orientation);
+    switch(_orientation) {
+      case 1: controls.activity.setRequestedOrientation (ActivityInfo.SCREEN_ORIENTATION_PORTRAIT); break;
+      case 2: controls.activity.setRequestedOrientation (ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE); break;
+      default:controls.activity.setRequestedOrientation (ActivityInfo.SCREEN_ORIENTATION_SENSOR); break;
+    }            
+}
+
+public int GetScreenOrientation() {
+	    int r = 0;
+        Display display = ((WindowManager) controls.activity.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();   
+        int orientation = display.getOrientation();  //getOrientation();
+        switch(orientation) {
+           case Configuration.ORIENTATION_PORTRAIT:
+               r= 1;//setRequestedOrientation (ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+               break;
+           case Configuration.ORIENTATION_LANDSCAPE:
+               r = 2; //setRequestedOrientation (ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+               break;               
+       }
+       return r; 
+}
+
+
+public String GetScreenDensity() {
+    String r= "";
+    DisplayMetrics metrics = new DisplayMetrics();
+
+    controls.activity.getWindowManager().getDefaultDisplay().getMetrics(metrics);
+
+    int density = metrics.densityDpi;
+        
+    if (density==DisplayMetrics.DENSITY_XXHIGH) {    	    	
+        r= "XXHIGH:" + String.valueOf(density);
+    }
+    else if (density==DisplayMetrics.DENSITY_XHIGH) {    	    	
+        r= "XHIGH:" + String.valueOf(density);
+    }
+    else if (density==DisplayMetrics.DENSITY_HIGH) {    	    	
+        r= "HIGH:" + String.valueOf(density);
+    }
+    else if (density==DisplayMetrics.DENSITY_MEDIUM) {
+        r= "MEDIUM:" + String.valueOf(density);
+    }
+    else if (density==DisplayMetrics.DENSITY_LOW) {
+        r= "LOW:" + String.valueOf(density);
+    }
+    return r;
+}
+
+public String GetScreenSize() {
+	String r= "";
+	
+	if((controls.activity.getResources().getConfiguration().screenLayout & Configuration.SCREENLAYOUT_SIZE_MASK) == Configuration.SCREENLAYOUT_SIZE_XLARGE) {     
+        r = "XLARGE";
+    }else if((controls.activity.getResources().getConfiguration().screenLayout & Configuration.SCREENLAYOUT_SIZE_MASK) == Configuration.SCREENLAYOUT_SIZE_LARGE) {     
+        r = "LARGE";
+    }else if ((controls.activity.getResources().getConfiguration().screenLayout & Configuration.SCREENLAYOUT_SIZE_MASK) == Configuration.SCREENLAYOUT_SIZE_NORMAL) {     
+        r = "NORMAL";
+    }else if ((controls.activity.getResources().getConfiguration().screenLayout & Configuration.SCREENLAYOUT_SIZE_MASK) == Configuration.SCREENLAYOUT_SIZE_SMALL) {     
+    	r = "SMALL";
+    }
+	return r;
+}
 
 }
 
@@ -1033,6 +1163,25 @@ public void Append(String _txt) {
   this.append( _txt);
 }
 
+public void AppendLn(String _txt) {
+	  this.append( _txt+ "\n");
+}
+
+public void AppendTab() {
+	  this.append("\t");
+}
+
+public void setFontAndTextTypeFace(int fontFace, int fontStyle) { 
+  Typeface t = null; 
+  switch (fontFace) { 
+    case 0: t = Typeface.DEFAULT; break; 
+    case 1: t = Typeface.SANS_SERIF; break; 
+    case 2: t = Typeface.SERIF; break; 
+    case 3: t = Typeface.MONOSPACE; break; 
+  } 
+  this.setTypeface(t, fontStyle); 		
+} 
+
 }
 
 //-------------------------------------------------------------------------
@@ -1073,6 +1222,11 @@ int marginBottom = 5;
 String bufStr;
 private boolean canDispatchChangeEvent = false;
 private boolean canDispatchChangedEvent = false;
+private boolean mFlagSuggestion = false;
+
+private ClipboardManager mClipBoard = null;
+private ClipData mClipData = null;
+
 
 // Constructor
 public  jEditText(android.content.Context context,
@@ -1086,6 +1240,9 @@ controls = ctrls;
 // Init Class
 lparams = new RelativeLayout.LayoutParams(100,100);
 lparams.setMargins(5, 5,5,5);
+this.setHintTextColor(Color.LTGRAY);
+
+mClipBoard = (ClipboardManager) controls.activity.getSystemService(Context.CLIPBOARD_SERVICE);
  
 // Init Event : http://socome.tistory.com/15
 onKeyListener = new OnKeyListener() {	
@@ -1178,8 +1335,17 @@ public  void setInputTypeEx(String str) {
 	  if(str.equals("NUMBER")) {
 		  this.setInputType(android.text.InputType.TYPE_CLASS_NUMBER);
 	  }
+      else if (str.equals("CAPCHARACTERS")) {
+    	  if (!mFlagSuggestion) 
+            this.setInputType(android.text.InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS|InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);
+    	  else
+            this.setInputType(android.text.InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS);
+      }
 	  else if (str.equals("TEXT")) { 
-		  this.setInputType(android.text.InputType.TYPE_CLASS_TEXT);
+		  if (!mFlagSuggestion) 
+		      this.setInputType(android.text.InputType.TYPE_CLASS_TEXT|InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);
+		  else
+			  this.setInputType(android.text.InputType.TYPE_CLASS_TEXT);
 	  }
 	  else if (str.equals("PHONE"))       {this.setInputType(android.text.InputType.TYPE_CLASS_PHONE); }
 	  else if (str.equals("PASSNUMBER"))  {this.setInputType(android.text.InputType.TYPE_CLASS_NUMBER);
@@ -1187,10 +1353,14 @@ public  void setInputTypeEx(String str) {
 	  else if (str.equals("PASSTEXT"))    {this.setInputType(android.text.InputType.TYPE_CLASS_TEXT);
 	                                       this.setTransformationMethod(android.text.method.PasswordTransformationMethod.getInstance()); }
 	  
-	  else if (str.equals("TEXTMULTILINE")){this.setInputType(android.text.InputType.TYPE_CLASS_TEXT|android.text.InputType.TYPE_TEXT_FLAG_MULTI_LINE);}
-	                                    
-	  
-	  else                                 {this.setInputType(android.text.InputType.TYPE_CLASS_TEXT);};
+	  else if (str.equals("TEXTMULTILINE")){
+		  if (!mFlagSuggestion)
+		      this.setInputType(android.text.InputType.TYPE_CLASS_TEXT|android.text.InputType.TYPE_TEXT_FLAG_MULTI_LINE|InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);
+		   else  
+		      this.setInputType(android.text.InputType.TYPE_CLASS_TEXT|android.text.InputType.TYPE_TEXT_FLAG_MULTI_LINE);
+		  }
+	                                    	  
+	  else {this.setInputType(android.text.InputType.TYPE_CLASS_TEXT|InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);};
 	    
 	}
 
@@ -1258,10 +1428,15 @@ public  void setCursorPos(int startPos, int endPos) {
 }
 
 //LORDMAN - 2013-07-26
-public  void maxLength(int mLength) { //Edit not to make the length of the text greater than the specified length
-  InputFilter[] FilterArray = new InputFilter[1];
-  FilterArray[0] = new InputFilter.LengthFilter(mLength);
-  this.setFilters(FilterArray);
+public  void maxLength(int mLength) { //not make the length of the text greater than the specified length		
+  if (mLength >= 0) { 
+    InputFilter[] FilterArray = new InputFilter[1];
+    FilterArray[0] = new InputFilter.LengthFilter(mLength);
+    this.setFilters(FilterArray);
+  }
+  else { 
+	  this.setFilters(new InputFilter[] {});  //reset to default!!!
+  }	  
 }
 
 //LORDMAN 2013-08-27
@@ -1315,6 +1490,14 @@ public void Append(String _txt) {
 	this.append(_txt);
 }
 
+public void AppendLn(String _txt) {
+	this.append(_txt+"\n");
+}
+
+public void AppendTab() {
+	  this.append("\t");
+}
+
 public void SetImeOptions(int _imeOption) {
   switch(_imeOption ) {
 	 case 0: this.setImeOptions(EditorInfo.IME_FLAG_NO_FULLSCREEN); break;
@@ -1327,6 +1510,36 @@ public void SetImeOptions(int _imeOption) {
 	 case 7: this.setImeOptions(EditorInfo.IME_MASK_ACTION|EditorInfo.IME_ACTION_PREVIOUS ); break;  
 	 case 8: this.setImeOptions(EditorInfo.IME_FLAG_FORCE_ASCII); break;
   }   
+}
+
+public void setFontAndTextTypeFace(int fontFace, int fontStyle) { 
+  Typeface t = null; 
+  switch (fontFace) { 
+    case 0: t = Typeface.DEFAULT; break; 
+    case 1: t = Typeface.SANS_SERIF; break; 
+    case 2: t = Typeface.SERIF; break; 
+    case 3: t = Typeface.MONOSPACE; break; 
+  } 
+  this.setTypeface(t, fontStyle); 		
+} 
+
+public void SetAcceptSuggestion(boolean _value) { 
+    mFlagSuggestion = _value;
+}
+
+public void CopyToClipboard() {
+	mClipData = ClipData.newPlainText("text", this.getText().toString());
+    mClipBoard.setPrimaryClip(mClipData);
+}
+   
+public void PasteFromClipboard() {
+    ClipData cdata = mClipBoard.getPrimaryClip();
+    ClipData.Item item = cdata.getItemAt(0);
+    this.setText(item.getText().toString());
+}
+
+public void Clear() {
+	this.setText("");
 }
 	
 }
@@ -1982,7 +2195,7 @@ public int GetDrawableResourceId(String _resName) {
 	     return drawableId;
 	  }
 	  catch (Exception e) {
-	     Log.e("jForm", "Failure to get drawable id.", e);
+	     Log.e("jImageView", "Failure to get drawable id.", e);
 	     return 0;
 	  }
 }
@@ -2066,7 +2279,7 @@ public void setLayoutAll(int idAnchor) {
  * TScaleType = (scaleCenter, scaleCenterCrop, scaleCenterInside, scaleFitCenter,
                 scaleFitEnd, scaleFitStart, scaleFitXY, scaleMatrix);
   ref. http://www.peachpit.com/articles/article.aspx?p=1846580&seqNum=2
-       hint: If you’re creating a photo-viewing application, 
+       hint: If you are creating a photo-viewing application, 
              you will probably want to use the center or fitCenter scale types.                  
  */
 public void SetScaleType(int _scaleType) { //TODO! 	
@@ -2136,6 +2349,7 @@ private Controls        controls = null;   // Control Class for Event
 private Context       ctx;
 private int           id;
 private List <jListItemRow> items ;
+private ArrayAdapter thisAdapter;
 
 public  jArrayAdapter(Context context, Controls ctrls,long pasobj, int textViewResourceId , 
 		               List<jListItemRow> list) {
@@ -2145,6 +2359,8 @@ public  jArrayAdapter(Context context, Controls ctrls,long pasobj, int textViewR
    ctx   = context;
    id    = textViewResourceId;
    items = list;
+   thisAdapter = this;
+		   
 }
 
 @Override
@@ -2338,15 +2554,19 @@ View.OnClickListener getOnCheckItem(final View cb, final int position) {
 	               else if (cb.getClass().getName().equals("android.widget.RadioButton")) {
 	            	   
 	            	     //new code: fix to RadioButton Group  default behavior: thanks to Leledumbo.
-	            	      boolean doCheck = ((RadioButton)cb).isChecked(); //new code	            	    		            	     		            	      
+	            	      boolean doCheck = ((RadioButton)cb).isChecked(); //new code
+	            	      
 	            	      for (int i=0; i < items.size(); i++) {
 	            	    	  ((RadioButton)items.get(i).jWidget).setChecked(false);
-	            	    	  items.get(i).checked = false;	            	    	  
-	            	      }	            	      
+	            	    	  items.get(i).checked = false;	 	            	    	 
+	            	    	  thisAdapter.notifyDataSetChanged(); //fix 16-febr-2015 
+	            	      }	            	
+	            	      
 		                  items.get(position).checked = doCheck;
-		                  //items.get(position).jWidget = ((RadioButton)cb); 
-		                  ((RadioButton)cb).setChecked(doCheck);		                  		                  
-		                  controls.pOnClickWidgetItem(PasObj, position, ((RadioButton)cb).isChecked());
+		                   
+		                  ((RadioButton)items.get(position).jWidget).setChecked(doCheck);
+		                  
+		                  controls.pOnClickWidgetItem(PasObj, position, doCheck);
 		                  
 		           }
 	               else if (cb.getClass().getName().equals("android.widget.Button")) { //button	            	      	            	        
@@ -2406,7 +2626,7 @@ int MarginTop = 5;
 int marginRight = 5;
 int marginBottom = 5;
 
-boolean highLightSelectedItem = true;
+boolean highLightSelectedItem = false;
 int highLightColor = Color.RED;
 int lastSelectedItem = -1;
 
@@ -2450,11 +2670,23 @@ setChoiceMode(ListView.CHOICE_MODE_SINGLE);
 //Init Event
 onItemClickListener = new OnItemClickListener() {
    @Override
-   public  void onItemClick(AdapterView<?> parent, View v, int position, long id) {	   
+   public  void onItemClick(AdapterView<?> parent, View v, int position, long id) {
+	   
 	   if (highLightSelectedItem) {		 
-		   if (lastSelectedItem > -1) {highlight(lastSelectedItem, textColor);}
-		   highlight(position, highLightColor);
+		   if (lastSelectedItem > -1) {
+			   DoHighlight(lastSelectedItem, textColor);	   
+		   } 		   
+		   DoHighlight(position, highLightColor);
 	   }		 
+	   
+	   if (alist.get(position).widget == 2 /*radio*/) { //fix 16-febr-2015
+		  for (int i=0; i < alist.size(); i++) { 
+		    alist.get(i).checked = false;
+		  }
+		  alist.get(position).checked = true;
+		  aadapter.notifyDataSetChanged();
+	   }	   
+	   	   
 	   lastSelectedItem = position;		
        controls.pOnClick(PasObj, (int)position );
        controls.pOnClickCaptionItem(PasObj, (int)position , alist.get((int)position).label);
@@ -2572,9 +2804,8 @@ public void setLayoutAll(int idAnchor) {
 	} 
 	for (int j=0; j < countParentRule; j++) {  
 		lparams.addRule(lparamsParentRule[j]);		
-  }
-  //
-  setLayoutParams(lparams);
+    }
+    setLayoutParams(lparams);
 }
 
 //by jmpessoa
@@ -2702,7 +2933,7 @@ private int GetDrawableResourceId(String _resName) {
 	     return drawableId;
 	  }
 	  catch (Exception e) {
-	     Log.e("jForm", "Failure to get drawable id.", e);
+	     Log.e("ListView", "Failure to get drawable id.", e);
 	     return 0;
 	  }
 }
@@ -2767,8 +2998,8 @@ public void setWidgetCheck(boolean value, int index){
 	aadapter.notifyDataSetChanged();
 }
 
-private void highlight(int position, int _color) {
-   	alist.get(position).textColor = _color;    	
+private void DoHighlight(int position, int _color) {
+   	alist.get(position).textColor = _color;
     aadapter.notifyDataSetChanged();		
 }
 
@@ -2978,14 +3209,18 @@ class jPanel extends RelativeLayout {
 		marginBottom = bottom;
 		lpH = h;
 		lpW = w;
+		lparams.width  = lpW;
+		lparams.height = lpH;
 	}	
 	
 	public void setLParamWidth(int w) {
 	  lpW = w;
+	  lparams.width  = lpW; 
 	}
 
 	public void setLParamHeight(int h) {
-	  lpH = h;
+	  lpH = h;  
+	  lparams.height = lpH; 
 	}
 
 	public int getLParamHeight() {	
@@ -2993,17 +3228,18 @@ class jPanel extends RelativeLayout {
 	}  
 
 	public int getLParamWidth() {
-		return lpW; //getWidth();
+	 return lpW; //getWidth();
 	}
 
 	public void resetLParamsRules() {
 		for (int i=0; i < countAnchorRule; i++) {  
-				lparams.removeRule(lparamsAnchorRule[i]);		
+			lparams.removeRule(lparamsAnchorRule[i]);		
 		}
 				
 		for (int j=0; j < countParentRule; j++) {  
 			lparams.removeRule(lparamsParentRule[j]);		
-	    }		
+	    }
+		
 		countAnchorRule = 0;
 	    countParentRule = 0;
 	}
@@ -3027,8 +3263,7 @@ class jPanel extends RelativeLayout {
 			for (int i=0; i < countAnchorRule; i++) {  
 				lparams.addRule(lparamsAnchorRule[i], idAnchor);		
 		    }			
-		} 
-		
+		} 		
 		for (int j=0; j < countParentRule; j++) {  
 			lparams.addRule(lparamsParentRule[j]);		
 	    }
@@ -3046,6 +3281,7 @@ class jPanel extends RelativeLayout {
 	    parent.addView(this,lparams);
 	    mRemovedFromParent=false;
 	}	
+	
 	// Free object except Self, Pascal Code Free the class.
 	public  void Free() {
 		if (parent != null) { parent.removeView(this); }
@@ -3143,6 +3379,25 @@ class jPanel extends RelativeLayout {
    public void SetMaxZoomFactor(float _maxZoomFactor) {
 	   MAX_ZOOM = _maxZoomFactor;
    }
+   
+   public void CenterInParent() {
+		lparams.addRule(CENTER_IN_PARENT);  //android.widget.RelativeLayout.CENTER_VERTICAL = 15
+		countParentRule = countParentRule+1;	 		
+   }
+      
+   public void MatchParent() {		
+		lpH = RelativeLayout.LayoutParams.MATCH_PARENT;
+		lpW = RelativeLayout.LayoutParams.MATCH_PARENT; //w
+		lparams.height = lpH;
+		lparams.width =  lpW;			
+	}
+   
+   public void WrapParent() {		
+		lpH = RelativeLayout.LayoutParams.WRAP_CONTENT;
+		lpW = RelativeLayout.LayoutParams.WRAP_CONTENT; //w
+		lparams.height = lpH;
+		lparams.width =  lpW;			
+	}
 }
 
 
@@ -3501,6 +3756,19 @@ class jWebClient extends WebViewClient {
 public  long            PasObj   = 0;      // Pascal Obj
 public  Controls        controls = null;   // Control Class for Event
 
+public String mUsername = ""; 
+public String mPassword = "";
+
+public jWebClient(){
+	//
+}
+
+
+@Override
+public void onReceivedHttpAuthRequest(WebView view, HttpAuthHandler handler, String host, String realm) {
+	handler.proceed(mUsername, mPassword);
+}
+
 @Override
 public  boolean shouldOverrideUrlLoading(WebView view, String url) {
 int rtn = controls.pOnWebViewStatus(PasObj,Const.WebView_OnBefore,url);
@@ -3512,17 +3780,26 @@ else { return true; }
 
 @Override
 public  void onLoadResource(WebView view, String url) {
+	//
 }
 
 @Override
 public  void onPageFinished(WebView view, String url) {
-controls.pOnWebViewStatus(PasObj,Const.WebView_OnFinish,url);
+   controls.pOnWebViewStatus(PasObj,Const.WebView_OnFinish,url);
 }
 
 @Override
 public  void onReceivedError(WebView view, int errorCode, String description, String failingUrl)  {
-super.onReceivedError(view, errorCode, description, failingUrl);
-controls.pOnWebViewStatus(PasObj,Const.WebView_OnError, description);
+super.onReceivedError(view, errorCode, description, failingUrl);      
+   if (errorCode == 401) {
+       // alert to username and password
+       // set it through the setHttpAuthUsernamePassword(...) 
+	   controls.pOnWebViewStatus(PasObj, 401 , "login/password");
+   }
+   else{
+       controls.pOnWebViewStatus(PasObj,Const.WebView_OnError, description);
+   }
+   
 }
 
 }
@@ -3550,7 +3827,6 @@ int MarginTop = 5;
 int marginRight = 5;
 int marginBottom = 5;
 
-
 // Constructor
 public  jWebView(android.content.Context context,
               Controls ctrls,long pasobj ) {
@@ -3559,18 +3835,21 @@ super(context);
 PasObj   = pasobj;
 controls = ctrls;
 // Init Class
-webclient          = new jWebClient();
+webclient = new jWebClient();
+
 webclient.PasObj   = pasobj;
 webclient.controls = ctrls;
 //
 setWebViewClient(webclient); // Prevent to run External Browser
 //
-getSettings().setJavaScriptEnabled(true);
+this.getSettings().setJavaScriptEnabled(true);
 //
 lparams = new RelativeLayout.LayoutParams  (300,300);
 lparams.setMargins( 50, 50,0,0);
+ 
 //
 }
+
 
 public void setLeftTopRightBottomWidthHeight(int left, int top, int right, int bottom, int w, int h) {
 	MarginLeft = left;
@@ -3591,8 +3870,8 @@ viewgroup.addView(this,lparams);
 // Free object except Self, Pascal Code Free the class.
 public  void Free() {
 if (parent != null) { parent.removeView(this); }
-webclient = null;
 setWebViewClient(null);
+webclient = null;
 lparams = null;
 }
 
@@ -3622,9 +3901,6 @@ public void setLayoutAll(int idAnchor) {
 	lparams.setMargins(MarginLeft,MarginTop,marginRight,marginBottom);
 
 	if (idAnchor > 0) {    	
-		//lparams.addRule(RelativeLayout.BELOW, id); 
-		//lparams.addRule(RelativeLayout.ALIGN_BASELINE, id)
-	    //lparams.addRule(RelativeLayout.LEFT_OF, id); //lparams.addRule(RelativeLayout.RIGHT_OF, id)
 		for (int i=0; i < countAnchorRule; i++) {  
 			lparams.addRule(lparamsAnchorRule[i], idAnchor);		
 	    }
@@ -3641,6 +3917,18 @@ public  void setJavaScript(boolean javascript) {
 	  this.getSettings().setJavaScriptEnabled(javascript);
 }
 
+	// Fatih - ZoomControl
+	public  void setZoomControl(boolean zoomControl) {		
+		this.getSettings().setBuiltInZoomControls(zoomControl);
+	}
+
+	//TODO: http://www.learn2crack.com/2014/01/android-oauth2-webview.html
+	//Stores HTTP authentication credentials for a given host and realm. This method is intended to be used with
+	public void SetHttpAuthUsernamePassword(String _hostName, String  _hostDomain, String _username, String _password) {
+	   this.setHttpAuthUsernamePassword(_hostName, _hostDomain, _username, _password);
+	   webclient.mUsername = _username; 
+	   webclient.mPassword = _password;
+	}
 }
 
 //-------------------------------------------------------------------------
@@ -4399,7 +4687,7 @@ private int GetDrawableResourceId(String _resName) {
 	     return drawableId;
 	  }
 	  catch (Exception e) {
-	     Log.e("jForm", "Failure to get drawable id.", e);
+	     Log.e("jImageBtn", "Failure to get drawable id.", e);
 	     return 0;
 	  }
 }
@@ -4662,23 +4950,17 @@ protected void onPreExecute() {
 //Step #2. Task
 @Override
 protected Void doInBackground(Void... params) {
-   int i;
    
-   if (autoPublishProgress) {
-      for (i = 0; i < 25; i++) {
-         publishProgress(i);	
-      }
-   }
+   if (autoPublishProgress) 
+         publishProgress(25);	
    
    controls.pOnAsyncEvent(PasObj, Const.Task_BackGround, 100); // Pascal Event
    
-   if (autoPublishProgress) {
-      for (i = 25; i < 100; i++) {
-	     publishProgress(i);	
-      }
-   }  
+   if (autoPublishProgress) 
+	     publishProgress(100);
+	     
    return null;
-};
+}
 
 // Step #3. Progress
 @Override
@@ -4749,8 +5031,11 @@ class jBitmap {
 // Java-Pascal Interface
 private long             PasObj   = 0;      // Pascal Obj
 private Controls        controls = null;   // Control Class for Event
+
 //
 public  Bitmap bmp    = null;
+
+
 
 // Constructor
 public  jBitmap(Controls ctrls, long pasobj ) {
@@ -4775,7 +5060,7 @@ private int GetDrawableResourceId(String _resName) {
 	     return drawableId;
 	  }
 	  catch (Exception e) {
-	     Log.e("jForm", "Failure to get drawable id.", e);
+	     Log.e("jBitmap", "Failure to get drawable id.", e);
 	     return 0;
 	  }
 }
@@ -4937,13 +5222,31 @@ public Bitmap GetResizedBitmap(int _newWidth, int _newHeight){
    return bm;
 }
 
-public Bitmap GetResizedBitmap(float _factorScaleX, float _factorScaleY ){
+ public Bitmap GetResizedBitmap(float _factorScaleX, float _factorScaleY ){
    float factorToUse = (_factorScaleY > _factorScaleX) ? _factorScaleX : _factorScaleY;
    Bitmap bm = Bitmap.createScaledBitmap(bmp,
      (int) (bmp.getWidth() * factorToUse),
      (int) (bmp.getHeight() * factorToUse),false);     
    return bm;
-}
+ }
+
+  public ByteBuffer GetByteBuffer(int _width, int _height) {	  
+	ByteBuffer graphicBuffer = ByteBuffer.allocateDirect(_width*_height*4);    
+    return graphicBuffer;    
+  }
+
+  public Bitmap GetBitmapFromByteBuffer(ByteBuffer _byteBuffer, int _width, int _height) {	  
+	  Bitmap bm = Bitmap.createBitmap(_width, _height, Bitmap.Config.ARGB_8888);					 
+      bm.copyPixelsFromBuffer(_byteBuffer);  	
+      return bm;
+  }
+  
+  //by jmpessoa
+  public Bitmap GetBitmapFromByteArray(byte[] _image) {
+	Bitmap bm = BitmapFactory.decodeByteArray(_image, 0, _image.length);
+	return bm;
+	//Log.i("SetByteArrayToBitmap","size="+ image.length);
+  }
 
 }
 
@@ -5210,7 +5513,7 @@ class jSqliteDataAccess {
         	     return drawableId;
         	  }
         	  catch (Exception e) {
-        	     Log.e("jForm", "Failure to get drawable id.", e);
+        	     Log.e("jSqliteDataAccess", "Failure to get drawable id.", e);
         	     return 0;
         	  }
         }
@@ -5511,7 +5814,7 @@ class jMyHello /*extends ...*/ {
         private Controls controls  = null;   // Control Class for events
         private Context  context   = null;
 
-        private int    mFlag;          // <<----- custom property
+        private int    mFlag = 0;          // <<----- custom property
         private String mMsgHello = ""; // <<----- custom property 
         private int[]  mBufArray;      // <<----- custom property
 
@@ -6595,7 +6898,11 @@ class jMenu /*extends ...*/ {
        controls.activity.registerForContextMenu(_view);
     }
         
-    //http://daniel-codes.blogspot.com.br/2009/12/dynamically-retrieving-resources-in.html
+    public void UnRegisterForContextMenu(View _view){ 
+      controls.activity.unregisterForContextMenu(_view); 
+    }  
+    
+//http://daniel-codes.blogspot.com.br/2009/12/dynamically-retrieving-resources-in.html
    //Just note that in case you want to retrieve Views (Buttons, TextViews, etc.) 
     //you must implement R.id.class instead of R.drawable.
     private int GetDrawableResourceId(String _resName) {
@@ -6755,6 +7062,10 @@ class jContextMenu /*extends ...*/ {
        controls.activity.registerForContextMenu(_view);
     }   
     
+    public void UnRegisterForContextMenu(View _view){ 
+      controls.activity.unregisterForContextMenu(_view); 
+   }        
+ 
     //_itemType --> 0:Default, 1:Checkable
     public MenuItem AddItem(ContextMenu _menu, int _itemID, String _caption, int _itemType){    	     	
     	MenuItem item = _menu.add(0,_itemID,0 ,(CharSequence)_caption);
@@ -6811,6 +7122,8 @@ class jContextMenu /*extends ...*/ {
     }
            
 }
+
+
 
 //ref. http://stackoverflow.com/questions/19395970/android-bluetooth-background-listner?rq=1
 //ref. http://androidcookbook.com/Recipe.seam;jsessionid=6C1411AB8CCAFBA9384A5EC295B44525?recipeId=1991
@@ -7094,6 +7407,7 @@ class jBluetoothServerSocket {
        }else return null;
       
     }  
+  
 }
 
 //ref. http://androidcookbook.com/Recipe.seam;jsessionid=9B476BA317AA36E2CB0D6517ABE60A5E?recipeId=1665
@@ -7424,7 +7738,7 @@ class jBluetooth /*extends ...*/ {
 
     private BluetoothAdapter mBA = null;
     
-    Intent intent = null;
+    private Intent intent = null;
     
     ArrayList<String> mListFoundedDevices = new ArrayList<String>();
     ArrayList<BluetoothDevice> mListReachablePairedDevices  = new ArrayList<BluetoothDevice>();
@@ -7700,7 +8014,21 @@ class jBluetooth /*extends ...*/ {
     	    }    	       	    	    
     	}    	
     	return devName;
-    }    
+    }
+        
+    //http://stackoverflow.com/questions/15697601/automate-file-transfer-to-a-paired-device-in-android-using-bluetooth
+    public void SendFile(String _filePath, String _fileName, String _mimeType){
+      
+        File file = new File(_filePath, "/" + _fileName);
+        Uri uri = Uri.fromFile(file);
+        String mtype = _mimeType; //"image/*";
+
+        Intent sharingIntent = new Intent(android.content.Intent.ACTION_SEND);
+        sharingIntent.setType(mtype);
+        sharingIntent.setClassName("com.android.bluetooth", "com.android.bluetooth.opp.BluetoothOppLauncherActivity");
+        sharingIntent.putExtra(Intent.EXTRA_STREAM, uri);
+        controls.activity.startActivity(sharingIntent);       
+    }
 }
 
 //by jmpessoa
@@ -7875,6 +8203,7 @@ class CustomSpinnerArrayAdapter<T> extends ArrayAdapter<String>{
 	private int mSelectedTextColor = Color.LTGRAY; 
 	private int flag = 0;
 	private boolean mLastItemAsPrompt = false;
+	private int mTextFontSize = 0;
 	
   public CustomSpinnerArrayAdapter(Context context, int simpleSpinnerItem, ArrayList<String> alist) {
      super(context, simpleSpinnerItem, alist);
@@ -7888,7 +8217,13 @@ class CustomSpinnerArrayAdapter<T> extends ArrayAdapter<String>{
       View view = super.getView(position, convertView, parent);        
       //we know that simple_spinner_item has android.R.id.text1 TextView:         
       TextView text = (TextView)view.findViewById(android.R.id.text1);
+      
+      text.setPadding(10, 15, 10, 15);      
       text.setTextColor(mTextColor);
+                 
+      if (mTextFontSize != 0)
+          text.setTextSize(mTextFontSize);
+      
       text.setBackgroundColor(mTexBackgroundtColor);
       return view;        
   }
@@ -7900,9 +8235,11 @@ class CustomSpinnerArrayAdapter<T> extends ArrayAdapter<String>{
 	  View view = super.getView(pos, cnvtView, prnt);	    
 	  TextView text = (TextView)view.findViewById(android.R.id.text1);
 	       
-	  text.setPadding(10, 15, 10, 15); //improve here.... 17-jan-2015
-	  
+	  text.setPadding(10, 15, 10, 15); //improve here.... 17-jan-2015	  
       text.setTextColor(mSelectedTextColor);      
+      
+      if (mTextFontSize != 0)
+          text.setTextSize(mTextFontSize);  
       
       if (mLastItemAsPrompt) flag = 1;
       return view; 
@@ -7930,6 +8267,10 @@ class CustomSpinnerArrayAdapter<T> extends ArrayAdapter<String>{
 	 public void SetLastItemAsPrompt(boolean _hasPrompt) {
 	    mLastItemAsPrompt = _hasPrompt;	   
 	 }
+	 
+	    public void SetTextFontSize(int txtFontSize) {
+	    	mTextFontSize = txtFontSize;	
+	    }
 	
 }
 
@@ -8069,9 +8410,16 @@ class jSpinner extends Spinner /*dummy*/ { //please, fix what GUI object will be
   
    public void Add(String _item) {	  	 
 	 mStrList.add(_item);    
+	 Log.i("Spinner_Add: ",_item);
      mSpAdapter.notifyDataSetChanged();
    }
    
+   //ELERA_04032015 
+   public void Clear() { 
+     mStrList.clear(); 
+     mSpAdapter.notifyDataSetChanged(); 
+   } 
+
    public void SetSelectedTextColor(int _color) {
 	  mSpAdapter.SetSelectedTextColor(_color);
    }
@@ -8114,6 +8462,10 @@ class jSpinner extends Spinner /*dummy*/ { //please, fix what GUI object will be
 	   else if (_index > (mStrList.size()-1)) mStrList.set(mStrList.size()-1,_item);
 	   else mStrList.set(_index,_item);	 
 	   mSpAdapter.notifyDataSetChanged();
+   }
+   
+   public void SetTextFontSize(int _txtFontSize) {
+	  mSpAdapter.SetTextFontSize(_txtFontSize);
    }
    
 }  //end class
@@ -8863,8 +9215,8 @@ class jActionBarTab {
 	private class TabContentFragment extends Fragment {
 	    private View mView;
 	    private String mText;
-	    /*.*/public TabContentFragment(View v, String tag) {
-	        mView = v;
+	    /*.*/public TabContentFragment(View v, String tag) {	    	
+	        mView = v;	       
 	        mText = tag;
 	    }
 
@@ -8888,6 +9240,9 @@ class jActionBarTab {
 	    	     * You can access the container's id by calling
 	               ((ViewGroup)getView().getParent()).getId();
 	    	     */
+	    	 LayoutParams lparams = new LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT);
+	    	 lparams.addRule(RelativeLayout.CENTER_IN_PARENT);
+	    	 mView.setLayoutParams(lparams);
 	         return mView;
 	    }
 	}
@@ -8912,7 +9267,7 @@ class jActionBarTab {
 		      tab.setIcon(GetDrawableResourceById(GetDrawableResourceId(_iconIdentifier))); //_iconIdentifier
 		  }
 		  ActionBar actionBar = this.controls.activity.getActionBar();
-		  actionBar.addTab(tab, false);	  
+		  actionBar.addTab(tab, false);		  
 	}
 
 	public void Add(String _title, View _panel){
@@ -8922,7 +9277,8 @@ class jActionBarTab {
 	}
 
 	public void Add(String _title, View _panel, View _customTabView){
-		  ActionBar.Tab tab = CreateTab(_title, _panel);  	 
+		  ActionBar.Tab tab = CreateTab(_title, _panel);
+		  _customTabView.setVisibility(View.VISIBLE); 
 		  tab.setCustomView(_customTabView);	//This overrides values set by setText(CharSequence) and setIcon(Drawable).	  
 		  ActionBar actionBar = this.controls.activity.getActionBar();
 		  actionBar.addTab(tab, false);	  
@@ -8956,7 +9312,7 @@ class jActionBarTab {
 		     return drawableId;
 		  }
 		  catch (Exception e) {
-		     Log.e("jForm", "Failure to get drawable id.", e);
+		     Log.e("jActionBarTab", "Failure to get drawable id.", e);
 		     return 0;
 		  }
 	}
@@ -9137,7 +9493,7 @@ class jCustomDialog extends RelativeLayout {
 		     return drawableId;
 		  }
 		  catch (Exception e) {
-		     Log.e("jForm", "Failure to get drawable id.", e);
+		     Log.e("jCustomDialog", "Failure to get drawable id.", e);
 		     return 0;
 		  }
 	}
@@ -10261,6 +10617,10 @@ class jBroadcastReceiver extends BroadcastReceiver {
    private long     pascalObj = 0;      // Pascal Object
    private Controls controls  = null;   // Control Class -> Java/Pascal Interface ...
    private Context  context   = null;
+   
+   private int mResultCode;
+   private String mResultData;
+   private Bundle mResultExtras; 
  
    //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
  
@@ -10276,30 +10636,29 @@ class jBroadcastReceiver extends BroadcastReceiver {
    }
 
    @Override
-   /*.*/public void onReceive(Context arg0, Intent intent) {
-	// TODO Auto-generated method stub
-	    controls.pOnBroadcastReceiver(pascalObj,  intent);
+   /*.*/public void onReceive(Context arg0, Intent intent) { 
+	   mResultCode = -1;
+	   switch (this.getResultCode()) {
+	        case Activity.RESULT_OK: mResultCode = 1; break;
+	        case Activity.RESULT_CANCELED: mResultCode = 0; break;  
+	   }	     	     	     
+	   mResultData = this.getResultData();	    	      	    
+	   mResultExtras = this.getResultExtras(true);	   
+	   controls.pOnBroadcastReceiver(pascalObj,  intent);
    }
    
   //write others [public] methods code here......
   //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
  
-   /*
-    * This method enables the Broadcast receiver for
-    * "android.intent.action.TIME_TICK"  This intent get
-    * broadcasted Once The battery level has fallen below a threshold
-    */
    
-   public void RegisterIntentActionFilter(String _intentAction) {
+   public void RegisterIntentActionFilter(String _intentAction) { //android.provider.Telephony.SMS_RECEIVED
 	   //intentFilter.addDataScheme("http"); 
 	   //intentFilter.addDataScheme("ftp"); 
-	   //intentFilter.addAction(BluetoothDevice.ACTION_FOUND);
+	   //intentFilter.addAction(BluetoothDevice.ACTION_FOUND);	    	         	   
 	   controls.activity.registerReceiver(this, new IntentFilter(_intentAction));
 	   //Log.i("receiver","Register ....");
    }
-   
-      	   	  	   
-      
+         	   	  	         
    /*
     * This method disables the Broadcast receiver
     */
@@ -10317,11 +10676,22 @@ class jBroadcastReceiver extends BroadcastReceiver {
 	     case 4: controls.activity.registerReceiver(this, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
 	     case 5: controls.activity.registerReceiver(this, new IntentFilter(Intent.ACTION_POWER_CONNECTED));
 	     case 6: controls.activity.registerReceiver(this, new IntentFilter(Intent.ACTION_POWER_DISCONNECTED));
-	     case 7: controls.activity.registerReceiver(this, new IntentFilter(Intent.ACTION_SHUTDOWN));	  
+	     case 7: controls.activity.registerReceiver(this, new IntentFilter(Intent.ACTION_SHUTDOWN));
+	     case 8: controls.activity.registerReceiver(this, new IntentFilter("android.provider.Telephony.SMS_RECEIVED"));
 	   }
    }
-
-      
+   
+   public int GetResultCode() {     
+      return mResultCode;
+   }
+   
+   public String GetResultData() {
+      return mResultData;
+   }
+   
+   public Bundle GetResultExtras() { //true
+      return mResultExtras;
+   }   
 }
 
 /*Draft java code by "Lazarus Android Module Wizard" [1/18/2015 19:10:57]*/
@@ -10398,12 +10768,12 @@ class jIntentManager  {
    }
    
 /*http://courses.coreservlets.com/Course-Materials/pdf/android/Android-Intents-2.pdf
- >> Java (original Activity)
-   String address ="loan://coreservlets.com/calc?loanAmount=xxx&…";
+   Java (original Activity)
+   String address ="loan://coreservlets.com/calc?loanAmount=xxx";
    Uri uri = Uri.parse(address);
    Intent intent = new Intent(Intent.ACTION_VIEW, uri);
    startActivity(activityIntent);
->>Java (new Activity – can be different project)
+  Java (new Activity - can be different project)
   Uri uri = getIntent().getData();
   String loanAmountString = uri.getQueryParameter("loanAmount");
   //Convert String to double, handle bad data   
@@ -10411,10 +10781,10 @@ class jIntentManager  {
      
 /*
  * Intents Starting a new Activity Dial a number 
- *    Intent intent = new Intent (Intent.ACTION_DIAL, Uri.parse(“tel:93675359”)); 
+ *    Intent intent = new Intent (Intent.ACTION_DIAL, Uri.parse("tel:93675359")); 
  *    startActivity(intent);       
  * Launch a website 
- * Intent intent = new Intent (Intent.ACTION_VIEW, Uri.parse(“http://codeandroid.org”)); 
+ * Intent intent = new Intent (Intent.ACTION_VIEW, Uri.parse("http://codeandroid.org")); 
  *   startActivity(intent);   
  */
       
@@ -10504,7 +10874,7 @@ Sending Data: Extras vs. URI Parameters
    
    /*
     * Intents Broadcast Intents 
-    * Intent intent = new Intent(“org.codeandroid.intentstest.TestBroadcastReceiver”); 
+    * Intent intent = new Intent("org.codeandroid.intentstest.TestBroadcastReceiver"); 
     * sendBroadcast(intent);
     */
    
@@ -10698,7 +11068,7 @@ Sending Data: Extras vs. URI Parameters
     * Bitmap object in the extra field. This is useful for applications that only need a small image. 
     */
    public String GetActionViewAsString(){
-	 String c = MediaStore.ACTION_IMAGE_CAPTURE;  //"android.media.action.IMAGE_CAPTURE"
+	 //String c = MediaStore.ACTION_IMAGE_CAPTURE;  //"android.media.action.IMAGE_CAPTURE" TODO! 
      return "android.intent.action.VIEW";
    }	   
    
@@ -10840,11 +11210,23 @@ Sending Data: Extras vs. URI Parameters
    }
    
    public String GetActionImageCaptureAsString(){
-		 String c = MediaStore.ACTION_IMAGE_CAPTURE;
+		 //String c = MediaStore.ACTION_IMAGE_CAPTURE;
 	     return "android.media.action.IMAGE_CAPTURE";
    }
-
+      
+   //http://www.coderanch.com/t/492490/Android/Mobile/Check-application-installed
+   public boolean IsCallable(Intent _intent) {  
+       List<ResolveInfo> list = controls.activity.getPackageManager().queryIntentActivities(_intent, PackageManager.MATCH_DEFAULT_ONLY);  
+       if(list.size() > 0)
+          return true ;  
+       else
+          return false;
+    }
      
+   public boolean IsActionEqual(Intent _intent, String _intentAction) { //'android.provider.Telephony.SMS_RECEIVED'
+	   return _intent.getAction().equals(_intentAction);
+   }
+      
 }
 
 /*Draft java code by "Lazarus Android Module Wizard" [2/3/2015 16:12:53]*/
@@ -11022,6 +11404,669 @@ class jDatePickerDialog /*extends ...*/ {
 }
 
 
+/*Draft java code by "Lazarus Android Module Wizard" [2/16/2015 20:17:59]*/
+/*https://github.com/jmpessoa/lazandroidmodulewizard*/
+/*jControl template*/
+
+//ref. http://www.javacodegeeks.com/2013/06/android-http-client-get-post-download-upload-multipart-request.html
+//ref http://lethargicpanda.tumblr.com/post/14784695735/oauth-login-on-your-android-app-the-github
+class jHttpClient /*extends ...*/ {
+ 
+   private long     pascalObj = 0;      // Pascal Object
+   private Controls controls  = null;   // Control Class -> Java/Pascal Interface ...
+   private Context  context   = null;
+   
+   private String mUSERNAME = "USERNAME";
+   private String mPASSWORD = "PASSWORD";
+   private int mAuthenticationMode = 0; //0: none. 1: basic; 2= OAuth
+   private String mHOSTNAME = AuthScope.ANY_HOST; // null; 
+   private int mPORT = AuthScope.ANY_PORT; //-1;
+ 
+   //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
+   public jHttpClient(Controls _ctrls, long _Self) { //Add more others news "_xxx" params if needed!
+      //super(_ctrls.activity);
+      context   = _ctrls.activity;
+      pascalObj = _Self;
+      controls  = _ctrls;
+   }
+ 
+   public void jFree() {
+     //free local objects...
+   }
+ 
+ //write others [public] methods code here......
+ //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
+   
+   //ref. http://blog.leocad.io/basic-http-authentication-on-android/
+   //ref. http://simpleprogrammer.com/2011/05/25/oauth-and-rest-in-android-part-1/
+   //ref. http://jan.horneck.info/blog/androidhttpclientwithbasicauthentication
+   public String Get(String _stringUrl) {
+	   
+       //ref. http://jan.horneck.info/blog/androidhttpclientwithbasicauthentication
+	   HttpEntity entity = null;
+	   
+	   HttpParams httpParams = new BasicHttpParams();
+	   int connection_Timeout = 5000;
+	   HttpConnectionParams.setConnectionTimeout(httpParams, connection_Timeout);
+	   HttpConnectionParams.setSoTimeout(httpParams, connection_Timeout);
+	    
+	    /*ref. http://blog.leocad.io/basic-http-authentication-on-android/
+	    String credentials = mUSERNAME + ":" + mPASSWORD;  
+	    String base64EncodedCredentials = Base64.encodeToString(credentials.getBytes(), Base64.NO_WRAP);  
+	    request.addHeader("Authorization", "Basic " + base64EncodedCredentials);
+	    client = new DefaultHttpClient();
+	   */
+	   
+	   DefaultHttpClient httpclient = new DefaultHttpClient(httpParams);
+       String strResult="";
+       
+       try {
+    	   
+		    //AuthScope:
+		    //host  the host the credentials apply to. May be set to null if credenticals are applicable to any host. 
+		    //port  the port the credentials apply to. May be set to negative value if credenticals are applicable to any port.
+    	   if (mAuthenticationMode != 0) {    		   
+              httpclient.getCredentialsProvider().setCredentials(
+                               new AuthScope(mHOSTNAME,mPORT),  // 
+                               new UsernamePasswordCredentials(mUSERNAME, mPASSWORD));
+    	   }
+    	   
+           HttpGet httpget = new HttpGet(_stringUrl);
+
+           //System.out.println("executing request" + httpget.getRequestLine());
+           HttpResponse response = httpclient.execute(httpget);
+           entity = response.getEntity();
+           
+           /*TODO
+           StatusLine statusLine = response.getStatusLine();
+           int statusCode = statusLine.getStatusCode();
+           if (statusCode == 200) {           
+               entity = response.getEntity();
+           }    
+            */
+           
+           if (entity != null) {
+        	   strResult = EntityUtils.toString(entity);
+           }
+       } catch(Exception e){
+       	    e.printStackTrace();
+       }finally {
+           // When HttpClient instance is no longer needed,
+           // shut down the connection manager to ensure
+           // immediate deallocation of all system resources
+           httpclient.getConnectionManager().shutdown();
+       }
+       return strResult;
+
+   }
+	 
+     public void SetAuthenticationUser(String _userName, String _password) {       	 
+	   mUSERNAME = _userName;
+	   mPASSWORD =_password;
+     }
+     
+     public void SetAuthenticationHost(String _hostName, int _port) {
+    	 if ( _hostName.equals("") ) {
+    		 mHOSTNAME = null;
+    	 } 
+    	 else {
+    		 mHOSTNAME = _hostName;
+    	 }
+    	 mPORT = _port;	 
+     }
+               
+     public void SetAuthenticationMode(int _authenticationMode) {    	 
+        mAuthenticationMode = _authenticationMode; //0: none. 1: basic; 2= OAuth	 	                
+     }
+     
+     //ref. http://mobiledevtuts.com/android/android-http-with-asynctask-example/ 
+	public int PostNameValueData(String _stringUrl, String _name, String _value) {
+			// Create a new HttpClient and Post Header
+			int statusCode = 0;						
+			HttpParams httpParams = new BasicHttpParams();
+			int connection_Timeout = 5000;
+			HttpConnectionParams.setConnectionTimeout(httpParams, connection_Timeout);
+			HttpConnectionParams.setSoTimeout(httpParams, connection_Timeout);
+			
+			DefaultHttpClient httpclient = new DefaultHttpClient();					 	   
+		    //AuthScope:
+		    //host  the host the credentials apply to. May be set to null if credenticals are applicable to any host. 
+		    //port  the port the credentials apply to. May be set to negative value if credenticals are applicable to any port.
+			try {				
+    	        if (mAuthenticationMode != 0) {    		   
+                  httpclient.getCredentialsProvider().setCredentials(
+                               new AuthScope(mHOSTNAME,mPORT),  // 
+                               new UsernamePasswordCredentials(mUSERNAME, mPASSWORD));
+    	        }						
+			    HttpPost httppost = new HttpPost(_stringUrl);
+				// Add your data
+				List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();								
+				nameValuePairs.add(new BasicNameValuePair(_name, _value));								
+				httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
+				// Execute HTTP Post Request
+				HttpResponse response = httpclient.execute(httppost);
+				StatusLine statusLine = response.getStatusLine();  
+				statusCode = statusLine.getStatusCode();
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+			} 
+			return statusCode;
+	}
+	
+	public int PostNameValueData(String _stringUrl, String _listNameValue) {
+		// Create a new HttpClient and Post Header
+		int statusCode = 0; 
+		
+		HttpParams httpParams = new BasicHttpParams();
+		int connection_Timeout = 5000;
+		HttpConnectionParams.setConnectionTimeout(httpParams, connection_Timeout);
+		HttpConnectionParams.setSoTimeout(httpParams, connection_Timeout);
+		
+		DefaultHttpClient httpclient = new DefaultHttpClient();			 	   
+	    //AuthScope:
+	    //host  the host the credentials apply to. May be set to null if credenticals are applicable to any host. 
+	    //port  the port the credentials apply to. May be set to negative value if credenticals are applicable to any port.
+		try {
+			
+	        if (mAuthenticationMode != 0) {    		   
+              httpclient.getCredentialsProvider().setCredentials(
+                           new AuthScope(mHOSTNAME,mPORT),  // 
+                           new UsernamePasswordCredentials(mUSERNAME, mPASSWORD));
+	        }
+					
+		    HttpPost httppost = new HttpPost(_stringUrl);
+
+			// Add your data
+			List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();						
+			StringTokenizer st = new StringTokenizer(_listNameValue, "=&");		
+			
+			while(st.hasMoreTokens()) { 
+			  String key = st.nextToken(); 
+			  String val = st.nextToken(); 
+			  //Log.i("name ->", key);
+			  //Log.i("value ->", val);
+			  nameValuePairs.add(new BasicNameValuePair(key, val));
+			}					
+			httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
+			// Execute HTTP Post Request
+			HttpResponse response = httpclient.execute(httppost);
+			StatusLine statusLine = response.getStatusLine();  
+			statusCode = statusLine.getStatusCode();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+		}		 
+		return statusCode;
+    }
+
+}
+
+
+/*Draft java code by "Lazarus Android Module Wizard" [5/8/2015 20:24:14]*/
+/*https://github.com/jmpessoa/lazandroidmodulewizard*/
+/*jControl template*/
+
+//ref. http://tech-papers.org/executing-shell-command-android-application/
+class jShellCommand extends AsyncTask<String, String, String>  {
+ 
+   private long     pascalObj = 0;      // Pascal Object
+   private Controls controls  = null;   // Control Class -> Java/Pascal Interface ...
+   private Context  context   = null;
+ 
+   //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
+ 
+   public jShellCommand(Controls _ctrls, long _Self) { //Add more others news "_xxx" params if needed!
+      //super(_ctrls.activity);
+      context   = _ctrls.activity;
+      pascalObj = _Self;
+      controls  = _ctrls;
+   }
+ 
+   public void jFree() {
+     //free local objects...
+   }
+ 
+ //write others [public] methods code here......
+ //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
+
+   @Override
+   protected void onPreExecute() {
+     super.onPreExecute();
+     //
+   }
+   
+   @Override
+   protected String doInBackground(String... params) {
+     Process p;
+     StringBuffer output = new StringBuffer();
+     try {
+        p = Runtime.getRuntime().exec(params[0]);
+        BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
+        String line = "";
+        while ((line = reader.readLine()) != null) {
+            output.append(line + "\n");
+            p.waitFor();
+        }
+      } catch (IOException e) {
+         e.printStackTrace();
+      } catch (InterruptedException e) {
+         e.printStackTrace();
+      }
+      String response = output.toString();
+      return response;
+   }
+   
+   @Override
+   protected void onPostExecute(String result) {
+      super.onPostExecute(result);   
+      controls.pOnShellCommandExecuted(pascalObj, result);
+      //Log.i("Output", result);
+   }      
+   
+   public void Execute(String _shellCmd) {
+	   this.execute(_shellCmd);
+   }   
+}
+
+/*Draft java code by "Lazarus Android Module Wizard" [5/9/2015 3:06:34]*/
+/*https://github.com/jmpessoa/lazandroidmodulewizard*/
+/*jVisualControl template*/
+  
+class jAnalogClock extends AnalogClock /*dummy*/ { //please, fix what GUI object will be extended!
+   
+   private long       pascalObj = 0;    // Pascal Object
+   private Controls   controls  = null; // Control Class for events
+   
+   private Context context = null;
+   private ViewGroup parent   = null;         // parent view
+   private RelativeLayout.LayoutParams lparams;              // layout XYWH 
+   private OnClickListener onClickListener;   // click event
+   private Boolean enabled  = true;           // click-touch enabled!
+   private int lparamsAnchorRule[] = new int[30];
+   private int countAnchorRule = 0;
+   private int lparamsParentRule[] = new int[30];
+   private int countParentRule = 0;
+   private int lparamH = 100;
+   private int lparamW = 100;
+   private int marginLeft = 0;
+   private int marginTop = 0;
+   private int marginRight = 0;
+   private int marginBottom = 0;
+   private boolean mRemovedFromParent = false;
+  
+  //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
+  
+   public jAnalogClock(Controls _ctrls, long _Self) { //Add more others news "_xxx"p arams if needed!
+      super(_ctrls.activity);
+      context   = _ctrls.activity;
+      pascalObj = _Self;
+      controls  = _ctrls;
+   
+      lparams = new RelativeLayout.LayoutParams(lparamW, lparamH);
+   
+      onClickListener = new OnClickListener(){
+      /*.*/public void onClick(View view){  //please, do not remove /*.*/ mask for parse invisibility!
+              if (enabled) {
+                 controls.pOnClick(pascalObj, Const.Click_Default); //JNI event onClick!
+              }
+           };
+      };
+      setOnClickListener(onClickListener);
+   } //end constructor
+   
+   public void jFree() {
+      if (parent != null) { parent.removeView(this); }
+      //free local objects...
+      lparams = null;
+      setOnClickListener(null);
+   }
+  
+   public void SetViewParent(ViewGroup _viewgroup) {
+      if (parent != null) { parent.removeView(this); }
+      parent = _viewgroup;
+      parent.addView(this,lparams);
+      mRemovedFromParent = false;
+   }
+   
+   public void RemoveFromViewParent() {
+      if (!mRemovedFromParent) {
+         this.setVisibility(android.view.View.INVISIBLE);
+         if (parent != null)
+    	       parent.removeView(this);
+	   mRemovedFromParent = true;
+	}
+   }
+  
+   public View GetView() {
+      return this;
+   }
+  
+   public void SetLParamWidth(int _w) {
+      lparamW = _w;
+   }
+  
+   public void SetLParamHeight(int _h) {
+      lparamH = _h;
+   }
+  
+   public void SetLeftTopRightBottomWidthHeight(int _left, int _top, int _right, int _bottom, int _w, int _h) {
+      marginLeft = _left;
+      marginTop = _top;
+      marginRight = _right;
+      marginBottom = _bottom;
+      lparamH = _h;
+      lparamW = _w;
+   }
+  
+   public void AddLParamsAnchorRule(int _rule) {
+      lparamsAnchorRule[countAnchorRule] = _rule;
+      countAnchorRule = countAnchorRule + 1;
+   }
+  
+   public void AddLParamsParentRule(int _rule) {
+      lparamsParentRule[countParentRule] = _rule;
+      countParentRule = countParentRule + 1;
+   }
+  
+   public void SetLayoutAll(int _idAnchor) {
+  	lparams.width  = lparamW;
+	lparams.height = lparamH;
+	lparams.setMargins(marginLeft,marginTop,marginRight,marginBottom);
+	if (_idAnchor > 0) {
+	    for (int i=0; i < countAnchorRule; i++) {
+		lparams.addRule(lparamsAnchorRule[i], _idAnchor);
+	    }
+	}
+      for (int j=0; j < countParentRule; j++) {
+         lparams.addRule(lparamsParentRule[j]);
+      }
+      this.setLayoutParams(lparams);
+   }
+  
+   public void ClearLayoutAll() {
+	for (int i=0; i < countAnchorRule; i++) {
+  	   lparams.removeRule(lparamsAnchorRule[i]);
+    	}
+  
+	for (int j=0; j < countParentRule; j++) {
+   	   lparams.removeRule(lparamsParentRule[j]);
+	}
+	countAnchorRule = 0;
+	countParentRule = 0;
+   }
+ 
+   public void SetId(int _id) { //wrapper method pattern ...
+      this.setId(_id);
+   }
+  
+  //write others [public] methods code here......
+  //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
+  
+} //end class
+
+class jDigitalClock extends DigitalClock /*TextClock*/ { //please, fix what GUI object will be extended!
+	   
+	   private long       pascalObj = 0;    // Pascal Object
+	   private Controls   controls  = null; // Control Class for events
+	   
+	   private Context context = null;
+	   private ViewGroup parent   = null;         // parent view
+	   private RelativeLayout.LayoutParams lparams;              // layout XYWH 
+	   private OnClickListener onClickListener;   // click event
+	   private Boolean enabled  = true;           // click-touch enabled!
+	   private int lparamsAnchorRule[] = new int[30];
+	   private int countAnchorRule = 0;
+	   private int lparamsParentRule[] = new int[30];
+	   private int countParentRule = 0;
+	   private int lparamH = 100;
+	   private int lparamW = 100;
+	   private int marginLeft = 0;
+	   private int marginTop = 0;
+	   private int marginRight = 0;
+	   private int marginBottom = 0;
+	   private boolean mRemovedFromParent = false;
+	  
+	  //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
+	  
+	   public jDigitalClock(Controls _ctrls, long _Self) { //Add more others news "_xxx"p arams if needed!
+	      super(_ctrls.activity);
+	      context   = _ctrls.activity;
+	      pascalObj = _Self;
+	      controls  = _ctrls;
+	   
+	      lparams = new RelativeLayout.LayoutParams(lparamW, lparamH);
+	   
+	      onClickListener = new OnClickListener(){
+	      /*.*/public void onClick(View view){  //please, do not remove /*.*/ mask for parse invisibility!
+	              if (enabled) {
+	                 controls.pOnClick(pascalObj, Const.Click_Default); //JNI event onClick!
+	              }
+	           };
+	      };
+	      setOnClickListener(onClickListener);
+	   } //end constructor
+	   
+	   public void jFree() {
+	      if (parent != null) { parent.removeView(this); }
+	      //free local objects...
+	      lparams = null;
+	      setOnClickListener(null);
+	   }
+	  
+	   public void SetViewParent(ViewGroup _viewgroup) {
+	      if (parent != null) { parent.removeView(this); }
+	      parent = _viewgroup;
+	      parent.addView(this,lparams);
+	      mRemovedFromParent = false;
+	   }
+	   
+	   public void RemoveFromViewParent() {
+	      if (!mRemovedFromParent) {
+	         this.setVisibility(android.view.View.INVISIBLE);
+	         if (parent != null)
+	    	       parent.removeView(this);
+		   mRemovedFromParent = true;
+		}
+	   }
+	  
+	   public View GetView() {
+	      return this;
+	   }
+	  
+	   public void SetLParamWidth(int _w) {
+	      lparamW = _w;
+	   }
+	  
+	   public void SetLParamHeight(int _h) {
+	      lparamH = _h;
+	   }
+	  
+	   public void SetLeftTopRightBottomWidthHeight(int _left, int _top, int _right, int _bottom, int _w, int _h) {
+	      marginLeft = _left;
+	      marginTop = _top;
+	      marginRight = _right;
+	      marginBottom = _bottom;
+	      lparamH = _h;
+	      lparamW = _w;
+	   }
+	  
+	   public void AddLParamsAnchorRule(int _rule) {
+	      lparamsAnchorRule[countAnchorRule] = _rule;
+	      countAnchorRule = countAnchorRule + 1;
+	   }
+	  
+	   public void AddLParamsParentRule(int _rule) {
+	      lparamsParentRule[countParentRule] = _rule;
+	      countParentRule = countParentRule + 1;
+	   }
+	  
+	   public void SetLayoutAll(int _idAnchor) {
+	  	lparams.width  = lparamW;
+		lparams.height = lparamH;
+		lparams.setMargins(marginLeft,marginTop,marginRight,marginBottom);
+		if (_idAnchor > 0) {
+		    for (int i=0; i < countAnchorRule; i++) {
+			lparams.addRule(lparamsAnchorRule[i], _idAnchor);
+		    }
+		}
+	      for (int j=0; j < countParentRule; j++) {
+	         lparams.addRule(lparamsParentRule[j]);
+	      }
+	      this.setLayoutParams(lparams);
+	   }
+	  
+	   public void ClearLayoutAll() {
+		for (int i=0; i < countAnchorRule; i++) {
+	  	   lparams.removeRule(lparamsAnchorRule[i]);
+	    	}
+	  
+		for (int j=0; j < countParentRule; j++) {
+	   	   lparams.removeRule(lparamsParentRule[j]);
+		}
+		countAnchorRule = 0;
+		countParentRule = 0;
+	   }
+	 
+	   public void SetId(int _id) { //wrapper method pattern ...
+	      this.setId(_id);
+	   }
+	  
+	  //write others [public] methods code here......
+	  //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
+	  
+} //end class
+
+
+class jCustomViewLayout extends RelativeLayout {
+
+	   private long       pascalObj = 0;    // Pascal Object
+	   private Controls   controls  = null; // Control Class for events
+
+	   private Context context = null;
+	   private ViewGroup parent   = null;         // parent view
+	   private LayoutParams lparams;              // layout XYWH
+	   private int lparamsAnchorRule[] = new int[30];
+	   private int countAnchorRule = 0;
+	   private int lparamsParentRule[] = new int[30];
+	   private int countParentRule = 0;
+	   private int lparamH = 100;
+	   private int lparamW = 100;
+	   private int marginLeft = 0;
+	   private int marginTop = 0;
+	   private int marginRight = 0;
+	   private int marginBottom = 0;
+	   boolean mRemovedFromParent = false; //no parent!   
+	   
+	  //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
+	   public jCustomViewLayout(Controls _ctrls, long _Self) { //Add more others news "_xxx"p arams if needed!
+	      super(_ctrls.activity);
+	      context   = _ctrls.activity;
+	      pascalObj = _Self;
+	      controls  = _ctrls;
+	      lparams = new LayoutParams(lparamW, lparamH);
+	      //lparams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);		
+	   } //end constructor
+
+	   public void jFree() {
+	      if (parent != null) { parent.removeView(this); }
+	      //free local objects...      
+	      lparams = null;
+	      //parent = null;  //?!
+	   }
+
+	   public void SetViewParent(ViewGroup _viewgroup) {
+	      if (parent != null) { parent.removeView(this); }
+	      parent = _viewgroup;
+	      parent.addView(this,lparams);
+	      mRemovedFromParent = false; //now there is a parent!    	
+	   }
+	   	  				   
+	   public void RemoveFromViewParent() {
+	      if (!mRemovedFromParent) {
+	    	 this.setVisibility(android.view.View.INVISIBLE);
+	    	 ViewGroup parent1 = (ViewGroup)this.getParent();	    	 	    	
+	    	 if (parent1 != null) {
+	            parent1.removeView(this);
+	            parent = null;
+	            mRemovedFromParent = true; //no more parent!
+	    	 }          
+	      }
+	   }
+	   
+	   public View GetView() {
+	      return this;
+	   }
+	   
+	   public void SetLParamWidth(int _w) {
+	      lparamW = _w;
+	   }
+
+	   public void SetLParamHeight(int _h) {
+	      lparamH = _h;
+	   }
+
+	   public void SetLeftTopRightBottomWidthHeight(int _left, int _top, int _right, int _bottom, int _w, int _h) {
+	      marginLeft = _left;
+	      marginTop = _top;
+	      marginRight = _right;
+	      marginBottom = _bottom;
+	      lparamH = _h;
+	      lparamW = _w;
+	   }
+
+	   public void AddLParamsAnchorRule(int _rule) {
+	      lparamsAnchorRule[countAnchorRule] = _rule;
+	      countAnchorRule = countAnchorRule + 1;
+	   }
+
+	   public void AddLParamsParentRule(int _rule) {
+	      lparamsParentRule[countParentRule] = _rule;
+	      countParentRule = countParentRule + 1;
+	   }
+
+	   public void SetLayoutAll(int _idAnchor) {
+	  	 lparams.width  = lparamW;
+		 lparams.height = lparamH;
+		 lparams.setMargins(marginLeft,marginTop,marginRight,marginBottom);
+		 if (_idAnchor > 0) {
+		    for (int i=0; i < countAnchorRule; i++) {
+			  lparams.addRule(lparamsAnchorRule[i], _idAnchor);
+		    }
+		 }
+	     for (int j=0; j < countParentRule; j++) {
+	         lparams.addRule(lparamsParentRule[j]);
+	     }
+	     this.setLayoutParams(lparams);
+	   }
+
+	   public void ClearLayoutAll() {
+		  for (int i=0; i < countAnchorRule; i++) {
+	  	    lparams.removeRule(lparamsAnchorRule[i]);
+	      }
+
+		  for (int j=0; j < countParentRule; j++) {
+	   	    lparams.removeRule(lparamsParentRule[j]);
+		  }
+		  countAnchorRule = 0;
+		  countParentRule = 0;
+	   }
+
+	   public void SetId(int _id) { //wrapper method pattern ...
+	      this.setId(_id);
+	   }
+	   			
+       public void Show() {	//0: visible; 4: invisible; 8: gone		  
+		  this.setVisibility(android.view.View.VISIBLE);
+	   }
+				
+	   public void Hide() { 
+		 if (this.getVisibility()==0) { //visible   
+			this.setVisibility(android.view.View.INVISIBLE); //4
+		 }    
+	   }	
+	                 
+} //end class
+
+
 //**new jclass entrypoint**//please, do not remove/change this line!
 
 //Javas/Pascal Interface Class 
@@ -11116,7 +12161,6 @@ public native void pOnClickGridItem(long pasobj, int position, String caption);
  
 public native void pOnChangedSensor(long pasobj, Sensor sensor, int sensorType, float[] values, long timestamp);
 public native void pOnListeningSensor(long pasobj, Sensor sensor, int sensorType);
-public native void pOnStopedListeningSensors(long pasobj);
 
 public native void pOnUnregisterListeningSensor(long pasobj, int sensorType, String sensorName);
 public native void pOnBroadcastReceiver(long pasobj, Intent intent);
@@ -11127,10 +12171,16 @@ public native void pOnDatePicker(long pasobj, int year, int monthOfYear, int day
 public native void pOnFlingGestureDetected(long pasobj, int direction);
 public native void pOnPinchZoomGestureDetected(long pasobj, float scaleFactor, int state); 
 
+public native void pOnShellCommandExecuted(long pasobj, String cmdResult);
+
 //Load Pascal Library
 static {
-   // Log.i("JNI_Java", "1.load libcontrols.so");
+    //Log.i("JNI_Java", "1.load libcontrols.so");
+
+    //System.loadLibrary("freetype"); // need by TFPNoGUIGraphicsBridge [ref. www.github.com/jmpessoa/tfpnoguigraphicsbridge]
+
     System.loadLibrary("controls");
+
     //Log.i("JNI_Java", "2.load libcontrols.so");  
 }
 
@@ -11426,6 +12476,25 @@ public  String getStrDateTime() {  //hacked by jmpessoa!! sorry, was for a good 
   		   "6$4=getLocale;";  
   return listVersionInfo;
 }
+
+//Fatih: Path = '' = Asset Root Folder 
+//Path Example: gunlukler/2015/02/28/001 
+public String[] getAssetContentList(String Path) throws IOException { 
+   ArrayList<String> Folders = new ArrayList<String>(); 
+
+   Resources r = this.activity.getResources();  
+   AssetManager am = r.getAssets(); 
+   String fileList[] = am.list(Path); 
+   if (fileList != null) 
+  {    
+     for (int i = 0; i < fileList.length; i++) 
+     { 
+ 	Folders.add(fileList[i]); 
+     } 
+  } 
+  String sFolders[] = Folders.toArray(new String[Folders.size()]);    	   
+  return sFolders; 
+} 
 
 //by jmpessoa:  Class controls version info
 public String GetControlsVersionInfo() { 
@@ -11763,76 +12832,6 @@ public  java.lang.Object jAsyncTask_Create(long pasobj ) {
   return (java.lang.Object)( new jAsyncTask(this,pasobj));
 }
 
-// -------------------------------------------------------------------------
-//  Http API
-//  Why ?
-//        android:minSdkVersion       = "9"   ---> OK
-//        android:minSdkVersion       = "10"  ---> Not OK
-//
-//  Ref. http://theeye.pe.kr/entry/how-to-get-and-multipart-post-on-android-platform
-//       http://cafe.naver.com/securitycommunity/56
-//       http://stackoverflow.com/questions/8179658/urlconnection-getcontent-return-null
-//       http://blog.naver.com/since201109?Redirect=Log&logNo=150169407558
-//       http://www.java-samples.com/showtutorial.php?tutorialid=1521
-//
-//
-//
-// -------------------------------------------------------------------------
-
-public  String jHttp_get(String url) {
-  String rst = "";
-  try {
-    HttpClient client = new DefaultHttpClient();
-    HttpGet    get    = new HttpGet(url);
-    HttpResponse resp = client.execute(get);
-    /*
-    BufferedReader br = new BufferedReader(new InputStreamReader(resp.getEntity().getContent()));
-    String str = null;
-    StringBuilder sb = new StringBuilder();
-    while ((rst = br.readLine()) != null) {
-      sb.append(str).append("\n"); }
-    br.close();
-    rst = sb.toString();
-    */
-    HttpEntity resEntityGet = resp.getEntity();
-    if (resp != null) {
-      rst = EntityUtils.toString(resEntityGet);  }
-
-    Log.i("RESPONSE", rst);  }
-  catch (Exception e) {
-    Log.i("Java","Error");
-    e.printStackTrace();
-  };
-  return(rst);
-};
-
-//by jmpessoa
-//http://blog.dahanne.net/2009/08/16/how-to-access-http-resources-from-android/
-public String jHttp_get2(String location) throws Throwable {
-	HttpURLConnection con = null;
-	URL url;
-	InputStream is=null;
-		url = new URL(location);
-		con = (HttpURLConnection) url.openConnection();
-		//con.setReadTimeout(10000 /* milliseconds */);
-		//con.setConnectTimeout(15000 /* milliseconds */);
-		con.setRequestMethod("GET");
-		con.setDoInput(true);
-		//con.addRequestProperty("Referer", location);
-		// Start the query
-		con.connect();
-		is = con.getInputStream();
-	
-    BufferedReader rd = new BufferedReader(new InputStreamReader(is), 4096);
-    String line;
-    StringBuilder sb =  new StringBuilder();
-	while ((line = rd.readLine()) != null) {
-		    sb.append(line);
-	}
-	rd.close();
-    return  sb.toString();
-}
-
 //by jmpessoa
 //you need a real android device (not emulator!)
 //http://www.androidaspect.com/2013/09/how-to-send-email-from-android.html
@@ -11866,16 +12865,75 @@ public void jSend_Email(
   }		  
 }
 
+//http://codetheory.in/android-sms/
 //http://www.developerfeed.com/java/tutorial/sending-sms-using-android
 //http://www.techrepublic.com/blog/software-engineer/how-to-send-a-text-message-from-within-your-android-app/
+
 public int jSend_SMS(String phoneNumber, String msg) {
-	  try {
-	      SmsManager.getDefault().sendTextMessage(phoneNumber, null, msg, null, null);
-	      return 1; //ok
+	
+	SmsManager sms = SmsManager.getDefault();	
+	try {
+	      //SmsManager.getDefault().sendTextMessage(phoneNumber, null, msg, null, null);	      
+	      List<String> messages = sms.divideMessage(msg);    
+	      for (String message : messages) {
+	          sms.sendTextMessage(phoneNumber, null, message, null, null);
+	      }	      
+	      //Log.i("Send_SMS",phoneNumber+": "+ msg);
+	      return 1; //ok	      
 	  }catch (Exception e) {
+		  //Log.i("Send_SMS Fail",e.toString());
 	      return 0; //fail
 	  }
 }
+
+
+public int jSend_SMS(String phoneNumber, String msg, String packageDeliveredAction) {
+	
+	String SMS_DELIVERED = packageDeliveredAction;
+	
+	PendingIntent deliveredPendingIntent = PendingIntent.getBroadcast(this.GetContext(), 0, new Intent(SMS_DELIVERED), 0);
+	SmsManager sms = SmsManager.getDefault();
+	
+	try {
+	      //SmsManager.getDefault().sendTextMessage(phoneNumber, null, msg, null, deliveredPendingIntent);
+	      //Log.i("Send_SMS",phoneNumber+": "+ msg);
+	      List<String> messages = sms.divideMessage(msg);    
+	      for (String message : messages) {
+	          sms.sendTextMessage(phoneNumber, null, message, null, deliveredPendingIntent);
+	      }	      
+	      return 1; //ok	      
+	}catch (Exception e) {
+		  //Log.i("Send_SMS Fail",e.toString());
+	      return 0; //fail
+	}
+}
+
+public String jRead_SMS(Intent intent, String addressBodyDelimiter)  {
+  //---get the SMS message passed in---	
+  SmsMessage[] msgs = null;
+  String str = "";
+	   
+  if (intent.getAction().equals("android.provider.Telephony.SMS_RECEIVED")) {	  
+    Bundle bundle = intent.getExtras();               
+    if (bundle != null)
+    {
+        //---retrieve the SMS message received---
+        Object[] pdus = (Object[]) bundle.get("pdus");
+        msgs = new SmsMessage[pdus.length];            
+        for (int i=0; i<msgs.length; i++){
+            msgs[i] = SmsMessage.createFromPdu((byte[])pdus[i]);                
+            str += msgs[i].getOriginatingAddress();                     
+            str += addressBodyDelimiter;
+            str += msgs[i].getMessageBody().toString();
+            str += " ";        
+        }         
+        //Log.i("Read_SMS", str);
+    }
+    
+  } 
+  return str;                         
+}
+
 
 //by jmpessoa
 //http://eagle.phys.utk.edu/guidry/android/readContacts.html
@@ -12138,5 +13196,25 @@ public float[] benchMark1 () {
    public java.lang.Object jDatePickerDialog_jCreate(long _Self) {
 	      return (java.lang.Object)(new jDatePickerDialog(this,_Self));
    }
-
+   
+   public java.lang.Object jHttpClient_jCreate(long _Self) {
+	      return (java.lang.Object)(new jHttpClient(this,_Self));
+   }
+  
+   public java.lang.Object jShellCommand_jCreate(long _Self) {
+	      return (java.lang.Object)(new jShellCommand(this,_Self));
+   }
+   
+   public java.lang.Object jAnalogClock_jCreate(long _Self) {
+	      return (java.lang.Object)(new jAnalogClock(this,_Self));
+   }   
+   
+   public java.lang.Object jDigitalClock_jCreate(long _Self) {
+	      return (java.lang.Object)(new jDigitalClock(this,_Self));
+   }
+   
+   public java.lang.Object jCustomViewLayout_jCreate(long _Self) {
+	      return (java.lang.Object)(new jCustomViewLayout(this,_Self));
+   }
+   
 }

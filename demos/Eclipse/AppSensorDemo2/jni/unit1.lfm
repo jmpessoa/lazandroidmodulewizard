@@ -13,10 +13,10 @@ object AndroidModule1: TAndroidModule1
   OnCloseQuery = AndroidModule1CloseQuery
   OnClose = AndroidModule1Close
   object jTextView1: jTextView
-    Left = 88
-    Top = 24
-    Width = 175
-    Height = 25
+    Left = 64
+    Top = 5
+    Width = 171
+    Height = 20
     MarginLeft = 5
     MarginTop = 5
     MarginRight = 5
@@ -36,10 +36,10 @@ object AndroidModule1: TAndroidModule1
     Id = 635628
   end
   object jTextView2: jTextView
-    Left = 8
-    Top = 48
-    Width = 288
-    Height = 25
+    Left = 5
+    Top = 35
+    Width = 290
+    Height = 20
     MarginLeft = 5
     MarginTop = 5
     MarginRight = 5
@@ -60,6 +60,7 @@ object AndroidModule1: TAndroidModule1
     Id = 6158346
   end
   object jListView1: jListView
+    Tag = 1
     Left = 8
     Top = 80
     Width = 287

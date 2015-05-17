@@ -60,6 +60,7 @@ begin
      jAsyncTask1.Execute
   else
      ShowMessage('Running...');
+
 end;
 
 procedure TAndroidModule1.jAsyncTask1AsyncEvent(Sender: TObject; EventType, Progress: Integer);

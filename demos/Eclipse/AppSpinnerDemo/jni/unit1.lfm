@@ -7,11 +7,10 @@ object AndroidModule1: TAndroidModule1
   MarginTop = 0
   MarginRight = 0
   MarginBottom = 0
-  OnCreate = DataModuleCreate
+  OnCreate = AndroidModule1Create
   Text = 'AndroidModule1'
   ActivityMode = actMain
   BackgroundColor = colbrDefault
-  OnJNIPrompt = DataModuleJNIPrompt
   object jSpinner1: jSpinner
     Tag = 1
     Left = 8
@@ -39,6 +38,7 @@ object AndroidModule1: TAndroidModule1
     DropListTextColor = colbrDefault
     DropListBackgroundColor = colbrDefault
     LastItemAsPrompt = False
+    FontSize = 0
     Id = 1262173
   end
   object jTextView1: jTextView
@@ -61,6 +61,7 @@ object AndroidModule1: TAndroidModule1
     BackgroundColor = colbrDefault
     FontColor = colbrSilver
     FontSize = 0
+    FontFace = ffMonospace
     TextTypeFace = tfNormal
     Id = 1581953
   end
@@ -114,7 +115,8 @@ object AndroidModule1: TAndroidModule1
     DropListTextColor = colbrDefault
     DropListBackgroundColor = colbrDefault
     LastItemAsPrompt = True
-    Id = 0
+    FontSize = 0
+    Id = 7996405
   end
   object jTextView2: jTextView
     Left = 8
@@ -137,6 +139,7 @@ object AndroidModule1: TAndroidModule1
     BackgroundColor = colbrDefault
     FontColor = colbrSilver
     FontSize = 0
+    FontFace = ffSerif
     TextTypeFace = tfNormal
     Id = 2832611
   end
@@ -163,5 +166,59 @@ object AndroidModule1: TAndroidModule1
     FontSize = 0
     TextTypeFace = tfNormal
     Id = 7712776
+  end
+  object jEditText1: jEditText
+    Left = 8
+    Top = 280
+    Width = 288
+    Height = 40
+    MarginLeft = 5
+    MarginTop = 10
+    MarginRight = 5
+    MarginBottom = 10
+    Visible = True
+    Anchor = jSpinner2
+    PosRelativeToAnchor = [raBelow]
+    PosRelativeToParent = []
+    LayoutParamWidth = lpMatchParent
+    LayoutParamHeight = lpWrapContent
+    Text = 'jEditText1'
+    Alignment = taLeft
+    InputTypeEx = itxText
+    MaxTextLength = 300
+    BackgroundColor = colbrDefault
+    FontColor = colbrDefault
+    FontSize = 0
+    FontFace = ffSerif
+    TextTypeFace = tfItalic
+    ScrollBarStyle = scrNone
+    MaxLines = 1
+    HorScrollBar = True
+    VerScrollBar = False
+    WrappingLine = False
+    Editable = True
+    Id = 4365413
+  end
+  object jButton2: jButton
+    Left = 8
+    Top = 328
+    Width = 287
+    Height = 40
+    MarginLeft = 2
+    MarginTop = 4
+    MarginRight = 2
+    MarginBottom = 4
+    Visible = True
+    Anchor = jEditText1
+    PosRelativeToAnchor = [raBelow]
+    PosRelativeToParent = []
+    LayoutParamWidth = lpMatchParent
+    LayoutParamHeight = lpWrapContent
+    Text = 'jButton2'
+    BackgroundColor = colbrDefault
+    FontColor = colbrDefault
+    FontSize = 0
+    OnClick = jButton2Click
+    Id = 0
   end
 end

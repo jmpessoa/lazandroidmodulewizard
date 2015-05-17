@@ -6,13 +6,14 @@ interface
 
 uses
   Classes, SysUtils, Dialogs, IDECommands, MenuIntf, Forms,
-  uformsettingspaths, lazandroidtoolsexpert, uformupdatecodetemplate, ufrmEditor, ufrmCompCreate;
+  uformsettingspaths, lazandroidtoolsexpert, uformupdatecodetemplate, ufrmEditor, ufrmCompCreate,  uformchangepathtondk;
 
 procedure StartPathTool(Sender: TObject);
 procedure StartLateTool(Sender: TObject);   //By Thierrydijoux!
 procedure StartUpdateCodeTemplateTool(Sender: TObject);
 procedure StartResEditor(Sender: TObject);   //By Thierrydijoux!
 procedure StartComponentCreate(Sender: TObject);
+procedure StartPathToNDKDemo(Sender: TObject);
 
 procedure Register;
 
@@ -55,6 +56,12 @@ begin
   FrmCompCreate:= TFrmCompCreate.Create(Application);
   FrmCompCreate.ShowModal;
      //ShowMessage('Component create assistencie...');	
+end;
+
+procedure StartPathToNDKDemo(Sender: TObject);
+begin
+   FormChangeDemoPathToNDK:= TFormChangeDemoPathToNDK.Create(Application);
+   FormChangeDemoPathToNDK.ShowModal;
 end;
 
 procedure BuildAPKandRun(Sender: TObject);
@@ -105,10 +112,11 @@ begin
   RegisterIDEMenuCommand(ideSubMnuAMW, 'PathToolCmd', 'Path Settings [Jdk, Sdk, Ndk, ...]', nil,@StartPathTool);
   //Adding 5a. entry
   RegisterIDEMenuCommand(ideSubMnuAMW, 'PathCompCreateCmd', 'New jComponent [Create]', nil,@StartComponentCreate);
+  //Adding 6a. entry
+  RegisterIDEMenuCommand(ideSubMnuAMW, 'PathToNDKDemoCmd', 'Change Project [*.lpi] Ndk Path [Demos]', nil,@StartPathToNDKDemo);
   // And so on...
+  RegisterIDEMenuCommand(itmRunBuilding, 'BuildAPKandRun', '[Lamw] Build Apk and Run',nil, @BuildAPKandRun);
 
-  RegisterIDEMenuCommand(itmRunBuilding, 'BuildAPKandRun', '[Lamw] Build Apk and Run',
-    nil, @BuildAPKandRun);
 end;
 
 end.

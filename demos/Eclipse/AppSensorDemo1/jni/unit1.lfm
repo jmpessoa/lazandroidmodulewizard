@@ -11,10 +11,10 @@ object AndroidModule1: TAndroidModule1
   ActivityMode = actMain
   BackgroundColor = colbrDefault
   object jTextView1: jTextView
-    Left = 80
-    Top = 24
-    Width = 168
-    Height = 25
+    Left = 66
+    Top = 5
+    Width = 167
+    Height = 20
     MarginLeft = 5
     MarginTop = 5
     MarginRight = 5
@@ -34,9 +34,9 @@ object AndroidModule1: TAndroidModule1
     Id = 7408134
   end
   object jButton1: jButton
-    Left = 8
-    Top = 64
-    Width = 288
+    Left = 2
+    Top = 34
+    Width = 296
     Height = 40
     MarginLeft = 2
     MarginTop = 4
@@ -56,6 +56,7 @@ object AndroidModule1: TAndroidModule1
     Id = 5675812
   end
   object jListView1: jListView
+    Tag = 1
     Left = 8
     Top = 112
     Width = 287

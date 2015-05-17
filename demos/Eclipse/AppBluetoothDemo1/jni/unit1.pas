@@ -33,6 +33,7 @@ type
     procedure jButton3Click(Sender: TObject);
     procedure jButton4Click(Sender: TObject);
     procedure jButton5Click(Sender: TObject);
+
   private
     {private declarations}
     procedure ShowPairedDevices;
@@ -142,6 +143,5 @@ procedure TAndroidModule1.jButton5Click(Sender: TObject);
 begin
    jBluetooth1.Disable();
 end;
-
 
 end.

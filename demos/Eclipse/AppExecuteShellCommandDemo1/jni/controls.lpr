@@ -1,5 +1,5 @@
 {hint: save all files to location: C:\adt32\eclipse\workspace\AppExecuteShellCommandDemo1\jni}
-library controls;  //by Lamw: Lazarus Android Module Wizard: 5/8/2015 20:54:57]
+library controls;  //by Lamw: Lazarus Android Module Wizard: 5/16/2015 15:50:36]
  
 {$mode delphi}
  

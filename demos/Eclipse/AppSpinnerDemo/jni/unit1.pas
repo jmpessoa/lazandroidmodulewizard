@@ -15,14 +15,16 @@ type
 
   TAndroidModule1 = class(jForm)
       jButton1: jButton;
+      jButton2: jButton;
+      jEditText1: jEditText;
       jSpinner1: jSpinner;
       jSpinner2: jSpinner;
       jTextView1: jTextView;
       jTextView2: jTextView;
       jTextView3: jTextView;
-      procedure DataModuleCreate(Sender: TObject);
-      procedure DataModuleJNIPrompt(Sender: TObject);
+      procedure AndroidModule1Create(Sender: TObject);
       procedure jButton1Click(Sender: TObject);
+      procedure jButton2Click(Sender: TObject);
       procedure jSpinner1ItemSelected(Sender: TObject; caption: string;
         position: integer);
       procedure jSpinner2ItemSelected(Sender: TObject; caption: string;
@@ -59,18 +61,27 @@ begin
 end;
 
 procedure TAndroidModule1.jButton1Click(Sender: TObject);
+var
+  i: integer;
 begin
-  ShowMessage('caption='+jSpinner1.GetSelectedItem() + ' :  Index='+IntToStr(jSpinner1.GetSelectedItemPosition()));
+  for i:= 0 to 3000 do
+  begin
+    jSpinner1.Add('Item_Item_Item_Item_'+IntToStr(i));
+  end;
+  //ShowMessage('caption='+jSpinner1.GetSelectedItem() + ' :  Index='+IntToStr(jSpinner1.GetSelectedItemPosition()));
 end;
 
-procedure TAndroidModule1.DataModuleCreate(Sender: TObject);
+procedure TAndroidModule1.jButton2Click(Sender: TObject);
 begin
-   //
+   jEditText1.Editable:= not jEditText1.Editable;
+   ShowMessage(Self.GetDeviceID);
+   ShowMessage(Self.GetDevicePhoneNumber);
+   ShowMessage(IntToStr(jSpinner1.Count));
 end;
 
-procedure TAndroidModule1.DataModuleJNIPrompt(Sender: TObject);
+procedure TAndroidModule1.AndroidModule1Create(Sender: TObject);
 begin
-  //
+  //FCount = 0;
 end;
 
 end.

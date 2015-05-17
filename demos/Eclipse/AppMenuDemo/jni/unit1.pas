@@ -183,7 +183,7 @@ end;
 
 procedure TAndroidModule1.DataModuleJNIPrompt(Sender: TObject);
 begin
-  jContextMenu1.RegisterForContextMenu(jButton1.jSelf);  // <------- register jButton1 for Context Menu!
+  jContextMenu1.RegisterForContextMenu(jButton1.View);  // <------- register jButton1 for Context Menu!
 end;
 
 procedure TAndroidModule1.jButton1Click(Sender: TObject);

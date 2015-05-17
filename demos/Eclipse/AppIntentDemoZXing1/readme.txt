@@ -45,3 +45,5 @@ Tutorial: How to get your Android Application [Apk] using "Ant":
 ....  Thank you!
 
 ....  by jmpessoa_hotmail_com
+
+System Path to Android NDK=C:\adt32\ndk10

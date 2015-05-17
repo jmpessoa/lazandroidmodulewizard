@@ -2,7 +2,7 @@ object AndroidModule1: TAndroidModule1
   Left = 287
   Top = 163
   Width = 320
-  Height = 400
+  Height = 529
   MarginLeft = 0
   MarginTop = 0
   MarginRight = 0
@@ -170,7 +170,7 @@ object AndroidModule1: TAndroidModule1
     Left = 5
     Top = 296
     Width = 310
-    Height = 380
+    Height = 39
     MarginLeft = 5
     MarginTop = 10
     MarginRight = 5
@@ -180,7 +180,8 @@ object AndroidModule1: TAndroidModule1
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = []
     LayoutParamWidth = lpMatchParent
-    LayoutParamHeight = lpMatchParent
+    LayoutParamHeight = lpWrapContent
+    Text = 'jEditText3'
     Alignment = taLeft
     InputTypeEx = itxMultiLine
     MaxTextLength = -1
@@ -231,5 +232,11 @@ object AndroidModule1: TAndroidModule1
     OnReceiver = jBroadcastReceiver1Receiver
     left = 232
     top = 48
+  end
+  object jBroadcastReceiver2: jBroadcastReceiver
+    IntentActionFilter = afNone
+    OnReceiver = jBroadcastReceiver2Receiver
+    left = 232
+    top = 128
   end
 end

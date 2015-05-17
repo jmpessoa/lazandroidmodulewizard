@@ -53,10 +53,10 @@ object AndroidModule1: TAndroidModule1
     FontColor = colbrDefault
     FontSize = 0
     OnClick = jButton1Click
-    Id = 0
+    Id = 6533546
   end
   object jHelloAdder1: jHelloAdder
-    left = 62
-    top = 165
+    left = 224
+    top = 16
   end
 end

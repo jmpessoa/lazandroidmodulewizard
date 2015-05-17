@@ -80,7 +80,7 @@
 
 
 	****************************************************************************************************
-	*How to use the Demos:
+	*How to use [projects] demos :
 	*
 	*1. Open the lazarus project "controls.lpi" [...\jni] 
 	*
@@ -90,14 +90,18 @@
 	*2. Change this informations in "controls.lpi" to correct one!
 	*
 	*	"C:\adt32\ndk10"   -- just my system NDK path
-	*	"C:\adt32\eclipse\workspace"  -- just my system eclipse workspace 
 	*
-	*	Option 1: Go to Lazarus IDE:
+	*			
+	*	Option 1: NEW !!
+	*		IDE --> Tools --> 
+	*				[Lamw] Android Module Wizard --> 
+	*								Change Project [*.lpi] Ndk Path [Demos]
+	*	Option 2: Go to Lazarus IDE:
 	*			->Project
 	*			->Project -> Option
 	*			->Path -->> change/modify paths according to your system ..
 	*
-	*     	Option 2: Open/edit the "controls.lpi" [...\jni],  you can use Notepad like editor....
+	*     	Option 3: Open/edit the "controls.lpi" [...\jni],  you can use Notepad like editor....
 	*			
 	*
 	*3. All [compatible] Eclipse projects support Ant!
@@ -113,6 +117,9 @@ Version 0.6 - rev. 25 - 14 May 2015 -
 
 	NEW! 	
 		Demo AppCustomShowMessageDemo1 [Eclipse Compatible Project] 
+	
+	NEW!	New Menu entry: added support to configure project demos
+		Lazarus IDE --> Tools --> [Lamw] Android Module Wizard --> Change Project [*.lpi] Ndk Path [Demos]
 
 Version 0.6 - rev. 24 - 10 May 2015 - 
 

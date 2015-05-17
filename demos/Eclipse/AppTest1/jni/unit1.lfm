@@ -228,6 +228,7 @@ object AndroidModule1: TAndroidModule1
     MaxPinchZoomFactor = 4
     Id = 945929
     object jListView1: jListView
+      Tag = 1
       Left = 3
       Top = 5
       Width = 274
