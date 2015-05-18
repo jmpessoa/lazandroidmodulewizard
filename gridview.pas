@@ -144,7 +144,7 @@ begin
     if FParent is jScrollView then
     begin
       jScrollView(FParent).Init(refApp);
-      FjPRLayout:= jScrollView(FParent).View;
+      FjPRLayout:= jScrollView_getView(FjEnv, jScrollView(FParent).jSelf);//FjPRLayout:= jScrollView(FParent).View;
     end;
     if FParent is jCustomDialog then
     begin
