@@ -1,3 +1,3 @@
 cd C:\adt32\sdk\tools
-tools emulator -avd avd_api_14 &
+emulator -avd avd_default +  -gpu on &
 cd C:\adt32\eclipse\workspace\AppNoGUIDemo1

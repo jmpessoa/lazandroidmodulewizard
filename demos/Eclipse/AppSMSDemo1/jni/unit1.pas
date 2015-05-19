@@ -15,6 +15,7 @@ type
 
   TAndroidModule1 = class(jForm)
     jBroadcastReceiver1: jBroadcastReceiver;
+    jBroadcastReceiver2: jBroadcastReceiver;
     jButton1: jButton;
     jEditText1: jEditText;
     jEditText2: jEditText;
@@ -26,6 +27,7 @@ type
     jTextView4: jTextView;
     procedure AndroidModule1JNIPrompt(Sender: TObject);
     procedure jBroadcastReceiver1Receiver(Sender: TObject; intent: jObject);
+    procedure jBroadcastReceiver2Receiver(Sender: TObject; intent: jObject);
     procedure jButton1Click(Sender: TObject);
   private
     {private declarations}
@@ -44,20 +46,22 @@ implementation
 
 procedure TAndroidModule1.jButton1Click(Sender: TObject);
 begin
-
-   if jSMS1.Send(jEditText1.Text,jEditText2.Text) = 1 then
+   if jSMS1.Send(jEditText1.Text, jEditText2.Text, 'com.example.appsmsdemo1.SMS_DELIVERED') = 1 then
      ShowMessage('Message Sending .... OK!')
    else
      ShowMessage('Message Sending .... Fail!');
-
    jEditText2.Text:= '';
-
 end;
 
 procedure TAndroidModule1.AndroidModule1JNIPrompt(Sender: TObject);
 begin
+
    jBroadcastReceiver1.RegisterIntentActionFilter('android.provider.Telephony.SMS_RECEIVED');
-   //or jBroadcastReceiver1.IntentActionFilter:= afSMSReceived;
+     //or jBroadcastReceiver1.IntentActionFilter:= afSMSReceived;
+
+   //register custom app action to retrieve DELIVERED status
+   jBroadcastReceiver2.RegisterIntentActionFilter('com.example.appsmsdemo1.SMS_DELIVERED');
+
    jEditText1.SetFocus;
 end;
 
@@ -86,6 +90,15 @@ begin
       end;
       auxList.Free;
    end;
+end;
+
+//DELIVERED status
+procedure TAndroidModule1.jBroadcastReceiver2Receiver(Sender: TObject; intent: jObject);
+begin
+   if jBroadcastReceiver2.GetResultCode() = 1 then   //ok
+      ShowMessage('Ok. SMS delivered !!')
+   else
+      ShowMessage('Sorry... SMS Not delivered...')
 end;
 
 end.

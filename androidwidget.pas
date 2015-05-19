@@ -982,6 +982,7 @@ type
 
     function GetScreenSize(): string;
     function GetScreenDensity(): string;
+    procedure LogDebug(_tag: string; _msg: string);
 
     // Property
     property View         : jObject        read FjRLayout; //layout!
@@ -1184,6 +1185,7 @@ end;
 
   function jForm_GetScreenDensity(env: PJNIEnv; _jform: JObject): string;
   function jForm_GetScreenSize(env: PJNIEnv; _jform: JObject): string;
+  procedure jForm_LogDebug(env: PJNIEnv; _jform: JObject; _tag: string; _msg: string);
 
 
 //jni API Bridge
@@ -2662,6 +2664,13 @@ begin
    Result:= jForm_GetScreenSize(FjEnv, FjObject);
 end;
 
+procedure jForm.LogDebug(_tag: string; _msg: string);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jForm_LogDebug(FjEnv, FjObject, _tag ,_msg);
+end;
+
 {-------- jForm_JNI_Bridge ----------}
 
 function jForm_GetStringExtra(env: PJNIEnv; _jform: JObject; data: jObject; extraName: string): string;
@@ -3190,6 +3199,21 @@ begin
               Result:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
             end;
   end;
+end;
+
+procedure jForm_LogDebug(env: PJNIEnv; _jform: JObject; _tag: string; _msg: string);
+var
+  jParams: array[0..1] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_tag));
+  jParams[1].l:= env^.NewStringUTF(env, PChar(_msg));
+  jCls:= env^.GetObjectClass(env, _jform);
+  jMethod:= env^.GetMethodID(env, jCls, 'LogDebug', '(Ljava/lang/String;Ljava/lang/String;)V');
+  env^.CallVoidMethodA(env, _jform, jMethod, @jParams);
+  env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env,jParams[1].l);
 end;
 
   {jApp by jmpessoa}

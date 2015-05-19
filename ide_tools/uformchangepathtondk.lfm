@@ -1,0 +1,166 @@
+object FormChangeDemoPathToNDK: TFormChangeDemoPathToNDK
+  Left = 350
+  Height = 254
+  Top = 159
+  Width = 488
+  Caption = 'Lamw: Change [Demo] Project [*.lpi] Android Ndk Path'
+  ClientHeight = 254
+  ClientWidth = 488
+  OnClose = FormClose
+  OnCreate = FormCreate
+  LCLVersion = '1.3'
+  object Label1: TLabel
+    Left = 16
+    Height = 15
+    Top = 120
+    Width = 149
+    Caption = '[New] Path to Android NDK:'
+    ParentColor = False
+  end
+  object EditPathToAndroidNDK: TEdit
+    Left = 18
+    Height = 23
+    Top = 139
+    Width = 428
+    Anchors = [akTop, akLeft, akRight]
+    TabOrder = 0
+  end
+  object SpeedButton1: TSpeedButton
+    AnchorSideTop.Control = EditPathToAndroidNDK
+    Left = 454
+    Height = 22
+    Top = 139
+    Width = 23
+    Anchors = [akTop, akRight]
+    Caption = '...'
+    OnClick = SpeedButton1Click
+  end
+  object Label2: TLabel
+    Left = 16
+    Height = 15
+    Top = 8
+    Width = 233
+    Caption = 'Path to [Demos] Projects Folder/Workspace:'
+    ParentColor = False
+  end
+  object EditPathToWorkspace: TEdit
+    Left = 16
+    Height = 23
+    Top = 31
+    Width = 428
+    Anchors = [akTop, akLeft, akRight]
+    TabOrder = 1
+  end
+  object SpeedButton2: TSpeedButton
+    AnchorSideTop.Control = EditPathToWorkspace
+    Left = 452
+    Height = 22
+    Top = 31
+    Width = 23
+    Anchors = [akTop, akRight]
+    Caption = '...'
+    OnClick = SpeedButton2Click
+  end
+  object Label3: TLabel
+    Left = 16
+    Height = 15
+    Top = 64
+    Width = 117
+    Caption = 'Select [Demo] Project:'
+    ParentColor = False
+  end
+  object ComboBoxSelectProject: TComboBox
+    Left = 16
+    Height = 23
+    Top = 83
+    Width = 426
+    Anchors = [akTop, akLeft, akRight]
+    ItemHeight = 15
+    OnChange = ComboBoxSelectProjectChange
+    TabOrder = 2
+  end
+  object SpeedButton3: TSpeedButton
+    AnchorSideTop.Control = ComboBoxSelectProject
+    Left = 452
+    Height = 22
+    Top = 83
+    Width = 23
+    Anchors = [akTop, akRight]
+    Glyph.Data = {
+      36040000424D3604000000000000360000002800000010000000100000000100
+      2000000000000004000064000000640000000000000000000000FFFFFF00FFFF
+      FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+      FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+      FF00FFFFFF00FFFFFF00FFFFFF00286E2D03256929AAFFFFFF00FFFFFF00FFFF
+      FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+      FF00FFFFFF00FFFFFF00FFFFFF002D7533C0296F2ED2FFFFFF00FFFFFF00FFFF
+      FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+      FF00FFFFFF00FFFFFF0038833EB9569D5EFF53995AFF2A712FFF266B2BFF2366
+      27FF206223C01D5E2040FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+      FF00FFFFFF0042924AE960A768FF8DCD97FF8ACB94FF87CA91FF84C98EFF81C8
+      8CFF60A768FF206324CC1D5F2140FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+      FF00FFFFFF00FFFFFF0043944BBB62A96AFF5DA465FF35803BFF317A36FF5197
+      58FF82C88DFF5BA163FF21642599FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+      FF00FFFFFF004EA25709499C520245954CC2408F47D2FFFFFF00FFFFFF00327B
+      38C22D7533FF296F2EFF256A2AE0FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+      FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF0046974EACFFFFFF00FFFFFF00FFFF
+      FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+      FF00FFFFFF00FFFFFF00FFFFFF0050A65903FFFFFF00FFFFFF0042924AAC3D8C
+      4503FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+      FF0061BD6CE05DB868FF5AB364FF56AD5FC2FFFFFF00FFFFFF00489A50D24394
+      4BC23F8D46023A874109FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+      FF0065C270998ECF97FFAAD9B1FF7AC383FF57AF61FF52A95CFF6FB778FF6BB3
+      74FF45954CBBFFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+      FF0068C6734065C371CC94D29CFFABDAB2FFA8D9AFFFA5D8ADFFA2D6AAFF9FD5
+      A7FF6CB474FF46974EDCFFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+      FF00FFFFFF0068C7744066C472C063C06FFF60BC6BFF5DB767FF79C282FF75BE
+      7EFF50A659B9FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+      FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF005DB868D25AB3
+      64C0FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+      FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF0062BE6DAA5EB9
+      6903FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+      FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+      FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00
+    }
+    OnClick = SpeedButton3Click
+  end
+  object BitBtn2: TBitBtn
+    Left = 232
+    Height = 30
+    Top = 184
+    Width = 210
+    Anchors = [akTop, akLeft, akRight]
+    Cancel = True
+    DefaultCaption = True
+    Kind = bkCancel
+    ModalResult = 2
+    TabOrder = 3
+  end
+  object BitBtn1: TBitBtn
+    Left = 16
+    Height = 30
+    Top = 184
+    Width = 206
+    Caption = 'Change [*.lpi] Ndk Path '
+    Default = True
+    Kind = bkOK
+    ModalResult = 1
+    OnClick = BitBtn1Click
+    TabOrder = 4
+  end
+  object StatusBar1: TStatusBar
+    Left = 0
+    Height = 23
+    Top = 231
+    Width = 488
+    Panels = <>
+  end
+  object SelectDirectoryDialog1: TSelectDirectoryDialog
+    left = 376
+    top = 128
+  end
+  object SelectDirectoryDialog2: TSelectDirectoryDialog
+    left = 344
+    top = 8
+  end
+end

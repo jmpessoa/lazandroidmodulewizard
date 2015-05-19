@@ -1,5 +1,5 @@
 {hint: save all files to location: C:\adt32\eclipse\workspace\AppPinchZoomGestureDemo1\jni}
-library controls;  //by Lamw: Lazarus Android Module Wizard: 2/13/2015 1:43:51]
+library controls;  //by Lamw: Lazarus Android Module Wizard: 5/16/2015 16:43:19]
  
 {$mode delphi}
  
@@ -472,14 +472,6 @@ begin
 end;
 
 { Class:     com_example_apppinchzoomgesturedemo1_Controls
-  Method:    pOnStopedListeningSensors
-  Signature: (J)V }
-procedure pOnStopedListeningSensors(PEnv: PJNIEnv; this: JObject; pasobj: JLong); cdecl;
-begin
-  
-end;
-
-{ Class:     com_example_apppinchzoomgesturedemo1_Controls
   Method:    pOnUnregisterListeningSensor
   Signature: (JILjava/lang/String;)V }
 procedure pOnUnregisterListeningSensor(PEnv: PJNIEnv; this: JObject; pasobj: JLong; sensorType: JInt; sensorName: JString); cdecl;
@@ -525,6 +517,14 @@ end;
 procedure pOnPinchZoomGestureDetected(PEnv: PJNIEnv; this: JObject; pasobj: JLong; scaleFactor: JFloat; state: JInt); cdecl;
 begin
   Java_Event_pOnPinchZoomGestureDetected(PEnv,this,TObject(pasobj),scaleFactor,state);
+end;
+
+{ Class:     com_example_apppinchzoomgesturedemo1_Controls
+  Method:    pOnShellCommandExecuted
+  Signature: (JLjava/lang/String;)V }
+procedure pOnShellCommandExecuted(PEnv: PJNIEnv; this: JObject; pasobj: JLong; cmdResult: JString); cdecl;
+begin
+  Java_Event_pOnShellCommandExecuted(PEnv,this,TObject(pasobj),cmdResult);
 end;
 
 const NativeMethods:array[0..64] of JNINativeMethod = (
@@ -702,9 +702,6 @@ const NativeMethods:array[0..64] of JNINativeMethod = (
    (name:'pOnListeningSensor';
     signature:'(JLandroid/hardware/Sensor;I)V';
     fnPtr:@pOnListeningSensor;),
-   (name:'pOnStopedListeningSensors';
-    signature:'(J)V';
-    fnPtr:@pOnStopedListeningSensors;),
    (name:'pOnUnregisterListeningSensor';
     signature:'(JILjava/lang/String;)V';
     fnPtr:@pOnUnregisterListeningSensor;),
@@ -722,7 +719,10 @@ const NativeMethods:array[0..64] of JNINativeMethod = (
     fnPtr:@pOnFlingGestureDetected;),
    (name:'pOnPinchZoomGestureDetected';
     signature:'(JFI)V';
-    fnPtr:@pOnPinchZoomGestureDetected;)
+    fnPtr:@pOnPinchZoomGestureDetected;),
+   (name:'pOnShellCommandExecuted';
+    signature:'(JLjava/lang/String;)V';
+    fnPtr:@pOnShellCommandExecuted;)
 );
 
 function RegisterNativeMethodsArray(PEnv: PJNIEnv; className: PChar; methods: PJNINativeMethod; countMethods:integer):integer;
@@ -836,13 +836,13 @@ exports
   pOnClickGridItem name 'Java_com_example_apppinchzoomgesturedemo1_Controls_pOnClickGridItem',
   pOnChangedSensor name 'Java_com_example_apppinchzoomgesturedemo1_Controls_pOnChangedSensor',
   pOnListeningSensor name 'Java_com_example_apppinchzoomgesturedemo1_Controls_pOnListeningSensor',
-  pOnStopedListeningSensors name 'Java_com_example_apppinchzoomgesturedemo1_Controls_pOnStopedListeningSensors',
   pOnUnregisterListeningSensor name 'Java_com_example_apppinchzoomgesturedemo1_Controls_pOnUnregisterListeningSensor',
   pOnBroadcastReceiver name 'Java_com_example_apppinchzoomgesturedemo1_Controls_pOnBroadcastReceiver',
   pOnTimePicker name 'Java_com_example_apppinchzoomgesturedemo1_Controls_pOnTimePicker',
   pOnDatePicker name 'Java_com_example_apppinchzoomgesturedemo1_Controls_pOnDatePicker',
   pOnFlingGestureDetected name 'Java_com_example_apppinchzoomgesturedemo1_Controls_pOnFlingGestureDetected',
-  pOnPinchZoomGestureDetected name 'Java_com_example_apppinchzoomgesturedemo1_Controls_pOnPinchZoomGestureDetected';
+  pOnPinchZoomGestureDetected name 'Java_com_example_apppinchzoomgesturedemo1_Controls_pOnPinchZoomGestureDetected',
+  pOnShellCommandExecuted name 'Java_com_example_apppinchzoomgesturedemo1_Controls_pOnShellCommandExecuted';
 
 begin
   gApp:= jApp.Create(nil);{AndroidWidget.pas}

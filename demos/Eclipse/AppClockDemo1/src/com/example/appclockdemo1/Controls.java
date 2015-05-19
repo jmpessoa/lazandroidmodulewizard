@@ -2,7 +2,7 @@ package com.example.appclockdemo1;
 
 //Lamw: Lazarus Android Module Wizard 
 //Form Designer and Components development model!
-//version 0.6 - revision 24 - 10 May - 2015
+//version 0.6 - revision 25 - 14 May - 2015
 //
 //https://github.com/jmpessoa/lazandroidmodulewizard
 //http://forum.lazarus.freepascal.org/index.php/topic,21919.270.html
@@ -69,6 +69,7 @@ import android.app.Fragment;
 import android.app.FragmentTransaction;
 import android.app.Notification;
 import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.ProgressDialog;
 import android.app.TimePickerDialog;
 import android.bluetooth.BluetoothAdapter;
@@ -85,11 +86,13 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.content.pm.ResolveInfo;
 import android.content.res.AssetFileDescriptor;
 import android.content.res.AssetManager;
+import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.database.Cursor;
 import android.graphics.Bitmap.CompressFormat;
@@ -146,6 +149,7 @@ import android.net.Uri;
 import android.net.wifi.WifiManager;
 import android.util.Log;
 import android.view.ContextMenu;
+import android.view.Display;
 import android.view.GestureDetector;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -156,6 +160,7 @@ import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.view.ScaleGestureDetector.SimpleOnScaleGestureListener;
 import android.view.SubMenu;
+import android.view.Surface;
 import android.view.SurfaceHolder;
 import android.view.View.OnClickListener;
 import android.view.View;
@@ -170,6 +175,7 @@ import android.view.animation.AnimationUtils;
 import android.view.animation.TranslateAnimation;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
+import android.view.WindowManager;
 import android.webkit.HttpAuthHandler;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
@@ -203,6 +209,7 @@ import android.widget.Scroller;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ViewFlipper;
+
 
 import java.io.*;
 
@@ -266,7 +273,7 @@ import android.database.sqlite.SQLiteException;
 import java.lang.reflect.*;
 
 //-------------------------------------------------------------------------
-//Constantstogg
+//Constants
 
 //-------------------------------------------------------------------------
 class Const {
@@ -450,6 +457,11 @@ public  RelativeLayout GetLayout() {
   return layout;
 }
 
+public  RelativeLayout GetView() {
+	  //Log.i("Form:", "getLayout");
+	  return layout;
+}
+
 //
 public  void Show(int effect) {		
    //Log.i("Form:","Show");	
@@ -512,7 +524,7 @@ for (int i = 0; i < layout.getChildCount(); i++) {
 
 //by jmpessoa
 public void ShowMessage(String msg){
-  Log.i("ShowMessage As:", msg);
+  Log.i("ShowMessage", msg);
   Toast.makeText(controls.activity, msg, Toast.LENGTH_SHORT).show();	
 }
 
@@ -528,8 +540,7 @@ public String GetDateTime() {
    onClickListener = null;
    layout.setOnClickListener(null);
    layparam = null;
-   layout   = null;
-  
+   layout   = null;  
    //Log.i("jForm:", "Free");
  }
   
@@ -914,7 +925,85 @@ public boolean IsPackageInstalled(String _packagename) {
     }
 }
 
+public void ShowCustomMessage(RelativeLayout _layout,  int _gravity) {
+    //controls.pOnShowCustomMessage(PasObj);
+    Toast toast = new Toast(controls.activity);   
+    toast.setGravity(_gravity, 0, 0);    
+    toast.setDuration(Toast.LENGTH_LONG);    
+    RelativeLayout par = (RelativeLayout)_layout.getParent();
+	if (par != null) {
+	    par.removeView(_layout);        	    
+	}    
+    _layout.setVisibility(0);
+    toast.setView(_layout);
+    toast.show();
+}
 
+public void SetScreenOrientation(int _orientation) {
+	//Log.i("Screen","Orientation "+ _orientation);
+    switch(_orientation) {
+      case 1: controls.activity.setRequestedOrientation (ActivityInfo.SCREEN_ORIENTATION_PORTRAIT); break;
+      case 2: controls.activity.setRequestedOrientation (ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE); break;
+      default:controls.activity.setRequestedOrientation (ActivityInfo.SCREEN_ORIENTATION_SENSOR); break;
+    }            
+}
+
+public int GetScreenOrientation() {
+	    int r = 0;
+        Display display = ((WindowManager) controls.activity.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();   
+        int orientation = display.getOrientation();  //getOrientation();
+        switch(orientation) {
+           case Configuration.ORIENTATION_PORTRAIT:
+               r= 1;//setRequestedOrientation (ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+               break;
+           case Configuration.ORIENTATION_LANDSCAPE:
+               r = 2; //setRequestedOrientation (ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+               break;               
+       }
+       return r; 
+}
+
+
+public String GetScreenDensity() {
+    String r= "";
+    DisplayMetrics metrics = new DisplayMetrics();
+
+    controls.activity.getWindowManager().getDefaultDisplay().getMetrics(metrics);
+
+    int density = metrics.densityDpi;
+        
+    if (density==DisplayMetrics.DENSITY_XXHIGH) {    	    	
+        r= "XXHIGH:" + String.valueOf(density);
+    }
+    else if (density==DisplayMetrics.DENSITY_XHIGH) {    	    	
+        r= "XHIGH:" + String.valueOf(density);
+    }
+    else if (density==DisplayMetrics.DENSITY_HIGH) {    	    	
+        r= "HIGH:" + String.valueOf(density);
+    }
+    else if (density==DisplayMetrics.DENSITY_MEDIUM) {
+        r= "MEDIUM:" + String.valueOf(density);
+    }
+    else if (density==DisplayMetrics.DENSITY_LOW) {
+        r= "LOW:" + String.valueOf(density);
+    }
+    return r;
+}
+
+public String GetScreenSize() {
+	String r= "";
+	
+	if((controls.activity.getResources().getConfiguration().screenLayout & Configuration.SCREENLAYOUT_SIZE_MASK) == Configuration.SCREENLAYOUT_SIZE_XLARGE) {     
+        r = "XLARGE";
+    }else if((controls.activity.getResources().getConfiguration().screenLayout & Configuration.SCREENLAYOUT_SIZE_MASK) == Configuration.SCREENLAYOUT_SIZE_LARGE) {     
+        r = "LARGE";
+    }else if ((controls.activity.getResources().getConfiguration().screenLayout & Configuration.SCREENLAYOUT_SIZE_MASK) == Configuration.SCREENLAYOUT_SIZE_NORMAL) {     
+        r = "NORMAL";
+    }else if ((controls.activity.getResources().getConfiguration().screenLayout & Configuration.SCREENLAYOUT_SIZE_MASK) == Configuration.SCREENLAYOUT_SIZE_SMALL) {     
+    	r = "SMALL";
+    }
+	return r;
+}
 
 }
 
@@ -1076,6 +1165,10 @@ public void Append(String _txt) {
 
 public void AppendLn(String _txt) {
 	  this.append( _txt+ "\n");
+}
+
+public void AppendTab() {
+	  this.append("\t");
 }
 
 public void setFontAndTextTypeFace(int fontFace, int fontStyle) { 
@@ -1399,6 +1492,10 @@ public void Append(String _txt) {
 
 public void AppendLn(String _txt) {
 	this.append(_txt+"\n");
+}
+
+public void AppendTab() {
+	  this.append("\t");
 }
 
 public void SetImeOptions(int _imeOption) {
@@ -3112,14 +3209,18 @@ class jPanel extends RelativeLayout {
 		marginBottom = bottom;
 		lpH = h;
 		lpW = w;
+		lparams.width  = lpW;
+		lparams.height = lpH;
 	}	
 	
 	public void setLParamWidth(int w) {
 	  lpW = w;
+	  lparams.width  = lpW; 
 	}
 
 	public void setLParamHeight(int h) {
-	  lpH = h;
+	  lpH = h;  
+	  lparams.height = lpH; 
 	}
 
 	public int getLParamHeight() {	
@@ -3127,17 +3228,18 @@ class jPanel extends RelativeLayout {
 	}  
 
 	public int getLParamWidth() {
-		return lpW; //getWidth();
+	 return lpW; //getWidth();
 	}
 
 	public void resetLParamsRules() {
 		for (int i=0; i < countAnchorRule; i++) {  
-				lparams.removeRule(lparamsAnchorRule[i]);		
+			lparams.removeRule(lparamsAnchorRule[i]);		
 		}
 				
 		for (int j=0; j < countParentRule; j++) {  
 			lparams.removeRule(lparamsParentRule[j]);		
-	    }		
+	    }
+		
 		countAnchorRule = 0;
 	    countParentRule = 0;
 	}
@@ -3161,8 +3263,7 @@ class jPanel extends RelativeLayout {
 			for (int i=0; i < countAnchorRule; i++) {  
 				lparams.addRule(lparamsAnchorRule[i], idAnchor);		
 		    }			
-		} 
-		
+		} 		
 		for (int j=0; j < countParentRule; j++) {  
 			lparams.addRule(lparamsParentRule[j]);		
 	    }
@@ -3180,6 +3281,7 @@ class jPanel extends RelativeLayout {
 	    parent.addView(this,lparams);
 	    mRemovedFromParent=false;
 	}	
+	
 	// Free object except Self, Pascal Code Free the class.
 	public  void Free() {
 		if (parent != null) { parent.removeView(this); }
@@ -3277,6 +3379,25 @@ class jPanel extends RelativeLayout {
    public void SetMaxZoomFactor(float _maxZoomFactor) {
 	   MAX_ZOOM = _maxZoomFactor;
    }
+   
+   public void CenterInParent() {
+		lparams.addRule(CENTER_IN_PARENT);  //android.widget.RelativeLayout.CENTER_VERTICAL = 15
+		countParentRule = countParentRule+1;	 		
+   }
+      
+   public void MatchParent() {		
+		lpH = RelativeLayout.LayoutParams.MATCH_PARENT;
+		lpW = RelativeLayout.LayoutParams.MATCH_PARENT; //w
+		lparams.height = lpH;
+		lparams.width =  lpW;			
+	}
+   
+   public void WrapParent() {		
+		lpH = RelativeLayout.LayoutParams.WRAP_CONTENT;
+		lpW = RelativeLayout.LayoutParams.WRAP_CONTENT; //w
+		lparams.height = lpH;
+		lparams.width =  lpW;			
+	}
 }
 
 
@@ -9094,8 +9215,8 @@ class jActionBarTab {
 	private class TabContentFragment extends Fragment {
 	    private View mView;
 	    private String mText;
-	    /*.*/public TabContentFragment(View v, String tag) {
-	        mView = v;
+	    /*.*/public TabContentFragment(View v, String tag) {	    	
+	        mView = v;	       
 	        mText = tag;
 	    }
 
@@ -9119,6 +9240,9 @@ class jActionBarTab {
 	    	     * You can access the container's id by calling
 	               ((ViewGroup)getView().getParent()).getId();
 	    	     */
+	    	 LayoutParams lparams = new LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT);
+	    	 lparams.addRule(RelativeLayout.CENTER_IN_PARENT);
+	    	 mView.setLayoutParams(lparams);
 	         return mView;
 	    }
 	}
@@ -9143,7 +9267,7 @@ class jActionBarTab {
 		      tab.setIcon(GetDrawableResourceById(GetDrawableResourceId(_iconIdentifier))); //_iconIdentifier
 		  }
 		  ActionBar actionBar = this.controls.activity.getActionBar();
-		  actionBar.addTab(tab, false);	  
+		  actionBar.addTab(tab, false);		  
 	}
 
 	public void Add(String _title, View _panel){
@@ -9153,7 +9277,8 @@ class jActionBarTab {
 	}
 
 	public void Add(String _title, View _panel, View _customTabView){
-		  ActionBar.Tab tab = CreateTab(_title, _panel);  	 
+		  ActionBar.Tab tab = CreateTab(_title, _panel);
+		  _customTabView.setVisibility(View.VISIBLE); 
 		  tab.setCustomView(_customTabView);	//This overrides values set by setText(CharSequence) and setIcon(Drawable).	  
 		  ActionBar actionBar = this.controls.activity.getActionBar();
 		  actionBar.addTab(tab, false);	  
@@ -10492,6 +10617,10 @@ class jBroadcastReceiver extends BroadcastReceiver {
    private long     pascalObj = 0;      // Pascal Object
    private Controls controls  = null;   // Control Class -> Java/Pascal Interface ...
    private Context  context   = null;
+   
+   private int mResultCode;
+   private String mResultData;
+   private Bundle mResultExtras; 
  
    //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
  
@@ -10507,9 +10636,15 @@ class jBroadcastReceiver extends BroadcastReceiver {
    }
 
    @Override
-   /*.*/public void onReceive(Context arg0, Intent intent) {
-	// TODO Auto-generated method stub
-	    controls.pOnBroadcastReceiver(pascalObj,  intent);
+   /*.*/public void onReceive(Context arg0, Intent intent) { 
+	   mResultCode = -1;
+	   switch (this.getResultCode()) {
+	        case Activity.RESULT_OK: mResultCode = 1; break;
+	        case Activity.RESULT_CANCELED: mResultCode = 0; break;  
+	   }	     	     	     
+	   mResultData = this.getResultData();	    	      	    
+	   mResultExtras = this.getResultExtras(true);	   
+	   controls.pOnBroadcastReceiver(pascalObj,  intent);
    }
    
   //write others [public] methods code here......
@@ -10519,7 +10654,7 @@ class jBroadcastReceiver extends BroadcastReceiver {
    public void RegisterIntentActionFilter(String _intentAction) { //android.provider.Telephony.SMS_RECEIVED
 	   //intentFilter.addDataScheme("http"); 
 	   //intentFilter.addDataScheme("ftp"); 
-	   //intentFilter.addAction(BluetoothDevice.ACTION_FOUND);
+	   //intentFilter.addAction(BluetoothDevice.ACTION_FOUND);	    	         	   
 	   controls.activity.registerReceiver(this, new IntentFilter(_intentAction));
 	   //Log.i("receiver","Register ....");
    }
@@ -10545,7 +10680,18 @@ class jBroadcastReceiver extends BroadcastReceiver {
 	     case 8: controls.activity.registerReceiver(this, new IntentFilter("android.provider.Telephony.SMS_RECEIVED"));
 	   }
    }
-             
+   
+   public int GetResultCode() {     
+      return mResultCode;
+   }
+   
+   public String GetResultData() {
+      return mResultData;
+   }
+   
+   public Bundle GetResultExtras() { //true
+      return mResultExtras;
+   }   
 }
 
 /*Draft java code by "Lazarus Android Module Wizard" [1/18/2015 19:10:57]*/
@@ -11789,6 +11935,138 @@ class jDigitalClock extends DigitalClock /*TextClock*/ { //please, fix what GUI 
 	  
 } //end class
 
+
+class jCustomViewLayout extends RelativeLayout {
+
+	   private long       pascalObj = 0;    // Pascal Object
+	   private Controls   controls  = null; // Control Class for events
+
+	   private Context context = null;
+	   private ViewGroup parent   = null;         // parent view
+	   private LayoutParams lparams;              // layout XYWH
+	   private int lparamsAnchorRule[] = new int[30];
+	   private int countAnchorRule = 0;
+	   private int lparamsParentRule[] = new int[30];
+	   private int countParentRule = 0;
+	   private int lparamH = 100;
+	   private int lparamW = 100;
+	   private int marginLeft = 0;
+	   private int marginTop = 0;
+	   private int marginRight = 0;
+	   private int marginBottom = 0;
+	   boolean mRemovedFromParent = false; //no parent!   
+	   
+	  //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
+	   public jCustomViewLayout(Controls _ctrls, long _Self) { //Add more others news "_xxx"p arams if needed!
+	      super(_ctrls.activity);
+	      context   = _ctrls.activity;
+	      pascalObj = _Self;
+	      controls  = _ctrls;
+	      lparams = new LayoutParams(lparamW, lparamH);
+	      //lparams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);		
+	   } //end constructor
+
+	   public void jFree() {
+	      if (parent != null) { parent.removeView(this); }
+	      //free local objects...      
+	      lparams = null;
+	      //parent = null;  //?!
+	   }
+
+	   public void SetViewParent(ViewGroup _viewgroup) {
+	      if (parent != null) { parent.removeView(this); }
+	      parent = _viewgroup;
+	      parent.addView(this,lparams);
+	      mRemovedFromParent = false; //now there is a parent!    	
+	   }
+	   	  				   
+	   public void RemoveFromViewParent() {
+	      if (!mRemovedFromParent) {
+	    	 this.setVisibility(android.view.View.INVISIBLE);
+	    	 ViewGroup parent1 = (ViewGroup)this.getParent();	    	 	    	
+	    	 if (parent1 != null) {
+	            parent1.removeView(this);
+	            parent = null;
+	            mRemovedFromParent = true; //no more parent!
+	    	 }          
+	      }
+	   }
+	   
+	   public View GetView() {
+	      return this;
+	   }
+	   
+	   public void SetLParamWidth(int _w) {
+	      lparamW = _w;
+	   }
+
+	   public void SetLParamHeight(int _h) {
+	      lparamH = _h;
+	   }
+
+	   public void SetLeftTopRightBottomWidthHeight(int _left, int _top, int _right, int _bottom, int _w, int _h) {
+	      marginLeft = _left;
+	      marginTop = _top;
+	      marginRight = _right;
+	      marginBottom = _bottom;
+	      lparamH = _h;
+	      lparamW = _w;
+	   }
+
+	   public void AddLParamsAnchorRule(int _rule) {
+	      lparamsAnchorRule[countAnchorRule] = _rule;
+	      countAnchorRule = countAnchorRule + 1;
+	   }
+
+	   public void AddLParamsParentRule(int _rule) {
+	      lparamsParentRule[countParentRule] = _rule;
+	      countParentRule = countParentRule + 1;
+	   }
+
+	   public void SetLayoutAll(int _idAnchor) {
+	  	 lparams.width  = lparamW;
+		 lparams.height = lparamH;
+		 lparams.setMargins(marginLeft,marginTop,marginRight,marginBottom);
+		 if (_idAnchor > 0) {
+		    for (int i=0; i < countAnchorRule; i++) {
+			  lparams.addRule(lparamsAnchorRule[i], _idAnchor);
+		    }
+		 }
+	     for (int j=0; j < countParentRule; j++) {
+	         lparams.addRule(lparamsParentRule[j]);
+	     }
+	     this.setLayoutParams(lparams);
+	   }
+
+	   public void ClearLayoutAll() {
+		  for (int i=0; i < countAnchorRule; i++) {
+	  	    lparams.removeRule(lparamsAnchorRule[i]);
+	      }
+
+		  for (int j=0; j < countParentRule; j++) {
+	   	    lparams.removeRule(lparamsParentRule[j]);
+		  }
+		  countAnchorRule = 0;
+		  countParentRule = 0;
+	   }
+
+	   public void SetId(int _id) { //wrapper method pattern ...
+	      this.setId(_id);
+	   }
+	   			
+       public void Show() {	//0: visible; 4: invisible; 8: gone		  
+		  this.setVisibility(android.view.View.VISIBLE);
+	   }
+				
+	   public void Hide() { 
+		 if (this.getVisibility()==0) { //visible   
+			this.setVisibility(android.view.View.INVISIBLE); //4
+		 }    
+	   }	
+	                 
+} //end class
+
+
 //**new jclass entrypoint**//please, do not remove/change this line!
 
 //Javas/Pascal Interface Class 
@@ -12587,17 +12865,47 @@ public void jSend_Email(
   }		  
 }
 
+//http://codetheory.in/android-sms/
 //http://www.developerfeed.com/java/tutorial/sending-sms-using-android
 //http://www.techrepublic.com/blog/software-engineer/how-to-send-a-text-message-from-within-your-android-app/
+
 public int jSend_SMS(String phoneNumber, String msg) {
-	  try {
-	      SmsManager.getDefault().sendTextMessage(phoneNumber, null, msg, null, null);
+	
+	SmsManager sms = SmsManager.getDefault();	
+	try {
+	      //SmsManager.getDefault().sendTextMessage(phoneNumber, null, msg, null, null);	      
+	      List<String> messages = sms.divideMessage(msg);    
+	      for (String message : messages) {
+	          sms.sendTextMessage(phoneNumber, null, message, null, null);
+	      }	      
 	      //Log.i("Send_SMS",phoneNumber+": "+ msg);
 	      return 1; //ok	      
 	  }catch (Exception e) {
 		  //Log.i("Send_SMS Fail",e.toString());
 	      return 0; //fail
 	  }
+}
+
+
+public int jSend_SMS(String phoneNumber, String msg, String packageDeliveredAction) {
+	
+	String SMS_DELIVERED = packageDeliveredAction;
+	
+	PendingIntent deliveredPendingIntent = PendingIntent.getBroadcast(this.GetContext(), 0, new Intent(SMS_DELIVERED), 0);
+	SmsManager sms = SmsManager.getDefault();
+	
+	try {
+	      //SmsManager.getDefault().sendTextMessage(phoneNumber, null, msg, null, deliveredPendingIntent);
+	      //Log.i("Send_SMS",phoneNumber+": "+ msg);
+	      List<String> messages = sms.divideMessage(msg);    
+	      for (String message : messages) {
+	          sms.sendTextMessage(phoneNumber, null, message, null, deliveredPendingIntent);
+	      }	      
+	      return 1; //ok	      
+	}catch (Exception e) {
+		  //Log.i("Send_SMS Fail",e.toString());
+	      return 0; //fail
+	}
 }
 
 public String jRead_SMS(Intent intent, String addressBodyDelimiter)  {
@@ -12625,6 +12933,7 @@ public String jRead_SMS(Intent intent, String addressBodyDelimiter)  {
   } 
   return str;                         
 }
+
 
 //by jmpessoa
 //http://eagle.phys.utk.edu/guidry/android/readContacts.html
@@ -12902,5 +13211,10 @@ public float[] benchMark1 () {
    
    public java.lang.Object jDigitalClock_jCreate(long _Self) {
 	      return (java.lang.Object)(new jDigitalClock(this,_Self));
-   }     
+   }
+   
+   public java.lang.Object jCustomViewLayout_jCreate(long _Self) {
+	      return (java.lang.Object)(new jCustomViewLayout(this,_Self));
+   }
+   
 }

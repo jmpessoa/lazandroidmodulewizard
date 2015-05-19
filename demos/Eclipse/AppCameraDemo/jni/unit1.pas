@@ -114,14 +114,12 @@ begin
     if FPhotoExist then
     begin
 
-
        w:= jBitmap1.Width;       //ex. Width: 640   ... Height: 480
        h:= jBitmap1.Height;
 
        //Ratio > 1 !
        if w > h then Ratio:= w/h
        else  Ratio:= h/w;
-
 
        if FSaveRotate = 2 then
        begin

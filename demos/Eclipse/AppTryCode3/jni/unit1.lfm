@@ -14,10 +14,10 @@ object AndroidModule1: TAndroidModule1
   BackgroundColor = colbrBlack
   OnJNIPrompt = DataModuleJNIPrompt
   object jTextView1: jTextView
-    Left = 56
-    Top = 64
-    Width = 200
-    Height = 24
+    Left = 52
+    Top = 5
+    Width = 196
+    Height = 20
     MarginLeft = 10
     MarginTop = 5
     MarginRight = 10
@@ -37,10 +37,10 @@ object AndroidModule1: TAndroidModule1
     Id = 5650871
   end
   object jTextView2: jTextView
-    Left = 8
-    Top = 96
-    Width = 264
-    Height = 32
+    Left = 10
+    Top = 40
+    Width = 256
+    Height = 20
     MarginLeft = 10
     MarginTop = 5
     MarginRight = 10
@@ -62,10 +62,10 @@ object AndroidModule1: TAndroidModule1
   end
   object jEditText1: jEditText
     Tag = 1
-    Left = 8
-    Top = 128
+    Left = 10
+    Top = 70
     Width = 280
-    Height = 40
+    Height = 39
     MarginLeft = 10
     MarginTop = 5
     MarginRight = 10
@@ -93,9 +93,9 @@ object AndroidModule1: TAndroidModule1
     Id = 289992
   end
   object jButton1: jButton
-    Left = 8
-    Top = 184
-    Width = 280
+    Left = 5
+    Top = 119
+    Width = 290
     Height = 40
     MarginLeft = 5
     MarginTop = 5
@@ -142,8 +142,8 @@ object AndroidModule1: TAndroidModule1
     Id = 5691155
   end
   object jButton2: jButton
-    Left = 8
-    Top = 528
+    Left = 5
+    Top = 486
     Width = 136
     Height = 40
     MarginLeft = 5
@@ -164,10 +164,10 @@ object AndroidModule1: TAndroidModule1
     Id = 6076616
   end
   object jTextView3: jTextView
-    Left = 56
-    Top = 232
-    Width = 216
-    Height = 40
+    Left = 63
+    Top = 169
+    Width = 174
+    Height = 20
     MarginLeft = 10
     MarginTop = 5
     MarginRight = 10
@@ -188,10 +188,10 @@ object AndroidModule1: TAndroidModule1
     Id = 588674
   end
   object jRadioButton1: jRadioButton
-    Left = 8
-    Top = 408
-    Width = 100
-    Height = 40
+    Left = 5
+    Top = 402
+    Width = 89
+    Height = 32
     MarginLeft = 5
     MarginTop = 5
     MarginRight = 5
@@ -211,10 +211,10 @@ object AndroidModule1: TAndroidModule1
     Id = 7432958
   end
   object jRadioButton2: jRadioButton
-    Left = 128
-    Top = 408
-    Width = 140
-    Height = 40
+    Left = 104
+    Top = 402
+    Width = 131
+    Height = 32
     MarginLeft = 5
     MarginTop = 5
     MarginRight = 5
@@ -234,8 +234,8 @@ object AndroidModule1: TAndroidModule1
     Id = 0
   end
   object jButton3: jButton
-    Left = 152
-    Top = 528
+    Left = 151
+    Top = 486
     Width = 136
     Height = 40
     MarginLeft = 5
@@ -256,10 +256,10 @@ object AndroidModule1: TAndroidModule1
     Id = 0
   end
   object jRadioButton3: jRadioButton
-    Left = 8
-    Top = 472
-    Width = 120
-    Height = 40
+    Left = 5
+    Top = 444
+    Width = 122
+    Height = 32
     MarginLeft = 5
     MarginTop = 5
     MarginRight = 5
@@ -279,10 +279,10 @@ object AndroidModule1: TAndroidModule1
     Id = 5143804
   end
   object jRadioButton4: jRadioButton
-    Left = 128
-    Top = 472
-    Width = 100
-    Height = 40
+    Left = 137
+    Top = 444
+    Width = 110
+    Height = 32
     MarginLeft = 5
     MarginTop = 5
     MarginRight = 5

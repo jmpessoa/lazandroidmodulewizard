@@ -21,12 +21,12 @@
     <VersionInfo>
       <StringTable ProductVersion=""/>
     </VersionInfo>
-    <CustomData Count="1">
-      <Item0 Name="LAMW" Value="GUI"/>
-    </CustomData>
     <BuildModes Count="1">
       <Item1 Name="Default" Default="True"/>
     </BuildModes>
+    <CustomData Count="1">
+      <Item0 Name="LAMW" Value="GUI"/>
+    </CustomData>
     <PublishOptions>
       <Version Value="2"/>
     </PublishOptions>

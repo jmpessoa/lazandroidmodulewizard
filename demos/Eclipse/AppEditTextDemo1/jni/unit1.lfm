@@ -1,6 +1,6 @@
 object AndroidModule1: TAndroidModule1
-  Left = 277
-  Top = 118
+  Left = 292
+  Top = 106
   Width = 300
   Height = 600
   MarginLeft = 0
@@ -12,10 +12,10 @@ object AndroidModule1: TAndroidModule1
   BackgroundColor = colbrDefault
   OnJNIPrompt = AndroidModule1JNIPrompt
   object jTextView1: jTextView
-    Left = 56
-    Top = 28
-    Width = 178
-    Height = 25
+    Left = 65
+    Top = 5
+    Width = 169
+    Height = 20
     MarginLeft = 5
     MarginTop = 5
     MarginRight = 5
@@ -35,10 +35,10 @@ object AndroidModule1: TAndroidModule1
     Id = 7247068
   end
   object jEditText1: jEditText
-    Left = 8
-    Top = 56
-    Width = 287
-    Height = 40
+    Left = 5
+    Top = 40
+    Width = 290
+    Height = 39
     MarginLeft = 5
     MarginTop = 10
     MarginRight = 5
@@ -56,20 +56,22 @@ object AndroidModule1: TAndroidModule1
     BackgroundColor = colbrDefault
     FontColor = colbrDefault
     FontSize = 0
+    HintTextColor = colbrSilver
     ScrollBarStyle = scrNone
     MaxLines = 1
     HorScrollBar = True
     VerScrollBar = False
     WrappingLine = False
+    Editable = True
     OnEnter = jEditText1Enter
     OnChange = jEditText1Change
     OnChanged = jEditText1Changed
     Id = 4513252
   end
   object jButton1: jButton
-    Left = 8
-    Top = 112
-    Width = 288
+    Left = 2
+    Top = 93
+    Width = 296
     Height = 40
     MarginLeft = 2
     MarginTop = 4
@@ -86,6 +88,10 @@ object AndroidModule1: TAndroidModule1
     FontColor = colbrDefault
     FontSize = 0
     OnClick = jButton1Click
-    Id = 0
+    Id = 6616321
+  end
+  object jTextFileManager1: jTextFileManager
+    left = 123
+    top = 249
   end
 end

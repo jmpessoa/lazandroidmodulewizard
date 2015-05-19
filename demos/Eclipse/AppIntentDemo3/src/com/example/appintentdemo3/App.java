@@ -1,6 +1,6 @@
 package com.example.appintentdemo3;
 
-//Lamw: Lazarus Android Module Wizard - Version 0.6 - rev. 14 - 13 February - 2015
+//Lamw: Lazarus Android Module Wizard - Version 0.6 - rev. 25 - 14 May - 2015
 //Form Designer and Components development model!
 //Author: jmpessoa@hotmail.com
 //https://github.com/jmpessoa/lazandroidmodulewizard
@@ -17,6 +17,8 @@ package com.example.appintentdemo3;
 //          LoadMan    / Jang,Yang-Ho
 //                       wkddidgh@naver.com
 //                       http://blog.naver.com/wkddidgh
+
+//	    JMPessoa  /  josemarquespessoa@gmail.com
 
 
 import java.lang.Override;

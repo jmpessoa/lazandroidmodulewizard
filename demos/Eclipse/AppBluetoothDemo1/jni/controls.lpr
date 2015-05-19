@@ -1,12 +1,12 @@
-{hint: save all files to location: C:\adt32\eclipse\workspace\AppBluetoothDemo1\jni\ }
-library controls;  //[by LazAndroidWizard: 4/7/2015 0:40:02]
-
+{hint: save all files to location: C:\adt32\eclipse\workspace\AppBluetoothDemo1\jni}
+library controls;  //by Lamw: Lazarus Android Module Wizard: 5/16/2015 15:15:04]
+ 
 {$mode delphi}
-
+ 
 uses
   Classes, SysUtils, And_jni, And_jni_Bridge, AndroidWidget, Laz_And_Controls,
   Laz_And_Controls_Events, unit1;
-
+ 
 { Class:     com_example_appbluetoothdemo1_Controls
   Method:    pAppOnScreenStyle
   Signature: ()I }
@@ -519,199 +519,210 @@ begin
   Java_Event_pOnPinchZoomGestureDetected(PEnv,this,TObject(pasobj),scaleFactor,state);
 end;
 
-const NativeMethods:array[0..63] of JNINativeMethod = (
-    (name:'pAppOnScreenStyle';
+{ Class:     com_example_appbluetoothdemo1_Controls
+  Method:    pOnShellCommandExecuted
+  Signature: (JLjava/lang/String;)V }
+procedure pOnShellCommandExecuted(PEnv: PJNIEnv; this: JObject; pasobj: JLong; cmdResult: JString); cdecl;
+begin
+  Java_Event_pOnShellCommandExecuted(PEnv,this,TObject(pasobj),cmdResult);
+end;
+
+const NativeMethods:array[0..64] of JNINativeMethod = (
+   (name:'pAppOnScreenStyle';
     signature:'()I';
     fnPtr:@pAppOnScreenStyle;),
-    (name:'pAppOnCreate';
+   (name:'pAppOnCreate';
     signature:'(Landroid/content/Context;Landroid/widget/RelativeLayout;)V';
     fnPtr:@pAppOnCreate;),
-    (name:'pAppOnNewIntent';
+   (name:'pAppOnNewIntent';
     signature:'()V';
     fnPtr:@pAppOnNewIntent;),
-    (name:'pAppOnDestroy';
+   (name:'pAppOnDestroy';
     signature:'()V';
     fnPtr:@pAppOnDestroy;),
-    (name:'pAppOnPause';
+   (name:'pAppOnPause';
     signature:'()V';
     fnPtr:@pAppOnPause;),
-    (name:'pAppOnRestart';
+   (name:'pAppOnRestart';
     signature:'()V';
     fnPtr:@pAppOnRestart;),
-    (name:'pAppOnResume';
+   (name:'pAppOnResume';
     signature:'()V';
     fnPtr:@pAppOnResume;),
-    (name:'pAppOnStart';
+   (name:'pAppOnStart';
     signature:'()V';
     fnPtr:@pAppOnStart;),
-    (name:'pAppOnStop';
+   (name:'pAppOnStop';
     signature:'()V';
     fnPtr:@pAppOnStop;),
-    (name:'pAppOnBackPressed';
+   (name:'pAppOnBackPressed';
     signature:'()V';
     fnPtr:@pAppOnBackPressed;),
-    (name:'pAppOnRotate';
+   (name:'pAppOnRotate';
     signature:'(I)I';
     fnPtr:@pAppOnRotate;),
-    (name:'pAppOnConfigurationChanged';
+   (name:'pAppOnConfigurationChanged';
     signature:'()V';
     fnPtr:@pAppOnConfigurationChanged;),
-    (name:'pAppOnActivityResult';
+   (name:'pAppOnActivityResult';
     signature:'(IILandroid/content/Intent;)V';
     fnPtr:@pAppOnActivityResult;),
-    (name:'pAppOnCreateOptionsMenu';
+   (name:'pAppOnCreateOptionsMenu';
     signature:'(Landroid/view/Menu;)V';
     fnPtr:@pAppOnCreateOptionsMenu;),
-    (name:'pAppOnClickOptionMenuItem';
+   (name:'pAppOnClickOptionMenuItem';
     signature:'(Landroid/view/MenuItem;ILjava/lang/String;Z)V';
     fnPtr:@pAppOnClickOptionMenuItem;),
-    (name:'pAppOnCreateContextMenu';
+   (name:'pAppOnCreateContextMenu';
     signature:'(Landroid/view/ContextMenu;)V';
     fnPtr:@pAppOnCreateContextMenu;),
-    (name:'pAppOnClickContextMenuItem';
+   (name:'pAppOnClickContextMenuItem';
     signature:'(Landroid/view/MenuItem;ILjava/lang/String;Z)V';
     fnPtr:@pAppOnClickContextMenuItem;),
-    (name:'pOnClick';
+   (name:'pOnClick';
     signature:'(JI)V';
     fnPtr:@pOnClick;),
-    (name:'pOnChange';
+   (name:'pOnChange';
     signature:'(JLjava/lang/String;I)V';
     fnPtr:@pOnChange;),
-    (name:'pOnChanged';
+   (name:'pOnChanged';
     signature:'(JLjava/lang/String;I)V';
     fnPtr:@pOnChanged;),
-    (name:'pOnEnter';
+   (name:'pOnEnter';
     signature:'(J)V';
     fnPtr:@pOnEnter;),
-    (name:'pOnTimer';
+   (name:'pOnTimer';
     signature:'(J)V';
     fnPtr:@pOnTimer;),
-    (name:'pOnDraw';
+   (name:'pOnDraw';
     signature:'(JLandroid/graphics/Canvas;)V';
     fnPtr:@pOnDraw;),
-    (name:'pOnTouch';
+   (name:'pOnTouch';
     signature:'(JIIFFFF)V';
     fnPtr:@pOnTouch;),
-    (name:'pOnGLRenderer';
+   (name:'pOnGLRenderer';
     signature:'(JIII)V';
     fnPtr:@pOnGLRenderer;),
-    (name:'pOnClose';
+   (name:'pOnClose';
     signature:'(J)V';
     fnPtr:@pOnClose;),
-    (name:'pOnWebViewStatus';
+   (name:'pOnWebViewStatus';
     signature:'(JILjava/lang/String;)I';
     fnPtr:@pOnWebViewStatus;),
-    (name:'pOnAsyncEvent';
+   (name:'pOnAsyncEvent';
     signature:'(JII)V';
     fnPtr:@pOnAsyncEvent;),
-    (name:'pOnClickWidgetItem';
+   (name:'pOnClickWidgetItem';
     signature:'(JIZ)V';
     fnPtr:@pOnClickWidgetItem;),
-    (name:'pOnClickCaptionItem';
+   (name:'pOnClickCaptionItem';
     signature:'(JILjava/lang/String;)V';
     fnPtr:@pOnClickCaptionItem;),
-    (name:'pOnBluetoothEnabled';
+   (name:'pOnBluetoothEnabled';
     signature:'(J)V';
     fnPtr:@pOnBluetoothEnabled;),
-    (name:'pOnBluetoothDisabled';
+   (name:'pOnBluetoothDisabled';
     signature:'(J)V';
     fnPtr:@pOnBluetoothDisabled;),
-    (name:'pOnBluetoothDeviceFound';
+   (name:'pOnBluetoothDeviceFound';
     signature:'(JLjava/lang/String;Ljava/lang/String;)V';
     fnPtr:@pOnBluetoothDeviceFound;),
-    (name:'pOnBluetoothDiscoveryStarted';
+   (name:'pOnBluetoothDiscoveryStarted';
     signature:'(J)V';
     fnPtr:@pOnBluetoothDiscoveryStarted;),
-    (name:'pOnBluetoothDiscoveryFinished';
+   (name:'pOnBluetoothDiscoveryFinished';
     signature:'(JII)V';
     fnPtr:@pOnBluetoothDiscoveryFinished;),
-    (name:'pOnBluetoothDeviceBondStateChanged';
+   (name:'pOnBluetoothDeviceBondStateChanged';
     signature:'(JILjava/lang/String;Ljava/lang/String;)V';
     fnPtr:@pOnBluetoothDeviceBondStateChanged;),
-    (name:'pOnBluetoothClientSocketConnected';
+   (name:'pOnBluetoothClientSocketConnected';
     signature:'(JLjava/lang/String;Ljava/lang/String;)V';
     fnPtr:@pOnBluetoothClientSocketConnected;),
-    (name:'pOnBluetoothClientSocketIncomingMessage';
+   (name:'pOnBluetoothClientSocketIncomingMessage';
     signature:'(JLjava/lang/String;)V';
     fnPtr:@pOnBluetoothClientSocketIncomingMessage;),
-    (name:'pOnBluetoothClientSocketWritingMessage';
+   (name:'pOnBluetoothClientSocketWritingMessage';
     signature:'(J)V';
     fnPtr:@pOnBluetoothClientSocketWritingMessage;),
-    (name:'pOnBluetoothServerSocketConnected';
+   (name:'pOnBluetoothServerSocketConnected';
     signature:'(JLjava/lang/String;Ljava/lang/String;)V';
     fnPtr:@pOnBluetoothServerSocketConnected;),
-    (name:'pOnBluetoothServerSocketIncomingMessage';
+   (name:'pOnBluetoothServerSocketIncomingMessage';
     signature:'(JLjava/lang/String;)V';
     fnPtr:@pOnBluetoothServerSocketIncomingMessage;),
-    (name:'pOnBluetoothServerSocketWritingMessage';
+   (name:'pOnBluetoothServerSocketWritingMessage';
     signature:'(J)V';
     fnPtr:@pOnBluetoothServerSocketWritingMessage;),
-    (name:'pOnBluetoothServerSocketListen';
+   (name:'pOnBluetoothServerSocketListen';
     signature:'(JLjava/lang/String;Ljava/lang/String;)V';
     fnPtr:@pOnBluetoothServerSocketListen;),
-    (name:'pOnSpinnerItemSeleceted';
+   (name:'pOnSpinnerItemSeleceted';
     signature:'(JILjava/lang/String;)V';
     fnPtr:@pOnSpinnerItemSeleceted;),
-    (name:'pOnLocationChanged';
+   (name:'pOnLocationChanged';
     signature:'(JDDDLjava/lang/String;)V';
     fnPtr:@pOnLocationChanged;),
-    (name:'pOnLocationStatusChanged';
+   (name:'pOnLocationStatusChanged';
     signature:'(JILjava/lang/String;Ljava/lang/String;)V';
     fnPtr:@pOnLocationStatusChanged;),
-    (name:'pOnLocationProviderEnabled';
+   (name:'pOnLocationProviderEnabled';
     signature:'(JLjava/lang/String;)V';
     fnPtr:@pOnLocationProviderEnabled;),
-    (name:'pOnLocationProviderDisabled';
+   (name:'pOnLocationProviderDisabled';
     signature:'(JLjava/lang/String;)V';
     fnPtr:@pOnLocationProviderDisabled;),
-    (name:'pAppOnViewClick';
+   (name:'pAppOnViewClick';
     signature:'(Landroid/view/View;I)V';
     fnPtr:@pAppOnViewClick;),
-    (name:'pAppOnListItemClick';
+   (name:'pAppOnListItemClick';
     signature:'(Landroid/widget/AdapterView;Landroid/view/View;II)V';
     fnPtr:@pAppOnListItemClick;),
-    (name:'pOnActionBarTabSelected';
+   (name:'pOnActionBarTabSelected';
     signature:'(JLandroid/view/View;Ljava/lang/String;)V';
     fnPtr:@pOnActionBarTabSelected;),
-    (name:'pOnActionBarTabUnSelected';
+   (name:'pOnActionBarTabUnSelected';
     signature:'(JLandroid/view/View;Ljava/lang/String;)V';
     fnPtr:@pOnActionBarTabUnSelected;),
-    (name:'pOnCustomDialogShow';
+   (name:'pOnCustomDialogShow';
     signature:'(JLandroid/app/Dialog;Ljava/lang/String;)V';
     fnPtr:@pOnCustomDialogShow;),
-    (name:'pOnClickToggleButton';
+   (name:'pOnClickToggleButton';
     signature:'(JZ)V';
     fnPtr:@pOnClickToggleButton;),
-    (name:'pOnChangeSwitchButton';
+   (name:'pOnChangeSwitchButton';
     signature:'(JZ)V';
     fnPtr:@pOnChangeSwitchButton;),
-    (name:'pOnClickGridItem';
+   (name:'pOnClickGridItem';
     signature:'(JILjava/lang/String;)V';
     fnPtr:@pOnClickGridItem;),
-    (name:'pOnChangedSensor';
+   (name:'pOnChangedSensor';
     signature:'(JLandroid/hardware/Sensor;I[FJ)V';
     fnPtr:@pOnChangedSensor;),
-    (name:'pOnListeningSensor';
+   (name:'pOnListeningSensor';
     signature:'(JLandroid/hardware/Sensor;I)V';
     fnPtr:@pOnListeningSensor;),
-    (name:'pOnUnregisterListeningSensor';
+   (name:'pOnUnregisterListeningSensor';
     signature:'(JILjava/lang/String;)V';
     fnPtr:@pOnUnregisterListeningSensor;),
-    (name:'pOnBroadcastReceiver';
+   (name:'pOnBroadcastReceiver';
     signature:'(JLandroid/content/Intent;)V';
     fnPtr:@pOnBroadcastReceiver;),
-    (name:'pOnTimePicker';
+   (name:'pOnTimePicker';
     signature:'(JII)V';
     fnPtr:@pOnTimePicker;),
-    (name:'pOnDatePicker';
+   (name:'pOnDatePicker';
     signature:'(JIII)V';
     fnPtr:@pOnDatePicker;),
-    (name:'pOnFlingGestureDetected';
+   (name:'pOnFlingGestureDetected';
     signature:'(JI)V';
     fnPtr:@pOnFlingGestureDetected;),
-    (name:'pOnPinchZoomGestureDetected';
+   (name:'pOnPinchZoomGestureDetected';
     signature:'(JFI)V';
-    fnPtr:@pOnPinchZoomGestureDetected;)
+    fnPtr:@pOnPinchZoomGestureDetected;),
+   (name:'pOnShellCommandExecuted';
+    signature:'(JLjava/lang/String;)V';
+    fnPtr:@pOnShellCommandExecuted;)
 );
 
 function RegisterNativeMethodsArray(PEnv: PJNIEnv; className: PChar; methods: PJNINativeMethod; countMethods:integer):integer;
@@ -725,12 +736,12 @@ begin
     if (PEnv^).RegisterNatives(PEnv, curClass, methods, countMethods) > 0 then Result:= JNI_TRUE;
   end;
 end;
-
+ 
 function RegisterNativeMethods(PEnv: PJNIEnv; className: PChar): integer;
 begin
   Result:= RegisterNativeMethodsArray(PEnv, className, @NativeMethods[0], Length(NativeMethods));
 end;
-
+ 
 function JNI_OnLoad(VM: PJavaVM; reserved: pointer): JInt; cdecl;
 var
   PEnv: PPointer;
@@ -741,12 +752,12 @@ begin
   (VM^).GetEnv(VM, @PEnv, Result);
   if PEnv <> nil then
   begin
-      curEnv:= PJNIEnv(PEnv);
-      RegisterNativeMethods(curEnv, 'com/example/appbluetoothdemo1/Controls');
+     curEnv:= PJNIEnv(PEnv);
+     RegisterNativeMethods(curEnv, 'com/example/appbluetoothdemo1/Controls');
   end;
-  gVM:= VM;{And_jni_Bridge}
+  gVM:= VM;{AndroidWidget.pas}
 end;
-
+ 
 procedure JNI_OnUnload(VM: PJavaVM; reserved: pointer); cdecl;
 var
   PEnv: PPointer;
@@ -757,9 +768,8 @@ begin
   if PEnv <> nil then
   begin
     curEnv:= PJNIEnv(PEnv);
-    (curEnv^).DeleteGlobalRef(curEnv, gjClass);
-    gjClass:= nil;
-    gVM:= nil;
+    (curEnv^).DeleteGlobalRef(curEnv, gjClass);   {AndroidWidget.pas}
+    gVM:= nil;{AndroidWidget.pas}
   end;
   gApp.Terminate;
   FreeAndNil(gApp);
@@ -831,13 +841,14 @@ exports
   pOnTimePicker name 'Java_com_example_appbluetoothdemo1_Controls_pOnTimePicker',
   pOnDatePicker name 'Java_com_example_appbluetoothdemo1_Controls_pOnDatePicker',
   pOnFlingGestureDetected name 'Java_com_example_appbluetoothdemo1_Controls_pOnFlingGestureDetected',
-  pOnPinchZoomGestureDetected name 'Java_com_example_appbluetoothdemo1_Controls_pOnPinchZoomGestureDetected';
+  pOnPinchZoomGestureDetected name 'Java_com_example_appbluetoothdemo1_Controls_pOnPinchZoomGestureDetected',
+  pOnShellCommandExecuted name 'Java_com_example_appbluetoothdemo1_Controls_pOnShellCommandExecuted';
 
 begin
-  gApp:= jApp.Create(nil);
-  gApp.Title:= 'JNI Android Bridges Library';
-  gjAppName:= 'com.example.appbluetoothdemo1';
-  gjClassName:= 'com/example/appbluetoothdemo1/Controls';
+  gApp:= jApp.Create(nil);{AndroidWidget.pas}
+  gApp.Title:= 'My Android Bridges Library';
+  gjAppName:= 'com.example.appbluetoothdemo1';{AndroidWidget.pas}
+  gjClassName:= 'com/example/appbluetoothdemo1/Controls';{AndroidWidget.pas}
   gApp.AppName:=gjAppName;
   gApp.ClassName:=gjClassName;
   gApp.Initialize;

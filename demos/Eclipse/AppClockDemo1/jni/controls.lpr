@@ -1,5 +1,5 @@
 {hint: save all files to location: C:\adt32\eclipse\workspace\AppClockDemo1\jni}
-library controls;  //by Lamw: Lazarus Android Module Wizard: 5/9/2015 22:02:36]
+library controls;  //by Lamw: Lazarus Android Module Wizard: 5/16/2015 15:28:10]
  
 {$mode delphi}
  

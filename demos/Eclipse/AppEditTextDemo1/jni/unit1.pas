@@ -7,7 +7,7 @@ interface
   
 uses
   Classes, SysUtils, And_jni, And_jni_Bridge, Laz_And_Controls, 
-    Laz_And_Controls_Events, AndroidWidget;
+    Laz_And_Controls_Events, AndroidWidget, textfilemanager;
   
 type
 
@@ -16,6 +16,7 @@ type
   TAndroidModule1 = class(jForm)
       jButton1: jButton;
       jEditText1: jEditText;
+      jTextFileManager1: jTextFileManager;
       jTextView1: jTextView;
       procedure AndroidModule1JNIPrompt(Sender: TObject);
       procedure jButton1Click(Sender: TObject);
@@ -38,8 +39,11 @@ implementation
 { TAndroidModule1 }
 
 procedure TAndroidModule1.jButton1Click(Sender: TObject);
+var
+   strFromAssets: string;
 begin
-   ShowMessage(jEditText1.Text);
+   strFromAssets:= jTextFileManager1.LoadFromAssets('name1.txt');
+   ShowMessage(jTextFileManager1.LoadFromAssets('name1.txt'));
 end;
 
 {

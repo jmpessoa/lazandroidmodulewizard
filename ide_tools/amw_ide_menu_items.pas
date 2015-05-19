@@ -6,13 +6,14 @@ interface
 
 uses
   Classes, SysUtils, Dialogs, IDECommands, MenuIntf, Forms,
-  uformsettingspaths, lazandroidtoolsexpert, uformupdatecodetemplate, ufrmEditor, ufrmCompCreate;
+  uformsettingspaths, lazandroidtoolsexpert, uformupdatecodetemplate, ufrmEditor, ufrmCompCreate,  uformchangepathtondk;
 
 procedure StartPathTool(Sender: TObject);
 procedure StartLateTool(Sender: TObject);   //By Thierrydijoux!
 procedure StartUpdateCodeTemplateTool(Sender: TObject);
 procedure StartResEditor(Sender: TObject);   //By Thierrydijoux!
 procedure StartComponentCreate(Sender: TObject);
+procedure StartPathToNDKDemo(Sender: TObject);
 
 procedure Register;
 
@@ -57,6 +58,12 @@ begin
      //ShowMessage('Component create assistencie...');	
 end;
 
+procedure StartPathToNDKDemo(Sender: TObject);
+begin
+   FormChangeDemoPathToNDK:= TFormChangeDemoPathToNDK.Create(Application);
+   FormChangeDemoPathToNDK.ShowModal;
+end;
+
 procedure BuildAPKandRun(Sender: TObject);
 var
   Project: TLazProject;
@@ -77,7 +84,9 @@ begin
     end;
   except
     on e: Exception do
-      IDEMessagesWindow.AddCustomMessage(mluFatal, '[' + e.ClassName + '] Failed: ' + e.Message, '', 0);
+      IDEMessagesWindow.SelectMsgLine(
+        IDEMessagesWindow.AddCustomMessage(mluFatal,
+          '[' + e.ClassName + '] Failed: ' + e.Message, '', 0, 0, 'Exception'));
   end else
     ShowMessage('The active project is not LAMW project!');
 end;
@@ -103,10 +112,11 @@ begin
   RegisterIDEMenuCommand(ideSubMnuAMW, 'PathToolCmd', 'Path Settings [Jdk, Sdk, Ndk, ...]', nil,@StartPathTool);
   //Adding 5a. entry
   RegisterIDEMenuCommand(ideSubMnuAMW, 'PathCompCreateCmd', 'New jComponent [Create]', nil,@StartComponentCreate);
+  //Adding 6a. entry
+  RegisterIDEMenuCommand(ideSubMnuAMW, 'PathToNDKDemoCmd', 'Change Project [*.lpi] Ndk Path [Demos]', nil,@StartPathToNDKDemo);
   // And so on...
+  RegisterIDEMenuCommand(itmRunBuilding, 'BuildAPKandRun', '[Lamw] Build Apk and Run',nil, @BuildAPKandRun);
 
-  RegisterIDEMenuCommand(itmRunBuilding, 'BuildAPKandRun', '[Lamw] Build Apk and Run',
-    nil, @BuildAPKandRun);
 end;
 
 end.

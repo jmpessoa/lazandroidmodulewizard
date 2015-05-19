@@ -42,31 +42,33 @@ implementation
 procedure TAndroidModule1.jListView1ClickCaptionItem(Sender: TObject;
   Item: integer; caption: string);
 begin
+  //if jListView1.IsItemChecked(Item) then
+  //begin
+     jIntentManager1.SetAction('com.google.zxing.client.android.SCAN');
+     if  jIntentManager1.IsCallable(jIntentManager1.GetIntent()) then
+     begin
+         //ShowMessage('ZXing App is Installed!! ');
 
-   jIntentManager1.SetAction('com.google.zxing.client.android.SCAN');
-   if  jIntentManager1.IsCallable(jIntentManager1.GetIntent()) then
-   begin
-       //ShowMessage('ZXing App is Installed!! ');
+         case Item of
+            0: jIntentManager1.PutExtraString('SCAN_MODE', 'PRODUCT_MODE');   //Prod
+            1: jIntentManager1.PutExtraString('SCAN_MODE', 'QR_CODE_MODE');   //QR
+            2: jIntentManager1.PutExtraString('SCAN_FORMATS', 'CODE_39,CODE_93,CODE_128,DATA_MATRIX,ITF'); //others
+         end;
 
-       case Item of
-          0: jIntentManager1.PutExtraString('SCAN_MODE', 'PRODUCT_MODE');   //Prod
-          1: jIntentManager1.PutExtraString('SCAN_MODE', 'QR_CODE_MODE');   //QR
-          2: jIntentManager1.PutExtraString('SCAN_FORMATS', 'CODE_39,CODE_93,CODE_128,DATA_MATRIX,ITF'); //others
-       end;
+         //ZXing Barcode Scanner to scan for us
+         jIntentManager1.StartActivityForResult(0);      //user-defined requestCode= 0
 
-       //ZXing Barcode Scanner to scan for us
-       jIntentManager1.StartActivityForResult(0);      //user-defined requestCode= 0
-
-   end
-   else  //download ZXing
-   begin
-      ShowMessage('Try downloading   ZXing App ...');
-      if not Self.IsWifiEnabled() then Self.SetWifiEnabled(True);
-      jIntentManager1.SetAction(jIntentManager1.GetActionViewAsString());
-      //or jIntentManager1.SetAction('android.intent.action.VIEW');
-      jIntentManager1.SetDataUri(jIntentManager1.ParseUri('market://search?q=pname:'+'com.google.zxing.client.android'));
-      jIntentManager1.StartActivity();
-   end;
+     end
+     else  //download ZXing
+     begin
+        ShowMessage('Try downloading   ZXing App ...');
+        if not Self.IsWifiEnabled() then Self.SetWifiEnabled(True);
+        jIntentManager1.SetAction(jIntentManager1.GetActionViewAsString());
+        //or jIntentManager1.SetAction('android.intent.action.VIEW');
+        jIntentManager1.SetDataUri(jIntentManager1.ParseUri('market://search?q=pname:'+'com.google.zxing.client.android'));
+        jIntentManager1.StartActivity();
+     end;
+  //end;
 end;
 
 procedure TAndroidModule1.AndroidModule1ActivityRst(Sender: TObject;

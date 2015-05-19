@@ -58,10 +58,11 @@
     <Version Value="11"/>
     <PathDelim Value="\"/>
     <Target>
-      <Filename Value="C:\adt32\eclipse\workspace\AppCameraDemo\libs\armeabi\controls"/>
+      <Filename Value="..\libs\armeabi\libcontrols.so"/>
     </Target>
     <SearchPaths>
-      <Libraries Value="C:\adt32\ndk9\platforms\android-14\arch-arm\usr\lib\"/>
+      <Libraries Value="C:\adt32\ndk10\platforms\android-15\arch-arm\usr\lib\;C:\adt32\ndk10\toolchains\arm-linux-androideabi-4.6\prebuilt\windows\lib\gcc\arm-linux-androideabi\4.6\"/>
+      <UnitOutputDirectory Value="..\obj\controls"/>
     </SearchPaths>
     <Parsing>
       <SyntaxOptions>
@@ -84,7 +85,7 @@
       </Options>
     </Linking>
     <Other>
-      <CustomOptions Value="-dANDROID -Xd -CpARMv6 -CfSoft -FLC:\adt32\ndk9\platforms\android-14\arch-arm\usr\lib\libdl.so -FUC:\adt32\eclipse\workspace\AppCameraDemo\obj\Controls -oC:\adt32\eclipse\workspace\AppCameraDemo\libs\armeabi\libcontrols.so"/>
+      <CustomOptions Value="-Xd -CfSoft -CpARMV6 -XParm-linux-androideabi- -FDC:\adt32\ndk10\toolchains\arm-linux-androideabi-4.6\prebuilt\windows\bin -o..\libs\armeabi\libcontrols.so"/>
     </Other>
   </CompilerOptions>
   <Debugging>

@@ -12,10 +12,10 @@ object AndroidModule1: TAndroidModule1
   BackgroundColor = colbrDefault
   OnActivityRst = AndroidModule1ActivityRst
   object jTextView1: jTextView
-    Left = 82
-    Top = 26
-    Width = 135
-    Height = 25
+    Left = 80
+    Top = 5
+    Width = 140
+    Height = 20
     MarginLeft = 5
     MarginTop = 5
     MarginRight = 5
@@ -64,10 +64,10 @@ object AndroidModule1: TAndroidModule1
     Id = 713760
   end
   object jTextView2: jTextView
-    Left = 14
-    Top = 69
-    Width = 135
-    Height = 25
+    Left = 5
+    Top = 35
+    Width = 118
+    Height = 20
     MarginLeft = 5
     MarginTop = 5
     MarginRight = 5
