@@ -110,6 +110,17 @@
 	*			or Go To: Lazarus IDE menu "Run--> [Lamw] Build and Run"! Thanks to Anton!!!
 	****************************************************************************************************
 
+Version 0.6 - rev. 26 - 21 May 2015 - 
+
+	NEW!  
+		jTCPSocketClient component
+
+	FIXED! 	
+		jHorizontalScrollView component
+	NEW!  
+		Demo AppHorizontalScrollViewDemo1 [Eclipse Compatible Project] 
+		Demo AppTCPClientDemo1 [Eclipse Compatible Project] 
+
 Version 0.6 - rev. 25 - 14 May 2015 - 
 
 	NEW!  

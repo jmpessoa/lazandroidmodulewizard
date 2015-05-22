@@ -1,0 +1,219 @@
+object AndroidModule1: TAndroidModule1
+  Left = 290
+  Top = 163
+  Width = 479
+  Height = 400
+  MarginLeft = 0
+  MarginTop = 0
+  MarginRight = 0
+  MarginBottom = 0
+  Text = 'AndroidModule1'
+  ActivityMode = actMain
+  BackgroundColor = colbrDefault
+  object jTextView1: jTextView
+    Left = 139
+    Top = 5
+    Width = 200
+    Height = 20
+    MarginLeft = 5
+    MarginTop = 5
+    MarginRight = 5
+    MarginBottom = 5
+    Visible = True
+    PosRelativeToAnchor = []
+    PosRelativeToParent = [rpTop, rpCenterHorizontal]
+    LayoutParamWidth = lpWrapContent
+    LayoutParamHeight = lpWrapContent
+    Text = 'App jHorizontalScrollView  Demo1'
+    Alignment = taLeft
+    Enabled = True
+    BackgroundColor = colbrDefault
+    FontColor = colbrDefault
+    FontSize = 0
+    TextTypeFace = tfNormal
+    Id = 7125476
+  end
+  object jHorizontalScrollView1: jHorizontalScrollView
+    Left = 11
+    Top = 51
+    Width = 460
+    Height = 96
+    Visible = True
+    Anchor = jTextView1
+    PosRelativeToAnchor = [raBelow]
+    PosRelativeToParent = []
+    LayoutParamWidth = lpMatchParent
+    LayoutParamHeight = lpWrapContent
+    ScrollSize = 1500
+    BackgroundColor = colbrDefault
+    Id = 0
+    object jImageView1: jImageView
+      Left = 5
+      Top = 29
+      Width = 48
+      Height = 48
+      Visible = True
+      PosRelativeToAnchor = []
+      PosRelativeToParent = [rpLeft, rpCenterVertical]
+      LayoutParamWidth = lpWrapContent
+      LayoutParamHeight = lpWrapContent
+      ImageIndex = 0
+      Images = jImageList1
+      BackgroundColor = colbrDefault
+      ImageScaleType = scaleCenter
+      Id = 9491395
+    end
+    object jImageView2: jImageView
+      Left = 53
+      Top = 29
+      Width = 48
+      Height = 48
+      Visible = True
+      Anchor = jImageView1
+      PosRelativeToAnchor = [raToRightOf]
+      PosRelativeToParent = [rpCenterVertical]
+      LayoutParamWidth = lpWrapContent
+      LayoutParamHeight = lpWrapContent
+      ImageIndex = 1
+      Images = jImageList1
+      BackgroundColor = colbrDefault
+      ImageScaleType = scaleCenter
+      Id = 7368519
+    end
+    object jImageView3: jImageView
+      Left = 101
+      Top = 29
+      Width = 48
+      Height = 48
+      Visible = True
+      Anchor = jImageView2
+      PosRelativeToAnchor = [raToRightOf]
+      PosRelativeToParent = [rpCenterVertical]
+      LayoutParamWidth = lpWrapContent
+      LayoutParamHeight = lpWrapContent
+      ImageIndex = 2
+      Images = jImageList1
+      BackgroundColor = colbrDefault
+      ImageScaleType = scaleCenter
+      Id = 3176041
+    end
+    object jImageView4: jImageView
+      Left = 149
+      Top = 29
+      Width = 48
+      Height = 48
+      Visible = True
+      Anchor = jImageView3
+      PosRelativeToAnchor = [raToRightOf]
+      PosRelativeToParent = [rpCenterVertical]
+      LayoutParamWidth = lpWrapContent
+      LayoutParamHeight = lpWrapContent
+      ImageIndex = 3
+      Images = jImageList1
+      BackgroundColor = colbrDefault
+      ImageScaleType = scaleCenter
+      Id = 7830337
+    end
+    object jImageView5: jImageView
+      Left = 197
+      Top = 29
+      Width = 48
+      Height = 48
+      Visible = True
+      Anchor = jImageView4
+      PosRelativeToAnchor = [raToRightOf]
+      PosRelativeToParent = [rpCenterVertical]
+      LayoutParamWidth = lpWrapContent
+      LayoutParamHeight = lpWrapContent
+      ImageIndex = 4
+      Images = jImageList1
+      BackgroundColor = colbrDefault
+      ImageScaleType = scaleCenter
+      OnClick = jImageView5Click
+      Id = 966852
+    end
+    object jImageView6: jImageView
+      Left = 245
+      Top = 29
+      Width = 48
+      Height = 48
+      Visible = True
+      Anchor = jImageView5
+      PosRelativeToAnchor = [raToRightOf]
+      PosRelativeToParent = [rpCenterVertical]
+      LayoutParamWidth = lpWrapContent
+      LayoutParamHeight = lpWrapContent
+      ImageIndex = 5
+      Images = jImageList1
+      BackgroundColor = colbrDefault
+      ImageScaleType = scaleCenter
+      Id = 6802120
+    end
+    object jImageView7: jImageView
+      Left = 293
+      Top = 29
+      Width = 48
+      Height = 48
+      Visible = True
+      Anchor = jImageView6
+      PosRelativeToAnchor = [raToRightOf]
+      PosRelativeToParent = [rpCenterVertical]
+      LayoutParamWidth = lpWrapContent
+      LayoutParamHeight = lpWrapContent
+      ImageIndex = 6
+      Images = jImageList1
+      BackgroundColor = colbrDefault
+      ImageScaleType = scaleCenter
+      Id = 5615354
+    end
+    object jImageView8: jImageView
+      Left = 341
+      Top = 29
+      Width = 48
+      Height = 48
+      Visible = True
+      Anchor = jImageView7
+      PosRelativeToAnchor = [raToRightOf]
+      PosRelativeToParent = [rpCenterVertical]
+      LayoutParamWidth = lpWrapContent
+      LayoutParamHeight = lpWrapContent
+      ImageIndex = 7
+      Images = jImageList1
+      BackgroundColor = colbrDefault
+      ImageScaleType = scaleCenter
+      Id = 4654441
+    end
+    object jImageView9: jImageView
+      Left = 389
+      Top = 29
+      Width = 48
+      Height = 48
+      Visible = True
+      Anchor = jImageView8
+      PosRelativeToAnchor = [raToRightOf]
+      PosRelativeToParent = [rpCenterVertical]
+      LayoutParamWidth = lpWrapContent
+      LayoutParamHeight = lpWrapContent
+      ImageIndex = 8
+      Images = jImageList1
+      BackgroundColor = colbrDefault
+      ImageScaleType = scaleCenter
+      Id = 0
+    end
+  end
+  object jImageList1: jImageList
+    Images.Strings = (
+      'btn1_1.png'
+      'image01.png'
+      'lamw_logo.png'
+      'image02.png'
+      'lazarus_logo.png'
+      'lemur_toy.jpg'
+      'caravel.jpg'
+      'btn1_2.png'
+      'lemur_face.jpg'
+    )
+    left = 208
+    top = 176
+  end
+end

@@ -2,7 +2,7 @@ package com.example.dummyapp;
 
 //Lamw: Lazarus Android Module Wizard 
 //Form Designer and Components development model!
-//version 0.6 - revision 25 - 14 May - 2015
+//version 0.6 - revision 26 - 21 May - 2015
 //
 //https://github.com/jmpessoa/lazandroidmodulewizard
 //http://forum.lazarus.freepascal.org/index.php/topic,21919.270.html
@@ -114,6 +114,7 @@ import android.opengl.GLSurfaceView;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
@@ -216,6 +217,8 @@ import java.io.*;
 import java.lang.*;
 
 import java.net.HttpURLConnection;
+import java.net.InetAddress;
+import java.net.Socket;
 //import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
@@ -939,6 +942,40 @@ public void ShowCustomMessage(RelativeLayout _layout,  int _gravity) {
     toast.show();
 }
 
+private class MyCountDownTimer extends CountDownTimer {
+	  Toast toast;
+	  public MyCountDownTimer(long startTime, long interval, Toast toas) {
+	     super(startTime, interval);
+	     toast = toas;
+	  }
+	  @Override
+	  public void onFinish() {
+	   //text.setText("Time's up!");
+		  toast.cancel();
+	  }
+	  @Override
+	  public void onTick(long millisUntilFinished) {
+	   //text.setText("" + millisUntilFinished / 1000);
+		  toast.show();
+	  }	 	  
+}
+
+public void ShowCustomMessage(RelativeLayout _layout,  int _gravity,  int _lenghTimeSecond) {
+    Toast toast = new Toast(controls.activity);   
+    toast.setGravity(_gravity, 0, 0);    
+    //toast.setDuration(Toast.LENGTH_LONG);    
+    RelativeLayout par = (RelativeLayout)_layout.getParent();
+	if (par != null) {
+	    par.removeView(_layout);        	    
+	}    
+    _layout.setVisibility(0);
+    toast.setView(_layout);    				
+    //it will show the toast for 20 seconds: 
+    //(20000 milliseconds/1st argument) with interval of 1 second/2nd argument //--> (20 000, 1000)
+    MyCountDownTimer countDownTimer = new MyCountDownTimer(_lenghTimeSecond*1000, 1000, toast);
+    countDownTimer.start();
+}
+
 public void SetScreenOrientation(int _orientation) {
 	//Log.i("Screen","Orientation "+ _orientation);
     switch(_orientation) {
@@ -1003,6 +1040,10 @@ public String GetScreenSize() {
     	r = "SMALL";
     }
 	return r;
+}
+
+public void LogDebug(String _tag, String  _msg) {
+   Log.d(_tag, _msg);  //debug
 }
 
 }
@@ -11935,6 +11976,150 @@ class jDigitalClock extends DigitalClock /*TextClock*/ { //please, fix what GUI 
 	  
 } //end class
 
+/**
+ *         ref. http://www.myandroidsolutions.com/2013/03/31/android-tcp-connection-enhanced/
+ *         ref. http://www.darksleep.com/player/SocketExample/
+ */
+
+class jTCPSocketClient {
+
+    private long  pascalObj = 0;      // Pascal Object
+    Controls controls;    
+    private Context  context   = null;
+    
+    private String SERVER_IP = "" ;//"192.168.0.100"   
+    private int SERVER_PORT;
+       
+    // message to send to the server
+    private String mServerMessage;
+    
+    private boolean mRun = false;
+    // used to send messages
+    private PrintWriter mBufferOut;
+    // used to read messages from the server
+    private BufferedReader mBufferIn;
+    private Socket mSocket;
+    
+    //TCPSocketClientTask task;
+           	
+    public jTCPSocketClient(Controls _ctrls, long _Self) { //Add more others news "_xxx" params if needed!
+    	   //super(_ctrls.activity);
+ 	       context   = _ctrls.activity;
+    	   pascalObj = _Self;
+    	   controls  = _ctrls; 	
+    }
+
+    public void jFree() {
+       //free local objects...
+        mBufferOut= null;;
+        mBufferIn= null;
+        mSocket= null;    	
+    }
+   
+    /**
+     * Sends the message entered by client to the server
+     */   
+    public void SendMessage(String message) {
+    	
+        if (mBufferOut != null && !mBufferOut.checkError()) {
+            mBufferOut.println(message);
+            mBufferOut.flush();
+        }
+    }
+     
+    //write others [public] methods code here......
+    //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
+         
+    public void Connect(String _serverIP, int _serverPort) {
+    	  
+          SERVER_IP = _serverIP;          //IP address
+          SERVER_PORT = _serverPort;       //port number;
+          if (mSocket != null) {
+        	  try {
+				mSocket.close();
+				mSocket = null;
+			  } catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			  }
+          }
+          
+          try {
+              InetAddress serverAddr = InetAddress.getByName(SERVER_IP);
+			  mSocket = new Socket(serverAddr, SERVER_PORT);
+		  } catch (IOException e) {
+			  // TODO Auto-generated catch block
+		      e.printStackTrace();
+		  }
+          
+          controls.pOnTCPSocketClientConnected(pascalObj);         
+          new TCPSocketClientTask().execute();                                    	  
+      }
+            
+     public void Connect(String _serverIP, int _serverPort, String _login) {    	  
+    	 Connect(_serverIP,_serverPort);
+    	 SendMessage(_login);       	  
+      }
+     
+      public void CloseConnection(String _finalMessage) {                
+          mRun = false;        
+                        
+          if (mBufferOut != null) {
+               mBufferOut.flush();
+          }
+          if (_finalMessage.equals("")) 
+              SendMessage("client_closed");
+          else SendMessage(_finalMessage);
+      }
+      
+      public void CloseConnection() {
+      	CloseConnection("client_closed");
+      }
+                  
+      class TCPSocketClientTask extends AsyncTask<String, String, String> {
+      	
+          @Override
+          protected String doInBackground(String... message) {               
+              mRun = true;
+              while (mRun) {
+                    if ( mSocket!= null && !mSocket.isClosed()) {             		
+                        try {                    	
+    						mBufferOut = new PrintWriter(new BufferedWriter(new OutputStreamWriter(mSocket.getOutputStream())), true);
+    	                    mBufferIn = new BufferedReader(new InputStreamReader(mSocket.getInputStream()));              
+    	                    //in this while the client listens for the messages sent by the server
+    	                    if (mBufferIn != null)
+    	                           mServerMessage = mBufferIn.readLine();
+    	                    if (mServerMessage != null )                     	
+    	                       	 publishProgress(mServerMessage);
+    					} catch (IOException e) {
+    						// TODO Auto-generated catch block
+    						Log.e("jTCPSocketClient", "Error_doInBackground", e);
+    						e.printStackTrace();
+    					}                                 	                                         
+               	    }        	        	             
+              }
+              return null;
+          }
+
+          @Override
+          protected void onProgressUpdate(String... values) {
+              super.onProgressUpdate(values);
+              controls.pOnTCPSocketClientMessageReceived(pascalObj ,values);
+          }
+          
+          @Override
+          protected void onPostExecute(String values) {    	  
+            super.onPostExecute(values);   	  
+            try {                	
+         	   
+     			mSocket.close();
+     	    } catch (IOException e) {
+     			// TODO Auto-generated catch block
+     			e.printStackTrace();
+     	    }            
+          }
+        }            
+}
 
 
 //**new jclass entrypoint**//please, do not remove/change this line!
@@ -12042,6 +12227,9 @@ public native void pOnFlingGestureDetected(long pasobj, int direction);
 public native void pOnPinchZoomGestureDetected(long pasobj, float scaleFactor, int state); 
 
 public native void pOnShellCommandExecuted(long pasobj, String cmdResult);
+
+public native void pOnTCPSocketClientMessageReceived(long pasobj, String[] messagesReceived);
+public native void pOnTCPSocketClientConnected(long pasobj);
 
 //Load Pascal Library
 static {
@@ -12595,6 +12783,12 @@ public  java.lang.Object jScrollView_Create(long pasobj ) {
 }
 
 //-------------------------------------------------------------------------
+//HorizontalScrollView: Create
+//-------------------------------------------------------------------------
+public  java.lang.Object jHorizontalScrollView_Create(long pasobj ) {
+	return (java.lang.Object)( new jHorizontalScrollView(this.activity,this,pasobj));
+}
+//-------------------------------------------------------------------------
 //Panel: Create - new by jmpessoa
 //-------------------------------------------------------------------------
 public  java.lang.Object jPanel_Create(long pasobj ) {
@@ -13081,6 +13275,10 @@ public float[] benchMark1 () {
    
    public java.lang.Object jDigitalClock_jCreate(long _Self) {
 	      return (java.lang.Object)(new jDigitalClock(this,_Self));
+   }
+   
+   public java.lang.Object jTCPSocketClient_jCreate(long _Self) {
+	      return (java.lang.Object)(new jTCPSocketClient(this,_Self));
    }
    
 }

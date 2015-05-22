@@ -141,6 +141,11 @@ begin
       jScrollView(FParent).Init(refApp);
       FjPRLayout:= jScrollView_getView(FjEnv, jScrollView(FParent).jSelf); //FjPRLayout:= jScrollView(FParent).View;
     end;
+    if FParent is jHorizontalScrollView then
+    begin
+      jHorizontalScrollView(FParent).Init(refApp);
+      FjPRLayout:= jHorizontalScrollView_getView(FjEnv, jHorizontalScrollView(FParent).jSelf);
+    end;
   end;
 
   jCustomDialog_SetViewParent(FjEnv, FjObject, FjPRLayout);

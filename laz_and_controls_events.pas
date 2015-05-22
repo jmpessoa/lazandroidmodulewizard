@@ -49,6 +49,8 @@ uses
    Procedure Java_Event_pOnDatePicker(env: PJNIEnv; this: jobject; Obj: TObject; year: integer; monthOfYear: integer; dayOfMonth: integer);
 
    Procedure Java_Event_pOnShellCommandExecuted(env: PJNIEnv; this: jobject; Obj: TObject; cmdResult: jString);
+   Procedure Java_Event_pOnTCPSocketClientMessageReceived(env: PJNIEnv; this: jobject; Obj: TObject; messagesReceived: JStringArray);
+   Procedure Java_Event_pOnTCPSocketClientConnected(env: PJNIEnv; this: jobject; Obj: TObject);
 
 implementation
 
@@ -56,7 +58,7 @@ uses
 
    AndroidWidget, bluetooth, bluetoothclientsocket, bluetoothserversocket,
    spinner, location, actionbartab, customdialog, togglebutton, switchbutton, gridview,
-   sensormanager, broadcastreceiver, datepickerdialog, timepickerdialog, shellcommand;
+   sensormanager, broadcastreceiver, datepickerdialog, timepickerdialog, shellcommand, tcpsocketclient;
 
 procedure Java_Event_pOnBluetoothEnabled(env: PJNIEnv; this: jobject; Obj: TObject);
 begin
@@ -512,7 +514,7 @@ begin
   gApp.Jni.jThis:= this;
   if Obj is jToggleButton then
   begin
-    jToggleButton(Obj).UpdateJNI(gApp);
+    jForm(jLocation(Obj).Owner).UpdateJNI(gApp);
     jToggleButton(Obj).GenEvent_OnClickToggleButton(Obj, state);
   end;
 end;
@@ -523,7 +525,7 @@ begin
   gApp.Jni.jThis:= this;
   if Obj is jSwitchButton then
   begin
-    jSwitchButton(Obj).UpdateJNI(gApp);
+    jForm(jLocation(Obj).Owner).UpdateJNI(gApp);
     jSwitchButton(Obj).GenEvent_OnChangeSwitchButton(Obj, state);
   end;
 end;
@@ -537,7 +539,7 @@ begin
   gApp.Jni.jThis:= this;
   if Obj is jGridView then
   begin
-    jGridView(Obj).UpdateJNI(gApp);
+    jForm(jLocation(Obj).Owner).UpdateJNI(gApp);
     pasCaption:= '';
     if caption <> nil then
     begin
@@ -563,7 +565,7 @@ begin
   gApp.Jni.jThis:= this;
   if Obj is jSensorManager then
   begin
-    jSensorManager(Obj).UpdateJNI(gApp);
+    jForm(jLocation(Obj).Owner).UpdateJNI(gApp);
     jSensorManager(Obj).GenEvent_OnChangedSensor(Obj, sensor, sensorType, arrayResult, timestamp{sizeArray});
   end;
 
@@ -575,7 +577,7 @@ begin
   gApp.Jni.jThis:= this;
   if Obj is jSensorManager then
   begin
-    jSensorManager(Obj).UpdateJNI(gApp);
+    jForm(jLocation(Obj).Owner).UpdateJNI(gApp);
     jSensorManager(Obj).GenEvent_OnListeningSensor(Obj, sensor, sensorType);
   end;
 end;
@@ -589,7 +591,7 @@ begin
   gApp.Jni.jThis:= this;
   if Obj is jSensorManager then
   begin
-    jSensorManager(Obj).UpdateJNI(gApp);
+    jForm(jLocation(Obj).Owner).UpdateJNI(gApp);
     pasSensorName:= '';
     if sensorName <> nil then
     begin
@@ -606,7 +608,7 @@ begin
   gApp.Jni.jThis:= this;
   if Obj is jBroadcastReceiver then
   begin
-    jBroadcastReceiver(Obj).UpdateJNI(gApp);
+    jForm(jBroadcastReceiver(Obj).Owner).UpdateJNI(gApp);
     jBroadcastReceiver(Obj).GenEvent_OnBroadcastReceiver(Obj,  intent);
   end;
 end;
@@ -618,7 +620,7 @@ begin
   gApp.Jni.jThis:= this;
   if Obj is jTimePickerDialog then
   begin
-    jTimePickerDialog(Obj).UpdateJNI(gApp);
+    jForm(jTimePickerDialog(Obj).Owner).UpdateJNI(gApp);
     jTimePickerDialog(Obj).GenEvent_OnTimePicker(Obj, hourOfDay, minute);
   end;
 end;
@@ -629,7 +631,7 @@ begin
   gApp.Jni.jThis:= this;
   if Obj is jDatePickerDialog then
   begin
-    jDatePickerDialog(Obj).UpdateJNI(gApp);
+    jForm(jDatePickerDialog(Obj).Owner).UpdateJNI(gApp);
     jDatePickerDialog(Obj).GenEvent_OnDatePicker(Obj,  year, monthOfYear, dayOfMonth);
   end;
 end;
@@ -643,7 +645,7 @@ begin
   gApp.Jni.jThis:= this;
   if Obj is jShellCommand then
   begin
-    jShellCommand(Obj).UpdateJNI(gApp);
+    jForm(jShellCommand(Obj).Owner).UpdateJNI(gApp);
     pascmdResult:= '';
     if cmdResult <> nil then
     begin
@@ -651,6 +653,50 @@ begin
       pascmdResult:= string(env^.GetStringUTFChars(Env, cmdResult,@_jBoolean) );
     end;
     jShellCommand(Obj).GenEvent_OnShellCommandExecuted(Obj, pascmdResult);
+  end;
+end;
+
+Procedure Java_Event_pOnTCPSocketClientMessageReceived(env: PJNIEnv; this: jobject; Obj: TObject; messagesReceived: JStringArray);
+var
+   pasmessagesReceived: array of string;
+   i, messageSize: integer;
+   jStr: jObject;
+   jBoo: jBoolean;
+begin
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+  if Obj is jTCPSocketClient then
+  begin
+    jForm(jTCPSocketClient(Obj).Owner).UpdateJNI(gApp);
+    if messagesReceived <> nil then
+    begin
+      messageSize:= env^.GetArrayLength(env, messagesReceived);
+      SetLength(pasmessagesReceived, messageSize);
+      for i:= 0 to messageSize - 1 do
+      begin
+        jStr:= env^.GetObjectArrayElement(env, messagesReceived, i);
+        case jStr = nil of
+           True : pasmessagesReceived[i]:= '';
+           False: begin
+                    jBoo:= JNI_False;
+                    pasmessagesReceived[i]:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
+                   end;
+        end;
+      end;
+    end;
+    jTCPSocketClient(Obj).GenEvent_OnTCPSocketClientMessagesReceived(Obj, pasmessagesReceived);
+  end;
+end;
+
+
+Procedure Java_Event_pOnTCPSocketClientConnected(env: PJNIEnv; this: jobject; Obj: TObject);
+begin
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+  if Obj is jTCPSocketClient then
+  begin
+    jForm(jBluetooth(Obj).Owner).UpdateJNI(gApp);
+    jTCPSocketClient(Obj).GenEvent_OnTCPSocketClientConnected(Obj);
   end;
 end;
 

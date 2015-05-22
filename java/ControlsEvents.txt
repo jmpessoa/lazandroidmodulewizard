@@ -64,3 +64,5 @@ pOnDatePicker=Java_Event_pOnDatePicker(PEnv,this,TObject(pasobj),year,monthOfYea
 pOnFlingGestureDetected=Java_Event_pOnFlingGestureDetected(PEnv,this,TObject(pasobj),direction);
 pOnPinchZoomGestureDetected=Java_Event_pOnPinchZoomGestureDetected(PEnv,this,TObject(pasobj),scaleFactor,state);
 pOnShellCommandExecuted=Java_Event_pOnShellCommandExecuted(PEnv,this,TObject(pasobj),cmdResult);
+pOnTCPSocketClientMessageReceived=Java_Event_pOnTCPSocketClientMessageReceived(PEnv,this,TObject(pasobj),messagesReceived);
+pOnTCPSocketClientConnected=Java_Event_pOnTCPSocketClientConnected(PEnv,this,TObject(pasobj));

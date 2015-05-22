@@ -1080,6 +1080,7 @@ type
     procedure UpdateLParamWidth;
   protected
     procedure SetViewParent(Value: jObject);  override;
+    function GetView: jObject; override;
   public
     constructor Create(AOwner: TComponent); override;
     Destructor  Destroy; override;
@@ -1089,10 +1090,9 @@ type
     // Property
   published
     property ScrollSize: integer read FScrollSize write SetScrollSize;
-    property BackgroundColor     : TARGBColorBridge read FColor      write SetColor;
+    property BackgroundColor: TARGBColorBridge read FColor      write SetColor;
   end;
 
-  //----------
 
   jHorizontalScrollView = class(jVisualControl)
   private
@@ -1103,6 +1103,7 @@ type
     procedure UpdateLParamWidth;
   protected
     procedure SetViewParent(Value: jObject); override;
+    function GetView: jObject; override;
   public
     constructor Create(AOwner: TComponent); override;
     Destructor  Destroy; override;
@@ -2067,7 +2068,11 @@ begin
     jScrollView(FParent).Init(refApp);
     FjPRLayout:= jScrollView_getView(FjEnv, jScrollView(FParent).jSelf);
   end;
-
+  if FParent is jHorizontalScrollView then
+  begin
+    jHorizontalScrollView(FParent).Init(refApp);
+    FjPRLayout:= jHorizontalScrollView_getView(FjEnv, jHorizontalScrollView(FParent).jSelf);
+  end;
   if FParent is jCustomDialog then
   begin
     jCustomDialog(FParent).Init(refApp);
@@ -2370,6 +2375,11 @@ begin
   begin
     jScrollView(FParent).Init(refApp);
     FjPRLayout:= jScrollView_getView(FjEnv, jScrollView(FParent).jSelf);
+  end;
+  if FParent is jHorizontalScrollView then
+  begin
+    jHorizontalScrollView(FParent).Init(refApp);
+    FjPRLayout:= jHorizontalScrollView_getView(FjEnv, jHorizontalScrollView(FParent).jSelf);
   end;
   if FParent is jCustomDialog then
   begin
@@ -3104,7 +3114,11 @@ begin
     jScrollView(FParent).Init(refApp);
     FjPRLayout:= jScrollView_getView(FjEnv, jScrollView(FParent).jSelf);
   end;
-
+  if FParent is jHorizontalScrollView then
+  begin
+    jHorizontalScrollView(FParent).Init(refApp);
+    FjPRLayout:= jHorizontalScrollView_getView(FjEnv, jHorizontalScrollView(FParent).jSelf);
+  end;
   if FParent is jCustomDialog then
   begin
     jCustomDialog(FParent).Init(refApp);
@@ -3334,6 +3348,11 @@ begin
   begin
     jScrollView(FParent).Init(refApp);
     FjPRLayout:= jScrollView_getView(FjEnv, jScrollView(FParent).jSelf);
+  end;
+  if FParent is jHorizontalScrollView then
+  begin
+    jHorizontalScrollView(FParent).Init(refApp);
+    FjPRLayout:= jHorizontalScrollView_getView(FjEnv, jHorizontalScrollView(FParent).jSelf);
   end;
   if FParent is jCustomDialog then
   begin
@@ -3571,6 +3590,11 @@ begin
       jScrollView(FParent).Init(refApp);
       FjPRLayout:= jScrollView_getView(FjEnv, jScrollView(FParent).jSelf);
     end;
+    if FParent is jHorizontalScrollView then
+    begin
+      jHorizontalScrollView(FParent).Init(refApp);
+      FjPRLayout:= jHorizontalScrollView_getView(FjEnv, jHorizontalScrollView(FParent).jSelf);
+    end;
     if FParent is jCustomDialog then
     begin
       jCustomDialog(FParent).Init(refApp);
@@ -3795,12 +3819,16 @@ begin
     jScrollView(FParent).Init(refApp);
     FjPRLayout:= jScrollView_getView(FjEnv, jScrollView(FParent).jSelf);//jScrollView(FParent).View;
   end;
+  if FParent is jHorizontalScrollView then
+  begin
+    jHorizontalScrollView(FParent).Init(refApp);
+    FjPRLayout:= jHorizontalScrollView_getView(FjEnv, jHorizontalScrollView(FParent).jSelf);//jHorizontalScrollView(FParent).View;
+  end;
   if FParent is jCustomDialog then
   begin
     jCustomDialog(FParent).Init(refApp);
     FjPRLayout:= jCustomDialog(FParent).View;
   end;
-
 
   jImageView_setParent(FjEnv,FjObject , FjPRLayout);
   jImageView_setId(FjEnv, FjObject , Self.Id);
@@ -4625,6 +4653,11 @@ begin
       jScrollView(FParent).Init(refApp);
       FjPRLayout:= jScrollView_getView(FjEnv, jScrollView(FParent).jSelf);
     end;
+    if FParent is jHorizontalScrollView then
+    begin
+      jHorizontalScrollView(FParent).Init(refApp);
+      FjPRLayout:= jHorizontalScrollView_getView(FjEnv, jHorizontalScrollView(FParent).jSelf);
+    end;
     if FParent is jCustomDialog then
     begin
       jCustomDialog(FParent).Init(refApp);
@@ -5050,7 +5083,7 @@ begin
 
   FjObject := jScrollView_Create(FjEnv,  FjThis, Self); //View  !!!
   FInitialized:= True;
-  FjRLayout:= jScrollView_getView(FjEnv, FjObject ); //Self.View
+  //FjRLayout:= jScrollView_getView(FjEnv, FjObject ); //Self.View
 
   if FParent <> nil then
   begin
@@ -5063,6 +5096,11 @@ begin
     begin
       jScrollView(FParent).Init(refApp);
       FjPRLayout:=  jScrollView_getView(FjEnv, jScrollView(FParent).jSelf); //jScrollView(FParent).View;
+    end;
+    if FParent is jHorizontalScrollView then
+    begin
+      jHorizontalScrollView(FParent).Init(refApp);
+      FjPRLayout:= jHorizontalScrollView_getView(FjEnv, jHorizontalScrollView(FParent).jSelf);
     end;
     if FParent is jCustomDialog then
     begin
@@ -5115,6 +5153,12 @@ begin
   FjPRLayout:= Value;
   if FInitialized then
     jScrollView_setParent(FjEnv, FjObject , FjPRLayout);
+end;
+
+function jScrollView.GetView: jObject;
+begin
+    if FInitialized then
+       Result:= jScrollView_getView(FjEnv, FjObject);
 end;
 
 Procedure jScrollView.SetColor(Value: TARGBColorBridge);
@@ -5205,12 +5249,14 @@ end;
 Constructor jHorizontalScrollView.Create(AOwner: TComponent);
  begin
   inherited Create(AOwner);
-  FScrollSize := 800;
+  FScrollSize := 800; //to scrolling images this number could be higher....
 
   FLParamWidth:= lpMatchParent;
   FLParamHeight:= lpWrapContent;
   FHeight:= 96;
   FWidth:= 100;
+  //FAcceptChildsAtDesignTime:= True;
+  FAcceptChildrenAtDesignTime:= True;
  end;
 
 Destructor jHorizontalScrollView.Destroy;
@@ -5236,8 +5282,6 @@ begin
   FjObject  := jHorizontalScrollView_Create(FjEnv, FjThis, Self);
   FInitialized:= True;
 
-  FjRLayout:= jHorizontalScrollView_getView(FjEnv, FjObject ); //self.View
-
   if FParent <> nil then
   begin
     if FParent is jPanel then
@@ -5245,11 +5289,18 @@ begin
       jPanel(FParent).Init(refApp);
       FjPRLayout:= jPanel(FParent).View;
     end;
+
     if FParent is jScrollView then
     begin
       jScrollView(FParent).Init(refApp);
-      FjPRLayout:= jHorizontalScrollView_getView(FjEnv, jScrollView(FParent).jSelf ) //jScrollView(FParent).View;
+      FjPRLayout:= jScrollView_getView(FjEnv, jScrollView(FParent).jSelf ) //jScrollView(FParent).View;
     end;
+    if FParent is jHorizontalScrollView then
+    begin
+      jHorizontalScrollView(FParent).Init(refApp);
+      FjPRLayout:= jHorizontalScrollView_getView(FjEnv, jHorizontalScrollView(FParent).jSelf);
+    end;
+
     if FParent is jCustomDialog then
     begin
       jCustomDialog(FParent).Init(refApp);
@@ -5292,6 +5343,12 @@ begin
   FjPRLayout:= Value;
   if FInitialized then
     jHorizontalScrollView_setParent(FjEnv, FjObject , FjPRLayout);
+end;
+
+function jHorizontalScrollView.GetView: jObject;
+begin
+    if FInitialized then
+       Result:= jHorizontalScrollView_getView(FjEnv, FjObject);
 end;
 
 Procedure jHorizontalScrollView.SetColor(Value: TARGBColorBridge);
@@ -5416,6 +5473,11 @@ begin
     begin
       jScrollView(FParent).Init(refApp);
       FjPRLayout:= jScrollView_getView(FjEnv, jScrollView(FParent).jSelf);
+    end;
+    if FParent is jHorizontalScrollView then
+    begin
+      jHorizontalScrollView(FParent).Init(refApp);
+      FjPRLayout:= jHorizontalScrollView_getView(FjEnv, jHorizontalScrollView(FParent).jSelf);
     end;
     if FParent is jCustomDialog then
     begin
@@ -5584,6 +5646,11 @@ begin
     begin
       jScrollView(FParent).Init(refApp);
       FjPRLayout:= jScrollView_getView(FjEnv, jScrollView(FParent).jSelf);
+    end;
+    if FParent is jHorizontalScrollView then
+    begin
+      jHorizontalScrollView(FParent).Init(refApp);
+      FjPRLayout:= jHorizontalScrollView_getView(FjEnv, jHorizontalScrollView(FParent).jSelf )
     end;
     if FParent is jCustomDialog then
     begin
@@ -6351,6 +6418,11 @@ begin
       jScrollView(FParent).Init(refApp);
       FjPRLayout:= jScrollView_getView(FjEnv, jScrollView(FParent).jSelf);
     end;
+    if FParent is jHorizontalScrollView then
+    begin
+      jHorizontalScrollView(FParent).Init(refApp);
+      FjPRLayout:= jHorizontalScrollView_getView(FjEnv, jHorizontalScrollView(FParent).jSelf);
+    end;
     if FParent is jCustomDialog then
     begin
       jCustomDialog(FParent).Init(refApp);
@@ -6766,6 +6838,11 @@ begin
     begin
       jScrollView(FParent).Init(refApp);
       FjPRLayout:= jScrollView_getView(FjEnv, jScrollView(FParent).jSelf);
+    end;
+    if FParent is jHorizontalScrollView then
+    begin
+      jHorizontalScrollView(FParent).Init(refApp);
+      FjPRLayout:= jHorizontalScrollView_getView(FjEnv, jHorizontalScrollView(FParent).jSelf )
     end;
     if FParent is jCustomDialog then
     begin
@@ -7580,6 +7657,11 @@ begin
     begin
       jScrollView(FParent).Init(refApp);
       FjPRLayout:= jScrollView_getView(FjEnv, jScrollView(FParent).jSelf);
+    end;
+    if FParent is jHorizontalScrollView then
+    begin
+      jHorizontalScrollView(FParent).Init(refApp);
+      FjPRLayout:= jHorizontalScrollView_getView(FjEnv, jHorizontalScrollView(FParent).jSelf);
     end;
     if FParent is jCustomDialog then
     begin

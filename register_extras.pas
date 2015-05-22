@@ -8,6 +8,7 @@ interface
 
 uses 
   Classes,
+  tcpsocketclient,
   digitalclock,
   analogclock,
   shellcommand,
@@ -48,6 +49,7 @@ implementation
   
 Procedure Register;
 begin
+  {$I jtcpsocketclient_icon.lrs}
   {$I jdigitalclock_icon.lrs}
   {$I janalogclock_icon.lrs}
   {$I jshellcommand_icon.lrs}
@@ -79,6 +81,7 @@ begin
   {$I jhelloadder_icon.lrs}
   RegisterComponents('Android Bridges Extra',
     [
+      jTCPSocketClient,
       jDigitalClock,
       jAnalogClock,
       jShellCommand,

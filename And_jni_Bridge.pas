@@ -4270,7 +4270,7 @@ var
   cls: jClass;
  begin
   cls := env^.GetObjectClass(env, ScrollView);
- _jMethod:= env^.GetMethodID(env, cls, 'getView', '()Landroid/view/ViewGroup;');
+ _jMethod:= env^.GetMethodID(env, cls, 'getView', '()Landroid/widget/RelativeLayout;'); //Landroid/view/ViewGroup;
   Result := env^.CallObjectMethod(env,ScrollView,_jMethod);
  end;
 
