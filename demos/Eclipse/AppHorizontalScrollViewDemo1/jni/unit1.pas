@@ -17,6 +17,15 @@ type
     jHorizontalScrollView1: jHorizontalScrollView;
     jImageList1: jImageList;
     jImageView1: jImageView;
+    jImageView10: jImageView;
+    jImageView11: jImageView;
+    jImageView12: jImageView;
+    jImageView13: jImageView;
+    jImageView14: jImageView;
+    jImageView15: jImageView;
+    jImageView16: jImageView;
+    jImageView17: jImageView;
+    jImageView18: jImageView;
     jImageView2: jImageView;
     jImageView3: jImageView;
     jImageView4: jImageView;
@@ -25,6 +34,7 @@ type
     jImageView7: jImageView;
     jImageView8: jImageView;
     jImageView9: jImageView;
+    jScrollView1: jScrollView;
     jTextView1: jTextView;
     procedure jImageView5Click(Sender: TObject);
   private
@@ -46,7 +56,7 @@ implementation
 
 procedure TAndroidModule1.jImageView5Click(Sender: TObject);
 begin
-   ShowMessage(jImageList1.GetImageByIndex(jImageView5.ImageIndex));
+  ShowMessage(jImageList1.GetImageByIndex(jImageView5.ImageIndex));
 end;
 
 end.

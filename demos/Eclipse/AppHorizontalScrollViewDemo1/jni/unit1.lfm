@@ -1,8 +1,8 @@
 object AndroidModule1: TAndroidModule1
-  Left = 290
-  Top = 163
+  Left = 297
+  Top = 78
   Width = 479
-  Height = 400
+  Height = 611
   MarginLeft = 0
   MarginTop = 0
   MarginRight = 0
@@ -46,7 +46,7 @@ object AndroidModule1: TAndroidModule1
     LayoutParamHeight = lpWrapContent
     ScrollSize = 1500
     BackgroundColor = colbrDefault
-    Id = 0
+    Id = 4553114
     object jImageView1: jImageView
       Left = 5
       Top = 29
@@ -201,6 +201,173 @@ object AndroidModule1: TAndroidModule1
       Id = 0
     end
   end
+  object jScrollView1: jScrollView
+    Left = 11
+    Top = 148
+    Width = 463
+    Height = 196
+    Visible = True
+    Anchor = jHorizontalScrollView1
+    PosRelativeToAnchor = [raBelow]
+    PosRelativeToParent = []
+    LayoutParamWidth = lpMatchParent
+    LayoutParamHeight = lpOneThirdOfParent
+    ScrollSize = 1500
+    BackgroundColor = colbrLightBlue
+    Id = 0
+    object jImageView10: jImageView
+      Left = 195
+      Top = 0
+      Width = 48
+      Height = 48
+      Visible = True
+      PosRelativeToAnchor = []
+      PosRelativeToParent = [rpTop, rpCenterHorizontal]
+      LayoutParamWidth = lpWrapContent
+      LayoutParamHeight = lpWrapContent
+      ImageIndex = 0
+      Images = jImageList1
+      BackgroundColor = colbrDefault
+      ImageScaleType = scaleCenter
+      Id = 6235117
+    end
+    object jImageView11: jImageView
+      Left = 195
+      Top = 56
+      Width = 48
+      Height = 48
+      Visible = True
+      Anchor = jImageView10
+      PosRelativeToAnchor = [raBelow]
+      PosRelativeToParent = [rpCenterHorizontal]
+      LayoutParamWidth = lpWrapContent
+      LayoutParamHeight = lpWrapContent
+      ImageIndex = 1
+      Images = jImageList1
+      BackgroundColor = colbrDefault
+      ImageScaleType = scaleCenter
+      Id = 167710
+    end
+    object jImageView12: jImageView
+      Left = 196
+      Top = 112
+      Width = 48
+      Height = 48
+      Visible = True
+      Anchor = jImageView11
+      PosRelativeToAnchor = [raBelow]
+      PosRelativeToParent = [rpCenterHorizontal]
+      LayoutParamWidth = lpWrapContent
+      LayoutParamHeight = lpWrapContent
+      ImageIndex = 2
+      Images = jImageList1
+      BackgroundColor = colbrDefault
+      ImageScaleType = scaleCenter
+      Id = 1530270
+    end
+    object jImageView13: jImageView
+      Left = 195
+      Top = 168
+      Width = 48
+      Height = 48
+      Visible = True
+      Anchor = jImageView12
+      PosRelativeToAnchor = [raBelow]
+      PosRelativeToParent = [rpCenterHorizontal]
+      LayoutParamWidth = lpWrapContent
+      LayoutParamHeight = lpWrapContent
+      ImageIndex = 3
+      Images = jImageList1
+      BackgroundColor = colbrDefault
+      ImageScaleType = scaleCenter
+      Id = 4321755
+    end
+    object jImageView14: jImageView
+      Left = 195
+      Top = 224
+      Width = 48
+      Height = 48
+      Visible = True
+      Anchor = jImageView13
+      PosRelativeToAnchor = [raBelow]
+      PosRelativeToParent = [rpCenterHorizontal]
+      LayoutParamWidth = lpWrapContent
+      LayoutParamHeight = lpWrapContent
+      ImageIndex = 4
+      Images = jImageList1
+      BackgroundColor = colbrDefault
+      ImageScaleType = scaleCenter
+      Id = 5867249
+    end
+    object jImageView15: jImageView
+      Left = 195
+      Top = 280
+      Width = 48
+      Height = 48
+      Visible = True
+      Anchor = jImageView14
+      PosRelativeToAnchor = [raBelow]
+      PosRelativeToParent = [rpCenterHorizontal]
+      LayoutParamWidth = lpWrapContent
+      LayoutParamHeight = lpWrapContent
+      ImageIndex = 5
+      Images = jImageList1
+      BackgroundColor = colbrDefault
+      ImageScaleType = scaleCenter
+      Id = 4398335
+    end
+    object jImageView16: jImageView
+      Left = 195
+      Top = 336
+      Width = 48
+      Height = 48
+      Visible = True
+      Anchor = jImageView15
+      PosRelativeToAnchor = [raBelow]
+      PosRelativeToParent = [rpCenterHorizontal]
+      LayoutParamWidth = lpWrapContent
+      LayoutParamHeight = lpWrapContent
+      ImageIndex = 6
+      Images = jImageList1
+      BackgroundColor = colbrDefault
+      ImageScaleType = scaleCenter
+      Id = 4257025
+    end
+    object jImageView17: jImageView
+      Left = 196
+      Top = 392
+      Width = 48
+      Height = 48
+      Visible = True
+      Anchor = jImageView16
+      PosRelativeToAnchor = [raBelow]
+      PosRelativeToParent = [rpCenterHorizontal]
+      LayoutParamWidth = lpWrapContent
+      LayoutParamHeight = lpWrapContent
+      ImageIndex = 7
+      Images = jImageList1
+      BackgroundColor = colbrDefault
+      ImageScaleType = scaleCenter
+      Id = 3209536
+    end
+    object jImageView18: jImageView
+      Left = 196
+      Top = 448
+      Width = 48
+      Height = 48
+      Visible = True
+      Anchor = jImageView17
+      PosRelativeToAnchor = [raBelow]
+      PosRelativeToParent = [rpCenterHorizontal]
+      LayoutParamWidth = lpWrapContent
+      LayoutParamHeight = lpWrapContent
+      ImageIndex = 8
+      Images = jImageList1
+      BackgroundColor = colbrDefault
+      ImageScaleType = scaleCenter
+      Id = 0
+    end
+  end
   object jImageList1: jImageList
     Images.Strings = (
       'btn1_1.png'
@@ -213,7 +380,7 @@ object AndroidModule1: TAndroidModule1
       'btn1_2.png'
       'lemur_face.jpg'
     )
-    left = 208
-    top = 176
+    left = 392
+    top = 8
   end
 end
