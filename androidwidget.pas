@@ -2700,6 +2700,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jform);
   jMethod:= env^.GetMethodID(env, jCls, 'ShowCustomMessage', '(Landroid/widget/RelativeLayout;II)V');
   env^.CallVoidMethodA(env, _jform, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -2724,6 +2725,7 @@ begin
             end;
   end;
   env^.DeleteLocalRef(env,jParams[1].l);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -2740,6 +2742,7 @@ begin
   jMethod:= env^.GetMethodID(env, jCls, 'GetIntExtra', '(Landroid/content/Intent;Ljava/lang/String;I)I');
   Result:= env^.CallIntMethodA(env, _jform, jMethod, @jParams);
   env^.DeleteLocalRef(env,jParams[1].l);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 function jForm_GetDoubleExtra(env: PJNIEnv; _jform: JObject; data: jObject; extraName: string; defaultValue: double): double;
@@ -2755,6 +2758,7 @@ begin
   jMethod:= env^.GetMethodID(env, jCls, 'GetDoubleExtra', '(Landroid/content/Intent;Ljava/lang/String;D)D');
   Result:= env^.CallIntMethodA(env, _jform, jMethod, @jParams);
   env^.DeleteLocalRef(env,jParams[1].l);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 procedure jForm_DeleteFile(env: PJNIEnv; _jform: JObject; _filename: string);
@@ -2767,7 +2771,8 @@ begin
   jCls:= env^.GetObjectClass(env, _jform);
   jMethod:= env^.GetMethodID(env, jCls, 'DeleteFile', '(Ljava/lang/String;)V');
   env^.CallVoidMethodA(env, _jform, jMethod, @jParams);
-env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -2782,8 +2787,9 @@ begin
   jCls:= env^.GetObjectClass(env, _jform);
   jMethod:= env^.GetMethodID(env, jCls, 'DeleteFile', '(Ljava/lang/String;Ljava/lang/String;)V');
   env^.CallVoidMethodA(env, _jform, jMethod, @jParams);
-env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env,jParams[0].l);
   env^.DeleteLocalRef(env,jParams[1].l);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -2798,7 +2804,8 @@ begin
   jCls:= env^.GetObjectClass(env, _jform);
   jMethod:= env^.GetMethodID(env, jCls, 'DeleteFile', '(ILjava/lang/String;)V');
   env^.CallVoidMethodA(env, _jform, jMethod, @jParams);
-env^.DeleteLocalRef(env,jParams[1].l);
+  env^.DeleteLocalRef(env,jParams[1].l);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -2821,7 +2828,8 @@ begin
               Result:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
             end;
   end;
-env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -2845,7 +2853,8 @@ begin
               Result:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
             end;
   end;
-env^.DeleteLocalRef(env,jParams[1].l);
+  env^.DeleteLocalRef(env,jParams[1].l);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -2869,8 +2878,9 @@ begin
               Result:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
             end;
   end;
-env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env,jParams[0].l);
   env^.DeleteLocalRef(env,jParams[1].l);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -2884,6 +2894,7 @@ begin
   jMethod:= env^.GetMethodID(env, jCls, 'IsExternalStorageEmulated', '()Z');
   jBoo:= env^.CallBooleanMethod(env, _jform, jMethod);
   Result:= boolean(jBoo);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -2897,6 +2908,7 @@ begin
   jMethod:= env^.GetMethodID(env, jCls, 'IsExternalStorageRemovable', '()Z');
   jBoo:= env^.CallBooleanMethod(env, _jform, jMethod);
   Result:= boolean(jBoo);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 function jForm_GetjFormVersionFeatures(env: PJNIEnv; _jform: JObject): string;
@@ -2916,6 +2928,7 @@ begin
               Result:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
             end;
   end;
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -2927,6 +2940,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jform);
   jMethod:= env^.GetMethodID(env, jCls, 'GetActionBar', '()Landroid/app/ActionBar;');
   Result:= env^.CallObjectMethod(env, _jform, jMethod);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 procedure jForm_HideActionBar(env: PJNIEnv; _jform: JObject);
@@ -2937,6 +2951,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jform);
   jMethod:= env^.GetMethodID(env, jCls, 'HideActionBar', '()V');
   env^.CallVoidMethod(env, _jform, jMethod);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 procedure jForm_ShowActionBar(env: PJNIEnv; _jform: JObject);
@@ -2947,6 +2962,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jform);
   jMethod:= env^.GetMethodID(env, jCls, 'ShowActionBar', '()V');
   env^.CallVoidMethod(env, _jform, jMethod);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 procedure jForm_ShowTitleActionBar(env: PJNIEnv; _jform: JObject; _value: boolean);
@@ -2959,6 +2975,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jform);
   jMethod:= env^.GetMethodID(env, jCls, 'ShowTitleActionBar', '(Z)V');
   env^.CallVoidMethodA(env, _jform, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 procedure jForm_HideLogoActionBar(env: PJNIEnv; _jform: JObject; _value: boolean);
@@ -2971,6 +2988,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jform);
   jMethod:= env^.GetMethodID(env, jCls, 'HideLogoActionBar', '(Z)V');
   env^.CallVoidMethodA(env, _jform, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 procedure jForm_SetTitleActionBar(env: PJNIEnv; _jform: JObject; _title: string);
@@ -2983,7 +3001,8 @@ begin
   jCls:= env^.GetObjectClass(env, _jform);
   jMethod:= env^.GetMethodID(env, jCls, 'SetTitleActionBar', '(Ljava/lang/String;)V');
   env^.CallVoidMethodA(env, _jform, jMethod, @jParams);
-env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 procedure jForm_SetSubTitleActionBar(env: PJNIEnv; _jform: JObject; _subtitle: string);
@@ -2996,7 +3015,8 @@ begin
   jCls:= env^.GetObjectClass(env, _jform);
   jMethod:= env^.GetMethodID(env, jCls, 'SetSubTitleActionBar', '(Ljava/lang/String;)V');
   env^.CallVoidMethodA(env, _jform, jMethod, @jParams);
-env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 procedure jForm_SetIconActionBar(env: PJNIEnv; _jform: JObject; _iconIdentifier: string);
@@ -3009,7 +3029,8 @@ begin
   jCls:= env^.GetObjectClass(env, _jform);
   jMethod:= env^.GetMethodID(env, jCls, 'SetIconActionBar', '(Ljava/lang/String;)V');
   env^.CallVoidMethodA(env, _jform, jMethod, @jParams);
-env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -3021,6 +3042,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jform);
   jMethod:= env^.GetMethodID(env, jCls, 'SetTabNavigationModeActionBar', '()V');
   env^.CallVoidMethod(env, _jform, jMethod);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 procedure jForm_RemoveAllTabsActionBar(env: PJNIEnv; _jform: JObject);
@@ -3031,6 +3053,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jform);
   jMethod:= env^.GetMethodID(env, jCls, 'RemoveAllTabsActionBar', '()V');
   env^.CallVoidMethod(env, _jform, jMethod);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 function jForm_GetStringResourceId(env: PJNIEnv; _jform: JObject; _resName: string): integer;
@@ -3043,7 +3066,8 @@ begin
   jCls:= env^.GetObjectClass(env, _jform);
   jMethod:= env^.GetMethodID(env, jCls, 'GetStringResourceId', '(Ljava/lang/String;)I');
   Result:= env^.CallIntMethodA(env, _jform, jMethod, @jParams);
-env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -3066,6 +3090,7 @@ begin
               Result:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
             end;
   end;
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 function jForm_GetDrawableResourceId(env: PJNIEnv; _jform: JObject; _resName: string): integer;
@@ -3078,7 +3103,8 @@ begin
   jCls:= env^.GetObjectClass(env, _jform);
   jMethod:= env^.GetMethodID(env, jCls, 'GetDrawableResourceId', '(Ljava/lang/String;)I');
   Result:= env^.CallIntMethodA(env, _jform, jMethod, @jParams);
-env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 function jForm_GetDrawableResourceById(env: PJNIEnv; _jform: JObject; _resID: integer): jObject;
@@ -3091,6 +3117,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jform);
   jMethod:= env^.GetMethodID(env, jCls, 'GetDrawableResourceById', '(I)Landroid/graphics/drawable/Drawable;');
   Result:= env^.CallObjectMethodA(env, _jform, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -3115,6 +3142,7 @@ begin
             end;
   end;
   env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -3138,6 +3166,7 @@ begin
             end;
   end;
   env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 function jForm_IsPackageInstalled(env: PJNIEnv; _jform: JObject; _packagename: string): boolean;
@@ -3153,6 +3182,7 @@ begin
   jBoo:= env^.CallBooleanMethodA(env, _jform, jMethod, @jParams);
   Result:= boolean(jBoo);
   env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 procedure jForm_ShowCustomMessage(env: PJNIEnv; _jform: JObject; _layout: jObject; _gravity: integer);
@@ -3166,6 +3196,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jform);
   jMethod:= env^.GetMethodID(env, jCls, 'ShowCustomMessage', '(Landroid/widget/RelativeLayout;I)V');
   env^.CallVoidMethodA(env, _jform, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 procedure jForm_SetScreenOrientation(env: PJNIEnv; _jform: JObject; _orientation: integer);
@@ -3178,6 +3209,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jform);
   jMethod:= env^.GetMethodID(env, jCls, 'SetScreenOrientation', '(I)V');
   env^.CallVoidMethodA(env, _jform, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 function jForm_GetScreenOrientation(env: PJNIEnv; _jform: JObject): integer;
@@ -3188,6 +3220,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jform);
   jMethod:= env^.GetMethodID(env, jCls, 'GetScreenOrientation', '()I');
   Result:= env^.CallIntMethod(env, _jform, jMethod);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 function jForm_GetScreenDensity(env: PJNIEnv; _jform: JObject): string;
@@ -3207,6 +3240,7 @@ begin
               Result:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
             end;
   end;
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 function jForm_GetScreenSize(env: PJNIEnv; _jform: JObject): string;
@@ -3226,6 +3260,7 @@ begin
               Result:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
             end;
   end;
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 procedure jForm_LogDebug(env: PJNIEnv; _jform: JObject; _tag: string; _msg: string);
@@ -3241,6 +3276,7 @@ begin
   env^.CallVoidMethodA(env, _jform, jMethod, @jParams);
   env^.DeleteLocalRef(env,jParams[0].l);
   env^.DeleteLocalRef(env,jParams[1].l);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -4004,6 +4040,7 @@ begin
            Result    := String( env^.GetStringUTFChars(Env,_jString,@_jBoolean) );
           end;
   end;
+  env^.DeleteLocalRef(env, _cls);
 end;
 
 function jApp_GetAssetContentList(env: PJNIEnv; this: JObject; Path: string): TDynArrayOfString; 
@@ -4036,7 +4073,8 @@ begin
  	 end; 
        end; 
     end; 
-  end; 
+  end;
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -4059,6 +4097,7 @@ begin
   cls := env^.GetObjectClass(env, this);
   method:= env^.GetMethodID(env, cls, 'appFinish', '()V');
   env^.CallVoidMethod(env, this, method);
+  env^.DeleteLocalRef(env, cls);
 end;
 
 function  jApp_GetContext(env:PJNIEnv;this:jobject): jObject;
@@ -4069,6 +4108,7 @@ begin
   cls := env^.GetObjectClass(env, this);
   method:= env^.GetMethodID(env, cls, 'GetContext', '()Landroid/content/Context;');
   Result:= env^.CallObjectMethod(env, this, method);
+  env^.DeleteLocalRef(env, cls);
 end;
 
 function jApp_GetControlsVersionInfo(env:PJNIEnv;this:jobject): string;
@@ -4088,6 +4128,7 @@ begin
            Result    := String( env^.GetStringUTFChars(Env,_jString,@_jBoolean) );
           end;
   end;
+  env^.DeleteLocalRef(env, _cls);
 end;
 
 function  jForm_GetOnViewClickListener(env:PJNIEnv; Form: jObject): jObject;
@@ -4098,6 +4139,7 @@ begin
   cls := env^.GetObjectClass(env, Form);
   method:= env^.GetMethodID(env, cls, 'GetOnViewClickListener', '()Landroid/view/View$OnClickListener;');
   Result:= env^.CallObjectMethod(env, Form, method);
+  env^.DeleteLocalRef(env, cls);
 end;
 
 function  jForm_GetOnListItemClickListener(env:PJNIEnv; Form: jObject): jObject;
@@ -4108,6 +4150,7 @@ begin
   cls := env^.GetObjectClass(env, Form);
   method:= env^.GetMethodID(env, cls, 'GetOnListItemClickListener', '()Landroid/widget/AdapterView$OnItemClickListener;');
   Result:= env^.CallObjectMethod(env, Form, method);
+  env^.DeleteLocalRef(env, cls);
 end;
 
 Procedure jApp_KillProcess(env:PJNIEnv;this:jobject);
@@ -4154,6 +4197,7 @@ begin
   _jParams[0].l := env^.NewStringUTF(env, pchar(_resName) );
   Result:= env^.CallIntMethodA(env,this,_jMethod,@_jParams);
   env^.DeleteLocalRef(env,_jParams[0].l);
+  env^.DeleteLocalRef(env, _cls);
 end;
 
 function  jApp_GetStringResourceById(env:PJNIEnv;this:jobject; _resId: integer ): string;
@@ -4175,6 +4219,7 @@ begin
            Result    := String( env^.GetStringUTFChars(Env,_jString,@_jBoolean) );
           end;
   end;
+  env^.DeleteLocalRef(env, _cls);
 end;
 
 function  jApp_GetStringResourceByName(env:PJNIEnv;this:jobject; _resName: string): string;
@@ -4197,6 +4242,7 @@ begin
            Result    := String( env^.GetStringUTFChars(Env,_jString,@_jBoolean) );
           end;
   end;
+  env^.DeleteLocalRef(env, _cls);
 end;
 
 // thierrydijoux - get a resource quantity string by name
@@ -4221,6 +4267,7 @@ begin
            Result    := String( env^.GetStringUTFChars(Env,_jString,@_jBoolean) );
           end;
   end;
+  env^.DeleteLocalRef(env, _cls);
 end;
 
 //------------------------------------------------------------------------------
@@ -4250,6 +4297,7 @@ begin
   method:= env^.GetMethodID(env, cls, 'Free', '()V');
   env^.CallVoidMethod(env, Form, method);
   env^.DeleteGlobalRef(env,Form);
+  env^.DeleteLocalRef(env, cls);
 end;
 
 //by jmpessoa
@@ -4263,6 +4311,7 @@ begin
     cls := env^.GetObjectClass(env, Form);
     method:= env^.GetMethodID(env, cls, 'Show', '(I)V');
     env^.CallVoidMethodA(env, Form, method,@_jParams);
+    env^.DeleteLocalRef(env, cls);
 end;
 
 Procedure jForm_Close2(env:PJNIEnv; Form: jObject);
@@ -4273,6 +4322,7 @@ begin
   cls := env^.GetObjectClass(env, Form);
   method:= env^.GetMethodID(env, cls, 'Close2', '()V');
   env^.CallVoidMethod(env, Form, method);
+  env^.DeleteLocalRef(env, cls);
 end;
 
 //by jmpessoa
@@ -4285,6 +4335,7 @@ begin
   method:= env^.GetMethodID(env, cls, 'GetLayout', '()Landroid/widget/RelativeLayout;');
   Result:= env^.CallObjectMethod(env, Form, method);
   Result := env^.NewGlobalRef(env,Result);   //<---- need here for ap1 > 13 - by jmpessoa
+  env^.DeleteLocalRef(env, cls);
 end;
 
 Function jForm_GetView(env:PJNIEnv; Form: jObject): jObject;
@@ -4296,6 +4347,7 @@ begin
   method:= env^.GetMethodID(env, cls, 'GetView', '()Landroid/widget/RelativeLayout;');
   Result:= env^.CallObjectMethod(env, Form, method);
   Result := env^.NewGlobalRef(env,Result);   //<---- need here for ap1 > 13 - by jmpessoa
+  env^.DeleteLocalRef(env, cls);
 end;
 
 //by jmpessoa
@@ -4307,6 +4359,7 @@ begin
     cls := env^.GetObjectClass(env, Form);
     method:= env^.GetMethodID(env, cls, 'GetClikListener', '()Landroid/view/View$OnClickListener;');
     Result:= env^.CallObjectMethod(env, Form, method);
+    env^.DeleteLocalRef(env, cls);
 end;
 
 //by jmpessoa
@@ -4325,6 +4378,7 @@ begin
     cls := env^.GetObjectClass(env, Form);
     method:= env^.GetMethodID(env, cls, 'SetVisible', '(Z)V');
     env^.CallVoidMethodA(env, Form, method, @_jParams);
+    env^.DeleteLocalRef(env, cls);
 end;
 
  //by jmpessoa
@@ -4338,6 +4392,7 @@ begin
     cls := env^.GetObjectClass(env, Form);
     method:= env^.GetMethodID(env, cls, 'SetEnabled', '(Z)V');
     env^.CallVoidMethodA(env, Form, method, @_jParams);
+    env^.DeleteLocalRef(env, cls);
 end;
 
 //by jmpessoa
@@ -4352,6 +4407,7 @@ begin
   method:= env^.GetMethodID(env, cls, 'ShowMessage', '(Ljava/lang/String;)V');
   env^.CallVoidMethodA(env, Form, method,@_jParams);
   env^.DeleteLocalRef(env,_jParams[0].l);
+  env^.DeleteLocalRef(env, cls);
 end;
 
 
@@ -4369,6 +4425,7 @@ begin
   method:= env^.GetMethodID(env, cls, 'ShowMessage', '(Ljava/lang/String;)V');
   env^.CallVoidMethodA(env, Form, method,@_jParams);
   env^.DeleteLocalRef(env,_jParams[0].l);
+  env^.DeleteLocalRef(env, cls);
 end;
 
 //by jmpessoa
@@ -4389,6 +4446,7 @@ begin
            Result    := string( env^.GetStringUTFChars(env,_jString,@_jBoolean) );
           end;
   end;
+  env^.DeleteLocalRef(env, cls);
 end;
 
 procedure jForm_SetWifiEnabled(env: PJNIEnv; _jform: JObject; _status: boolean);
@@ -4401,6 +4459,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jform);
   jMethod:= env^.GetMethodID(env, jCls, 'SetWifiEnabled', '(Z)V');
   env^.CallVoidMethodA(env, _jform, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 function jForm_IsWifiEnabled(env: PJNIEnv; _jform: JObject): boolean;
@@ -4413,6 +4472,7 @@ begin
   jMethod:= env^.GetMethodID(env, jCls, 'IsWifiEnabled', '()Z');
   jBoo:= env^.CallBooleanMethod(env, _jform, jMethod);
   Result:= boolean(jBoo);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 function jForm_GetEnvironmentDirectoryPath(env: PJNIEnv; _jform: JObject; _directory: integer): string;
@@ -4434,6 +4494,7 @@ begin
              Result:= String( env^.GetStringUTFChars(Env,_jString,@_jBoolean) );
            end;
   end;
+  env^.DeleteLocalRef(env, _cls);
 end;
 
 function jForm_GetInternalAppStoragePath(env: PJNIEnv; _jform: JObject): string;
@@ -4453,6 +4514,7 @@ begin
              Result:= String( env^.GetStringUTFChars(Env,_jString,@_jBoolean) );
            end;
   end;
+  env^.DeleteLocalRef(env, _cls);
 end;
 
 function jForm_CopyFile(env: PJNIEnv; _jform: JObject; _srcFullName: string; _destFullName: string): boolean;
@@ -4470,6 +4532,7 @@ begin
   env^.DeleteLocalRef(env,_jParams[0].l);
   env^.DeleteLocalRef(env,_jParams[1].l);
   Result:= boolean(_jBoo);
+  env^.DeleteLocalRef(env, _jCls);
 end;
 
 function jForm_LoadFromAssets(env: PJNIEnv; _jform: JObject; _fileName: string): string;
@@ -4492,6 +4555,7 @@ begin
            end;
   end;
   env^.DeleteLocalRef(env,_jParams[0].l);
+  env^.DeleteLocalRef(env, _jCls);
 end;
 
 function jForm_IsSdCardMounted(env: PJNIEnv; _jform: JObject): boolean;
@@ -4504,6 +4568,7 @@ begin
   _jMethod:= env^.GetMethodID(env, _jCls, 'IsSdCardMounted', '()Z');
   _jBoo:= env^.CallBooleanMethod(env, _jform, _jMethod);
   Result:= boolean(_jBoo);
+  env^.DeleteLocalRef(env, _jCls);
 end;
 
 //------------------------------------------------------------------------------
@@ -4540,6 +4605,7 @@ begin
   cls:= env^.GetObjectClass(env, view);
   method:= env^.GetMethodID(env, cls, 'setVisibility', '(I)V');
   env^.CallVoidMethodA(env, view, method, @_jParams);
+  env^.DeleteLocalRef(env, cls);
 end;
 
 
@@ -4567,6 +4633,7 @@ begin
  cls:= env^.GetObjectClass(env, view);
  _jMethod:= env^.GetMethodID(env, cls, 'setBackgroundColor', '(I)V');
  env^.CallVoidMethodA(env,view,_jMethod,@_jParams);
+ env^.DeleteLocalRef(env, cls);
 end;
 
 Procedure View_Invalidate(env:PJNIEnv;this:jobject; view : jObject);
@@ -4589,6 +4656,7 @@ begin
   cls:= env^.GetObjectClass(env, view);
  _jMethod:= env^.GetMethodID(env, cls, 'invalidate', '()V');
  env^.CallVoidMethod(env,view,_jMethod);
+ env^.DeleteLocalRef(env, cls);
 end;
 
 //------------------------------

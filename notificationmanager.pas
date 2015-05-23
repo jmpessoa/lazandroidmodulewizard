@@ -164,6 +164,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jnotificationmanager);
   jMethod:= env^.GetMethodID(env, jCls, 'jFree', '()V');
   env^.CallVoidMethod(env, _jnotificationmanager, jMethod);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -181,10 +182,11 @@ begin
   jCls:= env^.GetObjectClass(env, _jnotificationmanager);
   jMethod:= env^.GetMethodID(env, jCls, 'Notify', '(ILjava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V');
   env^.CallVoidMethodA(env, _jnotificationmanager, jMethod, @jParams);
-env^.DeleteLocalRef(env,jParams[1].l);
+  env^.DeleteLocalRef(env,jParams[1].l);
   env^.DeleteLocalRef(env,jParams[2].l);
   env^.DeleteLocalRef(env,jParams[3].l);
   env^.DeleteLocalRef(env,jParams[4].l);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -198,6 +200,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jnotificationmanager);
   jMethod:= env^.GetMethodID(env, jCls, 'Cancel', '(I)V');
   env^.CallVoidMethodA(env, _jnotificationmanager, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -209,6 +212,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jnotificationmanager);
   jMethod:= env^.GetMethodID(env, jCls, 'CancelAll', '()V');
   env^.CallVoidMethod(env, _jnotificationmanager, jMethod);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 end.

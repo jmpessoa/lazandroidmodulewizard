@@ -394,6 +394,7 @@ begin
   jCls:= env^.GetObjectClass(env, _janalogclock);
   jMethod:= env^.GetMethodID(env, jCls, 'jFree', '()V');
   env^.CallVoidMethod(env, _janalogclock, jMethod);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -407,6 +408,7 @@ begin
   jCls:= env^.GetObjectClass(env, _janalogclock);
   jMethod:= env^.GetMethodID(env, jCls, 'SetViewParent', '(Landroid/view/ViewGroup;)V');
   env^.CallVoidMethodA(env, _janalogclock, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -418,6 +420,7 @@ begin
   jCls:= env^.GetObjectClass(env, _janalogclock);
   jMethod:= env^.GetMethodID(env, jCls, 'RemoveFromViewParent', '()V');
   env^.CallVoidMethod(env, _janalogclock, jMethod);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -429,6 +432,7 @@ begin
   jCls:= env^.GetObjectClass(env, _janalogclock);
   jMethod:= env^.GetMethodID(env, jCls, 'GetView', '()Landroid/view/View;');
   Result:= env^.CallObjectMethod(env, _janalogclock, jMethod);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -442,6 +446,7 @@ begin
   jCls:= env^.GetObjectClass(env, _janalogclock);
   jMethod:= env^.GetMethodID(env, jCls, 'SetLParamWidth', '(I)V');
   env^.CallVoidMethodA(env, _janalogclock, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -455,6 +460,7 @@ begin
   jCls:= env^.GetObjectClass(env, _janalogclock);
   jMethod:= env^.GetMethodID(env, jCls, 'SetLParamHeight', '(I)V');
   env^.CallVoidMethodA(env, _janalogclock, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -473,6 +479,7 @@ begin
   jCls:= env^.GetObjectClass(env, _janalogclock);
   jMethod:= env^.GetMethodID(env, jCls, 'SetLeftTopRightBottomWidthHeight', '(IIIIII)V');
   env^.CallVoidMethodA(env, _janalogclock, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -486,6 +493,7 @@ begin
   jCls:= env^.GetObjectClass(env, _janalogclock);
   jMethod:= env^.GetMethodID(env, jCls, 'AddLParamsAnchorRule', '(I)V');
   env^.CallVoidMethodA(env, _janalogclock, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -499,6 +507,7 @@ begin
   jCls:= env^.GetObjectClass(env, _janalogclock);
   jMethod:= env^.GetMethodID(env, jCls, 'AddLParamsParentRule', '(I)V');
   env^.CallVoidMethodA(env, _janalogclock, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -512,6 +521,7 @@ begin
   jCls:= env^.GetObjectClass(env, _janalogclock);
   jMethod:= env^.GetMethodID(env, jCls, 'SetLayoutAll', '(I)V');
   env^.CallVoidMethodA(env, _janalogclock, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -523,6 +533,7 @@ begin
   jCls:= env^.GetObjectClass(env, _janalogclock);
   jMethod:= env^.GetMethodID(env, jCls, 'ClearLayoutAll', '()V');
   env^.CallVoidMethod(env, _janalogclock, jMethod);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -536,8 +547,7 @@ begin
   jCls:= env^.GetObjectClass(env, _janalogclock);
   jMethod:= env^.GetMethodID(env, jCls, 'SetId', '(I)V');
   env^.CallVoidMethodA(env, _janalogclock, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
 end;
-
-
 
 end.

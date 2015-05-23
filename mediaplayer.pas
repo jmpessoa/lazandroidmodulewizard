@@ -257,6 +257,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jmediaplayer);
   jMethod:= env^.GetMethodID(env, jCls, 'jFree', '()V');
   env^.CallVoidMethod(env, _jmediaplayer, jMethod);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 procedure jMediaPlayer_DeselectTrack(env: PJNIEnv; _jmediaplayer: JObject; _index: integer);
@@ -269,6 +270,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jmediaplayer);
   jMethod:= env^.GetMethodID(env, jCls, 'DeselectTrack', '(I)V');
   env^.CallVoidMethodA(env, _jmediaplayer, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 procedure jMediaPlayer_Release(env: PJNIEnv; _jmediaplayer: JObject);
@@ -279,6 +281,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jmediaplayer);
   jMethod:= env^.GetMethodID(env, jCls, 'Release', '()V');
   env^.CallVoidMethod(env, _jmediaplayer, jMethod);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 procedure jMediaPlayer_Reset(env: PJNIEnv; _jmediaplayer: JObject);
@@ -289,6 +292,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jmediaplayer);
   jMethod:= env^.GetMethodID(env, jCls, 'Reset', '()V');
   env^.CallVoidMethod(env, _jmediaplayer, jMethod);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 procedure jMediaPlayer_SetDataSource(env: PJNIEnv; _jmediaplayer: JObject; _path: string);
@@ -302,6 +306,7 @@ begin
   jMethod:= env^.GetMethodID(env, jCls, 'SetDataSource', '(Ljava/lang/String;)V');
   env^.CallVoidMethodA(env, _jmediaplayer, jMethod, @jParams);
   env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 procedure jMediaPlayer_Prepare(env: PJNIEnv; _jmediaplayer: JObject);
@@ -312,6 +317,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jmediaplayer);
   jMethod:= env^.GetMethodID(env, jCls, 'Prepare', '()V');
   env^.CallVoidMethod(env, _jmediaplayer, jMethod);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 procedure jMediaPlayer_Start(env: PJNIEnv; _jmediaplayer: JObject);
@@ -322,6 +328,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jmediaplayer);
   jMethod:= env^.GetMethodID(env, jCls, 'Start', '()V');
   env^.CallVoidMethod(env, _jmediaplayer, jMethod);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 procedure jMediaPlayer_Stop(env: PJNIEnv; _jmediaplayer: JObject);
@@ -332,6 +339,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jmediaplayer);
   jMethod:= env^.GetMethodID(env, jCls, 'Stop', '()V');
   env^.CallVoidMethod(env, _jmediaplayer, jMethod);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 procedure jMediaPlayer_Pause(env: PJNIEnv; _jmediaplayer: JObject);
@@ -342,6 +350,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jmediaplayer);
   jMethod:= env^.GetMethodID(env, jCls, 'Pause', '()V');
   env^.CallVoidMethod(env, _jmediaplayer, jMethod);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 function jMediaPlayer_IsPlaying(env: PJNIEnv; _jmediaplayer: JObject): boolean;
@@ -354,6 +363,7 @@ begin
   jMethod:= env^.GetMethodID(env, jCls, 'IsPlaying', '()Z');
   jBoo:= env^.CallBooleanMethod(env, _jmediaplayer, jMethod);
   Result:= boolean(jBoo);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 procedure jMediaPlayer_SeekTo(env: PJNIEnv; _jmediaplayer: JObject; _millis: integer);
@@ -366,6 +376,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jmediaplayer);
   jMethod:= env^.GetMethodID(env, jCls, 'SeekTo', '(I)V');
   env^.CallVoidMethodA(env, _jmediaplayer, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 procedure jMediaPlayer_SetLooping(env: PJNIEnv; _jmediaplayer: JObject; _looping: boolean);
@@ -378,6 +389,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jmediaplayer);
   jMethod:= env^.GetMethodID(env, jCls, 'SetLooping', '(Z)V');
   env^.CallVoidMethodA(env, _jmediaplayer, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 function jMediaPlayer_IsLooping(env: PJNIEnv; _jmediaplayer: JObject): boolean;
@@ -390,6 +402,7 @@ begin
   jMethod:= env^.GetMethodID(env, jCls, 'IsLooping', '()Z');
   jBoo:= env^.CallBooleanMethod(env, _jmediaplayer, jMethod);
   Result:= boolean(jBoo);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 procedure jMediaPlayer_SelectTrack(env: PJNIEnv; _jmediaplayer: JObject; _index: integer);
@@ -402,6 +415,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jmediaplayer);
   jMethod:= env^.GetMethodID(env, jCls, 'SelectTrack', '(I)V');
   env^.CallVoidMethodA(env, _jmediaplayer, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 function jMediaPlayer_GetCurrentPosition(env: PJNIEnv; _jmediaplayer: JObject): integer;
@@ -412,6 +426,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jmediaplayer);
   jMethod:= env^.GetMethodID(env, jCls, 'GetCurrentPosition', '()I');
   Result:= env^.CallIntMethod(env, _jmediaplayer, jMethod);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 function jMediaPlayer_GetDuration(env: PJNIEnv; _jmediaplayer: JObject): integer;
@@ -422,6 +437,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jmediaplayer);
   jMethod:= env^.GetMethodID(env, jCls, 'GetDuration', '()I');
   Result:= env^.CallIntMethod(env, _jmediaplayer, jMethod);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 procedure jMediaPlayer_SetVolume(env: PJNIEnv; _jmediaplayer: JObject; _leftVolume: single; _rightVolume: single);
@@ -435,6 +451,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jmediaplayer);
   jMethod:= env^.GetMethodID(env, jCls, 'SetVolume', '(FF)V');
   env^.CallVoidMethodA(env, _jmediaplayer, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 end.

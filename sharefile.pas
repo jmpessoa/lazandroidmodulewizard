@@ -168,6 +168,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jsharefile);
   jMethod:= env^.GetMethodID(env, jCls, 'jFree', '()V');
   env^.CallVoidMethod(env, _jsharefile, jMethod);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -182,8 +183,9 @@ begin
   jCls:= env^.GetObjectClass(env, _jsharefile);
   jMethod:= env^.GetMethodID(env, jCls, 'ShareFromSdCard', '(Ljava/lang/String;Ljava/lang/String;)V');
   env^.CallVoidMethodA(env, _jsharefile, jMethod, @jParams);
-env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env,jParams[0].l);
   env^.DeleteLocalRef(env,jParams[1].l);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -198,8 +200,9 @@ begin
   jCls:= env^.GetObjectClass(env, _jsharefile);
   jMethod:= env^.GetMethodID(env, jCls, 'ShareFromAssets', '(Ljava/lang/String;Ljava/lang/String;)V');
   env^.CallVoidMethodA(env, _jsharefile, jMethod, @jParams);
-env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env,jParams[0].l);
   env^.DeleteLocalRef(env,jParams[1].l);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -216,6 +219,7 @@ begin
   env^.CallVoidMethodA(env, _jsharefile, jMethod, @jParams);
   env^.DeleteLocalRef(env,jParams[0].l);
   env^.DeleteLocalRef(env,jParams[1].l);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 procedure jShareFile_ShareFrom(env: PJNIEnv; _jsharefile: JObject; _fullFilename: string; _mimetype: string);
@@ -231,6 +235,7 @@ begin
   env^.CallVoidMethodA(env, _jsharefile, jMethod, @jParams);
   env^.DeleteLocalRef(env,jParams[0].l);
   env^.DeleteLocalRef(env,jParams[1].l);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 procedure jShareFile_SetTransitoryEnvironmentDirectory(env: PJNIEnv; _jsharefile: JObject;_index: integer);
@@ -243,6 +248,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jsharefile);
   jMethod:= env^.GetMethodID(env, jCls, 'SetTransitoryEnvironmentDirectory', '(I)V');
   env^.CallVoidMethodA(env, _jsharefile, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 

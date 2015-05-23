@@ -463,6 +463,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jcustomdialog);
   jMethod:= env^.GetMethodID(env, jCls, 'jFree', '()V');
   env^.CallVoidMethod(env, _jcustomdialog, jMethod);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -476,6 +477,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jcustomdialog);
   jMethod:= env^.GetMethodID(env, jCls, 'SetViewParent', '(Landroid/view/ViewGroup;)V');
   env^.CallVoidMethodA(env, _jcustomdialog, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -487,6 +489,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jcustomdialog);
   jMethod:= env^.GetMethodID(env, jCls, 'RemoveFromViewParent', '()V');
   env^.CallVoidMethod(env, _jcustomdialog, jMethod);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 procedure jCustomDialog_SetLParamWidth(env: PJNIEnv; _jcustomdialog: JObject; _w: integer);
@@ -499,6 +502,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jcustomdialog);
   jMethod:= env^.GetMethodID(env, jCls, 'SetLParamWidth', '(I)V');
   env^.CallVoidMethodA(env, _jcustomdialog, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -512,6 +516,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jcustomdialog);
   jMethod:= env^.GetMethodID(env, jCls, 'SetLParamHeight', '(I)V');
   env^.CallVoidMethodA(env, _jcustomdialog, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -530,6 +535,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jcustomdialog);
   jMethod:= env^.GetMethodID(env, jCls, 'SetLeftTopRightBottomWidthHeight', '(IIIIII)V');
   env^.CallVoidMethodA(env, _jcustomdialog, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -543,6 +549,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jcustomdialog);
   jMethod:= env^.GetMethodID(env, jCls, 'AddLParamsAnchorRule', '(I)V');
   env^.CallVoidMethodA(env, _jcustomdialog, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -556,6 +563,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jcustomdialog);
   jMethod:= env^.GetMethodID(env, jCls, 'AddLParamsParentRule', '(I)V');
   env^.CallVoidMethodA(env, _jcustomdialog, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -569,6 +577,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jcustomdialog);
   jMethod:= env^.GetMethodID(env, jCls, 'SetLayoutAll', '(I)V');
   env^.CallVoidMethodA(env, _jcustomdialog, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -580,6 +589,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jcustomdialog);
   jMethod:= env^.GetMethodID(env, jCls, 'ClearLayoutAll', '()V');
   env^.CallVoidMethod(env, _jcustomdialog, jMethod);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -593,6 +603,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jcustomdialog);
   jMethod:= env^.GetMethodID(env, jCls, 'SetId', '(I)V');
   env^.CallVoidMethodA(env, _jcustomdialog, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 procedure jCustomDialog_Show(env: PJNIEnv; _jcustomdialog: JObject);
@@ -603,6 +614,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jcustomdialog);
   jMethod:= env^.GetMethodID(env, jCls, 'Show', '()V');
   env^.CallVoidMethod(env, _jcustomdialog, jMethod);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 procedure jCustomDialog_Show(env: PJNIEnv; _jcustomdialog: JObject; _title: string);
@@ -616,6 +628,7 @@ begin
   jMethod:= env^.GetMethodID(env, jCls, 'Show', '(Ljava/lang/String;)V');
   env^.CallVoidMethodA(env, _jcustomdialog, jMethod, @jParams);
   env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 procedure jCustomDialog_Show(env: PJNIEnv; _jcustomdialog: JObject; _title: string; _iconIdentifier: string);
@@ -631,6 +644,7 @@ begin
   env^.CallVoidMethodA(env, _jcustomdialog, jMethod, @jParams);
   env^.DeleteLocalRef(env,jParams[0].l);
   env^.DeleteLocalRef(env,jParams[1].l);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 procedure jCustomDialog_SetTitle(env: PJNIEnv; _jcustomdialog: JObject; _title: string);
@@ -644,6 +658,7 @@ begin
   jMethod:= env^.GetMethodID(env, jCls, 'SetTitle', '(Ljava/lang/String;)V');
   env^.CallVoidMethodA(env, _jcustomdialog, jMethod, @jParams);
   env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 procedure jCustomDialog_SetIconIdentifier(env: PJNIEnv; _jcustomdialog: JObject; _iconIdentifier: string);
@@ -657,6 +672,7 @@ begin
   jMethod:= env^.GetMethodID(env, jCls, 'SetIconIdentifier', '(Ljava/lang/String;)V');
   env^.CallVoidMethodA(env, _jcustomdialog, jMethod, @jParams);
   env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 procedure jCustomDialog_Close(env: PJNIEnv; _jcustomdialog: JObject);
@@ -667,6 +683,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jcustomdialog);
   jMethod:= env^.GetMethodID(env, jCls, 'Close', '()V');
   env^.CallVoidMethod(env, _jcustomdialog, jMethod);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 end.

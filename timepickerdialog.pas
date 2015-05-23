@@ -132,6 +132,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jtimepickerdialog);
   jMethod:= env^.GetMethodID(env, jCls, 'jFree', '()V');
   env^.CallVoidMethod(env, _jtimepickerdialog, jMethod);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -143,6 +144,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jtimepickerdialog);
   jMethod:= env^.GetMethodID(env, jCls, 'Show', '()V');
   env^.CallVoidMethod(env, _jtimepickerdialog, jMethod);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 end.

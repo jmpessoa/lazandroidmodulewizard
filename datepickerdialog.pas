@@ -132,6 +132,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jdatepickerdialog);
   jMethod:= env^.GetMethodID(env, jCls, 'jFree', '()V');
   env^.CallVoidMethod(env, _jdatepickerdialog, jMethod);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 procedure jDatePickerDialog_Show(env: PJNIEnv; _jdatepickerdialog: JObject);
@@ -142,6 +143,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jdatepickerdialog);
   jMethod:= env^.GetMethodID(env, jCls, 'Show', '()V');
   env^.CallVoidMethod(env, _jdatepickerdialog, jMethod);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 end.

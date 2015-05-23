@@ -313,6 +313,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jbluetooth);
   jMethod:= env^.GetMethodID(env, jCls, 'jFree', '()V');
   env^.CallVoidMethod(env, _jbluetooth, jMethod);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 procedure jBluetooth_Enabled(env: PJNIEnv; _jbluetooth: JObject);
@@ -323,6 +324,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jbluetooth);
   jMethod:= env^.GetMethodID(env, jCls, 'Enabled', '()V');
   env^.CallVoidMethod(env, _jbluetooth, jMethod);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 procedure jBluetooth_Discovery(env: PJNIEnv; _jbluetooth: JObject);
@@ -333,6 +335,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jbluetooth);
   jMethod:= env^.GetMethodID(env, jCls, 'Discovery', '()V');
   env^.CallVoidMethod(env, _jbluetooth, jMethod);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 procedure jBluetooth_CancelDiscovery(env: PJNIEnv; _jbluetooth: JObject);
@@ -343,6 +346,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jbluetooth);
   jMethod:= env^.GetMethodID(env, jCls, 'CancelDiscovery', '()V');
   env^.CallVoidMethod(env, _jbluetooth, jMethod);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 function jBluetooth_GetPairedDevices(env: PJNIEnv; _jbluetooth: JObject): TDynArrayOfString;
@@ -374,6 +378,7 @@ begin
       end;
     end;
   end;
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 function jBluetooth_GetFoundedDevices(env: PJNIEnv; _jbluetooth: JObject): TDynArrayOfString;
@@ -405,6 +410,7 @@ begin
       end;
     end;
   end;
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 function jBluetooth_GetReachablePairedDevices(env: PJNIEnv; _jbluetooth: JObject): TDynArrayOfString;
@@ -436,6 +442,7 @@ begin
       end;
     end;
   end;
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 procedure jBluetooth_Disable(env: PJNIEnv; _jbluetooth: JObject);
@@ -446,6 +453,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jbluetooth);
   jMethod:= env^.GetMethodID(env, jCls, 'Disable', '()V');
   env^.CallVoidMethod(env, _jbluetooth, jMethod);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 function jBluetooth_IsEnable(env: PJNIEnv; _jbluetooth: JObject): boolean;
@@ -458,6 +466,7 @@ begin
   jMethod:= env^.GetMethodID(env, jCls, 'IsEnable', '()Z');
   jBoo:= env^.CallBooleanMethod(env, _jbluetooth, jMethod);
   Result:= boolean(jBoo);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 function jBluetooth_GetState(env: PJNIEnv; _jbluetooth: JObject): integer;
@@ -468,6 +477,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jbluetooth);
   jMethod:= env^.GetMethodID(env, jCls, 'GetState', '()I');
   Result:= env^.CallIntMethod(env, _jbluetooth, jMethod);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 function jBluetooth_GetReachablePairedDeviceByName(env: PJNIEnv; _jbluetooth: JObject; _deviceName: string): jObject;
@@ -481,6 +491,7 @@ begin
   jMethod:= env^.GetMethodID(env, jCls, 'GetReachablePairedDeviceByName', '(Ljava/lang/String;)Landroid/bluetooth/BluetoothDevice;');
   Result:= env^.CallObjectMethodA(env, _jbluetooth, jMethod, @jParams);
   env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 function jBluetooth_GetReachablePairedDeviceByAddress(env: PJNIEnv; _jbluetooth: JObject; _deviceAddress: string): jObject;
@@ -494,6 +505,7 @@ begin
   jMethod:= env^.GetMethodID(env, jCls, 'GetReachablePairedDeviceByAddress', '(Ljava/lang/String;)Landroid/bluetooth/BluetoothDevice;');
   Result:= env^.CallObjectMethodA(env, _jbluetooth, jMethod, @jParams);
   env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 function jBluetooth_IsReachablePairedDevice(env: PJNIEnv; _jbluetooth: JObject; _macAddress: string): boolean;
@@ -508,7 +520,8 @@ begin
   jMethod:= env^.GetMethodID(env, jCls, 'IsReachablePairedDevice', '(Ljava/lang/String;)Z');
   jBoo:= env^.CallBooleanMethodA(env, _jbluetooth, jMethod, @jParams);
   Result:= boolean(jBoo);
-env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -523,6 +536,7 @@ begin
   jMethod:= env^.GetMethodID(env, jCls, 'GetRemoteDevice', '(Ljava/lang/String;)Landroid/bluetooth/BluetoothDevice;');
   Result:= env^.CallObjectMethodA(env, _jbluetooth, jMethod, @jParams);
   env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 procedure jBluetooth_SendFile(env: PJNIEnv; _jbluetooth: JObject; _filePath: string; _fileName: string; _mimeType: string);
@@ -540,6 +554,7 @@ begin
   env^.DeleteLocalRef(env,jParams[0].l);
   env^.DeleteLocalRef(env,jParams[1].l);
   env^.DeleteLocalRef(env,jParams[2].l);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 end.

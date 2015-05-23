@@ -266,6 +266,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jcontextmenu);
   jMethod:= env^.GetMethodID(env, jCls, 'jFree', '()V');
   env^.CallVoidMethod(env, _jcontextmenu, jMethod);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -279,6 +280,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jcontextmenu);
   jMethod:= env^.GetMethodID(env, jCls, 'CheckItemCommute', '(Landroid/view/MenuItem;)I');
   Result:= env^.CallIntMethodA(env, _jcontextmenu, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -292,6 +294,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jcontextmenu);
   jMethod:= env^.GetMethodID(env, jCls, 'CheckItem', '(Landroid/view/MenuItem;)I');
   Result:= env^.CallIntMethodA(env, _jcontextmenu, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -305,6 +308,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jcontextmenu);
   jMethod:= env^.GetMethodID(env, jCls, 'UnCheckItem', '(Landroid/view/MenuItem;)I');
   Result:= env^.CallIntMethodA(env, _jcontextmenu, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 function jContextMenu_Size(env: PJNIEnv; _jcontextmenu: JObject): integer;
@@ -315,6 +319,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jcontextmenu);
   jMethod:= env^.GetMethodID(env, jCls, 'Size', '()I');
   Result:= env^.CallIntMethod(env, _jcontextmenu, jMethod);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -328,6 +333,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jcontextmenu);
   jMethod:= env^.GetMethodID(env, jCls, 'FindMenuItemByID', '(I)Landroid/view/MenuItem;');
   Result:= env^.CallObjectMethodA(env, _jcontextmenu, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -341,6 +347,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jcontextmenu);
   jMethod:= env^.GetMethodID(env, jCls, 'GetMenuItemByIndex', '(I)Landroid/view/MenuItem;');
   Result:= env^.CallObjectMethodA(env, _jcontextmenu, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -352,6 +359,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jcontextmenu);
   jMethod:= env^.GetMethodID(env, jCls, 'UnCheckAllMenuItem', '()V');
   env^.CallVoidMethod(env, _jcontextmenu, jMethod);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -365,6 +373,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jcontextmenu);
   jMethod:= env^.GetMethodID(env, jCls, 'RegisterForContextMenu', '(Landroid/view/View;)V');
   env^.CallVoidMethodA(env, _jcontextmenu, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 procedure JContextMenu_UnRegisterForContextMenu(env: PJNIEnv; _JContextMenu: JObject; _View: JObject); 
@@ -376,7 +385,8 @@ begin
   JParams[0].l := _View; 
   JCls := env^.GetObjectClass(env, _JContextMenu); 
   JMethod := env^.GetMethodID(env, JCls, 'UnRegisterForContextMenu', '(Landroid/view/View;)V'); 
-  env^.CallVoidMethodA(env, _JContextMenu, JMethod, @JParams); 
+  env^.CallVoidMethodA(env, _JContextMenu, JMethod, @JParams);
+  env^.DeleteLocalRef(env, jCls);
 end; 
 
 function jContextMenu_AddItem(env: PJNIEnv; _jcontextmenu: JObject; _menu: jObject; _itemID: integer; _caption: string; _itemType: integer): jObject;
@@ -393,6 +403,7 @@ begin
   jMethod:= env^.GetMethodID(env, jCls, 'AddItem', '(Landroid/view/ContextMenu;ILjava/lang/String;I)Landroid/view/MenuItem;');
   Result:= env^.CallObjectMethodA(env, _jcontextmenu, jMethod, @jParams);
   env^.DeleteLocalRef(env,jParams[2].l);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -410,6 +421,7 @@ begin
   env^.CallVoidMethodA(env, _jcontextmenu, jMethod, @jParams);
   env^.DeleteLocalRef(env,jParams[1].l);
   env^.DeleteLocalRef(env,jParams[2].l);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 procedure jContextMenu_SetHeaderTitle(env: PJNIEnv; _jcontextmenu: JObject; _title: string);
@@ -423,6 +435,7 @@ begin
   jMethod:= env^.GetMethodID(env, jCls, 'SetHeaderTitle', '(Ljava/lang/String;)V');
   env^.CallVoidMethodA(env, _jcontextmenu, jMethod, @jParams);
   env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 procedure jContextMenu_SetHeaderIconByIdentifier(env: PJNIEnv; _jcontextmenu: JObject; _headerIconIdentifier: string);
@@ -436,6 +449,7 @@ begin
   jMethod:= env^.GetMethodID(env, jCls, 'SetHeaderIconByIdentifier', '(Ljava/lang/String;)V');
   env^.CallVoidMethodA(env, _jcontextmenu, jMethod, @jParams);
   env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 function jContextMenu_IsItemChecked(env: PJNIEnv; _jcontextmenu: JObject; _itemID: integer): boolean;
@@ -450,6 +464,7 @@ begin
   jMethod:= env^.GetMethodID(env, jCls, 'IsItemChecked', '(I)Z');
   jBoo:= env^.CallBooleanMethodA(env, _jcontextmenu, jMethod, @jParams);
   Result:= boolean(jBoo);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 end.

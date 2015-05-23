@@ -557,6 +557,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jspinner);
   jMethod:= env^.GetMethodID(env, jCls, 'jFree', '()V');
   env^.CallVoidMethod(env, _jspinner, jMethod);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -570,6 +571,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jspinner);
   jMethod:= env^.GetMethodID(env, jCls, 'SetjParent', '(Landroid/view/ViewGroup;)V');
   env^.CallVoidMethodA(env, _jspinner, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -583,6 +585,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jspinner);
   jMethod:= env^.GetMethodID(env, jCls, 'SetLParamWidth', '(I)V');
   env^.CallVoidMethodA(env, _jspinner, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -596,6 +599,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jspinner);
   jMethod:= env^.GetMethodID(env, jCls, 'SetLParamHeight', '(I)V');
   env^.CallVoidMethodA(env, _jspinner, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -614,6 +618,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jspinner);
   jMethod:= env^.GetMethodID(env, jCls, 'SetLeftTopRightBottomWidthHeight', '(IIIIII)V');
   env^.CallVoidMethodA(env, _jspinner, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -627,6 +632,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jspinner);
   jMethod:= env^.GetMethodID(env, jCls, 'AddLParamsAnchorRule', '(I)V');
   env^.CallVoidMethodA(env, _jspinner, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -640,6 +646,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jspinner);
   jMethod:= env^.GetMethodID(env, jCls, 'AddLParamsParentRule', '(I)V');
   env^.CallVoidMethodA(env, _jspinner, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -653,6 +660,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jspinner);
   jMethod:= env^.GetMethodID(env, jCls, 'SetLayoutAll', '(I)V');
   env^.CallVoidMethodA(env, _jspinner, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -666,6 +674,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jspinner);
   jMethod:= env^.GetMethodID(env, jCls, 'SetId', '(I)V');
   env^.CallVoidMethodA(env, _jspinner, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -677,6 +686,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jspinner);
   jMethod:= env^.GetMethodID(env, jCls, 'GetSelectedItemPosition', '()I');
   Result:= env^.CallIntMethod(env, _jspinner, jMethod);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -697,6 +707,7 @@ begin
               Result:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
             end;
   end;
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 procedure jSpinner_Add(env: PJNIEnv; _jspinner: JObject; _item: string);
@@ -721,7 +732,7 @@ begin
  JCls := env^.GetObjectClass(env, _jspinner); 
  JMethod := env^.GetMethodID(env, jCls, 'Clear', '()V'); 
  env^.CallVoidMethod(env, _JSpinner, JMethod); 
- env^.DeleteLocalRef(env, JCls); 
+ env^.DeleteLocalRef(env, JCls);
 end; 
 
 procedure jSpinner_SetSelectedTextColor(env: PJNIEnv; _jspinner: JObject; _color: integer);
@@ -734,6 +745,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jspinner);
   jMethod:= env^.GetMethodID(env, jCls, 'SetSelectedTextColor', '(I)V');
   env^.CallVoidMethodA(env, _jspinner, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -747,6 +759,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jspinner);
   jMethod:= env^.GetMethodID(env, jCls, 'SetDropListTextColor', '(I)V');
   env^.CallVoidMethodA(env, _jspinner, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 procedure jSpinner_SetDropListBackgroundColor(env: PJNIEnv; _jspinner: JObject; _color: integer);
@@ -759,6 +772,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jspinner);
   jMethod:= env^.GetMethodID(env, jCls, 'SetDropListBackgroundColor', '(I)V');
   env^.CallVoidMethodA(env, _jspinner, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -772,6 +786,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jspinner);
   jMethod:= env^.GetMethodID(env, jCls, 'SetLastItemAsPrompt', '(Z)V');
   env^.CallVoidMethodA(env, _jspinner, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -783,6 +798,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jspinner);
   jMethod:= env^.GetMethodID(env, jCls, 'GetSize', '()I');
   Result:= env^.CallIntMethod(env, _jspinner, jMethod);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -796,6 +812,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jspinner);
   jMethod:= env^.GetMethodID(env, jCls, 'Delete', '(I)V');
   env^.CallVoidMethodA(env, _jspinner, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -809,6 +826,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jspinner);
   jMethod:= env^.GetMethodID(env, jCls, 'SetSelection', '(I)V');
   env^.CallVoidMethodA(env, _jspinner, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 procedure jSpinner_SetItem(env: PJNIEnv; _jspinner: JObject; _index: integer; _item: string);
@@ -823,6 +841,7 @@ begin
   jMethod:= env^.GetMethodID(env, jCls, 'SetItem', '(ILjava/lang/String;)V');
   env^.CallVoidMethodA(env, _jspinner, jMethod, @jParams);
   env^.DeleteLocalRef(env,jParams[1].l);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 procedure jSpinner_SetTextFontSize(env: PJNIEnv; _jspinner: JObject; _txtFontSize: integer);
@@ -835,6 +854,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jspinner);
   jMethod:= env^.GetMethodID(env, jCls, 'SetTextFontSize', '(I)V');
   env^.CallVoidMethodA(env, _jspinner, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 end.

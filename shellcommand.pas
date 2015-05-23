@@ -130,6 +130,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jshellcommand);
   jMethod:= env^.GetMethodID(env, jCls, 'jFree', '()V');
   env^.CallVoidMethod(env, _jshellcommand, jMethod);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -143,7 +144,8 @@ begin
   jCls:= env^.GetObjectClass(env, _jshellcommand);
   jMethod:= env^.GetMethodID(env, jCls, 'Execute', '(Ljava/lang/String;)V');
   env^.CallVoidMethodA(env, _jshellcommand, jMethod, @jParams);
-env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 end.

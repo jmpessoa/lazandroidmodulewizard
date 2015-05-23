@@ -1081,6 +1081,7 @@ type
   protected
     procedure SetViewParent(Value: jObject);  override;
     function GetView: jObject; override;
+    //procedure SetParamWidth(Value: TLayoutParams); override; TODO
   public
     constructor Create(AOwner: TComponent); override;
     Destructor  Destroy; override;
@@ -5160,6 +5161,13 @@ begin
     if FInitialized then
        Result:= jScrollView_getView(FjEnv, FjObject);
 end;
+
+(* TODO
+procedure jScrollView.SetParamWidth(Value: TLayoutParams);
+begin
+  //
+end;
+*)
 
 Procedure jScrollView.SetColor(Value: TARGBColorBridge);
 begin

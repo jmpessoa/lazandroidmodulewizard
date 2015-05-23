@@ -180,6 +180,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jtcpsocketclient);
   jMethod:= env^.GetMethodID(env, jCls, 'jFree', '()V');
   env^.CallVoidMethod(env, _jtcpsocketclient, jMethod);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -193,7 +194,8 @@ begin
   jCls:= env^.GetObjectClass(env, _jtcpsocketclient);
   jMethod:= env^.GetMethodID(env, jCls, 'SendMessage', '(Ljava/lang/String;)V');
   env^.CallVoidMethodA(env, _jtcpsocketclient, jMethod, @jParams);
-env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -205,6 +207,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jtcpsocketclient);
   jMethod:= env^.GetMethodID(env, jCls, 'CloseConnection', '()V');
   env^.CallVoidMethod(env, _jtcpsocketclient, jMethod);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 procedure jTCPSocketClient_Connect(env: PJNIEnv; _jtcpsocketclient: JObject; _serverIP: string; _serverPort: integer; _login: string);
@@ -221,6 +224,7 @@ begin
   env^.CallVoidMethodA(env, _jtcpsocketclient, jMethod, @jParams);
   env^.DeleteLocalRef(env,jParams[0].l);
   env^.DeleteLocalRef(env,jParams[2].l);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 procedure jTCPSocketClient_CloseConnection(env: PJNIEnv; _jtcpsocketclient: JObject; _finalMessage: string);
@@ -234,6 +238,7 @@ begin
   jMethod:= env^.GetMethodID(env, jCls, 'CloseConnection', '(Ljava/lang/String;)V');
   env^.CallVoidMethodA(env, _jtcpsocketclient, jMethod, @jParams);
   env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 procedure jTCPSocketClient_Connect(env: PJNIEnv; _jtcpsocketclient: JObject; _serverIP: string; _serverPort: integer);
@@ -247,8 +252,8 @@ begin
   jCls:= env^.GetObjectClass(env, _jtcpsocketclient);
   jMethod:= env^.GetMethodID(env, jCls, 'Connect', '(Ljava/lang/String;I)V');
   env^.CallVoidMethodA(env, _jtcpsocketclient, jMethod, @jParams);
-env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
 end;
-
 
 end.

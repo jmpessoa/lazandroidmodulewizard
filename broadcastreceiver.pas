@@ -231,6 +231,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jbroadcastreceiver);
   jMethod:= env^.GetMethodID(env, jCls, 'jFree', '()V');
   env^.CallVoidMethod(env, _jbroadcastreceiver, jMethod);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -244,7 +245,8 @@ begin
   jCls:= env^.GetObjectClass(env, _jbroadcastreceiver);
   jMethod:= env^.GetMethodID(env, jCls, 'RegisterIntentActionFilter', '(Ljava/lang/String;)V');
   env^.CallVoidMethodA(env, _jbroadcastreceiver, jMethod, @jParams);
-env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 procedure jBroadcastReceiver_RegisterIntentActionFilter(env: PJNIEnv; _jbroadcastreceiver: JObject; _intentAction: integer);
@@ -257,6 +259,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jbroadcastreceiver);
   jMethod:= env^.GetMethodID(env, jCls, 'RegisterIntentActionFilter', '(I)V');
   env^.CallVoidMethodA(env, _jbroadcastreceiver, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -268,6 +271,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jbroadcastreceiver);
   jMethod:= env^.GetMethodID(env, jCls, 'Unregister', '()V');
   env^.CallVoidMethod(env, _jbroadcastreceiver, jMethod);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 function jBroadcastReceiver_GetResultCode(env: PJNIEnv; _jbroadcastreceiver: JObject): integer;
@@ -278,6 +282,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jbroadcastreceiver);
   jMethod:= env^.GetMethodID(env, jCls, 'GetResultCode', '()I');
   Result:= env^.CallIntMethod(env, _jbroadcastreceiver, jMethod);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -298,6 +303,7 @@ begin
               Result:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
             end;
   end;
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -309,6 +315,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jbroadcastreceiver);
   jMethod:= env^.GetMethodID(env, jCls, 'GetResultExtras', '()Landroid/os/Bundle;');
   Result:= env^.CallObjectMethod(env, _jbroadcastreceiver, jMethod);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 end.

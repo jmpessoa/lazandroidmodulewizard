@@ -385,6 +385,8 @@ begin
   jCls:= env^.GetObjectClass(env, _jlocation);
   jMethod:= env^.GetMethodID(env, jCls, 'jFree', '()V');
   env^.CallVoidMethod(env, _jlocation, jMethod);
+  env^.DeleteLocalRef(env, jCls);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 function jLocation_StartTracker(env: PJNIEnv; _jlocation: JObject): boolean;
@@ -397,6 +399,7 @@ begin
   jMethod:= env^.GetMethodID(env, jCls, 'StartTracker', '()Z');
   jBoo:= env^.CallBooleanMethod(env, _jlocation, jMethod);
   Result:= boolean(jBoo);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 procedure jLocation_ShowLocationSouceSettings(env: PJNIEnv; _jlocation: JObject);
@@ -407,6 +410,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jlocation);
   jMethod:= env^.GetMethodID(env, jCls, 'ShowLocationSouceSettings', '()V');
   env^.CallVoidMethod(env, _jlocation, jMethod);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -418,6 +422,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jlocation);
   jMethod:= env^.GetMethodID(env, jCls, 'RequestLocationUpdates', '()V');
   env^.CallVoidMethod(env, _jlocation, jMethod);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -429,6 +434,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jlocation);
   jMethod:= env^.GetMethodID(env, jCls, 'StopTracker', '()V');
   env^.CallVoidMethod(env, _jlocation, jMethod);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -442,6 +448,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jlocation);
   jMethod:= env^.GetMethodID(env, jCls, 'SetCriteriaAccuracy', '(I)V');
   env^.CallVoidMethodA(env, _jlocation, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 function jLocation_IsGPSProvider(env: PJNIEnv; _jlocation: JObject): boolean;
@@ -454,6 +461,7 @@ begin
   jMethod:= env^.GetMethodID(env, jCls, 'IsGPSProvider', '()Z');
   jBoo:= env^.CallBooleanMethod(env, _jlocation, jMethod);
   Result:= boolean(jBoo);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 function jLocation_IsNetProvider(env: PJNIEnv; _jlocation: JObject): boolean;
@@ -466,6 +474,7 @@ begin
   jMethod:= env^.GetMethodID(env, jCls, 'IsNetProvider', '()Z');
   jBoo:= env^.CallBooleanMethod(env, _jlocation, jMethod);
   Result:= boolean(jBoo);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -479,6 +488,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jlocation);
   jMethod:= env^.GetMethodID(env, jCls, 'SetTimeForUpdates', '(J)V');
   env^.CallVoidMethodA(env, _jlocation, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 procedure jLocation_SetDistanceForUpdades(env: PJNIEnv; _jlocation: JObject; _distance: int64);
@@ -491,6 +501,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jlocation);
   jMethod:= env^.GetMethodID(env, jCls, 'SetDistanceForUpdates', '(J)V');
   env^.CallVoidMethodA(env, _jlocation, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 function jLocation_GetLatitude(env: PJNIEnv; _jlocation: JObject): double;
@@ -501,6 +512,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jlocation);
   jMethod:= env^.GetMethodID(env, jCls, 'GetLatitude', '()D');
   Result:= env^.CallDoubleMethod(env, _jlocation, jMethod);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 function jLocation_GetLongitude(env: PJNIEnv; _jlocation: JObject): double;
@@ -511,6 +523,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jlocation);
   jMethod:= env^.GetMethodID(env, jCls, 'GetLongitude', '()D');
   Result:= env^.CallDoubleMethod(env, _jlocation, jMethod);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 function jLocation_GetAltitude(env: PJNIEnv; _jlocation: JObject): double;
@@ -521,6 +534,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jlocation);
   jMethod:= env^.GetMethodID(env, jCls, 'GetAltitude', '()D');
   Result:= env^.CallDoubleMethod(env, _jlocation, jMethod);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 function jLocation_IsWifiEnabled(env: PJNIEnv; _jlocation: JObject): boolean;
@@ -533,6 +547,7 @@ begin
   jMethod:= env^.GetMethodID(env, jCls, 'IsWifiEnabled', '()Z');
   jBoo:= env^.CallBooleanMethod(env, _jlocation, jMethod);
   Result:= boolean(jBoo);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 procedure jLocation_SetWifiEnabled(env: PJNIEnv; _jlocation: JObject; _status: boolean);
@@ -545,6 +560,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jlocation);
   jMethod:= env^.GetMethodID(env, jCls, 'SetWifiEnabled', '(Z)V');
   env^.CallVoidMethodA(env, _jlocation, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -568,6 +584,7 @@ begin
               Result:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
             end;
   end;
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 procedure jLocation_SetMapWidth(env: PJNIEnv; _jlocation: JObject; _mapwidth: integer);
@@ -580,6 +597,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jlocation);
   jMethod:= env^.GetMethodID(env, jCls, 'SetMapWidth', '(I)V');
   env^.CallVoidMethodA(env, _jlocation, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -593,6 +611,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jlocation);
   jMethod:= env^.GetMethodID(env, jCls, 'SetMapHeight', '(I)V');
   env^.CallVoidMethodA(env, _jlocation, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -606,6 +625,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jlocation);
   jMethod:= env^.GetMethodID(env, jCls, 'SetMapZoom', '(I)V');
   env^.CallVoidMethodA(env, _jlocation, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -619,6 +639,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jlocation);
   jMethod:= env^.GetMethodID(env, jCls, 'SetMapType', '(I)V');
   env^.CallVoidMethodA(env, _jlocation, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 function jLocation_GetAddress(env: PJNIEnv; _jlocation: JObject): string;
@@ -638,6 +659,7 @@ begin
               Result:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
             end;
   end;
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -661,6 +683,7 @@ begin
               Result:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
             end;
   end;
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 end.
