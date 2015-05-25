@@ -2,7 +2,7 @@ package com.example.dummyapp;
 
 //Lamw: Lazarus Android Module Wizard 
 //Form Designer and Components development model!
-//version 0.6 - revision 26 - 21 May - 2015
+//version 0.6 - revision 27 - 25 May - 2015
 //
 //https://github.com/jmpessoa/lazandroidmodulewizard
 //http://forum.lazarus.freepascal.org/index.php/topic,21919.270.html
@@ -11647,7 +11647,7 @@ class jHttpClient /*extends ...*/ {
 /*jControl template*/
 
 //ref. http://tech-papers.org/executing-shell-command-android-application/
-class jShellCommand extends AsyncTask<String, String, String>  {
+class jShellCommand {
  
    private long     pascalObj = 0;      // Pascal Object
    private Controls controls  = null;   // Control Class -> Java/Pascal Interface ...
@@ -11660,6 +11660,7 @@ class jShellCommand extends AsyncTask<String, String, String>  {
       context   = _ctrls.activity;
       pascalObj = _Self;
       controls  = _ctrls;
+      Log.i("jShellCommand", "create");
    }
  
    public void jFree() {
@@ -11668,44 +11669,50 @@ class jShellCommand extends AsyncTask<String, String, String>  {
  
  //write others [public] methods code here......
  //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
-
-   @Override
-   protected void onPreExecute() {
-     super.onPreExecute();
-     //
-   }
+ public void Execute(String _shellCmd) {
+	 Log.i("exec", "0");
+	 new ShellCmd().execute(_shellCmd);
+	// Log.i("exec", "1");
+ }  
    
-   @Override
-   protected String doInBackground(String... params) {
-     Process p;
-     StringBuffer output = new StringBuffer();
-     try {
-        p = Runtime.getRuntime().exec(params[0]);
-        BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
-        String line = "";
-        while ((line = reader.readLine()) != null) {
+
+ class ShellCmd extends AsyncTask<String, String, String>  {	     
+    
+     @Override
+     protected String doInBackground(String... params) {
+       Process p;
+       StringBuffer output = new StringBuffer();
+       try {
+         p = Runtime.getRuntime().exec(params[0]);
+         BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
+         String line = "";
+         while ((line = reader.readLine()) != null) {
             output.append(line + "\n");
             p.waitFor();
-        }
-      } catch (IOException e) {
+          //publishProgress(response); TODO       
+         }         
+        } catch (IOException e) {
          e.printStackTrace();
-      } catch (InterruptedException e) {
+        } catch (InterruptedException e) {
          e.printStackTrace();
-      }
-      String response = output.toString();
-      return response;
-   }
-   
-   @Override
-   protected void onPostExecute(String result) {
-      super.onPostExecute(result);   
-      controls.pOnShellCommandExecuted(pascalObj, result);
-      //Log.i("Output", result);
-   }      
-   
-   public void Execute(String _shellCmd) {
-	   this.execute(_shellCmd);
-   }   
+       }
+       String response = output.toString();       
+       return response;
+     }
+        
+     @Override
+     protected void onProgressUpdate(String... values) {
+         super.onProgressUpdate(values);
+         //TODO        
+     }   
+     
+     @Override
+     protected void onPostExecute(String values) {    	  
+       super.onPostExecute(values);       
+       controls.pOnShellCommandExecuted(pascalObj, values);
+     }          
+  } //AsyncTask
+ 
 }
 
 /*Draft java code by "Lazarus Android Module Wizard" [5/9/2015 3:06:34]*/

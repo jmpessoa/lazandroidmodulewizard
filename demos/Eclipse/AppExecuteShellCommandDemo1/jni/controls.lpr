@@ -1,5 +1,5 @@
 {hint: save all files to location: C:\adt32\eclipse\workspace\AppExecuteShellCommandDemo1\jni}
-library controls;  //by Lamw: Lazarus Android Module Wizard: 5/16/2015 15:50:36]
+library controls;  //by Lamw: Lazarus Android Module Wizard: 5/25/2015 2:29:47]
  
 {$mode delphi}
  
@@ -527,7 +527,23 @@ begin
   Java_Event_pOnShellCommandExecuted(PEnv,this,TObject(pasobj),cmdResult);
 end;
 
-const NativeMethods:array[0..64] of JNINativeMethod = (
+{ Class:     com_example_appexecuteshellcommanddemo1_Controls
+  Method:    pOnTCPSocketClientMessageReceived
+  Signature: (J[Ljava/lang/String;)V }
+procedure pOnTCPSocketClientMessageReceived(PEnv: PJNIEnv; this: JObject; pasobj: JLong; messagesReceived: jObjectArray); cdecl;
+begin
+  Java_Event_pOnTCPSocketClientMessageReceived(PEnv,this,TObject(pasobj),messagesReceived);
+end;
+
+{ Class:     com_example_appexecuteshellcommanddemo1_Controls
+  Method:    pOnTCPSocketClientConnected
+  Signature: (J)V }
+procedure pOnTCPSocketClientConnected(PEnv: PJNIEnv; this: JObject; pasobj: JLong); cdecl;
+begin
+  Java_Event_pOnTCPSocketClientConnected(PEnv,this,TObject(pasobj));
+end;
+
+const NativeMethods:array[0..66] of JNINativeMethod = (
    (name:'pAppOnScreenStyle';
     signature:'()I';
     fnPtr:@pAppOnScreenStyle;),
@@ -722,7 +738,13 @@ const NativeMethods:array[0..64] of JNINativeMethod = (
     fnPtr:@pOnPinchZoomGestureDetected;),
    (name:'pOnShellCommandExecuted';
     signature:'(JLjava/lang/String;)V';
-    fnPtr:@pOnShellCommandExecuted;)
+    fnPtr:@pOnShellCommandExecuted;),
+   (name:'pOnTCPSocketClientMessageReceived';
+    signature:'(J[Ljava/lang/String;)V';
+    fnPtr:@pOnTCPSocketClientMessageReceived;),
+   (name:'pOnTCPSocketClientConnected';
+    signature:'(J)V';
+    fnPtr:@pOnTCPSocketClientConnected;)
 );
 
 function RegisterNativeMethodsArray(PEnv: PJNIEnv; className: PChar; methods: PJNINativeMethod; countMethods:integer):integer;
@@ -842,7 +864,9 @@ exports
   pOnDatePicker name 'Java_com_example_appexecuteshellcommanddemo1_Controls_pOnDatePicker',
   pOnFlingGestureDetected name 'Java_com_example_appexecuteshellcommanddemo1_Controls_pOnFlingGestureDetected',
   pOnPinchZoomGestureDetected name 'Java_com_example_appexecuteshellcommanddemo1_Controls_pOnPinchZoomGestureDetected',
-  pOnShellCommandExecuted name 'Java_com_example_appexecuteshellcommanddemo1_Controls_pOnShellCommandExecuted';
+  pOnShellCommandExecuted name 'Java_com_example_appexecuteshellcommanddemo1_Controls_pOnShellCommandExecuted',
+  pOnTCPSocketClientMessageReceived name 'Java_com_example_appexecuteshellcommanddemo1_Controls_pOnTCPSocketClientMessageReceived',
+  pOnTCPSocketClientConnected name 'Java_com_example_appexecuteshellcommanddemo1_Controls_pOnTCPSocketClientConnected';
 
 begin
   gApp:= jApp.Create(nil);{AndroidWidget.pas}

@@ -2,7 +2,7 @@ package com.example.appexecuteshellcommanddemo1;
 
 //Lamw: Lazarus Android Module Wizard 
 //Form Designer and Components development model!
-//version 0.6 - revision 25 - 14 May - 2015
+//version 0.6 - revision 27 - 25 May - 2015
 //
 //https://github.com/jmpessoa/lazandroidmodulewizard
 //http://forum.lazarus.freepascal.org/index.php/topic,21919.270.html
@@ -114,6 +114,7 @@ import android.opengl.GLSurfaceView;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
@@ -216,6 +217,8 @@ import java.io.*;
 import java.lang.*;
 
 import java.net.HttpURLConnection;
+import java.net.InetAddress;
+import java.net.Socket;
 //import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
@@ -939,6 +942,40 @@ public void ShowCustomMessage(RelativeLayout _layout,  int _gravity) {
     toast.show();
 }
 
+private class MyCountDownTimer extends CountDownTimer {
+	  Toast toast;
+	  public MyCountDownTimer(long startTime, long interval, Toast toas) {
+	     super(startTime, interval);
+	     toast = toas;
+	  }
+	  @Override
+	  public void onFinish() {
+	   //text.setText("Time's up!");
+		  toast.cancel();
+	  }
+	  @Override
+	  public void onTick(long millisUntilFinished) {
+	   //text.setText("" + millisUntilFinished / 1000);
+		  toast.show();
+	  }	 	  
+}
+
+public void ShowCustomMessage(RelativeLayout _layout,  int _gravity,  int _lenghTimeSecond) {
+    Toast toast = new Toast(controls.activity);   
+    toast.setGravity(_gravity, 0, 0);    
+    //toast.setDuration(Toast.LENGTH_LONG);    
+    RelativeLayout par = (RelativeLayout)_layout.getParent();
+	if (par != null) {
+	    par.removeView(_layout);        	    
+	}    
+    _layout.setVisibility(0);
+    toast.setView(_layout);    				
+    //it will show the toast for 20 seconds: 
+    //(20000 milliseconds/1st argument) with interval of 1 second/2nd argument //--> (20 000, 1000)
+    MyCountDownTimer countDownTimer = new MyCountDownTimer(_lenghTimeSecond*1000, 1000, toast);
+    countDownTimer.start();
+}
+
 public void SetScreenOrientation(int _orientation) {
 	//Log.i("Screen","Orientation "+ _orientation);
     switch(_orientation) {
@@ -1003,6 +1040,10 @@ public String GetScreenSize() {
     	r = "SMALL";
     }
 	return r;
+}
+
+public void LogDebug(String _tag, String  _msg) {
+   Log.d(_tag, _msg);  //debug
 }
 
 }
@@ -11606,7 +11647,7 @@ class jHttpClient /*extends ...*/ {
 /*jControl template*/
 
 //ref. http://tech-papers.org/executing-shell-command-android-application/
-class jShellCommand extends AsyncTask<String, String, String>  {
+class jShellCommand {
  
    private long     pascalObj = 0;      // Pascal Object
    private Controls controls  = null;   // Control Class -> Java/Pascal Interface ...
@@ -11619,6 +11660,7 @@ class jShellCommand extends AsyncTask<String, String, String>  {
       context   = _ctrls.activity;
       pascalObj = _Self;
       controls  = _ctrls;
+      Log.i("jShellCommand", "create");
    }
  
    public void jFree() {
@@ -11627,44 +11669,50 @@ class jShellCommand extends AsyncTask<String, String, String>  {
  
  //write others [public] methods code here......
  //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
-
-   @Override
-   protected void onPreExecute() {
-     super.onPreExecute();
-     //
-   }
+ public void Execute(String _shellCmd) {
+	 Log.i("exec", "0");
+	 new ShellCmd().execute(_shellCmd);
+	// Log.i("exec", "1");
+ }  
    
-   @Override
-   protected String doInBackground(String... params) {
-     Process p;
-     StringBuffer output = new StringBuffer();
-     try {
-        p = Runtime.getRuntime().exec(params[0]);
-        BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
-        String line = "";
-        while ((line = reader.readLine()) != null) {
+
+ class ShellCmd extends AsyncTask<String, String, String>  {	     
+    
+     @Override
+     protected String doInBackground(String... params) {
+       Process p;
+       StringBuffer output = new StringBuffer();
+       try {
+         p = Runtime.getRuntime().exec(params[0]);
+         BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
+         String line = "";
+         while ((line = reader.readLine()) != null) {
             output.append(line + "\n");
             p.waitFor();
-        }
-      } catch (IOException e) {
+          //publishProgress(response); TODO       
+         }         
+        } catch (IOException e) {
          e.printStackTrace();
-      } catch (InterruptedException e) {
+        } catch (InterruptedException e) {
          e.printStackTrace();
-      }
-      String response = output.toString();
-      return response;
-   }
-   
-   @Override
-   protected void onPostExecute(String result) {
-      super.onPostExecute(result);   
-      controls.pOnShellCommandExecuted(pascalObj, result);
-      //Log.i("Output", result);
-   }      
-   
-   public void Execute(String _shellCmd) {
-	   this.execute(_shellCmd);
-   }   
+       }
+       String response = output.toString();       
+       return response;
+     }
+        
+     @Override
+     protected void onProgressUpdate(String... values) {
+         super.onProgressUpdate(values);
+         //TODO        
+     }   
+     
+     @Override
+     protected void onPostExecute(String values) {    	  
+       super.onPostExecute(values);       
+       controls.pOnShellCommandExecuted(pascalObj, values);
+     }          
+  } //AsyncTask
+ 
 }
 
 /*Draft java code by "Lazarus Android Module Wizard" [5/9/2015 3:06:34]*/
@@ -11935,136 +11983,150 @@ class jDigitalClock extends DigitalClock /*TextClock*/ { //please, fix what GUI 
 	  
 } //end class
 
+/**
+ *         ref. http://www.myandroidsolutions.com/2013/03/31/android-tcp-connection-enhanced/
+ *         ref. http://www.darksleep.com/player/SocketExample/
+ */
 
-class jCustomViewLayout extends RelativeLayout {
+class jTCPSocketClient {
 
-	   private long       pascalObj = 0;    // Pascal Object
-	   private Controls   controls  = null; // Control Class for events
+    private long  pascalObj = 0;      // Pascal Object
+    Controls controls;    
+    private Context  context   = null;
+    
+    private String SERVER_IP = "" ;//"192.168.0.100"   
+    private int SERVER_PORT;
+       
+    // message to send to the server
+    private String mServerMessage;
+    
+    private boolean mRun = false;
+    // used to send messages
+    private PrintWriter mBufferOut;
+    // used to read messages from the server
+    private BufferedReader mBufferIn;
+    private Socket mSocket;
+    
+    //TCPSocketClientTask task;
+           	
+    public jTCPSocketClient(Controls _ctrls, long _Self) { //Add more others news "_xxx" params if needed!
+    	   //super(_ctrls.activity);
+ 	       context   = _ctrls.activity;
+    	   pascalObj = _Self;
+    	   controls  = _ctrls; 	
+    }
 
-	   private Context context = null;
-	   private ViewGroup parent   = null;         // parent view
-	   private LayoutParams lparams;              // layout XYWH
-	   private int lparamsAnchorRule[] = new int[30];
-	   private int countAnchorRule = 0;
-	   private int lparamsParentRule[] = new int[30];
-	   private int countParentRule = 0;
-	   private int lparamH = 100;
-	   private int lparamW = 100;
-	   private int marginLeft = 0;
-	   private int marginTop = 0;
-	   private int marginRight = 0;
-	   private int marginBottom = 0;
-	   boolean mRemovedFromParent = false; //no parent!   
-	   
-	  //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
-	   public jCustomViewLayout(Controls _ctrls, long _Self) { //Add more others news "_xxx"p arams if needed!
-	      super(_ctrls.activity);
-	      context   = _ctrls.activity;
-	      pascalObj = _Self;
-	      controls  = _ctrls;
-	      lparams = new LayoutParams(lparamW, lparamH);
-	      //lparams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);		
-	   } //end constructor
-
-	   public void jFree() {
-	      if (parent != null) { parent.removeView(this); }
-	      //free local objects...      
-	      lparams = null;
-	      //parent = null;  //?!
-	   }
-
-	   public void SetViewParent(ViewGroup _viewgroup) {
-	      if (parent != null) { parent.removeView(this); }
-	      parent = _viewgroup;
-	      parent.addView(this,lparams);
-	      mRemovedFromParent = false; //now there is a parent!    	
-	   }
-	   	  				   
-	   public void RemoveFromViewParent() {
-	      if (!mRemovedFromParent) {
-	    	 this.setVisibility(android.view.View.INVISIBLE);
-	    	 ViewGroup parent1 = (ViewGroup)this.getParent();	    	 	    	
-	    	 if (parent1 != null) {
-	            parent1.removeView(this);
-	            parent = null;
-	            mRemovedFromParent = true; //no more parent!
-	    	 }          
-	      }
-	   }
-	   
-	   public View GetView() {
-	      return this;
-	   }
-	   
-	   public void SetLParamWidth(int _w) {
-	      lparamW = _w;
-	   }
-
-	   public void SetLParamHeight(int _h) {
-	      lparamH = _h;
-	   }
-
-	   public void SetLeftTopRightBottomWidthHeight(int _left, int _top, int _right, int _bottom, int _w, int _h) {
-	      marginLeft = _left;
-	      marginTop = _top;
-	      marginRight = _right;
-	      marginBottom = _bottom;
-	      lparamH = _h;
-	      lparamW = _w;
-	   }
-
-	   public void AddLParamsAnchorRule(int _rule) {
-	      lparamsAnchorRule[countAnchorRule] = _rule;
-	      countAnchorRule = countAnchorRule + 1;
-	   }
-
-	   public void AddLParamsParentRule(int _rule) {
-	      lparamsParentRule[countParentRule] = _rule;
-	      countParentRule = countParentRule + 1;
-	   }
-
-	   public void SetLayoutAll(int _idAnchor) {
-	  	 lparams.width  = lparamW;
-		 lparams.height = lparamH;
-		 lparams.setMargins(marginLeft,marginTop,marginRight,marginBottom);
-		 if (_idAnchor > 0) {
-		    for (int i=0; i < countAnchorRule; i++) {
-			  lparams.addRule(lparamsAnchorRule[i], _idAnchor);
-		    }
-		 }
-	     for (int j=0; j < countParentRule; j++) {
-	         lparams.addRule(lparamsParentRule[j]);
-	     }
-	     this.setLayoutParams(lparams);
-	   }
-
-	   public void ClearLayoutAll() {
-		  for (int i=0; i < countAnchorRule; i++) {
-	  	    lparams.removeRule(lparamsAnchorRule[i]);
-	      }
-
-		  for (int j=0; j < countParentRule; j++) {
-	   	    lparams.removeRule(lparamsParentRule[j]);
+    public void jFree() {
+       //free local objects...
+        mBufferOut= null;;
+        mBufferIn= null;
+        mSocket= null;    	
+    }
+   
+    /**
+     * Sends the message entered by client to the server
+     */   
+    public void SendMessage(String message) {
+    	
+        if (mBufferOut != null && !mBufferOut.checkError()) {
+            mBufferOut.println(message);
+            mBufferOut.flush();
+        }
+    }
+     
+    //write others [public] methods code here......
+    //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
+         
+    public void Connect(String _serverIP, int _serverPort) {
+    	  
+          SERVER_IP = _serverIP;          //IP address
+          SERVER_PORT = _serverPort;       //port number;
+          if (mSocket != null) {
+        	  try {
+				mSocket.close();
+				mSocket = null;
+			  } catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			  }
+          }
+          
+          try {
+              InetAddress serverAddr = InetAddress.getByName(SERVER_IP);
+			  mSocket = new Socket(serverAddr, SERVER_PORT);
+		  } catch (IOException e) {
+			  // TODO Auto-generated catch block
+		      e.printStackTrace();
 		  }
-		  countAnchorRule = 0;
-		  countParentRule = 0;
-	   }
+          
+          controls.pOnTCPSocketClientConnected(pascalObj);         
+          new TCPSocketClientTask().execute();                                    	  
+      }
+            
+     public void Connect(String _serverIP, int _serverPort, String _login) {    	  
+    	 Connect(_serverIP,_serverPort);
+    	 SendMessage(_login);       	  
+      }
+     
+      public void CloseConnection(String _finalMessage) {                
+          mRun = false;        
+                        
+          if (mBufferOut != null) {
+               mBufferOut.flush();
+          }
+          if (_finalMessage.equals("")) 
+              SendMessage("client_closed");
+          else SendMessage(_finalMessage);
+      }
+      
+      public void CloseConnection() {
+      	CloseConnection("client_closed");
+      }
+                  
+      class TCPSocketClientTask extends AsyncTask<String, String, String> {
+      	
+          @Override
+          protected String doInBackground(String... message) {               
+              mRun = true;
+              while (mRun) {
+                    if ( mSocket!= null && !mSocket.isClosed()) {             		
+                        try {                    	
+    						mBufferOut = new PrintWriter(new BufferedWriter(new OutputStreamWriter(mSocket.getOutputStream())), true);
+    	                    mBufferIn = new BufferedReader(new InputStreamReader(mSocket.getInputStream()));              
+    	                    //in this while the client listens for the messages sent by the server
+    	                    if (mBufferIn != null)
+    	                           mServerMessage = mBufferIn.readLine();
+    	                    if (mServerMessage != null )                     	
+    	                       	 publishProgress(mServerMessage);
+    					} catch (IOException e) {
+    						// TODO Auto-generated catch block
+    						Log.e("jTCPSocketClient", "Error_doInBackground", e);
+    						e.printStackTrace();
+    					}                                 	                                         
+               	    }        	        	             
+              }
+              return null;
+          }
 
-	   public void SetId(int _id) { //wrapper method pattern ...
-	      this.setId(_id);
-	   }
-	   			
-       public void Show() {	//0: visible; 4: invisible; 8: gone		  
-		  this.setVisibility(android.view.View.VISIBLE);
-	   }
-				
-	   public void Hide() { 
-		 if (this.getVisibility()==0) { //visible   
-			this.setVisibility(android.view.View.INVISIBLE); //4
-		 }    
-	   }	
-	                 
-} //end class
+          @Override
+          protected void onProgressUpdate(String... values) {
+              super.onProgressUpdate(values);
+              controls.pOnTCPSocketClientMessageReceived(pascalObj ,values);
+          }
+          
+          @Override
+          protected void onPostExecute(String values) {    	  
+            super.onPostExecute(values);   	  
+            try {                	
+         	   
+     			mSocket.close();
+     	    } catch (IOException e) {
+     			// TODO Auto-generated catch block
+     			e.printStackTrace();
+     	    }            
+          }
+        }            
+}
 
 
 //**new jclass entrypoint**//please, do not remove/change this line!
@@ -12172,6 +12234,9 @@ public native void pOnFlingGestureDetected(long pasobj, int direction);
 public native void pOnPinchZoomGestureDetected(long pasobj, float scaleFactor, int state); 
 
 public native void pOnShellCommandExecuted(long pasobj, String cmdResult);
+
+public native void pOnTCPSocketClientMessageReceived(long pasobj, String[] messagesReceived);
+public native void pOnTCPSocketClientConnected(long pasobj);
 
 //Load Pascal Library
 static {
@@ -12725,6 +12790,12 @@ public  java.lang.Object jScrollView_Create(long pasobj ) {
 }
 
 //-------------------------------------------------------------------------
+//HorizontalScrollView: Create
+//-------------------------------------------------------------------------
+public  java.lang.Object jHorizontalScrollView_Create(long pasobj ) {
+	return (java.lang.Object)( new jHorizontalScrollView(this.activity,this,pasobj));
+}
+//-------------------------------------------------------------------------
 //Panel: Create - new by jmpessoa
 //-------------------------------------------------------------------------
 public  java.lang.Object jPanel_Create(long pasobj ) {
@@ -13213,8 +13284,8 @@ public float[] benchMark1 () {
 	      return (java.lang.Object)(new jDigitalClock(this,_Self));
    }
    
-   public java.lang.Object jCustomViewLayout_jCreate(long _Self) {
-	      return (java.lang.Object)(new jCustomViewLayout(this,_Self));
+   public java.lang.Object jTCPSocketClient_jCreate(long _Self) {
+	      return (java.lang.Object)(new jTCPSocketClient(this,_Self));
    }
    
 }

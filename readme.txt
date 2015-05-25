@@ -110,6 +110,13 @@
 	*			or Go To: Lazarus IDE menu "Run--> [Lamw] Build and Run"! Thanks to Anton!!!
 	****************************************************************************************************
 
+Version 0.6 - rev. 27 - 25 May 2015 - 
+
+	FIXED! 	
+		jShellCommand component
+	FIXED!   
+		IDE Tools: New jComponent [Create]
+
 Version 0.6 - rev. 26 - 21 May 2015 - 
 
 	NEW!  

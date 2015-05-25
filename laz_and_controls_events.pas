@@ -48,7 +48,7 @@ uses
    Procedure Java_Event_pOnTimePicker(env: PJNIEnv; this: jobject; Obj: TObject; hourOfDay: integer; minute: integer);
    Procedure Java_Event_pOnDatePicker(env: PJNIEnv; this: jobject; Obj: TObject; year: integer; monthOfYear: integer; dayOfMonth: integer);
 
-   Procedure Java_Event_pOnShellCommandExecuted(env: PJNIEnv; this: jobject; Obj: TObject; cmdResult: jString);
+   Procedure Java_Event_pOnShellCommandExecuted(env: PJNIEnv; this: jobject; Obj: TObject; cmdResult: JString);
    Procedure Java_Event_pOnTCPSocketClientMessageReceived(env: PJNIEnv; this: jobject; Obj: TObject; messagesReceived: JStringArray);
    Procedure Java_Event_pOnTCPSocketClientConnected(env: PJNIEnv; this: jobject; Obj: TObject);
 
@@ -636,21 +636,22 @@ begin
   end;
 end;
 
-Procedure Java_Event_pOnShellCommandExecuted(env: PJNIEnv; this: jobject; Obj: TObject; cmdResult: jString);
+Procedure Java_Event_pOnShellCommandExecuted(env: PJNIEnv; this: jobject; Obj: TObject; cmdResult: JString);
 var
-   pascmdResult: string;
-  _jBoolean: JBoolean;
+   pascmdResult:  string;
+   jStr: jObject;
+   jBoo: jBoolean;
 begin
   gApp.Jni.jEnv:= env;
   gApp.Jni.jThis:= this;
   if Obj is jShellCommand then
   begin
     jForm(jShellCommand(Obj).Owner).UpdateJNI(gApp);
-    pascmdResult:= '';
+    pascmdResult := '';
     if cmdResult <> nil then
     begin
-      _jBoolean:= JNI_False;
-      pascmdResult:= string(env^.GetStringUTFChars(Env, cmdResult,@_jBoolean) );
+      jBoo := JNI_False;
+      pascmdResult:= string( env^.GetStringUTFChars(Env,cmdResult,@jBoo) );
     end;
     jShellCommand(Obj).GenEvent_OnShellCommandExecuted(Obj, pascmdResult);
   end;

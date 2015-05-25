@@ -27,7 +27,7 @@ jShellCommand = class(jControl)
     function jCreate(): jObject;
     procedure jFree();
     procedure Execute(_shellCmd: string);
-    procedure GenEvent_OnShellCommandExecuted(Obj: TObject; cmdResult: String);
+    procedure GenEvent_OnShellCommandExecuted(Obj: TObject; cmdResult: string);
  published
     property OnExecuted: TOnCommandExecuted read FOnCommandExecuted write FOnCommandExecuted;
 end;
@@ -91,7 +91,7 @@ begin
      jShellCommand_Execute(FjEnv, FjObject, _shellCmd);
 end;
 
-procedure jShellCommand.GenEvent_OnShellCommandExecuted(Obj: TObject; cmdResult: String);
+procedure jShellCommand.GenEvent_OnShellCommandExecuted(Obj: TObject; cmdResult: string);
 begin
    if Assigned(FOnCommandExecuted) then FOnCommandExecuted(Obj, cmdResult);
 end;
