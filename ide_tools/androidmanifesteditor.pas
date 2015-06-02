@@ -108,12 +108,13 @@ begin
   AddPerm('Read external storage');
   AddPerm('Read owner data');
   AddPerm('Read phone state');
+  AddPerm('Receive SMS');
   AddPerm('Restart packages');
   AddPerm('Send SMS');
+  AddPerm('Vibrate');
   AddPerm('Write external storage');
   AddPerm('Write owner data');
   AddPerm('Write user dictionary');
-  AddPerm('Receive SMS');
   { todo:
   Access location extra commands
   Access mock location
@@ -166,7 +167,6 @@ begin
   Use credentials
   Use SIP
   Vending billing (In-app Billing)
-  Vibrate
   Wake lock
   Write calendar
   Write call log
