@@ -95,7 +95,7 @@
 	*	Option 1: NEW !!
 	*		IDE --> Tools --> 
 	*				[Lamw] Android Module Wizard --> 
-	*								Change Project [*.lpi] Ndk Path [Demos]
+	*					Change Project [*.lpi] Ndk Path [Demos]
 	*	Option 2: Go to Lazarus IDE:
 	*			->Project
 	*			->Project -> Option
@@ -109,6 +109,49 @@
 	*			see "build.bat" [or .sh] and "install.bat" or [.sh]
 	*			or Go To: Lazarus IDE menu "Run--> [Lamw] Build and Run"! Thanks to Anton!!!
 	****************************************************************************************************
+
+Version 0.6 - rev. 28 - 02 June 2015 - 
+
+	NEW!
+		jForm "TakeScreeshot" method
+		jForm "Vibrate" method
+			:"AndroidManifest.xml" add on:  
+				"<uses-permission android:name="android.permission.VIBRATE"/>"
+
+
+	IMPROVEDMENTS!   
+
+		jAsyncTask component:
+			New! component design/behaviour !
+			News events properties: 
+    				OnDoInBackground
+				OnProgressUpdate
+				OnPreExecute
+				OnPostExecute
+
+		::Redesigned Demo : AppAsyncTaskDemo1 		
+		
+
+		jHttpClient
+			New! Added build in "asynctask" support!
+			News events properties: 
+				OnContentResult
+				OnCodeResult
+
+		::Redesigned Demo: AppHttpClientDemo1					
+
+	
+		jDialogProgress component //<--- Euller's suggestion!
+			New! Added "custom view" support!
+			News methods:								
+				Show
+				SetMessage
+				SetTitle
+				SetCancelable
+
+	NEW!  
+		Demo AppDialogProgressDemo1 [Eclipse Compatible Project] 			
+
 
 Version 0.6 - rev. 27 - 25 May 2015 - 
 
@@ -552,9 +595,9 @@ Version 0.6 - rev. 11 - 03 January 2015 -
 		.Just puts the jImageView "first" on jForm and set LayoutParams [H/W] to lpMatchParent
 			(Form Background Image is done!) 
 
-Version 0.6 - rev. 10 - 21 December 2014 -
+Version 0.6 - rev. 10 - 21 December 2014 - 
 
-	Important Code Reorganization: A sugestion by Leledumbo [Thank you very much Leledumbo!]
+	Important Code Reorganization: A suggestion by Leledumbo [Thank you very much Leledumbo!]
 
 	Significantly reducing the final size of "controls.so"  [just about half!]
 
@@ -738,7 +781,7 @@ Version 0.6 - rev. 05 - 13 November 2014 -
 
 			:: Yes, Now became easy to keep the [olds] projects in sync with the new AMW version-revision!	
 
-		.Add sub entry "Path Settings [JDK, SDK, NDK, ...]" <<--- Stephano's sugestion! (**)
+		.Add sub entry "Path Settings [JDK, SDK, NDK, ...]" <<--- Stephano's suggestion! (**)
 		ref. image: https://jmpessoa.opendrive.com/files?Ml82Nzg4MzA1OF9yVVU3RA
 
 			:: WARNING: I recommend that "new" User start here: Set Paths to JDK, SDK, NDK, ...
@@ -1206,7 +1249,7 @@ V. Ref. Lazarus forum: http://forum.lazarus.freepascal.org/index.php/topic,21919
 
      -Help and Hints
      -Bugs : [SOLVED!] {known bug: fail on Api > 13. Temporary solution: a workaround to prevent Api > 13 - 02 jan 2014} 
-     -Sugestions 
+     -suggestions 
      -Colaborations	
      -Critics
      -Roadmap

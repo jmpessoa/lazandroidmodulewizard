@@ -797,6 +797,14 @@ Function  jDialogProgress_Create       (env:PJNIEnv; this:jobject; SelfObj : TOb
 
 Procedure jDialogProgress_Free         (env:PJNIEnv; DialogProgress : jObject);
 
+procedure jDialogProgress_Show(env: PJNIEnv; _jdialogprogress: JObject);  overload;
+procedure jDialogProgress_Show(env: PJNIEnv; _jdialogprogress: JObject; _title: string; _msg: string);  overload;
+procedure jDialogProgress_Show(env: PJNIEnv; _jdialogprogress: JObject; _layout: jObject);   overload;
+procedure jDialogProgress_SetMessage(env: PJNIEnv; _jprogressdialog: JObject; _msg: string);
+procedure jDialogProgress_SetTitle(env: PJNIEnv; _jprogressdialog: JObject; _title: string);
+procedure jDialogProgress_SetCancelable(env: PJNIEnv; _jdialogprogress: JObject; _value: boolean);
+procedure jDialogProgress_Stop(env: PJNIEnv; _jdialogprogress: JObject);
+
 // Toast
 Procedure jToast                       (env:PJNIEnv; this:jobject;Str : String);
 
@@ -847,10 +855,10 @@ Procedure jAsyncTask_Free              (env:PJNIEnv; AsyncTask : jObject);
 
 Procedure jAsyncTask_Execute           (env:PJNIEnv; AsyncTask : jObject);
 
-Procedure jAsyncTask_setProgress       (env:PJNIEnv; AsyncTask : jObject; Progress : Integer);
+//Procedure jAsyncTask_setProgress       (env:PJNIEnv; AsyncTask : jObject; Progress : Integer);
 
 //by jmpessoa
-Procedure jAsyncTask_SetAutoPublishProgress(env:PJNIEnv; AsyncTask : jObject; Value : boolean);
+//Procedure jAsyncTask_SetAutoPublishProgress(env:PJNIEnv; AsyncTask : jObject; Value : boolean);
 
 //jSqliteCursor : by jmpessoa}
 Function  jSqliteCursor_Create(env:PJNIEnv;  this:jobject; SelfObj: TObject): jObject;
@@ -931,14 +939,16 @@ procedure jSqliteDataAccess_UpdateImageBatch(env: PJNIEnv; _jsqlitedataaccess: J
 
 function jHttpClient_jCreate(env: PJNIEnv;_Self: int64; this: jObject): jObject;
 procedure jHttpClient_jFree(env: PJNIEnv; _jhttpclient: JObject);
-function jHttpClient_Get(env: PJNIEnv; _jhttpclient: JObject; _stringUrl: string): string; overload;
+
+procedure jHttpClient_Get(env: PJNIEnv; _jhttpclient: JObject; _stringUrl: string);
+
 //procedure jHttpClient_Get(env: PJNIEnv; _jhttpclient: JObject; _stringUrl: string); overload;
+
 procedure jHttpClient_SetAuthenticationUser(env: PJNIEnv; _jhttpclient: JObject; _userName: string; _password: string);
 procedure jHttpClient_SetAuthenticationMode(env: PJNIEnv; _jhttpclient: JObject; _authenticationMode: integer);
 procedure jHttpClient_SetAuthenticationHost(env: PJNIEnv; _jhttpclient: JObject; _hostName: string; _port: integer);
-function jHttpClient_PostNameValueData(env: PJNIEnv; _jhttpclient: JObject; _stringUrl: string; _name: string; _value: string): integer; overload;
-function jHttpClient_PostNameValueData(env: PJNIEnv; _jhttpclient: JObject; _stringUrl: string; _listNameValue: string): integer; overload;
-
+procedure jHttpClient_PostNameValueData(env: PJNIEnv; _jhttpclient: JObject; _stringUrl: string; _name: string; _value: string); overload;
+procedure jHttpClient_PostNameValueData(env: PJNIEnv; _jhttpclient: JObject; _stringUrl: string; _listNameValue: string); overload;
 
 //by jmpessoa
 procedure jSend_Email(env:PJNIEnv; this:jobject;
@@ -5999,6 +6009,100 @@ begin
   env^.DeleteLocalRef(env, cls);
 end;
 
+procedure jDialogProgress_Show(env: PJNIEnv; _jdialogprogress: JObject);
+var
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jdialogprogress);
+  jMethod:= env^.GetMethodID(env, jCls, 'Show', '()V');
+  env^.CallVoidMethod(env, _jdialogprogress, jMethod);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jDialogProgress_Stop(env: PJNIEnv; _jdialogprogress: JObject);
+var
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jdialogprogress);
+  jMethod:= env^.GetMethodID(env, jCls, 'Stop', '()V');
+  env^.CallVoidMethod(env, _jdialogprogress, jMethod);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+
+procedure jDialogProgress_Show(env: PJNIEnv; _jdialogprogress: JObject; _title: string; _msg: string);
+var
+  jParams: array[0..1] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_title));
+  jParams[1].l:= env^.NewStringUTF(env, PChar(_msg));
+  jCls:= env^.GetObjectClass(env, _jdialogprogress);
+  jMethod:= env^.GetMethodID(env, jCls, 'Show', '(Ljava/lang/String;Ljava/lang/String;)V');
+  env^.CallVoidMethodA(env, _jdialogprogress, jMethod, @jParams);
+env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env,jParams[1].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+
+procedure jDialogProgress_Show(env: PJNIEnv; _jdialogprogress: JObject; _layout: jObject);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= _layout;
+  jCls:= env^.GetObjectClass(env, _jdialogprogress);
+  jMethod:= env^.GetMethodID(env, jCls, 'Show', '(Landroid/widget/RelativeLayout;)V');
+  env^.CallVoidMethodA(env, _jdialogprogress, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jDialogProgress_SetMessage(env: PJNIEnv; _jprogressdialog: JObject; _msg: string);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_msg));
+  jCls:= env^.GetObjectClass(env, _jprogressdialog);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetMessage', '(Ljava/lang/String;)V');
+  env^.CallVoidMethodA(env, _jprogressdialog, jMethod, @jParams);
+  env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jDialogProgress_SetTitle(env: PJNIEnv; _jprogressdialog: JObject; _title: string);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_title));
+  jCls:= env^.GetObjectClass(env, _jprogressdialog);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetTitle', '(Ljava/lang/String;)V');
+  env^.CallVoidMethodA(env, _jprogressdialog, jMethod, @jParams);
+  env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jDialogProgress_SetCancelable(env: PJNIEnv; _jdialogprogress: JObject; _value: boolean);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].z:= JBool(_value);
+  jCls:= env^.GetObjectClass(env, _jdialogprogress);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetCancelable', '(Z)V');
+  env^.CallVoidMethodA(env, _jdialogprogress, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
 //------------------------------------------------------------------------------
 // MessageBox , Dialog
 //------------------------------------------------------------------------------
@@ -6296,6 +6400,7 @@ begin
  env^.DeleteLocalRef(env, cls);
 end;
 
+(*
 Procedure jAsyncTask_setProgress(env:PJNIEnv; AsyncTask : jObject; Progress : Integer);
 var
  _jMethod : jMethodID = nil;
@@ -6322,6 +6427,7 @@ begin
  env^.CallVoidMethodA(env, AsyncTask,_jMethod,@_jParams);
  env^.DeleteLocalRef(env, cls);
 end;
+ *)
 
 {jSqliteCursor by jmpessoa}
 
@@ -7057,25 +7163,16 @@ begin
 end;
 
 
-function  jHttpClient_Get(env: PJNIEnv; _jhttpclient: JObject; _stringUrl: string): string;
+procedure  jHttpClient_Get(env: PJNIEnv; _jhttpclient: JObject; _stringUrl: string);
 var
-  jStr: JString;
-  jBoo: JBoolean;
   jParams: array[0..0] of jValue;
   jMethod: jMethodID=nil;
   jCls: jClass=nil;
 begin
   jParams[0].l:= env^.NewStringUTF(env, PChar(_stringUrl));
   jCls:= env^.GetObjectClass(env, _jhttpclient);
-  jMethod:= env^.GetMethodID(env, jCls, 'Get', '(Ljava/lang/String;)Ljava/lang/String;');
-  jStr:= env^.CallObjectMethodA(env, _jhttpclient, jMethod, @jParams);
-  case jStr = nil of
-     True : Result:= '';
-     False: begin
-              jBoo:= JNI_False;
-              Result:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
-            end;
-  end;
+  jMethod:= env^.GetMethodID(env, jCls, 'Get', '(Ljava/lang/String;)V');
+  env^.CallVoidMethodA(env, _jhttpclient, jMethod, @jParams);
   env^.DeleteLocalRef(env,jParams[0].l);
   env^.DeleteLocalRef(env, jCls);
 end;
@@ -7126,7 +7223,7 @@ begin
   env^.DeleteLocalRef(env, jCls);
 end;
 
-function jHttpClient_PostNameValueData(env: PJNIEnv; _jhttpclient: JObject; _stringUrl: string; _name: string; _value: string): integer;
+procedure jHttpClient_PostNameValueData(env: PJNIEnv; _jhttpclient: JObject; _stringUrl: string; _name: string; _value: string);
 var
   jParams: array[0..2] of jValue;
   jMethod: jMethodID=nil;
@@ -7136,15 +7233,15 @@ begin
   jParams[1].l:= env^.NewStringUTF(env, PChar(_name));
   jParams[2].l:= env^.NewStringUTF(env, PChar(_value));
   jCls:= env^.GetObjectClass(env, _jhttpclient);
-  jMethod:= env^.GetMethodID(env, jCls, 'PostNameValueData', '(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)I');
-  Result:= env^.CallIntMethodA(env, _jhttpclient, jMethod, @jParams);
+  jMethod:= env^.GetMethodID(env, jCls, 'PostNameValueData', '(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V');
+  env^.CallVoidMethodA(env, _jhttpclient, jMethod, @jParams);
   env^.DeleteLocalRef(env,jParams[0].l);
   env^.DeleteLocalRef(env,jParams[1].l);
   env^.DeleteLocalRef(env,jParams[2].l);
   env^.DeleteLocalRef(env, jCls);
 end;
 
-function jHttpClient_PostNameValueData(env: PJNIEnv; _jhttpclient: JObject; _stringUrl: string; _listNameValue: string): integer;
+procedure jHttpClient_PostNameValueData(env: PJNIEnv; _jhttpclient: JObject; _stringUrl: string; _listNameValue: string);
 var
   jParams: array[0..1] of jValue;
   jMethod: jMethodID=nil;
@@ -7153,8 +7250,8 @@ begin
   jParams[0].l:= env^.NewStringUTF(env, PChar(_stringUrl));
   jParams[1].l:= env^.NewStringUTF(env, PChar(_listNameValue));
   jCls:= env^.GetObjectClass(env, _jhttpclient);
-  jMethod:= env^.GetMethodID(env, jCls, 'PostNameValueData', '(Ljava/lang/String;Ljava/lang/String;)I');
-  Result:= env^.CallIntMethodA(env, _jhttpclient, jMethod, @jParams);
+  jMethod:= env^.GetMethodID(env, jCls, 'PostNameValueData', '(Ljava/lang/String;Ljava/lang/String;)V');
+  env^.CallVoidMethodA(env, _jhttpclient, jMethod, @jParams);
   env^.DeleteLocalRef(env,jParams[0].l);
   env^.DeleteLocalRef(env,jParams[1].l);
   env^.DeleteLocalRef(env, jCls);

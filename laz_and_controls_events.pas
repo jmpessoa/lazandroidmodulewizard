@@ -639,7 +639,6 @@ end;
 Procedure Java_Event_pOnShellCommandExecuted(env: PJNIEnv; this: jobject; Obj: TObject; cmdResult: JString);
 var
    pascmdResult:  string;
-   jStr: jObject;
    jBoo: jBoolean;
 begin
   gApp.Jni.jEnv:= env;

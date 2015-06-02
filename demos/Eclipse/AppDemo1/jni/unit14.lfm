@@ -7,18 +7,16 @@ object AndroidModule14: TAndroidModule14
   MarginTop = 0
   MarginRight = 0
   MarginBottom = 0
-  OnCreate = DataModuleCreate
   Text = 'AndroidModule14'
   ActivityMode = actRecyclable
   BackgroundColor = colbrBlack
-  OnCloseQuery = DataModuleCloseQuery
   OnRotate = DataModuleRotate
   OnJNIPrompt = DataModuleJNIPrompt
   object jTextView1: jTextView
-    Left = 80
-    Top = 8
-    Width = 157
-    Height = 25
+    Left = 87
+    Top = 10
+    Width = 126
+    Height = 20
     MarginLeft = 10
     MarginTop = 10
     MarginRight = 10
@@ -38,9 +36,9 @@ object AndroidModule14: TAndroidModule14
     Id = 41380
   end
   object jButton1: jButton
-    Left = 8
-    Top = 72
-    Width = 288
+    Left = 5
+    Top = 87
+    Width = 290
     Height = 40
     MarginLeft = 5
     MarginTop = 5
@@ -52,18 +50,18 @@ object AndroidModule14: TAndroidModule14
     PosRelativeToParent = []
     LayoutParamWidth = lpMatchParent
     LayoutParamHeight = lpWrapContent
-    Text = 'Http Get/Asyn Start'
+    Text = 'HttpGet(www.firemedia.de/)'
     BackgroundColor = colbrDefault
-    FontColor = colbrLightSteelBlue
+    FontColor = colbrDarkBlue
     FontSize = 0
     OnClick = jButton1Click
     Id = 67114
   end
   object jProgressBar1: jProgressBar
-    Left = 8
-    Top = 120
-    Width = 288
-    Height = 30
+    Left = 10
+    Top = 142
+    Width = 280
+    Height = 23
     MarginLeft = 10
     MarginTop = 10
     MarginRight = 10
@@ -81,10 +79,10 @@ object AndroidModule14: TAndroidModule14
     Id = 24359
   end
   object jTextView2: jTextView
-    Left = 8
-    Top = 160
-    Width = 157
-    Height = 25
+    Left = 10
+    Top = 185
+    Width = 106
+    Height = 20
     MarginLeft = 10
     MarginTop = 10
     MarginRight = 10
@@ -105,10 +103,10 @@ object AndroidModule14: TAndroidModule14
     Id = 69640
   end
   object jEditText1: jEditText
-    Left = 8
-    Top = 192
-    Width = 288
-    Height = 128
+    Left = 10
+    Top = 225
+    Width = 280
+    Height = 136
     MarginLeft = 10
     MarginTop = 10
     MarginRight = 10
@@ -123,21 +121,23 @@ object AndroidModule14: TAndroidModule14
     Alignment = taLeft
     InputTypeEx = itxMultiLine
     MaxTextLength = 3000
-    BackgroundColor = colbrLightSlateGray
+    BackgroundColor = colbrLightSlateBlue
     FontColor = colbrDefault
     FontSize = 0
+    HintTextColor = colbrSilver
     ScrollBarStyle = scrlInsideInset
     MaxLines = 50
     HorScrollBar = False
     VerScrollBar = True
     WrappingLine = True
+    Editable = True
     Id = 45472
   end
   object jTextView3: jTextView
-    Left = 8
-    Top = 344
-    Width = 157
-    Height = 25
+    Left = 10
+    Top = 381
+    Width = 128
+    Height = 20
     MarginLeft = 10
     MarginTop = 10
     MarginRight = 10
@@ -158,8 +158,8 @@ object AndroidModule14: TAndroidModule14
     Id = 47102
   end
   object jScrollView1: jScrollView
-    Left = 8
-    Top = 376
+    Left = 5
+    Top = 416
     Width = 288
     Height = 144
     Visible = True
@@ -169,16 +169,16 @@ object AndroidModule14: TAndroidModule14
     LayoutParamWidth = lpMatchParent
     LayoutParamHeight = lpOneQuarterOfParent
     ScrollSize = 800
-    BackgroundColor = colbrLightSlateGray
+    BackgroundColor = colbrSkyBlue
     Id = 0
     object jEditText2: jEditText
-      Left = 3
-      Top = 3
-      Width = 258
-      Height = 130
+      Left = 17
+      Top = 10
+      Width = 253
+      Height = 124
       MarginLeft = 5
       MarginTop = 10
-      MarginRight = 5
+      MarginRight = 30
       MarginBottom = 10
       Visible = True
       PosRelativeToAnchor = []
@@ -189,22 +189,24 @@ object AndroidModule14: TAndroidModule14
       Alignment = taLeft
       InputTypeEx = itxMultiLine
       MaxTextLength = 3000
-      BackgroundColor = colbrLightSlateGray
+      BackgroundColor = colbrPapayaWhip
       FontColor = colbrDefault
       FontSize = 0
+      HintTextColor = colbrSilver
       ScrollBarStyle = scrNone
       MaxLines = 50
       HorScrollBar = False
       VerScrollBar = False
       WrappingLine = False
+      Editable = True
       Id = 0
     end
   end
   object jCheckBox1: jCheckBox
-    Left = 8
-    Top = 39
-    Width = 135
-    Height = 25
+    Left = 5
+    Top = 45
+    Width = 111
+    Height = 32
     MarginLeft = 5
     MarginTop = 5
     MarginRight = 5
@@ -224,17 +226,23 @@ object AndroidModule14: TAndroidModule14
     Id = 2231034
   end
   object jAsyncTask1: jAsyncTask
-    OnAsyncEvent = jAsyncTask1AsyncEvent
-    AutoPublishProgress = True
+    Tag = 1
+    OnDoInBackground = jAsyncTask1DoInBackground
+    OnProgressUpdate = jAsyncTask1ProgressUpdate
+    OnPreExecute = jAsyncTask1PreExecute
+    OnPostExecute = jAsyncTask1PostExecute
     left = 248
-    top = 8
+    top = 12
   end
   object jHttpClient1: jHttpClient
     IndexUrl = 0
     Urls.Strings = (
       'http://www.firemedia.de/'
     )
-    left = 184
-    top = 56
+    AuthenticationMode = autNone
+    OnContentResult = jHttpClient1ContentResult
+    OnCodeResult = jHttpClient1CodeResult
+    left = 160
+    top = 168
   end
 end

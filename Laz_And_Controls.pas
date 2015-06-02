@@ -136,7 +136,7 @@ unit Laz_And_Controls;
 interface
 
 uses
-  SysUtils, Classes, Math,
+  SysUtils, Classes,
   And_jni, And_jni_Bridge,
   And_lib_Unzip, And_bitmap_h,
   AndroidWidget;
@@ -225,6 +225,9 @@ type
   end;
 
   THttpClientAuthenticationMode = (autNone, autBasic{, autOAuth}); //TODO: autOAuth
+  TOnHttpClientContentResult = procedure(Sender: TObject; content: string) of Object;
+  TOnHttpClientCodeResult = procedure(Sender: TObject; code: integer) of Object;
+
   //NEW by jmpessoa
   jHttpClient = class(jControl)
   private
@@ -232,6 +235,10 @@ type
     FUrls: TStrings;
     FIndexUrl: integer;
     FAuthenticationMode: THttpClientAuthenticationMode;
+
+    FOnContentResult: TOnHttpClientContentResult;
+    FOnCodeResult: TOnHttpClientCodeResult;
+
     procedure SetIndexUrl(Value: integer);
     procedure SetUrlByIndex(Value: integer);
     procedure SetUrls(Value: TStrings);
@@ -242,15 +249,17 @@ type
     function jCreate(): jObject;
     procedure jFree();
 
-    function Get(_stringUrl: string): string; overload;
-    function Get: string; overload; overload;
-
+    procedure Get(_stringUrl: string);overload;
+    procedure Get; overload; overload;
 
     procedure SetAuthenticationUser(_userName: string; _password: string);
     procedure SetAuthenticationMode(_authenticationMode: THttpClientAuthenticationMode);
     procedure SetAuthenticationHost(_hostName: string; _port: integer);
-    function  PostNameValueData(_stringUrl: string; _name: string; _value: string): integer; overload;
-    function  PostNameValueData(_stringUrl: string; _listNameValue: string): integer;  overload;
+    procedure  PostNameValueData(_stringUrl: string; _name: string; _value: string); overload;
+    procedure  PostNameValueData(_stringUrl: string; _listNameValue: string);  overload;
+
+    procedure GenEvent_OnHttpClientContentResult(Obj: TObject; content: string);
+    procedure GenEvent_OnHttpClientCodeResult(Obj: TObject; code: integer);
 
     // Property
     property Url: string read FUrl;
@@ -258,6 +267,8 @@ type
     property IndexUrl: integer read  FIndexUrl write SetIndexUrl;
     property Urls: TStrings read FUrls write SetUrls;
     property AuthenticationMode: THttpClientAuthenticationMode read FAuthenticationMode write SetAuthenticationMode;
+    property OnContentResult: TOnHttpClientContentResult read FOnContentResult write FOnContentResult;
+    property OnCodeResult: TOnHttpClientCodeResult read FOnCodeResult write FOnCodeResult;
   end;
 
   //NEW by jmpessoa
@@ -488,41 +499,56 @@ type
     procedure Init(refApp: jApp) override;
     procedure Start;
     procedure Stop;
+    procedure Close;
+
+    procedure Show();   overload;
+    procedure Show(_title: string; _msg: string);   overload;
+    procedure Show(_layout: jObject);   overload;
+
+    procedure SetMessage(_msg: string);
+    procedure SetTitle(_title: string);
+
+    procedure SetCancelable(_value: boolean);
+
     property Parent: jForm read FParent write FParent;
   published
-    property Title: string read FTitle write FTitle;
-    property Msg: string read FMsg write FMsg;
+    property Title: string read FTitle write SetTitle;
+    property Msg: string read FMsg write SetMessage;
   end;
 
   jAsyncTask = class(jControl)
   private
     FAsyncTaskState: TAsyncTaskState;
     FRunning: boolean;
-    FOnAsyncEvent : TOnAsyncEvent;
-    FAutoPublishProgress: boolean;
-    procedure SetAutoPublishProgress(Value: boolean);
+    FOnDoInBackground: TOnAsyncEventDoInBackground;
+    FOnProgressUpdate: TOnAsyncEventProgressUpdate;
+    FOnPreExecute: TOnAsyncEventPreExecute;
+    FOnPostExecute: TOnAsyncEventPostExecute;
   protected
-    Procedure GenEvent_OnAsyncEvent(Obj: TObject;EventType,Progress : Integer);
+    Procedure GenEvent_OnAsyncEventDoInBackground(Obj: TObject; progress: Integer; out keepInBackground: boolean);
+    procedure GenEvent_OnAsyncEventProgressUpdate(Obj: TObject; progress: Integer; out progressUpdate: integer);
+    procedure GenEvent_OnAsyncEventPreExecute(Obj: TObject; out startProgress: integer);
+    procedure GenEvent_OnAsyncEventPostExecute(Obj: TObject; progress: Integer);
   public
     constructor Create(AOwner: TComponent); override;
     Destructor  Destroy; override;
     procedure Init(refApp: jApp) override;
     procedure Done;    //by jmpessoa
     Procedure Execute;
-    Procedure UpdateUI(Progress : Integer);
     property Running: boolean read FRunning  write FRunning;
     property AsyncTaskState: TAsyncTaskState read FAsyncTaskState write FAsyncTaskState;
   published
     // Event
-    property  OnAsyncEvent : TOnAsyncEvent read FOnAsyncEvent write FOnAsyncEvent;
-    property  AutoPublishProgress: boolean read FAutoPublishProgress write SetAutoPublishProgress;
+    property OnDoInBackground : TOnAsyncEventDoInBackground read FOnDoInBackground write FOnDoInBackground;
+    property OnProgressUpdate: TOnAsyncEventProgressUpdate read FOnProgressUpdate write FOnProgressUpdate;
+    property OnPreExecute: TOnAsyncEventPreExecute read FOnPreExecute write FOnPreExecute;
+    property OnPostExecute: TOnAsyncEventPostExecute read FOnPostExecute write FOnPostExecute;
   end;
 
   //NEW by jmpessoa
   jSqliteCursor = class(jControl)
    private
-      //FInitialized: boolean;
-      //FjObject: jObject;
+      //
    protected
    public
      constructor Create(AOwner: TComponent); override;
@@ -1408,13 +1434,20 @@ type
   Function  Java_Event_pOnWebViewStatus          (env: PJNIEnv; this: jobject; WebView : TObject; EventType : integer; URL : jString) : Integer;
 
   // AsyncTask Event & Task
-  Procedure Java_Event_pOnAsyncEvent             (env: PJNIEnv; this: jobject; Obj : TObject; EventType,Progress : integer);
+ // procedure Java_Event_pOnAsyncEvent(env: PJNIEnv; this: jobject; Obj : TObject; EventType,Progress: integer);
+  function Java_Event_pOnAsyncEventDoInBackground(env: PJNIEnv; this: jobject; Obj: TObject; Progress: integer): JBoolean;
+
+  function Java_Event_pOnAsyncEventProgressUpdate(env: PJNIEnv; this: jobject; Obj: TObject; Progress: integer): JInt;
+  function Java_Event_pOnAsyncEventPreExecute(env: PJNIEnv; this: jobject; Obj: TObject): JInt;
+  procedure Java_Event_pOnAsyncEventPostExecute(env: PJNIEnv; this: jobject; Obj: TObject; Progress: integer);
 
   procedure Java_Event_pAppOnViewClick(env: PJNIEnv; this: jobject; jObjView: jObject; id: integer);
   procedure Java_Event_pAppOnListItemClick(env: PJNIEnv; this: jobject;jObjAdapterView: jObject; jObjView: jObject; position: integer; id: integer);
 
   Procedure Java_Event_pOnFlingGestureDetected(env: PJNIEnv; this: jobject; Obj: TObject; direction: integer);
   Procedure Java_Event_pOnPinchZoomGestureDetected(env: PJNIEnv; this: jobject; Obj: TObject; scaleFactor: single; state: integer);
+  procedure Java_Event_pOnHttpClientContentResult(env: PJNIEnv; this: jobject; Obj: TObject; content: jString);
+  procedure Java_Event_pOnHttpClientCodeResult(env: PJNIEnv; this: jobject; Obj: TObject; code: integer);
 
 
   // Asset Function (P : Pascal Native)
@@ -1739,6 +1772,7 @@ begin
   if not Assigned(Obj) then Exit;
   if Obj is jView  then
   begin
+    jView(Obj).UpdateJNI(gApp);
     jForm(jView(Obj).Owner).UpdateJNI(gApp);
     jView(Obj).GenEvent_OnDraw(Obj, jCanvas);
   end;
@@ -1979,10 +2013,10 @@ begin
 
 end;
 
-Procedure Java_Event_pOnAsyncEvent(env: PJNIEnv; this: jobject;
+{
+procedure Java_Event_pOnAsyncEvent(env: PJNIEnv; this: jobject;
                                       Obj: TObject; EventType,Progress : integer);
 begin
-
   gApp.Jni.jEnv:= env;
   gApp.Jni.jThis:= this;
 
@@ -1996,8 +2030,117 @@ begin
        cjTask_BackGround: jAsyncTask(Obj).AsyncTaskState:= atsInBackground;
      end;
      jAsyncTask(Obj).UpdateJNI(gApp);
+     jForm(jAsyncTask(Obj).Owner).UpdateJNI(gApp);
      jAsyncTask(Obj).GenEvent_OnAsyncEvent(Obj,EventType,Progress);
   end
+end;
+ }
+
+function Java_Event_pOnAsyncEventDoInBackground(env: PJNIEnv; this: jobject; Obj : TObject; Progress : integer): JBoolean;
+var
+  doing: boolean;
+begin
+  doing:= True;  //doing!
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+
+  if not Assigned(Obj) then Exit;
+  if Obj is jAsyncTask then
+  begin
+     jAsyncTask(Obj).AsyncTaskState:= atsInBackground;
+     jAsyncTask(Obj).UpdateJNI(gApp);
+     jForm(jAsyncTask(Obj).Owner).UpdateJNI(gApp);
+     jAsyncTask(Obj).GenEvent_OnAsyncEventDoInBackground(Obj, Progress, doing);
+     Result:=  JBool(doing);
+  end
+end;
+
+function Java_Event_pOnAsyncEventProgressUpdate(env: PJNIEnv; this: jobject; Obj : TObject; Progress : integer): JInt;
+var
+  progressUpdate: integer;
+begin
+  progressUpdate:= Progress + 1;
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+  if not Assigned(Obj) then Exit;
+  if Obj is jAsyncTask then
+  begin
+     jAsyncTask(Obj).AsyncTaskState:= atsProgress;
+     jAsyncTask(Obj).UpdateJNI(gApp);
+     jForm(jAsyncTask(Obj).Owner).UpdateJNI(gApp);
+     jAsyncTask(Obj).GenEvent_OnAsyncEventProgressUpdate(Obj, Progress, progressUpdate);
+     Result:=  progressUpdate;
+  end
+end;
+
+function Java_Event_pOnAsyncEventPreExecute(env: PJNIEnv; this: jobject; Obj: TObject): JInt;
+var
+  startProgress: integer;
+begin
+  startProgress:= 0;
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+  if not Assigned(Obj) then Exit;
+  if Obj is jAsyncTask then
+  begin
+     jAsyncTask(Obj).AsyncTaskState:= atsBefore;
+     jAsyncTask(Obj).UpdateJNI(gApp);
+     jForm(jAsyncTask(Obj).Owner).UpdateJNI(gApp);
+     jAsyncTask(Obj).GenEvent_OnAsyncEventPreExecute(Obj, startProgress);
+     Result:= startProgress;
+  end
+end;
+
+procedure Java_Event_pOnAsyncEventPostExecute(env: PJNIEnv; this: jobject; Obj: TObject; Progress: integer);
+begin
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+  if not Assigned(Obj) then Exit;
+  if Obj is jAsyncTask then
+  begin
+     jAsyncTask(Obj).AsyncTaskState:= atsPost ;
+     jAsyncTask(Obj).UpdateJNI(gApp);
+     jForm(jAsyncTask(Obj).Owner).UpdateJNI(gApp);
+     jAsyncTask(Obj).GenEvent_OnAsyncEventPostExecute(Obj, Progress);
+  end
+end;
+
+procedure Java_Event_pOnHttpClientContentResult(env: PJNIEnv; this: jobject; Obj: TObject; content: jString);
+var
+  pascontent    : String;
+  _jBoolean  : jBoolean;
+begin
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+  //
+  if not Assigned(Obj) then Exit;
+
+  if Obj is jHttpClient then
+  begin
+    pascontent := '';
+    if content <> nil then
+    begin
+      _jBoolean := JNI_False;
+      pascontent    := String( env^.GetStringUTFChars(Env,content,@_jBoolean) );
+    end;
+    jForm(jHttpClient(Obj).Owner).UpdateJNI(gApp);
+    jHttpClient(Obj).GenEvent_OnHttpClientContentResult(Obj, pascontent);
+  end;
+
+end;
+
+procedure Java_Event_pOnHttpClientCodeResult(env: PJNIEnv; this: jobject; Obj: TObject; code: integer);
+
+begin
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+  //
+  if not Assigned(Obj) then Exit;
+  if Obj is jHttpClient then
+  begin
+    jForm(jHttpClient(Obj).Owner).UpdateJNI(gApp);
+    jHttpClient(Obj).GenEvent_OnHttpClientCodeResult(Obj, code);
+  end;
 end;
 
 //------------------------------------------------------------------------------
@@ -4261,17 +4404,17 @@ begin
   FUrls.Assign(Value);
 end;
 
-function jHttpClient.Get: string;
+procedure jHttpClient.Get;
 begin
  if FInitialized then
-   Result:= jHttpClient_Get(FjEnv, FjObject, FUrl);
+   jHttpClient_Get(FjEnv, FjObject, FUrl);
 end;
 
-function jHttpClient.Get(_stringUrl: string): string;
+procedure jHttpClient.Get(_stringUrl: string);
 begin
   //in designing component state: result value here...
   if FInitialized then
-      Result:= jHttpClient_Get(FjEnv, FjObject, _stringUrl);
+      jHttpClient_Get(FjEnv, FjObject, _stringUrl);
 end;
 
 
@@ -4288,20 +4431,29 @@ begin
   if FInitialized then SetUrlByIndex(Value);
 end;
 
-function jHttpClient.PostNameValueData(_stringUrl: string; _name: string; _value: string): integer;
+procedure jHttpClient.PostNameValueData(_stringUrl: string; _name: string; _value: string);
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jHttpClient_PostNameValueData(FjEnv, FjObject, _stringUrl ,_name ,_value);
+    jHttpClient_PostNameValueData(FjEnv, FjObject, _stringUrl ,_name ,_value);
 end;
 
-function jHttpClient.PostNameValueData(_stringUrl: string; _listNameValue: string): integer;
+procedure jHttpClient.PostNameValueData(_stringUrl: string; _listNameValue: string);
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jHttpClient_PostNameValueData(FjEnv, FjObject, _stringUrl ,_listNameValue);
+    jHttpClient_PostNameValueData(FjEnv, FjObject, _stringUrl ,_listNameValue);
 end;
 
+procedure jHttpClient.GenEvent_OnHttpClientContentResult(Obj: TObject; content: string);
+begin
+   if Assigned(FOnContentResult) then FOnContentResult(Obj, content);
+end;
+
+procedure jHttpClient.GenEvent_OnHttpClientCodeResult(Obj: TObject; code: integer);
+begin
+   if Assigned(FOnCodeResult) then FOnCodeResult(Obj, code);
+end;
 
 {jSMTPClient by jmpessoa: warning: not tested!}
 
@@ -6749,7 +6901,7 @@ begin
   // Init
   FParent  := jForm(AOwner);
   FjObject  := nil;
-  FTitle:= 'jDialogProgress';
+  FTitle:= 'Lamw: Lazarus Android Module Wizard';
   FMsg:= 'Please, wait...';
 end;
 
@@ -6768,24 +6920,74 @@ end;
 
 procedure jDialogProgress.Stop;
 begin
-  if FjObject  <> nil then
-  begin
-     jDialogProgress_Free(FjEnv, FjObject );
-     FjObject := nil;
-  end;
+  if FInitialized then
+     jDialogProgress_Stop(FjEnv, FjObject);
+end;
+
+
+procedure jDialogProgress.Close;
+begin
+  if FInitialized then
+     jDialogProgress_Stop(FjEnv, FjObject);
 end;
 
 procedure jDialogProgress.Start;
 begin
-  if (FjObject  = nil) and (FInitialized = True) then
-     FjObject := jDialogProgress_Create(FjEnv, gApp.Jni.jThis, Self, FTitle, FMsg);
+  if FInitialized then
+     jDialogProgress_Show(FjEnv, FjObject);
 end;
 
 procedure jDialogProgress.Init(refApp: jApp);
 begin
   if FInitialized  then Exit;
-  inherited Init(refApp);
+  inherited Init(refApp); //set default ViewParent/FjPRLayout as jForm.View!
+  //your code here: set/initialize create params....
+  FjObject:= jDialogProgress_Create(FjEnv, gApp.Jni.jThis, Self, FTitle, FMsg);
   FInitialized:= True;
+end;
+
+procedure jDialogProgress.Show();
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jDialogProgress_Show(FjEnv, FjObject);
+end;
+
+procedure jDialogProgress.Show(_title: string; _msg: string);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jDialogProgress_Show(FjEnv, FjObject, _title ,_msg);
+end;
+
+procedure jDialogProgress.Show(_layout: jObject);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jDialogProgress_Show(FjEnv, FjObject, _layout);
+end;
+
+procedure jDialogProgress.SetMessage(_msg: string);
+begin
+  //in designing component state: set value here...
+  FMsg:= _msg;
+  if FInitialized then
+     jDialogProgress_SetMessage(FjEnv, FjObject, _msg);
+end;
+
+procedure jDialogProgress.SetTitle(_title: string);
+begin
+  //in designing component state: set value here...
+  FTitle:= _title;
+  if FInitialized then
+     jDialogProgress_SetTitle(FjEnv, FjObject, _title);
+end;
+
+procedure jDialogProgress.SetCancelable(_value: boolean);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jDialogProgress_SetCancelable(FjEnv, FjObject, _value);
 end;
 
 //------------------------------------------------------------------------------
@@ -7082,11 +7284,8 @@ end;
 constructor jAsyncTask.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
-  // Init
-  FOnAsyncEvent := nil;
   FjObject:= nil;
   FRunning:= False;
-  FAutoPublishProgress:= False;
 end;
 
 destructor jAsyncTask.Destroy;
@@ -7107,48 +7306,45 @@ begin
   if FInitialized  then Exit;
   inherited Init(refApp);
   FInitialized:= True;
+  FjObject := jAsyncTask_Create(FjEnv, FjThis, Self);
 end;
 
 procedure jAsyncTask.Done;
 begin
-  if FjObject  <> nil then
-  begin
-    jAsyncTask_Free(FjEnv, FjObject );
-    FjObject := nil;
-    FRunning:= False;
-  end;
+   FRunning:= False;
 end;
 
 Procedure jAsyncTask.Execute;
 begin
-  if (FjObject  = nil) and (FInitialized = True) and (FRunning = False) then
+  if  (FInitialized = True) and (FRunning = False) then
   begin
     Self.UpdateJNI(gApp);
-    FjObject := jAsyncTask_Create(FjEnv, FjThis, Self);
-    jAsyncTask_SetAutoPublishProgress(FjEnv, FjObject , FAutoPublishProgress);
     FRunning:= True;
-    jAsyncTask_Execute(FjEnv, FjObject );
+    jAsyncTask_Execute(FjEnv, FjObject);
   end;
 end;
 
-Procedure jAsyncTask.UpdateUI(Progress : Integer);
+procedure jAsyncTask.GenEvent_OnAsyncEventDoInBackground(Obj: TObject; progress: integer; out keepInBackground: boolean);
 begin
-  if FInitialized then
-  begin
-     jAsyncTask_setProgress(FjEnv, FjObject ,Progress);
-  end;
+  keepInBackground:= True;
+  if Assigned(FOnDoInBackground) then FOnDoInBackground(Obj,progress,keepInBackground);
 end;
 
-procedure jAsyncTask.SetAutoPublishProgress(Value: boolean);
+procedure jAsyncTask.GenEvent_OnAsyncEventProgressUpdate(Obj: TObject; progress: integer; out progressUpdate: integer);
 begin
-  FAutoPublishProgress:= Value;
-  if FInitialized then
-     jAsyncTask_SetAutoPublishProgress(FjEnv, FjObject , Value);
+  progressUpdate:= progress + 1;
+  if Assigned(FOnProgressUpdate) then FOnProgressUpdate(Obj,progress, progressUpdate);
 end;
 
-Procedure jAsyncTask.GenEvent_OnAsyncEvent(Obj: TObject; EventType, Progress:Integer);
+procedure jAsyncTask.GenEvent_OnAsyncEventPreExecute(Obj: TObject; out startProgress: integer);
 begin
-  if Assigned(FOnAsyncEvent) then FOnAsyncEvent(Obj,EventType,Progress);
+  startProgress:= 0;
+  if Assigned(FOnPreExecute) then FOnPreExecute(Obj, startProgress);
+end;
+
+procedure jAsyncTask.GenEvent_OnAsyncEventPostExecute(Obj: TObject; progress: Integer);
+begin
+  if Assigned(FOnPostExecute) then FOnPostExecute(Obj,progress);
 end;
 
 //------------------------------------------------------------------------------

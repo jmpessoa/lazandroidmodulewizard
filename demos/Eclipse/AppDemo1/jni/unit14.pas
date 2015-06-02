@@ -25,20 +25,26 @@ type
       jTextView2: jTextView;
       jTextView3: jTextView;
 
-      procedure DataModuleCloseQuery(Sender: TObject; var CanClose: boolean);
-      procedure DataModuleCreate(Sender: TObject);
       procedure DataModuleJNIPrompt(Sender: TObject);
       procedure DataModuleRotate(Sender: TObject; rotate: integer;
         var rstRotate: integer);
-      procedure jAsyncTask1AsyncEvent(Sender: TObject; EventType,
-        Progress: Integer);
+      procedure jAsyncTask1DoInBackground(Sender: TObject; Progress: Integer;
+        out keepInBackground: boolean);
+      procedure jAsyncTask1PostExecute(Sender: TObject; progress: integer);
+      procedure jAsyncTask1PreExecute(Sender: TObject; out
+        startProgress: integer);
+      procedure jAsyncTask1ProgressUpdate(Sender: TObject; progress: integer;
+        out progressUpdate: integer);
       procedure jButton1Click(Sender: TObject);
       procedure jCheckBox1Click(Sender: TObject);
+      procedure jHttpClient1CodeResult(Sender: TObject; code: integer);
+      procedure jHttpClient1ContentResult(Sender: TObject; content: string);
     private
        {private declarations}
     public
        {public declarations}
-       resultInfo: string;
+       FTaskDone: boolean;
+       function DoTask(done: boolean): boolean;
   end;
 
 var
@@ -50,17 +56,6 @@ implementation
   
 
 { TAndroidModule14 }
-
-procedure TAndroidModule14.DataModuleCreate(Sender: TObject);
-begin
-  //
-end;
-
-procedure TAndroidModule14.DataModuleCloseQuery(Sender: TObject;
-  var CanClose: boolean);
-begin
-  CanClose:= True;
-end;
 
 
 procedure TAndroidModule14.DataModuleJNIPrompt(Sender: TObject);
@@ -74,53 +69,54 @@ begin
   Self.UpdateLayout;
 end;
 
-procedure TAndroidModule14.jAsyncTask1AsyncEvent(Sender: TObject; EventType, Progress: Integer);
-var
-  i: integer;
+function TAndroidModule14.DoTask(done: boolean): boolean;
 begin
-  case EventType of
-     cjTask_Before     : begin
-                          { Dialog.show();}
-                           jButton1.Text:= 'Running...';
-                           //jTextView2.Text:= 'UI_Task_Progress: 0';
-                           jProgressBar1.Progress:= 0;
-                           jProgressBar1.Start;
-                         end;
+   if  not done then Result:= True //continue doing ...
+   else  Result:= False; //done!
+end;
 
-     cjTask_Progress   : begin
-                           //jTextView2.Text := 'UI_Task_Progress: ' + IntToStr(Progress);
-                           if Progress <= jProgressBar1.Max then
-                           begin
-                              jProgressBar1.Progress:= Progress
-                           end
-                           else
-                              jProgressBar1.Progress:= 0;
-                         end;
-     cjTask_BackGround : // Thread Routine Here - write here the code to any background task.
-                         begin
-                           resultInfo:= jHttpClient1.Get;
-                         end;
-     cjTask_Post       : begin
-                           {Dialog.dismiss();}
-                           //jTextView2.Text:= 'The game is over!!';
-                           jButton1.Text:= 'Get/Start';
-                           jProgressBar1.Stop;
-                           jAsyncTask1.Done;
-                           //ShowMessage(resultInfo);
-                           jEditText1.Text:= resultInfo;
-                           jEditText2.Text:= resultInfo;
-                         end;
-  end;
+procedure TAndroidModule14.jAsyncTask1DoInBackground(Sender: TObject; Progress: Integer; out keepInBackground: boolean);
+begin
+   keepInBackground:= DoTask(FTaskDone);
+end;
+
+procedure TAndroidModule14.jAsyncTask1PostExecute(Sender: TObject; progress: integer);
+begin
+  jButton1.Text:= 'Get/Start';
+  jProgressBar1.Stop;
+  jAsyncTask1.Done;
+end;
+
+procedure TAndroidModule14.jAsyncTask1PreExecute(Sender: TObject; out startProgress: integer);
+begin
+  startProgress:= 0; //out param
+  jButton1.Text:= 'Running...';
+  jProgressBar1.Progress:= 0;
+  jProgressBar1.Start;
+  jHttpClient1.Get;
+end;
+
+procedure TAndroidModule14.jAsyncTask1ProgressUpdate(Sender: TObject; progress: integer; out progressUpdate: integer);
+begin
+   if Progress <= jProgressBar1.Max then
+   begin
+      jProgressBar1.Progress:= Progress;
+      progressUpdate:=  Progress + 1; //out param
+   end
+   else
+   begin
+      jProgressBar1.Progress:= 0;
+      progressUpdate:= 0;  //out param
+   end;
 end;
 
 procedure TAndroidModule14.jButton1Click(Sender: TObject);
 begin
-
   if not jAsyncTask1.Running then
-     jAsyncTask1.Execute
-  else
-     ShowMessage('Running...');
-
+  begin
+    FTaskDone:= False;
+    jAsyncTask1.Execute;
+  end;
 end;
 
 procedure TAndroidModule14.jCheckBox1Click(Sender: TObject);
@@ -128,10 +124,20 @@ begin
    if jCheckBox1.Checked then
    begin
      if not Self.IsWifiEnabled() then Self.SetWifiEnabled(True);
-
    end else Self.SetWifiEnabled(True);
-
 end;
 
+procedure TAndroidModule14.jHttpClient1CodeResult(Sender: TObject; code: integer);
+begin
+  ShowMessage('Http Code = '+ IntToStr(code));
+end;
+
+procedure TAndroidModule14.jHttpClient1ContentResult(Sender: TObject; content: string);
+begin
+   FTaskDone:= True;
+   jAsyncTask1.Done;
+   jEditText1.Text:= content;
+   jEditText2.Text:= content;
+end;
 
 end.

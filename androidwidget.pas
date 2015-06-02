@@ -256,8 +256,6 @@ const
 
 type
 
- TAsyncTaskState = (atsBefore, atsProgress, atsPost, atsInBackground);
-
  TImageScaleType = (scaleCenter, scaleCenterCrop, scaleCenterInside, scaleFitCenter,
                 scaleFitEnd, scaleFitStart, scaleFitXY, scaleMatrix);
 
@@ -564,12 +562,15 @@ type
   TOnClickWidgetItem = Procedure(Sender: TObject; Item: integer; checked: boolean) of object;
   TOnClickCaptionItem= Procedure(Sender: TObject; Item: integer; caption: string) of object;
 
-  //
   TOnWebViewStatus   = Procedure(Sender: TObject; Status : TWebViewStatus;
                                  URL : String; Var CanNavi : Boolean) of object;
 
-  TOnAsyncEvent      = Procedure(Sender: TObject; EventType,Progress : Integer) of object;
-
+  TAsyncTaskState = (atsBefore, atsProgress, atsPost, atsInBackground);
+  TOnAsyncEvent = Procedure(Sender: TObject; eventType, progress: integer) of object;
+  TOnAsyncEventDoInBackground = Procedure(Sender: TObject; progress: integer; out keepInBackground: boolean) of object;
+  TOnAsyncEventProgressUpdate = Procedure(Sender: TObject; progress: integer; out progressUpdate: integer) of object;
+  TOnAsyncEventPreExecute= Procedure(Sender: TObject; out startProgress: integer) of object;
+  TOnAsyncEventPostExecute= Procedure(Sender: TObject; progress: integer) of object;
   // App
   TEnvJni     = record
                  jEnv        : PJNIEnv;  // a pointer reference to the JNI environment,
@@ -711,7 +712,7 @@ type
   protected
     FjClass: jObject;
     FClassPath: string; //need by new pure jni model! -->> initialized by widget.Create
-    FjObject      : jObject; //jSelf - java object
+    FjObject     : jObject; //jSelf - java object
     FEnabled     : boolean;
     FInitialized : boolean;
     FjEnv: PJNIEnv;
@@ -984,6 +985,9 @@ type
     function GetScreenDensity(): string;
     procedure LogDebug(_tag: string; _msg: string);
     procedure ShowCustomMessage(_layout: jObject; _gravity: integer; _lenghTimeSecond: integer); overload;
+    procedure Vibrate(_milliseconds: integer);  overload;
+    procedure Vibrate(var _millisecondsPattern: TDynArrayOfInt64);overload;
+    procedure TakeScreenshot(_savePath: string; _saveFileNameJPG: string);
 
     // Property
     property View         : jObject        read FjRLayout; //layout!
@@ -1190,6 +1194,9 @@ end;
 
   procedure jForm_ShowCustomMessage(env: PJNIEnv; _jform: JObject; _layout: jObject; _gravity: integer; _lenghTimeSecond: integer); overload;
 
+  procedure jForm_Vibrate(env: PJNIEnv; _jform: JObject; _milliseconds: integer); overload;
+  procedure jForm_Vibrate(env: PJNIEnv; _jform: JObject; var _millisecondsPattern: TDynArrayOfInt64); overload;
+  procedure jForm_TakeScreenshot(env: PJNIEnv; _jform: JObject; _savePath: string; _saveFileNameJPG: string);
 
 //jni API Bridge
 
@@ -2686,6 +2693,27 @@ begin
      jForm_ShowCustomMessage(FjEnv, FjObject, _layout ,_gravity ,_lenghTimeSecond);
 end;
 
+procedure jForm.Vibrate(_milliseconds: integer);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jForm_Vibrate(FjEnv, FjObject, _milliseconds);
+end;
+
+procedure jForm.Vibrate(var _millisecondsPattern: TDynArrayOfInt64);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jForm_Vibrate(FjEnv, FjObject, _millisecondsPattern);
+end;
+
+procedure jForm.TakeScreenshot(_savePath: string; _saveFileNameJPG: string);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jForm_TakeScreenshot(FjEnv, FjObject, _savePath ,_saveFileNameJPG);
+end;
+
 {-------- jForm_JNI_Bridge ----------}
 
 procedure jForm_ShowCustomMessage(env: PJNIEnv; _jform: JObject; _layout: jObject; _gravity: integer; _lenghTimeSecond: integer);
@@ -3279,7 +3307,57 @@ begin
   env^.DeleteLocalRef(env, jCls);
 end;
 
+procedure jForm_Vibrate(env: PJNIEnv; _jform: JObject; _milliseconds: integer);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].i:= _milliseconds;
+  jCls:= env^.GetObjectClass(env, _jform);
+  jMethod:= env^.GetMethodID(env, jCls, 'Vibrate', '(I)V');
+  env^.CallVoidMethodA(env, _jform, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
 
+
+procedure jForm_Vibrate(env: PJNIEnv; _jform: JObject; var _millisecondsPattern: TDynArrayOfInt64);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+  newSize0: integer;
+  jNewArray0: jObject=nil;
+begin
+  newSize0:= Length(_millisecondsPattern);
+  jNewArray0:= env^.NewLongArray(env, newSize0);  // allocate
+  env^.SetLongArrayRegion(env, jNewArray0, 0 , newSize0, @_millisecondsPattern[0] {source});
+  jParams[0].l:= jNewArray0;
+  jCls:= env^.GetObjectClass(env, _jform);
+  jMethod:= env^.GetMethodID(env, jCls, 'Vibrate', '([J)V');
+  env^.CallVoidMethodA(env, _jform, jMethod, @jParams);
+  env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+
+procedure jForm_TakeScreenshot(env: PJNIEnv; _jform: JObject; _savePath: string; _saveFileNameJPG: string);
+var
+  jParams: array[0..1] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_savePath));
+  jParams[1].l:= env^.NewStringUTF(env, PChar(_saveFileNameJPG));
+  jCls:= env^.GetObjectClass(env, _jform);
+  jMethod:= env^.GetMethodID(env, jCls, 'TakeScreenshot', '(Ljava/lang/String;Ljava/lang/String;)V');
+  env^.CallVoidMethodA(env, _jform, jMethod, @jParams);
+  env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env,jParams[1].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+//-----------------------------------------------
    {jApp by jmpessoa}
 
 constructor jApp.Create(AOwner: TComponent);
