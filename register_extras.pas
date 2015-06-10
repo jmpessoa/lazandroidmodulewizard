@@ -8,6 +8,7 @@ interface
 
 uses 
   Classes,
+  surfaceview,
   tcpsocketclient,
   digitalclock,
   analogclock,
@@ -49,6 +50,7 @@ implementation
   
 Procedure Register;
 begin
+  {$I jsurfaceview_icon.lrs}
   {$I jtcpsocketclient_icon.lrs}
   {$I jdigitalclock_icon.lrs}
   {$I janalogclock_icon.lrs}
@@ -78,9 +80,9 @@ begin
   {$I jmediaplayer_icon.lrs}
   {$I jdumpjavamethods_icon.lrs}
   {$I jmyhello_icon.lrs}
-  {$I jhelloadder_icon.lrs}
   RegisterComponents('Android Bridges Extra',
     [
+      jSurfaceView,
       jTCPSocketClient,
       jDigitalClock,
       jAnalogClock,
@@ -109,8 +111,7 @@ begin
       jSharefile,
       jMediaPlayer,
       jDumpJavaMethods,
-      jMyHello,
-      jHelloAdder
+      jMyHello
     ]
   );
 end;

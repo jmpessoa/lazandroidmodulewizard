@@ -720,7 +720,7 @@ type
     FCustomColor: DWord;
     procedure SetEnabled(Value: boolean);
   public
-    procedure UpdateJNI(refApp: jApp);
+    procedure UpdateJNI(refApp: jApp); virtual;
     property Enabled     : boolean read FEnabled  write SetEnabled;
     property Initialized : boolean read FInitialized write FInitialized;
     constructor Create(AOwner: TComponent); override;
@@ -928,6 +928,8 @@ type
 
     Procedure GenEvent_OnViewClick(jObjView: jObject; Id: integer);
     Procedure GenEvent_OnListItemClick(jObjAdapterView: jObject; jObjView: jObject; position: integer; Id: integer);
+
+    procedure UpdateJNI(refApp: jApp); override;
 
     //by jmpessoa
     Procedure UpdateLayout;
@@ -1313,6 +1315,7 @@ Procedure View_SetBackGroundColor     (env:PJNIEnv;view : jObject; color : DWord
 
 Procedure View_Invalidate             (env:PJNIEnv;this:jobject; view : jObject); overload;
 Procedure View_Invalidate             (env:PJNIEnv; view : jObject); overload;
+Procedure View_PostInvalidate(env:PJNIEnv; view : jObject);
 
 //------------
   function JBool( Bool : Boolean ) : byte;
@@ -2714,6 +2717,20 @@ begin
      jForm_TakeScreenshot(FjEnv, FjObject, _savePath ,_saveFileNameJPG);
 end;
 
+procedure jForm.UpdateJNI(refApp: jApp);
+var
+  i, count: integer;
+begin
+  inherited UpdateJNI(refApp);
+  count:= Self.ComponentCount;
+  for i:= (count-1) downto 0 do
+  begin
+    if (Self.Components[i] is jControl) then
+    begin
+       (Self.Components[i] as jControl).UpdateJNI(refApp);
+    end;
+  end;
+end;
 {-------- jForm_JNI_Bridge ----------}
 
 procedure jForm_ShowCustomMessage(env: PJNIEnv; _jform: JObject; _layout: jObject; _gravity: integer; _lenghTimeSecond: integer);
@@ -4733,6 +4750,17 @@ var
 begin
   cls:= env^.GetObjectClass(env, view);
  _jMethod:= env^.GetMethodID(env, cls, 'invalidate', '()V');
+ env^.CallVoidMethod(env,view,_jMethod);
+ env^.DeleteLocalRef(env, cls);
+end;
+
+Procedure View_PostInvalidate(env:PJNIEnv; view : jObject);
+var
+ _jMethod : jMethodID = nil;
+ cls: jClass;
+begin
+  cls:= env^.GetObjectClass(env, view);
+ _jMethod:= env^.GetMethodID(env, cls, 'postInvalidate', '()V');
  env^.CallVoidMethod(env,view,_jMethod);
  env^.DeleteLocalRef(env, cls);
 end;

@@ -57,8 +57,8 @@ object AndroidModule1: TAndroidModule1
     Id = 0
   end
   object jPanel1: jPanel
-    Left = 4
-    Top = 144
+    Left = 2
+    Top = 109
     Width = 312
     Height = 102
     MarginLeft = 4

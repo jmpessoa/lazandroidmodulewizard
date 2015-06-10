@@ -9,6 +9,20 @@ uses
 
 type
 
+
+//AudioManager.STREAM_VOICE_CALL//0
+//AudioManager.STREAM_SYSTEM //1
+//AudioManager.STREAM_RING //2
+//AudioManager.STREAM_MUSIC 3
+//AudioManager.STREAM_ALARM //4
+//AudioManager.STREAM_NOTIFICATION //5
+
+ TAudioStreamType = (astVoiceCall, astSystem, astRing, astMusic, astAlarm, astNotification, astNone);
+
+ TOnPrepared = procedure(Sender: TObject; videoWidth: integer; videoHeight: integer) of Object;
+ TOnVideoSizeChanged = procedure(Sender: TObject; videoWidth: integer; videoHeigh: integer) of Object;
+ TOnCompletion = procedure(Sender: TObject) of Object;
+ TOnTimedText =   procedure(Sender: TObject; timedText: string) of Object;
 {Draft Component code by "Lazarus Android Module Wizard" [4/27/2014 0:21:25]}
 {https://github.com/jmpessoa/lazandroidmodulewizard}
 
@@ -16,7 +30,10 @@ type
 
 jMediaPlayer = class(jControl)
  private
-
+     FOnPrepared: TOnPrepared;
+     FOnVideoSizeChanged: TOnVideoSizeChanged;
+     FOnCompletion: TOnCompletion;
+     FOnTimedText: TOnTimedText;
  protected
 
  public
@@ -41,9 +58,21 @@ jMediaPlayer = class(jControl)
     function GetCurrentPosition(): integer;
     function GetDuration(): integer;
     procedure SetVolume(_leftVolume: single; _rightVolume: single);
+    procedure SetDisplay(_surfaceHolder: jObject);
+    function GetVideoWidth(): integer;
+    function GetVideoHeight(): integer;
+    procedure SetScreenOnWhilePlaying(_value: boolean);
+    procedure SetAudioStreamType(_audioStreamType: TAudioStreamType);
 
+    procedure GenEvent_OnPrepared(Obj: TObject; videoWidth: integer; videoHeigh: integer);
+    procedure GenEvent_OnVideoSizeChanged(Obj: TObject; videoWidth: integer; videoHeight: integer);
+    procedure GenEvent_OnCompletion(Obj: TObject);
+    procedure GenEvent_pOnMediaPlayerTimedText(Obj: TObject; timedText: string);
  published
-
+    property OnPrepared: TOnPrepared read FOnPrepared write FOnPrepared;
+    property OnVideoSizeChanged: TOnVideoSizeChanged read FOnVideoSizeChanged write FOnVideoSizeChanged;
+    property OnCompletion: TOnCompletion read FOnCompletion write FOnCompletion;
+    property OnTimedText: TOnTimedText read FOnTimedText write FOnTimedText;
 end;
 
 function jMediaPlayer_jCreate(env: PJNIEnv; this: JObject;_Self: int64): jObject;
@@ -65,6 +94,13 @@ function jMediaPlayer_GetCurrentPosition(env: PJNIEnv; _jmediaplayer: JObject): 
 function jMediaPlayer_GetDuration(env: PJNIEnv; _jmediaplayer: JObject): integer;
 procedure jMediaPlayer_SetVolume(env: PJNIEnv; _jmediaplayer: JObject; _leftVolume: single; _rightVolume: single);
 
+//procedure jMediaPlayer_SetDisplay(env: PJNIEnv; _jmediaplayer: JObject; _surfaceView: jObject);
+procedure jMediaPlayer_SetDisplay(env: PJNIEnv; _jmediaplayer: JObject; _surfaceHolder: jObject);
+
+function jMediaPlayer_GetVideoWidth(env: PJNIEnv; _jmediaplayer: JObject): integer;
+function jMediaPlayer_GetVideoHeight(env: PJNIEnv; _jmediaplayer: JObject): integer;
+procedure jMediaPlayer_SetScreenOnWhilePlaying(env: PJNIEnv; _jmediaplayer: JObject; _value: boolean);
+procedure jMediaPlayer_SetAudioStreamType(env: PJNIEnv; _jmediaplayer: JObject; _audioStreamType: integer);
 
 implementation
 
@@ -224,6 +260,60 @@ begin
      jMediaPlayer_SetVolume(FjEnv, FjObject, _leftVolume ,_rightVolume);
 end;
 
+procedure jMediaPlayer.SetDisplay(_surfaceHolder: jObject);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jMediaPlayer_SetDisplay(FjEnv, FjObject, _surfaceHolder);
+end;
+
+function jMediaPlayer.GetVideoWidth(): integer;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jMediaPlayer_GetVideoWidth(FjEnv, FjObject);
+end;
+
+function jMediaPlayer.GetVideoHeight(): integer;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jMediaPlayer_GetVideoHeight(FjEnv, FjObject);
+end;
+
+procedure jMediaPlayer.SetScreenOnWhilePlaying(_value: boolean);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jMediaPlayer_SetScreenOnWhilePlaying(FjEnv, FjObject, _value);
+end;
+
+procedure jMediaPlayer.SetAudioStreamType(_audioStreamType: TAudioStreamType);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jMediaPlayer_SetAudioStreamType(FjEnv, FjObject, Ord(_audioStreamType));
+end;
+
+procedure jMediaPlayer.GenEvent_OnPrepared(Obj: TObject; videoWidth: integer; videoHeigh: integer);
+begin
+   if Assigned(FOnPrepared) then FOnPrepared(Obj, videoWidth, videoHeigh);
+end;
+
+procedure jMediaPlayer.GenEvent_OnVideoSizeChanged(Obj: TObject; videoWidth: integer; videoHeight: integer);
+begin
+   if Assigned(FOnVideoSizeChanged) then FOnVideoSizeChanged(Obj, videoWidth, videoHeight);
+end;
+
+procedure jMediaPlayer.GenEvent_OnCompletion(Obj: TObject);
+begin
+   if Assigned(FOnCompletion) then FOnCompletion(Obj);
+end;
+
+procedure jMediaPlayer.GenEvent_pOnMediaPlayerTimedText(Obj: TObject; timedText: string);
+begin
+   if Assigned(FOnTimedText) then FOnTimedText(Obj, timedText);
+end;
 {-------- jMediaPlayer_JNI_Bridge ----------}
 
 function jMediaPlayer_jCreate(env: PJNIEnv; this: JObject;_Self: int64): jObject;
@@ -450,6 +540,68 @@ begin
   jParams[1].f:= _rightVolume;
   jCls:= env^.GetObjectClass(env, _jmediaplayer);
   jMethod:= env^.GetMethodID(env, jCls, 'SetVolume', '(FF)V');
+  env^.CallVoidMethodA(env, _jmediaplayer, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jMediaPlayer_SetDisplay(env: PJNIEnv; _jmediaplayer: JObject; _surfaceHolder: jObject);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= _surfaceHolder;
+  jCls:= env^.GetObjectClass(env, _jmediaplayer);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetDisplay', '(Landroid/view/SurfaceHolder;)V');
+  env^.CallVoidMethodA(env, _jmediaplayer, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+function jMediaPlayer_GetVideoWidth(env: PJNIEnv; _jmediaplayer: JObject): integer;
+var
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jmediaplayer);
+  jMethod:= env^.GetMethodID(env, jCls, 'GetVideoWidth', '()I');
+  Result:= env^.CallIntMethod(env, _jmediaplayer, jMethod);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+
+function jMediaPlayer_GetVideoHeight(env: PJNIEnv; _jmediaplayer: JObject): integer;
+var
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jmediaplayer);
+  jMethod:= env^.GetMethodID(env, jCls, 'GetVideoHeight', '()I');
+  Result:= env^.CallIntMethod(env, _jmediaplayer, jMethod);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jMediaPlayer_SetScreenOnWhilePlaying(env: PJNIEnv; _jmediaplayer: JObject; _value: boolean);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].z:= JBool(_value);
+  jCls:= env^.GetObjectClass(env, _jmediaplayer);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetScreenOnWhilePlaying', '(Z)V');
+  env^.CallVoidMethodA(env, _jmediaplayer, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jMediaPlayer_SetAudioStreamType(env: PJNIEnv; _jmediaplayer: JObject; _audioStreamType: integer);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].i:= _audioStreamType;
+  jCls:= env^.GetObjectClass(env, _jmediaplayer);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetAudioStreamType', '(I)V');
   env^.CallVoidMethodA(env, _jmediaplayer, jMethod, @jParams);
   env^.DeleteLocalRef(env, jCls);
 end;

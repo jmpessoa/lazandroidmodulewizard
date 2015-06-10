@@ -68,6 +68,7 @@ procedure TAndroidModule1.AndroidModule1JNIPrompt(Sender: TObject);
 begin
   jEditText2.Clear;
   jEditText1.SetFocus;
+  if  not Self.IsWifiEnabled() then Self.SetWifiEnabled(True);
 end;
 
 end.

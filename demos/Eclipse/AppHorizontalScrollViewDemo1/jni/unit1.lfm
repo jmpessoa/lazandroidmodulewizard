@@ -1,7 +1,7 @@
 object AndroidModule1: TAndroidModule1
-  Left = 297
+  Left = 286
   Top = 78
-  Width = 479
+  Width = 490
   Height = 611
   MarginLeft = 0
   MarginTop = 0
@@ -11,7 +11,7 @@ object AndroidModule1: TAndroidModule1
   ActivityMode = actMain
   BackgroundColor = colbrDefault
   object jTextView1: jTextView
-    Left = 139
+    Left = 145
     Top = 5
     Width = 200
     Height = 20
@@ -380,7 +380,7 @@ object AndroidModule1: TAndroidModule1
       'btn1_2.png'
       'lemur_face.jpg'
     )
-    left = 392
-    top = 8
+    left = 336
+    top = 432
   end
 end

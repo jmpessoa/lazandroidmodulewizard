@@ -1,0 +1,111 @@
+object AndroidModule1: TAndroidModule1
+  Left = 290
+  Top = 118
+  Width = 320
+  Height = 514
+  MarginLeft = 0
+  MarginTop = 0
+  MarginRight = 0
+  MarginBottom = 0
+  OnCreate = AndroidModule1Create
+  Text = 'AndroidModule1'
+  ActivityMode = actMain
+  BackgroundColor = colbrDefault
+  OnJNIPrompt = AndroidModule1JNIPrompt
+  OnClose = AndroidModule1Close
+  object jTextView1: jTextView
+    Left = 88
+    Top = 5
+    Width = 144
+    Height = 20
+    MarginLeft = 5
+    MarginTop = 5
+    MarginRight = 5
+    MarginBottom = 5
+    Visible = True
+    PosRelativeToAnchor = []
+    PosRelativeToParent = [rpTop, rpCenterHorizontal]
+    LayoutParamWidth = lpWrapContent
+    LayoutParamHeight = lpWrapContent
+    Text = 'App SurfaceView Demo1'
+    Alignment = taLeft
+    Enabled = True
+    BackgroundColor = colbrDefault
+    FontColor = colbrDefault
+    FontSize = 0
+    TextTypeFace = tfNormal
+    Id = 4831487
+  end
+  object jButton1: jButton
+    Left = 2
+    Top = 34
+    Width = 316
+    Height = 40
+    MarginLeft = 2
+    MarginTop = 4
+    MarginRight = 2
+    MarginBottom = 4
+    Visible = True
+    Anchor = jTextView1
+    PosRelativeToAnchor = [raBelow]
+    PosRelativeToParent = []
+    LayoutParamWidth = lpMatchParent
+    LayoutParamHeight = lpWrapContent
+    Text = 'Draw [Non Thread/Non Lock]'
+    BackgroundColor = colbrDefault
+    FontColor = colbrDefault
+    FontSize = 0
+    OnClick = jButton1Click
+    Id = 5740368
+  end
+  object jButton2: jButton
+    Left = 2
+    Top = 82
+    Width = 316
+    Height = 40
+    MarginLeft = 2
+    MarginTop = 4
+    MarginRight = 2
+    MarginBottom = 4
+    Visible = True
+    Anchor = jButton1
+    PosRelativeToAnchor = [raBelow]
+    PosRelativeToParent = []
+    LayoutParamWidth = lpMatchParent
+    LayoutParamHeight = lpWrapContent
+    Text = 'Draw [Threaded/Locked !]'
+    BackgroundColor = colbrDefault
+    FontColor = colbrDefault
+    FontSize = 0
+    OnClick = jButton2Click
+    Id = 6058869
+  end
+  object jSurfaceView1: jSurfaceView
+    Left = 8
+    Top = 144
+    Width = 304
+    Height = 208
+    MarginLeft = 10
+    MarginTop = 10
+    MarginRight = 10
+    MarginBottom = 10
+    Visible = True
+    Anchor = jButton2
+    PosRelativeToAnchor = [raBelow]
+    PosRelativeToParent = []
+    LayoutParamWidth = lpMatchParent
+    LayoutParamHeight = lpHalfOfParent
+    BackgroundColor = colbrDefault
+    PaintColor = colbrRed
+    OnSurfaceCreated = jSurfaceView1SurfaceCreated
+    OnSurfaceDraw = jSurfaceView1SurfaceDraw
+    OnDrawInBackground = jSurfaceView1DrawInBackground
+    OnDrawOutBackground = jSurfaceView1DrawOutBackground
+    OnTouchDown = jSurfaceView1TouchDown
+    Id = 0
+  end
+  object jImageFileManager1: jImageFileManager
+    left = 168
+    top = 216
+  end
+end

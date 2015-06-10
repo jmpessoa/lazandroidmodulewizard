@@ -1,6 +1,6 @@
 package com.example.apphorizontalscrollviewdemo1;
 
-//Lamw: Lazarus Android Module Wizard - Version 0.6 - rev. 26 - 21 May - 2015
+//Lamw: Lazarus Android Module Wizard - Version 0.6 - rev. 29 - 08 June - 2015
 //Form Designer and Components development model!
 //https://github.com/jmpessoa/lazandroidmodulewizard
 //http://forum.lazarus.freepascal.org/index.php/topic,21919.270.html

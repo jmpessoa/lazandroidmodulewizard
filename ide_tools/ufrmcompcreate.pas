@@ -1747,7 +1747,9 @@ begin
   if listDeleteLocalRef.Text <> '' then
      strList.Add(Trim(listDeleteLocalRef.Text));
 
-  strList.Add('  env^.DeleteLocalRef(env, jCls);');
+  if funcResult <> 'constructor' then
+     strList.Add('  env^.DeleteLocalRef(env, jCls);');
+
   strList.Add('end;');
 
   if funcResult = 'constructor' then

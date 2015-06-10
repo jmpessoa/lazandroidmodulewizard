@@ -1396,10 +1396,6 @@ type
   Procedure Java_Event_pAppOnConfigurationChanged(env: PJNIEnv; this: jobject);
   Procedure Java_Event_pAppOnActivityResult      (env: PJNIEnv; this: jobject; requestCode,resultCode : Integer; jIntent : jObject);
 
-  //Procedure Java_Event_pOnActionBarTabSelected(env: PJNIEnv; this: jobject; view: jObject; title: jString);
-  //Procedure Java_Event_pOnActionBarTabUnSelected(env: PJNIEnv; this: jobject; view:jObject; title: jString);
-
-
   //by jmpessoa: support to Option Menu
   procedure Java_Event_pAppOnCreateOptionsMenu(env: PJNIEnv; this: jobject; jObjMenu: jObject);
   Procedure Java_Event_pAppOnClickOptionMenuItem(env: PJNIEnv; this: jobject; jObjMenuItem: jObject;
@@ -1791,46 +1787,55 @@ begin
   if Obj is jForm then
   begin
     jForm(Obj).UpdateJNI(gApp);
-    jForm(Obj).GenEvent_OnClick(Obj);       exit;
+    jForm(Obj).GenEvent_OnClick(Obj);
+    Exit;
   end;
   if Obj is jTextView then
   begin
     jForm(jTextView(Obj).Owner).UpdateJNI(gApp);
-    jTextView(Obj).GenEvent_OnClick(Obj);       exit;
+    jTextView(Obj).GenEvent_OnClick(Obj);
+    Exit;
   end;
   if Obj is jButton then
   begin
     jForm(jButton(Obj).Owner).UpdateJNI(gApp);
-    jButton(Obj).GenEvent_OnClick(Obj);       exit;
+    jButton(Obj).GenEvent_OnClick(Obj);
+    Exit;
   end;
   if Obj is jCheckBox then
   begin
     jForm(jCheckBox(Obj).Owner).UpdateJNI(gApp);
-    jCheckBox(Obj).GenEvent_OnClick(Obj);       exit;
+    jCheckBox(Obj).GenEvent_OnClick(Obj);
+    Exit;
   end;
   if Obj is jRadioButton then
   begin
     jForm(jRadioButton(Obj).Owner).UpdateJNI(gApp);
-    jRadioButton(Obj).GenEvent_OnClick(Obj);       exit;
+    jRadioButton(Obj).GenEvent_OnClick(Obj);
+    Exit;
   end;
   if Obj is jDialogYN then
   begin
-    jDialogYN(Obj).GenEvent_OnClick(Obj,Value); exit;
+    jDialogYN(Obj).GenEvent_OnClick(Obj,Value);
+    Exit;
   end;
   if Obj is jImageBtn then
   begin
     jForm(jImageBtn(Obj).Owner).UpdateJNI(gApp);
-    jImageBtn(Obj).GenEvent_OnClick(Obj);       exit;
+    jImageBtn(Obj).GenEvent_OnClick(Obj);
+    Exit;
   end;
   if Obj is jListView then
   begin
     jForm(jListVIew(Obj).Owner).UpdateJNI(gApp);
-    jListVIew(Obj).GenEvent_OnClick(Obj,Value); exit;
+    jListVIew(Obj).GenEvent_OnClick(Obj,Value);
+    Exit;
   end;
   if Obj is jImageView then
   begin
     jForm(jImageView(Obj).Owner).UpdateJNI(gApp);
-    jImageView(Obj).GenEvent_OnClick(Obj);  Exit;
+    jImageView(Obj).GenEvent_OnClick(Obj);
+    Exit;
   end;
 end;
 

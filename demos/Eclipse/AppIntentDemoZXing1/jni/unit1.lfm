@@ -12,9 +12,9 @@ object AndroidModule1: TAndroidModule1
   BackgroundColor = colbrDefault
   OnActivityRst = AndroidModule1ActivityRst
   object jTextView1: jTextView
-    Left = 80
+    Left = 47
     Top = 5
-    Width = 140
+    Width = 206
     Height = 20
     MarginLeft = 5
     MarginTop = 5
@@ -25,7 +25,7 @@ object AndroidModule1: TAndroidModule1
     PosRelativeToParent = [rpTop, rpCenterHorizontal]
     LayoutParamWidth = lpWrapContent
     LayoutParamHeight = lpWrapContent
-    Text = 'App Intent Demo ZXing '
+    Text = 'App Intent Demo ZXing  [Bar Code]'
     Alignment = taLeft
     Enabled = True
     BackgroundColor = colbrDefault
@@ -66,7 +66,7 @@ object AndroidModule1: TAndroidModule1
   object jTextView2: jTextView
     Left = 5
     Top = 35
-    Width = 118
+    Width = 153
     Height = 20
     MarginLeft = 5
     MarginTop = 5
@@ -78,7 +78,7 @@ object AndroidModule1: TAndroidModule1
     PosRelativeToParent = [rpLeft]
     LayoutParamWidth = lpWrapContent
     LayoutParamHeight = lpWrapContent
-    Text = 'Select a Scan Mode:'
+    Text = 'Select a Scan Code Mode:'
     Alignment = taLeft
     Enabled = True
     BackgroundColor = colbrDefault

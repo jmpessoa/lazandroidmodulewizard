@@ -43,8 +43,10 @@ begin
     jNotificationManager1.IConIdentifier:='lamw_logo';
     jNotificationManager1.Notify();
 
+
     //or
     //jNotificationManager1.Notify(1001,'Lamw','Hello','Lamw: App Hello World Notification Demo1!', 'lamw_logo');
+     ShowMessage('Notification ok ... ');
 
 end;
 

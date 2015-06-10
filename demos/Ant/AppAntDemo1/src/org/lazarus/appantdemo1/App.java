@@ -1,8 +1,7 @@
 package org.lazarus.appantdemo1;
 
-//Lamw: Lazarus Android Module Wizard - Version 0.6 - rev. 20 - 07 April - 2015
+//Lamw: Lazarus Android Module Wizard - Version 0.6 - rev. 29 - 08 June - 2015
 //Form Designer and Components development model!
-//Author: jmpessoa@hotmail.com
 //https://github.com/jmpessoa/lazandroidmodulewizard
 //http://forum.lazarus.freepascal.org/index.php/topic,21919.270.html
 
@@ -17,6 +16,8 @@ package org.lazarus.appantdemo1;
 //          LoadMan    / Jang,Yang-Ho
 //                       wkddidgh@naver.com
 //                       http://blog.naver.com/wkddidgh
+
+//	    JMPessoa  /  josemarquespessoa@gmail.com
 
 
 import java.lang.Override;

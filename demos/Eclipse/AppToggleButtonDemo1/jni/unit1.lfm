@@ -1,7 +1,7 @@
 object AndroidModule1: TAndroidModule1
   Left = 277
   Top = 118
-  Width = 300
+  Width = 327
   Height = 600
   MarginLeft = 0
   MarginTop = 0
@@ -12,7 +12,7 @@ object AndroidModule1: TAndroidModule1
   BackgroundColor = colbrDefault
   OnJNIPrompt = AndroidModule1JNIPrompt
   object jTextView1: jTextView
-    Left = 77
+    Left = 91
     Top = 5
     Width = 145
     Height = 20
@@ -37,7 +37,7 @@ object AndroidModule1: TAndroidModule1
   object jButton1: jButton
     Left = 2
     Top = 118
-    Width = 136
+    Width = 149
     Height = 40
     MarginLeft = 2
     MarginTop = 4
@@ -57,9 +57,9 @@ object AndroidModule1: TAndroidModule1
     Id = 1443981
   end
   object jButton2: jButton
-    Left = 142
+    Left = 155
     Top = 118
-    Width = 136
+    Width = 182
     Height = 40
     MarginLeft = 2
     MarginTop = 4
@@ -69,7 +69,7 @@ object AndroidModule1: TAndroidModule1
     Anchor = jButton1
     PosRelativeToAnchor = [raToRightOf, raAlignBaseline]
     PosRelativeToParent = []
-    LayoutParamWidth = lpHalfOfParent
+    LayoutParamWidth = lpThreeFifthOfParent
     LayoutParamHeight = lpWrapContent
     Text = 'ToggleButton1 Off'
     BackgroundColor = colbrDefault

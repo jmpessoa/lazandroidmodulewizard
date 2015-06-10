@@ -108,43 +108,65 @@
 	*			You can build/install/Run all Eclipse projects just with "Ant"... 
 	*			see "build.bat" [or .sh] and "install.bat" or [.sh]
 	*			or Go To: Lazarus IDE menu "Run--> [Lamw] Build and Run"! Thanks to Anton!!!
+	*
+	*4.PANIC  ? [upgrade your project [or demo] code templates!] !
+	*	Lazarus IDE --> menu Tools --> [Lamw] Android Module Wizard --> Upgrade code Templates [*.lpr, *.java]
+	*
+	*5.PANIC ? When prompt "Read error" [Unknown Property] just choice "Continue Loading" !
 	****************************************************************************************************
+
+Version 0.6 - rev. 29 - 08 June 2015 - 
+
+	NEW! jSurfaceView component 
+
+	IMPROVEDMENTS!   
+
+		jMediaPlayer component:			
+			New! Add support to video play! // <<------ @m4u_hoahoctro's request and suggestion!
+	NEW!  
+		Demo AppMediaPlayerDemo1 [Eclipse Compatible Project] 			
+		Demo AppSurfaceViewDemo1 [Eclipse Compatible Project] 
+
+	UPDATED: All Demos was "upgrade"!			
+
+	HINT 1: Old Projects: upgrade your projects code templates !
+		Lazarus IDE --> menu Tools --> [Lamw] Android Module Wizard --> Upgrade code Templates [*.lpr, *.java]
+
+	HINT 2:	When prompt "Read error" [Unknown Property] just choice "Continue Loading"!
 
 Version 0.6 - rev. 28 - 02 June 2015 - 
 
 	NEW!
-		jForm "TakeScreeshot" method
+		jForm "TakeScreenshot" method
 		jForm "Vibrate" method
 			:"AndroidManifest.xml" add on:  
 				"<uses-permission android:name="android.permission.VIBRATE"/>"
 
-
 	IMPROVEDMENTS!   
 
-		jAsyncTask component:
-			New! component design/behaviour !
+		jAsyncTask component:   
+			New! component design/behaviour changed!
 			News events properties: 
     				OnDoInBackground
 				OnProgressUpdate
 				OnPreExecute
 				OnPostExecute
 
-		::Redesigned Demo : AppAsyncTaskDemo1 		
+			::Redesigned DEMO : AppAsyncTaskDemo1 		
 		
-
 		jHttpClient
 			New! Added build in "asynctask" support!
 			News events properties: 
 				OnContentResult
 				OnCodeResult
 
-		::Redesigned Demo: AppHttpClientDemo1					
-
+			::Redesigned DEMO: AppHttpClientDemo1					
 	
 		jDialogProgress component //<--- Euller's suggestion!
 			New! Added "custom view" support!
 			News methods:								
 				Show
+				Close
 				SetMessage
 				SetTitle
 				SetCancelable
@@ -152,6 +174,33 @@ Version 0.6 - rev. 28 - 02 June 2015 -
 	NEW!  
 		Demo AppDialogProgressDemo1 [Eclipse Compatible Project] 			
 
+	-----------------------------------------------------------------------
+	Ok. We did dramatic changes, sorry! 
+
+	Please, you can learn the new components design/behaviour in the Demos:  AppAsyncTaskDemo1 and AppHttpClientDemo1  !!!
+
+	1. jAsyncTask lost property "OnAsyncEvent" but no panic!
+		when prompt "Read error" [Unknown Property] just choice "Continue Loading"!
+
+		Now copy the old code to matching/equivalent news events:
+			OnPreExecute			
+			OnDoInBackground			
+			OnProgressUpdate
+			OnPostExecute
+
+	2. jHttpClient: now "runInBackground/asynctask" have build in  support! 
+			You do not  need more use jAsyncTask component to run it "in background" !
+
+		Ok, you will need handle the new event "ContentResult" to get content result and
+		"get" now is a procedure [not a function] ... so, no more result!
+
+	3. Old Projects: upgrade your project [or demo] code templates!] !
+		Lazarus IDE --> menu Tools --> [Lamw] Android Module Wizard --> Upgrade code Templates [*.lpr, *.java]
+	--------------------------------------------------------------------
+
+but, the changes was for more elegance and effective solution!  
+
+Thanks to All!
 
 Version 0.6 - rev. 27 - 25 May 2015 - 
 

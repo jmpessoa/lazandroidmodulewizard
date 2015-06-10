@@ -7,7 +7,7 @@ interface
 
 uses
   Classes, SysUtils, And_jni, And_jni_Bridge, Laz_And_Controls,
-  Laz_And_Controls_Events, AndroidWidget, shellcommand, tcpsocketclient;
+  Laz_And_Controls_Events, AndroidWidget, shellcommand;
 
 type
 
@@ -53,10 +53,9 @@ end;
 
 procedure TAndroidModule1.AndroidModule1JNIPrompt(Sender: TObject);
 begin
-
    jEditText1.SetFocus;
    //jEditText1.Clear;
-   //jEditText1.Text:= '/system/bin/ping -c 1 -w 1 8.8.8.8';
+   //jEditText1.Text:= '/system/bin/ping -c 1 -w 1 8.8.8.8';     //need: self.SetWifiEnabled(True);
 end;
 
 end.

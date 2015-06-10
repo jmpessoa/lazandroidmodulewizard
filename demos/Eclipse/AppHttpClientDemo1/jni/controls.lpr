@@ -1,5 +1,5 @@
 {hint: save all files to location: C:\adt32\eclipse\workspace\AppHttpClientDemo1\jni}
-library controls;  //by Lamw: Lazarus Android Module Wizard: 6/2/2015 0:10:00]
+library controls;  //by Lamw: Lazarus Android Module Wizard: 6/9/2015 2:38:36]
  
 {$mode delphi}
  
@@ -583,7 +583,87 @@ begin
   Java_Event_pOnHttpClientCodeResult(PEnv,this,TObject(pasobj),code);
 end;
 
-const NativeMethods:array[0..71] of JNINativeMethod = (
+{ Class:     com_example_apphttpclientdemo1_Controls
+  Method:    pOnSurfaceViewCreated
+  Signature: (JLandroid/view/SurfaceHolder;)V }
+procedure pOnSurfaceViewCreated(PEnv: PJNIEnv; this: JObject; pasobj: JLong; surfaceHolder: JObject); cdecl;
+begin
+  Java_Event_pOnSurfaceViewCreated(PEnv,this,TObject(pasobj),surfaceHolder);
+end;
+
+{ Class:     com_example_apphttpclientdemo1_Controls
+  Method:    pOnSurfaceViewDraw
+  Signature: (JLandroid/graphics/Canvas;)V }
+procedure pOnSurfaceViewDraw(PEnv: PJNIEnv; this: JObject; pasobj: JLong; canvas: JObject); cdecl;
+begin
+  Java_Event_pOnSurfaceViewDraw(PEnv,this,TObject(pasobj),canvas);
+end;
+
+{ Class:     com_example_apphttpclientdemo1_Controls
+  Method:    pOnSurfaceViewChanged
+  Signature: (JII)V }
+procedure pOnSurfaceViewChanged(PEnv: PJNIEnv; this: JObject; pasobj: JLong; width: JInt; height: JInt); cdecl;
+begin
+  Java_Event_pOnSurfaceViewChanged(PEnv,this,TObject(pasobj),width,height);                                             
+end;
+
+{ Class:     com_example_apphttpclientdemo1_Controls
+  Method:    pOnMediaPlayerPrepared
+  Signature: (JII)V }
+procedure pOnMediaPlayerPrepared(PEnv: PJNIEnv; this: JObject; pasobj: JLong; videoWidth: JInt; videoHeigh: JInt); cdecl;
+begin
+  Java_Event_pOnMediaPlayerPrepared(PEnv,this,TObject(pasobj),videoWidth,videoHeigh);
+end;
+
+{ Class:     com_example_apphttpclientdemo1_Controls
+  Method:    pOnMediaPlayerVideoSizeChanged
+  Signature: (JII)V }
+procedure pOnMediaPlayerVideoSizeChanged(PEnv: PJNIEnv; this: JObject; pasobj: JLong; videoWidth: JInt; videoHeight: JInt); cdecl;
+begin
+  Java_Event_pOnMediaPlayerVideoSizeChanged(PEnv,this,TObject(pasobj),videoWidth,videoHeight);
+end;
+
+{ Class:     com_example_apphttpclientdemo1_Controls
+  Method:    pOnMediaPlayerCompletion
+  Signature: (J)V }
+procedure pOnMediaPlayerCompletion(PEnv: PJNIEnv; this: JObject; pasobj: JLong); cdecl;
+begin
+  Java_Event_pOnMediaPlayerCompletion(PEnv,this,TObject(pasobj));
+end;
+
+{ Class:     com_example_apphttpclientdemo1_Controls
+  Method:    pOnMediaPlayerTimedText
+  Signature: (JLjava/lang/String;)V }
+procedure pOnMediaPlayerTimedText(PEnv: PJNIEnv; this: JObject; pasobj: JLong; timedText: JString); cdecl;
+begin
+  Java_Event_pOnMediaPlayerTimedText(PEnv,this,TObject(pasobj),timedText);
+end;
+
+{ Class:     com_example_apphttpclientdemo1_Controls
+  Method:    pOnSurfaceViewTouch
+  Signature: (JIIFFFF)V }
+procedure pOnSurfaceViewTouch(PEnv: PJNIEnv; this: JObject; pasobj: JLong; act: JInt; cnt: JInt; x1: JFloat; y1: JFloat; x2: JFloat; y2: JFloat); cdecl;
+begin
+  Java_Event_pOnSurfaceViewTouch(PEnv,this,TObject(pasobj),act,cnt,x1,y1,x2,y2);
+end;
+
+{ Class:     com_example_apphttpclientdemo1_Controls
+  Method:    pOnSurfaceViewDrawingInBackground
+  Signature: (JF)Z }
+function pOnSurfaceViewDrawingInBackground(PEnv: PJNIEnv; this: JObject; pasobj: JLong; progress: JFloat): JBoolean; cdecl;
+begin
+  Result:=Java_Event_pOnSurfaceViewDrawingInBackground(PEnv,this,TObject(pasobj),progress);
+end;
+
+{ Class:     com_example_apphttpclientdemo1_Controls
+  Method:    pOnSurfaceViewDrawingPostExecute
+  Signature: (JF)V }
+procedure pOnSurfaceViewDrawingPostExecute(PEnv: PJNIEnv; this: JObject; pasobj: JLong; progress: JFloat); cdecl;
+begin
+  Java_Event_pOnSurfaceViewDrawingPostExecute(PEnv,this,TObject(pasobj),progress);
+end;
+
+const NativeMethods:array[0..81] of JNINativeMethod = (
    (name:'pAppOnScreenStyle';
     signature:'()I';
     fnPtr:@pAppOnScreenStyle;),
@@ -799,7 +879,37 @@ const NativeMethods:array[0..71] of JNINativeMethod = (
     fnPtr:@pOnHttpClientContentResult;),
    (name:'pOnHttpClientCodeResult';
     signature:'(JI)V';
-    fnPtr:@pOnHttpClientCodeResult;)
+    fnPtr:@pOnHttpClientCodeResult;),
+   (name:'pOnSurfaceViewCreated';
+    signature:'(JLandroid/view/SurfaceHolder;)V';
+    fnPtr:@pOnSurfaceViewCreated;),
+   (name:'pOnSurfaceViewDraw';
+    signature:'(JLandroid/graphics/Canvas;)V';
+    fnPtr:@pOnSurfaceViewDraw;),
+   (name:'pOnSurfaceViewChanged';
+    signature:'(JII)V';
+    fnPtr:@pOnSurfaceViewChanged;),
+   (name:'pOnMediaPlayerPrepared';
+    signature:'(JII)V';
+    fnPtr:@pOnMediaPlayerPrepared;),
+   (name:'pOnMediaPlayerVideoSizeChanged';
+    signature:'(JII)V';
+    fnPtr:@pOnMediaPlayerVideoSizeChanged;),
+   (name:'pOnMediaPlayerCompletion';
+    signature:'(J)V';
+    fnPtr:@pOnMediaPlayerCompletion;),
+   (name:'pOnMediaPlayerTimedText';
+    signature:'(JLjava/lang/String;)V';
+    fnPtr:@pOnMediaPlayerTimedText;),
+   (name:'pOnSurfaceViewTouch';
+    signature:'(JIIFFFF)V';
+    fnPtr:@pOnSurfaceViewTouch;),
+   (name:'pOnSurfaceViewDrawingInBackground';
+    signature:'(JF)Z';
+    fnPtr:@pOnSurfaceViewDrawingInBackground;),
+   (name:'pOnSurfaceViewDrawingPostExecute';
+    signature:'(JF)V';
+    fnPtr:@pOnSurfaceViewDrawingPostExecute;)
 );
 
 function RegisterNativeMethodsArray(PEnv: PJNIEnv; className: PChar; methods: PJNINativeMethod; countMethods:integer):integer;
@@ -926,7 +1036,17 @@ exports
   pOnTCPSocketClientMessageReceived name 'Java_com_example_apphttpclientdemo1_Controls_pOnTCPSocketClientMessageReceived',
   pOnTCPSocketClientConnected name 'Java_com_example_apphttpclientdemo1_Controls_pOnTCPSocketClientConnected',
   pOnHttpClientContentResult name 'Java_com_example_apphttpclientdemo1_Controls_pOnHttpClientContentResult',
-  pOnHttpClientCodeResult name 'Java_com_example_apphttpclientdemo1_Controls_pOnHttpClientCodeResult';
+  pOnHttpClientCodeResult name 'Java_com_example_apphttpclientdemo1_Controls_pOnHttpClientCodeResult',
+  pOnSurfaceViewCreated name 'Java_com_example_apphttpclientdemo1_Controls_pOnSurfaceViewCreated',
+  pOnSurfaceViewDraw name 'Java_com_example_apphttpclientdemo1_Controls_pOnSurfaceViewDraw',
+  pOnSurfaceViewChanged name 'Java_com_example_apphttpclientdemo1_Controls_pOnSurfaceViewChanged',
+  pOnMediaPlayerPrepared name 'Java_com_example_apphttpclientdemo1_Controls_pOnMediaPlayerPrepared',
+  pOnMediaPlayerVideoSizeChanged name 'Java_com_example_apphttpclientdemo1_Controls_pOnMediaPlayerVideoSizeChanged',
+  pOnMediaPlayerCompletion name 'Java_com_example_apphttpclientdemo1_Controls_pOnMediaPlayerCompletion',
+  pOnMediaPlayerTimedText name 'Java_com_example_apphttpclientdemo1_Controls_pOnMediaPlayerTimedText',
+  pOnSurfaceViewTouch name 'Java_com_example_apphttpclientdemo1_Controls_pOnSurfaceViewTouch',
+  pOnSurfaceViewDrawingInBackground name 'Java_com_example_apphttpclientdemo1_Controls_pOnSurfaceViewDrawingInBackground',
+  pOnSurfaceViewDrawingPostExecute name 'Java_com_example_apphttpclientdemo1_Controls_pOnSurfaceViewDrawingPostExecute';
 
 begin
   gApp:= jApp.Create(nil);{AndroidWidget.pas}

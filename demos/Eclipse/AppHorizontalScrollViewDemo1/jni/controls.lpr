@@ -1,12 +1,12 @@
-{hint: save all files to location: C:\adt32\eclipse\workspace\AppHorizontalScrollViewDemo1\jni\ }
-library controls;  //[by LazAndroidWizard: 5/21/2015 21:43:31]
-
+{hint: save all files to location: C:\adt32\eclipse\workspace\AppHorizontalScrollViewDemo1\jni}
+library controls;  //by Lamw: Lazarus Android Module Wizard: 6/9/2015 2:36:12]
+ 
 {$mode delphi}
-
+ 
 uses
   Classes, SysUtils, And_jni, And_jni_Bridge, AndroidWidget, Laz_And_Controls,
   Laz_And_Controls_Events, unit1;
-
+ 
 { Class:     com_example_apphorizontalscrollviewdemo1_Controls
   Method:    pAppOnScreenStyle
   Signature: ()I }
@@ -224,11 +224,35 @@ begin
 end;
 
 { Class:     com_example_apphorizontalscrollviewdemo1_Controls
-  Method:    pOnAsyncEvent
-  Signature: (JII)V }
-procedure pOnAsyncEvent(PEnv: PJNIEnv; this: JObject; pasobj: JLong; EventType: JInt; progress: JInt); cdecl;
+  Method:    pOnAsyncEventDoInBackground
+  Signature: (JI)Z }
+function pOnAsyncEventDoInBackground(PEnv: PJNIEnv; this: JObject; pasobj: JLong; progress: JInt): JBoolean; cdecl;
 begin
-  Java_Event_pOnAsyncEvent(PEnv,this,TObject(pasobj),EventType,progress);
+  Result:=Java_Event_pOnAsyncEventDoInBackground(PEnv,this,TObject(pasobj),progress);
+end;
+
+{ Class:     com_example_apphorizontalscrollviewdemo1_Controls
+  Method:    pOnAsyncEventProgressUpdate
+  Signature: (JI)I }
+function pOnAsyncEventProgressUpdate(PEnv: PJNIEnv; this: JObject; pasobj: JLong; progress: JInt): JInt; cdecl;
+begin
+  Result:=Java_Event_pOnAsyncEventProgressUpdate(PEnv,this,TObject(pasobj),progress);
+end;
+
+{ Class:     com_example_apphorizontalscrollviewdemo1_Controls
+  Method:    pOnAsyncEventPreExecute
+  Signature: (J)I }
+function pOnAsyncEventPreExecute(PEnv: PJNIEnv; this: JObject; pasobj: JLong): JInt; cdecl;
+begin
+  Result:=Java_Event_pOnAsyncEventPreExecute(PEnv,this,TObject(pasobj));
+end;
+
+{ Class:     com_example_apphorizontalscrollviewdemo1_Controls
+  Method:    pOnAsyncEventPostExecute
+  Signature: (JI)V }
+procedure pOnAsyncEventPostExecute(PEnv: PJNIEnv; this: JObject; pasobj: JLong; progress: JInt); cdecl;
+begin
+  Java_Event_pOnAsyncEventPostExecute(PEnv,this,TObject(pasobj),progress);
 end;
 
 { Class:     com_example_apphorizontalscrollviewdemo1_Controls
@@ -530,7 +554,7 @@ end;
 { Class:     com_example_apphorizontalscrollviewdemo1_Controls
   Method:    pOnTCPSocketClientMessageReceived
   Signature: (J[Ljava/lang/String;)V }
-procedure pOnTCPSocketClientMessageReceived(PEnv: PJNIEnv; this: JObject; pasobj: JLong; messagesReceived: JStringArray); cdecl;
+procedure pOnTCPSocketClientMessageReceived(PEnv: PJNIEnv; this: JObject; pasobj: JLong; messagesReceived: jObjectArray); cdecl;
 begin
   Java_Event_pOnTCPSocketClientMessageReceived(PEnv,this,TObject(pasobj),messagesReceived);
 end;
@@ -543,208 +567,349 @@ begin
   Java_Event_pOnTCPSocketClientConnected(PEnv,this,TObject(pasobj));
 end;
 
-const NativeMethods:array[0..66] of JNINativeMethod = (
-    (name:'pAppOnScreenStyle';
+{ Class:     com_example_apphorizontalscrollviewdemo1_Controls
+  Method:    pOnHttpClientContentResult
+  Signature: (JLjava/lang/String;)V }
+procedure pOnHttpClientContentResult(PEnv: PJNIEnv; this: JObject; pasobj: JLong; content: JString); cdecl;
+begin
+  Java_Event_pOnHttpClientContentResult(PEnv,this,TObject(pasobj),content);
+end;
+
+{ Class:     com_example_apphorizontalscrollviewdemo1_Controls
+  Method:    pOnHttpClientCodeResult
+  Signature: (JI)V }
+procedure pOnHttpClientCodeResult(PEnv: PJNIEnv; this: JObject; pasobj: JLong; code: JInt); cdecl;
+begin
+  Java_Event_pOnHttpClientCodeResult(PEnv,this,TObject(pasobj),code);
+end;
+
+{ Class:     com_example_apphorizontalscrollviewdemo1_Controls
+  Method:    pOnSurfaceViewCreated
+  Signature: (JLandroid/view/SurfaceHolder;)V }
+procedure pOnSurfaceViewCreated(PEnv: PJNIEnv; this: JObject; pasobj: JLong; surfaceHolder: JObject); cdecl;
+begin
+  Java_Event_pOnSurfaceViewCreated(PEnv,this,TObject(pasobj),surfaceHolder);
+end;
+
+{ Class:     com_example_apphorizontalscrollviewdemo1_Controls
+  Method:    pOnSurfaceViewDraw
+  Signature: (JLandroid/graphics/Canvas;)V }
+procedure pOnSurfaceViewDraw(PEnv: PJNIEnv; this: JObject; pasobj: JLong; canvas: JObject); cdecl;
+begin
+  Java_Event_pOnSurfaceViewDraw(PEnv,this,TObject(pasobj),canvas);
+end;
+
+{ Class:     com_example_apphorizontalscrollviewdemo1_Controls
+  Method:    pOnSurfaceViewChanged
+  Signature: (JII)V }
+procedure pOnSurfaceViewChanged(PEnv: PJNIEnv; this: JObject; pasobj: JLong; width: JInt; height: JInt); cdecl;
+begin
+  Java_Event_pOnSurfaceViewChanged(PEnv,this,TObject(pasobj),width,height);                                             
+end;
+
+{ Class:     com_example_apphorizontalscrollviewdemo1_Controls
+  Method:    pOnMediaPlayerPrepared
+  Signature: (JII)V }
+procedure pOnMediaPlayerPrepared(PEnv: PJNIEnv; this: JObject; pasobj: JLong; videoWidth: JInt; videoHeigh: JInt); cdecl;
+begin
+  Java_Event_pOnMediaPlayerPrepared(PEnv,this,TObject(pasobj),videoWidth,videoHeigh);
+end;
+
+{ Class:     com_example_apphorizontalscrollviewdemo1_Controls
+  Method:    pOnMediaPlayerVideoSizeChanged
+  Signature: (JII)V }
+procedure pOnMediaPlayerVideoSizeChanged(PEnv: PJNIEnv; this: JObject; pasobj: JLong; videoWidth: JInt; videoHeight: JInt); cdecl;
+begin
+  Java_Event_pOnMediaPlayerVideoSizeChanged(PEnv,this,TObject(pasobj),videoWidth,videoHeight);
+end;
+
+{ Class:     com_example_apphorizontalscrollviewdemo1_Controls
+  Method:    pOnMediaPlayerCompletion
+  Signature: (J)V }
+procedure pOnMediaPlayerCompletion(PEnv: PJNIEnv; this: JObject; pasobj: JLong); cdecl;
+begin
+  Java_Event_pOnMediaPlayerCompletion(PEnv,this,TObject(pasobj));
+end;
+
+{ Class:     com_example_apphorizontalscrollviewdemo1_Controls
+  Method:    pOnMediaPlayerTimedText
+  Signature: (JLjava/lang/String;)V }
+procedure pOnMediaPlayerTimedText(PEnv: PJNIEnv; this: JObject; pasobj: JLong; timedText: JString); cdecl;
+begin
+  Java_Event_pOnMediaPlayerTimedText(PEnv,this,TObject(pasobj),timedText);
+end;
+
+{ Class:     com_example_apphorizontalscrollviewdemo1_Controls
+  Method:    pOnSurfaceViewTouch
+  Signature: (JIIFFFF)V }
+procedure pOnSurfaceViewTouch(PEnv: PJNIEnv; this: JObject; pasobj: JLong; act: JInt; cnt: JInt; x1: JFloat; y1: JFloat; x2: JFloat; y2: JFloat); cdecl;
+begin
+  Java_Event_pOnSurfaceViewTouch(PEnv,this,TObject(pasobj),act,cnt,x1,y1,x2,y2);
+end;
+
+{ Class:     com_example_apphorizontalscrollviewdemo1_Controls
+  Method:    pOnSurfaceViewDrawingInBackground
+  Signature: (JF)Z }
+function pOnSurfaceViewDrawingInBackground(PEnv: PJNIEnv; this: JObject; pasobj: JLong; progress: JFloat): JBoolean; cdecl;
+begin
+  Result:=Java_Event_pOnSurfaceViewDrawingInBackground(PEnv,this,TObject(pasobj),progress);
+end;
+
+{ Class:     com_example_apphorizontalscrollviewdemo1_Controls
+  Method:    pOnSurfaceViewDrawingPostExecute
+  Signature: (JF)V }
+procedure pOnSurfaceViewDrawingPostExecute(PEnv: PJNIEnv; this: JObject; pasobj: JLong; progress: JFloat); cdecl;
+begin
+  Java_Event_pOnSurfaceViewDrawingPostExecute(PEnv,this,TObject(pasobj),progress);
+end;
+
+const NativeMethods:array[0..81] of JNINativeMethod = (
+   (name:'pAppOnScreenStyle';
     signature:'()I';
     fnPtr:@pAppOnScreenStyle;),
-    (name:'pAppOnCreate';
+   (name:'pAppOnCreate';
     signature:'(Landroid/content/Context;Landroid/widget/RelativeLayout;)V';
     fnPtr:@pAppOnCreate;),
-    (name:'pAppOnNewIntent';
+   (name:'pAppOnNewIntent';
     signature:'()V';
     fnPtr:@pAppOnNewIntent;),
-    (name:'pAppOnDestroy';
+   (name:'pAppOnDestroy';
     signature:'()V';
     fnPtr:@pAppOnDestroy;),
-    (name:'pAppOnPause';
+   (name:'pAppOnPause';
     signature:'()V';
     fnPtr:@pAppOnPause;),
-    (name:'pAppOnRestart';
+   (name:'pAppOnRestart';
     signature:'()V';
     fnPtr:@pAppOnRestart;),
-    (name:'pAppOnResume';
+   (name:'pAppOnResume';
     signature:'()V';
     fnPtr:@pAppOnResume;),
-    (name:'pAppOnStart';
+   (name:'pAppOnStart';
     signature:'()V';
     fnPtr:@pAppOnStart;),
-    (name:'pAppOnStop';
+   (name:'pAppOnStop';
     signature:'()V';
     fnPtr:@pAppOnStop;),
-    (name:'pAppOnBackPressed';
+   (name:'pAppOnBackPressed';
     signature:'()V';
     fnPtr:@pAppOnBackPressed;),
-    (name:'pAppOnRotate';
+   (name:'pAppOnRotate';
     signature:'(I)I';
     fnPtr:@pAppOnRotate;),
-    (name:'pAppOnConfigurationChanged';
+   (name:'pAppOnConfigurationChanged';
     signature:'()V';
     fnPtr:@pAppOnConfigurationChanged;),
-    (name:'pAppOnActivityResult';
+   (name:'pAppOnActivityResult';
     signature:'(IILandroid/content/Intent;)V';
     fnPtr:@pAppOnActivityResult;),
-    (name:'pAppOnCreateOptionsMenu';
+   (name:'pAppOnCreateOptionsMenu';
     signature:'(Landroid/view/Menu;)V';
     fnPtr:@pAppOnCreateOptionsMenu;),
-    (name:'pAppOnClickOptionMenuItem';
+   (name:'pAppOnClickOptionMenuItem';
     signature:'(Landroid/view/MenuItem;ILjava/lang/String;Z)V';
     fnPtr:@pAppOnClickOptionMenuItem;),
-    (name:'pAppOnCreateContextMenu';
+   (name:'pAppOnCreateContextMenu';
     signature:'(Landroid/view/ContextMenu;)V';
     fnPtr:@pAppOnCreateContextMenu;),
-    (name:'pAppOnClickContextMenuItem';
+   (name:'pAppOnClickContextMenuItem';
     signature:'(Landroid/view/MenuItem;ILjava/lang/String;Z)V';
     fnPtr:@pAppOnClickContextMenuItem;),
-    (name:'pOnClick';
+   (name:'pOnClick';
     signature:'(JI)V';
     fnPtr:@pOnClick;),
-    (name:'pOnChange';
+   (name:'pOnChange';
     signature:'(JLjava/lang/String;I)V';
     fnPtr:@pOnChange;),
-    (name:'pOnChanged';
+   (name:'pOnChanged';
     signature:'(JLjava/lang/String;I)V';
     fnPtr:@pOnChanged;),
-    (name:'pOnEnter';
+   (name:'pOnEnter';
     signature:'(J)V';
     fnPtr:@pOnEnter;),
-    (name:'pOnTimer';
+   (name:'pOnTimer';
     signature:'(J)V';
     fnPtr:@pOnTimer;),
-    (name:'pOnDraw';
+   (name:'pOnDraw';
     signature:'(JLandroid/graphics/Canvas;)V';
     fnPtr:@pOnDraw;),
-    (name:'pOnTouch';
+   (name:'pOnTouch';
     signature:'(JIIFFFF)V';
     fnPtr:@pOnTouch;),
-    (name:'pOnGLRenderer';
+   (name:'pOnGLRenderer';
     signature:'(JIII)V';
     fnPtr:@pOnGLRenderer;),
-    (name:'pOnClose';
+   (name:'pOnClose';
     signature:'(J)V';
     fnPtr:@pOnClose;),
-    (name:'pOnWebViewStatus';
+   (name:'pOnWebViewStatus';
     signature:'(JILjava/lang/String;)I';
     fnPtr:@pOnWebViewStatus;),
-    (name:'pOnAsyncEvent';
-    signature:'(JII)V';
-    fnPtr:@pOnAsyncEvent;),
-    (name:'pOnClickWidgetItem';
+   (name:'pOnAsyncEventDoInBackground';
+    signature:'(JI)Z';
+    fnPtr:@pOnAsyncEventDoInBackground;),
+   (name:'pOnAsyncEventProgressUpdate';
+    signature:'(JI)I';
+    fnPtr:@pOnAsyncEventProgressUpdate;),
+   (name:'pOnAsyncEventPreExecute';
+    signature:'(J)I';
+    fnPtr:@pOnAsyncEventPreExecute;),
+   (name:'pOnAsyncEventPostExecute';
+    signature:'(JI)V';
+    fnPtr:@pOnAsyncEventPostExecute;),
+   (name:'pOnClickWidgetItem';
     signature:'(JIZ)V';
     fnPtr:@pOnClickWidgetItem;),
-    (name:'pOnClickCaptionItem';
+   (name:'pOnClickCaptionItem';
     signature:'(JILjava/lang/String;)V';
     fnPtr:@pOnClickCaptionItem;),
-    (name:'pOnBluetoothEnabled';
+   (name:'pOnBluetoothEnabled';
     signature:'(J)V';
     fnPtr:@pOnBluetoothEnabled;),
-    (name:'pOnBluetoothDisabled';
+   (name:'pOnBluetoothDisabled';
     signature:'(J)V';
     fnPtr:@pOnBluetoothDisabled;),
-    (name:'pOnBluetoothDeviceFound';
+   (name:'pOnBluetoothDeviceFound';
     signature:'(JLjava/lang/String;Ljava/lang/String;)V';
     fnPtr:@pOnBluetoothDeviceFound;),
-    (name:'pOnBluetoothDiscoveryStarted';
+   (name:'pOnBluetoothDiscoveryStarted';
     signature:'(J)V';
     fnPtr:@pOnBluetoothDiscoveryStarted;),
-    (name:'pOnBluetoothDiscoveryFinished';
+   (name:'pOnBluetoothDiscoveryFinished';
     signature:'(JII)V';
     fnPtr:@pOnBluetoothDiscoveryFinished;),
-    (name:'pOnBluetoothDeviceBondStateChanged';
+   (name:'pOnBluetoothDeviceBondStateChanged';
     signature:'(JILjava/lang/String;Ljava/lang/String;)V';
     fnPtr:@pOnBluetoothDeviceBondStateChanged;),
-    (name:'pOnBluetoothClientSocketConnected';
+   (name:'pOnBluetoothClientSocketConnected';
     signature:'(JLjava/lang/String;Ljava/lang/String;)V';
     fnPtr:@pOnBluetoothClientSocketConnected;),
-    (name:'pOnBluetoothClientSocketIncomingMessage';
+   (name:'pOnBluetoothClientSocketIncomingMessage';
     signature:'(JLjava/lang/String;)V';
     fnPtr:@pOnBluetoothClientSocketIncomingMessage;),
-    (name:'pOnBluetoothClientSocketWritingMessage';
+   (name:'pOnBluetoothClientSocketWritingMessage';
     signature:'(J)V';
     fnPtr:@pOnBluetoothClientSocketWritingMessage;),
-    (name:'pOnBluetoothServerSocketConnected';
+   (name:'pOnBluetoothServerSocketConnected';
     signature:'(JLjava/lang/String;Ljava/lang/String;)V';
     fnPtr:@pOnBluetoothServerSocketConnected;),
-    (name:'pOnBluetoothServerSocketIncomingMessage';
+   (name:'pOnBluetoothServerSocketIncomingMessage';
     signature:'(JLjava/lang/String;)V';
     fnPtr:@pOnBluetoothServerSocketIncomingMessage;),
-    (name:'pOnBluetoothServerSocketWritingMessage';
+   (name:'pOnBluetoothServerSocketWritingMessage';
     signature:'(J)V';
     fnPtr:@pOnBluetoothServerSocketWritingMessage;),
-    (name:'pOnBluetoothServerSocketListen';
+   (name:'pOnBluetoothServerSocketListen';
     signature:'(JLjava/lang/String;Ljava/lang/String;)V';
     fnPtr:@pOnBluetoothServerSocketListen;),
-    (name:'pOnSpinnerItemSeleceted';
+   (name:'pOnSpinnerItemSeleceted';
     signature:'(JILjava/lang/String;)V';
     fnPtr:@pOnSpinnerItemSeleceted;),
-    (name:'pOnLocationChanged';
+   (name:'pOnLocationChanged';
     signature:'(JDDDLjava/lang/String;)V';
     fnPtr:@pOnLocationChanged;),
-    (name:'pOnLocationStatusChanged';
+   (name:'pOnLocationStatusChanged';
     signature:'(JILjava/lang/String;Ljava/lang/String;)V';
     fnPtr:@pOnLocationStatusChanged;),
-    (name:'pOnLocationProviderEnabled';
+   (name:'pOnLocationProviderEnabled';
     signature:'(JLjava/lang/String;)V';
     fnPtr:@pOnLocationProviderEnabled;),
-    (name:'pOnLocationProviderDisabled';
+   (name:'pOnLocationProviderDisabled';
     signature:'(JLjava/lang/String;)V';
     fnPtr:@pOnLocationProviderDisabled;),
-    (name:'pAppOnViewClick';
+   (name:'pAppOnViewClick';
     signature:'(Landroid/view/View;I)V';
     fnPtr:@pAppOnViewClick;),
-    (name:'pAppOnListItemClick';
+   (name:'pAppOnListItemClick';
     signature:'(Landroid/widget/AdapterView;Landroid/view/View;II)V';
     fnPtr:@pAppOnListItemClick;),
-    (name:'pOnActionBarTabSelected';
+   (name:'pOnActionBarTabSelected';
     signature:'(JLandroid/view/View;Ljava/lang/String;)V';
     fnPtr:@pOnActionBarTabSelected;),
-    (name:'pOnActionBarTabUnSelected';
+   (name:'pOnActionBarTabUnSelected';
     signature:'(JLandroid/view/View;Ljava/lang/String;)V';
     fnPtr:@pOnActionBarTabUnSelected;),
-    (name:'pOnCustomDialogShow';
+   (name:'pOnCustomDialogShow';
     signature:'(JLandroid/app/Dialog;Ljava/lang/String;)V';
     fnPtr:@pOnCustomDialogShow;),
-    (name:'pOnClickToggleButton';
+   (name:'pOnClickToggleButton';
     signature:'(JZ)V';
     fnPtr:@pOnClickToggleButton;),
-    (name:'pOnChangeSwitchButton';
+   (name:'pOnChangeSwitchButton';
     signature:'(JZ)V';
     fnPtr:@pOnChangeSwitchButton;),
-    (name:'pOnClickGridItem';
+   (name:'pOnClickGridItem';
     signature:'(JILjava/lang/String;)V';
     fnPtr:@pOnClickGridItem;),
-    (name:'pOnChangedSensor';
+   (name:'pOnChangedSensor';
     signature:'(JLandroid/hardware/Sensor;I[FJ)V';
     fnPtr:@pOnChangedSensor;),
-    (name:'pOnListeningSensor';
+   (name:'pOnListeningSensor';
     signature:'(JLandroid/hardware/Sensor;I)V';
     fnPtr:@pOnListeningSensor;),
-    (name:'pOnUnregisterListeningSensor';
+   (name:'pOnUnregisterListeningSensor';
     signature:'(JILjava/lang/String;)V';
     fnPtr:@pOnUnregisterListeningSensor;),
-    (name:'pOnBroadcastReceiver';
+   (name:'pOnBroadcastReceiver';
     signature:'(JLandroid/content/Intent;)V';
     fnPtr:@pOnBroadcastReceiver;),
-    (name:'pOnTimePicker';
+   (name:'pOnTimePicker';
     signature:'(JII)V';
     fnPtr:@pOnTimePicker;),
-    (name:'pOnDatePicker';
+   (name:'pOnDatePicker';
     signature:'(JIII)V';
     fnPtr:@pOnDatePicker;),
-    (name:'pOnFlingGestureDetected';
+   (name:'pOnFlingGestureDetected';
     signature:'(JI)V';
     fnPtr:@pOnFlingGestureDetected;),
-    (name:'pOnPinchZoomGestureDetected';
+   (name:'pOnPinchZoomGestureDetected';
     signature:'(JFI)V';
     fnPtr:@pOnPinchZoomGestureDetected;),
-    (name:'pOnShellCommandExecuted';
+   (name:'pOnShellCommandExecuted';
     signature:'(JLjava/lang/String;)V';
     fnPtr:@pOnShellCommandExecuted;),
-    (name:'pOnTCPSocketClientMessageReceived';
+   (name:'pOnTCPSocketClientMessageReceived';
     signature:'(J[Ljava/lang/String;)V';
     fnPtr:@pOnTCPSocketClientMessageReceived;),
-    (name:'pOnTCPSocketClientConnected';
+   (name:'pOnTCPSocketClientConnected';
     signature:'(J)V';
-    fnPtr:@pOnTCPSocketClientConnected;)
+    fnPtr:@pOnTCPSocketClientConnected;),
+   (name:'pOnHttpClientContentResult';
+    signature:'(JLjava/lang/String;)V';
+    fnPtr:@pOnHttpClientContentResult;),
+   (name:'pOnHttpClientCodeResult';
+    signature:'(JI)V';
+    fnPtr:@pOnHttpClientCodeResult;),
+   (name:'pOnSurfaceViewCreated';
+    signature:'(JLandroid/view/SurfaceHolder;)V';
+    fnPtr:@pOnSurfaceViewCreated;),
+   (name:'pOnSurfaceViewDraw';
+    signature:'(JLandroid/graphics/Canvas;)V';
+    fnPtr:@pOnSurfaceViewDraw;),
+   (name:'pOnSurfaceViewChanged';
+    signature:'(JII)V';
+    fnPtr:@pOnSurfaceViewChanged;),
+   (name:'pOnMediaPlayerPrepared';
+    signature:'(JII)V';
+    fnPtr:@pOnMediaPlayerPrepared;),
+   (name:'pOnMediaPlayerVideoSizeChanged';
+    signature:'(JII)V';
+    fnPtr:@pOnMediaPlayerVideoSizeChanged;),
+   (name:'pOnMediaPlayerCompletion';
+    signature:'(J)V';
+    fnPtr:@pOnMediaPlayerCompletion;),
+   (name:'pOnMediaPlayerTimedText';
+    signature:'(JLjava/lang/String;)V';
+    fnPtr:@pOnMediaPlayerTimedText;),
+   (name:'pOnSurfaceViewTouch';
+    signature:'(JIIFFFF)V';
+    fnPtr:@pOnSurfaceViewTouch;),
+   (name:'pOnSurfaceViewDrawingInBackground';
+    signature:'(JF)Z';
+    fnPtr:@pOnSurfaceViewDrawingInBackground;),
+   (name:'pOnSurfaceViewDrawingPostExecute';
+    signature:'(JF)V';
+    fnPtr:@pOnSurfaceViewDrawingPostExecute;)
 );
 
 function RegisterNativeMethodsArray(PEnv: PJNIEnv; className: PChar; methods: PJNINativeMethod; countMethods:integer):integer;
@@ -758,12 +923,12 @@ begin
     if (PEnv^).RegisterNatives(PEnv, curClass, methods, countMethods) > 0 then Result:= JNI_TRUE;
   end;
 end;
-
+ 
 function RegisterNativeMethods(PEnv: PJNIEnv; className: PChar): integer;
 begin
   Result:= RegisterNativeMethodsArray(PEnv, className, @NativeMethods[0], Length(NativeMethods));
 end;
-
+ 
 function JNI_OnLoad(VM: PJavaVM; reserved: pointer): JInt; cdecl;
 var
   PEnv: PPointer;
@@ -774,12 +939,12 @@ begin
   (VM^).GetEnv(VM, @PEnv, Result);
   if PEnv <> nil then
   begin
-      curEnv:= PJNIEnv(PEnv);
-      RegisterNativeMethods(curEnv, 'com/example/apphorizontalscrollviewdemo1/Controls');
+     curEnv:= PJNIEnv(PEnv);
+     RegisterNativeMethods(curEnv, 'com/example/apphorizontalscrollviewdemo1/Controls');
   end;
-  gVM:= VM;{And_jni_Bridge}
+  gVM:= VM;{AndroidWidget.pas}
 end;
-
+ 
 procedure JNI_OnUnload(VM: PJavaVM; reserved: pointer); cdecl;
 var
   PEnv: PPointer;
@@ -790,9 +955,8 @@ begin
   if PEnv <> nil then
   begin
     curEnv:= PJNIEnv(PEnv);
-    (curEnv^).DeleteGlobalRef(curEnv, gjClass);
-    gjClass:= nil;
-    gVM:= nil;
+    (curEnv^).DeleteGlobalRef(curEnv, gjClass);   {AndroidWidget.pas}
+    gVM:= nil;{AndroidWidget.pas}
   end;
   gApp.Terminate;
   FreeAndNil(gApp);
@@ -828,7 +992,10 @@ exports
   pOnGLRenderer name 'Java_com_example_apphorizontalscrollviewdemo1_Controls_pOnGLRenderer',
   pOnClose name 'Java_com_example_apphorizontalscrollviewdemo1_Controls_pOnClose',
   pOnWebViewStatus name 'Java_com_example_apphorizontalscrollviewdemo1_Controls_pOnWebViewStatus',
-  pOnAsyncEvent name 'Java_com_example_apphorizontalscrollviewdemo1_Controls_pOnAsyncEvent',
+  pOnAsyncEventDoInBackground name 'Java_com_example_apphorizontalscrollviewdemo1_Controls_pOnAsyncEventDoInBackground',
+  pOnAsyncEventProgressUpdate name 'Java_com_example_apphorizontalscrollviewdemo1_Controls_pOnAsyncEventProgressUpdate',
+  pOnAsyncEventPreExecute name 'Java_com_example_apphorizontalscrollviewdemo1_Controls_pOnAsyncEventPreExecute',
+  pOnAsyncEventPostExecute name 'Java_com_example_apphorizontalscrollviewdemo1_Controls_pOnAsyncEventPostExecute',
   pOnClickWidgetItem name 'Java_com_example_apphorizontalscrollviewdemo1_Controls_pOnClickWidgetItem',
   pOnClickCaptionItem name 'Java_com_example_apphorizontalscrollviewdemo1_Controls_pOnClickCaptionItem',
   pOnBluetoothEnabled name 'Java_com_example_apphorizontalscrollviewdemo1_Controls_pOnBluetoothEnabled',
@@ -867,13 +1034,25 @@ exports
   pOnPinchZoomGestureDetected name 'Java_com_example_apphorizontalscrollviewdemo1_Controls_pOnPinchZoomGestureDetected',
   pOnShellCommandExecuted name 'Java_com_example_apphorizontalscrollviewdemo1_Controls_pOnShellCommandExecuted',
   pOnTCPSocketClientMessageReceived name 'Java_com_example_apphorizontalscrollviewdemo1_Controls_pOnTCPSocketClientMessageReceived',
-  pOnTCPSocketClientConnected name 'Java_com_example_apphorizontalscrollviewdemo1_Controls_pOnTCPSocketClientConnected';
+  pOnTCPSocketClientConnected name 'Java_com_example_apphorizontalscrollviewdemo1_Controls_pOnTCPSocketClientConnected',
+  pOnHttpClientContentResult name 'Java_com_example_apphorizontalscrollviewdemo1_Controls_pOnHttpClientContentResult',
+  pOnHttpClientCodeResult name 'Java_com_example_apphorizontalscrollviewdemo1_Controls_pOnHttpClientCodeResult',
+  pOnSurfaceViewCreated name 'Java_com_example_apphorizontalscrollviewdemo1_Controls_pOnSurfaceViewCreated',
+  pOnSurfaceViewDraw name 'Java_com_example_apphorizontalscrollviewdemo1_Controls_pOnSurfaceViewDraw',
+  pOnSurfaceViewChanged name 'Java_com_example_apphorizontalscrollviewdemo1_Controls_pOnSurfaceViewChanged',
+  pOnMediaPlayerPrepared name 'Java_com_example_apphorizontalscrollviewdemo1_Controls_pOnMediaPlayerPrepared',
+  pOnMediaPlayerVideoSizeChanged name 'Java_com_example_apphorizontalscrollviewdemo1_Controls_pOnMediaPlayerVideoSizeChanged',
+  pOnMediaPlayerCompletion name 'Java_com_example_apphorizontalscrollviewdemo1_Controls_pOnMediaPlayerCompletion',
+  pOnMediaPlayerTimedText name 'Java_com_example_apphorizontalscrollviewdemo1_Controls_pOnMediaPlayerTimedText',
+  pOnSurfaceViewTouch name 'Java_com_example_apphorizontalscrollviewdemo1_Controls_pOnSurfaceViewTouch',
+  pOnSurfaceViewDrawingInBackground name 'Java_com_example_apphorizontalscrollviewdemo1_Controls_pOnSurfaceViewDrawingInBackground',
+  pOnSurfaceViewDrawingPostExecute name 'Java_com_example_apphorizontalscrollviewdemo1_Controls_pOnSurfaceViewDrawingPostExecute';
 
 begin
-  gApp:= jApp.Create(nil);
-  gApp.Title:= 'JNI Android Bridges Library';
-  gjAppName:= 'com.example.apphorizontalscrollviewdemo1';
-  gjClassName:= 'com/example/apphorizontalscrollviewdemo1/Controls';
+  gApp:= jApp.Create(nil);{AndroidWidget.pas}
+  gApp.Title:= 'My Android Bridges Library';
+  gjAppName:= 'com.example.apphorizontalscrollviewdemo1';{AndroidWidget.pas}
+  gjClassName:= 'com/example/apphorizontalscrollviewdemo1/Controls';{AndroidWidget.pas}
   gApp.AppName:=gjAppName;
   gApp.ClassName:=gjClassName;
   gApp.Initialize;

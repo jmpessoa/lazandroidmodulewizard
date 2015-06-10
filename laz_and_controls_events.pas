@@ -52,13 +52,31 @@ uses
    Procedure Java_Event_pOnTCPSocketClientMessageReceived(env: PJNIEnv; this: jobject; Obj: TObject; messagesReceived: JStringArray);
    Procedure Java_Event_pOnTCPSocketClientConnected(env: PJNIEnv; this: jobject; Obj: TObject);
 
+
+   Procedure Java_Event_pOnMediaPlayerVideoSizeChanged(env: PJNIEnv; this: jobject; Obj: TObject; videoWidth: integer; videoHeight: integer);
+   Procedure Java_Event_pOnMediaPlayerCompletion(env: PJNIEnv; this: jobject; Obj: TObject);
+   Procedure Java_Event_pOnMediaPlayerPrepared(env: PJNIEnv; this: jobject; Obj: TObject; videoWidth: integer; videoHeigh: integer);
+   Procedure Java_Event_pOnMediaPlayerTimedText(env: PJNIEnv; this: jobject; Obj: TObject; timedText: JString);
+
+   Procedure Java_Event_pOnSurfaceViewCreated(env: PJNIEnv; this: jobject; Obj: TObject;
+                                  surfaceHolder: jObject);
+   Procedure Java_Event_pOnSurfaceViewDraw (env: PJNIEnv; this: jobject; Obj: TObject; canvas: jObject);
+   Procedure Java_Event_pOnSurfaceViewChanged(env: PJNIEnv; this: jobject; Obj: TObject; width: integer; height: integer);
+   procedure Java_Event_pOnSurfaceViewTouch(env: PJNIEnv; this: jobject;
+                              Obj: TObject;
+                              act,cnt: integer; x1,y1,x2,y2 : single);
+   function Java_Event_pOnSurfaceViewDrawingInBackground(env: PJNIEnv; this: jobject; Obj: TObject; progress: single): JBoolean;
+   procedure Java_Event_pOnSurfaceViewDrawingPostExecute(env: PJNIEnv; this: jobject; Obj: TObject; progress: single);
+
+
 implementation
 
 uses
 
    AndroidWidget, bluetooth, bluetoothclientsocket, bluetoothserversocket,
    spinner, location, actionbartab, customdialog, togglebutton, switchbutton, gridview,
-   sensormanager, broadcastreceiver, datepickerdialog, timepickerdialog, shellcommand, tcpsocketclient;
+   sensormanager, broadcastreceiver, datepickerdialog, timepickerdialog, shellcommand,
+   tcpsocketclient, surfaceview, mediaplayer;
 
 procedure Java_Event_pOnBluetoothEnabled(env: PJNIEnv; this: jobject; Obj: TObject);
 begin
@@ -700,6 +718,141 @@ begin
   end;
 end;
 
+Procedure Java_Event_pOnSurfaceViewCreated(env: PJNIEnv; this: jobject; Obj: TObject;
+                               surfaceHolder: jObject);
+begin
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+  if Obj is jSurfaceView then
+  begin
+    jSurfaceView(Obj).UpdateJNI(gApp);
+    jForm(jSurfaceView(Obj).Owner).UpdateJNI(gApp);
+    jSurfaceView(Obj).GenEvent_OnSurfaceViewCreated(Obj,surfaceHolder);
+  end;
+end;
+
+Procedure Java_Event_pOnSurfaceViewDraw (env: PJNIEnv; this: jobject; Obj: TObject; canvas: jObject);
+begin
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+  if Obj is jSurfaceView then
+  begin
+    jSurfaceView(Obj).UpdateJNI(gApp);
+    jForm(jSurfaceView(Obj).Owner).UpdateJNI(gApp);
+    jSurfaceView(Obj).GenEvent_OnSurfaceViewDraw(Obj, canvas);
+  end;
+end;
+
+Procedure Java_Event_pOnMediaPlayerPrepared(env: PJNIEnv; this: jobject; Obj: TObject; videoWidth: integer; videoHeigh: integer);
+begin
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+  if Obj is jMediaPlayer then
+  begin
+    jForm(jMediaPlayer(Obj).Owner).UpdateJNI(gApp);
+    jMediaPlayer(Obj).GenEvent_OnPrepared(Obj, videoWidth, videoHeigh);
+  end;
+end;
+
+Procedure Java_Event_pOnMediaPlayerVideoSizeChanged(env: PJNIEnv; this: jobject; Obj: TObject; videoWidth: integer; videoHeight: integer);
+begin
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+  if Obj is jMediaPlayer then
+  begin
+    jForm(jMediaPlayer(Obj).Owner).UpdateJNI(gApp);
+    jMediaPlayer(Obj).GenEvent_OnVideoSizeChanged(Obj, videoWidth, videoHeight);
+  end;
+end;
+
+Procedure Java_Event_pOnMediaPlayerCompletion(env: PJNIEnv; this: jobject; Obj: TObject);
+begin
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+  if Obj is jMediaPlayer then
+  begin
+    jForm(jMediaPlayer(Obj).Owner).UpdateJNI(gApp);
+    jMediaPlayer(Obj).GenEvent_OnCompletion(Obj);
+  end;
+end;
+
+Procedure Java_Event_pOnMediaPlayerTimedText(env: PJNIEnv; this: jobject; Obj: TObject; timedText: JString);
+var
+   pastimedText:  string;
+   jBoo: jBoolean;
+begin
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+  if Obj is jMediaPlayer then
+  begin
+    jForm(jMediaPlayer(Obj).Owner).UpdateJNI(gApp);
+    pastimedText := '';
+    if timedText <> nil then
+    begin
+      jBoo := JNI_False;
+      pastimedText:= string( env^.GetStringUTFChars(Env,timedText,@jBoo) );
+    end;
+    jMediaPlayer(Obj).GenEvent_pOnMediaPlayerTimedText(Obj, pastimedText);
+  end;
+end;
+
+procedure Java_Event_pOnSurfaceViewTouch(env: PJNIEnv; this: jobject;
+                              Obj: TObject;
+                              act,cnt: integer; x1,y1,x2,y2 : single);
+begin
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+  if not Assigned(Obj)  then Exit;
+  if Obj is jSurfaceView then
+  begin
+      jSurfaceView(Obj).UpdateJNI(gApp);
+      jForm(jSurfaceView(Obj).Owner).UpdateJNI(gApp);
+      jSurfaceView(Obj).GenEvent_OnSurfaceViewTouch(Obj,act,cnt,x1,y1,x2,y2);
+  end;
+end;
+
+Procedure Java_Event_pOnSurfaceViewChanged(env: PJNIEnv; this: jobject;
+                              Obj: TObject; width: integer; height: integer);
+begin
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+  if Obj is jSurfaceView then
+  begin
+    jSurfaceView(Obj).UpdateJNI(gApp);
+    jForm(jSurfaceView(Obj).Owner).UpdateJNI(gApp);
+    jSurfaceView(Obj).GenEvent_OnSurfaceViewChanged(Obj, width, height);
+  end;
+end;
+
+function Java_Event_pOnSurfaceViewDrawingInBackground(env: PJNIEnv; this: jobject; Obj: TObject; progress: single): JBoolean;
+var
+  running: boolean;
+begin
+  running:= True;
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+  if not Assigned(Obj)  then Exit;
+  if Obj is jSurfaceView then
+  begin
+      //jSurfaceView(Obj).UpdateJNI(gApp);
+      jForm(jSurfaceView(Obj).Owner).UpdateJNI(gApp);
+      jSurfaceView(Obj).GenEvent_OnSurfaceViewDrawingInBackground(Obj,progress,running);
+  end;
+  Result:= JBool(running);
+end;
+
+procedure Java_Event_pOnSurfaceViewDrawingPostExecute(env: PJNIEnv; this: jobject; Obj: TObject; progress: single);
+begin
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+  if not Assigned(Obj)  then Exit;
+  if Obj is jSurfaceView then
+  begin
+      //jSurfaceView(Obj).UpdateJNI(gApp);
+      jForm(jSurfaceView(Obj).Owner).UpdateJNI(gApp);
+      jSurfaceView(Obj).GenEvent_OnSurfaceViewDrawingPostExecute(Obj,progress);
+  end;
+end;
 
 end.
 
