@@ -15,9 +15,9 @@ object AndroidModule4: TAndroidModule4
   OnRotate = DataModuleRotate
   OnJNIPrompt = DataModuleJNIPrompt
   object jButton1: jButton
-    Left = 9
-    Top = 56
-    Width = 279
+    Left = 5
+    Top = 45
+    Width = 290
     Height = 40
     MarginLeft = 5
     MarginTop = 5
@@ -37,10 +37,10 @@ object AndroidModule4: TAndroidModule4
     Id = 31367
   end
   object jTextView1: jTextView
-    Left = 64
-    Top = 24
-    Width = 198
-    Height = 25
+    Left = 67
+    Top = 10
+    Width = 166
+    Height = 20
     MarginLeft = 10
     MarginTop = 10
     MarginRight = 10
@@ -60,10 +60,10 @@ object AndroidModule4: TAndroidModule4
     Id = 9880053
   end
   object jEditText1: jEditText
-    Left = 8
-    Top = 104
-    Width = 279
-    Height = 112
+    Left = 10
+    Top = 100
+    Width = 280
+    Height = 106
     MarginLeft = 10
     MarginTop = 10
     MarginRight = 10
@@ -81,11 +81,13 @@ object AndroidModule4: TAndroidModule4
     BackgroundColor = colbrCyan
     FontColor = colbrDefault
     FontSize = 0
+    HintTextColor = colbrSilver
     ScrollBarStyle = scrlInsideInset
     MaxLines = 10
     HorScrollBar = False
     VerScrollBar = True
     WrappingLine = True
+    Editable = True
     Id = 2813603
   end
   object jScrollView1: jScrollView
@@ -105,9 +107,9 @@ object AndroidModule4: TAndroidModule4
     object jEditText2: jEditText
       Tag = 1
       Left = 5
-      Top = 5
-      Width = 248
-      Height = 136
+      Top = 10
+      Width = 269
+      Height = 132
       MarginLeft = 5
       MarginTop = 10
       MarginRight = 5
@@ -124,11 +126,13 @@ object AndroidModule4: TAndroidModule4
       BackgroundColor = colbrLightSlateBlue
       FontColor = colbrDefault
       FontSize = 0
+      HintTextColor = colbrSilver
       ScrollBarStyle = scrNone
       MaxLines = 800
       HorScrollBar = False
       VerScrollBar = False
       WrappingLine = False
+      Editable = True
       Id = 0
     end
   end

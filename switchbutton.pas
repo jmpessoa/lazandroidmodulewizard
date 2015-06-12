@@ -151,6 +151,11 @@ begin
       jScrollView(FParent).Init(refApp);
       FjPRLayout:= jScrollView_getView(FjEnv, jScrollView(FParent).jSelf);//FjPRLayout:= jScrollView(FParent).View;
     end;
+    if FParent is jHorizontalScrollView then
+    begin
+      jHorizontalScrollView(FParent).Init(refApp);
+      FjPRLayout:= jHorizontalScrollView_getView(FjEnv, jHorizontalScrollView(FParent).jSelf);
+    end;
     if FParent is jCustomDialog then
     begin
       jCustomDialog(FParent).Init(refApp);
@@ -496,6 +501,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jswitchbutton);
   jMethod:= env^.GetMethodID(env, jCls, 'jFree', '()V');
   env^.CallVoidMethod(env, _jswitchbutton, jMethod);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -509,6 +515,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jswitchbutton);
   jMethod:= env^.GetMethodID(env, jCls, 'SetViewParent', '(Landroid/view/ViewGroup;)V');
   env^.CallVoidMethodA(env, _jswitchbutton, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -520,6 +527,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jswitchbutton);
   jMethod:= env^.GetMethodID(env, jCls, 'RemoveFromViewParent', '()V');
   env^.CallVoidMethod(env, _jswitchbutton, jMethod);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -531,6 +539,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jswitchbutton);
   jMethod:= env^.GetMethodID(env, jCls, 'GetView', '()Landroid/view/View;');
   Result:= env^.CallObjectMethod(env, _jswitchbutton, jMethod);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -544,6 +553,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jswitchbutton);
   jMethod:= env^.GetMethodID(env, jCls, 'SetLParamWidth', '(I)V');
   env^.CallVoidMethodA(env, _jswitchbutton, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -557,6 +567,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jswitchbutton);
   jMethod:= env^.GetMethodID(env, jCls, 'SetLParamHeight', '(I)V');
   env^.CallVoidMethodA(env, _jswitchbutton, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -575,6 +586,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jswitchbutton);
   jMethod:= env^.GetMethodID(env, jCls, 'SetLeftTopRightBottomWidthHeight', '(IIIIII)V');
   env^.CallVoidMethodA(env, _jswitchbutton, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -588,6 +600,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jswitchbutton);
   jMethod:= env^.GetMethodID(env, jCls, 'AddLParamsAnchorRule', '(I)V');
   env^.CallVoidMethodA(env, _jswitchbutton, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -601,6 +614,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jswitchbutton);
   jMethod:= env^.GetMethodID(env, jCls, 'AddLParamsParentRule', '(I)V');
   env^.CallVoidMethodA(env, _jswitchbutton, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -614,6 +628,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jswitchbutton);
   jMethod:= env^.GetMethodID(env, jCls, 'SetLayoutAll', '(I)V');
   env^.CallVoidMethodA(env, _jswitchbutton, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -625,6 +640,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jswitchbutton);
   jMethod:= env^.GetMethodID(env, jCls, 'ClearLayoutAll', '()V');
   env^.CallVoidMethod(env, _jswitchbutton, jMethod);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -638,6 +654,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jswitchbutton);
   jMethod:= env^.GetMethodID(env, jCls, 'SetId', '(I)V');
   env^.CallVoidMethodA(env, _jswitchbutton, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -651,7 +668,8 @@ begin
   jCls:= env^.GetObjectClass(env, _jswitchbutton);
   jMethod:= env^.GetMethodID(env, jCls, 'SetTextOff', '(Ljava/lang/String;)V');
   env^.CallVoidMethodA(env, _jswitchbutton, jMethod, @jParams);
-env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -665,7 +683,8 @@ begin
   jCls:= env^.GetObjectClass(env, _jswitchbutton);
   jMethod:= env^.GetMethodID(env, jCls, 'SetTextOn', '(Ljava/lang/String;)V');
   env^.CallVoidMethodA(env, _jswitchbutton, jMethod, @jParams);
-env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -679,6 +698,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jswitchbutton);
   jMethod:= env^.GetMethodID(env, jCls, 'SetChecked', '(Z)V');
   env^.CallVoidMethodA(env, _jswitchbutton, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 procedure jSwitchButton_DispatchOnToggleEvent(env: PJNIEnv; _jswitchbutton: JObject; _value: boolean);
@@ -691,6 +711,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jswitchbutton);
   jMethod:= env^.GetMethodID(env, jCls, 'DispatchOnToggleEvent', '(Z)V');
   env^.CallVoidMethodA(env, _jswitchbutton, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 procedure jSwitchButton_Toggle(env: PJNIEnv; _jswitchbutton: JObject);
@@ -701,6 +722,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jswitchbutton);
   jMethod:= env^.GetMethodID(env, jCls, 'Toggle', '()V');
   env^.CallVoidMethod(env, _jswitchbutton, jMethod);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -714,7 +736,8 @@ begin
   jCls:= env^.GetObjectClass(env, _jswitchbutton);
   jMethod:= env^.GetMethodID(env, jCls, 'SetThumbIcon', '(Ljava/lang/String;)V');
   env^.CallVoidMethodA(env, _jswitchbutton, jMethod, @jParams);
-env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -728,6 +751,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jswitchbutton);
   jMethod:= env^.GetMethodID(env, jCls, 'SetShowText', '(Z)V');
   env^.CallVoidMethodA(env, _jswitchbutton, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 function jSwitchButton_IsChecked(env: PJNIEnv; _jswitchbutton: JObject): boolean;
@@ -740,8 +764,7 @@ begin
   jMethod:= env^.GetMethodID(env, jCls, 'IsChecked', '()Z');
   jBoo:= env^.CallBooleanMethod(env, _jswitchbutton, jMethod);
   Result:= boolean(jBoo);
+  env^.DeleteLocalRef(env, jCls);
 end;
-
-
 
 end.

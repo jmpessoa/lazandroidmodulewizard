@@ -123,6 +123,11 @@ begin
       jScrollView(FParent).Init(refApp);
       FjPRLayout:= jScrollView_getView(FjEnv, jScrollView(FParent).jSelf);//FjPRLayout:= jScrollView(FParent).View;
     end;
+    if FParent is jHorizontalScrollView then
+    begin
+      jHorizontalScrollView(FParent).Init(refApp);
+      FjPRLayout:= jHorizontalScrollView_getView(FjEnv, jHorizontalScrollView(FParent).jSelf);
+    end;
     if FParent is jCustomDialog then
     begin
       jCustomDialog(FParent).Init(refApp);
@@ -389,6 +394,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jdigitalclock);
   jMethod:= env^.GetMethodID(env, jCls, 'jFree', '()V');
   env^.CallVoidMethod(env, _jdigitalclock, jMethod);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -402,6 +408,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jdigitalclock);
   jMethod:= env^.GetMethodID(env, jCls, 'SetViewParent', '(Landroid/view/ViewGroup;)V');
   env^.CallVoidMethodA(env, _jdigitalclock, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -413,6 +420,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jdigitalclock);
   jMethod:= env^.GetMethodID(env, jCls, 'RemoveFromViewParent', '()V');
   env^.CallVoidMethod(env, _jdigitalclock, jMethod);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -424,6 +432,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jdigitalclock);
   jMethod:= env^.GetMethodID(env, jCls, 'GetView', '()Landroid/view/View;');
   Result:= env^.CallObjectMethod(env, _jdigitalclock, jMethod);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -437,6 +446,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jdigitalclock);
   jMethod:= env^.GetMethodID(env, jCls, 'SetLParamWidth', '(I)V');
   env^.CallVoidMethodA(env, _jdigitalclock, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -450,6 +460,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jdigitalclock);
   jMethod:= env^.GetMethodID(env, jCls, 'SetLParamHeight', '(I)V');
   env^.CallVoidMethodA(env, _jdigitalclock, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -468,6 +479,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jdigitalclock);
   jMethod:= env^.GetMethodID(env, jCls, 'SetLeftTopRightBottomWidthHeight', '(IIIIII)V');
   env^.CallVoidMethodA(env, _jdigitalclock, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -481,6 +493,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jdigitalclock);
   jMethod:= env^.GetMethodID(env, jCls, 'AddLParamsAnchorRule', '(I)V');
   env^.CallVoidMethodA(env, _jdigitalclock, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -494,6 +507,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jdigitalclock);
   jMethod:= env^.GetMethodID(env, jCls, 'AddLParamsParentRule', '(I)V');
   env^.CallVoidMethodA(env, _jdigitalclock, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -507,6 +521,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jdigitalclock);
   jMethod:= env^.GetMethodID(env, jCls, 'SetLayoutAll', '(I)V');
   env^.CallVoidMethodA(env, _jdigitalclock, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -518,6 +533,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jdigitalclock);
   jMethod:= env^.GetMethodID(env, jCls, 'ClearLayoutAll', '()V');
   env^.CallVoidMethod(env, _jdigitalclock, jMethod);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -531,8 +547,8 @@ begin
   jCls:= env^.GetObjectClass(env, _jdigitalclock);
   jMethod:= env^.GetMethodID(env, jCls, 'SetId', '(I)V');
   env^.CallVoidMethodA(env, _jdigitalclock, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
 end;
-
 
 
 end.

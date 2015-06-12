@@ -268,6 +268,19 @@ function TApkBuilder.TryFixPaths: TModalResult;
     FindCloseUTF8(dir);
   end;
 
+  function PosIdent(const str, dest: string): Integer;
+  var i: Integer;
+  begin
+    i := Pos(str, dest);
+    repeat
+      if ((i = 1) or not (dest[i - 1] in ['a'..'z', 'A'..'Z']))
+      and ((i + Length(str) > Length(dest))
+           or not (dest[i + Length(str)] in ['a'..'z', 'A'..'Z'])) then Break;
+      i := PosEx(str, dest, i + 1);
+    until i = 0;
+    Result := i;
+  end;
+
   function FixPath(var path: string; const truncBy, newPath: string): Boolean;
   begin
     if Pos(PathDelim, path) = 0 then
@@ -275,7 +288,7 @@ function TApkBuilder.TryFixPaths: TModalResult;
         {%H-}path := StringReplace(path, '/', PathDelim, [rfReplaceAll])
       else
         {%H-}path := StringReplace(path, '\', PathDelim, [rfReplaceAll]);
-    Delete(path, 1, Pos(PathDelim + truncBy, path));
+    Delete(path, 1, PosIdent(truncBy, path));
     Delete(path, 1, Pos(PathDelim, path));
     path := AppendPathDelim(newPath) + path;
     FixArmLinuxAndroidEabiVersion(path);

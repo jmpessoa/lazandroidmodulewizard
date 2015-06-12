@@ -172,6 +172,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jPreferences);
   jMethod:= env^.GetMethodID(env, jCls, 'jFree', '()V');
   env^.CallVoidMethod(env, _jPreferences, jMethod);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -186,7 +187,8 @@ begin
   jCls:= env^.GetObjectClass(env, _jPreferences);
   jMethod:= env^.GetMethodID(env, jCls, 'GetIntData', '(Ljava/lang/String;I)I');
   Result:= env^.CallIntMethodA(env, _jPreferences, jMethod, @jParams);
-env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -201,7 +203,8 @@ begin
   jCls:= env^.GetObjectClass(env, _jPreferences);
   jMethod:= env^.GetMethodID(env, jCls, 'SetIntData', '(Ljava/lang/String;I)V');
   env^.CallVoidMethodA(env, _jPreferences, jMethod, @jParams);
-env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -225,8 +228,9 @@ begin
               Result:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
             end;
   end;
-env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env,jParams[0].l);
   env^.DeleteLocalRef(env,jParams[1].l);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -241,8 +245,9 @@ begin
   jCls:= env^.GetObjectClass(env, _jPreferences);
   jMethod:= env^.GetMethodID(env, jCls, 'SetStringData', '(Ljava/lang/String;Ljava/lang/String;)V');
   env^.CallVoidMethodA(env, _jPreferences, jMethod, @jParams);
-env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env,jParams[0].l);
   env^.DeleteLocalRef(env,jParams[1].l);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -259,7 +264,8 @@ begin
   jMethod:= env^.GetMethodID(env, jCls, 'GetBoolData', '(Ljava/lang/String;Z)Z');
   jBoo:= env^.CallBooleanMethodA(env, _jPreferences, jMethod, @jParams);
   Result:= boolean(jBoo);
-env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -274,7 +280,8 @@ begin
   jCls:= env^.GetObjectClass(env, _jPreferences);
   jMethod:= env^.GetMethodID(env, jCls, 'SetBoolData', '(Ljava/lang/String;Z)V');
   env^.CallVoidMethodA(env, _jPreferences, jMethod, @jParams);
-env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 

@@ -35,10 +35,13 @@
         <FormatVersion Value="1"/>
       </local>
     </RunParams>
-    <RequiredPackages Count="1">
+    <RequiredPackages Count="2">
       <Item1>
-        <PackageName Value="tfpandroidbridge_pack"/>
+        <PackageName Value="tfpnoguigraphicsbridge_pack"/>
       </Item1>
+      <Item2>
+        <PackageName Value="tfpandroidbridge_pack"/>
+      </Item2>
     </RequiredPackages>
     <Units Count="2">
       <Unit0>

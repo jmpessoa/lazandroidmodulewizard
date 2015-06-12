@@ -140,6 +140,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jhelloadder);
   jMethod:= env^.GetMethodID(env, jCls, 'jFree', '()V');
   env^.CallVoidMethod(env, _jhelloadder, jMethod);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -154,6 +155,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jhelloadder);
   jMethod:= env^.GetMethodID(env, jCls, 'Add', '(II)I');
   Result:= env^.CallIntMethodA(env, _jhelloadder, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -177,6 +179,7 @@ begin
             end;
   end;
   env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 end.

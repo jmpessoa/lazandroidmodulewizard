@@ -146,6 +146,11 @@ begin
       jScrollView(FParent).Init(refApp);
       FjPRLayout:= jScrollView_getView(FjEnv, jScrollView(FParent).jSelf);//FjPRLayout:= jScrollView(FParent).View;
     end;
+    if FParent is jHorizontalScrollView then
+    begin
+      jHorizontalScrollView(FParent).Init(refApp);
+      FjPRLayout:= jHorizontalScrollView_getView(FjEnv, jHorizontalScrollView(FParent).jSelf);
+    end;
     if FParent is jCustomDialog then
     begin
       jCustomDialog(FParent).Init(refApp);
@@ -455,6 +460,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jgridview);
   jMethod:= env^.GetMethodID(env, jCls, 'jFree', '()V');
   env^.CallVoidMethod(env, _jgridview, jMethod);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -468,6 +474,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jgridview);
   jMethod:= env^.GetMethodID(env, jCls, 'SetViewParent', '(Landroid/view/ViewGroup;)V');
   env^.CallVoidMethodA(env, _jgridview, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -479,6 +486,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jgridview);
   jMethod:= env^.GetMethodID(env, jCls, 'RemoveFromViewParent', '()V');
   env^.CallVoidMethod(env, _jgridview, jMethod);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -490,6 +498,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jgridview);
   jMethod:= env^.GetMethodID(env, jCls, 'GetView', '()Landroid/view/View;');
   Result:= env^.CallObjectMethod(env, _jgridview, jMethod);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -503,6 +512,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jgridview);
   jMethod:= env^.GetMethodID(env, jCls, 'SetLParamWidth', '(I)V');
   env^.CallVoidMethodA(env, _jgridview, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -516,6 +526,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jgridview);
   jMethod:= env^.GetMethodID(env, jCls, 'SetLParamHeight', '(I)V');
   env^.CallVoidMethodA(env, _jgridview, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -534,6 +545,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jgridview);
   jMethod:= env^.GetMethodID(env, jCls, 'SetLeftTopRightBottomWidthHeight', '(IIIIII)V');
   env^.CallVoidMethodA(env, _jgridview, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -547,6 +559,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jgridview);
   jMethod:= env^.GetMethodID(env, jCls, 'AddLParamsAnchorRule', '(I)V');
   env^.CallVoidMethodA(env, _jgridview, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -560,6 +573,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jgridview);
   jMethod:= env^.GetMethodID(env, jCls, 'AddLParamsParentRule', '(I)V');
   env^.CallVoidMethodA(env, _jgridview, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -573,6 +587,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jgridview);
   jMethod:= env^.GetMethodID(env, jCls, 'SetLayoutAll', '(I)V');
   env^.CallVoidMethodA(env, _jgridview, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -584,6 +599,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jgridview);
   jMethod:= env^.GetMethodID(env, jCls, 'ClearLayoutAll', '()V');
   env^.CallVoidMethod(env, _jgridview, jMethod);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -597,6 +613,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jgridview);
   jMethod:= env^.GetMethodID(env, jCls, 'SetId', '(I)V');
   env^.CallVoidMethodA(env, _jgridview, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 procedure jGridView_Add(env: PJNIEnv; _jgridview: JObject; _item: string; _imgIdentifier: string);
@@ -612,6 +629,7 @@ begin
   env^.CallVoidMethodA(env, _jgridview, jMethod, @jParams);
   env^.DeleteLocalRef(env,jParams[0].l);
   env^.DeleteLocalRef(env,jParams[1].l);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 procedure jGridView_SetNumColumns(env: PJNIEnv; _jgridview: JObject; _value: integer);
@@ -624,6 +642,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jgridview);
   jMethod:= env^.GetMethodID(env, jCls, 'SetNumColumns', '(I)V');
   env^.CallVoidMethodA(env, _jgridview, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -637,6 +656,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jgridview);
   jMethod:= env^.GetMethodID(env, jCls, 'SetColumnWidth', '(I)V');
   env^.CallVoidMethodA(env, _jgridview, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -648,6 +668,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jgridview);
   jMethod:= env^.GetMethodID(env, jCls, 'Clear', '()V');
   env^.CallVoidMethod(env, _jgridview, jMethod);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -661,6 +682,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jgridview);
   jMethod:= env^.GetMethodID(env, jCls, 'Delete', '(I)V');
   env^.CallVoidMethodA(env, _jgridview, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 procedure jGridView_SetItemsLayout(env: PJNIEnv; _jgridview: JObject; _value: integer);
@@ -673,6 +695,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jgridview);
   jMethod:= env^.GetMethodID(env, jCls, 'SetItemsLayout', '(I)V');
   env^.CallVoidMethodA(env, _jgridview, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 end.

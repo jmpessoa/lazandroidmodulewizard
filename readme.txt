@@ -95,7 +95,7 @@
 	*	Option 1: NEW !!
 	*		IDE --> Tools --> 
 	*				[Lamw] Android Module Wizard --> 
-	*								Change Project [*.lpi] Ndk Path [Demos]
+	*					Change Project [*.lpi] Ndk Path [Demos]
 	*	Option 2: Go to Lazarus IDE:
 	*			->Project
 	*			->Project -> Option
@@ -108,7 +108,117 @@
 	*			You can build/install/Run all Eclipse projects just with "Ant"... 
 	*			see "build.bat" [or .sh] and "install.bat" or [.sh]
 	*			or Go To: Lazarus IDE menu "Run--> [Lamw] Build and Run"! Thanks to Anton!!!
+	*
+	*4.PANIC  ? [upgrade your project [or demo] code templates!] !
+	*	Lazarus IDE --> menu Tools --> [Lamw] Android Module Wizard --> Upgrade code Templates [*.lpr, *.java]
+	*
+	*5.PANIC ? When prompt "Read error" [Unknown Property] just choice "Continue Loading" !
 	****************************************************************************************************
+
+Version 0.6 - rev. 29 - 08 June 2015 - 
+
+	NEW! jSurfaceView component 
+
+	IMPROVEDMENTS!   
+
+		jMediaPlayer component:			
+			New! Add support to video play! // <<------ @m4u_hoahoctro's request and suggestion!
+	NEW!  
+		Demo AppMediaPlayerDemo1 [Eclipse Compatible Project] 			
+		Demo AppSurfaceViewDemo1 [Eclipse Compatible Project] 
+
+	UPDATED: All Demos was "upgrade"!			
+
+	HINT 1: Old Projects: upgrade your projects code templates !
+		Lazarus IDE --> menu Tools --> [Lamw] Android Module Wizard --> Upgrade code Templates [*.lpr, *.java]
+
+	HINT 2:	When prompt "Read error" [Unknown Property] just choice "Continue Loading"!
+
+Version 0.6 - rev. 28 - 02 June 2015 - 
+
+	NEW!
+		jForm "TakeScreenshot" method
+		jForm "Vibrate" method
+			:"AndroidManifest.xml" add on:  
+				"<uses-permission android:name="android.permission.VIBRATE"/>"
+
+	IMPROVEDMENTS!   
+
+		jAsyncTask component:   
+			New! component design/behaviour changed!
+			News events properties: 
+    				OnDoInBackground
+				OnProgressUpdate
+				OnPreExecute
+				OnPostExecute
+
+			::Redesigned DEMO : AppAsyncTaskDemo1 		
+		
+		jHttpClient
+			New! Added build in "asynctask" support!
+			News events properties: 
+				OnContentResult
+				OnCodeResult
+
+			::Redesigned DEMO: AppHttpClientDemo1					
+	
+		jDialogProgress component //<--- Euller's suggestion!
+			New! Added "custom view" support!
+			News methods:								
+				Show
+				Close
+				SetMessage
+				SetTitle
+				SetCancelable
+
+	NEW!  
+		Demo AppDialogProgressDemo1 [Eclipse Compatible Project] 			
+
+	-----------------------------------------------------------------------
+	Ok. We did dramatic changes, sorry! 
+
+	Please, you can learn the new components design/behaviour in the Demos:  AppAsyncTaskDemo1 and AppHttpClientDemo1  !!!
+
+	1. jAsyncTask lost property "OnAsyncEvent" but no panic!
+		when prompt "Read error" [Unknown Property] just choice "Continue Loading"!
+
+		Now copy the old code to matching/equivalent news events:
+			OnPreExecute			
+			OnDoInBackground			
+			OnProgressUpdate
+			OnPostExecute
+
+	2. jHttpClient: now "runInBackground/asynctask" have build in  support! 
+			You do not  need more use jAsyncTask component to run it "in background" !
+
+		Ok, you will need handle the new event "ContentResult" to get content result and
+		"get" now is a procedure [not a function] ... so, no more result!
+
+	3. Old Projects: upgrade your project [or demo] code templates!] !
+		Lazarus IDE --> menu Tools --> [Lamw] Android Module Wizard --> Upgrade code Templates [*.lpr, *.java]
+	--------------------------------------------------------------------
+
+but, the changes was for more elegance and effective solution!  
+
+Thanks to All!
+
+Version 0.6 - rev. 27 - 25 May 2015 - 
+
+	FIXED! 	
+		jShellCommand component
+	FIXED!   
+		IDE Tools: New jComponent [Create]
+
+Version 0.6 - rev. 26 - 21 May 2015 - 
+
+	NEW!  
+		jTCPSocketClient component
+
+	FIXED! 	
+		jHorizontalScrollView component
+	NEW!  
+		Demo AppHorizontalScrollViewDemo1 [Eclipse Compatible Project] 
+		Demo AppTCPClientDemo1 [Eclipse Compatible Project] 
 
 Version 0.6 - rev. 25 - 14 May 2015 - 
 
@@ -534,9 +644,9 @@ Version 0.6 - rev. 11 - 03 January 2015 -
 		.Just puts the jImageView "first" on jForm and set LayoutParams [H/W] to lpMatchParent
 			(Form Background Image is done!) 
 
-Version 0.6 - rev. 10 - 21 December 2014 -
+Version 0.6 - rev. 10 - 21 December 2014 - 
 
-	Important Code Reorganization: A sugestion by Leledumbo [Thank you very much Leledumbo!]
+	Important Code Reorganization: A suggestion by Leledumbo [Thank you very much Leledumbo!]
 
 	Significantly reducing the final size of "controls.so"  [just about half!]
 
@@ -720,7 +830,7 @@ Version 0.6 - rev. 05 - 13 November 2014 -
 
 			:: Yes, Now became easy to keep the [olds] projects in sync with the new AMW version-revision!	
 
-		.Add sub entry "Path Settings [JDK, SDK, NDK, ...]" <<--- Stephano's sugestion! (**)
+		.Add sub entry "Path Settings [JDK, SDK, NDK, ...]" <<--- Stephano's suggestion! (**)
 		ref. image: https://jmpessoa.opendrive.com/files?Ml82Nzg4MzA1OF9yVVU3RA
 
 			:: WARNING: I recommend that "new" User start here: Set Paths to JDK, SDK, NDK, ...
@@ -1188,7 +1298,7 @@ V. Ref. Lazarus forum: http://forum.lazarus.freepascal.org/index.php/topic,21919
 
      -Help and Hints
      -Bugs : [SOLVED!] {known bug: fail on Api > 13. Temporary solution: a workaround to prevent Api > 13 - 02 jan 2014} 
-     -Sugestions 
+     -suggestions 
      -Colaborations	
      -Critics
      -Roadmap

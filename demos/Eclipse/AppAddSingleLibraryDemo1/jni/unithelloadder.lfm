@@ -1,7 +1,0 @@
-object NoGUIAndroidModule1: TNoGUIAndroidModule1
-  OldCreateOrder = False
-  Height = 150
-  HorizontalOffset = 354
-  VerticalOffset = 146
-  Width = 150
-end

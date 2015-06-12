@@ -302,6 +302,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jmenu);
   jMethod:= env^.GetMethodID(env, jCls, 'jFree', '()V');
   env^.CallVoidMethod(env, _jmenu, jMethod);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 procedure jMenu_Add(env: PJNIEnv; _jmenu: JObject; _menu: jObject; _itemID: integer; _caption: string);
@@ -317,6 +318,7 @@ begin
   jMethod:= env^.GetMethodID(env, jCls, 'Add', '(Landroid/view/Menu;ILjava/lang/String;)V');
   env^.CallVoidMethodA(env, _jmenu, jMethod, @jParams);
   env^.DeleteLocalRef(env,jParams[2].l);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 procedure jMenu_AddCheckable(env: PJNIEnv; _jmenu: JObject; _menu: jObject; _itemID: integer; _caption: string);
@@ -332,6 +334,7 @@ begin
   jMethod:= env^.GetMethodID(env, jCls, 'AddCheckable', '(Landroid/view/Menu;ILjava/lang/String;)V');
   env^.CallVoidMethodA(env, _jmenu, jMethod, @jParams);
   env^.DeleteLocalRef(env,jParams[2].l);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 procedure jMenu_AddDrawable(env: PJNIEnv; _jmenu: JObject; _menu: jObject; _itemID: integer; _caption: string);
@@ -347,6 +350,7 @@ begin
   jMethod:= env^.GetMethodID(env, jCls, 'AddDrawable', '(Landroid/view/Menu;ILjava/lang/String;)V');
   env^.CallVoidMethodA(env, _jmenu, jMethod, @jParams);
   env^.DeleteLocalRef(env,jParams[2].l);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 procedure jMenu_CheckItemCommute(env: PJNIEnv; _jmenu: JObject; _item: jObject);
@@ -359,6 +363,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jmenu);
   jMethod:= env^.GetMethodID(env, jCls, 'CheckItemCommute', '(Landroid/view/MenuItem;)V');
   env^.CallVoidMethodA(env, _jmenu, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -372,6 +377,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jmenu);
   jMethod:= env^.GetMethodID(env, jCls, 'CheckItem', '(Landroid/view/MenuItem;)V');
   env^.CallVoidMethodA(env, _jmenu, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -385,6 +391,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jmenu);
   jMethod:= env^.GetMethodID(env, jCls, 'UnCheckItem', '(Landroid/view/MenuItem;)V');
   env^.CallVoidMethodA(env, _jmenu, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 procedure jMenu_AddSubMenu(env: PJNIEnv; _jmenu: JObject; _menu: jObject; _startItemID: integer; var _captions: TDynArrayOfString);
@@ -409,6 +416,7 @@ begin
   jMethod:= env^.GetMethodID(env, jCls, 'AddSubMenu', '(Landroid/view/Menu;I[Ljava/lang/String;)V');
   env^.CallVoidMethodA(env, _jmenu, jMethod, @jParams);
   env^.DeleteLocalRef(env,jParams[2].l);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 procedure jMenu_AddCheckableSubMenu(env: PJNIEnv; _jmenu: JObject; _menu: jObject; _startItemID: integer; var _captions: TDynArrayOfString);
@@ -433,6 +441,7 @@ begin
   jMethod:= env^.GetMethodID(env, jCls, 'AddCheckableSubMenu', '(Landroid/view/Menu;I[Ljava/lang/String;)V');
   env^.CallVoidMethodA(env, _jmenu, jMethod, @jParams);
   env^.DeleteLocalRef(env,jParams[2].l);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 function jMenu_Size(env: PJNIEnv; _jmenu: JObject): integer;
@@ -443,6 +452,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jmenu);
   jMethod:= env^.GetMethodID(env, jCls, 'Size', '()I');
   Result:= env^.CallIntMethod(env, _jmenu, jMethod);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 function jMenu_FindMenuItemByID(env: PJNIEnv; _jmenu: JObject; _itemID: integer): jObject;
@@ -455,6 +465,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jmenu);
   jMethod:= env^.GetMethodID(env, jCls, 'FindMenuItemByID', '(I)Landroid/view/MenuItem;');
   Result:= env^.CallObjectMethodA(env, _jmenu, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 function jMenu_GetMenuItemByIndex(env: PJNIEnv; _jmenu: JObject; _index: integer): jObject;
@@ -467,6 +478,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jmenu);
   jMethod:= env^.GetMethodID(env, jCls, 'GetMenuItemByIndex', '(I)Landroid/view/MenuItem;');
   Result:= env^.CallObjectMethodA(env, _jmenu, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 procedure jMenu_UnCheckAllMenuItem(env: PJNIEnv; _jmenu: JObject);
@@ -477,6 +489,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jmenu);
   jMethod:= env^.GetMethodID(env, jCls, 'UnCheckAllMenuItem', '()V');
   env^.CallVoidMethod(env, _jmenu, jMethod);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 function jMenu_CountSubMenus(env: PJNIEnv; _jmenu: JObject): integer;
@@ -487,6 +500,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jmenu);
   jMethod:= env^.GetMethodID(env, jCls, 'CountSubMenus', '()I');
   Result:= env^.CallIntMethod(env, _jmenu, jMethod);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 procedure jMenu_UnCheckAllSubMenuItemByIndex(env: PJNIEnv; _jmenu: JObject; _subMenuIndex: integer);
@@ -499,6 +513,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jmenu);
   jMethod:= env^.GetMethodID(env, jCls, 'UnCheckAllSubMenuItemByIndex', '(I)V');
   env^.CallVoidMethodA(env, _jmenu, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 procedure jMenu_RegisterForContextMenu(env: PJNIEnv; _jmenu: JObject; _view: jObject);
@@ -511,6 +526,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jmenu);
   jMethod:= env^.GetMethodID(env, jCls, 'RegisterForContextMenu', '(Landroid/view/View;)V');
   env^.CallVoidMethodA(env, _jmenu, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 procedure JMenu_UnRegisterForContextMenu(env: PJNIEnv; _JMenu: JObject; _View: JObject); 
@@ -522,7 +538,8 @@ begin
   JParams[0].l := _View; 
   JCls := env^.GetObjectClass(env, _JMenu); 
   JMethod := env^.GetMethodID(env, JCls, 'UnRegisterForContextMenu', '(Landroid/view/View;)V'); 
-  env^.CallVoidMethodA(env, _JMenu, JMethod, @JParams); 
+  env^.CallVoidMethodA(env, _JMenu, JMethod, @JParams);
+  env^.DeleteLocalRef(env, jCls);
 end; 	
 
 procedure jMenu_AddItem(env: PJNIEnv; _jmenu: JObject; _menu: jObject; _itemID: integer; _caption: string; _iconIdentifier: string; _itemType: integer; _showAsAction: integer);
@@ -540,8 +557,9 @@ begin
   jCls:= env^.GetObjectClass(env, _jmenu);
   jMethod:= env^.GetMethodID(env, jCls, 'AddItem', '(Landroid/view/Menu;ILjava/lang/String;Ljava/lang/String;II)V');
   env^.CallVoidMethodA(env, _jmenu, jMethod, @jParams);
-env^.DeleteLocalRef(env,jParams[2].l);
+  env^.DeleteLocalRef(env,jParams[2].l);
   env^.DeleteLocalRef(env,jParams[3].l);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -559,6 +577,7 @@ begin
   jMethod:= env^.GetMethodID(env, jCls, 'AddItem', '(Landroid/view/SubMenu;ILjava/lang/String;I)V');
   env^.CallVoidMethodA(env, _jmenu, jMethod, @jParams);
   env^.DeleteLocalRef(env,jParams[2].l);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -574,9 +593,9 @@ begin
   jCls:= env^.GetObjectClass(env, _jmenu);
   jMethod:= env^.GetMethodID(env, jCls, 'AddSubMenu', '(Landroid/view/Menu;Ljava/lang/String;Ljava/lang/String;)Landroid/view/SubMenu;');
   Result:= env^.CallObjectMethodA(env, _jmenu, jMethod, @jParams);
-env^.DeleteLocalRef(env,jParams[1].l);
+  env^.DeleteLocalRef(env,jParams[1].l);
   env^.DeleteLocalRef(env,jParams[2].l);
-
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 

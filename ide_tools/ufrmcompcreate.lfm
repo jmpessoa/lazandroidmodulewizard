@@ -3,8 +3,8 @@ object FrmCompCreate: TFrmCompCreate
   Height = 468
   Top = 137
   Width = 724
-  BorderStyle = bsSizeToolWin
-  Caption = 'Android Module Wizard: Create New jComponent'
+  BorderStyle = bsToolWindow
+  Caption = 'Lamw: Lazarus Android Module Wizard: Create New jComponent'
   ClientHeight = 468
   ClientWidth = 724
   OnActivate = FormActivate

@@ -716,6 +716,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jintentmanager);
   jMethod:= env^.GetMethodID(env, jCls, 'jFree', '()V');
   env^.CallVoidMethod(env, _jintentmanager, jMethod);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -727,6 +728,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jintentmanager);
   jMethod:= env^.GetMethodID(env, jCls, 'GetIntent', '()Landroid/content/Intent;');
   Result:= env^.CallObjectMethod(env, _jintentmanager, jMethod);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -738,6 +740,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jintentmanager);
   jMethod:= env^.GetMethodID(env, jCls, 'GetActivityStartedIntent', '()Landroid/content/Intent;');
   Result:= env^.CallObjectMethod(env, _jintentmanager, jMethod);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -752,6 +755,7 @@ begin
   jMethod:= env^.GetMethodID(env, jCls, 'SetAction', '(Ljava/lang/String;)V');
   env^.CallVoidMethodA(env, _jintentmanager, jMethod, @jParams);
   env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -766,6 +770,7 @@ begin
   jMethod:= env^.GetMethodID(env, jCls, 'SetMimeType', '(Ljava/lang/String;)V');
   env^.CallVoidMethodA(env, _jintentmanager, jMethod, @jParams);
   env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -780,6 +785,7 @@ begin
   jMethod:= env^.GetMethodID(env, jCls, 'SetDataUriAsString', '(Ljava/lang/String;)V');
   env^.CallVoidMethodA(env, _jintentmanager, jMethod, @jParams);
   env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -793,6 +799,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jintentmanager);
   jMethod:= env^.GetMethodID(env, jCls, 'StartActivityForResult', '(I)V');
   env^.CallVoidMethodA(env, _jintentmanager, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -804,6 +811,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jintentmanager);
   jMethod:= env^.GetMethodID(env, jCls, 'StartActivity', '()V');
   env^.CallVoidMethod(env, _jintentmanager, jMethod);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -818,6 +826,7 @@ begin
   jMethod:= env^.GetMethodID(env, jCls, 'StartActivity', '(Ljava/lang/String;)V');
   env^.CallVoidMethodA(env, _jintentmanager, jMethod, @jParams);
   env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -833,6 +842,7 @@ begin
   jMethod:= env^.GetMethodID(env, jCls, 'StartActivityForResult', '(ILjava/lang/String;)V');
   env^.CallVoidMethodA(env, _jintentmanager, jMethod, @jParams);
   env^.DeleteLocalRef(env,jParams[1].l);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -844,6 +854,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jintentmanager);
   jMethod:= env^.GetMethodID(env, jCls, 'SendBroadcast', '()V');
   env^.CallVoidMethod(env, _jintentmanager, jMethod);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -866,6 +877,7 @@ begin
               Result:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
             end;
   end;
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -883,6 +895,7 @@ begin
   jBoo:= env^.CallBooleanMethodA(env, _jintentmanager, jMethod, @jParams);
   Result:= boolean(jBoo);
   env^.DeleteLocalRef(env,jParams[1].l);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -896,6 +909,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jintentmanager);
   jMethod:= env^.GetMethodID(env, jCls, 'PutExtraBundle', '(Landroid/os/Bundle;)V');
   env^.CallVoidMethodA(env, _jintentmanager, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -909,6 +923,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jintentmanager);
   jMethod:= env^.GetMethodID(env, jCls, 'GetExtraBundle', '(Landroid/content/Intent;)Landroid/os/Bundle;');
   Result:= env^.CallObjectMethodA(env, _jintentmanager, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -932,6 +947,7 @@ begin
     env^.GetDoubleArrayRegion(env, jResultArray, 0, resultSize, @Result[0] {target});
   end;
   env^.DeleteLocalRef(env,jParams[1].l);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -953,6 +969,7 @@ begin
   env^.CallVoidMethodA(env, _jintentmanager, jMethod, @jParams);
   env^.DeleteLocalRef(env,jParams[0].l);
   env^.DeleteLocalRef(env,jParams[1].l);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -968,6 +985,7 @@ begin
   jMethod:= env^.GetMethodID(env, jCls, 'GetExtraDouble', '(Landroid/content/Intent;Ljava/lang/String;)D');
   Result:= env^.CallDoubleMethodA(env, _jintentmanager, jMethod, @jParams);
   env^.DeleteLocalRef(env,jParams[1].l);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -983,6 +1001,7 @@ begin
   jMethod:= env^.GetMethodID(env, jCls, 'PutExtraDouble', '(Ljava/lang/String;D)V');
   env^.CallVoidMethodA(env, _jintentmanager, jMethod, @jParams);
   env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -1006,6 +1025,7 @@ begin
     env^.GetFloatArrayRegion(env, jResultArray, 0, resultSize, @Result[0] {target});
   end;
   env^.DeleteLocalRef(env,jParams[1].l);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -1027,6 +1047,7 @@ begin
   env^.CallVoidMethodA(env, _jintentmanager, jMethod, @jParams);
   env^.DeleteLocalRef(env,jParams[0].l);
   env^.DeleteLocalRef(env,jParams[1].l);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -1042,6 +1063,7 @@ begin
   jMethod:= env^.GetMethodID(env, jCls, 'GetExtraFloat', '(Landroid/content/Intent;Ljava/lang/String;)F');
   Result:= env^.CallFloatMethodA(env, _jintentmanager, jMethod, @jParams);
   env^.DeleteLocalRef(env,jParams[1].l);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -1057,6 +1079,7 @@ begin
   jMethod:= env^.GetMethodID(env, jCls, 'PutExtraFloat', '(Ljava/lang/String;F)V');
   env^.CallVoidMethodA(env, _jintentmanager, jMethod, @jParams);
   env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -1080,6 +1103,7 @@ begin
     env^.GetIntArrayRegion(env, jResultArray, 0, resultSize, @Result[0] {target});
   end;
   env^.DeleteLocalRef(env,jParams[1].l);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -1101,6 +1125,7 @@ begin
   env^.CallVoidMethodA(env, _jintentmanager, jMethod, @jParams);
   env^.DeleteLocalRef(env,jParams[0].l);
   env^.DeleteLocalRef(env,jParams[1].l);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -1116,6 +1141,7 @@ begin
   jMethod:= env^.GetMethodID(env, jCls, 'GetExtraInt', '(Landroid/content/Intent;Ljava/lang/String;)I');
   Result:= env^.CallIntMethodA(env, _jintentmanager, jMethod, @jParams);
   env^.DeleteLocalRef(env,jParams[1].l);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -1131,6 +1157,7 @@ begin
   jMethod:= env^.GetMethodID(env, jCls, 'PutExtraInt', '(Ljava/lang/String;I)V');
   env^.CallVoidMethodA(env, _jintentmanager, jMethod, @jParams);
   env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -1167,6 +1194,7 @@ begin
     end;
   end;
   env^.DeleteLocalRef(env,jParams[1].l);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -1192,6 +1220,7 @@ begin
   env^.CallVoidMethodA(env, _jintentmanager, jMethod, @jParams);
   env^.DeleteLocalRef(env,jParams[0].l);
   env^.DeleteLocalRef(env,jParams[1].l);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -1216,6 +1245,7 @@ begin
             end;
   end;
   env^.DeleteLocalRef(env,jParams[1].l);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -1232,6 +1262,7 @@ begin
   env^.CallVoidMethodA(env, _jintentmanager, jMethod, @jParams);
   env^.DeleteLocalRef(env,jParams[0].l);
   env^.DeleteLocalRef(env,jParams[1].l);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -1245,6 +1276,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jintentmanager);
   jMethod:= env^.GetMethodID(env, jCls, 'SetDataUri', '(Landroid/net/Uri;)V');
   env^.CallVoidMethodA(env, _jintentmanager, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -1258,6 +1290,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jintentmanager);
   jMethod:= env^.GetMethodID(env, jCls, 'GetDataUri', '(Landroid/content/Intent;)Landroid/net/Uri;');
   Result:= env^.CallObjectMethodA(env, _jintentmanager, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -1280,6 +1313,7 @@ begin
               Result:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
             end;
   end;
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -1296,6 +1330,7 @@ begin
   env^.CallVoidMethodA(env, _jintentmanager, jMethod, @jParams);
   env^.DeleteLocalRef(env,jParams[0].l);
   env^.DeleteLocalRef(env,jParams[1].l);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -1309,7 +1344,8 @@ begin
   jCls:= env^.GetObjectClass(env, _jintentmanager);
   jMethod:= env^.GetMethodID(env, jCls, 'PutExtraMailSubject', '(Ljava/lang/String;)V');
   env^.CallVoidMethodA(env, _jintentmanager, jMethod, @jParams);
-env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -1323,7 +1359,8 @@ begin
   jCls:= env^.GetObjectClass(env, _jintentmanager);
   jMethod:= env^.GetMethodID(env, jCls, 'PutExtraMailBody', '(Ljava/lang/String;)V');
   env^.CallVoidMethodA(env, _jintentmanager, jMethod, @jParams);
-env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -1346,7 +1383,8 @@ begin
   jCls:= env^.GetObjectClass(env, _jintentmanager);
   jMethod:= env^.GetMethodID(env, jCls, 'PutExtraMailCCs', '([Ljava/lang/String;)V');
   env^.CallVoidMethodA(env, _jintentmanager, jMethod, @jParams);
-env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -1369,7 +1407,8 @@ begin
   jCls:= env^.GetObjectClass(env, _jintentmanager);
   jMethod:= env^.GetMethodID(env, jCls, 'PutExtraMailBCCs', '([Ljava/lang/String;)V');
   env^.CallVoidMethodA(env, _jintentmanager, jMethod, @jParams);
-env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -1392,7 +1431,8 @@ begin
   jCls:= env^.GetObjectClass(env, _jintentmanager);
   jMethod:= env^.GetMethodID(env, jCls, 'PutExtraMailTos', '([Ljava/lang/String;)V');
   env^.CallVoidMethodA(env, _jintentmanager, jMethod, @jParams);
-env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -1416,6 +1456,7 @@ begin
   jMethod:= env^.GetMethodID(env, jCls, 'PutExtraPhoneNumbers', '([Ljava/lang/String;)V');
   env^.CallVoidMethodA(env, _jintentmanager, jMethod, @jParams);
   env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -1427,6 +1468,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jintentmanager);
   jMethod:= env^.GetMethodID(env, jCls, 'GetContactsContentUri', '()Landroid/net/Uri;');
   Result:= env^.CallObjectMethod(env, _jintentmanager, jMethod);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -1438,6 +1480,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jintentmanager);
   jMethod:= env^.GetMethodID(env, jCls, 'GetContactsPhoneUri', '()Landroid/net/Uri;');
   Result:= env^.CallObjectMethod(env, _jintentmanager, jMethod);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -1449,6 +1492,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jintentmanager);
   jMethod:= env^.GetMethodID(env, jCls, 'GetAudioExternContentUri', '()Landroid/net/Uri;');
   Result:= env^.CallObjectMethod(env, _jintentmanager, jMethod);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -1460,6 +1504,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jintentmanager);
   jMethod:= env^.GetMethodID(env, jCls, 'GetVideoExternContentUri', '()Landroid/net/Uri;');
   Result:= env^.CallObjectMethod(env, _jintentmanager, jMethod);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -1474,6 +1519,7 @@ begin
   jMethod:= env^.GetMethodID(env, jCls, 'ParseUri', '(Ljava/lang/String;)Landroid/net/Uri;');
   Result:= env^.CallObjectMethodA(env, _jintentmanager, jMethod, @jParams);
   env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -1494,6 +1540,7 @@ begin
               Result:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
             end;
   end;
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -1514,6 +1561,7 @@ begin
               Result:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
             end;
   end;
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -1534,6 +1582,7 @@ begin
               Result:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
             end;
   end;
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -1554,6 +1603,7 @@ begin
               Result:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
             end;
   end;
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -1574,6 +1624,7 @@ begin
               Result:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
             end;
   end;
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -1594,6 +1645,7 @@ begin
               Result:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
             end;
   end;
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -1627,6 +1679,7 @@ begin
   jMethod:= env^.GetMethodID(env, jCls, 'ResolveActivity', '()Z');
   jBoo:= env^.CallBooleanMethod(env, _jintentmanager, jMethod);
   Result:= boolean(jBoo);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -1638,6 +1691,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jintentmanager);
   jMethod:= env^.GetMethodID(env, jCls, 'GetMailtoUri', '()Landroid/net/Uri;');
   Result:= env^.CallObjectMethod(env, _jintentmanager, jMethod);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -1652,6 +1706,7 @@ begin
   jMethod:= env^.GetMethodID(env, jCls, 'GetMailtoUri', '(Ljava/lang/String;)Landroid/net/Uri;');
   Result:= env^.CallObjectMethodA(env, _jintentmanager, jMethod, @jParams);
   env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -1663,6 +1718,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jintentmanager);
   jMethod:= env^.GetMethodID(env, jCls, 'GetTelUri', '()Landroid/net/Uri;');
   Result:= env^.CallObjectMethod(env, _jintentmanager, jMethod);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -1677,6 +1733,7 @@ begin
   jMethod:= env^.GetMethodID(env, jCls, 'GetTelUri', '(Ljava/lang/String;)Landroid/net/Uri;');
   Result:= env^.CallObjectMethodA(env, _jintentmanager, jMethod, @jParams);
   env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -1697,6 +1754,7 @@ begin
               Result:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
             end;
   end;
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -1710,6 +1768,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jintentmanager);
   jMethod:= env^.GetMethodID(env, jCls, 'PutExtraFile', '(Landroid/net/Uri;)V');
   env^.CallVoidMethodA(env, _jintentmanager, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -1730,6 +1789,7 @@ begin
               Result:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
             end;
   end;
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -1752,6 +1812,7 @@ begin
               Result:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
             end;
   end;
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -1774,6 +1835,7 @@ begin
               Result:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
             end;
   end;
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -1808,6 +1870,7 @@ begin
       end;
     end;
   end;
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 procedure jIntentManager_SetAction(env: PJNIEnv; _jintentmanager: JObject; _intentAction: integer);
@@ -1820,6 +1883,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jintentmanager);
   jMethod:= env^.GetMethodID(env, jCls, 'SetAction', '(I)V');
   env^.CallVoidMethodA(env, _jintentmanager, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 function jIntentManager_IsCallable(env: PJNIEnv; _jintentmanager: JObject; _intent: jObject): boolean;
@@ -1834,6 +1898,7 @@ begin
   jMethod:= env^.GetMethodID(env, jCls, 'IsCallable', '(Landroid/content/Intent;)Z');
   jBoo:= env^.CallBooleanMethodA(env, _jintentmanager, jMethod, @jParams);
   Result:= boolean(jBoo);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 function jIntentManager_IsActionEqual(env: PJNIEnv; _jintentmanager: JObject; _intent: jObject; _intentAction: string): boolean;
@@ -1850,6 +1915,7 @@ begin
   jBoo:= env^.CallBooleanMethodA(env, _jintentmanager, jMethod, @jParams);
   Result:= boolean(jBoo);
   env^.DeleteLocalRef(env,jParams[1].l);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 

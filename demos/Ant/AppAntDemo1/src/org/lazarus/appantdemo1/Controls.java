@@ -2,7 +2,7 @@ package org.lazarus.appantdemo1;
 
 //Lamw: Lazarus Android Module Wizard 
 //Form Designer and Components development model!
-//version 0.6 - revision 25 - 14 May - 2015
+//version 0.6 - revision 29 - 08 June - 2015
 //
 //https://github.com/jmpessoa/lazandroidmodulewizard
 //http://forum.lazarus.freepascal.org/index.php/topic,21919.270.html
@@ -102,8 +102,11 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
+import android.graphics.PixelFormat;
+import android.graphics.PorterDuff;
 import android.graphics.Rect;
 import android.graphics.Typeface;
+import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.BitmapDrawable;
 import android.hardware.Sensor;
@@ -114,9 +117,11 @@ import android.opengl.GLSurfaceView;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
+import android.os.Vibrator;
 import android.telephony.SmsManager;
 import android.telephony.SmsMessage;
 import android.telephony.TelephonyManager;
@@ -130,6 +135,7 @@ import android.provider.Settings;
 import android.text.Editable;
 import android.text.InputFilter;
 import android.text.InputType;
+import android.text.Layout;
 import android.text.TextUtils;
 import android.text.TextUtils.TruncateAt;
 import android.text.TextWatcher;
@@ -144,7 +150,13 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.location.LocationProvider;
+import android.media.AudioManager;
 import android.media.MediaPlayer;
+import android.media.MediaPlayer.OnCompletionListener;
+import android.media.MediaPlayer.OnPreparedListener;
+import android.media.MediaPlayer.OnTimedTextListener;
+import android.media.MediaPlayer.OnVideoSizeChangedListener;
+import android.media.TimedText;
 import android.net.Uri;
 import android.net.wifi.WifiManager;
 import android.util.Log;
@@ -162,9 +174,12 @@ import android.view.ScaleGestureDetector.SimpleOnScaleGestureListener;
 import android.view.SubMenu;
 import android.view.Surface;
 import android.view.SurfaceHolder;
+import android.view.SurfaceHolder.Callback;
+import android.view.SurfaceView;
 import android.view.View.OnClickListener;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewParent;
 import android.view.Window;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.AlphaAnimation;
@@ -190,6 +205,7 @@ import android.widget.CompoundButton;
 import android.widget.DatePicker;
 import android.widget.DigitalClock;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -216,6 +232,8 @@ import java.io.*;
 import java.lang.*;
 
 import java.net.HttpURLConnection;
+import java.net.InetAddress;
+import java.net.Socket;
 //import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
@@ -939,6 +957,40 @@ public void ShowCustomMessage(RelativeLayout _layout,  int _gravity) {
     toast.show();
 }
 
+private class MyCountDownTimer extends CountDownTimer {
+	  Toast toast;
+	  public MyCountDownTimer(long startTime, long interval, Toast toas) {
+	     super(startTime, interval);
+	     toast = toas;
+	  }
+	  @Override
+	  public void onFinish() {
+	   //text.setText("Time's up!");
+		  toast.cancel();
+	  }
+	  @Override
+	  public void onTick(long millisUntilFinished) {
+	   //text.setText("" + millisUntilFinished / 1000);
+		  toast.show();
+	  }	 	  
+}
+
+public void ShowCustomMessage(RelativeLayout _layout,  int _gravity,  int _lenghTimeSecond) {
+    Toast toast = new Toast(controls.activity);   
+    toast.setGravity(_gravity, 0, 0);    
+    //toast.setDuration(Toast.LENGTH_LONG);    
+    RelativeLayout par = (RelativeLayout)_layout.getParent();
+	if (par != null) {
+	    par.removeView(_layout);        	    
+	}    
+    _layout.setVisibility(0);
+    toast.setView(_layout);    				
+    //it will show the toast for 20 seconds: 
+    //(20000 milliseconds/1st argument) with interval of 1 second/2nd argument //--> (20 000, 1000)
+    MyCountDownTimer countDownTimer = new MyCountDownTimer(_lenghTimeSecond*1000, 1000, toast);
+    countDownTimer.start();
+}
+
 public void SetScreenOrientation(int _orientation) {
 	//Log.i("Screen","Orientation "+ _orientation);
     switch(_orientation) {
@@ -1004,6 +1056,54 @@ public String GetScreenSize() {
     }
 	return r;
 }
+
+public void LogDebug(String _tag, String  _msg) {
+   Log.d(_tag, _msg);  //debug
+}
+
+public void Vibrate(int _milliseconds) {
+	Vibrator vib = (Vibrator) controls.activity.getSystemService(Context.VIBRATOR_SERVICE);	
+    if (vib.hasVibrator()) {
+    	vib.vibrate(_milliseconds);
+    }		
+}
+
+
+public void Vibrate(long[] _millisecondsPattern) {
+	Vibrator vib = (Vibrator) controls.activity.getSystemService(Context.VIBRATOR_SERVICE);	
+    if (vib.hasVibrator()) {
+    	vib.vibrate(_millisecondsPattern, -1);
+    }		
+}
+//http://stackoverflow.com/questions/2661536/how-to-programatically-take-a-screenshot-on-android
+public void TakeScreenshot(String _savePath, String _saveFileNameJPG) {
+	
+	String myPath = _savePath + "/" +  _saveFileNameJPG;	
+	Bitmap bitmap;	
+	View v1 = controls.activity.getWindow().getDecorView().getRootView(); 
+	v1.setDrawingCacheEnabled(true);
+	
+	bitmap = Bitmap.createBitmap(v1.getDrawingCache());
+	v1.setDrawingCacheEnabled(false);
+
+	OutputStream fout = null;
+	File imageFile = new File(myPath);
+
+	try {
+	    fout = new FileOutputStream(imageFile);
+	    bitmap.compress(Bitmap.CompressFormat.JPEG, 90, fout);
+	    fout.flush();
+	    fout.close();
+
+	} catch (FileNotFoundException e) {
+	    // TODO Auto-generated catch block
+	    e.printStackTrace();
+	} catch (IOException e) {
+	    // TODO Auto-generated catch block
+	    e.printStackTrace();
+	}
+}
+
 
 }
 
@@ -4152,18 +4252,20 @@ public  void onDraw( Canvas canvas) {
 }
 
 public void saveView( String sFileName ) {
-Bitmap b = Bitmap.createBitmap( getWidth(), getHeight(), Bitmap.Config.ARGB_8888);
-Canvas c = new Canvas( b );
-draw( c );
-
-FileOutputStream fos = null;
-try {
-  fos = new FileOutputStream( sFileName );
-  if (fos != null) {
-   b.compress(Bitmap.CompressFormat.PNG, 100, fos );
-   fos.close(); }  }
-catch ( Exception e) {
-  Log.e("SaveView", "Exception: "+ e.toString() ); }
+  Bitmap b = Bitmap.createBitmap( getWidth(), getHeight(), Bitmap.Config.ARGB_8888);
+  Canvas c = new Canvas( b );
+  draw( c );
+  FileOutputStream fos = null;
+  try {
+     fos = new FileOutputStream( sFileName );
+     if (fos != null) {
+       b.compress(Bitmap.CompressFormat.PNG, 100, fos );
+       fos.close(); 
+     }  
+   }
+   catch ( Exception e) {
+    Log.e("jView_SaveView", "Exception: "+ e.toString() ); 
+   }
 }
 
 // Free object except Self, Pascal Code Free the class.
@@ -4206,9 +4308,6 @@ public void setLayoutAll(int idAnchor) {
 	lparams.setMargins(MarginLeft,MarginTop,marginRight,marginBottom);
 
 	if (idAnchor > 0) {    	
-		//lparams.addRule(RelativeLayout.BELOW, id); 
-		//lparams.addRule(RelativeLayout.ALIGN_BASELINE, id)
-	    //lparams.addRule(RelativeLayout.LEFT_OF, id); //lparams.addRule(RelativeLayout.RIGHT_OF, id)
 		for (int i=0; i < countAnchorRule; i++) {  
 			lparams.addRule(lparamsAnchorRule[i], idAnchor);		
 	    }
@@ -4567,26 +4666,176 @@ dialog = null;
 //-------------------------------------------------------------------------
 
 class jDialogProgress {
-// Java-Pascal Interface
-private long            PasObj   = 0;      // Pascal Obj
-private Controls        controls = null;   // Control Class for Event
-//
-private ProgressDialog  dialog;
+  // Java-Pascal Interface
+  private long  PasObj = 0;      // Pascal Obj
+  private Controls controls = null;   // Control Class for Event
+  
+  String mTitle = "";
+  String mMsg = "";
+  int mFlag = 0;  
+  private ProgressDialog  dialog = null;  
+  private AlertDialog  customDialog = null;  
+  
+  public jDialogProgress(android.content.Context context,
+                     Controls ctrls, long pasobj, String title, String msg) {
+    //Connect Pascal I/F
+    PasObj = pasobj;
+    controls = ctrls;
+    mTitle= title;
+    mMsg = msg; 
+    mFlag = 0;
+  }
 
-// Constructor
-public  jDialogProgress(android.content.Context context,
-                     Controls ctrls, long pasobj, String title,String msg ) {
-// Connect Pascal I/F
-PasObj   = pasobj;
-controls = ctrls;
-// Init & Run
-dialog = ProgressDialog.show(context,title,msg,true);
-}
+  public  void Free() {
+	if (dialog != null) dialog.dismiss();
+	if (customDialog != null) customDialog.dismiss();		
+    dialog = null;
+    customDialog = null;
+  }
+  
+  
+  public void Show() {
+	if (dialog != null) dialog.dismiss();
+	dialog = null;	  
+	dialog = new ProgressDialog(controls.activity);
+	
+	if (!mMsg.equals("")) dialog.setMessage(mMsg);		 
+	if (!mTitle.equals("")) 
+		dialog.setTitle(mTitle);	
+	 else 
+		dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+	
+    dialog.setCancelable(true);         
+    dialog.show();
+  }
+	  
+  public void Show(String _title, String _msg) {
+	  if (dialog != null) dialog.dismiss();
+	  dialog = null;	 
+	  mMsg = _msg;
+	  mTitle= _title;
+	  dialog = new ProgressDialog(controls.activity);
+	  	  
+	  if (!mMsg.equals("")) dialog.setMessage(mMsg);		 
+	  if (!mTitle.equals("")) 
+		 dialog.setTitle(mTitle);	
+	  else 
+		 dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+	  
+      dialog.setCancelable(true); //back key            
+      dialog.show();
+  }
+  
+  public void Show(RelativeLayout _layout) {	
+	if (dialog != null) dialog.dismiss();
+	dialog = null;		
+    if(_layout.getVisibility()==0) { //visible   
+	  _layout.setVisibility(android.view.View.INVISIBLE); //4
+    }                  
+    if ( _layout.getParent().getClass().getName().equals("android.widget.RelativeLayout") ) {    	
+    	RelativeLayout par = (RelativeLayout)_layout.getParent();
+    	if (par != null) par.removeView(_layout);
+    } 			
+    else {
+    	FrameLayout par = (FrameLayout)_layout.getParent();
+    	if (par != null) par.removeView(_layout);
+    }
+    
+	_layout.setVisibility(0);	
+    AlertDialog.Builder builder = new AlertDialog.Builder(controls.activity);    
+    builder.setView(_layout);
+    builder.setCancelable(true); //back key    
+    customDialog = builder.create();   
+    		 
+	if (!mTitle.equals("")) 
+	  customDialog.setTitle(mTitle);	
+	else 
+	  customDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+    
+    customDialog.show();    
+  }
+  
+  public void SetMessage(String _msg) {
+    mMsg = _msg;
+    if (dialog != null) dialog.setMessage(_msg);
+  }
+ 
+  public void SetTitle(String _title) {
+	mTitle = _title;
+	if (dialog != null) dialog.setTitle(_title);
+	if (customDialog != null) customDialog.setTitle(_title);
+  }
+  
+  public void SetCancelable(boolean _value) {
+	if (dialog != null) dialog.setCancelable(_value);
+	if (customDialog != null) customDialog.setCancelable(_value);
+  }
+      
+  public void Stop() {
+	  if (customDialog != null) customDialog.dismiss();
+	  if (dialog != null) dialog.dismiss();
+  }
+  
+  //TODO
+  public void ShowAsync() {  //Async
+	  new ATask().execute(null, null, null); 
+  }
+  
+  //TODO                        //params, progress, result
+  class ATask extends AsyncTask<String, Integer, Integer>{
+       int count;
+       
+    // Step #1. 
+       @Override
+       protected void onPreExecute(){ 
+         super.onPreExecute();
+         
+         count = 1;         
+  		 if (dialog != null) dialog.dismiss();
+  		 dialog = null;
+  		 
+  		 dialog = new ProgressDialog(controls.activity);
+  		
+  		 if (!mMsg.equals("")) dialog.setMessage(mMsg);
+  		 
+  		 if (!mTitle.equals("")) 
+  			dialog.setTitle(mTitle);	
+  		 else 
+  			dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+  		
+  	     dialog.setCancelable(true);         
+  	     dialog.show();
+       }
+       
+    // Step #2. 
+	   @Override
+	   protected Integer doInBackground(String... params) {
+		   int result = 0;		   
+	       while( count > 0 ) {	 //controls.pOnShowDialogProgressAsync(PasObj, count)
+	    	  result = count;
+	    	  publishProgress(count);
+	       }	       
+	       return result;	      
+	    }
 
-public  void Free() {
-dialog.dismiss();
-dialog = null;
-}
+	    // Step #3. Progress
+	    @Override
+	    protected void onProgressUpdate(Integer... params) {
+	       super.onProgressUpdate(params);	       
+	       count = count + 1;	       
+	       if ( count == 1000) { //just test !
+	    	   count = -1;
+	       }
+	    }
+
+	    //Step #4. After Process
+	    @Override
+	    protected void onPostExecute(Integer result) {
+	      super.onPostExecute(result);
+	      if (dialog != null) dialog.dismiss();
+	      //Log.i("onPostExecute = ", "result = "+ result.intValue());	      
+	    }        	    
+	  }
 }
 
 
@@ -4927,97 +5176,77 @@ return null;
 //------------------------------------------------------------------------------
 
 //                             Params , Progress , Result
-class jAsyncTask extends AsyncTask<Void   , Integer  , Void>{
-// Java-Pascal Interface
-private long             PasObj   = 0;      // Pascal Obj
-private Controls        controls = null;   // Control Class for Event
-boolean autoPublishProgress = false;
-
-// Constructor
-public  jAsyncTask(Controls ctrls,long pasobj) {
-   //Connect Pascal I/F
-   PasObj   = pasobj;
-   controls = ctrls;
-}
-
-// Step #1. Before Process
-@Override
-protected void onPreExecute() {
-   super.onPreExecute();
-   controls.pOnAsyncEvent(PasObj,Const.Task_Before,0); // Pascal Event
-}
-
-//Step #2. Task
-@Override
-protected Void doInBackground(Void... params) {
-   
-   if (autoPublishProgress) 
-         publishProgress(25);	
-   
-   controls.pOnAsyncEvent(PasObj, Const.Task_BackGround, 100); // Pascal Event
-   
-   if (autoPublishProgress) 
-	     publishProgress(100);
-	     
-   return null;
-}
-
-// Step #3. Progress
-@Override
-protected void onProgressUpdate(Integer... params) {
-   super.onProgressUpdate(params);
-   controls.pOnAsyncEvent(PasObj,Const.Task_Progress,params[0]); // Pascal Event
-}
-
-// Step #4. After Process
-@Override
-protected void onPostExecute(Void result) {
-    super.onPostExecute(result);
-    controls.pOnAsyncEvent(PasObj,Const.Task_Post,100); // Pascal Event
-}
-
-public void setProgress(int progress ) {
-   //Log.i("jAsyncTask","setProgress "+progress );
-   publishProgress(progress);
-}
-
-//by jmpessoa
-public void SetAutoPublishProgress(boolean value){
-    autoPublishProgress = value;
-}
-
-public void Execute(){
-  this.execute();
-}
-
-//Free object except Self, Pascal Code Free the class.
-public  void Free() {
+class jAsyncTask {
 	
-}
-
-}
-
-//
-class jTask {
-// Java-Pascal Interface
-private long             PasObj   = 0;      // Pascal Obj
-private Controls        controls = null;   // Control Class for Event
-//
-public  jAsyncTask      asynctask = null;  //
+   //Java-Pascal Interface
+   private long             PasObj   = 0;      // Pascal Obj
+   private Controls        controls = null;   // Control Class for Event
+   boolean autoPublishProgress = false;  
 
 // Constructor
-public  jTask(Controls ctrls,long pasobj) {
-// Connect Pascal I/F
-PasObj   = pasobj;
-controls = ctrls;
-//
-asynctask = new jAsyncTask(ctrls,pasobj);
-}
+   public  jAsyncTask(Controls ctrls,long pasobj) {
+   //Connect Pascal I/F
+    PasObj   = pasobj;
+    controls = ctrls;
+   }
 
-public void setProgress(int progress ) {
-//Log.i("jTask","setProgress " );
+   public void setProgress(int progress ) {  //update UI
+	   //Log.i("jAsyncTask","setProgress "+progress );
+	   //publishProgress(progress);
+	   //count = count + progress;
+   }
 
-}
+	//by jmpessoa
+	public void SetAutoPublishProgress(boolean value){		
+	   //autoPublishProgress = value;
+	}
+
+    public void Execute(){
+      //Log.i("Execute","Execute...");	
+	  new ATask().execute();
+    }
+
+	//Free object except Self, Pascal Code Free the class.
+    public  void Free() {
+	  	//
+    }
+
+  class ATask extends AsyncTask<String, Integer, Integer>{
+    int count = 0;
+    int progressUpdate = 0;
+    //Step #1. Before Process    
+   @Override
+   protected void onPreExecute() {	   
+     super.onPreExecute();
+     progressUpdate = controls.pOnAsyncEventPreExecute(PasObj); // Pascal Event
+     if ( progressUpdate != 0) count = progressUpdate;
+   }
+
+   //Step #2. Task/Process
+   @Override
+   protected Integer doInBackground(String... params) {	   
+       while(controls.pOnAsyncEventDoInBackground(PasObj, count) ) {    	  
+    	   publishProgress(count);
+       }     	    
+       return null; //count;      
+    }
+
+    //Step #3. Progress
+    @Override
+    protected void onProgressUpdate(Integer... params) {
+       super.onProgressUpdate(params);
+       progressUpdate = controls.pOnAsyncEventProgressUpdate(PasObj, count); // Pascal Event
+       if (progressUpdate != count)  count = progressUpdate;       
+    }
+
+    //Step #4. After Process
+    @Override
+    protected void onPostExecute(Integer result) {  
+      super.onPostExecute(result);
+      controls.pOnAsyncEventPostExecute(PasObj, count); //result.intValue()      
+    }        
+    
+  }
 
 }
 
@@ -6567,7 +6796,8 @@ class jTextFileManager /*extends ...*/ {
 //https://software.intel.com/en-us/forums/topic/277068
 //http://www.streamhead.com/android-tutorial-sd-card/
 	
-class jMediaPlayer {
+
+class jMediaPlayer implements OnPreparedListener, OnVideoSizeChangedListener, OnCompletionListener, OnTimedTextListener {
 
 	  private long pascalObj = 0;           // Pascal Object
 	  private Controls controls  = null;    // Control Class for events
@@ -6575,16 +6805,16 @@ class jMediaPlayer {
 		
 	  private MediaPlayer mplayer;
 	  
-	  public jMediaPlayer (Controls _ctrls, long _Self) {	    
-	     
+	  public jMediaPlayer (Controls _ctrls, long _Self) {	    	     
 	     //super(_ctrls.activity);
 	     pascalObj = _Self ;
 		 controls  = _ctrls;
-		 context   = _ctrls.activity;
-		   
-		 this.mplayer = new MediaPlayer();
-		 	 
-		 //Log.i("jMediaPlayer", "Created!");
+		 context   = _ctrls.activity;		   
+		 this.mplayer = new MediaPlayer();		 
+		 this.mplayer.setOnPreparedListener(this);
+		 this.mplayer.setOnVideoSizeChangedListener(this);
+		 this.mplayer.setOnCompletionListener(this);
+		 this.mplayer.setOnTimedTextListener(this);		
 	  }
 	  
 	  public void jFree() {
@@ -6626,39 +6856,32 @@ class jMediaPlayer {
 			  }catch (IOException e){
 				 e.printStackTrace();	
 			  }
-		 }else if (_path.indexOf("DEFAULT_RINGTONE_URI") >= 0){
-			 
-			 //Log.i("jMediaPlayer", "DEFAULT_RINGTONE_URI");
-			 
+		 }else if (_path.indexOf("DEFAULT_RINGTONE_URI") >= 0){			 
+			 //Log.i("jMediaPlayer", "DEFAULT_RINGTONE_URI");			 
 	         try{ 
 	              this.mplayer.setDataSource(context, Settings.System.DEFAULT_RINGTONE_URI);
 	         }catch (IOException e){
 	        	  //Log.i("jMediaPlayer", "RINGTONE ERROR");
 	  	          e.printStackTrace();  	         
-	         }
-	         
+	         }	         
 		 }else if (_path.indexOf("sdcard") >= 0){ //Environment.getExternalStorageDirectory().getPath()		 
 			 String sdPath =Environment.getExternalStorageDirectory().getPath();		 
 			 String newPath;     
 			 int p1 = _path.indexOf("sdcard/", 0);		 
 			 if ( p1 >= 0) {		  	 		 		   		   		   
 			   int p2 = p1+6;			 
-			   newPath = sdPath +  _path.substring(p2);				
-			   //Toast.makeText(controls.activity, newPath, Toast.LENGTH_SHORT).show();		   
-			   
+			   newPath = sdPath +  _path.substring(p2);						  			   
 	  		    try{                                
 			       this.mplayer.setDataSource(newPath);  //    "/sdcard/music/tarck1.mp3"
 			    }catch (IOException e){
 		           e.printStackTrace();	
-	            }
-	           		   
-	  		   // Log.i("jMediaPlayer", newPath);
-	  		   
+	            }	           		   	  		   	  		   
 		      } else {	    	 
 		    	 String initChar = _path.substring(0,1);	    	 
 		    	 if (! initChar.equals("/")) {newPath = sdPath + '/'+ _path;}
-		    	 else {newPath = sdPath + _path;}		    	 
-		    	 //Toast.makeText(controls.activity, "->" +newPath, Toast.LENGTH_SHORT).show();
+		    	 else {
+		    		 newPath = sdPath + _path;
+		    	 }		    	 		    	 
 	  		     try{                                
 		               this.mplayer.setDataSource(newPath);  //    "/sdcard/music/tarck1.mp3"
 		 		 }catch (IOException e){
@@ -6666,7 +6889,7 @@ class jMediaPlayer {
 		         }
 	     	 }		 	
 		 }else {
-			// Log.i("jMediaPlayer", "loadFromAssets: "+ _path);
+			 //Log.i("jMediaPlayer", "loadFromAssets: "+ _path);
 			 AssetFileDescriptor afd;
 			 try {
 			 	afd = controls.activity.getAssets().openFd(_path);
@@ -6680,11 +6903,10 @@ class jMediaPlayer {
 	  //for files, it is OK to call prepare(), which blocks until MediaPlayer is ready for playback...
 	  public void Prepare(){	 //prepares the player for playback synchronously.
 	  	try {
-	  		   //Log.i("jMediaPlayer", "Prepare");
 	  		   this.mplayer.prepare();		
 			} catch (IOException e) {
 				e.printStackTrace();		
-		}
+		    }
 	  }
 	  
 	  //TODO:  prepareAsync()  
@@ -6734,15 +6956,63 @@ class jMediaPlayer {
 	  }
 	  
 	  /*
-	    setVolume  takes a scalar float value between 0 and 1 for both the left and right channels (where 0 is silent and 1 is
+	    setVolume takes a scalar float value between 0 and 1 for both the left and right channels (where 0 is silent and 1 is
 	    maximum volume) ex. mediaPlayer.setVolume(1f, 0.5f);
-	   */
+	  */
 	  
 	  public void SetVolume(float _leftVolume,float _rightVolume){
 	  	 this.mplayer.setVolume(_leftVolume, _rightVolume);
 	  }
+	 
 	  
-}
+	 //called onsurfaceCreated!
+	  public void SetDisplay(android.view.SurfaceHolder _surfaceHolder) {
+		 this.mplayer.setAudioStreamType (AudioManager.STREAM_MUSIC);
+		 this.mplayer.setDisplay(_surfaceHolder);		      		  				 
+	  }
+	  
+	  //http://alvinalexander.com/java/jwarehouse/android-examples/samples/android-8/ApiDemos/src/com/example/android/apis/media/MediaPlayerDemo_Video.java.shtml
+	 
+	  @Override
+	  /*.*/public void onPrepared(MediaPlayer mediaplayer) {		    
+		    controls.pOnMediaPlayerPrepared(pascalObj, mplayer.getVideoWidth(), mplayer.getVideoHeight());
+	   }
+	  
+	  @Override
+	  /*.*/public void onVideoSizeChanged(MediaPlayer mp, int width, int height) { 		
+			controls.pOnMediaPlayerVideoSizeChanged(pascalObj, width, height);
+	  }
+	  
+	  @Override
+	  /*.*/public void onCompletion(MediaPlayer arg0) {
+		    controls.pOnMediaPlayerCompletion(pascalObj);
+	  }
+	  	  
+	  /* (non-Javadoc)
+	 * @see android.media.MediaPlayer.OnTimedTextListener#onTimedText(android.media.MediaPlayer, android.media.TimedText)
+	 */
+  	 @Override
+	  /*.*/public void onTimedText(MediaPlayer arg0, TimedText timedText) {	
+  		   controls.pOnMediaPlayerTimedText(pascalObj, timedText.getText());		
+	  }	
+  	 	  
+	  public int GetVideoWidth() {
+		   return mplayer.getVideoWidth();
+	  }
+	  
+	  public int GetVideoHeight() {
+		  return mplayer.getVideoHeight();
+	  }
+	  
+  	  public void SetScreenOnWhilePlaying(boolean _value) {
+		  mplayer.setScreenOnWhilePlaying(_value);
+  	  }	  		   	    	  
+  	    	
+  	  public void SetAudioStreamType (int _audioStreamType) { 
+  		  if (_audioStreamType < 6)
+		     mplayer.setAudioStreamType(_audioStreamType);
+  	  }	 
+} 
 
 /*Draft java code by "Lazarus Android Module Wizard" [4-5-14 20:46:56]*/
 /*https://github.com/jmpessoa/lazandroidmodulewizard*/
@@ -8905,7 +9175,7 @@ class jImageFileManager /*extends ...*/ {
 	       FileOutputStream out = new FileOutputStream(file);	           	           	         
 	     
            if ( _filename.toLowerCase().contains(".jpg") ) _image.compress(Bitmap.CompressFormat.JPEG, 90, out);
-	       if ( _filename.toLowerCase().contains(".png") ) _image.compress(Bitmap.CompressFormat.JPEG, 100, out);	       
+	       if ( _filename.toLowerCase().contains(".png") ) _image.compress(Bitmap.CompressFormat.PNG, 100, out);	       
 	       
 	       out.flush();
 	       out.close();
@@ -9036,7 +9306,7 @@ class jImageFileManager /*extends ...*/ {
 	        FileOutputStream out = new FileOutputStream(file);	  
 	        
 	        if ( _filename.toLowerCase().contains(".jpg") ) _image.compress(Bitmap.CompressFormat.JPEG, 90, out);
-	        if ( _filename.toLowerCase().contains(".png") ) _image.compress(Bitmap.CompressFormat.JPEG, 100, out);
+	        if ( _filename.toLowerCase().contains(".png") ) _image.compress(Bitmap.CompressFormat.PNG, 100, out);
 	        
 	         out.flush();
 	         out.close();
@@ -9053,7 +9323,7 @@ class jImageFileManager /*extends ...*/ {
 	        FileOutputStream out = new FileOutputStream(file);	  
 	        
 	        if ( _filename.toLowerCase().contains(".jpg") ) _image.compress(Bitmap.CompressFormat.JPEG, 90, out);
-	        if ( _filename.toLowerCase().contains(".png") ) _image.compress(Bitmap.CompressFormat.JPEG, 100, out);
+	        if ( _filename.toLowerCase().contains(".png") ) _image.compress(Bitmap.CompressFormat.PNG, 100, out);
 	        
 	         out.flush();
 	         out.close();
@@ -11421,7 +11691,7 @@ class jHttpClient /*extends ...*/ {
    private int mAuthenticationMode = 0; //0: none. 1: basic; 2= OAuth
    private String mHOSTNAME = AuthScope.ANY_HOST; // null; 
    private int mPORT = AuthScope.ANY_PORT; //-1;
- 
+   
    //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
    public jHttpClient(Controls _ctrls, long _Self) { //Add more others news "_xxx" params if needed!
       //super(_ctrls.activity);
@@ -11434,78 +11704,23 @@ class jHttpClient /*extends ...*/ {
      //free local objects...
    }
  
- //write others [public] methods code here......
- //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
+   //write others [public] methods code here......
+   //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
    
    //ref. http://blog.leocad.io/basic-http-authentication-on-android/
    //ref. http://simpleprogrammer.com/2011/05/25/oauth-and-rest-in-android-part-1/
    //ref. http://jan.horneck.info/blog/androidhttpclientwithbasicauthentication
-   public String Get(String _stringUrl) {
-	   
-       //ref. http://jan.horneck.info/blog/androidhttpclientwithbasicauthentication
-	   HttpEntity entity = null;
-	   
-	   HttpParams httpParams = new BasicHttpParams();
-	   int connection_Timeout = 5000;
-	   HttpConnectionParams.setConnectionTimeout(httpParams, connection_Timeout);
-	   HttpConnectionParams.setSoTimeout(httpParams, connection_Timeout);
-	    
-	    /*ref. http://blog.leocad.io/basic-http-authentication-on-android/
-	    String credentials = mUSERNAME + ":" + mPASSWORD;  
-	    String base64EncodedCredentials = Base64.encodeToString(credentials.getBytes(), Base64.NO_WRAP);  
-	    request.addHeader("Authorization", "Basic " + base64EncodedCredentials);
-	    client = new DefaultHttpClient();
-	   */
-	   
-	   DefaultHttpClient httpclient = new DefaultHttpClient(httpParams);
-       String strResult="";
-       
-       try {
-    	   
-		    //AuthScope:
-		    //host  the host the credentials apply to. May be set to null if credenticals are applicable to any host. 
-		    //port  the port the credentials apply to. May be set to negative value if credenticals are applicable to any port.
-    	   if (mAuthenticationMode != 0) {    		   
-              httpclient.getCredentialsProvider().setCredentials(
-                               new AuthScope(mHOSTNAME,mPORT),  // 
-                               new UsernamePasswordCredentials(mUSERNAME, mPASSWORD));
-    	   }
-    	   
-           HttpGet httpget = new HttpGet(_stringUrl);
-
-           //System.out.println("executing request" + httpget.getRequestLine());
-           HttpResponse response = httpclient.execute(httpget);
-           entity = response.getEntity();
-           
-           /*TODO
-           StatusLine statusLine = response.getStatusLine();
-           int statusCode = statusLine.getStatusCode();
-           if (statusCode == 200) {           
-               entity = response.getEntity();
-           }    
-            */
-           
-           if (entity != null) {
-        	   strResult = EntityUtils.toString(entity);
-           }
-       } catch(Exception e){
-       	    e.printStackTrace();
-       }finally {
-           // When HttpClient instance is no longer needed,
-           // shut down the connection manager to ensure
-           // immediate deallocation of all system resources
-           httpclient.getConnectionManager().shutdown();
-       }
-       return strResult;
-
-   }
-	 
-     public void SetAuthenticationUser(String _userName, String _password) {       	 
+         
+   public void Get(String _stringUrl) {
+	   new AsyncHttpClientGet().execute(_stringUrl);	   
+   } 
+   
+   public void SetAuthenticationUser(String _userName, String _password) {       	 
 	   mUSERNAME = _userName;
 	   mPASSWORD =_password;
-     }
+   }
      
-     public void SetAuthenticationHost(String _hostName, int _port) {
+   public void SetAuthenticationHost(String _hostName, int _port) {
     	 if ( _hostName.equals("") ) {
     		 mHOSTNAME = null;
     	 } 
@@ -11513,14 +11728,45 @@ class jHttpClient /*extends ...*/ {
     		 mHOSTNAME = _hostName;
     	 }
     	 mPORT = _port;	 
-     }
+   }
                
-     public void SetAuthenticationMode(int _authenticationMode) {    	 
+   public void SetAuthenticationMode(int _authenticationMode) {    	 
         mAuthenticationMode = _authenticationMode; //0: none. 1: basic; 2= OAuth	 	                
-     }
+   }
      
+	/*
+	 * AsyncTask has three generic types:
+      Params: An array of parameters you want to pass in to the class you create when you subclass AsyncTask.
+      Progress: If you override onProgressUpdate, this is the type that method returns.
+      Result: This is the type that doInBackground returns.
+	 */
+   
      //ref. http://mobiledevtuts.com/android/android-http-with-asynctask-example/ 
-	public int PostNameValueData(String _stringUrl, String _name, String _value) {
+   public void PostNameValueData(String _stringUrl, String _name, String _value) {
+	  new AsyncHttpClientPostNameValueData().execute(_stringUrl, _name, _value);	  
+   }
+  
+	
+	public void PostNameValueData(String _stringUrl, String _listNameValue) {
+	   new AsyncHttpClientPostListNameValueData().execute(_stringUrl, _listNameValue);     
+    }
+	
+	/*
+	 * AsyncTask has three generic types:
+       Params: An array of parameters you want to pass in to the class you create when you subclass AsyncTask.
+       Progress: If you override onProgressUpdate, this is the type that method returns.
+       Result: This is the type that doInBackground returns.
+	 */
+	
+	class AsyncHttpClientPostNameValueData extends AsyncTask<String, Integer, Integer> {	
+		  
+	    @Override
+	    protected Integer doInBackground(String... stringUrl) {
+	    	
+	    	String _stringUrl = stringUrl[0]; 
+	    	String _name  = stringUrl[1]; 
+	    	String _value  = stringUrl[2];
+	    	
 			// Create a new HttpClient and Post Header
 			int statusCode = 0;						
 			HttpParams httpParams = new BasicHttpParams();
@@ -11550,54 +11796,142 @@ class jHttpClient /*extends ...*/ {
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 			} 
-			return statusCode;
+			return statusCode;	
+	    }	    	
+	           	    
+	    @Override
+	    protected void onPostExecute(Integer statusCode) {
+	    	controls.pOnHttpClientCodeResult(pascalObj, statusCode.intValue());
+	    }	    	    	    
+	}
+		
+	class AsyncHttpClientPostListNameValueData extends AsyncTask<String, Integer, Integer> {	
+		  
+	    @Override
+	    protected Integer doInBackground(String... stringParams) {
+			// Create a new HttpClient and Post Header
+			int statusCode = 0; 
+			
+			HttpParams httpParams = new BasicHttpParams();
+			int connection_Timeout = 5000;
+			HttpConnectionParams.setConnectionTimeout(httpParams, connection_Timeout);
+			HttpConnectionParams.setSoTimeout(httpParams, connection_Timeout);
+			
+			DefaultHttpClient httpclient = new DefaultHttpClient();			 	   
+		    //AuthScope:
+		    //host  the host the credentials apply to. May be set to null if credenticals are applicable to any host. 
+		    //port  the port the credentials apply to. May be set to negative value if credenticals are applicable to any port.
+			try {
+				
+		        if (mAuthenticationMode != 0) {    		   
+	              httpclient.getCredentialsProvider().setCredentials(
+	                           new AuthScope(mHOSTNAME,mPORT),  // 
+	                           new UsernamePasswordCredentials(mUSERNAME, mPASSWORD));
+		        }
+						
+			    HttpPost httppost = new HttpPost(stringParams[0]);
+
+				// Add your data
+				List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();						
+				StringTokenizer st = new StringTokenizer(stringParams[1], "=&");		
+				
+				while(st.hasMoreTokens()) { 
+				  String key = st.nextToken(); 
+				  String val = st.nextToken(); 
+				  //Log.i("name ->", key);
+				  //Log.i("value ->", val);
+				  nameValuePairs.add(new BasicNameValuePair(key, val));
+				}					
+				httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
+				// Execute HTTP Post Request
+				HttpResponse response = httpclient.execute(httppost);
+				StatusLine statusLine = response.getStatusLine();  
+				statusCode = statusLine.getStatusCode();
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+			}		 
+			return statusCode;	    		
+	    }	    	
+	           	    
+	    @Override
+	    protected void onPostExecute(Integer statusCode) {
+	    	controls.pOnHttpClientCodeResult(pascalObj, statusCode.intValue());
+	    }	      
+	    
 	}
 	
-	public int PostNameValueData(String _stringUrl, String _listNameValue) {
-		// Create a new HttpClient and Post Header
-		int statusCode = 0; 
-		
-		HttpParams httpParams = new BasicHttpParams();
-		int connection_Timeout = 5000;
-		HttpConnectionParams.setConnectionTimeout(httpParams, connection_Timeout);
-		HttpConnectionParams.setSoTimeout(httpParams, connection_Timeout);
-		
-		DefaultHttpClient httpclient = new DefaultHttpClient();			 	   
-	    //AuthScope:
-	    //host  the host the credentials apply to. May be set to null if credenticals are applicable to any host. 
-	    //port  the port the credentials apply to. May be set to negative value if credenticals are applicable to any port.
-		try {
-			
-	        if (mAuthenticationMode != 0) {    		   
-              httpclient.getCredentialsProvider().setCredentials(
-                           new AuthScope(mHOSTNAME,mPORT),  // 
-                           new UsernamePasswordCredentials(mUSERNAME, mPASSWORD));
+	class AsyncHttpClientGet extends AsyncTask<String,Integer,String> {	
+		  	    
+	    @Override
+	    protected String doInBackground(String... stringUrl) {
+	    	
+	        //ref. http://jan.horneck.info/blog/androidhttpclientwithbasicauthentication
+	 	   HttpEntity entity = null;	 	   
+	 	   HttpParams httpParams = new BasicHttpParams();
+	 	   int connection_Timeout = 5000;
+	 	   HttpConnectionParams.setConnectionTimeout(httpParams, connection_Timeout);
+	 	   HttpConnectionParams.setSoTimeout(httpParams, connection_Timeout);
+	 	    
+	 	    /*ref. http://blog.leocad.io/basic-http-authentication-on-android/
+	 	    String credentials = mUSERNAME + ":" + mPASSWORD;  
+	 	    String base64EncodedCredentials = Base64.encodeToString(credentials.getBytes(), Base64.NO_WRAP);  
+	 	    request.addHeader("Authorization", "Basic " + base64EncodedCredentials);
+	 	    client = new DefaultHttpClient();
+	 	   */
+	 	   
+	 	    DefaultHttpClient httpclient = new DefaultHttpClient(httpParams);
+	        String strResult="";
+	        
+	        try {
+	     	   
+	 		    //AuthScope:
+	 		    //host  the host the credentials apply to. May be set to null if credenticals are applicable to any host. 
+	 		    //port  the port the credentials apply to. May be set to negative value if credenticals are applicable to any port.
+	     	   if (mAuthenticationMode != 0) {    		   
+	               httpclient.getCredentialsProvider().setCredentials(
+	                                new AuthScope(mHOSTNAME,mPORT),  // 
+	                                new UsernamePasswordCredentials(mUSERNAME, mPASSWORD));
+	     	   }
+	     	   
+	            HttpGet httpget = new HttpGet(stringUrl[0]);
+
+	            //System.out.println("executing request" + httpget.getRequestLine());
+	            HttpResponse response = httpclient.execute(httpget);
+	            
+	            StatusLine statusLine = response.getStatusLine();
+	            int statusCode = statusLine.getStatusCode();
+	            this.publishProgress(statusCode);	            	            
+	            strResult= "";	            
+	            if (statusCode == 200) {    //OK       
+	                entity = response.getEntity();	                
+		            if (entity != null) {
+			         	   strResult = EntityUtils.toString(entity);
+			         }
+	            }    
+	            	            	          	            
+	        } catch(Exception e){
+	        	    e.printStackTrace();
+	        }finally {
+	            // When HttpClient instance is no longer needed,
+	            // shut down the connection manager to ensure
+	            // immediate deallocation of all system resources
+	            httpclient.getConnectionManager().shutdown();
 	        }
-					
-		    HttpPost httppost = new HttpPost(_stringUrl);
-
-			// Add your data
-			List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();						
-			StringTokenizer st = new StringTokenizer(_listNameValue, "=&");		
-			
-			while(st.hasMoreTokens()) { 
-			  String key = st.nextToken(); 
-			  String val = st.nextToken(); 
-			  //Log.i("name ->", key);
-			  //Log.i("value ->", val);
-			  nameValuePairs.add(new BasicNameValuePair(key, val));
-			}					
-			httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
-			// Execute HTTP Post Request
-			HttpResponse response = httpclient.execute(httppost);
-			StatusLine statusLine = response.getStatusLine();  
-			statusCode = statusLine.getStatusCode();
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-		}		 
-		return statusCode;
-    }
-
+	        return strResult;
+	    }	    	
+	           	            
+	    @Override
+	    protected void onPostExecute(String content) {
+	    	controls.pOnHttpClientContentResult(pascalObj, content);
+	    }
+	    	    
+	    @Override
+	    protected void onProgressUpdate(Integer... params) {
+	       super.onProgressUpdate(params);	       
+	       controls.pOnHttpClientCodeResult(pascalObj, params[0].intValue());	  	     
+	    }	    	    
+	    
+	}
 }
 
 
@@ -11606,7 +11940,7 @@ class jHttpClient /*extends ...*/ {
 /*jControl template*/
 
 //ref. http://tech-papers.org/executing-shell-command-android-application/
-class jShellCommand extends AsyncTask<String, String, String>  {
+class jShellCommand {
  
    private long     pascalObj = 0;      // Pascal Object
    private Controls controls  = null;   // Control Class -> Java/Pascal Interface ...
@@ -11619,6 +11953,7 @@ class jShellCommand extends AsyncTask<String, String, String>  {
       context   = _ctrls.activity;
       pascalObj = _Self;
       controls  = _ctrls;
+      //Log.i("jShellCommand", "create");
    }
  
    public void jFree() {
@@ -11627,44 +11962,52 @@ class jShellCommand extends AsyncTask<String, String, String>  {
  
  //write others [public] methods code here......
  //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
-
-   @Override
-   protected void onPreExecute() {
-     super.onPreExecute();
-     //
-   }
+ public void Execute(String _shellCmd) {
+	 //Log.i("exec", "0");
+	 new AsyncShellCmd().execute(_shellCmd);
+	// Log.i("exec", "1");
+ }  
    
-   @Override
-   protected String doInBackground(String... params) {
-     Process p;
-     StringBuffer output = new StringBuffer();
-     try {
-        p = Runtime.getRuntime().exec(params[0]);
-        BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
-        String line = "";
-        while ((line = reader.readLine()) != null) {
+
+ class AsyncShellCmd extends AsyncTask<String, String, String>  {	     
+    
+     @Override
+     protected String doInBackground(String... params) {
+       Process p;
+       StringBuffer output = new StringBuffer();
+       try {
+         p = Runtime.getRuntime().exec(params[0]);
+         BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
+         String line = "";
+         while ((line = reader.readLine()) != null) {
             output.append(line + "\n");
             p.waitFor();
-        }
-      } catch (IOException e) {
+          //publishProgress(response); TODO       
+         }         
+        } catch (IOException e) {
          e.printStackTrace();
-      } catch (InterruptedException e) {
+        } catch (InterruptedException e) {
          e.printStackTrace();
-      }
-      String response = output.toString();
-      return response;
-   }
-   
-   @Override
-   protected void onPostExecute(String result) {
-      super.onPostExecute(result);   
-      controls.pOnShellCommandExecuted(pascalObj, result);
-      //Log.i("Output", result);
-   }      
-   
-   public void Execute(String _shellCmd) {
-	   this.execute(_shellCmd);
-   }   
+       }
+       String response = output.toString();       
+       return response;
+     }
+        
+     /*
+     @Override
+     protected void onProgressUpdate(String... values) {
+         super.onProgressUpdate(values);
+         //TODO        
+     }   
+     */
+     
+     @Override
+     protected void onPostExecute(String values) {    	  
+       super.onPostExecute(values);       
+       controls.pOnShellCommandExecuted(pascalObj, values);
+     }          
+  } //AsyncTask
+ 
 }
 
 /*Draft java code by "Lazarus Android Module Wizard" [5/9/2015 3:06:34]*/
@@ -11935,9 +12278,577 @@ class jDigitalClock extends DigitalClock /*TextClock*/ { //please, fix what GUI 
 	  
 } //end class
 
+/**
+ *         ref. http://www.myandroidsolutions.com/2013/03/31/android-tcp-connection-enhanced/
+ *         ref. http://www.darksleep.com/player/SocketExample/
+ */
+
+class jTCPSocketClient {
+
+    private long  pascalObj = 0;      // Pascal Object
+    Controls controls;    
+    private Context  context   = null;
+    
+    private String SERVER_IP = "" ;//"192.168.0.100"   
+    private int SERVER_PORT;
+       
+    // message to send to the server
+    private String mServerMessage;
+    
+    private boolean mRun = false;
+    // used to send messages
+    private PrintWriter mBufferOut;
+    // used to read messages from the server
+    private BufferedReader mBufferIn;
+    private Socket mSocket;
+    
+    //TCPSocketClientTask task;
+           	
+    public jTCPSocketClient(Controls _ctrls, long _Self) { //Add more others news "_xxx" params if needed!
+    	   //super(_ctrls.activity);
+ 	       context   = _ctrls.activity;
+    	   pascalObj = _Self;
+    	   controls  = _ctrls; 	
+    }
+
+    public void jFree() {
+       //free local objects...
+        mBufferOut= null;;
+        mBufferIn= null;
+        mSocket= null;    	
+    }
+   
+    /**
+     * Sends the message entered by client to the server
+     */   
+    public void SendMessage(String message) {
+    	
+        if (mBufferOut != null && !mBufferOut.checkError()) {
+            mBufferOut.println(message);
+            mBufferOut.flush();
+        }
+    }
+     
+    //write others [public] methods code here......
+    //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
+         
+    public void Connect(String _serverIP, int _serverPort) {
+    	  
+          SERVER_IP = _serverIP;          //IP address
+          SERVER_PORT = _serverPort;       //port number;
+          if (mSocket != null) {
+        	  try {
+				mSocket.close();
+				mSocket = null;
+			  } catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			  }
+          }
+          
+          try {
+              InetAddress serverAddr = InetAddress.getByName(SERVER_IP);
+			  mSocket = new Socket(serverAddr, SERVER_PORT);
+		  } catch (IOException e) {
+			  // TODO Auto-generated catch block
+		      e.printStackTrace();
+		  }
+          
+          controls.pOnTCPSocketClientConnected(pascalObj);         
+          new TCPSocketClientTask().execute();                                    	  
+      }
+            
+     public void Connect(String _serverIP, int _serverPort, String _login) {    	  
+    	 Connect(_serverIP,_serverPort);
+    	 SendMessage(_login);       	  
+      }
+     
+      public void CloseConnection(String _finalMessage) {                
+          mRun = false;        
+                        
+          if (mBufferOut != null) {
+               mBufferOut.flush();
+          }
+          if (_finalMessage.equals("")) 
+              SendMessage("client_closed");
+          else SendMessage(_finalMessage);
+      }
+      
+      public void CloseConnection() {
+      	CloseConnection("client_closed");
+      }
+                  
+      class TCPSocketClientTask extends AsyncTask<String, String, String> {
+      	
+          @Override
+          protected String doInBackground(String... message) {               
+              mRun = true;
+              while (mRun) {
+                    if ( mSocket!= null && !mSocket.isClosed()) {             		
+                        try {                    	
+    						mBufferOut = new PrintWriter(new BufferedWriter(new OutputStreamWriter(mSocket.getOutputStream())), true);
+    	                    mBufferIn = new BufferedReader(new InputStreamReader(mSocket.getInputStream()));              
+    	                    //in this while the client listens for the messages sent by the server
+    	                    if (mBufferIn != null)
+    	                           mServerMessage = mBufferIn.readLine();
+    	                    if (mServerMessage != null )                     	
+    	                       	 publishProgress(mServerMessage);
+    					} catch (IOException e) {
+    						// TODO Auto-generated catch block
+    						Log.e("jTCPSocketClient", "Error_doInBackground", e);
+    						e.printStackTrace();
+    					}                                 	                                         
+               	    }        	        	             
+              }
+              return null;
+          }
+
+          @Override
+          protected void onProgressUpdate(String... values) {
+              super.onProgressUpdate(values);
+              controls.pOnTCPSocketClientMessageReceived(pascalObj ,values);
+          }
+          
+          @Override
+          protected void onPostExecute(String values) {    	  
+            super.onPostExecute(values);   	  
+            try {                	
+         	   
+     			mSocket.close();
+     	    } catch (IOException e) {
+     			// TODO Auto-generated catch block
+     			e.printStackTrace();
+     	    }            
+          }
+        }            
+}
 
 
-//**new jclass entrypoint**//please, do not remove/change this line!
+/*Draft java code by "Lazarus Android Module Wizard" [6/3/2015 0:43:27]*/
+/*https://github.com/jmpessoa/lazandroidmodulewizard*/
+/*jVisualControl template*/
+ 
+class jSurfaceView  extends SurfaceView  /*dummy*/ { //please, fix what GUI object will be extended!
+  
+  private long       pascalObj = 0;    // Pascal Object
+  private Controls   controls  = null; // Control Class for events
+  
+  private Context context = null;
+  private ViewGroup parent   = null;         // parent view
+  private RelativeLayout.LayoutParams lparams;              // layout XYWH 
+  private OnClickListener onClickListener;   // click event
+  private Boolean enabled  = true;           // click-touch enabled!
+  private int lparamsAnchorRule[] = new int[30];
+  private int countAnchorRule = 0;
+  private int lparamsParentRule[] = new int[30];
+  private int countParentRule = 0;
+  private int lparamH = RelativeLayout.LayoutParams.MATCH_PARENT;
+  private int lparamW = RelativeLayout.LayoutParams.MATCH_PARENT;
+  private int marginLeft = 0;
+  private int marginTop = 0;
+  private int marginRight = 0;
+  private int marginBottom = 0;
+  private boolean mRemovedFromParent = false;
+  
+  private SurfaceHolder surfaceHolder;
+
+  Paint paint;
+  
+  boolean mRun = false;
+  long mSleeptime = 10;
+  float mStartProgress = 0;
+  float mStepProgress = 1;
+  boolean mDrawing = false;
+ 
+ //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
+ 
+  public jSurfaceView(Controls _ctrls, long _Self) { //Add more others news "_xxx"p arams if needed!
+     super(_ctrls.activity);
+     context   = _ctrls.activity;
+     pascalObj = _Self;
+     controls  = _ctrls;
+           
+     controls.activity.getWindow().setFormat(PixelFormat.UNKNOWN);
+     lparams = new RelativeLayout.LayoutParams(lparamW, lparamH);
+       
+     surfaceHolder = this.getHolder();
+     surfaceHolder.addCallback(new Callback() {     	           
+         
+         @Override  
+         public void surfaceCreated(SurfaceHolder holder) {           	        	
+     		controls.pOnSurfaceViewCreated(pascalObj, holder);     		     		
+     		//setWillNotDraw(true); //false = Allows us to use invalidate() to call onDraw()     		      		      		     		                        
+         }          
+         
+         @Override           
+         public void surfaceChanged(SurfaceHolder holder, int format, int width,  int height) {  
+        	 controls.pOnSurfaceViewChanged(pascalObj,width,height);
+         }
+         
+         @Override  
+         public void surfaceDestroyed(SurfaceHolder holder) {
+        	 mRun = false;        	              
+         }
+         
+     });
+     
+     /*
+     onClickListener = new OnClickListener(){
+         public void onClick(View view){  //please, do not remove mask for parse invisibility!
+                 if (enabled) {
+                    controls.pOnClick(pascalObj, Const.Click_Default); //JNI event onClick!
+                 }
+              };
+     };     
+     setOnClickListener(onClickListener);     
+     */
+     
+     paint = new Paint();
+                   
+  } //end constructor
+    
+   public void jFree() {
+     if (parent != null) { parent.removeView(this); }
+     //free local objects...
+     lparams = null;
+     //setOnClickListener(null);     
+     surfaceHolder  = null;
+     paint = null;
+   }
+ 
+   public void SetViewParent(ViewGroup _viewgroup) {
+     if (parent != null) { parent.removeView(this); }
+     parent = _viewgroup;
+     parent.addView(this,lparams);
+     mRemovedFromParent = false;
+   }
+  
+   public void RemoveFromViewParent() {
+     if (!mRemovedFromParent) {
+        this.setVisibility(android.view.View.INVISIBLE);
+        if (parent != null)
+   	        parent.removeView(this);
+	    mRemovedFromParent = true;
+	 }
+   }
+ 
+   public View GetView() {
+     return this;
+   }
+ 
+   public void SetLParamWidth(int _w) {
+     lparamW = _w;
+   }
+ 
+   public void SetLParamHeight(int _h) {
+     lparamH = _h;
+   }
+ 
+   public void SetLeftTopRightBottomWidthHeight(int _left, int _top, int _right, int _bottom, int _w, int _h) {
+     marginLeft = _left;
+     marginTop = _top;
+     marginRight = _right;
+     marginBottom = _bottom;
+     lparamH = _h;
+     lparamW = _w;
+   }
+ 
+   public void AddLParamsAnchorRule(int _rule) {
+     lparamsAnchorRule[countAnchorRule] = _rule;
+     countAnchorRule = countAnchorRule + 1;
+   }
+ 
+   public void AddLParamsParentRule(int _rule) {
+     lparamsParentRule[countParentRule] = _rule;
+     countParentRule = countParentRule + 1;
+   }
+ 
+   public void SetLayoutAll(int _idAnchor) {
+ 	 lparams.width  = lparamW;
+	 lparams.height = lparamH;
+	 lparams.setMargins(marginLeft,marginTop,marginRight,marginBottom);
+	 if (_idAnchor > 0) {
+	    for (int i=0; i < countAnchorRule; i++) {
+		lparams.addRule(lparamsAnchorRule[i], _idAnchor);
+	    }
+	 }
+     for (int j=0; j < countParentRule; j++) {
+        lparams.addRule(lparamsParentRule[j]);
+     }
+     this.setLayoutParams(lparams);
+   }
+ 
+   public void ClearLayoutAll() {
+	 for (int i=0; i < countAnchorRule; i++) {
+ 	   lparams.removeRule(lparamsAnchorRule[i]);
+     }
+ 
+	 for (int j=0; j < countParentRule; j++) {
+  	   lparams.removeRule(lparamsParentRule[j]);
+	 }
+	 countAnchorRule = 0;
+	 countParentRule = 0;
+   }
+
+   public void SetId(int _id) { //wrapper method pattern ...
+     this.setId(_id);
+   }
+ 
+   @Override
+   protected void onDraw(Canvas canvas) {	
+	 if (mDrawing)  controls.pOnSurfaceViewDraw(pascalObj, canvas);	   
+   }
+  
+  //write others [public] methods code here......
+  //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...  
+         
+   public void DrawLine(Canvas _canvas, float _x1, float _y1, float _x2, float _y2) {	       
+	  _canvas.drawLine(_x1,_y1,_x2,_y2, paint );
+   }
+
+   public void DrawLine(Canvas _canvas, float[] _points) {	 
+	   _canvas.drawLines(_points, paint);        	     
+   }
+      
+	public  void DrawText(Canvas _canvas, String _text, float _x, float _y ) {
+		_canvas.drawText(_text,_x,_y,paint);
+	}
+
+	public  void DrawBitmap(Canvas _canvas, Bitmap _bitmap, int _b, int _l, int _r, int _t) {
+	    Rect rect = new Rect(_b,_l,_r,_t); //bello, left, right, top
+	   _canvas.drawBitmap(_bitmap,null,rect,null/*paint*/);
+    }
+	
+	public void DrawBitmap(Canvas _canvas, Bitmap _bitmap , float _left, float _top) {
+	   _canvas.drawBitmap(_bitmap, _left, _top, null/*paint*/);
+	}
+
+   public void DrawPoint(Canvas _canvas, float _x1, float _y1) {	   
+	   _canvas.drawPoint(_x1,_y1,paint);		   
+   }
+   
+   public void DrawCircle(Canvas _canvas, float _cx, float _cy, float _radius) {	   
+	   _canvas.drawCircle(_cx, _cy, _radius, paint);		   
+   }
+      
+   public void DrawBackground(Canvas _canvas, int _color) {
+        _canvas.drawColor(_color);
+   }
+      
+  public void DrawRect(Canvas _canvas, float _left, float _top, float _right, float _bottom) { 
+     _canvas.drawRect(_left, _top, _right, _bottom, paint);
+  }
+   
+  public  void SetPaintStrokeWidth(float _width) {
+	 paint.setStrokeWidth(_width);
+  }
+
+   public  void SetPaintStyle(int _style) {
+		switch (_style) {
+		  case 0  : { paint.setStyle(Paint.Style.FILL           ); break; }
+		  case 1  : { paint.setStyle(Paint.Style.FILL_AND_STROKE); break; }
+		  case 2  : { paint.setStyle(Paint.Style.STROKE);          break; }
+		  default : { paint.setStyle(Paint.Style.FILL           ); break; }
+		}
+	}
+
+	public  void SetPaintColor(int _color) {
+		paint.setColor(_color);
+	}
+
+	public  void SetPaintTextSize(float _textsize) {
+		paint.setTextSize(_textsize);
+	}
+	
+	public void DispatchOnDraw(boolean _value) {
+	   mDrawing = _value;	
+	   setWillNotDraw(!_value); //false = Allows us to use invalidate() to call onDraw()
+	}
+		
+	public void SaveToFile(String _path, String _filename) {	 
+		
+		    Bitmap image = Bitmap.createBitmap(this.getWidth(), this.getHeight(), Bitmap.Config.ARGB_8888);
+		    Canvas c = new Canvas(image);
+		    this.draw(c);		  
+		    File file = new File (_path +"/"+ _filename);	    
+		    if (file.exists ()) file.delete (); 
+		    try {
+		        FileOutputStream out = new FileOutputStream(file);	  
+		        
+		        if ( _filename.toLowerCase().contains(".jpg") ) image.compress(Bitmap.CompressFormat.JPEG, 90, out);
+		        if ( _filename.toLowerCase().contains(".png") ) image.compress(Bitmap.CompressFormat.PNG, 100, out);
+		        
+		         out.flush();
+		         out.close();
+		         
+		    } catch (Exception e) {
+		         e.printStackTrace();
+		    }  	     	   
+	}	
+	
+	@Override
+	public  boolean onTouchEvent( MotionEvent event) {
+	int act     = event.getAction() & MotionEvent.ACTION_MASK;
+	switch(act) {
+	  case MotionEvent.ACTION_DOWN: {
+	        switch (event.getPointerCount()) {
+	        	case 1 : { controls.pOnSurfaceViewTouch (pascalObj,Const.TouchDown,1,
+	        		                            event.getX(0),event.getY(0),0,0); break; }
+	        	default: { controls.pOnSurfaceViewTouch (pascalObj,Const.TouchDown,2,
+	        		                            event.getX(0),event.getY(0),
+	        		                            event.getX(1),event.getY(1));     break; }
+	        }
+	       break;}
+	  case MotionEvent.ACTION_MOVE: {
+	        switch (event.getPointerCount()) {
+	        	case 1 : { controls.pOnSurfaceViewTouch (pascalObj,Const.TouchMove,1,
+	        		                            event.getX(0),event.getY(0),0,0); break; }
+	        	default: { controls.pOnSurfaceViewTouch (pascalObj,Const.TouchMove,2,
+	        		                            event.getX(0),event.getY(0),
+	        		                            event.getX(1),event.getY(1));     break; }
+	        }
+	       break;}
+	  case MotionEvent.ACTION_UP: {
+	        switch (event.getPointerCount()) {
+	        	case 1 : { controls.pOnSurfaceViewTouch (pascalObj,Const.TouchUp  ,1,
+	        		                            event.getX(0),event.getY(0),0,0); break; }
+	        	default: { controls.pOnSurfaceViewTouch (pascalObj,Const.TouchUp  ,2,
+	        		                            event.getX(0),event.getY(0),
+	        		                            event.getX(1),event.getY(1));     break; }
+	        }
+	       break;}
+	  case MotionEvent.ACTION_POINTER_DOWN: {
+	        switch (event.getPointerCount()) {
+	        	case 1 : { controls.pOnSurfaceViewTouch (pascalObj,Const.TouchDown,1,
+	        		                            event.getX(0),event.getY(0),0,0); break; }
+	        	default: { controls.pOnSurfaceViewTouch (pascalObj,Const.TouchDown,2,
+	        		                            event.getX(0),event.getY(0),
+	        		                            event.getX(1),event.getY(1));     break; }
+	        }
+	       break;}
+	  case MotionEvent.ACTION_POINTER_UP  : {
+	  	   // Log.i("Java","PUp");
+	        switch (event.getPointerCount()) {
+	        	case 1 : { controls.pOnSurfaceViewTouch (pascalObj,Const.TouchUp  ,1,
+	        		                            event.getX(0),event.getY(0),0,0); break; }
+	        	default: { controls.pOnSurfaceViewTouch (pascalObj,Const.TouchUp  ,2,
+	        		                            event.getX(0),event.getY(0),
+	        		                            event.getX(1),event.getY(1));     break; }
+	        }
+	       break;}
+	} 
+	return true;
+	}
+
+	public void SetHolderFixedSize(int _width, int _height) {	     		 
+	   surfaceHolder.setFixedSize(_width, _height);
+	}
+	 				
+	public Canvas GetLockedCanvas() {		  		  
+		return surfaceHolder.lockCanvas();  
+	}
+    
+	public void UnLockCanvas(Canvas _canvas) {
+		if(_canvas != null) {   
+	          surfaceHolder.unlockCanvasAndPost(_canvas);
+		}
+	}
+	
+    //invalidate(): This must be called from a UI thread. 
+    //To call from a non-UI thread, call  postInvalidate(). 
+      
+	//http://blog-en.openalfa.com/how-to-draw-graphics-in-android
+    //http://blog.danielnadeau.io/2012/01/android-canvas-beginners-tutorial.html	  
+    //http://www.edu4java.com/en/androidgame/androidgame3.html
+   
+    public void DoDrawingInBackground(boolean _value) {    	       
+	   if (!mRun) { 	      	      
+	      new DrawTask().execute();   
+	   }
+       mRun = _value;
+       mDrawing = _value;
+	   setWillNotDraw(!_value); //false = Allows us to use invalidate() to call onDraw()
+    }
+               
+   public void SetDrawingInBackgroundSleeptime(long _sleepTime) { //long mSleeptime = 20;	   
+	   mSleeptime = _sleepTime;   
+   }
+   
+   public void PostInvalidate() {
+      this.postInvalidate();
+   }
+   
+   public void Invalidate() {
+	  this.invalidate();
+   }
+   
+   public void SetKeepScreenOn(boolean _value) { 
+       surfaceHolder.setKeepScreenOn(_value);
+   }
+  
+   //Set whether this view can receive the focus. 
+   //Setting this to false will also ensure that this view is not focusable in touch mode.  
+   public void SetFocusable(boolean _value) { 
+       this.setFocusable(_value); // make sure we get key events
+   }
+      
+   public void SetProgress(float _startValue, float _step) {
+       mStartProgress = _startValue; 
+       mStepProgress =  _step;
+   }
+   
+   class DrawTask extends AsyncTask<String, Float, String> {
+	   Canvas canvas;
+	   float count;	   	   
+       @Override
+       protected String doInBackground(String... message) {               
+    	  count = mStartProgress;    	  
+          while (controls.pOnSurfaceViewDrawingInBackground(pascalObj, count)) {        	  
+            canvas = null;  
+            try {  
+              canvas = surfaceHolder.lockCanvas(null);                        				 
+              try {
+                 Thread.sleep(mSleeptime);
+              } catch (InterruptedException iE) {
+            	  //
+              }        	  			              
+              synchronized (surfaceHolder) {            
+            	  if (canvas != null) {
+            	     //Invalidate(); 
+                	 PostInvalidate(); 
+            	  }	 
+              }
+              publishProgress(count);
+           }
+           finally {        	           	   
+               if (canvas != null) {                	   
+                   surfaceHolder.unlockCanvasAndPost(canvas);     
+               }        	                      
+           }
+           
+          }
+          mDrawing = false;
+          mRun = false;
+          return null;
+       }
+
+       @Override
+       protected void onProgressUpdate(Float... values) {    	   
+           super.onProgressUpdate(values);           
+           count = count + mStepProgress;           
+       }
+       
+       @Override
+       protected void onPostExecute(String values) {    	  
+         super.onPostExecute(values);   	             
+         controls.pOnSurfaceViewDrawingPostExecute(pascalObj, count);
+       }            
+   }
+   
+} //end class
+
+
+//**new jComponent class entrypoint**//please, do not remove/change this line!
 
 //Javas/Pascal Interface Class 
 
@@ -11986,7 +12897,10 @@ public  native void pOnGLRenderer(long pasobj, int EventType, int w, int h);
 public  native void pOnClose     (long pasobj);    
 
 public  native int  pOnWebViewStatus (long pasobj, int EventType, String url);
-public  native void pOnAsyncEvent    (long pasobj, int EventType, int progress);
+public  native boolean pOnAsyncEventDoInBackground(long pasobj, int progress);
+public  native int  pOnAsyncEventProgressUpdate(long pasobj, int progress);
+public  native int  pOnAsyncEventPreExecute(long pasobj);
+public  native void pOnAsyncEventPostExecute(long pasobj, int progress);
 
 //new by jmpessoa: support for jListView custom row
 public  native void pOnClickWidgetItem(long pasobj, int position, boolean checked); 
@@ -12042,6 +12956,26 @@ public native void pOnFlingGestureDetected(long pasobj, int direction);
 public native void pOnPinchZoomGestureDetected(long pasobj, float scaleFactor, int state); 
 
 public native void pOnShellCommandExecuted(long pasobj, String cmdResult);
+
+public native void pOnTCPSocketClientMessageReceived(long pasobj, String[] messagesReceived);
+public native void pOnTCPSocketClientConnected(long pasobj);
+
+public native void pOnHttpClientContentResult(long pasobj, String content);
+public native void pOnHttpClientCodeResult(long pasobj, int code);
+public native void pOnSurfaceViewCreated(long pasobj, SurfaceHolder surfaceHolder);
+public native void pOnSurfaceViewDraw(long pasobj, Canvas canvas);
+public native void pOnSurfaceViewChanged(long pasobj, int width, int height);
+
+public native void pOnMediaPlayerPrepared(long pasobj, int videoWidth, int videoHeigh);
+public native void pOnMediaPlayerVideoSizeChanged(long pasobj, int videoWidth, int videoHeight);
+public native void pOnMediaPlayerCompletion(long pasobj);
+public native void pOnMediaPlayerTimedText(long pasobj, String timedText);
+
+public native void pOnSurfaceViewTouch(long pasobj, int act, int cnt,float x1, float y1,float x2, float y2);
+                       
+public native boolean pOnSurfaceViewDrawingInBackground(long pasobj, float progress);
+public native void pOnSurfaceViewDrawingPostExecute(long pasobj, float progress);
+
 
 //Load Pascal Library
 static {
@@ -12595,6 +13529,12 @@ public  java.lang.Object jScrollView_Create(long pasobj ) {
 }
 
 //-------------------------------------------------------------------------
+//HorizontalScrollView: Create
+//-------------------------------------------------------------------------
+public  java.lang.Object jHorizontalScrollView_Create(long pasobj ) {
+	return (java.lang.Object)( new jHorizontalScrollView(this.activity,this,pasobj));
+}
+//-------------------------------------------------------------------------
 //Panel: Create - new by jmpessoa
 //-------------------------------------------------------------------------
 public  java.lang.Object jPanel_Create(long pasobj ) {
@@ -13081,6 +14021,14 @@ public float[] benchMark1 () {
    
    public java.lang.Object jDigitalClock_jCreate(long _Self) {
 	      return (java.lang.Object)(new jDigitalClock(this,_Self));
+   }
+   
+   public java.lang.Object jTCPSocketClient_jCreate(long _Self) {
+	      return (java.lang.Object)(new jTCPSocketClient(this,_Self));
+   }
+   
+   public java.lang.Object jSurfaceView_jCreate(long _Self) {
+	      return (java.lang.Object)(new jSurfaceView(this,_Self));
    }
    
 }

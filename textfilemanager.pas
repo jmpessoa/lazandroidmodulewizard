@@ -218,6 +218,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jtextfilemanager);
   jMethod:= env^.GetMethodID(env, jCls, 'jFree', '()V');
   env^.CallVoidMethod(env, _jtextfilemanager, jMethod);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 procedure jTextFileManager_SaveToFile(env: PJNIEnv; _jtextfilemanager: JObject; _txtContent: string; _filename: string);
@@ -233,6 +234,7 @@ begin
   env^.CallVoidMethodA(env, _jtextfilemanager, jMethod, @jParams);
   env^.DeleteLocalRef(env,jParams[0].l);
   env^.DeleteLocalRef(env,jParams[1].l);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 procedure jTextFileManager_SaveToFile(env: PJNIEnv; _jtextfilemanager: JObject; _txtContent: string; _path: string; _filename: string);
@@ -250,6 +252,7 @@ begin
   env^.DeleteLocalRef(env,jParams[0].l);
   env^.DeleteLocalRef(env,jParams[1].l);
   env^.DeleteLocalRef(env,jParams[2].l);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 function jTextFileManager_LoadFromFile(env: PJNIEnv; _jtextfilemanager: JObject; _filename: string): string;
@@ -272,6 +275,7 @@ begin
             end;
   end;
   env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 function jTextFileManager_LoadFromFile(env: PJNIEnv; _jtextfilemanager: JObject;_path: string; _filename: string): string;
@@ -296,6 +300,7 @@ begin
   end;
   env^.DeleteLocalRef(env,jParams[0].l);
   env^.DeleteLocalRef(env,jParams[1].l);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 procedure jTextFileManager_SaveToSdCard(env: PJNIEnv; _jtextfilemanager: JObject; _txtContent: string; _filename: string);
@@ -311,6 +316,7 @@ begin
   env^.CallVoidMethodA(env, _jtextfilemanager, jMethod, @jParams);
   env^.DeleteLocalRef(env,jParams[0].l);
   env^.DeleteLocalRef(env,jParams[1].l);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 function jTextFileManager_LoadFromSdCard(env: PJNIEnv; _jtextfilemanager: JObject; _filename: string): string;
@@ -333,6 +339,7 @@ begin
             end;
   end;
   env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 function jTextFileManager_LoadFromAssets(env: PJNIEnv; _jtextfilemanager: JObject; _filename: string): string;
@@ -355,6 +362,7 @@ begin
             end;
   end;
   env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 procedure jTextFileManager_CopyToClipboard(env: PJNIEnv; _jtextfilemanager: JObject; _text: string);
@@ -368,6 +376,7 @@ begin
   jMethod:= env^.GetMethodID(env, jCls, 'CopyToClipboard', '(Ljava/lang/String;)V');
   env^.CallVoidMethodA(env, _jtextfilemanager, jMethod, @jParams);
   env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 function jTextFileManager_PasteFromClipboard(env: PJNIEnv; _jtextfilemanager: JObject): string;
@@ -387,6 +396,7 @@ begin
               Result:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
             end;
   end;
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 procedure jTextFileManager_CopyContentToClipboard(env: PJNIEnv; _jtextfilemanager: JObject; _filename: string);
@@ -400,6 +410,7 @@ begin
   jMethod:= env^.GetMethodID(env, jCls, 'CopyContentToClipboard', '(Ljava/lang/String;)V');
   env^.CallVoidMethodA(env, _jtextfilemanager, jMethod, @jParams);
   env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 procedure jTextFileManager_PasteContentFromClipboard(env: PJNIEnv; _jtextfilemanager: JObject; _filename: string);
@@ -413,6 +424,7 @@ begin
   jMethod:= env^.GetMethodID(env, jCls, 'PasteContentFromClipboard', '(Ljava/lang/String;)V');
   env^.CallVoidMethodA(env, _jtextfilemanager, jMethod, @jParams);
   env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 

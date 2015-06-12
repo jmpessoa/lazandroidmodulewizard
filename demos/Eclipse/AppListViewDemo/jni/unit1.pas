@@ -18,7 +18,7 @@ type
       jEditText1: jEditText;
       jListView1: jListView;
       jTextView1: jTextView;
-      procedure DataModuleCreate(Sender: TObject);
+
       procedure DataModuleJNIPrompt(Sender: TObject);
       procedure jButton1Click(Sender: TObject);
       procedure jButton2Click(Sender: TObject);
@@ -41,36 +41,32 @@ implementation
 
 { TAndroidModule1 }
 
-procedure TAndroidModule1.DataModuleCreate(Sender: TObject);
-begin
-   //
-end;
-
 procedure TAndroidModule1.DataModuleJNIPrompt(Sender: TObject);
 var
   i: integer;
 begin
   for i:=0 to jListView1.Count-1 do
-    jListView1.SetImageByIndex('ic_bullets',i);
+    jListView1.SetImageByIndex('ic_bullets',i); //from .../res 'ic_bullets.png'
 end;
 
 procedure TAndroidModule1.jButton1Click(Sender: TObject);
 begin
-   jEditText1.MaxTextLength:= 10;
-  {
+
    if jEditText1.Text <> '' then
-     jListView1.Add(jEditText1.Text)
+   begin
+     jListView1.Add(jEditText1.Text);
+     jListView1.SetImageByIndex('ic_bullets',jListView1.Count-1); //from .../res 'ic_bullets.png'
+   end
    else
      ShowMessage('Please, enter some text!');
-     }
+
 end;
 
 procedure TAndroidModule1.jButton2Click(Sender: TObject);
 var
   i, itemChecked: integer;
 begin
-  jEditText1.MaxTextLength:= -4;
-  {
+
   itemChecked:= -1;
   for i:=0 to jListView1.Count-1 do
   begin
@@ -88,7 +84,7 @@ begin
   end
   else
     ShowMessage('Item Checked not found!');
-    }
+
 end;
 
 procedure TAndroidModule1.jListView1ClickCaptionItem(Sender: TObject;

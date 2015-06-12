@@ -1,0 +1,189 @@
+object AndroidModule1: TAndroidModule1
+  Left = 290
+  Top = 163
+  Width = 320
+  Height = 516
+  MarginLeft = 0
+  MarginTop = 0
+  MarginRight = 0
+  MarginBottom = 0
+  Text = 'AndroidModule1'
+  ActivityMode = actMain
+  BackgroundColor = colbrDefault
+  OnBackButton = AndroidModule1BackButton
+  object jTextView1: jTextView
+    Left = 76
+    Top = 5
+    Width = 168
+    Height = 20
+    MarginLeft = 5
+    MarginTop = 5
+    MarginRight = 5
+    MarginBottom = 5
+    Visible = True
+    PosRelativeToAnchor = []
+    PosRelativeToParent = [rpTop, rpCenterHorizontal]
+    LayoutParamWidth = lpWrapContent
+    LayoutParamHeight = lpWrapContent
+    Text = 'App Dialog Progress Demo1'
+    Alignment = taLeft
+    Enabled = True
+    BackgroundColor = colbrDefault
+    FontColor = colbrDefault
+    FontSize = 0
+    TextTypeFace = tfNormal
+    Id = 604543
+  end
+  object jButton1: jButton
+    Left = 2
+    Top = 34
+    Width = 316
+    Height = 40
+    MarginLeft = 2
+    MarginTop = 4
+    MarginRight = 2
+    MarginBottom = 4
+    Visible = True
+    Anchor = jTextView1
+    PosRelativeToAnchor = [raBelow]
+    PosRelativeToParent = []
+    LayoutParamWidth = lpMatchParent
+    LayoutParamHeight = lpWrapContent
+    Text = 'Show Dialog Progress'
+    BackgroundColor = colbrDefault
+    FontColor = colbrDefault
+    FontSize = 0
+    OnClick = jButton1Click
+    Id = 1640870
+  end
+  object jButton2: jButton
+    Left = 2
+    Top = 82
+    Width = 316
+    Height = 40
+    MarginLeft = 2
+    MarginTop = 4
+    MarginRight = 2
+    MarginBottom = 4
+    Visible = True
+    Anchor = jButton1
+    PosRelativeToAnchor = [raBelow]
+    PosRelativeToParent = []
+    LayoutParamWidth = lpMatchParent
+    LayoutParamHeight = lpWrapContent
+    Text = 'Show [Custom!] Dialog Progress'
+    BackgroundColor = colbrDefault
+    FontColor = colbrDefault
+    FontSize = 0
+    OnClick = jButton2Click
+    Id = 3952987
+  end
+  object jPanel1: jPanel
+    Left = 7
+    Top = 168
+    Width = 312
+    Height = 56
+    MarginLeft = 4
+    MarginTop = 4
+    MarginRight = 4
+    MarginBottom = 4
+    Visible = False
+    PosRelativeToAnchor = []
+    PosRelativeToParent = []
+    LayoutParamWidth = lpMatchParent
+    LayoutParamHeight = lpWrapContent
+    BackgroundColor = colbrDefault
+    MinPinchZoomFactor = 0.25
+    MaxPinchZoomFactor = 4
+    Id = 0
+    object jImageView1: jImageView
+      Left = 13
+      Top = 8
+      Width = 48
+      Height = 48
+      Visible = True
+      PosRelativeToAnchor = []
+      PosRelativeToParent = [rpLeft, rpCenterVertical]
+      LayoutParamWidth = lpWrapContent
+      LayoutParamHeight = lpWrapContent
+      ImageIndex = 0
+      Images = jImageList1
+      BackgroundColor = colbrDefault
+      ImageScaleType = scaleCenter
+      OnClick = jImageView1Click
+      Id = 9147729
+    end
+    object jTextView2: jTextView
+      Left = 69
+      Top = 18
+      Width = 76
+      Height = 20
+      MarginLeft = 5
+      MarginTop = 5
+      MarginRight = 5
+      MarginBottom = 5
+      Visible = True
+      Anchor = jImageView1
+      PosRelativeToAnchor = [raToRightOf]
+      PosRelativeToParent = [rpCenterVertical]
+      LayoutParamWidth = lpWrapContent
+      LayoutParamHeight = lpWrapContent
+      Text = 'Please, wait...'
+      Alignment = taLeft
+      Enabled = True
+      BackgroundColor = colbrDefault
+      FontColor = colbrDefault
+      FontSize = 0
+      TextTypeFace = tfNormal
+      Id = 0
+    end
+    object jButton3: jButton
+      Left = 220
+      Top = 8
+      Width = 90
+      Height = 40
+      MarginLeft = 2
+      MarginTop = 4
+      MarginRight = 2
+      MarginBottom = 4
+      Visible = True
+      PosRelativeToAnchor = []
+      PosRelativeToParent = [rpRight, rpCenterVertical]
+      LayoutParamWidth = lpOneThirdOfParent
+      LayoutParamHeight = lpWrapContent
+      Text = 'Close'
+      BackgroundColor = colbrDefault
+      FontColor = colbrDefault
+      FontSize = 0
+      OnClick = jButton3Click
+      Id = 0
+    end
+  end
+  object jDialogProgress1: jDialogProgress
+    Title = 'Lamw: jDialogProgress Demo'
+    Msg = 'Please, wait [backkey cancel!]...'
+    left = 240
+    top = 264
+  end
+  object jTimer1: jTimer
+    Enabled = False
+    Interval = 50
+    OnTimer = jTimer1Timer
+    left = 40
+    top = 264
+  end
+  object jImageList1: jImageList
+    Images.Strings = (
+      't1.png'
+      't2.png'
+      't3.png'
+      't4.png'
+      't5.png'
+      't6.png'
+      't7.png'
+      't8.png'
+    )
+    left = 128
+    top = 264
+  end
+end

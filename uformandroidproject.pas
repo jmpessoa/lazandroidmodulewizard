@@ -202,6 +202,7 @@ begin
   if Pos('String', jType) > 0 then
   begin
      Result:= 'JString';
+     if Pos('[', jType) > 0 then Result := 'JStringArray';  //20-may-2015
   end else if Pos('int', jType) > 0  then
   begin
      Result := 'JInt';

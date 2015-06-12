@@ -3,7 +3,8 @@
 http://forum.lazarus.freepascal.org/index.php/topic,21919.300.html
 
 Quote
-...let's say somebody sends me a libcontrols1.so (produced using lawm) and I want to use it either with lawm (or some other tool). My question is how to use it with lawm ....
+...let's say somebody sends me a libcontrols1.so (produced using lawm) and I want to use it either with lawm (or some other tool). 
+My question is how to use it with lawm ....
 
 Quote
 a- the java code make the calls to libcontrols1.so
@@ -18,7 +19,8 @@ You can get from here: https://jmpessoa.opendrive.com/files?Ml83NzE5Mjk1NV95QmRp
 
 The produce project [.rar] is here: https://jmpessoa.opendrive.com/files?Ml83NzE5MzU4OV9MTFZjMg
 
-Why not a ".so" made by Lamw? Only because at the moment [as is] Lamw can not do a very very "raw" .so  [TODO list!] --- but everything written here works with a ".so"produced by Pascal/Lamw!
+Why not a ".so" made by Lamw? Only because at the moment [as is] Lamw can not do a very very "raw" .so  [TODO list!] 
+--- but everything written here works with a ".so"produced by Pascal/Lamw!
 
 2. Here is the "MyLib.java" code:
 
@@ -36,12 +38,13 @@ public class MyLib {
 }
 
 And here is the JNI "C" export  signature : [by libMyLib.so]
-Code: [Select]
+
 JNIEXPORT jint JNICALL Java_jmpessoa_ndktest_MyLib_add(JNIEnv *, jobject, jint, jint);
 JNIEXPORT jstring JNICALL Java_jmpessoa_ndktest_MyLib_getHello(JNIEnv *, jobject);
 
+
 And here is the JNI "Pascal/Lamw" equivalent exports signature:
-Code: [Select]
+
 function Java_jmpessoa_ndktest_MyLib_add(PEnv: PJNIEnv; this: JObject;  x:jInt, y:jInt): jInt;
 function Java_jmpessoa_ndktest_MyLib_getHello(PEnv: PJNIEnv; this: JObject): jString;
 
@@ -59,7 +62,6 @@ Copy "libMyLib.so"   to  "..\libs" yes, together with "libcontrols.so"
 
 b.3 - Declare the library and methods in your Pascal/Lamw code:
 
-Quote
 const NATIVE_LIB = 'libMyLib.so';
 
 function Add(PEnv: PJNIEnv; this: jObject; x: jInt; y:jInt): jInt; cdecl; external NATIVE_LIB name 'Java_jmpessoa_ndktest_MyLib_add';
@@ -68,7 +70,6 @@ function GetHello(PEnv: PJNIEnv; this: jObject): jString; cdecl; external NATIVE
 
 b.3 - Use it!
 
-Code: [Select]
 procedure TAndroidModule1.jButton1Click(Sender: TObject);
 var
   sum: integer;
@@ -80,18 +81,19 @@ begin
    hello:= Get_pString( GetHello(gApp.Jni.jEnv,gApp.Jni.jThis) ); 
    ShowMessage(hello);
 
-   //Get_pString <--> convert java string to pascal string    
+   //NOTE: Get_pString <--> convert java string to pascal string    
 end;
 
 Yes!! Pascal/Lamw can use it!!
 
-Considerations: in fact Pacal/Lamw no matter how the function name/signature was "designate" [exports],  so we can use any ".so" compiled to android/arm/x86 etc... even more complex made by Lamw!
+Considerations: in fact Pacal/Lamw no matter how the function name/signature was "designate" [exports],  
+                so we can use any ".so" compiled to android/arm/x86 etc... even more complex made by Lamw!
 
+-----------------------------------------------------------------------------------------------------------
 Question a:  the java code make the calls to libMyLib.so
 
 a.1 In the same/"natural" package [ no problem ....] just copy it to "...\libs"    and use it!
 
-Code: [Select]
 package jmpessoa.ndktest;
 
 public class MainActivity extends Activity {
@@ -109,7 +111,7 @@ a.2 In the "strange" package: NOT!!!
 
 why? the original exported name JNI preface: "Java_jmpessoa_ndktest_"  need match!
 
-Code: [Select]
+
 package strange.test;
 
 public class MyLib {
@@ -123,6 +125,7 @@ public class MyLib {
 }
 
 Fail! Native method not found! 
+
 because: "Java_strange_test_MyLib_add"  and "Java_strange_test_MyLib_getHello" was expected but "Java_jmpessoa_ndktest_*" was found!
 
 [workaround] You can force and design [your new project]  package "preface.name" as expected, that is: "jmpessoa.ndktest"!

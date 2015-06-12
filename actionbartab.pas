@@ -249,6 +249,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jActionBarTab);
   jMethod:= env^.GetMethodID(env, jCls, 'jFree', '()V');
   env^.CallVoidMethod(env, _jActionBarTab, jMethod);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -260,6 +261,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jActionBarTab);
   jMethod:= env^.GetMethodID(env, jCls, 'GetActionBar', '()Landroid/app/ActionBar;');
   Result:= env^.CallObjectMethod(env, _jActionBarTab, jMethod);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -275,8 +277,9 @@ begin
   jCls:= env^.GetObjectClass(env, _jActionBarTab);
   jMethod:= env^.GetMethodID(env, jCls, 'Add', '(Ljava/lang/String;Landroid/view/View;Ljava/lang/String;)V');
   env^.CallVoidMethodA(env, _jActionBarTab, jMethod, @jParams);
-env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env,jParams[0].l);
   env^.DeleteLocalRef(env,jParams[2].l);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -291,7 +294,8 @@ begin
   jCls:= env^.GetObjectClass(env, _jActionBarTab);
   jMethod:= env^.GetMethodID(env, jCls, 'Add', '(Ljava/lang/String;Landroid/view/View;)V');
   env^.CallVoidMethodA(env, _jActionBarTab, jMethod, @jParams);
-env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 procedure jActionBarTab_Add(env: PJNIEnv; _jActionBarTab: JObject; _title: string; _panel: jObject; _customTabView: jObject);
@@ -306,7 +310,8 @@ begin
   jCls:= env^.GetObjectClass(env, _jActionBarTab);
   jMethod:= env^.GetMethodID(env, jCls, 'Add', '(Ljava/lang/String;Landroid/view/View;Landroid/view/View;)V');
   env^.CallVoidMethodA(env, _jActionBarTab, jMethod, @jParams);
-env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -318,6 +323,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jActionBarTab);
   jMethod:= env^.GetMethodID(env, jCls, 'SetTabNavigationMode', '()V');
   env^.CallVoidMethod(env, _jActionBarTab, jMethod);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -329,6 +335,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jActionBarTab);
   jMethod:= env^.GetMethodID(env, jCls, 'RemoveAllTabs', '()V');
   env^.CallVoidMethod(env, _jActionBarTab, jMethod);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 function jActionBarTab_GetSelectedTab(env: PJNIEnv; _jactionbartab: JObject): jObject;
@@ -339,6 +346,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jactionbartab);
   jMethod:= env^.GetMethodID(env, jCls, 'GetSelectedTab', '()Landroid/app/ActionBar/Tab;');
   Result:= env^.CallObjectMethod(env, _jactionbartab, jMethod);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -352,6 +360,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jactionbartab);
   jMethod:= env^.GetMethodID(env, jCls, 'SelectTab', '(LActionBar/Tab;)V');
   env^.CallVoidMethodA(env, _jactionbartab, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -365,6 +374,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jactionbartab);
   jMethod:= env^.GetMethodID(env, jCls, 'GetTabAtIndex', '(I)Landroid/app/ActionBar/Tab;');
   Result:= env^.CallObjectMethodA(env, _jactionbartab, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -378,6 +388,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jactionbartab);
   jMethod:= env^.GetMethodID(env, jCls, 'SelectTabByIndex', '(I)V');
   env^.CallVoidMethodA(env, _jactionbartab, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 

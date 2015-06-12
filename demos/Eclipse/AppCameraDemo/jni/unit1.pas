@@ -197,8 +197,8 @@ begin
              jView1.Refresh;
              jImageView1.Refresh;
            end;
-        end
-        else ShowMessage('Photo Fail!');
+   end
+   else ShowMessage('Photo Fail!');
 end;
 
 end.

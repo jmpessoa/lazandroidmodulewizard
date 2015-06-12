@@ -318,6 +318,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jdumpjavamethods);
   jMethod:= env^.GetMethodID(env, jCls, 'jFree', '()V');
   env^.CallVoidMethod(env, _jdumpjavamethods, jMethod);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 function jDumpJavaMethods_GetMethodFullSignatureList(env: PJNIEnv; _jdumpjavamethods: JObject): string;
@@ -337,6 +338,7 @@ begin
               Result:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
             end;
   end;
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 function jDumpJavaMethods_GetMethodImplementationList(env: PJNIEnv; _jdumpjavamethods: JObject): string;
@@ -356,6 +358,7 @@ begin
               Result:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
             end;
   end;
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 procedure jDumpJavaMethods_SetStripFullTypeName(env: PJNIEnv; _jdumpjavamethods: JObject; _stripFullTypeName: boolean);
@@ -368,6 +371,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jdumpjavamethods);
   jMethod:= env^.GetMethodID(env, jCls, 'SetStripFullTypeName', '(Z)V');
   env^.CallVoidMethodA(env, _jdumpjavamethods, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 function jDumpJavaMethods_GetStripFullTypeName(env: PJNIEnv; _jdumpjavamethods: JObject): boolean;
@@ -380,6 +384,7 @@ begin
   jMethod:= env^.GetMethodID(env, jCls, 'GetStripFullTypeName', '()Z');
   jBoo:= env^.CallBooleanMethod(env, _jdumpjavamethods, jMethod);
   Result:= boolean(jBoo);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 procedure jDumpJavaMethods_SetFullJavaClassName(env: PJNIEnv; _jdumpjavamethods: JObject; _fullJavaClassName: string);
@@ -393,6 +398,7 @@ begin
   jMethod:= env^.GetMethodID(env, jCls, 'SetFullJavaClassName', '(Ljava/lang/String;)V');
   env^.CallVoidMethodA(env, _jdumpjavamethods, jMethod, @jParams);
   env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 function jDumpJavaMethods_GetFullJavaClassName(env: PJNIEnv; _jdumpjavamethods: JObject): string;
@@ -412,6 +418,7 @@ begin
               Result:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
             end;
   end;
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 procedure jDumpJavaMethods_SetObjReferenceName(env: PJNIEnv; _jdumpjavamethods: JObject; _objReferenceName: string);
@@ -425,6 +432,7 @@ begin
   jMethod:= env^.GetMethodID(env, jCls, 'SetObjReferenceName', '(Ljava/lang/String;)V');
   env^.CallVoidMethodA(env, _jdumpjavamethods, jMethod, @jParams);
   env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 function jDumpJavaMethods_GetObjReferenceName(env: PJNIEnv; _jdumpjavamethods: JObject): string;
@@ -444,6 +452,7 @@ begin
               Result:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
             end;
   end;
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 procedure jDumpJavaMethods_SetDelimiter(env: PJNIEnv; _jdumpjavamethods: JObject; _delimiter: string);
@@ -457,6 +466,7 @@ begin
   jMethod:= env^.GetMethodID(env, jCls, 'SetDelimiter', '(Ljava/lang/String;)V');
   env^.CallVoidMethodA(env, _jdumpjavamethods, jMethod, @jParams);
   env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 function jDumpJavaMethods_GetDelimiter(env: PJNIEnv; _jdumpjavamethods: JObject): string;
@@ -476,6 +486,7 @@ begin
               Result:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
             end;
   end;
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 function jDumpJavaMethods_GetMethodHeaderList(env: PJNIEnv; _jdumpjavamethods: JObject): string;
@@ -495,6 +506,7 @@ begin
               Result:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
             end;
   end;
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 function jDumpJavaMethods_GetMethodHeaderListSize(env: PJNIEnv; _jdumpjavamethods: JObject): integer;
@@ -505,6 +517,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jdumpjavamethods);
   jMethod:= env^.GetMethodID(env, jCls, 'GetMethodHeaderListSize', '()I');
   Result:= env^.CallIntMethod(env, _jdumpjavamethods, jMethod);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 function jDumpJavaMethods_GetMethodHeaderByIndex(env: PJNIEnv; _jdumpjavamethods: JObject; _index: integer): string;
@@ -526,6 +539,7 @@ begin
               Result:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
             end;
   end;
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 procedure jDumpJavaMethods_MaskMethodHeaderByIndex(env: PJNIEnv; _jdumpjavamethods: JObject; _index: integer);
@@ -538,6 +552,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jdumpjavamethods);
   jMethod:= env^.GetMethodID(env, jCls, 'MaskMethodHeaderByIndex', '(I)V');
   env^.CallVoidMethodA(env, _jdumpjavamethods, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 procedure jDumpJavaMethods_UnMaskMethodHeaderByIndex(env: PJNIEnv; _jdumpjavamethods: JObject; _index: integer);
@@ -550,6 +565,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jdumpjavamethods);
   jMethod:= env^.GetMethodID(env, jCls, 'UnMaskMethodHeaderByIndex', '(I)V');
   env^.CallVoidMethodA(env, _jdumpjavamethods, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 function jDumpJavaMethods_GetNoMaskedMethodHeaderList(env: PJNIEnv; _jdumpjavamethods: JObject): string;
@@ -569,6 +585,7 @@ begin
               Result:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
             end;
   end;
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 function jDumpJavaMethods_Extract(env: PJNIEnv; _jdumpjavamethods: JObject): string;
@@ -588,6 +605,7 @@ begin
               Result:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
             end;
   end;
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 function jDumpJavaMethods_Extract(env: PJNIEnv; _jdumpjavamethods: JObject; _fullJavaClassName: string; _delimiter: string): string;
@@ -612,6 +630,7 @@ begin
   end;
   env^.DeleteLocalRef(env,jParams[0].l);
   env^.DeleteLocalRef(env,jParams[1].l);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 function jDumpJavaMethods_GetNoMaskedMethodImplementationByIndex(env: PJNIEnv; _jdumpjavamethods: JObject; _index: integer): string;
@@ -633,6 +652,7 @@ begin
               Result:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
             end;
   end;
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 function jDumpJavaMethods_GetNoMaskedMethodImplementationListSize(env: PJNIEnv; _jdumpjavamethods: JObject): integer;
@@ -643,6 +663,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jdumpjavamethods);
   jMethod:= env^.GetMethodID(env, jCls, 'GetNoMaskedMethodImplementationListSize', '()I');
   Result:= env^.CallIntMethod(env, _jdumpjavamethods, jMethod);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 function jDumpJavaMethods_GetNoMaskedMethodImplementationList(env: PJNIEnv; _jdumpjavamethods: JObject): string;
@@ -662,6 +683,7 @@ begin
               Result:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
             end;
   end;
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 end.

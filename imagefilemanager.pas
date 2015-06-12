@@ -297,6 +297,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jimagefilemanager);
   jMethod:= env^.GetMethodID(env, jCls, 'jFree', '()V');
   env^.CallVoidMethod(env, _jimagefilemanager, jMethod);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -311,7 +312,8 @@ begin
   jCls:= env^.GetObjectClass(env, _jimagefilemanager);
   jMethod:= env^.GetMethodID(env, jCls, 'SaveToSdCard', '(Landroid/graphics/Bitmap;Ljava/lang/String;)V');
   env^.CallVoidMethodA(env, _jimagefilemanager, jMethod, @jParams);
-env^.DeleteLocalRef(env,jParams[1].l);
+  env^.DeleteLocalRef(env,jParams[1].l);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -323,6 +325,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jimagefilemanager);
   jMethod:= env^.GetMethodID(env, jCls, 'ShowImagesFromGallery', '()V');
   env^.CallVoidMethod(env, _jimagefilemanager, jMethod);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -336,7 +339,8 @@ begin
   jCls:= env^.GetObjectClass(env, _jimagefilemanager);
   jMethod:= env^.GetMethodID(env, jCls, 'LoadFromSdCard', '(Ljava/lang/String;)Landroid/graphics/Bitmap;');
   Result:= env^.CallObjectMethodA(env, _jimagefilemanager, jMethod, @jParams);
-env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -350,7 +354,8 @@ begin
   jCls:= env^.GetObjectClass(env, _jimagefilemanager);
   jMethod:= env^.GetMethodID(env, jCls, 'LoadFromURL', '(Ljava/lang/String;)Landroid/graphics/Bitmap;');
   Result:= env^.CallObjectMethodA(env, _jimagefilemanager, jMethod, @jParams);
-env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -364,7 +369,8 @@ begin
   jCls:= env^.GetObjectClass(env, _jimagefilemanager);
   jMethod:= env^.GetMethodID(env, jCls, 'LoadFromAssets', '(Ljava/lang/String;)Landroid/graphics/Bitmap;');
   Result:= env^.CallObjectMethodA(env, _jimagefilemanager, jMethod, @jParams);
-env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 function jImageFileManager_LoadFromResources(env: PJNIEnv; _jimagefilemanager: JObject; _imageResIdentifier: string): jObject;
@@ -378,6 +384,7 @@ begin
   jMethod:= env^.GetMethodID(env, jCls, 'LoadFromResources', '(Ljava/lang/String;)Landroid/graphics/Bitmap;');
   Result:= env^.CallObjectMethodA(env, _jimagefilemanager, jMethod, @jParams);
   env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 function jImageFileManager_LoadFromFile(env: PJNIEnv; _jimagefilemanager: JObject; _filename: string): jObject;
@@ -390,7 +397,8 @@ begin
   jCls:= env^.GetObjectClass(env, _jimagefilemanager);
   jMethod:= env^.GetMethodID(env, jCls, 'LoadFromFile', '(Ljava/lang/String;)Landroid/graphics/Bitmap;');
   Result:= env^.CallObjectMethodA(env, _jimagefilemanager, jMethod, @jParams);
-env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 function jImageFileManager_LoadFromFile(env: PJNIEnv; _jimagefilemanager: JObject;_path: string; _filename: string): jObject;
@@ -406,6 +414,7 @@ begin
   Result:= env^.CallObjectMethodA(env, _jimagefilemanager, jMethod, @jParams);
   env^.DeleteLocalRef(env,jParams[0].l);
   env^.DeleteLocalRef(env,jParams[1].l);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 procedure jImageFileManager_SaveToFile(env: PJNIEnv; _jimagefilemanager: JObject; _image: jObject; _filename: string);
@@ -419,7 +428,8 @@ begin
   jCls:= env^.GetObjectClass(env, _jimagefilemanager);
   jMethod:= env^.GetMethodID(env, jCls, 'SaveToFile', '(Landroid/graphics/Bitmap;Ljava/lang/String;)V');
   env^.CallVoidMethodA(env, _jimagefilemanager, jMethod, @jParams);
-env^.DeleteLocalRef(env,jParams[1].l);
+  env^.DeleteLocalRef(env,jParams[1].l);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -437,6 +447,7 @@ begin
   env^.CallVoidMethodA(env, _jimagefilemanager, jMethod, @jParams);
   env^.DeleteLocalRef(env,jParams[1].l);
   env^.DeleteLocalRef(env,jParams[2].l);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 function jImageFileManager_LoadFromUri(env: PJNIEnv; _jimagefilemanager: JObject; _imageUri: jObject): jObject;
@@ -449,6 +460,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jimagefilemanager);
   jMethod:= env^.GetMethodID(env, jCls, 'LoadFromUri', '(Landroid/net/Uri;)Landroid/graphics/Bitmap;');
   Result:= env^.CallObjectMethodA(env, _jimagefilemanager, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 function jImageFileManager_LoadFromFile(env: PJNIEnv; _jimagefilemanager: JObject; _filename: string; _scale: integer): jObject;
@@ -462,7 +474,8 @@ begin
   jCls:= env^.GetObjectClass(env, _jimagefilemanager);
   jMethod:= env^.GetMethodID(env, jCls, 'LoadFromFile', '(Ljava/lang/String;I)Landroid/graphics/Bitmap;');
   Result:= env^.CallObjectMethodA(env, _jimagefilemanager, jMethod, @jParams);
-env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -477,6 +490,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jimagefilemanager);
   jMethod:= env^.GetMethodID(env, jCls, 'CreateBitmap', '(II)Landroid/graphics/Bitmap;');
   Result:= env^.CallObjectMethodA(env, _jimagefilemanager, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -490,6 +504,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jimagefilemanager);
   jMethod:= env^.GetMethodID(env, jCls, 'GetBitmapWidth', '(Landroid/graphics/Bitmap;)I');
   Result:= env^.CallIntMethodA(env, _jimagefilemanager, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -503,6 +518,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jimagefilemanager);
   jMethod:= env^.GetMethodID(env, jCls, 'GetBitmapHeight', '(Landroid/graphics/Bitmap;)I');
   Result:= env^.CallIntMethodA(env, _jimagefilemanager, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -526,6 +542,7 @@ begin
     env^.GetByteArrayRegion(env, jResultArray, 0, resultSize, @Result[0] {target});
   end;
   env^.DeleteLocalRef(env,jParams[1].l);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -544,7 +561,8 @@ begin
   jCls:= env^.GetObjectClass(env, _jimagefilemanager);
   jMethod:= env^.GetMethodID(env, jCls, 'SetByteArrayToBitmap', '([B)Landroid/graphics/Bitmap;');
   Result:= env^.CallObjectMethodA(env, _jimagefilemanager, jMethod, @jParams);
-env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -559,6 +577,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jimagefilemanager);
   jMethod:= env^.GetMethodID(env, jCls, 'ClockWise', '(Landroid/graphics/Bitmap;Landroid/widget/ImageView;)Landroid/graphics/Bitmap;');
   Result:= env^.CallObjectMethodA(env, _jimagefilemanager, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -573,6 +592,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jimagefilemanager);
   jMethod:= env^.GetMethodID(env, jCls, 'AntiClockWise', '(Landroid/graphics/Bitmap;Landroid/widget/ImageView;)Landroid/graphics/Bitmap;');
   Result:= env^.CallObjectMethodA(env, _jimagefilemanager, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 function jImageFileManager_SetScale(env: PJNIEnv; _jimagefilemanager: JObject; _bmp: jObject; _imageView: jObject; _scaleX: single; _scaleY: single): jObject;
@@ -588,6 +608,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jimagefilemanager);
   jMethod:= env^.GetMethodID(env, jCls, 'SetScale', '(Landroid/graphics/Bitmap;Landroid/widget/ImageView;FF)Landroid/graphics/Bitmap;');
   Result:= env^.CallObjectMethodA(env, _jimagefilemanager, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 end.

@@ -6,8 +6,8 @@ unit unit1;
 interface
 
 uses
-  Classes, SysUtils, And_jni, And_jni_Bridge, Laz_And_Controls, 
-    Laz_And_Controls_Events, AndroidWidget, shellcommand;
+  Classes, SysUtils, And_jni, And_jni_Bridge, Laz_And_Controls,
+  Laz_And_Controls_Events, AndroidWidget, shellcommand;
 
 type
 
@@ -41,19 +41,21 @@ implementation
 
 procedure TAndroidModule1.jButton1Click(Sender: TObject);
 begin
+   jEditText2.Clear;
    if  jEditText1.Text <> '' then
-      jShellCommand1.Execute(jEditText1.Text);
+       jShellCommand1.Execute(jEditText1.Text);
 end;
 
 procedure TAndroidModule1.jShellCommand1Executed(Sender: TObject; cmdResult: string);
 begin
-  jEditText2.Clear;
-  jEditText2.Append(cmdResult);
+   jEditText2.Append(cmdResult)
 end;
 
 procedure TAndroidModule1.AndroidModule1JNIPrompt(Sender: TObject);
 begin
    jEditText1.SetFocus;
+   //jEditText1.Clear;
+   //jEditText1.Text:= '/system/bin/ping -c 1 -w 1 8.8.8.8';     //need: self.SetWifiEnabled(True);
 end;
 
 end.

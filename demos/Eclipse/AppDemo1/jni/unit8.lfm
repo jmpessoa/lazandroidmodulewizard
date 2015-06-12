@@ -54,7 +54,7 @@ object AndroidModule8: TAndroidModule8
     LayoutParamHeight = lpWrapContent
     Text = 'Save Image'
     BackgroundColor = colbrDefault
-    FontColor = colbrOrangeRed
+    FontColor = colbrMediumSpringGreen
     FontSize = 0
     OnClick = jButton1Click
     Id = 0

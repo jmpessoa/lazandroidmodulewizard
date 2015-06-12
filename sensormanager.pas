@@ -383,6 +383,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jsensormanager);
   jMethod:= env^.GetMethodID(env, jCls, 'jFree', '()V');
   env^.CallVoidMethod(env, _jsensormanager, jMethod);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -402,6 +403,7 @@ begin
     SetLength(Result, resultsize);
     env^.GetIntArrayRegion(env, jResultArray, 0, resultSize, @Result[0] {target});
   end;
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -434,6 +436,7 @@ begin
       end;
     end;
   end;
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -447,6 +450,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jsensormanager);
   jMethod:= env^.GetMethodID(env, jCls, 'RegisterListeningSensor', '(I)V');
   env^.CallVoidMethodA(env, _jsensormanager, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -461,6 +465,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jsensormanager);
   jMethod:= env^.GetMethodID(env, jCls, 'RegisterListeningSensor', '(II)V');
   env^.CallVoidMethodA(env, _jsensormanager, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -472,6 +477,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jsensormanager);
   jMethod:= env^.GetMethodID(env, jCls, 'StopListeningAll', '()V');
   env^.CallVoidMethod(env, _jsensormanager, jMethod);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -487,6 +493,7 @@ begin
   jMethod:= env^.GetMethodID(env, jCls, 'SensorExists', '(I)Z');
   jBoo:= env^.CallBooleanMethodA(env, _jsensormanager, jMethod, @jParams);
   Result:= boolean(jBoo);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -521,6 +528,7 @@ begin
       end;
     end;
   end;
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -534,6 +542,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jsensormanager);
   jMethod:= env^.GetMethodID(env, jCls, 'GetSensor', '(I)Landroid/hardware/Sensor;');
   Result:= env^.CallObjectMethodA(env, _jsensormanager, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -547,6 +556,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jsensormanager);
   jMethod:= env^.GetMethodID(env, jCls, 'GetSensorMaximumRange', '(Landroid/hardware/Sensor;)F');
   Result:= env^.CallFloatMethodA(env, _jsensormanager, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -569,6 +579,7 @@ begin
               Result:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
             end;
   end;
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -582,6 +593,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jsensormanager);
   jMethod:= env^.GetMethodID(env, jCls, 'GetSensorMinDelay', '(Landroid/hardware/Sensor;)I');
   Result:= env^.CallIntMethodA(env, _jsensormanager, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -604,6 +616,7 @@ begin
               Result:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
             end;
   end;
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -617,6 +630,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jsensormanager);
   jMethod:= env^.GetMethodID(env, jCls, 'GetSensorType', '(Landroid/hardware/Sensor;)I');
   Result:= env^.CallIntMethodA(env, _jsensormanager, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -630,6 +644,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jsensormanager);
   jMethod:= env^.GetMethodID(env, jCls, 'UnregisterListenerSensor', '(Landroid/hardware/Sensor;)V');
   env^.CallVoidMethodA(env, _jsensormanager, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 function jSensorManager_GetGravityEarth(env: PJNIEnv; _jsensormanager: JObject): single;
@@ -640,6 +655,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jsensormanager);
   jMethod:= env^.GetMethodID(env, jCls, 'GetGravityEarth', '()F');
   Result:= env^.CallFloatMethod(env, _jsensormanager, jMethod);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 function jSensorManager_GetAltitude(env: PJNIEnv; _jsensormanager: JObject; _localPressure: single): single;
@@ -652,6 +668,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jsensormanager);
   jMethod:= env^.GetMethodID(env, jCls, 'GetAltitude', '(F)F');
   Result:= env^.CallFloatMethodA(env, _jsensormanager, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -666,6 +683,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jsensormanager);
   jMethod:= env^.GetMethodID(env, jCls, 'GetAltitude', '(FF)F');
   Result:= env^.CallFloatMethodA(env, _jsensormanager, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 function jSensorManager_GetSensorPower(env: PJNIEnv; _jsensormanager: JObject; _sensor: jObject): single;
@@ -678,6 +696,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jsensormanager);
   jMethod:= env^.GetMethodID(env, jCls, 'GetSensorPower', '(Landroid/hardware/Sensor;)F');
   Result:= env^.CallFloatMethodA(env, _jsensormanager, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 function jSensorManager_GetSensorResolution(env: PJNIEnv; _jsensormanager: JObject; _sensor: jObject): single;
@@ -690,6 +709,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jsensormanager);
   jMethod:= env^.GetMethodID(env, jCls, 'GetSensorResolution', '(Landroid/hardware/Sensor;)F');
   Result:= env^.CallFloatMethodA(env, _jsensormanager, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 procedure jSensorManager_RegisterListeningSensor(env: PJNIEnv; _jsensormanager: JObject; _sensor: jObject);
@@ -702,6 +722,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jsensormanager);
   jMethod:= env^.GetMethodID(env, jCls, 'RegisterListeningSensor', '(Landroid/hardware/Sensor;)V');
   env^.CallVoidMethodA(env, _jsensormanager, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 procedure jSensorManager_RegisterListeningSensor(env: PJNIEnv; _jsensormanager: JObject; _sensor: jObject; _delayType: integer);
@@ -715,6 +736,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jsensormanager);
   jMethod:= env^.GetMethodID(env, jCls, 'RegisterListeningSensor', '(Landroid/hardware/Sensor;I)V');
   env^.CallVoidMethodA(env, _jsensormanager, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 function jSensorManager_GetSensor(env: PJNIEnv; _jsensormanager: JObject; _sensorName: string): jObject;
@@ -728,6 +750,7 @@ begin
   jMethod:= env^.GetMethodID(env, jCls, 'GetSensor', '(Ljava/lang/String;)Landroid/hardware/Sensor;');
   Result:= env^.CallObjectMethodA(env, _jsensormanager, jMethod, @jParams);
   env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 end.

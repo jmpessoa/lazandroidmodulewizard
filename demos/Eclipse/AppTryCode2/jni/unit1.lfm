@@ -10,12 +10,12 @@ object AndroidModule1: TAndroidModule1
   OnCreate = DataModuleCreate
   Text = 'AndroidModule1'
   ActivityMode = actMain
-  BackgroundColor = colbrBlack
+  BackgroundColor = colbrDefault
   object jTextView1: jTextView
-    Left = 88
-    Top = 16
-    Width = 136
-    Height = 40
+    Left = 93
+    Top = 10
+    Width = 114
+    Height = 20
     MarginLeft = 10
     MarginTop = 10
     MarginRight = 10
@@ -35,9 +35,9 @@ object AndroidModule1: TAndroidModule1
     Id = 2120193
   end
   object jButton1: jButton
-    Left = 8
-    Top = 64
-    Width = 280
+    Left = 5
+    Top = 45
+    Width = 290
     Height = 40
     MarginLeft = 5
     MarginTop = 5
@@ -57,9 +57,9 @@ object AndroidModule1: TAndroidModule1
     Id = 5794927
   end
   object jButton2: jButton
-    Left = 8
-    Top = 120
-    Width = 280
+    Left = 5
+    Top = 95
+    Width = 290
     Height = 40
     MarginLeft = 5
     MarginTop = 5
@@ -79,9 +79,9 @@ object AndroidModule1: TAndroidModule1
     Id = 1706367
   end
   object jButton3: jButton
-    Left = 8
-    Top = 168
-    Width = 280
+    Left = 5
+    Top = 145
+    Width = 290
     Height = 40
     MarginLeft = 5
     MarginTop = 5
@@ -101,9 +101,9 @@ object AndroidModule1: TAndroidModule1
     Id = 1646716
   end
   object jButton4: jButton
-    Left = 8
-    Top = 224
-    Width = 280
+    Left = 2
+    Top = 194
+    Width = 296
     Height = 40
     MarginLeft = 2
     MarginTop = 4
@@ -120,10 +120,34 @@ object AndroidModule1: TAndroidModule1
     FontColor = colbrDefault
     FontSize = 0
     OnClick = jButton4Click
+    Id = 5979351
+  end
+  object jSurfaceView1: jSurfaceView
+    Tag = 1
+    Left = 8
+    Top = 256
+    Width = 288
+    Height = 288
+    MarginLeft = 10
+    MarginTop = 10
+    MarginRight = 10
+    MarginBottom = 10
+    Visible = True
+    Anchor = jButton4
+    PosRelativeToAnchor = [raBelow]
+    PosRelativeToParent = [rpCenterHorizontal]
+    LayoutParamWidth = lpMatchParent
+    LayoutParamHeight = lpWrapContent
+    BackgroundColor = colbrDefault
+    PaintColor = colbrRed
+    OnSurfaceCreated = jSurfaceView1SurfaceCreated
+    OnSurfaceDraw = jSurfaceView1SurfaceDraw
     Id = 0
   end
   object jMediaPlayer1: jMediaPlayer
-    left = 32
-    top = 8
+    OnPrepared = jMediaPlayer1Prepared
+    OnCompletion = jMediaPlayer1Completion
+    left = 128
+    top = 328
   end
 end

@@ -246,6 +246,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jbluetoothserversocket);
   jMethod:= env^.GetMethodID(env, jCls, 'handleMessage', '(Landroid/os/Message;)V');
   env^.CallVoidMethodA(env, _jbluetoothserversocket, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -281,6 +282,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jbluetoothserversocket);
   jMethod:= env^.GetMethodID(env, jCls, 'jFree', '()V');
   env^.CallVoidMethod(env, _jbluetoothserversocket, jMethod);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -294,7 +296,8 @@ begin
   jCls:= env^.GetObjectClass(env, _jbluetoothserversocket);
   jMethod:= env^.GetMethodID(env, jCls, 'SetUUID', '(Ljava/lang/String;)V');
   env^.CallVoidMethodA(env, _jbluetoothserversocket, jMethod, @jParams);
-env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 procedure jBluetoothServerSocket_Listen(env: PJNIEnv; _jbluetoothserversocket: JObject);
@@ -305,6 +308,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jbluetoothserversocket);
   jMethod:= env^.GetMethodID(env, jCls, 'Listen', '()V');
   env^.CallVoidMethod(env, _jbluetoothserversocket, jMethod);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 procedure jBluetoothServerSocket_WriteMessage(env: PJNIEnv; _jbluetoothserversocket: JObject; _message: string);
@@ -317,7 +321,8 @@ begin
   jCls:= env^.GetObjectClass(env, _jbluetoothserversocket);
   jMethod:= env^.GetMethodID(env, jCls, 'WriteMessage', '(Ljava/lang/String;)V');
   env^.CallVoidMethodA(env, _jbluetoothserversocket, jMethod, @jParams);
-env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 procedure jBluetoothServerSocket_Write(env: PJNIEnv; _jbluetoothserversocket: JObject; var _buffer: TDynArrayOfJByte);
@@ -335,7 +340,8 @@ begin
   jCls:= env^.GetObjectClass(env, _jbluetoothserversocket);
   jMethod:= env^.GetMethodID(env, jCls, 'Write', '([B)V');
   env^.CallVoidMethodA(env, _jbluetoothserversocket, jMethod, @jParams);
-env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 procedure jBluetoothServerSocket_CloseServerSocket(env: PJNIEnv; _jbluetoothserversocket: JObject);
@@ -346,6 +352,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jbluetoothserversocket);
   jMethod:= env^.GetMethodID(env, jCls, 'CloseServerSocket', '()V');
   env^.CallVoidMethod(env, _jbluetoothserversocket, jMethod);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 procedure jBluetoothServerSocket_Disconnect(env: PJNIEnv; _jbluetoothserversocket: JObject);
@@ -356,6 +363,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jbluetoothserversocket);
   jMethod:= env^.GetMethodID(env, jCls, 'Disconnect', '()V');
   env^.CallVoidMethod(env, _jbluetoothserversocket, jMethod);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 function jBluetoothServerSocket_IsConnected(env: PJNIEnv; _jbluetoothserversocket: JObject): boolean;
@@ -368,6 +376,7 @@ begin
   jMethod:= env^.GetMethodID(env, jCls, 'IsConnected', '()Z');
   jBoo:= env^.CallBooleanMethod(env, _jbluetoothserversocket, jMethod);
   Result:= boolean(jBoo);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 procedure jBluetoothServerSocket_StopListen(env: PJNIEnv; _jbluetoothserversocket: JObject);
@@ -378,6 +387,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jbluetoothserversocket);
   jMethod:= env^.GetMethodID(env, jCls, 'StopListen', '()V');
   env^.CallVoidMethod(env, _jbluetoothserversocket, jMethod);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -391,6 +401,7 @@ begin
   jMethod:= env^.GetMethodID(env, jCls, 'IsListen', '()Z');
   jBoo:= env^.CallBooleanMethod(env, _jbluetoothserversocket, jMethod);
   Result:= boolean(jBoo);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 procedure jBluetoothServerSocket_SetAccept(env: PJNIEnv; _jbluetoothserversocket: JObject; _accept: boolean);
@@ -403,6 +414,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jbluetoothserversocket);
   jMethod:= env^.GetMethodID(env, jCls, 'SetAccept', '(Z)V');
   env^.CallVoidMethodA(env, _jbluetoothserversocket, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 function jBluetoothServerSocket_Read(env: PJNIEnv; _jbluetoothserversocket: JObject): TDynArrayOfJByte;
@@ -421,6 +433,7 @@ begin
     SetLength(Result, resultsize);
     env^.GetByteArrayRegion(env, jResultArray, 0, resultSize, @Result[0] {target});
   end;
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 

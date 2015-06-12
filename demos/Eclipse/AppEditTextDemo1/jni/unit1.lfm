@@ -83,7 +83,7 @@ object AndroidModule1: TAndroidModule1
     PosRelativeToParent = []
     LayoutParamWidth = lpMatchParent
     LayoutParamHeight = lpWrapContent
-    Text = 'jButton1'
+    Text = 'Read Text From [assets] File '
     BackgroundColor = colbrDefault
     FontColor = colbrDefault
     FontSize = 0

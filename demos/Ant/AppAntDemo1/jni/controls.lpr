@@ -1,5 +1,5 @@
 {hint: save all files to location: C:\adt32\ant\workspace\AppAntDemo1\jni}
-library controls;  //[by LazAndroidWizard: 1/11/2015 18:00:03]
+library controls;  //by Lamw: Lazarus Android Module Wizard: 6/9/2015 22:00:04]
  
 {$mode delphi}
  
@@ -224,11 +224,35 @@ begin
 end;
 
 { Class:     org_lazarus_appantdemo1_Controls
-  Method:    pOnAsyncEvent
-  Signature: (JII)V }
-procedure pOnAsyncEvent(PEnv: PJNIEnv; this: JObject; pasobj: JLong; EventType: JInt; progress: JInt); cdecl;
+  Method:    pOnAsyncEventDoInBackground
+  Signature: (JI)Z }
+function pOnAsyncEventDoInBackground(PEnv: PJNIEnv; this: JObject; pasobj: JLong; progress: JInt): JBoolean; cdecl;
 begin
-  Java_Event_pOnAsyncEvent(PEnv,this,TObject(pasobj),EventType,progress);
+  Result:=Java_Event_pOnAsyncEventDoInBackground(PEnv,this,TObject(pasobj),progress);
+end;
+
+{ Class:     org_lazarus_appantdemo1_Controls
+  Method:    pOnAsyncEventProgressUpdate
+  Signature: (JI)I }
+function pOnAsyncEventProgressUpdate(PEnv: PJNIEnv; this: JObject; pasobj: JLong; progress: JInt): JInt; cdecl;
+begin
+  Result:=Java_Event_pOnAsyncEventProgressUpdate(PEnv,this,TObject(pasobj),progress);
+end;
+
+{ Class:     org_lazarus_appantdemo1_Controls
+  Method:    pOnAsyncEventPreExecute
+  Signature: (J)I }
+function pOnAsyncEventPreExecute(PEnv: PJNIEnv; this: JObject; pasobj: JLong): JInt; cdecl;
+begin
+  Result:=Java_Event_pOnAsyncEventPreExecute(PEnv,this,TObject(pasobj));
+end;
+
+{ Class:     org_lazarus_appantdemo1_Controls
+  Method:    pOnAsyncEventPostExecute
+  Signature: (JI)V }
+procedure pOnAsyncEventPostExecute(PEnv: PJNIEnv; this: JObject; pasobj: JLong; progress: JInt); cdecl;
+begin
+  Java_Event_pOnAsyncEventPostExecute(PEnv,this,TObject(pasobj),progress);
 end;
 
 { Class:     org_lazarus_appantdemo1_Controls
@@ -455,7 +479,191 @@ begin
   Java_Event_pOnClickGridItem(PEnv,this,TObject(pasobj),position,caption);
 end;
 
-const NativeMethods:array[0..55] of JNINativeMethod = (
+{ Class:     org_lazarus_appantdemo1_Controls
+  Method:    pOnChangedSensor
+  Signature: (JLandroid/hardware/Sensor;I[FJ)V }
+procedure pOnChangedSensor(PEnv: PJNIEnv; this: JObject; pasobj: JLong; sensor: JObject; sensorType: JInt; values: JFloatArray; timestamp: JLong); cdecl;
+begin
+  Java_Event_pOnChangedSensor(PEnv,this,TObject(pasobj),sensor,sensorType,values,timestamp);
+end;
+
+{ Class:     org_lazarus_appantdemo1_Controls
+  Method:    pOnListeningSensor
+  Signature: (JLandroid/hardware/Sensor;I)V }
+procedure pOnListeningSensor(PEnv: PJNIEnv; this: JObject; pasobj: JLong; sensor: JObject; sensorType: JInt); cdecl;
+begin
+  Java_Event_pOnListeningSensor(PEnv,this,TObject(pasobj),sensor,sensorType);
+end;
+
+{ Class:     org_lazarus_appantdemo1_Controls
+  Method:    pOnUnregisterListeningSensor
+  Signature: (JILjava/lang/String;)V }
+procedure pOnUnregisterListeningSensor(PEnv: PJNIEnv; this: JObject; pasobj: JLong; sensorType: JInt; sensorName: JString); cdecl;
+begin
+  Java_Event_pOnUnregisterListeningSensor(PEnv,this,TObject(pasobj),sensorType,sensorName);
+end;
+
+{ Class:     org_lazarus_appantdemo1_Controls
+  Method:    pOnBroadcastReceiver
+  Signature: (JLandroid/content/Intent;)V }
+procedure pOnBroadcastReceiver(PEnv: PJNIEnv; this: JObject; pasobj: JLong; intent: JObject); cdecl;
+begin
+  Java_Event_pOnBroadcastReceiver(PEnv,this,TObject(pasobj),intent);
+end;
+
+{ Class:     org_lazarus_appantdemo1_Controls
+  Method:    pOnTimePicker
+  Signature: (JII)V }
+procedure pOnTimePicker(PEnv: PJNIEnv; this: JObject; pasobj: JLong; hourOfDay: JInt; minute: JInt); cdecl;
+begin
+  Java_Event_pOnTimePicker(PEnv,this,TObject(pasobj),hourOfDay,minute);
+end;
+
+{ Class:     org_lazarus_appantdemo1_Controls
+  Method:    pOnDatePicker
+  Signature: (JIII)V }
+procedure pOnDatePicker(PEnv: PJNIEnv; this: JObject; pasobj: JLong; year: JInt; monthOfYear: JInt; dayOfMonth: JInt); cdecl;
+begin
+  Java_Event_pOnDatePicker(PEnv,this,TObject(pasobj),year,monthOfYear,dayOfMonth);
+end;
+
+{ Class:     org_lazarus_appantdemo1_Controls
+  Method:    pOnFlingGestureDetected
+  Signature: (JI)V }
+procedure pOnFlingGestureDetected(PEnv: PJNIEnv; this: JObject; pasobj: JLong; direction: JInt); cdecl;
+begin
+  Java_Event_pOnFlingGestureDetected(PEnv,this,TObject(pasobj),direction);
+end;
+
+{ Class:     org_lazarus_appantdemo1_Controls
+  Method:    pOnPinchZoomGestureDetected
+  Signature: (JFI)V }
+procedure pOnPinchZoomGestureDetected(PEnv: PJNIEnv; this: JObject; pasobj: JLong; scaleFactor: JFloat; state: JInt); cdecl;
+begin
+  Java_Event_pOnPinchZoomGestureDetected(PEnv,this,TObject(pasobj),scaleFactor,state);
+end;
+
+{ Class:     org_lazarus_appantdemo1_Controls
+  Method:    pOnShellCommandExecuted
+  Signature: (JLjava/lang/String;)V }
+procedure pOnShellCommandExecuted(PEnv: PJNIEnv; this: JObject; pasobj: JLong; cmdResult: JString); cdecl;
+begin
+  Java_Event_pOnShellCommandExecuted(PEnv,this,TObject(pasobj),cmdResult);
+end;
+
+{ Class:     org_lazarus_appantdemo1_Controls
+  Method:    pOnTCPSocketClientMessageReceived
+  Signature: (J[Ljava/lang/String;)V }
+procedure pOnTCPSocketClientMessageReceived(PEnv: PJNIEnv; this: JObject; pasobj: JLong; messagesReceived: jObjectArray); cdecl;
+begin
+  Java_Event_pOnTCPSocketClientMessageReceived(PEnv,this,TObject(pasobj),messagesReceived);
+end;
+
+{ Class:     org_lazarus_appantdemo1_Controls
+  Method:    pOnTCPSocketClientConnected
+  Signature: (J)V }
+procedure pOnTCPSocketClientConnected(PEnv: PJNIEnv; this: JObject; pasobj: JLong); cdecl;
+begin
+  Java_Event_pOnTCPSocketClientConnected(PEnv,this,TObject(pasobj));
+end;
+
+{ Class:     org_lazarus_appantdemo1_Controls
+  Method:    pOnHttpClientContentResult
+  Signature: (JLjava/lang/String;)V }
+procedure pOnHttpClientContentResult(PEnv: PJNIEnv; this: JObject; pasobj: JLong; content: JString); cdecl;
+begin
+  Java_Event_pOnHttpClientContentResult(PEnv,this,TObject(pasobj),content);
+end;
+
+{ Class:     org_lazarus_appantdemo1_Controls
+  Method:    pOnHttpClientCodeResult
+  Signature: (JI)V }
+procedure pOnHttpClientCodeResult(PEnv: PJNIEnv; this: JObject; pasobj: JLong; code: JInt); cdecl;
+begin
+  Java_Event_pOnHttpClientCodeResult(PEnv,this,TObject(pasobj),code);
+end;
+
+{ Class:     org_lazarus_appantdemo1_Controls
+  Method:    pOnSurfaceViewCreated
+  Signature: (JLandroid/view/SurfaceHolder;)V }
+procedure pOnSurfaceViewCreated(PEnv: PJNIEnv; this: JObject; pasobj: JLong; surfaceHolder: JObject); cdecl;
+begin
+  Java_Event_pOnSurfaceViewCreated(PEnv,this,TObject(pasobj),surfaceHolder);
+end;
+
+{ Class:     org_lazarus_appantdemo1_Controls
+  Method:    pOnSurfaceViewDraw
+  Signature: (JLandroid/graphics/Canvas;)V }
+procedure pOnSurfaceViewDraw(PEnv: PJNIEnv; this: JObject; pasobj: JLong; canvas: JObject); cdecl;
+begin
+  Java_Event_pOnSurfaceViewDraw(PEnv,this,TObject(pasobj),canvas);
+end;
+
+{ Class:     org_lazarus_appantdemo1_Controls
+  Method:    pOnSurfaceViewChanged
+  Signature: (JII)V }
+procedure pOnSurfaceViewChanged(PEnv: PJNIEnv; this: JObject; pasobj: JLong; width: JInt; height: JInt); cdecl;
+begin
+  Java_Event_pOnSurfaceViewChanged(PEnv,this,TObject(pasobj),width,height);                                             
+end;
+
+{ Class:     org_lazarus_appantdemo1_Controls
+  Method:    pOnMediaPlayerPrepared
+  Signature: (JII)V }
+procedure pOnMediaPlayerPrepared(PEnv: PJNIEnv; this: JObject; pasobj: JLong; videoWidth: JInt; videoHeigh: JInt); cdecl;
+begin
+  Java_Event_pOnMediaPlayerPrepared(PEnv,this,TObject(pasobj),videoWidth,videoHeigh);
+end;
+
+{ Class:     org_lazarus_appantdemo1_Controls
+  Method:    pOnMediaPlayerVideoSizeChanged
+  Signature: (JII)V }
+procedure pOnMediaPlayerVideoSizeChanged(PEnv: PJNIEnv; this: JObject; pasobj: JLong; videoWidth: JInt; videoHeight: JInt); cdecl;
+begin
+  Java_Event_pOnMediaPlayerVideoSizeChanged(PEnv,this,TObject(pasobj),videoWidth,videoHeight);
+end;
+
+{ Class:     org_lazarus_appantdemo1_Controls
+  Method:    pOnMediaPlayerCompletion
+  Signature: (J)V }
+procedure pOnMediaPlayerCompletion(PEnv: PJNIEnv; this: JObject; pasobj: JLong); cdecl;
+begin
+  Java_Event_pOnMediaPlayerCompletion(PEnv,this,TObject(pasobj));
+end;
+
+{ Class:     org_lazarus_appantdemo1_Controls
+  Method:    pOnMediaPlayerTimedText
+  Signature: (JLjava/lang/String;)V }
+procedure pOnMediaPlayerTimedText(PEnv: PJNIEnv; this: JObject; pasobj: JLong; timedText: JString); cdecl;
+begin
+  Java_Event_pOnMediaPlayerTimedText(PEnv,this,TObject(pasobj),timedText);
+end;
+
+{ Class:     org_lazarus_appantdemo1_Controls
+  Method:    pOnSurfaceViewTouch
+  Signature: (JIIFFFF)V }
+procedure pOnSurfaceViewTouch(PEnv: PJNIEnv; this: JObject; pasobj: JLong; act: JInt; cnt: JInt; x1: JFloat; y1: JFloat; x2: JFloat; y2: JFloat); cdecl;
+begin
+  Java_Event_pOnSurfaceViewTouch(PEnv,this,TObject(pasobj),act,cnt,x1,y1,x2,y2);
+end;
+
+{ Class:     org_lazarus_appantdemo1_Controls
+  Method:    pOnSurfaceViewDrawingInBackground
+  Signature: (JF)Z }
+function pOnSurfaceViewDrawingInBackground(PEnv: PJNIEnv; this: JObject; pasobj: JLong; progress: JFloat): JBoolean; cdecl;
+begin
+  Result:=Java_Event_pOnSurfaceViewDrawingInBackground(PEnv,this,TObject(pasobj),progress);
+end;
+
+{ Class:     org_lazarus_appantdemo1_Controls
+  Method:    pOnSurfaceViewDrawingPostExecute
+  Signature: (JF)V }
+procedure pOnSurfaceViewDrawingPostExecute(PEnv: PJNIEnv; this: JObject; pasobj: JLong; progress: JFloat); cdecl;
+begin
+  Java_Event_pOnSurfaceViewDrawingPostExecute(PEnv,this,TObject(pasobj),progress);
+end;
+
+const NativeMethods:array[0..81] of JNINativeMethod = (
    (name:'pAppOnScreenStyle';
     signature:'()I';
     fnPtr:@pAppOnScreenStyle;),
@@ -537,9 +745,18 @@ const NativeMethods:array[0..55] of JNINativeMethod = (
    (name:'pOnWebViewStatus';
     signature:'(JILjava/lang/String;)I';
     fnPtr:@pOnWebViewStatus;),
-   (name:'pOnAsyncEvent';
-    signature:'(JII)V';
-    fnPtr:@pOnAsyncEvent;),
+   (name:'pOnAsyncEventDoInBackground';
+    signature:'(JI)Z';
+    fnPtr:@pOnAsyncEventDoInBackground;),
+   (name:'pOnAsyncEventProgressUpdate';
+    signature:'(JI)I';
+    fnPtr:@pOnAsyncEventProgressUpdate;),
+   (name:'pOnAsyncEventPreExecute';
+    signature:'(J)I';
+    fnPtr:@pOnAsyncEventPreExecute;),
+   (name:'pOnAsyncEventPostExecute';
+    signature:'(JI)V';
+    fnPtr:@pOnAsyncEventPostExecute;),
    (name:'pOnClickWidgetItem';
     signature:'(JIZ)V';
     fnPtr:@pOnClickWidgetItem;),
@@ -623,7 +840,76 @@ const NativeMethods:array[0..55] of JNINativeMethod = (
     fnPtr:@pOnChangeSwitchButton;),
    (name:'pOnClickGridItem';
     signature:'(JILjava/lang/String;)V';
-    fnPtr:@pOnClickGridItem;)
+    fnPtr:@pOnClickGridItem;),
+   (name:'pOnChangedSensor';
+    signature:'(JLandroid/hardware/Sensor;I[FJ)V';
+    fnPtr:@pOnChangedSensor;),
+   (name:'pOnListeningSensor';
+    signature:'(JLandroid/hardware/Sensor;I)V';
+    fnPtr:@pOnListeningSensor;),
+   (name:'pOnUnregisterListeningSensor';
+    signature:'(JILjava/lang/String;)V';
+    fnPtr:@pOnUnregisterListeningSensor;),
+   (name:'pOnBroadcastReceiver';
+    signature:'(JLandroid/content/Intent;)V';
+    fnPtr:@pOnBroadcastReceiver;),
+   (name:'pOnTimePicker';
+    signature:'(JII)V';
+    fnPtr:@pOnTimePicker;),
+   (name:'pOnDatePicker';
+    signature:'(JIII)V';
+    fnPtr:@pOnDatePicker;),
+   (name:'pOnFlingGestureDetected';
+    signature:'(JI)V';
+    fnPtr:@pOnFlingGestureDetected;),
+   (name:'pOnPinchZoomGestureDetected';
+    signature:'(JFI)V';
+    fnPtr:@pOnPinchZoomGestureDetected;),
+   (name:'pOnShellCommandExecuted';
+    signature:'(JLjava/lang/String;)V';
+    fnPtr:@pOnShellCommandExecuted;),
+   (name:'pOnTCPSocketClientMessageReceived';
+    signature:'(J[Ljava/lang/String;)V';
+    fnPtr:@pOnTCPSocketClientMessageReceived;),
+   (name:'pOnTCPSocketClientConnected';
+    signature:'(J)V';
+    fnPtr:@pOnTCPSocketClientConnected;),
+   (name:'pOnHttpClientContentResult';
+    signature:'(JLjava/lang/String;)V';
+    fnPtr:@pOnHttpClientContentResult;),
+   (name:'pOnHttpClientCodeResult';
+    signature:'(JI)V';
+    fnPtr:@pOnHttpClientCodeResult;),
+   (name:'pOnSurfaceViewCreated';
+    signature:'(JLandroid/view/SurfaceHolder;)V';
+    fnPtr:@pOnSurfaceViewCreated;),
+   (name:'pOnSurfaceViewDraw';
+    signature:'(JLandroid/graphics/Canvas;)V';
+    fnPtr:@pOnSurfaceViewDraw;),
+   (name:'pOnSurfaceViewChanged';
+    signature:'(JII)V';
+    fnPtr:@pOnSurfaceViewChanged;),
+   (name:'pOnMediaPlayerPrepared';
+    signature:'(JII)V';
+    fnPtr:@pOnMediaPlayerPrepared;),
+   (name:'pOnMediaPlayerVideoSizeChanged';
+    signature:'(JII)V';
+    fnPtr:@pOnMediaPlayerVideoSizeChanged;),
+   (name:'pOnMediaPlayerCompletion';
+    signature:'(J)V';
+    fnPtr:@pOnMediaPlayerCompletion;),
+   (name:'pOnMediaPlayerTimedText';
+    signature:'(JLjava/lang/String;)V';
+    fnPtr:@pOnMediaPlayerTimedText;),
+   (name:'pOnSurfaceViewTouch';
+    signature:'(JIIFFFF)V';
+    fnPtr:@pOnSurfaceViewTouch;),
+   (name:'pOnSurfaceViewDrawingInBackground';
+    signature:'(JF)Z';
+    fnPtr:@pOnSurfaceViewDrawingInBackground;),
+   (name:'pOnSurfaceViewDrawingPostExecute';
+    signature:'(JF)V';
+    fnPtr:@pOnSurfaceViewDrawingPostExecute;)
 );
 
 function RegisterNativeMethodsArray(PEnv: PJNIEnv; className: PChar; methods: PJNINativeMethod; countMethods:integer):integer;
@@ -706,7 +992,10 @@ exports
   pOnGLRenderer name 'Java_org_lazarus_appantdemo1_Controls_pOnGLRenderer',
   pOnClose name 'Java_org_lazarus_appantdemo1_Controls_pOnClose',
   pOnWebViewStatus name 'Java_org_lazarus_appantdemo1_Controls_pOnWebViewStatus',
-  pOnAsyncEvent name 'Java_org_lazarus_appantdemo1_Controls_pOnAsyncEvent',
+  pOnAsyncEventDoInBackground name 'Java_org_lazarus_appantdemo1_Controls_pOnAsyncEventDoInBackground',
+  pOnAsyncEventProgressUpdate name 'Java_org_lazarus_appantdemo1_Controls_pOnAsyncEventProgressUpdate',
+  pOnAsyncEventPreExecute name 'Java_org_lazarus_appantdemo1_Controls_pOnAsyncEventPreExecute',
+  pOnAsyncEventPostExecute name 'Java_org_lazarus_appantdemo1_Controls_pOnAsyncEventPostExecute',
   pOnClickWidgetItem name 'Java_org_lazarus_appantdemo1_Controls_pOnClickWidgetItem',
   pOnClickCaptionItem name 'Java_org_lazarus_appantdemo1_Controls_pOnClickCaptionItem',
   pOnBluetoothEnabled name 'Java_org_lazarus_appantdemo1_Controls_pOnBluetoothEnabled',
@@ -734,7 +1023,30 @@ exports
   pOnCustomDialogShow name 'Java_org_lazarus_appantdemo1_Controls_pOnCustomDialogShow',
   pOnClickToggleButton name 'Java_org_lazarus_appantdemo1_Controls_pOnClickToggleButton',
   pOnChangeSwitchButton name 'Java_org_lazarus_appantdemo1_Controls_pOnChangeSwitchButton',
-  pOnClickGridItem name 'Java_org_lazarus_appantdemo1_Controls_pOnClickGridItem';
+  pOnClickGridItem name 'Java_org_lazarus_appantdemo1_Controls_pOnClickGridItem',
+  pOnChangedSensor name 'Java_org_lazarus_appantdemo1_Controls_pOnChangedSensor',
+  pOnListeningSensor name 'Java_org_lazarus_appantdemo1_Controls_pOnListeningSensor',
+  pOnUnregisterListeningSensor name 'Java_org_lazarus_appantdemo1_Controls_pOnUnregisterListeningSensor',
+  pOnBroadcastReceiver name 'Java_org_lazarus_appantdemo1_Controls_pOnBroadcastReceiver',
+  pOnTimePicker name 'Java_org_lazarus_appantdemo1_Controls_pOnTimePicker',
+  pOnDatePicker name 'Java_org_lazarus_appantdemo1_Controls_pOnDatePicker',
+  pOnFlingGestureDetected name 'Java_org_lazarus_appantdemo1_Controls_pOnFlingGestureDetected',
+  pOnPinchZoomGestureDetected name 'Java_org_lazarus_appantdemo1_Controls_pOnPinchZoomGestureDetected',
+  pOnShellCommandExecuted name 'Java_org_lazarus_appantdemo1_Controls_pOnShellCommandExecuted',
+  pOnTCPSocketClientMessageReceived name 'Java_org_lazarus_appantdemo1_Controls_pOnTCPSocketClientMessageReceived',
+  pOnTCPSocketClientConnected name 'Java_org_lazarus_appantdemo1_Controls_pOnTCPSocketClientConnected',
+  pOnHttpClientContentResult name 'Java_org_lazarus_appantdemo1_Controls_pOnHttpClientContentResult',
+  pOnHttpClientCodeResult name 'Java_org_lazarus_appantdemo1_Controls_pOnHttpClientCodeResult',
+  pOnSurfaceViewCreated name 'Java_org_lazarus_appantdemo1_Controls_pOnSurfaceViewCreated',
+  pOnSurfaceViewDraw name 'Java_org_lazarus_appantdemo1_Controls_pOnSurfaceViewDraw',
+  pOnSurfaceViewChanged name 'Java_org_lazarus_appantdemo1_Controls_pOnSurfaceViewChanged',
+  pOnMediaPlayerPrepared name 'Java_org_lazarus_appantdemo1_Controls_pOnMediaPlayerPrepared',
+  pOnMediaPlayerVideoSizeChanged name 'Java_org_lazarus_appantdemo1_Controls_pOnMediaPlayerVideoSizeChanged',
+  pOnMediaPlayerCompletion name 'Java_org_lazarus_appantdemo1_Controls_pOnMediaPlayerCompletion',
+  pOnMediaPlayerTimedText name 'Java_org_lazarus_appantdemo1_Controls_pOnMediaPlayerTimedText',
+  pOnSurfaceViewTouch name 'Java_org_lazarus_appantdemo1_Controls_pOnSurfaceViewTouch',
+  pOnSurfaceViewDrawingInBackground name 'Java_org_lazarus_appantdemo1_Controls_pOnSurfaceViewDrawingInBackground',
+  pOnSurfaceViewDrawingPostExecute name 'Java_org_lazarus_appantdemo1_Controls_pOnSurfaceViewDrawingPostExecute';
 
 begin
   gApp:= jApp.Create(nil);{AndroidWidget.pas}

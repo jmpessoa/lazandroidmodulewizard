@@ -215,6 +215,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jmyhello);
   jMethod:= env^.GetMethodID(env, jCls, 'jFree', '()V');
   env^.CallVoidMethod(env, _jmyhello, jMethod);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 procedure jMyHello_SetFlag(env: PJNIEnv; _jmyhello: JObject; _flag: integer);
@@ -227,6 +228,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jmyhello);
   jMethod:= env^.GetMethodID(env, jCls, 'SetFlag', '(I)V');
   env^.CallVoidMethodA(env, _jmyhello, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 function jMyHello_GetFlag(env: PJNIEnv; _jmyhello: JObject): integer;
@@ -237,6 +239,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jmyhello);
   jMethod:= env^.GetMethodID(env, jCls, 'GetFlag', '()I');
   Result:= env^.CallIntMethod(env, _jmyhello, jMethod);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 procedure jMyHello_SetHello(env: PJNIEnv; _jmyhello: JObject; _hello: string);
@@ -250,6 +253,7 @@ begin
   jMethod:= env^.GetMethodID(env, jCls, 'SetHello', '(Ljava/lang/String;)V');
   env^.CallVoidMethodA(env, _jmyhello, jMethod, @jParams);
   env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 function jMyHello_GetHello(env: PJNIEnv; _jmyhello: JObject): string;
@@ -269,6 +273,7 @@ begin
               Result:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
             end;
   end;
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 function jMyHello_GetStringArray(env: PJNIEnv; _jmyhello: JObject): TDynArrayOfString;
@@ -300,6 +305,7 @@ begin
       end;
     end;
   end;
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 function jMyHello_ToUpperStringArray(env: PJNIEnv; _jmyhello: JObject; var _msgArray: TDynArrayOfString): TDynArrayOfString;
@@ -339,6 +345,7 @@ begin
     end;
   end;
   env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 function jMyHello_ConcatStringArray(env: PJNIEnv; _jmyhello: JObject; var _strArrayA: TDynArrayOfString; var _strArrayB: TDynArrayOfString): TDynArrayOfString;
@@ -388,6 +395,7 @@ begin
   end;
   env^.DeleteLocalRef(env,jParams[0].l);
   env^.DeleteLocalRef(env,jParams[1].l);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 function jMyHello_GetIntArray(env: PJNIEnv; _jmyhello: JObject): TDynArrayOfInteger;
@@ -403,6 +411,7 @@ begin
   resultsize:= env^.GetArrayLength(env, jresultArray);
   SetLength(Result, resultsize);
   env^.GetIntArrayRegion(env, jResultArray, 0, resultSize, @Result[0] {target});
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 function jMyHello_GetSumIntArray(env: PJNIEnv; _jmyhello: JObject; var _vA: TDynArrayOfInteger; var _vB: TDynArrayOfInteger; _size: integer): TDynArrayOfInteger;
@@ -434,6 +443,7 @@ begin
   env^.GetIntArrayRegion(env, jResultArray, 0, resultSize, @Result[0] {target});
   env^.DeleteLocalRef(env,jParams[0].l);
   env^.DeleteLocalRef(env,jParams[1].l);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 procedure jMyHello_ShowHello(env: PJNIEnv; _jmyhello: JObject);
@@ -444,6 +454,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jmyhello);
   jMethod:= env^.GetMethodID(env, jCls, 'ShowHello', '()V');
   env^.CallVoidMethod(env, _jmyhello, jMethod);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 end.

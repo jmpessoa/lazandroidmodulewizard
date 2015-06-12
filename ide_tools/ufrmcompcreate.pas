@@ -859,7 +859,12 @@ begin
     listPascal.Add('    if FParent is jScrollView then');
     listPascal.Add('    begin');
     listPascal.Add('      jScrollView(FParent).Init(refApp);');
-    listPascal.Add('      FjPRLayout:= jScrollView(FParent).View;');
+    listPascal.Add('      FjPRLayout:= jScrollView_getView(FjEnv, jScrollView(FParent).jSelf);');
+    listPascal.Add('    end;');
+    listPascal.Add('    if FParent is jHorizontalScrollView then');
+    listPascal.Add('    begin');
+    listPascal.Add('      jHorizontalScrollView(FParent).Init(refApp);');
+    listPascal.Add('      FjPRLayout:= jHorizontalScrollView_getView(FjEnv, jHorizontalScrollView(FParent).jSelf);');
     listPascal.Add('    end;');
     listPascal.Add('    if FParent is jCustomDialog then');
     listPascal.Add('    begin');
@@ -1741,6 +1746,9 @@ begin
 
   if listDeleteLocalRef.Text <> '' then
      strList.Add(Trim(listDeleteLocalRef.Text));
+
+  if funcResult <> 'constructor' then
+     strList.Add('  env^.DeleteLocalRef(env, jCls);');
 
   strList.Add('end;');
 

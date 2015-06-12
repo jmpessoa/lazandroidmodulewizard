@@ -69,6 +69,7 @@ type va_list=pointer;
      jobject=pointer;
      jclass=jobject;
      jstring=jobject;
+     JStringArray=jobject;  //by jmpessoa
      jarray=jobject;
      jobjectArray=jarray;
      jbooleanArray=jarray;

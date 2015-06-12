@@ -54,7 +54,7 @@ procedure StartComponentCreate(Sender: TObject);
 begin
   // Call componente create expert
   FrmCompCreate:= TFrmCompCreate.Create(Application);
-  FrmCompCreate.ShowModal;
+  FrmCompCreate.Show;
      //ShowMessage('Component create assistencie...');	
 end;
 
