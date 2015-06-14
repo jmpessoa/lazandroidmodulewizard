@@ -2,7 +2,7 @@ package com.example.appmenudemo;
 
 //Lamw: Lazarus Android Module Wizard 
 //Form Designer and Components development model!
-//version 0.6 - revision 29 - 08 June - 2015
+//version 0.6 - revision 30 - 14 June - 2015
 //
 //https://github.com/jmpessoa/lazandroidmodulewizard
 //http://forum.lazarus.freepascal.org/index.php/topic,21919.270.html
@@ -902,6 +902,9 @@ public void SetTitleActionBar(String _title) {
     actionBar.setTitle(_title);    
 }
 
+
+//set a title and subtitle to the Action bar as shown in the code snippet.
+
 //set a title and subtitle to the Action bar as shown in the code snippet.
 public void SetSubTitleActionBar(String _subtitle) {
    ActionBar actionBar = this.controls.activity.getActionBar();    
@@ -1102,6 +1105,17 @@ public void TakeScreenshot(String _savePath, String _saveFileNameJPG) {
 	    // TODO Auto-generated catch block
 	    e.printStackTrace();
 	}
+}
+
+
+public String GetTitleActionBar() {
+	ActionBar actionBar = this.controls.activity.getActionBar();   	
+    return (String)actionBar.getTitle();    
+}
+
+public String GetSubTitleActionBar() {
+	   ActionBar actionBar = this.controls.activity.getActionBar();    
+	   return (String)actionBar.getSubtitle();  
 }
 
 
@@ -7029,13 +7043,14 @@ class jMenu /*extends ...*/ {
   
     //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
   
-    public jMenu(Controls _ctrls, long _Self) { //Add more others news "_xxx" params if needed!
+    public jMenu (Controls _ctrls, long _Self) { //Add more others news "_xxx" params if needed!
        //super(_ctrls.activity);
        context   = _ctrls.activity;
        pascalObj = _Self;
        controls  = _ctrls;
        mMenu     = null;
-       mSubMenus = new SubMenu[9]; //max sub menus number = 10!
+       mSubMenus = new SubMenu[19]; //max sub menus number = 20!
+       mCountSubMenu = 0;
     }
   
     public void jFree() {
@@ -7043,9 +7058,11 @@ class jMenu /*extends ...*/ {
         if (mMenu != null){	
         	  for(int i=0; i < mCountSubMenu; i++){
         		 mSubMenus[i] = null;
-        	  }    	 
+        	  }    
+        	  mCountSubMenu = 0;
+        	  mMenu.clear();
         }
-    	mMenu = null;
+        
     }
   
     
@@ -7062,22 +7079,28 @@ class jMenu /*extends ...*/ {
      * Phones with menu keys display the action overflow when the user presses the key.
      */
     
-    public void Add(Menu _menu, int _itemID, String _caption){    	
-      _menu.add(0,_itemID,0 ,(CharSequence)_caption); //return MenuItem
-      if (mMenu == null) mMenu = _menu; 
+    public void Add(Menu _menu, int _itemID, String _caption){
+      if (_menu != null) {
+    	  mMenu = _menu;
+          _menu.add(0,_itemID,0 ,(CharSequence)_caption); //return MenuItem          
+      }
     }
         
     //TODO: ic_launcher.png just for test!
-    public void AddDrawable(Menu _menu, int _itemID, String _caption){    	     	
-       String _resName = "ic_launcher"; //ok       
-       MenuItem item = _menu.add(0,_itemID,0 ,(CharSequence)_caption);       
-       item.setIcon(GetDrawableResourceId(_resName));
-       if (mMenu == null) mMenu = _menu;
+    public void AddDrawable(Menu _menu, int _itemID, String _caption){
+       if (_menu != null) {	
+    	  mMenu = _menu;
+          String _resName = "ic_launcher"; //ok       
+          MenuItem item = _menu.add(0,_itemID,0 ,(CharSequence)_caption);       
+          item.setIcon(GetDrawableResourceId(_resName));          
+       }
     }
     
     public void AddCheckable(Menu _menu, int _itemID, String _caption){
-        _menu.add(0,_itemID,0 ,(CharSequence)_caption).setCheckable(true);
-        if (mMenu == null) mMenu = _menu;
+    	if (_menu != null) {
+    	  mMenu = _menu;	
+          _menu.add(0,_itemID,0 ,(CharSequence)_caption).setCheckable(true);          
+    	}
      }
     
     public void CheckItemCommute(MenuItem _item){
@@ -7102,28 +7125,34 @@ class jMenu /*extends ...*/ {
     
     public void AddSubMenu(Menu _menu, int _startItemID, String[] _captions){    	
     	int size = _captions.length;
-    	if (size > 1) {    		    	     	   
-    	   mSubMenus[mCountSubMenu] = _menu.addSubMenu((CharSequence)_captions[0]); //main title      	  
-     	   mSubMenus[mCountSubMenu].setHeaderIcon(R.drawable.ic_launcher);      	       	   
-    	   for(int i=1; i < size; i++) {    	
+    	if (_menu != null) {      	   	
+     	  if (size > 1) {
+     		 mMenu = _menu;
+    	     mSubMenus[mCountSubMenu] = _menu.addSubMenu((CharSequence)_captions[0]); //main title      	  
+     	     mSubMenus[mCountSubMenu].setHeaderIcon(R.drawable.ic_launcher);      	       	   
+    	     for(int i=1; i < size; i++) {    	
     		   MenuItem item = mSubMenus[mCountSubMenu].add(0,_startItemID+(i-1),0,(CharSequence)_captions[i]); //sub titles...    		       	    
-    	   }    	   
-    	   mCountSubMenu++;    	       	   
-    	}    	    	
+    	     }    	   
+    	     mCountSubMenu++;    	           	
+    	  }   
+    	}
     }
 
    //TODO: ic_launcher.png just for test!
-    public void AddCheckableSubMenu(Menu _menu, int _startItemID, String[] _captions){    	
+    public void AddCheckableSubMenu(Menu _menu, int _startItemID, String[] _captions){
+      if (_menu != null) {	    	
     	int size = _captions.length;
-    	if (size > 1) {    		
+    	if (size > 1) {    	
+    	   mMenu = _menu;	
     	   mSubMenus[mCountSubMenu] = _menu.addSubMenu((CharSequence)_captions[0]); //main title
     	   mSubMenus[mCountSubMenu].setHeaderIcon(R.drawable.ic_launcher);       	   
     	   //Log.i("jMenu_AddCheckableSubMenu", _captions[0]);
     	   for(int i=1; i < size; i++) {    	
     		  mSubMenus[mCountSubMenu].add(0,_startItemID+(i-1),0,(CharSequence)_captions[i]).setCheckable(true); //sub titles...
     	   }    	   
-    	   mCountSubMenu++;	   
+    	   mCountSubMenu++;    	   
     	}
+      }
     }
     
     public int Size(){
@@ -7158,9 +7187,11 @@ class jMenu /*extends ...*/ {
     
     public void UnCheckAllSubMenuItemByIndex(int _subMenuIndex){
        if (mMenu != null){	
-      	  for(int i=0; i < mSubMenus[_subMenuIndex].size(); i++){
-      		 mSubMenus[_subMenuIndex].getItem(i).setChecked(false);
-      	  }    	 
+    	  if  (_subMenuIndex < mCountSubMenu) {    		      	  
+      	    for(int i=0; i < mSubMenus[_subMenuIndex].size(); i++){
+      		   mSubMenus[_subMenuIndex].getItem(i).setChecked(false);
+      	    }
+    	 }
        } 	
     }
     
@@ -7193,46 +7224,165 @@ class jMenu /*extends ...*/ {
     }
     
     //_itemType --> 0:Default, 1:Checkable
-    public void AddItem(Menu _menu, int _itemID, String _caption, String _iconIdentifier, int _itemType, int _showAsAction){    	     	
-    	MenuItem item = _menu.add(0,_itemID,0 ,(CharSequence)_caption);
-    			
-    	switch  (_itemType) {
-    	case 1:  item.setCheckable(true); break;    	
-    	}
-    	
-        if (!_iconIdentifier.equals("")) {
-           item.setIcon(GetDrawableResourceId(_iconIdentifier));
-        }
-                      
-        switch (_showAsAction) {
-          case 0: item.setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER); break;
-          case 1: item.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM); break;
-          case 2: item.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS); break;
-          case 4: item.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM|MenuItem.SHOW_AS_ACTION_WITH_TEXT); 
-                  item.setTitleCondensed("ok0"); break;                    
-          case 5: item.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS|MenuItem.SHOW_AS_ACTION_WITH_TEXT);
-                  item.setTitleCondensed("ok1");break;
-        } 	
-        
-  	   if (mMenu == null) mMenu = _menu;
-  	   
+    public void AddItem(Menu _menu, int _itemID, String _caption, String _iconIdentifier, int _itemType, int _showAsAction){
+      if (_menu != null) {
+    	 mMenu = _menu;
+    	 MenuItem item = _menu.add(0,_itemID,0 ,(CharSequence)_caption);    			
+    	 switch  (_itemType) {
+    	    case 1:  item.setCheckable(true); break;    	
+    	 }    	
+         if (!_iconIdentifier.equals("")) {
+           item.setIcon(GetDrawableResourceId(_iconIdentifier)); 
+         }                     
+         switch (_showAsAction) {
+           case 0: item.setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER); break;
+           case 1: item.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM); break;
+           case 2: item.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS); break;
+           case 4: item.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM|MenuItem.SHOW_AS_ACTION_WITH_TEXT); 
+                  item.setTitleCondensed("."); break;                    
+           case 5: item.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS|MenuItem.SHOW_AS_ACTION_WITH_TEXT);
+                  item.setTitleCondensed(".");break;
+         } 	                	     
+      } 
      }
     
     ////Sub menus Items: Do not support item icons, or nested sub menus.    
     public void AddItem(SubMenu _subMenu, int _itemID, String _caption, int _itemType){    	     	        
         MenuItem item = _subMenu.add(0,_itemID,0 ,(CharSequence)_caption);        
     	switch  (_itemType) {
-    	case 1:  item.setCheckable(true); break;    	
+    	  case 1:  item.setCheckable(true); break;    	
     	}                            
      }
     
-    public SubMenu AddSubMenu(Menu _menu, String _title, String _headerIconIdentifier){  
-     	   SubMenu sm =_menu.addSubMenu((CharSequence)_title); //main title     	        	       	  
+    public SubMenu AddSubMenu(Menu _menu, String _title, String _headerIconIdentifier){
+    	SubMenu sm = null;
+    	if (_menu != null) {
+    	   mMenu = _menu;	
+     	   sm =_menu.addSubMenu((CharSequence)_title); //main title     	        	       	  
      	   sm.setHeaderIcon(GetDrawableResourceId(_headerIconIdentifier));
     	   mSubMenus[mCountSubMenu] = sm;      	       	     	       	       	   
-    	   mCountSubMenu++;    	   
-    	   return sm;  	    	
+    	   mCountSubMenu++; 
+    	}   
+    	return sm;  	    	
     }  
+    
+    //Request a call to onPrepareOptionsMenu so we can change the items   
+    public void InvalidateOptionsMenu() {
+    	controls.activity.invalidateOptionsMenu(); 
+    }
+    
+    
+    public void SetItemVisible(MenuItem _item, boolean _value){
+        _item.setVisible( _value);        
+    }
+    
+    public void SetItemVisible(Menu _menu, int _index, boolean _value){
+    	if (_menu != null) {
+      	  if ( _index < _menu.size() ) {
+      	    MenuItem item = _menu.getItem(_index);
+    	    item.setVisible( _value);    
+    	  }
+    	}
+    }
+            
+    public void Clear(Menu _menu){
+  	    for(int i=0; i < mCountSubMenu; i++){
+    		 mSubMenus[i] = null;       	 
+    	}
+  	    mCountSubMenu = 0;
+    	if (_menu != null) {    		    		  
+        	  _menu.clear();
+        	  if (mMenu != null) mMenu.clear();        
+    	}	    	
+    }
+    
+    public void Clear(){                
+   	    for(int i=0; i < mCountSubMenu; i++){
+   		   mSubMenus[i] = null;
+   	    }
+   	    mCountSubMenu = 0;
+    	if (mMenu != null)  {    		      	        	        	  
+    	  mMenu.clear();    	  
+    	}		
+    }
+    
+    public void SetItemTitle(MenuItem _item, String _title) {
+    	_item.setTitle((CharSequence)_title);
+    }
+     
+    public void SetItemTitle(Menu _menu, int _index,  String _title){
+    	if (_menu != null)  {
+    	  if ( _index < _menu.size() ) {
+    	    MenuItem item = _menu.getItem(_index);
+    	    item.setTitle((CharSequence)_title);
+    	  }
+    	}
+    }
+     
+    public void SetItemIcon(MenuItem _item, int _iconIdentifier) {
+    	_item.setIcon(_iconIdentifier);
+    }
+     
+    public void SetItemIcon(Menu _menu, int _index,  int _iconIdentifier){
+    	if (_menu != null)  {
+    	  if ( _index < _menu.size() ) {
+      	    MenuItem item = _menu.getItem(_index);
+    	    item.setIcon(_iconIdentifier);
+    	  }
+    	}
+    }
+    
+    public void SetItemChecked(MenuItem _item, boolean _value) {
+    	_item.setChecked(_value);
+    }
+    
+    public void SetItemCheckable(MenuItem _item, boolean _value) {
+    	_item.setCheckable(_value);
+    }   
+      
+    
+    public int GetItemIdByIndex(Menu _menu, int _index) {
+    	if ( _index < _menu.size() ) {
+    	  MenuItem i = _menu.getItem(_index);    	
+    	  return i.getItemId();
+    	} else return -1;
+    	
+    }
+    
+    public int GetItemIndexById(Menu _menu, int _id) {
+    	int r = -1;
+    	if (_menu != null)  {
+    	  for(int i=0; i < _menu.size(); i++)  {
+    		 MenuItem item = _menu.getItem(i);    		
+    	     if ( item.getItemId() == _id ) {
+    	    	r = i;
+    	    	break;
+    	     }
+    	  }
+    	}
+    	return r;
+    }
+    
+    public void RemoveItemById(Menu _menu, int _id){
+    	int id = GetItemIndexById(_menu, _id);
+    	if (id > -1) _menu.removeItem(id);
+    }
+    
+    public void RemoveItemByIndex(Menu _menu, int _index){
+    	if (_menu != null)  {	
+    	  if ( _index < _menu.size() ) {
+      	    MenuItem item = _menu.getItem(_index);
+    	    int id = item.getItemId();  	
+    	    _menu.removeItem(id);
+    	  }
+    	}
+    }
+    
+    public void SetMenu(Menu _menu) {
+        if (_menu != null) {	
+    	   mMenu = _menu;
+        }
+    }
 }
 
 
@@ -11783,8 +11933,17 @@ class jHttpClient /*extends ...*/ {
                   httpclient.getCredentialsProvider().setCredentials(
                                new AuthScope(mHOSTNAME,mPORT),  // 
                                new UsernamePasswordCredentials(mUSERNAME, mPASSWORD));
-    	        }						
+    	        }
+    	        
 			    HttpPost httppost = new HttpPost(_stringUrl);
+			    
+			    //thanks to @renabor
+			    if (mAuthenticationMode != 0) {
+                    String _credentials = mUSERNAME + ":" + mPASSWORD;
+                    String _base64EncodedCredentials = Base64.encodeToString(_credentials.getBytes(), Base64.NO_WRAP);
+                    httppost.addHeader("Authorization", "Basic " + _base64EncodedCredentials);
+               }
+			    			    			    
 				// Add your data
 				List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();								
 				nameValuePairs.add(new BasicNameValuePair(_name, _value));								
@@ -11831,9 +11990,16 @@ class jHttpClient /*extends ...*/ {
 						
 			    HttpPost httppost = new HttpPost(stringParams[0]);
 
+			    //thanks to @renabor
+			    if (mAuthenticationMode != 0) {
+                    String _credentials = mUSERNAME + ":" + mPASSWORD;
+                    String _base64EncodedCredentials = Base64.encodeToString(_credentials.getBytes(), Base64.NO_WRAP);
+                    httppost.addHeader("Authorization", "Basic " + _base64EncodedCredentials);
+                }
+			    
 				// Add your data
 				List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();						
-				StringTokenizer st = new StringTokenizer(stringParams[1], "=&");		
+				StringTokenizer st = new StringTokenizer(stringParams[1], "=&"); //name1=value1&name2=value2&name3=value3 ...		
 				
 				while(st.hasMoreTokens()) { 
 				  String key = st.nextToken(); 
@@ -11894,6 +12060,13 @@ class jHttpClient /*extends ...*/ {
 	     	   }
 	     	   
 	            HttpGet httpget = new HttpGet(stringUrl[0]);
+	            
+	            //thanks to @renabor
+	            if (mAuthenticationMode != 0) {
+                    String _credentials = mUSERNAME + ":" + mPASSWORD;
+                    String _base64EncodedCredentials = Base64.encodeToString(_credentials.getBytes(), Base64.NO_WRAP);
+                    httpget.addHeader("Authorization", "Basic " + _base64EncodedCredentials);
+                }
 
 	            //System.out.println("executing request" + httpget.getRequestLine());
 	            HttpResponse response = httpclient.execute(httpget);
@@ -12876,6 +13049,8 @@ public  native void pAppOnActivityResult(int requestCode,int resultCode,Intent d
 //by jmpessoa: support Option Menu
 public  native void pAppOnCreateOptionsMenu(Menu menu);
 public  native void pAppOnClickOptionMenuItem(MenuItem menuItem,int itemID,String itemCaption,boolean checked);
+public native boolean pAppOnPrepareOptionsMenu(Menu menu, int menuSize);
+public native boolean pAppOnPrepareOptionsMenuItem(Menu menu, MenuItem menuItem, int itemIndex);
 
 //by jmpessoa: support Context Menu
 public  native void pAppOnCreateContextMenu(ContextMenu menu);
@@ -13016,6 +13191,16 @@ public  void jAppOnActivityResult(int requestCode, int resultCode, Intent data)
 //By jmpessoa: support Option Menu
 public  void jAppOnCreateOptionsMenu(Menu m) {pAppOnCreateOptionsMenu(m);}
 public  void jAppOnClickOptionMenuItem(MenuItem item,int itemID, String itemCaption, boolean checked){pAppOnClickOptionMenuItem(item,itemID,itemCaption,checked);}
+
+public boolean jAppOnPrepareOptionsMenu(Menu m, int size) {
+	boolean r = pAppOnPrepareOptionsMenu(m, size);
+	return r;
+ }
+
+public boolean jAppOnPrepareOptionsItem(Menu m, MenuItem item, int index) {
+	boolean r = pAppOnPrepareOptionsMenuItem(m, item, index);
+	return r;
+ }
 
 //By jmpessoa: supportContextMenu
 public  void jAppOnCreateContextMenu(ContextMenu m) {pAppOnCreateContextMenu(m);}

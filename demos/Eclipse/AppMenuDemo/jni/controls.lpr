@@ -1,11 +1,11 @@
 {hint: save all files to location: C:\adt32\eclipse\workspace\AppMenuDemo\jni}
-library controls;  //by Lamw: Lazarus Android Module Wizard: 6/9/2015 3:18:51]
+library controls;  //by Lamw: Lazarus Android Module Wizard: 6/13/2015 0:38:42]
  
 {$mode delphi}
  
 uses
   Classes, SysUtils, And_jni, And_jni_Bridge, AndroidWidget, Laz_And_Controls,
-  Laz_And_Controls_Events, unit1;
+  Laz_And_Controls_Events, unit1, unit2;
  
 { Class:     com_example_appmenudemo_Controls
   Method:    pAppOnScreenStyle
@@ -125,6 +125,22 @@ end;
 procedure pAppOnClickOptionMenuItem(PEnv: PJNIEnv; this: JObject; menuItem: JObject; itemID: JInt; itemCaption: JString; checked: JBoolean); cdecl;
 begin
   Java_Event_pAppOnClickOptionMenuItem(PEnv,this,menuItem,itemID,itemCaption,Boolean(checked));
+end;
+
+{ Class:     com_example_appmenudemo_Controls
+  Method:    pAppOnPrepareOptionsMenu
+  Signature: (Landroid/view/Menu;I)Z }
+function pAppOnPrepareOptionsMenu(PEnv: PJNIEnv; this: JObject; menu: JObject; menuSize: JInt): JBoolean; cdecl;
+begin
+  Result:=Java_Event_pAppOnPrepareOptionsMenu(PEnv,this,menu,menuSize);
+end;
+
+{ Class:     com_example_appmenudemo_Controls
+  Method:    pAppOnPrepareOptionsMenuItem
+  Signature: (Landroid/view/Menu;Landroid/view/MenuItem;I)Z }
+function pAppOnPrepareOptionsMenuItem(PEnv: PJNIEnv; this: JObject; menu: JObject; menuItem: JObject; itemIndex: JInt): JBoolean; cdecl;
+begin
+  Result:=Java_Event_pAppOnPrepareOptionsMenuItem(PEnv,this,menu,menuItem,itemIndex);
 end;
 
 { Class:     com_example_appmenudemo_Controls
@@ -663,7 +679,7 @@ begin
   Java_Event_pOnSurfaceViewDrawingPostExecute(PEnv,this,TObject(pasobj),progress);
 end;
 
-const NativeMethods:array[0..81] of JNINativeMethod = (
+const NativeMethods:array[0..83] of JNINativeMethod = (
    (name:'pAppOnScreenStyle';
     signature:'()I';
     fnPtr:@pAppOnScreenStyle;),
@@ -709,6 +725,12 @@ const NativeMethods:array[0..81] of JNINativeMethod = (
    (name:'pAppOnClickOptionMenuItem';
     signature:'(Landroid/view/MenuItem;ILjava/lang/String;Z)V';
     fnPtr:@pAppOnClickOptionMenuItem;),
+   (name:'pAppOnPrepareOptionsMenu';
+    signature:'(Landroid/view/Menu;I)Z';
+    fnPtr:@pAppOnPrepareOptionsMenu;),
+   (name:'pAppOnPrepareOptionsMenuItem';
+    signature:'(Landroid/view/Menu;Landroid/view/MenuItem;I)Z';
+    fnPtr:@pAppOnPrepareOptionsMenuItem;),
    (name:'pAppOnCreateContextMenu';
     signature:'(Landroid/view/ContextMenu;)V';
     fnPtr:@pAppOnCreateContextMenu;),
@@ -980,6 +1002,8 @@ exports
   pAppOnActivityResult name 'Java_com_example_appmenudemo_Controls_pAppOnActivityResult',
   pAppOnCreateOptionsMenu name 'Java_com_example_appmenudemo_Controls_pAppOnCreateOptionsMenu',
   pAppOnClickOptionMenuItem name 'Java_com_example_appmenudemo_Controls_pAppOnClickOptionMenuItem',
+  pAppOnPrepareOptionsMenu name 'Java_com_example_appmenudemo_Controls_pAppOnPrepareOptionsMenu',
+  pAppOnPrepareOptionsMenuItem name 'Java_com_example_appmenudemo_Controls_pAppOnPrepareOptionsMenuItem',
   pAppOnCreateContextMenu name 'Java_com_example_appmenudemo_Controls_pAppOnCreateContextMenu',
   pAppOnClickContextMenuItem name 'Java_com_example_appmenudemo_Controls_pAppOnClickContextMenuItem',
   pOnClick name 'Java_com_example_appmenudemo_Controls_pOnClick',

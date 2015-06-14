@@ -1,0 +1,97 @@
+object AndroidModule2: TAndroidModule2
+  Left = 300
+  Top = 133
+  Width = 320
+  Height = 400
+  MarginLeft = 0
+  MarginTop = 0
+  MarginRight = 0
+  MarginBottom = 0
+  Text = 'AndroidModule2'
+  ActivityMode = actRecyclable
+  BackgroundColor = colbrWhite
+  OnJNIPrompt = AndroidModule2JNIPrompt
+  OnClose = AndroidModule2Close
+  OnCreateOptionMenu = AndroidModule2CreateOptionMenu
+  OnClickOptionMenuItem = AndroidModule2ClickOptionMenuItem
+  object jButton1: jButton
+    Left = 2
+    Top = 180
+    Width = 316
+    Height = 40
+    MarginLeft = 2
+    MarginTop = 4
+    MarginRight = 2
+    MarginBottom = 4
+    Visible = True
+    PosRelativeToAnchor = []
+    PosRelativeToParent = [rpCenterInParent]
+    LayoutParamWidth = lpMatchParent
+    LayoutParamHeight = lpWrapContent
+    Text = 'Hint about jForm2'
+    BackgroundColor = colbrDefault
+    FontColor = colbrDefault
+    FontSize = 0
+    OnClick = jButton1Click
+    Id = 7590539
+  end
+  object jButton2: jButton
+    Left = 2
+    Top = 228
+    Width = 316
+    Height = 40
+    MarginLeft = 2
+    MarginTop = 4
+    MarginRight = 2
+    MarginBottom = 4
+    Visible = True
+    Anchor = jButton1
+    PosRelativeToAnchor = [raBelow]
+    PosRelativeToParent = [rpCenterHorizontal]
+    LayoutParamWidth = lpMatchParent
+    LayoutParamHeight = lpWrapContent
+    Text = 'Close'
+    BackgroundColor = colbrDefault
+    FontColor = colbrDefault
+    FontSize = 0
+    OnClick = jButton2Click
+    Id = 0
+  end
+  object jTextView1: jTextView
+    Left = 45
+    Top = 5
+    Width = 230
+    Height = 20
+    MarginLeft = 5
+    MarginTop = 5
+    MarginRight = 5
+    MarginBottom = 5
+    Visible = True
+    PosRelativeToAnchor = []
+    PosRelativeToParent = [rpTop, rpCenterHorizontal]
+    LayoutParamWidth = lpWrapContent
+    LayoutParamHeight = lpWrapContent
+    Text = 'Form 2 [you can use back key to close!]'
+    Alignment = taLeft
+    Enabled = True
+    BackgroundColor = colbrDefault
+    FontColor = colbrBlue
+    FontSize = 0
+    TextTypeFace = tfNormal
+    Id = 0
+  end
+  object jMenu1: jMenu
+    Options.Strings = (
+      'Item 3000'
+      'Item 3001'
+      'Item 3002'
+    )
+    IconIdentifiers.Strings = (
+      'ic_undo'
+      'ic_ruler'
+      'ic_frame'
+    )
+    left = 160
+    top = 88
+  end
+end

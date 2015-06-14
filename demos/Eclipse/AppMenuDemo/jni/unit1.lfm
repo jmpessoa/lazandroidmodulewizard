@@ -1,13 +1,12 @@
 object AndroidModule1: TAndroidModule1
   Left = 298
   Top = 61
-  Width = 300
+  Width = 340
   Height = 600
   MarginLeft = 0
   MarginTop = 0
   MarginRight = 0
   MarginBottom = 0
-  OnCreate = DataModuleCreate
   Text = 'AndroidModule1'
   ActivityMode = actMain
   BackgroundColor = colbrBlack
@@ -19,7 +18,7 @@ object AndroidModule1: TAndroidModule1
   object jButton1: jButton
     Left = 5
     Top = 45
-    Width = 290
+    Width = 330
     Height = 40
     MarginLeft = 5
     MarginTop = 5
@@ -39,7 +38,7 @@ object AndroidModule1: TAndroidModule1
     Id = 8111758
   end
   object jTextView1: jTextView
-    Left = 55
+    Left = 75
     Top = 10
     Width = 190
     Height = 20
@@ -62,8 +61,8 @@ object AndroidModule1: TAndroidModule1
     Id = 7951916
   end
   object jTextView2: jTextView
-    Left = 17
-    Top = 100
+    Left = 37
+    Top = 148
     Width = 265
     Height = 20
     MarginLeft = 10
@@ -71,7 +70,7 @@ object AndroidModule1: TAndroidModule1
     MarginRight = 10
     MarginBottom = 10
     Visible = True
-    Anchor = jButton1
+    Anchor = jButton2
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = [rpCenterHorizontal]
     LayoutParamWidth = lpWrapContent
@@ -84,6 +83,28 @@ object AndroidModule1: TAndroidModule1
     FontSize = 0
     TextTypeFace = tfNormal
     Id = 0
+  end
+  object jButton2: jButton
+    Left = 2
+    Top = 94
+    Width = 336
+    Height = 40
+    MarginLeft = 2
+    MarginTop = 4
+    MarginRight = 2
+    MarginBottom = 4
+    Visible = True
+    Anchor = jButton1
+    PosRelativeToAnchor = [raBelow]
+    PosRelativeToParent = []
+    LayoutParamWidth = lpMatchParent
+    LayoutParamHeight = lpWrapContent
+    Text = 'Open Form2 [ActivityMode=actRecyclable]'
+    BackgroundColor = colbrDefault
+    FontColor = colbrDefault
+    FontSize = 0
+    OnClick = jButton2Click
+    Id = 4957801
   end
   object jMenu1: jMenu
     Options.Strings = (

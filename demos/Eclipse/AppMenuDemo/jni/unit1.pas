@@ -15,24 +15,29 @@ type
 
   TAndroidModule1 = class(jForm)
       jButton1: jButton;
+      jButton2: jButton;
       jMenu1: jMenu;
       jContextMenu1: jContextMenu;
       jTextView1: jTextView;
       jTextView2: jTextView;
+
       procedure DataModuleClickContextMenuItem(Sender: TObject;
         jObjMenuItem: jObject; itemID: integer; itemCaption: string; checked: boolean);
       procedure DataModuleClickOptionMenuItem(Sender: TObject;
         jObjMenuItem: jObject; itemID: integer; itemCaption: string; checked: boolean);
-      procedure DataModuleCreate(Sender: TObject);
+
       procedure DataModuleCreateContextMenu(Sender: TObject; jObjMenu: jObject);
       procedure DataModuleCreateOptionMenu(Sender: TObject; jObjMenu: jObject);
       procedure DataModuleJNIPrompt(Sender: TObject);
       procedure jButton1Click(Sender: TObject);
+      procedure jButton2Click(Sender: TObject);
 
     private
       {private declarations}
     public
       {public declarations}
+      Procedure CallBackNotify_Form2Closed(Sender: TObject);
+      //Procedure CallBackData(Sender: TObject; strData: string; intData: integer; doubleData: double);
   end;
   
 var
@@ -42,13 +47,11 @@ implementation
   
 {$R *.lfm}
 
+uses
+
+  Unit2;
+
 { TAndroidModule1 }
-
-procedure TAndroidModule1.DataModuleCreate(Sender: TObject);
-begin
-   //
-end;
-
 
 //ref1:http://android-developers.blogspot.com.br/2012/01/say-goodbye-to-menu-button.htmt
 //ref2: http://developer.android.com/downloads/design/Android_Design_Icons_20131106.zip
@@ -62,6 +65,13 @@ end;
  item on navigation bar and opens menu when clicked.
  However, to make such a menu bar appear, you have to set a minSdkVersion to be 10 or lower.
 }
+
+Procedure TAndroidModule1.CallBackNotify_Form2Closed(Sender: TObject); //form2 was closed ...
+begin
+  //ShowMessage('from CallBack ... ');
+  jMenu1.Clear();
+  jMenu1.InvalidateOptionsMenu();  //fire OnCreateOptionsMenu [--> OnPrepareOptionsMenu] to rebuild original menu!!!
+end;
 
 procedure TAndroidModule1.DataModuleCreateOptionMenu(Sender: TObject; jObjMenu: jObject);
 var
@@ -95,6 +105,7 @@ begin
    jMenu1.AddItem(jSubMenu, 1002 {itemID}, 'Green', mitCheckable);
 
 end;
+
 
 procedure TAndroidModule1.DataModuleClickOptionMenuItem(Sender: TObject;
   jObjMenuItem: jObject; itemID: integer; itemCaption: string; checked: boolean);
@@ -139,6 +150,12 @@ begin
   end;
 end;
 
+procedure TAndroidModule1.DataModuleJNIPrompt(Sender: TObject);
+begin
+  jContextMenu1.RegisterForContextMenu(jButton1.View); //<--register jButton1 for Context Menu [long pressed]
+  Self.SetSubTitleActionBar('jForm [1]');
+end;
+
 //warning: Context Menu Items does not support the Icon and neither Sub Menu!
 procedure TAndroidModule1.DataModuleCreateContextMenu(Sender: TObject; jObjMenu: jObject);
 var
@@ -149,14 +166,13 @@ begin
   begin
     jContextMenu1.SetHeader(jObjMenu, 'Context Menu!', 'ic_bullets');
     for i:=0 to jContextMenu1.Options.Count-1 do
-    begin                                        //0:mitDefault, 1:mitCheckable
+    begin                                                                                      //0:mitDefault, 1:mitCheckable
        jItem:= jContextMenu1.AddItem(jObjMenu, 10+i {itemID}, jContextMenu1.Options.Strings[i], mitCheckable);
 
        if jContextMenu1.IsItemChecked(10+i) then //Checkable persistence need for Context Menu
        begin
           jContextMenu1.CheckItem(jItem);
        end;
-
     end;
   end;
 end;
@@ -181,15 +197,25 @@ begin
   end;
 end;
 
-procedure TAndroidModule1.DataModuleJNIPrompt(Sender: TObject);
-begin
-  jContextMenu1.RegisterForContextMenu(jButton1.View);  // <------- register jButton1 for Context Menu!
-end;
-
 procedure TAndroidModule1.jButton1Click(Sender: TObject);
 begin
-  ShowMessage('Button clicked!');
-  Self.SetSubTitleActionBar('Hello!');
+   ShowMessage('Hello !');
+end;
+
+procedure TAndroidModule1.jButton2Click(Sender: TObject);
+begin
+  jMenu1.Clear(); //clean up ....
+  if(AndroidModule2 = nil) then
+  begin
+      gApp.CreateForm(TAndroidModule2, AndroidModule2);
+      AndroidModule2.SetCloseCallBack(CallBackNotify_Form2Closed, Self);
+      //AndroidModule2.SetCloseCallBack(CallBackData, Self);
+      AndroidModule2.Init(gApp);
+  end
+  else
+  begin
+    AndroidModule2.Show;
+  end;
 end;
 
 end.
