@@ -539,12 +539,15 @@ type
 
   TOnRotate          = Procedure(Sender: TObject; rotate : integer; Var rstRotate : integer) of Object;
 
-  TOnOptionMenuItemCreate=  Procedure(Sender: TObject; jObjMenu: jObject) of Object;
+  TOnOptionMenuItemCreate = Procedure(Sender: TObject; jObjMenu: jObject) of Object;
+
+  TOnPrepareOptionsMenu = Procedure(Sender: TObject; jObjMenu: jObject; menuSize: integer; out prepareItems: boolean) of Object;
+  TOnPrepareOptionsMenuItem = Procedure(Sender: TObject; jObjMenu: jObject; jObjMenuItem:jObject; itemIndex: integer; out prepareMoreItems: boolean ) of Object;
 
   TOnClickOptionMenuItem = Procedure(Sender: TObject; jObjMenuItem: jObject;
                                      itemID: integer; itemCaption: string; checked: boolean) of Object;
 
-  TOnContextMenuItemCreate=  Procedure(Sender: TObject; jObjMenu: jObject) of Object;
+  TOnContextMenuItemCreate = Procedure(Sender: TObject; jObjMenu: jObject) of Object;
 
   TOnClickContextMenuItem = Procedure(Sender: TObject; jObjMenuItem: jObject;
                                      itemID: integer; itemCaption: string; checked: boolean) of Object;
@@ -871,6 +874,10 @@ type
     FOnContextMenuCreate: TOnContextMenuItemCreate;
     FOnClickContextMenuItem: TOnClickContextMenuItem;
 
+    FOnPrepareOptionsMenu: TOnPrepareOptionsMenu;
+    FOnPrepareOptionsMenuItem: TOnPrepareOptionsMenuItem;
+
+
     //---------------  dummies for compatibility----
    {  FHorizontalOffset: integer;
      FVerticalOffset: integer;
@@ -903,6 +910,7 @@ type
   public
     FormState     : TjFormState;
     FormIndex: integer;
+    Finished: boolean;
 
     constructor CreateNew(AOwner: TComponent);
     constructor Create(AOwner: TComponent); override;
@@ -990,6 +998,8 @@ type
     procedure Vibrate(_milliseconds: integer);  overload;
     procedure Vibrate(var _millisecondsPattern: TDynArrayOfInt64);overload;
     procedure TakeScreenshot(_savePath: string; _saveFileNameJPG: string);
+    function GetTitleActionBar(): string;
+    function GetSubTitleActionBar(): string;
 
     // Property
     property View         : jObject        read FjRLayout; //layout!
@@ -1032,6 +1042,9 @@ type
 
     property OnCreateOptionMenu: TOnOptionMenuItemCreate read FOnOptionMenuCreate write FOnOptionMenuCreate;
     property OnClickOptionMenuItem: TOnClickOptionMenuItem read FOnClickOptionMenuItem write FOnClickOptionMenuItem;
+
+    property OnPrepareOptionsMenu: TOnPrepareOptionsMenu read FOnPrepareOptionsMenu write FOnPrepareOptionsMenu;
+    property OnPrepareOptionsMenuItem: TOnPrepareOptionsMenuItem read FOnPrepareOptionsMenuItem write FOnPrepareOptionsMenuItem;
 
     property OnCreateContextMenu: TOnContextMenuItemCreate read FOnContextMenuCreate write FOnContextMenuCreate;
     property OnClickContextMenuItem: TOnClickContextMenuItem read FOnClickContextMenuItem write FOnClickContextMenuItem;
@@ -1199,6 +1212,10 @@ end;
   procedure jForm_Vibrate(env: PJNIEnv; _jform: JObject; _milliseconds: integer); overload;
   procedure jForm_Vibrate(env: PJNIEnv; _jform: JObject; var _millisecondsPattern: TDynArrayOfInt64); overload;
   procedure jForm_TakeScreenshot(env: PJNIEnv; _jform: JObject; _savePath: string; _saveFileNameJPG: string);
+
+  function jForm_GetTitleActionBar(env: PJNIEnv; _jform: JObject): string;
+  function jForm_GetSubTitleActionBar(env: PJNIEnv; _jform: JObject): string;
+
 
 //jni API Bridge
 
@@ -2118,6 +2135,7 @@ begin
 
   FWidth := 320;
   FHeight := 400;
+  Finished:= False;
 
   //-------------- dummies for compatibility----
   //FOldCreateOrder:= False;
@@ -2125,21 +2143,25 @@ begin
   //FHorizontalOffset:= 300;
   //FVerticalOffset:= 150;
   //--------------
-
   //now load the stream
   InitInheritedComponent(Self, TAndroidWidget {TAndroidForm}); {thanks to  x2nie !!}
-
 end;
 
 destructor jForm.Destroy;
 begin
+  if not Finished then
+  begin
+    jForm_FreeLayout(FjEnv, FjRLayout); //free jni jForm Layout global reference
+    jForm_Free2(FjEnv, FjObject);
+  end;
   inherited Destroy;
 end;
 
 procedure jForm.Finish;
 begin
-  jForm_FreeLayout(FjEnv, FjRLayout);
+  jForm_FreeLayout(FjEnv, FjRLayout); //free jni jForm Layout global reference
   jForm_Free2(FjEnv, FjObject);
+  Finished:= True;
 end;
 
 procedure jForm.Init(refApp: jApp);
@@ -2231,18 +2253,6 @@ begin
       View_SetBackGroundColor(FjEnv, FjRLayout,GetARGB(FCustomColor, FColor));
 end;
 
-Procedure jForm.Show;
-begin
-  if not FInitialized then Exit;
-  if FVisible then Exit;
-  FormState := fsFormWork;
-  FVisible:= True;
-  gApp.BaseIndex := gApp.TopIndex;
-  gApp.TopIndex:= Self.FormIndex;
-  jForm_Show2(FjEnv,FjObject,FAnimation.In_);
-  if Assigned(FOnJNIPrompt) then FOnJNIPrompt(Self);    //*****
-end;
-
 Procedure jForm.UpdateLayout;
 var
   i: integer;
@@ -2256,6 +2266,18 @@ begin
   end;
 end;
 
+Procedure jForm.Show;
+begin
+  if not FInitialized then Exit;
+  if FVisible then Exit;
+  FormState := fsFormWork;
+  FVisible:= True;
+  gApp.BaseIndex := gApp.TopIndex;
+  gApp.TopIndex:= Self.FormIndex;
+  jForm_Show2(FjEnv,FjObject,FAnimation.In_);
+  if Assigned(FOnJNIPrompt) then FOnJNIPrompt(Self);    //*****
+end;
+
 //Ref. Destroy
 procedure jForm.Close;
 begin
@@ -2263,10 +2285,10 @@ begin
  // --------------------------------------------------------------------------
  // Java           Java          Java-> Pascal
  // jForm_Close -> RemoveView -> Java_Event_pOnClose
-  jForm_Close2(FjEnv, FjObject);  //close java form...
+  jForm_Close2(FjEnv, FjObject);  //close java form...  remove view layout .... [1]
 end;
 
-//after java form close......
+// [2] after java form close......
 Procedure Java_Event_pOnClose(env: PJNIEnv; this: jobject;  Form : TObject);
 var
   Inx: integer;
@@ -2302,15 +2324,12 @@ begin
                                                  jForm(Form).FCBDataDouble);
   end;
 
-  gApp.Forms.Stack[Inx].CloseCB.EventData  := nil;
-  gApp.Forms.Stack[Inx].CloseCB.Event  := nil;
-  gApp.Forms.Stack[Inx].CloseCB.Sender := nil;
-
   if jForm(Form).ActivityMode = actMain then  //"The End"
   begin
     jForm(Form).Finish;
     gApp.Finish;
   end;
+
 end;
 
 Procedure jForm.Refresh;
@@ -2731,6 +2750,21 @@ begin
     end;
   end;
 end;
+
+function jForm.GetTitleActionBar(): string;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jForm_GetTitleActionBar(FjEnv, FjObject);
+end;
+
+function jForm.GetSubTitleActionBar(): string;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jForm_GetSubTitleActionBar(FjEnv, FjObject);
+end;
+
 {-------- jForm_JNI_Bridge ----------}
 
 procedure jForm_ShowCustomMessage(env: PJNIEnv; _jform: JObject; _layout: jObject; _gravity: integer; _lenghTimeSecond: integer);
@@ -3373,6 +3407,48 @@ begin
   env^.DeleteLocalRef(env,jParams[1].l);
   env^.DeleteLocalRef(env, jCls);
 end;
+
+function jForm_GetTitleActionBar(env: PJNIEnv; _jform: JObject): string;
+var
+  jStr: JString;
+  jBoo: JBoolean;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jform);
+  jMethod:= env^.GetMethodID(env, jCls, 'GetTitleActionBar', '()Ljava/lang/String;');
+  jStr:= env^.CallObjectMethod(env, _jform, jMethod);
+  case jStr = nil of
+     True : Result:= '';
+     False: begin
+              jBoo:= JNI_False;
+              Result:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
+            end;
+  end;
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+
+function jForm_GetSubTitleActionBar(env: PJNIEnv; _jform: JObject): string;
+var
+  jStr: JString;
+  jBoo: JBoolean;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jform);
+  jMethod:= env^.GetMethodID(env, jCls, 'GetSubTitleActionBar', '()Ljava/lang/String;');
+  jStr:= env^.CallObjectMethod(env, _jform, jMethod);
+  case jStr = nil of
+     True : Result:= '';
+     False: begin
+              jBoo:= JNI_False;
+              Result:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
+            end;
+  end;
+  env^.DeleteLocalRef(env, jCls);
+end;
+
 
 //-----------------------------------------------
    {jApp by jmpessoa}
@@ -4382,7 +4458,7 @@ begin
  Result := env^.NewGlobalRef(env,Result);
 end;
 
-//by jmpessoa
+//by jmpessoa   -- java clean up ....
 Procedure jForm_Free2(env:PJNIEnv; Form: jObject);
 var
   cls: jClass;
@@ -4395,7 +4471,7 @@ begin
   env^.DeleteLocalRef(env, cls);
 end;
 
-//by jmpessoa
+//addView( layout )
 Procedure jForm_Show2(env:PJNIEnv; Form: jObject; effect : Integer);
 var
    cls: jClass;
@@ -4408,7 +4484,7 @@ begin
     env^.CallVoidMethodA(env, Form, method,@_jParams);
     env^.DeleteLocalRef(env, cls);
 end;
-
+           //remove view layout ....
 Procedure jForm_Close2(env:PJNIEnv; Form: jObject);
 var
   cls: jClass;

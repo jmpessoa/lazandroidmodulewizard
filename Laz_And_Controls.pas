@@ -1400,6 +1400,10 @@ type
   procedure Java_Event_pAppOnCreateOptionsMenu(env: PJNIEnv; this: jobject; jObjMenu: jObject);
   Procedure Java_Event_pAppOnClickOptionMenuItem(env: PJNIEnv; this: jobject; jObjMenuItem: jObject;
                                                  itemID: integer; itemCaption: JString; checked: boolean);
+
+  function Java_Event_pAppOnPrepareOptionsMenuItem(env: PJNIEnv; this: jobject; jObjMenu: jObject;  jObjMenuItem: jObject; itemIndex: integer): jBoolean;
+  function Java_Event_pAppOnPrepareOptionsMenu(env: PJNIEnv; this: jobject; jObjMenu: jObject; menuSize: integer): jBoolean;
+
   //by jmpessoa: support to Context Menu
   Procedure Java_Event_pAppOnClickContextMenuItem(env: PJNIEnv; this: jobject; jObjMenuItem: jObject;
                                                 itemID: integer; itemCaption: JString; checked: boolean);
@@ -1693,6 +1697,35 @@ begin
   if Assigned(Form.OnCreateOptionMenu) then Form.OnCreateOptionMenu(Form, jObjMenu);
 end;
 
+function Java_Event_pAppOnPrepareOptionsMenu(env: PJNIEnv; this: jobject; jObjMenu: jObject; menuSize: integer): jBoolean;
+var
+  Form: jForm;
+  prepareItems: boolean;
+begin
+  prepareItems:= False;
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+  Form:= gApp.Forms.Stack[gApp.TopIndex].Form;
+  if not Assigned(Form) then Exit;
+  Form.UpdateJNI(gApp);
+  if Assigned(Form.OnPrepareOptionsMenu) then Form.OnPrepareOptionsMenu(Form, jObjMenu, menuSize, prepareItems);
+  Result:= JBool(prepareItems);
+end;
+
+function Java_Event_pAppOnPrepareOptionsMenuItem(env: PJNIEnv; this: jobject; jObjMenu: jObject;  jObjMenuItem: jObject; itemIndex: integer): jBoolean;
+var
+  Form: jForm;
+  prepareMoreItems: boolean;
+begin
+  prepareMoreItems:= True;
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+  Form:= gApp.Forms.Stack[gApp.TopIndex].Form;
+  if not Assigned(Form) then Exit;
+  Form.UpdateJNI(gApp);
+  if Assigned(Form.OnPrepareOptionsMenuItem) then Form.OnPrepareOptionsMenuItem(Form, jObjMenu, jObjMenuItem, itemIndex, prepareMoreItems);
+  Result:= JBool(prepareMoreItems);
+end;
 //by jmpessoa: support to Option Menu
 Procedure Java_Event_pAppOnClickOptionMenuItem(env: PJNIEnv; this: jobject; jObjMenuItem: jObject;
                                                 itemID: integer; itemCaption: JString; checked: boolean);
@@ -1730,6 +1763,7 @@ begin
   Form.UpdateJNI(gApp);
   if Assigned(Form.OnCreateContextMenu) then Form.OnCreateContextMenu(Form, jObjMenu);
 end;
+
 
 //by jmpessoa: support to Context Menu
 Procedure Java_Event_pAppOnClickContextMenuItem(env: PJNIEnv; this: jobject; jObjMenuItem: jObject;
@@ -5770,7 +5804,7 @@ end;
 constructor jWebView.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
-  FJavaScript := False;
+  FJavaScript := True;
   FZoomControl := False;
   FOnStatus   := nil;
   FLParamWidth:= lpMatchParent;
@@ -5852,13 +5886,19 @@ begin
        jWebView_addlParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
      end;
   end;
+
   if Self.Anchor <> nil then Self.AnchorId:= Self.Anchor.Id
   else Self.AnchorId:= -1;
+
   jWebView_setLayoutAll(FjEnv, FjObject , Self.AnchorId);
+
   jWebView_SetJavaScript(FjEnv, FjObject , FJavaScript);
+
   if FColor <> colbrDefault then
     View_SetBackGroundColor(FjEnv, FjThis, FjObject , GetARGB(FCustomColor, FColor));
+
   View_SetVisible(FjEnv, FjThis, FjObject , FVisible);
+
   FInitialized:= True;
 end;
 

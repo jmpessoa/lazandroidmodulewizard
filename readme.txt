@@ -115,6 +115,27 @@
 	*5.PANIC ? When prompt "Read error" [Unknown Property] just choice "Continue Loading" !
 	****************************************************************************************************
 
+Version 0.6 - rev. 30 - 14 June 2015 - 
+
+	IMPROVEDMENTS!   
+
+		jMenu component:			
+			New! Add support to different menu in each form! // <<--- @renabor's request and suggestion!
+			New! Methods, Propery and Events
+		jForm 
+			News! Events/Properties to handler the news from jMenu 
+
+	UPDATED: Demo AppMenuDemo 
+
+	FIXs	
+		jForm		:fixed form close callback 
+		jHttpClient	:fixed "basic authentication" //<--- Thanks to @renabor !!!	
+
+	HINT 1: Old Projects: upgrade your projects code templates !
+		Lazarus IDE --> menu Tools --> [Lamw] Android Module Wizard --> Upgrade code Templates [*.lpr, *.java]
+
+	HINT 2:	When prompt "Read error" [Unknown Property] just choice "Continue Loading"!
+
 Version 0.6 - rev. 29 - 08 June 2015 - 
 
 	NEW! jSurfaceView component 
