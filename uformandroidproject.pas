@@ -1549,20 +1549,26 @@ begin
 
    selectedNode:= ShellTreeView1.Items.FindNodeWithText('src');
 
-   if selectedNode = nil then Exit;
+   if selectedNode = nil then
+   begin
+     ShowMessage('..\src NOT found!');
+     Exit;
+   end;
 
    selectedNode.Expanded:= True;
    tempNode:= selectedNode.GetFirstVisibleChild;
    while tempNode  <> nil do
    begin
-       selectedNode:= tempNode;
-       selectedNode.Expanded:= True;
-       tempNode:= selectedNode.GetFirstVisibleChild;
+      selectedNode:= tempNode;
+      selectedNode.Expanded:= True;
+      tempNode:= selectedNode.GetFirstVisibleChild;
    end;
 
    ShellTreeView1.Selected:= selectedNode;
 
    StatusBar1.Panels.Items[0].Text:= ShellTreeView1.GetPathFromNode(ShellTreeView1.Selected);
+
+   ShellListView1.Root := StatusBar1.Panels.Items[0].Text;
 
 end;
 
