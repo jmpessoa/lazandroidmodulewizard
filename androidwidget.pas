@@ -2149,7 +2149,7 @@ end;
 
 destructor jForm.Destroy;
 begin
-  if not Finished then
+  if Initialized and not Finished then
   begin
     jForm_FreeLayout(FjEnv, FjRLayout); //free jni jForm Layout global reference
     jForm_Free2(FjEnv, FjObject);
