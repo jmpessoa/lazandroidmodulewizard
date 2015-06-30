@@ -32,7 +32,9 @@ uses
 
    Procedure Java_Event_pOnActionBarTabSelected(env: PJNIEnv; this: jobject; Obj: TObject; view: jObject; title: jString);
    Procedure Java_Event_pOnActionBarTabUnSelected(env: PJNIEnv; this: jobject; Obj: TObject; view:jObject; title: jString);
+
    Procedure Java_Event_pOnCustomDialogShow(env: PJNIEnv; this: jobject; Obj: TObject; dialog:jObject; title: jString);
+   Procedure Java_Event_pOnCustomDialogBackKeyPressed(env: PJNIEnv; this: jobject; Obj: TObject; title: jString);
 
    Procedure Java_Event_pOnClickToggleButton(env: PJNIEnv; this: jobject; Obj: TObject; state: boolean);
 
@@ -68,7 +70,13 @@ uses
    function Java_Event_pOnSurfaceViewDrawingInBackground(env: PJNIEnv; this: jobject; Obj: TObject; progress: single): JBoolean;
    procedure Java_Event_pOnSurfaceViewDrawingPostExecute(env: PJNIEnv; this: jobject; Obj: TObject; progress: single);
 
+   Procedure Java_Event_pOnContactManagerContactsExecuted(env: PJNIEnv; this: jobject; Obj: TObject; count: integer);
 
+   function Java_Event_pOnContactManagerContactsProgress(env: PJNIEnv; this: jobject; Obj: TObject; contactInfo: JString;
+                                                                                                    contactShortInfo: JString;
+                                                                                                    contactPhotoUriAsString: JString;
+                                                                                                    contactPhoto: jObject;
+                                                                                                    progress: integer): jBoolean;
 implementation
 
 uses
@@ -76,7 +84,7 @@ uses
    AndroidWidget, bluetooth, bluetoothclientsocket, bluetoothserversocket,
    spinner, location, actionbartab, customdialog, togglebutton, switchbutton, gridview,
    sensormanager, broadcastreceiver, datepickerdialog, timepickerdialog, shellcommand,
-   tcpsocketclient, surfaceview, mediaplayer;
+   tcpsocketclient, surfaceview, mediaplayer, contactmanager;
 
 procedure Java_Event_pOnBluetoothEnabled(env: PJNIEnv; this: jobject; Obj: TObject);
 begin
@@ -526,6 +534,27 @@ begin
   end;
 end;
 
+Procedure Java_Event_pOnCustomDialogBackKeyPressed(env: PJNIEnv; this: jobject; Obj: TObject; title: jString);
+var
+   pastitle: string;
+  _jBoolean: JBoolean;
+begin
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+  if Obj is jCustomDialog then
+  begin
+    jForm(jCustomDialog(Obj).Owner).UpdateJNI(gApp);
+    pastitle:= '';
+    if title <> nil then
+    begin
+      _jBoolean:= JNI_False;
+      pastitle:= string(env^.GetStringUTFChars(Env, title,@_jBoolean) );
+    end;
+    jCustomDialog(Obj).GenEvent_OnCustomDialogBackKeyPressed(Obj, pastitle);
+  end;
+end;
+
+
 Procedure Java_Event_pOnClickToggleButton(env: PJNIEnv; this: jobject; Obj: TObject; state: boolean);
 begin
   gApp.Jni.jEnv:= env;
@@ -706,7 +735,6 @@ begin
   end;
 end;
 
-
 Procedure Java_Event_pOnTCPSocketClientConnected(env: PJNIEnv; this: jobject; Obj: TObject);
 begin
   gApp.Jni.jEnv:= env;
@@ -853,6 +881,63 @@ begin
       jSurfaceView(Obj).GenEvent_OnSurfaceViewDrawingPostExecute(Obj,progress);
   end;
 end;
+
+Procedure Java_Event_pOnContactManagerContactsExecuted(env: PJNIEnv; this: jobject; Obj: TObject; count: integer);
+begin
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+  if not Assigned(Obj)  then Exit;
+  if Obj is jContactManager then
+  begin
+      jForm(jContactManager(Obj).Owner).UpdateJNI(gApp);
+      jContactManager(Obj).GenEvent_OnContactManagerContactsExecuted(Obj, count);
+  end;
+end;
+
+function Java_Event_pOnContactManagerContactsProgress(env: PJNIEnv; this: jobject; Obj: TObject; contactInfo: JString;
+                                                                                                 contactShortInfo: JString;
+                                                                                                 contactPhotoUriAsString: JString;
+                                                                                                 contactPhoto: jObject;
+                                                                                                 progress: integer): jBoolean;
+var
+   pascontact, pascontactShortInfo, pascontactPhotoUriAsString:  string;
+   jBoo: jBoolean;
+   continueListing: boolean;
+begin
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+
+  continueListing:= True;
+
+  if Obj is jContactManager then
+  begin
+    jForm(jContactManager(Obj).Owner).UpdateJNI(gApp);
+    pascontact := '';
+    if contactInfo <> nil then
+    begin
+      jBoo := JNI_False;
+      pascontact:= string( env^.GetStringUTFChars(Env,contactInfo,@jBoo) );
+    end;
+
+    pascontactShortInfo := '';
+    if contactShortInfo <> nil then
+    begin
+      jBoo := JNI_False;
+      pascontactShortInfo:= string( env^.GetStringUTFChars(Env,contactShortInfo,@jBoo) );
+    end;
+
+    pascontactPhotoUriAsString := '';
+    if contactPhotoUriAsString <> nil then
+    begin
+      jBoo := JNI_False;
+      pascontactPhotoUriAsString:= string( env^.GetStringUTFChars(Env,contactPhotoUriAsString,@jBoo) );
+    end;
+
+    jContactManager(Obj).GenEvent_OnContactManagerContactsProgress(Obj, pascontact, pascontactShortInfo, pascontactPhotoUriAsString, contactPhoto, progress, continueListing);
+  end;
+  Result:= JBool(continueListing);
+end;
+
 
 end.
 

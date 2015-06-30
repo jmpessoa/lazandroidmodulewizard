@@ -1,8 +1,8 @@
 object AndroidModule1: TAndroidModule1
   Left = 297
-  Top = 85
+  Top = 23
   Width = 300
-  Height = 600
+  Height = 662
   MarginLeft = 0
   MarginTop = 0
   MarginRight = 0
@@ -13,10 +13,10 @@ object AndroidModule1: TAndroidModule1
   OnRotate = AndroidModule1Rotate
   OnJNIPrompt = AndroidModule1JNIPrompt
   object jPanel1: jPanel
-    Left = 6
+    Left = 0
     Top = 0
-    Width = 287
-    Height = 146
+    Width = 300
+    Height = 151
     MarginLeft = 0
     MarginTop = 0
     MarginRight = 0
@@ -31,10 +31,10 @@ object AndroidModule1: TAndroidModule1
     MaxPinchZoomFactor = 4
     Id = 5157644
     object jTextView1: jTextView
-      Left = 77
+      Left = 76
       Top = 5
-      Width = 144
-      Height = 25
+      Width = 147
+      Height = 20
       MarginLeft = 5
       MarginTop = 5
       MarginRight = 5
@@ -54,10 +54,10 @@ object AndroidModule1: TAndroidModule1
       Id = 3926083
     end
     object jTextView2: jTextView
-      Left = 1
-      Top = 13
-      Width = 88
-      Height = 25
+      Left = 5
+      Top = 35
+      Width = 290
+      Height = 20
       MarginLeft = 5
       MarginTop = 5
       MarginRight = 5
@@ -79,9 +79,9 @@ object AndroidModule1: TAndroidModule1
     end
     object jPanel3: jPanel
       Left = 4
-      Top = 37
-      Width = 274
-      Height = 48
+      Top = 64
+      Width = 292
+      Height = 39
       MarginLeft = 4
       MarginTop = 4
       MarginRight = 4
@@ -97,10 +97,10 @@ object AndroidModule1: TAndroidModule1
       MaxPinchZoomFactor = 4
       Id = 8563928
       object jEditText1: jEditText
-        Left = -1
-        Top = 1
-        Width = 268
-        Height = 40
+        Left = 4
+        Top = 0
+        Width = 284
+        Height = 39
         MarginLeft = 4
         MarginTop = 10
         MarginRight = 4
@@ -129,9 +129,9 @@ object AndroidModule1: TAndroidModule1
     end
     object jPanel4: jPanel
       Left = 4
-      Top = 91
-      Width = 129
-      Height = 48
+      Top = 107
+      Width = 136
+      Height = 40
       MarginLeft = 4
       MarginTop = 4
       MarginRight = 4
@@ -146,9 +146,9 @@ object AndroidModule1: TAndroidModule1
       MaxPinchZoomFactor = 4
       Id = 0
       object jButton1: jButton
-        Left = 0
+        Left = 2
         Top = 0
-        Width = 121
+        Width = 132
         Height = 40
         MarginLeft = 2
         MarginTop = 4
@@ -168,10 +168,10 @@ object AndroidModule1: TAndroidModule1
       end
     end
     object jPanel5: jPanel
-      Left = 140
-      Top = 91
-      Width = 138
-      Height = 48
+      Left = 160
+      Top = 107
+      Width = 136
+      Height = 40
       MarginLeft = 4
       MarginTop = 4
       MarginRight = 4
@@ -186,9 +186,9 @@ object AndroidModule1: TAndroidModule1
       MaxPinchZoomFactor = 4
       Id = 0
       object jButton2: jButton
-        Left = 0
+        Left = 2
         Top = 0
-        Width = 130
+        Width = 132
         Height = 40
         MarginLeft = 2
         MarginTop = 4
@@ -209,10 +209,10 @@ object AndroidModule1: TAndroidModule1
     end
   end
   object jPanel2: jPanel
-    Left = 6
-    Top = 149
-    Width = 287
-    Height = 155
+    Left = 4
+    Top = 155
+    Width = 292
+    Height = 206
     MarginLeft = 4
     MarginTop = 4
     MarginRight = 4
@@ -229,13 +229,13 @@ object AndroidModule1: TAndroidModule1
     Id = 945929
     object jListView1: jListView
       Tag = 1
-      Left = 3
-      Top = 5
+      Left = 12
+      Top = 10
       Width = 274
       Height = 130
       Visible = True
       PosRelativeToAnchor = []
-      PosRelativeToParent = [rpTop]
+      PosRelativeToParent = [rpTop, rpCenterHorizontal]
       LayoutParamWidth = lpMatchParent
       LayoutParamHeight = lpWrapContent
       BackgroundColor = colbrDefault
@@ -250,5 +250,27 @@ object AndroidModule1: TAndroidModule1
       HighLightSelectedItemColor = colbrRed
       Id = 3721116
     end
+  end
+  object jButton3: jButton
+    Left = 82
+    Top = 366
+    Width = 136
+    Height = 40
+    MarginLeft = 2
+    MarginTop = 4
+    MarginRight = 2
+    MarginBottom = 4
+    Visible = True
+    Anchor = jPanel2
+    PosRelativeToAnchor = [raBelow]
+    PosRelativeToParent = [rpCenterHorizontal]
+    LayoutParamWidth = lpHalfOfParent
+    LayoutParamHeight = lpWrapContent
+    Text = 'Open Form 4'
+    BackgroundColor = colbrDefault
+    FontColor = colbrRed
+    FontSize = 0
+    OnClick = jButton3Click
+    Id = 0
   end
 end

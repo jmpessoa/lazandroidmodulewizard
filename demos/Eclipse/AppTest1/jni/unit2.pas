@@ -7,7 +7,7 @@ interface
   
 uses
   Classes, SysUtils, And_jni, And_jni_Bridge, Laz_And_Controls,
-  Laz_And_Controls_Events, AndroidWidget;
+  Laz_And_Controls_Events, AndroidWidget, customdialog, Unit3;
   
 type
 
@@ -15,6 +15,7 @@ type
 
   TAndroidModule2 = class(jForm)
       jButton1: jButton;
+      jButton2: jButton;
       jEditText1: jEditText;
       jEditText2: jEditText;
       jImageList1: jImageList;
@@ -30,6 +31,7 @@ type
       procedure AndroidModule2Close(Sender: TObject);
       procedure AndroidModule2JNIPrompt(Sender: TObject);
       procedure jButton1Click(Sender: TObject);
+      procedure jButton2Click(Sender: TObject);
     private
       {private declarations}
       FMens: string;
@@ -53,10 +55,23 @@ begin
   Self.Close;
 end;
 
+procedure TAndroidModule2.jButton2Click(Sender: TObject);
+begin
+   if(AndroidModule3 = nil) then
+  begin
+      gApp.CreateForm(TAndroidModule3, AndroidModule3);
+      AndroidModule3.Init(gApp);
+  end
+  else
+  begin
+    AndroidModule3.Show;
+  end;
+end;
+
   //the last close event!
 procedure TAndroidModule2.AndroidModule2Close(Sender: TObject);
 begin
-  ShowMessage('jForm 2 "game over!"!');
+  //ShowMessage('jForm 2 "game over!"!');
   Self.CallBackDataString:= jEditText1.Text;
   Self.CallBackDataInteger:= 3*StrToInt(jEditText2.Text);
   Self.CallBackDataDouble:= SQRT(Self.CallBackDataInteger);
@@ -64,6 +79,8 @@ end;
 
 procedure TAndroidModule2.AndroidModule2JNIPrompt(Sender: TObject);
 begin
+  ShowMessage('jForm 2 jni prompt!  FormBaseIndex = '+ IntToStr(Self.FormBaseIndex)+
+                                 '  FormIndex = '+ IntToStr(Self.FormIndex));
   jEditText1.SetFocus;
 end;
 

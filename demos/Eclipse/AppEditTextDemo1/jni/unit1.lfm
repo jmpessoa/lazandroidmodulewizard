@@ -66,6 +66,7 @@ object AndroidModule1: TAndroidModule1
     OnEnter = jEditText1Enter
     OnChange = jEditText1Change
     OnChanged = jEditText1Changed
+    OnClick = jEditText1Click
     Id = 4513252
   end
   object jButton1: jButton

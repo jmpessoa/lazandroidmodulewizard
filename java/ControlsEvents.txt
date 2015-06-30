@@ -83,3 +83,6 @@ pOnSurfaceViewDraw=Java_Event_pOnSurfaceViewDraw(PEnv,this,TObject(pasobj),canva
 pOnSurfaceViewChanged=Java_Event_pOnSurfaceViewChanged(PEnv,this,TObject(pasobj),width,height);                                             
 pOnSurfaceViewDrawingInBackground=Java_Event_pOnSurfaceViewDrawingInBackground(PEnv,this,TObject(pasobj),progress);
 pOnSurfaceViewDrawingPostExecute=Java_Event_pOnSurfaceViewDrawingPostExecute(PEnv,this,TObject(pasobj),progress);
+pOnContactManagerContactsExecuted=Java_Event_pOnContactManagerContactsExecuted(PEnv,this,TObject(pasobj),count);
+pOnContactManagerContactsProgress=Java_Event_pOnContactManagerContactsProgress(PEnv,this,TObject(pasobj),contactInfo,contactShortInfo,contactPhotoUriAsString,contactPhoto,progress);
+pOnCustomDialogBackKeyPressed=Java_Event_pOnCustomDialogBackKeyPressed(PEnv,this,TObject(pasobj),title);

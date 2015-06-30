@@ -1,0 +1,114 @@
+object AndroidModule1: TAndroidModule1
+  Left = 285
+  Top = 163
+  Width = 320
+  Height = 400
+  MarginLeft = 0
+  MarginTop = 0
+  MarginRight = 0
+  MarginBottom = 0
+  OnCreate = AndroidModule1Create
+  Text = 'AndroidModule1'
+  ActivityMode = actMain
+  BackgroundColor = colbrDefault
+  object jTextView1: jTextView
+    Left = 70
+    Top = 5
+    Width = 179
+    Height = 20
+    MarginLeft = 5
+    MarginTop = 5
+    MarginRight = 5
+    MarginBottom = 5
+    Visible = True
+    PosRelativeToAnchor = []
+    PosRelativeToParent = [rpTop, rpCenterHorizontal]
+    LayoutParamWidth = lpWrapContent
+    LayoutParamHeight = lpWrapContent
+    Text = 'App Contact Manager Demo 2'
+    Alignment = taLeft
+    Enabled = True
+    BackgroundColor = colbrDefault
+    FontColor = colbrDefault
+    FontSize = 0
+    TextTypeFace = tfNormal
+    Id = 5289785
+  end
+  object jButton1: jButton
+    Left = 2
+    Top = 34
+    Width = 316
+    Height = 40
+    MarginLeft = 2
+    MarginTop = 4
+    MarginRight = 2
+    MarginBottom = 4
+    Visible = True
+    Anchor = jTextView1
+    PosRelativeToAnchor = [raBelow]
+    PosRelativeToParent = []
+    LayoutParamWidth = lpMatchParent
+    LayoutParamHeight = lpWrapContent
+    Text = 'List All Contacts'
+    BackgroundColor = colbrDefault
+    FontColor = colbrDefault
+    FontSize = 0
+    OnClick = jButton1Click
+    Id = 4661961
+  end
+  object jListView1: jListView
+    Left = 3
+    Top = 120
+    Width = 312
+    Height = 96
+    Visible = True
+    Anchor = jProgressBar1
+    PosRelativeToAnchor = [raBelow]
+    PosRelativeToParent = []
+    LayoutParamWidth = lpMatchParent
+    LayoutParamHeight = lpWrapContent
+    BackgroundColor = colbrDefault
+    FontColor = colbrDefault
+    FontSize = 0
+    WidgetItem = wgNone
+    Delimiter = '|'
+    TextDecorated = txtNormal
+    ItemLayout = layImageTextWidget
+    TextSizeDecorated = sdNone
+    TextAlign = alLeft
+    OnClickCaptionItem = jListView1ClickCaptionItem
+    HighLightSelectedItemColor = colbrDefault
+    Id = 4274354
+  end
+  object jProgressBar1: jProgressBar
+    Left = 10
+    Top = 88
+    Width = 300
+    Height = 23
+    MarginLeft = 10
+    MarginTop = 10
+    MarginRight = 10
+    MarginBottom = 10
+    Visible = True
+    Anchor = jButton1
+    PosRelativeToAnchor = [raBelow]
+    PosRelativeToParent = []
+    LayoutParamWidth = lpMatchParent
+    LayoutParamHeight = lpWrapContent
+    Style = cjProgressBarStyleHorizontal
+    BackgroundColor = colbrDefault
+    Progress = 0
+    Max = 100
+    Id = 1258859
+  end
+  object jContactManager1: jContactManager
+    OnGetContactsFinished = jContactManager1GetContactsFinished
+    OnGetContactsProgress = jContactManager1GetContactsProgress
+    left = 104
+    top = 264
+  end
+  object jImageFileManager1: jImageFileManager
+    left = 240
+    top = 232
+  end
+end

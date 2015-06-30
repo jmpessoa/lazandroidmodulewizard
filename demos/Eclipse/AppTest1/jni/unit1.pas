@@ -7,7 +7,7 @@ interface
   
 uses
   Classes, SysUtils, And_jni, And_jni_Bridge, Laz_And_Controls,
-  Laz_And_Controls_Events, AndroidWidget, Unit2;
+  Laz_And_Controls_Events, AndroidWidget, Unit2, unit4;
   
 type
 
@@ -16,6 +16,7 @@ type
   TAndroidModule1 = class(jForm)
       jButton1: jButton;
       jButton2: jButton;
+      jButton3: jButton;
       jEditText1: jEditText;
       jListView1: jListView;
       jPanel1: jPanel;
@@ -30,6 +31,7 @@ type
       procedure AndroidModule1Rotate(Sender: TObject; rotate: integer; var rstRotate: integer);
       procedure jButton1Click(Sender: TObject);
       procedure jButton2Click(Sender: TObject);
+      procedure jButton3Click(Sender: TObject);
 
     private
       {private declarations}
@@ -81,10 +83,23 @@ begin
   end;
 end;
 
+procedure TAndroidModule1.jButton3Click(Sender: TObject);
+begin
+  if(AndroidModule4 = nil) then
+  begin
+      gApp.CreateForm(TAndroidModule4, AndroidModule4);
+      AndroidModule4.Init(gApp);
+  end
+  else
+  begin
+    AndroidModule4.Show;
+  end;
+end;
+
 procedure TAndroidModule1.AndroidModule1JNIPrompt(Sender: TObject);
 begin
-   //Self.BackgroundColor:= colbrBlue; {ok}
-   ShowMessage('Hello form 1');
+   ShowMessage('jForm 1 jni prompt!  FormBaseIndex = '+ IntToStr(Self.FormBaseIndex)+
+                                  '  FormIndex = '+ IntToStr(Self.FormIndex));
 end;
 
 procedure TAndroidModule1.AndroidModule1Rotate(Sender: TObject; rotate: integer; var rstRotate: integer);

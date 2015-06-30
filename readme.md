@@ -115,9 +115,46 @@
 	*5.PANIC ? When prompt "Read error" [Unknown Property] just choice "Continue Loading" !
 	****************************************************************************************************
 
+Version 0.6 - rev. 31 - 30 June 2015 - 
+
+	NEW! jContactManager component [Partial support] // <<--- @renabor's request and suggestion! 
+		
+		warning [need]:
+		<uses-permission android:name="android.permission.READ_CONTACTS"/>
+		<uses-permission android:name="android.permission.WRITE_CONTACTS"/>
+
+	NEW! AppContactManagerDemo1 
+	NEW! AppContactManagerDemo2 
+
+	IMPROVEMENTS!   
+
+	       jCustomDialog component:			
+			New! OnBackKeyPressed property event// <<--- @renabor's request and suggestion!
+
+			UPDATED: Demo AppCustomDialogDemo1
+
+	       jEditText component:			
+			New! OnClick property event // <<--- @renabor's request and suggestion!
+			New! itxCurrency mask // <<--- @renabor's request and suggestion! 
+
+			UPDATED: AppEditTextDemo1
+			
+		jForm 
+			New! OnJNIPrompt event now fires when a form is reactivated trough a Backkeypressed!
+			// <<--- @renabor's request and suggestion! 	
+
+			Fixed! jForms stack behaviour
+
+			UPDATED: Demo AppTest1  
+
+	HINT 1: Old Projects: upgrade your projects code templates !
+		Lazarus IDE --> menu Tools --> [Lamw] Android Module Wizard --> Upgrade code Templates [*.lpr, *.java]
+
+	HINT 2:	When prompt "Read error" [Unknown Property] just choice "Continue Loading"!
+
 Version 0.6 - rev. 30 - 14 June 2015 - 
 
-	IMPROVEDMENTS!   
+	IMPROVEMENTS!   
 
 		jMenu component:			
 			New! Add support to different menu in each form! // <<--- @renabor's request and suggestion!
@@ -140,7 +177,7 @@ Version 0.6 - rev. 29 - 08 June 2015 -
 
 	NEW! jSurfaceView component 
 
-	IMPROVEDMENTS!   
+	IMPROVEMENTS!   
 
 		jMediaPlayer component:			
 			New! Add support to video play! // <<------ @m4u_hoahoctro's request and suggestion!
@@ -163,7 +200,7 @@ Version 0.6 - rev. 28 - 02 June 2015 -
 			:"AndroidManifest.xml" add on:  
 				"<uses-permission android:name="android.permission.VIBRATE"/>"
 
-	IMPROVEDMENTS!   
+	IMPROVEMENTS!   
 
 		jAsyncTask component:   
 			New! component design/behaviour changed!

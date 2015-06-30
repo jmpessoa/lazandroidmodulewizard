@@ -726,6 +726,7 @@ type
     Procedure GenEvent_OnEnter (Obj: TObject);
     Procedure GenEvent_OnChange(Obj: TObject; txt: string; count : Integer);
     Procedure GenEvent_OnChanged(Obj: TObject; txt : string; count: integer);
+    Procedure GenEvent_OnClick(Obj: TObject);
 
   public
     constructor Create(AOwner: TComponent); override;
@@ -784,6 +785,8 @@ type
     property OnEnter: TOnNotify  read FOnEnter write FOnEnter;
     property OnChange: TOnChange read FOnChange write FOnChange;
     property OnChanged: TOnChange read FOnChanged write FOnChanged;
+    property OnClick : TOnNotify read FOnClick   write FOnClick;
+
   end;
 
   jButton = class(jVisualControl)
@@ -969,6 +972,9 @@ type
     procedure SetImageMatrixScale(_scaleX: single; _scaleY: single);
     procedure SetScaleType(_scaleType: TImageScaleType);
     function GetBitmapImage(): jObject;
+    procedure SetImageFromURI(_uri: jObject);
+    procedure SetImageFromIntentResult(_intentData: jObject);
+    procedure SetImageThumbnailFromCamera(_intentData: jObject);
 
     property Count: integer read GetCount;
   published
@@ -1048,8 +1054,8 @@ type
     function IsItemChecked(index: integer): boolean;
     procedure Add(item: string); overload;
     procedure Add(item: string; delim: string); overload;
-    procedure Add(item: string; delim: string; fColor: TARGBColorBridge;
-                  fSize: integer; hasWidget: TWidgetItem; widgetText: string; image: jObject); overload;
+    procedure Add(item: string; delim: string; fontColor: TARGBColorBridge;
+                  fontSize: integer; hasWidget: TWidgetItem; widgetText: string; image: jObject); overload;
     Procedure Delete(index: Integer);
     function GetText(index: integer): string;
     Procedure Clear;
@@ -1394,7 +1400,7 @@ type
   Procedure Java_Event_pAppOnBackPressed         (env: PJNIEnv; this: jobject);
   Function  Java_Event_pAppOnRotate              (env: PJNIEnv; this: jobject; rotate : Integer) : integer;
   Procedure Java_Event_pAppOnConfigurationChanged(env: PJNIEnv; this: jobject);
-  Procedure Java_Event_pAppOnActivityResult      (env: PJNIEnv; this: jobject; requestCode,resultCode : Integer; jIntent : jObject);
+  Procedure Java_Event_pAppOnActivityResult      (env: PJNIEnv; this: jobject; requestCode, resultCode: Integer; intentData : jObject);
 
   //by jmpessoa: support to Option Menu
   procedure Java_Event_pAppOnCreateOptionsMenu(env: PJNIEnv; this: jobject; jObjMenu: jObject);
@@ -1647,7 +1653,7 @@ end;
 
 Procedure Java_Event_pAppOnActivityResult(env: PJNIEnv; this: jobject;
                                                 requestCode, resultCode : Integer;
-                                               jIntent : jObject);
+                                               intentData : jObject);
 var
   Form: jForm;
 begin
@@ -1656,7 +1662,7 @@ begin
   Form:= gApp.Forms.Stack[gApp.TopIndex].Form;
   if not Assigned(Form) then Exit;
   Form.UpdateJNI(gApp);
-  if Assigned(Form.OnActivityRst) then Form.OnActivityRst(Form,requestCode,resultCode,jIntent);
+  if Assigned(Form.OnActivityRst) then Form.OnActivityRst(Form,requestCode,resultCode,intentData);
 end;
 
 //
@@ -1828,6 +1834,12 @@ begin
   begin
     jForm(jTextView(Obj).Owner).UpdateJNI(gApp);
     jTextView(Obj).GenEvent_OnClick(Obj);
+    Exit;
+  end;
+  if Obj is jEditText then
+  begin
+    jForm(jEditText(Obj).Owner).UpdateJNI(gApp);
+    jEditText(Obj).GenEvent_OnClick(Obj);
     Exit;
   end;
   if Obj is jButton then
@@ -2886,6 +2898,13 @@ begin
   if jForm(Owner).FormState = fsFormClose then Exit;
   if Assigned(FOnChanged) then FOnChanged(Obj, txt, count);
 end;
+
+// Event : Java -> Pascal
+Procedure jEditText.GenEvent_OnClick(Obj: TObject);
+begin
+  if Assigned(FOnClick) then FOnClick(Obj);
+end;
+
 
 procedure jEditText.UpdateLParamWidth;
 var
@@ -4299,6 +4318,29 @@ begin
    Result:= jImageView_GetBitmapImage(FjEnv, FjObject);
 end;
 
+
+procedure jImageView.SetImageFromURI(_uri: jObject);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jImageView_SetImageFromURI(FjEnv, FjObject, _uri);
+end;
+
+procedure jImageView.SetImageFromIntentResult(_intentData: jObject);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jImageView_SetImageFromIntentResult(FjEnv, FjObject, _intentData);
+end;
+
+procedure jImageView.SetImageThumbnailFromCamera(_intentData: jObject);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jImageView_SetImageThumbnailFromCamera(FjEnv, FjObject, _intentData);
+end;
+
+
 //  new by jmpessoa
 {jImageList}
 
@@ -5046,7 +5088,7 @@ begin
   end;
 end;
 
-Procedure jListView.Add(item: string; delim: string; fColor: TARGBColorBridge; fSize: integer; hasWidget:
+Procedure jListView.Add(item: string; delim: string; fontColor: TARGBColorBridge; fontSize: integer; hasWidget:
                                       TWidgetItem; widgetText: string; image: jObject);
 begin
   if FInitialized then
@@ -5054,7 +5096,7 @@ begin
      if delim = '' then delim:= '+';
      if item = '' then delim:= 'dummy';
      jListView_add3(FjEnv, FjObject , item,
-     delim, GetARGB(FCustomColor, fColor), fSize, Ord(hasWidget), widgetText, image);
+     delim, GetARGB(FCustomColor, fontColor), fontSize, Ord(hasWidget), widgetText, image);
      Self.Items.Add(item);
   end;
 end;

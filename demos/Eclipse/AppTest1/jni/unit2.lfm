@@ -13,10 +13,10 @@ object AndroidModule2: TAndroidModule2
   OnJNIPrompt = AndroidModule2JNIPrompt
   OnClose = AndroidModule2Close
   object jTextView1: jTextView
-    Left = 56
-    Top = 8
-    Width = 208
-    Height = 25
+    Left = 51
+    Top = 10
+    Width = 198
+    Height = 20
     MarginLeft = 10
     MarginTop = 10
     MarginRight = 10
@@ -26,7 +26,7 @@ object AndroidModule2: TAndroidModule2
     PosRelativeToParent = [rpTop, rpCenterHorizontal]
     LayoutParamWidth = lpWrapContent
     LayoutParamHeight = lpWrapContent
-    Text = 'jScrollView And jImageView demo'
+    Text = 'Form 2 ScrollView And ImageView'
     Alignment = taLeft
     Enabled = True
     BackgroundColor = colbrDefault
@@ -63,6 +63,7 @@ object AndroidModule2: TAndroidModule2
       ImageIndex = 0
       Images = jImageList1
       BackgroundColor = colbrDefault
+      ImageScaleType = scaleCenter
       Id = 5790643
     end
     object jImageView2: jImageView
@@ -80,6 +81,7 @@ object AndroidModule2: TAndroidModule2
       ImageIndex = 1
       Images = jImageList1
       BackgroundColor = colbrDefault
+      ImageScaleType = scaleCenter
       Id = 5220794
     end
     object jImageView3: jImageView
@@ -97,6 +99,7 @@ object AndroidModule2: TAndroidModule2
       ImageIndex = 2
       Images = jImageList1
       BackgroundColor = colbrDefault
+      ImageScaleType = scaleCenter
       Id = 9466797
     end
     object jImageView4: jImageView
@@ -114,6 +117,7 @@ object AndroidModule2: TAndroidModule2
       ImageIndex = 3
       Images = jImageList1
       BackgroundColor = colbrDefault
+      ImageScaleType = scaleCenter
       Id = 8792415
     end
     object jImageView5: jImageView
@@ -131,13 +135,14 @@ object AndroidModule2: TAndroidModule2
       ImageIndex = 4
       Images = jImageList1
       BackgroundColor = colbrDefault
+      ImageScaleType = scaleCenter
       Id = 0
     end
   end
   object jButton1: jButton
-    Left = 80
-    Top = 312
-    Width = 135
+    Left = 82
+    Top = 328
+    Width = 136
     Height = 40
     MarginLeft = 2
     MarginTop = 4
@@ -154,13 +159,13 @@ object AndroidModule2: TAndroidModule2
     FontColor = colbrDefault
     FontSize = 0
     OnClick = jButton1Click
-    Id = 0
+    Id = 3648999
   end
   object jTextView2: jTextView
     Left = 5
     Top = 240
-    Width = 95
-    Height = 25
+    Width = 57
+    Height = 20
     MarginLeft = 5
     MarginTop = 5
     MarginRight = 5
@@ -182,9 +187,9 @@ object AndroidModule2: TAndroidModule2
   end
   object jEditText1: jEditText
     Left = 5
-    Top = 264
-    Width = 135
-    Height = 40
+    Top = 275
+    Width = 136
+    Height = 39
     MarginLeft = 5
     MarginTop = 10
     MarginRight = 5
@@ -202,19 +207,21 @@ object AndroidModule2: TAndroidModule2
     BackgroundColor = colbrDefault
     FontColor = colbrSilver
     FontSize = 0
+    HintTextColor = colbrSilver
     ScrollBarStyle = scrNone
     MaxLines = 1
     HorScrollBar = True
     VerScrollBar = False
     WrappingLine = False
+    Editable = True
     Id = 8989420
   end
   object jEditText2: jEditText
     Tag = 1
     Left = 159
-    Top = 264
-    Width = 135
-    Height = 40
+    Top = 275
+    Width = 136
+    Height = 39
     MarginLeft = 5
     MarginTop = 10
     MarginRight = 5
@@ -232,18 +239,20 @@ object AndroidModule2: TAndroidModule2
     BackgroundColor = colbrDefault
     FontColor = colbrSilver
     FontSize = 0
+    HintTextColor = colbrSilver
     ScrollBarStyle = scrNone
     MaxLines = 1
     HorScrollBar = True
     VerScrollBar = False
     WrappingLine = False
+    Editable = True
     Id = 9101877
   end
   object jTextView3: jTextView
-    Left = 159
-    Top = 242
-    Width = 105
-    Height = 25
+    Left = 164
+    Top = 240
+    Width = 104
+    Height = 20
     MarginLeft = 5
     MarginTop = 5
     MarginRight = 5
@@ -261,6 +270,28 @@ object AndroidModule2: TAndroidModule2
     FontColor = colbrGoldenRod
     FontSize = 0
     TextTypeFace = tfNormal
+    Id = 0
+  end
+  object jButton2: jButton
+    Left = 82
+    Top = 376
+    Width = 136
+    Height = 40
+    MarginLeft = 2
+    MarginTop = 4
+    MarginRight = 2
+    MarginBottom = 4
+    Visible = True
+    Anchor = jButton1
+    PosRelativeToAnchor = [raBelow]
+    PosRelativeToParent = [rpCenterHorizontal]
+    LayoutParamWidth = lpHalfOfParent
+    LayoutParamHeight = lpWrapContent
+    Text = 'Open Form 3'
+    BackgroundColor = colbrDefault
+    FontColor = colbrLightSlateBlue
+    FontSize = 0
+    OnClick = jButton2Click
     Id = 0
   end
   object jImageList1: jImageList

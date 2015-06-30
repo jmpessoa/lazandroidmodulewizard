@@ -35,7 +35,7 @@ jImageFileManager = class(jControl)
     function LoadFromFile(_path: string; _filename: string): jObject; overload;
     procedure SaveToFile(_image: jObject; _filename: string); overload;
     procedure SaveToFile(_image: jObject;_path: string; _filename: string); overload;
-    function LoadFromUri(_imageUri: jObject): jObject;
+    function LoadFromUri(_imageUri: jObject): jObject;   overload;
 
     function LoadFromFile(_filename: string; _scale: integer): jObject; overload;
     function CreateBitmap(_width: integer; _height: integer): jObject;
@@ -46,6 +46,10 @@ jImageFileManager = class(jControl)
     function ClockWise(_bitmap: jObject; _imageView: jObject): jObject;
     function AntiClockWise(_bitmap: jObject; _imageView: jObject): jObject;
     function SetScale(_bmp: jObject; _imageView: jObject; _scaleX: single; _scaleY: single): jObject;
+    function GetBitmapFromDecodedFile(_imagePath: string): jObject;
+    function GetBitmapFromIntentResult(_intentData: jObject): jObject;
+    function GetBitmapThumbnailFromCamera(_intentData: jObject): jObject;
+    function LoadFromUri(_uriAsString: string): jObject; overload;
 
  published
 
@@ -63,7 +67,7 @@ function jImageFileManager_LoadFromFile(env: PJNIEnv; _jimagefilemanager: JObjec
 function jImageFileManager_LoadFromFile(env: PJNIEnv; _jimagefilemanager: JObject; _path: string; _filename: string): jObject; overload;
 procedure jImageFileManager_SaveToFile(env: PJNIEnv; _jimagefilemanager: JObject; _image: jObject; _filename: string); overload;
 procedure jImageFileManager_SaveToFile(env: PJNIEnv; _jimagefilemanager: JObject; _image: jObject;_path:string; _filename: string); overload;
-function jImageFileManager_LoadFromUri(env: PJNIEnv; _jimagefilemanager: JObject; _imageUri: jObject): jObject;
+function jImageFileManager_LoadFromUri(env: PJNIEnv; _jimagefilemanager: JObject; _imageUri: jObject): jObject;  overload;
 
 function jImageFileManager_LoadFromFile(env: PJNIEnv; _jimagefilemanager: JObject; _filename: string; _scale: integer): jObject;  overload;
 function jImageFileManager_CreateBitmap(env: PJNIEnv; _jimagefilemanager: JObject; _width: integer; _height: integer): jObject;
@@ -75,6 +79,11 @@ function jImageFileManager_Clockwise(env: PJNIEnv; _jimagefilemanager: JObject; 
 function jImageFileManager_AntiClockWise(env: PJNIEnv; _jimagefilemanager: JObject; _bitmap: jObject; _imageView: jObject): jObject;
 function jImageFileManager_SetScale(env: PJNIEnv; _jimagefilemanager: JObject; _bmp: jObject; _imageView: jObject; _scaleX: single; _scaleY: single): jObject;
 
+function jImageFileManager_GetBitmapFromDecodedFile(env: PJNIEnv; _jimagefilemanager: JObject; _imagePath: string): jObject;
+function jImageFileManager_GetBitmapFromIntentResult(env: PJNIEnv; _jimagefilemanager: JObject; _intentData: jObject): jObject;
+function jImageFileManager_GetBitmapThumbnailFromCamera(env: PJNIEnv; _jimagefilemanager: JObject; _intentData: jObject): jObject;
+
+function jImageFileManager_LoadFromUri(env: PJNIEnv; _jimagefilemanager: JObject; _uriAsString: string): jObject; overload;
 
 implementation
 
@@ -261,6 +270,36 @@ begin
   //in designing component state: result value here...
   if FInitialized then
    Result:= jImageFileManager_SetScale(FjEnv, FjObject, _bmp ,_imageView ,_scaleX ,_scaleY);
+end;
+
+
+function jImageFileManager.GetBitmapFromDecodedFile(_imagePath: string): jObject;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jImageFileManager_GetBitmapFromDecodedFile(FjEnv, FjObject, _imagePath);
+end;
+
+function jImageFileManager.GetBitmapFromIntentResult(_intentData: jObject): jObject;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jImageFileManager_GetBitmapFromIntentResult(FjEnv, FjObject, _intentData);
+end;
+
+
+function jImageFileManager.GetBitmapThumbnailFromCamera(_intentData: jObject): jObject;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jImageFileManager_GetBitmapThumbnailFromCamera(FjEnv, FjObject, _intentData);
+end;
+
+function jImageFileManager.LoadFromUri(_uriAsString: string): jObject;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jImageFileManager_LoadFromUri(FjEnv, FjObject, _uriAsString);
 end;
 
 {-------- jImageFileManager_JNI_Bridge ----------}
@@ -610,5 +649,62 @@ begin
   Result:= env^.CallObjectMethodA(env, _jimagefilemanager, jMethod, @jParams);
   env^.DeleteLocalRef(env, jCls);
 end;
+
+
+function jImageFileManager_GetBitmapFromDecodedFile(env: PJNIEnv; _jimagefilemanager: JObject; _imagePath: string): jObject;
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_imagePath));
+  jCls:= env^.GetObjectClass(env, _jimagefilemanager);
+  jMethod:= env^.GetMethodID(env, jCls, 'GetBitmapFromDecodedFile', '(Ljava/lang/String;)Landroid/graphics/Bitmap;');
+  Result:= env^.CallObjectMethodA(env, _jimagefilemanager, jMethod, @jParams);
+env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+
+function jImageFileManager_GetBitmapFromIntentResult(env: PJNIEnv; _jimagefilemanager: JObject; _intentData: jObject): jObject;
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= _intentData;
+  jCls:= env^.GetObjectClass(env, _jimagefilemanager);
+  jMethod:= env^.GetMethodID(env, jCls, 'GetBitmapFromIntentData', '(Landroid/content/Intent;)Landroid/graphics/Bitmap;');
+  Result:= env^.CallObjectMethodA(env, _jimagefilemanager, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+function jImageFileManager_GetBitmapThumbnailFromCamera(env: PJNIEnv; _jimagefilemanager: JObject; _intentData: jObject): jObject;
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= _intentData;
+  jCls:= env^.GetObjectClass(env, _jimagefilemanager);
+  jMethod:= env^.GetMethodID(env, jCls, 'GetBitmapThumbnailFromCamera', '(Landroid/content/Intent;)Landroid/graphics/Bitmap;');
+  Result:= env^.CallObjectMethodA(env, _jimagefilemanager, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+function jImageFileManager_LoadFromUri(env: PJNIEnv; _jimagefilemanager: JObject; _uriAsString: string): jObject;
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_uriAsString));
+  jCls:= env^.GetObjectClass(env, _jimagefilemanager);
+  jMethod:= env^.GetMethodID(env, jCls, 'LoadFromUri', '(Ljava/lang/String;)Landroid/graphics/Bitmap;');
+  Result:= env^.CallObjectMethodA(env, _jimagefilemanager, jMethod, @jParams);
+env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
 
 end.

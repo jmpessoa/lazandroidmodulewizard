@@ -30,6 +30,7 @@ type
       procedure jButton1Click(Sender: TObject);
       procedure jButton2Click(Sender: TObject);
       procedure jButton3Click(Sender: TObject);
+      procedure jCustomDialog1BackKeyPressed(Sender: TObject; title: string);
       procedure jCustomDialog1Show(Sender: TObject; dialog: jObject;
         title: string);
     private
@@ -67,6 +68,12 @@ procedure TAndroidModule1.jButton3Click(Sender: TObject);   //ok
 begin
   ShowMessage(jEditText1.Text);
   ShowMessage(jEditText2.Text);
+  jCustomDialog1.Close();
+end;
+
+procedure TAndroidModule1.jCustomDialog1BackKeyPressed(Sender: TObject; title: string);
+begin
+  ShowMessage('CustomDialog ["'+title+'"] BackKeyPressed');
   jCustomDialog1.Close();
 end;
 

@@ -8,6 +8,7 @@ interface
 
 uses 
   Classes,
+  contactmanager,
   surfaceview,
   tcpsocketclient,
   digitalclock,
@@ -50,6 +51,7 @@ implementation
   
 Procedure Register;
 begin
+  {$I jcontactmanager_icon.lrs}
   {$I jsurfaceview_icon.lrs}
   {$I jtcpsocketclient_icon.lrs}
   {$I jdigitalclock_icon.lrs}
@@ -82,6 +84,7 @@ begin
   {$I jmyhello_icon.lrs}
   RegisterComponents('Android Bridges Extra',
     [
+      jContactManager,
       jSurfaceView,
       jTCPSocketClient,
       jDigitalClock,

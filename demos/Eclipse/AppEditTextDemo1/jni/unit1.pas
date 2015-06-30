@@ -22,6 +22,7 @@ type
       procedure jButton1Click(Sender: TObject);
       procedure jEditText1Change(Sender: TObject; txt: string; count: integer);
       procedure jEditText1Changed(Sender: TObject; txt: string; count: integer);
+      procedure jEditText1Click(Sender: TObject);
       procedure jEditText1Enter(Sender: TObject);
     private
       {private declarations}
@@ -60,9 +61,8 @@ TImeOptions = (imeFlagNoFullScreen,
 
 procedure TAndroidModule1.AndroidModule1JNIPrompt(Sender: TObject);
 begin
-  //jEditText1.DispatchOnChangeEvent(False);   //the trick!  stop event!
-  //jEditText1.DispatchOnChangedEvent(False);   //the trick! stop event!
-
+  //jEditText1.DispatchOnChangeEvent(False);   //the trick!  stop event [improve performace]!
+  //jEditText1.DispatchOnChangedEvent(False);   //the trick! stop event [improve performace]!
   jEditText1.SetImeOptions(imeFlagNoFullScreen); //Thanks to @Ps !!
                                                    //IMEs will never go into full screen mode,
                                                    //and always leave some space to display the application UI
@@ -81,6 +81,11 @@ procedure TAndroidModule1.jEditText1Changed(Sender: TObject; txt: string;
   count: integer);
 begin
    ShowMessage('after= ' +txt+ ' :: count= '+ intToStr(count));
+end;
+
+procedure TAndroidModule1.jEditText1Click(Sender: TObject);
+begin
+  ShowMessage('Clicked....');
 end;
 
 procedure TAndroidModule1.jEditText1Enter(Sender: TObject);

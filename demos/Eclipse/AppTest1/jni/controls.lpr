@@ -1,5 +1,5 @@
 {hint: save all files to location: C:\adt32\eclipse\workspace\AppTest1\jni}
-library controls;  //by Lamw: Lazarus Android Module Wizard: 6/9/2015 3:58:17]
+library controls;  //by Lamw: Lazarus Android Module Wizard: 6/30/2015 15:58:37]
  
 {$mode delphi}
  
@@ -125,6 +125,22 @@ end;
 procedure pAppOnClickOptionMenuItem(PEnv: PJNIEnv; this: JObject; menuItem: JObject; itemID: JInt; itemCaption: JString; checked: JBoolean); cdecl;
 begin
   Java_Event_pAppOnClickOptionMenuItem(PEnv,this,menuItem,itemID,itemCaption,Boolean(checked));
+end;
+
+{ Class:     com_example_apptest1_Controls
+  Method:    pAppOnPrepareOptionsMenu
+  Signature: (Landroid/view/Menu;I)Z }
+function pAppOnPrepareOptionsMenu(PEnv: PJNIEnv; this: JObject; menu: JObject; menuSize: JInt): JBoolean; cdecl;
+begin
+  Result:=Java_Event_pAppOnPrepareOptionsMenu(PEnv,this,menu,menuSize);
+end;
+
+{ Class:     com_example_apptest1_Controls
+  Method:    pAppOnPrepareOptionsMenuItem
+  Signature: (Landroid/view/Menu;Landroid/view/MenuItem;I)Z }
+function pAppOnPrepareOptionsMenuItem(PEnv: PJNIEnv; this: JObject; menu: JObject; menuItem: JObject; itemIndex: JInt): JBoolean; cdecl;
+begin
+  Result:=Java_Event_pAppOnPrepareOptionsMenuItem(PEnv,this,menu,menuItem,itemIndex);
 end;
 
 { Class:     com_example_apptest1_Controls
@@ -456,6 +472,14 @@ begin
 end;
 
 { Class:     com_example_apptest1_Controls
+  Method:    pOnCustomDialogBackKeyPressed
+  Signature: (JLjava/lang/String;)V }
+procedure pOnCustomDialogBackKeyPressed(PEnv: PJNIEnv; this: JObject; pasobj: JLong; title: JString); cdecl;
+begin
+  Java_Event_pOnCustomDialogBackKeyPressed(PEnv,this,TObject(pasobj),title);
+end;
+
+{ Class:     com_example_apptest1_Controls
   Method:    pOnClickToggleButton
   Signature: (JZ)V }
 procedure pOnClickToggleButton(PEnv: PJNIEnv; this: JObject; pasobj: JLong; state: JBoolean); cdecl;
@@ -663,7 +687,23 @@ begin
   Java_Event_pOnSurfaceViewDrawingPostExecute(PEnv,this,TObject(pasobj),progress);
 end;
 
-const NativeMethods:array[0..81] of JNINativeMethod = (
+{ Class:     com_example_apptest1_Controls
+  Method:    pOnContactManagerContactsExecuted
+  Signature: (JI)V }
+procedure pOnContactManagerContactsExecuted(PEnv: PJNIEnv; this: JObject; pasobj: JLong; count: JInt); cdecl;
+begin
+  Java_Event_pOnContactManagerContactsExecuted(PEnv,this,TObject(pasobj),count);
+end;
+
+{ Class:     com_example_apptest1_Controls
+  Method:    pOnContactManagerContactsProgress
+  Signature: (JLjava/lang/String;Ljava/lang/String;Ljava/lang/String;Landroid/graphics/Bitmap;I)Z }
+function pOnContactManagerContactsProgress(PEnv: PJNIEnv; this: JObject; pasobj: JLong; contactInfo: JString; contactShortInfo: JString; contactPhotoUriAsString: JString; contactPhoto: JObject; progress: JInt): JBoolean; cdecl;
+begin
+  Result:=Java_Event_pOnContactManagerContactsProgress(PEnv,this,TObject(pasobj),contactInfo,contactShortInfo,contactPhotoUriAsString,contactPhoto,progress);
+end;
+
+const NativeMethods:array[0..86] of JNINativeMethod = (
    (name:'pAppOnScreenStyle';
     signature:'()I';
     fnPtr:@pAppOnScreenStyle;),
@@ -709,6 +749,12 @@ const NativeMethods:array[0..81] of JNINativeMethod = (
    (name:'pAppOnClickOptionMenuItem';
     signature:'(Landroid/view/MenuItem;ILjava/lang/String;Z)V';
     fnPtr:@pAppOnClickOptionMenuItem;),
+   (name:'pAppOnPrepareOptionsMenu';
+    signature:'(Landroid/view/Menu;I)Z';
+    fnPtr:@pAppOnPrepareOptionsMenu;),
+   (name:'pAppOnPrepareOptionsMenuItem';
+    signature:'(Landroid/view/Menu;Landroid/view/MenuItem;I)Z';
+    fnPtr:@pAppOnPrepareOptionsMenuItem;),
    (name:'pAppOnCreateContextMenu';
     signature:'(Landroid/view/ContextMenu;)V';
     fnPtr:@pAppOnCreateContextMenu;),
@@ -832,6 +878,9 @@ const NativeMethods:array[0..81] of JNINativeMethod = (
    (name:'pOnCustomDialogShow';
     signature:'(JLandroid/app/Dialog;Ljava/lang/String;)V';
     fnPtr:@pOnCustomDialogShow;),
+   (name:'pOnCustomDialogBackKeyPressed';
+    signature:'(JLjava/lang/String;)V';
+    fnPtr:@pOnCustomDialogBackKeyPressed;),
    (name:'pOnClickToggleButton';
     signature:'(JZ)V';
     fnPtr:@pOnClickToggleButton;),
@@ -909,7 +958,13 @@ const NativeMethods:array[0..81] of JNINativeMethod = (
     fnPtr:@pOnSurfaceViewDrawingInBackground;),
    (name:'pOnSurfaceViewDrawingPostExecute';
     signature:'(JF)V';
-    fnPtr:@pOnSurfaceViewDrawingPostExecute;)
+    fnPtr:@pOnSurfaceViewDrawingPostExecute;),
+   (name:'pOnContactManagerContactsExecuted';
+    signature:'(JI)V';
+    fnPtr:@pOnContactManagerContactsExecuted;),
+   (name:'pOnContactManagerContactsProgress';
+    signature:'(JLjava/lang/String;Ljava/lang/String;Ljava/lang/String;Landroid/graphics/Bitmap;I)Z';
+    fnPtr:@pOnContactManagerContactsProgress;)
 );
 
 function RegisterNativeMethodsArray(PEnv: PJNIEnv; className: PChar; methods: PJNINativeMethod; countMethods:integer):integer;
@@ -980,6 +1035,8 @@ exports
   pAppOnActivityResult name 'Java_com_example_apptest1_Controls_pAppOnActivityResult',
   pAppOnCreateOptionsMenu name 'Java_com_example_apptest1_Controls_pAppOnCreateOptionsMenu',
   pAppOnClickOptionMenuItem name 'Java_com_example_apptest1_Controls_pAppOnClickOptionMenuItem',
+  pAppOnPrepareOptionsMenu name 'Java_com_example_apptest1_Controls_pAppOnPrepareOptionsMenu',
+  pAppOnPrepareOptionsMenuItem name 'Java_com_example_apptest1_Controls_pAppOnPrepareOptionsMenuItem',
   pAppOnCreateContextMenu name 'Java_com_example_apptest1_Controls_pAppOnCreateContextMenu',
   pAppOnClickContextMenuItem name 'Java_com_example_apptest1_Controls_pAppOnClickContextMenuItem',
   pOnClick name 'Java_com_example_apptest1_Controls_pOnClick',
@@ -1021,6 +1078,7 @@ exports
   pOnActionBarTabSelected name 'Java_com_example_apptest1_Controls_pOnActionBarTabSelected',
   pOnActionBarTabUnSelected name 'Java_com_example_apptest1_Controls_pOnActionBarTabUnSelected',
   pOnCustomDialogShow name 'Java_com_example_apptest1_Controls_pOnCustomDialogShow',
+  pOnCustomDialogBackKeyPressed name 'Java_com_example_apptest1_Controls_pOnCustomDialogBackKeyPressed',
   pOnClickToggleButton name 'Java_com_example_apptest1_Controls_pOnClickToggleButton',
   pOnChangeSwitchButton name 'Java_com_example_apptest1_Controls_pOnChangeSwitchButton',
   pOnClickGridItem name 'Java_com_example_apptest1_Controls_pOnClickGridItem',
@@ -1046,7 +1104,9 @@ exports
   pOnMediaPlayerTimedText name 'Java_com_example_apptest1_Controls_pOnMediaPlayerTimedText',
   pOnSurfaceViewTouch name 'Java_com_example_apptest1_Controls_pOnSurfaceViewTouch',
   pOnSurfaceViewDrawingInBackground name 'Java_com_example_apptest1_Controls_pOnSurfaceViewDrawingInBackground',
-  pOnSurfaceViewDrawingPostExecute name 'Java_com_example_apptest1_Controls_pOnSurfaceViewDrawingPostExecute';
+  pOnSurfaceViewDrawingPostExecute name 'Java_com_example_apptest1_Controls_pOnSurfaceViewDrawingPostExecute',
+  pOnContactManagerContactsExecuted name 'Java_com_example_apptest1_Controls_pOnContactManagerContactsExecuted',
+  pOnContactManagerContactsProgress name 'Java_com_example_apptest1_Controls_pOnContactManagerContactsProgress';
 
 begin
   gApp:= jApp.Create(nil);{AndroidWidget.pas}

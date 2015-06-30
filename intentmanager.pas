@@ -170,6 +170,7 @@ function jIntentManager_IsCallable(env: PJNIEnv; _jintentmanager: JObject; _inte
 
 function jIntentManager_IsActionEqual(env: PJNIEnv; _jintentmanager: JObject; _intent: jObject; _intentAction: string): boolean;
 
+
 implementation
 
 
@@ -682,6 +683,7 @@ begin
   if FInitialized then
    Result:= jIntentManager_IsActionEqual(FjEnv, FjObject, _intent ,_intentAction);
 end;
+
 {-------- jIntentManager_JNI_Bridge ----------}
 
 function jIntentManager_jCreate(env: PJNIEnv;_Self: int64; this: jObject): jObject;
@@ -1917,6 +1919,5 @@ begin
   env^.DeleteLocalRef(env,jParams[1].l);
   env^.DeleteLocalRef(env, jCls);
 end;
-
 
 end.

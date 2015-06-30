@@ -363,7 +363,7 @@ Procedure jImageView_setParent         (env:PJNIEnv;
                                         ImageView : jObject;ViewGroup : jObject);
 
 Procedure jImageView_setImage          (env:PJNIEnv;
-                                        ImageView : jObject; Str : String);
+                                        ImageView : jObject; fullPath : String);
 
 Procedure jImageView_setBitmapImage(env:PJNIEnv;
                                     ImageView : jObject; bitmap : jObject);
@@ -397,6 +397,11 @@ procedure jImageView_SetImageMatrixScale(env: PJNIEnv; _jimageview: JObject; _sc
 procedure jImageView_SetScaleType(env: PJNIEnv; _jimageview: JObject; _scaleType: integer);
 
 function jImageView_GetBitmapImage(env: PJNIEnv; _jimageview: JObject): jObject;
+
+procedure jImageView_SetImageFromURI(env: PJNIEnv; _jimageview: JObject; _uri: jObject);
+procedure jImageView_SetImageFromIntentResult(env: PJNIEnv; _jimageview: JObject; _intentData: jObject);
+procedure jImageView_SetImageThumbnailFromCamera(env: PJNIEnv; _jimageview: JObject; _intentData: jObject);
+
 
 // ListView
 Function  jListView_Create2             (env:PJNIEnv;  this:jobject; SelfObj: TObject;
@@ -3139,13 +3144,13 @@ var
  
 
 Procedure jImageView_setImage(env:PJNIEnv;
-                              ImageView : jObject; Str : String);
+                              ImageView : jObject; fullPath : String);
  var
   _jMethod : jMethodID = nil;
   _jParams : array[0..0] of jValue;
   cls: jClass;
  begin
-  _jParams[0].l := env^.NewStringUTF(env, pchar(Str) );
+  _jParams[0].l := env^.NewStringUTF(env, pchar(fullPath) );
     cls := env^.GetObjectClass(env, ImageView);
  _jMethod:= env^.GetMethodID(env, cls, 'setImage', '(Ljava/lang/String;)V');
   env^.CallVoidMethodA(env,ImageView,_jMethod,@_jParams);
@@ -3345,6 +3350,48 @@ begin
   Result:= env^.CallObjectMethod(env, _jimageview, jMethod);
   env^.DeleteLocalRef(env, jCls);
 end;
+
+procedure jImageView_SetImageFromURI(env: PJNIEnv; _jimageview: JObject; _uri: jObject);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= _uri;
+  jCls:= env^.GetObjectClass(env, _jimageview);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetImageFromURI', '(Landroid/net/Uri;)V');
+  env^.CallVoidMethodA(env, _jimageview, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+
+procedure jImageView_SetImageFromIntentResult(env: PJNIEnv; _jimageview: JObject; _intentData: jObject);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= _intentData;
+  jCls:= env^.GetObjectClass(env, _jimageview);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetImageFromIntentResult', '(Landroid/content/Intent;)V');
+  env^.CallVoidMethodA(env, _jimageview, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+
+procedure jImageView_SetImageThumbnailFromCamera(env: PJNIEnv; _jimageview: JObject; _intentData: jObject);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= _intentData;
+  jCls:= env^.GetObjectClass(env, _jimageview);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetImageThumbnailFromCamera', '(Landroid/content/Intent;)V');
+  env^.CallVoidMethodA(env, _jimageview, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
 //------------------------------------------------------------------------------
 // ListView
 //------------------------------------------------------------------------------

@@ -409,6 +409,7 @@ type
   TInputTypeEx  =(  itxText,
                     itxCapCharacters,
                     itxNumber,
+                    itxCurrency,
                     itxPhone,
                     itxNumberPassword,
                     itxTextPassword,
@@ -552,7 +553,7 @@ type
   TOnClickContextMenuItem = Procedure(Sender: TObject; jObjMenuItem: jObject;
                                      itemID: integer; itemCaption: string; checked: boolean) of Object;
 
-  TOnActivityRst     = Procedure(Sender: TObject; requestCode,resultCode : Integer; jIntent : jObject) of Object;
+  TOnActivityRst     = Procedure(Sender: TObject; requestCode, resultCode: Integer; intentData: jObject) of Object;
 
   TActionBarTabSelected = Procedure(Sender: TObject; view: jObject; title: string) of Object;
   TCustomDialogShow = Procedure(Sender: TObject; dialog: jObject; title: string) of Object;
@@ -676,7 +677,6 @@ type
     ControlsVersionInfo: string; //by jmpessoa
 
     TopIndex: integer;
-    BaseIndex: integer;
 
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -909,7 +909,10 @@ type
 
   public
     FormState     : TjFormState;
+
     FormIndex: integer;
+    FormBaseIndex: integer;
+
     Finished: boolean;
 
     constructor CreateNew(AOwner: TComponent);
@@ -922,6 +925,7 @@ type
     procedure Init(refApp: jApp); override;
     procedure Finish;
     Procedure Show;
+    Procedure DoJNIPrompt;
     Procedure Close;
     Procedure Refresh;
     procedure ShowMessage(msg: string);  overload;
@@ -2137,6 +2141,9 @@ begin
   FHeight := 400;
   Finished:= False;
 
+  FormBaseIndex:= -1;  //main form not have a form base
+  FormIndex:= 0;      //main form INDEX
+
   //-------------- dummies for compatibility----
   //FOldCreateOrder:= False;
   //FTitle:= 'jForm';
@@ -2149,7 +2156,7 @@ end;
 
 destructor jForm.Destroy;
 begin
-  if Initialized and not Finished then
+  if FInitialized and not Finished then
   begin
     jForm_FreeLayout(FjEnv, FjRLayout); //free jni jForm Layout global reference
     jForm_Free2(FjEnv, FjObject);
@@ -2159,9 +2166,12 @@ end;
 
 procedure jForm.Finish;
 begin
-  jForm_FreeLayout(FjEnv, FjRLayout); //free jni jForm Layout global reference
-  jForm_Free2(FjEnv, FjObject);
-  Finished:= True;
+  if FInitialized  then
+  begin
+    jForm_FreeLayout(FjEnv, FjRLayout); //free jni jForm Layout global reference
+    jForm_Free2(FjEnv, FjObject);
+    Finished:= True;
+  end;
 end;
 
 procedure jForm.Init(refApp: jApp);
@@ -2184,8 +2194,6 @@ begin
   //thierrydijoux - if backgroundColor is set to black, no theme ...
   if  FColor <> colbrDefault then
      View_SetBackGroundColor(refApp.Jni.jEnv, refApp.Jni.jThis, FjRLayout, GetARGB(FCustomColor, FColor));
-  //else
-     //jView_SetBackGroundColor(App.Jni.jEnv, App.Jni.jThis, FjRLayout, GetARGB(colbrBlack));
 
   FInitialized:= True;
 
@@ -2201,17 +2209,17 @@ begin
 
   if gApp.GetCurrentFormsIndex = (cjFormsMax-1) then Exit; //no more form is possible!
 
-  gApp.BaseIndex:= gApp.TopIndex;
+  FormBaseIndex:= gApp.TopIndex;           //initial = -1
+  FormIndex:=     gApp.GetNewFormsIndex;  //first valid = 0;
 
-  gApp.TopIndex:= gApp.GetCurrentFormsIndex;
-  gApp.Forms.Stack[gApp.TopIndex].Form    := Self;
-  gApp.Forms.Stack[gApp.TopIndex].CloseCB := FCloseCallBack;
+  gApp.Forms.Stack[FormIndex].Form    := Self;
+  gApp.Forms.Stack[FormIndex].CloseCB := FCloseCallBack;
 
   FormState := fsFormWork;
-  FormIndex:= gApp.TopIndex;
   FVisible:= True;
-  //inc Index..
-  gApp.IncFormsIndex;  //prepare the next index...
+
+  gApp.TopIndex:= FormIndex;
+
   //Show ...
   jForm_Show2(refApp.Jni.jEnv, FjObject, FAnimation.In_);
   if Assigned(FOnJNIPrompt) then FOnJNIPrompt(Self);
@@ -2270,35 +2278,46 @@ Procedure jForm.Show;
 begin
   if not FInitialized then Exit;
   if FVisible then Exit;
+
   FormState := fsFormWork;
   FVisible:= True;
-  gApp.BaseIndex := gApp.TopIndex;
+
   gApp.TopIndex:= Self.FormIndex;
+
   jForm_Show2(FjEnv,FjObject,FAnimation.In_);
   if Assigned(FOnJNIPrompt) then FOnJNIPrompt(Self);    //*****
 end;
 
-//Ref. Destroy
+Procedure jForm.DoJNIPrompt;
+begin
+  if not FInitialized then Exit;
+  if Assigned(FOnJNIPrompt) then FOnJNIPrompt(Self);    //*****
+end;
+
+//[1]
 procedure jForm.Close;
 begin
  // Post Closing Step
  // --------------------------------------------------------------------------
  // Java           Java          Java-> Pascal
  // jForm_Close -> RemoveView -> Java_Event_pOnClose
-  jForm_Close2(FjEnv, FjObject);  //close java form...  remove view layout .... [1]
+  jForm_Close2(FjEnv, FjObject);  //close java form...  remove view layout ....
 end;
 
-// [2] after java form close......
+//[2] after java form close......
 Procedure Java_Event_pOnClose(env: PJNIEnv; this: jobject;  Form : TObject);
 var
   Inx: integer;
+  formBaseInx: integer;
 begin
 
   gApp.Jni.jEnv:= env;
   gApp.Jni.jThis:= this;
-  gApp.TopIndex:= gApp.BaseIndex;  //update topIndex...
 
-  Inx := jForm(Form).FormIndex ;
+  Inx:= jForm(Form).FormIndex;
+  formBaseInx:= jForm(Form).FormBaseIndex;
+
+  gApp.TopIndex:= formBaseInx; //update topIndex...
 
   if not Assigned(Form) then exit; //just precaution...
 
@@ -2312,6 +2331,9 @@ begin
 
   if jForm(Form).ActivityMode <> actMain then //actSplash or actRecycable
   begin
+
+      jForm(gApp.Forms.Stack[formBaseInx].Form).DoJNIPrompt;   //<<--- thanks to @arenabor
+
       //LORDMAN - 2013-08-01 / Call Back
       if Assigned(gApp.Forms.Stack[Inx].CloseCB.Event) then
          gApp.Forms.Stack[Inx].CloseCB.Event(gApp.Forms.Stack[Inx].CloseCB.Sender);
@@ -3483,9 +3505,7 @@ begin
   //Device.PhoneNumber := '';
   //Device.ID          := '';
   FInitialized     := False;
-  Forms.Index      := 0; //dummy
-  TopIndex:= 0;
-  BaseIndex:= 0;
+  TopIndex:= -1;
 end;
 
 Destructor jApp.Destroy;
@@ -3498,6 +3518,8 @@ begin
   if FInitialized  then Exit;
   // Setting Global Environment -----------------------------------------------
   FillChar(Forms,SizeOf(Forms),#0);
+  Forms.Index      := -1; //initial dummy index ...
+
   //
   Screen.Style  := ssSensor;     // Screen Style [Device,Portrait,Lanscape]
 
@@ -3556,7 +3578,7 @@ end;
 
 Procedure jApp.IncFormsIndex;
 begin
-   Forms.Index:= Forms.Index +1;
+   Forms.Index:= Forms.Index + 1;
 end;
 
 function jApp.GetNewFormsIndex: integer;
@@ -3635,6 +3657,7 @@ Function InputTypeToStrEx ( InputType : TInputTypeEx ) : String;
    itxText       : Result := 'TEXT';
    itxCapCharacters: Result := 'CAPCHARACTERS'; 
    itxNumber     : Result := 'NUMBER';
+   itxCurrency   : Result := 'CURRENCY';  //thanks to @renabor
    itxPhone      : Result := 'PHONE';
    itxNumberPassword : Result := 'PASSNUMBER';
    itxTextPassword   : Result := 'PASSTEXT';

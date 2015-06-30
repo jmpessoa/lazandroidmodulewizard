@@ -9,6 +9,7 @@ uses
 
 type
 
+  TCustomDialogBackKeyPressed = Procedure(Sender: TObject; title: string) of Object;
 {Draft Component code by "Lazarus Android Module Wizard" [12/5/2014 1:49:10]}
 {https://github.com/jmpessoa/lazandroidmodulewizard}
 
@@ -19,6 +20,7 @@ type
     //FTitle: string;
     FIconIdentifier: string;    // -->>  ../res/drawable  ex: just 'ic_launcher' [not 'ic_launcher.png']
     FOnShow: TCustomDialogShow;
+    FOnBackKeyPressed: TCustomDialogBackKeyPressed;
     procedure SetColor(Value: TARGBColorBridge); //background
     procedure UpdateLParamHeight;
     procedure UpdateLParamWidth;
@@ -53,11 +55,13 @@ type
     procedure Show(_title: string; _iconIdentifier: string); overload;
     procedure Close();
     procedure GenEvent_OnCustomDialogShow(Obj: TObject; dialog: jObject; title: string);
+    procedure GenEvent_OnCustomDialogBackKeyPressed(Obj: TObject; title: string);
   published
     property Text: string read GetText write SetText;
     property IconIdentifier: string read FIconIdentifier write SetIconIdentifier;
     property BackgroundColor: TARGBColorBridge read FColor write SetColor;
     property OnShow: TCustomDialogShow read FOnShow write FOnShow;
+    property OnBackKeyPressed: TCustomDialogBackKeyPressed read FOnBackKeyPressed write FOnBackKeyPressed;
   end;
 
 function jCustomDialog_jCreate(env: PJNIEnv; this: JObject;_Self: int64): jObject;
@@ -376,6 +380,7 @@ begin
   end;
 end;
 
+
 procedure jCustomDialog.Show(_title: string);
 begin
   //in designing component state: set value here...
@@ -427,6 +432,12 @@ end;
 procedure jCustomDialog.GenEvent_OnCustomDialogShow(Obj: TObject; dialog: jObject; title: string);
 begin
    if Assigned(OnShow) then OnShow(Obj, dialog, title);
+end;
+
+
+procedure jCustomDialog.GenEvent_OnCustomDialogBackKeyPressed(Obj: TObject; title: string);
+begin
+   if Assigned(FOnBackKeyPressed) then FOnBackKeyPressed(Obj, title);
 end;
 
 {-------- jCustomDialog_JNI_Bridge ----------}
