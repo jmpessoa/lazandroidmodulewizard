@@ -945,7 +945,8 @@ procedure jSqliteDataAccess_UpdateImageBatch(env: PJNIEnv; _jsqlitedataaccess: J
 function jHttpClient_jCreate(env: PJNIEnv;_Self: int64; this: jObject): jObject;
 procedure jHttpClient_jFree(env: PJNIEnv; _jhttpclient: JObject);
 
-procedure jHttpClient_Get(env: PJNIEnv; _jhttpclient: JObject; _stringUrl: string);
+procedure jHttpClient_Get(env: PJNIEnv; _jhttpclient: JObject; _stringUrl: string); overload;
+function jHTTPClient_Get2(env: PJNIEnv; _jHTTPClient: JObject; _Link: string): string;
 
 //procedure jHttpClient_Get(env: PJNIEnv; _jhttpclient: JObject; _stringUrl: string); overload;
 
@@ -7224,6 +7225,30 @@ begin
   env^.DeleteLocalRef(env, jCls);
 end;
 
+function jHTTPClient_Get2(env: PJNIEnv; _jHTTPClient: JObject; _Link: string): string;
+  var
+   jParams: array[0..0] of jValue;
+   jMethod: jMethodID = nil;
+   jCls: jClass = nil;
+   jStr: jString;
+   jBool: jBoolean;
+begin
+
+  jParams[0].l := env^.NewStringUTF(env, PChar(_Link));
+  jCls := env^.GetObjectClass(env, _jHTTPClient);
+  jMethod := env^.GetMethodID(env, jCls, 'Get2', '(Ljava/lang/String;)Ljava/lang/String;');
+  jStr := env^.CallObjectMethodA(env, _jHTTPClient, jMethod, @jParams);
+  case jStr = nil of
+    True: Result := '';
+    False:
+    begin
+      jBool := JNI_False;
+      Result := string(env^.GetStringUTFChars(env, jStr, @jBool));
+    end;
+  end;
+  env^.DeleteLocalRef(env, jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
 
 procedure jHttpClient_SetAuthenticationUser(env: PJNIEnv; _jhttpclient: JObject; _userName: string; _password: string);
 var

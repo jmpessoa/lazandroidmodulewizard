@@ -249,8 +249,9 @@ type
     function jCreate(): jObject;
     procedure jFree();
 
-    procedure Get(_stringUrl: string);overload;
-    procedure Get; overload; overload;
+    procedure Get(_stringUrl: string); overload;
+    procedure Get; overload;
+    function Get2(Link: string): string;
 
     procedure SetAuthenticationUser(_userName: string; _password: string);
     procedure SetAuthenticationMode(_authenticationMode: THttpClientAuthenticationMode);
@@ -4498,6 +4499,13 @@ begin
       jHttpClient_Get(FjEnv, FjObject, _stringUrl);
 end;
 
+function jHttpClient.Get2(Link: string): string;
+begin
+
+  if(FInitialized) then
+    Result := jHttpClient_Get2(FjEnv, FjObject, Link)
+  else Result := '';
+end;
 
 Procedure jHttpClient.SetUrlByIndex(Value: integer);
 begin
