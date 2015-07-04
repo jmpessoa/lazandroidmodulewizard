@@ -11986,6 +11986,8 @@ class jHttpClient /*extends ...*/ {
    private int mAuthenticationMode = 0; //0: none. 1: basic; 2= OAuth
    private String mHOSTNAME = AuthScope.ANY_HOST; // null; 
    private int mPORT = AuthScope.ANY_PORT; //-1;
+   private List<NameValuePair> ValuesForPost2 = new ArrayList<NameValuePair>();
+   HttpClient client2;
    
    //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
    public jHttpClient(Controls _ctrls, long _Self) { //Add more others news "_xxx" params if needed!
@@ -11993,10 +11995,14 @@ class jHttpClient /*extends ...*/ {
       context   = _ctrls.activity;
       pascalObj = _Self;
       controls  = _ctrls;
+      
+	  client2 = new DefaultHttpClient();     
    }
  
    public void jFree() {
-     //free local objects...
+     
+	   //free local objects...	   
+	   client2.getConnectionManager().shutdown();
    }
  
    //write others [public] methods code here......
@@ -12009,6 +12015,49 @@ class jHttpClient /*extends ...*/ {
    public void Get(String _stringUrl) {
 	   new AsyncHttpClientGet().execute(_stringUrl);	   
    } 
+
+   public void AddValueForPost2(String Name, String Value) {
+	
+	   ValuesForPost2.add(new BasicNameValuePair(Name, Value));	
+   }
+   
+   public void ClearPost2Values() {
+		
+	   ValuesForPost2.clear();	
+   }   
+   
+   public String Get2(String Link) throws Exception { 
+	   	   	   
+	   HttpGet httpGet = new HttpGet(Link);	   
+	   HttpResponse response = client2.execute(httpGet);
+	      
+	   BufferedReader rd = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
+
+	   StringBuffer sb = new StringBuffer();
+	   String line = "";
+	   while ((line = rd.readLine()) != null) {
+		   sb.append(line);		   
+	   }	   
+	   return sb.toString();
+   } 
+   
+   public String Post2(String Link) throws Exception {				
+			
+	    HttpPost httpPost = new HttpPost(Link);
+	        
+	    httpPost.setEntity(new UrlEncodedFormEntity(ValuesForPost2));
+	    	
+		HttpResponse response = client2.execute(httpPost);
+			
+		BufferedReader rd = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
+
+		StringBuffer sb = new StringBuffer();
+		String line;		
+		while ((line = rd.readLine()) != null) {
+			sb.append(line);
+		}		
+		return sb.toString();	   
+   }
    
    public void SetAuthenticationUser(String _userName, String _password) {       	 
 	   mUSERNAME = _userName;

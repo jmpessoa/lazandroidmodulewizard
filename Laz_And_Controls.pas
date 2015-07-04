@@ -258,6 +258,9 @@ type
     procedure SetAuthenticationHost(_hostName: string; _port: integer);
     procedure  PostNameValueData(_stringUrl: string; _name: string; _value: string); overload;
     procedure  PostNameValueData(_stringUrl: string; _listNameValue: string);  overload;
+    procedure ClearPost2Values;
+    procedure AddValueForPost2(Name, Value: string);
+    function Post2(Link: string): string;
 
     procedure GenEvent_OnHttpClientContentResult(Obj: TObject; content: string);
     procedure GenEvent_OnHttpClientCodeResult(Obj: TObject; code: integer);
@@ -4503,7 +4506,7 @@ function jHttpClient.Get2(Link: string): string;
 begin
 
   if(FInitialized) then
-    Result := jHttpClient_Get2(FjEnv, FjObject, Link)
+    Result := jHTTPClient_Get2(FjEnv, FjObject, Link)
   else Result := '';
 end;
 
@@ -4525,6 +4528,26 @@ begin
   //in designing component state: result value here...
   if FInitialized then
     jHttpClient_PostNameValueData(FjEnv, FjObject, _stringUrl ,_name ,_value);
+end;
+
+procedure jHttpClient.ClearPost2Values;
+begin
+
+  if(FInitialized) then jHTTPClient_ClearPost2Values(FjEnv, FjObject);
+end;
+
+procedure jHttpClient.AddValueForPost2(Name, Value: string);
+begin
+
+  if(FInitialized) then jHTTPClient_AddValueForPost2(FjEnv, FjObject, Name, Value);
+end;
+
+function jHttpClient.Post2(Link: string): string;
+begin
+
+  if(FInitialized) then
+    Result := jHTTPClient_Post2(FjEnv, FjObject, Link)
+  else Result := '';
 end;
 
 procedure jHttpClient.PostNameValueData(_stringUrl: string; _listNameValue: string);

@@ -955,6 +955,9 @@ procedure jHttpClient_SetAuthenticationMode(env: PJNIEnv; _jhttpclient: JObject;
 procedure jHttpClient_SetAuthenticationHost(env: PJNIEnv; _jhttpclient: JObject; _hostName: string; _port: integer);
 procedure jHttpClient_PostNameValueData(env: PJNIEnv; _jhttpclient: JObject; _stringUrl: string; _name: string; _value: string); overload;
 procedure jHttpClient_PostNameValueData(env: PJNIEnv; _jhttpclient: JObject; _stringUrl: string; _listNameValue: string); overload;
+procedure jHTTPClient_ClearPost2Values(env: PJNIEnv; _jHTTPClient: JObject);
+procedure jHTTPClient_AddValueForPost2(env: PJNIEnv; _jHTTPClient: JObject; Name, Value: string);
+function jHTTPClient_Post2(env: PJNIEnv; _jHTTPClient: JObject; _Link: string): string;
 
 //by jmpessoa
 procedure jSend_Email(env:PJNIEnv; this:jobject;
@@ -7227,11 +7230,11 @@ end;
 
 function jHTTPClient_Get2(env: PJNIEnv; _jHTTPClient: JObject; _Link: string): string;
   var
-   jParams: array[0..0] of jValue;
-   jMethod: jMethodID = nil;
-   jCls: jClass = nil;
-   jStr: jString;
-   jBool: jBoolean;
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID = nil;
+  jCls: jClass = nil;
+  jStr: jString;
+  jBool: jBoolean;
 begin
 
   jParams[0].l := env^.NewStringUTF(env, PChar(_Link));
@@ -7326,6 +7329,60 @@ begin
   env^.CallVoidMethodA(env, _jhttpclient, jMethod, @jParams);
   env^.DeleteLocalRef(env,jParams[0].l);
   env^.DeleteLocalRef(env,jParams[1].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jHTTPClient_ClearPost2Values(env: PJNIEnv; _jHTTPClient: JObject);
+  var
+  jMethod: jMethodID = nil;
+  jCls: jClass = nil;
+begin
+
+ jCls := env^.GetObjectClass(env, _jHTTPClient);
+ jMethod := env^.GetMethodID(env, jCls, 'ClearPost2Values', '()V');
+ env^.CallVoidMethod(env, _jHTTPClient, jMethod);
+ env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jHTTPClient_AddValueForPost2(env: PJNIEnv; _jHTTPClient: JObject; Name, Value: string);
+  var
+  jParams: array[0..1] of jValue;
+  jMethod: jMethodID = nil;
+  jCls: jClass = nil;
+begin
+
+  jParams[0].l := env^.NewStringUTF(env, PChar(Name));
+  jParams[1].l := env^.NewStringUTF(env, PChar(Value));
+  jCls := env^.GetObjectClass(env, _jHTTPClient);
+  jMethod := env^.GetMethodID(env, jCls, 'AddValueForPost2', '(Ljava/lang/String;Ljava/lang/String;)V');
+  env^.CallVoidMethodA(env, _jHTTPClient, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jParams[0].l);
+  env^.DeleteLocalRef(env, jParams[1].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+function jHTTPClient_Post2(env: PJNIEnv; _jHTTPClient: JObject; _Link: string): string;
+  var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID = nil;
+  jCls: jClass = nil;
+  jStr: jString;
+  jBool: jBoolean;
+begin
+
+  jParams[0].l := env^.NewStringUTF(env, PChar(_Link));
+  jCls := env^.GetObjectClass(env, _jHTTPClient);
+  jMethod := env^.GetMethodID(env, jCls, 'Post2', '(Ljava/lang/String;)Ljava/lang/String;');
+  jStr := env^.CallObjectMethodA(env, _jHTTPClient, jMethod, @jParams);
+  case jStr = nil of
+    True: Result := '';
+    False:
+    begin
+      jBool := JNI_False;
+      Result := string(env^.GetStringUTFChars(env, jStr, @jBool));
+    end;
+  end;
+  env^.DeleteLocalRef(env, jParams[0].l);
   env^.DeleteLocalRef(env, jCls);
 end;
 
