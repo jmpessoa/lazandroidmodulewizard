@@ -26,7 +26,7 @@ jShellCommand = class(jControl)
     procedure Init(refApp: jApp); override;
     function jCreate(): jObject;
     procedure jFree();
-    procedure Execute(_shellCmd: string);
+    procedure ExecuteAsync(_shellCmd: string);
     procedure GenEvent_OnShellCommandExecuted(Obj: TObject; cmdResult: string);
  published
     property OnExecuted: TOnCommandExecuted read FOnCommandExecuted write FOnCommandExecuted;
@@ -84,7 +84,7 @@ begin
      jShellCommand_jFree(FjEnv, FjObject);
 end;
 
-procedure jShellCommand.Execute(_shellCmd: string);
+procedure jShellCommand.ExecuteAsync(_shellCmd: string);
 begin
   //in designing component state: set value here...
   if FInitialized then

@@ -27,7 +27,7 @@ object AndroidModule3: TAndroidModule3
     LayoutParamHeight = lpWrapContent
     Text = 'Hello Form 3!'
     BackgroundColor = colbrDefault
-    FontColor = colbrLightSlateBlue
+    FontColor = colbrYellow
     FontSize = 0
     OnClick = jButton1Click
     Id = 0
@@ -50,7 +50,7 @@ object AndroidModule3: TAndroidModule3
     Alignment = taLeft
     Enabled = True
     BackgroundColor = colbrDefault
-    FontColor = colbrLightSlateBlue
+    FontColor = colbrYellowGreen
     FontSize = 0
     TextTypeFace = tfNormal
     Id = 0

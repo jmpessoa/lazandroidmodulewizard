@@ -137,9 +137,15 @@ object AndroidModule1: TAndroidModule1
     ItemLayout = layImageTextWidget
     TextSizeDecorated = sdNone
     TextAlign = alLeft
-    OnClickWidgetItem = jListView1ClickWidgetItem
-    OnClickCaptionItem = jListView1ClickCaptionItem
     HighLightSelectedItemColor = colbrDefault
+    OnClickItem = jListView1ClickItem
+    OnClickWidgetItem = jListView1ClickWidgetItem
+    OnDrawItemTextColor = jListView1DrawItemTextColor
+    OnDrawItemBitmap = jListView1DrawItemBitmap
     Id = 0
+  end
+  object jImageFileManager1: jImageFileManager
+    left = 146
+    top = 321
   end
 end

@@ -2,7 +2,7 @@ package com.example.dummyapp;
 
 //Lamw: Lazarus Android Module Wizard 
 //Form Designer and Components development model!
-//version 0.6 - revision 31 - 30 June - 2015
+//version 0.6 - revision 32 - 05 July - 2015
 //
 //https://github.com/jmpessoa/lazandroidmodulewizard
 //http://forum.lazarus.freepascal.org/index.php/topic,21919.270.html
@@ -1309,6 +1309,11 @@ public void setFontAndTextTypeFace(int fontFace, int fontStyle) {
   this.setTypeface(t, fontStyle); 		
 } 
 
+
+public void SetTextSize(float size) {
+	this.setTextSize(TypedValue.COMPLEX_UNIT_PX, size); 
+}
+
 }
 
 //-------------------------------------------------------------------------
@@ -1685,6 +1690,10 @@ public void PasteFromClipboard() {
 public void Clear() {
 	this.setText("");
 }
+
+public void SetTextSize(float size) {
+	this.setTextSize(TypedValue.COMPLEX_UNIT_PX, size); 
+}
 	
 }
 
@@ -1815,6 +1824,10 @@ public  void SetFocusable(boolean enabled ) {
   this.setFocusable            (enabled);//*
   this.setFocusableInTouchMode (enabled);//*
   //obj.requestFocus(); 
+}
+
+public void SetTextSize(float size) {
+	this.setTextSize(TypedValue.COMPLEX_UNIT_PX, size); 
 }
 
 
@@ -1984,8 +1997,8 @@ public String GetText() {
 	return this.getText().toString();
 }
 
-public void SetTextSize(int size) {
-	this.setTextSize(size);
+public void SetTextSize(float size) {
+	this.setTextSize(TypedValue.COMPLEX_UNIT_PX, size); 
 }
 
 }
@@ -2099,6 +2112,10 @@ public void setLayoutAll(int idAnchor) {
 	    }
 		//
 		setLayoutParams(lparams);
+}
+
+public void SetTextSize(float size) {
+	this.setTextSize(TypedValue.COMPLEX_UNIT_PX, size); 
 }
 
 }
@@ -2525,8 +2542,10 @@ private Context       ctx;
 private int           id;
 private List <jListItemRow> items ;
 private ArrayAdapter thisAdapter;
+private boolean mDispatchOnDrawItemTextColor;
+private boolean mDispatchOnDrawItemBitmap;
 
-public  jArrayAdapter(Context context, Controls ctrls,long pasobj, int textViewResourceId , 
+public  jArrayAdapter(Context context, Controls ctrls,long pasobj, int textViewResourceId, 
 		               List<jListItemRow> list) {
    super(context, textViewResourceId, list);
    PasObj = pasobj;
@@ -2535,7 +2554,17 @@ public  jArrayAdapter(Context context, Controls ctrls,long pasobj, int textViewR
    id    = textViewResourceId;
    items = list;
    thisAdapter = this;
+   mDispatchOnDrawItemTextColor = true;
+   mDispatchOnDrawItemBitmap = true;
 		   
+}
+
+public void SetDispatchOnDrawItemTextColor(boolean _value) {
+	mDispatchOnDrawItemTextColor = _value;
+}
+
+public void SetDispatchOnDrawItemBitmap(boolean _value) {
+	mDispatchOnDrawItemBitmap = _value;
 }
 
 @Override
@@ -2564,6 +2593,46 @@ public  View getView(int position, View v, ViewGroup parent) {
 	   itemImage.setPadding(6, 6, 0, 0);
 	   itemImage.setOnClickListener(getOnCheckItem(itemImage, position));       
    }
+   
+   
+   if (mDispatchOnDrawItemBitmap)  {        	
+       Bitmap  imageBmp = (Bitmap)controls.pOnListViewDrawItemBitmap(PasObj, (int)position , items.get(position).label);
+   	   if (imageBmp != null) {        		      	        	      
+		  imgParam = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT); //w,h
+		  itemImage = new ImageView(ctx); 
+		  itemImage.setId(position);
+		  itemImage.setImageBitmap(imageBmp);  
+		  itemImage.setFocusable(false);
+		  itemImage.setFocusableInTouchMode(false);
+		  itemImage.setPadding(6, 6, 0, 0);
+		  itemImage.setOnClickListener(getOnCheckItem(itemImage, position));   	      
+     	}
+   	    else {
+   		   if (items.get(position).bmp !=  null) {       			
+   		  	   imgParam = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT); //w,h
+   		  	   itemImage = new ImageView(ctx); 
+   		  	   itemImage.setId(position);
+   		  	   itemImage.setImageBitmap(items.get(position).bmp);  
+   		  	   itemImage.setFocusable(false);
+   		  	   itemImage.setFocusableInTouchMode(false);
+   		  	   itemImage.setPadding(6, 6, 0, 0);
+   		  	   itemImage.setOnClickListener(getOnCheckItem(itemImage, position));
+   		    }  
+        }	        	
+   } 
+   else {
+   	 if (items.get(position).bmp !=  null) {	
+  	   imgParam = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT); //w,h
+  	   itemImage = new ImageView(ctx); 
+  	   itemImage.setId(position);
+  	   itemImage.setImageBitmap(items.get(position).bmp);  
+  	   itemImage.setFocusable(false);
+  	   itemImage.setFocusableInTouchMode(false);
+  	   itemImage.setPadding(6, 6, 0, 0);
+  	   itemImage.setOnClickListener(getOnCheckItem(itemImage, position));
+   	  }   
+    }   
+   
    
    RelativeLayout itemLayout = new RelativeLayout(ctx);
        
@@ -2610,6 +2679,7 @@ public  View getView(int position, View v, ViewGroup parent) {
 		    }
 		    itemText[i].setPadding(10, 15, 10, 15);
 		    itemText[i].setTypeface(null,faceTitle);
+		    
 		}
 		else{			
 		   itemText[i].setTypeface(null,faceBody);
@@ -2625,12 +2695,25 @@ public  View getView(int position, View v, ViewGroup parent) {
 		}
 	   
 	    itemText[i].setText(lines[i]);
+	    	    	    
+        if (mDispatchOnDrawItemTextColor)  {            	             	
+          	 int drawItemTxtColor = controls.pOnListViewDrawItemCaptionColor(PasObj, (int)position, lines[i]);
+          	 if (drawItemTxtColor != 0) {
+          		itemText[i].setTextColor(drawItemTxtColor); 
+          	 }
+          	 else {
+          		 if (items.get(position).textColor != 0) {	
+          			itemText[i].setTextColor(items.get(position).textColor);
+                 }	 
+          	 }
+          } 
+          else {
+          	if (items.get(position).textColor != 0) {	
+          		itemText[i].setTextColor(items.get(position).textColor);
+          	}   
+          }
 	    
-	    if (items.get(position).textColor != 0) {
-	       itemText[i].setTextColor(items.get(position).textColor);
-	    }
-	    
-	    txtLayout.addView(itemText[i]);   
+	      txtLayout.addView(itemText[i]);   
    }
    
    View itemWidget = null;
@@ -2811,7 +2894,10 @@ int marginBottom = 5;
 
 boolean highLightSelectedItem = false;
 int highLightColor = Color.RED;
+
 int lastSelectedItem = -1;
+String selectedItemCaption = "";
+
 
 
 //Constructor
@@ -2844,7 +2930,7 @@ setCacheColorHint  (0);
 
 alist = new ArrayList<jListItemRow>();
 //simple_list_item_1
-aadapter = new jArrayAdapter(context, controls, PasObj, android.R.layout.simple_list_item_1,  alist);
+aadapter = new jArrayAdapter(context, controls, PasObj, android.R.layout.simple_list_item_1, alist);
 
 setAdapter(aadapter);
 
@@ -2870,13 +2956,25 @@ onItemClickListener = new OnItemClickListener() {
 		  aadapter.notifyDataSetChanged();
 	   }	   
 	   	   
-	   lastSelectedItem = position;		
-       controls.pOnClick(PasObj, (int)position );
+	   lastSelectedItem = (int)position;
+	   selectedItemCaption = alist.get((int)position).label;
        controls.pOnClickCaptionItem(PasObj, (int)position , alist.get((int)position).label);
    }
 };
 
 setOnItemClickListener(onItemClickListener);
+
+this.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+    @Override
+    public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+    	//Log.i("OnItemLongClickListener", "position = "+position);    	
+    	lastSelectedItem = (int)position;
+ 	   selectedItemCaption = alist.get((int)position).label;
+    	controls.pOnListViewLongClickCaptionItem(PasObj, (int)position , alist.get((int)position).label);
+        return false;
+    }
+});
+
 }
 
 //by jmpessoa
@@ -2904,8 +3002,8 @@ public  void setTextColor( int textcolor) {
    this.textColor =textcolor;
 }
 
-public  void setTextSize (int textsize) {
-   this.textSize =textsize ;
+public void setTextSize (int textsize) {
+   this.textSize = textsize;
 }
 
 // LORDMAN - 2013-08-07
@@ -3193,6 +3291,24 @@ public void SetHighLightSelectedItem(boolean _value)  {
 public void SetHighLightSelectedItemColor(int _color)  {
 	highLightColor = _color;
 }
+
+public int GetItemIndex() { 
+  return lastSelectedItem;
+}
+
+public String GetItemCaption() {
+ return selectedItemCaption;
+}
+
+
+public void DispatchOnDrawItemTextColor(boolean _value) {
+	aadapter.SetDispatchOnDrawItemTextColor(_value);
+}
+
+public void DispatchOnDrawItemBitmap(boolean _value) {
+	aadapter.SetDispatchOnDrawItemBitmap(_value);
+}
+
 
 }
 //-------------------------------------------------------------------------
@@ -4840,7 +4956,9 @@ class jDialogProgress {
   
   public void SetMessage(String _msg) {
     mMsg = _msg;
-    if (dialog != null) dialog.setMessage(_msg);
+    if (dialog != null) {
+    	if (dialog.isShowing()) {dialog.setMessage(_msg);}
+    }	
   }
  
   public void SetTitle(String _title) {
@@ -4855,8 +4973,12 @@ class jDialogProgress {
   }
       
   public void Stop() {
-	  if (customDialog != null) customDialog.dismiss();
-	  if (dialog != null) dialog.dismiss();
+	  if (customDialog != null) {
+		  customDialog.dismiss();		  
+	  }
+	  if (dialog != null) {
+		  dialog.dismiss();		  
+	  }
   }
   
   //TODO
@@ -5625,7 +5747,7 @@ class jSqliteCursor {
     public void MoveToLast() {
     	if (cursor != null) cursor.moveToLast();
     }
-  
+              
     public void MoveToPosition(int position) {
     	if (cursor != null) cursor.moveToPosition(position);
     }
@@ -5639,7 +5761,7 @@ class jSqliteCursor {
     	if (cursor != null) return cursor.getString(columnIndex);
     	else return "";			
     }
-    
+
     //Cursor.FIELD_TYPE_BLOB; //4
 	//Cursor.FIELD_TYPE_FLOAT//2
 	//Cursor.FIELD_TYPE_INTEGER//1
@@ -5705,11 +5827,35 @@ class jSqliteCursor {
     	else return "";			
     }
          
+    //Cursor.FIELD_TYPE_BLOB; //4
+	//Cursor.FIELD_TYPE_FLOAT//2
+	//Cursor.FIELD_TYPE_INTEGER//1
+	//Cursor.FIELD_TYPE_STRING//3
+	//Cursor.FIELD_TYPE_NULL //0           
+    public String GetValueAsString(int position, String columnName) {
+    	String colValue = "";
+        if (this.cursor != null) {
+        	
+        	if (position == -1)  cursor.moveToLast();
+        	else cursor.moveToPosition(position);
+        	
+            int index = this.cursor.getColumnIndex(columnName);                      
+            switch (cursor.getType(index)) {                
+     	      case Cursor.FIELD_TYPE_INTEGER: colValue = Integer.toString(cursor.getInt(index));           break;
+     	      case Cursor.FIELD_TYPE_STRING : colValue =  cursor.getString(index);                         break;
+     	      case Cursor.FIELD_TYPE_FLOAT  : colValue =  String.format("%.3f", cursor.getFloat(index));   break;
+     	      case Cursor.FIELD_TYPE_BLOB   : colValue = "BLOB";                                       break;
+     	      case Cursor.FIELD_TYPE_NULL   : colValue = "NULL";                                       break;
+     	      default:                        colValue = "UNKNOW";                              
+    	   }                                                                       
+        }
+        return colValue;        
+    }
+    
     public void Free() {
       cursor = null;	
       bufBmp = null;
-    }
-    
+    }    
 }
 
 /**
@@ -8711,7 +8857,7 @@ class CustomSpinnerArrayAdapter<T> extends ArrayAdapter<String>{
       text.setTextColor(mTextColor);
                  
       if (mTextFontSize != 0)
-          text.setTextSize(mTextFontSize);
+          text.setTextSize(TypedValue.COMPLEX_UNIT_PX, mTextFontSize);
       
       text.setBackgroundColor(mTexBackgroundtColor);
       return view;        
@@ -8728,7 +8874,7 @@ class CustomSpinnerArrayAdapter<T> extends ArrayAdapter<String>{
       text.setTextColor(mSelectedTextColor);      
       
       if (mTextFontSize != 0)
-          text.setTextSize(mTextFontSize);  
+          text.setTextSize(TypedValue.COMPLEX_UNIT_PX, mTextFontSize);  
       
       if (mLastItemAsPrompt) flag = 1;
       return view; 
@@ -8899,7 +9045,7 @@ class jSpinner extends Spinner /*dummy*/ { //please, fix what GUI object will be
   
    public void Add(String _item) {	  	 
 	 mStrList.add(_item);    
-	 Log.i("Spinner_Add: ",_item);
+	 //Log.i("Spinner_Add: ",_item);
      mSpAdapter.notifyDataSetChanged();
    }
    
@@ -10065,20 +10211,26 @@ class jCustomDialog extends RelativeLayout {
 	      mDialog.setFeatureDrawableResource(Window.FEATURE_LEFT_ICON, GetDrawableResourceId(mIconIdentifier));	      
 	      mDialog.setTitle(mTitle);
 	      
-	      
+	       //fix by @renabor	      	      	      	      
 	      mDialog.setOnKeyListener(new Dialog.OnKeyListener() {
-
-	            @Override
-	            public boolean onKey(DialogInterface arg0, int keyCode,
-	                    KeyEvent event) {
-	                // TODO Auto-generated method stub
-	                if (keyCode == KeyEvent.KEYCODE_BACK) {
-	                	controls.pOnCustomDialogBackKeyPressed(pascalObj, mTitle);	                    
-	                }
-	                return true;
-	            }
-	        });
-	      
+	    	  @Override
+	    	    public  boolean onKey(DialogInterface arg0, int keyCode, KeyEvent event) {
+	    	       if (event.getAction() == KeyEvent.ACTION_UP) {
+	    	          if (keyCode == KeyEvent.KEYCODE_BACK) {
+	    	               controls.pOnCustomDialogBackKeyPressed(pascalObj, mTitle);
+	    	               if (mDialog != null) mDialog.dismiss();
+	    	               return false; 
+	    	          } else if (keyCode == KeyEvent.KEYCODE_ENTER) {
+	    	              InputMethodManager imm = (InputMethodManager) controls.activity.getSystemService(Context.INPUT_METHOD_SERVICE);
+	    	              imm.hideSoftInputFromWindow(getWindowToken(), 0);
+	    	              controls.pOnEnter(pascalObj);
+	    	              return true;
+	    	          }
+	    	       }
+	    	       return false;
+	    	     }
+	    	  });
+	      	      	      
 	      this.setVisibility(android.view.View.VISIBLE);
 	 	  controls.pOnCustomDialogShow(pascalObj, mDialog, mTitle);	      
 	      mDialog.show();							
@@ -10489,27 +10641,50 @@ class jGridItem{
 	
 	Context ctx;
 	String label;
+	int itemTextColor;
+	int itemTextSize;
 	int id;
 	String drawableIdentifier;
 	
 	public  jGridItem(Context context) {
 		ctx = context;
+		itemTextColor = 0; //default
 	}
 }
 
 class jGridViewCustomAdapter extends ArrayAdapter {
      Context context;
      
+     Controls contrls;
+     
+     long pascalObj;
+     
+     boolean mDispatchOnDrawItemTextColor;
+     boolean mDispatchOnDrawItemBitmap;
+     
      private int itemsLayout; 
      private List <jGridItem> items ;
-     
-     public jGridViewCustomAdapter(Context context, int ResourceId, int itemslayout, List<jGridItem> list) {
+     //Context context, Controls ctrls,long pasobj
+     public jGridViewCustomAdapter(Context context, Controls ctrls,long pasobj, int ResourceId, int itemslayout, List<jGridItem> list) {
         super(context, ResourceId, list);  //ResourceId/0 or android.R.layout.simple_list_item_1;
-        this.context=context;       
+        this.context=context;
+        
+        contrls = ctrls;
+        pascalObj = pasobj;
         items = list;
-        itemsLayout = itemslayout; 
+        itemsLayout = itemslayout;
+        mDispatchOnDrawItemTextColor = true;
+        mDispatchOnDrawItemBitmap = true;
      }
-      
+
+     public void SetDispatchOnDrawItemTextColor(boolean _value) {
+    	 mDispatchOnDrawItemTextColor= _value;
+     }
+     
+     public void SetDispatchOnDrawItemBitmap(boolean _value) {
+    	 mDispatchOnDrawItemBitmap= _value;
+     }
+     
      @Override
      public int getCount() {
     	//Log.i("count",": "+items.size()); 
@@ -10552,15 +10727,55 @@ class jGridViewCustomAdapter extends ArrayAdapter {
            imageViewItem.setPadding(25,45,25,20);              
            txtParam.addRule(RelativeLayout.ALIGN_PARENT_TOP);
         } 	
-                
-        if ( ! items.get(position).drawableIdentifier.equals("") ) {        	
-        	imageViewItem.setImageResource(GetDrawableResourceId( items.get(position).drawableIdentifier ));        	 
-        	itemLayout.addView(imageViewItem, imgParam);
-        }                
+        
+        
+        if (mDispatchOnDrawItemBitmap)  {        	
+           Bitmap  imageBmp = (Bitmap)contrls.pOnGridDrawItemBitmap(pascalObj, (int)position , items.get(position).label);
+       	   if (imageBmp != null) {        		   
+       	      imageViewItem.setImageBitmap(imageBmp);
+       	      itemLayout.addView(imageViewItem, imgParam);
+         	}
+       	    else {
+       		   if (! items.get(position).drawableIdentifier.equals("")) {       			
+       		    	imageViewItem.setImageResource(GetDrawableResourceId( items.get(position).drawableIdentifier ));        	 
+               	    itemLayout.addView(imageViewItem, imgParam);
+       		    }  
+            }	        	
+       } 
+       else {
+       	 if (! items.get(position).drawableIdentifier.equals("")) {	
+       		imageViewItem.setImageResource(GetDrawableResourceId( items.get(position).drawableIdentifier ));        	 
+       	    itemLayout.addView(imageViewItem, imgParam);
+       	  }   
+        }
+                    
         
         if (!items.get(position).label.equals("")) {
-            textViewTitle.setText( items.get(position).label ); //+""+ items.get(position).id          
-            itemLayout.addView(textViewTitle, txtParam);
+            textViewTitle.setText( items.get(position).label ); //+""+ items.get(position).id
+            
+            
+            if (items.get(position).itemTextSize != 0) {            
+            	textViewTitle.setTextSize(TypedValue.COMPLEX_UNIT_PX, items.get(position).itemTextSize);            
+            }
+                                    
+            if (mDispatchOnDrawItemTextColor)  {            	   
+            	 int drawItemCaptionColor = contrls.pOnGridDrawItemCaptionColor(pascalObj, (int)position , items.get(position).label);
+            	 if (drawItemCaptionColor != 0) {
+            	     textViewTitle.setTextColor(drawItemCaptionColor); 
+            	 }
+            	 else {
+            		 if (items.get(position).itemTextColor != 0) {	
+                         textViewTitle.setTextColor(items.get(position).itemTextColor);
+                  	}	 
+            	 }
+            } 
+            else {
+            	if (items.get(position).itemTextColor != 0) {	
+                   textViewTitle.setTextColor(items.get(position).itemTextColor);
+            	}   
+            }       
+                                                 
+            itemLayout.addView(textViewTitle, txtParam);            
         }
         
         listLayout.addView(itemLayout);
@@ -10614,7 +10829,12 @@ class jGridView extends GridView /*dummy*/ { //please, fix what GUI object will 
    private int marginRight = 0;
    private int marginBottom = 0;
    private boolean mRemovedFromParent = false;
-
+   private int lastSelectedItem = -1;
+   String lastSelectedItemCaption = "";
+   
+   int mItemTextColor = 0;
+   int mItemTextSize = 0;
+   
    private jGridViewCustomAdapter gridViewCustomeAdapter;
    private ArrayList<jGridItem>  alist;
   
@@ -10629,7 +10849,7 @@ class jGridView extends GridView /*dummy*/ { //please, fix what GUI object will 
       alist = new ArrayList<jGridItem>();
             
       //Create the Custom Adapter Object      
-      gridViewCustomeAdapter = new jGridViewCustomAdapter(this.controls.activity, android.R.layout.simple_list_item_1, 0, alist);
+      gridViewCustomeAdapter = new jGridViewCustomAdapter(this.controls.activity, controls, pascalObj, android.R.layout.simple_list_item_1, 0, alist);
       
       // Set the Adapter to GridView
       this.setAdapter(gridViewCustomeAdapter);
@@ -10638,14 +10858,30 @@ class jGridView extends GridView /*dummy*/ { //please, fix what GUI object will 
     	  
       /*.*/public void onItemClick(AdapterView<?> parent, View v, int position, long id){  //please, do not remove /*.*/ mask for parse invisibility!
               if (enabled) {            	  
+            	 lastSelectedItem = (int)position;
+        	     lastSelectedItemCaption = alist.get((int)position).label;
                  controls.pOnClickGridItem(pascalObj, (int)position , alist.get((int)position).label);
               }
            };
       };      
       
-      this.setOnItemClickListener(onItemClickListener);     
-      this.setNumColumns(android.widget.GridView.AUTO_FIT);  //android.widget.GridView.AUTO_FIT --> -1      
-
+      this.setOnItemClickListener(onItemClickListener);
+            
+      this.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+    	    @Override
+    	    public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+    	    	if (enabled) {	
+    	    	  //Log.i("OnItemLongClickListener", "position = "+position);    	
+    	      	   lastSelectedItem = (int)position;
+    	    	   lastSelectedItemCaption = alist.get((int)position).label;
+    	    	   controls.pOnLongClickGridItem(pascalObj, (int)position, lastSelectedItemCaption);    	        
+    	    	}
+    	    	return false;
+    	    }
+    	});
+      
+      this.setNumColumns(android.widget.GridView.AUTO_FIT);  //android.widget.GridView.AUTO_FIT --> -1
+     
    } //end constructor
    
    public void jFree() {
@@ -10748,6 +10984,8 @@ class jGridView extends GridView /*dummy*/ { //please, fix what GUI object will 
    	  info.label = _item;
    	  info.drawableIdentifier = _imgIdentifier;
    	  info.id = alist.size();
+   	  info.itemTextColor = mItemTextColor;
+   	  info.itemTextSize = mItemTextSize;
    	  alist.add(info);
    	  gridViewCustomeAdapter.notifyDataSetChanged();
    }
@@ -10780,7 +11018,32 @@ class jGridView extends GridView /*dummy*/ { //please, fix what GUI object will 
 	     //0: image-text  ; 1: text-image
 	   gridViewCustomeAdapter.SetItemsLayout(_value);
    }
-
+   
+   public int  GetItemIndex() {
+	   return lastSelectedItem;
+   }
+   
+   public String GetItemCaption() {
+	   return lastSelectedItemCaption;
+   }
+   
+   public void DispatchOnDrawItemTextColor(boolean _value) {
+	   gridViewCustomeAdapter.SetDispatchOnDrawItemTextColor(_value);
+	}
+   
+   
+   public void DispatchOnDrawItemBitmap(boolean _value) {
+	   gridViewCustomeAdapter.SetDispatchOnDrawItemBitmap(_value);
+	}
+   
+   public void SetFontSize(int _size) {	   	   
+	   mItemTextSize = _size;
+   }
+   
+   public void SetFontColor(int _color) {	  
+	   mItemTextColor = _color;	
+   }
+   
 } //end class
 
 
@@ -11986,8 +12249,9 @@ class jHttpClient /*extends ...*/ {
    private int mAuthenticationMode = 0; //0: none. 1: basic; 2= OAuth
    private String mHOSTNAME = AuthScope.ANY_HOST; // null; 
    private int mPORT = AuthScope.ANY_PORT; //-1;
+   
    private List<NameValuePair> ValuesForPost2 = new ArrayList<NameValuePair>();
-   HttpClient client2;
+   DefaultHttpClient client2;
    
    //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
    public jHttpClient(Controls _ctrls, long _Self) { //Add more others news "_xxx" params if needed!
@@ -11995,44 +12259,30 @@ class jHttpClient /*extends ...*/ {
       context   = _ctrls.activity;
       pascalObj = _Self;
       controls  = _ctrls;
-      
-	  client2 = new DefaultHttpClient();     
+      client2 = new DefaultHttpClient();     
    }
  
    public void jFree() {
-     
-	   //free local objects...	   
+     //free local objects...
 	   client2.getConnectionManager().shutdown();
    }
  
    //write others [public] methods code here......
    //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
-   
    //ref. http://blog.leocad.io/basic-http-authentication-on-android/
    //ref. http://simpleprogrammer.com/2011/05/25/oauth-and-rest-in-android-part-1/
    //ref. http://jan.horneck.info/blog/androidhttpclientwithbasicauthentication
          
-   public void Get(String _stringUrl) {
+   public void GetAsync(String _stringUrl) {
 	   new AsyncHttpClientGet().execute(_stringUrl);	   
-   } 
-
-   public void AddValueForPost2(String Name, String Value) {
-	
-	   ValuesForPost2.add(new BasicNameValuePair(Name, Value));	
    }
-   
-   public void ClearPost2Values() {
-		
-	   ValuesForPost2.clear();	
-   }   
-   
-   public String Get2(String Link) throws Exception { 
+         
+   public String Get2(String _stringUrl) throws Exception {  //Pascal: Get  
 	   	   	   
-	   HttpGet httpGet = new HttpGet(Link);	   
+	   HttpGet httpGet = new HttpGet(_stringUrl);	   
 	   HttpResponse response = client2.execute(httpGet);
 	      
 	   BufferedReader rd = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
-
 	   StringBuffer sb = new StringBuffer();
 	   String line = "";
 	   while ((line = rd.readLine()) != null) {
@@ -12041,23 +12291,52 @@ class jHttpClient /*extends ...*/ {
 	   return sb.toString();
    } 
    
-   public String Post2(String Link) throws Exception {				
-			
+      
+   public void AddValueForPost2(String Name, String Value) {  //Pascal: AddPostNameValueData		
+       ValuesForPost2.add(new BasicNameValuePair(Name, Value));	
+   }
+
+   public void ClearPost2Values() { // Pascal: ClearPostNameValueData
+      ValuesForPost2.clear();	
+   }   
+
+   public String Post2(String Link) throws Exception {	// Pascal: Post			
+		
+		// Create a new HttpClient and Post Header
+		int statusCode = 0;						
+		HttpParams httpParams = new BasicHttpParams();
+		int connection_Timeout = 5000;
+		HttpConnectionParams.setConnectionTimeout(httpParams, connection_Timeout);
+		HttpConnectionParams.setSoTimeout(httpParams, connection_Timeout);
+		
+        if (mAuthenticationMode != 0) {    		   
+        	client2.getCredentialsProvider().setCredentials(
+                        new AuthScope(mHOSTNAME,mPORT),  // 
+                        new UsernamePasswordCredentials(mUSERNAME, mPASSWORD));
+	    }
+        			   
 	    HttpPost httpPost = new HttpPost(Link);
+	    
+	  //thanks to @renabor
+	    if (mAuthenticationMode != 0) {
+            String _credentials = mUSERNAME + ":" + mPASSWORD;
+            String _base64EncodedCredentials = Base64.encodeToString(_credentials.getBytes(), Base64.NO_WRAP);
+            httpPost.addHeader("Authorization", "Basic " + _base64EncodedCredentials);
+        }	   
+
 	        
 	    httpPost.setEntity(new UrlEncodedFormEntity(ValuesForPost2));
 	    	
 		HttpResponse response = client2.execute(httpPost);
 			
 		BufferedReader rd = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
-
 		StringBuffer sb = new StringBuffer();
 		String line;		
 		while ((line = rd.readLine()) != null) {
 			sb.append(line);
 		}		
 		return sb.toString();	   
-   }
+  }
    
    public void SetAuthenticationUser(String _userName, String _password) {       	 
 	   mUSERNAME = _userName;
@@ -12086,14 +12365,18 @@ class jHttpClient /*extends ...*/ {
 	 */
    
      //ref. http://mobiledevtuts.com/android/android-http-with-asynctask-example/ 
-   public void PostNameValueData(String _stringUrl, String _name, String _value) {
+   public void PostNameValueDataAsync(String _stringUrl, String _name, String _value) {
 	  new AsyncHttpClientPostNameValueData().execute(_stringUrl, _name, _value);	  
    }
   
 	
-	public void PostNameValueData(String _stringUrl, String _listNameValue) {
+	public void PostNameValueDataAsync(String _stringUrl, String _listNameValue) {
 	   new AsyncHttpClientPostListNameValueData().execute(_stringUrl, _listNameValue);     
     }
+	
+	public void PostNameValueDataAsync(String _stringUrl) {
+		new AsyncHttpClientPostNameValueData().execute(_stringUrl, "", "");
+	}
 	
 	/*
 	 * AsyncTask has three generic types:
@@ -12138,10 +12421,16 @@ class jHttpClient /*extends ...*/ {
                     httppost.addHeader("Authorization", "Basic " + _base64EncodedCredentials);
                }
 			    			    			    
-				// Add your data
-				List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();								
-				nameValuePairs.add(new BasicNameValuePair(_name, _value));								
-				httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
+				// Add your data				
+			    if (!_name.equals("")) { 
+			         List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();				
+				     nameValuePairs.add(new BasicNameValuePair(_name, _value));
+				     httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
+			    }
+			    else {			    	
+			       httppost.setEntity(new UrlEncodedFormEntity(ValuesForPost2));
+			    }
+				
 				// Execute HTTP Post Request
 				HttpResponse response = httpclient.execute(httppost);
 				StatusLine statusLine = response.getStatusLine();  
@@ -12507,7 +12796,7 @@ class jAnalogClock extends AnalogClock /*dummy*/ { //please, fix what GUI object
    public void SetId(int _id) { //wrapper method pattern ...
       this.setId(_id);
    }
-  
+     
   //write others [public] methods code here......
   //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
   
@@ -12642,7 +12931,10 @@ class jDigitalClock extends DigitalClock /*TextClock*/ { //please, fix what GUI 
 	  
 	  //write others [public] methods code here......
 	  //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
-	  
+	   
+	   public void SetTextSize(float _size) {
+			this.setTextSize(TypedValue.COMPLEX_UNIT_PX, _size);		   
+	   }	  
 } //end class
 
 /**
@@ -14116,7 +14408,7 @@ public void AddContact(String _displayName, String _mobileNumber) {
     }
 }
 
-public void GetContactsAsyn(String _delimiter) {
+public void GetContactsAsync(String _delimiter) {
 	new ATask().execute(_delimiter);
 }
                              //param, progr, result  
@@ -14428,6 +14720,9 @@ public  native void pOnAsyncEventPostExecute(long pasobj, int progress);
 //new by jmpessoa: support for jListView custom row
 public  native void pOnClickWidgetItem(long pasobj, int position, boolean checked); 
 public  native void pOnClickCaptionItem(long pasobj, int position, String caption);
+public  native void pOnListViewLongClickCaptionItem(long pasobj, int position, String caption);
+public  native int pOnListViewDrawItemCaptionColor(long pasobj, int position, String caption);
+public  native Bitmap pOnListViewDrawItemBitmap(long pasobj, int position, String caption);
 
 //new by jmpessoa: support for Bluetooth
 public  native void pOnBluetoothEnabled(long pasobj);
@@ -14467,6 +14762,9 @@ public native void pOnClickToggleButton(long pasobj, boolean state);
 public native void pOnChangeSwitchButton(long pasobj, boolean state);
 
 public native void pOnClickGridItem(long pasobj, int position, String caption);
+public native void pOnLongClickGridItem(long pasobj, int position, String caption);
+public  native int pOnGridDrawItemCaptionColor(long pasobj, int position, String caption);
+public  native Bitmap pOnGridDrawItemBitmap(long pasobj, int position, String caption);
  
 public native void pOnChangedSensor(long pasobj, Sensor sensor, int sensorType, float[] values, long timestamp);
 public native void pOnListeningSensor(long pasobj, Sensor sensor, int sensorType);

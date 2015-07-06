@@ -25,14 +25,13 @@ type
       jTextView2: jTextView;
       jTextView3: jTextView;
       procedure DataModuleCloseQuery(Sender: TObject; var CanClose: boolean);
-      procedure DataModuleCreate(Sender: TObject);
-      procedure DataModuleJNIPrompt(Sender: TObject);
       procedure DataModuleRotate(Sender: TObject; rotate: integer;
         var rstRotate: integer);
       procedure jButton1Click(Sender: TObject);
       procedure jButton2Click(Sender: TObject);
       procedure jButton3Click(Sender: TObject);
-      procedure jListView1ClickItem(Sender: TObject; Item: Integer);
+      procedure jListView1ClickItem(Sender: TObject; itemIndex: integer;
+        itemCaption: string);
       procedure jListView1ClickWidgetItem(Sender: TObject; Item: integer;
         checked: boolean);
     private
@@ -56,15 +55,6 @@ begin
    CanClose:= True;
 end;
 
-procedure TAndroidModule6.DataModuleCreate(Sender: TObject);
-begin
-   //
-end;
-
-procedure TAndroidModule6.DataModuleJNIPrompt(Sender: TObject);
-begin
-  //
-end;
 
 procedure TAndroidModule6.DataModuleRotate(Sender: TObject; rotate: integer; var rstRotate: integer);
 begin
@@ -127,15 +117,16 @@ begin
   jListView1.Clear;
 end;
 
-procedure TAndroidModule6.jListView1ClickItem(Sender: TObject; Item: Integer);
+procedure TAndroidModule6.jListView1ClickItem(Sender: TObject;
+  itemIndex: integer; itemCaption: string);
 var
   strCheck: string;
 begin
 
-  if jListView1.IsItemChecked(Item) then strCheck:= 'checked!'
+  if jListView1.IsItemChecked(itemIndex) then strCheck:= 'checked!'
   else strCheck:= 'not checked!';
 
-  ShowMessage(IntToStr(Item)+ ' ['+ jListView1.GetText(Item)+ '] :'+ strCheck);
+  ShowMessage(IntToStr(itemIndex)+ ' ['+ jListView1.GetText(itemIndex)+ '] :'+ strCheck);
 end;
 
 procedure TAndroidModule6.jListView1ClickWidgetItem(Sender: TObject; Item: integer; checked: boolean);

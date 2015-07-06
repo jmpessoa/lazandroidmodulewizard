@@ -49,7 +49,7 @@ object AndroidModule1: TAndroidModule1
     PosRelativeToParent = []
     LayoutParamWidth = lpMatchParent
     LayoutParamHeight = lpWrapContent
-    Text = 'Load Music File From Assets'
+    Text = 'Load Video/Music File From Assets'
     BackgroundColor = colbrDefault
     FontColor = colbrDefault
     FontSize = 0

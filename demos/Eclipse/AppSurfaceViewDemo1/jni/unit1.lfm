@@ -7,7 +7,6 @@ object AndroidModule1: TAndroidModule1
   MarginTop = 0
   MarginRight = 0
   MarginBottom = 0
-  OnCreate = AndroidModule1Create
   Text = 'AndroidModule1'
   ActivityMode = actMain
   BackgroundColor = colbrDefault

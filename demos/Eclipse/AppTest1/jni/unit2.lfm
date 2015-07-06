@@ -289,7 +289,7 @@ object AndroidModule2: TAndroidModule2
     LayoutParamHeight = lpWrapContent
     Text = 'Open Form 3'
     BackgroundColor = colbrDefault
-    FontColor = colbrLightSlateBlue
+    FontColor = colbrGoldenRod
     FontSize = 0
     OnClick = jButton2Click
     Id = 0

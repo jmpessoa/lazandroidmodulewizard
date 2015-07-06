@@ -43,7 +43,7 @@ procedure TAndroidModule1.jButton1Click(Sender: TObject);
 begin
    jEditText2.Clear;
    if  jEditText1.Text <> '' then
-       jShellCommand1.Execute(jEditText1.Text);
+       jShellCommand1.ExecuteAsync(jEditText1.Text);
 end;
 
 procedure TAndroidModule1.jShellCommand1Executed(Sender: TObject; cmdResult: string);

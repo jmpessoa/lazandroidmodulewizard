@@ -20,8 +20,8 @@ type
     jTextView2: jTextView;
     procedure AndroidModule1ActivityRst(Sender: TObject; requestCode,
       resultCode: Integer; jIntent: jObject);
-    procedure jListView1ClickCaptionItem(Sender: TObject; Item: integer;
-      caption: string);
+    procedure jListView1ClickItem(Sender: TObject; itemIndex: integer;
+      itemCaption: string);
   private
     {private declarations}
   public
@@ -39,8 +39,8 @@ implementation
 
 //ref. http://androidcookbook.com/Recipe.seam?recipeId=3324
 
-procedure TAndroidModule1.jListView1ClickCaptionItem(Sender: TObject;
-  Item: integer; caption: string);
+procedure TAndroidModule1.jListView1ClickItem(Sender: TObject;
+  itemIndex: integer; itemCaption: string);
 begin
   //if jListView1.IsItemChecked(Item) then
   //begin
@@ -49,7 +49,7 @@ begin
      begin
          //ShowMessage('ZXing App is Installed!! ');
 
-         case Item of
+         case itemIndex of
             0: jIntentManager1.PutExtraString('SCAN_MODE', 'PRODUCT_MODE');   //Prod
             1: jIntentManager1.PutExtraString('SCAN_MODE', 'QR_CODE_MODE');   //QR
             2: jIntentManager1.PutExtraString('SCAN_FORMATS', 'CODE_39,CODE_93,CODE_128,DATA_MATRIX,ITF'); //others

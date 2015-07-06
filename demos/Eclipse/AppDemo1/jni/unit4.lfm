@@ -31,7 +31,7 @@ object AndroidModule4: TAndroidModule4
     LayoutParamHeight = lpWrapContent
     Text = 'Show System Info'
     BackgroundColor = colbrDefault
-    FontColor = colbrLightGrey
+    FontColor = colbrCoral
     FontSize = 0
     OnClick = jButton1Click
     Id = 31367

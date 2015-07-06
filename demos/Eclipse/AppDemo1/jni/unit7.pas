@@ -26,8 +26,6 @@ type
       jTextView2: jTextView;
       jTextView3: jTextView;
       procedure DataModuleCloseQuery(Sender: TObject; var CanClose: boolean);
-      procedure DataModuleCreate(Sender: TObject);
-      procedure DataModuleJNIPrompt(Sender: TObject);
       procedure DataModuleRotate(Sender: TObject; rotate: integer; var rstRotate: integer);
       procedure jImageBtn1Click(Sender: TObject);
 
@@ -50,16 +48,6 @@ procedure TAndroidModule7.DataModuleCloseQuery(Sender: TObject;
   var CanClose: boolean);
 begin
   CanClose:= True;
-end;
-
-procedure TAndroidModule7.DataModuleCreate(Sender: TObject);
-begin
-  //
-end;
-
-procedure TAndroidModule7.DataModuleJNIPrompt(Sender: TObject);
-begin
-  //
 end;
 
 procedure TAndroidModule7.DataModuleRotate(Sender: TObject; rotate: integer;

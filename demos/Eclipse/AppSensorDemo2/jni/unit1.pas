@@ -20,8 +20,8 @@ type
       jTextView2: jTextView;
       procedure AndroidModule1Close(Sender: TObject);
       procedure AndroidModule1CloseQuery(Sender: TObject; var CanClose: boolean);
-      procedure jListView1ClickCaptionItem(Sender: TObject; Item: integer;
-        caption: string);
+      procedure jListView1ClickItem(Sender: TObject; itemIndex: integer;
+        itemCaption: string);
       procedure jSensorManager1Changed(Sender: TObject; sensor: jObject;
         sensorType: TSensorType; values: array of single; timestamp: int64);
       procedure jSensorManager1Listening(Sender: TObject; sensor: jObject;
@@ -56,12 +56,12 @@ begin
   end;
 end;
 
-procedure TAndroidModule1.jListView1ClickCaptionItem(Sender: TObject;
-  Item: integer; caption: string);
+procedure TAndroidModule1.jListView1ClickItem(Sender: TObject;
+  itemIndex: integer; itemCaption: string);
 var
   sensorType: TSensorType;
 begin
-  sensorType:= GetSensorType(Item);
+  sensorType:= GetSensorType(itemIndex);
   if jSensorManager1.SensorExists(sensorType) then
   begin
     ShowMessage('Listening ... '+ jSensorManager1.GetSensorName(jSensorManager1.GetSensor(sensorType)) );

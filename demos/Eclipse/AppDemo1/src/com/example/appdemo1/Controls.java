@@ -2,7 +2,7 @@ package com.example.appdemo1;
 
 //Lamw: Lazarus Android Module Wizard 
 //Form Designer and Components development model!
-//version 0.6 - revision 29 - 08 June - 2015
+//version 0.6 - revision 32 - 05 July - 2015
 //
 //https://github.com/jmpessoa/lazandroidmodulewizard
 //http://forum.lazarus.freepascal.org/index.php/topic,21919.270.html
@@ -79,12 +79,17 @@ import android.bluetooth.BluetoothSocket;
 import android.content.BroadcastReceiver;
 import android.content.ClipData;
 import android.content.ClipboardManager;
+import android.content.ContentProviderOperation;
+import android.content.ContentProviderOperation.Builder;
+import android.content.ContentProviderResult;
 import android.content.ContentResolver;
+import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.OperationApplicationException;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
@@ -121,15 +126,23 @@ import android.os.CountDownTimer;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
+import android.os.RemoteException;
 import android.os.Vibrator;
 import android.telephony.SmsManager;
 import android.telephony.SmsMessage;
 import android.telephony.TelephonyManager;
 import android.preference.PreferenceManager;
 import android.provider.BaseColumns;
+
 import android.provider.ContactsContract;
+import android.provider.ContactsContract.CommonDataKinds;
 import android.provider.ContactsContract.CommonDataKinds.Email;
 import android.provider.ContactsContract.CommonDataKinds.Phone;
+import android.provider.ContactsContract.CommonDataKinds.Photo;
+import android.provider.ContactsContract.CommonDataKinds.StructuredName;
+import android.provider.ContactsContract.Contacts;
+import android.provider.ContactsContract.Data;
+import android.provider.ContactsContract.RawContacts;   //**
 import android.provider.MediaStore;
 import android.provider.Settings;
 import android.text.Editable;
@@ -143,6 +156,7 @@ import android.text.method.NumberKeyListener;
 import android.text.method.ScrollingMovementMethod;
 import android.util.Base64;
 import android.util.DisplayMetrics;
+import android.util.TypedValue;
 import android.location.Address;
 import android.location.Criteria;
 import android.location.Geocoder;
@@ -481,8 +495,7 @@ public  RelativeLayout GetView() {
 }
 
 //
-public  void Show(int effect) {		
-   //Log.i("Form:","Show");	
+public  void Show(int effect) {			
    controls.appLayout.addView( layout );
    parent = controls.appLayout;
    //
@@ -516,13 +529,13 @@ switch ( effect ) {
  }
 
 //by jmpessoa
-public  void Close2() {  
+public  void Close2() {  	
   controls.appLayout.removeView(layout);
   controls.pOnClose(PasObj);
 }
 
 //
-public  void SetVisible ( boolean visible ) {
+public  void SetVisible ( boolean visible ) {	
 if (visible) { if (layout.getParent() == null)
                { controls.appLayout.addView(layout); } }
 else         { if (layout.getParent() != null)
@@ -532,7 +545,7 @@ else         { if (layout.getParent() != null)
 
 //
 public  void SetEnabled ( boolean enabled ) {
-//Log.i("Form:","Parent Form Enabled "+ Integer.toString(layout.getChildCount()));
+  //Log.i("Form:","Parent Form Enabled "+ Integer.toString(layout.getChildCount()));	
 for (int i = 0; i < layout.getChildCount(); i++) {
   View child = layout.getChildAt(i);
   child.setEnabled(enabled);
@@ -902,6 +915,9 @@ public void SetTitleActionBar(String _title) {
     actionBar.setTitle(_title);    
 }
 
+
+//set a title and subtitle to the Action bar as shown in the code snippet.
+
 //set a title and subtitle to the Action bar as shown in the code snippet.
 public void SetSubTitleActionBar(String _subtitle) {
    ActionBar actionBar = this.controls.activity.getActionBar();    
@@ -1105,6 +1121,17 @@ public void TakeScreenshot(String _savePath, String _saveFileNameJPG) {
 }
 
 
+public String GetTitleActionBar() {
+	ActionBar actionBar = this.controls.activity.getActionBar();   	
+    return (String)actionBar.getTitle();    
+}
+
+public String GetSubTitleActionBar() {
+	   ActionBar actionBar = this.controls.activity.getActionBar();    
+	   return (String)actionBar.getSubtitle();  
+}
+
+
 }
 
 //-------------------------------------------------------------------------
@@ -1282,6 +1309,11 @@ public void setFontAndTextTypeFace(int fontFace, int fontStyle) {
   this.setTypeface(t, fontStyle); 		
 } 
 
+
+public void SetTextSize(float size) {
+	this.setTextSize(TypedValue.COMPLEX_UNIT_PX, size); 
+}
+
 }
 
 //-------------------------------------------------------------------------
@@ -1296,8 +1328,10 @@ private Controls      controls = null;   // Control Class for Event
 //
 private ViewGroup     parent   = null;   // parent view
 private RelativeLayout.LayoutParams lparams;           // layout XYWH
-private OnKeyListener onKeyListener;     //
+private OnKeyListener onKeyListener;     //  thanks to @renabor
 private TextWatcher   textwatcher;       // OnChange
+
+private OnClickListener onClickListener;   // event 
 
 //by jmpessoa
 int wrapContent = RelativeLayout.LayoutParams.WRAP_CONTENT; //h
@@ -1344,10 +1378,22 @@ this.setHintTextColor(Color.LTGRAY);
 
 mClipBoard = (ClipboardManager) controls.activity.getSystemService(Context.CLIPBOARD_SERVICE);
  
+// Event
+onClickListener = new OnClickListener() {
+   public  void onClick(View view) {
+    //if (enabled) {
+      controls.pOnClick(PasObj,Const.Click_Default);
+    //}
+   };
+};
+
+setOnClickListener(onClickListener);
+
+
 // Init Event : http://socome.tistory.com/15
 onKeyListener = new OnKeyListener() {	
   public  boolean onKey(View v, int keyCode, KeyEvent event) { //Called when a hardware key is dispatched to a view	
-    if (event.getAction() == KeyEvent.ACTION_UP) {	
+     if (event.getAction() == KeyEvent.ACTION_UP) {	
     	if (keyCode == KeyEvent.KEYCODE_ENTER) {
             InputMethodManager imm = (InputMethodManager) controls.activity.getSystemService(Context.INPUT_METHOD_SERVICE);
             imm.hideSoftInputFromWindow(getWindowToken(), 0);       
@@ -1356,10 +1402,10 @@ onKeyListener = new OnKeyListener() {
             controls.pOnEnter(PasObj);  //just Enter/Done/Next/backbutton ....!      
             return true;    		
     	}    
-    }   
-    return false;
-  }  
-};
+     }   
+     return false;
+   }  
+  };
 
 setOnKeyListener(onKeyListener);
 // Event
@@ -1429,11 +1475,14 @@ public void setLayoutAll(int idAnchor) {
     }
 	setLayoutParams(lparams);
 }
-
+      //CURRENCY 
 public  void setInputTypeEx(String str) {
 	  bufStr = new String(str.toString());
-	  if(str.equals("NUMBER")) {
-		  this.setInputType(android.text.InputType.TYPE_CLASS_NUMBER);
+	  if(str.equals("NUMBER")) {  		   
+		  this.setInputType(android.text.InputType.TYPE_CLASS_NUMBER);	     
+	  }
+	  else if(str.equals("CURRENCY")) {  		    //thanks to @renabor		 
+		  this.setInputType(InputType.TYPE_CLASS_NUMBER|InputType.TYPE_NUMBER_FLAG_DECIMAL|InputType.TYPE_NUMBER_FLAG_SIGNED);
 	  }
       else if (str.equals("CAPCHARACTERS")) {
     	  if (!mFlagSuggestion) 
@@ -1641,6 +1690,10 @@ public void PasteFromClipboard() {
 public void Clear() {
 	this.setText("");
 }
+
+public void SetTextSize(float size) {
+	this.setTextSize(TypedValue.COMPLEX_UNIT_PX, size); 
+}
 	
 }
 
@@ -1771,6 +1824,10 @@ public  void SetFocusable(boolean enabled ) {
   this.setFocusable            (enabled);//*
   this.setFocusableInTouchMode (enabled);//*
   //obj.requestFocus(); 
+}
+
+public void SetTextSize(float size) {
+	this.setTextSize(TypedValue.COMPLEX_UNIT_PX, size); 
 }
 
 
@@ -1940,8 +1997,8 @@ public String GetText() {
 	return this.getText().toString();
 }
 
-public void SetTextSize(int size) {
-	this.setTextSize(size);
+public void SetTextSize(float size) {
+	this.setTextSize(TypedValue.COMPLEX_UNIT_PX, size); 
 }
 
 }
@@ -2055,6 +2112,10 @@ public void setLayoutAll(int idAnchor) {
 	    }
 		//
 		setLayoutParams(lparams);
+}
+
+public void SetTextSize(float size) {
+	this.setTextSize(TypedValue.COMPLEX_UNIT_PX, size); 
 }
 
 }
@@ -2279,10 +2340,10 @@ public void setBitmapImage(Bitmap bm) {
 	this.setImageBitmap(bm);
 }
 
-public  void setImage(String str) {
+public  void setImage(String fullPath) {
 	  //if (bmp != null)        { bmp.recycle(); }
-	  if (str.equals("null")) { this.setImageBitmap(null); return; };
-	  bmp = BitmapFactory.decodeFile( str );
+	  if (fullPath.equals("null")) { this.setImageBitmap(null); return; };
+	  bmp = BitmapFactory.decodeFile( fullPath );
 	  this.setImageBitmap(bmp);
 }
 
@@ -2295,7 +2356,7 @@ public int GetDrawableResourceId(String _resName) {
 	     return drawableId;
 	  }
 	  catch (Exception e) {
-	     Log.e("jImageView", "Failure to get drawable id.", e);
+	     //Log.e("jImageView", "Failure to get drawable id.", e);
 	     return 0;
 	  }
 }
@@ -2403,11 +2464,42 @@ public void SetImageMatrixScale(float _scaleX, float _scaleY ) {
     this.setImageMatrix(mMatrix);
 }
 
-//by jmpessoa
 public Bitmap GetBitmapImage() {		
    return bmp; 	
 }
 
+
+public void SetImageFromIntentResult(Intent _intentData) {						
+	Uri selectedImage = _intentData.getData();
+	String[] filePathColumn = { MediaStore.Images.Media.DATA };	 
+    Cursor cursor = controls.activity.getContentResolver().query(selectedImage, filePathColumn, null, null, null);
+    cursor.moveToFirst();
+    int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
+    String picturePath = cursor.getString(columnIndex);
+    cursor.close();
+    bmp = BitmapFactory.decodeFile(picturePath);
+    this.setImageBitmap(bmp);        
+}
+
+public void SetImageThumbnailFromCamera(Intent _intentData) {
+	Bundle extras = _intentData.getExtras();
+    bmp = (Bitmap) extras.get("data");
+    this.setImageBitmap(bmp);    
+}
+
+
+//TODO Pascal
+public void SetImageFromURI(Uri _uri) {	
+	InputStream imageStream = null;
+	try {
+		imageStream = controls.activity.getContentResolver().openInputStream(_uri);
+	} catch (FileNotFoundException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}
+	bmp = BitmapFactory.decodeStream(imageStream);	        
+  this.setImageBitmap(bmp);
+}
 
 }
  
@@ -2450,8 +2542,10 @@ private Context       ctx;
 private int           id;
 private List <jListItemRow> items ;
 private ArrayAdapter thisAdapter;
+private boolean mDispatchOnDrawItemTextColor;
+private boolean mDispatchOnDrawItemBitmap;
 
-public  jArrayAdapter(Context context, Controls ctrls,long pasobj, int textViewResourceId , 
+public  jArrayAdapter(Context context, Controls ctrls,long pasobj, int textViewResourceId, 
 		               List<jListItemRow> list) {
    super(context, textViewResourceId, list);
    PasObj = pasobj;
@@ -2460,7 +2554,17 @@ public  jArrayAdapter(Context context, Controls ctrls,long pasobj, int textViewR
    id    = textViewResourceId;
    items = list;
    thisAdapter = this;
+   mDispatchOnDrawItemTextColor = true;
+   mDispatchOnDrawItemBitmap = true;
 		   
+}
+
+public void SetDispatchOnDrawItemTextColor(boolean _value) {
+	mDispatchOnDrawItemTextColor = _value;
+}
+
+public void SetDispatchOnDrawItemBitmap(boolean _value) {
+	mDispatchOnDrawItemBitmap = _value;
 }
 
 @Override
@@ -2477,8 +2581,8 @@ public  View getView(int position, View v, ViewGroup parent) {
    listLayout.setLayoutParams(lparam);
    
    LayoutParams imgParam = null;      
-   ImageView itemImage = null; 
-	
+   ImageView itemImage = null;
+   	
    if (items.get(position).bmp !=  null) {  
 	   imgParam = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT); //w,h
 	   itemImage = new ImageView(ctx); 
@@ -2489,6 +2593,46 @@ public  View getView(int position, View v, ViewGroup parent) {
 	   itemImage.setPadding(6, 6, 0, 0);
 	   itemImage.setOnClickListener(getOnCheckItem(itemImage, position));       
    }
+   
+   
+   if (mDispatchOnDrawItemBitmap)  {        	
+       Bitmap  imageBmp = (Bitmap)controls.pOnListViewDrawItemBitmap(PasObj, (int)position , items.get(position).label);
+   	   if (imageBmp != null) {        		      	        	      
+		  imgParam = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT); //w,h
+		  itemImage = new ImageView(ctx); 
+		  itemImage.setId(position);
+		  itemImage.setImageBitmap(imageBmp);  
+		  itemImage.setFocusable(false);
+		  itemImage.setFocusableInTouchMode(false);
+		  itemImage.setPadding(6, 6, 0, 0);
+		  itemImage.setOnClickListener(getOnCheckItem(itemImage, position));   	      
+     	}
+   	    else {
+   		   if (items.get(position).bmp !=  null) {       			
+   		  	   imgParam = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT); //w,h
+   		  	   itemImage = new ImageView(ctx); 
+   		  	   itemImage.setId(position);
+   		  	   itemImage.setImageBitmap(items.get(position).bmp);  
+   		  	   itemImage.setFocusable(false);
+   		  	   itemImage.setFocusableInTouchMode(false);
+   		  	   itemImage.setPadding(6, 6, 0, 0);
+   		  	   itemImage.setOnClickListener(getOnCheckItem(itemImage, position));
+   		    }  
+        }	        	
+   } 
+   else {
+   	 if (items.get(position).bmp !=  null) {	
+  	   imgParam = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT); //w,h
+  	   itemImage = new ImageView(ctx); 
+  	   itemImage.setId(position);
+  	   itemImage.setImageBitmap(items.get(position).bmp);  
+  	   itemImage.setFocusable(false);
+  	   itemImage.setFocusableInTouchMode(false);
+  	   itemImage.setPadding(6, 6, 0, 0);
+  	   itemImage.setOnClickListener(getOnCheckItem(itemImage, position));
+   	  }   
+    }   
+   
    
    RelativeLayout itemLayout = new RelativeLayout(ctx);
        
@@ -2523,31 +2667,53 @@ public  View getView(int position, View v, ViewGroup parent) {
    //txtParam.alignWithParent = true;
         
    for (int i=0; i < lines.length; i++) {
-	   itemText[i] = new TextView(ctx);
 	   
-	   itemText[i].setPadding(10, 15, 10, 15);  //improve here 17-Jan-2015
-	   
-	   if (items.get(position).textSize != 0){
-		   itemText[i].setTextSize(items.get(position).textSize); //TypedValue.COMPLEX_UNIT_PX,
-	   }
-	   
-	   if (i == 0) {		   
+	   TextView textViewnew = new TextView(ctx);	   
+	   float auxf = textViewnew.getTextSize();	   	  	  
+	   itemText[i] = textViewnew;
+	   	   
+	   if (i == 0) {
+		    if (items.get(position).textSize != 0){
+		    	auxf = items.get(position).textSize;				       
+			   itemText[i].setTextSize(TypedValue.COMPLEX_UNIT_PX, auxf); 
+		    }
+		    itemText[i].setPadding(10, 15, 10, 15);
 		    itemText[i].setTypeface(null,faceTitle);
+		    
 		}
 		else{			
 		   itemText[i].setTypeface(null,faceBody);
-		   if (items.get(position).textSizeDecorated == 1) {
-			     itemText[i].setTextSize(itemText[i].getTextSize() - 2*i); //TypedValue.COMPLEX_UNIT_PX, 
-		   }		   
+		   itemText[i].setPadding(10, 0, 10, 15);
+		   
+		   if (items.get(position).textSizeDecorated == 1) {	
+			     itemText[i].setTextSize(TypedValue.COMPLEX_UNIT_PX, auxf - 5*i);  // sdDeCecreasing
+		   }
+		   
+		   if (items.get(position).textSizeDecorated == 2) {			     
+			     itemText[i].setTextSize(TypedValue.COMPLEX_UNIT_PX, auxf + 5*i);  // sdInCecreasing
+		   }
 		}
 	   
 	    itemText[i].setText(lines[i]);
+	    	    	    
+        if (mDispatchOnDrawItemTextColor)  {            	             	
+          	 int drawItemTxtColor = controls.pOnListViewDrawItemCaptionColor(PasObj, (int)position, lines[i]);
+          	 if (drawItemTxtColor != 0) {
+          		itemText[i].setTextColor(drawItemTxtColor); 
+          	 }
+          	 else {
+          		 if (items.get(position).textColor != 0) {	
+          			itemText[i].setTextColor(items.get(position).textColor);
+                 }	 
+          	 }
+          } 
+          else {
+          	if (items.get(position).textColor != 0) {	
+          		itemText[i].setTextColor(items.get(position).textColor);
+          	}   
+          }
 	    
-	    if (items.get(position).textColor != 0) {
-	       itemText[i].setTextColor(items.get(position).textColor);
-	    }
-	    
-	    txtLayout.addView(itemText[i]);   
+	      txtLayout.addView(itemText[i]);   
    }
    
    View itemWidget = null;
@@ -2728,7 +2894,10 @@ int marginBottom = 5;
 
 boolean highLightSelectedItem = false;
 int highLightColor = Color.RED;
+
 int lastSelectedItem = -1;
+String selectedItemCaption = "";
+
 
 
 //Constructor
@@ -2761,7 +2930,7 @@ setCacheColorHint  (0);
 
 alist = new ArrayList<jListItemRow>();
 //simple_list_item_1
-aadapter = new jArrayAdapter(context, controls, PasObj, android.R.layout.simple_list_item_1,  alist);
+aadapter = new jArrayAdapter(context, controls, PasObj, android.R.layout.simple_list_item_1, alist);
 
 setAdapter(aadapter);
 
@@ -2787,13 +2956,25 @@ onItemClickListener = new OnItemClickListener() {
 		  aadapter.notifyDataSetChanged();
 	   }	   
 	   	   
-	   lastSelectedItem = position;		
-       controls.pOnClick(PasObj, (int)position );
+	   lastSelectedItem = (int)position;
+	   selectedItemCaption = alist.get((int)position).label;
        controls.pOnClickCaptionItem(PasObj, (int)position , alist.get((int)position).label);
    }
 };
 
 setOnItemClickListener(onItemClickListener);
+
+this.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+    @Override
+    public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+    	//Log.i("OnItemLongClickListener", "position = "+position);    	
+    	lastSelectedItem = (int)position;
+ 	   selectedItemCaption = alist.get((int)position).label;
+    	controls.pOnListViewLongClickCaptionItem(PasObj, (int)position , alist.get((int)position).label);
+        return false;
+    }
+});
+
 }
 
 //by jmpessoa
@@ -2821,8 +3002,8 @@ public  void setTextColor( int textcolor) {
    this.textColor =textcolor;
 }
 
-public  void setTextSize (int textsize) {
-   this.textSize =textsize ;
+public void setTextSize (int textsize) {
+   this.textSize = textsize;
 }
 
 // LORDMAN - 2013-08-07
@@ -3110,6 +3291,24 @@ public void SetHighLightSelectedItem(boolean _value)  {
 public void SetHighLightSelectedItemColor(int _color)  {
 	highLightColor = _color;
 }
+
+public int GetItemIndex() { 
+  return lastSelectedItem;
+}
+
+public String GetItemCaption() {
+ return selectedItemCaption;
+}
+
+
+public void DispatchOnDrawItemTextColor(boolean _value) {
+	aadapter.SetDispatchOnDrawItemTextColor(_value);
+}
+
+public void DispatchOnDrawItemBitmap(boolean _value) {
+	aadapter.SetDispatchOnDrawItemBitmap(_value);
+}
+
 
 }
 //-------------------------------------------------------------------------
@@ -4757,7 +4956,9 @@ class jDialogProgress {
   
   public void SetMessage(String _msg) {
     mMsg = _msg;
-    if (dialog != null) dialog.setMessage(_msg);
+    if (dialog != null) {
+    	if (dialog.isShowing()) {dialog.setMessage(_msg);}
+    }	
   }
  
   public void SetTitle(String _title) {
@@ -4772,8 +4973,12 @@ class jDialogProgress {
   }
       
   public void Stop() {
-	  if (customDialog != null) customDialog.dismiss();
-	  if (dialog != null) dialog.dismiss();
+	  if (customDialog != null) {
+		  customDialog.dismiss();		  
+	  }
+	  if (dialog != null) {
+		  dialog.dismiss();		  
+	  }
   }
   
   //TODO
@@ -5542,7 +5747,7 @@ class jSqliteCursor {
     public void MoveToLast() {
     	if (cursor != null) cursor.moveToLast();
     }
-  
+              
     public void MoveToPosition(int position) {
     	if (cursor != null) cursor.moveToPosition(position);
     }
@@ -5556,7 +5761,7 @@ class jSqliteCursor {
     	if (cursor != null) return cursor.getString(columnIndex);
     	else return "";			
     }
-    
+
     //Cursor.FIELD_TYPE_BLOB; //4
 	//Cursor.FIELD_TYPE_FLOAT//2
 	//Cursor.FIELD_TYPE_INTEGER//1
@@ -5622,11 +5827,35 @@ class jSqliteCursor {
     	else return "";			
     }
          
+    //Cursor.FIELD_TYPE_BLOB; //4
+	//Cursor.FIELD_TYPE_FLOAT//2
+	//Cursor.FIELD_TYPE_INTEGER//1
+	//Cursor.FIELD_TYPE_STRING//3
+	//Cursor.FIELD_TYPE_NULL //0           
+    public String GetValueAsString(int position, String columnName) {
+    	String colValue = "";
+        if (this.cursor != null) {
+        	
+        	if (position == -1)  cursor.moveToLast();
+        	else cursor.moveToPosition(position);
+        	
+            int index = this.cursor.getColumnIndex(columnName);                      
+            switch (cursor.getType(index)) {                
+     	      case Cursor.FIELD_TYPE_INTEGER: colValue = Integer.toString(cursor.getInt(index));           break;
+     	      case Cursor.FIELD_TYPE_STRING : colValue =  cursor.getString(index);                         break;
+     	      case Cursor.FIELD_TYPE_FLOAT  : colValue =  String.format("%.3f", cursor.getFloat(index));   break;
+     	      case Cursor.FIELD_TYPE_BLOB   : colValue = "BLOB";                                       break;
+     	      case Cursor.FIELD_TYPE_NULL   : colValue = "NULL";                                       break;
+     	      default:                        colValue = "UNKNOW";                              
+    	   }                                                                       
+        }
+        return colValue;        
+    }
+    
     public void Free() {
       cursor = null;	
       bufBmp = null;
-    }
-    
+    }    
 }
 
 /**
@@ -7029,13 +7258,14 @@ class jMenu /*extends ...*/ {
   
     //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
   
-    public jMenu(Controls _ctrls, long _Self) { //Add more others news "_xxx" params if needed!
+    public jMenu (Controls _ctrls, long _Self) { //Add more others news "_xxx" params if needed!
        //super(_ctrls.activity);
        context   = _ctrls.activity;
        pascalObj = _Self;
        controls  = _ctrls;
        mMenu     = null;
-       mSubMenus = new SubMenu[9]; //max sub menus number = 10!
+       mSubMenus = new SubMenu[19]; //max sub menus number = 20!
+       mCountSubMenu = 0;
     }
   
     public void jFree() {
@@ -7043,9 +7273,11 @@ class jMenu /*extends ...*/ {
         if (mMenu != null){	
         	  for(int i=0; i < mCountSubMenu; i++){
         		 mSubMenus[i] = null;
-        	  }    	 
+        	  }    
+        	  mCountSubMenu = 0;
+        	  mMenu.clear();
         }
-    	mMenu = null;
+        
     }
   
     
@@ -7062,22 +7294,28 @@ class jMenu /*extends ...*/ {
      * Phones with menu keys display the action overflow when the user presses the key.
      */
     
-    public void Add(Menu _menu, int _itemID, String _caption){    	
-      _menu.add(0,_itemID,0 ,(CharSequence)_caption); //return MenuItem
-      if (mMenu == null) mMenu = _menu; 
+    public void Add(Menu _menu, int _itemID, String _caption){
+      if (_menu != null) {
+    	  mMenu = _menu;
+          _menu.add(0,_itemID,0 ,(CharSequence)_caption); //return MenuItem          
+      }
     }
         
     //TODO: ic_launcher.png just for test!
-    public void AddDrawable(Menu _menu, int _itemID, String _caption){    	     	
-       String _resName = "ic_launcher"; //ok       
-       MenuItem item = _menu.add(0,_itemID,0 ,(CharSequence)_caption);       
-       item.setIcon(GetDrawableResourceId(_resName));
-       if (mMenu == null) mMenu = _menu;
+    public void AddDrawable(Menu _menu, int _itemID, String _caption){
+       if (_menu != null) {	
+    	  mMenu = _menu;
+          String _resName = "ic_launcher"; //ok       
+          MenuItem item = _menu.add(0,_itemID,0 ,(CharSequence)_caption);       
+          item.setIcon(GetDrawableResourceId(_resName));          
+       }
     }
     
     public void AddCheckable(Menu _menu, int _itemID, String _caption){
-        _menu.add(0,_itemID,0 ,(CharSequence)_caption).setCheckable(true);
-        if (mMenu == null) mMenu = _menu;
+    	if (_menu != null) {
+    	  mMenu = _menu;	
+          _menu.add(0,_itemID,0 ,(CharSequence)_caption).setCheckable(true);          
+    	}
      }
     
     public void CheckItemCommute(MenuItem _item){
@@ -7102,28 +7340,34 @@ class jMenu /*extends ...*/ {
     
     public void AddSubMenu(Menu _menu, int _startItemID, String[] _captions){    	
     	int size = _captions.length;
-    	if (size > 1) {    		    	     	   
-    	   mSubMenus[mCountSubMenu] = _menu.addSubMenu((CharSequence)_captions[0]); //main title      	  
-     	   mSubMenus[mCountSubMenu].setHeaderIcon(R.drawable.ic_launcher);      	       	   
-    	   for(int i=1; i < size; i++) {    	
+    	if (_menu != null) {      	   	
+     	  if (size > 1) {
+     		 mMenu = _menu;
+    	     mSubMenus[mCountSubMenu] = _menu.addSubMenu((CharSequence)_captions[0]); //main title      	  
+     	     mSubMenus[mCountSubMenu].setHeaderIcon(R.drawable.ic_launcher);      	       	   
+    	     for(int i=1; i < size; i++) {    	
     		   MenuItem item = mSubMenus[mCountSubMenu].add(0,_startItemID+(i-1),0,(CharSequence)_captions[i]); //sub titles...    		       	    
-    	   }    	   
-    	   mCountSubMenu++;    	       	   
-    	}    	    	
+    	     }    	   
+    	     mCountSubMenu++;    	           	
+    	  }   
+    	}
     }
 
    //TODO: ic_launcher.png just for test!
-    public void AddCheckableSubMenu(Menu _menu, int _startItemID, String[] _captions){    	
+    public void AddCheckableSubMenu(Menu _menu, int _startItemID, String[] _captions){
+      if (_menu != null) {	    	
     	int size = _captions.length;
-    	if (size > 1) {    		
+    	if (size > 1) {    	
+    	   mMenu = _menu;	
     	   mSubMenus[mCountSubMenu] = _menu.addSubMenu((CharSequence)_captions[0]); //main title
     	   mSubMenus[mCountSubMenu].setHeaderIcon(R.drawable.ic_launcher);       	   
     	   //Log.i("jMenu_AddCheckableSubMenu", _captions[0]);
     	   for(int i=1; i < size; i++) {    	
     		  mSubMenus[mCountSubMenu].add(0,_startItemID+(i-1),0,(CharSequence)_captions[i]).setCheckable(true); //sub titles...
     	   }    	   
-    	   mCountSubMenu++;	   
+    	   mCountSubMenu++;    	   
     	}
+      }
     }
     
     public int Size(){
@@ -7158,9 +7402,11 @@ class jMenu /*extends ...*/ {
     
     public void UnCheckAllSubMenuItemByIndex(int _subMenuIndex){
        if (mMenu != null){	
-      	  for(int i=0; i < mSubMenus[_subMenuIndex].size(); i++){
-      		 mSubMenus[_subMenuIndex].getItem(i).setChecked(false);
-      	  }    	 
+    	  if  (_subMenuIndex < mCountSubMenu) {    		      	  
+      	    for(int i=0; i < mSubMenus[_subMenuIndex].size(); i++){
+      		   mSubMenus[_subMenuIndex].getItem(i).setChecked(false);
+      	    }
+    	 }
        } 	
     }
     
@@ -7193,46 +7439,165 @@ class jMenu /*extends ...*/ {
     }
     
     //_itemType --> 0:Default, 1:Checkable
-    public void AddItem(Menu _menu, int _itemID, String _caption, String _iconIdentifier, int _itemType, int _showAsAction){    	     	
-    	MenuItem item = _menu.add(0,_itemID,0 ,(CharSequence)_caption);
-    			
-    	switch  (_itemType) {
-    	case 1:  item.setCheckable(true); break;    	
-    	}
-    	
-        if (!_iconIdentifier.equals("")) {
-           item.setIcon(GetDrawableResourceId(_iconIdentifier));
-        }
-                      
-        switch (_showAsAction) {
-          case 0: item.setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER); break;
-          case 1: item.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM); break;
-          case 2: item.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS); break;
-          case 4: item.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM|MenuItem.SHOW_AS_ACTION_WITH_TEXT); 
-                  item.setTitleCondensed("ok0"); break;                    
-          case 5: item.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS|MenuItem.SHOW_AS_ACTION_WITH_TEXT);
-                  item.setTitleCondensed("ok1");break;
-        } 	
-        
-  	   if (mMenu == null) mMenu = _menu;
-  	   
+    public void AddItem(Menu _menu, int _itemID, String _caption, String _iconIdentifier, int _itemType, int _showAsAction){
+      if (_menu != null) {
+    	 mMenu = _menu;
+    	 MenuItem item = _menu.add(0,_itemID,0 ,(CharSequence)_caption);    			
+    	 switch  (_itemType) {
+    	    case 1:  item.setCheckable(true); break;    	
+    	 }    	
+         if (!_iconIdentifier.equals("")) {
+           item.setIcon(GetDrawableResourceId(_iconIdentifier)); 
+         }                     
+         switch (_showAsAction) {
+           case 0: item.setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER); break;
+           case 1: item.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM); break;
+           case 2: item.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS); break;
+           case 4: item.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM|MenuItem.SHOW_AS_ACTION_WITH_TEXT); 
+                  item.setTitleCondensed("."); break;                    
+           case 5: item.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS|MenuItem.SHOW_AS_ACTION_WITH_TEXT);
+                  item.setTitleCondensed(".");break;
+         } 	                	     
+      } 
      }
     
     ////Sub menus Items: Do not support item icons, or nested sub menus.    
     public void AddItem(SubMenu _subMenu, int _itemID, String _caption, int _itemType){    	     	        
         MenuItem item = _subMenu.add(0,_itemID,0 ,(CharSequence)_caption);        
     	switch  (_itemType) {
-    	case 1:  item.setCheckable(true); break;    	
+    	  case 1:  item.setCheckable(true); break;    	
     	}                            
      }
     
-    public SubMenu AddSubMenu(Menu _menu, String _title, String _headerIconIdentifier){  
-     	   SubMenu sm =_menu.addSubMenu((CharSequence)_title); //main title     	        	       	  
+    public SubMenu AddSubMenu(Menu _menu, String _title, String _headerIconIdentifier){
+    	SubMenu sm = null;
+    	if (_menu != null) {
+    	   mMenu = _menu;	
+     	   sm =_menu.addSubMenu((CharSequence)_title); //main title     	        	       	  
      	   sm.setHeaderIcon(GetDrawableResourceId(_headerIconIdentifier));
     	   mSubMenus[mCountSubMenu] = sm;      	       	     	       	       	   
-    	   mCountSubMenu++;    	   
-    	   return sm;  	    	
+    	   mCountSubMenu++; 
+    	}   
+    	return sm;  	    	
     }  
+    
+    //Request a call to onPrepareOptionsMenu so we can change the items   
+    public void InvalidateOptionsMenu() {
+    	controls.activity.invalidateOptionsMenu(); 
+    }
+    
+    
+    public void SetItemVisible(MenuItem _item, boolean _value){
+        _item.setVisible( _value);        
+    }
+    
+    public void SetItemVisible(Menu _menu, int _index, boolean _value){
+    	if (_menu != null) {
+      	  if ( _index < _menu.size() ) {
+      	    MenuItem item = _menu.getItem(_index);
+    	    item.setVisible( _value);    
+    	  }
+    	}
+    }
+            
+    public void Clear(Menu _menu){
+  	    for(int i=0; i < mCountSubMenu; i++){
+    		 mSubMenus[i] = null;       	 
+    	}
+  	    mCountSubMenu = 0;
+    	if (_menu != null) {    		    		  
+        	  _menu.clear();
+        	  if (mMenu != null) mMenu.clear();        
+    	}	    	
+    }
+    
+    public void Clear(){                
+   	    for(int i=0; i < mCountSubMenu; i++){
+   		   mSubMenus[i] = null;
+   	    }
+   	    mCountSubMenu = 0;
+    	if (mMenu != null)  {    		      	        	        	  
+    	  mMenu.clear();    	  
+    	}		
+    }
+    
+    public void SetItemTitle(MenuItem _item, String _title) {
+    	_item.setTitle((CharSequence)_title);
+    }
+     
+    public void SetItemTitle(Menu _menu, int _index,  String _title){
+    	if (_menu != null)  {
+    	  if ( _index < _menu.size() ) {
+    	    MenuItem item = _menu.getItem(_index);
+    	    item.setTitle((CharSequence)_title);
+    	  }
+    	}
+    }
+     
+    public void SetItemIcon(MenuItem _item, int _iconIdentifier) {
+    	_item.setIcon(_iconIdentifier);
+    }
+     
+    public void SetItemIcon(Menu _menu, int _index,  int _iconIdentifier){
+    	if (_menu != null)  {
+    	  if ( _index < _menu.size() ) {
+      	    MenuItem item = _menu.getItem(_index);
+    	    item.setIcon(_iconIdentifier);
+    	  }
+    	}
+    }
+    
+    public void SetItemChecked(MenuItem _item, boolean _value) {
+    	_item.setChecked(_value);
+    }
+    
+    public void SetItemCheckable(MenuItem _item, boolean _value) {
+    	_item.setCheckable(_value);
+    }   
+      
+    
+    public int GetItemIdByIndex(Menu _menu, int _index) {
+    	if ( _index < _menu.size() ) {
+    	  MenuItem i = _menu.getItem(_index);    	
+    	  return i.getItemId();
+    	} else return -1;
+    	
+    }
+    
+    public int GetItemIndexById(Menu _menu, int _id) {
+    	int r = -1;
+    	if (_menu != null)  {
+    	  for(int i=0; i < _menu.size(); i++)  {
+    		 MenuItem item = _menu.getItem(i);    		
+    	     if ( item.getItemId() == _id ) {
+    	    	r = i;
+    	    	break;
+    	     }
+    	  }
+    	}
+    	return r;
+    }
+    
+    public void RemoveItemById(Menu _menu, int _id){
+    	int id = GetItemIndexById(_menu, _id);
+    	if (id > -1) _menu.removeItem(id);
+    }
+    
+    public void RemoveItemByIndex(Menu _menu, int _index){
+    	if (_menu != null)  {	
+    	  if ( _index < _menu.size() ) {
+      	    MenuItem item = _menu.getItem(_index);
+    	    int id = item.getItemId();  	
+    	    _menu.removeItem(id);
+    	  }
+    	}
+    }
+    
+    public void SetMenu(Menu _menu) {
+        if (_menu != null) {	
+    	   mMenu = _menu;
+        }
+    }
 }
 
 
@@ -8492,7 +8857,7 @@ class CustomSpinnerArrayAdapter<T> extends ArrayAdapter<String>{
       text.setTextColor(mTextColor);
                  
       if (mTextFontSize != 0)
-          text.setTextSize(mTextFontSize);
+          text.setTextSize(TypedValue.COMPLEX_UNIT_PX, mTextFontSize);
       
       text.setBackgroundColor(mTexBackgroundtColor);
       return view;        
@@ -8509,7 +8874,7 @@ class CustomSpinnerArrayAdapter<T> extends ArrayAdapter<String>{
       text.setTextColor(mSelectedTextColor);      
       
       if (mTextFontSize != 0)
-          text.setTextSize(mTextFontSize);  
+          text.setTextSize(TypedValue.COMPLEX_UNIT_PX, mTextFontSize);  
       
       if (mLastItemAsPrompt) flag = 1;
       return view; 
@@ -9189,7 +9554,7 @@ class jImageFileManager /*extends ...*/ {
    public void ShowImagesFromGallery () {	   
 	   controls.activity.sendBroadcast(new Intent(
 		   Intent.ACTION_MEDIA_MOUNTED,
-		               Uri.parse("file://" + Environment.getExternalStorageDirectory())));
+		   Uri.parse("file://" + Environment.getExternalStorageDirectory())));
    }
    
    public Bitmap LoadFromSdCard(String _filename) {	   
@@ -9344,7 +9709,7 @@ class jImageFileManager /*extends ...*/ {
 		}        
         return selectedImage;
    }
-   
+         
    public  Bitmap LoadFromFile(String _filename, int _scale) {
 	   BitmapFactory.Options options = new BitmapFactory.Options();
 	   options.inSampleSize = _scale; // --> 1/4
@@ -9411,7 +9776,55 @@ class jImageFileManager /*extends ...*/ {
 		return Bitmap.createBitmap(_bmp , 0, 0, _bmp.getWidth(), _bmp.getHeight(), mMatrix, false);	   
 	}
 
-      
+	public Bitmap GetBitmapFromDecodedFile(String _imagePath) {
+	   return BitmapFactory.decodeFile(_imagePath);
+	}
+	
+	
+	public Bitmap GetBitmapFromIntentResult(Intent _intentData) {						
+		Uri selectedImage = _intentData.getData();
+		String[] filePathColumn = { MediaStore.Images.Media.DATA };	 
+	    Cursor cursor = controls.activity.getContentResolver().query(selectedImage, filePathColumn, null, null, null);
+	    cursor.moveToFirst();
+	    int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
+	    String picturePath = cursor.getString(columnIndex);
+	    cursor.close();
+	    return BitmapFactory.decodeFile(picturePath);    
+	}
+	
+	
+	public Bitmap GetBitmapThumbnailFromCamera(Intent _intentData) {
+		Bundle extras = _intentData.getExtras();
+	    return (Bitmap) extras.get("data");    
+	}
+	
+	//TODO Pascal
+	public String GetImageFilePath(Intent _intentData) {
+		   //Uri selectedImage = data.getData();
+	  Uri selectedImage = _intentData.getData();	
+	  String[] filePathColumn = { MediaStore.Images.Media.DATA };	   
+	  Cursor cursor = controls.activity.getContentResolver().query(selectedImage, filePathColumn, null, null, null);
+	  cursor.moveToFirst();
+	  int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
+	  String path = cursor.getString(columnIndex);
+	  cursor.close();               
+	  return path;
+	  // String path contains the path of selected Image  
+	}
+
+	public Bitmap LoadFromUri(String _uriAsString) {
+		   Uri imageUri =  Uri.parse(_uriAsString);
+	       InputStream imageStream;
+	       Bitmap selectedImage= null;
+			try {
+				imageStream = controls.activity.getContentResolver().openInputStream(imageUri);
+				selectedImage = BitmapFactory.decodeStream(imageStream);
+			} catch (FileNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}        
+	       return selectedImage;
+	}
 }
 
 //by jmpessoa
@@ -9797,6 +10210,27 @@ class jCustomDialog extends RelativeLayout {
 	      mDialog.setContentView(this);	      
 	      mDialog.setFeatureDrawableResource(Window.FEATURE_LEFT_ICON, GetDrawableResourceId(mIconIdentifier));	      
 	      mDialog.setTitle(mTitle);
+	      
+	       //fix by @renabor	      	      	      	      
+	      mDialog.setOnKeyListener(new Dialog.OnKeyListener() {
+	    	  @Override
+	    	    public  boolean onKey(DialogInterface arg0, int keyCode, KeyEvent event) {
+	    	       if (event.getAction() == KeyEvent.ACTION_UP) {
+	    	          if (keyCode == KeyEvent.KEYCODE_BACK) {
+	    	               controls.pOnCustomDialogBackKeyPressed(pascalObj, mTitle);
+	    	               if (mDialog != null) mDialog.dismiss();
+	    	               return false; 
+	    	          } else if (keyCode == KeyEvent.KEYCODE_ENTER) {
+	    	              InputMethodManager imm = (InputMethodManager) controls.activity.getSystemService(Context.INPUT_METHOD_SERVICE);
+	    	              imm.hideSoftInputFromWindow(getWindowToken(), 0);
+	    	              controls.pOnEnter(pascalObj);
+	    	              return true;
+	    	          }
+	    	       }
+	    	       return false;
+	    	     }
+	    	  });
+	      	      	      
 	      this.setVisibility(android.view.View.VISIBLE);
 	 	  controls.pOnCustomDialogShow(pascalObj, mDialog, mTitle);	      
 	      mDialog.show();							
@@ -10207,27 +10641,50 @@ class jGridItem{
 	
 	Context ctx;
 	String label;
+	int itemTextColor;
+	int itemTextSize;
 	int id;
 	String drawableIdentifier;
 	
 	public  jGridItem(Context context) {
 		ctx = context;
+		itemTextColor = 0; //default
 	}
 }
 
 class jGridViewCustomAdapter extends ArrayAdapter {
      Context context;
      
+     Controls contrls;
+     
+     long pascalObj;
+     
+     boolean mDispatchOnDrawItemTextColor;
+     boolean mDispatchOnDrawItemBitmap;
+     
      private int itemsLayout; 
      private List <jGridItem> items ;
-     
-     public jGridViewCustomAdapter(Context context, int ResourceId, int itemslayout, List<jGridItem> list) {
+     //Context context, Controls ctrls,long pasobj
+     public jGridViewCustomAdapter(Context context, Controls ctrls,long pasobj, int ResourceId, int itemslayout, List<jGridItem> list) {
         super(context, ResourceId, list);  //ResourceId/0 or android.R.layout.simple_list_item_1;
-        this.context=context;       
+        this.context=context;
+        
+        contrls = ctrls;
+        pascalObj = pasobj;
         items = list;
-        itemsLayout = itemslayout; 
+        itemsLayout = itemslayout;
+        mDispatchOnDrawItemTextColor = true;
+        mDispatchOnDrawItemBitmap = true;
      }
-      
+
+     public void SetDispatchOnDrawItemTextColor(boolean _value) {
+    	 mDispatchOnDrawItemTextColor= _value;
+     }
+     
+     public void SetDispatchOnDrawItemBitmap(boolean _value) {
+    	 mDispatchOnDrawItemBitmap= _value;
+     }
+     
      @Override
      public int getCount() {
     	//Log.i("count",": "+items.size()); 
@@ -10270,15 +10727,55 @@ class jGridViewCustomAdapter extends ArrayAdapter {
            imageViewItem.setPadding(25,45,25,20);              
            txtParam.addRule(RelativeLayout.ALIGN_PARENT_TOP);
         } 	
-                
-        if ( ! items.get(position).drawableIdentifier.equals("") ) {        	
-        	imageViewItem.setImageResource(GetDrawableResourceId( items.get(position).drawableIdentifier ));        	 
-        	itemLayout.addView(imageViewItem, imgParam);
-        }                
+        
+        
+        if (mDispatchOnDrawItemBitmap)  {        	
+           Bitmap  imageBmp = (Bitmap)contrls.pOnGridDrawItemBitmap(pascalObj, (int)position , items.get(position).label);
+       	   if (imageBmp != null) {        		   
+       	      imageViewItem.setImageBitmap(imageBmp);
+       	      itemLayout.addView(imageViewItem, imgParam);
+         	}
+       	    else {
+       		   if (! items.get(position).drawableIdentifier.equals("")) {       			
+       		    	imageViewItem.setImageResource(GetDrawableResourceId( items.get(position).drawableIdentifier ));        	 
+               	    itemLayout.addView(imageViewItem, imgParam);
+       		    }  
+            }	        	
+       } 
+       else {
+       	 if (! items.get(position).drawableIdentifier.equals("")) {	
+       		imageViewItem.setImageResource(GetDrawableResourceId( items.get(position).drawableIdentifier ));        	 
+       	    itemLayout.addView(imageViewItem, imgParam);
+       	  }   
+        }
+                    
         
         if (!items.get(position).label.equals("")) {
-            textViewTitle.setText( items.get(position).label ); //+""+ items.get(position).id          
-            itemLayout.addView(textViewTitle, txtParam);
+            textViewTitle.setText( items.get(position).label ); //+""+ items.get(position).id
+            
+            
+            if (items.get(position).itemTextSize != 0) {            
+            	textViewTitle.setTextSize(TypedValue.COMPLEX_UNIT_PX, items.get(position).itemTextSize);            
+            }
+                                    
+            if (mDispatchOnDrawItemTextColor)  {            	   
+            	 int drawItemCaptionColor = contrls.pOnGridDrawItemCaptionColor(pascalObj, (int)position , items.get(position).label);
+            	 if (drawItemCaptionColor != 0) {
+            	     textViewTitle.setTextColor(drawItemCaptionColor); 
+            	 }
+            	 else {
+            		 if (items.get(position).itemTextColor != 0) {	
+                         textViewTitle.setTextColor(items.get(position).itemTextColor);
+                  	}	 
+            	 }
+            } 
+            else {
+            	if (items.get(position).itemTextColor != 0) {	
+                   textViewTitle.setTextColor(items.get(position).itemTextColor);
+            	}   
+            }       
+                                                 
+            itemLayout.addView(textViewTitle, txtParam);            
         }
         
         listLayout.addView(itemLayout);
@@ -10332,7 +10829,12 @@ class jGridView extends GridView /*dummy*/ { //please, fix what GUI object will 
    private int marginRight = 0;
    private int marginBottom = 0;
    private boolean mRemovedFromParent = false;
-
+   private int lastSelectedItem = -1;
+   String lastSelectedItemCaption = "";
+   
+   int mItemTextColor = 0;
+   int mItemTextSize = 0;
+   
    private jGridViewCustomAdapter gridViewCustomeAdapter;
    private ArrayList<jGridItem>  alist;
   
@@ -10347,7 +10849,7 @@ class jGridView extends GridView /*dummy*/ { //please, fix what GUI object will 
       alist = new ArrayList<jGridItem>();
             
       //Create the Custom Adapter Object      
-      gridViewCustomeAdapter = new jGridViewCustomAdapter(this.controls.activity, android.R.layout.simple_list_item_1, 0, alist);
+      gridViewCustomeAdapter = new jGridViewCustomAdapter(this.controls.activity, controls, pascalObj, android.R.layout.simple_list_item_1, 0, alist);
       
       // Set the Adapter to GridView
       this.setAdapter(gridViewCustomeAdapter);
@@ -10356,14 +10858,30 @@ class jGridView extends GridView /*dummy*/ { //please, fix what GUI object will 
     	  
       /*.*/public void onItemClick(AdapterView<?> parent, View v, int position, long id){  //please, do not remove /*.*/ mask for parse invisibility!
               if (enabled) {            	  
+            	 lastSelectedItem = (int)position;
+        	     lastSelectedItemCaption = alist.get((int)position).label;
                  controls.pOnClickGridItem(pascalObj, (int)position , alist.get((int)position).label);
               }
            };
       };      
       
-      this.setOnItemClickListener(onItemClickListener);     
-      this.setNumColumns(android.widget.GridView.AUTO_FIT);  //android.widget.GridView.AUTO_FIT --> -1      
-
+      this.setOnItemClickListener(onItemClickListener);
+            
+      this.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+    	    @Override
+    	    public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+    	    	if (enabled) {	
+    	    	  //Log.i("OnItemLongClickListener", "position = "+position);    	
+    	      	   lastSelectedItem = (int)position;
+    	    	   lastSelectedItemCaption = alist.get((int)position).label;
+    	    	   controls.pOnLongClickGridItem(pascalObj, (int)position, lastSelectedItemCaption);    	        
+    	    	}
+    	    	return false;
+    	    }
+    	});
+      
+      this.setNumColumns(android.widget.GridView.AUTO_FIT);  //android.widget.GridView.AUTO_FIT --> -1
+     
    } //end constructor
    
    public void jFree() {
@@ -10466,6 +10984,8 @@ class jGridView extends GridView /*dummy*/ { //please, fix what GUI object will 
    	  info.label = _item;
    	  info.drawableIdentifier = _imgIdentifier;
    	  info.id = alist.size();
+   	  info.itemTextColor = mItemTextColor;
+   	  info.itemTextSize = mItemTextSize;
    	  alist.add(info);
    	  gridViewCustomeAdapter.notifyDataSetChanged();
    }
@@ -10498,7 +11018,32 @@ class jGridView extends GridView /*dummy*/ { //please, fix what GUI object will 
 	     //0: image-text  ; 1: text-image
 	   gridViewCustomeAdapter.SetItemsLayout(_value);
    }
-
+   
+   public int  GetItemIndex() {
+	   return lastSelectedItem;
+   }
+   
+   public String GetItemCaption() {
+	   return lastSelectedItemCaption;
+   }
+   
+   public void DispatchOnDrawItemTextColor(boolean _value) {
+	   gridViewCustomeAdapter.SetDispatchOnDrawItemTextColor(_value);
+	}
+   
+   
+   public void DispatchOnDrawItemBitmap(boolean _value) {
+	   gridViewCustomeAdapter.SetDispatchOnDrawItemBitmap(_value);
+	}
+   
+   public void SetFontSize(int _size) {	   	   
+	   mItemTextSize = _size;
+   }
+   
+   public void SetFontColor(int _color) {	  
+	   mItemTextColor = _color;	
+   }
+   
 } //end class
 
 
@@ -11167,7 +11712,7 @@ Sending Data: Extras vs. URI Parameters
    public Bundle GetExtraBundle(Intent _intent) {  //the map of all extras previously added with putExtra(), or null if none have been added. 
 	   return _intent.getExtras();
    }
-   
+     
    public double[] GetExtraDoubleArray(Intent _intent, String _dataName) {
        return _intent.getDoubleArrayExtra(_dataName);
    }
@@ -11277,7 +11822,7 @@ Sending Data: Extras vs. URI Parameters
    public void PutExtraFile(String _environmentDirectoryPath, String _fileName) { //Environment.DIRECTORY_DOWNLOADS
       mIntent.putExtra(Intent.EXTRA_STREAM, Uri.parse("file://"+_environmentDirectoryPath+"/"+ _fileName)); //android.intent.extra.STREAM
    }
-          
+      
    public void PutExtraMailSubject(String  _mailSubject) {
 	   mIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, _mailSubject);
    }
@@ -11301,6 +11846,7 @@ Sending Data: Extras vs. URI Parameters
    public void PutExtraPhoneNumbers(String[]  _callPhoneNumbers) {	  
 	   mIntent.putExtra(android.content.Intent.EXTRA_PHONE_NUMBER, _callPhoneNumbers); //used with Action_Call	   	   
    }
+   
    
    public Uri GetContactsContentUri(){
 	  return ContactsContract.Contacts.CONTENT_URI;
@@ -11337,11 +11883,10 @@ Sending Data: Extras vs. URI Parameters
     * If the EXTRA_OUTPUT is not present, then a small sized image is returned as a 
     * Bitmap object in the extra field. This is useful for applications that only need a small image. 
     */
-   public String GetActionViewAsString(){
-	 //String c = MediaStore.ACTION_IMAGE_CAPTURE;  //"android.media.action.IMAGE_CAPTURE" TODO! 
+   public String GetActionViewAsString(){  
      return "android.intent.action.VIEW";
    }	   
-   
+      
    public String GetActionPickAsString() {
 	   return "android.intent.action.PICK";
    }  	   
@@ -11404,17 +11949,19 @@ Sending Data: Extras vs. URI Parameters
    }
    
    /* Pick image from Gallery
-    Intent intent = new Intent();
-    intent.setType("image/*");
+    Intent intent = new Intent();  
     intent.setAction(Intent.ACTION_GET_CONTENT);
+    intent.setType("image/*");
+    intent.putExtra("return-data", true);
+    
  
-    ACTION_GET_CONTENT with MIME type vnd.android.cursor.item/phone -- 
+    ACTION_GET_CONTENT with MIME type vnd.android.cursor.item/phone 
     Display the list of people's phone numbers,
     allowing the user to browse through them and pick one and return it to the parent activity.
     
     */
    
-   public String GetActionGetContentUri(){	        
+   public String GetActionGetContentUri(){	      //generic pick!    
 	  return "android.intent.action.GET_CONTENT";
    }
    
@@ -11443,6 +11990,7 @@ Sending Data: Extras vs. URI Parameters
       // Retrieve the phone number from the NUMBER column
        int column = cursor.getColumnIndex(Phone.NUMBER);
        String number = cursor.getString(column);
+       cursor.close();
        return number;
    }
    
@@ -11454,9 +12002,10 @@ Sending Data: Extras vs. URI Parameters
 	      // Retrieve the phone number from the DATA column
 	       int column = cursor.getColumnIndex(Email.DATA);
 	       String email = cursor.getString(column);
+	       cursor.close();
 	       return email;
    }
-   
+      
    //ref. http://code.tutsplus.com/tutorials/android-essentials-using-the-contact-picker--mobile-2017
    public String[] GetBundleContent(Intent _intent) {
 	 		
@@ -11479,8 +12028,7 @@ Sending Data: Extras vs. URI Parameters
      
    }
    
-   public String GetActionImageCaptureAsString(){
-		 //String c = MediaStore.ACTION_IMAGE_CAPTURE;
+   public String GetActionImageCaptureAsString() {
 	     return "android.media.action.IMAGE_CAPTURE";
    }
       
@@ -11496,7 +12044,17 @@ Sending Data: Extras vs. URI Parameters
    public boolean IsActionEqual(Intent _intent, String _intentAction) { //'android.provider.Telephony.SMS_RECEIVED'
 	   return _intent.getAction().equals(_intentAction);
    }
-      
+   
+   //TODO Pascal
+   public void PutExtraMediaStoreOutput(String _environmentDirectoryPath, String _fileName) {
+	   mIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.parse("file://"+_environmentDirectoryPath+"/"+ _fileName));
+   }
+   
+ //TODO Pascal
+   public String GetActionCameraCropAsString() {
+	  return "com.android.camera.action.CROP"; //http://shaikhhamadali.blogspot.com.br/2013/09/capture-images-and-crop-images-using.html
+   }
+          
 }
 
 /*Draft java code by "Lazarus Android Module Wizard" [2/3/2015 16:12:53]*/
@@ -11692,28 +12250,93 @@ class jHttpClient /*extends ...*/ {
    private String mHOSTNAME = AuthScope.ANY_HOST; // null; 
    private int mPORT = AuthScope.ANY_PORT; //-1;
    
+   private List<NameValuePair> ValuesForPost2 = new ArrayList<NameValuePair>();
+   DefaultHttpClient client2;
+   
    //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
    public jHttpClient(Controls _ctrls, long _Self) { //Add more others news "_xxx" params if needed!
       //super(_ctrls.activity);
       context   = _ctrls.activity;
       pascalObj = _Self;
       controls  = _ctrls;
+      client2 = new DefaultHttpClient();     
    }
  
    public void jFree() {
      //free local objects...
+	   client2.getConnectionManager().shutdown();
    }
  
    //write others [public] methods code here......
    //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
-   
    //ref. http://blog.leocad.io/basic-http-authentication-on-android/
    //ref. http://simpleprogrammer.com/2011/05/25/oauth-and-rest-in-android-part-1/
    //ref. http://jan.horneck.info/blog/androidhttpclientwithbasicauthentication
          
-   public void Get(String _stringUrl) {
+   public void GetAsync(String _stringUrl) {
 	   new AsyncHttpClientGet().execute(_stringUrl);	   
+   }
+         
+   public String Get2(String _stringUrl) throws Exception {  //Pascal: Get  
+	   	   	   
+	   HttpGet httpGet = new HttpGet(_stringUrl);	   
+	   HttpResponse response = client2.execute(httpGet);
+	      
+	   BufferedReader rd = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
+	   StringBuffer sb = new StringBuffer();
+	   String line = "";
+	   while ((line = rd.readLine()) != null) {
+		   sb.append(line);		   
+	   }	   
+	   return sb.toString();
    } 
+   
+      
+   public void AddValueForPost2(String Name, String Value) {  //Pascal: AddPostNameValueData		
+       ValuesForPost2.add(new BasicNameValuePair(Name, Value));	
+   }
+
+   public void ClearPost2Values() { // Pascal: ClearPostNameValueData
+      ValuesForPost2.clear();	
+   }   
+
+   public String Post2(String Link) throws Exception {	// Pascal: Post			
+		
+		// Create a new HttpClient and Post Header
+		int statusCode = 0;						
+		HttpParams httpParams = new BasicHttpParams();
+		int connection_Timeout = 5000;
+		HttpConnectionParams.setConnectionTimeout(httpParams, connection_Timeout);
+		HttpConnectionParams.setSoTimeout(httpParams, connection_Timeout);
+		
+        if (mAuthenticationMode != 0) {    		   
+        	client2.getCredentialsProvider().setCredentials(
+                        new AuthScope(mHOSTNAME,mPORT),  // 
+                        new UsernamePasswordCredentials(mUSERNAME, mPASSWORD));
+	    }
+        			   
+	    HttpPost httpPost = new HttpPost(Link);
+	    
+	  //thanks to @renabor
+	    if (mAuthenticationMode != 0) {
+            String _credentials = mUSERNAME + ":" + mPASSWORD;
+            String _base64EncodedCredentials = Base64.encodeToString(_credentials.getBytes(), Base64.NO_WRAP);
+            httpPost.addHeader("Authorization", "Basic " + _base64EncodedCredentials);
+        }	   
+
+	        
+	    httpPost.setEntity(new UrlEncodedFormEntity(ValuesForPost2));
+	    	
+		HttpResponse response = client2.execute(httpPost);
+			
+		BufferedReader rd = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
+		StringBuffer sb = new StringBuffer();
+		String line;		
+		while ((line = rd.readLine()) != null) {
+			sb.append(line);
+		}		
+		return sb.toString();	   
+  }
    
    public void SetAuthenticationUser(String _userName, String _password) {       	 
 	   mUSERNAME = _userName;
@@ -11742,14 +12365,18 @@ class jHttpClient /*extends ...*/ {
 	 */
    
      //ref. http://mobiledevtuts.com/android/android-http-with-asynctask-example/ 
-   public void PostNameValueData(String _stringUrl, String _name, String _value) {
+   public void PostNameValueDataAsync(String _stringUrl, String _name, String _value) {
 	  new AsyncHttpClientPostNameValueData().execute(_stringUrl, _name, _value);	  
    }
   
 	
-	public void PostNameValueData(String _stringUrl, String _listNameValue) {
+	public void PostNameValueDataAsync(String _stringUrl, String _listNameValue) {
 	   new AsyncHttpClientPostListNameValueData().execute(_stringUrl, _listNameValue);     
     }
+	
+	public void PostNameValueDataAsync(String _stringUrl) {
+		new AsyncHttpClientPostNameValueData().execute(_stringUrl, "", "");
+	}
 	
 	/*
 	 * AsyncTask has three generic types:
@@ -11783,12 +12410,27 @@ class jHttpClient /*extends ...*/ {
                   httpclient.getCredentialsProvider().setCredentials(
                                new AuthScope(mHOSTNAME,mPORT),  // 
                                new UsernamePasswordCredentials(mUSERNAME, mPASSWORD));
-    	        }						
+    	        }
+    	        
 			    HttpPost httppost = new HttpPost(_stringUrl);
-				// Add your data
-				List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();								
-				nameValuePairs.add(new BasicNameValuePair(_name, _value));								
-				httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
+			    
+			    //thanks to @renabor
+			    if (mAuthenticationMode != 0) {
+                    String _credentials = mUSERNAME + ":" + mPASSWORD;
+                    String _base64EncodedCredentials = Base64.encodeToString(_credentials.getBytes(), Base64.NO_WRAP);
+                    httppost.addHeader("Authorization", "Basic " + _base64EncodedCredentials);
+               }
+			    			    			    
+				// Add your data				
+			    if (!_name.equals("")) { 
+			         List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();				
+				     nameValuePairs.add(new BasicNameValuePair(_name, _value));
+				     httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
+			    }
+			    else {			    	
+			       httppost.setEntity(new UrlEncodedFormEntity(ValuesForPost2));
+			    }
+				
 				// Execute HTTP Post Request
 				HttpResponse response = httpclient.execute(httppost);
 				StatusLine statusLine = response.getStatusLine();  
@@ -11831,9 +12473,16 @@ class jHttpClient /*extends ...*/ {
 						
 			    HttpPost httppost = new HttpPost(stringParams[0]);
 
+			    //thanks to @renabor
+			    if (mAuthenticationMode != 0) {
+                    String _credentials = mUSERNAME + ":" + mPASSWORD;
+                    String _base64EncodedCredentials = Base64.encodeToString(_credentials.getBytes(), Base64.NO_WRAP);
+                    httppost.addHeader("Authorization", "Basic " + _base64EncodedCredentials);
+                }
+			    
 				// Add your data
 				List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();						
-				StringTokenizer st = new StringTokenizer(stringParams[1], "=&");		
+				StringTokenizer st = new StringTokenizer(stringParams[1], "=&"); //name1=value1&name2=value2&name3=value3 ...		
 				
 				while(st.hasMoreTokens()) { 
 				  String key = st.nextToken(); 
@@ -11894,6 +12543,13 @@ class jHttpClient /*extends ...*/ {
 	     	   }
 	     	   
 	            HttpGet httpget = new HttpGet(stringUrl[0]);
+	            
+	            //thanks to @renabor
+	            if (mAuthenticationMode != 0) {
+                    String _credentials = mUSERNAME + ":" + mPASSWORD;
+                    String _base64EncodedCredentials = Base64.encodeToString(_credentials.getBytes(), Base64.NO_WRAP);
+                    httpget.addHeader("Authorization", "Basic " + _base64EncodedCredentials);
+                }
 
 	            //System.out.println("executing request" + httpget.getRequestLine());
 	            HttpResponse response = httpclient.execute(httpget);
@@ -12140,7 +12796,7 @@ class jAnalogClock extends AnalogClock /*dummy*/ { //please, fix what GUI object
    public void SetId(int _id) { //wrapper method pattern ...
       this.setId(_id);
    }
-  
+     
   //write others [public] methods code here......
   //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
   
@@ -12275,7 +12931,10 @@ class jDigitalClock extends DigitalClock /*TextClock*/ { //please, fix what GUI 
 	  
 	  //write others [public] methods code here......
 	  //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
-	  
+	   
+	   public void SetTextSize(float _size) {
+			this.setTextSize(TypedValue.COMPLEX_UNIT_PX, _size);		   
+	   }	  
 } //end class
 
 /**
@@ -12848,6 +13507,1160 @@ class jSurfaceView  extends SurfaceView  /*dummy*/ { //please, fix what GUI obje
 } //end class
 
 
+
+/*Draft java code by "Lazarus Android Module Wizard" [6/16/2015 22:00:31]*/
+/*https://github.com/jmpessoa/lazandroidmodulewizard*/
+/*jControl template*/
+
+//http://androidsurya.blogspot.com.br/2011/12/android-adding-contacts.html
+//http://www.higherpass.com/android/tutorials/working-with-android-contacts/
+//http://www.androidhub4you.com/2013/06/get-phone-contacts-details-in-android_6.html
+//http://stackoverflow.com/questions/9907751/android-update-a-contact   - image
+//ref   http://wptrafficanalyzer.in/blog/programatically-adding-contacts-with-photo-using-contacts-provider-in-android-example/
+//http://stackoverflow.com/questions/4744187/how-to-add-new-contacts-in-android
+//http://techblogon.com/read-multiple-phone-numbers-from-android-contacts-list-programmatically/
+//http://email-addresses-in-android-contacts.blogspot.com.br/2011/04/how-to-insert-and-update-email.html
+
+class jContactManager /*extends ...*/ {
+ 
+   private long     pascalObj = 0;      // Pascal Object
+   private Controls controls  = null;   // Control Class -> Java/Pascal Interface ...
+   private Context  context   = null;
+   
+   //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
+ 
+   public jContactManager(Controls _ctrls, long _Self) { //Add more others news "_xxx" params if needed!
+      //super(_ctrls.activity);
+      context   = _ctrls.activity;
+      pascalObj = _Self;
+      controls  = _ctrls;
+   }
+ 
+   public void jFree() {
+     //free local objects...
+   }
+ 
+ //write others [public] methods code here......
+ //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
+   public String GetMobilePhoneNumber(String _displayName){
+       
+	   String matchNumber = "";
+	   String username = _displayName;	   
+	   username = username.toLowerCase(); 	   
+	   Cursor phones = controls.activity.getContentResolver().query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null,null,null, null);
+	
+	   while (phones.moveToNext()) {
+	     String name = phones.getString(phones.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME));
+	     String phoneNumber = phones.getString(phones.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
+	     String phoneType = phones.getString(phones.getColumnIndex(ContactsContract.CommonDataKinds.Phone.TYPE));	     	     
+	     name = name.toLowerCase();	   
+	     if(name.equals(username)) {
+	    	 if (phoneType.equals("2")) { //mobile
+	    	    matchNumber = phoneNumber;
+	    	    break;
+	    	 }   
+	     }		    
+	   }	   
+	   phones.close();	   
+	   return matchNumber;
+}
+      
+//ref http://www.higherpass.com/android/tutorials/working-with-android-contacts/
+//http://android-contact-id-vs-raw-contact-id.blogspot.de/
+//It's worth to note that there is a 1-to-1 relationship between the CONTACT_ID and the DISPLAY_NAME.   
+public String GetContactID(String _displayName){
+    
+	   String matchID = "";	  
+	   String username = _displayName;;	   
+	   username = username.toLowerCase(); 
+	   
+	   Cursor phones = controls.activity.getContentResolver().query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null,null,null, null);
+	      							
+		while(phones.moveToNext()) {											
+			String name=phones.getString(phones.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME));			
+			name = name.toLowerCase();			
+		     if(name.equals(username)) {			    	  
+	    		matchID = phones.getString(phones.getColumnIndex(ContactsContract.CommonDataKinds.Phone.CONTACT_ID));	    		
+	    	    break;	       
+	         }	         		     		    
+		}				
+	   phones.close();	   
+	   return matchID;	   
+}
+
+
+public String GetDisplayName(String _contactID){
+	
+	   String matchName = "";	  
+	   String userID = _contactID;;	   
+	  	   
+	   Cursor phones = controls.activity.getContentResolver().query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null,null,null, null);
+	      							
+	   while(phones.moveToNext()) {											
+			 String contact_id=phones.getString(phones.getColumnIndex(ContactsContract.CommonDataKinds.Phone.CONTACT_ID));									
+		     if(contact_id.equals(userID)) {			    	  
+		    	 matchName = phones.getString(phones.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME));	    		
+	    	    break;	       
+	         }	         		     		    
+	   }
+		
+	   phones.close();	   
+	   return matchName;
+}
+
+/*
+public String GetRawContactIDByContactID(String _contactID){
+	
+	   String raw_contact_id = "";	   
+	   String userID = _contactID;;	   
+	   
+	   Cursor cur = controls.activity.getContentResolver().query(ContactsContract.Data.CONTENT_URI, null, null, null, null);
+
+	   if ( (null == cur) || (!cur.moveToFirst()) ) return "";
+	      							
+	   while(cur.moveToNext()) {											
+			String contact_id=cur.getString(cur.getColumnIndex(ContactsContract.Data.CONTACT_ID));									
+		     if(contact_id.equals(userID)) {			    	  
+	            raw_contact_id = cur.getString(cur.getColumnIndex(ContactsContract.Data.RAW_CONTACT_ID));
+	    	    break;	       
+	         }	         		     		    
+	   }
+	   
+	   cur.close();	   
+	   return raw_contact_id;
+}
+*/
+
+private String GetRawContactID(String _displayName){
+    
+	   String raw_contact_id = "";
+	   
+	   String username = _displayName;;	   
+	   username = username.toLowerCase(); 
+	   
+	   Cursor cur = controls.activity.getContentResolver().query(ContactsContract.Data.CONTENT_URI, null, null, null, null);
+
+	   if ( (null == cur) || (!cur.moveToFirst()) ) return "";
+	      							
+	   while(cur.moveToNext()) {											
+			String name=cur.getString(cur.getColumnIndex(ContactsContract.Data.DISPLAY_NAME));			
+			name = name.toLowerCase();			
+		     if(name.equals(username)) {			    	  
+	            raw_contact_id = cur.getString(cur.getColumnIndex(ContactsContract.Data.RAW_CONTACT_ID));
+	    	    break;	       
+	         }	         		     		    
+	    }	
+		
+		cur.close();	   
+	    return raw_contact_id;	   
+}
+
+public void UpdateDisplayName(String _displayName, String _newDisplayName) {
+	
+    try {
+        ArrayList<ContentProviderOperation> ops = new ArrayList<ContentProviderOperation>();
+        
+        String queryWhere = ContactsContract.Data.DISPLAY_NAME + " = ? AND " + ContactsContract.Data.MIMETYPE + " = ?"; 
+        String[] queryParams = new String[]{_displayName, ContactsContract.CommonDataKinds.StructuredName.CONTENT_ITEM_TYPE};
+        
+        Builder builder = ContentProviderOperation.newUpdate(ContactsContract.Data.CONTENT_URI);	        
+        builder.withSelection(queryWhere, queryParams);
+        
+        builder.withValue(ContactsContract.Data.MIMETYPE, ContactsContract.CommonDataKinds.StructuredName.CONTENT_ITEM_TYPE);        
+        builder.withValue(ContactsContract.CommonDataKinds.StructuredName.DISPLAY_NAME, _newDisplayName);
+        
+        ops.add(builder.build());	        
+                	        	        
+        try {
+            controls.activity.getContentResolver().applyBatch(ContactsContract.AUTHORITY,ops);
+        }
+        catch (Exception e) {
+              e.printStackTrace();
+        }        
+    } catch (Exception e) {
+        //	        
+    }	
+}
+
+public void UpdateMobilePhoneNumber(String _displayName, String _newMobileNumber) {
+	
+	 try {
+	        ArrayList<ContentProviderOperation> ops = new ArrayList<ContentProviderOperation>();
+	        Builder builder = null; 		   	        
+	        String raw_contact_id = GetRawContactID(_displayName);
+	        
+	        String where = ContactsContract.Data.RAW_CONTACT_ID + " = ? AND " + 
+	                   ContactsContract.Data.MIMETYPE + " = ? AND " + 
+	                   String.valueOf(ContactsContract.CommonDataKinds.Phone.TYPE) + " = ?";
+	        
+	        String[] params = new String[]{raw_contact_id, 
+	                                   ContactsContract.CommonDataKinds.Phone.CONTENT_ITEM_TYPE,
+	                                   String.valueOf(ContactsContract.CommonDataKinds.Phone.TYPE_MOBILE)}; 
+
+	        Cursor numberPhone = controls.activity.getContentResolver().query(ContactsContract.Data.CONTENT_URI, null, where, params, null);
+	        	        
+	        //if not found Insert... 	        
+	        if ( (null == numberPhone) || (!numberPhone.moveToFirst()) ) {	        	
+	           builder = ContentProviderOperation.newInsert(ContactsContract.Data.CONTENT_URI);	        		        	        		          
+	           builder.withValue(ContactsContract.Data.RAW_CONTACT_ID, raw_contact_id);
+	           builder.withValue(ContactsContract.Data.MIMETYPE, ContactsContract.CommonDataKinds.Phone.CONTENT_ITEM_TYPE);
+	           builder.withValue(ContactsContract.CommonDataKinds.Phone.DATA, _newMobileNumber);
+	           builder.withValue(ContactsContract.CommonDataKinds.Phone.TYPE, ContactsContract.CommonDataKinds.Phone.TYPE_MOBILE);	            
+	        }	        
+	        else {	        	        	        
+	          String queryWhere = ContactsContract.Data.DISPLAY_NAME + " = ? AND " + 
+	                   ContactsContract.Data.MIMETYPE + " = ? AND " + 
+	                   String.valueOf(ContactsContract.CommonDataKinds.Phone.TYPE) + " = ?"; 
+
+	          String[] queryParams = new String[]{_displayName, 
+	        		ContactsContract.CommonDataKinds.Phone.CONTENT_ITEM_TYPE,
+	                                   String.valueOf(ContactsContract.CommonDataKinds.Phone.TYPE_MOBILE)}; 	        	        	       
+	          builder = ContentProviderOperation.newUpdate(ContactsContract.Data.CONTENT_URI);	        
+	          builder.withSelection(queryWhere, queryParams);
+	        
+	          builder.withValue(ContactsContract.Data.MIMETYPE, ContactsContract.CommonDataKinds.Phone.CONTENT_ITEM_TYPE);
+	          builder.withValue(ContactsContract.CommonDataKinds.Phone.TYPE, ContactsContract.CommonDataKinds.Phone.TYPE_MOBILE);	        
+	          builder.withValue(ContactsContract.CommonDataKinds.Phone.DATA, _newMobileNumber);
+	        }
+	        
+	        numberPhone.close();
+	        ops.add(builder.build());	        
+	                	        	        
+	        try {
+	          controls.activity.getContentResolver().applyBatch(ContactsContract.AUTHORITY,ops);
+	        }
+	        catch (Exception e) {
+	              e.printStackTrace();
+	        }	          	          
+	    } catch (Exception e) {
+	        //	        
+	    }	
+}
+
+
+
+public void UpdateWorkPhoneNumber(String _displayName, String _newWorkNumber) {
+	
+	 try {
+	        ArrayList<ContentProviderOperation> ops = new ArrayList<ContentProviderOperation>();
+	        	  
+	        Builder builder = null; 		   	        
+	        String raw_contact_id = GetRawContactID(_displayName);
+	        
+	        String where = ContactsContract.Data.RAW_CONTACT_ID + " = ? AND " + 
+	                   ContactsContract.Data.MIMETYPE + " = ? AND " + 
+	                   String.valueOf(ContactsContract.CommonDataKinds.Phone.TYPE) + " = ?";
+	        
+	        String[] params = new String[]{raw_contact_id, 
+	                                   ContactsContract.CommonDataKinds.Phone.CONTENT_ITEM_TYPE,
+	                                   String.valueOf(ContactsContract.CommonDataKinds.Phone.TYPE_WORK)}; 
+
+	        Cursor numberPhone = controls.activity.getContentResolver().query(ContactsContract.Data.CONTENT_URI, null, where, params, null);
+	        	        
+	        //if not found Insert... 	        
+	        if ( (null == numberPhone) || (!numberPhone.moveToFirst()) ) {	        	
+	           builder = ContentProviderOperation.newInsert(ContactsContract.Data.CONTENT_URI);	        		        	        		          
+	           builder.withValue(ContactsContract.Data.RAW_CONTACT_ID, raw_contact_id);
+	           builder.withValue(ContactsContract.Data.MIMETYPE, ContactsContract.CommonDataKinds.Phone.CONTENT_ITEM_TYPE);
+	           builder.withValue(ContactsContract.CommonDataKinds.Phone.DATA, _newWorkNumber);
+	           builder.withValue(ContactsContract.CommonDataKinds.Phone.TYPE, ContactsContract.CommonDataKinds.Phone.TYPE_WORK);	            
+	        }	        
+	        else {	        
+	          String queryWhere = ContactsContract.Data.DISPLAY_NAME + " = ? AND " + 
+	                   ContactsContract.Data.MIMETYPE + " = ? AND " + 
+	                   String.valueOf(ContactsContract.CommonDataKinds.Phone.TYPE) + " = ?"; 
+
+	          String[] queryParams = new String[]{_displayName, 
+	        		ContactsContract.CommonDataKinds.Phone.CONTENT_ITEM_TYPE,
+	                                   String.valueOf(ContactsContract.CommonDataKinds.Phone.TYPE_WORK)}; 	        	        	       
+	          builder = ContentProviderOperation.newUpdate(ContactsContract.Data.CONTENT_URI);	        
+	          builder.withSelection(queryWhere, queryParams);
+	        
+	          builder.withValue(ContactsContract.Data.MIMETYPE, ContactsContract.CommonDataKinds.Phone.CONTENT_ITEM_TYPE);
+	          builder.withValue(ContactsContract.CommonDataKinds.Phone.TYPE, ContactsContract.CommonDataKinds.Phone.TYPE_WORK);	        
+	          builder.withValue(ContactsContract.CommonDataKinds.Phone.DATA, _newWorkNumber);
+	        }
+	        
+	        numberPhone.close();	        
+	        ops.add(builder.build());	        
+	                	        	        
+	        try {
+	        	  controls.activity.getContentResolver().applyBatch(ContactsContract.AUTHORITY,ops);
+	        }
+	        catch (Exception e) {
+	              e.printStackTrace();
+	        }	          	          
+	    } catch (Exception e) {
+	        //	        
+	    }	
+}
+
+public void UpdateHomePhoneNumber(String _displayName, String _newHomeNumber) {
+	
+	 try {
+	        ArrayList<ContentProviderOperation> ops = new ArrayList<ContentProviderOperation>();
+	       	      
+	        Builder builder = null; 		   	        
+	        String raw_contact_id = GetRawContactID(_displayName);
+	        
+	        String where = ContactsContract.Data.RAW_CONTACT_ID + " = ? AND " + 
+	                   ContactsContract.Data.MIMETYPE + " = ? AND " + 
+	                   String.valueOf(ContactsContract.CommonDataKinds.Phone.TYPE) + " = ?";
+	        
+	        String[] params = new String[]{raw_contact_id, 
+	                                   ContactsContract.CommonDataKinds.Phone.CONTENT_ITEM_TYPE,
+	                                   String.valueOf(ContactsContract.CommonDataKinds.Phone.TYPE_HOME)}; 
+
+	        Cursor numberPhone = controls.activity.getContentResolver().query(ContactsContract.Data.CONTENT_URI, null, where, params, null);
+	        	        
+	        // If not found Insert ... 	        
+	        if ( (null == numberPhone) || (!numberPhone.moveToFirst()) ) {	        	
+	           builder = ContentProviderOperation.newInsert(ContactsContract.Data.CONTENT_URI);	        		        	        		          
+	           builder.withValue(ContactsContract.Data.RAW_CONTACT_ID, raw_contact_id);
+	           builder.withValue(ContactsContract.Data.MIMETYPE, ContactsContract.CommonDataKinds.Phone.CONTENT_ITEM_TYPE);
+	           builder.withValue(ContactsContract.CommonDataKinds.Phone.DATA, _newHomeNumber);
+	           builder.withValue(ContactsContract.CommonDataKinds.Phone.TYPE, ContactsContract.CommonDataKinds.Phone.TYPE_HOME);	            
+	        }	        
+	        else {	        
+	           String queryWhere = ContactsContract.Data.DISPLAY_NAME + " = ? AND " + 
+	                   ContactsContract.Data.MIMETYPE + " = ? AND " + 
+	                   String.valueOf(ContactsContract.CommonDataKinds.Phone.TYPE) + " = ?"; 
+
+	           String[] queryParams = new String[]{_displayName, 
+	        		ContactsContract.CommonDataKinds.Phone.CONTENT_ITEM_TYPE,
+	                                   String.valueOf(ContactsContract.CommonDataKinds.Phone.TYPE_HOME)}; 	        
+	        	        
+	           builder = ContentProviderOperation.newUpdate(ContactsContract.Data.CONTENT_URI);	        
+	           builder.withSelection(queryWhere, queryParams);
+	        
+	           builder.withValue(ContactsContract.Data.MIMETYPE, ContactsContract.CommonDataKinds.Phone.CONTENT_ITEM_TYPE);
+	           builder.withValue(ContactsContract.CommonDataKinds.Phone.TYPE, ContactsContract.CommonDataKinds.Phone.TYPE_HOME);	        
+	           builder.withValue(ContactsContract.CommonDataKinds.Phone.DATA, _newHomeNumber);
+	        }	                
+	        
+	        numberPhone.close();
+	        ops.add(builder.build());	        
+	                	        	        
+	        try {
+	        	  controls.activity.getContentResolver().applyBatch(ContactsContract.AUTHORITY,ops);
+	          }
+	        catch (Exception e) {
+	              e.printStackTrace();
+	        }	          	          
+	    } catch (Exception e) {
+	        //	        
+	    }	
+}
+
+public void UpdateHomeEmail(String _displayName, String _newHomeEmail) {
+	
+	 try {
+	        ArrayList<ContentProviderOperation> ops = new ArrayList<ContentProviderOperation>();
+	        Builder builder = null; 		   	        
+	        String raw_contact_id = GetRawContactID(_displayName);
+	        
+	        String where = ContactsContract.Data.RAW_CONTACT_ID + " = ? AND " + 
+	                   ContactsContract.Data.MIMETYPE + " = ? AND " + 
+	                   String.valueOf(ContactsContract.CommonDataKinds.Email.TYPE) + " = ?";
+	        
+	        String[] params = new String[]{raw_contact_id, 
+	                                   ContactsContract.CommonDataKinds.Email.CONTENT_ITEM_TYPE,
+	                                   String.valueOf(ContactsContract.CommonDataKinds.Email.TYPE_HOME)}; 
+
+	        Cursor emailCur = controls.activity.getContentResolver().query(ContactsContract.Data.CONTENT_URI, null, where, params, null);
+	        	        
+	        //If not found Insert... 	        
+	        if ( (null == emailCur) || (!emailCur.moveToFirst()) ) {	        	
+	           builder = ContentProviderOperation.newInsert(ContactsContract.Data.CONTENT_URI);	        		        	        		          
+	           builder.withValue(ContactsContract.Data.RAW_CONTACT_ID, raw_contact_id);
+	           builder.withValue(ContactsContract.Data.MIMETYPE, ContactsContract.CommonDataKinds.Email.CONTENT_ITEM_TYPE);
+	           builder.withValue(ContactsContract.CommonDataKinds.Email.DATA, _newHomeEmail);
+	           builder.withValue(ContactsContract.CommonDataKinds.Email.TYPE, ContactsContract.CommonDataKinds.Email.TYPE_HOME);	            
+	        }	        
+	        else {
+	        
+	          String queryWhere = ContactsContract.Data.DISPLAY_NAME + " = ? AND " + ContactsContract.Data.MIMETYPE + " = ? AND " + 
+	                   String.valueOf(ContactsContract.CommonDataKinds.Email.TYPE) + " = ?"; 
+
+	          String[] queryParams = new String[]{_displayName, 
+	                                             ContactsContract.CommonDataKinds.Email.CONTENT_ITEM_TYPE,
+	                                             String.valueOf(ContactsContract.CommonDataKinds.Email.TYPE_HOME)}; 	        
+	         	           
+	          builder = ContentProviderOperation.newUpdate(ContactsContract.Data.CONTENT_URI);	        
+	          builder.withSelection(queryWhere, queryParams);	        
+	        
+	          builder.withValue(ContactsContract.Data.MIMETYPE, ContactsContract.CommonDataKinds.Email.CONTENT_ITEM_TYPE);
+	          builder.withValue(ContactsContract.CommonDataKinds.Email.TYPE, ContactsContract.CommonDataKinds.Email.TYPE_HOME);	        
+	          builder.withValue(ContactsContract.CommonDataKinds.Email.DATA, _newHomeEmail);
+	        }
+	        
+	        emailCur.close();
+	        ops.add(builder.build());	        
+	                	        	        
+	        try {
+	        	  controls.activity.getContentResolver().applyBatch(ContactsContract.AUTHORITY,ops);
+	          }
+	        catch (Exception e) {
+	              e.printStackTrace();
+	        }	          	          
+	    } catch (Exception e) {
+	        //	        
+	    }	
+}
+
+public void UpdateWorkEmail(String _displayName, String _newWorkEmail) {
+	
+	 try {
+	        ArrayList<ContentProviderOperation> ops = new ArrayList<ContentProviderOperation>();	        
+	        
+	        Builder builder = null; 		   	        
+	        String raw_contact_id = GetRawContactID(_displayName);
+	        
+	        String where = ContactsContract.Data.RAW_CONTACT_ID + " = ? AND " + 
+	                   ContactsContract.Data.MIMETYPE + " = ? AND " + 
+	                   String.valueOf(ContactsContract.CommonDataKinds.Email.TYPE) + " = ?";
+	        
+	        String[] params = new String[]{raw_contact_id, 
+	                                   ContactsContract.CommonDataKinds.Email.CONTENT_ITEM_TYPE,
+	                                   String.valueOf(ContactsContract.CommonDataKinds.Email.TYPE_HOME)}; 
+
+	        Cursor emailCur = controls.activity.getContentResolver().query(ContactsContract.Data.CONTENT_URI, null, where, params, null);
+	        	        
+	        //If not found Insert.... 	        
+	        if ( (null == emailCur) || (!emailCur.moveToFirst()) ) {	        	
+	           builder = ContentProviderOperation.newInsert(ContactsContract.Data.CONTENT_URI);	        		        	        		          
+	           builder.withValue(ContactsContract.Data.RAW_CONTACT_ID, raw_contact_id);
+	           builder.withValue(ContactsContract.Data.MIMETYPE, ContactsContract.CommonDataKinds.Email.CONTENT_ITEM_TYPE);
+	           builder.withValue(ContactsContract.CommonDataKinds.Email.DATA, _newWorkEmail);
+	           builder.withValue(ContactsContract.CommonDataKinds.Email.TYPE, ContactsContract.CommonDataKinds.Email.TYPE_HOME);	            
+	        }	        
+	        else {
+	        String queryWhere = ContactsContract.Data.DISPLAY_NAME + " = ? AND " + ContactsContract.Data.MIMETYPE + " = ? AND " + 
+	                   String.valueOf(ContactsContract.CommonDataKinds.Email.TYPE) + " = ?"; 
+
+	        String[] queryParams = new String[]{_displayName, 
+	                                             ContactsContract.CommonDataKinds.Email.CONTENT_ITEM_TYPE,
+	                                             String.valueOf(ContactsContract.CommonDataKinds.Email.TYPE_WORK)}; 	        
+	         	           
+	        builder = ContentProviderOperation.newUpdate(ContactsContract.Data.CONTENT_URI);	        
+	        builder.withSelection(queryWhere, queryParams);	        
+	        
+	        builder.withValue(ContactsContract.Data.MIMETYPE, ContactsContract.CommonDataKinds.Email.CONTENT_ITEM_TYPE);
+	        builder.withValue(ContactsContract.CommonDataKinds.Email.TYPE, ContactsContract.CommonDataKinds.Email.TYPE_WORK);	        
+	        builder.withValue(ContactsContract.CommonDataKinds.Email.DATA, _newWorkEmail);	        
+	        }
+	        
+	        emailCur.close();
+	        ops.add(builder.build());	        
+	                	        	        
+	        try {
+	        	  controls.activity.getContentResolver().applyBatch(ContactsContract.AUTHORITY,ops);
+	          }
+	        catch (Exception e) {
+	              e.printStackTrace();
+	        }	          	          
+	    } catch (Exception e) {
+	        //	        
+	    }	
+}
+
+public void UpdateOrganization(String _displayName, String _newCompany, String _newJobTitle) {
+	
+	 try {
+	        ArrayList<ContentProviderOperation> ops = new ArrayList<ContentProviderOperation>();
+	        Builder builder = null; 		   	        
+	        String raw_contact_id = GetRawContactID(_displayName);
+	        
+	        String where = ContactsContract.Data.RAW_CONTACT_ID + " = ? AND " + 
+	                   ContactsContract.Data.MIMETYPE + " = ? AND " + 
+	                   String.valueOf(ContactsContract.CommonDataKinds.Organization.TYPE) + " = ?";
+	        
+	        String[] params = new String[]{raw_contact_id, 
+	                                   ContactsContract.CommonDataKinds.Organization.CONTENT_ITEM_TYPE,
+	                                   String.valueOf(ContactsContract.CommonDataKinds.Organization.TYPE_WORK)}; 
+
+	        Cursor orgCur = controls.activity.getContentResolver().query(ContactsContract.Data.CONTENT_URI, null, where, params, null);
+	        	        	        
+	        // If not found Insert... 	        
+	        if ( (null == orgCur) || (!orgCur.moveToFirst()) ) {	        	
+	           builder = ContentProviderOperation.newInsert(ContactsContract.Data.CONTENT_URI);	        		        	        		          
+	           builder.withValue(ContactsContract.Data.RAW_CONTACT_ID, raw_contact_id);
+	           builder.withValue(ContactsContract.Data.MIMETYPE, ContactsContract.CommonDataKinds.Organization.CONTENT_ITEM_TYPE);
+	           builder.withValue(ContactsContract.CommonDataKinds.Organization.DATA, _newCompany);
+	           builder.withValue(ContactsContract.CommonDataKinds.Organization.TYPE, ContactsContract.CommonDataKinds.Organization.TYPE_WORK);
+			   builder.withValue(ContactsContract.CommonDataKinds.Organization.TITLE, _newJobTitle);
+			   builder.withValue(ContactsContract.CommonDataKinds.Organization.TYPE, ContactsContract.CommonDataKinds.Organization.TYPE_WORK);
+	        }	        
+	        else {	        	        
+	          String queryWhere = ContactsContract.Data.DISPLAY_NAME + " = ? AND " + ContactsContract.Data.MIMETYPE + " = ?"; 
+	          String[] queryParams = new String[]{_displayName, ContactsContract.CommonDataKinds.Organization.CONTENT_ITEM_TYPE};	              
+	        	        
+	          builder = ContentProviderOperation.newUpdate(ContactsContract.Data.CONTENT_URI);	        
+	          builder.withSelection(queryWhere, queryParams);	        
+	          builder.withValue(ContactsContract.Data.MIMETYPE, ContactsContract.CommonDataKinds.Organization.CONTENT_ITEM_TYPE);
+		      builder.withValue(ContactsContract.CommonDataKinds.Organization.COMPANY, _newCompany);
+		      builder.withValue( ContactsContract.CommonDataKinds.Organization.TYPE, ContactsContract.CommonDataKinds.Organization.TYPE_WORK);
+		      builder.withValue(ContactsContract.CommonDataKinds.Organization.TITLE, _newJobTitle);
+		      builder.withValue(ContactsContract.CommonDataKinds.Organization.TYPE, ContactsContract.CommonDataKinds.Organization.TYPE_WORK);
+	        }
+	        
+	        orgCur.close();
+	        ops.add(builder.build());	        
+	                	        	        
+	        try {
+	        	  controls.activity.getContentResolver().applyBatch(ContactsContract.AUTHORITY,ops);
+	          }
+	        catch (Exception e) {
+	              e.printStackTrace();
+	        }	          	          
+	    } catch (Exception e) {
+	        //	        
+	    }	
+}
+
+public void UpdatePhoto(String _displayName, Bitmap _bitmapImage) {
+	
+  if(_bitmapImage!=null) {
+	  
+     ByteArrayOutputStream stream = new ByteArrayOutputStream();
+     _bitmapImage.compress(Bitmap.CompressFormat.PNG , 75, stream);	
+	
+	 try {
+	        ArrayList<ContentProviderOperation> ops = new ArrayList<ContentProviderOperation>();
+
+	        Builder builder = null;
+	        String raw_contact_id = GetRawContactID(_displayName);
+	        
+	        String qwhere = RawContacts.Data._ID + "=?";
+	        String[] qparam = new String[] {String.valueOf(raw_contact_id)};
+	        	       	        	        	        	        
+	        Cursor cursorPhoto = controls.activity.getContentResolver().query(RawContacts.CONTENT_URI, null,qwhere,qparam, null);	             
+	        		                                                             	        		                                                            	               	        
+	        //If not found Insert... 	        
+	        if ( (null == cursorPhoto) || (!cursorPhoto.moveToFirst()) ) {	           
+	           builder = ContentProviderOperation.newInsert(ContactsContract.Data.CONTENT_URI);	        		        	        		          
+			   builder.withValue(ContactsContract.Data.RAW_CONTACT_ID, raw_contact_id);			           			    	   			    	   				       
+			   builder.withValue(ContactsContract.Data.MIMETYPE, ContactsContract.CommonDataKinds.Photo.CONTENT_ITEM_TYPE);
+			   builder.withValue(ContactsContract.CommonDataKinds.Photo.PHOTO,stream.toByteArray());			   
+	        }	        
+	        else {	        		      	        	  
+	          Log.i("found update...", _displayName);	
+	          String queryWhere = ContactsContract.Data.DISPLAY_NAME + " = ? AND " + ContactsContract.Data.MIMETYPE + " = ?"; 
+	          String[] queryParams = new String[]{_displayName, ContactsContract.CommonDataKinds.Photo.CONTENT_ITEM_TYPE};			           			    	   			    	   				       	
+		      builder = ContentProviderOperation.newUpdate(ContactsContract.Data.CONTENT_URI);	        
+			  builder.withSelection(queryWhere, queryParams);
+			  builder.withValue(ContactsContract.Data.MIMETYPE, ContactsContract.CommonDataKinds.Photo.CONTENT_ITEM_TYPE);
+			  builder.withValue(ContactsContract.CommonDataKinds.Photo.PHOTO,stream.toByteArray());
+	        }	        	        	        	        
+   		    ops.add(builder.build());
+   		    
+			try {
+			   controls.activity.getContentResolver().applyBatch(ContactsContract.AUTHORITY,ops);
+			}
+			catch (Exception e) {
+			    e.printStackTrace();
+		    }
+			
+			cursorPhoto.close();
+			
+			try {
+			       stream.flush();
+			}catch (IOException e) {
+			       e.printStackTrace();
+			}
+			
+	    } 
+	    catch (Exception e) {
+	        //	        
+	    }
+  }	 
+}
+
+public Bitmap GetPhoto(String _displayName){
+	   
+	   Bitmap photoImage= null;
+	   String photoURI = null;	   
+	   String username;	   
+	   username = _displayName;	   
+	   username = username.toLowerCase();
+	   	          	   
+	   Cursor phones = controls.activity.getContentResolver().query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null,null,null, null);
+	   	    
+	   while (phones.moveToNext()) {
+	     String name = phones.getString(phones.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME));	     	     	     	    
+	     name = name.toLowerCase();	     
+	     if(name.equals(username)) {
+	    	    photoURI = phones.getString(phones.getColumnIndex(ContactsContract.CommonDataKinds.Phone.PHOTO_URI));
+	    	    break;	    	   
+	     }		    
+	   }
+	   	   
+	   phones.close();	   
+	   	   
+	   if (photoURI != null) {		   	   
+	     Uri imageUri =  Uri.parse(photoURI);
+         InputStream imageStream;       
+	     try {
+		  imageStream = controls.activity.getContentResolver().openInputStream(imageUri);
+		  photoImage = BitmapFactory.decodeStream(imageStream);
+		 } catch (FileNotFoundException e) {
+		  // TODO Auto-generated catch block
+		   e.printStackTrace();
+	     }
+	   }	   	   
+       return photoImage;       	  	 
+}
+
+
+public Bitmap GetPhotoByUriAsString(String _uriAsString){
+	   
+	Bitmap photoImage= null;
+			   	   
+	if (!_uriAsString.equals("")) {		   	   
+	     Uri imageUri =  Uri.parse(_uriAsString);
+         InputStream imageStream;       
+	     try {
+		  imageStream = controls.activity.getContentResolver().openInputStream(imageUri);
+		  photoImage = BitmapFactory.decodeStream(imageStream);
+		 } catch (FileNotFoundException e) {
+		  // TODO Auto-generated catch block
+		   e.printStackTrace();
+	     }
+	}	   	   
+    return photoImage;       	  	 
+}
+
+//ref. http://android-contact-id-vs-raw-contact-id.blogspot.de/
+public void DeleteContact(String _displayName) {
+	 try {
+	        ArrayList<ContentProviderOperation> ops = new ArrayList<ContentProviderOperation>();	        	        
+	        Builder builder = null; 		   	        
+	        String raw_contact_id = GetRawContactID(_displayName);
+	        
+	        String where = RawContacts._ID + " = ?";	        
+	        String[] params = new String[]{String.valueOf(raw_contact_id)};	        
+	        builder = ContentProviderOperation.newDelete(RawContacts.CONTENT_URI);	        		        	        		          
+			builder.withSelection(where,params);			           					
+			
+			ops.add(builder.build());	    
+			
+	        try {
+	        	  controls.activity.getContentResolver().applyBatch(ContactsContract.AUTHORITY,ops);
+	          }
+	        catch (Exception e) {
+	              e.printStackTrace();
+	        }	          	          
+	    } catch (Exception e) {
+	        //	        
+	    }
+}
+
+/*TODO
+//ref. http://stackoverflow.com/questions/27781285/how-to-delete-sim-card-contact-in-android
+public void DeleteContactFromSIMCard(String _displayName) {
+	
+	String username = _displayName;
+	username = username.toLowerCase();
+	
+	Log.i("username...", username);
+	
+	Uri simUri = Uri.parse("content://icc/adn/");
+	
+	ContentResolver mContentResolver = controls.activity.getContentResolver();
+	
+	Cursor c = mContentResolver.query(simUri, null, null, null, null);
+	
+	if (c.getCount() > 0) {		
+		while ( c.moveToNext() ) {
+		     String name = c.getString(c.getColumnIndex("name"));			     		     		     
+		     name = name.toLowerCase();		     
+		     Log.i("do...", name);
+		     if(name.equals(username)) {
+		    	 Log.i("equals...", name);		    	 		  		    	 		    	 
+		    	 //String where = "tag=? AND number=?";
+		    	 //String[] args = new String[] { c.getString(c.getColumnIndex("name")) ,  c.getString(c.getColumnIndex("number"))};		         		    	 
+		    	 int i = mContentResolver.delete(
+		                 simUri,
+		                 "tag='" + c.getString(c.getColumnIndex("name")) +
+		                 "' AND " +
+		                 "number='" + c.getString(c.getColumnIndex("number")) + "'", null);		                		    	 
+		    	 //int i = mContentResolver.delete(simUri,where,args);		        
+		         Log.i("return"," i= "+ i);
+			     break;	    	   
+		     }
+		}     
+		    		
+	}		   
+	c.close();	 
+}
+
+*/
+//ref. http://stackoverflow.com/questions/10412634/fetch-local-phonebook-contacts-from-sim-card-only-android/10412757#10412757
+public String[] GetContactsFromSIMCard(String _delimiter) {
+	
+	ArrayList<String> list = new ArrayList<String>();
+	
+    try
+    {
+        String  simPhonename = null; 
+        String  simphoneNo = null;
+
+        Uri simUri = Uri.parse("content://icc/adn"); 
+        Cursor cursorSim = controls.activity.getContentResolver().query(simUri,null,null,null,null);
+
+        //Log.i("PhoneContact", "total: "+cursorSim.getCount());
+        if (cursorSim.getCount() > 0) {        
+           while (cursorSim.moveToNext()) {      
+        	   simPhonename = cursorSim.getString(cursorSim.getColumnIndex("name"));
+        	   simphoneNo = cursorSim.getString(cursorSim.getColumnIndex("number"));
+        	   simphoneNo.replaceAll("\\D","");
+        	   simphoneNo.replaceAll("&", "");
+               simPhonename=simPhonename.replace("|","");
+               //Log.i("PhoneContact", "name: "+simPhonename+" phone: "+simphoneNo);               
+               list.add(simPhonename+ _delimiter + simphoneNo);
+           }  
+       }         
+       cursorSim.close();
+    }
+    catch(Exception e) {
+        e.printStackTrace();
+    }
+    
+    return list.toArray(new String[list.size()]);
+}
+
+public void AddContact(String _displayName, String _mobileNumber, String _homeNumber, String _workNumber, 
+		               String _homeEmail, String _workEmail, String _companyName, String _jobTitle, Bitmap _bitmapImage) {
+
+		 String displayName = _displayName;		 		 
+		 if (displayName.equals(""))  displayName = "New Contact";
+		
+		 String homeNumber = _homeNumber;
+		 if (homeNumber.equals(""))  homeNumber =  "000000000000";
+		 
+		 String mobileNumber = _mobileNumber;
+		 if (mobileNumber.equals(""))  mobileNumber = "000000000000";
+		  
+		 String workNumber = _workNumber;
+		 if (workNumber.equals(""))  workNumber = "000000000000";
+		 
+		 String homeEmail = _homeEmail;
+		 if (homeEmail.equals(""))  homeEmail = "email@home";
+		 
+		 String workEmail = _workEmail;
+		 if (workEmail.equals(""))  workEmail = "email@work";
+		 
+		 String company = _companyName;
+		 if (company.equals(""))  company = "Company Name";
+		 
+		 String jobTitle = _jobTitle;
+		 if (jobTitle.equals(""))  jobTitle = "Job Title";
+		 
+		 Context ctx = controls.activity;
+
+		 ArrayList<ContentProviderOperation> contentProviderOperation = new ArrayList<ContentProviderOperation>();
+
+		 int rawContactID = contentProviderOperation.size();
+
+		    // Adding insert operation to operations list 
+		    // to insert a new raw contact in the table ContactsContract.RawContacts
+		 contentProviderOperation.add(ContentProviderOperation.newInsert(ContactsContract.RawContacts.CONTENT_URI)
+		   .withValue(ContactsContract.RawContacts.ACCOUNT_TYPE, null)
+		   .withValue(ContactsContract.RawContacts.ACCOUNT_NAME, null)
+		   .build());
+
+		 // ------------------------------------------------------ Names
+	     // Adding insert operation to operations list
+	     // to insert display name in the table ContactsContract.Data
+		 
+		  contentProviderOperation.add(ContentProviderOperation
+		    .newInsert(ContactsContract.Data.CONTENT_URI)
+		    .withValueBackReference(ContactsContract.Data.RAW_CONTACT_ID, rawContactID)
+		    .withValue(ContactsContract.Data.MIMETYPE, ContactsContract.CommonDataKinds.StructuredName.CONTENT_ITEM_TYPE)
+		    .withValue(ContactsContract.CommonDataKinds.StructuredName.DISPLAY_NAME, displayName)
+		    .build());
+		  
+		 // ------------------------------------------------------ Mobile Number
+		  contentProviderOperation.add(ContentProviderOperation.newInsert(ContactsContract.Data.CONTENT_URI)
+		    .withValueBackReference(ContactsContract.Data.RAW_CONTACT_ID, rawContactID)
+		    .withValue(ContactsContract.Data.MIMETYPE, ContactsContract.CommonDataKinds.Phone.CONTENT_ITEM_TYPE)
+		    .withValue(ContactsContract.CommonDataKinds.Phone.NUMBER, mobileNumber)
+		    .withValue(ContactsContract.CommonDataKinds.Phone.TYPE, ContactsContract.CommonDataKinds.Phone.TYPE_MOBILE)
+		    .build());
+		  
+		 // ------------------------------------------------------ Home Numbers		  
+		  contentProviderOperation.add(ContentProviderOperation.newInsert(ContactsContract.Data.CONTENT_URI)
+		    .withValueBackReference(ContactsContract.Data.RAW_CONTACT_ID, rawContactID)
+		    .withValue(ContactsContract.Data.MIMETYPE, ContactsContract.CommonDataKinds.Phone.CONTENT_ITEM_TYPE)
+		    .withValue(ContactsContract.CommonDataKinds.Phone.NUMBER, homeNumber)
+		    .withValue(ContactsContract.CommonDataKinds.Phone.TYPE, ContactsContract.CommonDataKinds.Phone.TYPE_HOME)
+		    .build());
+		 
+		 // ------------------------------------------------------ Work Numbers		  
+		  contentProviderOperation.add(ContentProviderOperation.newInsert(ContactsContract.Data.CONTENT_URI)
+		    .withValueBackReference(ContactsContract.Data.RAW_CONTACT_ID, rawContactID)
+		    .withValue(ContactsContract.Data.MIMETYPE, ContactsContract.CommonDataKinds.Phone.CONTENT_ITEM_TYPE)
+		    .withValue(ContactsContract.CommonDataKinds.Phone.NUMBER, workNumber)
+		    .withValue(ContactsContract.CommonDataKinds.Phone.TYPE, ContactsContract.CommonDataKinds.Phone.TYPE_WORK)
+		    .build());		 
+		 
+		 // ------------------------------------------------------ homeEmail
+		  contentProviderOperation.add(ContentProviderOperation.newInsert(ContactsContract.Data.CONTENT_URI)
+		    .withValueBackReference( ContactsContract.Data.RAW_CONTACT_ID, rawContactID)
+		    .withValue( ContactsContract.Data.MIMETYPE, ContactsContract.CommonDataKinds.Email.CONTENT_ITEM_TYPE)
+		    .withValue(ContactsContract.CommonDataKinds.Email.DATA, homeEmail)
+		    .withValue(ContactsContract.CommonDataKinds.Email.TYPE, ContactsContract.CommonDataKinds.Email.TYPE_HOME)
+		    .build());
+		  
+			 // ------------------------------------------------------ workEmail		  
+		  contentProviderOperation.add(ContentProviderOperation.newInsert(ContactsContract.Data.CONTENT_URI)
+		    .withValueBackReference(ContactsContract.Data.RAW_CONTACT_ID, rawContactID)
+		    .withValue(ContactsContract.Data.MIMETYPE, ContactsContract.CommonDataKinds.Email.CONTENT_ITEM_TYPE)
+		    .withValue(ContactsContract.CommonDataKinds.Email.DATA, workEmail)
+		    .withValue(ContactsContract.CommonDataKinds.Email.TYPE, ContactsContract.CommonDataKinds.Email.TYPE_WORK)
+		    .build());		  
+		 
+		 // ------------------------------------------------------ Organization
+		  contentProviderOperation.add(ContentProviderOperation.newInsert(ContactsContract.Data.CONTENT_URI)
+		    .withValueBackReference(ContactsContract.Data.RAW_CONTACT_ID, rawContactID)
+		    .withValue(ContactsContract.Data.MIMETYPE, ContactsContract.CommonDataKinds.Organization.CONTENT_ITEM_TYPE)
+		    .withValue(ContactsContract.CommonDataKinds.Organization.COMPANY, company)
+		    .withValue( ContactsContract.CommonDataKinds.Organization.TYPE, ContactsContract.CommonDataKinds.Organization.TYPE_WORK)
+		    .withValue(ContactsContract.CommonDataKinds.Organization.TITLE, jobTitle)
+		    .withValue(ContactsContract.CommonDataKinds.Organization.TYPE, ContactsContract.CommonDataKinds.Organization.TYPE_WORK)
+		    .build());		 		 
+		  
+		 //------------------------------------------------------------------ photo
+	     if(_bitmapImage!=null) { 
+	    	    ByteArrayOutputStream stream = new ByteArrayOutputStream();
+	    	    _bitmapImage.compress(Bitmap.CompressFormat.PNG,75,stream);
+	    	   
+	           // Adding insert operation to operations list
+	           // to insert Photo in the table ContactsContract.Data
+	    	   contentProviderOperation.add(ContentProviderOperation.newInsert(ContactsContract.Data.CONTENT_URI)
+	                .withValueBackReference(ContactsContract.Data.RAW_CONTACT_ID, rawContactID)
+	                .withValue(ContactsContract.Data.IS_SUPER_PRIMARY, 1)
+	                .withValue(ContactsContract.Data.MIMETYPE, ContactsContract.CommonDataKinds.Photo.CONTENT_ITEM_TYPE)
+	                .withValue(ContactsContract.CommonDataKinds.Photo.PHOTO,stream.toByteArray())
+	                .build());
+	           try {
+	               stream.flush();
+	           }catch (IOException e) {
+	               e.printStackTrace();
+	           }
+	       }
+	      
+		 // Asking the Contact provider to create a new contact
+		 try {
+		    ctx.getContentResolver().applyBatch(ContactsContract.AUTHORITY, contentProviderOperation);
+		 } catch (Exception e) {
+		  e.printStackTrace();
+		     //show exception in toast
+		     //Toast.makeText(ctx, "Exception: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+		 }
+}
+
+public void AddContact(String _displayName, String _mobileNumber) {
+
+	String displayName = _displayName;		 		 	
+	if (displayName.equals(""))  displayName = "New Contact";
+
+	String mobileNumber = _mobileNumber;
+	if (mobileNumber.equals(""))  mobileNumber = "000000000000";
+
+	Context ctx = controls.activity;
+
+	ArrayList<ContentProviderOperation> contentProviderOperation = new ArrayList<ContentProviderOperation>();
+
+	int rawContactID = contentProviderOperation.size();
+
+// Adding insert operation to operations list 
+// to insert a new raw contact in the table ContactsContract.RawContacts
+	contentProviderOperation.add(ContentProviderOperation.newInsert(ContactsContract.RawContacts.CONTENT_URI)
+			.withValue(ContactsContract.RawContacts.ACCOUNT_TYPE, null)
+			.withValue(ContactsContract.RawContacts.ACCOUNT_NAME, null)	
+			.build());
+
+// ------------------------------------------------------ Names
+// Adding insert operation to operations list
+// to insert display name in the table ContactsContract.Data
+
+	contentProviderOperation.add(ContentProviderOperation
+			.newInsert(ContactsContract.Data.CONTENT_URI)
+			.withValueBackReference(ContactsContract.Data.RAW_CONTACT_ID, rawContactID)
+			.withValue(ContactsContract.Data.MIMETYPE, ContactsContract.CommonDataKinds.StructuredName.CONTENT_ITEM_TYPE)
+			.withValue(ContactsContract.CommonDataKinds.StructuredName.DISPLAY_NAME, displayName)
+			.build());
+
+// ------------------------------------------------------ Mobile Number
+	contentProviderOperation.add(ContentProviderOperation.newInsert(ContactsContract.Data.CONTENT_URI)
+			.withValueBackReference(ContactsContract.Data.RAW_CONTACT_ID, rawContactID)
+			.withValue(ContactsContract.Data.MIMETYPE, ContactsContract.CommonDataKinds.Phone.CONTENT_ITEM_TYPE)
+			.withValue(ContactsContract.CommonDataKinds.Phone.NUMBER, mobileNumber)
+			.withValue(ContactsContract.CommonDataKinds.Phone.TYPE, ContactsContract.CommonDataKinds.Phone.TYPE_MOBILE)
+			.build());
+
+    //Asking the Contact provider to create a new contact
+	try {
+		ctx.getContentResolver().applyBatch(ContactsContract.AUTHORITY, contentProviderOperation);
+	} catch (Exception e) {
+		e.printStackTrace();
+    }
+}
+
+public void GetContactsAsync(String _delimiter) {
+	new ATask().execute(_delimiter);
+}
+                             //param, progr, result  
+class ATask extends AsyncTask<String, String, String[]> {
+	   
+	//ArrayList<String> list = new ArrayList<String>();
+	boolean mListing = true;
+	int mCount = 0;
+	String _delimiter = null;
+	//String mName = "";
+	Bitmap mPhoto = null;
+	String photoURI = null;	   
+	
+    @Override
+    protected String[] doInBackground(String... message) {
+    	
+       _delimiter = message[0];   	   	
+   	   String line = "";
+       
+   	   ContentResolver cr = controls.activity.getContentResolver();       
+       Cursor cur = cr.query(ContactsContract.Contacts.CONTENT_URI,null, null, null, null);
+                         	              	                         	   
+       if (cur.getCount() > 0) {
+    	   while (cur.moveToNext() && mListing) {
+ 	          if (Integer.parseInt(cur.getString(cur.getColumnIndex(ContactsContract.Contacts.HAS_PHONE_NUMBER))) > 0) {    	        	
+    	            String id = cur.getString(cur.getColumnIndex(ContactsContract.Contacts._ID));    	                	        	                	            
+    	            String name = cur.getString(cur.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME));    	            
+    	            line = name + _delimiter;
+    	            
+    	            // get the phone number
+    	            Cursor pCur = cr.query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI,null,
+    	                                       ContactsContract.CommonDataKinds.Phone.CONTACT_ID +" = ?",
+    	                                       new String[]{id}, null);
+    	            while (pCur.moveToNext()) {
+    	                      String phone = pCur.getString(pCur.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
+    	                      String phoneType = pCur.getString(pCur.getColumnIndex(ContactsContract.CommonDataKinds.Phone.TYPE));
+    	                    //1:home 2:mobile 3:Work 
+    	                      if (phoneType.equals("1"))  
+    	                    	  line = line + phone +" [Home]"+ _delimiter;
+    	                      else if (phoneType.equals("3"))  
+    	                    	  line = line + phone +" [Work]"+ _delimiter;
+    	                      else line = line + phone + _delimiter;    	                          	                                             	                     
+    	            }
+    	            pCur.close();
+    	               
+    	            // get email and type
+    	            Cursor emailCur = cr.query(ContactsContract.CommonDataKinds.Email.CONTENT_URI,null, 
+    	            		                   ContactsContract.CommonDataKinds.Email.CONTACT_ID + " = ?",
+    	                                        new String[]{id}, null);
+    	               
+    	            while (emailCur.moveToNext()) {
+    	                    // This would allow you get several email addresses
+    	                    // if the email addresses were stored in an array
+    	                    String email = emailCur.getString(
+    	                                  emailCur.getColumnIndex(ContactsContract.CommonDataKinds.Email.DATA));
+    	                    
+    	                    String emailType = emailCur.getString(
+    	                                  emailCur.getColumnIndex(ContactsContract.CommonDataKinds.Email.TYPE));
+                                  	                    
+    	                    line = line + email + _delimiter;
+    	            }
+    	            emailCur.close();
+
+    	            //Get note.......
+    	            //Get Postal Address....
+    	            //Get Organizations.........
+    	            String orgWhere = ContactsContract.Data.CONTACT_ID + " = ? AND " + ContactsContract.Data.MIMETYPE + " = ?";
+    	            String[] orgWhereParams = new String[]{id,ContactsContract.CommonDataKinds.Organization.CONTENT_ITEM_TYPE};
+    	            Cursor orgCur = cr.query(ContactsContract.Data.CONTENT_URI, null, orgWhere, orgWhereParams, null);
+    	            if (orgCur.moveToFirst()) {
+    	                    String orgName = orgCur.getString(orgCur.getColumnIndex(ContactsContract.CommonDataKinds.Organization.DATA));
+    	                    String title = orgCur.getString(orgCur.getColumnIndex(ContactsContract.CommonDataKinds.Organization.TITLE));
+    	                    //System.out.println("orgName " + orgName + " Job title : " + title);
+    	                    line = line + orgName + _delimiter + title + _delimiter;
+    	            }
+    	            
+    	            orgCur.close();           	                	            
+    	            
+    	            //list.add(line);    	            
+    	            //line = line + id + _delimiter;    	   
+    	            
+    	            //Get photo Uri
+    	            Cursor phCur = cr.query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI,null,
+                                            ContactsContract.CommonDataKinds.Phone.CONTACT_ID +" = ?",
+                                            new String[]{id}, null);
+    	            
+    	            photoURI = null;
+    	            if (phCur.moveToFirst()) {    	                 
+    	               photoURI = phCur.getString(phCur.getColumnIndex(ContactsContract.CommonDataKinds.Phone.PHOTO_URI));   
+    	         	   if (photoURI == null) {
+    	         		  photoURI = ":)";
+    	               }	       	                   	         	   
+    	            }
+    	            
+    	            phCur.close();   
+    	            
+    	            line = line + photoURI;
+    	            
+    	            publishProgress(line);    	            
+    	      }    	            	     
+    	   }       
+    	   cur.close();    	             	   
+       }    	       	       	    
+       return  null; //list.toArray(new String[list.size()]);
+    }
+
+    @Override
+    protected void onProgressUpdate(String... contact) {    	   
+        super.onProgressUpdate(contact[0]);
+        
+        StringTokenizer stToken = new StringTokenizer(contact[0], _delimiter);                                
+        int count = stToken.countTokens();
+        final String[] splitStr = new String[count];
+        int index = 0;
+        while(stToken.hasMoreElements()) {        	
+           splitStr[index] = stToken.nextToken();                     
+           index = index + 1;
+        }
+        
+        String contactInfo = splitStr[0] ;         
+        for (int i=1; i < count-1 ; i++) {
+        	contactInfo = contactInfo + _delimiter + splitStr[i];
+        }		
+                         	
+        mPhoto = null;
+        
+        if (! splitStr[count-1].equals(":)") ) {        	
+          mPhoto = GetPhotoByUriAsString(splitStr[count-1]); 
+        }
+        
+        String shortInfo = splitStr[0] + _delimiter + splitStr[1];
+                     
+        mCount = mCount + 1;
+        mListing = controls.pOnContactManagerContactsProgress(pascalObj, contactInfo , shortInfo, splitStr[count-1], mPhoto, mCount);
+    }
+    
+    @Override
+    protected void onPostExecute(String[] contactsResult) {    	  
+      super.onPostExecute(contactsResult);           
+      controls.pOnContactManagerContactsExecuted(pascalObj, mCount);
+    }      
+    
+}
+  
+public String GetContactInfo(String _displayName, String _delimiter) {
+	   
+	  //ArrayList<String> list = new ArrayList<String>();
+	  boolean mListing = true;
+	  int mCount = 0;
+	
+	  //String mName = "";
+	  Bitmap mPhoto = null;
+	  String photoURI = null;
+	  
+	   String username = _displayName;;	   
+	   username = username.toLowerCase(); 
+	
+       
+   	   String line = "";
+       
+   	   ContentResolver cr = controls.activity.getContentResolver();       
+       Cursor cur = cr.query(ContactsContract.Contacts.CONTENT_URI,null, null, null, null);
+                                          
+       if (cur.getCount() > 0) {    	       	   
+    	   while(cur.moveToNext()) {											
+    		 String name=cur.getString(cur.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME));			
+    		 String name1 = name.toLowerCase();			
+    		 if(name1.equals(username)) {    		    	     		     
+ 	            if (Integer.parseInt(cur.getString(cur.getColumnIndex(ContactsContract.Contacts.HAS_PHONE_NUMBER))) > 0) {    	        	
+    	            String id = cur.getString(cur.getColumnIndex(ContactsContract.Contacts._ID));    	                	        	                	            
+    	            //String name = cur.getString(cur.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME));    	            
+    	            line = name + _delimiter;;    	                	             	                       	               
+    	            // get the phone number
+    	            Cursor pCur = cr.query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI,null,
+    	                                       ContactsContract.CommonDataKinds.Phone.CONTACT_ID +" = ?",
+    	                                       new String[]{id}, null);
+    	            while (pCur.moveToNext()) {
+    	                      String phone = pCur.getString(pCur.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
+    	                      String phoneType = pCur.getString(pCur.getColumnIndex(ContactsContract.CommonDataKinds.Phone.TYPE));
+    	                    //1:home 2:mobile 3:Work 
+    	                      if (phoneType.equals("1"))  
+    	                    	  line = line + phone +" [Home]"+ _delimiter;
+    	                      else if (phoneType.equals("3"))  
+    	                    	  line = line + phone +" [Work]"+ _delimiter;
+    	                      else line = line + phone + _delimiter;    	                          	                                             	                     
+    	            }
+    	            pCur.close();
+    	               
+    	            // get email and type
+    	            Cursor emailCur = cr.query(ContactsContract.CommonDataKinds.Email.CONTENT_URI,null, 
+    	            		                   ContactsContract.CommonDataKinds.Email.CONTACT_ID + " = ?",
+    	                                        new String[]{id}, null);
+    	               
+    	            while (emailCur.moveToNext()) {
+    	                    // This would allow you get several email addresses
+    	                    // if the email addresses were stored in an array
+    	                    String email = emailCur.getString(
+    	                                  emailCur.getColumnIndex(ContactsContract.CommonDataKinds.Email.DATA));
+    	                    
+    	                    String emailType = emailCur.getString(
+    	                                  emailCur.getColumnIndex(ContactsContract.CommonDataKinds.Email.TYPE));
+                                  	                    
+    	                    line = line + email + _delimiter;
+    	            }
+    	            emailCur.close();
+
+    	            //Get note.......
+    	            //Get Postal Address....
+    	            //Get Organizations.........
+    	            String orgWhere = ContactsContract.Data.CONTACT_ID + " = ? AND " + ContactsContract.Data.MIMETYPE + " = ?";
+    	            String[] orgWhereParams = new String[]{id,ContactsContract.CommonDataKinds.Organization.CONTENT_ITEM_TYPE};
+    	            Cursor orgCur = cr.query(ContactsContract.Data.CONTENT_URI, null, orgWhere, orgWhereParams, null);
+    	            if (orgCur.moveToFirst()) {
+    	                    String orgName = orgCur.getString(orgCur.getColumnIndex(ContactsContract.CommonDataKinds.Organization.DATA));
+    	                    String title = orgCur.getString(orgCur.getColumnIndex(ContactsContract.CommonDataKinds.Organization.TITLE));
+    	                    //System.out.println("orgName " + orgName + " Job title : " + title);
+    	                    line = line + orgName + _delimiter + title + _delimiter;
+    	            }
+    	            
+    	            orgCur.close();           	                	            
+    	            
+    	            //list.add(line);    	            
+    	            line = line + id + _delimiter;    	   
+    	            
+    	            //Get photo Uri
+    	            Cursor phCur = cr.query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI,null,
+                                            ContactsContract.CommonDataKinds.Phone.CONTACT_ID +" = ?",
+                                            new String[]{id}, null);
+    	            
+    	            photoURI = null;
+    	            if (phCur.moveToFirst()) {    	                 
+    	               photoURI = phCur.getString(phCur.getColumnIndex(ContactsContract.CommonDataKinds.Phone.PHOTO_URI));   
+    	         	   if (photoURI == null) {
+    	         		  photoURI = ":)";
+    	               }	       	                   	         	   
+    	            }
+    	            
+    	            phCur.close();   
+    	            
+    	            line = line + photoURI;    	            
+    	        }
+ 	            break; 
+    		 } 
+    	   }       
+    	   cur.close();    	             	   
+    }
+    return line;   
+}
+
+
+}
+
 //**new jComponent class entrypoint**//please, do not remove/change this line!
 
 //Javas/Pascal Interface Class 
@@ -12876,6 +14689,8 @@ public  native void pAppOnActivityResult(int requestCode,int resultCode,Intent d
 //by jmpessoa: support Option Menu
 public  native void pAppOnCreateOptionsMenu(Menu menu);
 public  native void pAppOnClickOptionMenuItem(MenuItem menuItem,int itemID,String itemCaption,boolean checked);
+public native boolean pAppOnPrepareOptionsMenu(Menu menu, int menuSize);
+public native boolean pAppOnPrepareOptionsMenuItem(Menu menu, MenuItem menuItem, int itemIndex);
 
 //by jmpessoa: support Context Menu
 public  native void pAppOnCreateContextMenu(ContextMenu menu);
@@ -12905,6 +14720,9 @@ public  native void pOnAsyncEventPostExecute(long pasobj, int progress);
 //new by jmpessoa: support for jListView custom row
 public  native void pOnClickWidgetItem(long pasobj, int position, boolean checked); 
 public  native void pOnClickCaptionItem(long pasobj, int position, String caption);
+public  native void pOnListViewLongClickCaptionItem(long pasobj, int position, String caption);
+public  native int pOnListViewDrawItemCaptionColor(long pasobj, int position, String caption);
+public  native Bitmap pOnListViewDrawItemBitmap(long pasobj, int position, String caption);
 
 //new by jmpessoa: support for Bluetooth
 public  native void pOnBluetoothEnabled(long pasobj);
@@ -12938,10 +14756,15 @@ public native void pOnActionBarTabSelected(long pasobj, View view, String title)
 public native void pOnActionBarTabUnSelected(long pasobj, View view, String title);
 public native void pOnCustomDialogShow(long pasobj, Dialog dialog, String title);
 
+public native void pOnCustomDialogBackKeyPressed(long pasobj, String title);
+
 public native void pOnClickToggleButton(long pasobj, boolean state);
 public native void pOnChangeSwitchButton(long pasobj, boolean state);
 
 public native void pOnClickGridItem(long pasobj, int position, String caption);
+public native void pOnLongClickGridItem(long pasobj, int position, String caption);
+public  native int pOnGridDrawItemCaptionColor(long pasobj, int position, String caption);
+public  native Bitmap pOnGridDrawItemBitmap(long pasobj, int position, String caption);
  
 public native void pOnChangedSensor(long pasobj, Sensor sensor, int sensorType, float[] values, long timestamp);
 public native void pOnListeningSensor(long pasobj, Sensor sensor, int sensorType);
@@ -12975,6 +14798,9 @@ public native void pOnSurfaceViewTouch(long pasobj, int act, int cnt,float x1, f
                        
 public native boolean pOnSurfaceViewDrawingInBackground(long pasobj, float progress);
 public native void pOnSurfaceViewDrawingPostExecute(long pasobj, float progress);
+
+public native void pOnContactManagerContactsExecuted(long pasobj,  int count);
+public native boolean pOnContactManagerContactsProgress(long pasobj, String contactInfo, String contactShortInfo, String contactPhotoUriAsString, Bitmap contactPhoto, int progress);
 
 
 //Load Pascal Library
@@ -13016,6 +14842,16 @@ public  void jAppOnActivityResult(int requestCode, int resultCode, Intent data)
 //By jmpessoa: support Option Menu
 public  void jAppOnCreateOptionsMenu(Menu m) {pAppOnCreateOptionsMenu(m);}
 public  void jAppOnClickOptionMenuItem(MenuItem item,int itemID, String itemCaption, boolean checked){pAppOnClickOptionMenuItem(item,itemID,itemCaption,checked);}
+
+public boolean jAppOnPrepareOptionsMenu(Menu m, int size) {
+	boolean r = pAppOnPrepareOptionsMenu(m, size);
+	return r;
+ }
+
+public boolean jAppOnPrepareOptionsItem(Menu m, MenuItem item, int index) {
+	boolean r = pAppOnPrepareOptionsMenuItem(m, item, index);
+	return r;
+ }
 
 //By jmpessoa: supportContextMenu
 public  void jAppOnCreateContextMenu(ContextMenu m) {pAppOnCreateContextMenu(m);}
@@ -14030,5 +15866,9 @@ public float[] benchMark1 () {
    public java.lang.Object jSurfaceView_jCreate(long _Self) {
 	      return (java.lang.Object)(new jSurfaceView(this,_Self));
    }
+   
+   public java.lang.Object jContactManager_jCreate(long _Self) {
+	      return (java.lang.Object)(new jContactManager(this,_Self));
+   }   
    
 }

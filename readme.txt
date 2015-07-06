@@ -69,6 +69,8 @@
 		Ant	http://ant.apache.org/bindownload.cgi 
 			Simply extract the zip file to a convenient location...
 
+		NDK-r10c	http://dl.google.com/android/ndk/android-ndk-r10c-windows-x86.exe
+
 
 	***************************************************************************************************
 	* To start:				
@@ -114,6 +116,60 @@
 	*
 	*5.PANIC ? When prompt "Read error" [Unknown Property] just choice "Continue Loading" !
 	****************************************************************************************************
+
+Version 0.6 - rev. 32 - 05 July 2015 - 
+
+	IMPROVEMENTS!   
+
+	       jListView component:			
+			New! event/properties:	
+				OnDrawItemBitmap 
+				OnDrawItemTextColor
+				OnLongClick <<--- @renabor's request and suggestion! 
+
+			warning/changed: "OnClickItemCaption" was lost [sorry ...], please, copy your code to "new" OnClickItem
+
+	       jGridView component:			
+			New! Event/properties:	
+				OnDrawItemBitmap 
+				OnDrawItemTextColor		
+				OnLongClick
+
+	       jDigitalClock component:			
+			New! properties:
+				FontColor
+				FontSize
+		jSqliteCursor
+			New! method:
+				GetValueAsString(rowPosition, columnName) <<--- @renabor's suggestion [GetLastID]! 
+							rowPosition = -1 --> move to last!
+		
+		jHttpClient 
+			New! synchronous methods:  // <<---- by Fatih KILIÇ 
+				Get(url): string				
+
+				AddNameValueData(name,value)
+				Post(url)  
+
+			warning/changed: asynchronous "Get" methods was renamed to "GetAsync"
+			warning/changed: asynchronous "PostNameValueData" methods was renamed to "PostNameValueDataAsync"
+
+			New! 
+				AddNameValueData(name,value)
+				PostNameValueDataAsync(url)  
+			
+		jShellcommand 
+			warning/changed: asynchronous "Execute" method was renamed to "ExecuteAsync"
+
+		jContactManager
+			warning/changed: asynchronous "GetContact" method was renamed to "GetContactAsync"
+
+	UPDATED: ALL Demos !!!
+
+	HINT 1: Old Projects: upgrade your projects code templates !
+		Lazarus IDE --> menu Tools --> [Lamw] Android Module Wizard --> Upgrade code Templates [*.lpr, *.java]
+
+	HINT 2:	When prompt "Read error" [Unknown Property] just choice "Continue Loading"!
 
 Version 0.6 - rev. 31 - 30 June 2015 - 
 

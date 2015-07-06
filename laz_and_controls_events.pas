@@ -40,6 +40,7 @@ uses
 
    Procedure Java_Event_pOnChangeSwitchButton(env: PJNIEnv; this: jobject; Obj: TObject; state: boolean);
    Procedure Java_Event_pOnClickGridItem(env: PJNIEnv; this: jobject; Obj: TObject; position: integer; caption: JString);
+   Procedure Java_Event_pOnLongClickGridItem(env: PJNIEnv; this: jobject; Obj: TObject; position: integer; caption: JString);
 
    Procedure Java_Event_pOnChangedSensor(env: PJNIEnv; this: jobject; Obj: TObject; sensor: JObject; sensorType: integer; values: JObject; timestamp: jLong);
    Procedure Java_Event_pOnListeningSensor(env: PJNIEnv; this: jobject; Obj: TObject; sensor: jObject; sensorType: integer);
@@ -77,6 +78,10 @@ uses
                                                                                                     contactPhotoUriAsString: JString;
                                                                                                     contactPhoto: jObject;
                                                                                                     progress: integer): jBoolean;
+
+   function  Java_Event_pOnGridDrawItemCaptionColor(env: PJNIEnv; this: jobject; Obj: TObject; index: integer; caption: JString): JInt;
+   function  Java_Event_pOnGridDrawItemBitmap(env: PJNIEnv; this: jobject; Obj: TObject; index: integer; caption: JString): JObject;
+
 implementation
 
 uses
@@ -597,6 +602,25 @@ begin
   end;
 end;
 
+Procedure Java_Event_pOnLongClickGridItem(env: PJNIEnv; this: jobject; Obj: TObject; position: integer; caption: JString);
+var
+   pasCaption: string;
+  _jBoolean: JBoolean;
+begin
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+  if Obj is jGridView then
+  begin
+    jForm(jLocation(Obj).Owner).UpdateJNI(gApp);
+    pasCaption:= '';
+    if caption <> nil then
+    begin
+      _jBoolean:= JNI_False;
+      pasCaption:= string(env^.GetStringUTFChars(Env, caption,@_jBoolean) );
+    end;
+    jGridView(Obj).GenEvent_OnLongClickGridItem(Obj, position, pasCaption);
+  end;
+end;
 
 Procedure Java_Event_pOnChangedSensor(env: PJNIEnv; this: jobject; Obj: TObject; sensor: JObject; sensorType: integer; values: JObject; timestamp: jLong);
 var
@@ -938,6 +962,51 @@ begin
   Result:= JBool(continueListing);
 end;
 
+function  Java_Event_pOnGridDrawItemCaptionColor(env: PJNIEnv; this: jobject; Obj: TObject; index: integer; caption: JString): JInt;
+var
+  pasCaption: string;
+  _jBoolean: JBoolean;
+  outColor: dword;
+begin
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+  outColor:= 0;
+  if Obj is jGridVIew then
+  begin
+    jForm(jGridVIew(Obj).Owner).UpdateJNI(gApp);
+    pasCaption := '';
+    if caption <> nil then
+    begin
+      _jBoolean:= JNI_False;
+      pasCaption:= string( env^.GetStringUTFChars(env,caption,@_jBoolean) );
+    end;
+    jGridVIew(Obj).GenEvent_OnDrawItemCaptionColor(Obj, index, pasCaption, outColor);
+  end;
+  Result:= outColor;
+end;
+
+function  Java_Event_pOnGridDrawItemBitmap(env: PJNIEnv; this: jobject; Obj: TObject; index: integer; caption: JString): JObject;
+var
+  pasCaption: string;
+  _jBoolean: JBoolean;
+  outBitmap: jObject;
+begin
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+  outBitmap:= nil;
+  if Obj is jGridVIew then
+  begin
+    jForm(jGridVIew(Obj).Owner).UpdateJNI(gApp);
+    pasCaption := '';
+    if caption <> nil then
+    begin
+      _jBoolean:= JNI_False;
+      pasCaption:= string( env^.GetStringUTFChars(env,caption,@_jBoolean) );
+    end;
+    jGridVIew(Obj).GenEvent_OnDrawItemBitmap(Obj, index, pasCaption, outBitmap);
+  end;
+  Result:= outBitmap;
+end;
 
 end.
 

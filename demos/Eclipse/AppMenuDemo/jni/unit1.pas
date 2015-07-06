@@ -16,10 +16,12 @@ type
   TAndroidModule1 = class(jForm)
       jButton1: jButton;
       jButton2: jButton;
+      jListView1: jListView;
       jMenu1: jMenu;
       jContextMenu1: jContextMenu;
       jTextView1: jTextView;
       jTextView2: jTextView;
+      jTextView3: jTextView;
 
       procedure DataModuleClickContextMenuItem(Sender: TObject;
         jObjMenuItem: jObject; itemID: integer; itemCaption: string; checked: boolean);
@@ -32,14 +34,22 @@ type
       procedure jButton1Click(Sender: TObject);
       procedure jButton2Click(Sender: TObject);
 
+      procedure jListView1ClickItem(Sender: TObject; itemIndex: integer;
+        itemCaption: string);
+      procedure jListView1DrawItemTextColor(Sender: TObject;
+        itemIndex: integer; itemCaption: string; out textColor: TARGBColorBridge);
+      procedure jListView1LongClickItem(Sender: TObject; itemIndex: integer;
+        itemCaption: string);
+
     private
       {private declarations}
+       FSavedListViewItemCaption: string;
     public
       {public declarations}
       Procedure CallBackNotify_Form2Closed(Sender: TObject);
       //Procedure CallBackData(Sender: TObject; strData: string; intData: integer; doubleData: double);
   end;
-  
+
 var
   AndroidModule1: TAndroidModule1;
 
@@ -152,7 +162,8 @@ end;
 
 procedure TAndroidModule1.DataModuleJNIPrompt(Sender: TObject);
 begin
-  jContextMenu1.RegisterForContextMenu(jButton1.View); //<--register jButton1 for Context Menu [long pressed]
+  //jContextMenu1.RegisterForContextMenu(jButton1.View); //<--register jButton1 for Context Menu [long pressed]
+  jContextMenu1.RegisterForContextMenu(jListView1.View);
   Self.SetSubTitleActionBar('jForm [1]');
 end;
 
@@ -174,6 +185,19 @@ begin
           jContextMenu1.CheckItem(jItem);
        end;
     end;
+
+    if  jListView1.GetItemIndex() > -1 then
+    begin
+       jContextMenu1.AddItem(jObjMenu, 100{itemID},jListView1.GetItemCaption(), mitDefault);
+    end;
+
+    (* OR ...
+    if  FSavedListViewItemCaption <> '' then
+    begin
+        jContextMenu1.AddItem(jObjMenu, 100{itemID},FSavedListViewItemCaption , mitDefault);
+    end;
+    *)
+
   end;
 end;
 
@@ -188,6 +212,14 @@ begin
       10: jButton1.FontColor:= colbrGreen;
       11: jButton1.FontColor:= colbrRed;
       12: jButton1.FontColor:= colbrYellow;
+      100: begin
+             case jListView1.GetItemIndex() of
+                0: jButton1.FontColor:= colbrDarkKhaki;
+                1: jButton1.FontColor:= colbrThistle;
+                2: jButton1.FontColor:= colbrPeru;
+                3: jButton1.FontColor:= colbrSienna;
+             end;
+           end;
     end;
   end
   else
@@ -199,7 +231,7 @@ end;
 
 procedure TAndroidModule1.jButton1Click(Sender: TObject);
 begin
-   ShowMessage('Hello !');
+  ShowMessage('Hello !');
 end;
 
 procedure TAndroidModule1.jButton2Click(Sender: TObject);
@@ -216,6 +248,29 @@ begin
   begin
     AndroidModule2.Show;
   end;
+end;
+
+procedure TAndroidModule1.jListView1ClickItem(Sender: TObject;
+  itemIndex: integer; itemCaption: string);
+begin
+   ShowMessage('itemIndex = '+ IntToStr(itemIndex) + '     itemCaption = '+ itemCaption);
+end;
+
+procedure TAndroidModule1.jListView1DrawItemTextColor(Sender: TObject;
+  itemIndex: integer; itemCaption: string; out textColor: TARGBColorBridge);
+begin
+  case itemIndex of
+    0: textColor:= colbrDarkKhaki;
+    1: textColor:= colbrThistle;
+    2: textColor:= colbrPeru;
+    3: textColor:= colbrSienna;
+  end;
+end;
+
+procedure TAndroidModule1.jListView1LongClickItem(Sender: TObject;
+  itemIndex: integer; itemCaption: string);
+begin
+   FSavedListViewItemCaption:= itemCaption; //here !
 end;
 
 end.

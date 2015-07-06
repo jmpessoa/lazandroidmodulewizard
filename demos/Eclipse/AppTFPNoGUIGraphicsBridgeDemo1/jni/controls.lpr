@@ -1,5 +1,5 @@
 {hint: save all files to location: C:\adt32\eclipse\workspace\AppTFPNoGUIGraphicsBridgeDemo1\jni}
-library controls;  //by Lamw: Lazarus Android Module Wizard: 6/9/2015 4:02:43]
+library controls;  //by Lamw: Lazarus Android Module Wizard: 7/5/2015 20:35:09]
  
 {$mode delphi}
  
@@ -125,6 +125,22 @@ end;
 procedure pAppOnClickOptionMenuItem(PEnv: PJNIEnv; this: JObject; menuItem: JObject; itemID: JInt; itemCaption: JString; checked: JBoolean); cdecl;
 begin
   Java_Event_pAppOnClickOptionMenuItem(PEnv,this,menuItem,itemID,itemCaption,Boolean(checked));
+end;
+
+{ Class:     com_example_apptfpnoguigraphicsbridgedemo1_Controls
+  Method:    pAppOnPrepareOptionsMenu
+  Signature: (Landroid/view/Menu;I)Z }
+function pAppOnPrepareOptionsMenu(PEnv: PJNIEnv; this: JObject; menu: JObject; menuSize: JInt): JBoolean; cdecl;
+begin
+  Result:=Java_Event_pAppOnPrepareOptionsMenu(PEnv,this,menu,menuSize);
+end;
+
+{ Class:     com_example_apptfpnoguigraphicsbridgedemo1_Controls
+  Method:    pAppOnPrepareOptionsMenuItem
+  Signature: (Landroid/view/Menu;Landroid/view/MenuItem;I)Z }
+function pAppOnPrepareOptionsMenuItem(PEnv: PJNIEnv; this: JObject; menu: JObject; menuItem: JObject; itemIndex: JInt): JBoolean; cdecl;
+begin
+  Result:=Java_Event_pAppOnPrepareOptionsMenuItem(PEnv,this,menu,menuItem,itemIndex);
 end;
 
 { Class:     com_example_apptfpnoguigraphicsbridgedemo1_Controls
@@ -269,6 +285,30 @@ end;
 procedure pOnClickCaptionItem(PEnv: PJNIEnv; this: JObject; pasobj: JLong; position: JInt; caption: JString); cdecl;
 begin
   Java_Event_pOnClickCaptionItem(PEnv,this,TObject(pasobj),position,caption);
+end;
+
+{ Class:     com_example_apptfpnoguigraphicsbridgedemo1_Controls
+  Method:    pOnListViewLongClickCaptionItem
+  Signature: (JILjava/lang/String;)V }
+procedure pOnListViewLongClickCaptionItem(PEnv: PJNIEnv; this: JObject; pasobj: JLong; position: JInt; caption: JString); cdecl;
+begin
+  Java_Event_pOnListViewLongClickCaptionItem(PEnv,this,TObject(pasobj),position,caption);
+end;
+
+{ Class:     com_example_apptfpnoguigraphicsbridgedemo1_Controls
+  Method:    pOnListViewDrawItemCaptionColor
+  Signature: (JILjava/lang/String;)I }
+function pOnListViewDrawItemCaptionColor(PEnv: PJNIEnv; this: JObject; pasobj: JLong; position: JInt; caption: JString): JInt; cdecl;
+begin
+  Result:=Java_Event_pOnListViewDrawItemCaptionColor(PEnv,this,TObject(pasobj),position,caption);
+end;
+
+{ Class:     com_example_apptfpnoguigraphicsbridgedemo1_Controls
+  Method:    pOnListViewDrawItemBitmap
+  Signature: (JILjava/lang/String;)Landroid/graphics/Bitmap; }
+function pOnListViewDrawItemBitmap(PEnv: PJNIEnv; this: JObject; pasobj: JLong; position: JInt; caption: JString): JObject; cdecl;
+begin
+  Result:=Java_Event_pOnListViewDrawItemBitmap(PEnv,this,TObject(pasobj),position,caption);
 end;
 
 { Class:     com_example_apptfpnoguigraphicsbridgedemo1_Controls
@@ -456,6 +496,14 @@ begin
 end;
 
 { Class:     com_example_apptfpnoguigraphicsbridgedemo1_Controls
+  Method:    pOnCustomDialogBackKeyPressed
+  Signature: (JLjava/lang/String;)V }
+procedure pOnCustomDialogBackKeyPressed(PEnv: PJNIEnv; this: JObject; pasobj: JLong; title: JString); cdecl;
+begin
+  Java_Event_pOnCustomDialogBackKeyPressed(PEnv,this,TObject(pasobj),title);
+end;
+
+{ Class:     com_example_apptfpnoguigraphicsbridgedemo1_Controls
   Method:    pOnClickToggleButton
   Signature: (JZ)V }
 procedure pOnClickToggleButton(PEnv: PJNIEnv; this: JObject; pasobj: JLong; state: JBoolean); cdecl;
@@ -476,7 +524,31 @@ end;
   Signature: (JILjava/lang/String;)V }
 procedure pOnClickGridItem(PEnv: PJNIEnv; this: JObject; pasobj: JLong; position: JInt; caption: JString); cdecl;
 begin
-  Java_Event_pOnClickGridItem(PEnv,this,TObject(pasobj),position,caption);
+  Java_Event_pOnClickGridItem(PEnv,this,TObject(pasobj),position,caption);                            
+end;
+
+{ Class:     com_example_apptfpnoguigraphicsbridgedemo1_Controls
+  Method:    pOnLongClickGridItem
+  Signature: (JILjava/lang/String;)V }
+procedure pOnLongClickGridItem(PEnv: PJNIEnv; this: JObject; pasobj: JLong; position: JInt; caption: JString); cdecl;
+begin
+  Java_Event_pOnLongClickGridItem(PEnv,this,TObject(pasobj),position,caption);
+end;
+
+{ Class:     com_example_apptfpnoguigraphicsbridgedemo1_Controls
+  Method:    pOnGridDrawItemCaptionColor
+  Signature: (JILjava/lang/String;)I }
+function pOnGridDrawItemCaptionColor(PEnv: PJNIEnv; this: JObject; pasobj: JLong; position: JInt; caption: JString): JInt; cdecl;
+begin
+  Result:=Java_Event_pOnGridDrawItemCaptionColor(PEnv,this,TObject(pasobj),position,caption);
+end;
+
+{ Class:     com_example_apptfpnoguigraphicsbridgedemo1_Controls
+  Method:    pOnGridDrawItemBitmap
+  Signature: (JILjava/lang/String;)Landroid/graphics/Bitmap; }
+function pOnGridDrawItemBitmap(PEnv: PJNIEnv; this: JObject; pasobj: JLong; position: JInt; caption: JString): JObject; cdecl;
+begin
+  Result:=Java_Event_pOnGridDrawItemBitmap(PEnv,this,TObject(pasobj),position,caption);
 end;
 
 { Class:     com_example_apptfpnoguigraphicsbridgedemo1_Controls
@@ -663,7 +735,23 @@ begin
   Java_Event_pOnSurfaceViewDrawingPostExecute(PEnv,this,TObject(pasobj),progress);
 end;
 
-const NativeMethods:array[0..81] of JNINativeMethod = (
+{ Class:     com_example_apptfpnoguigraphicsbridgedemo1_Controls
+  Method:    pOnContactManagerContactsExecuted
+  Signature: (JI)V }
+procedure pOnContactManagerContactsExecuted(PEnv: PJNIEnv; this: JObject; pasobj: JLong; count: JInt); cdecl;
+begin
+  Java_Event_pOnContactManagerContactsExecuted(PEnv,this,TObject(pasobj),count);
+end;
+
+{ Class:     com_example_apptfpnoguigraphicsbridgedemo1_Controls
+  Method:    pOnContactManagerContactsProgress
+  Signature: (JLjava/lang/String;Ljava/lang/String;Ljava/lang/String;Landroid/graphics/Bitmap;I)Z }
+function pOnContactManagerContactsProgress(PEnv: PJNIEnv; this: JObject; pasobj: JLong; contactInfo: JString; contactShortInfo: JString; contactPhotoUriAsString: JString; contactPhoto: JObject; progress: JInt): JBoolean; cdecl;
+begin
+  Result:=Java_Event_pOnContactManagerContactsProgress(PEnv,this,TObject(pasobj),contactInfo,contactShortInfo,contactPhotoUriAsString,contactPhoto,progress);
+end;
+
+const NativeMethods:array[0..92] of JNINativeMethod = (
    (name:'pAppOnScreenStyle';
     signature:'()I';
     fnPtr:@pAppOnScreenStyle;),
@@ -709,6 +797,12 @@ const NativeMethods:array[0..81] of JNINativeMethod = (
    (name:'pAppOnClickOptionMenuItem';
     signature:'(Landroid/view/MenuItem;ILjava/lang/String;Z)V';
     fnPtr:@pAppOnClickOptionMenuItem;),
+   (name:'pAppOnPrepareOptionsMenu';
+    signature:'(Landroid/view/Menu;I)Z';
+    fnPtr:@pAppOnPrepareOptionsMenu;),
+   (name:'pAppOnPrepareOptionsMenuItem';
+    signature:'(Landroid/view/Menu;Landroid/view/MenuItem;I)Z';
+    fnPtr:@pAppOnPrepareOptionsMenuItem;),
    (name:'pAppOnCreateContextMenu';
     signature:'(Landroid/view/ContextMenu;)V';
     fnPtr:@pAppOnCreateContextMenu;),
@@ -763,6 +857,15 @@ const NativeMethods:array[0..81] of JNINativeMethod = (
    (name:'pOnClickCaptionItem';
     signature:'(JILjava/lang/String;)V';
     fnPtr:@pOnClickCaptionItem;),
+   (name:'pOnListViewLongClickCaptionItem';
+    signature:'(JILjava/lang/String;)V';
+    fnPtr:@pOnListViewLongClickCaptionItem;),
+   (name:'pOnListViewDrawItemCaptionColor';
+    signature:'(JILjava/lang/String;)I';
+    fnPtr:@pOnListViewDrawItemCaptionColor;),
+   (name:'pOnListViewDrawItemBitmap';
+    signature:'(JILjava/lang/String;)Landroid/graphics/Bitmap;';
+    fnPtr:@pOnListViewDrawItemBitmap;),
    (name:'pOnBluetoothEnabled';
     signature:'(J)V';
     fnPtr:@pOnBluetoothEnabled;),
@@ -832,6 +935,9 @@ const NativeMethods:array[0..81] of JNINativeMethod = (
    (name:'pOnCustomDialogShow';
     signature:'(JLandroid/app/Dialog;Ljava/lang/String;)V';
     fnPtr:@pOnCustomDialogShow;),
+   (name:'pOnCustomDialogBackKeyPressed';
+    signature:'(JLjava/lang/String;)V';
+    fnPtr:@pOnCustomDialogBackKeyPressed;),
    (name:'pOnClickToggleButton';
     signature:'(JZ)V';
     fnPtr:@pOnClickToggleButton;),
@@ -841,6 +947,15 @@ const NativeMethods:array[0..81] of JNINativeMethod = (
    (name:'pOnClickGridItem';
     signature:'(JILjava/lang/String;)V';
     fnPtr:@pOnClickGridItem;),
+   (name:'pOnLongClickGridItem';
+    signature:'(JILjava/lang/String;)V';
+    fnPtr:@pOnLongClickGridItem;),
+   (name:'pOnGridDrawItemCaptionColor';
+    signature:'(JILjava/lang/String;)I';
+    fnPtr:@pOnGridDrawItemCaptionColor;),
+   (name:'pOnGridDrawItemBitmap';
+    signature:'(JILjava/lang/String;)Landroid/graphics/Bitmap;';
+    fnPtr:@pOnGridDrawItemBitmap;),
    (name:'pOnChangedSensor';
     signature:'(JLandroid/hardware/Sensor;I[FJ)V';
     fnPtr:@pOnChangedSensor;),
@@ -909,7 +1024,13 @@ const NativeMethods:array[0..81] of JNINativeMethod = (
     fnPtr:@pOnSurfaceViewDrawingInBackground;),
    (name:'pOnSurfaceViewDrawingPostExecute';
     signature:'(JF)V';
-    fnPtr:@pOnSurfaceViewDrawingPostExecute;)
+    fnPtr:@pOnSurfaceViewDrawingPostExecute;),
+   (name:'pOnContactManagerContactsExecuted';
+    signature:'(JI)V';
+    fnPtr:@pOnContactManagerContactsExecuted;),
+   (name:'pOnContactManagerContactsProgress';
+    signature:'(JLjava/lang/String;Ljava/lang/String;Ljava/lang/String;Landroid/graphics/Bitmap;I)Z';
+    fnPtr:@pOnContactManagerContactsProgress;)
 );
 
 function RegisterNativeMethodsArray(PEnv: PJNIEnv; className: PChar; methods: PJNINativeMethod; countMethods:integer):integer;
@@ -980,6 +1101,8 @@ exports
   pAppOnActivityResult name 'Java_com_example_apptfpnoguigraphicsbridgedemo1_Controls_pAppOnActivityResult',
   pAppOnCreateOptionsMenu name 'Java_com_example_apptfpnoguigraphicsbridgedemo1_Controls_pAppOnCreateOptionsMenu',
   pAppOnClickOptionMenuItem name 'Java_com_example_apptfpnoguigraphicsbridgedemo1_Controls_pAppOnClickOptionMenuItem',
+  pAppOnPrepareOptionsMenu name 'Java_com_example_apptfpnoguigraphicsbridgedemo1_Controls_pAppOnPrepareOptionsMenu',
+  pAppOnPrepareOptionsMenuItem name 'Java_com_example_apptfpnoguigraphicsbridgedemo1_Controls_pAppOnPrepareOptionsMenuItem',
   pAppOnCreateContextMenu name 'Java_com_example_apptfpnoguigraphicsbridgedemo1_Controls_pAppOnCreateContextMenu',
   pAppOnClickContextMenuItem name 'Java_com_example_apptfpnoguigraphicsbridgedemo1_Controls_pAppOnClickContextMenuItem',
   pOnClick name 'Java_com_example_apptfpnoguigraphicsbridgedemo1_Controls_pOnClick',
@@ -998,6 +1121,9 @@ exports
   pOnAsyncEventPostExecute name 'Java_com_example_apptfpnoguigraphicsbridgedemo1_Controls_pOnAsyncEventPostExecute',
   pOnClickWidgetItem name 'Java_com_example_apptfpnoguigraphicsbridgedemo1_Controls_pOnClickWidgetItem',
   pOnClickCaptionItem name 'Java_com_example_apptfpnoguigraphicsbridgedemo1_Controls_pOnClickCaptionItem',
+  pOnListViewLongClickCaptionItem name 'Java_com_example_apptfpnoguigraphicsbridgedemo1_Controls_pOnListViewLongClickCaptionItem',
+  pOnListViewDrawItemCaptionColor name 'Java_com_example_apptfpnoguigraphicsbridgedemo1_Controls_pOnListViewDrawItemCaptionColor',
+  pOnListViewDrawItemBitmap name 'Java_com_example_apptfpnoguigraphicsbridgedemo1_Controls_pOnListViewDrawItemBitmap',
   pOnBluetoothEnabled name 'Java_com_example_apptfpnoguigraphicsbridgedemo1_Controls_pOnBluetoothEnabled',
   pOnBluetoothDisabled name 'Java_com_example_apptfpnoguigraphicsbridgedemo1_Controls_pOnBluetoothDisabled',
   pOnBluetoothDeviceFound name 'Java_com_example_apptfpnoguigraphicsbridgedemo1_Controls_pOnBluetoothDeviceFound',
@@ -1021,9 +1147,13 @@ exports
   pOnActionBarTabSelected name 'Java_com_example_apptfpnoguigraphicsbridgedemo1_Controls_pOnActionBarTabSelected',
   pOnActionBarTabUnSelected name 'Java_com_example_apptfpnoguigraphicsbridgedemo1_Controls_pOnActionBarTabUnSelected',
   pOnCustomDialogShow name 'Java_com_example_apptfpnoguigraphicsbridgedemo1_Controls_pOnCustomDialogShow',
+  pOnCustomDialogBackKeyPressed name 'Java_com_example_apptfpnoguigraphicsbridgedemo1_Controls_pOnCustomDialogBackKeyPressed',
   pOnClickToggleButton name 'Java_com_example_apptfpnoguigraphicsbridgedemo1_Controls_pOnClickToggleButton',
   pOnChangeSwitchButton name 'Java_com_example_apptfpnoguigraphicsbridgedemo1_Controls_pOnChangeSwitchButton',
   pOnClickGridItem name 'Java_com_example_apptfpnoguigraphicsbridgedemo1_Controls_pOnClickGridItem',
+  pOnLongClickGridItem name 'Java_com_example_apptfpnoguigraphicsbridgedemo1_Controls_pOnLongClickGridItem',
+  pOnGridDrawItemCaptionColor name 'Java_com_example_apptfpnoguigraphicsbridgedemo1_Controls_pOnGridDrawItemCaptionColor',
+  pOnGridDrawItemBitmap name 'Java_com_example_apptfpnoguigraphicsbridgedemo1_Controls_pOnGridDrawItemBitmap',
   pOnChangedSensor name 'Java_com_example_apptfpnoguigraphicsbridgedemo1_Controls_pOnChangedSensor',
   pOnListeningSensor name 'Java_com_example_apptfpnoguigraphicsbridgedemo1_Controls_pOnListeningSensor',
   pOnUnregisterListeningSensor name 'Java_com_example_apptfpnoguigraphicsbridgedemo1_Controls_pOnUnregisterListeningSensor',
@@ -1046,7 +1176,9 @@ exports
   pOnMediaPlayerTimedText name 'Java_com_example_apptfpnoguigraphicsbridgedemo1_Controls_pOnMediaPlayerTimedText',
   pOnSurfaceViewTouch name 'Java_com_example_apptfpnoguigraphicsbridgedemo1_Controls_pOnSurfaceViewTouch',
   pOnSurfaceViewDrawingInBackground name 'Java_com_example_apptfpnoguigraphicsbridgedemo1_Controls_pOnSurfaceViewDrawingInBackground',
-  pOnSurfaceViewDrawingPostExecute name 'Java_com_example_apptfpnoguigraphicsbridgedemo1_Controls_pOnSurfaceViewDrawingPostExecute';
+  pOnSurfaceViewDrawingPostExecute name 'Java_com_example_apptfpnoguigraphicsbridgedemo1_Controls_pOnSurfaceViewDrawingPostExecute',
+  pOnContactManagerContactsExecuted name 'Java_com_example_apptfpnoguigraphicsbridgedemo1_Controls_pOnContactManagerContactsExecuted',
+  pOnContactManagerContactsProgress name 'Java_com_example_apptfpnoguigraphicsbridgedemo1_Controls_pOnContactManagerContactsProgress';
 
 begin
   gApp:= jApp.Create(nil);{AndroidWidget.pas}

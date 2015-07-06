@@ -59,7 +59,7 @@ begin
     Self.SetIconActionBar('ic_bullets');
 
     //prepare custom tab view - jPanel3
-     jPanel3.MatchParent();
+    jPanel3.MatchParent();
     //jPanel3.CenterInParent();
     jTextView3.TextTypeFace:= tfBold;
     jImageView1.SetImageByResIdentifier('ic_bullet_red');    //...\res\drawable-xxx

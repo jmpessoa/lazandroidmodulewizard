@@ -126,7 +126,7 @@ object AndroidModule1: TAndroidModule1
   object jMyHello1: jMyHello
     Flag = 0
     Hello = 'Hello Lazarus Pascal World!'
-    left = 32
-    top = 16
+    left = 120
+    top = 312
   end
 end

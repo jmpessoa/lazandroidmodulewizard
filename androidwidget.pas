@@ -561,10 +561,13 @@ type
   TOnGLChange        = Procedure(Sender: TObject; W, H: integer) of object;
 
   TOnClickYN         = Procedure(Sender: TObject; YN  : TClickYN) of object;
-  TOnClickItem       = Procedure(Sender: TObject; Item: Integer) of object;
+  TOnClickItem       = Procedure(Sender: TObject; itemIndex: Integer) of object;
 
-  TOnClickWidgetItem = Procedure(Sender: TObject; Item: integer; checked: boolean) of object;
-  TOnClickCaptionItem= Procedure(Sender: TObject; Item: integer; caption: string) of object;
+  TOnClickWidgetItem = Procedure(Sender: TObject; itemIndex: integer; checked: boolean) of object;
+  TOnClickCaptionItem= Procedure(Sender: TObject; itemIndex: integer; itemCaption: string) of object;
+
+  TOnDrawItemTextColor = Procedure(Sender: TObject; itemIndex: integer; itemCaption: string; out textColor: TARGBColorBridge) of Object;
+  TOnDrawItemBitmap  = Procedure(Sender: TObject; itemIndex: integer; itemCaption: string; out bimap: JObject) of Object;
 
   TOnWebViewStatus   = Procedure(Sender: TObject; Status : TWebViewStatus;
                                  URL : String; Var CanNavi : Boolean) of object;
@@ -1073,19 +1076,23 @@ type
     FjPRLayout   : jObject; //Java: Parent Layout {parent View)
     FOrientation : integer;
     FTextAlignment: TTextAlignment;
+
     FFontSize     : DWord;
+    FFontColor     : TARGBColorBridge;
     FFontFace: TFontFace;
     FTextTypeFace: TTextTypeFace;
-    FAnchorId     : integer;
-    FAnchor       : jVisualControl;  //http://www.semurjengkol.com/android-relative-layout-example/
-    FPositionRelativeToAnchor: TPositionRelativeToAnchorIDSet;
-    FPositionRelativeToParent: TPositionRelativeToParentSet;
-    //FGravity      : TGravitySet;    TODO: by jmpessoa  - java "setGravity"
-    FLParamWidth: TLayoutParams;
-    FLParamHeight: TLayoutParams;
     FHintTextColor: TARGBColorBridge;
 
+    FAnchorId     : integer;
+    FAnchor       : jVisualControl;
+    FPositionRelativeToAnchor: TPositionRelativeToAnchorIDSet;
+    FPositionRelativeToParent: TPositionRelativeToParentSet;
+
+    FLParamWidth: TLayoutParams;
+    FLParamHeight: TLayoutParams;
+
     FOnClick: TOnNotify;
+
     procedure SetAnchor(Value: jVisualControl);
     procedure DefineProperties(Filer: TFiler); override;
     procedure Notification(AComponent: TComponent; Operation: TOperation); override;
@@ -1098,9 +1105,13 @@ type
     procedure SetParentComponent(Value: TComponent); override;
     procedure SetParamHeight(Value: TLayoutParams); virtual;
     procedure SetParamWidth(Value: TLayoutParams);
-    procedure SetTextTypeFace(Value: TTextTypeFace); virtual;
-    procedure SetFontFace(AValue: TFontFace); virtual;
-    procedure SetHintTextColor(Value: TARGBColorBridge); virtual;
+
+    //procedure SetFontFace(AValue: TFontFace); virtual;
+    //procedure SetFontColor(AValue: TARGBColorBridge); virtual;
+    //procedure SetFontSize(AValue : DWord); virtual;
+    //procedure SetTextTypeFace(Value: TTextTypeFace); virtual;
+    //procedure SetHintTextColor(Value: TARGBColorBridge); virtual;
+
     function GetView: jObject; virtual;
   public
     constructor Create(AOwner: TComponent); override;
@@ -1113,15 +1124,17 @@ type
     property ViewParent {ViewParent}: jObject  read  GetViewParent write SetViewParent; // Java : Parent Relative Layout
 
     property View: jObject read GetView; //FjObject; //View/Layout
-
     property Id: DWord read FId write FId;
-    property FontFace: TFontFace read FFontFace write SetFontFace;
-    property TextTypeFace: TTextTypeFace read FTextTypeFace write SetTextTypeFace;
-    property HintTextColor: TARGBColorBridge read FHintTextColor write SetHintTextColor;
+
+    //property FontColor: TARGBColorBridge read FFontColor write SetFontColor;
+    //property FontSize: DWord read FFontSize write SetFontSize;
+    //property FontFace: TFontFace read FFontFace write SetFontFace;
+    //property TextTypeFace: TTextTypeFace read FTextTypeFace write SetTextTypeFace;
+    //property HintTextColor: TARGBColorBridge read FHintTextColor write SetHintTextColor;
+
   published
     property Visible: boolean read FVisible write SetVisible;
     property Anchor  : jVisualControl read FAnchor write SetAnchor;
-    //property Gravity      : TGravitySet read FGravity write FGravity;   TODO: by jmpessoa
     property PosRelativeToAnchor: TPositionRelativeToAnchorIDSet read FPositionRelativeToAnchor
                                                                        write FPositionRelativeToAnchor;
     property PosRelativeToParent: TPositionRelativeToParentSet read FPositionRelativeToParent
@@ -2034,6 +2047,7 @@ begin
   FLParamHeight:= Value;
 end;
 
+{
 procedure jVisualControl.SetTextTypeFace(Value: TTextTypeFace);
 begin
   FTextTypeFace:= Value;
@@ -2049,6 +2063,16 @@ begin
   FHintTextColor:= Value;
 end;
 
+ procedure jVisualControl.SetFontColor(AValue: TARGBColorBridge);
+ begin
+    FFontColor:= AValue;
+ end;
+
+ procedure jVisualControl.SetFontSize(AValue : DWord);
+ begin
+    FFontSize:= AValue;
+ end;
+ }
   { TAndroidForm }
 
 constructor TAndroidForm.CreateNew(AOwner: TComponent);

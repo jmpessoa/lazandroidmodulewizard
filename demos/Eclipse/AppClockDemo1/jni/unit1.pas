@@ -30,4 +30,6 @@ implementation
 
 {$R *.lfm}
 
+{ TAndroidModule1 }
+
 end.

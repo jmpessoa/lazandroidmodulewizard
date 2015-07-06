@@ -93,6 +93,6 @@ object AndroidModule1: TAndroidModule1
   end
   object jTextFileManager1: jTextFileManager
     left = 123
-    top = 249
+    top = 168
   end
 end

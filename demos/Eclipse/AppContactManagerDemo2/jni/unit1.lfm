@@ -11,6 +11,7 @@ object AndroidModule1: TAndroidModule1
   Text = 'AndroidModule1'
   ActivityMode = actMain
   BackgroundColor = colbrDefault
+  OnJNIPrompt = AndroidModule1JNIPrompt
   object jTextView1: jTextView
     Left = 70
     Top = 5
@@ -76,8 +77,8 @@ object AndroidModule1: TAndroidModule1
     ItemLayout = layImageTextWidget
     TextSizeDecorated = sdNone
     TextAlign = alLeft
-    OnClickCaptionItem = jListView1ClickCaptionItem
     HighLightSelectedItemColor = colbrDefault
+    OnClickItem = jListView1ClickItem
     Id = 4274354
   end
   object jProgressBar1: jProgressBar

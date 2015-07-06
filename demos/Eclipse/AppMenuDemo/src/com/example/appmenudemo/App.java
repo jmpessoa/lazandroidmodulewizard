@@ -1,6 +1,6 @@
 package com.example.appmenudemo;
 
-//Lamw: Lazarus Android Module Wizard - Version 0.6 - rev. 30 - 14 June - 2015
+//Lamw: Lazarus Android Module Wizard - Version 0.6 - rev. 32 - 05 July - 2015
 //Form Designer and Components development model!
 //https://github.com/jmpessoa/lazandroidmodulewizard
 //http://forum.lazarus.freepascal.org/index.php/topic,21919.270.html

@@ -6,7 +6,7 @@ unit unit1;
 interface
   
 uses
-  Classes, SysUtils, {And_jni, And_jni_Bridge,} Laz_And_Controls, AndroidWidget;
+  Classes, SysUtils, Laz_And_Controls, AndroidWidget, And_jni, imagefilemanager;
   
 type
 
@@ -16,16 +16,22 @@ type
       jButton1: jButton;
       jButton2: jButton;
       jEditText1: jEditText;
+      jImageFileManager1: jImageFileManager;
       jListView1: jListView;
       jTextView1: jTextView;
 
       procedure DataModuleJNIPrompt(Sender: TObject);
       procedure jButton1Click(Sender: TObject);
       procedure jButton2Click(Sender: TObject);
-      procedure jListView1ClickCaptionItem(Sender: TObject; Item: integer;
-        caption: string);
+      procedure jListView1ClickItem(Sender: TObject; itemIndex: integer;
+        itemCaption: string);
       procedure jListView1ClickWidgetItem(Sender: TObject; Item: integer;
         checked: boolean);
+      procedure jListView1DrawItemBitmap(Sender: TObject; itemIndex: integer;
+        itemCaption: string; out bimap: JObject);
+      procedure jListView1DrawItemTextColor(Sender: TObject;
+        itemIndex: integer; itemCaption: string; out textColor: TARGBColorBridge
+        );
     private
       {private declarations}
     public
@@ -87,13 +93,13 @@ begin
 
 end;
 
-procedure TAndroidModule1.jListView1ClickCaptionItem(Sender: TObject;
-  Item: integer; caption: string);
+procedure TAndroidModule1.jListView1ClickItem(Sender: TObject;
+  itemIndex: integer; itemCaption: string);
 begin
-  if jListView1.IsItemChecked(Item) then
-     ShowMessage('index = ['+intToStr(Item)+'/'+caption+'] is Cheched!')
+   if jListView1.IsItemChecked(itemIndex) then
+     ShowMessage('index = ['+intToStr(itemIndex)+'/'+itemCaption+'] is Cheched!')
   else
-     ShowMessage('index = ['+intToStr(Item)+'/'+caption+'] is Not Cheched!');
+     ShowMessage('index = ['+intToStr(itemIndex)+'/'+itemCaption+'] is Not Cheched!');
 end;
 
 procedure TAndroidModule1.jListView1ClickWidgetItem(Sender: TObject;
@@ -104,9 +110,21 @@ begin
   //ShowMessage();
   for i:=0 to jListView1.Count-1 do
   begin
-     if jListView1.IsItemChecked(i) then ShowMessage('just index = ['+intToStr(i)+'] is Cheched!');
+     if jListView1.IsItemChecked(i) then ShowMessage('Index = ['+intToStr(i)+'] is Cheched!');
   end;
 
+end;
+
+procedure TAndroidModule1.jListView1DrawItemBitmap(Sender: TObject;
+  itemIndex: integer; itemCaption: string; out bimap: JObject);
+begin
+  if  itemIndex = 1 then bimap:= jImageFileManager1.LoadFromResources('ic_launcher');
+end;
+
+procedure TAndroidModule1.jListView1DrawItemTextColor(Sender: TObject;
+  itemIndex: integer; itemCaption: string; out textColor: TARGBColorBridge);
+begin
+  if  itemIndex = 1 then textColor:= colbrGreen;
 end;
 
 end.

@@ -51,7 +51,7 @@ jContactManager = class(jControl)
     function GetPhoto(_displayName: string): jObject;
 
     procedure AddContact(_displayName: string; _mobileNumber: string; _homeNumber: string;  _workNumber: string; _homeEmail: string; _workEmail: string; _companyName: string; _jobTitle: string; _bitmapImage: jObject); overload;
-    procedure GetContactsAsyn(_delimiter: string);
+    procedure GetContactsAsync(_delimiter: string);
 
     procedure AddContact(_displayName: string; _mobileNumber: string); overload;
     function GetDisplayName(_contactID: string): string;
@@ -88,7 +88,7 @@ procedure jContactManager_UpdatePhoto(env: PJNIEnv; _jcontactmanager: JObject; _
 function jContactManager_GetPhoto(env: PJNIEnv; _jcontactmanager: JObject; _displayName: string): jObject;
 
 procedure jContactManager_AddContact(env: PJNIEnv; _jcontactmanager: JObject; _displayName: string; _mobileNumber: string; _homeNumber: string; _workNumber: string; _homeEmail: string; _workEmail: string; _companyName: string; _jobTitle: string; _bitmapImage: jObject); overload;
-procedure jContactManager_GetContactsAsyn(env: PJNIEnv; _jcontactmanager: JObject; _delimiter: string);
+procedure jContactManager_GetContactsAsync(env: PJNIEnv; _jcontactmanager: JObject; _delimiter: string);
 
 procedure jContactManager_AddContact(env: PJNIEnv; _jcontactmanager: JObject; _displayName: string; _mobileNumber: string); overload;
 function jContactManager_GetDisplayName(env: PJNIEnv; _jcontactmanager: JObject; _contactID: string): string;
@@ -233,11 +233,11 @@ begin
      jContactManager_AddContact(FjEnv, FjObject, _displayName , _mobileNumber, _homeNumber  ,_workNumber ,_homeEmail ,_workEmail ,_companyName ,_jobTitle ,_bitmapImage);
 end;
 
-procedure jContactManager.GetContactsAsyn(_delimiter: string);
+procedure jContactManager.GetContactsAsync(_delimiter: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jContactManager_GetContactsAsyn(FjEnv, FjObject, _delimiter);
+     jContactManager_GetContactsAsync(FjEnv, FjObject, _delimiter);
 end;
 
 procedure jContactManager.GenEvent_OnContactManagerContactsExecuted(Sender: TObject; count: integer);
@@ -571,7 +571,7 @@ begin
   env^.DeleteLocalRef(env, jCls);
 end;
 
-procedure jContactManager_GetContactsAsyn(env: PJNIEnv; _jcontactmanager: JObject; _delimiter: string);
+procedure jContactManager_GetContactsAsync(env: PJNIEnv; _jcontactmanager: JObject; _delimiter: string);
 var
   jParams: array[0..0] of jValue;
   jMethod: jMethodID=nil;
@@ -579,7 +579,7 @@ var
 begin
   jParams[0].l:= env^.NewStringUTF(env, PChar(_delimiter));
   jCls:= env^.GetObjectClass(env, _jcontactmanager);
-  jMethod:= env^.GetMethodID(env, jCls, 'GetContactsAsyn', '(Ljava/lang/String;)V');
+  jMethod:= env^.GetMethodID(env, jCls, 'GetContactsAsync', '(Ljava/lang/String;)V');
   env^.CallVoidMethodA(env, _jcontactmanager, jMethod, @jParams);
   env^.DeleteLocalRef(env,jParams[0].l);
   env^.DeleteLocalRef(env, jCls);

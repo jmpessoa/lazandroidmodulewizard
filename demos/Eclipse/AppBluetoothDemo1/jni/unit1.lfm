@@ -11,10 +11,10 @@ object AndroidModule1: TAndroidModule1
   ActivityMode = actMain
   BackgroundColor = colbrDefault
   object jTextView1: jTextView
-    Left = 112
-    Top = 24
-    Width = 135
-    Height = 25
+    Left = 85
+    Top = 5
+    Width = 129
+    Height = 20
     MarginLeft = 5
     MarginTop = 5
     MarginRight = 5
@@ -24,7 +24,7 @@ object AndroidModule1: TAndroidModule1
     PosRelativeToParent = [rpTop, rpCenterHorizontal]
     LayoutParamWidth = lpWrapContent
     LayoutParamHeight = lpWrapContent
-    Text = 'jTextView1'
+    Text = 'App Bluetooth Demo1'
     Alignment = taLeft
     Enabled = True
     BackgroundColor = colbrDefault
@@ -34,9 +34,9 @@ object AndroidModule1: TAndroidModule1
     Id = 2884513
   end
   object jButton1: jButton
-    Left = 8
-    Top = 56
-    Width = 280
+    Left = 2
+    Top = 34
+    Width = 296
     Height = 40
     MarginLeft = 2
     MarginTop = 4
@@ -56,9 +56,9 @@ object AndroidModule1: TAndroidModule1
     Id = 1768641
   end
   object jButton2: jButton
-    Left = 8
-    Top = 112
-    Width = 135
+    Left = 2
+    Top = 82
+    Width = 136
     Height = 40
     MarginLeft = 2
     MarginTop = 4
@@ -78,9 +78,9 @@ object AndroidModule1: TAndroidModule1
     Id = 2680672
   end
   object jButton3: jButton
-    Left = 152
-    Top = 112
-    Width = 135
+    Left = 142
+    Top = 82
+    Width = 136
     Height = 40
     MarginLeft = 2
     MarginTop = 4
@@ -100,9 +100,9 @@ object AndroidModule1: TAndroidModule1
     Id = 0
   end
   object jButton4: jButton
-    Left = 9
-    Top = 296
-    Width = 280
+    Left = 2
+    Top = 297
+    Width = 296
     Height = 40
     MarginLeft = 2
     MarginTop = 4
@@ -148,9 +148,9 @@ object AndroidModule1: TAndroidModule1
     Id = 4193543
   end
   object jButton5: jButton
-    Left = 9
-    Top = 344
-    Width = 279
+    Left = 2
+    Top = 345
+    Width = 296
     Height = 40
     MarginLeft = 2
     MarginTop = 4

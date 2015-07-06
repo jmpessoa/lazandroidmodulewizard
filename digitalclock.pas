@@ -18,6 +18,7 @@ jDigitalClock = class(jVisualControl)
  private
     procedure SetVisible(Value: Boolean);
     procedure SetColor(Value: TARGBColorBridge); //background
+    Procedure SetFontColor    (Value : TARGBColorBridge);
     procedure UpdateLParamHeight;
     procedure UpdateLParamWidth;
 
@@ -43,9 +44,12 @@ jDigitalClock = class(jVisualControl)
     procedure SetLayoutAll(_idAnchor: integer);
     procedure ClearLayoutAll();
     procedure SetId(_id: integer);
+    procedure SetFontSize(_size: DWord);
 
  published
     property BackgroundColor: TARGBColorBridge read FColor write SetColor;
+    property FontSize: DWord  read FFontSize write SetFontSize;
+    property FontColor: TARGBColorBridge read FFontColor write SetFontColor;
     property OnClick: TOnNotify read FOnClick write FOnClick;
 
 end;
@@ -63,6 +67,8 @@ procedure jDigitalClock_AddLParamsParentRule(env: PJNIEnv; _jdigitalclock: JObje
 procedure jDigitalClock_SetLayoutAll(env: PJNIEnv; _jdigitalclock: JObject; _idAnchor: integer);
 procedure jDigitalClock_ClearLayoutAll(env: PJNIEnv; _jdigitalclock: JObject);
 procedure jDigitalClock_SetId(env: PJNIEnv; _jdigitalclock: JObject; _id: integer);
+procedure jDigitalClock_SetTextSize(env: PJNIEnv; _jdigitalclock: JObject; _size: integer);
+Procedure jDigitalClock_setTextColor(env:PJNIEnv; _jdigitalclock: jObject; color : DWord);
 
 
 implementation
@@ -168,6 +174,12 @@ begin
 
   if  FColor <> colbrDefault then
     View_SetBackGroundColor(FjEnv, FjObject, GetARGB(FCustomColor, FColor));
+
+  if FFontColor <> colbrDefault then
+       jDigitalClock_setTextColor(FjEnv, FjObject, GetARGB(FCustomColor, FFontColor));
+
+  if FFontSize <> 0 then
+      jDigitalClock_SetTextSize(FjEnv, FjObject, FFontSize);
 
   View_SetVisible(FjEnv, FjObject, FVisible);
 end;
@@ -360,6 +372,21 @@ begin
      jDigitalClock_SetId(FjEnv, FjObject, _id);
 end;
 
+procedure jDigitalClock.SetFontSize(_size: DWord);
+begin
+  //in designing component state: set value here...
+  FFontSize:= _size;
+  if FInitialized then
+     jDigitalClock_SetTextSize(FjEnv, FjObject, _size);
+end;
+
+Procedure jDigitalClock.SetFontColor(Value: TARGBColorBridge);
+begin
+ FFontColor:= Value;
+ if (FInitialized = True) and (FFontColor <> colbrDefault) then
+     jDigitalClock_setTextColor(FjEnv, FjObject, GetARGB(FCustomColor, FFontColor));
+end;
+
 {-------- jDigitalClock_JNI_Bridge ----------}
 
 function jDigitalClock_jCreate(env: PJNIEnv;_Self: int64; this: jObject): jObject;
@@ -550,5 +577,30 @@ begin
   env^.DeleteLocalRef(env, jCls);
 end;
 
+procedure jDigitalClock_SetTextSize(env: PJNIEnv; _jdigitalclock: JObject; _size: integer);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].f:= _size;
+  jCls:= env^.GetObjectClass(env, _jdigitalclock);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetTextSize', '(F)V');
+  env^.CallVoidMethodA(env, _jdigitalclock, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+Procedure jDigitalClock_setTextColor(env:PJNIEnv; _jdigitalclock: jObject; color : DWord);
+var
+  _jMethod : jMethodID = nil;
+  _jParams : array[0..0] of jValue;
+  cls: jClass;
+begin
+  _jParams[0].i := color;
+  cls := env^.GetObjectClass(env, _jdigitalclock);
+  _jMethod:= env^.GetMethodID(env, cls, 'setTextColor', '(I)V');
+  env^.CallVoidMethodA(env,_jdigitalclock,_jMethod,@_jParams);
+  env^.DeleteLocalRef(env, cls);
+end;
 
 end.

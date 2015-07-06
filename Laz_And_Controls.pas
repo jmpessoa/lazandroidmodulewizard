@@ -249,18 +249,25 @@ type
     function jCreate(): jObject;
     procedure jFree();
 
-    procedure Get(_stringUrl: string); overload;
-    procedure Get; overload;
-    function Get2(Link: string): string;
+    procedure GetAsync(_stringUrl: string); overload;
+    procedure GetAsync; overload;
+
+    //thanks to Fatih KILIÇ
+    function Get(_stringUrl: string): string;  overload;
+    function Get(): string;   overload;
 
     procedure SetAuthenticationUser(_userName: string; _password: string);
     procedure SetAuthenticationMode(_authenticationMode: THttpClientAuthenticationMode);
     procedure SetAuthenticationHost(_hostName: string; _port: integer);
-    procedure  PostNameValueData(_stringUrl: string; _name: string; _value: string); overload;
-    procedure  PostNameValueData(_stringUrl: string; _listNameValue: string);  overload;
-    procedure ClearPost2Values;
-    procedure AddValueForPost2(Name, Value: string);
-    function Post2(Link: string): string;
+
+    procedure PostNameValueDataAsync(_stringUrl: string); overload;
+    procedure PostNameValueDataAsync(_stringUrl: string; _name: string; _value: string); overload;
+    procedure PostNameValueDataAsync(_stringUrl: string; _listNameValue: string);  overload;
+
+    //thanks to Fatih KILIÇ
+    procedure ClearNameValueData; //ClearPost2Values;
+    procedure AddNameValueData(_name, _value: string); //AddValueForPost2;
+    function Post(_stringUrl: string): string;
 
     procedure GenEvent_OnHttpClientContentResult(Obj: TObject; content: string);
     procedure GenEvent_OnHttpClientCodeResult(Obj: TObject; code: integer);
@@ -569,13 +576,16 @@ type
      function GetColumnIndex(colName: string): integer;
      function GetColumName(columnIndex: integer): string;
      function GetColType(columnIndex: integer): TSqliteFieldType;
-     function GetValueAsString(columnIndex: integer): string;
+     function GetValueAsString(columnIndex: integer): string;   overload;
      function GetValueAsBitmap(columnIndex: integer): jObject;
      function GetValueAsInteger(columnIndex: integer): integer;
      function GetValueAsDouble(columnIndex: integer): double;
      function GetValueAsFloat(columnIndex: integer): real;
 
      procedure SetCursor(Value: jObject);
+     //position = -1 --> Last Row !
+     function GetValueAsString(position: integer; columnName: string): string; overload;
+
    published
    end;
 
@@ -638,10 +648,12 @@ type
 
   jTextView = class(jVisualControl)
   private
+
     Procedure SetColor    (Value : TARGBColorBridge);
-    Procedure SetEnabled  (Value : Boolean);
     Procedure SetFontColor(Value : TARGBColorBridge);
     Procedure SetFontSize (Value : DWord  );
+
+    Procedure SetEnabled  (Value : Boolean);
     Procedure SetTextAlignment(Value: TTextAlignment);
     procedure UpdateLParamHeight;
     procedure UpdateLParamWidth;
@@ -650,9 +662,9 @@ type
     Procedure SetText(Value: string ); override;
     Function  GetText: string;   override;
 
-    procedure SetFontFace(AValue: TFontFace); override;
+    procedure SetFontFace(AValue: TFontFace); //override;
+    procedure SetTextTypeFace(Value: TTextTypeFace); //override;
 
-    procedure SetTextTypeFace(Value: TTextTypeFace); override;
     procedure SetViewParent(Value: jObject);  override;
     Procedure GenEvent_OnClick(Obj: TObject);
   public
@@ -667,13 +679,14 @@ type
     property Text: string read GetText write SetText;
     property Alignment : TTextAlignment read FTextAlignment write SetTextAlignment;
     property Enabled   : Boolean read FEnabled   write SetEnabled;
+
     property BackgroundColor     : TARGBColorBridge read FColor     write SetColor;
+
     property FontColor : TARGBColorBridge  read FFontColor write SetFontColor;
     property FontSize  : DWord   read FFontSize  write SetFontSize;
-
-    property FontFace: TFontFace read FFontFace write SetFontFace default ffNormal; 
-
+    property FontFace: TFontFace read FFontFace write SetFontFace default ffNormal;
     property TextTypeFace: TTextTypeFace read FTextTypeFace write SetTextTypeFace; //by jmpessoa
+
     // Event - if enabled!
     property OnClick : TOnNotify read FOnClick   write FOnClick;
   end;
@@ -721,10 +734,10 @@ type
     Procedure SetText(Value: string ); override;
     Function  GetText: string; override;
 
-    procedure SetFontFace(AValue: TFontFace); override; 
-    procedure SetTextTypeFace(Value: TTextTypeFace); override; 
+    procedure SetFontFace(AValue: TFontFace); //override; 
+    procedure SetTextTypeFace(Value: TTextTypeFace); //override; 
     procedure SetEditable(enabled: boolean);
-    procedure SetHintTextColor(Value: TARGBColorBridge); override;
+    procedure SetHintTextColor(Value: TARGBColorBridge); //override;
 
     procedure SetViewParent(Value: jObject);  override;
     Procedure GenEvent_OnEnter (Obj: TObject);
@@ -826,7 +839,6 @@ type
   private
     FChecked   : boolean;
     Procedure SetColor    (Value : TARGBColorBridge);
-
     Procedure SetFontSize (Value : DWord  );
     Function  GetChecked         : boolean;
     Procedure SetChecked  (Value : boolean);
@@ -928,19 +940,15 @@ type
     property BackgroundColor: TARGBColorBridge read FColor write SetColor;
     property Progress: integer read GetProgress write SetProgress;
     property Max: integer read GetMax write SetMax;
-    //property Visible   : Boolean read FVisible    write SetVisible;
+
   end;
 
   jImageView = class(jVisualControl)
   private
-    //FOnClick   : TOnNotify;
     FImageName : string;
     FImageIndex: integer;
     FImageList : jImageList;  //by jmpessoa
-    //FCount: integer;
-    //FIsBackgroundImage     : boolean;
     FFilePath: TFilePath;
-    //FImageIdentifier: string;
     FImageScaleType: TImageScaleType;
 
     Procedure SetColor    (Value : TARGBColorBridge);
@@ -986,7 +994,6 @@ type
     property Images    : jImageList read FImageList write SetImages;     //by jmpessoa
 
     property BackgroundColor     : TARGBColorBridge read FColor       write SetColor;
-    //property IsBackgroundImage   : boolean read FIsBackgroundImage    write FIsBackgroundImage;
     property ImageIdentifier : string read FImageName write SetImageByResIdentifier;
     property ImageScaleType: TImageScaleType read FImageScaleType write SetScaleType;
      // Event
@@ -1010,9 +1017,11 @@ type
 
   jListView = class(jVisualControl)
   private
-    FOnClickItem  : TOnClickItem;
+    FOnClickItem  : TOnClickCaptionItem;
     FOnClickWidgetItem: TOnClickWidgetItem;
-    FOnClickCaptionItem: TOnClickCaptionItem;
+    FOnLongClickItem:  TOnClickCaptionItem;
+    FOnDrawItemTextColor: TOnDrawItemTextColor;
+    FOnDrawItemBitmap: TOnDrawItemBitmap;
 
     FItems        : TStrings;
     FWidgetItem   : TWidgetItem;
@@ -1045,9 +1054,13 @@ type
     procedure UpdateLParamWidth;
   protected
     procedure SetViewParent(Value: jObject);  override;
-    Procedure GenEvent_OnClick(Obj: TObject; Value: integer);
     procedure GenEvent_OnClickWidgetItem(Obj: TObject; index: integer; checked: boolean);
+
     procedure GenEvent_OnClickCaptionItem(Obj: TObject; index: integer; caption: string);
+    procedure GenEvent_OnLongClickCaptionItem(Obj: TObject; index: integer; caption: string);
+    procedure GenEvent_OnDrawItemCaptionColor(Obj: TObject; index: integer; caption: string;  out color: dword);
+    procedure GenEvent_OnDrawItemBitmap(Obj: TObject; index: integer; caption: string;  out bitmap: JObject);
+
     procedure Notification(AComponent: TComponent; Operation: TOperation); override;
   public
     constructor Create(AOwner: TComponent); override;
@@ -1080,13 +1093,17 @@ type
 
     procedure SetLayoutByIndex(Value: TItemLayout; index: integer);
 
+    function GetItemIndex(): integer;
+    function GetItemCaption(): string;
+    procedure DispatchOnDrawItemTextColor(_value: boolean);
+    procedure DispatchOnDrawItemBitmap(_value: boolean);
+
     // Property
     property setItemIndex: TXY write SetItemPosition;
     property Count: integer read GetCount;
     property HighLightSelectedItem: boolean read FHighLightSelectedItem write SetHighLightSelectedItem;
   published
     property Items: TStrings read FItems write SetItems;
-    //property Visible: Boolean   read FVisible   write SetVisible;
     property BackgroundColor: TARGBColorBridge read FColor     write SetColor;
     property FontColor: TARGBColorBridge read FFontColor write SetFontColor;
     property FontSize: DWord read FFontSize  write SetFontSize;
@@ -1098,12 +1115,13 @@ type
     property ItemLayout: TItemLayout read FItemLayout write FItemLayout;
     property TextSizeDecorated: TTextSizeDecorated read FTextSizeDecorated write FTextSizeDecorated;
     property TextAlign: TTextAlign read FTextAlign write FTextAlign;
-    // Event
-    property OnClickItem : TOnClickItem read FOnClickItem write FOnClickItem;
-    property OnClickWidgetItem: TOnClickWidgetItem read FOnClickWidgetItem write FOnClickWidgetItem;
-    property OnClickCaptionItem: TOnClickCaptionItem read FOnClickCaptionItem write FOnClickCaptionItem;
-
     property HighLightSelectedItemColor: TARGBColorBridge read FHighLightSelectedItemColor write SetHighLightSelectedItemColor;
+    // Event
+    property OnClickItem : TOnClickCaptionItem read FOnClickItem write FOnClickItem;
+    property OnClickWidgetItem: TOnClickWidgetItem read FOnClickWidgetItem write FOnClickWidgetItem;
+    property OnLongClickItem: TOnClickCaptionItem read FOnLongClickItem write FOnLongClickItem;
+    property OnDrawItemTextColor: TOnDrawItemTextColor read FOnDrawItemTextColor write FOnDrawItemTextColor;
+    property OnDrawItemBitmap: TOnDrawItemBitmap  read FOnDrawItemBitmap write FOnDrawItemBitmap;
 
   end;
 
@@ -1428,6 +1446,11 @@ type
   //by jmpessoa
   Procedure Java_Event_pOnClickWidgetItem(env: PJNIEnv; this: jobject; Obj: TObject;index: integer; checked: boolean);
   Procedure Java_Event_pOnClickCaptionItem(env: PJNIEnv; this: jobject; Obj: TObject;index: integer; caption: JString);
+  Procedure Java_Event_pOnListViewLongClickCaptionItem(env: PJNIEnv; this: jobject; Obj: TObject;index: integer; caption: JString);
+  function  Java_Event_pOnListViewDrawItemCaptionColor(env: PJNIEnv; this: jobject; Obj: TObject; index: integer; caption: JString): JInt;
+  function  Java_Event_pOnListViewDrawItemBitmap(env: PJNIEnv; this: jobject; Obj: TObject; index: integer; caption: JString): JObject;
+
+
 
 
   Procedure Java_Event_pOnChange(env: PJNIEnv; this: jobject; Obj: TObject; txt: JString; count : integer);
@@ -1875,12 +1898,6 @@ begin
     jImageBtn(Obj).GenEvent_OnClick(Obj);
     Exit;
   end;
-  if Obj is jListView then
-  begin
-    jForm(jListVIew(Obj).Owner).UpdateJNI(gApp);
-    jListVIew(Obj).GenEvent_OnClick(Obj,Value);
-    Exit;
-  end;
   if Obj is jImageView then
   begin
     jForm(jImageView(Obj).Owner).UpdateJNI(gApp);
@@ -1918,6 +1935,73 @@ begin
       pasCaption:= string( env^.GetStringUTFChars(env,caption,@_jBoolean) );
     end;
     jListVIew(Obj).GenEvent_OnClickCaptionItem(Obj, index, pasCaption);
+  end;
+end;
+
+function  Java_Event_pOnListViewDrawItemCaptionColor(env: PJNIEnv; this: jobject; Obj: TObject; index: integer; caption: JString): JInt;
+var
+  pasCaption: string;
+  _jBoolean: JBoolean;
+  outColor: dword;
+begin
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+  outColor:= 0;
+  if Obj is jListVIew then
+  begin
+    jForm(jListVIew(Obj).Owner).UpdateJNI(gApp);
+    pasCaption := '';
+    if caption <> nil then
+    begin
+      _jBoolean:= JNI_False;
+      pasCaption:= string( env^.GetStringUTFChars(env,caption,@_jBoolean) );
+    end;
+    jListVIew(Obj).GenEvent_OnDrawItemCaptionColor(Obj, index, pasCaption, outColor);
+  end;
+  Result:= outColor;
+end;
+
+function  Java_Event_pOnListViewDrawItemBitmap(env: PJNIEnv; this: jobject; Obj: TObject; index: integer; caption: JString): JObject;
+var
+  pasCaption: string;
+  _jBoolean: JBoolean;
+  outBitmap: JObject;
+begin
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+  outBitmap:= nil;
+  if Obj is jListVIew then
+  begin
+    jForm(jListVIew(Obj).Owner).UpdateJNI(gApp);
+    pasCaption := '';
+    if caption <> nil then
+    begin
+      _jBoolean:= JNI_False;
+      pasCaption:= string( env^.GetStringUTFChars(env,caption,@_jBoolean) );
+    end;
+    jListVIew(Obj).GenEvent_OnDrawItemBitmap(Obj, index, pasCaption, outBitmap);
+  end;
+  Result:= outBitmap;
+end;
+
+Procedure Java_Event_pOnListViewLongClickCaptionItem(env: PJNIEnv; this: jobject; Obj: TObject;index: integer; caption: JString);
+var
+   pasCaption: string;
+ _jBoolean: JBoolean;
+begin
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+
+  if Obj is jListVIew then
+  begin
+    jForm(jListVIew(Obj).Owner).UpdateJNI(gApp);
+    pasCaption := '';
+    if caption <> nil then
+    begin
+      _jBoolean:= JNI_False;
+      pasCaption:= string( env^.GetStringUTFChars(env,caption,@_jBoolean) );
+    end;
+    jListVIew(Obj).GenEvent_OnLongClickCaptionItem(Obj, index, pasCaption);
   end;
 end;
 
@@ -2397,18 +2481,19 @@ end;
 
 procedure jTextView.SetFontFace(AValue: TFontFace); 
 begin 
- inherited SetFontFace(AValue); 
+ FFontFace:= AValue;
  if(FInitialized) then 
    jTextView_setFontAndTextTypeFace(FjEnv, FjObject, Ord(FFontFace), Ord(FTextTypeFace)); 
 end;
 
 procedure jTextView.SetTextTypeFace(Value: TTextTypeFace);
 begin
-  inherited SetTextTypeFace(Value);
+  //inherited SetTextTypeFace(Value);
 
 {  if FInitialized  then
     jTextView_SetTextTypeFace(FjEnv, FjObject, Ord(Value));}
 
+  FTextTypeFace:= Value ;
   if(FInitialized) then 
     jTextView_setFontAndTextTypeFace(FjEnv, FjObject, Ord(FFontFace), Ord(FTextTypeFace)); 
 
@@ -2737,22 +2822,25 @@ end;
 
 procedure jEditText.SetFontFace(AValue: TFontFace); 
 begin 
-  inherited SetFontFace(AValue); 
+  //inherited SetFontFace(AValue);
+  FFontFace:= AValue;
   if(FInitialized) then 
    jEditText_setFontAndTextTypeFace(FjEnv, FjObject, Ord(FFontFace), Ord(FTextTypeFace)); 
 end; 
 
 procedure jEditText.SetTextTypeFace(Value: TTextTypeFace); 
 begin 
- inherited SetTextTypeFace(Value); 	 
+ //inherited SetTextTypeFace(Value);
+ FTextTypeFace:= Value;
  if(FInitialized) then 
    jEditText_setFontAndTextTypeFace(FjEnv, FjObject, Ord(FFontFace), Ord(FTextTypeFace)); 
 end; 
 
 procedure jEditText.SetHintTextColor(Value: TARGBColorBridge);
 begin
- inherited SetHintTextColor(Value);
- if(FInitialized) then
+ //inherited SetHintTextColor(Value);
+ FHintTextColor:= Value;
+ if FInitialized then
    jEditText_setHintTextColor(FjEnv, FjObject, GetARGB(FCustomColor, Value));
 end;
 
@@ -3843,6 +3931,7 @@ begin
 
   if FColor <> colbrDefault then
     View_SetBackGroundColor(FjEnv, FjThis, FjObject , GetARGB(FCustomColor, FColor));
+
   View_SetVisible(FjEnv, FjThis, FjObject , FVisible);
   FInitialized:= True;
 end;
@@ -3856,14 +3945,18 @@ end;
 
 procedure jProgressBar.Stop;
 begin
+  FProgress:= 0;
+  FVisible:= False;
+  if not FInitialized then Exit;
   SetProgress(0);
   SetVisible(False);
 end;
 
 procedure jProgressBar.Start;
 begin
-   SetProgress(FProgress);
-   SetVisible(True);
+  if not FInitialized then Exit;
+  SetVisible(True);
+  SetProgress(FProgress);
 end;
 
 Procedure jProgressBar.SetStyle(Value : TProgressBarStyle);
@@ -3881,7 +3974,7 @@ end;
 Procedure jProgressBar.Refresh;
 begin
   if not FInitialized then Exit;
-  View_Invalidate(FjEnv, FjObject );
+     View_Invalidate(FjEnv, FjObject );
 end;
 
 Function jProgressBar.GetProgress: integer;
@@ -3893,9 +3986,14 @@ end;
 
 Procedure jProgressBar.SetProgress(Value: integer);
 begin
-  if Value >= 0 then FProgress:= Value
-  else FProgress:= 0;
-  if FInitialized then
+  if Value >= 0 then
+    FProgress:= Value
+  else
+    FProgress:= 0;
+
+  if not FInitialized then Exit;
+
+  if  FjObject <> nil then
      jProgressBar_setProgress(FjEnv, FjObject , FProgress);
 end;
 
@@ -4489,27 +4587,6 @@ begin
   FUrls.Assign(Value);
 end;
 
-procedure jHttpClient.Get;
-begin
- if FInitialized then
-   jHttpClient_Get(FjEnv, FjObject, FUrl);
-end;
-
-procedure jHttpClient.Get(_stringUrl: string);
-begin
-  //in designing component state: result value here...
-  if FInitialized then
-      jHttpClient_Get(FjEnv, FjObject, _stringUrl);
-end;
-
-function jHttpClient.Get2(Link: string): string;
-begin
-
-  if(FInitialized) then
-    Result := jHTTPClient_Get2(FjEnv, FjObject, Link)
-  else Result := '';
-end;
-
 Procedure jHttpClient.SetUrlByIndex(Value: integer);
 begin
    FUrl:='';
@@ -4523,38 +4600,72 @@ begin
   if FInitialized then SetUrlByIndex(Value);
 end;
 
-procedure jHttpClient.PostNameValueData(_stringUrl: string; _name: string; _value: string);
+procedure jHttpClient.GetAsync;
+begin
+ if not FInitialized then Exit;
+ if  FUrl <> '' then
+   jHttpClient_GetAsync(FjEnv, FjObject, FUrl);
+end;
+
+procedure jHttpClient.GetAsync(_stringUrl: string);
 begin
   //in designing component state: result value here...
   if FInitialized then
-    jHttpClient_PostNameValueData(FjEnv, FjObject, _stringUrl ,_name ,_value);
+      jHttpClient_GetAsync(FjEnv, FjObject, _stringUrl);
 end;
 
-procedure jHttpClient.ClearPost2Values;
+function jHttpClient.Get(_stringUrl: string): string;
 begin
-
-  if(FInitialized) then jHTTPClient_ClearPost2Values(FjEnv, FjObject);
-end;
-
-procedure jHttpClient.AddValueForPost2(Name, Value: string);
-begin
-
-  if(FInitialized) then jHTTPClient_AddValueForPost2(FjEnv, FjObject, Name, Value);
-end;
-
-function jHttpClient.Post2(Link: string): string;
-begin
-
-  if(FInitialized) then
-    Result := jHTTPClient_Post2(FjEnv, FjObject, Link)
+  if FInitialized then
+    Result := jHTTPClient_Get2(FjEnv, FjObject, _stringUrl)
   else Result := '';
 end;
 
-procedure jHttpClient.PostNameValueData(_stringUrl: string; _listNameValue: string);
+function jHttpClient.Get: string;
+begin
+  Result := '';
+  if not FInitialized then Exit;
+
+  if  FUrl <> '' then
+    Result := jHTTPClient_Get2(FjEnv, FjObject, FUrl)
+end;
+
+procedure jHttpClient.ClearNameValueData; //ClearPost2Values;
+begin
+  if(FInitialized) then jHTTPClient_ClearPost2Values(FjEnv, FjObject);
+end;
+
+procedure jHttpClient.AddNameValueData(_name, _value: string); //AddValueForPost2
+begin
+  if(FInitialized) then jHTTPClient_AddValueForPost2(FjEnv, FjObject, _name, _value);
+end;
+
+function jHttpClient.Post(_stringUrl: string): string;
+begin
+  if(FInitialized) then
+    Result := jHTTPClient_Post2(FjEnv, FjObject, _stringUrl)
+  else Result := '';
+end;
+
+procedure jHttpClient.PostNameValueDataAsync(_stringUrl: string);
 begin
   //in designing component state: result value here...
   if FInitialized then
-    jHttpClient_PostNameValueData(FjEnv, FjObject, _stringUrl ,_listNameValue);
+    jHttpClient_PostNameValueDataAsync(FjEnv, FjObject, _stringUrl);
+end;
+
+procedure jHttpClient.PostNameValueDataAsync(_stringUrl: string; _name: string; _value: string);
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+    jHttpClient_PostNameValueDataAsync(FjEnv, FjObject, _stringUrl ,_name ,_value);
+end;
+
+procedure jHttpClient.PostNameValueDataAsync(_stringUrl: string; _listNameValue: string);
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+    jHttpClient_PostNameValueDataAsync(FjEnv, FjObject, _stringUrl ,_listNameValue);
 end;
 
 procedure jHttpClient.GenEvent_OnHttpClientContentResult(Obj: TObject; content: string);
@@ -4820,7 +4931,7 @@ constructor jListView.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
   FFontSize:= 0;
-  FFontColor:= colbrDefault; //colbrRed;
+  FFontColor:= colbrDefault;
   FWidgetItem:= wgNone;
 
   FDelimiter:= '|';
@@ -5067,6 +5178,7 @@ begin
   FFontColor:= Value;
   //if (FInitialized = True) and (FFontColor <> colbrDefault ) then
     // jListView_setTextColor2(FjEnv, FjObject , GetARGB(FCustomColor, FFontColor), index);
+    //jListView_setTextColor(FjEnv, FjObject , GetARGB(FCustomColor, FFontColor));
 end;
 
 Procedure jListView.SetFontColorByIndex(Value: TARGBColorBridge; index: integer);
@@ -5277,20 +5389,37 @@ begin
 end;
 
 // Event : Java -> Pascal
-Procedure jListView.GenEvent_OnClick(Obj: TObject; Value: integer);
+Procedure jListView.GenEvent_OnClickCaptionItem(Obj: TObject; index: integer;  caption: string);
 begin
-  if Assigned(FOnClickItem) then FOnClickItem(Obj,Value);
+  if Assigned(FOnClickItem) then FOnClickItem(Obj,index, caption);
 end;
 
-//by jmpessoa
 procedure jListView.GenEvent_OnClickWidgetItem(Obj: TObject; index: integer; checked: boolean);
 begin
   if Assigned(FOnClickWidgetItem) then FOnClickWidgetItem(Obj,index,checked);
 end;
 
-procedure jListView.GenEvent_OnClickCaptionItem(Obj: TObject; index: integer; caption: string);
+procedure jListView.GenEvent_OnLongClickCaptionItem(Obj: TObject; index: integer; caption: string);
 begin
-  if Assigned(FOnClickCaptionItem) then FOnClickCaptionItem(Obj,index,caption);
+  if Assigned(FOnLongClickItem) then FOnLongClickItem(Obj,index,caption);
+end;
+
+procedure jListView.GenEvent_OnDrawItemCaptionColor(Obj: TObject; index: integer; caption: string;  out color: dword);
+var
+  outColor: TARGBColorBridge;
+begin
+  outColor:= Self.FontColor;
+  color:= 0; //default;
+  if Assigned(FOnDrawItemTextColor) then FOnDrawItemTextColor(Obj,index,caption, outColor);
+  if (outColor <> colbrNone) and  (outColor <> colbrDefault) then
+      color:= GetARGB(FCustomColor, outColor);
+end;
+
+
+procedure jListView.GenEvent_OnDrawItemBitmap(Obj: TObject; index: integer; caption: string;  out bitmap: JObject);
+begin
+  bitmap:=  nil;
+  if Assigned(FOnDrawItemBitmap) then FOnDrawItemBitmap(Obj,index,caption, bitmap);
 end;
 
 procedure jListView.SetHighLightSelectedItem(_value: boolean);
@@ -5307,6 +5436,34 @@ begin
   FHighLightSelectedItemColor:= _color;
   if FInitialized then
      jListView_SetHighLightSelectedItemColor(FjEnv, FjObject, GetARGB(FCustomColor, _color));
+end;
+
+function jListView.GetItemIndex(): integer;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jListView_GetItemIndex(FjEnv, FjObject);
+end;
+
+function jListView.GetItemCaption(): string;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jListView_GetItemCaption(FjEnv, FjObject);
+end;
+
+procedure jListView.DispatchOnDrawItemTextColor(_value: boolean);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jListView_SetDispatchOnDrawItemTextColor(FjEnv, FjObject, _value);
+end;
+
+procedure jListView.DispatchOnDrawItemBitmap(_value: boolean);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jListView_DispatchOnDrawItemBitmap(FjEnv, FjObject, _value);
 end;
 
 //------------------------------------------------------------------------------
@@ -7021,6 +7178,7 @@ begin
   FjObject  := nil;
   FTitle:= 'Lamw: Lazarus Android Module Wizard';
   FMsg:= 'Please, wait...';
+  FInitialized:= False;
 end;
 
 Destructor jDialogProgress.Destroy;
@@ -7034,6 +7192,15 @@ begin
     end;
   end;
   inherited Destroy;
+end;
+
+procedure jDialogProgress.Init(refApp: jApp);
+begin
+  if FInitialized  then Exit;
+  inherited Init(refApp); //set default ViewParent/FjPRLayout as jForm.View!
+  //your code here: set/initialize create params....
+  FjObject:= jDialogProgress_Create(FjEnv, gApp.Jni.jThis, Self, FTitle, FMsg);
+  FInitialized:= True;
 end;
 
 procedure jDialogProgress.Stop;
@@ -7052,16 +7219,8 @@ end;
 procedure jDialogProgress.Start;
 begin
   if FInitialized then
-     jDialogProgress_Show(FjEnv, FjObject);
-end;
+     jDialogProgress_Show(FjEnv, FjObject)
 
-procedure jDialogProgress.Init(refApp: jApp);
-begin
-  if FInitialized  then Exit;
-  inherited Init(refApp); //set default ViewParent/FjPRLayout as jForm.View!
-  //your code here: set/initialize create params....
-  FjObject:= jDialogProgress_Create(FjEnv, gApp.Jni.jThis, Self, FTitle, FMsg);
-  FInitialized:= True;
 end;
 
 procedure jDialogProgress.Show();
@@ -7089,8 +7248,9 @@ procedure jDialogProgress.SetMessage(_msg: string);
 begin
   //in designing component state: set value here...
   FMsg:= _msg;
-  if FInitialized then
-     jDialogProgress_SetMessage(FjEnv, FjObject, _msg);
+  if not FInitialized then  Exit;
+     if FjObject <> nil then
+        jDialogProgress_SetMessage(FjEnv, FjObject, _msg);
 end;
 
 procedure jDialogProgress.SetTitle(_title: string);
@@ -7670,6 +7830,14 @@ function jSqliteCursor.GetValueAsFloat(columnIndex: integer): real;
 begin
   if not FInitialized  then Exit;
     Result:=  jSqliteCursor_GetValueAsFloat(FjEnv, FjObject , columnIndex);
+end;
+
+//position = -1 --->> Last Row !!!
+function jSqliteCursor.GetValueAsString(position: integer; columnName: string): string;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jSqliteCursor_GetValueAsString(FjEnv, FjObject, position ,columnName);
 end;
 
 

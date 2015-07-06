@@ -1,5 +1,5 @@
 {hint: save all files to location: C:\adt32\eclipse\workspace\AppContactManagerDemo2\jni}
-library controls;  //by Lamw: Lazarus Android Module Wizard: 6/30/2015 16:06:22]
+library controls;  //by Lamw: Lazarus Android Module Wizard: 7/5/2015 15:36:04]
  
 {$mode delphi}
  
@@ -288,6 +288,30 @@ begin
 end;
 
 { Class:     com_example_appcontactmanagerdemo2_Controls
+  Method:    pOnListViewLongClickCaptionItem
+  Signature: (JILjava/lang/String;)V }
+procedure pOnListViewLongClickCaptionItem(PEnv: PJNIEnv; this: JObject; pasobj: JLong; position: JInt; caption: JString); cdecl;
+begin
+  Java_Event_pOnListViewLongClickCaptionItem(PEnv,this,TObject(pasobj),position,caption);
+end;
+
+{ Class:     com_example_appcontactmanagerdemo2_Controls
+  Method:    pOnListViewDrawItemCaptionColor
+  Signature: (JILjava/lang/String;)I }
+function pOnListViewDrawItemCaptionColor(PEnv: PJNIEnv; this: JObject; pasobj: JLong; position: JInt; caption: JString): JInt; cdecl;
+begin
+  Result:=Java_Event_pOnListViewDrawItemCaptionColor(PEnv,this,TObject(pasobj),position,caption);
+end;
+
+{ Class:     com_example_appcontactmanagerdemo2_Controls
+  Method:    pOnListViewDrawItemBitmap
+  Signature: (JILjava/lang/String;)Landroid/graphics/Bitmap; }
+function pOnListViewDrawItemBitmap(PEnv: PJNIEnv; this: JObject; pasobj: JLong; position: JInt; caption: JString): JObject; cdecl;
+begin
+  Result:=Java_Event_pOnListViewDrawItemBitmap(PEnv,this,TObject(pasobj),position,caption);
+end;
+
+{ Class:     com_example_appcontactmanagerdemo2_Controls
   Method:    pOnBluetoothEnabled
   Signature: (J)V }
 procedure pOnBluetoothEnabled(PEnv: PJNIEnv; this: JObject; pasobj: JLong); cdecl;
@@ -500,7 +524,31 @@ end;
   Signature: (JILjava/lang/String;)V }
 procedure pOnClickGridItem(PEnv: PJNIEnv; this: JObject; pasobj: JLong; position: JInt; caption: JString); cdecl;
 begin
-  Java_Event_pOnClickGridItem(PEnv,this,TObject(pasobj),position,caption);
+  Java_Event_pOnClickGridItem(PEnv,this,TObject(pasobj),position,caption);                            
+end;
+
+{ Class:     com_example_appcontactmanagerdemo2_Controls
+  Method:    pOnLongClickGridItem
+  Signature: (JILjava/lang/String;)V }
+procedure pOnLongClickGridItem(PEnv: PJNIEnv; this: JObject; pasobj: JLong; position: JInt; caption: JString); cdecl;
+begin
+  Java_Event_pOnLongClickGridItem(PEnv,this,TObject(pasobj),position,caption);
+end;
+
+{ Class:     com_example_appcontactmanagerdemo2_Controls
+  Method:    pOnGridDrawItemCaptionColor
+  Signature: (JILjava/lang/String;)I }
+function pOnGridDrawItemCaptionColor(PEnv: PJNIEnv; this: JObject; pasobj: JLong; position: JInt; caption: JString): JInt; cdecl;
+begin
+  Result:=Java_Event_pOnGridDrawItemCaptionColor(PEnv,this,TObject(pasobj),position,caption);
+end;
+
+{ Class:     com_example_appcontactmanagerdemo2_Controls
+  Method:    pOnGridDrawItemBitmap
+  Signature: (JILjava/lang/String;)Landroid/graphics/Bitmap; }
+function pOnGridDrawItemBitmap(PEnv: PJNIEnv; this: JObject; pasobj: JLong; position: JInt; caption: JString): JObject; cdecl;
+begin
+  Result:=Java_Event_pOnGridDrawItemBitmap(PEnv,this,TObject(pasobj),position,caption);
 end;
 
 { Class:     com_example_appcontactmanagerdemo2_Controls
@@ -703,7 +751,7 @@ begin
   Result:=Java_Event_pOnContactManagerContactsProgress(PEnv,this,TObject(pasobj),contactInfo,contactShortInfo,contactPhotoUriAsString,contactPhoto,progress);
 end;
 
-const NativeMethods:array[0..86] of JNINativeMethod = (
+const NativeMethods:array[0..92] of JNINativeMethod = (
    (name:'pAppOnScreenStyle';
     signature:'()I';
     fnPtr:@pAppOnScreenStyle;),
@@ -809,6 +857,15 @@ const NativeMethods:array[0..86] of JNINativeMethod = (
    (name:'pOnClickCaptionItem';
     signature:'(JILjava/lang/String;)V';
     fnPtr:@pOnClickCaptionItem;),
+   (name:'pOnListViewLongClickCaptionItem';
+    signature:'(JILjava/lang/String;)V';
+    fnPtr:@pOnListViewLongClickCaptionItem;),
+   (name:'pOnListViewDrawItemCaptionColor';
+    signature:'(JILjava/lang/String;)I';
+    fnPtr:@pOnListViewDrawItemCaptionColor;),
+   (name:'pOnListViewDrawItemBitmap';
+    signature:'(JILjava/lang/String;)Landroid/graphics/Bitmap;';
+    fnPtr:@pOnListViewDrawItemBitmap;),
    (name:'pOnBluetoothEnabled';
     signature:'(J)V';
     fnPtr:@pOnBluetoothEnabled;),
@@ -890,6 +947,15 @@ const NativeMethods:array[0..86] of JNINativeMethod = (
    (name:'pOnClickGridItem';
     signature:'(JILjava/lang/String;)V';
     fnPtr:@pOnClickGridItem;),
+   (name:'pOnLongClickGridItem';
+    signature:'(JILjava/lang/String;)V';
+    fnPtr:@pOnLongClickGridItem;),
+   (name:'pOnGridDrawItemCaptionColor';
+    signature:'(JILjava/lang/String;)I';
+    fnPtr:@pOnGridDrawItemCaptionColor;),
+   (name:'pOnGridDrawItemBitmap';
+    signature:'(JILjava/lang/String;)Landroid/graphics/Bitmap;';
+    fnPtr:@pOnGridDrawItemBitmap;),
    (name:'pOnChangedSensor';
     signature:'(JLandroid/hardware/Sensor;I[FJ)V';
     fnPtr:@pOnChangedSensor;),
@@ -1055,6 +1121,9 @@ exports
   pOnAsyncEventPostExecute name 'Java_com_example_appcontactmanagerdemo2_Controls_pOnAsyncEventPostExecute',
   pOnClickWidgetItem name 'Java_com_example_appcontactmanagerdemo2_Controls_pOnClickWidgetItem',
   pOnClickCaptionItem name 'Java_com_example_appcontactmanagerdemo2_Controls_pOnClickCaptionItem',
+  pOnListViewLongClickCaptionItem name 'Java_com_example_appcontactmanagerdemo2_Controls_pOnListViewLongClickCaptionItem',
+  pOnListViewDrawItemCaptionColor name 'Java_com_example_appcontactmanagerdemo2_Controls_pOnListViewDrawItemCaptionColor',
+  pOnListViewDrawItemBitmap name 'Java_com_example_appcontactmanagerdemo2_Controls_pOnListViewDrawItemBitmap',
   pOnBluetoothEnabled name 'Java_com_example_appcontactmanagerdemo2_Controls_pOnBluetoothEnabled',
   pOnBluetoothDisabled name 'Java_com_example_appcontactmanagerdemo2_Controls_pOnBluetoothDisabled',
   pOnBluetoothDeviceFound name 'Java_com_example_appcontactmanagerdemo2_Controls_pOnBluetoothDeviceFound',
@@ -1082,6 +1151,9 @@ exports
   pOnClickToggleButton name 'Java_com_example_appcontactmanagerdemo2_Controls_pOnClickToggleButton',
   pOnChangeSwitchButton name 'Java_com_example_appcontactmanagerdemo2_Controls_pOnChangeSwitchButton',
   pOnClickGridItem name 'Java_com_example_appcontactmanagerdemo2_Controls_pOnClickGridItem',
+  pOnLongClickGridItem name 'Java_com_example_appcontactmanagerdemo2_Controls_pOnLongClickGridItem',
+  pOnGridDrawItemCaptionColor name 'Java_com_example_appcontactmanagerdemo2_Controls_pOnGridDrawItemCaptionColor',
+  pOnGridDrawItemBitmap name 'Java_com_example_appcontactmanagerdemo2_Controls_pOnGridDrawItemBitmap',
   pOnChangedSensor name 'Java_com_example_appcontactmanagerdemo2_Controls_pOnChangedSensor',
   pOnListeningSensor name 'Java_com_example_appcontactmanagerdemo2_Controls_pOnListeningSensor',
   pOnUnregisterListeningSensor name 'Java_com_example_appcontactmanagerdemo2_Controls_pOnUnregisterListeningSensor',

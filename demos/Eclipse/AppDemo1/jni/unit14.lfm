@@ -10,7 +10,6 @@ object AndroidModule14: TAndroidModule14
   Text = 'AndroidModule14'
   ActivityMode = actRecyclable
   BackgroundColor = colbrBlack
-  OnRotate = DataModuleRotate
   OnJNIPrompt = DataModuleJNIPrompt
   object jTextView1: jTextView
     Left = 87
@@ -50,9 +49,9 @@ object AndroidModule14: TAndroidModule14
     PosRelativeToParent = []
     LayoutParamWidth = lpMatchParent
     LayoutParamHeight = lpWrapContent
-    Text = 'HttpGet(www.firemedia.de/)'
+    Text = 'Http.GetAsync(www.firemedia.de/)'
     BackgroundColor = colbrDefault
-    FontColor = colbrDarkBlue
+    FontColor = colbrSteelBlue
     FontSize = 0
     OnClick = jButton1Click
     Id = 67114
@@ -225,15 +224,6 @@ object AndroidModule14: TAndroidModule14
     OnClick = jCheckBox1Click
     Id = 2231034
   end
-  object jAsyncTask1: jAsyncTask
-    Tag = 1
-    OnDoInBackground = jAsyncTask1DoInBackground
-    OnProgressUpdate = jAsyncTask1ProgressUpdate
-    OnPreExecute = jAsyncTask1PreExecute
-    OnPostExecute = jAsyncTask1PostExecute
-    left = 248
-    top = 12
-  end
   object jHttpClient1: jHttpClient
     IndexUrl = 0
     Urls.Strings = (
@@ -244,5 +234,12 @@ object AndroidModule14: TAndroidModule14
     OnCodeResult = jHttpClient1CodeResult
     left = 160
     top = 168
+  end
+  object jTimer1: jTimer
+    Enabled = False
+    Interval = 20
+    OnTimer = jTimer1Timer
+    left = 233
+    top = 171
   end
 end

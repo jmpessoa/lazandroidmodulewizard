@@ -19,8 +19,8 @@ type
       jSensorManager1: jSensorManager;
       jTextView1: jTextView;
       procedure jButton1Click(Sender: TObject);
-      procedure jListView1ClickCaptionItem(Sender: TObject; Item: integer;
-        caption: string);
+      procedure jListView1ClickItem(Sender: TObject; itemIndex: integer;
+        itemCaption: string);
     private
       {private declarations}
     public
@@ -54,15 +54,15 @@ begin
     SetLength(listTypes,0);
 end;
 
-procedure TAndroidModule1.jListView1ClickCaptionItem(Sender: TObject;
-  Item: integer; caption: string);
+procedure TAndroidModule1.jListView1ClickItem(Sender: TObject;
+  itemIndex: integer; itemCaption: string);
 var
     sensorName: string;
     index: integer;
     sensor: jObject;
 begin
-    index:= Pos('[', caption);
-    sensorName:= Copy(caption, 1, index-2);
+    index:= Pos('[', itemCaption);
+    sensorName:= Copy(itemCaption, 1, index-2);
     sensor:= jSensorManager1.GetSensor(sensorName);
     ShowMessage(jSensorManager1.GetSensorVendor(sensor));
 end;

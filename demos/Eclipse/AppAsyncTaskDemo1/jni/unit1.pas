@@ -65,7 +65,9 @@ procedure TAndroidModule1.jAsyncTask1PostExecute(Sender: TObject; progress: inte
 begin
   jButton1.Text:= 'Start Async Task ...';
   jProgressBar1.Stop;
-  jDialogProgress1.Stop;  //or Close
+
+  //jDialogProgress1.Stop;  //or Close
+
   jAsyncTask1.Done;
 end;
 
@@ -75,23 +77,25 @@ begin
    jButton1.Text:= 'Running ...';
    jProgressBar1.Progress:= 0;
    jProgressBar1.Start;
-   jDialogProgress1.Start; //or Show
+  // jDialogProgress1.Start; //or Show
 end;
 
 procedure TAndroidModule1.jAsyncTask1ProgressUpdate(Sender: TObject; progress: integer; out progressUpdate: integer);
 begin
+
    if progress <= jProgressBar1.Max then
    begin
       jProgressBar1.Progress:= progress;
-      jDialogProgress1.Msg:= 'Lamw: Please, wait... ['+IntToStr(Progress)+']';
+     // jDialogProgress1.Msg:= 'Lamw: Please, wait... ['+IntToStr(progress)+']';
       progressUpdate:= progress + 1; //out param !
    end
    else
    begin
-      jProgressBar1.Progress:= 0;
-      jDialogProgress1.Msg:= 'Lamw: Please, wait...';
-      progressUpdate:= 0;  //out param !
+     jProgressBar1.Progress:= 0;
+     //jDialogProgress1.Msg:= 'Lamw: Please, wait...';
+     progressUpdate:= 0;  //out param !
    end;
+
 end;
 
 procedure TAndroidModule1.jButton1Click(Sender: TObject);

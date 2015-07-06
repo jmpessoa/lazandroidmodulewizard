@@ -101,10 +101,13 @@ begin
   {bigbunny.mp4}   //default: from "assets"
   if not FIsLoaded then
   begin                         //http://bffmedia.com/bigbunny.mp4
-     jMediaPlayer1.SetDataSource('bigbunny.mp4');  //from  .../assets...pipershut2.mp3
+     jMediaPlayer1.SetDataSource('bigbunny.mp4');  //from  .../assets...  or pipershut2.mp3
      FIsLoaded:= True;
 
      ShowMessage('Loaded "bigbunny.mp4" from Assets!');
+
+     //or ShowMessage('Loaded "pipershut2.mp3" from Assets!');
+
      jMediaPlayer1.Prepare();  //Dispatch --> OnPrepared !
   end;
 end;

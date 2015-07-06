@@ -59,8 +59,8 @@ object AndroidModule1: TAndroidModule1
     ItemLayout = layImageTextWidget
     TextSizeDecorated = sdNone
     TextAlign = alLeft
-    OnClickCaptionItem = jListView1ClickCaptionItem
     HighLightSelectedItemColor = colbrDefault
+    OnClickItem = jListView1ClickItem
     Id = 713760
   end
   object jTextView2: jTextView

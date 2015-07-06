@@ -61,14 +61,8 @@ begin
 end;
 
 procedure TAndroidModule1.jButton1Click(Sender: TObject);
-var
-  i: integer;
 begin
-  for i:= 0 to 3000 do
-  begin
-    jSpinner1.Add('Item_Item_Item_Item_'+IntToStr(i));
-  end;
-  //ShowMessage('caption='+jSpinner1.GetSelectedItem() + ' :  Index='+IntToStr(jSpinner1.GetSelectedItemPosition()));
+  ShowMessage('caption='+jSpinner1.GetSelectedItem() + ' :  Index='+IntToStr(jSpinner1.GetSelectedItemPosition()));
 end;
 
 procedure TAndroidModule1.jButton2Click(Sender: TObject);

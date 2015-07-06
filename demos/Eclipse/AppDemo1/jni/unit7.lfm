@@ -7,18 +7,16 @@ object AndroidModule7: TAndroidModule7
   MarginTop = 0
   MarginRight = 0
   MarginBottom = 0
-  OnCreate = DataModuleCreate
   Text = 'AndroidModule7'
   ActivityMode = actRecyclable
   BackgroundColor = colbrBlack
   OnCloseQuery = DataModuleCloseQuery
   OnRotate = DataModuleRotate
-  OnJNIPrompt = DataModuleJNIPrompt
   object jTextView1: jTextView
-    Left = 80
-    Top = 8
-    Width = 140
-    Height = 25
+    Left = 81
+    Top = 10
+    Width = 137
+    Height = 20
     MarginLeft = 10
     MarginTop = 10
     MarginRight = 10
@@ -39,7 +37,7 @@ object AndroidModule7: TAndroidModule7
   end
   object jScrollView1: jScrollView
     Left = 8
-    Top = 40
+    Top = 72
     Width = 282
     Height = 200
     MarginLeft = 10
@@ -47,7 +45,7 @@ object AndroidModule7: TAndroidModule7
     MarginRight = 10
     MarginBottom = 10
     Visible = True
-    Anchor = jTextView1
+    Anchor = jTextView2
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = [rpCenterHorizontal]
     LayoutParamWidth = lpMatchParent
@@ -69,6 +67,7 @@ object AndroidModule7: TAndroidModule7
       ImageIndex = 0
       Images = jImageList1
       BackgroundColor = colbrDefault
+      ImageScaleType = scaleCenter
       Id = 7100012
     end
     object jImageView2: jImageView
@@ -85,6 +84,7 @@ object AndroidModule7: TAndroidModule7
       ImageIndex = 1
       Images = jImageList1
       BackgroundColor = colbrDefault
+      ImageScaleType = scaleCenter
       Id = 3953947
     end
     object jImageView3: jImageView
@@ -102,6 +102,7 @@ object AndroidModule7: TAndroidModule7
       ImageIndex = 2
       Images = jImageList1
       BackgroundColor = colbrDefault
+      ImageScaleType = scaleCenter
       Id = 7668691
     end
     object jImageView4: jImageView
@@ -119,6 +120,7 @@ object AndroidModule7: TAndroidModule7
       ImageIndex = 3
       Images = jImageList1
       BackgroundColor = colbrDefault
+      ImageScaleType = scaleCenter
       Id = 3535108
     end
     object jImageView5: jImageView
@@ -136,20 +138,21 @@ object AndroidModule7: TAndroidModule7
       ImageIndex = 4
       Images = jImageList1
       BackgroundColor = colbrDefault
+      ImageScaleType = scaleCenter
       Id = 0
     end
   end
   object jTextView2: jTextView
-    Left = 80
-    Top = 248
-    Width = 184
-    Height = 25
+    Left = 57
+    Top = 50
+    Width = 185
+    Height = 20
     MarginLeft = 10
     MarginTop = 10
     MarginRight = 10
     MarginBottom = 10
     Visible = True
-    Anchor = jScrollView1
+    Anchor = jTextView1
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = [rpCenterHorizontal]
     LayoutParamWidth = lpWrapContent
@@ -164,18 +167,18 @@ object AndroidModule7: TAndroidModule7
     Id = 10102
   end
   object jTextView3: jTextView
-    Left = 192
-    Top = 296
-    Width = 100
-    Height = 25
+    Left = 207
+    Top = 292
+    Width = 83
+    Height = 20
     MarginLeft = 10
     MarginTop = 10
     MarginRight = 10
     MarginBottom = 10
     Visible = True
-    Anchor = jImageBtn1
-    PosRelativeToAnchor = [raToRightOf, raAlignBottom]
-    PosRelativeToParent = []
+    Anchor = jScrollView1
+    PosRelativeToAnchor = [raBelow]
+    PosRelativeToParent = [rpRight]
     LayoutParamWidth = lpWrapContent
     LayoutParamHeight = lpWrapContent
     Text = '<<---- Click it!'
@@ -189,7 +192,7 @@ object AndroidModule7: TAndroidModule7
   end
   object jImageBtn1: jImageBtn
     Left = 120
-    Top = 285
+    Top = 308
     Width = 48
     Height = 48
     MarginLeft = 5
@@ -197,7 +200,7 @@ object AndroidModule7: TAndroidModule7
     MarginRight = 5
     MarginBottom = 5
     Visible = True
-    Anchor = jTextView2
+    Anchor = jScrollView1
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = [rpCenterHorizontal]
     LayoutParamWidth = lp48px
@@ -218,8 +221,8 @@ object AndroidModule7: TAndroidModule7
       'Lazarus_Logo_new.png'
       'btn1_2.png'
     )
-    left = 184
-    top = 48
+    left = 200
+    top = 120
   end
   object jImageList2: jImageList
     Images.Strings = (
@@ -227,6 +230,6 @@ object AndroidModule7: TAndroidModule7
       'Graphic_tools2.png'
     )
     left = 40
-    top = 264
+    top = 336
   end
 end

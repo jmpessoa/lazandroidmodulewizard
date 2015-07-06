@@ -9,7 +9,7 @@ uses
 
 type
 
-TOnItemSelected = procedure(Sender: TObject; caption: string; position: integer) of object;
+TOnItemSelected = procedure(Sender: TObject; itemCaption: string; itemIndex: integer) of object;
 
 {Draft Component code by "Lazarus Android Module Wizard" [6/12/2014 3:35:32]}
 {https://github.com/jmpessoa/lazandroidmodulewizard}
@@ -26,7 +26,7 @@ TOnItemSelected = procedure(Sender: TObject; caption: string; position: integer)
     FDropListBackgroundColor: TARGBColorBridge;
     FLastItemAsPrompt: boolean;
 
-    FFontSize: integer;
+    //FFontSize: integer;
 
     procedure SetColor(Value: TARGBColorBridge);
 
@@ -63,7 +63,7 @@ TOnItemSelected = procedure(Sender: TObject; caption: string; position: integer)
     procedure Delete(_index: integer);
     procedure SetSelection(_index: integer);
     procedure SetItem(_index: integer; _item: string);
-    procedure SetTextFontSize(_txtFontSize: integer);
+    procedure SetFontSize(_txtFontSize: DWord);
 
     property jParent: jObject  read  FjPRLayout write SetjParent; // Java : Parent Relative Layout
 
@@ -80,7 +80,7 @@ TOnItemSelected = procedure(Sender: TObject; caption: string; position: integer)
     property DropListTextColor: TARGBColorBridge read FDropListTextColor write SetDropListTextColor;
     property DropListBackgroundColor: TARGBColorBridge  read FDropListBackgroundColor write SetDropListBackgroundColor;
     property LastItemAsPrompt: boolean read FLastItemAsPrompt write SetLastItemAsPrompt;
-    property FontSize: integer read FFontSize write SetTextFontSize;
+    property FontSize: Dword read FFontSize write SetFontSize;
   end;
 
 function jSpinner_jCreate(env: PJNIEnv; this: JObject;_Self: int64): jObject;
@@ -514,7 +514,7 @@ begin
     SetSelectedTextColor(GetARGB(FCustomColor, FSelectedFontColor));
 end;
 
-procedure jSpinner.SetTextFontSize(_txtFontSize: integer);
+procedure jSpinner.SetFontSize(_txtFontSize: DWord);
 begin
   //in designing component state: set value here...
   FFontSize:= _txtFontSize;

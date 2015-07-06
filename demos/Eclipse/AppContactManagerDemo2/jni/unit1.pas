@@ -21,6 +21,7 @@ type
     jProgressBar1: jProgressBar;
     jTextView1: jTextView;
     procedure AndroidModule1Create(Sender: TObject);
+    procedure AndroidModule1JNIPrompt(Sender: TObject);
     procedure jButton1Click(Sender: TObject);
     procedure jContactManager1GetContactsFinished(Sender: TObject;
       count: integer);
@@ -28,8 +29,8 @@ type
       contactInfo: string; contactShortInfo: string;
       contactPhotoUriAsString: string; contactPhoto: jObject;
       progress: integer; out continueListing: boolean);
-    procedure jListView1ClickCaptionItem(Sender: TObject; Item: integer;
-      caption: string);
+    procedure jListView1ClickItem(Sender: TObject; itemIndex: integer;
+      itemCaption: string);
   private
     {private declarations}
     FInProgress: boolean;
@@ -54,7 +55,7 @@ begin
      jProgressBar1.Start;
      FInProgress:= True;
      jListView1.Clear;
-     jContactManager1.GetContactsAsyn('|'); //handled by OnGetContactsProgress ...
+     jContactManager1.GetContactsAsync('|'); //handled by OnGetContactsProgress ...
   end
   else ShowMessage('Please, wait....');
 end;
@@ -83,9 +84,10 @@ begin
   if jProgressBar1.Progress >= jProgressBar1.Max then jProgressBar1.Progress:= 0;
 end;
 
-procedure TAndroidModule1.jListView1ClickCaptionItem(Sender: TObject; Item: integer; caption: string);
+procedure TAndroidModule1.jListView1ClickItem(Sender: TObject;
+  itemIndex: integer; itemCaption: string);
 var
-  i: integer;
+  //i: integer;
   captionParts: TStringList;
   contactInfoParts: TStringList;
   contactDisplayName: string;
@@ -96,7 +98,7 @@ begin
   captionParts:= TStringList.Create;
   captionParts.Delimiter:= '|';
   captionParts.StrictDelimiter:= True;
-  captionParts.DelimitedText:= caption; //displayName|mobile|phone [Home]|phone [Work]|email|email|email|orgName|jobtitle| ...
+  captionParts.DelimitedText:= itemCaption; //displayName|mobile|phone [Home]|phone [Work]|email|email|email|orgName|jobtitle| ...
 
   //ShowMessage(caption);
   {
@@ -124,7 +126,7 @@ begin
   //just test 2!
   if contactInfoParts.Strings[contactInfoParts.Count-1] = ':)' then  // ':)' -->dummy [not valid photoUriAsString]
   begin
-     jListView1.SetImageByIndex(jImageFileManager1.LoadFromResources('ic_launcher'), Item);
+     jListView1.SetImageByIndex(jImageFileManager1.LoadFromResources('ic_launcher'), itemIndex);
 
      //if contact is in SIM card not will update photo ...
     jContactManager1.UpdatePhoto(contactDisplayName, jImageFileManager1.LoadFromResources('ic_launcher'));
@@ -140,6 +142,12 @@ end;
 procedure TAndroidModule1.AndroidModule1Create(Sender: TObject);
 begin
   FInProgress:= False;
+end;
+
+procedure TAndroidModule1.AndroidModule1JNIPrompt(Sender: TObject);
+begin
+  jListView1.DispatchOnDrawItemBitmap(False);  //better performace!
+  jListView1.DispatchOnDrawItemTextColor(False);  //better performace!
 end;
 
 end.

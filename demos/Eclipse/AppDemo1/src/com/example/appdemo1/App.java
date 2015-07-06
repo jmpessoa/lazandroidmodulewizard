@@ -1,6 +1,6 @@
 package com.example.appdemo1;
 
-//Lamw: Lazarus Android Module Wizard - Version 0.6 - rev. 29 - 08 June - 2015
+//Lamw: Lazarus Android Module Wizard - Version 0.6 - rev. 32 - 05 July - 2015
 //Form Designer and Components development model!
 //https://github.com/jmpessoa/lazandroidmodulewizard
 //http://forum.lazarus.freepascal.org/index.php/topic,21919.270.html
@@ -48,9 +48,8 @@ import android.util.Log;
 // http://stackoverflow.com/questions/16282294/show-title-bar-from-code
 public class App extends Activity {
     
-	private Controls       controls;    
-   
-
+	private Controls       controls;
+	   
     @Override
     public void onCreate(Bundle savedInstanceState) {
      super.onCreate(savedInstanceState);                            
@@ -83,41 +82,31 @@ public class App extends Activity {
     }
        
     @Override    
-    protected void onNewIntent(Intent intent) { super.onNewIntent(intent);
-    	                                        controls.jAppOnNewIntent();     }
+    protected void onNewIntent(Intent intent) {super.onNewIntent(intent); controls.jAppOnNewIntent();}
     
     @Override
-    protected void onDestroy()                { super.onDestroy(); 
-    	                                        controls.jAppOnDestroy();       }
+    protected void onDestroy() { super.onDestroy(); controls.jAppOnDestroy();}
     
     @Override
-    protected void onPause()                  { super.onPause();
-                                                //Log.i("jApp","onPause");
-    	                                        controls.jAppOnPause();         }    
+    protected void onPause() {super.onPause();  controls.jAppOnPause();}
     
     @Override
-    protected void onRestart()                { super.onRestart();
-                                                //Log.i("jApp","onRestart");
-    	                                        controls.jAppOnRestart();    	  }
-
+    protected void onRestart() {super.onRestart(); controls.jAppOnRestart();}
+                                    	                                        
     @Override
-    protected void onResume()                 { super.onResume();  
-    	                                        controls.jAppOnResume();        }
-
+    protected void onResume() { super.onResume(); controls.jAppOnResume();}  
+    	                                        
     @Override
-    protected void onStart()                  { super.onStart();
-                                                //Log.i("jApp","onStart");
-    	                                        controls.jAppOnStart();        }
+    protected void onStart() { super.onStart(); controls.jAppOnStart(); }
+                                                  	                                        
     @Override
-    protected void onStop()                   { super.onStop(); 
-    	                                        controls.jAppOnStop();          }
-
+    protected void onStop() { super.onStop(); controls.jAppOnStop();} 
+    	                                        
     @Override
-    public    void onBackPressed()            { controls.jAppOnBackPressed();   }
+    public    void onBackPressed() { controls.jAppOnBackPressed();}
     
     @Override
-    public    void onConfigurationChanged(Configuration newConfig)
-    {
+    public    void onConfigurationChanged(Configuration newConfig) {
     	super.onConfigurationChanged(newConfig);
     	controls.jAppOnRotate(newConfig.orientation);
     	controls.jAppOnConfigurationChanged();
@@ -127,13 +116,6 @@ public class App extends Activity {
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
       controls.jAppOnActivityResult(requestCode,resultCode,data);                                     
     }
-
-   //by jmpessoa: option menu support
-   @Override
-   public boolean onCreateOptionsMenu(Menu menu) {
-    	controls.jAppOnCreateOptionsMenu(menu);
-        return true;
-   }
 
    /*by jmpessoa: Handles menu item selections */
    @Override
@@ -147,7 +129,7 @@ public class App extends Activity {
    @Override    
    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
       super.onCreateContextMenu(menu, v, menuInfo);
-      Log.i("App.Java_onCreateContextMenu", "long_pressed!");
+      //Log.i("App.Java_onCreateContextMenu", "long_pressed!");
       controls.jAppOnCreateContextMenu(menu);              
    }
 
@@ -158,14 +140,31 @@ public class App extends Activity {
    	  controls.jAppOnClickContextMenuItem(item, item.getItemId(), caption, item.isChecked());
       return false;
    }
-   
+
+   //by jmpessoa: option menu support
+   @Override
+   public boolean onCreateOptionsMenu(Menu menu) {
+	    controls.jAppOnCreateOptionsMenu(menu);
+        return true;
+   }   
    
    /*by jmpessoa: TODO :Handles prepare menu item*/
    @Override
    public boolean onPrepareOptionsMenu(Menu menu) {
-       super.onPrepareOptionsMenu(menu);
-       //TODO!!!!
-       return true;
+       //super.onPrepareOptionsMenu(menu);        
+	   boolean changeMenuItems = false;
+	   boolean continueChangingItem = true;
+	   	   
+	   changeMenuItems =controls.jAppOnPrepareOptionsMenu(menu, menu.size());
+	   	   
+       if (changeMenuItems) {    	  
+          for  (int  i = 0; i < menu.size(); i++) { 
+             MenuItem item = menu.getItem(i); 
+             continueChangingItem = controls.jAppOnPrepareOptionsItem(menu, item, i); 
+             if (!continueChangingItem)  break;
+          }         
+       } 
+       return super.onPrepareOptionsMenu(menu);
    }
    
    /*by jmpessoa: TODO :Handles opened menu */

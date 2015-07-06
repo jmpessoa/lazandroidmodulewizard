@@ -9,7 +9,7 @@ uses
 
 type
 
-TOnClickGridItem = procedure(Sender: TObject; position: integer; caption: string) of Object;
+TOnClickGridItem = procedure(Sender: TObject; itemIndex: integer; itemCaption: string) of Object;
 TGridItemLayout = (ilImageText, ilTextImage);
 
 {Draft Component code by "Lazarus Android Module Wizard" [1/9/2015 21:12:18]}
@@ -20,6 +20,10 @@ TGridItemLayout = (ilImageText, ilTextImage);
   jGridView = class(jVisualControl)
   private
     FOnClickGridItem: TOnClickGridItem;
+    FOnLongClickGridItem: TOnClickGridItem;
+    FOnDrawItemTextColor: TOnDrawItemTextColor;
+    FOnDrawItemBitmap: TOnDrawItemBitmap;
+
     FColumns: integer;
     FItemsLayout: TGridItemLayout;
 
@@ -35,6 +39,7 @@ TGridItemLayout = (ilImageText, ilTextImage);
     procedure ClearLayout;
 
     procedure GenEvent_OnClickGridItem(Obj: TObject; position: integer; caption: string);
+    procedure GenEvent_OnLongClickGridItem(Obj: TObject; position: integer; caption: string);
 
     function jCreate(): jObject;
     procedure jFree();
@@ -56,12 +61,28 @@ TGridItemLayout = (ilImageText, ilTextImage);
     procedure Clear();
     procedure Delete(_index: integer);
     procedure SetItemsLayout(_value: TGridItemLayout);
+    function GetItemIndex(): integer;
+    function GetItemCaption(): string;
+
+    procedure DispatchOnDrawItemTextColor(_value: boolean);
+    procedure DispatchOnDrawItemBitmap(_value: boolean);
+
+    procedure SetFontSize(_size: Dword);
+    procedure SetFontColor(_color: TARGBColorBridge);
+
+    procedure GenEvent_OnDrawItemCaptionColor(Obj: TObject; index: integer; caption: string;  out color: dword);
+    procedure GenEvent_OnDrawItemBitmap(Obj: TObject; index: integer; caption: string;  out bitmap: JObject);
 
   published
     property BackgroundColor: TARGBColorBridge read FColor write SetColor;
     property Columns: integer read FColumns write SetNumColumns;
     property ItemsLayout: TGridItemLayout read FItemsLayout write SetItemsLayout;
-    property OnClick: TOnClickGridItem read FOnClickGridItem write FOnClickGridItem;
+    property  FontSize: Dword read FFontSize write SetFontSize;
+    property  FontColor: TARGBColorBridge read FFontColor write SetFontColor;
+    property OnClickItem: TOnClickGridItem read FOnClickGridItem write FOnClickGridItem;
+    property OnLongClickItem: TOnClickGridItem  read FOnLongClickGridItem write FOnLongClickGridItem;
+    property OnDrawItemTextColor: TOnDrawItemTextColor read FOnDrawItemTextColor write FOnDrawItemTextColor;
+    property OnDrawItemBitmap: TOnDrawItemBitmap read FOnDrawItemBitmap write FOnDrawItemBitmap;
 
   end;
 
@@ -84,6 +105,13 @@ procedure jGridView_SetColumnWidth(env: PJNIEnv; _jgridview: JObject; _value: in
 procedure jGridView_Clear(env: PJNIEnv; _jgridview: JObject);
 procedure jGridView_Delete(env: PJNIEnv; _jgridview: JObject; _index: integer);
 procedure jGridView_SetItemsLayout(env: PJNIEnv; _jgridview: JObject; _value: integer);
+function jGridView_GetItemIndex(env: PJNIEnv; _jgridview: JObject): integer;
+function jGridView_GetItemCaption(env: PJNIEnv; _jgridview: JObject): string;
+
+procedure jGridView_DispatchOnDrawItemTextColor(env: PJNIEnv; _jgridview: JObject; _value: boolean);
+procedure jGridView_DispatchOnDrawItemBitmap(env: PJNIEnv; _jgridview: JObject; _value: boolean);
+procedure jGridView_SetFontSize(env: PJNIEnv; _jgridview: JObject; _size: integer);
+procedure jGridView_SetFontColor(env: PJNIEnv; _jgridview: JObject; _color: integer);
 
 
 implementation
@@ -108,6 +136,7 @@ begin
 //your code here....
   FColumns:= -1; //AUTO_FIT
   FItemsLayout:= ilImageText;
+
 end;
 
 destructor jGridView.Destroy;
@@ -185,9 +214,19 @@ begin
   end;
   if Self.Anchor <> nil then Self.AnchorId:= Self.Anchor.Id
   else Self.AnchorId:= -1; //dummy
+
+
   jGridView_SetLayoutAll(FjEnv, FjObject, Self.AnchorId);
+
+
   if  FColor <> colbrDefault then
     View_SetBackGroundColor(FjEnv, FjObject, GetARGB(FCustomColor, FColor));
+
+  if FFontColor <> colbrDefault then
+    jGridView_SetFontColor(FjEnv, FjObject, GetARGB(FCustomColor, FFontColor));
+
+  if FFontSize <> 0 then
+    jGridView_SetFontSize(FjEnv, FjObject,FFontSize);
 
   if FItemsLayout <> ilImageText then
       jGridView_SetItemsLayout(FjEnv, FjObject, Ord(FItemsLayout));
@@ -290,6 +329,11 @@ end;
 procedure jGridView.GenEvent_OnClickGridItem(Obj: TObject; position: integer; caption: string);
 begin
   if Assigned(FOnClickGridItem) then FOnClickGridItem(Obj, position, caption);
+end;
+
+procedure jGridView.GenEvent_OnLongClickGridItem(Obj: TObject; position: integer; caption: string);
+begin
+  if Assigned(FOnLongClickGridItem) then FOnLongClickGridItem(Obj, position, caption);
 end;
 
 function jGridView.jCreate(): jObject;
@@ -424,6 +468,67 @@ begin
   FItemsLayout:= _value;
   if FInitialized then
      jGridView_SetItemsLayout(FjEnv, FjObject, Ord(_value));
+end;
+
+function jGridView.GetItemIndex(): integer;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jGridView_GetItemIndex(FjEnv, FjObject);
+end;
+
+function jGridView.GetItemCaption(): string;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jGridView_GetItemCaption(FjEnv, FjObject);
+end;
+
+procedure jGridView.DispatchOnDrawItemTextColor(_value: boolean);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jGridView_DispatchOnDrawItemTextColor(FjEnv, FjObject, _value);
+end;
+
+procedure jGridView.DispatchOnDrawItemBitmap(_value: boolean);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jGridView_DispatchOnDrawItemBitmap(FjEnv, FjObject, _value);
+end;
+
+procedure jGridView.SetFontSize(_size: Dword);
+begin
+  //in designing component state: set value here...
+  FFontSize:= _size;
+  if FInitialized then
+     jGridView_SetFontSize(FjEnv, FjObject, _size);
+end;
+
+procedure jGridView.SetFontColor(_color: TARGBColorBridge);
+begin
+  //in designing component state: set value here...
+  FFontColor:=  _color;
+  if FInitialized then
+     jGridView_SetFontColor(FjEnv, FjObject, GetARGB(FCustomColor, _color));
+end;
+
+procedure jGridView.GenEvent_OnDrawItemCaptionColor(Obj: TObject; index: integer; caption: string;  out color: dword);
+var
+  outColor: TARGBColorBridge;
+begin
+  outColor:= Self.FontColor;
+  color:= 0; //default;
+  if Assigned(FOnDrawItemTextColor) then FOnDrawItemTextColor(Obj,index,caption, outColor);
+  if (outColor <> colbrNone) and  (outColor <> colbrDefault) then
+      color:= GetARGB(FCustomColor, outColor);
+end;
+
+procedure jGridView.GenEvent_OnDrawItemBitmap(Obj: TObject; index: integer; caption: string;  out bitmap: JObject);
+begin
+  bitmap:= nil;
+  if Assigned(FOnDrawItemBitmap) then FOnDrawItemBitmap(Obj,index,caption, bitmap);
 end;
 
 {-------- jGridView_JNI_Bridge ----------}
@@ -694,6 +799,93 @@ begin
   jParams[0].i:= _value;
   jCls:= env^.GetObjectClass(env, _jgridview);
   jMethod:= env^.GetMethodID(env, jCls, 'SetItemsLayout', '(I)V');
+  env^.CallVoidMethodA(env, _jgridview, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+function jGridView_GetItemIndex(env: PJNIEnv; _jgridview: JObject): integer;
+var
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jgridview);
+  jMethod:= env^.GetMethodID(env, jCls, 'GetItemIndex', '()I');
+  Result:= env^.CallIntMethod(env, _jgridview, jMethod);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+
+function jGridView_GetItemCaption(env: PJNIEnv; _jgridview: JObject): string;
+var
+  jStr: JString;
+  jBoo: JBoolean;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jgridview);
+  jMethod:= env^.GetMethodID(env, jCls, 'GetItemCaption', '()Ljava/lang/String;');
+  jStr:= env^.CallObjectMethod(env, _jgridview, jMethod);
+  case jStr = nil of
+     True : Result:= '';
+     False: begin
+              jBoo:= JNI_False;
+              Result:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
+            end;
+  end;
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jGridView_DispatchOnDrawItemTextColor(env: PJNIEnv; _jgridview: JObject; _value: boolean);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].z:= JBool(_value);
+  jCls:= env^.GetObjectClass(env, _jgridview);
+  jMethod:= env^.GetMethodID(env, jCls, 'DispatchOnDrawItemTextColor', '(Z)V');
+  env^.CallVoidMethodA(env, _jgridview, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+
+procedure jGridView_DispatchOnDrawItemBitmap(env: PJNIEnv; _jgridview: JObject; _value: boolean);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].z:= JBool(_value);
+  jCls:= env^.GetObjectClass(env, _jgridview);
+  jMethod:= env^.GetMethodID(env, jCls, 'DispatchOnDrawItemBitmap', '(Z)V');
+  env^.CallVoidMethodA(env, _jgridview, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+
+procedure jGridView_SetFontSize(env: PJNIEnv; _jgridview: JObject; _size: integer);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].i:= _size;
+  jCls:= env^.GetObjectClass(env, _jgridview);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetFontSize', '(I)V');
+  env^.CallVoidMethodA(env, _jgridview, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+
+procedure jGridView_SetFontColor(env: PJNIEnv; _jgridview: JObject; _color: integer);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].i:= _color;
+  jCls:= env^.GetObjectClass(env, _jgridview);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetFontColor', '(I)V');
   env^.CallVoidMethodA(env, _jgridview, jMethod, @jParams);
   env^.DeleteLocalRef(env, jCls);
 end;

@@ -496,6 +496,10 @@ Procedure jListView_setLayoutAll(env:PJNIEnv; ListView : jObject;  idAnchor: DWo
 
 procedure jListView_SetHighLightSelectedItem(env: PJNIEnv; _jlistview: JObject; _value: boolean);
 procedure jListView_SetHighLightSelectedItemColor(env: PJNIEnv;  _jlistview: JObject; _color: integer);
+function jListView_GetItemIndex(env: PJNIEnv; _jlistview: JObject): integer;
+function jListView_GetItemCaption(env: PJNIEnv; _jlistview: JObject): string;
+procedure jListView_SetDispatchOnDrawItemTextColor(env: PJNIEnv; _jlistview: JObject; _value: boolean);
+procedure jListView_DispatchOnDrawItemBitmap(env: PJNIEnv; _jlistview: JObject; _value: boolean);
 
 
 // ScrollView
@@ -886,13 +890,15 @@ Function jSqliteCursor_GetColumName(env:PJNIEnv;  SqliteCursor: jObject; columnI
 
 Function jSqliteCursor_GetColType(env:PJNIEnv;  SqliteCursor: jObject; columnIndex: integer): integer;
 
-Function jSqliteCursor_GetValueAsString(env:PJNIEnv;  SqliteCursor: jObject; columnIndex: integer): string;
+Function jSqliteCursor_GetValueAsString(env:PJNIEnv;  SqliteCursor: jObject; columnIndex: integer): string; overload;
 function jSqliteCursor_GetValueAsBitmap(env:PJNIEnv;  SqliteCursor: jObject; columnIndex: integer): jObject;
 
 function jSqliteCursor_GetValueAsDouble (env:PJNIEnv;  SqliteCursor: jObject; columnIndex: integer): double;
 function jSqliteCursor_GetValueAsFloat (env:PJNIEnv;  SqliteCursor: jObject; columnIndex: integer): real;
 
 function jSqliteCursor_GetValueAsInteger(env:PJNIEnv;  SqliteCursor: jObject; columnIndex: integer): integer;
+
+function jSqliteCursor_GetValueAsString(env: PJNIEnv; _jsqlitecursor: JObject; position: integer; columnName: string): string; overload;
 {jSqliteDataAccess: by jmpessoa}
 
 Function  jSqliteDataAccess_Create(env: PJNIEnv;   this:jobject; SelfObj: TObject;
@@ -945,18 +951,20 @@ procedure jSqliteDataAccess_UpdateImageBatch(env: PJNIEnv; _jsqlitedataaccess: J
 function jHttpClient_jCreate(env: PJNIEnv;_Self: int64; this: jObject): jObject;
 procedure jHttpClient_jFree(env: PJNIEnv; _jhttpclient: JObject);
 
-procedure jHttpClient_Get(env: PJNIEnv; _jhttpclient: JObject; _stringUrl: string); overload;
-function jHTTPClient_Get2(env: PJNIEnv; _jHTTPClient: JObject; _Link: string): string;
+procedure jHttpClient_GetAsync(env: PJNIEnv; _jhttpclient: JObject; _stringUrl: string);
 
-//procedure jHttpClient_Get(env: PJNIEnv; _jhttpclient: JObject; _stringUrl: string); overload;
+function jHTTPClient_Get2(env: PJNIEnv; _jHTTPClient: JObject; _Link: string): string;
 
 procedure jHttpClient_SetAuthenticationUser(env: PJNIEnv; _jhttpclient: JObject; _userName: string; _password: string);
 procedure jHttpClient_SetAuthenticationMode(env: PJNIEnv; _jhttpclient: JObject; _authenticationMode: integer);
 procedure jHttpClient_SetAuthenticationHost(env: PJNIEnv; _jhttpclient: JObject; _hostName: string; _port: integer);
-procedure jHttpClient_PostNameValueData(env: PJNIEnv; _jhttpclient: JObject; _stringUrl: string; _name: string; _value: string); overload;
-procedure jHttpClient_PostNameValueData(env: PJNIEnv; _jhttpclient: JObject; _stringUrl: string; _listNameValue: string); overload;
+
+procedure jHttpClient_PostNameValueDataAsync(env: PJNIEnv; _jhttpclient: JObject; _stringUrl: string); overload;
+procedure jHttpClient_PostNameValueDataAsync(env: PJNIEnv; _jhttpclient: JObject; _stringUrl: string; _name: string; _value: string); overload;
+procedure jHttpClient_PostNameValueDataAsync(env: PJNIEnv; _jhttpclient: JObject; _stringUrl: string; _listNameValue: string); overload;
+
 procedure jHTTPClient_ClearPost2Values(env: PJNIEnv; _jHTTPClient: JObject);
-procedure jHTTPClient_AddValueForPost2(env: PJNIEnv; _jHTTPClient: JObject; Name, Value: string);
+procedure jHTTPClient_AddValueForPost2(env: PJNIEnv; _jHTTPClient: JObject; _name, _value: string);
 function jHTTPClient_Post2(env: PJNIEnv; _jHTTPClient: JObject; _Link: string): string;
 
 //by jmpessoa
@@ -1357,7 +1365,7 @@ var
 begin
   _jParams[0].f := size;
   cls := env^.GetObjectClass(env, TextView);
-  _jMethod:= env^.GetMethodID(env, cls, 'setTextSize', '(F)V');
+  _jMethod:= env^.GetMethodID(env, cls, 'SetTextSize', '(F)V');
   env^.CallVoidMethodA(env,TextView,_jMethod,@_jParams);
   env^.DeleteLocalRef(env, cls);
 end;
@@ -1641,7 +1649,7 @@ var
 begin
  _jParams[0].f := size;
  cls := env^.GetObjectClass(env, EditText);
- _jMethod:= env^.GetMethodID(env, cls, 'setTextSize', '(F)V');
+ _jMethod:= env^.GetMethodID(env, cls, 'SetTextSize', '(F)V');
  env^.CallVoidMethodA(env,EditText,_jMethod,@_jParams);
  env^.DeleteLocalRef(env, cls);
 end;
@@ -2309,7 +2317,7 @@ var
 begin
  _jParams[0].f := size;
  cls := env^.GetObjectClass(env, Button);
- _jMethod:= env^.GetMethodID(env, cls, 'setTextSize', '(F)V');
+ _jMethod:= env^.GetMethodID(env, cls, 'SetTextSize', '(F)V');
  env^.CallVoidMethodA(env,Button,_jMethod,@_jParams);
  env^.DeleteLocalRef(env, cls);
 end;
@@ -2558,7 +2566,7 @@ var
 begin
   _jParams[0].f := size;
   cls := env^.GetObjectClass(env, CheckBox);
- _jMethod:= env^.GetMethodID(env, cls, 'setTextSize', '(F)V');
+ _jMethod:= env^.GetMethodID(env, cls, 'SetTextSize', '(F)V');
  env^.CallVoidMethodA(env,CheckBox,_jMethod,@_jParams);
  env^.DeleteLocalRef(env, cls);
 end;
@@ -2795,7 +2803,7 @@ var
 begin
   _jParams[0].f := size;
   cls := env^.GetObjectClass(env, RadioButton);
-  _jMethod:= env^.GetMethodID(env, cls, 'setTextSize', '(F)V');
+  _jMethod:= env^.GetMethodID(env, cls, 'SetTextSize', '(F)V');
   env^.CallVoidMethodA(env,RadioButton,_jMethod,@_jParams);
   env^.DeleteLocalRef(env, cls);
 end;
@@ -4010,6 +4018,64 @@ begin
   env^.DeleteLocalRef(env, jCls);
 end;
 
+function jListView_GetItemIndex(env: PJNIEnv; _jlistview: JObject): integer;
+var
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jlistview);
+  jMethod:= env^.GetMethodID(env, jCls, 'GetItemIndex', '()I');
+  Result:= env^.CallIntMethod(env, _jlistview, jMethod);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+
+function jListView_GetItemCaption(env: PJNIEnv; _jlistview: JObject): string;
+var
+  jStr: JString;
+  jBoo: JBoolean;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jlistview);
+  jMethod:= env^.GetMethodID(env, jCls, 'GetItemCaption', '()Ljava/lang/String;');
+  jStr:= env^.CallObjectMethod(env, _jlistview, jMethod);
+  case jStr = nil of
+     True : Result:= '';
+     False: begin
+              jBoo:= JNI_False;
+              Result:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
+            end;
+  end;
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jListView_SetDispatchOnDrawItemTextColor(env: PJNIEnv; _jlistview: JObject; _value: boolean);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].z:= JBool(_value);
+  jCls:= env^.GetObjectClass(env, _jlistview);
+  jMethod:= env^.GetMethodID(env, jCls, 'DispatchOnDrawItemTextColor', '(Z)V');
+  env^.CallVoidMethodA(env, _jlistview, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jListView_DispatchOnDrawItemBitmap(env: PJNIEnv; _jlistview: JObject; _value: boolean);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].z:= JBool(_value);
+  jCls:= env^.GetObjectClass(env, _jlistview);
+  jMethod:= env^.GetMethodID(env, jCls, 'DispatchOnDrawItemBitmap', '(Z)V');
+  env^.CallVoidMethodA(env, _jlistview, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
 //------------------------------------------------------------------------------
 // ScrollView
 //------------------------------------------------------------------------------
@@ -4181,6 +4247,8 @@ _jMethod:= env^.GetMethodID(env, cls, 'setLayoutAll', '(I)V');
  env^.CallVoidMethodA(env,ScrollView,_jMethod,@_jParams);
  env^.DeleteLocalRef(env, cls);
 end;
+
+
 //----------------------------------------
 //Panel - new by jmpessoa
 //----------------------------------------
@@ -6039,7 +6107,7 @@ var
   _jMethod:= env^.GetMethodID(env, cls, 'jDialogProgress_Create', '(JLjava/lang/String;Ljava/lang/String;)Ljava/lang/Object;');
   _jParams[0].j := Int64(SelfObj);
   _jParams[1].l := env^.NewStringUTF(env, pchar(title) );
-  _jParams[2].l := env^.NewStringUTF(env, pchar(Msg  ) );
+  _jParams[2].l := env^.NewStringUTF(env, pchar(Msg) );
 
   Result := env^.CallObjectMethodA(env,this,_jMethod,@_jParams);
   Result := env^.NewGlobalRef(env,Result);
@@ -6722,6 +6790,30 @@ begin
   env^.DeleteLocalRef(env, cls);
 end;
 
+function jSqliteCursor_GetValueAsString(env: PJNIEnv; _jsqlitecursor: JObject; position: integer; columnName: string): string;
+var
+  jStr: JString;
+  jBoo: JBoolean;
+  jParams: array[0..1] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].i:= position;
+  jParams[1].l:= env^.NewStringUTF(env, PChar(columnName));
+  jCls:= env^.GetObjectClass(env, _jsqlitecursor);
+  jMethod:= env^.GetMethodID(env, jCls, 'GetValueAsString', '(ILjava/lang/String;)Ljava/lang/String;');
+  jStr:= env^.CallObjectMethodA(env, _jsqlitecursor, jMethod, @jParams);
+  case jStr = nil of
+     True : Result:= '';
+     False: begin
+              jBoo:= JNI_False;
+              Result:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
+            end;
+  end;
+  env^.DeleteLocalRef(env,jParams[1].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
  {jSqliteDataAccess - by jmpessoa}
 
 Function  jSqliteDataAccess_Create(env: PJNIEnv; this:jobject; SelfObj: TObject;
@@ -7214,7 +7306,7 @@ begin
 end;
 
 
-procedure  jHttpClient_Get(env: PJNIEnv; _jhttpclient: JObject; _stringUrl: string);
+procedure  jHttpClient_GetAsync(env: PJNIEnv; _jhttpclient: JObject; _stringUrl: string);
 var
   jParams: array[0..0] of jValue;
   jMethod: jMethodID=nil;
@@ -7222,7 +7314,7 @@ var
 begin
   jParams[0].l:= env^.NewStringUTF(env, PChar(_stringUrl));
   jCls:= env^.GetObjectClass(env, _jhttpclient);
-  jMethod:= env^.GetMethodID(env, jCls, 'Get', '(Ljava/lang/String;)V');
+  jMethod:= env^.GetMethodID(env, jCls, 'GetAsync', '(Ljava/lang/String;)V');
   env^.CallVoidMethodA(env, _jhttpclient, jMethod, @jParams);
   env^.DeleteLocalRef(env,jParams[0].l);
   env^.DeleteLocalRef(env, jCls);
@@ -7236,7 +7328,6 @@ function jHTTPClient_Get2(env: PJNIEnv; _jHTTPClient: JObject; _Link: string): s
   jStr: jString;
   jBool: jBoolean;
 begin
-
   jParams[0].l := env^.NewStringUTF(env, PChar(_Link));
   jCls := env^.GetObjectClass(env, _jHTTPClient);
   jMethod := env^.GetMethodID(env, jCls, 'Get2', '(Ljava/lang/String;)Ljava/lang/String;');
@@ -7298,7 +7389,21 @@ begin
   env^.DeleteLocalRef(env, jCls);
 end;
 
-procedure jHttpClient_PostNameValueData(env: PJNIEnv; _jhttpclient: JObject; _stringUrl: string; _name: string; _value: string);
+procedure jHttpClient_PostNameValueDataAsync(env: PJNIEnv; _jhttpclient: JObject; _stringUrl: string);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_stringUrl));
+  jCls:= env^.GetObjectClass(env, _jhttpclient);
+  jMethod:= env^.GetMethodID(env, jCls, 'PostNameValueDataAsync', '(Ljava/lang/String;)V');
+  env^.CallVoidMethodA(env, _jhttpclient, jMethod, @jParams);
+  env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jHttpClient_PostNameValueDataAsync(env: PJNIEnv; _jhttpclient: JObject; _stringUrl: string; _name: string; _value: string);
 var
   jParams: array[0..2] of jValue;
   jMethod: jMethodID=nil;
@@ -7308,7 +7413,7 @@ begin
   jParams[1].l:= env^.NewStringUTF(env, PChar(_name));
   jParams[2].l:= env^.NewStringUTF(env, PChar(_value));
   jCls:= env^.GetObjectClass(env, _jhttpclient);
-  jMethod:= env^.GetMethodID(env, jCls, 'PostNameValueData', '(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V');
+  jMethod:= env^.GetMethodID(env, jCls, 'PostNameValueDataAsync', '(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V');
   env^.CallVoidMethodA(env, _jhttpclient, jMethod, @jParams);
   env^.DeleteLocalRef(env,jParams[0].l);
   env^.DeleteLocalRef(env,jParams[1].l);
@@ -7316,7 +7421,7 @@ begin
   env^.DeleteLocalRef(env, jCls);
 end;
 
-procedure jHttpClient_PostNameValueData(env: PJNIEnv; _jhttpclient: JObject; _stringUrl: string; _listNameValue: string);
+procedure jHttpClient_PostNameValueDataAsync(env: PJNIEnv; _jhttpclient: JObject; _stringUrl: string; _listNameValue: string);
 var
   jParams: array[0..1] of jValue;
   jMethod: jMethodID=nil;
@@ -7325,7 +7430,7 @@ begin
   jParams[0].l:= env^.NewStringUTF(env, PChar(_stringUrl));
   jParams[1].l:= env^.NewStringUTF(env, PChar(_listNameValue));
   jCls:= env^.GetObjectClass(env, _jhttpclient);
-  jMethod:= env^.GetMethodID(env, jCls, 'PostNameValueData', '(Ljava/lang/String;Ljava/lang/String;)V');
+  jMethod:= env^.GetMethodID(env, jCls, 'PostNameValueDataAsync', '(Ljava/lang/String;Ljava/lang/String;)V');
   env^.CallVoidMethodA(env, _jhttpclient, jMethod, @jParams);
   env^.DeleteLocalRef(env,jParams[0].l);
   env^.DeleteLocalRef(env,jParams[1].l);
@@ -7337,22 +7442,19 @@ procedure jHTTPClient_ClearPost2Values(env: PJNIEnv; _jHTTPClient: JObject);
   jMethod: jMethodID = nil;
   jCls: jClass = nil;
 begin
-
  jCls := env^.GetObjectClass(env, _jHTTPClient);
  jMethod := env^.GetMethodID(env, jCls, 'ClearPost2Values', '()V');
  env^.CallVoidMethod(env, _jHTTPClient, jMethod);
  env^.DeleteLocalRef(env, jCls);
 end;
-
-procedure jHTTPClient_AddValueForPost2(env: PJNIEnv; _jHTTPClient: JObject; Name, Value: string);
+procedure jHTTPClient_AddValueForPost2(env: PJNIEnv; _jHTTPClient: JObject; _name, _value: string);
   var
   jParams: array[0..1] of jValue;
   jMethod: jMethodID = nil;
   jCls: jClass = nil;
 begin
-
-  jParams[0].l := env^.NewStringUTF(env, PChar(Name));
-  jParams[1].l := env^.NewStringUTF(env, PChar(Value));
+  jParams[0].l := env^.NewStringUTF(env, PChar(_name));
+  jParams[1].l := env^.NewStringUTF(env, PChar(_value));
   jCls := env^.GetObjectClass(env, _jHTTPClient);
   jMethod := env^.GetMethodID(env, jCls, 'AddValueForPost2', '(Ljava/lang/String;Ljava/lang/String;)V');
   env^.CallVoidMethodA(env, _jHTTPClient, jMethod, @jParams);
@@ -7369,7 +7471,6 @@ function jHTTPClient_Post2(env: PJNIEnv; _jHTTPClient: JObject; _Link: string): 
   jStr: jString;
   jBool: jBoolean;
 begin
-
   jParams[0].l := env^.NewStringUTF(env, PChar(_Link));
   jCls := env^.GetObjectClass(env, _jHTTPClient);
   jMethod := env^.GetMethodID(env, jCls, 'Post2', '(Ljava/lang/String;)Ljava/lang/String;');

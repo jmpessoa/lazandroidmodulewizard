@@ -20,7 +20,6 @@ type
     jSurfaceView1: jSurfaceView;
     jTextView1: jTextView;
     procedure AndroidModule1Close(Sender: TObject);
-    procedure AndroidModule1Create(Sender: TObject);
     procedure AndroidModule1JNIPrompt(Sender: TObject);
     procedure jButton1Click(Sender: TObject);
     procedure jButton2Click(Sender: TObject);
@@ -61,11 +60,6 @@ procedure TAndroidModule1.AndroidModule1JNIPrompt(Sender: TObject);
 begin
   GlobalImage:= jImageFileManager1.LoadFromAssets('lemur.jpg');
   GlobalImage:= Get_jObjGlobalRef(GlobalImage);
-end;
-
-procedure TAndroidModule1.AndroidModule1Create(Sender: TObject);
-begin
-
 end;
 
 //simple/trivial Ondraw event handle

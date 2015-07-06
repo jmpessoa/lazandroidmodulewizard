@@ -7,18 +7,16 @@ object AndroidModule6: TAndroidModule6
   MarginTop = 0
   MarginRight = 0
   MarginBottom = 0
-  OnCreate = DataModuleCreate
   Text = 'AndroidModule6'
   ActivityMode = actRecyclable
   BackgroundColor = colbrBlack
   OnCloseQuery = DataModuleCloseQuery
   OnRotate = DataModuleRotate
-  OnJNIPrompt = DataModuleJNIPrompt
   object jTextView1: jTextView
-    Left = 104
-    Top = 8
-    Width = 145
-    Height = 25
+    Left = 105
+    Top = 10
+    Width = 89
+    Height = 20
     MarginLeft = 10
     MarginTop = 10
     MarginRight = 10
@@ -38,10 +36,10 @@ object AndroidModule6: TAndroidModule6
     Id = 26515
   end
   object jTextView2: jTextView
-    Left = 8
-    Top = 48
-    Width = 145
-    Height = 25
+    Left = 10
+    Top = 50
+    Width = 92
+    Height = 20
     MarginLeft = 10
     MarginTop = 10
     MarginRight = 10
@@ -63,10 +61,10 @@ object AndroidModule6: TAndroidModule6
   end
   object jEditText1: jEditText
     Tag = 1
-    Left = 8
-    Top = 80
-    Width = 137
-    Height = 40
+    Left = 5
+    Top = 90
+    Width = 136
+    Height = 39
     MarginLeft = 5
     MarginTop = 10
     MarginRight = 5
@@ -94,9 +92,9 @@ object AndroidModule6: TAndroidModule6
     Id = 53166
   end
   object jButton1: jButton
-    Left = 152
-    Top = 80
-    Width = 137
+    Left = 151
+    Top = 90
+    Width = 136
     Height = 40
     MarginLeft = 5
     MarginTop = 5
@@ -110,16 +108,16 @@ object AndroidModule6: TAndroidModule6
     LayoutParamHeight = lpWrapContent
     Text = 'Add'
     BackgroundColor = colbrDefault
-    FontColor = colbrLightSteelBlue
+    FontColor = colbrSlateBlue
     FontSize = 0
     OnClick = jButton1Click
     Id = 0
   end
   object jEditText2: jEditText
-    Left = 8
-    Top = 160
-    Width = 137
-    Height = 40
+    Left = 5
+    Top = 189
+    Width = 136
+    Height = 39
     MarginLeft = 5
     MarginTop = 10
     MarginRight = 5
@@ -147,10 +145,10 @@ object AndroidModule6: TAndroidModule6
     Id = 80017
   end
   object jTextView3: jTextView
-    Left = 8
-    Top = 136
-    Width = 145
-    Height = 25
+    Left = 10
+    Top = 149
+    Width = 97
+    Height = 20
     MarginLeft = 10
     MarginTop = 10
     MarginRight = 10
@@ -171,9 +169,9 @@ object AndroidModule6: TAndroidModule6
     Id = 5036
   end
   object jButton2: jButton
-    Left = 152
-    Top = 160
-    Width = 137
+    Left = 151
+    Top = 189
+    Width = 136
     Height = 40
     MarginLeft = 5
     MarginTop = 5
@@ -187,7 +185,7 @@ object AndroidModule6: TAndroidModule6
     LayoutParamHeight = lpWrapContent
     Text = 'Delete'
     BackgroundColor = colbrDefault
-    FontColor = colbrLightSteelBlue
+    FontColor = colbrSlateBlue
     FontSize = 0
     OnClick = jButton2Click
     Id = 63804
@@ -195,9 +193,9 @@ object AndroidModule6: TAndroidModule6
   object jListView1: jListView
     Tag = 1
     Left = 8
-    Top = 264
+    Top = 296
     Width = 283
-    Height = 328
+    Height = 296
     MarginLeft = 10
     MarginTop = 0
     MarginRight = 10
@@ -207,7 +205,7 @@ object AndroidModule6: TAndroidModule6
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = []
     LayoutParamWidth = lpMatchParent
-    LayoutParamHeight = lpThreeFifthOfParent
+    LayoutParamHeight = lpHalfOfParent
     Items.Strings = (
       'Pascal|The Best Language'
       'Lazarus|The Best IDE'
@@ -223,15 +221,15 @@ object AndroidModule6: TAndroidModule6
     ItemLayout = layImageTextWidget
     TextSizeDecorated = sdNone
     TextAlign = alLeft
+    HighLightSelectedItemColor = colbrRed
     OnClickItem = jListView1ClickItem
     OnClickWidgetItem = jListView1ClickWidgetItem
-    HighLightSelectedItemColor = colbrRed
     Id = 8951
   end
   object jButton3: jButton
-    Left = 8
-    Top = 208
-    Width = 280
+    Left = 5
+    Top = 243
+    Width = 290
     Height = 40
     MarginLeft = 5
     MarginTop = 5
@@ -245,7 +243,7 @@ object AndroidModule6: TAndroidModule6
     LayoutParamHeight = lpWrapContent
     Text = 'ListView Items Clear '
     BackgroundColor = colbrDefault
-    FontColor = colbrLightSteelBlue
+    FontColor = colbrSlateBlue
     FontSize = 0
     OnClick = jButton3Click
     Id = 3040099

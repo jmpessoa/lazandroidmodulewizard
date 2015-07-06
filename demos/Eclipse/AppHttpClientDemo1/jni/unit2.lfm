@@ -1,0 +1,13 @@
+object AndroidModule2: TAndroidModule2
+  Left = 378
+  Top = 132
+  Width = 320
+  Height = 400
+  MarginLeft = 0
+  MarginTop = 0
+  MarginRight = 0
+  MarginBottom = 0
+  Text = 'AndroidModule2'
+  ActivityMode = actMain
+  BackgroundColor = colbrDefault
+end

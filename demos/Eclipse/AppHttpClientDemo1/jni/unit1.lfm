@@ -10,11 +10,12 @@ object AndroidModule1: TAndroidModule1
   Text = 'AndroidModule1'
   ActivityMode = actMain
   BackgroundColor = colbrDefault
+  OnRotate = AndroidModule1Rotate
   OnJNIPrompt = AndroidModule1JNIPrompt
   object jTextView1: jTextView
-    Left = 84
+    Left = 46
     Top = 5
-    Width = 131
+    Width = 208
     Height = 20
     MarginLeft = 5
     MarginTop = 5
@@ -25,7 +26,7 @@ object AndroidModule1: TAndroidModule1
     PosRelativeToParent = [rpTop, rpCenterHorizontal]
     LayoutParamWidth = lpWrapContent
     LayoutParamHeight = lpWrapContent
-    Text = 'App HttpClient Demo1'
+    Text = 'App HttpClient and WebView Demo'
     Alignment = taLeft
     Enabled = True
     BackgroundColor = colbrDefault
@@ -49,7 +50,7 @@ object AndroidModule1: TAndroidModule1
     PosRelativeToParent = []
     LayoutParamWidth = lpMatchParent
     LayoutParamHeight = lpWrapContent
-    Text = 'http://www.firemedia.de/'
+    Text = 'http://cartoonforyou.forumvi.com/h1-page'
     Alignment = taLeft
     InputTypeEx = itxText
     MaxTextLength = 300
@@ -91,24 +92,24 @@ object AndroidModule1: TAndroidModule1
   end
   object jEditText2: jEditText
     Left = 5
-    Top = 220
+    Top = 321
     Width = 290
-    Height = 580
+    Height = 106
     MarginLeft = 5
     MarginTop = 10
     MarginRight = 5
     MarginBottom = 10
     Visible = True
-    Anchor = jProgressBar1
+    Anchor = jButton4
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = []
     LayoutParamWidth = lpMatchParent
-    LayoutParamHeight = lpMatchParent
+    LayoutParamHeight = lpOneFifthOfParent
     Text = 'jEditText2'
     Alignment = taLeft
     InputTypeEx = itxMultiLine
     MaxTextLength = 2000
-    BackgroundColor = colbrDefault
+    BackgroundColor = colbrPeachPuff
     FontColor = colbrDefault
     FontSize = 0
     HintTextColor = colbrSilver
@@ -118,7 +119,7 @@ object AndroidModule1: TAndroidModule1
     VerScrollBar = True
     WrappingLine = False
     Editable = True
-    Id = 0
+    Id = 3379671
   end
   object jButton1: jButton
     Left = 2
@@ -135,46 +136,105 @@ object AndroidModule1: TAndroidModule1
     PosRelativeToParent = []
     LayoutParamWidth = lpMatchParent
     LayoutParamHeight = lpWrapContent
-    Text = 'Get Url Content'
+    Text = 'Get [Async] Url Content'
     BackgroundColor = colbrDefault
     FontColor = colbrDefault
     FontSize = 0
     OnClick = jButton1Click
     Id = 2166001
   end
-  object jProgressBar1: jProgressBar
-    Left = 10
-    Top = 177
+  object jWebView1: jWebView
+    Left = 5
+    Top = 432
     Width = 280
-    Height = 23
-    MarginLeft = 10
-    MarginTop = 10
-    MarginRight = 10
-    MarginBottom = 10
-    Visible = False
+    Height = 152
+    Visible = True
+    Anchor = jEditText2
+    PosRelativeToAnchor = [raBelow]
+    PosRelativeToParent = []
+    LayoutParamWidth = lpMatchParent
+    LayoutParamHeight = lpOneThirdOfParent
+    JavaScript = True
+    BackgroundColor = colbrDefault
+    ZoomControl = False
+    Id = 0
+  end
+  object jButton2: jButton
+    Left = 2
+    Top = 171
+    Width = 296
+    Height = 40
+    MarginLeft = 2
+    MarginTop = 4
+    MarginRight = 2
+    MarginBottom = 4
+    Visible = True
     Anchor = jButton1
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = []
     LayoutParamWidth = lpMatchParent
     LayoutParamHeight = lpWrapContent
-    Style = cjProgressBarStyleHorizontal
+    Text = 'Post [Async] Data'
     BackgroundColor = colbrDefault
-    Progress = 0
-    Max = 100
-    Id = 6731056
+    FontColor = colbrDefault
+    FontSize = 0
+    OnClick = jButton2Click
+    Id = 9749670
+  end
+  object jButton3: jButton
+    Left = 2
+    Top = 219
+    Width = 296
+    Height = 40
+    MarginLeft = 2
+    MarginTop = 4
+    MarginRight = 2
+    MarginBottom = 4
+    Visible = True
+    Anchor = jButton2
+    PosRelativeToAnchor = [raBelow]
+    PosRelativeToParent = []
+    LayoutParamWidth = lpMatchParent
+    LayoutParamHeight = lpWrapContent
+    Text = 'Get [blocking] Url Content'
+    BackgroundColor = colbrDefault
+    FontColor = colbrDefault
+    FontSize = 0
+    OnClick = jButton3Click
+    Id = 4061258
+  end
+  object jButton4: jButton
+    Left = 2
+    Top = 267
+    Width = 296
+    Height = 40
+    MarginLeft = 2
+    MarginTop = 4
+    MarginRight = 2
+    MarginBottom = 4
+    Visible = True
+    Anchor = jButton3
+    PosRelativeToAnchor = [raBelow]
+    PosRelativeToParent = []
+    LayoutParamWidth = lpMatchParent
+    LayoutParamHeight = lpWrapContent
+    Text = 'Post [blocking] Data'
+    BackgroundColor = colbrDefault
+    FontColor = colbrDefault
+    FontSize = 0
+    OnClick = jButton4Click
+    Id = 8039590
   end
   object jHttpClient1: jHttpClient
     IndexUrl = -1
     AuthenticationMode = autNone
     OnContentResult = jHttpClient1ContentResult
     OnCodeResult = jHttpClient1CodeResult
-    left = 184
-    top = 280
+    left = 96
+    top = 32
   end
-  object jDialogProgress1: jDialogProgress
-    Title = 'Lamw: Lazarus Android Module Wizard'
-    Msg = 'Please, wait...'
-    left = 48
-    top = 320
+  object jTextFileManager1: jTextFileManager
+    left = 224
+    top = 40
   end
 end

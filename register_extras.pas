@@ -39,7 +39,6 @@ uses
   mediaplayer,
   dumpjavamethods,
   myhello,
-  helloadder,
   SysUtils,
   LResources;
   

@@ -30,8 +30,8 @@ jTCPSocketClient = class(jControl)
     procedure SendMessage(message: string);
 
     procedure CloseConnection(); overload;
-    procedure Connect(_serverIP: string; _serverPort: integer; _login: string); overload;
-    procedure Connect(_serverIP: string; _serverPort: integer);  overload;
+    procedure ConnectAsync(_serverIP: string; _serverPort: integer; _login: string); overload;
+    procedure ConnectAsync(_serverIP: string; _serverPort: integer);  overload;
     procedure CloseConnection(_finalMessage: string); overload;
 
     procedure GenEvent_OnTCPSocketClientMessagesReceived(Sender: TObject; messagesReceived: array of string);
@@ -113,7 +113,7 @@ begin
      jTCPSocketClient_CloseConnection(FjEnv, FjObject);
 end;
 
-procedure jTCPSocketClient.Connect(_serverIP: string; _serverPort: integer; _login: string);
+procedure jTCPSocketClient.ConnectAsync(_serverIP: string; _serverPort: integer; _login: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
@@ -121,7 +121,7 @@ begin
 end;
 
 
-procedure jTCPSocketClient.Connect(_serverIP: string; _serverPort: integer);
+procedure jTCPSocketClient.ConnectAsync(_serverIP: string; _serverPort: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
