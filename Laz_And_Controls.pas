@@ -229,16 +229,21 @@ type
   TOnHttpClientCodeResult = procedure(Sender: TObject; code: integer) of Object;
 
   //NEW by jmpessoa
+
+  { jHttpClient }
+
   jHttpClient = class(jControl)
   private
     FUrl : string;
     FUrls: TStrings;
     FIndexUrl: integer;
+    FCharSet: string;
     FAuthenticationMode: THttpClientAuthenticationMode;
 
     FOnContentResult: TOnHttpClientContentResult;
     FOnCodeResult: TOnHttpClientCodeResult;
 
+    procedure SetCharSet(AValue: string);
     procedure SetIndexUrl(Value: integer);
     procedure SetUrlByIndex(Value: integer);
     procedure SetUrls(Value: TStrings);
@@ -275,6 +280,7 @@ type
     // Property
     property Url: string read FUrl;
   published
+    property CharSet: string read FCharSet write SetCharSet;
     property IndexUrl: integer read  FIndexUrl write SetIndexUrl;
     property Urls: TStrings read FUrls write SetUrls;
     property AuthenticationMode: THttpClientAuthenticationMode read FAuthenticationMode write SetAuthenticationMode;
@@ -4518,6 +4524,7 @@ begin
 //your code here....
   FUrls:= TStringList.Create;
   FUrl:= '';
+  FCharSet := 'UTF-8';
   FIndexUrl:= -1;
   FAuthenticationMode:= autNone;
 end;
@@ -4587,7 +4594,7 @@ begin
   FUrls.Assign(Value);
 end;
 
-Procedure jHttpClient.SetUrlByIndex(Value: integer);
+procedure jHttpClient.SetUrlByIndex(Value: integer);
 begin
    FUrl:='';
    if (Value >= 0) and (Value < FUrls.Count) then
@@ -4598,6 +4605,12 @@ procedure jHttpClient.SetIndexUrl(Value: integer);
 begin
   FIndexUrl:= Value;
   if FInitialized then SetUrlByIndex(Value);
+end;
+
+procedure jHttpClient.SetCharSet(AValue: string);
+begin
+
+  FCharSet := AValue;
 end;
 
 procedure jHttpClient.GetAsync;
@@ -4616,9 +4629,13 @@ end;
 
 function jHttpClient.Get(_stringUrl: string): string;
 begin
+
   if FInitialized then
+  begin
+
+    jHttpClient_SetCharSet(FjEnv, FjObject, FCharSet);
     Result := jHTTPClient_Get2(FjEnv, FjObject, _stringUrl)
-  else Result := '';
+  end else Result := '';
 end;
 
 function jHttpClient.Get: string;
@@ -4642,9 +4659,13 @@ end;
 
 function jHttpClient.Post(_stringUrl: string): string;
 begin
+
   if(FInitialized) then
+  begin
+
+    jHttpClient_SetCharSet(FjEnv, FjObject, FCharSet);
     Result := jHTTPClient_Post2(FjEnv, FjObject, _stringUrl)
-  else Result := '';
+  end else Result := '';
 end;
 
 procedure jHttpClient.PostNameValueDataAsync(_stringUrl: string);

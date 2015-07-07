@@ -12252,6 +12252,7 @@ class jHttpClient /*extends ...*/ {
    
    private List<NameValuePair> ValuesForPost2 = new ArrayList<NameValuePair>();
    DefaultHttpClient client2;
+   String httpCharSet = "UTF-8";	// default UTF-8 
    
    //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
    public jHttpClient(Controls _ctrls, long _Self) { //Add more others news "_xxx" params if needed!
@@ -12276,13 +12277,19 @@ class jHttpClient /*extends ...*/ {
    public void GetAsync(String _stringUrl) {
 	   new AsyncHttpClientGet().execute(_stringUrl);	   
    }
+   
+   public void SetCharSet(String _charSet) {
+	   
+	   httpCharSet = _charSet;
+	   //Log.i("CharSet", _charSet);
+   }  
          
    public String Get2(String _stringUrl) throws Exception {  //Pascal: Get  
 	   	   	   
 	   HttpGet httpGet = new HttpGet(_stringUrl);	   
 	   HttpResponse response = client2.execute(httpGet);
 	      
-	   BufferedReader rd = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
+	   BufferedReader rd = new BufferedReader(new InputStreamReader(response.getEntity().getContent(), httpCharSet));
 	   StringBuffer sb = new StringBuffer();
 	   String line = "";
 	   while ((line = rd.readLine()) != null) {
@@ -12329,7 +12336,7 @@ class jHttpClient /*extends ...*/ {
 	    	
 		HttpResponse response = client2.execute(httpPost);
 			
-		BufferedReader rd = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
+		BufferedReader rd = new BufferedReader(new InputStreamReader(response.getEntity().getContent(), httpCharSet));
 		StringBuffer sb = new StringBuffer();
 		String line;		
 		while ((line = rd.readLine()) != null) {

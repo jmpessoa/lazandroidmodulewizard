@@ -951,6 +951,7 @@ procedure jSqliteDataAccess_UpdateImageBatch(env: PJNIEnv; _jsqlitedataaccess: J
 function jHttpClient_jCreate(env: PJNIEnv;_Self: int64; this: jObject): jObject;
 procedure jHttpClient_jFree(env: PJNIEnv; _jhttpclient: JObject);
 
+procedure jHTTPClient_SetCharSet(env: PJNIEnv; _jHTTPClient: JObject; _CharSet: string);
 procedure jHttpClient_GetAsync(env: PJNIEnv; _jhttpclient: JObject; _stringUrl: string);
 
 function jHTTPClient_Get2(env: PJNIEnv; _jHTTPClient: JObject; _Link: string): string;
@@ -7305,6 +7306,19 @@ begin
   env^.DeleteLocalRef(env, jCls);
 end;
 
+procedure jHTTPClient_SetCharSet(env: PJNIEnv; _jHTTPClient: JObject; _CharSet: string);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID = nil;
+  jCls: jClass = nil;
+begin
+  jParams[0].l := env^.NewStringUTF(env, PChar(_CharSet));
+  jCls := env^.GetObjectClass(env, _jHTTPClient);
+  jMethod := env^.GetMethodID(env, jCls, 'SetCharSet', '(Ljava/lang/String;)V');
+  env^.CallVoidMethodA(env, _jHTTPClient, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
 
 procedure  jHttpClient_GetAsync(env: PJNIEnv; _jhttpclient: JObject; _stringUrl: string);
 var
