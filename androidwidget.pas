@@ -912,11 +912,10 @@ type
 
   public
     FormState     : TjFormState;
-
     FormIndex: integer;
     FormBaseIndex: integer;
-
     Finished: boolean;
+    PromptOnBackKey: boolean;
 
     constructor CreateNew(AOwner: TComponent);
     constructor Create(AOwner: TComponent); override;
@@ -929,6 +928,7 @@ type
     procedure Finish;
     Procedure Show;
     Procedure DoJNIPrompt;
+
     Procedure Close;
     Procedure Refresh;
     procedure ShowMessage(msg: string);  overload;
@@ -2168,6 +2168,8 @@ begin
   FormBaseIndex:= -1;  //main form not have a form base
   FormIndex:= 0;      //main form INDEX
 
+  PromptOnBackKey:= True;
+
   //-------------- dummies for compatibility----
   //FOldCreateOrder:= False;
   //FTitle:= 'jForm';
@@ -2356,7 +2358,8 @@ begin
   if jForm(Form).ActivityMode <> actMain then //actSplash or actRecycable
   begin
 
-      jForm(gApp.Forms.Stack[formBaseInx].Form).DoJNIPrompt;   //<<--- thanks to @arenabor
+      if jForm(gApp.Forms.Stack[formBaseInx].Form).PromptOnBackKey then
+         jForm(gApp.Forms.Stack[formBaseInx].Form).DoJNIPrompt; //<<--- thanks to @arenabor
 
       //LORDMAN - 2013-08-01 / Call Back
       if Assigned(gApp.Forms.Stack[Inx].CloseCB.Event) then
