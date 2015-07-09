@@ -1530,7 +1530,7 @@ end;
 
 function TAndroidFileDescPascalUnitWithResource.GetLocalizedName: string;
 begin
-   Result := 'Android DataModule'
+   Result := 'JNI Android Form [Lamw GUI]';
 end;
 
 function TAndroidFileDescPascalUnitWithResource.GetLocalizedDescription: string;

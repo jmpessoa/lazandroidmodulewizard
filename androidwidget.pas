@@ -916,6 +916,7 @@ type
     FormBaseIndex: integer;
     Finished: boolean;
     PromptOnBackKey: boolean;
+    TryBacktrackOnClose: boolean;
 
     constructor CreateNew(AOwner: TComponent);
     constructor Create(AOwner: TComponent); override;
@@ -2169,6 +2170,7 @@ begin
   FormIndex:= 0;      //main form INDEX
 
   PromptOnBackKey:= True;
+  TryBacktrackOnClose:= False;
 
   //-------------- dummies for compatibility----
   //FOldCreateOrder:= False;
@@ -2340,12 +2342,12 @@ begin
   gApp.Jni.jEnv:= env;
   gApp.Jni.jThis:= this;
 
+  if not Assigned(Form) then exit; //just precaution...
+
   Inx:= jForm(Form).FormIndex;
   formBaseInx:= jForm(Form).FormBaseIndex;
 
   gApp.TopIndex:= formBaseInx; //update topIndex...
-
-  if not Assigned(Form) then exit; //just precaution...
 
   if Assigned(jForm(Form).OnClose) then
   begin
@@ -2361,7 +2363,7 @@ begin
       if jForm(gApp.Forms.Stack[formBaseInx].Form).PromptOnBackKey then
          jForm(gApp.Forms.Stack[formBaseInx].Form).DoJNIPrompt; //<<--- thanks to @arenabor
 
-      //LORDMAN - 2013-08-01 / Call Back
+      //LORDMAN - 2013-08-01 // Call Back
       if Assigned(gApp.Forms.Stack[Inx].CloseCB.Event) then
          gApp.Forms.Stack[Inx].CloseCB.Event(gApp.Forms.Stack[Inx].CloseCB.Sender);
 
@@ -2371,6 +2373,13 @@ begin
                                                  jForm(Form).FCBDataString,
                                                  jForm(Form).FCBDataInteger ,
                                                  jForm(Form).FCBDataDouble);
+      //BacktrackOnClose
+      if jForm(Form).TryBacktrackOnClose then
+      begin
+        if formBaseInx <> 0 then
+           jForm(gApp.Forms.Stack[formBaseInx].Form).Close;
+      end;
+
   end;
 
   if jForm(Form).ActivityMode = actMain then  //"The End"
@@ -2389,20 +2398,20 @@ end;
 
 Procedure jForm.SetCloseCallBack(func : TOnNotify; Sender : TObject);
 begin
-  FCloseCallBack.Event  := func;
-  FCloseCallBack.Sender := Sender;
+  FCloseCallBack.Event:= func;
+  FCloseCallBack.Sender:= Sender;
 end;
 
 Procedure jForm.SetCloseCallBack(func : TOnCallBackData; Sender : TObject);
 begin
   FCloseCallBack.EventData:= func;
-  FCloseCallBack.Sender := Sender;
+  FCloseCallBack.Sender:= Sender;
 end;
 
 // Event : Java -> Pascal
 Procedure jForm.GenEvent_OnClick(Obj: TObject);
 begin
-   if Assigned(FOnClick) then FOnClick(Obj);
+  if Assigned(FOnClick) then FOnClick(Obj);
 end;
 
 function  jForm.GetOnViewClickListener(jObjForm: jObject): jObject;
@@ -2419,8 +2428,8 @@ end;
 
 Procedure jForm.GenEvent_OnListItemClick(jObjAdapterView: jObject; jObjView: jObject; position: integer; Id: integer);
 begin
- if FInitialized then
-   if Assigned(FOnListItemClick) then FOnListItemClick(jObjAdapterView, jObjView,position,Id);
+  if FInitialized then
+    if Assigned(FOnListItemClick) then FOnListItemClick(jObjAdapterView, jObjView,position,Id);
 end;
 
 
