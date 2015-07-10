@@ -1,0 +1,57 @@
+object AndroidModule5: TAndroidModule5
+  Left = 285
+  Top = 163
+  Width = 320
+  Height = 400
+  MarginLeft = 0
+  MarginTop = 0
+  MarginRight = 0
+  MarginBottom = 0
+  Text = 'AndroidModule5'
+  ActivityMode = actRecyclable
+  BackgroundColor = colbrDarkSeaGreen
+  object jTextView1: jTextView
+    Left = 139
+    Top = 5
+    Width = 41
+    Height = 20
+    MarginLeft = 5
+    MarginTop = 5
+    MarginRight = 5
+    MarginBottom = 5
+    Visible = True
+    PosRelativeToAnchor = []
+    PosRelativeToParent = [rpTop, rpCenterHorizontal]
+    LayoutParamWidth = lpWrapContent
+    LayoutParamHeight = lpWrapContent
+    Text = 'Form 5'
+    Alignment = taLeft
+    Enabled = True
+    BackgroundColor = colbrDefault
+    FontColor = colbrDefault
+    FontSize = 0
+    TextTypeFace = tfNormal
+    Id = 0
+  end
+  object jButton1: jButton
+    Left = 114
+    Top = 180
+    Width = 92
+    Height = 40
+    MarginLeft = 2
+    MarginTop = 4
+    MarginRight = 2
+    MarginBottom = 4
+    Visible = True
+    PosRelativeToAnchor = []
+    PosRelativeToParent = [rpCenterInParent]
+    LayoutParamWidth = lpOneThirdOfParent
+    LayoutParamHeight = lpWrapContent
+    Text = 'Hello!'
+    BackgroundColor = colbrDefault
+    FontColor = colbrDefault
+    FontSize = 0
+    OnClick = jButton1Click
+    Id = 0
+  end
+end

@@ -92,3 +92,6 @@ pOnCustomDialogBackKeyPressed=Java_Event_pOnCustomDialogBackKeyPressed(PEnv,this
 pOnListViewDrawItemCaptionColor=Java_Event_pOnListViewDrawItemCaptionColor(PEnv,this,TObject(pasobj),position,caption);
 pOnListViewLongClickCaptionItem=Java_Event_pOnListViewLongClickCaptionItem(PEnv,this,TObject(pasobj),position,caption);
 pOnListViewDrawItemBitmap=Java_Event_pOnListViewDrawItemBitmap(PEnv,this,TObject(pasobj),position,caption);
+pOnSeekBarProgressChanged=Java_Event_pOnSeekBarProgressChanged(PEnv,this,TObject(pasobj),progress,Boolean(fromUser));
+pOnSeekBarStartTrackingTouch=Java_Event_pOnSeekBarStartTrackingTouch(PEnv,this,TObject(pasobj),progress);
+pOnSeekBarStopTrackingTouch=Java_Event_pOnSeekBarStopTrackingTouch(PEnv,this,TObject(pasobj),progress);

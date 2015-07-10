@@ -1015,7 +1015,7 @@ type
     property ScreenStyle  : TScreenStyle   read FScreenStyle    write FScreenStyle;
     property Animation    : TAnimation     read FAnimation      write FAnimation;
     property Orientation   : integer read FOrientation write SetOrientation;
-    //property App: jApp read FApplication write FApplication;
+
     property ScreenWH      : TWH read FScreenWH;
 
     property CallBackDataString: string read FCBDataString write FCBDataString;
@@ -1117,7 +1117,7 @@ type
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
-    //procedure Init;  override;
+
     procedure Init(refApp: jApp); override;
     procedure UpdateLayout; virtual;
     property AnchorId: integer read FAnchorId write FAnchorId;
@@ -1144,26 +1144,15 @@ type
     property LayoutParamHeight: TLayoutParams read FLParamHeight write SetParamHeight;
 end;
 
-
-  //by jmpessoa
   Function InputTypeToStrEx ( InputType : TInputTypeEx ) : String;
-
   function SplitStr(var theString: string; delimiter: string): string;
-
   function GetARGB(customColor: Dword; colbrColor: TARGBColorBridge): DWord;
-
-
   function GetProgressBarStyle(cjProgressBarStyle: TProgressBarStyle ): DWord;
-
-  //function GetInputTypeEx(itxType: TInputTypeEx): DWord;
-
   function GetScrollBarStyle(scrlBarStyle: TScrollBarStyle ): integer;
   function GetPositionRelativeToAnchor(posRelativeToAnchorID: TPositionRelativeToAnchorID): DWord;
   function GetPositionRelativeToParent(posRelativeToParent: TPositionRelativeToParent): DWord;
-
   function GetLayoutParams(App: jApp; lpParam: TLayoutParams;  side: TSide): DWord;
   function GetLayoutParamsByParent(paren: TAndroidWidget; lpParam: TLayoutParams;  side: TSide): DWord;
-
   function GetLayoutParamsOrd(lpParam: TLayoutParams): DWord;
   function GetLayoutParamsName(ordIndex: DWord): TLayoutParams;
 
@@ -1302,7 +1291,6 @@ function  jForm_GetOnListItemClickListener    (env:PJNIEnv; Form: jObject): jObj
 Procedure jApp_KillProcess             (env:PJNIEnv;this:jobject);
 Procedure jApp_ScreenStyle             (env:PJNIEnv;this:jobject; screenstyle : integer);
 
-//by jmpessoa
 procedure jApp_GetJNIEnv(var env: PJNIEnv);
 
 function  jApp_GetStringResourceId(env:PJNIEnv;this:jobject; _resName: string): integer;
@@ -2309,6 +2297,8 @@ begin
 
   FormState := fsFormWork;
   FVisible:= True;
+
+  FormBaseIndex:= gApp.TopIndex; //rx3!
 
   gApp.TopIndex:= Self.FormIndex;
 

@@ -15,7 +15,8 @@
 //
 //              LoadMan    / Jang,Yang-Ho , 장양호
 //                           wkddidgh@naver.com    
-//                           http://blog.naver.com/wkddidgh 
+//                           http://blog.naver.com/wkddidgh
+//
 //
 //   Controls
 //               2012.02.26         TextView
@@ -123,13 +124,14 @@
 unit Laz_And_Controls;
 
 //A modified and expanded version of the simonsayz's "And_Controls.pas"
-//Lazarus Android Module Wizard: Form Designer and Components development model!
+//for Lazarus Android Module Wizard: Form Designer and Components development model!
 //Author: jmpessoa@hotmail.com
 //https://github.com/jmpessoa/lazandroidmodulewizard
 //http://forum.lazarus.freepascal.org/index.php/topic,21919.0.html
-//Start:  -  26-october-2013
+
+//Start:  - 26-october-2013
 //Ver_0.1 - 08-december-2013
-//Ver_0.2 - 08-february-2014: Add support to API > 13
+//Ver_0.2 - 08-february-2014: Added support to Android API > 13
 
 {$mode delphi}
 
@@ -865,14 +867,11 @@ type
     Procedure Refresh;
     Procedure UpdateLayout; override;
 
-    //property Parent: jObject  read  FjPRLayout write SetParent; // Java : Parent Relative Layout
   published
     property Text: string read GetText write SetText;
-    //property Visible   : boolean   read FVisible   write SetVisible;
     property BackgroundColor     : TARGBColorBridge read FColor     write SetColor;
     property FontColor : TARGBColorBridge read FFontColor write SetFontColor;
     property FontSize  : DWord     read FFontSize  write SetFontSize;
-    //property Text      : string    read GetText    write SetText;
     property Checked   : boolean   read GetChecked write SetChecked;
     // Event
     property OnClick   : TOnNotify read FOnClick   write FOnClick;
@@ -902,14 +901,11 @@ type
     procedure Refresh;
     Procedure UpdateLayout; override;
 
-    //property Parent: jObject  read  FjPRLayout write SetParent; // Java : Parent Relative Layout
   published
     property Text: string read GetText write SetText;
-    //property Visible   : boolean   read FVisible   write SetVisible;
     property BackgroundColor     : TARGBColorBridge read FColor     write SetColor;
     property FontColor : TARGBColorBridge read FFontColor write SetFontColor;
     property FontSize  : DWord     read FFontSize  write SetFontSize;
-    //property Text      : string    read GetText    write SetText;
     property Checked   : boolean   read GetChecked write SetChecked;
     // Event
     property OnClick   : TOnNotify read FOnClick   write FOnClick;
@@ -1080,7 +1076,7 @@ type
     procedure Add(item: string; delim: string; fontColor: TARGBColorBridge;
                   fontSize: integer; hasWidget: TWidgetItem; widgetText: string; image: jObject); overload;
     Procedure Delete(index: Integer);
-    function GetText(index: integer): string;
+    function GetItemText(index: integer): string;
     Procedure Clear;
     Procedure SetFontColorByIndex(Value : TARGBColorBridge; index: integer);
     Procedure SetFontSizeByIndex(Value : DWord; index: integer  );
@@ -5265,7 +5261,7 @@ begin
   end;
 end;
 
-function jListView.GetText(index: Integer): string;
+function jListView.GetItemText(index: Integer): string;
 begin
   if FInitialized then
     Result:= jListView_GetItemText(FjEnv, FjObject , index);

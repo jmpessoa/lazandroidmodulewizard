@@ -345,17 +345,31 @@ begin
 end;
 
 procedure TFormUpdateCodeTemplate.FormShow(Sender: TObject);
+var
+  IDEProjectName: string;
+  p: integer;
 begin
   EditPathToWorkspace.Text:= PathToWorkspace; //by jmpessoa
   ComboBoxSelectProject.Items.Clear;  //by jmpessoa
   if PathToWorkspace <> '' then
   begin
+    IDEProjectName:='';
+    p:= Pos(DirectorySeparator+'jni', LazarusIDE.ActiveProject.MainFile.Filename);
+    if p > 0 then
+      IDEProjectName:= Copy(LazarusIDE.ActiveProject.MainFile.Filename,1,p-1);
+
     GetSubDirectories(PathToWorkspace, ComboBoxSelectProject.Items);
-    if ProjectPath <> '' then
+    if IDEProjectName <> '' then
     begin
-      ComboBoxSelectProject.Text:= ProjectPath;
-      StatusBar1.SimpleText:= 'Recent: '+ ProjectPath; //path to most recent project ...   by jmpessoa
-      JNIProjectPath:= ProjectPath + DirectorySeparator + 'jni';
+        ComboBoxSelectProject.Text:= IDEProjectName;
+        StatusBar1.SimpleText:= 'Recent: '+ IDEProjectName; //path to most recent project ...   by jmpessoa
+        JNIProjectPath:= IDEProjectName + DirectorySeparator + 'jni';
+    end
+    else if ProjectPath <> '' then
+    begin
+        ComboBoxSelectProject.Text:= ProjectPath;
+        StatusBar1.SimpleText:= 'Recent: '+ ProjectPath; //path to most recent project ...   by jmpessoa
+        JNIProjectPath:= ProjectPath + DirectorySeparator + 'jni';
     end;
   end;
   CheckGroupUpgradeTemplates.Checked[0]:= True;

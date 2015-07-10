@@ -82,6 +82,10 @@ uses
    function  Java_Event_pOnGridDrawItemCaptionColor(env: PJNIEnv; this: jobject; Obj: TObject; index: integer; caption: JString): JInt;
    function  Java_Event_pOnGridDrawItemBitmap(env: PJNIEnv; this: jobject; Obj: TObject; index: integer; caption: JString): JObject;
 
+   procedure Java_Event_pOnSeekBarProgressChanged(env: PJNIEnv; this: jobject; Obj: TObject; progress: integer; fromUser: boolean);
+   procedure Java_Event_pOnSeekBarStartTrackingTouch(env: PJNIEnv; this: jobject; Obj: TObject; progress: integer);
+   procedure Java_Event_pOnSeekBarStopTrackingTouch(env: PJNIEnv; this: jobject; Obj: TObject; progress: integer);
+
 implementation
 
 uses
@@ -89,7 +93,7 @@ uses
    AndroidWidget, bluetooth, bluetoothclientsocket, bluetoothserversocket,
    spinner, location, actionbartab, customdialog, togglebutton, switchbutton, gridview,
    sensormanager, broadcastreceiver, datepickerdialog, timepickerdialog, shellcommand,
-   tcpsocketclient, surfaceview, mediaplayer, contactmanager;
+   tcpsocketclient, surfaceview, mediaplayer, contactmanager, seekbar;
 
 procedure Java_Event_pOnBluetoothEnabled(env: PJNIEnv; this: jobject; Obj: TObject);
 begin
@@ -1006,6 +1010,43 @@ begin
     jGridVIew(Obj).GenEvent_OnDrawItemBitmap(Obj, index, pasCaption, outBitmap);
   end;
   Result:= outBitmap;
+end;
+
+
+procedure Java_Event_pOnSeekBarProgressChanged(env: PJNIEnv; this: jobject; Obj: TObject; progress: integer; fromUser: boolean);
+begin
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+  if not Assigned(Obj)  then Exit;
+  if Obj is jSeekBar then
+  begin
+     jForm(jSeekBar(Obj).Owner).UpdateJNI(gApp);
+     jSeekBar(Obj).GenEvent_OnSeekBarProgressChanged(Obj, progress, fromUser);
+  end;
+end;
+
+procedure Java_Event_pOnSeekBarStartTrackingTouch(env: PJNIEnv; this: jobject; Obj: TObject; progress: integer);
+begin
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+  if not Assigned(Obj)  then Exit;
+  if Obj is jSeekBar then
+  begin
+     jForm(jSeekBar(Obj).Owner).UpdateJNI(gApp);
+     jSeekBar(Obj).GenEvent_OnSeekBarStartTrackingTouch(Obj, progress);
+  end;
+end;
+
+procedure Java_Event_pOnSeekBarStopTrackingTouch(env: PJNIEnv; this: jobject; Obj: TObject; progress: integer);
+begin
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+  if not Assigned(Obj)  then Exit;
+  if Obj is jSeekBar then
+  begin
+     jForm(jSeekBar(Obj).Owner).UpdateJNI(gApp);
+     jSeekBar(Obj).GenEvent_OnSeekBarStopTrackingTouch(Obj, progress);
+  end;
 end;
 
 end.

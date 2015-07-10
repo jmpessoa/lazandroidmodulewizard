@@ -7,7 +7,7 @@ interface
 
 uses
   Classes, SysUtils, And_jni, And_jni_Bridge, Laz_And_Controls, 
-    Laz_And_Controls_Events, AndroidWidget;
+    Laz_And_Controls_Events, AndroidWidget, Unit4;
 
 type
 
@@ -35,7 +35,16 @@ implementation
 
 procedure TAndroidModule3.jButton1Click(Sender: TObject);
 begin
-     ShowMessage('jForm 3 Hello!');
+   if(AndroidModule4 = nil) then
+  begin
+    gApp.CreateForm(TAndroidModule4, AndroidModule4);
+    AndroidModule4.TryBacktrackOnClose:= True;
+    AndroidModule4.Init(gApp);
+  end
+  else
+  begin
+    AndroidModule4.Show;
+  end;
 end;
 
 procedure TAndroidModule3.AndroidModule3JNIPrompt(Sender: TObject);

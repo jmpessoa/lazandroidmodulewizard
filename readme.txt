@@ -66,10 +66,16 @@
 		
 	References:
 
-		Ant	http://ant.apache.org/bindownload.cgi 
-			Simply extract the zip file to a convenient location...
+		Laz4Android
+			http://sourceforge.net/projects/laz4android/files/?source=navbar
+			:To Install [*.7z], please, read the "Laz4Android_readme.txt"
 
-		NDK-r10c	http://dl.google.com/android/ndk/android-ndk-r10c-windows-x86.exe
+		Android NDK-r10c 
+			http://dl.google.com/android/ndk/android-ndk-r10c-windows-x86.exe
+
+		Ant	
+			http://ant.apache.org/bindownload.cgi 
+			Simply extract the zip file to a convenient location...
 
 
 	***************************************************************************************************
@@ -98,6 +104,7 @@
 	*		IDE --> Tools --> 
 	*				[Lamw] Android Module Wizard --> 
 	*					Change Project [*.lpi] Ndk Path [Demos]
+
 	*	Option 2: Go to Lazarus IDE:
 	*			->Project
 	*			->Project -> Option
@@ -115,7 +122,40 @@
 	*	Lazarus IDE --> menu Tools --> [Lamw] Android Module Wizard --> Upgrade code Templates [*.lpr, *.java]
 	*
 	*5.PANIC ? When prompt "Read error" [Unknown Property] just choice "Continue Loading" !
+	*
+	*6.PANIC ? Fail to build Apk. Try change "AndroidManifest.xml" according your system installation
+	*		<uses-sdk android:minSdkVersion="15" android:targetSdkVersion="17"/>
+	*
 	****************************************************************************************************
+
+Version 0.6 - rev. 33 - 09 July 2015 - 
+
+	NEW! jSeekBar component 
+
+	IMPROVEMENTS!   
+			
+		jForm 
+			New! 
+				properties: // <<--- @rx3.fireproof's request and suggestion! 
+					PromptOnBackKey [default=True]
+
+					TryBacktrackOnClose [default=False]
+
+						The form now know your [own] base... so, 
+						if you close it, you will return to the form where it was created 
+						[or "showed"!].  But you can try return to "main form" form using the new 
+						property "TryBacktrackOnClose:= True" in all [forms] chains ...
+						[warnig]the process will stop [before main from] if some form [in the way] 
+						was not set "TryBacktrackOnClose:= True"
+
+	NEW! AppSeekBarDemo1   [multiples forms demos, too]
+			
+	UPDATED: Demo AppTest1  [multiples forms demos]
+
+	HINT 1: Old Projects: upgrade your projects code templates !
+		Lazarus IDE --> menu Tools --> [Lamw] Android Module Wizard --> Upgrade code Templates [*.lpr, *.java]
+
+	HINT 2:	When prompt "Read error" [Unknown Property] just choice "Continue Loading"!
 
 Version 0.6 - rev. 32 - 05 July 2015 - 
 

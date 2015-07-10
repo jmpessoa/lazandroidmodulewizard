@@ -7,7 +7,7 @@ interface
   
 uses
   Classes, SysUtils, And_jni, And_jni_Bridge, Laz_And_Controls,
-  Laz_And_Controls_Events, AndroidWidget, Unit2, unit4;
+  Laz_And_Controls_Events, AndroidWidget, Unit2, unit5;
   
 type
 
@@ -72,10 +72,11 @@ procedure TAndroidModule1.jButton2Click(Sender: TObject);
 begin
   if(AndroidModule2 = nil) then
   begin
-      gApp.CreateForm(TAndroidModule2, AndroidModule2);
-      AndroidModule2.SetCloseCallBack(CallBackNotify, Self);
-      AndroidModule2.SetCloseCallBack(CallBackData, Self);
-      AndroidModule2.Init(gApp);
+    gApp.CreateForm(TAndroidModule2, AndroidModule2);
+    AndroidModule2.SetCloseCallBack(CallBackNotify, Self);
+    AndroidModule2.SetCloseCallBack(CallBackData, Self);
+    AndroidModule2.PromptOnBackKey:= False;
+    AndroidModule2.Init(gApp);
   end
   else
   begin
@@ -85,14 +86,14 @@ end;
 
 procedure TAndroidModule1.jButton3Click(Sender: TObject);
 begin
-  if(AndroidModule4 = nil) then
+  if AndroidModule5 = nil then
   begin
-      gApp.CreateForm(TAndroidModule4, AndroidModule4);
-      AndroidModule4.Init(gApp);
+     gApp.CreateForm(TAndroidModule5, AndroidModule5);
+     AndroidModule5.Init(gApp);
   end
   else
   begin
-    AndroidModule4.Show;
+    AndroidModule5.Show;
   end;
 end;
 

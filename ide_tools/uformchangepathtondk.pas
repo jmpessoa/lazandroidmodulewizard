@@ -41,6 +41,7 @@ type
     PathToDemosWorkspace: string;
     PathToDemoAndroidNDK: string;
     PathToAndroidNDK: string;
+    LastFullProjectName: string;
   end;
 
   procedure GetSubDirectories(const directory : string; list : TStrings);
@@ -163,7 +164,10 @@ end;
 procedure TFormChangeDemoPathToNDK.FormCreate(Sender: TObject);
 var
   AmwFile: string;
+  IDEProjectName: string;
+  p: integer;
 begin
+  ComboBoxSelectProject.Text:= '';
   AmwFile:= AppendPathDelim(LazarusIDE.GetPrimaryConfigPath) + 'JNIAndroidProject.ini';
   if FileExistsUTF8(AmwFile) then
   begin
@@ -172,21 +176,25 @@ begin
         PathToDemosWorkspace:=  ReadString('NewProject', 'PathToDemosWorkspace', '');
         PathToAndroidNDK:= ReadString('NewProject', 'PathToAndroidNDK', '');
         EditPathToWorkspace.Text:= PathToDemosWorkspace;
-
+        LastFullProjectName:= ReadString('NewProject', 'FullProjectName', '');
         if  PathToDemosWorkspace <> '' then
         begin
+           IDEProjectName:='';
+           p:= Pos(DirectorySeparator+'jni', LazarusIDE.ActiveProject.MainFile.Filename);
+           if p > 0 then
+             IDEProjectName:= Copy(LazarusIDE.ActiveProject.MainFile.Filename,1,p-1);
            ComboBoxSelectProject.Items.Clear;
            GetSubDirectories(PathToDemosWorkspace, ComboBoxSelectProject.Items);
-           ComboBoxSelectProject.ItemIndex:= -1;
-           ComboBoxSelectProject.Text:='';
+           if IDEProjectName <> '' then
+               ComboBoxSelectProject.Text:= IDEProjectName
+           else if LastFullProjectName <> '' then
+               ComboBoxSelectProject.Text:= LastFullProjectName;
         end;
-
         EditPathToAndroidNDK.Text:= PathToAndroidNDK;
       finally
         Free
       end;
   end;
-  ComboBoxSelectProject.Text:= '';
 end;
 
 //helper... by jmpessoa

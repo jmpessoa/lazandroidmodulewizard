@@ -9,7 +9,7 @@ object AndroidModule4: TAndroidModule4
   MarginBottom = 0
   Text = 'AndroidModule4'
   ActivityMode = actRecyclable
-  BackgroundColor = colbrBlack
+  BackgroundColor = colbrDarkKhaki
   OnJNIPrompt = AndroidModule4JNIPrompt
   object jButton1: jButton
     Left = 87
@@ -27,7 +27,7 @@ object AndroidModule4: TAndroidModule4
     LayoutParamHeight = lpWrapContent
     Text = 'Hello Form 4!'
     BackgroundColor = colbrDefault
-    FontColor = colbrRed
+    FontColor = colbrForestGreen
     FontSize = 0
     OnClick = jButton1Click
     Id = 0
@@ -50,7 +50,7 @@ object AndroidModule4: TAndroidModule4
     Alignment = taLeft
     Enabled = True
     BackgroundColor = colbrDefault
-    FontColor = colbrRed
+    FontColor = colbrForestGreen
     FontSize = 0
     TextTypeFace = tfNormal
     Id = 0

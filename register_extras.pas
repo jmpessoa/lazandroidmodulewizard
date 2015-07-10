@@ -8,6 +8,7 @@ interface
 
 uses 
   Classes,
+  seekbar,
   contactmanager,
   surfaceview,
   tcpsocketclient,
@@ -50,6 +51,7 @@ implementation
   
 Procedure Register;
 begin
+  {$I jseekbar_icon.lrs}
   {$I jcontactmanager_icon.lrs}
   {$I jsurfaceview_icon.lrs}
   {$I jtcpsocketclient_icon.lrs}
@@ -83,6 +85,7 @@ begin
   {$I jmyhello_icon.lrs}
   RegisterComponents('Android Bridges Extra',
     [
+      jSeekBar,
       jContactManager,
       jSurfaceView,
       jTCPSocketClient,

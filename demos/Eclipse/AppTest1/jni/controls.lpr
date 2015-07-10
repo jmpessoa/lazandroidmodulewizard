@@ -1,5 +1,5 @@
 {hint: save all files to location: C:\adt32\eclipse\workspace\AppTest1\jni}
-library controls;  //by Lamw: Lazarus Android Module Wizard: 7/5/2015 20:14:04]
+library controls;  //by Lamw: Lazarus Android Module Wizard: 7/9/2015 18:29:08]
  
 {$mode delphi}
  
@@ -751,7 +751,31 @@ begin
   Result:=Java_Event_pOnContactManagerContactsProgress(PEnv,this,TObject(pasobj),contactInfo,contactShortInfo,contactPhotoUriAsString,contactPhoto,progress);
 end;
 
-const NativeMethods:array[0..92] of JNINativeMethod = (
+{ Class:     com_example_apptest1_Controls
+  Method:    pOnSeekBarProgressChanged
+  Signature: (JIZ)V }
+procedure pOnSeekBarProgressChanged(PEnv: PJNIEnv; this: JObject; pasobj: JLong; progress: JInt; fromUser: JBoolean); cdecl;
+begin
+  Java_Event_pOnSeekBarProgressChanged(PEnv,this,TObject(pasobj),progress,Boolean(fromUser));
+end;
+
+{ Class:     com_example_apptest1_Controls
+  Method:    pOnSeekBarStartTrackingTouch
+  Signature: (JI)V }
+procedure pOnSeekBarStartTrackingTouch(PEnv: PJNIEnv; this: JObject; pasobj: JLong; progress: JInt); cdecl;
+begin
+  Java_Event_pOnSeekBarStartTrackingTouch(PEnv,this,TObject(pasobj),progress);
+end;
+
+{ Class:     com_example_apptest1_Controls
+  Method:    pOnSeekBarStopTrackingTouch
+  Signature: (JI)V }
+procedure pOnSeekBarStopTrackingTouch(PEnv: PJNIEnv; this: JObject; pasobj: JLong; progress: JInt); cdecl;
+begin
+  Java_Event_pOnSeekBarStopTrackingTouch(PEnv,this,TObject(pasobj),progress);
+end;
+
+const NativeMethods:array[0..95] of JNINativeMethod = (
    (name:'pAppOnScreenStyle';
     signature:'()I';
     fnPtr:@pAppOnScreenStyle;),
@@ -1030,7 +1054,16 @@ const NativeMethods:array[0..92] of JNINativeMethod = (
     fnPtr:@pOnContactManagerContactsExecuted;),
    (name:'pOnContactManagerContactsProgress';
     signature:'(JLjava/lang/String;Ljava/lang/String;Ljava/lang/String;Landroid/graphics/Bitmap;I)Z';
-    fnPtr:@pOnContactManagerContactsProgress;)
+    fnPtr:@pOnContactManagerContactsProgress;),
+   (name:'pOnSeekBarProgressChanged';
+    signature:'(JIZ)V';
+    fnPtr:@pOnSeekBarProgressChanged;),
+   (name:'pOnSeekBarStartTrackingTouch';
+    signature:'(JI)V';
+    fnPtr:@pOnSeekBarStartTrackingTouch;),
+   (name:'pOnSeekBarStopTrackingTouch';
+    signature:'(JI)V';
+    fnPtr:@pOnSeekBarStopTrackingTouch;)
 );
 
 function RegisterNativeMethodsArray(PEnv: PJNIEnv; className: PChar; methods: PJNINativeMethod; countMethods:integer):integer;
@@ -1178,7 +1211,10 @@ exports
   pOnSurfaceViewDrawingInBackground name 'Java_com_example_apptest1_Controls_pOnSurfaceViewDrawingInBackground',
   pOnSurfaceViewDrawingPostExecute name 'Java_com_example_apptest1_Controls_pOnSurfaceViewDrawingPostExecute',
   pOnContactManagerContactsExecuted name 'Java_com_example_apptest1_Controls_pOnContactManagerContactsExecuted',
-  pOnContactManagerContactsProgress name 'Java_com_example_apptest1_Controls_pOnContactManagerContactsProgress';
+  pOnContactManagerContactsProgress name 'Java_com_example_apptest1_Controls_pOnContactManagerContactsProgress',
+  pOnSeekBarProgressChanged name 'Java_com_example_apptest1_Controls_pOnSeekBarProgressChanged',
+  pOnSeekBarStartTrackingTouch name 'Java_com_example_apptest1_Controls_pOnSeekBarStartTrackingTouch',
+  pOnSeekBarStopTrackingTouch name 'Java_com_example_apptest1_Controls_pOnSeekBarStopTrackingTouch';
 
 begin
   gApp:= jApp.Create(nil);{AndroidWidget.pas}

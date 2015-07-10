@@ -40,7 +40,7 @@
         <PackageName Value="tfpandroidbridge_pack"/>
       </Item1>
     </RequiredPackages>
-    <Units Count="5">
+    <Units Count="6">
       <Unit0>
         <Filename Value="controls.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -73,6 +73,13 @@
         <HasResources Value="True"/>
         <UnitName Value="unit4"/>
       </Unit4>
+      <Unit5>
+        <Filename Value="unit5.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="AndroidModule5"/>
+        <HasResources Value="True"/>
+        <UnitName Value="unit5"/>
+      </Unit5>
     </Units>
   </ProjectOptions>
   <CompilerOptions>

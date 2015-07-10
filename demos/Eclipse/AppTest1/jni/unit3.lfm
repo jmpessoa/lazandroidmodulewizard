@@ -25,7 +25,7 @@ object AndroidModule3: TAndroidModule3
     PosRelativeToParent = [rpCenterInParent]
     LayoutParamWidth = lpHalfOfParent
     LayoutParamHeight = lpWrapContent
-    Text = 'Hello Form 3!'
+    Text = 'Open Form 3!'
     BackgroundColor = colbrDefault
     FontColor = colbrYellow
     FontSize = 0

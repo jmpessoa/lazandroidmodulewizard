@@ -2,7 +2,7 @@ package com.example.dummyapp;
 
 //Lamw: Lazarus Android Module Wizard 
 //Form Designer and Components development model!
-//version 0.6 - revision 32 - 05 July - 2015
+//version 0.6 - revision 33 - 09 July - 2015
 //
 //https://github.com/jmpessoa/lazandroidmodulewizard
 //http://forum.lazarus.freepascal.org/index.php/topic,21919.270.html
@@ -226,6 +226,7 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.RadioButton;
+import android.widget.SeekBar;
 import android.widget.Spinner;
 import android.widget.RelativeLayout.LayoutParams;
 import android.widget.Switch;
@@ -14668,6 +14669,186 @@ public String GetContactInfo(String _displayName, String _delimiter) {
 
 }
 
+
+/*Draft java code by "Lazarus Android Module Wizard" [7/8/2015 22:55:27]*/
+/*https://github.com/jmpessoa/lazandroidmodulewizard*/
+/*jVisualControl template*/
+ 
+class jSeekBar extends SeekBar /*dummy*/ { //please, fix what GUI object will be extended!
+  
+  private long       pascalObj = 0;    // Pascal Object
+  private Controls   controls  = null; // Control Class for events
+  
+  private Context context = null;
+  private ViewGroup parent   = null;         // parent view
+  private RelativeLayout.LayoutParams lparams;              // layout XYWH 
+  private OnClickListener onClickListener;   // click event
+  
+  private OnSeekBarChangeListener onSeekBarChangeListener;
+  
+  private Boolean enabled  = true;           // click-touch enabled!
+  private int lparamsAnchorRule[] = new int[30];
+  private int countAnchorRule = 0;
+  private int lparamsParentRule[] = new int[30];
+  private int countParentRule = 0;
+  private int lparamH = 100;
+  private int lparamW = 100;
+  private int marginLeft = 0;
+  private int marginTop = 0;
+  private int marginRight = 0;
+  private int marginBottom = 0;
+  private boolean mRemovedFromParent = false;
+  
+  int mProgress = 0;
+ 
+ //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...    
+  public jSeekBar(Controls _ctrls, long _Self) { //Add more others news "_xxx"p arams if needed!
+     super(_ctrls.activity);
+     context   = _ctrls.activity;
+     pascalObj = _Self;
+     controls  = _ctrls;
+  
+     lparams = new RelativeLayout.LayoutParams(lparamW, lparamH);
+  
+     onClickListener = new OnClickListener(){
+     /*.*/public void onClick(View view){  //please, do not remove /*.*/ mask for parse invisibility!
+             if (enabled) {
+                //controls.pOnClick(pascalObj, Const.Click_Default); //JNI event onClick!
+             }
+          };
+     };
+     
+     setOnClickListener(onClickListener);
+     
+     onSeekBarChangeListener = new OnSeekBarChangeListener() {                 
+         @Override
+         /*.*/public void onProgressChanged(SeekBar seekBar, int progresValue, boolean fromUser) {
+        	 mProgress = progresValue;
+             controls.pOnSeekBarProgressChanged(pascalObj, mProgress, fromUser); 
+         }        
+         
+         @Override
+         /*.*/public void onStartTrackingTouch(SeekBar seekBar) {
+        	  controls.pOnSeekBarStartTrackingTouch(pascalObj, seekBar.getProgress());
+         }
+
+         @Override
+         /*.*/public void onStopTrackingTouch(SeekBar seekBar) {
+        	 controls.pOnSeekBarStopTrackingTouch(pascalObj, seekBar.getProgress());   
+         }
+     };
+
+     setOnSeekBarChangeListener(onSeekBarChangeListener);
+  } //end constructor
+ 
+  public void jFree() {
+     if (parent != null) { parent.removeView(this); }
+     //free local objects...
+     lparams = null;
+     setOnClickListener(null);
+  }
+ 
+  public void SetViewParent(ViewGroup _viewgroup) {
+     if (parent != null) { parent.removeView(this); }
+     parent = _viewgroup;
+     parent.addView(this,lparams);
+     mRemovedFromParent = false;
+  }
+  
+  public void RemoveFromViewParent() {
+     if (!mRemovedFromParent) {
+        this.setVisibility(android.view.View.INVISIBLE);
+        if (parent != null)
+   	       parent.removeView(this);
+	   mRemovedFromParent = true;
+	}
+  }
+ 
+  public View GetView() {
+     return this;
+  }
+ 
+  public void SetLParamWidth(int _w) {
+     lparamW = _w;
+  }
+ 
+  public void SetLParamHeight(int _h) {
+     lparamH = _h;
+  }
+ 
+  public void SetLeftTopRightBottomWidthHeight(int _left, int _top, int _right, int _bottom, int _w, int _h) {
+     marginLeft = _left;
+     marginTop = _top;
+     marginRight = _right;
+     marginBottom = _bottom;
+     lparamH = _h;
+     lparamW = _w;
+  }
+ 
+  public void AddLParamsAnchorRule(int _rule) {
+     lparamsAnchorRule[countAnchorRule] = _rule;
+     countAnchorRule = countAnchorRule + 1;
+  }
+ 
+  public void AddLParamsParentRule(int _rule) {
+     lparamsParentRule[countParentRule] = _rule;
+     countParentRule = countParentRule + 1;
+  }
+ 
+  public void SetLayoutAll(int _idAnchor) {
+ 	lparams.width  = lparamW;
+	lparams.height = lparamH;
+	lparams.setMargins(marginLeft,marginTop,marginRight,marginBottom);
+	if (_idAnchor > 0) {
+	    for (int i=0; i < countAnchorRule; i++) {
+		lparams.addRule(lparamsAnchorRule[i], _idAnchor);
+	    }
+	}
+     for (int j=0; j < countParentRule; j++) {
+        lparams.addRule(lparamsParentRule[j]);
+     }
+     this.setLayoutParams(lparams);
+  }
+ 
+  public void ClearLayoutAll() {
+	for (int i=0; i < countAnchorRule; i++) {
+ 	   lparams.removeRule(lparamsAnchorRule[i]);
+   	}
+ 
+	for (int j=0; j < countParentRule; j++) {
+  	   lparams.removeRule(lparamsParentRule[j]);
+	}
+	countAnchorRule = 0;
+	countParentRule = 0;
+  }
+
+  public void SetId(int _id) { //wrapper method pattern ...
+     this.setId(_id);
+  }
+ 
+ //write others [public] methods code here......
+ //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
+  
+  public void SetMax(int _maxProgress) {
+     this.setMax(_maxProgress);
+  }
+
+  public void SetProgress(int _progress) {
+	 if (_progress <  this.getMax())   
+	    this.setProgress(_progress);	 	 
+  }
+  
+  public int GetProgress() {		   
+		return this.getProgress();  
+  }
+  
+  public void SetRotation(float _rotation) {  //  API level 11 270 = vertical
+      this.setRotation(_rotation);
+  }
+  
+   
+} //end class
+
 //**new jComponent class entrypoint**//please, do not remove/change this line!
 
 //Javas/Pascal Interface Class 
@@ -14808,6 +14989,10 @@ public native void pOnSurfaceViewDrawingPostExecute(long pasobj, float progress)
 
 public native void pOnContactManagerContactsExecuted(long pasobj,  int count);
 public native boolean pOnContactManagerContactsProgress(long pasobj, String contactInfo, String contactShortInfo, String contactPhotoUriAsString, Bitmap contactPhoto, int progress);
+
+public native void pOnSeekBarProgressChanged(long pasobj,  int progress, boolean fromUser); 
+public native void pOnSeekBarStartTrackingTouch(long pasobj, int progress);
+public native void pOnSeekBarStopTrackingTouch(long pasobj, int progress);
 
 
 //Load Pascal Library
@@ -15877,5 +16062,9 @@ public float[] benchMark1 () {
    public java.lang.Object jContactManager_jCreate(long _Self) {
 	      return (java.lang.Object)(new jContactManager(this,_Self));
    }   
+   
+   public java.lang.Object jSeekBar_jCreate(long _Self) {
+	      return (java.lang.Object)(new jSeekBar(this,_Self));
+   }
    
 }

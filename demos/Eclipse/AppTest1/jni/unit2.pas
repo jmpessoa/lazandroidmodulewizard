@@ -34,7 +34,6 @@ type
       procedure jButton2Click(Sender: TObject);
     private
       {private declarations}
-      FMens: string;
     public
       {public declarations}
   end;
@@ -52,15 +51,16 @@ uses unit1;
 
 procedure TAndroidModule2.jButton1Click(Sender: TObject);
 begin
-  Self.Close;
+    Self.Close;
 end;
 
 procedure TAndroidModule2.jButton2Click(Sender: TObject);
 begin
-   if(AndroidModule3 = nil) then
+  if(AndroidModule3 = nil) then
   begin
-      gApp.CreateForm(TAndroidModule3, AndroidModule3);
-      AndroidModule3.Init(gApp);
+    gApp.CreateForm(TAndroidModule3, AndroidModule3);
+    AndroidModule3.TryBacktrackOnClose:= True;
+    AndroidModule3.Init(gApp);
   end
   else
   begin
@@ -79,9 +79,9 @@ end;
 
 procedure TAndroidModule2.AndroidModule2JNIPrompt(Sender: TObject);
 begin
-  ShowMessage('jForm 2 jni prompt!  FormBaseIndex = '+ IntToStr(Self.FormBaseIndex)+
+   ShowMessage('jForm 2 jni prompt!  FormBaseIndex = '+ IntToStr(Self.FormBaseIndex)+
                                  '  FormIndex = '+ IntToStr(Self.FormIndex));
-  jEditText1.SetFocus;
+   jEditText1.SetFocus;
 end;
 
 end.
