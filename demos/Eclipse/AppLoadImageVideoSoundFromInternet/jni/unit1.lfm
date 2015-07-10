@@ -1,0 +1,160 @@
+object AndroidModule1: TAndroidModule1
+  Left = 285
+  Top = 163
+  Width = 320
+  Height = 400
+  MarginLeft = 0
+  MarginTop = 0
+  MarginRight = 0
+  MarginBottom = 0
+  Text = 'AndroidModule1'
+  ActivityMode = actMain
+  BackgroundColor = colbrDefault
+  OnJNIPrompt = AndroidModule1JNIPrompt
+  object jTextView1: jTextView
+    Left = 31
+    Top = 5
+    Width = 258
+    Height = 20
+    MarginLeft = 5
+    MarginTop = 5
+    MarginRight = 5
+    MarginBottom = 5
+    Visible = True
+    PosRelativeToAnchor = []
+    PosRelativeToParent = [rpTop, rpCenterHorizontal]
+    LayoutParamWidth = lpWrapContent
+    LayoutParamHeight = lpWrapContent
+    Text = 'App Load Image Video Sound From Internet'
+    Alignment = taLeft
+    Enabled = True
+    BackgroundColor = colbrDefault
+    FontColor = colbrDefault
+    FontSize = 0
+    TextTypeFace = tfNormal
+    Id = 7138094
+  end
+  object jButton1: jButton
+    Left = 2
+    Top = 34
+    Width = 92
+    Height = 40
+    MarginLeft = 2
+    MarginTop = 4
+    MarginRight = 2
+    MarginBottom = 4
+    Visible = True
+    Anchor = jTextView1
+    PosRelativeToAnchor = [raBelow]
+    PosRelativeToParent = [rpLeft]
+    LayoutParamWidth = lpOneThirdOfParent
+    LayoutParamHeight = lpWrapContent
+    Text = 'Sound'
+    BackgroundColor = colbrDefault
+    FontColor = colbrDefault
+    FontSize = 0
+    OnClick = jButton1Click
+    Id = 5324807
+  end
+  object jButton2: jButton
+    Left = 114
+    Top = 34
+    Width = 92
+    Height = 40
+    MarginLeft = 2
+    MarginTop = 4
+    MarginRight = 2
+    MarginBottom = 4
+    Visible = True
+    Anchor = jTextView1
+    PosRelativeToAnchor = [raBelow]
+    PosRelativeToParent = [rpCenterHorizontal]
+    LayoutParamWidth = lpOneThirdOfParent
+    LayoutParamHeight = lpWrapContent
+    Text = 'Image'
+    BackgroundColor = colbrDefault
+    FontColor = colbrDefault
+    FontSize = 0
+    OnClick = jButton2Click
+    Id = 8462655
+  end
+  object jButton3: jButton
+    Left = 226
+    Top = 34
+    Width = 92
+    Height = 40
+    MarginLeft = 2
+    MarginTop = 4
+    MarginRight = 2
+    MarginBottom = 4
+    Visible = True
+    Anchor = jTextView1
+    PosRelativeToAnchor = [raBelow]
+    PosRelativeToParent = [rpRight]
+    LayoutParamWidth = lpOneThirdOfParent
+    LayoutParamHeight = lpWrapContent
+    Text = 'Video'
+    BackgroundColor = colbrDefault
+    FontColor = colbrDefault
+    FontSize = 0
+    OnClick = jButton3Click
+    Id = 1641892
+  end
+  object jImageView1: jImageView
+    Left = 8
+    Top = 272
+    Width = 304
+    Height = 128
+    Visible = True
+    PosRelativeToAnchor = [raBelow]
+    PosRelativeToParent = [rpBottom]
+    LayoutParamWidth = lpWrapContent
+    LayoutParamHeight = lpWrapContent
+    ImageIndex = -1
+    BackgroundColor = colbrDefault
+    ImageScaleType = scaleCenter
+    Id = 1481240
+  end
+  object jSurfaceView1: jSurfaceView
+    Left = 6
+    Top = 80
+    Width = 306
+    Height = 96
+    MarginLeft = 10
+    MarginTop = 10
+    MarginRight = 10
+    MarginBottom = 10
+    Visible = True
+    Anchor = jButton1
+    PosRelativeToAnchor = [raBelow]
+    PosRelativeToParent = []
+    LayoutParamWidth = lpWrapContent
+    LayoutParamHeight = lpOneThirdOfParent
+    BackgroundColor = colbrDefault
+    PaintColor = colbrRed
+    OnSurfaceCreated = jSurfaceView1SurfaceCreated
+    Id = 3868251
+  end
+  object jAsyncTask1: jAsyncTask
+    OnDoInBackground = jAsyncTask1DoInBackground
+    OnPostExecute = jAsyncTask1PostExecute
+    left = 248
+    top = 224
+  end
+  object jImageFileManager1: jImageFileManager
+    left = 136
+    top = 184
+  end
+  object jDialogProgress1: jDialogProgress
+    Title = 'Lamw: Lazarus Android Module Wizard'
+    Msg = 'Please, wait...'
+    left = 248
+    top = 168
+  end
+  object jMediaPlayer1: jMediaPlayer
+    OnPrepared = jMediaPlayer1Prepared
+    OnCompletion = jMediaPlayer1Completion
+    left = 40
+    top = 168
+  end
+end
