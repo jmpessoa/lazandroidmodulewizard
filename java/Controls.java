@@ -2,7 +2,7 @@ package com.example.dummyapp;
 
 //Lamw: Lazarus Android Module Wizard 
 //Form Designer and Components development model!
-//version 0.6 - revision 33 - 09 July - 2015
+//version 0.6 - revision 33.1 - 12 July - 2015
 //
 //https://github.com/jmpessoa/lazandroidmodulewizard
 //http://forum.lazarus.freepascal.org/index.php/topic,21919.270.html
@@ -1168,6 +1168,8 @@ int MarginTop = 5;
 int marginRight = 5;
 int marginBottom = 5;
 
+boolean mChangeFontSizeByComplexUnitPixel = true; //OMPLEX_UNIT_PX
+
 // Constructor
 public  jTextView(android.content.Context context,
                Controls ctrls,long pasobj ) {                    //jTextView(this.activity,this,pasobj));
@@ -1312,7 +1314,14 @@ public void setFontAndTextTypeFace(int fontFace, int fontStyle) {
 
 
 public void SetTextSize(float size) {
-	this.setTextSize(TypedValue.COMPLEX_UNIT_PX, size); 
+	if (mChangeFontSizeByComplexUnitPixel) 
+	    this.setTextSize(TypedValue.COMPLEX_UNIT_PX, size);
+	else 
+		this.setTextSize(size);
+}     
+
+public void SetChangeFontSizeByComplexUnitPixel(boolean _value) {
+    mChangeFontSizeByComplexUnitPixel = _value;
 }
 
 }
@@ -1361,6 +1370,9 @@ private boolean mFlagSuggestion = false;
 
 private ClipboardManager mClipBoard = null;
 private ClipData mClipData = null;
+
+
+boolean mChangeFontSizeByComplexUnitPixel = true;
 
 
 // Constructor
@@ -1693,7 +1705,13 @@ public void Clear() {
 }
 
 public void SetTextSize(float size) {
-	this.setTextSize(TypedValue.COMPLEX_UNIT_PX, size); 
+	if (mChangeFontSizeByComplexUnitPixel) 
+	   this.setTextSize(TypedValue.COMPLEX_UNIT_PX, size);
+	else this.setTextSize(size);
+}
+
+public void SetChangeFontSizeByComplexUnitPixel(boolean _value) {
+    mChangeFontSizeByComplexUnitPixel = _value;
 }
 	
 }

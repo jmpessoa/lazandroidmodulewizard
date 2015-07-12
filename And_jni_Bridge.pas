@@ -155,6 +155,7 @@ Procedure jTextView_setLeftTopRightBottomWidthHeight(env:PJNIEnv; TextView : jOb
 
 procedure jTextView_Append(env: PJNIEnv; _jtextview: JObject; _txt: string);
 procedure jTextView_AppendLn(env: PJNIEnv; _jtextview: JObject; _txt: string);
+procedure jTextView_SetChangeFontSizeByComplexUnitPixel(env: PJNIEnv; _jedittext: JObject; _value: boolean);
 
 //-----------------------------------
 // EditText  :: changed by jmpessoa [support Api > 13]
@@ -232,6 +233,7 @@ procedure jEditText_setFontAndTextTypeFace(env: PJNIEnv; EditText: jObject; Font
 procedure jEditText_SetAcceptSuggestion(env: PJNIEnv; _jedittext: JObject; _value: boolean);
 procedure jEditText_CopyToClipboard(env: PJNIEnv; _jedittext: JObject);
 procedure jEditText_PasteFromClipboard(env: PJNIEnv; _jedittext: JObject);
+procedure jEditText_SetChangeFontSizeByComplexUnitPixel(env: PJNIEnv; _jedittext: JObject; _value: boolean);
 
 // Button
 Function jButton_Create(env: PJNIEnv;   this:jobject; SelfObj: TObject): jObject;
@@ -1520,6 +1522,20 @@ begin
   env^.DeleteLocalRef(env, jCls);
 end;
 
+procedure jTextView_SetChangeFontSizeByComplexUnitPixel(env: PJNIEnv; _jedittext: JObject; _value: boolean);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].z:= JBool(_value);
+  jCls:= env^.GetObjectClass(env, _jedittext);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetChangeFontSizeByComplexUnitPixel', '(Z)V');
+  env^.CallVoidMethodA(env, _jedittext, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+
 //------------------------------------------------------------------------------
 // EditText
 //------------------------------------------------------------------------------
@@ -2189,6 +2205,20 @@ begin
   jCls:= env^.GetObjectClass(env, _jedittext);
   jMethod:= env^.GetMethodID(env, jCls, 'PasteFromClipboard', '()V');
   env^.CallVoidMethod(env, _jedittext, jMethod);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+
+procedure jEditText_SetChangeFontSizeByComplexUnitPixel(env: PJNIEnv; _jedittext: JObject; _value: boolean);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].z:= JBool(_value);
+  jCls:= env^.GetObjectClass(env, _jedittext);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetChangeFontSizeByComplexUnitPixel', '(Z)V');
+  env^.CallVoidMethodA(env, _jedittext, jMethod, @jParams);
   env^.DeleteLocalRef(env, jCls);
 end;
 

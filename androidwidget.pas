@@ -1008,6 +1008,7 @@ type
     procedure TakeScreenshot(_savePath: string; _saveFileNameJPG: string);
     function GetTitleActionBar(): string;
     function GetSubTitleActionBar(): string;
+    function GetFormByIndex(index: integer): jForm;
 
     // Property
     property View         : jObject        read FjRLayout; //layout!
@@ -2205,7 +2206,7 @@ begin
 
   FjObject:=  jForm_Create(refApp.Jni.jEnv, refApp.Jni.jThis, Self); {jSef}
 
-  FjRLayout:= jForm_Getlayout2(refApp.Jni.jEnv, FjObject);  {form view/RelativeLayout}
+  FjRLayout:=  jForm_Getlayout2(refApp.Jni.jEnv, FjObject);  {form view/RelativeLayout}
 
   //thierrydijoux - if backgroundColor is set to black, no theme ...
   if  FColor <> colbrDefault then
@@ -2239,6 +2240,14 @@ begin
   //Show ...
   jForm_Show2(refApp.Jni.jEnv, FjObject, FAnimation.In_);
   if Assigned(FOnJNIPrompt) then FOnJNIPrompt(Self);
+end;
+
+function jForm.GetFormByIndex(index: integer): jForm;
+begin
+   if index < gApp.GetCurrentFormsIndex then
+      Result:= jForm(gApp.Forms.Stack[index].Form)
+   else
+      Result:=  jForm(gApp.Forms.Stack[gApp.GetCurrentFormsIndex].Form)
 end;
 
 procedure jForm.ShowMessage(msg: string);
@@ -3604,23 +3613,29 @@ end;
 
 Procedure jApp.IncFormsIndex;
 begin
-   Forms.Index:= Forms.Index + 1;
+   if Forms.Index < (cjFormsMax-1) then
+      Forms.Index:= Forms.Index + 1;
 end;
 
 function jApp.GetNewFormsIndex: integer;
 begin
-  Forms.Index:= Forms.Index +1;
+  if Forms.Index < (cjFormsMax-1) then
+     Forms.Index:= Forms.Index +1;
   Result:= Forms.Index;
 end;
 
 function jApp.GetPreviousFormsIndex: integer;
 begin
-  Result:= Forms.Index - 1;
+  if  Forms.Index > 0 then
+    Result:= Forms.Index - 1
+  else
+    Result:= Forms.Index;
 end;
 
 Procedure jApp.DecFormsIndex;
 begin
-  Forms.Index:= Forms.Index - 1;
+    if  Forms.Index > 0 then
+      Forms.Index:= Forms.Index - 1;
 end;
 
 Procedure jApp.SetAppName (Value : String);

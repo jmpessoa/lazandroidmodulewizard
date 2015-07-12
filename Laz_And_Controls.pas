@@ -683,6 +683,7 @@ type
     Procedure UpdateLayout; override;
     procedure Append(_txt: string);
     procedure AppendLn(_txt: string);
+    procedure SetChangeFontSizeByComplexUnitPixel(_value: boolean);
   published
     property Text: string read GetText write SetText;
     property Alignment : TTextAlignment read FTextAlignment write SetTextAlignment;
@@ -780,6 +781,9 @@ type
     procedure CopyToClipboard();
     procedure PasteFromClipboard();
     procedure Clear;
+    procedure SetChangeFontSizeByComplexUnitPixel(_value: boolean);
+
+
     // Property
     property CursorPos : TXY        read GetCursorPos  write SetCursorPos;
     //property Scroller: boolean  read FScroller write SetScroller;
@@ -2592,6 +2596,14 @@ begin
      jTextView_AppendLn(FjEnv, FjObject, _txt);
 end;
 
+
+procedure jTextView.SetChangeFontSizeByComplexUnitPixel(_value: boolean);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jTextView_SetChangeFontSizeByComplexUnitPixel(FjEnv, FjObject, _value);
+end;
+
 //------------------------------------------------------------------------------
 // jEditText
 //------------------------------------------------------------------------------
@@ -2610,7 +2622,7 @@ begin
   FMaxLines:= 1;
 
   FScrollBarStyle:= scrNone;
-  FVerticalScrollBar:= False;
+  FVerticalScrollBar:= True;
   FHorizontalScrollBar:= True;
 
   FWrappingLine:= False;
@@ -3136,6 +3148,13 @@ end;
 procedure jEditText.Clear;
 begin
   jEditText_setText(FjEnv, FjObject , '');
+end;
+
+procedure jEditText.SetChangeFontSizeByComplexUnitPixel(_value: boolean);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jEditText_SetChangeFontSizeByComplexUnitPixel(FjEnv, FjObject, _value);
 end;
 
 //------------------------------------------------------------------------------
