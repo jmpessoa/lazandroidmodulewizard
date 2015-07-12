@@ -112,6 +112,7 @@ begin
   AddPerm('Restart packages');
   AddPerm('Send SMS');
   AddPerm('Vibrate');
+  AddPerm('Write contacts');
   AddPerm('Write external storage');
   AddPerm('Write owner data');
   AddPerm('Write user dictionary');
@@ -170,7 +171,6 @@ begin
   Wake lock
   Write calendar
   Write call log
-  Write contacts
   Write history bookmarks
   Write profile
   Write settings
