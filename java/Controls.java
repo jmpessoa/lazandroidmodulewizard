@@ -2,7 +2,7 @@ package com.example.dummyapp;
 
 //Lamw: Lazarus Android Module Wizard 
 //Form Designer and Components development model!
-//version 0.6 - revision 33.1 - 12 July - 2015
+//version 0.6 - revision 33.2 - 12 July - 2015
 //
 //https://github.com/jmpessoa/lazandroidmodulewizard
 //http://forum.lazarus.freepascal.org/index.php/topic,21919.270.html
@@ -1745,6 +1745,8 @@ int marginRight = 5;
 int marginBottom = 5;
 int textColor;
 
+boolean mChangeFontSizeByComplexUnitPixel = true; 
+
 public void setLeftTopRightBottomWidthHeight(int left, int top, int right, int bottom, int w, int h) {
 	MarginLeft = left;
 	MarginTop = top;
@@ -1846,7 +1848,14 @@ public  void SetFocusable(boolean enabled ) {
 }
 
 public void SetTextSize(float size) {
-	this.setTextSize(TypedValue.COMPLEX_UNIT_PX, size); 
+	if (mChangeFontSizeByComplexUnitPixel) 
+	    this.setTextSize(TypedValue.COMPLEX_UNIT_PX, size);
+	else 
+		this.setTextSize(size);
+}     
+
+public void SetChangeFontSizeByComplexUnitPixel(boolean _value) {
+    mChangeFontSizeByComplexUnitPixel = _value;
 }
 
 
@@ -1880,6 +1889,7 @@ int MarginTop = 5;
 int marginRight = 5;
 int marginBottom = 5;
 
+boolean mChangeFontSizeByComplexUnitPixel = true;
 //by jmpessoa
 public void setMarginRight(int x) {
 	marginRight = x;
@@ -2017,7 +2027,14 @@ public String GetText() {
 }
 
 public void SetTextSize(float size) {
-	this.setTextSize(TypedValue.COMPLEX_UNIT_PX, size); 
+	if (mChangeFontSizeByComplexUnitPixel) 
+	    this.setTextSize(TypedValue.COMPLEX_UNIT_PX, size);
+	else 
+		this.setTextSize(size);
+}     
+
+public void SetChangeFontSizeByComplexUnitPixel(boolean _value) {
+    mChangeFontSizeByComplexUnitPixel = _value;
 }
 
 }
@@ -2049,6 +2066,8 @@ int MarginLeft = 5;
 int MarginTop = 5;
 int marginRight = 5;
 int marginBottom = 5;
+
+boolean mChangeFontSizeByComplexUnitPixel = true;
 
 // Constructor
 public  jRadioButton(android.content.Context context,
@@ -2134,7 +2153,14 @@ public void setLayoutAll(int idAnchor) {
 }
 
 public void SetTextSize(float size) {
-	this.setTextSize(TypedValue.COMPLEX_UNIT_PX, size); 
+	if (mChangeFontSizeByComplexUnitPixel) 
+	    this.setTextSize(TypedValue.COMPLEX_UNIT_PX, size);
+	else 
+		this.setTextSize(size);
+}     
+
+public void SetChangeFontSizeByComplexUnitPixel(boolean _value) {
+    mChangeFontSizeByComplexUnitPixel = _value;
 }
 
 }
@@ -2563,6 +2589,7 @@ private List <jListItemRow> items ;
 private ArrayAdapter thisAdapter;
 private boolean mDispatchOnDrawItemTextColor;
 private boolean mDispatchOnDrawItemBitmap;
+boolean mChangeFontSizeByComplexUnitPixel;
 
 public  jArrayAdapter(Context context, Controls ctrls,long pasobj, int textViewResourceId, 
 		               List<jListItemRow> list) {
@@ -2575,7 +2602,12 @@ public  jArrayAdapter(Context context, Controls ctrls,long pasobj, int textViewR
    thisAdapter = this;
    mDispatchOnDrawItemTextColor = true;
    mDispatchOnDrawItemBitmap = true;
+   mChangeFontSizeByComplexUnitPixel = true;
 		   
+}
+
+public void SetChangeFontSizeByComplexUnitPixel(boolean _value) {
+    mChangeFontSizeByComplexUnitPixel = _value;
 }
 
 public void SetDispatchOnDrawItemTextColor(boolean _value) {
@@ -2693,8 +2725,13 @@ public  View getView(int position, View v, ViewGroup parent) {
 	   	   
 	   if (i == 0) {
 		    if (items.get(position).textSize != 0){
-		    	auxf = items.get(position).textSize;				       
-			   itemText[i].setTextSize(TypedValue.COMPLEX_UNIT_PX, auxf); 
+		    	auxf = items.get(position).textSize;
+		    	
+		    	if (mChangeFontSizeByComplexUnitPixel) 
+			       itemText[i].setTextSize(TypedValue.COMPLEX_UNIT_PX, auxf);
+		    	else
+		    		itemText[i].setTextSize(auxf);
+		    	
 		    }
 		    itemText[i].setPadding(10, 15, 10, 15);
 		    itemText[i].setTypeface(null,faceTitle);
@@ -2704,12 +2741,21 @@ public  View getView(int position, View v, ViewGroup parent) {
 		   itemText[i].setTypeface(null,faceBody);
 		   itemText[i].setPadding(10, 0, 10, 15);
 		   
-		   if (items.get(position).textSizeDecorated == 1) {	
-			     itemText[i].setTextSize(TypedValue.COMPLEX_UNIT_PX, auxf - 5*i);  // sdDeCecreasing
+		   if (items.get(position).textSizeDecorated == 1) {
+			   
+			   if (mChangeFontSizeByComplexUnitPixel) 
+			       itemText[i].setTextSize(TypedValue.COMPLEX_UNIT_PX, auxf - 5*i);  // sdDeCecreasing
+			   else 
+				   itemText[i].setTextSize(auxf - 5*i);  // sdDeCecreasing
 		   }
 		   
-		   if (items.get(position).textSizeDecorated == 2) {			     
+		   if (items.get(position).textSizeDecorated == 2) {
+			   
+			   if (mChangeFontSizeByComplexUnitPixel) 
 			     itemText[i].setTextSize(TypedValue.COMPLEX_UNIT_PX, auxf + 5*i);  // sdInCecreasing
+			   else
+				   itemText[i].setTextSize(auxf + 5*i);  // sdInCecreasing  
+			     
 		   }
 		}
 	   
@@ -2916,8 +2962,6 @@ int highLightColor = Color.RED;
 
 int lastSelectedItem = -1;
 String selectedItemCaption = "";
-
-
 
 //Constructor
 public  jListView(android.content.Context context,
@@ -3326,6 +3370,10 @@ public void DispatchOnDrawItemTextColor(boolean _value) {
 
 public void DispatchOnDrawItemBitmap(boolean _value) {
 	aadapter.SetDispatchOnDrawItemBitmap(_value);
+}
+
+public void SetChangeFontSizeByComplexUnitPixel(boolean _value) {    
+    aadapter.SetChangeFontSizeByComplexUnitPixel(_value);
 }
 
 
@@ -8858,10 +8906,15 @@ class CustomSpinnerArrayAdapter<T> extends ArrayAdapter<String>{
 	private int flag = 0;
 	private boolean mLastItemAsPrompt = false;
 	private int mTextFontSize = 0;
+	boolean mChangeFontSizeByComplexUnitPixel = true;
 	
   public CustomSpinnerArrayAdapter(Context context, int simpleSpinnerItem, ArrayList<String> alist) {
      super(context, simpleSpinnerItem, alist);
      ctx = context;
+  }
+  
+  public void SetChangeFontSizeByComplexUnitPixel(boolean _value) {
+	    mChangeFontSizeByComplexUnitPixel = _value;
   }
 
   //This method is used to display the dropdown popup that contains data.
@@ -8875,8 +8928,13 @@ class CustomSpinnerArrayAdapter<T> extends ArrayAdapter<String>{
       text.setPadding(10, 15, 10, 15);      
       text.setTextColor(mTextColor);
                  
-      if (mTextFontSize != 0)
-          text.setTextSize(TypedValue.COMPLEX_UNIT_PX, mTextFontSize);
+      if (mTextFontSize != 0) {
+    	  
+    	  if (mChangeFontSizeByComplexUnitPixel)
+            text.setTextSize(TypedValue.COMPLEX_UNIT_PX, mTextFontSize);
+    	  else
+    		 text.setTextSize(mTextFontSize);  
+      }    
       
       text.setBackgroundColor(mTexBackgroundtColor);
       return view;        
@@ -8892,8 +8950,13 @@ class CustomSpinnerArrayAdapter<T> extends ArrayAdapter<String>{
 	  text.setPadding(10, 15, 10, 15); //improve here.... 17-jan-2015	  
       text.setTextColor(mSelectedTextColor);      
       
-      if (mTextFontSize != 0)
-          text.setTextSize(TypedValue.COMPLEX_UNIT_PX, mTextFontSize);  
+      if (mTextFontSize != 0) {
+    	  
+    	  if (mChangeFontSizeByComplexUnitPixel)
+             text.setTextSize(TypedValue.COMPLEX_UNIT_PX, mTextFontSize);
+    	  else
+     		 text.setTextSize(mTextFontSize);
+      }    
       
       if (mLastItemAsPrompt) flag = 1;
       return view; 
@@ -9121,6 +9184,10 @@ class jSpinner extends Spinner /*dummy*/ { //please, fix what GUI object will be
    public void SetTextFontSize(int _txtFontSize) {
 	  mSpAdapter.SetTextFontSize(_txtFontSize);
    }
+   
+   public void SetChangeFontSizeByComplexUnitPixel(boolean _value) {
+	   mSpAdapter.SetChangeFontSizeByComplexUnitPixel(_value);
+	}
    
 }  //end class
 
@@ -10681,6 +10748,8 @@ class jGridViewCustomAdapter extends ArrayAdapter {
      boolean mDispatchOnDrawItemTextColor;
      boolean mDispatchOnDrawItemBitmap;
      
+     boolean mChangeFontSizeByComplexUnitPixel;
+     
      private int itemsLayout; 
      private List <jGridItem> items ;
      //Context context, Controls ctrls,long pasobj
@@ -10694,6 +10763,7 @@ class jGridViewCustomAdapter extends ArrayAdapter {
         itemsLayout = itemslayout;
         mDispatchOnDrawItemTextColor = true;
         mDispatchOnDrawItemBitmap = true;
+        mChangeFontSizeByComplexUnitPixel = true;
      }
 
      public void SetDispatchOnDrawItemTextColor(boolean _value) {
@@ -10773,8 +10843,11 @@ class jGridViewCustomAdapter extends ArrayAdapter {
             textViewTitle.setText( items.get(position).label ); //+""+ items.get(position).id
             
             
-            if (items.get(position).itemTextSize != 0) {            
-            	textViewTitle.setTextSize(TypedValue.COMPLEX_UNIT_PX, items.get(position).itemTextSize);            
+            if (items.get(position).itemTextSize != 0) {              	
+            	if ((mChangeFontSizeByComplexUnitPixel) )
+            	   textViewTitle.setTextSize(TypedValue.COMPLEX_UNIT_PX, items.get(position).itemTextSize);     
+            	else 
+            	  textViewTitle.setTextSize(items.get(position).itemTextSize);            	
             }
                                     
             if (mDispatchOnDrawItemTextColor)  {            	   
@@ -12849,6 +12922,7 @@ class jDigitalClock extends DigitalClock /*TextClock*/ { //please, fix what GUI 
 	   private int marginRight = 0;
 	   private int marginBottom = 0;
 	   private boolean mRemovedFromParent = false;
+	   boolean mChangeFontSizeByComplexUnitPixel = true;
 	  
 	  //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
 	  
@@ -12959,8 +13033,16 @@ class jDigitalClock extends DigitalClock /*TextClock*/ { //please, fix what GUI 
 	  //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
 	   
 	   public void SetTextSize(float _size) {
-			this.setTextSize(TypedValue.COMPLEX_UNIT_PX, _size);		   
-	   }	  
+			if (mChangeFontSizeByComplexUnitPixel) 
+			    this.setTextSize(TypedValue.COMPLEX_UNIT_PX, _size);
+			else 
+				this.setTextSize(_size);
+		}     
+
+		public void SetChangeFontSizeByComplexUnitPixel(boolean _value) {
+		    mChangeFontSizeByComplexUnitPixel = _value;
+		}
+	   
 } //end class
 
 /**

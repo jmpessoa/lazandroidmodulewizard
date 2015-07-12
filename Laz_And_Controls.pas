@@ -837,6 +837,7 @@ type
     procedure Init(refApp: jApp); override;
     Procedure Refresh;
     Procedure UpdateLayout; override;
+    procedure SetChangeFontSizeByComplexUnitPixel(_value: boolean);
 
   published
     property Text: string read GetText write SetText;
@@ -870,6 +871,7 @@ type
     procedure Init(refApp: jApp); override;
     Procedure Refresh;
     Procedure UpdateLayout; override;
+    procedure SetChangeFontSizeByComplexUnitPixel(_value: boolean);
 
   published
     property Text: string read GetText write SetText;
@@ -904,6 +906,7 @@ type
     procedure Init(refApp: jApp); override;
     procedure Refresh;
     Procedure UpdateLayout; override;
+    procedure SetChangeFontSizeByComplexUnitPixel(_value: boolean);
 
   published
     property Text: string read GetText write SetText;
@@ -1058,6 +1061,7 @@ type
     function GetCount: integer;
     procedure UpdateLParamHeight;
     procedure UpdateLParamWidth;
+    procedure SetChangeFontSizeByComplexUnitPixel(_value: boolean);
   protected
     procedure SetViewParent(Value: jObject);  override;
     procedure GenEvent_OnClickWidgetItem(Obj: TObject; index: integer; checked: boolean);
@@ -3370,6 +3374,13 @@ begin
   end;
 end;
 
+procedure jButton.SetChangeFontSizeByComplexUnitPixel(_value: boolean);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jButton_SetChangeFontSizeByComplexUnitPixel(FjEnv, FjObject, _value);
+end;
+
 // Event : Java -> Pascal
 Procedure jButton.GenEvent_OnClick(Obj: TObject);
 begin
@@ -3603,6 +3614,13 @@ begin
     UpdateLParamHeight;
     jCheckBox_setLayoutAll(FjEnv, FjObject , Self.AnchorId);
   end;
+end;
+
+procedure jCheckBox.SetChangeFontSizeByComplexUnitPixel(_value: boolean);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jCheckBox_SetChangeFontSizeByComplexUnitPixel(FjEnv, FjObject, _value);
 end;
 
 // Event Java -> Pascal
@@ -3841,6 +3859,14 @@ begin
     jRadioButton_setLayoutAll(FjEnv, FjObject , Self.AnchorId);
   end;
 end;
+
+procedure jRadioButton.SetChangeFontSizeByComplexUnitPixel(_value: boolean);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jRadioButton_SetChangeFontSizeByComplexUnitPixel(FjEnv, FjObject, _value);
+end;
+
 
 // Event Java -> Pascal
 Procedure jRadioButton.GenEvent_OnClick(Obj: TObject);
@@ -5500,6 +5526,13 @@ begin
   //in designing component state: set value here...
   if FInitialized then
      jListView_DispatchOnDrawItemBitmap(FjEnv, FjObject, _value);
+end;
+
+procedure jListView.SetChangeFontSizeByComplexUnitPixel(_value: boolean);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jListView_SetChangeFontSizeByComplexUnitPixel(FjEnv, FjObject, _value);
 end;
 
 //------------------------------------------------------------------------------

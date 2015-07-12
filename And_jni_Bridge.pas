@@ -155,7 +155,7 @@ Procedure jTextView_setLeftTopRightBottomWidthHeight(env:PJNIEnv; TextView : jOb
 
 procedure jTextView_Append(env: PJNIEnv; _jtextview: JObject; _txt: string);
 procedure jTextView_AppendLn(env: PJNIEnv; _jtextview: JObject; _txt: string);
-procedure jTextView_SetChangeFontSizeByComplexUnitPixel(env: PJNIEnv; _jedittext: JObject; _value: boolean);
+procedure jTextView_SetChangeFontSizeByComplexUnitPixel(env: PJNIEnv; _jtextview: JObject; _value: boolean);
 
 //-----------------------------------
 // EditText  :: changed by jmpessoa [support Api > 13]
@@ -264,6 +264,7 @@ Procedure jButton_setLParamHeight(env:PJNIEnv; Button : jObject; h: DWord);
 
 Procedure jButton_setId(env:PJNIEnv; Button : jObject; id: DWord);
 Procedure jButton_setFocusable(env:PJNIEnv; Button : jObject; enabled: boolean);
+procedure jButton_SetChangeFontSizeByComplexUnitPixel(env: PJNIEnv; _jbutton: JObject; _value: boolean);
 
 
 // CheckBox
@@ -292,6 +293,8 @@ Procedure jCheckBox_addLParamsParentRule(env:PJNIEnv; CheckBox : jObject; rule: 
 Procedure jCheckBox_addLParamsAnchorRule(env:PJNIEnv; CheckBox : jObject; rule: DWord);
 Procedure jCheckBox_setLayoutAll(env:PJNIEnv; CheckBox : jObject;  idAnchor: DWord);
 
+procedure jCheckBox_SetChangeFontSizeByComplexUnitPixel(env: PJNIEnv; _jcheckbox: JObject; _value: boolean);
+
 // RadioButton
 
 Function  jRadioButton_Create(env:PJNIEnv; this:jobject; SelfObj: TObject ): jObject;
@@ -319,6 +322,8 @@ Procedure jRadioButton_setLeftTopRightBottomWidthHeight(env:PJNIEnv;
 Procedure jRadioButton_addLParamsParentRule(env:PJNIEnv; RadioButton : jObject; rule: DWord);
 Procedure jRadioButton_addLParamsAnchorRule(env:PJNIEnv; RadioButton : jObject; rule: DWord);
 Procedure jRadioButton_setLayoutAll(env:PJNIEnv; RadioButton : jObject;  idAnchor: DWord);
+
+procedure jRadioButton_SetChangeFontSizeByComplexUnitPixel(env: PJNIEnv; _jradiobutton: JObject; _value: boolean);
 
 // ProgressBar
 
@@ -502,6 +507,8 @@ function jListView_GetItemIndex(env: PJNIEnv; _jlistview: JObject): integer;
 function jListView_GetItemCaption(env: PJNIEnv; _jlistview: JObject): string;
 procedure jListView_SetDispatchOnDrawItemTextColor(env: PJNIEnv; _jlistview: JObject; _value: boolean);
 procedure jListView_DispatchOnDrawItemBitmap(env: PJNIEnv; _jlistview: JObject; _value: boolean);
+
+procedure jListView_SetChangeFontSizeByComplexUnitPixel(env: PJNIEnv; _jlistview: JObject; _value: boolean);
 
 
 // ScrollView
@@ -1522,16 +1529,16 @@ begin
   env^.DeleteLocalRef(env, jCls);
 end;
 
-procedure jTextView_SetChangeFontSizeByComplexUnitPixel(env: PJNIEnv; _jedittext: JObject; _value: boolean);
+procedure jTextView_SetChangeFontSizeByComplexUnitPixel(env: PJNIEnv; _jtextview: JObject; _value: boolean);
 var
   jParams: array[0..0] of jValue;
   jMethod: jMethodID=nil;
   jCls: jClass=nil;
 begin
   jParams[0].z:= JBool(_value);
-  jCls:= env^.GetObjectClass(env, _jedittext);
+  jCls:= env^.GetObjectClass(env, _jtextview);
   jMethod:= env^.GetMethodID(env, jCls, 'SetChangeFontSizeByComplexUnitPixel', '(Z)V');
-  env^.CallVoidMethodA(env, _jedittext, jMethod, @jParams);
+  env^.CallVoidMethodA(env, _jtextview, jMethod, @jParams);
   env^.DeleteLocalRef(env, jCls);
 end;
 
@@ -2447,6 +2454,19 @@ begin
  env^.DeleteLocalRef(env, cls);
 end;
 
+procedure jButton_SetChangeFontSizeByComplexUnitPixel(env: PJNIEnv; _jbutton: JObject; _value: boolean);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].z:= JBool(_value);
+  jCls:= env^.GetObjectClass(env, _jbutton);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetChangeFontSizeByComplexUnitPixel', '(Z)V');
+  env^.CallVoidMethodA(env, _jbutton, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
 //------------------------------------------------------------------------------
 // CheckBox
 //------------------------------------------------------------------------------
@@ -2684,6 +2704,19 @@ _jMethod:= env^.GetMethodID(env, cls, 'setLayoutAll', '(I)V');
  env^.DeleteLocalRef(env, cls);
 end;
 
+procedure jCheckBox_SetChangeFontSizeByComplexUnitPixel(env: PJNIEnv; _jcheckbox: JObject; _value: boolean);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].z:= JBool(_value);
+  jCls:= env^.GetObjectClass(env, _jcheckbox);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetChangeFontSizeByComplexUnitPixel', '(Z)V');
+  env^.CallVoidMethodA(env, _jcheckbox, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
 //------------------------------------------------------------------------------
 // RadioButton
 //------------------------------------------------------------------------------
@@ -2919,6 +2952,20 @@ _jMethod:= env^.GetMethodID(env, cls, 'setLayoutAll', '(I)V');
  env^.CallVoidMethodA(env,RadioButton,_jMethod,@_jParams);
  env^.DeleteLocalRef(env, cls);
 end;
+
+procedure jRadioButton_SetChangeFontSizeByComplexUnitPixel(env: PJNIEnv; _jradiobutton: JObject; _value: boolean);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].z:= JBool(_value);
+  jCls:= env^.GetObjectClass(env, _jradiobutton);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetChangeFontSizeByComplexUnitPixel', '(Z)V');
+  env^.CallVoidMethodA(env, _jradiobutton, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
 
 //------------------------------------------------------------------------------
 // ProgressBar
@@ -4103,6 +4150,19 @@ begin
   jParams[0].z:= JBool(_value);
   jCls:= env^.GetObjectClass(env, _jlistview);
   jMethod:= env^.GetMethodID(env, jCls, 'DispatchOnDrawItemBitmap', '(Z)V');
+  env^.CallVoidMethodA(env, _jlistview, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jListView_SetChangeFontSizeByComplexUnitPixel(env: PJNIEnv; _jlistview: JObject; _value: boolean);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].z:= JBool(_value);
+  jCls:= env^.GetObjectClass(env, _jlistview);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetChangeFontSizeByComplexUnitPixel', '(Z)V');
   env^.CallVoidMethodA(env, _jlistview, jMethod, @jParams);
   env^.DeleteLocalRef(env, jCls);
 end;
@@ -5403,7 +5463,6 @@ begin
   Result:= env^.CallObjectMethodA(env, _jbitmap, jMethod, @jParams);
   env^.DeleteLocalRef(env, jCls);
 end;
-
 
 function jBitmap_SetScale(env: PJNIEnv; _jbitmap: JObject; _imageView: jObject; _scaleX: single; _scaleY: single): jObject;
 var

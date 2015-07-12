@@ -64,6 +64,7 @@ TOnItemSelected = procedure(Sender: TObject; itemCaption: string; itemIndex: int
     procedure SetSelection(_index: integer);
     procedure SetItem(_index: integer; _item: string);
     procedure SetFontSize(_txtFontSize: DWord);
+    procedure SetChangeFontSizeByComplexUnitPixel(_value: boolean);
 
     property jParent: jObject  read  FjPRLayout write SetjParent; // Java : Parent Relative Layout
 
@@ -107,6 +108,7 @@ procedure jSpinner_SetSelection(env: PJNIEnv; _jspinner: JObject; _index: intege
 procedure jSpinner_SetItem(env: PJNIEnv; _jspinner: JObject; _index: integer; _item: string);
 
 procedure jSpinner_SetTextFontSize(env: PJNIEnv; _jspinner: JObject; _txtFontSize: integer);
+procedure jSpinner_SetChangeFontSizeByComplexUnitPixel(env: PJNIEnv; _jspinner: JObject; _value: boolean);
 
 
 implementation
@@ -522,6 +524,12 @@ begin
      jSpinner_SetTextFontSize(FjEnv, FjObject, _txtFontSize);
 end;
 
+procedure jSpinner.SetChangeFontSizeByComplexUnitPixel(_value: boolean);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jSpinner_SetChangeFontSizeByComplexUnitPixel(FjEnv, FjObject, _value);
+end;
 
 {-------- jSpinner_JNI_Bridge ----------}
 
@@ -856,5 +864,19 @@ begin
   env^.CallVoidMethodA(env, _jspinner, jMethod, @jParams);
   env^.DeleteLocalRef(env, jCls);
 end;
+
+procedure jSpinner_SetChangeFontSizeByComplexUnitPixel(env: PJNIEnv; _jspinner: JObject; _value: boolean);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].z:= JBool(_value);
+  jCls:= env^.GetObjectClass(env, _jspinner);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetChangeFontSizeByComplexUnitPixel', '(Z)V');
+  env^.CallVoidMethodA(env, _jspinner, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
 
 end.
