@@ -22,6 +22,7 @@ jDigitalClock = class(jVisualControl)
     procedure UpdateLParamHeight;
     procedure UpdateLParamWidth;
 
+
  public
     constructor Create(AOwner: TComponent); override;
     destructor  Destroy; override;
@@ -52,6 +53,7 @@ jDigitalClock = class(jVisualControl)
     property FontSize: DWord  read FFontSize write SetFontSize;
     property FontColor: TARGBColorBridge read FFontColor write SetFontColor;
     property OnClick: TOnNotify read FOnClick write FOnClick;
+    property FontSizeByComplexUnitPixel: boolean  read FChangeFontSizeByComplexUnitPixel write SetChangeFontSizeByComplexUnitPixel;
 
 end;
 
@@ -182,6 +184,9 @@ begin
 
   if FFontSize <> 0 then
       jDigitalClock_SetTextSize(FjEnv, FjObject, FFontSize);
+
+   if FChangeFontSizeByComplexUnitPixel = False then
+      jDigitalClock_SetChangeFontSizeByComplexUnitPixel(FjEnv, FjObject, FChangeFontSizeByComplexUnitPixel);
 
   View_SetVisible(FjEnv, FjObject, FVisible);
 end;

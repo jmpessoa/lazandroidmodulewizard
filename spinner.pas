@@ -26,8 +26,6 @@ TOnItemSelected = procedure(Sender: TObject; itemCaption: string; itemIndex: int
     FDropListBackgroundColor: TARGBColorBridge;
     FLastItemAsPrompt: boolean;
 
-    //FFontSize: integer;
-
     procedure SetColor(Value: TARGBColorBridge);
 
     procedure SetItems(Value: TStrings);
@@ -82,6 +80,7 @@ TOnItemSelected = procedure(Sender: TObject; itemCaption: string; itemIndex: int
     property DropListBackgroundColor: TARGBColorBridge  read FDropListBackgroundColor write SetDropListBackgroundColor;
     property LastItemAsPrompt: boolean read FLastItemAsPrompt write SetLastItemAsPrompt;
     property FontSize: Dword read FFontSize write SetFontSize;
+    property FontSizeByComplexUnitPixel: boolean  read FChangeFontSizeByComplexUnitPixel write SetChangeFontSizeByComplexUnitPixel;
   end;
 
 function jSpinner_jCreate(env: PJNIEnv; this: JObject;_Self: int64): jObject;
@@ -240,6 +239,9 @@ begin
 
   if FFontSize <> 0 then
      jSpinner_SetTextFontSize(FjEnv, FjObject , FFontSize);
+
+  if FChangeFontSizeByComplexUnitPixel = False then
+      jSpinner_SetChangeFontSizeByComplexUnitPixel(FjEnv, FjObject, FChangeFontSizeByComplexUnitPixel);
 
   View_SetVisible(FjEnv, FjThis, FjObject , FVisible);
 end;

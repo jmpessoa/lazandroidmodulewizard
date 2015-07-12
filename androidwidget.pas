@@ -1084,6 +1084,7 @@ type
     FFontFace: TFontFace;
     FTextTypeFace: TTextTypeFace;
     FHintTextColor: TARGBColorBridge;
+    FChangeFontSizeByComplexUnitPixel: boolean;
 
     FAnchorId     : integer;
     FAnchor       : jVisualControl;
@@ -1908,6 +1909,9 @@ inherited Create(AOwner);
   FColor     := colbrDefault;
   FFontColor := colbrDefault;
   FFontSize  := 0; //default size!
+
+  FChangeFontSizeByComplexUnitPixel:= True;
+
   FId        := 0; //0: no control anchored on this control!
   FAnchorId  := -1;  //dummy
   FAnchor    := nil;

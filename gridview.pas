@@ -84,6 +84,7 @@ TGridItemLayout = (ilImageText, ilTextImage);
     property OnLongClickItem: TOnClickGridItem  read FOnLongClickGridItem write FOnLongClickGridItem;
     property OnDrawItemTextColor: TOnDrawItemTextColor read FOnDrawItemTextColor write FOnDrawItemTextColor;
     property OnDrawItemBitmap: TOnDrawItemBitmap read FOnDrawItemBitmap write FOnDrawItemBitmap;
+    property FontSizeByComplexUnitPixel: boolean  read FChangeFontSizeByComplexUnitPixel write SetChangeFontSizeByComplexUnitPixel;
 
   end;
 
@@ -235,6 +236,9 @@ begin
 
   if FColumns <> -1 then
       jGridView_SetNumColumns(FjEnv, FjObject, FColumns);
+
+  if FChangeFontSizeByComplexUnitPixel = False then
+      jGridView_SetChangeFontSizeByComplexUnitPixel(FjEnv, FjObject, FChangeFontSizeByComplexUnitPixel);
 
   View_SetVisible(FjEnv, FjObject, FVisible);
 end;
