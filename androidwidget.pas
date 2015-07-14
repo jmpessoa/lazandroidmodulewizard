@@ -1060,7 +1060,11 @@ type
 
   end;
 
-    {jVisualControl - NEW by jmpessoa}
+
+  {jVisualControl}
+
+
+  TFontSizeUnit =(unitDefault, unitPixel, unitDIP, unitInch, unitMillimeter, unitPoint, unitScaledPixel);
 
   jVisualControl = class(TAndroidWidget)
   private
@@ -1080,11 +1084,12 @@ type
     FTextAlignment: TTextAlignment;
 
     FFontSize     : DWord;
+    FFontSizeUnit: TFontSizeUnit;
+
     FFontColor     : TARGBColorBridge;
     FFontFace: TFontFace;
     FTextTypeFace: TTextTypeFace;
     FHintTextColor: TARGBColorBridge;
-    FChangeFontSizeByComplexUnitPixel: boolean;
 
     FAnchorId     : integer;
     FAnchor       : jVisualControl;
@@ -1901,7 +1906,7 @@ end;
 
 constructor jVisualControl.Create(AOwner: TComponent);
 begin
-inherited Create(AOwner);
+  inherited Create(AOwner);
   FjPRLayout := nil;  //java parent
   FjObject    := nil; //java object
   FEnabled   := True;
@@ -1910,7 +1915,7 @@ inherited Create(AOwner);
   FFontColor := colbrDefault;
   FFontSize  := 0; //default size!
 
-  FChangeFontSizeByComplexUnitPixel:= True;
+  FFontSizeUnit:= unitDefault; //  --> unitScaledPixel!
 
   FId        := 0; //0: no control anchored on this control!
   FAnchorId  := -1;  //dummy

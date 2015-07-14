@@ -46,14 +46,14 @@ jDigitalClock = class(jVisualControl)
     procedure ClearLayoutAll();
     procedure SetId(_id: integer);
     procedure SetFontSize(_size: DWord);
-    procedure SetChangeFontSizeByComplexUnitPixel(_value: boolean);
+    procedure SetFontSizeUnit(_unit: TFontSizeUnit);
 
  published
     property BackgroundColor: TARGBColorBridge read FColor write SetColor;
     property FontSize: DWord  read FFontSize write SetFontSize;
     property FontColor: TARGBColorBridge read FFontColor write SetFontColor;
     property OnClick: TOnNotify read FOnClick write FOnClick;
-    property FontSizeByComplexUnitPixel: boolean  read FChangeFontSizeByComplexUnitPixel write SetChangeFontSizeByComplexUnitPixel;
+    property FontSizeUnit: TFontSizeUnit read FFontSizeUnit write SetFontSizeUnit;
 
 end;
 
@@ -72,7 +72,8 @@ procedure jDigitalClock_ClearLayoutAll(env: PJNIEnv; _jdigitalclock: JObject);
 procedure jDigitalClock_SetId(env: PJNIEnv; _jdigitalclock: JObject; _id: integer);
 procedure jDigitalClock_SetTextSize(env: PJNIEnv; _jdigitalclock: JObject; _size: integer);
 Procedure jDigitalClock_setTextColor(env:PJNIEnv; _jdigitalclock: jObject; color : DWord);
-procedure jDigitalClock_SetChangeFontSizeByComplexUnitPixel(env: PJNIEnv; _jdigitalclock: JObject; _value: boolean);
+//procedure jDigitalClock_SetChangeFontSizeByComplexUnitPixel(env: PJNIEnv; _jdigitalclock: JObject; _value: boolean);
+procedure jDigitalClock_SetFontSizeUnit(env: PJNIEnv; _jdigitalclock: JObject; _unit: integer);
 
 
 implementation
@@ -182,11 +183,11 @@ begin
   if FFontColor <> colbrDefault then
        jDigitalClock_setTextColor(FjEnv, FjObject, GetARGB(FCustomColor, FFontColor));
 
+  if FFontSizeUnit <> unitDefault then
+        jDigitalClock_SetFontSizeUnit(FjEnv, FjObject, Ord(FFontSizeUnit));
+
   if FFontSize <> 0 then
       jDigitalClock_SetTextSize(FjEnv, FjObject, FFontSize);
-
-   if FChangeFontSizeByComplexUnitPixel = False then
-      jDigitalClock_SetChangeFontSizeByComplexUnitPixel(FjEnv, FjObject, FChangeFontSizeByComplexUnitPixel);
 
   View_SetVisible(FjEnv, FjObject, FVisible);
 end;
@@ -394,13 +395,13 @@ begin
      jDigitalClock_setTextColor(FjEnv, FjObject, GetARGB(FCustomColor, FFontColor));
 end;
 
-procedure jDigitalClock.SetChangeFontSizeByComplexUnitPixel(_value: boolean);
+procedure jDigitalClock.SetFontSizeUnit(_unit: TFontSizeUnit);
 begin
   //in designing component state: set value here...
+  FFontSizeUnit:= _unit;
   if FInitialized then
-     jDigitalClock_SetChangeFontSizeByComplexUnitPixel(FjEnv, FjObject, _value);
+     jDigitalClock_SetFontSizeUnit(FjEnv, FjObject, Ord(_unit));
 end;
-
 
 {-------- jDigitalClock_JNI_Bridge ----------}
 
@@ -618,17 +619,18 @@ begin
   env^.DeleteLocalRef(env, cls);
 end;
 
-procedure jDigitalClock_SetChangeFontSizeByComplexUnitPixel(env: PJNIEnv; _jdigitalclock: JObject; _value: boolean);
+
+procedure jDigitalClock_SetFontSizeUnit(env: PJNIEnv; _jdigitalclock: JObject; _unit: integer);
 var
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
+ jParams: array[0..0] of jValue;
+ jMethod: jMethodID=nil;
+ jCls: jClass=nil;
 begin
-  jParams[0].z:= JBool(_value);
-  jCls:= env^.GetObjectClass(env, _jdigitalclock);
-  jMethod:= env^.GetMethodID(env, jCls, 'SetChangeFontSizeByComplexUnitPixel', '(Z)V');
-  env^.CallVoidMethodA(env, _jdigitalclock, jMethod, @jParams);
-  env^.DeleteLocalRef(env, jCls);
+ jParams[0].i:= _unit;
+ jCls:= env^.GetObjectClass(env, _jdigitalclock);
+ jMethod:= env^.GetMethodID(env, jCls, 'SetFontSizeUnit', '(I)V');
+ env^.CallVoidMethodA(env, _jdigitalclock, jMethod, @jParams);
+ env^.DeleteLocalRef(env, jCls);
 end;
 
 end.

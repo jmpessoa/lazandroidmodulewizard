@@ -128,6 +128,32 @@
 	*
 	****************************************************************************************************
 
+Version 0.6 - rev. 34 - 14 July 2015 - 
+
+	IMPROVEMENTS!   
+
+	       jHttpClient component:	
+		
+			New! Added Cookie Support [need tests !!]: // <<--- @Leledumbo's request and suggestion! 	
+
+	NEW! 
+		AppHttpClientCookiesDemo1
+
+	LOST! [sorry ..]  
+
+		FontSizeByComplexUnitPixel component property was lost!   //<<--many problems caused to @rx3.fireproof!
+	
+	NEW!
+		FontSizeUnit component property [ unitDefault  <--> unitScaledPixel ]
+
+		Hint:  try FontSizeUnit=unitPixel [jListView and jSpinner more responsive] and better developer experience! 
+
+	HINT 1: Old Projects: upgrade your projects code templates !
+			Lazarus IDE --> menu Tools --> [Lamw] Android Module Wizard --> Upgrade code Templates [*.lpr, *.java]
+
+	HINT 2:	When prompt "Read error" [Unknown Property] just choice "Continue Loading"! 
+			[After any form/component/property  changed and saved the problem gets solved!]
+		
 Version 0.6 - rev. 33 - 09 July 2015 - 
 
 	NEW! jSeekBar component 

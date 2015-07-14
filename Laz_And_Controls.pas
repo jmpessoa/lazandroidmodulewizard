@@ -276,6 +276,25 @@ type
     procedure AddNameValueData(_name, _value: string); //AddValueForPost2;
     function Post(_stringUrl: string): string;
 
+    function GetCookies(_url: string; _nameValueSeparator: string): TDynArrayOfString;  overload;
+    function GetCookiesCount(): integer;
+    function GetCookieByIndex(_index: integer): jObject;
+    function GetCookieAttributeValue(_cookie: jObject; _fieldName: string): string;
+    procedure ClearCookieStore();
+    function AddCookie(_name: string; _value: string): jObject;
+    function IsExpired(_cookie: jObject): boolean;
+    function GetStateful(_url: string): string;
+    function PostStateful(_url: string): string;
+    function IsCookiePersistent(_cookie: jObject): boolean;
+    procedure SetCookieValue(_cookie: jObject; _value: string);
+    function GetCookieByName(_cookieName: string): jObject;
+    procedure SetCookieAttributeValue(_cookie: jObject; _attribute: string; _value: string);
+    function GetCookieValue(_cookie: jObject): string;
+    function GetCookieName(_cookie: jObject): string;
+    function GetCookies(_nameValueSeparator: string): TDynArrayOfString;  overload;
+    procedure AddClientHeader(_name: string; _value: string);
+    procedure ClearClientHeader(_name: string; _value: string);
+
     procedure GenEvent_OnHttpClientContentResult(Obj: TObject; content: string);
     procedure GenEvent_OnHttpClientCodeResult(Obj: TObject; code: integer);
 
@@ -672,7 +691,8 @@ type
 
     procedure SetFontFace(AValue: TFontFace); //override;
     procedure SetTextTypeFace(Value: TTextTypeFace); //override;
-    procedure SetChangeFontSizeByComplexUnitPixel(_value: boolean);
+
+    procedure SetFontSizeUnit(_unit: TFontSizeUnit);
 
     procedure SetViewParent(Value: jObject);  override;
     Procedure GenEvent_OnClick(Obj: TObject);
@@ -698,7 +718,7 @@ type
     property FontFace: TFontFace read FFontFace write SetFontFace default ffNormal;
     property TextTypeFace: TTextTypeFace read FTextTypeFace write SetTextTypeFace;
 
-    property FontSizeByComplexUnitPixel: boolean read FChangeFontSizeByComplexUnitPixel write SetChangeFontSizeByComplexUnitPixel;
+    property FontSizeUnit: TFontSizeUnit read FFontSizeUnit write SetFontSizeUnit;
 
     // Event - if enabled!
     property OnClick : TOnNotify read FOnClick   write FOnClick;
@@ -785,7 +805,8 @@ type
     procedure CopyToClipboard();
     procedure PasteFromClipboard();
     procedure Clear;
-    procedure SetChangeFontSizeByComplexUnitPixel(_value: boolean);
+
+    procedure SetFontSizeUnit(_unit: TFontSizeUnit);
 
     // Property
     property CursorPos : TXY        read GetCursorPos  write SetCursorPos;
@@ -805,14 +826,15 @@ type
     property Hint      : string     read FHint         write SetHint;
     property HintTextColor: TARGBColorBridge read FHintTextColor write SetHintTextColor;
 
-    //property SingleLine: boolean read FSingleLine write SetSingleLine;
     property ScrollBarStyle: TScrollBarStyle read FScrollBarStyle write SetScrollBarStyle;
     property MaxLines: DWord read FMaxLines write SetMaxLines;
     property HorScrollBar: boolean read FHorizontalScrollBar write SetHorizontalScrollBar;
     property VerScrollBar: boolean read FVerticalScrollBar write SetVerticalScrollBar;
     property WrappingLine: boolean read FWrappingLine write FWrappingLine;
     property Editable: boolean read FEditable write SetEditable;
-    property FontSizeByComplexUnitPixel: boolean  read FChangeFontSizeByComplexUnitPixel write SetChangeFontSizeByComplexUnitPixel;
+
+    property FontSizeUnit: TFontSizeUnit read FFontSizeUnit write SetFontSizeUnit;
+
     // Event
     property OnEnter: TOnNotify  read FOnEnter write FOnEnter;
     property OnChange: TOnChange read FOnChange write FOnChange;
@@ -840,14 +862,15 @@ type
     procedure Init(refApp: jApp); override;
     Procedure Refresh;
     Procedure UpdateLayout; override;
-    procedure SetChangeFontSizeByComplexUnitPixel(_value: boolean);
+
+    procedure SetFontSizeUnit(_unit: TFontSizeUnit);
 
   published
     property Text: string read GetText write SetText;
     property BackgroundColor     : TARGBColorBridge read FColor     write SetColor;
     property FontColor : TARGBColorBridge read FFontColor write SetFontColor;
     property FontSize  : DWord     read FFontSize  write SetFontSize;
-    property FontSizeByComplexUnitPixel: boolean  read FChangeFontSizeByComplexUnitPixel write SetChangeFontSizeByComplexUnitPixel;
+    property FontSizeUnit: TFontSizeUnit read FFontSizeUnit write SetFontSizeUnit;
     // Event
     property OnClick   : TOnNotify read FOnClick   write FOnClick;
   end;
@@ -875,7 +898,8 @@ type
     procedure Init(refApp: jApp); override;
     Procedure Refresh;
     Procedure UpdateLayout; override;
-    procedure SetChangeFontSizeByComplexUnitPixel(_value: boolean);
+
+    procedure SetFontSizeUnit(_unit: TFontSizeUnit);
 
   published
     property Text: string read GetText write SetText;
@@ -883,7 +907,7 @@ type
     property FontColor : TARGBColorBridge read FFontColor write SetFontColor;
     property FontSize  : DWord     read FFontSize  write SetFontSize;
     property Checked   : boolean   read GetChecked write SetChecked;
-    property FontSizeByComplexUnitPixel: boolean  read FChangeFontSizeByComplexUnitPixel write SetChangeFontSizeByComplexUnitPixel;
+    property FontSizeUnit: TFontSizeUnit read FFontSizeUnit write SetFontSizeUnit;
     // Event
     property OnClick   : TOnNotify read FOnClick   write FOnClick;
   end;
@@ -911,7 +935,7 @@ type
     procedure Init(refApp: jApp); override;
     procedure Refresh;
     Procedure UpdateLayout; override;
-    procedure SetChangeFontSizeByComplexUnitPixel(_value: boolean);
+    procedure SetFontSizeUnit(_unit: TFontSizeUnit);
 
   published
     property Text: string read GetText write SetText;
@@ -919,7 +943,7 @@ type
     property FontColor : TARGBColorBridge read FFontColor write SetFontColor;
     property FontSize  : DWord     read FFontSize  write SetFontSize;
     property Checked   : boolean   read GetChecked write SetChecked;
-    property FontSizeByComplexUnitPixel: boolean  read FChangeFontSizeByComplexUnitPixel write SetChangeFontSizeByComplexUnitPixel;
+    property FontSizeUnit: TFontSizeUnit read FFontSizeUnit write SetFontSizeUnit;
     // Event
     property OnClick   : TOnNotify read FOnClick   write FOnClick;
   end;
@@ -1067,7 +1091,8 @@ type
     function GetCount: integer;
     procedure UpdateLParamHeight;
     procedure UpdateLParamWidth;
-    procedure SetChangeFontSizeByComplexUnitPixel(_value: boolean);
+    procedure SetFontSizeUnit(_unit: TFontSizeUnit);
+
   protected
     procedure SetViewParent(Value: jObject);  override;
     procedure GenEvent_OnClickWidgetItem(Obj: TObject; index: integer; checked: boolean);
@@ -1132,7 +1157,7 @@ type
     property TextSizeDecorated: TTextSizeDecorated read FTextSizeDecorated write FTextSizeDecorated;
     property TextAlign: TTextAlign read FTextAlign write FTextAlign;
     property HighLightSelectedItemColor: TARGBColorBridge read FHighLightSelectedItemColor write SetHighLightSelectedItemColor;
-    property FontSizeByComplexUnitPixel: boolean  read FChangeFontSizeByComplexUnitPixel write SetChangeFontSizeByComplexUnitPixel;
+    property FontSizeUnit: TFontSizeUnit read FFontSizeUnit write SetFontSizeUnit;
     // Event
     property OnClickItem : TOnClickCaptionItem read FOnClickItem write FOnClickItem;
     property OnClickWidgetItem: TOnClickWidgetItem read FOnClickWidgetItem write FOnClickWidgetItem;
@@ -2424,13 +2449,16 @@ begin
 
   jTextView_setLayoutAll(FjEnv, FjObject , Self.AnchorId);
 
-  jTextView_setText(FjEnv, FjObject , FText);
-
   if  FFontColor <> colbrDefault then
     jTextView_setTextColor(FjEnv, FjObject , GetARGB(FCustomColor, FFontColor));
 
+  if FFontSizeUnit <> unitDefault then
+     jTextView_SetFontSizeUnit(FjEnv, FjObject, Ord(FFontSizeUnit));
+
   if FFontSize > 0 then
     jTextView_setTextSize(FjEnv, FjObject , FFontSize);
+
+  jTextView_setText(FjEnv, FjObject , FText);
 
   jTextView_setTextAlignment(FjEnv, FjObject , Ord(FTextAlignment));
 
@@ -2439,12 +2467,7 @@ begin
 
   jTextView_setEnabled(FjEnv, FjObject , FEnabled);
 
-
   jTextView_setFontAndTextTypeFace(FjEnv, FjObject, Ord(FFontFace), Ord(FTextTypeFace));
-
-  if FChangeFontSizeByComplexUnitPixel = False then
-     jTextView_SetChangeFontSizeByComplexUnitPixel(FjEnv, FjObject, FChangeFontSizeByComplexUnitPixel);
-
 
   View_SetVisible(FjEnv, FjThis, FjObject , FVisible);
 
@@ -2610,13 +2633,12 @@ begin
      jTextView_AppendLn(FjEnv, FjObject, _txt);
 end;
 
-
-procedure jTextView.SetChangeFontSizeByComplexUnitPixel(_value: boolean);
+procedure jTextView.SetFontSizeUnit(_unit: TFontSizeUnit);
 begin
   //in designing component state: set value here...
-  FChangeFontSizeByComplexUnitPixel:= _value;
+  FFontSizeUnit:=_unit;
   if FInitialized then
-     jTextView_SetChangeFontSizeByComplexUnitPixel(FjEnv, FjObject, _value);
+     jTextView_SetFontSizeUnit(FjEnv, FjObject, Ord(_unit));
 end;
 
 //------------------------------------------------------------------------------
@@ -2743,6 +2765,9 @@ begin
   if FFontColor <> colbrDefault then
     jEditText_setTextColor(FjEnv, FjObject , GetARGB(FCustomColor, FFontColor));
 
+  if FFontSizeUnit <> unitDefault then
+     jEditText_SetFontSizeUnit(FjEnv, FjObject, Ord(FFontSizeUnit));
+
   if FFontSize > 0 then
     jEditText_setTextSize(FjEnv, FjObject , FFontSize);
 
@@ -2795,9 +2820,6 @@ begin
      jEditText_SetEditable(FjEnv, FjObject, FEditable);
 
   jEditText_setHintTextColor(FjEnv, FjObject, GetARGB(FCustomColor, FHintTextColor));
-
-  if FChangeFontSizeByComplexUnitPixel = False then
-     jEditText_SetChangeFontSizeByComplexUnitPixel(FjEnv, FjObject, FChangeFontSizeByComplexUnitPixel);
 
   jEditText_DispatchOnChangeEvent(FjEnv, FjObject , True);
   jEditText_DispatchOnChangedEvent(FjEnv, FjObject , True);
@@ -3168,12 +3190,12 @@ begin
   jEditText_setText(FjEnv, FjObject , '');
 end;
 
-procedure jEditText.SetChangeFontSizeByComplexUnitPixel(_value: boolean);
+procedure jEditText.SetFontSizeUnit(_unit: TFontSizeUnit);
 begin
   //in designing component state: set value here...
-  FChangeFontSizeByComplexUnitPixel:= _value;
+  FFontSizeUnit:= _unit;
   if FInitialized then
-     jEditText_SetChangeFontSizeByComplexUnitPixel(FjEnv, FjObject, _value);
+     jEditText_SetFontSizeUnit(FjEnv, FjObject, Ord(_unit));
 end;
 
 //------------------------------------------------------------------------------
@@ -3269,16 +3291,16 @@ begin
 
   jButton_setLayoutAll(FjEnv, FjObject , Self.AnchorId);
 
-  jButton_setText(FjEnv, FjObject , FText);
-
   if FFontColor <> colbrDefault then
      jButton_setTextColor(FjEnv, FjObject , GetARGB(FCustomColor, FFontColor));
+
+  if FFontSizeUnit <> unitDefault then
+     jButton_SetFontSizeUnit(FjEnv, FjObject, Ord(FFontSizeUnit));
 
   if FFontSize > 0 then //not default...
      jButton_setTextSize(FjEnv, FjObject , FFontSize);
 
-  if FChangeFontSizeByComplexUnitPixel = False then
-     jButton_SetChangeFontSizeByComplexUnitPixel(FjEnv, FjObject, FChangeFontSizeByComplexUnitPixel);
+  jButton_setText(FjEnv, FjObject , FText);
 
   if FColor <> colbrDefault then
     View_SetBackGroundColor(FjEnv, FjThis, FjObject , GetARGB(FCustomColor, FColor));
@@ -3392,13 +3414,14 @@ begin
   end;
 end;
 
-procedure jButton.SetChangeFontSizeByComplexUnitPixel(_value: boolean);
+procedure jButton.SetFontSizeUnit(_unit: TFontSizeUnit);
 begin
   //in designing component state: set value here...
-  FChangeFontSizeByComplexUnitPixel:= _value;
+  FFontSizeUnit:=_unit;
   if FInitialized then
-     jButton_SetChangeFontSizeByComplexUnitPixel(FjEnv, FjObject, _value);
+     jButton_SetFontSizeUnit(FjEnv, FjObject, Ord(_unit));
 end;
+
 
 // Event : Java -> Pascal
 Procedure jButton.GenEvent_OnClick(Obj: TObject);
@@ -3505,11 +3528,13 @@ begin
   if FFontColor <> colbrDefault then
      jCheckBox_setTextColor(FjEnv, FjObject , GetARGB(FCustomColor, FFontColor));
 
+  if FFontSizeUnit <> unitDefault then
+      jCheckBox_SetFontSizeUnit(FjEnv, FjObject, Ord(FFontSizeUnit));
+
   if FFontSize > 0 then
      jCheckBox_setTextSize(FjEnv, FjObject , FFontSize);
 
-  if FChangeFontSizeByComplexUnitPixel = False then
-     jCheckBox_SetChangeFontSizeByComplexUnitPixel(FjEnv, FjObject, FChangeFontSizeByComplexUnitPixel);
+  jCheckBox_setText(FjEnv, FjObject , FText);
 
   if FColor <> colbrDefault then
      View_SetBackGroundColor(FjEnv, FjThis, FjObject , GetARGB(FCustomColor, FColor));
@@ -3637,12 +3662,12 @@ begin
   end;
 end;
 
-procedure jCheckBox.SetChangeFontSizeByComplexUnitPixel(_value: boolean);
+procedure jCheckBox.SetFontSizeUnit(_unit: TFontSizeUnit);
 begin
   //in designing component state: set value here...
-   FChangeFontSizeByComplexUnitPixel:= _value;
+  FFontSizeUnit:=_unit;
   if FInitialized then
-     jCheckBox_SetChangeFontSizeByComplexUnitPixel(FjEnv, FjObject, _value);
+     jCheckBox_SetFontSizeUnit(FjEnv, FjObject, Ord(_unit));
 end;
 
 // Event Java -> Pascal
@@ -3746,18 +3771,19 @@ begin
   else Self.AnchorId:= -1;
 
   jRadioButton_setLayoutAll(FjEnv, FjObject , Self.AnchorId);
-  jRadioButton_setText(FjEnv, FjObject , FText);
 
   if FFontColor <> colbrDefault then
      jRadioButton_setTextColor(FjEnv, FjObject , GetARGB(FCustomColor, FFontColor));
 
+  if FFontSizeUnit <> unitDefault then
+      jRadioButton_SetFontSizeUnit(FjEnv, FjObject, Ord(FFontSizeUnit));
+
   if FFontSize > 0 then
      jRadioButton_setTextSize(FjEnv, FjObject , FFontSize);
 
-  jRadioButton_setChecked(FjEnv, FjObject , FChecked);
+  jRadioButton_setText(FjEnv, FjObject , FText);
 
-  if FChangeFontSizeByComplexUnitPixel = False then
-     jRadioButton_SetChangeFontSizeByComplexUnitPixel(FjEnv, FjObject, FChangeFontSizeByComplexUnitPixel);
+  jRadioButton_setChecked(FjEnv, FjObject , FChecked);
 
   if FColor <> colbrDefault then
      View_SetBackGroundColor(FjEnv, FjThis, FjObject , GetARGB(FCustomColor, FColor));
@@ -3885,14 +3911,13 @@ begin
   end;
 end;
 
-procedure jRadioButton.SetChangeFontSizeByComplexUnitPixel(_value: boolean);
+procedure jRadioButton.SetFontSizeUnit(_unit: TFontSizeUnit);
 begin
   //in designing component state: set value here...
-    FChangeFontSizeByComplexUnitPixel:= _value;
+  FFontSizeUnit:=_unit;
   if FInitialized then
-     jRadioButton_SetChangeFontSizeByComplexUnitPixel(FjEnv, FjObject, _value);
+     jRadioButton_SetFontSizeUnit(FjEnv, FjObject, Ord(_unit));
 end;
-
 
 // Event Java -> Pascal
 Procedure jRadioButton.GenEvent_OnClick(Obj: TObject);
@@ -4756,6 +4781,134 @@ begin
     jHttpClient_PostNameValueDataAsync(FjEnv, FjObject, _stringUrl ,_listNameValue);
 end;
 
+function jHttpClient.GetCookies(_url: string; _nameValueSeparator: string): TDynArrayOfString;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jHttpClient_GetCookies(FjEnv, FjObject, _url ,_nameValueSeparator);
+end;
+
+function jHttpClient.GetCookiesCount(): integer;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jHttpClient_GetCookiesCount(FjEnv, FjObject);
+end;
+
+function jHttpClient.GetCookieByIndex(_index: integer): jObject;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jHttpClient_GetCookieByIndex(FjEnv, FjObject, _index);
+end;
+
+function jHttpClient.GetCookieAttributeValue(_cookie: jObject; _fieldName: string): string;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jHttpClient_GetCookieAttributeValue(FjEnv, FjObject, _cookie ,_fieldName);
+end;
+
+procedure jHttpClient.ClearCookieStore();
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jHttpClient_ClearCookieStore(FjEnv, FjObject);
+end;
+
+function jHttpClient.AddCookie(_name: string; _value: string): jObject;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jHttpClient_AddCookie(FjEnv, FjObject, _name ,_value);
+end;
+
+function jHttpClient.IsExpired(_cookie: jObject): boolean;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jHttpClient_IsExpired(FjEnv, FjObject, _cookie);
+end;
+
+function jHttpClient.GetStateful(_url: string): string;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jHttpClient_GetStateful(FjEnv, FjObject, _url);
+end;
+
+function jHttpClient.PostStateful(_url: string): string;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jHttpClient_PostStateful(FjEnv, FjObject, _url);
+end;
+
+
+function jHttpClient.IsCookiePersistent(_cookie: jObject): boolean;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jHttpClient_IsCookiePersistent(FjEnv, FjObject, _cookie);
+end;
+
+procedure jHttpClient.SetCookieValue(_cookie: jObject; _value: string);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jHttpClient_SetCookieValue(FjEnv, FjObject, _cookie ,_value);
+end;
+
+function jHttpClient.GetCookieByName(_cookieName: string): jObject;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jHttpClient_GetCookieByName(FjEnv, FjObject, _cookieName);
+end;
+
+procedure jHttpClient.SetCookieAttributeValue(_cookie: jObject; _attribute: string; _value: string);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jHttpClient_SetCookieAttributeValue(FjEnv, FjObject, _cookie ,_attribute ,_value);
+end;
+
+function jHttpClient.GetCookieValue(_cookie: jObject): string;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jHttpClient_GetCookieValue(FjEnv, FjObject, _cookie);
+end;
+
+function jHttpClient.GetCookieName(_cookie: jObject): string;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jHttpClient_GetCookieName(FjEnv, FjObject, _cookie);
+end;
+
+function jHttpClient.GetCookies(_nameValueSeparator: string): TDynArrayOfString;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jHttpClient_GetCookies(FjEnv, FjObject, _nameValueSeparator);
+end;
+
+procedure jHttpClient.AddClientHeader(_name: string; _value: string);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jHttpClient_AddClientHeader(FjEnv, FjObject, _name ,_value);
+end;
+
+procedure jHttpClient.ClearClientHeader(_name: string; _value: string);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jHttpClient_ClearClientHeader(FjEnv, FjObject, _name ,_value);
+end;
+
+
 procedure jHttpClient.GenEvent_OnHttpClientContentResult(Obj: TObject; content: string);
 begin
    if Assigned(FOnContentResult) then FOnContentResult(Obj, content);
@@ -4765,6 +4918,8 @@ procedure jHttpClient.GenEvent_OnHttpClientCodeResult(Obj: TObject; code: intege
 begin
    if Assigned(FOnCodeResult) then FOnCodeResult(Obj, code);
 end;
+
+
 
 {jSMTPClient by jmpessoa: warning: not tested!}
 
@@ -5074,11 +5229,11 @@ begin
     if FFontColor <> colbrDefault then
        jListView_setTextColor(FjEnv, FjObject , GetARGB(FCustomColor, FFontColor));
 
+    if FFontSizeUnit <> unitDefault then
+        jListView_SetFontSizeUnit(FjEnv, FjObject, Ord(FFontSizeUnit));
+
     if FFontSize > 0 then
        jListView_setTextSize(FjEnv, FjObject , FFontSize);
-
-    if FChangeFontSizeByComplexUnitPixel = False then
-         jListView_SetChangeFontSizeByComplexUnitPixel(FjEnv, FjObject, FChangeFontSizeByComplexUnitPixel);
 
     if FColor <> colbrDefault then
        View_SetBackGroundColor(FjEnv, FjThis, FjObject , GetARGB(FCustomColor, FColor));
@@ -5097,6 +5252,10 @@ begin
 
      if FFontColor <> colbrDefault then
         jListView_setTextColor(FjEnv, FjObject , GetARGB(FCustomColor, FFontColor));
+
+
+     if FFontSizeUnit <> unitDefault then
+          jListView_SetFontSizeUnit(FjEnv, FjObject, Ord(FFontSizeUnit));
 
      if FFontSize > 0 then
         jListView_setTextSize(FjEnv, FjObject , FFontSize);
@@ -5557,12 +5716,12 @@ begin
      jListView_DispatchOnDrawItemBitmap(FjEnv, FjObject, _value);
 end;
 
-procedure jListView.SetChangeFontSizeByComplexUnitPixel(_value: boolean);
+procedure jListView.SetFontSizeUnit(_unit: TFontSizeUnit);
 begin
   //in designing component state: set value here...
-  FChangeFontSizeByComplexUnitPixel:= _value;
+  FFontSizeUnit:=_unit;
   if FInitialized then
-     jListView_SetChangeFontSizeByComplexUnitPixel(FjEnv, FjObject, _value);
+     jListView_SetFontSizeUnit(FjEnv, FjObject, Ord(_unit));
 end;
 
 //------------------------------------------------------------------------------

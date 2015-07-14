@@ -69,7 +69,7 @@ TGridItemLayout = (ilImageText, ilTextImage);
 
     procedure SetFontSize(_size: Dword);
     procedure SetFontColor(_color: TARGBColorBridge);
-    procedure SetChangeFontSizeByComplexUnitPixel(_value: boolean);
+    procedure SetFontSizeUnit(_unit: TFontSizeUnit);
 
     procedure GenEvent_OnDrawItemCaptionColor(Obj: TObject; index: integer; caption: string;  out color: dword);
     procedure GenEvent_OnDrawItemBitmap(Obj: TObject; index: integer; caption: string;  out bitmap: JObject);
@@ -84,7 +84,7 @@ TGridItemLayout = (ilImageText, ilTextImage);
     property OnLongClickItem: TOnClickGridItem  read FOnLongClickGridItem write FOnLongClickGridItem;
     property OnDrawItemTextColor: TOnDrawItemTextColor read FOnDrawItemTextColor write FOnDrawItemTextColor;
     property OnDrawItemBitmap: TOnDrawItemBitmap read FOnDrawItemBitmap write FOnDrawItemBitmap;
-    property FontSizeByComplexUnitPixel: boolean  read FChangeFontSizeByComplexUnitPixel write SetChangeFontSizeByComplexUnitPixel;
+    property FontSizeUnit: TFontSizeUnit read FFontSizeUnit write SetFontSizeUnit;
 
   end;
 
@@ -110,11 +110,12 @@ procedure jGridView_SetItemsLayout(env: PJNIEnv; _jgridview: JObject; _value: in
 function jGridView_GetItemIndex(env: PJNIEnv; _jgridview: JObject): integer;
 function jGridView_GetItemCaption(env: PJNIEnv; _jgridview: JObject): string;
 
+
 procedure jGridView_DispatchOnDrawItemTextColor(env: PJNIEnv; _jgridview: JObject; _value: boolean);
 procedure jGridView_DispatchOnDrawItemBitmap(env: PJNIEnv; _jgridview: JObject; _value: boolean);
 procedure jGridView_SetFontSize(env: PJNIEnv; _jgridview: JObject; _size: integer);
 procedure jGridView_SetFontColor(env: PJNIEnv; _jgridview: JObject; _color: integer);
-procedure jGridView_SetChangeFontSizeByComplexUnitPixel(env: PJNIEnv; _jgridview: JObject; _value: boolean);
+procedure jGridView_SetFontSizeUnit(env: PJNIEnv; _jgridview: JObject; _unit: integer);
 
 
 implementation
@@ -218,15 +219,16 @@ begin
   if Self.Anchor <> nil then Self.AnchorId:= Self.Anchor.Id
   else Self.AnchorId:= -1; //dummy
 
-
   jGridView_SetLayoutAll(FjEnv, FjObject, Self.AnchorId);
-
 
   if  FColor <> colbrDefault then
     View_SetBackGroundColor(FjEnv, FjObject, GetARGB(FCustomColor, FColor));
 
   if FFontColor <> colbrDefault then
     jGridView_SetFontColor(FjEnv, FjObject, GetARGB(FCustomColor, FFontColor));
+
+  if FFontSizeUnit <> unitDefault then
+        jGridView_SetFontSizeUnit(FjEnv, FjObject, Ord(FFontSizeUnit));
 
   if FFontSize <> 0 then
     jGridView_SetFontSize(FjEnv, FjObject,FFontSize);
@@ -236,9 +238,6 @@ begin
 
   if FColumns <> -1 then
       jGridView_SetNumColumns(FjEnv, FjObject, FColumns);
-
-  if FChangeFontSizeByComplexUnitPixel = False then
-      jGridView_SetChangeFontSizeByComplexUnitPixel(FjEnv, FjObject, FChangeFontSizeByComplexUnitPixel);
 
   View_SetVisible(FjEnv, FjObject, FVisible);
 end;
@@ -520,11 +519,12 @@ begin
      jGridView_SetFontColor(FjEnv, FjObject, GetARGB(FCustomColor, _color));
 end;
 
-procedure jGridView.SetChangeFontSizeByComplexUnitPixel(_value: boolean);
+procedure jGridView.SetFontSizeUnit(_unit: TFontSizeUnit);
 begin
   //in designing component state: set value here...
+  FFontSizeUnit:= _unit;
   if FInitialized then
-     jGridView_SetChangeFontSizeByComplexUnitPixel(FjEnv, FjObject, _value);
+     jGridView_SetFontSizeUnit(FjEnv, FjObject, Ord(_unit));
 end;
 
 procedure jGridView.GenEvent_OnDrawItemCaptionColor(Obj: TObject; index: integer; caption: string;  out color: dword);
@@ -903,17 +903,17 @@ begin
   env^.DeleteLocalRef(env, jCls);
 end;
 
-procedure jGridView_SetChangeFontSizeByComplexUnitPixel(env: PJNIEnv; _jgridview: JObject; _value: boolean);
+procedure jGridView_SetFontSizeUnit(env: PJNIEnv; _jgridview: JObject; _unit: integer);
 var
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
+   jParams: array[0..0] of jValue;
+   jMethod: jMethodID=nil;
+   jCls: jClass=nil;
 begin
-  jParams[0].z:= JBool(_value);
-  jCls:= env^.GetObjectClass(env, _jgridview);
-  jMethod:= env^.GetMethodID(env, jCls, 'SetChangeFontSizeByComplexUnitPixel', '(Z)V');
-  env^.CallVoidMethodA(env, _jgridview, jMethod, @jParams);
-  env^.DeleteLocalRef(env, jCls);
+   jParams[0].i:= _unit;
+   jCls:= env^.GetObjectClass(env, _jgridview);
+   jMethod:= env^.GetMethodID(env, jCls, 'SetFontSizeUnit', '(I)V');
+   env^.CallVoidMethodA(env, _jgridview, jMethod, @jParams);
+   env^.DeleteLocalRef(env, jCls);
 end;
 
 end.

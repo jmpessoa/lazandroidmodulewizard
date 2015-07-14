@@ -1,4 +1,4 @@
-package com.example.dummyapp;
+package com.example.apphttpclientcookiesdemo1;
 
 //Lamw: Lazarus Android Module Wizard 
 //Form Designer and Components development model!

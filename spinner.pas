@@ -62,7 +62,7 @@ TOnItemSelected = procedure(Sender: TObject; itemCaption: string; itemIndex: int
     procedure SetSelection(_index: integer);
     procedure SetItem(_index: integer; _item: string);
     procedure SetFontSize(_txtFontSize: DWord);
-    procedure SetChangeFontSizeByComplexUnitPixel(_value: boolean);
+    procedure SetFontSizeUnit(_unit: TFontSizeUnit);
 
     property jParent: jObject  read  FjPRLayout write SetjParent; // Java : Parent Relative Layout
 
@@ -80,7 +80,7 @@ TOnItemSelected = procedure(Sender: TObject; itemCaption: string; itemIndex: int
     property DropListBackgroundColor: TARGBColorBridge  read FDropListBackgroundColor write SetDropListBackgroundColor;
     property LastItemAsPrompt: boolean read FLastItemAsPrompt write SetLastItemAsPrompt;
     property FontSize: Dword read FFontSize write SetFontSize;
-    property FontSizeByComplexUnitPixel: boolean  read FChangeFontSizeByComplexUnitPixel write SetChangeFontSizeByComplexUnitPixel;
+    property FontSizeUnit: TFontSizeUnit read FFontSizeUnit write SetFontSizeUnit;
   end;
 
 function jSpinner_jCreate(env: PJNIEnv; this: JObject;_Self: int64): jObject;
@@ -107,7 +107,7 @@ procedure jSpinner_SetSelection(env: PJNIEnv; _jspinner: JObject; _index: intege
 procedure jSpinner_SetItem(env: PJNIEnv; _jspinner: JObject; _index: integer; _item: string);
 
 procedure jSpinner_SetTextFontSize(env: PJNIEnv; _jspinner: JObject; _txtFontSize: integer);
-procedure jSpinner_SetChangeFontSizeByComplexUnitPixel(env: PJNIEnv; _jspinner: JObject; _value: boolean);
+procedure jSpinner_SetFontSizeUnit(env: PJNIEnv; _jspinner: JObject; _unit: integer);
 
 
 implementation
@@ -230,18 +230,18 @@ begin
   if FDropListTextColor <> colbrDefault then self.SetDropListTextColor(FDropListTextColor);
   if FDropListBackgroundColor <> colbrDefault then  Self.SetDropListBackgroundColor(FDropListBackgroundColor);
 
-  for i:= 0 to FItems.Count-1 do
-  begin
-    Self.Add(FItems.Strings[i]);
-  end;
-
   if (FLastItemAsPrompt) then Self.SetLastItemAsPrompt(FLastItemAsPrompt);
+
+  if FFontSizeUnit <> unitDefault then
+       jSpinner_SetFontSizeUnit(FjEnv, FjObject, Ord(FFontSizeUnit));
 
   if FFontSize <> 0 then
      jSpinner_SetTextFontSize(FjEnv, FjObject , FFontSize);
 
-  if FChangeFontSizeByComplexUnitPixel = False then
-      jSpinner_SetChangeFontSizeByComplexUnitPixel(FjEnv, FjObject, FChangeFontSizeByComplexUnitPixel);
+  for i:= 0 to FItems.Count-1 do
+  begin
+    Self.Add(FItems.Strings[i]);
+  end;
 
   View_SetVisible(FjEnv, FjThis, FjObject , FVisible);
 end;
@@ -526,11 +526,12 @@ begin
      jSpinner_SetTextFontSize(FjEnv, FjObject, _txtFontSize);
 end;
 
-procedure jSpinner.SetChangeFontSizeByComplexUnitPixel(_value: boolean);
+procedure jSpinner.SetFontSizeUnit(_unit: TFontSizeUnit);
 begin
   //in designing component state: set value here...
+  FFontSizeUnit:= _unit;
   if FInitialized then
-     jSpinner_SetChangeFontSizeByComplexUnitPixel(FjEnv, FjObject, _value);
+     jSpinner_SetFontSizeUnit(FjEnv, FjObject, Ord(_unit));
 end;
 
 {-------- jSpinner_JNI_Bridge ----------}
@@ -867,18 +868,17 @@ begin
   env^.DeleteLocalRef(env, jCls);
 end;
 
-procedure jSpinner_SetChangeFontSizeByComplexUnitPixel(env: PJNIEnv; _jspinner: JObject; _value: boolean);
+procedure jSpinner_SetFontSizeUnit(env: PJNIEnv; _jspinner: JObject; _unit: integer);
 var
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
+   jParams: array[0..0] of jValue;
+   jMethod: jMethodID=nil;
+   jCls: jClass=nil;
 begin
-  jParams[0].z:= JBool(_value);
-  jCls:= env^.GetObjectClass(env, _jspinner);
-  jMethod:= env^.GetMethodID(env, jCls, 'SetChangeFontSizeByComplexUnitPixel', '(Z)V');
-  env^.CallVoidMethodA(env, _jspinner, jMethod, @jParams);
-  env^.DeleteLocalRef(env, jCls);
+   jParams[0].i:= _unit;
+   jCls:= env^.GetObjectClass(env, _jspinner);
+   jMethod:= env^.GetMethodID(env, jCls, 'SetFontSizeUnit', '(I)V');
+   env^.CallVoidMethodA(env, _jspinner, jMethod, @jParams);
+   env^.DeleteLocalRef(env, jCls);
 end;
-
 
 end.
