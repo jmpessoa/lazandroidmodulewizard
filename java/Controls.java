@@ -2,7 +2,7 @@ package com.example.dummyapp;
 
 //Lamw: Lazarus Android Module Wizard 
 //Form Designer and Components development model!
-//version 0.6 - revision 34 - 14 July - 2015
+//version 0.6 - revision 34.1 - 16 July - 2015
 //
 //https://github.com/jmpessoa/lazandroidmodulewizard
 //http://forum.lazarus.freepascal.org/index.php/topic,21919.270.html
@@ -3110,20 +3110,20 @@ onItemClickListener = new OnItemClickListener() {
 		   if (lastSelectedItem > -1) {
 			   DoHighlight(lastSelectedItem, textColor);	   
 		   } 		   
-		   DoHighlight(position, highLightColor);
+		   DoHighlight((int)id, highLightColor);
 	   }		 
 	   
-	   if (alist.get(position).widget == 2 /*radio*/) { //fix 16-febr-2015
+	   if (alist.get((int)id).widget == 2 /*radio*/) { //fix 16-febr-2015
 		  for (int i=0; i < alist.size(); i++) { 
 		    alist.get(i).checked = false;
 		  }
-		  alist.get(position).checked = true;
+		  alist.get((int)id).checked = true;
 		  aadapter.notifyDataSetChanged();
 	   }	   
 	   	   
-	   lastSelectedItem = (int)position;
-	   selectedItemCaption = alist.get((int)position).label;
-       controls.pOnClickCaptionItem(PasObj, (int)position , alist.get((int)position).label);
+	   lastSelectedItem = (int)id;
+	   selectedItemCaption = alist.get((int)id).label;
+       controls.pOnClickCaptionItem(PasObj, (int)id , alist.get((int)id).label);
    }
 };
 
@@ -3133,9 +3133,9 @@ this.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
     @Override
     public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
     	//Log.i("OnItemLongClickListener", "position = "+position);    	
-    	lastSelectedItem = (int)position;
- 	   selectedItemCaption = alist.get((int)position).label;
-    	controls.pOnListViewLongClickCaptionItem(PasObj, (int)position , alist.get((int)position).label);
+    	lastSelectedItem = (int)id;
+ 	   selectedItemCaption = alist.get((int)id).label;
+    	controls.pOnListViewLongClickCaptionItem(PasObj, (int)id , alist.get((int)id).label);
         return false;
     }
 });
