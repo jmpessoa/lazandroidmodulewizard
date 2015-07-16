@@ -2,7 +2,7 @@ package com.example.dummyapp;
 
 //Lamw: Lazarus Android Module Wizard 
 //Form Designer and Components development model!
-//version 0.6 - revision 34.1 - 16 July - 2015
+//version 0.6 - revision 34.2 - 16 July - 2015
 //
 //https://github.com/jmpessoa/lazandroidmodulewizard
 //http://forum.lazarus.freepascal.org/index.php/topic,21919.270.html
@@ -2641,8 +2641,9 @@ public void SetImageFromURI(Uri _uri) {
 //-------------------------------------------------------------------------
 //by jmpessoa : custom row!
 //by jmpessoa : custom row!
+
 class jListItemRow{
-	String label;
+	String label = "";
 	int    id; 
 	int widget = 0;
 	View jWidget; //needed to fix  the RadioButton Group default behavior: thanks to Leledumbo.
@@ -2659,6 +2660,7 @@ class jListItemRow{
 	Bitmap bmp;
 	public  jListItemRow(Context context) {
 		ctx = context;
+		label = "";
 	}
 }
 
