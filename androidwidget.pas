@@ -1002,7 +1002,7 @@ type
     function GetScreenSize(): string;
     function GetScreenDensity(): string;
     procedure LogDebug(_tag: string; _msg: string);
-    procedure ShowCustomMessage(_layout: jObject; _gravity: integer; _lenghTimeSecond: integer); overload;
+    procedure ShowCustomMessage(_layout: jObject; _gravity: TGravity; _lenghTimeSecond: integer); overload;
     procedure Vibrate(_milliseconds: integer);  overload;
     procedure Vibrate(var _millisecondsPattern: TDynArrayOfInt64);overload;
     procedure TakeScreenshot(_savePath: string; _saveFileNameJPG: string);
@@ -1171,7 +1171,7 @@ end;
 
   function GetFilePath(filePath: TFilePath): string;
 
-  function GetGravity(gvValue: TGravity): DWord;  //TODO
+  function GetGravity(gvValue: TGravity): DWord;
 
   //Form Event
   Procedure Java_Event_pOnClose(env: PJNIEnv; this: jobject; Form : TObject);
@@ -2774,11 +2774,11 @@ begin
      jForm_LogDebug(FjEnv, FjObject, _tag ,_msg);
 end;
 
-procedure jForm.ShowCustomMessage(_layout: jObject; _gravity: integer; _lenghTimeSecond: integer);
+procedure jForm.ShowCustomMessage(_layout: jObject; _gravity: TGravity; _lenghTimeSecond: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jForm_ShowCustomMessage(FjEnv, FjObject, _layout ,_gravity ,_lenghTimeSecond);
+     jForm_ShowCustomMessage(FjEnv, FjObject, _layout ,GetGravity(_gravity) ,_lenghTimeSecond);
 end;
 
 procedure jForm.Vibrate(_milliseconds: integer);
