@@ -41,7 +41,10 @@ jImageFileManager = class(jControl)
     function CreateBitmap(_width: integer; _height: integer): jObject;
     function GetBitmapWidth(_bitmap: jObject): integer;
     function GetBitmapHeight(_bitmap: jObject): integer;
+
+    //_compressFormat -->> 'WEBP' or 'JPEG'  or 'PNG'
     function GetByteArrayFromBitmap(_bitmap: jObject; _compressFormat: string): TDynArrayOfJByte;
+
     function SetByteArrayToBitmap(var _imageArray: TDynArrayOfJByte): jObject;
     function ClockWise(_bitmap: jObject; _imageView: jObject): jObject;
     function AntiClockWise(_bitmap: jObject; _imageView: jObject): jObject;
@@ -241,7 +244,7 @@ function jImageFileManager.GetByteArrayFromBitmap(_bitmap: jObject; _compressFor
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jImageFileManager_GetByteArrayFromBitmap(FjEnv, FjObject, _bitmap ,_compressFormat);
+     Result:= jImageFileManager_GetByteArrayFromBitmap(FjEnv, FjObject, _bitmap ,_compressFormat);
 end;
 
 function jImageFileManager.SetByteArrayToBitmap(var _imageArray: TDynArrayOfJByte): jObject;

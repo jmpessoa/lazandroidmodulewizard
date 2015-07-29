@@ -15,14 +15,15 @@ uses
    procedure Java_Event_pOnBluetoothDeviceBondStateChanged(env: PJNIEnv; this: jobject; Obj: TObject; state: integer; deviceName: JString; deviceAddress: JString);
 
    procedure Java_Event_pOnBluetoothClientSocketConnected(env: PJNIEnv; this: jobject; Obj: TObject; deviceName: JString; deviceAddress: JString);
-   procedure Java_Event_pOnBluetoothClientSocketIncomingMessage(env: PJNIEnv; this: jobject; Obj: TObject; messageText: JString);
-   procedure Java_Event_pOnBluetoothClientSocketWritingMessage(env: PJNIEnv; this: jobject; Obj: TObject);
+   procedure Java_Event_pOnBluetoothClientSocketIncomingData(env: PJNIEnv; this: jobject; Obj: TObject; byteArrayData: JByteArray; byteArrayHeader: JByteArray);
+   procedure Java_Event_pOnBluetoothClientSocketDisconnected(env: PJNIEnv; this: jobject; Obj: TObject);
 
-   procedure Java_Event_pOnBluetoothServerSocketConnected(env: PJNIEnv; this: jobject; Obj: TObject; deviceName: JString; deviceAddress: JString);
-   procedure Java_Event_pOnBluetoothServerSocketIncomingMessage(env: PJNIEnv; this: jobject; Obj: TObject; messageText: JString);
-   procedure Java_Event_pOnBluetoothServerSocketWritingMessage(env: PJNIEnv; this: jobject; Obj: TObject);
-   procedure Java_Event_pOnBluetoothServerSocketListen(env: PJNIEnv; this: jobject; Obj: TObject; deviceName: JString; deviceAddress: JString);
-   procedure Java_Event_pOnBluetoothServerSocketAccept(env: PJNIEnv; this: jobject; Obj: TObject; deviceName: JString; deviceAddress: JString);
+   function Java_Event_pOnBluetoothServerSocketConnected(env: PJNIEnv; this: jobject; Obj: TObject; deviceName: JString; deviceAddress: JString): JBoolean;
+   function Java_Event_pOnBluetoothServerSocketIncomingData(env: PJNIEnv; this: jobject; Obj: TObject; byteArrayData: JByteArray; byteArrayHeader: JByteArray): JBoolean;
+
+   procedure Java_Event_pOnBluetoothServerSocketListen(env: PJNIEnv; this: jobject; Obj: TObject; serverName: JString; strUUID: JString);
+   procedure Java_Event_pOnBluetoothServerSocketAcceptTimeout(env: PJNIEnv; this: jobject; Obj: TObject);
+
    procedure Java_Event_pOnSpinnerItemSeleceted(env: PJNIEnv; this: jobject; Obj: TObject; position: integer; caption: JString);
 
    procedure Java_Event_pOnLocationChanged(env: PJNIEnv; this: jobject; Obj: TObject; latitude: JDouble; longitude: JDouble; altitude: JDouble; address: JString);
@@ -192,38 +193,40 @@ begin
     end;
     jBluetooth(Obj).GenEvent_OnBluetoothDeviceBondStateChanged(Obj, state, pasStrName, pasStrAddress);
   end;
-
 end;
 
-procedure Java_Event_pOnBluetoothClientSocketIncomingMessage(env: PJNIEnv; this: jobject; Obj: TObject; messageText: JString);
+procedure Java_Event_pOnBluetoothClientSocketIncomingData(env: PJNIEnv; this: jobject; Obj: TObject; byteArrayData: JByteArray; byteArrayHeader: JByteArray);
 var
-  pasStrText: string;
-  _jBoolean: JBoolean;
-begin
-  gApp.Jni.jEnv:= env;
-  gApp.Jni.jThis:= this;
-  if Obj is jBluetoothClientSocket then
-  begin
-    jForm(jBluetoothClientSocket(Obj).Owner).UpdateJNI(gApp);
-    pasStrText := '';
-    if messageText <> nil then
-    begin
-      _jBoolean:= JNI_False;
-      pasStrText:= string( env^.GetStringUTFChars(Env,messageText,@_jBoolean) );
-    end;
-    jBluetoothClientSocket(Obj).GenEvent_OnBluetoothClientSocketIncomingMessage(Obj,pasStrText);
-  end;
-end;
+  sizeArray: integer;
+  arrayResult: TDynArrayOfJByte; //array of jByte;  //shortint
 
-procedure Java_Event_pOnBluetoothClientSocketWritingMessage(env: PJNIEnv; this: jobject; Obj: TObject);
+  sizeArrayHeader: integer;
+  arrayResultHeader: TDynArrayOfJByte; //array of jByte;  //shortint
+
 begin
   gApp.Jni.jEnv:= env;
   gApp.Jni.jThis:= this;
+
+  if byteArrayData <> nil then
+  begin
+    sizeArray:=  env^.GetArrayLength(env, byteArrayData);
+    SetLength(arrayResult, sizeArray);
+    env^.GetByteArrayRegion(env, byteArrayData, 0, sizeArray, @arrayResult[0] {target});
+  end;
+
+  if byteArrayHeader <> nil then
+  begin
+    sizeArrayHeader:=  env^.GetArrayLength(env, byteArrayHeader);
+    SetLength(arrayResultHeader, sizeArrayHeader);
+    env^.GetByteArrayRegion(env, byteArrayHeader, 0, sizeArrayHeader, @arrayResultHeader[0] {target});
+  end;
+
   if Obj is jBluetoothClientSocket then
   begin
-    jForm(jBluetoothClientSocket(Obj).Owner).UpdateJNI(gApp);
-    jBluetoothClientSocket(Obj).GenEvent_OnBluetoothClientSocketWritingMessage(Obj);;
+    jForm(jLocation(Obj).Owner).UpdateJNI(gApp);
+    jBluetoothClientSocket(Obj).GenEvent_OnBluetoothClientSocketIncomingData(Obj, arrayResult, arrayResultHeader);
   end;
+
 end;
 
 procedure Java_Event_pOnBluetoothClientSocketConnected(env: PJNIEnv; this: jobject; Obj: TObject; deviceName: JString; deviceAddress: JString);
@@ -251,13 +254,24 @@ begin
     end;
     jBluetoothClientSocket(Obj).GenEvent_OnBluetoothClientSocketConnected(Obj, pasStrName, pasStrAddress);
   end;
-
 end;
 
-procedure Java_Event_pOnBluetoothServerSocketConnected(env: PJNIEnv; this: jobject; Obj: TObject; deviceName: JString; deviceAddress: JString);
+procedure Java_Event_pOnBluetoothClientSocketDisconnected(env: PJNIEnv; this: jobject; Obj: TObject);
+begin
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+  if Obj is jBluetoothClientSocket then
+  begin
+    jForm(jBluetoothClientSocket(Obj).Owner).UpdateJNI(gApp);
+    jBluetoothClientSocket(Obj).GenEvent_OnBluetoothClientSocketDisconnected(Obj);
+  end;
+end;
+
+function Java_Event_pOnBluetoothServerSocketConnected(env: PJNIEnv; this: jobject; Obj: TObject; deviceName: JString; deviceAddress: JString): JBoolean;
 var
  pasStrName, pasStrAddress: string;
  _jBoolean: JBoolean;
+ keepConnected: boolean;
 begin
   gApp.Jni.jEnv:= env;
   gApp.Jni.jThis:= this;
@@ -277,94 +291,81 @@ begin
       _jBoolean := JNI_False;
       pasStrAddress:= string( env^.GetStringUTFChars(Env,deviceAddress,@_jBoolean) );
     end;
-    jBluetoothServerSocket(Obj).GenEvent_OnBluetoothServerSocketConnected(Obj, pasStrName, pasStrAddress);
+    jBluetoothServerSocket(Obj).GenEvent_OnBluetoothServerSocketConnected(Obj, pasStrName, pasStrAddress, keepConnected);
   end;
-
+  Result:= JBool(keepConnected);
 end;
 
-
-procedure Java_Event_pOnBluetoothServerSocketIncomingMessage(env: PJNIEnv; this: jobject; Obj: TObject; messageText: JString);
+function Java_Event_pOnBluetoothServerSocketIncomingData(env: PJNIEnv; this: jobject; Obj: TObject; byteArrayData: JByteArray; byteArrayHeader: JByteArray): JBoolean;
 var
-  pasStrText: string;
-  _jBoolean: JBoolean;
+  sizeArray: integer;
+  sizeArrayHeader: integer;
+
+  arrayResult: TDynArrayOfJByte; //array of jByte;  //shortint
+  arrayResultHeader: TDynArrayOfJByte; //array of jByte;  //shortint
+
+  keepConnected: boolean;
 begin
+  if byteArrayData <> nil then
+  begin
+     sizeArray:=  env^.GetArrayLength(env, byteArrayData);
+     SetLength(arrayResult, sizeArray);
+     env^.GetByteArrayRegion(env, byteArrayData, 0, sizeArray, @arrayResult[0] {target});
+  end;
+
+  if byteArrayHeader <> nil then
+  begin
+    sizeArrayHeader:=  env^.GetArrayLength(env, byteArrayHeader);
+    SetLength(arrayResultHeader, sizeArrayHeader);
+    env^.GetByteArrayRegion(env, byteArrayHeader, 0, sizeArrayHeader, @arrayResultHeader[0] {target});
+  end;
+
   gApp.Jni.jEnv:= env;
   gApp.Jni.jThis:= this;
   if Obj is jBluetoothServerSocket then
   begin
-    jForm(jBluetoothServerSocket(Obj).Owner).UpdateJNI(gApp);
-    pasStrText := '';
-    if messageText <> nil then
-    begin
-      _jBoolean:= JNI_False;
-      pasStrText:= string( env^.GetStringUTFChars(Env,messageText,@_jBoolean) );
-    end;
-    jBluetoothServerSocket(Obj).GenEvent_OnBluetoothServerSocketIncomingMessage(Obj,pasStrText);
+    jForm(jLocation(Obj).Owner).UpdateJNI(gApp);
+    jBluetoothServerSocket(Obj).GenEvent_OnBluetoothServerSocketIncomingData(Obj, arrayResult, arrayResultHeader, keepConnected);
   end;
+  Result:= JBool(keepConnected);
 end;
 
-procedure Java_Event_pOnBluetoothServerSocketWritingMessage(env: PJNIEnv; this: jobject; Obj: TObject);
-begin
-  gApp.Jni.jEnv:= env;
-  gApp.Jni.jThis:= this;
-  if Obj is jBluetoothServerSocket then
-  begin
-    jForm(jBluetoothServerSocket(Obj).Owner).UpdateJNI(gApp);
-    jBluetoothServerSocket(Obj).GenEvent_OnBluetoothServerSocketWritingMessage(Obj);;
-  end;
-end;
 
-procedure Java_Event_pOnBluetoothServerSocketListen(env: PJNIEnv; this: jobject; Obj: TObject; deviceName: JString; deviceAddress: JString);
+
+procedure Java_Event_pOnBluetoothServerSocketListen(env: PJNIEnv; this: jobject; Obj: TObject; serverName: JString; strUUID: JString);
 var
  pasStrName, pasStrAddress: string;
  _jBoolean: JBoolean;
 begin
   gApp.Jni.jEnv:= env;
   gApp.Jni.jThis:= this;
-
   if Obj is jBluetoothServerSocket then
   begin
     jForm(jBluetoothServerSocket(Obj).Owner).UpdateJNI(gApp);
     pasStrName := '';
-    if deviceName <> nil then
+    if serverName <> nil then
     begin
       _jBoolean:= JNI_False;
-      pasStrName:= string( env^.GetStringUTFChars(Env,deviceName,@_jBoolean) );
+      pasStrName:= string( env^.GetStringUTFChars(Env,serverName,@_jBoolean) );
     end;
     pasStrAddress := '';
-    if deviceAddress <> nil then
+    if strUUID <> nil then
     begin
       _jBoolean := JNI_False;
-      pasStrAddress:= string( env^.GetStringUTFChars(Env,deviceAddress,@_jBoolean) );
+      pasStrAddress:= string( env^.GetStringUTFChars(Env,strUUID,@_jBoolean) );
     end;
     jBluetoothServerSocket(Obj).GenEvent_OnBluetoothServerSocketListen(Obj, pasStrName, pasStrAddress);
   end;
 end;
 
-procedure Java_Event_pOnBluetoothServerSocketAccept(env: PJNIEnv; this: jobject; Obj: TObject; deviceName: JString; deviceAddress: JString);
-var
- pasStrName, pasStrAddress: string;
- _jBoolean: JBoolean;
+procedure Java_Event_pOnBluetoothServerSocketAcceptTimeout(env: PJNIEnv; this: jobject; Obj: TObject);
 begin
   gApp.Jni.jEnv:= env;
   gApp.Jni.jThis:= this;
-
   if Obj is jBluetoothServerSocket then
   begin
     jForm(jBluetoothServerSocket(Obj).Owner).UpdateJNI(gApp);
-    pasStrName := '';
-    if deviceName <> nil then
-    begin
-      _jBoolean:= JNI_False;
-      pasStrName:= string( env^.GetStringUTFChars(Env,deviceName,@_jBoolean) );
-    end;
-    pasStrAddress := '';
-    if deviceAddress <> nil then
-    begin
-      _jBoolean := JNI_False;
-      pasStrAddress:= string( env^.GetStringUTFChars(Env,deviceAddress,@_jBoolean) );
-    end;
-    jBluetoothServerSocket(Obj).GenEvent_OnBluetoothServerSocketAccept(Obj, pasStrName, pasStrAddress);
+    jBluetoothServerSocket(Obj).GenEvent_OnBluetoothServerSocketAcceptTimeout(Obj);
   end;
 end;
 
@@ -632,9 +633,12 @@ var
   arrayResult: array of single;
 begin
 
-  sizeArray:=  env^.GetArrayLength(env, values);
-  SetLength(arrayResult, sizeArray);
-  env^.GetFloatArrayRegion(env, values, 0, sizeArray, @arrayResult[0] {target});
+  if values <> nil then
+  begin
+    sizeArray:=  env^.GetArrayLength(env, values);
+    SetLength(arrayResult, sizeArray);
+    env^.GetFloatArrayRegion(env, values, 0, sizeArray, @arrayResult[0] {target});
+  end;
 
   gApp.Jni.jEnv:= env;
   gApp.Jni.jThis:= this;
@@ -745,17 +749,20 @@ begin
     jForm(jTCPSocketClient(Obj).Owner).UpdateJNI(gApp);
     if messagesReceived <> nil then
     begin
-      messageSize:= env^.GetArrayLength(env, messagesReceived);
-      SetLength(pasmessagesReceived, messageSize);
-      for i:= 0 to messageSize - 1 do
+      if  messagesReceived <> nil then
       begin
-        jStr:= env^.GetObjectArrayElement(env, messagesReceived, i);
-        case jStr = nil of
-           True : pasmessagesReceived[i]:= '';
-           False: begin
+        messageSize:= env^.GetArrayLength(env, messagesReceived);
+        SetLength(pasmessagesReceived, messageSize);
+        for i:= 0 to messageSize - 1 do
+        begin
+          jStr:= env^.GetObjectArrayElement(env, messagesReceived, i);
+          case jStr = nil of
+            True : pasmessagesReceived[i]:= '';
+            False: begin
                     jBoo:= JNI_False;
                     pasmessagesReceived[i]:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
                    end;
+          end;
         end;
       end;
     end;
@@ -941,6 +948,7 @@ begin
   begin
     jForm(jContactManager(Obj).Owner).UpdateJNI(gApp);
     pascontact := '';
+
     if contactInfo <> nil then
     begin
       jBoo := JNI_False;
@@ -1012,7 +1020,6 @@ begin
   Result:= outBitmap;
 end;
 
-
 procedure Java_Event_pOnSeekBarProgressChanged(env: PJNIEnv; this: jobject; Obj: TObject; progress: integer; fromUser: boolean);
 begin
   gApp.Jni.jEnv:= env;
@@ -1032,8 +1039,8 @@ begin
   if not Assigned(Obj)  then Exit;
   if Obj is jSeekBar then
   begin
-     jForm(jSeekBar(Obj).Owner).UpdateJNI(gApp);
-     jSeekBar(Obj).GenEvent_OnSeekBarStartTrackingTouch(Obj, progress);
+    jForm(jSeekBar(Obj).Owner).UpdateJNI(gApp);
+    jSeekBar(Obj).GenEvent_OnSeekBarStartTrackingTouch(Obj, progress);
   end;
 end;
 

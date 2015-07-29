@@ -294,6 +294,7 @@ type
     function GetCookies(_nameValueSeparator: string): TDynArrayOfString;  overload;
     procedure AddClientHeader(_name: string; _value: string);
     procedure ClearClientHeader(_name: string; _value: string);
+    function DeleteStateful(_url: string; _value:string): string;  //thanks to @renabor
 
     procedure GenEvent_OnHttpClientContentResult(Obj: TObject; content: string);
     procedure GenEvent_OnHttpClientCodeResult(Obj: TObject; code: integer);
@@ -1026,6 +1027,7 @@ type
     procedure SetImageFromURI(_uri: jObject);
     procedure SetImageFromIntentResult(_intentData: jObject);
     procedure SetImageThumbnailFromCamera(_intentData: jObject);
+    procedure SetImageFromJByteArray(var _image: TDynArrayOfJByte);
 
     property Count: integer read GetCount;
   published
@@ -4541,6 +4543,12 @@ begin
 end;
 
 
+procedure jImageView.SetImageFromJByteArray(var _image: TDynArrayOfJByte);
+begin
+if FInitialized then
+   jImageView_SetImageFromByteArray(FjEnv, FjObject, _image);
+end;
+
 //  new by jmpessoa
 {jImageList}
 
@@ -4908,6 +4916,12 @@ begin
      jHttpClient_ClearClientHeader(FjEnv, FjObject, _name ,_value);
 end;
 
+function jHttpClient.DeleteStateful(_url: string; _value:string): string;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jHttpClient_DeleteStateful(FjEnv, FjObject, _url, _value);
+end;
 
 procedure jHttpClient.GenEvent_OnHttpClientContentResult(Obj: TObject; content: string);
 begin

@@ -1,0 +1,298 @@
+object AndroidModule1: TAndroidModule1
+  Left = 324
+  Top = 84
+  Width = 300
+  Height = 600
+  MarginLeft = 0
+  MarginTop = 0
+  MarginRight = 0
+  MarginBottom = 0
+  Text = 'AndroidModule1'
+  ActivityMode = actMain
+  BackgroundColor = colbrDefault
+  object jTextView1: jTextView
+    Left = 46
+    Top = 10
+    Width = 207
+    Height = 20
+    MarginLeft = 10
+    MarginTop = 10
+    MarginRight = 10
+    MarginBottom = 10
+    Visible = True
+    PosRelativeToAnchor = []
+    PosRelativeToParent = [rpTop, rpCenterHorizontal]
+    LayoutParamWidth = lpWrapContent
+    LayoutParamHeight = lpWrapContent
+    Text = 'App Bluetooth Client Socket Demo2'
+    Alignment = taLeft
+    Enabled = True
+    BackgroundColor = colbrDefault
+    FontColor = colbrDefault
+    FontSize = 0
+    TextTypeFace = tfNormal
+    FontSizeUnit = unitDefault
+    Id = 1754273
+  end
+  object jButton1: jButton
+    Left = 5
+    Top = 85
+    Width = 136
+    Height = 40
+    MarginLeft = 5
+    MarginTop = 5
+    MarginRight = 5
+    MarginBottom = 5
+    Visible = True
+    Anchor = jTextView2
+    PosRelativeToAnchor = [raBelow]
+    PosRelativeToParent = []
+    LayoutParamWidth = lpHalfOfParent
+    LayoutParamHeight = lpWrapContent
+    Text = 'Enable Bluetooth'
+    BackgroundColor = colbrDefault
+    FontColor = colbrDefault
+    FontSize = 0
+    FontSizeUnit = unitDefault
+    OnClick = jButton1Click
+    Id = 9792316
+  end
+  object jButton2: jButton
+    Left = 151
+    Top = 85
+    Width = 136
+    Height = 40
+    MarginLeft = 5
+    MarginTop = 5
+    MarginRight = 5
+    MarginBottom = 5
+    Visible = True
+    Anchor = jButton1
+    PosRelativeToAnchor = [raToRightOf, raAlignBaseline]
+    PosRelativeToParent = []
+    LayoutParamWidth = lpHalfOfParent
+    LayoutParamHeight = lpWrapContent
+    Text = 'Discovery Near...'
+    BackgroundColor = colbrDefault
+    FontColor = colbrDefault
+    FontSize = 0
+    FontSizeUnit = unitDefault
+    OnClick = jButton2Click
+    Id = 163433
+  end
+  object jButton3: jButton
+    Left = 5
+    Top = 135
+    Width = 136
+    Height = 40
+    MarginLeft = 5
+    MarginTop = 5
+    MarginRight = 5
+    MarginBottom = 5
+    Visible = True
+    Anchor = jButton1
+    PosRelativeToAnchor = [raBelow]
+    PosRelativeToParent = []
+    LayoutParamWidth = lpHalfOfParent
+    LayoutParamHeight = lpWrapContent
+    Text = 'List Paired...'
+    BackgroundColor = colbrDefault
+    FontColor = colbrDefault
+    FontSize = 0
+    FontSizeUnit = unitDefault
+    OnClick = jButton3Click
+    Id = 5369493
+  end
+  object jButton4: jButton
+    Left = 151
+    Top = 135
+    Width = 136
+    Height = 40
+    MarginLeft = 5
+    MarginTop = 5
+    MarginRight = 5
+    MarginBottom = 5
+    Visible = True
+    Anchor = jButton3
+    PosRelativeToAnchor = [raToRightOf, raAlignBaseline]
+    PosRelativeToParent = []
+    LayoutParamWidth = lpHalfOfParent
+    LayoutParamHeight = lpWrapContent
+    Text = 'Disable Bluetooth'
+    BackgroundColor = colbrDefault
+    FontColor = colbrDefault
+    FontSize = 0
+    FontSizeUnit = unitDefault
+    OnClick = jButton4Click
+    Id = 7228597
+  end
+  object jListView1: jListView
+    Tag = 1
+    Left = 8
+    Top = 192
+    Width = 281
+    Height = 66
+    MarginLeft = 10
+    MarginTop = 0
+    MarginRight = 10
+    MarginBottom = 0
+    Visible = True
+    Anchor = jButton3
+    PosRelativeToAnchor = [raBelow]
+    PosRelativeToParent = []
+    LayoutParamWidth = lpMatchParent
+    LayoutParamHeight = lpWrapContent
+    BackgroundColor = colbrDefault
+    FontColor = colbrGray
+    FontSize = 0
+    WidgetItem = wgNone
+    Delimiter = '|'
+    TextDecorated = txtNormal
+    ItemLayout = layImageTextWidget
+    TextSizeDecorated = sdNone
+    TextAlign = alLeft
+    HighLightSelectedItemColor = colbrTomato
+    FontSizeUnit = unitDefault
+    OnClickItem = jListView1ClickItem
+    OnDrawItemTextColor = jListView1DrawItemTextColor
+    Id = 0
+  end
+  object jTextView2: jTextView
+    Left = 10
+    Top = 50
+    Width = 280
+    Height = 20
+    MarginLeft = 10
+    MarginTop = 10
+    MarginRight = 10
+    MarginBottom = 10
+    Visible = True
+    Anchor = jTextView1
+    PosRelativeToAnchor = [raBelow]
+    PosRelativeToParent = []
+    LayoutParamWidth = lpWrapContent
+    LayoutParamHeight = lpWrapContent
+    Text = 'Hint: Property DataHeaderReceiveEnable = True'
+    Alignment = taLeft
+    Enabled = True
+    BackgroundColor = colbrDefault
+    FontColor = colbrDefault
+    FontSize = 0
+    TextTypeFace = tfNormal
+    FontSizeUnit = unitDefault
+    Id = 6003850
+  end
+  object jButton5: jButton
+    Left = 5
+    Top = 505
+    Width = 136
+    Height = 40
+    MarginLeft = 5
+    MarginTop = 5
+    MarginRight = 5
+    MarginBottom = 5
+    Visible = True
+    Anchor = jButton6
+    PosRelativeToAnchor = [raAbove]
+    PosRelativeToParent = [rpLeft]
+    LayoutParamWidth = lpHalfOfParent
+    LayoutParamHeight = lpWrapContent
+    Text = 'Send  Message...'
+    BackgroundColor = colbrDefault
+    FontColor = colbrDefault
+    FontSize = 0
+    FontSizeUnit = unitDefault
+    OnClick = jButton5Click
+    Id = 5672414
+  end
+  object jButton6: jButton
+    Left = 5
+    Top = 555
+    Width = 290
+    Height = 40
+    MarginLeft = 5
+    MarginTop = 5
+    MarginRight = 5
+    MarginBottom = 5
+    Visible = True
+    PosRelativeToAnchor = []
+    PosRelativeToParent = [rpBottom]
+    LayoutParamWidth = lpMatchParent
+    LayoutParamHeight = lpWrapContent
+    Text = 'Cancel Socket Connection'
+    BackgroundColor = colbrDefault
+    FontColor = colbrDefault
+    FontSize = 0
+    FontSizeUnit = unitDefault
+    OnClick = jButton6Click
+    Id = 3685715
+  end
+  object jButton7: jButton
+    Left = 162
+    Top = 506
+    Width = 136
+    Height = 40
+    MarginLeft = 2
+    MarginTop = 4
+    MarginRight = 2
+    MarginBottom = 4
+    Visible = True
+    Anchor = jButton6
+    PosRelativeToAnchor = [raAbove]
+    PosRelativeToParent = [rpRight]
+    LayoutParamWidth = lpHalfOfParent
+    LayoutParamHeight = lpWrapContent
+    Text = 'Send  Image'
+    BackgroundColor = colbrDefault
+    FontColor = colbrDefault
+    FontSize = 0
+    FontSizeUnit = unitDefault
+    OnClick = jButton7Click
+    Id = 0
+  end
+  object jImageView1: jImageView
+    Left = 128
+    Top = 456
+    Width = 48
+    Height = 48
+    Visible = True
+    Anchor = jButton5
+    PosRelativeToAnchor = [raAbove]
+    PosRelativeToParent = [rpCenterHorizontal]
+    LayoutParamWidth = lpWrapContent
+    LayoutParamHeight = lpWrapContent
+    ImageIndex = -1
+    BackgroundColor = colbrDefault
+    ImageScaleType = scaleCenter
+    Id = 4690105
+  end
+  object jBluetooth1: jBluetooth
+    Tag = 1
+    OnEnabled = jBluetooth1Enabled
+    OnDisabled = jBluetooth1Disabled
+    OnDeviceFound = jBluetooth1DeviceFound
+    OnDiscoveryStarted = jBluetooth1DiscoveryStarted
+    OnDiscoveryFinished = jBluetooth1DiscoveryFinished
+    left = 24
+    top = 312
+  end
+  object jImageFileManager1: jImageFileManager
+    left = 128
+    top = 296
+  end
+  object jBluetoothClientSocket1: jBluetoothClientSocket
+    UUID = '00001101-0000-1000-8000-00805F9B34FB'
+    ReceiverBufferLength = 9216
+    DataHeaderReceiveEnabled = True
+    OnConnected = jBluetoothClientSocket1Connected
+    OnIncomingData = jBluetoothClientSocket1IncomingData
+    left = 231
+    top = 312
+  end
+  object jDialogProgress1: jDialogProgress
+    Title = 'Lamw: Bluetooch'
+    Msg = 'Please, wait... discovering devices ..'
+    left = 116
+    top = 400
+  end
+end

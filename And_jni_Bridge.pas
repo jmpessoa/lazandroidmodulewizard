@@ -408,6 +408,7 @@ function jImageView_GetBitmapImage(env: PJNIEnv; _jimageview: JObject): jObject;
 procedure jImageView_SetImageFromURI(env: PJNIEnv; _jimageview: JObject; _uri: jObject);
 procedure jImageView_SetImageFromIntentResult(env: PJNIEnv; _jimageview: JObject; _intentData: jObject);
 procedure jImageView_SetImageThumbnailFromCamera(env: PJNIEnv; _jimageview: JObject; _intentData: jObject);
+procedure jImageView_SetImageFromByteArray(env: PJNIEnv; _jimageview: JObject; var _image: TDynArrayOfJByte);
 
 
 // ListView
@@ -995,6 +996,7 @@ function jHttpClient_GetCookieName(env: PJNIEnv; _jhttpclient: JObject; _cookie:
 function jHttpClient_GetCookies(env: PJNIEnv; _jhttpclient: JObject; _nameValueSeparator: string): TDynArrayOfString; overload;
 procedure jHttpClient_AddClientHeader(env: PJNIEnv; _jhttpclient: JObject; _name: string; _value: string);
 procedure jHttpClient_ClearClientHeader(env: PJNIEnv; _jhttpclient: JObject; _name: string; _value: string);
+function jHttpClient_DeleteStateful(env: PJNIEnv; _jhttpclient: JObject; _url, _value: string): string;
 
 
 
@@ -3501,6 +3503,27 @@ begin
   env^.CallVoidMethodA(env, _jimageview, jMethod, @jParams);
   env^.DeleteLocalRef(env, jCls);
 end;
+
+
+procedure jImageView_SetImageFromByteArray(env: PJNIEnv; _jimageview: JObject; var _image: TDynArrayOfJByte);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+  newSize0: integer;
+  jNewArray0: jObject=nil;
+begin
+  newSize0:= Length(_image);
+  jNewArray0:= env^.NewByteArray(env, newSize0);  // allocate
+  env^.SetByteArrayRegion(env, jNewArray0, 0 , newSize0, @_image[0] {source});
+  jParams[0].l:= jNewArray0;
+  jCls:= env^.GetObjectClass(env, _jimageview);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetImageFromByteArray', '([B)V');
+  env^.CallVoidMethodA(env, _jimageview, jMethod, @jParams);
+  env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
 
 //------------------------------------------------------------------------------
 // ListView
@@ -7969,6 +7992,30 @@ begin
   env^.DeleteLocalRef(env, jCls);
 end;
 
+function jHttpClient_DeleteStateful(env: PJNIEnv; _jhttpclient: JObject; _url, _value: string): string;
+var
+  jStr: JString;
+  jBoo: JBoolean;
+  jParams: array[0..1] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_url));
+  jParams[1].l:= env^.NewStringUTF(env, PChar(_value));
+  jCls:= env^.GetObjectClass(env, _jhttpclient);
+  jMethod:= env^.GetMethodID(env, jCls, 'DeleteStateful', '(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;');
+  jStr:= env^.CallObjectMethodA(env, _jhttpclient, jMethod, @jParams);
+  case jStr = nil of
+     True : Result:= '';
+     False: begin
+              jBoo:= JNI_False;
+              Result:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
+            end;
+  end;
+  env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env,jParams[1].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
 
 //by jmpessoa
 procedure jSend_Email(env:PJNIEnv; this:jobject;

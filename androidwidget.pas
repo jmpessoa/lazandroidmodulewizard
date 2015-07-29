@@ -1010,6 +1010,10 @@ type
     function GetSubTitleActionBar(): string;
     function GetFormByIndex(index: integer): jForm;
 
+    procedure CopyFromAssetsToInternalAppStorage(_filename: string);
+    procedure CopyFromInternalAppStorageToEnvironmentDir(_filename: string; _environmentDirPath: string);
+    procedure CopyFromAssetsToEnvironmentDir(_filename: string; _environmentDirPath: string);
+
     // Property
     property View         : jObject        read FjRLayout; //layout!
 
@@ -1229,6 +1233,11 @@ end;
 
   function jForm_GetTitleActionBar(env: PJNIEnv; _jform: JObject): string;
   function jForm_GetSubTitleActionBar(env: PJNIEnv; _jform: JObject): string;
+
+  procedure jForm_CopyFromAssetsToInternalAppStorage(env: PJNIEnv; _jform: JObject; _filename: string);
+  procedure jForm_CopyFromInternalAppStorageToEnvironmentDir(env: PJNIEnv; _jform: JObject; _filename: string; _environmentDir: string);
+  procedure jForm_CopyFromAssetsToEnvironmentDir(env: PJNIEnv; _jform: JObject; _filename: string; _environmentDir: string);
+
 
 
 //jni API Bridge
@@ -2831,6 +2840,27 @@ begin
    Result:= jForm_GetSubTitleActionBar(FjEnv, FjObject);
 end;
 
+procedure jForm.CopyFromAssetsToInternalAppStorage(_filename: string);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jForm_CopyFromAssetsToInternalAppStorage(FjEnv, FjObject, _filename);
+end;
+
+procedure jForm.CopyFromInternalAppStorageToEnvironmentDir(_filename: string; _environmentDirPath: string);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jForm_CopyFromInternalAppStorageToEnvironmentDir(FjEnv, FjObject, _filename ,_environmentDirPath);
+end;
+
+procedure jForm.CopyFromAssetsToEnvironmentDir(_filename: string; _environmentDirPath: string);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jForm_CopyFromAssetsToEnvironmentDir(FjEnv, FjObject, _filename ,_environmentDirPath);
+end;
+
 {-------- jForm_JNI_Bridge ----------}
 
 procedure jForm_ShowCustomMessage(env: PJNIEnv; _jform: JObject; _layout: jObject; _gravity: integer; _lenghTimeSecond: integer);
@@ -3512,6 +3542,55 @@ begin
               Result:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
             end;
   end;
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+
+procedure jForm_CopyFromAssetsToInternalAppStorage(env: PJNIEnv; _jform: JObject; _filename: string);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_filename));
+  jCls:= env^.GetObjectClass(env, _jform);
+  jMethod:= env^.GetMethodID(env, jCls, 'CopyFromAssetsToInternalAppStorage', '(Ljava/lang/String;)V');
+  env^.CallVoidMethodA(env, _jform, jMethod, @jParams);
+env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+
+procedure jForm_CopyFromInternalAppStorageToEnvironmentDir(env: PJNIEnv; _jform: JObject; _filename: string; _environmentDir: string);
+var
+  jParams: array[0..1] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_filename));
+  jParams[1].l:= env^.NewStringUTF(env, PChar(_environmentDir));
+  jCls:= env^.GetObjectClass(env, _jform);
+  jMethod:= env^.GetMethodID(env, jCls, 'CopyFromInternalAppStorageToEnvironmentDir', '(Ljava/lang/String;Ljava/lang/String;)V');
+  env^.CallVoidMethodA(env, _jform, jMethod, @jParams);
+env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env,jParams[1].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+
+procedure jForm_CopyFromAssetsToEnvironmentDir(env: PJNIEnv; _jform: JObject; _filename: string; _environmentDir: string);
+var
+  jParams: array[0..1] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_filename));
+  jParams[1].l:= env^.NewStringUTF(env, PChar(_environmentDir));
+  jCls:= env^.GetObjectClass(env, _jform);
+  jMethod:= env^.GetMethodID(env, jCls, 'CopyFromAssetsToEnvironmentDir', '(Ljava/lang/String;Ljava/lang/String;)V');
+  env^.CallVoidMethodA(env, _jform, jMethod, @jParams);
+   env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env,jParams[1].l);
   env^.DeleteLocalRef(env, jCls);
 end;
 

@@ -99,34 +99,77 @@
 	*
 	*	"C:\adt32\ndk10"   -- just my system NDK path
 	*
+	*3. Change this informations in  "build.xml"   according your system..
+	*	"C:\adt32\sdk"
 	*			
 	*	Option 1: NEW !!
-	*		IDE --> Tools --> 
+	*		.IDE --> Tools --> 
 	*				[Lamw] Android Module Wizard --> 
 	*					Change Project [*.lpi] Ndk Path [Demos]
-
+	*		.Change/edit "build.xml": "C:\adt32\sdk" according your system..
+	*
 	*	Option 2: Go to Lazarus IDE:
 	*			->Project
 	*			->Project -> Option
 	*			->Path -->> change/modify paths according to your system ..
 	*
-	*     	Option 3: Open/edit the "controls.lpi" [...\jni],  you can use Notepad like editor....
+	*	Option 3: Open/edit the "controls.lpi" [...\jni] and "build.xml". You can use Notepad like editor....
 	*			
 	*
-	*3. All [compatible] Eclipse projects support Ant!
+	*4. All [compatible] Eclipse projects support Ant!
 	*			You can build/install/Run all Eclipse projects just with "Ant"... 
 	*			see "build.bat" [or .sh] and "install.bat" or [.sh]
 	*			or Go To: Lazarus IDE menu "Run--> [Lamw] Build and Run"! Thanks to Anton!!!
 	*
-	*4.PANIC  ? [upgrade your project [or demo] code templates!] !
+	*5.PANIC ? [upgrade your project [or demo] code templates!] !
 	*	Lazarus IDE --> menu Tools --> [Lamw] Android Module Wizard --> Upgrade code Templates [*.lpr, *.java]
 	*
-	*5.PANIC ? When prompt "Read error" [Unknown Property] just choice "Continue Loading" !
+	*6.PANIC ? When prompt "Read error" [Unknown Property] just choice "Continue Loading" !
 	*
-	*6.PANIC ? Fail to build Apk. Try change "AndroidManifest.xml" according your system installation
+	*7.PANIC ? Fail to build Apk. Change according your system installation:
+	*
+	*	"AndroidManifest.xml" 		
 	*		<uses-sdk android:minSdkVersion="15" android:targetSdkVersion="17"/>
 	*
+	*	"build.xml"	
+	*		<property name="target"  value="android-17"/>
+	*
+	*	"build.xml"
+	*		<property name="sdk.dir" location="C:\adt32\sdk"/>
+	*
 	****************************************************************************************************
+
+Version 0.6 - rev. 35 - 28 July 2015 - 
+
+	IMPROVEMENT/FIXED!   
+
+	       jBluetoothClientSocket component <<--- @Euller and @osvaldotcf request! 
+               jBluetoothServerSocket component <<--- @Euller and @osvaldotcf request! 				
+					
+
+	NEW Demos!
+ 
+                AppBluetoothServerSocketDemo1 <---> AppBluetoothClientSocketDemo1 //<<--- No header
+
+                AppBluetoothServerSocketDemo2 <---> AppBluetoothClientSocketDemo2 //<<--- header support
+
+			Technical Notes [header support]: 
+				.Set property "DataHeaderReceiveEnable = True" for both [client/server]
+				.Internal Format [yes, you can use without knowing this information!]: 
+					first two bytes: size of "header"
+					following four bytes: size of "content"
+					following bytes "dataHeader"
+					following bytes "dataContent"
+						
+
+	FIXED!  Target x86 [AndroidWizard_intf.pas]//<---- thanks to Takeda Matsuki.
+
+
+	HINT 1: Old Projects: Please, upgrade your project code templates !
+			Lazarus IDE --> menu Tools --> [Lamw] Android Module Wizard --> Upgrade code Templates [*.lpr, *.java]
+
+	HINT 2:	When prompt "Read error" [Unknown Property] just choice "Continue Loading"! 
+			[After any form/component/property  changed and saved.... Problem solved!]
 
 Version 0.6 - rev. 34 - 14 July 2015 - 
 

@@ -1340,18 +1340,18 @@ begin
   customOptions_armV7a:='-Xd'+' -Cf'+ FFPUSet+ ' -CpARMV7A'; //until laz bug fix for ARMV7A
   customOptions_x86:=   '-Xd';
 
-  customOptions_default:=customOptions_default+' -XParm-linux-androideabi-';
   customOptions_armV6:=  customOptions_armV6  +' -XParm-linux-androideabi-';
   customOptions_armV7a:= customOptions_armV7a +' -XParm-linux-androideabi-';
   customOptions_x86:=    customOptions_x86    +' -XPi686-linux-android-';   //fix by jmpessoa
 
+  // Takeda Patch - "customOptions_default" now would really aware about compilation for x86 Target
   if FInstructionSet <> 'x86' then
   begin
-    customOptions_default:= customOptions_default+' -FD'+pathToNdkToolchainsBinArm;
+    customOptions_default:= customOptions_default+' -XParm-linux-androideabi-'+' -FD'+pathToNdkToolchainsBinArm;
   end
   else
   begin
-    customOptions_default:= customOptions_default+' -FD'+pathToNdkToolchainsBinX86;
+    customOptions_default:= customOptions_default+' -XPi686-linux-android-'+' -FD'+pathToNdkToolchainsBinX86;
   end;
 
   customOptions_armV6:= customOptions_armV6+' -FD'+pathToNdkToolchainsBinArm;
