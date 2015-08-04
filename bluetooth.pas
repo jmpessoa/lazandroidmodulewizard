@@ -17,7 +17,13 @@ TOnDiscoveryFinished = procedure(Sender: TObject; countFoundedDevices: integer; 
 
 TOnDeviceBondStateChanged= procedure(Sender: TObject; state: integer; deviceName: string; deviceAddress: string) of Object;
 
-TBondState = ( bsNone {10/Unpaired}, bsBonding {11/Pairing}, bsBonded{12/Paired});
+TBondState = ( bsUnBonded {10/Unpaired}, bsBonding {11/Pairing}, bsBonded{12/Paired});
+
+{
+PairingWith ///11
+PairedWith  //12
+UnpairedWith //10
+}
 
 
 {jControl template}
@@ -55,6 +61,9 @@ jBluetooth = class(jControl)
     function IsReachablePairedDevice(_macAddress: string): boolean;
     function GetRemoteDevice(_macAddress: string): jObject;
 
+    procedure UnpairDeviceByAddress(_deviceAddress: string);
+    function GetFoundedDeviceByAddress(_deviceAddress: string): jObject;
+    procedure PairDeviceByAddress(_deviceAddress: string);
 
     procedure GenEvent_OnBluetoothEnabled(Obj: TObject);
     procedure GenEvent_OnBluetoothDisabled(Obj: TObject);
@@ -93,6 +102,11 @@ function jBluetooth_GetReachablePairedDeviceByAddress(env: PJNIEnv; _jbluetooth:
 function jBluetooth_IsReachablePairedDevice(env: PJNIEnv; _jbluetooth: JObject; _macAddress: string): boolean;
 function jBluetooth_GetRemoteDevice(env: PJNIEnv; _jbluetooth: JObject; _macAddress: string): jObject;
 procedure jBluetooth_SendFile(env: PJNIEnv; _jbluetooth: JObject; _filePath: string; _fileName: string; _mimeType: string);
+
+procedure jBluetooth_UnpairDeviceByAddress(env: PJNIEnv; _jbluetooth: JObject; _deviceAddress: string);
+function jBluetooth_GetFoundedDeviceByAddress(env: PJNIEnv; _jbluetooth: JObject; _deviceAddress: string): jObject;
+procedure jBluetooth_PairDeviceByAddress(env: PJNIEnv; _jbluetooth: JObject; _deviceAddress: string);
+
 
 
 implementation
@@ -266,10 +280,10 @@ end;
 //TBondState = ( bsNone {10/Unpaired}, bsBonding {11/Pairing}, bsBonded{12/Paired});
 function jBluetooth.GetBondState(state: integer):TBondState;
 begin
-  Result:= bsNone; //10
+  Result:= bsUnBonded; //10  Unpaired With
   case state of
-     11: Result:= bsBonding;
-     12: Result:= bsBonded;
+     11: Result:= bsBonding; //Pairing With
+     12: Result:= bsBonded;  //PairedWith
   end;
 end;
 
@@ -278,6 +292,28 @@ begin
   //in designing component state: set value here...
   if FInitialized then
      jBluetooth_SendFile(FjEnv, FjObject, _filePath ,_fileName ,LowerCase(_mimeType));
+end;
+
+
+procedure jBluetooth.UnpairDeviceByAddress(_deviceAddress: string);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jBluetooth_UnpairDeviceByAddress(FjEnv, FjObject, _deviceAddress);
+end;
+
+function jBluetooth.GetFoundedDeviceByAddress(_deviceAddress: string): jObject;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jBluetooth_GetFoundedDeviceByAddress(FjEnv, FjObject, _deviceAddress);
+end;
+
+procedure jBluetooth.PairDeviceByAddress(_deviceAddress: string);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jBluetooth_PairDeviceByAddress(FjEnv, FjObject, _deviceAddress);
 end;
 
 {-------- jBluetooth_JNI_Bridge ----------}
@@ -556,5 +592,50 @@ begin
   env^.DeleteLocalRef(env,jParams[2].l);
   env^.DeleteLocalRef(env, jCls);
 end;
+
+procedure jBluetooth_UnpairDeviceByAddress(env: PJNIEnv; _jbluetooth: JObject; _deviceAddress: string);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_deviceAddress));
+  jCls:= env^.GetObjectClass(env, _jbluetooth);
+  jMethod:= env^.GetMethodID(env, jCls, 'UnpairDeviceByAddress', '(Ljava/lang/String;)V');
+  env^.CallVoidMethodA(env, _jbluetooth, jMethod, @jParams);
+env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+
+function jBluetooth_GetFoundedDeviceByAddress(env: PJNIEnv; _jbluetooth: JObject; _deviceAddress: string): jObject;
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_deviceAddress));
+  jCls:= env^.GetObjectClass(env, _jbluetooth);
+  jMethod:= env^.GetMethodID(env, jCls, 'GetFoundedDeviceByAddress', '(Ljava/lang/String;)Landroid/bluetooth/BluetoothDevice;');
+  Result:= env^.CallObjectMethodA(env, _jbluetooth, jMethod, @jParams);
+  env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+
+procedure jBluetooth_PairDeviceByAddress(env: PJNIEnv; _jbluetooth: JObject; _deviceAddress: string);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_deviceAddress));
+  jCls:= env^.GetObjectClass(env, _jbluetooth);
+  jMethod:= env^.GetMethodID(env, jCls, 'PairDeviceByAddress', '(Ljava/lang/String;)V');
+  env^.CallVoidMethodA(env, _jbluetooth, jMethod, @jParams);
+  env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
 
 end.

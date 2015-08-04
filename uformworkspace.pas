@@ -38,16 +38,17 @@ type
     PanelRadioGroup: TPanel;
     RGInstruction: TRadioGroup;
     RGFPU: TRadioGroup;
-    RGProjectType: TRadioGroup;
     SelDirDlgPathToWorkspace: TSelectDirectoryDialog;
     SpdBtnPathToWorkspace: TSpeedButton;
     SpdBtnRefreshProjectName: TSpeedButton;
+    SpeedButton1: TSpeedButton;
     StatusBarInfo: TStatusBar;
 
     procedure CheckBox1Click(Sender: TObject);
     procedure ComboSelectProjectNameKeyPress(Sender: TObject; var Key: char);
     procedure FormActivate(Sender: TObject);
     procedure FormClose(Sender: TObject; var CloseAction: TCloseAction);
+    procedure FormCloseQuery(Sender: TObject; var CanClose: boolean);
     procedure FormCreate(Sender: TObject);
 
     procedure ListBoxMinSDKClick(Sender: TObject);
@@ -58,9 +59,10 @@ type
 
     procedure RGInstructionClick(Sender: TObject);
     procedure RGFPUClick(Sender: TObject);
-    procedure RGProjectTypeClick(Sender: TObject);
+
     procedure SpdBtnPathToWorkspaceClick(Sender: TObject);
     procedure SpdBtnRefreshProjectNameClick(Sender: TObject);
+    procedure SpeedButton1Click(Sender: TObject);
 
   private
     { private declarations }
@@ -79,9 +81,10 @@ type
 
     FProjectModel: string;
 
-    //FModuleType: integer;  //0: GUI project   1: NoGui project
+    FModuleType: integer;  //0: GUI project   1: NoGui project
+    FSmallProjName: string;
 
-    FAntPackageName: string;
+    FPackagePrefaceName: string;
 
     FMinApi: string;
     FTargetApi: string;
@@ -95,6 +98,9 @@ type
 
     FPrebuildOSYS: string;
 
+    FFullJavaSrcPath: string;
+    FJavaClassName: string;
+
   public
     { public declarations }
     procedure LoadSettings(const pFilename: string);
@@ -102,6 +108,8 @@ type
     function GetTextByListIndex(index:integer): string;
     function GetTextByList2Index(index:integer): string;
     function GetNDKPlatform(identName: string): string;
+
+    function GetFullJavaSrcPath(fullProjectName: string): string;
 
     procedure LoadPathsSettings(const fileName: string);
 
@@ -117,7 +125,7 @@ type
     property PathToAndroidNDK: string read FPathToAndroidNDK write FPathToAndroidNDK;
     property PathToAntBin: string read FPathToAntBin write FPathToAntBin;
     property ProjectModel: string read FProjectModel write FProjectModel; {eclipse or ant}
-    property AntPackageName: string read FAntPackageName write FAntPackageName;
+    property PackagePrefaceName: string read FPackagePrefaceName write FPackagePrefaceName;
     property MinApi: string read FMinApi write FMinApi;
     property TargetApi: string read FTargetApi write FTargetApi;
     property TouchtestEnabled: string read FTouchtestEnabled write FTouchtestEnabled;
@@ -127,8 +135,12 @@ type
     property AndroidPlatform: string read FAndroidPlatform write FAndroidPlatform;
     property SupportV4: string read FSupportV4 write FSupportV4;
     property PrebuildOSYS: string read FPrebuildOSYS write FPrebuildOSYS;
-    //property ModuleType: integer read FModuleType write FModuleType;
+    property FullJavaSrcPath: string read FFullJavaSrcPath write FFullJavaSrcPath;
+    property JavaClassName: string read   FJavaClassName write FJavaClassName;
+    property ModuleType: integer read FModuleType write FModuleType;  //0: GUI project   1: NoGui project
+    property SmallProjName: string read FSmallProjName write FSmallProjName;
   end;
+
 
   procedure GetSubDirectories(const directory : string; list : TStrings);
   function TrimChar(query: string; delimiter: char): string;
@@ -254,16 +266,6 @@ begin
   FFPUSet:= RGFPU.Items[RGFPU.ItemIndex];  //fix 15-december-2013
 end;
 
-procedure TFormWorkspace.RGProjectTypeClick(Sender: TObject);
-begin
-   //"Ant" or "Eclipse"
-  FProjectModel:= RGProjectType.Items[RGProjectType.ItemIndex];  //fix 15-december-2013
-
-
-  if RGProjectType.ItemIndex = 1 then
-     if EditPackagePrefaceName.Text = '' then EditPackagePrefaceName.Text:= 'org.lazarus';
-end;
-
 function TFormWorkspace.GetNDKPlatform(identName: string): string;
 begin
     Result:= 'android-14'; //default
@@ -277,12 +279,37 @@ begin
     else if identName = 'Lollipop 5.0'   then Result:= 'android-21';
 end;
 
+
+function TFormWorkspace.GetFullJavaSrcPath(fullProjectName: string): string;
+var
+  strList: TStringList;
+  count: integer;
+  path: string;
+
+begin
+    strList:= TStringList.Create;
+    path:= fullProjectName+DirectorySeparator+'src';
+    GetSubDirectories(path, strList);
+    count:= strList.Count;
+    while count > 0 do
+    begin
+       path:= strList.Strings[0];
+       strList.Clear;
+       GetSubDirectories(path, strList);
+       count:= strList.Count;
+    end;
+    Result:= path;
+    strList.Free;
+end;
+
 procedure TFormWorkspace.FormClose(Sender: TObject; var CloseAction: TCloseAction);
 var
-   strList: TStringList;
-   count, i, j: integer;
-   path: string;
+  strList: TStringList;
+  count, i, j: integer;
+  path: string;
+  aList: TStringList;
 begin
+
   SaveSettings(FFileName);
   if ModalResult = mrCancel  then Exit;
 
@@ -300,59 +327,118 @@ begin
     Exit;
   end;
 
-  if EditPackagePrefaceName.Text = '' then EditPackagePrefaceName.Text:= 'org.lazarus';
+  FPathToWorkspace:= Trim(EditPathToWorkspace.Text);
+  FJavaClassName:= 'Controls'; //GUI  [try guess]
+
+  if Pos(DirectorySeparator, ComboSelectProjectName.Text) <= 0 then
+  begin
+     FProjectModel:= 'Ant';   //project not exits!
+     FSmallProjName:= Trim(ComboSelectProjectName.Text);
+     FAndroidProjectName:= FPathToWorkspace+ DirectorySeparator+ FSmallProjName;
+     FPackagePrefaceName:= LowerCase(Trim(EditPackagePrefaceName.Text));
+     if EditPackagePrefaceName.Text = '' then EditPackagePrefaceName.Text:= 'org.lamw';
+     if FModuleType = 1 then //NoGUI
+       FJavaClassName:=  FSmallProjName;
+  end
+  else
+  begin
+     FProjectModel:= 'Eclipse';  //project exits!
+     FAndroidProjectName:= Trim(ComboSelectProjectName.Text);
+     aList:= TStringList.Create;
+     aList.StrictDelimiter:= True;
+     aList.Delimiter:= DirectorySeparator;
+     aList.DelimitedText:= TrimChar(FAndroidProjectName, DirectorySeparator);
+     FSmallProjName:=  aList.Strings[aList.Count-1];; //ex. "AppTest1"
+     FPackagePrefaceName:= '';
+     aList.Free;
+     if FModuleType = 1 then  //NoGUI
+       FJavaClassName:=  FSmallProjName //ex. "AppTest1"
+  end;
 
   FMainActivity:= 'App'; {dummy for Simon template} //TODO: need name flexibility here...
 
-  FAntPackageName:= LowerCase(Trim(EditPackagePrefaceName.Text));
-
-  FPathToWorkspace:= EditPathToWorkspace.Text;
-  FAndroidProjectName:= Trim(ComboSelectProjectName.Text);
   FAndroidPlatform:= GetNDKPlatform(ListBoxPlatform.Items.Strings[ListBoxPlatform.ItemIndex]);
 
-  if FProjectModel <> 'Ant' then
+  if FProjectModel = 'Eclipse' then   //if project exits!
   begin
-      strList:= TStringList.Create;
-      path:= FAndroidProjectName+DirectorySeparator+'src';
-      GetSubDirectories(path, strList);
-      count:= strList.Count;
-      while count > 0 do
-      begin
+     strList:= TStringList.Create;
+     path:= FAndroidProjectName+DirectorySeparator+'src';
+     GetSubDirectories(path, strList);
+
+     count:= strList.Count;
+     while count > 0 do
+     begin
          path:= strList.Strings[0];
          strList.Clear;
          GetSubDirectories(path, strList);
          count:= strList.Count;
-      end;
-      strList.Clear;
-      strList.Delimiter:= DirectorySeparator;
-      strList.DelimitedText:= path;
-      i:= 0;
-      path:=strList.Strings[i];
-      while path <> 'src' do
-      begin
+     end;
+
+     strList.Clear;
+     strList.Delimiter:= DirectorySeparator;
+     strList.DelimitedText:= path;
+
+     i:= 0;
+     path:=strList.Strings[i];
+     while path <> 'src' do
+     begin
          i:= i+1;
          path:= strList.Strings[i];
-      end;
-      path:='';
-      for j:= (i+1) to strList.Count-2 do
-      begin
+     end;
+
+     path:='';
+     for j:= (i+1) to strList.Count-2 do
+     begin
          path:= path + '.' + strList.Strings[j];
-      end;
-      FAntPackageName:= TrimChar(path, '.');
-      strList.Free;
+     end;
+
+     FPackagePrefaceName:= TrimChar(path, '.');
+     strList.Free;
+
+     FFullJavaSrcPath:=GetFullJavaSrcPath(FAndroidProjectName);
   end;
 
-  if RGProjectType.ItemIndex = 1 then  //Ant Project
+  if FProjectModel = 'Ant' then    //if project not exits!
   begin
-     FProjectModel:= 'Ant';
-     if (Pos(DirectorySeparator, ComboSelectProjectName.Text) = 0) then  //i.e just "name", not path+name
-     begin
-         FAndroidProjectName:= FPathToWorkspace + DirectorySeparator + ComboSelectProjectName.Text; //get full name: path+name
-         {$I-}
-         ChDir(FPathToWorkspace+DirectorySeparator+ComboSelectProjectName.Text);
-         if IOResult <> 0 then MkDir(FPathToWorkspace+DirectorySeparator+ComboSelectProjectName.Text);
-     end;
+      if not DirectoryExists(FAndroidProjectName) then
+      begin
+        MkDir(FAndroidProjectName);
+        ChDir(FAndroidProjectName);
+
+        MkDir(FAndroidProjectName+ DirectorySeparator + 'jni');
+        ChDir(FAndroidProjectName+DirectorySeparator+ 'jni');
+
+        MkDir(FAndroidProjectName+DirectorySeparator+ 'jni'+DirectorySeparator+'build-modes');
+        ChDir(FAndroidProjectName+DirectorySeparator+ 'jni'+DirectorySeparator+'build-modes');
+
+        MkDir(FAndroidProjectName+ DirectorySeparator + 'libs');
+        ChDir(FAndroidProjectName+DirectorySeparator+ 'libs');
+
+        if FSupportV4 = 'yes' then  //add "android 4.0" support to olds devices ...
+              CopyFile(FPathToJavaTemplates+DirectorySeparator+'libs'+DirectorySeparator+'android-support-v4.jar',
+                   FAndroidProjectName+DirectorySeparator+'libs'+DirectorySeparator+'android-support-v4.jar');
+
+        MkDir(FAndroidProjectName+ DirectorySeparator + 'obj');
+        ChDir(FAndroidProjectName+DirectorySeparator+ 'obj');
+
+        MkDir(FAndroidProjectName+ DirectorySeparator + 'obj'+DirectorySeparator+LowerCase(FJavaClassName));
+        ChDir(FAndroidProjectName+DirectorySeparator+ 'obj'+DirectorySeparator+LowerCase(FJavaClassName));
+
+        MkDir(FAndroidProjectName+ DirectorySeparator + 'libs'+DirectorySeparator+'x86');
+        ChDir(FAndroidProjectName+DirectorySeparator+ 'libs'+DirectorySeparator+'x86');
+
+        MkDir(FAndroidProjectName+ DirectorySeparator + 'libs'+DirectorySeparator+'armeabi');
+        ChDir(FAndroidProjectName+DirectorySeparator+ 'libs'+DirectorySeparator+'armeabi');
+
+        MkDir(FAndroidProjectName+ DirectorySeparator + 'libs'+DirectorySeparator+'armeabi-v7a');
+        ChDir(FAndroidProjectName+DirectorySeparator+ 'libs'+DirectorySeparator+'armeabi-v7a');
+      end
+      else ShowMessage('Error! Projec/Directory ['+FAndroidProjectName+'] already exists !');
   end;
+end;
+
+procedure TFormWorkspace.FormCloseQuery(Sender: TObject; var CanClose: boolean);
+begin
 
 end;
 
@@ -363,7 +449,7 @@ begin
   fileName:= AppendPathDelim(LazarusIDE.GetPrimaryConfigPath) + 'JNIAndroidProject.ini';
   if not FileExistsUTF8(fileName) then
   begin
-    if EditPackagePrefaceName.Text = '' then EditPackagePrefaceName.Text:= 'org.lazarus';
+    if EditPackagePrefaceName.Text = '' then EditPackagePrefaceName.Text:= 'org.lamw';
     SaveSettings(fileName);  //force to create empty/initial file!
   end;
 end;
@@ -507,7 +593,7 @@ begin
      ComboSelectProjectName.SetFocus
   else EditPathToWorkspace.SetFocus;
 
-  if EditPackagePrefaceName.Text = '' then EditPackagePrefaceName.Text:= 'org.lazarus';
+  if EditPackagePrefaceName.Text = '' then EditPackagePrefaceName.Text:= 'org.lamw';
 
   StatusBarInfo.Panels.Items[0].Text:= 'MinSdk Api: '+GetTextByListIndex(ListBoxMinSDK.ItemIndex);
   StatusBarInfo.Panels.Items[1].Text:= 'Target Api: '+GetTextByList2Index(ListBoxTargetAPI.ItemIndex);
@@ -542,14 +628,17 @@ begin
     ComboSelectProjectName.Items.Clear;
     GetSubDirectories(FPathToWorkspace, ComboSelectProjectName.Items);
 
+    {
     //try some guesswork:
     if Pos('eclipse', LowerCase(FPathToWorkspace) ) > 0 then RGProjectType.ItemIndex:= 0;
 
     if Pos('ant', LowerCase(FPathToWorkspace) ) > 0 then
     begin
        RGProjectType.ItemIndex:= 1;
-       if EditPackagePrefaceName.Text = '' then EditPackagePrefaceName.Text:= 'org.lazarus';
+       if EditPackagePrefaceName.Text = '' then EditPackagePrefaceName.Text:= 'org.lamw';
     end;
+    }
+
   end;
 end;
 
@@ -558,18 +647,11 @@ begin
   FPathToWorkspace:= EditPathToWorkspace.Text;
   ComboSelectProjectName.Items.Clear;
   GetSubDirectories(FPathToWorkspace, ComboSelectProjectName.Items);
+end;
 
-  //try some guesswork:
-  if Pos('eclipse', LowerCase(FPathToWorkspace) ) > 0 then
-  begin
-    RGProjectType.ItemIndex:= 0;
-  end;
-
-  if Pos('ant', LowerCase(FPathToWorkspace) ) > 0 then
-  begin
-     RGProjectType.ItemIndex:= 1;
-     if EditPackagePrefaceName.Text = '' then EditPackagePrefaceName.Text:= 'org.lazarus';
-  end;
+procedure TFormWorkspace.SpeedButton1Click(Sender: TObject);
+begin
+  ShowMessage('Lamw: Lazarus Android Module Wizard' +#10#13+ '[ver. 0.6 - rev. 36 - 03 August 2015]');
 end;
 
 procedure TFormWorkspace.LoadSettings(const pFilename: string);  //called by
@@ -580,7 +662,7 @@ begin
   with TIniFile.Create(pFilename) do
   try
     FPathToWorkspace:= ReadString('NewProject','PathToWorkspace', '');
-    FAntPackageName:= ReadString('NewProject','AntPackageName', '');
+    FPackagePrefaceName:= ReadString('NewProject','AntPackageName', '');
 
     FAntBuildMode:= 'debug'; //default...
     FTouchtestEnabled:= 'True'; //default
@@ -662,22 +744,23 @@ begin
   RGInstruction.ItemIndex:= i1;
   RGFPU.ItemIndex:= i2;
 
-  if i3 > 1 then i3:= 0;
-  RGProjectType.ItemIndex:= i3;
+
+  //if i3 > 1 then i3:= 0;
+  //RGProjectType.ItemIndex:= i3;
 
   if i3 = 0 then FProjectModel:= 'Eclipse'
   else FProjectModel:= 'Ant';
 
   FInstructionSet:= RGInstruction.Items[RGInstruction.ItemIndex];
   FFPUSet:= RGFPU.Items[RGFPU.ItemIndex];
-  FProjectModel:= RGProjectType.Items[RGProjectType.ItemIndex]; //Eclipse Project or Ant Project
+  //FProjectModel:= RGProjectType.Items[RGProjectType.ItemIndex]; //Eclipse Project or Ant Project
 
   FMinApi:= ListBoxMinSDK.Items[ListBoxMinSDK.ItemIndex];
   FTargetApi:= ListBoxTargetAPI.Items[ListBoxTargetAPI.ItemIndex];
 
   EditPathToWorkspace.Text := FPathToWorkspace;
 
-  EditPackagePrefaceName.Text := FAntPackageName;
+  EditPackagePrefaceName.Text := FPackagePrefaceName;
 
   //verify if some was not load!
   Self.LoadPathsSettings(FFileName);
@@ -694,10 +777,13 @@ begin
       WriteString('NewProject', 'InstructionSet', IntToStr(RGInstruction.ItemIndex));
       WriteString('NewProject', 'FPUSet', IntToStr(RGFPU.ItemIndex));
 
-      WriteString('NewProject', 'ProjectModel',IntToStr(RGProjectType.ItemIndex));  //Eclipse or Ant
+      if  FProjectModel = 'Ant' then            //IntToStr(RGProjectType.ItemIndex)
+        WriteString('NewProject', 'ProjectModel', '1')  //Ant
+      else
+        WriteString('NewProject', 'ProjectModel','0');  //Eclipse
 
 
-      if EditPackagePrefaceName.Text = '' then EditPackagePrefaceName.Text:= 'org.lazarus';
+      if EditPackagePrefaceName.Text = '' then EditPackagePrefaceName.Text:= 'org.lamw';
       WriteString('NewProject', 'AntPackageName', LowerCase(Trim(EditPackagePrefaceName.Text)));
 
       WriteString('NewProject', 'AndroidPlatform', IntToStr(ListBoxPlatform.ItemIndex));

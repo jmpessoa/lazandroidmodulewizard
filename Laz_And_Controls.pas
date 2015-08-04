@@ -639,8 +639,8 @@ type
     procedure AddTable(tableName: string; createTableQuery: string);
     procedure CreateAllTables;
 
-    function Select(selectQuery: string): string;  overload; //set cursor and return selected rows
-    procedure Select(selectQuery: string); overload;  //just set  java Cursor
+    function Select(selectQuery: string): string;   overload;  //set cursor and return selected rows
+    function Select(selectQuery: string; moveToLast: boolean): boolean;   overload;
 
     procedure SetSelectDelimiters(coldelim: char; rowdelim: char);
     procedure CreateTable(createQuery: string);
@@ -7722,14 +7722,14 @@ end;
 
 procedure jImageBtn.SetImageDownByRes(imgResIdentifief: string);
 begin
-   FImageUpName:= imgResIdentifief;
+   FImageDownName:= imgResIdentifief;
    if FInitialized then
      jImageBtn_setButtonDownByRes(FjEnv, FjObject , imgResIdentifief);
 end;
 
 procedure jImageBtn.SetImageUpByRes(imgResIdentifief: string);
 begin
-  FImageDownName:=  imgResIdentifief;
+  FImageUpName:=  imgResIdentifief;
   if FInitialized then
     jImageBtn_setButtonUpByRes(FjEnv, FjObject , imgResIdentifief);
 end;
@@ -8209,18 +8209,19 @@ begin
   jSqliteDataAccess_CreateAllTables(FjEnv, FjObject );
 end;
 
-function jSqliteDataAccess.Select(selectQuery: string) : string;
+function jSqliteDataAccess.Select(selectQuery: string): string;
 begin
    if not FInitialized then Exit;
-   Result:= jSqliteDataAccess_Select(FjEnv, FjObject , selectQuery);
+   Result:= jSqliteDataAccess_Select(FjEnv, FjObject, selectQuery);
    if FjSqliteCursor <> nil then FjSqliteCursor.SetCursor(Self.GetCursor);
 end;
 
-procedure jSqliteDataAccess.Select(selectQuery: string);
+function jSqliteDataAccess.Select(selectQuery: string; moveToLast: boolean): boolean;
 begin
-   if not FInitialized then Exit;
-   jSqliteDataAccess_Select(FjEnv, FjObject ,  selectQuery);
-   if FjSqliteCursor <> nil then FjSqliteCursor.SetCursor(Self.GetCursor);
+  if not FInitialized then Exit;
+  Result:= jSqliteDataAccess_Select(FjEnv, FjObject, selectQuery ,moveToLast);
+  if Result then
+     if FjSqliteCursor <> nil then FjSqliteCursor.SetCursor(Self.GetCursor);
 end;
 
 

@@ -1,12 +1,12 @@
 package com.example.dummyapp;
 
-//Lamw: Lazarus Android Module Wizard - Version 0.6 - rev. 35 - 28 July - 2015
+//Lamw: Lazarus Android Module Wizard - Version 0.6 - rev. 36 - 03 August - 2015
 //Form Designer and Components development model!
 //https://github.com/jmpessoa/lazandroidmodulewizard
 //http://forum.lazarus.freepascal.org/index.php/topic,21919.270.html
 
 //Android Java Interface for Pascal/Delphi XE5
-//And LAZARUS by jmpessoa@hotmail.com - december 2013
+//And LAZARUS by Jose Marques Pessoa [december 2013]
 
 //Developers
 //          Simon,Choi / Choi,Won-sik
@@ -17,7 +17,7 @@ package com.example.dummyapp;
 //                       wkddidgh@naver.com
 //                       http://blog.naver.com/wkddidgh
 
-//	    JMPessoa  /  josemarquespessoa@gmail.com
+//	    Jose Marques Pessoa  /  josemarquespessoa@gmail.com
 
 
 import java.lang.Override;

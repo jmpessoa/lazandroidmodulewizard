@@ -61,7 +61,10 @@
 		-Thierry Dijoux - Late: Apk Expert Tools [Build, Install, ...]
 
 		-Anton [at github/odisey1245] - many many contributions!
-		
+
+		-JC99 - The Wiki-Page "get_start"
+			Ref. http://wiki.freepascal.org/Talk:Android_tutorial
+				
 		-Lazarus forum community!
 		
 	References:
@@ -138,6 +141,38 @@
 	*		<property name="sdk.dir" location="C:\adt32\sdk"/>
 	*
 	****************************************************************************************************
+
+Version 0.6 - rev. 36 - 03 August 2015 - 
+
+	IMPROVEMENT!   
+
+		Wizard forms usability [and code] redesigned! 
+			Eclipe/Ant project [finally] unified!
+			Fixed [Lamw NoGUI] project //<<----Thanks to @leledumbo! 			
+					
+	IMPROVEMENT!   
+
+		jBluetooth
+			News methods: 
+				PairDeviceByAddress
+				UnpairDeviceByAddress
+		
+	FIXED!  
+
+		jImageBtn //<<----Thanks to @renabor!			
+
+		jSqliteDataAccess.Select //<<----Thanks to @renabor!
+
+	NEW! 
+		"GET START" The Wiki-Page //<<----Thanks to @jc99!
+			Ref. http://wiki.freepascal.org/Talk:Android_tutorial
+
+				
+	HINT 1: Old Projects: Please, upgrade your project code templates !
+			Lazarus IDE --> menu Tools --> [Lamw] Android Module Wizard --> Upgrade code Templates [*.lpr, *.java]
+
+	HINT 2:	When prompt "Read error" [Unknown Property] just choice "Continue Loading"! 
+			[After any form/component/property  changed and saved.... Problem solved!]
 
 Version 0.6 - rev. 35 - 28 July 2015 - 
 

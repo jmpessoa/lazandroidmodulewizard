@@ -1,14 +1,14 @@
 object FormWorkspace: TFormWorkspace
-  Left = 336
+  Left = 329
   Height = 519
   Top = 68
-  Width = 382
+  Width = 357
   AutoSize = True
   BorderIcons = [biSystemMenu]
   BorderStyle = bsSizeToolWin
   Caption = 'Android Module Wizard: Configure Project Workspace and Builds'
   ClientHeight = 519
-  ClientWidth = 382
+  ClientWidth = 357
   Icon.Data = {
     5E07000000000100010018180000010018004807000016000000280000001800
     0000300000000100180000000000C00600006400000064000000000000000000
@@ -80,7 +80,7 @@ object FormWorkspace: TFormWorkspace
     Left = 0
     Height = 23
     Top = 496
-    Width = 382
+    Width = 357
     Panels = <    
       item
         Text = 'MinSdk Api:'
@@ -100,7 +100,7 @@ object FormWorkspace: TFormWorkspace
     Left = 8
     Height = 120
     Top = 296
-    Width = 366
+    Width = 341
     Align = alClient
     BorderSpacing.Around = 8
     BevelOuter = bvNone
@@ -113,7 +113,7 @@ object FormWorkspace: TFormWorkspace
     ChildSizing.Layout = cclLeftToRightThenTopToBottom
     ChildSizing.ControlsPerLine = 4
     ClientHeight = 120
-    ClientWidth = 366
+    ClientWidth = 341
     Constraints.MinHeight = 80
     TabOrder = 1
     object RGInstruction: TRadioGroup
@@ -122,7 +122,7 @@ object FormWorkspace: TFormWorkspace
       Left = 0
       Height = 112
       Top = 4
-      Width = 87
+      Width = 107
       AutoFill = True
       Caption = 'Instruction:'
       ChildSizing.LeftRightSpacing = 6
@@ -134,7 +134,7 @@ object FormWorkspace: TFormWorkspace
       ChildSizing.Layout = cclLeftToRightThenTopToBottom
       ChildSizing.ControlsPerLine = 1
       ClientHeight = 92
-      ClientWidth = 83
+      ClientWidth = 103
       ItemIndex = 0
       Items.Strings = (
         'ARMv6'
@@ -147,10 +147,10 @@ object FormWorkspace: TFormWorkspace
     object RGFPU: TRadioGroup
       AnchorSideLeft.Side = asrBottom
       AnchorSideTop.Side = asrBottom
-      Left = 91
+      Left = 111
       Height = 112
       Top = 4
-      Width = 78
+      Width = 98
       AutoFill = True
       Caption = 'ARM Fpu:'
       ChildSizing.LeftRightSpacing = 6
@@ -162,7 +162,7 @@ object FormWorkspace: TFormWorkspace
       ChildSizing.Layout = cclLeftToRightThenTopToBottom
       ChildSizing.ControlsPerLine = 1
       ClientHeight = 92
-      ClientWidth = 74
+      ClientWidth = 94
       ItemIndex = 0
       Items.Strings = (
         'Soft'
@@ -172,38 +172,11 @@ object FormWorkspace: TFormWorkspace
       OnClick = RGFPUClick
       TabOrder = 1
     end
-    object RGProjectType: TRadioGroup
-      AnchorSideLeft.Side = asrBottom
-      AnchorSideTop.Side = asrBottom
-      Left = 173
-      Height = 112
-      Top = 4
-      Width = 79
-      AutoFill = True
-      Caption = 'Project:'
-      ChildSizing.LeftRightSpacing = 6
-      ChildSizing.TopBottomSpacing = 6
-      ChildSizing.EnlargeHorizontal = crsHomogenousChildResize
-      ChildSizing.EnlargeVertical = crsHomogenousChildResize
-      ChildSizing.ShrinkHorizontal = crsScaleChilds
-      ChildSizing.ShrinkVertical = crsScaleChilds
-      ChildSizing.Layout = cclLeftToRightThenTopToBottom
-      ChildSizing.ControlsPerLine = 1
-      ClientHeight = 92
-      ClientWidth = 75
-      ItemIndex = 1
-      Items.Strings = (
-        'Eclipse'
-        'Ant'
-      )
-      OnClick = RGProjectTypeClick
-      TabOrder = 2
-    end
     object Image1: TImage
-      Left = 256
+      Left = 213
       Height = 112
       Top = 4
-      Width = 110
+      Width = 128
       AutoSize = True
       Picture.Data = {
         1754506F727461626C654E6574776F726B47726170686963924E000089504E47
@@ -844,15 +817,15 @@ object FormWorkspace: TFormWorkspace
     Left = 0
     Height = 72
     Top = 424
-    Width = 382
+    Width = 357
     Align = alBottom
     BevelOuter = bvNone
     ClientHeight = 72
-    ClientWidth = 382
+    ClientWidth = 357
     Constraints.MinHeight = 50
     TabOrder = 2
     object BitBtnOK: TBitBtn
-      Left = 292
+      Left = 267
       Height = 26
       Top = 34
       Width = 82
@@ -864,7 +837,7 @@ object FormWorkspace: TFormWorkspace
       TabOrder = 0
     end
     object BitBtnCancel: TBitBtn
-      Left = 292
+      Left = 267
       Height = 26
       Top = 2
       Width = 82
@@ -878,42 +851,44 @@ object FormWorkspace: TFormWorkspace
       Left = 8
       Height = 15
       Top = 48
-      Width = 91
-      Caption = 'Project Type: GUI'
+      Width = 134
+      Caption = 'Project Type: [Lamw GUI]'
+      Font.Color = clRed
       ParentColor = False
+      ParentFont = False
     end
   end
   object Panel1: TPanel
     Left = 0
     Height = 107
     Top = 0
-    Width = 382
+    Width = 357
     Align = alTop
     AutoSize = True
     BevelOuter = bvNone
     ClientHeight = 107
-    ClientWidth = 382
+    ClientWidth = 357
     TabOrder = 3
     object LabelPathToWorkspace: TLabel
       Left = 8
       Height = 15
       Top = 8
-      Width = 366
+      Width = 341
       Align = alTop
       BorderSpacing.Left = 8
       BorderSpacing.Top = 8
       BorderSpacing.Right = 8
-      Caption = 'Path to Workspace [projects folder]:'
+      Caption = 'Path to Workspace [Projects Folder]:'
       ParentColor = False
     end
     object EditPathToWorkspace: TEdit
       AnchorSideTop.Control = LabelPathToWorkspace
       AnchorSideTop.Side = asrBottom
       AnchorSideRight.Control = SpdBtnPathToWorkspace
-      Left = 7
+      Left = 5
       Height = 23
       Top = 27
-      Width = 336
+      Width = 313
       Anchors = [akTop, akLeft, akRight]
       BorderSpacing.Left = 8
       BorderSpacing.Top = 4
@@ -925,7 +900,7 @@ object FormWorkspace: TFormWorkspace
       AnchorSideTop.Side = asrCenter
       AnchorSideRight.Control = Panel1
       AnchorSideRight.Side = asrBottom
-      Left = 351
+      Left = 326
       Height = 22
       Hint = 'Select directory'
       Top = 27
@@ -939,10 +914,10 @@ object FormWorkspace: TFormWorkspace
       AnchorSideTop.Control = LabelSelectProjectName
       AnchorSideTop.Side = asrBottom
       AnchorSideRight.Control = SpdBtnRefreshProjectName
-      Left = 7
+      Left = 5
       Height = 23
       Top = 77
-      Width = 336
+      Width = 313
       Anchors = [akTop, akLeft, akRight]
       BorderSpacing.Left = 8
       BorderSpacing.Top = 4
@@ -958,7 +933,7 @@ object FormWorkspace: TFormWorkspace
       AnchorSideTop.Side = asrCenter
       AnchorSideRight.Control = Panel1
       AnchorSideRight.Side = asrBottom
-      Left = 351
+      Left = 326
       Height = 22
       Top = 77
       Width = 23
@@ -1005,39 +980,83 @@ object FormWorkspace: TFormWorkspace
     object LabelSelectProjectName: TLabel
       AnchorSideTop.Control = EditPathToWorkspace
       AnchorSideTop.Side = asrBottom
-      Left = 7
+      Left = -4305
       Height = 15
       Top = 58
-      Width = 270
+      Width = 161
       BorderSpacing.Left = 8
       BorderSpacing.Top = 8
-      Caption = '[Select] Eclipse Project or [Enter] Ant Project Name:'
+      Caption = 'New Project Name  [or Select]:'
       ParentColor = False
+    end
+    object SpeedButton1: TSpeedButton
+      Left = 327
+      Height = 22
+      Top = 1
+      Width = 23
+      Anchors = [akTop, akRight]
+      Glyph.Data = {
+        36040000424D3604000000000000360000002800000010000000100000000100
+        2000000000000004000064000000640000000000000000000000FFFFFF00FFFF
+        FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+        FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+        FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+        FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF000260
+        9F00025F9C00025C9800025B9600025B9600025B9600025B9600035993000355
+        8B00034E7F3D034D7DB5034D7D00034D7D00034D7D00FFFFFF00FFFFFF000260
+        9F00025F9C00025C9800025B9600025B9600025B9600025B9600035993020356
+        8D3903558BA603558BA603568E000359920003599300FFFFFF00FFFFFF000260
+        9F00025F9C00025C9813025C9752025C977D025C9794025C9799025C9799025C
+        9799B6EDFDFF025C9799025C9813025F9C0002609F00FFFFFF00FFFFFF000260
+        9F00025F9D32126BA48F5CA7CBC595D6EBE9A8E7F6FAABEAF9FFAAEAF9FFAAEA
+        F8FFAAEAF9FF57A5CBC5116BA48F025F9D3202609F00FFFFFF00FFFFFF000261
+        A11F1C73AC9297D6E9E7A4E9F5FF9DE6F4FF9DE6F4FF9DE6F4FF9DE6F4FF9DE6
+        F4FF9DE6F4FF9DE6F4FF83D0E6E71571AA920261A11FFFFFFF00FFFFFF000264
+        A4659AC9E3D3BCEDFAFF94E4F0FF8FE3EEFF8FE3EEFF8FE3EEFF8FE3EEFF8FE3
+        EEFF8FE3EEFF8FE3EEFF90E4EFFF66BDD8D30264A465FFFFFF00FFFFFF000266
+        A781D1EFFBF6CCEEFFFFC2ECFCFF9DE5F1FF85E0EAFF82E0E9FF82E0E9FF82E0
+        E9FF82E0E9FF82E0E9FF82E0E9FF86DDE8F60266A781FFFFFF00FFFFFF000268
+        AB7ED6F1FCF5CEEFFFFFCEEFFFFFCEEFFFFFC2EDFCFFA8E8F4FF91E3EDFF84E0
+        E9FF7CDEE7FF7CDEE7FF84E0E9FF99E2EDF50268AB7EFFFFFF00FFFFFF00026A
+        AE5DA6D2E8CED9F5FFFFD3F2FFFFD3F2FFFFD3F2FFFFD3F2FFFFD3F2FFFFD3F2
+        FFFFD3F2FFFFD3F2FFFFD7F4FFFF9DCDE8CE026AAE5DFFFFFF00FFFFFF00026B
+        B11B227FBC82C9E8F4E2DFF7FFFFD9F4FFFFD8F4FFFFD8F4FFFFD8F4FFFFD8F4
+        FFFFD9F4FFFFDDF7FFFFC3E5F4E2207EBC82026BB11BFFFFFF00FFFFFF00026B
+        B200026DB429197BBB7980BBDCB6CDEBF6E3E2F8FEF9E6FAFFFFE5FAFFFFE1F8
+        FEF9CBE9F6E37EBADCB6197BBB79026DB429026BB200FFFFFF00FFFFFF00026B
+        B200026DB400026DB50F026EB641026EB663026EB675026EB679026EB679026E
+        B675026EB663026EB641026DB50F026DB400026BB200FFFFFF00FFFFFF00FFFF
+        FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+        FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+        FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+        FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00
+      }
+      OnClick = SpeedButton1Click
     end
   end
   object Panel2: TPanel
     Left = 0
     Height = 55
     Top = 107
-    Width = 382
+    Width = 357
     Align = alTop
     AutoSize = True
     BevelOuter = bvNone
     ClientHeight = 55
-    ClientWidth = 382
+    ClientWidth = 357
     TabOrder = 4
     object GroupBox1: TGroupBox
       Left = 3
       Height = 55
       Top = 0
-      Width = 376
+      Width = 351
       Align = alClient
       AutoSize = True
       BorderSpacing.Left = 3
       BorderSpacing.Right = 3
-      Caption = 'Ant [Preface] Package Name:'
+      Caption = 'Default Package Name:'
       ClientHeight = 35
-      ClientWidth = 372
+      ClientWidth = 347
       TabOrder = 0
       object EditPackagePrefaceName: TEdit
         AnchorSideLeft.Control = GroupBox1
@@ -1046,27 +1065,27 @@ object FormWorkspace: TFormWorkspace
         Left = 6
         Height = 23
         Top = 4
-        Width = 118
+        Width = 115
         Anchors = [akTop, akLeft, akRight]
         BorderSpacing.Left = 6
         BorderSpacing.Top = 4
         BorderSpacing.Right = 20
         BorderSpacing.Bottom = 8
         TabOrder = 0
-        Text = 'org.lazarus'
+        Text = 'org.lamw'
       end
       object CheckBox1: TCheckBox
         AnchorSideTop.Control = EditPackagePrefaceName
         AnchorSideTop.Side = asrCenter
         AnchorSideRight.Control = GroupBox1
         AnchorSideRight.Side = asrBottom
-        Left = 144
+        Left = 141
         Height = 19
         Top = 6
-        Width = 222
+        Width = 200
         Anchors = [akTop, akRight]
         BorderSpacing.Right = 6
-        Caption = 'Ant [Include] "android-support-v4.jar"'
+        Caption = '[Include] "android-support-v4.jar"'
         OnClick = CheckBox1Click
         TabOrder = 1
       end
@@ -1076,7 +1095,7 @@ object FormWorkspace: TFormWorkspace
     Left = 8
     Height = 118
     Top = 170
-    Width = 366
+    Width = 341
     Align = alTop
     BorderSpacing.Around = 8
     BevelOuter = bvNone
@@ -1089,22 +1108,22 @@ object FormWorkspace: TFormWorkspace
     ChildSizing.Layout = cclLeftToRightThenTopToBottom
     ChildSizing.ControlsPerLine = 3
     ClientHeight = 118
-    ClientWidth = 366
+    ClientWidth = 341
     TabOrder = 5
     object GroupBox2: TGroupBox
       Left = 0
       Height = 110
       Top = 4
-      Width = 120
+      Width = 111
       Caption = 'Platform:'
       ClientHeight = 90
-      ClientWidth = 116
+      ClientWidth = 107
       TabOrder = 0
       object ListBoxPlatform: TListBox
         Left = 0
         Height = 90
         Top = 0
-        Width = 116
+        Width = 107
         Align = alClient
         Items.Strings = (
           'Froyo'
@@ -1117,25 +1136,24 @@ object FormWorkspace: TFormWorkspace
           'Lollipop 5.0'
         )
         ItemHeight = 15
-        ItemIndex = 1
         OnClick = ListBoxPlatformClick
         TabOrder = 0
       end
     end
     object GroupBox3: TGroupBox
-      Left = 124
+      Left = 115
       Height = 110
       Top = 4
-      Width = 120
+      Width = 111
       Caption = 'MinSdk:'
       ClientHeight = 90
-      ClientWidth = 116
+      ClientWidth = 107
       TabOrder = 1
       object ListBoxMinSDK: TListBox
         Left = 0
         Height = 90
         Top = 0
-        Width = 116
+        Width = 107
         Align = alClient
         Items.Strings = (
           '8'
@@ -1156,19 +1174,19 @@ object FormWorkspace: TFormWorkspace
       end
     end
     object GroupBox4: TGroupBox
-      Left = 248
+      Left = 230
       Height = 110
       Top = 4
-      Width = 118
+      Width = 111
       Caption = 'TargetApi:'
       ClientHeight = 90
-      ClientWidth = 114
+      ClientWidth = 107
       TabOrder = 2
       object ListBoxTargetAPI: TListBox
         Left = 0
         Height = 90
         Top = 0
-        Width = 114
+        Width = 107
         Align = alClient
         Items.Strings = (
           '8'
@@ -1192,7 +1210,6 @@ object FormWorkspace: TFormWorkspace
     end
   end
   object SelDirDlgPathToWorkspace: TSelectDirectoryDialog
-    left = 368
-    top = 16
+    left = 216
   end
 end

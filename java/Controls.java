@@ -1,17 +1,14 @@
 package com.example.dummyapp;
 
-//Lamw: Lazarus Android Module Wizard  - version 0.6 - revision 35 - 28 July - 2015 
+//Lamw: Lazarus Android Module Wizard  - version 0.6 - revision 36 - 03 August - 2015 
 //Form Designer and Components development model!
-//
 //
 //https://github.com/jmpessoa/lazandroidmodulewizard
 //http://forum.lazarus.freepascal.org/index.php/topic,21919.270.html
 //
 //Android Java Interface for Pascal/Delphi XE5 and FreePacal/LAZARUS[december 2013]
 //
-//
 //Developers:
-//
 //          Simon,Choi / Choi,Won-sik
 //                       simonsayz@naver.com
 //                       http://blog.naver.com/simonsayz
@@ -20,7 +17,7 @@ package com.example.dummyapp;
 //                       wkddidgh@naver.com
 //                       http://blog.naver.com/wkddidgh
 //
-//          JMPessoa   / josemarquespessoa@gmail.com
+//          Jose Marques Pessoa   / josemarquespessoa@gmail.com
 //
 //Version
 //History
@@ -5294,7 +5291,7 @@ private Paint           mPaint   = null;
 private Bitmap          bmpUp    = null;
 private Bitmap          bmpDn    = null;
 private Rect            rect;
-private int             btnState = 0;      // Normal = 0 , Pressed = 1
+private int             btnState = 0;      // Normal/Up = 0 , Pressed = 1
 private Boolean         enabled  = true;   //
 
 //by jmpessoa
@@ -5307,10 +5304,10 @@ int countParentRule = 0;
 int lpH = RelativeLayout.LayoutParams.WRAP_CONTENT;
 int lpW = RelativeLayout.LayoutParams.WRAP_CONTENT; //w
 
-int MarginLeft = 5;
-int MarginTop = 5;
-int marginRight = 5;
-int marginBottom = 5;
+int MarginLeft = 0;
+int MarginTop = 0;
+int marginRight = 0;
+int marginBottom = 0;
 
 // Constructor
 public  jImageBtn(android.content.Context context,
@@ -5321,12 +5318,12 @@ PasObj   = pasobj;
 controls = ctrls;
 // Init Class
 lparams = new LayoutParams  (100,100);
-lparams.setMargins( 50, 50,0,0);
+lparams.setMargins(0, 0,0,0);
 // BackGroundColor
 //setBackgroundColor(0xFF0000FF);
 //
 mPaint = new Paint();
-rect   = new Rect(0,0,100,100);
+rect   = new Rect(0,0,200,200);
 }
 
 public void setLeftTopRightBottomWidthHeight(int left, int top, int right, int bottom, int w, int h) {
@@ -5348,20 +5345,25 @@ viewgroup.addView(this,lparams);
 public  void setButton( String fileup , String filedn ) {
 if (bmpUp  != null) { bmpUp.recycle();         }
 bmpUp = BitmapFactory.decodeFile(fileup);
+rect   = new Rect(0,0,bmpUp.getWidth(),bmpUp.getHeight());
+
 if (bmpDn  != null) { bmpDn.recycle();         }
 bmpDn = BitmapFactory.decodeFile(filedn);
+rect   = new Rect(0,0,bmpDn.getWidth(),bmpDn.getHeight());
 invalidate();
 }
 
 public  void setButtonUp( String fileup) {
 if (bmpUp  != null) { bmpUp.recycle(); }
 bmpUp = BitmapFactory.decodeFile(fileup);
+rect   = new Rect(0,0,bmpUp.getWidth(),bmpUp.getHeight());
 invalidate();
 }
 
 public  void setButtonDown( String filedn ) {
 if (bmpDn  != null) { bmpDn.recycle();         }
 bmpDn = BitmapFactory.decodeFile(filedn);
+rect   = new Rect(0,0,bmpDn.getWidth(),bmpDn.getHeight());
 invalidate();
 }
 
@@ -5386,9 +5388,10 @@ private Drawable GetDrawableResourceById(int _resID) {
 }
 
 public  void setButtonUpByRes(String resup) {   // ..res/drawable
- if (bmpUp  != null) { bmpUp.recycle(); }
+  if (bmpUp  != null) { bmpUp.recycle(); }
   Drawable d = GetDrawableResourceById(GetDrawableResourceId(resup));
   bmpUp = ((BitmapDrawable)d).getBitmap();
+  rect   = new Rect(0,0,bmpUp.getWidth(),bmpUp.getHeight());
   invalidate();
 }
 
@@ -5396,6 +5399,7 @@ public  void setButtonDownByRes(String resdn) {   // ..res/drawable
   if (bmpDn  != null) { bmpDn.recycle(); }
    Drawable d = GetDrawableResourceById(GetDrawableResourceId(resdn));
    bmpDn = ((BitmapDrawable)d).getBitmap();
+   rect   = new Rect(0,0,bmpDn.getWidth(),bmpDn.getHeight());	 
    invalidate();
 }
 
@@ -5403,28 +5407,49 @@ public  void setButtonDownByRes(String resdn) {   // ..res/drawable
 @Override
 public  boolean onTouchEvent( MotionEvent event) {
 // LORDMAN 2013-08-16
-if (enabled == false) { return(false); }
 
-int actType = event.getAction() &MotionEvent.ACTION_MASK;
+if (enabled == false) { return false; }
+
+int actType = event.getAction()&MotionEvent.ACTION_MASK;
+
 switch(actType) {
-  case MotionEvent.ACTION_DOWN: { btnState = 1; invalidate(); 
-                                 //Log.i("Java","jImageBtn Here"); 
-                                 break; }
-  case MotionEvent.ACTION_MOVE: {                             break; }
-  case MotionEvent.ACTION_UP  : { btnState = 0; invalidate();
-                                  controls.pOnClick(PasObj,Const.Click_Default);
-                                  break; }
+  case MotionEvent.ACTION_DOWN: {  btnState = 1; 
+                                   invalidate(); 
+                                   //Log.i("Java","jImageBtn Here"); 
+                                   break; 
+                                 }
+  case MotionEvent.ACTION_MOVE: { break; }
+  case MotionEvent.ACTION_UP  : {  btnState = 0; 
+                                   invalidate();
+                                   controls.pOnClick(PasObj,Const.Click_Default);                                  
+                                   break; 
+                                  }
 }
+
 return true;
+
 }
 
 //
 @Override
 public  void onDraw( Canvas canvas) {
 //
-if (btnState == 0) { if (bmpUp != null) { canvas.drawBitmap(bmpUp,null,rect,mPaint); }; }
-else               { if (bmpDn != null) { canvas.drawBitmap(bmpDn,null,rect,mPaint); }; };
+  if (btnState == 0) { 
+	if (bmpUp != null) { 
+		//Log.i("onDraw","UP");		
+		canvas.drawBitmap(bmpUp,null,rect,null); //mPaint 
+	} 
+  }
+  else  { 
+	 if (bmpDn != null) { 
+		//Log.i("onDraw","Dow");
+		canvas.drawBitmap(bmpDn,null,rect,null); //mPaint 
+	 }
+  }	
+  
 }
+
+
 
 public  void setEnabled(boolean value) {
 enabled = value;
@@ -6265,7 +6290,7 @@ class jSqliteDataAccess {
             }	        	        	               	
         }
                 
-	    public String SelectS(String selectQuery) {	 //return String
+	    public String Select(String selectQuery) {	 //return String
 	    	
 		     String row = "";
 		     String rows = "";
@@ -6276,6 +6301,7 @@ class jSqliteDataAccess {
 		     String allRows = null;
 		      		     		     
 		     try{
+		    	   this.cursor = null; //[by renabor] without this a second query will find the Cursor randomly positioned!!!
 		           if (mydb!= null) {
 		               if (!mydb.isOpen()) {
 		                  mydb = this.Open();
@@ -6321,7 +6347,8 @@ class jSqliteDataAccess {
 		     return allRows; 
 	    }
 	    	    
-	    public void SelectV(String selectQuery) {   //just set the cursor! return void..
+	    public boolean Select(String selectQuery,  boolean moveToLast) {   //just set the cursor! return void..
+	    	    boolean result = true;
 	    	    this.cursor = null;
 		        try{  		        	
 			        if (mydb!= null) {
@@ -6329,11 +6356,24 @@ class jSqliteDataAccess {
 			              mydb = this.Open(); //controls.activity.openOrCreateDatabase(DATABASE_NAME, Context.MODE_PRIVATE, null); 
 			           }
 			        }		        			        				     	         
-			     	this.cursor  = mydb.rawQuery(selectQuery, null);			    			        
+			     	this.cursor  = mydb.rawQuery(selectQuery, null);
+			     	
+			         //try renabor sugestion!
+			     	
+			     	if (!this.cursor.moveToFirst()) result = false;
+			     		
+			     	if (result) {
+			       	   if (moveToLast)
+			     	      this.cursor.moveToLast(); 	
+			     	   else
+			     	       this.cursor.moveToFirst(); 	
+			     	}
+			     	
 			        mydb.close();			       
 			     }catch(SQLiteException se){
 			         Log.e(getClass().getSimpleName(), "Could not select:" + selectQuery);
-			     }	     		         			     
+			     }	     				        
+		         return result;
 		}
 
 	    public Cursor GetCursor() {
@@ -9072,6 +9112,10 @@ class jBluetooth /*extends ...*/ {
     ArrayList<String> mListFoundedDevices = new ArrayList<String>();
     ArrayList<BluetoothDevice> mListReachablePairedDevices  = new ArrayList<BluetoothDevice>();
     
+    ArrayList<BluetoothDevice> mListFoundedDevices2  = new ArrayList<BluetoothDevice>();
+    
+    ArrayList<String> mListBondedDevices = new ArrayList<String>();
+    
     //jBluetoothClientSocket mBluetoothClientSocket;    
 
     final BroadcastReceiver mBroadcastReceiver = new BroadcastReceiver() {
@@ -9086,6 +9130,7 @@ class jBluetooth /*extends ...*/ {
 	        	   mListReachablePairedDevices.add(device);	               
 	           }
 			   mListFoundedDevices.add( device.getName() + "|" + device.getAddress() );
+			   mListFoundedDevices2.add(device);
 			  // Log.i("jBluetooth_onReceive",device.getName() + "|" + device.getAddress());	        	   
 	           	           
 	           controls.pOnBluetoothDeviceFound(pascalObj,device.getName(),device.getAddress());
@@ -9183,33 +9228,28 @@ class jBluetooth /*extends ...*/ {
             
     public String[] GetPairedDevices(){  //list all paired devices...
     	
-        ArrayList<String> listBondedDevices = new ArrayList<String>();
+    	mListBondedDevices.clear();
+    	
+        mListBondedDevices.add("null|null");
         
-        listBondedDevices.add("null|null");
-        
-        if (mBA != null && mBA.isEnabled()){
-            
-           Set<BluetoothDevice> Devices = mBA.getBondedDevices();
+        if (mBA != null && mBA.isEnabled()){            
+           Set<BluetoothDevice> Devices = mBA.getBondedDevices();           
+           //Toast.makeText(controls.activity.getApplicationContext(),"Devices Count = "+Devices.size(), Toast.LENGTH_SHORT).show();           
            
-           Toast.makeText(controls.activity.getApplicationContext(),"Devices Count = "+Devices.size(), Toast.LENGTH_SHORT).show();
-           
-           if(Devices.size() > 0) {
-        	   
-              listBondedDevices.clear();
-              
+           if(Devices.size() > 0) {        	  
+              mListBondedDevices.clear();              
               for(BluetoothDevice device : Devices) {        	
-         	     listBondedDevices.add(device.getName()+"|"+ device.getAddress());
+         	     mListBondedDevices.add(device.getName()+"|"+ device.getAddress());
            	     //Log.i("Bluetooch_devices",device.getName());  //device.getAddress()            
-              }
-              
+              }              
            }  
         }
         //strDevices = new String[mPairedDevices.size()];
         //strDevices = listDevices.toArray(strDevices);
-        String strDevices[] = listBondedDevices.toArray(new String[listBondedDevices.size()]);    	  
+        String strDevices[] = mListBondedDevices.toArray(new String[mListBondedDevices.size()]);    	  
         return strDevices;        
     }
-
+          
     public String[] GetFoundedDevices(){  //list
     	if (mListFoundedDevices.size() == 0) {
             mListFoundedDevices.add("null|null");
@@ -9257,8 +9297,7 @@ class jBluetooth /*extends ...*/ {
     	  return -1;
       }
     }       
-                         
-    
+                            
     public BluetoothDevice GetReachablePairedDeviceByName(String _deviceName) {
     	
     	int index = -1;
@@ -9358,6 +9397,49 @@ class jBluetooth /*extends ...*/ {
         sharingIntent.putExtra(Intent.EXTRA_STREAM, uri);
         controls.activity.startActivity(sharingIntent);       
     }
+    
+    public void UnpairDeviceByAddress(String _deviceAddress) {
+  	   BluetoothDevice device =  GetReachablePairedDeviceByAddress(_deviceAddress);
+      	try {
+      		
+      	  if (device != null) {	
+      	     Method m = device.getClass()
+      	        .getMethod("removeBond", (Class[]) null);
+      	     m.invoke(device, (Object[]) null);
+      	  }
+      	} catch (Exception e) {
+      	    //Log.e(TAG, e.getMessage());
+      	}
+      }  
+         
+    public BluetoothDevice GetFoundedDeviceByAddress(String _deviceAddress) {
+     	
+     	int index = -1;     	
+         for (int i=0; i < mListFoundedDevices2.size(); i++) {
+         	if (mListFoundedDevices2.get(i).getAddress().equals(_deviceAddress)) {
+         		index = i;
+         		break;
+         	}
+         }
+         if (index > -1) { 
+         	return mListFoundedDevices2.get(index);
+         }	
+         else return null;
+     }
+
+     public void PairDeviceByAddress(String _deviceAddress) {
+     	BluetoothDevice device = GetFoundedDeviceByAddress(_deviceAddress);
+     	try {
+     	    if (device != null) {    	    	
+     	    Method m = device.getClass()
+     	               .getMethod("createBond", (Class[]) null);    	    
+     	               m.invoke(device, (Object[]) null);
+     	    } 	    	   
+     	} catch (Exception e) {
+     	    //Log.e(TAG, e.getMessage());
+     	}
+     }
+      
 }
 
 //by jmpessoa

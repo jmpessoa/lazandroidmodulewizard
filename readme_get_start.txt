@@ -72,10 +72,16 @@ II. LAMW:  Lazarus Android Module Wizard
 
 6. Connect your Device to Computer [usb] and configure it to "debug mode"     
 
-     "App settings"  ---> more -- developer options:  
-      stay awake  [checked!]
-       usb debugging [checked!]
-       verify apps via usb [checked!]
+	"App settings"  ---> more/aditional -- developer options [*]:  
+	stay awake  [checked!]
+	usb debugging [checked!]
+	verify apps via usb [checked!]
+
+	PANIC! Go to Google search with "android usb debugging <device name>" to get the operating mode adapted to your device...
+	
+	ex. Galaxy S3/S4 --> app settings --> about -->> Build number -->> [tap,tap,tap,...]
+        ex. MI 2 --> app settings --> about -->> MIUI Version -->> [tap,tap,tap,...]
+
 
 7.Lazarus IDE menu "Run" ---> "[Lamw] Build Apk and Run" [Congratulations!!!]
 

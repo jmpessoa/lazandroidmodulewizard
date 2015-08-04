@@ -1,11 +1,11 @@
 object FormChangeDemoPathToNDK: TFormChangeDemoPathToNDK
   Left = 350
-  Height = 254
+  Height = 319
   Top = 159
-  Width = 488
-  Caption = 'Lamw: Change [Demo] Project [*.lpi] Android Ndk Path'
-  ClientHeight = 254
-  ClientWidth = 488
+  Width = 580
+  Caption = 'Lamw: Change [Demo] Project  "*.lpi" and "build.xml" Ndk/Sdk  Path '
+  ClientHeight = 319
+  ClientWidth = 580
   OnClose = FormClose
   OnCreate = FormCreate
   LCLVersion = '1.3'
@@ -21,13 +21,13 @@ object FormChangeDemoPathToNDK: TFormChangeDemoPathToNDK
     Left = 18
     Height = 23
     Top = 139
-    Width = 428
+    Width = 520
     Anchors = [akTop, akLeft, akRight]
     TabOrder = 0
   end
   object SpeedButton1: TSpeedButton
     AnchorSideTop.Control = EditPathToAndroidNDK
-    Left = 454
+    Left = 546
     Height = 22
     Top = 139
     Width = 23
@@ -47,13 +47,13 @@ object FormChangeDemoPathToNDK: TFormChangeDemoPathToNDK
     Left = 16
     Height = 23
     Top = 31
-    Width = 428
+    Width = 520
     Anchors = [akTop, akLeft, akRight]
     TabOrder = 1
   end
   object SpeedButton2: TSpeedButton
     AnchorSideTop.Control = EditPathToWorkspace
-    Left = 452
+    Left = 544
     Height = 22
     Top = 31
     Width = 23
@@ -73,7 +73,7 @@ object FormChangeDemoPathToNDK: TFormChangeDemoPathToNDK
     Left = 16
     Height = 23
     Top = 83
-    Width = 426
+    Width = 518
     Anchors = [akTop, akLeft, akRight]
     ItemHeight = 15
     OnChange = ComboBoxSelectProjectChange
@@ -81,7 +81,7 @@ object FormChangeDemoPathToNDK: TFormChangeDemoPathToNDK
   end
   object SpeedButton3: TSpeedButton
     AnchorSideTop.Control = ComboBoxSelectProject
-    Left = 452
+    Left = 544
     Height = 22
     Top = 83
     Width = 23
@@ -125,10 +125,10 @@ object FormChangeDemoPathToNDK: TFormChangeDemoPathToNDK
     OnClick = SpeedButton3Click
   end
   object BitBtn2: TBitBtn
-    Left = 232
+    Left = 280
     Height = 30
-    Top = 184
-    Width = 210
+    Top = 224
+    Width = 256
     Anchors = [akTop, akLeft, akRight]
     Cancel = True
     DefaultCaption = True
@@ -139,9 +139,9 @@ object FormChangeDemoPathToNDK: TFormChangeDemoPathToNDK
   object BitBtn1: TBitBtn
     Left = 16
     Height = 30
-    Top = 184
-    Width = 206
-    Caption = 'Change [*.lpi] Ndk Path '
+    Top = 224
+    Width = 264
+    Caption = 'Change [*.lpi] [build.xml] Ndk/Sdk  Path '
     Default = True
     Kind = bkOK
     ModalResult = 1
@@ -151,16 +151,45 @@ object FormChangeDemoPathToNDK: TFormChangeDemoPathToNDK
   object StatusBar1: TStatusBar
     Left = 0
     Height = 23
-    Top = 231
-    Width = 488
+    Top = 296
+    Width = 580
     Panels = <>
   end
+  object EditPathToAndroidSDK: TEdit
+    Left = 19
+    Height = 23
+    Top = 184
+    Width = 517
+    Anchors = [akTop, akLeft, akRight]
+    TabOrder = 6
+  end
+  object Label4: TLabel
+    Left = 18
+    Height = 15
+    Top = 169
+    Width = 146
+    Caption = '[New] Path to Android SDK:'
+    ParentColor = False
+  end
+  object SpeedButton4: TSpeedButton
+    Left = 546
+    Height = 22
+    Top = 185
+    Width = 23
+    Anchors = [akTop, akRight]
+    Caption = '...'
+    OnClick = SpeedButton4Click
+  end
   object SelectDirectoryDialog1: TSelectDirectoryDialog
-    left = 376
-    top = 128
+    left = 272
+    top = 120
   end
   object SelectDirectoryDialog2: TSelectDirectoryDialog
     left = 344
     top = 8
+  end
+  object SelectDirectoryDialog3: TSelectDirectoryDialog
+    left = 384
+    top = 176
   end
 end
