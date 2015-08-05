@@ -1,6 +1,5 @@
-[Eclipse Users]
 
-**Tutorial: Lamw: Lazarus Android Module Wizard  
+**Tutorial: Lamw: Lazarus Android Module Wizard
 
 	"Form Designer and Components development model! 		
 	A wizard to create JNI Android loadable module (.so) in Lazarus/Free Pascal using 
@@ -10,11 +9,11 @@
 		ref. http://forum.lazarus.freepascal.org/index.php/topic,21919.0.html
 
 
-Note 1:	Linux Users:	Please, go to lazandroidmodulewizard folder  "...\linux" 
+Note 1:	Linux Users:	Please, go to " lazandroidmodulewizard folder  "...\linux" 
 			and read: "new_how_to_install_by_renabor.txt"
 
 
-[I]. Infrastructure 
+[I]. Infrastructure
 
 
 .Java  sdk_x86 [32 bits]
@@ -37,7 +36,6 @@ Note 1:	Linux Users:	Please, go to lazandroidmodulewizard folder  "...\linux"
 .Ant [to build Apk]
 	http://ant.apache.org/bindownload.cgi 
 	Simply extract the zip file to a convenient location...
-
 
 .Eclipse is not mandatory!  [but to facilitate, all projects are Eclipse compatible!]  
 
@@ -99,25 +97,7 @@ Note 1:	Linux Users:	Please, go to lazandroidmodulewizard folder  "...\linux"
 
 [IV]. New "Lamw GUI" Project  //<<----- support to "Android Bridges" and "Android Bridges Extra" components ...
 
-
-	1. From Eclipse IDE: [create a "dummy" project] 
-
-        1.1. File -> New -> Android Application Project        
-	1.2. [Next]
-	1.3. [Next]
-	1.4. [Next]
-	1.5. On "Create Activity" Dialog select: <Blank Activity>   [Next]
-             
-		ref. Image: http://www.opendrive.com/files?Ml8zNjMwMDUwOF9pZm4xMQ
-          
-        1.6. On "Activity Name" Dialog enter: App  // <<--- WARNING:"App" name is MANDATORY! 
-
-		ref. Image: https://www.opendrive.com/files?Ml8zNjMwMDE0M19aZ2dkeA
-
-	[Finish]                                              
-       	1.7  Right click your recent "dummy" created project -> Close it!  
-
-	1.8 Lazarus IDE menu "Project" ---> New Project ---> JNI Android Module [Lamw GUI]
+	1.1 Lazarus IDE menu "Project" ---> New Project ---> JNI Android Module [Lamw GUI]
 
 		ref. image: https://jmpessoa.opendrive.com/files?Ml85OTEwMDQ3OV9BRW45VA
 
@@ -125,13 +105,15 @@ Note 1:	Linux Users:	Please, go to lazandroidmodulewizard folder  "...\linux"
 
 		ref. image: https://jmpessoa.opendrive.com/files?Ml85OTEwMDU1Nl9YVE5qUg
 
-          	-Path to Workspace ...[your eclipse workspace folder]
+          	-Path to Workspace ...yours main projects folder [like eclipse workspace]
 			
-			ex. C:\eclipse\workspace
+			ex. C:\android\ant\workspace
 
- 	        -Project Name: 	select your "dummy" project ...
+ 	        -Project Name: "GUIProject1	
 		
-		-Ant Package Preface Name  [not used by eclipse project]	                                             
+		-Ant Package Preface Name	                                             
+			
+			ex. "org.lamw"   --->>  final package name = "org.lamw.guiproject1"	  
 
 		-[Include] "android-support-v4.jar" [add support to "olds" 2.x android devices...]
 
@@ -204,114 +186,75 @@ Note 1:	Linux Users:	Please, go to lazandroidmodulewizard folder  "...\linux"
 
 	.No Support for "Android Bridges" components
      
-1. From Eclipse IDE: [create a "dummy" project] 
+1. Lazarus IDE menu "Project" ---> New Project ---> JNI Android Module [Lamw NoGUI]
 
-        1.1. File -> New -> Android Application Project    [ex. "NoGUIProject1"]     
-	1.2. [Next]
-	1.3. [Next]
-	1.4. [Next]
-	1.5. On "Create Activity" Dialog select: <Blank Activity>   [Next]
-             
-		ref. Image: http://www.opendrive.com/files?Ml8zNjMwMDUwOF9pZm4xMQ
-          
-        1.6. On "Activity Name" Dialog enter: App  // <<--- WARNING:"App" name is MANDATORY! 
-
-		ref. Image: https://www.opendrive.com/files?Ml8zNjMwMDE0M19aZ2dkeA
-
-
-	[Finish]                                              
-
-	1.7. From Eclipse IDE menu "File" --> New --> Class --> Name: NoGUIProject1 // <<--- WARNING: match/equal project  name here is MANDATORY! 
-
-	1.8. Results code:
-	-----------------------------------------------------------------------------
-	//"App.java"  [just for "demo" complete your code as here:]
-	public class App extends Activity {
-
-		AppNoGUIProject1 mAppNoGUIProjec1;  //just for demo...
-	
-		@Override
-		protected void onCreate(Bundle savedInstanceState) {
-            		super.onCreate(savedInstanceState);            
-	    		setContentView(R.layout.activity_app);
-
-			mAppNoGUIProjec1 = new  AppNoGUIProject1();           //just for demo...
-		 
-	    		int sum = mAppNoGUIProjec1.getSum(2,3);          //just for demo...
-	    		String  mens = mAppNoGUIProjec1.getString(1);    //just for demo...
-	    		
-        		Toast.makeText(getApplicationContext(), "Sum(2,3) = " + sum, Toast.LENGTH_SHORT).show();
-			Toast.makeText(getApplicationContext(), mens, Toast.LENGTH_SHORT).show(); 
-		}
-
-		@Override
-		public boolean onCreateOptionsMenu(Menu menu) {
-			// Inflate the menu; this adds items to the action bar if it is present.
-			getMenuInflater().inflate(R.menu.app, menu);
-			return true;
-		}
-	}	
-
-	--------------------------------------------------------------------------------------
-
-	//"AppNoGUIProject1.java"  [just for "demo" complete your code as here:]
-	public class AppNoGUIProject1 {
-	
-		public native String getString(int flag);
-		public native int getSum(int x, int y);
-	  	static {
-		  try {
-		      System.loadLibrary("appnoguiproject1");
-		  } catch(UnsatisfiedLinkError ule) {
-		      ule.printStackTrace();
-		  }
-	  	}
-	}
-	--------------------------------------------------------------------------------
-
-       	1.9  Right click your recent "dummy" created project -> Close it! 
-
-	1.10 Lazarus IDE menu "Project" ---> New Project ---> JNI Android Module [Lamw NoGUI]
- 
 		[Workspace Form]
 
 		ref. image:https://jmpessoa.opendrive.com/files?Ml85OTEwMDY0NF9oT0x4TQ
 
-          	-Path to Workspace ...[your eclipse workspace folder]
-			
-			ex. C:\eclipse\workspace
+          	-Path to Workspace ...yours main projects folder [like eclipse workspace]
 
- 	        -Project Name: 	select your "dummy" project. -->> "...\workspace\AppNoGUIProject1"
+			ex. C:\android\ant\workspace
+
+ 	        -Project Name: "NoGUIProject1	
 		
-		-Ant Package Preface Name  [not used by eclipse project]	                                             
+		-Ant Package Preface Name	                                            
+			
+			ex. org.lamw   ::warning: final package name = "org.lamw.noguiproject1"	  
 
-		-[Include] "android-support-v4.jar" [add support to "olds" 2.x android devices...]
+		-[Include] "android-support-v4.jar" [add support to "olds 2." android devices...]
 
 		-Plataform [Select]
 		-MinSdk [Select]
 		-TargetApi [Select] ...your [real] device api...
                                                   
 	        -Instructions [Select]
+		-Arm Fpu  [Select]
 
-			-Arm Fpu  [Select] <<---- just for Arm!!
-
-		OK!   // <<--------
-
-	1.11 Save all ...
+		OK!   //<<---------
 
 		[Project Form] :
 
 		ref. image: https://jmpessoa.opendrive.com/files?Ml85OTEwMDY2NF9mdGF6Vw
 
-		-----------------------------------------------------------------------
+		//HINT: You can change/edit "App.java" and "NoGUIProject1.java" 
+		//to accomplish/fill  yours requirements...
 
-		//"App.java"  [just for "demo" complete your code as here:]
+		-----------------------------------------------------------------------
+		/*App.java*/ 
+		public class App extends Activity {
+  
+   			NoGUIProject1 mNoGUIProject1;  //just for demo...
+  
+			@Override
+			protected void onCreate(Bundle savedInstanceState) {
+				.....
+				mNoGUIProject1 = new NoGUIProject1(); //just for demo...
+
+				int sum = mNoGUIProject1.getSum(2,3); //just for demo...
+ 				String mens = mNoGUIProject1.getString(1); //just for demo...
+				......				
+   			}
+		}	
 		------------------------------------------------------------------------
 
-		//"AppNoGUIProject1.java"  [just for "demo" complete your code as here:]
+		/*NoGUIProject1.java*/		
+		public class NoGUIProject1 {   // <<---your library java wrapper class! 
+
+			public native String getString(int flag);  //just for demo...
+			public native int getSum(int x, int y);    //just for demo...
+
+			static {
+				try {
+					System.loadLibrary("noguiproject1");  // <<------ load your Pascal library!!!
+				} catch(UnsatisfiedLinkError ule) {
+					ule.printStackTrace();
+				}
+			}
+		}    			
 		---------------------------------------------------------------------------
 
-		.[Generated!] Pascal library JNI [Methods] Interface  ---->> "noguiproject1.lpr"
+			.[Generated!] Pascal library JNI [Methods] Interface  ---->> "noguiproject1.lpr"
 
 			function getString(PEnv: PJNIEnv; this: JObject; flag: JInt): JString; cdecl;
 			begin
@@ -322,7 +265,6 @@ Note 1:	Linux Users:	Please, go to lazandroidmodulewizard folder  "...\linux"
 			begin
   				{your code....}
 			end;
-
 		---------------------------------------------------------------------------		
 
 		.OK! // <<-------------
@@ -350,7 +292,7 @@ Note 1:	Linux Users:	Please, go to lazandroidmodulewizard folder  "...\linux"
 
 3.  Lazarus IDE menu "Run" ---> "Build"    
 	
-		.Yes! You got it! ".so" was created! see project "..\libs\armeabi" folder...
+		.Yes! You got it! ".so" was created! see "..\libs\armeabi" folder...
 
         	.For multi build modes, please, read "readme.txt" in "..\jni\build-modes" folder 
 
@@ -375,23 +317,8 @@ Note 1:	Linux Users:	Please, go to lazandroidmodulewizard folder  "...\linux"
         		ex. MI 2 --> app settings --> about -->> MIUI Version -->> [tap,tap,tap,...]
 
 
-5. Build and Run Android Application [Eclipse]
+5.Lazarus IDE menu "Run" ---> "[Lamw] Build Apk and Run" [Congratulations!!!]
 
-        3.1.From Eclipse IDE
-
-          -double click your project //that is: open the project...
-
-          -right click your  project: -> Refresh (*)
-	
-          -right click your  project: -> Run as -> Android Application
-
-	
-	(*) Refresh do not refresh "AndroidManifest.xml" you need do it by hand!
-	SOLUTION [do it!]: simulates some change/edition of "AndroidManifest.xml" and save it!
-
-	------------------------------------------------------------------------------------------------------------
-	NOTE: Build and Run Android Application [Lazarus] --> Lazarus IDE menu "Run" ---> "[Lamw] Build Apk and Run"  
-	------------------------------------------------------------------------------------------------------------
 
 6.PANIC!!! Fail to buid "Apk"
 
@@ -418,6 +345,7 @@ Note 1:	Linux Users:	Please, go to lazandroidmodulewizard folder  "...\linux"
 
       		.change/edit project "build.xml"   according your system.. [notepad like editor]
 			<property name="sdk.dir" location="C:\adt32\sdk"/>
+
 
 Thanks to All!
 

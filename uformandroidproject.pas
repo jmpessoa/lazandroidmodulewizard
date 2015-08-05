@@ -802,7 +802,8 @@ begin
    SynMemo3.Lines.Clear;
 
    PageControl1.ActivePage:= TabSheet1;
-   Self.Caption:= Self.Caption+ ' <-> ' + Self.AndroidProjectName;
+
+   Self.Caption:= 'Lamw: Lazarus Android Module Wizard "NoGUI" Project';
 
    StatusBar1.Panels.Items[0].Text:= FFullJavaSrcPath;
 

@@ -1,6 +1,6 @@
+[readme_get_start.txt]
 
-
-Here is a  rapid "get_start" for windows: "Laz4Android + lazandroidmodulewizard"
+Here is a  rapid "get_start" for windows: "Laz4Android + Lazaru Azandroid Module Wizard"
 
 Note 1:	for Linux:  go to " lazandroidmodulewizard folder  "...\linux" 
 	and read: "new_how_to_install_by_renabor.txt"
@@ -12,24 +12,24 @@ I. Infrastructure
 .Android sdk, NDK-r10c
 
 .Laz4Android [All in one!] =
-	FPC: 3.1.1 trunk svn 29987 
-		--->>win32/arm-android/i386-android/jvm-android 
+	FPC: 3.1.1 trunk svn 31226 win32/arm-android/i386-android/jvm-android
+			--->>win32/arm-android/i386-android/jvm-android 
 			Note: required: NDK: r10c (arm-linux-androideabi-4.6 + x86-4.6)                               
-
-	Lazarus:1.5  trunk svn 47987 
-		http://sourceforge.net/projects/laz4android/files/?source=navbar :
-		To Install [*.7z], please, read the "Laz4Android_readme.txt"
+	Lazarus:1.5 trunk svn 49563
+			http://sourceforge.net/projects/laz4android/files/?source=navbar
+			:To Install [*.7z], please, read the "Laz4Android_readme.txt"
 
 .Android sdk
 
-.Android ndk-r10c   -  this version is required by "Laz4Android"  
-		http://dl.google.com/android/ndk/android-ndk-r10c-windows-x86.exe
+.Android ndk-r10c   - 	this version is required by "Laz4Android"  
+			http://dl.google.com/android/ndk/android-ndk-r10c-windows-x86.exe
 
 .Ant [to build Apk]
 	http://ant.apache.org/bindownload.cgi 
 	Simply extract the zip file to a convenient location...
 
 .Eclipse is not mandatory!  [but to  facility, the Demos projects are Eclipse compatible!]  
+
 
 II. LAMW:  Lazarus Android Module Wizard
 
@@ -41,13 +41,13 @@ II. LAMW:  Lazarus Android Module Wizard
 		lazandroidwizardpack.lpk
 		amw_ide_tools.lpk     [../ide-tools]
 
-	.USE.
+III. USE
 
-	1. Configure Paths:
+1. Configure Paths:
 
 	Lazarus IDE menu "Tools" ---> "[Lamw] Android Module Wizard" -->  "Path Settings ..."
 
-	2. New Project
+2. New Project
 
 	Lazarus IDE menu "Project" ---> New Project ---> JNI Android Module [Lamw GUI]
 
@@ -98,7 +98,7 @@ II. LAMW:  Lazarus Android Module Wizard
 		<property name="target"  value="android-17"/>
 
 
-8. How to configure a Demo to Use/Test:
+9. How to configure a Demo to Use/Test:
 
       .Lazarus IDE menu Open a [*.lpi] Demo Project   [...\jni]
 
@@ -111,12 +111,14 @@ II. LAMW:  Lazarus Android Module Wizard
 		<property name="sdk.dir" location="C:\adt32\sdk"/>
 
 
-9 There are some [olds] docs:   
+10. There are some others docs:   
 
-	"install_tutorial_ant_users.txt" 
+	"install_tutorial.txt" 
    		and
 	"install_tutorial_eclipse_users.txt"
 
 Thank you!
 
-J. M. Pessoa   [jmpessoa_hotmail_com]
+by jmpessoa at [josemarquespessoa_gmail_com]
+
+[updated: 04 august 2015]
