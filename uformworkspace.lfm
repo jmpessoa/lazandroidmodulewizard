@@ -977,18 +977,6 @@ object FormWorkspace: TFormWorkspace
       }
       OnClick = SpdBtnRefreshProjectNameClick
     end
-    object LabelSelectProjectName: TLabel
-      AnchorSideTop.Control = EditPathToWorkspace
-      AnchorSideTop.Side = asrBottom
-      Left = -4305
-      Height = 15
-      Top = 58
-      Width = 161
-      BorderSpacing.Left = 8
-      BorderSpacing.Top = 8
-      Caption = 'New Project Name  [or Select]:'
-      ParentColor = False
-    end
     object SpeedButton1: TSpeedButton
       Left = 327
       Height = 22
@@ -1032,6 +1020,18 @@ object FormWorkspace: TFormWorkspace
         FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00
       }
       OnClick = SpeedButton1Click
+    end
+    object LabelSelectProjectName: TLabel
+      AnchorSideTop.Control = EditPathToWorkspace
+      AnchorSideTop.Side = asrBottom
+      Left = 8
+      Height = 15
+      Top = 58
+      Width = 161
+      BorderSpacing.Left = 8
+      BorderSpacing.Top = 8
+      Caption = 'New Project Name  [or Select]:'
+      ParentColor = False
     end
   end
   object Panel2: TPanel

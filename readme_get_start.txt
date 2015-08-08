@@ -47,19 +47,50 @@ III. USE
 
 	Lazarus IDE menu "Tools" ---> "[Lamw] Android Module Wizard" -->  "Path Settings ..."
 
-2. New Project
+2. New Project [thanks to @Developing!]  	
 
-	Lazarus IDE menu "Project" ---> New Project ---> JNI Android Module [Lamw GUI]
+	After install "LAMW" packages:
 
-	Projects workspace [yours main projecs folder or eclipse workspace]:  ____________   
-   	Project Name: _____________ 
-   	etc....
+	2.1-From Lazarus IDE select "Project" -> "New Project" 
 
-	OK!
+	ref. https://jmpessoa.opendrive.com/files?Ml85OTEwMDQ3OV9BRW45VA
 
-	save all!
+	2.2-From displayed dialog  select "JNI Android Module [Lamw GUI]" 	
 
-	3. From "Android Bridge" component tab drag/drop a jTextView in jForm
+
+	2.3-Press OK Button.
+
+	2.4. From form "Android Module wizard: Configure Project..." [Workspace Form]
+
+		ref. https://jmpessoa.opendrive.com/files?Ml85OTEwMDU1Nl9YVE5qUg
+
+	2.4-Fill/complete the field:
+		"Path to workspace [project folder]"  
+		example c:\LamwProjects
+
+	2.5-Fill/complete the field:
+		"New Project Name  [or Selec
+		example: MyProject1
+		[This is your Android App/Apk name]
+
+	2.6-Select your Sdk [installed] Platform:
+		example: Jelly Bean 4.1
+
+	2.7-[MinSdk] Select the  min. Sdk Api to compile your project:
+		example: 15
+
+	2.8-[TagetApi] Select the target [api] device
+		example: 19
+
+	2.9-Select Instruction: 
+		example: ARMv6
+		
+        2.10. If Arm then Select Fpu:
+		example: Soft
+
+	2.11-Save All [unit1.pas] in path that is showed ...
+
+3. From "Android Bridge" component tab drag/drop a jTextView in jForm
 		set property: PosRelativeToParent  = [rpTop,rpCenterHorizontal]
 
 4. From "Android Bridge" component tab drag/drop a jButton     in jForm
