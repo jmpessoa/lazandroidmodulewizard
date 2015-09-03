@@ -5,8 +5,9 @@ unit ufrmEditor;
 interface
 
 uses
-  Classes, SysUtils, FileUtil, IniFiles, Forms, Controls, Graphics, Dialogs, StdCtrls,
-  ExtCtrls, ComCtrls, Buttons, IDEIntf, ProjectIntf, LazIDEIntf, LCLIntf, AndroidXMLResString;
+  Classes, SysUtils, LazFileUtils, IniFiles, Forms, Controls, Graphics, Dialogs,
+  StdCtrls, ExtCtrls, ComCtrls, Buttons, IDEIntf, ProjectIntf, LazIDEIntf,
+  LCLIntf, AndroidXMLResString;
 
 type
 

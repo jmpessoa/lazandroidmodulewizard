@@ -5,7 +5,7 @@ unit uformchangepathtondk;
 interface
 
 uses
-  Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, StdCtrls,
+  Classes, SysUtils, LazFileUtils, Forms, Controls, Graphics, Dialogs, StdCtrls,
   Buttons, IniFiles, IDEIntf, ProjectIntf, LazIDEIntf, LCLIntf, ComCtrls;
 
 type

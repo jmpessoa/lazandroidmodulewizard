@@ -138,7 +138,7 @@ resourcestring
 
 implementation
 
-uses IniFiles, laz2_Dom, laz2_XMLWrite, laz2_XMLRead;
+uses IniFiles, laz2_Dom, laz2_XMLWrite, laz2_XMLRead, LazFileUtils;
 
 {$R *.lfm}
 

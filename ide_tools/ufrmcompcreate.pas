@@ -102,6 +102,8 @@ var
 
 implementation
 
+uses LazFileUtils;
+
 {$R *.lfm}
 
 procedure TFrmCompCreate.TryInsertJavaCreate(txt: string);

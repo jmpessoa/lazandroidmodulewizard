@@ -5,7 +5,7 @@ unit uformupdatecodetemplate;
 interface
 
 uses
-  Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, ComCtrls,
+  Classes, SysUtils, LazFileUtils, Forms, Controls, Graphics, Dialogs, ComCtrls,
   StdCtrls, Buttons, IDEIntf, ProjectIntf, LazIDEIntf, MacroIntf, LCLIntf,
   ExtCtrls, IniFiles, ThreadProcess, Clipbrd;
 

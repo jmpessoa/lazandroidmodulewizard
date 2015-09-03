@@ -5,7 +5,7 @@ unit AndroidManifestEditor;
 interface
 
 uses
-  Classes, SysUtils, FileUtil, laz2_XMLRead, Laz2_DOM, AvgLvlTree,
+  Classes, SysUtils, LazFileUtils, laz2_XMLRead, Laz2_DOM, AvgLvlTree,
   IDEOptionsIntf, ProjectIntf, Forms, Controls, Dialogs, Grids, StdCtrls,
   LResources, ExtCtrls, Spin;
 

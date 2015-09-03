@@ -37,7 +37,7 @@ implementation
 
 uses IDEExternToolIntf, LazIDEIntf, LazFileUtils, UTF8Process, Controls,
   EditBtn, StdCtrls, ButtonPanel, Dialogs, uFormStartEmulator, IniFiles,
-  process, strutils, laz2_XMLRead, Laz2_DOM, FileUtil, laz2_XMLWrite;
+  process, strutils, laz2_XMLRead, Laz2_DOM, laz2_XMLWrite;
 
 function QueryPath(APrompt: string; out Path: string;
   ACaption: string = 'Android Wizard: Path Missing!'): Boolean;
