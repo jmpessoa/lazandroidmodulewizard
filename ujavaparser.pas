@@ -48,8 +48,6 @@ type
 
 implementation
 
-uses strutils;
-
 type
 
   { TNativeMetodDesc }
@@ -275,7 +273,7 @@ begin
   FPascalJNI.Add('     curEnv:= PJNIEnv(PEnv);');
   FPascalJNI.Add('     RegisterNativeMethods(curEnv, ''' + str + ''');');
   FPascalJNI.Add('  end;');
-  FPascalJNI.Add('  gVM:= VM;{And_jni_Bridge}');
+  FPascalJNI.Add('  gVM:= VM; {AndroidWidget.pas}');
   FPascalJNI.Add('end;');
   FPascalJNI.Add('');
   FPascalJNI.Add('procedure JNI_OnUnload(VM: PJavaVM; reserved: pointer); cdecl;');
@@ -289,8 +287,8 @@ begin
   FPascalJNI.Add('  begin');
   FPascalJNI.Add('    curEnv:= PJNIEnv(PEnv);');
   FPascalJNI.Add('    (curEnv^).DeleteGlobalRef(curEnv, gjClass);');
-  FPascalJNI.Add('    gjClass:= nil;');
-  FPascalJNI.Add('    gVM:= nil;');
+  FPascalJNI.Add('    gjClass:= nil; {AndroidWidget.pas}');
+  FPascalJNI.Add('    gVM:= nil; {AndroidWidget.pas}');
   FPascalJNI.Add('  end;');
   FPascalJNI.Add('  gApp.Terminate;');
   FPascalJNI.Add('  FreeAndNil(gApp);');
