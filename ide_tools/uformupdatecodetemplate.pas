@@ -54,7 +54,6 @@ type
     JNIDecoratedMethodName: string;
     JavaClassName: string;  //"Controls"
 
-    CmdShell: string;
     APKProcess: TThreadProcess;
 
     procedure GetImportsList;
@@ -104,17 +103,19 @@ procedure TFormUpdateCodeTemplate.FormClose(Sender: TObject;
 var
   AmwFile: string;
 begin
-   AmwFile:= AppendPathDelim(LazarusIDE.GetPrimaryConfigPath) + 'JNIAndroidProject.ini';
-   with TInifile.Create(AmwFile) do
-   try
-      WriteString('NewProject', 'FullProjectName', ProjectPath);
-      WriteString('NewProject', 'PathToWorkspace', PathToWorkspace);
-   finally
-      Free;
-   end;
+  AmwFile:= AppendPathDelim(LazarusIDE.GetPrimaryConfigPath) + 'JNIAndroidProject.ini';
+  with TInifile.Create(AmwFile) do
+  try
+    WriteString('NewProject', 'FullProjectName', ProjectPath);
+    WriteString('NewProject', 'PathToWorkspace', PathToWorkspace);
+  finally
+    Free;
+  end;
 
   if Assigned(APKProcess) then
     if not APKProcess.IsTerminated then APKProcess.Terminate;
+
+  CloseAction := caFree;
 end;
 
 procedure TFormUpdateCodeTemplate.ShowProcOutput(AOutput: TStrings);
@@ -171,10 +172,20 @@ var
 begin
   MemoLog.Clear;
 
-  if ProjectPath = '' then
+  if (ProjectPath = '') or (JNIProjectPath = '') then
   begin
      ShowMessage('Fail! Please, select a Project!');
+     ModalResult := mrNone;
      Exit;
+  end;
+
+  if not FileExistsUTF8(PathToJavaTemplates + PathDelim + 'App.java')
+  or not FileExistsUTF8(PathToJavaTemplates + PathDelim + 'Controls.java')
+  then begin
+    MessageDlg('Fail! Incorrect path to Java templates!' + sLineBreak
+      + 'Can not find "App.java" or "Controls.java" in "' + PathToJavaTemplates + '"',
+      mtError, [mbOk], 0);
+    Exit;
   end;
 
   packList:= TstringList.Create;
@@ -294,7 +305,7 @@ procedure TFormUpdateCodeTemplate.ComboBoxSelectProjectChange(Sender: TObject);
 begin
   if ComboBoxSelectProject.ItemIndex > -1 then
   begin
-    ProjectPath:= ComboBoxSelectProject.Items.Strings[ComboBoxSelectProject.ItemIndex];
+    ProjectPath:= ComboBoxSelectProject.Text;
     JNIProjectPath:= ProjectPath + DirectorySeparator + 'jni';
     StatusBar1.SimpleText:= ProjectPath;
   end;
@@ -305,14 +316,6 @@ procedure TFormUpdateCodeTemplate.FormCreate(Sender: TObject);
 var
   AmwFile: string;
 begin
-
-  {$IFDEF WINDOWS}
-    CmdShell:= 'cmd /c ';
-  {$ENDIF}
-  {$IFDEF LINUX}
-    CmdShell:= 'sh -c ';
-  {$ENDIF}
-
   MemoLog:= TStringList.Create;
 
   JavaClassName:= 'Controls';

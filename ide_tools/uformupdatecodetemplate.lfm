@@ -14,13 +14,13 @@ object FormUpdateCodeTemplate: TFormUpdateCodeTemplate
   OnDestroy = FormDestroy
   OnShow = FormShow
   Position = poScreenCenter
-  LCLVersion = '1.3'
+  LCLVersion = '1.5'
   object StatusBar1: TStatusBar
     AnchorSideTop.Control = BitBtnOK
     AnchorSideTop.Side = asrBottom
     Left = 0
-    Height = 26
-    Top = 218
+    Height = 34
+    Top = 210
     Width = 498
     Anchors = [akTop, akLeft, akRight, akBottom]
     Panels = <>
@@ -31,8 +31,8 @@ object FormUpdateCodeTemplate: TFormUpdateCodeTemplate
     AnchorSideTop.Side = asrBottom
     AnchorSideRight.Control = SpBPathToWorkspace
     Left = 8
-    Height = 23
-    Top = 31
+    Height = 21
+    Top = 29
     Width = 451
     Anchors = [akTop, akLeft, akRight]
     BorderSpacing.Around = 8
@@ -45,7 +45,7 @@ object FormUpdateCodeTemplate: TFormUpdateCodeTemplate
     AnchorSideRight.Side = asrBottom
     Left = 467
     Height = 22
-    Top = 31
+    Top = 28
     Width = 23
     Anchors = [akTop, akRight]
     BorderSpacing.Around = 8
@@ -58,12 +58,12 @@ object FormUpdateCodeTemplate: TFormUpdateCodeTemplate
     AnchorSideTop.Side = asrBottom
     AnchorSideRight.Control = SpBSelectProject
     Left = 8
-    Height = 23
-    Top = 85
+    Height = 21
+    Top = 79
     Width = 451
     Anchors = [akTop, akLeft, akRight]
     BorderSpacing.Around = 8
-    ItemHeight = 15
+    ItemHeight = 13
     OnChange = ComboBoxSelectProjectChange
     TabOrder = 2
   end
@@ -74,7 +74,7 @@ object FormUpdateCodeTemplate: TFormUpdateCodeTemplate
     AnchorSideRight.Side = asrBottom
     Left = 467
     Height = 22
-    Top = 85
+    Top = 78
     Width = 23
     Anchors = [akTop, akRight]
     BorderSpacing.Around = 8
@@ -123,7 +123,7 @@ object FormUpdateCodeTemplate: TFormUpdateCodeTemplate
     AnchorSideRight.Control = BitBtnClose
     Left = 8
     Height = 30
-    Top = 180
+    Top = 172
     Width = 212
     Anchors = [akTop, akLeft, akRight]
     BorderSpacing.Around = 8
@@ -141,7 +141,7 @@ object FormUpdateCodeTemplate: TFormUpdateCodeTemplate
     AnchorSideRight.Side = asrBottom
     Left = 228
     Height = 30
-    Top = 180
+    Top = 172
     Width = 262
     Anchors = [akTop, akLeft, akRight]
     BorderSpacing.Around = 8
@@ -158,7 +158,7 @@ object FormUpdateCodeTemplate: TFormUpdateCodeTemplate
     AnchorSideRight.Side = asrBottom
     Left = 8
     Height = 56
-    Top = 116
+    Top = 108
     Width = 482
     Anchors = [akTop, akLeft, akRight]
     AutoFill = True
@@ -172,7 +172,7 @@ object FormUpdateCodeTemplate: TFormUpdateCodeTemplate
     ChildSizing.ShrinkVertical = crsScaleChilds
     ChildSizing.Layout = cclLeftToRightThenTopToBottom
     ChildSizing.ControlsPerLine = 3
-    ClientHeight = 36
+    ClientHeight = 38
     ClientWidth = 478
     Columns = 3
     Items.Strings = (
@@ -189,9 +189,9 @@ object FormUpdateCodeTemplate: TFormUpdateCodeTemplate
     AnchorSideLeft.Control = Owner
     AnchorSideTop.Control = Owner
     Left = 8
-    Height = 15
+    Height = 13
     Top = 8
-    Width = 189
+    Width = 176
     BorderSpacing.Around = 8
     Caption = 'Path to [projects folder] Workspace:'
     ParentColor = False
@@ -201,9 +201,9 @@ object FormUpdateCodeTemplate: TFormUpdateCodeTemplate
     AnchorSideTop.Control = EditPathToWorkspace
     AnchorSideTop.Side = asrBottom
     Left = 8
-    Height = 15
-    Top = 62
-    Width = 74
+    Height = 13
+    Top = 58
+    Width = 70
     BorderSpacing.Around = 8
     Caption = 'Select Project:'
     ParentColor = False
