@@ -5,19 +5,18 @@ unit uformsettingspaths;
 interface
 
 uses
-  inifiles, Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs,
-  StdCtrls, Buttons, ExtCtrls, ComCtrls, LazIDEIntf;
+  Classes, SysUtils, LazFileUtils, Forms, Controls, Graphics, Dialogs,
+  StdCtrls, Buttons, ExtCtrls, ButtonPanel, LazIDEIntf, IniFiles;
 
 type
 
   { TFormSettingsPaths }
 
   TFormSettingsPaths  = class(TForm)
-    BitBtnOK: TBitBtn;
     BevelSimonsayzTemplateLazBuildAndButtons: TBevel;
     BevelSDKNDKAndSimonsayzTemplateLazBuild: TBevel;
     BevelJDKAntAndSDKNDK: TBevel;
-    BitBtnCancel: TBitBtn;
+    ButtonPanel1: TButtonPanel;
     EditPathToAndroidNDK: TEdit;
     EditPathToSimonsayzTemplate: TEdit;
     EditPathToJavaJDK: TEdit;
@@ -40,8 +39,6 @@ type
     SpBPathToJavaJDK: TSpeedButton;
     SpBPathToAndroidSDK: TSpeedButton;
     SpBPathToAntBinary: TSpeedButton;
-    procedure BitBtnOKClick(Sender: TObject);
-    procedure BitBtnCancelClick(Sender: TObject);
     procedure FormActivate(Sender: TObject);
     procedure FormClose(Sender: TObject; var CloseAction: TCloseAction);
     procedure FormShow(Sender: TObject);
@@ -61,7 +58,6 @@ type
     FPrebuildOSYS: string;
   public
     { public declarations }
-    FOk: boolean;
     procedure LoadSettings(const fileName: string);
     procedure SaveSettings(const fileName: string);
   end;
@@ -77,32 +73,19 @@ implementation
 
 procedure TFormSettingsPaths.FormClose(Sender: TObject; var CloseAction: TCloseAction);
 begin
-  if FOk then
-    Self.SaveSettings( AppendPathDelim(LazarusIDE.GetPrimaryConfigPath) + 'JNIAndroidProject.ini' );
+  if ModalResult = mrOK then
+    Self.SaveSettings(AppendPathDelim(LazarusIDE.GetPrimaryConfigPath) + 'JNIAndroidProject.ini');
+  CloseAction := caFree;
 end;
-
 
 procedure TFormSettingsPaths.FormShow(Sender: TObject);
 begin
-   FOk:= False;
    Self.LoadSettings(AppendPathDelim(LazarusIDE.GetPrimaryConfigPath) + 'JNIAndroidProject.ini');
 end;
 
 procedure TFormSettingsPaths.FormActivate(Sender: TObject);
 begin
   EditPathToJavaJDK.SetFocus;
-end;
-
-procedure TFormSettingsPaths.BitBtnCancelClick(Sender: TObject);
-begin
-  FOk:= False;
-  Close;
-end;
-
-procedure TFormSettingsPaths.BitBtnOKClick(Sender: TObject);
-begin
-   FOk:= True;
-   Close;
 end;
 
 procedure TFormSettingsPaths.SpBPathToAndroidNDKClick(Sender: TObject);
