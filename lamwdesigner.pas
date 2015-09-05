@@ -1160,15 +1160,9 @@ begin
   begin
     if Assigned(Parent) then
     begin
-      if LayoutParamWidth = lpMatchParent then
-        FnewW := Parent.Width - MarginLeft - MarginRight
-      else
-      if LayoutParamWidth <> lpWrapContent then
+      if not (LayoutParamWidth in [lpWrapContent, lpMatchParent]) then
         FnewW := GetLayoutParamsByParent(Parent, LayoutParamWidth, sdW);
-      if LayoutParamHeight = lpMatchParent then
-        FnewH := Parent.Height - MarginTop - MarginBottom
-      else
-      if LayoutParamHeight <> lpWrapContent then
+      if not (LayoutParamHeight in [lpWrapContent, lpMatchParent]) then
         FnewH := GetLayoutParamsByParent(Parent, LayoutParamHeight, sdH);
       if FnewW < FminW then FnewW := FminW;
       if FnewH < FminH then FnewH := FminH;
@@ -1223,6 +1217,13 @@ begin
       if raToEndOf in PosRelativeToAnchor then
         FnewL := Anchor.Left + Anchor.Width + Anchor.MarginRight + MarginLeft;
       { TODO: other combinations }
+    end;
+    if Assigned(Parent) then
+    begin
+      if LayoutParamWidth = lpMatchParent then
+        FnewW := Parent.Width - MarginLeft - FnewL - MarginRight;
+      if LayoutParamHeight = lpMatchParent then
+        FnewH := Parent.Height - MarginTop - FnewT - MarginBottom;
     end;
     SetBounds(FnewL, FnewT, FnewW, FnewH);
   end;
