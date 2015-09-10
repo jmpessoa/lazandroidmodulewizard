@@ -605,7 +605,7 @@ begin
   for i := 0 to TPropertyEditor(Sender).PropCount - 1 do
   begin
     Instance := TPropertyEditor(Sender).GetComponent(i);
-    if (Instance is jVisualControl)
+    if (Instance = AndroidForm) or (Instance is jVisualControl)
     and (jVisualControl(Instance).Owner = AndroidForm) then
     begin
       InvalidateNeeded := True;
