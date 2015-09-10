@@ -444,11 +444,11 @@ begin
     if ChildCount > 0 then
     begin
       with Children[0] do
-        maxH := Top + Height;
+        maxH := Top + Height + MarginBottom;
       for i := 1 to ChildCount - 1 do
         with Children[i] do
         begin
-          t := Top + Height;
+          t := Top + Height + MarginBottom;
           if t > maxH then maxH := t;
         end;
       FnewH := maxH;
