@@ -126,7 +126,7 @@ begin
   if jListView1.IsItemChecked(itemIndex) then strCheck:= 'checked!'
   else strCheck:= 'not checked!';
 
-  ShowMessage(IntToStr(itemIndex)+ ' ['+ jListView1.GetText(itemIndex)+ '] :'+ strCheck);
+  ShowMessage(IntToStr(itemIndex)+ ' ['+ jListView1.GetItemText(itemIndex)+ '] :'+ strCheck);
 end;
 
 procedure TAndroidModule6.jListView1ClickWidgetItem(Sender: TObject; Item: integer; checked: boolean);
