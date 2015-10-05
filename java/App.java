@@ -118,12 +118,28 @@ public class App extends Activity {
     }
 
    /*by jmpessoa: Handles menu item selections */
-   @Override
+/*	@Override
    public boolean onOptionsItemSelected(MenuItem item) {
       String caption = item.getTitle().toString();
       controls.jAppOnClickOptionMenuItem(item, item.getItemId(), caption, item.isChecked());
       return false;
    }
+*/
+// http://stackoverflow.com/questions/15686555/display-back-button-on-action-bar
+@Override
+public boolean onOptionsItemSelected(MenuItem item) {
+    switch (item.getItemId()) {
+        case android.R.id.home:
+            // app icon in action bar clicked; go home
+	    controls.jAppOnBackPressed();
+            return true;
+        default:
+		String caption = item.getTitle().toString();
+		controls.jAppOnClickOptionMenuItem(item, item.getItemId(), caption,
+				item.isChecked());
+		return true; //renabor
+    }
+}
 
  //by jmpessoa: context menu support -  Context menu items do not support icons!
    @Override    
@@ -138,7 +154,7 @@ public class App extends Activity {
    public boolean onContextItemSelected(MenuItem item) {
    	  String caption = item.getTitle().toString();
    	  controls.jAppOnClickContextMenuItem(item, item.getItemId(), caption, item.isChecked());
-      return false;
+      return true; // stop propagating event
    }
 
    //by jmpessoa: option menu support

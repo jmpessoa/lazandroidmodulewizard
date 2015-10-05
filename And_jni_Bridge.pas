@@ -920,6 +920,11 @@ function jSqliteDataAccess_CheckDataBaseExists(env:PJNIEnv;  SqliteDataBase: jOb
 Procedure jSqliteDataAccess_ExecSQL(env:PJNIEnv; SqliteDataBase: jObject; execQuery: string);
 
 Procedure jSqliteDataAccess_OpenOrCreate(env:PJNIEnv; SqliteDataBase: jObject; dataBaseName: string);
+
+Procedure jSqliteDataAccess_SetVersion(env:PJNIEnv; SqliteDataBase: jObject; version:integer ); // renabor
+function jSqliteDataAccess_GetVersion(env:PJNIEnv; SqliteDataBase: jObject):integer; // renabor
+
+
 Procedure jSqliteDataAccess_AddTableName(env:PJNIEnv; SqliteDataBase: jObject; tableName: string);
 
 Procedure jSqliteDataAccess_AddCreateTableQuery(env:PJNIEnv; SqliteDataBase: jObject; createTableQuery: string);
@@ -7008,6 +7013,30 @@ begin
   method:= env^.GetMethodID(env, cls, 'OpenOrCreate', '(Ljava/lang/String;)V');
   env^.CallVoidMethodA(env, SqliteDataBase, method,@_jParams);
   env^.DeleteLocalRef(env,_jParams[0].l);
+  env^.DeleteLocalRef(env, cls);
+end;
+
+Procedure jSqliteDataAccess_SetVersion(env:PJNIEnv; SqliteDataBase: jObject; version:integer ); // renabor
+var
+ _jMethod : jMethodID = nil;
+ cls: jClass;
+ _lparam: array[0..0] of jValue;
+begin
+ _lparam[0].i := version;
+ cls := env^.GetObjectClass(env, SqliteDataBase);
+ _jMethod:= env^.GetMethodID(env, cls, 'SetVersion', '(I)V');
+ env^.CallVoidMethodA(env,SqliteDataBase,_jMethod, @_lparam);
+ env^.DeleteLocalRef(env, cls);
+end;
+
+function jSqliteDataAccess_GetVersion(env:PJNIEnv; SqliteDataBase: jObject):integer; // renabor
+var
+ _jMethod : jMethodID = nil;
+ cls: jClass;
+begin
+ cls := env^.GetObjectClass(env, SqliteDataBase);
+  _jMethod:= env^.GetMethodID(env, cls, 'GetVersion', '()I');
+ Result := env^.CallIntMethod(env,SqliteDataBase,_jMethod);
   env^.DeleteLocalRef(env, cls);
 end;
 

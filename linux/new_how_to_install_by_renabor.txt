@@ -1,64 +1,147 @@
+How to install LAMW on Linux.
 
-[@renabor]
-Here my modified version for installing fpc, lazarus and lazandroidmodulewizardwith on Ubuntu 14.04 64 bit:
+################
+Befor you begin
+################
 
-ref: http://forum.lazarus.freepascal.org/index.php/topic,21919.msg168526.html#msg168526
+Replace x86_64 with i386 if your Linux distribution is not 64 bit. 
+Replace $HOME with your username !!! 
+Take note that fpc version for compiling the trunk version (3.1.1) is 2.6.4.
+You can download the correct version from here:
+http://packages.ubuntu.com/vivid/fpc-2.6.4
 
------------------
-install some necessary stuff:
-sudo apt-get install adb ant fp-compiler openjdk-7-jdk
-mkdir ~/Android
-cd ~/Android
-_Get Android SDK and NDK.
-_Create a simbolic link (ln -s) to your sdk/ndk folder (~/Android -> /your/folder/ (ndk and sdk))
-_Add to your ~/.bashrc:
-export PATH=$PATH:~/Android/ndk/toolchains/arm-linux-androideabi-4.6/prebuilt/linux-x86_64/bin
-_Download with svn
-svn co http://svn.freepascal.org/svn/lazarus/branches/trunk/
-svn co http://svn.freepascal.org/svn/fpc/branches/trunk/
-###  ###
+################
+install some necessary programs:
+################
+
+(CMD) sudo apt-get install android-tools-adb ant fp-compiler openjdk-7-jdk subversion freeglut3 freeglut3-dev
+(CMD) sudo apt-get install libgtk2-gladexml-perl libgtk2.0-bin libgtk2.0-cil libwxgtk2.8-0 
+
+################
+initial setup
+################
+
+(CMD) mkdir ~/Android
+(CMD) cd ~/Android
+
+################
+install Android NDK
+################
+
+Download Android NDK from https://developer.android.com/ndk/downloads/index.html#download 
+follow instruction to install it
+
+create a symbolic link for later use
+
+(CMD) ln -s /home/$HOME/Android/android-ndk-r10e /home/$HOME/Android/ndk
+
+################
+create symbolic link for linker
+################
+
+(CMD) cd /usr/bin
+(CMD) sudo ln -s /home/$HOME/Android/ndk/toolchains/arm-linux-androideabi-4.8/prebuilt/linux-x86_64/bin/arm-linux-androideabi-as arm-linux-androideabi-as
+(CMD) sudo ln -s /home/$HOME/Android/ndk/toolchains/arm-linux-androideabi-4.8/prebuilt/linux-x86_64/bin/arm-linux-androideabi-ld.bfd arm-linux-androideabi-ld
+(CMD) sudo ln -s /usr/bin/arm-linux-androideabi-as arm-linux-as
+(CMD) sudo ln -s /usr/bin/arm-linux-androideabi-ld arm-linux-ld
+
+################
+install Android Sdk
+################
+
+Download Android Sdk from https://developer.android.com/sdk/index.html#Other (SDK Tools Only)
+and extract it 
+
+(CMD) tar xzvf android-sdk_r24.3.4-linux.tgz
+
+create a symbolik link for later use
+
+(CMD) ln -s /home/$HOME/Android/android-sdk-linux /home/$HOME/Android/sdk
+
+################
+install SDK packages
+################
+
+Follow these instructions
+https://developer.android.com/sdk/installing/adding-packages.html
+
+and install SDK packages
+(CMD) ~/Android/sdk/tools/android sdk
+
+################
+modify your PATH
+################
+
+Add to your ~/.bashrc:
+export PATH=$PATH:~/Android/ndk/toolchains/arm-linux-androideabi-4.8/prebuilt/linux-x86_64/bin
+
+################
+download FPC and LAZARUS
+################
+
+svn co -r 49563 http://svn.freepascal.org/svn/lazarus/trunk lazarus
+svn co -r 31226 http://svn.freepascal.org/svn/fpc/trunk fpc
+
+################
+install other needed packages
+################
 (ref.: http://wiki.freepascal.org/How_to_setup_a_FPC_and_Lazarus_Ubuntu_repository)
-sudo apt-get install libgtk2.0-dev, libgdk-pixbuf2.0-dev, libgpm-dev, fakeroot, libncurses5-dev, libtinfo-dev
+sudo apt-get install libgtk2.0-dev libgdk-pixbuf2.0-dev libgpm-dev fakeroot libncurses5-dev libtinfo-dev
 
-- BUILD FPC.DEB AND FPC-SRC.DEB
-ENTER the directory: 
-cd ~/Android/lazarus/tools/install 
-EXECUTE:
-./create_fpc_deb.sh fpc /home/user/Android/fpc/
+################
+BUILD FPC.DEB AND FPC-SRC.DEB
+################
+
+(CMD) cd ~/Android/lazarus/tools/install 
+(CMD) ./create_fpc_deb.sh fpc /home/$HOME/Android/fpc/
+(CMD) ./create_fpc_deb.sh fpc-src /home/$HOME/Android/fpc/
+
+################
+purge fpc from system 
+################
+
 REMOVE all fpc deb and fp_ deb (fpc, fpc-src, fp_compiler and so on)
-sudo dpkg --remove fpc* fp-*
-INSTALL the new fpc package: 
-sudo dpkg -i ./fpc_3.1.1-150130_amd64.deb
-CREATE fpc-src:
-./create_fpc_deb.sh fpc-src //home/user/Android/fpc/
-INSTALL fpc_src:
-sudo dpkg -i fpc-src_3.1.1-150130_amd64.deb
+(EX) sudo dpkg --remove fpc* fp-*
 
-- BUILD LAZARUS.DEB
-./create_lazarus_deb.sh append-revision
-REMOVE all lazarus deb
-sudo dpkg --remove lazarus* lcl-* lcl
-INSTALL the new lazarus package:
-sudo dpkg -i lazarus_1.5.47565-0_amd64.deb
+################
+INSTALL the new trunk fpc package
+################
 
-### ###
-- BUILD THE CROSS COMPILER
+(CMD) sudo dpkg -i fpc_3.1.1-150830_amd64.deb
+(CMD) sudo dpkg -i fpc-src_3.1.1-150830_amd64.deb
+
+################
+BUILD LAZARUS.DEB AND INSTALL IT
+################
+
+(CMD) cd ~/Android/lazarus/tools/install
+(CMD) ln -s `which fpcres`
+(CMD) ./create_lazarus_deb.sh append-revision
+(CMD) sudo dpkg -i lazarus_1.5.49563-0_amd64.deb
+
+################
+BUILD THE CROSS COMPILER
+################
+
+cd ~/Android/fpc
 make clean crossall OS_TARGET=android CPU_TARGET=arm
 sudo make crossinstall OS_TARGET=android CPU_TARGET=arm INSTALL_PREFIX=/usr
-_create simbolic link:
-cd /usr/bin
-sudo ln -s /usr/lib/fpc/3.1.1/ppcrossarm .
-sudo ln -s /usr/bin/ppcrossarm ppcarm
-sudo ln -s ~/Android/ndk/toolchains/arm-linux-androideabi-4.6/prebuilt/linux-x86_64/bin/arm-linux-androideabi-as 
-sudo ln -s ~/Android/ndk/toolchains/arm-linux-androideabi-4.6/prebuilt/linux-x86_64/bin/arm-linux-androideabi-ld.bfd /usr/bin/arm-linux-androideabi-ld
-ln -s /usr/bin/arm-linux-androideabi-as /usr/bin/arm-linux-as
-ln -s /usr/bin/arm-linux-androideabi-ld /usr/bin/arm-linux-ld
-########## compile dummylibs
-cd ~/Android/lazandroidmodulewizard/linux/dummylibs
-ln -s /home/renabor/Android/lazandroidmodulewizard/linux/dummylibs/libglesv1_cm.so libGLESv1_CM.so 
-ln -s /home/renabor/Android/lazandroidmodulewizard/linux/dummylibs/libglesv2.so libGLESv2.so
 
-_Add lines below to /etc/fpc.cfg
+################
+create symbolic link for newly created arm compiler
+################
+
+(CMD) cd /usr/bin
+(CMD) sudo ln -s /usr/lib/fpc/3.1.1/ppcrossarm .
+(CMD) sudo ln -s /usr/bin/ppcrossarm ppcarm
+
+
+
+################
+update /etc/fpc.cfg
+################
+Add these lines to /etc/fpc.cfg
+
 #IFDEF ANDROID
 #IFDEF CPUARM
 -Fu/usr/lib/fpc/$fpcversion/units/$fpctarget
@@ -67,80 +150,110 @@ _Add lines below to /etc/fpc.cfg
 #ENDIF
 #ENDIF
 
+################
+install LAMW
+################
 
-Now follow the instructions in: install_tutorial_ant_users.txt
-                        1. From Lazarus IDE - Install Wizard Packages
+(CMD) svn co https://github.com/jmpessoa/lazandroidmodulewizard.git
+(CMD) ln -s /home/$HOME/Android/svn-lazandroidmodulewizard/trunk /home/$HOME/Android/lazandroidmodulewizard
+( for further updating: cd /home/$HOME/Android/svn-lazandroidmodulewizard/ && svn up )
 
-                        1.1 Package -> Open Package -> "tfpandroidbridge_pack.lpk"  [Android Components Bridges!]
-                                Ref. image: https://www.opendrive.com/files?Ml8zNjMwNDQ3NF83SzhsZg
+################
+Install LAMW on Lazarus 
+################
 
-                        1.1.1 From Package Wizard
+1. From Lazarus IDE - Install Wizard Packages
+  1.1 Package -> Open Package -> "tfpandroidbridge_pack.lpk"  [Android Components Bridges!]
+     1.1.1 From Package Wizard
                                 - Compile
                                 - Use -> Install
-                        1.2 Package -> Open Package -> "lazandroidwizardpack.lpk"
-                        1.2.1 From Package Wizard
+  1.2 Package -> Open Package -> "lazandroidwizardpack.lpk"
+     1.2.1 From Package Wizard
+                                - Compile
+                                - Use -> Install
+  1.3 Package -> Open Package -> "amw_ide_tools.lpk"  [folder: ..\LazAndroidWizard\ide_tools]
+     1.3.1 From Package Wizard
                                 - Compile
                                 - Use -> Install
 
-                        1.3 Package -> Open Package -> "amw_ide_tools.lpk"  [folder: ..\LazAndroidWizard\ide_tools]
-                        1.3.1 From Package Wizard
-                                - Compile
-                                - Use -> Install
-                                ref. https://jmpessoa.opendrive.com/files?Ml82Nzg4MzAyNF9leGVIVg
+2. From Lazarus IDE menu Tools -->> "Android Module Wizard" --> Paths Settings"
+  update paths settings according to your system
+(ref. https://jmpessoa.opendrive.com/files?Ml82Nzg4MzA1OF9yVVU3RA)
 
-        1. From Lazarus IDE menu Tools -->> "Android Module Wizard" --> Paths Settings"
+     -Path to Java JDK (ex. /usr/lib/jvm/java-7-openjdk-amd64)
+     -Path to Android SDK( ex. /home/$HOME/Android/sdk)
+     -Path to Ant bin (ex. /usr/bin)
+     -Select Ndk version: [10]
+     -Path to Ndk (ex.  /home/$HOME/Android/android-ndk-r10e)
+     -Path to Java Resources  [Simonsayz's Controls.java,  *.xml and default Icons]: (ex. /home/$HOME/Android/svn-lazandroidmodulewizard/trunk/java)
 
-                ref. https://jmpessoa.opendrive.com/files?Ml82Nzg4MzA1OF9yVVU3RA
+################
+BUILD YOUR FIRST PROJECT
+################
 
-                -Path to Java JDK
-
-                  ex. /usr/lib/jvm/java-7-openjdk-amd64
-
-                -Path to Android SDK
-
-                  ex. /home/renabor/Android/Sdk
-
-                -Select Ndk version: [10]
-
-                -Path to Ndk
-
-                  ex.  /home/renabor/Android/android-ndk-r10d
-
-                -Path to Java Resources  [Simonsayz's Controls.java,  *.xml and default Icons]:
-
-                  ex. /home/renabor/Android/lazandroidmodulewizard/java
-
-                -Path to Lazbuild
-
-                  ex. /usr/bin
-
-
-- BUILD YOUR FIRST PROJECT
 Open a project from lazandroidmodulewizard/demos/Ant or lazandroidmodulewizard/demos/Eclipse directory
 open ~/Android/lazandroidmodulewizard/demos/Eclipse/AppDemo1/jni/controls.lpi
 from Project->Options, change/modify paths according to your system (under «paths» and «other»)
+
+(ex. for «paths» ../../../Android/android-ndk-r10e/platforms/android-21/arch-arm/usr/lib;/home/$HOME/Android/android-ndk-r10e/toolchains/arm-linux-androideabi-4.8/prebuilt/linux-x86_64/lib/gcc/arm-linux-androideabi/4.8/)
+
+(ex. for «other» -Xd -CfSoft -CpARMV6 -XParm-linux-androideabi- -FD/home/$HOME/Android/android-ndk-r10e/toolchains/arm-linux-androideabi-4.8/prebuilt/linux-x86_64/bin)
+
 build it!
-Now enter the shell, and cd's into ~/Android/lazandroidmodulewizard/demos/Eclipse/AppDemo1
-edit build.sh and modify to reflect your system:
+
+################
+################
+compile for ARM
+################
+################
+
+from shell
+(CMD) cd ~/Android/lazandroidmodulewizard/demos/Eclipse/AppDemo1
+
+################
+build.xml
+################
 
 <?xml version="1.0" encoding="UTF-8"?>
 <project name="AppDemo1" default="help">
-<property name="sdk.dir" location="/home/renabor/Android/sdk"/>
+<property name="sdk.dir" location="/home/$HOME/Android/sdk"/>
 <property name="target"  value="android-19"/>
 <property file="ant.properties"/>
 <fail message="sdk.dir is missing." unless="sdk.dir"/>
 <import file="${sdk.dir}/tools/ant/build.xml"/>
 </project>
 
+################
+build.sh
+################
 edit build.sh and leave only this line:
-ant -Dtouchtest.enabled=true debug
 
-- FROM COMMAND LINE
-chmod +x ./build.sh
-./build.sh
-cd bin
-~/Android/sdk/tools/android avd & 
-adb install AppDemo1-debug.apk
+   ant -Dtouchtest.enabled=true debug
+
+################
+install.sh
+################
+
+remove content of install.sh with:
+
+/home/$HOME/Android/sdk/platform-tools/adb uninstall com.example.appdemo1
+/home/$HOME/Android/sdk/platform-tools/adb install -r bin/AppDemo1-debug.apk
+/home/$HOME/Android/sdk/platform-tools/adb logcat
+
+################
+Connect a device
+################
+
+run an emulator
+(CMD) ~/Android/sdk/tools/android avd &
+
+################
+COMPILE AND INSTALL
+################
+
+(CMD) chmod +x ./build.sh && chmod +x ./install.sh
+(CMD) ./build.sh
+(CMD) ./install.sh
 
 Enjoy!
-[@renabor]
+

@@ -955,6 +955,8 @@ public void SetTabNavigationModeActionBar(){
 public void RemoveAllTabsActionBar() {
 	ActionBar actionBar = this.controls.activity.getActionBar();
 	actionBar.removeAllTabs();
+        this.controls.activity.invalidateOptionsMenu(); // by renabor
+	actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD); //API 11 renabor
 }
 
 
@@ -3150,46 +3152,80 @@ setChoiceMode(ListView.CHOICE_MODE_SINGLE);
 //Init Event
 
 
+// renabor gesture
+onTouchListener = new OnTouchListener() {@Override
+	public boolean onTouch(View v, MotionEvent event) {
+		int action = event.getAction() & MotionEvent.ACTION_MASK;
+		switch (action) {
+			case MotionEvent.ACTION_DOWN:
+				canClick = false;
+				// Log.i("ACTION", "DOWN");
+				mDownX = event.getX();
+				mDownY = event.getY();
+				isOnClick = true; // blocco la propagazione
+				break;
+			case MotionEvent.ACTION_CANCEL:
+			case MotionEvent.ACTION_UP:
+				if (isOnClick) {
+					// Log.i("ACTION", "UP");
+					canClick = true;
+				} else { Log.i("ACTION","UP NOT PROCESSED"); }
+				//return false; // passa oltre, ma potrebbe diventare true
+				//mDownX = -1;
+				return false;
+
+			case MotionEvent.ACTION_MOVE:
+				if (isOnClick && (Math.abs(mDownX - event.getX()) > SCROLL_THRESHOLD || Math.abs(mDownY - event.getY()) > SCROLL_THRESHOLD)) {
+					// Log.i("ACTION", "MOVE");
+					isOnClick = false;
+				};
+				return false; 
+		};
+	return false;
+	};
+};
+setOnTouchListener(onTouchListener);
+
 //fixed! thanks to @renabor
 onItemClickListener = new OnItemClickListener() {@Override
 	public void onItemClick(AdapterView <? > parent, View v, int position, long id) {
-		lastSelectedItem = (int) position;
-		if (!isEmpty(alist)) { // this test is necessary !  //  <----- thanks to @renabor
-			if (highLightSelectedItem) {
-				if (lastSelectedItem > -1) {
-					DoHighlight(lastSelectedItem, textColor);
+		if (canClick) {
+	    	lastSelectedItem = (int) position;
+			if (!isEmpty(alist)) { // this test is necessary !  //  <----- thanks to @renabor
+				if (highLightSelectedItem) {
+					if (lastSelectedItem > -1) {
+						DoHighlight(lastSelectedItem, textColor);
+					}
+					DoHighlight((int) id, highLightColor);
 				}
-				DoHighlight((int) id, highLightColor);
-			}
-			if (alist.get((int) id).widget == 2  ) { //radio fix 16-febr-2015
-				for (int i = 0; i < alist.size(); i++) {
-					alist.get(i).checked = false;
+				if (alist.get((int) id).widget == 2  ) { //radio fix 16-febr-2015
+					for (int i = 0; i < alist.size(); i++) {
+						alist.get(i).checked = false;
+					}
+					alist.get((int) id).checked = true;
+					aadapter.notifyDataSetChanged();
 				}
-				alist.get((int) id).checked = true;
-				aadapter.notifyDataSetChanged();
+				controls.pOnClickCaptionItem(PasObj, (int) id, alist.get((int) id).label);
+			} else {
+				controls.pOnClickCaptionItem(PasObj, lastSelectedItem, ""); // avoid passing possibly undefined Caption
 			}
-			controls.pOnClickCaptionItem(PasObj, (int) id, alist.get((int) id).label);
-		} else {
-			controls.pOnClickCaptionItem(PasObj, lastSelectedItem, ""); // avoid passing possibly undefined Caption
 		}
 	}
 };
-
 setOnItemClickListener(onItemClickListener);
 
-
 this.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {@Override
-	
 	public boolean onItemLongClick(AdapterView <?> parent, View view, int position, long id) {
-		if (!isEmpty(alist)) {  //  <----- thanks to @renabor
-			selectedItemCaption = alist.get((int) id).label;
-			controls.pOnListViewLongClickCaptionItem(PasObj, (int)id, alist.get((int)id).label);
-			return false;
-		}
-		lastSelectedItem = (int)id;
+		lastSelectedItem = (int)position;
+		if (canClick) {
+			if (!isEmpty(alist)) {  //  <----- thanks to @renabor
+				selectedItemCaption = alist.get((int) id).label;
+				controls.pOnListViewLongClickCaptionItem(PasObj, (int)id, alist.get((int)id).label);
+				return false;
+				};
+		};
 		return false;
 	}
-
 });
 
 }
@@ -3864,10 +3900,10 @@ class jPanel extends RelativeLayout {
            }
            if(event1.getY() - event2.getY() > SWIPE_MIN_DISTANCE && Math.abs(velocityY) > SWIPE_THRESHOLD_VELOCITY) {
         	   controls.pOnFlingGestureDetected(PasObj, 2);//onBottomToTop();
-        	   return true;
+        	   return false;
            } else if (event2.getY() - event1.getY() > SWIPE_MIN_DISTANCE && Math.abs(velocityY) > SWIPE_THRESHOLD_VELOCITY) {
         	   controls.pOnFlingGestureDetected(PasObj, 3); //onTopToBottom();
-        	   return true;
+        	   return false;
            } 		   
  		   return false;
  	   }
@@ -6195,7 +6231,17 @@ class jSqliteDataAccess {
 		   DATABASE_NAME = dataBaseName;
 		   mydb = this.Open();
 	    }
-	           
+	    public void SetVersion(int version) {
+	    	if (mydb!= null) {
+	    		mydb.setVersion(version);
+	    	}
+	    }
+	    public int GetVersion() {
+	    	if (mydb!= null) {
+	    		return mydb.getVersion();
+	    	}
+	    	return 0;
+	    }
         public void ExecSQL(String execQuery){
 	        try{ 	
 	           if (mydb!= null) {
@@ -6357,23 +6403,12 @@ class jSqliteDataAccess {
 			           }
 			        }		        			        				     	         
 			     	this.cursor  = mydb.rawQuery(selectQuery, null);
-			     	
-			         //try renabor sugestion!
-			     	
-			     	if (!this.cursor.moveToFirst()) result = false;
-			     		
-			     	if (result) {
-			       	   if (moveToLast)
-			     	      this.cursor.moveToLast(); 	
-			     	   else
 			     	       this.cursor.moveToFirst(); 	
-			     	}
-			     	
 			        mydb.close();			       
 			     }catch(SQLiteException se){
 			         Log.e(getClass().getSimpleName(), "Could not select:" + selectQuery);
 			     }	     				        
-		         return result;
+		         return true;
 		}
 
 	    public Cursor GetCursor() {
@@ -7983,7 +8018,7 @@ class jContextMenu /*extends ...*/ {
     //_itemType --> 0:Default, 1:Checkable
     public MenuItem AddItem(ContextMenu _menu, int _itemID, String _caption, int _itemType){    	     	
     	MenuItem item = _menu.add(0,_itemID,0 ,(CharSequence)_caption);
-    	
+
     	switch  (_itemType) {
     	case 1:  item.setCheckable(true); break;    	
     	}
@@ -11722,6 +11757,7 @@ class jGridView extends GridView /*dummy*/ { //please, fix what GUI object will 
       setAdapter(null);     
       gridViewCustomeAdapter = null;
       setOnItemClickListener(null);
+	  setOnItemLongClickListener(null); // renabor
    }
 
    public void SetViewParent(ViewGroup _viewgroup) {
@@ -16455,6 +16491,13 @@ public  int  getScreenWH(android.content.Context context) {
 
   int h = context.getResources().getDisplayMetrics().heightPixels;
   int w = context.getResources().getDisplayMetrics().widthPixels;
+// proposed by renabor
+/* 
+ float density  = context.getResources().getDisplayMetrics().density;
+ int dpHeight = Math.round ( h / density );
+ int dpWidth  = Math.round ( w / density );
+ return ( dpWidth << 16 | dpHeight ); // dp screen size  
+*/
   return ( (w << 16)| h );
 }
 

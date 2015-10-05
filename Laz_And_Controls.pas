@@ -636,6 +636,10 @@ type
     Procedure ExecSQL(execQuery: string);
     function CheckDataBaseExists(dataBaseName: string): boolean;
     procedure OpenOrCreate(dataBaseName: string);
+
+    procedure SetVersion(version :integer); //renabor
+    function GetVersion():integer; // renabor
+
     procedure AddTable(tableName: string; createTableQuery: string);
     procedure CreateAllTables;
 
@@ -4346,7 +4350,7 @@ end;
 Procedure jImageView.SetImageName(Value: string);
 begin
   FImageName:= Value;
-  if FInitialized then SetImageByName(Value);  ;
+  if FInitialized then SetImageByName(Value);
 end;
 
 procedure jImageView.SetImageIndex(Value: integer);
@@ -8194,6 +8198,18 @@ begin
   if not FInitialized then Exit;
   if dataBaseName <> '' then FDataBaseName:= dataBaseName;
   jSqliteDataAccess_OpenOrCreate(FjEnv, FjObject , FDataBaseName);
+end;
+
+procedure jSqliteDataAccess.SetVersion(version :integer); //renabor
+begin
+  if not FInitialized then Exit;
+  jSqliteDataAccess_SetVersion(FjEnv, FjObject , version);
+end;
+
+function jSqliteDataAccess.GetVersion():integer; // renabor
+begin
+  if not FInitialized then Exit;
+  Result:=jSqliteDataAccess_GetVersion(FjEnv, FjObject);
 end;
 
 procedure jSqliteDataAccess.AddTable(tableName: string; createTableQuery: string);
