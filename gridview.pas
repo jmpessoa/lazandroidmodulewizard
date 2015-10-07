@@ -70,6 +70,7 @@ TGridItemLayout = (ilImageText, ilTextImage);
     procedure SetFontSize(_size: Dword);
     procedure SetFontColor(_color: TARGBColorBridge);
     procedure SetFontSizeUnit(_unit: TFontSizeUnit);
+    procedure UpdateItemTitle(_index: integer; _title: string);
 
     procedure GenEvent_OnDrawItemCaptionColor(Obj: TObject; index: integer; caption: string;  out color: dword);
     procedure GenEvent_OnDrawItemBitmap(Obj: TObject; index: integer; caption: string;  out bitmap: JObject);
@@ -116,6 +117,7 @@ procedure jGridView_DispatchOnDrawItemBitmap(env: PJNIEnv; _jgridview: JObject; 
 procedure jGridView_SetFontSize(env: PJNIEnv; _jgridview: JObject; _size: integer);
 procedure jGridView_SetFontColor(env: PJNIEnv; _jgridview: JObject; _color: integer);
 procedure jGridView_SetFontSizeUnit(env: PJNIEnv; _jgridview: JObject; _unit: integer);
+procedure jGridView_UpdateItemTitle(env: PJNIEnv; _jgridview: JObject; _index: integer; _title: string);
 
 
 implementation
@@ -544,6 +546,13 @@ begin
   if Assigned(FOnDrawItemBitmap) then FOnDrawItemBitmap(Obj,index,caption, bitmap);
 end;
 
+procedure jGridView.UpdateItemTitle(_index: integer; _title: string);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jGridView_UpdateItemTitle(FjEnv, FjObject, _index ,_title);
+end;
+
 {-------- jGridView_JNI_Bridge ----------}
 
 function jGridView_jCreate(env: PJNIEnv;_Self: int64; this: jObject): jObject;
@@ -915,5 +924,21 @@ begin
    env^.CallVoidMethodA(env, _jgridview, jMethod, @jParams);
    env^.DeleteLocalRef(env, jCls);
 end;
+
+procedure jGridView_UpdateItemTitle(env: PJNIEnv; _jgridview: JObject; _index: integer; _title: string);
+var
+  jParams: array[0..1] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].i:= _index;
+  jParams[1].l:= env^.NewStringUTF(env, PChar(_title));
+  jCls:= env^.GetObjectClass(env, _jgridview);
+  jMethod:= env^.GetMethodID(env, jCls, 'UpdateItemTitle', '(ILjava/lang/String;)V');
+  env^.CallVoidMethodA(env, _jgridview, jMethod, @jParams);
+  env^.DeleteLocalRef(env,jParams[1].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
 
 end.

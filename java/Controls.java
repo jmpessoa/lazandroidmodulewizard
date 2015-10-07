@@ -1,6 +1,6 @@
 package com.example.dummyapp;
 
-//Lamw: Lazarus Android Module Wizard  - version 0.6 - revision 36.1 - 07 October- 2015 
+//Lamw: Lazarus Android Module Wizard  - version 0.6 - revision 36.2 - 07 October- 2015 
 //Form Designer and Components development model!
 //
 //https://github.com/jmpessoa/lazandroidmodulewizard
@@ -11920,6 +11920,14 @@ class jGridView extends GridView /*dummy*/ { //please, fix what GUI object will 
    public void SetFontColor(int _color) {	  
 	   mItemTextColor = _color;	
    }
+   
+   
+   public void UpdateItemTitle(int _index, String _title) {
+	   jGridItem info = alist.get(_index);
+	   info.label = _title;
+	   gridViewCustomeAdapter.notifyDataSetChanged();    
+   }
+   
    
 } //end class
 
