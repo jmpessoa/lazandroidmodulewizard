@@ -3229,13 +3229,13 @@ setOnItemClickListener(onItemClickListener);
 this.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {@Override
 	public boolean onItemLongClick(AdapterView <?> parent, View view, int position, long id) {
 		lastSelectedItem = (int)position;
-		//if (canClick) {
+		if (canClick) {
 			if (!isEmpty(alist)) {  //  <----- thanks to @renabor
 				selectedItemCaption = alist.get((int) id).label;
 				controls.pOnListViewLongClickCaptionItem(PasObj, (int)id, alist.get((int)id).label);
 				return false;
 				};
-		//};
+		};
 		return false;
 	}
 });
