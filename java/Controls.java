@@ -1,6 +1,6 @@
 package com.example.dummyapp;
 
-//Lamw: Lazarus Android Module Wizard  - version 0.6 - revision 36 - 03 August - 2015 
+//Lamw: Lazarus Android Module Wizard  - version 0.6 - revision 36.1 - 07 October- 2015 
 //Form Designer and Components development model!
 //
 //https://github.com/jmpessoa/lazandroidmodulewizard
@@ -3075,7 +3075,15 @@ private Bitmap          genericBmp;
 private int             widgetItem;
 private String          widgetText;
 private int             textColor; 
-private int             textSize;     
+private int             textSize;
+
+//by Renabor
+private float mDownX = -1;
+private float mDownY = -1;
+private final float SCROLL_THRESHOLD = 10;
+private boolean isOnClick;
+private boolean canClick;
+
 int textDecorated;
 int itemLayout;
 int textSizeDecorated;
@@ -3091,6 +3099,7 @@ private ArrayList<jListItemRow>    alist;
 private jArrayAdapter        aadapter;
 
 private OnItemClickListener  onItemClickListener;
+private OnTouchListener onTouchListener;
 
 //by jmpessoa
 private int lparamsAnchorRule[] = new int[20]; 
@@ -3151,9 +3160,7 @@ setChoiceMode(ListView.CHOICE_MODE_SINGLE);
 
 //Init Event
 
-
 // renabor gesture
-/* Hi renabor, please fix here!
 onTouchListener = new OnTouchListener() {	
 	@Override
 	public boolean onTouch(View v, MotionEvent event) {
@@ -3187,13 +3194,14 @@ onTouchListener = new OnTouchListener() {
 	return false;
 	};
 };
+
 setOnTouchListener(onTouchListener);
-*/
+
 
 //fixed! thanks to @renabor
 onItemClickListener = new OnItemClickListener() {@Override
 	public void onItemClick(AdapterView <? > parent, View v, int position, long id) {
-		//if (canClick) { Hi renabor, please fix here!
+	  if (canClick) { 
 	    	lastSelectedItem = (int) position;
 			if (!isEmpty(alist)) { // this test is necessary !  //  <----- thanks to @renabor
 				if (highLightSelectedItem) {
@@ -3214,7 +3222,7 @@ onItemClickListener = new OnItemClickListener() {@Override
 				controls.pOnClickCaptionItem(PasObj, lastSelectedItem, ""); // avoid passing possibly undefined Caption
 			}
 		}
-	//} Hi renabor, please fix here!
+	} 
 };
 setOnItemClickListener(onItemClickListener);
 
