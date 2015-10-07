@@ -552,12 +552,13 @@ begin
       if ReadString('NewProject','NDK', '') <> '' then
           indexNdk:= StrToInt(ReadString('NewProject','NDK', ''))
       else
-          indexNdk:= 2;  //ndk 10   ... default
+          indexNdk:= 3;  //ndk 10e   ... default
 
       case indexNdk of
          0: FNDK:= '7';
          1: FNDK:= '9';
-         2: FNDK:= '10';
+         2: FNDK:= '10c'; //old Laz4Android
+         3: FNDK:= '10e';
       end;
 
       FPathToJavaTemplates:= ReadString('NewProject','PathToJavaTemplates', '');

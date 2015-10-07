@@ -5,18 +5,19 @@ unit uformsettingspaths;
 interface
 
 uses
-  Classes, SysUtils, LazFileUtils, Forms, Controls, Graphics, Dialogs,
-  StdCtrls, Buttons, ExtCtrls, ButtonPanel, LazIDEIntf, IniFiles;
+  inifiles, Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs,
+  StdCtrls, Buttons, ExtCtrls, ComCtrls, LazIDEIntf;
 
 type
 
   { TFormSettingsPaths }
 
   TFormSettingsPaths  = class(TForm)
+    BitBtnOK: TBitBtn;
     BevelSimonsayzTemplateLazBuildAndButtons: TBevel;
     BevelSDKNDKAndSimonsayzTemplateLazBuild: TBevel;
     BevelJDKAntAndSDKNDK: TBevel;
-    ButtonPanel1: TButtonPanel;
+    BitBtnCancel: TBitBtn;
     EditPathToAndroidNDK: TEdit;
     EditPathToSimonsayzTemplate: TEdit;
     EditPathToJavaJDK: TEdit;
@@ -39,6 +40,8 @@ type
     SpBPathToJavaJDK: TSpeedButton;
     SpBPathToAndroidSDK: TSpeedButton;
     SpBPathToAntBinary: TSpeedButton;
+    procedure BitBtnOKClick(Sender: TObject);
+    procedure BitBtnCancelClick(Sender: TObject);
     procedure FormActivate(Sender: TObject);
     procedure FormClose(Sender: TObject; var CloseAction: TCloseAction);
     procedure FormShow(Sender: TObject);
@@ -58,6 +61,7 @@ type
     FPrebuildOSYS: string;
   public
     { public declarations }
+    FOk: boolean;
     procedure LoadSettings(const fileName: string);
     procedure SaveSettings(const fileName: string);
   end;
@@ -73,19 +77,32 @@ implementation
 
 procedure TFormSettingsPaths.FormClose(Sender: TObject; var CloseAction: TCloseAction);
 begin
-  if ModalResult = mrOK then
-    Self.SaveSettings(AppendPathDelim(LazarusIDE.GetPrimaryConfigPath) + 'JNIAndroidProject.ini');
-  CloseAction := caFree;
+  if FOk then
+    Self.SaveSettings(AppendPathDelim(LazarusIDE.GetPrimaryConfigPath) + 'JNIAndroidProject.ini' );
 end;
+
 
 procedure TFormSettingsPaths.FormShow(Sender: TObject);
 begin
+   FOk:= False;
    Self.LoadSettings(AppendPathDelim(LazarusIDE.GetPrimaryConfigPath) + 'JNIAndroidProject.ini');
 end;
 
 procedure TFormSettingsPaths.FormActivate(Sender: TObject);
 begin
   EditPathToJavaJDK.SetFocus;
+end;
+
+procedure TFormSettingsPaths.BitBtnCancelClick(Sender: TObject);
+begin
+  FOk:= False;
+  Close;
+end;
+
+procedure TFormSettingsPaths.BitBtnOKClick(Sender: TObject);
+begin
+   FOk:= True;
+   Close;
 end;
 
 procedure TFormSettingsPaths.SpBPathToAndroidNDKClick(Sender: TObject);
@@ -159,7 +176,7 @@ begin
       if ReadString('NewProject','NDK', '') <> '' then
           indexNdk:= StrToInt(ReadString('NewProject','NDK', ''))
       else
-          indexNdk:= 2;  //ndk 10
+          indexNdk:= 3;  //ndk 10e
 
       RGNDKVersion.ItemIndex:= indexNdk;
 
@@ -183,7 +200,7 @@ begin
       WriteString('NewProject', 'PathToAndroidNDK', EditPathToAndroidNDK.Text);
       WriteString('NewProject', 'PathToAndroidSDK', EditPathToAndroidSDK.Text);
       WriteString('NewProject', 'PathToAntBin', EditPathToAntBinary.Text);
-      WriteString('NewProject', 'NDK', IntToStr(RGNDKVersion.ItemIndex));
+      WriteString('NewProject', 'NDK', IntToStr(RGNDKVersion.ItemIndex));  //RGNDKVersion
 
      case RadioGroupPrebuildOSys.ItemIndex of
        0: FPrebuildOSYS:= 'windows';

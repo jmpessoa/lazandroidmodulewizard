@@ -3153,7 +3153,9 @@ setChoiceMode(ListView.CHOICE_MODE_SINGLE);
 
 
 // renabor gesture
-onTouchListener = new OnTouchListener() {@Override
+/* Hi renabor, please fix here!
+onTouchListener = new OnTouchListener() {	
+	@Override
 	public boolean onTouch(View v, MotionEvent event) {
 		int action = event.getAction() & MotionEvent.ACTION_MASK;
 		switch (action) {
@@ -3173,23 +3175,25 @@ onTouchListener = new OnTouchListener() {@Override
 				//return false; // passa oltre, ma potrebbe diventare true
 				//mDownX = -1;
 				return false;
-
+				
+    
 			case MotionEvent.ACTION_MOVE:
 				if (isOnClick && (Math.abs(mDownX - event.getX()) > SCROLL_THRESHOLD || Math.abs(mDownY - event.getY()) > SCROLL_THRESHOLD)) {
 					// Log.i("ACTION", "MOVE");
 					isOnClick = false;
-				};
-				return false; 
+				};			
+				return false;					
 		};
 	return false;
 	};
 };
 setOnTouchListener(onTouchListener);
+*/
 
 //fixed! thanks to @renabor
 onItemClickListener = new OnItemClickListener() {@Override
 	public void onItemClick(AdapterView <? > parent, View v, int position, long id) {
-		if (canClick) {
+		//if (canClick) { Hi renabor, please fix here!
 	    	lastSelectedItem = (int) position;
 			if (!isEmpty(alist)) { // this test is necessary !  //  <----- thanks to @renabor
 				if (highLightSelectedItem) {
@@ -3210,20 +3214,20 @@ onItemClickListener = new OnItemClickListener() {@Override
 				controls.pOnClickCaptionItem(PasObj, lastSelectedItem, ""); // avoid passing possibly undefined Caption
 			}
 		}
-	}
+	//} Hi renabor, please fix here!
 };
 setOnItemClickListener(onItemClickListener);
 
 this.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {@Override
 	public boolean onItemLongClick(AdapterView <?> parent, View view, int position, long id) {
 		lastSelectedItem = (int)position;
-		if (canClick) {
+		//if (canClick) {
 			if (!isEmpty(alist)) {  //  <----- thanks to @renabor
 				selectedItemCaption = alist.get((int) id).label;
 				controls.pOnListViewLongClickCaptionItem(PasObj, (int)id, alist.get((int)id).label);
 				return false;
 				};
-		};
+		//};
 		return false;
 	}
 });
