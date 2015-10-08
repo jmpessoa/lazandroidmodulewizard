@@ -1,0 +1,205 @@
+object AndroidModule1: TAndroidModule1
+  Left = 315
+  Top = 132
+  Width = 320
+  Height = 557
+  MarginLeft = 0
+  MarginTop = 0
+  MarginRight = 0
+  MarginBottom = 0
+  OnCreate = AndroidModule1Create
+  Text = 'AndroidModule1'
+  ActivityMode = actSplash
+  BackgroundColor = colbrDefault
+  OnRotate = AndroidModule1Rotate
+  OnJNIPrompt = AndroidModule1JNIPrompt
+  OnClose = AndroidModule1Close
+  object jImageView1: jImageView
+    Left = 119
+    Top = 71
+    Width = 52
+    Height = 70
+    Visible = True
+    PosRelativeToAnchor = []
+    PosRelativeToParent = [rpCenterInParent]
+    LayoutParamWidth = lpWrapContent
+    LayoutParamHeight = lpWrapContent
+    ImageIndex = 0
+    Images = jImageList1
+    BackgroundColor = colbrDefault
+    ImageScaleType = scaleCenter
+    Id = 7018114
+  end
+  object jTextView1: jTextView
+    Left = 88
+    Top = 164
+    Width = 143
+    Height = 20
+    MarginLeft = 5
+    MarginTop = 20
+    MarginRight = 5
+    MarginBottom = 5
+    Visible = True
+    Anchor = jImageView1
+    PosRelativeToAnchor = [raBelow]
+    PosRelativeToParent = [rpCenterHorizontal]
+    LayoutParamWidth = lpWrapContent
+    LayoutParamHeight = lpWrapContent
+    Text = 'Powered by FPC/Lazarus'
+    Alignment = taLeft
+    Enabled = True
+    BackgroundColor = colbrWhite
+    FontColor = colbrDefault
+    FontSize = 0
+    TextTypeFace = tfNormal
+    FontSizeUnit = unitDefault
+    Id = 2928445
+  end
+  object jImageView2: jImageView
+    Left = 111
+    Top = 190
+    Width = 81
+    Height = 80
+    MarginTop = 20
+    Visible = True
+    Anchor = jTextView1
+    PosRelativeToAnchor = [raBelow]
+    PosRelativeToParent = [rpCenterHorizontal]
+    LayoutParamWidth = lpWrapContent
+    LayoutParamHeight = lpWrapContent
+    ImageIndex = 8
+    Images = jImageList1
+    BackgroundColor = colbrDefault
+    ImageScaleType = scaleCenter
+    Id = 8177500
+  end
+  object jTextView2: jTextView
+    Left = 104
+    Top = 293
+    Width = 111
+    Height = 20
+    MarginLeft = 5
+    MarginTop = 20
+    MarginRight = 5
+    MarginBottom = 5
+    Visible = True
+    Anchor = jImageView2
+    PosRelativeToAnchor = [raBelow]
+    PosRelativeToParent = [rpCenterHorizontal]
+    LayoutParamWidth = lpWrapContent
+    LayoutParamHeight = lpWrapContent
+    Text = 'Powered by LAMW'
+    Alignment = taLeft
+    Enabled = True
+    BackgroundColor = colbrWhite
+    FontColor = colbrDefault
+    FontSize = 0
+    TextTypeFace = tfNormal
+    FontSizeUnit = unitDefault
+    Id = 8484102
+  end
+  object jImageView3: jImageView
+    Left = 98
+    Top = 342
+    Width = 94
+    Height = 82
+    MarginTop = 30
+    Visible = True
+    Anchor = jTextView2
+    PosRelativeToAnchor = [raBelow]
+    PosRelativeToParent = [rpCenterInParent]
+    LayoutParamWidth = lpWrapContent
+    LayoutParamHeight = lpWrapContent
+    ImageIndex = 9
+    Images = jImageList1
+    BackgroundColor = colbrDefault
+    ImageScaleType = scaleCenter
+    Id = 9656989
+  end
+  object jTextView3: jTextView
+    Left = 86
+    Top = 432
+    Width = 148
+    Height = 20
+    MarginLeft = 5
+    MarginTop = 5
+    MarginRight = 5
+    MarginBottom = 5
+    Visible = True
+    Anchor = jImageView3
+    PosRelativeToAnchor = [raBelow]
+    PosRelativeToParent = [rpCenterHorizontal]
+    LayoutParamWidth = lpWrapContent
+    LayoutParamHeight = lpWrapContent
+    Text = 'Powered by the mORMot'
+    Alignment = taLeft
+    Enabled = True
+    BackgroundColor = colbrFuchsia
+    FontColor = colbrDefault
+    FontSize = 0
+    TextTypeFace = tfNormal
+    FontSizeUnit = unitDefault
+    Id = 0
+  end
+  object jImageView4: jImageView
+    Left = 145
+    Top = 9
+    Width = 37
+    Height = 29
+    Visible = True
+    PosRelativeToAnchor = []
+    PosRelativeToParent = [rpTop, rpCenterHorizontal]
+    LayoutParamWidth = lpWrapContent
+    LayoutParamHeight = lpWrapContent
+    ImageIndex = 10
+    Images = jImageList1
+    BackgroundColor = colbrDefault
+    ImageScaleType = scaleCenter
+    Id = 0
+  end
+  object jImageView5: jImageView
+    Left = 0
+    Top = 0
+    Width = 80
+    Height = 39
+    MarginLeft = 0
+    MarginTop = 0
+    MarginRight = 0
+    MarginBottom = 0
+    Visible = True
+    PosRelativeToAnchor = []
+    PosRelativeToParent = []
+    LayoutParamWidth = lpMatchParent
+    LayoutParamHeight = lpMatchParent
+    ImageIndex = 11
+    Images = jImageList1
+    BackgroundColor = colbrDefault
+    ImageScaleType = scaleFitXY
+    Id = 0
+  end
+  object jImageList1: jImageList
+    Images.Strings = (
+      't1.png'
+      't2.png'
+      't3.png'
+      't4.png'
+      't5.png'
+      't6.png'
+      't7.png'
+      't8.png'
+      'lamw_logo1.png'
+      'synopse.png'
+      'smallmormot.png'
+      'mormot.jpg'
+    )
+    left = 264
+    top = 8
+  end
+  object jTimer1: jTimer
+    Enabled = False
+    Interval = 40
+    OnTimer = jTimer1Timer
+    left = 208
+    top = 16
+  end
+end
