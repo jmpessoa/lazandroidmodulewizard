@@ -294,6 +294,13 @@ end;
 //Event : Java -> Pascal
 procedure jToggleButton.GenEvent_OnClickToggleButton(Obj: TObject; state: boolean);
 begin
+
+   //fixed! thanks to @Sait
+  if state then
+    FToggleState:= tsOn
+  else
+    FToggleState:= tsOff;
+
   if Assigned(FOnToggle) then FOnToggle(Obj, state);
 end;
 

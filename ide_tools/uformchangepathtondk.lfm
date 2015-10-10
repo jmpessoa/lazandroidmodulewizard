@@ -2,15 +2,15 @@ object FormChangeDemoPathToNDK: TFormChangeDemoPathToNDK
   Left = 350
   Height = 319
   Top = 159
-  Width = 580
+  Width = 609
   Caption = 'Lamw: Change [Demo] Project  "*.lpi" and "build.xml" Ndk/Sdk  Path '
   ClientHeight = 319
-  ClientWidth = 580
+  ClientWidth = 609
   OnClose = FormClose
   OnCreate = FormCreate
-  LCLVersion = '1.3'
+  LCLVersion = '1.5'
   object Label1: TLabel
-    Left = 16
+    Left = 168
     Height = 15
     Top = 120
     Width = 149
@@ -18,18 +18,18 @@ object FormChangeDemoPathToNDK: TFormChangeDemoPathToNDK
     ParentColor = False
   end
   object EditPathToAndroidNDK: TEdit
-    Left = 18
+    Left = 168
     Height = 23
-    Top = 139
-    Width = 520
+    Top = 135
+    Width = 397
     Anchors = [akTop, akLeft, akRight]
     TabOrder = 0
   end
   object SpeedButton1: TSpeedButton
     AnchorSideTop.Control = EditPathToAndroidNDK
-    Left = 546
+    Left = 575
     Height = 22
-    Top = 139
+    Top = 135
     Width = 23
     Anchors = [akTop, akRight]
     Caption = '...'
@@ -47,13 +47,13 @@ object FormChangeDemoPathToNDK: TFormChangeDemoPathToNDK
     Left = 16
     Height = 23
     Top = 31
-    Width = 520
+    Width = 549
     Anchors = [akTop, akLeft, akRight]
     TabOrder = 1
   end
   object SpeedButton2: TSpeedButton
     AnchorSideTop.Control = EditPathToWorkspace
-    Left = 544
+    Left = 573
     Height = 22
     Top = 31
     Width = 23
@@ -73,7 +73,7 @@ object FormChangeDemoPathToNDK: TFormChangeDemoPathToNDK
     Left = 16
     Height = 23
     Top = 83
-    Width = 518
+    Width = 547
     Anchors = [akTop, akLeft, akRight]
     ItemHeight = 15
     OnChange = ComboBoxSelectProjectChange
@@ -81,7 +81,7 @@ object FormChangeDemoPathToNDK: TFormChangeDemoPathToNDK
   end
   object SpeedButton3: TSpeedButton
     AnchorSideTop.Control = ComboBoxSelectProject
-    Left = 544
+    Left = 573
     Height = 22
     Top = 83
     Width = 23
@@ -128,7 +128,7 @@ object FormChangeDemoPathToNDK: TFormChangeDemoPathToNDK
     Left = 280
     Height = 30
     Top = 224
-    Width = 256
+    Width = 285
     Anchors = [akTop, akLeft, akRight]
     Cancel = True
     DefaultCaption = True
@@ -152,14 +152,14 @@ object FormChangeDemoPathToNDK: TFormChangeDemoPathToNDK
     Left = 0
     Height = 23
     Top = 296
-    Width = 580
+    Width = 609
     Panels = <>
   end
   object EditPathToAndroidSDK: TEdit
     Left = 19
     Height = 23
     Top = 184
-    Width = 517
+    Width = 546
     Anchors = [akTop, akLeft, akRight]
     TabOrder = 6
   end
@@ -172,7 +172,7 @@ object FormChangeDemoPathToNDK: TFormChangeDemoPathToNDK
     ParentColor = False
   end
   object SpeedButton4: TSpeedButton
-    Left = 546
+    Left = 575
     Height = 22
     Top = 185
     Width = 23
@@ -180,9 +180,35 @@ object FormChangeDemoPathToNDK: TFormChangeDemoPathToNDK
     Caption = '...'
     OnClick = SpeedButton4Click
   end
+  object RadioGroupNDK: TRadioGroup
+    Left = 8
+    Height = 41
+    Top = 120
+    Width = 160
+    AutoFill = True
+    Caption = 'NDK'
+    ChildSizing.LeftRightSpacing = 6
+    ChildSizing.EnlargeHorizontal = crsHomogenousChildResize
+    ChildSizing.EnlargeVertical = crsHomogenousChildResize
+    ChildSizing.ShrinkHorizontal = crsScaleChilds
+    ChildSizing.ShrinkVertical = crsScaleChilds
+    ChildSizing.Layout = cclLeftToRightThenTopToBottom
+    ChildSizing.ControlsPerLine = 4
+    ClientHeight = 21
+    ClientWidth = 156
+    Columns = 4
+    ItemIndex = 3
+    Items.Strings = (
+      '7'
+      '9'
+      '10c'
+      '10e'
+    )
+    TabOrder = 7
+  end
   object SelectDirectoryDialog1: TSelectDirectoryDialog
     left = 272
-    top = 120
+    top = 64
   end
   object SelectDirectoryDialog2: TSelectDirectoryDialog
     left = 344

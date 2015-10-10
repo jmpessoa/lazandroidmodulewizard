@@ -299,6 +299,13 @@ end;
 //Event : Java -> Pascal
 procedure jSwitchButton.GenEvent_OnChangeSwitchButton(Obj: TObject; state: boolean);
 begin
+
+  //fixed! thanks to @Sait
+  if state then
+    FSwitchState:= tsOn
+  else
+    FSwitchState:= tsOff;
+
   if Assigned(FOnToggle) then FOnToggle(Obj, state);
 end;
 

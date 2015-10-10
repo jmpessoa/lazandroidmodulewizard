@@ -287,6 +287,7 @@ begin
     SynMemo2.Add('  gApp.Initialize;');
     SynMemo2.Add('  gApp.CreateForm(TAndroidModule1, AndroidModule1);');
     SynMemo2.Add('end.');
+    SynMemo2.Add('(*last [template] upgrade: '+DateTimeToStr(Now)+'*)');
 
     if FileExistsUTF8(JNIProjectPath+DirectorySeparator+'controls.lpr') then
     begin
