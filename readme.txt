@@ -29,13 +29,14 @@
 		-Felipemdc [Android support...]
 
 		-TrueTom [Laz4Android Package]
+			Last update:2015-10-02
+			FPC: 3.1.1 trunk svn 31903 
+				-->> win32/arm-android/i386-android/jvm-android
+				Note: Need Android NDK: r10e (arm-linux-androideabi-4.9 + x86-4.9)
 
-			Last update:2015-02-25
-			FPC: 3.1.1 trunk svn 29987 win32/arm-android/i386-android/jvm-android
-			Lazarus:1.5 trunk svn 47987
-			Android NDK: r10c (arm-linux-androideabi-4.6 + x86-4.6)
-			http://sourceforge.net/projects/laz4android/files/?source=navbar
-			:To Install [*.7z], please, read the "Laz4Android_readme.txt"
+			Lazarus:1.5 trunk svn 49903
+				-->> http://sourceforge.net/projects/laz4android/files/?source=navbar
+			:To Install [*.7z], execute "build.bat"
 
 		-Simonsayz [great work on Android [GUI] Controls!]
 			Simon,Choi / Choi,Won-sik
@@ -73,8 +74,8 @@
 			http://sourceforge.net/projects/laz4android/files/?source=navbar
 			:To Install [*.7z], please, read the "Laz4Android_readme.txt"
 
-		Android NDK-r10c 
-			http://dl.google.com/android/ndk/android-ndk-r10c-windows-x86.exe
+		Android NDK-r10e
+			http://dl.google.com/android/ndk/android-ndk-r10e-windows-x86.exe
 
 		Ant	
 			http://ant.apache.org/bindownload.cgi 
@@ -83,8 +84,9 @@
 
 	***************************************************************************************************
 	* To start:				
-	*					
-	* "install_tutorial_ant_users.txt"	
+	*	
+	*  "readme_getstart.txt"				
+	* "install_tutorial.txt"	
 	* "install_tutorial_eclipse_users.txt"	                                
 	*					
 	***************************************************************************************************

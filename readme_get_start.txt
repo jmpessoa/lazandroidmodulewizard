@@ -12,23 +12,26 @@ I. Infrastructure
 .Android sdk, NDK-r10c
 
 .Laz4Android [All in one!] =
-	FPC: 3.1.1 trunk svn 31226 win32/arm-android/i386-android/jvm-android
-			--->>win32/arm-android/i386-android/jvm-android 
-			Note: required: NDK: r10c (arm-linux-androideabi-4.6 + x86-4.6)                               
-	Lazarus:1.5 trunk svn 49563
-			http://sourceforge.net/projects/laz4android/files/?source=navbar
-			:To Install [*.7z], please, read the "Laz4Android_readme.txt"
+
+	FPC: 3.1.1 trunk svn 31903 
+		-->> win32/arm-android/i386-android/jvm-android
+		Note: Need Android NDK: r10e (arm-linux-androideabi-4.9 + x86-4.9)
+
+	Lazarus:1.5 trunk svn 49903
+		-->> http://sourceforge.net/projects/laz4android/files/?source=navbar
+		:To Install [*.7z], execute "build.bat"
 
 .Android sdk
 
-.Android ndk-r10c   - 	this version is required by "Laz4Android"  
-			http://dl.google.com/android/ndk/android-ndk-r10c-windows-x86.exe
+.Android NDK-r10e   - 	this version is required by "Laz4Android"  [Last update:2015-10-02]
+			http://dl.google.com/android/ndk/android-ndk-r10e-windows-x86.exe
 
 .Ant [to build Apk]
+
 	http://ant.apache.org/bindownload.cgi 
 	Simply extract the zip file to a convenient location...
 
-.Eclipse is not mandatory!  [but to  facility, the Demos projects are Eclipse compatible!]  
+.Eclipse is not mandatory!  [but to  facility, all projects [and demos] are Eclipse compatible!]  
 
 
 II. LAMW:  Lazarus Android Module Wizard
@@ -152,4 +155,38 @@ Thank you!
 
 by jmpessoa at [josemarquespessoa_gmail_com]
 
-[updated: 04 august 2015]
+[updated: 08 august 2015]
+
+
+FAQ: [Thanks to @developing!]
+
+#Question: How do we can design a custom layout that shown same in real device?
+
+[Answer]: You should use: 
+		"Anchor", 
+		"PosRelativeToParent", 
+		"PosRelativeToAnchor", 
+		"LayoutParamHeight", 
+		"LayoutParamWhidth" 
+          
+Example: 
+
+1-Put a "jTextView" component on your AndroidModule form.
+	Set "PosRelativeToParent"
+		"rpCenterHorizontal" [True]
+		"rpTop" [True]
+
+2-Put a "jButton" component on AndroidModule form.
+	Set "Anchor" to "jTextView" (Because you should set position relative with "jTextView")
+	set "PosRelativeToAnchor"
+		"raBelow" [True]
+
+3-Put a "jEditText" component on form.
+	Set "Anchor" to "jButton".
+	Set "PosRelativeToAnchor"
+		"raBelow" [True]
+
+NOTE: 	Anchor setting is most important section of this design, 
+	because your component position depends on this property.
+	And for change width and/or height of each components you should 
+	change/configure "LayoutParamWhidth" and/or "LayoutParamHeight".
