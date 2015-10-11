@@ -168,6 +168,8 @@ import android.media.MediaPlayer.OnPreparedListener;
 import android.media.MediaPlayer.OnTimedTextListener;
 import android.media.MediaPlayer.OnVideoSizeChangedListener;
 import android.media.TimedText;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.net.wifi.WifiManager;
 import android.util.Log;
@@ -541,6 +543,17 @@ switch ( effect ) {
 public  void Close2() {  	
   controls.appLayout.removeView(layout);
   controls.pOnClose(PasObj);
+}
+public boolean IsConnected(){ // by renabor
+   ConnectivityManager cm =  (ConnectivityManager)controls.activity.getSystemService(Context.CONNECTIVITY_SERVICE);
+   NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+   return activeNetwork != null && activeNetwork.isConnectedOrConnecting();
+}
+
+public boolean IsConnectedWifi(){ // by renabor
+   ConnectivityManager cm =  (ConnectivityManager)controls.activity.getSystemService(Context.CONNECTIVITY_SERVICE);
+   NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+   return activeNetwork.getType() == ConnectivityManager.TYPE_WIFI;
 }
 
 //

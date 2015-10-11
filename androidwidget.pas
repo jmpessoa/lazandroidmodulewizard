@@ -952,6 +952,8 @@ type
 
     procedure SetWifiEnabled(_status: boolean);
     function IsWifiEnabled(): boolean;
+    function isConnected(): boolean; // by renabor
+    function isConnectedWifi(): boolean; // by renabor
 
     function GetEnvironmentDirectoryPath(_directory: TEnvDirectory): string;
     function GetInternalAppStoragePath: string;
@@ -1336,6 +1338,8 @@ procedure jForm_ShowMessage(env:PJNIEnv; Form:jObject; msg: string); overload;
 function jForm_GetDateTime(env:PJNIEnv; Form:jObject): string;
 procedure jForm_SetWifiEnabled(env: PJNIEnv;  _jform: JObject; _status: boolean);
 function jForm_IsWifiEnabled              (env: PJNIEnv;  _jform: JObject): boolean;
+function jForm_IsConnected              (env: PJNIEnv;  _jform: JObject): boolean;
+function jForm_IsConnectedWifi              (env: PJNIEnv;  _jform: JObject): boolean;
 function jForm_GetEnvironmentDirectoryPath(env: PJNIEnv;  _jform: JObject; _directory: integer): string;
 function jForm_GetInternalAppStoragePath(env: PJNIEnv;  _jform: JObject): string;
 function jForm_CopyFile(env: PJNIEnv;  _jform: JObject; _srcFullName: string; _destFullName: string): boolean;
@@ -2536,6 +2540,20 @@ begin
    if FInitialized then
       Result:= jForm_IsWifiEnabled(FjEnv, FjObject);
 end;
+
+function jForm.isConnected(): boolean; // by renabor
+begin
+   if FInitialized then
+      Result:= jForm_IsConnected(FjEnv, FjObject);
+end;
+
+function jForm.isConnectedWifi(): boolean; // by renabor
+begin
+   if FInitialized then
+      Result:= jForm_IsConnectedWifi(FjEnv, FjObject);
+end;
+
+
 
 function jForm.GetEnvironmentDirectoryPath(_directory: TEnvDirectory): string;
 begin
@@ -4797,6 +4815,36 @@ begin
   Result:= boolean(jBoo);
   env^.DeleteLocalRef(env, jCls);
 end;
+
+// by renabor
+function jForm_IsConnected(env: PJNIEnv; _jform: JObject): boolean;
+var
+  jBoo: JBoolean;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jform);
+  jMethod:= env^.GetMethodID(env, jCls, 'IsConnected', '()Z');
+  jBoo:= env^.CallBooleanMethod(env, _jform, jMethod);
+  Result:= boolean(jBoo);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+// by renabor
+function jForm_IsConnectedWifi(env: PJNIEnv; _jform: JObject): boolean;
+var
+  jBoo: JBoolean;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jform);
+  jMethod:= env^.GetMethodID(env, jCls, 'IsConnectedWifi', '()Z');
+  jBoo:= env^.CallBooleanMethod(env, _jform, jMethod);
+  Result:= boolean(jBoo);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+
 
 function jForm_GetEnvironmentDirectoryPath(env: PJNIEnv; _jform: JObject; _directory: integer): string;
 var
