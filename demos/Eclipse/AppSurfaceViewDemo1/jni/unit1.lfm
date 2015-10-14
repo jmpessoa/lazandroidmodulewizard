@@ -33,12 +33,13 @@ object AndroidModule1: TAndroidModule1
     FontColor = colbrDefault
     FontSize = 0
     TextTypeFace = tfNormal
+    FontSizeUnit = unitDefault
     Id = 4831487
   end
   object jButton1: jButton
     Left = 2
     Top = 34
-    Width = 316
+    Width = 314
     Height = 40
     MarginLeft = 2
     MarginTop = 4
@@ -54,13 +55,14 @@ object AndroidModule1: TAndroidModule1
     BackgroundColor = colbrDefault
     FontColor = colbrDefault
     FontSize = 0
+    FontSizeUnit = unitDefault
     OnClick = jButton1Click
     Id = 5740368
   end
   object jButton2: jButton
     Left = 2
     Top = 82
-    Width = 316
+    Width = 314
     Height = 40
     MarginLeft = 2
     MarginTop = 4
@@ -76,6 +78,7 @@ object AndroidModule1: TAndroidModule1
     BackgroundColor = colbrDefault
     FontColor = colbrDefault
     FontSize = 0
+    FontSizeUnit = unitDefault
     OnClick = jButton2Click
     Id = 6058869
   end
@@ -101,6 +104,7 @@ object AndroidModule1: TAndroidModule1
     OnDrawInBackground = jSurfaceView1DrawInBackground
     OnDrawOutBackground = jSurfaceView1DrawOutBackground
     OnTouchDown = jSurfaceView1TouchDown
+    OnTouchUp = jSurfaceView1TouchUp
     Id = 0
   end
   object jImageFileManager1: jImageFileManager

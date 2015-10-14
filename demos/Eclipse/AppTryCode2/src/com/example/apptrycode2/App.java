@@ -1,12 +1,12 @@
 package com.example.apptrycode2;
 
-//Lamw: Lazarus Android Module Wizard - Version 0.6 - rev. 32 - 05 July - 2015
+//Lamw: Lazarus Android Module Wizard - Version 0.6 - rev. 36 - 03 August - 2015
 //Form Designer and Components development model!
 //https://github.com/jmpessoa/lazandroidmodulewizard
 //http://forum.lazarus.freepascal.org/index.php/topic,21919.270.html
 
 //Android Java Interface for Pascal/Delphi XE5
-//And LAZARUS by jmpessoa@hotmail.com - december 2013
+//And LAZARUS by Jose Marques Pessoa [december 2013]
 
 //Developers
 //          Simon,Choi / Choi,Won-sik
@@ -17,7 +17,7 @@ package com.example.apptrycode2;
 //                       wkddidgh@naver.com
 //                       http://blog.naver.com/wkddidgh
 
-//	    JMPessoa  /  josemarquespessoa@gmail.com
+//	    Jose Marques Pessoa  /  josemarquespessoa@gmail.com
 
 
 import java.lang.Override;
@@ -118,12 +118,28 @@ public class App extends Activity {
     }
 
    /*by jmpessoa: Handles menu item selections */
-   @Override
+/*	@Override
    public boolean onOptionsItemSelected(MenuItem item) {
       String caption = item.getTitle().toString();
       controls.jAppOnClickOptionMenuItem(item, item.getItemId(), caption, item.isChecked());
       return false;
    }
+*/
+// http://stackoverflow.com/questions/15686555/display-back-button-on-action-bar
+@Override
+public boolean onOptionsItemSelected(MenuItem item) {
+    switch (item.getItemId()) {
+        case android.R.id.home:
+            // app icon in action bar clicked; go home
+	    controls.jAppOnBackPressed();
+            return true;
+        default:
+		String caption = item.getTitle().toString();
+		controls.jAppOnClickOptionMenuItem(item, item.getItemId(), caption,
+				item.isChecked());
+		return true; //renabor
+    }
+}
 
  //by jmpessoa: context menu support -  Context menu items do not support icons!
    @Override    
@@ -138,7 +154,7 @@ public class App extends Activity {
    public boolean onContextItemSelected(MenuItem item) {
    	  String caption = item.getTitle().toString();
    	  controls.jAppOnClickContextMenuItem(item, item.getItemId(), caption, item.isChecked());
-      return false;
+      return true; // stop propagating event
    }
 
    //by jmpessoa: option menu support

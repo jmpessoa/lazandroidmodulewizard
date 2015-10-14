@@ -1554,6 +1554,7 @@ begin
   customOptions_armV7a:= customOptions_armV7a+' -FD'+pathToNdkToolchainsBinArm;
   customOptions_x86:= customOptions_x86+' -FD'+pathToNdkToolchainsBinX86;
 
+  (*FIXED !!!   lazarus  rev  >> 46598  !!!
   {$IFDEF WINDOWS}
      //to others :: just to [fix a bug]  lazarus  rev < 46598 .... //thanks to Stephano!
      // ThierryDijoux - change auxStr by value of the correct folder
@@ -1562,6 +1563,7 @@ begin
      customOptions_armV7a:=  customOptions_armV7a +' -o..'+DirectorySeparator+'libs'+DirectorySeparator+'armeabi-v7a'+DirectorySeparator+'lib'+LowerCase(FJavaClassName)+'.so';
      customOptions_x86:=     customOptions_x86    +' -o..'+DirectorySeparator+'libs'+DirectorySeparator+'x86'        +DirectorySeparator+'lib'+LowerCase(FJavaClassName)+'.so';
   {$ENDIF}
+  *)
 
   auxList:= TStringList.Create;
   auxList.Add('<Libraries Value="'+libraries_x86+'"/>');

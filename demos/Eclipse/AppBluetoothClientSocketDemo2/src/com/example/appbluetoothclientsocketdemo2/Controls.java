@@ -1,17 +1,14 @@
 package com.example.appbluetoothclientsocketdemo2;
 
-//Lamw: Lazarus Android Module Wizard  - version 0.6 - revision 35 - 28 July - 2015 
+//Lamw: Lazarus Android Module Wizard  - version 0.6 - revision 36.2 - 07 October- 2015 
 //Form Designer and Components development model!
-//
 //
 //https://github.com/jmpessoa/lazandroidmodulewizard
 //http://forum.lazarus.freepascal.org/index.php/topic,21919.270.html
 //
 //Android Java Interface for Pascal/Delphi XE5 and FreePacal/LAZARUS[december 2013]
 //
-//
 //Developers:
-//
 //          Simon,Choi / Choi,Won-sik
 //                       simonsayz@naver.com
 //                       http://blog.naver.com/simonsayz
@@ -20,7 +17,7 @@ package com.example.appbluetoothclientsocketdemo2;
 //                       wkddidgh@naver.com
 //                       http://blog.naver.com/wkddidgh
 //
-//          JMPessoa   / josemarquespessoa@gmail.com
+//          Jose Marques Pessoa   / josemarquespessoa@gmail.com
 //
 //Version
 //History
@@ -171,6 +168,8 @@ import android.media.MediaPlayer.OnPreparedListener;
 import android.media.MediaPlayer.OnTimedTextListener;
 import android.media.MediaPlayer.OnVideoSizeChangedListener;
 import android.media.TimedText;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.net.wifi.WifiManager;
 import android.util.Log;
@@ -544,6 +543,17 @@ switch ( effect ) {
 public  void Close2() {  	
   controls.appLayout.removeView(layout);
   controls.pOnClose(PasObj);
+}
+public boolean IsConnected(){ // by renabor
+   ConnectivityManager cm =  (ConnectivityManager)controls.activity.getSystemService(Context.CONNECTIVITY_SERVICE);
+   NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+   return activeNetwork != null && activeNetwork.isConnectedOrConnecting();
+}
+
+public boolean IsConnectedWifi(){ // by renabor
+   ConnectivityManager cm =  (ConnectivityManager)controls.activity.getSystemService(Context.CONNECTIVITY_SERVICE);
+   NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+   return activeNetwork.getType() == ConnectivityManager.TYPE_WIFI;
 }
 
 //
@@ -958,6 +968,8 @@ public void SetTabNavigationModeActionBar(){
 public void RemoveAllTabsActionBar() {
 	ActionBar actionBar = this.controls.activity.getActionBar();
 	actionBar.removeAllTabs();
+        this.controls.activity.invalidateOptionsMenu(); // by renabor
+	actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD); //API 11 renabor
 }
 
 
@@ -3076,7 +3088,15 @@ private Bitmap          genericBmp;
 private int             widgetItem;
 private String          widgetText;
 private int             textColor; 
-private int             textSize;     
+private int             textSize;
+
+//by Renabor
+private float mDownX = -1;
+private float mDownY = -1;
+private final float SCROLL_THRESHOLD = 10;
+private boolean isOnClick;
+private boolean canClick;
+
 int textDecorated;
 int itemLayout;
 int textSizeDecorated;
@@ -3092,6 +3112,7 @@ private ArrayList<jListItemRow>    alist;
 private jArrayAdapter        aadapter;
 
 private OnItemClickListener  onItemClickListener;
+private OnTouchListener onTouchListener;
 
 //by jmpessoa
 private int lparamsAnchorRule[] = new int[20]; 
@@ -3152,47 +3173,84 @@ setChoiceMode(ListView.CHOICE_MODE_SINGLE);
 
 //Init Event
 
+// renabor gesture
+onTouchListener = new OnTouchListener() {	
+	@Override
+	public boolean onTouch(View v, MotionEvent event) {
+		int action = event.getAction() & MotionEvent.ACTION_MASK;
+		switch (action) {
+			case MotionEvent.ACTION_DOWN:
+				canClick = false;
+				// Log.i("ACTION", "DOWN");
+				mDownX = event.getX();
+				mDownY = event.getY();
+				isOnClick = true; // blocco la propagazione
+				break;
+			case MotionEvent.ACTION_CANCEL:
+			case MotionEvent.ACTION_UP:
+				if (isOnClick) {
+					// Log.i("ACTION", "UP");
+					canClick = true;
+				} else { Log.i("ACTION","UP NOT PROCESSED"); }
+				//return false; // passa oltre, ma potrebbe diventare true
+				//mDownX = -1;
+				return false;
+				
+    
+			case MotionEvent.ACTION_MOVE:
+				if (isOnClick && (Math.abs(mDownX - event.getX()) > SCROLL_THRESHOLD || Math.abs(mDownY - event.getY()) > SCROLL_THRESHOLD)) {
+					// Log.i("ACTION", "MOVE");
+					isOnClick = false;
+				};			
+				return false;					
+		};
+	return false;
+	};
+};
+
+setOnTouchListener(onTouchListener);
+
 
 //fixed! thanks to @renabor
 onItemClickListener = new OnItemClickListener() {@Override
 	public void onItemClick(AdapterView <? > parent, View v, int position, long id) {
-		lastSelectedItem = (int) position;
-		if (!isEmpty(alist)) { // this test is necessary !  //  <----- thanks to @renabor
-			if (highLightSelectedItem) {
-				if (lastSelectedItem > -1) {
-					DoHighlight(lastSelectedItem, textColor);
+	  if (canClick) { 
+	    	lastSelectedItem = (int) position;
+			if (!isEmpty(alist)) { // this test is necessary !  //  <----- thanks to @renabor
+				if (highLightSelectedItem) {
+					if (lastSelectedItem > -1) {
+						DoHighlight(lastSelectedItem, textColor);
+					}
+					DoHighlight((int) id, highLightColor);
 				}
-				DoHighlight((int) id, highLightColor);
-			}
-			if (alist.get((int) id).widget == 2  ) { //radio fix 16-febr-2015
-				for (int i = 0; i < alist.size(); i++) {
-					alist.get(i).checked = false;
+				if (alist.get((int) id).widget == 2  ) { //radio fix 16-febr-2015
+					for (int i = 0; i < alist.size(); i++) {
+						alist.get(i).checked = false;
+					}
+					alist.get((int) id).checked = true;
+					aadapter.notifyDataSetChanged();
 				}
-				alist.get((int) id).checked = true;
-				aadapter.notifyDataSetChanged();
+				controls.pOnClickCaptionItem(PasObj, (int) id, alist.get((int) id).label);
+			} else {
+				controls.pOnClickCaptionItem(PasObj, lastSelectedItem, ""); // avoid passing possibly undefined Caption
 			}
-			controls.pOnClickCaptionItem(PasObj, (int) id, alist.get((int) id).label);
-		} else {
-			controls.pOnClickCaptionItem(PasObj, lastSelectedItem, ""); // avoid passing possibly undefined Caption
 		}
-	}
+	} 
 };
-
 setOnItemClickListener(onItemClickListener);
 
-
 this.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {@Override
-	
 	public boolean onItemLongClick(AdapterView <?> parent, View view, int position, long id) {
-		if (!isEmpty(alist)) {  //  <----- thanks to @renabor
-			selectedItemCaption = alist.get((int) id).label;
-			controls.pOnListViewLongClickCaptionItem(PasObj, (int)id, alist.get((int)id).label);
-			return false;
-		}
-		lastSelectedItem = (int)id;
+		lastSelectedItem = (int)position;
+		if (canClick) {
+			if (!isEmpty(alist)) {  //  <----- thanks to @renabor
+				selectedItemCaption = alist.get((int) id).label;
+				controls.pOnListViewLongClickCaptionItem(PasObj, (int)id, alist.get((int)id).label);
+				return false;
+				};
+		};
 		return false;
 	}
-
 });
 
 }
@@ -3867,10 +3925,10 @@ class jPanel extends RelativeLayout {
            }
            if(event1.getY() - event2.getY() > SWIPE_MIN_DISTANCE && Math.abs(velocityY) > SWIPE_THRESHOLD_VELOCITY) {
         	   controls.pOnFlingGestureDetected(PasObj, 2);//onBottomToTop();
-        	   return true;
+        	   return false;
            } else if (event2.getY() - event1.getY() > SWIPE_MIN_DISTANCE && Math.abs(velocityY) > SWIPE_THRESHOLD_VELOCITY) {
         	   controls.pOnFlingGestureDetected(PasObj, 3); //onTopToBottom();
-        	   return true;
+        	   return false;
            } 		   
  		   return false;
  	   }
@@ -5294,7 +5352,7 @@ private Paint           mPaint   = null;
 private Bitmap          bmpUp    = null;
 private Bitmap          bmpDn    = null;
 private Rect            rect;
-private int             btnState = 0;      // Normal = 0 , Pressed = 1
+private int             btnState = 0;      // Normal/Up = 0 , Pressed = 1
 private Boolean         enabled  = true;   //
 
 //by jmpessoa
@@ -5307,10 +5365,10 @@ int countParentRule = 0;
 int lpH = RelativeLayout.LayoutParams.WRAP_CONTENT;
 int lpW = RelativeLayout.LayoutParams.WRAP_CONTENT; //w
 
-int MarginLeft = 5;
-int MarginTop = 5;
-int marginRight = 5;
-int marginBottom = 5;
+int MarginLeft = 0;
+int MarginTop = 0;
+int marginRight = 0;
+int marginBottom = 0;
 
 // Constructor
 public  jImageBtn(android.content.Context context,
@@ -5321,12 +5379,12 @@ PasObj   = pasobj;
 controls = ctrls;
 // Init Class
 lparams = new LayoutParams  (100,100);
-lparams.setMargins( 50, 50,0,0);
+lparams.setMargins(0, 0,0,0);
 // BackGroundColor
 //setBackgroundColor(0xFF0000FF);
 //
 mPaint = new Paint();
-rect   = new Rect(0,0,100,100);
+rect   = new Rect(0,0,200,200);
 }
 
 public void setLeftTopRightBottomWidthHeight(int left, int top, int right, int bottom, int w, int h) {
@@ -5348,20 +5406,25 @@ viewgroup.addView(this,lparams);
 public  void setButton( String fileup , String filedn ) {
 if (bmpUp  != null) { bmpUp.recycle();         }
 bmpUp = BitmapFactory.decodeFile(fileup);
+rect   = new Rect(0,0,bmpUp.getWidth(),bmpUp.getHeight());
+
 if (bmpDn  != null) { bmpDn.recycle();         }
 bmpDn = BitmapFactory.decodeFile(filedn);
+rect   = new Rect(0,0,bmpDn.getWidth(),bmpDn.getHeight());
 invalidate();
 }
 
 public  void setButtonUp( String fileup) {
 if (bmpUp  != null) { bmpUp.recycle(); }
 bmpUp = BitmapFactory.decodeFile(fileup);
+rect   = new Rect(0,0,bmpUp.getWidth(),bmpUp.getHeight());
 invalidate();
 }
 
 public  void setButtonDown( String filedn ) {
 if (bmpDn  != null) { bmpDn.recycle();         }
 bmpDn = BitmapFactory.decodeFile(filedn);
+rect   = new Rect(0,0,bmpDn.getWidth(),bmpDn.getHeight());
 invalidate();
 }
 
@@ -5386,9 +5449,10 @@ private Drawable GetDrawableResourceById(int _resID) {
 }
 
 public  void setButtonUpByRes(String resup) {   // ..res/drawable
- if (bmpUp  != null) { bmpUp.recycle(); }
+  if (bmpUp  != null) { bmpUp.recycle(); }
   Drawable d = GetDrawableResourceById(GetDrawableResourceId(resup));
   bmpUp = ((BitmapDrawable)d).getBitmap();
+  rect   = new Rect(0,0,bmpUp.getWidth(),bmpUp.getHeight());
   invalidate();
 }
 
@@ -5396,6 +5460,7 @@ public  void setButtonDownByRes(String resdn) {   // ..res/drawable
   if (bmpDn  != null) { bmpDn.recycle(); }
    Drawable d = GetDrawableResourceById(GetDrawableResourceId(resdn));
    bmpDn = ((BitmapDrawable)d).getBitmap();
+   rect   = new Rect(0,0,bmpDn.getWidth(),bmpDn.getHeight());	 
    invalidate();
 }
 
@@ -5403,28 +5468,49 @@ public  void setButtonDownByRes(String resdn) {   // ..res/drawable
 @Override
 public  boolean onTouchEvent( MotionEvent event) {
 // LORDMAN 2013-08-16
-if (enabled == false) { return(false); }
 
-int actType = event.getAction() &MotionEvent.ACTION_MASK;
+if (enabled == false) { return false; }
+
+int actType = event.getAction()&MotionEvent.ACTION_MASK;
+
 switch(actType) {
-  case MotionEvent.ACTION_DOWN: { btnState = 1; invalidate(); 
-                                 //Log.i("Java","jImageBtn Here"); 
-                                 break; }
-  case MotionEvent.ACTION_MOVE: {                             break; }
-  case MotionEvent.ACTION_UP  : { btnState = 0; invalidate();
-                                  controls.pOnClick(PasObj,Const.Click_Default);
-                                  break; }
+  case MotionEvent.ACTION_DOWN: {  btnState = 1; 
+                                   invalidate(); 
+                                   //Log.i("Java","jImageBtn Here"); 
+                                   break; 
+                                 }
+  case MotionEvent.ACTION_MOVE: { break; }
+  case MotionEvent.ACTION_UP  : {  btnState = 0; 
+                                   invalidate();
+                                   controls.pOnClick(PasObj,Const.Click_Default);                                  
+                                   break; 
+                                  }
 }
+
 return true;
+
 }
 
 //
 @Override
 public  void onDraw( Canvas canvas) {
 //
-if (btnState == 0) { if (bmpUp != null) { canvas.drawBitmap(bmpUp,null,rect,mPaint); }; }
-else               { if (bmpDn != null) { canvas.drawBitmap(bmpDn,null,rect,mPaint); }; };
+  if (btnState == 0) { 
+	if (bmpUp != null) { 
+		//Log.i("onDraw","UP");		
+		canvas.drawBitmap(bmpUp,null,rect,null); //mPaint 
+	} 
+  }
+  else  { 
+	 if (bmpDn != null) { 
+		//Log.i("onDraw","Dow");
+		canvas.drawBitmap(bmpDn,null,rect,null); //mPaint 
+	 }
+  }	
+  
 }
+
+
 
 public  void setEnabled(boolean value) {
 enabled = value;
@@ -6170,7 +6256,17 @@ class jSqliteDataAccess {
 		   DATABASE_NAME = dataBaseName;
 		   mydb = this.Open();
 	    }
-	           
+	    public void SetVersion(int version) {
+	    	if (mydb!= null) {
+	    		mydb.setVersion(version);
+	    	}
+	    }
+	    public int GetVersion() {
+	    	if (mydb!= null) {
+	    		return mydb.getVersion();
+	    	}
+	    	return 0;
+	    }
         public void ExecSQL(String execQuery){
 	        try{ 	
 	           if (mydb!= null) {
@@ -6265,7 +6361,7 @@ class jSqliteDataAccess {
             }	        	        	               	
         }
                 
-	    public String SelectS(String selectQuery) {	 //return String
+	    public String Select(String selectQuery) {	 //return String
 	    	
 		     String row = "";
 		     String rows = "";
@@ -6276,6 +6372,7 @@ class jSqliteDataAccess {
 		     String allRows = null;
 		      		     		     
 		     try{
+		    	   this.cursor = null; //[by renabor] without this a second query will find the Cursor randomly positioned!!!
 		           if (mydb!= null) {
 		               if (!mydb.isOpen()) {
 		                  mydb = this.Open();
@@ -6321,7 +6418,8 @@ class jSqliteDataAccess {
 		     return allRows; 
 	    }
 	    	    
-	    public void SelectV(String selectQuery) {   //just set the cursor! return void..
+	    public boolean Select(String selectQuery,  boolean moveToLast) {   //just set the cursor! return void..
+	    	    boolean result = true;
 	    	    this.cursor = null;
 		        try{  		        	
 			        if (mydb!= null) {
@@ -6329,11 +6427,13 @@ class jSqliteDataAccess {
 			              mydb = this.Open(); //controls.activity.openOrCreateDatabase(DATABASE_NAME, Context.MODE_PRIVATE, null); 
 			           }
 			        }		        			        				     	         
-			     	this.cursor  = mydb.rawQuery(selectQuery, null);			    			        
+			     	this.cursor  = mydb.rawQuery(selectQuery, null);
+			     	       this.cursor.moveToFirst(); 	
 			        mydb.close();			       
 			     }catch(SQLiteException se){
 			         Log.e(getClass().getSimpleName(), "Could not select:" + selectQuery);
-			     }	     		         			     
+			     }	     				        
+		         return true;
 		}
 
 	    public Cursor GetCursor() {
@@ -7943,7 +8043,7 @@ class jContextMenu /*extends ...*/ {
     //_itemType --> 0:Default, 1:Checkable
     public MenuItem AddItem(ContextMenu _menu, int _itemID, String _caption, int _itemType){    	     	
     	MenuItem item = _menu.add(0,_itemID,0 ,(CharSequence)_caption);
-    	
+
     	switch  (_itemType) {
     	case 1:  item.setCheckable(true); break;    	
     	}
@@ -9072,6 +9172,10 @@ class jBluetooth /*extends ...*/ {
     ArrayList<String> mListFoundedDevices = new ArrayList<String>();
     ArrayList<BluetoothDevice> mListReachablePairedDevices  = new ArrayList<BluetoothDevice>();
     
+    ArrayList<BluetoothDevice> mListFoundedDevices2  = new ArrayList<BluetoothDevice>();
+    
+    ArrayList<String> mListBondedDevices = new ArrayList<String>();
+    
     //jBluetoothClientSocket mBluetoothClientSocket;    
 
     final BroadcastReceiver mBroadcastReceiver = new BroadcastReceiver() {
@@ -9086,6 +9190,7 @@ class jBluetooth /*extends ...*/ {
 	        	   mListReachablePairedDevices.add(device);	               
 	           }
 			   mListFoundedDevices.add( device.getName() + "|" + device.getAddress() );
+			   mListFoundedDevices2.add(device);
 			  // Log.i("jBluetooth_onReceive",device.getName() + "|" + device.getAddress());	        	   
 	           	           
 	           controls.pOnBluetoothDeviceFound(pascalObj,device.getName(),device.getAddress());
@@ -9183,33 +9288,28 @@ class jBluetooth /*extends ...*/ {
             
     public String[] GetPairedDevices(){  //list all paired devices...
     	
-        ArrayList<String> listBondedDevices = new ArrayList<String>();
+    	mListBondedDevices.clear();
+    	
+        mListBondedDevices.add("null|null");
         
-        listBondedDevices.add("null|null");
-        
-        if (mBA != null && mBA.isEnabled()){
-            
-           Set<BluetoothDevice> Devices = mBA.getBondedDevices();
+        if (mBA != null && mBA.isEnabled()){            
+           Set<BluetoothDevice> Devices = mBA.getBondedDevices();           
+           //Toast.makeText(controls.activity.getApplicationContext(),"Devices Count = "+Devices.size(), Toast.LENGTH_SHORT).show();           
            
-           Toast.makeText(controls.activity.getApplicationContext(),"Devices Count = "+Devices.size(), Toast.LENGTH_SHORT).show();
-           
-           if(Devices.size() > 0) {
-        	   
-              listBondedDevices.clear();
-              
+           if(Devices.size() > 0) {        	  
+              mListBondedDevices.clear();              
               for(BluetoothDevice device : Devices) {        	
-         	     listBondedDevices.add(device.getName()+"|"+ device.getAddress());
+         	     mListBondedDevices.add(device.getName()+"|"+ device.getAddress());
            	     //Log.i("Bluetooch_devices",device.getName());  //device.getAddress()            
-              }
-              
+              }              
            }  
         }
         //strDevices = new String[mPairedDevices.size()];
         //strDevices = listDevices.toArray(strDevices);
-        String strDevices[] = listBondedDevices.toArray(new String[listBondedDevices.size()]);    	  
+        String strDevices[] = mListBondedDevices.toArray(new String[mListBondedDevices.size()]);    	  
         return strDevices;        
     }
-
+          
     public String[] GetFoundedDevices(){  //list
     	if (mListFoundedDevices.size() == 0) {
             mListFoundedDevices.add("null|null");
@@ -9257,8 +9357,7 @@ class jBluetooth /*extends ...*/ {
     	  return -1;
       }
     }       
-                         
-    
+                            
     public BluetoothDevice GetReachablePairedDeviceByName(String _deviceName) {
     	
     	int index = -1;
@@ -9358,6 +9457,49 @@ class jBluetooth /*extends ...*/ {
         sharingIntent.putExtra(Intent.EXTRA_STREAM, uri);
         controls.activity.startActivity(sharingIntent);       
     }
+    
+    public void UnpairDeviceByAddress(String _deviceAddress) {
+  	   BluetoothDevice device =  GetReachablePairedDeviceByAddress(_deviceAddress);
+      	try {
+      		
+      	  if (device != null) {	
+      	     Method m = device.getClass()
+      	        .getMethod("removeBond", (Class[]) null);
+      	     m.invoke(device, (Object[]) null);
+      	  }
+      	} catch (Exception e) {
+      	    //Log.e(TAG, e.getMessage());
+      	}
+      }  
+         
+    public BluetoothDevice GetFoundedDeviceByAddress(String _deviceAddress) {
+     	
+     	int index = -1;     	
+         for (int i=0; i < mListFoundedDevices2.size(); i++) {
+         	if (mListFoundedDevices2.get(i).getAddress().equals(_deviceAddress)) {
+         		index = i;
+         		break;
+         	}
+         }
+         if (index > -1) { 
+         	return mListFoundedDevices2.get(index);
+         }	
+         else return null;
+     }
+
+     public void PairDeviceByAddress(String _deviceAddress) {
+     	BluetoothDevice device = GetFoundedDeviceByAddress(_deviceAddress);
+     	try {
+     	    if (device != null) {    	    	
+     	    Method m = device.getClass()
+     	               .getMethod("createBond", (Class[]) null);    	    
+     	               m.invoke(device, (Object[]) null);
+     	    } 	    	   
+     	} catch (Exception e) {
+     	    //Log.e(TAG, e.getMessage());
+     	}
+     }
+      
 }
 
 //by jmpessoa
@@ -11640,6 +11782,7 @@ class jGridView extends GridView /*dummy*/ { //please, fix what GUI object will 
       setAdapter(null);     
       gridViewCustomeAdapter = null;
       setOnItemClickListener(null);
+	  setOnItemLongClickListener(null); // renabor
    }
 
    public void SetViewParent(ViewGroup _viewgroup) {
@@ -11790,6 +11933,14 @@ class jGridView extends GridView /*dummy*/ { //please, fix what GUI object will 
    public void SetFontColor(int _color) {	  
 	   mItemTextColor = _color;	
    }
+   
+   
+   public void UpdateItemTitle(int _index, String _title) {
+	   jGridItem info = alist.get(_index);
+	   info.label = _title;
+	   gridViewCustomeAdapter.notifyDataSetChanged();    
+   }
+   
    
 } //end class
 
@@ -16373,6 +16524,13 @@ public  int  getScreenWH(android.content.Context context) {
 
   int h = context.getResources().getDisplayMetrics().heightPixels;
   int w = context.getResources().getDisplayMetrics().widthPixels;
+// proposed by renabor
+/* 
+ float density  = context.getResources().getDisplayMetrics().density;
+ int dpHeight = Math.round ( h / density );
+ int dpWidth  = Math.round ( w / density );
+ return ( dpWidth << 16 | dpHeight ); // dp screen size  
+*/
   return ( (w << 16)| h );
 }
 

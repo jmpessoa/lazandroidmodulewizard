@@ -368,51 +368,51 @@ begin
 end;
 
 { Class:     com_example_apploadimagevideosoundfrominternet_Controls
-  Method:    pOnBluetoothClientSocketIncomingMessage
-  Signature: (JLjava/lang/String;)V }
-procedure pOnBluetoothClientSocketIncomingMessage(PEnv: PJNIEnv; this: JObject; pasobj: JLong; messageText: JString); cdecl;
+  Method:    pOnBluetoothClientSocketIncomingData
+  Signature: (J[B[B)V }
+procedure pOnBluetoothClientSocketIncomingData(PEnv: PJNIEnv; this: JObject; pasobj: JLong; byteArrayContent: JByteArray; byteArrayHeader: JByteArray); cdecl;
 begin
-  Java_Event_pOnBluetoothClientSocketIncomingMessage(PEnv,this,TObject(pasobj),messageText);
+  Java_Event_pOnBluetoothClientSocketIncomingData(PEnv,this,TObject(pasobj),byteArrayContent,byteArrayHeader);
 end;
 
 { Class:     com_example_apploadimagevideosoundfrominternet_Controls
-  Method:    pOnBluetoothClientSocketWritingMessage
+  Method:    pOnBluetoothClientSocketDisconnected
   Signature: (J)V }
-procedure pOnBluetoothClientSocketWritingMessage(PEnv: PJNIEnv; this: JObject; pasobj: JLong); cdecl;
+procedure pOnBluetoothClientSocketDisconnected(PEnv: PJNIEnv; this: JObject; pasobj: JLong); cdecl;
 begin
-  Java_Event_pOnBluetoothClientSocketWritingMessage(PEnv,this,TObject(pasobj));
+  Java_Event_pOnBluetoothClientSocketDisconnected(PEnv,this,TObject(pasobj));
 end;
 
 { Class:     com_example_apploadimagevideosoundfrominternet_Controls
   Method:    pOnBluetoothServerSocketConnected
-  Signature: (JLjava/lang/String;Ljava/lang/String;)V }
-procedure pOnBluetoothServerSocketConnected(PEnv: PJNIEnv; this: JObject; pasobj: JLong; deviceName: JString; deviceAddress: JString); cdecl;
+  Signature: (JLjava/lang/String;Ljava/lang/String;)Z }
+function pOnBluetoothServerSocketConnected(PEnv: PJNIEnv; this: JObject; pasobj: JLong; deviceName: JString; deviceAddress: JString): JBoolean; cdecl;
 begin
-  Java_Event_pOnBluetoothServerSocketConnected(PEnv,this,TObject(pasobj),deviceName,deviceAddress);
+  Result:=Java_Event_pOnBluetoothServerSocketConnected(PEnv,this,TObject(pasobj),deviceName,deviceAddress);
 end;
 
 { Class:     com_example_apploadimagevideosoundfrominternet_Controls
-  Method:    pOnBluetoothServerSocketIncomingMessage
-  Signature: (JLjava/lang/String;)V }
-procedure pOnBluetoothServerSocketIncomingMessage(PEnv: PJNIEnv; this: JObject; pasobj: JLong; messageText: JString); cdecl;
+  Method:    pOnBluetoothServerSocketIncomingData
+  Signature: (J[B[B)Z }
+function pOnBluetoothServerSocketIncomingData(PEnv: PJNIEnv; this: JObject; pasobj: JLong; byteArrayContent: JByteArray; byteArrayHeader: JByteArray): JBoolean; cdecl;
 begin
-  Java_Event_pOnBluetoothServerSocketIncomingMessage(PEnv,this,TObject(pasobj),messageText);
-end;
-
-{ Class:     com_example_apploadimagevideosoundfrominternet_Controls
-  Method:    pOnBluetoothServerSocketWritingMessage
-  Signature: (J)V }
-procedure pOnBluetoothServerSocketWritingMessage(PEnv: PJNIEnv; this: JObject; pasobj: JLong); cdecl;
-begin
-  Java_Event_pOnBluetoothServerSocketWritingMessage(PEnv,this,TObject(pasobj));
+  Result:=Java_Event_pOnBluetoothServerSocketIncomingData(PEnv,this,TObject(pasobj),byteArrayContent,byteArrayHeader);
 end;
 
 { Class:     com_example_apploadimagevideosoundfrominternet_Controls
   Method:    pOnBluetoothServerSocketListen
   Signature: (JLjava/lang/String;Ljava/lang/String;)V }
-procedure pOnBluetoothServerSocketListen(PEnv: PJNIEnv; this: JObject; pasobj: JLong; deviceName: JString; deviceAddress: JString); cdecl;
+procedure pOnBluetoothServerSocketListen(PEnv: PJNIEnv; this: JObject; pasobj: JLong; serverName: JString; strUUID: JString); cdecl;
 begin
-  Java_Event_pOnBluetoothServerSocketListen(PEnv,this,TObject(pasobj),deviceName,deviceAddress);
+  Java_Event_pOnBluetoothServerSocketListen(PEnv,this,TObject(pasobj),serverName,strUUID);
+end;
+
+{ Class:     com_example_apploadimagevideosoundfrominternet_Controls
+  Method:    pOnBluetoothServerSocketAcceptTimeout
+  Signature: (J)V }
+procedure pOnBluetoothServerSocketAcceptTimeout(PEnv: PJNIEnv; this: JObject; pasobj: JLong); cdecl;
+begin
+  Java_Event_pOnBluetoothServerSocketAcceptTimeout(PEnv,this,TObject(pasobj));
 end;
 
 { Class:     com_example_apploadimagevideosoundfrominternet_Controls
@@ -776,292 +776,292 @@ begin
 end;
 
 const NativeMethods:array[0..95] of JNINativeMethod = (
-    (name:'pAppOnScreenStyle';
+   (name:'pAppOnScreenStyle';
     signature:'()I';
     fnPtr:@pAppOnScreenStyle;),
-    (name:'pAppOnCreate';
+   (name:'pAppOnCreate';
     signature:'(Landroid/content/Context;Landroid/widget/RelativeLayout;)V';
     fnPtr:@pAppOnCreate;),
-    (name:'pAppOnNewIntent';
+   (name:'pAppOnNewIntent';
     signature:'()V';
     fnPtr:@pAppOnNewIntent;),
-    (name:'pAppOnDestroy';
+   (name:'pAppOnDestroy';
     signature:'()V';
     fnPtr:@pAppOnDestroy;),
-    (name:'pAppOnPause';
+   (name:'pAppOnPause';
     signature:'()V';
     fnPtr:@pAppOnPause;),
-    (name:'pAppOnRestart';
+   (name:'pAppOnRestart';
     signature:'()V';
     fnPtr:@pAppOnRestart;),
-    (name:'pAppOnResume';
+   (name:'pAppOnResume';
     signature:'()V';
     fnPtr:@pAppOnResume;),
-    (name:'pAppOnStart';
+   (name:'pAppOnStart';
     signature:'()V';
     fnPtr:@pAppOnStart;),
-    (name:'pAppOnStop';
+   (name:'pAppOnStop';
     signature:'()V';
     fnPtr:@pAppOnStop;),
-    (name:'pAppOnBackPressed';
+   (name:'pAppOnBackPressed';
     signature:'()V';
     fnPtr:@pAppOnBackPressed;),
-    (name:'pAppOnRotate';
+   (name:'pAppOnRotate';
     signature:'(I)I';
     fnPtr:@pAppOnRotate;),
-    (name:'pAppOnConfigurationChanged';
+   (name:'pAppOnConfigurationChanged';
     signature:'()V';
     fnPtr:@pAppOnConfigurationChanged;),
-    (name:'pAppOnActivityResult';
+   (name:'pAppOnActivityResult';
     signature:'(IILandroid/content/Intent;)V';
     fnPtr:@pAppOnActivityResult;),
-    (name:'pAppOnCreateOptionsMenu';
+   (name:'pAppOnCreateOptionsMenu';
     signature:'(Landroid/view/Menu;)V';
     fnPtr:@pAppOnCreateOptionsMenu;),
-    (name:'pAppOnClickOptionMenuItem';
+   (name:'pAppOnClickOptionMenuItem';
     signature:'(Landroid/view/MenuItem;ILjava/lang/String;Z)V';
     fnPtr:@pAppOnClickOptionMenuItem;),
-    (name:'pAppOnPrepareOptionsMenu';
+   (name:'pAppOnPrepareOptionsMenu';
     signature:'(Landroid/view/Menu;I)Z';
     fnPtr:@pAppOnPrepareOptionsMenu;),
-    (name:'pAppOnPrepareOptionsMenuItem';
+   (name:'pAppOnPrepareOptionsMenuItem';
     signature:'(Landroid/view/Menu;Landroid/view/MenuItem;I)Z';
     fnPtr:@pAppOnPrepareOptionsMenuItem;),
-    (name:'pAppOnCreateContextMenu';
+   (name:'pAppOnCreateContextMenu';
     signature:'(Landroid/view/ContextMenu;)V';
     fnPtr:@pAppOnCreateContextMenu;),
-    (name:'pAppOnClickContextMenuItem';
+   (name:'pAppOnClickContextMenuItem';
     signature:'(Landroid/view/MenuItem;ILjava/lang/String;Z)V';
     fnPtr:@pAppOnClickContextMenuItem;),
-    (name:'pOnClick';
+   (name:'pOnClick';
     signature:'(JI)V';
     fnPtr:@pOnClick;),
-    (name:'pOnChange';
+   (name:'pOnChange';
     signature:'(JLjava/lang/String;I)V';
     fnPtr:@pOnChange;),
-    (name:'pOnChanged';
+   (name:'pOnChanged';
     signature:'(JLjava/lang/String;I)V';
     fnPtr:@pOnChanged;),
-    (name:'pOnEnter';
+   (name:'pOnEnter';
     signature:'(J)V';
     fnPtr:@pOnEnter;),
-    (name:'pOnTimer';
+   (name:'pOnTimer';
     signature:'(J)V';
     fnPtr:@pOnTimer;),
-    (name:'pOnDraw';
+   (name:'pOnDraw';
     signature:'(JLandroid/graphics/Canvas;)V';
     fnPtr:@pOnDraw;),
-    (name:'pOnTouch';
+   (name:'pOnTouch';
     signature:'(JIIFFFF)V';
     fnPtr:@pOnTouch;),
-    (name:'pOnGLRenderer';
+   (name:'pOnGLRenderer';
     signature:'(JIII)V';
     fnPtr:@pOnGLRenderer;),
-    (name:'pOnClose';
+   (name:'pOnClose';
     signature:'(J)V';
     fnPtr:@pOnClose;),
-    (name:'pOnWebViewStatus';
+   (name:'pOnWebViewStatus';
     signature:'(JILjava/lang/String;)I';
     fnPtr:@pOnWebViewStatus;),
-    (name:'pOnAsyncEventDoInBackground';
+   (name:'pOnAsyncEventDoInBackground';
     signature:'(JI)Z';
     fnPtr:@pOnAsyncEventDoInBackground;),
-    (name:'pOnAsyncEventProgressUpdate';
+   (name:'pOnAsyncEventProgressUpdate';
     signature:'(JI)I';
     fnPtr:@pOnAsyncEventProgressUpdate;),
-    (name:'pOnAsyncEventPreExecute';
+   (name:'pOnAsyncEventPreExecute';
     signature:'(J)I';
     fnPtr:@pOnAsyncEventPreExecute;),
-    (name:'pOnAsyncEventPostExecute';
+   (name:'pOnAsyncEventPostExecute';
     signature:'(JI)V';
     fnPtr:@pOnAsyncEventPostExecute;),
-    (name:'pOnClickWidgetItem';
+   (name:'pOnClickWidgetItem';
     signature:'(JIZ)V';
     fnPtr:@pOnClickWidgetItem;),
-    (name:'pOnClickCaptionItem';
+   (name:'pOnClickCaptionItem';
     signature:'(JILjava/lang/String;)V';
     fnPtr:@pOnClickCaptionItem;),
-    (name:'pOnListViewLongClickCaptionItem';
+   (name:'pOnListViewLongClickCaptionItem';
     signature:'(JILjava/lang/String;)V';
     fnPtr:@pOnListViewLongClickCaptionItem;),
-    (name:'pOnListViewDrawItemCaptionColor';
+   (name:'pOnListViewDrawItemCaptionColor';
     signature:'(JILjava/lang/String;)I';
     fnPtr:@pOnListViewDrawItemCaptionColor;),
-    (name:'pOnListViewDrawItemBitmap';
+   (name:'pOnListViewDrawItemBitmap';
     signature:'(JILjava/lang/String;)Landroid/graphics/Bitmap;';
     fnPtr:@pOnListViewDrawItemBitmap;),
-    (name:'pOnBluetoothEnabled';
+   (name:'pOnBluetoothEnabled';
     signature:'(J)V';
     fnPtr:@pOnBluetoothEnabled;),
-    (name:'pOnBluetoothDisabled';
+   (name:'pOnBluetoothDisabled';
     signature:'(J)V';
     fnPtr:@pOnBluetoothDisabled;),
-    (name:'pOnBluetoothDeviceFound';
+   (name:'pOnBluetoothDeviceFound';
     signature:'(JLjava/lang/String;Ljava/lang/String;)V';
     fnPtr:@pOnBluetoothDeviceFound;),
-    (name:'pOnBluetoothDiscoveryStarted';
+   (name:'pOnBluetoothDiscoveryStarted';
     signature:'(J)V';
     fnPtr:@pOnBluetoothDiscoveryStarted;),
-    (name:'pOnBluetoothDiscoveryFinished';
+   (name:'pOnBluetoothDiscoveryFinished';
     signature:'(JII)V';
     fnPtr:@pOnBluetoothDiscoveryFinished;),
-    (name:'pOnBluetoothDeviceBondStateChanged';
+   (name:'pOnBluetoothDeviceBondStateChanged';
     signature:'(JILjava/lang/String;Ljava/lang/String;)V';
     fnPtr:@pOnBluetoothDeviceBondStateChanged;),
-    (name:'pOnBluetoothClientSocketConnected';
+   (name:'pOnBluetoothClientSocketConnected';
     signature:'(JLjava/lang/String;Ljava/lang/String;)V';
     fnPtr:@pOnBluetoothClientSocketConnected;),
-    (name:'pOnBluetoothClientSocketIncomingMessage';
-    signature:'(JLjava/lang/String;)V';
-    fnPtr:@pOnBluetoothClientSocketIncomingMessage;),
-    (name:'pOnBluetoothClientSocketWritingMessage';
+   (name:'pOnBluetoothClientSocketIncomingData';
+    signature:'(J[B[B)V';
+    fnPtr:@pOnBluetoothClientSocketIncomingData;),
+   (name:'pOnBluetoothClientSocketDisconnected';
     signature:'(J)V';
-    fnPtr:@pOnBluetoothClientSocketWritingMessage;),
-    (name:'pOnBluetoothServerSocketConnected';
-    signature:'(JLjava/lang/String;Ljava/lang/String;)V';
+    fnPtr:@pOnBluetoothClientSocketDisconnected;),
+   (name:'pOnBluetoothServerSocketConnected';
+    signature:'(JLjava/lang/String;Ljava/lang/String;)Z';
     fnPtr:@pOnBluetoothServerSocketConnected;),
-    (name:'pOnBluetoothServerSocketIncomingMessage';
-    signature:'(JLjava/lang/String;)V';
-    fnPtr:@pOnBluetoothServerSocketIncomingMessage;),
-    (name:'pOnBluetoothServerSocketWritingMessage';
-    signature:'(J)V';
-    fnPtr:@pOnBluetoothServerSocketWritingMessage;),
-    (name:'pOnBluetoothServerSocketListen';
+   (name:'pOnBluetoothServerSocketIncomingData';
+    signature:'(J[B[B)Z';
+    fnPtr:@pOnBluetoothServerSocketIncomingData;),
+   (name:'pOnBluetoothServerSocketListen';
     signature:'(JLjava/lang/String;Ljava/lang/String;)V';
     fnPtr:@pOnBluetoothServerSocketListen;),
-    (name:'pOnSpinnerItemSeleceted';
+   (name:'pOnBluetoothServerSocketAcceptTimeout';
+    signature:'(J)V';
+    fnPtr:@pOnBluetoothServerSocketAcceptTimeout;),
+   (name:'pOnSpinnerItemSeleceted';
     signature:'(JILjava/lang/String;)V';
     fnPtr:@pOnSpinnerItemSeleceted;),
-    (name:'pOnLocationChanged';
+   (name:'pOnLocationChanged';
     signature:'(JDDDLjava/lang/String;)V';
     fnPtr:@pOnLocationChanged;),
-    (name:'pOnLocationStatusChanged';
+   (name:'pOnLocationStatusChanged';
     signature:'(JILjava/lang/String;Ljava/lang/String;)V';
     fnPtr:@pOnLocationStatusChanged;),
-    (name:'pOnLocationProviderEnabled';
+   (name:'pOnLocationProviderEnabled';
     signature:'(JLjava/lang/String;)V';
     fnPtr:@pOnLocationProviderEnabled;),
-    (name:'pOnLocationProviderDisabled';
+   (name:'pOnLocationProviderDisabled';
     signature:'(JLjava/lang/String;)V';
     fnPtr:@pOnLocationProviderDisabled;),
-    (name:'pAppOnViewClick';
+   (name:'pAppOnViewClick';
     signature:'(Landroid/view/View;I)V';
     fnPtr:@pAppOnViewClick;),
-    (name:'pAppOnListItemClick';
+   (name:'pAppOnListItemClick';
     signature:'(Landroid/widget/AdapterView;Landroid/view/View;II)V';
     fnPtr:@pAppOnListItemClick;),
-    (name:'pOnActionBarTabSelected';
+   (name:'pOnActionBarTabSelected';
     signature:'(JLandroid/view/View;Ljava/lang/String;)V';
     fnPtr:@pOnActionBarTabSelected;),
-    (name:'pOnActionBarTabUnSelected';
+   (name:'pOnActionBarTabUnSelected';
     signature:'(JLandroid/view/View;Ljava/lang/String;)V';
     fnPtr:@pOnActionBarTabUnSelected;),
-    (name:'pOnCustomDialogShow';
+   (name:'pOnCustomDialogShow';
     signature:'(JLandroid/app/Dialog;Ljava/lang/String;)V';
     fnPtr:@pOnCustomDialogShow;),
-    (name:'pOnCustomDialogBackKeyPressed';
+   (name:'pOnCustomDialogBackKeyPressed';
     signature:'(JLjava/lang/String;)V';
     fnPtr:@pOnCustomDialogBackKeyPressed;),
-    (name:'pOnClickToggleButton';
+   (name:'pOnClickToggleButton';
     signature:'(JZ)V';
     fnPtr:@pOnClickToggleButton;),
-    (name:'pOnChangeSwitchButton';
+   (name:'pOnChangeSwitchButton';
     signature:'(JZ)V';
     fnPtr:@pOnChangeSwitchButton;),
-    (name:'pOnClickGridItem';
+   (name:'pOnClickGridItem';
     signature:'(JILjava/lang/String;)V';
     fnPtr:@pOnClickGridItem;),
-    (name:'pOnLongClickGridItem';
+   (name:'pOnLongClickGridItem';
     signature:'(JILjava/lang/String;)V';
     fnPtr:@pOnLongClickGridItem;),
-    (name:'pOnGridDrawItemCaptionColor';
+   (name:'pOnGridDrawItemCaptionColor';
     signature:'(JILjava/lang/String;)I';
     fnPtr:@pOnGridDrawItemCaptionColor;),
-    (name:'pOnGridDrawItemBitmap';
+   (name:'pOnGridDrawItemBitmap';
     signature:'(JILjava/lang/String;)Landroid/graphics/Bitmap;';
     fnPtr:@pOnGridDrawItemBitmap;),
-    (name:'pOnChangedSensor';
+   (name:'pOnChangedSensor';
     signature:'(JLandroid/hardware/Sensor;I[FJ)V';
     fnPtr:@pOnChangedSensor;),
-    (name:'pOnListeningSensor';
+   (name:'pOnListeningSensor';
     signature:'(JLandroid/hardware/Sensor;I)V';
     fnPtr:@pOnListeningSensor;),
-    (name:'pOnUnregisterListeningSensor';
+   (name:'pOnUnregisterListeningSensor';
     signature:'(JILjava/lang/String;)V';
     fnPtr:@pOnUnregisterListeningSensor;),
-    (name:'pOnBroadcastReceiver';
+   (name:'pOnBroadcastReceiver';
     signature:'(JLandroid/content/Intent;)V';
     fnPtr:@pOnBroadcastReceiver;),
-    (name:'pOnTimePicker';
+   (name:'pOnTimePicker';
     signature:'(JII)V';
     fnPtr:@pOnTimePicker;),
-    (name:'pOnDatePicker';
+   (name:'pOnDatePicker';
     signature:'(JIII)V';
     fnPtr:@pOnDatePicker;),
-    (name:'pOnFlingGestureDetected';
+   (name:'pOnFlingGestureDetected';
     signature:'(JI)V';
     fnPtr:@pOnFlingGestureDetected;),
-    (name:'pOnPinchZoomGestureDetected';
+   (name:'pOnPinchZoomGestureDetected';
     signature:'(JFI)V';
     fnPtr:@pOnPinchZoomGestureDetected;),
-    (name:'pOnShellCommandExecuted';
+   (name:'pOnShellCommandExecuted';
     signature:'(JLjava/lang/String;)V';
     fnPtr:@pOnShellCommandExecuted;),
-    (name:'pOnTCPSocketClientMessageReceived';
+   (name:'pOnTCPSocketClientMessageReceived';
     signature:'(J[Ljava/lang/String;)V';
     fnPtr:@pOnTCPSocketClientMessageReceived;),
-    (name:'pOnTCPSocketClientConnected';
+   (name:'pOnTCPSocketClientConnected';
     signature:'(J)V';
     fnPtr:@pOnTCPSocketClientConnected;),
-    (name:'pOnHttpClientContentResult';
+   (name:'pOnHttpClientContentResult';
     signature:'(JLjava/lang/String;)V';
     fnPtr:@pOnHttpClientContentResult;),
-    (name:'pOnHttpClientCodeResult';
+   (name:'pOnHttpClientCodeResult';
     signature:'(JI)V';
     fnPtr:@pOnHttpClientCodeResult;),
-    (name:'pOnSurfaceViewCreated';
+   (name:'pOnSurfaceViewCreated';
     signature:'(JLandroid/view/SurfaceHolder;)V';
     fnPtr:@pOnSurfaceViewCreated;),
-    (name:'pOnSurfaceViewDraw';
+   (name:'pOnSurfaceViewDraw';
     signature:'(JLandroid/graphics/Canvas;)V';
     fnPtr:@pOnSurfaceViewDraw;),
-    (name:'pOnSurfaceViewChanged';
+   (name:'pOnSurfaceViewChanged';
     signature:'(JII)V';
     fnPtr:@pOnSurfaceViewChanged;),
-    (name:'pOnMediaPlayerPrepared';
+   (name:'pOnMediaPlayerPrepared';
     signature:'(JII)V';
     fnPtr:@pOnMediaPlayerPrepared;),
-    (name:'pOnMediaPlayerVideoSizeChanged';
+   (name:'pOnMediaPlayerVideoSizeChanged';
     signature:'(JII)V';
     fnPtr:@pOnMediaPlayerVideoSizeChanged;),
-    (name:'pOnMediaPlayerCompletion';
+   (name:'pOnMediaPlayerCompletion';
     signature:'(J)V';
     fnPtr:@pOnMediaPlayerCompletion;),
-    (name:'pOnMediaPlayerTimedText';
+   (name:'pOnMediaPlayerTimedText';
     signature:'(JLjava/lang/String;)V';
     fnPtr:@pOnMediaPlayerTimedText;),
-    (name:'pOnSurfaceViewTouch';
+   (name:'pOnSurfaceViewTouch';
     signature:'(JIIFFFF)V';
     fnPtr:@pOnSurfaceViewTouch;),
-    (name:'pOnSurfaceViewDrawingInBackground';
+   (name:'pOnSurfaceViewDrawingInBackground';
     signature:'(JF)Z';
     fnPtr:@pOnSurfaceViewDrawingInBackground;),
-    (name:'pOnSurfaceViewDrawingPostExecute';
+   (name:'pOnSurfaceViewDrawingPostExecute';
     signature:'(JF)V';
     fnPtr:@pOnSurfaceViewDrawingPostExecute;),
-    (name:'pOnContactManagerContactsExecuted';
+   (name:'pOnContactManagerContactsExecuted';
     signature:'(JI)V';
     fnPtr:@pOnContactManagerContactsExecuted;),
-    (name:'pOnContactManagerContactsProgress';
+   (name:'pOnContactManagerContactsProgress';
     signature:'(JLjava/lang/String;Ljava/lang/String;Ljava/lang/String;Landroid/graphics/Bitmap;I)Z';
     fnPtr:@pOnContactManagerContactsProgress;),
-    (name:'pOnSeekBarProgressChanged';
+   (name:'pOnSeekBarProgressChanged';
     signature:'(JIZ)V';
     fnPtr:@pOnSeekBarProgressChanged;),
-    (name:'pOnSeekBarStartTrackingTouch';
+   (name:'pOnSeekBarStartTrackingTouch';
     signature:'(JI)V';
     fnPtr:@pOnSeekBarStartTrackingTouch;),
-    (name:'pOnSeekBarStopTrackingTouch';
+   (name:'pOnSeekBarStopTrackingTouch';
     signature:'(JI)V';
     fnPtr:@pOnSeekBarStopTrackingTouch;)
 );
@@ -1093,10 +1093,10 @@ begin
   (VM^).GetEnv(VM, @PEnv, Result);
   if PEnv <> nil then
   begin
-      curEnv:= PJNIEnv(PEnv);
-      RegisterNativeMethods(curEnv, 'com/example/apploadimagevideosoundfrominternet/Controls');
+     curEnv:= PJNIEnv(PEnv);
+     RegisterNativeMethods(curEnv, 'com/example/apploadimagevideosoundfrominternet/Controls');
   end;
-  gVM:= VM;{And_jni_Bridge}
+  gVM:= VM; {AndroidWidget.pas}
 end;
 
 procedure JNI_OnUnload(VM: PJavaVM; reserved: pointer); cdecl;
@@ -1110,8 +1110,8 @@ begin
   begin
     curEnv:= PJNIEnv(PEnv);
     (curEnv^).DeleteGlobalRef(curEnv, gjClass);
-    gjClass:= nil;
-    gVM:= nil;
+    gjClass:= nil; {AndroidWidget.pas}
+    gVM:= nil; {AndroidWidget.pas}
   end;
   gApp.Terminate;
   FreeAndNil(gApp);
@@ -1165,12 +1165,12 @@ exports
   pOnBluetoothDiscoveryFinished name 'Java_com_example_apploadimagevideosoundfrominternet_Controls_pOnBluetoothDiscoveryFinished',
   pOnBluetoothDeviceBondStateChanged name 'Java_com_example_apploadimagevideosoundfrominternet_Controls_pOnBluetoothDeviceBondStateChanged',
   pOnBluetoothClientSocketConnected name 'Java_com_example_apploadimagevideosoundfrominternet_Controls_pOnBluetoothClientSocketConnected',
-  pOnBluetoothClientSocketIncomingMessage name 'Java_com_example_apploadimagevideosoundfrominternet_Controls_pOnBluetoothClientSocketIncomingMessage',
-  pOnBluetoothClientSocketWritingMessage name 'Java_com_example_apploadimagevideosoundfrominternet_Controls_pOnBluetoothClientSocketWritingMessage',
+  pOnBluetoothClientSocketIncomingData name 'Java_com_example_apploadimagevideosoundfrominternet_Controls_pOnBluetoothClientSocketIncomingData',
+  pOnBluetoothClientSocketDisconnected name 'Java_com_example_apploadimagevideosoundfrominternet_Controls_pOnBluetoothClientSocketDisconnected',
   pOnBluetoothServerSocketConnected name 'Java_com_example_apploadimagevideosoundfrominternet_Controls_pOnBluetoothServerSocketConnected',
-  pOnBluetoothServerSocketIncomingMessage name 'Java_com_example_apploadimagevideosoundfrominternet_Controls_pOnBluetoothServerSocketIncomingMessage',
-  pOnBluetoothServerSocketWritingMessage name 'Java_com_example_apploadimagevideosoundfrominternet_Controls_pOnBluetoothServerSocketWritingMessage',
+  pOnBluetoothServerSocketIncomingData name 'Java_com_example_apploadimagevideosoundfrominternet_Controls_pOnBluetoothServerSocketIncomingData',
   pOnBluetoothServerSocketListen name 'Java_com_example_apploadimagevideosoundfrominternet_Controls_pOnBluetoothServerSocketListen',
+  pOnBluetoothServerSocketAcceptTimeout name 'Java_com_example_apploadimagevideosoundfrominternet_Controls_pOnBluetoothServerSocketAcceptTimeout',
   pOnSpinnerItemSeleceted name 'Java_com_example_apploadimagevideosoundfrominternet_Controls_pOnSpinnerItemSeleceted',
   pOnLocationChanged name 'Java_com_example_apploadimagevideosoundfrominternet_Controls_pOnLocationChanged',
   pOnLocationStatusChanged name 'Java_com_example_apploadimagevideosoundfrominternet_Controls_pOnLocationStatusChanged',
@@ -1218,12 +1218,13 @@ exports
   pOnSeekBarStopTrackingTouch name 'Java_com_example_apploadimagevideosoundfrominternet_Controls_pOnSeekBarStopTrackingTouch';
 
 begin
-  gApp:= jApp.Create(nil);
-  gApp.Title:= 'JNI Android Bridges Library';
-  gjAppName:= 'com.example.apploadimagevideosoundfrominternet';
-  gjClassName:= 'com/example/apploadimagevideosoundfrominternet/Controls';
+  gApp:= jApp.Create(nil);{AndroidWidget.pas}
+  gApp.Title:= 'My Android Bridges Library';
+  gjAppName:= 'com.example.apploadimagevideosoundfrominternet';{AndroidWidget.pas}
+  gjClassName:= 'com/example/apploadimagevideosoundfrominternet/Controls';{AndroidWidget.pas}
   gApp.AppName:=gjAppName;
   gApp.ClassName:=gjClassName;
   gApp.Initialize;
   gApp.CreateForm(TAndroidModule1, AndroidModule1);
 end.
+(*last [template] upgrade: 10/12/2015 21:53:21*)

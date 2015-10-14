@@ -32,6 +32,8 @@ type
       procedure jListView1DrawItemTextColor(Sender: TObject;
         itemIndex: integer; itemCaption: string; out textColor: TARGBColorBridge
         );
+      procedure jListView1LongClickItem(Sender: TObject; itemIndex: integer;
+        itemCaption: string);
     private
       {private declarations}
     public
@@ -125,6 +127,12 @@ procedure TAndroidModule1.jListView1DrawItemTextColor(Sender: TObject;
   itemIndex: integer; itemCaption: string; out textColor: TARGBColorBridge);
 begin
   if  itemIndex = 1 then textColor:= colbrGreen;
+end;
+
+procedure TAndroidModule1.jListView1LongClickItem(Sender: TObject;
+  itemIndex: integer; itemCaption: string);
+begin
+    ShowMessage('LOng: index = ['+intToStr(itemIndex)+'/'+itemCaption+']');
 end;
 
 end.

@@ -74,8 +74,8 @@ begin
   ViewPort1.DrawGrid:= True;
   ViewPort1.SetScaleXY(-1.6 {xmin},1.6{xmax}, -2.0{ymin}, 6.0{ymax}); //real world!!
 
-  FPNoGUIGraphicsBridge1.AddEntity('blue_layer','Circle',[Point(0.0,1.0){left/top},
-                                                           Point(1.0,0.0){right/botom}],'This is a Circle!','foo');
+  FPNoGUIGraphicsBridge1.AddEntity('blue_layer','Circle',[Point(0.0,1.0){center},
+                                                           Point(0.0+0.5,1.0){radio=Abs(x2-x1)}],'This is a Circle!','foo');
 
   FPNoGUIGraphicsBridge1.AddEntity('blue_layer','Line',[Point(0.0,1.5),Point(1.0, 3.6)],'','foo');
   FPNoGUIGraphicsBridge1.AddEntity('blue_layer','Polyline',[Point(0.0,1.5),Point(0.5,1),

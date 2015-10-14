@@ -50,35 +50,30 @@
         <IsPartOfProject Value="True"/>
         <ComponentName Value="AndroidModule1"/>
         <HasResources Value="True"/>
-        <UnitName Value="unit1"/>
       </Unit1>
       <Unit2>
         <Filename Value="unit2.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="AndroidModule2"/>
         <HasResources Value="True"/>
-        <UnitName Value="unit2"/>
       </Unit2>
       <Unit3>
         <Filename Value="unit3.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="AndroidModule3"/>
         <HasResources Value="True"/>
-        <UnitName Value="unit3"/>
       </Unit3>
       <Unit4>
         <Filename Value="unit4.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="AndroidModule4"/>
         <HasResources Value="True"/>
-        <UnitName Value="unit4"/>
       </Unit4>
       <Unit5>
         <Filename Value="unit5.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="AndroidModule5"/>
         <HasResources Value="True"/>
-        <UnitName Value="unit5"/>
       </Unit5>
     </Units>
   </ProjectOptions>
@@ -89,12 +84,12 @@
       <Filename Value="..\libs\armeabi\libcontrols"/>
     </Target>
     <SearchPaths>
-      <Libraries Value="C:\adt32\ndk10\platforms\android-15\arch-arm\usr\lib\;C:\adt32\ndk10\toolchains\arm-linux-androideabi-4.6\prebuilt\windows\lib\gcc\arm-linux-androideabi\4.6\"/>
+      <Libraries Value="C:\adt32\ndk10e\platforms\android-15\arch-arm\usr\lib\;C:\adt32\ndk10e\toolchains\arm-linux-androideabi-4.9\prebuilt\windows\lib\gcc\arm-linux-androideabi\4.9\"/>
       <UnitOutputDirectory Value="..\obj\controls"/>
     </SearchPaths>
     <Parsing>
       <SyntaxOptions>
-        <SyntaxMode Value="delphi"/>
+        <SyntaxMode Value="Delphi"/>
         <CStyleMacros Value="True"/>
       </SyntaxOptions>
     </Parsing>
@@ -118,7 +113,7 @@
       </Options>
     </Linking>
     <Other>
-      <CustomOptions Value="-Xd -CfSoft -CpARMV6 -XParm-linux-androideabi- -FDC:\adt32\ndk10\toolchains\arm-linux-androideabi-4.6\prebuilt\windows\bin -o..\libs\armeabi\libcontrols.so"/>
+      <CustomOptions Value="-Xd -CfSoft -CpARMV6 -XParm-linux-androideabi- -FDC:\adt32\ndk10e\toolchains\arm-linux-androideabi-4.9\prebuilt\windows\bin"/>
     </Other>
   </CompilerOptions>
   <Debugging>

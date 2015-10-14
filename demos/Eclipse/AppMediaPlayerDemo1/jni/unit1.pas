@@ -144,7 +144,7 @@ begin
     begin
        if jMediaPlayer1.IsPlaying() then jMediaPlayer1.Stop();
        jRadioButton1.Checked:= False;
-       jMediaPlayer1.SetDataSource('bigbunny.mp4');  //from  .../assets or 'http://bffmedia.com/bigbunny.mp4'
+       jMediaPlayer1.SetDataSource('http://bffmedia.com/bigbunny.mp4');  {'bigbunny.mp4'}//from  .../assets or
        ShowMessage('Video "bigbunny.mp4" Loaded ... Preparing.. ');
        FIsPrepared:= False;
        jMediaPlayer1.Prepare();  //Dispatch --> OnPrepared !

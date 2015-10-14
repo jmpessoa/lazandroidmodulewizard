@@ -32,6 +32,7 @@ object AndroidModule1: TAndroidModule1
     FontColor = colbrDefault
     FontSize = 0
     TextTypeFace = tfNormal
+    FontSizeUnit = unitDefault
     Id = 475129
   end
   object jButton1: jButton
@@ -53,6 +54,7 @@ object AndroidModule1: TAndroidModule1
     BackgroundColor = colbrDefault
     FontColor = colbrDefault
     FontSize = 0
+    FontSizeUnit = unitDefault
     OnClick = jButton1Click
     Id = 5638307
   end
@@ -75,6 +77,7 @@ object AndroidModule1: TAndroidModule1
     BackgroundColor = colbrDefault
     FontColor = colbrDefault
     FontSize = 0
+    FontSizeUnit = unitDefault
     OnClick = jButton2Click
     Id = 0
   end
@@ -109,6 +112,7 @@ object AndroidModule1: TAndroidModule1
     VerScrollBar = False
     WrappingLine = False
     Editable = True
+    FontSizeUnit = unitDefault
     Id = 9565430
   end
   object jListView1: jListView
@@ -138,8 +142,10 @@ object AndroidModule1: TAndroidModule1
     TextSizeDecorated = sdNone
     TextAlign = alLeft
     HighLightSelectedItemColor = colbrDefault
+    FontSizeUnit = unitDefault
     OnClickItem = jListView1ClickItem
     OnClickWidgetItem = jListView1ClickWidgetItem
+    OnLongClickItem = jListView1LongClickItem
     OnDrawItemTextColor = jListView1DrawItemTextColor
     OnDrawItemBitmap = jListView1DrawItemBitmap
     Id = 0

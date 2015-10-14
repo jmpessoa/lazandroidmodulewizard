@@ -1,4 +1,4 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <CONFIG>
   <ProjectOptions>
     <Version Value="9"/>
@@ -38,7 +38,6 @@
       <Unit0>
         <Filename Value="jnihello.lpr"/>
         <IsPartOfProject Value="True"/>
-        <UnitName Value="jnihello"/>
       </Unit0>
       <Unit1>
         <Filename Value="unit1.pas"/>
@@ -46,7 +45,6 @@
         <ComponentName Value="NoGUIAndroidModule1"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="DataModule"/>
-        <UnitName Value="unit1"/>
       </Unit1>
     </Units>
   </ProjectOptions>
@@ -54,14 +52,15 @@
     <Version Value="11"/>
     <PathDelim Value="\"/>
     <Target>
-      <Filename Value="C:\adt32\eclipse\workspace\AppNoGUIDemo1\libs\armeabi\jnihello"/>
+      <Filename Value="..\libs\armeabi\libjnihello"/>
     </Target>
     <SearchPaths>
-      <Libraries Value="C:\adt32\ndk7\platforms\android-14\arch-arm\usr\lib\;C:\adt32\ndk7\toolchains\arm-linux-androideabi-4.4.3\prebuilt\windows\lib\gcc\arm-linux-androideabi\4.4.3\"/>
+      <Libraries Value="C:\adt32\ndk10e\platforms\android-15\arch-arm\usr\lib\;C:\adt32\ndk10e\toolchains\arm-linux-androideabi-4.9\prebuilt\windows\lib\gcc\arm-linux-androideabi\4.9\"/>
+      <UnitOutputDirectory Value="..\obj\jnihello"/>
     </SearchPaths>
     <Parsing>
       <SyntaxOptions>
-        <SyntaxMode Value="delphi"/>
+        <SyntaxMode Value="Delphi"/>
         <CStyleMacros Value="True"/>
       </SyntaxOptions>
     </Parsing>
@@ -80,11 +79,7 @@
       </Options>
     </Linking>
     <Other>
-      <CompilerMessages>
-        <MsgFileName Value=""/>
-      </CompilerMessages>
-      <CustomOptions Value="-dANDROID -Xd -CpARMv6 -CfSoft -FLC:\adt32\ndk7\platforms\android-14\arch-arm\usr\lib\libdl.so -FUC:\adt32\eclipse\workspace\AppNoGUIDemo1\obj\JNIHello -oC:\adt32\eclipse\workspace\AppNoGUIDemo1\libs\armeabi\libjnihello.so"/>
-      <CompilerPath Value="$(CompPath)"/>
+      <CustomOptions Value="-Xd -CfSoft -CpARMV6 -XParm-linux-androideabi- -FDC:\adt32\ndk10e\toolchains\arm-linux-androideabi-4.9\prebuilt\windows\bin"/>
     </Other>
   </CompilerOptions>
   <Debugging>

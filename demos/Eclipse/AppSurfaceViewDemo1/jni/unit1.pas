@@ -28,6 +28,8 @@ type
     procedure jSurfaceView1SurfaceCreated(Sender: TObject);
     procedure jSurfaceView1SurfaceDraw(Sender: TObject; canvas: jObject);
     procedure jSurfaceView1TouchDown(Sender: TObject; Touch: TMouch);
+    procedure jSurfaceView1TouchUp(Sender: TObject; Touch: TMouch);
+
   private
     {private declarations}
     FX1, FY1: single;
@@ -128,7 +130,12 @@ end;
 
 procedure TAndroidModule1.jSurfaceView1TouchDown(Sender: TObject; Touch: TMouch);
 begin
-  if not FInBackground then ShowMessage('Touch Hello!');
+  if not FInBackground then ShowMessage('Touch: X='+ FloatToStr(Touch.Pt.X) + ' Y='+FloatToStr(Touch.Pt.Y) );
+end;
+
+procedure TAndroidModule1.jSurfaceView1TouchUp(Sender: TObject; Touch: TMouch);
+begin
+  //
 end;
 
 procedure TAndroidModule1.AndroidModule1Close(Sender: TObject);

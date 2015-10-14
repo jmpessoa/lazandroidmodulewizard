@@ -17,12 +17,15 @@ type
     jButton1: jButton;
     jButton2: jButton;
     jButton3: jButton;
+    jButton4: jButton;
     jEditText1: jEditText;
     jHttpClient1: jHttpClient;
     jTextView1: jTextView;
     procedure jButton1Click(Sender: TObject);
     procedure jButton2Click(Sender: TObject);
     procedure jButton3Click(Sender: TObject);
+    procedure jButton4Click(Sender: TObject);
+
   private
     {private declarations}
   public
@@ -180,5 +183,43 @@ begin
                       }
    end;
 end;
+
+procedure TAndroidModule1.jButton4Click(Sender: TObject);
+var
+  i, count: integer;
+begin
+
+   jEditText1.Clear;
+   jHttpClient1.ClearCookieStore();
+
+   jEditText1.AppendLn(jHttpClient1.GetStateful('http://localhost:8080/cookie/get'));
+
+   count:= jHttpClient1.GetCookiesCount();
+   ShowMessage('Count Cookie = '+ IntToStr(count));
+
+   for i:=0 to count-1 do
+   begin
+       ShowMessage(jHttpClient1.GetCookieAttributeValue(
+                       jHttpClient1.GetCookieByIndex(i), 'name'));
+
+       ShowMessage(jHttpClient1.GetCookieAttributeValue(
+                       jHttpClient1.GetCookieByIndex(i), 'value'));
+
+       ShowMessage(jHttpClient1.GetCookieAttributeValue(
+                       jHttpClient1.GetCookieByIndex(i), 'expirydate'));
+
+                     {
+                      'name'
+                      'value'
+                      'domain'
+                      'version'
+                      'expirydate'
+                      'path'
+                      'comment'
+                      'ports'
+                      }
+   end;
+end;
+
 
 end.

@@ -1,17 +1,14 @@
 package com.example.apphttpclientcookiesdemo1;
 
-//Lamw: Lazarus Android Module Wizard 
+//Lamw: Lazarus Android Module Wizard  - version 0.6 - revision 36.2 - 07 October- 2015 
 //Form Designer and Components development model!
-//version 0.6 - revision 34 - 14 July - 2015
 //
 //https://github.com/jmpessoa/lazandroidmodulewizard
 //http://forum.lazarus.freepascal.org/index.php/topic,21919.270.html
 //
 //Android Java Interface for Pascal/Delphi XE5 and FreePacal/LAZARUS[december 2013]
 //
-//
 //Developers:
-//
 //          Simon,Choi / Choi,Won-sik
 //                       simonsayz@naver.com
 //                       http://blog.naver.com/simonsayz
@@ -20,7 +17,7 @@ package com.example.apphttpclientcookiesdemo1;
 //                       wkddidgh@naver.com
 //                       http://blog.naver.com/wkddidgh
 //
-//          JMPessoa   / josemarquespessoa@gmail.com
+//          Jose Marques Pessoa   / josemarquespessoa@gmail.com
 //
 //Version
 //History
@@ -171,6 +168,8 @@ import android.media.MediaPlayer.OnPreparedListener;
 import android.media.MediaPlayer.OnTimedTextListener;
 import android.media.MediaPlayer.OnVideoSizeChangedListener;
 import android.media.TimedText;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.net.wifi.WifiManager;
 import android.util.Log;
@@ -253,6 +252,7 @@ import java.net.Socket;
 import java.net.URL;
 import java.net.URLConnection;
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.text.ParseException;
 //import java.nio.ByteBuffer;
 //import java.nio.ByteOrder;
@@ -261,6 +261,7 @@ import java.text.ParseException;
 //import java.text.Format;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Iterator;
@@ -287,6 +288,7 @@ import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.CookieStore;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.protocol.ClientContext;
@@ -541,6 +543,17 @@ switch ( effect ) {
 public  void Close2() {  	
   controls.appLayout.removeView(layout);
   controls.pOnClose(PasObj);
+}
+public boolean IsConnected(){ // by renabor
+   ConnectivityManager cm =  (ConnectivityManager)controls.activity.getSystemService(Context.CONNECTIVITY_SERVICE);
+   NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+   return activeNetwork != null && activeNetwork.isConnectedOrConnecting();
+}
+
+public boolean IsConnectedWifi(){ // by renabor
+   ConnectivityManager cm =  (ConnectivityManager)controls.activity.getSystemService(Context.CONNECTIVITY_SERVICE);
+   NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+   return activeNetwork.getType() == ConnectivityManager.TYPE_WIFI;
 }
 
 //
@@ -955,6 +968,8 @@ public void SetTabNavigationModeActionBar(){
 public void RemoveAllTabsActionBar() {
 	ActionBar actionBar = this.controls.activity.getActionBar();
 	actionBar.removeAllTabs();
+        this.controls.activity.invalidateOptionsMenu(); // by renabor
+	actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD); //API 11 renabor
 }
 
 
@@ -1140,6 +1155,44 @@ public String GetSubTitleActionBar() {
 	   return (String)actionBar.getSubtitle();  
 }
 
+
+//https://xjaphx.wordpress.com/2011/10/02/store-and-use-files-in-assets/
+public void CopyFromAssetsToInternalAppStorage(String _filename){				    		   
+		InputStream is = null;
+		FileOutputStream fos = null;			
+		String PathDat = controls.activity.getFilesDir().getAbsolutePath();			 			
+		try {		   		     			
+			File outfile = new File(PathDat+"/"+_filename);								
+			// if file doesnt exists, then create it
+			if (!outfile.exists()) {
+				outfile.createNewFile();			
+			}												
+			fos = new FileOutputStream(outfile);  //save to data/data/your_package/files/your_file_name														
+			is = controls.activity.getAssets().open(_filename);																				
+			int size = is.available();	     
+			byte[] buffer = new byte[size];												
+			for (int c = is.read(buffer); c != -1; c = is.read(buffer)){
+		      fos.write(buffer, 0, c);
+			}																
+			is.close();								
+			fos.close();															
+		}catch (IOException e) {
+			// Log.i("ShareFromAssets","fail!!");
+		     e.printStackTrace();			     
+		}									
+}	
+
+public void CopyFromInternalAppStorageToEnvironmentDir(String _filename, String _environmentDir) {	 
+    String srcPath = controls.activity.getFilesDir().getAbsolutePath()+"/"+ _filename;       //Result : /data/data/com/MyApp/files	 
+    String destPath = _environmentDir + "/" + _filename;	  
+    CopyFile(srcPath, destPath);	  	  	   
+}
+	
+
+public void CopyFromAssetsToEnvironmentDir(String _filename, String _environmentDir) {
+	CopyFromAssetsToInternalAppStorage(_filename);
+	CopyFromInternalAppStorageToEnvironmentDir(_filename,_environmentDir);	
+}
 
 }
 
@@ -2630,6 +2683,12 @@ public void SetImageFromURI(Uri _uri) {
   this.setImageBitmap(bmp);
 }
 
+public void SetImageFromByteArray(byte[] _image) {
+	bmp = BitmapFactory.decodeByteArray(_image, 0, _image.length);
+	this.setImageBitmap(bmp);
+}
+
+
 }
  
 
@@ -2641,8 +2700,9 @@ public void SetImageFromURI(Uri _uri) {
 //-------------------------------------------------------------------------
 //by jmpessoa : custom row!
 //by jmpessoa : custom row!
+
 class jListItemRow{
-	String label;
+	String label = "";
 	int    id; 
 	int widget = 0;
 	View jWidget; //needed to fix  the RadioButton Group default behavior: thanks to Leledumbo.
@@ -2659,6 +2719,7 @@ class jListItemRow{
 	Bitmap bmp;
 	public  jListItemRow(Context context) {
 		ctx = context;
+		label = "";
 	}
 }
 
@@ -3027,7 +3088,15 @@ private Bitmap          genericBmp;
 private int             widgetItem;
 private String          widgetText;
 private int             textColor; 
-private int             textSize;     
+private int             textSize;
+
+//by Renabor
+private float mDownX = -1;
+private float mDownY = -1;
+private final float SCROLL_THRESHOLD = 10;
+private boolean isOnClick;
+private boolean canClick;
+
 int textDecorated;
 int itemLayout;
 int textSizeDecorated;
@@ -3043,6 +3112,7 @@ private ArrayList<jListItemRow>    alist;
 private jArrayAdapter        aadapter;
 
 private OnItemClickListener  onItemClickListener;
+private OnTouchListener onTouchListener;
 
 //by jmpessoa
 private int lparamsAnchorRule[] = new int[20]; 
@@ -3102,44 +3172,92 @@ setAdapter(aadapter);
 setChoiceMode(ListView.CHOICE_MODE_SINGLE);
 
 //Init Event
-onItemClickListener = new OnItemClickListener() {
-   @Override
-   public  void onItemClick(AdapterView<?> parent, View v, int position, long id) {
-	   
-	   if (highLightSelectedItem) {		 
-		   if (lastSelectedItem > -1) {
-			   DoHighlight(lastSelectedItem, textColor);	   
-		   } 		   
-		   DoHighlight(position, highLightColor);
-	   }		 
-	   
-	   if (alist.get(position).widget == 2 /*radio*/) { //fix 16-febr-2015
-		  for (int i=0; i < alist.size(); i++) { 
-		    alist.get(i).checked = false;
-		  }
-		  alist.get(position).checked = true;
-		  aadapter.notifyDataSetChanged();
-	   }	   
-	   	   
-	   lastSelectedItem = (int)position;
-	   selectedItemCaption = alist.get((int)position).label;
-       controls.pOnClickCaptionItem(PasObj, (int)position , alist.get((int)position).label);
-   }
+
+// renabor gesture
+onTouchListener = new OnTouchListener() {	
+	@Override
+	public boolean onTouch(View v, MotionEvent event) {
+		int action = event.getAction() & MotionEvent.ACTION_MASK;
+		switch (action) {
+			case MotionEvent.ACTION_DOWN:
+				canClick = false;
+				// Log.i("ACTION", "DOWN");
+				mDownX = event.getX();
+				mDownY = event.getY();
+				isOnClick = true; // blocco la propagazione
+				break;
+			case MotionEvent.ACTION_CANCEL:
+			case MotionEvent.ACTION_UP:
+				if (isOnClick) {
+					// Log.i("ACTION", "UP");
+					canClick = true;
+				} else { Log.i("ACTION","UP NOT PROCESSED"); }
+				//return false; // passa oltre, ma potrebbe diventare true
+				//mDownX = -1;
+				return false;
+				
+    
+			case MotionEvent.ACTION_MOVE:
+				if (isOnClick && (Math.abs(mDownX - event.getX()) > SCROLL_THRESHOLD || Math.abs(mDownY - event.getY()) > SCROLL_THRESHOLD)) {
+					// Log.i("ACTION", "MOVE");
+					isOnClick = false;
+				};			
+				return false;					
+		};
+	return false;
+	};
 };
 
+setOnTouchListener(onTouchListener);
+
+
+//fixed! thanks to @renabor
+onItemClickListener = new OnItemClickListener() {@Override
+	public void onItemClick(AdapterView <? > parent, View v, int position, long id) {
+	  if (canClick) { 
+	    	lastSelectedItem = (int) position;
+			if (!isEmpty(alist)) { // this test is necessary !  //  <----- thanks to @renabor
+				if (highLightSelectedItem) {
+					if (lastSelectedItem > -1) {
+						DoHighlight(lastSelectedItem, textColor);
+					}
+					DoHighlight((int) id, highLightColor);
+				}
+				if (alist.get((int) id).widget == 2  ) { //radio fix 16-febr-2015
+					for (int i = 0; i < alist.size(); i++) {
+						alist.get(i).checked = false;
+					}
+					alist.get((int) id).checked = true;
+					aadapter.notifyDataSetChanged();
+				}
+				controls.pOnClickCaptionItem(PasObj, (int) id, alist.get((int) id).label);
+			} else {
+				controls.pOnClickCaptionItem(PasObj, lastSelectedItem, ""); // avoid passing possibly undefined Caption
+			}
+		}
+	} 
+};
 setOnItemClickListener(onItemClickListener);
 
-this.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-    @Override
-    public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-    	//Log.i("OnItemLongClickListener", "position = "+position);    	
-    	lastSelectedItem = (int)position;
- 	   selectedItemCaption = alist.get((int)position).label;
-    	controls.pOnListViewLongClickCaptionItem(PasObj, (int)position , alist.get((int)position).label);
-        return false;
-    }
+this.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {@Override
+	public boolean onItemLongClick(AdapterView <?> parent, View view, int position, long id) {
+		lastSelectedItem = (int)position;
+		if (canClick) {
+			if (!isEmpty(alist)) {  //  <----- thanks to @renabor
+				selectedItemCaption = alist.get((int) id).label;
+				controls.pOnListViewLongClickCaptionItem(PasObj, (int)id, alist.get((int)id).label);
+				return false;
+				};
+		};
+		return false;
+	}
 });
 
+}
+
+//thanks to @renabor
+public static boolean isEmpty(ArrayList<?> coll) {
+	return (coll == null || coll.isEmpty());
 }
 
 //by jmpessoa
@@ -3210,6 +3328,7 @@ public  void Free() {
   aadapter = null;
   lparams  = null;
   setOnItemClickListener(null);
+  setOnItemLongClickListener(null); //thanks @renabor
 }
 
 //by jmpessoa
@@ -3806,10 +3925,10 @@ class jPanel extends RelativeLayout {
            }
            if(event1.getY() - event2.getY() > SWIPE_MIN_DISTANCE && Math.abs(velocityY) > SWIPE_THRESHOLD_VELOCITY) {
         	   controls.pOnFlingGestureDetected(PasObj, 2);//onBottomToTop();
-        	   return true;
+        	   return false;
            } else if (event2.getY() - event1.getY() > SWIPE_MIN_DISTANCE && Math.abs(velocityY) > SWIPE_THRESHOLD_VELOCITY) {
         	   controls.pOnFlingGestureDetected(PasObj, 3); //onTopToBottom();
-        	   return true;
+        	   return false;
            } 		   
  		   return false;
  	   }
@@ -5233,7 +5352,7 @@ private Paint           mPaint   = null;
 private Bitmap          bmpUp    = null;
 private Bitmap          bmpDn    = null;
 private Rect            rect;
-private int             btnState = 0;      // Normal = 0 , Pressed = 1
+private int             btnState = 0;      // Normal/Up = 0 , Pressed = 1
 private Boolean         enabled  = true;   //
 
 //by jmpessoa
@@ -5246,10 +5365,10 @@ int countParentRule = 0;
 int lpH = RelativeLayout.LayoutParams.WRAP_CONTENT;
 int lpW = RelativeLayout.LayoutParams.WRAP_CONTENT; //w
 
-int MarginLeft = 5;
-int MarginTop = 5;
-int marginRight = 5;
-int marginBottom = 5;
+int MarginLeft = 0;
+int MarginTop = 0;
+int marginRight = 0;
+int marginBottom = 0;
 
 // Constructor
 public  jImageBtn(android.content.Context context,
@@ -5260,12 +5379,12 @@ PasObj   = pasobj;
 controls = ctrls;
 // Init Class
 lparams = new LayoutParams  (100,100);
-lparams.setMargins( 50, 50,0,0);
+lparams.setMargins(0, 0,0,0);
 // BackGroundColor
 //setBackgroundColor(0xFF0000FF);
 //
 mPaint = new Paint();
-rect   = new Rect(0,0,100,100);
+rect   = new Rect(0,0,200,200);
 }
 
 public void setLeftTopRightBottomWidthHeight(int left, int top, int right, int bottom, int w, int h) {
@@ -5287,20 +5406,25 @@ viewgroup.addView(this,lparams);
 public  void setButton( String fileup , String filedn ) {
 if (bmpUp  != null) { bmpUp.recycle();         }
 bmpUp = BitmapFactory.decodeFile(fileup);
+rect   = new Rect(0,0,bmpUp.getWidth(),bmpUp.getHeight());
+
 if (bmpDn  != null) { bmpDn.recycle();         }
 bmpDn = BitmapFactory.decodeFile(filedn);
+rect   = new Rect(0,0,bmpDn.getWidth(),bmpDn.getHeight());
 invalidate();
 }
 
 public  void setButtonUp( String fileup) {
 if (bmpUp  != null) { bmpUp.recycle(); }
 bmpUp = BitmapFactory.decodeFile(fileup);
+rect   = new Rect(0,0,bmpUp.getWidth(),bmpUp.getHeight());
 invalidate();
 }
 
 public  void setButtonDown( String filedn ) {
 if (bmpDn  != null) { bmpDn.recycle();         }
 bmpDn = BitmapFactory.decodeFile(filedn);
+rect   = new Rect(0,0,bmpDn.getWidth(),bmpDn.getHeight());
 invalidate();
 }
 
@@ -5325,9 +5449,10 @@ private Drawable GetDrawableResourceById(int _resID) {
 }
 
 public  void setButtonUpByRes(String resup) {   // ..res/drawable
- if (bmpUp  != null) { bmpUp.recycle(); }
+  if (bmpUp  != null) { bmpUp.recycle(); }
   Drawable d = GetDrawableResourceById(GetDrawableResourceId(resup));
   bmpUp = ((BitmapDrawable)d).getBitmap();
+  rect   = new Rect(0,0,bmpUp.getWidth(),bmpUp.getHeight());
   invalidate();
 }
 
@@ -5335,6 +5460,7 @@ public  void setButtonDownByRes(String resdn) {   // ..res/drawable
   if (bmpDn  != null) { bmpDn.recycle(); }
    Drawable d = GetDrawableResourceById(GetDrawableResourceId(resdn));
    bmpDn = ((BitmapDrawable)d).getBitmap();
+   rect   = new Rect(0,0,bmpDn.getWidth(),bmpDn.getHeight());	 
    invalidate();
 }
 
@@ -5342,28 +5468,49 @@ public  void setButtonDownByRes(String resdn) {   // ..res/drawable
 @Override
 public  boolean onTouchEvent( MotionEvent event) {
 // LORDMAN 2013-08-16
-if (enabled == false) { return(false); }
 
-int actType = event.getAction() &MotionEvent.ACTION_MASK;
+if (enabled == false) { return false; }
+
+int actType = event.getAction()&MotionEvent.ACTION_MASK;
+
 switch(actType) {
-  case MotionEvent.ACTION_DOWN: { btnState = 1; invalidate(); 
-                                 //Log.i("Java","jImageBtn Here"); 
-                                 break; }
-  case MotionEvent.ACTION_MOVE: {                             break; }
-  case MotionEvent.ACTION_UP  : { btnState = 0; invalidate();
-                                  controls.pOnClick(PasObj,Const.Click_Default);
-                                  break; }
+  case MotionEvent.ACTION_DOWN: {  btnState = 1; 
+                                   invalidate(); 
+                                   //Log.i("Java","jImageBtn Here"); 
+                                   break; 
+                                 }
+  case MotionEvent.ACTION_MOVE: { break; }
+  case MotionEvent.ACTION_UP  : {  btnState = 0; 
+                                   invalidate();
+                                   controls.pOnClick(PasObj,Const.Click_Default);                                  
+                                   break; 
+                                  }
 }
+
 return true;
+
 }
 
 //
 @Override
 public  void onDraw( Canvas canvas) {
 //
-if (btnState == 0) { if (bmpUp != null) { canvas.drawBitmap(bmpUp,null,rect,mPaint); }; }
-else               { if (bmpDn != null) { canvas.drawBitmap(bmpDn,null,rect,mPaint); }; };
+  if (btnState == 0) { 
+	if (bmpUp != null) { 
+		//Log.i("onDraw","UP");		
+		canvas.drawBitmap(bmpUp,null,rect,null); //mPaint 
+	} 
+  }
+  else  { 
+	 if (bmpDn != null) { 
+		//Log.i("onDraw","Dow");
+		canvas.drawBitmap(bmpDn,null,rect,null); //mPaint 
+	 }
+  }	
+  
 }
+
+
 
 public  void setEnabled(boolean value) {
 enabled = value;
@@ -6109,7 +6256,17 @@ class jSqliteDataAccess {
 		   DATABASE_NAME = dataBaseName;
 		   mydb = this.Open();
 	    }
-	           
+	    public void SetVersion(int version) {
+	    	if (mydb!= null) {
+	    		mydb.setVersion(version);
+	    	}
+	    }
+	    public int GetVersion() {
+	    	if (mydb!= null) {
+	    		return mydb.getVersion();
+	    	}
+	    	return 0;
+	    }
         public void ExecSQL(String execQuery){
 	        try{ 	
 	           if (mydb!= null) {
@@ -6204,7 +6361,7 @@ class jSqliteDataAccess {
             }	        	        	               	
         }
                 
-	    public String SelectS(String selectQuery) {	 //return String
+	    public String Select(String selectQuery) {	 //return String
 	    	
 		     String row = "";
 		     String rows = "";
@@ -6215,6 +6372,7 @@ class jSqliteDataAccess {
 		     String allRows = null;
 		      		     		     
 		     try{
+		    	   this.cursor = null; //[by renabor] without this a second query will find the Cursor randomly positioned!!!
 		           if (mydb!= null) {
 		               if (!mydb.isOpen()) {
 		                  mydb = this.Open();
@@ -6260,7 +6418,8 @@ class jSqliteDataAccess {
 		     return allRows; 
 	    }
 	    	    
-	    public void SelectV(String selectQuery) {   //just set the cursor! return void..
+	    public boolean Select(String selectQuery,  boolean moveToLast) {   //just set the cursor! return void..
+	    	    boolean result = true;
 	    	    this.cursor = null;
 		        try{  		        	
 			        if (mydb!= null) {
@@ -6268,11 +6427,13 @@ class jSqliteDataAccess {
 			              mydb = this.Open(); //controls.activity.openOrCreateDatabase(DATABASE_NAME, Context.MODE_PRIVATE, null); 
 			           }
 			        }		        			        				     	         
-			     	this.cursor  = mydb.rawQuery(selectQuery, null);			    			        
+			     	this.cursor  = mydb.rawQuery(selectQuery, null);
+			     	       this.cursor.moveToFirst(); 	
 			        mydb.close();			       
 			     }catch(SQLiteException se){
 			         Log.e(getClass().getSimpleName(), "Could not select:" + selectQuery);
-			     }	     		         			     
+			     }	     				        
+		         return true;
 		}
 
 	    public Cursor GetCursor() {
@@ -7182,7 +7343,12 @@ class jTextFileManager /*extends ...*/ {
       ClipData.Item item = cdata.getItemAt(0);
       String txt = item.getText().toString();
       SaveToFile(txt, _filename);
-   }   
+   }
+   
+   public String LoadFromByteArray(byte[] _byteArray) {  //TODO Pascal
+	   return (new String(_byteArray));   
+   }
+      
 
 }
 
@@ -7877,7 +8043,7 @@ class jContextMenu /*extends ...*/ {
     //_itemType --> 0:Default, 1:Checkable
     public MenuItem AddItem(ContextMenu _menu, int _itemID, String _caption, int _itemType){    	     	
     	MenuItem item = _menu.add(0,_itemID,0 ,(CharSequence)_caption);
-    	
+
     	switch  (_itemType) {
     	case 1:  item.setCheckable(true); break;    	
     	}
@@ -7921,6 +8087,7 @@ class jContextMenu /*extends ...*/ {
    		  mMenu.setHeaderIcon(GetDrawableResourceId(_iconIdentifier));
    	   }
      }    
+    
     public boolean IsItemChecked(int _itemID) {
     	boolean res = false; 
     	if (mItemList.size() > 0)  {
@@ -7942,280 +8109,541 @@ class jBluetoothServerSocket {
     private Context  context   = null;
 
     private BluetoothAdapter mBAdapter;
-    private String mServerName = "jBluetoothServerSocket";
+    private String mServerName = "LamwBluetoothServer";
     private BluetoothServerSocket mServerSocket;
     private BluetoothSocket mConnectedSocket;
-
-    byte[] mBufferIn;
-    byte[] mBufferOut;
     
-	private  InputStream mInStream;
-	private  OutputStream mOutStream;
-   
-    private final String TAG = "jBluetoothServerSocket";
-   
-    static final String ACTION = "jBluetoothServerSocket.action.CONNECTED";
     private boolean mConnected;
+    private boolean mIsListing = false;
     
-    String mStrUUID = null;
-            
-	private Handler mHandler = new Handler(){
-        /*.*/public void handleMessage(Message msg) {
-           if (msg.what == 0){ 
-         		controls.pOnBluetoothServerSocketConnected(pascalObj, 
-         				msg.getData().getString("DeviceName"),
-         				msg.getData().getString("DeviceAddress"));
-           }else if(msg.what == 1){		
-          	    HandleInput();
-           }else if (msg.what == 2){  //qet as text....
-        	    controls.pOnBluetoothClientSocketIncomingMessage(pascalObj, msg.getData().getString("text"));
-        	    //Log.i("mHandler",msg.getData().getString("text"));	                
-           }else if (msg.what == 3){ //QUIT
-        	   mConnected = false;
-           }	           
-        }        
-    };
+    BufferedInputStream mBufferInput;
+	BufferedOutputStream mBufferOutput;
 
+    String mStrUUID = "00001101-0000-1000-8000-00805F9B34FB";   //Well known SPP UUID - Serial Port Profile
+    int mTimeout = -1; //infinity
+        
+    int mBuffer = 1024;
     
+    boolean IsFirstsByteHeader = false;
+                 
     public jBluetoothServerSocket(Controls _ctrls, long _Self) {
         context   = _ctrls.activity;
 	    pascalObj = _Self;
-	    controls  = _ctrls;
-	    
-	    mConnected= false;
-	    
-	    //Well known SPP UUID	       
-	    mStrUUID = "00001101-0000-1000-8000-00805F9B34FB";
-	    
+	    controls  = _ctrls;	    
+	    mConnected= false;	   	    
 	    mBAdapter = BluetoothAdapter.getDefaultAdapter(); // Emulator -->> null!!!
     }
     
 	public void jFree() {
         //free local objects...
+		mConnectedSocket = null;
+	    mBufferInput = null;		
+		mBufferOutput = null;						
+		mServerSocket = null;
+		mBAdapter = null;		
 	}
 
 	public void SetUUID(String _strUUID) {
 		if (!_strUUID.equals("")) {
-			mStrUUID = _strUUID;
-			//mmUUID = UUID.fromString(mmUUIDString);
+			mStrUUID = _strUUID;	
 		}   
 	}
+		
+	   public void CancelListening() {
+		    DisconnectClient();
+	        try {
+	        	if (mServerSocket != null) 
+	        		mServerSocket.close();        
+	        }
+	        catch (IOException ex) {
+	            //Log.e(TAG+":cancel", "error while closing server socket");
+	        }
+	    }
+		 
+	public void DisconnectClient() {
+		   mConnected = false;
+		   try {
+		      if (mConnectedSocket != null && mConnectedSocket.isConnected()) 	    	   
+		    	  mConnectedSocket.close();
+		   } catch (IOException e) {
+	          //
+		   }	   
+    }
+		   
+
+	public boolean IsClientConnected() {	
+		if (mConnectedSocket != null)
+	    	return mConnectedSocket.isConnected();
+		else return false;
+    }
+			
+	/* System.arraycopy
+	 * src  the source array to copy the content. 
+       srcPos  the starting index of the content in src. 
+       dst  the destination array to copy the data into. 
+       dstPos  the starting index for the copied content in dst. 
+       length  the number of elements to be copied.  
+	 */	
 	
-	private void TryListen(){
-		mConnected = true;		
-	    Thread listenThread = new Thread() {
-	            @Override
-	       /*.*/public void run() {
-	                try {
-	                    while(mConnected) {
-	                        // do things
-  				             if (mConnectedSocket.isConnected()) {  				            	 
-  				            	//notice that when the server is connected it sends a broadcast so any activity could register it and receive 
-  				            	//so there is no problem in changing activities while the BT connects.            	                            
-  				            	//Broadcast(); //??  				            	     				            	
-  				                CloseServerSocket(); //??  				                
-  				                //Create a data stream so we can talk to client....
-  				            	mInStream  = mConnectedSocket.getInputStream();
-  			        			mOutStream = mConnectedSocket.getOutputStream();   			        			
-  				                Message msgDone = new Message();
-  				  		        Bundle messageData = new Bundle();
-  				  		        msgDone.what = 0; //connected!    
-  				  		        messageData.putString("DeviceName",mConnectedSocket.getRemoteDevice().getName());
-  				  		        messageData.putString("DeviceAddress",mConnectedSocket.getRemoteDevice().getAddress()); 
-  				  		        msgDone.setData(messageData);    				  		        
-  				  		        mHandler.sendMessage(msgDone);
-  				             } else {
-  				            	 mConnected = false;
-  				             }
-	                    }
-	                } catch(Exception e) {
-	                	mConnected = false;
-	                } finally {	                   
-	                   mConnected = false;
-	                }
-	            }
-	    };
-	    listenThread.start();
+	//talk to client	
+	public void Write(byte[] _dataContent, byte[] _dataHeader) {		 		
+	       try {    	   
+	           if (mBufferOutput != null) {	        	           	   	        	    
+	        	    int sizeContent = _dataContent.length;	        	    
+	        	    int tempsizeHeader = _dataHeader.length;
+	        	    
+	        	    if (tempsizeHeader > 32767) tempsizeHeader = 32767; 
+	        	    
+	        	    short sizeHeader = (short)tempsizeHeader;
+	        	    
+	        	    byte[] extendedArray = new byte[sizeContent+4+sizeHeader+2];	        	     	   
+	        	    byte[] sizeContentBuff = intToByteArray(sizeContent, ByteOrder.LITTLE_ENDIAN);
+	        	    byte[] sizeHeaderBuff = shortToByteArray(sizeHeader, ByteOrder.LITTLE_ENDIAN);
+	        	    
+	        	    System.arraycopy(sizeHeaderBuff, 0,  extendedArray, 0, 2);
+	        	    System.arraycopy(sizeContentBuff, 0,  extendedArray, 2, 4);	        	    
+	        	    System.arraycopy(_dataHeader, 0,  extendedArray, 2+4, _dataHeader.length);	        	    	        	           	   		           	   
+	       	        System.arraycopy(_dataContent, 0,  extendedArray, 2+4+_dataHeader.length, _dataContent.length);		
+	       	        mBufferOutput.write(extendedArray, 0, extendedArray.length);              
+	       	        mBufferOutput.flush();          
+	           }
+	           
+	        } catch (IOException e) { }       	       
+	}	
+
+	public void WriteMessage(String _message, byte[] _dataHeader) {		 		
+		Write(_message.getBytes(), _dataHeader);       	      
+	}
+			
+	public void WriteMessage(String _message) {						
+	    try {	    	   
+	       if (mBufferOutput != null) {
+	       	    byte[] _byteArray = _message.getBytes();	        	   	       	        	       	        		
+	       	    mBufferOutput.write(_byteArray, 0, _byteArray.length);              
+	       	    mBufferOutput.flush();          
+	        }	           
+	    } catch (IOException e) { }       	       
+	}
+			
+    //talk to client	
+	public void Write(byte[] _dataContent) {	
+		
+     try {
+        if (mBufferOutput != null) {	        	 
+     	   mBufferOutput.write(_dataContent, 0, _dataContent.length);              
+     	   mBufferOutput.flush();
+         }    
+      }  catch (IOException e) { }    
+     
+ }
+	
+	
+public void SendFile(String _filePath, String _fileName, byte[] _dataHeader) throws IOException {
+		
+		  if (mBufferOutput != null) {	
+		    File F = new File( _filePath + "/" + _fileName);		    	    	    	    	    
+		    int sizeContent = (int)F.length();	    
+		        	    	        	    
+    	    int tempsizeHeader = _dataHeader.length;	        	    	        	    
+    	    if (tempsizeHeader > 32767) tempsizeHeader = 32767; 	        	    	        	   	        	    	        	    
+    	    short sizeHeader = (short)tempsizeHeader; 		        	    	        	      	       	        	    
+    	    byte[] extendedArray = new byte[sizeContent+4+sizeHeader+2];	        	     	   
+    	    byte[] sizeContentBuff = intToByteArray(sizeContent, ByteOrder.LITTLE_ENDIAN);
+    	    byte[] sizeHeaderBuff = shortToByteArray(sizeHeader, ByteOrder.LITTLE_ENDIAN);	        	    	        	    	        	    
+    	    
+    	    System.arraycopy(sizeHeaderBuff, 0,  extendedArray, 0, 2);
+    	    System.arraycopy(sizeContentBuff, 0,  extendedArray, 2, 4);	        	    
+    	    System.arraycopy(_dataHeader, 0,  extendedArray, 2+4, _dataHeader.length);	 
+    	    
+		    BufferedInputStream bis = new BufferedInputStream(new FileInputStream(F));			    
+		    if (bis.read(extendedArray, 2+4+_dataHeader.length, sizeContent) > 0) {  
+	          try {	        	  
+	        	mBufferOutput.write(extendedArray, 0, extendedArray.length);
+	            mBufferOutput.flush();
+	          }  
+	          finally {
+	            bis.close();   
+	          }        
+		    }
+		  }   
+	}
+		
+	public void SendFile(String _filePath, String _fileName) throws IOException {
+		
+	 if ( mBufferOutput != null) {			 
+		    File F = new File( _filePath + "/" + _fileName);		    	    	    	    	    
+		    int size = (int)F.length();	    
+		    byte[] buffer = new byte[size];  	    	  	  	    	    	    	    
+		    BufferedInputStream bis = new BufferedInputStream(new FileInputStream(F));	    	  	    
+		    if (bis.read(buffer, 0, size) > 0) {		    
+		      try {             		    	  
+		    	mBufferOutput.write(buffer, 0, buffer.length);
+		        mBufferOutput.flush();
+		      }  
+		      finally {
+		        bis.close();   
+		      }        
+		    }
+	   }  		 
+     }
+	
+	public void WriteMessage(String _message, String _dataHeader) {		 	
+		WriteMessage(_message, _dataHeader.getBytes());
 	}
 	
-	public void Listen() {
-      if ( !mStrUUID.equals("") && mBAdapter != null) {		    	  
-        try {
-        	        	
-        	if (mBAdapter != null) {
-        		        		        	  
-        	  controls.pOnBluetoothServerSocketListen(pascalObj, mBAdapter.getName(), mBAdapter.getAddress());
-        	  
-        	  if (!mBAdapter.isEnabled()) {
-                  controls.activity.startActivityForResult(new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE), 1001);
-              }
-        	
-        	  mServerSocket = null; 
-			  mServerSocket = mBAdapter.listenUsingRfcommWithServiceRecord(mServerName, UUID.fromString(mStrUUID));
-			  if (mServerSocket != null) {
-				 mConnectedSocket = null;																
-            	 mConnectedSocket = mServerSocket.accept();            	            	            	            	
-            	 if (mConnectedSocket != null) {            		
-			        TryListen();
-            	 }
-			  } else {
-				 mConnected = false;
-			  }
-        	}
-		} catch (IOException e1) {
-			mConnected = false;
-			//e1.printStackTrace();
-		}                
-	  }        
+	public void Write(byte[] _dataContent,  String _dataHeader) {			 
+		Write(_dataContent,_dataHeader.getBytes());		   
 	}
 	
-    private void HandleInput() {    	
-      String content;
-      ArrayList<String> textLines = new ArrayList<String>();
-      //int size;
+	public void SendFile(String _filePath, String _fileName, String _dataHeader) throws IOException {
+		SendFile(_filePath,_fileName, _dataHeader.getBytes());		
+	}
+	
+	public void SaveByteArrayToFile(byte[] _byteArray, String _filePath,  String _fileName) {
+		
+		File F = new File( _filePath + "/" + _fileName);
+	    FileOutputStream fos;
+		try {
+			fos = new FileOutputStream(F);						
+		    try {
+				fos.write(_byteArray, 0, _byteArray.length);
+				fos.flush();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}	
+		    try {
+				fos.close();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}		        
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+	}
+    	
+private byte[] intToByteArray(int value, ByteOrder order) {
+        ByteBuffer buffer = ByteBuffer.allocate(4); // in java, int takes 4 bytes.
+        buffer.order(order);	        	       	        
+        return buffer.putInt(value).array();
+}
+ 	  
+private int byteArrayToInt(byte[] byteArray, ByteOrder order) {
+        ByteBuffer buffer = ByteBuffer.wrap(byteArray);
+        buffer.order(order);
+        return buffer.getInt();
+}
+
+private byte[] shortToByteArray(short value, ByteOrder order) {
+    ByteBuffer buffer = ByteBuffer.allocate(2); // in java, shortint takes 2 bytes.
+    buffer.order(order);	        	       	        
+    return buffer.putShort(value).array();
+}
+	  
+private int byteArrayToShort(byte[] byteArray, ByteOrder order) {
+    ByteBuffer buffer = ByteBuffer.wrap(byteArray);
+    buffer.order(order);
+    return buffer.getShort();
+}
+	
+public void SetTimeout(int _milliseconds) {
+	   mTimeout= _milliseconds;			
+}	
+	
+	public String ByteArrayToString(byte[] _byteArray) {  
+		   return (new String(_byteArray));   
+	}
+	
+    public Bitmap ByteArrayToBitmap(byte[] _byteArray) {
+    	return BitmapFactory.decodeByteArray(_byteArray, 0, _byteArray.length);    	
+    }
         
-   	  try {
-   		//size =  mInStream.available();
-   		
-   		BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(mInStream, "UTF-8"));		 
-  	 	content = bufferedReader.readLine();  
-  	 	if (content != null) {
-  	 	  if (!content.equals("QUIT")) {		 		     
-  	 		     while(content != null){ 		    	                             	              
-  	               textLines.add(content);
-  	               content = bufferedReader.readLine();
-  	             }
-  		         Message msgDone = new Message();
-  		         Bundle messageData = new Bundle();
-  		         msgDone.what = 1; //set messageBuffer...    
-  		         messageData.putString("text", textLines.toString()); //[..., ...., ...]
-  		         msgDone.setData(messageData);
-  		         // send message to mHandler...
-  		         mHandler.sendMessage(msgDone);		         
-  		   } else { //QUIT 
-  		         Message msgDone = new Message();
-  	             Bundle messageData = new Bundle();
-  	             msgDone.what = 2;   //done.... interrupt thread...   
-  	             messageData.putString("text", "QUIT");
-  	             msgDone.setData(messageData);
-  	            // send message to mHandler...
-  	             mHandler.sendMessage(msgDone);
-  			   //} 
-  		   }		 
-  	 	} 		 
-  	  } catch (IOException e) {
-  		e.printStackTrace();
-  	  } 	 	  	  
-    }
-
-	//send text
-	public void WriteMessage(String _message) {
-	   mBufferOut = _message.getBytes();
-	   if (mConnected) {
-	      controls.pOnBluetoothServerSocketWritingMessage(pascalObj);
-          Thread sender = new Thread(){
-    	    @Override
-          /*.*/public void run() {                       
-               try { 
-                   //mmOutStream.write(mmBufferOut.length); //data size
-              	   mOutStream.write(mBufferOut); //data content              
-                } catch (IOException e) { 
-                   //
-                }
-             }
-          };
-         sender.start(); // Init
-	   }
-	}
-
-	public void Write(byte[] _buffer) {		
-		mBufferOut = _buffer;
-		if (mConnected) {
-		   controls.pOnBluetoothServerSocketWritingMessage(pascalObj);
-	       Thread sender = new Thread(){
-	         @Override
-	    /*.*/public void run() {                       
-	                try {
-		              //mOutStream.write("RAW"); ?? 	
-	              	  mOutStream.write(mBufferOut.length); // write the data length to server/socket stream
-	              	  mOutStream.write(mBufferOut);        // write the data content to server/socket stream
-	                 } catch (IOException e) {
-	                 //
-	                 }
-	           }	          
-	       };
-	       sender.start(); // Init
-		}    
-	}
-	
-    private void Broadcast() {
-       try {    	       	   
-            Intent intent = new Intent();
-            intent.setAction(ACTION);            
-            if (mConnectedSocket != null && mConnectedSocket.isConnected()) {
-               intent.putExtra("state", "true");
-               mConnected = true;  //break listen!
-            }else{
-              intent.putExtra("state", "false");
-            }              
-            controls.activity.sendBroadcast(intent);           
-        }
-        catch (RuntimeException runTimeEx) {
-            //
-        }
-        this.CloseServerSocket();
-    }
-
-    public void CloseServerSocket() {
-        try {
-        	if (mServerSocket != null) mServerSocket.close();        	
-        }
-        catch (IOException ex) {
-            //Log.e(TAG+":cancel", "error while closing server socket");
-        }
-    }
-
-	public void Disconnect() {
-	   mConnected = false;
-	   try {
-	      if (mConnectedSocket != null && mConnectedSocket.isConnected()) 	    	   
-	    	  mConnectedSocket.close();
-	   } catch (IOException e) {
-		  //e.printStackTrace();
-	   }
-    }
-
-	public boolean IsConnected() {		
-       return mConnected;
+    public boolean GetDataHeaderReceiveEnabled() {
+        return IsFirstsByteHeader;
     }
     
-	//ref. http://flanzer.wordpress.com/2011/09/20/convert-inputstream-to-byte/
-    public byte[] Read() {
-    	
-      if (mConnected){
-    	  
-    	  ByteArrayOutputStream buffer = new ByteArrayOutputStream();
-		  int count;   
-    	  byte[] data = new byte[1024];  //or 8192 or 16384 ...
-    	  
-    	  try {
-			while ((count = mInStream.read(data, 0, data.length)) != -1) {
-			   buffer.write(data, 0, count);
-			}
- 		  } catch (IOException e) {
-             //
-		  }    	  
-    	  try {
-			buffer.flush();
-	  	  } catch (IOException e) {
-            //
-		  }
-    	  return buffer.toByteArray();
-    	  
-       }else return null;
       
-    }  
-  
+    public void SetDataHeaderReceiveEnabled(boolean _value)  {
+    	IsFirstsByteHeader = _value;
+    }
+    
+           
+    public void SetReceiverBufferLength(int _value)  {
+    	mBuffer = _value;
+    }
+    
+    public int GetReceiverBufferLength()  {
+    	return mBuffer; 
+    }
+    
+    public void SetServerName() { //TODO Pascal 
+       mServerName = "LamwBluetoothServer";
+    }
+    
+	public void Listen() {
+				  		  		 
+		  DisconnectClient();
+		  
+		  mConnected = false; 	
+	      if ( !mStrUUID.equals("") && mBAdapter != null) {		    	  
+	        try {        	        	        	               		
+	        	  if (!mBAdapter.isEnabled()) {
+	                  controls.activity.startActivityForResult(new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE), 1001);
+	              }         	                  	    
+				  mServerSocket = mBAdapter.listenUsingRfcommWithServiceRecord(mServerName, UUID.fromString(mStrUUID));		
+				  				  
+				  if (mServerSocket != null) {	
+					  controls.pOnBluetoothServerSocketListen(pascalObj, mServerName, mStrUUID);
+	                  new ASocketServerTask().execute();							  	 								
+				  }        	  
+			 } catch (IOException e1) {
+				//	
+			 }                 
+		  }              
+	}
+	
+    class ASocketServerTask extends AsyncTask<String,ByteArrayOutputStream,String> {
+      	boolean flagAceept = false;
+    	    	
+    	int bytes_read = 0;
+    	int count = 0;
+    	
+    	int lenContent = 0;
+    	int lenHeader = 0;
+    	
+    	byte[] inputBuffer = new byte[mBuffer];    
+    	
+    	ByteArrayOutputStream bufferOutput;
+    	ByteArrayOutputStream bufferOutputHeader;
+    	
+    	byte[] headerBuffer;
+    	    	    	
+        @Override
+        protected String doInBackground(String... message) {    
+          mConnected = false;          	
+          try {            	            	            
+            	if (mTimeout > 0) { 
+            	  mIsListing = true;
+     			  mConnectedSocket = mServerSocket.accept(mTimeout); //locking...
+     			  mIsListing = false;
+            	}  
+            	else {           		
+            	  mIsListing = true;
+            	  mConnectedSocket = mServerSocket.accept();
+            	  mIsListing = false;
+            	}  
+            	            	            	        	    
+				if (mConnectedSocket != null) { 			        					
+					mConnected = true;
+	        	    mBufferInput = new BufferedInputStream(mConnectedSocket.getInputStream());
+	        		mBufferOutput = new  BufferedOutputStream(mConnectedSocket.getOutputStream());	
+	        		try {
+	            	   mServerSocket.close();
+	            	   mServerSocket = null;
+	        		}
+	        		catch (IOException e3) {		
+	        			mServerSocket = null;	
+	    		    }
+				}				
+		  } 
+            catch (IOException e2) {		
+				//e2.printStackTrace();		
+		  }
+          while (mConnected) {                          	
+             try {
+               bufferOutput = new ByteArrayOutputStream();
+               bytes_read =  -1;
+               if (mBufferInput != null)
+    		       bytes_read =  mBufferInput.read(inputBuffer, 0, inputBuffer.length); //blocking ...
+    		   if (bytes_read == -1) { 
+    			  mConnected = false;    			 
+    		   }	    				
+    		 } catch (IOException e) {
+    			//
+    			 mConnected = false;
+    		 } 
+                
+             if (IsFirstsByteHeader) {
+                if(bytes_read > 6) {
+              	   bufferOutputHeader = new ByteArrayOutputStream();   
+                   byte[] lenHeaderBuffer = new byte[2];  //header lenght [short]
+                   byte[] lenContentBuffer = new byte[4];  //content lenght [int]
+                                     
+                   if (inputBuffer!=null) {
+                	 System.arraycopy(inputBuffer, 0,lenHeaderBuffer, 0, 2); //copy first 2 bytes -->header lenght
+                     System.arraycopy(inputBuffer, 2,lenContentBuffer, 0, 4); //copy more 4 bytes --> content lenght
+                     
+                     lenContent = byteArrayToInt(lenContentBuffer, ByteOrder.LITTLE_ENDIAN); //get number
+                     lenHeader = byteArrayToShort(lenHeaderBuffer, ByteOrder.LITTLE_ENDIAN); //get number
+                            
+                     //---headerBuffer = new byte[lenHeader]; //get header info ...
+                     
+                     //----------------------------------------------------------------------                                                                                      
+                     int index = 2+4;  
+                     int r = bytes_read;                    
+                     while ( r < (lenHeader+index)) {
+                      if (bytes_read > 0) { 
+                   	    bufferOutputHeader.write(inputBuffer,index, bytes_read-index);
+                   	    if (mBufferInput!=null) {
+                   	       try {                    		  
+							   bytes_read =  mBufferInput.read(inputBuffer, 0, inputBuffer.length);
+							   if (bytes_read < 0) {
+	                   	        	mConnected = false;	                  			    
+	                   	       }
+					 	    } catch (IOException e) {
+							// TODO Auto-generated catch block
+					 	      mConnected = false;	
+							  e.printStackTrace();
+						    }                    	  
+                   	        index = 0;
+                   	        if (bytes_read > 0)
+                   	           r = r + bytes_read;                   	       
+                   	    }
+                      } 
+                     }                        
+                     if (bytes_read > 0)
+               	       r = r - bytes_read;  //backtraking..
+               	  
+                     //-----------------------------------------------------------------------------                      
+                     if (bufferOutput!=null) {       
+                    	if ( (lenHeader-r) > 0) {
+                   	      bufferOutputHeader.write(inputBuffer,index,lenHeader-r); //dx                    	 
+                   	      headerBuffer = bufferOutputHeader.toByteArray();  
+                   	      if ((bytes_read-index-(lenHeader-r)) > 0) {
+                   	        bufferOutput.write(inputBuffer, index+(lenHeader-r), bytes_read-index-(lenHeader-r));                     
+                   	        count = count + bytes_read-index-(lenHeader-r);
+                            publishProgress(bufferOutput);
+                   	      }
+                    	}
+                     }                                                               
+                     
+                     //---------------------------------------------------------------------
+                     
+                     /*                                                          
+                     if (inputBuffer!=null &&  bufferOutput!=null) {                       
+                    	  System.arraycopy(inputBuffer, 2+4 ,headerBuffer, 0, lenHeader); //get header info ..                       
+                          bufferOutput.write(inputBuffer, 2+4+lenHeader, bytes_read-2-4-lenHeader);  //get content info                
+                          count = count + bytes_read-2-4-lenHeader;                   
+                          publishProgress(bufferOutput);
+                     }
+                     */ 
+                     
+                   }
+                   
+                   while ( count < lenContent) {                	  
+                 	    try {
+                 	    	bytes_read = -1;
+                 	    	if (mBufferInput!=null) {
+   						       bytes_read =  mBufferInput.read(inputBuffer, 0, inputBuffer.length);                 	    	
+                 	    	   if (bytes_read < 0) {
+                   	        	 mConnected = false;
+                  			     //return null;
+                 	    	   }  
+                   	        }
+                 	    	
+   					    } catch (IOException e) {
+   						// TODO Auto-generated catch block
+   					    	mConnected = false;	
+   						    e.printStackTrace();
+   				 	    } 
+                 	    if(bytes_read > 0) {
+                 	       if (bufferOutput!=null) {
+                 	    	 if (bytes_read > 0)  { 
+                 	           bufferOutput.write(inputBuffer, 0, bytes_read);     	                  	                                         
+                               count = count + bytes_read;
+                               publishProgress(bufferOutput);
+                 	    	 }  
+                 	       }
+                        }
+                   }    
+                } 
+                else {
+                  mConnected = false;                 
+                }
+            }  
+            else{
+            	if (bufferOutput!=null) {	
+            	  if (bytes_read > 0) {	
+                    bufferOutput.write(inputBuffer, 0, bytes_read);
+                    publishProgress(bufferOutput);
+            	  }
+            	}
+            }
+                                    	                         
+          }// main loop            
+          return null;
+        }
+        
+		@Override
+		protected void onPreExecute() {			
+		   super.onPreExecute();		   				   
+		}
+				
+		//http://examples.javacodegeeks.com/core-java/nio/bytebuffer/convert-between-bytebuffer-and-byte-array/
+        @Override
+        protected void onProgressUpdate(ByteArrayOutputStream...buffers) {
+           super.onProgressUpdate(buffers[0]);            
+ 		   if (!flagAceept) {
+			   flagAceept = true;
+		       boolean keep = controls.pOnBluetoothServerSocketConnected(pascalObj,mConnectedSocket.getRemoteDevice().getName(),mConnectedSocket.getRemoteDevice().getAddress());
+		       if (!keep) {
+		    	    mConnected = false;
+		    	    
+		    	    mBufferInput = null;
+					mBufferOutput = null;
+		  			mConnectedSocket = null;
+		  			
+		    		while (mConnectedSocket.isConnected()) {
+		    			try {
+						  mConnectedSocket.close();
+					     } catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					    }   
+		    		}		    																	              		
+		       }	
+		   }  	
+ 		   
+ 		   if (IsFirstsByteHeader) { 			   
+ 		      if (buffers[0].toByteArray().length == lenContent) { 		    	  
+                 mConnected = controls.pOnBluetoothServerSocketIncomingData(pascalObj, buffers[0].toByteArray(), headerBuffer);
+                 try {
+                	 if (bufferOutput != null) 
+                	   bufferOutput.close();                	   
+				 } catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				 }                 
+ 		      }  
+              //TODO
+              /*
+              else controls.pOnBluetoothServerSocketProgress(pascalObj, values[0].toByteArray().length);
+              */
+ 		   }        
+           else {
+        	  mConnected = controls.pOnBluetoothServerSocketIncomingData(pascalObj, buffers[0].toByteArray(), headerBuffer);
+              try {
+            	  if (bufferOutput != null)
+            	      bufferOutput.close();	
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+			  }              
+           } 		    		   
+        }
+        
+        @Override
+        protected void onPostExecute(String values) {    	  
+          super.onPostExecute(values);
+        	controls.pOnBluetoothServerSocketAcceptTimeout(pascalObj);
+		    mBufferInput = null;
+			mBufferOutput = null;
+
+        }        
+      }	
 }
 
 //ref. http://androidcookbook.com/Recipe.seam;jsessionid=9B476BA317AA36E2CB0D6517ABE60A5E?recipeId=1665
@@ -8226,307 +8654,500 @@ class jBluetoothClientSocket {
     private Controls controls  = null;   // Control Class -> Java/Pascal Interface ...
     private Context  context   = null;
 
-	private  BluetoothSocket mmSocket;
-	private  InputStream mmInStream;
-	private  OutputStream mmOutStream;
+	private  BluetoothSocket mmSocket;	
 	private BluetoothDevice mmDevice;
 	
-	private byte[] mmBufferIn;
-	private byte[] mmBufferOut;
-	
 	boolean mmConnected;
-	boolean jBluetoothServerSocketIsListen = false;
+	
+    BufferedInputStream mBufferInput;
+	BufferedOutputStream mBufferOutput;
 	
 	BluetoothAdapter mmBAdapter;
-
+	
+    int mBuffer = 1024;
+    
+    boolean IsFirstsByteHeader = false;
+    	
 	//Unique UUID for this application.....
 	//private UUID mmUUID = UUID.fromString("fa87c0d0-afac-11de-8a39-0800200c9a66");
 	
-	private String mmUUIDString = null;
+	//Well known SPP UUID
+	private String mmUUIDString = "00001101-0000-1000-8000-00805F9B34FB";
 	
-	private Handler mmHandler = new Handler(){
-	   /*.*/public void handleMessage(Message msg) {
-	           if (msg.what == 0){ 	        	   
-	        	     controls.pOnBluetoothClientSocketConnected(pascalObj,
-			                mmSocket.getRemoteDevice().getName(),								
-			                mmSocket.getRemoteDevice().getAddress());
-	           }else if (msg.what == 1){ 
-	        	     HandleInput();        	   
-	           }else if (msg.what == 2){  //qet as  text
-	        	    controls.pOnBluetoothClientSocketIncomingMessage(pascalObj, msg.getData().getString("text"));	        	    
-	        	   // Log.i("mHandler",msg.getData().getString("text"));	                
-	           }else if (msg.what == 3){ //QUIT
-	        	   mmConnected = false;
-	           }	           
-	        }        
-	};
-	
-    final BroadcastReceiver mBroadcastReceiverConnector = new BroadcastReceiver() { //just for app running in same device!
-         @Override
-    /*.*/public void onReceive(Context context, Intent intent) {
-            if (intent.getAction().equals("jBluetoothServerSocket.action.CONNECTED" ) ){
-            	if (intent.getStringExtra("state").equals("true")) {
-            	    jBluetoothServerSocketIsListen = true;
-            	}    
-            }
-         }
-    };
-	
+	String mMimeType = "text";
+		
 	public jBluetoothClientSocket(Controls _ctrls, long _Self) {
 	       context   = _ctrls.activity;
 	       pascalObj = _Self;
 	       controls  = _ctrls;
-	   	   //Well known SPP UUID	       
-	       mmUUIDString = "00001101-0000-1000-8000-00805F9B34FB";
-	       
 	       mmBAdapter = BluetoothAdapter.getDefaultAdapter(); // Emulator -->> null!!!
 	}
 	
 	public void jFree() {
          //free local objects...
 		mmDevice = null;
+	    mBufferInput = null;
+		mBufferOutput = null;
+		mmSocket = null;
+		mmBAdapter = null;
 	}
 	
-	public void SetDevice(BluetoothDevice _device) {
-		//Log.i("SetDevice","SetDevice...");
+	public void SetDevice(BluetoothDevice _device) {		
 		mmDevice = _device;
 	}
 	
 	public void SetUUID(String _strUUID) {
 		if (!_strUUID.equals("")) {
 			mmUUIDString = _strUUID;
-			//mmUUID = UUID.fromString(mmUUIDString);
 		}   
 	}
-		
-	private void TryConnect() {
-		
-		try {
-			mmSocket = mmDevice.createRfcommSocketToServiceRecord(UUID.fromString(mmUUIDString));
-		} catch (IOException e) {
-			//e.printStackTrace();
-			mmConnected = false;
-		}
-					
-		Thread connectionThread  = new Thread() {				
- 	    @Override
-   /*.*/public void run() {
-					// Always cancel discovery because it will slow down a connection					
-					// Make a connection to the BluetoothSocket
-					try {
-						// This is a blocking call and will only return on a
-						// successful connection or an exception
-						mmConnected = true;						
-						mmSocket.connect();												
-						//Get the BluetoothSocket input and output streams
-						try {
-							mmInStream = mmSocket.getInputStream();
-							mmOutStream = mmSocket.getOutputStream(); // Create a data stream so we can talk to server....
-							mmBufferIn = new byte[1024];         //init buffer for input...
-							//mmBufferOut = new byte[1024];      //init buffer...
-						} catch (IOException e) {
-							mmConnected = false;
-							//e.printStackTrace();
-						}
-						
-					    Message msgDone = new Message();
-		  		        Bundle messageData = new Bundle();
-		  		        msgDone.what = 0; //connected!    
-		  		        //messageData.putString("RemoteName",mmSocket.getRemoteDevice().getName());
-		  		        //messageData.putString("RemoteAddress",mmSocket.getRemoteDevice().getAddress()); 
-		  		        msgDone.setData(messageData);    				  		        
-		  		        mmHandler.sendMessage(msgDone);
-		  		        
-						//java --> pascal
-					} catch (IOException e) {
-						//connection to device failed so close the socket
-						mmConnected = false;
-						try {
-							mmSocket.close();
-						} catch (IOException e2) {
-							e2.printStackTrace();
-							//finish();
-						}
-					}
-				}
-		};		
-		connectionThread.start();						        
-	}
-		
-    private void HandleInput() {    	
-      String content;
-      ArrayList<String> textLines = new ArrayList<String>();
-      //int size;
-      
- 	  try {
- 		  
- 		//size = mmInStream.available();
- 		
- 		BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(mmInStream, "UTF-8"));		 
-	 	content = bufferedReader.readLine();  
-	 	if (content != null) {
-	 	  if (!content.equals("QUIT")) {		 		     
-	 		     while(content != null){ 		    	                             	              
-	               textLines.add(content);
-	               content = bufferedReader.readLine();
-	             }
-		         Message msgDone = new Message();
-		         Bundle messageData = new Bundle();
-		         msgDone.what = 2; //set messageBuffer...    
-		         messageData.putString("text", textLines.toString()); //[..., ...., ...]
-		         msgDone.setData(messageData);
-		         // send message to mHandler...
-		         mmHandler.sendMessage(msgDone);		         
-		   } else { //QUIT 
-		         Message msgDone = new Message();
-	             Bundle messageData = new Bundle();
-	             msgDone.what = 3;   //done.... interrupt thread...   
-	             messageData.putString("text", "QUIT");
-	             msgDone.setData(messageData);
-	            // send message to mHandler...
-	             mmHandler.sendMessage(msgDone);
-			   //} 
-		   }		 
-	 	} 		 
-	  } catch (IOException e) {
-		e.printStackTrace();
-	  } 	 	  	  
-    }
-
-	
-	public void Connect() {
-
-	 if (mmBAdapter != null) {
-					
-  	    if (!mmBAdapter.isEnabled()) {
-            controls.activity.startActivityForResult(new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE), 1000);
-        }
-  	    
-  	    if (mmBAdapter.isDiscovering()) mmBAdapter.cancelDiscovery(); //must cancel to connect!
-  						
-		mmConnected = true;
-		
-		Thread mainThread = new Thread() {
-			
-            // setting the behavior we want from the Thread
-            @Override
-         /*.*/public void run() {
-                try {
-                    // a Thread loop
-                    while(mmConnected) {
-                        // do things
-                     	
-                    	if (mmDevice != null &&  !mmUUIDString.equals("")) {
-                    	   TryConnect();
-                    	} else mmConnected = false;
-                    }
-                } catch(Exception e) {
-                    // don't forget to deal with exceptions....
-                	mmConnected = false;
-                	
-                } finally {
-                    // this block always executes so take care here of
-                    // unfinished business
-                	mmConnected = false;
-                }
-            }
-        };
-        mainThread.start();
-	 }  
-	}
-			
-	public void Write(byte[] _buffer) {	  	
-	  mmBufferOut = _buffer;
-      if (mmConnected){	
-		controls.pOnBluetoothClientSocketWritingMessage(pascalObj);
-	      Thread sender = new Thread(){
-	         @Override
-	      /*.*/public void run() {                       
-	                try {                //data content output...
-	              	  mmOutStream.write(mmBufferOut.length); // write the data length to server/socket stream
-	              	  mmOutStream.write(mmBufferOut);        // write the data content to server/socket stream
-	              	  
-	 		         Message msgDone = new Message();
-			         Bundle messageData = new Bundle();
-			         msgDone.what = 1; //handle input..			         			         
-			         msgDone.setData(messageData);
-			         mmHandler.sendMessage(msgDone);
-	                 } catch (IOException e) {
-	                 //
-	                 }
-	           }	          
-	      };
-	      sender.start(); 
-       }  
-	}
-
-	//send text
-	public void WriteMessage(String _message) {
-	  mmBufferOut = _message.getBytes();
-	  if (mmConnected){
-		  	  
-	     controls.pOnBluetoothClientSocketWritingMessage(pascalObj);
-	  
-         Thread sender = new Thread(){
-    	    @Override
-        /*.*/public void run() {                       
-               try { 
-                	 //mmOutStream.write(mmBufferOut.length); //data size    ::TODO        	   
-            	     mmOutStream.write(mmBufferOut); //data content output...
-            	    
-	 		         Message msgDone = new Message();
-			         Bundle messageData = new Bundle();
-			         msgDone.what = 1; //handle input..    
-			         msgDone.setData(messageData);
-			         mmHandler.sendMessage(msgDone);
-
-                } catch (IOException e) { 
-                   //
-                }
-             }
-         };         
-         sender.start(); 
-	  } 
-	}
-		
-	public byte[] Read() {
-	    	
-	   if (mmConnected){	      	  		     		   
-	      	  ByteArrayOutputStream buffer = new ByteArrayOutputStream();
-	  		  int count;
-	      	  byte[] data = new byte[1024];  //16384
-	      	  
-	      	  try {
-	  			while ((count = mmInStream.read(data, 0, data.length)) != -1) {
-	  			   buffer.write(data, 0, count);
-	  			}
-	   		  } catch (IOException e) {
-	               //
-	  		  }    	  
-	      	  try {
-	  			buffer.flush();
-	  	  	  } catch (IOException e) {
-	              //
-	  		  }
-	      	  return buffer.toByteArray();
-	      	  
-	   }else return null;
-	        
-	}
-
+				         
+    //write others [public] methods code here......
+    //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
+        
 	public boolean IsConnected() {
-		return mmConnected;
+		if (mmSocket != null)
+		   return mmSocket.isConnected();
+		else return false; 
 	}
-	
+		
 	public void Disconnect() {
 		mmConnected = false;
 		try {
-			mmSocket.close();
+			if (mmSocket != null)
+				while (mmSocket.isConnected()) {
+					mmSocket.close();	
+				}
+			    
 		} catch (IOException e2) {			
-			//finish();
+
 		}	
 	}
+		
+	//talk to server
+	/* System.arraycopy
+	 * src  the source array to copy the content. 
+       srcPos  the starting index of the content in src. 
+       dst  the destination array to copy the data into. 
+       dstPos  the starting index for the copied content in dst. 
+       length  the number of elements to be copied.  
+	 */	
 	
+	//talk to client	
+	public void Write(byte[] _dataContent, byte[] _dataHeader) {		 		
+	       try {    	   
+	           if (mBufferOutput != null) {	        	           	   	        	    
+	        	    int sizeContent = _dataContent.length;	        	    
+	        	    int tempsizeHeader = _dataHeader.length;	        	    	        	    
+	        	    if (tempsizeHeader > 32767) tempsizeHeader = 32767; 	        	    	        	   	        	    	        	    
+	        	    short sizeHeader = (short)tempsizeHeader; 		        	    	        	      	       	        	    
+	        	    byte[] extendedArray = new byte[sizeContent+4+sizeHeader+2];	        	     	   
+	        	    byte[] sizeContentBuff = intToByteArray(sizeContent, ByteOrder.LITTLE_ENDIAN);
+	        	    byte[] sizeHeaderBuff = shortToByteArray(sizeHeader, ByteOrder.LITTLE_ENDIAN);	        	    	        	    	        	    
+	        	    System.arraycopy(sizeHeaderBuff, 0,  extendedArray, 0, 2);
+	        	    System.arraycopy(sizeContentBuff, 0,  extendedArray, 2, 4);	        	    
+	        	    System.arraycopy(_dataHeader, 0,  extendedArray, 2+4, _dataHeader.length);	        	    	        	           	   		           	   
+	       	        System.arraycopy(_dataContent, 0,  extendedArray, 2+4+_dataHeader.length, _dataContent.length);		
+	       	        mBufferOutput.write(extendedArray, 0, extendedArray.length);              
+	       	        mBufferOutput.flush();          
+	           }
+	           
+	        } catch (IOException e) { }       	       
+	}	
+
+	public void WriteMessage(String _message, byte[] _dataHeader) {		 		
+		Write(_message.getBytes(), _dataHeader);       	      
+	}
+			
+	public void WriteMessage(String _message) {						
+	    try {	    	   
+	       if (mBufferOutput != null) {
+	       	    byte[] _byteArray = _message.getBytes();	        	   	       	        	       	        		
+	       	    mBufferOutput.write(_byteArray, 0, _byteArray.length);              
+	       	    mBufferOutput.flush();          
+	        }	           
+	    } catch (IOException e) { }       	       
+	}
+			
+    //talk to client	
+	public void Write(byte[] _dataContent) {	
+		
+     try {
+        if (mBufferOutput != null) {	        	 
+     	   mBufferOutput.write(_dataContent, 0, _dataContent.length);              
+     	   mBufferOutput.flush();
+         }    
+      }  catch (IOException e) { }    
+     
+ }
+	
+	
+public void SendFile(String _filePath, String _fileName, byte[] _dataHeader) throws IOException {
+		
+		  if (mBufferOutput != null) {	
+		    File F = new File( _filePath + "/" + _fileName);		    	    	    	    	    
+		    int sizeContent = (int)F.length();	    
+		        	    	        	    
+    	    int tempsizeHeader = _dataHeader.length;	        	    	        	    
+    	    if (tempsizeHeader > 32767) tempsizeHeader = 32767; 	        	    	        	   	        	    	        	    
+    	    short sizeHeader = (short)tempsizeHeader; 		        	    	        	      	       	        	    
+    	    byte[] extendedArray = new byte[sizeContent+4+sizeHeader+2];	        	     	   
+    	    byte[] sizeContentBuff = intToByteArray(sizeContent, ByteOrder.LITTLE_ENDIAN);
+    	    byte[] sizeHeaderBuff = shortToByteArray(sizeHeader, ByteOrder.LITTLE_ENDIAN);	        	    	        	    	        	    
+    	    
+    	    System.arraycopy(sizeHeaderBuff, 0,  extendedArray, 0, 2);
+    	    System.arraycopy(sizeContentBuff, 0,  extendedArray, 2, 4);	        	    
+    	    System.arraycopy(_dataHeader, 0,  extendedArray, 2+4, _dataHeader.length);	 
+    	    
+		    BufferedInputStream bis = new BufferedInputStream(new FileInputStream(F));			    
+		    if (bis.read(extendedArray, 2+4+_dataHeader.length, sizeContent) > 0) {  
+	          try {         	        
+	        	mBufferOutput.write(extendedArray, 0, extendedArray.length);
+	            mBufferOutput.flush();
+	          }  
+	          finally {
+	            bis.close();   
+	          }        
+		    }
+		  }   
+	}
+		
+	public void SendFile(String _filePath, String _fileName) throws IOException {
+		
+	 if ( mBufferOutput != null) {			 
+		    File F = new File( _filePath + "/" + _fileName);		    	    	    	    	    
+		    int size = (int)F.length();	    
+		    byte[] buffer = new byte[size];  	    	  	  	    	    	    	    
+		    BufferedInputStream bis = new BufferedInputStream(new FileInputStream(F));	    	  	    
+		    if (bis.read(buffer, 0, size) > 0) {		    
+		      try {             		    	  
+		    	mBufferOutput.write(buffer, 0, buffer.length);
+		        mBufferOutput.flush();
+		      }  
+		      finally {
+		        bis.close();   
+		      }        
+		    }
+	   }  		 
+    }
+	
+	public void WriteMessage(String _message, String _dataHeader) {		 	
+		WriteMessage(_message, _dataHeader.getBytes());
+	}
+	
+	public void Write(byte[] _dataContent,  String _dataHeader) {			 
+		Write(_dataContent,_dataHeader.getBytes());		   
+	}
+	
+	public void SendFile(String _filePath, String _fileName, String _dataHeader) throws IOException {
+		SendFile(_filePath,_fileName, _dataHeader.getBytes());		
+	}
+
+	
+    public boolean GetDataHeaderReceiveEnabled() {
+        return IsFirstsByteHeader;
+    }
+          
+    public void SetDataHeaderReceiveEnabled(boolean _value)  {
+    	IsFirstsByteHeader = _value;
+    }
+    
+           
+    public void SetReceiverBufferLength(int _value)  {
+    	mBuffer = _value;
+    }
+    
+    public int GetReceiverBufferLength()  {
+    	return mBuffer; 
+    }
+    
+	public void SaveByteArrayToFile(byte[] _byteArray, String _filePath,  String _fileName) {
+			  	
+		File F = new File( _filePath + "/" + _fileName);
+	    FileOutputStream fos;
+		try {
+			fos = new FileOutputStream(F);						
+		    try {
+				fos.write(_byteArray, 0, _byteArray.length);
+				fos.flush();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}	
+		    try {
+				fos.close();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}		        
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}	  	
+	}
+    	
+	private byte[] intToByteArray(int value, ByteOrder order) {
+	        ByteBuffer buffer = ByteBuffer.allocate(4); // in java, int takes 4 bytes.
+	        buffer.order(order);	        	       	        
+	        return buffer.putInt(value).array();
+	}
+	 	  
+	private int byteArrayToInt(byte[] byteArray, ByteOrder order) {
+	        ByteBuffer buffer = ByteBuffer.wrap(byteArray);
+	        buffer.order(order);
+	        return buffer.getInt();
+	}
+	
+	
+	private byte[] shortToByteArray(short value, ByteOrder order) {
+        ByteBuffer buffer = ByteBuffer.allocate(2); // in java, shortint takes 2 bytes.
+        buffer.order(order);	        	       	        
+        return buffer.putShort(value).array();
+    }
+ 	  
+    private int byteArrayToShort(byte[] byteArray, ByteOrder order) {
+        ByteBuffer buffer = ByteBuffer.wrap(byteArray);
+        buffer.order(order);
+        return buffer.getShort();
+    }
+			
+	public void Connect() {
+  	  
+  	    if (!mmBAdapter.isEnabled()) {
+            controls.activity.startActivityForResult(new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE), 1000);
+        }  	    
+  	    
+  	    if (mmBAdapter.isDiscovering()) mmBAdapter.cancelDiscovery(); //must cancel to connect!
+  	    
+        if (mmSocket != null) {
+        	  try {        		  
+				mmSocket.close();
+				mmSocket = null;
+			  } catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			  }
+        }
+          
+        try {
+        	  mmConnected = false;
+			  mmSocket = mmDevice.createRfcommSocketToServiceRecord(UUID.fromString(mmUUIDString));
+			  
+			  // This is a blocking call and will only return on a successful connection or an exception			  
+		      mmSocket.connect();
+		      
+		} catch (IOException e) {
+				 mmConnected = false;									
+				mmSocket = null;				
+		}          	
+         
+        if (mmSocket != null) {
+    		try {
+    			mBufferInput = new BufferedInputStream(mmSocket.getInputStream());
+				mBufferOutput = new  BufferedOutputStream(mmSocket.getOutputStream());
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				mBufferInput = null;
+				mBufferOutput = null;
+				e.printStackTrace();
+			}        	
+            new ASocketClientTask().execute();
+        }  
+    }	
+
+	public String ByteArrayToString(byte[] _byteArray) { 
+		 return (new String(_byteArray));   
+	}
+	
+    public Bitmap ByteArrayToBitmap(byte[] _byteArray) {
+    	return BitmapFactory.decodeByteArray(_byteArray, 0, _byteArray.length);    	
+    }
+    
+    class ASocketClientTask extends AsyncTask<String, ByteArrayOutputStream, String> {
+    	
+    	int bytes_read = 0;
+    	int count = 0;
+    	int lenContent = 0;    
+    	int lenHeader = 0;    
+    	    	
+    	byte[] inputBuffer = new byte[mBuffer];    	     	
+    	
+    	ByteArrayOutputStream bufferOutput;
+    	ByteArrayOutputStream bufferOutputHeader;
+    	
+        byte[] headerBuffer;
+    	
+    	
+        @Override
+        protected String doInBackground(String... message) {
+          while (mmConnected) {                                                                     	
+            try {            	
+            	bytes_read = -1;
+            	bufferOutput = new ByteArrayOutputStream();
+            	
+            	if (mBufferInput!=null)
+				    bytes_read =  mBufferInput.read(inputBuffer, 0, inputBuffer.length);   //blocking ...
+				if (bytes_read < 0) { 
+					mmConnected = false;				
+				}	
+			} catch (IOException e) {
+				mmConnected = false;
+				e.printStackTrace();				
+			} 
+
+            if (IsFirstsByteHeader) {
+               if(bytes_read > 6) {            	
+            	  bufferOutputHeader = new ByteArrayOutputStream();   
+                  byte[] lenHeaderBuffer = new byte[2];  //package lenght [int]
+                  byte[] lenContentBuffer = new byte[4];  //package lenght [int]
+                  
+                  if (inputBuffer!=null) {
+                	  System.arraycopy(inputBuffer, 0,lenHeaderBuffer, 0, 2);                	    
+                      System.arraycopy(inputBuffer, 2,lenContentBuffer, 0, 4);
+                                            
+                      lenHeader = byteArrayToShort(lenHeaderBuffer, ByteOrder.LITTLE_ENDIAN);
+                      lenContent = byteArrayToInt(lenContentBuffer, ByteOrder.LITTLE_ENDIAN);                                                                             
+                      
+                      //----------------------------------------------------------------------                                                                                      
+                      int index = 2+4;  // [header+content len] 
+                      int r = bytes_read;                    
+                      while ( r < (lenHeader+index)) {
+                    	if (bytes_read > 0) {  
+                    	  bufferOutputHeader.write(inputBuffer,index, bytes_read-index);
+                    	  if (mBufferInput!=null) {
+                    	    try {                    		  
+							   bytes_read =  mBufferInput.read(inputBuffer, 0, inputBuffer.length);
+							   if (bytes_read < 0) {
+								   mmConnected = false;
+								   //return null;
+							   }
+					 	    } catch (IOException e) {
+							// TODO Auto-generated catch block
+					 	      mmConnected = false;	
+							  e.printStackTrace();
+						    }                    	  
+                    	    index = 0;
+                    	    if (bytes_read > 0)
+                    	       r = r + bytes_read;      
+                    	  }
+                    	}  
+                      } 
+                      if (bytes_read > 0)
+                	    r = r - bytes_read;  //backtraking..
+                	  
+                      //-----------------------------------------------------------------------------                      
+                      if (bufferOutput!=null) {                    	                      	                        	                        	                     	                     	                     	  
+                    	if ( (lenHeader-r) > 0 ) {
+                    	   //---System.arraycopy(inputBuffer, 2+4 ,headerBuffer, 0, lenHeader);
+                    	   bufferOutputHeader.write(inputBuffer,index,lenHeader-r); //dx                    	 
+                    	   headerBuffer = bufferOutputHeader.toByteArray();                    	  
+                           //---bufferOutput.write(inputBuffer, 2+4+lenHeader, bytes_read-2-4-lenHeader);
+                    	   if ((bytes_read-index-(lenHeader-r)) > 0 ) {
+                    	      bufferOutput.write(inputBuffer, index+(lenHeader-r), bytes_read-index-(lenHeader-r));
+                              //--count = count + bytes_read-2-4-lenHeader;
+                    	      count = count + bytes_read-index-(lenHeader-r);
+                              publishProgress(bufferOutput);
+                    	   }
+                    	}   
+                      }                      
+                  }
+                                    
+                  while ( count < lenContent) {                	  
+              	    try {
+              	    	bytes_read = -1;
+              	    	if (mBufferInput != null)
+					   	   bytes_read =  mBufferInput.read(inputBuffer, 0, inputBuffer.length); //blocking ...
+						   if (bytes_read < 0) {
+							   mmConnected = false;							
+						   }
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						mmConnected = false;
+						e.printStackTrace();
+					} 
+              	                  	    
+              	    if (bufferOutput!=null) { 	
+              	    	if  (bytes_read > 0) { 
+              	          bufferOutput.write(inputBuffer, 0, bytes_read);     	                  	                                         
+                          count = count + bytes_read;
+                          publishProgress(bufferOutput);
+              	    	}
+              	    }                    
+                  }                  
+                                    
+               }               
+               else {
+                   mmConnected = false;
+               }
+            }   
+            else{
+            	if (bufferOutput!=null) {
+                  if  (bytes_read > 0) {            		
+                     bufferOutput.write(inputBuffer, 0, bytes_read);
+                     publishProgress(bufferOutput);
+                  }
+            	}
+            }
+                                                   	                                								                         	                      			                                                      
+          } //main loop           
+          return null;
+        }
+        
+		@Override
+		protected void onPreExecute() {			
+			super.onPreExecute();
+			mmConnected = true;												
+			controls.pOnBluetoothClientSocketConnected(pascalObj,mmSocket.getRemoteDevice().getName(),mmSocket.getRemoteDevice().getAddress());
+		}
+		
+        @Override
+        protected void onProgressUpdate(ByteArrayOutputStream... values) {
+           super.onProgressUpdate(values);
+           if (IsFirstsByteHeader) {
+              if (values[0].toByteArray().length == lenContent ) {
+                 controls.pOnBluetoothClientSocketIncomingData(pascalObj, values[0].toByteArray(), headerBuffer);
+                 try {                	 
+                	if (bufferOutput != null) 
+                	   bufferOutput.close();    		
+                	if (bufferOutputHeader!= null)
+                	   bufferOutputHeader.close();                	
+    			  } catch (IOException e) {
+    					// TODO Auto-generated catch block
+    					e.printStackTrace();
+    			 }
+                 //TODO
+                 /*
+                 else controls.pOnBluetoothClientSocketProgress(pascalObj, values[0].toByteArray().length);
+                 */
+              }  
+              
+           }
+           else {
+        	  controls.pOnBluetoothClientSocketIncomingData(pascalObj, values[0].toByteArray(), headerBuffer);
+              try {
+            	  if (bufferOutput != null)
+            	       bufferOutput.close();
+			  } catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+			  }
+           }
+        }
+        
+        @Override
+        protected void onPostExecute(String values) {    	  
+          super.onPostExecute(values);          
+          controls.pOnBluetoothClientSocketDisconnected(pascalObj);
+          try {
+        	 mmConnected = false;
+        	 mBufferOutput = null;         	 
+        	 if (mmSocket != null) mmSocket.close();   	  	        	  	
+   	       } catch (IOException e) {
+   		    
+   	       }          
+        }
+        
+      }	
 }
 
 /*Draft java code by "Lazarus Android Module Wizard" [5/10/2014 14:32:21]*/
@@ -8551,6 +9172,10 @@ class jBluetooth /*extends ...*/ {
     ArrayList<String> mListFoundedDevices = new ArrayList<String>();
     ArrayList<BluetoothDevice> mListReachablePairedDevices  = new ArrayList<BluetoothDevice>();
     
+    ArrayList<BluetoothDevice> mListFoundedDevices2  = new ArrayList<BluetoothDevice>();
+    
+    ArrayList<String> mListBondedDevices = new ArrayList<String>();
+    
     //jBluetoothClientSocket mBluetoothClientSocket;    
 
     final BroadcastReceiver mBroadcastReceiver = new BroadcastReceiver() {
@@ -8565,6 +9190,7 @@ class jBluetooth /*extends ...*/ {
 	        	   mListReachablePairedDevices.add(device);	               
 	           }
 			   mListFoundedDevices.add( device.getName() + "|" + device.getAddress() );
+			   mListFoundedDevices2.add(device);
 			  // Log.i("jBluetooth_onReceive",device.getName() + "|" + device.getAddress());	        	   
 	           	           
 	           controls.pOnBluetoothDeviceFound(pascalObj,device.getName(),device.getAddress());
@@ -8662,33 +9288,28 @@ class jBluetooth /*extends ...*/ {
             
     public String[] GetPairedDevices(){  //list all paired devices...
     	
-        ArrayList<String> listBondedDevices = new ArrayList<String>();
+    	mListBondedDevices.clear();
+    	
+        mListBondedDevices.add("null|null");
         
-        listBondedDevices.add("null|null");
-        
-        if (mBA != null && mBA.isEnabled()){
-            
-           Set<BluetoothDevice> Devices = mBA.getBondedDevices();
+        if (mBA != null && mBA.isEnabled()){            
+           Set<BluetoothDevice> Devices = mBA.getBondedDevices();           
+           //Toast.makeText(controls.activity.getApplicationContext(),"Devices Count = "+Devices.size(), Toast.LENGTH_SHORT).show();           
            
-           Toast.makeText(controls.activity.getApplicationContext(),"Devices Count = "+Devices.size(), Toast.LENGTH_SHORT).show();
-           
-           if(Devices.size() > 0) {
-        	   
-              listBondedDevices.clear();
-              
+           if(Devices.size() > 0) {        	  
+              mListBondedDevices.clear();              
               for(BluetoothDevice device : Devices) {        	
-         	     listBondedDevices.add(device.getName()+"|"+ device.getAddress());
+         	     mListBondedDevices.add(device.getName()+"|"+ device.getAddress());
            	     //Log.i("Bluetooch_devices",device.getName());  //device.getAddress()            
-              }
-              
+              }              
            }  
         }
         //strDevices = new String[mPairedDevices.size()];
         //strDevices = listDevices.toArray(strDevices);
-        String strDevices[] = listBondedDevices.toArray(new String[listBondedDevices.size()]);    	  
+        String strDevices[] = mListBondedDevices.toArray(new String[mListBondedDevices.size()]);    	  
         return strDevices;        
     }
-
+          
     public String[] GetFoundedDevices(){  //list
     	if (mListFoundedDevices.size() == 0) {
             mListFoundedDevices.add("null|null");
@@ -8736,8 +9357,7 @@ class jBluetooth /*extends ...*/ {
     	  return -1;
       }
     }       
-                         
-    
+                            
     public BluetoothDevice GetReachablePairedDeviceByName(String _deviceName) {
     	
     	int index = -1;
@@ -8837,6 +9457,49 @@ class jBluetooth /*extends ...*/ {
         sharingIntent.putExtra(Intent.EXTRA_STREAM, uri);
         controls.activity.startActivity(sharingIntent);       
     }
+    
+    public void UnpairDeviceByAddress(String _deviceAddress) {
+  	   BluetoothDevice device =  GetReachablePairedDeviceByAddress(_deviceAddress);
+      	try {
+      		
+      	  if (device != null) {	
+      	     Method m = device.getClass()
+      	        .getMethod("removeBond", (Class[]) null);
+      	     m.invoke(device, (Object[]) null);
+      	  }
+      	} catch (Exception e) {
+      	    //Log.e(TAG, e.getMessage());
+      	}
+      }  
+         
+    public BluetoothDevice GetFoundedDeviceByAddress(String _deviceAddress) {
+     	
+     	int index = -1;     	
+         for (int i=0; i < mListFoundedDevices2.size(); i++) {
+         	if (mListFoundedDevices2.get(i).getAddress().equals(_deviceAddress)) {
+         		index = i;
+         		break;
+         	}
+         }
+         if (index > -1) { 
+         	return mListFoundedDevices2.get(index);
+         }	
+         else return null;
+     }
+
+     public void PairDeviceByAddress(String _deviceAddress) {
+     	BluetoothDevice device = GetFoundedDeviceByAddress(_deviceAddress);
+     	try {
+     	    if (device != null) {    	    	
+     	    Method m = device.getClass()
+     	               .getMethod("createBond", (Class[]) null);    	    
+     	               m.invoke(device, (Object[]) null);
+     	    } 	    	   
+     	} catch (Exception e) {
+     	    //Log.e(TAG, e.getMessage());
+     	}
+     }
+      
 }
 
 //by jmpessoa
@@ -11119,6 +11782,7 @@ class jGridView extends GridView /*dummy*/ { //please, fix what GUI object will 
       setAdapter(null);     
       gridViewCustomeAdapter = null;
       setOnItemClickListener(null);
+	  setOnItemLongClickListener(null); // renabor
    }
 
    public void SetViewParent(ViewGroup _viewgroup) {
@@ -11269,6 +11933,14 @@ class jGridView extends GridView /*dummy*/ { //please, fix what GUI object will 
    public void SetFontColor(int _color) {	  
 	   mItemTextColor = _color;	
    }
+   
+   
+   public void UpdateItemTitle(int _index, String _title) {
+	   jGridItem info = alist.get(_index);
+	   info.label = _title;
+	   gridViewCustomeAdapter.notifyDataSetChanged();    
+   }
+   
    
 } //end class
 
@@ -12838,7 +13510,8 @@ class jHttpClient /*extends ...*/ {
  	    	Log.i(listHeaderName.get(i), listHeaderValue.get(i));
  	    	httpPost.setHeader(listHeaderName.get(i), listHeaderValue.get(i));
  	    }
- 	  //thanks to @renabor
+ 	    
+ 	    //thanks to @renabor
  	    if (mAuthenticationMode != 0) {
              String _credentials = mUSERNAME + ":" + mPASSWORD;
              String _base64EncodedCredentials = Base64.encodeToString(_credentials.getBytes(), Base64.NO_WRAP);
@@ -12864,6 +13537,41 @@ class jHttpClient /*extends ...*/ {
  			 		
  		return strResult; 
    }
+    
+  //thanks to @renabor
+    public String DeleteStateful(String _url, String _value) throws Exception { 			
+
+    	int statusCode = 0;
+    	String strResult = "";
+
+    	HttpParams httpParams = new BasicHttpParams();
+    	int connection_Timeout = 5000;
+    	HttpConnectionParams.setConnectionTimeout(httpParams, connection_Timeout);
+    	HttpConnectionParams.setSoTimeout(httpParams, connection_Timeout);
+
+    	HttpDelete httpDelete = new HttpDelete(_url + "/" + _value);
+
+    	if (mAuthenticationMode != 0) {
+    		String _credentials = mUSERNAME + ":" + mPASSWORD;
+    		String _base64EncodedCredentials = Base64.encodeToString(_credentials.getBytes(), Base64.NO_WRAP);
+    		httpDelete.addHeader("Authorization", "Basic " + _base64EncodedCredentials);
+    	}
+
+    	HttpResponse response = client2.execute(httpDelete, localContext);
+    	HttpEntity entity = response.getEntity();
+
+    	StatusLine statusLine = response.getStatusLine();
+    	statusCode = statusLine.getStatusCode();
+
+    	if (statusCode == 200) { //OK       
+    		entity = response.getEntity();
+    		if (entity != null) {
+    			strResult = EntityUtils.toString(entity);
+    		}
+    	}
+    	return strResult;
+    }    
+    
 	/*
 	 * AsyncTask has three generic types:
        Params: An array of parameters you want to pass in to the class you create when you subclass AsyncTask.
@@ -13524,7 +14232,8 @@ class jTCPSocketClient {
    
     /**
      * Sends the message entered by client to the server
-     */   
+     */
+    
     public void SendMessage(String message) {
     	
         if (mBufferOut != null && !mBufferOut.checkError()) {
@@ -13616,8 +14325,7 @@ class jTCPSocketClient {
           @Override
           protected void onPostExecute(String values) {    	  
             super.onPostExecute(values);   	  
-            try {                	
-         	   
+            try {                	         	   
      			mSocket.close();
      	    } catch (IOException e) {
      			// TODO Auto-generated catch block
@@ -15458,16 +16166,16 @@ public  native void pOnBluetoothDiscoveryFinished(long pasobj,int countFoundedDe
 public  native void pOnBluetoothDeviceBondStateChanged(long pasobj, int state, String deviceName, String deviceAddress);
 
 public  native void pOnBluetoothClientSocketConnected(long pasobj, String deviceName, String deviceAddress);
-public  native void pOnBluetoothClientSocketIncomingMessage(long pasobj, String messageText);
-public  native void pOnBluetoothClientSocketWritingMessage(long pasobj);
+public  native void pOnBluetoothClientSocketIncomingData(long pasobj, byte[] byteArrayContent, byte[] byteArrayHeader);
+public  native void pOnBluetoothClientSocketDisconnected(long pasobj);
 
-public  native void pOnBluetoothServerSocketConnected(long pasobj, String deviceName, String deviceAddress);
-public  native void pOnBluetoothServerSocketIncomingMessage(long pasobj, String messageText);
-public  native void pOnBluetoothServerSocketWritingMessage(long pasobj);
-public  native void pOnBluetoothServerSocketListen(long pasobj, String deviceName, String deviceAddress);
+public  native boolean pOnBluetoothServerSocketConnected(long pasobj, String deviceName, String deviceAddress);
+public  native boolean pOnBluetoothServerSocketIncomingData(long pasobj, byte[] byteArrayContent, byte[] byteArrayHeader);
+
+public  native void pOnBluetoothServerSocketListen(long pasobj, String serverName, String strUUID);
+public native void pOnBluetoothServerSocketAcceptTimeout(long pasobj);
 
 public  native void pOnSpinnerItemSeleceted(long pasobj, int position, String caption);
-
 //gps - location
 public  native void pOnLocationChanged(long pasobj, double latitude,  double longitude, double altitude, String address);
 public  native void pOnLocationStatusChanged(long pasobj, int status, String provider, String msgStatus);
@@ -15816,6 +16524,13 @@ public  int  getScreenWH(android.content.Context context) {
 
   int h = context.getResources().getDisplayMetrics().heightPixels;
   int w = context.getResources().getDisplayMetrics().widthPixels;
+// proposed by renabor
+/* 
+ float density  = context.getResources().getDisplayMetrics().density;
+ int dpHeight = Math.round ( h / density );
+ int dpWidth  = Math.round ( w / density );
+ return ( dpWidth << 16 | dpHeight ); // dp screen size  
+*/
   return ( (w << 16)| h );
 }
 

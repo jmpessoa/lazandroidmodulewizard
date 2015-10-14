@@ -48,10 +48,10 @@ PANIC II: [building Lamw project cross-arm]::
 
 		Copy "libfreetype.so" to NDK location    "....\platforms\android-XX\arch-arm\usr\lib" 
 		where XX = 14 or 15 or 16... or 21 .. etc
+		example: put "libfreetype.so" here: "..\ndkplatforms\android-15\arch-arm\usr\lib" 
 
 		For Lamw project you can look for "XX" value in menu: 
 		"Project" --->> "Project Options" ---> "Compile Options" -->> "Paths" --->> Libraries [-Fl]
-
 
 PANIC III. Where I find a "libfreetype.so" for arm-android ?
 

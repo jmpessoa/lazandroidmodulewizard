@@ -32,8 +32,13 @@ implementation
 { TAndroidModule5 }
 
 procedure TAndroidModule5.jButton1Click(Sender: TObject);
+var
+   baseform: jForm;
 begin
-  ShowMessage('jForm 5 Hello!');
+    baseform:= jForm(gApp.Forms.Stack[Self.FormBaseIndex].Form);
+    ShowMessage(baseform.Name);
+    ShowMessage(IntToStr(baseform.Tag));
+    ShowMessage('jForm 5 Hello!');
 end;
 
 end.

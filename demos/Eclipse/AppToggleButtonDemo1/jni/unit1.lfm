@@ -1,8 +1,8 @@
 object AndroidModule1: TAndroidModule1
-  Left = 277
+  Left = 284
   Top = 118
   Width = 327
-  Height = 600
+  Height = 512
   MarginLeft = 0
   MarginTop = 0
   MarginRight = 0
@@ -32,6 +32,7 @@ object AndroidModule1: TAndroidModule1
     FontColor = colbrDefault
     FontSize = 0
     TextTypeFace = tfNormal
+    FontSizeUnit = unitDefault
     Id = 4844937
   end
   object jButton1: jButton
@@ -53,6 +54,7 @@ object AndroidModule1: TAndroidModule1
     BackgroundColor = colbrDefault
     FontColor = colbrDefault
     FontSize = 0
+    FontSizeUnit = unitDefault
     OnClick = jButton1Click
     Id = 1443981
   end
@@ -75,6 +77,7 @@ object AndroidModule1: TAndroidModule1
     BackgroundColor = colbrDefault
     FontColor = colbrDefault
     FontSize = 0
+    FontSizeUnit = unitDefault
     OnClick = jButton2Click
     Id = 0
   end

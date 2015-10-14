@@ -11,10 +11,10 @@ object AndroidModule1: TAndroidModule1
   ActivityMode = actMain
   BackgroundColor = colbrDefault
   object jTextView1: jTextView
-    Left = 112
-    Top = 24
-    Width = 135
-    Height = 25
+    Left = 119
+    Top = 5
+    Width = 61
+    Height = 20
     MarginLeft = 5
     MarginTop = 5
     MarginRight = 5
@@ -31,12 +31,13 @@ object AndroidModule1: TAndroidModule1
     FontColor = colbrDefault
     FontSize = 0
     TextTypeFace = tfNormal
+    FontSizeUnit = unitDefault
     Id = 7303042
   end
   object jButton1: jButton
-    Left = 8
-    Top = 56
-    Width = 288
+    Left = 2
+    Top = 34
+    Width = 294
     Height = 40
     MarginLeft = 2
     MarginTop = 4
@@ -52,13 +53,14 @@ object AndroidModule1: TAndroidModule1
     BackgroundColor = colbrDefault
     FontColor = colbrDefault
     FontSize = 0
+    FontSizeUnit = unitDefault
     OnClick = jButton1Click
     Id = 6613246
   end
   object jButton2: jButton
-    Left = 8
-    Top = 120
-    Width = 288
+    Left = 2
+    Top = 82
+    Width = 294
     Height = 40
     MarginLeft = 2
     MarginTop = 4
@@ -74,17 +76,18 @@ object AndroidModule1: TAndroidModule1
     BackgroundColor = colbrDefault
     FontColor = colbrDefault
     FontSize = 0
+    FontSizeUnit = unitDefault
     OnClick = jButton2Click
-    Id = 0
+    Id = 2373117
   end
   object jDatePickerDialog1: jDatePickerDialog
     OnDatePicker = jDatePickerDialog1DatePicker
-    left = 64
-    top = 199
+    left = 80
+    top = 368
   end
   object jTimePickerDialog1: jTimePickerDialog
     OnTimePicker = jTimePickerDialog1TimePicker
-    left = 208
-    top = 200
+    left = 200
+    top = 280
   end
 end

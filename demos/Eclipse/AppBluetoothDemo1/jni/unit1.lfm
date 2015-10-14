@@ -31,6 +31,7 @@ object AndroidModule1: TAndroidModule1
     FontColor = colbrDefault
     FontSize = 0
     TextTypeFace = tfNormal
+    FontSizeUnit = unitDefault
     Id = 2884513
   end
   object jButton1: jButton
@@ -52,6 +53,7 @@ object AndroidModule1: TAndroidModule1
     BackgroundColor = colbrDefault
     FontColor = colbrDefault
     FontSize = 0
+    FontSizeUnit = unitDefault
     OnClick = jButton1Click
     Id = 1768641
   end
@@ -74,6 +76,7 @@ object AndroidModule1: TAndroidModule1
     BackgroundColor = colbrDefault
     FontColor = colbrDefault
     FontSize = 0
+    FontSizeUnit = unitDefault
     OnClick = jButton2Click
     Id = 2680672
   end
@@ -96,6 +99,7 @@ object AndroidModule1: TAndroidModule1
     BackgroundColor = colbrDefault
     FontColor = colbrDefault
     FontSize = 0
+    FontSizeUnit = unitDefault
     OnClick = jButton3Click
     Id = 0
   end
@@ -118,6 +122,7 @@ object AndroidModule1: TAndroidModule1
     BackgroundColor = colbrDefault
     FontColor = colbrDefault
     FontSize = 0
+    FontSizeUnit = unitDefault
     OnClick = jButton4Click
     Id = 1423383
   end
@@ -145,6 +150,7 @@ object AndroidModule1: TAndroidModule1
     TextSizeDecorated = sdNone
     TextAlign = alLeft
     HighLightSelectedItemColor = colbrDefault
+    FontSizeUnit = unitDefault
     Id = 4193543
   end
   object jButton5: jButton
@@ -166,18 +172,57 @@ object AndroidModule1: TAndroidModule1
     BackgroundColor = colbrDefault
     FontColor = colbrDefault
     FontSize = 0
+    FontSizeUnit = unitDefault
     OnClick = jButton5Click
+    Id = 3487016
+  end
+  object jImageBtn1: jImageBtn
+    Left = 16
+    Top = 392
+    Width = 48
+    Height = 48
+    MarginLeft = 5
+    MarginTop = 5
+    MarginRight = 5
+    MarginBottom = 5
+    Visible = True
+    Anchor = jButton5
+    PosRelativeToAnchor = [raBelow]
+    PosRelativeToParent = []
+    LayoutParamWidth = lpWrapContent
+    LayoutParamHeight = lpWrapContent
+    BackgroundColor = colbrDefault
+    Enabled = True
+    Images = jImageList1
+    IndexImageUp = 0
+    IndexImageDown = 1
+    OnClick = jImageBtn1Click
     Id = 0
   end
   object jBluetooth1: jBluetooth
     OnDeviceFound = jBluetooth1DeviceFound
     OnDiscoveryStarted = jBluetooth1DiscoveryStarted
     OnDiscoveryFinished = jBluetooth1DiscoveryFinished
+    OnDeviceBondStateChanged = jBluetooth1DeviceBondStateChanged
     left = 192
     top = 427
   end
   object jImageFileManager1: jImageFileManager
-    left = 67
-    top = 427
+    left = 88
+    top = 440
+  end
+  object jDialogProgress1: jDialogProgress
+    Title = 'Lamw: Bluetooch Demo'
+    Msg = 'Please, wait... discovering devices ...'
+    left = 124
+    top = 505
+  end
+  object jImageList1: jImageList
+    Images.Strings = (
+      'btn1_1.png'
+      'btn1_2.png'
+    )
+    left = 150
+    top = 397
   end
 end

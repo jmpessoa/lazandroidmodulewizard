@@ -7,15 +7,13 @@ object AndroidModule1: TAndroidModule1
   MarginTop = 0
   MarginRight = 0
   MarginBottom = 0
-  OnCreate = DataModuleCreate
   Text = 'AndroidModule1'
   ActivityMode = actMain
   BackgroundColor = colbrBlack
-  OnJNIPrompt = DataModuleJNIPrompt
   object jButton1: jButton
     Left = 5
     Top = 45
-    Width = 290
+    Width = 285
     Height = 40
     MarginLeft = 5
     MarginTop = 5
@@ -31,6 +29,7 @@ object AndroidModule1: TAndroidModule1
     BackgroundColor = colbrDefault
     FontColor = colbrDefault
     FontSize = 0
+    FontSizeUnit = unitDefault
     OnClick = jButton1Click
     Id = 8505388
   end
@@ -55,12 +54,13 @@ object AndroidModule1: TAndroidModule1
     FontColor = colbrSlateBlue
     FontSize = 0
     TextTypeFace = tfNormal
+    FontSizeUnit = unitDefault
     Id = 1639469
   end
   object jButton2: jButton
     Left = 5
     Top = 95
-    Width = 290
+    Width = 285
     Height = 40
     MarginLeft = 5
     MarginTop = 5
@@ -76,13 +76,14 @@ object AndroidModule1: TAndroidModule1
     BackgroundColor = colbrDefault
     FontColor = colbrDefault
     FontSize = 0
+    FontSizeUnit = unitDefault
     OnClick = jButton2Click
     Id = 3267055
   end
   object jButton3: jButton
     Left = 5
     Top = 145
-    Width = 290
+    Width = 285
     Height = 40
     MarginLeft = 5
     MarginTop = 5
@@ -98,13 +99,14 @@ object AndroidModule1: TAndroidModule1
     BackgroundColor = colbrDefault
     FontColor = colbrDefault
     FontSize = 0
+    FontSizeUnit = unitDefault
     OnClick = jButton3Click
     Id = 5406064
   end
   object jButton4: jButton
     Left = 5
     Top = 195
-    Width = 290
+    Width = 285
     Height = 40
     MarginLeft = 5
     MarginTop = 5
@@ -120,6 +122,7 @@ object AndroidModule1: TAndroidModule1
     BackgroundColor = colbrDefault
     FontColor = colbrDefault
     FontSize = 0
+    FontSizeUnit = unitDefault
     OnClick = jButton4Click
     Id = 0
   end

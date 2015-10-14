@@ -14,7 +14,7 @@ object AndroidModule1: TAndroidModule1
   object jPanel1: jPanel
     Left = 8
     Top = 56
-    Width = 297
+    Width = 289
     Height = 136
     MarginLeft = 4
     MarginTop = 4
@@ -51,13 +51,14 @@ object AndroidModule1: TAndroidModule1
       FontColor = colbrLimeGreen
       FontSize = 0
       TextTypeFace = tfNormal
+      FontSizeUnit = unitDefault
       Id = 7271715
     end
     object jEditText1: jEditText
       Tag = 1
       Left = 5
       Top = 40
-      Width = 287
+      Width = 274
       Height = 39
       MarginLeft = 5
       MarginTop = 10
@@ -83,12 +84,13 @@ object AndroidModule1: TAndroidModule1
       VerScrollBar = False
       WrappingLine = False
       Editable = True
+      FontSizeUnit = unitDefault
       Id = 4813408
     end
     object jButton1: jButton
       Left = 2
       Top = 93
-      Width = 293
+      Width = 283
       Height = 40
       MarginLeft = 2
       MarginTop = 4
@@ -104,6 +106,7 @@ object AndroidModule1: TAndroidModule1
       BackgroundColor = colbrDefault
       FontColor = colbrLimeGreen
       FontSize = 0
+      FontSizeUnit = unitDefault
       OnClick = jButton1Click
       Id = 0
     end
@@ -111,7 +114,7 @@ object AndroidModule1: TAndroidModule1
   object jPanel2: jPanel
     Left = 8
     Top = 200
-    Width = 297
+    Width = 289
     Height = 136
     MarginLeft = 4
     MarginTop = 4
@@ -128,7 +131,7 @@ object AndroidModule1: TAndroidModule1
     OnFlingGesture = jPanel2FlingGesture
     Id = 0
     object jTextView2: jTextView
-      Left = 123
+      Left = 119
       Top = 5
       Width = 51
       Height = 20
@@ -148,13 +151,14 @@ object AndroidModule1: TAndroidModule1
       FontColor = colbrMidnightBlue
       FontSize = 0
       TextTypeFace = tfNormal
+      FontSizeUnit = unitDefault
       Id = 506422
     end
     object jEditText2: jEditText
       Tag = 1
       Left = 5
       Top = 40
-      Width = 287
+      Width = 274
       Height = 39
       MarginLeft = 5
       MarginTop = 10
@@ -180,12 +184,13 @@ object AndroidModule1: TAndroidModule1
       VerScrollBar = False
       WrappingLine = False
       Editable = True
+      FontSizeUnit = unitDefault
       Id = 3792120
     end
     object jButton2: jButton
       Left = 2
       Top = 93
-      Width = 293
+      Width = 283
       Height = 40
       MarginLeft = 2
       MarginTop = 4
@@ -201,6 +206,7 @@ object AndroidModule1: TAndroidModule1
       BackgroundColor = colbrDefault
       FontColor = colbrMidnightBlue
       FontSize = 0
+      FontSizeUnit = unitDefault
       OnClick = jButton2Click
       Id = 0
     end
@@ -242,6 +248,7 @@ object AndroidModule1: TAndroidModule1
       FontColor = colbrTomato
       FontSize = 12
       Checked = False
+      FontSizeUnit = unitDefault
       Id = 3232535
     end
     object jTextView3: jTextView
@@ -266,6 +273,7 @@ object AndroidModule1: TAndroidModule1
       FontColor = colbrSteelBlue
       FontSize = 12
       TextTypeFace = tfNormal
+      FontSizeUnit = unitDefault
       Id = 0
     end
     object jImageView1: jImageView
@@ -292,7 +300,7 @@ object AndroidModule1: TAndroidModule1
   object jPanel4: jPanel
     Left = 7
     Top = 430
-    Width = 297
+    Width = 290
     Height = 106
     MarginLeft = 4
     MarginTop = 4
@@ -329,6 +337,7 @@ object AndroidModule1: TAndroidModule1
       TextSizeDecorated = sdNone
       TextAlign = alLeft
       HighLightSelectedItemColor = colbrRed
+      FontSizeUnit = unitDefault
       Id = 0
     end
   end

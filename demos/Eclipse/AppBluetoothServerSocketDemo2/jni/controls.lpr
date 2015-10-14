@@ -6,7 +6,7 @@ library controls;  //by Lamw: Lazarus Android Module Wizard: 7/28/2015 23:02:52]
 uses
   Classes, SysUtils, And_jni, And_jni_Bridge, AndroidWidget, Laz_And_Controls,
   Laz_And_Controls_Events, unit1;
- 
+
 { Class:     com_example_appbluetoothserversocketdemo2_Controls
   Method:    pAppOnScreenStyle
   Signature: ()I }
@@ -626,7 +626,7 @@ end;
 { Class:     com_example_appbluetoothserversocketdemo2_Controls
   Method:    pOnTCPSocketClientMessageReceived
   Signature: (J[Ljava/lang/String;)V }
-procedure pOnTCPSocketClientMessageReceived(PEnv: PJNIEnv; this: JObject; pasobj: JLong; messagesReceived: jObjectArray); cdecl;
+procedure pOnTCPSocketClientMessageReceived(PEnv: PJNIEnv; this: JObject; pasobj: JLong; messagesReceived: JStringArray); cdecl;
 begin
   Java_Event_pOnTCPSocketClientMessageReceived(PEnv,this,TObject(pasobj),messagesReceived);
 end;
@@ -1077,12 +1077,12 @@ begin
     if (PEnv^).RegisterNatives(PEnv, curClass, methods, countMethods) > 0 then Result:= JNI_TRUE;
   end;
 end;
- 
+
 function RegisterNativeMethods(PEnv: PJNIEnv; className: PChar): integer;
 begin
   Result:= RegisterNativeMethodsArray(PEnv, className, @NativeMethods[0], Length(NativeMethods));
 end;
- 
+
 function JNI_OnLoad(VM: PJavaVM; reserved: pointer): JInt; cdecl;
 var
   PEnv: PPointer;
@@ -1096,9 +1096,9 @@ begin
      curEnv:= PJNIEnv(PEnv);
      RegisterNativeMethods(curEnv, 'com/example/appbluetoothserversocketdemo2/Controls');
   end;
-  gVM:= VM;{AndroidWidget.pas}
+  gVM:= VM; {AndroidWidget.pas}
 end;
- 
+
 procedure JNI_OnUnload(VM: PJavaVM; reserved: pointer); cdecl;
 var
   PEnv: PPointer;
@@ -1109,8 +1109,9 @@ begin
   if PEnv <> nil then
   begin
     curEnv:= PJNIEnv(PEnv);
-    (curEnv^).DeleteGlobalRef(curEnv, gjClass);   {AndroidWidget.pas}
-    gVM:= nil;{AndroidWidget.pas}
+    (curEnv^).DeleteGlobalRef(curEnv, gjClass);
+    gjClass:= nil; {AndroidWidget.pas}
+    gVM:= nil; {AndroidWidget.pas}
   end;
   gApp.Terminate;
   FreeAndNil(gApp);
@@ -1226,3 +1227,4 @@ begin
   gApp.Initialize;
   gApp.CreateForm(TAndroidModule1, AndroidModule1);
 end.
+(*last [template] upgrade: 10/12/2015 19:05:23*)

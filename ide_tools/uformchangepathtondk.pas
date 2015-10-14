@@ -206,16 +206,19 @@ begin
   strList:= TStringList.Create;
   if EditPathToAndroidNDK.Text <> '' then
   begin
-    strList.LoadFromFile(ComboBoxSelectProject.Text+ DirectorySeparator+'jni'+ DirectorySeparator + lpiFileName);
-    strList.SaveToFile(ComboBoxSelectProject.Text+ DirectorySeparator+'jni'+ DirectorySeparator + lpiFileName+'.bak');
-
     if (PathToDemoAndroidNDK <> '') and (EditPathToAndroidNDK.Text <> '') then
     begin
+      strList.LoadFromFile(ComboBoxSelectProject.Text+ DirectorySeparator+'jni'+ DirectorySeparator + lpiFileName);
+      strList.SaveToFile(ComboBoxSelectProject.Text+ DirectorySeparator+'jni'+ DirectorySeparator + lpiFileName+'.bak');
+      strList.Clear;
+      strList.LoadFromFile(ComboBoxSelectProject.Text+ DirectorySeparator+'jni'+ DirectorySeparator + lpiFileName);
       strResult:=  StringReplace(strList.Text, PathToDemoAndroidNDK, EditPathToAndroidNDK.Text, [rfReplaceAll,rfIgnoreCase]);
+      strList.Clear;
       strList.Text:= strResult;
       if RadioGroupNDK.ItemIndex = 3 then
       begin
         strResult:= StringReplace(strList.Text, '4.6', '4.9', [rfReplaceAll,rfIgnoreCase]);
+        strList.Clear;
         strList.Text:= strResult;
       end;
       strList.SaveToFile(ComboBoxSelectProject.Text+ DirectorySeparator+'jni'+ DirectorySeparator + lpiFileName);

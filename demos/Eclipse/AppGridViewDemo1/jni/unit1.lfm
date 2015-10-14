@@ -32,6 +32,7 @@ object AndroidModule1: TAndroidModule1
     FontColor = colbrDefault
     FontSize = 0
     TextTypeFace = tfNormal
+    FontSizeUnit = unitDefault
     Id = 2508198
   end
   object jGridView1: jGridView
@@ -58,6 +59,7 @@ object AndroidModule1: TAndroidModule1
     OnLongClickItem = jGridView1LongClickItem
     OnDrawItemTextColor = jGridView1DrawItemTextColor
     OnDrawItemBitmap = jGridView1DrawItemBitmap
+    FontSizeUnit = unitDefault
     Id = 0
   end
   object jButton1: jButton
@@ -79,6 +81,7 @@ object AndroidModule1: TAndroidModule1
     BackgroundColor = colbrDefault
     FontColor = colbrDefault
     FontSize = 0
+    FontSizeUnit = unitDefault
     OnClick = jButton1Click
     Id = 9524516
   end

@@ -52,98 +52,84 @@
         <IsPartOfProject Value="True"/>
         <ComponentName Value="AndroidModule1"/>
         <HasResources Value="True"/>
-        <UnitName Value="unit1"/>
       </Unit1>
       <Unit2>
         <Filename Value="unit2.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="AndroidModule2"/>
         <HasResources Value="True"/>
-        <UnitName Value="unit2"/>
       </Unit2>
       <Unit3>
         <Filename Value="unit3.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="AndroidModule3"/>
         <HasResources Value="True"/>
-        <UnitName Value="unit3"/>
       </Unit3>
       <Unit4>
         <Filename Value="unit4.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="AndroidModule4"/>
         <HasResources Value="True"/>
-        <UnitName Value="unit4"/>
       </Unit4>
       <Unit5>
         <Filename Value="unit5.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="AndroidModule5"/>
         <HasResources Value="True"/>
-        <UnitName Value="unit5"/>
       </Unit5>
       <Unit6>
         <Filename Value="unit6.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="AndroidModule6"/>
         <HasResources Value="True"/>
-        <UnitName Value="unit6"/>
       </Unit6>
       <Unit7>
         <Filename Value="unit7.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="AndroidModule7"/>
         <HasResources Value="True"/>
-        <UnitName Value="unit7"/>
       </Unit7>
       <Unit8>
         <Filename Value="unit8.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="AndroidModule8"/>
         <HasResources Value="True"/>
-        <UnitName Value="unit8"/>
       </Unit8>
       <Unit9>
         <Filename Value="unit9.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="AndroidModule9"/>
         <HasResources Value="True"/>
-        <UnitName Value="unit9"/>
       </Unit9>
       <Unit10>
         <Filename Value="unit10.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="AndroidModule10"/>
         <HasResources Value="True"/>
-        <UnitName Value="unit10"/>
       </Unit10>
       <Unit11>
         <Filename Value="unit11.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="AndroidModule11"/>
         <HasResources Value="True"/>
-        <UnitName Value="unit11"/>
       </Unit11>
       <Unit12>
         <Filename Value="unit12.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="AndroidModule12"/>
         <HasResources Value="True"/>
-        <UnitName Value="unit12"/>
       </Unit12>
       <Unit13>
         <Filename Value="unit13.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="AndroidModule13"/>
         <HasResources Value="True"/>
-        <UnitName Value="unit13"/>
       </Unit13>
       <Unit14>
         <Filename Value="unit14.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="AndroidModule14"/>
         <HasResources Value="True"/>
-        <UnitName Value="unit14"/>
       </Unit14>
       <Unit15>
         <Filename Value="unitglobal.pas"/>
@@ -155,10 +141,10 @@
     <Version Value="11"/>
     <PathDelim Value="\"/>
     <Target>
-      <Filename Value="..\libs\armeabi\libcontrols.so"/>
+      <Filename Value="..\libs\armeabi\libcontrols"/>
     </Target>
     <SearchPaths>
-      <Libraries Value="C:\adt32\ndk10\platforms\android-15\arch-arm\usr\lib\;C:\adt32\ndk10\toolchains\arm-linux-androideabi-4.6\prebuilt\windows\lib\gcc\arm-linux-androideabi\4.6\"/>
+      <Libraries Value="C:\adt32\ndk10e\platforms\android-15\arch-arm\usr\lib\;C:\adt32\ndk10e\toolchains\arm-linux-androideabi-4.9\prebuilt\windows\lib\gcc\arm-linux-androideabi\4.9\"/>
       <UnitOutputDirectory Value="..\obj\controls"/>
     </SearchPaths>
     <Parsing>
@@ -182,7 +168,7 @@
       </Options>
     </Linking>
     <Other>
-      <CustomOptions Value="-Xd -CfSoft -CpARMV6 -XParm-linux-androideabi- -FDC:\adt32\ndk10\toolchains\arm-linux-androideabi-4.6\prebuilt\windows\bin -o..\libs\armeabi\libcontrols.so"/>
+      <CustomOptions Value="-Xd -CfSoft -CpARMV6 -XParm-linux-androideabi- -FDC:\adt32\ndk10e\toolchains\arm-linux-androideabi-4.9\prebuilt\windows\bin"/>
     </Other>
   </CompilerOptions>
   <Debugging>

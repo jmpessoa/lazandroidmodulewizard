@@ -1,8 +1,8 @@
 object AndroidModule1: TAndroidModule1
-  Left = 277
-  Top = 118
+  Left = 273
+  Top = 112
   Width = 300
-  Height = 600
+  Height = 503
   MarginLeft = 0
   MarginTop = 0
   MarginRight = 0
@@ -13,9 +13,9 @@ object AndroidModule1: TAndroidModule1
   OnJNIPrompt = AndroidModule1JNIPrompt
   object jTextView1: jTextView
     Left = 80
-    Top = 24
-    Width = 152
-    Height = 25
+    Top = 5
+    Width = 140
+    Height = 20
     MarginLeft = 5
     MarginTop = 5
     MarginRight = 5
@@ -32,13 +32,14 @@ object AndroidModule1: TAndroidModule1
     FontColor = colbrDefault
     FontSize = 0
     TextTypeFace = tfNormal
+    FontSizeUnit = unitDefault
     Id = 5110518
   end
   object jSwitchButton1: jSwitchButton
-    Left = 8
-    Top = 56
-    Width = 62
-    Height = 30
+    Left = 7
+    Top = 37
+    Width = 96
+    Height = 28
     MarginLeft = 7
     MarginTop = 7
     MarginRight = 7
@@ -57,10 +58,10 @@ object AndroidModule1: TAndroidModule1
     Id = 0
   end
   object jSwitchButton2: jSwitchButton
-    Left = 232
-    Top = 56
-    Width = 62
-    Height = 30
+    Left = 197
+    Top = 37
+    Width = 96
+    Height = 28
     MarginLeft = 7
     MarginTop = 7
     MarginRight = 7

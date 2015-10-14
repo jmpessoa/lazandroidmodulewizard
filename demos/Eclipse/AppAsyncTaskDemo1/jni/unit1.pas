@@ -6,8 +6,8 @@ unit unit1;
 interface
   
 uses
-  Classes, SysUtils, And_jni, And_jni_Bridge, Laz_And_Controls, 
-    Laz_And_Controls_Events, AndroidWidget;
+  Classes, SysUtils,{ And_jni, And_jni_Bridge,} Laz_And_Controls, 
+    {Laz_And_Controls_Events,} AndroidWidget;
   
 type
 
@@ -56,8 +56,9 @@ begin
     Result:= False; //done !!
 end;
 
+
 procedure TAndroidModule1.jAsyncTask1DoInBackground(Sender: TObject; progress: Integer; out keepInBackground: boolean);
-begin
+begin  //do not put update GUI here!!!
   keepInBackground:= DoTask(progress); //doing taks:  False --> Done !
 end;
 

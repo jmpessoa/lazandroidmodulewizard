@@ -48,7 +48,8 @@ implementation
 procedure TAndroidModule1.jGridView1ClickItem(Sender: TObject;
   itemIndex: integer; itemCaption: string);
 begin
-   ShowMessage(itemCaption +' clicked!');
+  //ShowMessage(itemCaption +' ['+IntToStr(itemIndex) +'] Clicked!');
+  jGridView1.UpdateItemTitle(itemIndex, 'Changed!!');
 end;
 
 procedure TAndroidModule1.jGridView1DrawItemBitmap(Sender: TObject;
@@ -68,7 +69,7 @@ end;
 procedure TAndroidModule1.jGridView1LongClickItem(Sender: TObject;
   itemIndex: integer; itemCaption: string);
 begin
-  ShowMessage(itemCaption +' long clicked!');
+  ShowMessage(itemCaption +' ['+IntToStr(itemIndex) +']  LONG Click!');
 end;
 
 procedure TAndroidModule1.jButton1Click(Sender: TObject);

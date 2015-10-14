@@ -6,7 +6,7 @@ library controls;  //by Lamw: Lazarus Android Module Wizard: 7/5/2015 18:36:41]
 uses
   Classes, SysUtils, And_jni, And_jni_Bridge, AndroidWidget, Laz_And_Controls,
   Laz_And_Controls_Events, unit1;
- 
+
 { Class:     com_example_applocationdemo1_Controls
   Method:    pAppOnScreenStyle
   Signature: ()I }
@@ -368,51 +368,51 @@ begin
 end;
 
 { Class:     com_example_applocationdemo1_Controls
-  Method:    pOnBluetoothClientSocketIncomingMessage
-  Signature: (JLjava/lang/String;)V }
-procedure pOnBluetoothClientSocketIncomingMessage(PEnv: PJNIEnv; this: JObject; pasobj: JLong; messageText: JString); cdecl;
+  Method:    pOnBluetoothClientSocketIncomingData
+  Signature: (J[B[B)V }
+procedure pOnBluetoothClientSocketIncomingData(PEnv: PJNIEnv; this: JObject; pasobj: JLong; byteArrayContent: JByteArray; byteArrayHeader: JByteArray); cdecl;
 begin
-  Java_Event_pOnBluetoothClientSocketIncomingMessage(PEnv,this,TObject(pasobj),messageText);
+  Java_Event_pOnBluetoothClientSocketIncomingData(PEnv,this,TObject(pasobj),byteArrayContent,byteArrayHeader);
 end;
 
 { Class:     com_example_applocationdemo1_Controls
-  Method:    pOnBluetoothClientSocketWritingMessage
+  Method:    pOnBluetoothClientSocketDisconnected
   Signature: (J)V }
-procedure pOnBluetoothClientSocketWritingMessage(PEnv: PJNIEnv; this: JObject; pasobj: JLong); cdecl;
+procedure pOnBluetoothClientSocketDisconnected(PEnv: PJNIEnv; this: JObject; pasobj: JLong); cdecl;
 begin
-  Java_Event_pOnBluetoothClientSocketWritingMessage(PEnv,this,TObject(pasobj));
+  Java_Event_pOnBluetoothClientSocketDisconnected(PEnv,this,TObject(pasobj));
 end;
 
 { Class:     com_example_applocationdemo1_Controls
   Method:    pOnBluetoothServerSocketConnected
-  Signature: (JLjava/lang/String;Ljava/lang/String;)V }
-procedure pOnBluetoothServerSocketConnected(PEnv: PJNIEnv; this: JObject; pasobj: JLong; deviceName: JString; deviceAddress: JString); cdecl;
+  Signature: (JLjava/lang/String;Ljava/lang/String;)Z }
+function pOnBluetoothServerSocketConnected(PEnv: PJNIEnv; this: JObject; pasobj: JLong; deviceName: JString; deviceAddress: JString): JBoolean; cdecl;
 begin
-  Java_Event_pOnBluetoothServerSocketConnected(PEnv,this,TObject(pasobj),deviceName,deviceAddress);
+  Result:=Java_Event_pOnBluetoothServerSocketConnected(PEnv,this,TObject(pasobj),deviceName,deviceAddress);
 end;
 
 { Class:     com_example_applocationdemo1_Controls
-  Method:    pOnBluetoothServerSocketIncomingMessage
-  Signature: (JLjava/lang/String;)V }
-procedure pOnBluetoothServerSocketIncomingMessage(PEnv: PJNIEnv; this: JObject; pasobj: JLong; messageText: JString); cdecl;
+  Method:    pOnBluetoothServerSocketIncomingData
+  Signature: (J[B[B)Z }
+function pOnBluetoothServerSocketIncomingData(PEnv: PJNIEnv; this: JObject; pasobj: JLong; byteArrayContent: JByteArray; byteArrayHeader: JByteArray): JBoolean; cdecl;
 begin
-  Java_Event_pOnBluetoothServerSocketIncomingMessage(PEnv,this,TObject(pasobj),messageText);
-end;
-
-{ Class:     com_example_applocationdemo1_Controls
-  Method:    pOnBluetoothServerSocketWritingMessage
-  Signature: (J)V }
-procedure pOnBluetoothServerSocketWritingMessage(PEnv: PJNIEnv; this: JObject; pasobj: JLong); cdecl;
-begin
-  Java_Event_pOnBluetoothServerSocketWritingMessage(PEnv,this,TObject(pasobj));
+  Result:=Java_Event_pOnBluetoothServerSocketIncomingData(PEnv,this,TObject(pasobj),byteArrayContent,byteArrayHeader);
 end;
 
 { Class:     com_example_applocationdemo1_Controls
   Method:    pOnBluetoothServerSocketListen
   Signature: (JLjava/lang/String;Ljava/lang/String;)V }
-procedure pOnBluetoothServerSocketListen(PEnv: PJNIEnv; this: JObject; pasobj: JLong; deviceName: JString; deviceAddress: JString); cdecl;
+procedure pOnBluetoothServerSocketListen(PEnv: PJNIEnv; this: JObject; pasobj: JLong; serverName: JString; strUUID: JString); cdecl;
 begin
-  Java_Event_pOnBluetoothServerSocketListen(PEnv,this,TObject(pasobj),deviceName,deviceAddress);
+  Java_Event_pOnBluetoothServerSocketListen(PEnv,this,TObject(pasobj),serverName,strUUID);
+end;
+
+{ Class:     com_example_applocationdemo1_Controls
+  Method:    pOnBluetoothServerSocketAcceptTimeout
+  Signature: (J)V }
+procedure pOnBluetoothServerSocketAcceptTimeout(PEnv: PJNIEnv; this: JObject; pasobj: JLong); cdecl;
+begin
+  Java_Event_pOnBluetoothServerSocketAcceptTimeout(PEnv,this,TObject(pasobj));
 end;
 
 { Class:     com_example_applocationdemo1_Controls
@@ -626,7 +626,7 @@ end;
 { Class:     com_example_applocationdemo1_Controls
   Method:    pOnTCPSocketClientMessageReceived
   Signature: (J[Ljava/lang/String;)V }
-procedure pOnTCPSocketClientMessageReceived(PEnv: PJNIEnv; this: JObject; pasobj: JLong; messagesReceived: jObjectArray); cdecl;
+procedure pOnTCPSocketClientMessageReceived(PEnv: PJNIEnv; this: JObject; pasobj: JLong; messagesReceived: JStringArray); cdecl;
 begin
   Java_Event_pOnTCPSocketClientMessageReceived(PEnv,this,TObject(pasobj),messagesReceived);
 end;
@@ -751,7 +751,31 @@ begin
   Result:=Java_Event_pOnContactManagerContactsProgress(PEnv,this,TObject(pasobj),contactInfo,contactShortInfo,contactPhotoUriAsString,contactPhoto,progress);
 end;
 
-const NativeMethods:array[0..92] of JNINativeMethod = (
+{ Class:     com_example_applocationdemo1_Controls
+  Method:    pOnSeekBarProgressChanged
+  Signature: (JIZ)V }
+procedure pOnSeekBarProgressChanged(PEnv: PJNIEnv; this: JObject; pasobj: JLong; progress: JInt; fromUser: JBoolean); cdecl;
+begin
+  Java_Event_pOnSeekBarProgressChanged(PEnv,this,TObject(pasobj),progress,Boolean(fromUser));
+end;
+
+{ Class:     com_example_applocationdemo1_Controls
+  Method:    pOnSeekBarStartTrackingTouch
+  Signature: (JI)V }
+procedure pOnSeekBarStartTrackingTouch(PEnv: PJNIEnv; this: JObject; pasobj: JLong; progress: JInt); cdecl;
+begin
+  Java_Event_pOnSeekBarStartTrackingTouch(PEnv,this,TObject(pasobj),progress);
+end;
+
+{ Class:     com_example_applocationdemo1_Controls
+  Method:    pOnSeekBarStopTrackingTouch
+  Signature: (JI)V }
+procedure pOnSeekBarStopTrackingTouch(PEnv: PJNIEnv; this: JObject; pasobj: JLong; progress: JInt); cdecl;
+begin
+  Java_Event_pOnSeekBarStopTrackingTouch(PEnv,this,TObject(pasobj),progress);
+end;
+
+const NativeMethods:array[0..95] of JNINativeMethod = (
    (name:'pAppOnScreenStyle';
     signature:'()I';
     fnPtr:@pAppOnScreenStyle;),
@@ -887,24 +911,24 @@ const NativeMethods:array[0..92] of JNINativeMethod = (
    (name:'pOnBluetoothClientSocketConnected';
     signature:'(JLjava/lang/String;Ljava/lang/String;)V';
     fnPtr:@pOnBluetoothClientSocketConnected;),
-   (name:'pOnBluetoothClientSocketIncomingMessage';
-    signature:'(JLjava/lang/String;)V';
-    fnPtr:@pOnBluetoothClientSocketIncomingMessage;),
-   (name:'pOnBluetoothClientSocketWritingMessage';
+   (name:'pOnBluetoothClientSocketIncomingData';
+    signature:'(J[B[B)V';
+    fnPtr:@pOnBluetoothClientSocketIncomingData;),
+   (name:'pOnBluetoothClientSocketDisconnected';
     signature:'(J)V';
-    fnPtr:@pOnBluetoothClientSocketWritingMessage;),
+    fnPtr:@pOnBluetoothClientSocketDisconnected;),
    (name:'pOnBluetoothServerSocketConnected';
-    signature:'(JLjava/lang/String;Ljava/lang/String;)V';
+    signature:'(JLjava/lang/String;Ljava/lang/String;)Z';
     fnPtr:@pOnBluetoothServerSocketConnected;),
-   (name:'pOnBluetoothServerSocketIncomingMessage';
-    signature:'(JLjava/lang/String;)V';
-    fnPtr:@pOnBluetoothServerSocketIncomingMessage;),
-   (name:'pOnBluetoothServerSocketWritingMessage';
-    signature:'(J)V';
-    fnPtr:@pOnBluetoothServerSocketWritingMessage;),
+   (name:'pOnBluetoothServerSocketIncomingData';
+    signature:'(J[B[B)Z';
+    fnPtr:@pOnBluetoothServerSocketIncomingData;),
    (name:'pOnBluetoothServerSocketListen';
     signature:'(JLjava/lang/String;Ljava/lang/String;)V';
     fnPtr:@pOnBluetoothServerSocketListen;),
+   (name:'pOnBluetoothServerSocketAcceptTimeout';
+    signature:'(J)V';
+    fnPtr:@pOnBluetoothServerSocketAcceptTimeout;),
    (name:'pOnSpinnerItemSeleceted';
     signature:'(JILjava/lang/String;)V';
     fnPtr:@pOnSpinnerItemSeleceted;),
@@ -1030,7 +1054,16 @@ const NativeMethods:array[0..92] of JNINativeMethod = (
     fnPtr:@pOnContactManagerContactsExecuted;),
    (name:'pOnContactManagerContactsProgress';
     signature:'(JLjava/lang/String;Ljava/lang/String;Ljava/lang/String;Landroid/graphics/Bitmap;I)Z';
-    fnPtr:@pOnContactManagerContactsProgress;)
+    fnPtr:@pOnContactManagerContactsProgress;),
+   (name:'pOnSeekBarProgressChanged';
+    signature:'(JIZ)V';
+    fnPtr:@pOnSeekBarProgressChanged;),
+   (name:'pOnSeekBarStartTrackingTouch';
+    signature:'(JI)V';
+    fnPtr:@pOnSeekBarStartTrackingTouch;),
+   (name:'pOnSeekBarStopTrackingTouch';
+    signature:'(JI)V';
+    fnPtr:@pOnSeekBarStopTrackingTouch;)
 );
 
 function RegisterNativeMethodsArray(PEnv: PJNIEnv; className: PChar; methods: PJNINativeMethod; countMethods:integer):integer;
@@ -1044,12 +1077,12 @@ begin
     if (PEnv^).RegisterNatives(PEnv, curClass, methods, countMethods) > 0 then Result:= JNI_TRUE;
   end;
 end;
- 
+
 function RegisterNativeMethods(PEnv: PJNIEnv; className: PChar): integer;
 begin
   Result:= RegisterNativeMethodsArray(PEnv, className, @NativeMethods[0], Length(NativeMethods));
 end;
- 
+
 function JNI_OnLoad(VM: PJavaVM; reserved: pointer): JInt; cdecl;
 var
   PEnv: PPointer;
@@ -1063,9 +1096,9 @@ begin
      curEnv:= PJNIEnv(PEnv);
      RegisterNativeMethods(curEnv, 'com/example/applocationdemo1/Controls');
   end;
-  gVM:= VM;{AndroidWidget.pas}
+  gVM:= VM; {AndroidWidget.pas}
 end;
- 
+
 procedure JNI_OnUnload(VM: PJavaVM; reserved: pointer); cdecl;
 var
   PEnv: PPointer;
@@ -1076,8 +1109,9 @@ begin
   if PEnv <> nil then
   begin
     curEnv:= PJNIEnv(PEnv);
-    (curEnv^).DeleteGlobalRef(curEnv, gjClass);   {AndroidWidget.pas}
-    gVM:= nil;{AndroidWidget.pas}
+    (curEnv^).DeleteGlobalRef(curEnv, gjClass);
+    gjClass:= nil; {AndroidWidget.pas}
+    gVM:= nil; {AndroidWidget.pas}
   end;
   gApp.Terminate;
   FreeAndNil(gApp);
@@ -1131,12 +1165,12 @@ exports
   pOnBluetoothDiscoveryFinished name 'Java_com_example_applocationdemo1_Controls_pOnBluetoothDiscoveryFinished',
   pOnBluetoothDeviceBondStateChanged name 'Java_com_example_applocationdemo1_Controls_pOnBluetoothDeviceBondStateChanged',
   pOnBluetoothClientSocketConnected name 'Java_com_example_applocationdemo1_Controls_pOnBluetoothClientSocketConnected',
-  pOnBluetoothClientSocketIncomingMessage name 'Java_com_example_applocationdemo1_Controls_pOnBluetoothClientSocketIncomingMessage',
-  pOnBluetoothClientSocketWritingMessage name 'Java_com_example_applocationdemo1_Controls_pOnBluetoothClientSocketWritingMessage',
+  pOnBluetoothClientSocketIncomingData name 'Java_com_example_applocationdemo1_Controls_pOnBluetoothClientSocketIncomingData',
+  pOnBluetoothClientSocketDisconnected name 'Java_com_example_applocationdemo1_Controls_pOnBluetoothClientSocketDisconnected',
   pOnBluetoothServerSocketConnected name 'Java_com_example_applocationdemo1_Controls_pOnBluetoothServerSocketConnected',
-  pOnBluetoothServerSocketIncomingMessage name 'Java_com_example_applocationdemo1_Controls_pOnBluetoothServerSocketIncomingMessage',
-  pOnBluetoothServerSocketWritingMessage name 'Java_com_example_applocationdemo1_Controls_pOnBluetoothServerSocketWritingMessage',
+  pOnBluetoothServerSocketIncomingData name 'Java_com_example_applocationdemo1_Controls_pOnBluetoothServerSocketIncomingData',
   pOnBluetoothServerSocketListen name 'Java_com_example_applocationdemo1_Controls_pOnBluetoothServerSocketListen',
+  pOnBluetoothServerSocketAcceptTimeout name 'Java_com_example_applocationdemo1_Controls_pOnBluetoothServerSocketAcceptTimeout',
   pOnSpinnerItemSeleceted name 'Java_com_example_applocationdemo1_Controls_pOnSpinnerItemSeleceted',
   pOnLocationChanged name 'Java_com_example_applocationdemo1_Controls_pOnLocationChanged',
   pOnLocationStatusChanged name 'Java_com_example_applocationdemo1_Controls_pOnLocationStatusChanged',
@@ -1178,7 +1212,10 @@ exports
   pOnSurfaceViewDrawingInBackground name 'Java_com_example_applocationdemo1_Controls_pOnSurfaceViewDrawingInBackground',
   pOnSurfaceViewDrawingPostExecute name 'Java_com_example_applocationdemo1_Controls_pOnSurfaceViewDrawingPostExecute',
   pOnContactManagerContactsExecuted name 'Java_com_example_applocationdemo1_Controls_pOnContactManagerContactsExecuted',
-  pOnContactManagerContactsProgress name 'Java_com_example_applocationdemo1_Controls_pOnContactManagerContactsProgress';
+  pOnContactManagerContactsProgress name 'Java_com_example_applocationdemo1_Controls_pOnContactManagerContactsProgress',
+  pOnSeekBarProgressChanged name 'Java_com_example_applocationdemo1_Controls_pOnSeekBarProgressChanged',
+  pOnSeekBarStartTrackingTouch name 'Java_com_example_applocationdemo1_Controls_pOnSeekBarStartTrackingTouch',
+  pOnSeekBarStopTrackingTouch name 'Java_com_example_applocationdemo1_Controls_pOnSeekBarStopTrackingTouch';
 
 begin
   gApp:= jApp.Create(nil);{AndroidWidget.pas}
@@ -1190,3 +1227,4 @@ begin
   gApp.Initialize;
   gApp.CreateForm(TAndroidModule1, AndroidModule1);
 end.
+(*last [template] upgrade: 10/12/2015 21:58:11*)

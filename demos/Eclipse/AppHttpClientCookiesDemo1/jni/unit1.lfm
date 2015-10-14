@@ -60,7 +60,7 @@ object AndroidModule1: TAndroidModule1
   end
   object jEditText1: jEditText
     Left = 5
-    Top = 184
+    Top = 232
     Width = 317
     Height = 380
     MarginLeft = 5
@@ -68,7 +68,7 @@ object AndroidModule1: TAndroidModule1
     MarginRight = 5
     MarginBottom = 10
     Visible = True
-    Anchor = jButton3
+    Anchor = jButton4
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = []
     LayoutParamWidth = lpMatchParent
@@ -135,6 +135,29 @@ object AndroidModule1: TAndroidModule1
     FontSizeUnit = unitDefault
     OnClick = jButton3Click
     Id = 2386489
+  end
+  object jButton4: jButton
+    Left = 2
+    Top = 178
+    Width = 323
+    Height = 40
+    MarginLeft = 2
+    MarginTop = 4
+    MarginRight = 2
+    MarginBottom = 4
+    Visible = True
+    Anchor = jButton3
+    PosRelativeToAnchor = [raBelow]
+    PosRelativeToParent = []
+    LayoutParamWidth = lpMatchParent
+    LayoutParamHeight = lpWrapContent
+    Text = 'jButton4'
+    BackgroundColor = colbrDefault
+    FontColor = colbrDefault
+    FontSize = 0
+    FontSizeUnit = unitDefault
+    OnClick = jButton4Click
+    Id = 7835291
   end
   object jHttpClient1: jHttpClient
     CharSet = 'UTF-8'

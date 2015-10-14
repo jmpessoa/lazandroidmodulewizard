@@ -19,8 +19,7 @@ type
       jButton4: jButton;
       jMyHello1: jMyHello;
       jTextView1: jTextView;
-      procedure DataModuleCreate(Sender: TObject);
-      procedure DataModuleJNIPrompt(Sender: TObject);
+
       procedure jButton1Click(Sender: TObject);
       procedure jButton2Click(Sender: TObject);
       procedure jButton3Click(Sender: TObject);
@@ -128,16 +127,6 @@ begin
   SetLength(strDynArray2, 0);
   SetLength(strDynArrayRes, 0);
 
-end;
-
-procedure TAndroidModule1.DataModuleCreate(Sender: TObject);
-begin
-  //
-end;
-
-procedure TAndroidModule1.DataModuleJNIPrompt(Sender: TObject);
-begin
-   //
 end;
 
 end.

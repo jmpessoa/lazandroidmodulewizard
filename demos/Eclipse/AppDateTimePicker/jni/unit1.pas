@@ -6,8 +6,8 @@ unit unit1;
 interface
   
 uses
-  Classes, SysUtils, And_jni, And_jni_Bridge, Laz_And_Controls, 
-    Laz_And_Controls_Events, AndroidWidget, datepickerdialog, timepickerdialog;
+  Classes, SysUtils, And_jni, And_jni_Bridge, Laz_And_Controls,
+  Laz_And_Controls_Events, AndroidWidget, datepickerdialog, timepickerdialog;
   
 type
 
@@ -47,7 +47,7 @@ end;
 
 procedure TAndroidModule1.jButton2Click(Sender: TObject);
 begin
-    jDatePickerDialog1.Show();
+  jDatePickerDialog1.Show();
 end;
 
 procedure TAndroidModule1.jDatePickerDialog1DatePicker(Sender: TObject;

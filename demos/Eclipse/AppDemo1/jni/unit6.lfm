@@ -33,6 +33,7 @@ object AndroidModule6: TAndroidModule6
     FontColor = colbrYellow
     FontSize = 0
     TextTypeFace = tfNormal
+    FontSizeUnit = unitDefault
     Id = 26515
   end
   object jTextView2: jTextView
@@ -57,6 +58,7 @@ object AndroidModule6: TAndroidModule6
     FontColor = colbrSilver
     FontSize = 0
     TextTypeFace = tfNormal
+    FontSizeUnit = unitDefault
     Id = 36024
   end
   object jEditText1: jEditText
@@ -89,6 +91,7 @@ object AndroidModule6: TAndroidModule6
     VerScrollBar = False
     WrappingLine = True
     Editable = True
+    FontSizeUnit = unitDefault
     Id = 53166
   end
   object jButton1: jButton
@@ -110,6 +113,7 @@ object AndroidModule6: TAndroidModule6
     BackgroundColor = colbrDefault
     FontColor = colbrSlateBlue
     FontSize = 0
+    FontSizeUnit = unitDefault
     OnClick = jButton1Click
     Id = 0
   end
@@ -142,6 +146,7 @@ object AndroidModule6: TAndroidModule6
     VerScrollBar = False
     WrappingLine = True
     Editable = True
+    FontSizeUnit = unitDefault
     Id = 80017
   end
   object jTextView3: jTextView
@@ -166,6 +171,7 @@ object AndroidModule6: TAndroidModule6
     FontColor = colbrSilver
     FontSize = 0
     TextTypeFace = tfNormal
+    FontSizeUnit = unitDefault
     Id = 5036
   end
   object jButton2: jButton
@@ -187,6 +193,7 @@ object AndroidModule6: TAndroidModule6
     BackgroundColor = colbrDefault
     FontColor = colbrSlateBlue
     FontSize = 0
+    FontSizeUnit = unitDefault
     OnClick = jButton2Click
     Id = 63804
   end
@@ -222,6 +229,7 @@ object AndroidModule6: TAndroidModule6
     TextSizeDecorated = sdNone
     TextAlign = alLeft
     HighLightSelectedItemColor = colbrRed
+    FontSizeUnit = unitDefault
     OnClickItem = jListView1ClickItem
     OnClickWidgetItem = jListView1ClickWidgetItem
     Id = 8951
@@ -229,7 +237,7 @@ object AndroidModule6: TAndroidModule6
   object jButton3: jButton
     Left = 5
     Top = 243
-    Width = 290
+    Width = 285
     Height = 40
     MarginLeft = 5
     MarginTop = 5
@@ -245,6 +253,7 @@ object AndroidModule6: TAndroidModule6
     BackgroundColor = colbrDefault
     FontColor = colbrSlateBlue
     FontSize = 0
+    FontSizeUnit = unitDefault
     OnClick = jButton3Click
     Id = 3040099
   end

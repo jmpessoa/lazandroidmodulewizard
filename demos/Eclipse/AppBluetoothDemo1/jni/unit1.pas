@@ -20,9 +20,14 @@ type
     jButton3: jButton;
     jButton4: jButton;
     jButton5: jButton;
+    jDialogProgress1: jDialogProgress;
+    jImageBtn1: jImageBtn;
     jImageFileManager1: jImageFileManager;
+    jImageList1: jImageList;
     jListView1: jListView;
     jTextView1: jTextView;
+    procedure jBluetooth1DeviceBondStateChanged(Sender: TObject;
+      state: integer; deviceName: string; deviceAddress: string);
     procedure jBluetooth1DeviceFound(Sender: TObject; deviceName: string;
       deviceAddress: string);
     procedure jBluetooth1DiscoveryFinished(Sender: TObject;
@@ -33,10 +38,12 @@ type
     procedure jButton3Click(Sender: TObject);
     procedure jButton4Click(Sender: TObject);
     procedure jButton5Click(Sender: TObject);
+    procedure jImageBtn1Click(Sender: TObject);
 
   private
     {private declarations}
     procedure ShowPairedDevices;
+    procedure ShowNewDevices;
   public
     {public declarations}
   end;
@@ -63,16 +70,41 @@ begin
         ShowMessage('Paired Devices Not Found ... [0]')
      else
      begin
-      // jListView1.Clear;
+       jListView1.Clear;
+       jListView1.Add('      Select a [Paired] device:');
        for i:= 0 to size-1 do
        begin
-         //ShowMessage(listArray[i]);
          jListView1.Add(listArray[i]);
        end;
        SetLength(listArray, 0); //free ...
      end;
   end
   else ShowMessage('Paired Devices Not Found ... [nil]');
+end;
+
+procedure TAndroidModule1.ShowNewDevices;
+var
+  listArray: TDynArrayOfString;
+  i, size: integer;
+begin
+  listArray:= jBluetooth1.GetFoundedDevices();
+  if listArray <> nil then
+  begin
+     size:=Length(listArray);
+     if size = 0 then
+        ShowMessage('News Devices Not Found ... [0]')
+     else
+     begin
+       jListView1.Clear;
+       jListView1.Add('      Devices Found:');
+       for i:= 0 to size-1 do
+       begin
+          jListView1.Add(listArray[i]);
+       end;
+       SetLength(listArray, 0);
+     end;
+  end
+  else ShowMessage('News Devices Not Found ... [nil]');
 end;
 
 procedure TAndroidModule1.jButton1Click(Sender: TObject);
@@ -88,48 +120,56 @@ end;
 procedure TAndroidModule1.jBluetooth1DiscoveryFinished(Sender: TObject;
   countFoundedDevices: integer; countPairedDevices: integer);
 begin
-  ShowMessage('***Discovery Finished! Founded Devices = '+IntToStr(countFoundedDevices));
-  ShowMessage('...Discovery Finished! Reachable Paired Devices = '+IntToStr(countPairedDevices));
+  jDialogProgress1.Stop;
+  ShowNewDevices();
 end;
 
 procedure TAndroidModule1.jBluetooth1DeviceFound(Sender: TObject;
   deviceName: string; deviceAddress: string);
 begin
    //ShowMessage('deviceName: ' +deviceName +' : deviceAddress: '+deviceAddress);
-  jListView1.Add('.......Founded Device........');
-  jListView1.Add(deviceName + '|' + deviceAddress);
+end;
+
+procedure TAndroidModule1.jBluetooth1DeviceBondStateChanged(Sender: TObject;
+  state: integer; deviceName: string; deviceAddress: string);
+begin
+  case jBluetooth1.GetBondState(state) of
+    bsUnBonded: ShowMessage(deviceName+'|'+deviceAddress +' [Unpaired]');
+    bsBonding:  ShowMessage(deviceName+'|'+deviceAddress +' [Pairing...]');
+    bsBonded:   ShowMessage(deviceName+'|'+deviceAddress +' [Paired]');
+  end;
 end;
 
 {
 Note: to transfer via Bluetooth , you need to do some common user's tasks:
-      activate bluetooth, detect neighbors devices and pair neighbors devices....
+      activate bluetooth, detect [visibles] neighbors devices and pair neighbors devices....
 }
+
 procedure TAndroidModule1.jButton2Click(Sender: TObject);
 begin
-   //jListView1.Clear;
-   jBluetooth1.Discovery();
-   //handle order: OnDiscoveryStarted -->> OnDeviceFound -->> OnDiscoveryFinished
+   jListView1.Clear;
+   jBluetooth1.Discovery(); //handled by: OnDiscoveryStarted, OnDeviceFound and OnDiscoveryFinished
+   jDialogProgress1.Show();
 end;
 
 procedure TAndroidModule1.jButton3Click(Sender: TObject);
 begin
-  ShowMessage('Listing Paired Devices..');
-  jListView1.Add('   ');
-  jListView1.Add('.......Paired Devices........');
+  ShowMessage('Listing Only Paired Devices....');
+  jListView1.Clear;
   ShowPairedDevices();
 end;
 
 procedure TAndroidModule1.jButton4Click(Sender: TObject);
 var
-  jimage, jimage3: jObject;
+  jImage: jObject;
   copyOk: boolean;
 begin
-  jimage:= jImageFileManager1.LoadFromAssets('lemur_background_black.png');
+  jImage:= jImageFileManager1.LoadFromAssets('lemur_background_black.png');
 
    //save to internal app storage...
-  jImageFileManager1.SaveToFile(jimage, 'lemur_background_black.png');
+  jImageFileManager1.SaveToFile(jImage, 'lemur_background_black.png');
 
-  //copy from internal storage  to /downloads [public directory!]
+  //copy from internal app storage  to /downloads [public directory!]
   copyOk:= Self.CopyFile(Self.GetEnvironmentDirectoryPath(dirInternalAppStorage)+'/lemur_background_black.png',
                         Self.GetEnvironmentDirectoryPath(dirDownloads)+'/lemur_background_black.png');
 
@@ -142,6 +182,11 @@ end;
 procedure TAndroidModule1.jButton5Click(Sender: TObject);
 begin
    jBluetooth1.Disable();
+end;
+
+procedure TAndroidModule1.jImageBtn1Click(Sender: TObject);
+begin
+    ShowMessage('jImageBtn1 Clicked....');
 end;
 
 end.
