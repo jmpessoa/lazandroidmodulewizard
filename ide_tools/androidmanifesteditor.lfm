@@ -17,8 +17,8 @@ object LamwAndroidManifestEditor: TLamwAndroidManifestEditor
     AnchorSideBottom.Control = Owner
     AnchorSideBottom.Side = asrBottom
     Left = 6
-    Height = 164
-    Top = 70
+    Height = 111
+    Top = 123
     Width = 308
     Anchors = [akTop, akLeft, akRight, akBottom]
     AutoFillColumns = True
@@ -51,13 +51,13 @@ object LamwAndroidManifestEditor: TLamwAndroidManifestEditor
     AnchorSideRight.Control = Owner
     AnchorSideRight.Side = asrBottom
     Left = 6
-    Height = 29
+    Height = 27
     Top = 6
     Width = 308
     Anchors = [akTop, akLeft, akRight]
     AutoSize = True
     BorderSpacing.Around = 6
-    ClientHeight = 29
+    ClientHeight = 27
     ClientWidth = 308
     TabOrder = 1
     Visible = False
@@ -67,7 +67,7 @@ object LamwAndroidManifestEditor: TLamwAndroidManifestEditor
       AnchorSideRight.Control = ErrorPanel
       AnchorSideRight.Side = asrBottom
       Left = 7
-      Height = 15
+      Height = 13
       Top = 7
       Width = 294
       Anchors = [akTop, akLeft, akRight]
@@ -85,9 +85,9 @@ object LamwAndroidManifestEditor: TLamwAndroidManifestEditor
     AnchorSideTop.Control = seMinSdkVersion
     AnchorSideTop.Side = asrCenter
     Left = 6
-    Height = 15
-    Top = 45
-    Width = 89
+    Height = 13
+    Top = 100
+    Width = 80
     BorderSpacing.Around = 6
     Caption = 'Min SDK version:'
     ParentColor = False
@@ -95,11 +95,11 @@ object LamwAndroidManifestEditor: TLamwAndroidManifestEditor
   object seMinSdkVersion: TSpinEdit
     AnchorSideLeft.Control = Label1
     AnchorSideLeft.Side = asrBottom
-    AnchorSideTop.Control = ErrorPanel
+    AnchorSideTop.Control = gbVersion
     AnchorSideTop.Side = asrBottom
-    Left = 101
-    Height = 23
-    Top = 41
+    Left = 92
+    Height = 21
+    Top = 96
     Width = 50
     BorderSpacing.Around = 6
     TabOrder = 2
@@ -110,10 +110,10 @@ object LamwAndroidManifestEditor: TLamwAndroidManifestEditor
     AnchorSideLeft.Side = asrBottom
     AnchorSideTop.Control = seTargetSdkVersion
     AnchorSideTop.Side = asrCenter
-    Left = 169
-    Height = 15
-    Top = 45
-    Width = 102
+    Left = 160
+    Height = 13
+    Top = 100
+    Width = 96
     BorderSpacing.Left = 12
     BorderSpacing.Around = 6
     Caption = 'Target SDK version:'
@@ -122,14 +122,80 @@ object LamwAndroidManifestEditor: TLamwAndroidManifestEditor
   object seTargetSdkVersion: TSpinEdit
     AnchorSideLeft.Control = Label2
     AnchorSideLeft.Side = asrBottom
-    AnchorSideTop.Control = ErrorPanel
+    AnchorSideTop.Control = gbVersion
     AnchorSideTop.Side = asrBottom
-    Left = 277
-    Height = 23
-    Top = 41
+    Left = 262
+    Height = 21
+    Top = 96
     Width = 50
     BorderSpacing.Around = 6
     TabOrder = 3
     Value = 19
+  end
+  object gbVersion: TGroupBox
+    AnchorSideLeft.Control = Owner
+    AnchorSideTop.Control = ErrorPanel
+    AnchorSideTop.Side = asrBottom
+    AnchorSideRight.Control = Owner
+    AnchorSideRight.Side = asrBottom
+    Left = 6
+    Height = 51
+    Top = 39
+    Width = 308
+    Anchors = [akTop, akLeft, akRight]
+    AutoSize = True
+    BorderSpacing.Around = 6
+    Caption = 'Version'
+    ClientHeight = 33
+    ClientWidth = 304
+    TabOrder = 4
+    object Label3: TLabel
+      AnchorSideLeft.Control = gbVersion
+      AnchorSideTop.Control = seVersionCode
+      AnchorSideTop.Side = asrCenter
+      Left = 6
+      Height = 13
+      Top = 10
+      Width = 25
+      BorderSpacing.Around = 6
+      Caption = 'Code'
+      ParentColor = False
+    end
+    object seVersionCode: TSpinEdit
+      AnchorSideLeft.Control = Label3
+      AnchorSideLeft.Side = asrBottom
+      AnchorSideTop.Control = gbVersion
+      Left = 37
+      Height = 21
+      Top = 6
+      Width = 54
+      BorderSpacing.Around = 6
+      MinValue = 1
+      TabOrder = 0
+      Value = 1
+    end
+    object Label4: TLabel
+      AnchorSideTop.Control = edVersionName
+      AnchorSideTop.Side = asrCenter
+      Left = 112
+      Height = 13
+      Top = 10
+      Width = 27
+      BorderSpacing.Left = 12
+      BorderSpacing.Around = 6
+      Caption = 'Name'
+      ParentColor = False
+    end
+    object edVersionName: TEdit
+      AnchorSideLeft.Control = Label4
+      AnchorSideLeft.Side = asrBottom
+      AnchorSideTop.Control = gbVersion
+      Left = 145
+      Height = 21
+      Top = 6
+      Width = 120
+      BorderSpacing.Around = 6
+      TabOrder = 1
+    end
   end
 end

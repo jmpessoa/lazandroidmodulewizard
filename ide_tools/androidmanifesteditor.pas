@@ -21,6 +21,8 @@ type
     FPermNames: TStringToStringTree;
     FUsesSDKNode: TDOMElement;
     FMinSdkVersion, FTargetSdkVersion: Integer;
+    FVersionCode: Integer;
+    FVersionName: string;
     procedure Clear;
   public
     constructor Create;
@@ -33,18 +35,25 @@ type
     property PermNames: TStringToStringTree read FPermNames;
     property MinSDKVersion: Integer read FMinSdkVersion write FMinSdkVersion;
     property TargetSDKVersion: Integer read FTargetSdkVersion write FTargetSdkVersion;
+    property VersionCode: Integer read FVersionCode write FVersionCode;
+    property VersionName: string read FVersionName write FVersionName;
   end;
 
   { TLamwAndroidManifestEditor }
 
   TLamwAndroidManifestEditor = class(TAbstractIDEOptionsEditor)
+    edVersionName: TEdit;
+    gbVersion: TGroupBox;
     Label1: TLabel;
     Label2: TLabel;
+    Label3: TLabel;
+    Label4: TLabel;
     lblErrorMessage: TLabel;
     ErrorPanel: TPanel;
     seMinSdkVersion: TSpinEdit;
     seTargetSdkVersion: TSpinEdit;
     PermissonGrid: TStringGrid;
+    seVersionCode: TSpinEdit;
   private
     { private declarations }
     FOptions: TLamwAndroidManifestOptions;
@@ -201,6 +210,11 @@ begin
   ReadXMLFile(xml, AFileName);
   FFileName := AFileName;
   if (xml = nil) or (xml.DocumentElement = nil) then Exit;
+  with xml.DocumentElement do
+  begin
+    FVersionCode := StrToIntDef(AttribStrings['android:versionCode'], 1);
+    FVersionName := AttribStrings['android:versionName'];
+  end;
   with xml.DocumentElement.ChildNodes do
   begin
     FPermNames.GetNames(FPermissions);
@@ -239,6 +253,9 @@ var
 begin
   // writing manifest
   if not Assigned(xml) then Exit;
+
+  xml.DocumentElement.AttribStrings['android:versionCode'] := IntToStr(FVersionCode);
+  xml.DocumentElement.AttribStrings['android:versionName'] := FVersionName;
 
   if not Assigned(FUsesSDKNode) then
   begin
@@ -363,6 +380,8 @@ begin
       FillPermissionGrid(Permissions, PermNames);
       seMinSdkVersion.Value := MinSDKVersion;
       seTargetSdkVersion.Value := TargetSDKVersion;
+      seVersionCode.Value := VersionCode;
+      edVersionName.Text := VersionName;
     end;
   except
     on e: Exception do
@@ -385,6 +404,8 @@ begin
         Permissions.Delete(i - 1);
     MinSDKVersion := seMinSdkVersion.Value;
     TargetSDKVersion := seTargetSdkVersion.Value;
+    VersionCode := seVersionCode.Value;
+    VersionName := edVersionName.Text;
     Save;
   end;
 end;
