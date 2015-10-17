@@ -1136,6 +1136,7 @@ object FormWorkspace: TFormWorkspace
           'Lollipop 5.0'
         )
         ItemHeight = 15
+        ItemIndex = 2
         OnClick = ListBoxPlatformClick
         TabOrder = 0
       end

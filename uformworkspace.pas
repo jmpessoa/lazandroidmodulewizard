@@ -48,7 +48,6 @@ type
     procedure ComboSelectProjectNameKeyPress(Sender: TObject; var Key: char);
     procedure FormActivate(Sender: TObject);
     procedure FormClose(Sender: TObject; var CloseAction: TCloseAction);
-    procedure FormCloseQuery(Sender: TObject; var CanClose: boolean);
     procedure FormCreate(Sender: TObject);
 
     procedure ListBoxMinSDKClick(Sender: TObject);
@@ -437,11 +436,6 @@ begin
   end;
 end;
 
-procedure TFormWorkspace.FormCloseQuery(Sender: TObject; var CanClose: boolean);
-begin
-
-end;
-
 procedure TFormWorkspace.FormCreate(Sender: TObject);
 var
   fileName: string;
@@ -549,10 +543,7 @@ begin
           end;
       end;
 
-      if ReadString('NewProject','NDK', '') <> '' then
-          indexNdk:= StrToInt(ReadString('NewProject','NDK', ''))
-      else
-          indexNdk:= 3;  //ndk 10e   ... default
+      indexNdk:= StrToIntDef(ReadString('NewProject','NDK', ''), 3); //ndk 10e   ... default
 
       case indexNdk of
          0: FNDK:= '7';
@@ -671,9 +662,7 @@ begin
     FMainActivity:= ReadString('NewProject','MainActivity', '');  //dummy
     if FMainActivity = '' then FMainActivity:= 'App';
 
-    if ReadString('NewProject','NDK', '') <> '' then
-      i5:= strToInt(ReadString('NewProject','NDK', ''))
-    else i5:= 2;  //ndk 10
+    i5:= StrToIntDef(ReadString('NewProject','NDK', ''), 2);  //ndk 10
 
     ListBoxPlatform.Clear;
     if i5 > 0 then //not ndk7
@@ -694,30 +683,21 @@ begin
       ListBoxPlatform.Items.Add('Ice Cream 4.0');  //Android-14
     end;
 
-    if ReadString('NewProject','InstructionSet', '') <> '' then
-       i1:= strToInt(ReadString('NewProject','InstructionSet', ''))
-    else i1:= 0;
+    i1:= StrToIntDef(ReadString('NewProject','InstructionSet', ''), 0);
 
-    if ReadString('NewProject','FPUSet', '') <> '' then
-       i2:= strToInt(ReadString('NewProject','FPUSet', ''))
-    else i2:= 0;
+    i2:= StrToIntDef(ReadString('NewProject','FPUSet', ''), 0);
 
-    if ReadString('NewProject','ProjectModel', '') <> '' then
-       i3:= strToInt(ReadString('NewProject','ProjectModel', ''))
-    else i3:= 0;
+    i3:= StrToIntDef(ReadString('NewProject','ProjectModel', ''), 0);
 
-    if ReadString('NewProject','MinApi', '') <> '' then
-       j1:= strToInt(ReadString('NewProject','MinApi', ''))
-    else j1:= 2; // Api 14
+    j1:= StrToIntDef(ReadString('NewProject','MinApi', ''), 2); // default Api 14
 
-    if  j1 < ListBoxMinSDK.Items.Count then
-        ListBoxMinSDK.ItemIndex:= j1
+    if (j1 >= 0) and (j1 < ListBoxMinSDK.Items.Count) then
+       ListBoxMinSDK.ItemIndex:= j1
     else
        ListBoxMinSDK.ItemIndex:= ListBoxMinSDK.Items.Count-1;
 
-    if ReadString('NewProject','AndroidPlatform', '') <> '' then
-       j2:= strToInt(ReadString('NewProject','AndroidPlatform', ''))
-    else j2:= 2; // Android-14
+    j2:= StrToIntDef(ReadString('NewProject','AndroidPlatform', ''), 2); // default Android-14
+    if j2 < 0 then j2 := 2;
 
     ListBoxPlatform.ItemIndex:= j2;
     ListBoxMinSDKClick(nil); //update ListBoxMinSDK
@@ -725,12 +705,10 @@ begin
 
     FAndroidPlatform:=  GetNDKPlatform(ListBoxPlatform.Items.Strings[ListBoxPlatform.ItemIndex]);
 
-    if ReadString('NewProject','TargetApi', '') <> '' then
-       j3:= strToInt(ReadString('NewProject','TargetApi', ''))
-    else j3:= 2; // Api 14
+    j3:= StrToIntDef(ReadString('NewProject','TargetApi', ''), 2); // Api 14
 
-    if  j3 < ListBoxTargetAPI.Items.Count then
-        ListBoxTargetAPI.ItemIndex:= j3
+    if (j3 >= 0) and (j3 < ListBoxTargetAPI.Items.Count) then
+       ListBoxTargetAPI.ItemIndex:= j3
     else
        ListBoxTargetAPI.ItemIndex:= ListBoxTargetAPI.Items.Count-1;
 
