@@ -515,6 +515,7 @@ begin
 
       FNDK:= frm.NDK;
       FAndroidPlatform:= frm.AndroidPlatform;
+
       FPathToAntBin:= frm.PathToAntBin;
 
       FMinApi:= frm.MinApi;
@@ -852,7 +853,6 @@ begin
         strList.Add('pause');
         strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'utils'+DirectorySeparator+'aapt.bat'); //Android Asset Packaging Tool
 
-        FAndroidPlatform:= 'android-'+Trim(FTargetApi);
         strList.Clear;
         strList.Add('<?xml version="1.0" encoding="UTF-8"?>');
         strList.Add('<project name="'+FSmallProjName+'" default="help">');
@@ -1208,7 +1208,7 @@ begin
         auxList.Add('#proguard.config=${sdk.dir}/tools/proguard/proguard-android.txt:proguard-project.txt');
         auxList.Add(' ');
         auxList.Add('# Project target.');
-        auxList.Add('target='+FAndroidPlatform);
+        auxList.Add('target=android-'+Trim(FTargetApi));
         auxList.SaveToFile(FAndroidProjectName+DirectorySeparator+'project.properties');
 
         auxList.Free;
@@ -1861,6 +1861,28 @@ begin
     end;
   end;
 end;
+
+//http://delphi.about.com/od/delphitips2008/qt/subdirectories.htm
+//fils the "list" TStrings with the subdirectories of the "directory" directory
+//Warning: if not  subdirectories was found return empty list [list.count = 0]!
+procedure GetSubDirectories(const directory : string; list : TStrings);
+var
+   sr : TSearchRec;
+begin
+   try
+     if FindFirst(IncludeTrailingPathDelimiter(directory) + '*.*', faDirectory, sr) < 0 then Exit
+     else
+     repeat
+       if ((sr.Attr and faDirectory <> 0) and (sr.Name <> '.') and (sr.Name <> '..')) then
+       begin
+           List.Add(IncludeTrailingPathDelimiter(directory) + sr.Name);
+       end;
+     until FindNext(sr) <> 0;
+   finally
+     SysUtils.FindClose(sr) ;
+   end;
+end;
+
 
 end.
 

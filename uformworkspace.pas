@@ -52,6 +52,7 @@ type
 
     procedure ListBoxMinSDKClick(Sender: TObject);
     procedure ListBoxMinSDKSelectionChange(Sender: TObject; User: boolean);
+    procedure ListBoxPlatformSelectionChange(Sender: TObject; User: boolean);
     procedure ListBoxTargetAPIClick(Sender: TObject);
     procedure ListBoxTargetAPISelectionChange(Sender: TObject; User: boolean);
     procedure ListBoxPlatformClick(Sender: TObject);
@@ -92,21 +93,26 @@ type
     FAntBuildMode: string;
     FMainActivity: string;   //Simon "App"
     FNDK: string;
-    FAndroidPlatform: string;
+    FAndroidNdkPlatform: string;
     FSupportV4: string;
 
     FPrebuildOSYS: string;
 
     FFullJavaSrcPath: string;
     FJavaClassName: string;
+    FIndexTargetApi: integer;
+    FIndexNdkPlatformApi: integer;
 
   public
     { public declarations }
     procedure LoadSettings(const pFilename: string);
     procedure SaveSettings(const pFilename: string);
     function GetTextByListIndex(index:integer): string;
-    function GetTextByList2Index(index:integer): string;
+
     function GetNDKPlatform(identName: string): string;
+
+    function GetCodeNameByApi(api: string):string;
+    function GetNDKPlatformByApi(api: string): string;
 
     function GetFullJavaSrcPath(fullProjectName: string): string;
 
@@ -131,7 +137,7 @@ type
     property AntBuildMode: string read FAntBuildMode write FAntBuildMode;
     property MainActivity: string read FMainActivity write FMainActivity;
     property NDK: string read FNDK write FNDK;
-    property AndroidPlatform: string read FAndroidPlatform write FAndroidPlatform;
+    property AndroidPlatform: string read FAndroidNdkPlatform write FAndroidNdkPlatform;
     property SupportV4: string read FSupportV4 write FSupportV4;
     property PrebuildOSYS: string read FPrebuildOSYS write FPrebuildOSYS;
     property FullJavaSrcPath: string read FFullJavaSrcPath write FFullJavaSrcPath;
@@ -143,6 +149,7 @@ type
 
   procedure GetSubDirectories(const directory : string; list : TStrings);
   function TrimChar(query: string; delimiter: char): string;
+  function SplitStr(var theString: string; delimiter: string): string;
 
 var
    FormWorkspace: TFormWorkspace;
@@ -152,6 +159,23 @@ implementation
 {$R *.lfm}
 
 { TFormWorkspace }
+
+function TFormWorkspace.GetCodeNameByApi(api: string):string;
+begin
+  Result:= 'Unknown';
+  if api='8' then Result:= 'Froyo 2.2'
+  else if api='10' then Result:= 'Gingerbread 2.3'
+  else if api='14' then Result:= 'IceCream 4.0'
+  else if api='15' then Result:= 'IceCream 4.0x'
+  else if api='16' then Result:= 'JellyBean 4.1'
+  else if api='17' then Result:= 'JellyBean 4.2'
+  else if api='18' then Result:= 'JellyBean 4.3'
+  else if api='19' then Result:= 'KitKat 4.4'
+  else if api='20' then Result:= 'KitKat 4.4x'
+  else if api='21' then Result:= 'Lollipop 5.0'
+  else if api='22' then Result:= 'Lollipop 5.1'
+  else if api='23' then Result:= 'Marshmallow 6.0';
+end;
 
 procedure TFormWorkspace.ListBoxMinSDKClick(Sender: TObject);
 begin
@@ -163,95 +187,43 @@ function TFormWorkspace.GetTextByListIndex(index:integer): string;
 begin
    Result:= '';
    case index of
-     0: Result:= '100% market sharing'; // Api(8)    -Froyo 2.2
-     1: Result:= '99.3% market sharing'; // Api(10)  -Gingerbread 2.3
-     2: Result:= '87.9% market sharing'; // Api(15)  -Ice Cream 4.0x
-     3: Result:= '78.3% market sharing'; // Api(16)  -Jelly Bean 4.1
-     4: Result:= '53.2% market sharing'; // Api(17)  -Jelly Bean 4.2
-     5: Result:= '32.5% market sharing'; // Api(18)  -Jelly Bean 4.3
-     6: Result:= '24.5% market sharing'; // Api(19)  -KitKat 4.4
+     0: Result:= 'Froyo 2.2'; // Api(8)    -Froyo 2.2
+     1: Result:= 'Gingerbread 2.3'; // Api(10)   -Gingerbread 2.3
+     2: Result:= 'IceCream 4.0'; // Api(15)  -Ice Cream 4.0x
+     3: Result:= 'JellyBean 4.1'; // Api(16)  -Jelly Bean 4.1
+     4: Result:= 'JellyBean 4.2'; // Api(17)  -Jelly Bean 4.2
+     5: Result:= 'JellyBean 4.3'; // Api(18)  -Jelly Bean 4.3
+     6: Result:= 'KitKat 4.4'; // Api(19)  -KitKat 4.4
+     7: Result:= 'KitKat 4.4'; // Api(20)  -KitKat 4.4
+     8: Result:= 'Lollipop 5.0'; // Api(21)  -Lollipop [5.0]
+     9: Result:= 'Lollipop 5.1'; // Api(22)  -Lollipop [5.1]
    end;
 end;
-
-//http://developer.android.com/about/dashboards/index.html
-function TFormWorkspace.GetTextByList2Index(index:integer): string;
-begin
-   Result:= 'KitKat 4.4';
-   case index of
-     0: Result:= 'Froyo 2.2';        //0.7%  -  Api:8     100-0   =  100.0
-     1: Result:= 'Gingerbread 2.3';  //11.4% -  Api:10    100-0.7 =   99.3
-     2: Result:= 'Ice Cream 4.0x';   //9.6%  -  Api:15    99.3-11.4 = 87.9
-     3: Result:= 'Jelly Bean 4.1';   //25.1% -  Api:16    87.9-9.6  = 78.3
-     4: Result:= 'Jelly Bean 4.2';   //20.7% -  Api:17    78.3-25.1 = 53.2
-     5: Result:= 'Jelly Bean 4.3';   //8.0%  -  Api:18    53.2-20.7 = 32.5
-     6: Result:= 'KitKat 4.4';       //24.5% -  Api:19    32.5-8.0  = 24.5
-   end;
-end;
-
 
 procedure TFormWorkspace.ListBoxMinSDKSelectionChange(Sender: TObject; User: boolean);
 begin
-    //StatusBarInfo.SimpleText:= GetTextByListIndex(ListBoxMinSDK.ItemIndex);
-    StatusBarInfo.Panels.Items[0].Text:= 'MinSdk Api: '+GetTextByListIndex(ListBoxMinSDK.ItemIndex);
+  StatusBarInfo.Panels.Items[1].Text:= 'MinSdk: '+GetTextByListIndex(ListBoxMinSDK.ItemIndex);
+end;
+
+procedure TFormWorkspace.ListBoxPlatformSelectionChange(Sender: TObject;
+  User: boolean);
+begin
+  StatusBarInfo.Panels.Items[0].Text:='Ndk: '+ GetCodeNameByApi(ListBoxPlatform.Items[ListBoxPlatform.ItemIndex]);
 end;
 
 procedure TFormWorkspace.ListBoxTargetAPIClick(Sender: TObject);
 begin
-  case ListBoxTargetAPI.ItemIndex of
-      0: FTargetApi:= '8';
-      1: FTargetApi:= '11';
-      2: FTargetApi:= '14';
-      3: FTargetApi:= '15';
-      4: FTargetApi:= '16';
-      5: FTargetApi:= '17';
-      6: FTargetApi:= '18';
-      7: FTargetApi:= '19';
-      8: FTargetApi:= '20';
-      9: FTargetApi:= '21';
-  end
+  FTargetApi:= ListBoxTargetAPI.Items[ListBoxTargetAPI.ItemIndex];
 end;
 
 procedure TFormWorkspace.ListBoxTargetAPISelectionChange(Sender: TObject; User: boolean);
 begin
-  StatusBarInfo.Panels.Items[1].Text:='Target Api: '+GetTextByList2Index(ListBoxTargetAPI.ItemIndex);
+  StatusBarInfo.Panels.Items[2].Text:='Target: '+ GetCodeNameByApi(ListBoxTargetAPI.Items[ListBoxTargetAPI.ItemIndex]);
 end;
 
 procedure TFormWorkspace.ListBoxPlatformClick(Sender: TObject);
-var
-   saveIndex: integer;
 begin
-   saveIndex:=ListBoxMinSDK.ItemIndex;
-   ListBoxMinSDK.Clear;
-   if ListBoxPlatform.ItemIndex = 0 then
-   begin
-     ListBoxMinSDK.Items.Add('8');
-     //ListBoxMinSDK.Items.Add('10');
-     //ListBoxMinSDK.Items.Add('14');
-   end
-   else if ListBoxPlatform.ItemIndex = 1 then
-   begin
-     ListBoxMinSDK.Items.Add('8');
-     ListBoxMinSDK.Items.Add('11');
-     //ListBoxMinSDK.Items.Add('14');
-   end
-   else
-   begin
-     ListBoxMinSDK.Items.Add('8');
-     ListBoxMinSDK.Items.Add('11');
-     //ListBoxMinSDK.Items.Add('14');
-     ListBoxMinSDK.Items.Add('15');
-     ListBoxMinSDK.Items.Add('16');
-     ListBoxMinSDK.Items.Add('17');
-     ListBoxMinSDK.Items.Add('18');
-     ListBoxMinSDK.Items.Add('19');
-   end;
-
-   if saveIndex < ListBoxMinSDK.Count then
-      ListBoxMinSDK.ItemIndex:= saveIndex
-   else
-      ListBoxMinSDK.ItemIndex:= ListBoxMinSDK.Count-1;
-
-   ListBoxMinSDKClick(nil);
+  FAndroidNdkPlatform:= 'android-'+ListBoxPlatform.Items[ListBoxPlatform.ItemIndex]
 end;
 
 
@@ -276,6 +248,11 @@ begin
     else if identName = 'Jelly Bean 4.3' then Result:= 'android-18'
     else if identName = 'KitKat 4.4'     then Result:= 'android-19'
     else if identName = 'Lollipop 5.0'   then Result:= 'android-21';
+end;
+
+function TFormWorkspace.GetNDKPlatformByApi(api: string): string;
+begin
+  Result:= 'android-'+api;
 end;
 
 
@@ -356,7 +333,7 @@ begin
 
   FMainActivity:= 'App'; {dummy for Simon template} //TODO: need name flexibility here...
 
-  FAndroidPlatform:= GetNDKPlatform(ListBoxPlatform.Items.Strings[ListBoxPlatform.ItemIndex]);
+  FAndroidNdkPlatform:= GetNDKPlatformByApi(ListBoxPlatform.Items.Strings[ListBoxPlatform.ItemIndex]); //(ListBoxPlatform.Items.Strings[ListBoxPlatform.ItemIndex]);
 
   if FProjectModel = 'Eclipse' then   //if project exits!
   begin
@@ -443,7 +420,6 @@ begin
   fileName:= AppendPathDelim(LazarusIDE.GetPrimaryConfigPath) + 'JNIAndroidProject.ini';
   if not FileExistsUTF8(fileName) then
   begin
-    if EditPackagePrefaceName.Text = '' then EditPackagePrefaceName.Text:= 'org.lamw';
     SaveSettings(fileName);  //force to create empty/initial file!
   end;
 end;
@@ -580,15 +556,82 @@ begin
 end;
 
 procedure TFormWorkspace.FormActivate(Sender: TObject);
+var
+  lisDir: TStringList;
+  auxStr1,auxStr2: string;
+  i: integer;
 begin
+        //C:\adt32\sdk\platforms
+  lisDir:= TStringList.Create;
+
+  ListBoxTargetAPI.Clear;
+  GetSubDirectories(FPathToAndroidSDK+DirectorySeparator+'platforms', lisDir);
+  if lisDir.Count > 0 then
+  begin
+    for i:=0 to  lisDir.Count-1 do
+    begin
+       auxStr1:= lisDir.Strings[i];
+       auxStr2:= SplitStr(auxStr1, '-');
+       ListBoxTargetAPI.Items.Add(auxStr1);
+    end;
+    if FIndexTargetApi < 0  then FIndexTargetApi:= 0;
+
+    if FIndexTargetApi > (ListBoxTargetAPI.Count-1) then
+       FIndexTargetApi:= ListBoxTargetAPI.Count-1;
+
+    ListBoxTargetAPI.ItemIndex:= FIndexTargetApi;
+    FTargetApi:= ListBoxTargetAPI.Items[ListBoxTargetAPI.ItemIndex]
+  end
+  else
+  begin
+    ShowMessage('Fail! '+'Folder "'+FPathToAndroidSDK+DirectorySeparator+'platforms" is Empty!!');
+    lisDir.Free;
+    Exit;
+  end;
+
+  lisDir.Clear;
+  ListBoxPlatform.Clear;
+  GetSubDirectories(FPathToAndroidNDK+DirectorySeparator+'platforms', lisDir);
+
+  if lisDir.Count > 0 then
+  begin
+    for i:=0 to  lisDir.Count-1 do
+    begin
+       auxStr1:= lisDir.Strings[i];
+       auxStr2:= SplitStr(auxStr1, '-');
+
+       if auxStr1 <> '' then
+         if StrToInt(auxStr1) > 13 then
+            ListBoxPlatform.Items.Add(auxStr1);
+    end;
+
+    if FIndexNdkPlatformApi < 0  then FIndexNdkPlatformApi:= 0;
+
+    if FIndexNdkPlatformApi > (ListBoxPlatform.Count-1) then
+       FIndexNdkPlatformApi:= ListBoxPlatform.Count-1;
+
+    ListBoxPlatform.ItemIndex:= FIndexNdkPlatformApi;
+    FAndroidNdkPlatform:= 'android-'+ListBoxPlatform.Items[ListBoxPlatform.ItemIndex]
+
+  end
+  else
+  begin
+    ShowMessage('Fail! '+'Folder "'+FPathToAndroidNDK+DirectorySeparator+'platforms" is Empty!!');
+    lisDir.Free;
+    Exit;
+  end;
+
+  lisDir.Free;
+
   if EditPathToWorkspace.Text <> '' then
      ComboSelectProjectName.SetFocus
   else EditPathToWorkspace.SetFocus;
 
   if EditPackagePrefaceName.Text = '' then EditPackagePrefaceName.Text:= 'org.lamw';
 
-  StatusBarInfo.Panels.Items[0].Text:= 'MinSdk Api: '+GetTextByListIndex(ListBoxMinSDK.ItemIndex);
-  StatusBarInfo.Panels.Items[1].Text:= 'Target Api: '+GetTextByList2Index(ListBoxTargetAPI.ItemIndex);
+  StatusBarInfo.Panels.Items[0].Text:='Ndk: '+ GetCodeNameByApi(ListBoxPlatform.Items[ListBoxPlatform.ItemIndex]);
+  StatusBarInfo.Panels.Items[1].Text:= 'MinSdk: '+GetTextByListIndex(ListBoxMinSDK.ItemIndex);
+  StatusBarInfo.Panels.Items[2].Text:='Target: '+ GetCodeNameByApi(ListBoxTargetAPI.Items[ListBoxTargetAPI.ItemIndex]);
 
   ListBoxPlatform.MakeCurrentVisible;
   ListBoxMinSDK.MakeCurrentVisible;
@@ -648,7 +691,7 @@ end;
 
 procedure TFormWorkspace.LoadSettings(const pFilename: string);  //called by
 var
-  i1, i2, i3, i5, j1, j2, j3: integer;
+  i1, i2, i3, i5, j1{, j2, j3}: integer;
 begin
   FFileName:= pFilename;
   with TIniFile.Create(pFilename) do
@@ -663,8 +706,9 @@ begin
     if FMainActivity = '' then FMainActivity:= 'App';
 
     i5:= StrToIntDef(ReadString('NewProject','NDK', ''), 2);  //ndk 10
-
     ListBoxPlatform.Clear;
+
+    (*
     if i5 > 0 then //not ndk7
     begin
       ListBoxPlatform.Items.Add('Froyo');
@@ -682,6 +726,7 @@ begin
       ListBoxPlatform.Items.Add('Gingerbread');
       ListBoxPlatform.Items.Add('Ice Cream 4.0');  //Android-14
     end;
+    *)
 
     i1:= StrToIntDef(ReadString('NewProject','InstructionSet', ''), 0);
 
@@ -696,21 +741,20 @@ begin
     else
        ListBoxMinSDK.ItemIndex:= ListBoxMinSDK.Items.Count-1;
 
-    j2:= StrToIntDef(ReadString('NewProject','AndroidPlatform', ''), 2); // default Android-14
+    FIndexNdkPlatformApi:= StrToIntDef(ReadString('NewProject','AndroidPlatform', ''), 0);
+    {
     if j2 < 0 then j2 := 2;
-
     ListBoxPlatform.ItemIndex:= j2;
     ListBoxMinSDKClick(nil); //update ListBoxMinSDK
+    }
+    FIndexTargetApi:= StrToIntDef(ReadString('NewProject','TargetApi', ''), 0); //default index 0
 
-
-    FAndroidPlatform:=  GetNDKPlatform(ListBoxPlatform.Items.Strings[ListBoxPlatform.ItemIndex]);
-
-    j3:= StrToIntDef(ReadString('NewProject','TargetApi', ''), 2); // Api 14
-
+    {
     if (j3 >= 0) and (j3 < ListBoxTargetAPI.Items.Count) then
        ListBoxTargetAPI.ItemIndex:= j3
     else
        ListBoxTargetAPI.ItemIndex:= ListBoxTargetAPI.Items.Count-1;
+     }
 
     ComboSelectProjectName.Items.Clear;
     GetSubDirectories(FPathToWorkspace, ComboSelectProjectName.Items);
@@ -735,7 +779,6 @@ begin
   //FProjectModel:= RGProjectType.Items[RGProjectType.ItemIndex]; //Eclipse Project or Ant Project
 
   FMinApi:= ListBoxMinSDK.Items[ListBoxMinSDK.ItemIndex];
-  FTargetApi:= ListBoxTargetAPI.Items[ListBoxTargetAPI.ItemIndex];
 
   EditPathToWorkspace.Text := FPathToWorkspace;
 
@@ -763,9 +806,14 @@ begin
 
 
       if EditPackagePrefaceName.Text = '' then EditPackagePrefaceName.Text:= 'org.lamw';
-      WriteString('NewProject', 'AntPackageName', LowerCase(Trim(EditPackagePrefaceName.Text)));
+        WriteString('NewProject', 'AntPackageName', LowerCase(Trim(EditPackagePrefaceName.Text)));
 
-      WriteString('NewProject', 'AndroidPlatform', IntToStr(ListBoxPlatform.ItemIndex));
+      if ListBoxPlatform.ItemIndex < 0 then
+        WriteString('NewProject', 'AndroidPlatform', '1')    //ndk plataform
+      else
+        WriteString('NewProject', 'AndroidPlatform', IntToStr(ListBoxPlatform.ItemIndex));
+
+
       WriteString('NewProject', 'MinApi', IntToStr(ListBoxMinSDK.ItemIndex));
       WriteString('NewProject', 'TargetApi', IntToStr(ListBoxTargetAPI.ItemIndex));
 
@@ -828,6 +876,28 @@ begin
      SysUtils.FindClose(sr) ;
    end;
 end;
+
+function SplitStr(var theString: string; delimiter: string): string;
+var
+  i: integer;
+begin
+  Result:= '';
+  if theString <> '' then
+  begin
+    i:= Pos(delimiter, theString);
+    if i > 0 then
+    begin
+       Result:= Copy(theString, 1, i-1);
+       theString:= Copy(theString, i+Length(delimiter), maxLongInt);
+    end
+    else
+    begin
+       Result:= theString;
+       theString:= '';
+    end;
+  end;
+end;
+
 
 end.
 
