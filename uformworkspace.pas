@@ -147,7 +147,6 @@ type
   end;
 
 
-  procedure GetSubDirectories(const directory : string; list : TStrings);
   function TrimChar(query: string; delimiter: char): string;
   function SplitStr(var theString: string; delimiter: string): string;
 
@@ -265,13 +264,13 @@ var
 begin
     strList:= TStringList.Create;
     path:= fullProjectName+DirectorySeparator+'src';
-    GetSubDirectories(path, strList);
+    FindAllDirectories(strList, path, False);
     count:= strList.Count;
     while count > 0 do
     begin
        path:= strList.Strings[0];
        strList.Clear;
-       GetSubDirectories(path, strList);
+       FindAllDirectories(strList, path, False);
        count:= strList.Count;
     end;
     Result:= path;
@@ -339,14 +338,14 @@ begin
   begin
      strList:= TStringList.Create;
      path:= FAndroidProjectName+DirectorySeparator+'src';
-     GetSubDirectories(path, strList);
+     FindAllDirectories(strList, path, False);
 
      count:= strList.Count;
      while count > 0 do
      begin
          path:= strList.Strings[0];
          strList.Clear;
-         GetSubDirectories(path, strList);
+         FindAllDirectories(strList, path, False);
          count:= strList.Count;
      end;
 
@@ -565,13 +564,13 @@ begin
   lisDir:= TStringList.Create;
 
   ListBoxTargetAPI.Clear;
-  GetSubDirectories(FPathToAndroidSDK+DirectorySeparator+'platforms', lisDir);
+  FindAllDirectories(lisDir, FPathToAndroidSDK+PathDelim+'platforms', False);
   if lisDir.Count > 0 then
   begin
     for i:=0 to  lisDir.Count-1 do
     begin
        auxStr1:= lisDir.Strings[i];
-       auxStr2:= SplitStr(auxStr1, '-');
+       auxStr1 := Copy(auxStr1, LastDelimiter('-', auxStr1) + 1, MaxInt);
        ListBoxTargetAPI.Items.Add(auxStr1);
     end;
     if FIndexTargetApi < 0  then FIndexTargetApi:= 0;
@@ -591,14 +590,14 @@ begin
 
   lisDir.Clear;
   ListBoxPlatform.Clear;
-  GetSubDirectories(FPathToAndroidNDK+DirectorySeparator+'platforms', lisDir);
+  FindAllDirectories(lisDir, FPathToAndroidNDK+PathDelim+'platforms', False);
 
   if lisDir.Count > 0 then
   begin
     for i:=0 to  lisDir.Count-1 do
     begin
        auxStr1:= lisDir.Strings[i];
-       auxStr2:= SplitStr(auxStr1, '-');
+       auxStr1 := Copy(auxStr1, LastDelimiter('-', auxStr1) + 1, MaxInt);
 
        if auxStr1 <> '' then
          if StrToInt(auxStr1) > 13 then
@@ -661,7 +660,7 @@ begin
     EditPathToWorkspace.Text := SelDirDlgPathToWorkspace.FileName;
     FPathToWorkspace:= SelDirDlgPathToWorkspace.FileName;
     ComboSelectProjectName.Items.Clear;
-    GetSubDirectories(FPathToWorkspace, ComboSelectProjectName.Items);
+    FindAllDirectories(ComboSelectProjectName.Items, FPathToWorkspace, False);
 
     {
     //try some guesswork:
@@ -681,7 +680,7 @@ procedure TFormWorkspace.SpdBtnRefreshProjectNameClick(Sender: TObject);
 begin
   FPathToWorkspace:= EditPathToWorkspace.Text;
   ComboSelectProjectName.Items.Clear;
-  GetSubDirectories(FPathToWorkspace, ComboSelectProjectName.Items);
+  FindAllDirectories(ComboSelectProjectName.Items, FPathToWorkspace, False);
 end;
 
 procedure TFormWorkspace.SpeedButton1Click(Sender: TObject);
@@ -757,7 +756,7 @@ begin
      }
 
     ComboSelectProjectName.Items.Clear;
-    GetSubDirectories(FPathToWorkspace, ComboSelectProjectName.Items);
+    FindAllDirectories(ComboSelectProjectName.Items, FPathToWorkspace, False);
 
     FPrebuildOSYS:= ReadString('NewProject','PrebuildOSYS', '');
   finally
@@ -854,27 +853,6 @@ begin
       end;
       Result:= Trim(auxStr);
   end;
-end;
-
-//http://delphi.about.com/od/delphitips2008/qt/subdirectories.htm
-//fils the "list" TStrings with the subdirectories of the "directory" directory
-//Warning: if not  subdirectories was found return empty list [list.count = 0]!
-procedure GetSubDirectories(const directory : string; list : TStrings);
-var
-   sr : TSearchRec;
-begin
-   try
-     if FindFirst(IncludeTrailingPathDelimiter(directory) + '*.*', faDirectory, sr) < 0 then Exit
-     else
-     repeat
-       if ((sr.Attr and faDirectory <> 0) and (sr.Name <> '.') and (sr.Name <> '..')) then
-       begin
-           List.Add(IncludeTrailingPathDelimiter(directory) + sr.Name);
-       end;
-     until FindNext(sr) <> 0;
-   finally
-     SysUtils.FindClose(sr) ;
-   end;
 end;
 
 function SplitStr(var theString: string; delimiter: string): string;
