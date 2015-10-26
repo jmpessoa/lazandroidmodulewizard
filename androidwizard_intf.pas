@@ -177,6 +177,7 @@ begin
   try
     FModuleType := 0; //0: GUI --- 1:NoGUI
     FJavaClassName := 'Controls';
+    FPathToClassName := '';
     if GetWorkSpaceFromForm(0) then
     begin
       with TStringList.Create do
