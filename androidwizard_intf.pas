@@ -59,12 +59,14 @@ type
      FFullJavaSrcPath: string;
      FSmallProjName:  string; //ex. 'AppDemo1'
 
+     FAndroidTheme: string;
+
      function SettingsFilename: string;
      function TryNewJNIAndroidInterfaceCode(projectType: integer): boolean; //0: GUI  project --- 1:NoGUI project
      function GetPathToJNIFolder(fullPath: string): string;
      function GetWorkSpaceFromForm(projectType: integer): boolean;
      function GetAppName(className: string): string;
-     function GetIdFromApi(api: integer): string;
+
      function GetFolderFromApi(api: integer): string;
      procedure ChDir(const Dir: String);
      procedure Mkdir(const Dir: String);
@@ -166,7 +168,7 @@ begin
   Result:= 'A [GUI] JNI Android loadable module (.so)'+ LineEnding +
             'based on Simonsayz''s templates'+ LineEnding +
             'with Form Designer and Android Components Bridges.'+ LineEnding +
-            'The project and library file is maintained by Lazarus [Lamw].'
+            'The project and library file are maintained by Lazarus [Lamw].'
 end;
 
 function TAndroidGUIProjectDescriptor.DoInitDescriptor: TModalResult;    //GUI
@@ -429,29 +431,20 @@ function TAndroidProjectDescriptor.GetLocalizedDescription: string;
 begin
   Result := 'A [NoGUI] JNI Android loadable module (.so)'+ LineEnding +
             'using DataModule (NO Form Designer/Android Components Bridges!).'+ LineEnding +
-            'The project and library file is maintained by Lazarus [Lamw].'
+            'The project and library are maintained by Lazarus [Lamw].'
 end;
 
-
-     //just for test! not realistic!
-function TAndroidProjectDescriptor.GetIdFromApi(api: integer): string;
-begin
-  {
-  case api of
-     17: result:= '1';
-     18: result:= '2';
-     19: result:= '3';
-  end;
-  }
-  Result:= '1';
-end;
      //just for test!  not realistic!
 function TAndroidProjectDescriptor.GetFolderFromApi(api: integer): string;
 begin
+  Result:= 'android-x.y';
   case api of
-     17: result:= 'android-4.2.2';
-     18: result:= 'android-4.3';
-     19: result:= 'android-4.4';
+     17: Result:= 'android-4.2.2';
+     18: Result:= 'android-4.3';
+     19: Result:= 'android-4.4';
+     20: Result:= 'android-4.4W';
+     21: Result:= 'Lollipop-5.0';
+     22: Result:= 'Lollipop-5.1';
   end;
 end;
 
@@ -459,7 +452,7 @@ function TAndroidProjectDescriptor.GetWorkSpaceFromForm(projectType: integer): b
 var
   frm: TFormWorkspace;
   strList: TStringList;
-  i: integer;
+  i, intApi: integer;
   linuxDirSeparator: string;
   linuxPathToJavaJDK: string;
   linuxPathToAndroidSdk: string;
@@ -467,7 +460,7 @@ var
   tempStr: string;
   linuxPathToAdbBin: string;
   linuxPathToAntBin: string;
-  dummy: string;
+  dummy, strText: string;
 begin
   Result:= False;
   FModuleType:= projectType; //0:GUI  1:noGUI
@@ -483,13 +476,13 @@ begin
     frm.LoadSettings(SettingsFilename);
 
     frm.ComboSelectProjectName.Text:= 'GUIProject1';
-    frm.LabelModuleType.Caption:= 'Project Type: [Lamw GUI]';
+    //frm.LabelModuleType.Caption:= 'Project Type: [Lamw GUI]';
 
     if projectType = 1 then //No GUI
     begin
       frm.Color:= clWhite;
       frm.ComboSelectProjectName.Text:= 'NoGUIProject1';
-      frm.LabelModuleType.Caption:= 'Project Type: [Lamw NoGUI]';
+      //frm.LabelModuleType.Caption:= 'Project Type: [Lamw NoGUI]';
     end;
 
     frm.ModuleType:= projectType;  //<-- input to form
@@ -497,6 +490,8 @@ begin
     if frm.ShowModal = mrOK then
     begin
       frm.SaveSettings(SettingsFilename);
+
+      FAndroidTheme:= frm.AndroidTheme;
 
       FJavaClassName:= frm.JavaClassName;
 
@@ -607,15 +602,55 @@ begin
           MkDir(FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'values-v11');
           ChDir(FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'values-v11');
 
-          CopyFile(FPathToJavaTemplates+DirectorySeparator+'values-v11'+DirectorySeparator+'styles.xml',
-                       FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'values-v11'+DirectorySeparator+'styles.xml');
+          //replace "dummyTheme" ..res\values-v11
+          strList.Clear;
+          {CopyFile(FPathToJavaTemplates+DirectorySeparator+'values-v11'+DirectorySeparator+'styles.xml',
+                       FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'values-v11'+DirectorySeparator+'styles.xml');}
+          strList.LoadFromFile(FPathToJavaTemplates+DirectorySeparator+'values-v11'+DirectorySeparator+'styles.xml');
 
+          intApi:= StrToInt(FTargetApi);
+
+          if (intApi >= 11) and (intApi < 14) then
+            strText:= StringReplace(strList.Text,'dummyTheme', 'android:Theme.'+FAndroidTheme, [rfReplaceAll])
+          else
+            strText:= StringReplace(strList.Text,'dummyTheme', 'android:Theme.Holo.Light', [rfReplaceAll]); //default
+
+          strList.Text:= strText;
+          strList.SaveToFile(FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'values-v11'+DirectorySeparator+'styles.xml');
 
           MkDir(FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'values-v14');
           ChDir(FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'values-v14');
-          CopyFile(FPathToJavaTemplates+DirectorySeparator+'values-v14'+DirectorySeparator+'styles.xml',
-                       FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'values-v14'+DirectorySeparator+'styles.xml');
 
+          //replace "dummyTheme" ..res\values-v14
+          strList.Clear;
+          {CopyFile(FPathToJavaTemplates+DirectorySeparator+'values-v14'+DirectorySeparator+'styles.xml',
+                       FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'values-v14'+DirectorySeparator+'styles.xml');}
+          strList.LoadFromFile(FPathToJavaTemplates+DirectorySeparator+'values-v14'+DirectorySeparator+'styles.xml');
+
+          if (intApi >= 14) and (intApi < 21) then
+             strText:= StringReplace(strList.Text,'dummyTheme', 'android:Theme.'+FAndroidTheme, [rfReplaceAll])
+          else
+             strText:= StringReplace(strList.Text,'dummyTheme', 'android:Theme.DeviceDefault', [rfReplaceAll]);
+
+          strList.Text:= strText;
+          strList.SaveToFile(FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'values-v14'+DirectorySeparator+'styles.xml');
+
+          MkDir(FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'values-v21');
+          ChDir(FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'values-v21');
+
+          //replace "dummyTheme" ..res\values-v21
+          strList.Clear;
+           {CopyFile(FPathToJavaTemplates+DirectorySeparator+'values-v14'+DirectorySeparator+'styles.xml',
+                        FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'values-v14'+DirectorySeparator+'styles.xml');}
+          strList.LoadFromFile(FPathToJavaTemplates+DirectorySeparator+'values-v21'+DirectorySeparator+'styles.xml');
+
+          if (intApi >= 21) then
+            strText:= StringReplace(strList.Text,'dummyTheme', 'android:Theme.'+FAndroidTheme, [rfReplaceAll])
+          else
+            strText:= StringReplace(strList.Text,'dummyTheme', 'android:Theme.DeviceDefault', [rfReplaceAll]);
+
+          strList.Text:= strText;
+          strList.SaveToFile(FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'values-v21'+DirectorySeparator+'styles.xml');
 
           MkDir(FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'layout');
           ChDir(FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'layout');

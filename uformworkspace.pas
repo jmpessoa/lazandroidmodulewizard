@@ -16,6 +16,7 @@ type
     BitBtnCancel: TBitBtn;
     BitBtnOK: TBitBtn;
     CheckBox1: TCheckBox;
+    ComboBoxTheme: TComboBox;
     ComboSelectProjectName: TComboBox;
     EditPackagePrefaceName: TEdit;
     EditPathToWorkspace: TEdit;
@@ -25,7 +26,7 @@ type
     GroupBox3: TGroupBox;
     GroupBox4: TGroupBox;
     Image1: TImage;
-    LabelModuleType: TLabel;
+    Label1: TLabel;
     LabelPathToWorkspace: TLabel;
     LabelSelectProjectName: TLabel;
     ListBoxMinSDK: TListBox;
@@ -42,9 +43,11 @@ type
     SpdBtnPathToWorkspace: TSpeedButton;
     SpdBtnRefreshProjectName: TSpeedButton;
     SpeedButton1: TSpeedButton;
+    SpeedButton2: TSpeedButton;
     StatusBarInfo: TStatusBar;
 
     procedure CheckBox1Click(Sender: TObject);
+    procedure ComboBoxThemeChange(Sender: TObject);
     procedure ComboSelectProjectNameKeyPress(Sender: TObject; var Key: char);
     procedure FormActivate(Sender: TObject);
     procedure FormClose(Sender: TObject; var CloseAction: TCloseAction);
@@ -63,6 +66,7 @@ type
     procedure SpdBtnPathToWorkspaceClick(Sender: TObject);
     procedure SpdBtnRefreshProjectNameClick(Sender: TObject);
     procedure SpeedButton1Click(Sender: TObject);
+    procedure SpeedButton2Click(Sender: TObject);
 
   private
     { private declarations }
@@ -102,6 +106,7 @@ type
     FJavaClassName: string;
     FIndexTargetApi: integer;
     FIndexNdkPlatformApi: integer;
+    FAndroidTheme: string;
 
   public
     { public declarations }
@@ -144,6 +149,7 @@ type
     property JavaClassName: string read   FJavaClassName write FJavaClassName;
     property ModuleType: integer read FModuleType write FModuleType;  //0: GUI project   1: NoGui project
     property SmallProjName: string read FSmallProjName write FSmallProjName;
+    property AndroidTheme: string read FAndroidTheme write FAndroidTheme;
   end;
 
 
@@ -193,7 +199,7 @@ begin
      4: Result:= 'JellyBean 4.2'; // Api(17)  -Jelly Bean 4.2
      5: Result:= 'JellyBean 4.3'; // Api(18)  -Jelly Bean 4.3
      6: Result:= 'KitKat 4.4'; // Api(19)  -KitKat 4.4
-     7: Result:= 'KitKat 4.4'; // Api(20)  -KitKat 4.4
+     7: Result:= 'KitKat 4.4W'; // Api(20)  -KitKat 4.4
      8: Result:= 'Lollipop 5.0'; // Api(21)  -Lollipop [5.0]
      9: Result:= 'Lollipop 5.1'; // Api(22)  -Lollipop [5.1]
    end;
@@ -280,7 +286,7 @@ end;
 procedure TFormWorkspace.FormClose(Sender: TObject; var CloseAction: TCloseAction);
 var
   strList: TStringList;
-  count, i, j: integer;
+  count, i, j, apiTarg: integer;
   path: string;
   aList: TStringList;
 begin
@@ -288,9 +294,21 @@ begin
   SaveSettings(FFileName);
   if ModalResult = mrCancel  then Exit;
 
+  apiTarg:=  StrToInt(FTargetApi);
+
+  if apiTarg < 11 then
+    FAndroidTheme:= 'Light'
+  else if (apiTarg >= 11) and  (apiTarg < 14) then
+    FAndroidTheme:= 'Holo.Light'
+  else
+    FAndroidTheme:= 'DeviceDefault';
+
+  if ComboBoxTheme.Text <> 'DeviceDefault' then
+    FAndroidTheme:= ComboBoxTheme.Text;
+
   if EditPathToWorkspace.Text = '' then
   begin
-    ShowMessage('Error! Workplace Path was missing....[Cancel]');
+    ShowMessage('Error! Workspace Path was missing....[Cancel]');
     ModalResult:= mrCancel;
     Exit;
   end;
@@ -309,11 +327,11 @@ begin
   begin
      FProjectModel:= 'Ant';   //project not exits!
      FSmallProjName:= Trim(ComboSelectProjectName.Text);
-     FAndroidProjectName:= FPathToWorkspace+ DirectorySeparator+ FSmallProjName;
-     FPackagePrefaceName:= LowerCase(Trim(EditPackagePrefaceName.Text));
-     if EditPackagePrefaceName.Text = '' then EditPackagePrefaceName.Text:= 'org.lamw';
-     if FModuleType = 1 then //NoGUI
-       FJavaClassName:=  FSmallProjName;
+     FAndroidProjectName:= FPathToWorkspace + DirectorySeparator+ FSmallProjName;
+       FPackagePrefaceName:= LowerCase(Trim(EditPackagePrefaceName.Text));
+       if EditPackagePrefaceName.Text = '' then EditPackagePrefaceName.Text:= 'org.lamw';
+       if FModuleType = 1 then //NoGUI
+          FJavaClassName:=  FSmallProjName;
   end
   else
   begin
@@ -334,7 +352,7 @@ begin
 
   FAndroidNdkPlatform:= GetNDKPlatformByApi(ListBoxPlatform.Items.Strings[ListBoxPlatform.ItemIndex]); //(ListBoxPlatform.Items.Strings[ListBoxPlatform.ItemIndex]);
 
-  if FProjectModel = 'Eclipse' then   //if project exits!
+  if FProjectModel = 'Eclipse' then
   begin
      strList:= TStringList.Create;
      path:= FAndroidProjectName+DirectorySeparator+'src';
@@ -373,42 +391,49 @@ begin
      FFullJavaSrcPath:=GetFullJavaSrcPath(FAndroidProjectName);
   end;
 
-  if FProjectModel = 'Ant' then    //if project not exits!
+  if FProjectModel = 'Ant' then
   begin
-      if not DirectoryExists(FAndroidProjectName) then
-      begin
-        MkDir(FAndroidProjectName);
-        ChDir(FAndroidProjectName);
+    if DirectoryExists(FAndroidProjectName) then   //if project exits
+    begin
+       if MessageDlg('Projec/Directory already Exists!',
+         'Re-Create "'+FAndroidProjectName+'" ?', mtConfirmation, [mbYes, mbNo],0) = mrNo then
+       begin
+         ModalResult:= mrCancel;
+       end;
+    end
+    else
+    begin
+      MkDir(FAndroidProjectName);
+      ChDir(FAndroidProjectName);
 
-        MkDir(FAndroidProjectName+ DirectorySeparator + 'jni');
-        ChDir(FAndroidProjectName+DirectorySeparator+ 'jni');
+      MkDir(FAndroidProjectName+ DirectorySeparator + 'jni');
+      ChDir(FAndroidProjectName+DirectorySeparator+ 'jni');
 
-        MkDir(FAndroidProjectName+DirectorySeparator+ 'jni'+DirectorySeparator+'build-modes');
-        ChDir(FAndroidProjectName+DirectorySeparator+ 'jni'+DirectorySeparator+'build-modes');
+      MkDir(FAndroidProjectName+DirectorySeparator+ 'jni'+DirectorySeparator+'build-modes');
+      ChDir(FAndroidProjectName+DirectorySeparator+ 'jni'+DirectorySeparator+'build-modes');
 
-        MkDir(FAndroidProjectName+ DirectorySeparator + 'libs');
-        ChDir(FAndroidProjectName+DirectorySeparator+ 'libs');
+      MkDir(FAndroidProjectName+ DirectorySeparator + 'libs');
+      ChDir(FAndroidProjectName+DirectorySeparator+ 'libs');
 
-        if FSupportV4 = 'yes' then  //add "android 4.0" support to olds devices ...
-              CopyFile(FPathToJavaTemplates+DirectorySeparator+'libs'+DirectorySeparator+'android-support-v4.jar',
-                   FAndroidProjectName+DirectorySeparator+'libs'+DirectorySeparator+'android-support-v4.jar');
+      if FSupportV4 = 'yes' then  //add "android 4.0" support to olds devices ...
+            CopyFile(FPathToJavaTemplates+DirectorySeparator+'libs'+DirectorySeparator+'android-support-v4.jar',
+                 FAndroidProjectName+DirectorySeparator+'libs'+DirectorySeparator+'android-support-v4.jar');
 
-        MkDir(FAndroidProjectName+ DirectorySeparator + 'obj');
-        ChDir(FAndroidProjectName+DirectorySeparator+ 'obj');
+      MkDir(FAndroidProjectName+ DirectorySeparator + 'obj');
+      ChDir(FAndroidProjectName+DirectorySeparator+ 'obj');
 
-        MkDir(FAndroidProjectName+ DirectorySeparator + 'obj'+DirectorySeparator+LowerCase(FJavaClassName));
-        ChDir(FAndroidProjectName+DirectorySeparator+ 'obj'+DirectorySeparator+LowerCase(FJavaClassName));
+      MkDir(FAndroidProjectName+ DirectorySeparator + 'obj'+DirectorySeparator+LowerCase(FJavaClassName));
+      ChDir(FAndroidProjectName+DirectorySeparator+ 'obj'+DirectorySeparator+LowerCase(FJavaClassName));
 
-        MkDir(FAndroidProjectName+ DirectorySeparator + 'libs'+DirectorySeparator+'x86');
-        ChDir(FAndroidProjectName+DirectorySeparator+ 'libs'+DirectorySeparator+'x86');
+      MkDir(FAndroidProjectName+ DirectorySeparator + 'libs'+DirectorySeparator+'x86');
+      ChDir(FAndroidProjectName+DirectorySeparator+ 'libs'+DirectorySeparator+'x86');
 
-        MkDir(FAndroidProjectName+ DirectorySeparator + 'libs'+DirectorySeparator+'armeabi');
-        ChDir(FAndroidProjectName+DirectorySeparator+ 'libs'+DirectorySeparator+'armeabi');
+      MkDir(FAndroidProjectName+ DirectorySeparator + 'libs'+DirectorySeparator+'armeabi');
+      ChDir(FAndroidProjectName+DirectorySeparator+ 'libs'+DirectorySeparator+'armeabi');
 
-        MkDir(FAndroidProjectName+ DirectorySeparator + 'libs'+DirectorySeparator+'armeabi-v7a');
-        ChDir(FAndroidProjectName+DirectorySeparator+ 'libs'+DirectorySeparator+'armeabi-v7a');
-      end
-      else ShowMessage('Error! Projec/Directory ['+FAndroidProjectName+'] already exists !');
+      MkDir(FAndroidProjectName+ DirectorySeparator + 'libs'+DirectorySeparator+'armeabi-v7a');
+      ChDir(FAndroidProjectName+DirectorySeparator+ 'libs'+DirectorySeparator+'armeabi-v7a');
+    end;
   end;
 end;
 
@@ -557,7 +582,7 @@ end;
 procedure TFormWorkspace.FormActivate(Sender: TObject);
 var
   lisDir: TStringList;
-  auxStr1,auxStr2: string;
+  auxStr1: string;
   i: integer;
 begin
         //C:\adt32\sdk\platforms
@@ -643,6 +668,59 @@ begin
     else FSupportV4:= 'no';
 end;
 
+procedure TFormWorkspace.ComboBoxThemeChange(Sender: TObject);
+var
+  api21Index, api, apiTarget, i: integer;
+begin
+  apiTarget:= StrToInt(ListBoxTargetAPI.GetSelectedText);
+
+  if apiTarget < 11 then
+  begin
+    ShowMessage('Warning:'+
+                 #10#13+'"Holo Theme" need TargetSdkApi >= 11'+ //TODO: Theme.Holo.NoActionBar.Fullscreen
+                 #10#13+'"Holo Theme + ActionBar" need TargetSdkApi >= 14'+
+                 #10#13+'"Material Theme" need TargetSdkApi >= 21');
+    ComboBoxTheme.ItemIndex:= 0; //default
+    Exit;
+  end;
+
+  if (apiTarget < 14) and (Pos('ActionBar', ComboBoxTheme.Text) > 0) then
+  begin
+    ShowMessage('Warning:'+
+                 #10#13+'"Holo Theme + ActionBar" need TargetSdkApi >= 14');
+    ComboBoxTheme.ItemIndex:= 0; //default
+    Exit;
+  end;
+
+  if (apiTarget < 21) and
+     (Pos('Material', ComboBoxTheme.Text) > 0) then
+  begin
+        api21Index:= -1;
+        for i:=0 to ListBoxTargetAPI.Count-1 do
+        begin
+            api:= StrToInt(ListBoxTargetAPI.Items.Strings[i]);
+            if   api >= 21 then
+            begin
+              api21Index:= i;
+              if api = 21 then
+              begin
+                 break;
+               end;
+            end
+        end;
+        if api21Index <> -1 then
+        begin
+          ListBoxTargetAPI.ItemIndex:= api21Index;
+          ShowMessage('Warning: TargetSdkApi changed to ['+ListBoxTargetAPI.GetSelectedText+']');
+        end
+        else
+        begin
+          ShowMessage('Warning: "Material Theme" need TargetSdkApi >= 21!');
+          ComboBoxTheme.ItemIndex:= 0; //default
+        end;
+  end;
+end;
+
 procedure TFormWorkspace.ComboSelectProjectNameKeyPress(Sender: TObject;
   var Key: char);
 begin
@@ -662,17 +740,6 @@ begin
     ComboSelectProjectName.Items.Clear;
     FindAllDirectories(ComboSelectProjectName.Items, FPathToWorkspace, False);
 
-    {
-    //try some guesswork:
-    if Pos('eclipse', LowerCase(FPathToWorkspace) ) > 0 then RGProjectType.ItemIndex:= 0;
-
-    if Pos('ant', LowerCase(FPathToWorkspace) ) > 0 then
-    begin
-       RGProjectType.ItemIndex:= 1;
-       if EditPackagePrefaceName.Text = '' then EditPackagePrefaceName.Text:= 'org.lamw';
-    end;
-    }
-
   end;
 end;
 
@@ -686,6 +753,14 @@ end;
 procedure TFormWorkspace.SpeedButton1Click(Sender: TObject);
 begin
   ShowMessage('Lamw: Lazarus Android Module Wizard' +#10#13+ '[ver. 0.6 - rev. 36 - 03 August 2015]');
+end;
+
+procedure TFormWorkspace.SpeedButton2Click(Sender: TObject);
+begin
+  ShowMessage('Warning:'+
+               #10#13+'"Holo Theme" need TargetSdkApi >= 11'+
+               #10#13+'"Holo Theme + ActionBar" need TargetSdkApi >= 14'+
+               #10#13+'"Material Theme" need TargetSdkApi >= 21');
 end;
 
 procedure TFormWorkspace.LoadSettings(const pFilename: string);  //called by
@@ -707,25 +782,6 @@ begin
     i5:= StrToIntDef(ReadString('NewProject','NDK', ''), 2);  //ndk 10
     ListBoxPlatform.Clear;
 
-    (*
-    if i5 > 0 then //not ndk7
-    begin
-      ListBoxPlatform.Items.Add('Froyo');
-      ListBoxPlatform.Items.Add('Gingerbread');
-      ListBoxPlatform.Items.Add('Ice Cream 4.0x');
-      ListBoxPlatform.Items.Add('Jelly Bean 4.1');
-      ListBoxPlatform.Items.Add('Jelly Bean 4.2');
-      ListBoxPlatform.Items.Add('Jelly Bean 4.3');
-      ListBoxPlatform.Items.Add('KitKat 4.4');
-      ListBoxPlatform.Items.Add('Lollipop 5.0');
-    end
-    else
-    begin  //just ndk7
-      ListBoxPlatform.Items.Add('Froyo');
-      ListBoxPlatform.Items.Add('Gingerbread');
-      ListBoxPlatform.Items.Add('Ice Cream 4.0');  //Android-14
-    end;
-    *)
 
     i1:= StrToIntDef(ReadString('NewProject','InstructionSet', ''), 0);
 
@@ -741,19 +797,8 @@ begin
        ListBoxMinSDK.ItemIndex:= ListBoxMinSDK.Items.Count-1;
 
     FIndexNdkPlatformApi:= StrToIntDef(ReadString('NewProject','AndroidPlatform', ''), 0);
-    {
-    if j2 < 0 then j2 := 2;
-    ListBoxPlatform.ItemIndex:= j2;
-    ListBoxMinSDKClick(nil); //update ListBoxMinSDK
-    }
-    FIndexTargetApi:= StrToIntDef(ReadString('NewProject','TargetApi', ''), 0); //default index 0
 
-    {
-    if (j3 >= 0) and (j3 < ListBoxTargetAPI.Items.Count) then
-       ListBoxTargetAPI.ItemIndex:= j3
-    else
-       ListBoxTargetAPI.ItemIndex:= ListBoxTargetAPI.Items.Count-1;
-     }
+    FIndexTargetApi:= StrToIntDef(ReadString('NewProject','TargetApi', ''), 0); //default index 0
 
     ComboSelectProjectName.Items.Clear;
     FindAllDirectories(ComboSelectProjectName.Items, FPathToWorkspace, False);
@@ -766,16 +811,11 @@ begin
   RGInstruction.ItemIndex:= i1;
   RGFPU.ItemIndex:= i2;
 
-
-  //if i3 > 1 then i3:= 0;
-  //RGProjectType.ItemIndex:= i3;
-
   if i3 = 0 then FProjectModel:= 'Eclipse'
   else FProjectModel:= 'Ant';
 
   FInstructionSet:= RGInstruction.Items[RGInstruction.ItemIndex];
   FFPUSet:= RGFPU.Items[RGFPU.ItemIndex];
-  //FProjectModel:= RGProjectType.Items[RGProjectType.ItemIndex]; //Eclipse Project or Ant Project
 
   FMinApi:= ListBoxMinSDK.Items[ListBoxMinSDK.ItemIndex];
 
