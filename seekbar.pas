@@ -61,12 +61,11 @@ jSeekBar = class(jVisualControl)
     procedure GenEvent_OnSeekBarProgressChanged(Obj: TObject; progress: integer; fromUser: boolean);
     procedure GenEvent_OnSeekBarStartTrackingTouch(Obj: TObject; progress: integer);
     procedure GenEvent_OnSeekBarStopTrackingTouch(Obj: TObject; progress: integer);
+    property Progress:integer read GetProgress write SetProgress;
 
-    property Progress:integer read FProgress write FProgress;
  published
 
     property Max: integer read FMax write SetMax;
-
     property BackgroundColor: TARGBColorBridge read FColor write SetColor;
     //property OnClick: TOnNotify read FOnClick write FOnClick;
 
@@ -408,6 +407,7 @@ end;
 procedure jSeekBar.SetProgress(_progress: integer);
 begin
   //in designing component state: set value here...
+  FProgress:=  _progress;
   if FInitialized then
      jSeekBar_SetProgress(FjEnv, FjObject, _progress);
 end;
@@ -415,9 +415,9 @@ end;
 function jSeekBar.GetProgress(): integer;
 begin
   //in designing component state: result value here...
-  Result:= 0;
+  Result:= FProgress;
   if FInitialized then
-   Result:= jSeekBar_GetProgress(FjEnv, FjObject);
+    Result:= jSeekBar_GetProgress(FjEnv, FjObject);
 end;
 
 procedure jSeekBar.SetRotation(_rotation: single);
