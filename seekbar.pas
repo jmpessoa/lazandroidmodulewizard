@@ -21,6 +21,7 @@ TOnSeekBarStopTrackingTouch= procedure(Sender: TObject;  progress: integer) of O
 jSeekBar = class(jVisualControl)
  private
     FMax: integer;
+    FProgress: integer;
     FOnSeekBarProgressChanged:    TOnSeekBarProgressChanged;
     FOnSeekBarStartTrackingTouch: TOnSeekBarStartTrackingTouch;
     FOnSeekBarStopTrackingTouch:  TOnSeekBarStopTrackingTouch;
@@ -61,9 +62,11 @@ jSeekBar = class(jVisualControl)
     procedure GenEvent_OnSeekBarStartTrackingTouch(Obj: TObject; progress: integer);
     procedure GenEvent_OnSeekBarStopTrackingTouch(Obj: TObject; progress: integer);
 
+    property Progress:integer read FProgress write FProgress;
  published
 
     property Max: integer read FMax write SetMax;
+
     property BackgroundColor: TARGBColorBridge read FColor write SetColor;
     //property OnClick: TOnNotify read FOnClick write FOnClick;
 
@@ -106,13 +109,14 @@ begin
   FMarginTop    := 10;
   FMarginBottom := 10;
   FMarginRight  := 10;
-  FHeight       := 24; //??
-  FWidth        := 192; //??
+  FHeight       := 30; //??
+  FWidth        := 100; //??
   FLParamWidth  := lpMatchParent;  //lpWrapContent
   FLParamHeight := lpWrapContent; //lpMatchParent
   FAcceptChildrenAtDesignTime:= False;
 //your code here....
   FMax:= 100;
+  FProgress:= 50;
 end;
 
 destructor jSeekBar.Destroy;
@@ -411,6 +415,7 @@ end;
 function jSeekBar.GetProgress(): integer;
 begin
   //in designing component state: result value here...
+  Result:= 0;
   if FInitialized then
    Result:= jSeekBar_GetProgress(FjEnv, FjObject);
 end;

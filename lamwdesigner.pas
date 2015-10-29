@@ -158,6 +158,13 @@ type
     procedure UpdateLayout; override;
   end;
 
+  TDraftSeekBar = class(TDraftWidget)
+  public
+    constructor Create(AWidget: TAndroidWidget; Canvas: TCanvas); override;
+    procedure Draw; override;
+    procedure UpdateLayout; override;
+  end;
+
   { TDraftListView }
 
   TDraftListView = class(TDraftWidget)
@@ -284,7 +291,7 @@ implementation
 uses
   LCLIntf, LCLType, ObjInspStrConsts, FPimage, typinfo, Laz_And_Controls,
   customdialog, togglebutton, switchbutton, Laz_And_GLESv1_Canvas,
-  Laz_And_GLESv2_Canvas, gridview, Spinner, uFormSizeSelect;
+  Laz_And_GLESv2_Canvas, gridview, Spinner, seekbar,  uFormSizeSelect;
 
 var
   DraftClassesMap: TDraftControlHash;
@@ -1669,6 +1676,72 @@ begin
   inherited UpdateLayout;
 end;
 
+
+{ TDraftSeekBar }
+
+constructor TDraftSeekBar.Create(AWidget: TAndroidWidget; Canvas: TCanvas);
+begin
+  inherited;
+  Height := AWidget.Height;
+  Width := AWidget.Width;
+  MarginLeft := AWidget.MarginLeft;
+  MarginTop := AWidget.MarginTop;
+  MarginRight := AWidget.MarginRight;
+  MarginBottom := AWidget.MarginBottom;
+  Color := jSeekBar(AWidget).BackgroundColor;
+  FontColor := colbrBlack;
+
+  if AWidget.Parent is jPanel then
+  begin
+    if jSeekBar(AWidget).BackgroundColor = colbrDefault then
+      Color := jPanel(AWidget.Parent).BackgroundColor;
+  end else
+  if AWidget.Parent is jCustomDialog then
+  begin
+    if jSeekBar(AWidget).BackgroundColor = colbrDefault then
+      Color := jCustomDialog(AWidget.Parent).BackgroundColor;
+  end;
+end;
+
+procedure TDraftSeekBar.Draw;
+var
+  x: integer;
+  r: TRect;
+begin
+  with Fcanvas do
+  begin
+    Brush.Color := RGBToColor($ad,$ad,$ad);
+    r := Rect(0, 10, Self.Width, 13);
+    FillRect(r);
+    Brush.Color := RGBToColor($44,$B3,$DD);
+    r.Top := 9;
+    r.Bottom := 12;
+    if jSeekBar(FAndroidWidget).Max <= 0 then
+      jSeekBar(FAndroidWidget).Max := 100;
+    x := Self.Width * jSeekBar(FAndroidWidget).Progress div jSeekBar(FAndroidWidget).Max;
+    { "inverse" does not work... yet?
+    if not (jProgressBar(FAndroidWidget).Style
+            in [cjProgressBarStyleInverse, cjProgressBarStyleLargeInverse])
+    then}
+      r.Right := x;
+    {else begin
+      r.Right := Self.Width;
+      r.Left := Self.Width - x;
+    end};
+    FillRect(r);
+    Brush.Color := RGBToColor($ff,$ff,$00);
+    Ellipse(Rect(x, 6, x+12 , 18));
+  end;
+end;
+
+procedure TDraftSeekBar.UpdateLayout;
+begin
+  with jSeekBar(FAndroidWidget) do
+    if LayoutParamHeight = lpWrapContent then
+      FnewH := 23;
+  inherited UpdateLayout;
+end;
+
 { TDraftListView }
 
 constructor TDraftListView.Create(AWidget: TAndroidWidget; Canvas: TCanvas);
@@ -2155,6 +2228,8 @@ initialization
 
   // DraftClasses registeration:
   RegisterAndroidWidgetDraftClass(jProgressBar, TDraftProgressBar);
+  RegisterAndroidWidgetDraftClass(jSeekBar, TDraftSeekBar);
+
   RegisterAndroidWidgetDraftClass(jButton, TDraftButton);
   RegisterAndroidWidgetDraftClass(jCheckBox, TDraftCheckBox);
   RegisterAndroidWidgetDraftClass(jRadioButton, TDraftRadioButton);
