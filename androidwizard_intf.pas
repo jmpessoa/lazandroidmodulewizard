@@ -475,14 +475,20 @@ begin
     strList:= TStringList.Create;
     frm.LoadSettings(SettingsFilename);
 
-    frm.ComboSelectProjectName.Text:= 'GUIProject1';
+    frm.ComboSelectProjectName.Text:= 'LamwGUIProject1';
     //frm.LabelModuleType.Caption:= 'Project Type: [Lamw GUI]';
+    frm.LabelTheme.Caption:= 'Android Theme:';
+    frm.ComboBoxTheme.Visible:= True;
+    frm.SpeedButtonHintTheme.Visible:= True;
 
     if projectType = 1 then //No GUI
     begin
       frm.Color:= clWhite;
-      frm.ComboSelectProjectName.Text:= 'NoGUIProject1';
+      frm.ComboSelectProjectName.Text:= 'LamwNoGUIProject1';
       //frm.LabelModuleType.Caption:= 'Project Type: [Lamw NoGUI]';
+      frm.LabelTheme.Caption:= 'Lamw NoGUI Project';
+      frm.ComboBoxTheme.Visible:= False;
+      frm.SpeedButtonHintTheme.Visible:= False;
     end;
 
     frm.ModuleType:= projectType;  //<-- input to form

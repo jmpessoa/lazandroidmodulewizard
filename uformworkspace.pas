@@ -26,7 +26,7 @@ type
     GroupBox3: TGroupBox;
     GroupBox4: TGroupBox;
     Image1: TImage;
-    Label1: TLabel;
+    LabelTheme: TLabel;
     LabelPathToWorkspace: TLabel;
     LabelSelectProjectName: TLabel;
     ListBoxMinSDK: TListBox;
@@ -43,7 +43,7 @@ type
     SpdBtnPathToWorkspace: TSpeedButton;
     SpdBtnRefreshProjectName: TSpeedButton;
     SpeedButton1: TSpeedButton;
-    SpeedButton2: TSpeedButton;
+    SpeedButtonHintTheme: TSpeedButton;
     StatusBarInfo: TStatusBar;
 
     procedure CheckBox1Click(Sender: TObject);
@@ -66,7 +66,7 @@ type
     procedure SpdBtnPathToWorkspaceClick(Sender: TObject);
     procedure SpdBtnRefreshProjectNameClick(Sender: TObject);
     procedure SpeedButton1Click(Sender: TObject);
-    procedure SpeedButton2Click(Sender: TObject);
+    procedure SpeedButtonHintThemeClick(Sender: TObject);
 
   private
     { private declarations }
@@ -755,12 +755,18 @@ begin
   ShowMessage('Lamw: Lazarus Android Module Wizard' +#10#13+ '[ver. 0.6 - rev. 36 - 03 August 2015]');
 end;
 
-procedure TFormWorkspace.SpeedButton2Click(Sender: TObject);
+procedure TFormWorkspace.SpeedButtonHintThemeClick(Sender: TObject);
 begin
   ShowMessage('Warning:'+
                #10#13+'"Holo Theme" need TargetSdkApi >= 11'+
                #10#13+'"Holo Theme + ActionBar" need TargetSdkApi >= 14'+
-               #10#13+'"Material Theme" need TargetSdkApi >= 21');
+               #10#13+'"Material Theme" need TargetSdkApi >= 21'+
+               #10#13+' ' +
+               #10#13+'Old Projects [target >= 11]:'+
+               #10#13+'Go to ..\res\values-vXX'+
+               #10#13+'and modifier "styles.xml" [parent attribute]'+
+               #10#13+'Example:'+
+               #10#13+'<style name="AppBaseTheme" parent="android:Theme.Holo.Light">');
 end;
 
 procedure TFormWorkspace.LoadSettings(const pFilename: string);  //called by
