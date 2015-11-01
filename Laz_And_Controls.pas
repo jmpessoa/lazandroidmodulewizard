@@ -513,7 +513,11 @@ type
     constructor Create(AOwner: TComponent); override;
     Destructor Destroy; override;
     procedure Init(refApp: jApp)  override;
-    Procedure Show;
+
+    Procedure Show;   overload;
+    Procedure Show(titleText: string; msgText: string; yesText: string; noText: string); overload;
+    Procedure Show(titleText: string; msgText: string); overload;
+
     property Parent   : jForm     read FParent   write FParent;
   published
     property Title: string read FTitle write FTitle;
@@ -7432,6 +7436,19 @@ begin
   if FInitialized then
      jDialogYN_Show(FjEnv, FjObject );
 end;
+
+Procedure jDialogYN.Show(titleText: string; msgText: string; yesText: string; noText: string);
+begin
+  if FInitialized then
+     jDialogYN_Show(FjEnv, FjObject, titleText, msgText, yesText, noText);
+end;
+
+Procedure jDialogYN.Show(titleText: string; msgText: string);
+begin
+  if FInitialized then
+     jDialogYN_Show(FjEnv, FjObject, titleText, msgText);
+end;
+
 
 // Event : Java -> Pascal
 Procedure jDialogYN.GenEvent_OnClick(Obj: TObject; Value: integer);

@@ -808,7 +808,9 @@ Function  jDialogYN_Create             (env:PJNIEnv; this:jobject; SelfObj : TOb
                                         title,msg,y,n : string ): jObject;
 Procedure jDialogYN_Free               (env:PJNIEnv; DialogYN: jObject);
 
-Procedure jDialogYN_Show               (env:PJNIEnv; DialogYN: jObject);
+Procedure jDialogYN_Show               (env:PJNIEnv; DialogYN: jObject);  overload;
+Procedure jDialogYN_Show(env:PJNIEnv; DialogYN: jObject; titleText: string; msgText: string; yesText: string; noText:string);  overload;
+Procedure jDialogYN_Show(env:PJNIEnv; DialogYN: jObject; titleText: string; msgText: string); overload;
 
 // Dialog Progress
 Function  jDialogProgress_Create       (env:PJNIEnv; this:jobject; SelfObj : TObject;
@@ -6228,6 +6230,49 @@ begin
  cls:= env^.GetObjectClass(env, DialogYN);
  _jMethod:= env^.GetMethodID(env, cls, 'show', '()V');
  env^.CallVoidMethodA(env,DialogYN,_jMethod,@_jParam);
+ env^.DeleteLocalRef(env, cls);
+end;
+
+Procedure jDialogYN_Show(env:PJNIEnv; DialogYN: jObject; titleText: string; msgText: string; yesText: string; noText:string);
+var
+ _jMethod: jMethodID = nil;
+ _jParams:  Array[0..3] of jValue;
+ cls: jClass;
+begin
+ _jParams[0].l := env^.NewStringUTF(env, pchar(titleText) );
+ _jParams[1].l := env^.NewStringUTF(env, pchar(msgText) );
+ _jParams[2].l := env^.NewStringUTF(env, pchar(yesText) );
+ _jParams[3].l := env^.NewStringUTF(env, pchar(noText) );
+
+ cls:= env^.GetObjectClass(env, DialogYN);
+ _jMethod:= env^.GetMethodID(env, cls, 'show', '(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V');
+ env^.CallVoidMethodA(env,DialogYN,_jMethod,@_jParams);
+
+ env^.DeleteLocalRef(env,_jParams[0].l);
+ env^.DeleteLocalRef(env,_jParams[1].l);
+ env^.DeleteLocalRef(env,_jParams[2].l);
+ env^.DeleteLocalRef(env,_jParams[3].l);
+
+ env^.DeleteLocalRef(env, cls);
+end;
+
+
+Procedure jDialogYN_Show(env:PJNIEnv; DialogYN: jObject; titleText: string; msgText: string);
+var
+ _jMethod: jMethodID = nil;
+ _jParams:  Array[0..1] of jValue;
+ cls: jClass;
+begin
+ _jParams[0].l := env^.NewStringUTF(env, pchar(titleText) );
+ _jParams[1].l := env^.NewStringUTF(env, pchar(msgText) );
+
+ cls:= env^.GetObjectClass(env, DialogYN);
+ _jMethod:= env^.GetMethodID(env, cls, 'show', '(Ljava/lang/String;Ljava/lang/String;)V');
+ env^.CallVoidMethodA(env,DialogYN,_jMethod,@_jParams);
+
+ env^.DeleteLocalRef(env,_jParams[0].l);
+ env^.DeleteLocalRef(env,_jParams[1].l);
+
  env^.DeleteLocalRef(env, cls);
 end;
 

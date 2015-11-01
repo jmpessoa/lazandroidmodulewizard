@@ -1,6 +1,6 @@
 package com.example.dummyapp;
 
-//Lamw: Lazarus Android Module Wizard  - version 0.6 - revision 36.2 - 07 October- 2015 
+//Lamw: Lazarus Android Module Wizard  - version 0.6 - revision 36.3 - 01 November - 2015 
 //Form Designer and Components development model!
 //
 //https://github.com/jmpessoa/lazandroidmodulewizard
@@ -5127,6 +5127,9 @@ onClickListener = new DialogInterface.OnClickListener() {
   };
 };
 // Init Class
+if (dlgY.equals("")) dlgY ="Yes";
+if (dlgN.equals("")) dlgN ="No";
+
 AlertDialog.Builder builder = new AlertDialog.Builder(controls.activity);
 builder.setMessage       (dlgMsg  )
        .setCancelable    (false)
@@ -5144,11 +5147,52 @@ public  void show() {
    dialog.show();
 }
 
+public  void show(String titleText, String msgText, String yesText, String noText) {
+	   //Log.i("java","DlgYN_Show");
+	dlgTitle = titleText;
+	dlgMsg   = msgText;
+	dlgY     = yesText;
+	dlgN     = noText;
+
+	if (dlgY.equals("")) dlgY ="Yes";
+	if (dlgN.equals("")) dlgN ="No";
+	
+	AlertDialog.Builder builder = new AlertDialog.Builder(controls.activity);
+	builder.setMessage       (dlgMsg  )
+	       .setCancelable    (false)
+	       .setPositiveButton(dlgY,onClickListener)
+	       .setNegativeButton(dlgN,onClickListener);
+	dialog = builder.create();
+	//
+	dialog.setTitle(dlgTitle);
+
+	dialog.show();
+}
+
+public void show(String titleText, String msgText) {
+	   //Log.i("java","DlgYN_Show");
+	dlgTitle = titleText;
+	dlgMsg   = msgText;
+
+	if (dlgY.equals("")) dlgY ="Yes";
+	if (dlgN.equals("")) dlgN ="No";
+	
+	AlertDialog.Builder builder = new AlertDialog.Builder(controls.activity);
+	builder.setMessage       (dlgMsg  )
+	       .setCancelable    (false)
+	       .setPositiveButton(dlgY,onClickListener)
+	       .setNegativeButton(dlgN,onClickListener);
+	dialog = builder.create();
+	//
+	dialog.setTitle(dlgTitle);
+	dialog.show();
+}
+
 public  void Free() {
-onClickListener = null;
-dialog.setTitle("");
-dialog.setIcon(null);
-dialog = null;
+  onClickListener = null;
+  dialog.setTitle("");
+  dialog.setIcon(null);
+  dialog = null;
 }
 }
 
@@ -16242,13 +16286,21 @@ public native void pOnSeekBarStopTrackingTouch(long pasobj, int progress);
 
 //Load Pascal Library
 static {
-    //Log.i("JNI_Java", "1.load libcontrols.so");
+    //Log.i("JNI_Load_LibControls", "1. try load libcontrols.so");
 
-    //System.loadLibrary("freetype"); // need by TFPNoGUIGraphicsBridge [ref. www.github.com/jmpessoa/tfpnoguigraphicsbridge]
+    try {
+    	System.loadLibrary("freetype"); // need by TFPNoGUIGraphicsBridge [ref. www.github.com/jmpessoa/tfpnoguigraphicsbridge]
+    } catch (UnsatisfiedLinkError e) {
+         Log.e("JNI_Load_LibFreetype", "exception", e);
+    }
 
-    System.loadLibrary("controls");
+    try {
+    	System.loadLibrary("controls");
+    } catch (UnsatisfiedLinkError e) {
+         Log.e("JNI_Load_LibControls", "exception", e);
+    }
 
-    //Log.i("JNI_Java", "2.load libcontrols.so");  
+    //Log.i("JNI_Load_LibControls", "2.load libcontrols.so OK!");  
 }
 
 // -------------------------------------------------------------------------
