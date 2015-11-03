@@ -1,6 +1,6 @@
 package com.example.dummyapp;
 
-//Lamw: Lazarus Android Module Wizard  - version 0.6 - revision 36.3 - 01 November - 2015 
+//Lamw: Lazarus Android Module Wizard  - version 0.6 - revision 36.4 - 02 November - 2015 
 //Form Designer and Components development model!
 //
 //https://github.com/jmpessoa/lazandroidmodulewizard
@@ -16288,12 +16288,14 @@ public native void pOnSeekBarStopTrackingTouch(long pasobj, int progress);
 static {
     //Log.i("JNI_Load_LibControls", "1. try load libcontrols.so");
 
+	/*
     try {
     	System.loadLibrary("freetype"); // need by TFPNoGUIGraphicsBridge [ref. www.github.com/jmpessoa/tfpnoguigraphicsbridge]
     } catch (UnsatisfiedLinkError e) {
          Log.e("JNI_Load_LibFreetype", "exception", e);
     }
-
+    */
+	
     try {
     	System.loadLibrary("controls");
     } catch (UnsatisfiedLinkError e) {

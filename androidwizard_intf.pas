@@ -323,7 +323,7 @@ begin
         auxList.Add('#proguard.config=${sdk.dir}/tools/proguard/proguard-android.txt:proguard-project.txt');
         auxList.Add(' ');
         auxList.Add('# Project target.');
-        auxList.Add('target='+FAndroidPlatform);
+        auxList.Add('target='+FTargetApi);
         auxList.SaveToFile(FAndroidProjectName+DirectorySeparator+'project.properties');
 
         auxList.Free;
