@@ -8,7 +8,7 @@ interface
 uses
   Classes, SysUtils, And_jni, And_jni_Bridge, Laz_And_Controls,
   Laz_And_Controls_Events, AndroidWidget, FPNoGUIGraphicsBridge, ViewPort,
-  GridData, FPColorBridge, GeometryUtilsBridge;
+  FPColorBridge, GeometryUtilsBridge;
 
 type
 
@@ -16,7 +16,6 @@ type
 
   TAndroidModule1 = class(jForm)
     FPNoGUIGraphicsBridge1: TFPNoGUIGraphicsBridge;
-    GridData1: TGridData;
     jBitmap1: jBitmap;
     jButton1: jButton;
     jImageView1: jImageView;

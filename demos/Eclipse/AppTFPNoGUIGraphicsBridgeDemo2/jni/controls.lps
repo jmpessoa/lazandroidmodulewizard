@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CONFIG>
+  <ProjectSession>
+    <PathDelim Value="\"/>
+    <Version Value="9"/>
+    <BuildModes Active="Default"/>
+    <Units Count="4">
+      <Unit0>
+        <Filename Value="controls.lpr"/>
+        <IsPartOfProject Value="True"/>
+        <EditorIndex Value="1"/>
+        <TopLine Value="1449"/>
+        <CursorPos X="19" Y="1457"/>
+        <UsageCount Value="26"/>
+        <Loaded Value="True"/>
+        <DefaultSyntaxHighlighter Value="Delphi"/>
+      </Unit0>
+      <Unit1>
+        <Filename Value="unit1.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="AndroidModule1"/>
+        <HasResources Value="True"/>
+        <IsVisibleTab Value="True"/>
+        <TopLine Value="79"/>
+        <CursorPos X="11" Y="87"/>
+        <UsageCount Value="26"/>
+        <Loaded Value="True"/>
+        <LoadedDesigner Value="True"/>
+        <DefaultSyntaxHighlighter Value="Delphi"/>
+      </Unit1>
+      <Unit2>
+        <Filename Value="C:\laz4android\components\NoGuiGraphicsBridge\fpnoguigraphicsbridge.pas"/>
+        <UnitName Value="FPNoGUIGraphicsBridge"/>
+        <EditorIndex Value="-1"/>
+        <CursorPos X="40" Y="7"/>
+        <UsageCount Value="10"/>
+      </Unit2>
+      <Unit3>
+        <Filename Value="C:\laz4android\components\NoGuiGraphicsBridge\fpcolorbridge.pas"/>
+        <UnitName Value="FPColorBridge"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="56"/>
+        <CursorPos X="55" Y="65"/>
+        <UsageCount Value="10"/>
+      </Unit3>
+    </Units>
+    <JumpHistory Count="10" HistoryIndex="9">
+      <Position1>
+        <Filename Value="unit1.pas"/>
+        <Caret Line="6" Column="24"/>
+      </Position1>
+      <Position2>
+        <Filename Value="controls.lpr"/>
+      </Position2>
+      <Position3>
+        <Filename Value="controls.lpr"/>
+        <Caret Line="1457" Column="8" TopLine="1449"/>
+      </Position3>
+      <Position4>
+        <Filename Value="unit1.pas"/>
+        <Caret Line="15" Column="40"/>
+      </Position4>
+      <Position5>
+        <Filename Value="unit1.pas"/>
+        <Caret Line="9" Column="40"/>
+      </Position5>
+      <Position6>
+        <Filename Value="unit1.pas"/>
+        <Caret Line="32" Column="35" TopLine="19"/>
+      </Position6>
+      <Position7>
+        <Filename Value="unit1.pas"/>
+        <Caret Line="39" Column="9" TopLine="39"/>
+      </Position7>
+      <Position8>
+        <Filename Value="unit1.pas"/>
+        <Caret Line="118" TopLine="115"/>
+      </Position8>
+      <Position9>
+        <Filename Value="unit1.pas"/>
+        <Caret Line="111" Column="29" TopLine="100"/>
+      </Position9>
+      <Position10>
+        <Filename Value="unit1.pas"/>
+        <Caret Line="106" Column="19" TopLine="101"/>
+      </Position10>
+    </JumpHistory>
+  </ProjectSession>
+</CONFIG>

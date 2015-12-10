@@ -1879,6 +1879,9 @@ var
 begin
   sttList:= TStringList.Create;
   sttList.Add('{$R *.lfm}');
+
+  sttList.Add(' ');
+
   Result:= sttList.Text;
   sttList.Free;
 end;

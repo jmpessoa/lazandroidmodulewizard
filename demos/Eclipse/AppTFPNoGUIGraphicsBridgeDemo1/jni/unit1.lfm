@@ -13,7 +13,7 @@ object AndroidModule1: TAndroidModule1
   object jPanel1: jPanel
     Left = 4
     Top = 4
-    Width = 292
+    Width = 288
     Height = 186
     MarginLeft = 4
     MarginTop = 4
@@ -29,9 +29,9 @@ object AndroidModule1: TAndroidModule1
     MaxPinchZoomFactor = 4
     Id = 8023441
     object jButton1: jButton
-      Left = 2
+      Left = 3
       Top = 73
-      Width = 288
+      Width = 281
       Height = 40
       MarginLeft = 2
       MarginTop = 4
@@ -51,7 +51,7 @@ object AndroidModule1: TAndroidModule1
       Id = 0
     end
     object jTextView1: jTextView
-      Left = 38
+      Left = 36
       Top = 5
       Width = 215
       Height = 20
@@ -78,7 +78,7 @@ object AndroidModule1: TAndroidModule1
   object jPanel2: jPanel
     Left = 4
     Top = 198
-    Width = 292
+    Width = 288
     Height = 286
     MarginLeft = 4
     MarginTop = 4

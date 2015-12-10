@@ -705,6 +705,7 @@ type
 
     procedure IncFormsIndex;
     procedure DecFormsIndex;
+
     //properties
     property Initialized : boolean read FInitialized;
     property Form: jForm read FForm write FForm; // Main Form
@@ -1015,6 +1016,8 @@ type
     procedure CopyFromAssetsToInternalAppStorage(_filename: string);
     procedure CopyFromInternalAppStorageToEnvironmentDir(_filename: string; _environmentDirPath: string);
     procedure CopyFromAssetsToEnvironmentDir(_filename: string; _environmentDirPath: string);
+
+    function DumpExceptionCallStack(E: Exception): string; //Thanks to Euller and Oswaldo
 
     // Property
     property View         : jObject        read FjRLayout; //layout!
@@ -1385,6 +1388,7 @@ Function  jSysInfo_DeviceID            (env:PJNIEnv;this:jobject) : String;
   Procedure jClassMethod(FuncName, FuncSig : PChar;
                        env : PJNIEnv; var Class_ : jClass; var Method_ :jMethodID);
   function Get_gjClass(env: PJNIEnv): jClass; //by jmpessoa
+
 //-----
 // Helper Function
 Function  xy  (x, y: integer): TXY;
@@ -2877,6 +2881,20 @@ begin
   //in designing component state: set value here...
   if FInitialized then
      jForm_CopyFromAssetsToEnvironmentDir(FjEnv, FjObject, _filename ,_environmentDirPath);
+end;
+
+function jForm.DumpExceptionCallStack(E: Exception): string; //by Euller and Oswaldo
+var
+  i: integer;
+begin
+  Result := 'Error: Pascal "libcontrols.so" exception!'+ LineEnding + LineEnding;
+  if E <> nil then
+  begin
+    Result := Result + 'Exception class: ' + E.ClassName + LineEnding + 'Message: ' + E.Message + LineEnding;
+  end;
+  Result := Result + 'Address: '+BackTraceStrFunc(ExceptAddr);
+  for i:= 0 to ExceptFrameCount - 1 do
+    Result := Result + LineEnding + BackTraceStrFunc(ExceptFrames[i]);
 end;
 
 {-------- jForm_JNI_Bridge ----------}
