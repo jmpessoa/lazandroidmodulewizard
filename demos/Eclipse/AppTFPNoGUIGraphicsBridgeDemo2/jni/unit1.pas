@@ -120,6 +120,19 @@ begin
   ViewPort1.PenColor:= colbrBlue;
   FPNoGUIGraphicsBridge1.DrawEntities('blue');
 
+     //or simply
+   ViewPort1.PenColor:= colbrGreen;
+   FPNoGUIGraphicsBridge1.DrawPath([ToRealPoint(3,3), ToRealPoint(4,4), ToRealPoint(5,5),ToRealPoint(6,6), ToRealPoint(7,7), ToRealPoint(8,8)]);
+   FPNoGUIGraphicsBridge1.DrawFillCircle([ToRealPoint(3,3){center},ToRealPoint(3+0.1,3) {rX}]);
+   FPNoGUIGraphicsBridge1.DrawFillCircle([ToRealPoint(4,4){center},ToRealPoint(4+0.1,4) {rX}]);
+   FPNoGUIGraphicsBridge1.DrawFillCircle([ToRealPoint(5,5){center},ToRealPoint(5+0.1,5) {rX}]);
+   FPNoGUIGraphicsBridge1.DrawFillCircle([ToRealPoint(6,6){center},ToRealPoint(6+0.1,6) {rX}]);
+   FPNoGUIGraphicsBridge1.DrawFillCircle([ToRealPoint(7,7){center},ToRealPoint(7+0.1,7) {rX}]);
+   FPNoGUIGraphicsBridge1.DrawFillCircle([ToRealPoint(8,8){center},ToRealPoint(8+0.1,8) {rX}]);
+   FPNoGUIGraphicsBridge1.DrawFillRectangle([ToRealPoint(9.5,8.0),ToRealPoint(10,7)]); {left-top, right-bottom}
+   FPNoGUIGraphicsBridge1.TextOut(ToRealPoint(10.2,7), 'Mar', 22, colbrGreen);
+
+
   jGraphicsBuffer:= jBitmap1.GetByteBuffer(w,h);
 
   PGlobalDirectImagePixel:= jBitmap1.GetDirectBufferAddress(jGraphicsBuffer);

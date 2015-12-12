@@ -6,6 +6,7 @@ TFPNoGuiGraphicsBridge
 	A program, for example, running on a webserver without X11 could benefit from 
 	not having a visual library as a dependency." ref. http://wiki.freepascal.org/Developing_with_Graphics
 
+
 version: 0.1 - 18 April - 2015
 
 Author:
@@ -15,6 +16,10 @@ Author:
 	jmpessoa_hotmail.com
 
 	ref. https://github.com/jmpessoa/tfpnoguigraphicsbridge
+
+	warning: Need Package:
+		"tfpdxfwritebridge_pack.lpk 
+                 ref. https://github.com/jmpessoa/tfpdxfwritebridge
 
 
 Hint: TFPNoGuiGraphicsBridge on Android [Lamw/Lazarus Android Module Wizard project!]
