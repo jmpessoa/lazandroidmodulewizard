@@ -7,8 +7,7 @@ interface
 
 uses
   Classes, SysUtils, And_jni, And_jni_Bridge, Laz_And_Controls,
-  Laz_And_Controls_Events, AndroidWidget, FPNoGUIGraphicsBridge, ViewPort,
-  FPColorBridge, GeometryUtilsBridge;
+  Laz_And_Controls_Events, AndroidWidget, FPNoGUIGraphicsBridge, ViewPort;
 
 type
 
@@ -39,6 +38,9 @@ implementation
 
 {$R *.lfm}
 
+uses
+  FPColorBridge, GeometryUtilsBridge;
+
 { TAndroidModule1 }
 
 function GenericFunction1(x: real): real;
@@ -66,11 +68,13 @@ begin
 
   FPNoGUIGraphicsBridge1.SetSurfaceSize(w,h);
   FPNoGUIGraphicsBridge1.PathToFontFile:= '/system/fonts/Roboto-Regular.ttf'; //DroidSerif-Bold.ttf
-  FPNoGUIGraphicsBridge1.ActiveViewPort:= ViewPort1; //set in Object inspector!
+  //FPNoGUIGraphicsBridge1.ActiveViewPort:= ViewPort1; //set in Object inspector!
 
   ViewPort1.SetSize(w,h);
+
   ViewPort1.DrawAxis:= True;
   ViewPort1.DrawGrid:= True;
+
   ViewPort1.SetScaleXY(-1.6 {xmin},1.6{xmax}, -2.0{ymin}, 6.0{ymax}); //real world!!
 
   FPNoGUIGraphicsBridge1.AddEntity('blue_layer','Circle',[Point(0.0,1.0){center},

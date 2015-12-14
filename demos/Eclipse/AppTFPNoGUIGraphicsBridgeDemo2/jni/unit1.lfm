@@ -148,7 +148,7 @@ object AndroidModule1: TAndroidModule1
     Height = 100
     MarginLeft = 60
     MarginTop = 60
-    MarginRight = 80
+    MarginRight = 120
     MarginBottom = 60
     Cliping = False
     GridData.XTitle = ' [ H ]'
@@ -156,7 +156,7 @@ object AndroidModule1: TAndroidModule1
     GridData.AxisColor = colbrLime
     GridData.Color = colbrLightSteelBlue
     GridData.BackgroundColor = colbrGreenYellow
-    GridData.XInterval = 15
+    GridData.XInterval = 14
     GridData.YInterval = 10
     GridData.XLegendInterval = 2
     GridData.YLegendInterval = 1

@@ -35,7 +35,7 @@ PANIC I: Compiling ... [please, read lazarus or/as laz4android and ...\fpc\2.7.1
 
 		to folder "...\tfpnoguigraphicsbridge" package folder and build AGAIN your project!
 
-		Yes, now you got ftfont.ppu, ftfont.o, freetype.ppu etc... to "arm-android" [\lib] !
+		Yes, now you got ftfont.ppu, ftfont.o, freetype.ppu etc... to "arm-android" !
 
 	2. Copy THEM to folder  "...\lazarus\fpc\2.7.1\units\arm-android\fcl-image"
 		So, others [future] projects will find its there!  [solved to "arm-android" !!!]

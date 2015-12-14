@@ -53,7 +53,7 @@ begin
   ViewPort1.Height:= h;
   ViewPort1.Width:= w;
 
-  ViewPort1.SetScaleXY(0 {minx}, 15 {maxx}, -5 {miny}, 15 {maxy});
+  ViewPort1.SetScaleXY(0 {minx}, 14 {maxx}, -5 {miny}, 15 {maxy});
 
   FPNoGUIGraphicsBridge1.SetSurfaceSize(w,h);
   FPNoGUIGraphicsBridge1.PathToFontFile:= '/system/fonts/Roboto-Regular.ttf'; //or DroidSerif-Bold.ttf
@@ -62,76 +62,73 @@ begin
   FPNoGUIGraphicsBridge1.PaintViewPort;
   FPNoGUIGraphicsBridge1.PaintGrid(True);
 
-  FPNoGUIGraphicsBridge1.AddEntity('red','Line',[ToRealPoint(4,10),ToRealPoint(5,11) ],'','');
-  FPNoGUIGraphicsBridge1.AddEntity('red','Circle',[ToRealPoint(4,10),ToRealPoint(4+0.1,10) ],'','');
-
-  FPNoGUIGraphicsBridge1.AddEntity('red','Line',[ToRealPoint(5,11),ToRealPoint(6,11) ],'','');
-  FPNoGUIGraphicsBridge1.AddEntity('red','Circle',[ToRealPoint(5,11),ToRealPoint(5+0.1,11) ],'','');
-
-  FPNoGUIGraphicsBridge1.AddEntity('red','Line',[ToRealPoint(6,11),ToRealPoint(7,12) ],'','');
-  FPNoGUIGraphicsBridge1.AddEntity('red','Circle',[ToRealPoint(6,11),ToRealPoint(6+0.1,11) ],'','');
-
-  FPNoGUIGraphicsBridge1.AddEntity('red','Line',[ToRealPoint(7,12),ToRealPoint(8,12) ],'','');
-  FPNoGUIGraphicsBridge1.AddEntity('red','Circle',[ToRealPoint(7,12),ToRealPoint(7+0.1,12) ],'','');
-
-  FPNoGUIGraphicsBridge1.AddEntity('red','Line',[ToRealPoint(8,12),ToRealPoint(10,13) ],'','');
-  FPNoGUIGraphicsBridge1.AddEntity('red','Circle',[ToRealPoint(8,12),ToRealPoint(8+0.1,12) ],'','');
-
-  FPNoGUIGraphicsBridge1.AddEntity('red','Line',[ToRealPoint(10,13),ToRealPoint(11,14) ],'','');
-  FPNoGUIGraphicsBridge1.AddEntity('red','Circle',[ToRealPoint(10,13),ToRealPoint(10+0.1,13) ],'','');
-
-  FPNoGUIGraphicsBridge1.AddEntity('red','Line',[ToRealPoint(11,14),ToRealPoint(12,15) ],'','');
-  FPNoGUIGraphicsBridge1.AddEntity('red','Circle',[ToRealPoint(11,14),ToRealPoint(11+0.1,14) ],'','');
-  FPNoGUIGraphicsBridge1.AddEntity('red','Circle',[ToRealPoint(12,15),ToRealPoint(12+0.1,15) ],'','');
-
-  //legend
-  FPNoGUIGraphicsBridge1.AddEntity('red','Line',[ToRealPoint(14,5),ToRealPoint(15,5) ],'','');
-  FPNoGUIGraphicsBridge1.AddEntity('red','Text',[ToRealPoint(15,5)],'Feb','');
-
-  FPNoGUIGraphicsBridge1.AddEntity('blue','Line',[ToRealPoint(4,-5),ToRealPoint(5,0) ],'','');
-  FPNoGUIGraphicsBridge1.AddEntity('blue','Circle',[ToRealPoint(4,-5),ToRealPoint(4+0.1,-5) ],'','');
-
-  FPNoGUIGraphicsBridge1.AddEntity('blue','Line',[ToRealPoint(5,0),ToRealPoint(6,7) ],'','');
-  FPNoGUIGraphicsBridge1.AddEntity('blue','Circle',[ToRealPoint(5,0),ToRealPoint(5+0.1,0) ],'','');
-
-  FPNoGUIGraphicsBridge1.AddEntity('blue','Line',[ToRealPoint(6,7),ToRealPoint(7,10) ],'','');
-  FPNoGUIGraphicsBridge1.AddEntity('blue','Circle',[ToRealPoint(6,7),ToRealPoint(6+0.1,7) ],'','');
-
-  FPNoGUIGraphicsBridge1.AddEntity('blue','Line',[ToRealPoint(7,10),ToRealPoint(8,10) ],'','');
-  FPNoGUIGraphicsBridge1.AddEntity('blue','Circle',[ToRealPoint(7,10),ToRealPoint(7+0.1,10) ],'','');
-
-  FPNoGUIGraphicsBridge1.AddEntity('blue','Line',[ToRealPoint(8,10),ToRealPoint(10,11) ],'','');
-  FPNoGUIGraphicsBridge1.AddEntity('blue','Circle',[ToRealPoint(8,10),ToRealPoint(8+0.1,10) ],'','');
-
-  FPNoGUIGraphicsBridge1.AddEntity('blue','Line',[ToRealPoint(10,11),ToRealPoint(11,12) ],'','');
-  FPNoGUIGraphicsBridge1.AddEntity('blue','Circle',[ToRealPoint(10,11),ToRealPoint(10+0.1,11) ],'','');
-
-  FPNoGUIGraphicsBridge1.AddEntity('blue','Line',[ToRealPoint(11,12),ToRealPoint(12,14) ],'','');
-  FPNoGUIGraphicsBridge1.AddEntity('blue','Circle',[ToRealPoint(11,12),ToRealPoint(11+0.1,12) ],'','');
-  FPNoGUIGraphicsBridge1.AddEntity('blue','Circle',[ToRealPoint(12,14),ToRealPoint(12+0.1,14) ],'','');
-
-  //legend
-  FPNoGUIGraphicsBridge1.AddEntity('blue','Line',[ToRealPoint(14,4),ToRealPoint(15,4) ],'','');
-  FPNoGUIGraphicsBridge1.AddEntity('blue','Text',[ToRealPoint(15,4)],'Jan','');
-
-  //ViewPort1.PenColor:= colbrRed;  //default: design time
-  FPNoGUIGraphicsBridge1.DrawEntities('red');
+  ViewPort1.PenColor:= colbrRed;
+  FPNoGUIGraphicsBridge1.DrawPath([ToRealPoint(4,10),
+                                   ToRealPoint(5,11),
+                                   ToRealPoint(6,11),
+                                   ToRealPoint(7,12),
+                                   ToRealPoint(8,12),
+                                   ToRealPoint(10,13),
+                                   ToRealPoint(11,14),
+                                   ToRealPoint(12,15)]);
+  //circle radius = 0.1
+  FPNoGUIGraphicsBridge1.DrawFillCircle([ToRealPoint(4,10),ToRealPoint(4+0.1,10) ]);
+  FPNoGUIGraphicsBridge1.DrawFillCircle([ToRealPoint(5,11),ToRealPoint(5+0.1,11) ]);
+  FPNoGUIGraphicsBridge1.DrawFillCircle([ToRealPoint(6,11),ToRealPoint(6+0.1,11) ]);
+  FPNoGUIGraphicsBridge1.DrawFillCircle([ToRealPoint(7,12),ToRealPoint(7+0.1,12) ]);
+  FPNoGUIGraphicsBridge1.DrawFillCircle([ToRealPoint(8,12),ToRealPoint(8+0.1,12) ]);
+  FPNoGUIGraphicsBridge1.DrawFillCircle([ToRealPoint(10,13),ToRealPoint(10+0.1,13)]);
+  FPNoGUIGraphicsBridge1.DrawFillCircle([ToRealPoint(11,14),ToRealPoint(11+0.1,14)]);
+  FPNoGUIGraphicsBridge1.DrawFillCircle([ToRealPoint(12,15),ToRealPoint(12+0.1,15)]);
 
   ViewPort1.PenColor:= colbrBlue;
-  FPNoGUIGraphicsBridge1.DrawEntities('blue');
+  FPNoGUIGraphicsBridge1.DrawPath([ToRealPoint(4,-5),
+                                   ToRealPoint(5,0),
+                                   ToRealPoint(6,7),
+                                   ToRealPoint(7,10),
+                                   ToRealPoint(8,10),
+                                   ToRealPoint(10,11),
+                                   ToRealPoint(11,12),
+                                   ToRealPoint(12,14)]);
+  FPNoGUIGraphicsBridge1.DrawFillCircle([ToRealPoint(4,-5),ToRealPoint(4+0.1,-5) ]);
+  FPNoGUIGraphicsBridge1.DrawFillCircle([ToRealPoint(5,0),ToRealPoint(5+0.1,0) ]);
+  FPNoGUIGraphicsBridge1.DrawFillCircle([ToRealPoint(6,7),ToRealPoint(6+0.1,7) ]);
+  FPNoGUIGraphicsBridge1.DrawFillCircle([ToRealPoint(7,10),ToRealPoint(7+0.1,10)]);
+  FPNoGUIGraphicsBridge1.DrawFillCircle([ToRealPoint(8,10),ToRealPoint(8+0.1,10)]);
+  FPNoGUIGraphicsBridge1.DrawFillCircle([ToRealPoint(10,11),ToRealPoint(10+0.1,11)]);
+  FPNoGUIGraphicsBridge1.DrawFillCircle([ToRealPoint(11,12),ToRealPoint(11+0.1,12)]);
+  FPNoGUIGraphicsBridge1.DrawFillCircle([ToRealPoint(12,14),ToRealPoint(12+0.1,14)]);
 
-     //or simply
-   ViewPort1.PenColor:= colbrGreen;
-   FPNoGUIGraphicsBridge1.DrawPath([ToRealPoint(3,3), ToRealPoint(4,4), ToRealPoint(5,5),ToRealPoint(6,6), ToRealPoint(7,7), ToRealPoint(8,8)]);
-   FPNoGUIGraphicsBridge1.DrawFillCircle([ToRealPoint(3,3){center},ToRealPoint(3+0.1,3) {rX}]);
-   FPNoGUIGraphicsBridge1.DrawFillCircle([ToRealPoint(4,4){center},ToRealPoint(4+0.1,4) {rX}]);
-   FPNoGUIGraphicsBridge1.DrawFillCircle([ToRealPoint(5,5){center},ToRealPoint(5+0.1,5) {rX}]);
-   FPNoGUIGraphicsBridge1.DrawFillCircle([ToRealPoint(6,6){center},ToRealPoint(6+0.1,6) {rX}]);
-   FPNoGUIGraphicsBridge1.DrawFillCircle([ToRealPoint(7,7){center},ToRealPoint(7+0.1,7) {rX}]);
-   FPNoGUIGraphicsBridge1.DrawFillCircle([ToRealPoint(8,8){center},ToRealPoint(8+0.1,8) {rX}]);
-   FPNoGUIGraphicsBridge1.DrawFillRectangle([ToRealPoint(9.5,8.0),ToRealPoint(10,7)]); {left-top, right-bottom}
-   FPNoGUIGraphicsBridge1.TextOut(ToRealPoint(10.2,7), 'Mar', 22, colbrGreen);
+  ViewPort1.PenColor:= colbrIndigo;
+  FPNoGUIGraphicsBridge1.DrawPath([ToRealPoint(4,0),
+                                   ToRealPoint(5,6),
+                                   ToRealPoint(6,9),
+                                   ToRealPoint(7,11),
+                                   ToRealPoint(8,11),
+                                   ToRealPoint(10,12),
+                                   ToRealPoint(11,13),
+                                   ToRealPoint(12,13)]);
+  FPNoGUIGraphicsBridge1.DrawFillCircle([ToRealPoint(4,0){center},ToRealPoint(4+0.1,0) {rX}]);
+  FPNoGUIGraphicsBridge1.DrawFillCircle([ToRealPoint(5,6){center},ToRealPoint(5+0.1,6) {rX}]);
+  FPNoGUIGraphicsBridge1.DrawFillCircle([ToRealPoint(6,9){center},ToRealPoint(6+0.1,9) {rX}]);
+  FPNoGUIGraphicsBridge1.DrawFillCircle([ToRealPoint(7,11){center},ToRealPoint(7+0.1,11) {rX}]);
+  FPNoGUIGraphicsBridge1.DrawFillCircle([ToRealPoint(8,11){center},ToRealPoint(8+0.1,11) {rX}]);
+  FPNoGUIGraphicsBridge1.DrawFillCircle([ToRealPoint(10,12){center},ToRealPoint(10+0.1,12) {rX}]);
+  FPNoGUIGraphicsBridge1.DrawFillCircle([ToRealPoint(11,13){center},ToRealPoint(11+0.1,13) {rX}]);
+  FPNoGUIGraphicsBridge1.DrawFillCircle([ToRealPoint(12,13){center},ToRealPoint(12+0.1,13) {rX}]);
 
+  //legends
+  ViewPort1.PenColor:= colbrRed;
+  FPNoGUIGraphicsBridge1.DrawFillRectangle([ToRealPoint(14,9),ToRealPoint(14.5,8)]); {left-top, right-bottom}
+  FPNoGUIGraphicsBridge1.TextOut(ToRealPoint(14.7,8), 'Jan', 18, colbrRed);
+
+  ViewPort1.PenColor:= colbrBlue;
+  FPNoGUIGraphicsBridge1.DrawFillRectangle([ToRealPoint(14,7),ToRealPoint(14.5,6)]); {left-top, right-bottom}
+  FPNoGUIGraphicsBridge1.TextOut(ToRealPoint(14.7,6), 'Fev', 18, colbrBlue);
+
+  ViewPort1.PenColor:= colbrIndigo;
+  FPNoGUIGraphicsBridge1.DrawFillRectangle([ToRealPoint(14,5),ToRealPoint(14.5,4)]); {left-top, right-bottom}
+  FPNoGUIGraphicsBridge1.TextOut(ToRealPoint(14.7,4), 'Mar', 18, colbrIndigo);
 
   jGraphicsBuffer:= jBitmap1.GetByteBuffer(w,h);
 
