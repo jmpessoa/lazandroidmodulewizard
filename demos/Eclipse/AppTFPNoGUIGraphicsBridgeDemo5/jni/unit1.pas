@@ -1,4 +1,4 @@
-{Hint: save all files to location: C:\adt32\eclipse\workspace\AppTFPNoGUIGraphicsBridgeDemo2\jni }
+{Hint: save all files to location: C:\adt32\eclipse\workspace\AppTFPNoGUIGraphicsBridgeDemo5\jni }
 unit unit1;
 
 {$mode delphi}
@@ -22,6 +22,7 @@ type
     jPanel2: jPanel;
     jTextView1: jTextView;
     ViewPort1: TViewPort;
+    ViewPort2: TViewPort;
     procedure jButton1Click(Sender: TObject);
   private
     {private declarations}
@@ -38,11 +39,10 @@ implementation
 {$R *.lfm}
 
 uses
-  FPColorBridge, GeometryUtilsBridge;
+  GeometryUtilsBridge, fpcolorbridge;
 
 { TAndroidModule1 }
 
-//[Xinyiman's suggestion. Thank you!]
 procedure TAndroidModule1.jButton1Click(Sender: TObject);
 var
   jGraphicsBuffer: jObject;
@@ -51,47 +51,48 @@ begin
   w:= jPanel2.Width;
   h:= jPanel2.Height;
 
-  ViewPort1.Height:= h;
+  ViewPort1.Height:= Trunc(h/2);
   ViewPort1.Width:= w;
+  ViewPort1.SetScaleXY(0 {minx}, 23 {maxx}, 0 {miny}, 100 {maxy});
 
-  ViewPort1.SetScaleXY(0 {minx}, 14 {maxx}, -5 {miny}, 15 {maxy});
+  ViewPort2.YTop:= Trunc(h/2);
+  ViewPort2.Height:= Trunc(h/2);
+  ViewPort2.Width:= w;
+  ViewPort2.SetScaleXY(0 {minx}, 2.5*6 {maxx = range*6}, 0 {miny}, 100 {maxy});
 
   FPNoGUIGraphicsBridge1.SetSurfaceSize(w,h);
   FPNoGUIGraphicsBridge1.PathToFontFile:= '/system/fonts/Roboto-Regular.ttf'; //or DroidSerif-Bold.ttf
 
-  //FPNoGUIGraphicsBridge1.ActiveViewPort:= ViewPort1; //or in design time
+  FPNoGUIGraphicsBridge1.ActiveViewPort:= ViewPort1; //or in design time
   FPNoGUIGraphicsBridge1.PaintViewPort;
   FPNoGUIGraphicsBridge1.PaintGrid(True);
 
-  FPNoGUIGraphicsBridge1.DrawDataLine([ToRealPoint(4,10),
-                                   ToRealPoint(5,11),
-                                   ToRealPoint(6,11),
-                                   ToRealPoint(7,12),
-                                   ToRealPoint(8,12),
-                                   ToRealPoint(10,13),
-                                   ToRealPoint(11,14),
-                                   ToRealPoint(12,15)],
-                                   ToLegend('Jan', colbrBlue, 14.1,9));
+  FPNoGUIGraphicsBridge1.DrawDataBars([ToBar(15,'Jan', colbrBlue),
+                                           ToBar(30,'Fev', colbrYellow),
+                                           ToBar(70,'Mar', colbrRed),
+                                           ToBar(25,'Abr', colbrLightBlue),
+                                           ToBar(40,'Mai', colbrLime),
+                                           ToBar(60,'Jun', colbrLightSalmon),
+                                           ToBar(15,'Jul', colbrGold),
+                                           ToBar(30,'Ago', colbrMagenta),
+                                           ToBar(70,'Set', colbrGreen),
+                                           ToBar(25,'Out', colbrLightSlateBlue),
+                                           ToBar(40,'Nov', colbrOrange),
+                                           ToBar(60,'Dez', colbrSalmon)]);
 
-  FPNoGUIGraphicsBridge1.DrawDataLine([ToRealPoint(4,-5),
-                                   ToRealPoint(5,0),
-                                   ToRealPoint(6,7),
-                                   ToRealPoint(7,10),
-                                   ToRealPoint(8,10),
-                                   ToRealPoint(10,11),
-                                   ToRealPoint(11,12),
-                                   ToRealPoint(12,14)],
-                                   ToLegend('Fev', colbrSalmon, 14.1,7));
 
-  FPNoGUIGraphicsBridge1.DrawDataLine([ToRealPoint(4,0),
-                                   ToRealPoint(5,6),
-                                   ToRealPoint(6,9),
-                                   ToRealPoint(7,11),
-                                   ToRealPoint(8,11),
-                                   ToRealPoint(10,12),
-                                   ToRealPoint(11,13),
-                                   ToRealPoint(12,13)],
-                                   ToLegend('Mar', colbrIndigo, 14.1,5));
+  FPNoGUIGraphicsBridge1.ActiveViewPort:= ViewPort2;
+  FPNoGUIGraphicsBridge1.PaintViewPort;
+  FPNoGUIGraphicsBridge1.PaintGrid(True);
+
+  FPNoGUIGraphicsBridge1.DrawDataHistograms(
+                                              [ToHistogram(30, colbrGreen),
+                                              ToHistogram(45, colbrGold),
+                                              ToHistogram(65, colbrTomato),
+                                              ToHistogram(25, colbrLightSlateBlue),
+                                              ToHistogram(40, colbrRed),
+                                              ToHistogram(50, colbrBlue)],  2.5 {range});
+
 
   jGraphicsBuffer:= jBitmap1.GetByteBuffer(w,h);
 

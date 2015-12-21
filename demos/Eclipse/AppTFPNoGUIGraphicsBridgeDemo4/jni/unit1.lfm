@@ -2,7 +2,7 @@ object AndroidModule1: TAndroidModule1
   Left = 272
   Top = 140
   Width = 320
-  Height = 400
+  Height = 477
   MarginLeft = 0
   MarginTop = 0
   MarginRight = 0
@@ -14,7 +14,7 @@ object AndroidModule1: TAndroidModule1
     Left = 7
     Top = 4
     Width = 305
-    Height = 86
+    Height = 81
     MarginLeft = 4
     MarginTop = 4
     MarginRight = 4
@@ -23,33 +23,11 @@ object AndroidModule1: TAndroidModule1
     PosRelativeToAnchor = []
     PosRelativeToParent = [rpTop, rpCenterHorizontal]
     LayoutParamWidth = lpMatchParent
-    LayoutParamHeight = lpOneQuarterOfParent
+    LayoutParamHeight = lpOneFifthOfParent
     BackgroundColor = colbrDefault
     MinPinchZoomFactor = 0.25
     MaxPinchZoomFactor = 4
-    Id = 5032
-    object jButton1: jButton
-      Left = 4
-      Top = 23
-      Width = 297
-      Height = 40
-      MarginLeft = 2
-      MarginTop = 4
-      MarginRight = 2
-      MarginBottom = 4
-      Visible = True
-      PosRelativeToAnchor = []
-      PosRelativeToParent = [rpCenterInParent]
-      LayoutParamWidth = lpMatchParent
-      LayoutParamHeight = lpWrapContent
-      Text = 'DrawDataLine'
-      BackgroundColor = colbrDefault
-      FontColor = colbrDefault
-      FontSize = 0
-      FontSizeUnit = unitDefault
-      OnClick = jButton1Click
-      Id = 0
-    end
+    Id = 7330613
     object jTextView1: jTextView
       Left = 16
       Top = 5
@@ -72,14 +50,37 @@ object AndroidModule1: TAndroidModule1
       FontSize = 0
       TextTypeFace = tfNormal
       FontSizeUnit = unitDefault
+      Id = 699631
+    end
+    object jButton1: jButton
+      Left = 3
+      Top = 34
+      Width = 298
+      Height = 40
+      MarginLeft = 2
+      MarginTop = 4
+      MarginRight = 2
+      MarginBottom = 4
+      Visible = True
+      Anchor = jTextView1
+      PosRelativeToAnchor = [raBelow]
+      PosRelativeToParent = [rpCenterHorizontal]
+      LayoutParamWidth = lpMatchParent
+      LayoutParamHeight = lpWrapContent
+      Text = 'Draw DataPieSlices and DataLine'
+      BackgroundColor = colbrDefault
+      FontColor = colbrDefault
+      FontSize = 0
+      FontSizeUnit = unitDefault
+      OnClick = jButton1Click
       Id = 0
     end
   end
   object jPanel2: jPanel
     Left = 7
-    Top = 98
+    Top = 93
     Width = 305
-    Height = 119
+    Height = 304
     MarginLeft = 4
     MarginTop = 4
     MarginRight = 4
@@ -89,19 +90,19 @@ object AndroidModule1: TAndroidModule1
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = [rpCenterHorizontal]
     LayoutParamWidth = lpMatchParent
-    LayoutParamHeight = lpOneThirdOfParent
+    LayoutParamHeight = lpTwoThirdOfParent
     BackgroundColor = colbrDefault
     MinPinchZoomFactor = 0.25
     MaxPinchZoomFactor = 4
     Id = 0
     object jImageView1: jImageView
       Left = 9
-      Top = 13
+      Top = 18
       Width = 288
-      Height = 88
+      Height = 273
       Visible = True
       PosRelativeToAnchor = []
-      PosRelativeToParent = []
+      PosRelativeToParent = [rpCenterInParent]
       LayoutParamWidth = lpMatchParent
       LayoutParamHeight = lpMatchParent
       ImageIndex = -1
@@ -109,6 +110,14 @@ object AndroidModule1: TAndroidModule1
       ImageScaleType = scaleCenter
       Id = 0
     end
+  end
+  object jBitmap1: jBitmap
+    FilePath = fpathData
+    ImageIndex = -1
+    Width = 0
+    Height = 0
+    left = 256
+    top = 152
   end
   object FPNoGUIGraphicsBridge1: TFPNoGUIGraphicsBridge
     Width = 400
@@ -130,47 +139,69 @@ object AndroidModule1: TAndroidModule1
     EntityData.FieldSeparator = ';'
     EntityData.NameValueSeparator = '#'
     ActiveViewPort = ViewPort1
-    left = 88
-    top = 160
+    left = 72
+    top = 152
   end
   object ViewPort1: TViewPort
     PenThickness = 1
     PenColor = colbrRed
-    FontSize = 22
+    FontSize = 30
     FontColor = colbrBlack
     BackgroundColor = colbrLavender
-    DrawGrid = True
-    DrawAxis = True
-    Title = 'Temperature'
+    DrawGrid = False
+    DrawAxis = False
+    Title = 'DataPieSlices Graphics'
     XLeft = 0
     YTop = 0
     Width = 800
     Height = 100
-    MarginLeft = 120
+    MarginLeft = 110
     MarginTop = 100
-    MarginRight = 120
+    MarginRight = 110
     MarginBottom = 100
     Cliping = False
-    GridData.XTitle = ' [ H ]'
-    GridData.YTitle = '  [ T ]'
     GridData.AxisColor = colbrLime
     GridData.Color = colbrLightSteelBlue
     GridData.BackgroundColor = colbrGreenYellow
-    GridData.XInterval = 14
+    GridData.XInterval = 10
     GridData.YInterval = 10
     GridData.XLegendInterval = 2
     GridData.YLegendInterval = 1
     GridData.XShowLengend = True
     GridData.YShowLengend = True
-    left = 192
-    top = 160
+    left = 184
+    top = 150
   end
-  object jBitmap1: jBitmap
-    FilePath = fpathData
-    ImageIndex = -1
-    Width = 0
-    Height = 0
-    left = 160
-    top = 112
+  object ViewPort2: TViewPort
+    PenThickness = 1
+    PenColor = colbrRed
+    FontSize = 30
+    FontColor = colbrBlack
+    BackgroundColor = colbrLavender
+    DrawGrid = True
+    DrawAxis = True
+    Title = 'DataLine Graphics [Temperature X Hour]'
+    XLeft = 0
+    YTop = 0
+    Width = 800
+    Height = 100
+    MarginLeft = 110
+    MarginTop = 100
+    MarginRight = 110
+    MarginBottom = 100
+    Cliping = False
+    GridData.XTitle = ' [H]'
+    GridData.YTitle = '  [T]'
+    GridData.AxisColor = colbrLime
+    GridData.Color = colbrLightSteelBlue
+    GridData.BackgroundColor = colbrGreenYellow
+    GridData.XInterval = 14
+    GridData.YInterval = 20
+    GridData.XLegendInterval = 2
+    GridData.YLegendInterval = 2
+    GridData.XShowLengend = True
+    GridData.YShowLengend = True
+    left = 143
+    top = 245
   end
 end

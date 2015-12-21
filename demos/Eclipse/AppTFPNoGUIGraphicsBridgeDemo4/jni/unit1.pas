@@ -1,4 +1,4 @@
-{Hint: save all files to location: C:\adt32\eclipse\workspace\AppTFPNoGUIGraphicsBridgeDemo2\jni }
+{Hint: save all files to location: C:\adt32\eclipse\workspace\AppTFPNoGUIGraphicsBridgeDemo4\jni }
 unit unit1;
 
 {$mode delphi}
@@ -22,6 +22,7 @@ type
     jPanel2: jPanel;
     jTextView1: jTextView;
     ViewPort1: TViewPort;
+    ViewPort2: TViewPort;
     procedure jButton1Click(Sender: TObject);
   private
     {private declarations}
@@ -42,7 +43,6 @@ uses
 
 { TAndroidModule1 }
 
-//[Xinyiman's suggestion. Thank you!]
 procedure TAndroidModule1.jButton1Click(Sender: TObject);
 var
   jGraphicsBuffer: jObject;
@@ -51,18 +51,38 @@ begin
   w:= jPanel2.Width;
   h:= jPanel2.Height;
 
-  ViewPort1.Height:= h;
+  ViewPort1.XLeft:= 0;
+  ViewPort1.YTop:= 0;
+  ViewPort1.Height:= Trunc(h/2);
   ViewPort1.Width:= w;
 
-  ViewPort1.SetScaleXY(0 {minx}, 14 {maxx}, -5 {miny}, 15 {maxy});
+  ViewPort1.SetScaleXY(0 {minx}, 10 {maxx}, 0 {miny}, 10 {maxy});
 
   FPNoGUIGraphicsBridge1.SetSurfaceSize(w,h);
   FPNoGUIGraphicsBridge1.PathToFontFile:= '/system/fonts/Roboto-Regular.ttf'; //or DroidSerif-Bold.ttf
 
-  //FPNoGUIGraphicsBridge1.ActiveViewPort:= ViewPort1; //or in design time
+  FPNoGUIGraphicsBridge1.ActiveViewPort:= ViewPort1; //or in design time
   FPNoGUIGraphicsBridge1.PaintViewPort;
   FPNoGUIGraphicsBridge1.PaintGrid(True);
 
+  FPNoGUIGraphicsBridge1.DrawDataPieSlices([ToRealPoint(1,8),ToRealPoint(7,2)],
+                                           [ToSlice(45,'Jan', colbrLightGray),
+                                            ToSlice(15,'Fev', colbrYellow),
+                                            ToSlice(40,'Mar', colbrMoccasin),
+                                            ToSlice(40,'Abr', colbrLightBlue),
+                                            ToSlice(40,'Mai', colbrLime),
+                                            ToSlice(45,'Jun', colbrLightSalmon)], False);
+  ViewPort2.XLeft:= 0;
+  ViewPort2.YTop:= Trunc(h/2);
+  ViewPort2.Height:= Trunc(h/2);
+  ViewPort2.Width:= w;
+  ViewPort2.SetScaleXY(0 {minx}, 14 {maxx}, -5 {miny}, 15 {maxy});
+
+  FPNoGUIGraphicsBridge1.ActiveViewPort:= ViewPort2;
+  FPNoGUIGraphicsBridge1.PaintViewPort;
+  FPNoGUIGraphicsBridge1.PaintGrid(True);
+
+  //
   FPNoGUIGraphicsBridge1.DrawDataLine([ToRealPoint(4,10),
                                    ToRealPoint(5,11),
                                    ToRealPoint(6,11),
@@ -124,5 +144,4 @@ system/fonts/DroidSerif-BoldItalic.ttf
 system/fonts/DroidSerif-Italic.ttf
 system/fonts/DroidSerif-Regular.ttf
 }
-
 end.

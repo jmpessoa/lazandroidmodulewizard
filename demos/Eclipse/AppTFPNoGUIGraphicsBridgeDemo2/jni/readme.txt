@@ -21,7 +21,7 @@ Hint: TFPNoGuiGraphicsBridge on Android [Lamw/Lazarus Android Module Wizard proj
 
 	--->>> Cross compile [Lamw/arm-android] project fail .... NO PANIC!
 
-PANIC I: Compiling ... [please, read lazarus or/as laz4android and ...\fpc\2.7.1 or/as ...\fpc\3.1.1 etc..]
+PANIC I: Compiling ... [please, read "lazarus" or/as "laz4android" and "...\fpc\2.7.1" or/as "...\fpc\3.1.1" ]
 
 	"(FTFont.PPU and freetype.PPU) units NOT FOUND in "...\lazarus\fpc\2.7.1\units\arm-android\fcl-image" ???
 
@@ -33,7 +33,7 @@ PANIC I: Compiling ... [please, read lazarus or/as laz4android and ...\fpc\2.7.1
 		freetype.pp (if need change to .pas)
 		freetypeh.pp (if need change to .pas)
 
-		to folder "...\tfpnoguigraphicsbridge" package folder and build AGAIN your project!
+		to "...\tfpnoguigraphicsbridge" package folder and build AGAIN your project!
 
 		Yes, now you got ftfont.ppu, ftfont.o, freetype.ppu etc... to "arm-android" !
 
@@ -55,24 +55,19 @@ PANIC II: [building Lamw project cross-arm]::
 
 PANIC III. Where I find a "libfreetype.so" for arm-android ?
 
-	Go to demo "...\AppTFPNoGUIGraphicsBridgeDemo1\libs\armeabi" [Eclipse compatible Project]
+	Go to "..\demos\Eclipse\AppTFPNoGUIGraphicsBridgeDemo1\libs\armeabi"
 
-	You will find an "all ready" there! 
+	You will find a "libfreetype.so" there! 
 
 PANIC IV.  Where "libfreetype.so" will be load in java code?
 
-	Go to "Controls.java" [\src\...\..] and uncomment this line:
+	Go to "Controls.java" [\src\...\..] and uncomment this lines:
 
-		--->> System.loadLibrary("freetype");
-
-	The code now will stay that way:
-
-	//Load Pascal Library
-	static {   		
-      		System.loadLibrary("freetype");  // <<---uncommented here!
-      		System.loadLibrary("controls");    		
-	}
-
+        try {
+    	  System.loadLibrary("freetype");  // <<-------------------
+        } catch (UnsatisfiedLinkError e) {
+          Log.e("JNI_Load_LibFreetype", "exception", e);
+       }
 
 
 Thank You!
