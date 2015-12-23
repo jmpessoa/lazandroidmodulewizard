@@ -94,3 +94,4 @@ pOnListViewDrawItemBitmap=Java_Event_pOnListViewDrawItemBitmap(PEnv,this,TObject
 pOnSeekBarProgressChanged=Java_Event_pOnSeekBarProgressChanged(PEnv,this,TObject(pasobj),progress,Boolean(fromUser));
 pOnSeekBarStartTrackingTouch=Java_Event_pOnSeekBarStartTrackingTouch(PEnv,this,TObject(pasobj),progress);
 pOnSeekBarStopTrackingTouch=Java_Event_pOnSeekBarStopTrackingTouch(PEnv,this,TObject(pasobj),progress);
+pOnRatingBarChanged=Java_Event_pOnRatingBarChanged(PEnv,this,TObject(pasobj),rating);

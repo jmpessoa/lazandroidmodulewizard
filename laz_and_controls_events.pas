@@ -87,6 +87,8 @@ uses
    procedure Java_Event_pOnSeekBarStartTrackingTouch(env: PJNIEnv; this: jobject; Obj: TObject; progress: integer);
    procedure Java_Event_pOnSeekBarStopTrackingTouch(env: PJNIEnv; this: jobject; Obj: TObject; progress: integer);
 
+   procedure Java_Event_pOnRatingBarChanged(env: PJNIEnv; this: jobject; Obj: TObject; rating: single);
+
 implementation
 
 uses
@@ -94,7 +96,7 @@ uses
    AndroidWidget, bluetooth, bluetoothclientsocket, bluetoothserversocket,
    spinner, location, actionbartab, customdialog, togglebutton, switchbutton, gridview,
    sensormanager, broadcastreceiver, datepickerdialog, timepickerdialog, shellcommand,
-   tcpsocketclient, surfaceview, mediaplayer, contactmanager, seekbar;
+   tcpsocketclient, surfaceview, mediaplayer, contactmanager, seekbar, ratingbar;
 
 procedure Java_Event_pOnBluetoothEnabled(env: PJNIEnv; this: jobject; Obj: TObject);
 begin
@@ -914,6 +916,19 @@ begin
       //jSurfaceView(Obj).UpdateJNI(gApp);
       jForm(jSurfaceView(Obj).Owner).UpdateJNI(gApp);
       jSurfaceView(Obj).GenEvent_OnSurfaceViewDrawingPostExecute(Obj,progress);
+  end;
+end;
+
+procedure Java_Event_pOnRatingBarChanged(env: PJNIEnv; this: jobject; Obj: TObject; rating: single);
+begin
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+  if not Assigned(Obj)  then Exit;
+  if Obj is jRatingBar then
+  begin
+      //jSurfaceView(Obj).UpdateJNI(gApp);
+      jForm(jRatingBar(Obj).Owner).UpdateJNI(gApp);
+      jRatingBar(Obj).GenEvent_OnRatingBarChanged(Obj,rating);
   end;
 end;
 

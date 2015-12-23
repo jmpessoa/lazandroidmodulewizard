@@ -8,6 +8,7 @@ interface
 
 uses 
   Classes,
+  ratingbar,
   seekbar,
   contactmanager,
   surfaceview,
@@ -51,6 +52,7 @@ implementation
   
 Procedure Register;
 begin
+  {$I jratingbar_icon.lrs}
   {$I jseekbar_icon.lrs}
   {$I jcontactmanager_icon.lrs}
   {$I jsurfaceview_icon.lrs}
@@ -85,6 +87,7 @@ begin
   {$I jmyhello_icon.lrs}
   RegisterComponents('Android Bridges Extra',
     [
+      jRatingBar,
       jSeekBar,
       jContactManager,
       jSurfaceView,

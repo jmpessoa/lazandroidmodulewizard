@@ -144,6 +144,12 @@
 	*
 	****************************************************************************************************
 
+Version 0.6 - rev. 37 - 23 December 2015 - 
+
+	NEW! jRatingBar component 
+
+	NEW! AppRatingBar Demo1   
+
 Version 0.6 - rev. 36 - 03 August 2015 - 
 
 	IMPROVEMENT!   
