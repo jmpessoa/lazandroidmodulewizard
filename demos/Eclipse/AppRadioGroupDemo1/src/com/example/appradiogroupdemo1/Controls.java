@@ -1,4 +1,4 @@
-package com.example.dummyapp;
+package com.example.appradiogroupdemo1;
 
 //Lamw: Lazarus Android Module Wizard  - version 0.6 - revision 38 - 26 December - 2015 
 //Form Designer and Components development model!
@@ -16359,7 +16359,7 @@ class jRadioGroup extends RadioGroup /*dummy*/ { //please, fix what GUI object w
      controls  = _ctrls;
   
      lparams = new RelativeLayout.LayoutParams(lparamW, lparamH);
-     checkedIndex =  -1;
+     checkedIndex =  -1;     
      
      this.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener()
      {    	    	 

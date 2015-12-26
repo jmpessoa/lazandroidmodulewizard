@@ -8,6 +8,7 @@ interface
 
 uses 
   Classes,
+  radiogroup,
   ratingbar,
   seekbar,
   contactmanager,
@@ -52,6 +53,7 @@ implementation
   
 Procedure Register;
 begin
+  {$I jradiogroup_icon.lrs}
   {$I jratingbar_icon.lrs}
   {$I jseekbar_icon.lrs}
   {$I jcontactmanager_icon.lrs}
@@ -87,6 +89,7 @@ begin
   {$I jmyhello_icon.lrs}
   RegisterComponents('Android Bridges Extra',
     [
+      jRadioGroup,
       jRatingBar,
       jSeekBar,
       jContactManager,

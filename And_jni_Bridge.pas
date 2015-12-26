@@ -300,6 +300,7 @@ procedure jCheckBox_SetFontSizeUnit(env: PJNIEnv; _jcheckbox: JObject; _unit: in
 Function  jRadioButton_Create(env:PJNIEnv; this:jobject; SelfObj: TObject ): jObject;
 Procedure jRadioButton_Free(env:PJNIEnv; RadioButton : jObject);
 Procedure jRadioButton_setParent(env:PJNIEnv; RadioButton : jObject;ViewGroup : jObject);
+Procedure jRadioButton_setParent2(env:PJNIEnv; RadioButton : jObject;ViewGroup : jObject);
 
 Function  jRadioButton_getText(env:PJNIEnv; RadioButton : jObject) : String;
 
@@ -2807,6 +2808,20 @@ var
     _jParams[0].l := ViewGroup;
    cls := env^.GetObjectClass(env, RadioButton);
     _jMethod:= env^.GetMethodID(env, cls, 'setParent', '(Landroid/view/ViewGroup;)V');
+   env^.CallVoidMethodA(env,RadioButton,_jMethod,@_jParams);
+   env^.DeleteLocalRef(env, cls);
+ end;
+
+Procedure jRadioButton_setParent2(env:PJNIEnv;
+                              RadioButton : jObject;ViewGroup : jObject);
+var
+  _jMethod : jMethodID = nil;
+  _jParams : array[0..0] of jValue;
+   cls: jClass;
+ begin
+    _jParams[0].l := ViewGroup;
+   cls := env^.GetObjectClass(env, RadioButton);
+    _jMethod:= env^.GetMethodID(env, cls, 'setParent2', '(Landroid/view/ViewGroup;)V');
    env^.CallVoidMethodA(env,RadioButton,_jMethod,@_jParams);
    env^.DeleteLocalRef(env, cls);
  end;

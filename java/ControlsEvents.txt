@@ -95,3 +95,4 @@ pOnSeekBarProgressChanged=Java_Event_pOnSeekBarProgressChanged(PEnv,this,TObject
 pOnSeekBarStartTrackingTouch=Java_Event_pOnSeekBarStartTrackingTouch(PEnv,this,TObject(pasobj),progress);
 pOnSeekBarStopTrackingTouch=Java_Event_pOnSeekBarStopTrackingTouch(PEnv,this,TObject(pasobj),progress);
 pOnRatingBarChanged=Java_Event_pOnRatingBarChanged(PEnv,this,TObject(pasobj),rating);
+pRadioGroupCheckedChanged=Java_Event_pRadioGroupCheckedChanged(PEnv,this,TObject(pasobj),checkedIndex,checkedCaption);

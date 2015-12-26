@@ -230,6 +230,7 @@ begin
 
       if FProjectModel = 'Ant' then
       begin
+
         auxList:= TStringList.Create;
         //eclipe compatibility!
         CreateDirUTF8(FAndroidProjectName+DirectorySeparator+'.settings');

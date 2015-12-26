@@ -1,4 +1,4 @@
-package com.example.dummyapp;
+package com.example.appradiogroupdemo1;
 
 //Lamw: Lazarus Android Module Wizard - Version 0.6 - revision 38 - 26 December - 2015
 //Form Designer and Components development model!

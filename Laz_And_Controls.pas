@@ -1542,7 +1542,7 @@ type
 implementation
 
 uses
-  customdialog;
+  customdialog, radiogroup;
 
 
 //-----------------------------------------------------------------------------
@@ -2408,6 +2408,7 @@ begin
     jHorizontalScrollView(FParent).Init(refApp);
     FjPRLayout:= jHorizontalScrollView_getView(FjEnv, jHorizontalScrollView(FParent).jSelf);
   end;
+
   if FParent is jCustomDialog then
   begin
     jCustomDialog(FParent).Init(refApp);
@@ -3723,7 +3724,9 @@ procedure jRadioButton.Init(refApp: jApp);
 var
   rToP: TPositionRelativeToParent;
   rToA: TPositionRelativeToAnchorID;
+  flag: boolean;
 begin
+  flag:= False;
   if FInitialized  then Exit;
   inherited Init(refApp);
   FjObject := jRadioButton_Create(FjEnv, FjThis, Self);
@@ -3744,15 +3747,34 @@ begin
     jHorizontalScrollView(FParent).Init(refApp);
     FjPRLayout:= jHorizontalScrollView_getView(FjEnv, jHorizontalScrollView(FParent).jSelf);
   end;
+
   if FParent is jCustomDialog then
   begin
     jCustomDialog(FParent).Init(refApp);
     FjPRLayout:= jCustomDialog(FParent).View;
   end;
 
+  if FParent is jRadioGroup then
+  begin
+    jRadioGroup(FParent).Init(refApp);
+    //FjPRLayout:= jRadioGroup(FParent).View;
+    FjPRLayout:= jRadioGroup_GetView(FjEnv, jRadioGroup(FParent).jSelf);
+    flag:= True;
+  end;
 
-  jRadioButton_setParent(FjEnv, FjObject , FjPRLayout);
+  if not flag then
+  begin
+    jRadioButton_setParent(FjEnv, FjObject , FjPRLayout);
+  end
+  else
+  begin
+    jRadioButton_setParent2(FjEnv, FjObject , FjPRLayout);
+  end;
+
+  if  Self.Id = 0 then Self.Id:= Random(10000000);
+
   jRadioButton_setId(FjEnv, FjObject , Self.Id);
+
   jRadioButton_setLeftTopRightBottomWidthHeight(FjEnv, FjObject ,
                                            FMarginLeft,FMarginTop,FMarginRight,FMarginBottom,
                                            GetLayoutParams(gApp, FLParamWidth, sdW),
@@ -3777,10 +3799,12 @@ begin
        jRadioButton_addlParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
      end;
   end;
+
   if Self.Anchor <> nil then Self.AnchorId:= Self.Anchor.Id
   else Self.AnchorId:= -1;
 
-  jRadioButton_setLayoutAll(FjEnv, FjObject , Self.AnchorId);
+   if not flag then
+     jRadioButton_setLayoutAll(FjEnv, FjObject , Self.AnchorId);
 
   if FFontColor <> colbrDefault then
      jRadioButton_setTextColor(FjEnv, FjObject , GetARGB(FCustomColor, FFontColor));

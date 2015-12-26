@@ -144,6 +144,12 @@
 	*
 	****************************************************************************************************
 
+Version 0.6 - rev. 38 - 26 December 2015 - 
+
+	NEW! jRadioGroup component 
+
+	NEW! AppRadioGroupDemo1   
+
 Version 0.6 - rev. 37 - 23 December 2015 - 
 
 	NEW! jRatingBar component 

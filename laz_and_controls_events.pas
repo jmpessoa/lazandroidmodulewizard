@@ -89,6 +89,8 @@ uses
 
    procedure Java_Event_pOnRatingBarChanged(env: PJNIEnv; this: jobject; Obj: TObject; rating: single);
 
+   procedure Java_Event_pRadioGroupCheckedChanged(env: PJNIEnv; this: jobject; Obj: TObject; checkedIndex: integer; checkedCaption: JString);
+
 implementation
 
 uses
@@ -96,7 +98,7 @@ uses
    AndroidWidget, bluetooth, bluetoothclientsocket, bluetoothserversocket,
    spinner, location, actionbartab, customdialog, togglebutton, switchbutton, gridview,
    sensormanager, broadcastreceiver, datepickerdialog, timepickerdialog, shellcommand,
-   tcpsocketclient, surfaceview, mediaplayer, contactmanager, seekbar, ratingbar;
+   tcpsocketclient, surfaceview, mediaplayer, contactmanager, seekbar, ratingbar, radiogroup;
 
 procedure Java_Event_pOnBluetoothEnabled(env: PJNIEnv; this: jobject; Obj: TObject);
 begin
@@ -1010,6 +1012,26 @@ begin
     jGridVIew(Obj).GenEvent_OnDrawItemCaptionColor(Obj, index, pasCaption, outColor);
   end;
   Result:= outColor;
+end;
+
+procedure Java_Event_pRadioGroupCheckedChanged(env: PJNIEnv; this: jobject; Obj: TObject; checkedIndex: integer; checkedCaption: JString);
+var
+  pascheckedCaption: string;
+  _jBoolean: JBoolean;
+begin
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+  if Obj is jRadioGroup then
+  begin
+    jForm(jRadioGroup(Obj).Owner).UpdateJNI(gApp);
+    pascheckedCaption := '';
+    if checkedCaption <> nil then
+    begin
+      _jBoolean:= JNI_False;
+      pascheckedCaption:= string( env^.GetStringUTFChars(env,checkedCaption,@_jBoolean) );
+    end;
+    jRadioGroup(Obj).GenEvent_CheckedChanged(Obj, checkedIndex, pascheckedCaption);
+  end;
 end;
 
 function  Java_Event_pOnGridDrawItemBitmap(env: PJNIEnv; this: jobject; Obj: TObject; index: integer; caption: JString): JObject;
