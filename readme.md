@@ -144,6 +144,15 @@
 	*
 	****************************************************************************************************
 
+Version 0.6 - rev. 38.1 - 30 December 2015 - 
+
+	NEW! Executable native console application support.
+
+	NEW! LamwConsoleAppDemo1  [../demos/Console]
+		please, read:
+		 "readme_How_To_Run_AVD_Emulator.txt"  
+		 "readme_How_To_Run_AVD_Emulator.txt"
+
 Version 0.6 - rev. 38 - 26 December 2015 - 
 
 	NEW! jRadioGroup component 

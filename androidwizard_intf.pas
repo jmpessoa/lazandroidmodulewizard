@@ -17,6 +17,10 @@ type
   TNoGUIAndroidModule = class(TDataModule) //raw ".so"
   end;
 
+
+  TAndroidConsoleDataForm = class(TDataModule) // executable console app
+  end;
+
   { TAndroidProjectDescriptor }
 
   TAndroidProjectDescriptor = class(TProjectDescriptor)
@@ -33,8 +37,10 @@ type
      FFPUSet: string;            {Soft}
      FPathToJavaTemplates: string;
      FAndroidProjectName: string;
-     FModuleType: integer;     {0: GUI; 1: NoGUI}
+     FModuleType: integer;     {0: GUI; 1: NoGUI; 2: NoGUI EXE}
      FSyntaxMode: TSyntaxMode;   {}
+
+     FPieChecked: boolean;
 
      FPathToJavaJDK: string;
      FPathToAndroidSDK: string;
@@ -89,13 +95,21 @@ type
     function DoInitDescriptor: TModalResult; override;
   end;
 
+  TAndroidNoGUIExeProjectDescriptor = class(TAndroidProjectDescriptor)   //console executable App
+  public
+    constructor Create; override;
+    function GetLocalizedName: string; override;
+    function GetLocalizedDescription: string; override;
+    function DoInitDescriptor: TModalResult; override;
+  end;
+
   TAndroidFileDescPascalUnitWithResource = class(TFileDescPascalUnitWithResource)
   private
     //
   public
     SyntaxMode: TSyntaxMode; {mdDelphi, mdObjFpc}
     PathToJNIFolder: string;
-    ModuleType: integer;   //0: GUI; 1: No GUI
+    ModuleType: integer;   //0: GUI; 1: No GUI ; 2: console executable App
     constructor Create; override;
 
     function CreateSource(const Filename     : string;
@@ -119,7 +133,9 @@ type
 var
   AndroidProjectDescriptor: TAndroidProjectDescriptor;
   AndroidFileDescriptor: TAndroidFileDescPascalUnitWithResource;
+
   AndroidGUIProjectDescriptor: TAndroidGUIProjectDescriptor;
+  AndroidNoGUIExeProjectDescriptor: TAndroidNoGUIExeProjectDescriptor;
 
 
 procedure Register;
@@ -136,18 +152,201 @@ begin
 
   FormEditingHook.RegisterDesignerMediator(TAndroidWidgetMediator);
   AndroidFileDescriptor := TAndroidFileDescPascalUnitWithResource.Create;
+
   RegisterProjectFileDescriptor(AndroidFileDescriptor);
 
   AndroidProjectDescriptor:= TAndroidProjectDescriptor.Create;
   RegisterProjectDescriptor(AndroidProjectDescriptor);
 
   AndroidGUIProjectDescriptor:= TAndroidGUIProjectDescriptor.Create;
-  //RegisterProjectDescriptor(TAndroidGUIProjectDescriptor.Create); //original
   RegisterProjectDescriptor(AndroidGUIProjectDescriptor);
+
+  AndroidNoGUIExeProjectDescriptor:= TAndroidNoGUIExeProjectDescriptor.Create;
+  RegisterProjectDescriptor(AndroidNoGUIExeProjectDescriptor);
 
   FormEditingHook.RegisterDesignerBaseClass(TAndroidModule);
   FormEditingHook.RegisterDesignerBaseClass(TNoGUIAndroidModule);
+  FormEditingHook.RegisterDesignerBaseClass(TAndroidConsoleDataForm);
 
+
+end;
+
+{TAndroidNoGUIExeProjectDescriptor}
+
+constructor TAndroidNoGUIExeProjectDescriptor.Create;
+begin
+  inherited Create;
+  Name := 'Create new [NoGUI] Android Exec Console App';
+end;
+
+function TAndroidNoGUIExeProjectDescriptor.GetLocalizedName: string;
+begin
+  Result:= 'Android Console App [Lamw]';
+end;
+
+function TAndroidNoGUIExeProjectDescriptor.GetLocalizedDescription: string;
+begin
+  Result:=  'Android [NoGUI] Console Application'+ LineEnding +
+            '[Native Executable]'+ LineEnding +
+            'using datamodule like form.'+ LineEnding +
+            'The project is maintained by Lazarus [Lamw].'
+end;
+
+function TAndroidNoGUIExeProjectDescriptor.DoInitDescriptor: TModalResult;    //NoGUI Exe
+var
+  list: TStringList;
+begin
+  try
+    FModuleType := 2; //0: GUI --- 1:NoGUI --- 2: NoGUI EXE
+    FJavaClassName := FSmallProjName; //'Controls';
+    FPathToClassName := '';
+    if GetWorkSpaceFromForm(2) then
+    begin
+
+      FPathToJNIFolder := FAndroidProjectName;
+      AndroidFileDescriptor.PathToJNIFolder:= FPathToJNIFolder;
+      AndroidFileDescriptor.ModuleType:= 2;
+
+      CreateDirUTF8(FAndroidProjectName+DirectorySeparator+'build-modes');
+
+      CreateDirUTF8(FAndroidProjectName+DirectorySeparator+'libs');
+      CreateDirUTF8(FAndroidProjectName+DirectorySeparator+'libs'+DirectorySeparator+'armeabi');
+      CreateDirUTF8(FAndroidProjectName+DirectorySeparator+'libs'+DirectorySeparator+'armeabi-v7a');
+      CreateDirUTF8(FAndroidProjectName+DirectorySeparator+'libs'+DirectorySeparator+'x86');
+      CreateDirUTF8(FAndroidProjectName+DirectorySeparator+'obj');
+
+      list:= TStringList.Create;
+
+
+      list.Add('How to Run your native console App in "AVD/Emulator"');
+      list.Add(' ');
+      list.Add('		NOTE 1: To get the executable app, go to Lazarus menu  ---> "Run" --> "Build"' );
+      list.Add(' ');
+      if FPieChecked then
+      list.Add('		NOTE 2: Project settings: Target Api = '+FTargetApi+ ' and PIE enabled!' )
+      else
+      list.Add('		NOTE 2: Project settings: Targeg Api = '+FTargetApi+ ' and PIE  not enabled!' );
+
+      list.Add(' ');
+      list.Add('		NOTE 3: To run in a real device, please, "readme_How_To_Run_Real_Device.txt" [ref. http://kevinboone.net/android_native.html] ');
+      list.Add(' ');
+      list.Add('		NOTE 4: Android >=5.0 [Target API >= 21] need to enable PIE [Position Independent Executables]: ');
+      list.Add(' ');
+      list.Add('			"Project" --->> "Project Options" -->> "Compile Options" --->> "Compilation and Linking" ');
+      list.Add('			--->> "Pas options to linker"  [check it !] and enter: -pie into edit below ');
+      list.Add(' ');
+      list.Add('		NOTE 5: Handle the form OnCreate event to start the program''s tasks!');
+      list.Add(' ');
+      list.Add('1. Execute the AVD/Emulator ');
+      list.Add(' ');
+      list.Add('2. Execute the  "cmd"  terminal [windows] ');
+      list.Add(' ');
+      list.Add('3. Go to folder  ".../skd/platform-tools"  and run the adb shell  [note: "-e" ---> emulator ... and "-d" ---> device] ');
+      list.Add(' ');
+      list.Add('adb -e shell ');
+      list.Add(' ');
+      list.Add('4. Create a new dir/folder "tmp" in  "/sdcard" ');
+      list.Add(' ');
+      list.Add('cd /sdcard ');
+      list.Add(' ');
+      list.Add('mkdir tmp ');
+      list.Add(' ');
+      list.Add('exit ');
+      list.Add(' ');
+      list.Add('5. Copy your program file  "'+LowerCase(FSmallProjName)+'" from project folder "...\libs\armeabi\" to Emulator "/sdcard/tmp" ');
+      list.Add(' ');
+      list.Add('adb push C:\adt32\workspace\'+FSmallProjName+'\libs\armeabi\'+LowerCase(FSmallProjName)+'  /sdcard/tmp/'+LowerCase(FSmallProjName));
+      list.Add(' ');
+      list.Add('6. go to "adb shell" again ');
+      list.Add(' ');
+      list.Add('adb -e shell. ');
+      list.Add(' ');
+      list.Add('7. Go to folder "/sdcard/tmp" ');
+      list.Add(' ');
+      list.Add('root@android:/ # cd /sdcard/tmp ');
+      list.Add(' ');
+      list.Add('8. Now copy your programa file "' + LowerCase(FSmallProjName)+'" to an executable place ');
+      list.Add(' ');
+      list.Add('root@android:/sdcard/tmp # cp ' + LowerCase(FSmallProjName)+' /data/local/tmp/'+LowerCase(FSmallProjName));
+      list.Add(' ');
+      list.Add('9. Go to folder /data/local/tmp and Change permission to run executable ');
+      list.Add(' ');
+      list.Add('root@android:/ # cd /data/local/tmp');
+      list.Add('root@android:/data/local/tmp # chmod 755 ' + LowerCase(FSmallProjName));
+      list.Add(' ');
+      list.Add('10. Execute your program! ');
+      list.Add(' ');
+      list.Add('root@android:/data/local/tmp # ./' + LowerCase(FSmallProjName));
+      list.Add(' ');
+      list.Add('Hello Lamw''s World!');
+      list.Add(' ');
+      list.Add('11. Congratulations !!!! ');
+      list.Add(' ');
+      list.Add('    by jmpessoa_hotmail_com');
+      list.Add(' ');
+      list.Add('    Thanks to @gtyhn,  @engkin and Prof. Claudio Z. M. [Suggestion/Motivation] ');
+      list.SaveToFile(FAndroidProjectName+DirectorySeparator+'readme_How_To_Run_AVD_Emulator.txt');
+
+      list.Clear;
+      list.Add('How to run your native console app in "Real Device" [ref. http://kevinboone.net/android_native.html] ');
+      list.Add(' ');
+      list.Add('		NOTE 1: To get the executable app, go to Lazarus menu  ---> "Run" --> "Build"' );
+      list.Add(' ');
+      if FPieChecked then
+      list.Add('		NOTE 2: Project settings: Target Api = '+FTargetApi+ ' and PIE enabled!' )
+      else
+      list.Add('		NOTE 2: Project settings: Targeg Api = '+FTargetApi+ ' and PIE  not enabled!' );
+
+      list.Add(' ');
+      list.Add('		NOTE 3: To run in AVD/Emulator, please, "readme_How_To_Run_Real_Device.txt"');
+      list.Add(' ');
+      list.Add('		NOTE 4: Android >=5.0 [Target API >= 21] need to enable PIE [Position Independent Executables] enabled: ');
+      list.Add(' ');
+      list.Add('			"Project" --->> "Project Options" -->> "Compile Options" --->> "Compilation and Linking"');
+      list.Add('			--->> "Pas options to linker"  [check it !] and enter: -pie into edit below');
+      list.Add(' ');
+      list.Add('		NOTE 5: Handle the form OnCreate event to start the program''s tasks!');
+      list.Add(' ');
+      list.Add('1. Go to Google Play Store and get "Terminal Emulador" by Jack Palevich [thanks to jack!]');
+      list.Add(' ');
+      list.Add('2. Connect PC <---> Device via an USB cable  and  copy your program file  "'+LowerCase(FSmallProjName)+'" from project folder "...\libs\armeabi\" to Device folder "Download"');
+      list.Add(' ');
+      list.Add('3. Go to your Device and run  the app "Terminal Emulador"  and go to internal "Terminal Emulador" storage folder');
+      list.Add(' ');
+      list.Add('$ cd /data/data/jackpal.androidterm/shared_prefs');
+      list.Add(' ');
+      list.Add('5. Copy [cat] your program file  "'+LowerCase(FSmallProjName)+'" from Device folder "Download" to internal "Terminal Emulador" storage folder');
+      list.Add(' ');
+      list.Add('$ cat /sdcard/Download/'+LowerCase(FSmallProjName)+' > '+LowerCase(FSmallProjName));
+      list.Add(' ');
+      list.Add('6. Change your program file  "'+LowerCase(FSmallProjName)+'" permission to "executable" mode');
+      list.Add(' ');
+      list.Add('$ chmod 755 '+LowerCase(FSmallProjName));
+      list.Add(' ');
+      list.Add('7. Execute your program!');
+      list.Add(' ');
+      list.Add('$ ./'+LowerCase(FSmallProjName));
+      list.Add(' ');
+      list.Add('Hello Lamw''s World!');
+      list.Add(' ');
+      list.Add('8. Congratulations !!!!');
+      list.Add(' ');
+      list.Add('    by jmpessoa_hotmail_com');
+      list.Add(' ');
+      list.Add('    Thanks to @gtyhn,  @engkin and Prof. Claudio Z. M. [Suggestion/Motivation]');
+
+      list.SaveToFile(FAndroidProjectName+DirectorySeparator+'readme_How_To_Run_Real_Device.txt');
+      list.Free;
+      Result := mrOK
+    end else
+      Result := mrAbort;
+  except
+    on e: Exception do
+    begin
+      MessageDlg('Error', e.Message, mtError, [mbOk], 0);
+      Result := mrAbort;
+    end;
+  end;
 end;
 
 { TAndroidGUIProjectDescriptor }
@@ -160,12 +359,12 @@ end;
 
 function TAndroidGUIProjectDescriptor.GetLocalizedName: string;
 begin
-  Result:= 'JNI Android Module [Lamw GUI]';
+  Result:= 'Android [GUI] JNI Module [Lamw]';
 end;
 
 function TAndroidGUIProjectDescriptor.GetLocalizedDescription: string;
 begin
-  Result:= 'A [GUI] JNI Android loadable module (.so)'+ LineEnding +
+  Result:=  'Android [GUI] JNI loadable module (.so)'+ LineEnding +
             'based on Simonsayz''s templates'+ LineEnding +
             'with Form Designer and Android Components Bridges.'+ LineEnding +
             'The project and library file are maintained by Lazarus [Lamw].'
@@ -177,7 +376,7 @@ var
   auxList: TStringList;
 begin
   try
-    FModuleType := 0; //0: GUI --- 1:NoGUI
+    FModuleType := 0; //0: GUI --- 1:NoGUI --- 2: NoGUI EXE
     FJavaClassName := 'Controls';
     FPathToClassName := '';
     if GetWorkSpaceFromForm(0) then
@@ -219,7 +418,9 @@ begin
       CreateDirUTF8(FAndroidProjectName+DirectorySeparator+'libs'+DirectorySeparator+'armeabi-v7a');
       CreateDirUTF8(FAndroidProjectName+DirectorySeparator+'libs'+DirectorySeparator+'x86');
       CreateDirUTF8(FAndroidProjectName+DirectorySeparator+'obj');
-      CreateDirUTF8(FAndroidProjectName+DirectorySeparator+'obj'+DirectorySeparator+'controls');
+
+      if  FModuleType <> 2 then
+        CreateDirUTF8(FAndroidProjectName+DirectorySeparator+'obj'+DirectorySeparator+'controls');
 
       if FSupportV4 = 'yes' then  //add android 4.0 support to olds devices ...
       begin
@@ -386,7 +587,7 @@ var
 begin
 
   Result := False;
-  FModuleType:= projectType; //0:GUI <--> 1:NoGUI
+  FModuleType:= projectType; //0:GUI <--> 1:NoGUI <--> 2:NoGUI console Exe
   frm:= TFormAndroidProject.Create(nil);  //Create Form
 
   frm.PathToJavaTemplates:= FPathToJavaTemplates;
@@ -403,7 +604,7 @@ begin
   begin
 
     FSyntaxMode:= frm.SyntaxMode;
-    //FPathToJavaClass:= frm.PathToJavaClass;
+
     FPathToJNIFolder:= FAndroidProjectName;
 
     AndroidFileDescriptor.PathToJNIFolder:= FAndroidProjectName;
@@ -425,13 +626,14 @@ end;
 
 function TAndroidProjectDescriptor.GetLocalizedName: string;
 begin
-  Result := 'JNI Android Module [Lamw NoGUI]'; //fix thanks to Stephano!
+  Result := 'Android [NoGUI] JNI Module [Lamw]'; //fix thanks to Stephano!
 end;
 
 function TAndroidProjectDescriptor.GetLocalizedDescription: string;
 begin
-  Result := 'A [NoGUI] JNI Android loadable module (.so)'+ LineEnding +
-            'using DataModule (NO Form Designer/Android Components Bridges!).'+ LineEnding +
+  Result := 'Android [NoGUI] JNI loadable module (.so)'+ LineEnding +
+            'using datamodule like form.'+ LineEnding +
+            'No Form Designer/Android and no Components Bridges!'+ LineEnding +
             'The project and library are maintained by Lazarus [Lamw].'
 end;
 
@@ -464,7 +666,7 @@ var
   dummy, strText: string;
 begin
   Result:= False;
-  FModuleType:= projectType; //0:GUI  1:noGUI
+  FModuleType:= projectType; //0:GUI  1:NoGUI 2: NoGUI EXE
 
   AndroidFileDescriptor.ModuleType:= projectType;
 
@@ -477,20 +679,43 @@ begin
     frm.LoadSettings(SettingsFilename);
 
     frm.ComboSelectProjectName.Text:= 'LamwGUIProject1';
-    //frm.LabelModuleType.Caption:= 'Project Type: [Lamw GUI]';
     frm.LabelTheme.Caption:= 'Android Theme:';
     frm.ComboBoxTheme.Visible:= True;
     frm.SpeedButtonHintTheme.Visible:= True;
 
+    frm.CheckBox2.Visible:= False;
     if projectType = 1 then //No GUI
     begin
       frm.Color:= clWhite;
+      frm.PanelButtons.Color:= clWhite;
+
       frm.ComboSelectProjectName.Text:= 'LamwNoGUIProject1';
-      //frm.LabelModuleType.Caption:= 'Project Type: [Lamw NoGUI]';
       frm.LabelTheme.Caption:= 'Lamw NoGUI Project';
       frm.ComboBoxTheme.Visible:= False;
       frm.SpeedButtonHintTheme.Visible:= False;
     end;
+
+    if projectType = 2 then //No GUI console executable
+    begin
+      frm.GroupBox1.Visible:= False;
+
+      frm.Color:= clGradientInactiveCaption;
+      frm.PanelButtons.Color:= clGradientInactiveCaption;
+
+      frm.ComboSelectProjectName.Text:= 'LamwConsoleApp1';
+      frm.LabelTheme.Caption:= 'Lamw NoGUI Console/Executable Project';
+      frm.EditPackagePrefaceName.Visible:= False;
+
+      frm.EditPackagePrefaceName.Text:= '';
+      frm.EditPackagePrefaceName.Enabled:= False;
+
+      frm.CheckBox1.Visible:= False;
+      frm.ComboBoxTheme.Visible:= False;
+      frm.SpeedButtonHintTheme.Visible:= False;
+
+      frm.CheckBox2.Visible:= True;
+    end;
+
 
     frm.ModuleType:= projectType;  //<-- input to form
 
@@ -524,6 +749,7 @@ begin
       FMinApi:= frm.MinApi;
       FTargetApi:= frm.TargetApi;
       FSupportV4:= frm.SupportV4;
+      FPieChecked:= frm.CheckBox2.Checked;
 
       FMainActivity:= frm.MainActivity;
       FJavaClassName:= frm.JavaClassName;
@@ -545,133 +771,135 @@ begin
       try
         if  FProjectModel = 'Ant' then
         begin
-          ChDir(FAndroidProjectName);
-          MkDir(FAndroidProjectName+ DirectorySeparator + 'src');
-          ChDir(FAndroidProjectName+DirectorySeparator+ 'src');
-
-          FPathToJavaSrc:= FAndroidProjectName+DirectorySeparator+ 'src';
-          FFullJavaSrcPath:= FPathToJavaSrc;
-
-          strList.Clear;
-          strList.StrictDelimiter:= True;
-          strList.Delimiter:= '.';
-          strList.DelimitedText:= FPackagePrefaceName+'.'+LowerCase(FSmallProjName);
-          for i:= 0 to strList.Count -1 do
+          if FModuleType <> 2 then
           begin
-             FFullJavaSrcPath:= FFullJavaSrcPath + DirectorySeparator + strList.Strings[i];
-             MkDir(FFullJavaSrcPath);
-             ChDir(FFullJavaSrcPath);
+            ChDir(FAndroidProjectName);
+            MkDir(FAndroidProjectName+ DirectorySeparator + 'src');
+            ChDir(FAndroidProjectName+DirectorySeparator+ 'src');
+
+            FPathToJavaSrc:= FAndroidProjectName+DirectorySeparator+ 'src';
+            FFullJavaSrcPath:= FPathToJavaSrc;
+
+            strList.Clear;
+            strList.StrictDelimiter:= True;
+            strList.Delimiter:= '.';
+            strList.DelimitedText:= FPackagePrefaceName+'.'+LowerCase(FSmallProjName);
+            for i:= 0 to strList.Count -1 do
+            begin
+               FFullJavaSrcPath:= FFullJavaSrcPath + DirectorySeparator + strList.Strings[i];
+               MkDir(FFullJavaSrcPath);
+               ChDir(FFullJavaSrcPath);
+            end;
+
+            MkDir(FAndroidProjectName+ DirectorySeparator + 'res');
+            ChDir(FAndroidProjectName+DirectorySeparator+ 'res');
+
+            MkDir(FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'drawable-hdpi');
+            ChDir(FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'drawable-hdpi');
+            CopyFile(FPathToJavaTemplates+DirectorySeparator+'drawable-hdpi'+DirectorySeparator+'ic_launcher.png',
+                     FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'drawable-hdpi'+DirectorySeparator+'ic_launcher.png');
+
+            MkDir(FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'drawable-ldpi');
+            ChDir(FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'drawable-ldpi');
+            CopyFile(FPathToJavaTemplates+DirectorySeparator+'drawable-ldpi'+DirectorySeparator+'ic_launcher.png',
+                     FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'drawable-ldpi'+DirectorySeparator+'ic_launcher.png');
+
+            MkDir(FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'drawable-mdpi');
+            ChDir(FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'drawable-mdpi');
+            CopyFile(FPathToJavaTemplates+DirectorySeparator+'drawable-mdpi'+DirectorySeparator+'ic_launcher.png',
+                     FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'drawable-mdpi'+DirectorySeparator+'ic_launcher.png');
+
+            MkDir(FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'drawable-xhdpi');
+            ChDir(FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'drawable-xhdpi');
+            CopyFile(FPathToJavaTemplates+DirectorySeparator+'drawable-xhdpi'+DirectorySeparator+'ic_launcher.png',
+                     FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'drawable-xhdpi'+DirectorySeparator+'ic_launcher.png');
+
+            MkDir(FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'drawable-xxhdpi');
+            ChDir(FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'drawable-xxhdpi');
+            CopyFile(FPathToJavaTemplates+DirectorySeparator+'drawable-xxhdpi'+DirectorySeparator+'ic_launcher.png',
+                     FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'drawable-xxhdpi'+DirectorySeparator+'ic_launcher.png');
+
+            MkDir(FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'values');
+            ChDir(FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'values');
+
+            strList.Clear;
+            strList.Add('<?xml version="1.0" encoding="utf-8"?>');
+            strList.Add('<resources>');
+            strList.Add('   <string name="app_name">'+FSmallProjName+'</string>');
+            strList.Add('   <string name="hello_world">Hello world!</string>');
+            strList.Add('</resources>');
+            strList.SaveToFile(FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'values'+DirectorySeparator+'strings.xml');
+
+            CopyFile(FPathToJavaTemplates+DirectorySeparator+'values'+DirectorySeparator+'styles.xml',
+                         FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'values'+DirectorySeparator+'styles.xml');
+
+
+            MkDir(FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'values-v11');
+            ChDir(FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'values-v11');
+
+            //replace "dummyTheme" ..res\values-v11
+            strList.Clear;
+            strList.LoadFromFile(FPathToJavaTemplates+DirectorySeparator+'values-v11'+DirectorySeparator+'styles.xml');
+
+            intApi:= StrToInt(FTargetApi);
+
+            if (intApi >= 11) and (intApi < 14) then
+              strText:= StringReplace(strList.Text,'dummyTheme', 'android:Theme.'+FAndroidTheme, [rfReplaceAll])
+            else
+              strText:= StringReplace(strList.Text,'dummyTheme', 'android:Theme.Holo.Light', [rfReplaceAll]); //default
+
+            strList.Text:= strText;
+            strList.SaveToFile(FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'values-v11'+DirectorySeparator+'styles.xml');
+
+            MkDir(FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'values-v14');
+            ChDir(FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'values-v14');
+
+            //replace "dummyTheme" ..res\values-v14
+            strList.Clear;
+            {CopyFile(FPathToJavaTemplates+DirectorySeparator+'values-v14'+DirectorySeparator+'styles.xml',
+                         FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'values-v14'+DirectorySeparator+'styles.xml');}
+            strList.LoadFromFile(FPathToJavaTemplates+DirectorySeparator+'values-v14'+DirectorySeparator+'styles.xml');
+
+            if (intApi >= 14) and (intApi < 21) then
+               strText:= StringReplace(strList.Text,'dummyTheme', 'android:Theme.'+FAndroidTheme, [rfReplaceAll])
+            else
+               strText:= StringReplace(strList.Text,'dummyTheme', 'android:Theme.DeviceDefault', [rfReplaceAll]);
+
+            strList.Text:= strText;
+            strList.SaveToFile(FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'values-v14'+DirectorySeparator+'styles.xml');
+
+            MkDir(FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'values-v21');
+            ChDir(FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'values-v21');
+
+            //replace "dummyTheme" ..res\values-v21
+            strList.Clear;
+             {CopyFile(FPathToJavaTemplates+DirectorySeparator+'values-v14'+DirectorySeparator+'styles.xml',
+                          FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'values-v14'+DirectorySeparator+'styles.xml');}
+            strList.LoadFromFile(FPathToJavaTemplates+DirectorySeparator+'values-v21'+DirectorySeparator+'styles.xml');
+
+            if (intApi >= 21) then
+              strText:= StringReplace(strList.Text,'dummyTheme', 'android:Theme.'+FAndroidTheme, [rfReplaceAll])
+            else
+              strText:= StringReplace(strList.Text,'dummyTheme', 'android:Theme.DeviceDefault', [rfReplaceAll]);
+
+            strList.Text:= strText;
+            strList.SaveToFile(FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'values-v21'+DirectorySeparator+'styles.xml');
+
+            MkDir(FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'layout');
+            ChDir(FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'layout');
+            CopyFile(FPathToJavaTemplates+DirectorySeparator+'layout'+DirectorySeparator+'activity_app.xml',
+                         FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'layout'+DirectorySeparator+'activity_app.xml');
+
+            MkDir(FAndroidProjectName+ DirectorySeparator + 'assets');
+            ChDir(FAndroidProjectName+DirectorySeparator+ 'assets');
+
+            MkDir(FAndroidProjectName+ DirectorySeparator + 'bin');
+            ChDir(FAndroidProjectName+DirectorySeparator+ 'bin');
+
+            MkDir(FAndroidProjectName+ DirectorySeparator + 'gen');
+            ChDir(FAndroidProjectName+DirectorySeparator+ 'gen');
+
           end;
-
-          MkDir(FAndroidProjectName+ DirectorySeparator + 'res');
-          ChDir(FAndroidProjectName+DirectorySeparator+ 'res');
-
-          MkDir(FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'drawable-hdpi');
-          ChDir(FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'drawable-hdpi');
-          CopyFile(FPathToJavaTemplates+DirectorySeparator+'drawable-hdpi'+DirectorySeparator+'ic_launcher.png',
-                   FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'drawable-hdpi'+DirectorySeparator+'ic_launcher.png');
-
-          MkDir(FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'drawable-ldpi');
-          ChDir(FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'drawable-ldpi');
-          CopyFile(FPathToJavaTemplates+DirectorySeparator+'drawable-ldpi'+DirectorySeparator+'ic_launcher.png',
-                   FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'drawable-ldpi'+DirectorySeparator+'ic_launcher.png');
-
-          MkDir(FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'drawable-mdpi');
-          ChDir(FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'drawable-mdpi');
-          CopyFile(FPathToJavaTemplates+DirectorySeparator+'drawable-mdpi'+DirectorySeparator+'ic_launcher.png',
-                   FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'drawable-mdpi'+DirectorySeparator+'ic_launcher.png');
-
-          MkDir(FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'drawable-xhdpi');
-          ChDir(FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'drawable-xhdpi');
-          CopyFile(FPathToJavaTemplates+DirectorySeparator+'drawable-xhdpi'+DirectorySeparator+'ic_launcher.png',
-                   FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'drawable-xhdpi'+DirectorySeparator+'ic_launcher.png');
-
-          MkDir(FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'drawable-xxhdpi');
-          ChDir(FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'drawable-xxhdpi');
-          CopyFile(FPathToJavaTemplates+DirectorySeparator+'drawable-xxhdpi'+DirectorySeparator+'ic_launcher.png',
-                   FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'drawable-xxhdpi'+DirectorySeparator+'ic_launcher.png');
-
-          MkDir(FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'values');
-          ChDir(FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'values');
-
-          strList.Clear;
-          strList.Add('<?xml version="1.0" encoding="utf-8"?>');
-          strList.Add('<resources>');
-          strList.Add('   <string name="app_name">'+FSmallProjName+'</string>');
-          strList.Add('   <string name="hello_world">Hello world!</string>');
-          strList.Add('</resources>');
-          strList.SaveToFile(FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'values'+DirectorySeparator+'strings.xml');
-
-          CopyFile(FPathToJavaTemplates+DirectorySeparator+'values'+DirectorySeparator+'styles.xml',
-                       FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'values'+DirectorySeparator+'styles.xml');
-
-
-          MkDir(FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'values-v11');
-          ChDir(FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'values-v11');
-
-          //replace "dummyTheme" ..res\values-v11
-          strList.Clear;
-          {CopyFile(FPathToJavaTemplates+DirectorySeparator+'values-v11'+DirectorySeparator+'styles.xml',
-                       FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'values-v11'+DirectorySeparator+'styles.xml');}
-          strList.LoadFromFile(FPathToJavaTemplates+DirectorySeparator+'values-v11'+DirectorySeparator+'styles.xml');
-
-          intApi:= StrToInt(FTargetApi);
-
-          if (intApi >= 11) and (intApi < 14) then
-            strText:= StringReplace(strList.Text,'dummyTheme', 'android:Theme.'+FAndroidTheme, [rfReplaceAll])
-          else
-            strText:= StringReplace(strList.Text,'dummyTheme', 'android:Theme.Holo.Light', [rfReplaceAll]); //default
-
-          strList.Text:= strText;
-          strList.SaveToFile(FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'values-v11'+DirectorySeparator+'styles.xml');
-
-          MkDir(FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'values-v14');
-          ChDir(FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'values-v14');
-
-          //replace "dummyTheme" ..res\values-v14
-          strList.Clear;
-          {CopyFile(FPathToJavaTemplates+DirectorySeparator+'values-v14'+DirectorySeparator+'styles.xml',
-                       FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'values-v14'+DirectorySeparator+'styles.xml');}
-          strList.LoadFromFile(FPathToJavaTemplates+DirectorySeparator+'values-v14'+DirectorySeparator+'styles.xml');
-
-          if (intApi >= 14) and (intApi < 21) then
-             strText:= StringReplace(strList.Text,'dummyTheme', 'android:Theme.'+FAndroidTheme, [rfReplaceAll])
-          else
-             strText:= StringReplace(strList.Text,'dummyTheme', 'android:Theme.DeviceDefault', [rfReplaceAll]);
-
-          strList.Text:= strText;
-          strList.SaveToFile(FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'values-v14'+DirectorySeparator+'styles.xml');
-
-          MkDir(FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'values-v21');
-          ChDir(FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'values-v21');
-
-          //replace "dummyTheme" ..res\values-v21
-          strList.Clear;
-           {CopyFile(FPathToJavaTemplates+DirectorySeparator+'values-v14'+DirectorySeparator+'styles.xml',
-                        FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'values-v14'+DirectorySeparator+'styles.xml');}
-          strList.LoadFromFile(FPathToJavaTemplates+DirectorySeparator+'values-v21'+DirectorySeparator+'styles.xml');
-
-          if (intApi >= 21) then
-            strText:= StringReplace(strList.Text,'dummyTheme', 'android:Theme.'+FAndroidTheme, [rfReplaceAll])
-          else
-            strText:= StringReplace(strList.Text,'dummyTheme', 'android:Theme.DeviceDefault', [rfReplaceAll]);
-
-          strList.Text:= strText;
-          strList.SaveToFile(FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'values-v21'+DirectorySeparator+'styles.xml');
-
-          MkDir(FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'layout');
-          ChDir(FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'layout');
-          CopyFile(FPathToJavaTemplates+DirectorySeparator+'layout'+DirectorySeparator+'activity_app.xml',
-                       FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'layout'+DirectorySeparator+'activity_app.xml');
-
-          MkDir(FAndroidProjectName+ DirectorySeparator + 'assets');
-          ChDir(FAndroidProjectName+DirectorySeparator+ 'assets');
-
-          MkDir(FAndroidProjectName+ DirectorySeparator + 'bin');
-          ChDir(FAndroidProjectName+DirectorySeparator+ 'bin');
-
-          MkDir(FAndroidProjectName+ DirectorySeparator + 'gen');
-          ChDir(FAndroidProjectName+DirectorySeparator+ 'gen');
 
           if FModuleType = 0 then     //Android Bridges Controls... [GUI]
           begin
@@ -786,339 +1014,344 @@ begin
 
         end; // Ant
 
-        strList.Clear;
 
-        strList.Add('set Path=%PATH%;'+FPathToAntBin); //<--- thanks to andersonscinfo !  [set path=%path%;C:\and32\ant\bin]
-        strList.Add('set JAVA_HOME='+FPathToJavaJDK);  //set JAVA_HOME=C:\Program Files (x86)\Java\jdk1.7.0_21
-        strList.Add('cd '+FAndroidProjectName);
-        strList.Add('ant -Dtouchtest.enabled=true debug');
-        strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'build-debug.bat'); //build Apk using "Ant"
+        if FModuleType <> 2 then
+        begin
+          strList.Clear;
 
-        strList.Clear;
-        strList.Add('set Path=%PATH%;'+FPathToAntBin); //<--- thanks to andersonscinfo !
-        strList.Add('set JAVA_HOME='+FPathToJavaJDK);  //set JAVA_HOME=C:\Program Files (x86)\Java\jdk1.7.0_21
-        strList.Add('cd '+FAndroidProjectName);
-        strList.Add('ant clean release');
-        strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'build-release.bat'); //build Apk using "Ant"
 
-            //*.bat utils...
-        MkDir(FAndroidProjectName+ DirectorySeparator + 'utils');
-        ChDir(FAndroidProjectName+DirectorySeparator+ 'utils');
+          strList.Add('set Path=%PATH%;'+FPathToAntBin); //<--- thanks to andersonscinfo !  [set path=%path%;C:\and32\ant\bin]
+          strList.Add('set JAVA_HOME='+FPathToJavaJDK);  //set JAVA_HOME=C:\Program Files (x86)\Java\jdk1.7.0_21
+          strList.Add('cd '+FAndroidProjectName);
+          strList.Add('ant -Dtouchtest.enabled=true debug');
+          strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'build-debug.bat'); //build Apk using "Ant"
 
-        {"android list targets" to see the available targets...}
-        strList.Clear;
-        strList.Add('cd '+FPathToAndroidSDK+DirectorySeparator+'tools');
-        strList.Add('android list targets');
-        strList.Add('cd '+FAndroidProjectName);
-        strList.Add('pause');
-        strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'utils'+DirectorySeparator+'list_target.bat');
+          strList.Clear;
+          strList.Add('set Path=%PATH%;'+FPathToAntBin); //<--- thanks to andersonscinfo !
+          strList.Add('set JAVA_HOME='+FPathToJavaJDK);  //set JAVA_HOME=C:\Program Files (x86)\Java\jdk1.7.0_21
+          strList.Add('cd '+FAndroidProjectName);
+          strList.Add('ant clean release');
+          strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'build-release.bat'); //build Apk using "Ant"
 
-        //need to pause on double-click use...
-        strList.Clear;
-        strList.Add('cmd /K list_target.bat');
-        strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'utils'+DirectorySeparator+'paused_list_target.bat');
+              //*.bat utils...
+          MkDir(FAndroidProjectName+ DirectorySeparator + 'utils');
+          ChDir(FAndroidProjectName+DirectorySeparator+ 'utils');
 
-        strList.Clear;
-        strList.Add('cd '+FPathToAndroidSDK+DirectorySeparator+'tools');
-        strList.Add('android create avd -n avd_default -t 1 -c 32M');
-        strList.Add('cd '+FAndroidProjectName);
-        strList.Add('pause');
-        strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'utils'+DirectorySeparator+'create_avd_default.bat');
+          {"android list targets" to see the available targets...}
+          strList.Clear;
+          strList.Add('cd '+FPathToAndroidSDK+DirectorySeparator+'tools');
+          strList.Add('android list targets');
+          strList.Add('cd '+FAndroidProjectName);
+          strList.Add('pause');
+          strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'utils'+DirectorySeparator+'list_target.bat');
 
-        //need to pause on double-click use...
-        strList.Clear;
-        strList.Add('cmd /k create_avd_default.bat');
-        strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'utils'+DirectorySeparator+'paused_create_avd_default.bat');
+          //need to pause on double-click use...
+          strList.Clear;
+          strList.Add('cmd /K list_target.bat');
+          strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'utils'+DirectorySeparator+'paused_list_target.bat');
 
-        strList.Clear;
-        strList.Add('cd '+FPathToAndroidSDK+DirectorySeparator+'tools');
-        if StrToInt(FMinApi) >= 15 then
-          strList.Add('emulator -avd avd_default +  -gpu on &')  //gpu: api >= 15,,,
-        else
-          strList.Add('tools emulator -avd avd_api_'+FMinApi + ' &');
-        strList.Add('cd '+FAndroidProjectName);
-        //strList.Add('pause');
-        strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'launch_avd_default.bat');
+          strList.Clear;
+          strList.Add('cd '+FPathToAndroidSDK+DirectorySeparator+'tools');
+          strList.Add('android create avd -n avd_default -t 1 -c 32M');
+          strList.Add('cd '+FAndroidProjectName);
+          strList.Add('pause');
+          strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'utils'+DirectorySeparator+'create_avd_default.bat');
 
-        strList.Clear;
-        strList.Add('cd '+FAndroidProjectName+DirectorySeparator+'bin');
-        strList.Add(FPathToAndroidSDK+DirectorySeparator+'platform-tools'+
-                   DirectorySeparator+'adb install -r '+FSmallProjName+'-'+FAntBuildMode+'.apk');
-        strList.Add('cd ..');
-        strList.Add('pause');
-        strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'install.bat');
+          //need to pause on double-click use...
+          strList.Clear;
+          strList.Add('cmd /k create_avd_default.bat');
+          strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'utils'+DirectorySeparator+'paused_create_avd_default.bat');
 
-        strList.Clear;
-        strList.Add('cd '+FAndroidProjectName+DirectorySeparator+'bin');
-        strList.Add(FPathToAndroidSDK+DirectorySeparator+'platform-tools'+
-                   DirectorySeparator+'adb uninstall '+FPackagePrefaceName+'.'+LowerCase(FSmallProjName));
-        strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'uninstall.bat');
+          strList.Clear;
+          strList.Add('cd '+FPathToAndroidSDK+DirectorySeparator+'tools');
+          if StrToInt(FMinApi) >= 15 then
+            strList.Add('emulator -avd avd_default +  -gpu on &')  //gpu: api >= 15,,,
+          else
+            strList.Add('tools emulator -avd avd_api_'+FMinApi + ' &');
+          strList.Add('cd '+FAndroidProjectName);
+          //strList.Add('pause');
+          strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'launch_avd_default.bat');
 
-        strList.Clear;
-        strList.Add('cd '+FAndroidProjectName+DirectorySeparator+'bin');
-        strList.Add(FPathToAndroidSDK+DirectorySeparator+'platform-tools'+
-                   DirectorySeparator+'adb logcat');
-        strList.Add('cd ..');
-        strList.Add('pause');
-        strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'logcat.bat');
+          strList.Clear;
+          strList.Add('cd '+FAndroidProjectName+DirectorySeparator+'bin');
+          strList.Add(FPathToAndroidSDK+DirectorySeparator+'platform-tools'+
+                     DirectorySeparator+'adb install -r '+FSmallProjName+'-'+FAntBuildMode+'.apk');
+          strList.Add('cd ..');
+          strList.Add('pause');
+          strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'install.bat');
 
-        strList.Clear;
-        strList.Add('cd '+FAndroidProjectName+DirectorySeparator+'bin');
-        strList.Add(FPathToAndroidSDK+DirectorySeparator+'platform-tools'+
-                   DirectorySeparator+'adb logcat AndroidRuntime:E *:S');
-        strList.Add('cd ..');
-        strList.Add('pause');
-        strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'utils'+DirectorySeparator+'logcat_error.bat');
+          strList.Clear;
+          strList.Add('cd '+FAndroidProjectName+DirectorySeparator+'bin');
+          strList.Add(FPathToAndroidSDK+DirectorySeparator+'platform-tools'+
+                     DirectorySeparator+'adb uninstall '+FPackagePrefaceName+'.'+LowerCase(FSmallProjName));
+          strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'uninstall.bat');
 
-        strList.Clear;
-        strList.Add('cd '+FAndroidProjectName+DirectorySeparator+'bin');
-        strList.Add(FPathToAndroidSDK+DirectorySeparator+'platform-tools'+DirectorySeparator+
-                   'adb logcat ActivityManager:I '+FSmallProjName+'-'+FAntBuildMode+'.apk:D *:S');
-        strList.Add('cd ..');
-        strList.Add('pause');
-        strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'utils'+DirectorySeparator+'logcat_app_perform.bat');
+          strList.Clear;
+          strList.Add('cd '+FAndroidProjectName+DirectorySeparator+'bin');
+          strList.Add(FPathToAndroidSDK+DirectorySeparator+'platform-tools'+
+                     DirectorySeparator+'adb logcat');
+          strList.Add('cd ..');
+          strList.Add('pause');
+          strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'logcat.bat');
 
-        (*//causes instability in the simulator! why ?
-        strList.Clear;
-        strList.Add('cd '+FAndroidProjectName+DirectorySeparator+'bin');
-        strList.Add(FPathToAndroidSDK+DirectorySeparator+'platform-tools'+DirectorySeparator+
-                   'adb shell am start -a android.intent.action.MAIN -n '+
-                    FAntPackageName+'.'+LowerCase(projName)+'/.'+FMainActivity);
-        strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'launch_apk.bat');
-        *)
+          strList.Clear;
+          strList.Add('cd '+FAndroidProjectName+DirectorySeparator+'bin');
+          strList.Add(FPathToAndroidSDK+DirectorySeparator+'platform-tools'+
+                     DirectorySeparator+'adb logcat AndroidRuntime:E *:S');
+          strList.Add('cd ..');
+          strList.Add('pause');
+          strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'utils'+DirectorySeparator+'logcat_error.bat');
 
-        strList.Clear;
-        strList.Add('cd '+FAndroidProjectName+DirectorySeparator+'bin');
-        strList.Add(FPathToAndroidSDK+DirectorySeparator+
-                   'build-tools'+DirectorySeparator+ GetFolderFromApi(StrToInt(FMinApi))+
-                   DirectorySeparator + 'aapt list '+FSmallProjName+'-'+FAntBuildMode+'.apk');
-        strList.Add('cd ..');
-        strList.Add('pause');
-        strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'utils'+DirectorySeparator+'aapt.bat'); //Android Asset Packaging Tool
+          strList.Clear;
+          strList.Add('cd '+FAndroidProjectName+DirectorySeparator+'bin');
+          strList.Add(FPathToAndroidSDK+DirectorySeparator+'platform-tools'+DirectorySeparator+
+                     'adb logcat ActivityManager:I '+FSmallProjName+'-'+FAntBuildMode+'.apk:D *:S');
+          strList.Add('cd ..');
+          strList.Add('pause');
+          strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'utils'+DirectorySeparator+'logcat_app_perform.bat');
 
-        strList.Clear;
-        strList.Add('<?xml version="1.0" encoding="UTF-8"?>');
-        strList.Add('<project name="'+FSmallProjName+'" default="help">');
-        strList.Add('<property name="sdk.dir" location="'+FPathToAndroidSDK+'"/>');
-        strList.Add('<property name="target"  value="android-'+Trim(FTargetApi)+'"/>');
-        strList.Add('<property file="ant.properties"/>');
-        strList.Add('<fail message="sdk.dir is missing." unless="sdk.dir"/>');
-        strList.Add('<import file="${sdk.dir}/tools/ant/build.xml"/>');
-        strList.Add('</project>');
-        strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'build.xml');
+          (*//causes instability in the simulator! why ?
+          strList.Clear;
+          strList.Add('cd '+FAndroidProjectName+DirectorySeparator+'bin');
+          strList.Add(FPathToAndroidSDK+DirectorySeparator+'platform-tools'+DirectorySeparator+
+                     'adb shell am start -a android.intent.action.MAIN -n '+
+                      FAntPackageName+'.'+LowerCase(projName)+'/.'+FMainActivity);
+          strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'launch_apk.bat');
+          *)
 
-        strList.Clear;
-        strList.Add('Tutorial: How to get your Android Application [Apk] using "Ant":');
-        strList.Add(' ');
-        strList.Add('   NEW! Go to Lazarus IDE menu "Run--> [Lamw] Build and Run"! Thanks to Anton!!!');
-        strList.Add(' ');
-        strList.Add('1. Double click "build-debug.bat [.sh]" to build Apk');
-        strList.Add(' ');
-        strList.Add('2. If Android Virtual Device[AVD]/Emulator [or real device] is running then:');
-        strList.Add('   2.1 double click "install.bat" to install the Apk on the Emulator [or real device]');
-        strList.Add('   2.2 look for the App "'+FSmallProjName+'" in the Emulator [or real device] and click it!');
-        strList.Add(' ');
-        strList.Add('3. If AVD/Emulator is NOT running:');
-        strList.Add('   3.1 If AVD/Emulator NOT exist:');
-        strList.Add('        3.1.1 double click "paused_create_avd_default.bat" to create the AVD ['+DirectorySeparator+'utils folder]');
-        strList.Add('   3.2 double click "launch_avd_default.bat" to launch the Emulator ['+DirectorySeparator+'utils  folder]');
-        strList.Add('   3.3 look for the App "'+FSmallProjName+'" in the Emulator and click it!');
-        strList.Add(' ');
-        strList.Add('4. Log/Debug');
-        strList.Add('   4.1 double click "logcat*.bat" to read logs and bugs! ['+DirectorySeparator+'utils folder]');
-        strList.Add(' ');
-        strList.Add('5. Uninstall Apk');
-        strList.Add('   5.1 double click "uninstall.bat" to remove Apk from the Emulator [or real device]!');
-        strList.Add(' ');
-        strList.Add('6. To find your Apk look for the "'+FSmallProjName+'-'+FAntBuildMode+'.apk" in '+DirectorySeparator+'bin folder!');
-        strList.Add(' ');
-        strList.Add('7. Android Asset Packaging Tool: to know which files were packed in "'+FSmallProjName+'-'+FAntBuildMode+'.apk"');
-        strList.Add('   7.1 double click "aapt.bat" ['+DirectorySeparator+'utils folder]' );
-        strList.Add(' ');
-        strList.Add('8. To see all available Android targets in your system ['+DirectorySeparator+'utils folder]');
-        strList.Add('   8.1 double click "paused_list_target.bat" ');
-        strList.Add(' ');
-        strList.Add('9. Hint 1: you can edit "*.bat" to extend/modify some command or to fix some incorrect info/path!');
-        strList.Add(' ');
-        strList.Add('10.Hint 2: you can edit "build.xml" to set another Android target. ex. "android-18" or "android-19" etc.');
-        strList.Add('   WARNING: Yes, if after run  "build.*" the folder "...\bin" is still empty then try another target!' );
-        strList.Add('   WARNING: If you changed the target in "build.xml" change it in "AndroidManifest.xml" too!' );
-        strList.Add(' ');
-        strList.Add('11.WARNING: After a new [Lazarus IDE]-> "run->build" do not forget to run again: "build.bat" and "install.bat" !');
-        strList.Add(' ');
-        strList.Add('12. Linux users: use "build.sh" , "install.sh" , "uninstall.sh" and "logcat.sh" [thanks to Stephano!]');
-        strList.Add('    WARNING: All demos Apps was generate on my windows system! So, please,  edit its to correct paths...!');
-        strList.Add(' ');
-        strList.Add('13. WARNING, before to execute "build-release.bat [.sh]"  you need execute "release.keystore.bat [.sh]"!');
-        strList.Add('    Please, read "readme-keytool-input.txt!"');
-        strList.Add(' ');
-        strList.Add('14. Please, for more info, look for "How to use the Demos" in "Lamw: Lazarus Android Module Wizard" readme.txt!!');
-        strList.Add(' ');
-        strList.Add('....  Thank you!');
-        strList.Add(' ');
-        strList.Add('....  by jmpessoa_hotmail_com');
-        strList.Add(' ');
-        strList.Add('System Path to Android SDK='+FPathToAndroidSDK);
-        strList.Add('System Path to Android NDK='+FPathToAndroidNDK);
-        strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'readme.txt');
+          strList.Clear;
+          strList.Add('cd '+FAndroidProjectName+DirectorySeparator+'bin');
+          strList.Add(FPathToAndroidSDK+DirectorySeparator+
+                     'build-tools'+DirectorySeparator+ GetFolderFromApi(StrToInt(FMinApi))+
+                     DirectorySeparator + 'aapt list '+FSmallProjName+'-'+FAntBuildMode+'.apk');
+          strList.Add('cd ..');
+          strList.Add('pause');
+          strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'utils'+DirectorySeparator+'aapt.bat'); //Android Asset Packaging Tool
 
-        dummy:= LowerCase(FSmallProjName);
-        strList.Clear;
-        strList.Add('key.store='+dummy+'-release.keystore');
-        strList.Add('key.alias='+dummy+'aliaskey');
-        strList.Add('key.store.password='+dummy+'passw');
-        strList.Add('key.alias.password='+dummy+'passw');
-        strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'ant.properties');
+          strList.Clear;
+          strList.Add('<?xml version="1.0" encoding="UTF-8"?>');
+          strList.Add('<project name="'+FSmallProjName+'" default="help">');
+          strList.Add('<property name="sdk.dir" location="'+FPathToAndroidSDK+'"/>');
+          strList.Add('<property name="target"  value="android-'+Trim(FTargetApi)+'"/>');
+          strList.Add('<property file="ant.properties"/>');
+          strList.Add('<fail message="sdk.dir is missing." unless="sdk.dir"/>');
+          strList.Add('<import file="${sdk.dir}/tools/ant/build.xml"/>');
+          strList.Add('</project>');
+          strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'build.xml');
 
-        //keytool input [dammy] data!
-        strList.Clear;
-        strList.Add('123456');             //Enter keystore password:
-        strList.Add('123456');             //Re-enter new password:
-        strList.Add('MyFirstName MyLastName'); //What is your first and last name?
-        strList.Add('MyDevelopmentUnit');        //What is the name of your organizational unit?
-        strList.Add('MyExampleCompany');   //What is the name of your organization?
-        strList.Add('MyCity');             //What is the name of your City or Locality?
-        strList.Add('AA');                 //What is the name of your State or Province?
-        strList.Add('BB');                 //What is the two-letter country code for this unit?
-        strList.Add('y');  //Is <CN=FirstName LastName, OU=Development, O=MyExampleCompany, L=MyCity, ST=AK, C=WZ> correct?[no]:  y
-        strList.Add('123456'); //Enter key password for <aliasKey> <RETURN if same as keystore password>:
-        strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'keytool_input.txt');
+          strList.Clear;
+          strList.Add('Tutorial: How to get your Android Application [Apk] using "Ant":');
+          strList.Add(' ');
+          strList.Add('   NEW! Go to Lazarus IDE menu "Run--> [Lamw] Build and Run"! Thanks to Anton!!!');
+          strList.Add(' ');
+          strList.Add('1. Double click "build-debug.bat [.sh]" to build Apk');
+          strList.Add(' ');
+          strList.Add('2. If Android Virtual Device[AVD]/Emulator [or real device] is running then:');
+          strList.Add('   2.1 double click "install.bat" to install the Apk on the Emulator [or real device]');
+          strList.Add('   2.2 look for the App "'+FSmallProjName+'" in the Emulator [or real device] and click it!');
+          strList.Add(' ');
+          strList.Add('3. If AVD/Emulator is NOT running:');
+          strList.Add('   3.1 If AVD/Emulator NOT exist:');
+          strList.Add('        3.1.1 double click "paused_create_avd_default.bat" to create the AVD ['+DirectorySeparator+'utils folder]');
+          strList.Add('   3.2 double click "launch_avd_default.bat" to launch the Emulator ['+DirectorySeparator+'utils  folder]');
+          strList.Add('   3.3 look for the App "'+FSmallProjName+'" in the Emulator and click it!');
+          strList.Add(' ');
+          strList.Add('4. Log/Debug');
+          strList.Add('   4.1 double click "logcat*.bat" to read logs and bugs! ['+DirectorySeparator+'utils folder]');
+          strList.Add(' ');
+          strList.Add('5. Uninstall Apk');
+          strList.Add('   5.1 double click "uninstall.bat" to remove Apk from the Emulator [or real device]!');
+          strList.Add(' ');
+          strList.Add('6. To find your Apk look for the "'+FSmallProjName+'-'+FAntBuildMode+'.apk" in '+DirectorySeparator+'bin folder!');
+          strList.Add(' ');
+          strList.Add('7. Android Asset Packaging Tool: to know which files were packed in "'+FSmallProjName+'-'+FAntBuildMode+'.apk"');
+          strList.Add('   7.1 double click "aapt.bat" ['+DirectorySeparator+'utils folder]' );
+          strList.Add(' ');
+          strList.Add('8. To see all available Android targets in your system ['+DirectorySeparator+'utils folder]');
+          strList.Add('   8.1 double click "paused_list_target.bat" ');
+          strList.Add(' ');
+          strList.Add('9. Hint 1: you can edit "*.bat" to extend/modify some command or to fix some incorrect info/path!');
+          strList.Add(' ');
+          strList.Add('10.Hint 2: you can edit "build.xml" to set another Android target. ex. "android-18" or "android-19" etc.');
+          strList.Add('   WARNING: Yes, if after run  "build.*" the folder "...\bin" is still empty then try another target!' );
+          strList.Add('   WARNING: If you changed the target in "build.xml" change it in "AndroidManifest.xml" too!' );
+          strList.Add(' ');
+          strList.Add('11.WARNING: After a new [Lazarus IDE]-> "run->build" do not forget to run again: "build.bat" and "install.bat" !');
+          strList.Add(' ');
+          strList.Add('12. Linux users: use "build.sh" , "install.sh" , "uninstall.sh" and "logcat.sh" [thanks to Stephano!]');
+          strList.Add('    WARNING: All demos Apps was generate on my windows system! So, please,  edit its to correct paths...!');
+          strList.Add(' ');
+          strList.Add('13. WARNING, before to execute "build-release.bat [.sh]"  you need execute "release.keystore.bat [.sh]"!');
+          strList.Add('    Please, read "readme-keytool-input.txt!"');
+          strList.Add(' ');
+          strList.Add('14. Please, for more info, look for "How to use the Demos" in "Lamw: Lazarus Android Module Wizard" readme.txt!!');
+          strList.Add(' ');
+          strList.Add('....  Thank you!');
+          strList.Add(' ');
+          strList.Add('....  by jmpessoa_hotmail_com');
+          strList.Add(' ');
+          strList.Add('System Path to Android SDK='+FPathToAndroidSDK);
+          strList.Add('System Path to Android NDK='+FPathToAndroidNDK);
+          strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'readme.txt');
 
-        strList.Clear;
-        strList.Add('set JAVA_HOME='+FPathToJavaJDK);  //set JAVA_HOME=C:\Program Files (x86)\Java\jdk1.7.0_21
-        strList.Add('cd '+FAndroidProjectName);
-        strList.Add('keytool -genkey -v -keystore '+FSmallProjName+'-release.keystore -alias '+dummy+'aliaskey -keyalg RSA -keysize 2048 -validity 10000 < '+
-                    FAndroidProjectName+DirectorySeparator+'keytool_input.txt');
-        strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'release-keystore.bat');
+          dummy:= LowerCase(FSmallProjName);
+          strList.Clear;
+          strList.Add('key.store='+dummy+'-release.keystore');
+          strList.Add('key.alias='+dummy+'aliaskey');
+          strList.Add('key.store.password='+dummy+'passw');
+          strList.Add('key.alias.password='+dummy+'passw');
+          strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'ant.properties');
 
-        strList.Clear;
-        strList.Add('set JAVA_HOME='+FPathToJavaJDK);  //set JAVA_HOME=C:\Program Files (x86)\Java\jdk1.7.0_21
-        strList.Add('cd '+FAndroidProjectName);
-        strList.Add('jarsigner -verify -verbose -certs '+FAndroidProjectName+DirectorySeparator+'bin'+DirectorySeparator+FSmallProjName+'-release.apk');
-        strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'jarsigner-verify.bat');
+          //keytool input [dammy] data!
+          strList.Clear;
+          strList.Add('123456');             //Enter keystore password:
+          strList.Add('123456');             //Re-enter new password:
+          strList.Add('MyFirstName MyLastName'); //What is your first and last name?
+          strList.Add('MyDevelopmentUnit');        //What is the name of your organizational unit?
+          strList.Add('MyExampleCompany');   //What is the name of your organization?
+          strList.Add('MyCity');             //What is the name of your City or Locality?
+          strList.Add('AA');                 //What is the name of your State or Province?
+          strList.Add('BB');                 //What is the two-letter country code for this unit?
+          strList.Add('y');  //Is <CN=FirstName LastName, OU=Development, O=MyExampleCompany, L=MyCity, ST=AK, C=WZ> correct?[no]:  y
+          strList.Add('123456'); //Enter key password for <aliasKey> <RETURN if same as keystore password>:
+          strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'keytool_input.txt');
 
-        strList.Clear;
+          strList.Clear;
+          strList.Add('set JAVA_HOME='+FPathToJavaJDK);  //set JAVA_HOME=C:\Program Files (x86)\Java\jdk1.7.0_21
+          strList.Add('cd '+FAndroidProjectName);
+          strList.Add('keytool -genkey -v -keystore '+FSmallProjName+'-release.keystore -alias '+dummy+'aliaskey -keyalg RSA -keysize 2048 -validity 10000 < '+
+                      FAndroidProjectName+DirectorySeparator+'keytool_input.txt');
+          strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'release-keystore.bat');
 
-        strList.Add('Tutorial: How to get your keystore to Apk release:');
-        strList.Add('');
-        strList.Add('1. Edit "keytool_input.txt" to more representative information!"');
-        strList.Add('2. You need answer the prompts:');
-        strList.Add('');
-        strList.Add('Enter keystore password: 123456');
-        strList.Add('Re-enter new password: 123456');
-        strList.Add('What is your first and last name?');
-        strList.Add('  [Unknown]:  MyFirstName MyLastName');
-        strList.Add('What is the name of your organizational unit?');
-        strList.Add('  [Unknown]:  MyDevelopmentUnit');
-        strList.Add('What is the name of your organization?');
-        strList.Add('  [Unknown]:  MyExampleCompany');
-        strList.Add('What is the name of your City or Locality?');
-        strList.Add('  [Unknown]:  MyCity');
-        strList.Add('What is the name of your State or Province?');
-        strList.Add('  [Unknown]:  AA');
-        strList.Add('What is the two-letter country code for this unit?');
-        strList.Add('  [Unknown]:  BB');
-        strList.Add('Is <CN=MyFirstName MyLastName, OU=MyDevelopmentUnit, O=MyExampleCompany,');
-        strList.Add('    L=MyCity, ST=AA, C=BB> correct?');
-        strList.Add('  [no]:  y');
-        strList.Add('Enter key password for <'+dummy+'aliaskey> <RETURN if same as keystore password>: 123456');
-        strList.Add('');
-        strList.Add('3. Execute "release-keystore.bat" [.sh]');
-        strList.Add('            warning: well, before execute, you can change/edit the [param] -alias '+dummy+'aliaskey');
-        strList.Add('              ex.  -alias www.mycompany.com ');
-        strList.Add('              Please, change/edit/Sync [key.alias='+dummy+'aliaskey] "ant.properties" too!');
-        strList.Add('');
-        strList.Add('4. Edit [notepad like] "ant.properties" to more representative information!"');
-        strList.Add('        warning: "key.alias='+dummy+'aliaskey" need be the same as in "release-keystore.bat [.sh]"');
-        strList.Add('');
+          strList.Clear;
+          strList.Add('set JAVA_HOME='+FPathToJavaJDK);  //set JAVA_HOME=C:\Program Files (x86)\Java\jdk1.7.0_21
+          strList.Add('cd '+FAndroidProjectName);
+          strList.Add('jarsigner -verify -verbose -certs '+FAndroidProjectName+DirectorySeparator+'bin'+DirectorySeparator+FSmallProjName+'-release.apk');
+          strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'jarsigner-verify.bat');
 
-        strList.Add('Yes, you got his [renowned] keystore!');
-        strList.Add('');
-        strList.Add('....  Thank you!');
-        strList.Add('');
-        strList.Add('....  by jmpessoa_hotmail_com');
-        strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'readme-keytool-input.txt');
+          strList.Clear;
 
-        linuxDirSeparator:=  DirectorySeparator;    //  C:\adt32\eclipse\workspace\AppTest1
-        linuxPathToJavaJDK:=  FPathToJavaJDK;       //  C:\adt32\sdk
-        linuxAndroidProjectName:= FAndroidProjectName;
-        linuxPathToAntBin:= FPathToAntBin;
-        linuxPathToAndroidSdk:= FPathToAndroidSDK;
+          strList.Add('Tutorial: How to get your keystore to Apk release:');
+          strList.Add('');
+          strList.Add('1. Edit "keytool_input.txt" to more representative information!"');
+          strList.Add('2. You need answer the prompts:');
+          strList.Add('');
+          strList.Add('Enter keystore password: 123456');
+          strList.Add('Re-enter new password: 123456');
+          strList.Add('What is your first and last name?');
+          strList.Add('  [Unknown]:  MyFirstName MyLastName');
+          strList.Add('What is the name of your organizational unit?');
+          strList.Add('  [Unknown]:  MyDevelopmentUnit');
+          strList.Add('What is the name of your organization?');
+          strList.Add('  [Unknown]:  MyExampleCompany');
+          strList.Add('What is the name of your City or Locality?');
+          strList.Add('  [Unknown]:  MyCity');
+          strList.Add('What is the name of your State or Province?');
+          strList.Add('  [Unknown]:  AA');
+          strList.Add('What is the two-letter country code for this unit?');
+          strList.Add('  [Unknown]:  BB');
+          strList.Add('Is <CN=MyFirstName MyLastName, OU=MyDevelopmentUnit, O=MyExampleCompany,');
+          strList.Add('    L=MyCity, ST=AA, C=BB> correct?');
+          strList.Add('  [no]:  y');
+          strList.Add('Enter key password for <'+dummy+'aliaskey> <RETURN if same as keystore password>: 123456');
+          strList.Add('');
+          strList.Add('3. Execute "release-keystore.bat" [.sh]');
+          strList.Add('            warning: well, before execute, you can change/edit the [param] -alias '+dummy+'aliaskey');
+          strList.Add('              ex.  -alias www.mycompany.com ');
+          strList.Add('              Please, change/edit/Sync [key.alias='+dummy+'aliaskey] "ant.properties" too!');
+          strList.Add('');
+          strList.Add('4. Edit [notepad like] "ant.properties" to more representative information!"');
+          strList.Add('        warning: "key.alias='+dummy+'aliaskey" need be the same as in "release-keystore.bat [.sh]"');
+          strList.Add('');
 
-        {$IFDEF WINDOWS}
-           linuxDirSeparator:= '/';
-           tempStr:= FPathToJavaJDK;
-           SplitStr(tempStr, ':');
-           linuxPathToJavaJDK:= StringReplace(tempStr, '\', '/', [rfReplaceAll]);
+          strList.Add('Yes, you got his [renowned] keystore!');
+          strList.Add('');
+          strList.Add('....  Thank you!');
+          strList.Add('');
+          strList.Add('....  by jmpessoa_hotmail_com');
+          strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'readme-keytool-input.txt');
 
-           tempStr:= FAndroidProjectName;
-           SplitStr(tempStr, ':');
-           linuxAndroidProjectName:= StringReplace(tempStr, '\', '/', [rfReplaceAll]);
+          linuxDirSeparator:=  DirectorySeparator;    //  C:\adt32\eclipse\workspace\AppTest1
+          linuxPathToJavaJDK:=  FPathToJavaJDK;       //  C:\adt32\sdk
+          linuxAndroidProjectName:= FAndroidProjectName;
+          linuxPathToAntBin:= FPathToAntBin;
+          linuxPathToAndroidSdk:= FPathToAndroidSDK;
 
-           tempStr:= FPathToAntBin;
-           SplitStr(tempStr, ':');
-           linuxPathToAntBin:= StringReplace(tempStr, '\', '/', [rfReplaceAll]);
+          {$IFDEF WINDOWS}
+             linuxDirSeparator:= '/';
+             tempStr:= FPathToJavaJDK;
+             SplitStr(tempStr, ':');
+             linuxPathToJavaJDK:= StringReplace(tempStr, '\', '/', [rfReplaceAll]);
 
-           tempStr:= FPathToAndroidSDK;
-           SplitStr(tempStr, ':');
-           linuxPathToAndroidSdk:= StringReplace(tempStr, '\', '/', [rfReplaceAll]);
-        {$ENDIF}
+             tempStr:= FAndroidProjectName;
+             SplitStr(tempStr, ':');
+             linuxAndroidProjectName:= StringReplace(tempStr, '\', '/', [rfReplaceAll]);
 
-        //linux build Apk using "Ant"  ---- Thanks to Stephano!
-        strList.Clear;
-        if FPathToAntBin <> '' then //PATH=$PATH:/data/myscripts
-          strList.Add('export PATH='+linuxPathToAntBin+':$PATH'); //export PATH=/usr/bin/ant:PATH
+             tempStr:= FPathToAntBin;
+             SplitStr(tempStr, ':');
+             linuxPathToAntBin:= StringReplace(tempStr, '\', '/', [rfReplaceAll]);
 
-        strList.Add('export JAVA_HOME='+linuxPathToJavaJDK);     //export JAVA_HOME=/usr/lib/jvm/java-6-openjdk
-        strList.Add('cd '+linuxAndroidProjectName);
-        strList.Add('ant -Dtouchtest.enabled=true debug');
-        strList.SaveToFile(linuxAndroidProjectName+linuxDirSeparator+'build-debug.sh');
+             tempStr:= FPathToAndroidSDK;
+             SplitStr(tempStr, ':');
+             linuxPathToAndroidSdk:= StringReplace(tempStr, '\', '/', [rfReplaceAll]);
+          {$ENDIF}
 
-        strList.Clear;
-        if FPathToAntBin <> '' then
-           strList.Add('export PATH='+linuxPathToAntBin+':$PATH'); //export PATH=/usr/bin/ant:PATH
+          //linux build Apk using "Ant"  ---- Thanks to Stephano!
+          strList.Clear;
+          if FPathToAntBin <> '' then //PATH=$PATH:/data/myscripts
+            strList.Add('export PATH='+linuxPathToAntBin+':$PATH'); //export PATH=/usr/bin/ant:PATH
 
-        strList.Add('export JAVA_HOME='+linuxPathToJavaJDK);     //export JAVA_HOME=/usr/lib/jvm/java-6-openjdk
-        strList.Add('cd '+linuxAndroidProjectName);
-        strList.Add('ant clean release');
-        strList.SaveToFile(linuxAndroidProjectName+linuxDirSeparator+'build-release.sh');
+          strList.Add('export JAVA_HOME='+linuxPathToJavaJDK);     //export JAVA_HOME=/usr/lib/jvm/java-6-openjdk
+          strList.Add('cd '+linuxAndroidProjectName);
+          strList.Add('ant -Dtouchtest.enabled=true debug');
+          strList.SaveToFile(linuxAndroidProjectName+linuxDirSeparator+'build-debug.sh');
 
-        linuxPathToAdbBin:= linuxPathToAndroidSdk+linuxDirSeparator+'platform-tools';
+          strList.Clear;
+          if FPathToAntBin <> '' then
+             strList.Add('export PATH='+linuxPathToAntBin+':$PATH'); //export PATH=/usr/bin/ant:PATH
 
-        //linux install - thanks to Stephano!
-        strList.Clear;
-        strList.Add(linuxPathToAdbBin+linuxDirSeparator+'adb uninstall '+FPackagePrefaceName+'.'+LowerCase(FSmallProjName));
+          strList.Add('export JAVA_HOME='+linuxPathToJavaJDK);     //export JAVA_HOME=/usr/lib/jvm/java-6-openjdk
+          strList.Add('cd '+linuxAndroidProjectName);
+          strList.Add('ant clean release');
+          strList.SaveToFile(linuxAndroidProjectName+linuxDirSeparator+'build-release.sh');
 
-        //strList.Add(linuxPathToAdbBin+linuxDirSeparator+'adb install -r '+linuxDirSeparator+'bin'+linuxDirSeparator+projName+'-'+FAntBuildMode+'.apk');
-        //fix/sugestion by OsvaldoTCF - clear slash from /bin
-        strList.Add(linuxPathToAdbBin+linuxDirSeparator+'adb install -r bin'+linuxDirSeparator+FSmallProjName+'-'+FAntBuildMode+'.apk');
+          linuxPathToAdbBin:= linuxPathToAndroidSdk+linuxDirSeparator+'platform-tools';
 
-        strList.Add(linuxPathToAdbBin+linuxDirSeparator+'adb logcat');
-        strList.SaveToFile(linuxAndroidProjectName+linuxDirSeparator+'install.sh');
+          //linux install - thanks to Stephano!
+          strList.Clear;
+          strList.Add(linuxPathToAdbBin+linuxDirSeparator+'adb uninstall '+FPackagePrefaceName+'.'+LowerCase(FSmallProjName));
 
-        //linux uninstall  - thanks to Stephano!
-        strList.Clear;
-        strList.Add(linuxPathToAdbBin+linuxDirSeparator+'adb uninstall '+FPackagePrefaceName+'.'+LowerCase(FSmallProjName));
-        strList.SaveToFile(linuxAndroidProjectName+linuxDirSeparator+'uninstall.sh');
+          //strList.Add(linuxPathToAdbBin+linuxDirSeparator+'adb install -r '+linuxDirSeparator+'bin'+linuxDirSeparator+projName+'-'+FAntBuildMode+'.apk');
+          //fix/sugestion by OsvaldoTCF - clear slash from /bin
+          strList.Add(linuxPathToAdbBin+linuxDirSeparator+'adb install -r bin'+linuxDirSeparator+FSmallProjName+'-'+FAntBuildMode+'.apk');
 
-        //linux logcat  - thanks to Stephano!
-        strList.Clear;
-        strList.Add(linuxPathToAdbBin+linuxDirSeparator+'adb logcat');
-        strList.SaveToFile(linuxAndroidProjectName+linuxDirSeparator+'logcat.sh');
+          strList.Add(linuxPathToAdbBin+linuxDirSeparator+'adb logcat');
+          strList.SaveToFile(linuxAndroidProjectName+linuxDirSeparator+'install.sh');
 
-        strList.Clear;
-        strList.Add('export JAVA_HOME='+linuxPathToJavaJDK);     //export JAVA_HOME=/usr/lib/jvm/java-6-openjdk
-        strList.Add('cd '+linuxAndroidProjectName);
-        strList.Add('keytool -genkey -v -keystore '+FSmallProjName+'-release.keystore -alias '+dummy+'aliaskey -keyalg RSA -keysize 2048 -validity 10000 < '+
-                     linuxAndroidProjectName+linuxDirSeparator+dummy+'keytool_input.txt');
-        strList.SaveToFile(linuxAndroidProjectName+linuxDirSeparator+'release-keystore.sh');
+          //linux uninstall  - thanks to Stephano!
+          strList.Clear;
+          strList.Add(linuxPathToAdbBin+linuxDirSeparator+'adb uninstall '+FPackagePrefaceName+'.'+LowerCase(FSmallProjName));
+          strList.SaveToFile(linuxAndroidProjectName+linuxDirSeparator+'uninstall.sh');
 
-        strList.Clear;
-        strList.Add('export JAVA_HOME='+linuxPathToJavaJDK);     //export JAVA_HOME=/usr/lib/jvm/java-6-openjdk
-        strList.Add('cd '+linuxAndroidProjectName);
-        strList.Add('jarsigner -verify -verbose -certs '+linuxAndroidProjectName+linuxDirSeparator+'bin'+linuxDirSeparator+FSmallProjName+'-release.apk');
-        strList.SaveToFile(linuxAndroidProjectName+linuxDirSeparator+'jarsigner-verify.sh');
+          //linux logcat  - thanks to Stephano!
+          strList.Clear;
+          strList.Add(linuxPathToAdbBin+linuxDirSeparator+'adb logcat');
+          strList.SaveToFile(linuxAndroidProjectName+linuxDirSeparator+'logcat.sh');
 
+          strList.Clear;
+          strList.Add('export JAVA_HOME='+linuxPathToJavaJDK);     //export JAVA_HOME=/usr/lib/jvm/java-6-openjdk
+          strList.Add('cd '+linuxAndroidProjectName);
+          strList.Add('keytool -genkey -v -keystore '+FSmallProjName+'-release.keystore -alias '+dummy+'aliaskey -keyalg RSA -keysize 2048 -validity 10000 < '+
+                       linuxAndroidProjectName+linuxDirSeparator+dummy+'keytool_input.txt');
+          strList.SaveToFile(linuxAndroidProjectName+linuxDirSeparator+'release-keystore.sh');
+
+          strList.Clear;
+          strList.Add('export JAVA_HOME='+linuxPathToJavaJDK);     //export JAVA_HOME=/usr/lib/jvm/java-6-openjdk
+          strList.Add('cd '+linuxAndroidProjectName);
+          strList.Add('jarsigner -verify -verbose -certs '+linuxAndroidProjectName+linuxDirSeparator+'bin'+linuxDirSeparator+FSmallProjName+'-release.apk');
+          strList.SaveToFile(linuxAndroidProjectName+linuxDirSeparator+'jarsigner-verify.sh');
+
+        end;
         Result := True;
       except
         on e: Exception do
@@ -1136,6 +1369,7 @@ function TAndroidProjectDescriptor.DoInitDescriptor: TModalResult;  //No GUI
 var
    auxList: TStringList;
 begin
+   FModuleType := 1;
    if GetWorkSpaceFromForm(1) then //1: noGUI project
    begin
       if TryNewJNIAndroidInterfaceCode(1) then //1: noGUI project
@@ -1148,7 +1382,9 @@ begin
         CreateDirUTF8(FAndroidProjectName+DirectorySeparator+'libs'+DirectorySeparator+'armeabi-v7a');
         CreateDirUTF8(FAndroidProjectName+DirectorySeparator+'libs'+DirectorySeparator+'x86');
         CreateDirUTF8(FAndroidProjectName+DirectorySeparator+'obj');
-        CreateDirUTF8(FAndroidProjectName+DirectorySeparator+'obj'+DirectorySeparator+LowerCase(FSmallProjName));
+
+        if FModuleType <> 2 then
+           CreateDirUTF8(FAndroidProjectName+DirectorySeparator+'obj'+DirectorySeparator+'controls');
 
         if FSupportV4 = 'yes' then  //add android 4.0 support to olds devices ...
         begin
@@ -1313,17 +1549,25 @@ begin
 
   inherited InitProject(AProject);
 
-  projName:= LowerCase(FJavaClassName) + '.lpr';
+  if  FModuleType <> 2 then
+    projName:= LowerCase(FJavaClassName) + '.lpr'
+  else
+    projName:= LowerCase(FSmallProjName) + '.lpr';
 
   if   FPathToClassName = '' then
       FPathToClassName:= StringReplace(FPackagePrefaceName, '.', '/', [rfReplaceAll])+'/'+LowerCase(FSmallProjName)+'/'+ FJavaClassName; //ex. 'com/example/appasynctaskdemo1/Controls'
 
-  projDir := FPathToJNIFolder+DirectorySeparator+'jni'+DirectorySeparator;
+
+  if  FModuleType <> 2 then
+     projDir:= FPathToJNIFolder+DirectorySeparator+'jni'+DirectorySeparator
+  else
+     projDir:= FPathToJNIFolder+DirectorySeparator;
 
   if FModuleType = 0 then
     AProject.CustomData.Values['LAMW'] := 'GUI'
-  else
-    AProject.CustomData.Values['LAMW'] := 'NoGUI';
+  else if  FModuleType = 1 then
+    AProject.CustomData.Values['LAMW'] := 'NoGUI'
+  else  AProject.CustomData.Values['LAMW'] := 'NoGUIConsoleApp';
 
   AProject.ProjectInfoFile := projDir + ChangeFileExt(projName, '.lpi');
 
@@ -1338,7 +1582,12 @@ begin
 
   sourceList:= TStringList.Create;
   sourceList.Add('{hint: save all files to location: ' + projDir + ' }');
-  sourceList.Add('library '+ LowerCase(FJavaClassName) +'; '+ ' //[by Lamw: Lazarus Android Module Wizard: '+DateTimeToStr(Now)+']');
+
+  if FModuleType <> 2 then
+    sourceList.Add('library '+ LowerCase(FJavaClassName) +'; '+ ' //[by Lamw: Lazarus Android Module Wizard: '+DateTimeToStr(Now)+']')
+  else
+    sourceList.Add('program '+ LowerCase(FSmallProjName) +'; '+ ' //[by Lamw: Lazarus Android Module Wizard: '+DateTimeToStr(Now)+']');
+
   sourceList.Add(' ');
   sourceList.Add('{$mode delphi}');
   sourceList.Add(' ');
@@ -1350,7 +1599,7 @@ begin
     sourceList.Add('  Laz_And_Controls_Events;');
     sourceList.Add(' ');
   end
-  else //generic module :  Not Android Bridges Controls
+  else if FModuleType = 1 then //NoGUI ---  Not Android Bridges Controls
   begin
     sourceList.Add('  Classes, SysUtils, CustApp, jni;');
     sourceList.Add(' ');
@@ -1391,10 +1640,45 @@ begin
     sourceList.Add('  gNoGUIAppjClassName: string;');
 
     sourceList.Add('');
+  end
+  else   // 2 - NoGUI console executable
+  begin
+    sourceList.Add('  Classes, SysUtils, CustApp;');
+    sourceList.Add(' ');
+    sourceList.Add('type');
+    sourceList.Add(' ');
+    sourceList.Add('  TAndroidConsoleApp = class(TCustomApplication)');
+    sourceList.Add('  public');
+    sourceList.Add('     procedure CreateForm(InstanceClass: TComponentClass; out Reference);');
+    sourceList.Add('     constructor Create(TheOwner: TComponent); override;');
+    sourceList.Add('     destructor Destroy; override;');
+    sourceList.Add('  end;');
+    sourceList.Add(' ');
+    sourceList.Add('procedure TAndroidConsoleApp.CreateForm(InstanceClass: TComponentClass; out Reference);');
+    sourceList.Add('var');
+    sourceList.Add('  Instance: TComponent;');
+    sourceList.Add('begin');
+    sourceList.Add('  Instance := TComponent(InstanceClass.NewInstance);');
+    sourceList.Add('  TComponent(Reference):= Instance;');
+    sourceList.Add('  Instance.Create(Self);');
+    sourceList.Add('end;');
+    sourceList.Add(' ');
+    sourceList.Add('constructor TAndroidConsoleApp.Create(TheOwner: TComponent);');
+    sourceList.Add('begin');
+    sourceList.Add('  inherited Create(TheOwner);');
+    sourceList.Add('  StopOnException:=True;');
+    sourceList.Add('end;');
+    sourceList.Add(' ');
+    sourceList.Add('destructor TAndroidConsoleApp.Destroy;');
+    sourceList.Add('begin');
+    sourceList.Add('  inherited Destroy;');
+    sourceList.Add('end;');
+    sourceList.Add(' ');
+    sourceList.Add('var');
+    sourceList.Add('  AndroidConsoleApp: TAndroidConsoleApp;');
+    sourceList.Add('');
   end;
 
-  gjAppName:= 'com.example.appasynctaskdemo1';{AndroidWidget.pas}
-  gjClassName:= 'com/example/appasynctaskdemo1/Controls';{AndroidWidget.pas}
   sourceList.Add(FPascalJNIInterfaceCode);
 
   sourceList.Add(' ');
@@ -1410,7 +1694,7 @@ begin
     sourceList.Add('  gApp.Initialize;');
     sourceList.Add('  gApp.CreateForm(TAndroidModule1, AndroidModule1);');
   end
-  else
+  else if FModuleType = 1 then
   begin
      sourceList.Add('  gNoGUIApp:= TNoGUIApp.Create(nil);');
      sourceList.Add('  gNoGUIApp.Title:= ''My Android Pure Library'';');
@@ -1422,8 +1706,14 @@ begin
 
      sourceList.Add('  gNoGUIApp.Initialize;');
      sourceList.Add('  gNoGUIApp.CreateForm(TNoGUIAndroidModule1, NoGUIAndroidModule1);');
+  end
+  else // 2  - console executable
+  begin
+     sourceList.Add('  AndroidConsoleApp:= TAndroidConsoleApp.Create(nil);');
+     sourceList.Add('  AndroidConsoleApp.Title:= ''Android Executable Console App'';');
+     sourceList.Add('  AndroidConsoleApp.Initialize;');
+     sourceList.Add('  AndroidConsoleApp.CreateForm(TAndroidConsoleDataForm1,AndroidConsoleDataForm1);');
   end;
-
   sourceList.Add('end.');
 
   AProject.MainFile.SetSourceText(sourceList.Text, True);
@@ -1436,8 +1726,10 @@ begin
 
   if (Pos('\', FPathToAndroidNDK) > 0) or (Pos(':', FPathToAndroidNDK) > 0) then
      osys:= 'windows'
-  else if FPrebuildOSYS='linux-x86_64' then osys:= 'linux-x86_64'
-  else osys:= 'linux-x86';
+  else if FPrebuildOSYS='linux-x86_64' then
+     osys:= 'linux-x86_64'
+  else
+    osys:= 'linux-x86';
 
   {Set compiler options for Android requirements}
 
@@ -1558,6 +1850,15 @@ begin
   AProject.LazCompilerOptions.SmallerCode:= True;    //added 21-december-2014
   AProject.LazCompilerOptions.SmartLinkUnit:= True;  //added 21-december-2014
 
+  if FModuleType =  2 then
+  begin
+    if FPieChecked then  //here PIE support .. ok sorry... :(  ...bad code reuse!
+    begin
+      AProject.LazCompilerOptions.PassLinkerOptions:= True;
+      AProject.LazCompilerOptions.LinkerOptions:='-pie'
+    end;
+  end;
+
   {Verbose}
       //.....................
 
@@ -1613,21 +1914,30 @@ begin
   auxList.Add('<TargetCPU Value="i386"/>');
   auxList.Add('<CustomOptions Value="'+customOptions_x86+'"/>');
   //auxList.Add('<TargetProcessor Value=""/>');  //commented until lazarus fix bug for missing ARMV7A  //again thanks to Stephano!
-  auxList.SaveToFile(FPathToJNIFolder+DirectorySeparator+'jni'+DirectorySeparator+'build-modes'+DirectorySeparator+'build_x86.txt');
+  if FModuleType <> 2 then
+    auxList.SaveToFile(FPathToJNIFolder+DirectorySeparator+'jni'+DirectorySeparator+'build-modes'+DirectorySeparator+'build_x86.txt')
+  else
+     auxList.SaveToFile(FPathToJNIFolder+DirectorySeparator+'build-modes'+DirectorySeparator+'build_x86.txt');
 
   auxList.Clear;
   auxList.Add('<Libraries Value="'+libraries_arm+'"/>');
   auxList.Add('<TargetCPU Value="arm"/>');
   auxList.Add('<CustomOptions Value="'+customOptions_armV6+'"/>');
   //auxList.Add('<TargetProcessor Value="ARMV6"/>');  //commented until lazarus fix bug for missing ARMV7A  //again thanks to Stephano!
-  auxList.SaveToFile(FPathToJNIFolder+DirectorySeparator+'jni'+DirectorySeparator+'build-modes'+DirectorySeparator+'build_armV6.txt');
+  if FModuleType <> 2 then
+    auxList.SaveToFile(FPathToJNIFolder+DirectorySeparator+'jni'+DirectorySeparator+'build-modes'+DirectorySeparator+'build_armV6.txt')
+  else
+    auxList.SaveToFile(FPathToJNIFolder+DirectorySeparator+'build-modes'+DirectorySeparator+'build_armV6.txt');
 
   auxList.Clear;
   auxList.Add('<Libraries Value="'+libraries_arm+'"/>');
   auxList.Add('<TargetCPU Value="arm"/>');
   auxList.Add('<CustomOptions Value="'+customOptions_armV7a+'"/>');
   //auxList.Add('<TargetProcessor Value="ARMV7A"/>');  //commented until lazarus fix bug for missing ARMV7A  //again thanks to Stephano!
-  auxList.SaveToFile(FPathToJNIFolder+DirectorySeparator+'jni'+DirectorySeparator+'build-modes'+DirectorySeparator+'build_armV7a.txt');
+  if FModuleType <> 2 then
+     auxList.SaveToFile(FPathToJNIFolder+DirectorySeparator+'jni'+DirectorySeparator+'build-modes'+DirectorySeparator+'build_armV7a.txt')
+  else
+     auxList.SaveToFile(FPathToJNIFolder+DirectorySeparator+'build-modes'+DirectorySeparator+'build_armV7a.txt');
 
   auxList.Clear;
   auxList.Add('How To Get More Builds:');
@@ -1669,13 +1979,29 @@ begin
   auxList.Add('      Thank you!');
   auxList.Add('      By  ___jmpessoa_hotmail.com_____');
 
-  auxList.SaveToFile(FPathToJNIFolder+DirectorySeparator+'jni'+DirectorySeparator+'build-modes'+DirectorySeparator+'readme.txt');
+  if FModuleType <> 2 then
+    auxList.SaveToFile(FPathToJNIFolder+DirectorySeparator+'jni'+DirectorySeparator+'build-modes'+DirectorySeparator+'readme.txt')
+  else
+    auxList.SaveToFile(FPathToJNIFolder+DirectorySeparator+'build-modes'+DirectorySeparator+'readme.txt');
 
-  AProject.LazCompilerOptions.TargetFilename:=
+
+  if  FModuleType <> 2 then
+  begin
+    AProject.LazCompilerOptions.TargetFilename:=
           '..'+DirectorySeparator+'libs'+DirectorySeparator+auxStr+DirectorySeparator+'lib'+LowerCase(FJavaClassName){+'.so'};
 
-  AProject.LazCompilerOptions.UnitOutputDirectory :=
+    AProject.LazCompilerOptions.UnitOutputDirectory :=
          '..'+DirectorySeparator+'obj'+ DirectorySeparator+LowerCase(FJavaClassName); {-FU}
+
+  end
+  else  //2 -- noGUI console executable
+  begin
+    AProject.LazCompilerOptions.TargetFilename:=
+            'libs'+DirectorySeparator+auxStr+DirectorySeparator+LowerCase(FSmallProjName);
+
+    AProject.LazCompilerOptions.UnitOutputDirectory :='obj'; {-FU}
+
+  end;
 
   {TargetProcessor}
 
@@ -1683,6 +2009,7 @@ begin
   if FInstructionSet <> 'x86' then
      AProject.LazCompilerOptions.TargetProcessor:= UpperCase(FInstructionSet); {-Cp}
   *)
+
 
   {Others}
   AProject.LazCompilerOptions.CustomOptions:= customOptions_default;
@@ -1699,10 +2026,15 @@ begin
   begin
     AndroidFileDescriptor.ResourceClass:= TAndroidModule;
   end
-  else // =1 -> NoGUI Controls
+  else if FModuleType = 1 then // =1 -> NoGUI Controls
   begin
     AndroidFileDescriptor.ResourceClass:= TNoGUIAndroidModule;
+  end
+  else // =2 -> NoGUI Exe
+  begin
+    AndroidFileDescriptor.ResourceClass:= TAndroidConsoleDataForm;
   end;
+
   LazarusIDE.DoNewEditorFile(AndroidFileDescriptor, '', '',
                              [nfIsPartOfProject,nfOpenInEditor,nfCreateDefaultSrc]);
   LazarusIDE.DoSaveProject([]); // TODO: change hardcoded "controls"
@@ -1749,9 +2081,20 @@ begin
   Name:= 'AndroidDataModule';
 
   if ModuleType = 0 then
+  begin
+    Name:= 'AndroidDataModule';
     ResourceClass := TAndroidModule
-  else
-    ResourceClass := TNoGUIAndroidModule;
+  end
+  else if ModuleType = 1 then
+  begin
+     Name:= 'NoGUIAndroidDataModule';
+     ResourceClass := TNoGUIAndroidModule
+  end
+  else  //2
+  begin
+     Name:= 'AndroidConsoleDataForm';
+     ResourceClass:= TAndroidConsoleDataForm;
+  end;
 
   UseCreateFormStatements:= True;
 
@@ -1764,12 +2107,12 @@ end;
 
 function TAndroidFileDescPascalUnitWithResource.GetLocalizedName: string;
 begin
-   Result := 'JNI Android Form [Lamw GUI]';
+   Result := 'Android [GUI] Module [Lamw]';
 end;
 
 function TAndroidFileDescPascalUnitWithResource.GetLocalizedDescription: string;
 begin
-   Result := 'Create a new Unit with a DataModule for JNI Android module (.so)';
+   Result := 'Create a new GUI JNI Android module (.so)';
 end;
 
 function TAndroidFileDescPascalUnitWithResource.CreateSource(const Filename     : string;
@@ -1782,7 +2125,12 @@ begin
    uName:= FileName;
    uName:= SplitStr(uName,'.');
    sourceList:= TStringList.Create;
-   sourceList.Add('{Hint: save all files to location: ' +PathToJNIFolder+DirectorySeparator+'jni }');
+
+   if ModuleType <> 2 then
+     sourceList.Add('{Hint: save all files to location: ' +PathToJNIFolder+DirectorySeparator+'jni }')
+   else
+     sourceList.Add('{Hint: save all files to location: ' +PathToJNIFolder +'}');
+
    sourceList.Add('unit '+uName+';');
    sourceList.Add('');
    if SyntaxMode = smDelphi then
@@ -1816,10 +2164,11 @@ function TAndroidFileDescPascalUnitWithResource.GetInterfaceUsesSection: string;
 begin
   if ModuleType = 1 then //generic module: No GUI Controls
     Result := 'Classes, SysUtils, jni;'
-  else  //GUI controls module
-    Result := 'Classes, SysUtils, And_jni, And_jni_Bridge, Laz_And_Controls, Laz_And_Controls_Events, AndroidWidget;';
+  else if ModuleType = 0  then//GUI controls module
+    Result := 'Classes, SysUtils, And_jni, And_jni_Bridge, Laz_And_Controls, Laz_And_Controls_Events, AndroidWidget;'
+  else // 2
+    Result := 'Classes, SysUtils;'
 
-   //Result:='Classes, SysUtils, AndroidWidget;';
 end;
 
 function TAndroidFileDescPascalUnitWithResource.GetInterfaceSource(const Filename     : string;
@@ -1831,6 +2180,7 @@ begin
   strList:= TStringList.Create;
   strList.Add('');
   strList.Add('type');
+
   if ModuleType = 0 then //GUI controls module
   begin
     if ResourceName <> '' then
@@ -1838,13 +2188,21 @@ begin
     else
        strList.Add('  TAndroidModuleXX = class(jForm)');
   end
-  else //generic module
+  else if ModuleType = 1 then//generic module
   begin
     if ResourceName <> '' then
       strList.Add('  T' + ResourceName + ' = class(TDataModule)')
     else
       strList.Add('  TNoGUIAndroidModuleXX  = class(TDataModule)');
+  end
+  else //2
+  begin
+    if ResourceName <> '' then
+      strList.Add('  T' + ResourceName + ' = class(TDataModule)')
+    else
+      strList.Add('  TAndroidConsoleDataFormXX  = class(TDataModule)');
   end;
+
   strList.Add('  private');
   strList.Add('    {private declarations}');
   strList.Add('  public');
@@ -1860,13 +2218,21 @@ begin
     else
        strList.Add('  AndroidModuleXX: TDataMoule');
   end
-  else //generic module
+  else if ModuleType = 1 then //generic module
   begin
     if ResourceName <> '' then
       strList.Add('  ' + ResourceName + ': T' + ResourceName + ';')
     else
       strList.Add('  NoGUIAndroidModuleXX: TNoGUIDataMoule');
+  end
+  else //2
+  begin
+    if ResourceName <> '' then
+     strList.Add('  ' + ResourceName + ': T' + ResourceName + ';')
+    else
+      strList.Add('  AndroidConsoleDataFormXX: TAndroidConsoleDataForm');
   end;
+
   Result := strList.Text;
   strList.Free;
 end;

@@ -16,6 +16,7 @@ type
     BitBtnCancel: TBitBtn;
     BitBtnOK: TBitBtn;
     CheckBox1: TCheckBox;
+    CheckBox2: TCheckBox;
     ComboBoxTheme: TComboBox;
     ComboSelectProjectName: TComboBox;
     EditPackagePrefaceName: TEdit;
@@ -85,7 +86,7 @@ type
 
     FProjectModel: string;
 
-    FModuleType: integer;  //0: GUI project   1: NoGui project
+    FModuleType: integer;  //0: GUI project   1: NoGui project   2: NoGUI Exe
     FSmallProjName: string;
 
     FPackagePrefaceName: string;
@@ -330,13 +331,13 @@ begin
      FAndroidProjectName:= FPathToWorkspace + DirectorySeparator+ FSmallProjName;
        FPackagePrefaceName:= LowerCase(Trim(EditPackagePrefaceName.Text));
        if EditPackagePrefaceName.Text = '' then EditPackagePrefaceName.Text:= 'org.lamw';
-       if FModuleType = 1 then //NoGUI
+       if FModuleType <> 0 then //NoGUI
           FJavaClassName:=  FSmallProjName;
   end
   else
   begin
-     FProjectModel:= 'Eclipse';  //project exits!
-     FAndroidProjectName:= Trim(ComboSelectProjectName.Text);
+     FProjectModel:= 'Eclipse';  //please, read as project exists!
+     FAndroidProjectName:= Trim(ComboSelectProjectName.Text); //full
      aList:= TStringList.Create;
      aList.StrictDelimiter:= True;
      aList.Delimiter:= DirectorySeparator;
@@ -344,7 +345,7 @@ begin
      FSmallProjName:=  aList.Strings[aList.Count-1];; //ex. "AppTest1"
      FPackagePrefaceName:= '';
      aList.Free;
-     if FModuleType = 1 then  //NoGUI
+     if FModuleType <> 1 then  //NoGUI
        FJavaClassName:=  FSmallProjName //ex. "AppTest1"
   end;
 
@@ -406,11 +407,19 @@ begin
       MkDir(FAndroidProjectName);
       ChDir(FAndroidProjectName);
 
-      MkDir(FAndroidProjectName+ DirectorySeparator + 'jni');
-      ChDir(FAndroidProjectName+DirectorySeparator+ 'jni');
+      if FModuleType <> 2 then
+      begin
+        MkDir(FAndroidProjectName+ DirectorySeparator + 'jni');
+        ChDir(FAndroidProjectName+DirectorySeparator+ 'jni');
 
-      MkDir(FAndroidProjectName+DirectorySeparator+ 'jni'+DirectorySeparator+'build-modes');
-      ChDir(FAndroidProjectName+DirectorySeparator+ 'jni'+DirectorySeparator+'build-modes');
+        MkDir(FAndroidProjectName+DirectorySeparator+ 'jni'+DirectorySeparator+'build-modes');
+        ChDir(FAndroidProjectName+DirectorySeparator+ 'jni'+DirectorySeparator+'build-modes');
+      end
+      else  //console executable app
+      begin
+        MkDir(FAndroidProjectName+DirectorySeparator+'build-modes');
+        ChDir(FAndroidProjectName+DirectorySeparator+'build-modes');
+      end;
 
       MkDir(FAndroidProjectName+ DirectorySeparator + 'libs');
       ChDir(FAndroidProjectName+DirectorySeparator+ 'libs');
@@ -420,10 +429,13 @@ begin
                  FAndroidProjectName+DirectorySeparator+'libs'+DirectorySeparator+'android-support-v4.jar');
 
       MkDir(FAndroidProjectName+ DirectorySeparator + 'obj');
-      ChDir(FAndroidProjectName+DirectorySeparator+ 'obj');
+      ChDir(FAndroidProjectName+ DirectorySeparator+ 'obj');
 
-      MkDir(FAndroidProjectName+ DirectorySeparator + 'obj'+DirectorySeparator+LowerCase(FJavaClassName));
-      ChDir(FAndroidProjectName+DirectorySeparator+ 'obj'+DirectorySeparator+LowerCase(FJavaClassName));
+      if FModuleType <> 2 then
+      begin
+        MkDir(FAndroidProjectName+ DirectorySeparator + 'obj'+DirectorySeparator+LowerCase(FJavaClassName));
+        ChDir(FAndroidProjectName+ DirectorySeparator + 'obj'+DirectorySeparator+LowerCase(FJavaClassName));
+      end;
 
       MkDir(FAndroidProjectName+ DirectorySeparator + 'libs'+DirectorySeparator+'x86');
       ChDir(FAndroidProjectName+DirectorySeparator+ 'libs'+DirectorySeparator+'x86');
@@ -752,7 +764,7 @@ end;
 
 procedure TFormWorkspace.SpeedButton1Click(Sender: TObject);
 begin
-  ShowMessage('Lamw: Lazarus Android Module Wizard' +#10#13+ '[ver. 0.6 - rev. 36 - 03 August 2015]');
+  ShowMessage('Lamw: Lazarus Android Module Wizard' +#10#13+ '[ver. 0.6 - rev. 38.1 - 30 December 2015]');
 end;
 
 procedure TFormWorkspace.SpeedButtonHintThemeClick(Sender: TObject);
@@ -771,7 +783,7 @@ end;
 
 procedure TFormWorkspace.LoadSettings(const pFilename: string);  //called by
 var
-  i1, i2, i3, i5, j1{, j2, j3}: integer;
+  i1, i2, i3, i5, j1: integer;
 begin
   FFileName:= pFilename;
   with TIniFile.Create(pFilename) do
