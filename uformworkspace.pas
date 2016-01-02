@@ -326,7 +326,7 @@ begin
 
   if Pos(DirectorySeparator, ComboSelectProjectName.Text) <= 0 then
   begin
-     FProjectModel:= 'Ant';   //project not exits!
+     FProjectModel:= 'Ant';   //please, read as "project not exists"!
      FSmallProjName:= Trim(ComboSelectProjectName.Text);
      FAndroidProjectName:= FPathToWorkspace + DirectorySeparator+ FSmallProjName;
        FPackagePrefaceName:= LowerCase(Trim(EditPackagePrefaceName.Text));
@@ -336,7 +336,7 @@ begin
   end
   else
   begin
-     FProjectModel:= 'Eclipse';  //please, read as project exists!
+     FProjectModel:= 'Eclipse';  //please, read as "project exists!"
      FAndroidProjectName:= Trim(ComboSelectProjectName.Text); //full
      aList:= TStringList.Create;
      aList.StrictDelimiter:= True;
@@ -345,7 +345,7 @@ begin
      FSmallProjName:=  aList.Strings[aList.Count-1];; //ex. "AppTest1"
      FPackagePrefaceName:= '';
      aList.Free;
-     if FModuleType <> 1 then  //NoGUI
+     if FModuleType <> 0 then  //NoGUI
        FJavaClassName:=  FSmallProjName //ex. "AppTest1"
   end;
 
@@ -452,7 +452,7 @@ end;
 procedure TFormWorkspace.FormCreate(Sender: TObject);
 var
   fileName: string;
-begin
+begin   //here ModuleType already know!
   fileName:= AppendPathDelim(LazarusIDE.GetPrimaryConfigPath) + 'JNIAndroidProject.ini';
   if not FileExistsUTF8(fileName) then
   begin

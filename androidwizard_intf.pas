@@ -198,7 +198,7 @@ var
 begin
   try
     FModuleType := 2; //0: GUI --- 1:NoGUI --- 2: NoGUI EXE
-    FJavaClassName := FSmallProjName; //'Controls';
+    //FJavaClassName := 'Controls';
     FPathToClassName := '';
     if GetWorkSpaceFromForm(2) then
     begin
@@ -1984,7 +1984,6 @@ begin
   else
     auxList.SaveToFile(FPathToJNIFolder+DirectorySeparator+'build-modes'+DirectorySeparator+'readme.txt');
 
-
   if  FModuleType <> 2 then
   begin
     AProject.LazCompilerOptions.TargetFilename:=
@@ -2009,7 +2008,6 @@ begin
   if FInstructionSet <> 'x86' then
      AProject.LazCompilerOptions.TargetProcessor:= UpperCase(FInstructionSet); {-Cp}
   *)
-
 
   {Others}
   AProject.LazCompilerOptions.CustomOptions:= customOptions_default;
