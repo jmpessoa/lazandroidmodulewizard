@@ -145,6 +145,11 @@
 	****************************************************************************************************
 
 
+Version 0.6 - rev. 38.3 - 07 January 2016 - 
+
+	NEW! Added jForm method  ToggleSoftInput  
+		Show/Hide Soft Keyboard ...
+
 Version 0.6 - rev. 38.2 - 06 January 2016 - 
 
 	IMPROVEMENT! Better support for device screen rotation!

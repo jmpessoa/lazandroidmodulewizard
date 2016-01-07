@@ -1,6 +1,6 @@
 package com.example.dummyapp;
 
-//Lamw: Lazarus Android Module Wizard  - version 0.6 - revision 38.2 - 06 January - 2016 
+//Lamw: Lazarus Android Module Wizard  - version 0.6 - revision 38.3 - 07 January - 2016 
 //Form Designer and Components development model!
 //
 //https://github.com/jmpessoa/lazandroidmodulewizard
@@ -1213,6 +1213,12 @@ public void CopyFromAssetsToEnvironmentDir(String _filename, String _environment
 	CopyFromInternalAppStorageToEnvironmentDir(_filename,_environmentDir);	
 }
 
+public void ToggleSoftInput() {
+	  InputMethodManager imm =(InputMethodManager) controls.activity.getSystemService(Context.INPUT_METHOD_SERVICE);
+	  imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
+}
+
+
 }
 
 //-------------------------------------------------------------------------
@@ -1492,14 +1498,13 @@ onClickListener = new OnClickListener() {
 
 setOnClickListener(onClickListener);
 
-
 // Init Event : http://socome.tistory.com/15
 onKeyListener = new OnKeyListener() {	
   public  boolean onKey(View v, int keyCode, KeyEvent event) { //Called when a hardware key is dispatched to a view	
      if (event.getAction() == KeyEvent.ACTION_UP) {	
     	if (keyCode == KeyEvent.KEYCODE_ENTER) {
             InputMethodManager imm = (InputMethodManager) controls.activity.getSystemService(Context.INPUT_METHOD_SERVICE);
-            imm.hideSoftInputFromWindow(getWindowToken(), 0);       
+            imm.hideSoftInputFromWindow(v.getWindowToken(), 0);       
             //Log.i("OnKeyListener","OnEnter, Hide KeyBoard");
             // LoadMan
             controls.pOnEnter(PasObj);  //just Enter/Done/Next/backbutton ....!      
@@ -2603,16 +2608,12 @@ public void setLParamHeight(int h) {
 
 //by jmpessoa
 public int getLParamHeight() {   
-	//if (this.getHeight() == 0) 
-		return lpH;
-	//else return this.getHeight();		  
+  return lpH;
 }  
 
 //by jmpessoa
 public int getLParamWidth() {	
-	//if (this.getWidth() == 0) 
-		return lpW;
-	//else return this.getWidth();
+  return lpW;
 }
 
 //by jmpessoa
@@ -2742,7 +2743,6 @@ public void SetImageFromByteArray(byte[] _image) {
 //
 //
 //-------------------------------------------------------------------------
-//by jmpessoa : custom row!
 //by jmpessoa : custom row!
 
 class jListItemRow{

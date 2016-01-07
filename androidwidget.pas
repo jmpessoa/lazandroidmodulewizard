@@ -307,6 +307,19 @@ type
         Height: Integer;
        End;
 
+  TScreenResolution = (sr320x480, // <-- phones
+                       sr480x800,
+                       sr480x854,
+                       sr540x960,
+                       sr1280x720, //HD
+                       sr1920x1080, //Full HD
+                        sr1024x600,  // <-- tablets
+                        sr1280x800,
+                        {sr1920x1080,}
+                        sr2048x1536,
+                        sr2560x1440,
+                        sr2560x1600);
+
   TMenuItemShowAsAction = (misNever,
                         misIfRoom,
                         misAlways,
@@ -1028,6 +1041,7 @@ type
 
     function GetActionBarHeight(): integer;
     function ActionBarIsShowing(): boolean;
+    procedure ToggleSoftInput();
 
     // Property
     property View         : jObject        read FjRLayout; //layout!
@@ -1265,6 +1279,7 @@ end;
   function jForm_GetActionBarHeight(env: PJNIEnv; _jform: JObject): integer;
   function jForm_ActionBarIsShowing(env: PJNIEnv; _jform: JObject): boolean;
 
+  procedure jForm_ToggleSoftInput(env: PJNIEnv; _jform: JObject);
 
 //jni API Bridge
 
@@ -2945,6 +2960,14 @@ begin
    Result:= jForm_ActionBarIsShowing(FjEnv, FjObject);
 end;
 
+procedure jForm.ToggleSoftInput();
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jForm_ToggleSoftInput(FjEnv, FjObject);
+end;
+
+
 {-------- jForm_JNI_Bridge ----------}
 
 procedure jForm_ShowCustomMessage(env: PJNIEnv; _jform: JObject; _layout: jObject; _gravity: integer; _lenghTimeSecond: integer);
@@ -3700,6 +3723,18 @@ begin
   jMethod:= env^.GetMethodID(env, jCls, 'ActionBarIsShowing', '()Z');
   jBoo:= env^.CallBooleanMethod(env, _jform, jMethod);
   Result:= boolean(jBoo);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+
+procedure jForm_ToggleSoftInput(env: PJNIEnv; _jform: JObject);
+var
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jform);
+  jMethod:= env^.GetMethodID(env, jCls, 'ToggleSoftInput', '()V');
+  env^.CallVoidMethod(env, _jform, jMethod);
   env^.DeleteLocalRef(env, jCls);
 end;
 
