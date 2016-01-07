@@ -940,17 +940,17 @@ begin
    listPascal.Add('  begin');
    listPascal.Add('    if Self.Parent is jForm then');
    listPascal.Add('    begin');
-   listPascal.Add('      if jForm(Owner).Orientation = gApp.Orientation then side:= sdW else side:= sdH;');
+   listPascal.Add('      if jForm(Owner).ScreenStyle = (FParent as jForm).ScreenStyleAtStart  then side:= sdW else side:= sdH;');
    listPascal.Add('      '+FJavaClassName+'_SetLParamWidth(FjEnv, FjObject, GetLayoutParams(gApp, FLParamWidth, side));');
    listPascal.Add('    end');
    listPascal.Add('    else');
    listPascal.Add('    begin');
-   listPascal.Add('      if (Self.Parent as jVisualControl).LayoutParamWidth = lpMatchParent then');
-   listPascal.Add('        '+FJavaClassName+'_SetLParamWidth(FjEnv, FjObject, GetLayoutParams(gApp, FLParamWidth, sdW))');
-   listPascal.Add('      else if (Self.Parent as jVisualControl).LayoutParamWidth = lpWrapContent then');
-   listPascal.Add('        '+FJavaClassName+'_SetLParamWidth(FjEnv, FjObject, GetLayoutParams(gApp, FLParamWidth, sdW))');
-   listPascal.Add('      else');
-   listPascal.Add('        '+FJavaClassName+'_SetLParamWidth(FjEnv, FjObject, GetLayoutParamsByParent(Self.Parent, FLParamWidth, sdW))');
+
+   listPascal.Add('      if (Self.Parent as jVisualControl).LayoutParamWidth = lpWrapContent then');
+   listPascal.Add('        '+FJavaClassName+'_setLParamWidth(FjEnv, FjObject , GetLayoutParams(gApp, FLParamWidth, sdW))');
+   listPascal.Add('      else //lpMatchParent or others');
+   listPascal.Add('        '+FJavaClassName+'_setLParamWidth(FjEnv,FjObject,GetLayoutParamsByParent((Self.Parent as jVisualControl), FLParamWidth, sdW));');
+
    listPascal.Add('    end;');
    listPascal.Add('  end;');
    listPascal.Add('end;');
@@ -963,17 +963,17 @@ begin
    listPascal.Add('  begin');
    listPascal.Add('    if Self.Parent is jForm then');
    listPascal.Add('    begin');
-   listPascal.Add('      if jForm(Owner).Orientation = gApp.Orientation then side:= sdH else side:= sdW;');
+   listPascal.Add('      if jForm(Owner).ScreenStyle = (FParent as jForm).ScreenStyleAtStart then side:= sdH else side:= sdW;');
    listPascal.Add('      '+FJavaClassName+'_SetLParamHeight(FjEnv, FjObject, GetLayoutParams(gApp, FLParamHeight, side));');
    listPascal.Add('    end');
    listPascal.Add('    else');
    listPascal.Add('    begin');
-   listPascal.Add('      if (Self.Parent as jVisualControl).LayoutParamHeight = lpMatchParent then');
-   listPascal.Add('        '+FJavaClassName+'_SetLParamHeight(FjEnv, FjObject, GetLayoutParams(gApp, FLParamHeight, sdH))');
-   listPascal.Add('      else if (Self.Parent as jVisualControl).LayoutParamHeight = lpWrapContent then');
-   listPascal.Add('        '+FJavaClassName+'_SetLParamHeight(FjEnv, FjObject, GetLayoutParams(gApp, FLParamHeight, sdH))');
-   listPascal.Add('      else');
-   listPascal.Add('        '+FJavaClassName+'_SetLParamHeight(FjEnv, FjObject, GetLayoutParamsByParent(Self.Parent, FLParamHeight, sdH))');
+
+   listPascal.Add('      if (Self.Parent as jVisualControl).LayoutParamHeight = lpWrapContent then');
+   listPascal.Add('        '+FJavaClassName+'_setLParamHeight(FjEnv, FjObject , GetLayoutParams(gApp, FLParamHeight, sdH))');
+   listPascal.Add('      else //lpMatchParent and others');
+   listPascal.Add('        '+FJavaClassName+'_setLParamHeight(FjEnv,FjObject,GetLayoutParamsByParent((Self.Parent as jVisualControl), FLParamHeight, sdH));');
+
    listPascal.Add('    end;');
    listPascal.Add('  end;');
    listPascal.Add('end;');

@@ -1,6 +1,6 @@
 package com.example.dummyapp;
 
-//Lamw: Lazarus Android Module Wizard  - version 0.6 - revision 38.1 - 30 December - 2015 
+//Lamw: Lazarus Android Module Wizard  - version 0.6 - revision 38.2 - 06 January - 2016 
 //Form Designer and Components development model!
 //
 //https://github.com/jmpessoa/lazandroidmodulewizard
@@ -906,6 +906,7 @@ public ActionBar GetActionBar() {
 }
 
 /*
+ * 
  * To disableAction-bar Icon and Title, you must do two things:
  setDisplayShowHomeEnabled(false);  // hides action bar icon
  setDisplayShowTitleEnabled(false); // hides action bar title
@@ -938,7 +939,6 @@ public void SetTitleActionBar(String _title) {
 	ActionBar actionBar = this.controls.activity.getActionBar();   	
     actionBar.setTitle(_title);    
 }
-
 
 //set a title and subtitle to the Action bar as shown in the code snippet.
 
@@ -974,6 +974,23 @@ public void RemoveAllTabsActionBar() {
 	actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD); //API 11 renabor
 }
 
+
+//Calculate ActionBar height
+//ref http://stackoverflow.com/questions/12301510/how-to-get-the-actionbar-height
+public int GetActionBarHeight() {
+int actionBarHeight = 0;
+TypedValue tv = new TypedValue();
+if (controls.activity.getActionBar().isShowing()) {  
+   if (controls.activity.getTheme().resolveAttribute(android.R.attr.actionBarSize, tv, true)) {
+      actionBarHeight = TypedValue.complexToDimensionPixelSize(tv.data,controls.activity.getResources().getDisplayMetrics());
+   }
+}
+return actionBarHeight;
+}
+
+public boolean ActionBarIsShowing() {
+  return controls.activity.getActionBar().isShowing();
+}
 
 public boolean IsPackageInstalled(String _packagename) {
     PackageManager pm = controls.activity.getPackageManager();
@@ -1969,6 +1986,13 @@ public void SetFontSizeUnit(int _unit) {
 		this.setText(t);
 }
 
+public void PerformClick() {
+	this.performClick();
+}
+
+public void PerformLongClick() {
+	this.performLongClick();
+}
 
 }
 
@@ -2529,6 +2553,7 @@ public void setBitmapImage(Bitmap bm) {
 	//if (bmp    != null) { bmp.recycle(); }
 	bmp = bm;
 	this.setImageBitmap(bm);
+	this.invalidate();
 }
 
 public  void setImage(String fullPath) {
@@ -2536,6 +2561,7 @@ public  void setImage(String fullPath) {
 	  if (fullPath.equals("null")) { this.setImageBitmap(null); return; };
 	  bmp = BitmapFactory.decodeFile( fullPath );
 	  this.setImageBitmap(bmp);
+	  this.invalidate();
 }
 
 //by jmpessoa
@@ -2561,26 +2587,32 @@ public void SetImageByResIdentifier(String _imageResIdentifier) {
 	Drawable d = GetDrawableResourceById(GetDrawableResourceId(_imageResIdentifier));
 	bmp = ((BitmapDrawable)d).getBitmap();
 	this.setImageDrawable(d);
+	this.invalidate();
 }
 
 //by jmpessoa
 public void setLParamWidth(int w) {
-  lpW = w;
+  lpW = w;	
+  lparams.width = w;	  
 }
 
 public void setLParamHeight(int h) {
-  lpH = h;
+   lpH = h;  	   
+  lparams.height = h;  
 }
 
 //by jmpessoa
-public int getLParamHeight() {	
-  return  this.getHeight();
-  
+public int getLParamHeight() {   
+	//if (this.getHeight() == 0) 
+		return lpH;
+	//else return this.getHeight();		  
 }  
 
 //by jmpessoa
-public int getLParamWidth() {
-  return this.getWidth();  
+public int getLParamWidth() {	
+	//if (this.getWidth() == 0) 
+		return lpW;
+	//else return this.getWidth();
 }
 
 //by jmpessoa
@@ -2598,8 +2630,8 @@ public int GetBitmapWidth() {
 }
 
 public void addLParamsAnchorRule(int rule) {
-  lparamsAnchorRule[countAnchorRule] = rule;
-  countAnchorRule = countAnchorRule + 1;
+   lparamsAnchorRule[countAnchorRule] = rule;
+   countAnchorRule = countAnchorRule + 1;
 }
 
 public void addLParamsParentRule(int rule) {
@@ -2613,19 +2645,19 @@ public void setLayoutAll(int idAnchor) {
 	lparams.height = lpH; //wrapContent;
 	lparams.setMargins(MarginLeft,MarginTop,marginRight,marginBottom);
 
-	if (idAnchor > 0) {    	
-		
+	if (idAnchor > 0) {    		
 		for (int i=0; i < countAnchorRule; i++) {  
 			lparams.addRule(lparamsAnchorRule[i], idAnchor);		
 	    }		
-	} 
+	}
+	
 	for (int j=0; j < countParentRule; j++) {  
 		lparams.addRule(lparamsParentRule[j]);		
-    }
+    }	
+	
 	//
 	setLayoutParams(lparams);
 }
-
 
 /*
  * TScaleType = (scaleCenter, scaleCenterCrop, scaleCenterInside, scaleFitCenter,
@@ -2653,6 +2685,7 @@ public void SetImageMatrixScale(float _scaleX, float _scaleY ) {
     mMatrix.setScale(_scaleX, _scaleY);        
     //mMatrix.postScale(_scaleX, _scaleX);
     this.setImageMatrix(mMatrix);
+    this.invalidate();
 }
 
 public Bitmap GetBitmapImage() {		
@@ -2669,15 +2702,16 @@ public void SetImageFromIntentResult(Intent _intentData) {
     String picturePath = cursor.getString(columnIndex);
     cursor.close();
     bmp = BitmapFactory.decodeFile(picturePath);
-    this.setImageBitmap(bmp);        
+    this.setImageBitmap(bmp);
+    this.invalidate();
 }
 
 public void SetImageThumbnailFromCamera(Intent _intentData) {
 	Bundle extras = _intentData.getExtras();
     bmp = (Bitmap) extras.get("data");
-    this.setImageBitmap(bmp);    
+    this.setImageBitmap(bmp);
+    this.invalidate();
 }
-
 
 //TODO Pascal
 public void SetImageFromURI(Uri _uri) {	
@@ -2690,13 +2724,14 @@ public void SetImageFromURI(Uri _uri) {
 	}
 	bmp = BitmapFactory.decodeStream(imageStream);	        
   this.setImageBitmap(bmp);
+  this.invalidate();
 }
 
 public void SetImageFromByteArray(byte[] _image) {
 	bmp = BitmapFactory.decodeByteArray(_image, 0, _image.length);
 	this.setImageBitmap(bmp);
+	this.invalidate();
 }
-
 
 }
  

@@ -2036,7 +2036,7 @@ procedure jCanvasES2.UpdateLParamWidth;
 var
    side: TSide;
 begin
-  if jForm(Owner).Orientation = gApp.Orientation then
+  if jForm(Owner).ScreenStyle = gApp.Orientation then
       side:= sdW
   else
       side:= sdH;
@@ -2048,7 +2048,7 @@ procedure jCanvasES2.UpdateLParamHeight;
 var
    side: TSide;
 begin
-  if jForm(Owner).Orientation = gApp.Orientation then
+  if jForm(Owner).ScreenStyle = gApp.Orientation then
     side:= sdH
   else
     side:= sdW;

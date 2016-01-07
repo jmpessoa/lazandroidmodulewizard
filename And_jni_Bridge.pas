@@ -266,6 +266,9 @@ Procedure jButton_setId(env:PJNIEnv; Button : jObject; id: DWord);
 Procedure jButton_setFocusable(env:PJNIEnv; Button : jObject; enabled: boolean);
 procedure jButton_SetFontSizeUnit(env: PJNIEnv; _jbutton: JObject; _unit: integer);
 
+procedure jButton_PerformClick(env: PJNIEnv; _jbutton: JObject);
+procedure jButton_PerformLongClick(env: PJNIEnv; _jbutton: JObject);
+
 
 // CheckBox
 Function  jCheckBox_Create            (env:PJNIEnv;  this:jobject; SelfObj: TObject ): jObject;
@@ -2500,6 +2503,30 @@ begin
   env^.CallVoidMethodA(env, _jbutton, jMethod, @jParams);
   env^.DeleteLocalRef(env, jCls);
 end;
+
+procedure jButton_PerformClick(env: PJNIEnv; _jbutton: JObject);
+var
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jbutton);
+  jMethod:= env^.GetMethodID(env, jCls, 'PerformClick', '()V');
+  env^.CallVoidMethod(env, _jbutton, jMethod);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+
+procedure jButton_PerformLongClick(env: PJNIEnv; _jbutton: JObject);
+var
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jbutton);
+  jMethod:= env^.GetMethodID(env, jCls, 'PerformLongClick', '()V');
+  env^.CallVoidMethod(env, _jbutton, jMethod);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
 
 //------------------------------------------------------------------------------
 // CheckBox

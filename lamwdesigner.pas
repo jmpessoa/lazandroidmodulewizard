@@ -1168,9 +1168,9 @@ begin
     if Assigned(Parent) then
     begin
       if not (LayoutParamWidth in [lpWrapContent, lpMatchParent]) then
-        FnewW := GetLayoutParamsByParent(Parent, LayoutParamWidth, sdW);
+        FnewW := GetLayoutParamsByParent2(Parent, LayoutParamWidth, sdW);
       if not (LayoutParamHeight in [lpWrapContent, lpMatchParent]) then
-        FnewH := GetLayoutParamsByParent(Parent, LayoutParamHeight, sdH);
+        FnewH := GetLayoutParamsByParent2(Parent, LayoutParamHeight, sdH);
       if FnewW < FminW then FnewW := FminW;
       if FnewH < FminH then FnewH := FminH;
       if (PosRelativeToParent <> []) or (PosRelativeToAnchor <> []) then

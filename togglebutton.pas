@@ -218,17 +218,15 @@ begin
   begin
     if Self.Parent is jForm then
     begin
-      if jForm(Owner).Orientation = gApp.Orientation then side:= sdW else side:= sdH;
+      if jForm(Owner).ScreenStyle = gApp.Orientation then side:= sdW else side:= sdH;
       jToggleButton_SetLParamWidth(FjEnv, FjObject, GetLayoutParams(gApp, FLParamWidth, side));
     end
     else
     begin
-      if (Self.Parent as jVisualControl).LayoutParamWidth = lpMatchParent then
-        jToggleButton_SetLParamWidth(FjEnv, FjObject, GetLayoutParams(gApp, FLParamWidth, sdW))
-      else if (Self.Parent as jVisualControl).LayoutParamWidth = lpWrapContent then
-        jToggleButton_SetLParamWidth(FjEnv, FjObject, GetLayoutParams(gApp, FLParamWidth, sdW))
-      else
-        jToggleButton_SetLParamWidth(FjEnv, FjObject, GetLayoutParamsByParent(Self.Parent, FLParamWidth, sdW))
+      if (Self.Parent as jVisualControl).LayoutParamWidth = lpWrapContent then
+          jToggleButton_setLParamWidth(FjEnv, FjObject , GetLayoutParams(gApp, FLParamWidth, sdW))
+       else //lpMatchParent or others
+          jToggleButton_setLParamWidth(FjEnv,FjObject,GetLayoutParamsByParent((Self.Parent as jVisualControl), FLParamWidth, sdW));
     end;
   end;
 end;
@@ -241,17 +239,15 @@ begin
   begin
     if Self.Parent is jForm then
     begin
-      if jForm(Owner).Orientation = gApp.Orientation then side:= sdH else side:= sdW;
+      if jForm(Owner).ScreenStyle = gApp.Orientation then side:= sdH else side:= sdW;
       jToggleButton_SetLParamHeight(FjEnv, FjObject, GetLayoutParams(gApp, FLParamHeight, side));
     end
     else
     begin
-      if (Self.Parent as jVisualControl).LayoutParamHeight = lpMatchParent then
-        jToggleButton_SetLParamHeight(FjEnv, FjObject, GetLayoutParams(gApp, FLParamHeight, sdH))
-      else if (Self.Parent as jVisualControl).LayoutParamHeight = lpWrapContent then
-        jToggleButton_SetLParamHeight(FjEnv, FjObject, GetLayoutParams(gApp, FLParamHeight, sdH))
-      else
-        jToggleButton_SetLParamHeight(FjEnv, FjObject, GetLayoutParamsByParent(Self.Parent, FLParamHeight, sdH))
+      if (Self.Parent as jVisualControl).LayoutParamHeight = lpWrapContent then
+         jToggleButton_setLParamHeight(FjEnv, FjObject , GetLayoutParams(gApp, FLParamHeight, sdH))
+      else //lpMatchParent and others
+         jToggleButton_setLParamHeight(FjEnv,FjObject,GetLayoutParamsByParent((Self.Parent as jVisualControl), FLParamHeight, sdH));
     end;
   end;
 end;

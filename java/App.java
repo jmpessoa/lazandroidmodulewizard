@@ -1,6 +1,6 @@
 package com.example.dummyapp;
 
-//Lamw: Lazarus Android Module Wizard - Version 0.6 - revision 38.1 - 30 December - 2015
+//Lamw: Lazarus Android Module Wizard - Version 0.6 - revision 38.2 - 06 January - 2016
 //Form Designer and Components development model!
 //https://github.com/jmpessoa/lazandroidmodulewizard
 //http://forum.lazarus.freepascal.org/index.php/topic,21919.270.html
@@ -109,7 +109,7 @@ public class App extends Activity {
     public    void onConfigurationChanged(Configuration newConfig) {
     	super.onConfigurationChanged(newConfig);
     	controls.jAppOnRotate(newConfig.orientation);
-    	controls.jAppOnConfigurationChanged();
+    	//controls.jAppOnConfigurationChanged();
     }	   	
  
     @Override

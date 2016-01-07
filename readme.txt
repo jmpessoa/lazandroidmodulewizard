@@ -144,6 +144,24 @@
 	*
 	****************************************************************************************************
 
+
+Version 0.6 - rev. 38.2 - 06 January 2016 - 
+
+	IMPROVEMENT! Better support for device screen rotation!
+
+	CHANGED! Changed OnRotate event signature  [sorry...]  //@Euller and @Leledumbo suggestion ...
+
+	NEW! AppTFPNoGUIGraphicsBridgeDemo6  [ref. https://github.com/jmpessoa/tfpnoguigraphicsbridge]
+
+		Projectile Motion Graphicis Demo [parameterized function] and device screen rotation!
+
+		Screenshots Ref:
+			https://app.box.com/s/kpeuxb8p33m6rkg42bg1d0g2p2i7pkhd
+			https://app.box.com/s/l2ncravxk1mvlahvoyoup4lxyk0sh2ro
+			https://app.box.com/s/2e6xpm0wwhaus0xdw7x7ufc08atlewh4
+
+		Please, read the "readme.txt" in project folder "../jni"  
+
 Version 0.6 - rev. 38.1 - 30 December 2015 - 
 
 	NEW! Executable native console application support.

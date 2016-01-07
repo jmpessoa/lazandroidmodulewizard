@@ -173,16 +173,19 @@ type
      procedure UpdateLParamHeight;
      procedure UpdateLParamWidth;
    protected
-     function GetWidth: integer;  override;
-     function GetHeight: integer; override;
+
      procedure SetViewParent(Value: jObject); override;
      procedure SetParamHeight(Value: TLayoutParams); override;
+      procedure SetParamWidth(Value: TLayoutParams); override;
    public
      constructor Create(AOwner: TComponent); override;
      Destructor  Destroy; override;
      Procedure Refresh;
      Procedure UpdateLayout; override;
      procedure Init(refApp: jApp);  override;
+
+     function GetWidth: integer;  override;
+     function GetHeight: integer; override;
 
      procedure ResetAllRules;
      procedure RemoveParent;
@@ -873,6 +876,9 @@ type
     Procedure UpdateLayout; override;
 
     procedure SetFontSizeUnit(_unit: TFontSizeUnit);
+    procedure PerformClick();
+    procedure PerformLongClick();
+
 
   published
     property Text: string read GetText write SetText;
@@ -1005,13 +1011,16 @@ type
     function GetCount: integer;
     procedure SetImageName(Value: string);
     procedure SetImageIndex(Value: integer);
-    function  GetImageIndex      : integer;
+    function  GetImageIndex: integer;
     procedure UpdateLParamHeight;
     procedure UpdateLParamWidth;
   protected
     procedure SetViewParent(Value: jObject);  override;
     function GetHeight: integer;   override;
     function GetWidth: integer;     override;
+    procedure SetParamWidth(Value: TLayoutParams); override;
+    procedure SetParamHeight(Value: TLayoutParams); override;
+
     Procedure GenEvent_OnClick(Obj: TObject);
     procedure Notification(AComponent: TComponent; Operation: TOperation); override;
   public
@@ -1539,11 +1548,12 @@ type
   Function  Asset_SaveToFile (srcFile,outFile : String; SkipExists : Boolean = False) : Boolean;
   Function  Asset_SaveToFileP(srcFile,outFile : String; SkipExists : Boolean = False) : Boolean;
 
+
 implementation
+
 
 uses
   customdialog, radiogroup;
-
 
 //-----------------------------------------------------------------------------
 // Asset
@@ -1701,6 +1711,7 @@ Function Java_Event_pAppOnRotate(env: PJNIEnv; this: jobject; rotate : integer) 
 var                   {rotate=1 --> device vertical/default position ; 2: device horizontal position}
   Form      : jForm;
   rstRotate : Integer;
+  rotOrientation: TScreenStyle;
 begin
 
   gApp.Jni.jEnv:= env;
@@ -1716,11 +1727,17 @@ begin
 
   Form.UpdateJNI(gApp);
 
-  Form.SetOrientation(rotate);
+  if rotate = 1 then
+     rotOrientation:= ssPortrait
+  else if rotate = 2 then
+     rotOrientation:=ssLandscape
+  else if rotate = 4 then rotOrientation:= ssSensor
+      else
+        rotOrientation:=ssUnknown;
 
-  if Assigned(Form.OnRotate) then Form.OnRotate(Form, rotate, {var}rstRotate);
+  Form.ScreenStyle:= rotOrientation;
 
-  Result := rstRotate;
+  if Assigned(Form.OnRotate) then Form.OnRotate(Form, rotOrientation);
 
 end;
 
@@ -2561,17 +2578,15 @@ begin
   begin
     if Self.Parent is jForm then
     begin
-      if jForm(Owner).Orientation = gApp.Orientation then side:= sdW else side:= sdH;
+      if jForm(Owner).ScreenStyle = gApp.Orientation then side:= sdW else side:= sdH;
       jTextView_setLParamWidth(FjEnv, FjObject , GetLayoutParams(gApp, FLParamWidth, side));
     end
     else
     begin
-      if (Self.Parent as jVisualControl).LayoutParamWidth = lpMatchParent then
-        jTextView_setLParamWidth(FjEnv, FjObject , GetLayoutParams(gApp, FLParamWidth, sdW))
-      else if (Self.Parent as jVisualControl).LayoutParamWidth = lpWrapContent then
-        jTextView_setLParamWidth(FjEnv, FjObject , GetLayoutParams(gApp, FLParamWidth, sdW))
-      else
-        jTextView_setLParamWidth(FjEnv, FjObject , GetLayoutParamsByParent(Self.Parent, FLParamWidth, sdW))
+      if (Self.Parent as jVisualControl).LayoutParamWidth = lpWrapContent then
+          jTextView_setLParamWidth(FjEnv, FjObject , GetLayoutParams(gApp, FLParamWidth, sdW))
+       else //lpMatchParent or others
+          jTextView_setLParamWidth(FjEnv,FjObject,GetLayoutParamsByParent((Self.Parent as jVisualControl), FLParamWidth, sdW));
     end;
   end;
 end;
@@ -2584,17 +2599,15 @@ begin
   begin
     if Self.Parent is jForm then
     begin
-      if jForm(Owner).Orientation = gApp.Orientation then side:= sdH else side:= sdW;
+      if jForm(Owner).ScreenStyle = gApp.Orientation then side:= sdH else side:= sdW;
       jTextView_setLParamHeight(FjEnv, FjObject , GetLayoutParams(gApp, FLParamHeight, side));
     end
     else
     begin
-      if (Self.Parent as jVisualControl).LayoutParamHeight = lpMatchParent then
-        jTextView_setLParamHeight(FjEnv, FjObject , GetLayoutParams(gApp, FLParamHeight, sdH))
-      else if (Self.Parent as jVisualControl).LayoutParamHeight = lpWrapContent then
-        jTextView_setLParamHeight(FjEnv, FjObject , GetLayoutParams(gApp, FLParamHeight, sdH))
-      else
-        jTextView_setLParamHeight(FjEnv, FjObject , GetLayoutParamsByParent(Self.Parent, FLParamHeight, sdH))
+      if (Self.Parent as jVisualControl).LayoutParamHeight = lpWrapContent then
+         jTextView_setLParamHeight(FjEnv, FjObject , GetLayoutParams(gApp, FLParamHeight, sdH))
+      else //lpMatchParent and others
+         jTextView_setLParamHeight(FjEnv,FjObject,GetLayoutParamsByParent((Self.Parent as jVisualControl), FLParamHeight, sdH));
     end;
   end;
 end;
@@ -3071,17 +3084,15 @@ begin
   begin
     if Self.Parent is jForm then
     begin
-      if jForm(Owner).Orientation = gApp.Orientation then side:= sdW else side:= sdH;
+      if jForm(Owner).ScreenStyle = gApp.Orientation then side:= sdW else side:= sdH;
       jEditText_setLParamWidth(FjEnv, FjObject , GetLayoutParams(gApp, FLParamWidth, side));
     end
     else
     begin
-      if (Self.Parent as jVisualControl).LayoutParamWidth = lpMatchParent then
-        jEditText_setLParamWidth(FjEnv, FjObject , GetLayoutParams(gApp, FLParamWidth, sdW))
-      else if (Self.Parent as jVisualControl).LayoutParamWidth = lpWrapContent then
-        jEditText_setLParamWidth(FjEnv, FjObject , GetLayoutParams(gApp, FLParamWidth, sdW))
-      else
-        jEditText_setLParamWidth(FjEnv, FjObject , GetLayoutParamsByParent(Self.Parent, FLParamWidth, sdW))
+       if (Self.Parent as jVisualControl).LayoutParamWidth = lpWrapContent then
+          jEditText_setLParamWidth(FjEnv, FjObject , GetLayoutParams(gApp, FLParamWidth, sdW))
+       else //lpMatchParent or others
+          jEditText_setLParamWidth(FjEnv,FjObject,GetLayoutParamsByParent((Self.Parent as jVisualControl), FLParamWidth, sdW));
     end;
   end;
 end;
@@ -3094,17 +3105,15 @@ begin
   begin
     if Self.Parent is jForm then
     begin
-      if jForm(Owner).Orientation = gApp.Orientation then side:= sdH else side:= sdW;
+      if jForm(Owner).ScreenStyle = gApp.Orientation then side:= sdH else side:= sdW;
       jEditText_setLParamHeight(FjEnv, FjObject , GetLayoutParams(gApp, FLParamHeight, side));
     end
     else
     begin
-      if (Self.Parent as jVisualControl).LayoutParamHeight = lpMatchParent then
-        jEditText_setLParamHeight(FjEnv, FjObject , GetLayoutParams(gApp, FLParamHeight, sdH))
-      else if (Self.Parent as jVisualControl).LayoutParamHeight = lpWrapContent then
-        jEditText_setLParamHeight(FjEnv, FjObject , GetLayoutParams(gApp, FLParamHeight, sdH))
-      else
-        jEditText_setLParamHeight(FjEnv, FjObject , GetLayoutParamsByParent(Self.Parent, FLParamHeight, sdH))
+       if (Self.Parent as jVisualControl).LayoutParamHeight = lpWrapContent then
+          jEditText_setLParamHeight(FjEnv, FjObject , GetLayoutParams(gApp, FLParamHeight, sdH))
+       else //lpMatchParent and others
+          jEditText_setLParamHeight(FjEnv,FjObject,GetLayoutParamsByParent((Self.Parent as jVisualControl), FLParamHeight, sdH));
     end;
   end;
 end;
@@ -3376,17 +3385,15 @@ begin
   begin
     if Self.Parent is jForm then
     begin
-      if jForm(Owner).Orientation = gApp.Orientation then side:= sdW else side:= sdH;
+      if jForm(Owner).ScreenStyle = gApp.Orientation then side:= sdW else side:= sdH;
       jButton_setLParamWidth(FjEnv, FjObject , GetLayoutParams(gApp, FLParamWidth, side));
     end
     else
     begin
-      if (Self.Parent as jVisualControl).LayoutParamWidth = lpMatchParent then
-        jButton_setLParamWidth(FjEnv, FjObject , GetLayoutParams(gApp, FLParamWidth, sdW))
-      else if (Self.Parent as jVisualControl).LayoutParamWidth = lpWrapContent then
-        jButton_setLParamWidth(FjEnv, FjObject , GetLayoutParams(gApp, FLParamWidth, sdW))
-      else
-        jButton_setLParamWidth(FjEnv, FjObject , GetLayoutParamsByParent(Self.Parent, FLParamWidth, sdW))
+      if (Self.Parent as jVisualControl).LayoutParamWidth = lpWrapContent then
+         jButton_setLParamWidth(FjEnv, FjObject , GetLayoutParams(gApp, FLParamWidth, sdW))
+      else //lpMatchParent or others
+         jButton_setLParamWidth(FjEnv,FjObject,GetLayoutParamsByParent((Self.Parent as jVisualControl), FLParamWidth, sdW));
     end;
   end;
 end;
@@ -3399,17 +3406,15 @@ begin
   begin
     if Self.Parent is jForm then
     begin
-      if jForm(Owner).Orientation = gApp.Orientation then side:= sdH else side:= sdW;
+      if jForm(Owner).ScreenStyle = gApp.Orientation then side:= sdH else side:= sdW;
       jButton_setLParamHeight(FjEnv, FjObject , GetLayoutParams(gApp, FLParamHeight, side));
     end
     else
     begin
-      if (Self.Parent as jVisualControl).LayoutParamHeight = lpMatchParent then
-        jButton_setLParamHeight(FjEnv, FjObject , GetLayoutParams(gApp, FLParamHeight, sdH))
-      else if (Self.Parent as jVisualControl).LayoutParamHeight = lpWrapContent then
-        jButton_setLParamHeight(FjEnv, FjObject , GetLayoutParams(gApp, FLParamHeight, sdH))
-      else
-        jButton_setLParamHeight(FjEnv, FjObject , GetLayoutParamsByParent(Self.Parent, FLParamHeight, sdH))
+      if (Self.Parent as jVisualControl).LayoutParamHeight = lpWrapContent then
+         jButton_setLParamHeight(FjEnv, FjObject , GetLayoutParams(gApp, FLParamHeight, sdH))
+      else //lpMatchParent and others
+         jButton_setLParamHeight(FjEnv,FjObject,GetLayoutParamsByParent((Self.Parent as jVisualControl), FLParamHeight, sdH));
     end;
   end;
 end;
@@ -3431,6 +3436,21 @@ begin
   FFontSizeUnit:=_unit;
   if FInitialized then
      jButton_SetFontSizeUnit(FjEnv, FjObject, Ord(_unit));
+end;
+
+
+procedure jButton.PerformClick();
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jButton_PerformClick(FjEnv, FjObject);
+end;
+
+procedure jButton.PerformLongClick();
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jButton_PerformLongClick(FjEnv, FjObject);
 end;
 
 
@@ -3624,17 +3644,15 @@ begin
   begin
     if Self.Parent is jForm then
     begin
-      if jForm(Owner).Orientation = gApp.Orientation then side:= sdW else side:= sdH;
+      if jForm(Owner).ScreenStyle = gApp.Orientation then side:= sdW else side:= sdH;
       jCheckBox_setLParamWidth(FjEnv, FjObject , GetLayoutParams(gApp, FLParamWidth, side));
     end
     else
     begin
-      if (Self.Parent as jVisualControl).LayoutParamWidth = lpMatchParent then
-        jCheckBox_setLParamWidth(FjEnv, FjObject , GetLayoutParams(gApp, FLParamWidth, sdW))
-      else if (Self.Parent as jVisualControl).LayoutParamWidth = lpWrapContent then
-        jCheckBox_setLParamWidth(FjEnv, FjObject , GetLayoutParams(gApp, FLParamWidth, sdW))
-      else
-        jCheckBox_setLParamWidth(FjEnv, FjObject , GetLayoutParamsByParent(Self.Parent, FLParamWidth, sdW))
+       if (Self.Parent as jVisualControl).LayoutParamWidth = lpWrapContent then
+           jCheckBox_setLParamWidth(FjEnv, FjObject , GetLayoutParams(gApp, FLParamWidth, sdW))
+        else //lpMatchParent or others
+           jCheckBox_setLParamWidth(FjEnv,FjObject,GetLayoutParamsByParent((Self.Parent as jVisualControl), FLParamWidth, sdW));
     end;
   end;
 end;
@@ -3647,17 +3665,15 @@ begin
   begin
     if Self.Parent is jForm then
     begin
-      if jForm(Owner).Orientation = gApp.Orientation then side:= sdH else side:= sdW;
+      if jForm(Owner).ScreenStyle = gApp.Orientation then side:= sdH else side:= sdW;
       jCheckBox_setLParamHeight(FjEnv, FjObject , GetLayoutParams(gApp, FLParamHeight, side));
     end
     else
     begin
-      if (Self.Parent as jVisualControl).LayoutParamHeight = lpMatchParent then
-        jCheckBox_setLParamHeight(FjEnv, FjObject , GetLayoutParams(gApp, FLParamHeight, sdH))
-      else if (Self.Parent as jVisualControl).LayoutParamHeight = lpWrapContent then
-        jCheckBox_setLParamHeight(FjEnv, FjObject , GetLayoutParams(gApp, FLParamHeight, sdH))
-      else
-        jCheckBox_setLParamHeight(FjEnv, FjObject , GetLayoutParamsByParent(Self.Parent, FLParamHeight, sdH))
+       if (Self.Parent as jVisualControl).LayoutParamHeight = lpWrapContent then
+          jCheckBox_setLParamHeight(FjEnv, FjObject , GetLayoutParams(gApp, FLParamHeight, sdH))
+       else //lpMatchParent and others
+          jCheckBox_setLParamHeight(FjEnv,FjObject,GetLayoutParamsByParent((Self.Parent as jVisualControl), FLParamHeight, sdH));
     end;
   end;
 end;
@@ -3896,17 +3912,15 @@ begin
   begin
     if Self.Parent is jForm then
     begin
-      if jForm(Owner).Orientation = gApp.Orientation then side:= sdW else side:= sdH;
+      if jForm(Owner).ScreenStyle = gApp.Orientation then side:= sdW else side:= sdH;
       jRadioButton_setLParamWidth(FjEnv, FjObject , GetLayoutParams(gApp, FLParamWidth, side));
     end
     else
     begin
-      if (Self.Parent as jVisualControl).LayoutParamWidth = lpMatchParent then
-        jRadioButton_setLParamWidth(FjEnv, FjObject , GetLayoutParams(gApp, FLParamWidth, sdW))
-      else if (Self.Parent as jVisualControl).LayoutParamWidth = lpWrapContent then
-        jRadioButton_setLParamWidth(FjEnv, FjObject , GetLayoutParams(gApp, FLParamWidth, sdW))
-      else
-        jRadioButton_setLParamWidth(FjEnv, FjObject , GetLayoutParamsByParent(Self.Parent, FLParamWidth, sdW))
+       if (Self.Parent as jVisualControl).LayoutParamWidth = lpWrapContent then
+           jRadioButton_setLParamWidth(FjEnv, FjObject , GetLayoutParams(gApp, FLParamWidth, sdW))
+        else //lpMatchParent or others
+           jRadioButton_setLParamWidth(FjEnv,FjObject,GetLayoutParamsByParent((Self.Parent as jVisualControl), FLParamWidth, sdW));
     end;
   end;
 end;
@@ -3919,17 +3933,15 @@ begin
   begin
     if Self.Parent is jForm then
     begin
-      if jForm(Owner).Orientation = gApp.Orientation then side:= sdH else side:= sdW;
+      if jForm(Owner).ScreenStyle = gApp.Orientation then side:= sdH else side:= sdW;
       jRadioButton_setLParamHeight(FjEnv, FjObject , GetLayoutParams(gApp, FLParamHeight, side));
     end
     else
     begin
-      if (Self.Parent as jVisualControl).LayoutParamHeight = lpMatchParent then
-        jRadioButton_setLParamHeight(FjEnv, FjObject , GetLayoutParams(gApp, FLParamHeight, sdH))
-      else if (Self.Parent as jVisualControl).LayoutParamHeight = lpWrapContent then
-        jRadioButton_setLParamHeight(FjEnv, FjObject , GetLayoutParams(gApp, FLParamHeight, sdH))
-      else
-        jRadioButton_setLParamHeight(FjEnv, FjObject , GetLayoutParamsByParent(Self.Parent, FLParamHeight, sdH))
+       if (Self.Parent as jVisualControl).LayoutParamHeight = lpWrapContent then
+          jRadioButton_setLParamHeight(FjEnv, FjObject , GetLayoutParams(gApp, FLParamHeight, sdH))
+       else //lpMatchParent and others
+          jRadioButton_setLParamHeight(FjEnv,FjObject,GetLayoutParamsByParent((Self.Parent as jVisualControl), FLParamHeight, sdH));
     end;
   end;
 end;
@@ -4153,17 +4165,16 @@ begin
   begin
     if Self.Parent is jForm then
     begin
-      if jForm(Owner).Orientation = gApp.Orientation then side:= sdW else side:= sdH;
+      if jForm(Owner).ScreenStyle = gApp.Orientation then side:= sdW else side:= sdH;
         jProgressBar_setLParamWidth(FjEnv, FjObject , GetLayoutParams(gApp, FLParamWidth, side));
     end
     else
     begin
-      if (Self.Parent as jVisualControl).LayoutParamWidth = lpMatchParent then
-        jProgressBar_setLParamWidth(FjEnv, FjObject , GetLayoutParams(gApp, FLParamWidth, sdW))
-      else if (Self.Parent as jVisualControl).LayoutParamWidth = lpWrapContent then
-        jProgressBar_setLParamWidth(FjEnv, FjObject , GetLayoutParams(gApp, FLParamWidth, sdW))
-      else
-        jProgressBar_setLParamWidth(FjEnv, FjObject , GetLayoutParamsByParent(Self.Parent, FLParamWidth, sdW))
+
+      if (Self.Parent as jVisualControl).LayoutParamWidth = lpWrapContent then
+         jProgressBar_setLParamWidth(FjEnv, FjObject , GetLayoutParams(gApp, FLParamWidth, sdW))
+      else //lpMatchParent or others
+         jProgressBar_setLParamWidth(FjEnv,FjObject,GetLayoutParamsByParent((Self.Parent as jVisualControl), FLParamWidth, sdW));
     end;
   end;
 end;
@@ -4176,17 +4187,15 @@ begin
   begin
     if Self.Parent is jForm then
     begin
-      if jForm(Owner).Orientation = gApp.Orientation then side:= sdH else side:= sdW;
+      if jForm(Owner).ScreenStyle = gApp.Orientation then side:= sdH else side:= sdW;
       jProgressBar_setLParamHeight(FjEnv, FjObject , GetLayoutParams(gApp, FLParamHeight, side));
     end
     else
     begin
-      if (Self.Parent as jVisualControl).LayoutParamHeight = lpMatchParent then
-        jProgressBar_setLParamHeight(FjEnv, FjObject , GetLayoutParams(gApp, FLParamHeight, sdH))
-      else if (Self.Parent as jVisualControl).LayoutParamHeight = lpWrapContent then
-        jProgressBar_setLParamHeight(FjEnv, FjObject , GetLayoutParams(gApp, FLParamHeight, sdH))
-      else
-        jProgressBar_setLParamHeight(FjEnv, FjObject , GetLayoutParamsByParent(Self.Parent, FLParamHeight, sdH))
+      if (Self.Parent as jVisualControl).LayoutParamHeight = lpWrapContent then
+         jProgressBar_setLParamHeight(FjEnv, FjObject , GetLayoutParams(gApp, FLParamHeight, sdH))
+      else //lpMatchParent and others
+         jProgressBar_setLParamHeight(FjEnv,FjObject,GetLayoutParamsByParent((Self.Parent as jVisualControl), FLParamHeight, sdH));
     end;
   end;
 end;
@@ -4410,6 +4419,28 @@ begin
      jImageView_SetImageByResIdentifier(FjEnv, FjObject , _imageResIdentifier);
 end;
 
+procedure jImageView.SetParamHeight(Value: TLayoutParams);
+var
+  side: TSide;
+begin
+   inherited SetParamHeight(Value);
+   if FInitialized then
+   begin
+      //
+   end;
+end;
+
+procedure jImageView.SetParamWidth(Value: TLayoutParams);
+var
+  side: TSide;
+begin
+   inherited SetParamWidth(Value);     //FLParamWidth
+   if FInitialized then
+   begin
+      //
+   end;
+end;
+
 procedure jImageView.UpdateLParamWidth;
 var
   side: TSide;
@@ -4418,17 +4449,15 @@ begin
   begin
     if Self.Parent is jForm then
     begin
-      if jForm(Owner).Orientation = gApp.Orientation then side:= sdW else side:= sdH;
+      if jForm(Owner).ScreenStyle = (FParent as jForm).ScreenStyleAtStart  then side:= sdW else side:= sdH;
       jImageView_setLParamWidth(FjEnv, FjObject , GetLayoutParams(gApp, FLParamWidth, side));
     end
     else
     begin
-      if (Self.Parent as jVisualControl).LayoutParamWidth = lpMatchParent then
-        jImageView_setLParamWidth(FjEnv, FjObject , GetLayoutParams(gApp, FLParamWidth, sdW))
-      else if (Self.Parent as jVisualControl).LayoutParamWidth = lpWrapContent then
-        jImageView_setLParamWidth(FjEnv, FjObject , GetLayoutParams(gApp, FLParamWidth, sdW))
+      if (Self.Parent as jVisualControl).LayoutParamWidth = lpWrapContent then
+         jImageView_setLParamWidth(FjEnv, FjObject , GetLayoutParams(gApp, FLParamWidth, sdW))
       else
-        jImageView_setLParamWidth(FjEnv, FjObject , GetLayoutParamsByParent(Self.Parent, FLParamWidth, sdW))
+        jImageView_setLParamWidth(FjEnv,FjObject,GetLayoutParamsByParent((Self.Parent as jVisualControl), FLParamWidth, sdW));
     end;
   end;
 end;
@@ -4441,17 +4470,17 @@ begin
   begin
     if Self.Parent is jForm then
     begin
-      if jForm(Owner).Orientation = gApp.Orientation then side:= sdH else side:= sdW;
+      if jForm(Owner).ScreenStyle = (FParent as jForm).ScreenStyleAtStart  then side:= sdH else side:= sdW;
       jImageView_setLParamHeight(FjEnv, FjObject , GetLayoutParams(gApp, FLParamHeight, side));
     end
     else
     begin
-      if (Self.Parent as jVisualControl).LayoutParamHeight = lpMatchParent then
-        jImageView_setLParamHeight(FjEnv, FjObject , GetLayoutParams(gApp, FLParamHeight, sdH))
-      else if (Self.Parent as jVisualControl).LayoutParamHeight = lpWrapContent then
-        jImageView_setLParamHeight(FjEnv, FjObject , GetLayoutParams(gApp, FLParamHeight, sdH))
-      else
-        jImageView_setLParamHeight(FjEnv, FjObject , GetLayoutParamsByParent(Self.Parent, FLParamHeight, sdH))
+      if (Self.Parent as jVisualControl).LayoutParamHeight = lpWrapContent then
+         jImageView_setLParamHeight(FjEnv, FjObject , GetLayoutParams(gApp, FLParamHeight, sdH))
+      else if (Self.Parent is jPanel) then //lpMatchParent and others
+             jImageView_setLParamHeight(FjEnv,FjObject,GetLayoutParamsByParent((Self.Parent as jPanel), FLParamHeight, sdH))
+           else
+             jImageView_setLParamHeight(FjEnv,FjObject,GetLayoutParamsByParent((Self.Parent as jVisualControl), FLParamHeight, sdH));
     end;
   end;
 end;
@@ -4460,14 +4489,46 @@ function jImageView.GetWidth: integer;
 begin
   Result:= FWidth;
   if FInitialized then
-   Result:= jImageView_getLParamWidth(FjEnv, FjObject )
+  begin
+     Result:= jImageView_getLParamWidth(FjEnv, FjObject );
+     if Result = -1 then //lpMatchParent
+     begin
+       if FParent is jForm then
+       begin
+         if (FParent as jForm).ScreenStyle = (FParent as jForm).ScreenStyleAtStart then
+           Result:= (FParent as jForm).ScreenWH.Width
+         else
+           Result:= (FParent as jForm).ScreenWH.Height;
+       end
+       else
+       begin
+           Result:= (FParent as jVisualControl).GetWidth;
+       end;
+     end;
+  end;
 end;
 
 function jImageView.GetHeight: integer;
 begin
   Result:= FHeight;
   if FInitialized then
-    Result:= jImageView_getLParamHeight(FjEnv, FjObject );
+  begin
+     Result:= jImageView_getLParamHeight(FjEnv, FjObject );
+     if Result = -1 then //lpMatchParent
+     begin
+       if FParent is jForm then
+       begin
+          if (FParent as jForm).ScreenStyle = (FParent as jForm).ScreenStyleAtStart then
+             Result:= (FParent as jForm).ScreenWH.Height   //take from start!
+          else
+             Result:= (FParent as jForm).ScreenWH.Width;
+       end
+       else
+       begin
+          Result:= (FParent as jVisualControl).GetHeight;
+       end;
+     end;
+  end;
 end;
 
 procedure jImageView.UpdateLayout;
@@ -4528,7 +4589,6 @@ begin
  if FInitialized then
    Result:= jImageView_GetBitmapWidth(FjEnv, FjObject );
 end;
-
 
 procedure jImageView.SetImageMatrixScale(_scaleX: single; _scaleY: single);
 begin
@@ -5607,17 +5667,16 @@ begin
   begin
     if Self.Parent is jForm then
     begin
-      if jForm(Owner).Orientation = gApp.Orientation then side:= sdW else side:= sdH;
+      if jForm(Owner).ScreenStyle = gApp.Orientation then side:= sdW else side:= sdH;
       jListView_setLParamWidth(FjEnv, FjObject , GetLayoutParams(gApp, FLParamWidth, side));
     end
     else
     begin
-      if (Self.Parent as jVisualControl).LayoutParamWidth = lpMatchParent then
-        jListView_setLParamWidth(FjEnv, FjObject , GetLayoutParams(gApp, FLParamWidth, sdW))
-      else if (Self.Parent as jVisualControl).LayoutParamWidth = lpWrapContent then
-        jListView_setLParamWidth(FjEnv, FjObject , GetLayoutParams(gApp, FLParamWidth, sdW))
-      else
-        jListView_setLParamWidth(FjEnv, FjObject , GetLayoutParamsByParent(Self.Parent, FLParamWidth, sdW))
+
+       if (Self.Parent as jVisualControl).LayoutParamWidth = lpWrapContent then
+          jListView_setLParamWidth(FjEnv, FjObject , GetLayoutParams(gApp, FLParamWidth, sdW))
+       else //lpMatchParent or others
+          jListView_setLParamWidth(FjEnv,FjObject,GetLayoutParamsByParent((Self.Parent as jVisualControl), FLParamWidth, sdW));
     end;
   end;
 end;
@@ -5630,17 +5689,15 @@ begin
   begin
     if Self.Parent is jForm then
     begin
-      if jForm(Owner).Orientation = gApp.Orientation then side:= sdH else side:= sdW;
+      if jForm(Owner).ScreenStyle = gApp.Orientation then side:= sdH else side:= sdW;
       jListView_setLParamHeight(FjEnv, FjObject , GetLayoutParams(gApp, FLParamHeight, side));
     end
     else
     begin
-      if (Self.Parent as jVisualControl).LayoutParamHeight = lpMatchParent then
-        jListView_setLParamHeight(FjEnv, FjObject , GetLayoutParams(gApp, FLParamHeight, sdH))
-      else if (Self.Parent as jVisualControl).LayoutParamHeight = lpWrapContent then
-        jListView_setLParamHeight(FjEnv, FjObject , GetLayoutParams(gApp, FLParamHeight, sdH))
-      else
-        jListView_setLParamHeight(FjEnv, FjObject , GetLayoutParamsByParent(Self.Parent, FLParamHeight, sdH))
+       if (Self.Parent as jVisualControl).LayoutParamHeight = lpWrapContent then
+          jListView_setLParamHeight(FjEnv, FjObject , GetLayoutParams(gApp, FLParamHeight, sdH))
+       else //lpMatchParent and others
+          jListView_setLParamHeight(FjEnv,FjObject,GetLayoutParamsByParent((Self.Parent as jVisualControl), FLParamHeight, sdH));
     end;
   end;
 end;
@@ -5922,17 +5979,15 @@ begin
   begin
     if Self.Parent is jForm then
     begin
-      if jForm(Owner).Orientation = gApp.Orientation then side:= sdW else side:= sdH;
+      if jForm(Owner).ScreenStyle = gApp.Orientation then side:= sdW else side:= sdH;
       jScrollView_setLParamWidth(FjEnv, FjObject , GetLayoutParams(gApp, FLParamWidth, side));
     end
     else
     begin
-      if (Self.Parent as jVisualControl).LayoutParamWidth = lpMatchParent then
-        jScrollView_setLParamWidth(FjEnv, FjObject , GetLayoutParams(gApp, FLParamWidth, sdW))
-      else if (Self.Parent as jVisualControl).LayoutParamWidth = lpWrapContent then
-        jScrollView_setLParamWidth(FjEnv, FjObject , GetLayoutParams(gApp, FLParamWidth, sdW))
-      else
-        jScrollView_setLParamWidth(FjEnv, FjObject , GetLayoutParamsByParent(Self.Parent, FLParamWidth, sdW))
+       if (Self.Parent as jVisualControl).LayoutParamWidth = lpWrapContent then
+           jScrollView_setLParamWidth(FjEnv, FjObject , GetLayoutParams(gApp, FLParamWidth, sdW))
+        else //lpMatchParent or others
+           jScrollView_setLParamWidth(FjEnv,FjObject,GetLayoutParamsByParent((Self.Parent as jVisualControl), FLParamWidth, sdW));
     end;
   end;
 end;
@@ -5945,17 +6000,15 @@ begin
   begin
     if Self.Parent is jForm then
     begin
-      if jForm(Owner).Orientation = gApp.Orientation then side:= sdH else side:= sdW;
+      if jForm(Owner).ScreenStyle = gApp.Orientation then side:= sdH else side:= sdW;
       jScrollView_setLParamHeight(FjEnv, FjObject , GetLayoutParams(gApp, FLParamHeight, side));
     end
     else
     begin
-      if (Self.Parent as jVisualControl).LayoutParamHeight = lpMatchParent then
-        jScrollView_setLParamHeight(FjEnv, FjObject , GetLayoutParams(gApp, FLParamHeight, sdH))
-      else if (Self.Parent as jVisualControl).LayoutParamHeight = lpWrapContent then
-        jScrollView_setLParamHeight(FjEnv, FjObject , GetLayoutParams(gApp, FLParamHeight, sdH))
-      else
-        jScrollView_setLParamHeight(FjEnv, FjObject , GetLayoutParamsByParent(Self.Parent, FLParamHeight, sdH))
+       if (Self.Parent as jVisualControl).LayoutParamHeight = lpWrapContent then
+          jScrollView_setLParamHeight(FjEnv, FjObject , GetLayoutParams(gApp, FLParamHeight, sdH))
+       else //lpMatchParent and others
+          jScrollView_setLParamHeight(FjEnv,FjObject,GetLayoutParamsByParent((Self.Parent as jVisualControl), FLParamHeight, sdH));
     end;
   end;
 end;
@@ -6112,17 +6165,15 @@ begin
   begin
     if Self.Parent is jForm then
     begin
-      if jForm(Owner).Orientation = gApp.Orientation then side:= sdW else side:= sdH;
+      if jForm(Owner).ScreenStyle = gApp.Orientation then side:= sdW else side:= sdH;
       jHorizontalScrollView_setLParamWidth(FjEnv, FjObject , GetLayoutParams(gApp, FLParamWidth, side));
     end
     else
     begin
-      if (Self.Parent as jVisualControl).LayoutParamWidth = lpMatchParent then
-        jHorizontalScrollView_setLParamWidth(FjEnv, FjObject , GetLayoutParams(gApp, FLParamWidth, sdW))
-      else if (Self.Parent as jVisualControl).LayoutParamWidth = lpWrapContent then
-        jHorizontalScrollView_setLParamWidth(FjEnv, FjObject , GetLayoutParams(gApp, FLParamWidth, sdW))
-      else
-        jHorizontalScrollView_setLParamWidth(FjEnv, FjObject , GetLayoutParamsByParent(Self.Parent, FLParamWidth, sdW))
+       if (Self.Parent as jVisualControl).LayoutParamWidth = lpWrapContent then
+           jHorizontalScrollView_setLParamWidth(FjEnv, FjObject , GetLayoutParams(gApp, FLParamWidth, sdW))
+        else //lpMatchParent or others
+           jHorizontalScrollView_setLParamWidth(FjEnv,FjObject,GetLayoutParamsByParent((Self.Parent as jVisualControl), FLParamWidth, sdW));
     end;
   end;
 end;
@@ -6135,17 +6186,15 @@ begin
   begin
     if Self.Parent is jForm then
     begin
-      if jForm(Owner).Orientation = gApp.Orientation then side:= sdH else side:= sdW;
+      if jForm(Owner).ScreenStyle = gApp.Orientation then side:= sdH else side:= sdW;
       jHorizontalScrollView_setLParamHeight(FjEnv, FjObject , GetLayoutParams(gApp, FLParamHeight, side));
     end
     else
     begin
-      if (Self.Parent as jVisualControl).LayoutParamHeight = lpMatchParent then
-        jHorizontalScrollView_setLParamHeight(FjEnv, FjObject , GetLayoutParams(gApp, FLParamHeight, sdH))
-      else if (Self.Parent as jVisualControl).LayoutParamHeight = lpWrapContent then
-        jHorizontalScrollView_setLParamHeight(FjEnv, FjObject , GetLayoutParams(gApp, FLParamHeight, sdH))
-      else
-        jHorizontalScrollView_setLParamHeight(FjEnv, FjObject , GetLayoutParamsByParent(Self.Parent, FLParamHeight, sdH))
+       if (Self.Parent as jVisualControl).LayoutParamHeight = lpWrapContent then
+          jHorizontalScrollView_setLParamHeight(FjEnv, FjObject , GetLayoutParams(gApp, FLParamHeight, sdH))
+       else //lpMatchParent and others
+          jHorizontalScrollView_setLParamHeight(FjEnv,FjObject,GetLayoutParamsByParent((Self.Parent as jVisualControl), FLParamHeight, sdH));
     end;
   end;
 end;
@@ -6282,17 +6331,15 @@ begin
   begin
     if Self.Parent is jForm then
     begin
-      if jForm(Owner).Orientation = gApp.Orientation then side:= sdW else side:= sdH;
+      if jForm(Owner).ScreenStyle = gApp.Orientation then side:= sdW else side:= sdH;
       jViewFlipper_setLParamWidth(FjEnv, FjObject , GetLayoutParams(gApp, FLParamWidth, side));
     end
     else
     begin
-      if (Self.Parent as jVisualControl).LayoutParamWidth = lpMatchParent then
-        jViewFlipper_setLParamWidth(FjEnv, FjObject , GetLayoutParams(gApp, FLParamWidth, sdW))
-      else if (Self.Parent as jVisualControl).LayoutParamWidth = lpWrapContent then
-        jViewFlipper_setLParamWidth(FjEnv, FjObject , GetLayoutParams(gApp, FLParamWidth, sdW))
-      else
-        jViewFlipper_setLParamWidth(FjEnv, FjObject , GetLayoutParamsByParent(Self.Parent, FLParamWidth, sdW))
+       if (Self.Parent as jVisualControl).LayoutParamWidth = lpWrapContent then
+           jViewFlipper_setLParamWidth(FjEnv, FjObject , GetLayoutParams(gApp, FLParamWidth, sdW))
+        else //lpMatchParent or others
+           jViewFlipper_setLParamWidth(FjEnv,FjObject,GetLayoutParamsByParent((Self.Parent as jVisualControl), FLParamWidth, sdW));
     end;
   end;
 end;
@@ -6305,17 +6352,15 @@ begin
   begin
     if Self.Parent is jForm then
     begin
-      if jForm(Owner).Orientation = gApp.Orientation then side:= sdH else side:= sdW;
+      if jForm(Owner).ScreenStyle = gApp.Orientation then side:= sdH else side:= sdW;
       jViewFlipper_setLParamHeight(FjEnv, FjObject , GetLayoutParams(gApp, FLParamHeight, side));
     end
     else
     begin
-      if (Self.Parent as jVisualControl).LayoutParamHeight = lpMatchParent then
-        jViewFlipper_setLParamHeight(FjEnv, FjObject , GetLayoutParams(gApp, FLParamHeight, sdH))
-      else if (Self.Parent as jVisualControl).LayoutParamHeight = lpWrapContent then
-        jViewFlipper_setLParamHeight(FjEnv, FjObject , GetLayoutParams(gApp, FLParamHeight, sdH))
-      else
-        jViewFlipper_setLParamHeight(FjEnv, FjObject , GetLayoutParamsByParent(Self.Parent, FLParamHeight, sdH))
+       if (Self.Parent as jVisualControl).LayoutParamHeight = lpWrapContent then
+          jViewFlipper_setLParamHeight(FjEnv, FjObject , GetLayoutParams(gApp, FLParamHeight, sdH))
+       else //lpMatchParent and others
+          jViewFlipper_setLParamHeight(FjEnv,FjObject,GetLayoutParamsByParent((Self.Parent as jVisualControl), FLParamHeight, sdH));
     end;
   end;
 end;
@@ -6486,17 +6531,15 @@ begin
   begin
     if Self.Parent is jForm then
     begin
-      if jForm(Owner).Orientation = gApp.Orientation then side:= sdW else side:= sdH;
+      if jForm(Owner).ScreenStyle = gApp.Orientation then side:= sdW else side:= sdH;
       jWebView_setLParamWidth(FjEnv, FjObject , GetLayoutParams(gApp, FLParamWidth, side));
     end
     else
     begin
-      if (Self.Parent as jVisualControl).LayoutParamWidth = lpMatchParent then
-        jWebView_setLParamWidth(FjEnv, FjObject , GetLayoutParams(gApp, FLParamWidth, sdW))
-      else if (Self.Parent as jVisualControl).LayoutParamWidth = lpWrapContent then
-        jWebView_setLParamWidth(FjEnv, FjObject , GetLayoutParams(gApp, FLParamWidth, sdW))
-      else
-        jWebView_setLParamWidth(FjEnv, FjObject , GetLayoutParamsByParent(Self.Parent, FLParamWidth, sdW))
+       if (Self.Parent as jVisualControl).LayoutParamWidth = lpWrapContent then
+           jWebView_setLParamWidth(FjEnv, FjObject , GetLayoutParams(gApp, FLParamWidth, sdW))
+        else //lpMatchParent or others
+           jWebView_setLParamWidth(FjEnv,FjObject,GetLayoutParamsByParent((Self.Parent as jVisualControl), FLParamWidth, sdW));
     end;
   end;
 end;
@@ -6509,17 +6552,15 @@ begin
   begin
     if Self.Parent is jForm then
     begin
-      if jForm(Owner).Orientation = gApp.Orientation then side:= sdH else side:= sdW;
+      if jForm(Owner).ScreenStyle = gApp.Orientation then side:= sdH else side:= sdW;
       jWebView_setLParamHeight(FjEnv, FjObject , GetLayoutParams(gApp, FLParamHeight, side));
     end
     else
     begin
-      if (Self.Parent as jVisualControl).LayoutParamHeight = lpMatchParent then
-        jWebView_setLParamHeight(FjEnv, FjObject , GetLayoutParams(gApp, FLParamHeight, sdH))
-      else if (Self.Parent as jVisualControl).LayoutParamHeight = lpWrapContent then
-        jWebView_setLParamHeight(FjEnv, FjObject , GetLayoutParams(gApp, FLParamHeight, sdH))
-      else
-        jWebView_setLParamHeight(FjEnv, FjObject , GetLayoutParamsByParent(Self.Parent, FLParamHeight, sdH))
+       if (Self.Parent as jVisualControl).LayoutParamHeight = lpWrapContent then
+          jWebView_setLParamHeight(FjEnv, FjObject , GetLayoutParams(gApp, FLParamHeight, sdH))
+       else //lpMatchParent and others
+          jWebView_setLParamHeight(FjEnv,FjObject,GetLayoutParamsByParent((Self.Parent as jVisualControl), FLParamHeight, sdH));
     end;
   end;
 end;
@@ -7264,17 +7305,15 @@ begin
   begin
     if Self.Parent is jForm then
     begin
-      if jForm(Owner).Orientation = gApp.Orientation then side:= sdW else side:= sdH;
+      if jForm(Owner).ScreenStyle = gApp.Orientation then side:= sdW else side:= sdH;
       jView_setLParamWidth(FjEnv, FjObject , GetLayoutParams(gApp, FLParamWidth, side));
     end
     else
     begin
-      if (Self.Parent as jVisualControl).LayoutParamWidth = lpMatchParent then
-        jView_setLParamWidth(FjEnv, FjObject , GetLayoutParams(gApp, FLParamWidth, sdW))
-      else if (Self.Parent as jVisualControl).LayoutParamWidth = lpWrapContent then
-        jView_setLParamWidth(FjEnv, FjObject , GetLayoutParams(gApp, FLParamWidth, sdW))
-      else
-        jView_setLParamWidth(FjEnv, FjObject , GetLayoutParamsByParent(Self.Parent, FLParamWidth, sdW))
+       if (Self.Parent as jVisualControl).LayoutParamWidth = lpWrapContent then
+           jView_setLParamWidth(FjEnv, FjObject , GetLayoutParams(gApp, FLParamWidth, sdW))
+        else //lpMatchParent or others
+           jView_setLParamWidth(FjEnv,FjObject,GetLayoutParamsByParent((Self.Parent as jVisualControl), FLParamWidth, sdW));
     end;
   end;
 end;
@@ -7287,17 +7326,15 @@ begin
   begin
     if Self.Parent is jForm then
     begin
-      if jForm(Owner).Orientation = gApp.Orientation then side:= sdH else side:= sdW;
+      if jForm(Owner).ScreenStyle = gApp.Orientation then side:= sdH else side:= sdW;
       jView_setLParamHeight(FjEnv, FjObject , GetLayoutParams(gApp, FLParamHeight, side));
     end
     else
     begin
-      if (Self.Parent as jVisualControl).LayoutParamHeight = lpMatchParent then
-        jView_setLParamHeight(FjEnv, FjObject , GetLayoutParams(gApp, FLParamHeight, sdH))
-      else if (Self.Parent as jVisualControl).LayoutParamHeight = lpWrapContent then
-        jView_setLParamHeight(FjEnv, FjObject , GetLayoutParams(gApp, FLParamHeight, sdH))
-      else
-        jView_setLParamHeight(FjEnv, FjObject , GetLayoutParamsByParent(Self.Parent, FLParamHeight, sdH))
+       if (Self.Parent as jVisualControl).LayoutParamHeight = lpWrapContent then
+          jView_setLParamHeight(FjEnv, FjObject , GetLayoutParams(gApp, FLParamHeight, sdH))
+       else //lpMatchParent and others
+          jView_setLParamHeight(FjEnv,FjObject,GetLayoutParamsByParent((Self.Parent as jVisualControl), FLParamHeight, sdH));
     end;
   end;
 end;
@@ -7787,17 +7824,15 @@ begin
   begin
     if Self.Parent is jForm then
     begin
-      if jForm(Owner).Orientation = gApp.Orientation then side:= sdW else side:= sdH;
+      if jForm(Owner).ScreenStyle = gApp.Orientation then side:= sdW else side:= sdH;
       jImageBtn_setLParamWidth(FjEnv, FjObject , GetLayoutParams(gApp, FLParamWidth, side));
     end
     else
     begin
-      if (Self.Parent as jVisualControl).LayoutParamWidth = lpMatchParent then
-        jImageBtn_setLParamWidth(FjEnv, FjObject , GetLayoutParams(gApp, FLParamWidth, sdW))
-      else if (Self.Parent as jVisualControl).LayoutParamWidth = lpWrapContent then
-        jImageBtn_setLParamWidth(FjEnv, FjObject , GetLayoutParams(gApp, FLParamWidth, sdW))
-      else
-        jImageBtn_setLParamWidth(FjEnv, FjObject , GetLayoutParamsByParent(Self.Parent, FLParamWidth, sdW))
+       if (Self.Parent as jVisualControl).LayoutParamWidth = lpWrapContent then
+           jImageBtn_setLParamWidth(FjEnv, FjObject , GetLayoutParams(gApp, FLParamWidth, sdW))
+        else //lpMatchParent or others
+           jImageBtn_setLParamWidth(FjEnv,FjObject,GetLayoutParamsByParent((Self.Parent as jVisualControl), FLParamWidth, sdW));
     end;
   end;
 end;
@@ -7810,17 +7845,15 @@ begin
   begin
     if Self.Parent is jForm then
     begin
-      if jForm(Owner).Orientation = gApp.Orientation then side:= sdH else side:= sdW;
+      if jForm(Owner).ScreenStyle = gApp.Orientation then side:= sdH else side:= sdW;
       jImageBtn_setLParamHeight(FjEnv, FjObject , GetLayoutParams(gApp, FLParamHeight, side));
     end
     else
     begin
-      if (Self.Parent as jVisualControl).LayoutParamHeight = lpMatchParent then
-        jImageBtn_setLParamHeight(FjEnv, FjObject , GetLayoutParams(gApp, FLParamHeight, sdH))
-      else if (Self.Parent as jVisualControl).LayoutParamHeight = lpWrapContent then
-        jImageBtn_setLParamHeight(FjEnv, FjObject , GetLayoutParams(gApp, FLParamHeight, sdH))
-      else
-        jImageBtn_setLParamHeight(FjEnv, FjObject , GetLayoutParamsByParent(Self.Parent, FLParamHeight, sdH))
+       if (Self.Parent as jVisualControl).LayoutParamHeight = lpWrapContent then
+          jImageBtn_setLParamHeight(FjEnv, FjObject , GetLayoutParams(gApp, FLParamHeight, sdH))
+       else //lpMatchParent and others
+          jImageBtn_setLParamHeight(FjEnv,FjObject,GetLayoutParamsByParent((Self.Parent as jVisualControl), FLParamHeight, sdH));
     end;
   end;
 end;
@@ -8554,6 +8587,17 @@ begin
     View_Invalidate(FjEnv, FjObject );
 end;
 
+procedure jPanel.SetParamWidth(Value: TLayoutParams);
+var
+  side: TSide;
+begin
+   inherited  SetParamWidth(Value);
+   if FInitialized then
+   begin
+     //
+   end;
+end;
+
 procedure jPanel.UpdateLParamWidth;
 var
   side: TSide;
@@ -8562,17 +8606,15 @@ begin
   begin
     if Self.Parent is jForm then
     begin
-      if jForm(Owner).Orientation = gApp.Orientation then side:= sdW else side:= sdH;
+      if jForm(Owner).ScreenStyle = (FParent as jForm).ScreenStyleAtStart  then side:= sdW else side:= sdH;
       jPanel_setLParamWidth(FjEnv, FjObject , GetLayoutParams(gApp, FLParamWidth, side));
     end
     else
     begin
-      if (Self.Parent as jVisualControl).LayoutParamWidth = lpMatchParent then
-        jPanel_setLParamWidth(FjEnv, FjObject , GetLayoutParams(gApp, FLParamWidth, sdW))
-      else if (Self.Parent as jVisualControl).LayoutParamWidth = lpWrapContent then
-        jPanel_setLParamWidth(FjEnv, FjObject , GetLayoutParams(gApp, FLParamWidth, sdW))
-      else
-        jPanel_setLParamWidth(FjEnv, FjObject , GetLayoutParamsByParent(Self.Parent, FLParamWidth, sdW))
+      if (Self.Parent as jVisualControl).LayoutParamWidth = lpWrapContent then
+          jPanel_setLParamWidth(FjEnv, FjObject , GetLayoutParams(gApp, FLParamWidth, sdW))
+       else //lpMatchParent or others
+          jPanel_setLParamWidth(FjEnv,FjObject,GetLayoutParamsByParent((Self.Parent as jVisualControl), FLParamWidth, sdW));
     end;
   end;
 end;
@@ -8581,11 +8623,10 @@ procedure jPanel.SetParamHeight(Value: TLayoutParams);
 var
   side: TSide;
 begin
-   inherited  SetParamHeight(Value);
+   inherited SetParamHeight(Value);
    if FInitialized then
    begin
-     if jForm(Owner).Orientation = gApp.Orientation then side:= sdH else side:= sdW;
-        jPanel_setLParamHeight(FjEnv, FjObject , GetLayoutParams(gApp, {FLParamHeight}Value, side));
+     //
    end;
 end;
 
@@ -8597,17 +8638,15 @@ begin
   begin
     if Self.Parent is jForm then
     begin
-      if jForm(Owner).Orientation = gApp.Orientation then side:= sdH else side:= sdW;
-      jPanel_setLParamHeight(FjEnv, FjObject , GetLayoutParams(gApp, FLParamHeight, side));
+       if jForm(Owner).ScreenStyle = (FParent as jForm).ScreenStyleAtStart then side:= sdH else side:= sdW;
+       jPanel_setLParamHeight(FjEnv, FjObject , GetLayoutParams(gApp, FLParamHeight, side));
     end
     else
     begin
-      if (Self.Parent as jVisualControl).LayoutParamHeight = lpMatchParent then
-        jPanel_setLParamHeight(FjEnv, FjObject , GetLayoutParams(gApp, FLParamHeight, sdH))
-      else if (Self.Parent as jVisualControl).LayoutParamHeight = lpWrapContent then
-        jPanel_setLParamHeight(FjEnv, FjObject , GetLayoutParams(gApp, FLParamHeight, sdH))
-      else
-        jPanel_setLParamHeight(FjEnv, FjObject , GetLayoutParamsByParent(Self.Parent, FLParamHeight, sdH))
+       if (Self.Parent as jVisualControl).LayoutParamHeight = lpWrapContent then
+          jPanel_setLParamHeight(FjEnv, FjObject , GetLayoutParams(gApp, FLParamHeight, sdH))
+       else //lpMatchParent and others
+          jPanel_setLParamHeight(FjEnv,FjObject,GetLayoutParamsByParent((Self.Parent as jVisualControl), FLParamHeight, sdH));
     end;
   end;
 end;
@@ -8620,8 +8659,17 @@ begin
      Result:= jPanel_getLParamWidth(FjEnv, FjObject );
      if Result = -1 then //lpMatchParent
      begin
-       if FParent is jForm then Result:= (FParent as jForm).ScreenWH.Width
-       else Result:= Self.Parent.Width;
+       if FParent is jForm then
+       begin
+         if (FParent as jForm).ScreenStyle = (FParent as jForm).ScreenStyleAtStart then
+             Result:= (FParent as jForm).ScreenWH.Width
+         else
+             Result:= (FParent as jForm).ScreenWH.Height;
+       end
+       else
+       begin
+          Result:= (FParent as jVisualControl).GetWidth;
+       end;
      end;
   end;
 end;
@@ -8634,8 +8682,17 @@ begin
      Result:= jPanel_getLParamHeight(FjEnv, FjObject );
      if Result = -1 then //lpMatchParent
      begin
-        if FParent is jForm then Result:= (FParent as jForm).ScreenWH.Height
-        else Result:= Self.Parent.Height;
+       if FParent is jForm then
+       begin
+          if (FParent as jForm).ScreenStyle = (FParent as jForm).ScreenStyleAtStart then
+             Result:= (FParent as jForm).ScreenWH.Height
+          else
+             Result:= (FParent as jForm).ScreenWH.Width;
+       end
+       else
+       begin
+          Result:= (FParent as jVisualControl).GetHeight;
+       end;
      end;
   end;
 end;

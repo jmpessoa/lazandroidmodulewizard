@@ -457,8 +457,12 @@ type
   TSide = (sdW, sdH);
 
   TScreenStyle   = (ssPortrait = 1,     // Force Portrait
-                    ssLandScape = 2,    // Force LandScape
+                    ssLandscape = 2,    // Force LandScape
+                    ssUnknown = 3,
                     ssSensor = 4); // by Device Status
+
+  //TRotateOrientation = (orientUnknown, orientVertical, orientHorizontal, orientSensor);
+
 
   TWebViewStatus = (wvOnUnknown,    // WebView
                     wvOnBefore,
@@ -538,7 +542,8 @@ type
   TOnTouchEvent      = Procedure(Sender: TObject; Touch : TMouch ) of Object;
   TOnCloseQuery      = Procedure(Sender: TObject; var CanClose: boolean) of object;
 
-  TOnRotate          = Procedure(Sender: TObject; rotate : integer; Var rstRotate : integer) of Object;
+  TOnRotate          = Procedure(Sender: TObject; rotate: TScreenStyle) of Object;
+  TOnCanRotate       = Procedure(Sender: TObject; var canRotate: boolean) of Object;
 
   TOnOptionMenuItemCreate = Procedure(Sender: TObject; jObjMenu: jObject) of Object;
 
@@ -673,7 +678,7 @@ type
     //Device        : TEnvDevice;
     Forms         : TjForms;     // Form Stack
     Lock          : Boolean;     //
-    Orientation   : integer;   //orientation on app start....
+    Orientation   : TScreenStyle;   //orientation on app start....
 
     Locale        : TLocale;    //by thierrydijoux
 
@@ -856,10 +861,9 @@ type
     FOnViewClick      : TViewClick;
     FOnListItemClick  : TListItemClick;
 
-    FOrientation   : integer;
-
     FScreenWH      : TWH;
     FScreenStyle   : TScreenStyle;
+
     FAnimation     : TAnimation;
 
     FActivityMode  : TActivityMode;
@@ -912,6 +916,10 @@ type
     function  GetOnListItemClickListener(jObjForm: jObject): jObject;
 
   public
+
+    ScreenStyleAtStart: TScreenStyle;    //device direction [vertical=1 and vertical=2]
+    ActionBarHeight: integer;
+
     FormState     : TjFormState;
     FormIndex: integer;
     FormBaseIndex: integer;
@@ -923,7 +931,6 @@ type
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
 
-    procedure SetOrientation(Value: integer);
     Procedure GenEvent_OnClick(Obj: TObject);
 
     procedure Init(refApp: jApp); override;
@@ -999,8 +1006,8 @@ type
 
     function IsPackageInstalled(_packagename: string): boolean;
     procedure ShowCustomMessage(_panel: jObject; _gravity: TGravity);  overload;
-    procedure SetScreenOrientation(_orientation: TScreenStyle);
-    function  GetScreenOrientation(): integer;
+    procedure SetScreenOrientationStyle(_orientation: TScreenStyle);
+    function  GetScreenOrientationStyle(): TScreenStyle;
 
     function GetScreenSize(): string;
     function GetScreenDensity(): string;
@@ -1019,13 +1026,14 @@ type
 
     function DumpExceptionCallStack(E: Exception): string; //Thanks to Euller and Oswaldo
 
+    function GetActionBarHeight(): integer;
+    function ActionBarIsShowing(): boolean;
+
     // Property
     property View         : jObject        read FjRLayout; //layout!
 
     property ScreenStyle  : TScreenStyle   read FScreenStyle    write FScreenStyle;
     property Animation    : TAnimation     read FAnimation      write FAnimation;
-    property Orientation   : integer read FOrientation write SetOrientation;
-
     property ScreenWH      : TWH read FScreenWH;
 
     property CallBackDataString: string read FCBDataString write FCBDataString;
@@ -1089,7 +1097,7 @@ type
     // Java
     FId: DWord;
     FjPRLayout   : jObject; //Java: Parent Layout {parent View)
-    FOrientation : integer;
+    FScreenStyle    : TScreenStyle;
     FTextAlignment: TTextAlignment;
 
     FFontSize     : DWord;
@@ -1120,8 +1128,9 @@ type
     procedure SetVisible(Value: boolean);
 
     procedure SetParentComponent(Value: TComponent); override;
+
     procedure SetParamHeight(Value: TLayoutParams); virtual;
-    procedure SetParamWidth(Value: TLayoutParams);
+    procedure SetParamWidth(Value: TLayoutParams);  virtual;
 
     //procedure SetFontFace(AValue: TFontFace); virtual;
     //procedure SetFontColor(AValue: TARGBColorBridge); virtual;
@@ -1130,14 +1139,19 @@ type
     //procedure SetHintTextColor(Value: TARGBColorBridge); virtual;
 
     function GetView: jObject; virtual;
+
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
 
     procedure Init(refApp: jApp); override;
     procedure UpdateLayout; virtual;
+
+    function GetWidth: integer;  override;
+    function GetHeight: integer; override;
+
     property AnchorId: integer read FAnchorId write FAnchorId;
-    property Orientation: integer read FOrientation write FOrientation;
+    property ScreenStyle   : TScreenStyle read FScreenStyle  write FScreenStyle   ;
     property ViewParent {ViewParent}: jObject  read  GetViewParent write SetViewParent; // Java : Parent Relative Layout
 
     property View: jObject read GetView; //FjObject; //View/Layout
@@ -1168,7 +1182,10 @@ end;
   function GetPositionRelativeToAnchor(posRelativeToAnchorID: TPositionRelativeToAnchorID): DWord;
   function GetPositionRelativeToParent(posRelativeToParent: TPositionRelativeToParent): DWord;
   function GetLayoutParams(App: jApp; lpParam: TLayoutParams;  side: TSide): DWord;
-  function GetLayoutParamsByParent(paren: TAndroidWidget; lpParam: TLayoutParams;  side: TSide): DWord;
+
+  function GetLayoutParamsByParent(paren: jVisualControl; lpParam: TLayoutParams;  side: TSide): DWord;
+  function GetLayoutParamsByParent2(paren: TAndroidWidget; lpParam: TLayoutParams;  side: TSide): DWord; //old
+
   function GetLayoutParamsOrd(lpParam: TLayoutParams): DWord;
   function GetLayoutParamsName(ordIndex: DWord): TLayoutParams;
 
@@ -1176,7 +1193,9 @@ end;
   function GetDesignerLayoutByWH(Value: DWord; L: integer): TLayoutParams;
 
   function GetParamBySide(App: jApp; side: TSide): DWord;
-  function GetParamByParentSide(paren: TAndroidWidget; side: TSide): DWord;
+
+  function GetParamByParentSide(paren: jVisualControl; side: TSide): DWord;
+  function GetParamByParentSide2(paren: TAndroidWidget; side: TSide): DWord;
 
   function GetFilePath(filePath: TFilePath): string;
 
@@ -1243,6 +1262,8 @@ end;
   procedure jForm_CopyFromInternalAppStorageToEnvironmentDir(env: PJNIEnv; _jform: JObject; _filename: string; _environmentDir: string);
   procedure jForm_CopyFromAssetsToEnvironmentDir(env: PJNIEnv; _jform: JObject; _filename: string; _environmentDir: string);
 
+  function jForm_GetActionBarHeight(env: PJNIEnv; _jform: JObject): integer;
+  function jForm_ActionBarIsShowing(env: PJNIEnv; _jform: JObject): boolean;
 
 
 //jni API Bridge
@@ -1954,7 +1975,7 @@ procedure jVisualControl.Init(refApp: jApp);
 begin
   inherited Init(refApp);
   FjPRLayout:= jForm(Owner).View;  //set default ViewParent/FjPRLayout as jForm.View!
-  FOrientation:= jForm(Owner).Orientation;
+  FScreenStyle   := jForm(Owner).ScreenStyle;
   if (PosRelativeToAnchor = []) and (PosRelativeToParent = []) then
   begin
     FMarginLeft := FLeft;
@@ -2021,6 +2042,16 @@ end;
 function jVisualControl.GetView: jObject;
 begin
   Result:= FjObject;
+end;
+
+function jVisualControl.GetWidth: integer;
+begin
+   Result:= FWidth;
+end;
+
+function jVisualControl.GetHeight: integer;
+begin
+   Result:= FHeight
 end;
 
 procedure jVisualControl.SetVisible(Value: boolean);
@@ -2169,7 +2200,7 @@ begin
 
   FAnimation.In_        := cjEft_None; //cjEft_FadeIn;
   FAnimation.Out_       := cjEft_None; //cjEft_FadeOut;
-  FOrientation          := 0;
+  FScreenStyle          := ssUnknown;
   FInitialized          := False;
 
   FMarginBottom:= 0;
@@ -2227,8 +2258,11 @@ begin
 
   Inherited Init(refApp);
 
-  FScreenWH:= refApp.Screen.WH;
-  FOrientation:= refApp.Orientation;   //on start ...
+  FScreenStyle:= refApp.Orientation;
+
+  FScreenWH:= refApp.Screen.WH;   //sAved on start!
+
+  ScreenStyleAtStart:= FScreenStyle;   //saved on start!
 
   FjObject:=  jForm_Create(refApp.Jni.jEnv, refApp.Jni.jThis, Self); {jSef}
 
@@ -2265,6 +2299,9 @@ begin
 
   //Show ...
   jForm_Show2(refApp.Jni.jEnv, FjObject, FAnimation.In_);
+
+  ActionBarHeight:= jForm_GetActionBarHeight(FjEnv, FjObject);
+
   if Assigned(FOnJNIPrompt) then FOnJNIPrompt(Self);
 end;
 
@@ -2284,11 +2321,6 @@ end;
 function jForm.GetDateTime: String;
 begin
   Result:= jForm_GetDateTime(FjEnv,FjObject);
-end;
-
-procedure jForm.SetOrientation(Value: integer);
-begin
-  FOrientation:= Value;
 end;
 
 Procedure jForm.SetEnabled(Value: Boolean);
@@ -2316,12 +2348,12 @@ Procedure jForm.UpdateLayout;
 var
   i: integer;
 begin
-  for i := 0 to  (Self.ComponentCount - 1) do   //********
+  for i := 0 to (Self.ComponentCount - 1) do   //********
   begin
-     if Self.Components[i] is jVisualControl then
-     begin
+    if Self.Components[i] is jVisualControl then
+    begin
         (Self.Components[i] as jVisualControl).UpdateLayout;
-     end;
+    end;
   end;
 end;
 
@@ -2770,18 +2802,20 @@ begin
      jForm_ShowCustomMessage(FjEnv, FjObject, _panel, GetGravity(_gravity) );
 end;
 
-procedure jForm.SetScreenOrientation(_orientation: TScreenStyle);
+procedure jForm.SetScreenOrientationStyle(_orientation: TScreenStyle);
 begin
   //in designing component state: set value here...
+  FScreenStyle:= _orientation;
   if FInitialized then
      jForm_SetScreenOrientation(FjEnv, FjObject, Ord(_orientation));
 end;
 
-function jForm.GetScreenOrientation(): integer;
+function jForm.GetScreenOrientationStyle(): TScreenStyle;
 begin
   //in designing component state: result value here...
+  Result:= FScreenStyle;
   if FInitialized then
-   Result:= jForm_GetScreenOrientation(FjEnv, FjObject);
+   Result:= TScreenStyle(jForm_GetScreenOrientation(FjEnv, FjObject));
 end;
 
 function jForm.GetScreenDensity(): string;
@@ -2895,6 +2929,20 @@ begin
   Result := Result + 'Address: '+BackTraceStrFunc(ExceptAddr);
   for i:= 0 to ExceptFrameCount - 1 do
     Result := Result + LineEnding + BackTraceStrFunc(ExceptFrames[i]);
+end;
+
+function jForm.GetActionBarHeight(): integer;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jForm_GetActionBarHeight(FjEnv, FjObject);
+end;
+
+function jForm.ActionBarIsShowing(): boolean;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jForm_ActionBarIsShowing(FjEnv, FjObject);
 end;
 
 {-------- jForm_JNI_Bridge ----------}
@@ -3630,6 +3678,31 @@ begin
   env^.DeleteLocalRef(env, jCls);
 end;
 
+function jForm_GetActionBarHeight(env: PJNIEnv; _jform: JObject): integer;
+var
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jform);
+  jMethod:= env^.GetMethodID(env, jCls, 'GetActionBarHeight', '()I');
+  Result:= env^.CallIntMethod(env, _jform, jMethod);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+
+function jForm_ActionBarIsShowing(env: PJNIEnv; _jform: JObject): boolean;
+var
+  jBoo: JBoolean;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jform);
+  jMethod:= env^.GetMethodID(env, jCls, 'ActionBarIsShowing', '()Z');
+  jBoo:= env^.CallBooleanMethod(env, _jform, jMethod);
+  Result:= boolean(jBoo);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
 
 //-----------------------------------------------
    {jApp by jmpessoa}
@@ -3673,6 +3746,8 @@ begin
 end;
 
 Procedure jApp.Init(env: PJNIEnv; this: jObject; activity: jObject; layout: jObject);
+var
+  startOrient: integer;
 begin
   if FInitialized  then Exit;
   // Setting Global Environment -----------------------------------------------
@@ -3692,7 +3767,16 @@ begin
 
   // Screen
   Screen.WH     := jSysInfo_ScreenWH(env, this, activity);
-  Orientation   := jSystem_GetOrientation(env, this);
+
+  startOrient:= jSystem_GetOrientation(env, this);
+
+  if  startOrient = 1 then
+       Orientation   :=  ssPortrait
+  else if startOrient = 2 then
+       Orientation   :=  ssLandscape
+  else if startOrient = 4 then Orientation:=  ssSensor
+  else Orientation   :=  ssUnknown ;
+
   // Device
   Path.App      := jSysInfo_PathApp(env, this, activity, PChar(FAppName){gjAppName});
   Path.Dat      := jSysInfo_PathDat(env, this, activity);
@@ -3902,6 +3986,88 @@ begin
   Result:= TPositionRelativeToParentArray[index];
 end;
 
+function GetParamByParentSide(paren: jVisualControl; side: TSide): DWord;
+begin
+   case side of
+     sdW: begin
+               Result:= paren.GetWidth;
+          end;
+     sdH: begin
+              Result:= paren.GetHeight;
+           end;
+   end;
+end;
+
+function GetParamByParentSide2(paren: TAndroidWidget; side: TSide): DWord;
+begin
+   case side of
+     sdW: begin
+               Result:= paren.Width;
+          end;
+     sdH: begin
+              Result:= paren.Height;
+           end;
+   end;
+end;
+
+
+function GetLayoutParamsByParent(paren: jVisualControl; lpParam: TLayoutParams;  side: TSide): DWord;
+begin
+  case lpParam of
+     lpMatchParent:          Result:= TLayoutParamsArray[0];
+     lpWrapContent:          Result:= TLayoutParamsArray[1];
+     lpTwoThirdOfParent:     Result:= Trunc((2/3)*GetParamByParentSide(paren, side)-14);
+     lpOneThirdOfParent:     Result:= Trunc((1/3)*GetParamByParentSide(paren, side)-14);
+
+     lpHalfOfParent:         Result:= Trunc((1/2)*GetParamByParentSide(paren, side)-14);
+
+     lpOneQuarterOfParent:   Result:= Trunc((1/4)*GetParamByParentSide(paren, side)-14);
+     lpOneEighthOfParent:    Result:= Trunc((1/8)*GetParamByParentSide(paren, side)-14);
+     lpOneFifthOfParent:     Result:= Trunc((1/5)*GetParamByParentSide(paren, side)-14);
+     lpTwoFifthOfParent:     Result:= Trunc((2/5)*GetParamByParentSide(paren, side)-14);
+     lpThreeFifthOfParent:   Result:= Trunc((3/5)*GetParamByParentSide(paren, side)-14);
+     lpThreeQuarterOfParent: Result:= Trunc((3/4)*GetParamByParentSide(paren, side)-14);
+     lpFourFifthOfParent:    Result:= Trunc((4/5)*GetParamByParentSide(paren, side)-14);
+     lp16px: Result:= 16;
+     lp24px: Result:= 24;
+     lp32px: Result:= 32;
+     lp40px: Result:= 40;
+     lp48px: Result:= 48;
+     lp72px: Result:= 72;
+     lp96px: Result:= 96;
+     //lpDesigner: Result:= 0;
+  end;
+end;
+
+function GetLayoutParamsByParent2(paren: TAndroidWidget; lpParam: TLayoutParams;  side: TSide): DWord;
+begin
+  case lpParam of
+     lpMatchParent:          Result:= TLayoutParamsArray[0];
+     lpWrapContent:          Result:= TLayoutParamsArray[1];
+     lpTwoThirdOfParent:     Result:= Trunc((2/3)*GetParamByParentSide2(paren, side)-14);
+     lpOneThirdOfParent:     Result:= Trunc((1/3)*GetParamByParentSide2(paren, side)-14);
+
+     lpHalfOfParent:         Result:= Trunc((1/2)*GetParamByParentSide2(paren, side)-14);
+
+     lpOneQuarterOfParent:   Result:= Trunc((1/4)*GetParamByParentSide2(paren, side)-14);
+     lpOneEighthOfParent:    Result:= Trunc((1/8)*GetParamByParentSide2(paren, side)-14);
+     lpOneFifthOfParent:     Result:= Trunc((1/5)*GetParamByParentSide2(paren, side)-14);
+     lpTwoFifthOfParent:     Result:= Trunc((2/5)*GetParamByParentSide2(paren, side)-14);
+     lpThreeFifthOfParent:   Result:= Trunc((3/5)*GetParamByParentSide2(paren, side)-14);
+     lpThreeQuarterOfParent: Result:= Trunc((3/4)*GetParamByParentSide2(paren, side)-14);
+     lpFourFifthOfParent:    Result:= Trunc((4/5)*GetParamByParentSide2(paren, side)-14);
+     lp16px: Result:= 16;
+     lp24px: Result:= 24;
+     lp32px: Result:= 32;
+     lp40px: Result:= 40;
+     lp48px: Result:= 48;
+     lp72px: Result:= 72;
+     lp96px: Result:= 96;
+     //lpDesigner: Result:= 0;
+  end;
+end;
+
+
 function GetParamBySide(App:jApp; side: TSide): DWord;
 begin
    case side of
@@ -3910,17 +4076,6 @@ begin
    end;
 end;
 
-function GetParamByParentSide(paren: TAndroidWidget; side: TSide): DWord;
-begin
-   case side of
-     sdW: begin
-            Result:= paren.Width;
-          end;
-     sdH: begin
-            Result:= paren.Height;
-           end;
-   end;
-end;
 
 function GetLayoutParamsName(ordIndex: DWord): TLayoutParams;
 begin
@@ -3951,32 +4106,6 @@ end;
 function GetLayoutParamsOrd(lpParam: TLayoutParams): DWord;
 begin
    Result:= Ord(lpParam);
-end;
-
-function GetLayoutParamsByParent(paren: TAndroidWidget; lpParam: TLayoutParams;  side: TSide): DWord;
-begin
-  case lpParam of
-     lpMatchParent:          Result:= TLayoutParamsArray[0];
-     lpWrapContent:          Result:= TLayoutParamsArray[1];
-     lpTwoThirdOfParent:     Result:= Trunc((2/3)*GetParamByParentSide(paren, side)-14);
-     lpOneThirdOfParent:     Result:= Trunc((1/3)*GetParamByParentSide(paren, side)-14);
-     lpHalfOfParent:         Result:= Trunc((1/2)*GetParamByParentSide(paren, side)-14);
-     lpOneQuarterOfParent:   Result:= Trunc((1/4)*GetParamByParentSide(paren, side)-14);
-     lpOneEighthOfParent:    Result:= Trunc((1/8)*GetParamByParentSide(paren, side)-14);
-     lpOneFifthOfParent:     Result:= Trunc((1/5)*GetParamByParentSide(paren, side)-14);
-     lpTwoFifthOfParent:     Result:= Trunc((2/5)*GetParamByParentSide(paren, side)-14);
-     lpThreeFifthOfParent:   Result:= Trunc((3/5)*GetParamByParentSide(paren, side)-14);
-     lpThreeQuarterOfParent: Result:= Trunc((3/4)*GetParamByParentSide(paren, side)-14);
-     lpFourFifthOfParent:    Result:= Trunc((4/5)*GetParamByParentSide(paren, side)-14);
-     lp16px: Result:= 16;
-     lp24px: Result:= 24;
-     lp32px: Result:= 32;
-     lp40px: Result:= 40;
-     lp48px: Result:= 48;
-     lp72px: Result:= 72;
-     lp96px: Result:= 96;
-     //lpDesigner: Result:= 0;
-  end;
 end;
 
 function GetLayoutParams(App:jApp; lpParam: TLayoutParams; side: TSide): DWord;

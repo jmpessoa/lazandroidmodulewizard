@@ -17,11 +17,11 @@ Author:
 	ref. https://github.com/jmpessoa/tfpnoguigraphicsbridge
 
 
-Hint: TFPNoGuiGraphicsBridge on Android [Lamw/Lazarus Android Module Wizard project!]
+Hint: Cross compile/linking [arm-android] project fail .... NO PANIC!
 
-	--->>> Cross compile [Lamw/arm-android] project fail .... NO PANIC!
-
-PANIC I: Compiling ... [please, read "lazarus" or/as "laz4android" and "...\fpc\2.7.1" or/as "...\fpc\3.1.1" ]
+PANIC I: Compiling Fail! ... [please, read:
+					"lazarus" <==> "laz4android" and 
+					"...\fpc\2.7.1" <==> "...\fpc\3.1.1" ]
 
 	"(FTFont.PPU and freetype.PPU) units NOT FOUND in "...\lazarus\fpc\2.7.1\units\arm-android\fcl-image" ???
 
@@ -29,9 +29,9 @@ PANIC I: Compiling ... [please, read "lazarus" or/as "laz4android" and "...\fpc\
 
 	1. Goto "...\lazarus\fpc\2.7.1\source\packages\fcl-image\src" and copy
 
-		ftfont.pp (if need change to .pas)
-		freetype.pp (if need change to .pas)
-		freetypeh.pp (if need change to .pas)
+		ftfont.pp 
+		freetype.pp 
+		freetypeh.pp 
 
 		to "...\tfpnoguigraphicsbridge" package folder and build AGAIN your project!
 
@@ -40,20 +40,26 @@ PANIC I: Compiling ... [please, read "lazarus" or/as "laz4android" and "...\fpc\
 	2. Copy THEM to folder  "...\lazarus\fpc\2.7.1\units\arm-android\fcl-image"
 		So, others [future] projects will find its there!  [solved to "arm-android" !!!]
 
-PANIC II: [building Lamw project cross-arm]::
+PANIC II: Linking Fail !! [building a Lamw project cross-arm]::
 
 	".... : cannot find -lfreetype"
 
 	Solution:
 
-		Copy "libfreetype.so" to NDK location    "....\platforms\android-XX\arch-arm\usr\lib" 
+		Copy "libfreetype.so" 
+					FROM: project folder "..\libs\armeabi" 
+					TO: NDK location "....\platforms\android-XX\arch-arm\usr\lib" 
+
 		where XX = 14 or 15 or 16... or 21 .. etc
+
+		For "Lamw"  demo projects you can look for "XX" value here: 
+		"Project" --->> "Project Options" ---> "Compile Options" -->> "Paths" --->> Libraries [-Fl]
 		example: put "libfreetype.so" here: "..\ndkplatforms\android-15\arch-arm\usr\lib" 
 
-		For Lamw project you can look for "XX" value in menu: 
+		For "Lamw"  demo project you can look for "XX" value in menu: 
 		"Project" --->> "Project Options" ---> "Compile Options" -->> "Paths" --->> Libraries [-Fl]
 
-PANIC III. Where I find a "libfreetype.so" for arm-android ?
+PANIC III. Where can I find a "libfreetype.so" for arm-android ?
 
 	Go to "..\demos\Eclipse\AppTFPNoGUIGraphicsBridgeDemo1\libs\armeabi"
 
@@ -71,12 +77,3 @@ PANIC IV.  Where "libfreetype.so" will be load in java code?
 
 
 Thank You!
-
-
-
-
-
-
-
-
-

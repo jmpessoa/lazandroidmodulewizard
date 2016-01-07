@@ -55,7 +55,7 @@ PANIC II: [building Lamw project cross-arm]::
 
 PANIC III. Where I find a "libfreetype.so" for arm-android ?
 
-	Go to "..\demos\Eclipse\AppTFPNoGUIGraphicsBridgeDemo1\libs\armeabi"
+	Go to "..\demos\Eclipse\AppTFPNoGUIGraphicsBridgeDemo3\libs\armeabi"
 
 	You will find a "libfreetype.so" there! 
 
