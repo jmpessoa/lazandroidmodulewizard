@@ -184,8 +184,19 @@ begin
 end;
 
 procedure TFormWorkspace.ListBoxMinSDKClick(Sender: TObject);
-begin
-    FMinApi:= ListBoxMinSDK.Items.Strings[ListBoxMinSDK.ItemIndex]
+var
+ tApi, mApi: integer;
+ begin
+
+  if ListBoxTargetAPI.ItemIndex < 0then ListBoxTargetAPI.ItemIndex:= 0;
+  tApi:= StrToInt(ListBoxTargetAPI.Items[ListBoxTargetAPI.ItemIndex]);
+
+  mApi:= StrToInt(ListBoxMinSDK.Items.Strings[ListBoxMinSDK.ItemIndex]);
+  if  mApi > tApi then
+      ListBoxMinSDK.ItemIndex:= ListBoxMinSDK.Items.IndexOf(FTargetApi);
+
+  if ListBoxMinSDK.ItemIndex < 0 then ListBoxMinSDK.ItemIndex:= 2;
+  FMinApi:= ListBoxMinSDK.Items[ListBoxMinSDK.ItemIndex];
 end;
 
 //http://developer.android.com/about/dashboards/index.html
@@ -218,8 +229,22 @@ begin
 end;
 
 procedure TFormWorkspace.ListBoxTargetAPIClick(Sender: TObject);
+var
+ tApi, mApi: integer;
 begin
   FTargetApi:= ListBoxTargetAPI.Items[ListBoxTargetAPI.ItemIndex];
+
+  tApi:= StrToInt(FTargetApi);
+
+  if ListBoxMinSDK.ItemIndex < 0 then ListBoxMinSDK.ItemIndex:= 2;
+  mApi:= StrToInt(ListBoxMinSDK.Items.Strings[ListBoxMinSDK.ItemIndex]);
+
+  if  mApi > tApi then
+      ListBoxMinSDK.ItemIndex:= ListBoxMinSDK.Items.IndexOf(FTargetApi);
+
+  if ListBoxMinSDK.ItemIndex < 0 then ListBoxMinSDK.ItemIndex:= 2;
+  FMinApi:= ListBoxMinSDK.Items[ListBoxMinSDK.ItemIndex];
+
 end;
 
 procedure TFormWorkspace.ListBoxTargetAPISelectionChange(Sender: TObject; User: boolean);
@@ -290,7 +315,18 @@ var
   count, i, j, apiTarg: integer;
   path: string;
   aList: TStringList;
+  tApi, mApi: integer;
 begin
+
+  if ListBoxTargetAPI.ItemIndex < 0 then ListBoxTargetAPI.ItemIndex:= 0;
+  tApi:= StrToInt(ListBoxTargetAPI.Items[ListBoxTargetAPI.ItemIndex]);
+  if ListBoxMinSDK.ItemIndex < 0 then ListBoxMinSDK.ItemIndex:= 2;
+  mApi:= StrToInt(ListBoxMinSDK.Items.Strings[ListBoxMinSDK.ItemIndex]);
+  if  mApi > tApi then
+      ListBoxMinSDK.ItemIndex:= ListBoxMinSDK.Items.IndexOf(FTargetApi);
+
+  if ListBoxMinSDK.ItemIndex < 0 then ListBoxMinSDK.ItemIndex:= 2;
+  FMinApi:= ListBoxMinSDK.Items[ListBoxMinSDK.ItemIndex];
 
   SaveSettings(FFileName);
   if ModalResult = mrCancel  then Exit;
@@ -595,7 +631,7 @@ procedure TFormWorkspace.FormActivate(Sender: TObject);
 var
   lisDir: TStringList;
   auxStr1: string;
-  i: integer;
+  i, tApi, mApi: integer;
 begin
         //C:\adt32\sdk\platforms
   lisDir:= TStringList.Create;
@@ -616,7 +652,19 @@ begin
        FIndexTargetApi:= ListBoxTargetAPI.Count-1;
 
     ListBoxTargetAPI.ItemIndex:= FIndexTargetApi;
-    FTargetApi:= ListBoxTargetAPI.Items[ListBoxTargetAPI.ItemIndex]
+
+    FTargetApi:= ListBoxTargetAPI.Items[ListBoxTargetAPI.ItemIndex];
+    tApi:= StrToInt(FTargetApi);
+
+    if ListBoxMinSDK.ItemIndex < 0 then ListBoxMinSDK.ItemIndex:= 2;
+    mApi:= StrToInt(ListBoxMinSDK.Items.Strings[ListBoxMinSDK.ItemIndex]);
+    if  mApi > tApi then
+        ListBoxMinSDK.ItemIndex:= ListBoxMinSDK.Items.IndexOf(FTargetApi);
+
+    if ListBoxMinSDK.ItemIndex < 0 then ListBoxMinSDK.ItemIndex:= 2;
+
+    FMinApi:= ListBoxMinSDK.Items[ListBoxMinSDK.ItemIndex];
+
   end
   else
   begin
@@ -665,8 +713,13 @@ begin
 
   if EditPackagePrefaceName.Text = '' then EditPackagePrefaceName.Text:= 'org.lamw';
 
+  if ListBoxPlatform.ItemIndex < 0 then ListBoxPlatform.ItemIndex:= 0;
   StatusBarInfo.Panels.Items[0].Text:='Ndk: '+ GetCodeNameByApi(ListBoxPlatform.Items[ListBoxPlatform.ItemIndex]);
+
+  if ListBoxMinSDK.ItemIndex < 0 then ListBoxMinSDK.ItemIndex:= 2;
   StatusBarInfo.Panels.Items[1].Text:= 'MinSdk: '+GetTextByListIndex(ListBoxMinSDK.ItemIndex);
+
+  if ListBoxTargetAPI.ItemIndex < 0 then ListBoxTargetAPI.ItemIndex:= 0;
   StatusBarInfo.Panels.Items[2].Text:='Target: '+ GetCodeNameByApi(ListBoxTargetAPI.Items[ListBoxTargetAPI.ItemIndex]);
 
   ListBoxPlatform.MakeCurrentVisible;
@@ -764,7 +817,7 @@ end;
 
 procedure TFormWorkspace.SpeedButton1Click(Sender: TObject);
 begin
-  ShowMessage('Lamw: Lazarus Android Module Wizard' +#10#13+ '[ver. 0.6 - rev. 38.1 - 30 December 2015]');
+  ShowMessage('Lamw: Lazarus Android Module Wizard' +#10#13+ '[ver. 0.6 - rev. 38.3 - 07 January 2016]');
 end;
 
 procedure TFormWorkspace.SpeedButtonHintThemeClick(Sender: TObject);
@@ -784,6 +837,7 @@ end;
 procedure TFormWorkspace.LoadSettings(const pFilename: string);  //called by
 var
   i1, i2, i3, i5, j1: integer;
+  mApi: integer;
 begin
   FFileName:= pFilename;
   with TIniFile.Create(pFilename) do
@@ -812,7 +866,9 @@ begin
     if (j1 >= 0) and (j1 < ListBoxMinSDK.Items.Count) then
        ListBoxMinSDK.ItemIndex:= j1
     else
-       ListBoxMinSDK.ItemIndex:= ListBoxMinSDK.Items.Count-1;
+       ListBoxMinSDK.ItemIndex:= 2; //default!
+
+    FMinApi:= ListBoxMinSDK.Items[ListBoxMinSDK.ItemIndex];
 
     FIndexNdkPlatformApi:= StrToIntDef(ReadString('NewProject','AndroidPlatform', ''), 0);
 
@@ -834,8 +890,6 @@ begin
 
   FInstructionSet:= RGInstruction.Items[RGInstruction.ItemIndex];
   FFPUSet:= RGFPU.Items[RGFPU.ItemIndex];
-
-  FMinApi:= ListBoxMinSDK.Items[ListBoxMinSDK.ItemIndex];
 
   EditPathToWorkspace.Text := FPathToWorkspace;
 
@@ -870,8 +924,10 @@ begin
       else
         WriteString('NewProject', 'AndroidPlatform', IntToStr(ListBoxPlatform.ItemIndex));
 
-
+      if ListBoxMinSDK.ItemIndex < 0 then ListBoxMinSDK.ItemIndex:= 2;
       WriteString('NewProject', 'MinApi', IntToStr(ListBoxMinSDK.ItemIndex));
+
+      if ListBoxTargetAPI.ItemIndex < 0 then ListBoxTargetAPI.ItemIndex:= 0;
       WriteString('NewProject', 'TargetApi', IntToStr(ListBoxTargetAPI.ItemIndex));
 
       WriteString('NewProject', 'AntBuildMode', 'debug'); //default...

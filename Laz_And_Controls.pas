@@ -1016,8 +1016,6 @@ type
     procedure UpdateLParamWidth;
   protected
     procedure SetViewParent(Value: jObject);  override;
-    function GetHeight: integer;   override;
-    function GetWidth: integer;     override;
     procedure SetParamWidth(Value: TLayoutParams); override;
     procedure SetParamHeight(Value: TLayoutParams); override;
 
@@ -1029,6 +1027,9 @@ type
     procedure Refresh;
 
       //by jmpessoa
+    function GetHeight: integer;   override;
+    function GetWidth: integer;     override;
+
     Procedure UpdateLayout; override;
     procedure Init(refApp: jApp); override;
     Procedure SetImageByName(Value : string);
@@ -1308,9 +1309,6 @@ type
     procedure UpdateLParamHeight;
     procedure UpdateLParamWidth;
   protected
-    procedure SetViewParent(Value: jObject);   override;
-    function GetWidth: integer;  override;
-    function GetHeight: integer; override;
     Procedure GenEvent_OnTouch(Obj: TObject; Act,Cnt: integer; X1,Y1,X2,Y2: single);
     Procedure GenEvent_OnDraw (Obj: TObject; jCanvas: jObject);
     procedure Notification(AComponent: TComponent; Operation: TOperation); override;
@@ -1318,6 +1316,9 @@ type
     constructor Create(AOwner: TComponent); override;
     Destructor Destroy; override;
     Procedure Refresh;
+    function GetWidth: integer;  override;
+    function GetHeight: integer; override;
+    procedure SetViewParent(Value: jObject);   override;
     Procedure UpdateLayout; override;
     procedure Init(refApp: jApp); override;
     Procedure SaveToFile(fileName:String);
@@ -1710,14 +1711,11 @@ end;
 Function Java_Event_pAppOnRotate(env: PJNIEnv; this: jobject; rotate : integer) : Integer;
 var                   {rotate=1 --> device vertical/default position ; 2: device horizontal position}
   Form      : jForm;
-  rstRotate : Integer;
   rotOrientation: TScreenStyle;
 begin
 
   gApp.Jni.jEnv:= env;
   gApp.Jni.jThis:= this;
-
-  rstRotate:= 0; //rotate; //just initialize [var] param...
 
   Result := rotate;
 
@@ -4420,8 +4418,6 @@ begin
 end;
 
 procedure jImageView.SetParamHeight(Value: TLayoutParams);
-var
-  side: TSide;
 begin
    inherited SetParamHeight(Value);
    if FInitialized then
@@ -4431,8 +4427,6 @@ begin
 end;
 
 procedure jImageView.SetParamWidth(Value: TLayoutParams);
-var
-  side: TSide;
 begin
    inherited SetParamWidth(Value);     //FLParamWidth
    if FInitialized then
@@ -8588,8 +8582,6 @@ begin
 end;
 
 procedure jPanel.SetParamWidth(Value: TLayoutParams);
-var
-  side: TSide;
 begin
    inherited  SetParamWidth(Value);
    if FInitialized then
@@ -8620,8 +8612,6 @@ begin
 end;
 
 procedure jPanel.SetParamHeight(Value: TLayoutParams);
-var
-  side: TSide;
 begin
    inherited SetParamHeight(Value);
    if FInitialized then

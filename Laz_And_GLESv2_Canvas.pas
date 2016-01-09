@@ -282,8 +282,7 @@ Type
    //
    Procedure BindTexture( const Texture : TxgElement );
    procedure Notification(AComponent: TComponent; Operation: TOperation); override;
-   function GetWidth: integer;  override;
-   function GetHeight: integer;  override;
+
  public
    Textures : TxgTextures; // Texture
    MVP      : TM4x4;       // MVP Matrix
@@ -293,6 +292,9 @@ Type
    Destructor  Destroy; override;
    procedure Init(refApp: jApp); override;
    Procedure UpdateLayout; override;
+
+   function GetWidth: integer;  override;
+   function GetHeight: integer;  override;
    //
    Function  IntToShader   ( shader : integer ) : TxgShader;
    //

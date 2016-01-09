@@ -173,8 +173,7 @@ jCanvasES1 = class(jGLViewEvent)
   //
   Procedure BindTexture   ( const Texture : TxgElement );
   procedure Notification(AComponent: TComponent; Operation: TOperation); override; //by jmpessoa
-  function GetWidth: integer; override;
-  function GetHeight: integer; override;
+
  public
   Textures : TxgTextures; // Texture
   TexturesCount: integer; //by jmpessoa
@@ -183,6 +182,10 @@ jCanvasES1 = class(jGLViewEvent)
   Destructor  Destroy; override;
   procedure Init(refApp: jApp); override;
   Procedure UpdateLayout; override;
+
+  function GetWidth: integer; override;
+  function GetHeight: integer; override;
+
   //
   Procedure Screen_Setup(w,h        : Integer;
                          Projection : TxgProjection = xp2D;
