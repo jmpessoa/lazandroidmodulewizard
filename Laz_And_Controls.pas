@@ -685,8 +685,19 @@ type
   //http://startandroid.ru/en/lessons/complete-list/224-lesson-18-changing-layoutparams-in-a-running-application.html
   //http://stackoverflow.com/questions/13557387/align-radiobuttons-with-text-at-right-and-button-at-left-programmatically?rq=1
 
+  { jTextView }
+
   jTextView = class(jVisualControl)
   private
+    FColor: TARGBColorBridge;
+    FEnabled: Boolean;
+    FFontColor: TARGBColorBridge;
+    FFontFace: TFontFace;
+    FFontSize: DWord;
+    FFontSizeUnit: TFontSizeUnit;
+    FOnClick: TOnNotify;
+    FTextAlignment: TTextAlignment;
+    FTextTypeFace: TTextTypeFace;
 
     Procedure SetColor    (Value : TARGBColorBridge);
     Procedure SetFontColor(Value : TARGBColorBridge);
@@ -716,7 +727,8 @@ type
     Procedure UpdateLayout; override;
     procedure Append(_txt: string);
     procedure AppendLn(_txt: string);
-
+    procedure CopyToClipboard();
+    procedure PasteFromClipboard();
 
   published
     property Text: string read GetText write SetText;
@@ -2380,7 +2392,7 @@ begin
 end;
 
 //
-Destructor jTextView.Destroy;
+destructor jTextView.Destroy;
 begin
   if not (csDesigning in ComponentState) then
   begin
@@ -2499,49 +2511,49 @@ begin
 
 end;
 
-Procedure jTextView.SetViewParent(Value: jObject);
+procedure jTextView.SetViewParent(Value: jObject);
 begin
   FjPRLayout:= Value;
   if FInitialized then
      jTextView_setParent(FjEnv, FjObject, FjPRLayout);
 end;
 
-Procedure jTextView.SetColor(Value: TARGBColorBridge);
+procedure jTextView.SetColor(Value: TARGBColorBridge);
 begin
   FColor:= Value;
   if (FInitialized = True) and (FColor <> colbrDefault)  then
     View_SetBackGroundColor(FjEnv, FjObject , GetARGB(FCustomColor, FColor));
 end;
 
-Procedure jTextView.SetEnabled(Value: Boolean);
+procedure jTextView.SetEnabled(Value: Boolean);
 begin
   FEnabled := Value;
   if FInitialized then
     jTextView_setEnabled(FjEnv, FjObject , FEnabled);
 end;
 
-Function jTextView.GetText: string;
+function jTextView.GetText: string;
 begin
   Result:= FText;
   if FInitialized then
      Result:= jTextView_getText(FjEnv, FjObject );
 end;
 
-Procedure jTextView.SetText(Value: string);
+procedure jTextView.SetText(Value: string);
 begin
   inherited SetText(Value);
   if FInitialized then
     jTextView_setText(FjEnv, FjObject , Value);
 end;
 
-Procedure jTextView.SetFontColor(Value: TARGBColorBridge);
+procedure jTextView.SetFontColor(Value: TARGBColorBridge);
 begin
  FFontColor:= Value;
  if (FInitialized = True) and (FFontColor <> colbrDefault) then
      jTextView_setTextColor(FjEnv, FjObject, GetARGB(FCustomColor, FFontColor))
 end;
 
-Procedure jTextView.SetFontSize(Value: DWord);
+procedure jTextView.SetFontSize(Value: DWord);
 begin
   FFontSize:= Value;
   if FInitialized and  (FFontSize > 0) then
@@ -2622,21 +2634,21 @@ begin
 end;
 
 // LORDMAN 2013-08-12
-Procedure jTextView.setTextAlignment(Value: TTextAlignment);
+procedure jTextView.SetTextAlignment(Value: TTextAlignment);
 begin
   FTextAlignment:= Value;
   if FInitialized then
     jTextView_setTextAlignment(FjEnv, FjObject , Ord(FTextAlignment));
 end;
 
-Procedure jTextView.Refresh;
+procedure jTextView.Refresh;
 begin
   if FInitialized then
      View_Invalidate(FjEnv, FjObject );
 end;
 
 // Event : Java -> Pascal
-Procedure jTextView.GenEvent_OnClick(Obj: TObject);
+procedure jTextView.GenEvent_OnClick(Obj: TObject);
 begin
   if Assigned(FOnClick) then FOnClick(Obj);
 end;
@@ -2653,6 +2665,20 @@ begin
   //in designing component state: set value here...
   if FInitialized then
      jTextView_AppendLn(FjEnv, FjObject, _txt);
+end;
+
+procedure jTextView.CopyToClipboard();
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jTextView_CopyToClipboard(FjEnv, FjObject);
+end;
+
+procedure jTextView.PasteFromClipboard();
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jTextView_PasteFromClipboard(FjEnv, FjObject);
 end;
 
 procedure jTextView.SetFontSizeUnit(_unit: TFontSizeUnit);

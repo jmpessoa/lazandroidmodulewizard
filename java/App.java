@@ -1,4 +1,4 @@
-package com.example.dummyapp;
+package fk.elera.gunluk;
 
 //Lamw: Lazarus Android Module Wizard - Version 0.6 - revision 38.3 - 07 January - 2016
 //Form Designer and Components development model!

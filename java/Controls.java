@@ -1,4 +1,4 @@
-package com.example.dummyapp;
+package fk.elera.gunluk;
 
 //Lamw: Lazarus Android Module Wizard  - version 0.6 - revision 38.3 - 07 January - 2016 
 //Form Designer and Components development model!
@@ -1257,6 +1257,9 @@ int marginBottom = 5;
 float mTextSize = 0; //default
 int mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_SP; //default
 
+private ClipboardManager mClipBoard = null;
+private ClipData mClipData = null;
+
 // Constructor
 public  jTextView(android.content.Context context,
                  Controls ctrls,long pasobj ) {                    
@@ -1267,6 +1270,9 @@ controls = ctrls;
 // Init Class
 lparams = new LayoutParams(100,100);     // W,H
 lparams.setMargins(5,5,5,5); // L,T,
+
+mClipBoard = (ClipboardManager) controls.activity.getSystemService(Context.CLIPBOARD_SERVICE);
+
 // Init Event
 onClickListener = new OnClickListener() {
   public  void onClick(View view) {
@@ -1340,7 +1346,18 @@ public  void setTextAlignment( int align ) {
      default : { setGravity( Gravity.LEFT              ); }; break;
   };
 }
-             
+      
+public void CopyToClipboard() {
+	mClipData = ClipData.newPlainText("text", this.getText().toString());
+    mClipBoard.setPrimaryClip(mClipData);
+}
+   
+public void PasteFromClipboard() {
+    ClipData cdata = mClipBoard.getPrimaryClip();
+    ClipData.Item item = cdata.getItemAt(0);
+    this.setText(item.getText().toString());
+}
+
 public void setParent3( android.view.ViewGroup viewgroup ) {  //deprec...
 if (parent != null) { parent.removeView(this); }
    parent = viewgroup;

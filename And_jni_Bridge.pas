@@ -155,6 +155,10 @@ Procedure jTextView_setLeftTopRightBottomWidthHeight(env:PJNIEnv; TextView : jOb
 
 procedure jTextView_Append(env: PJNIEnv; _jtextview: JObject; _txt: string);
 procedure jTextView_AppendLn(env: PJNIEnv; _jtextview: JObject; _txt: string);
+
+procedure jTextView_CopyToClipboard(env: PJNIEnv; _jtextview: JObject);
+procedure jTextView_PasteFromClipboard(env: PJNIEnv; _jtextview: JObject);
+
 procedure jTextView_SetFontSizeUnit(env: PJNIEnv; _jtextview: JObject; _unit: integer);
 
 //-----------------------------------
@@ -1564,6 +1568,29 @@ begin
   jMethod:= env^.GetMethodID(env, jCls, 'AppendLn', '(Ljava/lang/String;)V');
   env^.CallVoidMethodA(env, _jtextview, jMethod, @jParams);
   env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jTextView_CopyToClipboard(env: PJNIEnv; _jtextview: JObject);
+var
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jtextview);
+  jMethod:= env^.GetMethodID(env, jCls, 'CopyToClipboard', '()V');
+  env^.CallVoidMethod(env, _jtextview, jMethod);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+
+procedure jTextView_PasteFromClipboard(env: PJNIEnv; _jtextview: JObject);
+var
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jtextview);
+  jMethod:= env^.GetMethodID(env, jCls, 'PasteFromClipboard', '()V');
+  env^.CallVoidMethod(env, _jtextview, jMethod);
   env^.DeleteLocalRef(env, jCls);
 end;
 
