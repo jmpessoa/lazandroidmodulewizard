@@ -1014,6 +1014,7 @@ type
     function GetStringResourceByName(_resName: string): string;
 
     //needed: <uses-permission android:name="android.permission.READ_PHONE_STATE"/>
+    function GetSystemVersion: Integer;
     function GetDevicePhoneNumber: String;
     function GetDeviceID: String;
 
@@ -1414,6 +1415,8 @@ Function jSysInfo_Language (env:PJNIEnv; this: jobject; localeType: TLocaleType)
 //by jmpessoa
 Function  jSysInfo_PathDataBase             (env:PJNIEnv;this:jobject;context : jObject) : String;
 // Device Info
+
+function jSysInfo_GetSystemVersion(env: PJNIEnv; _jform: JObject) : Integer;
 Function  jSysInfo_DevicePhoneNumber   (env:PJNIEnv;this:jobject) : String;
 Function  jSysInfo_DeviceID            (env:PJNIEnv;this:jobject) : String;
 
@@ -2789,6 +2792,12 @@ function jForm.GetStringResourceByName(_resName: string): string;
 begin
   if FInitialized then
    Result:= jForm_GetStringResourceByName(FjEnv, FjObject, _resName);
+end;
+
+function jForm.GetSystemVersion: Integer;
+begin
+  if(FInitialized) then
+    Result:= jSysInfo_GetSystemVersion(FjEnv, FjObject);
 end;
 
 function jForm.GetDevicePhoneNumber: String;
@@ -5389,6 +5398,16 @@ end;
 //------------------------------------------------------------------------------
 // Device Info
 //------------------------------------------------------------------------------
+function jSysInfo_GetSystemVersion(env: PJNIEnv; _jform: JObject) : Integer;
+  var
+  jMethod: jMethodID = nil;
+  jCls: jClass = nil;
+begin
+  jCls := env^.GetObjectClass(env, _jform);
+  jMethod := env^.GetMethodID(env, jCls, 'getSystemVersion', '()I');
+  Result := env^.CallIntMethod(env, _jform, jMethod);
+  env^.DeleteLocalRef(env, jCls);
+end;
 
 Function  jSysInfo_DevicePhoneNumber(env:PJNIEnv;this:jobject) : String;
  Const

@@ -56,7 +56,8 @@ public class App extends Activity {
      
       //by jmpessoa --- fix for http get    
       //ref. http://stackoverflow.com/questions/8706464/defaulthttpclient-to-androidhttpclient 
-     if (android.os.Build.VERSION.SDK_INT > 9) {
+     int systemVersion = android.os.Build.VERSION.SDK_INT; 
+     if (systemVersion > 9) {
          StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
          StrictMode.setThreadPolicy(policy);
      }
@@ -67,6 +68,7 @@ public class App extends Activity {
       controls.appLayout   = new RelativeLayout(this);
       controls.appLayout.getRootView().setBackgroundColor (0x00FFFFFF);
       controls.screenStyle = controls.jAppOnScreenStyle();
+      controls.systemVersion = systemVersion;
       switch( controls.screenStyle ) {
       	case 1  : this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT );  break;
       	case 2  : this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);  break;

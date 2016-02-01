@@ -637,6 +637,11 @@ public  OnItemClickListener  GetOnListItemClickListener  () {
 	return this.onListItemClickListener; 
 }
 
+public int getSystemVersion()
+{	
+	return controls.systemVersion;	
+}
+
 public void SetWifiEnabled(boolean _status) {
     WifiManager wifiManager = (WifiManager)this.controls.activity.getSystemService(Context.WIFI_SERVICE);             
     wifiManager.setWifiEnabled(_status);
@@ -16637,6 +16642,7 @@ public class Controls {          // <<---------
 public Activity        activity;  // Activity
 public RelativeLayout  appLayout; // Base Layout
 public int screenStyle=0;         // Screen Style [Dev:0 , Portrait: 1, Landscape : 2]
+public int systemVersion;
 
 // Jave -> Pascal Function ( Pascal Side = Event )
 public  native int  pAppOnScreenStyle(); 
