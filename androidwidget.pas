@@ -1335,6 +1335,9 @@ procedure Call_jCallStaticVoidMethodA(fullClassName: string; funcName: string; f
 Function jApp_GetControlsVersionFeatures          (env:PJNIEnv;this:jobject): String;
 
 function jApp_GetAssetContentList(env: PJNIEnv; this: JObject; Path: string): TDynArrayOfString;
+function jApp_GetDriverList(env: PJNIEnv; this: JObject): TDynArrayOfString;
+function jApp_GetFolderList(env: PJNIEnv; this: JObject; Path: string): TDynArrayOfString;
+function jApp_GetFileList(env: PJNIEnv; this: JObject; Path: string): TDynArrayOfString;
 
 Procedure jApp_Finish                  (env:PJNIEnv;this:jobject);
 
@@ -4576,39 +4579,142 @@ begin
 end;
 
 function jApp_GetAssetContentList(env: PJNIEnv; this: JObject; Path: string): TDynArrayOfString; 
-var 
-JCls: JClass = nil; 
-JMethod: JMethodID = nil; 
-DataArray: JObject; 
-JParams: array[0..0] of JValue; 
-StrX: JString; 
-ResB: JBoolean; 
-SizeArr, i: Integer; 
+  var
+  JCls: JClass = nil;
+  JMethod: JMethodID = nil;
+  DataArray: JObject;
+  JParams: array[0..0] of JValue;
+  StrX: JString;
+  ResB: JBoolean;
+  SizeArr, i: Integer;
 begin  
-  JCls := env^.GetObjectClass(env, this); 
+
+  JCls := env^.GetObjectClass(env, this);
   JParams[0].l := env^.NewStringUTF(env, PChar(Path)); 
   JMethod := env^.GetMethodID(env, JCls, 'getAssetContentList', '(Ljava/lang/String;)[Ljava/lang/String;'); 
   DataArray := env^.CallObjectMethodA(env, this, JMethod, @JParams); 
   if(DataArray <> nil) then 
   begin 
-    SizeArr := env^.GetArrayLength(env, DataArray); 
+    SizeArr := env^.GetArrayLength(env, DataArray);
     SetLength(Result, SizeArr); 
     for i := 0 to SizeArr - 1 do 
     begin 
-      StrX := env^.GetObjectArrayElement(env, DataArray, i); 
+      StrX := env^.GetObjectArrayElement(env, DataArray, i);
       case StrX = nil of 
-         True: Result[i] := ''; 
-         False: 
- 	 begin 
-           ResB := JNI_False; 
-           Result[i] := string(env^.GetStringUTFChars(env, StrX, @ResB)); 
- 	 end; 
-       end; 
-    end; 
+        True: Result[i] := '';
+        False:
+ 	      begin
+          ResB := JNI_False;
+          Result[i] := string(env^.GetStringUTFChars(env, StrX, @ResB));
+ 	      end;
+      end;
+    end;
   end;
   env^.DeleteLocalRef(env, jCls);
 end;
 
+function jApp_GetDriverList(env: PJNIEnv; this: JObject): TDynArrayOfString;
+  var
+  JCls: JClass = nil;
+  JMethod: JMethodID = nil;
+  DataArray: JObject;
+  StrX: JString;
+  ResB: JBoolean;
+  SizeArr, i: Integer;
+begin
+
+  JCls := env^.GetObjectClass(env, this);
+  JMethod := env^.GetMethodID(env, JCls, 'getDriverList', '()[Ljava/lang/String;');
+  DataArray := env^.CallObjectMethod(env, this, JMethod);
+  if(DataArray <> nil) then
+  begin
+    SizeArr := env^.GetArrayLength(env, DataArray);
+    SetLength(Result, SizeArr);
+    for i := 0 to SizeArr - 1 do
+    begin
+      StrX := env^.GetObjectArrayElement(env, DataArray, i);
+      case StrX = nil of
+        True: Result[i] := '';
+        False:
+ 	      begin
+          ResB := JNI_False;
+          Result[i] := string(env^.GetStringUTFChars(env, StrX, @ResB));
+ 	      end;
+      end;
+    end;
+  end;
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+function jApp_GetFolderList(env: PJNIEnv; this: JObject; Path: string): TDynArrayOfString;
+  var
+  JCls: JClass = nil;
+  JMethod: JMethodID = nil;
+  DataArray: JObject;
+  JParams: array[0..0] of JValue;
+  StrX: JString;
+  ResB: JBoolean;
+  SizeArr, i: Integer;
+begin
+
+  JCls := env^.GetObjectClass(env, this);
+  JParams[0].l := env^.NewStringUTF(env, PChar(Path));
+  JMethod := env^.GetMethodID(env, JCls, 'getFolderList', '(Ljava/lang/String;)[Ljava/lang/String;');
+  DataArray := env^.CallObjectMethodA(env, this, JMethod, @JParams);
+  if(DataArray <> nil) then
+  begin
+    SizeArr := env^.GetArrayLength(env, DataArray);
+    SetLength(Result, SizeArr);
+    for i := 0 to SizeArr - 1 do
+    begin
+      StrX := env^.GetObjectArrayElement(env, DataArray, i);
+      case StrX = nil of
+        True: Result[i] := '';
+        False:
+ 	      begin
+          ResB := JNI_False;
+          Result[i] := string(env^.GetStringUTFChars(env, StrX, @ResB));
+ 	      end;
+      end;
+    end;
+  end;
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+function jApp_GetFileList(env: PJNIEnv; this: JObject; Path: string): TDynArrayOfString;
+  var
+  JCls: JClass = nil;
+  JMethod: JMethodID = nil;
+  DataArray: JObject;
+  JParams: array[0..0] of JValue;
+  StrX: JString;
+  ResB: JBoolean;
+  SizeArr, i: Integer;
+begin
+
+  JCls := env^.GetObjectClass(env, this);
+  JParams[0].l := env^.NewStringUTF(env, PChar(Path));
+  JMethod := env^.GetMethodID(env, JCls, 'getFileList', '(Ljava/lang/String;)[Ljava/lang/String;');
+  DataArray := env^.CallObjectMethodA(env, this, JMethod, @JParams);
+  if(DataArray <> nil) then
+  begin
+    SizeArr := env^.GetArrayLength(env, DataArray);
+    SetLength(Result, SizeArr);
+    for i := 0 to SizeArr - 1 do
+    begin
+      StrX := env^.GetObjectArrayElement(env, DataArray, i);
+      case StrX = nil of
+        True: Result[i] := '';
+        False:
+ 	      begin
+          ResB := JNI_False;
+          Result[i] := string(env^.GetStringUTFChars(env, StrX, @ResB));
+ 	      end;
+      end;
+    end;
+  end;
+  env^.DeleteLocalRef(env, jCls);
+end;
 
 Procedure jApp_Finish(env:PJNIEnv;this:jobject);
 Const

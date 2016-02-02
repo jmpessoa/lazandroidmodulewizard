@@ -17118,20 +17118,81 @@ public  String getStrDateTime() {  //hacked by jmpessoa!! sorry, was for a good 
 //Fatih: Path = '' = Asset Root Folder 
 //Path Example: gunlukler/2015/02/28/001 
 public String[] getAssetContentList(String Path) throws IOException { 
-   ArrayList<String> Folders = new ArrayList<String>(); 
+	ArrayList<String> Folders = new ArrayList<String>(); 
 
-   Resources r = this.activity.getResources();  
-   AssetManager am = r.getAssets(); 
-   String fileList[] = am.list(Path); 
-   if (fileList != null) 
-  {    
-     for (int i = 0; i < fileList.length; i++) 
-     { 
- 	Folders.add(fileList[i]); 
-     } 
-  } 
-  String sFolders[] = Folders.toArray(new String[Folders.size()]);    	   
-  return sFolders; 
+	Resources r = this.activity.getResources();  
+	AssetManager am = r.getAssets(); 
+	String fileList[] = am.list(Path); 
+	if (fileList != null) 
+	{    
+		for (int i = 0; i < fileList.length; i++) 
+		{ 
+			Folders.add(fileList[i]); 
+		} 
+	} 
+	String sFolders[] = Folders.toArray(new String[Folders.size()]);    	   
+	return sFolders; 
+} 
+
+//Fatih: gets system storage driver list
+public String[] getDriverList() { 
+	ArrayList<String> Drivers = new ArrayList<String>(); 
+
+	String sDriver;
+	sDriver = System.getenv("EXTERNAL_STORAGE");
+	if(sDriver != null)
+	{
+		File fDriver = new File(sDriver);
+
+		if (fDriver.exists() && fDriver.canWrite()) {
+			Drivers.add(fDriver.getAbsolutePath());
+		}
+	}
+
+	sDriver = System.getenv("SECONDARY_STORAGE");
+	if(sDriver != null)
+	{
+		File fDriver = new File(sDriver);
+
+		if (fDriver.exists() && fDriver.canWrite()) {
+			Drivers.add(fDriver.getAbsolutePath());
+		}
+	}
+	
+	String sDrivers[] = Drivers.toArray(new String[Drivers.size()]);    	   
+	return sDrivers; 
+} 
+
+//Fatih: get folders list 
+//Path Example: /storage/emulated/legacy/ 
+public String[] getFolderList(String Path) { 
+	ArrayList<String> Folders = new ArrayList<String>(); 
+
+	File f = new File(Path);
+	File[] files = f.listFiles();
+	for (File fFile : files) {
+	    if (fFile.isDirectory()) {
+			Folders.add(fFile.getName());
+	    }
+	}	
+	String sFolders[] = Folders.toArray(new String[Folders.size()]);    	   
+	return sFolders; 
+} 
+
+//Fatih: get files list 
+//Path Example: /storage/emulated/legacy/ 
+public String[] getFileList(String Path) { 
+	ArrayList<String> Folders = new ArrayList<String>(); 
+
+	File f = new File(Path);
+	File[] files = f.listFiles();
+	for (File fFile : files) {
+	    if (fFile.isFile()) {
+			Folders.add(fFile.getName());
+	    }
+	}	
+	String sFolders[] = Folders.toArray(new String[Folders.size()]);    	   
+	return sFolders; 
 } 
 
 //by jmpessoa:  Class controls version info
