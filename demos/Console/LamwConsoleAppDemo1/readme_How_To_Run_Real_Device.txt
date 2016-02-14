@@ -4,7 +4,7 @@ How to run your native console app in "Real Device" [ref. http://kevinboone.net/
  
 		NOTE 2: Project settings: Targeg Api = 18 and PIE  not enabled!
  
-		NOTE 3: To run in AVD/Emulator, please, "readme_How_To_Run_Real_Device.txt"
+		NOTE 3: To run in AVD/Emulator, please, "readme_How_To_Run_AVD_Emulator.txt"
  
 		NOTE 4: Android >=5.0 [Target API >= 21] need to enable PIE [Position Independent Executables] enabled: 
  

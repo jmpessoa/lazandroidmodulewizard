@@ -1,5 +1,6 @@
 object AndroidConsoleDataForm1: TAndroidConsoleDataForm1
   OnCreate = DataModuleCreate
+  OnDestroy = DataModuleDestroy
   OldCreateOrder = False
   Height = 150
   HorizontalOffset = 272

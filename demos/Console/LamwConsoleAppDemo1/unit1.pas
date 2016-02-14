@@ -14,6 +14,7 @@ type
 
   TAndroidConsoleDataForm1 = class(TDataModule)
     procedure DataModuleCreate(Sender: TObject);
+    procedure DataModuleDestroy(Sender: TObject);
   private
     {private declarations}
   public
@@ -33,6 +34,11 @@ implementation
 procedure TAndroidConsoleDataForm1.DataModuleCreate(Sender: TObject);
 begin
   writeln('Hello Lamw''s World!');
+end;
+
+procedure TAndroidConsoleDataForm1.DataModuleDestroy(Sender: TObject);
+begin
+
 end;
 
 end.
