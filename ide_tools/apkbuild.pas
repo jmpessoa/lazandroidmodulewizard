@@ -35,9 +35,10 @@ type
 
 implementation
 
-uses IDEExternToolIntf, LazIDEIntf, LazFileUtils, UTF8Process, Controls,
-  EditBtn, StdCtrls, ButtonPanel, Dialogs, uFormStartEmulator, IniFiles,
-  process, strutils, laz2_XMLRead, Laz2_DOM, laz2_XMLWrite;
+uses
+  IDEExternToolIntf, LazIDEIntf, IDEDialogs, UTF8Process, Controls, EditBtn,
+  StdCtrls, ButtonPanel, Dialogs, uFormStartEmulator, IniFiles, process,
+  strutils, laz2_XMLRead, Laz2_DOM, laz2_XMLWrite, LazFileUtils;
 
 function QueryPath(APrompt: string; out Path: string;
   ACaption: string = 'Android Wizard: Path Missing!'): Boolean;
@@ -104,29 +105,29 @@ end;
 
 procedure TApkBuilder.LoadPaths;
 begin
-  with TIniFile.Create(AppendPathDelim(LazarusIDE.GetPrimaryConfigPath)
-    + 'late.ini') do
-  try
-    FSdkPath := ReadString('PATH', 'SDK', '');
-    FAntPath := ReadString('PATH', 'Ant', '');
-    FJdkPath := ReadString('PATH', 'JDK', '');
-    FNdkPath := ReadString('PATH', 'NDK', '');
-  finally
-    Free;
-  end;
-  with TIniFile.Create(AppendPathDelim(LazarusIDE.GetPrimaryConfigPath)
+  with TIniFile.Create(IncludeTrailingPathDelimiter(LazarusIDE.GetPrimaryConfigPath)
     + 'JNIAndroidProject.ini') do
   try
-    if FSdkPath = '' then
-      FSdkPath := ReadString('NewProject', 'PathToAndroidSDK', '');
-    if FAntPath = '' then
-      FAntPath := ReadString('NewProject', 'PathToAntBin', '');
-    if FJdkPath = '' then
-      FJdkPath := ReadString('NewProject', 'PathToJavaJDK', '');
-    if FNdkPath = '' then
-      FNdkPath := ReadString('NewProject', 'PathToAndroidNDK', '');
+    FSdkPath := ReadString('NewProject', 'PathToAndroidSDK', '');
+    FAntPath := ReadString('NewProject', 'PathToAntBin', '');
+    FJdkPath := ReadString('NewProject', 'PathToJavaJDK', '');
+    FNdkPath := ReadString('NewProject', 'PathToAndroidNDK', '');
   finally
     Free
+  end;
+  with TIniFile.Create(IncludeTrailingPathDelimiter(LazarusIDE.GetPrimaryConfigPath)
+    + 'late.ini') do
+  try
+    if FSdkPath = '' then
+      FSdkPath := ReadString('PATH', 'SDK', '');
+    if FAntPath = '' then
+      FAntPath := ReadString('PATH', 'Ant', '');
+    if FJdkPath = '' then
+      FJdkPath := ReadString('PATH', 'JDK', '');
+    if FNdkPath = '' then
+      FNdkPath := ReadString('PATH', 'NDK', '');
+  finally
+    Free;
   end;
   if FAntPath = '' then
     if not QueryPath('Path to Ant bin: [ex. C:\adt32\Ant\bin]', FAntPath) then
@@ -184,22 +185,22 @@ function TApkBuilder.TryFixPaths: TModalResult;
     f: TForm;
     lb: TListBox;
   begin
-    if DirectoryExistsUTF8(path) then Exit;
+    if DirectoryExists(path) then Exit;
     i := Pos('arm-linux-androideabi-', path);
     if i = 0 then Exit;
     p := Copy(path, 1, PosEx(PathDelim, path, i));
-    if DirectoryExistsUTF8(p) then Exit;
+    if DirectoryExists(p) then Exit;
     Delete(p, 1, i + 21);
     p := Copy(p, 1, Pos(PathDelim, p) - 1);
     if p = '' then Exit;
     s := Copy(path, 1, i - 1);
-    if FindFirstUTF8(s + 'arm-linux-androideabi-*', faDirectory, dir) = 0 then
+    if FindFirst(s + 'arm-linux-androideabi-*', faDirectory, dir) = 0 then
     begin
       sl := TStringList.Create;
       try
         repeat
           sl.Add(dir.Name);
-        until (FindNextUTF8(dir) <> 0);
+        until (FindNext(dir) <> 0);
         if sl.Count > 1 then
         begin
           sl.Sort;
@@ -243,7 +244,7 @@ function TApkBuilder.TryFixPaths: TModalResult;
       if s = '' then Exit;
       path := StringReplace(path, p, s, [rfReplaceAll]);
     end;
-    FindCloseUTF8(dir);
+    FindClose(dir);
   end;
 
   procedure FixPrebuiltSys(var path: string);
@@ -252,7 +253,7 @@ function TApkBuilder.TryFixPaths: TModalResult;
     p, s: string;
     dir: TSearchRec;
   begin
-    if DirectoryExistsUTF8(path) then Exit;
+    if DirectoryExists(path) then Exit;
     i := Pos(PathDelim + 'prebuilt' + PathDelim, path);
     if i = 0 then Exit;
     p := path;
@@ -260,12 +261,12 @@ function TApkBuilder.TryFixPaths: TModalResult;
     p := Copy(p, 1, Pos(PathDelim, p) - 1);
     if p = '' then Exit;
     s := Copy(path, 1, i + 9);
-    if FindFirstUTF8(s + '*', faDirectory, dir) = 0 then
+    if FindFirst(s + '*', faDirectory, dir) = 0 then
     begin
       s := dir.Name;
       path := StringReplace(path, p, s, [rfReplaceAll]);
     end;
-    FindCloseUTF8(dir);
+    FindClose(dir);
   end;
 
   function PosIdent(const str, dest: string): Integer;
@@ -290,10 +291,10 @@ function TApkBuilder.TryFixPaths: TModalResult;
         {%H-}path := StringReplace(path, '\', PathDelim, [rfReplaceAll]);
     Delete(path, 1, PosIdent(truncBy, path));
     Delete(path, 1, Pos(PathDelim, path));
-    path := AppendPathDelim(newPath) + path;
+    path := IncludeTrailingPathDelimiter(newPath) + path;
     FixArmLinuxAndroidEabiVersion(path);
     FixPrebuiltSys(path);
-    Result := DirectoryExistsUTF8(path);
+    Result := DirectoryExists(path);
   end;
 
   function GetManifestSdkTarget(Manifest: string; out SdkTarget: string): Boolean;
@@ -302,7 +303,7 @@ function TApkBuilder.TryFixPaths: TModalResult;
     n: TDOMNode;
   begin
     Result := False;
-    if not FileExistsUTF8(Manifest) then Exit;
+    if not FileExists(Manifest) then Exit;
     try
       ReadXMLFile(ManifestXML, Manifest);
       try
@@ -330,7 +331,11 @@ var
 begin
   Result := mrAbort;
   ForceFixPaths := False;
-  if not DirectoryExistsUTF8(FNdkPath) then Exit;
+  if not DirectoryExists(FNdkPath) then
+  begin
+    IDEMessageDialog('Error', 'NDK path (' + FNdkPath + ') does not exist!' + sLineBreak + 'Fix NDK path with Path settings in Tools menu', mtError, [mbOk]);
+    Exit;
+  end;
   sl := TStringList.Create;
   try
     // Libraries
@@ -338,7 +343,7 @@ begin
     sl.DelimitedText := FProj.LazCompilerOptions.Libraries;
     for i := 0 to sl.Count - 1 do
     begin
-      if not DirectoryExistsUTF8(sl[i]) then
+      if not DirectoryExists(sl[i]) then
       begin
         str := sl[i];
         if not FixPath(str, 'ndk', FNdkPath) then Exit;
@@ -369,7 +374,7 @@ begin
         Delete(str, 1, 3);
         prev := str;
         if Pos(';', str) > 0 then Exit;
-        if not DirectoryExistsUTF8(str) then
+        if not DirectoryExists(str) then
         begin
           if not FixPath(str, 'ndk', FNdkPath) then Exit;
           if not ForceFixPaths then
@@ -407,7 +412,7 @@ begin
               n := Item[i].Attributes.GetNamedItem('location');
               if not Assigned(n) then Continue;
               str := n.TextContent;
-              if not DirectoryExistsUTF8(str) and DirectoryExistsUTF8(FSdkPath) then
+              if not DirectoryExists(str) and DirectoryExists(FSdkPath) then
               begin
                 if not ForceFixPaths
                 and (MessageDlg('build.xml',
@@ -483,7 +488,7 @@ begin
   try
     repeat
       sl.Clear;
-      RunAndGetOutput(AppendPathDelim(FSdkPath) + 'platform-tools'
+      RunAndGetOutput(IncludeTrailingPathDelimiter(FSdkPath) + 'platform-tools'
         + PathDelim + 'adb', 'devices', sl);
       dev := False;
       for i := 0 to sl.Count - 1 do
@@ -533,7 +538,7 @@ begin
     Tool.Title := 'Building APK... ';
     Tool.EnvironmentOverrides.Add('JAVA_HOME=' + FJdkPath);
     Tool.WorkingDirectory := FProjPath;
-    Tool.Executable := AppendPathDelim(FAntPath) + 'ant'{$ifdef windows}+'.bat'{$endif};
+    Tool.Executable := IncludeTrailingPathDelimiter(FAntPath) + 'ant'{$ifdef windows}+'.bat'{$endif};
     Tool.CmdLineParams := '-Dtouchtest.enabled=true debug';
     if Install then
       Tool.CmdLineParams :=  Tool.CmdLineParams + ' install';
@@ -557,7 +562,7 @@ begin
     Tool.Title := 'Installing APK... ';
     Tool.EnvironmentOverrides.Add('JAVA_HOME=' + FJdkPath);
     Tool.WorkingDirectory := FProjPath;
-    Tool.Executable := AppendPathDelim(FAntPath) + 'ant'{$ifdef windows}+'.bat'{$endif};
+    Tool.Executable := IncludeTrailingPathDelimiter(FAntPath) + 'ant'{$ifdef windows}+'.bat'{$endif};
     Tool.CmdLineParams := 'installd';
     Tool.Scanners.Add(SubToolDefault);
     if not RunExternalTool(Tool) then
@@ -590,7 +595,7 @@ begin
   try
     Tool.Title := 'Starting APK... ';
     Tool.ResolveMacros := True;
-    Tool.Executable := AppendPathDelim(FSdkPath) + 'platform-tools' + PathDelim + 'adb$(ExeExt)';
+    Tool.Executable := IncludeTrailingPathDelimiter(FSdkPath) + 'platform-tools' + PathDelim + 'adb$(ExeExt)';
     Tool.CmdLineParams := 'shell am start -n ' + proj + '/.App';
     Tool.Scanners.Add(SubToolDefault);
     if not RunExternalTool(Tool) then
