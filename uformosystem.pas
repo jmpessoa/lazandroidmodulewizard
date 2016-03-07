@@ -5,7 +5,7 @@ unit uFormOSystem;
 interface
 
 uses
-  Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, StdCtrls,
+  Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs,
   ExtCtrls, Buttons, ButtonPanel, inifiles, LazIDEIntf;
 
 type
@@ -60,8 +60,8 @@ begin
   {$ifdef LCLGTK2}
   RadioGroup1.Items[3] := StringReplace(RadioGroup1.Items[3], '_', '__', []);
   {$endif}
-  fileName:= AppendPathDelim(LazarusIDE.GetPrimaryConfigPath) + 'JNIAndroidProject.ini';
-  if FileExistsUTF8(fileName) then
+  fileName:= IncludeTrailingPathDelimiter(LazarusIDE.GetPrimaryConfigPath) + 'JNIAndroidProject.ini';
+  if FileExists(fileName) then
   begin
     with TIniFile.Create(fileName) do
     try

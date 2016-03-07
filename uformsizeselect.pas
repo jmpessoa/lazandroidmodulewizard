@@ -171,9 +171,9 @@ var
 begin
   SDKPath := GetSdkPath;
   // "sdk\tools\lib\sdklib.jar" -> "\com\android\sdklib\devices\devices.xml"
-  f := AppendPathDelim(SDKPath) + 'tools' + PathDelim + 'lib' + PathDelim
+  f := IncludeTrailingPathDelimiter(SDKPath) + 'tools' + PathDelim + 'lib' + PathDelim
        + 'sdklib.jar';
-  if FileExistsUTF8(f) then
+  if FileExists(f) then
   begin
     with TUnZipper.Create do
     try
@@ -193,9 +193,9 @@ begin
     end;
   end;
 
-  f := AppendPathDelim(SDKPath) + 'tools' + PathDelim + 'lib' + PathDelim
+  f := IncludeTrailingPathDelimiter(SDKPath) + 'tools' + PathDelim + 'lib' + PathDelim
        + 'devices.xml';
-  if FileExistsUTF8(f) then
+  if FileExists(f) then
   begin
     ms := TMemoryStream.Create;
     ms.LoadFromFile(f);
@@ -205,7 +205,7 @@ end;
 
 function TfrmFormSizeSelect.GetSdkPath: string;
 begin
-  with TIniFile.Create(AppendPathDelim(LazarusIDE.GetPrimaryConfigPath)
+  with TIniFile.Create(IncludeTrailingPathDelimiter(LazarusIDE.GetPrimaryConfigPath)
     + 'JNIAndroidProject.ini') do
   try
     Result := ReadString('NewProject', 'PathToAndroidSDK', '');
@@ -214,7 +214,7 @@ begin
   end;
   if Result = '' then
   begin
-    with TIniFile.Create(AppendPathDelim(LazarusIDE.GetPrimaryConfigPath)
+    with TIniFile.Create(IncludeTrailingPathDelimiter(LazarusIDE.GetPrimaryConfigPath)
       + 'late.ini') do
     try
       Result := ReadString('PATH', 'SDK', '');
@@ -228,7 +228,7 @@ begin
         if ShowModal = mrOk then
         begin
           Result := PathMissing;
-          with TIniFile.Create(AppendPathDelim(LazarusIDE.GetPrimaryConfigPath)
+          with TIniFile.Create(IncludeTrailingPathDelimiter(LazarusIDE.GetPrimaryConfigPath)
             + 'JNIAndroidProject.ini') do
           try
             WriteString('NewProject', 'PathToAndroidSDK', Result);

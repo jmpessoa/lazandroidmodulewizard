@@ -489,8 +489,8 @@ procedure TFormWorkspace.FormCreate(Sender: TObject);
 var
   fileName: string;
 begin   //here ModuleType already know!
-  fileName:= AppendPathDelim(LazarusIDE.GetPrimaryConfigPath) + 'JNIAndroidProject.ini';
-  if not FileExistsUTF8(fileName) then
+  fileName:= IncludeTrailingPathDelimiter(LazarusIDE.GetPrimaryConfigPath) + 'JNIAndroidProject.ini';
+  if not FileExists(fileName) then
   begin
     SaveSettings(fileName);  //force to create empty/initial file!
   end;
@@ -502,7 +502,7 @@ var
   frm: TFormPathMissing;
   frmSys: TFormOSystem;
 begin
-  if FileExistsUTF8(fileName) then
+  if FileExists(fileName) then
   begin
     with TIniFile.Create(fileName) do
     try

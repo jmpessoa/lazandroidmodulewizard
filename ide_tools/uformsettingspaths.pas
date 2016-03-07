@@ -78,14 +78,14 @@ implementation
 procedure TFormSettingsPaths.FormClose(Sender: TObject; var CloseAction: TCloseAction);
 begin
   if FOk then
-    Self.SaveSettings(AppendPathDelim(LazarusIDE.GetPrimaryConfigPath) + 'JNIAndroidProject.ini' );
+    Self.SaveSettings(IncludeTrailingPathDelimiter(LazarusIDE.GetPrimaryConfigPath) + 'JNIAndroidProject.ini' );
 end;
 
 
 procedure TFormSettingsPaths.FormShow(Sender: TObject);
 begin
    FOk:= False;
-   Self.LoadSettings(AppendPathDelim(LazarusIDE.GetPrimaryConfigPath) + 'JNIAndroidProject.ini');
+   Self.LoadSettings(IncludeTrailingPathDelimiter(LazarusIDE.GetPrimaryConfigPath) + 'JNIAndroidProject.ini');
 end;
 
 procedure TFormSettingsPaths.FormActivate(Sender: TObject);
@@ -162,7 +162,7 @@ procedure TFormSettingsPaths.LoadSettings(const fileName: string);
 var
    indexNdk: integer;
 begin
-  if FileExistsUTF8(fileName) then
+  if FileExists(fileName) then
   begin
     with TIniFile.Create(fileName) do
     try

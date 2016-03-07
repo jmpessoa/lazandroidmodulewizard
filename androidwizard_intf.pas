@@ -207,13 +207,13 @@ begin
       AndroidFileDescriptor.PathToJNIFolder:= FPathToJNIFolder;
       AndroidFileDescriptor.ModuleType:= 2;
 
-      CreateDirUTF8(FAndroidProjectName+DirectorySeparator+'build-modes');
+      CreateDir(FAndroidProjectName+DirectorySeparator+'build-modes');
 
-      CreateDirUTF8(FAndroidProjectName+DirectorySeparator+'libs');
-      CreateDirUTF8(FAndroidProjectName+DirectorySeparator+'libs'+DirectorySeparator+'armeabi');
-      CreateDirUTF8(FAndroidProjectName+DirectorySeparator+'libs'+DirectorySeparator+'armeabi-v7a');
-      CreateDirUTF8(FAndroidProjectName+DirectorySeparator+'libs'+DirectorySeparator+'x86');
-      CreateDirUTF8(FAndroidProjectName+DirectorySeparator+'obj');
+      CreateDir(FAndroidProjectName+DirectorySeparator+'libs');
+      CreateDir(FAndroidProjectName+DirectorySeparator+'libs'+DirectorySeparator+'armeabi');
+      CreateDir(FAndroidProjectName+DirectorySeparator+'libs'+DirectorySeparator+'armeabi-v7a');
+      CreateDir(FAndroidProjectName+DirectorySeparator+'libs'+DirectorySeparator+'x86');
+      CreateDir(FAndroidProjectName+DirectorySeparator+'obj');
 
       list:= TStringList.Create;
 
@@ -411,16 +411,16 @@ begin
         Free;
       end;
 
-      CreateDirUTF8(FAndroidProjectName+DirectorySeparator+ 'jni');
-      CreateDirUTF8(FAndroidProjectName+DirectorySeparator+ 'jni'+DirectorySeparator+'build-modes');
-      CreateDirUTF8(FAndroidProjectName+DirectorySeparator+'libs');
-      CreateDirUTF8(FAndroidProjectName+DirectorySeparator+'libs'+DirectorySeparator+'armeabi');
-      CreateDirUTF8(FAndroidProjectName+DirectorySeparator+'libs'+DirectorySeparator+'armeabi-v7a');
-      CreateDirUTF8(FAndroidProjectName+DirectorySeparator+'libs'+DirectorySeparator+'x86');
-      CreateDirUTF8(FAndroidProjectName+DirectorySeparator+'obj');
+      CreateDir(FAndroidProjectName+DirectorySeparator+ 'jni');
+      CreateDir(FAndroidProjectName+DirectorySeparator+ 'jni'+DirectorySeparator+'build-modes');
+      CreateDir(FAndroidProjectName+DirectorySeparator+'libs');
+      CreateDir(FAndroidProjectName+DirectorySeparator+'libs'+DirectorySeparator+'armeabi');
+      CreateDir(FAndroidProjectName+DirectorySeparator+'libs'+DirectorySeparator+'armeabi-v7a');
+      CreateDir(FAndroidProjectName+DirectorySeparator+'libs'+DirectorySeparator+'x86');
+      CreateDir(FAndroidProjectName+DirectorySeparator+'obj');
 
       if  FModuleType <> 2 then
-        CreateDirUTF8(FAndroidProjectName+DirectorySeparator+'obj'+DirectorySeparator+'controls');
+        CreateDir(FAndroidProjectName+DirectorySeparator+'obj'+DirectorySeparator+'controls');
 
       if FSupportV4 = 'yes' then  //add android 4.0 support to olds devices ...
       begin
@@ -434,7 +434,7 @@ begin
 
         auxList:= TStringList.Create;
         //eclipe compatibility!
-        CreateDirUTF8(FAndroidProjectName+DirectorySeparator+'.settings');
+        CreateDir(FAndroidProjectName+DirectorySeparator+'.settings');
         auxList.Add('eclipse.preferences.version=1');
         auxList.Add('org.eclipse.jdt.core.compiler.codegen.targetPlatform=1.6');
         auxList.Add('org.eclipse.jdt.core.compiler.compliance=1.6');
@@ -567,7 +567,7 @@ end;
 
 function TAndroidProjectDescriptor.SettingsFilename: string;
 begin
-  Result := AppendPathDelim(LazarusIDE.GetPrimaryConfigPath) + 'JNIAndroidProject.ini'
+  Result := IncludeTrailingPathDelimiter(LazarusIDE.GetPrimaryConfigPath) + 'JNIAndroidProject.ini'
 end;
 
 function TAndroidProjectDescriptor.GetPathToJNIFolder(fullPath: string): string;
@@ -903,7 +903,7 @@ begin
 
           if FModuleType = 0 then     //Android Bridges Controls... [GUI]
           begin
-            if not FileExistsUTF8(FFullJavaSrcPath+DirectorySeparator+'App.java') then
+            if not FileExists(FFullJavaSrcPath+DirectorySeparator+'App.java') then
             begin
                strList.Clear;    //dummy App.java - will be replaced with simonsayz's "App.java" template!
                strList.Add('package '+FPackagePrefaceName+'.'+LowerCase(FSmallProjName)+';');
@@ -916,7 +916,7 @@ begin
 
           if FModuleType = 1 then     //[No GUI]
           begin
-             if not FileExistsUTF8(FFullJavaSrcPath+DirectorySeparator+'App.java') then
+             if not FileExists(FFullJavaSrcPath+DirectorySeparator+'App.java') then
              begin
                strList.Clear;
                strList.Add('package '+FPackagePrefaceName+'.'+LowerCase(FSmallProjName)+';');
@@ -953,7 +953,7 @@ begin
                strList.SaveToFile(FFullJavaSrcPath+DirectorySeparator+'App.java');
              end;
 
-             if not FileExistsUTF8(FFullJavaSrcPath+DirectorySeparator+FSmallProjName+'.java') then
+             if not FileExists(FFullJavaSrcPath+DirectorySeparator+FSmallProjName+'.java') then
              begin
                strList.Clear;
                strList.Add('package '+FPackagePrefaceName+'.'+LowerCase(FSmallProjName)+';');
@@ -980,7 +980,7 @@ begin
 
              strList.Clear;
 
-             if not FileExistsUTF8(FAndroidProjectName+DirectorySeparator+'AndroidManifest.xml') then
+             if not FileExists(FAndroidProjectName+DirectorySeparator+'AndroidManifest.xml') then
              begin
                strList.Add('<?xml version="1.0" encoding="utf-8"?>');
                strList.Add('<manifest xmlns:android="http://schemas.android.com/apk/res/android"');
@@ -1375,16 +1375,16 @@ begin
       if TryNewJNIAndroidInterfaceCode(1) then //1: noGUI project
       begin
 
-        CreateDirUTF8(FAndroidProjectName+DirectorySeparator+ 'jni');
-        CreateDirUTF8(FAndroidProjectName+DirectorySeparator+ 'jni'+DirectorySeparator+'build-modes');
-        CreateDirUTF8(FAndroidProjectName+DirectorySeparator+'libs');
-        CreateDirUTF8(FAndroidProjectName+DirectorySeparator+'libs'+DirectorySeparator+'armeabi');
-        CreateDirUTF8(FAndroidProjectName+DirectorySeparator+'libs'+DirectorySeparator+'armeabi-v7a');
-        CreateDirUTF8(FAndroidProjectName+DirectorySeparator+'libs'+DirectorySeparator+'x86');
-        CreateDirUTF8(FAndroidProjectName+DirectorySeparator+'obj');
+        CreateDir(FAndroidProjectName+DirectorySeparator+ 'jni');
+        CreateDir(FAndroidProjectName+DirectorySeparator+ 'jni'+DirectorySeparator+'build-modes');
+        CreateDir(FAndroidProjectName+DirectorySeparator+'libs');
+        CreateDir(FAndroidProjectName+DirectorySeparator+'libs'+DirectorySeparator+'armeabi');
+        CreateDir(FAndroidProjectName+DirectorySeparator+'libs'+DirectorySeparator+'armeabi-v7a');
+        CreateDir(FAndroidProjectName+DirectorySeparator+'libs'+DirectorySeparator+'x86');
+        CreateDir(FAndroidProjectName+DirectorySeparator+'obj');
 
         if FModuleType <> 2 then
-           CreateDirUTF8(FAndroidProjectName+DirectorySeparator+'obj'+DirectorySeparator+'controls');
+           CreateDir(FAndroidProjectName+DirectorySeparator+'obj'+DirectorySeparator+'controls');
 
         if FSupportV4 = 'yes' then  //add android 4.0 support to olds devices ...
         begin
@@ -1394,7 +1394,7 @@ begin
         end;
 
         //eclispe compatibility!
-        CreateDirUTF8(FAndroidProjectName+DirectorySeparator+'.settings');
+        CreateDir(FAndroidProjectName+DirectorySeparator+'.settings');
 
         auxList:= TStringList.Create;
         auxList.Add('eclipse.preferences.version=1');
