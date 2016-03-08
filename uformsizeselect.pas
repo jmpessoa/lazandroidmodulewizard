@@ -213,33 +213,23 @@ begin
     Free
   end;
   if Result = '' then
-  begin
-    with TIniFile.Create(IncludeTrailingPathDelimiter(LazarusIDE.GetPrimaryConfigPath)
-      + 'late.ini') do
+    with TFormPathMissing.Create(Self) do
     try
-      Result := ReadString('PATH', 'SDK', '');
+      LabelPathTo.Caption := 'Path to Android SDK: [ex. C:\adt32\sdk]';
+      if ShowModal = mrOk then
+      begin
+        Result := PathMissing;
+        with TIniFile.Create(IncludeTrailingPathDelimiter(LazarusIDE.GetPrimaryConfigPath)
+          + 'JNIAndroidProject.ini') do
+        try
+          WriteString('NewProject', 'PathToAndroidSDK', Result);
+        finally
+          Free
+        end;
+      end;
     finally
       Free;
     end;
-    if Result = '' then
-      with TFormPathMissing.Create(Self) do
-      try
-        LabelPathTo.Caption := 'Path to Android SDK: [ex. C:\adt32\sdk]';
-        if ShowModal = mrOk then
-        begin
-          Result := PathMissing;
-          with TIniFile.Create(IncludeTrailingPathDelimiter(LazarusIDE.GetPrimaryConfigPath)
-            + 'JNIAndroidProject.ini') do
-          try
-            WriteString('NewProject', 'PathToAndroidSDK', Result);
-          finally
-            Free
-          end;
-        end;
-      finally
-        Free;
-      end;
-  end;
 end;
 
 procedure TfrmFormSizeSelect.DoLoadFromDevices(XmlStream: TStream);

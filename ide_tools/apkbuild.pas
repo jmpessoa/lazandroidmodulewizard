@@ -36,9 +36,9 @@ type
 implementation
 
 uses
-  IDEExternToolIntf, LazIDEIntf, IDEDialogs, UTF8Process, Controls, EditBtn,
-  StdCtrls, ButtonPanel, Dialogs, uFormStartEmulator, IniFiles, process,
-  strutils, laz2_XMLRead, Laz2_DOM, laz2_XMLWrite, LazFileUtils;
+  IDEExternToolIntf, LazIDEIntf, IDEMsgIntf, UTF8Process, Controls,
+  EditBtn, StdCtrls, ButtonPanel, Dialogs, uFormStartEmulator, IniFiles,
+  process, strutils, laz2_XMLRead, Laz2_DOM, laz2_XMLWrite, LazFileUtils;
 
 function QueryPath(APrompt: string; out Path: string;
   ACaption: string = 'Android Wizard: Path Missing!'): Boolean;
@@ -114,20 +114,6 @@ begin
     FNdkPath := ReadString('NewProject', 'PathToAndroidNDK', '');
   finally
     Free
-  end;
-  with TIniFile.Create(IncludeTrailingPathDelimiter(LazarusIDE.GetPrimaryConfigPath)
-    + 'late.ini') do
-  try
-    if FSdkPath = '' then
-      FSdkPath := ReadString('PATH', 'SDK', '');
-    if FAntPath = '' then
-      FAntPath := ReadString('PATH', 'Ant', '');
-    if FJdkPath = '' then
-      FJdkPath := ReadString('PATH', 'JDK', '');
-    if FNdkPath = '' then
-      FNdkPath := ReadString('PATH', 'NDK', '');
-  finally
-    Free;
   end;
   if FAntPath = '' then
     if not QueryPath('Path to Ant bin: [ex. C:\adt32\Ant\bin]', FAntPath) then
@@ -333,7 +319,9 @@ begin
   ForceFixPaths := False;
   if not DirectoryExists(FNdkPath) then
   begin
-    IDEMessageDialog('Error', 'NDK path (' + FNdkPath + ') does not exist!' + sLineBreak + 'Fix NDK path with Path settings in Tools menu', mtError, [mbOk]);
+    IDEMessagesWindow.AddCustomMessage(mluError,
+      'NDK path (' + FNdkPath + ') does not exist! '
+      + 'Fix NDK path with Path settings in Tools menu.');
     Exit;
   end;
   sl := TStringList.Create;
