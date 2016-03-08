@@ -36,9 +36,9 @@ type
 implementation
 
 uses
-  IDEExternToolIntf, LazIDEIntf, IDEMsgIntf, UTF8Process, Controls,
-  EditBtn, StdCtrls, ButtonPanel, Dialogs, uFormStartEmulator, IniFiles,
-  process, strutils, laz2_XMLRead, Laz2_DOM, laz2_XMLWrite, LazFileUtils;
+  IDEExternToolIntf, LazIDEIntf, UTF8Process, Controls, EditBtn, StdCtrls,
+  ButtonPanel, Dialogs, uFormStartEmulator, IniFiles, process, strutils,
+  laz2_XMLRead, Laz2_DOM, laz2_XMLWrite, LazFileUtils;
 
 function QueryPath(APrompt: string; out Path: string;
   ACaption: string = 'Android Wizard: Path Missing!'): Boolean;
@@ -318,12 +318,8 @@ begin
   Result := mrAbort;
   ForceFixPaths := False;
   if not DirectoryExists(FNdkPath) then
-  begin
-    IDEMessagesWindow.AddCustomMessage(mluError,
-      'NDK path (' + FNdkPath + ') does not exist! '
+    raise Exception.Create('NDK path (' + FNdkPath + ') does not exist! '
       + 'Fix NDK path with Path settings in Tools menu.');
-    Exit;
-  end;
   sl := TStringList.Create;
   try
     // Libraries
