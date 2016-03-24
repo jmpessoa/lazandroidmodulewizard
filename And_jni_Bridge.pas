@@ -238,6 +238,9 @@ procedure jEditText_SetAcceptSuggestion(env: PJNIEnv; _jedittext: JObject; _valu
 procedure jEditText_CopyToClipboard(env: PJNIEnv; _jedittext: JObject);
 procedure jEditText_PasteFromClipboard(env: PJNIEnv; _jedittext: JObject);
 procedure jEditText_SetFontSizeUnit(env: PJNIEnv; _jedittext: JObject; _unit: integer);
+procedure jEditText_SetSelectAllOnFocus(env: PJNIEnv; _jedittext: JObject; _value: boolean);
+procedure jEditText_SelectAll(env: PJNIEnv; _jedittext: JObject);
+
 
 // Button
 Function jButton_Create(env: PJNIEnv;   this:jobject; SelfObj: TObject): jObject;
@@ -2293,6 +2296,32 @@ begin
   env^.CallVoidMethodA(env, _jedittext, jMethod, @jParams);
   env^.DeleteLocalRef(env, jCls);
 end;
+
+procedure jEditText_SetSelectAllOnFocus(env: PJNIEnv; _jedittext: JObject; _value: boolean);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].z:= JBool(_value);
+  jCls:= env^.GetObjectClass(env, _jedittext);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetSelectAllOnFocus', '(Z)V');
+  env^.CallVoidMethodA(env, _jedittext, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+
+procedure jEditText_SelectAll(env: PJNIEnv; _jedittext: JObject);
+var
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jedittext);
+  jMethod:= env^.GetMethodID(env, jCls, 'SelectAll', '()V');
+  env^.CallVoidMethod(env, _jedittext, jMethod);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
 //------------------------------------------------------------------------------
 // Button
 //------------------------------------------------------------------------------

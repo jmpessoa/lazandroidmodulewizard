@@ -145,6 +145,14 @@
 	****************************************************************************************************
 
 
+Version 0.6 - rev. 38.4 - 24 March 2016 - 
+
+	NEW! Added jEditText methods:  
+			SetSelectAllOnFocus	// <<---@Mladen suggestion 
+			SelectAll		// <<---@Mladen suggestion 
+
+	NEW! Tools --> [Lamw] Android Module Wizard --> Build FPC Cross Android
+
 Version 0.6 - rev. 38.3 - 07 January 2016 - 
 
 	NEW! Added jForm method  ToggleSoftInput  

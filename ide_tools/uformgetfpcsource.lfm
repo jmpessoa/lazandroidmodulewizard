@@ -1,0 +1,162 @@
+object FormGetFPCSource: TFormGetFPCSource
+  Left = 272
+  Height = 290
+  Top = 135
+  Width = 420
+  Caption = '[Lamw] Get FPC  Source [Trunk]'
+  ClientHeight = 290
+  ClientWidth = 420
+  LCLVersion = '1.5'
+  object StatusBar1: TStatusBar
+    Left = 0
+    Height = 23
+    Top = 267
+    Width = 420
+    Panels = <>
+  end
+  object GroupBox4: TGroupBox
+    Left = 9
+    Height = 81
+    Top = 17
+    Width = 400
+    Caption = 'FPC Source Folder'
+    ClientHeight = 61
+    ClientWidth = 396
+    TabOrder = 1
+    object Label2: TLabel
+      Left = 8
+      Height = 15
+      Top = 8
+      Width = 300
+      Caption = 'Path to Install FPC Source Code  [ex. C:\tmp\FPCSource]:'
+      ParentColor = False
+    end
+    object EditPathToFPCTrunk: TEdit
+      Left = 8
+      Height = 23
+      Top = 22
+      Width = 352
+      TabOrder = 0
+    end
+    object SpeedButton2: TSpeedButton
+      Left = 364
+      Height = 22
+      Top = 23
+      Width = 23
+      Caption = '...'
+      OnClick = SpeedButton2Click
+    end
+  end
+  object GroupBox1: TGroupBox
+    Left = 9
+    Height = 144
+    Top = 112
+    Width = 400
+    Caption = 'SNV Client'
+    ClientHeight = 124
+    ClientWidth = 396
+    TabOrder = 2
+    object Label1: TLabel
+      Left = 5
+      Height = 15
+      Top = 13
+      Width = 345
+      Caption = 'Path to SVN Console App [ex. C:\Program Files (x86)\SlikSvn\bin]:'
+      ParentColor = False
+    end
+    object EditPathToSVN: TEdit
+      Left = 5
+      Height = 23
+      Top = 32
+      Width = 352
+      TabOrder = 0
+    end
+    object SpeedButton1: TSpeedButton
+      Left = 364
+      Height = 22
+      Top = 33
+      Width = 23
+      Caption = '...'
+      OnClick = SpeedButton1Click
+    end
+    object Button1: TButton
+      Left = 232
+      Height = 25
+      Top = 85
+      Width = 156
+      Caption = 'SVN Checkout!'
+      OnClick = Button1Click
+      TabOrder = 1
+    end
+    object RadioGroup2: TRadioGroup
+      Left = 5
+      Height = 50
+      Top = 64
+      Width = 155
+      AutoFill = True
+      Caption = 'Get From:'
+      ChildSizing.LeftRightSpacing = 6
+      ChildSizing.EnlargeHorizontal = crsHomogenousChildResize
+      ChildSizing.EnlargeVertical = crsHomogenousChildResize
+      ChildSizing.ShrinkHorizontal = crsScaleChilds
+      ChildSizing.ShrinkVertical = crsScaleChilds
+      ChildSizing.Layout = cclLeftToRightThenTopToBottom
+      ChildSizing.ControlsPerLine = 2
+      ClientHeight = 30
+      ClientWidth = 151
+      Columns = 2
+      ItemIndex = 0
+      Items.Strings = (
+        'Trunk'
+      )
+      TabOrder = 2
+    end
+    object SpeedButton6: TSpeedButton
+      Left = 365
+      Height = 22
+      Top = -3
+      Width = 23
+      Glyph.Data = {
+        36040000424D3604000000000000360000002800000010000000100000000100
+        2000000000000004000064000000640000000000000000000000FFFFFF00FFFF
+        FF00FFFFFF00262626033A673C72484F48F6626562FE696B69FF6A6B6AFF3F6C
+        41EF3C6F3ECE6A6B6AF76B6B6BF7646464F44A4A4ADF3F3F3F30FFFFFF00FFFF
+        FF004194470D39793DC24A564BFE8E918EFFABACA9FFAEAEAEFF979797FF7171
+        71FF787878FF979797FFAEAEAEFFA9AAA9EF8D8D8DEF4D4D4DD7FFFFFF0049A1
+        520D469B4DD1547E61FF6B6F6DFFD3D3CEFF726D5FFF444342FF464646FF5151
+        51FF515151FF464646FF424342FF495C4AF5C4C4C4FF676767EFFFFFFF004EA8
+        57B176C08DFF617E6DFF828482FFD3D3CEFFC1A569FF464441FFBDBDBDFFCECE
+        CEFFC2C2C2FFADADADFF424543FF66A579FFC4C4C4FF828282F756B4614653AF
+        5DFBB5EAD3FF589160FF737773FFD3D3CEFF786D59FF4D4C4BFF656565FF9292
+        92FF797979FF656565FF4B4C4BFF6E7E76FFC4C4C4FF727372F55ABA66B292D7
+        AFFFA0DEB4FF82C36FFF768964FF919191FFE8E8E8FFDDDDDDFFC1C1C1FF8A84
+        7AFF8A7F6FFFD8D7D5FFDDDDDDFFC4C4C4FF919191FF415E42E25EBF6AE4B0E9
+        CFFF83D490FFBFDC8AFFBDC57FFF9F885FFF8B8882FF9E9E9EFF858076FFAD80
+        4CFFB08247FF848076FF9E9E9EFF838784FF88A697FF307733E960C36DF6BEEF
+        DDFF73D17DFF90D16CFFBCE09EFFC7A75EFFD3B05EFFC69953FFC6BC6EFFAFD1
+        7AFFB4C46DFFAFA95FFF7BA957FF5AA367FFB1E3CEFF317E35F761C46EF5BEF0
+        DCFF81D883FF77DB6DFFBFE59AFFCCDFA7FFCAA85DFFC2BD6CFFB8DA8BFFA6D8
+        60FF77D13FFF6AD046FF59BC50FF63AB6CFFB2E4CEFF358239F661C46EE2B3EC
+        D2FF9BE2A2FF9DEA8DFFD4EDB7FFD0EAC7FFCFB96EFFCCB166FFCBC975FF76DB
+        67FF66D94DFF65D74DFF6CD35DFF73BB7EFFA5DBC2FF39883EE661C46EAD98DE
+        B5FFB5EBCCFFB1EFA7FFC9EEA9FFD1EAC9FFD5CF8DFFD9CB8BFFCDB466FFBCBC
+        67FF9AD671FF82DE73FF7ADC71FF91D0A3FF88C8A4FF3D8F43B961C46E3C61C4
+        6EFAC0F3E2FFB5EFB4FFB5F0ACFFC1EDB7FFD4E3B7FFD9D89CFFDAD395FFCDB5
+        6DFFC7B36DFFB5CB84FF94DF9AFFAFE7CDFF469B4DFC4296494FFFFFFF0061C4
+        6EA587D7A0FFC0F2DEFFC7F2D6FFD5EFD5FFD0E9CFFFD5DBA6FFDCDEABFFDBCD
+        90FFD7C88BFFC9C18EFFBDD5AFFF7AC791FF4AA353B6FFFFFF00FFFFFF0061C4
+        6E0561C46EC48CD8A2FFCDF5E8FFD4EDDAFFCEEDD3FFCFDFAFFFD6DEB5FFD4D4
+        A2FFCED0A1FFC4D0AAFF87C991FF53AF5DD14FAA590FFFFFFF00FFFFFF00FFFF
+        FF0061C46E0461C46EA461C46EF8A5E1BBFFBAEACCFFC5E0BEFFC5DAB4FFBDD7
+        B0FFA6D7ACFF5DBE69FB5ABA66B657B6620CFFFFFF00FFFFFF00FFFFFF00FFFF
+        FF00FFFFFF00FFFFFF0061C46E3D61C46EAA61C46EDF61C46EF461C46EF861C4
+        6EE961C46EB260C26D48FFFFFF00FFFFFF00FFFFFF00FFFFFF00
+      }
+      OnClick = SpeedButton6Click
+    end
+  end
+  object SelectDirectoryDialog1: TSelectDirectoryDialog
+    left = 294
+    top = 94
+  end
+end

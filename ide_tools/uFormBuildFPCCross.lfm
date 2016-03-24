@@ -1,0 +1,239 @@
+object FormBuildFPCCross: TFormBuildFPCCross
+  Left = 245
+  Height = 420
+  Top = 108
+  Width = 420
+  ActiveControl = PageControl1
+  Caption = '[Lamw] FPC Android Cross Compiler Builder'
+  ClientHeight = 420
+  ClientWidth = 420
+  OnActivate = FormActivate
+  OnClose = FormClose
+  Position = poScreenCenter
+  LCLVersion = '1.5'
+  object StatusBar1: TStatusBar
+    Left = 0
+    Height = 23
+    Top = 397
+    Width = 420
+    Panels = <>
+  end
+  object Panel3: TPanel
+    Left = 0
+    Height = 397
+    Top = 0
+    Width = 420
+    Align = alClient
+    BevelOuter = bvNone
+    ClientHeight = 397
+    ClientWidth = 420
+    TabOrder = 1
+    object PageControl1: TPageControl
+      Left = 0
+      Height = 397
+      Top = 0
+      Width = 420
+      ActivePage = TabSheet2
+      Align = alClient
+      TabIndex = 0
+      TabOrder = 0
+      OnChange = PageControl1Change
+      object TabSheet2: TTabSheet
+        Caption = 'Build'
+        ClientHeight = 369
+        ClientWidth = 412
+        object GroupBox2: TGroupBox
+          Left = 0
+          Height = 246
+          Top = 120
+          Width = 400
+          Caption = 'Configure Paths'
+          ClientHeight = 226
+          ClientWidth = 396
+          TabOrder = 0
+          object Label3: TLabel
+            Left = 8
+            Height = 15
+            Top = 0
+            Width = 233
+            Caption = 'Path to Android  NDK [ex.  C:\adt32\ndk10e]'
+            ParentColor = False
+          end
+          object EditPathToNDK: TEdit
+            Left = 8
+            Height = 23
+            Top = 16
+            Width = 352
+            TabOrder = 0
+          end
+          object SpeedButton3: TSpeedButton
+            Left = 368
+            Height = 22
+            Top = 16
+            Width = 23
+            Caption = '...'
+            OnClick = SpeedButton3Click
+          end
+          object Label4: TLabel
+            Left = 10
+            Height = 15
+            Top = 49
+            Width = 342
+            Caption = 'Path to FPC "make.exe"  [ex. C\lazarus\fpc\3.0.0\bin\i386-win32]:'
+            ParentColor = False
+          end
+          object EditPathToFpc: TEdit
+            Left = 11
+            Height = 23
+            Top = 69
+            Width = 352
+            TabOrder = 1
+          end
+          object SpeedButton4: TSpeedButton
+            Left = 368
+            Height = 22
+            Top = 69
+            Width = 23
+            Caption = '...'
+            OnClick = SpeedButton4Click
+          end
+          object Button2: TButton
+            Left = 316
+            Height = 25
+            Top = 176
+            Width = 75
+            Caption = 'Build'
+            OnClick = Button2Click
+            TabOrder = 2
+          end
+          object RadioGroupInstruction: TRadioGroup
+            Left = 10
+            Height = 50
+            Top = 104
+            Width = 185
+            AutoFill = True
+            Caption = 'Architecture'
+            ChildSizing.LeftRightSpacing = 6
+            ChildSizing.EnlargeHorizontal = crsHomogenousChildResize
+            ChildSizing.EnlargeVertical = crsHomogenousChildResize
+            ChildSizing.ShrinkHorizontal = crsScaleChilds
+            ChildSizing.ShrinkVertical = crsScaleChilds
+            ChildSizing.Layout = cclLeftToRightThenTopToBottom
+            ChildSizing.ControlsPerLine = 3
+            ClientHeight = 30
+            ClientWidth = 181
+            Columns = 3
+            ItemIndex = 0
+            Items.Strings = (
+              'ArmV6'
+              'ArmV7a'
+              'x86'
+            )
+            OnClick = RadioGroupInstructionClick
+            TabOrder = 3
+          end
+        end
+        object GroupBox4: TGroupBox
+          Left = 0
+          Height = 81
+          Top = 16
+          Width = 400
+          Caption = 'FPC Source'
+          ClientHeight = 61
+          ClientWidth = 396
+          TabOrder = 1
+          object Label2: TLabel
+            Left = 8
+            Height = 15
+            Top = 8
+            Width = 260
+            Caption = 'Path to FPC Source Code  [ex. C:\tmp\FPCTrunk]:'
+            ParentColor = False
+          end
+          object EditPathToFPCTrunk: TEdit
+            Left = 8
+            Height = 23
+            Top = 22
+            Width = 352
+            TabOrder = 0
+          end
+          object SpeedButton2: TSpeedButton
+            Left = 364
+            Height = 22
+            Top = 23
+            Width = 23
+            Caption = '...'
+            OnClick = SpeedButton2Click
+          end
+        end
+      end
+      object TabSheet3: TTabSheet
+        Caption = 'Instal'
+        ClientHeight = 369
+        ClientWidth = 412
+        object GroupBox3: TGroupBox
+          Left = 8
+          Height = 360
+          Top = 0
+          Width = 400
+          Caption = 'Install FPC Cross Compiler [Android]'
+          ClientHeight = 340
+          ClientWidth = 396
+          TabOrder = 0
+          object Label5: TLabel
+            Left = 7
+            Height = 15
+            Top = 10
+            Width = 305
+            Caption = 'Path to FPC "units" Folder: [ex. C:\lazarus\fpc\3.0.0\units]:'
+            ParentColor = False
+          end
+          object EditPathToFPCUnits: TEdit
+            Left = 8
+            Height = 23
+            Top = 32
+            Width = 352
+            TabOrder = 0
+          end
+          object Button3: TButton
+            Left = 316
+            Height = 25
+            Top = 65
+            Width = 75
+            Caption = 'Install'
+            OnClick = Button3Click
+            TabOrder = 1
+          end
+          object SpeedButton5: TSpeedButton
+            Left = 368
+            Height = 22
+            Top = 32
+            Width = 23
+            Caption = '...'
+            OnClick = SpeedButton5Click
+          end
+          object Memo1: TMemo
+            Left = 7
+            Height = 232
+            Top = 96
+            Width = 384
+            ScrollBars = ssAutoBoth
+            TabOrder = 2
+          end
+          object Label6: TLabel
+            Left = 10
+            Height = 15
+            Top = 81
+            Width = 32
+            Caption = 'Log....'
+            ParentColor = False
+          end
+        end
+      end
+    end
+  end
+  object SelectDirectoryDialog1: TSelectDirectoryDialog
+    left = 440
+    top = 16
+  end
+end

@@ -1,6 +1,6 @@
-package fk.elera.gunluk;
+package com.example.dummyapp;
 
-//Lamw: Lazarus Android Module Wizard  - version 0.6 - revision 38.3 - 07 January - 2016 
+//Lamw: Lazarus Android Module Wizard  - version 0.6 - revision 38.4 - 24 March - 2016 
 //Form Designer and Components development model!
 //
 //https://github.com/jmpessoa/lazandroidmodulewizard
@@ -1843,7 +1843,15 @@ public void SetFontSizeUnit(int _unit) {
 		this.setTextSize(mTextSizeTypedValue, mTextSize);
 		this.setText(t);
 }
-	
+
+public void SetSelectAllOnFocus(boolean _value){	
+   this.setSelectAllOnFocus(_value);
+}
+
+public void SelectAll() {
+   this.selectAll();	
+}
+
 }
 
 //-------------------------------------------------------------------------

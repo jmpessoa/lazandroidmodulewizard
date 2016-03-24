@@ -6,7 +6,8 @@ interface
 
 uses
   Classes, SysUtils, Dialogs, IDECommands, MenuIntf, Forms,
-  uformsettingspaths, lazandroidtoolsexpert, uformupdatecodetemplate, ufrmEditor, ufrmCompCreate,  uformchangepathtondk;
+  uformsettingspaths, lazandroidtoolsexpert, uformupdatecodetemplate, ufrmEditor, ufrmCompCreate,
+  uformchangepathtondk, uFormBuildFPCCross, uFormGetFPCSource;
 
 procedure StartPathTool(Sender: TObject);
 procedure StartLateTool(Sender: TObject);   //By Thierrydijoux!
@@ -14,6 +15,8 @@ procedure StartUpdateCodeTemplateTool(Sender: TObject);
 procedure StartResEditor(Sender: TObject);   //By Thierrydijoux!
 procedure StartComponentCreate(Sender: TObject);
 procedure StartPathToNDKDemo(Sender: TObject);
+procedure StartPathToBuildFPCCross(Sender: TObject);
+procedure StartFPCTrunkSource(Sender: TObject);
 
 procedure Register;
 
@@ -21,6 +24,14 @@ implementation
 
 uses LazIDEIntf, CompOptsIntf, IDEMsgIntf, IDEExternToolIntf, ProjectIntf,
   Controls, ApkBuild;
+
+
+procedure StartFPCTrunkSource(Sender: TObject);
+begin
+  FormGetFPCSource:= TFormGetFPCSource.Create(Application);
+  FormGetFPCSource.ShowModal;
+end;
+
 
 procedure StartPathTool(Sender: TObject);  //by jmpessoa
 begin
@@ -64,6 +75,14 @@ begin
    FormChangeDemoPathToNDK.ShowModal;
 end;
 
+
+procedure StartPathToBuildFPCCross(Sender: TObject);
+begin
+  FormBuildFPCCross:= TFormBuildFPCCross.Create(Application);
+  FormBuildFPCCross.ShowModal;
+end;
+
+
 procedure BuildAPKandRun(Sender: TObject);
 var
   Project: TLazProject;
@@ -96,26 +115,32 @@ Var
   ideMnuAMW: TIDEMenuSection;
   ideSubMnuAMW: TIDEMenuSection;
 begin
+
   // Register main menu
   ideMnuAMW:= RegisterIDEMenuSection(mnuTools,'AMW');
   // Register submenu
   ideSubMnuAMW:= RegisterIDESubMenu(ideMnuAMW, 'AMW', '[Lamw] Android Module Wizard');
 
-
   // Adding first entry
   RegisterIDEMenuCommand(ideSubMnuAMW, 'PathLateCmd', 'LATE: Apk Expert Tools [Build, Install, ...]', nil,@StartLateTool);
   // Adding second entry
-   RegisterIDEMenuCommand(ideSubMnuAMW, 'PathResEditorCmd', 'Resource Editor [strings.xml] ', nil,@StartResEditor);
+  RegisterIDEMenuCommand(ideSubMnuAMW, 'PathResEditorCmd', 'Resource Editor [strings.xml] ', nil,@StartResEditor);
    // Adding third entry
   RegisterIDEMenuCommand(ideSubMnuAMW, 'PathUpdateCmd','Upgrade Code Templates [*.lpr, *.java]', nil,@StartUpdateCodeTemplateTool);
   // Adding fourth entry
-  RegisterIDEMenuCommand(ideSubMnuAMW, 'PathToolCmd', 'Path Settings [Jdk, Sdk, Ndk, ...]', nil,@StartPathTool);
-  //Adding 5a. entry
-  RegisterIDEMenuCommand(ideSubMnuAMW, 'PathCompCreateCmd', 'New jComponent [Create]', nil,@StartComponentCreate);
-  //Adding 6a. entry
+  RegisterIDEMenuCommand(ideSubMnuAMW, 'PathToolCmd', 'Paths Settings [Jdk, Sdk, Ndk, ...]', nil,@StartPathTool);
+  // Adding 5a. entry
+  RegisterIDEMenuCommand(ideSubMnuAMW, 'PathCompCreateCmd', 'New/Create jComponent ', nil,@StartComponentCreate);
+  // Adding 6a. entry
   RegisterIDEMenuCommand(ideSubMnuAMW, 'PathToNDKDemoCmd', 'Change Project [*.lpi] Ndk Path [Demos]', nil,@StartPathToNDKDemo);
+  // Adding 7a. entry
+  RegisterIDEMenuCommand(ideSubMnuAMW, 'PathToBuildFPCCross', 'Build FPC Cross Android', nil,@StartPathToBuildFPCCross);
+  // Adding 8a. entry
+  RegisterIDEMenuCommand(ideSubMnuAMW, 'PathToFPCTrunkSource', 'Get FPC Source [Trunk]', nil, @StartFPCTrunkSource);
   // And so on...
-  RegisterIDEMenuCommand(itmRunBuilding, 'BuildAPKandRun', '[Lamw] Build Apk and Run',nil, @BuildAPKandRun);
+
+  RegisterIDEMenuCommand(itmRunBuilding, 'BuildAPKandRun', '[Lamw] Build Android Apk and Run',nil, @BuildAPKandRun);
+  //RegisterIDEMenuCommand(ideMnuAMW, 'PathToBuildFPCCross', '[Lamw] Build FPC Cross Android',nil, @StartPathToBuildFPCCross);
 
 end;
 

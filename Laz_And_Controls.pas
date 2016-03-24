@@ -831,6 +831,8 @@ type
     procedure Clear;
 
     procedure SetFontSizeUnit(_unit: TFontSizeUnit);
+    procedure SetSelectAllOnFocus(_value: boolean);
+    procedure SelectAll();
 
     // Property
     property CursorPos : TXY        read GetCursorPos  write SetCursorPos;
@@ -3240,6 +3242,20 @@ begin
   FFontSizeUnit:= _unit;
   if FInitialized then
      jEditText_SetFontSizeUnit(FjEnv, FjObject, Ord(_unit));
+end;
+
+procedure jEditText.SetSelectAllOnFocus(_value: boolean);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jEditText_SetSelectAllOnFocus(FjEnv, FjObject, _value);
+end;
+
+procedure jEditText.SelectAll();
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jEditText_SelectAll(FjEnv, FjObject);
 end;
 
 //------------------------------------------------------------------------------
