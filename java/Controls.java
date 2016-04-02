@@ -1,6 +1,6 @@
 package com.example.dummyapp;
 
-//Lamw: Lazarus Android Module Wizard  - version 0.6 - revision 38.4 - 24 March - 2016 
+//Lamw: Lazarus Android Module Wizard  - version 0.6 - revision 38.5 - 02 April - 2016 
 //Form Designer and Components development model!
 //
 //https://github.com/jmpessoa/lazandroidmodulewizard
@@ -5285,6 +5285,8 @@ class jDialogProgress {
   private ProgressDialog  dialog = null;  
   private AlertDialog  customDialog = null;  
   
+  private boolean mCancelable; //thanks to Mladen
+  
   public jDialogProgress(android.content.Context context,
                      Controls ctrls, long pasobj, String title, String msg) {
     //Connect Pascal I/F
@@ -5293,6 +5295,7 @@ class jDialogProgress {
     mTitle= title;
     mMsg = msg; 
     mFlag = 0;
+    mCancelable= true;    
   }
 
   public  void Free() {
@@ -5314,7 +5317,11 @@ class jDialogProgress {
 	 else 
 		dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
 	
-    dialog.setCancelable(true);         
+	if (mCancelable)
+       dialog.setCancelable(true);
+    else   
+    	dialog.setCancelable(false);
+	
     dialog.show();
   }
 	  
@@ -5331,7 +5338,12 @@ class jDialogProgress {
 	  else 
 		 dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
 	  
-      dialog.setCancelable(true); //back key            
+	  
+		if (mCancelable)  //thanks to Mladen
+		  dialog.setCancelable(true);  //back key
+		else   
+		 dialog.setCancelable(false);
+		
       dialog.show();
   }
   
@@ -5361,6 +5373,11 @@ class jDialogProgress {
 	else 
 	  customDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
     
+	if (mCancelable) //thanks to Mladen
+		customDialog.setCancelable(true);  //back key
+	else   
+		customDialog.setCancelable(false);
+	
     customDialog.show();    
   }
   
@@ -5377,9 +5394,10 @@ class jDialogProgress {
 	if (customDialog != null) customDialog.setTitle(_title);
   }
   
-  public void SetCancelable(boolean _value) {
-	if (dialog != null) dialog.setCancelable(_value);
-	if (customDialog != null) customDialog.setCancelable(_value);
+  public void SetCancelable(boolean _value) {	  
+	mCancelable = _value; //thanks to Mladen
+	if (dialog != null) dialog.setCancelable(mCancelable);
+	if (customDialog != null) customDialog.setCancelable(mCancelable);		
   }
       
   public void Stop() {
@@ -5417,9 +5435,14 @@ class jDialogProgress {
   			dialog.setTitle(mTitle);	
   		 else 
   			dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+
+  		if (mCancelable)
+  			dialog.setCancelable(true);  //back key
+  		else   
+  			dialog.setCancelable(false);
   		
-  	     dialog.setCancelable(true);         
   	     dialog.show();
+  	     
        }
        
     // Step #2. 
