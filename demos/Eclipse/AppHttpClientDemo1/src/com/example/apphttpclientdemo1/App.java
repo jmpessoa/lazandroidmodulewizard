@@ -1,6 +1,6 @@
 package com.example.apphttpclientdemo1;
 
-//Lamw: Lazarus Android Module Wizard - Version 0.6 - rev. 36 - 03 August - 2015
+//Lamw: Lazarus Android Module Wizard - Version 0.6 - revision 38.6 - 12 April - 2016
 //Form Designer and Components development model!
 //https://github.com/jmpessoa/lazandroidmodulewizard
 //http://forum.lazarus.freepascal.org/index.php/topic,21919.270.html
@@ -56,7 +56,8 @@ public class App extends Activity {
      
       //by jmpessoa --- fix for http get    
       //ref. http://stackoverflow.com/questions/8706464/defaulthttpclient-to-androidhttpclient 
-     if (android.os.Build.VERSION.SDK_INT > 9) {
+     int systemVersion = android.os.Build.VERSION.SDK_INT; 
+     if (systemVersion > 9) {
          StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
          StrictMode.setThreadPolicy(policy);
      }
@@ -67,6 +68,7 @@ public class App extends Activity {
       controls.appLayout   = new RelativeLayout(this);
       controls.appLayout.getRootView().setBackgroundColor (0x00FFFFFF);
       controls.screenStyle = controls.jAppOnScreenStyle();
+      controls.systemVersion = systemVersion;
       switch( controls.screenStyle ) {
       	case 1  : this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT );  break;
       	case 2  : this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);  break;
@@ -109,7 +111,7 @@ public class App extends Activity {
     public    void onConfigurationChanged(Configuration newConfig) {
     	super.onConfigurationChanged(newConfig);
     	controls.jAppOnRotate(newConfig.orientation);
-    	controls.jAppOnConfigurationChanged();
+    	//controls.jAppOnConfigurationChanged();
     }	   	
  
     @Override

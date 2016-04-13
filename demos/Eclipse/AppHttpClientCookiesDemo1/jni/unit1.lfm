@@ -10,6 +10,7 @@ object AndroidModule1: TAndroidModule1
   Text = 'AndroidModule1'
   ActivityMode = actMain
   BackgroundColor = colbrDefault
+  OnJNIPrompt = AndroidModule1JNIPrompt
   object jTextView1: jTextView
     Left = 76
     Top = 5
@@ -38,7 +39,7 @@ object AndroidModule1: TAndroidModule1
     Tag = 1
     Left = 2
     Top = 34
-    Width = 323
+    Width = 321
     Height = 40
     MarginLeft = 2
     MarginTop = 4
@@ -60,19 +61,19 @@ object AndroidModule1: TAndroidModule1
   end
   object jEditText1: jEditText
     Left = 5
-    Top = 232
-    Width = 317
-    Height = 380
+    Top = 184
+    Width = 312
+    Height = 146
     MarginLeft = 5
     MarginTop = 10
     MarginRight = 5
     MarginBottom = 10
     Visible = True
-    Anchor = jButton4
+    Anchor = jButton3
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = []
     LayoutParamWidth = lpMatchParent
-    LayoutParamHeight = lpMatchParent
+    LayoutParamHeight = lpTwoFifthOfParent
     Text = 'jEditText1'
     Alignment = taLeft
     InputTypeEx = itxMultiLine
@@ -93,7 +94,7 @@ object AndroidModule1: TAndroidModule1
   object jButton2: jButton
     Left = 2
     Top = 82
-    Width = 323
+    Width = 321
     Height = 40
     MarginLeft = 2
     MarginTop = 4
@@ -116,7 +117,7 @@ object AndroidModule1: TAndroidModule1
   object jButton3: jButton
     Left = 2
     Top = 130
-    Width = 323
+    Width = 321
     Height = 40
     MarginLeft = 2
     MarginTop = 4
@@ -135,29 +136,6 @@ object AndroidModule1: TAndroidModule1
     FontSizeUnit = unitDefault
     OnClick = jButton3Click
     Id = 2386489
-  end
-  object jButton4: jButton
-    Left = 2
-    Top = 178
-    Width = 323
-    Height = 40
-    MarginLeft = 2
-    MarginTop = 4
-    MarginRight = 2
-    MarginBottom = 4
-    Visible = True
-    Anchor = jButton3
-    PosRelativeToAnchor = [raBelow]
-    PosRelativeToParent = []
-    LayoutParamWidth = lpMatchParent
-    LayoutParamHeight = lpWrapContent
-    Text = 'jButton4'
-    BackgroundColor = colbrDefault
-    FontColor = colbrDefault
-    FontSize = 0
-    FontSizeUnit = unitDefault
-    OnClick = jButton4Click
-    Id = 7835291
   end
   object jHttpClient1: jHttpClient
     CharSet = 'UTF-8'

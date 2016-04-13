@@ -33,12 +33,13 @@ object AndroidModule1: TAndroidModule1
     FontColor = colbrDefault
     FontSize = 0
     TextTypeFace = tfNormal
+    FontSizeUnit = unitDefault
     Id = 1806969
   end
   object jEditText1: jEditText
     Left = 5
     Top = 70
-    Width = 290
+    Width = 285
     Height = 39
     MarginLeft = 5
     MarginTop = 10
@@ -64,6 +65,7 @@ object AndroidModule1: TAndroidModule1
     VerScrollBar = False
     WrappingLine = False
     Editable = True
+    FontSizeUnit = unitDefault
     Id = 5407544
   end
   object jTextView2: jTextView
@@ -88,12 +90,13 @@ object AndroidModule1: TAndroidModule1
     FontColor = colbrDefault
     FontSize = 0
     TextTypeFace = tfNormal
+    FontSizeUnit = unitDefault
     Id = 313328
   end
   object jEditText2: jEditText
     Left = 5
     Top = 321
-    Width = 290
+    Width = 285
     Height = 106
     MarginLeft = 5
     MarginTop = 10
@@ -119,12 +122,13 @@ object AndroidModule1: TAndroidModule1
     VerScrollBar = True
     WrappingLine = False
     Editable = True
+    FontSizeUnit = unitDefault
     Id = 3379671
   end
   object jButton1: jButton
     Left = 2
     Top = 123
-    Width = 296
+    Width = 294
     Height = 40
     MarginLeft = 2
     MarginTop = 4
@@ -140,14 +144,15 @@ object AndroidModule1: TAndroidModule1
     BackgroundColor = colbrDefault
     FontColor = colbrDefault
     FontSize = 0
+    FontSizeUnit = unitDefault
     OnClick = jButton1Click
     Id = 2166001
   end
   object jWebView1: jWebView
-    Left = 5
-    Top = 432
-    Width = 280
-    Height = 152
+    Left = 3
+    Top = 440
+    Width = 291
+    Height = 186
     Visible = True
     Anchor = jEditText2
     PosRelativeToAnchor = [raBelow]
@@ -162,7 +167,7 @@ object AndroidModule1: TAndroidModule1
   object jButton2: jButton
     Left = 2
     Top = 171
-    Width = 296
+    Width = 294
     Height = 40
     MarginLeft = 2
     MarginTop = 4
@@ -178,13 +183,14 @@ object AndroidModule1: TAndroidModule1
     BackgroundColor = colbrDefault
     FontColor = colbrDefault
     FontSize = 0
+    FontSizeUnit = unitDefault
     OnClick = jButton2Click
     Id = 9749670
   end
   object jButton3: jButton
     Left = 2
     Top = 219
-    Width = 296
+    Width = 294
     Height = 40
     MarginLeft = 2
     MarginTop = 4
@@ -200,13 +206,14 @@ object AndroidModule1: TAndroidModule1
     BackgroundColor = colbrDefault
     FontColor = colbrDefault
     FontSize = 0
+    FontSizeUnit = unitDefault
     OnClick = jButton3Click
     Id = 4061258
   end
   object jButton4: jButton
     Left = 2
     Top = 267
-    Width = 296
+    Width = 294
     Height = 40
     MarginLeft = 2
     MarginTop = 4
@@ -222,10 +229,12 @@ object AndroidModule1: TAndroidModule1
     BackgroundColor = colbrDefault
     FontColor = colbrDefault
     FontSize = 0
+    FontSizeUnit = unitDefault
     OnClick = jButton4Click
     Id = 8039590
   end
   object jHttpClient1: jHttpClient
+    CharSet = 'UTF-8'
     IndexUrl = -1
     AuthenticationMode = autNone
     OnContentResult = jHttpClient1ContentResult

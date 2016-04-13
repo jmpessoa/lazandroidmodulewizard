@@ -1,12 +1,12 @@
 package com.example.dummyapp;
 
-//Lamw: Lazarus Android Module Wizard  - version 0.6 - revision 38.5 - 02 April - 2016 
+//Lamw: Lazarus Android Module Wizard  - version 0.6 - revision 38.6 - 12 April - 2016 
 //Form Designer and Components development model!
 //
 //https://github.com/jmpessoa/lazandroidmodulewizard
 //http://forum.lazarus.freepascal.org/index.php/topic,21919.270.html
 //
-//Android Java Interface for Pascal/Delphi XE5 and FreePacal/LAZARUS[december 2013]
+//Android Java Interface for Pascal/Delphi XE5 and FreePacal and LAZARUS[december/2013 by jmpessoa]
 //
 //Developers:
 //          Simon,Choi / Choi,Won-sik
@@ -204,6 +204,7 @@ import android.view.animation.TranslateAnimation;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.view.WindowManager;
+
 import android.webkit.HttpAuthHandler;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
@@ -247,16 +248,26 @@ import java.io.*;
 
 import java.lang.*;
 
+import java.net.CookieManager;
+import java.net.CookieHandler;
+import java.net.CookiePolicy;
+import java.net.CookieStore;
+import java.net.HttpCookie;
 import java.net.HttpURLConnection;
 import java.net.InetAddress;
+import java.net.MalformedURLException;
+import java.net.ProtocolException;
 import java.net.Socket;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URLEncoder;
 //import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.text.ParseException;
-//import java.nio.ByteBuffer;
+import java.nio.ByteBuffer;
 //import java.nio.ByteOrder;
 //import java.nio.IntBuffer;
 //import java.nio.FloatBuffer;
@@ -266,9 +277,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
+import java.util.Scanner;
 import java.util.StringTokenizer;
 //import java.util.Map;
 //import java.util.Random;
@@ -281,34 +295,6 @@ import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 import javax.microedition.khronos.egl.EGLContext;
 import javax.microedition.khronos.egl.EGL10;
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.NameValuePair;
-import org.apache.http.StatusLine;
-import org.apache.http.auth.AuthScope;
-import org.apache.http.auth.UsernamePasswordCredentials;
-import org.apache.http.client.CookieStore;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.HttpDelete;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.protocol.ClientContext;
-import org.apache.http.cookie.Cookie;
-import org.apache.http.impl.client.BasicCookieStore;
-//import org.apache.http.client.methods.HttpUriRequest;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.impl.cookie.BasicClientCookie;
-import org.apache.http.message.BasicNameValuePair;
-import org.apache.http.params.BasicHttpParams;
-import org.apache.http.params.HttpConnectionParams;
-import org.apache.http.params.HttpParams;
-import org.apache.http.protocol.BasicHttpContext;
-import org.apache.http.protocol.HttpContext;
-import org.apache.http.util.ByteArrayBuffer;
-import org.apache.http.util.EntityUtils;
-
-//import com.example.appmenudemo.R.drawable;
 
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -1505,7 +1491,7 @@ controls = ctrls;
 // Init Class
 lparams = new RelativeLayout.LayoutParams(100,100);
 lparams.setMargins(5, 5,5,5);
-this.setHintTextColor(Color.LTGRAY);
+//this.setHintTextColor(Color.LTGRAY); //default...
 
 mClipBoard = (ClipboardManager) controls.activity.getSystemService(Context.CLIPBOARD_SERVICE);
  
@@ -2790,7 +2776,10 @@ class jListItemRow{
 	int itemLayout;
 	int textAlign;
 	Context ctx;
-	Bitmap bmp;
+	Bitmap bmp;	
+	Typeface typeFace;          //TFontFace = (ffNormal, ffSans, ffSerif, ffMonospace);
+	//int fontTextStyle;         // TTextTypeFace = (tfNormal, tfBold, tfItalic, tfBoldItalic);
+	  
 	public  jListItemRow(Context context) {
 		ctx = context;
 		label = "";
@@ -2971,11 +2960,11 @@ public  View getView(int position, View v, ViewGroup parent) {
 		    	
 		    }
 		    itemText[i].setPadding(10, 15, 10, 15);
-		    itemText[i].setTypeface(null,faceTitle);
+		    itemText[i].setTypeface(items.get(position).typeFace, faceTitle);
 		    
 		}
 		else{			
-		   itemText[i].setTypeface(null,faceBody);
+		   itemText[i].setTypeface(items.get(position).typeFace, faceBody);
 		   itemText[i].setPadding(10, 0, 10, 15);
 		   
 		   if (items.get(position).textSizeDecorated == 1) {
@@ -3163,6 +3152,8 @@ private int             widgetItem;
 private String          widgetText;
 private int             textColor; 
 private int             textSize;
+//private int             fontTextStyle;
+private Typeface        typeFace;
 
 //by Renabor
 private float mDownX = -1;
@@ -3221,7 +3212,17 @@ PasObj   = pasobj;
 controls = ctrls;
 
 textColor = 0; //dummy: default
-textSize  = 0; //dummy: default       
+textSize  = 0; //dummy: default
+
+//fontFace =  Typeface.BOLD;
+//fontFace =  Typeface.BOLD_ITALIC;
+//fontFace =  Typeface.ITALIC;
+//fontTextStyle=  Typeface.NORMAL;
+//fontFace =  Typeface.MONOSPACE;
+//fontFace =  Typeface.DEFAULT;
+//fontFace =  Typeface.DEFAULT_BOLD;
+//fontFace =  Typeface.SANS_SERIF;
+//fontFace =  Typeface.SERIF;
 
 widgetItem = widget;
 widgetText = widgetTxt; 
@@ -3356,11 +3357,23 @@ if (parent != null) { parent.removeView(this); }
 }
 
 public  void setTextColor( int textcolor) {
-   this.textColor =textcolor;
+  this.textColor =textcolor;
 }
 
 public void setTextSize (int textsize) {
-   this.textSize = textsize;
+  this.textSize = textsize;
+}
+
+public void SetFontFace(int fontFace) { 
+	  Typeface t = Typeface.DEFAULT; 
+	  switch (fontFace) { 
+	    case 0: t = Typeface.DEFAULT; break; 
+	    case 1: t = Typeface.SANS_SERIF; break; 
+	    case 2: t = Typeface.SERIF; break; 
+	    case 3: t = Typeface.MONOSPACE; break; 
+	  } 
+	  this.typeFace = t;          //TFontFace = (ffNormal, ffSans, ffSerif, ffMonospace);
+	 // this.fontTextStyle = fontStyle; // TTextTypeFace = (tfNormal, tfBold, tfItalic, tfBoldItalic); 		
 }
 
 // LORDMAN - 2013-08-07
@@ -3466,6 +3479,9 @@ info.itemLayout =itemLayout;
 info.textSizeDecorated = textSizeDecorated;
 info.textAlign = textAlign;
 
+info.typeFace = Typeface.DEFAULT;    
+//info.fontTextStyle = Typeface.NORMAL;
+
 alist.add(info);
 aadapter.notifyDataSetChanged();
 }
@@ -3490,6 +3506,9 @@ info.itemLayout =itemLayout;
 info.textSizeDecorated = textSizeDecorated;
 info.textAlign = textAlign;
 
+info.typeFace = Typeface.DEFAULT;    
+//info.fontTextStyle = Typeface.NORMAL;
+
 alist.add(info);
 aadapter.notifyDataSetChanged();
 }
@@ -3513,6 +3532,9 @@ public  void add3(String item, String delimiter, int fontColor, int fontSize, in
 	  info.textSizeDecorated = textSizeDecorated;
 	  info.textAlign = textAlign;
 
+	  info.typeFace = Typeface.DEFAULT;    
+	  //info.fontTextStyle = Typeface.NORMAL;	  
+
 	  alist.add(info);
 	  aadapter.notifyDataSetChanged();
 }
@@ -3535,6 +3557,9 @@ public  void add4(String item, String delimiter, int fontColor, int fontSize, in
 	  info.itemLayout =itemLayout;
 	  info.textSizeDecorated = textSizeDecorated;
 	  info.textAlign = textAlign;
+	  
+	  info.typeFace = Typeface.DEFAULT;    
+	 // info.fontTextStyle = Typeface.NORMAL;	  
 	  
 	  alist.add(info);
 	  aadapter.notifyDataSetChanged();
@@ -5275,207 +5300,206 @@ public  void Free() {
 //-------------------------------------------------------------------------
 
 class jDialogProgress {
-  // Java-Pascal Interface
-  private long  PasObj = 0;      // Pascal Obj
-  private Controls controls = null;   // Control Class for Event
-  
-  String mTitle = "";
-  String mMsg = "";
-  int mFlag = 0;  
-  private ProgressDialog  dialog = null;  
-  private AlertDialog  customDialog = null;  
-  
-  private boolean mCancelable; //thanks to Mladen
-  
-  public jDialogProgress(android.content.Context context,
-                     Controls ctrls, long pasobj, String title, String msg) {
-    //Connect Pascal I/F
-    PasObj = pasobj;
-    controls = ctrls;
-    mTitle= title;
-    mMsg = msg; 
-    mFlag = 0;
-    mCancelable= true;    
-  }
+	  // Java-Pascal Interface
+	  private long  PasObj = 0;      // Pascal Obj
+	  private Controls controls = null;   // Control Class for Event
+	  
+	  String mTitle = "";
+	  String mMsg = "";
+	  int mFlag = 0;  
+	  private ProgressDialog  dialog = null;  
+	  private AlertDialog  customDialog = null;  
+	  
+	  private boolean mCancelable; //thanks to Mladen
+	  
+	  public jDialogProgress(android.content.Context context,
+	                     Controls ctrls, long pasobj, String title, String msg) {
+	    //Connect Pascal I/F
+	    PasObj = pasobj;
+	    controls = ctrls;
+	    mTitle= title;
+	    mMsg = msg; 
+	    mFlag = 0;
+	    mCancelable= true;    
+	  }
 
-  public  void Free() {
-	if (dialog != null) dialog.dismiss();
-	if (customDialog != null) customDialog.dismiss();		
-    dialog = null;
-    customDialog = null;
-  }
-  
-  
-  public void Show() {
-	if (dialog != null) dialog.dismiss();
-	dialog = null;	  
-	dialog = new ProgressDialog(controls.activity);
-	
-	if (!mMsg.equals("")) dialog.setMessage(mMsg);		 
-	if (!mTitle.equals("")) 
-		dialog.setTitle(mTitle);	
-	 else 
-		dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-	
-	if (mCancelable)
-       dialog.setCancelable(true);
-    else   
-    	dialog.setCancelable(false);
-	
-    dialog.show();
-  }
-	  
-  public void Show(String _title, String _msg) {
-	  if (dialog != null) dialog.dismiss();
-	  dialog = null;	 
-	  mMsg = _msg;
-	  mTitle= _title;
-	  dialog = new ProgressDialog(controls.activity);
-	  	  
-	  if (!mMsg.equals("")) dialog.setMessage(mMsg);		 
-	  if (!mTitle.equals("")) 
-		 dialog.setTitle(mTitle);	
-	  else 
-		 dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+	  public  void Free() {
+		if (dialog != null) dialog.dismiss();
+		if (customDialog != null) customDialog.dismiss();		
+	    dialog = null;
+	    customDialog = null;
+	  }
 	  
 	  
-		if (mCancelable)  //thanks to Mladen
-		  dialog.setCancelable(true);  //back key
-		else   
-		 dialog.setCancelable(false);
+	  public void Show() {
+		if (dialog != null) dialog.dismiss();
+		dialog = null;	  
+		dialog = new ProgressDialog(controls.activity);
 		
-      dialog.show();
-  }
-  
-  public void Show(RelativeLayout _layout) {	
-	if (dialog != null) dialog.dismiss();
-	dialog = null;		
-    if(_layout.getVisibility()==0) { //visible   
-	  _layout.setVisibility(android.view.View.INVISIBLE); //4
-    }                  
-    if ( _layout.getParent().getClass().getName().equals("android.widget.RelativeLayout") ) {    	
-    	RelativeLayout par = (RelativeLayout)_layout.getParent();
-    	if (par != null) par.removeView(_layout);
-    } 			
-    else {
-    	FrameLayout par = (FrameLayout)_layout.getParent();
-    	if (par != null) par.removeView(_layout);
-    }
-    
-	_layout.setVisibility(0);	
-    AlertDialog.Builder builder = new AlertDialog.Builder(controls.activity);    
-    builder.setView(_layout);
-    builder.setCancelable(true); //back key    
-    customDialog = builder.create();   
-    		 
-	if (!mTitle.equals("")) 
-	  customDialog.setTitle(mTitle);	
-	else 
-	  customDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-    
-	if (mCancelable) //thanks to Mladen
-		customDialog.setCancelable(true);  //back key
-	else   
-		customDialog.setCancelable(false);
-	
-    customDialog.show();    
-  }
-  
-  public void SetMessage(String _msg) {
-    mMsg = _msg;
-    if (dialog != null) {
-    	if (dialog.isShowing()) {dialog.setMessage(_msg);}
-    }	
-  }
- 
-  public void SetTitle(String _title) {
-	mTitle = _title;
-	if (dialog != null) dialog.setTitle(_title);
-	if (customDialog != null) customDialog.setTitle(_title);
-  }
-  
-  public void SetCancelable(boolean _value) {	  
-	mCancelable = _value; //thanks to Mladen
-	if (dialog != null) dialog.setCancelable(mCancelable);
-	if (customDialog != null) customDialog.setCancelable(mCancelable);		
-  }
-      
-  public void Stop() {
-	  if (customDialog != null) {
-		  customDialog.dismiss();		  
+		if (!mMsg.equals("")) dialog.setMessage(mMsg);		 
+		if (!mTitle.equals("")) 
+			dialog.setTitle(mTitle);	
+		 else 
+			dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+		
+		if (mCancelable)
+	       dialog.setCancelable(true);
+	    else   
+	    	dialog.setCancelable(false);
+		
+	    dialog.show();
 	  }
-	  if (dialog != null) {
-		  dialog.dismiss();		  
+		  
+	  public void Show(String _title, String _msg) {
+		  if (dialog != null) dialog.dismiss();
+		  dialog = null;	 
+		  mMsg = _msg;
+		  mTitle= _title;
+		  dialog = new ProgressDialog(controls.activity);
+		  	  
+		  if (!mMsg.equals("")) dialog.setMessage(mMsg);		 
+		  if (!mTitle.equals("")) 
+			 dialog.setTitle(mTitle);	
+		  else 
+			 dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+		  
+		  
+			if (mCancelable)  //thanks to Mladen
+			  dialog.setCancelable(true);  //back key
+			else   
+			 dialog.setCancelable(false);
+			
+	      dialog.show();
 	  }
-  }
-  
-  //TODO
-  public void ShowAsync() {  //Async
-	  new ATask().execute(null, null, null); 
-  }
-  
-  //TODO                        //params, progress, result
-  class ATask extends AsyncTask<String, Integer, Integer>{
-       int count;
-       
-    // Step #1. 
-       @Override
-       protected void onPreExecute(){ 
-         super.onPreExecute();
-         
-         count = 1;         
-  		 if (dialog != null) dialog.dismiss();
-  		 dialog = null;
-  		 
-  		 dialog = new ProgressDialog(controls.activity);
-  		
-  		 if (!mMsg.equals("")) dialog.setMessage(mMsg);
-  		 
-  		 if (!mTitle.equals("")) 
-  			dialog.setTitle(mTitle);	
-  		 else 
-  			dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-
-  		if (mCancelable)
-  			dialog.setCancelable(true);  //back key
-  		else   
-  			dialog.setCancelable(false);
-  		
-  	     dialog.show();
-  	     
-       }
-       
-    // Step #2. 
-	   @Override
-	   protected Integer doInBackground(String... params) {
-		   int result = 0;		   
-	       while( count > 0 ) {	 //controls.pOnShowDialogProgressAsync(PasObj, count)
-	    	  result = count;
-	    	  publishProgress(count);
-	       }	       
-	       return result;	      
+	  
+	  public void Show(RelativeLayout _layout) {	
+		if (dialog != null) dialog.dismiss();
+		dialog = null;		
+	    if(_layout.getVisibility()==0) { //visible   
+		  _layout.setVisibility(android.view.View.INVISIBLE); //4
+	    }                  
+	    if ( _layout.getParent().getClass().getName().equals("android.widget.RelativeLayout") ) {    	
+	    	RelativeLayout par = (RelativeLayout)_layout.getParent();
+	    	if (par != null) par.removeView(_layout);
+	    } 			
+	    else {
+	    	FrameLayout par = (FrameLayout)_layout.getParent();
+	    	if (par != null) par.removeView(_layout);
 	    }
+	    
+		_layout.setVisibility(0);	
+	    AlertDialog.Builder builder = new AlertDialog.Builder(controls.activity);    
+	    builder.setView(_layout);
+	    builder.setCancelable(true); //back key    
+	    customDialog = builder.create();   
+	    		 
+		if (!mTitle.equals("")) 
+		  customDialog.setTitle(mTitle);	
+		else 
+		  customDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+	    
+		if (mCancelable) //thanks to Mladen
+			customDialog.setCancelable(true);  //back key
+		else   
+			customDialog.setCancelable(false);
+		
+	    customDialog.show();    
+	  }
+	  
+	  public void SetMessage(String _msg) {
+	    mMsg = _msg;
+	    if (dialog != null) {
+	    	if (dialog.isShowing()) {dialog.setMessage(_msg);}
+	    }	
+	  }
+	 
+	  public void SetTitle(String _title) {
+		mTitle = _title;
+		if (dialog != null) dialog.setTitle(_title);
+		if (customDialog != null) customDialog.setTitle(_title);
+	  }
+	  
+	  public void SetCancelable(boolean _value) {	  
+		mCancelable = _value; //thanks to Mladen
+		if (dialog != null) dialog.setCancelable(mCancelable);
+		if (customDialog != null) customDialog.setCancelable(mCancelable);		
+	  }
+	      
+	  public void Stop() {
+		  if (customDialog != null) {
+			  customDialog.dismiss();		  
+		  }
+		  if (dialog != null) {
+			  dialog.dismiss();		  
+		  }
+	  }
+	  
+	  //TODO
+	  public void ShowAsync() {  //Async
+		  new ATask().execute(null, null, null); 
+	  }
+	  
+	  //TODO                        //params, progress, result
+	  class ATask extends AsyncTask<String, Integer, Integer>{
+	       int count;
+	       
+	    // Step #1. 
+	       @Override
+	       protected void onPreExecute(){ 
+	         super.onPreExecute();
+	         
+	         count = 1;         
+	  		 if (dialog != null) dialog.dismiss();
+	  		 dialog = null;
+	  		 
+	  		 dialog = new ProgressDialog(controls.activity);
+	  		
+	  		 if (!mMsg.equals("")) dialog.setMessage(mMsg);
+	  		 
+	  		 if (!mTitle.equals("")) 
+	  			dialog.setTitle(mTitle);	
+	  		 else 
+	  			dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
 
-	    // Step #3. Progress
-	    @Override
-	    protected void onProgressUpdate(Integer... params) {
-	       super.onProgressUpdate(params);	       
-	       count = count + 1;	       
-	       if ( count == 1000) { //just test !
-	    	   count = -1;
+	  		if (mCancelable)
+	  			dialog.setCancelable(true);  //back key
+	  		else   
+	  			dialog.setCancelable(false);
+	  		
+	  	     dialog.show();
+	  	     
 	       }
-	    }
+	       
+	    // Step #2. 
+		   @Override
+		   protected Integer doInBackground(String... params) {
+			   int result = 0;		   
+		       while( count > 0 ) {	 //controls.pOnShowDialogProgressAsync(PasObj, count)
+		    	  result = count;
+		    	  publishProgress(count);
+		       }	       
+		       return result;	      
+		    }
 
-	    //Step #4. After Process
-	    @Override
-	    protected void onPostExecute(Integer result) {
-	      super.onPostExecute(result);
-	      if (dialog != null) dialog.dismiss();
-	      //Log.i("onPostExecute = ", "result = "+ result.intValue());	      
-	    }        	    
-	  }
-}
+		    // Step #3. Progress
+		    @Override
+		    protected void onProgressUpdate(Integer... params) {
+		       super.onProgressUpdate(params);	       
+		       count = count + 1;	       
+		       if ( count == 1000) { //just test !
+		    	   count = -1;
+		       }
+		    }
 
+		    //Step #4. After Process
+		    @Override
+		    protected void onPostExecute(Integer result) {
+		      super.onPostExecute(result);
+		      if (dialog != null) dialog.dismiss();
+		      //Log.i("onPostExecute = ", "result = "+ result.intValue());	      
+		    }        	    
+		  }
+	}
 
 //-------------------------------------------------------------------------
 //jImageBtn
@@ -5806,23 +5830,18 @@ try {
      //File file               = new File(dir,System.IO.Path.GetFileName(localfile) );
      File file               = new File(localfile);
 
-     long startTime          = System.currentTimeMillis();
+     //long startTime          = System.currentTimeMillis();
      InputStream is          = ucon.getInputStream();
      BufferedInputStream bis = new BufferedInputStream(is);
-
-     ByteArrayBuffer baf = new ByteArrayBuffer(5);
-     int total = 0;
-     int count = 0;
-     while ((count = bis.read()) != -1) {
-       total += count;
-       publishProgress(total);
-       baf.append((byte) count);
-     }
-     //if (isCancelled()) break;
-
-     // Save File
+  
+	 int size = bis.available();     
+     byte[] buffer = new byte[size];
      FileOutputStream fos = new FileOutputStream(file);
-     fos.write(baf.toByteArray());
+     
+	 for (int c = is.read(buffer); c != -1; c = is.read(buffer)){
+	     fos.write(buffer, 0, c);
+	 }
+	 
      fos.flush();
      fos.close();
      //
@@ -13286,16 +13305,21 @@ class jHttpClient /*extends ...*/ {
    private String mUSERNAME = "USERNAME";
    private String mPASSWORD = "PASSWORD";
    private int mAuthenticationMode = 0; //0: none. 1: basic; 2= OAuth
-   private String mHOSTNAME = AuthScope.ANY_HOST; // null; 
-   private int mPORT = AuthScope.ANY_PORT; //-1;
    
-   private List<NameValuePair> ValuesForPost2 = new ArrayList<NameValuePair>();
-   DefaultHttpClient client2;
+   private String mHOSTNAME = null;   
+   private int mPORT = -1;
+     
    String httpCharSet = "UTF-8";	// default UTF-8
    
-	//List<Cookie> cookies;		 		 
-    CookieStore cookieStore; 	     
-    HttpContext localContext;    
+   private HashMap<String, String> ValuesForPost;   
+   private CookieManager cookieManager;
+   
+   private HttpURLConnection client3 = null; // renabor
+   
+   private CookieStore cookieStore;
+   
+   private String mUrlString= "";
+   private int mResponseCode = HttpURLConnection.HTTP_NOT_FOUND;
         
     ArrayList<String> listHeaderName = new ArrayList<String>();
     ArrayList<String> listHeaderValue = new ArrayList<String>();
@@ -13306,30 +13330,27 @@ class jHttpClient /*extends ...*/ {
       context   = _ctrls.activity;
       pascalObj = _Self;
       controls  = _ctrls;
+       
+      cookieManager = new CookieManager(null, CookiePolicy.ACCEPT_ALL );
+                  
+      CookieHandler.setDefault(cookieManager);   // <<------- CookieManager work automatically       
       
-      client2 = new DefaultHttpClient();
+      ValuesForPost = new HashMap<String, String>();      
       
-      cookieStore= new BasicCookieStore();      
-      localContext= new BasicHttpContext();      
-      localContext.setAttribute(ClientContext.COOKIE_STORE,cookieStore);
-      
-      //client2.setCookieStore(cookieStore);            
    }
- 
+      
+   //https://www.nczonline.net/blog/2009/05/05/http-cookies-explained/
+   
    public void jFree() {
-     //free local objects...
-	   client2.getConnectionManager().shutdown();
+       //free local objects...
+	   if (client3 != null) client3.disconnect();
    }
  
    //write others [public] methods code here......
    //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
-   
-   //ref. http://blog.leocad.io/basic-http-authentication-on-android/
-   //ref. http://simpleprogrammer.com/2011/05/25/oauth-and-rest-in-android-part-1/
-   //ref. http://jan.horneck.info/blog/androidhttpclientwithbasicauthentication
-   
       
    public void GetAsync(String _stringUrl) {
+	   mUrlString = _stringUrl;
 	   new AsyncHttpClientGet().execute(_stringUrl);	   
    }
    
@@ -13337,86 +13358,158 @@ class jHttpClient /*extends ...*/ {
 	   httpCharSet = _charSet;
 	   //Log.i("CharSet", _charSet);
    }  
-                      
-   public String Get2(String _stringUrl) throws Exception {  //Pascal: Get  
-	   	   	   	   
-	   HttpGet httpGet = new HttpGet(_stringUrl);	   
-	   HttpResponse response = client2.execute(httpGet);
-	      	  	   
-	   BufferedReader rd = new BufferedReader(new InputStreamReader(response.getEntity().getContent(), httpCharSet));
-	   StringBuffer sb = new StringBuffer();
-	   
-	   String line = "";
-	   while ((line = rd.readLine()) != null) {
-		  sb.append(line);		   
-	   }
-	   
-	   return sb.toString();	   
-   } 
-   
       
-   public void AddValueForPost2(String Name, String Value) {  //Pascal: AddPostNameValueData		
-       ValuesForPost2.add(new BasicNameValuePair(Name, Value));	
+   ////Pascal: Get  
+   public String Get(String _urlString) { //throws Exception {      
+      StringBuffer sb = new StringBuffer();      
+      mResponseCode = HttpURLConnection.HTTP_CREATED;
+      mUrlString = _urlString;
+      try {
+             URL url = new URL(_urlString);
+              client3 = (HttpURLConnection)url.openConnection();
+              client3.setRequestMethod("GET");              
+              if (mAuthenticationMode == 1) {
+                 String _credentials = mUSERNAME + ":" + mPASSWORD;
+                 String _base64EncodedCredentials = Base64.encodeToString(_credentials.getBytes(), Base64.NO_WRAP);
+                 client3.setRequestProperty("Authorization", "Basic "+ _base64EncodedCredentials);
+              }                                               
+              
+              int statusCode = client3.getResponseCode();
+              mResponseCode = statusCode;
+              
+              if (statusCode == HttpURLConnection.HTTP_OK) {    //OK            	
+                  InputStream inputStream = client3.getInputStream();
+                  BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+                  String inputLine;
+                  while ((inputLine = reader.readLine()) != null) {
+                       sb.append(inputLine);
+                  }
+                  inputStream.close();
+              } else {
+                  sb.append(String.valueOf(statusCode));
+               
+              }                                                        
+              client3.disconnect();
+      } catch (Exception e) {
+              return "";
+      }        
+      return sb.toString();
    }
+     
+   //by renabor
+   public void AddValueForPost2(String Name, String Value) {  //Pascal: AddPostNameValueData
+	   ValuesForPost.put(Name, Value);
+   }
+      
+   //by renabor 
+    public void ClearPost2Values() { // Pascal: ClearPostNameValueData
+         ValuesForPost.clear();   
+    }      
+    
+   //http://stackoverflow.com/questions/9767952/how-to-add-parameters-to-httpurlconnection-using-post 
+    private String getPostDataString(HashMap<String, String> params) throws UnsupportedEncodingException{
+        StringBuilder result = new StringBuilder();
+        boolean first = true;
+        for(Map.Entry<String, String> entry : params.entrySet()){
+            if (first)
+                first = false;
+            else
+                result.append("&");
 
-   public void ClearPost2Values() { // Pascal: ClearPostNameValueData
-      ValuesForPost2.clear();	
-   }   
+            result.append(URLEncoder.encode(entry.getKey(), "UTF-8"));
+            result.append("=");
+            result.append(URLEncoder.encode(entry.getValue(), "UTF-8"));
+        }
 
-   public String Post2(String Link) throws Exception {	// Pascal: Post			
-		
-		// Create a new HttpClient and Post Header
-		int statusCode = 0;						
-		HttpParams httpParams = new BasicHttpParams();
-		int connection_Timeout = 5000;
-		HttpConnectionParams.setConnectionTimeout(httpParams, connection_Timeout);
-		HttpConnectionParams.setSoTimeout(httpParams, connection_Timeout);
-		
-        if (mAuthenticationMode != 0) {    		   
-        	client2.getCredentialsProvider().setCredentials(
-                        new AuthScope(mHOSTNAME,mPORT),  // 
-                        new UsernamePasswordCredentials(mUSERNAME, mPASSWORD));
-	    }
-        			   
-	    HttpPost httpPost = new HttpPost(Link);
-	    
-	  //thanks to @renabor
-	    if (mAuthenticationMode != 0) {
-            String _credentials = mUSERNAME + ":" + mPASSWORD;
-            String _base64EncodedCredentials = Base64.encodeToString(_credentials.getBytes(), Base64.NO_WRAP);
-            httpPost.addHeader("Authorization", "Basic " + _base64EncodedCredentials);
-        }	   
-	        
-	    httpPost.setEntity(new UrlEncodedFormEntity(ValuesForPost2));
-	    	
-		HttpResponse response = client2.execute(httpPost);
-			
-		BufferedReader rd = new BufferedReader(new InputStreamReader(response.getEntity().getContent(), httpCharSet));
-		StringBuffer sb = new StringBuffer();
-		String line;		
-		while ((line = rd.readLine()) != null) {
-			sb.append(line);
-		}		
-		return sb.toString();	   
-  }
-   
+        return result.toString();
+    }
+    
+    //http://www.xyzws.com/javafaq/how-to-use-httpurlconnection-post-data-to-web-server/139
+    //http://stackoverflow.com/questions/9767952/how-to-add-parameters-to-httpurlconnection-using-post    
+    //http://www.mkyong.com/java/how-to-send-http-request-getpost-in-java/
+    //http://javatechig.com/android/android-networking-tutorial
+    //http://www.rapidvaluesolutions.com/tech_blog/introduction-to-httpurlconnection-http-client-for-performing-efficient-network-operations/
+    public String Post(String _urlString) { // Pascal: Post
+
+        URL url;
+        String response = "";
+        String Params;
+        mResponseCode = HttpURLConnection.HTTP_CREATED;
+        
+        mUrlString = _urlString;
+        
+        try {
+            url = new URL(_urlString);
+
+            client3 = (HttpURLConnection) url.openConnection();
+            client3.setReadTimeout(15000);
+            client3.setConnectTimeout(15000);
+            client3.setRequestMethod("POST");                        
+                        
+            client3.setDoInput(true);
+            client3.setDoOutput(true);
+          
+            Params = getPostDataString(ValuesForPost);            
+            client3.setFixedLengthStreamingMode(Params.getBytes().length);
+            //client3.setFixedLengthStreamingMode(Params.length());
+            
+            if (mAuthenticationMode == 1) {
+                String _credentials = mUSERNAME + ":" + mPASSWORD;
+                String _base64EncodedCredentials = Base64.encodeToString(_credentials.getBytes(), Base64.NO_WRAP);
+                client3.setRequestProperty("Authorization", "Basic "+ _base64EncodedCredentials);
+            }
+            
+            client3.setRequestProperty("Charset", "UTF-8");
+            client3.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");            
+                                   
+            OutputStream os = client3.getOutputStream();
+            BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(os, "UTF-8"));
+                      
+            writer.write(Params);
+            writer.flush();
+            writer.close();
+            os.close();
+            
+            int responseCode=client3.getResponseCode();            
+            mResponseCode = responseCode;
+            
+            if (responseCode == HttpURLConnection.HTTP_OK /*HttpsURLConnection.HTTP_OK*/ ) {
+                String line;
+                BufferedReader br=new BufferedReader(new InputStreamReader(client3.getInputStream()));
+                while ((line=br.readLine()) != null) {
+                    response+=line;
+                }
+            }
+            else {
+                response= String.valueOf(responseCode);
+            }
+            
+        } catch (Exception e) {
+        	//Log.i("test", e.printStackTrace());
+        	Log.e("http", "POST", e);            
+        	return "Error...";
+        }
+
+        return response;
+    }
+    
    public void SetAuthenticationUser(String _userName, String _password) {       	 
-	   mUSERNAME = _userName;
-	   mPASSWORD =_password;
+	  mUSERNAME = _userName;
+	  mPASSWORD =_password;
    }
      
    public void SetAuthenticationHost(String _hostName, int _port) {
-    	 if ( _hostName.equals("") ) {
+   	 if ( _hostName.equals("") ) {
     		 mHOSTNAME = null;
-    	 } 
-    	 else {
+   	 } 
+   	 else {
     		 mHOSTNAME = _hostName;
-    	 }
-    	 mPORT = _port;	 
+   	 }
+   	 mPORT = _port;	 
    }
                
    public void SetAuthenticationMode(int _authenticationMode) {    	 
-        mAuthenticationMode = _authenticationMode; //0: none. 1: basic; 2= OAuth	 	                
+      mAuthenticationMode = _authenticationMode; //0: none. 1: basic; 2= OAuth	 	                
    }
      
 	/*
@@ -13429,89 +13522,413 @@ class jHttpClient /*extends ...*/ {
      //ref. http://mobiledevtuts.com/android/android-http-with-asynctask-example/
    
    public void PostNameValueDataAsync(String _stringUrl, String _name, String _value) {
-	  new AsyncHttpClientPostNameValueData().execute(_stringUrl, _name, _value);	  
+	  mUrlString = _stringUrl; 
+ 	  ValuesForPost.clear();
+	  ValuesForPost.put(_name, _value);
+	  new AsyncHttpClientPostNameValueData().execute(_stringUrl, "", "");	  
    }
-  
-	
+  	
 	public void PostNameValueDataAsync(String _stringUrl, String _listNameValue) {
-	   new AsyncHttpClientPostListNameValueData().execute(_stringUrl, _listNameValue);     
+	    StringTokenizer st = new StringTokenizer(_listNameValue, "=&"); //name1=value1&name2=value2&name3=value3 ...						
+		
+	    ValuesForPost.clear();
+		
+	    mUrlString = _stringUrl;
+		
+		while(st.hasMoreTokens()) { 
+		  String key = st.nextToken(); 
+		  String val = st.nextToken(); 
+		  //Log.i("name ->", key);
+		  //Log.i("value ->", val);
+		  ValuesForPost.put(key, val);
+		}	
+		new AsyncHttpClientPostNameValueData().execute(_stringUrl, "", "");	
+	   //new AsyncHttpClientPostListNameValueData().execute(_stringUrl, _listNameValue);     
     }
 	
 	public void PostNameValueDataAsync(String _stringUrl) {
-		new AsyncHttpClientPostNameValueData().execute(_stringUrl, "", "");
+	   mUrlString = _stringUrl;
+	   new AsyncHttpClientPostNameValueData().execute(_stringUrl, "", "");
 	}
 	
 	//-----------------------
 	//Cookies
-	//-----------------------
-	    
-	public String[] GetCookies(String _nameValueSeparator) {		
-		ArrayList<String> list = new ArrayList<String>();
-	    List<Cookie> cookies = cookieStore.getCookies();	     
-        
-	    if (!cookies.isEmpty()) {
-		      for (Cookie cookie : cookies){
-		    	  list.add(cookie.getName() + _nameValueSeparator + cookie.getValue());	         
-		      }		  
-	    }
+	//-----------------------		   
+		   /*http://stackoverflow.com/questions/16150089/how-to-handle-cookies-in-httpurlconnection-using-cookiemanager
+		    *  
+		    *http://www.concretepage.com/java/example_cookiemanager_java 
+		    *https://czheng035.wordpress.com/2012/06/18/cookie-management-in-android-webview-development/ OTIMO!
+		    *
+		    *http://stackoverflow.com/questions/14860087/should-httpurlconnection-with-cookiemanager-automatically-handle-session-cookies
+		    *  
+		   HttpCookie cookie = new HttpCookie("lang", "fr");
+		   cookie.setDomain("twitter.com");
+		   cookie.setPath("/");
+		   cookie.setVersion(0);
+		   cookieManager.getCookieStore().add(new URI("http://twitter.com/"), cookie)   
+		   */
+	
+    public HttpCookie AddCookie(String _name, String _value)  {        
+    	HttpCookie cookie = new HttpCookie(_name, _value);
+    	//cookie.setDomain("your domain");cookie.setPath("/");    	
+    	cookieStore = cookieManager.getCookieStore();
+     	//cookieStore.add(Uri, cookie);
+		cookieStore.add(null, cookie); //All URIs		
+		return cookie;
+    }
+
+    public HttpCookie AddCookie(String _url, String _name, String _value)  {        
+       HttpCookie cookie = new HttpCookie(_name, _value);
+       //cookie.setDomain("your domain");cookie.setPath("/");    	
+       cookieStore = cookieManager.getCookieStore();    	
+       URI Uri;
+   	   try {
+   		Uri = new URI(_url);
+   	     cookieStore.add(Uri, cookie);
+ 		 //cookieStore.add(null, cookie); //All URIs   		
+   	   } catch (Exception e) {
+   		// TODO Auto-generated catch block
+   		   e.printStackTrace();
+   	   }   	        			
+	   return cookie;
+    }
+    
+    public String GetCookieValue(HttpCookie _cookie) {    
+        return _cookie.getValue();        
+    }
+    
+	public String[] GetCookies(String _nameValueSeparator) {
+				
+		 ArrayList<String> list = new ArrayList<String>();
+		 try {
+			 cookieStore = cookieManager.getCookieStore();			
+		    List<HttpCookie> cookies = cookieStore.getCookies(); //all URIs
+		    if (!cookies.isEmpty()) {
+			      for (HttpCookie cookie : cookies){
+			    	  list.add(cookie.getName() + _nameValueSeparator + cookie.getValue());	         
+			      }		  
+		    }
+			
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		 		 	  
 	    return list.toArray(new String[list.size()]);
 	}
-	
-	
-	public String[] GetCookies(String _url, String _nameValueSeparator) {  //Cookies		   
-	    ArrayList<String> list = new ArrayList<String>();   
-	    HttpGet httpget=new HttpGet(_url);  	    
-		try {				
-			  HttpResponse response = client2.execute(httpget, localContext);	 
-			  List<Cookie> cookies = cookieStore.getCookies();
-			  if( !cookies.isEmpty() ){
-			      for (Cookie cookie : cookies){
-			    	  list.add(cookie.getName() + _nameValueSeparator + cookie.getValue());	         
-			      }
-			  }
-			  
-		} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-		}			
+		
+	public String[] GetCookies(String _urlString, String _nameValueSeparator) {  //Cookies		  
+		
+	   ArrayList<String> list = new ArrayList<String>();   
+	   cookieStore = cookieManager.getCookieStore();		   
+	   URI uri;
+	   try {
+		 uri = new URI(_urlString);
+		 List<HttpCookie> cookies = cookieStore.get(uri);
+		 //List<HttpCookie> cookies = cookieStore.getCookies();  //All URIs		 
+  	     if( !cookies.isEmpty() ){
+			    for (HttpCookie cookie : cookies){
+			   	  list.add(cookie.getName() + _nameValueSeparator + cookie.getValue());	         
+			    }
+		 }
+		 
+	   } catch (Exception e) {
+		// TODO Auto-generated catch block
+		   e.printStackTrace();
+	   }	   	   	 	   			   
 		return list.toArray(new String[list.size()]);			
     }
-		   
-	public int GetCookiesCount() {	  	
+		   	
+	public int GetCookiesCount() {	  
+	  cookieStore = cookieManager.getCookieStore();	
 	  return cookieStore.getCookies().size();
-	}	 
-		   
-	public Cookie GetCookieByIndex(int _index) {
+	}	 		  
+		
+	public HttpCookie GetCookieByIndex(int _index) {
+		cookieStore = cookieManager.getCookieStore();					
 		if (_index <  cookieStore.getCookies().size()) 
 	       return cookieStore.getCookies().get(_index);
 		else return  null;
 	}
 		      
-    public String GetCookieAttributeValue(Cookie _cookie, String _attribute) {
+    public String GetCookieAttributeValue(HttpCookie _cookie, String _attribute) {
 			  String r = ""; 
 			  if (_attribute.equals("name"))  r = _cookie.getName();
 			  else if (_attribute.equals("value")) r = _cookie.getValue();
 			  else if (_attribute.equals("domain")) r = _cookie.getDomain();
-			  else if (_attribute.equals("version")) r = String.valueOf(_cookie.getVersion());
-			  else if (_attribute.equals("expirydate")) r = _cookie.getExpiryDate().toString();//DateFormat.format("yyyyMMdd  kk:mm",  _cookie.getExpiryDate()).toString();
+			  else if (_attribute.equals("version")) r = String.valueOf(_cookie.getVersion()); //getExpiryDate().toString()
+			  else if (_attribute.equals("expirydate")) r = ""+_cookie.getMaxAge();//DateFormat.format("yyyyMMdd  kk:mm",  _cookie.getExpiryDate()).toString();
 			  else if (_attribute.equals("path")) r = _cookie.getPath();
 			  else if (_attribute.equals("comment")) r = _cookie.getComment();			  
-			  else if (_attribute.equals("ports")) r = String.valueOf(_cookie.getPorts());
+			  else if (_attribute.equals("ports")) r = String.valueOf(_cookie.getPortlist()); //.getPorts()
 			  return r;
     }
-		   
-		   
+		   		   
     public void ClearCookieStore() {
-	    cookieStore.clear(); 			  
-    }
-		   
-    public Cookie AddCookie(String _name, String _value)  {        
-			   BasicClientCookie cookie = new BasicClientCookie(_name, _value);
-		       //cookie.setDomain("your domain");cookie.setPath("/");
-		       cookieStore.addCookie(cookie); 
-		       return cookie;
+    	cookieStore = cookieManager.getCookieStore();
+	    cookieStore.removeAll(); 			  
     }
 	
+    //http://stackoverflow.com/questions/14860087/should-httpurlconnection-with-cookiemanager-automatically-handle-session-cookies   
+    
+    //http://www.mkyong.com/java/how-to-automate-login-a-website-java-example/
+    //
+    
+    public HttpURLConnection OpenConnection(String _urlString) {
+  	   //ArrayList<String> list = new ArrayList<String>();
+  	   //Values must be set prior to calling the connect method:
+      client3 = null;	
+  	  try {
+  		 mUrlString = _urlString;
+  		 URL url = new URL(_urlString);                   	       
+          client3 = (HttpURLConnection)url.openConnection();          		 
+  	  } catch (IOException e) {
+  		//TODO Auto-generated catch block
+  		e.printStackTrace();
+  	  }
+  	  return  client3;
+  	  
+     }
+    
+    
+    //Sets the general request property. If a property with the key already exists, overwrite its value with the new value.
+    public HttpURLConnection SetRequestProperty(HttpURLConnection _httpConnection, String _headerName,  String _headerValue) {
+  	   //ArrayList<String> list = new ArrayList<String>();
+  	   //Values must be set prior to calling the connect method:
+  	 	 // _HeaderValue = "userId=igbrown; sessionId=SID77689211949; isAuthenticated=true";
+    	if (_httpConnection != null)
+    		_httpConnection.setRequestProperty(_headerName, _headerValue); 		 
+  		//Send the cookie to the server:
+  		//To send the cookie, simply call connect() on the URLConnection for which we have added the cookie property:	  	    		 
+    	//httpClient.connect();		 
+  	   return  _httpConnection;
+     }
+    
+    
+    //Adds a general request property specified by a key-value pair. 
+    //This method will not overwrite existing values associated with the same key.
+    
+    public HttpURLConnection AddRequestProperty(HttpURLConnection _httpConnection, String _headerName,  String _headerValue) {
+   	   //ArrayList<String> list = new ArrayList<String>();
+   	   //Values must be set prior to calling the connect method:
+   	 	 // _HeaderValue = "userId=igbrown; sessionId=SID77689211949; isAuthenticated=true";
+     	if (_httpConnection != null)
+     		_httpConnection.addRequestProperty(_headerName, _headerValue); 		 
+   		//Send the cookie to the server:
+   		//To send the cookie, simply call connect() on the URLConnection for which we have added the cookie property:	  	    		 
+     	//httpClient.connect();		 
+   	   return  _httpConnection;
+      }
+    
+    /*
+    public HttpURLConnection Connect(HttpURLConnection _httpConnection) {
+    	try {
+    		if (_httpConnection != null)
+    			_httpConnection.connect();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			_httpConnection = null;
+			Log.e("HttpURLConnection", "Connect", e);
+			//e.printStackTrace();
+		}		 
+   	   return  _httpConnection;
+   }
+   */ 
+    
+    public HttpURLConnection GetDefaultConnection() {
+    	return client3;
+    }
+    //http://www.hccp.org/java-net-cookie-how-to.html
+         
+    public String GetHeaderField(HttpURLConnection _httpConnection, String _headerName) {    	
+    	   //ArrayList<String> list = new ArrayList<String>();    	   
+ 		   String headerName=null;
+ 		   String _field ="";
+ 		  
+ 		   if (_httpConnection == null) return "";
+ 		  
+ 		   for (int i=1; (headerName = _httpConnection.getHeaderFieldKey(i))!=null; i++) {
+ 			    //Log.i("headers..", headerName);  //Keep-Alive ... Server ... Set-Cookie ... etc.. 
+ 		    	if (headerName.equals(_headerName)) {   		    		
+ 		    		_field = _httpConnection.getHeaderField(i); 		   	        
+ 		   	 	   //Loop through response headers looking for cookies:
+ 		   	 	   //Since a server may set multiple cookies in a single request, we will need to loop through the response headers, looking for all headers named "Set-Cookie". 		   	                                                      
+ 		   	 	   //Extract cookie name and value from cookie string:
+ 		   	 	   //The string returned by the getHeaderField(int index) method is a series of name=value separated by semi-colons (;). The first name/value pairing is actual data string we are interested in (i.e. "sessionId=0949eeee22222rtg" or "userId=igbrown"), the subsequent name/value pairings are meta-information that we would use to manage the storage of the cookie (when it expires, etc.).	   					
+ 		   	 	   //This is basically it. We now have the cookie name (cookieName) and the cookie value (cookieValue).
+ 		   	        
+ 		    	}     		  
+ 		   }
+ 		   
+ 	       return _field;
+     }
+               
+    //ref. http://blog.leocad.io/basic-http-authentication-on-android/
+    //ref. http://simpleprogrammer.com/2011/05/25/oauth-and-rest-in-android-part-1/
+    //ref. http://jan.horneck.info/blog/androidhttpclientwithbasicauthentication
+    
+    public String[] GetHeaderFields(HttpURLConnection _httpConnection) {   
+ 	    ArrayList<String> list = new ArrayList<String>();
+ 	    
+ 	    if (_httpConnection == null) return null;
+ 	   
+ 		try {
+ 		     Map<String, List<String>> hdrs = _httpConnection.getHeaderFields();
+ 		     Set<String> hdrKeys = hdrs.keySet();
+ 		     for (String k : hdrKeys) {
+ 		    	 if (k != null) 
+ 		    	    list.add(k + "=" + hdrs.get(k)); 		    
+ 		     }   		     
+ 		} catch (Exception e) {
+ 			// TODO Auto-generated catch block
+ 			e.printStackTrace();
+ 		}
+ 		
+ 		return list.toArray(new String[list.size()]);  	   
+   }
+    
+    public void Disconnect(HttpURLConnection _httpConnection) {
+         _httpConnection.disconnect();
+    }
+    
+    public String Get(HttpURLConnection _httpConnection) {          
+      StringBuffer sb = new StringBuffer();      
+      try {
+    	      _httpConnection.setRequestMethod("GET");
+    	          	      
+              if (mAuthenticationMode == 1) {
+                  String _credentials = mUSERNAME + ":" + mPASSWORD;
+                  String _base64EncodedCredentials = Base64.encodeToString(_credentials.getBytes(), Base64.NO_WRAP);
+                  _httpConnection.setRequestProperty("Authorization", "Basic "+ _base64EncodedCredentials);
+               }
+    	      
+     	 	  for (int i = 0; i < listHeaderName.size(); i++ ) { 	      	 	      	 		         	 		  
+     	 		  _httpConnection.setRequestProperty(listHeaderName.get(i), listHeaderValue.get(i));
+  	 	      }
+     	 	  
+              /* optional request header */
+              //client3.setRequestProperty("Content-Type", "application/json");
+              /* optional request header */
+              //client3.setRequestProperty("Accept", "application/json");    	          	 	                  
+              int status = _httpConnection.getResponseCode(); 
+              mResponseCode = status;
+              
+              if (status == HttpURLConnection.HTTP_OK) {              
+                 InputStream inputStream = _httpConnection.getInputStream();
+                 BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+                 String inputLine;
+                 while ((inputLine = reader.readLine()) != null) {
+                    sb.append(inputLine);
+                 }
+                 inputStream.close();
+              }
+              else {
+            	 sb.append(String.valueOf(status));  
+              }
+            	  
+                            
+      } catch (Exception e) {
+    	      Log.e("HttpURLConnection", "Get", e);
+              return "Error";
+      }       
+      return sb.toString();
+   }
+   
+    public String Post(HttpURLConnection _httpConnection) {      
+        
+    	String response = "";
+        String Params= "";
+        mResponseCode = HttpURLConnection.HTTP_CREATED;
+        
+        try {     
+        	_httpConnection.setRequestMethod("POST");                                     
+        	_httpConnection.setDoInput(true);
+        	_httpConnection.setDoOutput(true);
+        	
+            Params = getPostDataString(ValuesForPost);            
+            _httpConnection.setFixedLengthStreamingMode(Params.getBytes().length);
+            
+            if (mAuthenticationMode == 1) {
+                String _credentials = mUSERNAME + ":" + mPASSWORD;
+                String _base64EncodedCredentials = Base64.encodeToString(_credentials.getBytes(), Base64.NO_WRAP);
+                _httpConnection.setRequestProperty("Authorization", "Basic "+ _base64EncodedCredentials);
+            }
+            
+            _httpConnection.setRequestProperty("Charset", "UTF-8");
+            _httpConnection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+        	
+   	 	    for (int i = 0; i < listHeaderName.size(); i++ ) { 	      	 	      	 		         	 		  
+ 	 		  _httpConnection.setRequestProperty(listHeaderName.get(i), listHeaderValue.get(i));
+	 	    }        	           
+   	 	    
+            OutputStream os = _httpConnection.getOutputStream();
+            BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(os, "UTF-8"));
+                        
+            writer.write(Params);
+            writer.flush();
+            writer.close();
+            
+            os.close();
+            
+            int responseCode=_httpConnection.getResponseCode();
+            mResponseCode = responseCode;
+            
+            if (responseCode == HttpURLConnection.HTTP_OK /*HttpsURLConnection.HTTP_OK*/ ) {
+                String line;
+                BufferedReader br = new BufferedReader(new InputStreamReader(_httpConnection.getInputStream()));
+                while ((line=br.readLine()) != null) {
+                    response+=line;
+                }
+            }
+            else {
+                response= String.valueOf(responseCode);
+            }
+            
+            
+        } catch (Exception e) {
+        	Log.e("HttpURLConnection", "Post", e);
+            //e.printStackTrace();
+            return "Error";
+            
+        }
+        
+        return response;
+    } 
+          
+    public int GetResponseCode() {    	
+      return mResponseCode;      
+    }
+            
+    //thanks to Renabor
+    public boolean UrlExist(String _urlString) {
+          HttpURLConnection client;          
+ 	      int status = HttpURLConnection.HTTP_NOT_FOUND; 	 
+ 	      try { 	         
+ 	         URL url = new URL(_urlString); 	         
+ 	         mUrlString = _urlString;	         
+ 	         client = (HttpURLConnection)url.openConnection(); 	          	         
+ 	         client.setRequestMethod("HEAD");
+ 	         client.setConnectTimeout(30000);
+ 	         client.setReadTimeout(30000);
+ 	         
+             if (mAuthenticationMode == 1) {
+                 String _credentials = mUSERNAME + ":" + mPASSWORD;
+                 String _base64EncodedCredentials = Base64.encodeToString(_credentials.getBytes(), Base64.NO_WRAP);
+                 client.setRequestProperty("Authorization", "Basic "+ _base64EncodedCredentials);
+              }
+             
+ 	         status = client.getResponseCode();
+ 	         mResponseCode = status;
+ 	         
+ 	      } catch (IOException e) {
+ 	         //Log.e("Error. Url not found","try 1",e);
+ 	      } finally {
+ 	         if (status == HttpURLConnection.HTTP_OK ) { return true; }
+ 	      }
+ 	      return false;          
+    }
+    
+    /*
     private Date StringToDate(String dateString) {
       //String dateString = "03/26/2012 11:49:00 AM";
       SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy hh:mm:ss aa");
@@ -13524,17 +13941,18 @@ class jHttpClient /*extends ...*/ {
       }      
       return convertedDate;
     }
+    */
     
-    public void SetCookieAttributeValue(Cookie _cookie, String _attribute,  String _value) {
+    public void SetCookieAttributeValue(HttpCookie _cookie, String _attribute,  String _value) {
 		   
-    	  BasicClientCookie stdCookie = (BasicClientCookie)_cookie;	
+    	  HttpCookie stdCookie = (HttpCookie)_cookie;	
     	  
 		  if (_attribute.equals("value")) stdCookie.setValue(_value);
 		  else if (_attribute.equals("domain")) stdCookie.setDomain(_value);
 		  else if (_attribute.equals("version")) stdCookie.setVersion(Integer.parseInt(_value));
 		  
 		  else if (_attribute.equals("expirydate")) {  
-			  stdCookie.setExpiryDate(StringToDate(_value));
+			  stdCookie.setMaxAge(Long.parseLong(_value));  //setExpiryDate(StringToDate(_value));
 		  }	  
 		  
 		  else if (_attribute.equals("path")) stdCookie.setPath(_value);
@@ -13544,23 +13962,23 @@ class jHttpClient /*extends ...*/ {
 		  //stdCookie.setPorts(new int[] {80,8080});
     }    
     
-    public String GetCookieValue(Cookie _cookie) {    
-        return _cookie.getValue();        
-    }
-
-    public String GetCookieName(Cookie _cookie) {    
+    public String GetCookieName(HttpCookie _cookie) {    
         return _cookie.getName();        
     }
     
-    public void SetCookieValue(Cookie _cookie, String _value) {    
-       ((BasicClientCookie)_cookie).setValue(_value);
-       cookieStore.addCookie(_cookie);
+    public void SetCookieValue(HttpCookie _cookie, String _value) {    
+       ((HttpCookie)_cookie).setValue(_value);
+       cookieStore = cookieManager.getCookieStore();
+       cookieStore.add(null, _cookie);     
     }
-        
-    public Cookie GetCookieByName(String _cookieName) {
-        Cookie ret = null;
-        List<Cookie> l = cookieStore.getCookies();
-        for (Cookie c : l) {
+    
+    
+    public HttpCookie GetCookieByName(String _cookieName) {
+    	HttpCookie ret = null;
+    	cookieStore = cookieManager.getCookieStore();
+    	
+        List<HttpCookie> l = cookieStore.getCookies();
+        for (HttpCookie c : l) {
             if (c.getName().equals(_cookieName)) {
                 ret = c;
                 break;
@@ -13568,13 +13986,14 @@ class jHttpClient /*extends ...*/ {
         }
         return ret;
     }
-        
-    public boolean IsExpired(Cookie _cookie) { 
-	   return _cookie.isExpired(new Date()); //true if the cookie has expired. 
+    
+    
+    public boolean IsExpired(HttpCookie _cookie) { 
+	  return _cookie.hasExpired();  //isExpired(new Date()); //true if the cookie has expired. 
 	}
 	    
-    public boolean IsCookiePersistent(Cookie _cookie) { 
- 	   return _cookie.isPersistent(); //true if the cookie is Persistent 
+    public boolean IsCookiePersistent(HttpCookie _cookie) { 
+ 	  return _cookie.getDiscard();    //isPersistent(); //true if the cookie is Discard 
  	}
 
     //-----------------------------------    
@@ -13595,123 +14014,173 @@ class jHttpClient /*extends ...*/ {
     	listHeaderValue.clear();    	    	
     }
     
-    public String GetStateful(String _url) {
- 	   
- 		String strResult = ""; 		  		
- 	    HttpGet httpget=new HttpGet(_url);
- 	    
- 	    for (int i = 0; i < listHeaderName.size(); i++ ) { 	    
- 	    	httpget.setHeader(listHeaderName.get(i), listHeaderValue.get(i));
- 	    }	
- 	     	     	    
- 		try {			 
- 			//cookieStore.clear();
- 			 HttpResponse response = client2.execute(httpget, localContext);			 
- 		     HttpEntity entity= response.getEntity();
- 		     
- 		     StatusLine statusLine = response.getStatusLine();
- 	         int statusCode = statusLine.getStatusCode();
- 	          	                  
- 	         if (statusCode == 200) {    //OK       
- 	            entity = response.getEntity();	                
- 		        if (entity != null) {
- 			    	 strResult = EntityUtils.toString(entity);
- 			    }
- 	         }			 	 	         
-	 	       
- 	         return strResult;
- 		}
- 		 
- 		catch (IOException e) {
- 			// TODO Auto-generated catch block
- 			e.printStackTrace();
- 		}		 				 
- 		return strResult; //sb.toString(); 		
+   /*
+    *Set cookies in requests
+    CookieManager cookieManager = CookieManager.getInstance();
+    String cookie = cookieManager.getCookie(urlConnection.getURL().toString());
+    if (cookie != null) {
+        urlConnection.setRequestProperty("Cookie", cookie);
     }
-      
-    public String PostStateful(String _url) throws Exception {	// Pascal: Post			
-		
- 		int statusCode = 0;		
- 		String strResult = "";
- 		
- 		HttpParams httpParams = new BasicHttpParams();
- 		int connection_Timeout = 5000;
- 		HttpConnectionParams.setConnectionTimeout(httpParams, connection_Timeout);
- 		HttpConnectionParams.setSoTimeout(httpParams, connection_Timeout);
- 		
-        if (mAuthenticationMode != 0) {    		   
-         	client2.getCredentialsProvider().setCredentials(
-                         new AuthScope(mHOSTNAME,mPORT),  // 
-                         new UsernamePasswordCredentials(mUSERNAME, mPASSWORD));
- 	    }
-         			   
- 	    HttpPost httpPost = new HttpPost(_url);
- 	    
- 	    for (int i = 0; i < listHeaderName.size(); i++ ) {
- 	    	Log.i(listHeaderName.get(i), listHeaderValue.get(i));
- 	    	httpPost.setHeader(listHeaderName.get(i), listHeaderValue.get(i));
- 	    }
- 	    
- 	    //thanks to @renabor
- 	    if (mAuthenticationMode != 0) {
-             String _credentials = mUSERNAME + ":" + mPASSWORD;
-             String _base64EncodedCredentials = Base64.encodeToString(_credentials.getBytes(), Base64.NO_WRAP);
-             httpPost.addHeader("Authorization", "Basic " + _base64EncodedCredentials);
-         }	   
- 	        
- 	    httpPost.setEntity(new UrlEncodedFormEntity(ValuesForPost2));
- 	    
- 	    //cookieStore.clear();
- 	   
- 		HttpResponse response = client2.execute(httpPost, localContext);
- 		HttpEntity entity= response.getEntity();
- 		
-	     StatusLine statusLine = response.getStatusLine();
-	     statusCode = statusLine.getStatusCode();
- 		
-         if (statusCode == 200) {    //OK       
-	            entity = response.getEntity();	                
-		        if (entity != null) {
-			    	 strResult = EntityUtils.toString(entity);
-			    }
-	     }
- 			 		
- 		return strResult; 
-   }
+    */
     
-  //thanks to @renabor
-    public String DeleteStateful(String _url, String _value) throws Exception { 			
-
-    	int statusCode = 0;
-    	String strResult = "";
-
-    	HttpParams httpParams = new BasicHttpParams();
-    	int connection_Timeout = 5000;
-    	HttpConnectionParams.setConnectionTimeout(httpParams, connection_Timeout);
-    	HttpConnectionParams.setSoTimeout(httpParams, connection_Timeout);
-
-    	HttpDelete httpDelete = new HttpDelete(_url + "/" + _value);
-
-    	if (mAuthenticationMode != 0) {
-    		String _credentials = mUSERNAME + ":" + mPASSWORD;
-    		String _base64EncodedCredentials = Base64.encodeToString(_credentials.getBytes(), Base64.NO_WRAP);
-    		httpDelete.addHeader("Authorization", "Basic " + _base64EncodedCredentials);
-    	}
-
-    	HttpResponse response = client2.execute(httpDelete, localContext);
-    	HttpEntity entity = response.getEntity();
-
-    	StatusLine statusLine = response.getStatusLine();
-    	statusCode = statusLine.getStatusCode();
-
-    	if (statusCode == 200) { //OK       
-    		entity = response.getEntity();
-    		if (entity != null) {
-    			strResult = EntityUtils.toString(entity);
-    		}
-    	}
-    	return strResult;
-    }    
+    public String GetStateful(String _url) {
+    	int status = HttpURLConnection.HTTP_NOT_FOUND;
+        StringBuffer sb = new StringBuffer();     	
+ 		String strResult = "";
+ 		mResponseCode = HttpURLConnection.HTTP_CREATED;
+ 		 	    
+ 	    try {
+ 	              URL url = new URL(_url);
+ 	              client3 = (HttpURLConnection)url.openConnection();
+ 	              client3.setRequestMethod("GET");
+ 	            
+ 	              if (mAuthenticationMode == 1) {
+  	                 String _credentials = mUSERNAME + ":" + mPASSWORD;
+  	                 String _base64EncodedCredentials = Base64.encodeToString(_credentials.getBytes(), Base64.NO_WRAP);
+  	                 client3.setRequestProperty("Authorization", "Basic "+ _base64EncodedCredentials);
+  	              }      
+ 	              
+ 	     	 	  for (int i = 0; i < listHeaderName.size(); i++ ) { 	      	 	      	 		         	 		  
+ 	     	 		client3.setRequestProperty(listHeaderName.get(i), listHeaderValue.get(i));
+ 	  	 	      }
+ 	     	 	  
+ 	              /* optional request header */
+ 	              //client3.setRequestProperty("Content-Type", "application/json");
+ 	              /* optional request header */
+ 	              //client3.setRequestProperty("Accept", "application/json");
+ 	               	     	 	  
+ 	              status = client3.getResponseCode();
+ 	              mResponseCode = status;
+ 	             
+ 	              if (status == HttpURLConnection.HTTP_OK) {
+ 	                InputStream inputStream = client3.getInputStream();
+ 	                BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+ 	                String inputLine;
+ 	                while ((inputLine = reader.readLine()) != null) {
+ 	                   sb.append(inputLine);
+ 	                }
+ 	                inputStream.close(); 	               	             
+ 	              }
+ 	              else {
+ 	            	 sb.append(String.valueOf(status)); 
+ 	              }
+ 	              
+ 	              client3.disconnect();
+ 	              
+ 	      } catch (Exception e) {
+ 	              return "";
+ 	      } 
+ 	      return sb.toString();		 		
+    }     
+   
+                
+    public String PostStateful(String urlString) throws Exception {
+        StringBuffer sb = new StringBuffer();
+        StringBuilder _postData = new StringBuilder();
+        mResponseCode = HttpURLConnection.HTTP_CREATED;
+        
+        for (Map.Entry<String,String> param : ValuesForPost.entrySet()) {
+               if (_postData.length() != 0) _postData.append('&');
+               try {
+                  _postData.append(URLEncoder.encode(param.getKey(), "UTF-8"));
+                  _postData.append('=');
+                  _postData.append(URLEncoder.encode(param.getValue(), "UTF-8"));
+               } catch(UnsupportedEncodingException e) {
+                   //Log.e("showmessage","PostStateful UnsupportedEncodingException",e);
+               }
+        }
+        
+        String postData = _postData.toString();
+        try {
+            URL url = new URL(urlString);
+            client3 = (HttpURLConnection)url.openConnection();
+            client3.setRequestMethod("POST");            
+            client3.setDoOutput(true);
+            
+            client3.setFixedLengthStreamingMode(postData.getBytes().length);  // !!!!!
+            //client3.setFixedLengthStreamingMode(postData.length());
+            
+            if (mAuthenticationMode == 1) {
+                String _credentials = mUSERNAME + ":" + mPASSWORD;
+                String _base64EncodedCredentials = Base64.encodeToString(_credentials.getBytes(), Base64.NO_WRAP);
+                client3.setRequestProperty("Authorization", "Basic "+ _base64EncodedCredentials);
+             }
+            
+            client3.setRequestProperty("Charset", "UTF-8");
+            client3.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+            
+    	 	for (int i = 0; i < listHeaderName.size(); i++ ) { 	      	 	      	 		         	 		  
+    	 		client3.setRequestProperty(listHeaderName.get(i), listHeaderValue.get(i));
+ 	 	    }
+                                    
+                                 
+            PrintWriter out = new PrintWriter(client3.getOutputStream());
+            out.print(postData);
+            out.close();
+            
+            int statusCode = client3.getResponseCode(); 
+            mResponseCode = statusCode;
+            
+            if (statusCode == HttpURLConnection.HTTP_OK) {    //OK
+            	
+            	//String statusLine = client3.getResponseMessage();            	
+                Scanner inStream = new Scanner(client3.getInputStream());
+                //process the stream and store it in StringBuilder
+                while(   inStream.hasNextLine()) sb.append(inStream.nextLine()); // response+=(inStream.nextLine());
+                
+                inStream.close();
+                
+            } else {
+                sb.append(String.valueOf(statusCode));
+            }                        
+            client3.disconnect();
+            
+        } catch (Exception e) {
+            //Log.e("showmessage","PostStateful Error",e);
+        	return "";
+        }         
+        ValuesForPost.clear();        
+        return sb.toString();
+     }
+        
+    //thanks to @renabor    
+    public String DeleteStateful(String _stringUrl, String _value) throws Exception {          
+        int statusCode = 0;
+        StringBuilder sb = new StringBuilder();
+        String statusLine;
+        mResponseCode = HttpURLConnection.HTTP_CREATED;
+        try {
+           URL url = new URL(_stringUrl + "/" + _value);
+           client3 = (HttpURLConnection)url.openConnection();
+           // renabor
+           if (mAuthenticationMode == 1) {
+              String _credentials = mUSERNAME + ":" + mPASSWORD;
+              String _base64EncodedCredentials = Base64.encodeToString(_credentials.getBytes(), Base64.NO_WRAP);
+              client3.setRequestProperty("Authorization", "Basic "+ _base64EncodedCredentials);            
+           }   
+           client3.setRequestMethod("DELETE");
+           statusCode = client3.getResponseCode();
+           mResponseCode = statusCode;
+           // statusLine = client3.getResponseMessage();
+           if (statusCode == HttpURLConnection.HTTP_OK) {    //OK
+        	   
+              Scanner inStream = new Scanner(client3.getInputStream());
+              //process the stream and store it in StringBuilder
+              while(   inStream.hasNextLine()) sb.append(inStream.nextLine()); // response+=(inStream.nextLine());
+              
+              inStream.close();
+              
+           } else {
+              sb.append(String.valueOf(statusCode));
+              // Log.i("showmessage http delete error ",String.valueOf(statusCode) +" "+ statusLine); 
+           }
+           client3.disconnect();
+        } catch (Exception e) {
+           //Log.e("showmessage","DeleteStateful Error",e);
+           return "";
+        }
+        return sb.toString(); 
+     }  
     
 	/*
 	 * AsyncTask has three generic types:
@@ -13724,68 +14193,74 @@ class jHttpClient /*extends ...*/ {
 		  
 	    @Override
 	    protected String doInBackground(String... stringUrl) {
-	    	
-	    	String _stringUrl = stringUrl[0]; 
-	    	String _name  = stringUrl[1]; 
-	    	String _value  = stringUrl[2];
-	    	
-			String strResult = "";
-			HttpEntity entity = null;
-	    	
+	        URL url;
+	        String response = "";
+	        String Params;
 			// Create a new HttpClient and Post Header
 			int statusCode = 0;						
-			HttpParams httpParams = new BasicHttpParams();
-			int connection_Timeout = 5000;
-			HttpConnectionParams.setConnectionTimeout(httpParams, connection_Timeout);
-			HttpConnectionParams.setSoTimeout(httpParams, connection_Timeout);
-			
-			DefaultHttpClient httpclient = new DefaultHttpClient();					 	   
 		    //AuthScope:
 		    //host  the host the credentials apply to. May be set to null if credenticals are applicable to any host. 
 		    //port  the port the credentials apply to. May be set to negative value if credenticals are applicable to any port.
-			try {				
-    	        if (mAuthenticationMode != 0) {    		   
-                  httpclient.getCredentialsProvider().setCredentials(
-                               new AuthScope(mHOSTNAME,mPORT),  // 
-                               new UsernamePasswordCredentials(mUSERNAME, mPASSWORD));
-    	        }
-    	        
-			    HttpPost httppost = new HttpPost(_stringUrl);
-			    
-			    //thanks to @renabor
-			    if (mAuthenticationMode != 0) {
-                    String _credentials = mUSERNAME + ":" + mPASSWORD;
-                    String _base64EncodedCredentials = Base64.encodeToString(_credentials.getBytes(), Base64.NO_WRAP);
-                    httppost.addHeader("Authorization", "Basic " + _base64EncodedCredentials);
-               }
-			    			    			    
-				// Add your data				
-			    if (!_name.equals("")) { 
-			         List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();				
-				     nameValuePairs.add(new BasicNameValuePair(_name, _value));
-				     httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
-			    }
-			    else {			    	
-			       httppost.setEntity(new UrlEncodedFormEntity(ValuesForPost2));
-			    }				
-				// Execute HTTP Post Request
-				HttpResponse response = httpclient.execute(httppost);
-				StatusLine statusLine = response.getStatusLine();  
-				statusCode = statusLine.getStatusCode();
-				
-				this.publishProgress(statusCode);	            	            
-	            strResult= "";	            
-	            if (statusCode == 200) {    //OK       
-	                entity = response.getEntity();	                
-		            if (entity != null) {
-			         	   strResult = EntityUtils.toString(entity);
-			         }
+	        try {
+	            url = new URL(stringUrl[0]);
+
+	            client3 = (HttpURLConnection) url.openConnection();
+	            mResponseCode = HttpURLConnection.HTTP_CREATED;
+	            
+	            if (mAuthenticationMode == 1) {
+	                String _credentials = mUSERNAME + ":" + mPASSWORD;
+	                String _base64EncodedCredentials = Base64.encodeToString(_credentials.getBytes(), Base64.NO_WRAP);
+	                client3.setRequestProperty("Authorization", "Basic "+ _base64EncodedCredentials);
 	            }
-				
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-			} 
-			return strResult;	
+	            
+	            client3.setReadTimeout(15000);
+	            client3.setConnectTimeout(15000);
+	            client3.setRequestMethod("POST");
+	              	    	 	
+	            client3.setDoInput(true);
+	            client3.setDoOutput(true);
+	            
+	            Params = getPostDataString(ValuesForPost);            
+	            client3.setFixedLengthStreamingMode(Params.getBytes().length); //Params.length
+	            
+	            client3.setRequestProperty("Charset", "UTF-8");
+	            client3.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+	            
+	    	 	for (int i = 0; i < listHeaderName.size(); i++ ) { 	      	 	      	 		         	 		  
+	    	 		client3.setRequestProperty(listHeaderName.get(i), listHeaderValue.get(i));
+	 	 	    }
+	         	            	            
+	            OutputStream os = client3.getOutputStream();
+	            BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(os, "UTF-8"));
+	            	    	            
+	            writer.write(Params);
+	            
+	            writer.flush();
+	            writer.close();
+	            os.close();
+	            
+	            int responseCode = client3.getResponseCode();   
+	            mResponseCode = responseCode;
+	            
+	            this.publishProgress(responseCode);	  
+	            
+	            if (responseCode == HttpURLConnection.HTTP_OK /*HttpsURLConnection.HTTP_OK*/ ) {
+	                String line;
+	                BufferedReader br=new BufferedReader(new InputStreamReader(client3.getInputStream()));
+	                while ((line=br.readLine()) != null) {
+	                    response+=line;
+	                }
+	            }
+	            else {
+	                response= String.valueOf(responseCode);
+	            }
+	            	            
+	        } catch (Exception e) {
+	            //e.printStackTrace();
+	            return "";
+	        }
+	        
+	        return response;
 	    }	    	
 	           	    
 	    @Override
@@ -13799,153 +14274,53 @@ class jHttpClient /*extends ...*/ {
 	       controls.pOnHttpClientCodeResult(pascalObj, params[0].intValue());	  	     
 	    }
 	}
-		
-	class AsyncHttpClientPostListNameValueData extends AsyncTask<String, Integer, String> {	
-		  
-	    @Override
-	    protected String doInBackground(String... stringParams) {
-			// Create a new HttpClient and Post Header
-			int statusCode = 0;
-			String strResult = "";
-			HttpEntity entity = null;	 	   
-			
-			HttpParams httpParams = new BasicHttpParams();
-			int connection_Timeout = 5000;
-			HttpConnectionParams.setConnectionTimeout(httpParams, connection_Timeout);
-			HttpConnectionParams.setSoTimeout(httpParams, connection_Timeout);
-			
-			DefaultHttpClient httpclient = new DefaultHttpClient();			 	   
-		    //AuthScope:
-		    //host  the host the credentials apply to. May be set to null if credenticals are applicable to any host. 
-		    //port  the port the credentials apply to. May be set to negative value if credenticals are applicable to any port.
-			try {
 				
-		        if (mAuthenticationMode != 0) {    		   
-	              httpclient.getCredentialsProvider().setCredentials(
-	                           new AuthScope(mHOSTNAME,mPORT),  // 
-	                           new UsernamePasswordCredentials(mUSERNAME, mPASSWORD));
-		        }
-						
-			    HttpPost httppost = new HttpPost(stringParams[0]);
-
-			    //thanks to @renabor
-			    if (mAuthenticationMode != 0) {
-                    String _credentials = mUSERNAME + ":" + mPASSWORD;
-                    String _base64EncodedCredentials = Base64.encodeToString(_credentials.getBytes(), Base64.NO_WRAP);
-                    httppost.addHeader("Authorization", "Basic " + _base64EncodedCredentials);
-                }
-			    
-				// Add your data
-				List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();						
-				StringTokenizer st = new StringTokenizer(stringParams[1], "=&"); //name1=value1&name2=value2&name3=value3 ...		
-				
-				while(st.hasMoreTokens()) { 
-				  String key = st.nextToken(); 
-				  String val = st.nextToken(); 
-				  //Log.i("name ->", key);
-				  //Log.i("value ->", val);
-				  nameValuePairs.add(new BasicNameValuePair(key, val));
-				}					
-				httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
-				// Execute HTTP Post Request
-				HttpResponse response = httpclient.execute(httppost);
-				StatusLine statusLine = response.getStatusLine();  
-				statusCode = statusLine.getStatusCode();
-				
-				this.publishProgress(statusCode);	            	            
-	            strResult= "";	            
-	            if (statusCode == 200) {    //OK       
-	                entity = response.getEntity();	                
-		            if (entity != null) {
-			         	   strResult = EntityUtils.toString(entity);
-			         }
-	            }
-	            
-				
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-			}		 
-			return strResult;	    		
-	    }	    	
-	     
-	    @Override
-	    protected void onPostExecute(String content) {
-	      controls.pOnHttpClientContentResult(pascalObj, content);
-	    }
-	    	    
-	    @Override
-	    protected void onProgressUpdate(Integer... params) {
-	       super.onProgressUpdate(params);	       
-	       controls.pOnHttpClientCodeResult(pascalObj, params[0].intValue());	  	     
-	    }	    	    
-	    
-	}
-	
 	class AsyncHttpClientGet extends AsyncTask<String,Integer,String> {	
 		  	    
 	    @Override
-	    protected String doInBackground(String... stringUrl) {
-	    	
-	        //ref. http://jan.horneck.info/blog/androidhttpclientwithbasicauthentication
-	 	   HttpEntity entity = null;	 	   
-	 	   HttpParams httpParams = new BasicHttpParams();
-	 	   int connection_Timeout = 5000;
-	 	   HttpConnectionParams.setConnectionTimeout(httpParams, connection_Timeout);
-	 	   HttpConnectionParams.setSoTimeout(httpParams, connection_Timeout);
-	 	    
-	 	    /*ref. http://blog.leocad.io/basic-http-authentication-on-android/
-	 	    String credentials = mUSERNAME + ":" + mPASSWORD;  
-	 	    String base64EncodedCredentials = Base64.encodeToString(credentials.getBytes(), Base64.NO_WRAP);  
-	 	    request.addHeader("Authorization", "Basic " + base64EncodedCredentials);
-	 	    client = new DefaultHttpClient();
-	 	   */
-	 	   
-	 	    DefaultHttpClient httpclient = new DefaultHttpClient(httpParams);
-	        String strResult="";
-	        
+	    protected String doInBackground(String... stringUrl) {	    	
+	        int status = HttpURLConnection.HTTP_NOT_FOUND;
+	        StringBuffer sb = new StringBuffer();	        	        
 	        try {
-	     	   
-	 		    //AuthScope:
-	 		    //host  the host the credentials apply to. May be set to null if credenticals are applicable to any host. 
-	 		    //port  the port the credentials apply to. May be set to negative value if credenticals are applicable to any port.
-	     	   if (mAuthenticationMode != 0) {    		   
-	               httpclient.getCredentialsProvider().setCredentials(
-	                                new AuthScope(mHOSTNAME,mPORT),  // 
-	                                new UsernamePasswordCredentials(mUSERNAME, mPASSWORD));
-	     	   }
-	     	   
-	            HttpGet httpget = new HttpGet(stringUrl[0]);
-	            
-	            //thanks to @renabor
-	            if (mAuthenticationMode != 0) {
-                    String _credentials = mUSERNAME + ":" + mPASSWORD;
-                    String _base64EncodedCredentials = Base64.encodeToString(_credentials.getBytes(), Base64.NO_WRAP);
-                    httpget.addHeader("Authorization", "Basic " + _base64EncodedCredentials);
-                }
-
-	            //System.out.println("executing request" + httpget.getRequestLine());
-	            HttpResponse response = httpclient.execute(httpget);
-	            
-	            StatusLine statusLine = response.getStatusLine();
-	            int statusCode = statusLine.getStatusCode();
-	            this.publishProgress(statusCode);	            	            
-	            strResult= "";	            
-	            if (statusCode == 200) {    //OK       
-	                entity = response.getEntity();	                
-		            if (entity != null) {
-			         	   strResult = EntityUtils.toString(entity);
-			         }
-	            }    
-	            	            	          	            
-	        } catch(Exception e){
-	        	    e.printStackTrace();
-	        }finally {
-	            // When HttpClient instance is no longer needed,
-	            // shut down the connection manager to ensure
-	            // immediate deallocation of all system resources
-	            httpclient.getConnectionManager().shutdown();
+	                URL url = new URL(stringUrl[0]);
+	                mResponseCode = HttpURLConnection.HTTP_CREATED;	                
+	                 client3 = (HttpURLConnection)url.openConnection();
+	                 client3.setRequestMethod("GET");
+	                 
+	                 if (mAuthenticationMode == 1) {
+		                    String _credentials = mUSERNAME + ":" + mPASSWORD;
+		                    String _base64EncodedCredentials = Base64.encodeToString(_credentials.getBytes(), Base64.NO_WRAP);
+		                    client3.setRequestProperty("Authorization", "Basic "+ _base64EncodedCredentials);
+		             }
+	                 
+	         	 	 for (int i = 0; i < listHeaderName.size(); i++ ) { 	      	 	      	 		         	 		  
+	        	 		client3.setRequestProperty(listHeaderName.get(i), listHeaderValue.get(i));
+	     	 	     } 
+	         	 		                
+	                 status = client3.getResponseCode();
+	                 mResponseCode = status;
+	                 
+	 	             this.publishProgress(status);
+	 	             
+	 	             if (status == HttpURLConnection.HTTP_OK) {    //OK            	
+	                   InputStream inputStream = client3.getInputStream();
+	                   BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));	                 
+	                   String inputLine;	                 	                	                 
+	                   while ((inputLine = reader.readLine()) != null) {
+	                     sb.append(inputLine);
+	                   } 	                 
+	                   inputStream.close();
+	 	             }
+	 	             else {
+	 	               sb.append(String.valueOf(status));	
+	 	             }	 	            		                	 	             
+	                 client3.disconnect();
+	                 
+	        } catch (Exception e) {
+	            return "";	           
 	        }
-	        return strResult;
+	            
+	        return sb.toString(); 
 	    }	    	
 	           	            
 	    @Override
@@ -13960,7 +14335,6 @@ class jHttpClient /*extends ...*/ {
 	    }	    	    	    
 	}
 }
-
 
 /*Draft java code by "Lazarus Android Module Wizard" [5/8/2015 20:24:14]*/
 /*https://github.com/jmpessoa/lazandroidmodulewizard*/

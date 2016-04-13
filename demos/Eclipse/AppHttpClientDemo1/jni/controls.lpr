@@ -775,7 +775,23 @@ begin
   Java_Event_pOnSeekBarStopTrackingTouch(PEnv,this,TObject(pasobj),progress);
 end;
 
-const NativeMethods:array[0..95] of JNINativeMethod = (
+{ Class:     com_example_apphttpclientdemo1_Controls
+  Method:    pOnRatingBarChanged
+  Signature: (JF)V }
+procedure pOnRatingBarChanged(PEnv: PJNIEnv; this: JObject; pasobj: JLong; rating: JFloat); cdecl;
+begin
+  Java_Event_pOnRatingBarChanged(PEnv,this,TObject(pasobj),rating);
+end;
+
+{ Class:     com_example_apphttpclientdemo1_Controls
+  Method:    pRadioGroupCheckedChanged
+  Signature: (JILjava/lang/String;)V }
+procedure pRadioGroupCheckedChanged(PEnv: PJNIEnv; this: JObject; pasobj: JLong; checkedIndex: JInt; checkedCaption: JString); cdecl;
+begin
+  Java_Event_pRadioGroupCheckedChanged(PEnv,this,TObject(pasobj),checkedIndex,checkedCaption);
+end;
+
+const NativeMethods:array[0..97] of JNINativeMethod = (
    (name:'pAppOnScreenStyle';
     signature:'()I';
     fnPtr:@pAppOnScreenStyle;),
@@ -1063,7 +1079,13 @@ const NativeMethods:array[0..95] of JNINativeMethod = (
     fnPtr:@pOnSeekBarStartTrackingTouch;),
    (name:'pOnSeekBarStopTrackingTouch';
     signature:'(JI)V';
-    fnPtr:@pOnSeekBarStopTrackingTouch;)
+    fnPtr:@pOnSeekBarStopTrackingTouch;),
+   (name:'pOnRatingBarChanged';
+    signature:'(JF)V';
+    fnPtr:@pOnRatingBarChanged;),
+   (name:'pRadioGroupCheckedChanged';
+    signature:'(JILjava/lang/String;)V';
+    fnPtr:@pRadioGroupCheckedChanged;)
 );
 
 function RegisterNativeMethodsArray(PEnv: PJNIEnv; className: PChar; methods: PJNINativeMethod; countMethods:integer):integer;
@@ -1215,7 +1237,9 @@ exports
   pOnContactManagerContactsProgress name 'Java_com_example_apphttpclientdemo1_Controls_pOnContactManagerContactsProgress',
   pOnSeekBarProgressChanged name 'Java_com_example_apphttpclientdemo1_Controls_pOnSeekBarProgressChanged',
   pOnSeekBarStartTrackingTouch name 'Java_com_example_apphttpclientdemo1_Controls_pOnSeekBarStartTrackingTouch',
-  pOnSeekBarStopTrackingTouch name 'Java_com_example_apphttpclientdemo1_Controls_pOnSeekBarStopTrackingTouch';
+  pOnSeekBarStopTrackingTouch name 'Java_com_example_apphttpclientdemo1_Controls_pOnSeekBarStopTrackingTouch',
+  pOnRatingBarChanged name 'Java_com_example_apphttpclientdemo1_Controls_pOnRatingBarChanged',
+  pRadioGroupCheckedChanged name 'Java_com_example_apphttpclientdemo1_Controls_pRadioGroupCheckedChanged';
 
 begin
   gApp:= jApp.Create(nil);{AndroidWidget.pas}
@@ -1227,4 +1251,4 @@ begin
   gApp.Initialize;
   gApp.CreateForm(TAndroidModule1, AndroidModule1);
 end.
-(*last [template] upgrade: 10/12/2015 21:23:36*)
+(*last [template] upgrade: 4/10/2016 16:15:29*)

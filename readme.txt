@@ -144,6 +144,19 @@
 	*
 	****************************************************************************************************
 
+Version 0.6 - rev. 38.6 - 12 April 2016 - 
+
+	UPDATED! jHttpClient has been updated to use HttpURLConnection [We can Target API >= 21 !!] // <<-----Thanks to @Renabor!
+
+	NEW! Added demo AppHttpClientDemo2
+
+	NEW! jListView property "FontFace" // <<---@Mladen suggestion 
+
+Version 0.6 - rev. 38.5 - 02 April 2016 - 
+
+	FIXED! jDialogProgress SetCancelable [Controls.java] // <--- thanks to @Mladen
+
+	NEW! 
 
 Version 0.6 - rev. 38.4 - 24 March 2016 - 
 

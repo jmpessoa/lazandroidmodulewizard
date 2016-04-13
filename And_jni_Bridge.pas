@@ -179,7 +179,7 @@ Procedure jEditText_setTextSize        (env:PJNIEnv; EditText : jObject; size  :
 
 Procedure jEditText_setHint            (env:PJNIEnv; EditText : jObject; Str : String);
 
-procedure jEditText_setHintTextColor(env: PJNIEnv; _jedittext: JObject; _color: integer);
+procedure jEditText_setHintTextColor(env: PJNIEnv; _jedittext: JObject; _color: DWord);
 
 Procedure jEditText_SetFocus          (env:PJNIEnv; EditText : jObject);
 
@@ -520,7 +520,9 @@ function jListView_GetItemCaption(env: PJNIEnv; _jlistview: JObject): string;
 procedure jListView_SetDispatchOnDrawItemTextColor(env: PJNIEnv; _jlistview: JObject; _value: boolean);
 procedure jListView_DispatchOnDrawItemBitmap(env: PJNIEnv; _jlistview: JObject; _value: boolean);
 
-procedure jListView_SetFontSizeUnit(env: PJNIEnv; _jlistview: JObject; _unit: integer);
+procedure jListView_SetFontSizeUnit(env: PJNIEnv; _jlistview: JObject; _unit: integer);   //--here
+
+procedure jListView_SetFontFace(env: PJNIEnv; _jlistview: jObject; FontFace: DWord);
 
 
 // ScrollView
@@ -984,7 +986,7 @@ procedure jHttpClient_jFree(env: PJNIEnv; _jhttpclient: JObject);
 procedure jHTTPClient_SetCharSet(env: PJNIEnv; _jHTTPClient: JObject; _CharSet: string);
 procedure jHttpClient_GetAsync(env: PJNIEnv; _jhttpclient: JObject; _stringUrl: string);
 
-function jHTTPClient_Get2(env: PJNIEnv; _jHTTPClient: JObject; _Link: string): string;
+function jHTTPClient_Get(env: PJNIEnv; _jHTTPClient: JObject; _Link: string): string; overload;
 
 procedure jHttpClient_SetAuthenticationUser(env: PJNIEnv; _jhttpclient: JObject; _userName: string; _password: string);
 procedure jHttpClient_SetAuthenticationMode(env: PJNIEnv; _jhttpclient: JObject; _authenticationMode: integer);
@@ -996,14 +998,15 @@ procedure jHttpClient_PostNameValueDataAsync(env: PJNIEnv; _jhttpclient: JObject
 
 procedure jHTTPClient_ClearPost2Values(env: PJNIEnv; _jHTTPClient: JObject);
 procedure jHTTPClient_AddValueForPost2(env: PJNIEnv; _jHTTPClient: JObject; _name, _value: string);
-function jHTTPClient_Post2(env: PJNIEnv; _jHTTPClient: JObject; _Link: string): string;
+function jHTTPClient_Post(env: PJNIEnv; _jHTTPClient: JObject; _Link: string): string; overload;
 
-function jHttpClient_GetCookies(env: PJNIEnv; _jhttpclient: JObject; _url: string; _nameValueSeparator: string): TDynArrayOfString; overload;
+function jHttpClient_GetCookies(env: PJNIEnv; _jhttpclient: JObject;  _nameValueSeparator: string): TDynArrayOfString; overload;
 function jHttpClient_GetCookiesCount(env: PJNIEnv; _jhttpclient: JObject): integer;
+
 function jHttpClient_GetCookieByIndex(env: PJNIEnv; _jhttpclient: JObject; _index: integer): jObject;
 function jHttpClient_GetCookieAttributeValue(env: PJNIEnv; _jhttpclient: JObject; _cookie: jObject; _attribute: string): string;
 procedure jHttpClient_ClearCookieStore(env: PJNIEnv; _jhttpclient: JObject);
-function jHttpClient_AddCookie(env: PJNIEnv; _jhttpclient: JObject; _name: string; _value: string): jObject;
+function jHttpClient_AddCookie(env: PJNIEnv; _jhttpclient: JObject; _name: string; _value: string): jObject;  overload;
 function jHttpClient_IsExpired(env: PJNIEnv; _jhttpclient: JObject; _cookie: jObject): boolean;
 function jHttpClient_GetStateful(env: PJNIEnv; _jhttpclient: JObject; _url: string): string;
 function jHttpClient_PostStateful(env: PJNIEnv; _jhttpclient: JObject; _url: string): string;
@@ -1013,14 +1016,28 @@ function jHttpClient_GetCookieByName(env: PJNIEnv; _jhttpclient: JObject; _cooki
 procedure jHttpClient_SetCookieAttributeValue(env: PJNIEnv; _jhttpclient: JObject; _cookie: jObject; _attribute: string; _value: string);
 function jHttpClient_GetCookieValue(env: PJNIEnv; _jhttpclient: JObject; _cookie: jObject): string;
 function jHttpClient_GetCookieName(env: PJNIEnv; _jhttpclient: JObject; _cookie: jObject): string;
-function jHttpClient_GetCookies(env: PJNIEnv; _jhttpclient: JObject; _nameValueSeparator: string): TDynArrayOfString; overload;
+
+
 procedure jHttpClient_AddClientHeader(env: PJNIEnv; _jhttpclient: JObject; _name: string; _value: string);
 procedure jHttpClient_ClearClientHeader(env: PJNIEnv; _jhttpclient: JObject; _name: string; _value: string);
 function jHttpClient_DeleteStateful(env: PJNIEnv; _jhttpclient: JObject; _url, _value: string): string;
 
+function jHttpClient_UrlExist(env: PJNIEnv; _jhttpclient: JObject; _urlString: string): boolean;
 
+function jHttpClient_GetCookies(env: PJNIEnv; _jhttpclient: JObject; _urlString: string; _nameValueSeparator: string): TDynArrayOfString; overload;
+function jHttpClient_AddCookie(env: PJNIEnv; _jhttpclient: JObject; _urlString: string; _name: string; _value: string): jObject;  overload;
 
-
+function jHttpClient_OpenConnection(env: PJNIEnv; _jhttpclient: JObject; _urlString: string): jObject;
+function jHttpClient_SetRequestProperty(env: PJNIEnv; _jhttpclient: JObject; _httpConnection: jObject; _headerName: string; _headerValue: string): jObject;
+//function jHttpClient_Connect(env: PJNIEnv; _jhttpclient: JObject; _httpConnection: jObject): jObject;
+function jHttpClient_GetHeaderField(env: PJNIEnv; _jhttpclient: JObject; _httpConnection: jObject; _headerName: string): string;
+function jHttpClient_GetHeaderFields(env: PJNIEnv; _jhttpclient: JObject; _httpConnection: jObject): TDynArrayOfString;
+procedure jHttpClient_Disconnect(env: PJNIEnv; _jhttpclient: JObject; _httpConnection: jObject);
+function jHttpClient_Get(env: PJNIEnv; _jhttpclient: JObject; _httpConnection: jObject): string; overload;
+function jHttpClient_AddRequestProperty(env: PJNIEnv; _jhttpclient: JObject; _httpConnection: jObject; _headerName: string; _headerValue: string): jObject;
+function jHttpClient_Post(env: PJNIEnv; _jhttpclient: JObject; _httpConnection: jObject): string; overload;
+function jHttpClient_GetResponseCode(env: PJNIEnv; _jhttpclient: JObject): integer;
+function jHttpClient_GetDefaultConnection(env: PJNIEnv; _jhttpclient: JObject): jObject;
 
 //by jmpessoa
 procedure jSend_Email(env:PJNIEnv; this:jobject;
@@ -1763,7 +1780,7 @@ begin
  env^.DeleteLocalRef(env, cls);
 end;
 
-procedure jEditText_setHintTextColor(env: PJNIEnv; _jedittext: JObject; _color: integer);
+procedure jEditText_setHintTextColor(env: PJNIEnv; _jedittext: JObject; _color: DWord);
 var
   jParams: array[0..0] of jValue;
   jMethod: jMethodID=nil;
@@ -4315,6 +4332,19 @@ begin
   jMethod:= env^.GetMethodID(env, jCls, 'SetFontSizeUnit', '(I)V');
   env^.CallVoidMethodA(env, _jlistview, jMethod, @jParams);
   env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jListView_SetFontFace(env: PJNIEnv; _jlistview: jObject; FontFace: DWord);
+var
+  _jMethod : jMethodID = nil;
+  _jParams : array[0..0] of jValue;
+  cls: jClass;
+begin
+  _jParams[0].i := FontFace;
+  cls := env^.GetObjectClass(env, _jlistview);
+  _jMethod:= env^.GetMethodID(env, cls, 'SetFontFace', '(I)V');
+  env^.CallVoidMethodA(env,_jlistview,_jMethod,@_jParams);
+  env^.DeleteLocalRef(env, cls);
 end;
 
 //------------------------------------------------------------------------------
@@ -7645,7 +7675,7 @@ begin
   env^.DeleteLocalRef(env, jCls);
 end;
 
-function jHTTPClient_Get2(env: PJNIEnv; _jHTTPClient: JObject; _Link: string): string;
+function jHTTPClient_Get(env: PJNIEnv; _jHTTPClient: JObject; _Link: string): string;
   var
   jParams: array[0..0] of jValue;
   jMethod: jMethodID = nil;
@@ -7655,7 +7685,7 @@ function jHTTPClient_Get2(env: PJNIEnv; _jHTTPClient: JObject; _Link: string): s
 begin
   jParams[0].l := env^.NewStringUTF(env, PChar(_Link));
   jCls := env^.GetObjectClass(env, _jHTTPClient);
-  jMethod := env^.GetMethodID(env, jCls, 'Get2', '(Ljava/lang/String;)Ljava/lang/String;');
+  jMethod := env^.GetMethodID(env, jCls, 'Get', '(Ljava/lang/String;)Ljava/lang/String;');
   jStr := env^.CallObjectMethodA(env, _jHTTPClient, jMethod, @jParams);
   case jStr = nil of
     True: Result := '';
@@ -7788,7 +7818,7 @@ begin
   env^.DeleteLocalRef(env, jCls);
 end;
 
-function jHTTPClient_Post2(env: PJNIEnv; _jHTTPClient: JObject; _Link: string): string;
+function jHTTPClient_Post(env: PJNIEnv; _jHTTPClient: JObject; _Link: string): string;
   var
   jParams: array[0..0] of jValue;
   jMethod: jMethodID = nil;
@@ -7798,7 +7828,7 @@ function jHTTPClient_Post2(env: PJNIEnv; _jHTTPClient: JObject; _Link: string): 
 begin
   jParams[0].l := env^.NewStringUTF(env, PChar(_Link));
   jCls := env^.GetObjectClass(env, _jHTTPClient);
-  jMethod := env^.GetMethodID(env, jCls, 'Post2', '(Ljava/lang/String;)Ljava/lang/String;');
+  jMethod := env^.GetMethodID(env, jCls, 'Post', '(Ljava/lang/String;)Ljava/lang/String;');
   jStr := env^.CallObjectMethodA(env, _jHTTPClient, jMethod, @jParams);
   case jStr = nil of
     True: Result := '';
@@ -7811,44 +7841,6 @@ begin
   env^.DeleteLocalRef(env, jParams[0].l);
   env^.DeleteLocalRef(env, jCls);
 end;
-
-function jHttpClient_GetCookies(env: PJNIEnv; _jhttpclient: JObject; _url: string; _nameValueSeparator: string): TDynArrayOfString;
-var
-  jStr: JString;
-  jBoo: JBoolean;
-  resultSize: integer;
-  jResultArray: jObject;
-  jParams: array[0..1] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-  i: integer;
-begin
-  jParams[0].l:= env^.NewStringUTF(env, PChar(_url));
-  jParams[1].l:= env^.NewStringUTF(env, PChar(_nameValueSeparator));
-  jCls:= env^.GetObjectClass(env, _jhttpclient);
-  jMethod:= env^.GetMethodID(env, jCls, 'GetCookies', '(Ljava/lang/String;Ljava/lang/String;)[Ljava/lang/String;');
-  jResultArray:= env^.CallObjectMethodA(env, _jhttpclient, jMethod,  @jParams);
-  if jResultArray <> nil then
-  begin
-    resultSize:= env^.GetArrayLength(env, jResultArray);
-    SetLength(Result, resultSize);
-    for i:= 0 to resultsize - 1 do
-    begin
-      jStr:= env^.GetObjectArrayElement(env, jresultArray, i);
-      case jStr = nil of
-         True : Result[i]:= '';
-         False: begin
-                  jBoo:= JNI_False;
-                  Result[i]:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
-                end;
-      end;
-    end;
-  end;
-env^.DeleteLocalRef(env,jParams[0].l);
-  env^.DeleteLocalRef(env,jParams[1].l);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
 
 function jHttpClient_GetCookiesCount(env: PJNIEnv; _jhttpclient: JObject): integer;
 var
@@ -7870,7 +7862,7 @@ var
 begin
   jParams[0].i:= _index;
   jCls:= env^.GetObjectClass(env, _jhttpclient);
-  jMethod:= env^.GetMethodID(env, jCls, 'GetCookieByIndex', '(I)Lorg/apache/http/cookie/Cookie;');
+  jMethod:= env^.GetMethodID(env, jCls, 'GetCookieByIndex', '(I)Ljava/net/HttpCookie;');
   Result:= env^.CallObjectMethodA(env, _jhttpclient, jMethod, @jParams);
   env^.DeleteLocalRef(env, jCls);
 end;
@@ -7886,7 +7878,7 @@ begin
   jParams[0].l:= _cookie;
   jParams[1].l:= env^.NewStringUTF(env, PChar(_attribute));
   jCls:= env^.GetObjectClass(env, _jhttpclient);
-  jMethod:= env^.GetMethodID(env, jCls, 'GetCookieAttributeValue', '(Lorg/apache/http/cookie/Cookie;Ljava/lang/String;)Ljava/lang/String;');
+  jMethod:= env^.GetMethodID(env, jCls, 'GetCookieAttributeValue', '(Ljava/net/HttpCookie;Ljava/lang/String;)Ljava/lang/String;');
   jStr:= env^.CallObjectMethodA(env, _jhttpclient, jMethod, @jParams);
   case jStr = nil of
      True : Result:= '';
@@ -7922,15 +7914,12 @@ begin
   jParams[0].l:= env^.NewStringUTF(env, PChar(_name));
   jParams[1].l:= env^.NewStringUTF(env, PChar(_value));
   jCls:= env^.GetObjectClass(env, _jhttpclient);
-  jMethod:= env^.GetMethodID(env, jCls, 'AddCookie', '(Ljava/lang/String;Ljava/lang/String;)Lorg/apache/http/cookie/Cookie;');
+  jMethod:= env^.GetMethodID(env, jCls, 'AddCookie', '(Ljava/lang/String;Ljava/lang/String;)Ljava/net/HttpCookie;');
   Result:= env^.CallObjectMethodA(env, _jhttpclient, jMethod, @jParams);
   env^.DeleteLocalRef(env,jParams[0].l);
   env^.DeleteLocalRef(env,jParams[1].l);
   env^.DeleteLocalRef(env, jCls);
 end;
-
-
-
 
 function jHttpClient_IsExpired(env: PJNIEnv; _jhttpclient: JObject; _cookie: jObject): boolean;
 var
@@ -7941,7 +7930,7 @@ var
 begin
   jParams[0].l:= _cookie;
   jCls:= env^.GetObjectClass(env, _jhttpclient);
-  jMethod:= env^.GetMethodID(env, jCls, 'IsExpired', '(Lorg/apache/http/cookie/Cookie;)Z');
+  jMethod:= env^.GetMethodID(env, jCls, 'IsExpired', '(Ljava/net/HttpCookie;)Z');
   jBoo:= env^.CallBooleanMethodA(env, _jhttpclient, jMethod, @jParams);
   Result:= boolean(jBoo);
   env^.DeleteLocalRef(env, jCls);
@@ -8003,7 +7992,7 @@ var
 begin
   jParams[0].l:= _cookie;
   jCls:= env^.GetObjectClass(env, _jhttpclient);
-  jMethod:= env^.GetMethodID(env, jCls, 'IsCookiePersistent', '(Lorg/apache/http/cookie/Cookie;)Z');
+  jMethod:= env^.GetMethodID(env, jCls, 'IsCookiePersistent', '(Ljava/net/HttpCookie;)Z');
   jBoo:= env^.CallBooleanMethodA(env, _jhttpclient, jMethod, @jParams);
   Result:= boolean(jBoo);
   env^.DeleteLocalRef(env, jCls);
@@ -8019,7 +8008,7 @@ begin
   jParams[0].l:= _cookie;
   jParams[1].l:= env^.NewStringUTF(env, PChar(_value));
   jCls:= env^.GetObjectClass(env, _jhttpclient);
-  jMethod:= env^.GetMethodID(env, jCls, 'SetCookieValue', '(Lorg/apache/http/cookie/Cookie;Ljava/lang/String;)V');
+  jMethod:= env^.GetMethodID(env, jCls, 'SetCookieValue', '(Ljava/net/HttpCookie;Ljava/lang/String;)V');
   env^.CallVoidMethodA(env, _jhttpclient, jMethod, @jParams);
 env^.DeleteLocalRef(env,jParams[1].l);
   env^.DeleteLocalRef(env, jCls);
@@ -8034,7 +8023,7 @@ var
 begin
   jParams[0].l:= env^.NewStringUTF(env, PChar(_cookieName));
   jCls:= env^.GetObjectClass(env, _jhttpclient);
-  jMethod:= env^.GetMethodID(env, jCls, 'GetCookieByName', '(Ljava/lang/String;)Lorg/apache/http/cookie/Cookie;');
+  jMethod:= env^.GetMethodID(env, jCls, 'GetCookieByName', '(Ljava/lang/String;)Ljava/net/HttpCookie;');
   Result:= env^.CallObjectMethodA(env, _jhttpclient, jMethod, @jParams);
 env^.DeleteLocalRef(env,jParams[0].l);
   env^.DeleteLocalRef(env, jCls);
@@ -8050,7 +8039,7 @@ begin
   jParams[1].l:= env^.NewStringUTF(env, PChar(_attribute));
   jParams[2].l:= env^.NewStringUTF(env, PChar(_value));
   jCls:= env^.GetObjectClass(env, _jhttpclient);
-  jMethod:= env^.GetMethodID(env, jCls, 'SetCookieAttributeValue', '(Lorg/apache/http/cookie/Cookie;Ljava/lang/String;Ljava/lang/String;)V');
+  jMethod:= env^.GetMethodID(env, jCls, 'SetCookieAttributeValue', '(Ljava/net/HttpCookie;Ljava/lang/String;Ljava/lang/String;)V');
   env^.CallVoidMethodA(env, _jhttpclient, jMethod, @jParams);
 env^.DeleteLocalRef(env,jParams[1].l);
   env^.DeleteLocalRef(env,jParams[2].l);
@@ -8068,7 +8057,7 @@ var
 begin
   jParams[0].l:= _cookie;
   jCls:= env^.GetObjectClass(env, _jhttpclient);
-  jMethod:= env^.GetMethodID(env, jCls, 'GetCookieValue', '(Lorg/apache/http/cookie/Cookie;)Ljava/lang/String;');
+  jMethod:= env^.GetMethodID(env, jCls, 'GetCookieValue', '(Ljava/net/HttpCookie;)Ljava/lang/String;');
   jStr:= env^.CallObjectMethodA(env, _jhttpclient, jMethod, @jParams);
   case jStr = nil of
      True : Result:= '';
@@ -8090,7 +8079,7 @@ var
 begin
   jParams[0].l:= _cookie;
   jCls:= env^.GetObjectClass(env, _jhttpclient);
-  jMethod:= env^.GetMethodID(env, jCls, 'GetCookieName', '(Lorg/apache/http/cookie/Cookie;)Ljava/lang/String;');
+  jMethod:= env^.GetMethodID(env, jCls, 'GetCookieName', '(Ljava/net/HttpCookie;)Ljava/lang/String;');
   jStr:= env^.CallObjectMethodA(env, _jhttpclient, jMethod, @jParams);
   case jStr = nil of
      True : Result:= '';
@@ -8193,6 +8182,282 @@ begin
   end;
   env^.DeleteLocalRef(env,jParams[0].l);
   env^.DeleteLocalRef(env,jParams[1].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+function jHttpClient_UrlExist(env: PJNIEnv; _jhttpclient: JObject; _urlString: string): boolean;
+var
+  jBoo: JBoolean;
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_urlString));
+  jCls:= env^.GetObjectClass(env, _jhttpclient);
+  jMethod:= env^.GetMethodID(env, jCls, 'UrlExist', '(Ljava/lang/String;)Z');
+  jBoo:= env^.CallBooleanMethodA(env, _jhttpclient, jMethod, @jParams);
+  Result:= boolean(jBoo);
+env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+function jHttpClient_GetCookies(env: PJNIEnv; _jhttpclient: JObject; _urlString: string; _nameValueSeparator: string): TDynArrayOfString;
+var
+  jStr: JString;
+  jBoo: JBoolean;
+  resultSize: integer;
+  jResultArray: jObject;
+  jParams: array[0..1] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+  i: integer;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_urlString));
+  jParams[1].l:= env^.NewStringUTF(env, PChar(_nameValueSeparator));
+  jCls:= env^.GetObjectClass(env, _jhttpclient);
+  jMethod:= env^.GetMethodID(env, jCls, 'GetCookies', '(Ljava/lang/String;Ljava/lang/String;)[Ljava/lang/String;');
+  jResultArray:= env^.CallObjectMethodA(env, _jhttpclient, jMethod,  @jParams);
+  if jResultArray <> nil then
+  begin
+    resultSize:= env^.GetArrayLength(env, jResultArray);
+    SetLength(Result, resultSize);
+    for i:= 0 to resultsize - 1 do
+    begin
+      jStr:= env^.GetObjectArrayElement(env, jresultArray, i);
+      case jStr = nil of
+         True : Result[i]:= '';
+         False: begin
+                  jBoo:= JNI_False;
+                  Result[i]:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
+                end;
+      end;
+    end;
+  end;
+env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env,jParams[1].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+function jHttpClient_AddCookie(env: PJNIEnv; _jhttpclient: JObject; _urlString: string; _name: string; _value: string): jObject;
+var
+  jParams: array[0..2] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_urlString));
+  jParams[1].l:= env^.NewStringUTF(env, PChar(_name));
+  jParams[2].l:= env^.NewStringUTF(env, PChar(_value));
+  jCls:= env^.GetObjectClass(env, _jhttpclient);
+  jMethod:= env^.GetMethodID(env, jCls, 'AddCookie', '(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Ljava/net/HttpCookie;');
+  Result:= env^.CallObjectMethodA(env, _jhttpclient, jMethod, @jParams);
+env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env,jParams[1].l);
+  env^.DeleteLocalRef(env,jParams[2].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+function jHttpClient_OpenConnection(env: PJNIEnv; _jhttpclient: JObject; _urlString: string): jObject;
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_urlString));
+  jCls:= env^.GetObjectClass(env, _jhttpclient);
+  jMethod:= env^.GetMethodID(env, jCls, 'OpenConnection', '(Ljava/lang/String;)Ljava/net/HttpURLConnection;');
+  Result:= env^.CallObjectMethodA(env, _jhttpclient, jMethod, @jParams);
+env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+
+function jHttpClient_SetRequestProperty(env: PJNIEnv; _jhttpclient: JObject; _httpConnection: jObject; _headerName: string; _headerValue: string): jObject;
+var
+  jParams: array[0..2] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= _httpConnection;
+  jParams[1].l:= env^.NewStringUTF(env, PChar(_headerName));
+  jParams[2].l:= env^.NewStringUTF(env, PChar(_headerValue));
+  jCls:= env^.GetObjectClass(env, _jhttpclient);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetRequestProperty', '(Ljava/net/HttpURLConnection;Ljava/lang/String;Ljava/lang/String;)Ljava/net/HttpURLConnection;');
+  Result:= env^.CallObjectMethodA(env, _jhttpclient, jMethod, @jParams);
+  env^.DeleteLocalRef(env,jParams[1].l);
+  env^.DeleteLocalRef(env,jParams[2].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+(*
+function jHttpClient_Connect(env: PJNIEnv; _jhttpclient: JObject; _httpConnection: jObject): jObject;
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= _httpConnection;
+  jCls:= env^.GetObjectClass(env, _jhttpclient);
+  jMethod:= env^.GetMethodID(env, jCls, 'Connect', '(Ljava/net/HttpURLConnection;)Ljava/net/HttpURLConnection;');
+  Result:= env^.CallObjectMethodA(env, _jhttpclient, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+*)
+
+function jHttpClient_GetHeaderField(env: PJNIEnv; _jhttpclient: JObject; _httpConnection: jObject; _headerName: string): string;
+var
+  jStr: JString;
+  jBoo: JBoolean;
+  jParams: array[0..1] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= _httpConnection;
+  jParams[1].l:= env^.NewStringUTF(env, PChar(_headerName));
+  jCls:= env^.GetObjectClass(env, _jhttpclient);
+  jMethod:= env^.GetMethodID(env, jCls, 'GetHeaderField', '(Ljava/net/HttpURLConnection;Ljava/lang/String;)Ljava/lang/String;');
+  jStr:= env^.CallObjectMethodA(env, _jhttpclient, jMethod, @jParams);
+  case jStr = nil of
+     True : Result:= '';
+     False: begin
+              jBoo:= JNI_False;
+              Result:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
+            end;
+  end;
+env^.DeleteLocalRef(env,jParams[1].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+function jHttpClient_GetHeaderFields(env: PJNIEnv; _jhttpclient: JObject; _httpConnection: jObject): TDynArrayOfString;
+var
+  jStr: JString;
+  jBoo: JBoolean;
+  resultSize: integer;
+  jResultArray: jObject;
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+  i: integer;
+begin
+  jParams[0].l:= _httpConnection;
+  jCls:= env^.GetObjectClass(env, _jhttpclient);
+  jMethod:= env^.GetMethodID(env, jCls, 'GetHeaderFields', '(Ljava/net/HttpURLConnection;)[Ljava/lang/String;');
+  jResultArray:= env^.CallObjectMethodA(env, _jhttpclient, jMethod,  @jParams);
+  if jResultArray <> nil then
+  begin
+    resultSize:= env^.GetArrayLength(env, jResultArray);
+    SetLength(Result, resultSize);
+    for i:= 0 to resultsize - 1 do
+    begin
+      jStr:= env^.GetObjectArrayElement(env, jresultArray, i);
+      case jStr = nil of
+         True : Result[i]:= '';
+         False: begin
+                  jBoo:= JNI_False;
+                  Result[i]:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
+                end;
+      end;
+    end;
+  end;
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+
+procedure jHttpClient_Disconnect(env: PJNIEnv; _jhttpclient: JObject; _httpConnection: jObject);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= _httpConnection;
+  jCls:= env^.GetObjectClass(env, _jhttpclient);
+  jMethod:= env^.GetMethodID(env, jCls, 'Disconnect', '(Ljava/net/HttpURLConnection;)V');
+  env^.CallVoidMethodA(env, _jhttpclient, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+
+function jHttpClient_Get(env: PJNIEnv; _jhttpclient: JObject; _httpConnection: jObject): string;
+var
+  jStr: JString;
+  jBoo: JBoolean;
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= _httpConnection;
+  jCls:= env^.GetObjectClass(env, _jhttpclient);
+  jMethod:= env^.GetMethodID(env, jCls, 'Get', '(Ljava/net/HttpURLConnection;)Ljava/lang/String;');
+  jStr:= env^.CallObjectMethodA(env, _jhttpclient, jMethod, @jParams);
+  case jStr = nil of
+     True : Result:= '';
+     False: begin
+              jBoo:= JNI_False;
+              Result:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
+            end;
+  end;
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+function jHttpClient_AddRequestProperty(env: PJNIEnv; _jhttpclient: JObject; _httpConnection: jObject; _headerName: string; _headerValue: string): jObject;
+var
+  jParams: array[0..2] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= _httpConnection;
+  jParams[1].l:= env^.NewStringUTF(env, PChar(_headerName));
+  jParams[2].l:= env^.NewStringUTF(env, PChar(_headerValue));
+  jCls:= env^.GetObjectClass(env, _jhttpclient);
+  jMethod:= env^.GetMethodID(env, jCls, 'AddRequestProperty', '(Ljava/net/HttpURLConnection;Ljava/lang/String;Ljava/lang/String;)Ljava/net/HttpURLConnection;');
+  Result:= env^.CallObjectMethodA(env, _jhttpclient, jMethod, @jParams);
+  env^.DeleteLocalRef(env,jParams[1].l);
+  env^.DeleteLocalRef(env,jParams[2].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+function jHttpClient_Post(env: PJNIEnv; _jhttpclient: JObject; _httpConnection: jObject): string;
+var
+  jStr: JString;
+  jBoo: JBoolean;
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= _httpConnection;
+  jCls:= env^.GetObjectClass(env, _jhttpclient);
+  jMethod:= env^.GetMethodID(env, jCls, 'Post', '(Ljava/net/HttpURLConnection;)Ljava/lang/String;');
+  jStr:= env^.CallObjectMethodA(env, _jhttpclient, jMethod, @jParams);
+  case jStr = nil of
+     True : Result:= '';
+     False: begin
+              jBoo:= JNI_False;
+              Result:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
+            end;
+  end;
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+
+function jHttpClient_GetResponseCode(env: PJNIEnv; _jhttpclient: JObject): integer;
+var
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jhttpclient);
+  jMethod:= env^.GetMethodID(env, jCls, 'GetResponseCode', '()I');
+  Result:= env^.CallIntMethod(env, _jhttpclient, jMethod);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+
+function jHttpClient_GetDefaultConnection(env: PJNIEnv; _jhttpclient: JObject): jObject;
+var
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jhttpclient);
+  jMethod:= env^.GetMethodID(env, jCls, 'GetDefaultConnection', '()Ljava/net/HttpURLConnection;');
+  Result:= env^.CallObjectMethod(env, _jhttpclient, jMethod);
   env^.DeleteLocalRef(env, jCls);
 end;
 

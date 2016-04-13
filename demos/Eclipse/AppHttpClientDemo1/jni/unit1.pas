@@ -62,28 +62,28 @@ begin
   //jHttpClient1.SetAuthenticationUser('jmpessoa', '123456');       //ok!
   //jHttpClient1.SetAuthenticationMode(autBasic);                   //ok!
 
-  //Non-blocking !
+  //Non-blocking ! handled by:  OnCodeResult and OnContentResult
   jHttpClient1.GetAsync(jEditText1.Text);    //get [Async]  content  ... http://cartoonforyou.forumvi.com/h1-page
 
-  jWebView1.Navigate('http://www.freepascal.org');  // view page ... http://cartoonforyou.forumvi.com/h1-page
+  //ry:
+  //jWebView1.Navigate('http://www.freepascal.org');
 
 end;
 
 procedure TAndroidModule1.jButton2Click(Sender: TObject);
 begin
-  ShowMessage('Please,  configure to real location ...');
-  (*
-  //Non-blocking !
-  jHttpClient1.PostNameValueDataAsync('http:\\localhost\myphpcode.php', 'name','paul');     //ok
+  //ShowMessage('Please,  configure to real location ...');
+
+  jHttpClient1.ClearNameValueData;
+  jHttpClient1.AddNameValueData('param1', '4');
+  jHttpClient1.AddNameValueData('param2', '6');
+
+  //Non-blocking! handled by:  OnCodeResult and OnContentResult
+  jHttpClient1.PostNameValueDataAsync('http://ave.bolyartech.com/params.php');
 
   //or
-  jHttpClient1.PostNameValueDataAsync('http:\\localhost\myphpcode.php', 'name=paul&city=bsb'); //ok
+  //jHttpClient1.PostNameValueDataAsync('http://ave.bolyartech.com/params.php', 'param1=4&param2=6'); //ok
 
-  //or
-  jHttpClient1.AddNameValueData('name','paul');
-  jHttpClient1.AddNameValueData('city','bsb');
-  jHttpClient1.PostNameValueDataAsync('http:\\localhost\myphpcode.php');
-  *)
 end;
 
 procedure TAndroidModule1.jButton3Click(Sender: TObject);
@@ -94,25 +94,34 @@ begin
 
   //blocking
   content:= jHttpClient1.Get('http://cartoonforyou.forumvi.com/h1-page');
+
+  jEditText2.Clear;
+  jEditText2.AppendLn('------Blocking Content Result: ');
   jEditText2.Append(content);
 end;
 
 procedure TAndroidModule1.jButton4Click(Sender: TObject);
+var
+   responseSum: string;
 begin
-    ShowMessage('Please,  configure the code to real location ...');
-  (*
+
+    jHttpClient1.ClearNameValueData;
+    jHttpClient1.AddNameValueData('param1', '4');
+    jHttpClient1.AddNameValueData('param2', '6');
+
     //blocking
-    jHttpClient1.AddNameValueData('name','paul');
-    jHttpClient1.AddNameValueData('city','bsb');
-    jHttpClient1.Post('http:\\localhost\myphpcode.php');
-  *)
+    responseSum:=jHttpClient1.Post('http://ave.bolyartech.com/params.php');
+
+    jEditText2.Clear;
+    jEditText2.AppendLn('------Blocking Content Result: ');
+    jEditText2.AppendLn(responseSum);
+
 end;
 
 procedure TAndroidModule1.jHttpClient1CodeResult(Sender: TObject; code: integer);
 begin
-   jEditText2.AppendLn('--------------------------------');
-   jEditText2.AppendLn('Code Result = '+ IntToStr(code));
-   //ShowMessage(IntToStr(code));
+   jEditText2.Clear;
+   jEditText2.AppendLn('------Asyn Code Result: '+IntToStr(code) );
 end;
 
 procedure TAndroidModule1.jHttpClient1ContentResult(Sender: TObject; content: string);
@@ -121,10 +130,10 @@ var
   txtContent: String;
   ok: boolean;
 begin
+   jEditText2.AppendLn('------Asyn Content Result:');
+   jEditText2.AppendLn(content);
 
-  jEditText2.Clear;
-  jEditText2.AppendLn(content);
-
+  (*
   //save to device folder Download...   you can try others folders
   list:= TStringList.Create;
   list.Text:= content;
@@ -142,6 +151,7 @@ begin
 
    if ok then ShowMessage('copied !!') else  ShowMessage('copy  fail!')
    }
+    *)
 
 end;
 

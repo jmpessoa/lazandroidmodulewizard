@@ -17,14 +17,13 @@ type
     jButton1: jButton;
     jButton2: jButton;
     jButton3: jButton;
-    jButton4: jButton;
     jEditText1: jEditText;
     jHttpClient1: jHttpClient;
     jTextView1: jTextView;
+    procedure AndroidModule1JNIPrompt(Sender: TObject);
     procedure jButton1Click(Sender: TObject);
     procedure jButton2Click(Sender: TObject);
     procedure jButton3Click(Sender: TObject);
-    procedure jButton4Click(Sender: TObject);
 
   private
     {private declarations}
@@ -45,11 +44,16 @@ procedure TAndroidModule1.jButton1Click(Sender: TObject);
 var
   cookies: TDynArrayOfString;
   count, i: integer;
+  content: string;
 begin
   jEditText1.Clear;
 
   jHttpClient1.ClearCookieStore();
-  jEditText1.AppendLn(jHttpClient1.GetStateful('http://www.google.com/'));
+
+  //blocking ...
+  content:= jHttpClient1.GetStateful('http://www.google.com/');
+
+  jEditText1.Clear;
 
   if jHttpClient1.GetCookiesCount() > 0 then
   begin
@@ -58,7 +62,8 @@ begin
     for i:=0 to count-1 do
     begin
 
-      ShowMessage(cookies[i]);
+      jEditText1.AppendLn(cookies[i]);
+      //ShowMessage(cookies[i]);
 
       ShowMessage(jHttpClient1.GetCookieAttributeValue(
                       jHttpClient1.GetCookieByIndex(i), 'name')
@@ -90,22 +95,29 @@ begin
 
 end;
 
+procedure TAndroidModule1.AndroidModule1JNIPrompt(Sender: TObject);
+begin
+  jEditText1.Clear;
+  if  not Self.IsWifiEnabled() then Self.SetWifiEnabled(True);
+end;
+
 procedure TAndroidModule1.jButton2Click(Sender: TObject);
 var
   i, count: integer;
   cookie: JObject;
+  contentSum: string;
 begin
 
-  jEditText1.Clear;
   jHttpClient1.ClearCookieStore();
 
-  //httppost.AddClientHeader("Content-Type", "application/x-www-form-urlencoded");  //etc..
-  //jHttpClient1.AddClientHeader('Cookie','LAMW_SESSION_ID=1');                     //etc..
+  //jHttpClient1.AddClientHeader("Content-Type", "application/x-www-form-urlencoded");  //etc..
+  //jHttpClient1.AddClientHeader('Set-Cookie','LAMW_SESSION_ID=1');                     //etc..
 
   cookie:= jHttpClient1.AddCookie('LAMW_SESSION_ID', '1');
   jHttpClient1.SetCookieAttributeValue(cookie, 'domain', '.localhost');
   jHttpClient1.SetCookieAttributeValue(cookie, 'path', '/');
   jHttpClient1.SetCookieAttributeValue(cookie, 'version', '1');
+
 
   {
    'name'
@@ -118,10 +130,14 @@ begin
    'ports'
    }
 
-
   jHttpClient1.AddNameValueData('param1', '4');
   jHttpClient1.AddNameValueData('param2', '6');
-  jEditText1.AppendLn(jHttpClient1.PostStateful('http://ave.bolyartech.com/params.php'));
+
+  //blocking
+  contentSum:= jHttpClient1.PostStateful('http://ave.bolyartech.com/params.php');
+
+  jEditText1.Clear;
+  jEditText1.AppendLn('sum(param1, param1) = '+ contentSum);
 
   count:= jHttpClient1.GetCookiesCount();
   ShowMessage('Count Cookie = '+ IntToStr(count));
@@ -146,17 +162,23 @@ begin
                      'ports'
                      }
   end;
+
 end;
 
 procedure TAndroidModule1.jButton3Click(Sender: TObject);
 var
   i, count: integer;
+  content: string;
 begin
 
-   jEditText1.Clear;
    jHttpClient1.ClearCookieStore();
 
-   jEditText1.AppendLn(jHttpClient1.GetStateful('http://www.arenakampf.de'));
+   //blocking
+   content:= jHttpClient1.GetStateful('http://www.arenakampf.de');
+   jEditText1.Clear;
+   jEditText1.AppendLn(content);
+
+
    count:= jHttpClient1.GetCookiesCount();
    ShowMessage('Count Cookie = '+ IntToStr(count));
 
@@ -182,44 +204,7 @@ begin
                       'ports'
                       }
    end;
+
 end;
-
-procedure TAndroidModule1.jButton4Click(Sender: TObject);
-var
-  i, count: integer;
-begin
-
-   jEditText1.Clear;
-   jHttpClient1.ClearCookieStore();
-
-   jEditText1.AppendLn(jHttpClient1.GetStateful('http://localhost:8080/cookie/get'));
-
-   count:= jHttpClient1.GetCookiesCount();
-   ShowMessage('Count Cookie = '+ IntToStr(count));
-
-   for i:=0 to count-1 do
-   begin
-       ShowMessage(jHttpClient1.GetCookieAttributeValue(
-                       jHttpClient1.GetCookieByIndex(i), 'name'));
-
-       ShowMessage(jHttpClient1.GetCookieAttributeValue(
-                       jHttpClient1.GetCookieByIndex(i), 'value'));
-
-       ShowMessage(jHttpClient1.GetCookieAttributeValue(
-                       jHttpClient1.GetCookieByIndex(i), 'expirydate'));
-
-                     {
-                      'name'
-                      'value'
-                      'domain'
-                      'version'
-                      'expirydate'
-                      'path'
-                      'comment'
-                      'ports'
-                      }
-   end;
-end;
-
 
 end.

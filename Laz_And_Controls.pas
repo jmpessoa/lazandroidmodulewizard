@@ -277,14 +277,13 @@ type
     //thanks to Fatih KILIÇ
     procedure ClearNameValueData; //ClearPost2Values;
     procedure AddNameValueData(_name, _value: string); //AddValueForPost2;
-    function Post(_stringUrl: string): string;
+    function Post(_stringUrl: string): string; overload;
 
-    function GetCookies(_url: string; _nameValueSeparator: string): TDynArrayOfString;  overload;
     function GetCookiesCount(): integer;
     function GetCookieByIndex(_index: integer): jObject;
     function GetCookieAttributeValue(_cookie: jObject; _fieldName: string): string;
     procedure ClearCookieStore();
-    function AddCookie(_name: string; _value: string): jObject;
+    function AddCookie(_name: string; _value: string): jObject;  overload;
     function IsExpired(_cookie: jObject): boolean;
     function GetStateful(_url: string): string;
     function PostStateful(_url: string): string;
@@ -294,10 +293,32 @@ type
     procedure SetCookieAttributeValue(_cookie: jObject; _attribute: string; _value: string);
     function GetCookieValue(_cookie: jObject): string;
     function GetCookieName(_cookie: jObject): string;
+
     function GetCookies(_nameValueSeparator: string): TDynArrayOfString;  overload;
+
     procedure AddClientHeader(_name: string; _value: string);
     procedure ClearClientHeader(_name: string; _value: string);
     function DeleteStateful(_url: string; _value:string): string;  //thanks to @renabor
+
+    function UrlExist(_urlString: string): boolean;
+
+    function GetCookies(_urlString: string; _nameValueSeparator: string): TDynArrayOfString;  overload;
+
+    function AddCookie(_urlString: string; _name: string; _value: string): jObject;  overload;
+
+    function OpenConnection(_urlString: string): jObject;
+    function SetRequestProperty(_httpConnection: jObject; _headerName: string; _headerValue: string): jObject;
+    //function Connect(_httpConnection: jObject): jObject;
+
+    function GetHeaderField(_httpConnection: jObject; _headerName: string): string;
+    function GetHeaderFields(_httpConnection: jObject): TDynArrayOfString;
+
+    procedure Disconnect(_httpConnection: jObject);
+    function Get(_httpConnection: jObject): string; overload;
+    function AddRequestProperty(_httpConnection: jObject; _headerName: string; _headerValue: string): jObject;
+    function Post(_httpConnection: jObject): string; overload;
+    function GetResponseCode(): integer;
+    function GetDefaultConnection(): jObject;
 
     procedure GenEvent_OnHttpClientContentResult(Obj: TObject; content: string);
     procedure GenEvent_OnHttpClientCodeResult(Obj: TObject; code: integer);
@@ -689,12 +710,7 @@ type
 
   jTextView = class(jVisualControl)
   private
-    FColor: TARGBColorBridge;
-    FEnabled: Boolean;
-    FFontColor: TARGBColorBridge;
     FFontFace: TFontFace;
-    FFontSize: DWord;
-    FFontSizeUnit: TFontSizeUnit;
     FOnClick: TOnNotify;
     FTextAlignment: TTextAlignment;
     FTextTypeFace: TTextTypeFace;
@@ -1127,6 +1143,9 @@ type
     procedure UpdateLParamWidth;
     procedure SetFontSizeUnit(_unit: TFontSizeUnit);
 
+    procedure SetFontFace(AValue: TFontFace); //override;
+
+
   protected
     procedure SetViewParent(Value: jObject);  override;
     procedure GenEvent_OnClickWidgetItem(Obj: TObject; index: integer; checked: boolean);
@@ -1192,6 +1211,7 @@ type
     property TextAlign: TTextAlign read FTextAlign write FTextAlign;
     property HighLightSelectedItemColor: TARGBColorBridge read FHighLightSelectedItemColor write SetHighLightSelectedItemColor;
     property FontSizeUnit: TFontSizeUnit read FFontSizeUnit write SetFontSizeUnit;
+    property FontFace: TFontFace read FFontFace write SetFontFace default ffNormal;
     // Event
     property OnClickItem : TOnClickCaptionItem read FOnClickItem write FOnClickItem;
     property OnClickWidgetItem: TOnClickWidgetItem read FOnClickWidgetItem write FOnClickWidgetItem;
@@ -2374,14 +2394,14 @@ end;
 
 constructor jTextView.Create(AOwner: TComponent);
 begin
+
   inherited Create(AOwner);
   FTextAlignment:= taLeft;
   FText:= '';
-  FFontFace := ffNormal; 
- 
+
+  FFontFace := ffNormal;
   FTextTypeFace:= tfNormal;
- 
-  //FFontColor:= colbrDefault; //colbrSilver;
+
   FMarginLeft   := 5;
   FMarginTop    := 5;
   FMarginBottom := 5;
@@ -2390,7 +2410,7 @@ begin
   FWidth        := 51;
   FLParamWidth  := lpWrapContent;
   FLParamHeight := lpWrapContent;
-  FEnabled:= True;
+
 end;
 
 //
@@ -2699,7 +2719,7 @@ constructor jEditText.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
   FText      :='';
-  FColor     := colbrDefault; //colbrWhite;
+  //FColor     := colbrDefault; //colbrWhite;
   FOnEnter   := nil;
   FOnChange  := nil;
   FInputTypeEx := itxText;
@@ -2723,7 +2743,7 @@ begin
 
   FLParamWidth  := lpHalfOfParent;
   FLParamHeight := lpWrapContent;
-  FEditable:= True;
+
 end;
 
 Destructor jEditText.Destroy;
@@ -2869,7 +2889,8 @@ begin
   if FEditable = False then
      jEditText_SetEditable(FjEnv, FjObject, FEditable);
 
-  jEditText_setHintTextColor(FjEnv, FjObject, GetARGB(FCustomColor, FHintTextColor));
+  if FHintTextColor <> colbrDefault then
+     jEditText_setHintTextColor(FjEnv, FjObject, GetARGB(FCustomColor, FHintTextColor));
 
   jEditText_DispatchOnChangeEvent(FjEnv, FjObject , True);
   jEditText_DispatchOnChangedEvent(FjEnv, FjObject , True);
@@ -2945,7 +2966,7 @@ begin
  //inherited SetHintTextColor(Value);
  FHintTextColor:= Value;
  if FInitialized then
-   jEditText_setHintTextColor(FjEnv, FjObject, GetARGB(FCustomColor, Value));
+    jEditText_setHintTextColor(FjEnv, FjObject, GetARGB(FCustomColor, FHintTextColor));
 end;
 
 Procedure jEditText.SetHint(Value : String);
@@ -3515,7 +3536,6 @@ begin
   FMarginRight  := 5;
   FHeight       := 25;
   FWidth        := 100;
-  FFontColor    := colbrDefault;
   FLParamWidth:= lpWrapContent;
   FLParamHeight:= lpWrapContent;
 end;
@@ -3758,7 +3778,6 @@ begin
   FMarginRight  := 5;
   FHeight       := 25;
   FWidth        := 100;
-  FFontColor    := colbrDefault;
   FLParamWidth:= lpWrapContent;
   FLParamHeight:= lpWrapContent;
 end;
@@ -4860,9 +4879,8 @@ begin
 
   if FInitialized then
   begin
-
     jHttpClient_SetCharSet(FjEnv, FjObject, FCharSet);
-    Result := jHTTPClient_Get2(FjEnv, FjObject, _stringUrl)
+    Result := jHTTPClient_Get(FjEnv, FjObject, _stringUrl)
   end else Result := '';
 end;
 
@@ -4872,7 +4890,7 @@ begin
   if not FInitialized then Exit;
 
   if  FUrl <> '' then
-    Result := jHTTPClient_Get2(FjEnv, FjObject, FUrl)
+    Result := jHTTPClient_Get(FjEnv, FjObject, FUrl)
 end;
 
 procedure jHttpClient.ClearNameValueData; //ClearPost2Values;
@@ -4892,7 +4910,7 @@ begin
   begin
 
     jHttpClient_SetCharSet(FjEnv, FjObject, FCharSet);
-    Result := jHTTPClient_Post2(FjEnv, FjObject, _stringUrl)
+    Result := jHTTPClient_Post(FjEnv, FjObject, _stringUrl)
   end else Result := '';
 end;
 
@@ -4915,13 +4933,6 @@ begin
   //in designing component state: result value here...
   if FInitialized then
     jHttpClient_PostNameValueDataAsync(FjEnv, FjObject, _stringUrl ,_listNameValue);
-end;
-
-function jHttpClient.GetCookies(_url: string; _nameValueSeparator: string): TDynArrayOfString;
-begin
-  //in designing component state: result value here...
-  if FInitialized then
-   Result:= jHttpClient_GetCookies(FjEnv, FjObject, _url ,_nameValueSeparator);
 end;
 
 function jHttpClient.GetCookiesCount(): integer;
@@ -5061,7 +5072,110 @@ begin
    if Assigned(FOnCodeResult) then FOnCodeResult(Obj, code);
 end;
 
+function jHttpClient.UrlExist(_urlString: string): boolean;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jHttpClient_UrlExist(FjEnv, FjObject, _urlString);
+end;
 
+function jHttpClient.GetCookies(_urlString: string; _nameValueSeparator: string): TDynArrayOfString;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jHttpClient_GetCookies(FjEnv, FjObject, _urlString ,_nameValueSeparator);
+end;
+
+function jHttpClient.AddCookie(_urlString: string; _name: string; _value: string): jObject;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jHttpClient_AddCookie(FjEnv, FjObject, _urlString ,_name ,_value);
+end;
+
+
+// _cookieList format: 'userId=igbrown; sessionId=SID77689211949; isAuthenticated=true';
+
+function jHttpClient.OpenConnection(_urlString: string): jObject;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jHttpClient_OpenConnection(FjEnv, FjObject, _urlString);
+end;
+
+function jHttpClient.SetRequestProperty(_httpConnection: jObject; _headerName: string; _headerValue: string): jObject;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jHttpClient_SetRequestProperty(FjEnv, FjObject, _httpConnection ,_headerName, _headerValue);
+end;
+
+(*
+function jHttpClient.Connect(_httpConnection: jObject): jObject;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jHttpClient_Connect(FjEnv, FjObject, _httpConnection);
+end;
+*)
+
+function jHttpClient.GetHeaderField(_httpConnection: jObject; _headerName: string): string;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jHttpClient_GetHeaderField(FjEnv, FjObject, _httpConnection ,_headerName);
+end;
+
+function jHttpClient.GetHeaderFields(_httpConnection: jObject): TDynArrayOfString;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jHttpClient_GetHeaderFields(FjEnv, FjObject, _httpConnection);
+end;
+
+
+procedure jHttpClient.Disconnect(_httpConnection: jObject);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jHttpClient_Disconnect(FjEnv, FjObject, _httpConnection);
+end;
+
+function jHttpClient.Get(_httpConnection: jObject): string;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jHttpClient_Get(FjEnv, FjObject, _httpConnection);
+end;
+
+function jHttpClient.AddRequestProperty(_httpConnection: jObject; _headerName: string; _headerValue: string): jObject;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jHttpClient_AddRequestProperty(FjEnv, FjObject, _httpConnection ,_headerName ,_headerValue);
+end;
+
+function jHttpClient.Post(_httpConnection: jObject): string;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jHttpClient_Post(FjEnv, FjObject, _httpConnection);
+end;
+
+
+function jHttpClient.GetResponseCode(): integer;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jHttpClient_GetResponseCode(FjEnv, FjObject);
+end;
+
+function jHttpClient.GetDefaultConnection(): jObject;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jHttpClient_GetDefaultConnection(FjEnv, FjObject);
+end;
 
 {jSMTPClient by jmpessoa: warning: not tested!}
 
@@ -5315,17 +5429,13 @@ end;
 constructor jListView.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
-  FFontSize:= 0;
-  FFontColor:= colbrDefault;
+
   FWidgetItem:= wgNone;
-
   FDelimiter:= '|';
-
   FTextDecorated:= txtNormal;
   FItemLayout:= layImageTextWidget;
   FTextSizeDecorated:= sdNone;
   FTextAlign:= alLeft;
-
   FItems:= TStringList.Create;
   TStringList(FItems).OnChange:= ListViewChange;  //event handle
 
@@ -5376,6 +5486,9 @@ begin
 
     if FFontSize > 0 then
        jListView_setTextSize(FjEnv, FjObject , FFontSize);
+
+    if FFontFace <> ffNormal then
+       jListView_SetFontFace(FjEnv, FjObject, Ord(FFontFace));
 
     if FColor <> colbrDefault then
        View_SetBackGroundColor(FjEnv, FjThis, FjObject , GetARGB(FCustomColor, FColor));
@@ -5708,7 +5821,6 @@ begin
     end
     else
     begin
-
        if (Self.Parent as jVisualControl).LayoutParamWidth = lpWrapContent then
           jListView_setLParamWidth(FjEnv, FjObject , GetLayoutParams(gApp, FLParamWidth, sdW))
        else //lpMatchParent or others
@@ -5861,6 +5973,13 @@ begin
   FFontSizeUnit:=_unit;
   if FInitialized then
      jListView_SetFontSizeUnit(FjEnv, FjObject, Ord(_unit));
+end;
+
+procedure jListView.SetFontFace(AValue: TFontFace);
+begin
+ FFontFace:= AValue;
+ if(FInitialized) then
+   jListView_SetFontFace(FjEnv, FjObject, Ord(FFontFace));
 end;
 
 //------------------------------------------------------------------------------

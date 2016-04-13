@@ -538,9 +538,7 @@ type
 
   TTextTypeFace = (tfNormal, tfBold, tfItalic, tfBoldItalic); //by jmpessoa
   TFontFace = (ffNormal, ffSans, ffSerif, ffMonospace);
-
   //...
-
   TOnNotify = Procedure(Sender: TObject) of object;
   TViewClick = Procedure(jObjView: jObject; Id: integer) of object;
   TListItemClick = Procedure(jObjAdapterView: jObject; jObjView: jObject; position: integer; Id: integer) of object;
@@ -1965,13 +1963,18 @@ end;
 
 constructor jVisualControl.Create(AOwner: TComponent);
 begin
+
   inherited Create(AOwner);
+
   FjPRLayout := nil;  //java parent
   FjObject    := nil; //java object
   FEnabled   := True;
   FVisible   := True;
-  FColor     := colbrDefault;
+
+  FColor     := colbrDefault;  //background
   FFontColor := colbrDefault;
+  FFontFace := ffNormal;
+
   FFontSize  := 0; //default size!
 
   FFontSizeUnit:= unitDefault; //  --> unitScaledPixel!
@@ -1982,7 +1985,8 @@ begin
   //FGravity:=[];      TODO!
   FPositionRelativeToAnchor:= [];
   FPositionRelativeToParent:= [];
-  FHintTextColor:= colbrSilver;
+
+  FHintTextColor:= colbrDefault;
 end;
 
 //
