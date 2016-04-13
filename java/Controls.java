@@ -1,6 +1,6 @@
 package com.example.dummyapp;
 
-//Lamw: Lazarus Android Module Wizard  - version 0.6 - revision 38.6 - 12 April - 2016 
+//Lamw: Lazarus Android Module Wizard  - version 0.6 - revision 38.7 - 13 April - 2016 
 //Form Designer and Components development model!
 //
 //https://github.com/jmpessoa/lazandroidmodulewizard
@@ -2777,13 +2777,14 @@ class jListItemRow{
 	int textAlign;
 	Context ctx;
 	Bitmap bmp;	
-	Typeface typeFace;          //TFontFace = (ffNormal, ffSans, ffSerif, ffMonospace);
-	//int fontTextStyle;         // TTextTypeFace = (tfNormal, tfBold, tfItalic, tfBoldItalic);
-	  
+	Typeface typeFace;          
+	//TFontFace = (ffNormal, ffSans, ffSerif, ffMonospace);
+		  
 	public  jListItemRow(Context context) {
 		ctx = context;
 		label = "";
 	}
+	
 }
 
 //http://stackoverflow.com/questions/7361135/how-to-change-color-and-font-on-listview
@@ -2909,8 +2910,7 @@ public  View getView(int position, View v, ViewGroup parent) {
   	   itemImage.setOnClickListener(getOnCheckItem(itemImage, position));
    	  }   
     }   
-   
-   
+      
    RelativeLayout itemLayout = new RelativeLayout(ctx);
        
    String line = items.get(position).label;   
@@ -2947,8 +2947,7 @@ public  View getView(int position, View v, ViewGroup parent) {
 	   
 	   TextView textViewnew = new TextView(ctx);	   
 	   float auxf = textViewnew.getTextSize();	   	  	  
-	   itemText[i] = textViewnew;
-	   	   
+	   itemText[i] = textViewnew;	   	   
 	   if (i == 0) {
 		    if (items.get(position).textSize != 0){
 		    	auxf = items.get(position).textSize;
@@ -2956,17 +2955,14 @@ public  View getView(int position, View v, ViewGroup parent) {
 		    	if (mTextSizeTypedValue != TypedValue.COMPLEX_UNIT_SP) 
 			       itemText[i].setTextSize(mTextSizeTypedValue, auxf);
 		    	else
-		    		itemText[i].setTextSize(auxf);
-		    	
+		    		itemText[i].setTextSize(auxf);		    	
 		    }
-		    itemText[i].setPadding(10, 15, 10, 15);
-		    itemText[i].setTypeface(items.get(position).typeFace, faceTitle);
-		    
+		    itemText[i].setPadding(10, 15, 10, 15); //Typeface.MONOSPACE
+		    itemText[i].setTypeface(items.get(position).typeFace, faceTitle); //items.get(position).typeFace		    
 		}
-		else{			
-		   itemText[i].setTypeface(items.get(position).typeFace, faceBody);
-		   itemText[i].setPadding(10, 0, 10, 15);
-		   
+		else{
+		   itemText[i].setPadding(10, 0, 10, 15);  //Typeface.SERIF
+		   itemText[i].setTypeface(items.get(position).typeFace, faceBody); //		   
 		   if (items.get(position).textSizeDecorated == 1) {
 			   
 		       if (mTextSizeTypedValue != TypedValue.COMPLEX_UNIT_SP) 				    
@@ -3153,7 +3149,7 @@ private String          widgetText;
 private int             textColor; 
 private int             textSize;
 //private int             fontTextStyle;
-private Typeface        typeFace;
+private Typeface        typeFace = Typeface.DEFAULT;
 
 //by Renabor
 private float mDownX = -1;
@@ -3231,6 +3227,7 @@ textDecorated = txtDecorated;
 itemLayout =itemLay;
 textSizeDecorated = txtSizeDecorated;
 textAlign = txtAlign;
+typeFace = Typeface.DEFAULT;
 
 // Init Class
 lparams = new RelativeLayout.LayoutParams (100,100);
@@ -3270,8 +3267,7 @@ onTouchListener = new OnTouchListener() {
 				//return false; // passa oltre, ma potrebbe diventare true
 				//mDownX = -1;
 				return false;
-				
-    
+				    
 			case MotionEvent.ACTION_MOVE:
 				if (isOnClick && (Math.abs(mDownX - event.getX()) > SCROLL_THRESHOLD || Math.abs(mDownY - event.getY()) > SCROLL_THRESHOLD)) {
 					// Log.i("ACTION", "MOVE");
@@ -3479,8 +3475,7 @@ info.itemLayout =itemLayout;
 info.textSizeDecorated = textSizeDecorated;
 info.textAlign = textAlign;
 
-info.typeFace = Typeface.DEFAULT;    
-//info.fontTextStyle = Typeface.NORMAL;
+info.typeFace = this.typeFace;    
 
 alist.add(info);
 aadapter.notifyDataSetChanged();
@@ -3506,7 +3501,9 @@ info.itemLayout =itemLayout;
 info.textSizeDecorated = textSizeDecorated;
 info.textAlign = textAlign;
 
-info.typeFace = Typeface.DEFAULT;    
+info.typeFace = this.typeFace;
+
+//Log.i("typeFace", item);
 //info.fontTextStyle = Typeface.NORMAL;
 
 alist.add(info);
@@ -3532,7 +3529,7 @@ public  void add3(String item, String delimiter, int fontColor, int fontSize, in
 	  info.textSizeDecorated = textSizeDecorated;
 	  info.textAlign = textAlign;
 
-	  info.typeFace = Typeface.DEFAULT;    
+	  info.typeFace = this.typeFace;    
 	  //info.fontTextStyle = Typeface.NORMAL;	  
 
 	  alist.add(info);
@@ -3558,7 +3555,7 @@ public  void add4(String item, String delimiter, int fontColor, int fontSize, in
 	  info.textSizeDecorated = textSizeDecorated;
 	  info.textAlign = textAlign;
 	  
-	  info.typeFace = Typeface.DEFAULT;    
+	  info.typeFace = this.typeFace;    
 	 // info.fontTextStyle = Typeface.NORMAL;	  
 	  
 	  alist.add(info);

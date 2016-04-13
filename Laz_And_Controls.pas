@@ -1143,7 +1143,7 @@ type
     procedure UpdateLParamWidth;
     procedure SetFontSizeUnit(_unit: TFontSizeUnit);
 
-    procedure SetFontFace(AValue: TFontFace); //override;
+    procedure SetFontFace(AValue: TFontFace);
 
 
   protected
@@ -2583,7 +2583,7 @@ begin
 end;
 
 procedure jTextView.SetFontFace(AValue: TFontFace); 
-begin 
+begin
  FFontFace:= AValue;
  if(FInitialized) then 
    jTextView_setFontAndTextTypeFace(FjEnv, FjObject, Ord(FFontFace), Ord(FTextTypeFace)); 
@@ -5508,18 +5508,21 @@ begin
      if FFontColor <> colbrDefault then
         jListView_setTextColor(FjEnv, FjObject , GetARGB(FCustomColor, FFontColor));
 
-
      if FFontSizeUnit <> unitDefault then
           jListView_SetFontSizeUnit(FjEnv, FjObject, Ord(FFontSizeUnit));
 
      if FFontSize > 0 then
         jListView_setTextSize(FjEnv, FjObject , FFontSize);
 
+     if FFontFace <> ffNormal then
+          jListView_SetFontFace(FjEnv, FjObject, Ord(FFontFace));
+
      if FColor <> colbrDefault then
         View_SetBackGroundColor(FjEnv, FjThis, FjObject , GetARGB(FCustomColor, FColor));
 
      for i:= 0 to Self.Items.Count-1 do
         jListView_add2(FjEnv, FjObject , Self.Items.Strings[i], FDelimiter);
+
   end;
 
   if FParent <> nil then
