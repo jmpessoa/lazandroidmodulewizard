@@ -2722,6 +2722,7 @@ begin
   //FColor     := colbrDefault; //colbrWhite;
   FOnEnter   := nil;
   FOnChange  := nil;
+  FEditable := True;
   FInputTypeEx := itxText;
   FHint      := '';
   FMaxTextLength := -1; //300;
