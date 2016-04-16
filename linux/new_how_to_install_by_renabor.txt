@@ -6,9 +6,19 @@ Befor you begin
 
 Replace x86_64 with i386 if your Linux distribution is not 64 bit. 
 Replace $HOME with your username !!! 
+
 Take note that fpc version for compiling the trunk version (3.1.1) is 2.6.4.
 You can download the correct version from here:
 http://packages.ubuntu.com/vivid/fpc-2.6.4
+
+[NOTE] :by tintinux
+I suppose that when fpc 3.0 or newer was installed, LAMW will work fine with the 3.0 binary compiler. 
+Can someone confirm ?
+If true, is it possible to update the documentation :
+- remove fp-compiler automatic installation in the apt-get line of documentation
+- add a note specifying the fpc version(s) required  ?
+ref. http://forum.lazarus.freepascal.org/index.php/topic,32304.0.html
+[/NOTE]
 
 ################
 install some necessary programs:
@@ -34,6 +44,15 @@ follow instruction to install it
 create a symbolic link for later use
 
 (CMD) ln -s /home/$HOME/Android/android-ndk-r10e /home/$HOME/Android/ndk
+
+[NOTE] :by tintinux
+$HOME variable is usually on Linux the home directory, and $USER is the username.  
+So, it is better to replace, for example:
+	(CMD) ln -s $HOME/Android/android-ndk-r10e $HOME/Android/ndk
+Or when possible:
+	(CMD) ln -s ~/Android/android-ndk-r10e ~/Android/ndk/code 
+ref. http://forum.lazarus.freepascal.org/index.php/topic,32304.0.html
+[/NOTE]
 
 ################
 create symbolic link for linker
