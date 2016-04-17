@@ -652,6 +652,7 @@ type
     FColDelimiter: char;
     FRowDelimiter: char;
     FDataBaseName: string;
+    FFullPathDataBaseName: string;
     FCreateTableQuery: TStrings;
     FTableName: TStrings;
     procedure SetjSqliteCursor(Value: jSqliteCursor);
@@ -693,11 +694,16 @@ type
     function CheckDataBaseExistsByName(_dbName: string): boolean;
     procedure UpdateImageBatch(var _imageResIdentifierDataArray: TDynArrayOfString; _delimiter: string);
 
+    procedure SetDataBaseName(_dbName: string);
+    function GetFullPathDataBaseName(): string;
+
+    property FullPathDataBaseName: string read GetFullPathDataBaseName;
+
   published
     property Cursor    : jSqliteCursor read FjSqliteCursor write SetjSqliteCursor;
     property ColDelimiter: char read FColDelimiter write FColDelimiter;
     property RowDelimiter: char read FRowDelimiter write FRowDelimiter;
-    property DataBaseName: string read FDataBaseName write FDataBaseName;
+    property DataBaseName: string read FDataBaseName write SetDataBaseName;
     property CreateTableQuery: TStrings read FCreateTableQuery write FCreateTableQuery;
     property TableName: TStrings read FTableName write FTableName;
   end;
@@ -8384,8 +8390,7 @@ var
 begin
   if FInitialized then Exit;
   inherited Init(refApp);
-  FjObject := jSqliteDataAccess_Create(FjEnv, FjThis, Self,
-  FDataBaseName, FColDelimiter, FRowDelimiter);
+  FjObject := jSqliteDataAccess_Create(FjEnv, FjThis, Self, FDataBaseName, FColDelimiter, FRowDelimiter);
 
   FInitialized:= True;
 
@@ -8399,13 +8404,7 @@ begin
      jSqliteDataAccess_AddCreateTableQuery(FjEnv, FjObject , FCreateTableQuery.Strings[i]);
   end;
 
-  {
-  if FjSqliteCursor <> nil then
-  begin
-    FjSqliteCursor.Init(refApp: jApp);
-    FjSqliteCursor.SetCursor(Self.GetCursor);
-  end;
-  }
+  FFullPathDataBaseName:= GetFilePath(fpathDataBase) + '/' + FDataBaseName;
 
 end;
 
@@ -8416,7 +8415,7 @@ begin
    if FjSqliteCursor <> nil then FjSqliteCursor.SetCursor(Self.GetCursor);
 end;
 
-////"data/data/com.data.pack/databases/" + myData.db;
+//"data/data/com.data.pack/databases/" + myData.db;
 function jSqliteDataAccess.CheckDataBaseExists(databaseName: string): boolean;
 var
   fullPathDB: string;
@@ -8616,6 +8615,22 @@ begin
      jSqliteDataAccess_UpdateImageBatch(FjEnv, FjObject, _imageResIdentifierDataArray ,_delimiter);
 end;
 
+procedure jSqliteDataAccess.SetDataBaseName(_dbName: string);
+begin
+  //in designing component state: set value here...
+  FDatabaseName:= _dbName;
+  if FInitialized then
+     jSqliteDataAccess_SetDataBaseName(FjEnv, FjObject, _dbName);
+end;
+
+function jSqliteDataAccess.GetFullPathDataBaseName(): string;
+begin
+  if FInitialized then
+  begin
+     FFullPathDataBaseName:= GetFilePath(fpathDataBase) + '/' + FDataBaseName;
+  end;
+  Result:= FFullPathDataBaseName;
+end;
    {jPanel}
 
 constructor jPanel.Create(AOwner: TComponent);

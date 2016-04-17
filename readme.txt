@@ -144,6 +144,14 @@
 	*
 	****************************************************************************************************
 
+Version 0.6 - rev. 38.8 - 17 April 2016 - 
+
+	IMPROVEMENT jSqliteDataAccess
+
+Version 0.6 - rev. 38.7 - 13 April 2016 - 
+
+	FIXED jListView1.FontFace
+
 Version 0.6 - rev. 38.6 - 12 April 2016 - 
 
 	UPDATED! jHttpClient has been updated to use HttpURLConnection [We can Target API >= 21 !!] // <<-----Thanks to @Renabor!

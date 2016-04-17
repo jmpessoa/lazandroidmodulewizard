@@ -976,6 +976,7 @@ procedure jSqliteDataAccess_UpdateTableBatch(env: PJNIEnv; _jsqlitedataaccess: J
 function jSqliteDataAccess_CheckDataBaseExistsByName(env: PJNIEnv; _jsqlitedataaccess: JObject; _dbName: string): boolean;
 
 procedure jSqliteDataAccess_UpdateImageBatch(env: PJNIEnv; _jsqlitedataaccess: JObject; var _imageResIdentifierDataArray: TDynArrayOfString; _delimiter: string);
+procedure jSqliteDataAccess_SetDataBaseName(env: PJNIEnv; _jsqlitedataaccess: JObject; _dbName: string);
 
 // Http
 //Function  jHttp_Get(env:PJNIEnv;  this:jobject; URL: String) : String;
@@ -7608,6 +7609,20 @@ begin
   env^.CallVoidMethodA(env, _jsqlitedataaccess, jMethod, @jParams);
   env^.DeleteLocalRef(env,jParams[0].l);
   env^.DeleteLocalRef(env,jParams[1].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jSqliteDataAccess_SetDataBaseName(env: PJNIEnv; _jsqlitedataaccess: JObject; _dbName: string);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_dbName));
+  jCls:= env^.GetObjectClass(env, _jsqlitedataaccess);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetDataBaseName', '(Ljava/lang/String;)V');
+  env^.CallVoidMethodA(env, _jsqlitedataaccess, jMethod, @jParams);
+env^.DeleteLocalRef(env,jParams[0].l);
   env^.DeleteLocalRef(env, jCls);
 end;
 
