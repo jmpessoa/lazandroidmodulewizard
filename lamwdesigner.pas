@@ -6,7 +6,7 @@ interface
 
 uses
   Classes, SysUtils, Graphics, Controls, FormEditingIntf, PropEdits,
-  ComponentEditors, AndroidWidget;
+  ComponentEditors, AndroidWidget, LCLVersion;
 
 type
   TDraftWidget = class;
@@ -44,8 +44,8 @@ type
     FSelection: TFPList;
     function GetAndroidForm: jForm;
   protected
-    procedure OnDesignerModified(Sender: TObject);
-    procedure OnPersistentAdded(APersistent: TPersistent; Select: boolean);
+    procedure OnDesignerModified(Sender: TObject{$If lcl_fullversion>1060004}; {%H-}PropName: ShortString{$ENDIF});
+    procedure OnPersistentAdded(APersistent: TPersistent; {%H-}Select: boolean);
     procedure OnSetSelection(const ASelection: TPersistentSelectionList);
   public
     //needed by the lazarus form editor
@@ -685,7 +685,7 @@ begin
   inherited Destroy;
 end;
 
-procedure TAndroidWidgetMediator.OnDesignerModified(Sender: TObject);
+procedure TAndroidWidgetMediator.OnDesignerModified(Sender: TObject{$If lcl_fullversion>1060004}; {%H-}PropName: ShortString{$ENDIF});
 var
   Instance: TPersistent;
   InvalidateNeeded: Boolean;

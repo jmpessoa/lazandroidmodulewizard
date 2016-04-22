@@ -93,7 +93,7 @@ begin
     IDEMessagesWindow.BringToFront;
     with TApkBuilder.Create(Project) do
     try
-      if LazarusIDE.DoBuildProject(crRun, [pbfOnlyIfNeeded]) <> mrOK then
+      if LazarusIDE.DoBuildProject(crRun, []) <> mrOK then
         raise Exception.Create('Cannot build project');
       if BuildAPK then
         if InstallAPK then
