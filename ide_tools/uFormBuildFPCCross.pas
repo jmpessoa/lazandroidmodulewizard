@@ -216,7 +216,7 @@ begin
        Params.Add('CROSSBINDIR='+crossBinDIR);
        Params.Add('INSTALL_PREFIX='+ pathToFpcSource);
 
-       Tool.Executable := pathToFpcExecutables + DirectorySeparator+ 'make'+strExt;
+       Tool.Executable := AppendPathDelim(pathToFpcExecutables) + 'make'+strExt;
        Tool.CmdLineParams :=  Params.DelimitedText;
        Tool.Scanners.Add(SubToolDefault);
 
