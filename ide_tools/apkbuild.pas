@@ -523,9 +523,11 @@ begin
     Tool.EnvironmentOverrides.Add('JAVA_HOME=' + FJdkPath);
     Tool.WorkingDirectory := FProjPath;
     Tool.Executable := IncludeTrailingPathDelimiter(FAntPath) + 'ant'{$ifdef windows}+'.bat'{$endif};
+    if not FileExists(Tool.Executable) then
+      raise Exception.CreateFmt('Ant bin (%s) not found! Check path settings', [Tool.Executable]);
     Tool.CmdLineParams := '-Dtouchtest.enabled=true debug';
     if Install then
-      Tool.CmdLineParams :=  Tool.CmdLineParams + ' install';
+      Tool.CmdLineParams := Tool.CmdLineParams + ' install';
     Tool.Scanners.Add(SubToolDefault);
     if not RunExternalTool(Tool) then
       raise Exception.Create('Cannot build APK!');
