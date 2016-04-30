@@ -556,6 +556,10 @@ type
   TOnRotate          = Procedure(Sender: TObject; rotate: TScreenStyle) of Object;
   TOnCanRotate       = Procedure(Sender: TObject; var canRotate: boolean) of Object;
 
+  TOnKeyDown = Procedure(Sender: TObject; keyChar: char; keyCode: integer; keyCodeString:string; var mute: boolean) of Object;
+
+  TActionBarTitle = (abtDefault, abtTextAsTitle, abtTextAsTitleHideLogo, abtHideLogo, abtHide);
+
   TOnOptionMenuItemCreate = Procedure(Sender: TObject; jObjMenu: jObject) of Object;
 
   TOnPrepareOptionsMenu = Procedure(Sender: TObject; jObjMenu: jObject; menuSize: integer; out prepareItems: boolean) of Object;
@@ -878,6 +882,9 @@ type
     FAnimation     : TAnimation;
 
     FActivityMode  : TActivityMode;
+
+    FActionBarTitle: TActionBarTitle;
+
     FOnClick      : TOnNotify;
     FOnClose      :   TOnNotify;
     FOnCloseQuery  : TOnCloseQuery;
@@ -887,6 +894,8 @@ type
 
     FOnJNIPrompt   : TOnNotify;
     FOnBackButton  : TOnNotify;
+
+    FOnSpecialKeyDown      : TOnKeyDown;
 
     FOnOptionMenuCreate: TOnOptionMenuItemCreate;
     FOnClickOptionMenuItem: TOnClickOptionMenuItem;
@@ -996,7 +1005,7 @@ type
     procedure HideActionBar();
     procedure ShowActionBar();
     procedure ShowTitleActionBar(_value: boolean);
-    procedure HideLogoActionBar(_value: boolean);
+    procedure ShowLogoActionBar(_value: boolean);
     procedure SetTitleActionBar(_title: string);
     procedure SetSubTitleActionBar(_subtitle: string);
 
@@ -1068,6 +1077,7 @@ type
     property Text: string read GetText write SetText;
     property ActivityMode  : TActivityMode read FActivityMode write FActivityMode;
     property BackgroundColor: TARGBColorBridge  read FColor write SetColor;
+    property ActionBarTitle: TActionBarTitle read FActionBarTitle write FActionBarTitle;
 
     // Event
     property OnCloseQuery : TOnCloseQuery  read FOnCloseQuery  write FOnCloseQuery;
@@ -1076,8 +1086,11 @@ type
     property OnActivityRst: TOnActivityRst read FOnActivityRst write FOnActivityRst;
 
     property OnJNIPrompt  : TOnNotify read FOnJNIPrompt write FOnJNIPrompt;
+
     property OnBackButton : TOnNotify read FOnBackButton write FOnBackButton;
     property OnClose      : TOnNotify read FOnClose write FOnClose;
+
+    property OnSpecialKeyDown    :TOnKeyDown read FOnSpecialKeyDown write FOnSpecialKeyDown;
 
     property OnCreateOptionMenu: TOnOptionMenuItemCreate read FOnOptionMenuCreate write FOnOptionMenuCreate;
     property OnClickOptionMenuItem: TOnClickOptionMenuItem read FOnClickOptionMenuItem write FOnClickOptionMenuItem;
@@ -1235,7 +1248,7 @@ end;
   procedure jForm_HideActionBar(env: PJNIEnv; _jform: JObject);
   procedure jForm_ShowActionBar(env: PJNIEnv; _jform: JObject);
   procedure jForm_ShowTitleActionBar(env: PJNIEnv; _jform: JObject; _value: boolean);
-  procedure jForm_HideLogoActionBar(env: PJNIEnv; _jform: JObject; _value: boolean);
+  procedure jForm_ShowLogoActionBar(env: PJNIEnv; _jform: JObject; _value: boolean);
   procedure jForm_SetTitleActionBar(env: PJNIEnv; _jform: JObject; _title: string);
   procedure jForm_SetSubTitleActionBar(env: PJNIEnv; _jform: JObject; _subtitle: string);
 
@@ -2207,7 +2220,9 @@ begin
   FCloseCallBack.Event  := nil;
   FCloseCallBack.EventData:= nil; //by jmpessoa
   FCloseCallBack.Sender := nil;
-  FActivityMode          := actMain;  //actMain, actRecyclable, actSplash
+  FActivityMode         := actMain;  //actMain, actRecyclable, actSplash
+
+  FActionBarTitle:= abtDefault;
 
   FOnCloseQuery         := nil;
   FOnClose              := nil;
@@ -2215,10 +2230,10 @@ begin
   FOnClick              := nil;
   FOnActivityRst        := nil;
   FOnJNIPrompt          := nil;
+  FOnSpecialKeyDown     := nil;
 
   FjObject              := nil;
   FjRLayout{View}       := nil;
-  //FApplication            := nil;
 
   FScreenWH.Height      := 100; //dummy
   FScreenWH.Width       := 100;
@@ -2322,12 +2337,28 @@ begin
 
   gApp.TopIndex:= FormIndex;
 
+  if FActionBarTitle = abtHide then
+     jForm_HideActionBar(FjEnv, FjObject);
+
+  if FActionBarTitle = abtHideLogo then
+      jForm_ShowLogoActionBar(FjEnv, FjObject, False);
+
+  if FActionBarTitle = abtTextAsTitle then
+     jForm_SetTitleActionBar(FjEnv, FjObject, FText);
+
+  if FActionBarTitle = abtTextAsTitleHideLogo then
+  begin
+     jForm_ShowLogoActionBar(FjEnv, FjObject, False);
+     jForm_SetTitleActionBar(FjEnv, FjObject, FText);
+  end;
+
   //Show ...
   jForm_Show2(refApp.Jni.jEnv, FjObject, FAnimation.In_);
 
   ActionBarHeight:= jForm_GetActionBarHeight(FjEnv, FjObject);
 
   if Assigned(FOnJNIPrompt) then FOnJNIPrompt(Self);
+
 end;
 
 function jForm.GetFormByIndex(index: integer): jForm;
@@ -2614,8 +2645,6 @@ begin
       Result:= jForm_IsConnectedWifi(FjEnv, FjObject);
 end;
 
-
-
 function jForm.GetEnvironmentDirectoryPath(_directory: TEnvDirectory): string;
 begin
   Result:='';
@@ -2729,10 +2758,10 @@ begin
      jForm_ShowTitleActionBar(FjEnv, FjObject, _value);
 end;
 
-procedure jForm.HideLogoActionBar(_value: boolean);
+procedure jForm.ShowLogoActionBar(_value: boolean);
 begin
   if FInitialized then
-     jForm_HideLogoActionBar(FjEnv, FjObject, _value);
+     jForm_ShowLogoActionBar(FjEnv, FjObject, _value);
 end;
 
 procedure jForm.SetTitleActionBar(_title: string);
@@ -3276,7 +3305,7 @@ begin
   env^.DeleteLocalRef(env, jCls);
 end;
 
-procedure jForm_HideLogoActionBar(env: PJNIEnv; _jform: JObject; _value: boolean);
+procedure jForm_ShowLogoActionBar(env: PJNIEnv; _jform: JObject; _value: boolean);
 var
   jParams: array[0..0] of jValue;
   jMethod: jMethodID=nil;
@@ -3284,7 +3313,7 @@ var
 begin
   jParams[0].z:= JBool(_value);
   jCls:= env^.GetObjectClass(env, _jform);
-  jMethod:= env^.GetMethodID(env, jCls, 'HideLogoActionBar', '(Z)V');
+  jMethod:= env^.GetMethodID(env, jCls, 'ShowLogoActionBar', '(Z)V');
   env^.CallVoidMethodA(env, _jform, jMethod, @jParams);
   env^.DeleteLocalRef(env, jCls);
 end;

@@ -1,4 +1,4 @@
-package com.example.dummyapp;
+package com.example.appautocompletetextviewdemo1;
 
 //Lamw: Lazarus Android Module Wizard  - version 0.6 - revision 38.9 - 30 April - 2016 
 //Form Designer and Components development model!

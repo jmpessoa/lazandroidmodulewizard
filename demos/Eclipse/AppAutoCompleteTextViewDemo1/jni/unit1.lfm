@@ -1,0 +1,129 @@
+object AndroidModule1: TAndroidModule1
+  Left = 267
+  Top = 152
+  Width = 320
+  Height = 400
+  MarginLeft = 0
+  MarginTop = 0
+  MarginRight = 0
+  MarginBottom = 0
+  Text = 'AndroidModule1'
+  ActivityMode = actMain
+  BackgroundColor = colbrDefault
+  ActionBarTitle = abtDefault
+  OnBackButton = AndroidModule1BackButton
+  OnSpecialKeyDown = AndroidModule1SpecialKeyDown
+  object jTextView1: jTextView
+    Left = 60
+    Top = 5
+    Width = 200
+    Height = 20
+    MarginLeft = 5
+    MarginTop = 5
+    MarginRight = 5
+    MarginBottom = 5
+    Visible = True
+    PosRelativeToAnchor = []
+    PosRelativeToParent = [rpTop, rpCenterHorizontal]
+    LayoutParamWidth = lpWrapContent
+    LayoutParamHeight = lpWrapContent
+    Text = 'AppAutoCompleteTextViewDemo1'
+    Alignment = taLeft
+    Enabled = True
+    BackgroundColor = colbrDefault
+    FontColor = colbrDefault
+    FontSize = 0
+    TextTypeFace = tfNormal
+    FontSizeUnit = unitDefault
+    Id = 9230478
+  end
+  object jAutoTextView1: jAutoTextView
+    Left = 87
+    Top = 40
+    Width = 146
+    Height = 39
+    MarginLeft = 5
+    MarginTop = 10
+    MarginRight = 5
+    MarginBottom = 10
+    Visible = True
+    Anchor = jTextView1
+    PosRelativeToAnchor = [raBelow]
+    PosRelativeToParent = [rpCenterHorizontal]
+    LayoutParamWidth = lpHalfOfParent
+    LayoutParamHeight = lpWrapContent
+    Text = 'jAutoTextView1'
+    Alignment = taLeft
+    Enabled = True
+    FontColor = colbrDefault
+    FontSize = 0
+    TextTypeFace = tfNormal
+    FontSizeUnit = unitDefault
+    BackgroundColor = colbrDefault
+    Items.Strings = (
+      'Hello'
+      'World'
+      'Here'
+      'Android'
+      'Pascal'
+      'Way'
+    )
+    OnClick = jAutoTextView1Click
+    OnClickDropDownItem = jAutoTextView1ClickDropDownItem
+    Id = 3401591
+  end
+  object jButton1: jButton
+    Left = 87
+    Top = 93
+    Width = 146
+    Height = 40
+    MarginLeft = 2
+    MarginTop = 4
+    MarginRight = 2
+    MarginBottom = 4
+    Visible = True
+    Anchor = jAutoTextView1
+    PosRelativeToAnchor = [raBelow]
+    PosRelativeToParent = [rpCenterHorizontal]
+    LayoutParamWidth = lpHalfOfParent
+    LayoutParamHeight = lpWrapContent
+    Text = 'Show DropDown'
+    BackgroundColor = colbrDefault
+    FontColor = colbrDefault
+    FontSize = 0
+    FontSizeUnit = unitDefault
+    Id = 7758490
+  end
+  object jEditText1: jEditText
+    Left = 114
+    Top = 147
+    Width = 92
+    Height = 39
+    MarginLeft = 5
+    MarginTop = 10
+    MarginRight = 5
+    MarginBottom = 10
+    Visible = True
+    Anchor = jButton1
+    PosRelativeToAnchor = [raBelow]
+    PosRelativeToParent = [rpCenterHorizontal]
+    LayoutParamWidth = lpOneThirdOfParent
+    LayoutParamHeight = lpWrapContent
+    Text = 'jEditText1'
+    Alignment = taLeft
+    InputTypeEx = itxText
+    MaxTextLength = -1
+    BackgroundColor = colbrDefault
+    FontColor = colbrDefault
+    FontSize = 0
+    HintTextColor = colbrDefault
+    ScrollBarStyle = scrNone
+    MaxLines = 1
+    HorScrollBar = True
+    VerScrollBar = True
+    WrappingLine = False
+    Editable = True
+    FontSizeUnit = unitDefault
+    Id = 0
+  end
+end

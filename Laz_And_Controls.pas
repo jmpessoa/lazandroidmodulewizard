@@ -1522,6 +1522,9 @@ type
   Procedure Java_Event_pAppOnStart              (env: PJNIEnv; this: jobject); //old OnActive
   Procedure Java_Event_pAppOnStop                (env: PJNIEnv; this: jobject);
   Procedure Java_Event_pAppOnBackPressed         (env: PJNIEnv; this: jobject);
+
+  function Java_Event_pAppOnSpecialKeyDown              (env: PJNIEnv; this: jobject; keyChar: JChar; keyCode: integer; keyCodeString: JString): jBoolean;
+
   Function  Java_Event_pAppOnRotate              (env: PJNIEnv; this: jobject; rotate : Integer) : integer;
   Procedure Java_Event_pAppOnConfigurationChanged(env: PJNIEnv; this: jobject);
   Procedure Java_Event_pAppOnActivityResult      (env: PJNIEnv; this: jobject; requestCode, resultCode: Integer; intentData : jObject);
@@ -1866,6 +1869,34 @@ begin
   if Assigned(Form.OnPrepareOptionsMenuItem) then Form.OnPrepareOptionsMenuItem(Form, jObjMenu, jObjMenuItem, itemIndex, prepareMoreItems);
   Result:= JBool(prepareMoreItems);
 end;
+
+function Java_Event_pAppOnSpecialKeyDown(env: PJNIEnv; this: jobject; keyChar: JChar; keyCode: integer; keyCodeString: JString): jBoolean;
+var
+  Form: jForm;
+  mute: boolean;
+  pasStr: string;
+  _jBoolean:  JBoolean;
+begin
+  mute:= False;
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+  Form:= gApp.Forms.Stack[gApp.TopIndex].Form;
+
+  if not Assigned(Form) then Exit;
+  Form.UpdateJNI(gApp);
+
+  pasStr := '';
+  if keyCodeString <> nil then
+  begin
+      _jBoolean := JNI_False;
+      pasStr    := String( env^.GetStringUTFChars(Env,keyCodeString,@_jBoolean) );
+  end;
+
+  if Assigned(Form.OnSpecialKeyDown) then Form.OnSpecialKeyDown(Form, char(keyChar), keyCode, pasStr, mute);
+  Result:= JBool(mute);
+
+end;
+
 //by jmpessoa: support to Option Menu
 Procedure Java_Event_pAppOnClickOptionMenuItem(env: PJNIEnv; this: jobject; jObjMenuItem: jObject;
                                                 itemID: integer; itemCaption: JString; checked: boolean);
@@ -1947,7 +1978,6 @@ begin
     jView(Obj).GenEvent_OnDraw(Obj, jCanvas);
   end;
 end;
-
 
 Procedure Java_Event_pOnClick(env: PJNIEnv; this: jobject; Obj: TObject; Value: integer);
 begin

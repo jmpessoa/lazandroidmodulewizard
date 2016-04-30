@@ -91,6 +91,9 @@ uses
 
    procedure Java_Event_pRadioGroupCheckedChanged(env: PJNIEnv; this: jobject; Obj: TObject; checkedIndex: integer; checkedCaption: JString);
 
+   Procedure Java_Event_pOnClickGeneric(env: PJNIEnv; this: jobject; Obj: TObject; Value: integer);
+   Procedure Java_Event_pOnClickAutoDropDownItem(env: PJNIEnv; this: jobject; Obj: TObject;index: integer; caption: JString);
+
 implementation
 
 uses
@@ -98,7 +101,7 @@ uses
    AndroidWidget, bluetooth, bluetoothclientsocket, bluetoothserversocket,
    spinner, location, actionbartab, customdialog, togglebutton, switchbutton, gridview,
    sensormanager, broadcastreceiver, datepickerdialog, timepickerdialog, shellcommand,
-   tcpsocketclient, surfaceview, mediaplayer, contactmanager, seekbar, ratingbar, radiogroup;
+   tcpsocketclient, surfaceview, mediaplayer, contactmanager, seekbar, ratingbar, radiogroup, autocompletetextview;
 
 procedure Java_Event_pOnBluetoothEnabled(env: PJNIEnv; this: jobject; Obj: TObject);
 begin
@@ -1090,6 +1093,42 @@ begin
   begin
      jForm(jSeekBar(Obj).Owner).UpdateJNI(gApp);
      jSeekBar(Obj).GenEvent_OnSeekBarStopTrackingTouch(Obj, progress);
+  end;
+end;
+
+Procedure Java_Event_pOnClickAutoDropDownItem(env: PJNIEnv; this: jobject; Obj: TObject;index: integer; caption: JString);
+var
+   pasCaption: string;
+ _jBoolean: JBoolean;
+begin
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+
+  if Obj is jAutoTextVIew then
+  begin
+    jForm(jAutoTextVIew(Obj).Owner).UpdateJNI(gApp);
+    pasCaption := '';
+    if caption <> nil then
+    begin
+      _jBoolean:= JNI_False;
+      pasCaption:= string( env^.GetStringUTFChars(env,caption,@_jBoolean) );
+    end;
+    jAutoTextVIew(Obj).GenEvent_OnClickAutoDropDownItem(Obj, index, pasCaption);
+  end;
+end;
+
+Procedure Java_Event_pOnClickGeneric(env: PJNIEnv; this: jobject; Obj: TObject; Value: integer);
+begin
+  //----update global "gApp": to whom it may concern------
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+  //------------------------------------------------------
+  if not (Assigned(Obj)) then Exit;
+  if Obj is jAutoTextVIew then
+  begin
+    jForm(jAutoTextVIew(Obj).Owner).UpdateJNI(gApp);
+    jAutoTextVIew(Obj).GenEvent_OnClick(Obj);
+    Exit;
   end;
 end;
 

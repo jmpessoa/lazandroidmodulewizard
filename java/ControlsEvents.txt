@@ -96,3 +96,6 @@ pOnSeekBarStartTrackingTouch=Java_Event_pOnSeekBarStartTrackingTouch(PEnv,this,T
 pOnSeekBarStopTrackingTouch=Java_Event_pOnSeekBarStopTrackingTouch(PEnv,this,TObject(pasobj),progress);
 pOnRatingBarChanged=Java_Event_pOnRatingBarChanged(PEnv,this,TObject(pasobj),rating);
 pRadioGroupCheckedChanged=Java_Event_pRadioGroupCheckedChanged(PEnv,this,TObject(pasobj),checkedIndex,checkedCaption);
+pOnClickGeneric=Java_Event_pOnClickGeneric(PEnv,this,TObject(pasobj),value);
+pOnClickAutoDropDownItem=Java_Event_pOnClickAutoDropDownItem(PEnv,this,TObject(pasobj),itemIndex,itemCaption);
+pAppOnSpecialKeyDown=Java_Event_pAppOnSpecialKeyDown(PEnv,this,keyChar,keyCode,keyCodeString);

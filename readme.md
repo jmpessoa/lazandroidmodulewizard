@@ -1,41 +1,40 @@
 
 	Lamw: Lazarus Android Module Wizard: 
-		:: Form Designer and Components development model! 
+		:: RAD Android! Form Designer and Components development model! 
 		
-	"A wizard to create JNI Android loadable module (.so) in Lazarus/Free Pascal using 
-	[datamodule like] Form Designer and Components!" 
+	"A wizard to create JNI Android loadable module (.so) 
+		widh Lazarus/Free Pascal using Form Designer and Components!" 
 
 	Authors: 
 
 		Jose Marques Pessoa
-			jmpessoa_hotmail_com
+			jmpessoa@hotmail dot com
 			https://github.com/jmpessoa/lazandroidmodulewizard
 			http://forum.lazarus.freepascal.org/index.php/topic,21919.0.html
 
 		Simon,Choi / Choi,Won-sik
-			simonsayz@naver.com
+			simonsayz@naver dot com
 			http://blog.naver.com/simonsayz
 
 		Anton A. Panferov [@A.S.]
 			ast.a_s@mail dot ru
 			https://github.com/odisey1245
 
-
 	Acknowledgements: 
               
-		-Eny and Phil for the Project wizard hints...
+		-Eny and Phil for the Project Wizard hints...
 		http://forum.lazarus.freepascal.org/index.php/topic,20763.msg120823.html#msg120823
 
 		-Felipemdc [Android support...]
 
-		-TrueTom [Laz4Android Package]
-			Last update:2015-10-02
-			FPC: 3.1.1 trunk svn 31903 
-				-->> win32/arm-android/i386-android/jvm-android
-				Note: Need Android NDK: r10e (arm-linux-androideabi-4.9 + x86-4.9)
+		-TrueTom [Laz4Android Package]			
+			Last update:2016-02-21
+			FPC: 3.0.0 (win32/arm-android/i386-android/jvm-android)
 
-			Lazarus:1.5 trunk svn 49903
-				-->> http://sourceforge.net/projects/laz4android/files/?source=navbar
+			Lazarus:1.6.0
+
+			Android NDK: r10e (arm-linux-androideabi-4.9 + x86-4.9)
+
 			:To Install [*.7z], execute "build.bat"
 
 		-Simonsayz [great work on Android [GUI] Controls!]
@@ -53,7 +52,7 @@
 
 		-Stephano  - Many collaborations and suggestions!
 
-		-x2nie [Lazarus 1.3 patch :: No LCL form design!] 
+		-x2nie [Lazarus 1.3 patch to No LCL form designer!] 
 			http://github.com/x2nie/LiteZarus
 
                 -Fatih KILIÇ - How To Install!       
@@ -81,7 +80,6 @@
 			http://ant.apache.org/bindownload.cgi 
 			Simply extract the zip file to a convenient location...
 
-
 	***************************************************************************************************
 	* To start:				
 	*	
@@ -102,23 +100,23 @@
 	*
 	*2. Change this informations in "controls.lpi" to correct one!
 	*
-	*	"C:\adt32\ndk10"   -- just my system NDK path
+	*	"C:\adt32\ndk10"	-- just my system NDK path
 	*
 	*3. Change this informations in  "build.xml"   according your system..
-	*	"C:\adt32\sdk"
+	*	"C:\adt32\sdk"		-- just my system NDK path
 	*			
 	*	Option 1: NEW !!
 	*		.IDE --> Tools --> 
-	*				[Lamw] Android Module Wizard --> 
-	*					Change Project [*.lpi] Ndk Path [Demos]
-	*		.Change/edit "build.xml": "C:\adt32\sdk" according your system..
+	*				[Lamw] Android Module Wizard --> Change Project [*.lpi] Ndk Path [Demos]
+	*		.Change/edit "build.xml" [location="C:\adt32\sdk"] according your system..
+	*		.Change/edit "AndroidManifest.xml" [minSdkVersion="15" android:targetSdkVersion="17"] according your system..
 	*
 	*	Option 2: Go to Lazarus IDE:
 	*			->Project
 	*			->Project -> Option
 	*			->Path -->> change/modify paths according to your system ..
 	*
-	*	Option 3: Open/edit the "controls.lpi" [...\jni] and "build.xml". You can use Notepad like editor....
+	*	Option 3: Open/edit the "controls.lpi" [...\jni] and "build.xml" and "AndroidManifest.xml". You can use Notepad like editor....
 	*			
 	*
 	*4. All [compatible] Eclipse projects support Ant!
@@ -143,6 +141,21 @@
 	*		<property name="sdk.dir" location="C:\adt32\sdk"/>
 	*
 	****************************************************************************************************
+
+Version 0.6 - rev. 38.9 - 30 April 2016 - 
+
+	NEW! Component jAutoTextView 
+
+	NEW! jForm propertie and Event:
+		ActionBarTitle = (abtDefault, 
+                                  abtTextAsTitle,      // Get Text property content as Title!
+                                  abtTextAsTitleHideLogo, 
+                                  abtHideLogo, 
+                                  abtHide)          //<<-- Thanks to Handoko's bug
+
+		OnSpecialKeyDown  // <<---- Thanks to Handoko's suggestion [but, not for Home and Overview, yet. Sorry...] 
+
+	NEW! Demo AppAutoCompleteTextViewDemo1
 
 Version 0.6 - rev. 38.8 - 17 April 2016 - 
 

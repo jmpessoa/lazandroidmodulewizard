@@ -8,6 +8,7 @@ interface
 
 uses 
   Classes,
+  autocompletetextview,
   radiogroup,
   ratingbar,
   seekbar,
@@ -53,6 +54,7 @@ implementation
   
 Procedure Register;
 begin
+  {$I jautotextview_icon.lrs}
   {$I jradiogroup_icon.lrs}
   {$I jratingbar_icon.lrs}
   {$I jseekbar_icon.lrs}
@@ -89,6 +91,7 @@ begin
   {$I jmyhello_icon.lrs}
   RegisterComponents('Android Bridges Extra',
     [
+      jAutoTextView,
       jRadioGroup,
       jRatingBar,
       jSeekBar,
