@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CONFIG>
+  <ProjectSession>
+    <PathDelim Value="\"/>
+    <Version Value="9"/>
+    <BuildModes Active="Default"/>
+    <Units Count="14">
+      <Unit0>
+        <Filename Value="controls.lpr"/>
+        <IsPartOfProject Value="True"/>
+        <EditorIndex Value="1"/>
+        <TopLine Value="1206"/>
+        <CursorPos X="22" Y="11"/>
+        <UsageCount Value="72"/>
+        <Loaded Value="True"/>
+        <DefaultSyntaxHighlighter Value="Delphi"/>
+      </Unit0>
+      <Unit1>
+        <Filename Value="unit1.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="AndroidModule1"/>
+        <HasResources Value="True"/>
+        <IsVisibleTab Value="True"/>
+        <TopLine Value="101"/>
+        <CursorPos X="4" Y="110"/>
+        <UsageCount Value="72"/>
+        <Loaded Value="True"/>
+        <LoadedDesigner Value="True"/>
+        <DefaultSyntaxHighlighter Value="Delphi"/>
+      </Unit1>
+      <Unit2>
+        <Filename Value="C:\LiteZarus4Android\components\LazAndroidWizard\Laz_And_Controls.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="1856"/>
+        <CursorPos X="35" Y="1867"/>
+        <UsageCount Value="6"/>
+        <DefaultSyntaxHighlighter Value="Delphi"/>
+      </Unit2>
+      <Unit3>
+        <Filename Value="C:\LiteZarus4Android\components\LazAndroidWizard\androidwidget.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="2123"/>
+        <CursorPos X="18" Y="2127"/>
+        <UsageCount Value="6"/>
+        <DefaultSyntaxHighlighter Value="Delphi"/>
+      </Unit3>
+      <Unit4>
+        <Filename Value="C:\laz4android1346592\components\LazAndroidWizard\Laz_And_Controls.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="4297"/>
+        <CursorPos X="40" Y="4312"/>
+        <UsageCount Value="9"/>
+        <DefaultSyntaxHighlighter Value="Delphi"/>
+      </Unit4>
+      <Unit5>
+        <Filename Value="C:\laz4android1346592\components\LazAndroidWizard\And_jni_Bridge.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="6358"/>
+        <CursorPos X="23" Y="6366"/>
+        <UsageCount Value="9"/>
+        <DefaultSyntaxHighlighter Value="Delphi"/>
+      </Unit5>
+      <Unit6>
+        <Filename Value="C:\laz4android1346592\components\LazAndroidWizard\androidwidget.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="1551"/>
+        <CursorPos X="8" Y="1570"/>
+        <UsageCount Value="7"/>
+        <DefaultSyntaxHighlighter Value="Delphi"/>
+      </Unit6>
+      <Unit7>
+        <Filename Value="C:\laz4android1346592\components\LazAndroidWizard\ide_tools\uformupdatecodetemplate.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="242"/>
+        <CursorPos X="43" Y="258"/>
+        <UsageCount Value="6"/>
+        <DefaultSyntaxHighlighter Value="Delphi"/>
+      </Unit7>
+      <Unit8>
+        <Filename Value="unit1.lfm"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="61"/>
+        <CursorPos X="11" Y="69"/>
+        <UsageCount Value="6"/>
+        <DefaultSyntaxHighlighter Value="LFM"/>
+      </Unit8>
+      <Unit9>
+        <Filename Value="..\readme.txt"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="23"/>
+        <CursorPos X="42" Y="41"/>
+        <UsageCount Value="6"/>
+        <DefaultSyntaxHighlighter Value="None"/>
+      </Unit9>
+      <Unit10>
+        <Filename Value="C:\laz4android\components\androidmodulewizard\androidwidget.pas"/>
+        <UnitName Value="AndroidWidget"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="3534"/>
+        <CursorPos X="62" Y="3548"/>
+        <UsageCount Value="18"/>
+      </Unit10>
+      <Unit11>
+        <Filename Value="C:\laz4android\components\androidmodulewizard\Laz_And_Controls.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="6890"/>
+        <CursorPos X="69" Y="6909"/>
+        <UsageCount Value="17"/>
+      </Unit11>
+      <Unit12>
+        <Filename Value="C:\laz4android\components\androidmodulewizard\And_jni_Bridge.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="5495"/>
+        <CursorPos X="34" Y="5519"/>
+        <UsageCount Value="13"/>
+      </Unit12>
+      <Unit13>
+        <Filename Value="C:\laz4android\components\androidmodulewizard\imagefilemanager.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="179"/>
+        <CursorPos X="57" Y="187"/>
+        <UsageCount Value="14"/>
+      </Unit13>
+    </Units>
+    <JumpHistory Count="13" HistoryIndex="12">
+      <Position1>
+        <Filename Value="unit1.pas"/>
+        <Caret Line="181" Column="22" TopLine="166"/>
+      </Position1>
+      <Position2>
+        <Filename Value="unit1.pas"/>
+        <Caret Line="76" Column="57" TopLine="64"/>
+      </Position2>
+      <Position3>
+        <Filename Value="unit1.pas"/>
+        <Caret Line="104" Column="27" TopLine="94"/>
+      </Position3>
+      <Position4>
+        <Filename Value="unit1.pas"/>
+        <Caret Line="76" Column="26" TopLine="72"/>
+      </Position4>
+      <Position5>
+        <Filename Value="unit1.pas"/>
+        <Caret Line="106" Column="10" TopLine="96"/>
+      </Position5>
+      <Position6>
+        <Filename Value="unit1.pas"/>
+        <Caret Line="115" Column="24" TopLine="103"/>
+      </Position6>
+      <Position7>
+        <Filename Value="unit1.pas"/>
+        <Caret Line="105" Column="9" TopLine="94"/>
+      </Position7>
+      <Position8>
+        <Filename Value="unit1.pas"/>
+        <Caret Line="71" Column="47" TopLine="63"/>
+      </Position8>
+      <Position9>
+        <Filename Value="unit1.pas"/>
+        <Caret Line="79" Column="51" TopLine="63"/>
+      </Position9>
+      <Position10>
+        <Filename Value="unit1.pas"/>
+        <Caret Line="105" Column="14" TopLine="87"/>
+      </Position10>
+      <Position11>
+        <Filename Value="unit1.pas"/>
+        <Caret Line="168" Column="21" TopLine="156"/>
+      </Position11>
+      <Position12>
+        <Filename Value="unit1.pas"/>
+        <Caret Line="115" Column="13" TopLine="110"/>
+      </Position12>
+      <Position13>
+        <Filename Value="unit1.pas"/>
+        <Caret Line="111" Column="22" TopLine="101"/>
+      </Position13>
+    </JumpHistory>
+  </ProjectSession>
+</CONFIG>

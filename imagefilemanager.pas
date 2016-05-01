@@ -31,8 +31,8 @@ jImageFileManager = class(jControl)
     function LoadFromURL(_imageURL: string): jObject;
     function LoadFromAssets(strName: string): jObject;
     function LoadFromResources(_imageResIdentifier: string): jObject;
-    function LoadFromFile(_filename: string): jObject; overload;
-    function LoadFromFile(_path: string; _filename: string): jObject; overload;
+    function LoadFromFile(_filenameInternalAppStorage: string): jObject; overload;
+    function LoadFromFile(_pathEnvironment: string; _filename: string): jObject; overload;
     procedure SaveToFile(_image: jObject; _filename: string); overload;
     procedure SaveToFile(_image: jObject;_path: string; _filename: string); overload;
     function LoadFromUri(_imageUri: jObject): jObject;   overload;
@@ -177,18 +177,18 @@ begin
 end;
 
 
-function jImageFileManager.LoadFromFile(_filename: string): jObject;
+function jImageFileManager.LoadFromFile(_filenameInternalAppStorage: string): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jImageFileManager_LoadFromFile(FjEnv, FjObject, _filename);
+   Result:= jImageFileManager_LoadFromFile(FjEnv, FjObject, _filenameInternalAppStorage);
 end;
 
-function jImageFileManager.LoadFromFile(_path: string; _filename: string): jObject;
+function jImageFileManager.LoadFromFile(_pathEnvironment: string; _filename: string): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-    Result:= jImageFileManager_LoadFromFile(FjEnv, FjObject,_path, _filename);
+    Result:= jImageFileManager_LoadFromFile(FjEnv, FjObject,_pathEnvironment, _filename);
 end;
 
 procedure jImageFileManager.SaveToFile(_image: jObject; _filename: string);

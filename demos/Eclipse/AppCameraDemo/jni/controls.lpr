@@ -775,7 +775,47 @@ begin
   Java_Event_pOnSeekBarStopTrackingTouch(PEnv,this,TObject(pasobj),progress);
 end;
 
-const NativeMethods:array[0..95] of JNINativeMethod = (
+{ Class:     com_example_appcamerademo_Controls
+  Method:    pOnRatingBarChanged
+  Signature: (JF)V }
+procedure pOnRatingBarChanged(PEnv: PJNIEnv; this: JObject; pasobj: JLong; rating: JFloat); cdecl;
+begin
+  Java_Event_pOnRatingBarChanged(PEnv,this,TObject(pasobj),rating);
+end;
+
+{ Class:     com_example_appcamerademo_Controls
+  Method:    pRadioGroupCheckedChanged
+  Signature: (JILjava/lang/String;)V }
+procedure pRadioGroupCheckedChanged(PEnv: PJNIEnv; this: JObject; pasobj: JLong; checkedIndex: JInt; checkedCaption: JString); cdecl;
+begin
+  Java_Event_pRadioGroupCheckedChanged(PEnv,this,TObject(pasobj),checkedIndex,checkedCaption);
+end;
+
+{ Class:     com_example_appcamerademo_Controls
+  Method:    pOnClickAutoDropDownItem
+  Signature: (JILjava/lang/String;)V }
+procedure pOnClickAutoDropDownItem(PEnv: PJNIEnv; this: JObject; pasobj: JLong; itemIndex: JInt; itemCaption: JString); cdecl;
+begin
+  Java_Event_pOnClickAutoDropDownItem(PEnv,this,TObject(pasobj),itemIndex,itemCaption);
+end;
+
+{ Class:     com_example_appcamerademo_Controls
+  Method:    pOnClickGeneric
+  Signature: (JI)V }
+procedure pOnClickGeneric(PEnv: PJNIEnv; this: JObject; pasobj: JLong; value: JInt); cdecl;
+begin
+  Java_Event_pOnClickGeneric(PEnv,this,TObject(pasobj),value);
+end;
+
+{ Class:     com_example_appcamerademo_Controls
+  Method:    pAppOnSpecialKeyDown
+  Signature: (CILjava/lang/String;)Z }
+function pAppOnSpecialKeyDown(PEnv: PJNIEnv; this: JObject; keyChar: JChar; keyCode: JInt; keyCodeString: JString): JBoolean; cdecl;
+begin
+  Result:=Java_Event_pAppOnSpecialKeyDown(PEnv,this,keyChar,keyCode,keyCodeString);
+end;
+
+const NativeMethods:array[0..100] of JNINativeMethod = (
    (name:'pAppOnScreenStyle';
     signature:'()I';
     fnPtr:@pAppOnScreenStyle;),
@@ -1063,7 +1103,22 @@ const NativeMethods:array[0..95] of JNINativeMethod = (
     fnPtr:@pOnSeekBarStartTrackingTouch;),
    (name:'pOnSeekBarStopTrackingTouch';
     signature:'(JI)V';
-    fnPtr:@pOnSeekBarStopTrackingTouch;)
+    fnPtr:@pOnSeekBarStopTrackingTouch;),
+   (name:'pOnRatingBarChanged';
+    signature:'(JF)V';
+    fnPtr:@pOnRatingBarChanged;),
+   (name:'pRadioGroupCheckedChanged';
+    signature:'(JILjava/lang/String;)V';
+    fnPtr:@pRadioGroupCheckedChanged;),
+   (name:'pOnClickAutoDropDownItem';
+    signature:'(JILjava/lang/String;)V';
+    fnPtr:@pOnClickAutoDropDownItem;),
+   (name:'pOnClickGeneric';
+    signature:'(JI)V';
+    fnPtr:@pOnClickGeneric;),
+   (name:'pAppOnSpecialKeyDown';
+    signature:'(CILjava/lang/String;)Z';
+    fnPtr:@pAppOnSpecialKeyDown;)
 );
 
 function RegisterNativeMethodsArray(PEnv: PJNIEnv; className: PChar; methods: PJNINativeMethod; countMethods:integer):integer;
@@ -1215,7 +1270,12 @@ exports
   pOnContactManagerContactsProgress name 'Java_com_example_appcamerademo_Controls_pOnContactManagerContactsProgress',
   pOnSeekBarProgressChanged name 'Java_com_example_appcamerademo_Controls_pOnSeekBarProgressChanged',
   pOnSeekBarStartTrackingTouch name 'Java_com_example_appcamerademo_Controls_pOnSeekBarStartTrackingTouch',
-  pOnSeekBarStopTrackingTouch name 'Java_com_example_appcamerademo_Controls_pOnSeekBarStopTrackingTouch';
+  pOnSeekBarStopTrackingTouch name 'Java_com_example_appcamerademo_Controls_pOnSeekBarStopTrackingTouch',
+  pOnRatingBarChanged name 'Java_com_example_appcamerademo_Controls_pOnRatingBarChanged',
+  pRadioGroupCheckedChanged name 'Java_com_example_appcamerademo_Controls_pRadioGroupCheckedChanged',
+  pOnClickAutoDropDownItem name 'Java_com_example_appcamerademo_Controls_pOnClickAutoDropDownItem',
+  pOnClickGeneric name 'Java_com_example_appcamerademo_Controls_pOnClickGeneric',
+  pAppOnSpecialKeyDown name 'Java_com_example_appcamerademo_Controls_pAppOnSpecialKeyDown';
 
 begin
   gApp:= jApp.Create(nil);{AndroidWidget.pas}
@@ -1227,4 +1287,4 @@ begin
   gApp.Initialize;
   gApp.CreateForm(TAndroidModule1, AndroidModule1);
 end.
-(*last [template] upgrade: 10/12/2015 19:18:38*)
+(*last [template] upgrade: 4/30/2016 0:29:04*)

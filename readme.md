@@ -141,6 +141,9 @@
 	*		<property name="sdk.dir" location="C:\adt32\sdk"/>
 	*
 	****************************************************************************************************
+Version 0.6 - rev. 40 - 01 May 2016 - 
+
+	FIXED!  AppCameraDemo   // thanks to tintinux!!!
 
 Version 0.6 - rev. 38.9 - 30 April 2016 - 
 

@@ -384,7 +384,7 @@ Procedure jImageView_setImage          (env:PJNIEnv;
                                         ImageView : jObject; fullPath : String);
 
 Procedure jImageView_setBitmapImage(env:PJNIEnv;
-                                    ImageView : jObject; bitmap : jObject);
+                                    ImageView : jObject; bitmap : jObject); overload;
 
 Procedure jImageView_SetImageByResIdentifier(env:PJNIEnv; ImageView : jObject; _imageResIdentifier: string);
 
@@ -420,6 +420,7 @@ procedure jImageView_SetImageFromURI(env: PJNIEnv; _jimageview: JObject; _uri: j
 procedure jImageView_SetImageFromIntentResult(env: PJNIEnv; _jimageview: JObject; _intentData: jObject);
 procedure jImageView_SetImageThumbnailFromCamera(env: PJNIEnv; _jimageview: JObject; _intentData: jObject);
 procedure jImageView_SetImageFromByteArray(env: PJNIEnv; _jimageview: JObject; var _image: TDynArrayOfJByte);
+procedure jImageView_SetBitmapImage(env: PJNIEnv; _jimageview: JObject; _bitmap: jObject; _width: integer; _height: integer); overload;
 
 
 // ListView
@@ -693,7 +694,11 @@ Procedure jCanvas_drawText             (env:PJNIEnv;
                                         Canv : jObject; const text : string; x,y : single);
 
 Procedure jCanvas_drawBitmap           (env:PJNIEnv;
-                                        Canv : jObject; bmp : jObject; b,l,r,t : integer);
+                                        Canv : jObject; bmp : jObject; left, top, right, bottom : integer); overload;
+
+procedure jCanvas_drawBitmap(env: PJNIEnv; _jcanvas: JObject; _bitmap: jObject; _width: integer; _height: integer); overload;
+
+
 // Bitmap
 Function  jBitmap_Create               (env:PJNIEnv;
                                         this:jobject; SelfObj : TObject) : jObject;
@@ -3649,6 +3654,21 @@ begin
   env^.DeleteLocalRef(env, jCls);
 end;
 
+procedure jImageView_SetBitmapImage(env: PJNIEnv; _jimageview: JObject; _bitmap: jObject; _width: integer; _height: integer);
+var
+  jParams: array[0..2] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= _bitmap;
+  jParams[1].i:= _width;
+  jParams[2].i:= _height;
+  jCls:= env^.GetObjectClass(env, _jimageview);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetBitmapImage', '(Landroid/graphics/Bitmap;II)V');
+  env^.CallVoidMethodA(env, _jimageview, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
 
 //------------------------------------------------------------------------------
 // ListView
@@ -5451,21 +5471,38 @@ begin
 end;
 
 
-Procedure jCanvas_drawBitmap(env:PJNIEnv; Canv : jObject; bmp : jObject; b,l,r,t : integer);
+Procedure jCanvas_drawBitmap(env:PJNIEnv; Canv : jObject; bmp : jObject; left, top, right, bottom: integer);
 var
  _jMethod: jMethodID = nil;
  _jParams: Array[0..4] of jValue;
  cls: jClass;
 begin
+
  _jParams[0].l := bmp;
- _jParams[1].i := b;
- _jParams[2].i := l;
- _jParams[3].i := r;
- _jParams[4].i := t;
+ _jParams[1].i := left;
+ _jParams[2].i := top;
+ _jParams[3].i := right;
+ _jParams[4].i := bottom;
+
  cls:= env^.GetObjectClass(env, Canv);
  _jMethod:= env^.GetMethodID(env, cls, 'drawBitmap', '(Landroid/graphics/Bitmap;IIII)V');
  env^.CallVoidMethodA(env,Canv,_jMethod,@_jParams);
  env^.DeleteLocalRef(env, cls);
+end;
+
+procedure jCanvas_drawBitmap(env: PJNIEnv; _jcanvas: JObject; _bitmap: jObject; _width: integer; _height: integer);
+var
+  jParams: array[0..2] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= _bitmap;
+  jParams[1].i:= _width;
+  jParams[2].i:= _height;
+  jCls:= env^.GetObjectClass(env, _jcanvas);
+  jMethod:= env^.GetMethodID(env, jCls, 'drawBitmap', '(Landroid/graphics/Bitmap;II)V');
+  env^.CallVoidMethodA(env, _jcanvas, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 //------------------------------------------------------------------------------

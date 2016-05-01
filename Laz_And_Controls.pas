@@ -475,11 +475,12 @@ type
     Destructor  Destroy; override;
     procedure Init(refApp: jApp) override;
 
-    Procedure LoadFromFile(fileName : String);
+    Procedure LoadFromFile(fullFileName : String);
     Procedure LoadFromRes( imgResIdenfier: String);  // ..res/drawable
 
     Procedure CreateJavaBitmap(w,h : Integer);
     Function  GetJavaBitmap: jObject;
+    Function  GetImage: jObject;
 
     function BitmapToByte(var bufferImage: TArrayOfByte): integer;  //local/self
 
@@ -1070,7 +1071,7 @@ type
     procedure Init(refApp: jApp); override;
     Procedure SetImageByName(Value : string);
     Procedure SetImageByIndex(Value : integer);
-    procedure SetImageBitmap(bitmap: jObject);
+    procedure SetImageBitmap(bitmap: jObject); overload;
     procedure SetImageByResIdentifier(_imageResIdentifier: string);    // ../res/drawable
 
     function GetBitmapHeight: integer;
@@ -1082,6 +1083,7 @@ type
     procedure SetImageFromIntentResult(_intentData: jObject);
     procedure SetImageThumbnailFromCamera(_intentData: jObject);
     procedure SetImageFromJByteArray(var _image: TDynArrayOfJByte);
+    procedure SetImageBitmap(_bitmap: jObject; _width: integer; _height: integer); overload;
 
     property Count: integer read GetCount;
   published
@@ -1454,13 +1456,15 @@ type
     Procedure drawPoint            (x1,y1 : single);
     Procedure drawText             (Text : String; x,y : single);
 
-    Procedure drawBitmap(bmp: jObject; b,l,r,t: integer); overload;
+    Procedure DrawBitmap(bmp: jObject; b,l,r,t: integer); overload;
 
-    Procedure drawBitmap(bmp: jBitmap; x1, y1, size: integer; ratio: single); overload;
+    Procedure DrawBitmap(bmp: jBitmap; x1, y1, size: integer; ratio: single); overload;
 
-    Procedure drawBitmap(bmp: jObject; x1, y1, size: integer; ratio: single); overload;
+    Procedure DrawBitmap(bmp: jObject; x1, y1, size: integer; ratio: single); overload;
 
-    Procedure drawBitmap(bmp: jBitmap; b,l,r,t: integer); overload;
+    Procedure DrawBitmap(bmp: jBitmap; b,l,r,t: integer); overload;
+
+    procedure DrawBitmap(_bitmap: jObject; _width: integer; _height: integer); overload;
 
     // Property
     property  JavaObj : jObject read FjObject;
@@ -4733,6 +4737,14 @@ if FInitialized then
    jImageView_SetImageFromByteArray(FjEnv, FjObject, _image);
 end;
 
+procedure jImageView.SetImageBitmap(_bitmap: jObject; _width: integer; _height: integer);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jImageView_SetBitmapImage(FjEnv, FjObject, _bitmap ,_width ,_height);
+end;
+
+
 //  new by jmpessoa
 {jImageList}
 
@@ -6836,23 +6848,23 @@ begin
   if Pos(path, fileName) > 0 then Result:= True;
 end;
 
-procedure jBitmap.LoadFromFile(fileName : string);
+procedure jBitmap.LoadFromFile(fullFileName : string);
 var
   path: string;
 begin
   if FInitialized then
   begin
-     if fileName <> '' then
+     if fullFileName <> '' then
      begin
        path:='';
 
-       if TryPath(gApp.Path.Dat,fileName) then begin path:= gApp.Path.Dat; FFilePath:= fpathApp end
-       else if TryPath(gApp.Path.Dat,fileName) then begin path:= gApp.Path.Dat; FFilePath:= fpathData  end
-       else if TryPath(gApp.Path.DCIM,fileName) then begin path:= gApp.Path.DCIM; FFilePath:= fpathDCIM end
-       else if TryPath(gApp.Path.Ext,fileName) then begin path:= gApp.Path.Ext; FFilePath:= fpathExt end;
+       if TryPath(gApp.Path.Dat,fullFileName) then begin path:= gApp.Path.Dat; FFilePath:= fpathApp end
+       else if TryPath(gApp.Path.Dat,fullFileName) then begin path:= gApp.Path.Dat; FFilePath:= fpathData  end
+       else if TryPath(gApp.Path.DCIM,fullFileName) then begin path:= gApp.Path.DCIM; FFilePath:= fpathDCIM end
+       else if TryPath(gApp.Path.Ext,fullFileName) then begin path:= gApp.Path.Ext; FFilePath:= fpathExt end;
 
-       if path <> '' then FImageName:= ExtractFileName(fileName)
-       else  FImageName:= fileName;
+       if path <> '' then FImageName:= ExtractFileName(fullFileName)
+       else  FImageName:= fullFileName;
 
        jBitmap_loadFile(FjEnv, FjObject , GetFilePath(FFilePath)+'/'+FImageName);
 
@@ -6891,6 +6903,15 @@ begin
      Result:= jBitmap_jInstance(FjEnv, FjObject );
   end;
 end;
+
+Function jBitmap.GetImage: jObject;
+begin
+  if FInitialized then
+  begin
+     Result:= jBitmap_jInstance(FjEnv, FjObject );
+  end;
+end;
+
 
 function jBitmap.BitmapToByte(var bufferImage: TArrayOfByte): integer; //local/self
 var
@@ -7297,20 +7318,20 @@ begin
      jCanvas_drawText(FjEnv, FjObject ,text,x,y);
 end;
 
-Procedure jCanvas.drawBitmap(bmp: jObject; b,l,r,t: integer);
+Procedure jCanvas.DrawBitmap(bmp: jObject; b,l,r,t: integer);
 begin
   if FInitialized then
      jCanvas_drawBitmap(FjEnv, FjObject ,bmp, b, l, r, t);
 end;
 
-Procedure jCanvas.drawBitmap(bmp: jBitmap; b,l,r,t: integer);
+Procedure jCanvas.DrawBitmap(bmp: jBitmap; b,l,r,t: integer);
 begin
   if FInitialized then
      jCanvas_drawBitmap(FjEnv, FjObject ,bmp.GetJavaBitmap, b, l, r, t);
 end;
 
 
-Procedure jCanvas.drawBitmap(bmp: jObject; x1, y1, size: integer; ratio: single);
+Procedure jCanvas.DrawBitmap(bmp: jObject; x1, y1, size: integer; ratio: single);
 var
   r1, t1: integer;
 begin
@@ -7321,7 +7342,7 @@ begin
 end;
 
 
-Procedure jCanvas.drawBitmap(bmp: jBitmap; x1, y1, size: integer; ratio: single);
+Procedure jCanvas.DrawBitmap(bmp: jBitmap; x1, y1, size: integer; ratio: single);
 var
   r1, t1: integer;
 begin
@@ -7330,6 +7351,14 @@ begin
   if FInitialized then
     jCanvas_drawBitmap(FjEnv, FjObject , bmp.GetJavaBitmap, x1, y1, r1, t1);
 end;
+
+procedure jCanvas.DrawBitmap(_bitmap: jObject; _width: integer; _height: integer);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jCanvas_drawBitmap(FjEnv, FjObject, _bitmap ,_width ,_height);
+end;
+
 
 //------------------------------------------------------------------------------
 // jView
