@@ -1,6 +1,6 @@
 package com.example.appcamerademo;
 
-//Lamw: Lazarus Android Module Wizard - Version 0.6 - revision 40 - 01 May - 2016
+//Lamw: Lazarus Android Module Wizard - Version 0.6 - revision 40.01 - 01 May - 2016
 //Form Designer and Components development model!
 //https://github.com/jmpessoa/lazandroidmodulewizard
 //http://forum.lazarus.freepascal.org/index.php/topic,21919.270.html
@@ -231,14 +231,16 @@ public boolean onOptionsItemSelected(MenuItem item) {
           controls.jAppOnKeyDown(c,keyCode,KeyEvent.keyCodeToString(keyCode));
           return false;
           
+          /*commented! need SDK API >= 18 [Android 4.3] to compile!*/
+          /*
         case KeyEvent.KEYCODE_BRIGHTNESS_DOWN:
             controls.jAppOnKeyDown(c,keyCode,KeyEvent.keyCodeToString(keyCode));
-            return true;
-            
+            return true;                   
         case KeyEvent.KEYCODE_BRIGHTNESS_UP:
             controls.jAppOnKeyDown(c,keyCode,KeyEvent.keyCodeToString(keyCode));
             return true;
-            
+         */
+          
         case KeyEvent.KEYCODE_HEADSETHOOK:
             controls.jAppOnKeyDown(c,keyCode,KeyEvent.keyCodeToString(keyCode));
             return true;
