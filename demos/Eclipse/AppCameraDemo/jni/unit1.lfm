@@ -19,7 +19,7 @@ object AndroidModule1: TAndroidModule1
     Left = 0
     Top = 0
     Width = 300
-    Height = 136
+    Height = 187
     MarginLeft = 0
     MarginTop = 0
     MarginRight = 0
@@ -28,7 +28,7 @@ object AndroidModule1: TAndroidModule1
     PosRelativeToAnchor = []
     PosRelativeToParent = [rpTop]
     LayoutParamWidth = lpMatchParent
-    LayoutParamHeight = lpOneQuarterOfParent
+    LayoutParamHeight = lpOneThirdOfParent
     BackgroundColor = colbrDefault
     MinPinchZoomFactor = 0.25
     MaxPinchZoomFactor = 4
@@ -135,17 +135,18 @@ object AndroidModule1: TAndroidModule1
       end
     end
     object jPanel5: jPanel
-      Left = 4
-      Top = 85
-      Width = 288
+      Left = 7
+      Top = 126
+      Width = 285
       Height = 47
       MarginLeft = 4
-      MarginTop = 4
+      MarginTop = 0
       MarginRight = 4
-      MarginBottom = 4
+      MarginBottom = 0
       Visible = True
-      PosRelativeToAnchor = []
-      PosRelativeToParent = [rpBottom]
+      Anchor = jPanel4
+      PosRelativeToAnchor = [raBelow]
+      PosRelativeToParent = [rpBottom, rpCenterHorizontal]
       LayoutParamWidth = lpMatchParent
       LayoutParamHeight = lpWrapContent
       BackgroundColor = colbrLightGrey
@@ -155,7 +156,7 @@ object AndroidModule1: TAndroidModule1
       object jButton1: jButton
         Left = 3
         Top = 3
-        Width = 281
+        Width = 278
         Height = 40
         MarginLeft = 2
         MarginTop = 4
@@ -166,7 +167,7 @@ object AndroidModule1: TAndroidModule1
         PosRelativeToParent = [rpCenterInParent]
         LayoutParamWidth = lpMatchParent
         LayoutParamHeight = lpWrapContent
-        Text = 'Click!'
+        Text = 'Take photo!'
         BackgroundColor = colbrDefault
         FontColor = colbrDefault
         FontSize = 0
@@ -178,7 +179,7 @@ object AndroidModule1: TAndroidModule1
   end
   object jPanel2: jPanel
     Left = 0
-    Top = 136
+    Top = 187
     Width = 300
     Height = 187
     MarginLeft = 0
@@ -213,7 +214,7 @@ object AndroidModule1: TAndroidModule1
   end
   object jPanel3: jPanel
     Left = 0
-    Top = 323
+    Top = 374
     Width = 300
     Height = 187
     MarginLeft = 0
