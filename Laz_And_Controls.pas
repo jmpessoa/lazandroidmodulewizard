@@ -482,10 +482,11 @@ type
     Function  GetJavaBitmap: jObject;
     Function  GetImage: jObject;
 
-    function BitmapToByte(var bufferImage: TArrayOfByte): integer;  //local/self
+    function BitmapToArrayOfJByte(var bufferImage: TDynArrayOfJByte): integer;  //local/self
 
-    function GetByteArrayFromBitmap(var bufferImage: TArrayOfByte): integer;
-    procedure SetByteArrayToBitmap(var bufferImage: TArrayOfByte; size: integer);
+    function GetByteArrayFromBitmap(var bufferImage: TDynArrayOfJByte): integer;
+
+    procedure SetByteArrayToBitmap(var bufferImage: TDynArrayOfJByte; size: integer);
 
     procedure LockPixels(var PDWordPixel: PScanLine); overload;
     procedure LockPixels(var PBytePixel: PScanByte {delphi mode} ); overload;
@@ -493,7 +494,8 @@ type
     procedure UnlockPixels;
 
     procedure ScanPixel(PBytePixel: PScanByte; notByteIndex: integer); overload;   //TODO - just draft
-    procedure ScanPixel(PDWordPixel: PScanLine);  overload; //TODO - just draft
+    procedure ScanPixel(PDWordPixel: PScanLine);  overload;                        //TODO - just draft
+
     function GetInfo: boolean;
     function GetRatio: Single;
 
@@ -509,6 +511,9 @@ type
     function GetByteBuffer(_width: integer; _height: integer): jObject;
     function GetBitmapFromByteBuffer(_byteBuffer: jObject; _width: integer; _height: integer): jObject;
     function GetBitmapFromByteArray(var _image: TDynArrayOfJByte): jObject;
+
+    function GetByteBufferFromBitmap(_bmap: jObject): jObject; overload;
+    function GetByteBufferFromBitmap(): jObject; overload;
 
     function GetDirectBufferAddress(byteBuffer: jObject): PJByte;
 
@@ -1517,7 +1522,7 @@ type
   // ----------------------------------------------------------------------------
 
   // Activity Event
-  Function  Java_Event_pAppOnScreenStyle         (env: PJNIEnv; this: jobject): integer;
+  Function  Java_Event_pAppOnScreenStyle         (env: PJNIEnv; this: jobject): JInt;
   Procedure Java_Event_pAppOnNewIntent           (env: PJNIEnv; this: jobject);
   Procedure Java_Event_pAppOnDestroy             (env: PJNIEnv; this: jobject);
   Procedure Java_Event_pAppOnPause               (env: PJNIEnv; this: jobject);
@@ -1649,8 +1654,9 @@ Function IntToWebViewStatus( EventType : Integer ) : TWebViewStatus;
 //  Activity Event
 //------------------------------------------------------------------------------
 
-Function Java_Event_pAppOnScreenStyle(env: PJNIEnv; this: jobject): integer;
+Function Java_Event_pAppOnScreenStyle(env: PJNIEnv; this: jobject): JInt;
 begin
+  Result:= 1;
   gApp.Jni.jEnv:= env;
   gApp.Jni.jThis:= this;
   case gApp.Screen.Style of
@@ -6913,7 +6919,7 @@ begin
 end;
 
 
-function jBitmap.BitmapToByte(var bufferImage: TArrayOfByte): integer; //local/self
+function jBitmap.BitmapToArrayOfJByte(var bufferImage: TDynArrayOfJByte): integer; //local/self
 var
   PJavaPixel: PScanByte; {need by delphi mode!} //PJByte;
   k, row, col: integer;
@@ -6922,14 +6928,14 @@ begin
   Result:= 0;
   if Self.GetInfo then
   begin
-     //demo API LockPixels - overloaded - paramenter is "PJavaPixel"
+
     PJavaPixel:= nil;
-    Self.LockPixels(PJavaPixel); //ok
+    Self.LockPixels(PJavaPixel); //ok  ... demo API LockPixels - overloaded - paramenter is "PJavaPixel"
     k:= 0;
     w:= Self.Width;
     h:= Self.Height;
     Result:=  h*w;
-    SetLength(bufferImage,Result);
+    SetLength(bufferImage,Result*4); //thanks to Prof. Wellington Pinheiro dos Santos
     for row:= 0 to h-1 do  //ok
     begin
       for col:= 0 to w-1 do //ok
@@ -6945,13 +6951,13 @@ begin
   end;
 end;
 
-function jBitmap.GetByteArrayFromBitmap(var bufferImage: TArrayOfByte): integer;
+function jBitmap.GetByteArrayFromBitmap(var bufferImage: TDynArrayOfJByte): integer;
 begin
   if FInitialized then
    Result:= jBitmap_GetByteArrayFromBitmap(FjEnv, FjObject , bufferImage);
 end;
 
-procedure jBitmap.SetByteArrayToBitmap(var bufferImage: TArrayOfByte; size: integer);
+procedure jBitmap.SetByteArrayToBitmap(var bufferImage: TDynArrayOfJByte; size: integer);
 begin
   if FInitialized then
     jBitmap_SetByteArrayToBitmap(FjEnv, FjObject , bufferImage, size);
@@ -7143,8 +7149,8 @@ end;
 procedure jBitmap.ScanPixel(PDWordPixel: PScanLine);
 var
   k: integer;
-begin     //API LockPixels... parameter is "PScanLine"
-    Self.LockPixels(PDWordPixel); //ok
+begin
+    Self.LockPixels(PDWordPixel); //ok    ...API LockPixels... parameter is "PScanLine"
     for k:= 0 to Self.Width*Self.Height-1 do
         PDWordPixel^[k]:= not PDWordPixel^[k];  //ok
     Self.UnlockPixels;
@@ -7230,6 +7236,20 @@ end;
 function jBitmap.GetDirectBufferAddress(byteBuffer: jObject): PJByte;
 begin
    Result:= PJByte((FjEnv^).GetDirectBufferAddress(FjEnv,byteBuffer));
+end;
+
+function jBitmap.GetByteBufferFromBitmap(_bmap: jObject): jObject;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jBitmap_GetByteBufferFromBitmap(FjEnv, FjObject, _bmap);
+end;
+
+function jBitmap.GetByteBufferFromBitmap(): jObject;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jBitmap_GetByteBufferFromBitmap(FjEnv, FjObject);
 end;
 
 //------------------------------------------------------------------------------

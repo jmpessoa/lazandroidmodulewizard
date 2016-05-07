@@ -141,9 +141,16 @@
 	*		<property name="sdk.dir" location="C:\adt32\sdk"/>
 	*
 	****************************************************************************************************
+
+Version 0.6 - rev. 41 - 07 May 2016 - 
+
+	IMPROVED! jBitmap: added method GetByteBufferFromBitmap
+
+	NEW!	AppTFPNoGUIGraphicsBridgeDemo7
+
 Version 0.6 - rev. 40 - 01 May 2016 - 
 
-	FIXED!  AppCameraDemo   // thanks to tintinux!!!
+	FIXED!  AppCameraDemo   //thanks to tintinux!
 
 Version 0.6 - rev. 38.9 - 30 April 2016 - 
 

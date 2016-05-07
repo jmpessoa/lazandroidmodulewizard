@@ -730,9 +730,9 @@ function jBitmap_SetScale(env: PJNIEnv; _jbitmap: JObject; _imageView: jObject; 
 function jBitmap_LoadFromAssets(env: PJNIEnv; _jbitmap: JObject; strName: string): jObject;
 //by jmpessoa
 function jBitmap_GetByteArrayFromBitmap(env:PJNIEnv;  bmap: jObject;
-                                                   var bufferImage: TArrayOfByte): integer;
+                                                   var bufferImage: TDynArrayOfJByte): integer;
 //by jmpessoa
-procedure jBitmap_SetByteArrayToBitmap(env:PJNIEnv;  bmap: jObject; var bufferImage: TArrayOfByte; size: integer);
+procedure jBitmap_SetByteArrayToBitmap(env:PJNIEnv;  bmap: jObject; var bufferImage: TDynArrayOfJByte; size: integer);
 
 function jBitmap_GetResizedBitmap(env: PJNIEnv; _jbitmap: JObject; _bmp: jObject; _newWidth: integer; _newHeight: integer): jObject; overload;
 function jBitmap_GetResizedBitmap(env: PJNIEnv; _jbitmap: JObject; _newWidth: integer; _newHeight: integer): jObject; overload;
@@ -741,6 +741,9 @@ function jBitmap_GetResizedBitmap(env: PJNIEnv; _jbitmap: JObject; _factorScaleX
 function jBitmap_GetByteBuffer(env: PJNIEnv; _jbitmap: JObject; _width: integer; _height: integer): jObject;
 function jBitmap_GetBitmapFromByteBuffer(env: PJNIEnv; _jbitmap: JObject; _byteBuffer: jObject; _width: integer; _height: integer): jObject;
 function jBitmap_GetBitmapFromByteArray(env: PJNIEnv; _jbitmap: JObject; var _image: TDynArrayOfJByte): jObject;
+
+function jBitmap_GetByteBufferFromBitmap(env: PJNIEnv; _jbitmap: JObject; _bmap: jObject): jObject; overload;
+function jBitmap_GetByteBufferFromBitmap(env: PJNIEnv; _jbitmap: JObject): jObject; overload;
 
 //GLSurfaceView
 Function  jGLSurfaceView_Create       (env:PJNIEnv;  this:jobject; SelfObj: TObject; version: integer): jObject;
@@ -5713,7 +5716,7 @@ begin
 end;
 
 //by jmpessoa
-procedure jBitmap_SetByteArrayToBitmap(env:PJNIEnv;  bmap: jObject; var bufferImage: TArrayOfByte; size: integer);
+procedure jBitmap_SetByteArrayToBitmap(env:PJNIEnv;  bmap: jObject; var bufferImage: TDynArrayOfJByte; size: integer);
 var
   _jMethod: jMethodID = nil;
   cls: jClass;
@@ -5732,7 +5735,7 @@ begin
 end;
 
 //by jmpessoa
-function jBitmap_GetByteArrayFromBitmap(env:PJNIEnv;  bmap: jObject;  var bufferImage: TArrayOfByte): integer;
+function jBitmap_GetByteArrayFromBitmap(env:PJNIEnv;  bmap: jObject;  var bufferImage: TDynArrayOfJByte): integer;
 var
   _jMethod: jMethodID = nil;
   _jbyteArray: jbyteArray;
@@ -5839,6 +5842,31 @@ begin
   env^.DeleteLocalRef(env,jParams[0].l);
   env^.DeleteLocalRef(env, jCls);
 end;
+
+function jBitmap_GetByteBufferFromBitmap(env: PJNIEnv; _jbitmap: JObject; _bmap: jObject): jObject;
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= _bmap;
+  jCls:= env^.GetObjectClass(env, _jbitmap);
+  jMethod:= env^.GetMethodID(env, jCls, 'GetByteBufferFromBitmap', '(Landroid/graphics/Bitmap;)Ljava/nio/ByteBuffer;');
+  Result:= env^.CallObjectMethodA(env, _jbitmap, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+function jBitmap_GetByteBufferFromBitmap(env: PJNIEnv; _jbitmap: JObject): jObject;
+var
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jbitmap);
+  jMethod:= env^.GetMethodID(env, jCls, 'GetByteBufferFromBitmap', '()Ljava/nio/ByteBuffer;');
+  Result:= env^.CallObjectMethod(env, _jbitmap, jMethod);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
 
 //------------------------------------------------------------------------------
 // jGLSurfaceView

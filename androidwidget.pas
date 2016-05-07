@@ -280,6 +280,7 @@ type
  TDynArrayOfJByte = array of JByte;
 
  TArrayOfByte = array of JByte;
+ TArrayOfJByte = array of JByte;
 
  TScanByte = Array[0..0] of JByte;
  PScanByte = ^TScanByte;
