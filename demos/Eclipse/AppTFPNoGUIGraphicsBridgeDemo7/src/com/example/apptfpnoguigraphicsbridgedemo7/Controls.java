@@ -17647,13 +17647,11 @@ public native boolean pAppOnSpecialKeyDown(char keyChar, int keyCode, String key
 static {
     //Log.i("JNI_Load_LibControls", "1. try load libcontrols.so");
 
-	/*
     try {
     	System.loadLibrary("freetype"); // need by TFPNoGUIGraphicsBridge [ref. www.github.com/jmpessoa/tfpnoguigraphicsbridge]
     } catch (UnsatisfiedLinkError e) {
          Log.e("JNI_Load_LibFreetype", "exception", e);
     }
-    */
 	
     try {
     	System.loadLibrary("controls");
