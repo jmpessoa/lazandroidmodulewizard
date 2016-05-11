@@ -18,6 +18,7 @@ type
     jButton2: jButton;
     jMenu1: jMenu;
     jTextView1: jTextView;
+    procedure AndroidModule2BackButton(Sender: TObject);
     procedure AndroidModule2ClickOptionMenuItem(Sender: TObject;
       jObjMenuItem: jObject; itemID: integer; itemCaption: string;
       checked: boolean);
@@ -25,6 +26,8 @@ type
     procedure AndroidModule2CreateOptionMenu(Sender: TObject; jObjMenu: jObject);
 
     procedure AndroidModule2JNIPrompt(Sender: TObject);
+    procedure AndroidModule2SpecialKeyDown(Sender: TObject; keyChar: char;
+      keyCode: integer; keyCodeString: string; var mute: boolean);
     procedure jButton1Click(Sender: TObject);
     procedure jButton2Click(Sender: TObject);
   private
@@ -53,6 +56,12 @@ begin
   jMenu1.InvalidateOptionsMenu();  //fire OnCreateOptionsMenu --> OnPrepareOptionsMenu to do form2 menu ...
 end;
 
+procedure TAndroidModule2.AndroidModule2SpecialKeyDown(Sender: TObject;
+  keyChar: char; keyCode: integer; keyCodeString: string; var mute: boolean);
+begin
+  ShowMessage(keyCodeString);
+end;
+
 procedure TAndroidModule2.AndroidModule2CreateOptionMenu(Sender: TObject; jObjMenu: jObject);
 var
   i: integer;
@@ -67,6 +76,11 @@ procedure TAndroidModule2.AndroidModule2ClickOptionMenuItem(Sender: TObject;
   jObjMenuItem: jObject; itemID: integer; itemCaption: string; checked: boolean);
 begin
   ShowMessage(itemCaption);
+end;
+
+procedure TAndroidModule2.AndroidModule2BackButton(Sender: TObject);
+begin
+  ShowMessage('Back to jForm1');
 end;
 
 procedure TAndroidModule2.jButton1Click(Sender: TObject);

@@ -1287,4 +1287,4 @@ begin
   gApp.Initialize;
   gApp.CreateForm(TAndroidModule1, AndroidModule1);
 end.
-(*last [template] upgrade: 4/29/2016 22:41:20*)
+(*last [template] upgrade: 5/10/2016 22:13:57*)

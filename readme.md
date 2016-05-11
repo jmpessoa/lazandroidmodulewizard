@@ -142,6 +142,11 @@
 	*
 	****************************************************************************************************
 
+Version 0.6 - rev. 42 - 10 May 2016 - 
+	
+	UPDATE!	AppMenuDemo  // <<--- thanks to Freris!
+	FIXED!	OnKyDown [App.java] // <<--- thanks to Freris!
+
 Version 0.6 - rev. 41 - 07 May 2016 - 
 
 	IMPROVED! jBitmap: added method GetByteBufferFromBitmap

@@ -18,7 +18,6 @@ type
     jButton1: jButton;
     jEditText1: jEditText;
     jTextView1: jTextView;
-    procedure AndroidModule1BackButton(Sender: TObject);
     procedure AndroidModule1SpecialKeyDown(Sender: TObject; keyChar: char;
       keyCode: integer; keyCodeString: string; var mute: boolean);
     procedure jAutoTextView1Click(Sender: TObject);
@@ -46,17 +45,17 @@ begin
   jAutoTextView1.ShowDropDown();
 end;
 
-procedure TAndroidModule1.AndroidModule1BackButton(Sender: TObject);
-begin
-  ShowMessage('Hello Home!');
-end;
-
 procedure TAndroidModule1.AndroidModule1SpecialKeyDown(Sender: TObject;
   keyChar: char; keyCode: integer; keyCodeString: string; var mute: boolean);
 begin
    ShowMessage(keyCodeString);
-end;
 
+
+   //if keyCodeString = 'KEYCODE_BACK' then mute:= True;
+   //caution!! OnBackButton will be not fired !
+   //caution!! if "mute:= True" the key will not close the App, no more!!
+
+end;
 
 procedure TAndroidModule1.jAutoTextView1ClickDropDownItem(Sender: TObject;
   itemIndex: integer; itemCaption: string);

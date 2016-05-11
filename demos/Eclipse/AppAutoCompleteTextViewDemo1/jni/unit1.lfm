@@ -11,7 +11,6 @@ object AndroidModule1: TAndroidModule1
   ActivityMode = actMain
   BackgroundColor = colbrDefault
   ActionBarTitle = abtDefault
-  OnBackButton = AndroidModule1BackButton
   OnSpecialKeyDown = AndroidModule1SpecialKeyDown
   object jTextView1: jTextView
     Left = 60

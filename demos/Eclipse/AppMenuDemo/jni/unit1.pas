@@ -23,6 +23,8 @@ type
       jTextView2: jTextView;
       jTextView3: jTextView;
 
+      procedure AndroidModule1SpecialKeyDown(Sender: TObject; keyChar: char;
+        keyCode: integer; keyCodeString: string; var mute: boolean);
       procedure DataModuleClickContextMenuItem(Sender: TObject;
         jObjMenuItem: jObject; itemID: integer; itemCaption: string; checked: boolean);
       procedure DataModuleClickOptionMenuItem(Sender: TObject;
@@ -227,6 +229,12 @@ begin
     jContextMenu1.UnCheckItem(jObjMenuItem);
     jButton1.FontColor:= colbrBlack; //the colbrDefault was gone!
   end;
+end;
+
+procedure TAndroidModule1.AndroidModule1SpecialKeyDown(Sender: TObject;
+  keyChar: char; keyCode: integer; keyCodeString: string; var mute: boolean);
+begin
+  ShowMessage(keyCodeString);
 end;
 
 procedure TAndroidModule1.jButton1Click(Sender: TObject);

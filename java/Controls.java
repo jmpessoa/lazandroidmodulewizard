@@ -1,6 +1,6 @@
 package com.example.dummyapp;
 
-//Lamw: Lazarus Android Module Wizard  - version 0.6 - revision 41 - 07 May - 2016 
+//Lamw: Lazarus Android Module Wizard  - version 0.6 - revision 42 - 10 May - 2016 
 //Form Designer and Components development model!
 //
 //https://github.com/jmpessoa/lazandroidmodulewizard

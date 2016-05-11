@@ -1,6 +1,6 @@
 package com.example.appautocompletetextviewdemo1;
 
-//Lamw: Lazarus Android Module Wizard  - version 0.6 - revision 38.9 - 30 April - 2016 
+//Lamw: Lazarus Android Module Wizard  - version 0.6 - revision 42 - 10 May - 2016 
 //Form Designer and Components development model!
 //
 //https://github.com/jmpessoa/lazandroidmodulewizard
@@ -1052,9 +1052,8 @@ public void SetScreenOrientation(int _orientation) {
 }
 
 public int GetScreenOrientation() {
-	    int r = 0;
-        Display display = ((WindowManager) controls.activity.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();   
-        int orientation = display.getOrientation();  //getOrientation();
+	    int orientation = controls.activity.getResources().getConfiguration().orientation;
+	    int r = 0;       	    
         switch(orientation) {
            case Configuration.ORIENTATION_PORTRAIT:
                r= 1;//setRequestedOrientation (ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
@@ -2570,11 +2569,52 @@ if (parent != null) { parent.removeView(this); }
    mMatrix = null;
 }
 
+
+private Bitmap GetResizedBitmap(Bitmap _bmp, int _newWidth, int _newHeight){
+	   float factorH = _newHeight / (float)_bmp.getHeight();
+	   float factorW = _newWidth / (float)_bmp.getWidth();
+	   float factorToUse = (factorH > factorW) ? factorW : factorH;
+	   Bitmap bm = Bitmap.createScaledBitmap(_bmp,
+	     (int) (_bmp.getWidth() * factorToUse),
+	     (int) (_bmp.getHeight() * factorToUse),false);     
+	   return bm;
+}
+
+public void SetBitmapImage(Bitmap _bitmap, int _width, int _height) {
+	bmp = GetResizedBitmap(_bitmap, _width, _height);
+	this.setImageBitmap(bmp);	
+	this.invalidate();
+}
+
 //by jmpessoa
+//http://stackoverflow.com/questions/10271020/bitmap-too-large-to-be-uploaded-into-a-texture
+
 public void setBitmapImage(Bitmap bm) {
-	//if (bmp    != null) { bmp.recycle(); }
-	bmp = bm;
-	this.setImageBitmap(bm);
+	
+	//if (bmp    != null) { bmp.recycle(); }		
+	if ( (bm.getHeight() > GL10.GL_MAX_TEXTURE_SIZE) || (bm.getWidth() > GL10.GL_MAX_TEXTURE_SIZE)) {				
+		//is is the case when the bitmap fails to load			                   	   
+		int nh = (int) ( bm.getHeight() * (1024.0 / bm.getWidth()) );	
+		Bitmap scaled = Bitmap.createScaledBitmap(bm,1024, nh, true);
+		this.setImageBitmap(scaled);
+		bmp = scaled;
+	}	
+	else{
+	    // for bitmaps with dimensions that lie within the limits, load the image normally
+	    if (Build.VERSION.SDK_INT >= 16) {	    	
+	    	 Log.i("VERSION.SDK_INT >= 16", "VERSION.SDK_INT >= 16");	    	 
+	        BitmapDrawable ob = new BitmapDrawable(this.getResources(), bm);
+	        this.setBackground(ob);
+	        //this.setImageBitmap(bm);
+	        //bmp = bm;
+	    } else {
+	   	 Log.i("VERSION.SDK_INT < 16", "VERSION.SDK_INT < 16");	    	
+	    	this.setImageBitmap(bm);
+	    	bmp = bm;
+	    }
+	}	
+	//bmp = bm;
+	//this.setImageBitmap(bm);	
 	this.invalidate();
 }
 
@@ -4678,10 +4718,45 @@ public  void drawText(String text, float x, float y ) {
   canvas.drawText(text,x,y,paint);
 }
 
-public  void drawBitmap(Bitmap bitmap, int b, int l, int r, int t) {
-  Rect rect = new Rect(b,l,r,t);
-  canvas.drawBitmap(bitmap,null,rect,paint);
+
+private Bitmap GetResizedBitmap(Bitmap _bmp, int _newWidth, int _newHeight){
+	   float factorH = _newHeight / (float)_bmp.getHeight();
+	   float factorW = _newWidth / (float)_bmp.getWidth();
+	   float factorToUse = (factorH > factorW) ? factorW : factorH;
+	   Bitmap bm = Bitmap.createScaledBitmap(_bmp,
+	     (int) (_bmp.getWidth() * factorToUse),
+	     (int) (_bmp.getHeight() * factorToUse),false);     
+	   return bm;
 }
+
+public void drawBitmap(Bitmap _bitmap, int _width, int _height) {
+	Bitmap bmp = GetResizedBitmap(_bitmap, _width, _height);
+	Rect rect = new Rect(0, 0, _width, _height);	
+	canvas.drawBitmap(bmp,null,rect,paint);	
+}
+
+//0 , 0, w, h //int left/b, int top/l, int right/r, int bottom/t) 
+public  void drawBitmap(Bitmap bitmap, int left, int top, int right, int bottom) {  //int b, int l, int r, int t 	
+    /* Figure out which way needs to be reduced less */
+	/*
+    int scaleFactor = 1;
+    if ((right > 0) && (bottom > 0)) {
+        scaleFactor = Math.min(bitmap.getWidth()/(right-left), bitmap.getHeight()/(bottom-top));
+    }	
+	*/	
+    Rect rect = new Rect(left,top, right, bottom);
+    if ( (bitmap.getHeight() > GL10.GL_MAX_TEXTURE_SIZE) || (bitmap.getWidth() > GL10.GL_MAX_TEXTURE_SIZE)) {								                   	   
+		int nh = (int) ( bitmap.getHeight() * (512.0 / bitmap.getWidth()) );	
+		Bitmap scaled = Bitmap.createScaledBitmap(bitmap,512, nh, true);
+		canvas.drawBitmap(scaled,null,rect,paint);
+		 
+	}
+	else {
+		canvas.drawBitmap(bitmap,null,rect,paint);
+	}
+    
+}
+
 
 // Free object except Self, Pascal Code Free the class.
 public  void Free() {
@@ -5943,11 +6018,7 @@ class jBitmap {
 // Java-Pascal Interface
 private long             PasObj   = 0;      // Pascal Obj
 private Controls        controls = null;   // Control Class for Event
-
-//
 public  Bitmap bmp    = null;
-
-
 
 // Constructor
 public  jBitmap(Controls ctrls, long pasobj ) {
@@ -5957,9 +6028,10 @@ controls = ctrls;
 
 }
 
-public  void loadFile(String filename) {  //full file name!
+public  void loadFile(String fullFilename) {  //full file name!
   //if (bmp != null) { bmp.recycle(); }
-  bmp = BitmapFactory.decodeFile(filename);
+  //Log.i("loadFile", filename);	
+  bmp = BitmapFactory.decodeFile(fullFilename);
 }
 
 
@@ -5989,17 +6061,24 @@ public  void loadRes(String imgResIdentifier) {  //full file name!
 	  bmp =	  ((BitmapDrawable)d).getBitmap();
 }
 
-
 //by jmpessoa
 //BitmapFactory.Options options = new BitmapFactory.Options();
 //options.inSampleSize = 4;
-public  void loadFileEx(String filename) {
+
+public  void loadFileEx(String fullFilename) {
  //if (bmp != null) { bmp.recycle(); }
   BitmapFactory.Options options = new BitmapFactory.Options();
   options.inSampleSize = 4; // --> 1/4
-  bmp = BitmapFactory.decodeFile(filename, options);
+  bmp = BitmapFactory.decodeFile(fullFilename, options);
 }
 
+
+public  void LoadFile(String _fullFilename, int _shrinkFactor) {
+	 //if (bmp != null) { bmp.recycle(); }
+	  BitmapFactory.Options options = new BitmapFactory.Options();
+	  options.inSampleSize = _shrinkFactor; // 4 --> 1/4
+	  bmp = BitmapFactory.decodeFile(_fullFilename, options);	  
+}
 
 public  void createBitmap(int w, int h) {
    //if (bmp != null) { bmp.recycle(); }
@@ -6146,18 +6225,45 @@ public Bitmap GetResizedBitmap(int _newWidth, int _newHeight){
 	ByteBuffer graphicBuffer = ByteBuffer.allocateDirect(_width*_height*4);    
     return graphicBuffer;    
   }
+  
+  
+  public ByteBuffer GetByteBufferFromBitmap(Bitmap _bmap) {	  
+	int w =  _bmap.getWidth();
+	int h =_bmap.getHeight();
+	//Log.i("w="+w, "h="+h); ok
+	ByteBuffer graphicBuffer = ByteBuffer.allocateDirect(w*h*4);  	
+	_bmap.copyPixelsToBuffer(graphicBuffer);
+	graphicBuffer.rewind();  //reset position
+    return graphicBuffer;    
+  }
+  
+  public ByteBuffer GetByteBufferFromBitmap() {
+	
+	if (bmp == null) return null;
+	
+	int w =  bmp.getWidth();
+	int h =bmp.getHeight();
+	
+	ByteBuffer graphicBuffer = ByteBuffer.allocateDirect(w*h*4);  	
+	bmp.copyPixelsToBuffer(graphicBuffer);
+	
+	graphicBuffer.rewind();  //reset position
+	
+    return graphicBuffer;    
+  }
 
-  public Bitmap GetBitmapFromByteBuffer(ByteBuffer _byteBuffer, int _width, int _height) {	  
-	  Bitmap bm = Bitmap.createBitmap(_width, _height, Bitmap.Config.ARGB_8888);					 
-      bm.copyPixelsFromBuffer(_byteBuffer);  	
-      return bm;
+  public Bitmap GetBitmapFromByteBuffer(ByteBuffer _byteBuffer, int _width, int _height) {	 
+	  _byteBuffer.rewind();  //reset position
+	  bmp = Bitmap.createBitmap(_width, _height, Bitmap.Config.ARGB_8888);					 
+      bmp.copyPixelsFromBuffer(_byteBuffer); 	
+      return bmp;
   }
   
   //by jmpessoa
   public Bitmap GetBitmapFromByteArray(byte[] _image) {
-	Bitmap bm = BitmapFactory.decodeByteArray(_image, 0, _image.length);
-	return bm;
-	//Log.i("SetByteArrayToBitmap","size="+ image.length);
+   //this.bmp = BitmapFactory.decodeByteArray(_image, 0, _image.length);
+	bmp = BitmapFactory.decodeByteArray(_image, 0, _image.length);
+	return bmp;	
   }
 
 }
@@ -10704,7 +10810,7 @@ class jImageFileManager /*extends ...*/ {
       return bmap;
    }
    
-   public Bitmap LoadFromFile(String _filename) {	   
+   public Bitmap LoadFromFile(String _filename) {  //InternalAppStorage  !!!	   
 	   Bitmap bmap=null;	  
 	   File fDir = this.controls.activity.getFilesDir();  //Result : /data/data/com/MyApp/files
 	   File file = new File(fDir, _filename);	   
@@ -10722,7 +10828,7 @@ class jImageFileManager /*extends ...*/ {
   	   return bmap;  	   
    }
    
-   public Bitmap LoadFromFile(String _path, String _filename) {	   
+   public Bitmap LoadFromFile(String _path, String _filename) { //EnvironmentDirectoryPath  !!	   
 	   String imageIn = _path+"/"+_filename;	      
 	   Bitmap bitmap = BitmapFactory.decodeFile(imageIn);	      
 	   return bitmap; 

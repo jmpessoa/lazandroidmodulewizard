@@ -10,14 +10,17 @@ object AndroidModule2: TAndroidModule2
   Text = 'AndroidModule2'
   ActivityMode = actRecyclable
   BackgroundColor = colbrWhite
+  ActionBarTitle = abtDefault
   OnJNIPrompt = AndroidModule2JNIPrompt
+  OnBackButton = AndroidModule2BackButton
   OnClose = AndroidModule2Close
+  OnSpecialKeyDown = AndroidModule2SpecialKeyDown
   OnCreateOptionMenu = AndroidModule2CreateOptionMenu
   OnClickOptionMenuItem = AndroidModule2ClickOptionMenuItem
   object jButton1: jButton
-    Left = 2
+    Left = 3
     Top = 180
-    Width = 316
+    Width = 313
     Height = 40
     MarginLeft = 2
     MarginTop = 4
@@ -32,13 +35,14 @@ object AndroidModule2: TAndroidModule2
     BackgroundColor = colbrDefault
     FontColor = colbrDefault
     FontSize = 0
+    FontSizeUnit = unitDefault
     OnClick = jButton1Click
     Id = 7590539
   end
   object jButton2: jButton
-    Left = 2
+    Left = 3
     Top = 228
-    Width = 316
+    Width = 313
     Height = 40
     MarginLeft = 2
     MarginTop = 4
@@ -54,6 +58,7 @@ object AndroidModule2: TAndroidModule2
     BackgroundColor = colbrDefault
     FontColor = colbrDefault
     FontSize = 0
+    FontSizeUnit = unitDefault
     OnClick = jButton2Click
     Id = 0
   end
@@ -78,6 +83,7 @@ object AndroidModule2: TAndroidModule2
     FontColor = colbrBlue
     FontSize = 0
     TextTypeFace = tfNormal
+    FontSizeUnit = unitDefault
     Id = 0
   end
   object jMenu1: jMenu

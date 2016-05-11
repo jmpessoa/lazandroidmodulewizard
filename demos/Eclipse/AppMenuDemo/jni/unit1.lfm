@@ -10,15 +10,17 @@ object AndroidModule1: TAndroidModule1
   Text = 'AndroidModule1'
   ActivityMode = actMain
   BackgroundColor = colbrBlack
+  ActionBarTitle = abtDefault
   OnJNIPrompt = DataModuleJNIPrompt
+  OnSpecialKeyDown = AndroidModule1SpecialKeyDown
   OnCreateOptionMenu = DataModuleCreateOptionMenu
   OnClickOptionMenuItem = DataModuleClickOptionMenuItem
   OnCreateContextMenu = DataModuleCreateContextMenu
   OnClickContextMenuItem = DataModuleClickContextMenuItem
   object jButton1: jButton
-    Left = 5
+    Left = 9
     Top = 45
-    Width = 330
+    Width = 321
     Height = 40
     MarginLeft = 5
     MarginTop = 5
@@ -34,6 +36,7 @@ object AndroidModule1: TAndroidModule1
     BackgroundColor = colbrDefault
     FontColor = colbrDefault
     FontSize = 0
+    FontSizeUnit = unitDefault
     OnClick = jButton1Click
     Id = 8111758
   end
@@ -58,6 +61,7 @@ object AndroidModule1: TAndroidModule1
     FontColor = colbrSpringGreen
     FontSize = 0
     TextTypeFace = tfNormal
+    FontSizeUnit = unitDefault
     Id = 7951916
   end
   object jTextView2: jTextView
@@ -82,12 +86,13 @@ object AndroidModule1: TAndroidModule1
     FontColor = colbrSilver
     FontSize = 0
     TextTypeFace = tfNormal
+    FontSizeUnit = unitDefault
     Id = 6398620
   end
   object jButton2: jButton
     Left = 2
     Top = 94
-    Width = 336
+    Width = 334
     Height = 40
     MarginLeft = 2
     MarginTop = 4
@@ -103,13 +108,14 @@ object AndroidModule1: TAndroidModule1
     BackgroundColor = colbrDefault
     FontColor = colbrDefault
     FontSize = 0
+    FontSizeUnit = unitDefault
     OnClick = jButton2Click
     Id = 4957801
   end
   object jListView1: jListView
-    Left = 16
-    Top = 208
-    Width = 312
+    Left = 3
+    Top = 211
+    Width = 331
     Height = 96
     Visible = True
     Anchor = jTextView3
@@ -133,6 +139,7 @@ object AndroidModule1: TAndroidModule1
     TextSizeDecorated = sdNone
     TextAlign = alLeft
     HighLightSelectedItemColor = colbrDefault
+    FontSizeUnit = unitDefault
     OnClickItem = jListView1ClickItem
     OnLongClickItem = jListView1LongClickItem
     OnDrawItemTextColor = jListView1DrawItemTextColor
@@ -160,6 +167,7 @@ object AndroidModule1: TAndroidModule1
     FontColor = colbrAqua
     FontSize = 0
     TextTypeFace = tfNormal
+    FontSizeUnit = unitDefault
     Id = 2804683
   end
   object jMenu1: jMenu
