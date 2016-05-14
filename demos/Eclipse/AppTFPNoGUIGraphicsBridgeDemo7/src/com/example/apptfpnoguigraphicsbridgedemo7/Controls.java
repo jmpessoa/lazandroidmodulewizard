@@ -1,6 +1,6 @@
 package com.example.apptfpnoguigraphicsbridgedemo7;
 
-//Lamw: Lazarus Android Module Wizard  - version 0.6 - revision 41 - 07 May - 2016 
+//Lamw: Lazarus Android Module Wizard  - version 0.6 - revision 43 - 13 May - 2016 
 //Form Designer and Components development model!
 //
 //https://github.com/jmpessoa/lazandroidmodulewizard
@@ -1207,6 +1207,15 @@ public void CopyFromAssetsToEnvironmentDir(String _filename, String _environment
 public void ToggleSoftInput() {
 	  InputMethodManager imm =(InputMethodManager) controls.activity.getSystemService(Context.INPUT_METHOD_SERVICE);
 	  imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
+}
+
+//thanks to Mladen
+public String GetDeviceModel() {
+  return android.os.Build.MODEL;  
+}
+
+public String GetDeviceManufacturer() {
+  return android.os.Build.MANUFACTURER;  
 }
 
 
@@ -13310,13 +13319,28 @@ class jNotificationManager /*extends ...*/ {
     	   icon = GetDrawableResourceId(_iconIdentifier) ;
     	
     	mNotificationManager=(NotificationManager)controls.activity.getSystemService(Context.NOTIFICATION_SERVICE);    	
-       Notification notif = new Notification.Builder(controls.activity)         
+       Notification notif = new Notification.Builder(controls.activity)  //need API >= 11 !!            
        .setContentTitle(_title)        
        .setContentText(_subject)
        .setContentInfo(_body)
        .setSmallIcon(icon)         
        .build();       
        mNotificationManager.notify(_id, notif);
+       /*
+         Application will crash targeting api's below Android 3.0 [API 11]
+         
+         Solution by freris [http://forum.lazarus.free pascal.org/index.php/topic,32605.0.html]
+         
+         Step 1:  Add to folder "../libs": 
+                 "android-support-v4.jar"  file
+                 //the version number [v4] correspond to the minimum version of android [4.0.3/API 15] that the library require.         
+         Step 2: Add:  
+                 import android.support.v4.app.NotificationCompat;                 
+         Step 3: Change the line:          
+         		Notification notif = new Notification.Builder(controls.activity);
+         		with: 
+         		Notification notif = new NotificationCompat.Builder(controls.activity);         
+        */
     }
     
     //This method cancel a previously shown notification.
@@ -17647,11 +17671,13 @@ public native boolean pAppOnSpecialKeyDown(char keyChar, int keyCode, String key
 static {
     //Log.i("JNI_Load_LibControls", "1. try load libcontrols.so");
 
+	/*
     try {
     	System.loadLibrary("freetype"); // need by TFPNoGUIGraphicsBridge [ref. www.github.com/jmpessoa/tfpnoguigraphicsbridge]
     } catch (UnsatisfiedLinkError e) {
          Log.e("JNI_Load_LibFreetype", "exception", e);
     }
+    */
 	
     try {
     	System.loadLibrary("controls");

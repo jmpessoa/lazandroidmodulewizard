@@ -1051,6 +1051,8 @@ type
     function GetActionBarHeight(): integer;
     function ActionBarIsShowing(): boolean;
     procedure ToggleSoftInput();
+    function GetDeviceModel(): string;
+    function GetDeviceManufacturer(): string;
 
     // Property
     property View         : jObject        read FjRLayout; //layout!
@@ -1293,6 +1295,8 @@ end;
   function jForm_ActionBarIsShowing(env: PJNIEnv; _jform: JObject): boolean;
 
   procedure jForm_ToggleSoftInput(env: PJNIEnv; _jform: JObject);
+  function jForm_GetDeviceModel(env: PJNIEnv; _jform: JObject): string;
+  function jForm_GetDeviceManufacturer(env: PJNIEnv; _jform: JObject): string;
 
 //jni API Bridge
 
@@ -3013,6 +3017,19 @@ begin
      jForm_ToggleSoftInput(FjEnv, FjObject);
 end;
 
+function jForm.GetDeviceModel(): string;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jForm_GetDeviceModel(FjEnv, FjObject);
+end;
+
+function jForm.GetDeviceManufacturer(): string;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jForm_GetDeviceManufacturer(FjEnv, FjObject);
+end;
 
 {-------- jForm_JNI_Bridge ----------}
 
@@ -3784,6 +3801,45 @@ begin
   env^.DeleteLocalRef(env, jCls);
 end;
 
+function jForm_GetDeviceModel(env: PJNIEnv; _jform: JObject): string;
+var
+  jStr: JString;
+  jBoo: JBoolean;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jform);
+  jMethod:= env^.GetMethodID(env, jCls, 'GetDeviceModel', '()Ljava/lang/String;');
+  jStr:= env^.CallObjectMethod(env, _jform, jMethod);
+  case jStr = nil of
+     True : Result:= '';
+     False: begin
+              jBoo:= JNI_False;
+              Result:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
+            end;
+  end;
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+function jForm_GetDeviceManufacturer(env: PJNIEnv; _jform: JObject): string;
+var
+  jStr: JString;
+  jBoo: JBoolean;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jform);
+  jMethod:= env^.GetMethodID(env, jCls, 'GetDeviceManufacturer', '()Ljava/lang/String;');
+  jStr:= env^.CallObjectMethod(env, _jform, jMethod);
+  case jStr = nil of
+     True : Result:= '';
+     False: begin
+              jBoo:= JNI_False;
+              Result:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
+            end;
+  end;
+  env^.DeleteLocalRef(env, jCls);
+end;
 
 //-----------------------------------------------
    {jApp by jmpessoa}

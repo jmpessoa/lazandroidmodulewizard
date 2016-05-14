@@ -52,6 +52,7 @@
         <Filename Value="unit1.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="AndroidModule1"/>
+        <HasResources Value="True"/>
       </Unit1>
     </Units>
   </ProjectOptions>

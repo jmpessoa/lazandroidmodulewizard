@@ -6,8 +6,8 @@ unit unit1;
 interface
 
 uses
-  Classes, SysUtils, And_jni, And_jni_Bridge, Laz_And_Controls, 
-    Laz_And_Controls_Events, AndroidWidget, FPNoGUIGraphicsBridge, ViewPort;
+  Classes, SysUtils, And_jni, And_jni_Bridge, Laz_And_Controls,
+  Laz_And_Controls_Events, AndroidWidget, ViewPort, FPNoGUIGraphicsBridge, FPImage;
 
 type
 
@@ -21,6 +21,8 @@ type
     jImageView2: jImageView;
     jTextView1: jTextView;
     ViewPort1: TViewPort;
+    procedure FPNoGUIGraphicsBridge1DrawFunction(x: real; out y: real; out
+      skip: boolean);
     procedure jButton1Click(Sender: TObject);
   private
     {private declarations}
@@ -65,12 +67,20 @@ begin
   FPNoGUIGraphicsBridge1.Surface.SetRGBAGraphics(PGlobalDirectImagePixel);  // Android --> Pascal
 
   FPNoGUIGraphicsBridge1.PaintGrid(False); // false: grid background not painted!
+  FPNoGUIGraphicsBridge1.DrawFunction(False);
 
   FPNoGUIGraphicsBridge1.Surface.GetRGBAGraphics(PGlobalDirectImagePixel);  //Pascal --> Android
 
   jImageView2.SetImageBitmap(jBitmap1.GetBitmapFromByteBuffer(jGraphicsBuffer, w, h));
 
 end;
+
+procedure TAndroidModule1.FPNoGUIGraphicsBridge1DrawFunction(x: real; out
+  y: real; out skip: boolean);
+begin
+   y:= 4*x*x*x*x - 5*x*x*x - x*x + x -1;
+end;
+
 
 end.
 

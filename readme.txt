@@ -142,6 +142,14 @@
 	*
 	****************************************************************************************************
 
+Version 0.6 - rev. 43 - 13 May 2016 - 
+
+	NEW!	jForm methods: 
+				GetDeviceModel,   
+				GetDeviceManufacturer // <<--- thanks to Mladen
+
+	NEW!	AppTFPNoGUIGraphicsBridgeDemo8   // <<--- thanks to Profo Welligton Pinheiro Santos!
+
 Version 0.6 - rev. 42 - 10 May 2016 - 
 	
 	UPDATE!	AppMenuDemo  // <<--- thanks to Freris!

@@ -26,7 +26,7 @@ object AndroidModule1: TAndroidModule1
     PosRelativeToParent = [rpCenterHorizontal]
     LayoutParamWidth = lpMatchParent
     LayoutParamHeight = lpWrapContent
-    Text = 'Copy To ImageView2'
+    Text = 'Draw'
     BackgroundColor = colbrDefault
     FontColor = colbrDefault
     FontSize = 0
@@ -71,9 +71,9 @@ object AndroidModule1: TAndroidModule1
     LayoutParamHeight = lpWrapContent
     ImageIndex = -1
     BackgroundColor = colbrDefault
-    ImageIdentifier = 'lamw_architecture'
+    ImageIdentifier = 'lemur600'
     ImageScaleType = scaleCenter
-    Id = 2206350
+    Id = 7048641
   end
   object jImageView2: jImageView
     Left = 136
@@ -89,15 +89,7 @@ object AndroidModule1: TAndroidModule1
     ImageIndex = -1
     BackgroundColor = colbrDefault
     ImageScaleType = scaleCenter
-    Id = 0
-  end
-  object jBitmap1: jBitmap
-    FilePath = fpathData
-    ImageIndex = -1
-    Width = 0
-    Height = 0
-    left = 149
-    top = 223
+    Id = 2881379
   end
   object FPNoGUIGraphicsBridge1: TFPNoGUIGraphicsBridge
     Width = 400
@@ -119,8 +111,9 @@ object AndroidModule1: TAndroidModule1
     EntityData.FieldSeparator = ';'
     EntityData.NameValueSeparator = '#'
     ActiveViewPort = ViewPort1
-    left = 96
-    top = 306
+    OnDrawFunction = FPNoGUIGraphicsBridge1DrawFunction
+    left = 112
+    top = 248
   end
   object ViewPort1: TViewPort
     PenThickness = 1
@@ -148,7 +141,15 @@ object AndroidModule1: TAndroidModule1
     GridData.YLegendInterval = 1
     GridData.XShowLengend = True
     GridData.YShowLengend = True
-    left = 200
-    top = 306
+    left = 192
+    top = 237
+  end
+  object jBitmap1: jBitmap
+    FilePath = fpathData
+    ImageIndex = -1
+    Width = 0
+    Height = 0
+    left = 69
+    top = 158
   end
 end
