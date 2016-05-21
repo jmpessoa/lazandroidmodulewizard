@@ -83,13 +83,15 @@ type
     FColor: TARGBColorBridge;
     FFontColor: TARGBColorBridge;
     procedure SetColor(color: TARGBColorBridge);
-    procedure SetFontColor(color: TARGBColorBridge);
+    procedure SetFontColor(AColor: TARGBColorBridge);
     function Designer: TAndroidWidgetMediator;
   protected
     FAndroidWidget: TAndroidWidget;      // original
     FCanvas: TCanvas;                    // canvas to draw onto
     FnewW, FnewH, FnewL, FnewT: Integer; // layout
     FminW, FminH: Integer;
+    function GetParentBackgroundColor: TARGBColorBridge;
+    function GetBackGroundColor: TColor;
   public
     BackGroundColor: TColor;
     TextColor: TColor;
@@ -100,7 +102,7 @@ type
     Height: integer;
     Width: integer;
     constructor Create(AWidget: TAndroidWidget; Canvas: TCanvas); virtual;
-    procedure Draw; virtual; abstract;
+    procedure Draw; virtual;
     procedure UpdateLayout; virtual;
     property Color: TARGBColorBridge read FColor write SetColor;
     property FontColor: TARGBColorBridge read FFontColor write SetFontColor;
@@ -164,28 +166,21 @@ type
   public
     constructor Create(AWidget: TAndroidWidget; Canvas: TCanvas); override;
     procedure Draw; override;
-    procedure UpdateLayout; override;
   end;
 
   TDraftRatingBar = class(TDraftWidget)
   public
     constructor Create(AWidget: TAndroidWidget; Canvas: TCanvas); override;
-    procedure Draw; override;
-    procedure UpdateLayout; override;
   end;
 
   TDraftDigitalClock = class(TDraftWidget)
   public
     constructor Create(AWidget: TAndroidWidget; Canvas: TCanvas); override;
-    procedure Draw; override;
-    procedure UpdateLayout; override;
   end;
 
   TDraftAnalogClock = class(TDraftWidget)
   public
     constructor Create(AWidget: TAndroidWidget; Canvas: TCanvas); override;
-    procedure Draw; override;
-    procedure UpdateLayout; override;
   end;
 
   { TDraftProgressBar }
@@ -210,7 +205,6 @@ type
   public
     constructor Create(AWidget: TAndroidWidget; Canvas: TCanvas); override;
     procedure Draw; override;
-    procedure UpdateLayout; override;
   end;
 
   { TDraftImageBtn }
@@ -219,35 +213,28 @@ type
   public
     constructor Create(AWidget: TAndroidWidget; Canvas: TCanvas); override;
     procedure Draw; override;
-    procedure UpdateLayout; override;
   end;
 
   { TDraftImageView }
 
   TDraftImageView = class(TDraftWidget)
-   public
-     constructor Create(AWidget: TAndroidWidget; Canvas: TCanvas); override;
-     procedure Draw; override;
-     procedure UpdateLayout; override;
-   end;
+  public
+    constructor Create(AWidget: TAndroidWidget; Canvas: TCanvas); override;
+  end;
 
   {TDraftDrawingView}
 
   TDraftDrawingView = class(TDraftWidget)
-   public
-     constructor Create(AWidget: TAndroidWidget; Canvas: TCanvas); override;
-     procedure Draw; override;
-     procedure UpdateLayout; override;
-   end;
+  public
+    constructor Create(AWidget: TAndroidWidget; Canvas: TCanvas); override;
+  end;
 
   {TDraftSurfaceView}
 
   TDraftSurfaceView = class(TDraftWidget)
-   public
-     constructor Create(AWidget: TAndroidWidget; Canvas: TCanvas); override;
-     procedure Draw; override;
-     procedure UpdateLayout; override;
-   end;
+  public
+    constructor Create(AWidget: TAndroidWidget; Canvas: TCanvas); override;
+  end;
 
   { TDraftSpinner }
 
@@ -265,50 +252,45 @@ type
     procedure SetDropListTextColor(Acolor: TARGBColorBridge);
     procedure SetDropListBackgroundColor(Acolor: TARGBColorBridge);
     procedure SetSelectedFontColor(Acolor: TARGBColorBridge);
-
   public
-     constructor Create(AWidget: TAndroidWidget; Canvas: TCanvas); override;
-     procedure Draw; override;
-     procedure UpdateLayout; override;
+    constructor Create(AWidget: TAndroidWidget; Canvas: TCanvas); override;
+    procedure Draw; override;
 
-     property DropListTextColor: TARGBColorBridge read FDropListTextColor write SetDropListTextColor;
-     property DropListBackgroundColor: TARGBColorBridge  read FDropListBackgroundColor write SetDropListBackgroundColor;
-     property SelectedFontColor: TARGBColorBridge  read FSelectedFontColor write SetSelectedFontColor;
-  end;
+    property DropListTextColor: TARGBColorBridge read FDropListTextColor write SetDropListTextColor;
+    property DropListBackgroundColor: TARGBColorBridge  read FDropListBackgroundColor write SetDropListBackgroundColor;
+    property SelectedFontColor: TARGBColorBridge  read FSelectedFontColor write SetSelectedFontColor;
+ end;
 
   { TDraftWebView }
 
   TDraftWebView = class(TDraftWidget)
   public
-     constructor Create(AWidget: TAndroidWidget; Canvas: TCanvas); override;
-     procedure Draw; override;
-     procedure UpdateLayout; override;
+    constructor Create(AWidget: TAndroidWidget; Canvas: TCanvas); override;
+    procedure Draw; override;
   end;
 
   { TDraftScrollView }
 
   TDraftScrollView = class(TDraftWidget)
   public
-     constructor Create(AWidget: TAndroidWidget; Canvas: TCanvas); override;
-     procedure Draw; override;
-     procedure UpdateLayout; override;
+    constructor Create(AWidget: TAndroidWidget; Canvas: TCanvas); override;
+    procedure Draw; override;
   end;
 
   TDraftHorizontalScrollView = class(TDraftWidget)
   public
-     constructor Create(AWidget: TAndroidWidget; Canvas: TCanvas); override;
-     procedure Draw; override;
-     procedure UpdateLayout; override;
+    constructor Create(AWidget: TAndroidWidget; Canvas: TCanvas); override;
+    procedure Draw; override;
   end;
 
   { TDraftToggleButton }
 
   TDraftToggleButton = class(TDraftWidget)
+  private
+    FOnOff: boolean;
   public
-     OnOff: boolean;
-     constructor Create(AWidget: TAndroidWidget; Canvas: TCanvas); override;
-     procedure Draw; override;
-     procedure UpdateLayout; override;
+    constructor Create(AWidget: TAndroidWidget; Canvas: TCanvas); override;
+    procedure Draw; override;
   end;
 
   { TDraftSwitchButton }
@@ -323,35 +305,16 @@ type
 
   TDraftGridView = class(TDraftWidget)
   public
-     constructor Create(AWidget: TAndroidWidget; Canvas: TCanvas); override;
-     procedure Draw; override;
-     procedure UpdateLayout; override;
+    constructor Create(AWidget: TAndroidWidget; Canvas: TCanvas); override;
+    procedure Draw; override;
   end;
 
   { TDraftView }
 
   TDraftView = class(TDraftWidget)
   public
-     constructor Create(AWidget: TAndroidWidget; Canvas: TCanvas); override;
-     procedure Draw; override;
-     procedure UpdateLayout; override;
-  end;
-
-   { TDraftCanvasES1 }
-  TDraftCanvasES1 = class(TDraftWidget)
-  public
-     constructor Create(AWidget: TAndroidWidget; Canvas: TCanvas); override;
-     procedure Draw; override;
-     procedure UpdateLayout; override;
-  end;
-
-  { TDraftCanvasES2 }
- TDraftCanvasES2 = class(TDraftWidget)
- public
     constructor Create(AWidget: TAndroidWidget; Canvas: TCanvas); override;
-    procedure Draw; override;
-    procedure UpdateLayout; override;
- end;
+  end;
 
   { TDraftPanel }
 
@@ -360,6 +323,8 @@ type
     procedure Draw; override;
     procedure UpdateLayout; override;
   end;
+
+
 
   { TARGBColorBridgePropertyEditor }
 
@@ -396,8 +361,9 @@ implementation
 uses
   LCLIntf, LCLType, ObjInspStrConsts, FPimage, typinfo, Laz_And_Controls,
   customdialog, togglebutton, switchbutton, Laz_And_GLESv1_Canvas,
-  Laz_And_GLESv2_Canvas, gridview, Spinner, seekbar,  uFormSizeSelect, radiogroup, ratingbar,
-  digitalclock, analogclock, surfaceview, autocompletetextview, drawingview;
+  Laz_And_GLESv2_Canvas, gridview, Spinner, seekbar,  uFormSizeSelect,
+  radiogroup, ratingbar, digitalclock, analogclock, surfaceview,
+  autocompletetextview, drawingview;
 
 var
   DraftClassesMap: TDraftControlHash;
@@ -408,21 +374,21 @@ begin
   Red   := Red shl 8 or Red;
   Green := ( (rgb and $ff00  )  shr  8);
   Green := Green shl 8 or Green;
-  Blue  := ( (rgb and $ff)            );
+  Blue  := ( (rgb and $ff    )        );
   Blue  := Blue shl 8 or Blue;
 end;
 
-function ToTFPColor(colbrColor: TARGBColorBridge):  TFPColor;
+function ToTFPColor(colbrColor: TARGBColorBridge): TFPColor;
 var
-    index: integer;
-    red, green, blue: word;
+  index: integer;
+  red, green, blue: word;
 begin
-    index:= (Ord(colbrColor));
-    GetRedGreenBlue(TFPColorBridgeArray[index], red, green, blue);
-    Result.Red:=   red;
-    Result.Green:= green;
-    Result.Blue:=  blue;
-    Result.Alpha:= AlphaOpaque;
+  index := Ord(colbrColor);
+  GetRedGreenBlue(TFPColorBridgeArray[index], red, green, blue);
+  Result.Red   := red;
+  Result.Green := green;
+  Result.Blue  := blue;
+  Result.Alpha := AlphaOpaque;
 end;
 
 function AndroidToLCLFontSize(asize: DWord; Default: Integer): Integer; inline;
@@ -434,11 +400,21 @@ begin
   end;
 end;
 
+function MaxRGB(c: TColor): Byte;
+var
+  r, g, b: Byte;
+begin
+  RedGreenBlue(ColorToRGB(c), r, g, b);
+  if g > r then r := g;
+  if b > r then r := b;
+  Result := r;
+end;
+
 function BlendColors(c: TColor; alpha: Double; r, g, b: Byte): TColor; inline;
 var
   r1, g1, b1: Byte;
 begin
-  RedGreenBlue(c, r1, g1, b1);
+  RedGreenBlue(ColorToRGB(c), r1, g1, b1);
   Result := RGBToColor(Byte(Trunc(r1 * alpha + r * (1 - alpha))),
                        Byte(Trunc(g1 * alpha + g * (1 - alpha))),
                        Byte(Trunc(b1 * alpha + b * (1 - alpha))));
@@ -769,7 +745,7 @@ begin
   Mediator:= TAndroidWidgetMediator(Result);
   Mediator.Root := TheForm;
 
-  Mediator.FDefaultBrushColor:= clForm;
+  Mediator.FDefaultBrushColor:= clWhite;
   Mediator.FDefaultPenColor:= clMedGray;
   Mediator.FDefaultFontColor:= clMedGray;
 
@@ -800,15 +776,12 @@ end;
 
 procedure TAndroidWidgetMediator.GetObjInspNodeImageIndex(APersistent: TPersistent; var AIndex: integer);
 begin
-  if Assigned(APersistent) then
-  begin
-    if (APersistent is TAndroidWidget) and (TAndroidWidget(APersistent).AcceptChildrenAtDesignTime) then
-      AIndex:= FormEditingHook.GetCurrentObjectInspector.ComponentTree.ImgIndexBox
-    else if (APersistent is TAndroidWidget) then
-      AIndex:= FormEditingHook.GetCurrentObjectInspector.ComponentTree.ImgIndexControl
-    else
-      inherited GetObjInspNodeImageIndex(APersistent, AIndex);
-  end
+  if (APersistent is TAndroidWidget) and (TAndroidWidget(APersistent).AcceptChildrenAtDesignTime) then
+    AIndex:= FormEditingHook.GetCurrentObjectInspector.ComponentTree.ImgIndexBox
+  else if (APersistent is TAndroidWidget) then
+    AIndex:= FormEditingHook.GetCurrentObjectInspector.ComponentTree.ImgIndexControl
+  else
+    inherited GetObjInspNodeImageIndex(APersistent, AIndex);
 end;
 
 procedure TAndroidWidgetMediator.SetBounds(AComponent: TComponent; NewBounds: TRect);
@@ -903,9 +876,9 @@ procedure TAndroidWidgetMediator.Paint;
 
       if (AWidget is jForm) then
       begin
-        if (AWidget as jForm).BackgroundColor <> colbrDefault then
+        if jForm(AWidget).BackgroundColor <> colbrDefault then
         begin
-          fpcolor:= ToTFPColor((AWidget as jForm).BackgroundColor);
+          fpcolor:= ToTFPColor(jForm(AWidget).BackgroundColor);
           Brush.Color:= FPColorToTColor(fpcolor);
           Rectangle(0,0,AWidget.Width,AWidget.Height); // outer frame
         end
@@ -913,14 +886,16 @@ procedure TAndroidWidgetMediator.Paint;
         begin
           Brush.Color := clWhite;
           GradientFill(Rect(0,0,AWidget.Width,AWidget.Height),
-            RGBToColor($EC,$EC,$EC), clWhite, gdVertical);
+            BlendColors(FDefaultBrushColor, 0.9255, 0, 0, 0),
+            FDefaultBrushColor,
+            gdVertical);
         end;
       end else
       if (AWidget is jCustomDialog) then
       begin
-        if (AWidget as jCustomDialog).BackgroundColor <> colbrDefault then
+        if jCustomDialog(AWidget).BackgroundColor <> colbrDefault then
         begin
-          fpcolor:= ToTFPColor((AWidget as jCustomDialog).BackgroundColor);
+          fpcolor:= ToTFPColor(jCustomDialog(AWidget).BackgroundColor);
           Brush.Color:= FPColorToTColor(fpcolor);
         end;
         {
@@ -933,7 +908,6 @@ procedure TAndroidWidgetMediator.Paint;
         Rectangle(0,0,AWidget.Width,AWidget.Height);    // outer frame
         Font.Color:= clMedGray;
         TextOut(6,4,(AWidget as jVisualControl).Text);
-
       end
       else // generic
       begin
@@ -946,14 +920,15 @@ procedure TAndroidWidgetMediator.Paint;
           fWidget.Draw;
           fWidget.Free;
         end
-        else if (AWidget is jVisualControl) then     ////generic
+        //// default drawing: rect with Text
+        else if (AWidget is jVisualControl) then
         begin
           Brush.Color:= Self.FDefaultBrushColor;
           FillRect(0,0,AWidget.Width,AWidget.Height);
           Rectangle(0,0,AWidget.Width,AWidget.Height);    // outer frame
           //generic
           Font.Color:= clMedGray;
-          TextOut(5,4,(AWidget as TAndroidWidget).Text);
+          TextOut(5,4,AWidget.Text);
         end;
       end;
 
@@ -1006,7 +981,7 @@ end;
 
 function TAndroidWidgetMediator.ComponentIsIcon(AComponent: TComponent): boolean;
 begin
-  Result:=not (AComponent is TAndroidWidget);
+  Result := not (AComponent is TAndroidWidget);
 end;
 
 function TAndroidWidgetMediator.ParentAcceptsChild(Parent: TComponent; Child: TComponentClass): boolean;
@@ -1039,6 +1014,7 @@ begin
   BackGroundColor:= clNone;
   FAndroidWidget := AWidget;
   FCanvas := Canvas;
+  FColor := colbrDefault;
 
   with jVisualControl(FAndroidWidget) do
   begin
@@ -1055,6 +1031,28 @@ begin
         if not (LayoutParamHeight in [lpWrapContent]) then
           LayoutParamHeight := GetDesignerLayoutByWH(Height, Parent.Height);
       end;
+  end;
+
+  Height := AWidget.Height;
+  Width := AWidget.Width;
+  MarginLeft := AWidget.MarginLeft;
+  MarginTop := AWidget.MarginTop;
+  MarginRight := AWidget.MarginRight;
+  MarginBottom := AWidget.MarginBottom;
+end;
+
+procedure TDraftWidget.Draw;
+begin
+  with FCanvas do
+  begin
+    if Color <> colbrDefault then
+      Brush.Color := FPColorToTColor(ToTFPColor(Color))
+    else begin
+      Brush.Color:= clNone;
+      Brush.Style:= bsClear;
+    end;
+    Rectangle(0, 0, FAndroidWidget.Width, FAndroidWidget.Height);    // outer frame
+    TextOut(12, 9, FAndroidWidget.Text);
   end;
 end;
 
@@ -1142,14 +1140,13 @@ begin
     BackGroundColor:= clNone;
 end;
 
-procedure TDraftWidget.SetFontColor(color: TARGBColorBridge);
+procedure TDraftWidget.SetFontColor(AColor: TARGBColorBridge);
 begin
-  FFontColor:= color;
-  if color <> colbrDefault then
-  begin
-    TextColor:= FPColorToTColor(ToTFPColor(color));
-  end
-  else TextColor:= clNone;
+  FFontColor := AColor;
+  if AColor <> colbrDefault then
+    TextColor := FPColorToTColor(ToTFPColor(AColor))
+  else
+    TextColor := clNone;
 end;
 
 function TDraftWidget.Designer: TAndroidWidgetMediator;
@@ -1164,30 +1161,58 @@ begin
     Result := TAndroidForm(t).Designer as TAndroidWidgetMediator;
 end;
 
+function TDraftWidget.GetParentBackgroundColor: TARGBColorBridge;
+begin
+  // TODO: Parent.AcceptChildrenAtDesignTime
+  if FAndroidWidget.Parent is jPanel then
+  begin
+    Result := jPanel(FAndroidWidget.Parent).BackgroundColor;
+  end else
+  if FAndroidWidget.Parent is jCustomDialog then
+  begin
+    Result := jCustomDialog(FAndroidWidget.Parent).BackgroundColor;
+  end else
+    Result := Color;
+end;
+
+function TDraftWidget.GetBackGroundColor: TColor;
+var
+  w: TAndroidWidget;
+  d: TDraftWidgetClass;
+begin
+  Result := BackGroundColor;
+  if Result = clNone then
+  begin
+    w := FAndroidWidget.Parent;
+    while (Result = clNone) and (w is jVisualControl) do
+    begin
+      d := DraftClassesMap.Find(w.ClassType);
+      with d.Create(w, FCanvas) do
+      begin
+        Result := BackGroundColor;
+        w := w.Parent;
+        Free;
+      end;
+    end;
+    if (Result = clNone) and (w is jForm)
+    and (jForm(w).BackgroundColor <> colbrDefault) then
+      Result := FPColorToTColor(ToTFPColor(jForm(w).BackgroundColor))
+    else
+      Result := Designer.FDefaultBrushColor;
+  end;
+end;
+
 { TDraftButton }
 
 constructor TDraftButton.Create(AWidget: TAndroidWidget; Canvas: TCanvas);
 begin
   inherited;
-  Height := AWidget.Height;
-  Width := AWidget.Width;
-  MarginLeft := AWidget.MarginLeft;
-  MarginTop := AWidget.MarginTop;
-  MarginRight := AWidget.MarginRight;
-  MarginBottom := AWidget.MarginBottom;
-  FontColor := jButton(AWidget).FontColor;
-  Color := jButton(AWidget).BackgroundColor;
 
-  if AWidget.Parent is jPanel then
-  begin
-    if jButton(AWidget).BackgroundColor = colbrDefault then
-      Color := jPanel(AWidget.Parent).BackgroundColor;
-  end else
-  if AWidget.Parent is jCustomDialog then
-  begin
-    if jButton(AWidget).BackgroundColor = colbrDefault then
-      Color := jCustomDialog(AWidget.Parent).BackgroundColor;
-  end;
+  Color := jButton(AWidget).BackgroundColor;
+  FontColor := jButton(AWidget).FontColor;
+
+  if jButton(AWidget).BackgroundColor = colbrDefault then
+    Color := GetParentBackgroundColor;
 end;
 
 procedure TDraftButton.Draw;
@@ -1244,14 +1269,9 @@ end;
 constructor TDraftTextView.Create(AWidget: TAndroidWidget; Canvas: TCanvas);
 begin
   inherited;
-  BackGroundColor := clNone;
-  Height := AWidget.Height;
-  Width := AWidget.Width;
-  MarginLeft := AWidget.MarginLeft;
-  MarginTop := AWidget.MarginTop;
-  MarginRight := AWidget.MarginRight;
-  MarginBottom := AWidget.MarginBottom;
   Color := jTextView(AWidget).BackgroundColor;
+  if Color = colbrDefault then
+    Color := GetParentBackgroundColor;
   FontColor := jTextView(AWidget).FontColor;
 end;
 
@@ -1268,13 +1288,16 @@ begin
     Brush.Color := BackGroundColor;
     Pen.Color := TextColor;
     if BackGroundColor <> clNone then
-      FillRect(0, 0, FAndroidWidget.Width, FAndroidWidget.Height)
+      FillRect(0, 0, Self.Width, Self.Height)
     else
       Brush.Style := bsClear;
 
     if TextColor = clNone then
-      Font.Color := RGBToColor($3A,$3A,$3A)
-    else
+    begin
+      Font.Color := RGBToColor($3A,$3A,$3A);
+      if MaxRGB(GetBackGroundColor) < 20 then
+        Font.Color := InvertColor(Font.Color);
+    end else
       Font.Color := TextColor;
 
     TextOut(0, (ps + 5) div 10, FAndroidWidget.Text);
@@ -1312,6 +1335,8 @@ constructor TDraftEditText.Create(AWidget: TAndroidWidget; Canvas: TCanvas);
 begin
   inherited;
   Color := jEditText(AWidget).BackgroundColor;
+  if Color = colbrDefault then
+    Color := GetParentBackgroundColor;
   FontColor := jEditText(AWidget).FontColor;
 end;
 
@@ -1328,8 +1353,11 @@ begin
     end else
       Brush.Style := bsClear;
     if TextColor = clNone then
-      Font.Color := clBlack
-    else
+    begin
+      Font.Color := clBlack;
+      if MaxRGB(GetBackGroundColor) < 20 then
+        Font.Color := InvertColor(Font.Color);
+    end else
       Font.Color := TextColor;
     ls := Font.Size;
     Font.Size := AndroidToLCLFontSize(jEditText(FAndroidWidget).FontSize, 13);
@@ -1385,15 +1413,18 @@ begin
     end else
       Brush.Style := bsClear;
     if TextColor = clNone then
-      Font.Color := clBlack
-    else
+    begin
+      Font.Color := clBlack;
+      if MaxRGB(GetBackGroundColor) < 20 then
+        Font.Color := InvertColor(Font.Color);
+    end else
       Font.Color := TextColor;
 
     ls := Font.Size;
-    Font.Size := AndroidToLCLFontSize(jAutoTextView(FAndroidWidget).FontSize, 9);
+    Font.Size := AndroidToLCLFontSize(jAutoTextView(FAndroidWidget).FontSize, 13);
     TextOut(4, 12, jAutoTextView(FAndroidWidget).Text);
-
     Font.Size := ls;
+
     if BackgroundColor = clNone then
     begin
       Pen.Color := RGBToColor(175,175,175);
@@ -1427,15 +1458,8 @@ end;
 constructor TDraftCheckBox.Create(AWidget: TAndroidWidget; Canvas: TCanvas);
 begin
   inherited;
-  BackGroundColor:= clNone; //clActiveCaption;
-  Height:= AWidget.Height;
-  Width:= AWidget.Width;
-  MarginLeft:= AWidget.MarginLeft;
-  MarginTop:= AWidget.MarginTop;
-  MarginRight:= AWidget.MarginRight;
-  MarginBottom:= AWidget.MarginBottom;
-  Color:= jCheckBox(AWidget).BackgroundColor;
-  FontColor:= jCheckBox(AWidget).FontColor;
+  Color := jCheckBox(AWidget).BackgroundColor;
+  FontColor := jCheckBox(AWidget).FontColor;
 end;
 
 procedure TDraftCheckBox.Draw;
@@ -1480,7 +1504,7 @@ end;
 
 procedure TDraftCheckBox.UpdateLayout;
 var
- ls,  ps: Integer;
+  ls,  ps: Integer;
 begin
   with jCheckBox(FAndroidWidget) do
   begin
@@ -1503,13 +1527,6 @@ end;
 constructor TDraftRadioButton.Create(AWidget: TAndroidWidget; Canvas: TCanvas);
 begin
   inherited;
-  BackGroundColor := clNone;
-  Height := AWidget.Height;
-  Width := AWidget.Width;
-  MarginLeft := AWidget.MarginLeft;
-  MarginTop := AWidget.MarginTop;
-  MarginRight := AWidget.MarginRight;
-  MarginBottom := AWidget.MarginBottom;
   Color := jRadioButton(AWidget).BackgroundColor;
   FontColor := jRadioButton(AWidget).FontColor;
 end;
@@ -1574,25 +1591,12 @@ end;
 constructor TDraftProgressBar.Create(AWidget: TAndroidWidget; Canvas: TCanvas);
 begin
   inherited;
-  Height := AWidget.Height;
-  Width := AWidget.Width;
-  MarginLeft := AWidget.MarginLeft;
-  MarginTop := AWidget.MarginTop;
-  MarginRight := AWidget.MarginRight;
-  MarginBottom := AWidget.MarginBottom;
+
   Color := jProgressBar(AWidget).BackgroundColor;
   FontColor := colbrBlack;
 
-  if AWidget.Parent is jPanel then
-  begin
-    if jProgressBar(AWidget).BackgroundColor = colbrDefault then
-      Color := jPanel(AWidget.Parent).BackgroundColor;
-  end else
-  if AWidget.Parent is jCustomDialog then
-  begin
-    if jProgressBar(AWidget).BackgroundColor = colbrDefault then
-      Color := jCustomDialog(AWidget.Parent).BackgroundColor;
-  end;
+  if jProgressBar(AWidget).BackgroundColor = colbrDefault then
+    Color := GetParentBackgroundColor;
 end;
 
 procedure TDraftProgressBar.Draw;
@@ -1639,25 +1643,12 @@ end;
 constructor TDraftSeekBar.Create(AWidget: TAndroidWidget; Canvas: TCanvas);
 begin
   inherited;
-  Height := AWidget.Height;
-  Width := AWidget.Width;
-  MarginLeft := AWidget.MarginLeft;
-  MarginTop := AWidget.MarginTop;
-  MarginRight := AWidget.MarginRight;
-  MarginBottom := AWidget.MarginBottom;
+
   Color := jSeekBar(AWidget).BackgroundColor;
   FontColor := colbrBlack;
 
-  if AWidget.Parent is jPanel then
-  begin
-    if jSeekBar(AWidget).BackgroundColor = colbrDefault then
-      Color := jPanel(AWidget.Parent).BackgroundColor;
-  end else
-  if AWidget.Parent is jCustomDialog then
-  begin
-    if jSeekBar(AWidget).BackgroundColor = colbrDefault then
-      Color := jCustomDialog(AWidget.Parent).BackgroundColor;
-  end;
+  if jSeekBar(AWidget).BackgroundColor = colbrDefault then
+    Color := GetParentBackgroundColor;
 end;
 
 procedure TDraftSeekBar.Draw;
@@ -1705,26 +1696,11 @@ constructor TDraftListView.Create(AWidget: TAndroidWidget; Canvas: TCanvas);
 begin
   inherited;
 
-  Height := AWidget.Height;
-  Width := AWidget.Width;
-  MarginLeft := AWidget.MarginLeft;
-  MarginTop := AWidget.MarginTop;
-  MarginRight := AWidget.MarginRight;
-  MarginBottom := AWidget.MarginBottom;
   Color := jListView(AWidget).BackgroundColor;
   FontColor := jListView(AWidget).FontColor; //colbrBlack;
 
-  if AWidget.Parent is jPanel then
-  begin
-    if jListView(AWidget).BackgroundColor = colbrDefault then
-      Color := jPanel(AWidget.Parent).BackgroundColor;
-  end else
-  if AWidget.Parent is jCustomDialog then
-  begin
-    if jListView(AWidget).BackgroundColor = colbrDefault then
-      Color := jCustomDialog(AWidget.Parent).BackgroundColor;
-  end;
-
+  if jListView(AWidget).BackgroundColor = colbrDefault then
+    Color := GetParentBackgroundColor;
 end;
 
 procedure TDraftListView.Draw;
@@ -1756,39 +1732,19 @@ begin
 
 end;
 
-procedure TDraftListView.UpdateLayout;
-begin
-  inherited UpdateLayout;
-end;
-
-
 { TDraftImageBtn }
 
 constructor TDraftImageBtn.Create(AWidget: TAndroidWidget; Canvas: TCanvas);
 begin
   inherited;
 
-  Height := AWidget.Height;
-  Width := AWidget.Width;
-  MarginLeft := AWidget.MarginLeft;
-  MarginTop := AWidget.MarginTop;
-  MarginRight := AWidget.MarginRight;
-  MarginBottom := AWidget.MarginBottom;
   Color := jImageBtn(AWidget).BackgroundColor;
   //FontColor := jImageBtn(AWidget).FontColor; //colbrBlack;
   FontColor:= colbrGray;
   BackGroundColor:= clActiveCaption; //clMenuHighlight;
 
-  if AWidget.Parent is jPanel then
-  begin
-    if jImageBtn(AWidget).BackgroundColor = colbrDefault then
-      Color := jPanel(AWidget.Parent).BackgroundColor;
-  end else
-  if AWidget.Parent is jCustomDialog then
-  begin
-    if jImageBtn(AWidget).BackgroundColor = colbrDefault then
-      Color := jCustomDialog(AWidget.Parent).BackgroundColor;
-  end;
+  if jImageBtn(AWidget).BackgroundColor = colbrDefault then
+    Color := GetParentBackgroundColor;
 end;
 
 procedure TDraftImageBtn.Draw;
@@ -1817,60 +1773,18 @@ begin
   //canvas.TextOut(5,4,txt);
 end;
 
-procedure TDraftImageBtn.UpdateLayout;
-begin
-  inherited UpdateLayout;
-end;
-
 { TDraftImageView }
 
 constructor TDraftImageView.Create(AWidget: TAndroidWidget; Canvas: TCanvas);
 begin
   inherited;
-  Height:= AWidget.Height;
-  Width:= AWidget.Width;
-  MarginLeft := AWidget.MarginLeft;
-  MarginTop := AWidget.MarginTop;
-  MarginRight := AWidget.MarginRight;
-  MarginBottom := AWidget.MarginBottom;
-  Color:= jImageView(AWidget).BackgroundColor;
 
+  Color := jImageView(AWidget).BackgroundColor;
   FontColor:= colbrGray;
   BackGroundColor:= clActiveCaption; //clMenuHighlight;
 
-  if AWidget.Parent is jPanel then
-  begin
-    if jImageView(AWidget).BackgroundColor = colbrDefault then
-       Color := jPanel(AWidget.Parent).BackgroundColor;
-  end else
-  if AWidget.Parent is jCustomDialog then
-  begin
-    if jImageView(AWidget).BackgroundColor = colbrDefault then
-       Color := jCustomDialog(AWidget.Parent).BackgroundColor;
-  end;
-
-end;
-
-procedure TDraftImageView.Draw;
-begin
-
-  with Fcanvas do
-  begin
-    if jImageView(FAndroidWidget).BackgroundColor <> colbrDefault then
-      Brush.Color := FPColorToTColor(ToTFPColor(jImageView(FAndroidWidget).BackgroundColor))
-    else begin
-      Brush.Color:= clNone;
-      Brush.Style:= bsClear;
-    end;
-    Rectangle(0, 0, FAndroidWidget.Width, FAndroidWidget.Height);    // outer frame
-    TextOut(12, 9, jImageView(FAndroidWidget).Text);
-  end;
-
-end;
-
-procedure TDraftImageView.UpdateLayout;
-begin
-  inherited UpdateLayout;
+  if jImageView(AWidget).BackgroundColor = colbrDefault then
+    Color := GetParentBackgroundColor;
 end;
 
 { TDrafDrawingView }
@@ -1878,101 +1792,27 @@ end;
 constructor TDraftDrawingView.Create(AWidget: TAndroidWidget; Canvas: TCanvas);
 begin
   inherited;
-  Height:= AWidget.Height;
-  Width:= AWidget.Width;
-  MarginLeft := AWidget.MarginLeft;
-  MarginTop := AWidget.MarginTop;
-  MarginRight := AWidget.MarginRight;
-  MarginBottom := AWidget.MarginBottom;
-  Color:= jDrawingView(AWidget).BackgroundColor;
 
-  FontColor:= colbrGray;
-  BackGroundColor:= clActiveCaption; //clMenuHighlight;
+  Color := jDrawingView(AWidget).BackgroundColor;
+  FontColor := colbrGray;
+  BackGroundColor := clActiveCaption; //clMenuHighlight;
 
-  if AWidget.Parent is jPanel then
-  begin
-    if jDrawingView(AWidget).BackgroundColor = colbrDefault then
-       Color := jPanel(AWidget.Parent).BackgroundColor;
-  end else
-  if AWidget.Parent is jCustomDialog then
-  begin
-    if jDrawingView(AWidget).BackgroundColor = colbrDefault then
-       Color := jCustomDialog(AWidget.Parent).BackgroundColor;
-  end;
-
+  if jDrawingView(AWidget).BackgroundColor = colbrDefault then
+    Color := GetParentBackgroundColor;
 end;
 
-procedure TDraftDrawingView.Draw;
-begin
-
-  with Fcanvas do
-  begin
-    if jDrawingView(FAndroidWidget).BackgroundColor <> colbrDefault then
-      Brush.Color := FPColorToTColor(ToTFPColor(jDrawingView(FAndroidWidget).BackgroundColor))
-    else begin
-      Brush.Color:= clNone;
-      Brush.Style:= bsClear;
-    end;
-    Rectangle(0, 0, FAndroidWidget.Width, FAndroidWidget.Height);    // outer frame
-    TextOut(12, 9, jDrawingView(FAndroidWidget).Text);
-  end;
-
-end;
-
-procedure TDraftDrawingView.UpdateLayout;
-begin
-  inherited UpdateLayout;
-end;
-
-   { TDraftSurfaceView }
+{ TDraftSurfaceView }
 
 constructor TDraftSurfaceView.Create(AWidget: TAndroidWidget; Canvas: TCanvas);
 begin
   inherited;
-  Height:= AWidget.Height;
-  Width:= AWidget.Width;
-  MarginLeft := AWidget.MarginLeft;
-  MarginTop := AWidget.MarginTop;
-  MarginRight := AWidget.MarginRight;
-  MarginBottom := AWidget.MarginBottom;
-  Color:= jSurfaceView(AWidget).BackgroundColor;
 
-  FontColor:= colbrGray;
-  BackGroundColor:= clActiveCaption; //clMenuHighlight;
+  Color := jSurfaceView(AWidget).BackgroundColor;
+  FontColor := colbrGray;
+  BackGroundColor := clActiveCaption; //clMenuHighlight;
 
-  if AWidget.Parent is jPanel then
-  begin
-    if jSurfaceView(AWidget).BackgroundColor = colbrDefault then
-       Color := jPanel(AWidget.Parent).BackgroundColor;
-  end else
-  if AWidget.Parent is jCustomDialog then
-  begin
-    if jSurfaceView(AWidget).BackgroundColor = colbrDefault then
-       Color := jCustomDialog(AWidget.Parent).BackgroundColor;
-  end;
-
-end;
-
-procedure TDraftSurfaceView.Draw;
-begin
-
-  with Fcanvas do
-  begin
-    if jSurfaceView(FAndroidWidget).BackgroundColor <> colbrDefault then
-      Brush.Color := FPColorToTColor(ToTFPColor(jSurfaceView(FAndroidWidget).BackgroundColor))
-    else begin
-      Brush.Color:= clNone;
-      Brush.Style:= bsClear;
-    end;
-    Rectangle(0, 0, FAndroidWidget.Width, FAndroidWidget.Height);    // outer frame
-    TextOut(12, 9, jSurfaceView(FAndroidWidget).Text);
-  end;
-
-end;
-
-procedure TDraftSurfaceView.UpdateLayout;
-begin
-  inherited UpdateLayout;
+  if jSurfaceView(AWidget).BackgroundColor = colbrDefault then
+    Color := GetParentBackgroundColor;
 end;
 
 { TDraftSpinner }
@@ -1980,30 +1820,15 @@ end;
 constructor TDraftSpinner.Create(AWidget: TAndroidWidget; Canvas: TCanvas);
 begin
   inherited;
-  Self.Height:= AWidget.Height;
-  Self.Width:= AWidget.Width;
-  Self.MarginLeft:= AWidget.MarginLeft;
-  Self.MarginTop:= AWidget.MarginTop;
-  Self.MarginRight:= AWidget.MarginRight;
-  Self.MarginBottom:= AWidget.MarginBottom;
-  Self.Color:= (AWidget as jSpinner).BackgroundColor;
-  Self.FontColor:= (AWidget as jSpinner).DropListBackgroundColor;
-  Self.DropListTextColor:= (AWidget as jSpinner).DropListTextColor;
-  Self.DropListBackgroundColor:= (AWidget as jSpinner).DropListBackgroundColor;
-  Self.SelectedFontColor:= (AWidget as jSpinner).SelectedFontColor;
 
-  if (AWidget as jSpinner).Parent is jPanel  then
-  begin
-    if (AWidget as jSpinner).BackgroundColor = colbrDefault then
-       Self.Color:= ((AWidget as jSpinner).Parent as jPanel).BackgroundColor;
-  end;
+  Color := jSpinner(AWidget).BackgroundColor;
+  FontColor := jSpinner(AWidget).DropListBackgroundColor;
+  DropListTextColor := jSpinner(AWidget).DropListTextColor;
+  DropListBackgroundColor := jSpinner(AWidget).DropListBackgroundColor;
+  SelectedFontColor := jSpinner(AWidget).SelectedFontColor;
 
- if (AWidget as jSpinner).Parent is jCustomDialog  then
- begin
-   if (AWidget as jSpinner).BackgroundColor = colbrDefault then
-      Self.Color:= ((AWidget as jSpinner).Parent as jCustomDialog).BackgroundColor;
- end;
-  //BackGroundColor:= clInactiveBorder; //clActiveCaption;
+  if jSpinner(AWidget).BackgroundColor = colbrDefault then
+    Color := GetParentBackgroundColor;
 end;
 
 procedure TDraftSpinner.SetDropListBackgroundColor(Acolor: TARGBColorBridge);
@@ -2078,8 +1903,8 @@ begin
      Fcanvas.Pen.Color:= clSilver;
 
   Fcanvas.Line(Self.Width-42, 12,Self.Width-11, 12);
-  Fcanvas.Line(Self.Width-42-1, 12,Self.Width-42+Trunc(31/2), Self.Height-12);
-  Fcanvas.Line(Self.Width-42+Trunc(31/2),Self.Height-12,Self.Width-11,12);
+  Fcanvas.Line(Self.Width-42-1, 12,Self.Width-42+31 div 2, Self.Height-12);
+  Fcanvas.Line(Self.Width-42+31 div 2,Self.Height-12,Self.Width-11,12);
 
   Fcanvas.Font.Color:= Self.SelectedTextColor;
   if SelectedTextColor = clNone then
@@ -2088,38 +1913,17 @@ begin
   //Fcanvas.TextOut(5,4,txt);
 end;
 
-procedure TDraftSpinner.UpdateLayout;
-begin
-  // ...
-  inherited UpdateLayout;
-end;
-
 { TDraftWebView }
 
 constructor TDraftWebView.Create(AWidget: TAndroidWidget; Canvas: TCanvas);
 begin
   inherited;
-  Self.Height:= AWidget.Height;
-  Self.Width:= AWidget.Width;
-  Self.MarginLeft:= AWidget.MarginLeft;
-  Self.MarginTop:= AWidget.MarginTop;
-  Self.MarginRight:= AWidget.MarginRight;
-  Self.MarginBottom:= AWidget.MarginBottom;
-  Self.Color:= (AWidget as jWebView).BackgroundColor;
-  BackGroundColor:= clWhite; //clMoneyGreen; //clInactiveBorder; //clActiveCaption;
 
-  if (AWidget as jWebView).Parent is jPanel  then
-  begin
-    if (AWidget as jWebView).BackgroundColor = colbrDefault then
-       Self.Color:= ((AWidget as jWebView).Parent as jPanel).BackgroundColor;
-  end;
+  Color := jWebView(AWidget).BackgroundColor;
+  BackGroundColor := clWhite; //clMoneyGreen; //clInactiveBorder; //clActiveCaption;
 
- if (AWidget as jWebView).Parent is jCustomDialog  then
- begin
-   if (AWidget as jWebView).BackgroundColor = colbrDefault then
-      Self.Color:= ((AWidget as jWebView).Parent as jCustomDialog).BackgroundColor;
- end;
-
+  if jWebView(AWidget).BackgroundColor = colbrDefault then
+    Color := GetParentBackgroundColor;
 end;
 
 procedure TDraftWebView.Draw;
@@ -2150,36 +1954,16 @@ begin
  //Fcanvas.TextOut(10,6,txt);
 end;
 
-procedure TDraftWebView.UpdateLayout;
-begin
-  inherited UpdateLayout;
-end;
-
 { TDraftScrollView }
 
 constructor TDraftScrollView.Create(AWidget: TAndroidWidget; Canvas: TCanvas);
 begin
   inherited;
-  Self.Height:= AWidget.Height;
-  Self.Width:= AWidget.Width;
-  Self.MarginLeft:= AWidget.MarginLeft;
-  Self.MarginTop:= AWidget.MarginTop;
-  Self.MarginRight:= AWidget.MarginRight;
-  Self.MarginBottom:= AWidget.MarginBottom;
-  Self.Color:= (AWidget as jScrollView).BackgroundColor;
 
-   if (AWidget as jScrollView).Parent is jPanel  then
-   begin
-     if (AWidget as jScrollView).BackgroundColor = colbrDefault then
-        Self.Color:= ((AWidget as jScrollView).Parent as jPanel).BackgroundColor;
-   end;
+  Color := jScrollView(AWidget).BackgroundColor;
 
-  if (AWidget as jScrollView).Parent is jCustomDialog  then
-  begin
-    if (AWidget as jScrollView).BackgroundColor = colbrDefault then
-       Self.Color:= ((AWidget as jScrollView).Parent as jCustomDialog).BackgroundColor;
-  end;
-
+  if jScrollView(AWidget).BackgroundColor = colbrDefault then
+    Color := GetParentBackgroundColor;
 end;
 
 procedure TDraftScrollView.Draw;
@@ -2217,36 +2001,16 @@ begin
  // Fcanvas.TextOut(10,6,txt);
 end;
 
-procedure TDraftScrollView.UpdateLayout;
-begin
-  inherited UpdateLayout;
-end;
-
 { TDraftHorizontalScrollView }
 
 constructor TDraftHorizontalScrollView.Create(AWidget: TAndroidWidget; Canvas: TCanvas);
 begin
   inherited;
-  Self.Height:= AWidget.Height;
-  Self.Width:= AWidget.Width;
-  Self.MarginLeft:= AWidget.MarginLeft;
-  Self.MarginTop:= AWidget.MarginTop;
-  Self.MarginRight:= AWidget.MarginRight;
-  Self.MarginBottom:= AWidget.MarginBottom;
-  Self.Color:= (AWidget as jHorizontalScrollView).BackgroundColor;
 
-   if (AWidget as jHorizontalScrollView).Parent is jPanel  then
-   begin
-     if (AWidget as jHorizontalScrollView).BackgroundColor = colbrDefault then
-        Self.Color:= ((AWidget as jHorizontalScrollView).Parent as jPanel).BackgroundColor;
-   end;
+  Color := jHorizontalScrollView(AWidget).BackgroundColor;
 
-  if (AWidget as jHorizontalScrollView).Parent is jCustomDialog  then
-  begin
-    if (AWidget as jHorizontalScrollView).BackgroundColor = colbrDefault then
-       Self.Color:= ((AWidget as jHorizontalScrollView).Parent as jCustomDialog).BackgroundColor;
-  end;
-
+  if jHorizontalScrollView(AWidget).BackgroundColor = colbrDefault then
+    Color := GetParentBackgroundColor;
 end;
 
 procedure TDraftHorizontalScrollView.Draw;
@@ -2283,37 +2047,16 @@ begin
 
 end;
 
-procedure TDraftHorizontalScrollView.UpdateLayout;
-begin
-  inherited UpdateLayout;
-end;
-
-
 { TDraftRadioGroup}
 
 constructor TDraftRadioGroup.Create(AWidget: TAndroidWidget; Canvas: TCanvas);
 begin
   inherited;
-  Self.Height:= AWidget.Height;
-  Self.Width:= AWidget.Width;
-  Self.MarginLeft:= AWidget.MarginLeft;
-  Self.MarginTop:= AWidget.MarginTop;
-  Self.MarginRight:= AWidget.MarginRight;
-  Self.MarginBottom:= AWidget.MarginBottom;
-  Self.Color:= (AWidget as jRadioGroup).BackgroundColor;
 
-   if (AWidget as jRadioGroup).Parent is jPanel  then
-   begin
-     if (AWidget as jRadioGroup).BackgroundColor = colbrDefault then
-        Self.Color:= ((AWidget as jRadioGroup).Parent as jPanel).BackgroundColor;
-   end;
+  Color := jRadioGroup(AWidget).BackgroundColor;
 
-  if (AWidget as jRadioGroup).Parent is jCustomDialog  then
-  begin
-    if (AWidget as jRadioGroup).BackgroundColor = colbrDefault then
-       Self.Color:= ((AWidget as jRadioGroup).Parent as jCustomDialog).BackgroundColor;
-  end;
-
+  if jRadioGroup(AWidget).BackgroundColor = colbrDefault then
+    Color := GetParentBackgroundColor;
 end;
 
 procedure TDraftRadioGroup.Draw;
@@ -2330,50 +2073,16 @@ begin
   //Fcanvas.TextOut(10,6,txt);
 end;
 
-procedure TDraftRadioGroup.UpdateLayout;
-begin
-  inherited UpdateLayout;
-end;
-
 { TDraftRatingBar}
 
 constructor TDraftRatingBar.Create(AWidget: TAndroidWidget; Canvas: TCanvas);
 begin
   inherited;
-  Self.Height:= AWidget.Height;
-  Self.Width:= AWidget.Width;
-  Self.MarginLeft:= AWidget.MarginLeft;
-  Self.MarginTop:= AWidget.MarginTop;
-  Self.MarginRight:= AWidget.MarginRight;
-  Self.MarginBottom:= AWidget.MarginBottom;
-  Self.Color:= (AWidget as jRatingBar).BackgroundColor;
 
-   if (AWidget as jRatingBar).Parent is jPanel  then
-   begin
-     if (AWidget as jRatingBar).BackgroundColor = colbrDefault then
-        Self.Color:= ((AWidget as jRatingBar).Parent as jPanel).BackgroundColor;
-   end;
+  Color := jRatingBar(AWidget).BackgroundColor;
 
-  if (AWidget as jRatingBar).Parent is jCustomDialog  then
-  begin
-    if (AWidget as jRatingBar).BackgroundColor = colbrDefault then
-       Self.Color:= ((AWidget as jRatingBar).Parent as jCustomDialog).BackgroundColor;
-  end;
-
-end;
-
-procedure TDraftRatingBar.Draw;
-begin
-  Fcanvas.Brush.Color:= Self.BackGroundColor;
-  Fcanvas.Pen.Color:= clMedGray;
-  if Self.BackGroundColor = clNone then Fcanvas.Brush.Style:= bsClear;
-  Fcanvas.Rectangle(0,0,Self.Width,Self.Height);  // outer frame
-  Fcanvas.TextOut(12, 9, jRatingBar(FAndroidWidget).Text);
-end;
-
-procedure TDraftRatingBar.UpdateLayout;
-begin
-  inherited UpdateLayout;
+  if jRatingBar(AWidget).BackgroundColor = colbrDefault then
+    Color := GetParentBackgroundColor;
 end;
 
 { TDraftDigitalClock}
@@ -2381,40 +2090,11 @@ end;
 constructor TDraftDigitalClock.Create(AWidget: TAndroidWidget; Canvas: TCanvas);
 begin
   inherited;
-  Self.Height:= AWidget.Height;
-  Self.Width:= AWidget.Width;
-  Self.MarginLeft:= AWidget.MarginLeft;
-  Self.MarginTop:= AWidget.MarginTop;
-  Self.MarginRight:= AWidget.MarginRight;
-  Self.MarginBottom:= AWidget.MarginBottom;
-  Self.Color:= (AWidget as jDigitalClock).BackgroundColor;
 
-   if (AWidget as jDigitalClock).Parent is jPanel  then
-   begin
-     if (AWidget as jDigitalClock).BackgroundColor = colbrDefault then
-        Self.Color:= ((AWidget as jDigitalClock).Parent as jPanel).BackgroundColor;
-   end;
+  Color := jDigitalClock(AWidget).BackgroundColor;
 
-  if (AWidget as jDigitalClock).Parent is jCustomDialog  then
-  begin
-    if (AWidget as jDigitalClock).BackgroundColor = colbrDefault then
-       Self.Color:= ((AWidget as jDigitalClock).Parent as jCustomDialog).BackgroundColor;
-  end;
-
-end;
-
-procedure TDraftDigitalClock.Draw;
-begin
-  Fcanvas.Brush.Color:= Self.BackGroundColor;
-  Fcanvas.Pen.Color:= clMedGray;
-  if Self.BackGroundColor = clNone then Fcanvas.Brush.Style:= bsClear;
-  Fcanvas.Rectangle(0,0,Self.Width,Self.Height);  // outer frame
-  Fcanvas.TextOut(12, 9, jDigitalClock(FAndroidWidget).Text);
-end;
-
-procedure TDraftDigitalClock.UpdateLayout;
-begin
-  inherited UpdateLayout;
+  if jDigitalClock(AWidget).BackgroundColor = colbrDefault then
+    Color := GetParentBackgroundColor;
 end;
 
 { TDraftAnalogClock }
@@ -2422,40 +2102,11 @@ end;
 constructor TDraftAnalogClock.Create(AWidget: TAndroidWidget; Canvas: TCanvas);
 begin
   inherited;
-  Self.Height:= AWidget.Height;
-  Self.Width:= AWidget.Width;
-  Self.MarginLeft:= AWidget.MarginLeft;
-  Self.MarginTop:= AWidget.MarginTop;
-  Self.MarginRight:= AWidget.MarginRight;
-  Self.MarginBottom:= AWidget.MarginBottom;
-  Self.Color:= (AWidget as jAnalogClock).BackgroundColor;
 
-   if (AWidget as jAnalogClock).Parent is jPanel  then
-   begin
-     if (AWidget as jAnalogClock).BackgroundColor = colbrDefault then
-        Self.Color:= ((AWidget as jAnalogClock).Parent as jPanel).BackgroundColor;
-   end;
+  Color := jAnalogClock(AWidget).BackgroundColor;
 
-  if (AWidget as jAnalogClock).Parent is jCustomDialog  then
-  begin
-    if (AWidget as jAnalogClock).BackgroundColor = colbrDefault then
-       Self.Color:= ((AWidget as jAnalogClock).Parent as jCustomDialog).BackgroundColor;
-  end;
-
-end;
-
-procedure TDraftAnalogClock.Draw;
-begin
-  Fcanvas.Brush.Color:= Self.BackGroundColor;
-  Fcanvas.Pen.Color:= clMedGray;
-  if Self.BackGroundColor = clNone then Fcanvas.Brush.Style:= bsClear;
-  Fcanvas.Rectangle(0,0,Self.Width,Self.Height);  // outer frame
-  Fcanvas.TextOut(12, 9, jAnalogClock(FAndroidWidget).Text);
-end;
-
-procedure TDraftAnalogClock.UpdateLayout;
-begin
-  inherited UpdateLayout;
+  if jAnalogClock(AWidget).BackgroundColor = colbrDefault then
+    Color := GetParentBackgroundColor;
 end;
 
 { TDraftToggleButton }
@@ -2463,33 +2114,22 @@ end;
 constructor TDraftToggleButton.Create(AWidget: TAndroidWidget; Canvas: TCanvas);
 begin
   inherited;
-  Self.Height:= AWidget.Height;
-  Self.Width:= AWidget.Width;
-  Self.MarginLeft:= AWidget.MarginLeft;
-  Self.MarginTop:= AWidget.MarginTop;
-  Self.MarginRight:= AWidget.MarginRight;
-  Self.MarginBottom:= AWidget.MarginBottom;
-  Self.Color:= (AWidget as jToggleButton).BackgroundColor;
-  Self.FontColor:= colbrGray;
+  BackGroundColor := clActiveCaption;; //clMenuHighlight;
+  Color := jToggleButton(AWidget).BackgroundColor;
+  FontColor := colbrGray;
 
-  if (AWidget as jToggleButton).State = tsOff then
-    Self.OnOff := False
-  else
-    Self.OnOff := True;
-   {
-  if AWidget.Parent is jPanel then
-  begin
-    if jToggleButton(AWidget).BackgroundColor = colbrDefault then
-       Color := jPanel(AWidget.Parent).BackgroundColor;
-  end else
-  if AWidget.Parent is jCustomDialog then
-  begin
-    if jToggleButton(AWidget).BackgroundColor = colbrDefault then
-       Color := jCustomDialog(AWidget.Parent).BackgroundColor;
-  end;
-   }
-
-  BackGroundColor:= clActiveCaption;; //clMenuHighlight;
+  FOnOff := jToggleButton(AWidget).State <> tsOff
+  {
+  if jToggleButton(AWidget).BackgroundColor = colbrDefault then
+    if AWidget.Parent is jPanel then
+    begin
+      Color := jPanel(AWidget.Parent).BackgroundColor;
+    end else
+    if AWidget.Parent is jCustomDialog then
+    begin
+      Color := jCustomDialog(AWidget.Parent).BackgroundColor;
+    end;
+  }
 end;
 
 procedure TDraftToggleButton.Draw;
@@ -2509,7 +2149,7 @@ begin
   Fcanvas.Rectangle(0,0,Self.Width,Self.Height);
 
   Fcanvas.Pen.Color:= clWindowFrame;
-  if Self.OnOff = True then  //on
+  if Self.FOnOff = True then  //on
   begin
 
     Fcanvas.Brush.Style:= bsSolid;
@@ -2588,12 +2228,6 @@ begin
   //Fcanvas.TextOut(5,4,txt);
 end;
 
-procedure TDraftToggleButton.UpdateLayout;
-begin
-  // ...
-  inherited UpdateLayout;
-end;
-
 { TDraftSwitchButton }
 
 procedure TDraftSwitchButton.Draw;
@@ -2605,14 +2239,14 @@ var
 begin
   with FCanvas do
   begin
-    Color := jSwitchButton(FAndroidWidget).BackgroundColor;
+    //Color := jSwitchButton(FAndroidWidget).BackgroundColor;
     if BackGroundColor = clNone then
       BackGroundColor := clWhite
     else begin
       Brush.Color := BackGroundColor;
-      FillRect(0, 0, FAndroidWidget.Width, FAndroidWidget.Height);
+      FillRect(0, 0, Self.Width, Self.Height);
     end;
-    x := FAndroidWidget.Height div 2 - 12;
+    x := Self.Height div 2 - 12;
     Brush.Color := BlendColors(BackGroundColor, 0.7, 153,153,153);
     ps := Font.Size;
     Font.Size := 10;
@@ -2625,7 +2259,7 @@ begin
 
       i := 2 * (y + 2);
       if i < 92 then i := 92;
-      z := FAndroidWidget.Width - 2 - i;
+      z := Self.Width - 2 - i;
       rb := Rect(z, x, z + i, x + 24);
 
       FillRect(rb);
@@ -2684,26 +2318,12 @@ end;
 constructor TDraftGridView.Create(AWidget: TAndroidWidget; Canvas: TCanvas);
 begin
   inherited;
-  self.Height:= AWidget.Height;
-  self.Width:= AWidget.Width;
-  self.MarginLeft:= AWidget.MarginLeft;
-  self.MarginTop:= AWidget.MarginTop;
-  self.MarginRight:= AWidget.MarginRight;
-  self.MarginBottom:= AWidget.MarginBottom;
 
-  self.Color:= (AWidget as jGridView).BackgroundColor;
+  Color := jGridView(AWidget).BackgroundColor;
   //fWidget.FontColor:= (AWidget as jGridView).FontColor;
 
-  if (AWidget as jGridView).Parent is jPanel  then
-  begin
-    if (AWidget as jGridView).BackgroundColor = colbrDefault then
-       Self.Color:= ((AWidget as jGridView).Parent as jPanel).BackgroundColor;
-  end;
-  if (AWidget as jGridView).Parent is jCustomDialog  then
-  begin
-   if (AWidget as jGridView).BackgroundColor = colbrDefault then
-      Self.Color:= ((AWidget as jGridView).Parent as jCustomDialog).BackgroundColor;
-  end;
+  if jGridView(AWidget).BackgroundColor = colbrDefault then
+    Color := GetParentBackgroundColor;
 end;
 
 procedure TDraftGridView.Draw;
@@ -2744,131 +2364,31 @@ begin
   //Fcanvas.TextOut(5,4, txt);
 end;
 
-procedure TDraftGridView.UpdateLayout;
-begin
-   inherited UpdateLayout;
-end;
-
-
 { TDraftView }
 
 constructor TDraftView.Create(AWidget: TAndroidWidget; Canvas: TCanvas);
 begin
   inherited;
-  Height:= AWidget.Height;
-  Width:= AWidget.Width;
-  MarginLeft := AWidget.MarginLeft;
-  MarginTop := AWidget.MarginTop;
-  MarginRight := AWidget.MarginRight;
-  MarginBottom := AWidget.MarginBottom;
-  Color:= jView(AWidget).BackgroundColor;
+  Color := jView(AWidget).BackgroundColor;
 
   FontColor:= colbrGray;
   BackGroundColor:= clActiveCaption; //clMenuHighlight;
 
-  if AWidget.Parent is jPanel then
-  begin
-    if jView(AWidget).BackgroundColor = colbrDefault then
-       Color := jPanel(AWidget.Parent).BackgroundColor;
-  end else
-  if AWidget.Parent is jCustomDialog then
-  begin
-    if jView(AWidget).BackgroundColor = colbrDefault then
-       Color := jCustomDialog(AWidget.Parent).BackgroundColor;
-  end;
-
-end;
-
-procedure TDraftView.Draw;
-begin
-
-  with Fcanvas do
-  begin
-    if jView(FAndroidWidget).BackgroundColor <> colbrDefault then
-      Brush.Color := FPColorToTColor(ToTFPColor(jView(FAndroidWidget).BackgroundColor))
-    else begin
-      Brush.Color:= clNone;
-      Brush.Style:= bsClear;
-    end;
-    Rectangle(0, 0, FAndroidWidget.Width, FAndroidWidget.Height);    // outer frame
-    TextOut(12, 9, jView(FAndroidWidget).Text);
-  end;
-
-end;
-
-procedure TDraftView.UpdateLayout;
-begin
-  inherited UpdateLayout;
-end;
-
-{ TDraftCanvasES1 }
-
-constructor TDraftCanvasES1.Create(AWidget: TAndroidWidget; Canvas: TCanvas);
-begin
-  inherited;
-  Height:= AWidget.Height;
-  Width:= AWidget.Width;
-  MarginLeft := AWidget.MarginLeft;
-  MarginTop := AWidget.MarginTop;
-  MarginRight := AWidget.MarginRight;
-  MarginBottom := AWidget.MarginBottom;
-end;
-
-procedure TDraftCanvasES1.Draw;
-begin
-  with Fcanvas do
-  begin
-      Brush.Color:= clNone;
-      Brush.Style:= bsClear;
-      Rectangle(0, 0, FAndroidWidget.Width, FAndroidWidget.Height);    // outer frame
-      TextOut(12, 9, jCanvasES1(FAndroidWidget).Text);
-  end;
-end;
-
-procedure TDraftCanvasES1.UpdateLayout;
-begin
-  inherited UpdateLayout;
-end;
-
-
-{ TDraftCanvasES2 }
-
-constructor TDraftCanvasES2.Create(AWidget: TAndroidWidget; Canvas: TCanvas);
-begin
-  inherited;
-  Height:= AWidget.Height;
-  Width:= AWidget.Width;
-  MarginLeft := AWidget.MarginLeft;
-  MarginTop := AWidget.MarginTop;
-  MarginRight := AWidget.MarginRight;
-  MarginBottom := AWidget.MarginBottom;
-
-end;
-
-procedure TDraftCanvasES2.Draw;
-begin
-
-  with Fcanvas do
-  begin
-      Brush.Color:= clNone;
-      Brush.Style:= bsClear;
-      Rectangle(0, 0, FAndroidWidget.Width, FAndroidWidget.Height);    // outer frame
-      TextOut(12, 9, jCanvasES2(FAndroidWidget).Text);
-  end;
-end;
-
-procedure TDraftCanvasES2.UpdateLayout;
-begin
-  inherited UpdateLayout;
+  if jView(AWidget).BackgroundColor = colbrDefault then
+    Color := GetParentBackgroundColor;
 end;
 
 initialization
-  DraftClassesMap := TDraftControlHash.Create(64); // power of 2 for efficiency
+  DraftClassesMap := TDraftControlHash.Create(64); // should be power of 2 for efficiency
   RegisterPropertyEditor(TypeInfo(TARGBColorBridge), nil, '', TARGBColorBridgePropertyEditor);
   RegisterPropertyEditor(TypeInfo(jVisualControl), jVisualControl, 'Anchor', TAnchorPropertyEditor);
   RegisterComponentEditor(jForm, TAndroidFormComponentEditor);
 
   // DraftClasses registeration:
+  //  * default drawing and anchoring => use TDraftWidget
+  //    (it is not needed to create draft class without custom drawing)
+  //  * do not register custom draft class for default drawing w/o anchoring
+  //    (default drawing implemented in Mediator.Paint)
   RegisterAndroidWidgetDraftClass(jProgressBar, TDraftProgressBar);
   RegisterAndroidWidgetDraftClass(jSeekBar, TDraftSeekBar);
   RegisterAndroidWidgetDraftClass(jButton, TDraftButton);
@@ -2893,10 +2413,12 @@ initialization
   RegisterAndroidWidgetDraftClass(jDigitalClock, TDraftDigitalClock);
   RegisterAndroidWidgetDraftClass(jSpinner, TDraftSpinner);
   RegisterAndroidWidgetDraftClass(jView, TDraftView);
-  RegisterAndroidWidgetDraftClass(jCanvasES1, TDraftCanvasES1);
-  RegisterAndroidWidgetDraftClass(jCanvasES2, TDraftCanvasES2);
   RegisterAndroidWidgetDraftClass(jAutoTextView, TDraftAutoTextView);
   RegisterAndroidWidgetDraftClass(jDrawingView, TDraftDrawingView);
+
+  // TODO :: (default drawing and layout)
+  RegisterAndroidWidgetDraftClass(jCanvasES1, TDraftWidget);
+  RegisterAndroidWidgetDraftClass(jCanvasES2, TDraftWidget);
 
 finalization
   DraftClassesMap.Free;
