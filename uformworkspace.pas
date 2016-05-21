@@ -913,7 +913,7 @@ begin
       if  FProjectModel = 'Ant' then            //IntToStr(RGProjectType.ItemIndex)
         WriteString('NewProject', 'ProjectModel', '1')  //Ant
       else
-        WriteString('NewProject', 'ProjectModel','0');  //Eclipse
+        WriteString('NewProject', 'ProjectModel', '0'); //Eclipse
 
 
       if EditPackagePrefaceName.Text = '' then EditPackagePrefaceName.Text:= 'org.lamw';
@@ -927,8 +927,11 @@ begin
       if ListBoxMinSDK.ItemIndex < 0 then ListBoxMinSDK.ItemIndex:= 2;
       WriteString('NewProject', 'MinApi', IntToStr(ListBoxMinSDK.ItemIndex));
 
-      if ListBoxTargetAPI.ItemIndex < 0 then ListBoxTargetAPI.ItemIndex:= 0;
-      WriteString('NewProject', 'TargetApi', IntToStr(ListBoxTargetAPI.ItemIndex));
+      with ListBoxTargetAPI do begin
+        if (ItemIndex < 0) and (Count > 0) then ItemIndex:= 0;
+        if ItemIndex >= 0 then
+          WriteString('NewProject', 'TargetApi', IntToStr(ItemIndex));
+      end;
 
       WriteString('NewProject', 'AntBuildMode', 'debug'); //default...
 
