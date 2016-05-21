@@ -142,6 +142,14 @@
 	*
 	****************************************************************************************************
 
+Version 0.6 - rev. 45 - 21 May 2016 - 
+
+	NEW!	jForm methods:
+			SetKeepScreenOn   //thanks to noyse
+			SetTurnScreenOn
+			SetAllowLockWhileScreenOn
+			SetShowWhenLocked
+
 Version 0.6 - rev. 44 - 21 May 2016 - 
 
 	NEW!	jNotificationManager methods: 
