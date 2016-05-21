@@ -30,7 +30,7 @@ jNotificationManager = class(jControl)
     procedure Init(refApp: jApp); override;
     function jCreate(): jObject;
     procedure jFree();
-    procedure Notify(_id: integer; _title: string; _subject: string; _body: string; _iconIdentifier: string); overload;
+    procedure Notify(_id: integer; _title: string; _subject: string; _body: string; _iconIdentifier: string; _color: TARGBColorBridge); overload;
     procedure Notify(); overload;
 
     procedure Cancel(_id: integer);
@@ -50,7 +50,7 @@ end;
 
 function jNotificationManager_jCreate(env: PJNIEnv;_Self: int64; this: jObject): jObject;
 procedure jNotificationManager_jFree(env: PJNIEnv; _jnotificationmanager: JObject);
-procedure jNotificationManager_Notify(env: PJNIEnv; _jnotificationmanager: JObject; _id: integer; _title: string; _subject: string; _body: string; _iconIdentifier: string);
+procedure jNotificationManager_Notify(env: PJNIEnv; _jnotificationmanager: JObject; _id: integer; _title: string; _subject: string; _body: string; _iconIdentifier: string; _color: DWord);
 procedure jNotificationManager_Cancel(env: PJNIEnv; _jnotificationmanager: JObject; _id: integer);
 procedure jNotificationManager_CancelAll(env: PJNIEnv; _jnotificationmanager: JObject);
 
@@ -111,16 +111,16 @@ begin
      jNotificationManager_jFree(FjEnv, FjObject);
 end;
 
-procedure jNotificationManager.Notify(_id: integer; _title: string; _subject: string; _body: string; _iconIdentifier: string);
+procedure jNotificationManager.Notify(_id: integer; _title: string; _subject: string; _body: string; _iconIdentifier: string; _color: TARGBColorBridge);
+var
+  tempColor: TARGBColorBridge;
 begin
   //in designing component state: set value here...
   if FInitialized then
   begin
-     jNotificationManager_Notify(FjEnv, FjObject, _id ,_title ,_subject ,_body ,_iconIdentifier);
-
-     if (FLightsColor <> colbrDefault) and (FLightsColor <> colbrBlue) then
-         jNotificationManager_SetLightsColorAndTime(FjEnv, FjObject, GetARGB(FCustomColor, FLightsColor) ,-1 ,-1);
-
+     tempColor:= _color;
+     if  tempColor = colbrDefault then  tempColor:= colbrBlue;
+     jNotificationManager_Notify(FjEnv, FjObject, _id ,_title ,_subject ,_body ,_iconIdentifier,  GetARGB(FCustomColor, tempColor) )
   end;
 end;
 
@@ -129,11 +129,7 @@ begin
   //in designing component state: set value here...
   if FInitialized then
   begin
-     jNotificationManager_Notify(FjEnv, FjObject, FId , FTitle, FSubject, FBody, FIconIdentifier);
-
-     if (FLightsColor <> colbrDefault) and (FLightsColor <> colbrBlue) then
-         jNotificationManager_SetLightsColorAndTime(FjEnv, FjObject, GetARGB(FCustomColor, FLightsColor) ,-1 ,-1);
-
+     Notify(FId , FTitle, FSubject, FBody, FIconIdentifier, FLightsColor);
   end;
 end;
 
@@ -152,18 +148,31 @@ begin
 end;
 
 procedure jNotificationManager.SetLightsColorAndTimes(_color: TARGBColorBridge; _onMills: integer; _offMills: integer);
+var
+  tempColor: TARGBColorBridge;
 begin
   //in designing component state: set value here...
+   FLightsColor:= _color;
   if FInitialized then
-     jNotificationManager_SetLightsColorAndTime(FjEnv, FjObject, GetARGB(FCustomColor, _color) ,_onMills ,_offMills);
+  begin
+    tempColor:= _color;
+    if  tempColor = colbrDefault then  tempColor:= colbrBlue;
+     jNotificationManager_SetLightsColorAndTime(FjEnv, FjObject, GetARGB(FCustomColor, tempColor) ,_onMills ,_offMills);
+  end;
 end;
 
 procedure jNotificationManager.SetLightsColor(_lightsColor: TARGBColorBridge);
+var
+  tempColor: TARGBColorBridge;
 begin
  //in designing component state: set value here...
  FLightsColor:= _lightsColor;
  if FInitialized then
-   jNotificationManager_SetLightsColorAndTime(FjEnv, FjObject, GetARGB(FCustomColor, _lightsColor), -1 , -1);
+ begin
+   tempColor:= _lightsColor;
+   if  tempColor = colbrDefault then  tempColor:= colbrBlue;
+   jNotificationManager_SetLightsColorAndTime(FjEnv, FjObject, GetARGB(FCustomColor, tempColor), -1 , -1);
+ end;
 end;
 
 procedure jNotificationManager.SetLightsEnable(_enable: boolean);
@@ -209,10 +218,9 @@ begin
   env^.DeleteLocalRef(env, jCls);
 end;
 
-
-procedure jNotificationManager_Notify(env: PJNIEnv; _jnotificationmanager: JObject; _id: integer; _title: string; _subject: string; _body: string; _iconIdentifier: string);
+procedure jNotificationManager_Notify(env: PJNIEnv; _jnotificationmanager: JObject; _id: integer; _title: string; _subject: string; _body: string; _iconIdentifier: string; _color: DWord);
 var
-  jParams: array[0..4] of jValue;
+  jParams: array[0..5] of jValue;
   jMethod: jMethodID=nil;
   jCls: jClass=nil;
 begin
@@ -221,8 +229,9 @@ begin
   jParams[2].l:= env^.NewStringUTF(env, PChar(_subject));
   jParams[3].l:= env^.NewStringUTF(env, PChar(_body));
   jParams[4].l:= env^.NewStringUTF(env, PChar(_iconIdentifier));
+  jParams[5].i:= _color;
   jCls:= env^.GetObjectClass(env, _jnotificationmanager);
-  jMethod:= env^.GetMethodID(env, jCls, 'Notify', '(ILjava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V');
+  jMethod:= env^.GetMethodID(env, jCls, 'Notify', '(ILjava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;I)V');
   env^.CallVoidMethodA(env, _jnotificationmanager, jMethod, @jParams);
   env^.DeleteLocalRef(env,jParams[1].l);
   env^.DeleteLocalRef(env,jParams[2].l);

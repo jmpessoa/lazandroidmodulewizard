@@ -11,6 +11,7 @@ object AndroidModule1: TAndroidModule1
   ActivityMode = actMain
   BackgroundColor = colbrDefault
   ActionBarTitle = abtDefault
+  OnJNIPrompt = AndroidModule1JNIPrompt
   object jTextView1: jTextView
     Left = 51
     Top = 5
@@ -56,6 +57,29 @@ object AndroidModule1: TAndroidModule1
     FontSize = 0
     FontSizeUnit = unitDefault
     OnClick = jButton1Click
+    Id = 8479009
+  end
+  object jButton2: jButton
+    Left = 4
+    Top = 82
+    Width = 292
+    Height = 40
+    MarginLeft = 2
+    MarginTop = 4
+    MarginRight = 2
+    MarginBottom = 4
+    Visible = True
+    Anchor = jButton1
+    PosRelativeToAnchor = [raBelow]
+    PosRelativeToParent = [rpCenterHorizontal]
+    LayoutParamWidth = lpMatchParent
+    LayoutParamHeight = lpWrapContent
+    Text = 'Change Led Color  to Red '
+    BackgroundColor = colbrDefault
+    FontColor = colbrDefault
+    FontSize = 0
+    FontSizeUnit = unitDefault
+    OnClick = jButton2Click
     Id = 0
   end
   object jNotificationManager1: jNotificationManager

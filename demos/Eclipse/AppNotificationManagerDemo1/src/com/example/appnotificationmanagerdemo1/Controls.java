@@ -1,6 +1,6 @@
 package com.example.appnotificationmanagerdemo1;
 
-//Lamw: Lazarus Android Module Wizard  - version 0.6 - revision 44 - 21 May - 2016 
+//Lamw: Lazarus Android Module Wizard  - version 0.6 - revision 45.1 - 21 May - 2016 
 //Form Designer and Components development model!
 //
 //https://github.com/jmpessoa/lazandroidmodulewizard
@@ -59,6 +59,7 @@ import android.annotation.SuppressLint;
 import android.app.ActionBar;
 import android.app.ActionBar.Tab;
 import android.app.Activity;
+import android.app.AlarmManager;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
@@ -1215,6 +1216,21 @@ public String GetDeviceManufacturer() {
   return android.os.Build.MANUFACTURER;  
 }
 
+public void SetKeepScreenOn() {
+	controls.activity.getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+}
+
+public void SetTurnScreenOn() {
+	controls.activity.getWindow().addFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);
+}
+
+public void SetAllowLockWhileScreenOn() {
+	controls.activity.getWindow().addFlags(WindowManager.LayoutParams.FLAG_ALLOW_LOCK_WHILE_SCREEN_ON);
+}
+
+public void SetShowWhenLocked() {
+	controls.activity.getWindow().addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);
+}
 
 }
 
@@ -13268,7 +13284,8 @@ class jNotificationManager /*extends ...*/ {
     
     int mLightOn=  1000;
 	int mLightOff= 1000;
-	int mColor = Color.BLUE;
+	int mColor;
+	int mId;
     
     //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
     public jNotificationManager(Controls _ctrls, long _Self) { //Add more others news "_xxx" params if needed!
@@ -13299,8 +13316,8 @@ class jNotificationManager /*extends ...*/ {
     	     return 0;
     	  }
     }
-    
-    public void Notify(int _id, String _title, String _subject, String _body, String _iconIdentifier){
+            
+    public void Notify(int _id, String _title, String _subject, String _body, String _iconIdentifier, int _color){
     	
     	int icon;
     	
@@ -13315,8 +13332,9 @@ class jNotificationManager /*extends ...*/ {
        mNotificationBuilder.setContentText(_subject);
        mNotificationBuilder.setContentInfo(_body);       
        mNotificationBuilder.setSmallIcon(icon);   
-       mNotificationBuilder.setLights(mColor, mLightOn, mLightOff); //thanks to freris       
-
+       mNotificationBuilder.setLights(_color, mLightOn, mLightOff); //thanks to freris       
+       mColor = _color;
+       mId =  _id;  
        //Solution by freris 
        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
           mNotificationManager.notify(_id, mNotificationBuilder.build());
@@ -13326,25 +13344,41 @@ class jNotificationManager /*extends ...*/ {
        }  
        
     }
-    
     //thanks to freris
     public void SetLightsColorAndTime(int _color, int _onMills, int _offMills) {
     	if (mNotificationBuilder != null) {
-      	   mNotificationBuilder.setLights(_color, _onMills, _offMills);
-    	   if ((_onMills > 0) && (_offMills > 0)) {
-    	      mLightOn=  _onMills;
-    	      mLightOff= _offMills;
-    	   }
+    	   mColor = _color;	      	   
+      	      	   
+    	   if ( _onMills  > 0 ) mLightOn=  _onMills;    	       	       	
+    	   if ( _offMills > 0)  mLightOff= _offMills;
+    	   
+    	   mNotificationBuilder.setLights(_color, mLightOn, mLightOff);
+    	   
+           //Solution by freris     	   
+           if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+              mNotificationManager.notify(mId, mNotificationBuilder.build());
+           }
+           else {
+              mNotificationManager.notify(mId, mNotificationBuilder.getNotification());    	  
+           }    	              
     	}
     }
     
-  //thanks to freris
+    //thanks to freris
     public void SetLightsEnable(boolean _enable) {
     	if (mNotificationBuilder != null) {
     	    if (!_enable)     	
        	      mNotificationBuilder.setLights(mColor, 0, 0);    	   
     	    else
          	  mNotificationBuilder.setLights(mColor, mLightOn, mLightOff);
+    	    
+            //Solution by freris     	   
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+               mNotificationManager.notify(mId, mNotificationBuilder.build());
+            }
+            else {
+               mNotificationManager.notify(mId, mNotificationBuilder.getNotification());    	  
+            }    	    
     	}
     }    
     
