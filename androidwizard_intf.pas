@@ -110,6 +110,7 @@ type
     SyntaxMode: TSyntaxMode; {mdDelphi, mdObjFpc}
     PathToJNIFolder: string;
     ModuleType: integer;   //0: GUI; 1: No GUI ; 2: console executable App
+
     constructor Create; override;
 
     function CreateSource(const Filename     : string;
@@ -367,7 +368,8 @@ begin
   Result:=  'Android [GUI] JNI loadable module (.so)'+ LineEnding +
             'based on Simonsayz''s templates'+ LineEnding +
             'with Form Designer and Android Components Bridges.'+ LineEnding +
-            'The project and library file are maintained by Lazarus [Lamw].'
+            'The project and library file are maintained by Lazarus [Lamw].';
+  ActivityModeDesign:= actMain;  //main jForm
 end;
 
 function TAndroidGUIProjectDescriptor.DoInitDescriptor: TModalResult;    //GUI
@@ -2093,9 +2095,7 @@ begin
      Name:= 'AndroidConsoleDataForm';
      ResourceClass:= TAndroidConsoleDataForm;
   end;
-
   UseCreateFormStatements:= True;
-
 end;
 
 function TAndroidFileDescPascalUnitWithResource.GetResourceType: TResourceType;
@@ -2105,12 +2105,13 @@ end;
 
 function TAndroidFileDescPascalUnitWithResource.GetLocalizedName: string;
 begin
-   Result := 'Android [GUI] Module [Lamw]';
+   Result := 'AndroidModule GUI jForm [Lamw]';
 end;
 
 function TAndroidFileDescPascalUnitWithResource.GetLocalizedDescription: string;
 begin
-   Result := 'Create a new GUI JNI Android module (.so)';
+   Result := 'Create a new GUI jForm Android Module [Lamw]';
+   ActivityModeDesign:= actRecyclable;  //secondary jForm
 end;
 
 function TAndroidFileDescPascalUnitWithResource.CreateSource(const Filename     : string;

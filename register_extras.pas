@@ -8,6 +8,7 @@ interface
 
 uses 
   Classes,
+  drawingview,
   autocompletetextview,
   radiogroup,
   ratingbar,
@@ -54,6 +55,7 @@ implementation
   
 Procedure Register;
 begin
+  {$I jdrawingview_icon.lrs}
   {$I jautotextview_icon.lrs}
   {$I jradiogroup_icon.lrs}
   {$I jratingbar_icon.lrs}
@@ -91,6 +93,7 @@ begin
   {$I jmyhello_icon.lrs}
   RegisterComponents('Android Bridges Extra',
     [
+      jDrawingView,
       jAutoTextView,
       jRadioGroup,
       jRatingBar,

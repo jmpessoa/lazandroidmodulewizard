@@ -42,6 +42,7 @@ type
     FStarted, FDone: TFPList;
     FLastSelectedContainer: jVisualControl;
     FSelection: TFPList;
+    FFormActivityMode: TActivityMode;
     function GetAndroidForm: jForm;
   protected
     procedure OnDesignerModified(Sender: TObject{$If lcl_fullversion>1060004}; {%H-}PropName: ShortString{$ENDIF});
@@ -69,6 +70,7 @@ type
     destructor Destroy; override;
     procedure InvalidateRect(Sender: TObject; ARect: TRect; Erase: boolean);
     property AndroidForm: jForm read GetAndroidForm;
+
   public
     procedure GetObjInspNodeImageIndex(APersistent: TPersistent; var AIndex: integer); override;
   end;
@@ -229,6 +231,17 @@ type
      procedure UpdateLayout; override;
    end;
 
+  {TDraftDrawingView}
+
+  TDraftDrawingView = class(TDraftWidget)
+   public
+     constructor Create(AWidget: TAndroidWidget; Canvas: TCanvas); override;
+     procedure Draw; override;
+     procedure UpdateLayout; override;
+   end;
+
+  {TDraftSurfaceView}
+
   TDraftSurfaceView = class(TDraftWidget)
    public
      constructor Create(AWidget: TAndroidWidget; Canvas: TCanvas); override;
@@ -384,7 +397,7 @@ uses
   LCLIntf, LCLType, ObjInspStrConsts, FPimage, typinfo, Laz_And_Controls,
   customdialog, togglebutton, switchbutton, Laz_And_GLESv1_Canvas,
   Laz_And_GLESv2_Canvas, gridview, Spinner, seekbar,  uFormSizeSelect, radiogroup, ratingbar,
-  digitalclock, analogclock, surfaceview, autocompletetextview;
+  digitalclock, analogclock, surfaceview, autocompletetextview, drawingview;
 
 var
   DraftClassesMap: TDraftControlHash;
@@ -1860,6 +1873,57 @@ begin
   inherited UpdateLayout;
 end;
 
+{ TDrafDrawingView }
+
+constructor TDraftDrawingView.Create(AWidget: TAndroidWidget; Canvas: TCanvas);
+begin
+  inherited;
+  Height:= AWidget.Height;
+  Width:= AWidget.Width;
+  MarginLeft := AWidget.MarginLeft;
+  MarginTop := AWidget.MarginTop;
+  MarginRight := AWidget.MarginRight;
+  MarginBottom := AWidget.MarginBottom;
+  Color:= jDrawingView(AWidget).BackgroundColor;
+
+  FontColor:= colbrGray;
+  BackGroundColor:= clActiveCaption; //clMenuHighlight;
+
+  if AWidget.Parent is jPanel then
+  begin
+    if jDrawingView(AWidget).BackgroundColor = colbrDefault then
+       Color := jPanel(AWidget.Parent).BackgroundColor;
+  end else
+  if AWidget.Parent is jCustomDialog then
+  begin
+    if jDrawingView(AWidget).BackgroundColor = colbrDefault then
+       Color := jCustomDialog(AWidget.Parent).BackgroundColor;
+  end;
+
+end;
+
+procedure TDraftDrawingView.Draw;
+begin
+
+  with Fcanvas do
+  begin
+    if jDrawingView(FAndroidWidget).BackgroundColor <> colbrDefault then
+      Brush.Color := FPColorToTColor(ToTFPColor(jDrawingView(FAndroidWidget).BackgroundColor))
+    else begin
+      Brush.Color:= clNone;
+      Brush.Style:= bsClear;
+    end;
+    Rectangle(0, 0, FAndroidWidget.Width, FAndroidWidget.Height);    // outer frame
+    TextOut(12, 9, jDrawingView(FAndroidWidget).Text);
+  end;
+
+end;
+
+procedure TDraftDrawingView.UpdateLayout;
+begin
+  inherited UpdateLayout;
+end;
+
    { TDraftSurfaceView }
 
 constructor TDraftSurfaceView.Create(AWidget: TAndroidWidget; Canvas: TCanvas);
@@ -2832,6 +2896,7 @@ initialization
   RegisterAndroidWidgetDraftClass(jCanvasES1, TDraftCanvasES1);
   RegisterAndroidWidgetDraftClass(jCanvasES2, TDraftCanvasES2);
   RegisterAndroidWidgetDraftClass(jAutoTextView, TDraftAutoTextView);
+  RegisterAndroidWidgetDraftClass(jDrawingView, TDraftDrawingView);
 
 finalization
   DraftClassesMap.Free;

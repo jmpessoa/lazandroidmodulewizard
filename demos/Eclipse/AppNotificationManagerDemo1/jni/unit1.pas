@@ -41,6 +41,7 @@ begin
     jNotificationManager1.Subject:= 'Hello!';
     jNotificationManager1.Body:= 'Lamw: Hello System Notification ...';
     jNotificationManager1.IConIdentifier:='lamw_logo';
+    //jNotificationManager1.LightsColor:= colbrCoral;
     jNotificationManager1.Notify();
 
 

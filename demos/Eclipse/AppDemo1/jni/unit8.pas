@@ -17,6 +17,7 @@ type
       jButton1: jButton;
       jCanvas1: jCanvas;
       jImageList1: jImageList;
+      jImageView1: jImageView;
       jTextView1: jTextView;
       jView1: jView;
       procedure DataModuleCloseQuery(Sender: TObject; var CanClose: boolean);
@@ -68,7 +69,7 @@ begin
   //jView1.Canvas.drawText('Custom View Test: Drag the cube!', 10,30);
 
   jView1.Canvas.drawText('P(x,y)=(' + IntToStr(P.X) + ',' + IntToStr(P.Y)+')',10,h1-30);
-  jView1.Canvas.drawBitmap(jBitmap1, P.X-100,P.Y-100,P.X+100,P.Y+100);
+  jView1.Canvas.drawBitmap(jBitmap1.GetImage, P.X-100,P.Y-100,P.X+100,P.Y+100);
 end;
 
 procedure TAndroidModule8.jView1TouchMove(Sender: TObject; Touch: TMouch);
@@ -84,11 +85,12 @@ begin
   filename := 'custom_view_test.png';
   jView1.SaveToFile(filename);
   showMessage('Save to '+fileName);
+  jImageView1.SetImage(jView1.GetImage());
 end;
 
 procedure TAndroidModule8.DataModuleJNIPrompt(Sender: TObject);
 begin
-   //
+  //
 end;
 
 procedure TAndroidModule8.DataModuleRotate(Sender: TObject; rotate: integer;

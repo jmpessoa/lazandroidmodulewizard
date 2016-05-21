@@ -1,5 +1,5 @@
 object AndroidModule13: TAndroidModule13
-  Left = 341
+  Left = 364
   Top = 68
   Width = 300
   Height = 600
@@ -15,10 +15,10 @@ object AndroidModule13: TAndroidModule13
   OnRotate = DataModuleRotate
   OnJNIPrompt = DataModuleJNIPrompt
   object jTextView1: jTextView
-    Left = 104
-    Top = 24
-    Width = 135
-    Height = 25
+    Left = 86
+    Top = 10
+    Width = 127
+    Height = 20
     MarginLeft = 10
     MarginTop = 10
     MarginRight = 10
@@ -35,12 +35,13 @@ object AndroidModule13: TAndroidModule13
     FontColor = colbrSilver
     FontSize = 0
     TextTypeFace = tfNormal
+    FontSizeUnit = unitDefault
     Id = 60950
   end
   object jButton1: jButton
-    Left = 8
-    Top = 64
-    Width = 287
+    Left = 5
+    Top = 45
+    Width = 285
     Height = 40
     MarginLeft = 5
     MarginTop = 5
@@ -56,14 +57,15 @@ object AndroidModule13: TAndroidModule13
     BackgroundColor = colbrDefault
     FontColor = colbrDefault
     FontSize = 0
+    FontSizeUnit = unitDefault
     OnClick = jButton1Click
     Id = 21192
   end
   object jTextView2: jTextView
-    Left = 8
-    Top = 360
-    Width = 135
-    Height = 25
+    Left = 10
+    Top = 346
+    Width = 52
+    Height = 20
     MarginLeft = 10
     MarginTop = 10
     MarginRight = 10
@@ -81,13 +83,14 @@ object AndroidModule13: TAndroidModule13
     FontColor = colbrSilver
     FontSize = 0
     TextTypeFace = tfNormal
+    FontSizeUnit = unitDefault
     Id = 41110
   end
   object jTextView3: jTextView
-    Left = 72
-    Top = 392
-    Width = 135
-    Height = 25
+    Left = 86
+    Top = 386
+    Width = 127
+    Height = 20
     MarginLeft = 10
     MarginTop = 10
     MarginRight = 10
@@ -105,14 +108,15 @@ object AndroidModule13: TAndroidModule13
     FontColor = colbrSilver
     FontSize = 0
     TextTypeFace = tfNormal
+    FontSizeUnit = unitDefault
     Id = 0
   end
   object jCanvasES2_1: jCanvasES2
     Tag = 1
-    Left = 8
-    Top = 120
-    Width = 287
-    Height = 216
+    Left = 10
+    Top = 100
+    Width = 270
+    Height = 226
     MarginLeft = 10
     MarginTop = 10
     MarginRight = 10

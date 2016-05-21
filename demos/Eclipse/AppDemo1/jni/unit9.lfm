@@ -1,5 +1,5 @@
 object AndroidModule9: TAndroidModule9
-  Left = 310
+  Left = 331
   Top = 65
   Width = 300
   Height = 600
@@ -11,13 +11,14 @@ object AndroidModule9: TAndroidModule9
   Text = 'AndroidModule9'
   ActivityMode = actRecyclable
   BackgroundColor = colbrBlack
+  ActionBarTitle = abtDefault
   OnCloseQuery = DataModuleCloseQuery
   OnRotate = DataModuleRotate
   OnJNIPrompt = DataModuleJNIPrompt
   object jView1: jView
     Tag = 1
-    Left = 8
-    Top = 120
+    Left = 10
+    Top = 90
     Width = 280
     Height = 200
     MarginLeft = 0
@@ -37,10 +38,10 @@ object AndroidModule9: TAndroidModule9
     Id = 6162235
   end
   object jTextView1: jTextView
-    Left = 56
-    Top = 24
-    Width = 203
-    Height = 25
+    Left = 55
+    Top = 10
+    Width = 190
+    Height = 20
     MarginLeft = 10
     MarginTop = 10
     MarginRight = 10
@@ -57,12 +58,13 @@ object AndroidModule9: TAndroidModule9
     FontColor = colbrSilver
     FontSize = 0
     TextTypeFace = tfNormal
+    FontSizeUnit = unitDefault
     Id = 35711
   end
   object jButton1: jButton
-    Left = 8
-    Top = 64
-    Width = 280
+    Left = 5
+    Top = 45
+    Width = 285
     Height = 40
     MarginLeft = 5
     MarginTop = 5
@@ -78,6 +80,7 @@ object AndroidModule9: TAndroidModule9
     BackgroundColor = colbrDefault
     FontColor = colbrDefault
     FontSize = 0
+    FontSizeUnit = unitDefault
     OnClick = jButton1Click
     Id = 7531079
   end

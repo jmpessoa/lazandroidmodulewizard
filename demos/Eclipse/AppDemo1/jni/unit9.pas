@@ -6,7 +6,7 @@ unit unit9;
 interface
   
 uses
-  Classes, SysUtils, And_jni, And_jni_Bridge, Laz_And_Controls, And_bitmap_h, Laz_And_Controls_Events, AndroidWidget;
+  Classes,  SysUtils, And_jni, And_jni_Bridge, Laz_And_Controls, And_bitmap_h, Laz_And_Controls_Events, AndroidWidget, FPimage;
   
 type
 
@@ -34,11 +34,11 @@ type
       P: TPoint;
       Ratio : Single;
       SwapCanMode: integer;
-      //function CalcBitmapRatio : Single;
   end;
   
 var
   AndroidModule9: TAndroidModule9;
+  FImgMem: TFPMemoryImage;
 
 implementation
   
@@ -58,8 +58,12 @@ begin
      //jView1.Canvas.PaintStyle:= psFillAndStroke;
      //jView1.Canvas.PaintTextSize:= 20;
      //jView1.Canvas.drawBitmap(jBitmap1,10,10, jView1.Width-20,Round( (jView1.Width-20)*(1/Ratio) ) );
-     jView1.Canvas.drawBitmap(jBitmap1,10,10, jView1.Width, Ratio);
+     //jView1.Canvas.drawBitmap(jBitmap1,10,10, jView1.Width, Ratio);
+
+     jView1.Canvas.drawBitmap(jBitmap1.GetImage,jView1.Width, jView1.Height);
+
      jView1.Canvas.drawText('P(x,y)= (' + IntToStr(P.X) + ',' + IntToStr(P.Y)+')',60,60);
+
 end;
 
 procedure TAndroidModule9.DataModuleCloseQuery(Sender: TObject; var CanClose: boolean);
@@ -95,7 +99,7 @@ begin
 
   size:= jBitmap1.GetByteArrayFromBitmap({var}byteBuffer);  //just test!
   jBitmap1.SetByteArrayToBitmap(byteBuffer, size);          //just test!
-  Setlength(byteBuffer, 0); //free byte buffer
+  Setlength(byteBuffer, 0); //free byte buffer              //just test!
 
   if SwapCanMode = 0 then
   begin
@@ -107,6 +111,7 @@ begin
     jBitmap1.ScanPixel(PBytePixel, 4);
     SwapCanMode:= 0;
   end;
+
   jView1.Refresh;
 
 end;

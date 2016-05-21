@@ -1,5 +1,5 @@
 object AndroidModule4: TAndroidModule4
-  Left = 355
+  Left = 379
   Top = 63
   Width = 300
   Height = 600
@@ -17,7 +17,7 @@ object AndroidModule4: TAndroidModule4
   object jButton1: jButton
     Left = 5
     Top = 45
-    Width = 290
+    Width = 285
     Height = 40
     MarginLeft = 5
     MarginTop = 5
@@ -33,6 +33,7 @@ object AndroidModule4: TAndroidModule4
     BackgroundColor = colbrDefault
     FontColor = colbrCoral
     FontSize = 0
+    FontSizeUnit = unitDefault
     OnClick = jButton1Click
     Id = 31367
   end
@@ -57,12 +58,13 @@ object AndroidModule4: TAndroidModule4
     FontColor = colbrSilver
     FontSize = 0
     TextTypeFace = tfNormal
+    FontSizeUnit = unitDefault
     Id = 9880053
   end
   object jEditText1: jEditText
     Left = 10
     Top = 100
-    Width = 280
+    Width = 270
     Height = 106
     MarginLeft = 10
     MarginTop = 10
@@ -88,13 +90,14 @@ object AndroidModule4: TAndroidModule4
     VerScrollBar = True
     WrappingLine = True
     Editable = True
+    FontSizeUnit = unitDefault
     Id = 2813603
   end
   object jScrollView1: jScrollView
-    Left = 9
-    Top = 221
-    Width = 279
-    Height = 152
+    Left = 3
+    Top = 219
+    Width = 291
+    Height = 186
     Visible = True
     Anchor = jEditText1
     PosRelativeToAnchor = [raBelow]
@@ -108,8 +111,8 @@ object AndroidModule4: TAndroidModule4
       Tag = 1
       Left = 5
       Top = 10
-      Width = 269
-      Height = 132
+      Width = 276
+      Height = 156
       MarginLeft = 5
       MarginTop = 10
       MarginRight = 5
@@ -133,6 +136,7 @@ object AndroidModule4: TAndroidModule4
       VerScrollBar = False
       WrappingLine = False
       Editable = True
+      FontSizeUnit = unitDefault
       Id = 0
     end
   end

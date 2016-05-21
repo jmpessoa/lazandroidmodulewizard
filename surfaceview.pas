@@ -95,6 +95,9 @@ jSurfaceView = class(jVisualControl)
     procedure SetProgress(_startValue: single; _step: single);
     procedure DrawLine(_canvas: jObject; var _points: TDynArrayOfSingle); overload;
 
+    function GetDrawingCache(): jObject;
+    function GetImage(): jObject;
+
     procedure GenEvent_OnSurfaceViewCreated(Obj: TObject; surfaceHolder: jObject);
     procedure GenEvent_OnSurfaceViewDraw(Obj: TObject; canvas: jObject);
     procedure GenEvent_OnSurfaceViewTouch(Obj: TObject; Act,Cnt: integer; X1,Y1,X2,Y2: Single);
@@ -162,6 +165,8 @@ procedure jSurfaceView_SetKeepScreenOn(env: PJNIEnv; _jsurfaceview: JObject; _va
 procedure jSurfaceView_SetFocusable(env: PJNIEnv; _jsurfaceview: JObject; _value: boolean);
 procedure jSurfaceView_SetProgress(env: PJNIEnv; _jsurfaceview: JObject; _startValue: single; _step: single);
 procedure jSurfaceView_DrawLine(env: PJNIEnv; _jsurfaceview: JObject; _canvas: jObject; var _points: TDynArrayOfSingle); overload;
+
+function jSurfaceView_GetDrawingCache(env: PJNIEnv; _jsurfaceview: JObject): jObject;
 
 
 
@@ -677,6 +682,21 @@ begin
   if FInitialized then
      jSurfaceView_DrawLine(FjEnv, FjObject, _canvas ,_points);
 end;
+
+function jSurfaceView.GetDrawingCache(): jObject;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jSurfaceView_GetDrawingCache(FjEnv, FjObject);
+end;
+
+function jSurfaceView.GetImage(): jObject;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jSurfaceView_GetDrawingCache(FjEnv, FjObject);
+end;
+
 
 {-------- jSurfaceView_JNI_Bridge ----------}
 
@@ -1238,6 +1258,18 @@ begin
   env^.DeleteLocalRef(env,jParams[1].l);
   env^.DeleteLocalRef(env, jCls);
 end;
+
+function jSurfaceView_GetDrawingCache(env: PJNIEnv; _jsurfaceview: JObject): jObject;
+var
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jsurfaceview);
+  jMethod:= env^.GetMethodID(env, jCls, 'GetDrawingCache', '()Landroid/graphics/Bitmap;');
+  Result:= env^.CallObjectMethod(env, _jsurfaceview, jMethod);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
 
 
 end.

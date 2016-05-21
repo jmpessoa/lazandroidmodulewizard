@@ -1,5 +1,5 @@
 object AndroidModule8: TAndroidModule8
-  Left = 308
+  Left = 329
   Top = 70
   Width = 300
   Height = 600
@@ -11,14 +11,15 @@ object AndroidModule8: TAndroidModule8
   Text = 'AndroidModule8'
   ActivityMode = actRecyclable
   BackgroundColor = colbrBlack
+  ActionBarTitle = abtDefault
   OnCloseQuery = DataModuleCloseQuery
   OnRotate = DataModuleRotate
   OnJNIPrompt = DataModuleJNIPrompt
   object jTextView1: jTextView
-    Left = 56
-    Top = 24
-    Width = 192
-    Height = 25
+    Left = 48
+    Top = 10
+    Width = 204
+    Height = 20
     MarginLeft = 10
     MarginTop = 10
     MarginRight = 10
@@ -35,12 +36,13 @@ object AndroidModule8: TAndroidModule8
     FontColor = colbrMediumSpringGreen
     FontSize = 0
     TextTypeFace = tfNormal
+    FontSizeUnit = unitDefault
     Id = 22765
   end
   object jButton1: jButton
-    Left = 8
-    Top = 320
-    Width = 280
+    Left = 5
+    Top = 351
+    Width = 285
     Height = 40
     MarginLeft = 5
     MarginTop = 5
@@ -56,15 +58,16 @@ object AndroidModule8: TAndroidModule8
     BackgroundColor = colbrDefault
     FontColor = colbrMediumSpringGreen
     FontSize = 0
+    FontSizeUnit = unitDefault
     OnClick = jButton1Click
-    Id = 0
+    Id = 8848063
   end
   object jView1: jView
     Tag = 1
-    Left = 8
-    Top = 48
-    Width = 280
-    Height = 248
+    Left = 10
+    Top = 50
+    Width = 270
+    Height = 286
     MarginLeft = 10
     MarginTop = 10
     MarginRight = 10
@@ -80,6 +83,22 @@ object AndroidModule8: TAndroidModule8
     OnDraw = jView1Draw
     OnTouchMove = jView1TouchMove
     Id = 75225
+  end
+  object jImageView1: jImageView
+    Left = 126
+    Top = 399
+    Width = 48
+    Height = 48
+    Visible = True
+    Anchor = jButton1
+    PosRelativeToAnchor = [raBelow]
+    PosRelativeToParent = [rpCenterInParent]
+    LayoutParamWidth = lpWrapContent
+    LayoutParamHeight = lpWrapContent
+    ImageIndex = -1
+    BackgroundColor = colbrDefault
+    ImageScaleType = scaleCenter
+    Id = 0
   end
   object jBitmap1: jBitmap
     FilePath = fpathData

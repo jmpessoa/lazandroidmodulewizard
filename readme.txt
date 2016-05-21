@@ -142,6 +142,21 @@
 	*
 	****************************************************************************************************
 
+Version 0.6 - rev. 44 - 21 May 2016 - 
+
+	NEW!	jNotificationManager methods: 
+				SetLightsColorAndTime,
+				SetLightsEnable	//	<<--- thanks to freris
+
+	NEW!	jDrawingView component		//	<<---- thanks to tintinux
+
+	NEW!	AppDrawingViewDemo1 
+
+	UPDATED!	AppDemo1  
+	UPDATED!	AppNotificationManagerDemo1  
+
+	FIXED! jForm property set "ActivityMode:= actRecyclable" as from the second form... //<<---- thanks to tintinux
+
 Version 0.6 - rev. 43 - 13 May 2016 - 
 
 	NEW!	jForm methods: 

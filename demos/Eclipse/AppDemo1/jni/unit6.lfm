@@ -1,5 +1,5 @@
 object AndroidModule6: TAndroidModule6
-  Left = 352
+  Left = 376
   Top = 66
   Width = 300
   Height = 600
@@ -199,10 +199,10 @@ object AndroidModule6: TAndroidModule6
   end
   object jListView1: jListView
     Tag = 1
-    Left = 8
-    Top = 296
-    Width = 283
-    Height = 296
+    Left = 10
+    Top = 288
+    Width = 270
+    Height = 286
     MarginLeft = 10
     MarginTop = 0
     MarginRight = 10

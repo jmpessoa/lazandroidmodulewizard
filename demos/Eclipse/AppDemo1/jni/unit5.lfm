@@ -1,5 +1,5 @@
 object AndroidModule5: TAndroidModule5
-  Left = 352
+  Left = 376
   Top = 66
   Width = 300
   Height = 600
@@ -15,10 +15,10 @@ object AndroidModule5: TAndroidModule5
   OnRotate = DataModuleRotate
   OnJNIPrompt = DataModuleJNIPrompt
   object jTextView1: jTextView
-    Left = 96
-    Top = 8
-    Width = 135
-    Height = 25
+    Left = 10
+    Top = 10
+    Width = 93
+    Height = 20
     MarginLeft = 10
     MarginTop = 10
     MarginRight = 10
@@ -35,13 +35,14 @@ object AndroidModule5: TAndroidModule5
     FontColor = colbrTomato
     FontSize = 0
     TextTypeFace = tfNormal
+    FontSizeUnit = unitDefault
     Id = 72543
   end
   object jPanel1: jPanel
-    Left = 8
-    Top = 32
-    Width = 288
-    Height = 137
+    Left = 0
+    Top = 40
+    Width = 300
+    Height = 136
     MarginLeft = 0
     MarginTop = 0
     MarginRight = 0
@@ -53,13 +54,15 @@ object AndroidModule5: TAndroidModule5
     LayoutParamWidth = lpMatchParent
     LayoutParamHeight = lpOneQuarterOfParent
     BackgroundColor = colbrLightSteelBlue
+    MinPinchZoomFactor = 0.25
+    MaxPinchZoomFactor = 4
     Id = 7980347
     object jEditText1: jEditText
       Tag = 1
-      Left = 8
+      Left = 10
       Top = 40
-      Width = 272
-      Height = 40
+      Width = 280
+      Height = 39
       MarginLeft = 5
       MarginTop = 10
       MarginRight = 5
@@ -77,18 +80,21 @@ object AndroidModule5: TAndroidModule5
       BackgroundColor = colbrDefault
       FontColor = colbrDefault
       FontSize = 0
+      HintTextColor = colbrDefault
       ScrollBarStyle = scrNone
       MaxLines = 1
       HorScrollBar = True
       VerScrollBar = False
       WrappingLine = False
+      Editable = True
+      FontSizeUnit = unitDefault
       Id = 1944427
     end
     object jTextView2: jTextView
-      Left = 8
-      Top = 11
-      Width = 129
-      Height = 25
+      Left = 5
+      Top = 5
+      Width = 60
+      Height = 20
       MarginLeft = 5
       MarginTop = 5
       MarginRight = 5
@@ -105,13 +111,14 @@ object AndroidModule5: TAndroidModule5
       FontColor = colbrDefault
       FontSize = 0
       TextTypeFace = tfNormal
+      FontSizeUnit = unitDefault
       Id = 3092999
     end
     object jPanel3: jPanel
-      Left = 8
-      Top = 84
-      Width = 275
-      Height = 48
+      Left = 4
+      Top = 93
+      Width = 288
+      Height = 47
       MarginLeft = 4
       MarginTop = 4
       MarginRight = 4
@@ -123,11 +130,13 @@ object AndroidModule5: TAndroidModule5
       LayoutParamWidth = lpMatchParent
       LayoutParamHeight = lpWrapContent
       BackgroundColor = colbrGainsboro
+      MinPinchZoomFactor = 0.25
+      MaxPinchZoomFactor = 4
       Id = 0
       object jButton1: jButton
-        Left = 0
-        Top = 0
-        Width = 266
+        Left = 4
+        Top = 3
+        Width = 280
         Height = 40
         MarginLeft = 2
         MarginTop = 4
@@ -142,16 +151,17 @@ object AndroidModule5: TAndroidModule5
         BackgroundColor = colbrDefault
         FontColor = colbrDefault
         FontSize = 0
+        FontSizeUnit = unitDefault
         OnClick = jButton1Click
         Id = 0
       end
     end
   end
   object jPanel2: jPanel
-    Left = 8
-    Top = 172
-    Width = 287
-    Height = 420
+    Left = 0
+    Top = 176
+    Width = 300
+    Height = 424
     MarginLeft = 0
     MarginTop = 0
     MarginRight = 0
@@ -163,13 +173,15 @@ object AndroidModule5: TAndroidModule5
     LayoutParamWidth = lpMatchParent
     LayoutParamHeight = lpMatchParent
     BackgroundColor = colbrLightSalmon
+    MinPinchZoomFactor = 0.25
+    MaxPinchZoomFactor = 4
     Id = 0
     object jWebView1: jWebView
       Tag = 1
       Left = 4
       Top = 8
-      Width = 278
-      Height = 404
+      Width = 290
+      Height = 410
       Visible = True
       PosRelativeToAnchor = []
       PosRelativeToParent = []
@@ -178,6 +190,7 @@ object AndroidModule5: TAndroidModule5
       JavaScript = False
       BackgroundColor = colbrDefault
       OnStatus = jWebView1Status
+      ZoomControl = False
       Id = 0
     end
   end

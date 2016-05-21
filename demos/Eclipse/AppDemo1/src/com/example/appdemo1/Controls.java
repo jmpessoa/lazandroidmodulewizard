@@ -1,12 +1,12 @@
 package com.example.appdemo1;
 
-//Lamw: Lazarus Android Module Wizard  - version 0.6 - revision 36.2 - 07 October- 2015 
+//Lamw: Lazarus Android Module Wizard  - version 0.6 - revision 44 - 21 May - 2016 
 //Form Designer and Components development model!
 //
 //https://github.com/jmpessoa/lazandroidmodulewizard
 //http://forum.lazarus.freepascal.org/index.php/topic,21919.270.html
 //
-//Android Java Interface for Pascal/Delphi XE5 and FreePacal/LAZARUS[december 2013]
+//Android Java Interface for Pascal/Delphi XE5 and FreePacal and LAZARUS[december/2013 by jmpessoa]
 //
 //Developers:
 //          Simon,Choi / Choi,Won-sik
@@ -204,6 +204,7 @@ import android.view.animation.TranslateAnimation;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.view.WindowManager;
+
 import android.webkit.HttpAuthHandler;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
@@ -212,6 +213,7 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AnalogClock;
 import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
@@ -225,6 +227,8 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.RadioButton;
+import android.widget.RadioGroup;
+import android.widget.RatingBar;
 import android.widget.SeekBar;
 import android.widget.Spinner;
 import android.widget.RelativeLayout.LayoutParams;
@@ -245,16 +249,26 @@ import java.io.*;
 
 import java.lang.*;
 
+import java.net.CookieManager;
+import java.net.CookieHandler;
+import java.net.CookiePolicy;
+import java.net.CookieStore;
+import java.net.HttpCookie;
 import java.net.HttpURLConnection;
 import java.net.InetAddress;
+import java.net.MalformedURLException;
+import java.net.ProtocolException;
 import java.net.Socket;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URLEncoder;
 //import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.text.ParseException;
-//import java.nio.ByteBuffer;
+import java.nio.ByteBuffer;
 //import java.nio.ByteOrder;
 //import java.nio.IntBuffer;
 //import java.nio.FloatBuffer;
@@ -264,9 +278,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
+import java.util.Scanner;
 import java.util.StringTokenizer;
 //import java.util.Map;
 //import java.util.Random;
@@ -279,34 +296,6 @@ import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 import javax.microedition.khronos.egl.EGLContext;
 import javax.microedition.khronos.egl.EGL10;
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.NameValuePair;
-import org.apache.http.StatusLine;
-import org.apache.http.auth.AuthScope;
-import org.apache.http.auth.UsernamePasswordCredentials;
-import org.apache.http.client.CookieStore;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.HttpDelete;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.protocol.ClientContext;
-import org.apache.http.cookie.Cookie;
-import org.apache.http.impl.client.BasicCookieStore;
-//import org.apache.http.client.methods.HttpUriRequest;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.impl.cookie.BasicClientCookie;
-import org.apache.http.message.BasicNameValuePair;
-import org.apache.http.params.BasicHttpParams;
-import org.apache.http.params.HttpConnectionParams;
-import org.apache.http.params.HttpParams;
-import org.apache.http.protocol.BasicHttpContext;
-import org.apache.http.protocol.HttpContext;
-import org.apache.http.util.ByteArrayBuffer;
-import org.apache.http.util.EntityUtils;
-
-//import com.example.appmenudemo.R.drawable;
 
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -398,7 +387,6 @@ runnable = new Runnable() {
    }
 };
 }
-
 
 public  void SetInterval(int interval) {
   Interval = interval;
@@ -633,6 +621,11 @@ public  OnClickListener GetOnViewClickListener () {
 
 public  OnItemClickListener  GetOnListItemClickListener  () {   
 	return this.onListItemClickListener; 
+}
+
+public int getSystemVersion()
+{	
+	return controls.systemVersion;	
 }
 
 public void SetWifiEnabled(boolean _status) {
@@ -904,6 +897,7 @@ public ActionBar GetActionBar() {
 }
 
 /*
+ * 
  * To disableAction-bar Icon and Title, you must do two things:
  setDisplayShowHomeEnabled(false);  // hides action bar icon
  setDisplayShowTitleEnabled(false); // hides action bar title
@@ -925,8 +919,8 @@ public void ShowTitleActionBar(boolean _value) {
     actionBar.setDisplayShowTitleEnabled(_value);
 }
 
-//Hide the logo
-public void HideLogoActionBar(boolean _value) { 
+//Hide the logo = false
+public void ShowLogoActionBar(boolean _value) { 
    ActionBar actionBar = this.controls.activity.getActionBar();	    
    actionBar.setDisplayShowHomeEnabled(_value);
 }
@@ -936,7 +930,6 @@ public void SetTitleActionBar(String _title) {
 	ActionBar actionBar = this.controls.activity.getActionBar();   	
     actionBar.setTitle(_title);    
 }
-
 
 //set a title and subtitle to the Action bar as shown in the code snippet.
 
@@ -972,6 +965,23 @@ public void RemoveAllTabsActionBar() {
 	actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD); //API 11 renabor
 }
 
+
+//Calculate ActionBar height
+//ref http://stackoverflow.com/questions/12301510/how-to-get-the-actionbar-height
+public int GetActionBarHeight() {
+int actionBarHeight = 0;
+TypedValue tv = new TypedValue();
+if (controls.activity.getActionBar().isShowing()) {  
+   if (controls.activity.getTheme().resolveAttribute(android.R.attr.actionBarSize, tv, true)) {
+      actionBarHeight = TypedValue.complexToDimensionPixelSize(tv.data,controls.activity.getResources().getDisplayMetrics());
+   }
+}
+return actionBarHeight;
+}
+
+public boolean ActionBarIsShowing() {
+  return controls.activity.getActionBar().isShowing();
+}
 
 public boolean IsPackageInstalled(String _packagename) {
     PackageManager pm = controls.activity.getPackageManager();
@@ -1041,9 +1051,8 @@ public void SetScreenOrientation(int _orientation) {
 }
 
 public int GetScreenOrientation() {
-	    int r = 0;
-        Display display = ((WindowManager) controls.activity.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();   
-        int orientation = display.getOrientation();  //getOrientation();
+	    int orientation = controls.activity.getResources().getConfiguration().orientation;
+	    int r = 0;       	    
         switch(orientation) {
            case Configuration.ORIENTATION_PORTRAIT:
                r= 1;//setRequestedOrientation (ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
@@ -1121,8 +1130,7 @@ public void TakeScreenshot(String _savePath, String _saveFileNameJPG) {
 	String myPath = _savePath + "/" +  _saveFileNameJPG;	
 	Bitmap bitmap;	
 	View v1 = controls.activity.getWindow().getDecorView().getRootView(); 
-	v1.setDrawingCacheEnabled(true);
-	
+	v1.setDrawingCacheEnabled(true);		
 	bitmap = Bitmap.createBitmap(v1.getDrawingCache());
 	v1.setDrawingCacheEnabled(false);
 
@@ -1143,7 +1151,6 @@ public void TakeScreenshot(String _savePath, String _saveFileNameJPG) {
 	    e.printStackTrace();
 	}
 }
-
 
 public String GetTitleActionBar() {
 	ActionBar actionBar = this.controls.activity.getActionBar();   	
@@ -1194,6 +1201,21 @@ public void CopyFromAssetsToEnvironmentDir(String _filename, String _environment
 	CopyFromInternalAppStorageToEnvironmentDir(_filename,_environmentDir);	
 }
 
+public void ToggleSoftInput() {
+	  InputMethodManager imm =(InputMethodManager) controls.activity.getSystemService(Context.INPUT_METHOD_SERVICE);
+	  imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
+}
+
+//thanks to Mladen
+public String GetDeviceModel() {
+  return android.os.Build.MODEL;  
+}
+
+public String GetDeviceManufacturer() {
+  return android.os.Build.MANUFACTURER;  
+}
+
+
 }
 
 //-------------------------------------------------------------------------
@@ -1232,6 +1254,9 @@ int marginBottom = 5;
 float mTextSize = 0; //default
 int mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_SP; //default
 
+private ClipboardManager mClipBoard = null;
+private ClipData mClipData = null;
+
 // Constructor
 public  jTextView(android.content.Context context,
                  Controls ctrls,long pasobj ) {                    
@@ -1242,6 +1267,9 @@ controls = ctrls;
 // Init Class
 lparams = new LayoutParams(100,100);     // W,H
 lparams.setMargins(5,5,5,5); // L,T,
+
+mClipBoard = (ClipboardManager) controls.activity.getSystemService(Context.CLIPBOARD_SERVICE);
+
 // Init Event
 onClickListener = new OnClickListener() {
   public  void onClick(View view) {
@@ -1315,7 +1343,18 @@ public  void setTextAlignment( int align ) {
      default : { setGravity( Gravity.LEFT              ); }; break;
   };
 }
-             
+      
+public void CopyToClipboard() {
+	mClipData = ClipData.newPlainText("text", this.getText().toString());
+    mClipBoard.setPrimaryClip(mClipData);
+}
+   
+public void PasteFromClipboard() {
+    ClipData cdata = mClipBoard.getPrimaryClip();
+    ClipData.Item item = cdata.getItemAt(0);
+    this.setText(item.getText().toString());
+}
+
 public void setParent3( android.view.ViewGroup viewgroup ) {  //deprec...
 if (parent != null) { parent.removeView(this); }
    parent = viewgroup;
@@ -1458,7 +1497,7 @@ controls = ctrls;
 // Init Class
 lparams = new RelativeLayout.LayoutParams(100,100);
 lparams.setMargins(5, 5,5,5);
-this.setHintTextColor(Color.LTGRAY);
+//this.setHintTextColor(Color.LTGRAY); //default...
 
 mClipBoard = (ClipboardManager) controls.activity.getSystemService(Context.CLIPBOARD_SERVICE);
  
@@ -1473,14 +1512,13 @@ onClickListener = new OnClickListener() {
 
 setOnClickListener(onClickListener);
 
-
 // Init Event : http://socome.tistory.com/15
 onKeyListener = new OnKeyListener() {	
   public  boolean onKey(View v, int keyCode, KeyEvent event) { //Called when a hardware key is dispatched to a view	
      if (event.getAction() == KeyEvent.ACTION_UP) {	
     	if (keyCode == KeyEvent.KEYCODE_ENTER) {
             InputMethodManager imm = (InputMethodManager) controls.activity.getSystemService(Context.INPUT_METHOD_SERVICE);
-            imm.hideSoftInputFromWindow(getWindowToken(), 0);       
+            imm.hideSoftInputFromWindow(v.getWindowToken(), 0);       
             //Log.i("OnKeyListener","OnEnter, Hide KeyBoard");
             // LoadMan
             controls.pOnEnter(PasObj);  //just Enter/Done/Next/backbutton ....!      
@@ -1797,7 +1835,15 @@ public void SetFontSizeUnit(int _unit) {
 		this.setTextSize(mTextSizeTypedValue, mTextSize);
 		this.setText(t);
 }
-	
+
+public void SetSelectAllOnFocus(boolean _value){	
+   this.setSelectAllOnFocus(_value);
+}
+
+public void SelectAll() {
+   this.selectAll();	
+}
+
 }
 
 //-------------------------------------------------------------------------
@@ -1967,6 +2013,13 @@ public void SetFontSizeUnit(int _unit) {
 		this.setText(t);
 }
 
+public void PerformClick() {
+	this.performClick();
+}
+
+public void PerformLongClick() {
+	this.performLongClick();
+}
 
 }
 
@@ -2206,7 +2259,7 @@ lparams.setMargins( 50, 50,0,0);
 // Init Event
 onClickListener = new OnClickListener() {
   public  void onClick(View view) {
-    controls.pOnClick(PasObj,Const.Click_Default);
+      controls.pOnClick(PasObj,Const.Click_Default);
   }
 };
 setOnClickListener(onClickListener);
@@ -2224,8 +2277,14 @@ public void setLeftTopRightBottomWidthHeight(int left, int top, int right, int b
 //
 public  void setParent( android.view.ViewGroup viewgroup ) {
 if (parent != null) { parent.removeView(this); }
-parent = viewgroup;
-viewgroup.addView(this,lparams);
+   parent = viewgroup;
+   viewgroup.addView(this,lparams);
+}
+
+public  void setParent2( android.view.ViewGroup viewgroup ) { //need by RadioGroup [LinearLayout!]
+if (parent != null) { parent.removeView(this); }
+   parent = viewgroup;
+   viewgroup.addView(this, 0); //LinearLayout [no lparams], insert at index O ...
 }
 
 // Free object except Self, Pascal Code Free the class.
@@ -2268,7 +2327,8 @@ public void setLayoutAll(int idAnchor) {
 				lparams.addRule(lparamsAnchorRule[i], idAnchor);		
 		    }
 			
-		} 
+		}
+		
 		for (int j=0; j < countParentRule; j++) {  
 			lparams.addRule(lparamsParentRule[j]);		
 	    }
@@ -2483,7 +2543,11 @@ onClickListener = new OnClickListener() {
     controls.pOnClick(PasObj,Const.Click_Default);
   }
 };
+
 setOnClickListener(onClickListener);
+
+//this.setWillNotDraw(false); //false = fire OnDraw after Invalited ... true = not fire onDraw... thanks to tintinux
+
 }
 
 public void setLeftTopRightBottomWidthHeight(int left, int top, int right, int bottom, int w, int h) {
@@ -2515,18 +2579,59 @@ if (parent != null) { parent.removeView(this); }
    mMatrix = null;
 }
 
-//by jmpessoa
-public void setBitmapImage(Bitmap bm) {
-	//if (bmp    != null) { bmp.recycle(); }
-	bmp = bm;
-	this.setImageBitmap(bm);
+
+private Bitmap GetResizedBitmap(Bitmap _bmp, int _newWidth, int _newHeight){
+	   float factorH = _newHeight / (float)_bmp.getHeight();
+	   float factorW = _newWidth / (float)_bmp.getWidth();
+	   float factorToUse = (factorH > factorW) ? factorW : factorH;
+	   Bitmap bm = Bitmap.createScaledBitmap(_bmp,
+	     (int) (_bmp.getWidth() * factorToUse),
+	     (int) (_bmp.getHeight() * factorToUse),false);     
+	   return bm;
+}
+
+public void SetBitmapImage(Bitmap _bitmap, int _width, int _height) {
+	this.setImageResource(android.R.color.transparent);
+	bmp = GetResizedBitmap(_bitmap, _width, _height);
+	this.setImageBitmap(bmp);	
+	this.invalidate();
+}
+
+//http://stackoverflow.com/questions/10271020/bitmap-too-large-to-be-uploaded-into-a-texture
+public void SetBitmapImage(Bitmap bm) {
+	
+	this.setImageResource(android.R.color.transparent);  //erase image ??....		
+	
+	if ( (bm.getHeight() > GL10.GL_MAX_TEXTURE_SIZE) || (bm.getWidth() > GL10.GL_MAX_TEXTURE_SIZE)) {				
+		//is is the case when the bitmap fails to load			                   	   
+		int nh = (int) ( bm.getHeight() * (1024.0 / bm.getWidth()) );	
+		Bitmap scaled = Bitmap.createScaledBitmap(bm,1024, nh, true);
+		this.setImageBitmap(scaled);
+		bmp = scaled;
+	}	
+	else{
+	    // for bitmaps with dimensions that lie within the limits, load the image normally
+	    if (Build.VERSION.SDK_INT >= 16) {  // why??	    		    	 
+	        BitmapDrawable ob = new BitmapDrawable(this.getResources(), bm);	        
+	        this.setBackground(ob);	        
+	        //this.setImageBitmap(bm);	        
+	        bmp = bm;
+	        
+	    } else {	    	
+	    	this.setImageBitmap(bm);
+	    	bmp = bm;
+	    }
+	}	
+	this.invalidate();
 }
 
 public  void setImage(String fullPath) {
 	  //if (bmp != null)        { bmp.recycle(); }
+	  this.setImageResource(android.R.color.transparent);
 	  if (fullPath.equals("null")) { this.setImageBitmap(null); return; };
 	  bmp = BitmapFactory.decodeFile( fullPath );
 	  this.setImageBitmap(bmp);
+	  this.invalidate();
 }
 
 //by jmpessoa
@@ -2552,26 +2657,28 @@ public void SetImageByResIdentifier(String _imageResIdentifier) {
 	Drawable d = GetDrawableResourceById(GetDrawableResourceId(_imageResIdentifier));
 	bmp = ((BitmapDrawable)d).getBitmap();
 	this.setImageDrawable(d);
+	this.invalidate();
 }
 
 //by jmpessoa
 public void setLParamWidth(int w) {
-  lpW = w;
+  lpW = w;	
+  lparams.width = w;	  
 }
 
 public void setLParamHeight(int h) {
-  lpH = h;
+   lpH = h;  	   
+  lparams.height = h;  
 }
 
 //by jmpessoa
-public int getLParamHeight() {	
-  return  this.getHeight();
-  
+public int getLParamHeight() {   
+  return lpH;
 }  
 
 //by jmpessoa
-public int getLParamWidth() {
-  return this.getWidth();  
+public int getLParamWidth() {	
+  return lpW;
 }
 
 //by jmpessoa
@@ -2589,8 +2696,8 @@ public int GetBitmapWidth() {
 }
 
 public void addLParamsAnchorRule(int rule) {
-  lparamsAnchorRule[countAnchorRule] = rule;
-  countAnchorRule = countAnchorRule + 1;
+   lparamsAnchorRule[countAnchorRule] = rule;
+   countAnchorRule = countAnchorRule + 1;
 }
 
 public void addLParamsParentRule(int rule) {
@@ -2604,19 +2711,19 @@ public void setLayoutAll(int idAnchor) {
 	lparams.height = lpH; //wrapContent;
 	lparams.setMargins(MarginLeft,MarginTop,marginRight,marginBottom);
 
-	if (idAnchor > 0) {    	
-		
+	if (idAnchor > 0) {    		
 		for (int i=0; i < countAnchorRule; i++) {  
 			lparams.addRule(lparamsAnchorRule[i], idAnchor);		
 	    }		
-	} 
+	}
+	
 	for (int j=0; j < countParentRule; j++) {  
 		lparams.addRule(lparamsParentRule[j]);		
-    }
+    }	
+	
 	//
 	setLayoutParams(lparams);
 }
-
 
 /*
  * TScaleType = (scaleCenter, scaleCenterCrop, scaleCenterInside, scaleFitCenter,
@@ -2644,6 +2751,7 @@ public void SetImageMatrixScale(float _scaleX, float _scaleY ) {
     mMatrix.setScale(_scaleX, _scaleY);        
     //mMatrix.postScale(_scaleX, _scaleX);
     this.setImageMatrix(mMatrix);
+    this.invalidate();
 }
 
 public Bitmap GetBitmapImage() {		
@@ -2660,15 +2768,16 @@ public void SetImageFromIntentResult(Intent _intentData) {
     String picturePath = cursor.getString(columnIndex);
     cursor.close();
     bmp = BitmapFactory.decodeFile(picturePath);
-    this.setImageBitmap(bmp);        
+    this.setImageBitmap(bmp);
+    this.invalidate();
 }
 
 public void SetImageThumbnailFromCamera(Intent _intentData) {
 	Bundle extras = _intentData.getExtras();
     bmp = (Bitmap) extras.get("data");
-    this.setImageBitmap(bmp);    
+    this.setImageBitmap(bmp);
+    this.invalidate();
 }
-
 
 //TODO Pascal
 public void SetImageFromURI(Uri _uri) {	
@@ -2681,13 +2790,21 @@ public void SetImageFromURI(Uri _uri) {
 	}
 	bmp = BitmapFactory.decodeStream(imageStream);	        
   this.setImageBitmap(bmp);
+  this.invalidate();
 }
 
 public void SetImageFromByteArray(byte[] _image) {
 	bmp = BitmapFactory.decodeByteArray(_image, 0, _image.length);
 	this.setImageBitmap(bmp);
+	this.invalidate();
 }
 
+public Bitmap GetDrawingCache() {	 
+	this.setDrawingCacheEnabled(true);		
+	Bitmap b = Bitmap.createBitmap(this.getDrawingCache());
+	this.setDrawingCacheEnabled(false);	
+    return b;	
+}
 
 }
  
@@ -2698,7 +2815,6 @@ public void SetImageFromByteArray(byte[] _image) {
 //
 //
 //-------------------------------------------------------------------------
-//by jmpessoa : custom row!
 //by jmpessoa : custom row!
 
 class jListItemRow{
@@ -2716,11 +2832,15 @@ class jListItemRow{
 	int itemLayout;
 	int textAlign;
 	Context ctx;
-	Bitmap bmp;
+	Bitmap bmp;	
+	Typeface typeFace;          
+	//TFontFace = (ffNormal, ffSans, ffSerif, ffMonospace);
+		  
 	public  jListItemRow(Context context) {
 		ctx = context;
 		label = "";
 	}
+	
 }
 
 //http://stackoverflow.com/questions/7361135/how-to-change-color-and-font-on-listview
@@ -2846,8 +2966,7 @@ public  View getView(int position, View v, ViewGroup parent) {
   	   itemImage.setOnClickListener(getOnCheckItem(itemImage, position));
    	  }   
     }   
-   
-   
+      
    RelativeLayout itemLayout = new RelativeLayout(ctx);
        
    String line = items.get(position).label;   
@@ -2884,8 +3003,7 @@ public  View getView(int position, View v, ViewGroup parent) {
 	   
 	   TextView textViewnew = new TextView(ctx);	   
 	   float auxf = textViewnew.getTextSize();	   	  	  
-	   itemText[i] = textViewnew;
-	   	   
+	   itemText[i] = textViewnew;	   	   
 	   if (i == 0) {
 		    if (items.get(position).textSize != 0){
 		    	auxf = items.get(position).textSize;
@@ -2893,17 +3011,14 @@ public  View getView(int position, View v, ViewGroup parent) {
 		    	if (mTextSizeTypedValue != TypedValue.COMPLEX_UNIT_SP) 
 			       itemText[i].setTextSize(mTextSizeTypedValue, auxf);
 		    	else
-		    		itemText[i].setTextSize(auxf);
-		    	
+		    		itemText[i].setTextSize(auxf);		    	
 		    }
-		    itemText[i].setPadding(10, 15, 10, 15);
-		    itemText[i].setTypeface(null,faceTitle);
-		    
+		    itemText[i].setPadding(10, 15, 10, 15); //Typeface.MONOSPACE
+		    itemText[i].setTypeface(items.get(position).typeFace, faceTitle); //items.get(position).typeFace		    
 		}
-		else{			
-		   itemText[i].setTypeface(null,faceBody);
-		   itemText[i].setPadding(10, 0, 10, 15);
-		   
+		else{
+		   itemText[i].setPadding(10, 0, 10, 15);  //Typeface.SERIF
+		   itemText[i].setTypeface(items.get(position).typeFace, faceBody); //		   
 		   if (items.get(position).textSizeDecorated == 1) {
 			   
 		       if (mTextSizeTypedValue != TypedValue.COMPLEX_UNIT_SP) 				    
@@ -3089,6 +3204,8 @@ private int             widgetItem;
 private String          widgetText;
 private int             textColor; 
 private int             textSize;
+//private int             fontTextStyle;
+private Typeface        typeFace = Typeface.DEFAULT;
 
 //by Renabor
 private float mDownX = -1;
@@ -3147,7 +3264,17 @@ PasObj   = pasobj;
 controls = ctrls;
 
 textColor = 0; //dummy: default
-textSize  = 0; //dummy: default       
+textSize  = 0; //dummy: default
+
+//fontFace =  Typeface.BOLD;
+//fontFace =  Typeface.BOLD_ITALIC;
+//fontFace =  Typeface.ITALIC;
+//fontTextStyle=  Typeface.NORMAL;
+//fontFace =  Typeface.MONOSPACE;
+//fontFace =  Typeface.DEFAULT;
+//fontFace =  Typeface.DEFAULT_BOLD;
+//fontFace =  Typeface.SANS_SERIF;
+//fontFace =  Typeface.SERIF;
 
 widgetItem = widget;
 widgetText = widgetTxt; 
@@ -3156,6 +3283,7 @@ textDecorated = txtDecorated;
 itemLayout =itemLay;
 textSizeDecorated = txtSizeDecorated;
 textAlign = txtAlign;
+typeFace = Typeface.DEFAULT;
 
 // Init Class
 lparams = new RelativeLayout.LayoutParams (100,100);
@@ -3195,8 +3323,7 @@ onTouchListener = new OnTouchListener() {
 				//return false; // passa oltre, ma potrebbe diventare true
 				//mDownX = -1;
 				return false;
-				
-    
+				    
 			case MotionEvent.ACTION_MOVE:
 				if (isOnClick && (Math.abs(mDownX - event.getX()) > SCROLL_THRESHOLD || Math.abs(mDownY - event.getY()) > SCROLL_THRESHOLD)) {
 					// Log.i("ACTION", "MOVE");
@@ -3282,11 +3409,23 @@ if (parent != null) { parent.removeView(this); }
 }
 
 public  void setTextColor( int textcolor) {
-   this.textColor =textcolor;
+  this.textColor =textcolor;
 }
 
 public void setTextSize (int textsize) {
-   this.textSize = textsize;
+  this.textSize = textsize;
+}
+
+public void SetFontFace(int fontFace) { 
+	  Typeface t = Typeface.DEFAULT; 
+	  switch (fontFace) { 
+	    case 0: t = Typeface.DEFAULT; break; 
+	    case 1: t = Typeface.SANS_SERIF; break; 
+	    case 2: t = Typeface.SERIF; break; 
+	    case 3: t = Typeface.MONOSPACE; break; 
+	  } 
+	  this.typeFace = t;          //TFontFace = (ffNormal, ffSans, ffSerif, ffMonospace);
+	 // this.fontTextStyle = fontStyle; // TTextTypeFace = (tfNormal, tfBold, tfItalic, tfBoldItalic); 		
 }
 
 // LORDMAN - 2013-08-07
@@ -3392,6 +3531,8 @@ info.itemLayout =itemLayout;
 info.textSizeDecorated = textSizeDecorated;
 info.textAlign = textAlign;
 
+info.typeFace = this.typeFace;    
+
 alist.add(info);
 aadapter.notifyDataSetChanged();
 }
@@ -3416,6 +3557,11 @@ info.itemLayout =itemLayout;
 info.textSizeDecorated = textSizeDecorated;
 info.textAlign = textAlign;
 
+info.typeFace = this.typeFace;
+
+//Log.i("typeFace", item);
+//info.fontTextStyle = Typeface.NORMAL;
+
 alist.add(info);
 aadapter.notifyDataSetChanged();
 }
@@ -3439,6 +3585,9 @@ public  void add3(String item, String delimiter, int fontColor, int fontSize, in
 	  info.textSizeDecorated = textSizeDecorated;
 	  info.textAlign = textAlign;
 
+	  info.typeFace = this.typeFace;    
+	  //info.fontTextStyle = Typeface.NORMAL;	  
+
 	  alist.add(info);
 	  aadapter.notifyDataSetChanged();
 }
@@ -3461,6 +3610,9 @@ public  void add4(String item, String delimiter, int fontColor, int fontSize, in
 	  info.itemLayout =itemLayout;
 	  info.textSizeDecorated = textSizeDecorated;
 	  info.textAlign = textAlign;
+	  
+	  info.typeFace = this.typeFace;    
+	 // info.fontTextStyle = Typeface.NORMAL;	  
 	  
 	  alist.add(info);
 	  aadapter.notifyDataSetChanged();
@@ -4581,9 +4733,42 @@ public  void drawText(String text, float x, float y ) {
   canvas.drawText(text,x,y,paint);
 }
 
-public  void drawBitmap(Bitmap bitmap, int b, int l, int r, int t) {
-  Rect rect = new Rect(b,l,r,t);
-  canvas.drawBitmap(bitmap,null,rect,paint);
+
+private Bitmap GetResizedBitmap(Bitmap _bmp, int _newWidth, int _newHeight){
+	   float factorH = _newHeight / (float)_bmp.getHeight();
+	   float factorW = _newWidth / (float)_bmp.getWidth();
+	   float factorToUse = (factorH > factorW) ? factorW : factorH;
+	   Bitmap bm = Bitmap.createScaledBitmap(_bmp,
+	     (int) (_bmp.getWidth() * factorToUse),
+	     (int) (_bmp.getHeight() * factorToUse),false);     
+	   return bm;
+}
+
+public void drawBitmap(Bitmap _bitmap, int _width, int _height) {
+	Bitmap bmp = GetResizedBitmap(_bitmap, _width, _height);
+	Rect rect = new Rect(0, 0, _width, _height);	
+	canvas.drawBitmap(bmp,null,rect,paint);	
+}
+
+//0 , 0, w, h //int left/b, int top/l, int right/r, int bottom/t) 
+public  void drawBitmap(Bitmap bitmap, int left, int top, int right, int bottom) {  //int b, int l, int r, int t 	
+    /* Figure out which way needs to be reduced less */
+	/*
+    int scaleFactor = 1;
+    if ((right > 0) && (bottom > 0)) {
+        scaleFactor = Math.min(bitmap.getWidth()/(right-left), bitmap.getHeight()/(bottom-top));
+    }	
+	*/	
+    Rect rect = new Rect(left,top, right, bottom);
+    if ( (bitmap.getHeight() > GL10.GL_MAX_TEXTURE_SIZE) || (bitmap.getWidth() > GL10.GL_MAX_TEXTURE_SIZE)) {								                   	   
+		int nh = (int) ( bitmap.getHeight() * (512.0 / bitmap.getWidth()) );	
+		Bitmap scaled = Bitmap.createScaledBitmap(bitmap,512, nh, true);
+		canvas.drawBitmap(scaled,null,rect,paint);			
+	}
+	else {
+		canvas.drawBitmap(bitmap,null,rect,paint);
+	}
+    
 }
 
 // Free object except Self, Pascal Code Free the class.
@@ -4633,8 +4818,17 @@ controls = ctrls;
 // Init Class
 lparams = new LayoutParams(300,300);
 lparams.setMargins( 50, 50,0,0);
+
+//this.setWillNotDraw(false);  //fire onDraw ... thanks to tintinux
 }
 
+public Bitmap getBitmap(){ 
+ this.setDrawingCacheEnabled(true);  //thanks to tintinux		
+ Bitmap b = Bitmap.createBitmap(this.getDrawingCache());
+ this.setDrawingCacheEnabled(false);	
+ return b;   
+}
+	 	
 public void setLeftTopRightBottomWidthHeight(int left, int top, int right, int bottom, int w, int h) {
 	MarginLeft = left;
 	MarginTop = top;
@@ -4660,30 +4854,6 @@ public  void setjCanvas(java.lang.Object canvas) {
 @Override
 public  boolean onTouchEvent( MotionEvent event) {
 int act     = event.getAction() & MotionEvent.ACTION_MASK;
-/*
-switch(act) {
-  case MotionEvent.ACTION_DOWN: {
-        int count = event.getPointerCount();
-        for ( int i = 0; i < count; i++ ) {
-          int ptID = event.getPointerId(i);
-          controls.pOnTouch (PasObj,ptID,Const.TouchDown,event.getX(i), event.getY(i) );
-        }
-        break; }
-  case MotionEvent.ACTION_MOVE: {
-        int count = event.getPointerCount();
-        for ( int i = 0; i < count; i++ ) {
-          int ptID = event.getPointerId(i);
-          controls.pOnTouch (PasObj,ptID,Const.TouchMove,event.getX(i), event.getY(i) );
-        }
-        break; }
-  case MotionEvent.ACTION_UP: {
-        int count = event.getPointerCount();
-        for ( int i = 0; i < count; i++ ) {
-          int ptID = event.getPointerId(i);
-          controls.pOnTouch (PasObj,ptID,Const.TouchUp  ,event.getX(i), event.getY(i) );
-        }
-        break; }
-} */
 switch(act) {
   case MotionEvent.ACTION_DOWN: {
         switch (event.getPointerCount()) {
@@ -4722,7 +4892,6 @@ switch(act) {
         }
        break;}
   case MotionEvent.ACTION_POINTER_UP  : {
-  	   // Log.i("Java","PUp");
         switch (event.getPointerCount()) {
         	case 1 : { controls.pOnTouch (PasObj,Const.TouchUp  ,1,
         		                            event.getX(0),event.getY(0),0,0); break; }
@@ -4745,7 +4914,7 @@ public  void onDraw( Canvas canvas) {
 public void saveView( String sFileName ) {
   Bitmap b = Bitmap.createBitmap( getWidth(), getHeight(), Bitmap.Config.ARGB_8888);
   Canvas c = new Canvas( b );
-  draw( c );
+  draw( c );  
   FileOutputStream fos = null;
   try {
      fos = new FileOutputStream( sFileName );
@@ -4967,7 +5136,6 @@ switch(act) {
 return true;
 }
 
-//
 @Override
 public void surfaceDestroyed(SurfaceHolder holder) {
 	//Log.i("Java","surfaceDestroyed");
@@ -5127,6 +5295,9 @@ onClickListener = new DialogInterface.OnClickListener() {
   };
 };
 // Init Class
+if (dlgY.equals("")) dlgY ="Yes";
+if (dlgN.equals("")) dlgN ="No";
+
 AlertDialog.Builder builder = new AlertDialog.Builder(controls.activity);
 builder.setMessage       (dlgMsg  )
        .setCancelable    (false)
@@ -5144,11 +5315,52 @@ public  void show() {
    dialog.show();
 }
 
+public  void show(String titleText, String msgText, String yesText, String noText) {
+	   //Log.i("java","DlgYN_Show");
+	dlgTitle = titleText;
+	dlgMsg   = msgText;
+	dlgY     = yesText;
+	dlgN     = noText;
+
+	if (dlgY.equals("")) dlgY ="Yes";
+	if (dlgN.equals("")) dlgN ="No";
+	
+	AlertDialog.Builder builder = new AlertDialog.Builder(controls.activity);
+	builder.setMessage       (dlgMsg  )
+	       .setCancelable    (false)
+	       .setPositiveButton(dlgY,onClickListener)
+	       .setNegativeButton(dlgN,onClickListener);
+	dialog = builder.create();
+	//
+	dialog.setTitle(dlgTitle);
+
+	dialog.show();
+}
+
+public void show(String titleText, String msgText) {
+	   //Log.i("java","DlgYN_Show");
+	dlgTitle = titleText;
+	dlgMsg   = msgText;
+
+	if (dlgY.equals("")) dlgY ="Yes";
+	if (dlgN.equals("")) dlgN ="No";
+	
+	AlertDialog.Builder builder = new AlertDialog.Builder(controls.activity);
+	builder.setMessage       (dlgMsg  )
+	       .setCancelable    (false)
+	       .setPositiveButton(dlgY,onClickListener)
+	       .setNegativeButton(dlgN,onClickListener);
+	dialog = builder.create();
+	//
+	dialog.setTitle(dlgTitle);
+	dialog.show();
+}
+
 public  void Free() {
-onClickListener = null;
-dialog.setTitle("");
-dialog.setIcon(null);
-dialog = null;
+  onClickListener = null;
+  dialog.setTitle("");
+  dialog.setIcon(null);
+  dialog = null;
 }
 }
 
@@ -5157,184 +5369,206 @@ dialog = null;
 //-------------------------------------------------------------------------
 
 class jDialogProgress {
-  // Java-Pascal Interface
-  private long  PasObj = 0;      // Pascal Obj
-  private Controls controls = null;   // Control Class for Event
-  
-  String mTitle = "";
-  String mMsg = "";
-  int mFlag = 0;  
-  private ProgressDialog  dialog = null;  
-  private AlertDialog  customDialog = null;  
-  
-  public jDialogProgress(android.content.Context context,
-                     Controls ctrls, long pasobj, String title, String msg) {
-    //Connect Pascal I/F
-    PasObj = pasobj;
-    controls = ctrls;
-    mTitle= title;
-    mMsg = msg; 
-    mFlag = 0;
-  }
+	  // Java-Pascal Interface
+	  private long  PasObj = 0;      // Pascal Obj
+	  private Controls controls = null;   // Control Class for Event
+	  
+	  String mTitle = "";
+	  String mMsg = "";
+	  int mFlag = 0;  
+	  private ProgressDialog  dialog = null;  
+	  private AlertDialog  customDialog = null;  
+	  
+	  private boolean mCancelable; //thanks to Mladen
+	  
+	  public jDialogProgress(android.content.Context context,
+	                     Controls ctrls, long pasobj, String title, String msg) {
+	    //Connect Pascal I/F
+	    PasObj = pasobj;
+	    controls = ctrls;
+	    mTitle= title;
+	    mMsg = msg; 
+	    mFlag = 0;
+	    mCancelable= true;    
+	  }
 
-  public  void Free() {
-	if (dialog != null) dialog.dismiss();
-	if (customDialog != null) customDialog.dismiss();		
-    dialog = null;
-    customDialog = null;
-  }
-  
-  
-  public void Show() {
-	if (dialog != null) dialog.dismiss();
-	dialog = null;	  
-	dialog = new ProgressDialog(controls.activity);
-	
-	if (!mMsg.equals("")) dialog.setMessage(mMsg);		 
-	if (!mTitle.equals("")) 
-		dialog.setTitle(mTitle);	
-	 else 
-		dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-	
-    dialog.setCancelable(true);         
-    dialog.show();
-  }
-	  
-  public void Show(String _title, String _msg) {
-	  if (dialog != null) dialog.dismiss();
-	  dialog = null;	 
-	  mMsg = _msg;
-	  mTitle= _title;
-	  dialog = new ProgressDialog(controls.activity);
-	  	  
-	  if (!mMsg.equals("")) dialog.setMessage(mMsg);		 
-	  if (!mTitle.equals("")) 
-		 dialog.setTitle(mTitle);	
-	  else 
-		 dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-	  
-      dialog.setCancelable(true); //back key            
-      dialog.show();
-  }
-  
-  public void Show(RelativeLayout _layout) {	
-	if (dialog != null) dialog.dismiss();
-	dialog = null;		
-    if(_layout.getVisibility()==0) { //visible   
-	  _layout.setVisibility(android.view.View.INVISIBLE); //4
-    }                  
-    if ( _layout.getParent().getClass().getName().equals("android.widget.RelativeLayout") ) {    	
-    	RelativeLayout par = (RelativeLayout)_layout.getParent();
-    	if (par != null) par.removeView(_layout);
-    } 			
-    else {
-    	FrameLayout par = (FrameLayout)_layout.getParent();
-    	if (par != null) par.removeView(_layout);
-    }
-    
-	_layout.setVisibility(0);	
-    AlertDialog.Builder builder = new AlertDialog.Builder(controls.activity);    
-    builder.setView(_layout);
-    builder.setCancelable(true); //back key    
-    customDialog = builder.create();   
-    		 
-	if (!mTitle.equals("")) 
-	  customDialog.setTitle(mTitle);	
-	else 
-	  customDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-    
-    customDialog.show();    
-  }
-  
-  public void SetMessage(String _msg) {
-    mMsg = _msg;
-    if (dialog != null) {
-    	if (dialog.isShowing()) {dialog.setMessage(_msg);}
-    }	
-  }
- 
-  public void SetTitle(String _title) {
-	mTitle = _title;
-	if (dialog != null) dialog.setTitle(_title);
-	if (customDialog != null) customDialog.setTitle(_title);
-  }
-  
-  public void SetCancelable(boolean _value) {
-	if (dialog != null) dialog.setCancelable(_value);
-	if (customDialog != null) customDialog.setCancelable(_value);
-  }
-      
-  public void Stop() {
-	  if (customDialog != null) {
-		  customDialog.dismiss();		  
+	  public  void Free() {
+		if (dialog != null) dialog.dismiss();
+		if (customDialog != null) customDialog.dismiss();		
+	    dialog = null;
+	    customDialog = null;
 	  }
-	  if (dialog != null) {
-		  dialog.dismiss();		  
+	  
+	  
+	  public void Show() {
+		if (dialog != null) dialog.dismiss();
+		dialog = null;	  
+		dialog = new ProgressDialog(controls.activity);
+		
+		if (!mMsg.equals("")) dialog.setMessage(mMsg);		 
+		if (!mTitle.equals("")) 
+			dialog.setTitle(mTitle);	
+		 else 
+			dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+		
+		if (mCancelable)
+	       dialog.setCancelable(true);
+	    else   
+	    	dialog.setCancelable(false);
+		
+	    dialog.show();
 	  }
-  }
-  
-  //TODO
-  public void ShowAsync() {  //Async
-	  new ATask().execute(null, null, null); 
-  }
-  
-  //TODO                        //params, progress, result
-  class ATask extends AsyncTask<String, Integer, Integer>{
-       int count;
-       
-    // Step #1. 
-       @Override
-       protected void onPreExecute(){ 
-         super.onPreExecute();
-         
-         count = 1;         
-  		 if (dialog != null) dialog.dismiss();
-  		 dialog = null;
-  		 
-  		 dialog = new ProgressDialog(controls.activity);
-  		
-  		 if (!mMsg.equals("")) dialog.setMessage(mMsg);
-  		 
-  		 if (!mTitle.equals("")) 
-  			dialog.setTitle(mTitle);	
-  		 else 
-  			dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-  		
-  	     dialog.setCancelable(true);         
-  	     dialog.show();
-       }
-       
-    // Step #2. 
-	   @Override
-	   protected Integer doInBackground(String... params) {
-		   int result = 0;		   
-	       while( count > 0 ) {	 //controls.pOnShowDialogProgressAsync(PasObj, count)
-	    	  result = count;
-	    	  publishProgress(count);
-	       }	       
-	       return result;	      
+		  
+	  public void Show(String _title, String _msg) {
+		  if (dialog != null) dialog.dismiss();
+		  dialog = null;	 
+		  mMsg = _msg;
+		  mTitle= _title;
+		  dialog = new ProgressDialog(controls.activity);
+		  	  
+		  if (!mMsg.equals("")) dialog.setMessage(mMsg);		 
+		  if (!mTitle.equals("")) 
+			 dialog.setTitle(mTitle);	
+		  else 
+			 dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+		  
+		  
+			if (mCancelable)  //thanks to Mladen
+			  dialog.setCancelable(true);  //back key
+			else   
+			 dialog.setCancelable(false);
+			
+	      dialog.show();
+	  }
+	  
+	  public void Show(RelativeLayout _layout) {	
+		if (dialog != null) dialog.dismiss();
+		dialog = null;		
+	    if(_layout.getVisibility()==0) { //visible   
+		  _layout.setVisibility(android.view.View.INVISIBLE); //4
+	    }                  
+	    if ( _layout.getParent().getClass().getName().equals("android.widget.RelativeLayout") ) {    	
+	    	RelativeLayout par = (RelativeLayout)_layout.getParent();
+	    	if (par != null) par.removeView(_layout);
+	    } 			
+	    else {
+	    	FrameLayout par = (FrameLayout)_layout.getParent();
+	    	if (par != null) par.removeView(_layout);
 	    }
+	    
+		_layout.setVisibility(0);	
+	    AlertDialog.Builder builder = new AlertDialog.Builder(controls.activity);    
+	    builder.setView(_layout);
+	    builder.setCancelable(true); //back key    
+	    customDialog = builder.create();   
+	    		 
+		if (!mTitle.equals("")) 
+		  customDialog.setTitle(mTitle);	
+		else 
+		  customDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+	    
+		if (mCancelable) //thanks to Mladen
+			customDialog.setCancelable(true);  //back key
+		else   
+			customDialog.setCancelable(false);
+		
+	    customDialog.show();    
+	  }
+	  
+	  public void SetMessage(String _msg) {
+	    mMsg = _msg;
+	    if (dialog != null) {
+	    	if (dialog.isShowing()) {dialog.setMessage(_msg);}
+	    }	
+	  }
+	 
+	  public void SetTitle(String _title) {
+		mTitle = _title;
+		if (dialog != null) dialog.setTitle(_title);
+		if (customDialog != null) customDialog.setTitle(_title);
+	  }
+	  
+	  public void SetCancelable(boolean _value) {	  
+		mCancelable = _value; //thanks to Mladen
+		if (dialog != null) dialog.setCancelable(mCancelable);
+		if (customDialog != null) customDialog.setCancelable(mCancelable);		
+	  }
+	      
+	  public void Stop() {
+		  if (customDialog != null) {
+			  customDialog.dismiss();		  
+		  }
+		  if (dialog != null) {
+			  dialog.dismiss();		  
+		  }
+	  }
+	  
+	  //TODO
+	  public void ShowAsync() {  //Async
+		  new ATask().execute(null, null, null); 
+	  }
+	  
+	  //TODO                        //params, progress, result
+	  class ATask extends AsyncTask<String, Integer, Integer>{
+	       int count;
+	       
+	    // Step #1. 
+	       @Override
+	       protected void onPreExecute(){ 
+	         super.onPreExecute();
+	         
+	         count = 1;         
+	  		 if (dialog != null) dialog.dismiss();
+	  		 dialog = null;
+	  		 
+	  		 dialog = new ProgressDialog(controls.activity);
+	  		
+	  		 if (!mMsg.equals("")) dialog.setMessage(mMsg);
+	  		 
+	  		 if (!mTitle.equals("")) 
+	  			dialog.setTitle(mTitle);	
+	  		 else 
+	  			dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
 
-	    // Step #3. Progress
-	    @Override
-	    protected void onProgressUpdate(Integer... params) {
-	       super.onProgressUpdate(params);	       
-	       count = count + 1;	       
-	       if ( count == 1000) { //just test !
-	    	   count = -1;
+	  		if (mCancelable)
+	  			dialog.setCancelable(true);  //back key
+	  		else   
+	  			dialog.setCancelable(false);
+	  		
+	  	     dialog.show();
+	  	     
 	       }
-	    }
+	       
+	    // Step #2. 
+		   @Override
+		   protected Integer doInBackground(String... params) {
+			   int result = 0;		   
+		       while( count > 0 ) {	 //controls.pOnShowDialogProgressAsync(PasObj, count)
+		    	  result = count;
+		    	  publishProgress(count);
+		       }	       
+		       return result;	      
+		    }
 
-	    //Step #4. After Process
-	    @Override
-	    protected void onPostExecute(Integer result) {
-	      super.onPostExecute(result);
-	      if (dialog != null) dialog.dismiss();
-	      //Log.i("onPostExecute = ", "result = "+ result.intValue());	      
-	    }        	    
-	  }
-}
+		    // Step #3. Progress
+		    @Override
+		    protected void onProgressUpdate(Integer... params) {
+		       super.onProgressUpdate(params);	       
+		       count = count + 1;	       
+		       if ( count == 1000) { //just test !
+		    	   count = -1;
+		       }
+		    }
 
+		    //Step #4. After Process
+		    @Override
+		    protected void onPostExecute(Integer result) {
+		      super.onPostExecute(result);
+		      if (dialog != null) dialog.dismiss();
+		      //Log.i("onPostExecute = ", "result = "+ result.intValue());	      
+		    }        	    
+		  }
+	}
 
 //-------------------------------------------------------------------------
 //jImageBtn
@@ -5665,23 +5899,18 @@ try {
      //File file               = new File(dir,System.IO.Path.GetFileName(localfile) );
      File file               = new File(localfile);
 
-     long startTime          = System.currentTimeMillis();
+     //long startTime          = System.currentTimeMillis();
      InputStream is          = ucon.getInputStream();
      BufferedInputStream bis = new BufferedInputStream(is);
-
-     ByteArrayBuffer baf = new ByteArrayBuffer(5);
-     int total = 0;
-     int count = 0;
-     while ((count = bis.read()) != -1) {
-       total += count;
-       publishProgress(total);
-       baf.append((byte) count);
-     }
-     //if (isCancelled()) break;
-
-     // Save File
+  
+	 int size = bis.available();     
+     byte[] buffer = new byte[size];
      FileOutputStream fos = new FileOutputStream(file);
-     fos.write(baf.toByteArray());
+     
+	 for (int c = is.read(buffer); c != -1; c = is.read(buffer)){
+	     fos.write(buffer, 0, c);
+	 }
+	 
      fos.flush();
      fos.close();
      //
@@ -5785,11 +6014,7 @@ class jBitmap {
 // Java-Pascal Interface
 private long             PasObj   = 0;      // Pascal Obj
 private Controls        controls = null;   // Control Class for Event
-
-//
 public  Bitmap bmp    = null;
-
-
 
 // Constructor
 public  jBitmap(Controls ctrls, long pasobj ) {
@@ -5799,9 +6024,10 @@ controls = ctrls;
 
 }
 
-public  void loadFile(String filename) {  //full file name!
+public  void loadFile(String fullFilename) {  //full file name!
   //if (bmp != null) { bmp.recycle(); }
-  bmp = BitmapFactory.decodeFile(filename);
+  //Log.i("loadFile", filename);	
+  bmp = BitmapFactory.decodeFile(fullFilename);
 }
 
 
@@ -5831,17 +6057,24 @@ public  void loadRes(String imgResIdentifier) {  //full file name!
 	  bmp =	  ((BitmapDrawable)d).getBitmap();
 }
 
-
 //by jmpessoa
 //BitmapFactory.Options options = new BitmapFactory.Options();
 //options.inSampleSize = 4;
-public  void loadFileEx(String filename) {
+
+public  void loadFileEx(String fullFilename) {
  //if (bmp != null) { bmp.recycle(); }
   BitmapFactory.Options options = new BitmapFactory.Options();
   options.inSampleSize = 4; // --> 1/4
-  bmp = BitmapFactory.decodeFile(filename, options);
+  bmp = BitmapFactory.decodeFile(fullFilename, options);
 }
 
+
+public  void LoadFile(String _fullFilename, int _shrinkFactor) {
+	 //if (bmp != null) { bmp.recycle(); }
+	  BitmapFactory.Options options = new BitmapFactory.Options();
+	  options.inSampleSize = _shrinkFactor; // 4 --> 1/4
+	  bmp = BitmapFactory.decodeFile(_fullFilename, options);	  
+}
 
 public  void createBitmap(int w, int h) {
    //if (bmp != null) { bmp.recycle(); }
@@ -5988,18 +6221,45 @@ public Bitmap GetResizedBitmap(int _newWidth, int _newHeight){
 	ByteBuffer graphicBuffer = ByteBuffer.allocateDirect(_width*_height*4);    
     return graphicBuffer;    
   }
+  
+  
+  public ByteBuffer GetByteBufferFromBitmap(Bitmap _bmap) {	  
+	int w =  _bmap.getWidth();
+	int h =_bmap.getHeight();
+	//Log.i("w="+w, "h="+h); ok
+	ByteBuffer graphicBuffer = ByteBuffer.allocateDirect(w*h*4);  	
+	_bmap.copyPixelsToBuffer(graphicBuffer);
+	graphicBuffer.rewind();  //reset position
+    return graphicBuffer;    
+  }
+  
+  public ByteBuffer GetByteBufferFromBitmap() {
+	
+	if (bmp == null) return null;
+	
+	int w =  bmp.getWidth();
+	int h =bmp.getHeight();
+	
+	ByteBuffer graphicBuffer = ByteBuffer.allocateDirect(w*h*4);  	
+	bmp.copyPixelsToBuffer(graphicBuffer);
+	
+	graphicBuffer.rewind();  //reset position
+	
+    return graphicBuffer;    
+  }
 
-  public Bitmap GetBitmapFromByteBuffer(ByteBuffer _byteBuffer, int _width, int _height) {	  
-	  Bitmap bm = Bitmap.createBitmap(_width, _height, Bitmap.Config.ARGB_8888);					 
-      bm.copyPixelsFromBuffer(_byteBuffer);  	
-      return bm;
+  public Bitmap GetBitmapFromByteBuffer(ByteBuffer _byteBuffer, int _width, int _height) {	 
+	  _byteBuffer.rewind();  //reset position
+	  bmp = Bitmap.createBitmap(_width, _height, Bitmap.Config.ARGB_8888);					 
+      bmp.copyPixelsFromBuffer(_byteBuffer); 	
+      return bmp;
   }
   
   //by jmpessoa
   public Bitmap GetBitmapFromByteArray(byte[] _image) {
-	Bitmap bm = BitmapFactory.decodeByteArray(_image, 0, _image.length);
-	return bm;
-	//Log.i("SetByteArrayToBitmap","size="+ image.length);
+   //this.bmp = BitmapFactory.decodeByteArray(_image, 0, _image.length);
+	bmp = BitmapFactory.decodeByteArray(_image, 0, _image.length);
+	return bmp;	
   }
 
 }
@@ -6249,7 +6509,7 @@ class jSqliteDataAccess {
 
         // Open/Create database for insert,update,delete in syncronized manner
         private synchronized SQLiteDatabase Open() throws SQLException {
-    	   return controls.activity.openOrCreateDatabase(DATABASE_NAME, Context.MODE_PRIVATE, null);
+    	   return controls.activity.openOrCreateDatabase(DATABASE_NAME, SQLiteDatabase.CREATE_IF_NECESSARY,  null); //Context.MODE_PRIVATE,
         }
        
 	    public void OpenOrCreate(String dataBaseName) {
@@ -6257,11 +6517,17 @@ class jSqliteDataAccess {
 		   mydb = this.Open();
 	    }
 	    public void SetVersion(int version) {
+	    	if (mydb == null) {
+	    		mydb = this.Open();
+	    	}
 	    	if (mydb!= null) {
 	    		mydb.setVersion(version);
 	    	}
 	    }
 	    public int GetVersion() {
+	    	if (mydb == null) {
+	    		mydb = this.Open();
+	    	}	    	
 	    	if (mydb!= null) {
 	    		return mydb.getVersion();
 	    	}
@@ -6273,7 +6539,10 @@ class jSqliteDataAccess {
 	        	   if (!mydb.isOpen()) {
 	        	      mydb = this.Open();
 	        	   }
-	           }	           	           
+	           }	
+	           else {
+	        	   mydb = this.Open();
+	           }	        	   
 	           mydb.beginTransaction();
 	           try {
 	            	mydb.execSQL(execQuery); //Execute a single SQL statement that is NOT a SELECT or any other SQL statement that returns data.
@@ -6322,6 +6591,9 @@ class jSqliteDataAccess {
 	             mydb = this.Open();
 	          }
 	        }
+	        else {
+	           mydb = this.Open();
+	        }
 	        
             mydb.beginTransaction();
             try {
@@ -6345,6 +6617,9 @@ class jSqliteDataAccess {
 	           if (!mydb.isOpen()) {
 	               mydb = this.Open();
 	           }
+	        }
+	        else {
+	           mydb = this.Open();
 	        }
 	        
             mydb.beginTransaction();
@@ -6378,6 +6653,9 @@ class jSqliteDataAccess {
 		                  mydb = this.Open();
 		               }
 		            }
+		           else {
+		        	   mydb = this.Open();
+		           }
 		            cursor  = mydb.rawQuery(selectQuery, null);		       
 		        	
 		            colCount = cursor.getColumnCount();
@@ -6426,16 +6704,21 @@ class jSqliteDataAccess {
 			           if (!mydb.isOpen()) {
 			              mydb = this.Open(); //controls.activity.openOrCreateDatabase(DATABASE_NAME, Context.MODE_PRIVATE, null); 
 			           }
-			        }		        			        				     	         
+			        }
+			        else {
+			          mydb = this.Open(); 
+			        }
 			     	this.cursor  = mydb.rawQuery(selectQuery, null);
-			     	       this.cursor.moveToFirst(); 	
+			     	this.cursor.moveToFirst(); 	
 			        mydb.close();			       
 			     }catch(SQLiteException se){
+			    	 result = false;
 			         Log.e(getClass().getSimpleName(), "Could not select:" + selectQuery);
 			     }	     				        
-		         return true;
+		         return result;
 		}
 
+	    
 	    public Cursor GetCursor() {
     	    return this.cursor;
 	    }
@@ -6496,11 +6779,17 @@ class jSqliteDataAccess {
 		//news! version 06 rev. 08 15 december 2014.........................
 		
 		public void SetForeignKeyConstraintsEnabled(boolean _value) {
+	    	if (mydb == null) {
+	    		mydb = this.Open();
+	    	}
 			if (mydb!=null)
 		  	  mydb.setForeignKeyConstraintsEnabled(_value);			
 		}
 		
 		public void SetDefaultLocale() {
+	    	if (mydb == null) {
+	    		mydb = this.Open();
+	    	}			
 			if (mydb!=null)
 			   mydb.setLocale(Locale.getDefault());			
 		}
@@ -6526,7 +6815,10 @@ class jSqliteDataAccess {
 		         if (!mydb.isOpen()) {
 		              mydb = this.Open();
 		         }
-		     }
+		    }
+	        else {
+	           mydb = this.Open();
+	        }
             mydb.beginTransaction();
             try {
             	mydb.execSQL("UPDATE " + _tabName + " SET "+_imageFieldName+" = ? WHERE "+_keyFieldName+" = ?", new Object[] {image_byte, _keyValue} );
@@ -6592,7 +6884,12 @@ class jSqliteDataAccess {
         	for (i=0; i < len; i++) {
                	this.SplitUpdateImageData(_imageResIdentifierDataArray[i], _delimiter);
             }
-        }		
+        }
+        
+        public void SetDataBaseName(String _dbName) {
+        	DATABASE_NAME = _dbName;
+        }
+        
 }
 
 
@@ -10509,7 +10806,7 @@ class jImageFileManager /*extends ...*/ {
       return bmap;
    }
    
-   public Bitmap LoadFromFile(String _filename) {	   
+   public Bitmap LoadFromFile(String _filename) {  //InternalAppStorage  !!!	   
 	   Bitmap bmap=null;	  
 	   File fDir = this.controls.activity.getFilesDir();  //Result : /data/data/com/MyApp/files
 	   File file = new File(fDir, _filename);	   
@@ -10527,7 +10824,7 @@ class jImageFileManager /*extends ...*/ {
   	   return bmap;  	   
    }
    
-   public Bitmap LoadFromFile(String _path, String _filename) {	   
+   public Bitmap LoadFromFile(String _path, String _filename) { //EnvironmentDirectoryPath  !!	   
 	   String imageIn = _path+"/"+_filename;	      
 	   Bitmap bitmap = BitmapFactory.decodeFile(imageIn);	      
 	   return bitmap; 
@@ -12966,10 +13263,14 @@ class jNotificationManager /*extends ...*/ {
     private Context  context   = null;
 
     NotificationManager mNotificationManager;
-    String one,two,three;
-  
+    String one,two,three;    
+    Notification.Builder mNotificationBuilder;
+    
+    int mLightOn=  1000;
+	int mLightOff= 1000;
+	int mColor = Color.BLUE;
+    
     //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
-  
     public jNotificationManager(Controls _ctrls, long _Self) { //Add more others news "_xxx" params if needed!
        //super(_ctrls.activity);
        context   = _ctrls.activity;
@@ -13008,15 +13309,44 @@ class jNotificationManager /*extends ...*/ {
     	else
     	   icon = GetDrawableResourceId(_iconIdentifier) ;
     	
-    	mNotificationManager=(NotificationManager)controls.activity.getSystemService(Context.NOTIFICATION_SERVICE);    	
-       Notification notif = new Notification.Builder(controls.activity)         
-       .setContentTitle(_title)        
-       .setContentText(_subject)
-       .setContentInfo(_body)
-       .setSmallIcon(icon)         
-       .build();       
-       mNotificationManager.notify(_id, notif);
+       mNotificationManager=(NotificationManager)controls.activity.getSystemService(Context.NOTIFICATION_SERVICE);       
+       mNotificationBuilder = new Notification.Builder(controls.activity);  //need API >= 11 !!         
+       mNotificationBuilder.setContentTitle(_title);        
+       mNotificationBuilder.setContentText(_subject);
+       mNotificationBuilder.setContentInfo(_body);       
+       mNotificationBuilder.setSmallIcon(icon);   
+       mNotificationBuilder.setLights(mColor, mLightOn, mLightOff); //thanks to freris       
+
+       //Solution by freris 
+       if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+          mNotificationManager.notify(_id, mNotificationBuilder.build());
+       }
+       else {
+          mNotificationManager.notify(_id, mNotificationBuilder.getNotification());    	  
+       }  
+       
     }
+    
+    //thanks to freris
+    public void SetLightsColorAndTime(int _color, int _onMills, int _offMills) {
+    	if (mNotificationBuilder != null) {
+      	   mNotificationBuilder.setLights(_color, _onMills, _offMills);
+    	   if ((_onMills > 0) && (_offMills > 0)) {
+    	      mLightOn=  _onMills;
+    	      mLightOff= _offMills;
+    	   }
+    	}
+    }
+    
+  //thanks to freris
+    public void SetLightsEnable(boolean _enable) {
+    	if (mNotificationBuilder != null) {
+    	    if (!_enable)     	
+       	      mNotificationBuilder.setLights(mColor, 0, 0);    	   
+    	    else
+         	  mNotificationBuilder.setLights(mColor, mLightOn, mLightOff);
+    	}
+    }    
     
     //This method cancel a previously shown notification.
     public void Cancel(int _id) {
@@ -13145,16 +13475,21 @@ class jHttpClient /*extends ...*/ {
    private String mUSERNAME = "USERNAME";
    private String mPASSWORD = "PASSWORD";
    private int mAuthenticationMode = 0; //0: none. 1: basic; 2= OAuth
-   private String mHOSTNAME = AuthScope.ANY_HOST; // null; 
-   private int mPORT = AuthScope.ANY_PORT; //-1;
    
-   private List<NameValuePair> ValuesForPost2 = new ArrayList<NameValuePair>();
-   DefaultHttpClient client2;
+   private String mHOSTNAME = null;   
+   private int mPORT = -1;
+     
    String httpCharSet = "UTF-8";	// default UTF-8
    
-	//List<Cookie> cookies;		 		 
-    CookieStore cookieStore; 	     
-    HttpContext localContext;    
+   private HashMap<String, String> ValuesForPost;   
+   private CookieManager cookieManager;
+   
+   private HttpURLConnection client3 = null; // renabor
+   
+   private CookieStore cookieStore;
+   
+   private String mUrlString= "";
+   private int mResponseCode = HttpURLConnection.HTTP_NOT_FOUND;
         
     ArrayList<String> listHeaderName = new ArrayList<String>();
     ArrayList<String> listHeaderValue = new ArrayList<String>();
@@ -13165,30 +13500,27 @@ class jHttpClient /*extends ...*/ {
       context   = _ctrls.activity;
       pascalObj = _Self;
       controls  = _ctrls;
+       
+      cookieManager = new CookieManager(null, CookiePolicy.ACCEPT_ALL );
+                  
+      CookieHandler.setDefault(cookieManager);   // <<------- CookieManager work automatically       
       
-      client2 = new DefaultHttpClient();
+      ValuesForPost = new HashMap<String, String>();      
       
-      cookieStore= new BasicCookieStore();      
-      localContext= new BasicHttpContext();      
-      localContext.setAttribute(ClientContext.COOKIE_STORE,cookieStore);
-      
-      //client2.setCookieStore(cookieStore);            
    }
- 
+      
+   //https://www.nczonline.net/blog/2009/05/05/http-cookies-explained/
+   
    public void jFree() {
-     //free local objects...
-	   client2.getConnectionManager().shutdown();
+       //free local objects...
+	   if (client3 != null) client3.disconnect();
    }
  
    //write others [public] methods code here......
    //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
-   
-   //ref. http://blog.leocad.io/basic-http-authentication-on-android/
-   //ref. http://simpleprogrammer.com/2011/05/25/oauth-and-rest-in-android-part-1/
-   //ref. http://jan.horneck.info/blog/androidhttpclientwithbasicauthentication
-   
       
    public void GetAsync(String _stringUrl) {
+	   mUrlString = _stringUrl;
 	   new AsyncHttpClientGet().execute(_stringUrl);	   
    }
    
@@ -13196,86 +13528,158 @@ class jHttpClient /*extends ...*/ {
 	   httpCharSet = _charSet;
 	   //Log.i("CharSet", _charSet);
    }  
-                      
-   public String Get2(String _stringUrl) throws Exception {  //Pascal: Get  
-	   	   	   	   
-	   HttpGet httpGet = new HttpGet(_stringUrl);	   
-	   HttpResponse response = client2.execute(httpGet);
-	      	  	   
-	   BufferedReader rd = new BufferedReader(new InputStreamReader(response.getEntity().getContent(), httpCharSet));
-	   StringBuffer sb = new StringBuffer();
-	   
-	   String line = "";
-	   while ((line = rd.readLine()) != null) {
-		  sb.append(line);		   
-	   }
-	   
-	   return sb.toString();	   
-   } 
-   
       
-   public void AddValueForPost2(String Name, String Value) {  //Pascal: AddPostNameValueData		
-       ValuesForPost2.add(new BasicNameValuePair(Name, Value));	
+   ////Pascal: Get  
+   public String Get(String _urlString) { //throws Exception {      
+      StringBuffer sb = new StringBuffer();      
+      mResponseCode = HttpURLConnection.HTTP_CREATED;
+      mUrlString = _urlString;
+      try {
+             URL url = new URL(_urlString);
+              client3 = (HttpURLConnection)url.openConnection();
+              client3.setRequestMethod("GET");              
+              if (mAuthenticationMode == 1) {
+                 String _credentials = mUSERNAME + ":" + mPASSWORD;
+                 String _base64EncodedCredentials = Base64.encodeToString(_credentials.getBytes(), Base64.NO_WRAP);
+                 client3.setRequestProperty("Authorization", "Basic "+ _base64EncodedCredentials);
+              }                                               
+              
+              int statusCode = client3.getResponseCode();
+              mResponseCode = statusCode;
+              
+              if (statusCode == HttpURLConnection.HTTP_OK) {    //OK            	
+                  InputStream inputStream = client3.getInputStream();
+                  BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+                  String inputLine;
+                  while ((inputLine = reader.readLine()) != null) {
+                       sb.append(inputLine);
+                  }
+                  inputStream.close();
+              } else {
+                  sb.append(String.valueOf(statusCode));
+               
+              }                                                        
+              client3.disconnect();
+      } catch (Exception e) {
+              return "";
+      }        
+      return sb.toString();
    }
+     
+   //by renabor
+   public void AddValueForPost2(String Name, String Value) {  //Pascal: AddPostNameValueData
+	   ValuesForPost.put(Name, Value);
+   }
+      
+   //by renabor 
+    public void ClearPost2Values() { // Pascal: ClearPostNameValueData
+         ValuesForPost.clear();   
+    }      
+    
+   //http://stackoverflow.com/questions/9767952/how-to-add-parameters-to-httpurlconnection-using-post 
+    private String getPostDataString(HashMap<String, String> params) throws UnsupportedEncodingException{
+        StringBuilder result = new StringBuilder();
+        boolean first = true;
+        for(Map.Entry<String, String> entry : params.entrySet()){
+            if (first)
+                first = false;
+            else
+                result.append("&");
 
-   public void ClearPost2Values() { // Pascal: ClearPostNameValueData
-      ValuesForPost2.clear();	
-   }   
+            result.append(URLEncoder.encode(entry.getKey(), "UTF-8"));
+            result.append("=");
+            result.append(URLEncoder.encode(entry.getValue(), "UTF-8"));
+        }
 
-   public String Post2(String Link) throws Exception {	// Pascal: Post			
-		
-		// Create a new HttpClient and Post Header
-		int statusCode = 0;						
-		HttpParams httpParams = new BasicHttpParams();
-		int connection_Timeout = 5000;
-		HttpConnectionParams.setConnectionTimeout(httpParams, connection_Timeout);
-		HttpConnectionParams.setSoTimeout(httpParams, connection_Timeout);
-		
-        if (mAuthenticationMode != 0) {    		   
-        	client2.getCredentialsProvider().setCredentials(
-                        new AuthScope(mHOSTNAME,mPORT),  // 
-                        new UsernamePasswordCredentials(mUSERNAME, mPASSWORD));
-	    }
-        			   
-	    HttpPost httpPost = new HttpPost(Link);
-	    
-	  //thanks to @renabor
-	    if (mAuthenticationMode != 0) {
-            String _credentials = mUSERNAME + ":" + mPASSWORD;
-            String _base64EncodedCredentials = Base64.encodeToString(_credentials.getBytes(), Base64.NO_WRAP);
-            httpPost.addHeader("Authorization", "Basic " + _base64EncodedCredentials);
-        }	   
-	        
-	    httpPost.setEntity(new UrlEncodedFormEntity(ValuesForPost2));
-	    	
-		HttpResponse response = client2.execute(httpPost);
-			
-		BufferedReader rd = new BufferedReader(new InputStreamReader(response.getEntity().getContent(), httpCharSet));
-		StringBuffer sb = new StringBuffer();
-		String line;		
-		while ((line = rd.readLine()) != null) {
-			sb.append(line);
-		}		
-		return sb.toString();	   
-  }
-   
+        return result.toString();
+    }
+    
+    //http://www.xyzws.com/javafaq/how-to-use-httpurlconnection-post-data-to-web-server/139
+    //http://stackoverflow.com/questions/9767952/how-to-add-parameters-to-httpurlconnection-using-post    
+    //http://www.mkyong.com/java/how-to-send-http-request-getpost-in-java/
+    //http://javatechig.com/android/android-networking-tutorial
+    //http://www.rapidvaluesolutions.com/tech_blog/introduction-to-httpurlconnection-http-client-for-performing-efficient-network-operations/
+    public String Post(String _urlString) { // Pascal: Post
+
+        URL url;
+        String response = "";
+        String Params;
+        mResponseCode = HttpURLConnection.HTTP_CREATED;
+        
+        mUrlString = _urlString;
+        
+        try {
+            url = new URL(_urlString);
+
+            client3 = (HttpURLConnection) url.openConnection();
+            client3.setReadTimeout(15000);
+            client3.setConnectTimeout(15000);
+            client3.setRequestMethod("POST");                        
+                        
+            client3.setDoInput(true);
+            client3.setDoOutput(true);
+          
+            Params = getPostDataString(ValuesForPost);            
+            client3.setFixedLengthStreamingMode(Params.getBytes().length);
+            //client3.setFixedLengthStreamingMode(Params.length());
+            
+            if (mAuthenticationMode == 1) {
+                String _credentials = mUSERNAME + ":" + mPASSWORD;
+                String _base64EncodedCredentials = Base64.encodeToString(_credentials.getBytes(), Base64.NO_WRAP);
+                client3.setRequestProperty("Authorization", "Basic "+ _base64EncodedCredentials);
+            }
+            
+            client3.setRequestProperty("Charset", "UTF-8");
+            client3.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");            
+                                   
+            OutputStream os = client3.getOutputStream();
+            BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(os, "UTF-8"));
+                      
+            writer.write(Params);
+            writer.flush();
+            writer.close();
+            os.close();
+            
+            int responseCode=client3.getResponseCode();            
+            mResponseCode = responseCode;
+            
+            if (responseCode == HttpURLConnection.HTTP_OK /*HttpsURLConnection.HTTP_OK*/ ) {
+                String line;
+                BufferedReader br=new BufferedReader(new InputStreamReader(client3.getInputStream()));
+                while ((line=br.readLine()) != null) {
+                    response+=line;
+                }
+            }
+            else {
+                response= String.valueOf(responseCode);
+            }
+            
+        } catch (Exception e) {
+        	//Log.i("test", e.printStackTrace());
+        	Log.e("http", "POST", e);            
+        	return "Error...";
+        }
+
+        return response;
+    }
+    
    public void SetAuthenticationUser(String _userName, String _password) {       	 
-	   mUSERNAME = _userName;
-	   mPASSWORD =_password;
+	  mUSERNAME = _userName;
+	  mPASSWORD =_password;
    }
      
    public void SetAuthenticationHost(String _hostName, int _port) {
-    	 if ( _hostName.equals("") ) {
+   	 if ( _hostName.equals("") ) {
     		 mHOSTNAME = null;
-    	 } 
-    	 else {
+   	 } 
+   	 else {
     		 mHOSTNAME = _hostName;
-    	 }
-    	 mPORT = _port;	 
+   	 }
+   	 mPORT = _port;	 
    }
                
    public void SetAuthenticationMode(int _authenticationMode) {    	 
-        mAuthenticationMode = _authenticationMode; //0: none. 1: basic; 2= OAuth	 	                
+      mAuthenticationMode = _authenticationMode; //0: none. 1: basic; 2= OAuth	 	                
    }
      
 	/*
@@ -13288,89 +13692,413 @@ class jHttpClient /*extends ...*/ {
      //ref. http://mobiledevtuts.com/android/android-http-with-asynctask-example/
    
    public void PostNameValueDataAsync(String _stringUrl, String _name, String _value) {
-	  new AsyncHttpClientPostNameValueData().execute(_stringUrl, _name, _value);	  
+	  mUrlString = _stringUrl; 
+ 	  ValuesForPost.clear();
+	  ValuesForPost.put(_name, _value);
+	  new AsyncHttpClientPostNameValueData().execute(_stringUrl, "", "");	  
    }
-  
-	
+  	
 	public void PostNameValueDataAsync(String _stringUrl, String _listNameValue) {
-	   new AsyncHttpClientPostListNameValueData().execute(_stringUrl, _listNameValue);     
+	    StringTokenizer st = new StringTokenizer(_listNameValue, "=&"); //name1=value1&name2=value2&name3=value3 ...						
+		
+	    ValuesForPost.clear();
+		
+	    mUrlString = _stringUrl;
+		
+		while(st.hasMoreTokens()) { 
+		  String key = st.nextToken(); 
+		  String val = st.nextToken(); 
+		  //Log.i("name ->", key);
+		  //Log.i("value ->", val);
+		  ValuesForPost.put(key, val);
+		}	
+		new AsyncHttpClientPostNameValueData().execute(_stringUrl, "", "");	
+	   //new AsyncHttpClientPostListNameValueData().execute(_stringUrl, _listNameValue);     
     }
 	
 	public void PostNameValueDataAsync(String _stringUrl) {
-		new AsyncHttpClientPostNameValueData().execute(_stringUrl, "", "");
+	   mUrlString = _stringUrl;
+	   new AsyncHttpClientPostNameValueData().execute(_stringUrl, "", "");
 	}
 	
 	//-----------------------
 	//Cookies
-	//-----------------------
-	    
-	public String[] GetCookies(String _nameValueSeparator) {		
-		ArrayList<String> list = new ArrayList<String>();
-	    List<Cookie> cookies = cookieStore.getCookies();	     
-        
-	    if (!cookies.isEmpty()) {
-		      for (Cookie cookie : cookies){
-		    	  list.add(cookie.getName() + _nameValueSeparator + cookie.getValue());	         
-		      }		  
-	    }
+	//-----------------------		   
+		   /*http://stackoverflow.com/questions/16150089/how-to-handle-cookies-in-httpurlconnection-using-cookiemanager
+		    *  
+		    *http://www.concretepage.com/java/example_cookiemanager_java 
+		    *https://czheng035.wordpress.com/2012/06/18/cookie-management-in-android-webview-development/ OTIMO!
+		    *
+		    *http://stackoverflow.com/questions/14860087/should-httpurlconnection-with-cookiemanager-automatically-handle-session-cookies
+		    *  
+		   HttpCookie cookie = new HttpCookie("lang", "fr");
+		   cookie.setDomain("twitter.com");
+		   cookie.setPath("/");
+		   cookie.setVersion(0);
+		   cookieManager.getCookieStore().add(new URI("http://twitter.com/"), cookie)   
+		   */
+	
+    public HttpCookie AddCookie(String _name, String _value)  {        
+    	HttpCookie cookie = new HttpCookie(_name, _value);
+    	//cookie.setDomain("your domain");cookie.setPath("/");    	
+    	cookieStore = cookieManager.getCookieStore();
+     	//cookieStore.add(Uri, cookie);
+		cookieStore.add(null, cookie); //All URIs		
+		return cookie;
+    }
+
+    public HttpCookie AddCookie(String _url, String _name, String _value)  {        
+       HttpCookie cookie = new HttpCookie(_name, _value);
+       //cookie.setDomain("your domain");cookie.setPath("/");    	
+       cookieStore = cookieManager.getCookieStore();    	
+       URI Uri;
+   	   try {
+   		Uri = new URI(_url);
+   	     cookieStore.add(Uri, cookie);
+ 		 //cookieStore.add(null, cookie); //All URIs   		
+   	   } catch (Exception e) {
+   		// TODO Auto-generated catch block
+   		   e.printStackTrace();
+   	   }   	        			
+	   return cookie;
+    }
+    
+    public String GetCookieValue(HttpCookie _cookie) {    
+        return _cookie.getValue();        
+    }
+    
+	public String[] GetCookies(String _nameValueSeparator) {
+				
+		 ArrayList<String> list = new ArrayList<String>();
+		 try {
+			 cookieStore = cookieManager.getCookieStore();			
+		    List<HttpCookie> cookies = cookieStore.getCookies(); //all URIs
+		    if (!cookies.isEmpty()) {
+			      for (HttpCookie cookie : cookies){
+			    	  list.add(cookie.getName() + _nameValueSeparator + cookie.getValue());	         
+			      }		  
+		    }
+			
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		 		 	  
 	    return list.toArray(new String[list.size()]);
 	}
-	
-	
-	public String[] GetCookies(String _url, String _nameValueSeparator) {  //Cookies		   
-	    ArrayList<String> list = new ArrayList<String>();   
-	    HttpGet httpget=new HttpGet(_url);  	    
-		try {				
-			  HttpResponse response = client2.execute(httpget, localContext);	 
-			  List<Cookie> cookies = cookieStore.getCookies();
-			  if( !cookies.isEmpty() ){
-			      for (Cookie cookie : cookies){
-			    	  list.add(cookie.getName() + _nameValueSeparator + cookie.getValue());	         
-			      }
-			  }
-			  
-		} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-		}			
+		
+	public String[] GetCookies(String _urlString, String _nameValueSeparator) {  //Cookies		  
+		
+	   ArrayList<String> list = new ArrayList<String>();   
+	   cookieStore = cookieManager.getCookieStore();		   
+	   URI uri;
+	   try {
+		 uri = new URI(_urlString);
+		 List<HttpCookie> cookies = cookieStore.get(uri);
+		 //List<HttpCookie> cookies = cookieStore.getCookies();  //All URIs		 
+  	     if( !cookies.isEmpty() ){
+			    for (HttpCookie cookie : cookies){
+			   	  list.add(cookie.getName() + _nameValueSeparator + cookie.getValue());	         
+			    }
+		 }
+		 
+	   } catch (Exception e) {
+		// TODO Auto-generated catch block
+		   e.printStackTrace();
+	   }	   	   	 	   			   
 		return list.toArray(new String[list.size()]);			
     }
-		   
-	public int GetCookiesCount() {	  	
+		   	
+	public int GetCookiesCount() {	  
+	  cookieStore = cookieManager.getCookieStore();	
 	  return cookieStore.getCookies().size();
-	}	 
-		   
-	public Cookie GetCookieByIndex(int _index) {
+	}	 		  
+		
+	public HttpCookie GetCookieByIndex(int _index) {
+		cookieStore = cookieManager.getCookieStore();					
 		if (_index <  cookieStore.getCookies().size()) 
 	       return cookieStore.getCookies().get(_index);
 		else return  null;
 	}
 		      
-    public String GetCookieAttributeValue(Cookie _cookie, String _attribute) {
+    public String GetCookieAttributeValue(HttpCookie _cookie, String _attribute) {
 			  String r = ""; 
 			  if (_attribute.equals("name"))  r = _cookie.getName();
 			  else if (_attribute.equals("value")) r = _cookie.getValue();
 			  else if (_attribute.equals("domain")) r = _cookie.getDomain();
-			  else if (_attribute.equals("version")) r = String.valueOf(_cookie.getVersion());
-			  else if (_attribute.equals("expirydate")) r = _cookie.getExpiryDate().toString();//DateFormat.format("yyyyMMdd  kk:mm",  _cookie.getExpiryDate()).toString();
+			  else if (_attribute.equals("version")) r = String.valueOf(_cookie.getVersion()); //getExpiryDate().toString()
+			  else if (_attribute.equals("expirydate")) r = ""+_cookie.getMaxAge();//DateFormat.format("yyyyMMdd  kk:mm",  _cookie.getExpiryDate()).toString();
 			  else if (_attribute.equals("path")) r = _cookie.getPath();
 			  else if (_attribute.equals("comment")) r = _cookie.getComment();			  
-			  else if (_attribute.equals("ports")) r = String.valueOf(_cookie.getPorts());
+			  else if (_attribute.equals("ports")) r = String.valueOf(_cookie.getPortlist()); //.getPorts()
 			  return r;
     }
-		   
-		   
+		   		   
     public void ClearCookieStore() {
-	    cookieStore.clear(); 			  
-    }
-		   
-    public Cookie AddCookie(String _name, String _value)  {        
-			   BasicClientCookie cookie = new BasicClientCookie(_name, _value);
-		       //cookie.setDomain("your domain");cookie.setPath("/");
-		       cookieStore.addCookie(cookie); 
-		       return cookie;
+    	cookieStore = cookieManager.getCookieStore();
+	    cookieStore.removeAll(); 			  
     }
 	
+    //http://stackoverflow.com/questions/14860087/should-httpurlconnection-with-cookiemanager-automatically-handle-session-cookies   
+    
+    //http://www.mkyong.com/java/how-to-automate-login-a-website-java-example/
+    //
+    
+    public HttpURLConnection OpenConnection(String _urlString) {
+  	   //ArrayList<String> list = new ArrayList<String>();
+  	   //Values must be set prior to calling the connect method:
+      client3 = null;	
+  	  try {
+  		 mUrlString = _urlString;
+  		 URL url = new URL(_urlString);                   	       
+          client3 = (HttpURLConnection)url.openConnection();          		 
+  	  } catch (IOException e) {
+  		//TODO Auto-generated catch block
+  		e.printStackTrace();
+  	  }
+  	  return  client3;
+  	  
+     }
+    
+    
+    //Sets the general request property. If a property with the key already exists, overwrite its value with the new value.
+    public HttpURLConnection SetRequestProperty(HttpURLConnection _httpConnection, String _headerName,  String _headerValue) {
+  	   //ArrayList<String> list = new ArrayList<String>();
+  	   //Values must be set prior to calling the connect method:
+  	 	 // _HeaderValue = "userId=igbrown; sessionId=SID77689211949; isAuthenticated=true";
+    	if (_httpConnection != null)
+    		_httpConnection.setRequestProperty(_headerName, _headerValue); 		 
+  		//Send the cookie to the server:
+  		//To send the cookie, simply call connect() on the URLConnection for which we have added the cookie property:	  	    		 
+    	//httpClient.connect();		 
+  	   return  _httpConnection;
+     }
+    
+    
+    //Adds a general request property specified by a key-value pair. 
+    //This method will not overwrite existing values associated with the same key.
+    
+    public HttpURLConnection AddRequestProperty(HttpURLConnection _httpConnection, String _headerName,  String _headerValue) {
+   	   //ArrayList<String> list = new ArrayList<String>();
+   	   //Values must be set prior to calling the connect method:
+   	 	 // _HeaderValue = "userId=igbrown; sessionId=SID77689211949; isAuthenticated=true";
+     	if (_httpConnection != null)
+     		_httpConnection.addRequestProperty(_headerName, _headerValue); 		 
+   		//Send the cookie to the server:
+   		//To send the cookie, simply call connect() on the URLConnection for which we have added the cookie property:	  	    		 
+     	//httpClient.connect();		 
+   	   return  _httpConnection;
+      }
+    
+    /*
+    public HttpURLConnection Connect(HttpURLConnection _httpConnection) {
+    	try {
+    		if (_httpConnection != null)
+    			_httpConnection.connect();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			_httpConnection = null;
+			Log.e("HttpURLConnection", "Connect", e);
+			//e.printStackTrace();
+		}		 
+   	   return  _httpConnection;
+   }
+   */ 
+    
+    public HttpURLConnection GetDefaultConnection() {
+    	return client3;
+    }
+    //http://www.hccp.org/java-net-cookie-how-to.html
+         
+    public String GetHeaderField(HttpURLConnection _httpConnection, String _headerName) {    	
+    	   //ArrayList<String> list = new ArrayList<String>();    	   
+ 		   String headerName=null;
+ 		   String _field ="";
+ 		  
+ 		   if (_httpConnection == null) return "";
+ 		  
+ 		   for (int i=1; (headerName = _httpConnection.getHeaderFieldKey(i))!=null; i++) {
+ 			    //Log.i("headers..", headerName);  //Keep-Alive ... Server ... Set-Cookie ... etc.. 
+ 		    	if (headerName.equals(_headerName)) {   		    		
+ 		    		_field = _httpConnection.getHeaderField(i); 		   	        
+ 		   	 	   //Loop through response headers looking for cookies:
+ 		   	 	   //Since a server may set multiple cookies in a single request, we will need to loop through the response headers, looking for all headers named "Set-Cookie". 		   	                                                      
+ 		   	 	   //Extract cookie name and value from cookie string:
+ 		   	 	   //The string returned by the getHeaderField(int index) method is a series of name=value separated by semi-colons (;). The first name/value pairing is actual data string we are interested in (i.e. "sessionId=0949eeee22222rtg" or "userId=igbrown"), the subsequent name/value pairings are meta-information that we would use to manage the storage of the cookie (when it expires, etc.).	   					
+ 		   	 	   //This is basically it. We now have the cookie name (cookieName) and the cookie value (cookieValue).
+ 		   	        
+ 		    	}     		  
+ 		   }
+ 		   
+ 	       return _field;
+     }
+               
+    //ref. http://blog.leocad.io/basic-http-authentication-on-android/
+    //ref. http://simpleprogrammer.com/2011/05/25/oauth-and-rest-in-android-part-1/
+    //ref. http://jan.horneck.info/blog/androidhttpclientwithbasicauthentication
+    
+    public String[] GetHeaderFields(HttpURLConnection _httpConnection) {   
+ 	    ArrayList<String> list = new ArrayList<String>();
+ 	    
+ 	    if (_httpConnection == null) return null;
+ 	   
+ 		try {
+ 		     Map<String, List<String>> hdrs = _httpConnection.getHeaderFields();
+ 		     Set<String> hdrKeys = hdrs.keySet();
+ 		     for (String k : hdrKeys) {
+ 		    	 if (k != null) 
+ 		    	    list.add(k + "=" + hdrs.get(k)); 		    
+ 		     }   		     
+ 		} catch (Exception e) {
+ 			// TODO Auto-generated catch block
+ 			e.printStackTrace();
+ 		}
+ 		
+ 		return list.toArray(new String[list.size()]);  	   
+   }
+    
+    public void Disconnect(HttpURLConnection _httpConnection) {
+         _httpConnection.disconnect();
+    }
+    
+    public String Get(HttpURLConnection _httpConnection) {          
+      StringBuffer sb = new StringBuffer();      
+      try {
+    	      _httpConnection.setRequestMethod("GET");
+    	          	      
+              if (mAuthenticationMode == 1) {
+                  String _credentials = mUSERNAME + ":" + mPASSWORD;
+                  String _base64EncodedCredentials = Base64.encodeToString(_credentials.getBytes(), Base64.NO_WRAP);
+                  _httpConnection.setRequestProperty("Authorization", "Basic "+ _base64EncodedCredentials);
+               }
+    	      
+     	 	  for (int i = 0; i < listHeaderName.size(); i++ ) { 	      	 	      	 		         	 		  
+     	 		  _httpConnection.setRequestProperty(listHeaderName.get(i), listHeaderValue.get(i));
+  	 	      }
+     	 	  
+              /* optional request header */
+              //client3.setRequestProperty("Content-Type", "application/json");
+              /* optional request header */
+              //client3.setRequestProperty("Accept", "application/json");    	          	 	                  
+              int status = _httpConnection.getResponseCode(); 
+              mResponseCode = status;
+              
+              if (status == HttpURLConnection.HTTP_OK) {              
+                 InputStream inputStream = _httpConnection.getInputStream();
+                 BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+                 String inputLine;
+                 while ((inputLine = reader.readLine()) != null) {
+                    sb.append(inputLine);
+                 }
+                 inputStream.close();
+              }
+              else {
+            	 sb.append(String.valueOf(status));  
+              }
+            	  
+                            
+      } catch (Exception e) {
+    	      Log.e("HttpURLConnection", "Get", e);
+              return "Error";
+      }       
+      return sb.toString();
+   }
+   
+    public String Post(HttpURLConnection _httpConnection) {      
+        
+    	String response = "";
+        String Params= "";
+        mResponseCode = HttpURLConnection.HTTP_CREATED;
+        
+        try {     
+        	_httpConnection.setRequestMethod("POST");                                     
+        	_httpConnection.setDoInput(true);
+        	_httpConnection.setDoOutput(true);
+        	
+            Params = getPostDataString(ValuesForPost);            
+            _httpConnection.setFixedLengthStreamingMode(Params.getBytes().length);
+            
+            if (mAuthenticationMode == 1) {
+                String _credentials = mUSERNAME + ":" + mPASSWORD;
+                String _base64EncodedCredentials = Base64.encodeToString(_credentials.getBytes(), Base64.NO_WRAP);
+                _httpConnection.setRequestProperty("Authorization", "Basic "+ _base64EncodedCredentials);
+            }
+            
+            _httpConnection.setRequestProperty("Charset", "UTF-8");
+            _httpConnection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+        	
+   	 	    for (int i = 0; i < listHeaderName.size(); i++ ) { 	      	 	      	 		         	 		  
+ 	 		  _httpConnection.setRequestProperty(listHeaderName.get(i), listHeaderValue.get(i));
+	 	    }        	           
+   	 	    
+            OutputStream os = _httpConnection.getOutputStream();
+            BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(os, "UTF-8"));
+                        
+            writer.write(Params);
+            writer.flush();
+            writer.close();
+            
+            os.close();
+            
+            int responseCode=_httpConnection.getResponseCode();
+            mResponseCode = responseCode;
+            
+            if (responseCode == HttpURLConnection.HTTP_OK /*HttpsURLConnection.HTTP_OK*/ ) {
+                String line;
+                BufferedReader br = new BufferedReader(new InputStreamReader(_httpConnection.getInputStream()));
+                while ((line=br.readLine()) != null) {
+                    response+=line;
+                }
+            }
+            else {
+                response= String.valueOf(responseCode);
+            }
+            
+            
+        } catch (Exception e) {
+        	Log.e("HttpURLConnection", "Post", e);
+            //e.printStackTrace();
+            return "Error";
+            
+        }
+        
+        return response;
+    } 
+          
+    public int GetResponseCode() {    	
+      return mResponseCode;      
+    }
+            
+    //thanks to Renabor
+    public boolean UrlExist(String _urlString) {
+          HttpURLConnection client;          
+ 	      int status = HttpURLConnection.HTTP_NOT_FOUND; 	 
+ 	      try { 	         
+ 	         URL url = new URL(_urlString); 	         
+ 	         mUrlString = _urlString;	         
+ 	         client = (HttpURLConnection)url.openConnection(); 	          	         
+ 	         client.setRequestMethod("HEAD");
+ 	         client.setConnectTimeout(30000);
+ 	         client.setReadTimeout(30000);
+ 	         
+             if (mAuthenticationMode == 1) {
+                 String _credentials = mUSERNAME + ":" + mPASSWORD;
+                 String _base64EncodedCredentials = Base64.encodeToString(_credentials.getBytes(), Base64.NO_WRAP);
+                 client.setRequestProperty("Authorization", "Basic "+ _base64EncodedCredentials);
+              }
+             
+ 	         status = client.getResponseCode();
+ 	         mResponseCode = status;
+ 	         
+ 	      } catch (IOException e) {
+ 	         //Log.e("Error. Url not found","try 1",e);
+ 	      } finally {
+ 	         if (status == HttpURLConnection.HTTP_OK ) { return true; }
+ 	      }
+ 	      return false;          
+    }
+    
+    /*
     private Date StringToDate(String dateString) {
       //String dateString = "03/26/2012 11:49:00 AM";
       SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy hh:mm:ss aa");
@@ -13383,17 +14111,18 @@ class jHttpClient /*extends ...*/ {
       }      
       return convertedDate;
     }
+    */
     
-    public void SetCookieAttributeValue(Cookie _cookie, String _attribute,  String _value) {
+    public void SetCookieAttributeValue(HttpCookie _cookie, String _attribute,  String _value) {
 		   
-    	  BasicClientCookie stdCookie = (BasicClientCookie)_cookie;	
+    	  HttpCookie stdCookie = (HttpCookie)_cookie;	
     	  
 		  if (_attribute.equals("value")) stdCookie.setValue(_value);
 		  else if (_attribute.equals("domain")) stdCookie.setDomain(_value);
 		  else if (_attribute.equals("version")) stdCookie.setVersion(Integer.parseInt(_value));
 		  
 		  else if (_attribute.equals("expirydate")) {  
-			  stdCookie.setExpiryDate(StringToDate(_value));
+			  stdCookie.setMaxAge(Long.parseLong(_value));  //setExpiryDate(StringToDate(_value));
 		  }	  
 		  
 		  else if (_attribute.equals("path")) stdCookie.setPath(_value);
@@ -13403,23 +14132,23 @@ class jHttpClient /*extends ...*/ {
 		  //stdCookie.setPorts(new int[] {80,8080});
     }    
     
-    public String GetCookieValue(Cookie _cookie) {    
-        return _cookie.getValue();        
-    }
-
-    public String GetCookieName(Cookie _cookie) {    
+    public String GetCookieName(HttpCookie _cookie) {    
         return _cookie.getName();        
     }
     
-    public void SetCookieValue(Cookie _cookie, String _value) {    
-       ((BasicClientCookie)_cookie).setValue(_value);
-       cookieStore.addCookie(_cookie);
+    public void SetCookieValue(HttpCookie _cookie, String _value) {    
+       ((HttpCookie)_cookie).setValue(_value);
+       cookieStore = cookieManager.getCookieStore();
+       cookieStore.add(null, _cookie);     
     }
-        
-    public Cookie GetCookieByName(String _cookieName) {
-        Cookie ret = null;
-        List<Cookie> l = cookieStore.getCookies();
-        for (Cookie c : l) {
+    
+    
+    public HttpCookie GetCookieByName(String _cookieName) {
+    	HttpCookie ret = null;
+    	cookieStore = cookieManager.getCookieStore();
+    	
+        List<HttpCookie> l = cookieStore.getCookies();
+        for (HttpCookie c : l) {
             if (c.getName().equals(_cookieName)) {
                 ret = c;
                 break;
@@ -13427,13 +14156,14 @@ class jHttpClient /*extends ...*/ {
         }
         return ret;
     }
-        
-    public boolean IsExpired(Cookie _cookie) { 
-	   return _cookie.isExpired(new Date()); //true if the cookie has expired. 
+    
+    
+    public boolean IsExpired(HttpCookie _cookie) { 
+	  return _cookie.hasExpired();  //isExpired(new Date()); //true if the cookie has expired. 
 	}
 	    
-    public boolean IsCookiePersistent(Cookie _cookie) { 
- 	   return _cookie.isPersistent(); //true if the cookie is Persistent 
+    public boolean IsCookiePersistent(HttpCookie _cookie) { 
+ 	  return _cookie.getDiscard();    //isPersistent(); //true if the cookie is Discard 
  	}
 
     //-----------------------------------    
@@ -13454,123 +14184,173 @@ class jHttpClient /*extends ...*/ {
     	listHeaderValue.clear();    	    	
     }
     
-    public String GetStateful(String _url) {
- 	   
- 		String strResult = ""; 		  		
- 	    HttpGet httpget=new HttpGet(_url);
- 	    
- 	    for (int i = 0; i < listHeaderName.size(); i++ ) { 	    
- 	    	httpget.setHeader(listHeaderName.get(i), listHeaderValue.get(i));
- 	    }	
- 	     	     	    
- 		try {			 
- 			//cookieStore.clear();
- 			 HttpResponse response = client2.execute(httpget, localContext);			 
- 		     HttpEntity entity= response.getEntity();
- 		     
- 		     StatusLine statusLine = response.getStatusLine();
- 	         int statusCode = statusLine.getStatusCode();
- 	          	                  
- 	         if (statusCode == 200) {    //OK       
- 	            entity = response.getEntity();	                
- 		        if (entity != null) {
- 			    	 strResult = EntityUtils.toString(entity);
- 			    }
- 	         }			 	 	         
-	 	       
- 	         return strResult;
- 		}
- 		 
- 		catch (IOException e) {
- 			// TODO Auto-generated catch block
- 			e.printStackTrace();
- 		}		 				 
- 		return strResult; //sb.toString(); 		
+   /*
+    *Set cookies in requests
+    CookieManager cookieManager = CookieManager.getInstance();
+    String cookie = cookieManager.getCookie(urlConnection.getURL().toString());
+    if (cookie != null) {
+        urlConnection.setRequestProperty("Cookie", cookie);
     }
-      
-    public String PostStateful(String _url) throws Exception {	// Pascal: Post			
-		
- 		int statusCode = 0;		
- 		String strResult = "";
- 		
- 		HttpParams httpParams = new BasicHttpParams();
- 		int connection_Timeout = 5000;
- 		HttpConnectionParams.setConnectionTimeout(httpParams, connection_Timeout);
- 		HttpConnectionParams.setSoTimeout(httpParams, connection_Timeout);
- 		
-        if (mAuthenticationMode != 0) {    		   
-         	client2.getCredentialsProvider().setCredentials(
-                         new AuthScope(mHOSTNAME,mPORT),  // 
-                         new UsernamePasswordCredentials(mUSERNAME, mPASSWORD));
- 	    }
-         			   
- 	    HttpPost httpPost = new HttpPost(_url);
- 	    
- 	    for (int i = 0; i < listHeaderName.size(); i++ ) {
- 	    	Log.i(listHeaderName.get(i), listHeaderValue.get(i));
- 	    	httpPost.setHeader(listHeaderName.get(i), listHeaderValue.get(i));
- 	    }
- 	    
- 	    //thanks to @renabor
- 	    if (mAuthenticationMode != 0) {
-             String _credentials = mUSERNAME + ":" + mPASSWORD;
-             String _base64EncodedCredentials = Base64.encodeToString(_credentials.getBytes(), Base64.NO_WRAP);
-             httpPost.addHeader("Authorization", "Basic " + _base64EncodedCredentials);
-         }	   
- 	        
- 	    httpPost.setEntity(new UrlEncodedFormEntity(ValuesForPost2));
- 	    
- 	    //cookieStore.clear();
- 	   
- 		HttpResponse response = client2.execute(httpPost, localContext);
- 		HttpEntity entity= response.getEntity();
- 		
-	     StatusLine statusLine = response.getStatusLine();
-	     statusCode = statusLine.getStatusCode();
- 		
-         if (statusCode == 200) {    //OK       
-	            entity = response.getEntity();	                
-		        if (entity != null) {
-			    	 strResult = EntityUtils.toString(entity);
-			    }
-	     }
- 			 		
- 		return strResult; 
-   }
+    */
     
-  //thanks to @renabor
-    public String DeleteStateful(String _url, String _value) throws Exception { 			
-
-    	int statusCode = 0;
-    	String strResult = "";
-
-    	HttpParams httpParams = new BasicHttpParams();
-    	int connection_Timeout = 5000;
-    	HttpConnectionParams.setConnectionTimeout(httpParams, connection_Timeout);
-    	HttpConnectionParams.setSoTimeout(httpParams, connection_Timeout);
-
-    	HttpDelete httpDelete = new HttpDelete(_url + "/" + _value);
-
-    	if (mAuthenticationMode != 0) {
-    		String _credentials = mUSERNAME + ":" + mPASSWORD;
-    		String _base64EncodedCredentials = Base64.encodeToString(_credentials.getBytes(), Base64.NO_WRAP);
-    		httpDelete.addHeader("Authorization", "Basic " + _base64EncodedCredentials);
-    	}
-
-    	HttpResponse response = client2.execute(httpDelete, localContext);
-    	HttpEntity entity = response.getEntity();
-
-    	StatusLine statusLine = response.getStatusLine();
-    	statusCode = statusLine.getStatusCode();
-
-    	if (statusCode == 200) { //OK       
-    		entity = response.getEntity();
-    		if (entity != null) {
-    			strResult = EntityUtils.toString(entity);
-    		}
-    	}
-    	return strResult;
-    }    
+    public String GetStateful(String _url) {
+    	int status = HttpURLConnection.HTTP_NOT_FOUND;
+        StringBuffer sb = new StringBuffer();     	
+ 		String strResult = "";
+ 		mResponseCode = HttpURLConnection.HTTP_CREATED;
+ 		 	    
+ 	    try {
+ 	              URL url = new URL(_url);
+ 	              client3 = (HttpURLConnection)url.openConnection();
+ 	              client3.setRequestMethod("GET");
+ 	            
+ 	              if (mAuthenticationMode == 1) {
+  	                 String _credentials = mUSERNAME + ":" + mPASSWORD;
+  	                 String _base64EncodedCredentials = Base64.encodeToString(_credentials.getBytes(), Base64.NO_WRAP);
+  	                 client3.setRequestProperty("Authorization", "Basic "+ _base64EncodedCredentials);
+  	              }      
+ 	              
+ 	     	 	  for (int i = 0; i < listHeaderName.size(); i++ ) { 	      	 	      	 		         	 		  
+ 	     	 		client3.setRequestProperty(listHeaderName.get(i), listHeaderValue.get(i));
+ 	  	 	      }
+ 	     	 	  
+ 	              /* optional request header */
+ 	              //client3.setRequestProperty("Content-Type", "application/json");
+ 	              /* optional request header */
+ 	              //client3.setRequestProperty("Accept", "application/json");
+ 	               	     	 	  
+ 	              status = client3.getResponseCode();
+ 	              mResponseCode = status;
+ 	             
+ 	              if (status == HttpURLConnection.HTTP_OK) {
+ 	                InputStream inputStream = client3.getInputStream();
+ 	                BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+ 	                String inputLine;
+ 	                while ((inputLine = reader.readLine()) != null) {
+ 	                   sb.append(inputLine);
+ 	                }
+ 	                inputStream.close(); 	               	             
+ 	              }
+ 	              else {
+ 	            	 sb.append(String.valueOf(status)); 
+ 	              }
+ 	              
+ 	              client3.disconnect();
+ 	              
+ 	      } catch (Exception e) {
+ 	              return "";
+ 	      } 
+ 	      return sb.toString();		 		
+    }     
+   
+                
+    public String PostStateful(String urlString) throws Exception {
+        StringBuffer sb = new StringBuffer();
+        StringBuilder _postData = new StringBuilder();
+        mResponseCode = HttpURLConnection.HTTP_CREATED;
+        
+        for (Map.Entry<String,String> param : ValuesForPost.entrySet()) {
+               if (_postData.length() != 0) _postData.append('&');
+               try {
+                  _postData.append(URLEncoder.encode(param.getKey(), "UTF-8"));
+                  _postData.append('=');
+                  _postData.append(URLEncoder.encode(param.getValue(), "UTF-8"));
+               } catch(UnsupportedEncodingException e) {
+                   //Log.e("showmessage","PostStateful UnsupportedEncodingException",e);
+               }
+        }
+        
+        String postData = _postData.toString();
+        try {
+            URL url = new URL(urlString);
+            client3 = (HttpURLConnection)url.openConnection();
+            client3.setRequestMethod("POST");            
+            client3.setDoOutput(true);
+            
+            client3.setFixedLengthStreamingMode(postData.getBytes().length);  // !!!!!
+            //client3.setFixedLengthStreamingMode(postData.length());
+            
+            if (mAuthenticationMode == 1) {
+                String _credentials = mUSERNAME + ":" + mPASSWORD;
+                String _base64EncodedCredentials = Base64.encodeToString(_credentials.getBytes(), Base64.NO_WRAP);
+                client3.setRequestProperty("Authorization", "Basic "+ _base64EncodedCredentials);
+             }
+            
+            client3.setRequestProperty("Charset", "UTF-8");
+            client3.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+            
+    	 	for (int i = 0; i < listHeaderName.size(); i++ ) { 	      	 	      	 		         	 		  
+    	 		client3.setRequestProperty(listHeaderName.get(i), listHeaderValue.get(i));
+ 	 	    }
+                                    
+                                 
+            PrintWriter out = new PrintWriter(client3.getOutputStream());
+            out.print(postData);
+            out.close();
+            
+            int statusCode = client3.getResponseCode(); 
+            mResponseCode = statusCode;
+            
+            if (statusCode == HttpURLConnection.HTTP_OK) {    //OK
+            	
+            	//String statusLine = client3.getResponseMessage();            	
+                Scanner inStream = new Scanner(client3.getInputStream());
+                //process the stream and store it in StringBuilder
+                while(   inStream.hasNextLine()) sb.append(inStream.nextLine()); // response+=(inStream.nextLine());
+                
+                inStream.close();
+                
+            } else {
+                sb.append(String.valueOf(statusCode));
+            }                        
+            client3.disconnect();
+            
+        } catch (Exception e) {
+            //Log.e("showmessage","PostStateful Error",e);
+        	return "";
+        }         
+        ValuesForPost.clear();        
+        return sb.toString();
+     }
+        
+    //thanks to @renabor    
+    public String DeleteStateful(String _stringUrl, String _value) throws Exception {          
+        int statusCode = 0;
+        StringBuilder sb = new StringBuilder();
+        String statusLine;
+        mResponseCode = HttpURLConnection.HTTP_CREATED;
+        try {
+           URL url = new URL(_stringUrl + "/" + _value);
+           client3 = (HttpURLConnection)url.openConnection();
+           // renabor
+           if (mAuthenticationMode == 1) {
+              String _credentials = mUSERNAME + ":" + mPASSWORD;
+              String _base64EncodedCredentials = Base64.encodeToString(_credentials.getBytes(), Base64.NO_WRAP);
+              client3.setRequestProperty("Authorization", "Basic "+ _base64EncodedCredentials);            
+           }   
+           client3.setRequestMethod("DELETE");
+           statusCode = client3.getResponseCode();
+           mResponseCode = statusCode;
+           // statusLine = client3.getResponseMessage();
+           if (statusCode == HttpURLConnection.HTTP_OK) {    //OK
+        	   
+              Scanner inStream = new Scanner(client3.getInputStream());
+              //process the stream and store it in StringBuilder
+              while(   inStream.hasNextLine()) sb.append(inStream.nextLine()); // response+=(inStream.nextLine());
+              
+              inStream.close();
+              
+           } else {
+              sb.append(String.valueOf(statusCode));
+              // Log.i("showmessage http delete error ",String.valueOf(statusCode) +" "+ statusLine); 
+           }
+           client3.disconnect();
+        } catch (Exception e) {
+           //Log.e("showmessage","DeleteStateful Error",e);
+           return "";
+        }
+        return sb.toString(); 
+     }  
     
 	/*
 	 * AsyncTask has three generic types:
@@ -13583,68 +14363,74 @@ class jHttpClient /*extends ...*/ {
 		  
 	    @Override
 	    protected String doInBackground(String... stringUrl) {
-	    	
-	    	String _stringUrl = stringUrl[0]; 
-	    	String _name  = stringUrl[1]; 
-	    	String _value  = stringUrl[2];
-	    	
-			String strResult = "";
-			HttpEntity entity = null;
-	    	
+	        URL url;
+	        String response = "";
+	        String Params;
 			// Create a new HttpClient and Post Header
 			int statusCode = 0;						
-			HttpParams httpParams = new BasicHttpParams();
-			int connection_Timeout = 5000;
-			HttpConnectionParams.setConnectionTimeout(httpParams, connection_Timeout);
-			HttpConnectionParams.setSoTimeout(httpParams, connection_Timeout);
-			
-			DefaultHttpClient httpclient = new DefaultHttpClient();					 	   
 		    //AuthScope:
 		    //host  the host the credentials apply to. May be set to null if credenticals are applicable to any host. 
 		    //port  the port the credentials apply to. May be set to negative value if credenticals are applicable to any port.
-			try {				
-    	        if (mAuthenticationMode != 0) {    		   
-                  httpclient.getCredentialsProvider().setCredentials(
-                               new AuthScope(mHOSTNAME,mPORT),  // 
-                               new UsernamePasswordCredentials(mUSERNAME, mPASSWORD));
-    	        }
-    	        
-			    HttpPost httppost = new HttpPost(_stringUrl);
-			    
-			    //thanks to @renabor
-			    if (mAuthenticationMode != 0) {
-                    String _credentials = mUSERNAME + ":" + mPASSWORD;
-                    String _base64EncodedCredentials = Base64.encodeToString(_credentials.getBytes(), Base64.NO_WRAP);
-                    httppost.addHeader("Authorization", "Basic " + _base64EncodedCredentials);
-               }
-			    			    			    
-				// Add your data				
-			    if (!_name.equals("")) { 
-			         List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();				
-				     nameValuePairs.add(new BasicNameValuePair(_name, _value));
-				     httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
-			    }
-			    else {			    	
-			       httppost.setEntity(new UrlEncodedFormEntity(ValuesForPost2));
-			    }				
-				// Execute HTTP Post Request
-				HttpResponse response = httpclient.execute(httppost);
-				StatusLine statusLine = response.getStatusLine();  
-				statusCode = statusLine.getStatusCode();
-				
-				this.publishProgress(statusCode);	            	            
-	            strResult= "";	            
-	            if (statusCode == 200) {    //OK       
-	                entity = response.getEntity();	                
-		            if (entity != null) {
-			         	   strResult = EntityUtils.toString(entity);
-			         }
+	        try {
+	            url = new URL(stringUrl[0]);
+
+	            client3 = (HttpURLConnection) url.openConnection();
+	            mResponseCode = HttpURLConnection.HTTP_CREATED;
+	            
+	            if (mAuthenticationMode == 1) {
+	                String _credentials = mUSERNAME + ":" + mPASSWORD;
+	                String _base64EncodedCredentials = Base64.encodeToString(_credentials.getBytes(), Base64.NO_WRAP);
+	                client3.setRequestProperty("Authorization", "Basic "+ _base64EncodedCredentials);
 	            }
-				
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-			} 
-			return strResult;	
+	            
+	            client3.setReadTimeout(15000);
+	            client3.setConnectTimeout(15000);
+	            client3.setRequestMethod("POST");
+	              	    	 	
+	            client3.setDoInput(true);
+	            client3.setDoOutput(true);
+	            
+	            Params = getPostDataString(ValuesForPost);            
+	            client3.setFixedLengthStreamingMode(Params.getBytes().length); //Params.length
+	            
+	            client3.setRequestProperty("Charset", "UTF-8");
+	            client3.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+	            
+	    	 	for (int i = 0; i < listHeaderName.size(); i++ ) { 	      	 	      	 		         	 		  
+	    	 		client3.setRequestProperty(listHeaderName.get(i), listHeaderValue.get(i));
+	 	 	    }
+	         	            	            
+	            OutputStream os = client3.getOutputStream();
+	            BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(os, "UTF-8"));
+	            	    	            
+	            writer.write(Params);
+	            
+	            writer.flush();
+	            writer.close();
+	            os.close();
+	            
+	            int responseCode = client3.getResponseCode();   
+	            mResponseCode = responseCode;
+	            
+	            this.publishProgress(responseCode);	  
+	            
+	            if (responseCode == HttpURLConnection.HTTP_OK /*HttpsURLConnection.HTTP_OK*/ ) {
+	                String line;
+	                BufferedReader br=new BufferedReader(new InputStreamReader(client3.getInputStream()));
+	                while ((line=br.readLine()) != null) {
+	                    response+=line;
+	                }
+	            }
+	            else {
+	                response= String.valueOf(responseCode);
+	            }
+	            	            
+	        } catch (Exception e) {
+	            //e.printStackTrace();
+	            return "";
+	        }
+	        
+	        return response;
 	    }	    	
 	           	    
 	    @Override
@@ -13658,153 +14444,53 @@ class jHttpClient /*extends ...*/ {
 	       controls.pOnHttpClientCodeResult(pascalObj, params[0].intValue());	  	     
 	    }
 	}
-		
-	class AsyncHttpClientPostListNameValueData extends AsyncTask<String, Integer, String> {	
-		  
-	    @Override
-	    protected String doInBackground(String... stringParams) {
-			// Create a new HttpClient and Post Header
-			int statusCode = 0;
-			String strResult = "";
-			HttpEntity entity = null;	 	   
-			
-			HttpParams httpParams = new BasicHttpParams();
-			int connection_Timeout = 5000;
-			HttpConnectionParams.setConnectionTimeout(httpParams, connection_Timeout);
-			HttpConnectionParams.setSoTimeout(httpParams, connection_Timeout);
-			
-			DefaultHttpClient httpclient = new DefaultHttpClient();			 	   
-		    //AuthScope:
-		    //host  the host the credentials apply to. May be set to null if credenticals are applicable to any host. 
-		    //port  the port the credentials apply to. May be set to negative value if credenticals are applicable to any port.
-			try {
 				
-		        if (mAuthenticationMode != 0) {    		   
-	              httpclient.getCredentialsProvider().setCredentials(
-	                           new AuthScope(mHOSTNAME,mPORT),  // 
-	                           new UsernamePasswordCredentials(mUSERNAME, mPASSWORD));
-		        }
-						
-			    HttpPost httppost = new HttpPost(stringParams[0]);
-
-			    //thanks to @renabor
-			    if (mAuthenticationMode != 0) {
-                    String _credentials = mUSERNAME + ":" + mPASSWORD;
-                    String _base64EncodedCredentials = Base64.encodeToString(_credentials.getBytes(), Base64.NO_WRAP);
-                    httppost.addHeader("Authorization", "Basic " + _base64EncodedCredentials);
-                }
-			    
-				// Add your data
-				List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();						
-				StringTokenizer st = new StringTokenizer(stringParams[1], "=&"); //name1=value1&name2=value2&name3=value3 ...		
-				
-				while(st.hasMoreTokens()) { 
-				  String key = st.nextToken(); 
-				  String val = st.nextToken(); 
-				  //Log.i("name ->", key);
-				  //Log.i("value ->", val);
-				  nameValuePairs.add(new BasicNameValuePair(key, val));
-				}					
-				httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
-				// Execute HTTP Post Request
-				HttpResponse response = httpclient.execute(httppost);
-				StatusLine statusLine = response.getStatusLine();  
-				statusCode = statusLine.getStatusCode();
-				
-				this.publishProgress(statusCode);	            	            
-	            strResult= "";	            
-	            if (statusCode == 200) {    //OK       
-	                entity = response.getEntity();	                
-		            if (entity != null) {
-			         	   strResult = EntityUtils.toString(entity);
-			         }
-	            }
-	            
-				
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-			}		 
-			return strResult;	    		
-	    }	    	
-	     
-	    @Override
-	    protected void onPostExecute(String content) {
-	      controls.pOnHttpClientContentResult(pascalObj, content);
-	    }
-	    	    
-	    @Override
-	    protected void onProgressUpdate(Integer... params) {
-	       super.onProgressUpdate(params);	       
-	       controls.pOnHttpClientCodeResult(pascalObj, params[0].intValue());	  	     
-	    }	    	    
-	    
-	}
-	
 	class AsyncHttpClientGet extends AsyncTask<String,Integer,String> {	
 		  	    
 	    @Override
-	    protected String doInBackground(String... stringUrl) {
-	    	
-	        //ref. http://jan.horneck.info/blog/androidhttpclientwithbasicauthentication
-	 	   HttpEntity entity = null;	 	   
-	 	   HttpParams httpParams = new BasicHttpParams();
-	 	   int connection_Timeout = 5000;
-	 	   HttpConnectionParams.setConnectionTimeout(httpParams, connection_Timeout);
-	 	   HttpConnectionParams.setSoTimeout(httpParams, connection_Timeout);
-	 	    
-	 	    /*ref. http://blog.leocad.io/basic-http-authentication-on-android/
-	 	    String credentials = mUSERNAME + ":" + mPASSWORD;  
-	 	    String base64EncodedCredentials = Base64.encodeToString(credentials.getBytes(), Base64.NO_WRAP);  
-	 	    request.addHeader("Authorization", "Basic " + base64EncodedCredentials);
-	 	    client = new DefaultHttpClient();
-	 	   */
-	 	   
-	 	    DefaultHttpClient httpclient = new DefaultHttpClient(httpParams);
-	        String strResult="";
-	        
+	    protected String doInBackground(String... stringUrl) {	    	
+	        int status = HttpURLConnection.HTTP_NOT_FOUND;
+	        StringBuffer sb = new StringBuffer();	        	        
 	        try {
-	     	   
-	 		    //AuthScope:
-	 		    //host  the host the credentials apply to. May be set to null if credenticals are applicable to any host. 
-	 		    //port  the port the credentials apply to. May be set to negative value if credenticals are applicable to any port.
-	     	   if (mAuthenticationMode != 0) {    		   
-	               httpclient.getCredentialsProvider().setCredentials(
-	                                new AuthScope(mHOSTNAME,mPORT),  // 
-	                                new UsernamePasswordCredentials(mUSERNAME, mPASSWORD));
-	     	   }
-	     	   
-	            HttpGet httpget = new HttpGet(stringUrl[0]);
-	            
-	            //thanks to @renabor
-	            if (mAuthenticationMode != 0) {
-                    String _credentials = mUSERNAME + ":" + mPASSWORD;
-                    String _base64EncodedCredentials = Base64.encodeToString(_credentials.getBytes(), Base64.NO_WRAP);
-                    httpget.addHeader("Authorization", "Basic " + _base64EncodedCredentials);
-                }
-
-	            //System.out.println("executing request" + httpget.getRequestLine());
-	            HttpResponse response = httpclient.execute(httpget);
-	            
-	            StatusLine statusLine = response.getStatusLine();
-	            int statusCode = statusLine.getStatusCode();
-	            this.publishProgress(statusCode);	            	            
-	            strResult= "";	            
-	            if (statusCode == 200) {    //OK       
-	                entity = response.getEntity();	                
-		            if (entity != null) {
-			         	   strResult = EntityUtils.toString(entity);
-			         }
-	            }    
-	            	            	          	            
-	        } catch(Exception e){
-	        	    e.printStackTrace();
-	        }finally {
-	            // When HttpClient instance is no longer needed,
-	            // shut down the connection manager to ensure
-	            // immediate deallocation of all system resources
-	            httpclient.getConnectionManager().shutdown();
+	                URL url = new URL(stringUrl[0]);
+	                mResponseCode = HttpURLConnection.HTTP_CREATED;	                
+	                 client3 = (HttpURLConnection)url.openConnection();
+	                 client3.setRequestMethod("GET");
+	                 
+	                 if (mAuthenticationMode == 1) {
+		                    String _credentials = mUSERNAME + ":" + mPASSWORD;
+		                    String _base64EncodedCredentials = Base64.encodeToString(_credentials.getBytes(), Base64.NO_WRAP);
+		                    client3.setRequestProperty("Authorization", "Basic "+ _base64EncodedCredentials);
+		             }
+	                 
+	         	 	 for (int i = 0; i < listHeaderName.size(); i++ ) { 	      	 	      	 		         	 		  
+	        	 		client3.setRequestProperty(listHeaderName.get(i), listHeaderValue.get(i));
+	     	 	     } 
+	         	 		                
+	                 status = client3.getResponseCode();
+	                 mResponseCode = status;
+	                 
+	 	             this.publishProgress(status);
+	 	             
+	 	             if (status == HttpURLConnection.HTTP_OK) {    //OK            	
+	                   InputStream inputStream = client3.getInputStream();
+	                   BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));	                 
+	                   String inputLine;	                 	                	                 
+	                   while ((inputLine = reader.readLine()) != null) {
+	                     sb.append(inputLine);
+	                   } 	                 
+	                   inputStream.close();
+	 	             }
+	 	             else {
+	 	               sb.append(String.valueOf(status));	
+	 	             }	 	            		                	 	             
+	                 client3.disconnect();
+	                 
+	        } catch (Exception e) {
+	            return "";	           
 	        }
-	        return strResult;
+	            
+	        return sb.toString(); 
 	    }	    	
 	           	            
 	    @Override
@@ -13819,7 +14505,6 @@ class jHttpClient /*extends ...*/ {
 	    }	    	    	    
 	}
 }
-
 
 /*Draft java code by "Lazarus Android Module Wizard" [5/8/2015 20:24:14]*/
 /*https://github.com/jmpessoa/lazandroidmodulewizard*/
@@ -14348,7 +15033,7 @@ class jSurfaceView  extends SurfaceView  /*dummy*/ { //please, fix what GUI obje
   private Context context = null;
   private ViewGroup parent   = null;         // parent view
   private RelativeLayout.LayoutParams lparams;              // layout XYWH 
-  private OnClickListener onClickListener;   // click event
+  //private OnClickListener onClickListener;   // click event
   private Boolean enabled  = true;           // click-touch enabled!
   private int lparamsAnchorRule[] = new int[30];
   private int countAnchorRule = 0;
@@ -14382,7 +15067,7 @@ class jSurfaceView  extends SurfaceView  /*dummy*/ { //please, fix what GUI obje
            
      controls.activity.getWindow().setFormat(PixelFormat.UNKNOWN);
      lparams = new RelativeLayout.LayoutParams(lparamW, lparamH);
-       
+         
      surfaceHolder = this.getHolder();
      surfaceHolder.addCallback(new Callback() {     	           
          
@@ -14400,8 +15085,7 @@ class jSurfaceView  extends SurfaceView  /*dummy*/ { //please, fix what GUI obje
          @Override  
          public void surfaceDestroyed(SurfaceHolder holder) {
         	 mRun = false;        	              
-         }
-         
+         }                          
      });
      
      /*
@@ -14755,6 +15439,13 @@ class jSurfaceView  extends SurfaceView  /*dummy*/ { //please, fix what GUI obje
          super.onPostExecute(values);   	             
          controls.pOnSurfaceViewDrawingPostExecute(pascalObj, count);
        }            
+   }
+   
+   public Bitmap GetDrawingCache() {
+		this.setDrawingCacheEnabled(true);		
+		Bitmap b = Bitmap.createBitmap(this.getDrawingCache());
+		this.setDrawingCacheEnabled(false);	
+	    return b; 
    }
    
 } //end class
@@ -16094,6 +16785,1143 @@ class jSeekBar extends SeekBar /*dummy*/ { //please, fix what GUI object will be
    
 } //end class
 
+
+
+/*Draft java code by "Lazarus Android Module Wizard" [12/22/2015 20:35:59]*/
+/*https://github.com/jmpessoa/lazandroidmodulewizard*/
+/*jVisualControl template*/
+ 
+class jRatingBar extends RatingBar { //please, fix what GUI object will be extended!
+  
+  private long       pascalObj = 0;    // Pascal Object
+  private Controls   controls  = null; // Control Class for events
+  
+  private Context context = null;
+  private ViewGroup parent   = null;         // parent view
+  private RelativeLayout.LayoutParams lparams;              // layout XYWH 
+ 
+  private Boolean enabled  = true;           // click-touch enabled!
+  private int lparamsAnchorRule[] = new int[30];
+  private int countAnchorRule = 0;
+  private int lparamsParentRule[] = new int[30];
+  private int countParentRule = 0;
+  private int lparamH = 100;
+  private int lparamW = 100;
+  private int marginLeft = 0;
+  private int marginTop = 0;
+  private int marginRight = 0;
+  private int marginBottom = 0;
+  private boolean mRemovedFromParent = false;
+  private OnRatingBarChangeListener onRatingBarChangeListener;
+ 
+ //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
+ 
+  public jRatingBar(Controls _ctrls, long _Self,  int _numStars, float _step) { //Add more others news "_xxx"p arams if needed!
+     super(_ctrls.activity);
+     context   = _ctrls.activity;
+     pascalObj = _Self;
+     controls  = _ctrls;
+  
+     lparams = new RelativeLayout.LayoutParams(lparamW, lparamH);
+               
+     onRatingBarChangeListener = new OnRatingBarChangeListener() { 
+         /*.*/public void onRatingChanged(RatingBar ratingBar, float rating,  boolean fromUser) {
+              controls.pOnRatingBarChanged(pascalObj, rating); //JNI event onClick!
+          }
+     };     
+     setOnRatingBarChangeListener(onRatingBarChangeListener);
+     
+     this.setNumStars(_numStars);
+     this.setStepSize(_step);
+  } //end constructor
+  
+  public void jFree() {
+     if (parent != null) { parent.removeView(this); }
+     //free local objects...
+     lparams = null;
+     setOnRatingBarChangeListener(null);
+  }
+ 
+  public void SetViewParent(ViewGroup _viewgroup) {
+     if (parent != null) { parent.removeView(this); }
+     parent = _viewgroup;
+     parent.addView(this,lparams);
+     mRemovedFromParent = false;
+  }
+  
+  public void RemoveFromViewParent() {
+     if (!mRemovedFromParent) {
+        this.setVisibility(android.view.View.INVISIBLE);
+        if (parent != null)
+   	       parent.removeView(this);
+	   mRemovedFromParent = true;
+	}
+  }
+ 
+  public View GetView() {
+     return this;
+  }
+ 
+  public void SetLParamWidth(int _w) {
+     lparamW = _w;
+  }
+ 
+  public void SetLParamHeight(int _h) {
+     lparamH = _h;
+  }
+ 
+  public void SetLeftTopRightBottomWidthHeight(int _left, int _top, int _right, int _bottom, int _w, int _h) {
+     marginLeft = _left;
+     marginTop = _top;
+     marginRight = _right;
+     marginBottom = _bottom;
+     lparamH = _h;
+     lparamW = _w;
+  }
+ 
+  public void AddLParamsAnchorRule(int _rule) {
+     lparamsAnchorRule[countAnchorRule] = _rule;
+     countAnchorRule = countAnchorRule + 1;
+  }
+ 
+  public void AddLParamsParentRule(int _rule) {
+     lparamsParentRule[countParentRule] = _rule;
+     countParentRule = countParentRule + 1;
+  }
+ 
+  public void SetLayoutAll(int _idAnchor) {
+ 	lparams.width  = lparamW;
+	lparams.height = lparamH;
+	lparams.setMargins(marginLeft,marginTop,marginRight,marginBottom);
+	if (_idAnchor > 0) {
+	    for (int i=0; i < countAnchorRule; i++) {
+		lparams.addRule(lparamsAnchorRule[i], _idAnchor);
+	    }
+	}
+     for (int j=0; j < countParentRule; j++) {
+        lparams.addRule(lparamsParentRule[j]);
+     }
+     this.setLayoutParams(lparams);
+  }
+ 
+  public void ClearLayoutAll() {
+	for (int i=0; i < countAnchorRule; i++) {
+ 	   lparams.removeRule(lparamsAnchorRule[i]);
+   	}
+ 
+	for (int j=0; j < countParentRule; j++) {
+  	   lparams.removeRule(lparamsParentRule[j]);
+	}
+	countAnchorRule = 0;
+	countParentRule = 0;
+  }
+
+  public void SetId(int _id) { //wrapper method pattern ...
+     this.setId(_id);
+  }
+ 
+ //write others [public] methods code here......
+ //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
+  
+  public float GetRating() {  //the number of stars filled..
+	 return this.getRating();
+  }
+ 
+  public void SetRating(float _rating){
+	  this.setRating(_rating);
+  }
+  
+  public void SetNumStars(int _numStars) {
+	  this.setNumStars(_numStars);  
+  }
+  
+  public int GetNumStars() {
+	 return this.getNumStars();
+  }
+  
+  public float GetStepSize() { //The step size of this rating bar. if half-star granularity is wanted, this would be 0.5
+	 return this.getStepSize();
+  }
+  
+  public void SetStepSize(float _step) {
+	  this.setStepSize(_step);
+  }
+  
+  public void SetIsIndicator(boolean _isIndicator) {
+    this.setIsIndicator(_isIndicator);
+  }
+  
+  public void SetMax(int _max) {
+	  this.setMax(_max);
+  }
+  
+  public boolean IsIndicator() {
+	  return this.isIndicator();
+  }
+  
+} //end class
+
+
+/*Draft java code by "Lazarus Android Module Wizard" [12/25/2015 21:29:17]*/
+/*https://github.com/jmpessoa/lazandroidmodulewizard*/
+/*jVisualControl template*/
+ 
+class jRadioGroup extends RadioGroup /*dummy*/ { //please, fix what GUI object will be extended!
+  
+  private long       pascalObj = 0;    // Pascal Object
+  private Controls   controls  = null; // Control Class for events
+  
+  private Context context = null;
+  private ViewGroup parent   = null;         // parent view
+  private RelativeLayout.LayoutParams lparams;              // layout XYWH  
+  private Boolean enabled  = true;           // click-touch enabled!
+  private int lparamsAnchorRule[] = new int[30];
+  private int countAnchorRule = 0;
+  private int lparamsParentRule[] = new int[30];
+  private int countParentRule = 0;
+  private int lparamH = 100;
+  private int lparamW = 100;
+  private int marginLeft = 0;
+  private int marginTop = 0;
+  private int marginRight = 0;
+  private int marginBottom = 0;
+  private boolean mRemovedFromParent = false;
+  public int checkedIndex = -1;
+ 
+ //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
+ 
+  public jRadioGroup(Controls _ctrls, long _Self, int _orientation) { //Add more others news "_xxx" params if needed!
+     super(_ctrls.activity);
+     context   = _ctrls.activity;
+     pascalObj = _Self;
+     controls  = _ctrls;
+  
+     lparams = new RelativeLayout.LayoutParams(lparamW, lparamH);
+     checkedIndex =  -1;
+     
+     this.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener()
+     {    	    	 
+     /*.*/public void onCheckedChanged(RadioGroup group, int checkedId) {
+            
+    	     RadioButton rb= (RadioButton)findViewById(checkedId);            	 
+             String	 checkedCaption = (String) rb.getText();
+            
+       		 for (int i=0; i < GetChildCount(); i++){
+    			  rb = (RadioButton) GetChildAt(i);				     
+    		      if (checkedId == rb.getId()) {    		    	  
+    		    	  checkedIndex = i;
+    		    	  break; 
+    		      }
+    		 }    
+       		 
+             controls.pRadioGroupCheckedChanged(pascalObj, checkedIndex, checkedCaption); //JNI event onClick!             
+         }
+     });
+     
+     if (_orientation == 1)
+        this.setOrientation(RadioGroup.VERTICAL);
+     else
+    	 this.setOrientation(RadioGroup.HORIZONTAL); //0
+       
+         
+  } //end constructor
+  
+  public void jFree() {
+     if (parent != null) { parent.removeView(this); }
+     //free local objects...
+     lparams = null;
+     setOnCheckedChangeListener(null);
+  }
+ 
+  public void SetViewParent(ViewGroup _viewgroup) {
+     if (parent != null) { parent.removeView(this); }
+     parent = _viewgroup;
+     parent.addView(this,lparams);
+     mRemovedFromParent = false;
+  }
+  
+  public void RemoveFromViewParent() {
+     if (!mRemovedFromParent) {
+        this.setVisibility(android.view.View.INVISIBLE);
+        if (parent != null)
+   	       parent.removeView(this);
+	   mRemovedFromParent = true;
+	}
+  }
+ 
+  public RadioGroup GetView() {
+     return this;
+  }
+ 
+  public void SetLParamWidth(int _w) {
+     lparamW = _w;
+  }
+ 
+  public void SetLParamHeight(int _h) {
+     lparamH = _h;
+  }
+ 
+  public void SetLeftTopRightBottomWidthHeight(int _left, int _top, int _right, int _bottom, int _w, int _h) {
+     marginLeft = _left;
+     marginTop = _top;
+     marginRight = _right;
+     marginBottom = _bottom;
+     lparamH = _h;
+     lparamW = _w;
+  }
+ 
+  public void AddLParamsAnchorRule(int _rule) {
+     lparamsAnchorRule[countAnchorRule] = _rule;
+     countAnchorRule = countAnchorRule + 1;
+  }
+ 
+  public void AddLParamsParentRule(int _rule) {
+     lparamsParentRule[countParentRule] = _rule;
+     countParentRule = countParentRule + 1;
+  }
+ 
+  public void SetLayoutAll(int _idAnchor) {
+ 	lparams.width  = lparamW;
+	lparams.height = lparamH;
+	lparams.setMargins(marginLeft,marginTop,marginRight,marginBottom);
+	
+	if (_idAnchor > 0) {
+	   for (int i=0; i < countAnchorRule; i++) {
+		lparams.addRule(lparamsAnchorRule[i], _idAnchor);
+	   }
+	}   
+    for (int j=0; j < countParentRule; j++) {
+         lparams.addRule(lparamsParentRule[j]);
+    }	
+    
+    this.setLayoutParams(lparams);
+  }
+ 
+  public void ClearLayoutAll() {
+	
+	for (int i=0; i < countAnchorRule; i++) {
+ 	   lparams.removeRule(lparamsAnchorRule[i]);
+   	}
+ 
+	for (int j=0; j < countParentRule; j++) {
+  	   lparams.removeRule(lparamsParentRule[j]);
+	}
+	
+	countAnchorRule = 0;
+	countParentRule = 0;
+  }
+
+  public void SetId(int _id) { //wrapper method pattern ...
+     this.setId(_id);
+  }
+ 
+ //write others [public] methods code here......
+ //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
+  
+   public RadioButton GetChildAt(int _index) {
+	   return (RadioButton)this.getChildAt(_index);
+   }
+   
+   public void Check(int _id) {
+     this.check(_id);
+   }
+      
+   public void ClearCheck() {
+      this.clearCheck();
+   }	  
+   
+   public int GetCheckedRadioButtonId() { 
+     return this.getCheckedRadioButtonId();
+   }	  
+    
+   public int GetChildCount() {	 
+     return this.getChildCount();
+   }	  
+      
+   public void SetOrientation(int _orientation) {
+	  if (_orientation == 1)  
+        this.setOrientation(RadioGroup.VERTICAL);
+	  else
+		  this.setOrientation(RadioGroup.HORIZONTAL);  
+   }
+
+   public void CheckRadioButtonByCaption(String _caption) {	   
+	  for (int i=0; i < this.getChildCount(); i++){
+		  RadioButton rb = (RadioButton) this.getChildAt(i);
+		  String checkedCaption = (String)rb.getText();	      
+	      if (checkedCaption.equals(_caption)) {
+	    	  this.check(rb.getId());
+	    	  checkedIndex = i;
+	    	  break; 
+	      }
+	  }		  
+   }
+   
+   public void CheckRadioButtonByIndex(int _index) {	   	  
+	  RadioButton rb = (RadioButton) this.getChildAt(_index);
+	  checkedIndex = _index;
+	  this.check(rb.getId());	  
+   }
+
+   public String GetChekedRadioButtonCaption() {
+		  int checkedId = this.getCheckedRadioButtonId();
+		  RadioButton rb=(RadioButton)findViewById(checkedId);            	 
+	      String checkedCaption = (String)rb.getText();	      	      
+	      return checkedCaption;
+   }	  
+	
+   public int GetChekedRadioButtonIndex() {
+	     /*
+	      int res= -1;
+		  int checkedId = this.getCheckedRadioButtonId();
+		  for (int i=0; i < this.getChildCount(); i++){
+			  RadioButton rb = (RadioButton) this.getChildAt(i);				     
+		      if (checkedId == rb.getId()) {
+		    	  res = i;
+		    	  break; 
+		      }
+		  }
+		  */		  
+		  return checkedIndex;	    
+  }   
+    public boolean IsChekedRadioButtonByCaption(String _caption) {
+		    //this.getChildAt(_index); 	 
+			  int checkedId = this.getCheckedRadioButtonId();
+			  RadioButton rb=(RadioButton)findViewById(checkedId);            	 
+		      String checkedCaption = (String)rb.getText();	      
+		      if (checkedCaption.equals(_caption)) 
+		         return true;
+		      else 
+		    	return false;	      
+	}	
+   
+	public boolean IsChekedRadioButtonById(int _id) {
+			  int checkedId = this.getCheckedRadioButtonId();
+		      if (checkedId == _id) 
+		         return true;
+		      else 
+		    	return false;	      
+	}	
+
+	public boolean IsChekedRadioButtonByIndex(int _index) {
+		      RadioButton rb=(RadioButton)this.getChildAt(_index); 	 
+			  int checkedId = this.getCheckedRadioButtonId();			            		     
+		      if (checkedId == rb.getId()) 
+		         return true;
+		      else 
+		    	return false;	      
+	}	   
+	   
+} //end class
+
+/*Draft java code by "Lazarus Android Module Wizard" [4/21/2016 19:42:01]*/
+/*https://github.com/jmpessoa/lazandroidmodulewizard*/
+/*jVisualControl template*/
+  
+class jAutoTextView extends AutoCompleteTextView /*dummy*/ { //please, fix what GUI object will be extended!
+   
+   private long       pascalObj = 0;    // Pascal Object
+   private Controls   controls  = null; // Control Class for events
+   
+   private Context context = null;
+   private ViewGroup parent   = null;         // parent view
+   private RelativeLayout.LayoutParams lparams;              // layout XYWH 
+   private OnClickListener onClickListener;   // click event
+   private Boolean enabled  = true;           // click-touch enabled!
+   private int lparamsAnchorRule[] = new int[30];
+   private int countAnchorRule = 0;
+   private int lparamsParentRule[] = new int[30];
+   private int countParentRule = 0;
+   private int lparamH = 100;
+   private int lparamW = 100;
+   private int marginLeft = 0;
+   private int marginTop = 0;
+   private int marginRight = 0;
+   private int marginBottom = 0;
+   private boolean mRemovedFromParent = false;
+    
+   ArrayList<String> mStrList;   
+   ArrayAdapter<String> mAdapter;   
+   
+   float mTextSize = 0; //default
+   int mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_SP; //default
+
+   private ClipboardManager mClipBoard = null;
+   private ClipData mClipData = null;   
+  
+  //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
+  
+   public jAutoTextView(Controls _ctrls, long _Self) { //Add more others news "_xxx"p arams if needed!
+      super(_ctrls.activity);
+      context   = _ctrls.activity;
+      pascalObj = _Self;
+      controls  = _ctrls;
+   
+      lparams = new RelativeLayout.LayoutParams(lparamW, lparamH);
+      
+      mStrList = new ArrayList<String>();
+      mAdapter = new ArrayAdapter<String>(context,android.R.layout.simple_list_item_1,mStrList);           
+      this.setAdapter(mAdapter);      
+      this.setThreshold(1);
+              
+      mClipBoard = (ClipboardManager) controls.activity.getSystemService(Context.CLIPBOARD_SERVICE);
+      
+      onClickListener = new OnClickListener(){
+      /*.*/public void onClick(View view){  //please, do not remove /*.*/ mask for parse invisibility!
+              if (enabled) {
+                 controls.pOnClickGeneric(pascalObj, Const.Click_Default); //JNI event onClick!
+              }
+           };
+      };
+      setOnClickListener(onClickListener);
+            
+      // when the user clicks an item of the drop-down list
+      this.setOnItemClickListener(new OnItemClickListener() {       
+                  @Override
+                  public void onItemClick(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
+                	  /*
+                       Toast.makeText(getBaseContext(), "MultiAutoComplete: " +
+                                  "you add color "+arg0.getItemAtPosition(arg2), //mStrList.get((int)arg3)
+                                  Toast.LENGTH_LONG).show();
+                       */                	                  	
+                      controls.pOnClickAutoDropDownItem(pascalObj, (int)arg3, arg0.getItemAtPosition(arg2).toString());
+                  }
+      });
+      
+   } //end constructor
+   
+   public void jFree() {
+      if (parent != null) { parent.removeView(this); }
+      //free local objects...
+      lparams = null;
+      setOnClickListener(null);
+   }
+  
+   public void SetViewParent(ViewGroup _viewgroup) {
+      if (parent != null) { parent.removeView(this); }
+      parent = _viewgroup;
+      parent.addView(this,lparams);
+      mRemovedFromParent = false;
+   }
+   
+   public void RemoveFromViewParent() {
+      if (!mRemovedFromParent) {
+         this.setVisibility(android.view.View.INVISIBLE);
+         if (parent != null)
+    	       parent.removeView(this);
+	   mRemovedFromParent = true;
+	}
+   }
+  
+   public View GetView() {
+      return this;
+   }
+  
+   public void SetLParamWidth(int _w) {
+      lparamW = _w;
+   }
+  
+   public void SetLParamHeight(int _h) {
+      lparamH = _h;
+   }
+  
+   public void SetLeftTopRightBottomWidthHeight(int _left, int _top, int _right, int _bottom, int _w, int _h) {
+      marginLeft = _left;
+      marginTop = _top;
+      marginRight = _right;
+      marginBottom = _bottom;
+      lparamH = _h;
+      lparamW = _w;
+   }
+  
+   public void AddLParamsAnchorRule(int _rule) {
+      lparamsAnchorRule[countAnchorRule] = _rule;
+      countAnchorRule = countAnchorRule + 1;
+   }
+  
+   public void AddLParamsParentRule(int _rule) {
+      lparamsParentRule[countParentRule] = _rule;
+      countParentRule = countParentRule + 1;
+   }
+  
+   public void SetLayoutAll(int _idAnchor) {
+  	lparams.width  = lparamW;
+	lparams.height = lparamH;
+	lparams.setMargins(marginLeft,marginTop,marginRight,marginBottom);
+	if (_idAnchor > 0) {
+	    for (int i=0; i < countAnchorRule; i++) {
+		lparams.addRule(lparamsAnchorRule[i], _idAnchor);
+	    }
+	}
+      for (int j=0; j < countParentRule; j++) {
+         lparams.addRule(lparamsParentRule[j]);
+      }
+      this.setLayoutParams(lparams);
+   }
+  
+   public void ClearLayoutAll() {
+	for (int i=0; i < countAnchorRule; i++) {
+  	   lparams.removeRule(lparamsAnchorRule[i]);
+    	}
+  
+	for (int j=0; j < countParentRule; j++) {
+   	   lparams.removeRule(lparamsParentRule[j]);
+	}
+	countAnchorRule = 0;
+	countParentRule = 0;
+   }
+ 
+   public void SetId(int _id) { //wrapper method pattern ...
+      this.setId(_id);
+   }
+  
+  //write others [public] methods code here......
+  //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
+  
+   //getAdapter()
+   //This method returns a filterable list adapter used for auto completion
+ 
+   //This method returns optional hint text displayed at the bottom of the the matching list
+   /*
+   public String GetCompletionHint() {
+	   return (String)this.getCompletionHint();
+   }
+   */
+   
+   //This method returns returns the id for the view that the auto-complete drop down list is anchored to.
+   /*
+   public int GetDropDownAnchor() {
+	   return this.getDropDownAnchor();
+   }
+   */
+   
+   //This method returns the position of the dropdown view selection, if there is one
+   public int GetItemIndex() {
+	   return this.getListSelection();
+   }
+   
+   //This method indicates whether the popup menu is showing
+   /*
+   public boolean IsPopupShowing() {
+		return this.isPopupShowing();
+   }
+    */
+   
+   public void SetText(String _text) {
+	   this.setText(_text);
+   }
+   
+   public String GetText() {
+	   return this.getText().toString();
+   }
+   
+   public void Clear() {
+	   this.setText("");
+   }
+   
+   //This method displays the drop down on screen.
+   public void	ShowDropDown(){
+	  this.showDropDown();
+   }
+   
+   public void SetThreshold(int _threshold) {
+	  this.setThreshold(_threshold);
+   }
+   
+   public void Add(String _text) { 
+      mStrList.add(_text);
+      mAdapter.notifyDataSetChanged();     
+   }
+   
+   public int CountDropDown() {
+	   return mStrList.size();
+   }
+   
+   public void ClearAll() {
+	   this.setText("");
+	   mStrList.clear();
+	   mAdapter.notifyDataSetChanged();	   
+   }
+   
+   public void ClearDropDown() {	
+	   mStrList.clear();
+	   mAdapter.notifyDataSetChanged();	   
+   }
+   
+   public  void SetTextAlignment( int align ) {
+	   switch ( align ) {
+	      case 0 : { setGravity( Gravity.LEFT              ); }; break;
+	      case 1 : { setGravity( Gravity.RIGHT             ); }; break;
+	      case 2 : { setGravity( Gravity.TOP               ); }; break;
+	      case 3 : { setGravity( Gravity.BOTTOM            ); }; break;
+	      case 4 : { setGravity( Gravity.CENTER            ); }; break;
+	      case 5 : { setGravity( Gravity.CENTER_HORIZONTAL ); }; break;
+	      case 6 : { setGravity( Gravity.CENTER_VERTICAL   ); }; break;
+	      default : { setGravity( Gravity.LEFT              ); }; break;
+	   };
+	 }
+	       
+	 public void CopyToClipboard() {
+	 	mClipData = ClipData.newPlainText("text", this.getText().toString());
+	    mClipBoard.setPrimaryClip(mClipData);
+	 }
+	    
+	 public void PasteFromClipboard() {
+	     ClipData cdata = mClipBoard.getPrimaryClip();
+	     ClipData.Item item = cdata.getItemAt(0);
+	     this.setText(item.getText().toString());
+	 }
+	 
+	 public void Append(String _text) {
+	   this.append( _text);
+	 }
+
+	 public void AppendLn(String _text) {
+	 	  this.append( _text+ "\n");
+	 }
+
+	 public void AppendTab() {
+	 	  this.append("\t");
+	 }
+
+	 public void SetFontAndTextTypeFace(int _fontFace, int _fontStyle) { 
+	   Typeface t = null; 
+	   switch (_fontFace) { 
+	     case 0: t = Typeface.DEFAULT; break; 
+	     case 1: t = Typeface.SANS_SERIF; break; 
+	     case 2: t = Typeface.SERIF; break; 
+	     case 3: t = Typeface.MONOSPACE; break; 
+	   } 
+	   this.setTypeface(t, _fontStyle); 		
+	 } 
+
+	 public void SetTextSize(float _size) {
+	    mTextSize = _size;	
+	    String t = this.getText().toString();   
+	    this.setTextSize(mTextSizeTypedValue, mTextSize);
+	    this.setText(t);
+	 }     
+
+	 //TTextSizeTypedValue =(tsDefault, tsPixels, tsDIP, tsInches, tsMillimeters, tsPoints, tsScaledPixel);
+	 public void SetFontSizeUnit(int _unit) {	
+	    switch (_unit) {
+	       case 0: mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_SP; break; //default
+	       case 1: mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_PX; break; //default
+	       case 2: mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_DIP; break; //default
+	       case 3: mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_IN; break; //default
+	       case 4: mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_MM; break; //default
+	       case 5: mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_PT; break; //default
+	       case 6: mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_SP; break; //default
+	    }   
+	 	String t = this.getText().toString();
+	 	this.setTextSize(mTextSizeTypedValue, mTextSize);
+	 	this.setText(t);
+	 }   
+      
+} //end class
+
+//MultiAutoCompleteTextView
+
+/*Draft java code by "Lazarus Android Module Wizard" [5/20/2016 3:18:58]*/
+/*https://github.com/jmpessoa/lazandroidmodulewizard*/
+/*jVisualControl template*/
+ 
+class jDrawingView extends View /*dummy*/ { //please, fix what GUI object will be extended!
+  
+  private long       PasObj = 0;    // Pascal Object
+  private Controls   controls  = null; // Control Class for events
+  
+  private Context context = null;
+  private ViewGroup parent   = null;         // parent view
+  private RelativeLayout.LayoutParams lparams;              // layout XYWH 
+  private OnClickListener onClickListener;   // click event
+  private Boolean enabled  = true;           // click-touch enabled!
+  private int lparamsAnchorRule[] = new int[30];
+  private int countAnchorRule = 0;
+  private int lparamsParentRule[] = new int[30];
+  private int countParentRule = 0;
+  private int lparamH = 100;
+  private int lparamW = 100;
+  private int marginLeft = 0;
+  private int marginTop = 0;
+  private int marginRight = 0;
+  private int marginBottom = 0;
+  private boolean mRemovedFromParent = false;
+ 
+  private Canvas          mCanvas = null;
+  private Paint           mPaint  = null;
+  
+ //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
+ 
+  public jDrawingView(Controls _ctrls, long _Self) { //Add more others news "_xxx"p arams if needed!
+     super(_ctrls.activity);
+     context   = _ctrls.activity;
+     PasObj = _Self;
+     controls  = _ctrls;
+  
+     lparams = new RelativeLayout.LayoutParams(lparamW, lparamH);
+     
+	 mPaint   = new Paint();	  
+	
+	 //this.setWillNotDraw(false); //fire OnDraw
+	  
+     onClickListener = new OnClickListener(){
+     /*.*/public void onClick(View view){  //please, do not remove /*.*/ mask for parse invisibility!
+             if (enabled) {
+                //controls.pOnClick(PasObj, Const.Click_Default); //JNI event onClick!
+             }
+          };
+     };
+     setOnClickListener(onClickListener);
+     
+  } //end constructor
+  
+  public void jFree() {
+     if (parent != null) { parent.removeView(this); }
+     //free local objects...
+     lparams = null;
+     setOnClickListener(null);     
+	 mPaint = null;
+	 mCanvas = null;     
+  }
+ 
+  public void SetViewParent(ViewGroup _viewgroup) {
+     if (parent != null) { parent.removeView(this); }
+     parent = _viewgroup;
+     parent.addView(this,lparams);
+     mRemovedFromParent = false;
+  }
+  
+  public void RemoveFromViewParent() {
+     if (!mRemovedFromParent) {
+        this.setVisibility(android.view.View.INVISIBLE);
+        if (parent != null)
+   	       parent.removeView(this);
+	   mRemovedFromParent = true;
+	}
+  }
+ 
+  public View GetView() {
+     return this;
+  }
+ 
+  public void SetLParamWidth(int _w) {
+     lparamW = _w;
+  }
+ 
+  public void SetLParamHeight(int _h) {
+     lparamH = _h;
+  }
+ 
+  public void SetLeftTopRightBottomWidthHeight(int _left, int _top, int _right, int _bottom, int _w, int _h) {
+     marginLeft = _left;
+     marginTop = _top;
+     marginRight = _right;
+     marginBottom = _bottom;
+     lparamH = _h;
+     lparamW = _w;
+  }
+ 
+  public void AddLParamsAnchorRule(int _rule) {
+     lparamsAnchorRule[countAnchorRule] = _rule;
+     countAnchorRule = countAnchorRule + 1;
+  }
+ 
+  public void AddLParamsParentRule(int _rule) {
+     lparamsParentRule[countParentRule] = _rule;
+     countParentRule = countParentRule + 1;
+  }
+ 
+  public void SetLayoutAll(int _idAnchor) {
+ 	lparams.width  = lparamW;
+	lparams.height = lparamH;
+	lparams.setMargins(marginLeft,marginTop,marginRight,marginBottom);
+	if (_idAnchor > 0) {
+	    for (int i=0; i < countAnchorRule; i++) {
+		lparams.addRule(lparamsAnchorRule[i], _idAnchor);
+	    }
+	}
+     for (int j=0; j < countParentRule; j++) {
+        lparams.addRule(lparamsParentRule[j]);
+     }
+     this.setLayoutParams(lparams);
+  }
+ 
+  public void ClearLayoutAll() {
+	for (int i=0; i < countAnchorRule; i++) {
+ 	   lparams.removeRule(lparamsAnchorRule[i]);
+   	}
+ 
+	for (int j=0; j < countParentRule; j++) {
+  	   lparams.removeRule(lparamsParentRule[j]);
+	}
+	countAnchorRule = 0;
+	countParentRule = 0;
+  }
+
+  public void SetId(int _id) { //wrapper method pattern ...
+     this.setId(_id);
+  }
+ 
+ //write others [public] methods code here......
+ //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
+ 
+	@Override
+	/*.*/public  boolean onTouchEvent( MotionEvent event) {
+	int act     = event.getAction() & MotionEvent.ACTION_MASK;
+	switch(act) {
+	  case MotionEvent.ACTION_DOWN: {
+	        switch (event.getPointerCount()) {
+	        	case 1 : { controls.pOnTouch (PasObj,Const.TouchDown,1,
+	        		                            event.getX(0),event.getY(0),0,0); break; }
+	        	default: { controls.pOnTouch (PasObj,Const.TouchDown,2,
+	        		                            event.getX(0),event.getY(0),
+	        		                            event.getX(1),event.getY(1));     break; }
+	        }
+	       break;}
+	  case MotionEvent.ACTION_MOVE: {
+	        switch (event.getPointerCount()) {
+	        	case 1 : { controls.pOnTouch (PasObj,Const.TouchMove,1,
+	        		                            event.getX(0),event.getY(0),0,0); break; }
+	        	default: { controls.pOnTouch (PasObj,Const.TouchMove,2,
+	        		                            event.getX(0),event.getY(0),
+	        		                            event.getX(1),event.getY(1));     break; }
+	        }
+	       break;}
+	  case MotionEvent.ACTION_UP: {
+	        switch (event.getPointerCount()) {
+	        	case 1 : { controls.pOnTouch (PasObj,Const.TouchUp  ,1,
+	        		                            event.getX(0),event.getY(0),0,0); break; }
+	        	default: { controls.pOnTouch (PasObj,Const.TouchUp  ,2,
+	        		                            event.getX(0),event.getY(0),
+	        		                            event.getX(1),event.getY(1));     break; }
+	        }
+	       break;}
+	  case MotionEvent.ACTION_POINTER_DOWN: {
+	        switch (event.getPointerCount()) {
+	        	case 1 : { controls.pOnTouch (PasObj,Const.TouchDown,1,
+	        		                            event.getX(0),event.getY(0),0,0); break; }
+	        	default: { controls.pOnTouch (PasObj,Const.TouchDown,2,
+	        		                            event.getX(0),event.getY(0),
+	        		                            event.getX(1),event.getY(1));     break; }
+	        }
+	       break;}
+	  case MotionEvent.ACTION_POINTER_UP  : {
+	  	    switch (event.getPointerCount()) {
+	        	case 1 : { controls.pOnTouch (PasObj,Const.TouchUp  ,1,
+	        		                            event.getX(0),event.getY(0),0,0); break; }
+	        	default: { controls.pOnTouch (PasObj,Const.TouchUp  ,2,
+	        		                            event.getX(0),event.getY(0),
+	        		                            event.getX(1),event.getY(1));     break; }
+	        }
+	       break;}
+	} 
+	return true;
+	}
+
+	public Bitmap GetDrawingCache(){
+		this.setDrawingCacheEnabled(true);		
+		Bitmap b = Bitmap.createBitmap(this.getDrawingCache());
+		this.setDrawingCacheEnabled(false);	
+	    return b;	   
+	}
+
+	//
+	@Override
+	/*.*/public  void onDraw(Canvas canvas) {
+	  mCanvas = canvas;
+	  controls.pOnDraw(PasObj, mCanvas); // improvement required
+	}
+
+	public void SaveToFile(String _filename ) {
+	  Bitmap image = Bitmap.createBitmap( getWidth(), getHeight(), Bitmap.Config.ARGB_8888);
+	  Canvas c = new Canvas( image );
+	  draw( c );  
+	  FileOutputStream fos = null;
+	  try {
+	     fos = new FileOutputStream( _filename );
+	     if (fos != null) {
+	    	 
+	       if ( _filename.toLowerCase().contains(".jpg") ) image.compress(Bitmap.CompressFormat.JPEG, 90, fos);
+	       if ( _filename.toLowerCase().contains(".png") ) image.compress(Bitmap.CompressFormat.PNG, 100, fos);
+	        
+	       fos.close(); 
+	     }  
+	   }
+	   catch ( Exception e) {
+	     Log.e("jDrawingView_SaveImage1", "Exception: "+ e.toString() ); 
+	   }
+	}
+
+	public void SaveToFile(String _path, String _filename) {
+		
+		Bitmap image = Bitmap.createBitmap( getWidth(), getHeight(), Bitmap.Config.ARGB_8888);
+		Canvas c = new Canvas( image );
+		draw( c );
+		
+	    File file = new File (_path +"/"+ _filename);	    
+	    if (file.exists ()) file.delete (); 
+	    try {
+	        FileOutputStream out = new FileOutputStream(file);	  
+	        
+	        if ( _filename.toLowerCase().contains(".jpg") ) image.compress(Bitmap.CompressFormat.JPEG, 90, out);
+	        if ( _filename.toLowerCase().contains(".png") ) image.compress(Bitmap.CompressFormat.PNG, 100, out);
+	        
+	         out.flush();
+	         out.close();
+	    } catch (Exception e) {
+	    	Log.e("jDrawingView_SaveToFile2", "Exception: "+ e.toString() );
+	    }  	     	   
+  }
+	
+	public int GetHeight() {	
+	  return getHeight();
+	}  
+
+	public int GetWidth() {
+		return getWidth();
+	}
+
+	private Bitmap GetResizedBitmap(Bitmap _bitmap, int _newWidth, int _newHeight){
+			   float factorH = _newHeight / (float)_bitmap.getHeight();
+			   float factorW = _newWidth / (float)_bitmap.getWidth();
+			   float factorToUse = (factorH > factorW) ? factorW : factorH;
+			   Bitmap bm = Bitmap.createScaledBitmap(_bitmap,
+			     (int) (_bitmap.getWidth() * factorToUse),
+			     (int) (_bitmap.getHeight() * factorToUse),false);     
+			   return bm;
+	}
+
+	public void DrawBitmap(Bitmap _bitmap, int _width, int _height) {
+			Bitmap bmp = GetResizedBitmap(_bitmap, _width, _height);
+			Rect rect = new Rect(0, 0, _width, _height);	
+			mCanvas.drawBitmap(bmp,null,rect,mPaint);	
+	}
+	
+		//0 , 0, w, h //int left/b, int top/l, int right/r, int bottom/t) 
+	public  void DrawBitmap(Bitmap _bitmap, int _left, int _top, int _right, int _bottom) {  //int b, int l, int r, int t 	
+		    /* Figure out which way needs to be reduced less */
+			/*
+		    int scaleFactor = 1;
+		    if ((right > 0) && (bottom > 0)) {
+		        scaleFactor = Math.min(bitmap.getWidth()/(right-left), bitmap.getHeight()/(bottom-top));
+		    }	
+			*/	
+		    Rect rect = new Rect(_left,_top, _right, _bottom);
+		    if ( (_bitmap.getHeight() > GL10.GL_MAX_TEXTURE_SIZE) || (_bitmap.getWidth() > GL10.GL_MAX_TEXTURE_SIZE)) {								                   	   
+				int nh = (int) ( _bitmap.getHeight() * (512.0 / _bitmap.getWidth()) );	
+				Bitmap scaled = Bitmap.createScaledBitmap(_bitmap,512, nh, true);
+				mCanvas.drawBitmap(scaled,null,rect,mPaint);			
+			}
+			else {
+				mCanvas.drawBitmap(_bitmap,null,rect,mPaint);
+			}		   
+	}
+		
+	public  void SetPaintWidth(float _width) {
+			  mPaint.setStrokeWidth(_width);
+	}
+
+	public  void SetPaintStyle(int _style) {
+	  switch (_style) {
+		  case 0  : { mPaint.setStyle(Paint.Style.FILL           ); break; }
+		  case 1  : { mPaint.setStyle(Paint.Style.FILL_AND_STROKE); break; }
+		  case 2  : { mPaint.setStyle(Paint.Style.STROKE);          break; }
+		  default : { mPaint.setStyle(Paint.Style.FILL           ); break; }
+		};
+	}
+
+	public  void SetPaintColor(int _color) {
+	  mPaint.setColor(_color);
+	}
+
+	public  void SetTextSize(float _textSize) {
+	   mPaint.setTextSize(_textSize);
+	}
+		
+	public  void SetTypeface(int _typeface) {		
+		 Typeface t = null; 
+		  switch (_typeface) { 
+		    case 0: t = Typeface.DEFAULT; break; 
+		    case 1: t = Typeface.SANS_SERIF; break; 
+		    case 2: t = Typeface.SERIF; break; 
+		    case 3: t = Typeface.MONOSPACE; break; 
+		  } 
+		  mPaint.setTypeface(t); 				  				 
+	}
+	
+	public  void DrawLine(float _x1, float _y1, float _x2, float _y2) {
+		mCanvas.drawLine(_x1,_y1,_x2,_y2,mPaint);
+	}
+
+	public  void DrawText(String _text, float _x, float _y ) {
+		 mCanvas.drawText(_text,_x,_y,mPaint);
+	}
+	
+	   public void DrawLine(float[] _points) {	 
+		   mCanvas.drawLines(_points, mPaint);        	     
+	   }
+
+	   public void DrawPoint(float _x1, float _y1) {	   
+		   mCanvas.drawPoint(_x1,_y1,mPaint);		   
+	   }
+	   
+	   public void DrawCircle(float _cx, float _cy, float _radius) {	   
+		   mCanvas.drawCircle(_cx, _cy, _radius, mPaint);		   
+	   }
+	      
+	   public void DrawBackground(int _color) {
+		   mCanvas.drawColor(_color);
+	   }
+	      
+	  public void DrawRect(float _left, float _top, float _right, float _bottom) { 
+		  mCanvas.drawRect(_left, _top, _right, _bottom, mPaint);
+	  }	
+	
+	  private int GetDrawableResourceId(String _resName) {
+		  try {
+		     Class<?> res = R.drawable.class;
+		     Field field = res.getField(_resName);  //"drawableName"
+		     int drawableId = field.getInt(null);
+		     return drawableId;
+		  }
+		  catch (Exception e) {
+		     //Log.e("jDrawingView", "Failure to get drawable id.", e);
+		     return 0;
+		  }
+	}
+
+	private Drawable GetDrawableResourceById(int _resID) {
+		return (Drawable)( this.controls.activity.getResources().getDrawable(_resID));	
+	}
+	        
+	public void SetImageByResourceIdentifier(String _imageResIdentifier) {
+		Drawable d = GetDrawableResourceById(GetDrawableResourceId(_imageResIdentifier));
+		Bitmap bmp = ((BitmapDrawable)d).getBitmap();
+		this.DrawBitmap(bmp);
+		this.invalidate();
+	}
+	
+	public void DrawBitmap(Bitmap _bitmap){				
+	    int w = _bitmap.getWidth();
+	    int h = _bitmap.getHeight();		
+	    Rect rect = new Rect(0, 0, w, h);				
+		Bitmap bmp = GetResizedBitmap(_bitmap, w, h);			
+		mCanvas.drawBitmap(bmp,null,rect,mPaint);	    		
+		/*					  
+	    if ( (_bitmap.getHeight() > GL10.GL_MAX_TEXTURE_SIZE) || (_bitmap.getWidth() > GL10.GL_MAX_TEXTURE_SIZE)) {								                   	   
+			int nh = (int) ( _bitmap.getHeight() * (512.0 / _bitmap.getWidth()) );	
+			Bitmap scaled = Bitmap.createScaledBitmap(_bitmap,512, nh, true);
+			mCanvas.drawBitmap(scaled,null,rect,mPaint);			
+		}
+		else {
+			mCanvas.drawBitmap(_bitmap,null,rect,mPaint);
+		}
+	    */
+	}
+	  
+} //end class
+
 //**new jComponent class entrypoint**//please, do not remove/change this line!
 
 //Javas/Pascal Interface Class 
@@ -16103,6 +17931,7 @@ public class Controls {          // <<---------
 public Activity        activity;  // Activity
 public RelativeLayout  appLayout; // Base Layout
 public int screenStyle=0;         // Screen Style [Dev:0 , Portrait: 1, Landscape : 2]
+public int systemVersion;
 
 // Jave -> Pascal Function ( Pascal Side = Event )
 public  native int  pAppOnScreenStyle(); 
@@ -16239,16 +18068,35 @@ public native void pOnSeekBarProgressChanged(long pasobj,  int progress, boolean
 public native void pOnSeekBarStartTrackingTouch(long pasobj, int progress);
 public native void pOnSeekBarStopTrackingTouch(long pasobj, int progress);
 
+public native void pOnRatingBarChanged(long pasobj, float rating);
+
+public native void pRadioGroupCheckedChanged(long pasobj, int checkedIndex, String checkedCaption);
+
+public native void pOnClickAutoDropDownItem(long pasobj, int itemIndex, String itemCaption);
+public native void pOnClickGeneric(long pasobj, int value);
+
+//public  native void pAppOnHomePressed();  //TODO!
+public native boolean pAppOnSpecialKeyDown(char keyChar, int keyCode, String keyCodeString);
 
 //Load Pascal Library
 static {
-    //Log.i("JNI_Java", "1.load libcontrols.so");
+    //Log.i("JNI_Load_LibControls", "1. try load libcontrols.so");
 
-    //System.loadLibrary("freetype"); // need by TFPNoGUIGraphicsBridge [ref. www.github.com/jmpessoa/tfpnoguigraphicsbridge]
+	/*
+    try {
+    	System.loadLibrary("freetype"); // need by TFPNoGUIGraphicsBridge [ref. www.github.com/jmpessoa/tfpnoguigraphicsbridge]
+    } catch (UnsatisfiedLinkError e) {
+         Log.e("JNI_Load_LibFreetype", "exception", e);
+    }
+    */
+	
+    try {
+    	System.loadLibrary("controls");
+    } catch (UnsatisfiedLinkError e) {
+         Log.e("JNI_Load_LibControls", "exception", e);
+    }
 
-    System.loadLibrary("controls");
-
-    //Log.i("JNI_Java", "2.load libcontrols.so");  
+    //Log.i("JNI_Load_LibControls", "2.load libcontrols.so OK!");  
 }
 
 // -------------------------------------------------------------------------
@@ -16296,6 +18144,10 @@ public  void jAppOnClickContextMenuItem(MenuItem item,int itemID, String itemCap
 
 public void jAppOnViewClick(View view, int id){ pAppOnViewClick(view,id);}
 public void jAppOnListItemClick(AdapterView adapter, View view, int position, int id){ pAppOnListItemClick(adapter, view,position,id);}
+
+//public  void jAppOnHomePressed()          { pAppOnHomePressed();           }
+
+public boolean jAppOnKeyDown(char keyChar , int keyCode, String keyCodeString) {return pAppOnSpecialKeyDown(keyChar, keyCode, keyCodeString);};
 
 //// -------------------------------------------------------------------------
 //  System, Class
@@ -16564,20 +18416,81 @@ public  String getStrDateTime() {  //hacked by jmpessoa!! sorry, was for a good 
 //Fatih: Path = '' = Asset Root Folder 
 //Path Example: gunlukler/2015/02/28/001 
 public String[] getAssetContentList(String Path) throws IOException { 
-   ArrayList<String> Folders = new ArrayList<String>(); 
+	ArrayList<String> Folders = new ArrayList<String>(); 
 
-   Resources r = this.activity.getResources();  
-   AssetManager am = r.getAssets(); 
-   String fileList[] = am.list(Path); 
-   if (fileList != null) 
-  {    
-     for (int i = 0; i < fileList.length; i++) 
-     { 
- 	Folders.add(fileList[i]); 
-     } 
-  } 
-  String sFolders[] = Folders.toArray(new String[Folders.size()]);    	   
-  return sFolders; 
+	Resources r = this.activity.getResources();  
+	AssetManager am = r.getAssets(); 
+	String fileList[] = am.list(Path); 
+	if (fileList != null) 
+	{    
+		for (int i = 0; i < fileList.length; i++) 
+		{ 
+			Folders.add(fileList[i]); 
+		} 
+	} 
+	String sFolders[] = Folders.toArray(new String[Folders.size()]);    	   
+	return sFolders; 
+} 
+
+//Fatih: gets system storage driver list
+public String[] getDriverList() { 
+	ArrayList<String> Drivers = new ArrayList<String>(); 
+
+	String sDriver;
+	sDriver = System.getenv("EXTERNAL_STORAGE");
+	if(sDriver != null)
+	{
+		File fDriver = new File(sDriver);
+
+		if (fDriver.exists() && fDriver.canWrite()) {
+			Drivers.add(fDriver.getAbsolutePath());
+		}
+	}
+
+	sDriver = System.getenv("SECONDARY_STORAGE");
+	if(sDriver != null)
+	{
+		File fDriver = new File(sDriver);
+
+		if (fDriver.exists() && fDriver.canWrite()) {
+			Drivers.add(fDriver.getAbsolutePath());
+		}
+	}
+	
+	String sDrivers[] = Drivers.toArray(new String[Drivers.size()]);    	   
+	return sDrivers; 
+} 
+
+//Fatih: get folders list 
+//Path Example: /storage/emulated/legacy/ 
+public String[] getFolderList(String Path) { 
+	ArrayList<String> Folders = new ArrayList<String>(); 
+
+	File f = new File(Path);
+	File[] files = f.listFiles();
+	for (File fFile : files) {
+	    if (fFile.isDirectory()) {
+			Folders.add(fFile.getName());
+	    }
+	}	
+	String sFolders[] = Folders.toArray(new String[Folders.size()]);    	   
+	return sFolders; 
+} 
+
+//Fatih: get files list 
+//Path Example: /storage/emulated/legacy/ 
+public String[] getFileList(String Path) { 
+	ArrayList<String> Folders = new ArrayList<String>(); 
+
+	File f = new File(Path);
+	File[] files = f.listFiles();
+	for (File fFile : files) {
+	    if (fFile.isFile()) {
+			Folders.add(fFile.getName());
+	    }
+	}	
+	String sFolders[] = Folders.toArray(new String[Folders.size()]);    	   
+	return sFolders; 
 } 
 
 //by jmpessoa:  Class controls version info
@@ -17318,5 +19231,21 @@ public float[] benchMark1 () {
    public java.lang.Object jSeekBar_jCreate(long _Self) {
 	      return (java.lang.Object)(new jSeekBar(this,_Self));
    }
+                              
+   public java.lang.Object jRatingBar_jCreate(long _Self,  int _numStars, float _step) {
+	      return (java.lang.Object)(new jRatingBar(this,_Self,_numStars,_step));
+   }
    
+   public java.lang.Object jRadioGroup_jCreate(long _Self, int _orientation) {
+	      return (java.lang.Object)(new jRadioGroup(this,_Self, _orientation));
+   }
+   
+   public java.lang.Object jAutoTextView_jCreate(long _Self) {
+	      return (java.lang.Object)(new jAutoTextView(this,_Self));
+   }
+   
+   public java.lang.Object jDrawingView_jCreate(long _Self) {
+	      return (java.lang.Object)(new jDrawingView(this,_Self));
+   }   
+	     
 }

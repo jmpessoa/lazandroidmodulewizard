@@ -739,7 +739,9 @@ function jBitmap_GetResizedBitmap(env: PJNIEnv; _jbitmap: JObject; _newWidth: in
 function jBitmap_GetResizedBitmap(env: PJNIEnv; _jbitmap: JObject; _factorScaleX: single; _factorScaleY: single): jObject; overload;
 
 function jBitmap_GetByteBuffer(env: PJNIEnv; _jbitmap: JObject; _width: integer; _height: integer): jObject;
+
 function jBitmap_GetBitmapFromByteBuffer(env: PJNIEnv; _jbitmap: JObject; _byteBuffer: jObject; _width: integer; _height: integer): jObject;
+
 function jBitmap_GetBitmapFromByteArray(env: PJNIEnv; _jbitmap: JObject; var _image: TDynArrayOfJByte): jObject;
 
 function jBitmap_GetByteBufferFromBitmap(env: PJNIEnv; _jbitmap: JObject; _bmap: jObject): jObject; overload;
@@ -812,7 +814,7 @@ Procedure jView_setLayoutAll(env:PJNIEnv; View : jObject;  idAnchor: DWord);
 
 function jView_getLParamHeight(env:PJNIEnv; View : jObject ): integer;
 function jView_getLParamWidth(env:PJNIEnv; View : jObject): integer;
-
+function jView_GetBitmap(env: PJNIEnv; _jview: JObject): jObject;
 
 
 // Timer
@@ -3412,7 +3414,7 @@ Procedure jImageView_setBitmapImage(env:PJNIEnv;
  begin
   _jParams[0].l := bitmap;
     cls := env^.GetObjectClass(env, ImageView);
- _jMethod:= env^.GetMethodID(env, cls, 'setBitmapImage', '(Landroid/graphics/Bitmap;)V');
+ _jMethod:= env^.GetMethodID(env, cls, 'SetBitmapImage', '(Landroid/graphics/Bitmap;)V');
   env^.CallVoidMethodA(env,ImageView,_jMethod,@_jParams);
   env^.DeleteLocalRef(env, cls);
  end;
@@ -6313,6 +6315,17 @@ begin
 _jMethod:= env^.GetMethodID(env, cls, 'setLayoutAll', '(I)V');
  env^.CallVoidMethodA(env,View,_jMethod,@_jParams);
  env^.DeleteLocalRef(env, cls);
+end;
+
+function jView_getBitmap(env: PJNIEnv; _jview: JObject): jObject;
+var
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jview);
+  jMethod:= env^.GetMethodID(env, jCls, 'getBitmap', '()Landroid/graphics/Bitmap;');
+  Result:= env^.CallObjectMethod(env, _jview, jMethod);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 //------------------------------------------------------------------------------

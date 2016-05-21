@@ -1,5 +1,5 @@
 object AndroidModule2: TAndroidModule2
-  Left = 353
+  Left = 377
   Top = 64
   Width = 300
   Height = 600
@@ -35,6 +35,7 @@ object AndroidModule2: TAndroidModule2
     FontColor = colbrBlue
     FontSize = 0
     TextTypeFace = tfNormal
+    FontSizeUnit = unitDefault
     Id = 41266
   end
   object jButton1: jButton
@@ -56,6 +57,7 @@ object AndroidModule2: TAndroidModule2
     BackgroundColor = colbrDefault
     FontColor = colbrDefault
     FontSize = 0
+    FontSizeUnit = unitDefault
     OnClick = jButton1Click
     Id = 35128
   end
@@ -78,6 +80,7 @@ object AndroidModule2: TAndroidModule2
     BackgroundColor = colbrDefault
     FontColor = colbrDefault
     FontSize = 0
+    FontSizeUnit = unitDefault
     OnClick = jButton2Click
     Id = 0
   end
@@ -103,6 +106,7 @@ object AndroidModule2: TAndroidModule2
     FontColor = colbrBlue
     FontSize = 0
     TextTypeFace = tfNormal
+    FontSizeUnit = unitDefault
     Id = 93524
   end
   object jButton3: jButton
@@ -124,6 +128,7 @@ object AndroidModule2: TAndroidModule2
     BackgroundColor = colbrDefault
     FontColor = colbrDefault
     FontSize = 0
+    FontSizeUnit = unitDefault
     OnClick = jButton3Click
     Id = 2770
   end
@@ -146,6 +151,7 @@ object AndroidModule2: TAndroidModule2
     BackgroundColor = colbrDefault
     FontColor = colbrDefault
     FontSize = 0
+    FontSizeUnit = unitDefault
     OnClick = jButton4Click
     Id = 0
   end
@@ -168,6 +174,7 @@ object AndroidModule2: TAndroidModule2
     BackgroundColor = colbrDefault
     FontColor = colbrDefault
     FontSize = 0
+    FontSizeUnit = unitDefault
     OnClick = jButton5Click
     Id = 51074
   end
@@ -190,6 +197,7 @@ object AndroidModule2: TAndroidModule2
     BackgroundColor = colbrDefault
     FontColor = colbrDefault
     FontSize = 0
+    FontSizeUnit = unitDefault
     OnClick = jButton6Click
     Id = 0
   end
@@ -212,6 +220,7 @@ object AndroidModule2: TAndroidModule2
     BackgroundColor = colbrDefault
     FontColor = colbrDefault
     FontSize = 0
+    FontSizeUnit = unitDefault
     OnClick = jButton7Click
     Id = 71909
   end
@@ -234,6 +243,7 @@ object AndroidModule2: TAndroidModule2
     BackgroundColor = colbrDefault
     FontColor = colbrDefault
     FontSize = 0
+    FontSizeUnit = unitDefault
     OnClick = jButton8Click
     Id = 0
   end
@@ -256,6 +266,7 @@ object AndroidModule2: TAndroidModule2
     BackgroundColor = colbrDefault
     FontColor = colbrDefault
     FontSize = 0
+    FontSizeUnit = unitDefault
     OnClick = jButton9Click
     Id = 34150
   end
@@ -278,6 +289,7 @@ object AndroidModule2: TAndroidModule2
     BackgroundColor = colbrDefault
     FontColor = colbrDefault
     FontSize = 0
+    FontSizeUnit = unitDefault
     OnClick = jButton10Click
     Id = 0
   end
@@ -300,6 +312,7 @@ object AndroidModule2: TAndroidModule2
     BackgroundColor = colbrDefault
     FontColor = colbrDefault
     FontSize = 0
+    FontSizeUnit = unitDefault
     OnClick = jButton11Click
     Id = 59567
   end
@@ -322,13 +335,14 @@ object AndroidModule2: TAndroidModule2
     BackgroundColor = colbrDefault
     FontColor = colbrDefault
     FontSize = 0
+    FontSizeUnit = unitDefault
     OnClick = jButton12Click
     Id = 0
   end
   object jImageView1: jImageView
-    Left = 104
-    Top = 424
-    Width = 72
+    Left = 6
+    Top = 525
+    Width = 288
     Height = 72
     Visible = True
     PosRelativeToAnchor = []

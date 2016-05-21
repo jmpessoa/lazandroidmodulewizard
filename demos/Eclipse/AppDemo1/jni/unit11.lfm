@@ -1,5 +1,5 @@
 object AndroidModule11: TAndroidModule11
-  Left = 314
+  Left = 335
   Top = 58
   Width = 300
   Height = 600
@@ -14,10 +14,10 @@ object AndroidModule11: TAndroidModule11
   OnRotate = DataModuleRotate
   OnJNIPrompt = DataModuleJNIPrompt
   object jTextView1: jTextView
-    Left = 104
-    Top = 11
-    Width = 135
-    Height = 25
+    Left = 96
+    Top = 10
+    Width = 107
+    Height = 20
     MarginLeft = 10
     MarginTop = 10
     MarginRight = 10
@@ -34,12 +34,13 @@ object AndroidModule11: TAndroidModule11
     FontColor = colbrSilver
     FontSize = 0
     TextTypeFace = tfNormal
+    FontSizeUnit = unitDefault
     Id = 44776
   end
   object jButton1: jButton
-    Left = 8
-    Top = 72
-    Width = 135
+    Left = 5
+    Top = 45
+    Width = 136
     Height = 40
     MarginLeft = 5
     MarginTop = 5
@@ -55,13 +56,14 @@ object AndroidModule11: TAndroidModule11
     BackgroundColor = colbrDefault
     FontColor = colbrDefault
     FontSize = 0
+    FontSizeUnit = unitDefault
     OnClick = jButton1Click
     Id = 62954
   end
   object jButton2: jButton
-    Left = 160
-    Top = 72
-    Width = 135
+    Left = 151
+    Top = 45
+    Width = 136
     Height = 40
     MarginLeft = 5
     MarginTop = 5
@@ -77,15 +79,16 @@ object AndroidModule11: TAndroidModule11
     BackgroundColor = colbrDefault
     FontColor = colbrDefault
     FontSize = 0
+    FontSizeUnit = unitDefault
     OnClick = jButton2Click
     Id = 0
   end
   object jCanvasES2_1: jCanvasES2
     Tag = 1
-    Left = 8
-    Top = 120
-    Width = 287
-    Height = 241
+    Left = 10
+    Top = 100
+    Width = 270
+    Height = 286
     MarginLeft = 10
     MarginTop = 10
     MarginRight = 10
@@ -107,9 +110,9 @@ object AndroidModule11: TAndroidModule11
     Id = 14067
   end
   object jButton3: jButton
-    Left = 8
-    Top = 376
-    Width = 288
+    Left = 5
+    Top = 401
+    Width = 285
     Height = 40
     MarginLeft = 5
     MarginTop = 5
@@ -125,14 +128,15 @@ object AndroidModule11: TAndroidModule11
     BackgroundColor = colbrDefault
     FontColor = colbrDefault
     FontSize = 0
+    FontSizeUnit = unitDefault
     OnClick = jButton3Click
     Id = 72520
   end
   object jTextView2: jTextView
-    Left = 120
-    Top = 424
-    Width = 135
-    Height = 25
+    Left = 10
+    Top = 456
+    Width = 52
+    Height = 20
     MarginLeft = 10
     MarginTop = 10
     MarginRight = 10
@@ -150,13 +154,14 @@ object AndroidModule11: TAndroidModule11
     FontColor = colbrSilver
     FontSize = 0
     TextTypeFace = tfNormal
+    FontSizeUnit = unitDefault
     Id = 98715
   end
   object jTextView3: jTextView
-    Left = 56
-    Top = 448
-    Width = 208
-    Height = 25
+    Left = 46
+    Top = 496
+    Width = 207
+    Height = 20
     MarginLeft = 10
     MarginTop = 10
     MarginRight = 10
@@ -174,6 +179,7 @@ object AndroidModule11: TAndroidModule11
     FontColor = colbrSilver
     FontSize = 0
     TextTypeFace = tfNormal
+    FontSizeUnit = unitDefault
     Id = 0
   end
   object jImageList1: jImageList

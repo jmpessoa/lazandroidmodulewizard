@@ -1,6 +1,6 @@
 package com.example.dummyapp;
 
-//Lamw: Lazarus Android Module Wizard  - version 0.6 - revision 43 - 13 May - 2016 
+//Lamw: Lazarus Android Module Wizard  - version 0.6 - revision 44 - 21 May - 2016 
 //Form Designer and Components development model!
 //
 //https://github.com/jmpessoa/lazandroidmodulewizard
@@ -387,7 +387,6 @@ runnable = new Runnable() {
    }
 };
 }
-
 
 public  void SetInterval(int interval) {
   Interval = interval;
@@ -1131,8 +1130,7 @@ public void TakeScreenshot(String _savePath, String _saveFileNameJPG) {
 	String myPath = _savePath + "/" +  _saveFileNameJPG;	
 	Bitmap bitmap;	
 	View v1 = controls.activity.getWindow().getDecorView().getRootView(); 
-	v1.setDrawingCacheEnabled(true);
-	
+	v1.setDrawingCacheEnabled(true);		
 	bitmap = Bitmap.createBitmap(v1.getDrawingCache());
 	v1.setDrawingCacheEnabled(false);
 
@@ -1153,7 +1151,6 @@ public void TakeScreenshot(String _savePath, String _saveFileNameJPG) {
 	    e.printStackTrace();
 	}
 }
-
 
 public String GetTitleActionBar() {
 	ActionBar actionBar = this.controls.activity.getActionBar();   	
@@ -2546,7 +2543,11 @@ onClickListener = new OnClickListener() {
     controls.pOnClick(PasObj,Const.Click_Default);
   }
 };
+
 setOnClickListener(onClickListener);
+
+//this.setWillNotDraw(false); //false = fire OnDraw after Invalited ... true = not fire onDraw... thanks to tintinux
+
 }
 
 public void setLeftTopRightBottomWidthHeight(int left, int top, int right, int bottom, int w, int h) {
@@ -2590,17 +2591,17 @@ private Bitmap GetResizedBitmap(Bitmap _bmp, int _newWidth, int _newHeight){
 }
 
 public void SetBitmapImage(Bitmap _bitmap, int _width, int _height) {
+	this.setImageResource(android.R.color.transparent);
 	bmp = GetResizedBitmap(_bitmap, _width, _height);
 	this.setImageBitmap(bmp);	
 	this.invalidate();
 }
 
-//by jmpessoa
 //http://stackoverflow.com/questions/10271020/bitmap-too-large-to-be-uploaded-into-a-texture
-
-public void setBitmapImage(Bitmap bm) {
+public void SetBitmapImage(Bitmap bm) {
 	
-	//if (bmp    != null) { bmp.recycle(); }		
+	this.setImageResource(android.R.color.transparent);  //erase image ??....		
+	
 	if ( (bm.getHeight() > GL10.GL_MAX_TEXTURE_SIZE) || (bm.getWidth() > GL10.GL_MAX_TEXTURE_SIZE)) {				
 		//is is the case when the bitmap fails to load			                   	   
 		int nh = (int) ( bm.getHeight() * (1024.0 / bm.getWidth()) );	
@@ -2610,25 +2611,23 @@ public void setBitmapImage(Bitmap bm) {
 	}	
 	else{
 	    // for bitmaps with dimensions that lie within the limits, load the image normally
-	    if (Build.VERSION.SDK_INT >= 16) {	    	
-	    	 Log.i("VERSION.SDK_INT >= 16", "VERSION.SDK_INT >= 16");	    	 
-	        BitmapDrawable ob = new BitmapDrawable(this.getResources(), bm);
-	        this.setBackground(ob);
-	        //this.setImageBitmap(bm);
-	        //bmp = bm;
-	    } else {
-	   	 Log.i("VERSION.SDK_INT < 16", "VERSION.SDK_INT < 16");	    	
+	    if (Build.VERSION.SDK_INT >= 16) {  // why??	    		    	 
+	        BitmapDrawable ob = new BitmapDrawable(this.getResources(), bm);	        
+	        this.setBackground(ob);	        
+	        //this.setImageBitmap(bm);	        
+	        bmp = bm;
+	        
+	    } else {	    	
 	    	this.setImageBitmap(bm);
 	    	bmp = bm;
 	    }
 	}	
-	//bmp = bm;
-	//this.setImageBitmap(bm);	
 	this.invalidate();
 }
 
 public  void setImage(String fullPath) {
 	  //if (bmp != null)        { bmp.recycle(); }
+	  this.setImageResource(android.R.color.transparent);
 	  if (fullPath.equals("null")) { this.setImageBitmap(null); return; };
 	  bmp = BitmapFactory.decodeFile( fullPath );
 	  this.setImageBitmap(bmp);
@@ -2798,6 +2797,13 @@ public void SetImageFromByteArray(byte[] _image) {
 	bmp = BitmapFactory.decodeByteArray(_image, 0, _image.length);
 	this.setImageBitmap(bmp);
 	this.invalidate();
+}
+
+public Bitmap GetDrawingCache() {	 
+	this.setDrawingCacheEnabled(true);		
+	Bitmap b = Bitmap.createBitmap(this.getDrawingCache());
+	this.setDrawingCacheEnabled(false);	
+    return b;	
 }
 
 }
@@ -4757,15 +4763,13 @@ public  void drawBitmap(Bitmap bitmap, int left, int top, int right, int bottom)
     if ( (bitmap.getHeight() > GL10.GL_MAX_TEXTURE_SIZE) || (bitmap.getWidth() > GL10.GL_MAX_TEXTURE_SIZE)) {								                   	   
 		int nh = (int) ( bitmap.getHeight() * (512.0 / bitmap.getWidth()) );	
 		Bitmap scaled = Bitmap.createScaledBitmap(bitmap,512, nh, true);
-		canvas.drawBitmap(scaled,null,rect,paint);
-		 
+		canvas.drawBitmap(scaled,null,rect,paint);			
 	}
 	else {
 		canvas.drawBitmap(bitmap,null,rect,paint);
 	}
     
 }
-
 
 // Free object except Self, Pascal Code Free the class.
 public  void Free() {
@@ -4814,8 +4818,17 @@ controls = ctrls;
 // Init Class
 lparams = new LayoutParams(300,300);
 lparams.setMargins( 50, 50,0,0);
+
+//this.setWillNotDraw(false);  //fire onDraw ... thanks to tintinux
 }
 
+public Bitmap getBitmap(){ 
+ this.setDrawingCacheEnabled(true);  //thanks to tintinux		
+ Bitmap b = Bitmap.createBitmap(this.getDrawingCache());
+ this.setDrawingCacheEnabled(false);	
+ return b;   
+}
+	 	
 public void setLeftTopRightBottomWidthHeight(int left, int top, int right, int bottom, int w, int h) {
 	MarginLeft = left;
 	MarginTop = top;
@@ -4841,30 +4854,6 @@ public  void setjCanvas(java.lang.Object canvas) {
 @Override
 public  boolean onTouchEvent( MotionEvent event) {
 int act     = event.getAction() & MotionEvent.ACTION_MASK;
-/*
-switch(act) {
-  case MotionEvent.ACTION_DOWN: {
-        int count = event.getPointerCount();
-        for ( int i = 0; i < count; i++ ) {
-          int ptID = event.getPointerId(i);
-          controls.pOnTouch (PasObj,ptID,Const.TouchDown,event.getX(i), event.getY(i) );
-        }
-        break; }
-  case MotionEvent.ACTION_MOVE: {
-        int count = event.getPointerCount();
-        for ( int i = 0; i < count; i++ ) {
-          int ptID = event.getPointerId(i);
-          controls.pOnTouch (PasObj,ptID,Const.TouchMove,event.getX(i), event.getY(i) );
-        }
-        break; }
-  case MotionEvent.ACTION_UP: {
-        int count = event.getPointerCount();
-        for ( int i = 0; i < count; i++ ) {
-          int ptID = event.getPointerId(i);
-          controls.pOnTouch (PasObj,ptID,Const.TouchUp  ,event.getX(i), event.getY(i) );
-        }
-        break; }
-} */
 switch(act) {
   case MotionEvent.ACTION_DOWN: {
         switch (event.getPointerCount()) {
@@ -4903,7 +4892,6 @@ switch(act) {
         }
        break;}
   case MotionEvent.ACTION_POINTER_UP  : {
-  	   // Log.i("Java","PUp");
         switch (event.getPointerCount()) {
         	case 1 : { controls.pOnTouch (PasObj,Const.TouchUp  ,1,
         		                            event.getX(0),event.getY(0),0,0); break; }
@@ -4926,7 +4914,7 @@ public  void onDraw( Canvas canvas) {
 public void saveView( String sFileName ) {
   Bitmap b = Bitmap.createBitmap( getWidth(), getHeight(), Bitmap.Config.ARGB_8888);
   Canvas c = new Canvas( b );
-  draw( c );
+  draw( c );  
   FileOutputStream fos = null;
   try {
      fos = new FileOutputStream( sFileName );
@@ -5148,7 +5136,6 @@ switch(act) {
 return true;
 }
 
-//
 @Override
 public void surfaceDestroyed(SurfaceHolder holder) {
 	//Log.i("Java","surfaceDestroyed");
@@ -13276,10 +13263,14 @@ class jNotificationManager /*extends ...*/ {
     private Context  context   = null;
 
     NotificationManager mNotificationManager;
-    String one,two,three;
-  
+    String one,two,three;    
+    Notification.Builder mNotificationBuilder;
+    
+    int mLightOn=  1000;
+	int mLightOff= 1000;
+	int mColor = Color.BLUE;
+    
     //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
-  
     public jNotificationManager(Controls _ctrls, long _Self) { //Add more others news "_xxx" params if needed!
        //super(_ctrls.activity);
        context   = _ctrls.activity;
@@ -13318,30 +13309,44 @@ class jNotificationManager /*extends ...*/ {
     	else
     	   icon = GetDrawableResourceId(_iconIdentifier) ;
     	
-    	mNotificationManager=(NotificationManager)controls.activity.getSystemService(Context.NOTIFICATION_SERVICE);    	
-       Notification notif = new Notification.Builder(controls.activity)  //need API >= 11 !!            
-       .setContentTitle(_title)        
-       .setContentText(_subject)
-       .setContentInfo(_body)
-       .setSmallIcon(icon)         
-       .build();       
-       mNotificationManager.notify(_id, notif);
-       /*
-         Application will crash targeting api's below Android 3.0 [API 11]
-         
-         Solution by freris [http://forum.lazarus.free pascal.org/index.php/topic,32605.0.html]
-         
-         Step 1:  Add to folder "../libs": 
-                 "android-support-v4.jar"  file
-                 //the version number [v4] correspond to the minimum version of android [4.0.3/API 15] that the library require.         
-         Step 2: Add:  
-                 import android.support.v4.app.NotificationCompat;                 
-         Step 3: Change the line:          
-         		Notification notif = new Notification.Builder(controls.activity);
-         		with: 
-         		Notification notif = new NotificationCompat.Builder(controls.activity);         
-        */
+       mNotificationManager=(NotificationManager)controls.activity.getSystemService(Context.NOTIFICATION_SERVICE);       
+       mNotificationBuilder = new Notification.Builder(controls.activity);  //need API >= 11 !!         
+       mNotificationBuilder.setContentTitle(_title);        
+       mNotificationBuilder.setContentText(_subject);
+       mNotificationBuilder.setContentInfo(_body);       
+       mNotificationBuilder.setSmallIcon(icon);   
+       mNotificationBuilder.setLights(mColor, mLightOn, mLightOff); //thanks to freris       
+
+       //Solution by freris 
+       if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+          mNotificationManager.notify(_id, mNotificationBuilder.build());
+       }
+       else {
+          mNotificationManager.notify(_id, mNotificationBuilder.getNotification());    	  
+       }  
+       
     }
+    
+    //thanks to freris
+    public void SetLightsColorAndTime(int _color, int _onMills, int _offMills) {
+    	if (mNotificationBuilder != null) {
+      	   mNotificationBuilder.setLights(_color, _onMills, _offMills);
+    	   if ((_onMills > 0) && (_offMills > 0)) {
+    	      mLightOn=  _onMills;
+    	      mLightOff= _offMills;
+    	   }
+    	}
+    }
+    
+  //thanks to freris
+    public void SetLightsEnable(boolean _enable) {
+    	if (mNotificationBuilder != null) {
+    	    if (!_enable)     	
+       	      mNotificationBuilder.setLights(mColor, 0, 0);    	   
+    	    else
+         	  mNotificationBuilder.setLights(mColor, mLightOn, mLightOff);
+    	}
+    }    
     
     //This method cancel a previously shown notification.
     public void Cancel(int _id) {
@@ -15062,7 +15067,7 @@ class jSurfaceView  extends SurfaceView  /*dummy*/ { //please, fix what GUI obje
            
      controls.activity.getWindow().setFormat(PixelFormat.UNKNOWN);
      lparams = new RelativeLayout.LayoutParams(lparamW, lparamH);
-       
+         
      surfaceHolder = this.getHolder();
      surfaceHolder.addCallback(new Callback() {     	           
          
@@ -15080,8 +15085,7 @@ class jSurfaceView  extends SurfaceView  /*dummy*/ { //please, fix what GUI obje
          @Override  
          public void surfaceDestroyed(SurfaceHolder holder) {
         	 mRun = false;        	              
-         }
-         
+         }                          
      });
      
      /*
@@ -15435,6 +15439,13 @@ class jSurfaceView  extends SurfaceView  /*dummy*/ { //please, fix what GUI obje
          super.onPostExecute(values);   	             
          controls.pOnSurfaceViewDrawingPostExecute(pascalObj, count);
        }            
+   }
+   
+   public Bitmap GetDrawingCache() {
+		this.setDrawingCacheEnabled(true);		
+		Bitmap b = Bitmap.createBitmap(this.getDrawingCache());
+		this.setDrawingCacheEnabled(false);	
+	    return b; 
    }
    
 } //end class
@@ -17511,6 +17522,406 @@ class jAutoTextView extends AutoCompleteTextView /*dummy*/ { //please, fix what 
 
 //MultiAutoCompleteTextView
 
+/*Draft java code by "Lazarus Android Module Wizard" [5/20/2016 3:18:58]*/
+/*https://github.com/jmpessoa/lazandroidmodulewizard*/
+/*jVisualControl template*/
+ 
+class jDrawingView extends View /*dummy*/ { //please, fix what GUI object will be extended!
+  
+  private long       PasObj = 0;    // Pascal Object
+  private Controls   controls  = null; // Control Class for events
+  
+  private Context context = null;
+  private ViewGroup parent   = null;         // parent view
+  private RelativeLayout.LayoutParams lparams;              // layout XYWH 
+  private OnClickListener onClickListener;   // click event
+  private Boolean enabled  = true;           // click-touch enabled!
+  private int lparamsAnchorRule[] = new int[30];
+  private int countAnchorRule = 0;
+  private int lparamsParentRule[] = new int[30];
+  private int countParentRule = 0;
+  private int lparamH = 100;
+  private int lparamW = 100;
+  private int marginLeft = 0;
+  private int marginTop = 0;
+  private int marginRight = 0;
+  private int marginBottom = 0;
+  private boolean mRemovedFromParent = false;
+ 
+  private Canvas          mCanvas = null;
+  private Paint           mPaint  = null;
+  
+ //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
+ 
+  public jDrawingView(Controls _ctrls, long _Self) { //Add more others news "_xxx"p arams if needed!
+     super(_ctrls.activity);
+     context   = _ctrls.activity;
+     PasObj = _Self;
+     controls  = _ctrls;
+  
+     lparams = new RelativeLayout.LayoutParams(lparamW, lparamH);
+     
+	 mPaint   = new Paint();	  
+	
+	 //this.setWillNotDraw(false); //fire OnDraw
+	  
+     onClickListener = new OnClickListener(){
+     /*.*/public void onClick(View view){  //please, do not remove /*.*/ mask for parse invisibility!
+             if (enabled) {
+                //controls.pOnClick(PasObj, Const.Click_Default); //JNI event onClick!
+             }
+          };
+     };
+     setOnClickListener(onClickListener);
+     
+  } //end constructor
+  
+  public void jFree() {
+     if (parent != null) { parent.removeView(this); }
+     //free local objects...
+     lparams = null;
+     setOnClickListener(null);     
+	 mPaint = null;
+	 mCanvas = null;     
+  }
+ 
+  public void SetViewParent(ViewGroup _viewgroup) {
+     if (parent != null) { parent.removeView(this); }
+     parent = _viewgroup;
+     parent.addView(this,lparams);
+     mRemovedFromParent = false;
+  }
+  
+  public void RemoveFromViewParent() {
+     if (!mRemovedFromParent) {
+        this.setVisibility(android.view.View.INVISIBLE);
+        if (parent != null)
+   	       parent.removeView(this);
+	   mRemovedFromParent = true;
+	}
+  }
+ 
+  public View GetView() {
+     return this;
+  }
+ 
+  public void SetLParamWidth(int _w) {
+     lparamW = _w;
+  }
+ 
+  public void SetLParamHeight(int _h) {
+     lparamH = _h;
+  }
+ 
+  public void SetLeftTopRightBottomWidthHeight(int _left, int _top, int _right, int _bottom, int _w, int _h) {
+     marginLeft = _left;
+     marginTop = _top;
+     marginRight = _right;
+     marginBottom = _bottom;
+     lparamH = _h;
+     lparamW = _w;
+  }
+ 
+  public void AddLParamsAnchorRule(int _rule) {
+     lparamsAnchorRule[countAnchorRule] = _rule;
+     countAnchorRule = countAnchorRule + 1;
+  }
+ 
+  public void AddLParamsParentRule(int _rule) {
+     lparamsParentRule[countParentRule] = _rule;
+     countParentRule = countParentRule + 1;
+  }
+ 
+  public void SetLayoutAll(int _idAnchor) {
+ 	lparams.width  = lparamW;
+	lparams.height = lparamH;
+	lparams.setMargins(marginLeft,marginTop,marginRight,marginBottom);
+	if (_idAnchor > 0) {
+	    for (int i=0; i < countAnchorRule; i++) {
+		lparams.addRule(lparamsAnchorRule[i], _idAnchor);
+	    }
+	}
+     for (int j=0; j < countParentRule; j++) {
+        lparams.addRule(lparamsParentRule[j]);
+     }
+     this.setLayoutParams(lparams);
+  }
+ 
+  public void ClearLayoutAll() {
+	for (int i=0; i < countAnchorRule; i++) {
+ 	   lparams.removeRule(lparamsAnchorRule[i]);
+   	}
+ 
+	for (int j=0; j < countParentRule; j++) {
+  	   lparams.removeRule(lparamsParentRule[j]);
+	}
+	countAnchorRule = 0;
+	countParentRule = 0;
+  }
+
+  public void SetId(int _id) { //wrapper method pattern ...
+     this.setId(_id);
+  }
+ 
+ //write others [public] methods code here......
+ //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
+ 
+	@Override
+	/*.*/public  boolean onTouchEvent( MotionEvent event) {
+	int act     = event.getAction() & MotionEvent.ACTION_MASK;
+	switch(act) {
+	  case MotionEvent.ACTION_DOWN: {
+	        switch (event.getPointerCount()) {
+	        	case 1 : { controls.pOnTouch (PasObj,Const.TouchDown,1,
+	        		                            event.getX(0),event.getY(0),0,0); break; }
+	        	default: { controls.pOnTouch (PasObj,Const.TouchDown,2,
+	        		                            event.getX(0),event.getY(0),
+	        		                            event.getX(1),event.getY(1));     break; }
+	        }
+	       break;}
+	  case MotionEvent.ACTION_MOVE: {
+	        switch (event.getPointerCount()) {
+	        	case 1 : { controls.pOnTouch (PasObj,Const.TouchMove,1,
+	        		                            event.getX(0),event.getY(0),0,0); break; }
+	        	default: { controls.pOnTouch (PasObj,Const.TouchMove,2,
+	        		                            event.getX(0),event.getY(0),
+	        		                            event.getX(1),event.getY(1));     break; }
+	        }
+	       break;}
+	  case MotionEvent.ACTION_UP: {
+	        switch (event.getPointerCount()) {
+	        	case 1 : { controls.pOnTouch (PasObj,Const.TouchUp  ,1,
+	        		                            event.getX(0),event.getY(0),0,0); break; }
+	        	default: { controls.pOnTouch (PasObj,Const.TouchUp  ,2,
+	        		                            event.getX(0),event.getY(0),
+	        		                            event.getX(1),event.getY(1));     break; }
+	        }
+	       break;}
+	  case MotionEvent.ACTION_POINTER_DOWN: {
+	        switch (event.getPointerCount()) {
+	        	case 1 : { controls.pOnTouch (PasObj,Const.TouchDown,1,
+	        		                            event.getX(0),event.getY(0),0,0); break; }
+	        	default: { controls.pOnTouch (PasObj,Const.TouchDown,2,
+	        		                            event.getX(0),event.getY(0),
+	        		                            event.getX(1),event.getY(1));     break; }
+	        }
+	       break;}
+	  case MotionEvent.ACTION_POINTER_UP  : {
+	  	    switch (event.getPointerCount()) {
+	        	case 1 : { controls.pOnTouch (PasObj,Const.TouchUp  ,1,
+	        		                            event.getX(0),event.getY(0),0,0); break; }
+	        	default: { controls.pOnTouch (PasObj,Const.TouchUp  ,2,
+	        		                            event.getX(0),event.getY(0),
+	        		                            event.getX(1),event.getY(1));     break; }
+	        }
+	       break;}
+	} 
+	return true;
+	}
+
+	public Bitmap GetDrawingCache(){
+		this.setDrawingCacheEnabled(true);		
+		Bitmap b = Bitmap.createBitmap(this.getDrawingCache());
+		this.setDrawingCacheEnabled(false);	
+	    return b;	   
+	}
+
+	//
+	@Override
+	/*.*/public  void onDraw(Canvas canvas) {
+	  mCanvas = canvas;
+	  controls.pOnDraw(PasObj, mCanvas); // improvement required
+	}
+
+	public void SaveToFile(String _filename ) {
+	  Bitmap image = Bitmap.createBitmap( getWidth(), getHeight(), Bitmap.Config.ARGB_8888);
+	  Canvas c = new Canvas( image );
+	  draw( c );  
+	  FileOutputStream fos = null;
+	  try {
+	     fos = new FileOutputStream( _filename );
+	     if (fos != null) {
+	    	 
+	       if ( _filename.toLowerCase().contains(".jpg") ) image.compress(Bitmap.CompressFormat.JPEG, 90, fos);
+	       if ( _filename.toLowerCase().contains(".png") ) image.compress(Bitmap.CompressFormat.PNG, 100, fos);
+	        
+	       fos.close(); 
+	     }  
+	   }
+	   catch ( Exception e) {
+	     Log.e("jDrawingView_SaveImage1", "Exception: "+ e.toString() ); 
+	   }
+	}
+
+	public void SaveToFile(String _path, String _filename) {
+		
+		Bitmap image = Bitmap.createBitmap( getWidth(), getHeight(), Bitmap.Config.ARGB_8888);
+		Canvas c = new Canvas( image );
+		draw( c );
+		
+	    File file = new File (_path +"/"+ _filename);	    
+	    if (file.exists ()) file.delete (); 
+	    try {
+	        FileOutputStream out = new FileOutputStream(file);	  
+	        
+	        if ( _filename.toLowerCase().contains(".jpg") ) image.compress(Bitmap.CompressFormat.JPEG, 90, out);
+	        if ( _filename.toLowerCase().contains(".png") ) image.compress(Bitmap.CompressFormat.PNG, 100, out);
+	        
+	         out.flush();
+	         out.close();
+	    } catch (Exception e) {
+	    	Log.e("jDrawingView_SaveToFile2", "Exception: "+ e.toString() );
+	    }  	     	   
+  }
+	
+	public int GetHeight() {	
+	  return getHeight();
+	}  
+
+	public int GetWidth() {
+		return getWidth();
+	}
+
+	private Bitmap GetResizedBitmap(Bitmap _bitmap, int _newWidth, int _newHeight){
+			   float factorH = _newHeight / (float)_bitmap.getHeight();
+			   float factorW = _newWidth / (float)_bitmap.getWidth();
+			   float factorToUse = (factorH > factorW) ? factorW : factorH;
+			   Bitmap bm = Bitmap.createScaledBitmap(_bitmap,
+			     (int) (_bitmap.getWidth() * factorToUse),
+			     (int) (_bitmap.getHeight() * factorToUse),false);     
+			   return bm;
+	}
+
+	public void DrawBitmap(Bitmap _bitmap, int _width, int _height) {
+			Bitmap bmp = GetResizedBitmap(_bitmap, _width, _height);
+			Rect rect = new Rect(0, 0, _width, _height);	
+			mCanvas.drawBitmap(bmp,null,rect,mPaint);	
+	}
+	
+		//0 , 0, w, h //int left/b, int top/l, int right/r, int bottom/t) 
+	public  void DrawBitmap(Bitmap _bitmap, int _left, int _top, int _right, int _bottom) {  //int b, int l, int r, int t 	
+		    /* Figure out which way needs to be reduced less */
+			/*
+		    int scaleFactor = 1;
+		    if ((right > 0) && (bottom > 0)) {
+		        scaleFactor = Math.min(bitmap.getWidth()/(right-left), bitmap.getHeight()/(bottom-top));
+		    }	
+			*/	
+		    Rect rect = new Rect(_left,_top, _right, _bottom);
+		    if ( (_bitmap.getHeight() > GL10.GL_MAX_TEXTURE_SIZE) || (_bitmap.getWidth() > GL10.GL_MAX_TEXTURE_SIZE)) {								                   	   
+				int nh = (int) ( _bitmap.getHeight() * (512.0 / _bitmap.getWidth()) );	
+				Bitmap scaled = Bitmap.createScaledBitmap(_bitmap,512, nh, true);
+				mCanvas.drawBitmap(scaled,null,rect,mPaint);			
+			}
+			else {
+				mCanvas.drawBitmap(_bitmap,null,rect,mPaint);
+			}		   
+	}
+		
+	public  void SetPaintWidth(float _width) {
+			  mPaint.setStrokeWidth(_width);
+	}
+
+	public  void SetPaintStyle(int _style) {
+	  switch (_style) {
+		  case 0  : { mPaint.setStyle(Paint.Style.FILL           ); break; }
+		  case 1  : { mPaint.setStyle(Paint.Style.FILL_AND_STROKE); break; }
+		  case 2  : { mPaint.setStyle(Paint.Style.STROKE);          break; }
+		  default : { mPaint.setStyle(Paint.Style.FILL           ); break; }
+		};
+	}
+
+	public  void SetPaintColor(int _color) {
+	  mPaint.setColor(_color);
+	}
+
+	public  void SetTextSize(float _textSize) {
+	   mPaint.setTextSize(_textSize);
+	}
+		
+	public  void SetTypeface(int _typeface) {		
+		 Typeface t = null; 
+		  switch (_typeface) { 
+		    case 0: t = Typeface.DEFAULT; break; 
+		    case 1: t = Typeface.SANS_SERIF; break; 
+		    case 2: t = Typeface.SERIF; break; 
+		    case 3: t = Typeface.MONOSPACE; break; 
+		  } 
+		  mPaint.setTypeface(t); 				  				 
+	}
+	
+	public  void DrawLine(float _x1, float _y1, float _x2, float _y2) {
+		mCanvas.drawLine(_x1,_y1,_x2,_y2,mPaint);
+	}
+
+	public  void DrawText(String _text, float _x, float _y ) {
+		 mCanvas.drawText(_text,_x,_y,mPaint);
+	}
+	
+	   public void DrawLine(float[] _points) {	 
+		   mCanvas.drawLines(_points, mPaint);        	     
+	   }
+
+	   public void DrawPoint(float _x1, float _y1) {	   
+		   mCanvas.drawPoint(_x1,_y1,mPaint);		   
+	   }
+	   
+	   public void DrawCircle(float _cx, float _cy, float _radius) {	   
+		   mCanvas.drawCircle(_cx, _cy, _radius, mPaint);		   
+	   }
+	      
+	   public void DrawBackground(int _color) {
+		   mCanvas.drawColor(_color);
+	   }
+	      
+	  public void DrawRect(float _left, float _top, float _right, float _bottom) { 
+		  mCanvas.drawRect(_left, _top, _right, _bottom, mPaint);
+	  }	
+	
+	  private int GetDrawableResourceId(String _resName) {
+		  try {
+		     Class<?> res = R.drawable.class;
+		     Field field = res.getField(_resName);  //"drawableName"
+		     int drawableId = field.getInt(null);
+		     return drawableId;
+		  }
+		  catch (Exception e) {
+		     //Log.e("jDrawingView", "Failure to get drawable id.", e);
+		     return 0;
+		  }
+	}
+
+	private Drawable GetDrawableResourceById(int _resID) {
+		return (Drawable)( this.controls.activity.getResources().getDrawable(_resID));	
+	}
+	        
+	public void SetImageByResourceIdentifier(String _imageResIdentifier) {
+		Drawable d = GetDrawableResourceById(GetDrawableResourceId(_imageResIdentifier));
+		Bitmap bmp = ((BitmapDrawable)d).getBitmap();
+		this.DrawBitmap(bmp);
+		this.invalidate();
+	}
+	
+	public void DrawBitmap(Bitmap _bitmap){				
+	    int w = _bitmap.getWidth();
+	    int h = _bitmap.getHeight();		
+	    Rect rect = new Rect(0, 0, w, h);				
+		Bitmap bmp = GetResizedBitmap(_bitmap, w, h);			
+		mCanvas.drawBitmap(bmp,null,rect,mPaint);	    		
+		/*					  
+	    if ( (_bitmap.getHeight() > GL10.GL_MAX_TEXTURE_SIZE) || (_bitmap.getWidth() > GL10.GL_MAX_TEXTURE_SIZE)) {								                   	   
+			int nh = (int) ( _bitmap.getHeight() * (512.0 / _bitmap.getWidth()) );	
+			Bitmap scaled = Bitmap.createScaledBitmap(_bitmap,512, nh, true);
+			mCanvas.drawBitmap(scaled,null,rect,mPaint);			
+		}
+		else {
+			mCanvas.drawBitmap(_bitmap,null,rect,mPaint);
+		}
+	    */
+	}
+	  
+} //end class
+
 //**new jComponent class entrypoint**//please, do not remove/change this line!
 
 //Javas/Pascal Interface Class 
@@ -18832,5 +19243,9 @@ public float[] benchMark1 () {
    public java.lang.Object jAutoTextView_jCreate(long _Self) {
 	      return (java.lang.Object)(new jAutoTextView(this,_Self));
    }
+   
+   public java.lang.Object jDrawingView_jCreate(long _Self) {
+	      return (java.lang.Object)(new jDrawingView(this,_Self));
+   }   
 	     
 }

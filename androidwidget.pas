@@ -1490,6 +1490,9 @@ var
   gjAppName   : PChar; // Ex 'com.kredix';
   gjClassName : PChar; // Ex 'com/kredix/Controls';
 
+  ActivityModeDesign: TActivityMode = actMain;
+
+
 implementation
 
 //------------------------------------------------------------------------------
@@ -2225,7 +2228,7 @@ begin
   FCloseCallBack.Event  := nil;
   FCloseCallBack.EventData:= nil; //by jmpessoa
   FCloseCallBack.Sender := nil;
-  FActivityMode         := actMain;  //actMain, actRecyclable, actSplash
+  FActivityMode         := ActivityModeDesign; //actMain;  //actMain, actRecyclable, actSplash
 
   FActionBarTitle:= abtDefault;
 

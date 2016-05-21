@@ -479,8 +479,8 @@ type
     Procedure LoadFromRes( imgResIdenfier: String);  // ..res/drawable
 
     Procedure CreateJavaBitmap(w,h : Integer);
-    Function  GetJavaBitmap: jObject;
-    Function  GetImage: jObject;
+    Function  GetJavaBitmap: jObject;  //deprecated ..
+    Function  GetImage(): jObject;
 
     function BitmapToArrayOfJByte(var bufferImage: TDynArrayOfJByte): integer;  //local/self
 
@@ -509,7 +509,7 @@ type
     function GetResizedBitmap(_factorScaleX: single; _factorScaleY: single): jObject; overload;
 
     function GetByteBuffer(_width: integer; _height: integer): jObject;
-    function GetBitmapFromByteBuffer(_byteBuffer: jObject; _width: integer; _height: integer): jObject;
+    function GetBitmapFromByteBuffer(_byteBuffer: jObject; _width: integer; _height: integer): jObject; overload;
     function GetBitmapFromByteArray(var _image: TDynArrayOfJByte): jObject;
 
     function GetByteBufferFromBitmap(_bmap: jObject): jObject; overload;
@@ -722,8 +722,8 @@ type
 
   jTextView = class(jVisualControl)
   private
-    FFontFace: TFontFace;
-    FOnClick: TOnNotify;
+    // FFontFace: TFontFace;
+    //FOnClick: TOnNotify;
     FTextAlignment: TTextAlignment;
     FTextTypeFace: TTextTypeFace;
 
@@ -1076,19 +1076,26 @@ type
     procedure Init(refApp: jApp); override;
     Procedure SetImageByName(Value : string);
     Procedure SetImageByIndex(Value : integer);
-    procedure SetImageBitmap(bitmap: jObject); overload;
+
+    procedure SetImageBitmap(bitmap: jObject); overload;  //deprecated
+    procedure SetImage(bitmap: jObject); overload;
+
     procedure SetImageByResIdentifier(_imageResIdentifier: string);    // ../res/drawable
 
     function GetBitmapHeight: integer;
     function GetBitmapWidth: integer;
     procedure SetImageMatrixScale(_scaleX: single; _scaleY: single);
     procedure SetScaleType(_scaleType: TImageScaleType);
-    function GetBitmapImage(): jObject;
+
+    function GetBitmapImage(): jObject;  //deprecated ..
+    function GetImage(): jObject;
+
     procedure SetImageFromURI(_uri: jObject);
     procedure SetImageFromIntentResult(_intentData: jObject);
     procedure SetImageThumbnailFromCamera(_intentData: jObject);
     procedure SetImageFromJByteArray(var _image: TDynArrayOfJByte);
-    procedure SetImageBitmap(_bitmap: jObject; _width: integer; _height: integer); overload;
+    procedure SetImageBitmap(_bitmap: jObject; _width: integer; _height: integer); overload; //deprecated
+    procedure SetImage(_bitmap: jObject; _width: integer; _height: integer); overload;
 
     property Count: integer read GetCount;
   published
@@ -1369,6 +1376,9 @@ type
     Procedure UpdateLayout; override;
     procedure Init(refApp: jApp); override;
     Procedure SaveToFile(fileName:String);
+    function GetDrawingCache(): jObject;
+    function GetImage(): jObject;
+
     // Property
     //property Parent: jObject  read  FjPRLayout write SetParent; // Java : Parent Relative Layout
   published
@@ -1606,7 +1616,7 @@ implementation
 
 
 uses
-  customdialog, radiogroup;
+  customdialog, radiogroup, drawingview;
 
 //-----------------------------------------------------------------------------
 // Asset
@@ -1987,6 +1997,12 @@ begin
     jForm(jView(Obj).Owner).UpdateJNI(gApp);
     jView(Obj).GenEvent_OnDraw(Obj, jCanvas);
   end;
+  if Obj is jDrawingView  then
+  begin
+    jDrawingView(Obj).UpdateJNI(gApp);
+    jForm(jView(Obj).Owner).UpdateJNI(gApp);
+    jDrawingView(Obj).GenEvent_OnDraw(Obj, jCanvas);
+  end;
 end;
 
 Procedure Java_Event_pOnClick(env: PJNIEnv; this: jobject; Obj: TObject; Value: integer);
@@ -2251,6 +2267,12 @@ begin
   begin
     jForm(jView(Obj).Owner).UpdateJNI(gApp);
     jView(Obj).GenEvent_OnTouch(Obj,act,cnt,x1,y1,x2,y2);
+    Exit;
+  end;
+  if Obj is jDrawingView then
+  begin
+    jForm(jView(Obj).Owner).UpdateJNI(gApp);
+    jDrawingView(Obj).GenEvent_OnTouch(Obj,act,cnt,x1,y1,x2,y2);
     Exit;
   end;
 end;
@@ -4512,7 +4534,13 @@ begin
   Result:= FImageIndex;
 end;
 
-procedure jImageView.SetImageBitmap(bitmap: jObject);
+procedure jImageView.SetImageBitmap(bitmap: jObject); //deprecated..
+begin
+  if FInitialized then
+     jImageView_setBitmapImage(FjEnv, FjObject , bitmap);
+end;
+
+procedure jImageView.SetImage(bitmap: jObject);
 begin
   if FInitialized then
      jImageView_setBitmapImage(FjEnv, FjObject , bitmap);
@@ -4707,7 +4735,14 @@ begin
      jImageView_SetScaleType(FjEnv, FjObject, Ord(_scaleType));
 end;
 
-function jImageView.GetBitmapImage(): jObject;
+function jImageView.GetBitmapImage(): jObject; //deprecated ...
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jImageView_GetBitmapImage(FjEnv, FjObject);
+end;
+
+function jImageView.GetImage(): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
@@ -4743,13 +4778,19 @@ if FInitialized then
    jImageView_SetImageFromByteArray(FjEnv, FjObject, _image);
 end;
 
-procedure jImageView.SetImageBitmap(_bitmap: jObject; _width: integer; _height: integer);
+procedure jImageView.SetImageBitmap(_bitmap: jObject; _width: integer; _height: integer); //deprecated
 begin
   //in designing component state: set value here...
   if FInitialized then
      jImageView_SetBitmapImage(FjEnv, FjObject, _bitmap ,_width ,_height);
 end;
 
+procedure jImageView.SetImage(_bitmap: jObject; _width: integer; _height: integer);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jImageView_SetBitmapImage(FjEnv, FjObject, _bitmap ,_width ,_height);
+end;
 
 //  new by jmpessoa
 {jImageList}
@@ -6910,7 +6951,7 @@ begin
   end;
 end;
 
-Function jBitmap.GetImage: jObject;
+Function jBitmap.GetImage(): jObject;
 begin
   if FInitialized then
   begin
@@ -6930,6 +6971,7 @@ begin
   begin
 
     PJavaPixel:= nil;
+    //point to and lock java bitmap image ...
     Self.LockPixels(PJavaPixel); //ok  ... demo API LockPixels - overloaded - paramenter is "PJavaPixel"
     k:= 0;
     w:= Self.Width;
@@ -7646,6 +7688,20 @@ begin
        Value.FreeNotification(self);
     end;
   end;
+end;
+
+function jView.GetDrawingCache(): jObject;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jView_GetBitmap(FjEnv, FjObject);
+end;
+
+function jView.GetImage(): jObject;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jView_GetBitmap(FjEnv, FjObject);
 end;
 
 //------------------------------------------------------------------------------
