@@ -471,25 +471,34 @@ function TApkBuilder.CheckAvailableDevices: Boolean;
 var
   sl, devs: TStringList;
   i: Integer;
-  dev: Boolean;
+  dev, NeedReget: Boolean;
   str: string;
 begin
   sl := TStringList.Create;
   devs := TStringList.Create;
   try
     repeat
+      NeedReget := False;
       sl.Clear;
       RunAndGetOutput(IncludeTrailingPathDelimiter(FSdkPath) + 'platform-tools'
         + PathDelim + 'adb', 'devices', sl);
       dev := False;
       for i := 0 to sl.Count - 1 do
-        if dev then
+      begin
+        str := Trim(sl[i]);
+        if str = '' then Continue;
+        if str[1] = '*' then
         begin
-          str := Trim(sl[i]);
-          if str <> '' then devs.Add(str);
-        end else
-        if Pos('List ', sl[i]) = 1 then
+          NeedReget := True;
+          Break;
+        end;
+        if dev then
+          devs.Add(str)
+        else
+        if Pos('List ', str) = 1 then
           dev := True;
+      end;
+      if NeedReget then Continue;
       if devs.Count = 0 then
         with TfrmStartEmulator.Create(FSdkPath, @RunAndGetOutput) do
         try
