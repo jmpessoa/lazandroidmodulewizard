@@ -1,6 +1,6 @@
 package com.example.dummyapp;
 
-//Lamw: Lazarus Android Module Wizard  - version 0.6 - revision 45.1 - 21 May - 2016 
+//Lamw: Lazarus Android Module Wizard  - version 0.6 - revision 45.2 - 21 May - 2016 
 //Form Designer and Components development model!
 //
 //https://github.com/jmpessoa/lazandroidmodulewizard
@@ -1216,20 +1216,32 @@ public String GetDeviceManufacturer() {
   return android.os.Build.MANUFACTURER;  
 }
 
-public void SetKeepScreenOn() {
-	controls.activity.getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+public void SetKeepScreenOn(boolean _value) {
+  if (_value)
+	   controls.activity.getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+  else
+	  controls.activity.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);		
 }
 
-public void SetTurnScreenOn() {
-	controls.activity.getWindow().addFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);
+public void SetTurnScreenOn(boolean _value) {
+	if (_value)
+	   controls.activity.getWindow().addFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);
+	else
+		controls.activity.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);
 }
 
-public void SetAllowLockWhileScreenOn() {
-	controls.activity.getWindow().addFlags(WindowManager.LayoutParams.FLAG_ALLOW_LOCK_WHILE_SCREEN_ON);
+public void SetAllowLockWhileScreenOn(boolean _value) {
+	if (_value)
+	   controls.activity.getWindow().addFlags(WindowManager.LayoutParams.FLAG_ALLOW_LOCK_WHILE_SCREEN_ON);
+	else
+	   controls.activity.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_ALLOW_LOCK_WHILE_SCREEN_ON);
 }
 
-public void SetShowWhenLocked() {
-	controls.activity.getWindow().addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);
+public void SetShowWhenLocked(boolean _value) {
+	if (_value)
+	    controls.activity.getWindow().addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);
+	else
+		controls.activity.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);
 }
 
 }

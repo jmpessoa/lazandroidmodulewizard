@@ -1054,10 +1054,11 @@ type
     function GetDeviceModel(): string;
     function GetDeviceManufacturer(): string;
 
-    procedure SetKeepScreenOn();  //thanks to noyse
-    procedure SetTurnScreenOn();
-    procedure SetAllowLockWhileScreenOn();
-    procedure SetShowWhenLocked();
+    procedure SetKeepScreenOn(_value: boolean); //thanks to noisy
+    procedure SetTurnScreenOn(_value: boolean);
+    procedure SetAllowLockWhileScreenOn(_value: boolean);
+    procedure SetShowWhenLocked(_value: boolean);
+
     // Property
     property View         : jObject        read FjRLayout; //layout!
 
@@ -1302,11 +1303,10 @@ end;
   function jForm_GetDeviceModel(env: PJNIEnv; _jform: JObject): string;
   function jForm_GetDeviceManufacturer(env: PJNIEnv; _jform: JObject): string;
 
-  procedure jForm_SetKeepScreenOn(env: PJNIEnv; _jform: JObject);
-  procedure jForm_SetTurnScreenOn(env: PJNIEnv; _jform: JObject);
-  procedure jForm_SetAllowLockWhileScreenOn(env: PJNIEnv; _jform: JObject);
-  procedure jForm_SetShowWhenLocked(env: PJNIEnv; _jform: JObject);
-
+  procedure jForm_SetKeepScreenOn(env: PJNIEnv; _jform: JObject; _value: boolean);
+  procedure jForm_SetTurnScreenOn(env: PJNIEnv; _jform: JObject; _value: boolean);
+  procedure jForm_SetAllowLockWhileScreenOn(env: PJNIEnv; _jform: JObject; _value: boolean);
+  procedure jForm_SetShowWhenLocked(env: PJNIEnv; _jform: JObject; _value: boolean);
 
 //jni API Bridge
 
@@ -3044,32 +3044,32 @@ begin
    Result:= jForm_GetDeviceManufacturer(FjEnv, FjObject);
 end;
 
-procedure jForm.SetKeepScreenOn();
+procedure jForm.SetKeepScreenOn(_value: boolean);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jForm_SetKeepScreenOn(FjEnv, FjObject);
+     jForm_SetKeepScreenOn(FjEnv, FjObject, _value);
 end;
 
-procedure jForm.SetTurnScreenOn();
+procedure jForm.SetTurnScreenOn(_value: boolean);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jForm_SetTurnScreenOn(FjEnv, FjObject);
+     jForm_SetTurnScreenOn(FjEnv, FjObject, _value);
 end;
 
-procedure jForm.SetAllowLockWhileScreenOn();
+procedure jForm.SetAllowLockWhileScreenOn(_value: boolean);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jForm_SetAllowLockWhileScreenOn(FjEnv, FjObject);
+     jForm_SetAllowLockWhileScreenOn(FjEnv, FjObject, _value);
 end;
 
-procedure jForm.SetShowWhenLocked();
+procedure jForm.SetShowWhenLocked(_value: boolean);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jForm_SetShowWhenLocked(FjEnv, FjObject);
+     jForm_SetShowWhenLocked(FjEnv, FjObject, _value);
 end;
 
 {-------- jForm_JNI_Bridge ----------}
@@ -3882,52 +3882,61 @@ begin
   env^.DeleteLocalRef(env, jCls);
 end;
 
-procedure jForm_SetKeepScreenOn(env: PJNIEnv; _jform: JObject);
+procedure jForm_SetKeepScreenOn(env: PJNIEnv; _jform: JObject; _value: boolean);
 var
+  jParams: array[0..0] of jValue;
   jMethod: jMethodID=nil;
   jCls: jClass=nil;
 begin
+  jParams[0].z:= JBool(_value);
   jCls:= env^.GetObjectClass(env, _jform);
-  jMethod:= env^.GetMethodID(env, jCls, 'SetKeepScreenOn', '()V');
-  env^.CallVoidMethod(env, _jform, jMethod);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetKeepScreenOn', '(Z)V');
+  env^.CallVoidMethodA(env, _jform, jMethod, @jParams);
   env^.DeleteLocalRef(env, jCls);
 end;
 
 
-procedure jForm_SetTurnScreenOn(env: PJNIEnv; _jform: JObject);
+procedure jForm_SetTurnScreenOn(env: PJNIEnv; _jform: JObject; _value: boolean);
 var
+  jParams: array[0..0] of jValue;
   jMethod: jMethodID=nil;
   jCls: jClass=nil;
 begin
+  jParams[0].z:= JBool(_value);
   jCls:= env^.GetObjectClass(env, _jform);
-  jMethod:= env^.GetMethodID(env, jCls, 'SetTurnScreenOn', '()V');
-  env^.CallVoidMethod(env, _jform, jMethod);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetTurnScreenOn', '(Z)V');
+  env^.CallVoidMethodA(env, _jform, jMethod, @jParams);
   env^.DeleteLocalRef(env, jCls);
 end;
 
 
-procedure jForm_SetAllowLockWhileScreenOn(env: PJNIEnv; _jform: JObject);
+procedure jForm_SetAllowLockWhileScreenOn(env: PJNIEnv; _jform: JObject; _value: boolean);
 var
+  jParams: array[0..0] of jValue;
   jMethod: jMethodID=nil;
   jCls: jClass=nil;
 begin
+  jParams[0].z:= JBool(_value);
   jCls:= env^.GetObjectClass(env, _jform);
-  jMethod:= env^.GetMethodID(env, jCls, 'SetAllowLockWhileScreenOn', '()V');
-  env^.CallVoidMethod(env, _jform, jMethod);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetAllowLockWhileScreenOn', '(Z)V');
+  env^.CallVoidMethodA(env, _jform, jMethod, @jParams);
   env^.DeleteLocalRef(env, jCls);
 end;
 
 
-procedure jForm_SetShowWhenLocked(env: PJNIEnv; _jform: JObject);
+procedure jForm_SetShowWhenLocked(env: PJNIEnv; _jform: JObject; _value: boolean);
 var
+  jParams: array[0..0] of jValue;
   jMethod: jMethodID=nil;
   jCls: jClass=nil;
 begin
+  jParams[0].z:= JBool(_value);
   jCls:= env^.GetObjectClass(env, _jform);
-  jMethod:= env^.GetMethodID(env, jCls, 'SetShowWhenLocked', '()V');
-  env^.CallVoidMethod(env, _jform, jMethod);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetShowWhenLocked', '(Z)V');
+  env^.CallVoidMethodA(env, _jform, jMethod, @jParams);
   env^.DeleteLocalRef(env, jCls);
 end;
+
 
 //-----------------------------------------------
    {jApp by jmpessoa}
