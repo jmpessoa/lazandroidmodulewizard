@@ -8,7 +8,7 @@ object frmStartEmulator: TfrmStartEmulator
   ClientHeight = 242
   ClientWidth = 320
   Position = poScreenCenter
-  LCLVersion = '1.5'
+  LCLVersion = '1.7'
   object Panel1: TPanel
     Left = 224
     Height = 242
@@ -176,11 +176,11 @@ object frmStartEmulator: TfrmStartEmulator
     Columns = <    
       item
         Title.Caption = 'Name'
-        Width = 104
+        Width = 96
       end    
       item
         Title.Caption = 'State'
-        Width = 104
+        Width = 96
       end>
     ExtendedSelect = False
     FixedCols = 0
@@ -188,13 +188,13 @@ object frmStartEmulator: TfrmStartEmulator
     TabOrder = 1
     OnDrawCell = DrawGrid1DrawCell
     ColWidths = (
-      104
-      104
+      96
+      96
     )
   end
   object ActionList1: TActionList
     left = 144
-    top = 112
+    top = 114
     object acRefresh: TAction
       Caption = 'Refresh'
       OnExecute = acRefreshExecute

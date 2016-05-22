@@ -12,6 +12,8 @@ uses
 type
   TRunAndGetOutputProc = function (const cmd, params: string; Aout: TStrings): Integer of object;
 
+  TAvdState = (asUnknown, asOffLine, asOnLine);
+
   { TfrmStartEmulator }
 
   TfrmStartEmulator = class(TForm)
@@ -37,6 +39,7 @@ type
     FRun: TRunAndGetOutputProc;
     devs, avds, emul_wnds: TStringList;
     StartPushed: Integer;
+    function GetAvdState(Index: Integer): TAvdState;
   public
     { public declarations }
     constructor Create(ASDKPath: string; run: TRunAndGetOutputProc); reintroduce;
@@ -106,33 +109,35 @@ begin
 end;
 {$endif}
 
+function TfrmStartEmulator.GetAvdState(Index: Integer): TAvdState;
+var
+  str: string;
+  i, j: Integer;
+begin
+  Result := asOffLine;
+  str := ':' + avds[Index];
+  for i := 0 to emul_wnds.Count - 1 do
+    if Pos(str, emul_wnds[i]) > 0 then
+    begin
+      str := emul_wnds[i];
+      str := 'emulator-' + Copy(str, 1, Pos(':', str) - 1);
+      Result := asUnknown;
+      for j := 0 to devs.Count - 1 do
+        if Pos(str, devs[j]) > 0 then
+        begin
+          Result := asOnLine;
+          Break;
+        end;
+      Break;
+    end;
+end;
+
 procedure TfrmStartEmulator.DrawGrid1DrawCell(Sender: TObject;
   aCol, aRow: Integer; aRect: TRect; aState: TGridDrawState);
-
-  function GetState(Index: Integer): string;
-  var
-    str: string;
-    i, j: Integer;
-  begin
-    Result := 'off-line';
-    str := ':' + avds[Index];
-    for i := 0 to emul_wnds.Count - 1 do
-      if Pos(str, emul_wnds[i]) > 0 then
-      begin
-        str := emul_wnds[i];
-        str := 'emulator-' + Copy(str, 1, Pos(':', str) - 1);
-        Result := 'unknown';
-        for j := 0 to devs.Count - 1 do
-          if Pos(str, devs[j]) > 0 then
-          begin
-            Result := 'on-line';
-            Break;
-          end;
-        Break;
-      end;
-  end;
-
-var s: string;
+const
+  AvdStateString: array [TAvdState] of string = ('unknown', 'off-line', 'on-line');
+var
+  s: string;
 begin
   s := '';
   if aRow = 0 then Exit;
@@ -150,7 +155,7 @@ begin
     end;
   case aCol of
   0: s := avds[aRow - 1];
-  1: s := GetState(aRow - 1);
+  1: s := AvdStateString[GetAvdState(aRow - 1)];
   end;
   if s <> '' then
     with DrawGrid1.Canvas do
@@ -164,7 +169,9 @@ end;
 
 procedure TfrmStartEmulator.acStartUpdate(Sender: TObject);
 begin
-  TAction(Sender).Enabled := (avds.Count > 0) and (DrawGrid1.Row <> StartPushed);
+  TAction(Sender).Enabled := (avds.Count > 0)
+    and (DrawGrid1.Row <> StartPushed)
+    and (GetAvdState(DrawGrid1.Row - 1) = asOffLine);
 end;
 
 procedure TfrmStartEmulator.acStartExecute(Sender: TObject);
@@ -184,6 +191,7 @@ end;
 procedure TfrmStartEmulator.acRefreshExecute(Sender: TObject);
 begin
   GetAVDList;
+  StartPushed := 0;
 end;
 
 constructor TfrmStartEmulator.Create(ASDKPath: string;
