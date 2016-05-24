@@ -1,0 +1,155 @@
+object AndroidModule1: TAndroidModule1
+  Left = 267
+  Top = 152
+  Width = 320
+  Height = 400
+  MarginLeft = 0
+  MarginTop = 0
+  MarginRight = 0
+  MarginBottom = 0
+  Text = 'AndroidModule1'
+  ActivityMode = actMain
+  BackgroundColor = colbrDefault
+  ActionBarTitle = abtDefault
+  object jTextView1: jTextView
+    Left = 77
+    Top = 5
+    Width = 165
+    Height = 20
+    MarginLeft = 5
+    MarginTop = 5
+    MarginRight = 5
+    MarginBottom = 5
+    Visible = True
+    PosRelativeToAnchor = []
+    PosRelativeToParent = [rpTop, rpCenterHorizontal]
+    LayoutParamWidth = lpWrapContent
+    LayoutParamHeight = lpWrapContent
+    Text = 'App Alarm Manager Demo1'
+    Alignment = taLeft
+    Enabled = True
+    BackgroundColor = colbrDefault
+    FontColor = colbrDefault
+    FontSize = 0
+    TextTypeFace = tfNormal
+    FontSizeUnit = unitDefault
+    Id = 2182462
+  end
+  object jButton1: jButton
+    Left = 87
+    Top = 34
+    Width = 146
+    Height = 40
+    MarginLeft = 2
+    MarginTop = 4
+    MarginRight = 2
+    MarginBottom = 4
+    Visible = True
+    Anchor = jTextView1
+    PosRelativeToAnchor = [raBelow]
+    PosRelativeToParent = [rpCenterHorizontal]
+    LayoutParamWidth = lpHalfOfParent
+    LayoutParamHeight = lpWrapContent
+    Text = 'Pick Date'
+    BackgroundColor = colbrDefault
+    FontColor = colbrDefault
+    FontSize = 0
+    FontSizeUnit = unitDefault
+    OnClick = jButton1Click
+    Id = 6069139
+  end
+  object jButton2: jButton
+    Left = 87
+    Top = 82
+    Width = 146
+    Height = 40
+    MarginLeft = 2
+    MarginTop = 4
+    MarginRight = 2
+    MarginBottom = 4
+    Visible = True
+    Anchor = jButton1
+    PosRelativeToAnchor = [raBelow]
+    PosRelativeToParent = [rpCenterHorizontal]
+    LayoutParamWidth = lpHalfOfParent
+    LayoutParamHeight = lpWrapContent
+    Text = 'Pick Time'
+    BackgroundColor = colbrDefault
+    FontColor = colbrDefault
+    FontSize = 0
+    FontSizeUnit = unitDefault
+    OnClick = jButton2Click
+    Id = 7246417
+  end
+  object jButton3: jButton
+    Left = 87
+    Top = 130
+    Width = 146
+    Height = 40
+    MarginLeft = 2
+    MarginTop = 4
+    MarginRight = 2
+    MarginBottom = 4
+    Visible = True
+    Anchor = jButton2
+    PosRelativeToAnchor = [raBelow]
+    PosRelativeToParent = [rpCenterHorizontal]
+    LayoutParamWidth = lpHalfOfParent
+    LayoutParamHeight = lpWrapContent
+    Text = 'Start Alarm'
+    BackgroundColor = colbrDefault
+    FontColor = colbrDefault
+    FontSize = 0
+    FontSizeUnit = unitDefault
+    OnClick = jButton3Click
+    Id = 1481174
+  end
+  object jButton4: jButton
+    Left = 87
+    Top = 178
+    Width = 146
+    Height = 40
+    MarginLeft = 2
+    MarginTop = 4
+    MarginRight = 2
+    MarginBottom = 4
+    Visible = True
+    Anchor = jButton3
+    PosRelativeToAnchor = [raBelow]
+    PosRelativeToParent = [rpCenterHorizontal]
+    LayoutParamWidth = lpHalfOfParent
+    LayoutParamHeight = lpWrapContent
+    Text = 'Stop Alarm'
+    BackgroundColor = colbrDefault
+    FontColor = colbrDefault
+    FontSize = 0
+    FontSizeUnit = unitDefault
+    OnClick = jButton4Click
+    Id = 6398955
+  end
+  object jBroadcastReceiver1: jBroadcastReceiver
+    IntentActionFilter = afNone
+    OnReceiver = jBroadcastReceiver1Receiver
+    left = 224
+    top = 176
+  end
+  object jTimePickerDialog1: jTimePickerDialog
+    OnTimePicker = jTimePickerDialog1TimePicker
+    left = 240
+    top = 24
+  end
+  object jDatePickerDialog1: jDatePickerDialog
+    OnDatePicker = jDatePickerDialog1DatePicker
+    left = 240
+    top = 88
+  end
+  object jAlarmManager1: jAlarmManager
+    left = 167
+    top = 261
+  end
+  object jIntentManager1: jIntentManager
+    IntentAction = iaNone
+    left = 79
+    top = 238
+  end
+end

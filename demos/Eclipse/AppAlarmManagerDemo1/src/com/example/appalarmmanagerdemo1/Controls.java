@@ -1,4 +1,4 @@
-package com.example.dummyapp;
+package com.example.appalarmmanagerdemo1;
 
 //Lamw: Lazarus Android Module Wizard  - version 0.6 - revision 46 - 24 May - 2016 
 //Form Designer and Components development model!

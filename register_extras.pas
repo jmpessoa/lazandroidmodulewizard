@@ -8,6 +8,7 @@ interface
 
 uses 
   Classes,
+  alarmmanager,
   drawingview,
   autocompletetextview,
   radiogroup,
@@ -55,6 +56,7 @@ implementation
   
 Procedure Register;
 begin
+  {$I jalarmmanager_icon.lrs}
   {$I jdrawingview_icon.lrs}
   {$I jautotextview_icon.lrs}
   {$I jradiogroup_icon.lrs}
@@ -93,6 +95,7 @@ begin
   {$I jmyhello_icon.lrs}
   RegisterComponents('Android Bridges Extra',
     [
+      jAlarmManager,
       jDrawingView,
       jAutoTextView,
       jRadioGroup,

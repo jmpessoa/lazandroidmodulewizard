@@ -142,6 +142,11 @@
 	*
 	****************************************************************************************************
 
+Version 0.6 - rev. 46 - 24 May 2016 - 
+
+	NEW!	jAlarmManager component
+	NEW!	AppAlarmManagerDemo1
+
 Version 0.6 - rev. 45 - 21 May 2016 - 
 
 	NEW!	jForm methods:
