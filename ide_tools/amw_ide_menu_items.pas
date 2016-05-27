@@ -140,6 +140,8 @@ begin
   // And so on...
 
   RegisterIDEMenuCommand(itmRunBuilding, 'BuildAPKandRun', '[Lamw] Build Android Apk and Run',nil, @BuildAPKandRun);
+  ApkBuild.RegisterExtToolParser;
+
   //RegisterIDEMenuCommand(ideMnuAMW, 'PathToBuildFPCCross', '[Lamw] Build FPC Cross Android',nil, @StartPathToBuildFPCCross);
 
 end;

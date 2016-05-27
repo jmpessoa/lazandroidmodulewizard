@@ -33,12 +33,27 @@ type
     procedure RunAPK;
   end;
 
+procedure RegisterExtToolParser;
+
 implementation
 
 uses
   IDEExternToolIntf, LazIDEIntf, UTF8Process, Controls, EditBtn, StdCtrls,
   ButtonPanel, Dialogs, uFormStartEmulator, IniFiles, process, strutils,
   laz2_XMLRead, Laz2_DOM, laz2_XMLWrite, LazFileUtils;
+
+const
+  SubToolAnt = 'ant';
+
+type
+
+  { TAntParser }
+
+  TAntParser = class(TExtToolParser)
+  public
+    procedure ReadLine(Line: string; OutputIndex: integer; var Handled: boolean); override;
+    class function DefaultSubTool: string; override;
+  end;
 
 function QueryPath(APrompt: string; out Path: string;
   ACaption: string = 'Android Wizard: Path Missing!'): Boolean;
@@ -99,6 +114,29 @@ begin
   finally
     Free;
   end;
+end;
+
+{ TAntParser }
+
+procedure TAntParser.ReadLine(Line: string; OutputIndex: integer;
+  var Handled: boolean);
+var
+  msgLine: TMessageLine;
+begin
+  msgLine := CreateMsgLine(OutputIndex);
+  msgLine.Msg := Line;
+  if Pos('[exec] Failure', Line) > 0 then
+  begin
+    msgLine.Urgency := mluError;
+    Tool.ErrorMessage := Line;
+  end else
+    msgLine.Urgency := mluProgress;
+  AddMsgLine(msgLine);
+end;
+
+class function TAntParser.DefaultSubTool: string;
+begin
+  Result := SubToolAnt;
 end;
 
 { TApkBuilder }
@@ -544,7 +582,7 @@ begin
     Tool.CmdLineParams := '-Dtouchtest.enabled=true debug';
     if Install then
       Tool.CmdLineParams := Tool.CmdLineParams + ' install';
-    Tool.Scanners.Add(SubToolDefault);
+    Tool.Scanners.Add(SubToolAnt);
     if not RunExternalTool(Tool) then
       raise Exception.Create('Cannot build APK!');
     Result := True;
@@ -566,7 +604,7 @@ begin
     Tool.WorkingDirectory := FProjPath;
     Tool.Executable := IncludeTrailingPathDelimiter(FAntPath) + 'ant'{$ifdef windows}+'.bat'{$endif};
     Tool.CmdLineParams := 'installd';
-    Tool.Scanners.Add(SubToolDefault);
+    Tool.Scanners.Add(SubToolAnt);
     if not RunExternalTool(Tool) then
       raise Exception.Create('Cannot install APK!');
     Result := True;
@@ -606,6 +644,11 @@ begin
   finally
     Tool.Free;
   end;
+end;
+
+procedure RegisterExtToolParser;
+begin
+  ExternalToolList.RegisterParser(TAntParser);
 end;
 
 end.
