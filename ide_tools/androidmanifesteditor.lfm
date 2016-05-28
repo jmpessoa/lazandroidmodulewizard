@@ -175,9 +175,11 @@ object LamwAndroidManifestEditor: TLamwAndroidManifestEditor
       Value = 1
     end
     object Label4: TLabel
+      AnchorSideLeft.Control = seVersionCode
+      AnchorSideLeft.Side = asrBottom
       AnchorSideTop.Control = edVersionName
       AnchorSideTop.Side = asrCenter
-      Left = 112
+      Left = 109
       Height = 13
       Top = 10
       Width = 27
@@ -190,7 +192,7 @@ object LamwAndroidManifestEditor: TLamwAndroidManifestEditor
       AnchorSideLeft.Control = Label4
       AnchorSideLeft.Side = asrBottom
       AnchorSideTop.Control = gbVersion
-      Left = 145
+      Left = 142
       Height = 21
       Top = 6
       Width = 120
