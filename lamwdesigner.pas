@@ -168,9 +168,13 @@ type
     procedure Draw; override;
   end;
 
+  { TDraftRatingBar }
+
   TDraftRatingBar = class(TDraftWidget)
   public
     constructor Create(AWidget: TAndroidWidget; Canvas: TCanvas); override;
+    procedure Draw; override;
+    procedure UpdateLayout; override;
   end;
 
   TDraftDigitalClock = class(TDraftWidget)
@@ -2083,6 +2087,69 @@ begin
 
   if jRatingBar(AWidget).BackgroundColor = colbrDefault then
     Color := GetParentBackgroundColor;
+end;
+
+procedure TDraftRatingBar.Draw;
+
+  procedure DrawStar(cx, cy: Integer);
+  const
+    R1 = 18.8;
+    R2 = 8.4;
+  var
+    i: Integer;
+    p: array of TPoint;
+  begin
+    SetLength(p, 5*2);
+    for i := 0 to 4 do
+    begin
+      with p[i * 2] do
+      begin
+        x := cx + Round(R1 * Sin(i * 72 * pi / 180));
+        y := cy - Round(R1 * Cos(i * 72 * pi / 180));
+      end;
+      with p[i * 2 + 1] do
+      begin
+        x := cx + Round(R2 * Sin((i + 0.5) * 72 * pi / 180));
+        y := cy - Round(R2 * Cos((i + 0.5) * 72 * pi / 180));
+      end;
+    end;
+    with FCanvas.Brush do
+    begin
+      Style := bsSolid;
+      Color := RGBToColor(183, 183, 183);
+    end;
+    with FCanvas.Pen do
+    begin
+      Style := psSolid;
+      Width := 1;
+      Color := BlendColors(BackGroundColor, 62/114, 2, 2, 2);
+    end;
+    FCanvas.Polygon(p);
+  end;
+
+var
+  i: Integer;
+begin
+  with Fcanvas do
+  begin
+    Brush.Color := BackGroundColor;
+    if BackGroundColor <> clNone then
+      FillRect(0, 0, Self.Width, Self.Height)
+  end;
+  for i := 0 to jRatingBar(FAndroidWidget).NumStars - 1 do
+    DrawStar(24 + 48 * i, 6 + 19)
+end;
+
+procedure TDraftRatingBar.UpdateLayout;
+begin
+  with jRatingBar(FAndroidWidget) do
+  begin
+    if LayoutParamHeight = lpWrapContent then
+      FnewH := 57;
+    if LayoutParamWidth = lpWrapContent then
+      FnewW := 48 * NumStars;
+  end;
+  inherited UpdateLayout;
 end;
 
 { TDraftDigitalClock}
