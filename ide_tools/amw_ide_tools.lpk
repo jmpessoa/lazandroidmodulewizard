@@ -87,20 +87,20 @@
         <UnitName Value="uFormStartEmulator"/>
       </Item17>
       <Item18>
-        <Filename Value="androidmanifesteditor.lfm"/>
-        <Type Value="LFM"/>
+        <Filename Value="androidprojoptions.pas"/>
+        <UnitName Value="AndroidProjOptions"/>
       </Item18>
       <Item19>
-        <Filename Value="androidmanifesteditor.pas"/>
-        <UnitName Value="AndroidManifestEditor"/>
-      </Item19>
-      <Item20>
         <Filename Value="uformchangepathtondk.lfm"/>
         <Type Value="LFM"/>
-      </Item20>
-      <Item21>
+      </Item19>
+      <Item20>
         <Filename Value="uformchangepathtondk.pas"/>
         <UnitName Value="uformchangepathtondk"/>
+      </Item20>
+      <Item21>
+        <Filename Value="androidprojoptions.lfm"/>
+        <Type Value="LFM"/>
       </Item21>
     </Files>
     <RequiredPkgs Count="3">

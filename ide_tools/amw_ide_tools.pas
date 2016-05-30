@@ -4,14 +4,14 @@
 
 unit amw_ide_tools;
 
+{$warn 5023 off : no warning about unused units}
 interface
 
 uses
   amw_ide_menu_items, lazandroidtoolsexpert, uformsettingspaths, 
   uformupdatecodetemplate, AndroidXMLResString, ufrmEditor, ufrmCompCreate, 
-  uregistercompform, ApkBuild, uFormStartEmulator, AndroidManifestEditor, 
-  uformchangepathtondk, uFormBuildFPCCross, uFormGetFPCSource, 
-  LazarusPackageIntf;
+  uregistercompform, ApkBuild, uFormStartEmulator, AndroidProjOptions, 
+  uformchangepathtondk, LazarusPackageIntf;
 
 implementation
 

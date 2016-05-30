@@ -1,4 +1,4 @@
-unit AndroidManifestEditor;
+unit AndroidProjOptions;
 
 {$mode objfpc}{$H+}
 
@@ -7,7 +7,7 @@ interface
 uses
   Classes, SysUtils, LazFileUtils, laz2_XMLRead, Laz2_DOM, AvgLvlTree,
   IDEOptionsIntf, ProjectIntf, Forms, Controls, Dialogs, Grids, StdCtrls,
-  LResources, ExtCtrls, Spin;
+  LResources, ExtCtrls, Spin, ComCtrls;
 
 type
 
@@ -39,27 +39,29 @@ type
     property VersionName: string read FVersionName write FVersionName;
   end;
 
-  { TLamwAndroidManifestEditor }
+  { TLamwProjectOptions }
 
-  TLamwAndroidManifestEditor = class(TAbstractIDEOptionsEditor)
+  TLamwProjectOptions = class(TAbstractIDEOptionsEditor)
     edVersionName: TEdit;
+    ErrorPanel: TPanel;
     gbVersion: TGroupBox;
     Label1: TLabel;
     Label2: TLabel;
     Label3: TLabel;
     Label4: TLabel;
     lblErrorMessage: TLabel;
-    ErrorPanel: TPanel;
+    PageControl1: TPageControl;
+    PermissonGrid: TStringGrid;
     seMinSdkVersion: TSpinEdit;
     seTargetSdkVersion: TSpinEdit;
-    PermissonGrid: TStringGrid;
     seVersionCode: TSpinEdit;
+    tsManifest: TTabSheet;
   private
     { private declarations }
-    FOptions: TLamwAndroidManifestOptions;
+    FManifest: TLamwAndroidManifestOptions;
     procedure ErrorMessage(const msg: string);
     procedure FillPermissionGrid(Permissions: TStringList; PermNames: TStringToStringTree);
-    procedure SetControlsEnabled(en: Boolean);
+    procedure SetControlsEnabled(ts: TTabSheet; en: Boolean);
   public
     { public declarations }
     constructor Create(AOwner: TComponent); override;
@@ -286,36 +288,39 @@ begin
   WriteXMLFile(xml, FFileName);
 end;
 
-{ TLamwAndroidManifestEditor }
+{ TLamwProjectOptions }
 
-procedure TLamwAndroidManifestEditor.SetControlsEnabled(en: Boolean);
+procedure TLamwProjectOptions.SetControlsEnabled(ts: TTabSheet;
+  en: Boolean);
 var
   i: Integer;
 begin
-  for i := 0 to ControlCount - 1 do
-    Controls[i].Enabled := en;
+  with ts do
+    for i := 0 to ControlCount - 1 do
+      Controls[i].Enabled := en;
+  ErrorPanel.Enabled := True;
 end;
 
-constructor TLamwAndroidManifestEditor.Create(AOwner: TComponent);
+constructor TLamwProjectOptions.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
-  FOptions := TLamwAndroidManifestOptions.Create;
+  FManifest := TLamwAndroidManifestOptions.Create;
 end;
 
-destructor TLamwAndroidManifestEditor.Destroy;
+destructor TLamwProjectOptions.Destroy;
 begin
-  FOptions.Free;
+  FManifest.Free;
   inherited Destroy;
 end;
 
-procedure TLamwAndroidManifestEditor.ErrorMessage(const msg: string);
+procedure TLamwProjectOptions.ErrorMessage(const msg: string);
 begin
   lblErrorMessage.Caption := msg;
   ErrorPanel.Visible := True;
   ErrorPanel.Enabled := True;
 end;
 
-procedure TLamwAndroidManifestEditor.FillPermissionGrid(Permissions: TStringList;
+procedure TLamwProjectOptions.FillPermissionGrid(Permissions: TStringList;
   PermNames: TStringToStringTree);
 var
   i: Integer;
@@ -341,28 +346,28 @@ begin
   end;
 end;
 
-class function TLamwAndroidManifestEditor.SupportedOptionsClass: TAbstractIDEOptionsClass;
+class function TLamwProjectOptions.SupportedOptionsClass: TAbstractIDEOptionsClass;
 begin
   Result := nil;
 end;
 
-function TLamwAndroidManifestEditor.GetTitle: string;
+function TLamwProjectOptions.GetTitle: string;
 begin
-  Result := '[Lamw] Android Manifest';
+  Result := '[Lamw] Android Project Options';
 end;
 
-procedure TLamwAndroidManifestEditor.Setup(ADialog: TAbstractOptionsEditorDialog);
+procedure TLamwProjectOptions.Setup(ADialog: TAbstractOptionsEditorDialog);
 begin
   // localization
 end;
 
-procedure TLamwAndroidManifestEditor.ReadSettings(AOptions: TAbstractIDEOptions);
+procedure TLamwProjectOptions.ReadSettings(AOptions: TAbstractIDEOptions);
 var
   proj: TLazProject;
   fn: string;
 begin
   // reading manifest
-  SetControlsEnabled(False);
+  SetControlsEnabled(tsManifest, False);
   proj := LazarusIDE.ActiveProject;
   if (proj = nil) or (proj.IsVirtual) then Exit;
   fn := proj.MainFile.Filename;
@@ -374,7 +379,7 @@ begin
     Exit;
   end;
   try
-    with FOptions do
+    with FManifest do
     begin
       Load(fn);
       FillPermissionGrid(Permissions, PermNames);
@@ -390,14 +395,14 @@ begin
       Exit;
     end
   end;
-  SetControlsEnabled(True);
+  SetControlsEnabled(tsManifest, True);
 end;
 
-procedure TLamwAndroidManifestEditor.WriteSettings(AOptions: TAbstractIDEOptions);
+procedure TLamwProjectOptions.WriteSettings(AOptions: TAbstractIDEOptions);
 var
   i: Integer;
 begin
-  with FOptions do
+  with FManifest do
   begin
     for i := PermissonGrid.RowCount - 1 downto 1 do
       if PermissonGrid.Cells[1, i] <> '1' then
@@ -411,7 +416,7 @@ begin
 end;
 
 initialization
-  RegisterIDEOptionsEditor(GroupProject, TLamwAndroidManifestEditor, 1000);
+  RegisterIDEOptionsEditor(GroupProject, TLamwProjectOptions, 1000);
 
 end.
 
