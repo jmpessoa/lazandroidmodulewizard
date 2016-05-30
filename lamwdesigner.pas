@@ -360,6 +360,14 @@ type
     function GetVerbCount: Integer; override;
   end;
 
+  { TAndroidFormSizeEditor }
+
+  TAndroidFormSizeEditor = class(TIntegerPropertyEditor)
+  public
+    procedure Edit; override;
+    function GetAttributes: TPropertyAttributes; override;
+  end;
+
 implementation
 
 uses
@@ -428,6 +436,23 @@ procedure RegisterAndroidWidgetDraftClass(AWidgetClass: jVisualControlClass;
   ADraftClass: TDraftWidgetClass);
 begin
   DraftClassesMap.Add(AWidgetClass, ADraftClass);
+end;
+
+{ TAndroidFormSizeEditor }
+
+procedure TAndroidFormSizeEditor.Edit;
+begin
+  with TAndroidFormComponentEditor.Create(GetComponent(0) as TComponent, nil) do
+  try
+    ShowSelectSizeDialog
+  finally
+    Free
+  end;
+end;
+
+function TAndroidFormSizeEditor.GetAttributes: TPropertyAttributes;
+begin
+  Result := inherited GetAttributes + [paDialog];
 end;
 
 { TAndroidFormComponentEditor }
@@ -2450,6 +2475,8 @@ initialization
   RegisterPropertyEditor(TypeInfo(TARGBColorBridge), nil, '', TARGBColorBridgePropertyEditor);
   RegisterPropertyEditor(TypeInfo(jVisualControl), jVisualControl, 'Anchor', TAnchorPropertyEditor);
   RegisterComponentEditor(jForm, TAndroidFormComponentEditor);
+  RegisterPropertyEditor(TypeInfo(Integer), jForm, 'Width', TAndroidFormSizeEditor);
+  RegisterPropertyEditor(TypeInfo(Integer), jForm, 'Height', TAndroidFormSizeEditor);
 
   // DraftClasses registeration:
   //  * default drawing and anchoring => use TDraftWidget
