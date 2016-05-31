@@ -1216,6 +1216,7 @@ begin
     while (Result = clNone) and (w is jVisualControl) do
     begin
       d := DraftClassesMap.Find(w.ClassType);
+      if d = nil then Break;
       with d.Create(w, FCanvas) do
       begin
         Result := BackGroundColor;
