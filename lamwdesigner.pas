@@ -558,8 +558,8 @@ procedure TDraftPanel.UpdateLayout;
 var
   maxH, i, t: Integer;
 begin
-  with FAndroidWidget do
-    if ChildCount > 0 then
+  with jPanel(FAndroidWidget) do
+    if (LayoutParamHeight = lpWrapContent) and (ChildCount > 0) then
     begin
       with Children[0] do
         maxH := Top + Height + MarginBottom;
@@ -571,7 +571,7 @@ begin
         end;
       FnewH := maxH;
     end;
-  inherited UpdateLayout;
+  inherited;
 end;
 
 { TDraftControlHash }
@@ -1038,6 +1038,9 @@ end;
 { TDraftWidget }
 
 constructor TDraftWidget.Create(AWidget: TAndroidWidget; Canvas: TCanvas);
+var
+  x: TLayoutParams;
+  y, z: DWORD;
 begin
   TextColor:= clNone;
   BackGroundColor:= clNone;
@@ -1056,9 +1059,27 @@ begin
       and (Parent <> nil) then
       begin
         if not (LayoutParamWidth in [lpWrapContent]) then
-          LayoutParamWidth := GetDesignerLayoutByWH(Width, Parent.Width);
+        begin
+          x := GetDesignerLayoutByWH(FnewW, Parent.Width);
+          y := GetLayoutParamsByParent2(Parent, x, sdW);
+          if LayoutParamWidth = lpMatchParent then
+            z := Parent.Width - MarginLeft - FnewL - MarginRight
+          else
+            z := GetLayoutParamsByParent2(Parent, LayoutParamWidth, sdW);
+          if (z <> FnewW) and (Abs(y - FnewW) < Abs(z - FnewW)) then
+            LayoutParamWidth := x;
+        end;
         if not (LayoutParamHeight in [lpWrapContent]) then
-          LayoutParamHeight := GetDesignerLayoutByWH(Height, Parent.Height);
+        begin
+          x := GetDesignerLayoutByWH(FnewH, Parent.Height);
+          y := GetLayoutParamsByParent2(Parent, x, sdH);
+          if LayoutParamHeight = lpMatchParent then
+            z := Parent.Height - MarginTop - FnewT - MarginBottom
+          else
+            z := GetLayoutParamsByParent2(Parent, LayoutParamHeight, sdH);
+          if (z <> FnewH) and (Abs(y - FnewH) < Abs(z - FnewH)) then
+            LayoutParamHeight := x;
+        end;
       end;
   end;
 
@@ -1416,9 +1437,9 @@ begin
     begin
       fs := FontSize;
       if fs = 0 then fs := 18;
-      FnewH := 29 + (fs - 10) * 4 div 3; // todo: multile
+      FnewH := 29 + (fs - 10) * 4 div 3; // todo: multiline
     end;
-  inherited UpdateLayout;
+  inherited;
 end;
 
 {TDraftAutoTextView}
@@ -1478,7 +1499,7 @@ begin
     begin
       fs := FontSize;
       if fs = 0 then fs := 18;
-      FnewH := 29 + (fs - 10) * 4 div 3; // todo: multile
+      FnewH := 29 + (fs - 10) * 4 div 3; // todo: multiline
     end;
   inherited UpdateLayout;
 end;
@@ -1534,7 +1555,7 @@ end;
 
 procedure TDraftCheckBox.UpdateLayout;
 var
-  ls,  ps: Integer;
+  ls, ps: Integer;
 begin
   with jCheckBox(FAndroidWidget) do
   begin
