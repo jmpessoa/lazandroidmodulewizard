@@ -94,7 +94,7 @@ object LamwProjectOptions: TLamwProjectOptions
         end
       end
       object Label1: TLabel
-        AnchorSideLeft.Control = Owner
+        AnchorSideLeft.Control = tsManifest
         AnchorSideTop.Control = seMinSdkVersion
         AnchorSideTop.Side = asrCenter
         Left = 6
@@ -137,7 +137,7 @@ object LamwProjectOptions: TLamwProjectOptions
         AnchorSideLeft.Side = asrBottom
         AnchorSideTop.Control = gbVersion
         AnchorSideTop.Side = asrBottom
-        Left = 252
+        Left = 262
         Height = 21
         Top = 96
         Width = 50
