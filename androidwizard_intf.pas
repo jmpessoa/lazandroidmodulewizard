@@ -654,6 +654,21 @@ begin
 end;
 
 function TAndroidProjectDescriptor.GetWorkSpaceFromForm(projectType: integer): boolean;
+
+  function MakeUniqueName(const Orig: string; sl: TStrings): string;
+  var
+    i: Integer;
+  begin
+    if sl.Count = 0 then
+      Result := Orig + '1'
+    else begin
+      Result := ExtractFilePath(sl[0]) + Orig;
+      i := 1;
+      while sl.IndexOf(Result + IntToStr(i)) >= 0 do Inc(i);
+      Result := Orig + IntToStr(i);
+    end;
+  end;
+
 var
   frm: TFormWorkspace;
   strList: TStringList;
@@ -680,7 +695,7 @@ begin
     strList:= TStringList.Create;
     frm.LoadSettings(SettingsFilename);
 
-    frm.ComboSelectProjectName.Text:= 'LamwGUIProject1';
+    frm.ComboSelectProjectName.Text:= MakeUniqueName('LamwGUIProject', frm.ComboSelectProjectName.Items);
     frm.LabelTheme.Caption:= 'Android Theme:';
     frm.ComboBoxTheme.Visible:= True;
     frm.SpeedButtonHintTheme.Visible:= True;
@@ -691,7 +706,7 @@ begin
       frm.Color:= clWhite;
       frm.PanelButtons.Color:= clWhite;
 
-      frm.ComboSelectProjectName.Text:= 'LamwNoGUIProject1';
+      frm.ComboSelectProjectName.Text:= MakeUniqueName('LamwNoGUIProject', frm.ComboSelectProjectName.Items);
       frm.LabelTheme.Caption:= 'Lamw NoGUI Project';
       frm.ComboBoxTheme.Visible:= False;
       frm.SpeedButtonHintTheme.Visible:= False;
@@ -704,7 +719,7 @@ begin
       frm.Color:= clGradientInactiveCaption;
       frm.PanelButtons.Color:= clGradientInactiveCaption;
 
-      frm.ComboSelectProjectName.Text:= 'LamwConsoleApp1';
+      frm.ComboSelectProjectName.Text:= MakeUniqueName('LamwConsoleApp', frm.ComboSelectProjectName.Items);
       frm.LabelTheme.Caption:= 'Lamw NoGUI Console/Executable Project';
       frm.EditPackagePrefaceName.Visible:= False;
 
