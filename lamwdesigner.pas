@@ -1693,8 +1693,11 @@ begin
       Brush.Style := bsClear;
 
     if TextColor = clNone then
-      Font.Color := clBlack
-    else
+    begin
+      Font.Color := clBlack;
+      if MaxRGB(GetBackGroundColor) < MaxRGB2Inverse then
+        Font.Color := InvertColor(Font.Color);
+    end else
       Font.Color := TextColor;
 
     lastSize := Font.Size;
@@ -1756,16 +1759,18 @@ begin
   with Fcanvas do
   begin
     Brush.Color := BackGroundColor;
-    Font.Color := Self.TextColor;
     if BackGroundColor <> clNone then
       FillRect(0, 0, Self.Width, Self.Height)
     else
       Brush.Style := bsClear;
 
     if TextColor = clNone then
+    begin
       Font.Color := clBlack;
-
-    lastSize := Font.Size;
+      if MaxRGB(GetBackGroundColor) < MaxRGB2Inverse then
+        Font.Color := InvertColor(Font.Color);
+    end else
+      Font.Color := Self.TextColor;
 
     lastSize := Font.Size;
     Font.Size := AndroidToLCLFontSize(jCheckBox(FAndroidWidget).FontSize, 12);
