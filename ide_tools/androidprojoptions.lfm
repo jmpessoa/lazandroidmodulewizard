@@ -1,26 +1,26 @@
 object LamwProjectOptions: TLamwProjectOptions
   Left = 0
-  Height = 240
+  Height = 366
   Top = 0
-  Width = 320
-  ClientHeight = 240
-  ClientWidth = 320
+  Width = 355
+  ClientHeight = 366
+  ClientWidth = 355
   TabOrder = 0
   DesignLeft = 238
   DesignTop = 138
   object PageControl1: TPageControl
     Left = 0
-    Height = 240
+    Height = 366
     Top = 0
-    Width = 320
-    ActivePage = tsManifest
+    Width = 355
+    ActivePage = tsAppl
     Align = alClient
-    TabIndex = 0
+    TabIndex = 1
     TabOrder = 0
     object tsManifest: TTabSheet
       Caption = 'Android Manifest'
-      ClientHeight = 214
-      ClientWidth = 312
+      ClientHeight = 340
+      ClientWidth = 347
       object PermissonGrid: TStringGrid
         AnchorSideLeft.Control = tsManifest
         AnchorSideTop.Control = seMinSdkVersion
@@ -30,9 +30,9 @@ object LamwProjectOptions: TLamwProjectOptions
         AnchorSideBottom.Control = tsManifest
         AnchorSideBottom.Side = asrBottom
         Left = 6
-        Height = 85
+        Height = 211
         Top = 123
-        Width = 300
+        Width = 335
         Anchors = [akTop, akLeft, akRight, akBottom]
         AutoFillColumns = True
         BorderSpacing.Around = 6
@@ -41,7 +41,7 @@ object LamwProjectOptions: TLamwProjectOptions
           item
             ReadOnly = True
             Title.Caption = 'Permissions'
-            Width = 232
+            Width = 251
           end        
           item
             ButtonStyle = cbsCheckboxColumn
@@ -54,7 +54,7 @@ object LamwProjectOptions: TLamwProjectOptions
         RowCount = 1
         TabOrder = 0
         ColWidths = (
-          232
+          251
           64
         )
       end
@@ -66,12 +66,12 @@ object LamwProjectOptions: TLamwProjectOptions
         Left = 6
         Height = 27
         Top = 6
-        Width = 300
+        Width = 335
         Anchors = [akTop, akLeft, akRight]
         AutoSize = True
         BorderSpacing.Around = 6
         ClientHeight = 27
-        ClientWidth = 300
+        ClientWidth = 335
         TabOrder = 1
         Visible = False
         object lblErrorMessage: TLabel
@@ -82,7 +82,7 @@ object LamwProjectOptions: TLamwProjectOptions
           Left = 7
           Height = 13
           Top = 7
-          Width = 286
+          Width = 321
           Anchors = [akTop, akLeft, akRight]
           BorderSpacing.Around = 6
           Caption = 'lblErrorMessage'
@@ -154,13 +154,13 @@ object LamwProjectOptions: TLamwProjectOptions
         Left = 6
         Height = 51
         Top = 39
-        Width = 300
+        Width = 335
         Anchors = [akTop, akLeft, akRight]
         AutoSize = True
         BorderSpacing.Around = 6
         Caption = 'Version'
         ClientHeight = 33
-        ClientWidth = 296
+        ClientWidth = 331
         TabOrder = 4
         object Label3: TLabel
           AnchorSideLeft.Control = gbVersion
@@ -212,6 +212,230 @@ object LamwProjectOptions: TLamwProjectOptions
           BorderSpacing.Around = 6
           TabOrder = 1
         end
+      end
+    end
+    object tsAppl: TTabSheet
+      Caption = 'Application'
+      ClientHeight = 340
+      ClientWidth = 347
+      object Label5: TLabel
+        AnchorSideLeft.Control = tsAppl
+        AnchorSideTop.Control = edLabel
+        AnchorSideTop.Side = asrCenter
+        Left = 8
+        Height = 13
+        Top = 10
+        Width = 25
+        BorderSpacing.Left = 8
+        Caption = 'Label'
+        ParentColor = False
+      end
+      object Label6: TLabel
+        AnchorSideLeft.Control = tsAppl
+        AnchorSideTop.Control = cbTheme
+        AnchorSideTop.Side = asrCenter
+        Left = 8
+        Height = 13
+        Top = 37
+        Width = 32
+        BorderSpacing.Left = 8
+        Caption = 'Theme'
+        Enabled = False
+        ParentColor = False
+      end
+      object cbTheme: TComboBox
+        AnchorSideLeft.Control = Label6
+        AnchorSideLeft.Side = asrBottom
+        AnchorSideTop.Control = edLabel
+        AnchorSideTop.Side = asrBottom
+        Left = 46
+        Height = 21
+        Top = 33
+        Width = 154
+        BorderSpacing.Around = 6
+        Enabled = False
+        ItemHeight = 13
+        Style = csDropDownList
+        TabOrder = 0
+      end
+      object Label7: TLabel
+        Left = 8
+        Height = 1
+        Top = 61
+        Width = 1
+        ParentColor = False
+      end
+      object edLabel: TEdit
+        AnchorSideLeft.Control = cbTheme
+        AnchorSideTop.Control = tsAppl
+        Left = 46
+        Height = 21
+        Top = 6
+        Width = 154
+        BorderSpacing.Top = 6
+        TabOrder = 1
+      end
+      object GroupBox1: TGroupBox
+        AnchorSideLeft.Control = tsAppl
+        AnchorSideTop.Control = cbTheme
+        AnchorSideTop.Side = asrBottom
+        Left = 6
+        Height = 147
+        Top = 60
+        Width = 172
+        AutoSize = True
+        BorderSpacing.Left = 6
+        Caption = 'Launcher icon'
+        ClientHeight = 129
+        ClientWidth = 168
+        TabOrder = 2
+        object Label8: TLabel
+          AnchorSideLeft.Control = GroupBox1
+          AnchorSideTop.Control = cbLaunchIconSize
+          AnchorSideTop.Side = asrCenter
+          Left = 6
+          Height = 13
+          Top = 10
+          Width = 19
+          BorderSpacing.Around = 6
+          Caption = 'Size'
+          ParentColor = False
+        end
+        object SpeedButton1: TSpeedButton
+          AnchorSideLeft.Control = cbLaunchIconSize
+          AnchorSideLeft.Side = asrBottom
+          AnchorSideTop.Control = cbLaunchIconSize
+          AnchorSideTop.Side = asrCenter
+          Left = 142
+          Height = 20
+          Hint = 'Load from file...'
+          Top = 6
+          Width = 20
+          AutoSize = True
+          BorderSpacing.Around = 6
+          Glyph.Data = {
+            36040000424D3604000000000000360000002800000010000000100000000100
+            20000000000000040000640000006400000000000000000000002C86D8D12D88
+            D8F72D87D8F72D88D8F72D88D8F72D88D8F72D88D8F72D88D8F72D88D8F72D88
+            D8F72D88D8F72D87D8F72D88D8F72C86D8D1FFFFFF00FFFFFF00338ED9FBDCF0
+            FAFF98E1F6FF95E0F6FF92DFF6FF8EDEF5FF89DCF5FF85DAF4FF80D9F4FF7AD7
+            F3FF74D5F3FF70D3F2FFC2EAF8FF3594DAFFFFFFFF00FFFFFF003594DAF7EFFA
+            FEFF93E5F8FF8FE4F8FF89E3F8FF82E1F7FF7ADFF7FF71DEF6FF67DBF5FF5BD8
+            F4FF4DD4F3FF40D1F2FFCAF2FBFF3594DAFFFFFFFF00FFFFFF00369ADAF8F2FA
+            FDFF94E6F8FF92E5F8FF90E5F8FF8BE3F8FF86E2F7FF7FE1F7FF77DEF6FF6CDC
+            F6FF5ED9F4FF4FD5F3FFCCF2FBFF3594DAFFFFFFFF00FFFFFF0036A1DAF9F6FC
+            FEFF94E5F8FF93E5F8FF93E5F8FF91E5F8FF93DBE9FF93D7E3FF93D2DCFF90CE
+            D7FF8CC8CFFF86C1C6FFC9D8D6FF3594DAFFC57444E8CA7F53F137A6DAFAFEFF
+            FFFFF8FDFFFFF6FDFFFFF5FCFFFFF3FCFEFF9AE4F4FF9AE6F7FF9BE6F6FF9DE5
+            F5FF9EE5F5FF9FE5F4FFDAF3F8FF3594DAFFFDF4EEFFCA8054F935ABDAFAE8F6
+            FBFF70BCE7FF55AAE2FF4DA5E0FF91C9EBFFFAF3EFFFFDFEFDFFFFFDFCFFFFFD
+            FCFFFEFDFCFFFEFCFBFFFEFEFDFF3594DAFFEFF2E8FFCE8156FF36AADAF2F1FA
+            FDFF94DEF5FF93DCF4FF64BCE9FF3594DAFF3594DAFF3594DAFF3594DAFF3594
+            DAFF3594DAFF3594DAFF3594DAFF3594DAFFFBF6EFFFCC8355FE35AFDAF0F7FC
+            FEFF8EE4F8FF91DEF5FF9FE0F5FFACE1F6FFCA8452FFFFF7F1FFFFE9D9FFFFEA
+            DBFFFFE9D9FFFFE7D7FFFFE5D2FFFFE2CBFFFFF7F1FFCB8555FE36B3DAF8FDFE
+            FEFFFEFFFFFFFEFEFFFFFDFEFFFFFEFFFFFFE4BA91FFFFF7F0FFFFE7D5FFFDE7
+            D6FFFDE6D4FFFCE4D0FFFBE3CBFFFADCC2FFFEF3E8FFCC8656FE34B4D9D05EC2
+            E1FA60C3E2FA60C3E2FA60C3E2FA5FC3E2FAE4BB91FFFFF7F2FFFEE7D5FFFEE7
+            D5FFFDE5D1FFFAE0CAFFF9DEC4FFF7D9BCFFFDF2E7FFCC8757FEFFFFFF00FFFF
+            FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00E4BB92FFFEF7F1FFFCE5D2FFFCE4
+            D1FFFBE2CCFFF9DDC4FFF6D7BBFFF3D1AFFFFAEFE4FFCC8758FEFFFFFF00FFFF
+            FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00E4BB92FFFEF6F0FFFCE2CDFFFCE3
+            CDFFFADFC8FFF7D9BCFFF5E9DDFFFAF3EBFFFBF8F3FFCA8353FEFFFFFF00FFFF
+            FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00E4BB93FFFEF5EDFFFCDEC5FFFBE0
+            C7FFF9DCC2FFF5D3B4FFFEF9F3FFFAE2C4FFECC193FFC37D4893FFFFFF00FFFF
+            FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00E5BE96FFFFFFFEFFFDF3E9FFFDF3
+            EAFFFCF2E8FFFAEFE3FFFAF2E7FFEABB88FFCF8555B3B4693D0CFFFFFF00FFFF
+            FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00EAC39DFFE6BF96FFE4BB92FFE4BB
+            92FFD1A06CF5D09E6DF6CC965FDAC479427EB2673C09FFFFFF00
+          }
+          OnClick = SpeedButton1Click
+          ShowHint = True
+          ParentShowHint = False
+        end
+        object cbLaunchIconSize: TComboBox
+          AnchorSideLeft.Control = Label8
+          AnchorSideLeft.Side = asrBottom
+          AnchorSideTop.Control = GroupBox1
+          Left = 31
+          Height = 21
+          Top = 6
+          Width = 105
+          BorderSpacing.Around = 6
+          ItemHeight = 13
+          ItemIndex = 0
+          Items.Strings = (
+            '36x36 ldpi'
+            '48x48 mdpi'
+            '72x72 hdpi'
+            '96x96 xhdpi'
+            '144x144 xxhdpi'
+          )
+          OnSelect = cbLaunchIconSizeSelect
+          Style = csDropDownList
+          TabOrder = 0
+          Text = '36x36 ldpi'
+        end
+        object imLauncherIcon: TImage
+          AnchorSideLeft.Control = GroupBox1
+          AnchorSideLeft.Side = asrCenter
+          AnchorSideTop.Control = cbLaunchIconSize
+          AnchorSideTop.Side = asrBottom
+          Left = 39
+          Height = 90
+          Top = 33
+          Width = 90
+          AutoSize = True
+          BorderSpacing.Around = 6
+        end
+      end
+      object SpeedButtonHintTheme: TSpeedButton
+        AnchorSideLeft.Control = cbTheme
+        AnchorSideLeft.Side = asrBottom
+        AnchorSideTop.Control = cbTheme
+        AnchorSideTop.Side = asrCenter
+        Left = 206
+        Height = 20
+        Top = 33
+        Width = 20
+        AutoSize = True
+        Enabled = False
+        Glyph.Data = {
+          36040000424D3604000000000000360000002800000010000000100000000100
+          2000000000000004000064000000640000000000000000000000FFFFFF00FFFF
+          FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+          FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+          FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+          FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+          FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+          FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+          FF00FFFFFF00FFFFFF00FFFFFF00B8875822B88758DEB8875864FFFFFF00FFFF
+          FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+          FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00B887588DD4B699FFB88758F4B887
+          5871FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+          FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00B88758DCF5EEE7FFD5B8
+          9DFFB88758F7B887587DFFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+          FF00B8875812B88758A5B88758FCB88758FFB88758FFD5B89DFFFFFFFFFFFFFF
+          FFFFF8F3EFFFD5B89DFFB88758D3B8875824FFFFFF00FFFFFF00FFFFFF00FFFF
+          FF00B88758B1DAC1A9FFFEFEFDFFFFFFFFFFFFFFFFFFFFFFFFFFFEEEE2FFFDE3
+          D0FFFEF2E9FFFFFFFFFFDFC9B4FFB88758DBB8875809FFFFFF00FFFFFF00B887
+          580CB88758FCFEFEFDFFFEF2E9FFFEECDFFFFDEBDCFFFDE9D9FFFDE7D6FFFDE6
+          D3FFFDE4D0FFFCE4D1FFFFFFFFFFC8A27DFFB8875839FFFFFF00FFFFFF00B887
+          581EC0956CFFFFFFFFFFFEF0E5FFFEEEE2FFFEEDE0FFFEEBDDFFFDE9DAFFFDE8
+          D7FFFDE6D4FFFDE4D1FFFFFFFFFFCDAA89FFB887584BFFFFFF00FFFFFF00B887
+          581EC0956CFFFFFFFFFFFEF1E8FFFEF0E6FFFEEFE3FFFEEDE0FFFEECDDFFFDEA
+          DBFFFDE8D7FFFDE6D5FFFFFFFFFFCDAA89FFB887584BFFFFFF00FFFFFF00B887
+          580CB88758FCFEFEFDFFFEF6F0FFFEF2E9FFFEF1E6FFFEEFE4FFFEEEE1FFFEEC
+          DEFFFDEADBFFFDEADCFFFFFFFFFFC7A07BFFB8875836FFFFFF00FFFFFF00FFFF
+          FF00B88758B1DAC1A9FFFDFCFBFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+          FFFFFFFFFFFFFFFFFFFFDFC9B4FFB88758DBB8875806FFFFFF00FFFFFF00FFFF
+          FF00B8875812B88758A5B88758F9B88758FFB88758FFB88758FFB88758FFB887
+          58FFB88758FFB88758FFB88758BAB8875824FFFFFF00FFFFFF00FFFFFF00FFFF
+          FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+          FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+          FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+          FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00
+        }
       end
     end
   end

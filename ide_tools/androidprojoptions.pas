@@ -7,7 +7,7 @@ interface
 uses
   Classes, SysUtils, LazFileUtils, laz2_XMLRead, Laz2_DOM, AvgLvlTree,
   IDEOptionsIntf, ProjectIntf, Forms, Controls, Dialogs, Grids, StdCtrls,
-  LResources, ExtCtrls, Spin, ComCtrls;
+  LResources, ExtCtrls, Spin, ComCtrls, Buttons;
 
 type
 
@@ -20,9 +20,15 @@ type
     FPermissions: TStringList;
     FPermNames: TStringToStringTree;
     FUsesSDKNode: TDOMElement;
+    FApplicationNode: TDOMElement;
     FMinSdkVersion, FTargetSdkVersion: Integer;
     FVersionCode: Integer;
     FVersionName: string;
+    FLabelAvailable: Boolean;
+    FLabel, FRealLabel: string;
+    FIconFileName: string;
+    function GetString(const XMLPath, Ref: string; out Res: string): Boolean;
+    procedure SetString(const XMLPath, Ref, NewValue: string);
     procedure Clear;
   public
     constructor Create;
@@ -37,31 +43,59 @@ type
     property TargetSDKVersion: Integer read FTargetSdkVersion write FTargetSdkVersion;
     property VersionCode: Integer read FVersionCode write FVersionCode;
     property VersionName: string read FVersionName write FVersionName;
+    property AppLabel: string read FRealLabel write FRealLabel;
+    property IconFileName: string read FIconFileName;
   end;
 
   { TLamwProjectOptions }
 
   TLamwProjectOptions = class(TAbstractIDEOptionsEditor)
+    cbTheme: TComboBox;
+    cbLaunchIconSize: TComboBox;
+    edLabel: TEdit;
     edVersionName: TEdit;
     ErrorPanel: TPanel;
     gbVersion: TGroupBox;
+    GroupBox1: TGroupBox;
+    imLauncherIcon: TImage;
     Label1: TLabel;
     Label2: TLabel;
     Label3: TLabel;
     Label4: TLabel;
+    Label5: TLabel;
+    Label6: TLabel;
+    Label7: TLabel;
+    Label8: TLabel;
     lblErrorMessage: TLabel;
     PageControl1: TPageControl;
     PermissonGrid: TStringGrid;
     seMinSdkVersion: TSpinEdit;
     seTargetSdkVersion: TSpinEdit;
     seVersionCode: TSpinEdit;
+    SpeedButton1: TSpeedButton;
+    SpeedButtonHintTheme: TSpeedButton;
+    tsAppl: TTabSheet;
     tsManifest: TTabSheet;
+    procedure cbLaunchIconSizeSelect(Sender: TObject);
+    procedure SpeedButton1Click(Sender: TObject);
   private
     { private declarations }
+    const
+      Drawable: array [0..4] of record
+        Size: Integer;
+        Suffix: string;
+      end = ((Size:36;  Suffix:'ldpi'),
+             (Size:48;  Suffix:'mdpi'),
+             (Size:72;  Suffix:'hdpi'),
+             (Size:96;  Suffix:'xhdpi'),
+             (Size:144; Suffix:'xxhdpi'));
+  private
     FManifest: TLamwAndroidManifestOptions;
+    FIconsPath: string; // ".../res/drawable-"
     procedure ErrorMessage(const msg: string);
     procedure FillPermissionGrid(Permissions: TStringList; PermNames: TStringToStringTree);
     procedure SetControlsEnabled(ts: TTabSheet; en: Boolean);
+    procedure ShowLauncherIcon;
   public
     { public declarations }
     constructor Create(AOwner: TComponent); override;
@@ -75,11 +109,141 @@ type
 
 implementation
 
-uses LazIDEIntf, laz2_XMLWrite, Graphics, strutils;
+uses LazIDEIntf, laz2_XMLWrite, FileUtil, Graphics, ExtDlgs, FPCanvas, FPimage,
+  FPReadPNG, FPWritePNG, strutils;
 
 {$R *.lfm}
 
+type
+
+  { TMyCanvas }
+
+  TMyCanvas = class(TFPCustomCanvas)
+  private
+    FImage: TFPMemoryImage;
+  protected
+    procedure SetColor(x, y: integer; const Value: TFPColor); override;
+  public
+    constructor Create;
+    destructor Destroy; override;
+    property Image: TFPMemoryImage read FImage;
+  end;
+
+procedure ResizePNG(p: TPortableNetworkGraphic; NeedSize: Integer);
+var
+  ms: TMemoryStream;
+  r: TFPReaderPNG;
+  mi: TFPMemoryImage;
+  c: TMyCanvas;
+begin
+  ms := TMemoryStream.Create;
+  p.SaveToStream(ms);
+  ms.Position := 0;
+  mi := TFPMemoryImage.Create(0,0);
+  r := TFPReaderPNG.Create;
+  mi.LoadFromStream(ms, r);
+  r.Free;
+  ms.Free;
+  {$Push}{$Warnings off}
+  c := TMyCanvas.Create;
+  {$Pop}
+  c.Image.SetSize(NeedSize, NeedSize);
+  c.StretchDraw(0, 0, NeedSize, NeedSize, mi);
+  mi.Free;
+  p.Assign(c.Image);
+  c.Free;
+end;
+
+{ TMyCanvas }
+
+procedure TMyCanvas.SetColor(x, y: integer; const Value: TFPColor);
+begin
+  FImage.Colors[x, y] := Value;
+end;
+
+constructor TMyCanvas.Create;
+begin
+  FImage := TFPMemoryImage.create(0,0);
+end;
+
+destructor TMyCanvas.Destroy;
+begin
+  FImage.Free;
+end;
+
 { TLamwAndroidManifestOptions }
+
+function TLamwAndroidManifestOptions.GetString(const XMLPath, Ref: string;
+  out Res: string): Boolean;
+var
+  x: TXMLDocument;
+  tag, name: string;
+  n: TDOMNode;
+begin
+  Result := False;
+  tag := Copy(Ref, 2, Pos('/', Ref) - 2);
+  name := Copy(Ref, Pos('/', Ref) + 1, MaxInt);
+  if not FileExists(XMLPath) then Exit;
+  ReadXMLFile(x, XMLPath);
+  try
+    n := x.DocumentElement.FirstChild;
+    while n <> nil do
+    begin
+      if (n is TDOMElement) then
+        with TDOMElement(n) do
+          if (TagName = tag) and (AttribStrings['name'] = name) then
+          begin
+            Res := TextContent;
+            Result := True;
+            Exit;
+          end;
+      n := n.NextSibling
+    end;
+  finally
+    x.Free
+  end;
+end;
+
+procedure TLamwAndroidManifestOptions.SetString(const XMLPath, Ref, NewValue: string);
+var
+  x: TXMLDocument;
+  n: TDOMNode;
+  tag, name: string;
+  Changed: Boolean;
+begin
+  tag := Copy(Ref, 2, Pos('/', Ref) - 2);
+  name := Copy(Ref, Pos('/', Ref) + 1, MaxInt);
+  ReadXMLFile(x, XMLPath);
+  try
+    n := x.DocumentElement.FirstChild;
+    Changed := False;
+    while n <> nil do
+    begin
+      if n is TDOMElement then
+        with TDOMElement(n) do
+          if (TagName = tag) and (AttribStrings['name'] = name) then
+          begin
+            TextContent := NewValue;
+            Changed := True;
+            Break;
+          end;
+      n := n.NextSibling;
+    end;
+    if not Changed then
+    begin
+      n := x.CreateElement(tag);
+      with TDOMElement(n) do
+      begin
+        AttribStrings['name'] := name;
+        TextContent := NewValue;
+      end;
+      x.DocumentElement.AppendChild(n);
+    end;
+    WriteXMLFile(x, XMLPath);
+  finally
+    x.Free
+  end;
+end;
 
 procedure TLamwAndroidManifestOptions.Clear;
 begin
@@ -101,6 +265,7 @@ constructor TLamwAndroidManifestOptions.Create;
   end;
 
 begin
+  FIconFileName := 'ic_launcher'; // ".png"
   FPermissions := TStringList.Create;
   FPermNames := TStringToStringTree.Create(True);
   AddPerm('Bluetooth');
@@ -245,6 +410,25 @@ begin
           FTargetSdkVersion := StrToIntDef(n.TextContent, FTargetSdkVersion);
       end;
   end;
+  n := xml.DocumentElement.FindNode('application');
+  if n is TDOMElement then
+  begin
+    FApplicationNode := TDOMElement(n);
+    FLabelAvailable := True;
+    FLabel := TDOMElement(n).AttribStrings['android:label'];
+    if (FLabel <> '') and (FLabel[1] = '@') then
+    begin
+      // @string/app_name
+      // <string name="app_name">LamwGUIProject1</string>
+      if not GetString(ExtractFilePath(FFileName) + PathDelim
+        + 'res' + PathDelim + 'values' + PathDelim + 'strings.xml', FLabel, FRealLabel)
+      then begin
+        FRealLabel := '<null>';
+        FLabelAvailable := False;
+      end;
+    end else
+      FRealLabel := FLabel;
+  end;
 end;
 
 procedure TLamwAndroidManifestOptions.Save;
@@ -252,6 +436,7 @@ var
   i: Integer;
   r: TDOMNode;
   n: TDOMElement;
+  fn: string;
 begin
   // writing manifest
   if not Assigned(xml) then Exit;
@@ -285,7 +470,19 @@ begin
     else
       xml.ChildNodes[0].AppendChild(n);
   end;
+
+  if FLabelAvailable and (FLabel <> '') and (FLabel[1] <> '@')
+  and (FApplicationNode <> nil) then
+    FApplicationNode.AttribStrings['android:label'] := FLabel;
   WriteXMLFile(xml, FFileName);
+
+  if FLabelAvailable and (FLabel <> '') and (FLabel[1] = '@') then
+  begin
+    fn := ExtractFilePath(FFileName) + PathDelim + 'res' + PathDelim;
+    fn := fn + 'values' + PathDelim + 'strings.xml';
+    if FileExists(fn) then
+      SetString(fn, FLabel, FRealLabel)
+  end;
 end;
 
 { TLamwProjectOptions }
@@ -301,16 +498,112 @@ begin
   ErrorPanel.Enabled := True;
 end;
 
+procedure TLamwProjectOptions.ShowLauncherIcon;
+var
+  p: TPortableNetworkGraphic;
+  fn: string;
+begin
+  with cbLaunchIconSize do
+    p := TPortableNetworkGraphic(Items.Objects[ItemIndex]);
+  if p <> nil then
+  begin
+    imLauncherIcon.Picture.Assign(p);
+    Exit;
+  end;
+  fn := FIconsPath + Drawable[cbLaunchIconSize.ItemIndex].Suffix + PathDelim
+    + FManifest.IconFileName + '.png';
+  if FileExists(fn) then
+    imLauncherIcon.Picture.LoadFromFile(fn)
+  else
+    imLauncherIcon.Picture.Clear;
+end;
+
 constructor TLamwProjectOptions.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
   FManifest := TLamwAndroidManifestOptions.Create;
+  PageControl1.ActivePageIndex := 0;
 end;
 
 destructor TLamwProjectOptions.Destroy;
+var
+  i: Integer;
 begin
+  with cbLaunchIconSize.Items do
+    for i := 0 to Count - 1 do
+      TObject(Objects[i]).Free;
   FManifest.Free;
   inherited Destroy;
+end;
+
+procedure TLamwProjectOptions.cbLaunchIconSizeSelect(Sender: TObject);
+begin
+  ShowLauncherIcon;
+end;
+
+procedure TLamwProjectOptions.SpeedButton1Click(Sender: TObject);
+
+  function CreateAllIcons(p: TPortableNetworkGraphic; fname: string): Boolean;
+  var
+    i: Integer;
+    p1: TPortableNetworkGraphic;
+  begin
+    Result := MessageDlg(
+      Format('Do you want to prepare all other icons by resizing "%s"?',
+        [ExtractFileName(fname)]),
+      mtConfirmation, mbYesNo, 0) = mrYes;
+    if Result then
+      with cbLaunchIconSize.Items do
+      begin
+        for i := 0 to Count - 1 do
+        begin
+          p1 := TPortableNetworkGraphic.Create;
+          p1.Assign(p);
+          if p1.Width <> Drawable[i].Size then
+            ResizePNG(p1, Drawable[i].Size);
+          Objects[i] := p1;
+        end;
+        p.Free;
+      end;
+  end;
+
+var
+  p: TPortableNetworkGraphic;
+begin
+  with TOpenPictureDialog.Create(nil) do
+  try
+    Title := Format('%s (%s)', [GroupBox1.Caption, cbLaunchIconSize.Text]);
+    Filter := 'PNG|*.png';
+    if Execute then
+    begin
+      p := TPortableNetworkGraphic.Create;
+      p.LoadFromFile(FileName);
+      with Drawable[cbLaunchIconSize.ItemIndex] do
+        if (p.Width <> Size) or (p.Height <> Size) then
+          case MessageDlg(
+            Format('The size of "%s" is %dx%d but should be %dx%d. Do you want to resize?',
+              [ExtractFileName(FileName), p.Width, p.Height, Size, Size]),
+            mtConfirmation, mbYesNoCancel, 0) of
+          mrYes:
+            begin
+              if (p.Width = p.Height) and (p.Height > 90) then
+                if CreateAllIcons(p, FileName) then Exit;
+              ResizePNG(p, Size);
+            end
+          else
+            p.Free;
+            Exit;
+          end
+        else
+          if (Size > 90) then
+            if CreateAllIcons(p, FileName) then Exit;
+      with cbLaunchIconSize do
+        Items.Objects[ItemIndex] := p;
+    end;
+  finally
+    Free;
+    ShowLauncherIcon;
+  end;
 end;
 
 procedure TLamwProjectOptions.ErrorMessage(const msg: string);
@@ -373,12 +666,15 @@ begin
   fn := proj.MainFile.Filename;
   fn := Copy(fn, 1, Pos(PathDelim + 'jni' + PathDelim, fn));
   fn := fn + 'AndroidManifest.xml';
-  if not FileExistsUTF8(fn) then
+  if not FileExists(fn) then
   begin
     ErrorMessage('"' + fn + '" not found!');
+    tsAppl.Enabled := False;
     Exit;
   end;
   try
+    FIconsPath := ExtractFilePath(fn) + 'res' + PathDelim + 'drawable-';
+    ShowLauncherIcon;
     with FManifest do
     begin
       Load(fn);
@@ -387,6 +683,7 @@ begin
       seTargetSdkVersion.Value := TargetSDKVersion;
       seVersionCode.Value := VersionCode;
       edVersionName.Text := VersionName;
+      edLabel.Text := AppLabel;
     end;
   except
     on e: Exception do
@@ -411,8 +708,14 @@ begin
     TargetSDKVersion := seTargetSdkVersion.Value;
     VersionCode := seVersionCode.Value;
     VersionName := edVersionName.Text;
+    AppLabel := edLabel.Text;
     Save;
   end;
+  with cbLaunchIconSize.Items do
+    for i := 0 to Count - 1 do
+      if Assigned(Objects[i]) then
+        TPortableNetworkGraphic(Objects[i]).SaveToFile(FIconsPath
+          + Drawable[i].Suffix + PathDelim + FManifest.IconFileName + '.png');
 end;
 
 initialization
