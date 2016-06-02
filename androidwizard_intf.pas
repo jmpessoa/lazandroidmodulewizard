@@ -733,7 +733,6 @@ begin
       frm.CheckBox2.Visible:= True;
     end;
 
-
     frm.ModuleType:= projectType;  //<-- input to form
 
     if frm.ShowModal = mrOK then
@@ -2036,6 +2035,10 @@ begin
 end;
 
 function TAndroidProjectDescriptor.CreateStartFiles(AProject: TLazProject): TModalResult;
+var
+  d: TIDesigner;
+  c: TComponent;
+  s: TLazProjectFile;
 begin
   if FModuleType = 0 then  //GUI Controls
   begin
@@ -2053,6 +2056,19 @@ begin
   LazarusIDE.DoNewEditorFile(AndroidFileDescriptor, '', '',
                              [nfIsPartOfProject,nfOpenInEditor,nfCreateDefaultSrc]);
   LazarusIDE.DoSaveProject([]); // TODO: change hardcoded "controls"
+
+  if FModuleType = 0 then
+  begin
+    // refresh theme
+    with LazarusIDE do
+    begin
+      s := ActiveProject.Files[1];
+      d := GetDesignerWithProjectFile(s, True);
+    end;
+    c := d.LookupRoot;
+    (TAndroidModule(c).Designer as TAndroidWidgetMediator).UpdateTheme
+  end;
+
   Result := mrOK;
 end;
 
