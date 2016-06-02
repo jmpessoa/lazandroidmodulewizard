@@ -1214,8 +1214,8 @@ begin
           strList.Clear;
           strList.Add('key.store='+dummy+'-release.keystore');
           strList.Add('key.alias='+dummy+'aliaskey');
-          strList.Add('key.store.password='+dummy+'passw');
-          strList.Add('key.alias.password='+dummy+'passw');
+          strList.Add('key.store.password=123456');
+          strList.Add('key.alias.password=123456');
           strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'ant.properties');
 
           //keytool input [dammy] data!
@@ -1234,6 +1234,7 @@ begin
 
           strList.Clear;
           strList.Add('set JAVA_HOME='+FPathToJavaJDK);  //set JAVA_HOME=C:\Program Files (x86)\Java\jdk1.7.0_21
+          strList.Add('path %JAVA_HOME%'+PathDelim+'bin;%path%');
           strList.Add('cd '+FAndroidProjectName);
           strList.Add('keytool -genkey -v -keystore '+FSmallProjName+'-release.keystore -alias '+dummy+'aliaskey -keyalg RSA -keysize 2048 -validity 10000 < '+
                       FAndroidProjectName+DirectorySeparator+'keytool_input.txt');
@@ -1241,6 +1242,7 @@ begin
 
           strList.Clear;
           strList.Add('set JAVA_HOME='+FPathToJavaJDK);  //set JAVA_HOME=C:\Program Files (x86)\Java\jdk1.7.0_21
+          strList.Add('path %JAVA_HOME%'+PathDelim+'bin;%path%');
           strList.Add('cd '+FAndroidProjectName);
           strList.Add('jarsigner -verify -verbose -certs '+FAndroidProjectName+DirectorySeparator+'bin'+DirectorySeparator+FSmallProjName+'-release.apk');
           strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'jarsigner-verify.bat');
