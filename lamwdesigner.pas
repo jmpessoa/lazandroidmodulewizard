@@ -372,11 +372,12 @@ type
 implementation
 
 uses
-  LCLIntf, LCLType, strutils, ObjInspStrConsts, LazIDEIntf, laz2_XMLRead,
-  LazFileUtils, FPimage, IniFiles, typinfo, Laz_And_Controls, customdialog,
-  togglebutton, switchbutton, Laz_And_GLESv1_Canvas, Laz_And_GLESv2_Canvas,
-  gridview, Spinner, seekbar, uFormSizeSelect, radiogroup, ratingbar,
-  digitalclock, analogclock, surfaceview, autocompletetextview, drawingview;
+  LCLIntf, LCLType, strutils, ObjInspStrConsts, LazIDEIntf, IDEMsgIntf,
+  IDEExternToolIntf, laz2_XMLRead, LazFileUtils, FPimage, IniFiles, typinfo,
+  Laz_And_Controls, customdialog, togglebutton, switchbutton,
+  Laz_And_GLESv1_Canvas, Laz_And_GLESv2_Canvas, gridview, Spinner, seekbar,
+  uFormSizeSelect, radiogroup, ratingbar, digitalclock, analogclock,
+  surfaceview, autocompletetextview, drawingview;
 
 const
   MaxRGB2Inverse = 64;
@@ -388,10 +389,11 @@ function FindNodeAtrib(root: TDOMElement; const ATag, AAttr, AVal: string): TDOM
 var
   n: TDOMNode;
 begin
-  n := Root.FirstChild;
+  if not root.HasChildNodes then Exit(nil);
+  n := root.FirstChild;
   while n <> nil do
   begin
-    if (n is TDOMElement) then
+    if n is TDOMElement then
       with TDOMElement(n) do
         if (TagName = ATag) and (AttribStrings[AAttr] = AVal) then
         begin
@@ -409,10 +411,14 @@ var
 
   function FindTheme(AThemeName: string): TDOMElement;
   begin
+    Result := nil;
+    if (Copy(AThemeName, 1, 19) = 'Theme.DeviceDefault') then
+    begin
+      if Assigned(xml_themes_device) then
+        Result := FindNodeAtrib(xml_themes_device.DocumentElement, 'style', 'name', AThemeName);
+    end else
     if Assigned(xml_themes) then
       Result := FindNodeAtrib(xml_themes.DocumentElement, 'style', 'name', AThemeName);
-    if (Result = nil) and Assigned(xml_themes_device) then
-      Result := FindNodeAtrib(xml_themes_device.DocumentElement, 'style', 'name', AThemeName);
   end;
 
 var
@@ -936,9 +942,10 @@ begin
   Mediator:= TAndroidWidgetMediator(Result);
   Mediator.Root := TheForm;
 
-  Mediator.UpdateTheme;
+  Mediator.FDefaultBrushColor := clWhite;
   Mediator.FDefaultPenColor:= clMedGray;
   Mediator.FDefaultFontColor:= clMedGray;
+  Mediator.UpdateTheme;
 
   Mediator.AndroidForm.Designer:= Mediator;
 end;
@@ -1184,7 +1191,12 @@ end;
 
 procedure TAndroidWidgetMediator.UpdateTheme;
 begin
-  FDefaultBrushColor := GetColorBackgroundByTheme(Root);
+  try
+    FDefaultBrushColor := GetColorBackgroundByTheme(Root);
+  except
+    on e: Exception do
+      IDEMessagesWindow.AddCustomMessage(mluError, e.Message);
+  end;
 end;
 
 procedure TAndroidWidgetMediator.MouseDown(Button: TMouseButton;
