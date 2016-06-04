@@ -132,6 +132,7 @@ begin
   end else
     msgLine.Urgency := mluProgress;
   AddMsgLine(msgLine);
+  Handled := True;
 end;
 
 class function TAntParser.DefaultSubTool: string;
@@ -207,14 +208,62 @@ end;
 
 function TApkBuilder.TryFixPaths: TModalResult;
 
+  function ChooseDlg(const Title, Prompt: string; sl: TStringList; var s: string): Boolean;
+  var
+    lb: TListBox;
+    f: TForm;
+  begin
+    f := TForm.Create(nil);
+    try
+      f.Position := poScreenCenter;
+      f.Caption := Title;
+      f.AutoSize := True;
+      f.BorderIcons := [biSystemMenu];
+      with TLabel.Create(f) do
+      begin
+        Parent := f;
+        Align := alTop;
+        BorderSpacing.Around := 6;
+        Caption := Prompt;
+      end;
+      lb := TListBox.Create(f);
+      lb.Parent := f;
+      lb.Align := alClient;
+      lb.Items.Assign(sl);
+      lb.BorderSpacing.Around := 6;
+      lb.Constraints.MinHeight := 200;
+      lb.ItemIndex := 0;
+      with TButtonPanel.Create(f) do
+      begin
+        Parent := f;
+        ShowButtons := [pbOK, pbCancel];
+        ShowBevel := False;
+      end;
+      if f.ShowModal <> mrOk then Exit(False);
+      s := lb.Items[lb.ItemIndex];
+      Result := True;
+    finally
+      f.Free;
+    end;
+  end;
+
+  function CollectDirs(const PathMask: string): TStringList;
+  var
+    dir: TSearchRec;
+  begin
+    Result := TStringList.Create;
+    if FindFirst(PathMask, faDirectory, dir) = 0 then
+      repeat
+        Result.Add(dir.Name);
+      until (FindNext(dir) <> 0);
+    FindClose(dir);
+  end;
+
   procedure FixArmLinuxAndroidEabiVersion(var path: string);
   var
     i: Integer;
     s, p: string;
-    dir: TSearchRec;
     sl: TStringList;
-    f: TForm;
-    lb: TListBox;
   begin
     if DirectoryExists(path) then Exit;
     i := Pos('arm-linux-androideabi-', path);
@@ -225,57 +274,21 @@ function TApkBuilder.TryFixPaths: TModalResult;
     p := Copy(p, 1, Pos(PathDelim, p) - 1);
     if p = '' then Exit;
     s := Copy(path, 1, i - 1);
-    if FindFirst(s + 'arm-linux-androideabi-*', faDirectory, dir) = 0 then
-    begin
-      sl := TStringList.Create;
-      try
-        repeat
-          sl.Add(dir.Name);
-        until (FindNext(dir) <> 0);
-        if sl.Count > 1 then
-        begin
-          sl.Sort;
-          f := TForm.Create(nil);
-          try
-            f.Position := poScreenCenter;
-            f.Caption := 'arm-linux-androideabi';
-            f.AutoSize := True;
-            f.BorderIcons := [biSystemMenu];
-            with TLabel.Create(f) do
-            begin
-              Parent := f;
-              Align := alTop;
-              BorderSpacing.Around := 6;
-              Caption := 'Choose arm-linux-androideabi version:';
-            end;
-            lb := TListBox.Create(f);
-            lb.Parent := f;
-            lb.Align := alClient;
-            lb.Items.Assign(sl);
-            lb.BorderSpacing.Around := 6;
-            lb.Constraints.MinHeight := 200;
-            lb.ItemIndex := 0;
-            with TButtonPanel.Create(f) do
-            begin
-              Parent := f;
-              ShowButtons := [pbOK, pbCancel];
-              ShowBevel := False;
-            end;
-            if f.ShowModal <> mrOk then Exit;
-            s := lb.Items[lb.ItemIndex];
-          finally
-            f.Free;
-          end;
-        end else
-          s := sl[0];
-      finally
-        sl.Free;
-      end;
-      Delete(s, 1, 22);
-      if s = '' then Exit;
-      path := StringReplace(path, p, s, [rfReplaceAll]);
+    sl := CollectDirs(s + 'arm-linux-androideabi-*');
+    try
+      if sl.Count > 1 then
+      begin
+        sl.Sort;
+        if not ChooseDlg('arm-linux-androideabi',
+          'Choose arm-linux-androideabi version:', sl, s) then Exit;
+      end else
+        s := sl[0];
+    finally
+      sl.Free;
     end;
-    FindClose(dir);
+    Delete(s, 1, 22);
+    if s = '' then Exit;
+    path := StringReplace(path, p, s, [rfReplaceAll]);
   end;
 
   procedure FixPrebuiltSys(var path: string);
@@ -328,21 +341,48 @@ function TApkBuilder.TryFixPaths: TModalResult;
     Result := DirectoryExists(path);
   end;
 
-  function GetManifestSdkTarget(Manifest: string; out SdkTarget: string): Boolean;
+  function GetManifestSdkTarget(out SdkTarget: string): Boolean;
   var
     ManifestXML: TXMLDocument;
     n: TDOMNode;
   begin
     Result := False;
-    if not FileExists(Manifest) then Exit;
+    if not FileExists(FProjPath + 'AndroidManifest.xml') then Exit;
     try
-      ReadXMLFile(ManifestXML, Manifest);
+      ReadXMLFile(ManifestXML, FProjPath + 'AndroidManifest.xml');
       try
         n := ManifestXML.DocumentElement.FindNode('uses-sdk');
         if not Assigned(n) then Exit;
         n := n.Attributes.GetNamedItem('android:targetSdkVersion');
         if not Assigned(n) then Exit;
         SdkTarget := n.TextContent;
+        Result := True;
+      finally
+        ManifestXML.Free
+      end;
+    except
+      Exit;
+    end;
+  end;
+
+  function SetManifestSdkTarget(SdkTarget: string): Boolean;
+  var
+    ManifestXML: TXMLDocument;
+    n: TDOMNode;
+    fn: string;
+  begin
+    Result := False;
+    fn := FProjPath + 'AndroidManifest.xml';
+    if not FileExists(fn) then Exit;
+    try
+      ReadXMLFile(ManifestXML, fn);
+      try
+        n := ManifestXML.DocumentElement.FindNode('uses-sdk');
+        if not Assigned(n) then Exit;
+        n := n.Attributes.GetNamedItem('android:targetSdkVersion');
+        if not Assigned(n) then Exit;
+        n.TextContent := SdkTarget;
+        WriteXML(ManifestXML, fn);
         Result := True;
       finally
         ManifestXML.Free
@@ -457,15 +497,50 @@ begin
               // fix "target" according to AndroidManifest
               n := Item[i].Attributes.GetNamedItem('value');
               if not Assigned(n) then Continue;
-              if not GetManifestSdkTarget(FProjPath + 'AndroidManifest.xml', str) then Continue;
-              if n.TextContent <> 'android-' + str then
-              begin
-                if not ForceFixPaths
-                and (MessageDlg('build.xml',
-                               'Change target to "android-' + str + '"?',
-                               mtConfirmation, [mbYes, mbNo], 0) <> mrYes) then Exit;
-                Item[i].Attributes.GetNamedItem('value').TextContent := 'android-' + str;
-                WriteXMLFile(xml, prev);
+              if not GetManifestSdkTarget(str) then
+                str := n.TextContent
+              else
+                str := 'android-' + str;
+              sl := CollectDirs(AppendPathDelim(FSdkPath) + 'platforms' + PathDelim + 'android-*');
+              try
+                if sl.Count = 0 then Continue;
+                sl.Sorted := True;
+                if (sl.IndexOf(n.TextContent) < 0) and (sl.IndexOf(str) >= 0) then
+                begin
+                  if MessageDlg('build.xml',
+                                'Change target to "' + str + '"?',
+                                mtConfirmation, [mbYes, mbNo], 0) <> mrYes then Continue;
+                  n.TextContent := str;
+                  WriteXMLFile(xml, prev);
+                end else
+                if (sl.IndexOf(n.TextContent) >= 0) and (n.TextContent <> str) then
+                begin
+                  if MessageDlg('Manifest.xml',
+                                'SDK for "' + str + '" is not installed. Do you ' +
+                                'want to use "' + n.TextContent + '"?',
+                                mtConfirmation, [mbYes, mbNo], 0) <> mrYes then Continue;
+                  str := n.TextContent;
+                  Delete(str, 1, 8);
+                  SetManifestSdkTarget(str);
+                end else
+                if sl.IndexOf(n.TextContent) < 0 then
+                begin
+                  if sl.Count = 1 then
+                  begin
+                    if MessageDlg('Target SDK',
+                                  'You have only installed "' + sl[0] + '" SDK. ' +
+                                  'Do you want to use it?',
+                                  mtConfirmation, [mbYes, mbNo], 0) <> mrYes then Continue;
+                    str := sl[0];
+                  end else
+                    if not ChooseDlg('Target SDK', 'Choose target SDK:', sl, str) then Continue;
+                  n.TextContent := str;
+                  WriteXMLFile(xml, prev);
+                  Delete(str, 1, 8);
+                  SetManifestSdkTarget(str);
+                end;
+              finally
+                sl.Free
               end;
             end;
           end;
