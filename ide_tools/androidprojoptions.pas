@@ -30,6 +30,7 @@ type
     function GetString(const XMLPath, Ref: string; out Res: string): Boolean;
     procedure SetString(const XMLPath, Ref, NewValue: string);
     procedure Clear;
+    procedure UpdateBuildXML;
   public
     constructor Create;
     destructor Destroy; override;
@@ -254,6 +255,34 @@ begin
   FPermissions.Clear;
 end;
 
+procedure TLamwAndroidManifestOptions.UpdateBuildXML;
+var
+  fn: string;
+  build: TXMLDocument;
+  n: TDOMNode;
+begin
+  fn := ExtractFilePath(FFileName) + 'build.xml';
+  if not FileExists(fn) then Exit;
+  ReadXMLFile(build, fn);
+  try
+    n := build.DocumentElement.FirstChild;
+    while n <> nil do
+    begin
+      if n is TDOMElement then
+        with TDOMElement(n) do
+          if (TagName = 'property') and (AttribStrings['name'] = 'target') then
+          begin
+            AttribStrings['value'] := 'android-' + IntToStr(FTargetSdkVersion);
+            WriteXMLFile(build, fn);
+            Break;
+          end;
+      n := n.NextSibling;
+    end;
+  finally
+    build.Free
+  end;
+end;
+
 constructor TLamwAndroidManifestOptions.Create;
 
   procedure AddPerm(PermVisibleName: string; android_name: string = '');
@@ -470,6 +499,7 @@ begin
     else
       xml.ChildNodes[0].AppendChild(n);
   end;
+  UpdateBuildXML;
 
   if FLabelAvailable and (FLabel <> '') and (FLabel[1] <> '@')
   and (FApplicationNode <> nil) then
