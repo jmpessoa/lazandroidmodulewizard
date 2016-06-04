@@ -69,7 +69,7 @@ implementation
 
 {$R *.lfm}
 
-uses LazFileUtils;
+uses LazFileUtils, CompOptsIntf;
 
 { TFormUpdateCodeTemplate }
 
@@ -129,8 +129,9 @@ begin
   begin
     if not APKProcess.IsTerminated then APKProcess.Terminate;
   end;
+  LazarusIDE.DoBuildProject(crBuild, []);
   //MemoLog.Clear;
-  APKProcess:= TThreadProcess.Create(True);
+(*  APKProcess:= TThreadProcess.Create(True);
   with APKProcess do
   begin
     OnTerminated:= @DoTerminated;
@@ -139,9 +140,9 @@ begin
     IDEMacros.SubstituteMacros(str);
     Executable:= str;
     Parameters.Add('controls.lpi');
-    OnDisplayOutput:= @ShowProcOutput;
+    OnDisplayOutput:= @ShowProcOutput; // <<-- it cannot be used since MemoLog will be destroyed before lazbuild to be executed
     Start;
-  end;
+  end; *)
 end;
 
 procedure TFormUpdateCodeTemplate.BitBtnOKClick(Sender: TObject);
