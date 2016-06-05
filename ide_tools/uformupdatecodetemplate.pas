@@ -69,7 +69,7 @@ implementation
 
 {$R *.lfm}
 
-uses LazFileUtils, CompOptsIntf;
+uses LazFileUtils, CompOptsIntf, IDEExternToolIntf;
 
 { TFormUpdateCodeTemplate }
 
@@ -118,18 +118,31 @@ begin
 end;
 
 procedure TFormUpdateCodeTemplate.RebuildLibrary; //by jmpessoa
-var str: string;
+var
+  //str: string;
+  Tool: TIDEExternalToolOptions;
 begin
   if JNIProjectPath = '' then
   begin
-    ShowMessage('Fail! PathToLazbuild not found!' );
+    ShowMessage('Fail! JNI project path not found!' );
     Exit;
   end;
-  if Assigned(APKProcess) then
+  Tool := TIDEExternalToolOptions.Create;
+  try
+    Tool.Title := 'Rebuilding ".so" library';
+    Tool.ResolveMacros := True;
+    Tool.Executable := '$MakeDir($(LazarusDir))lazbuild$(ExeExt)';
+    Tool.CmdLineParams := 'controls.lpi';
+    Tool.WorkingDirectory := JNIProjectPath;
+    Tool.Scanners.Add(SubToolFPC);
+    RunExternalTool(Tool)
+  finally
+    Tool.Free
+  end;
+(*  if Assigned(APKProcess) then
   begin
     if not APKProcess.IsTerminated then APKProcess.Terminate;
-  end;
-  LazarusIDE.DoBuildProject(crBuild, []);
+  end; *)
   //MemoLog.Clear;
 (*  APKProcess:= TThreadProcess.Create(True);
   with APKProcess do
