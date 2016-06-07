@@ -321,6 +321,7 @@ begin
   AddPerm('Write external storage');
   AddPerm('Write owner data');
   AddPerm('Write user dictionary');
+  AddPerm('Wake lock');
   { todo:
   Access location extra commands
   Access mock location
@@ -373,7 +374,6 @@ begin
   Use credentials
   Use SIP
   Vending billing (In-app Billing)
-  Wake lock
   Write calendar
   Write call log
   Write history bookmarks
