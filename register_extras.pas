@@ -8,6 +8,8 @@ interface
 
 uses 
   Classes,
+  downloadmanager,
+  downloadservice,
   alarmmanager,
   drawingview,
   autocompletetextview,
@@ -56,6 +58,8 @@ implementation
   
 Procedure Register;
 begin
+  {$I jdownloadmanager_icon.lrs}
+  {$I jdownloadservice_icon.lrs}
   {$I jalarmmanager_icon.lrs}
   {$I jdrawingview_icon.lrs}
   {$I jautotextview_icon.lrs}
@@ -95,6 +99,8 @@ begin
   {$I jmyhello_icon.lrs}
   RegisterComponents('Android Bridges Extra',
     [
+      jDownloadManager,
+      jDownloadService,
       jAlarmManager,
       jDrawingView,
       jAutoTextView,

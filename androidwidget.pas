@@ -256,6 +256,10 @@ const
 
 type
 
+ TConnectionType = (ctMobile, ctWifi, ctBluetooch, ctEthernet);
+
+ TAndroidResult = (RESULT_OK = -1, RESULT_CANCELED = 0);
+
  TImageScaleType = (scaleCenter, scaleCenterCrop, scaleCenterInside, scaleFitCenter,
                 scaleFitEnd, scaleFitStart, scaleFitXY, scaleMatrix);
 
@@ -979,7 +983,7 @@ type
     //by jmpessoa
     Procedure UpdateLayout;
 
-    procedure SetWifiEnabled(_status: boolean);
+    function SetWifiEnabled(_status: boolean): boolean;
     function IsWifiEnabled(): boolean;
     function isConnected(): boolean; // by renabor
     function isConnectedWifi(): boolean; // by renabor
@@ -1058,6 +1062,11 @@ type
     procedure SetTurnScreenOn(_value: boolean);
     procedure SetAllowLockWhileScreenOn(_value: boolean);
     procedure SetShowWhenLocked(_value: boolean);
+
+    function ParseUri(_uriAsString: string): jObject;
+    function UriToString(_uri: jObject): string;
+    function IsConnectedTo(_connectionType: TConnectionType): boolean;
+     function IsMobileDataEnabled(): boolean;
 
     // Property
     property View         : jObject        read FjRLayout; //layout!
@@ -1308,6 +1317,12 @@ end;
   procedure jForm_SetAllowLockWhileScreenOn(env: PJNIEnv; _jform: JObject; _value: boolean);
   procedure jForm_SetShowWhenLocked(env: PJNIEnv; _jform: JObject; _value: boolean);
 
+  function jForm_ParseUri(env: PJNIEnv; _jform: JObject; _uriAsString: string): jObject;
+  function jForm_UriToString(env: PJNIEnv; _jform: JObject; _uri: jObject): string;
+  function jForm_IsConnectedTo(env: PJNIEnv; _jform: JObject; _connectionType: integer): boolean;
+  function jForm_IsMobileDataEnabled(env: PJNIEnv; _jform: JObject): boolean;
+
+
 //jni API Bridge
 
 // http://docs.oracle.com/javase/7/docs/technotes/guides/jni/spec/functions.html
@@ -1405,10 +1420,13 @@ Procedure jForm_SetVisibility2          (env:PJNIEnv; Form    : jObject; visible
 Procedure jForm_SetEnabled2             (env:PJNIEnv;Form    : jObject; enabled : Boolean);
 procedure jForm_ShowMessage(env:PJNIEnv; Form:jObject; msg: string); overload;
 function jForm_GetDateTime(env:PJNIEnv; Form:jObject): string;
-procedure jForm_SetWifiEnabled(env: PJNIEnv;  _jform: JObject; _status: boolean);
+
+function jForm_SetWifiEnabled(env: PJNIEnv; _jform: JObject; _status: boolean): boolean;
+
 function jForm_IsWifiEnabled              (env: PJNIEnv;  _jform: JObject): boolean;
 function jForm_IsConnected              (env: PJNIEnv;  _jform: JObject): boolean;
 function jForm_IsConnectedWifi              (env: PJNIEnv;  _jform: JObject): boolean;
+
 function jForm_GetEnvironmentDirectoryPath(env: PJNIEnv;  _jform: JObject; _directory: integer): string;
 function jForm_GetInternalAppStoragePath(env: PJNIEnv;  _jform: JObject): string;
 function jForm_CopyFile(env: PJNIEnv;  _jform: JObject; _srcFullName: string; _destFullName: string): boolean;
@@ -2639,10 +2657,11 @@ begin
     Result:= jForm_GetDoubleExtra(FjEnv, FjObject, data ,extraName ,defaultValue);
 end;
 
-procedure jForm.SetWifiEnabled(_status: boolean);
+function jForm.SetWifiEnabled(_status: boolean): boolean;
 begin
+  Result:= False;
   if FInitialized then
-   jForm_SetWifiEnabled(FjEnv, FjObject, _status);
+   Result:= jForm_SetWifiEnabled(FjEnv, FjObject, _status);
 end;
 
 function jForm.IsWifiEnabled(): boolean;
@@ -3070,6 +3089,34 @@ begin
   //in designing component state: set value here...
   if FInitialized then
      jForm_SetShowWhenLocked(FjEnv, FjObject, _value);
+end;
+
+function jForm.ParseUri(_uriAsString: string): jObject;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jForm_ParseUri(FjEnv, FjObject, _uriAsString);
+end;
+
+function jForm.UriToString(_uri: jObject): string;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jForm_UriToString(FjEnv, FjObject, _uri);
+end;
+
+function jForm.IsConnectedTo(_connectionType: TConnectionType): boolean;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jForm_IsConnectedTo(FjEnv, FjObject, Ord(_connectionType));
+end;
+
+function jForm.IsMobileDataEnabled(): boolean;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jForm_IsMobileDataEnabled(FjEnv, FjObject);
 end;
 
 {-------- jForm_JNI_Bridge ----------}
@@ -3934,6 +3981,71 @@ begin
   jCls:= env^.GetObjectClass(env, _jform);
   jMethod:= env^.GetMethodID(env, jCls, 'SetShowWhenLocked', '(Z)V');
   env^.CallVoidMethodA(env, _jform, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+function jForm_ParseUri(env: PJNIEnv; _jform: JObject; _uriAsString: string): jObject;
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_uriAsString));
+  jCls:= env^.GetObjectClass(env, _jform);
+  jMethod:= env^.GetMethodID(env, jCls, 'ParseUri', '(Ljava/lang/String;)Landroid/net/Uri;');
+  Result:= env^.CallObjectMethodA(env, _jform, jMethod, @jParams);
+env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+function jForm_UriToString(env: PJNIEnv; _jform: JObject; _uri: jObject): string;
+var
+  jStr: JString;
+  jBoo: JBoolean;
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= _uri;
+  jCls:= env^.GetObjectClass(env, _jform);
+  jMethod:= env^.GetMethodID(env, jCls, 'UriToString', '(Landroid/net/Uri;)Ljava/lang/String;');
+  jStr:= env^.CallObjectMethodA(env, _jform, jMethod, @jParams);
+  case jStr = nil of
+     True : Result:= '';
+     False: begin
+              jBoo:= JNI_False;
+              Result:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
+            end;
+  end;
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+function jForm_IsConnectedTo(env: PJNIEnv; _jform: JObject; _connectionType: integer): boolean;
+var
+  jBoo: JBoolean;
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].i:= _connectionType;
+  jCls:= env^.GetObjectClass(env, _jform);
+  jMethod:= env^.GetMethodID(env, jCls, 'IsConnectedTo', '(I)Z');
+  jBoo:= env^.CallBooleanMethodA(env, _jform, jMethod, @jParams);
+  Result:= boolean(jBoo);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+
+function jForm_IsMobileDataEnabled(env: PJNIEnv; _jform: JObject): boolean;
+var
+  jBoo: JBoolean;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jform);
+  jMethod:= env^.GetMethodID(env, jCls, 'IsMobileDataEnabled', '()Z');
+  jBoo:= env^.CallBooleanMethod(env, _jform, jMethod);
+  Result:= boolean(jBoo);
   env^.DeleteLocalRef(env, jCls);
 end;
 
@@ -5274,16 +5386,18 @@ begin
   env^.DeleteLocalRef(env, cls);
 end;
 
-procedure jForm_SetWifiEnabled(env: PJNIEnv; _jform: JObject; _status: boolean);
+function jForm_SetWifiEnabled(env: PJNIEnv; _jform: JObject; _status: boolean): boolean;
 var
+  jBoo: JBoolean;
   jParams: array[0..0] of jValue;
   jMethod: jMethodID=nil;
   jCls: jClass=nil;
 begin
   jParams[0].z:= JBool(_status);
   jCls:= env^.GetObjectClass(env, _jform);
-  jMethod:= env^.GetMethodID(env, jCls, 'SetWifiEnabled', '(Z)V');
-  env^.CallVoidMethodA(env, _jform, jMethod, @jParams);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetWifiEnabled', '(Z)Z');
+  jBoo:= env^.CallBooleanMethodA(env, _jform, jMethod, @jParams);
+  Result:= boolean(jBoo);
   env^.DeleteLocalRef(env, jCls);
 end;
 
@@ -5327,8 +5441,6 @@ begin
   Result:= boolean(jBoo);
   env^.DeleteLocalRef(env, jCls);
 end;
-
-
 
 function jForm_GetEnvironmentDirectoryPath(env: PJNIEnv; _jform: JObject; _directory: integer): string;
 var

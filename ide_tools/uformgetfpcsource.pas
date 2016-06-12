@@ -14,13 +14,15 @@ type
 
   TFormGetFPCSource = class(TForm)
     Button1: TButton;
+    ComboBoxFPCTrunk: TComboBox;
     EditPathToFPCTrunk: TEdit;
     EditPathToSVN: TEdit;
     GroupBox1: TGroupBox;
+    GroupBox2: TGroupBox;
     GroupBox4: TGroupBox;
     Label1: TLabel;
     Label2: TLabel;
-    RadioGroup2: TRadioGroup;
+    Label3: TLabel;
     SelectDirectoryDialog1: TSelectDirectoryDialog;
     SpeedButton1: TSpeedButton;
     SpeedButton2: TSpeedButton;
@@ -90,13 +92,9 @@ begin
 
     Tool.Executable := svnBinPath + DirectorySeparator+ 'svn'+ strExt;
 
-    Params.Add('co');                  //checkout the latest trunk sources of FPC
-    if RadioGroup2.ItemIndex = 0 then
-       Params.Add('http://svn.freepascal.org/svn/fpc/trunk')
-    else  //release ... TODO: need test!
-       Params.Add('http://svn.freepascal.org/svn/fpc/tags/release_3_0_0');
-
-    Params.Add(fpcTrunkStorePath);
+    Params.Add('co');                    //checkout the latest trunk sources of FPC
+    Params.Add(Trim(ComboBoxFPCTrunk.Text)); //http://svn.freepascal.org/svn/fpc/trunk
+    Params.Add(fpcTrunkStorePath);       //https://github.com/graemeg/freepascal.git
 
     Tool.CmdLineParams := Params.DelimitedText;
     Tool.Scanners.Add(SubToolDefault);

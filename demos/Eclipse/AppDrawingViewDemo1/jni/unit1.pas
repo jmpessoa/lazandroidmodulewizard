@@ -22,7 +22,11 @@ type
     jTextView2: jTextView;
     procedure AndroidModule1Create(Sender: TObject);
     procedure jButton1Click(Sender: TObject);
-    procedure jDrawingView1Draw(Sender: TObject; Canvas: jCanvas);
+    procedure jDrawingView1Draw(Sender: TObject);
+    procedure jDrawingView1FlingGesture(Sender: TObject;
+      flingGesture: TFlingGesture);
+    procedure jDrawingView1PinchZoomGesture(Sender: TObject;
+      scaleFactor: single; scaleState: TPinchZoomScaleState);
     procedure jDrawingView1TouchMove(Sender: TObject; Touch: TMouch);
     procedure jDrawingView1TouchUp(Sender: TObject; Touch: TMouch);
 
@@ -43,9 +47,16 @@ implementation
 
 { TAndroidModule1 }
 
-procedure TAndroidModule1.jDrawingView1Draw(Sender: TObject; Canvas: jCanvas);
+procedure TAndroidModule1.jButton1Click(Sender: TObject);
+begin
+  jDrawingView1.SaveToFile(Self.GetEnvironmentDirectoryPath(dirDownloads), 'drawing_image.png');
+  ShowMessage('Imagem Saved to "..\Download"...');
+end;
+
+procedure TAndroidModule1.jDrawingView1Draw(Sender: TObject);  // changed by tintinux's suggestion
 var
   w1, h1: integer;
+  //viewCanvas: jObject;
 begin
   w1:= jDrawingView1.Width;
   h1:= jDrawingView1.Height;
@@ -61,7 +72,7 @@ begin
   jDrawingView1.DrawLine(w1-1,0,0,0);
 
   //jView1.Canvas.PaintStyle:= psFillAndStroke;
-  jDrawingView1.PaintColor:= colbrRed;
+  //jDrawingView1.PaintColor:= colbrRed;
 
   //jView1.Canvas.PaintTextSize:= 20;
   //jView1.Canvas.drawText('Drawing View Test: Drag the cube!', 10,30);
@@ -70,12 +81,21 @@ begin
 
   jDrawingView1.DrawBitmap(jBitmap1.GetImage(), P.X-100,P.Y-100,P.X+100,P.Y+100);
 
+  //we can get the canvas here:
+  //viewCanvas:= jDrawingView1.Canvas;
+
 end;
 
-procedure TAndroidModule1.jButton1Click(Sender: TObject);
+procedure TAndroidModule1.jDrawingView1FlingGesture(Sender: TObject;
+  flingGesture: TFlingGesture);
 begin
-  jDrawingView1.SaveToFile(Self.GetEnvironmentDirectoryPath(dirDownloads), 'drawing_image.png');
-  ShowMessage('Imagem Saved to "..\Download"...');
+  jDrawingView1.PaintColor:= colbrGold;
+end;
+
+procedure TAndroidModule1.jDrawingView1PinchZoomGesture(Sender: TObject;
+  scaleFactor: single; scaleState: TPinchZoomScaleState);
+begin
+  jDrawingView1.PaintColor:= colbrRed;   //default
 end;
 
 procedure TAndroidModule1.AndroidModule1Create(Sender: TObject);

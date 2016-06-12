@@ -14,7 +14,6 @@ type
 
   TFormSettingsPaths  = class(TForm)
     BitBtnOK: TBitBtn;
-    BevelSimonsayzTemplateLazBuildAndButtons: TBevel;
     BevelSDKNDKAndSimonsayzTemplateLazBuild: TBevel;
     BevelJDKAntAndSDKNDK: TBevel;
     BitBtnCancel: TBitBtn;
@@ -28,7 +27,6 @@ type
     LabelPathToJavaJDK: TLabel;
     LabelPathToAndroidSDK: TLabel;
     LabelPathToAntBinary: TLabel;
-    RadioGroupPrebuildOSys: TRadioGroup;
     RGNDKVersion: TRadioGroup;
     SelDirDlgPathToAndroidNDK: TSelectDirectoryDialog;
     SelDirDlgPathToSimonsayzTemplate: TSelectDirectoryDialog;
@@ -40,6 +38,7 @@ type
     SpBPathToJavaJDK: TSpeedButton;
     SpBPathToAndroidSDK: TSpeedButton;
     SpBPathToAntBinary: TSpeedButton;
+    StatusBar1: TStatusBar;
     procedure BitBtnOKClick(Sender: TObject);
     procedure BitBtnCancelClick(Sender: TObject);
     procedure FormActivate(Sender: TObject);
@@ -50,7 +49,7 @@ type
     procedure SpBPathToJavaJDKClick(Sender: TObject);
     procedure SpBPathToAndroidSDKClick(Sender: TObject);
     procedure SpBPathToAntBinaryClick(Sender: TObject);
-    function GetRadioGroupPrebuildOSysIndex(prebuildSys: string): integer;
+
   private
     { private declarations }
     FPathToJavaTemplates: string;
@@ -64,6 +63,8 @@ type
     FOk: boolean;
     procedure LoadSettings(const fileName: string);
     procedure SaveSettings(const fileName: string);
+    function GetPrebuiltDirectory: string;
+
   end;
 
 var
@@ -75,6 +76,72 @@ implementation
 
 { TFormSettingsPaths }
 
+function TFormSettingsPaths.GetPrebuiltDirectory: string;
+var
+   pathToNdkToolchainsArm46,
+   pathToNdkToolchainsArm49,
+   pathToNdkToolchainsArm443: string;
+begin
+   Result:= '';
+
+   pathToNdkToolchainsArm443:= FPathToAndroidNDK+DirectorySeparator+'toolchains'+DirectorySeparator+
+                                                 'arm-linux-androideabi-4.4.3'+DirectorySeparator+
+                                                 'prebuilt'+DirectorySeparator;
+
+   pathToNdkToolchainsArm46:= FPathToAndroidNDK+DirectorySeparator+'toolchains'+DirectorySeparator+
+                                              'arm-linux-androideabi-4.6'+DirectorySeparator+
+                                              'prebuilt'+DirectorySeparator;
+
+   pathToNdkToolchainsArm49:= FPathToAndroidNDK+DirectorySeparator+'toolchains'+DirectorySeparator+
+                                                'arm-linux-androideabi-4.9'+DirectorySeparator+
+                                                'prebuilt'+DirectorySeparator;
+
+   {$ifdef windows}
+     if DirectoryExists(pathToNdkToolchainsArm49+ 'windows') then
+     begin
+       Result:= 'windows';
+       Exit;
+     end;
+     if DirectoryExists(pathToNdkToolchainsArm46+ 'windows') then
+     begin
+       Result:= 'windows';
+       Exit;
+     end;
+     if DirectoryExists(pathToNdkToolchainsArm443+ 'windows') then
+     begin
+       Result:= 'windows';
+       Exit;
+     end;
+     {$ifdef win64}
+       if DirectoryExists(pathToNdkToolchainsArm49 + 'windows-x86_64') then Result:= 'windows-x86_64';
+     {$endif}
+   {$else}
+     {$ifdef darvin}
+        if DirectoryExists(pathToNdkToolchainsArm49+ 'darwin-x86_64') then Result:= 'darwin-x86_64';
+     {$else}
+       {$ifdef cpu64}
+         if DirectoryExists(pathToNdkToolchainsArm49+ 'linux-x86_64') then Result:= 'linux-x86_64';
+       {$else}
+         if DirectoryExists(pathToNdkToolchainsArm49+ 'linux-x86_32') then
+         begin
+            Result:= 'linux-x86_32';
+            Exit;
+         end;
+         if DirectoryExists(pathToNdkToolchainsArm46+ 'linux-x86_32') then
+         begin
+           Result:= 'linux-x86_32';
+           Exit;
+         end;
+         if DirectoryExists(pathToNdkToolchainsArm443+ 'linux-x86_32') then
+         begin
+           Result:= 'linux-x86_32';
+           Exit;
+         end;
+       {$endif}
+     {$endif}
+   {$endif}
+
+end;
 procedure TFormSettingsPaths.FormClose(Sender: TObject; var CloseAction: TCloseAction);
 begin
   if FOk then
@@ -150,14 +217,6 @@ begin
   end;
 end;
 
-function TFormSettingsPaths.GetRadioGroupPrebuildOSysIndex(prebuildSys: string): integer;
-begin
-   if Pos('windows', prebuildSys) > 0 then Result:= 0
-   else if Pos('_64', prebuildSys) > 0 then Result:= 3
-   else if Pos('linux-x86', prebuildSys) > 0 then Result:= 1
-   else if Pos('osx', prebuildSys) > 0 then Result:= 2;
-end;
-
 procedure TFormSettingsPaths.LoadSettings(const fileName: string);
 var
    indexNdk: integer;
@@ -181,9 +240,7 @@ begin
       RGNDKVersion.ItemIndex:= indexNdk;
 
       FPrebuildOSYS:= ReadString('NewProject','PrebuildOSYS', '');
-      if  FPrebuildOSYS <> '' then
-         RadioGroupPrebuildOSys.ItemIndex:= GetRadioGroupPrebuildOSysIndex(FPrebuildOSYS)
-      else RadioGroupPrebuildOSys.ItemIndex:= 0;
+
     finally
       Free;
     end;
@@ -194,24 +251,36 @@ procedure TFormSettingsPaths.SaveSettings(const fileName: string);
 begin
   with TInifile.Create(fileName) do
   try
+    if EditPathToAndroidNDK.Text <> '' then
       WriteString('NewProject', 'PathToNdkPlataforms', EditPathToAndroidNDK.Text);
+
+    if EditPathToSimonsayzTemplate.Text <> '' then
       WriteString('NewProject', 'PathToJavaTemplates', EditPathToSimonsayzTemplate.Text);
+
+    if EditPathToJavaJDK.Text <> '' then
       WriteString('NewProject', 'PathToJavaJDK', EditPathToJavaJDK.Text);
+
+    if EditPathToAndroidNDK.Text <> '' then
       WriteString('NewProject', 'PathToAndroidNDK', EditPathToAndroidNDK.Text);
+
+    if EditPathToAndroidSDK.Text <> '' then
       WriteString('NewProject', 'PathToAndroidSDK', EditPathToAndroidSDK.Text);
-      WriteString('NewProject', 'PathToAntBin', EditPathToAntBinary.Text);
-      WriteString('NewProject', 'NDK', IntToStr(RGNDKVersion.ItemIndex));  //RGNDKVersion
 
-     case RadioGroupPrebuildOSys.ItemIndex of
-       0: FPrebuildOSYS:= 'windows';
-       1: FPrebuildOSYS:= 'linux-x86';
-       2: FPrebuildOSYS:= 'osx';   //TODO: fix here!
-       3: FPrebuildOSYS:= 'linux-x86_64';
-     end;
+    if EditPathToAndroidSDK.Text <> '' then
+      WriteString('NewProject', 'PathToAntBin', EditPathToAndroidSDK.Text);
 
-     WriteString('NewProject', 'PrebuildOSYS', FPrebuildOSYS);
+    WriteString('NewProject', 'NDK', IntToStr(RGNDKVersion.ItemIndex));
+
+    FPathToAndroidNDK:= EditPathToAndroidSDK.Text;
+
+    if FPathToAndroidNDK <> '' then
+        FPrebuildOSYS:= GetPrebuiltDirectory();
+
+    if FPrebuildOSYS <> '' then
+      WriteString('NewProject', 'PrebuildOSYS', FPrebuildOSYS);
+
   finally
-     Free;
+    Free;
   end;
 end;
 

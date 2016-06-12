@@ -39,7 +39,6 @@ type
     PanelButtons: TPanel;
     PanelRadioGroup: TPanel;
     RGInstruction: TRadioGroup;
-    RGFPU: TRadioGroup;
     SelDirDlgPathToWorkspace: TSelectDirectoryDialog;
     SpdBtnPathToWorkspace: TSpeedButton;
     SpdBtnRefreshProjectName: TSpeedButton;
@@ -62,7 +61,6 @@ type
     procedure ListBoxPlatformClick(Sender: TObject);
 
     procedure RGInstructionClick(Sender: TObject);
-    procedure RGFPUClick(Sender: TObject);
 
     procedure SpdBtnPathToWorkspaceClick(Sender: TObject);
     procedure SpdBtnRefreshProjectNameClick(Sender: TObject);
@@ -121,6 +119,7 @@ type
     function GetNDKPlatformByApi(api: string): string;
 
     function GetFullJavaSrcPath(fullProjectName: string): string;
+    function GetPrebuiltDirectory: string;
 
     procedure LoadPathsSettings(const fileName: string);
 
@@ -261,11 +260,14 @@ end;
 procedure TFormWorkspace.RGInstructionClick(Sender: TObject);
 begin
   FInstructionSet:= RGInstruction.Items[RGInstruction.ItemIndex];  //fix 15-december-2013
-end;
 
-procedure TFormWorkspace.RGFPUClick(Sender: TObject);
-begin
-  FFPUSet:= RGFPU.Items[RGFPU.ItemIndex];  //fix 15-december-2013
+  FFPUSet:= ''; //x86
+  if RGInstruction.ItemIndex = 0  then  FFPUSet:= 'Soft';
+  if RGInstruction.ItemIndex = 1  then FFPUSet:= 'VFPv3';
+
+  if FPathToAndroidNDK <> '' then
+     FPrebuildOSYS:= GetPrebuiltDirectory();
+
 end;
 
 function TFormWorkspace.GetNDKPlatform(identName: string): string;
@@ -307,6 +309,73 @@ begin
     end;
     Result:= path;
     strList.Free;
+end;
+
+function TFormWorkspace.GetPrebuiltDirectory: string;
+var
+   pathToNdkToolchainsArm46,
+   pathToNdkToolchainsArm49,
+   pathToNdkToolchainsArm443: string;
+begin
+   Result:= '';
+
+   pathToNdkToolchainsArm443:= FPathToAndroidNDK+DirectorySeparator+'toolchains'+DirectorySeparator+
+                                                 'arm-linux-androideabi-4.4.3'+DirectorySeparator+
+                                                 'prebuilt'+DirectorySeparator;
+
+   pathToNdkToolchainsArm46:= FPathToAndroidNDK+DirectorySeparator+'toolchains'+DirectorySeparator+
+                                              'arm-linux-androideabi-4.6'+DirectorySeparator+
+                                              'prebuilt'+DirectorySeparator;
+
+   pathToNdkToolchainsArm49:= FPathToAndroidNDK+DirectorySeparator+'toolchains'+DirectorySeparator+
+                                                'arm-linux-androideabi-4.9'+DirectorySeparator+
+                                                'prebuilt'+DirectorySeparator;
+
+   {$ifdef windows}
+     if DirectoryExists(pathToNdkToolchainsArm49+ 'windows') then
+     begin
+       Result:= 'windows';
+       Exit;
+     end;
+     if DirectoryExists(pathToNdkToolchainsArm46+ 'windows') then
+     begin
+       Result:= 'windows';
+       Exit;
+     end;
+     if DirectoryExists(pathToNdkToolchainsArm443+ 'windows') then
+     begin
+       Result:= 'windows';
+       Exit;
+     end;
+     {$ifdef win64}
+       if DirectoryExists(pathToNdkToolchainsArm49 + 'windows-x86_64') then Result:= 'windows-x86_64';
+     {$endif}
+   {$else}
+     {$ifdef darvin}
+        if DirectoryExists(pathToNdkToolchainsArm49+ 'darwin-x86_64') then Result:= 'darwin-x86_64';
+     {$else}
+       {$ifdef cpu64}
+         if DirectoryExists(pathToNdkToolchainsArm49+ 'linux-x86_64') then Result:= 'linux-x86_64';
+       {$else}
+         if DirectoryExists(pathToNdkToolchainsArm49+ 'linux-x86_32') then
+         begin
+            Result:= 'linux-x86_32';
+            Exit;
+         end;
+         if DirectoryExists(pathToNdkToolchainsArm46+ 'linux-x86_32') then
+         begin
+           Result:= 'linux-x86_32';
+           Exit;
+         end;
+         if DirectoryExists(pathToNdkToolchainsArm443+ 'linux-x86_32') then
+         begin
+           Result:= 'linux-x86_32';
+           Exit;
+         end;
+       {$endif}
+     {$endif}
+   {$endif}
+
 end;
 
 procedure TFormWorkspace.FormClose(Sender: TObject; var CloseAction: TCloseAction);
@@ -557,23 +626,6 @@ begin
           end;
       end;
 
-      FPrebuildOSYS:= ReadString('NewProject','PrebuildOSYS', '');
-      if FPrebuildOSYS = '' then
-      begin
-          frmSys:= TFormOSystem.Create(nil);
-          //frm.LabelPathTo.Caption:= 'WARNING! Enter Your System:  [ex. windows or linux-x86 or linux-x86_64 ...]';
-          if frmSys.ShowModal = mrOK then
-          begin
-             FPrebuildOSYS:= frmSys.PrebuildOSYS;
-             frmSys.Free;
-          end
-          else
-          begin
-             frmSys.Free;
-             Exit;
-          end;
-      end;
-
       FPathToAndroidNDK:= ReadString('NewProject','PathToAndroidNDK', '');
       if  FPathToAndroidNDK = '' then
       begin
@@ -591,6 +643,11 @@ begin
           end;
       end;
 
+      FPrebuildOSYS:= ReadString('NewProject','PrebuildOSYS', '');
+      if FPrebuildOSYS = '' then
+        if FPathToAndroidNDK <> '' then
+           FPrebuildOSYS:= GetPrebuiltDirectory();
+
       indexNdk:= StrToIntDef(ReadString('NewProject','NDK', ''), 3); //ndk 10e   ... default
 
       case indexNdk of
@@ -598,6 +655,7 @@ begin
          1: FNDK:= '9';
          2: FNDK:= '10c'; //old Laz4Android
          3: FNDK:= '10e';
+         4: FNDK:= '11c';
       end;
 
       FPathToJavaTemplates:= ReadString('NewProject','PathToJavaTemplates', '');
@@ -725,6 +783,10 @@ begin
   ListBoxPlatform.MakeCurrentVisible;
   ListBoxMinSDK.MakeCurrentVisible;
   ListBoxTargetAPI.MakeCurrentVisible;
+
+  if FPathToAndroidNDK <> '' then
+    FPrebuildOSYS:= GetPrebuiltDirectory();
+
 end;
 
 procedure TFormWorkspace.CheckBox1Click(Sender: TObject);
@@ -836,8 +898,7 @@ end;
 
 procedure TFormWorkspace.LoadSettings(const pFilename: string);  //called by
 var
-  i1, i2, i3, i5, j1: integer;
-  mApi: integer;
+  i1,  i3,  j1: integer;
 begin
   FFileName:= pFilename;
   with TIniFile.Create(pFilename) do
@@ -851,13 +912,10 @@ begin
     FMainActivity:= ReadString('NewProject','MainActivity', '');  //dummy
     if FMainActivity = '' then FMainActivity:= 'App';
 
-    i5:= StrToIntDef(ReadString('NewProject','NDK', ''), 2);  //ndk 10
     ListBoxPlatform.Clear;
 
 
     i1:= StrToIntDef(ReadString('NewProject','InstructionSet', ''), 0);
-
-    i2:= StrToIntDef(ReadString('NewProject','FPUSet', ''), 0);
 
     i3:= StrToIntDef(ReadString('NewProject','ProjectModel', ''), 0);
 
@@ -878,18 +936,21 @@ begin
     FindAllDirectories(ComboSelectProjectName.Items, FPathToWorkspace, False);
 
     FPrebuildOSYS:= ReadString('NewProject','PrebuildOSYS', '');
+
   finally
     Free;
   end;
 
   RGInstruction.ItemIndex:= i1;
-  RGFPU.ItemIndex:= i2;
 
   if i3 = 0 then FProjectModel:= 'Eclipse'
   else FProjectModel:= 'Ant';
 
   FInstructionSet:= RGInstruction.Items[RGInstruction.ItemIndex];
-  FFPUSet:= RGFPU.Items[RGFPU.ItemIndex];
+
+  FFPUSet:= ''; //x86
+  if RGInstruction.ItemIndex = 0  then  FFPUSet:= 'Soft';
+  if RGInstruction.ItemIndex = 1  then FFPUSet:= 'VFPv3';
 
   EditPathToWorkspace.Text := FPathToWorkspace;
 
@@ -908,7 +969,6 @@ begin
 
       WriteString('NewProject', 'FullProjectName', FAndroidProjectName);
       WriteString('NewProject', 'InstructionSet', IntToStr(RGInstruction.ItemIndex));
-      WriteString('NewProject', 'FPUSet', IntToStr(RGFPU.ItemIndex));
 
       if  FProjectModel = 'Ant' then            //IntToStr(RGProjectType.ItemIndex)
         WriteString('NewProject', 'ProjectModel', '1')  //Ant
@@ -946,6 +1006,7 @@ begin
       WriteString('NewProject', 'PathToAndroidSDK', FPathToAndroidSDK);
       WriteString('NewProject', 'PathToAntBin', FPathToAntBin);
 
+      FPrebuildOSYS:= GetPrebuiltDirectory();
       WriteString('NewProject', 'PrebuildOSYS', FPrebuildOSYS);
    finally
       Free;

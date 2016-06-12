@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android" package="com.example.appgridviewdemo1" android:versionCode="1" android:versionName="1.0">
   <uses-sdk android:minSdkVersion="11" android:targetSdkVersion="17"/>
+  
   <uses-permission android:name="android.permission.ACCESS_BLUETOOTH_SHARE"/>
   <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
   <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
@@ -19,6 +20,7 @@
   <uses-permission android:name="android.permission.SEND_SMS"/>
   <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
   <uses-permission android:name="android.permission.WRITE_OWNER_DATA"/>
+  
   <uses-feature android:name="android.hardware.camera" android:required="false"/>
   <uses-feature android:name="android.hardware.camera.flash" android:required="false"/>
   <uses-feature android:glEsVersion="0x00020000" android:required="true"/>

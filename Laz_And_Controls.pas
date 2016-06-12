@@ -156,6 +156,7 @@ type
                  imeFlagForceASCII);
 
   jCanvas = class;
+
   TOnDraw  = Procedure(Sender: TObject; Canvas: jCanvas) of object;
 
   jPanel = class;
@@ -1096,6 +1097,7 @@ type
     procedure SetImageFromJByteArray(var _image: TDynArrayOfJByte);
     procedure SetImageBitmap(_bitmap: jObject; _width: integer; _height: integer); overload; //deprecated
     procedure SetImage(_bitmap: jObject; _width: integer; _height: integer); overload;
+    Procedure SetImage(_fullFilename: string); overload;
 
     property Count: integer read GetCount;
   published
@@ -4492,6 +4494,12 @@ begin
       FImageName:= Trim(FImageList.Images.Strings[foundIndex]);
       jImageView_setImage(FjEnv, FjObject , GetFilePath(FFilePath){jForm(Owner).App.Path.Dat}+'/'+FImageName);
    end;
+end;
+
+Procedure jImageView.SetImage(_fullFilename: string);
+begin
+   if Initialized then
+      jImageView_setImage(FjEnv, FjObject , _fullFilename);
 end;
 
 Procedure jImageView.SetImageByIndex(Value: integer);
@@ -9051,6 +9059,11 @@ begin
     jPanel(Obj).UpdateJNI(gApp);
     jPanel(Obj).GenEvent_OnFlingGestureDetected(Obj, direction);
   end;
+  if Obj is jDrawingView then
+  begin
+    jDrawingView(Obj).UpdateJNI(gApp);
+    jDrawingView(Obj).GenEvent_OnFlingGestureDetected(Obj, direction);
+  end;
 end;
 
 procedure jPanel.GenEvent_OnPinchZoomGestureDetected(Obj: TObject; scaleFactor: single; state: integer);
@@ -9066,6 +9079,11 @@ begin
   begin
     jPanel(Obj).UpdateJNI(gApp);
     jPanel(Obj).GenEvent_OnPinchZoomGestureDetected(Obj,  scaleFactor, state);
+  end;
+  if Obj is jDrawingView then
+  begin
+    jDrawingView(Obj).UpdateJNI(gApp);
+    jDrawingView(Obj).GenEvent_OnPinchZoomGestureDetected(Obj,  scaleFactor, state);
   end;
 end;
 

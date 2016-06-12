@@ -185,6 +185,7 @@ begin
   end;
 
   packList:= TstringList.Create;
+  fileList:= TStringList.Create;
 
   if FileExistsUTF8(ComboBoxSelectProject.Text+DirectorySeparator+'packagename.txt') then //for release >= 0.6/05
   begin
@@ -215,12 +216,9 @@ begin
   begin
     if FileExistsUTF8(PathToJavaClass+DirectorySeparator+'App.java') then
     begin
-      fileList:= TStringList.Create;
       fileList.LoadFromFile(PathToJavaClass+DirectorySeparator+'App.java');
       fileList.SaveToFile(PathToJavaClass+DirectorySeparator+'App.java'+'.bak');
-      fileList.Free;
     end;
-    packList.Clear;
     packList.LoadFromFile(PathToJavaTemplates+DirectorySeparator+'App.java');
     packList.Strings[0]:= 'package '+ PackageName+';'; //ex. package com.example.appbuttondemo1;
     packList.SaveToFile(PathToJavaClass+DirectorySeparator+'App.java');
@@ -233,19 +231,34 @@ begin
   begin
     if FileExistsUTF8(PathToJavaClass+DirectorySeparator+'Controls.java') then
     begin
-      fileList:= TStringList.Create;
       fileList.LoadFromFile(PathToJavaClass+DirectorySeparator+'Controls.java');
       fileList.SaveToFile(PathToJavaClass+DirectorySeparator+'Controls.java'+'.bak');
-      fileList.Free;
     end;
-    packList.Clear;                                              //JavaClassName
     packList.LoadFromFile(PathToJavaTemplates+DirectorySeparator+'Controls.java');
     packList.Strings[0]:= 'package '+ PackageName+';'; //ex. package com.example.appbuttondemo1;
     packList.SaveToFile(PathToJavaClass+DirectorySeparator+'Controls.java');
+
+    if FileExistsUTF8(ProjectPath+DirectorySeparator+'lamwdesigner'+DirectorySeparator+'jForm.content') then
+    begin
+      packList.LoadFromFile(ProjectPath+DirectorySeparator+'lamwdesigner'+DirectorySeparator+'jForm.content');
+      for i:= 0 to packList.Count-1 do
+      begin
+        if FileExistsUTF8(PathToJavaTemplates+DirectorySeparator+'lamwdesigner'+DirectorySeparator +packList.Strings[i]+'.create') then
+        begin
+          fileList.LoadFromFile(PathToJavaTemplates+DirectorySeparator+'lamwdesigner'+DirectorySeparator +packList.Strings[i]+'.create');
+          strAux:= fileList.Text; //saved
+          fileList.LoadFromFile(PathToJavaClass+DirectorySeparator+'Controls.java');
+          fileList.Insert(fileList.Count-1, strAux);
+          fileList.SaveToFile(PathToJavaClass+DirectorySeparator+'Controls.java');
+        end;
+      end;
+    end;
+
     MemoLog.Add('["Controls.java"  :: updated!]');
     ShowMessage('"Controls.java"  :: updated!');
   end;
   packList.Free;
+  fileList.Free;
 
   //upgrade [library] controls.lpr
   if  CheckGroupUpgradeTemplates.Checked[2] then

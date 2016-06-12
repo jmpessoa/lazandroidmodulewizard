@@ -9,6 +9,7 @@ uses
 
 type
 
+ TOnDrawing  = Procedure(Sender: TObject) of object;
 {Draft Component code by "Lazarus Android Module Wizard" [5/20/2016 4:14:09]}
 {https://github.com/jmpessoa/lazandroidmodulewizard}
 
@@ -18,7 +19,7 @@ jDrawingView = class(jVisualControl)    //jDrawingView   jGraphicsView
  private
     FMouches     : TMouches;
     //
-    FOnDraw      : TOnDraw;
+    FOnDraw      : TOnDrawing;
     //
     FOnTouchDown : TOnTouchEvent;
     FOnTouchMove : TOnTouchEvent;
@@ -30,11 +31,17 @@ jDrawingView = class(jVisualControl)    //jDrawingView   jGraphicsView
 
     FImageIdentifier: string;
 
+    FOnFling: TOnFling;
+    FOnPinchGesture: TOnPinchZoom;
+    FMinZoomFactor: single;
+    FMaxZoomFactor: single;
+
     procedure SetVisible(Value: Boolean);
     procedure SetColor(Value: TARGBColorBridge); //background
     procedure UpdateLParamHeight;
     procedure UpdateLParamWidth;
 
+    function GetCanvas(): jObject;
  public
     constructor Create(AOwner: TComponent); override;
     destructor  Destroy; override;
@@ -86,6 +93,11 @@ jDrawingView = class(jVisualControl)    //jDrawingView   jGraphicsView
     procedure SaveToFile(_filename: string); overload;
     procedure SaveToFile(_path: string; _filename: string);  overload;
 
+    procedure SetMinZoomFactor(_minZoomFactor: single);
+    procedure SetMaxZoomFactor(_maxZoomFactor: single);
+    procedure GenEvent_OnFlingGestureDetected(Obj: TObject; direction: integer);
+    procedure GenEvent_OnPinchZoomGestureDetected(Obj: TObject; scaleFactor: single; state: integer);
+
     Procedure GenEvent_OnTouch(Obj: TObject; Act,Cnt: integer; X1,Y1,X2,Y2: single);
     Procedure GenEvent_OnDraw (Obj: TObject; jCanvas: jObject);
 
@@ -99,13 +111,23 @@ jDrawingView = class(jVisualControl)    //jDrawingView   jGraphicsView
     property PaintColor: TARGBColorBridge read FPaintColor write SetPaintColor;
 
     property ImageIdentifier : string read FImageIdentifier write SetImageByResourceIdentifier;
-    //  property OnClick: TOnNotify read FOnClick write FOnClick;
+
+    property MinPinchZoomFactor: single read FMinZoomFactor write FMinZoomFactor;
+    property MaxPinchZoomFactor: single read FMaxZoomFactor write FMaxZoomFactor;
+
+    // Event - Click
+    //property OnClick: TOnNotify read FOnClick write FOnClick;
+
     // Event - Drawing
-    property OnDraw      : TOnDraw read FOnDraw write FOnDraw;
+    property OnDraw      : TOnDrawing read FOnDraw write FOnDraw;
+
     // Event - Touch
     property OnTouchDown : TOnTouchEvent read FOnTouchDown write FOnTouchDown;
     property OnTouchMove : TOnTouchEvent read FOnTouchMove write FOnTouchMove;
     property OnTouchUp   : TOnTouchEvent read FOnTouchUp   write FOnTouchUp;
+
+    property OnFlingGesture: TOnFling read FOnFling write FOnFling;
+    property OnPinchZoomGesture: TOnPinchZoom read FOnPinchGesture write FOnPinchGesture;
 
 end;
 
@@ -146,6 +168,10 @@ procedure jDrawingView_SetImageByResourceIdentifier(env: PJNIEnv; _jdrawingview:
 procedure jDrawingView_DrawBitmap(env: PJNIEnv; _jdrawingview: JObject; _bitmap: jObject);  overload;
 procedure jDrawingView_SaveToFile(env: PJNIEnv; _jdrawingview: JObject; _filename: string); overload;
 procedure jDrawingView_SaveToFile(env: PJNIEnv; _jdrawingview: JObject; _path: string; _filename: string); overload;
+procedure jDrawingView_SetMinZoomFactor(env: PJNIEnv; _jdrawingview: JObject; _minZoomFactor: single);
+procedure jDrawingView_SetMaxZoomFactor(env: PJNIEnv; _jdrawingview: JObject; _maxZoomFactor: single);
+
+function jDrawingView_GetCanvas(env: PJNIEnv; _jdrawingview: JObject): jObject;
 
 
 implementation
@@ -178,6 +204,10 @@ begin
   FPaintStrokeWidth:= 1;
   FPaintStyle:= psFillAndStroke;
   FPaintColor:= colbrRed;
+
+  FMinZoomFactor:= 1/4;
+  FMaxZoomFactor:= 8/2;
+
 end;
 
 destructor jDrawingView.Destroy;
@@ -581,7 +611,7 @@ end;
 // Event : Java Event -> Pascal
 Procedure jDrawingView.GenEvent_OnDraw(Obj: TObject; jCanvas: jObject);
 begin
-  if Assigned(FOnDraw) then FOnDraw(Obj, jCanvas{FjCanvas});
+  if Assigned(FOnDraw) then FOnDraw(Obj{,jCanvas});
 end;
 
 procedure jDrawingView.DrawLine(var _points: TDynArrayOfSingle);
@@ -646,6 +676,38 @@ begin
   //in designing component state: set value here...
   if FInitialized then
      jDrawingView_SaveToFile(FjEnv, FjObject, _path ,_filename);
+end;
+
+procedure jDrawingView.SetMinZoomFactor(_minZoomFactor: single);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jDrawingView_SetMinZoomFactor(FjEnv, FjObject, _minZoomFactor);
+end;
+
+procedure jDrawingView.SetMaxZoomFactor(_maxZoomFactor: single);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jDrawingView_SetMaxZoomFactor(FjEnv, FjObject, _maxZoomFactor);
+end;
+
+procedure jDrawingView.GenEvent_OnFlingGestureDetected(Obj: TObject; direction: integer);
+begin
+  if Assigned(FOnFling) then  FOnFling(Obj, TFlingGesture(direction));
+end;
+
+procedure jDrawingView.GenEvent_OnPinchZoomGestureDetected(Obj: TObject; scaleFactor: single; state: integer);
+begin
+  if Assigned(FOnPinchGesture) then  FOnPinchGesture(Obj, scaleFactor, TPinchZoomScaleState(state));
+end;
+
+function jDrawingView.GetCanvas(): jObject;
+begin
+  //in designing component state: result value here...
+  Result:= nil;
+  if FInitialized then
+   Result:= jDrawingView_GetCanvas(FjEnv, FjObject);
 end;
 
 {-------- jDrawingView_JNI_Bridge ----------}
@@ -1148,6 +1210,44 @@ begin
   env^.CallVoidMethodA(env, _jdrawingview, jMethod, @jParams);
 env^.DeleteLocalRef(env,jParams[0].l);
   env^.DeleteLocalRef(env,jParams[1].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jDrawingView_SetMinZoomFactor(env: PJNIEnv; _jdrawingview: JObject; _minZoomFactor: single);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].f:= _minZoomFactor;
+  jCls:= env^.GetObjectClass(env, _jdrawingview);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetMinZoomFactor', '(F)V');
+  env^.CallVoidMethodA(env, _jdrawingview, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+
+procedure jDrawingView_SetMaxZoomFactor(env: PJNIEnv; _jdrawingview: JObject; _maxZoomFactor: single);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].f:= _maxZoomFactor;
+  jCls:= env^.GetObjectClass(env, _jdrawingview);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetMaxZoomFactor', '(F)V');
+  env^.CallVoidMethodA(env, _jdrawingview, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+function jDrawingView_GetCanvas(env: PJNIEnv; _jdrawingview: JObject): jObject;
+var
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jdrawingview);
+  jMethod:= env^.GetMethodID(env, jCls, 'GetCanvas', '()Landroid/graphics/Canvas;');
+  Result:= env^.CallObjectMethod(env, _jdrawingview, jMethod);
   env^.DeleteLocalRef(env, jCls);
 end;
 

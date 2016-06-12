@@ -1,6 +1,6 @@
 package com.example.dummyapp;
 
-//Lamw: Lazarus Android Module Wizard  - version 0.6 - revision 46 - 24 May - 2016 
+//Lamw: Lazarus Android Module Wizard  - version 0.6 - revision 47 - 11 June - 2016 
 //Form Designer and Components development model!
 //
 //https://github.com/jmpessoa/lazandroidmodulewizard
@@ -63,6 +63,7 @@ import android.app.AlarmManager;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
+import android.app.DownloadManager;
 import android.app.Fragment;
 import android.app.FragmentTransaction;
 import android.app.Notification;
@@ -79,15 +80,11 @@ import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.ContentProviderOperation;
 import android.content.ContentProviderOperation.Builder;
-import android.content.ContentProviderResult;
 import android.content.ContentResolver;
-import android.content.ContentUris;
-import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.OperationApplicationException;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
@@ -106,10 +103,8 @@ import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.PixelFormat;
-import android.graphics.PorterDuff;
 import android.graphics.Rect;
 import android.graphics.Typeface;
-import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.BitmapDrawable;
 import android.hardware.Sensor;
@@ -123,35 +118,23 @@ import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Environment;
 import android.os.Handler;
-import android.os.Message;
-import android.os.RemoteException;
 import android.os.SystemClock;
 import android.os.Vibrator;
 import android.telephony.SmsManager;
 import android.telephony.SmsMessage;
 import android.telephony.TelephonyManager;
 import android.preference.PreferenceManager;
-import android.provider.BaseColumns;
 
 import android.provider.ContactsContract;
-import android.provider.ContactsContract.CommonDataKinds;
 import android.provider.ContactsContract.CommonDataKinds.Email;
 import android.provider.ContactsContract.CommonDataKinds.Phone;
-import android.provider.ContactsContract.CommonDataKinds.Photo;
-import android.provider.ContactsContract.CommonDataKinds.StructuredName;
-import android.provider.ContactsContract.Contacts;
-import android.provider.ContactsContract.Data;
-import android.provider.ContactsContract.RawContacts;   //**
+import android.provider.ContactsContract.RawContacts;   
 import android.provider.MediaStore;
 import android.provider.Settings;
 import android.text.Editable;
 import android.text.InputFilter;
 import android.text.InputType;
-import android.text.Layout;
-import android.text.TextUtils;
-import android.text.TextUtils.TruncateAt;
 import android.text.TextWatcher;
-import android.text.method.NumberKeyListener;
 import android.text.method.ScrollingMovementMethod;
 import android.util.Base64;
 import android.util.DisplayMetrics;
@@ -169,8 +152,6 @@ import android.media.MediaPlayer.OnCompletionListener;
 import android.media.MediaPlayer.OnPreparedListener;
 import android.media.MediaPlayer.OnTimedTextListener;
 import android.media.MediaPlayer.OnVideoSizeChangedListener;
-//import android.media.Ringtone;
-//import android.media.RingtoneManager;
 import android.media.TimedText;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -178,7 +159,6 @@ import android.net.Uri;
 import android.net.wifi.WifiManager;
 import android.util.Log;
 import android.view.ContextMenu;
-//import android.view.Display;
 import android.view.GestureDetector;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -189,21 +169,18 @@ import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.view.ScaleGestureDetector.SimpleOnScaleGestureListener;
 import android.view.SubMenu;
-//import android.view.Surface;
 import android.view.SurfaceHolder;
 import android.view.SurfaceHolder.Callback;
 import android.view.SurfaceView;
 import android.view.View.OnClickListener;
 import android.view.View;
 import android.view.ViewGroup;
-//import android.view.ViewParent;
 import android.view.Window;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation.AnimationListener;
 import android.view.animation.Animation;
 import android.view.animation.AnimationSet;
-//import android.view.animation.AnimationUtils;
 import android.view.animation.TranslateAnimation;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
@@ -239,7 +216,6 @@ import android.widget.RelativeLayout.LayoutParams;
 import android.widget.Switch;
 import android.widget.TimePicker;
 import android.widget.ToggleButton;
-//import android.view.ViewGroup.LayoutParams;
 import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.HorizontalScrollView;
@@ -248,11 +224,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ViewFlipper;
 
-
 import java.io.*;
-
-import java.lang.*;
-
+import java.lang.Class;
 import java.net.CookieManager;
 import java.net.CookieHandler;
 import java.net.CookiePolicy;
@@ -260,23 +233,14 @@ import java.net.CookieStore;
 import java.net.HttpCookie;
 import java.net.HttpURLConnection;
 import java.net.InetAddress;
-//import java.net.MalformedURLException;
-//import java.net.ProtocolException;
 import java.net.Socket;
 import java.net.URI;
-//import java.net.URISyntaxException;
 import java.net.URLEncoder;
-//import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-//import java.text.ParseException;
 import java.nio.ByteBuffer;
-//import java.nio.ByteOrder;
-//import java.nio.IntBuffer;
-//import java.nio.FloatBuffer;
-//import java.text.Format;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -287,6 +251,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Random;
 import java.util.Scanner;
 import java.util.StringTokenizer;
 //import java.util.Map;
@@ -536,18 +501,44 @@ public  void Close2() {
   controls.appLayout.removeView(layout);
   controls.pOnClose(PasObj);
 }
+
 public boolean IsConnected(){ // by renabor
+   boolean r = false;	
    ConnectivityManager cm =  (ConnectivityManager)controls.activity.getSystemService(Context.CONNECTIVITY_SERVICE);
+   if (cm == null) return r;   
    NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+   if (activeNetwork == null) return r;   
    return activeNetwork != null && activeNetwork.isConnectedOrConnecting();
 }
 
 public boolean IsConnectedWifi(){ // by renabor
+   boolean r = false;
    ConnectivityManager cm =  (ConnectivityManager)controls.activity.getSystemService(Context.CONNECTIVITY_SERVICE);
+   if (cm == null) return r;   
    NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+   if (activeNetwork == null) return r;   
    return activeNetwork.getType() == ConnectivityManager.TYPE_WIFI;
 }
 
+public boolean IsConnectedTo(int _connectionType) {	   
+	   int r = -1;
+	   if (!IsConnected()) return false;	   
+	   ConnectivityManager cm =  (ConnectivityManager)controls.activity.getSystemService(Context.CONNECTIVITY_SERVICE);	   
+	   NetworkInfo activeNetwork = cm.getActiveNetworkInfo();	   
+	   if (activeNetwork != null) {   	   
+		  switch (activeNetwork.getType()){
+		  case ConnectivityManager.TYPE_MOBILE: r = 0; break;  //0
+		  case ConnectivityManager.TYPE_WIFI: r = 1; break;  //1
+ 		  case ConnectivityManager.TYPE_BLUETOOTH: r = 2; break; //7
+		  case ConnectivityManager.TYPE_ETHERNET: r = 3; break; //9		  
+		  }	      
+	   }	   
+	   if (r == _connectionType)  
+		   return true;
+	   else 
+		  return false;
+	   
+}
 //
 public  void SetVisible ( boolean visible ) {	
 if (visible) { if (layout.getParent() == null)
@@ -555,7 +546,6 @@ if (visible) { if (layout.getParent() == null)
 else         { if (layout.getParent() != null)
                { controls.appLayout.removeView(layout); } };
 }
-
 
 //
 public  void SetEnabled ( boolean enabled ) {
@@ -632,16 +622,32 @@ public int getSystemVersion()
 	return controls.systemVersion;	
 }
 
-public void SetWifiEnabled(boolean _status) {
+ public boolean SetWifiEnabled(boolean _status) {
     WifiManager wifiManager = (WifiManager)this.controls.activity.getSystemService(Context.WIFI_SERVICE);             
-    wifiManager.setWifiEnabled(_status);
+    return wifiManager.setWifiEnabled(_status);
  }
 
  public boolean IsWifiEnabled() {
     WifiManager wifiManager = (WifiManager)this.controls.activity.getSystemService(Context.WIFI_SERVICE);
     return  wifiManager.isWifiEnabled();	
  }
-              
+         
+ public boolean IsMobileDataEnabled() {
+   boolean mobileDataEnabled = false; // Assume disabled 
+   ConnectivityManager cm = (ConnectivityManager) controls.activity.getSystemService(Context.CONNECTIVITY_SERVICE);
+   try {
+      final Class<?> cmClass = Class.forName(cm.getClass().getName());
+      Method method = cmClass.getDeclaredMethod("getMobileDataEnabled");
+      method.setAccessible(true); // Make the method callable
+      // get the setting for "mobile data"
+      mobileDataEnabled = (Boolean)method.invoke(cm);
+   } catch (Exception e) {
+     // Some problem accessible private API
+     // TODO do whatever error handling you want here
+   }
+   return mobileDataEnabled;
+ }
+ 
 public String GetEnvironmentDirectoryPath(int _directory) {
 	
 	File filePath= null;
@@ -1245,6 +1251,14 @@ public void SetShowWhenLocked(boolean _value) {
 	    controls.activity.getWindow().addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);
 	else
 		controls.activity.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);
+}
+
+public Uri ParseUri(String _uriAsString) {
+  return Uri.parse(_uriAsString);
+}
+
+public String UriToString(Uri _uri) {
+  return _uri.toString();
 }
 
 }
@@ -9910,8 +9924,7 @@ class jShareFile /*extends ...*/ {
 				File outfile = new File(PathDat+"/"+_filename);								
 				// if file doesnt exists, then create it
 				if (!outfile.exists()) {
-					outfile.createNewFile();
-				
+					outfile.createNewFile();				
 				}												
 				fos = new FileOutputStream(outfile);  //save to data/data/your_package/files/your_file_name														
 				is = controls.activity.getAssets().open(_filename);																				
@@ -10775,10 +10788,12 @@ class jImageFileManager /*extends ...*/ {
 	    if (httpConn.getResponseCode() == HttpURLConnection.HTTP_OK) {
 	     inputStream = httpConn.getInputStream();
 	    }
+	    
 	   }
 	   catch (Exception ex)
 	   {
 	   }
+	   
 	   return inputStream;
    }
    
@@ -11941,8 +11956,7 @@ class jGridViewCustomAdapter extends ArrayAdapter {
            imageViewItem.setPadding(25,45,25,20);              
            txtParam.addRule(RelativeLayout.ALIGN_PARENT_TOP);
         } 	
-        
-        
+               
         if (mDispatchOnDrawItemBitmap)  {        	
            Bitmap  imageBmp = (Bitmap)contrls.pOnGridDrawItemBitmap(pascalObj, (int)position , items.get(position).label);
        	   if (imageBmp != null) {        		   
@@ -11962,12 +11976,10 @@ class jGridViewCustomAdapter extends ArrayAdapter {
        	    itemLayout.addView(imageViewItem, imgParam);
        	  }   
         }
-                    
-        
+                            
         if (!items.get(position).label.equals("")) {
             textViewTitle.setText( items.get(position).label ); //+""+ items.get(position).id
-            
-            
+                        
             if (items.get(position).itemTextSize != 0) {              	
             	if ((mTextSizeTypedValue != TypedValue.COMPLEX_UNIT_SP) )
             	   textViewTitle.setTextSize(mTextSizeTypedValue, items.get(position).itemTextSize);     
@@ -12269,7 +12281,34 @@ class jGridView extends GridView /*dummy*/ { //please, fix what GUI object will 
 	   gridViewCustomeAdapter.notifyDataSetChanged();    
    }
    
+   //Set the amount of horizontal (x) spacing to place between each item in the grid.
+   public void SetHorizontalSpacing(int _horizontalSpacingPixels) {
+     this.setHorizontalSpacing(_horizontalSpacingPixels);
+   }
+ 
+   //Set the amount of vertical (y) spacing to place between each item in the grid.
+   public void SetVerticalSpacing(int _verticalSpacingPixels){  // in pixels.
+      this.setVerticalSpacing(_verticalSpacingPixels);
+   }
    
+   //Sets the currently selected item
+   public void SetSelection(int _index){
+     this.setSelection(_index);
+   }
+   
+   //Control how items are stretched to fill their space.
+   public void SetStretchMode(int _stretchMode) {  
+     this.setStretchMode(_stretchMode);
+   }
+   
+   /*NO_STRETCH, STRETCH_SPACING, STRETCH_COLUMN_WIDTH, STRETCH_SPACING_UNIFORM,
+    * smNone, smSpacingWidth, smColumnWidth, smSpacingWidthUniform 
+    * none	0	Stretching is disabled.
+      spacingWidth	1	The spacing between each column is stretched.
+      columnWidth	2	Each column is stretched equally.
+      spacingWidthUniform	3	The spacing between each column is uniformly stretched..
+    */
+    
 } //end class
 
 
@@ -12709,6 +12748,7 @@ class jBroadcastReceiver extends BroadcastReceiver {
    }
    
    public void RegisterIntentActionFilter(int _intentAction) {
+	   
 	   switch(_intentAction) {
 	     case 0: controls.activity.registerReceiver(this, new IntentFilter(Intent.ACTION_TIME_TICK));
 	     case 1: controls.activity.registerReceiver(this, new IntentFilter(Intent.ACTION_TIME_CHANGED));
@@ -12719,6 +12759,7 @@ class jBroadcastReceiver extends BroadcastReceiver {
 	     case 6: controls.activity.registerReceiver(this, new IntentFilter(Intent.ACTION_POWER_DISCONNECTED));
 	     case 7: controls.activity.registerReceiver(this, new IntentFilter(Intent.ACTION_SHUTDOWN));
 	     case 8: controls.activity.registerReceiver(this, new IntentFilter("android.provider.Telephony.SMS_RECEIVED"));
+	     case 9: controls.activity.registerReceiver(this, new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
 	   }
    }
    
@@ -17566,7 +17607,7 @@ class jAutoTextView extends AutoCompleteTextView /*dummy*/ { //please, fix what 
       
 } //end class
 
-//MultiAutoCompleteTextView
+//TODO: MultiAutoCompleteTextView
 
 /*Draft java code by "Lazarus Android Module Wizard" [5/20/2016 3:18:58]*/
 /*https://github.com/jmpessoa/lazandroidmodulewizard*/
@@ -17597,6 +17638,13 @@ class jDrawingView extends View /*dummy*/ { //please, fix what GUI object will b
   private Canvas          mCanvas = null;
   private Paint           mPaint  = null;
   
+  private GestureDetector gDetect;
+  private ScaleGestureDetector scaleGestureDetector;
+  
+  private float mScaleFactor = 1.0f;
+  private float MIN_ZOOM = 0.25f;	  
+  private float MAX_ZOOM = 4.0f;	 	 
+	
  //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
  
   public jDrawingView(Controls _ctrls, long _Self) { //Add more others news "_xxx"p arams if needed!
@@ -17620,6 +17668,9 @@ class jDrawingView extends View /*dummy*/ { //please, fix what GUI object will b
      };
      setOnClickListener(onClickListener);
      
+     gDetect = new GestureDetector(controls.activity, new GestureListener());
+     scaleGestureDetector = new ScaleGestureDetector(controls.activity, new simpleOnScaleGestureListener());
+     
   } //end constructor
   
   public void jFree() {
@@ -17628,7 +17679,9 @@ class jDrawingView extends View /*dummy*/ { //please, fix what GUI object will b
      lparams = null;
      setOnClickListener(null);     
 	 mPaint = null;
-	 mCanvas = null;     
+	 mCanvas = null;
+     gDetect = null;
+     scaleGestureDetector = null;	 
   }
  
   public void SetViewParent(ViewGroup _viewgroup) {
@@ -17765,6 +17818,77 @@ class jDrawingView extends View /*dummy*/ { //please, fix what GUI object will b
 	return true;
 	}
 
+    @Override
+	/*.*/public boolean dispatchTouchEvent(MotionEvent e) {
+	        super.dispatchTouchEvent(e);
+	        this.gDetect.onTouchEvent(e);
+	        this.scaleGestureDetector.onTouchEvent(e);
+	        return true;
+	}
+    
+    //ref1. http://code.tutsplus.com/tutorials/android-sdk-detecting-gestures--mobile-21161
+    //ref2. http://stackoverflow.com/questions/9313607/simpleongesturelistener-never-goes-in-to-the-onfling-method
+    //ref3. http://x-tutorials.blogspot.com.br/2011/11/detect-pinch-zoom-using.html
+    private class GestureListener extends GestureDetector.SimpleOnGestureListener {
+
+       private static final int SWIPE_MIN_DISTANCE = 60;
+       private static final int SWIPE_THRESHOLD_VELOCITY = 100;
+      
+ 	   @Override
+ 	   public boolean onDown(MotionEvent event) {
+ 		  //Log.i("Down", "------------");
+ 	      return true;
+ 	   }
+ 	   
+ 	   @Override
+ 	   public boolean onFling(MotionEvent event1, MotionEvent event2, float velocityX, float velocityY) { 
+ 		   
+ 	      if(event1.getX() - event2.getX() > SWIPE_MIN_DISTANCE && Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY) {
+               controls.pOnFlingGestureDetected(PasObj, 0);                //onRightToLeft;
+               return  true;
+           } else if (event2.getX() - event1.getX() > SWIPE_MIN_DISTANCE && Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY) {
+        	   controls.pOnFlingGestureDetected(PasObj, 1);//onLeftToRight();
+        	   return true;
+           }
+           if(event1.getY() - event2.getY() > SWIPE_MIN_DISTANCE && Math.abs(velocityY) > SWIPE_THRESHOLD_VELOCITY) {
+        	   controls.pOnFlingGestureDetected(PasObj, 2);//onBottomToTop();
+        	   return false;
+           } else if (event2.getY() - event1.getY() > SWIPE_MIN_DISTANCE && Math.abs(velocityY) > SWIPE_THRESHOLD_VELOCITY) {
+        	   controls.pOnFlingGestureDetected(PasObj, 3); //onTopToBottom();
+        	   return false;
+           } 		   
+ 		   return false;
+ 	   }
+    }
+        
+   //ref. http://vivin.net/2011/12/04/implementing-pinch-zoom-and-pandrag-in-an-android-view-on-the-canvas/ 
+   private class simpleOnScaleGestureListener extends SimpleOnScaleGestureListener {
+	  
+      @Override
+      public boolean onScale(ScaleGestureDetector detector) {         
+    	  mScaleFactor *= detector.getScaleFactor();    
+    	  mScaleFactor = Math.max(MIN_ZOOM, Math.min(mScaleFactor, MAX_ZOOM));    	    	  
+    	// Log.i("tag", "onScale = "+ mScaleFactor);    	 
+    	 controls.pOnPinchZoomGestureDetected(PasObj, mScaleFactor, 1); //scalefactor->float    	
+         return true;
+      }
+
+      @Override
+      public boolean onScaleBegin(ScaleGestureDetector detector) {                
+    	controls.pOnPinchZoomGestureDetected(PasObj, detector.getScaleFactor(), 0); //scalefactor->float
+     	//Log.i("tag", "onScaleBegin");
+        return true;
+      }
+
+      @Override
+      public void onScaleEnd(ScaleGestureDetector detector) {
+         controls.pOnPinchZoomGestureDetected(PasObj, detector.getScaleFactor(), 2); //scalefactor->float
+     	//Log.i("tag", "onScaleEnd");
+        super.onScaleEnd(detector);	  
+      }
+
+  }
+      
 	public Bitmap GetDrawingCache(){
 		this.setDrawingCacheEnabled(true);		
 		Bitmap b = Bitmap.createBitmap(this.getDrawingCache());
@@ -17776,7 +17900,7 @@ class jDrawingView extends View /*dummy*/ { //please, fix what GUI object will b
 	@Override
 	/*.*/public  void onDraw(Canvas canvas) {
 	  mCanvas = canvas;
-	  controls.pOnDraw(PasObj, mCanvas); // improvement required
+	  controls.pOnDraw(PasObj, canvas); 
 	}
 
 	public void SaveToFile(String _filename ) {
@@ -17965,7 +18089,19 @@ class jDrawingView extends View /*dummy*/ { //please, fix what GUI object will b
 		}
 	    */
 	}
-	  
+	
+	public void SetMinZoomFactor(float _minZoomFactor) {
+	   MIN_ZOOM = _minZoomFactor;	
+	}
+	   
+	public void SetMaxZoomFactor(float _maxZoomFactor) {
+		   MAX_ZOOM = _maxZoomFactor;
+	}
+
+	public Canvas GetCanvas() {
+       return mCanvas;		
+	}
+	
 } //end class
 
  /*
@@ -18135,6 +18271,7 @@ class jAlarmManager  /*extends ...*/ {
    
 }
 
+
 //**new jComponent class entrypoint**//please, do not remove/change this line!
 
 //Javas/Pascal Interface Class 
@@ -18290,7 +18427,7 @@ public native void pOnClickGeneric(long pasobj, int value);
 
 //public  native void pAppOnHomePressed();  //TODO!
 public native boolean pAppOnSpecialKeyDown(char keyChar, int keyCode, String keyCodeString);
-
+ 
 //Load Pascal Library
 static {
     //Log.i("JNI_Load_LibControls", "1. try load libcontrols.so");
@@ -19450,19 +19587,19 @@ public float[] benchMark1 () {
    }
    
    public java.lang.Object jRadioGroup_jCreate(long _Self, int _orientation) {
-	      return (java.lang.Object)(new jRadioGroup(this,_Self, _orientation));
+	 return (java.lang.Object)(new jRadioGroup(this,_Self, _orientation));
    }
    
    public java.lang.Object jAutoTextView_jCreate(long _Self) {
-	      return (java.lang.Object)(new jAutoTextView(this,_Self));
+	 return (java.lang.Object)(new jAutoTextView(this,_Self));
    }
    
    public java.lang.Object jDrawingView_jCreate(long _Self) {
-	      return (java.lang.Object)(new jDrawingView(this,_Self));
+	 return (java.lang.Object)(new jDrawingView(this,_Self));
    }   
    
    public java.lang.Object jAlarmManager_jCreate(long _Self) {
-	      return (java.lang.Object)(new jAlarmManager(this,_Self));
+	 return (java.lang.Object)(new jAlarmManager(this,_Self));
    }   
-	     
+  
 }

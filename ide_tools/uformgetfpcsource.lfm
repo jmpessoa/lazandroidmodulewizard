@@ -1,16 +1,16 @@
 object FormGetFPCSource: TFormGetFPCSource
   Left = 272
-  Height = 290
+  Height = 401
   Top = 135
   Width = 420
   Caption = '[Lamw] Get FPC  Source [Trunk]'
-  ClientHeight = 290
+  ClientHeight = 401
   ClientWidth = 420
   LCLVersion = '1.5'
   object StatusBar1: TStatusBar
     Left = 0
     Height = 23
-    Top = 267
+    Top = 378
     Width = 420
     Panels = <>
   end
@@ -27,8 +27,8 @@ object FormGetFPCSource: TFormGetFPCSource
       Left = 8
       Height = 15
       Top = 8
-      Width = 300
-      Caption = 'Path to Install FPC Source Code  [ex. C:\tmp\FPCSource]:'
+      Width = 290
+      Caption = 'Path to Store FPC Source Code  [ex. C:\tmp\FPCTrunk]:'
       ParentColor = False
     end
     object EditPathToFPCTrunk: TEdit
@@ -50,7 +50,7 @@ object FormGetFPCSource: TFormGetFPCSource
   object GroupBox1: TGroupBox
     Left = 9
     Height = 144
-    Top = 112
+    Top = 208
     Width = 400
     Caption = 'SNV Client'
     ClientHeight = 124
@@ -87,29 +87,6 @@ object FormGetFPCSource: TFormGetFPCSource
       Caption = 'SVN Checkout!'
       OnClick = Button1Click
       TabOrder = 1
-    end
-    object RadioGroup2: TRadioGroup
-      Left = 5
-      Height = 50
-      Top = 64
-      Width = 155
-      AutoFill = True
-      Caption = 'Get From:'
-      ChildSizing.LeftRightSpacing = 6
-      ChildSizing.EnlargeHorizontal = crsHomogenousChildResize
-      ChildSizing.EnlargeVertical = crsHomogenousChildResize
-      ChildSizing.ShrinkHorizontal = crsScaleChilds
-      ChildSizing.ShrinkVertical = crsScaleChilds
-      ChildSizing.Layout = cclLeftToRightThenTopToBottom
-      ChildSizing.ControlsPerLine = 2
-      ClientHeight = 30
-      ClientWidth = 151
-      Columns = 2
-      ItemIndex = 0
-      Items.Strings = (
-        'Trunk'
-      )
-      TabOrder = 2
     end
     object SpeedButton6: TSpeedButton
       Left = 365
@@ -155,8 +132,40 @@ object FormGetFPCSource: TFormGetFPCSource
       OnClick = SpeedButton6Click
     end
   end
+  object GroupBox2: TGroupBox
+    Left = 9
+    Height = 81
+    Top = 108
+    Width = 400
+    Caption = 'FPC Source Trunk Download'
+    ClientHeight = 61
+    ClientWidth = 396
+    TabOrder = 3
+    object Label3: TLabel
+      Left = 8
+      Height = 15
+      Top = 8
+      Width = 24
+      Caption = 'URL:'
+      ParentColor = False
+    end
+    object ComboBoxFPCTrunk: TComboBox
+      Left = 8
+      Height = 23
+      Top = 22
+      Width = 352
+      ItemHeight = 15
+      ItemIndex = 0
+      Items.Strings = (
+        'http://svn.freepascal.org/svn/fpc/trunk'
+        'https://github.com/graemeg/freepascal.git'
+      )
+      TabOrder = 0
+      Text = 'http://svn.freepascal.org/svn/fpc/trunk'
+    end
+  end
   object SelectDirectoryDialog1: TSelectDirectoryDialog
-    left = 294
-    top = 94
+    left = 352
+    top = 8
   end
 end

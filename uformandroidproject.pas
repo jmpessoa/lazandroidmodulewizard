@@ -147,8 +147,6 @@ function DeleteLineBreaks(const S: string): string;
 function UpperCaseFirst(str: string): string;
 function ReplaceCharFirst(str: string; newChar: char): string;
 
-procedure GetSubDirectories(const directory : string; list : TStrings);
-
 implementation
 
 {$R *.lfm}
@@ -1008,25 +1006,6 @@ begin
     Result:= retStr;
   end;
 end;
-
-procedure GetSubDirectories(const directory : string; list : TStrings);
-var
-   sr : TSearchRec;
-begin
-   try
-     if FindFirst(IncludeTrailingPathDelimiter(directory) + '*.*', faDirectory, sr) < 0 then Exit
-     else
-     repeat
-       if ((sr.Attr and faDirectory <> 0) and (sr.Name <> '.') and (sr.Name <> '..')) then
-       begin
-           List.Add(IncludeTrailingPathDelimiter(directory) + sr.Name);
-       end;
-     until FindNext(sr) <> 0;
-   finally
-     SysUtils.FindClose(sr) ;
-   end;
-end;
-
 
 end.
 

@@ -27,15 +27,16 @@ object FormOSystem: TFormOSystem
     ChildSizing.ShrinkVertical = crsScaleChilds
     ChildSizing.Layout = cclLeftToRightThenTopToBottom
     ChildSizing.ControlsPerLine = 2
-    ClientHeight = 83
+    ClientHeight = 81
     ClientWidth = 238
     Columns = 2
     ItemIndex = 0
     Items.Strings = (
       'Windows'
+      'Windows-x86_64'
       'Linux-x86'
-      'Mac'
       'Linux-x86_64'
+      'Mac'
     )
     TabOrder = 0
   end

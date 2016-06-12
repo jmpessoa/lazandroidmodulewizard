@@ -64,6 +64,9 @@
 
 		-JC99 - The Wiki-Page "get_start"
 			Ref. http://wiki.freepascal.org/Talk:Android_tutorial
+
+		-tintinux and Dieselnutjob
+			ref. http://wiki.freepascal.org/LAMW
 				
 		-Lazarus forum community!
 		
@@ -142,6 +145,33 @@
 	*
 	****************************************************************************************************
 
+Version 0.6 - rev. 47 - 11 June 2016 - 
+
+	NEW!	jDownloadService component
+	NEW!	jDownloadManager component
+
+	NEW!	AppDownloadServiceDemo1
+	NEW!	AppDownloadManagerDemo1
+
+	IMPROVED!
+		jGridView	// <<---- thanks to tintinux suggestions
+			New methods:
+				SetHorizontalSpacing
+				SetVerticalSpacing
+				SetSelection
+				SetStretchMode
+
+		jDrawingView	// <<---- thanks to tintinux suggestions
+			New events:
+				OnFlingGesture
+				OnPinchZoomGesture
+			Changed:
+				OnDraw signature
+
+	UPDATE:
+		AppGridViewDemo1
+		AppDrawingViewDemo1	
+			
 Version 0.6 - rev. 46 - 24 May 2016 - 
 
 	NEW!	jAlarmManager component

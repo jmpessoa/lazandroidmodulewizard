@@ -1,0 +1,111 @@
+object AndroidModule1: TAndroidModule1
+  Left = 268
+  Top = 152
+  Width = 320
+  Height = 400
+  MarginLeft = 0
+  MarginTop = 0
+  MarginRight = 0
+  MarginBottom = 0
+  Text = 'AndroidModule1'
+  ActivityMode = actMain
+  BackgroundColor = colbrDefault
+  ActionBarTitle = abtDefault
+  OnJNIPrompt = AndroidModule1JNIPrompt
+  object jTextView1: jTextView
+    Left = 65
+    Top = 5
+    Width = 190
+    Height = 20
+    MarginLeft = 5
+    MarginTop = 5
+    MarginRight = 5
+    MarginBottom = 5
+    Visible = True
+    PosRelativeToAnchor = []
+    PosRelativeToParent = [rpTop, rpCenterHorizontal]
+    LayoutParamWidth = lpWrapContent
+    LayoutParamHeight = lpWrapContent
+    Text = 'App Download Manager Demo1'
+    Alignment = taLeft
+    Enabled = True
+    BackgroundColor = colbrDefault
+    FontColor = colbrDefault
+    FontSize = 0
+    TextTypeFace = tfNormal
+    FontSizeUnit = unitDefault
+    Id = 3645455
+  end
+  object jButton1: jButton
+    Left = 87
+    Top = 76
+    Width = 146
+    Height = 40
+    MarginLeft = 2
+    MarginTop = 4
+    MarginRight = 2
+    MarginBottom = 4
+    Visible = True
+    Anchor = jCheckBox1
+    PosRelativeToAnchor = [raBelow]
+    PosRelativeToParent = [rpCenterHorizontal]
+    LayoutParamWidth = lpHalfOfParent
+    LayoutParamHeight = lpWrapContent
+    Text = 'Download'
+    BackgroundColor = colbrDefault
+    FontColor = colbrDefault
+    FontSize = 0
+    FontSizeUnit = unitDefault
+    OnClick = jButton1Click
+    Id = 1958004
+  end
+  object jImageView1: jImageView
+    Left = 136
+    Top = 123
+    Width = 48
+    Height = 48
+    Visible = True
+    Anchor = jButton1
+    PosRelativeToAnchor = [raBelow]
+    PosRelativeToParent = [rpCenterHorizontal]
+    LayoutParamWidth = lpWrapContent
+    LayoutParamHeight = lpWrapContent
+    ImageIndex = -1
+    BackgroundColor = colbrDefault
+    ImageScaleType = scaleCenter
+    Id = 0
+  end
+  object jCheckBox1: jCheckBox
+    Left = 5
+    Top = 35
+    Width = 119
+    Height = 32
+    MarginLeft = 5
+    MarginTop = 5
+    MarginRight = 5
+    MarginBottom = 5
+    Visible = True
+    Anchor = jTextView1
+    PosRelativeToAnchor = [raBelow]
+    PosRelativeToParent = [rpLeft]
+    LayoutParamWidth = lpWrapContent
+    LayoutParamHeight = lpWrapContent
+    Text = 'Internet Wifi'
+    BackgroundColor = colbrDefault
+    FontColor = colbrDefault
+    FontSize = 0
+    Checked = False
+    FontSizeUnit = unitDefault
+    Id = 5695914
+  end
+  object jDownloadManager1: jDownloadManager
+    left = 168
+    top = 192
+  end
+  object jBroadcastReceiver1: jBroadcastReceiver
+    IntentActionFilter = afNone
+    OnReceiver = jBroadcastReceiver1Receiver
+    left = 64
+    top = 152
+  end
+end

@@ -54,6 +54,9 @@ TBuildMode = (bmArmV6, bmArmV7a, bmX86);
 
   private
     FBuildMode: TBuildMode;
+    FPrebuildOSYS: String;
+    FPCSysTarget: string;
+    FPathToAndroidNDK: string;
     { private declarations }
   public
     { public declarations }
@@ -61,6 +64,8 @@ TBuildMode = (bmArmV6, bmArmV7a, bmX86);
     procedure LoadSettings(const fileName: string);
     procedure SaveSettings(const fileName: string);
     procedure CopyCrossUnits(const SourceDirName: string;  TargetDirName: string);
+
+    function GetPrebuiltArmDirectory: string;
 
   end;
 
@@ -76,64 +81,76 @@ uses
 
 { TFormBuildFPCCross }
 
+function TFormBuildFPCCross.GetPrebuiltArmDirectory: string;
+var
+   pathToNdkToolchainsArm: string;
+begin
+   Result:= '';
+   if FPathToAndroidNDK = '' then Exit;
+
+   pathToNdkToolchainsArm:= FPathToAndroidNDK+DirectorySeparator+'toolchains'+DirectorySeparator+
+                                                'arm-linux-androideabi-4.9'+DirectorySeparator+
+                                                'prebuilt'+DirectorySeparator;
+
+   {$ifdef windows}  //C:\adt32\ndk10e\toolchains\arm-linux-androideabi-4.9\prebuilt\windows
+     if DirectoryExists(pathToNdkToolchainsArm+ 'windows') then
+     begin
+       Result:= 'windows';
+       Exit;
+     end;
+     {$ifdef win64}
+       if DirectoryExists(pathToNdkToolchainsArm + 'windows-x86_64') then Result:= 'windows-x86_64';
+     {$endif}
+   {$else}
+     {$ifdef darvin}
+        if DirectoryExists(pathToNdkToolchainsArm+ 'darwin-x86_64') then Result:= 'darwin-x86_64';
+     {$else}
+       {$ifdef cpu64}
+         if DirectoryExists(pathToNdkToolchainsArm+ 'linux-x86_64') then Result:= 'linux-x86_64';
+       {$else}
+         if DirectoryExists(pathToNdkToolchainsArm+ 'linux-x86_32') then Result:= 'linux-x86_32';
+       {$endif}
+     {$endif}
+   {$endif}
+end;
+
 procedure TFormBuildFPCCross.Button2Click(Sender: TObject);
 var
-   pathToNDK: string;
    pathToFpcExecutables: string;
    pathToFpcSource: string;
    crossBinDIR: string;
    binutilsPath: string;
-   auxStr, userString: string;
+   auxStr: string;
    Tool: TIDEExternalToolOptions;
    Params: TStringList;
    strExt, configFile: string;
    p: integer;
-   sysOS: string;
 begin
-
-   configFile:= LazarusIDE.GetPrimaryConfigPath+ DirectorySeparator+ 'JNIAndroidProject.ini';
-
-   if FileExists(configFile) then
-   begin
-     with TIniFile.Create(configFile) do
-     try
-       pathToNDK:= ReadString('NewProject','PathToAndroidNDK', '');
-       EditPathToNDK.Text:= pathToNDK;
-     finally
-       Free;
-    end;
-   end
-   else
-   begin
-     Params:= TStringList.Create;
-     Params.SaveToFile(configFile);
-     Params.Free;
-   end;
-
-   if pathToNDK =  '' then
-   begin
-     userString:= 'C:\adt32\ndk10e';
-     if InputQuery('Configure Path', 'Path to Android NDK', userString) then
-        pathToNDK:= userString;
-   end;
-
    Button2.Enabled:= False;
 
-   pathToNDK:= Trim(EditPathToNDK.Text);
+   FPathToAndroidNDK:= Trim(EditPathToNDK.Text);
    pathToFpcExecutables:= Trim(EditPathToFpc.Text);
    pathToFpcSource:= Trim(EditPathToFPCTrunk.Text);
 
-   if (pathToNDK = '') or  (pathToFpcExecutables = '') or (pathToFpcSource = '') then
+   if (FPathToAndroidNDK = '') or  (pathToFpcExecutables = '') or (pathToFpcSource = '') then
    begin
      ShowMessage('Sorry... Empty Info...');
      Exit;
    end;
 
-   with TIniFile.Create(configFile) do
-   try
-     writeString('NewProject','PathToAndroidNDK', pathToNDK);
-   finally
-     Free;
+   if FPathToAndroidNDK <> '' then
+      FPrebuildOSYS:= GetPrebuiltArmDirectory();
+
+   configFile:= LazarusIDE.GetPrimaryConfigPath+ DirectorySeparator+ 'JNIAndroidProject.ini';
+   if FileExists(configFile) then
+   begin
+     with TIniFile.Create(configFile) do
+     try
+       writeString('NewProject','PathToAndroidNDK', FPathToAndroidNDK);
+       writeString('NewProject','PrebuildOSYS', FPrebuildOSYS);
+     finally
+       Free;
+     end;
    end;
 
    //C:\laz4android\fpc\3.0.0\bin\i386-win32
@@ -142,11 +159,8 @@ begin
    EditPathToFPCUnits.Text:= auxStr+ 'units';   //C:\laz4android\fpc\3.0.0\units
 
    strExt:= '';
-   sysOS:= 'linux';
-
    {$IFDEF WINDOWS}
-      strExt:= '.exe';
-      sysOS:= 'windows';
+   strExt:= '.exe';
    {$ENDIF}
 
    FBuildMode:= TBuildMode(RadioGroupInstruction.ItemIndex);
@@ -155,12 +169,18 @@ begin
    begin
 
       //C:\adt32\ndk10e\toolchains\arm-linux-androideabi-4.9\prebuilt\windows\bin
-     binutilsPath:= pathToNdk+DirectorySeparator+
+     binutilsPath:= FPathToAndroidNDK+DirectorySeparator+
                                  'toolchains'+DirectorySeparator+
                                  'arm-linux-androideabi-4.9'+DirectorySeparator+
                                  'prebuilt'+DirectorySeparator+
-                                  sysOS+DirectorySeparator+
+                                  FPrebuildOSYS+DirectorySeparator+
                                  'bin';
+
+     if not DirectoryExists(binutilsPath)  then
+     begin
+        ShowMessage('Directory not exist! :"'+binutilsPath+'"');
+        Exit;
+     end;
 
      //------ brute force ... set path [below] did not work! why?
      CopyFile(binutilsPath+DirectorySeparator+'arm-linux-androideabi-as'+strExt,
@@ -199,19 +219,25 @@ begin
 
        Params.Add('OPT="-dFPC_ARMEL"');  //Armel means that all floating point values are always passed in integer registers.
 
-       if FBuildMode = bmArmV7a then                                        //[FPU] vfpv3 means that fp operations are performed by the hardware.
+       if FBuildMode = bmArmV7a then                                //[FPU] vfpv3 means that fp operations are performed by the hardware.
           Params.Add('CROSSOPT="-CpARMv7a -OoFASTMATH -CfVFPv3"')   //-OoFASTMATH to sacrifice precision for performance.
        else //default
           Params.Add('CROSSOPT="-CpARMv6 -CfSoft"');   //Softfp means that all fp operations are performed by software, no FPU support.
 
        //C:\adt32\ndk10e\toolchains\arm-linux-androideabi-4.9\prebuilt\windows\arm-linux-androideabi\bin
-       crossBinDIR:= pathToNdk+DirectorySeparator+
+       crossBinDIR:= FPathToAndroidNDK+DirectorySeparator+
                         'toolchains'+DirectorySeparator+
                         'arm-linux-androideabi-4.9'+DirectorySeparator+
                         'prebuilt'+DirectorySeparator+
-                         sysOS+DirectorySeparator+
+                         FPrebuildOSYS+DirectorySeparator+
                         'arm-linux-androideabi'+DirectorySeparator+
                         'bin';
+
+       if not DirectoryExists(crossBinDIR)  then
+       begin
+          ShowMessage('Directory not exist! :"'+crossBinDIR+'"');
+          Exit;
+       end;
 
        Params.Add('CROSSBINDIR='+crossBinDIR);
        Params.Add('INSTALL_PREFIX='+ pathToFpcSource);
@@ -234,12 +260,18 @@ begin
    begin
 
      //C:\adt32\ndk10e\toolchains\x86-4.9\prebuilt\windows\bin
-     binutilsPath:= pathToNdk+DirectorySeparator+
+     binutilsPath:= FPathToAndroidNDK+DirectorySeparator+
                       'toolchains'+DirectorySeparator+
                       'x86-4.9'+DirectorySeparator+
                       'prebuilt'+DirectorySeparator+
-                       sysOS+DirectorySeparator+
+                       FPrebuildOSYS+DirectorySeparator+
                       'bin';
+
+     if not DirectoryExists(binutilsPath)  then
+     begin
+       ShowMessage('Directory not exist! :"'+binutilsPath+'"');
+       Exit;
+     end;
 
      //----------brute force ... set path [below] did not work! why?
      CopyFile(binutilsPath+DirectorySeparator+'i686-linux-android-as'+strExt,
@@ -271,13 +303,19 @@ begin
        Params.Add('CPU_TARGET=i386');
 
        //C:\adt32\ndk10e\toolchains\x86-4.9\prebuilt\windows\i686-linux-android\bin
-       crossBinDIR:= pathToNdk+DirectorySeparator+
+       crossBinDIR:= FPathToAndroidNDK+DirectorySeparator+
                         'toolchains'+DirectorySeparator+
                         'x86-4.9'+DirectorySeparator+
                         'prebuilt'+DirectorySeparator+
-                         sysOS+DirectorySeparator+
+                         FPrebuildOSYS+DirectorySeparator+
                         'i686-linux-android'+DirectorySeparator+
                         'bin';
+
+       if not DirectoryExists(crossBinDIR)  then
+       begin
+          ShowMessage('Directory not exist! :"'+crossBinDIR+'"');
+          Exit;
+       end;
 
        Params.Add('CROSSBINDIR='+crossBinDIR);
        Params.Add('INSTALL_PREFIX='+ pathToFpcSource);
@@ -304,15 +342,28 @@ var
   fpcPathTrunk: string;
   strExt: string;
   fpcUnitsPath: string;
-  sysTarget: string;
+  //sysTarget: string;
   binutilsPath: string;
   pathToNDK: string;
-  sysOS: string;
+  auxList: TStringList;
 begin
 
   Button3.Enabled:= False;
-
   fpcExecutablesPath:= Trim(EditPathToFpc.Text); //C:\laz4android\fpc\3.0.0\bin\i386-win32
+
+  auxList:= TStringList.Create;
+  auxList.Delimiter:= DirectorySeparator;
+  auxList.StrictDelimiter:= True;
+  auxList.DelimitedText:= fpcExecutablesPath;
+  FPCSysTarget:= auxList.Strings[auxList.Count-1];
+  auxList.Free;
+
+  if  FPCSysTarget = '' then
+  begin
+    ShowMessage('FPC ".exe" directory not found! [ex:"C:\laz4android\fpc\3.0.0\bin\i386-win32"]');
+    Exit
+  end;
+
   fpcPathTrunk:= Trim(EditPathToFPCTrunk.Text);
   fpcUnitsPath:= Trim(EditPathToFPCUnits.Text);
   pathToNDK:= Trim(EditPathToNDK.Text);
@@ -325,25 +376,20 @@ begin
 
   //linux
   strExt:= '';
-  sysTarget:='i386-linux';
-  sysOS:= 'linux';
-
   {$IFDEF WINDOWS}
      strExt:= '.exe';
-     sysTarget:= 'i386-win32';
-     sysOS:= 'windows';
   {$ENDIF}
 
   if (FBuildMode = bmArmV6) or (FBuildMode = bmArmV7a) then  //arm
   begin
     if FileExists(fpcPathTrunk+DirectorySeparator +
                   'bin' + DirectorySeparator +
-                   sysTarget + DirectorySeparator +
+                   FPCSysTarget + DirectorySeparator +
                   'ppcrossarm' + strExt) then
     begin
        CopyFile(fpcPathTrunk+DirectorySeparator +
                   'bin' + DirectorySeparator +
-                   sysTarget + DirectorySeparator +
+                   FPCSysTarget + DirectorySeparator +
                   'ppcrossarm' + strExt,           //C:\adt32\fpctrunk300\bin\i386-win32
                  fpcExecutablesPath+DirectorySeparator+'ppcrossarm' + strExt);
     end
@@ -358,8 +404,15 @@ begin
                                   'toolchains'+DirectorySeparator+
                                   'arm-linux-androideabi-4.9'+DirectorySeparator+
                                   'prebuilt'+DirectorySeparator+
-                                   sysOS+DirectorySeparator+
+                                   FPrebuildOSYS+DirectorySeparator+
                                   'bin';
+
+    if not DirectoryExists(binutilsPath)  then
+    begin
+       ShowMessage('Directory not exist! :"'+binutilsPath+'"');
+       Exit;
+    end;
+
     CopyFile(binutilsPath+DirectorySeparator+'arm-linux-androideabi-as'+strExt,
              fpcExecutablesPath+DirectorySeparator+'arm-linux-androideabi-as'+strExt);
 
@@ -381,7 +434,7 @@ begin
                'arm-android');  //C:\laz4android\fpc\3.1.1\units\arm-android
 
     ShowMessage('FPC cross arm [android] installed!');
-    StatusBar1.SimpleText:='Success! [Installed]! FPC cross Arm [android] Installed!';
+    StatusBar1.SimpleText:='Success! FPC cross Arm [android] Installed!';
     //Self.Close;
   end;
 
@@ -389,12 +442,12 @@ begin
   begin
     if FileExists(fpcPathTrunk+DirectorySeparator+
              'bin'+DirectorySeparator +
-             sysTarget+DirectorySeparator+
+             FPCSysTarget+DirectorySeparator+
              'ppcross386'+strExt) then
     begin
        CopyFile(fpcPathTrunk+DirectorySeparator+
              'bin'+DirectorySeparator +
-             sysTarget+DirectorySeparator+
+             FPCSysTarget+DirectorySeparator+
              'ppcross386'+strExt,
              fpcExecutablesPath+DirectorySeparator+'ppcross386'+strExt);
     end
@@ -409,8 +462,14 @@ begin
                      'toolchains'+DirectorySeparator+
                      'x86-4.9'+DirectorySeparator+
                      'prebuilt'+DirectorySeparator+
-                      sysOS+DirectorySeparator+
+                      FPrebuildOSYS+DirectorySeparator+
                      'bin';
+
+    if not DirectoryExists(binutilsPath)  then
+    begin
+       ShowMessage('Directory not exist! :"'+binutilsPath+'"');
+       Exit;
+    end;
 
     CopyFile(binutilsPath+DirectorySeparator+'i686-linux-android-as'+strExt,
                fpcExecutablesPath+DirectorySeparator+'i686-linux-android-as'+strExt);
@@ -433,7 +492,7 @@ begin
                'i386-android'); // //C:\laz4android\fpc\3.1.1\units\i386-android
 
     ShowMessage('FPC cross x86 [android] installed!');
-    StatusBar1.SimpleText:='Success! [Installed]! FPC cross x86 [android] Installed!';
+    StatusBar1.SimpleText:='Success! FPC cross x86 [android] Installed!';
     //Self.Close;
   end;
 
@@ -451,7 +510,7 @@ begin
   if FileExists(configFile) then
      Self.LoadSettings(configFile);
 
-  RadioGroupInstruction.ItemIndex:= 0;
+//  RadioGroupInstruction.ItemIndex:= 0;
   FBuildMode:= bmArmV6;
 
 end;
@@ -499,7 +558,12 @@ begin
     1: FBuildMode:= bmArmV7a;
     2: FBuildMode:= bmX86;
   end;
+
+  if FPathToAndroidNDK <> '' then
+    FPrebuildOSYS:= GetPrebuiltArmDirectory();
+
 end;
+
 
 procedure TFormBuildFPCCross.SpeedButton2Click(Sender: TObject);
 begin
@@ -601,7 +665,14 @@ begin
   begin
     with TIniFile.Create(fileName) do
     try
-      EditPathToNDK.Text := ReadString('NewProject','PathToAndroidNDK', '');
+      FPathToAndroidNDK:= ReadString('NewProject','PathToAndroidNDK', '');
+      FPrebuildOSYS:= ReadString('NewProject','PrebuildOSYS', '');
+      EditPathToNDK.Text:= FPathToAndroidNDK;
+
+      if FPrebuildOSYS = '' then
+        if FPathToAndroidNDK <> '' then
+          FPrebuildOSYS:= GetPrebuiltArmDirectory();
+
     finally
       Free;
     end;
@@ -628,7 +699,17 @@ begin
      list.Free;
      with TInifile.Create(fileName) do
      try
-      WriteString('NewProject', 'PathToAndroidNDK', EditPathToNDK.Text);
+
+      if EditPathToNDK.Text <> '' then
+        WriteString('NewProject', 'PathToAndroidNDK', Trim(EditPathToNDK.Text));
+
+
+      if FPathToAndroidNDK <> '' then
+         FPrebuildOSYS:= GetPrebuiltArmDirectory();
+
+      if FPrebuildOSYS <> '' then
+         WriteString('NewProject', 'PrebuildOSYS', FPrebuildOSYS);
+
      finally
       Free;
      end;

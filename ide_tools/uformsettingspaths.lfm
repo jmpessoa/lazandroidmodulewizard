@@ -1,12 +1,13 @@
 object FormSettingsPaths: TFormSettingsPaths
-  Left = 389
-  Height = 464
-  Top = 112
+  Left = 404
+  Height = 500
+  Top = 30
   Width = 473
+  Anchors = []
   AutoSize = True
   BorderStyle = bsSizeToolWin
   Caption = 'Android Module Wizard: Path Settings'
-  ClientHeight = 464
+  ClientHeight = 500
   ClientWidth = 473
   Color = clWhite
   Icon.Data = {
@@ -77,13 +78,12 @@ object FormSettingsPaths: TFormSettingsPaths
   Position = poScreenCenter
   LCLVersion = '1.5'
   object BitBtnOK: TBitBtn
-    AnchorSideTop.Control = BevelSimonsayzTemplateLazBuildAndButtons
+    AnchorSideTop.Control = EditPathToSimonsayzTemplate
     AnchorSideTop.Side = asrBottom
-    AnchorSideRight.Control = Owner
     AnchorSideRight.Side = asrBottom
     Left = 390
-    Height = 30
-    Top = 367
+    Height = 50
+    Top = 393
     Width = 75
     Anchors = [akTop, akRight]
     BorderSpacing.Around = 8
@@ -98,8 +98,8 @@ object FormSettingsPaths: TFormSettingsPaths
     AnchorSideTop.Side = asrCenter
     AnchorSideRight.Control = BitBtnOK
     Left = 307
-    Height = 30
-    Top = 367
+    Height = 49
+    Top = 394
     Width = 75
     Anchors = [akTop, akRight]
     BorderSpacing.Around = 8
@@ -155,7 +155,7 @@ object FormSettingsPaths: TFormSettingsPaths
     AnchorSideRight.Control = SpBPathToSimonsayzTemplate
     Left = 8
     Height = 23
-    Top = 326
+    Top = 362
     Width = 426
     Anchors = [akTop, akLeft, akRight]
     BorderSpacing.Around = 8
@@ -167,7 +167,7 @@ object FormSettingsPaths: TFormSettingsPaths
     AnchorSideTop.Side = asrBottom
     Left = 8
     Height = 15
-    Top = 303
+    Top = 339
     Width = 397
     BorderSpacing.Around = 8
     Caption = 'Path to  Simonsayz''s  templates,  *.xml, etc. [ ex: .../LazAndroidWizard/java ]'
@@ -180,7 +180,7 @@ object FormSettingsPaths: TFormSettingsPaths
     AnchorSideRight.Side = asrBottom
     Left = 442
     Height = 22
-    Top = 326
+    Top = 362
     Width = 23
     Anchors = [akTop, akRight]
     BorderSpacing.Around = 8
@@ -261,18 +261,6 @@ object FormSettingsPaths: TFormSettingsPaths
     BorderSpacing.Around = 8
     TabOrder = 1
   end
-  object BevelSimonsayzTemplateLazBuildAndButtons: TBevel
-    AnchorSideLeft.Control = Owner
-    AnchorSideTop.Control = EditPathToSimonsayzTemplate
-    AnchorSideTop.Side = asrBottom
-    AnchorSideRight.Control = Owner
-    AnchorSideRight.Side = asrBottom
-    Left = 0
-    Height = 2
-    Top = 357
-    Width = 473
-    Anchors = [akTop, akLeft, akRight]
-  end
   object SpBPathToJavaJDK: TSpeedButton
     AnchorSideTop.Control = EditPathToJavaJDK
     AnchorSideTop.Side = asrCenter
@@ -322,10 +310,10 @@ object FormSettingsPaths: TFormSettingsPaths
     AnchorSideRight.Control = Owner
     AnchorSideRight.Side = asrBottom
     Left = 0
-    Height = 2
-    Top = 293
+    Height = 0
+    Top = 331
     Width = 473
-    Anchors = [akTop, akLeft, akRight]
+    Anchors = [akTop, akLeft, akRight, akBottom]
   end
   object BevelJDKAntAndSDKNDK: TBevel
     AnchorSideLeft.Control = Owner
@@ -340,13 +328,13 @@ object FormSettingsPaths: TFormSettingsPaths
     Anchors = [akTop, akLeft, akRight]
   end
   object RGNDKVersion: TRadioGroup
-    AnchorSideLeft.Control = Owner
     AnchorSideTop.Control = EditPathToAndroidNDK
     AnchorSideTop.Side = asrBottom
     Left = 8
-    Height = 51
+    Height = 89
     Top = 234
-    Width = 144
+    Width = 424
+    Anchors = [akTop, akLeft, akRight, akBottom]
     AutoFill = True
     AutoSize = True
     BorderSpacing.Around = 8
@@ -358,72 +346,47 @@ object FormSettingsPaths: TFormSettingsPaths
     ChildSizing.ShrinkHorizontal = crsScaleChilds
     ChildSizing.ShrinkVertical = crsScaleChilds
     ChildSizing.Layout = cclLeftToRightThenTopToBottom
-    ChildSizing.ControlsPerLine = 4
-    ClientHeight = 31
-    ClientWidth = 140
-    Columns = 4
-    ItemIndex = 2
+    ChildSizing.ControlsPerLine = 5
+    ClientHeight = 69
+    ClientWidth = 420
+    Columns = 5
+    ItemIndex = 3
     Items.Strings = (
       '7'
       '9'
       '10c'
       '10e'
+      '11c'
     )
     ParentShowHint = False
     ShowHint = True
     TabOrder = 3
   end
-  object RadioGroupPrebuildOSys: TRadioGroup
-    AnchorSideLeft.Control = RGNDKVersion
-    AnchorSideLeft.Side = asrBottom
-    AnchorSideTop.Control = RGNDKVersion
-    AnchorSideBottom.Control = RGNDKVersion
-    AnchorSideBottom.Side = asrBottom
-    Left = 160
-    Height = 51
-    Top = 234
-    Width = 304
-    Anchors = [akTop, akLeft, akRight, akBottom]
-    AutoFill = True
-    AutoSize = True
-    Caption = 'Select  [prebuilt] System :'
-    ChildSizing.LeftRightSpacing = 6
-    ChildSizing.EnlargeHorizontal = crsHomogenousChildResize
-    ChildSizing.EnlargeVertical = crsHomogenousChildResize
-    ChildSizing.ShrinkHorizontal = crsScaleChilds
-    ChildSizing.ShrinkVertical = crsScaleChilds
-    ChildSizing.Layout = cclLeftToRightThenTopToBottom
-    ChildSizing.ControlsPerLine = 4
-    ClientHeight = 31
-    ClientWidth = 300
-    Columns = 4
-    ItemIndex = 0
-    Items.Strings = (
-      'Windows'
-      'Linux-x86'
-      'Mac'
-      'Linux-x86_64'
-    )
-    TabOrder = 8
+  object StatusBar1: TStatusBar
+    Left = 0
+    Height = 23
+    Top = 477
+    Width = 473
+    Panels = <>
   end
   object SelDirDlgPathToAndroidNDK: TSelectDirectoryDialog
-    left = 387
-    top = 192
+    left = 240
+    top = 176
   end
   object SelDirDlgPathToSimonsayzTemplate: TSelectDirectoryDialog
-    left = 387
-    top = 319
+    left = 168
+    top = 384
   end
   object SelDirDlgPathToJavaJDK: TSelectDirectoryDialog
-    left = 387
+    left = 336
     top = 27
   end
   object SelDirDlgPathToAndroidSDK: TSelectDirectoryDialog
-    left = 387
-    top = 141
+    left = 240
+    top = 120
   end
   object SelDirDlgPathToAntBinary: TSelectDirectoryDialog
-    left = 387
-    top = 78
+    left = 344
+    top = 80
   end
 end

@@ -122,9 +122,9 @@ object FormWorkspace: TFormWorkspace
       Left = 0
       Height = 181
       Top = 4
-      Width = 142
+      Width = 258
       AutoFill = True
-      Caption = 'Instruction:'
+      Caption = 'Architecture/Instructions:'
       ChildSizing.LeftRightSpacing = 6
       ChildSizing.TopBottomSpacing = 6
       ChildSizing.EnlargeHorizontal = crsHomogenousChildResize
@@ -132,9 +132,10 @@ object FormWorkspace: TFormWorkspace
       ChildSizing.ShrinkHorizontal = crsScaleChilds
       ChildSizing.ShrinkVertical = crsScaleChilds
       ChildSizing.Layout = cclLeftToRightThenTopToBottom
-      ChildSizing.ControlsPerLine = 1
+      ChildSizing.ControlsPerLine = 3
       ClientHeight = 161
-      ClientWidth = 138
+      ClientWidth = 254
+      Columns = 3
       ItemIndex = 0
       Items.Strings = (
         'ARMv6'
@@ -144,39 +145,11 @@ object FormWorkspace: TFormWorkspace
       OnClick = RGInstructionClick
       TabOrder = 0
     end
-    object RGFPU: TRadioGroup
-      AnchorSideLeft.Side = asrBottom
-      AnchorSideTop.Side = asrBottom
-      Left = 146
-      Height = 181
-      Top = 4
-      Width = 133
-      AutoFill = True
-      Caption = 'ARM Fpu:'
-      ChildSizing.LeftRightSpacing = 6
-      ChildSizing.TopBottomSpacing = 6
-      ChildSizing.EnlargeHorizontal = crsHomogenousChildResize
-      ChildSizing.EnlargeVertical = crsHomogenousChildResize
-      ChildSizing.ShrinkHorizontal = crsScaleChilds
-      ChildSizing.ShrinkVertical = crsScaleChilds
-      ChildSizing.Layout = cclLeftToRightThenTopToBottom
-      ChildSizing.ControlsPerLine = 1
-      ClientHeight = 161
-      ClientWidth = 129
-      ItemIndex = 0
-      Items.Strings = (
-        'Soft'
-        'VFPv2'
-        'VFPv3'
-      )
-      OnClick = RGFPUClick
-      TabOrder = 1
-    end
     object Image1: TImage
-      Left = 283
+      Left = 262
       Height = 181
       Top = 4
-      Width = 164
+      Width = 185
       AutoSize = True
       Picture.Data = {
         1754506F727461626C654E6574776F726B47726170686963924E000089504E47

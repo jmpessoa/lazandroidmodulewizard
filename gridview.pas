@@ -11,6 +11,15 @@ type
 
 TOnClickGridItem = procedure(Sender: TObject; itemIndex: integer; itemCaption: string) of Object;
 TGridItemLayout = (ilImageText, ilTextImage);
+TGridStretchMode = (smNone, smSpacingWidth, smColumnWidth, smSpacingWidthUniform);
+
+{
+0	Stretching is disabled.
+1	The spacing between each column is stretched.
+2	Each column is stretched equally.
+3	The spacing between each column is uniformly stretched
+}
+
 
 {Draft Component code by "Lazarus Android Module Wizard" [1/9/2015 21:12:18]}
 {https://github.com/jmpessoa/lazandroidmodulewizard}
@@ -72,6 +81,11 @@ TGridItemLayout = (ilImageText, ilTextImage);
     procedure SetFontSizeUnit(_unit: TFontSizeUnit);
     procedure UpdateItemTitle(_index: integer; _title: string);
 
+    procedure SetHorizontalSpacing(_horizontalSpacingPixels: integer);
+    procedure SetVerticalSpacing(_verticalSpacingPixels: integer);
+    procedure SetSelection(_index: integer);
+    procedure SetStretchMode(_stretchMode: TGridStretchMode);
+
     procedure GenEvent_OnDrawItemCaptionColor(Obj: TObject; index: integer; caption: string;  out color: dword);
     procedure GenEvent_OnDrawItemBitmap(Obj: TObject; index: integer; caption: string;  out bitmap: JObject);
 
@@ -111,7 +125,6 @@ procedure jGridView_SetItemsLayout(env: PJNIEnv; _jgridview: JObject; _value: in
 function jGridView_GetItemIndex(env: PJNIEnv; _jgridview: JObject): integer;
 function jGridView_GetItemCaption(env: PJNIEnv; _jgridview: JObject): string;
 
-
 procedure jGridView_DispatchOnDrawItemTextColor(env: PJNIEnv; _jgridview: JObject; _value: boolean);
 procedure jGridView_DispatchOnDrawItemBitmap(env: PJNIEnv; _jgridview: JObject; _value: boolean);
 procedure jGridView_SetFontSize(env: PJNIEnv; _jgridview: JObject; _size: integer);
@@ -119,6 +132,10 @@ procedure jGridView_SetFontColor(env: PJNIEnv; _jgridview: JObject; _color: inte
 procedure jGridView_SetFontSizeUnit(env: PJNIEnv; _jgridview: JObject; _unit: integer);
 procedure jGridView_UpdateItemTitle(env: PJNIEnv; _jgridview: JObject; _index: integer; _title: string);
 
+procedure jGridView_SetHorizontalSpacing(env: PJNIEnv; _jgridview: JObject; _horizontalSpacingPixels: integer);
+procedure jGridView_SetVerticalSpacing(env: PJNIEnv; _jgridview: JObject; _verticalSpacingPixels: integer);
+procedure jGridView_SetSelection(env: PJNIEnv; _jgridview: JObject; _index: integer);
+procedure jGridView_SetStretchMode(env: PJNIEnv; _jgridview: JObject; _stretchMode: integer);
 
 implementation
 
@@ -140,9 +157,8 @@ begin
   FWidth        := 96; //??
   FAcceptChildrenAtDesignTime:= False;
 //your code here....
-  FColumns:= -1; //AUTO_FIT
+  FColumns:= -1; //AUTO_FIT - Creates as many columns as can fit on screen.
   FItemsLayout:= ilImageText;
-
 end;
 
 destructor jGridView.Destroy;
@@ -549,6 +565,34 @@ begin
      jGridView_UpdateItemTitle(FjEnv, FjObject, _index ,_title);
 end;
 
+procedure jGridView.SetHorizontalSpacing(_horizontalSpacingPixels: integer);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jGridView_SetHorizontalSpacing(FjEnv, FjObject, _horizontalSpacingPixels);
+end;
+
+procedure jGridView.SetVerticalSpacing(_verticalSpacingPixels: integer);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jGridView_SetVerticalSpacing(FjEnv, FjObject, _verticalSpacingPixels);
+end;
+
+procedure jGridView.SetSelection(_index: integer);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jGridView_SetSelection(FjEnv, FjObject, _index);
+end;
+
+procedure jGridView.SetStretchMode(_stretchMode: TGridStretchMode);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jGridView_SetStretchMode(FjEnv, FjObject, Ord(_stretchMode));
+end;
+
 {-------- jGridView_JNI_Bridge ----------}
 
 function jGridView_jCreate(env: PJNIEnv;_Self: int64; this: jObject): jObject;
@@ -933,6 +977,61 @@ begin
   jMethod:= env^.GetMethodID(env, jCls, 'UpdateItemTitle', '(ILjava/lang/String;)V');
   env^.CallVoidMethodA(env, _jgridview, jMethod, @jParams);
   env^.DeleteLocalRef(env,jParams[1].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jGridView_SetHorizontalSpacing(env: PJNIEnv; _jgridview: JObject; _horizontalSpacingPixels: integer);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].i:= _horizontalSpacingPixels;
+  jCls:= env^.GetObjectClass(env, _jgridview);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetHorizontalSpacing', '(I)V');
+  env^.CallVoidMethodA(env, _jgridview, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+
+procedure jGridView_SetVerticalSpacing(env: PJNIEnv; _jgridview: JObject; _verticalSpacingPixels: integer);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].i:= _verticalSpacingPixels;
+  jCls:= env^.GetObjectClass(env, _jgridview);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetVerticalSpacing', '(I)V');
+  env^.CallVoidMethodA(env, _jgridview, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+
+procedure jGridView_SetSelection(env: PJNIEnv; _jgridview: JObject; _index: integer);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].i:= _index;
+  jCls:= env^.GetObjectClass(env, _jgridview);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetSelection', '(I)V');
+  env^.CallVoidMethodA(env, _jgridview, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+
+procedure jGridView_SetStretchMode(env: PJNIEnv; _jgridview: JObject; _stretchMode: integer);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].i:= _stretchMode;
+  jCls:= env^.GetObjectClass(env, _jgridview);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetStretchMode', '(I)V');
+  env^.CallVoidMethodA(env, _jgridview, jMethod, @jParams);
   env^.DeleteLocalRef(env, jCls);
 end;
 

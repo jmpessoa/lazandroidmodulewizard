@@ -47,18 +47,34 @@ begin
   frmLazAndroidToolsExpert.ShowModal;
 end;
 
-procedure StartUpdateCodeTemplateTool(Sender: TObject);  //by jmpessoa
+procedure StartUpdateCodeTemplateTool(Sender: TObject);
+var
+  Project: TLazProject;
 begin
-  //Call Update code
-  FormUpdateCodeTemplate:= TFormUpdateCodeTemplate.Create(Application);
-  FormUpdateCodeTemplate.ShowModal;
+  Project := LazarusIDE.ActiveProject;
+  if Assigned(Project) and (Project.CustomData.Values['LAMW'] <> '') then
+  begin
+    //Call Update code
+    FormUpdateCodeTemplate:= TFormUpdateCodeTemplate.Create(Application);
+    FormUpdateCodeTemplate.ShowModal;
+  end
+  else
+    ShowMessage('The active project is not LAMW project!');
 end;
 
 procedure StartResEditor(Sender: TObject);
+var
+  Project: TLazProject;
 begin
-  // Call res editor
-  frmEditor:= TfrmEditor.Create(etResString, nil);
-  frmEditor.ShowModal;
+  Project := LazarusIDE.ActiveProject;
+  if Assigned(Project) and (Project.CustomData.Values['LAMW'] <> '') then
+  begin
+    // Call res editor
+    frmEditor:= TfrmEditor.Create(etResString, nil);
+    frmEditor.ShowModal;
+  end
+  else
+    ShowMessage('The active project is not LAMW project!');
 end;
 
 procedure StartComponentCreate(Sender: TObject);
@@ -70,9 +86,17 @@ begin
 end;
 
 procedure StartPathToNDKDemo(Sender: TObject);
+var
+  Project: TLazProject;
 begin
-   FormChangeDemoPathToNDK:= TFormChangeDemoPathToNDK.Create(Application);
-   FormChangeDemoPathToNDK.ShowModal;
+  Project := LazarusIDE.ActiveProject;
+  if Assigned(Project) and (Project.CustomData.Values['LAMW'] <> '') then
+  begin
+     FormChangeDemoPathToNDK:= TFormChangeDemoPathToNDK.Create(Application);
+     FormChangeDemoPathToNDK.ShowModal;
+  end
+  else
+    ShowMessage('The active project is not LAMW project!');
 end;
 
 
@@ -141,8 +165,6 @@ begin
 
   RegisterIDEMenuCommand(itmRunBuilding, 'BuildAPKandRun', '[Lamw] Build Android Apk and Run',nil, @BuildAPKandRun);
   ApkBuild.RegisterExtToolParser;
-
-  //RegisterIDEMenuCommand(ideMnuAMW, 'PathToBuildFPCCross', '[Lamw] Build FPC Cross Android',nil, @StartPathToBuildFPCCross);
 
 end;
 

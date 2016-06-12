@@ -42,13 +42,20 @@ type
     FStarted, FDone: TFPList;
     FLastSelectedContainer: jVisualControl;
     FSelection: TFPList;
-    FFormActivityMode: TActivityMode;
+
+    FSelectedJControlClassName: String;  //experimental ...
+
+    procedure RemoveJControl(jclassname: string);
+    procedure AddJControl(jclassname: string);
+
     function GetAndroidForm: jForm;
   protected
     procedure OnDesignerModified(Sender: TObject{$If lcl_fullversion>1060004}; {%H-}PropName: ShortString{$ENDIF});
     procedure OnPersistentAdded(APersistent: TPersistent; {%H-}Select: boolean);
     procedure OnSetSelection(const ASelection: TPersistentSelectionList);
+
   public
+
     //needed by the lazarus form editor
     class function CreateMediator(TheOwner, TheForm: TComponent): TDesignerMediator; override;
     class function FormClass: TComponentClass; override;
@@ -58,13 +65,14 @@ type
     procedure GetClientArea(AComponent: TComponent; out CurClientArea: TRect; out ScrollOffset: TPoint); override;
     procedure InitComponent(AComponent, NewParent: TComponent; NewBounds: TRect); override;
     procedure Paint; override;
+    procedure KeyDown(Sender: TControl; var {%H-}Key: word; {%H-}Shift: TShiftState); override;
     function ComponentIsIcon(AComponent: TComponent): boolean; override;
     function ParentAcceptsChild(Parent: TComponent; Child: TComponentClass): boolean; override;
     procedure UpdateTheme;
-
     procedure MouseDown(Button: TMouseButton; Shift: TShiftState; p: TPoint; var Handled: boolean); override;
     //procedure MouseMove(Shift: TShiftState; p: TPoint; var Handled: boolean); override;
     procedure MouseUp(Button: TMouseButton; Shift: TShiftState; p: TPoint; var Handled: boolean); override;
+
   public
     // needed by TAndroidWidget
     constructor Create(AOwner: TComponent); override;
@@ -223,23 +231,23 @@ type
   { TDraftImageView }
 
   TDraftImageView = class(TDraftWidget)
-  public
-    constructor Create(AWidget: TAndroidWidget; Canvas: TCanvas); override;
-  end;
+   public
+     constructor Create(AWidget: TAndroidWidget; Canvas: TCanvas); override;
+   end;
 
   {TDraftDrawingView}
 
   TDraftDrawingView = class(TDraftWidget)
-  public
-    constructor Create(AWidget: TAndroidWidget; Canvas: TCanvas); override;
-  end;
+   public
+     constructor Create(AWidget: TAndroidWidget; Canvas: TCanvas); override;
+   end;
 
   {TDraftSurfaceView}
 
   TDraftSurfaceView = class(TDraftWidget)
-  public
-    constructor Create(AWidget: TAndroidWidget; Canvas: TCanvas); override;
-  end;
+   public
+     constructor Create(AWidget: TAndroidWidget; Canvas: TCanvas); override;
+   end;
 
   { TDraftSpinner }
 
@@ -257,45 +265,46 @@ type
     procedure SetDropListTextColor(Acolor: TARGBColorBridge);
     procedure SetDropListBackgroundColor(Acolor: TARGBColorBridge);
     procedure SetSelectedFontColor(Acolor: TARGBColorBridge);
-  public
-    constructor Create(AWidget: TAndroidWidget; Canvas: TCanvas); override;
-    procedure Draw; override;
 
-    property DropListTextColor: TARGBColorBridge read FDropListTextColor write SetDropListTextColor;
-    property DropListBackgroundColor: TARGBColorBridge  read FDropListBackgroundColor write SetDropListBackgroundColor;
-    property SelectedFontColor: TARGBColorBridge  read FSelectedFontColor write SetSelectedFontColor;
- end;
+  public
+     constructor Create(AWidget: TAndroidWidget; Canvas: TCanvas); override;
+     procedure Draw; override;
+
+     property DropListTextColor: TARGBColorBridge read FDropListTextColor write SetDropListTextColor;
+     property DropListBackgroundColor: TARGBColorBridge  read FDropListBackgroundColor write SetDropListBackgroundColor;
+     property SelectedFontColor: TARGBColorBridge  read FSelectedFontColor write SetSelectedFontColor;
+  end;
 
   { TDraftWebView }
 
   TDraftWebView = class(TDraftWidget)
   public
-    constructor Create(AWidget: TAndroidWidget; Canvas: TCanvas); override;
-    procedure Draw; override;
+     constructor Create(AWidget: TAndroidWidget; Canvas: TCanvas); override;
+     procedure Draw; override;
   end;
 
   { TDraftScrollView }
 
   TDraftScrollView = class(TDraftWidget)
   public
-    constructor Create(AWidget: TAndroidWidget; Canvas: TCanvas); override;
-    procedure Draw; override;
+     constructor Create(AWidget: TAndroidWidget; Canvas: TCanvas); override;
+     procedure Draw; override;
   end;
 
   TDraftHorizontalScrollView = class(TDraftWidget)
   public
-    constructor Create(AWidget: TAndroidWidget; Canvas: TCanvas); override;
-    procedure Draw; override;
+     constructor Create(AWidget: TAndroidWidget; Canvas: TCanvas); override;
+     procedure Draw; override;
   end;
 
   { TDraftToggleButton }
 
   TDraftToggleButton = class(TDraftWidget)
   private
-    FOnOff: boolean;
+     FOnOff: boolean;
   public
-    constructor Create(AWidget: TAndroidWidget; Canvas: TCanvas); override;
-    procedure Draw; override;
+     constructor Create(AWidget: TAndroidWidget; Canvas: TCanvas); override;
+     procedure Draw; override;
   end;
 
   { TDraftSwitchButton }
@@ -310,15 +319,15 @@ type
 
   TDraftGridView = class(TDraftWidget)
   public
-    constructor Create(AWidget: TAndroidWidget; Canvas: TCanvas); override;
-    procedure Draw; override;
+     constructor Create(AWidget: TAndroidWidget; Canvas: TCanvas); override;
+     procedure Draw; override;
   end;
 
   { TDraftView }
 
   TDraftView = class(TDraftWidget)
   public
-    constructor Create(AWidget: TAndroidWidget; Canvas: TCanvas); override;
+     constructor Create(AWidget: TAndroidWidget; Canvas: TCanvas); override;
   end;
 
   { TDraftPanel }
@@ -328,8 +337,6 @@ type
     procedure Draw; override;
     procedure UpdateLayout; override;
   end;
-
-
 
   { TARGBColorBridgePropertyEditor }
 
@@ -363,11 +370,11 @@ type
 
   { TAndroidFormSizeEditor }
 
-  TAndroidFormSizeEditor = class(TIntegerPropertyEditor)
-  public
-    procedure Edit; override;
-    function GetAttributes: TPropertyAttributes; override;
-  end;
+   TAndroidFormSizeEditor = class(TIntegerPropertyEditor)
+   public
+     procedure Edit; override;
+     function GetAttributes: TPropertyAttributes; override;
+   end;
 
 implementation
 
@@ -384,6 +391,22 @@ const
 
 var
   DraftClassesMap: TDraftControlHash;
+  //design helpers
+  JControlsList: TStringList;
+  PathToJavaTemplates: string;
+  PathToAndroidProject: string;
+  AndroidPackage: string;
+  PathToJavaSource: string;
+
+
+function ReplaceChar(query: string; oldchar, newchar: char):string;
+begin
+    if query <> '' then
+    begin
+       while Pos(oldchar,query) > 0 do query[pos(oldchar,query)]:= newchar;
+       Result:= query;
+    end;
+end;
 
 function FindNodeAtrib(root: TDOMElement; const ATag, AAttr, AVal: string): TDOMElement;
 var
@@ -545,7 +568,6 @@ begin
       end;
     end;
   end;
-
 end;
 
 procedure GetRedGreenBlue(rgb: longInt; out Red, Green, Blue: word); inline;
@@ -726,7 +748,7 @@ procedure TDraftPanel.UpdateLayout;
 var
   maxH, i, t: Integer;
 begin
-  with jPanel(FAndroidWidget) do
+   with jPanel(FAndroidWidget) do
     if (LayoutParamHeight = lpWrapContent) and (ChildCount > 0) then
     begin
       with Children[0] do
@@ -875,6 +897,7 @@ begin
   FSelection.Free;
   FStarted.Free;
   FDone.Free;
+
   if GlobalDesignHook <> nil then
     GlobalDesignHook.RemoveAllHandlersForObject(Self);
   inherited Destroy;
@@ -900,6 +923,7 @@ begin
   end;
   if InvalidateNeeded then
     LCLForm.Invalidate;
+
 end;
 
 procedure TAndroidWidgetMediator.OnPersistentAdded(APersistent: TPersistent; {%H-}Select: boolean);
@@ -918,14 +942,29 @@ procedure TAndroidWidgetMediator.OnSetSelection(const ASelection: TPersistentSel
 var
   i: Integer;
 begin
+
   FLastSelectedContainer := nil;
   if (ASelection.Count = 1) and (ASelection[0] is jVisualControl) then
     with jVisualControl(ASelection[0]) do
       if (Owner = AndroidForm) and AcceptChildrenAtDesignTime then
         FLastSelectedContainer := jVisualControl(ASelection[0]);
+
   FSelection.Clear;
   for i := 0 to ASelection.Count - 1 do
     FSelection.Add(ASelection[i]);
+
+  if ASelection <> nil then //experimental ....
+  begin
+    if ASelection.Count > 0 then
+    begin
+      FSelectedJControlClassName:= '';
+      if (ASelection[0] is jControl) then
+      begin
+        FSelectedJControlClassName:= (ASelection[0] as jControl).ClassName;
+      end;
+    end;
+  end;
+
 end;
 
 function TAndroidWidgetMediator.GetAndroidForm: jForm;
@@ -936,6 +975,10 @@ end;
 class function TAndroidWidgetMediator.CreateMediator(TheOwner, TheForm: TComponent): TDesignerMediator;
 var
   Mediator: TAndroidWidgetMediator;
+
+  list: TStringList;
+  p1: integer;
+  aux: string;
 begin
   Result:=inherited CreateMediator(TheOwner,nil);
 
@@ -948,6 +991,52 @@ begin
   Mediator.UpdateTheme;
 
   Mediator.AndroidForm.Designer:= Mediator;
+
+  //Design Helpers ...............
+  p1:= Pos(DirectorySeparator+'jni'+DirectorySeparator, LazarusIDE.ActiveProject.ProjectInfoFile);
+  PathToAndroidProject:= Trim(Copy(LazarusIDE.ActiveProject.ProjectInfoFile, 1, p1-1));
+
+  list:= TStringList.Create;
+  if not FileExists(PathToAndroidProject+DirectorySeparator+'packagename.txt') then
+  begin
+
+    {$IFDEF LINUX}
+    list.LoadFromFile(PathToAndroidProject+DirectorySeparator+'uninstall.sh');
+    {$ENDIF}
+
+    {$IFDEF WINDOWS}
+    list.LoadFromFile(PathToAndroidProject+DirectorySeparator+'uninstall.bat');
+    {$ENDIF}
+
+    p1:= Pos('adb uninstall ', list.Text);
+    if p1 > 0 then
+    begin
+       p1:= p1+Length('adb uninstall ');
+       aux:= Copy(list.Text, p1 , Length(list.Text)); //ok!
+    end;
+    list.Clear;
+    list.Add(Trim(aux));
+    list.SaveToFile(PathToAndroidProject+DirectorySeparator+'packagename.txt');
+  end;
+
+  list.LoadFromFile(LazarusIDE.GetPrimaryConfigPath+DirectorySeparator+'JNIAndroidProject.ini');
+  PathToJavaTemplates:= Trim(list.Values['PathToJavaTemplates']);
+
+  list.LoadFromFile(PathToAndroidProject+DirectorySeparator+'packagename.txt');
+  aux:= Trim(list.Text);
+  AndroidPackage:= 'package '+aux+';';  //java package
+  PathToJavaSource:= PathToAndroidProject + DirectorySeparator+ 'src' + DirectorySeparator + ReplaceChar(aux, '.', DirectorySeparator);
+  list.Free;
+
+  JControlsList.Clear;
+  if ForceDirectories(PathToAndroidProject+DirectorySeparator+'lamwdesigner') then
+  begin
+     if FileExists(PathToAndroidProject+DirectorySeparator+'lamwdesigner'+DirectorySeparator+'jForm.content') then
+       JControlsList.LoadFromFile(PathToAndroidProject+ DirectorySeparator+'lamwdesigner'+DirectorySeparator+'jForm.content')
+     else //create empty "jForm.content"
+       JControlsList.SaveToFile(PathToAndroidProject+ DirectorySeparator+'lamwdesigner'+DirectorySeparator+'jForm.content');
+  end;
+
 end;
 
 class function TAndroidWidgetMediator.FormClass: TComponentClass;
@@ -1005,30 +1094,326 @@ begin
   else inherited GetClientArea(AComponent, CurClientArea, ScrollOffset);
 end;
 
-procedure TAndroidWidgetMediator.InitComponent(AComponent, NewParent: TComponent;
-  NewBounds: TRect);
+procedure TAndroidWidgetMediator.KeyDown(Sender: TControl; var {%H-}Key: word; {%H-}Shift: TShiftState);
 begin
-  if AComponent <> AndroidForm then // to preserve jForm size
+  if Key = VK_DELETE then
   begin
-    if AComponent is TAndroidWidget then
-      with NewBounds do
-        if (Right - Left = 50) and (Bottom - Top = 50) then // ugly check, but IDE makes 50x50 default size for non TControl
-        begin
-          // restore default size
-          Right := Left + TAndroidWidget(AComponent).Width;
-          Bottom := Top + TAndroidWidget(AComponent).Height
-        end;
-    inherited InitComponent(AComponent, NewParent, NewBounds);
-    if (AComponent is jVisualControl)
-    and Assigned(jVisualControl(AComponent).Parent) then
-      with jVisualControl(AComponent) do
-      begin
-        if not (LayoutParamWidth in [lpWrapContent]) then
-          LayoutParamWidth := GetDesignerLayoutByWH(Width, Parent.Width);
-        if not (LayoutParamHeight in [lpWrapContent]) then
-          LayoutParamHeight := GetDesignerLayoutByWH(Height, Parent.Height);
-      end;
+     if FSelectedJControlClassName <> '' then
+     begin
+        RemoveJControl(FSelectedJControlClassName);
+     end;
   end;
+end;
+
+//experimental....
+procedure TAndroidWidgetMediator.RemoveJControl(jclassname: string);
+var
+  list, auxList, listRequirements, manifestList: TStringList;
+  i, j, count: integer;
+  aux: string;
+  flagFound: boolean;
+begin
+
+  if JControlsList.Count = 0 then Exit;
+
+  i:= JControlsList.IndexOf(jclassname);
+  if i >= 0 then
+  begin
+    JControlsList.Delete(i); //delete one ocorrence of the class ...
+    JControlsList.SaveToFile(PathToAndroidProject+DirectorySeparator+'lamwdesigner'+DirectorySeparator+'jForm.content');
+  end;
+
+  if JControlsList.IndexOf(jclassname) >= 0 then Exit;  //not remove, still exists others component of the same class..
+
+  list:= TStringList.Create;
+  manifestList:= TStringList.Create;
+  listRequirements:= TStringList.Create;
+  auxList:= TStringList.Create;
+
+  if FileExists(PathToJavaSource+DirectorySeparator+jclassname+'.java') then
+  begin
+    DeleteFile(PathToJavaSource+DirectorySeparator+jclassname+'.java');
+    if FileExists(PathToJavaTemplates+DirectorySeparator+'lamwdesigner'+DirectorySeparator +jclassname+'.create') then
+    begin
+      list.LoadFromFile(PathToJavaTemplates+DirectorySeparator+'lamwdesigner'+DirectorySeparator +jclassname+'.create');
+      count:= list.Count; //count inserted lines
+      aux:= list.Strings[0]; //insert reference
+
+      list.LoadFromFile(PathToJavaSource+DirectorySeparator+'Controls.java');
+      for i:= list.Count-1 downto 0 do
+      begin
+        if list.Strings[i] = aux then //insert reference
+        begin
+          for j:= 0 to count do list.Delete(i);  //delete count+1 lines
+          list.SaveToFile(PathToJavaSource+DirectorySeparator+'Controls.java');
+          Break;
+        end;
+      end;
+    end;
+
+    //try delete all reference added by the component in AndroidManifest ...
+    if FileExists(PathToAndroidProject+DirectorySeparator+'lamwdesigner'+DirectorySeparator+jclassname+'.required') then
+    begin
+      listRequirements.LoadFromFile(PathToAndroidProject+DirectorySeparator+'lamwdesigner'+DirectorySeparator+jclassname+'.required');
+      manifestList.LoadFromFile(PathToAndroidProject+DirectorySeparator+'AndroidManifest.xml');
+      aux:= manifestList.Text;
+
+      for i:=0 to listRequirements.Count-1 do
+      begin
+        if Pos(Trim(listRequirements.Strings[i]), aux) > 0 then
+        begin
+          flagFound:= False;
+          for j:= 0 to JControlsList.Count-1 do
+          begin
+             if JControlsList.Strings[j] <> jclassname then
+             begin
+                auxlist.LoadFromFile(PathToAndroidProject+DirectorySeparator+'lamwdesigner'+DirectorySeparator+JControlsList.Strings[j]+'.required');
+                if auxlist.Count > 0 then
+                begin
+                  if Pos(Trim(listRequirements.Strings[i]), auxlist.Text) > 0 then
+                  begin
+                     flagFound:= True; //not can be deleted...
+                     Break;
+                  end;
+                end;
+             end;
+          end;
+          if not flagFound then //can be deleted ..
+             aux:= StringReplace(aux,sLineBreak+Trim(listRequirements.Strings[i]),'',[rfIgnoreCase]);
+        end;
+      end;
+
+      manifestList.Text:= aux;
+      manifestList.SaveToFile(PathToAndroidProject+DirectorySeparator+'AndroidManifest.xml');
+      DeleteFile(PathToAndroidProject+DirectorySeparator+'lamwdesigner'+DirectorySeparator+jclassname+'.required');
+    end;
+  end;
+  manifestList.Free;
+  listRequirements.Free;
+  list.Free;
+  auxList.Free;
+end;
+
+//experimental....
+procedure TAndroidWidgetMediator.AddJControl(jclassname: string);
+var
+  list, listRequirements, auxList, manifestList: TStringList;
+  p1, p2, i: integer;
+  aux: string;
+  insertRef: string;
+  c: char;
+begin
+
+  if not FileExists(PathToAndroidProject+DirectorySeparator+'packagename.txt') then Exit;
+
+  //if experimental jcontrol not exists: exit!
+  if not FileExists(PathToJavaTemplates+DirectorySeparator+'lamwdesigner'+DirectorySeparator +jclassname+'.java') then Exit;
+
+  JControlsList.Add(jclassname); //here admit/accept duplicated ...
+  JControlsList.SaveToFile(PathToAndroidProject+DirectorySeparator+'lamwdesigner'+DirectorySeparator+'jForm.content');
+
+  list:= TStringList.Create;
+  manifestList:= TStringList.Create;
+  listRequirements:= TStringList.Create;  //DesignRequirements
+  auxList:= TStringList.Create;
+  if not FileExists(PathToJavaSource+DirectorySeparator+jclassname+'.java') then //if not in "...\src" project ...
+  begin
+   listRequirements.SaveToFile(PathToAndroidProject+DirectorySeparator+'lamwdesigner'+DirectorySeparator+jclassname+'.required'); //create empty file
+   //try insert jControl in java project source
+   if FileExists(PathToJavaTemplates+DirectorySeparator+'lamwdesigner'+DirectorySeparator +jclassname+'.java') then
+   begin
+     list.LoadFromFile(PathToJavaTemplates+DirectorySeparator+'lamwdesigner'+DirectorySeparator +jclassname+'.java');
+     list.Strings[0]:= AndroidPackage;
+     list.SaveToFile(PathToJavaSource+DirectorySeparator+jclassname+'.java');
+     //try insert jControl constructor in Controls.java
+     if FileExists(PathToJavaTemplates+DirectorySeparator+'lamwdesigner'+DirectorySeparator +jclassname+'.create') then
+     begin
+       list.LoadFromFile(PathToJavaTemplates+DirectorySeparator+'lamwdesigner'+DirectorySeparator +jclassname+'.create');
+       aux:= list.Text;
+       list.LoadFromFile(PathToJavaSource+DirectorySeparator+'Controls.java');
+       list.Insert(list.Count-1, aux);
+       list.SaveToFile(PathToJavaSource+DirectorySeparator+'Controls.java');
+     end;
+     //try insert reference required by the jControl in AndroidManifest ..
+     if FileExists(PathToJavaTemplates+DirectorySeparator+'lamwdesigner'+DirectorySeparator +jclassname+'.permission') then
+     begin
+       auxList.LoadFromFile(PathToJavaTemplates+DirectorySeparator+'lamwdesigner'+DirectorySeparator +jclassname+'.permission');
+       if auxList.Count > 0 then
+       begin
+         insertRef:= '<uses-sdk android:minSdkVersion'; //insert reference point
+         manifestList.LoadFromFile(PathToAndroidProject+DirectorySeparator+'AndroidManifest.xml');
+         aux:= manifestList.Text;
+
+         listRequirements.Add(Trim(auxList.Text));  //Add permissions
+         list.Clear;
+         for i:= 0 to auxList.Count-1 do
+         begin
+           if Pos(Trim(auxList.Strings[i]), aux) <= 0 then list.Add(Trim(auxList.Strings[i])); //not duplicate..
+         end;
+
+         if list.Count > 0 then
+         begin
+           p1:= Pos(insertRef, aux);
+           p2:= p1 + Length(insertRef);
+           c:= aux[p2];
+           while c <> '>' do
+           begin
+              Inc(p2);
+              c:= aux[p2];
+           end;
+           Inc(p2);
+           insertRef:= Trim(Copy(aux, p1, p2-p1));
+           p1:= Pos(insertRef, aux);
+           if Length(list.Text) >  10 then  //dummy
+           begin
+             Insert(sLineBreak + Trim(list.Text), aux, p1+Length(insertRef) );
+             manifestList.Text:= aux;
+             manifestList.SaveToFile(PathToAndroidProject+DirectorySeparator+'AndroidManifest.xml');
+           end;
+         end;
+       end;
+     end;
+
+     if FileExists(PathToJavaTemplates+DirectorySeparator+'lamwdesigner'+DirectorySeparator +jclassname+'.feature') then
+     begin
+       auxList.LoadFromFile(PathToJavaTemplates+DirectorySeparator+'lamwdesigner'+DirectorySeparator +jclassname+'.feature');
+       if auxList.Count > 0 then
+       begin
+         insertRef:= '<uses-sdk android:minSdkVersion'; //insert reference point
+
+         manifestList.LoadFromFile(PathToAndroidProject+DirectorySeparator+'AndroidManifest.xml');
+         aux:= manifestList.Text;
+
+         listRequirements.Add(Trim(auxList.Text));  //Add feature
+         list.Clear;
+         for i:= 0 to auxList.Count-1 do
+         begin
+           if Pos(Trim(auxList.Strings[i]), aux) <= 0 then
+             list.Add(Trim(auxList.Strings[i])); //do not insert duplicate..
+         end;
+
+         if list.Count > 0 then
+         begin
+           p1:= Pos(insertRef, aux);
+           p2:= p1 + Length(insertRef);
+           c:= aux[p2];
+           while c <> '>' do
+           begin
+              Inc(p2);
+              c:= aux[p2];
+           end;
+           Inc(p2);
+           insertRef:= Trim(Copy(aux, p1, p2-p1));
+           p1:= Pos(insertRef, aux);
+           if Length(list.Text) > 10 then  //dummy
+           begin
+             Insert(sLineBreak + Trim(list.Text), aux, p1+Length(insertRef) );
+             manifestList.Text:= aux;
+             manifestList.SaveToFile(PathToAndroidProject+DirectorySeparator+'AndroidManifest.xml');
+           end;
+         end;
+       end;
+     end;
+
+     if FileExists(PathToJavaTemplates+DirectorySeparator+'lamwdesigner'+DirectorySeparator +jclassname+'.intentfilter') then
+     begin
+       auxList.LoadFromFile(PathToJavaTemplates+DirectorySeparator+'lamwdesigner'+DirectorySeparator +jclassname+'.intentfilter');
+       if auxList.Count > 0 then
+       begin
+         insertRef:= '<intent-filter>'; //insert reference point
+
+         manifestList.LoadFromFile(PathToAndroidProject+DirectorySeparator+'AndroidManifest.xml');
+         aux:= manifestList.Text;
+
+         listRequirements.Add(Trim(auxList.Text));  //Add intentfilters
+
+         list.Clear;
+         for i:= 0 to auxList.Count-1 do
+         begin
+           if Pos(Trim(auxList.Strings[i]), aux) <= 0 then list.Add(Trim(auxList.Strings[i])); //not duplicate..
+         end;
+
+         if list.Count > 0 then
+         begin
+           p1:= Pos(insertRef, aux);
+           if Length(list.Text) > 10 then  //dummy
+           begin
+             Insert(sLineBreak + Trim(list.Text), aux, p1+Length(insertRef) );
+             manifestList.Text:= aux;
+             manifestList.SaveToFile(PathToAndroidProject+DirectorySeparator+'AndroidManifest.xml');
+           end;
+         end;
+       end;
+     end;
+
+     if FileExists(PathToJavaTemplates+DirectorySeparator+'lamwdesigner'+DirectorySeparator +jclassname+'.service') then
+     begin
+       auxList.LoadFromFile(PathToJavaTemplates+DirectorySeparator+'lamwdesigner'+DirectorySeparator +jclassname+'.service');
+       if auxList.Count > 0 then
+       begin
+         insertRef:= '</activity>'; //insert reference point
+
+         manifestList.LoadFromFile(PathToAndroidProject+DirectorySeparator+'AndroidManifest.xml');
+         aux:= manifestList.Text;
+
+         listRequirements.Add(Trim(auxList.Text));  //Add services
+
+         list.Clear;
+         for i:= 0 to auxList.Count-1 do
+         begin
+           if Pos(Trim(auxList.Strings[i]), aux) <= 0 then list.Add(Trim(auxList.Strings[i])); //not duplicate..
+         end;
+
+         if list.Count > 0 then
+         begin
+           p1:= Pos(insertRef, aux);
+           if Length(list.Text) > 10 then //dummy
+           begin
+             Insert(sLineBreak+Trim(list.Text), aux, p1+Length(insertRef) );
+             manifestList.Text:= aux;
+             manifestList.SaveToFile(PathToAndroidProject+DirectorySeparator+'AndroidManifest.xml');
+           end;
+         end;
+       end;
+     end;
+   end;
+   listRequirements.SaveToFile(PathToAndroidProject+DirectorySeparator+'lamwdesigner'+DirectorySeparator+jclassname+'.required');
+  end;
+  manifestList.Free;
+  listRequirements.Free;
+  list.Free;
+  auxList.Free;
+end;
+
+procedure TAndroidWidgetMediator.InitComponent(AComponent, NewParent: TComponent; NewBounds: TRect);
+begin
+   if AComponent <> AndroidForm then // to preserve jForm size
+   begin
+     if AComponent is TAndroidWidget then
+       with NewBounds do
+         if (Right - Left = 50) and (Bottom - Top = 50) then // ugly check, but IDE makes 50x50 default size for non TControl
+         begin
+           // restore default size
+           Right := Left + TAndroidWidget(AComponent).Width;
+           Bottom := Top + TAndroidWidget(AComponent).Height
+         end;
+     inherited InitComponent(AComponent, NewParent, NewBounds);
+     if (AComponent is jVisualControl)
+     and Assigned(jVisualControl(AComponent).Parent) then
+       with jVisualControl(AComponent) do
+       begin
+         if not (LayoutParamWidth in [lpWrapContent]) then
+           LayoutParamWidth := GetDesignerLayoutByWH(Width, Parent.Width);
+         if not (LayoutParamHeight in [lpWrapContent]) then
+           LayoutParamHeight := GetDesignerLayoutByWH(Height, Parent.Height);
+       end;
+
+     if (AComponent is jControl) then
+     begin
+        AddJControl((AComponent as jControl).ClassName);   //experimental ...
+     end;
+
+   end;
 end;
 
 procedure TAndroidWidgetMediator.Paint;
@@ -1041,6 +1426,7 @@ procedure TAndroidWidgetMediator.Paint;
     fWidget: TDraftWidget;
     fWidgetClass: TDraftWidgetClass;
   begin
+
     if FDone.IndexOf(AWidget) >= 0 then Exit;
     if FStarted.IndexOf(AWidget) >= 0 then
     begin
@@ -1106,6 +1492,7 @@ procedure TAndroidWidgetMediator.Paint;
         Rectangle(0,0,AWidget.Width,AWidget.Height);    // outer frame
         Font.Color:= clMedGray;
         TextOut(6,4,(AWidget as jVisualControl).Text);
+
       end
       else // generic
       begin
@@ -1269,6 +1656,7 @@ begin
   MarginRight := AWidget.MarginRight;
   MarginBottom := AWidget.MarginBottom;
 end;
+
 
 procedure TDraftWidget.Draw;
 begin
@@ -1557,7 +1945,6 @@ begin
     end;
   inherited UpdateLayout;
 end;
-
 
 { TDraftEditText }
 
@@ -1974,7 +2361,6 @@ begin
   inherited;
 
   Color := jImageBtn(AWidget).BackgroundColor;
-  //FontColor := jImageBtn(AWidget).FontColor; //colbrBlack;
   FontColor:= colbrGray;
   BackGroundColor:= clActiveCaption; //clMenuHighlight;
 
@@ -1986,10 +2372,8 @@ procedure TDraftImageBtn.Draw;
 begin
   Fcanvas.Brush.Color:= Self.BackGroundColor;
   Fcanvas.Pen.Color:= clWhite;
-  //Fcanvas.Font.Color:= Self.TextColor;
   if Self.BackGroundColor = clNone then
      Fcanvas.Brush.Color:= clSilver; //clMedGray;
-  //if Self.TextColor = clNone then Fcanvas.Font.Color:= clBlack;
   Fcanvas.FillRect(0,0,Self.Width,Self.Height);
       // outer frame
   Fcanvas.Rectangle(0,0,Self.Width,Self.Height);
@@ -2003,9 +2387,6 @@ begin
              Self.Height-Self.MarginBottom+3,{y2}
              Self.MarginLeft-4,                {x1}
              Self.Height-Self.MarginBottom+3);  {y2}
-
-  //Fcanvas.Font.Color:= Self.TextColor;
-  //canvas.TextOut(5,4,txt);
 end;
 
 { TDraftImageView }
@@ -2182,11 +2563,6 @@ begin
 
   Fcanvas.FillRect (Trunc(Self.Width/2),Trunc(0.5*Self.Height)+5,Self.Width-5,Self.Height-5);
   Fcanvas.Rectangle(Trunc(Self.Width/2),Trunc(0.5*Self.Height)+5,Self.Width-5,Self.Height-5);
- //-----
-
- //Fcanvas.Font.Color:= Self.FontColor;
-
- //Fcanvas.TextOut(10,6,txt);
 end;
 
 { TDraftScrollView }
@@ -2230,10 +2606,6 @@ begin
   Fcanvas.MoveTo(Self.Width-5-5,5+25+1);
   Fcanvas.LineTo(Self.Width-5-5,Self.Height-5-25);
   Fcanvas.LineTo(Self.Width-20+5,Self.Height-5-25);
-
-  //-----
-  //Fcanvas.Brush.Style:= bsClear;
- // Fcanvas.TextOut(10,6,txt);
 end;
 
 { TDraftHorizontalScrollView }
@@ -2304,8 +2676,6 @@ begin
   Fcanvas.Rectangle(0,0,Self.Width,Self.Height);  // outer frame
 
   Fcanvas.TextOut(12, 9, jRadioGroup(FAndroidWidget).Text);
-  //Fcanvas.Brush.Style:= bsClear;
-  //Fcanvas.TextOut(10,6,txt);
 end;
 
 { TDraftRatingBar}
@@ -2484,7 +2854,6 @@ begin
   end
   else  //off
   begin
-
     (*
     Fcanvas.Brush.Style:= bsSolid;
     Fcanvas.Brush.Color:= clSkyBlue;
@@ -2522,8 +2891,6 @@ begin
 
 
   end;
-  //Fcanvas.Font.Color:= Self.TextColor;
-  //Fcanvas.TextOut(5,4,txt);
 end;
 
 { TDraftSwitchButton }
@@ -2537,7 +2904,6 @@ var
 begin
   with FCanvas do
   begin
-    //Color := jSwitchButton(FAndroidWidget).BackgroundColor;
     if BackGroundColor = clNone then
       BackGroundColor := GetBackGroundColor
     else begin
@@ -2616,10 +2982,7 @@ end;
 constructor TDraftGridView.Create(AWidget: TAndroidWidget; Canvas: TCanvas);
 begin
   inherited;
-
   Color := jGridView(AWidget).BackgroundColor;
-  //fWidget.FontColor:= (AWidget as jGridView).FontColor;
-
   if jGridView(AWidget).BackgroundColor = colbrDefault then
     Color := GetParentBackgroundColor;
 end;
@@ -2636,9 +2999,7 @@ begin
   Fcanvas.FillRect(0,0,Self.Width,Self.Height);
   // outer frame
   Fcanvas.Rectangle(0,0,Self.Width,Self.Height);
-
   Fcanvas.Brush.Style:= bsSolid;
-
   Fcanvas.Pen.Color:= clSilver;
 
   //H lines
@@ -2656,10 +3017,6 @@ begin
     Fcanvas.MoveTo((Self.MarginLeft-10)+i*70, Self.MarginTop-10);  {x1, y1}
     Fcanvas.LineTo((Self.MarginLeft-10)+i*70, Self.Height); {y1}
   end;
-
-  //Fcanvas.Brush.Style:= bs
-  //Fcanvas.Font.Color:= Self.TextColor;
-  //Fcanvas.TextOut(5,4, txt);
 end;
 
 { TDraftView }
@@ -2677,6 +3034,7 @@ begin
 end;
 
 initialization
+  JControlsList:= TStringList.Create;  //design helper
   DraftClassesMap := TDraftControlHash.Create(64); // should be power of 2 for efficiency
   RegisterPropertyEditor(TypeInfo(TARGBColorBridge), nil, '', TARGBColorBridgePropertyEditor);
   RegisterPropertyEditor(TypeInfo(jVisualControl), jVisualControl, 'Anchor', TAnchorPropertyEditor);
@@ -2722,5 +3080,6 @@ initialization
 
 finalization
   DraftClassesMap.Free;
+  JControlsList.Free;
 end.
 

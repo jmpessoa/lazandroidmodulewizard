@@ -16,7 +16,7 @@
         <CustomOptions Value="$(IDEBuildOptions)"/>
       </Other>
     </CompilerOptions>
-    <Files Count="21">
+    <Files Count="25">
       <Item1>
         <Filename Value="amw_ide_menu_items.pas"/>
         <HasRegisterProc Value="True"/>
@@ -102,6 +102,22 @@
         <Filename Value="androidprojoptions.lfm"/>
         <Type Value="LFM"/>
       </Item21>
+      <Item22>
+        <Filename Value="uFormBuildFPCCross.lfm"/>
+        <Type Value="LFM"/>
+      </Item22>
+      <Item23>
+        <Filename Value="uFormBuildFPCCross.pas"/>
+        <UnitName Value="uFormBuildFPCCross"/>
+      </Item23>
+      <Item24>
+        <Filename Value="uformgetfpcsource.lfm"/>
+        <Type Value="LFM"/>
+      </Item24>
+      <Item25>
+        <Filename Value="uformgetfpcsource.pas"/>
+        <UnitName Value="uFormGetFPCSource"/>
+      </Item25>
     </Files>
     <RequiredPkgs Count="3">
       <Item1>

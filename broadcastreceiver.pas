@@ -16,7 +16,10 @@ TIntentActionFiter = (afTimeTick,
                    afBatteryChanged,
                    afPowerConnected,
                    afPowerDisconnected,
-                   afShutDown, afSMSReceived, afNone);
+                   afShutDown,
+                   afSMSReceived,
+                   afDownloadComplete,  //android.intent.action.DOWNLOAD_COMPLETE  or DownloadManager.ACTION_DOWNLOAD_COMPLETE
+                   afNone);
 
 
 TOnReceiver = procedure(Sender: TObject;  intent: jObject) of Object;
@@ -41,10 +44,10 @@ jBroadcastReceiver = class(jControl)
     function jCreate(): jObject;
     procedure jFree();
 
-    procedure RegisterIntentActionFilter(_intentAction: string); overload;
-    procedure RegisterIntentActionFilter(_intentAction: TIntentActionFiter); overload;
+    procedure RegisterIntentActionFilter(_intentActionFilter: string); overload;
+    procedure RegisterIntentActionFilter(_intentActionFilter: TIntentActionFiter); overload;
 
-    procedure SetIntentActionFilter(_intentAction: TIntentActionFiter);
+    procedure SetIntentActionFilter(_intentActionFilter: TIntentActionFiter);
 
     procedure Unregister();
 
@@ -127,34 +130,34 @@ begin
      jBroadcastReceiver_jFree(FjEnv, FjObject);
 end;
 
-procedure jBroadcastReceiver.RegisterIntentActionFilter(_intentAction: string);
+procedure jBroadcastReceiver.RegisterIntentActionFilter(_intentActionFilter: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
   begin
      FRegistered:= True;
-     jBroadcastReceiver_RegisterIntentActionFilter(FjEnv, FjObject, _intentAction);
+     jBroadcastReceiver_RegisterIntentActionFilter(FjEnv, FjObject, _intentActionFilter);
   end;
 end;
 
-procedure jBroadcastReceiver.RegisterIntentActionFilter(_intentAction: TIntentActionFiter);
+procedure jBroadcastReceiver.RegisterIntentActionFilter(_intentActionFilter: TIntentActionFiter);
 begin
   //in designing component state: set value here...
   if FInitialized then
   begin
      FRegistered:= True;
-     jBroadcastReceiver_RegisterIntentActionFilter(FjEnv, FjObject, Ord(_intentAction));
+     jBroadcastReceiver_RegisterIntentActionFilter(FjEnv, FjObject, Ord(_intentActionFilter));
   end;
 end;
 
-procedure jBroadcastReceiver.SetIntentActionFilter(_intentAction: TIntentActionFiter);
+procedure jBroadcastReceiver.SetIntentActionFilter(_intentActionFilter: TIntentActionFiter);
 begin
   //in designing component state: set value here...
-  FIntentActionFilter:= _intentAction;
+  FIntentActionFilter:= _intentActionFilter;
   if FInitialized then
   begin
      FRegistered:= True;
-     jBroadcastReceiver_RegisterIntentActionFilter(FjEnv, FjObject, Ord(_intentAction));
+     jBroadcastReceiver_RegisterIntentActionFilter(FjEnv, FjObject, Ord(_intentActionFilter));
   end;
 end;
 

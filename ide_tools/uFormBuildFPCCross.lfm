@@ -1,36 +1,36 @@
 object FormBuildFPCCross: TFormBuildFPCCross
   Left = 245
-  Height = 420
+  Height = 380
   Top = 108
   Width = 420
   ActiveControl = PageControl1
   Caption = '[Lamw] FPC Android Cross Compiler Builder'
-  ClientHeight = 420
+  ClientHeight = 380
   ClientWidth = 420
   OnActivate = FormActivate
   OnClose = FormClose
   Position = poScreenCenter
-  LCLVersion = '1.7'
+  LCLVersion = '1.5'
   object StatusBar1: TStatusBar
     Left = 0
-    Height = 20
-    Top = 400
+    Height = 23
+    Top = 357
     Width = 420
     Panels = <>
   end
   object Panel3: TPanel
     Left = 0
-    Height = 400
+    Height = 357
     Top = 0
     Width = 420
     Align = alClient
     BevelOuter = bvNone
-    ClientHeight = 400
+    ClientHeight = 357
     ClientWidth = 420
     TabOrder = 1
     object PageControl1: TPageControl
       Left = 0
-      Height = 400
+      Height = 357
       Top = 0
       Width = 420
       ActivePage = TabSheet2
@@ -40,28 +40,28 @@ object FormBuildFPCCross: TFormBuildFPCCross
       OnChange = PageControl1Change
       object TabSheet2: TTabSheet
         Caption = 'Build'
-        ClientHeight = 374
+        ClientHeight = 329
         ClientWidth = 412
         object GroupBox2: TGroupBox
-          Left = 0
-          Height = 246
-          Top = 120
+          Left = 3
+          Height = 216
+          Top = 104
           Width = 400
           Caption = 'Configure Paths'
-          ClientHeight = 228
+          ClientHeight = 196
           ClientWidth = 396
           TabOrder = 0
           object Label3: TLabel
             Left = 8
-            Height = 13
+            Height = 15
             Top = 0
-            Width = 216
+            Width = 233
             Caption = 'Path to Android  NDK [ex.  C:\adt32\ndk10e]'
             ParentColor = False
           end
           object EditPathToNDK: TEdit
             Left = 8
-            Height = 21
+            Height = 23
             Top = 16
             Width = 352
             TabOrder = 0
@@ -75,24 +75,24 @@ object FormBuildFPCCross: TFormBuildFPCCross
             OnClick = SpeedButton3Click
           end
           object Label4: TLabel
-            Left = 10
-            Height = 13
-            Top = 49
-            Width = 320
-            Caption = 'Path to FPC "make.exe"  [ex. C\lazarus\fpc\3.0.0\bin\i386-win32]:'
+            Left = 12
+            Height = 15
+            Top = 64
+            Width = 318
+            Caption = 'Path to FPC "*.exe"  [ex. C\lazarus\fpc\3.0.0\bin\i386-win32]:'
             ParentColor = False
           end
           object EditPathToFpc: TEdit
-            Left = 8
-            Height = 21
-            Top = 69
+            Left = 10
+            Height = 23
+            Top = 80
             Width = 352
             TabOrder = 1
           end
           object SpeedButton4: TSpeedButton
-            Left = 368
+            Left = 370
             Height = 22
-            Top = 69
+            Top = 81
             Width = 23
             Caption = '...'
             OnClick = SpeedButton4Click
@@ -100,17 +100,17 @@ object FormBuildFPCCross: TFormBuildFPCCross
           object Button2: TButton
             Left = 316
             Height = 25
-            Top = 176
+            Top = 142
             Width = 75
             Caption = 'Build'
             OnClick = Button2Click
             TabOrder = 2
           end
           object RadioGroupInstruction: TRadioGroup
-            Left = 10
-            Height = 43
-            Top = 104
-            Width = 182
+            Left = 8
+            Height = 47
+            Top = 120
+            Width = 191
             AutoFill = True
             AutoSize = True
             Caption = 'Architecture'
@@ -123,8 +123,8 @@ object FormBuildFPCCross: TFormBuildFPCCross
             ChildSizing.ShrinkVertical = crsScaleChilds
             ChildSizing.Layout = cclLeftToRightThenTopToBottom
             ChildSizing.ControlsPerLine = 3
-            ClientHeight = 25
-            ClientWidth = 178
+            ClientHeight = 27
+            ClientWidth = 187
             Columns = 3
             ItemIndex = 0
             Items.Strings = (
@@ -137,25 +137,25 @@ object FormBuildFPCCross: TFormBuildFPCCross
           end
         end
         object GroupBox4: TGroupBox
-          Left = 0
+          Left = 3
           Height = 81
           Top = 16
           Width = 400
           Caption = 'FPC Source'
-          ClientHeight = 63
+          ClientHeight = 61
           ClientWidth = 396
           TabOrder = 1
           object Label2: TLabel
             Left = 8
-            Height = 13
+            Height = 15
             Top = 8
-            Width = 241
+            Width = 260
             Caption = 'Path to FPC Source Code  [ex. C:\tmp\FPCTrunk]:'
             ParentColor = False
           end
           object EditPathToFPCTrunk: TEdit
             Left = 8
-            Height = 21
+            Height = 23
             Top = 22
             Width = 352
             TabOrder = 0
@@ -172,7 +172,7 @@ object FormBuildFPCCross: TFormBuildFPCCross
       end
       object TabSheet3: TTabSheet
         Caption = 'Instal'
-        ClientHeight = 369
+        ClientHeight = 329
         ClientWidth = 412
         object GroupBox3: TGroupBox
           Left = 8
@@ -180,7 +180,7 @@ object FormBuildFPCCross: TFormBuildFPCCross
           Top = 0
           Width = 400
           Caption = 'Install FPC Cross Compiler [Android]'
-          ClientHeight = 342
+          ClientHeight = 340
           ClientWidth = 396
           TabOrder = 0
           object Label5: TLabel

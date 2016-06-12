@@ -57,9 +57,13 @@ object AndroidModule1: TAndroidModule1
     PaintStrokeWidth = 1
     PaintStyle = psFillAndStroke
     PaintColor = colbrRed
+    MinPinchZoomFactor = 0.25
+    MaxPinchZoomFactor = 4
     OnDraw = jDrawingView1Draw
     OnTouchMove = jDrawingView1TouchMove
     OnTouchUp = jDrawingView1TouchUp
+    OnFlingGesture = jDrawingView1FlingGesture
+    OnPinchZoomGesture = jDrawingView1PinchZoomGesture
     Id = 4940934
   end
   object jImageView1: jImageView

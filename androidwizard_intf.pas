@@ -28,7 +28,6 @@ type
      FPascalJNIInterfaceCode: string;
      FJavaClassName: string;
      FPathToClassName: string;
-    // FPathToJavaClass: string;
      FPathToJNIFolder: string;
      FPathToNdkPlatforms: string; {C:\adt32\ndk\platforms\android-14\arch-arm\usr\lib}
      FPathToNdkToolchains: string;
@@ -199,7 +198,6 @@ var
 begin
   try
     FModuleType := 2; //0: GUI --- 1:NoGUI --- 2: NoGUI EXE
-    //FJavaClassName := 'Controls';
     FPathToClassName := '';
     if GetWorkSpaceFromForm(2) then
     begin
@@ -209,6 +207,7 @@ begin
       AndroidFileDescriptor.ModuleType:= 2;
 
       CreateDir(FAndroidProjectName+DirectorySeparator+'build-modes');
+      CreateDir(FAndroidProjectName+DirectorySeparator+'lamwdesigner');
 
       CreateDir(FAndroidProjectName+DirectorySeparator+'libs');
       CreateDir(FAndroidProjectName+DirectorySeparator+'libs'+DirectorySeparator+'armeabi');
@@ -420,6 +419,7 @@ begin
       CreateDir(FAndroidProjectName+DirectorySeparator+'libs'+DirectorySeparator+'armeabi-v7a');
       CreateDir(FAndroidProjectName+DirectorySeparator+'libs'+DirectorySeparator+'x86');
       CreateDir(FAndroidProjectName+DirectorySeparator+'obj');
+      CreateDir(FAndroidProjectName+DirectorySeparator+'lamwdesigner');
 
       if  FModuleType <> 2 then
         CreateDir(FAndroidProjectName+DirectorySeparator+'obj'+DirectorySeparator+'controls');
@@ -696,6 +696,7 @@ begin
     frm.LoadSettings(SettingsFilename);
 
     frm.ComboSelectProjectName.Text:= MakeUniqueName('LamwGUIProject', frm.ComboSelectProjectName.Items);
+
     frm.LabelTheme.Caption:= 'Android Theme:';
     frm.ComboBoxTheme.Visible:= True;
     frm.SpeedButtonHintTheme.Visible:= True;
@@ -707,6 +708,7 @@ begin
       frm.PanelButtons.Color:= clWhite;
 
       frm.ComboSelectProjectName.Text:= MakeUniqueName('LamwNoGUIProject', frm.ComboSelectProjectName.Items);
+
       frm.LabelTheme.Caption:= 'Lamw NoGUI Project';
       frm.ComboBoxTheme.Visible:= False;
       frm.SpeedButtonHintTheme.Visible:= False;
@@ -720,6 +722,7 @@ begin
       frm.PanelButtons.Color:= clGradientInactiveCaption;
 
       frm.ComboSelectProjectName.Text:= MakeUniqueName('LamwConsoleApp', frm.ComboSelectProjectName.Items);
+
       frm.LabelTheme.Caption:= 'Lamw NoGUI Console/Executable Project';
       frm.EditPackagePrefaceName.Visible:= False;
 
@@ -732,6 +735,7 @@ begin
 
       frm.CheckBox2.Visible:= True;
     end;
+
 
     frm.ModuleType:= projectType;  //<-- input to form
 
@@ -1085,7 +1089,6 @@ begin
           else
             strList.Add('tools emulator -avd avd_api_'+FMinApi + ' &');
           strList.Add('cd '+FAndroidProjectName);
-          //strList.Add('pause');
           strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'launch_avd_default.bat');
 
           strList.Clear;
@@ -1216,6 +1219,7 @@ begin
           strList.Add('key.alias='+dummy+'aliaskey');
           strList.Add('key.store.password=123456');
           strList.Add('key.alias.password=123456');
+
           strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'ant.properties');
 
           //keytool input [dammy] data!
@@ -1233,6 +1237,7 @@ begin
           strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'keytool_input.txt');
 
           strList.Clear;
+
           strList.Add('set JAVA_HOME='+FPathToJavaJDK);  //set JAVA_HOME=C:\Program Files (x86)\Java\jdk1.7.0_21
           strList.Add('set PATH=%JAVA_HOME%'+PathDelim+'bin;%PATH%');
           strList.Add('set JAVA_TOOL_OPTIONS=-Duser.language=en');
@@ -1393,7 +1398,6 @@ begin
    begin
       if TryNewJNIAndroidInterfaceCode(1) then //1: noGUI project
       begin
-
         CreateDir(FAndroidProjectName+DirectorySeparator+ 'jni');
         CreateDir(FAndroidProjectName+DirectorySeparator+ 'jni'+DirectorySeparator+'build-modes');
         CreateDir(FAndroidProjectName+DirectorySeparator+'libs');
@@ -1401,6 +1405,7 @@ begin
         CreateDir(FAndroidProjectName+DirectorySeparator+'libs'+DirectorySeparator+'armeabi-v7a');
         CreateDir(FAndroidProjectName+DirectorySeparator+'libs'+DirectorySeparator+'x86');
         CreateDir(FAndroidProjectName+DirectorySeparator+'obj');
+        CreateDir(FAndroidProjectName+DirectorySeparator+'lamwdesigner');
 
         if FModuleType <> 2 then
            CreateDir(FAndroidProjectName+DirectorySeparator+'obj'+DirectorySeparator+'controls');
@@ -1508,6 +1513,10 @@ begin
         auxList.Add('# Project target.');
         auxList.Add('target=android-'+Trim(FTargetApi));
         auxList.SaveToFile(FAndroidProjectName+DirectorySeparator+'project.properties');
+
+        auxList.Clear;
+        auxList.Add(FPackagePrefaceName+'.'+LowerCase(FSmallProjName));
+        auxList.SaveToFile(FAndroidProjectName+DirectorySeparator + 'packagename.txt');
 
         auxList.Free;
 
@@ -1743,12 +1752,7 @@ begin
   AProject.UseManifest:= False;
   AProject.UseAppBundle:= False;
 
-  if (Pos('\', FPathToAndroidNDK) > 0) or (Pos(':', FPathToAndroidNDK) > 0) then
-     osys:= 'windows'
-  else if FPrebuildOSYS='linux-x86_64' then
-     osys:= 'linux-x86_64'
-  else
-    osys:= 'linux-x86';
+  osys:= FPrebuildOSYS;
 
   {Set compiler options for Android requirements}
 
@@ -1762,6 +1766,7 @@ begin
                                                  'prebuilt'+DirectorySeparator+osys+DirectorySeparator+
                                                  'lib'+DirectorySeparator+'gcc'+DirectorySeparator+
                                                  'arm-linux-androideabi'+DirectorySeparator+'4.4.3';
+
   if (FNDK = '9') or (FNDK = '10') or (FNDK = '10c') then          //arm-linux-androideabi-4.9
       pathToNdkToolchainsArm:= FPathToAndroidNDK+DirectorySeparator+'toolchains'+DirectorySeparator+
                                                  'arm-linux-androideabi-4.6'+DirectorySeparator+
@@ -1776,11 +1781,18 @@ begin
                                                  'lib'+DirectorySeparator+'gcc'+DirectorySeparator+
                                                  'arm-linux-androideabi'+DirectorySeparator+'4.9';
 
+  if FNDK = '11c' then          //arm-linux-androideabi-4.9
+      pathToNdkToolchainsArm:= FPathToAndroidNDK+DirectorySeparator+'toolchains'+DirectorySeparator+
+                                                 'arm-linux-androideabi-4.9'+DirectorySeparator+
+                                                 'prebuilt'+DirectorySeparator+osys+DirectorySeparator+
+                                                 'lib'+DirectorySeparator+'gcc'+DirectorySeparator+
+                                                 'arm-linux-androideabi'+DirectorySeparator+'4.9';
   if FNDK = '7' then
       pathToNdkToolchainsBinArm:= FPathToAndroidNDK+DirectorySeparator+'toolchains'+DirectorySeparator+
                                                  'arm-linux-androideabi-4.4.3'+DirectorySeparator+
                                                  'prebuilt'+DirectorySeparator+osys+DirectorySeparator+
                                                  'bin';
+
   if (FNDK = '9') or (FNDK = '10') or (FNDK = '10c') then
       pathToNdkToolchainsBinArm:= FPathToAndroidNDK+DirectorySeparator+'toolchains'+DirectorySeparator+
                                                  'arm-linux-androideabi-4.6'+DirectorySeparator+
@@ -1793,16 +1805,24 @@ begin
                                                  'prebuilt'+DirectorySeparator+osys+DirectorySeparator+
                                                  'bin';
 
+  if FNDK = '11c' then
+      pathToNdkToolchainsBinArm:= FPathToAndroidNDK+DirectorySeparator+'toolchains'+DirectorySeparator+
+                                                 'arm-linux-androideabi-4.9'+DirectorySeparator+
+                                                 'prebuilt'+DirectorySeparator+osys+DirectorySeparator+
+                                                 'bin';
+
   libraries_arm:= PathToNdkPlatformsArm+';'+pathToNdkToolchainsArm;
 
   PathToNdkPlatformsX86:= FPathToAndroidNDK+DirectorySeparator+'platforms'+DirectorySeparator+
                                              FAndroidPlatform+DirectorySeparator+'arch-x86'+DirectorySeparator+
                                              'usr'+DirectorySeparator+'lib';
+
   if FNdk = '7' then
       pathToNdkToolchainsX86:= FPathToAndroidNDK+DirectorySeparator+'toolchains'+DirectorySeparator+
                                                  'x86-4.4.3'+DirectorySeparator+'prebuilt'+DirectorySeparator+
                                                  osys+DirectorySeparator+'lib'+DirectorySeparator+
                                                  'gcc'+DirectorySeparator+'i686-android-linux'+DirectorySeparator+'4.4.3';
+
   if (FNDK = '9') or (FNDK = '10') or (FNDK = '10c') then
       pathToNdkToolchainsX86:= FPathToAndroidNDK+DirectorySeparator+'toolchains'+DirectorySeparator+
                                                  'x86-4.6'+DirectorySeparator+'prebuilt'+DirectorySeparator+
@@ -1815,17 +1835,31 @@ begin
                                                  osys+DirectorySeparator+'lib'+DirectorySeparator+'gcc'+DirectorySeparator+
                                                  'i686-android-linux'+DirectorySeparator+'4.9';
 
+  if FNDK = '11c' then
+      pathToNdkToolchainsX86:= FPathToAndroidNDK+DirectorySeparator+'toolchains'+DirectorySeparator+
+                                                 'x86-4.9'+DirectorySeparator+'prebuilt'+DirectorySeparator+
+                                                 osys+DirectorySeparator+'lib'+DirectorySeparator+'gcc'+DirectorySeparator+
+                                                 'i686-android-linux'+DirectorySeparator+'4.9';
+
+
 
   if FNDK = '7' then
       pathToNdkToolchainsBinX86:= FPathToAndroidNDK+DirectorySeparator+'toolchains'+DirectorySeparator+
                                                  'x86-4.4.3'+DirectorySeparator+'prebuilt'+DirectorySeparator+
                                                  osys+DirectorySeparator+'bin';
+
+
   if (FNDK = '9') or (FNDK = '10') or (FNDK = '10c') then
       pathToNdkToolchainsBinX86:= FPathToAndroidNDK+DirectorySeparator+'toolchains'+DirectorySeparator+
                                                  'x86-4.6'+DirectorySeparator+'prebuilt'+DirectorySeparator+
                                                  osys+DirectorySeparator+'bin';
 
   if FNDK = '10e' then
+      pathToNdkToolchainsBinX86:= FPathToAndroidNDK+DirectorySeparator+'toolchains'+DirectorySeparator+
+                                                 'x86-4.9'+DirectorySeparator+'prebuilt'+DirectorySeparator+
+                                                 osys+DirectorySeparator+'bin';
+
+  if FNDK = '11c' then
       pathToNdkToolchainsBinX86:= FPathToAndroidNDK+DirectorySeparator+'toolchains'+DirectorySeparator+
                                                  'x86-4.9'+DirectorySeparator+'prebuilt'+DirectorySeparator+
                                                  osys+DirectorySeparator+'bin';
@@ -1888,15 +1922,15 @@ begin
   if FInstructionSet <> 'x86' then
   begin
      customOptions_default:='-Xd'+' -Cf'+ FFPUSet;
-     customOptions_default:= customOptions_default + ' -Cp'+ UpperCase(FInstructionSet); //until laz bug fix for ARMV7A
+     customOptions_default:= customOptions_default + ' -Cp'+ UpperCase(FInstructionSet);
   end
   else
   begin
      customOptions_default:='-Xd';
   end;
 
-  customOptions_armV6:= '-Xd'+' -Cf'+ FFPUSet+ ' -CpARMV6';  //until laz bug fix for ARMV7A
-  customOptions_armV7a:='-Xd'+' -Cf'+ FFPUSet+ ' -CpARMV7A'; //until laz bug fix for ARMV7A
+  customOptions_armV6:= '-Xd'+' -Cf'+ FFPUSet+ ' -CpARMV6';
+  customOptions_armV7a:='-Xd'+' -Cf'+ FFPUSet+ ' -CpARMV7A';
   customOptions_x86:=   '-Xd';
 
   customOptions_armV6:=  customOptions_armV6  +' -XParm-linux-androideabi-';
@@ -2095,9 +2129,8 @@ end;
 procedure TAndroidProjectDescriptor.Mkdir(const Dir: String);
 begin
   try
-    //if FileExists(Dir) then raise Exception.Create('A file of the same name exists');
-    if not DirectoryExists(Dir) then //raise Exception.Create('Directory already exists');
-       System.MkDir(Dir);
+    if not DirectoryExists(Dir) then
+      System.MkDir(Dir);
   except
     on e: Exception do begin
       e.Message := 'Cannot create directory "' + Dir + '"' + LineEnding + e.Message;
@@ -2189,7 +2222,6 @@ begin
    sourceList.Add(GetImplementationSource(Filename, SourceName, ResourceName));
    sourceList.Add('end.');
    Result:= sourceList.Text;
-   //sourceList.SaveToFile(BasePathToJNIFolder+DirectorySeparator+'jni'+DirectorySeparator+'u'+ResourceName+'.pas');
    sourceList.Free;
 end;
 
@@ -2243,7 +2275,6 @@ begin
   strList.Add('  end;');
   strList.Add('');
   strList.Add('var');
-  //strList.Add('  ' + ResourceName + ': T' + ResourceName + ';');
   if ModuleType = 0 then //GUI controls module
   begin
     if ResourceName <> '' then
@@ -2306,28 +2337,6 @@ begin
     end;
   end;
 end;
-
-//http://delphi.about.com/od/delphitips2008/qt/subdirectories.htm
-//fils the "list" TStrings with the subdirectories of the "directory" directory
-//Warning: if not  subdirectories was found return empty list [list.count = 0]!
-procedure GetSubDirectories(const directory : string; list : TStrings);
-var
-   sr : TSearchRec;
-begin
-   try
-     if FindFirst(IncludeTrailingPathDelimiter(directory) + '*.*', faDirectory, sr) < 0 then Exit
-     else
-     repeat
-       if ((sr.Attr and faDirectory <> 0) and (sr.Name <> '.') and (sr.Name <> '..')) then
-       begin
-           List.Add(IncludeTrailingPathDelimiter(directory) + sr.Name);
-       end;
-     until FindNext(sr) <> 0;
-   finally
-     SysUtils.FindClose(sr) ;
-   end;
-end;
-
 
 end.
 
