@@ -266,8 +266,8 @@ begin
     if EditPathToAndroidSDK.Text <> '' then
       WriteString('NewProject', 'PathToAndroidSDK', EditPathToAndroidSDK.Text);
 
-    if EditPathToAndroidSDK.Text <> '' then
-      WriteString('NewProject', 'PathToAntBin', EditPathToAndroidSDK.Text);
+    if EditPathToAntBinary.Text <> '' then
+      WriteString('NewProject', 'PathToAntBin', EditPathToAntBinary.Text);
 
     WriteString('NewProject', 'NDK', IntToStr(RGNDKVersion.ItemIndex));
 
