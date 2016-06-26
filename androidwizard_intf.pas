@@ -2230,7 +2230,7 @@ begin
   if ModuleType = 1 then //generic module: No GUI Controls
     Result := 'Classes, SysUtils, jni;'
   else if ModuleType = 0  then//GUI controls module
-    Result := 'Classes, SysUtils, And_jni, And_jni_Bridge, Laz_And_Controls, Laz_And_Controls_Events, AndroidWidget;'
+    Result := 'Classes, SysUtils, AndroidWidget;'
   else // 2
     Result := 'Classes, SysUtils;'
 
