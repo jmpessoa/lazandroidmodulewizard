@@ -1,38 +1,40 @@
 [readme_get_start.txt]
+ref. https://github.com/jmpessoa/lazandroidmodulewizard
+https://justpaste.it/vntp
 
-Here is a  rapid "get_start" for windows: "Laz4Android + Lazaru Azandroid Module Wizard"
+		
+		LAMW: Lazaru Azandroid Module Wizard:
 
-Note 1:	for Linux:  go to " lazandroidmodulewizard folder  "...\linux" 
+				RAD Android!
+
+      			"Get Start" for Windows"
+
+
+Note 1:	Linux:  please, go to lazandroidmodulewizard folder  "...\linux" 
 	and read: "new_how_to_install_by_renabor.txt"
 
 I. Infrastructure
 
 .Java  sdk_x86 [32 bits]
 
-.Android sdk, NDK-r10c
-
-.Laz4Android [All in one!] =
-
-	FPC: 3.1.1 trunk svn 31903 
-		-->> win32/arm-android/i386-android/jvm-android
-		Note: Need Android NDK: r10e (arm-linux-androideabi-4.9 + x86-4.9)
-
-	Lazarus:1.5 trunk svn 49903
-		-->> http://sourceforge.net/projects/laz4android/files/?source=navbar
-		:To Install [*.7z], execute "build.bat"
-
 .Android sdk
 
-.Android NDK-r10e   - 	this version is required by "Laz4Android"  [Last update:2015-10-02]
-			http://dl.google.com/android/ndk/android-ndk-r10e-windows-x86.exe
+.Android NDK-r10e   - 	http://dl.google.com/android/ndk/android-ndk-r10e-windows-x86.exe
+
+.Laz4Android [cross Android compiler installed!] 
+
+		Or LAZARUS (Canonical/Trunk) 
+
+			Do It Yourself cross compile! [windows]: 			
+
+			After install the LAMW go to:
+			1. IDE "Tools" --> "[Lamw] Android Module Wizard" --> "Get FPC Source [Trunk]"
+			2. IDE "Tools" --> "[Lamw] Android Module Wizard" --> "Build FPC Cross Android"
 
 .Ant [to build Apk]
 
 	http://ant.apache.org/bindownload.cgi 
 	Simply extract the zip file to a convenient location...
-
-.Eclipse is not mandatory!  [but to  facility, all projects [and demos] are Eclipse compatible!]  
-
 
 II. LAMW:  Lazarus Android Module Wizard
 
@@ -150,6 +152,9 @@ III. USE
 	"install_tutorial.txt" 
    		and
 	"install_tutorial_eclipse_users.txt"
+
+
+11. NOTE: All LAMW projects [and demos] are Eclipse compatible!]  
 
 Thank you!
 
