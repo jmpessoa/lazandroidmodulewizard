@@ -5,9 +5,9 @@ unit AndroidWizard_intf;
 interface
 
 uses
- Classes, SysUtils, FileUtil, Controls, Forms, Dialogs, Graphics,
- LCLProc, LCLType, LCLIntf, LazIDEIntf, ProjectIntf, FormEditingIntf, uFormAndroidProject,
- uformworkspace, FPimage, AndroidWidget;
+  Classes, SysUtils, FileUtil, Controls, Forms, Dialogs, Graphics,
+  LCLProc, LCLType, LCLIntf, LazIDEIntf, ProjectIntf, FormEditingIntf,
+  uFormAndroidProject, uformworkspace, FPimage, AndroidWidget;
 
 type
 
@@ -73,8 +73,6 @@ type
      function GetAppName(className: string): string;
 
      function GetFolderFromApi(api: integer): string;
-     procedure ChDir(const Dir: String);
-     procedure Mkdir(const Dir: String);
    public
      constructor Create; override;
      function GetLocalizedName: string; override;
@@ -800,9 +798,7 @@ begin
         begin
           if FModuleType <> 2 then
           begin
-            ChDir(FAndroidProjectName);
-            MkDir(FAndroidProjectName+ DirectorySeparator + 'src');
-            ChDir(FAndroidProjectName+DirectorySeparator+ 'src');
+            ForceDirectories(FAndroidProjectName + DirectorySeparator + 'src');
 
             FPathToJavaSrc:= FAndroidProjectName+DirectorySeparator+ 'src';
             FFullJavaSrcPath:= FPathToJavaSrc;
@@ -814,40 +810,32 @@ begin
             for i:= 0 to strList.Count -1 do
             begin
                FFullJavaSrcPath:= FFullJavaSrcPath + DirectorySeparator + strList.Strings[i];
-               MkDir(FFullJavaSrcPath);
-               ChDir(FFullJavaSrcPath);
+               CreateDir(FFullJavaSrcPath);
             end;
 
-            MkDir(FAndroidProjectName+ DirectorySeparator + 'res');
-            ChDir(FAndroidProjectName+DirectorySeparator+ 'res');
+            CreateDir(FAndroidProjectName+DirectorySeparator+'res');
 
-            MkDir(FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'drawable-hdpi');
-            ChDir(FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'drawable-hdpi');
+            ForceDirectories(FAndroidProjectName+DirectorySeparator+'res'+DirectorySeparator+'drawable-hdpi');
             CopyFile(FPathToJavaTemplates+DirectorySeparator+'drawable-hdpi'+DirectorySeparator+'ic_launcher.png',
                      FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'drawable-hdpi'+DirectorySeparator+'ic_launcher.png');
 
-            MkDir(FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'drawable-ldpi');
-            ChDir(FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'drawable-ldpi');
+            CreateDir(FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'drawable-ldpi');
             CopyFile(FPathToJavaTemplates+DirectorySeparator+'drawable-ldpi'+DirectorySeparator+'ic_launcher.png',
                      FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'drawable-ldpi'+DirectorySeparator+'ic_launcher.png');
 
-            MkDir(FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'drawable-mdpi');
-            ChDir(FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'drawable-mdpi');
+            CreateDir(FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'drawable-mdpi');
             CopyFile(FPathToJavaTemplates+DirectorySeparator+'drawable-mdpi'+DirectorySeparator+'ic_launcher.png',
                      FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'drawable-mdpi'+DirectorySeparator+'ic_launcher.png');
 
-            MkDir(FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'drawable-xhdpi');
-            ChDir(FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'drawable-xhdpi');
+            CreateDir(FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'drawable-xhdpi');
             CopyFile(FPathToJavaTemplates+DirectorySeparator+'drawable-xhdpi'+DirectorySeparator+'ic_launcher.png',
                      FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'drawable-xhdpi'+DirectorySeparator+'ic_launcher.png');
 
-            MkDir(FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'drawable-xxhdpi');
-            ChDir(FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'drawable-xxhdpi');
+            CreateDir(FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'drawable-xxhdpi');
             CopyFile(FPathToJavaTemplates+DirectorySeparator+'drawable-xxhdpi'+DirectorySeparator+'ic_launcher.png',
                      FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'drawable-xxhdpi'+DirectorySeparator+'ic_launcher.png');
 
-            MkDir(FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'values');
-            ChDir(FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'values');
+            CreateDir(FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'values');
 
             strList.Clear;
             strList.Add('<?xml version="1.0" encoding="utf-8"?>');
@@ -861,8 +849,7 @@ begin
                          FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'values'+DirectorySeparator+'styles.xml');
 
 
-            MkDir(FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'values-v11');
-            ChDir(FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'values-v11');
+            CreateDir(FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'values-v11');
 
             //replace "dummyTheme" ..res\values-v11
             strList.Clear;
@@ -878,8 +865,7 @@ begin
             strList.Text:= strText;
             strList.SaveToFile(FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'values-v11'+DirectorySeparator+'styles.xml');
 
-            MkDir(FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'values-v14');
-            ChDir(FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'values-v14');
+            CreateDir(FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'values-v14');
 
             //replace "dummyTheme" ..res\values-v14
             strList.Clear;
@@ -895,8 +881,7 @@ begin
             strList.Text:= strText;
             strList.SaveToFile(FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'values-v14'+DirectorySeparator+'styles.xml');
 
-            MkDir(FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'values-v21');
-            ChDir(FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'values-v21');
+            CreateDir(FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'values-v21');
 
             //replace "dummyTheme" ..res\values-v21
             strList.Clear;
@@ -912,19 +897,15 @@ begin
             strList.Text:= strText;
             strList.SaveToFile(FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'values-v21'+DirectorySeparator+'styles.xml');
 
-            MkDir(FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'layout');
-            ChDir(FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'layout');
+            CreateDir(FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'layout');
             CopyFile(FPathToJavaTemplates+DirectorySeparator+'layout'+DirectorySeparator+'activity_app.xml',
                          FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'layout'+DirectorySeparator+'activity_app.xml');
 
-            MkDir(FAndroidProjectName+ DirectorySeparator + 'assets');
-            ChDir(FAndroidProjectName+DirectorySeparator+ 'assets');
+            CreateDir(FAndroidProjectName+ DirectorySeparator + 'assets');
 
-            MkDir(FAndroidProjectName+ DirectorySeparator + 'bin');
-            ChDir(FAndroidProjectName+DirectorySeparator+ 'bin');
+            CreateDir(FAndroidProjectName+ DirectorySeparator + 'bin');
 
-            MkDir(FAndroidProjectName+ DirectorySeparator + 'gen');
-            ChDir(FAndroidProjectName+DirectorySeparator+ 'gen');
+            CreateDir(FAndroidProjectName+ DirectorySeparator + 'gen');
 
           end;
 
@@ -1061,8 +1042,7 @@ begin
           strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'build-release.bat'); //build Apk using "Ant"
 
               //*.bat utils...
-          MkDir(FAndroidProjectName+ DirectorySeparator + 'utils');
-          ChDir(FAndroidProjectName+DirectorySeparator+ 'utils');
+          CreateDir(FAndroidProjectName+ DirectorySeparator + 'utils');
 
           {"android list targets" to see the available targets...}
           strList.Clear;
@@ -2117,36 +2097,6 @@ begin
   end;
 
   Result := mrOK;
-end;
-
-procedure TAndroidProjectDescriptor.ChDir(const Dir: String);
-begin
-  try
-    if DirectoryExists(Dir) then
-      System.ChDir(Dir)
-    else begin
-      if FileExists(Dir) then raise Exception.Create('Path is a file, not directory');
-      if not DirectoryExists(Dir) then raise Exception.Create('Directory not exists');
-    end;
-  except
-    on e: Exception do begin
-      e.Message := 'Cannot change directory to "' + Dir + '"' + LineEnding + e.Message;
-      raise;
-    end;
-  end;
-end;
-
-procedure TAndroidProjectDescriptor.Mkdir(const Dir: String);
-begin
-  try
-    if not DirectoryExists(Dir) then
-      System.MkDir(Dir);
-  except
-    on e: Exception do begin
-      e.Message := 'Cannot create directory "' + Dir + '"' + LineEnding + e.Message;
-      raise;
-    end;
-  end;
 end;
 
 {TAndroidFileDescPascalUnitWithResource}

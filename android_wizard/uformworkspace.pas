@@ -512,47 +512,37 @@ begin
     end
     else
     begin
-      MkDir(FAndroidProjectName);
-      ChDir(FAndroidProjectName);
+      CreateDir(FAndroidProjectName);
 
       if FModuleType <> 2 then
       begin
-        MkDir(FAndroidProjectName+ DirectorySeparator + 'jni');
-        ChDir(FAndroidProjectName+DirectorySeparator+ 'jni');
+        CreateDir(FAndroidProjectName+ DirectorySeparator + 'jni');
 
-        MkDir(FAndroidProjectName+DirectorySeparator+ 'jni'+DirectorySeparator+'build-modes');
-        ChDir(FAndroidProjectName+DirectorySeparator+ 'jni'+DirectorySeparator+'build-modes');
+        CreateDir(FAndroidProjectName+DirectorySeparator+ 'jni'+DirectorySeparator+'build-modes');
       end
       else  //console executable app
       begin
-        MkDir(FAndroidProjectName+DirectorySeparator+'build-modes');
-        ChDir(FAndroidProjectName+DirectorySeparator+'build-modes');
+        CreateDir(FAndroidProjectName+DirectorySeparator+'build-modes');
       end;
 
-      MkDir(FAndroidProjectName+ DirectorySeparator + 'libs');
-      ChDir(FAndroidProjectName+DirectorySeparator+ 'libs');
+      CreateDir(FAndroidProjectName+ DirectorySeparator + 'libs');
 
       if FSupportV4 = 'yes' then  //add "android 4.0" support to olds devices ...
             CopyFile(FPathToJavaTemplates+DirectorySeparator+'libs'+DirectorySeparator+'android-support-v4.jar',
                  FAndroidProjectName+DirectorySeparator+'libs'+DirectorySeparator+'android-support-v4.jar');
 
-      MkDir(FAndroidProjectName+ DirectorySeparator + 'obj');
-      ChDir(FAndroidProjectName+ DirectorySeparator+ 'obj');
+      CreateDir(FAndroidProjectName+ DirectorySeparator + 'obj');
 
       if FModuleType <> 2 then
       begin
-        MkDir(FAndroidProjectName+ DirectorySeparator + 'obj'+DirectorySeparator+LowerCase(FJavaClassName));
-        ChDir(FAndroidProjectName+ DirectorySeparator + 'obj'+DirectorySeparator+LowerCase(FJavaClassName));
+        CreateDir(FAndroidProjectName+ DirectorySeparator + 'obj'+DirectorySeparator+LowerCase(FJavaClassName));
       end;
 
-      MkDir(FAndroidProjectName+ DirectorySeparator + 'libs'+DirectorySeparator+'x86');
-      ChDir(FAndroidProjectName+DirectorySeparator+ 'libs'+DirectorySeparator+'x86');
+      CreateDir(FAndroidProjectName+ DirectorySeparator + 'libs'+DirectorySeparator+'x86');
 
-      MkDir(FAndroidProjectName+ DirectorySeparator + 'libs'+DirectorySeparator+'armeabi');
-      ChDir(FAndroidProjectName+DirectorySeparator+ 'libs'+DirectorySeparator+'armeabi');
+      CreateDir(FAndroidProjectName+ DirectorySeparator + 'libs'+DirectorySeparator+'armeabi');
 
-      MkDir(FAndroidProjectName+ DirectorySeparator + 'libs'+DirectorySeparator+'armeabi-v7a');
-      ChDir(FAndroidProjectName+DirectorySeparator+ 'libs'+DirectorySeparator+'armeabi-v7a');
+      CreateDir(FAndroidProjectName+ DirectorySeparator + 'libs'+DirectorySeparator+'armeabi-v7a');
     end;
   end;
 end;
