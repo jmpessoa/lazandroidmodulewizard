@@ -1,0 +1,2 @@
+public native void pOnContactManagerContactsExecuted(long pasobj,  int count);
+public native boolean pOnContactManagerContactsProgress(long pasobj, String contactInfo, String contactShortInfo, String contactPhotoUriAsString, Bitmap contactPhoto, int progress);

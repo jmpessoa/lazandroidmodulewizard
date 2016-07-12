@@ -11,6 +11,7 @@ object AndroidModule1: TAndroidModule1
   Text = 'AndroidModule1'
   ActivityMode = actMain
   BackgroundColor = colbrBlack
+  ActionBarTitle = abtDefault
   OnJNIPrompt = AndroidModule1JNIPrompt
   object jTextView1: jTextView
     Left = 85
@@ -33,12 +34,13 @@ object AndroidModule1: TAndroidModule1
     FontColor = colbrLime
     FontSize = 0
     TextTypeFace = tfNormal
+    FontSizeUnit = unitDefault
     Id = 2106566
   end
   object jButton1: jButton
     Left = 2
     Top = 76
-    Width = 316
+    Width = 314
     Height = 40
     MarginLeft = 2
     MarginTop = 4
@@ -54,6 +56,7 @@ object AndroidModule1: TAndroidModule1
     BackgroundColor = colbrDefault
     FontColor = colbrLightSlateBlue
     FontSize = 0
+    FontSizeUnit = unitDefault
     OnClick = jButton1Click
     Id = 8113041
   end
@@ -77,6 +80,7 @@ object AndroidModule1: TAndroidModule1
     FontColor = colbrTomato
     FontSize = 0
     Checked = False
+    FontSizeUnit = unitDefault
     OnClick = jRadioButton1Click
     Id = 2222508
   end
@@ -100,13 +104,14 @@ object AndroidModule1: TAndroidModule1
     FontColor = colbrTomato
     FontSize = 0
     Checked = False
+    FontSizeUnit = unitDefault
     OnClick = jRadioButton2Click
     Id = 0
   end
   object jButton2: jButton
     Left = 2
     Top = 124
-    Width = 316
+    Width = 314
     Height = 40
     MarginLeft = 2
     MarginTop = 4
@@ -122,13 +127,14 @@ object AndroidModule1: TAndroidModule1
     BackgroundColor = colbrDefault
     FontColor = colbrLightSlateBlue
     FontSize = 0
+    FontSizeUnit = unitDefault
     OnClick = jButton2Click
     Id = 2034794
   end
   object jPanel1: jPanel
     Left = 4
     Top = 172
-    Width = 312
+    Width = 308
     Height = 274
     MarginLeft = 4
     MarginTop = 4
@@ -145,10 +151,10 @@ object AndroidModule1: TAndroidModule1
     MaxPinchZoomFactor = 4
     Id = 0
     object jSurfaceView1: jSurfaceView
-      Left = 4
-      Top = 4
-      Width = 304
-      Height = 260
+      Left = 19
+      Top = 19
+      Width = 269
+      Height = 235
       MarginLeft = 10
       MarginTop = 10
       MarginRight = 10

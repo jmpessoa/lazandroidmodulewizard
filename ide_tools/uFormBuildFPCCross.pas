@@ -57,6 +57,7 @@ TBuildMode = (bmArmV6, bmArmV7a, bmX86);
     FPrebuildOSYS: String;
     FPCSysTarget: string;
     FPathToAndroidNDK: string;
+    FFPUSet: string;
     { private declarations }
   public
     { public declarations }
@@ -219,8 +220,8 @@ begin
 
        Params.Add('OPT="-dFPC_ARMEL"');  //Armel means that all floating point values are always passed in integer registers.
 
-       if FBuildMode = bmArmV7a then                                //[FPU] vfpv3 means that fp operations are performed by the hardware.
-          Params.Add('CROSSOPT="-CpARMv7a -OoFASTMATH -CfVFPv3"')   //-OoFASTMATH to sacrifice precision for performance.
+       if FBuildMode = bmArmV7a then  //                      //[FPU] vfpv3 means that fp operations are performed by the hardware.
+          Params.Add('CROSSOPT="-CpARMv7a -Cf'+FFPUSet+'"')   //-OoFASTMATH to sacrifice precision for performance.
        else //default
           Params.Add('CROSSOPT="-CpARMv6 -CfSoft"');   //Softfp means that all fp operations are performed by software, no FPU support.
 
@@ -553,10 +554,13 @@ end;
 
 procedure TFormBuildFPCCross.RadioGroupInstructionClick(Sender: TObject);
 begin
+
+  FFPUSet:= ''; //x86
   case RadioGroupInstruction.ItemIndex of
-    0: FBuildMode:= bmArmV6;
-    1: FBuildMode:= bmArmV7a;
-    2: FBuildMode:= bmX86;
+    0: begin FBuildMode:= bmArmV6;  FFPUSet:='Soft';  end;
+    1: begin FBuildMode:= bmArmV7a; FFPUSet:='Soft';  end;
+    2: begin FBuildMode:= bmArmV7a; FFPUSet:='VFPv3'; end;
+    3: FBuildMode:= bmX86;
   end;
 
   if FPathToAndroidNDK <> '' then

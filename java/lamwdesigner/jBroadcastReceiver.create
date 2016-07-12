@@ -1,0 +1,3 @@
+public java.lang.Object jBroadcastReceiver_jCreate(long _Self) {
+   return (java.lang.Object)(new jBroadcastReceiver(this,_Self));
+}   

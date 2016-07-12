@@ -28,8 +28,8 @@ type
     jTextView1: jTextView;
     jTextView2: jTextView;
     jView1: jView;
-    procedure AndroidModule1ActivityRst(Sender: TObject;
-      requestCode, resultCode: integer; intentData: jObject);
+    procedure AndroidModule1ActivityResult(Sender: TObject;
+      requestCode: integer; resultCode: TAndroidResult; intentData: jObject);
     procedure AndroidModule1Create(Sender: TObject);
     procedure AndroidModule1JNIPrompt(Sender: TObject);
     procedure AndroidModule1Rotate(Sender: TObject; rotate: TScreenStyle);
@@ -83,15 +83,15 @@ begin
   FSaveRotate := ssPortrait;  //default: Vertical
 end;
 
-procedure TAndroidModule1.AndroidModule1ActivityRst(Sender: TObject;
-  requestCode, resultCode: integer; intentData: jObject);
+procedure TAndroidModule1.AndroidModule1ActivityResult(Sender: TObject;
+  requestCode: integer; resultCode: TAndroidResult; intentData: jObject);
 var
   dir: string;
 begin
 
-  if resultCode = 0 then
+  if resultCode = RESULT_CANCELED then
     ShowMessage('Photo Canceled!')
-  else if resultCode = -1 then //ok...
+  else if resultCode = RESULT_OK then //ok...
   begin
     if requestCode = jCamera1.RequestCode then
     begin
@@ -126,7 +126,7 @@ begin
     jPanel3.LayoutParamHeight := lpMatchParent;
     jPanel3.LayoutParamWidth := lpOneThirdOfParent;
     jPanel3.PosRelativeToAnchor := [raToRightOf, raAlignBaseline];
-    ;
+
 
   end
   else

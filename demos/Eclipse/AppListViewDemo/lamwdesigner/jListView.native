@@ -1,0 +1,5 @@
+public native void pOnClickWidgetItem(long pasobj, int position, boolean checked);
+public native void pOnClickCaptionItem(long pasobj, int position, String caption);
+public native void pOnListViewLongClickCaptionItem(long pasobj, int position, String caption);
+public native int pOnListViewDrawItemCaptionColor(long pasobj, int position, String caption);
+public native Bitmap pOnListViewDrawItemBitmap(long pasobj, int position, String caption);

@@ -1,0 +1,4 @@
+public native boolean pOnAsyncEventDoInBackground(long pasobj, int progress);
+public native int pOnAsyncEventProgressUpdate(long pasobj, int progress);
+public native int pOnAsyncEventPreExecute(long pasobj);
+public native void pOnAsyncEventPostExecute(long pasobj, int progress);

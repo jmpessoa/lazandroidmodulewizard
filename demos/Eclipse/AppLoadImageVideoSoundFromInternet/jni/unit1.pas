@@ -19,6 +19,7 @@ type
     jButton1: jButton;
     jButton2: jButton;
     jButton3: jButton;
+    jCheckBox1: jCheckBox;
     jDialogProgress1: jDialogProgress;
     jImageFileManager1: jImageFileManager;
     jImageView1: jImageView;
@@ -58,7 +59,17 @@ implementation
 //try Wifi ...
 procedure TAndroidModule1.AndroidModule1JNIPrompt(Sender: TObject);
 begin
-  if not Self.IsWifiEnabled() then Self.SetWifiEnabled(True);
+    if not Self.isConnected() then
+  begin //try wifi
+    if Self.SetWifiEnabled(True) then
+      jCheckBox1.Checked:= True
+    else
+      ShowMessage('Please,  try enable some connection...');
+  end
+  else
+  begin
+     if Self.isConnectedWifi() then jCheckBox1.Checked:= True
+  end;
 end;
 
 procedure TAndroidModule1.jAsyncTask1DoInBackground(Sender: TObject;

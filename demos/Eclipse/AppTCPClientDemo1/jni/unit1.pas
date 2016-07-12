@@ -54,6 +54,7 @@ begin
   //how to get Port? Look in your app socker server [test code below]!
 
   jTCPSocketClient1.ConnectAsync('192.168.0.105', 54321); //IP Server/Port
+
 end;
 
 procedure TAndroidModule1.AndroidModule1JNIPrompt(Sender: TObject);

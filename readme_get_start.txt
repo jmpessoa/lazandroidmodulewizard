@@ -1,17 +1,20 @@
-[readme_get_start.txt]
 ref. https://github.com/jmpessoa/lazandroidmodulewizard
-https://justpaste.it/vntp
 
-		
-		LAMW: Lazaru Azandroid Module Wizard:
+ref. http://forum.lazarus.freepascal.org/index.php/topic,21919.0.html
 
-				RAD Android!
 
-      			"Get Start" for Windows"
+		[readme_get_start.txt]
+					
+	LAMW: Lazarus Android Module Wizard:
+
+		RAD Android!
+
+	"Get Start" for Windows
 
 
 Note 1:	Linux:  please, go to lazandroidmodulewizard folder  "...\linux" 
 	and read: "new_how_to_install_by_renabor.txt"
+
 
 I. Infrastructure
 
@@ -23,9 +26,9 @@ I. Infrastructure
 
 .Laz4Android [cross Android compiler installed!] 
 
-		Or LAZARUS (Canonical/Trunk) 
+	.OR Lazarus (canonical/trunk) 
 
-			Do It Yourself cross compile! [windows]: 			
+		Do It Yourself cross compile! [windows]: 			
 
 			After install the LAMW go to:
 			1. IDE "Tools" --> "[Lamw] Android Module Wizard" --> "Get FPC Source [Trunk]"
@@ -36,15 +39,14 @@ I. Infrastructure
 	http://ant.apache.org/bindownload.cgi 
 	Simply extract the zip file to a convenient location...
 
+
 II. LAMW:  Lazarus Android Module Wizard
 
-	ref. https://github.com/jmpessoa/lazandroidmodulewizard
+	.Install order.
 
-	.Install ordem.
-
-		tfpandroidbridge_pack.lpk
-		lazandroidwizardpack.lpk
-		amw_ide_tools.lpk     [../ide-tools]
+		tfpandroidbridge_pack.lpk	[..../android_bridges]
+		lazandroidwizardpack.lpk	[..../project_wizard]
+		amw_ide_tools.lpk		[..../ide_tools]
 
 III. USE
 
@@ -52,122 +54,131 @@ III. USE
 
 	Lazarus IDE menu "Tools" ---> "[Lamw] Android Module Wizard" -->  "Path Settings ..."
 
+		ref. http://i.imgur.com/XnTE7Qv.png
+
 2. New Project [thanks to @Developing!]  	
 
-	After install "LAMW" packages:
+	After install "LAMW" packages and Configured the paths:
 
 	2.1-From Lazarus IDE select "Project" -> "New Project" 
+	
+		ref. http://i.imgur.com/pESC8py.png
 
-	ref. https://jmpessoa.opendrive.com/files?Ml85OTEwMDQ3OV9BRW45VA
-
-	2.2-From displayed dialog  select "JNI Android Module [Lamw GUI]" 	
-
+	2.2-From displayed dialog select "Android [GUI] JNI Module [Lamw]" 	
 
 	2.3-Press OK Button.
 
-	2.4. From form "Android Module wizard: Configure Project..." [Workspace Form]
+	2.4. From Form "Android Module wizard: Configure Project..." [Workspace Form]
 
-		ref. https://jmpessoa.opendrive.com/files?Ml85OTEwMDU1Nl9YVE5qUg
+		ref. http://i.imgur.com/TIhVckB.png
 
 	2.4-Fill/complete the field:
-		"Path to workspace [project folder]"  
-		example c:\LamwProjects
+
+		"Path to workspace [projects folder]"  
+
+			example: C:\MyLamwProjects
 
 	2.5-Fill/complete the field:
-		"New Project Name  [or Selec
-		example: MyProject1
-		[This is your Android App/Apk name]
 
-	2.6-Select your Sdk [installed] Platform:
-		example: Jelly Bean 4.1
+		"New Project Name  [or Selec one]
 
-	2.7-[MinSdk] Select the  min. Sdk Api to compile your project:
+			example: LamwGUIProject1
+
+			[This is your Android App/Apk name]
+
+	2.6-[MinSdk] Select the  min. Sdk Api to compile your project:
+
 		example: 15
 
-	2.8-[TagetApi] Select the target [api] device
+	2.7-[TagetApi] Select the target [api] device
+
 		example: 19
 
-	2.9-Select Instruction: 
+	2.8-Select Architecture/Instruction: 
+
 		example: ARMv6
 		
-        2.10. If Arm then Select Fpu:
-		example: Soft
+        2.9.Select Android Theme
 
-	2.11-Save All [unit1.pas] in path that is showed ...
+		example: [DefaultDevice]
 
-3. From "Android Bridge" component tab drag/drop a jTextView in jForm
-		set property: PosRelativeToParent  = [rpTop,rpCenterHorizontal]
+	2.9.Click "OK"
 
-4. From "Android Bridge" component tab drag/drop a jButton     in jForm
-     set property: Anchor = jTextView1
-     set property: PosRelativeToAnchor : [raBelow]
-     set property:PosRelativeToParent = [rpCenter]
-     write code for event property "OnClick"  =  ShowMessage('Hello!')
+	2.10-Save All [unit1.pas] to path that is showed ...
 
-5.  Lazarus IDE menu "Run" ---> "Buld"    
+3. From "Android Bridge" component tab drag/drop a jTextView in the "Android Module Form" designer
+
+	set property: 
+		PosRelativeToParent  = [rpTop,rpCenterHorizontal]
+
+	WARNING!
+		.Please, whenever a dialog prompt, select "Reload from disk"
+
+4. From "Android Bridge" component tab drag/drop a jButton the "Android Module Form" designer
+
+	set property: 
+		Anchor = jTextView1
+	set property: 
+		PosRelativeToAnchor : [raBelow]
+	set property:
+		PosRelativeToParent = [rpCenter]
+
+	write code for event property "OnClick":
+		example: ShowMessage('Hello!')
+
+5.  Lazarus IDE menu "Run" ---> "Build"    
+
+	PANIC? Please, go to:
+		III.1. "Configure Paths" and fix its!
 
 6. Connect your Device to Computer [usb] and configure it to "debug mode"     
 
 	"App settings"  ---> more/aditional -- developer options [*]:  
-	stay awake  [checked!]
-	usb debugging [checked!]
-	verify apps via usb [checked!]
 
-	PANIC! Go to Google search with "android usb debugging <device name>" to get the operating mode adapted to your device...
+		stay awake  [checked!]
+		usb debugging [checked!]
+		verify apps via usb [checked!]
+
+	PANIC? Go to Google search with "android usb debugging <device name>" to get the operating mode adapted to your device...
 	
-	ex. Galaxy S3/S4 --> app settings --> about -->> Build number -->> [tap,tap,tap,...]
-        ex. MI 2 --> app settings --> about -->> MIUI Version -->> [tap,tap,tap,...]
-
+		ex. Galaxy S3/S4 --> app settings --> about -->> Build number -->> [tap,tap,tap,...]
+        	ex. MI 2 --> app settings --> about -->> MIUI Version -->> [tap,tap,tap,...]
 
 7.Lazarus IDE menu "Run" ---> "[Lamw] Build Apk and Run" [Congratulations!!!]
 
-8.PANIC!!! Fail to buid "Apk"
+8.PANIC? Fail to buid "Apk"...
 
-	.Try change project  "AndroidManifest.xml" according your system installation....
+	.Try change project "AndroidManifest.xml" according your Android SDK system installation....
 
-		<uses-sdk android:minSdkVersion="15" android:targetSdkVersion="17"/>
+			.<uses-sdk android:minSdkVersion="15" android:targetSdkVersion="17"/>
 
-		hint: other target:   "android:targetSdkVersion" !!
-		
-	.Change your project "build.xml"  according your system installation...
+		.Change your project "build.xml"  according your  Android SDK system installation and "AndroidManifest.xml"
 
-		<property name="target"  value="android-17"/>
+			.<property name="target"  value="android-17"/>			
 
 
-9. How to configure a Demo to Use/Test:
+9. Using/Testing "Demos":  [Please, before try a demo, "do your self" a first "hello" apk!]
 
-      .Lazarus IDE menu Open a [*.lpi] Demo Project   [...\jni]
+	.Lazarus IDE menu --> Open the project *.lpi   [....\jni]
+	.Lazarus IDE menu --> Project -->  Project Inspector --> "Unit1.pas"  [etc...]
+	.Lazarus IDE menu "Run" ---> "Build"    
+	.Lazarus IDE menu "Run" ---> "[Lamw] Build Apk and Run" 
 
-      .Lazarus IDE menu "Tools" ---> "[Lamw] Android Module Wizard" -->  "Change Project [*.lpi] Ndk Path"
+	[Congratulations!!!]
 
-      .set your "NDK" path!
+10. NOTE: All LAMW projects [and demos] are Eclipse compatible!
 
-      .change/edit project "build.xml"   according your system..
+		Thank you!
 
-		<property name="sdk.dir" location="C:\adt32\sdk"/>
-
-
-10. There are some others docs:   
-
-	"install_tutorial.txt" 
-   		and
-	"install_tutorial_eclipse_users.txt"
-
-
-11. NOTE: All LAMW projects [and demos] are Eclipse compatible!]  
-
-Thank you!
-
-by jmpessoa at [josemarquespessoa_gmail_com]
-
-[updated: 08 august 2015]
+	by jmpessoa hotmail com
 
 
 FAQ: [Thanks to @developing!]
 
-#Question: How do we can design a custom layout that shown same in real device?
+#Question: How do we can design a layout that shown same in real device?
 
-[Answer]: You should use: 
+[Answer]: You should use the component properties: 
+
 		"Anchor", 
 		"PosRelativeToParent", 
 		"PosRelativeToAnchor", 
@@ -176,17 +187,23 @@ FAQ: [Thanks to @developing!]
           
 Example: 
 
-1-Put a "jTextView" component on your AndroidModule form.
+1-Put a "jTextView" component on your AndroidModule form:
+
 	Set "PosRelativeToParent"
 		"rpCenterHorizontal" [True]
 		"rpTop" [True]
 
-2-Put a "jButton" component on AndroidModule form.
+	WARNING!
+		.Please, whenever a dialog prompt, select "Reload from disk"
+
+2-Put a "jButton" component on AndroidModule form:
+
 	Set "Anchor" to "jTextView" (Because you should set position relative with "jTextView")
 	set "PosRelativeToAnchor"
 		"raBelow" [True]
 
-3-Put a "jEditText" component on form.
+3-Put a "jEditText" component on form:
+
 	Set "Anchor" to "jButton".
 	Set "PosRelativeToAnchor"
 		"raBelow" [True]

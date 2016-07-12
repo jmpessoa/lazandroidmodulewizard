@@ -1,0 +1,3 @@
+public java.lang.Object jMyHello_jCreate(long _Self, int _flag, String _hello) {
+   return (java.lang.Object)(new jMyHello(this,_Self,_flag,_hello));
+}

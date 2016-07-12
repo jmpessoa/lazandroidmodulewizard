@@ -10,11 +10,12 @@ object AndroidModule1: TAndroidModule1
   Text = 'AndroidModule1'
   ActivityMode = actMain
   BackgroundColor = colbrDefault
+  ActionBarTitle = abtDefault
   OnJNIPrompt = AndroidModule1JNIPrompt
   object jTextView1: jTextView
-    Left = 31
+    Left = 35
     Top = 5
-    Width = 258
+    Width = 249
     Height = 20
     MarginLeft = 5
     MarginTop = 5
@@ -25,18 +26,19 @@ object AndroidModule1: TAndroidModule1
     PosRelativeToParent = [rpTop, rpCenterHorizontal]
     LayoutParamWidth = lpWrapContent
     LayoutParamHeight = lpWrapContent
-    Text = 'App Load Image Video Sound From Internet'
+    Text = 'App Get Image Video Sound From Internet'
     Alignment = taLeft
     Enabled = True
     BackgroundColor = colbrDefault
     FontColor = colbrDefault
     FontSize = 0
     TextTypeFace = tfNormal
+    FontSizeUnit = unitDefault
     Id = 7138094
   end
   object jButton1: jButton
     Left = 2
-    Top = 34
+    Top = 76
     Width = 92
     Height = 40
     MarginLeft = 2
@@ -44,7 +46,7 @@ object AndroidModule1: TAndroidModule1
     MarginRight = 2
     MarginBottom = 4
     Visible = True
-    Anchor = jTextView1
+    Anchor = jCheckBox1
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = [rpLeft]
     LayoutParamWidth = lpOneThirdOfParent
@@ -53,12 +55,13 @@ object AndroidModule1: TAndroidModule1
     BackgroundColor = colbrDefault
     FontColor = colbrDefault
     FontSize = 0
+    FontSizeUnit = unitDefault
     OnClick = jButton1Click
     Id = 5324807
   end
   object jButton2: jButton
     Left = 114
-    Top = 34
+    Top = 76
     Width = 92
     Height = 40
     MarginLeft = 2
@@ -66,7 +69,7 @@ object AndroidModule1: TAndroidModule1
     MarginRight = 2
     MarginBottom = 4
     Visible = True
-    Anchor = jTextView1
+    Anchor = jCheckBox1
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = [rpCenterHorizontal]
     LayoutParamWidth = lpOneThirdOfParent
@@ -75,12 +78,13 @@ object AndroidModule1: TAndroidModule1
     BackgroundColor = colbrDefault
     FontColor = colbrDefault
     FontSize = 0
+    FontSizeUnit = unitDefault
     OnClick = jButton2Click
     Id = 8462655
   end
   object jButton3: jButton
     Left = 226
-    Top = 34
+    Top = 76
     Width = 92
     Height = 40
     MarginLeft = 2
@@ -88,7 +92,7 @@ object AndroidModule1: TAndroidModule1
     MarginRight = 2
     MarginBottom = 4
     Visible = True
-    Anchor = jTextView1
+    Anchor = jCheckBox1
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = [rpRight]
     LayoutParamWidth = lpOneThirdOfParent
@@ -97,12 +101,13 @@ object AndroidModule1: TAndroidModule1
     BackgroundColor = colbrDefault
     FontColor = colbrDefault
     FontSize = 0
+    FontSizeUnit = unitDefault
     OnClick = jButton3Click
     Id = 1641892
   end
   object jImageView1: jImageView
-    Left = 8
-    Top = 272
+    Left = 3
+    Top = 269
     Width = 304
     Height = 128
     Visible = True
@@ -116,10 +121,10 @@ object AndroidModule1: TAndroidModule1
     Id = 1481240
   end
   object jSurfaceView1: jSurfaceView
-    Left = 6
-    Top = 80
+    Left = 10
+    Top = 130
     Width = 306
-    Height = 96
+    Height = 119
     MarginLeft = 10
     MarginTop = 10
     MarginRight = 10
@@ -134,6 +139,29 @@ object AndroidModule1: TAndroidModule1
     PaintColor = colbrRed
     OnSurfaceCreated = jSurfaceView1SurfaceCreated
     Id = 3868251
+  end
+  object jCheckBox1: jCheckBox
+    Left = 5
+    Top = 35
+    Width = 64
+    Height = 32
+    MarginLeft = 5
+    MarginTop = 5
+    MarginRight = 5
+    MarginBottom = 5
+    Visible = True
+    Anchor = jTextView1
+    PosRelativeToAnchor = [raBelow]
+    PosRelativeToParent = [rpLeft]
+    LayoutParamWidth = lpWrapContent
+    LayoutParamHeight = lpWrapContent
+    Text = 'WiFi'
+    BackgroundColor = colbrDefault
+    FontColor = colbrDefault
+    FontSize = 0
+    Checked = False
+    FontSizeUnit = unitDefault
+    Id = 7678907
   end
   object jAsyncTask1: jAsyncTask
     OnDoInBackground = jAsyncTask1DoInBackground

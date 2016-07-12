@@ -1,0 +1,3 @@
+public java.lang.Object jTimePickerDialog_jCreate(long _Self) {
+  return (java.lang.Object)(new jTimePickerDialog(this,_Self));
+}

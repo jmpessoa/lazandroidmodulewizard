@@ -1,0 +1,3 @@
+public native void pOnChangedSensor(long pasobj, Sensor sensor, int sensorType, float[] values, long timestamp);
+public native void pOnListeningSensor(long pasobj, Sensor sensor, int sensorType);
+public native void pOnUnregisterListeningSensor(long pasobj, int sensorType, String sensorName);

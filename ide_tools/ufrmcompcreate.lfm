@@ -11,7 +11,7 @@ object FrmCompCreate: TFrmCompCreate
   OnCreate = FormCreate
   OnDestroy = FormDestroy
   Position = poScreenCenter
-  LCLVersion = '1.3'
+  LCLVersion = '1.5'
   object Panel1: TPanel
     Left = 0
     Height = 50
@@ -482,11 +482,12 @@ object FrmCompCreate: TFrmCompCreate
             ShortCut = 57379
           end>
         MouseActions = <>
+        MouseTextActions = <>
         MouseSelActions = <>
         Lines.Strings = (
           ''
         )
-        SelectedColor.FrameEdges = sfeAround
+        VisibleSpecialChars = [vscSpace, vscTabAtLast]
         SelectedColor.BackPriority = 50
         SelectedColor.ForePriority = 50
         SelectedColor.FramePriority = 50
@@ -504,7 +505,6 @@ object FrmCompCreate: TFrmCompCreate
             MouseActions = <>
             MarkupInfo.Background = clBtnFace
             MarkupInfo.Foreground = clNone
-            MarkupInfo.FrameEdges = sfeAround
             DigitCount = 2
             ShowOnlyLineNumbersMultiplesOf = 1
             ZeroStart = False
@@ -521,13 +521,11 @@ object FrmCompCreate: TFrmCompCreate
             MouseActions = <>
             MarkupInfo.Background = clWhite
             MarkupInfo.Foreground = clGray
-            MarkupInfo.FrameEdges = sfeAround
           end
           object SynGutterCodeFolding1: TSynGutterCodeFolding
             MouseActions = <>
             MarkupInfo.Background = clNone
             MarkupInfo.Foreground = clGray
-            MarkupInfo.FrameEdges = sfeAround
             MouseActionsExpanded = <>
             MouseActionsCollapsed = <>
           end
@@ -979,8 +977,9 @@ object FrmCompCreate: TFrmCompCreate
             ShortCut = 57379
           end>
         MouseActions = <>
+        MouseTextActions = <>
         MouseSelActions = <>
-        SelectedColor.FrameEdges = sfeAround
+        VisibleSpecialChars = [vscSpace, vscTabAtLast]
         SelectedColor.BackPriority = 50
         SelectedColor.ForePriority = 50
         SelectedColor.FramePriority = 50
@@ -998,7 +997,6 @@ object FrmCompCreate: TFrmCompCreate
             MouseActions = <>
             MarkupInfo.Background = clBtnFace
             MarkupInfo.Foreground = clNone
-            MarkupInfo.FrameEdges = sfeAround
             DigitCount = 2
             ShowOnlyLineNumbersMultiplesOf = 1
             ZeroStart = False
@@ -1015,13 +1013,11 @@ object FrmCompCreate: TFrmCompCreate
             MouseActions = <>
             MarkupInfo.Background = clWhite
             MarkupInfo.Foreground = clGray
-            MarkupInfo.FrameEdges = sfeAround
           end
           object SynGutterCodeFolding1: TSynGutterCodeFolding
             MouseActions = <>
             MarkupInfo.Background = clNone
             MarkupInfo.Foreground = clGray
-            MarkupInfo.FrameEdges = sfeAround
             MouseActionsExpanded = <>
             MouseActionsCollapsed = <>
           end
@@ -1145,36 +1141,15 @@ object FrmCompCreate: TFrmCompCreate
   object SynJavaSyn1: TSynJavaSyn
     DefaultFilter = 'Java Files (*.java)|*.java'
     Enabled = False
-    AnnotationAttri.FrameEdges = sfeAround
     CommentAttri.Foreground = clOlive
-    CommentAttri.FrameEdges = sfeAround
-    DocumentAttri.FrameEdges = sfeAround
-    IdentifierAttri.FrameEdges = sfeAround
-    InvalidAttri.FrameEdges = sfeAround
     KeyAttri.Foreground = clGreen
-    KeyAttri.FrameEdges = sfeAround
-    NumberAttri.FrameEdges = sfeAround
-    SpaceAttri.FrameEdges = sfeAround
-    StringAttri.FrameEdges = sfeAround
-    SymbolAttri.FrameEdges = sfeAround
     left = 62
     top = 136
   end
   object SynPasSyn1: TSynPasSyn
     Enabled = False
-    AsmAttri.FrameEdges = sfeAround
     CommentAttri.Foreground = clTeal
-    CommentAttri.FrameEdges = sfeAround
-    IDEDirectiveAttri.FrameEdges = sfeAround
-    IdentifierAttri.FrameEdges = sfeAround
     KeyAttri.Foreground = clNavy
-    KeyAttri.FrameEdges = sfeAround
-    NumberAttri.FrameEdges = sfeAround
-    SpaceAttri.FrameEdges = sfeAround
-    StringAttri.FrameEdges = sfeAround
-    SymbolAttri.FrameEdges = sfeAround
-    CaseLabelAttri.FrameEdges = sfeAround
-    DirectiveAttri.FrameEdges = sfeAround
     CompilerMode = pcmDelphi
     NestedComments = False
     left = 253

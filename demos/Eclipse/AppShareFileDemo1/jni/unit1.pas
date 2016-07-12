@@ -74,12 +74,17 @@ end;
 
 procedure TAndroidModule1.AndroidModule1JNIPrompt(Sender: TObject);
 begin
-    if not Self.IsWifiEnabled() then
-    begin
-       Self.SetWifiEnabled(True);
-       jCheckBox1.Checked:= True;
-    end
-    else jCheckBox1.Checked:= True;
+   if not Self.isConnected() then
+   begin //try wifi
+     if Self.SetWifiEnabled(True) then
+       jCheckBox1.Checked:= True
+     else
+       ShowMessage('Please,  try enable some connection...');
+   end
+   else
+   begin
+      if Self.isConnectedWifi() then jCheckBox1.Checked:= True
+   end;
 end;
 
 //Load 'hello.txt' from Assets -> Add "new" content to 'hello.txt' and save to App.../files

@@ -1,0 +1,3 @@
+public  java.lang.Object jCheckBox_Create(long pasobj ) {
+  return (java.lang.Object)( new jCheckBox(this.activity,this,pasobj));
+}

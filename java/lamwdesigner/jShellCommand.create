@@ -1,0 +1,3 @@
+public java.lang.Object jShellCommand_jCreate(long _Self) {
+   return (java.lang.Object)(new jShellCommand(this,_Self));
+}

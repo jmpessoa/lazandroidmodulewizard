@@ -1,0 +1,3 @@
+public  java.lang.Object jDialogProgress_Create(long pasobj, String title, String msg) {
+  return (jDialogProgress)(new jDialogProgress(activity,this,pasobj,title,msg ) );
+}

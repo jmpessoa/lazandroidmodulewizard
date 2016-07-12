@@ -1,0 +1,4 @@
+public native boolean pOnBluetoothServerSocketConnected(long pasobj, String deviceName, String deviceAddress);
+public native boolean pOnBluetoothServerSocketIncomingData(long pasobj, byte[] byteArrayContent, byte[] byteArrayHeader);
+public native void pOnBluetoothServerSocketListen(long pasobj, String serverName, String strUUID);
+public native void pOnBluetoothServerSocketAcceptTimeout(long pasobj);

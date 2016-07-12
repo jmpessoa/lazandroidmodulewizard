@@ -130,8 +130,11 @@ begin
    FPNoGUIGraphicsBridge1.TextOut(ToRealPoint(0.1, -dy) , auxText);
 
    jGraphicsBuffer:= jBitmap1.GetByteBuffer(w,h);
+
    PGlobalDirectImagePixel:= jBitmap1.GetDirectBufferAddress(jGraphicsBuffer);
+
    FPNoGUIGraphicsBridge1.Surface.GetRGBAGraphics(PGlobalDirectImagePixel);
+
    jImageView1.SetImageBitmap(jBitmap1.GetBitmapFromByteBuffer(jGraphicsBuffer, w, h));
 
 end;

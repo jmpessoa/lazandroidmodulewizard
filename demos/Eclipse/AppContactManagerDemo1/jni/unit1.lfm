@@ -10,7 +10,8 @@ object AndroidModule1: TAndroidModule1
   Text = 'AndroidModule1'
   ActivityMode = actMain
   BackgroundColor = colbrDefault
-  OnActivityRst = AndroidModule1ActivityRst
+  ActionBarTitle = abtDefault
+  OnActivityResult = AndroidModule1ActivityResult
   OnJNIPrompt = AndroidModule1JNIPrompt
   object jTextView1: jTextView
     Left = 54
@@ -33,6 +34,7 @@ object AndroidModule1: TAndroidModule1
     FontColor = colbrDefault
     FontSize = 0
     TextTypeFace = tfNormal
+    FontSizeUnit = unitDefault
     Id = 5195379
   end
   object jButton1: jButton
@@ -54,12 +56,13 @@ object AndroidModule1: TAndroidModule1
     BackgroundColor = colbrDefault
     FontColor = colbrDefault
     FontSize = 0
+    FontSizeUnit = unitDefault
     OnClick = jButton1Click
     Id = 8997279
   end
   object jImageView1: jImageView
-    Left = 128
-    Top = 528
+    Left = 136
+    Top = 526
     Width = 48
     Height = 48
     Visible = True
@@ -102,6 +105,7 @@ object AndroidModule1: TAndroidModule1
     VerScrollBar = False
     WrappingLine = False
     Editable = True
+    FontSizeUnit = unitDefault
     Id = 1309668
   end
   object jTextView2: jTextView
@@ -126,6 +130,7 @@ object AndroidModule1: TAndroidModule1
     FontColor = colbrDefault
     FontSize = 0
     TextTypeFace = tfNormal
+    FontSizeUnit = unitDefault
     Id = 1124583
   end
   object jEditText2: jEditText
@@ -157,6 +162,7 @@ object AndroidModule1: TAndroidModule1
     VerScrollBar = False
     WrappingLine = False
     Editable = True
+    FontSizeUnit = unitDefault
     Id = 4976347
   end
   object jTextView3: jTextView
@@ -181,6 +187,7 @@ object AndroidModule1: TAndroidModule1
     FontColor = colbrDefault
     FontSize = 0
     TextTypeFace = tfNormal
+    FontSizeUnit = unitDefault
     Id = 0
   end
   object jTextView4: jTextView
@@ -205,6 +212,7 @@ object AndroidModule1: TAndroidModule1
     FontColor = colbrDefault
     FontSize = 0
     TextTypeFace = tfNormal
+    FontSizeUnit = unitDefault
     Id = 812950
   end
   object jTextView5: jTextView
@@ -229,6 +237,7 @@ object AndroidModule1: TAndroidModule1
     FontColor = colbrDefault
     FontSize = 0
     TextTypeFace = tfNormal
+    FontSizeUnit = unitDefault
     Id = 0
   end
   object jEditText3: jEditText
@@ -260,6 +269,7 @@ object AndroidModule1: TAndroidModule1
     VerScrollBar = False
     WrappingLine = False
     Editable = True
+    FontSizeUnit = unitDefault
     Id = 8992729
   end
   object jEditText4: jEditText
@@ -291,6 +301,7 @@ object AndroidModule1: TAndroidModule1
     VerScrollBar = False
     WrappingLine = False
     Editable = True
+    FontSizeUnit = unitDefault
     Id = 7645092
   end
   object jTextView6: jTextView
@@ -315,6 +326,7 @@ object AndroidModule1: TAndroidModule1
     FontColor = colbrDefault
     FontSize = 0
     TextTypeFace = tfNormal
+    FontSizeUnit = unitDefault
     Id = 4324900
   end
   object jTextView7: jTextView
@@ -339,12 +351,13 @@ object AndroidModule1: TAndroidModule1
     FontColor = colbrDefault
     FontSize = 0
     TextTypeFace = tfNormal
+    FontSizeUnit = unitDefault
     Id = 2913337
   end
   object jEditText5: jEditText
     Left = 5
     Top = 248
-    Width = 310
+    Width = 305
     Height = 39
     MarginLeft = 5
     MarginTop = 10
@@ -370,12 +383,13 @@ object AndroidModule1: TAndroidModule1
     VerScrollBar = False
     WrappingLine = False
     Editable = True
+    FontSizeUnit = unitDefault
     Id = 6590126
   end
   object jEditText6: jEditText
     Left = 5
     Top = 337
-    Width = 310
+    Width = 305
     Height = 39
     MarginLeft = 5
     MarginTop = 10
@@ -401,6 +415,7 @@ object AndroidModule1: TAndroidModule1
     VerScrollBar = False
     WrappingLine = False
     Editable = True
+    FontSizeUnit = unitDefault
     Id = 4400225
   end
   object jTextView8: jTextView
@@ -425,6 +440,7 @@ object AndroidModule1: TAndroidModule1
     FontColor = colbrDefault
     FontSize = 0
     TextTypeFace = tfNormal
+    FontSizeUnit = unitDefault
     Id = 4799282
   end
   object jEditText7: jEditText
@@ -456,6 +472,7 @@ object AndroidModule1: TAndroidModule1
     VerScrollBar = False
     WrappingLine = False
     Editable = True
+    FontSizeUnit = unitDefault
     Id = 635989
   end
   object jTextView9: jTextView
@@ -480,6 +497,7 @@ object AndroidModule1: TAndroidModule1
     FontColor = colbrDefault
     FontSize = 0
     TextTypeFace = tfNormal
+    FontSizeUnit = unitDefault
     Id = 0
   end
   object jEditText8: jEditText
@@ -511,6 +529,7 @@ object AndroidModule1: TAndroidModule1
     VerScrollBar = False
     WrappingLine = False
     Editable = True
+    FontSizeUnit = unitDefault
     Id = 0
   end
   object jButton2: jButton
@@ -532,6 +551,7 @@ object AndroidModule1: TAndroidModule1
     BackgroundColor = colbrDefault
     FontColor = colbrDefault
     FontSize = 0
+    FontSizeUnit = unitDefault
     OnClick = jButton2Click
     Id = 0
   end

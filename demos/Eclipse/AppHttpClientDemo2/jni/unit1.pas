@@ -16,6 +16,7 @@ type
   TAndroidModule1 = class(jForm)
     jButton1: jButton;
     jButton2: jButton;
+    jCheckBox1: jCheckBox;
     jEditText1: jEditText;
     jHttpClient1: jHttpClient;
     jTextView1: jTextView;
@@ -143,8 +144,20 @@ end;
 procedure TAndroidModule1.AndroidModule1JNIPrompt(Sender: TObject);
 begin
   // jEditText1.HintTextColor:= colbrYellow;
-   jEditText1.Clear;
-   if  not Self.IsWifiEnabled() then Self.SetWifiEnabled(True);
+  jEditText1.Clear;
+
+  if not Self.isConnected() then
+  begin //try wifi
+    if Self.SetWifiEnabled(True) then
+      jCheckBox1.Checked:= True
+    else
+      ShowMessage('Please,  try enable some connection...');
+  end
+  else
+  begin
+     if Self.isConnectedWifi() then jCheckBox1.Checked:= True
+  end;
+
 end;
 
 end.

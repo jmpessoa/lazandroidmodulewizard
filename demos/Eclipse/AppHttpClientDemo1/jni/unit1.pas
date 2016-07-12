@@ -18,6 +18,7 @@ type
       jButton2: jButton;
       jButton3: jButton;
       jButton4: jButton;
+      jCheckBox1: jCheckBox;
       jEditText1: jEditText;
       jEditText2: jEditText;
       jHttpClient1: jHttpClient;
@@ -166,7 +167,17 @@ begin
   jEditText2.Clear;
   jEditText1.SetFocus;
 
-  if  not Self.IsWifiEnabled() then Self.SetWifiEnabled(True);
+  if not Self.isConnected() then
+  begin //try wifi
+    if Self.SetWifiEnabled(True) then
+      jCheckBox1.Checked:= True
+    else
+      ShowMessage('Please,  try enable some connection...');
+  end
+  else
+  begin
+     if Self.isConnectedWifi() then jCheckBox1.Checked:= True
+  end;
 
   //Test
   {

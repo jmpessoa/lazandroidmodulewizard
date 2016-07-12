@@ -360,8 +360,8 @@ begin
     begin
         for i:= 0 to FImportsList.Count-1 do
         begin
-          if Pos(jType+';',FImportsList.Strings[i]) > 0 then   //fix here 09-september-2013
-          begin                                                //again fix here 21-sept-2013
+          if Pos(jType+';',FImportsList.Strings[i]) > 0 then
+          begin
              auxList:= TStringList.Create;
              auxList.StrictDelimiter:=True;
              auxList.Delimiter:='/';
@@ -537,7 +537,7 @@ begin
      strList.Add('      onClickListener = new OnClickListener(){');
      strList.Add('      /*.*/public void onClick(View view){  //please, do not remove /*.*/ mask for parse invisibility!');
      strList.Add('              if (enabled) {');
-     strList.Add('                 controls.pOnClick(pascalObj, Const.Click_Default); //JNI event onClick!');
+     strList.Add('                 controls.pOnClickGeneric(pascalObj, Const.Click_Default); //JNI event onClick!');
      strList.Add('              }');
      strList.Add('           };');
      strList.Add('      };');
@@ -1056,7 +1056,7 @@ begin
     for i:= 0 to SynMemo1.Lines.Count-1 do  //import local....
     begin
          auxStr:= SynMemo1.Lines.Strings[i];
-         if auxStr <> '' then   //minor fix... 08-september-2013
+         if auxStr <> '' then
          begin
            if Pos('import ', auxStr) > 0 then
            begin
@@ -1084,8 +1084,6 @@ begin
         end;
     end;
     auxList.Free;
-
-    //ShowMessage(FImportsList.Text);
 
     SplitStr(strCaption, ' ');
 
@@ -1173,8 +1171,8 @@ begin
     end;
 
     frm:= TFormRegisterComp.Create(nil);
-    frm.OpenDialog2.InitialDir:= FPathToWizardCode+DirectorySeparator;
-    frm.Edit2.Text:= FPathToWizardCode+DirectorySeparator+'register_extras.pas';
+    frm.OpenDialog2.InitialDir:= FPathToWizardCode+'android_bridges'+DirectorySeparator;
+    frm.Edit2.Text:= FPathToWizardCode+DirectorySeparator+'android_bridges'+DirectorySeparator+'register_extras.pas';
     if frm.ShowModal = mrOK then
     begin
       iconPath:= frm.Edit1.Text;
@@ -1182,17 +1180,17 @@ begin
 
       if iconPath <> '' then
       begin
-         if iconPath <> FPathToWizardCode+DirectorySeparator+LowerCase(FJavaClassName)+'.png' then
-            CopyFile(iconPath,FPathToWizardCode+DirectorySeparator+LowerCase(FJavaClassName)+'.png');
+         if iconPath <> FPathToWizardCode+DirectorySeparator+'ide_tools'+DirectorySeparator+LowerCase(FJavaClassName)+'.png' then
+            CopyFile(iconPath,FPathToWizardCode+DirectorySeparator+'ide_tools'+DirectorySeparator+LowerCase(FJavaClassName)+'.png');
          try
-           AProcess := TProcess.Create(nil);
-           AProcess.CurrentDirectory:= FPathToWizardCode;
-           AProcess.Executable:= FPathToWizardCode+DirectorySeparator+'lazres.exe';
+           AProcess:= TProcess.Create(nil);
+           AProcess.CurrentDirectory:= FPathToWizardCode+DirectorySeparator+'ide_tools';
+           AProcess.Executable:= FPathToWizardCode+DirectorySeparator+'ide_tools'+DirectorySeparator+'lazres.exe';
            {$IFDEF Linux}
-              AProcess.Executable:= FPathToWizardCode+DirectorySeparator+'lazres';
+              AProcess.Executable:= FPathToWizardCode+DirectorySeparator+'ide_tools'+DirectorySeparator+'lazres';
            {$Endif}
            {$IFDEF Darwin}
-              AProcess.Executable:= FPathToWizardCode+DirectorySeparator+'lazres.app';
+              AProcess.Executable:= FPathToWizardCode+DirectorySeparator+'ide_tools'+DirectorySeparator+'lazres.app';
            {$Endif}
            AProcess.Parameters.Add(LowerCase(FJavaClassName)+'_icon.lrs');
            AProcess.Parameters.Add(LowerCase(FJavaClassName)+'.png');
@@ -1247,8 +1245,8 @@ begin
            SynMemo2.CopyToClipboard;
            SynMemo2.ClearSelection;
            SynMemo2.PasteFromClipboard;
-           SynMemo2.Lines.SaveToFile(FPathToWizardCode+DirectorySeparator+Copy(LowerCase(FJavaClassName),2,Length(FJavaClassName))+'.pas');
-           ShowMessage('Saved to: '+FPathToWizardCode+DirectorySeparator+Copy(LowerCase(FJavaClassName),2,Length(FJavaClassName))+'.pas');
+           SynMemo2.Lines.SaveToFile(FPathToWizardCode+DirectorySeparator+'android_bridges'+DirectorySeparator+Copy(LowerCase(FJavaClassName),2,Length(FJavaClassName))+'.pas');
+           ShowMessage('Saved to: '+ FPathToWizardCode+DirectorySeparator+'android_bridges'+DirectorySeparator+Copy(LowerCase(FJavaClassName),2,Length(FJavaClassName))+'.pas');
          end; //finally
       end     //if iconPath
     end;      //showModal
@@ -1760,7 +1758,7 @@ begin
     auxStr:= funcParam;
     SplitStr(auxStr,',');
     listJCreate.Add('  ');
-    listJCreate.Add('   public java.lang.Object '+funcName+'_jCreate('+Trim(auxStr)+') {');
+    listJCreate.Add('public java.lang.Object '+funcName+'_jCreate('+Trim(auxStr)+') {');
     auxStr2:= Trim(auxStr);
     SplitStr(auxStr2,' ');
     auxStr:='';
@@ -1770,8 +1768,8 @@ begin
        lstParam.GetNameValue(i, paramName, paramType);
        auxStr:= auxStr + ',' +paramName;
     end;
-    listJCreate.Add('      return (java.lang.Object)(new '+FJavaClassName+'(this'+auxStr+'));');
-    listJCreate.Add('   }');
+    listJCreate.Add('  return (java.lang.Object)(new '+FJavaClassName+'(this'+auxStr+'));');
+    listJCreate.Add('}');
     listJCreate.Add('  ');
 
     strList.Add(' ');
@@ -1788,6 +1786,7 @@ begin
                  listJCreate.Text+
                  'inside the end "}" of "public class Controls" in "Controls.java"');
 
+    listJCreate.SaveToFile(FPathToJavaTemplates+DirectorySeparator+'lamwdesigner'+DirectorySeparator+FJavaClassName+'.create');
     listJCreate.Free;
   end;
 

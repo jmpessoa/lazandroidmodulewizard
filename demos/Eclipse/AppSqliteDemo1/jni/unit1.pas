@@ -39,7 +39,6 @@ type
       {private declarations}
        FInsertInto: boolean;
        FTableName: string;
-       FDatabaseName: string;
     public
       {public declarations}
   end;
@@ -60,14 +59,20 @@ begin
 end;
 
 procedure TAndroidModule1.DataModuleJNIPrompt(Sender: TObject);
+
 begin
-   FDatabaseName:= jSqliteDataAccess1.DataBaseName;
+   (*if you already have a database put it in folder "assets" then:
+     Self.CopyFromAssetsToEnvironmentDir('myData.db', Self.GetEnvironmentDirectoryPath(dirDatabase));
+     jSqliteDataAccess1.DataBaseName:= 'myData.db';
+   *)
+
+   //jSqliteDataAccess1.DataBaseName:= 'myData.db';    //set in design time ...
 end;
 
 procedure TAndroidModule1.jButton1Click(Sender: TObject);
 begin
-  jSqliteDataAccess1.OpenOrCreate(FDatabaseName);  // myData.db
-  ShowMessage('database created!');
+  jSqliteDataAccess1.OpenOrCreate(jSqliteDataAccess1.DataBaseName);  // myData.db
+  ShowMessage('database opened  or created!');
 end;
 
 procedure TAndroidModule1.jButton2Click(Sender: TObject);
@@ -134,7 +139,7 @@ begin
      FInsertInto:= True;
      ShowMessage('Ok. Table Inserted!');
 
-  end else  ShowMessage('warning: table was inserted!');
+  end else  ShowMessage('warning: table already was inserted!');
 end;
 
 procedure TAndroidModule1.jButton4Click(Sender: TObject);

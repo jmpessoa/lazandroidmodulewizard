@@ -10,6 +10,7 @@ object AndroidModule14: TAndroidModule14
   Text = 'AndroidModule14'
   ActivityMode = actRecyclable
   BackgroundColor = colbrBlack
+  ActionBarTitle = abtDefault
   OnJNIPrompt = DataModuleJNIPrompt
   object jTextView1: jTextView
     Left = 87

@@ -1,0 +1,3 @@
+public  java.lang.Object jProgressBar_Create(long pasobj, int style ) {
+  return (java.lang.Object)( new jProgressBar(this.activity,this,pasobj,style));
+}

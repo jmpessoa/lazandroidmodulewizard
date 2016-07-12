@@ -1,0 +1,6 @@
+public  java.lang.Object jListView_Create2(long pasobj,  int widget, String widgetTxt, Bitmap bmp, int txtDecorated, int itemLay, int textSizeDecorated, int textAlign) {
+  return (java.lang.Object)(new jListView(this.activity,this,pasobj,widget,widgetTxt,bmp,txtDecorated,itemLay,textSizeDecorated, textAlign));
+}
+public  java.lang.Object jListView_Create3(long pasobj,  int widget, String widgetTxt, int txtDecorated, int itemLay, int textSizeDecorated, int textAlign) {
+  return (java.lang.Object)(new jListView(this.activity,this,pasobj,widget,widgetTxt, null,txtDecorated,itemLay,textSizeDecorated, textAlign));
+}

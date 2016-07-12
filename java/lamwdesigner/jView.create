@@ -1,0 +1,3 @@
+public java.lang.Object jView_Create(long pasobj ) {
+  return (java.lang.Object)( new jView(this.activity,this,pasobj));
+}

@@ -1,0 +1,3 @@
+public java.lang.Object jDumpJavaMethods_jCreate(long _Self, String _fullJavaClassName) {
+   return (java.lang.Object)(new jDumpJavaMethods(this,_Self,_fullJavaClassName));
+}

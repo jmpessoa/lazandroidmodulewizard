@@ -1,0 +1,3 @@
+public java.lang.Object jDialogYN_Create(long pasobj, String title, String msg, String y, String n) {
+  return (jDialogYN)(new jDialogYN(activity,this,pasobj,title,msg,y,n) );
+}

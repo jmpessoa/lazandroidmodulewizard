@@ -10,13 +10,14 @@ object AndroidModule1: TAndroidModule1
   Text = 'AndroidModule1'
   ActivityMode = actMain
   BackgroundColor = colbrDefault
-  OnActivityRst = AndroidModule1ActivityRst
+  ActionBarTitle = abtDefault
+  OnActivityResult = AndroidModule1ActivityResult
   OnJNIPrompt = AndroidModule1JNIPrompt
   object jTextView1: jTextView
-    Left = 112
-    Top = 24
-    Width = 135
-    Height = 25
+    Left = 119
+    Top = 5
+    Width = 61
+    Height = 20
     MarginLeft = 5
     MarginTop = 5
     MarginRight = 5
@@ -33,19 +34,20 @@ object AndroidModule1: TAndroidModule1
     FontColor = colbrDefault
     FontSize = 0
     TextTypeFace = tfNormal
+    FontSizeUnit = unitDefault
     Id = 253746
   end
   object jButton1: jButton
-    Left = 8
-    Top = 56
-    Width = 282
+    Left = 2
+    Top = 76
+    Width = 294
     Height = 40
     MarginLeft = 2
     MarginTop = 4
     MarginRight = 2
     MarginBottom = 4
     Visible = True
-    Anchor = jTextView1
+    Anchor = jCheckBox1
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = []
     LayoutParamWidth = lpMatchParent
@@ -54,13 +56,14 @@ object AndroidModule1: TAndroidModule1
     BackgroundColor = colbrDefault
     FontColor = colbrDefault
     FontSize = 0
+    FontSizeUnit = unitDefault
     OnClick = jButton1Click
     Id = 5570504
   end
   object jButton2: jButton
-    Left = 11
-    Top = 114
-    Width = 279
+    Left = 2
+    Top = 124
+    Width = 294
     Height = 40
     MarginLeft = 2
     MarginTop = 4
@@ -76,13 +79,14 @@ object AndroidModule1: TAndroidModule1
     BackgroundColor = colbrDefault
     FontColor = colbrDefault
     FontSize = 0
+    FontSizeUnit = unitDefault
     OnClick = jButton2Click
     Id = 1192376
   end
   object jButton3: jButton
-    Left = 11
-    Top = 168
-    Width = 277
+    Left = 2
+    Top = 172
+    Width = 294
     Height = 40
     MarginLeft = 2
     MarginTop = 4
@@ -98,8 +102,32 @@ object AndroidModule1: TAndroidModule1
     BackgroundColor = colbrDefault
     FontColor = colbrDefault
     FontSize = 0
+    FontSizeUnit = unitDefault
     OnClick = jButton3Click
     Id = 9710961
+  end
+  object jCheckBox1: jCheckBox
+    Left = 5
+    Top = 35
+    Width = 114
+    Height = 32
+    MarginLeft = 5
+    MarginTop = 5
+    MarginRight = 5
+    MarginBottom = 5
+    Visible = True
+    Anchor = jTextView1
+    PosRelativeToAnchor = [raBelow]
+    PosRelativeToParent = []
+    LayoutParamWidth = lpWrapContent
+    LayoutParamHeight = lpWrapContent
+    Text = 'WiFi Enable'
+    BackgroundColor = colbrDefault
+    FontColor = colbrDefault
+    FontSize = 0
+    Checked = False
+    FontSizeUnit = unitDefault
+    Id = 2536600
   end
   object jIntentManager1: jIntentManager
     IntentAction = iaNone

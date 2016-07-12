@@ -654,7 +654,7 @@ begin
     Tool.Executable := IncludeTrailingPathDelimiter(FAntPath) + 'ant'{$ifdef windows}+'.bat'{$endif};
     if not FileExists(Tool.Executable) then
       raise Exception.CreateFmt('Ant bin (%s) not found! Check path settings', [Tool.Executable]);
-    Tool.CmdLineParams := '-Dtouchtest.enabled=true debug';
+    Tool.CmdLineParams := 'clean -Dtouchtest.enabled=true debug';
     if Install then
       Tool.CmdLineParams := Tool.CmdLineParams + ' install';
     Tool.Scanners.Add(SubToolAnt);

@@ -1,0 +1,1 @@
+public  native void pOnSpinnerItemSeleceted(long pasobj, int position, String caption);

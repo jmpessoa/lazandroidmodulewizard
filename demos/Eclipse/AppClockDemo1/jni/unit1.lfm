@@ -10,6 +10,7 @@ object AndroidModule1: TAndroidModule1
   Text = 'AndroidModule1'
   ActivityMode = actMain
   BackgroundColor = colbrDefault
+  ActionBarTitle = abtDefault
   object jTextView1: jTextView
     Left = 57
     Top = 5
@@ -31,11 +32,12 @@ object AndroidModule1: TAndroidModule1
     FontColor = colbrDefault
     FontSize = 0
     TextTypeFace = tfNormal
+    FontSizeUnit = unitDefault
     Id = 7639713
   end
   object jAnalogClock1: jAnalogClock
-    Left = 104
-    Top = 64
+    Left = 112
+    Top = 40
     Width = 96
     Height = 96
     MarginLeft = 10
@@ -52,8 +54,8 @@ object AndroidModule1: TAndroidModule1
     Id = 548101
   end
   object jDigitalClock1: jDigitalClock
-    Left = 104
-    Top = 184
+    Left = 112
+    Top = 176
     Width = 96
     Height = 48
     MarginLeft = 50
@@ -69,6 +71,7 @@ object AndroidModule1: TAndroidModule1
     BackgroundColor = colbrBlack
     FontSize = 50
     FontColor = colbrChartreuse
-    Id = 0
+    FontSizeUnit = unitDefault
+    Id = 2293279
   end
 end

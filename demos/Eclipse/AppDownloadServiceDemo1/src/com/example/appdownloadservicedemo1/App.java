@@ -1,6 +1,6 @@
 package com.example.appdownloadservicedemo1;
 
-//Lamw: Lazarus Android Module Wizard - Version 0.6 - revision 47 - 11 June - 2016
+//Lamw: Lazarus Android Module Wizard - Version 0.7 - 04 July - 2016
 //Form Designer and Components development model!
 //https://github.com/jmpessoa/lazandroidmodulewizard
 //http://forum.lazarus.freepascal.org/index.php/topic,21919.270.html
@@ -25,7 +25,6 @@ import java.lang.Override;
 
 
 import android.app.Activity;
-
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.content.pm.ActivityInfo; 
@@ -33,20 +32,14 @@ import android.widget.RelativeLayout;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.KeyEvent;
-
 import android.view.Menu;
 import android.view.MenuItem;
-
 import android.view.View;
-
 import android.view.WindowManager;
-
-//import android.view.View;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.util.Log;
 
-// http://stackoverflow.com/questions/16282294/show-title-bar-from-code
 public class App extends Activity {
     
 	private Controls       controls;
@@ -55,7 +48,6 @@ public class App extends Activity {
     public void onCreate(Bundle savedInstanceState) {
      super.onCreate(savedInstanceState);                            
      
-      //by jmpessoa --- fix for http get    
       //ref. http://stackoverflow.com/questions/8706464/defaulthttpclient-to-androidhttpclient 
      int systemVersion = android.os.Build.VERSION.SDK_INT; 
      if (systemVersion > 9) {

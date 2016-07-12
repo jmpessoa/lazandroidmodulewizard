@@ -2,7 +2,7 @@ object AndroidModule1: TAndroidModule1
   Left = 287
   Top = 104
   Width = 300
-  Height = 600
+  Height = 468
   MarginLeft = 0
   MarginTop = 0
   MarginRight = 0
@@ -11,12 +11,13 @@ object AndroidModule1: TAndroidModule1
   Text = 'AndroidModule1'
   ActivityMode = actMain
   BackgroundColor = colbrDefault
+  ActionBarTitle = abtDefault
   OnJNIPrompt = AndroidModule1JNIPrompt
   object jTextView1: jTextView
-    Left = 64
-    Top = 24
-    Width = 176
-    Height = 25
+    Left = 58
+    Top = 5
+    Width = 184
+    Height = 20
     MarginLeft = 5
     MarginTop = 5
     MarginRight = 5
@@ -33,13 +34,14 @@ object AndroidModule1: TAndroidModule1
     FontColor = colbrDefault
     FontSize = 0
     TextTypeFace = tfNormal
+    FontSizeUnit = unitDefault
     Id = 9623220
   end
   object jPanel1: jPanel
-    Left = 8
-    Top = 152
-    Width = 287
-    Height = 195
+    Left = 7
+    Top = 163
+    Width = 285
+    Height = 142
     MarginLeft = 4
     MarginTop = 4
     MarginRight = 4
@@ -55,10 +57,10 @@ object AndroidModule1: TAndroidModule1
     OnFlingGesture = jPanel1FlingGesture
     Id = 0
     object jTextView2: jTextView
-      Left = 10
-      Top = 15
-      Width = 264
-      Height = 25
+      Left = 2
+      Top = 5
+      Width = 281
+      Height = 20
       MarginLeft = 5
       MarginTop = 5
       MarginRight = 5
@@ -75,13 +77,14 @@ object AndroidModule1: TAndroidModule1
       FontColor = colbrBlue
       FontSize = 0
       TextTypeFace = tfNormal
+      FontSizeUnit = unitDefault
       Id = 1033894
     end
     object jTextView3: jTextView
-      Left = 10
-      Top = 54
-      Width = 264
-      Height = 25
+      Left = 5
+      Top = 35
+      Width = 270
+      Height = 20
       MarginLeft = 5
       MarginTop = 5
       MarginRight = 5
@@ -99,6 +102,7 @@ object AndroidModule1: TAndroidModule1
       FontColor = colbrRed
       FontSize = 0
       TextTypeFace = tfNormal
+      FontSizeUnit = unitDefault
       Id = 0
     end
   end

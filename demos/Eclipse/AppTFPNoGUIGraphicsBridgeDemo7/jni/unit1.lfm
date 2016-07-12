@@ -26,7 +26,7 @@ object AndroidModule1: TAndroidModule1
     PosRelativeToParent = [rpCenterHorizontal]
     LayoutParamWidth = lpMatchParent
     LayoutParamHeight = lpWrapContent
-    Text = 'Draw'
+    Text = 'Draw 3DCube'
     BackgroundColor = colbrDefault
     FontColor = colbrDefault
     FontSize = 0
@@ -71,8 +71,8 @@ object AndroidModule1: TAndroidModule1
     LayoutParamHeight = lpWrapContent
     ImageIndex = -1
     BackgroundColor = colbrDefault
-    ImageIdentifier = 'lemur600'
     ImageScaleType = scaleCenter
+    OnClick = jImageView1Click
     Id = 7048641
   end
   object jImageView2: jImageView
@@ -89,7 +89,25 @@ object AndroidModule1: TAndroidModule1
     ImageIndex = -1
     BackgroundColor = colbrDefault
     ImageScaleType = scaleCenter
+    OnClick = jImageView2Click
     Id = 2881379
+  end
+  object jImageView3: jImageView
+    Left = 136
+    Top = 189
+    Width = 48
+    Height = 48
+    Visible = True
+    Anchor = jImageView2
+    PosRelativeToAnchor = [raBelow]
+    PosRelativeToParent = [rpCenterHorizontal]
+    LayoutParamWidth = lpWrapContent
+    LayoutParamHeight = lpWrapContent
+    ImageIndex = -1
+    BackgroundColor = colbrDefault
+    ImageScaleType = scaleCenter
+    OnClick = jImageView3Click
+    Id = 0
   end
   object FPNoGUIGraphicsBridge1: TFPNoGUIGraphicsBridge
     Width = 400
@@ -147,6 +165,7 @@ object AndroidModule1: TAndroidModule1
   object jBitmap1: jBitmap
     FilePath = fpathData
     ImageIndex = -1
+    ImageIdentifier = 'lemur600'
     Width = 0
     Height = 0
     left = 69

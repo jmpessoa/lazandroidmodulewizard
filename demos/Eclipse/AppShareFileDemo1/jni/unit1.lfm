@@ -10,11 +10,12 @@ object AndroidModule1: TAndroidModule1
   Text = 'AndroidModule1'
   ActivityMode = actMain
   BackgroundColor = colbrDefault
+  ActionBarTitle = abtDefault
   OnJNIPrompt = AndroidModule1JNIPrompt
   object jButton1: jButton
-    Left = 16
-    Top = 56
-    Width = 272
+    Left = 2
+    Top = 76
+    Width = 294
     Height = 40
     MarginLeft = 2
     MarginTop = 4
@@ -30,13 +31,14 @@ object AndroidModule1: TAndroidModule1
     BackgroundColor = colbrDefault
     FontColor = colbrDefault
     FontSize = 0
+    FontSizeUnit = unitDefault
     OnClick = jButton1Click
     Id = 6773564
   end
   object jButton2: jButton
-    Left = 16
-    Top = 104
-    Width = 272
+    Left = 2
+    Top = 124
+    Width = 294
     Height = 40
     MarginLeft = 2
     MarginTop = 4
@@ -52,14 +54,15 @@ object AndroidModule1: TAndroidModule1
     BackgroundColor = colbrDefault
     FontColor = colbrDefault
     FontSize = 0
+    FontSizeUnit = unitDefault
     OnClick = jButton2Click
     Id = 8260831
   end
   object jTextView1: jTextView
-    Left = 88
-    Top = 8
-    Width = 272
-    Height = 25
+    Left = 90
+    Top = 5
+    Width = 119
+    Height = 20
     MarginLeft = 5
     MarginTop = 5
     MarginRight = 5
@@ -76,12 +79,13 @@ object AndroidModule1: TAndroidModule1
     FontColor = colbrTomato
     FontSize = 0
     TextTypeFace = tfBold
+    FontSizeUnit = unitDefault
     Id = 2106793
   end
   object jButton3: jButton
-    Left = 16
-    Top = 160
-    Width = 272
+    Left = 2
+    Top = 172
+    Width = 294
     Height = 40
     MarginLeft = 2
     MarginTop = 4
@@ -97,13 +101,14 @@ object AndroidModule1: TAndroidModule1
     BackgroundColor = colbrDefault
     FontColor = colbrDefault
     FontSize = 0
+    FontSizeUnit = unitDefault
     OnClick = jButton3Click
     Id = 9840640
   end
   object jButton4: jButton
-    Left = 16
-    Top = 216
-    Width = 272
+    Left = 2
+    Top = 220
+    Width = 294
     Height = 40
     MarginLeft = 2
     MarginTop = 4
@@ -119,13 +124,14 @@ object AndroidModule1: TAndroidModule1
     BackgroundColor = colbrDefault
     FontColor = colbrDefault
     FontSize = 0
+    FontSizeUnit = unitDefault
     OnClick = jButton4Click
     Id = 8892839
   end
   object jButton5: jButton
-    Left = 16
-    Top = 272
-    Width = 272
+    Left = 2
+    Top = 268
+    Width = 294
     Height = 40
     MarginLeft = 2
     MarginTop = 4
@@ -141,13 +147,14 @@ object AndroidModule1: TAndroidModule1
     BackgroundColor = colbrDefault
     FontColor = colbrDefault
     FontSize = 0
+    FontSizeUnit = unitDefault
     OnClick = jButton5Click
     Id = 6449156
   end
   object jButton6: jButton
-    Left = 16
-    Top = 324
-    Width = 272
+    Left = 2
+    Top = 316
+    Width = 294
     Height = 40
     MarginLeft = 2
     MarginTop = 4
@@ -163,13 +170,14 @@ object AndroidModule1: TAndroidModule1
     BackgroundColor = colbrDefault
     FontColor = colbrDefault
     FontSize = 0
+    FontSizeUnit = unitDefault
     OnClick = jButton6Click
     Id = 9882314
   end
   object jImageView1: jImageView
     Tag = 1
-    Left = 128
-    Top = 432
+    Left = 126
+    Top = 411
     Width = 48
     Height = 48
     Visible = True
@@ -184,9 +192,9 @@ object AndroidModule1: TAndroidModule1
     Id = 1233699
   end
   object jButton7: jButton
-    Left = 16
-    Top = 376
-    Width = 272
+    Left = 2
+    Top = 364
+    Width = 294
     Height = 40
     MarginLeft = 2
     MarginTop = 4
@@ -202,12 +210,13 @@ object AndroidModule1: TAndroidModule1
     BackgroundColor = colbrDefault
     FontColor = colbrDefault
     FontSize = 0
+    FontSizeUnit = unitDefault
     OnClick = jButton7Click
     Id = 4929774
   end
   object jImageView2: jImageView
-    Left = 128
-    Top = 496
+    Left = 126
+    Top = 465
     Width = 48
     Height = 48
     Visible = True
@@ -222,10 +231,10 @@ object AndroidModule1: TAndroidModule1
     Id = 0
   end
   object jCheckBox1: jCheckBox
-    Left = 8
-    Top = 29
-    Width = 135
-    Height = 25
+    Left = 5
+    Top = 35
+    Width = 61
+    Height = 32
     MarginLeft = 5
     MarginTop = 5
     MarginRight = 5
@@ -241,6 +250,7 @@ object AndroidModule1: TAndroidModule1
     FontColor = colbrDefault
     FontSize = 0
     Checked = False
+    FontSizeUnit = unitDefault
     OnClick = jCheckBox1Click
     Id = 6706055
   end

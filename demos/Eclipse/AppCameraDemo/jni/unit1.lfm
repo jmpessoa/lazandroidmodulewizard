@@ -13,7 +13,7 @@ object AndroidModule1: TAndroidModule1
   BackgroundColor = colbrDefault
   ActionBarTitle = abtDefault
   OnRotate = AndroidModule1Rotate
-  OnActivityRst = AndroidModule1ActivityRst
+  OnActivityResult = AndroidModule1ActivityResult
   OnJNIPrompt = AndroidModule1JNIPrompt
   object jPanel1: jPanel
     Left = 0

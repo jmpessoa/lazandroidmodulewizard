@@ -10,6 +10,7 @@ object AndroidModule6: TAndroidModule6
   Text = 'AndroidModule6'
   ActivityMode = actRecyclable
   BackgroundColor = colbrBlack
+  ActionBarTitle = abtDefault
   OnCloseQuery = DataModuleCloseQuery
   OnRotate = DataModuleRotate
   object jTextView1: jTextView
@@ -23,7 +24,7 @@ object AndroidModule6: TAndroidModule6
     MarginBottom = 10
     Visible = True
     PosRelativeToAnchor = []
-    PosRelativeToParent = [rpCenterHorizontal]
+    PosRelativeToParent = [rpTop, rpCenterHorizontal]
     LayoutParamWidth = lpWrapContent
     LayoutParamHeight = lpWrapContent
     Text = 'List View Demo'

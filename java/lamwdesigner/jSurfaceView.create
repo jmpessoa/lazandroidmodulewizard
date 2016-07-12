@@ -1,0 +1,3 @@
+public java.lang.Object jSurfaceView_jCreate(long _Self) {
+   return (java.lang.Object)(new jSurfaceView(this,_Self));
+}

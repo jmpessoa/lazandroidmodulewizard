@@ -6,15 +6,15 @@ interface
 
 uses
   Classes, SysUtils, Dialogs, IDECommands, MenuIntf, Forms,
-  uformsettingspaths, lazandroidtoolsexpert, uformupdatecodetemplate, ufrmEditor, ufrmCompCreate,
-  uformchangepathtondk, uFormBuildFPCCross, uFormGetFPCSource;
+  uformsettingspaths, lazandroidtoolsexpert, {uformupdatecodetemplate,} ufrmEditor, ufrmCompCreate,
+  {uformchangepathtondk,} uFormBuildFPCCross, uFormGetFPCSource;
 
 procedure StartPathTool(Sender: TObject);
 procedure StartLateTool(Sender: TObject);   //By Thierrydijoux!
-procedure StartUpdateCodeTemplateTool(Sender: TObject);
+//procedure StartUpdateCodeTemplateTool(Sender: TObject);
 procedure StartResEditor(Sender: TObject);   //By Thierrydijoux!
 procedure StartComponentCreate(Sender: TObject);
-procedure StartPathToNDKDemo(Sender: TObject);
+//procedure StartPathToNDKDemo(Sender: TObject);
 procedure StartPathToBuildFPCCross(Sender: TObject);
 procedure StartFPCTrunkSource(Sender: TObject);
 
@@ -47,21 +47,6 @@ begin
   frmLazAndroidToolsExpert.ShowModal;
 end;
 
-procedure StartUpdateCodeTemplateTool(Sender: TObject);
-var
-  Project: TLazProject;
-begin
-  Project := LazarusIDE.ActiveProject;
-  if Assigned(Project) and (Project.CustomData.Values['LAMW'] <> '') then
-  begin
-    //Call Update code
-    FormUpdateCodeTemplate:= TFormUpdateCodeTemplate.Create(Application);
-    FormUpdateCodeTemplate.ShowModal;
-  end
-  else
-    ShowMessage('The active project is not LAMW project!');
-end;
-
 procedure StartResEditor(Sender: TObject);
 var
   Project: TLazProject;
@@ -84,21 +69,6 @@ begin
   FrmCompCreate.Show;
      //ShowMessage('Component create assistencie...');	
 end;
-
-procedure StartPathToNDKDemo(Sender: TObject);
-var
-  Project: TLazProject;
-begin
-  Project := LazarusIDE.ActiveProject;
-  if Assigned(Project) and (Project.CustomData.Values['LAMW'] <> '') then
-  begin
-     FormChangeDemoPathToNDK:= TFormChangeDemoPathToNDK.Create(Application);
-     FormChangeDemoPathToNDK.ShowModal;
-  end
-  else
-    ShowMessage('The active project is not LAMW project!');
-end;
-
 
 procedure StartPathToBuildFPCCross(Sender: TObject);
 begin
@@ -139,33 +109,28 @@ Var
   ideMnuAMW: TIDEMenuSection;
   ideSubMnuAMW: TIDEMenuSection;
 begin
-
   // Register main menu
   ideMnuAMW:= RegisterIDEMenuSection(mnuTools,'AMW');
   // Register submenu
   ideSubMnuAMW:= RegisterIDESubMenu(ideMnuAMW, 'AMW', '[Lamw] Android Module Wizard');
-
   // Adding first entry
   RegisterIDEMenuCommand(ideSubMnuAMW, 'PathLateCmd', 'LATE: Apk Expert Tools [Build, Install, ...]', nil,@StartLateTool);
   // Adding second entry
   RegisterIDEMenuCommand(ideSubMnuAMW, 'PathResEditorCmd', 'Resource Editor [strings.xml] ', nil,@StartResEditor);
    // Adding third entry
-  RegisterIDEMenuCommand(ideSubMnuAMW, 'PathUpdateCmd','Upgrade Code Templates [*.lpr, *.java]', nil,@StartUpdateCodeTemplateTool);
+ //RegisterIDEMenuCommand(ideSubMnuAMW, 'PathUpdateCmd','Upgrade Code Templates [*.lpr, *.java]', nil,@StartUpdateCodeTemplateTool);
   // Adding fourth entry
   RegisterIDEMenuCommand(ideSubMnuAMW, 'PathToolCmd', 'Paths Settings [Jdk, Sdk, Ndk, ...]', nil,@StartPathTool);
   // Adding 5a. entry
-  RegisterIDEMenuCommand(ideSubMnuAMW, 'PathCompCreateCmd', 'New/Create jComponent ', nil,@StartComponentCreate);
+  RegisterIDEMenuCommand(ideSubMnuAMW, 'PathCompCreateCmd', 'New jComponent Create', nil,@StartComponentCreate);
   // Adding 6a. entry
-  RegisterIDEMenuCommand(ideSubMnuAMW, 'PathToNDKDemoCmd', 'Change Project [*.lpi] Ndk Path [Demos]', nil,@StartPathToNDKDemo);
-  // Adding 7a. entry
   RegisterIDEMenuCommand(ideSubMnuAMW, 'PathToBuildFPCCross', 'Build FPC Cross Android', nil,@StartPathToBuildFPCCross);
-  // Adding 8a. entry
+  // Adding 7a. entry
   RegisterIDEMenuCommand(ideSubMnuAMW, 'PathToFPCTrunkSource', 'Get FPC Source [Trunk]', nil, @StartFPCTrunkSource);
   // And so on...
-
   RegisterIDEMenuCommand(itmRunBuilding, 'BuildAPKandRun', '[Lamw] Build Android Apk and Run',nil, @BuildAPKandRun);
-  ApkBuild.RegisterExtToolParser;
 
+  ApkBuild.RegisterExtToolParser;
 end;
 
 end.

@@ -1,8 +1,8 @@
 object AndroidModule1: TAndroidModule1
   Left = 272
-  Top = 140
+  Top = 0
   Width = 320
-  Height = 477
+  Height = 696
   MarginLeft = 0
   MarginTop = 0
   MarginRight = 0
@@ -14,7 +14,7 @@ object AndroidModule1: TAndroidModule1
     Left = 7
     Top = 4
     Width = 305
-    Height = 81
+    Height = 73
     MarginLeft = 4
     MarginTop = 4
     MarginRight = 4
@@ -23,7 +23,7 @@ object AndroidModule1: TAndroidModule1
     PosRelativeToAnchor = []
     PosRelativeToParent = [rpTop, rpCenterHorizontal]
     LayoutParamWidth = lpMatchParent
-    LayoutParamHeight = lpOneFifthOfParent
+    LayoutParamHeight = lpOneEighthOfParent
     BackgroundColor = colbrDefault
     MinPinchZoomFactor = 0.25
     MaxPinchZoomFactor = 4
@@ -78,9 +78,9 @@ object AndroidModule1: TAndroidModule1
   end
   object jPanel2: jPanel
     Left = 7
-    Top = 93
+    Top = 85
     Width = 305
-    Height = 304
+    Height = 450
     MarginLeft = 4
     MarginTop = 4
     MarginRight = 4

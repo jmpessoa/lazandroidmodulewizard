@@ -1,0 +1,3 @@
+public  java.lang.Object jImageView_Create(long pasobj ) {
+  return (java.lang.Object)( new jImageView(this.activity,this,pasobj));
+}

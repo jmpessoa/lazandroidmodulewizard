@@ -52,7 +52,17 @@ implementation
 
 procedure TAndroidModule14.DataModuleJNIPrompt(Sender: TObject);
 begin
-  if Self.IsWifiEnabled() then jCheckBox1.Checked:= True;
+   if not Self.isConnected() then
+  begin //try wifi
+    if Self.SetWifiEnabled(True) then
+      jCheckBox1.Checked:= True
+    else
+      ShowMessage('Please,  try enable some connection...');
+  end
+  else
+  begin
+     if Self.isConnectedWifi() then jCheckBox1.Checked:= True
+  end;
 end;
 
 procedure TAndroidModule14.jButton1Click(Sender: TObject);

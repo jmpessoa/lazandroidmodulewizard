@@ -1,0 +1,2 @@
+public native void pOnHttpClientContentResult(long pasobj, String content);
+public native void pOnHttpClientCodeResult(long pasobj, int code);

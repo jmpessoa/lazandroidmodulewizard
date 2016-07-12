@@ -17,10 +17,12 @@ type
     jAnalogClock1: jAnalogClock;
     jDigitalClock1: jDigitalClock;
     jTextView1: jTextView;
+
   private
     {private declarations}
   public
     {public declarations}
+    //procedure CustomExceptionHandler(Sender: TObject; E: Exception);
   end;
 
 var

@@ -1,0 +1,3 @@
+public java.lang.Object jTCPSocketClient_jCreate(long _Self) {
+   return (java.lang.Object)(new jTCPSocketClient(this,_Self));
+}

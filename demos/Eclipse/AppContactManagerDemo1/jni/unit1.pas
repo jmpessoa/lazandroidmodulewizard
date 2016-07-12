@@ -38,8 +38,8 @@ type
     jTextView7: jTextView;
     jTextView8: jTextView;
     jTextView9: jTextView;
-    procedure AndroidModule1ActivityRst(Sender: TObject; requestCode,
-      resultCode: Integer; intentData: jObject);
+    procedure AndroidModule1ActivityResult(Sender: TObject;
+      requestCode: integer; resultCode: TAndroidResult; intentData: jObject);
     procedure AndroidModule1JNIPrompt(Sender: TObject);
     procedure jAsyncTask1DoInBackground(Sender: TObject; progress: integer; out
       keepInBackground: boolean);
@@ -75,13 +75,13 @@ begin
   jIntentManager1.StartActivityForResult(1001, 'Take/Pick a Contact Photo');      //user-defined requestCode=1001
 end;
 
-procedure TAndroidModule1.AndroidModule1ActivityRst(Sender: TObject;
-  requestCode, resultCode: Integer; intentData: jObject);
-begin
 
+procedure TAndroidModule1.AndroidModule1ActivityResult(Sender: TObject;
+  requestCode: integer; resultCode: TAndroidResult; intentData: jObject);
+begin
   if  requestCode =  1001 then  //user-defined requestCode=1001
   begin
-    if resultCode = -1 then  //ok
+    if resultCode = RESULT_OK then  //ok
     begin
        //jImageView1.SetImageFromIntentResult(intentData);  //PICK from galery
       jImageView1.SetImageThumbnailFromCamera(intentData);  //take from camera
@@ -93,7 +93,6 @@ begin
       FPickImage:= False;
     end;
   end;
-
 end;
 
 procedure TAndroidModule1.jButton2Click(Sender: TObject);

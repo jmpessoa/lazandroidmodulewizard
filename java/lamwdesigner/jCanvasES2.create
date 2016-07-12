@@ -1,0 +1,3 @@
+public java.lang.Object jCanvasES2_Create(long pasobj, int version ) {
+  return (java.lang.Object)(new jCanvasES2(this.activity,this,pasobj,version));
+}

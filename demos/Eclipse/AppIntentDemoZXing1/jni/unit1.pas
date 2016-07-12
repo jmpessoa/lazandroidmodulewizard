@@ -18,8 +18,8 @@ type
     jListView1: jListView;
     jTextView1: jTextView;
     jTextView2: jTextView;
-    procedure AndroidModule1ActivityRst(Sender: TObject; requestCode,
-      resultCode: Integer; jIntent: jObject);
+    procedure AndroidModule1ActivityResult(Sender: TObject;
+      requestCode: integer; resultCode: TAndroidResult; intentData: jObject);
     procedure jListView1ClickItem(Sender: TObject; itemIndex: integer;
       itemCaption: string);
   private
@@ -71,18 +71,17 @@ begin
   //end;
 end;
 
-procedure TAndroidModule1.AndroidModule1ActivityRst(Sender: TObject;
-  requestCode, resultCode: Integer; jIntent: jObject);
+procedure TAndroidModule1.AndroidModule1ActivityResult(Sender: TObject;
+  requestCode: integer; resultCode: TAndroidResult; intentData: jObject);
 begin
   if  requestCode =  0 then  //user-defined requestCode= 0
   begin
-    if resultCode = -1 then  //ok
+    if resultCode = RESULT_OK then  //ok
     begin
-        ShowMessage('FORMAT: '+jIntentManager1.GetExtraString(jIntent, 'SCAN_RESULT_FORMAT'));
-        ShowMessage('CONTENT: '+jIntentManager1.GetExtraString(jIntent, 'SCAN_RESULT'));
+        ShowMessage('FORMAT: '+jIntentManager1.GetExtraString(intentData, 'SCAN_RESULT_FORMAT'));
+        ShowMessage('CONTENT: '+jIntentManager1.GetExtraString(intentData, 'SCAN_RESULT'));
     end else ShowMessage('Fail/cancel to scan....');
   end;
 end;
-
 
 end.

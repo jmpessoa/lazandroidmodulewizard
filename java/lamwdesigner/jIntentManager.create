@@ -1,0 +1,3 @@
+public java.lang.Object jIntentManager_jCreate(long _Self) {
+   return (java.lang.Object)(new jIntentManager(this,_Self));
+}      

@@ -10,6 +10,7 @@ object AndroidModule1: TAndroidModule1
   Text = 'AndroidModule1'
   ActivityMode = actMain
   BackgroundColor = colbrDefault
+  ActionBarTitle = abtDefault
   OnRotate = AndroidModule1Rotate
   OnJNIPrompt = AndroidModule1JNIPrompt
   object jTextView1: jTextView
@@ -233,17 +234,40 @@ object AndroidModule1: TAndroidModule1
     OnClick = jButton4Click
     Id = 8039590
   end
+  object jCheckBox1: jCheckBox
+    Left = 206
+    Top = 35
+    Width = 64
+    Height = 32
+    MarginLeft = 5
+    MarginTop = 5
+    MarginRight = 30
+    MarginBottom = 5
+    Visible = True
+    Anchor = jTextView1
+    PosRelativeToAnchor = [raBelow]
+    PosRelativeToParent = [rpRight]
+    LayoutParamWidth = lpWrapContent
+    LayoutParamHeight = lpWrapContent
+    Text = 'WiFi'
+    BackgroundColor = colbrDefault
+    FontColor = colbrDefault
+    FontSize = 0
+    Checked = False
+    FontSizeUnit = unitDefault
+    Id = 0
+  end
   object jHttpClient1: jHttpClient
     CharSet = 'UTF-8'
     IndexUrl = -1
     AuthenticationMode = autNone
     OnContentResult = jHttpClient1ContentResult
     OnCodeResult = jHttpClient1CodeResult
-    left = 96
-    top = 32
+    left = 192
+    top = 352
   end
   object jTextFileManager1: jTextFileManager
-    left = 224
-    top = 40
+    left = 80
+    top = 368
   end
 end

@@ -48,7 +48,6 @@ begin
     //jNotificationManager1.LightsColor:= colbrCoral;
     jNotificationManager1.Notify();
 
-
     //or
     //jNotificationManager1.Notify(1001,'Lamw','Hello','Lamw: App Hello World Notification Demo1!', 'lamw_logo');
      ShowMessage('Notification ok ... ');

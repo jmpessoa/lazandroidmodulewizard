@@ -32,12 +32,13 @@ object AndroidModule1: TAndroidModule1
     FontColor = colbrDefault
     FontSize = 0
     TextTypeFace = tfNormal
+    FontSizeUnit = unitDefault
     Id = 3681978
   end
   object jButton1: jButton
     Left = 2
     Top = 34
-    Width = 296
+    Width = 294
     Height = 40
     MarginLeft = 2
     MarginTop = 4
@@ -53,6 +54,7 @@ object AndroidModule1: TAndroidModule1
     BackgroundColor = colbrDefault
     FontColor = colbrDefault
     FontSize = 0
+    FontSizeUnit = unitDefault
     OnClick = jButton1Click
     Id = 3444649
   end
@@ -77,10 +79,10 @@ object AndroidModule1: TAndroidModule1
     OnBackKeyPressed = jCustomDialog1BackKeyPressed
     Id = 0
     object jPanel1: jPanel
-      Left = 4
-      Top = 40
-      Width = 272
-      Height = 183
+      Left = 7
+      Top = 31
+      Width = 265
+      Height = 201
       MarginLeft = 4
       MarginTop = 4
       MarginRight = 4
@@ -95,10 +97,10 @@ object AndroidModule1: TAndroidModule1
       MaxPinchZoomFactor = 4
       Id = 1930661
       object jPanel2: jPanel
-        Left = 4
+        Left = 7
         Top = 4
-        Width = 264
-        Height = 79
+        Width = 250
+        Height = 89
         MarginLeft = 4
         MarginTop = 4
         MarginRight = 4
@@ -133,10 +135,11 @@ object AndroidModule1: TAndroidModule1
           FontColor = colbrDefault
           FontSize = 0
           TextTypeFace = tfNormal
+          FontSizeUnit = unitDefault
           Id = 9483154
         end
         object jTextView3: jTextView
-          Left = 133
+          Left = 126
           Top = 5
           Width = 39
           Height = 20
@@ -157,13 +160,14 @@ object AndroidModule1: TAndroidModule1
           FontColor = colbrDefault
           FontSize = 0
           TextTypeFace = tfNormal
+          FontSizeUnit = unitDefault
           Id = 0
         end
         object jEditText1: jEditText
           Tag = 1
           Left = 5
           Top = 40
-          Width = 118
+          Width = 111
           Height = 39
           MarginLeft = 5
           MarginTop = 10
@@ -189,13 +193,14 @@ object AndroidModule1: TAndroidModule1
           VerScrollBar = False
           WrappingLine = False
           Editable = True
+          FontSizeUnit = unitDefault
           Id = 7675193
         end
         object jEditText2: jEditText
           Tag = 1
-          Left = 133
+          Left = 126
           Top = 40
-          Width = 254
+          Width = 114
           Height = 39
           MarginLeft = 5
           MarginTop = 10
@@ -221,14 +226,15 @@ object AndroidModule1: TAndroidModule1
           VerScrollBar = False
           WrappingLine = False
           Editable = True
+          FontSizeUnit = unitDefault
           Id = 0
         end
       end
       object jPanel3: jPanel
-        Left = 4
-        Top = 91
-        Width = 264
-        Height = 92
+        Left = 7
+        Top = 101
+        Width = 250
+        Height = 96
         MarginLeft = 4
         MarginTop = 4
         MarginRight = 4
@@ -244,9 +250,9 @@ object AndroidModule1: TAndroidModule1
         MaxPinchZoomFactor = 4
         Id = 0
         object jButton2: jButton
-          Left = 2
+          Left = 3
           Top = 4
-          Width = 260
+          Width = 243
           Height = 40
           MarginLeft = 2
           MarginTop = 4
@@ -261,13 +267,14 @@ object AndroidModule1: TAndroidModule1
           BackgroundColor = colbrDefault
           FontColor = colbrDefault
           FontSize = 0
+          FontSizeUnit = unitDefault
           OnClick = jButton2Click
           Id = 8691918
         end
         object jButton3: jButton
-          Left = 2
+          Left = 3
           Top = 52
-          Width = 260
+          Width = 243
           Height = 40
           MarginLeft = 2
           MarginTop = 4
@@ -283,6 +290,7 @@ object AndroidModule1: TAndroidModule1
           BackgroundColor = colbrDefault
           FontColor = colbrDefault
           FontSize = 0
+          FontSizeUnit = unitDefault
           OnClick = jButton3Click
           Id = 0
         end

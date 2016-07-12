@@ -1,0 +1,3 @@
+public  java.lang.Object jGLSurfaceView_Create(long pasobj, int version ) {
+   return (java.lang.Object)( new jGLSurfaceView(this.activity,this,pasobj,version));
+}

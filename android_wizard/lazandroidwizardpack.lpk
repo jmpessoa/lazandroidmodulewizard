@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CONFIG>
+  <Package Version="4">
+    <PathDelim Value="\"/>
+    <Name Value="LazAndroidWizardPack"/>
+    <Type Value="RunAndDesignTime"/>
+    <CompilerOptions>
+      <Version Value="11"/>
+      <PathDelim Value="\"/>
+      <SearchPaths>
+        <UnitOutputDirectory Value="lib\$(TargetCPU)-$(TargetOS)"/>
+      </SearchPaths>
+      <Other>
+        <CustomOptions Value="$(IDEBuildOptions)"/>
+      </Other>
+    </CompilerOptions>
+    <Files Count="15">
+      <Item1>
+        <Filename Value="androidwizard_intf.pas"/>
+        <HasRegisterProc Value="True"/>
+        <UnitName Value="AndroidWizard_intf"/>
+      </Item1>
+      <Item2>
+        <Filename Value="lazandroidwizardmodule.lfm"/>
+        <Type Value="LFM"/>
+      </Item2>
+      <Item3>
+        <Filename Value="uformworkspace.lfm"/>
+        <Type Value="LFM"/>
+      </Item3>
+      <Item4>
+        <Filename Value="uformworkspace.pas"/>
+        <UnitName Value="uformworkspace"/>
+      </Item4>
+      <Item5>
+        <Filename Value="uformandroidproject.pas"/>
+        <UnitName Value="uFormAndroidProject"/>
+      </Item5>
+      <Item6>
+        <Filename Value="uformandroidproject.lfm"/>
+        <Type Value="LFM"/>
+      </Item6>
+      <Item7>
+        <Filename Value="uregisterform.pas"/>
+        <UnitName Value="uRegisterForm"/>
+      </Item7>
+      <Item8>
+        <Filename Value="formpathmissing.lfm"/>
+        <Type Value="LFM"/>
+      </Item8>
+      <Item9>
+        <Filename Value="formpathmissing.pas"/>
+        <UnitName Value="FormPathMissing"/>
+      </Item9>
+      <Item10>
+        <Filename Value="uformosystem.lfm"/>
+        <Type Value="LFM"/>
+      </Item10>
+      <Item11>
+        <Filename Value="uformosystem.pas"/>
+        <UnitName Value="uFormOSystem"/>
+      </Item11>
+      <Item12>
+        <Filename Value="ujavaparser.pas"/>
+        <UnitName Value="uJavaParser"/>
+      </Item12>
+      <Item13>
+        <Filename Value="lamwdesigner.pas"/>
+        <UnitName Value="LamwDesigner"/>
+      </Item13>
+      <Item14>
+        <Filename Value="uformsizeselect.pas"/>
+        <UnitName Value="uFormSizeSelect"/>
+      </Item14>
+      <Item15>
+        <Filename Value="imgcache.pas"/>
+        <UnitName Value="imgcache"/>
+      </Item15>
+    </Files>
+    <RequiredPkgs Count="4">
+      <Item1>
+        <PackageName Value="tfpandroidbridge_pack"/>
+      </Item1>
+      <Item2>
+        <PackageName Value="SynEdit"/>
+      </Item2>
+      <Item3>
+        <PackageName Value="IDEIntf"/>
+      </Item3>
+      <Item4>
+        <PackageName Value="FCL"/>
+      </Item4>
+    </RequiredPkgs>
+    <UsageOptions>
+      <UnitPath Value="$(PkgOutDir)"/>
+    </UsageOptions>
+    <PublishOptions>
+      <Version Value="2"/>
+    </PublishOptions>
+    <CustomOptions Items="ExternHelp" Version="2">
+      <_ExternHelp Items="Count"/>
+    </CustomOptions>
+  </Package>
+</CONFIG>

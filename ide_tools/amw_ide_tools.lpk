@@ -16,7 +16,7 @@
         <CustomOptions Value="$(IDEBuildOptions)"/>
       </Other>
     </CompilerOptions>
-    <Files Count="25">
+    <Files Count="21">
       <Item1>
         <Filename Value="amw_ide_menu_items.pas"/>
         <HasRegisterProc Value="True"/>
@@ -39,85 +39,69 @@
         <UnitName Value="uformsettingspaths"/>
       </Item5>
       <Item6>
-        <Filename Value="uformupdatecodetemplate.pas"/>
-        <UnitName Value="uformupdatecodetemplate"/>
+        <Filename Value="AndroidXMLResString.pas"/>
+        <UnitName Value="AndroidXMLResString"/>
       </Item6>
       <Item7>
-        <Filename Value="uformupdatecodetemplate.lfm"/>
+        <Filename Value="ufrmEditor.lfm"/>
         <Type Value="LFM"/>
       </Item7>
       <Item8>
-        <Filename Value="AndroidXMLResString.pas"/>
-        <UnitName Value="AndroidXMLResString"/>
-      </Item8>
-      <Item9>
-        <Filename Value="ufrmEditor.lfm"/>
-        <Type Value="LFM"/>
-      </Item9>
-      <Item10>
         <Filename Value="ufrmEditor.pas"/>
         <UnitName Value="ufrmEditor"/>
-      </Item10>
-      <Item11>
+      </Item8>
+      <Item9>
         <Filename Value="ufrmcompcreate.pas"/>
         <UnitName Value="ufrmCompCreate"/>
+      </Item9>
+      <Item10>
+        <Filename Value="ufrmcompcreate.lfm"/>
+        <Type Value="LFM"/>
+      </Item10>
+      <Item11>
+        <Filename Value="uregistercompform.pas"/>
+        <UnitName Value="uregistercompform"/>
       </Item11>
       <Item12>
-        <Filename Value="ufrmcompcreate.lfm"/>
+        <Filename Value="uregistercompform.lfm"/>
         <Type Value="LFM"/>
       </Item12>
       <Item13>
-        <Filename Value="uregistercompform.pas"/>
-        <UnitName Value="uregistercompform"/>
+        <Filename Value="apkbuild.pas"/>
+        <UnitName Value="ApkBuild"/>
       </Item13>
       <Item14>
-        <Filename Value="uregistercompform.lfm"/>
+        <Filename Value="uformstartemulator.lfm"/>
         <Type Value="LFM"/>
       </Item14>
       <Item15>
-        <Filename Value="apkbuild.pas"/>
-        <UnitName Value="ApkBuild"/>
-      </Item15>
-      <Item16>
-        <Filename Value="uformstartemulator.lfm"/>
-        <Type Value="LFM"/>
-      </Item16>
-      <Item17>
         <Filename Value="uformstartemulator.pas"/>
         <UnitName Value="uFormStartEmulator"/>
-      </Item17>
-      <Item18>
+      </Item15>
+      <Item16>
         <Filename Value="androidprojoptions.pas"/>
         <UnitName Value="AndroidProjOptions"/>
-      </Item18>
-      <Item19>
-        <Filename Value="uformchangepathtondk.lfm"/>
-        <Type Value="LFM"/>
-      </Item19>
-      <Item20>
-        <Filename Value="uformchangepathtondk.pas"/>
-        <UnitName Value="uformchangepathtondk"/>
-      </Item20>
-      <Item21>
+      </Item16>
+      <Item17>
         <Filename Value="androidprojoptions.lfm"/>
         <Type Value="LFM"/>
-      </Item21>
-      <Item22>
+      </Item17>
+      <Item18>
         <Filename Value="uFormBuildFPCCross.lfm"/>
         <Type Value="LFM"/>
-      </Item22>
-      <Item23>
+      </Item18>
+      <Item19>
         <Filename Value="uFormBuildFPCCross.pas"/>
         <UnitName Value="uFormBuildFPCCross"/>
-      </Item23>
-      <Item24>
+      </Item19>
+      <Item20>
         <Filename Value="uformgetfpcsource.lfm"/>
         <Type Value="LFM"/>
-      </Item24>
-      <Item25>
+      </Item20>
+      <Item21>
         <Filename Value="uformgetfpcsource.pas"/>
         <UnitName Value="uFormGetFPCSource"/>
-      </Item25>
+      </Item21>
     </Files>
     <RequiredPkgs Count="3">
       <Item1>

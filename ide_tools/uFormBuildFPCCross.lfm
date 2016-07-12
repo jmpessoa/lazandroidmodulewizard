@@ -1,11 +1,11 @@
 object FormBuildFPCCross: TFormBuildFPCCross
   Left = 245
-  Height = 380
+  Height = 418
   Top = 108
   Width = 420
   ActiveControl = PageControl1
   Caption = '[Lamw] FPC Android Cross Compiler Builder'
-  ClientHeight = 380
+  ClientHeight = 418
   ClientWidth = 420
   OnActivate = FormActivate
   OnClose = FormClose
@@ -14,23 +14,23 @@ object FormBuildFPCCross: TFormBuildFPCCross
   object StatusBar1: TStatusBar
     Left = 0
     Height = 23
-    Top = 357
+    Top = 395
     Width = 420
     Panels = <>
   end
   object Panel3: TPanel
     Left = 0
-    Height = 357
+    Height = 395
     Top = 0
     Width = 420
     Align = alClient
     BevelOuter = bvNone
-    ClientHeight = 357
+    ClientHeight = 395
     ClientWidth = 420
     TabOrder = 1
     object PageControl1: TPageControl
       Left = 0
-      Height = 357
+      Height = 395
       Top = 0
       Width = 420
       ActivePage = TabSheet2
@@ -40,7 +40,7 @@ object FormBuildFPCCross: TFormBuildFPCCross
       OnChange = PageControl1Change
       object TabSheet2: TTabSheet
         Caption = 'Build'
-        ClientHeight = 329
+        ClientHeight = 367
         ClientWidth = 412
         object GroupBox2: TGroupBox
           Left = 3
@@ -108,9 +108,9 @@ object FormBuildFPCCross: TFormBuildFPCCross
           end
           object RadioGroupInstruction: TRadioGroup
             Left = 8
-            Height = 47
+            Height = 66
             Top = 120
-            Width = 191
+            Width = 231
             AutoFill = True
             AutoSize = True
             Caption = 'Architecture'
@@ -122,14 +122,15 @@ object FormBuildFPCCross: TFormBuildFPCCross
             ChildSizing.ShrinkHorizontal = crsScaleChilds
             ChildSizing.ShrinkVertical = crsScaleChilds
             ChildSizing.Layout = cclLeftToRightThenTopToBottom
-            ChildSizing.ControlsPerLine = 3
-            ClientHeight = 27
-            ClientWidth = 187
-            Columns = 3
+            ChildSizing.ControlsPerLine = 2
+            ClientHeight = 46
+            ClientWidth = 227
+            Columns = 2
             ItemIndex = 0
             Items.Strings = (
               'ArmV6'
-              'ArmV7a'
+              'ArmV7a + Soft'
+              'ArmV7a + VFPv3'
               'x86'
             )
             OnClick = RadioGroupInstructionClick
@@ -172,7 +173,7 @@ object FormBuildFPCCross: TFormBuildFPCCross
       end
       object TabSheet3: TTabSheet
         Caption = 'Instal'
-        ClientHeight = 329
+        ClientHeight = 367
         ClientWidth = 412
         object GroupBox3: TGroupBox
           Left = 8

@@ -1,0 +1,3 @@
+public java.lang.Object jCustomDialog_jCreate(long _Self) {
+   return (java.lang.Object)(new jCustomDialog(this,_Self));
+}

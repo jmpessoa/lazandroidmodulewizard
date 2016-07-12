@@ -18,6 +18,7 @@ type
       jEditText1: jEditText;
       jImageFileManager1: jImageFileManager;
       jListView1: jListView;
+      jListView2: jListView;
       jTextView1: jTextView;
 
       procedure DataModuleJNIPrompt(Sender: TObject);
@@ -53,21 +54,21 @@ procedure TAndroidModule1.DataModuleJNIPrompt(Sender: TObject);
 var
   i: integer;
 begin
+  jListView2.FontFace:= ffMonospace;
   for i:=0 to jListView1.Count-1 do
     jListView1.SetImageByIndex('ic_bullets',i); //from .../res 'ic_bullets.png'
 end;
 
 procedure TAndroidModule1.jButton1Click(Sender: TObject);
 begin
-
    if jEditText1.Text <> '' then
    begin
-     jListView1.Add(jEditText1.Text);
-     jListView1.SetImageByIndex('ic_bullets',jListView1.Count-1); //from .../res 'ic_bullets.png'
+     //jListView1.Add(jEditText1.Text);
+   //  jListView1.SetImageByIndex('ic_bullets',jListView1.Count-1); //from .../res 'ic_bullets.png'
+       jListView2.Add(jEditText1.Text);
    end
    else
      ShowMessage('Please, enter some text!');
-
 end;
 
 procedure TAndroidModule1.jButton2Click(Sender: TObject);

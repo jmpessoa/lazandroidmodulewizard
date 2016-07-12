@@ -1,8 +1,8 @@
 object AndroidModule1: TAndroidModule1
-  Left = 272
-  Top = 140
+  Left = 311
+  Top = 200
   Width = 320
-  Height = 400
+  Height = 486
   MarginLeft = 0
   MarginTop = 0
   MarginRight = 0
@@ -10,11 +10,12 @@ object AndroidModule1: TAndroidModule1
   Text = 'AndroidModule1'
   ActivityMode = actMain
   BackgroundColor = colbrDefault
+  ActionBarTitle = abtDefault
   object jPanel1: jPanel
     Left = 7
     Top = 4
     Width = 305
-    Height = 66
+    Height = 83
     MarginLeft = 4
     MarginTop = 4
     MarginRight = 4
@@ -78,9 +79,9 @@ object AndroidModule1: TAndroidModule1
   end
   object jPanel2: jPanel
     Left = 8
-    Top = 78
+    Top = 95
     Width = 304
-    Height = 252
+    Height = 374
     MarginLeft = 4
     MarginTop = 4
     MarginRight = 4
@@ -90,16 +91,16 @@ object AndroidModule1: TAndroidModule1
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = [rpCenterHorizontal]
     LayoutParamWidth = lpMatchParent
-    LayoutParamHeight = lpTwoThirdOfParent
+    LayoutParamHeight = lpFourFifthOfParent
     BackgroundColor = colbrDefault
     MinPinchZoomFactor = 0.25
     MaxPinchZoomFactor = 4
     Id = 0
     object jImageView1: jImageView
-      Left = 15
-      Top = 16
-      Width = 281
-      Height = 224
+      Left = 6
+      Top = 5
+      Width = 292
+      Height = 363
       Visible = True
       PosRelativeToAnchor = []
       PosRelativeToParent = [rpCenterInParent]

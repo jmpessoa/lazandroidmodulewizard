@@ -10,6 +10,7 @@ object AndroidModule1: TAndroidModule1
   Text = 'AndroidModule1'
   ActivityMode = actMain
   BackgroundColor = colbrBlack
+  ActionBarTitle = abtDefault
   OnRotate = AndroidModule1Rotate
   OnJNIPrompt = AndroidModule1JNIPrompt
   object jPanel1: jPanel
@@ -26,7 +27,7 @@ object AndroidModule1: TAndroidModule1
     PosRelativeToParent = [rpTop]
     LayoutParamWidth = lpMatchParent
     LayoutParamHeight = lpOneQuarterOfParent
-    BackgroundColor = colbrDefault
+    BackgroundColor = colbrNavajoWhite
     MinPinchZoomFactor = 0.25
     MaxPinchZoomFactor = 4
     Id = 5157644
@@ -48,15 +49,16 @@ object AndroidModule1: TAndroidModule1
       Alignment = taLeft
       Enabled = True
       BackgroundColor = colbrDefault
-      FontColor = colbrGold
+      FontColor = colbrRed
       FontSize = 0
       TextTypeFace = tfNormal
+      FontSizeUnit = unitDefault
       Id = 3926083
     end
     object jTextView2: jTextView
       Left = 5
       Top = 35
-      Width = 290
+      Width = 285
       Height = 20
       MarginLeft = 5
       MarginTop = 5
@@ -75,13 +77,14 @@ object AndroidModule1: TAndroidModule1
       FontColor = colbrLime
       FontSize = 0
       TextTypeFace = tfNormal
+      FontSizeUnit = unitDefault
       Id = 2599751
     end
     object jPanel3: jPanel
-      Left = 4
+      Left = 7
       Top = 64
-      Width = 292
-      Height = 39
+      Width = 285
+      Height = 58
       MarginLeft = 4
       MarginTop = 4
       MarginRight = 4
@@ -97,9 +100,9 @@ object AndroidModule1: TAndroidModule1
       MaxPinchZoomFactor = 4
       Id = 8563928
       object jEditText1: jEditText
-        Left = 4
-        Top = 0
-        Width = 284
+        Left = 7
+        Top = 9
+        Width = 270
         Height = 39
         MarginLeft = 4
         MarginTop = 10
@@ -124,14 +127,15 @@ object AndroidModule1: TAndroidModule1
         VerScrollBar = False
         WrappingLine = False
         Editable = True
+        FontSizeUnit = unitDefault
         Id = 9498139
       end
     end
     object jPanel4: jPanel
       Left = 4
-      Top = 107
+      Top = 100
       Width = 136
-      Height = 40
+      Height = 47
       MarginLeft = 4
       MarginTop = 4
       MarginRight = 4
@@ -146,9 +150,9 @@ object AndroidModule1: TAndroidModule1
       MaxPinchZoomFactor = 4
       Id = 0
       object jButton1: jButton
-        Left = 2
-        Top = 0
-        Width = 132
+        Left = 3
+        Top = 3
+        Width = 129
         Height = 40
         MarginLeft = 2
         MarginTop = 4
@@ -163,15 +167,16 @@ object AndroidModule1: TAndroidModule1
         BackgroundColor = colbrDefault
         FontColor = colbrDefault
         FontSize = 0
+        FontSizeUnit = unitDefault
         OnClick = jButton1Click
         Id = 0
       end
     end
     object jPanel5: jPanel
       Left = 160
-      Top = 107
+      Top = 100
       Width = 136
-      Height = 40
+      Height = 47
       MarginLeft = 4
       MarginTop = 4
       MarginRight = 4
@@ -186,9 +191,9 @@ object AndroidModule1: TAndroidModule1
       MaxPinchZoomFactor = 4
       Id = 0
       object jButton2: jButton
-        Left = 2
-        Top = 0
-        Width = 132
+        Left = 3
+        Top = 3
+        Width = 129
         Height = 40
         MarginLeft = 2
         MarginTop = 4
@@ -203,6 +208,7 @@ object AndroidModule1: TAndroidModule1
         BackgroundColor = colbrDefault
         FontColor = colbrDefault
         FontSize = 0
+        FontSizeUnit = unitDefault
         OnClick = jButton2Click
         Id = 0
       end
@@ -211,7 +217,7 @@ object AndroidModule1: TAndroidModule1
   object jPanel2: jPanel
     Left = 4
     Top = 155
-    Width = 292
+    Width = 288
     Height = 206
     MarginLeft = 4
     MarginTop = 4
@@ -229,9 +235,9 @@ object AndroidModule1: TAndroidModule1
     Id = 945929
     object jListView1: jListView
       Tag = 1
-      Left = 12
-      Top = 10
-      Width = 274
+      Left = 6
+      Top = 3
+      Width = 276
       Height = 130
       Visible = True
       PosRelativeToAnchor = []
@@ -248,6 +254,7 @@ object AndroidModule1: TAndroidModule1
       TextSizeDecorated = sdNone
       TextAlign = alLeft
       HighLightSelectedItemColor = colbrRed
+      FontSizeUnit = unitDefault
       Id = 3721116
     end
   end
@@ -270,6 +277,7 @@ object AndroidModule1: TAndroidModule1
     BackgroundColor = colbrDefault
     FontColor = colbrRed
     FontSize = 0
+    FontSizeUnit = unitDefault
     OnClick = jButton3Click
     Id = 0
   end

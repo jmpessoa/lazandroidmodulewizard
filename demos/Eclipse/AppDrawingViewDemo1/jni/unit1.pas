@@ -23,10 +23,6 @@ type
     procedure AndroidModule1Create(Sender: TObject);
     procedure jButton1Click(Sender: TObject);
     procedure jDrawingView1Draw(Sender: TObject);
-    procedure jDrawingView1FlingGesture(Sender: TObject;
-      flingGesture: TFlingGesture);
-    procedure jDrawingView1PinchZoomGesture(Sender: TObject;
-      scaleFactor: single; scaleState: TPinchZoomScaleState);
     procedure jDrawingView1TouchMove(Sender: TObject; Touch: TMouch);
     procedure jDrawingView1TouchUp(Sender: TObject; Touch: TMouch);
 
@@ -86,17 +82,6 @@ begin
 
 end;
 
-procedure TAndroidModule1.jDrawingView1FlingGesture(Sender: TObject;
-  flingGesture: TFlingGesture);
-begin
-  jDrawingView1.PaintColor:= colbrGold;
-end;
-
-procedure TAndroidModule1.jDrawingView1PinchZoomGesture(Sender: TObject;
-  scaleFactor: single; scaleState: TPinchZoomScaleState);
-begin
-  jDrawingView1.PaintColor:= colbrRed;   //default
-end;
 
 procedure TAndroidModule1.AndroidModule1Create(Sender: TObject);
 begin

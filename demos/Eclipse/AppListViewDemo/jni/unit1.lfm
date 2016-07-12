@@ -85,7 +85,7 @@ object AndroidModule1: TAndroidModule1
     Tag = 1
     Left = 10
     Top = 50
-    Width = 280
+    Width = 270
     Height = 39
     MarginLeft = 10
     MarginTop = 10
@@ -117,9 +117,9 @@ object AndroidModule1: TAndroidModule1
   end
   object jListView1: jListView
     Tag = 1
-    Left = 8
-    Top = 168
-    Width = 280
+    Left = 3
+    Top = 151
+    Width = 291
     Height = 120
     Visible = True
     Anchor = jButton1
@@ -148,6 +148,35 @@ object AndroidModule1: TAndroidModule1
     OnLongClickItem = jListView1LongClickItem
     OnDrawItemTextColor = jListView1DrawItemTextColor
     OnDrawItemBitmap = jListView1DrawItemBitmap
+    Id = 2186385
+  end
+  object jListView2: jListView
+    Left = 3
+    Top = 277
+    Width = 291
+    Height = 96
+    Visible = True
+    Anchor = jListView1
+    PosRelativeToAnchor = [raBelow]
+    PosRelativeToParent = []
+    LayoutParamWidth = lpMatchParent
+    LayoutParamHeight = lpWrapContent
+    Items.Strings = (
+      'Hello'
+      'Android'
+      'World!'
+    )
+    BackgroundColor = colbrDefault
+    FontColor = colbrDefault
+    FontSize = 0
+    WidgetItem = wgNone
+    Delimiter = '|'
+    TextDecorated = txtNormal
+    ItemLayout = layImageTextWidget
+    TextSizeDecorated = sdNone
+    TextAlign = alLeft
+    HighLightSelectedItemColor = colbrDefault
+    FontSizeUnit = unitDefault
     Id = 0
   end
   object jImageFileManager1: jImageFileManager

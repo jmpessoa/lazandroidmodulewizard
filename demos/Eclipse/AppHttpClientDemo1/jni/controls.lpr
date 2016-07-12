@@ -8,19 +8,19 @@ uses
   Laz_And_Controls_Events, unit1;
 
 { Class:     com_example_apphttpclientdemo1_Controls
+  Method:    pAppOnCreate
+  Signature: (Landroid/content/Context;Landroid/widget/RelativeLayout;)V }
+procedure pAppOnCreate(PEnv: PJNIEnv; this: JObject; context: JObject; layout: JObject); cdecl;
+begin
+  Java_Event_pAppOnCreate(PEnv,this,context,layout);AndroidModule1.Init(gApp);
+end;
+
+{ Class:     com_example_apphttpclientdemo1_Controls
   Method:    pAppOnScreenStyle
   Signature: ()I }
 function pAppOnScreenStyle(PEnv: PJNIEnv; this: JObject): JInt; cdecl;
 begin
   Result:=Java_Event_pAppOnScreenStyle(PEnv,this);
-end;
-
-{ Class:     com_example_apphttpclientdemo1_Controls
-  Method:    pAppOnCreate
-  Signature: (Landroid/content/Context;Landroid/widget/RelativeLayout;)V }
-procedure pAppOnCreate(PEnv: PJNIEnv; this: JObject; context: JObject; layout: JObject); cdecl;
-begin
-  gApp.Init(PEnv,this,context,layout);AndroidModule1.Init(gApp);
 end;
 
 { Class:     com_example_apphttpclientdemo1_Controls
@@ -124,7 +124,7 @@ end;
   Signature: (Landroid/view/MenuItem;ILjava/lang/String;Z)V }
 procedure pAppOnClickOptionMenuItem(PEnv: PJNIEnv; this: JObject; menuItem: JObject; itemID: JInt; itemCaption: JString; checked: JBoolean); cdecl;
 begin
-  Java_Event_pAppOnClickOptionMenuItem(PEnv,this,menuItem,itemID,itemCaption,Boolean(checked));
+  Java_Event_pAppOnClickOptionMenuItem(PEnv,this,menuItem,itemID,itemCaption,checked);
 end;
 
 { Class:     com_example_apphttpclientdemo1_Controls
@@ -156,7 +156,39 @@ end;
   Signature: (Landroid/view/MenuItem;ILjava/lang/String;Z)V }
 procedure pAppOnClickContextMenuItem(PEnv: PJNIEnv; this: JObject; menuItem: JObject; itemID: JInt; itemCaption: JString; checked: JBoolean); cdecl;
 begin
-  Java_Event_pAppOnClickContextMenuItem(PEnv,this,menuItem,itemID,itemCaption,Boolean(checked));
+  Java_Event_pAppOnClickContextMenuItem(PEnv,this,menuItem,itemID,itemCaption,checked);
+end;
+
+{ Class:     com_example_apphttpclientdemo1_Controls
+  Method:    pOnDraw
+  Signature: (JLandroid/graphics/Canvas;)V }
+procedure pOnDraw(PEnv: PJNIEnv; this: JObject; pasobj: JLong; canvas: JObject); cdecl;
+begin
+  Java_Event_pOnDraw(PEnv,this,TObject(pasobj),canvas);
+end;
+
+{ Class:     com_example_apphttpclientdemo1_Controls
+  Method:    pOnTouch
+  Signature: (JIIFFFF)V }
+procedure pOnTouch(PEnv: PJNIEnv; this: JObject; pasobj: JLong; act: JInt; cnt: JInt; x1: JFloat; y1: JFloat; x2: JFloat; y2: JFloat); cdecl;
+begin
+  Java_Event_pOnTouch(PEnv,this,TObject(pasobj),act,cnt,x1,y1,x2,y2);
+end;
+
+{ Class:     com_example_apphttpclientdemo1_Controls
+  Method:    pOnClickGeneric
+  Signature: (JI)V }
+procedure pOnClickGeneric(PEnv: PJNIEnv; this: JObject; pasobj: JLong; value: JInt); cdecl;
+begin
+  Java_Event_pOnClickGeneric(PEnv,this,TObject(pasobj),value);
+end;
+
+{ Class:     com_example_apphttpclientdemo1_Controls
+  Method:    pAppOnSpecialKeyDown
+  Signature: (CILjava/lang/String;)Z }
+function pAppOnSpecialKeyDown(PEnv: PJNIEnv; this: JObject; keyChar: JChar; keyCode: JInt; keyCodeString: JString): JBoolean; cdecl;
+begin
+  Result:=Java_Event_pAppOnSpecialKeyDown(PEnv,this,keyChar,keyCode,keyCodeString);
 end;
 
 { Class:     com_example_apphttpclientdemo1_Controls
@@ -192,267 +224,11 @@ begin
 end;
 
 { Class:     com_example_apphttpclientdemo1_Controls
-  Method:    pOnTimer
-  Signature: (J)V }
-procedure pOnTimer(PEnv: PJNIEnv; this: JObject; pasobj: JLong); cdecl;
-begin
-  Java_Event_pOnTimer(PEnv,this,TObject(pasobj));
-end;
-
-{ Class:     com_example_apphttpclientdemo1_Controls
-  Method:    pOnDraw
-  Signature: (JLandroid/graphics/Canvas;)V }
-procedure pOnDraw(PEnv: PJNIEnv; this: JObject; pasobj: JLong; canvas: JObject); cdecl;
-begin
-  Java_Event_pOnDraw(PEnv,this,TObject(pasobj),canvas);
-end;
-
-{ Class:     com_example_apphttpclientdemo1_Controls
-  Method:    pOnTouch
-  Signature: (JIIFFFF)V }
-procedure pOnTouch(PEnv: PJNIEnv; this: JObject; pasobj: JLong; act: JInt; cnt: JInt; x1: JFloat; y1: JFloat; x2: JFloat; y2: JFloat); cdecl;
-begin
-  Java_Event_pOnTouch(PEnv,this,TObject(pasobj),act,cnt,x1,y1,x2,y2);
-end;
-
-{ Class:     com_example_apphttpclientdemo1_Controls
-  Method:    pOnGLRenderer
-  Signature: (JIII)V }
-procedure pOnGLRenderer(PEnv: PJNIEnv; this: JObject; pasobj: JLong; EventType: JInt; w: JInt; h: JInt); cdecl;
-begin
-  Java_Event_pOnGLRenderer(PEnv,this,TObject(pasobj),EventType,w,h);
-end;
-
-{ Class:     com_example_apphttpclientdemo1_Controls
   Method:    pOnClose
   Signature: (J)V }
 procedure pOnClose(PEnv: PJNIEnv; this: JObject; pasobj: JLong); cdecl;
 begin
   Java_Event_pOnClose(PEnv,this,TObject(pasobj));
-end;
-
-{ Class:     com_example_apphttpclientdemo1_Controls
-  Method:    pOnWebViewStatus
-  Signature: (JILjava/lang/String;)I }
-function pOnWebViewStatus(PEnv: PJNIEnv; this: JObject; pasobj: JLong; EventType: JInt; url: JString): JInt; cdecl;
-begin
-  Result:=Java_Event_pOnWebViewStatus(PEnv,this,TObject(pasobj),EventType,url);
-end;
-
-{ Class:     com_example_apphttpclientdemo1_Controls
-  Method:    pOnAsyncEventDoInBackground
-  Signature: (JI)Z }
-function pOnAsyncEventDoInBackground(PEnv: PJNIEnv; this: JObject; pasobj: JLong; progress: JInt): JBoolean; cdecl;
-begin
-  Result:=Java_Event_pOnAsyncEventDoInBackground(PEnv,this,TObject(pasobj),progress);
-end;
-
-{ Class:     com_example_apphttpclientdemo1_Controls
-  Method:    pOnAsyncEventProgressUpdate
-  Signature: (JI)I }
-function pOnAsyncEventProgressUpdate(PEnv: PJNIEnv; this: JObject; pasobj: JLong; progress: JInt): JInt; cdecl;
-begin
-  Result:=Java_Event_pOnAsyncEventProgressUpdate(PEnv,this,TObject(pasobj),progress);
-end;
-
-{ Class:     com_example_apphttpclientdemo1_Controls
-  Method:    pOnAsyncEventPreExecute
-  Signature: (J)I }
-function pOnAsyncEventPreExecute(PEnv: PJNIEnv; this: JObject; pasobj: JLong): JInt; cdecl;
-begin
-  Result:=Java_Event_pOnAsyncEventPreExecute(PEnv,this,TObject(pasobj));
-end;
-
-{ Class:     com_example_apphttpclientdemo1_Controls
-  Method:    pOnAsyncEventPostExecute
-  Signature: (JI)V }
-procedure pOnAsyncEventPostExecute(PEnv: PJNIEnv; this: JObject; pasobj: JLong; progress: JInt); cdecl;
-begin
-  Java_Event_pOnAsyncEventPostExecute(PEnv,this,TObject(pasobj),progress);
-end;
-
-{ Class:     com_example_apphttpclientdemo1_Controls
-  Method:    pOnClickWidgetItem
-  Signature: (JIZ)V }
-procedure pOnClickWidgetItem(PEnv: PJNIEnv; this: JObject; pasobj: JLong; position: JInt; checked: JBoolean); cdecl;
-begin
-  Java_Event_pOnClickWidgetItem(PEnv,this,TObject(pasobj),position,Boolean(checked));
-end;
-
-{ Class:     com_example_apphttpclientdemo1_Controls
-  Method:    pOnClickCaptionItem
-  Signature: (JILjava/lang/String;)V }
-procedure pOnClickCaptionItem(PEnv: PJNIEnv; this: JObject; pasobj: JLong; position: JInt; caption: JString); cdecl;
-begin
-  Java_Event_pOnClickCaptionItem(PEnv,this,TObject(pasobj),position,caption);
-end;
-
-{ Class:     com_example_apphttpclientdemo1_Controls
-  Method:    pOnListViewLongClickCaptionItem
-  Signature: (JILjava/lang/String;)V }
-procedure pOnListViewLongClickCaptionItem(PEnv: PJNIEnv; this: JObject; pasobj: JLong; position: JInt; caption: JString); cdecl;
-begin
-  Java_Event_pOnListViewLongClickCaptionItem(PEnv,this,TObject(pasobj),position,caption);
-end;
-
-{ Class:     com_example_apphttpclientdemo1_Controls
-  Method:    pOnListViewDrawItemCaptionColor
-  Signature: (JILjava/lang/String;)I }
-function pOnListViewDrawItemCaptionColor(PEnv: PJNIEnv; this: JObject; pasobj: JLong; position: JInt; caption: JString): JInt; cdecl;
-begin
-  Result:=Java_Event_pOnListViewDrawItemCaptionColor(PEnv,this,TObject(pasobj),position,caption);
-end;
-
-{ Class:     com_example_apphttpclientdemo1_Controls
-  Method:    pOnListViewDrawItemBitmap
-  Signature: (JILjava/lang/String;)Landroid/graphics/Bitmap; }
-function pOnListViewDrawItemBitmap(PEnv: PJNIEnv; this: JObject; pasobj: JLong; position: JInt; caption: JString): JObject; cdecl;
-begin
-  Result:=Java_Event_pOnListViewDrawItemBitmap(PEnv,this,TObject(pasobj),position,caption);
-end;
-
-{ Class:     com_example_apphttpclientdemo1_Controls
-  Method:    pOnBluetoothEnabled
-  Signature: (J)V }
-procedure pOnBluetoothEnabled(PEnv: PJNIEnv; this: JObject; pasobj: JLong); cdecl;
-begin
-  Java_Event_pOnBluetoothEnabled(PEnv,this,TObject(pasobj));
-end;
-
-{ Class:     com_example_apphttpclientdemo1_Controls
-  Method:    pOnBluetoothDisabled
-  Signature: (J)V }
-procedure pOnBluetoothDisabled(PEnv: PJNIEnv; this: JObject; pasobj: JLong); cdecl;
-begin
-  Java_Event_pOnBluetoothDisabled(PEnv,this,TObject(pasobj));
-end;
-
-{ Class:     com_example_apphttpclientdemo1_Controls
-  Method:    pOnBluetoothDeviceFound
-  Signature: (JLjava/lang/String;Ljava/lang/String;)V }
-procedure pOnBluetoothDeviceFound(PEnv: PJNIEnv; this: JObject; pasobj: JLong; deviceName: JString; deviceAddress: JString); cdecl;
-begin
-  Java_Event_pOnBluetoothDeviceFound(PEnv,this,TObject(pasobj),deviceName,deviceAddress);
-end;
-
-{ Class:     com_example_apphttpclientdemo1_Controls
-  Method:    pOnBluetoothDiscoveryStarted
-  Signature: (J)V }
-procedure pOnBluetoothDiscoveryStarted(PEnv: PJNIEnv; this: JObject; pasobj: JLong); cdecl;
-begin
-  Java_Event_pOnBluetoothDiscoveryStarted(PEnv,this,TObject(pasobj));
-end;
-
-{ Class:     com_example_apphttpclientdemo1_Controls
-  Method:    pOnBluetoothDiscoveryFinished
-  Signature: (JII)V }
-procedure pOnBluetoothDiscoveryFinished(PEnv: PJNIEnv; this: JObject; pasobj: JLong; countFoundedDevices: JInt; countPairedDevices: JInt); cdecl;
-begin
-  Java_Event_pOnBluetoothDiscoveryFinished(PEnv,this,TObject(pasobj),countFoundedDevices,countPairedDevices);
-end;
-
-{ Class:     com_example_apphttpclientdemo1_Controls
-  Method:    pOnBluetoothDeviceBondStateChanged
-  Signature: (JILjava/lang/String;Ljava/lang/String;)V }
-procedure pOnBluetoothDeviceBondStateChanged(PEnv: PJNIEnv; this: JObject; pasobj: JLong; state: JInt; deviceName: JString; deviceAddress: JString); cdecl;
-begin
-  Java_Event_pOnBluetoothDeviceBondStateChanged(PEnv,this,TObject(pasobj),state,deviceName,deviceAddress);
-end;
-
-{ Class:     com_example_apphttpclientdemo1_Controls
-  Method:    pOnBluetoothClientSocketConnected
-  Signature: (JLjava/lang/String;Ljava/lang/String;)V }
-procedure pOnBluetoothClientSocketConnected(PEnv: PJNIEnv; this: JObject; pasobj: JLong; deviceName: JString; deviceAddress: JString); cdecl;
-begin
-  Java_Event_pOnBluetoothClientSocketConnected(PEnv,this,TObject(pasobj),deviceName,deviceAddress);
-end;
-
-{ Class:     com_example_apphttpclientdemo1_Controls
-  Method:    pOnBluetoothClientSocketIncomingData
-  Signature: (J[B[B)V }
-procedure pOnBluetoothClientSocketIncomingData(PEnv: PJNIEnv; this: JObject; pasobj: JLong; byteArrayContent: JByteArray; byteArrayHeader: JByteArray); cdecl;
-begin
-  Java_Event_pOnBluetoothClientSocketIncomingData(PEnv,this,TObject(pasobj),byteArrayContent,byteArrayHeader);
-end;
-
-{ Class:     com_example_apphttpclientdemo1_Controls
-  Method:    pOnBluetoothClientSocketDisconnected
-  Signature: (J)V }
-procedure pOnBluetoothClientSocketDisconnected(PEnv: PJNIEnv; this: JObject; pasobj: JLong); cdecl;
-begin
-  Java_Event_pOnBluetoothClientSocketDisconnected(PEnv,this,TObject(pasobj));
-end;
-
-{ Class:     com_example_apphttpclientdemo1_Controls
-  Method:    pOnBluetoothServerSocketConnected
-  Signature: (JLjava/lang/String;Ljava/lang/String;)Z }
-function pOnBluetoothServerSocketConnected(PEnv: PJNIEnv; this: JObject; pasobj: JLong; deviceName: JString; deviceAddress: JString): JBoolean; cdecl;
-begin
-  Result:=Java_Event_pOnBluetoothServerSocketConnected(PEnv,this,TObject(pasobj),deviceName,deviceAddress);
-end;
-
-{ Class:     com_example_apphttpclientdemo1_Controls
-  Method:    pOnBluetoothServerSocketIncomingData
-  Signature: (J[B[B)Z }
-function pOnBluetoothServerSocketIncomingData(PEnv: PJNIEnv; this: JObject; pasobj: JLong; byteArrayContent: JByteArray; byteArrayHeader: JByteArray): JBoolean; cdecl;
-begin
-  Result:=Java_Event_pOnBluetoothServerSocketIncomingData(PEnv,this,TObject(pasobj),byteArrayContent,byteArrayHeader);
-end;
-
-{ Class:     com_example_apphttpclientdemo1_Controls
-  Method:    pOnBluetoothServerSocketListen
-  Signature: (JLjava/lang/String;Ljava/lang/String;)V }
-procedure pOnBluetoothServerSocketListen(PEnv: PJNIEnv; this: JObject; pasobj: JLong; serverName: JString; strUUID: JString); cdecl;
-begin
-  Java_Event_pOnBluetoothServerSocketListen(PEnv,this,TObject(pasobj),serverName,strUUID);
-end;
-
-{ Class:     com_example_apphttpclientdemo1_Controls
-  Method:    pOnBluetoothServerSocketAcceptTimeout
-  Signature: (J)V }
-procedure pOnBluetoothServerSocketAcceptTimeout(PEnv: PJNIEnv; this: JObject; pasobj: JLong); cdecl;
-begin
-  Java_Event_pOnBluetoothServerSocketAcceptTimeout(PEnv,this,TObject(pasobj));
-end;
-
-{ Class:     com_example_apphttpclientdemo1_Controls
-  Method:    pOnSpinnerItemSeleceted
-  Signature: (JILjava/lang/String;)V }
-procedure pOnSpinnerItemSeleceted(PEnv: PJNIEnv; this: JObject; pasobj: JLong; position: JInt; caption: JString); cdecl;
-begin
-  Java_Event_pOnSpinnerItemSeleceted(PEnv,this,TObject(pasobj),position,caption);
-end;
-
-{ Class:     com_example_apphttpclientdemo1_Controls
-  Method:    pOnLocationChanged
-  Signature: (JDDDLjava/lang/String;)V }
-procedure pOnLocationChanged(PEnv: PJNIEnv; this: JObject; pasobj: JLong; latitude: JDouble; longitude: JDouble; altitude: JDouble; address: JString); cdecl;
-begin
-  Java_Event_pOnLocationChanged(PEnv,this,TObject(pasobj),latitude,longitude,altitude,address);
-end;
-
-{ Class:     com_example_apphttpclientdemo1_Controls
-  Method:    pOnLocationStatusChanged
-  Signature: (JILjava/lang/String;Ljava/lang/String;)V }
-procedure pOnLocationStatusChanged(PEnv: PJNIEnv; this: JObject; pasobj: JLong; status: JInt; provider: JString; msgStatus: JString); cdecl;
-begin
-  Java_Event_pOnLocationStatusChanged(PEnv,this,TObject(pasobj),status,provider,msgStatus);
-end;
-
-{ Class:     com_example_apphttpclientdemo1_Controls
-  Method:    pOnLocationProviderEnabled
-  Signature: (JLjava/lang/String;)V }
-procedure pOnLocationProviderEnabled(PEnv: PJNIEnv; this: JObject; pasobj: JLong; provider: JString); cdecl;
-begin
-  Java_Event_pOnLocationProviderEnabled(PEnv,this,TObject(pasobj),provider);
-end;
-
-{ Class:     com_example_apphttpclientdemo1_Controls
-  Method:    pOnLocationProviderDisabled
-  Signature: (JLjava/lang/String;)V }
-procedure pOnLocationProviderDisabled(PEnv: PJNIEnv; this: JObject; pasobj: JLong; provider: JString); cdecl;
-begin
-  Java_Event_pOnLocationProviderDisabled(PEnv,this,TObject(pasobj),provider);
 end;
 
 { Class:     com_example_apphttpclientdemo1_Controls
@@ -472,134 +248,6 @@ begin
 end;
 
 { Class:     com_example_apphttpclientdemo1_Controls
-  Method:    pOnActionBarTabSelected
-  Signature: (JLandroid/view/View;Ljava/lang/String;)V }
-procedure pOnActionBarTabSelected(PEnv: PJNIEnv; this: JObject; pasobj: JLong; view: JObject; title: JString); cdecl;
-begin
-  Java_Event_pOnActionBarTabSelected(PEnv,this,TObject(pasobj),view,title);
-end;
-
-{ Class:     com_example_apphttpclientdemo1_Controls
-  Method:    pOnActionBarTabUnSelected
-  Signature: (JLandroid/view/View;Ljava/lang/String;)V }
-procedure pOnActionBarTabUnSelected(PEnv: PJNIEnv; this: JObject; pasobj: JLong; view: JObject; title: JString); cdecl;
-begin
-  Java_Event_pOnActionBarTabUnSelected(PEnv,this,TObject(pasobj),view,title);
-end;
-
-{ Class:     com_example_apphttpclientdemo1_Controls
-  Method:    pOnCustomDialogShow
-  Signature: (JLandroid/app/Dialog;Ljava/lang/String;)V }
-procedure pOnCustomDialogShow(PEnv: PJNIEnv; this: JObject; pasobj: JLong; dialog: JObject; title: JString); cdecl;
-begin
-  Java_Event_pOnCustomDialogShow(PEnv,this,TObject(pasobj),dialog,title);
-end;
-
-{ Class:     com_example_apphttpclientdemo1_Controls
-  Method:    pOnCustomDialogBackKeyPressed
-  Signature: (JLjava/lang/String;)V }
-procedure pOnCustomDialogBackKeyPressed(PEnv: PJNIEnv; this: JObject; pasobj: JLong; title: JString); cdecl;
-begin
-  Java_Event_pOnCustomDialogBackKeyPressed(PEnv,this,TObject(pasobj),title);
-end;
-
-{ Class:     com_example_apphttpclientdemo1_Controls
-  Method:    pOnClickToggleButton
-  Signature: (JZ)V }
-procedure pOnClickToggleButton(PEnv: PJNIEnv; this: JObject; pasobj: JLong; state: JBoolean); cdecl;
-begin
-  Java_Event_pOnClickToggleButton(PEnv,this,TObject(pasobj),Boolean(state));
-end;
-
-{ Class:     com_example_apphttpclientdemo1_Controls
-  Method:    pOnChangeSwitchButton
-  Signature: (JZ)V }
-procedure pOnChangeSwitchButton(PEnv: PJNIEnv; this: JObject; pasobj: JLong; state: JBoolean); cdecl;
-begin
-  Java_Event_pOnChangeSwitchButton(PEnv,this,TObject(pasobj),Boolean(state));
-end;
-
-{ Class:     com_example_apphttpclientdemo1_Controls
-  Method:    pOnClickGridItem
-  Signature: (JILjava/lang/String;)V }
-procedure pOnClickGridItem(PEnv: PJNIEnv; this: JObject; pasobj: JLong; position: JInt; caption: JString); cdecl;
-begin
-  Java_Event_pOnClickGridItem(PEnv,this,TObject(pasobj),position,caption);                            
-end;
-
-{ Class:     com_example_apphttpclientdemo1_Controls
-  Method:    pOnLongClickGridItem
-  Signature: (JILjava/lang/String;)V }
-procedure pOnLongClickGridItem(PEnv: PJNIEnv; this: JObject; pasobj: JLong; position: JInt; caption: JString); cdecl;
-begin
-  Java_Event_pOnLongClickGridItem(PEnv,this,TObject(pasobj),position,caption);
-end;
-
-{ Class:     com_example_apphttpclientdemo1_Controls
-  Method:    pOnGridDrawItemCaptionColor
-  Signature: (JILjava/lang/String;)I }
-function pOnGridDrawItemCaptionColor(PEnv: PJNIEnv; this: JObject; pasobj: JLong; position: JInt; caption: JString): JInt; cdecl;
-begin
-  Result:=Java_Event_pOnGridDrawItemCaptionColor(PEnv,this,TObject(pasobj),position,caption);
-end;
-
-{ Class:     com_example_apphttpclientdemo1_Controls
-  Method:    pOnGridDrawItemBitmap
-  Signature: (JILjava/lang/String;)Landroid/graphics/Bitmap; }
-function pOnGridDrawItemBitmap(PEnv: PJNIEnv; this: JObject; pasobj: JLong; position: JInt; caption: JString): JObject; cdecl;
-begin
-  Result:=Java_Event_pOnGridDrawItemBitmap(PEnv,this,TObject(pasobj),position,caption);
-end;
-
-{ Class:     com_example_apphttpclientdemo1_Controls
-  Method:    pOnChangedSensor
-  Signature: (JLandroid/hardware/Sensor;I[FJ)V }
-procedure pOnChangedSensor(PEnv: PJNIEnv; this: JObject; pasobj: JLong; sensor: JObject; sensorType: JInt; values: JFloatArray; timestamp: JLong); cdecl;
-begin
-  Java_Event_pOnChangedSensor(PEnv,this,TObject(pasobj),sensor,sensorType,values,timestamp);
-end;
-
-{ Class:     com_example_apphttpclientdemo1_Controls
-  Method:    pOnListeningSensor
-  Signature: (JLandroid/hardware/Sensor;I)V }
-procedure pOnListeningSensor(PEnv: PJNIEnv; this: JObject; pasobj: JLong; sensor: JObject; sensorType: JInt); cdecl;
-begin
-  Java_Event_pOnListeningSensor(PEnv,this,TObject(pasobj),sensor,sensorType);
-end;
-
-{ Class:     com_example_apphttpclientdemo1_Controls
-  Method:    pOnUnregisterListeningSensor
-  Signature: (JILjava/lang/String;)V }
-procedure pOnUnregisterListeningSensor(PEnv: PJNIEnv; this: JObject; pasobj: JLong; sensorType: JInt; sensorName: JString); cdecl;
-begin
-  Java_Event_pOnUnregisterListeningSensor(PEnv,this,TObject(pasobj),sensorType,sensorName);
-end;
-
-{ Class:     com_example_apphttpclientdemo1_Controls
-  Method:    pOnBroadcastReceiver
-  Signature: (JLandroid/content/Intent;)V }
-procedure pOnBroadcastReceiver(PEnv: PJNIEnv; this: JObject; pasobj: JLong; intent: JObject); cdecl;
-begin
-  Java_Event_pOnBroadcastReceiver(PEnv,this,TObject(pasobj),intent);
-end;
-
-{ Class:     com_example_apphttpclientdemo1_Controls
-  Method:    pOnTimePicker
-  Signature: (JII)V }
-procedure pOnTimePicker(PEnv: PJNIEnv; this: JObject; pasobj: JLong; hourOfDay: JInt; minute: JInt); cdecl;
-begin
-  Java_Event_pOnTimePicker(PEnv,this,TObject(pasobj),hourOfDay,minute);
-end;
-
-{ Class:     com_example_apphttpclientdemo1_Controls
-  Method:    pOnDatePicker
-  Signature: (JIII)V }
-procedure pOnDatePicker(PEnv: PJNIEnv; this: JObject; pasobj: JLong; year: JInt; monthOfYear: JInt; dayOfMonth: JInt); cdecl;
-begin
-  Java_Event_pOnDatePicker(PEnv,this,TObject(pasobj),year,monthOfYear,dayOfMonth);
-end;
-
-{ Class:     com_example_apphttpclientdemo1_Controls
   Method:    pOnFlingGestureDetected
   Signature: (JI)V }
 procedure pOnFlingGestureDetected(PEnv: PJNIEnv; this: JObject; pasobj: JLong; direction: JInt); cdecl;
@@ -613,30 +261,6 @@ end;
 procedure pOnPinchZoomGestureDetected(PEnv: PJNIEnv; this: JObject; pasobj: JLong; scaleFactor: JFloat; state: JInt); cdecl;
 begin
   Java_Event_pOnPinchZoomGestureDetected(PEnv,this,TObject(pasobj),scaleFactor,state);
-end;
-
-{ Class:     com_example_apphttpclientdemo1_Controls
-  Method:    pOnShellCommandExecuted
-  Signature: (JLjava/lang/String;)V }
-procedure pOnShellCommandExecuted(PEnv: PJNIEnv; this: JObject; pasobj: JLong; cmdResult: JString); cdecl;
-begin
-  Java_Event_pOnShellCommandExecuted(PEnv,this,TObject(pasobj),cmdResult);
-end;
-
-{ Class:     com_example_apphttpclientdemo1_Controls
-  Method:    pOnTCPSocketClientMessageReceived
-  Signature: (J[Ljava/lang/String;)V }
-procedure pOnTCPSocketClientMessageReceived(PEnv: PJNIEnv; this: JObject; pasobj: JLong; messagesReceived: JStringArray); cdecl;
-begin
-  Java_Event_pOnTCPSocketClientMessageReceived(PEnv,this,TObject(pasobj),messagesReceived);
-end;
-
-{ Class:     com_example_apphttpclientdemo1_Controls
-  Method:    pOnTCPSocketClientConnected
-  Signature: (J)V }
-procedure pOnTCPSocketClientConnected(PEnv: PJNIEnv; this: JObject; pasobj: JLong); cdecl;
-begin
-  Java_Event_pOnTCPSocketClientConnected(PEnv,this,TObject(pasobj));
 end;
 
 { Class:     com_example_apphttpclientdemo1_Controls
@@ -656,148 +280,20 @@ begin
 end;
 
 { Class:     com_example_apphttpclientdemo1_Controls
-  Method:    pOnSurfaceViewCreated
-  Signature: (JLandroid/view/SurfaceHolder;)V }
-procedure pOnSurfaceViewCreated(PEnv: PJNIEnv; this: JObject; pasobj: JLong; surfaceHolder: JObject); cdecl;
+  Method:    pOnWebViewStatus
+  Signature: (JILjava/lang/String;)I }
+function pOnWebViewStatus(PEnv: PJNIEnv; this: JObject; pasobj: JLong; EventType: JInt; url: JString): JInt; cdecl;
 begin
-  Java_Event_pOnSurfaceViewCreated(PEnv,this,TObject(pasobj),surfaceHolder);
+  Result:=Java_Event_pOnWebViewStatus(PEnv,this,TObject(pasobj),EventType,url);
 end;
 
-{ Class:     com_example_apphttpclientdemo1_Controls
-  Method:    pOnSurfaceViewDraw
-  Signature: (JLandroid/graphics/Canvas;)V }
-procedure pOnSurfaceViewDraw(PEnv: PJNIEnv; this: JObject; pasobj: JLong; canvas: JObject); cdecl;
-begin
-  Java_Event_pOnSurfaceViewDraw(PEnv,this,TObject(pasobj),canvas);
-end;
-
-{ Class:     com_example_apphttpclientdemo1_Controls
-  Method:    pOnSurfaceViewChanged
-  Signature: (JII)V }
-procedure pOnSurfaceViewChanged(PEnv: PJNIEnv; this: JObject; pasobj: JLong; width: JInt; height: JInt); cdecl;
-begin
-  Java_Event_pOnSurfaceViewChanged(PEnv,this,TObject(pasobj),width,height);                                             
-end;
-
-{ Class:     com_example_apphttpclientdemo1_Controls
-  Method:    pOnMediaPlayerPrepared
-  Signature: (JII)V }
-procedure pOnMediaPlayerPrepared(PEnv: PJNIEnv; this: JObject; pasobj: JLong; videoWidth: JInt; videoHeigh: JInt); cdecl;
-begin
-  Java_Event_pOnMediaPlayerPrepared(PEnv,this,TObject(pasobj),videoWidth,videoHeigh);
-end;
-
-{ Class:     com_example_apphttpclientdemo1_Controls
-  Method:    pOnMediaPlayerVideoSizeChanged
-  Signature: (JII)V }
-procedure pOnMediaPlayerVideoSizeChanged(PEnv: PJNIEnv; this: JObject; pasobj: JLong; videoWidth: JInt; videoHeight: JInt); cdecl;
-begin
-  Java_Event_pOnMediaPlayerVideoSizeChanged(PEnv,this,TObject(pasobj),videoWidth,videoHeight);
-end;
-
-{ Class:     com_example_apphttpclientdemo1_Controls
-  Method:    pOnMediaPlayerCompletion
-  Signature: (J)V }
-procedure pOnMediaPlayerCompletion(PEnv: PJNIEnv; this: JObject; pasobj: JLong); cdecl;
-begin
-  Java_Event_pOnMediaPlayerCompletion(PEnv,this,TObject(pasobj));
-end;
-
-{ Class:     com_example_apphttpclientdemo1_Controls
-  Method:    pOnMediaPlayerTimedText
-  Signature: (JLjava/lang/String;)V }
-procedure pOnMediaPlayerTimedText(PEnv: PJNIEnv; this: JObject; pasobj: JLong; timedText: JString); cdecl;
-begin
-  Java_Event_pOnMediaPlayerTimedText(PEnv,this,TObject(pasobj),timedText);
-end;
-
-{ Class:     com_example_apphttpclientdemo1_Controls
-  Method:    pOnSurfaceViewTouch
-  Signature: (JIIFFFF)V }
-procedure pOnSurfaceViewTouch(PEnv: PJNIEnv; this: JObject; pasobj: JLong; act: JInt; cnt: JInt; x1: JFloat; y1: JFloat; x2: JFloat; y2: JFloat); cdecl;
-begin
-  Java_Event_pOnSurfaceViewTouch(PEnv,this,TObject(pasobj),act,cnt,x1,y1,x2,y2);
-end;
-
-{ Class:     com_example_apphttpclientdemo1_Controls
-  Method:    pOnSurfaceViewDrawingInBackground
-  Signature: (JF)Z }
-function pOnSurfaceViewDrawingInBackground(PEnv: PJNIEnv; this: JObject; pasobj: JLong; progress: JFloat): JBoolean; cdecl;
-begin
-  Result:=Java_Event_pOnSurfaceViewDrawingInBackground(PEnv,this,TObject(pasobj),progress);
-end;
-
-{ Class:     com_example_apphttpclientdemo1_Controls
-  Method:    pOnSurfaceViewDrawingPostExecute
-  Signature: (JF)V }
-procedure pOnSurfaceViewDrawingPostExecute(PEnv: PJNIEnv; this: JObject; pasobj: JLong; progress: JFloat); cdecl;
-begin
-  Java_Event_pOnSurfaceViewDrawingPostExecute(PEnv,this,TObject(pasobj),progress);
-end;
-
-{ Class:     com_example_apphttpclientdemo1_Controls
-  Method:    pOnContactManagerContactsExecuted
-  Signature: (JI)V }
-procedure pOnContactManagerContactsExecuted(PEnv: PJNIEnv; this: JObject; pasobj: JLong; count: JInt); cdecl;
-begin
-  Java_Event_pOnContactManagerContactsExecuted(PEnv,this,TObject(pasobj),count);
-end;
-
-{ Class:     com_example_apphttpclientdemo1_Controls
-  Method:    pOnContactManagerContactsProgress
-  Signature: (JLjava/lang/String;Ljava/lang/String;Ljava/lang/String;Landroid/graphics/Bitmap;I)Z }
-function pOnContactManagerContactsProgress(PEnv: PJNIEnv; this: JObject; pasobj: JLong; contactInfo: JString; contactShortInfo: JString; contactPhotoUriAsString: JString; contactPhoto: JObject; progress: JInt): JBoolean; cdecl;
-begin
-  Result:=Java_Event_pOnContactManagerContactsProgress(PEnv,this,TObject(pasobj),contactInfo,contactShortInfo,contactPhotoUriAsString,contactPhoto,progress);
-end;
-
-{ Class:     com_example_apphttpclientdemo1_Controls
-  Method:    pOnSeekBarProgressChanged
-  Signature: (JIZ)V }
-procedure pOnSeekBarProgressChanged(PEnv: PJNIEnv; this: JObject; pasobj: JLong; progress: JInt; fromUser: JBoolean); cdecl;
-begin
-  Java_Event_pOnSeekBarProgressChanged(PEnv,this,TObject(pasobj),progress,Boolean(fromUser));
-end;
-
-{ Class:     com_example_apphttpclientdemo1_Controls
-  Method:    pOnSeekBarStartTrackingTouch
-  Signature: (JI)V }
-procedure pOnSeekBarStartTrackingTouch(PEnv: PJNIEnv; this: JObject; pasobj: JLong; progress: JInt); cdecl;
-begin
-  Java_Event_pOnSeekBarStartTrackingTouch(PEnv,this,TObject(pasobj),progress);
-end;
-
-{ Class:     com_example_apphttpclientdemo1_Controls
-  Method:    pOnSeekBarStopTrackingTouch
-  Signature: (JI)V }
-procedure pOnSeekBarStopTrackingTouch(PEnv: PJNIEnv; this: JObject; pasobj: JLong; progress: JInt); cdecl;
-begin
-  Java_Event_pOnSeekBarStopTrackingTouch(PEnv,this,TObject(pasobj),progress);
-end;
-
-{ Class:     com_example_apphttpclientdemo1_Controls
-  Method:    pOnRatingBarChanged
-  Signature: (JF)V }
-procedure pOnRatingBarChanged(PEnv: PJNIEnv; this: JObject; pasobj: JLong; rating: JFloat); cdecl;
-begin
-  Java_Event_pOnRatingBarChanged(PEnv,this,TObject(pasobj),rating);
-end;
-
-{ Class:     com_example_apphttpclientdemo1_Controls
-  Method:    pRadioGroupCheckedChanged
-  Signature: (JILjava/lang/String;)V }
-procedure pRadioGroupCheckedChanged(PEnv: PJNIEnv; this: JObject; pasobj: JLong; checkedIndex: JInt; checkedCaption: JString); cdecl;
-begin
-  Java_Event_pRadioGroupCheckedChanged(PEnv,this,TObject(pasobj),checkedIndex,checkedCaption);
-end;
-
-const NativeMethods:array[0..97] of JNINativeMethod = (
-   (name:'pAppOnScreenStyle';
-    signature:'()I';
-    fnPtr:@pAppOnScreenStyle;),
+const NativeMethods:array[0..34] of JNINativeMethod = (
    (name:'pAppOnCreate';
     signature:'(Landroid/content/Context;Landroid/widget/RelativeLayout;)V';
     fnPtr:@pAppOnCreate;),
+   (name:'pAppOnScreenStyle';
+    signature:'()I';
+    fnPtr:@pAppOnScreenStyle;),
    (name:'pAppOnNewIntent';
     signature:'()V';
     fnPtr:@pAppOnNewIntent;),
@@ -849,6 +345,18 @@ const NativeMethods:array[0..97] of JNINativeMethod = (
    (name:'pAppOnClickContextMenuItem';
     signature:'(Landroid/view/MenuItem;ILjava/lang/String;Z)V';
     fnPtr:@pAppOnClickContextMenuItem;),
+   (name:'pOnDraw';
+    signature:'(JLandroid/graphics/Canvas;)V';
+    fnPtr:@pOnDraw;),
+   (name:'pOnTouch';
+    signature:'(JIIFFFF)V';
+    fnPtr:@pOnTouch;),
+   (name:'pOnClickGeneric';
+    signature:'(JI)V';
+    fnPtr:@pOnClickGeneric;),
+   (name:'pAppOnSpecialKeyDown';
+    signature:'(CILjava/lang/String;)Z';
+    fnPtr:@pAppOnSpecialKeyDown;),
    (name:'pOnClick';
     signature:'(JI)V';
     fnPtr:@pOnClick;),
@@ -861,231 +369,30 @@ const NativeMethods:array[0..97] of JNINativeMethod = (
    (name:'pOnEnter';
     signature:'(J)V';
     fnPtr:@pOnEnter;),
-   (name:'pOnTimer';
-    signature:'(J)V';
-    fnPtr:@pOnTimer;),
-   (name:'pOnDraw';
-    signature:'(JLandroid/graphics/Canvas;)V';
-    fnPtr:@pOnDraw;),
-   (name:'pOnTouch';
-    signature:'(JIIFFFF)V';
-    fnPtr:@pOnTouch;),
-   (name:'pOnGLRenderer';
-    signature:'(JIII)V';
-    fnPtr:@pOnGLRenderer;),
    (name:'pOnClose';
     signature:'(J)V';
     fnPtr:@pOnClose;),
-   (name:'pOnWebViewStatus';
-    signature:'(JILjava/lang/String;)I';
-    fnPtr:@pOnWebViewStatus;),
-   (name:'pOnAsyncEventDoInBackground';
-    signature:'(JI)Z';
-    fnPtr:@pOnAsyncEventDoInBackground;),
-   (name:'pOnAsyncEventProgressUpdate';
-    signature:'(JI)I';
-    fnPtr:@pOnAsyncEventProgressUpdate;),
-   (name:'pOnAsyncEventPreExecute';
-    signature:'(J)I';
-    fnPtr:@pOnAsyncEventPreExecute;),
-   (name:'pOnAsyncEventPostExecute';
-    signature:'(JI)V';
-    fnPtr:@pOnAsyncEventPostExecute;),
-   (name:'pOnClickWidgetItem';
-    signature:'(JIZ)V';
-    fnPtr:@pOnClickWidgetItem;),
-   (name:'pOnClickCaptionItem';
-    signature:'(JILjava/lang/String;)V';
-    fnPtr:@pOnClickCaptionItem;),
-   (name:'pOnListViewLongClickCaptionItem';
-    signature:'(JILjava/lang/String;)V';
-    fnPtr:@pOnListViewLongClickCaptionItem;),
-   (name:'pOnListViewDrawItemCaptionColor';
-    signature:'(JILjava/lang/String;)I';
-    fnPtr:@pOnListViewDrawItemCaptionColor;),
-   (name:'pOnListViewDrawItemBitmap';
-    signature:'(JILjava/lang/String;)Landroid/graphics/Bitmap;';
-    fnPtr:@pOnListViewDrawItemBitmap;),
-   (name:'pOnBluetoothEnabled';
-    signature:'(J)V';
-    fnPtr:@pOnBluetoothEnabled;),
-   (name:'pOnBluetoothDisabled';
-    signature:'(J)V';
-    fnPtr:@pOnBluetoothDisabled;),
-   (name:'pOnBluetoothDeviceFound';
-    signature:'(JLjava/lang/String;Ljava/lang/String;)V';
-    fnPtr:@pOnBluetoothDeviceFound;),
-   (name:'pOnBluetoothDiscoveryStarted';
-    signature:'(J)V';
-    fnPtr:@pOnBluetoothDiscoveryStarted;),
-   (name:'pOnBluetoothDiscoveryFinished';
-    signature:'(JII)V';
-    fnPtr:@pOnBluetoothDiscoveryFinished;),
-   (name:'pOnBluetoothDeviceBondStateChanged';
-    signature:'(JILjava/lang/String;Ljava/lang/String;)V';
-    fnPtr:@pOnBluetoothDeviceBondStateChanged;),
-   (name:'pOnBluetoothClientSocketConnected';
-    signature:'(JLjava/lang/String;Ljava/lang/String;)V';
-    fnPtr:@pOnBluetoothClientSocketConnected;),
-   (name:'pOnBluetoothClientSocketIncomingData';
-    signature:'(J[B[B)V';
-    fnPtr:@pOnBluetoothClientSocketIncomingData;),
-   (name:'pOnBluetoothClientSocketDisconnected';
-    signature:'(J)V';
-    fnPtr:@pOnBluetoothClientSocketDisconnected;),
-   (name:'pOnBluetoothServerSocketConnected';
-    signature:'(JLjava/lang/String;Ljava/lang/String;)Z';
-    fnPtr:@pOnBluetoothServerSocketConnected;),
-   (name:'pOnBluetoothServerSocketIncomingData';
-    signature:'(J[B[B)Z';
-    fnPtr:@pOnBluetoothServerSocketIncomingData;),
-   (name:'pOnBluetoothServerSocketListen';
-    signature:'(JLjava/lang/String;Ljava/lang/String;)V';
-    fnPtr:@pOnBluetoothServerSocketListen;),
-   (name:'pOnBluetoothServerSocketAcceptTimeout';
-    signature:'(J)V';
-    fnPtr:@pOnBluetoothServerSocketAcceptTimeout;),
-   (name:'pOnSpinnerItemSeleceted';
-    signature:'(JILjava/lang/String;)V';
-    fnPtr:@pOnSpinnerItemSeleceted;),
-   (name:'pOnLocationChanged';
-    signature:'(JDDDLjava/lang/String;)V';
-    fnPtr:@pOnLocationChanged;),
-   (name:'pOnLocationStatusChanged';
-    signature:'(JILjava/lang/String;Ljava/lang/String;)V';
-    fnPtr:@pOnLocationStatusChanged;),
-   (name:'pOnLocationProviderEnabled';
-    signature:'(JLjava/lang/String;)V';
-    fnPtr:@pOnLocationProviderEnabled;),
-   (name:'pOnLocationProviderDisabled';
-    signature:'(JLjava/lang/String;)V';
-    fnPtr:@pOnLocationProviderDisabled;),
    (name:'pAppOnViewClick';
     signature:'(Landroid/view/View;I)V';
     fnPtr:@pAppOnViewClick;),
    (name:'pAppOnListItemClick';
     signature:'(Landroid/widget/AdapterView;Landroid/view/View;II)V';
     fnPtr:@pAppOnListItemClick;),
-   (name:'pOnActionBarTabSelected';
-    signature:'(JLandroid/view/View;Ljava/lang/String;)V';
-    fnPtr:@pOnActionBarTabSelected;),
-   (name:'pOnActionBarTabUnSelected';
-    signature:'(JLandroid/view/View;Ljava/lang/String;)V';
-    fnPtr:@pOnActionBarTabUnSelected;),
-   (name:'pOnCustomDialogShow';
-    signature:'(JLandroid/app/Dialog;Ljava/lang/String;)V';
-    fnPtr:@pOnCustomDialogShow;),
-   (name:'pOnCustomDialogBackKeyPressed';
-    signature:'(JLjava/lang/String;)V';
-    fnPtr:@pOnCustomDialogBackKeyPressed;),
-   (name:'pOnClickToggleButton';
-    signature:'(JZ)V';
-    fnPtr:@pOnClickToggleButton;),
-   (name:'pOnChangeSwitchButton';
-    signature:'(JZ)V';
-    fnPtr:@pOnChangeSwitchButton;),
-   (name:'pOnClickGridItem';
-    signature:'(JILjava/lang/String;)V';
-    fnPtr:@pOnClickGridItem;),
-   (name:'pOnLongClickGridItem';
-    signature:'(JILjava/lang/String;)V';
-    fnPtr:@pOnLongClickGridItem;),
-   (name:'pOnGridDrawItemCaptionColor';
-    signature:'(JILjava/lang/String;)I';
-    fnPtr:@pOnGridDrawItemCaptionColor;),
-   (name:'pOnGridDrawItemBitmap';
-    signature:'(JILjava/lang/String;)Landroid/graphics/Bitmap;';
-    fnPtr:@pOnGridDrawItemBitmap;),
-   (name:'pOnChangedSensor';
-    signature:'(JLandroid/hardware/Sensor;I[FJ)V';
-    fnPtr:@pOnChangedSensor;),
-   (name:'pOnListeningSensor';
-    signature:'(JLandroid/hardware/Sensor;I)V';
-    fnPtr:@pOnListeningSensor;),
-   (name:'pOnUnregisterListeningSensor';
-    signature:'(JILjava/lang/String;)V';
-    fnPtr:@pOnUnregisterListeningSensor;),
-   (name:'pOnBroadcastReceiver';
-    signature:'(JLandroid/content/Intent;)V';
-    fnPtr:@pOnBroadcastReceiver;),
-   (name:'pOnTimePicker';
-    signature:'(JII)V';
-    fnPtr:@pOnTimePicker;),
-   (name:'pOnDatePicker';
-    signature:'(JIII)V';
-    fnPtr:@pOnDatePicker;),
    (name:'pOnFlingGestureDetected';
     signature:'(JI)V';
     fnPtr:@pOnFlingGestureDetected;),
    (name:'pOnPinchZoomGestureDetected';
     signature:'(JFI)V';
     fnPtr:@pOnPinchZoomGestureDetected;),
-   (name:'pOnShellCommandExecuted';
-    signature:'(JLjava/lang/String;)V';
-    fnPtr:@pOnShellCommandExecuted;),
-   (name:'pOnTCPSocketClientMessageReceived';
-    signature:'(J[Ljava/lang/String;)V';
-    fnPtr:@pOnTCPSocketClientMessageReceived;),
-   (name:'pOnTCPSocketClientConnected';
-    signature:'(J)V';
-    fnPtr:@pOnTCPSocketClientConnected;),
    (name:'pOnHttpClientContentResult';
     signature:'(JLjava/lang/String;)V';
     fnPtr:@pOnHttpClientContentResult;),
    (name:'pOnHttpClientCodeResult';
     signature:'(JI)V';
     fnPtr:@pOnHttpClientCodeResult;),
-   (name:'pOnSurfaceViewCreated';
-    signature:'(JLandroid/view/SurfaceHolder;)V';
-    fnPtr:@pOnSurfaceViewCreated;),
-   (name:'pOnSurfaceViewDraw';
-    signature:'(JLandroid/graphics/Canvas;)V';
-    fnPtr:@pOnSurfaceViewDraw;),
-   (name:'pOnSurfaceViewChanged';
-    signature:'(JII)V';
-    fnPtr:@pOnSurfaceViewChanged;),
-   (name:'pOnMediaPlayerPrepared';
-    signature:'(JII)V';
-    fnPtr:@pOnMediaPlayerPrepared;),
-   (name:'pOnMediaPlayerVideoSizeChanged';
-    signature:'(JII)V';
-    fnPtr:@pOnMediaPlayerVideoSizeChanged;),
-   (name:'pOnMediaPlayerCompletion';
-    signature:'(J)V';
-    fnPtr:@pOnMediaPlayerCompletion;),
-   (name:'pOnMediaPlayerTimedText';
-    signature:'(JLjava/lang/String;)V';
-    fnPtr:@pOnMediaPlayerTimedText;),
-   (name:'pOnSurfaceViewTouch';
-    signature:'(JIIFFFF)V';
-    fnPtr:@pOnSurfaceViewTouch;),
-   (name:'pOnSurfaceViewDrawingInBackground';
-    signature:'(JF)Z';
-    fnPtr:@pOnSurfaceViewDrawingInBackground;),
-   (name:'pOnSurfaceViewDrawingPostExecute';
-    signature:'(JF)V';
-    fnPtr:@pOnSurfaceViewDrawingPostExecute;),
-   (name:'pOnContactManagerContactsExecuted';
-    signature:'(JI)V';
-    fnPtr:@pOnContactManagerContactsExecuted;),
-   (name:'pOnContactManagerContactsProgress';
-    signature:'(JLjava/lang/String;Ljava/lang/String;Ljava/lang/String;Landroid/graphics/Bitmap;I)Z';
-    fnPtr:@pOnContactManagerContactsProgress;),
-   (name:'pOnSeekBarProgressChanged';
-    signature:'(JIZ)V';
-    fnPtr:@pOnSeekBarProgressChanged;),
-   (name:'pOnSeekBarStartTrackingTouch';
-    signature:'(JI)V';
-    fnPtr:@pOnSeekBarStartTrackingTouch;),
-   (name:'pOnSeekBarStopTrackingTouch';
-    signature:'(JI)V';
-    fnPtr:@pOnSeekBarStopTrackingTouch;),
-   (name:'pOnRatingBarChanged';
-    signature:'(JF)V';
-    fnPtr:@pOnRatingBarChanged;),
-   (name:'pRadioGroupCheckedChanged';
-    signature:'(JILjava/lang/String;)V';
-    fnPtr:@pRadioGroupCheckedChanged;)
+   (name:'pOnWebViewStatus';
+    signature:'(JILjava/lang/String;)I';
+    fnPtr:@pOnWebViewStatus;)
 );
 
 function RegisterNativeMethodsArray(PEnv: PJNIEnv; className: PChar; methods: PJNINativeMethod; countMethods:integer):integer;
@@ -1142,8 +449,8 @@ end;
 exports
   JNI_OnLoad name 'JNI_OnLoad',
   JNI_OnUnload name 'JNI_OnUnload',
-  pAppOnScreenStyle name 'Java_com_example_apphttpclientdemo1_Controls_pAppOnScreenStyle',
   pAppOnCreate name 'Java_com_example_apphttpclientdemo1_Controls_pAppOnCreate',
+  pAppOnScreenStyle name 'Java_com_example_apphttpclientdemo1_Controls_pAppOnScreenStyle',
   pAppOnNewIntent name 'Java_com_example_apphttpclientdemo1_Controls_pAppOnNewIntent',
   pAppOnDestroy name 'Java_com_example_apphttpclientdemo1_Controls_pAppOnDestroy',
   pAppOnPause name 'Java_com_example_apphttpclientdemo1_Controls_pAppOnPause',
@@ -1161,85 +468,22 @@ exports
   pAppOnPrepareOptionsMenuItem name 'Java_com_example_apphttpclientdemo1_Controls_pAppOnPrepareOptionsMenuItem',
   pAppOnCreateContextMenu name 'Java_com_example_apphttpclientdemo1_Controls_pAppOnCreateContextMenu',
   pAppOnClickContextMenuItem name 'Java_com_example_apphttpclientdemo1_Controls_pAppOnClickContextMenuItem',
+  pOnDraw name 'Java_com_example_apphttpclientdemo1_Controls_pOnDraw',
+  pOnTouch name 'Java_com_example_apphttpclientdemo1_Controls_pOnTouch',
+  pOnClickGeneric name 'Java_com_example_apphttpclientdemo1_Controls_pOnClickGeneric',
+  pAppOnSpecialKeyDown name 'Java_com_example_apphttpclientdemo1_Controls_pAppOnSpecialKeyDown',
   pOnClick name 'Java_com_example_apphttpclientdemo1_Controls_pOnClick',
   pOnChange name 'Java_com_example_apphttpclientdemo1_Controls_pOnChange',
   pOnChanged name 'Java_com_example_apphttpclientdemo1_Controls_pOnChanged',
   pOnEnter name 'Java_com_example_apphttpclientdemo1_Controls_pOnEnter',
-  pOnTimer name 'Java_com_example_apphttpclientdemo1_Controls_pOnTimer',
-  pOnDraw name 'Java_com_example_apphttpclientdemo1_Controls_pOnDraw',
-  pOnTouch name 'Java_com_example_apphttpclientdemo1_Controls_pOnTouch',
-  pOnGLRenderer name 'Java_com_example_apphttpclientdemo1_Controls_pOnGLRenderer',
   pOnClose name 'Java_com_example_apphttpclientdemo1_Controls_pOnClose',
-  pOnWebViewStatus name 'Java_com_example_apphttpclientdemo1_Controls_pOnWebViewStatus',
-  pOnAsyncEventDoInBackground name 'Java_com_example_apphttpclientdemo1_Controls_pOnAsyncEventDoInBackground',
-  pOnAsyncEventProgressUpdate name 'Java_com_example_apphttpclientdemo1_Controls_pOnAsyncEventProgressUpdate',
-  pOnAsyncEventPreExecute name 'Java_com_example_apphttpclientdemo1_Controls_pOnAsyncEventPreExecute',
-  pOnAsyncEventPostExecute name 'Java_com_example_apphttpclientdemo1_Controls_pOnAsyncEventPostExecute',
-  pOnClickWidgetItem name 'Java_com_example_apphttpclientdemo1_Controls_pOnClickWidgetItem',
-  pOnClickCaptionItem name 'Java_com_example_apphttpclientdemo1_Controls_pOnClickCaptionItem',
-  pOnListViewLongClickCaptionItem name 'Java_com_example_apphttpclientdemo1_Controls_pOnListViewLongClickCaptionItem',
-  pOnListViewDrawItemCaptionColor name 'Java_com_example_apphttpclientdemo1_Controls_pOnListViewDrawItemCaptionColor',
-  pOnListViewDrawItemBitmap name 'Java_com_example_apphttpclientdemo1_Controls_pOnListViewDrawItemBitmap',
-  pOnBluetoothEnabled name 'Java_com_example_apphttpclientdemo1_Controls_pOnBluetoothEnabled',
-  pOnBluetoothDisabled name 'Java_com_example_apphttpclientdemo1_Controls_pOnBluetoothDisabled',
-  pOnBluetoothDeviceFound name 'Java_com_example_apphttpclientdemo1_Controls_pOnBluetoothDeviceFound',
-  pOnBluetoothDiscoveryStarted name 'Java_com_example_apphttpclientdemo1_Controls_pOnBluetoothDiscoveryStarted',
-  pOnBluetoothDiscoveryFinished name 'Java_com_example_apphttpclientdemo1_Controls_pOnBluetoothDiscoveryFinished',
-  pOnBluetoothDeviceBondStateChanged name 'Java_com_example_apphttpclientdemo1_Controls_pOnBluetoothDeviceBondStateChanged',
-  pOnBluetoothClientSocketConnected name 'Java_com_example_apphttpclientdemo1_Controls_pOnBluetoothClientSocketConnected',
-  pOnBluetoothClientSocketIncomingData name 'Java_com_example_apphttpclientdemo1_Controls_pOnBluetoothClientSocketIncomingData',
-  pOnBluetoothClientSocketDisconnected name 'Java_com_example_apphttpclientdemo1_Controls_pOnBluetoothClientSocketDisconnected',
-  pOnBluetoothServerSocketConnected name 'Java_com_example_apphttpclientdemo1_Controls_pOnBluetoothServerSocketConnected',
-  pOnBluetoothServerSocketIncomingData name 'Java_com_example_apphttpclientdemo1_Controls_pOnBluetoothServerSocketIncomingData',
-  pOnBluetoothServerSocketListen name 'Java_com_example_apphttpclientdemo1_Controls_pOnBluetoothServerSocketListen',
-  pOnBluetoothServerSocketAcceptTimeout name 'Java_com_example_apphttpclientdemo1_Controls_pOnBluetoothServerSocketAcceptTimeout',
-  pOnSpinnerItemSeleceted name 'Java_com_example_apphttpclientdemo1_Controls_pOnSpinnerItemSeleceted',
-  pOnLocationChanged name 'Java_com_example_apphttpclientdemo1_Controls_pOnLocationChanged',
-  pOnLocationStatusChanged name 'Java_com_example_apphttpclientdemo1_Controls_pOnLocationStatusChanged',
-  pOnLocationProviderEnabled name 'Java_com_example_apphttpclientdemo1_Controls_pOnLocationProviderEnabled',
-  pOnLocationProviderDisabled name 'Java_com_example_apphttpclientdemo1_Controls_pOnLocationProviderDisabled',
   pAppOnViewClick name 'Java_com_example_apphttpclientdemo1_Controls_pAppOnViewClick',
   pAppOnListItemClick name 'Java_com_example_apphttpclientdemo1_Controls_pAppOnListItemClick',
-  pOnActionBarTabSelected name 'Java_com_example_apphttpclientdemo1_Controls_pOnActionBarTabSelected',
-  pOnActionBarTabUnSelected name 'Java_com_example_apphttpclientdemo1_Controls_pOnActionBarTabUnSelected',
-  pOnCustomDialogShow name 'Java_com_example_apphttpclientdemo1_Controls_pOnCustomDialogShow',
-  pOnCustomDialogBackKeyPressed name 'Java_com_example_apphttpclientdemo1_Controls_pOnCustomDialogBackKeyPressed',
-  pOnClickToggleButton name 'Java_com_example_apphttpclientdemo1_Controls_pOnClickToggleButton',
-  pOnChangeSwitchButton name 'Java_com_example_apphttpclientdemo1_Controls_pOnChangeSwitchButton',
-  pOnClickGridItem name 'Java_com_example_apphttpclientdemo1_Controls_pOnClickGridItem',
-  pOnLongClickGridItem name 'Java_com_example_apphttpclientdemo1_Controls_pOnLongClickGridItem',
-  pOnGridDrawItemCaptionColor name 'Java_com_example_apphttpclientdemo1_Controls_pOnGridDrawItemCaptionColor',
-  pOnGridDrawItemBitmap name 'Java_com_example_apphttpclientdemo1_Controls_pOnGridDrawItemBitmap',
-  pOnChangedSensor name 'Java_com_example_apphttpclientdemo1_Controls_pOnChangedSensor',
-  pOnListeningSensor name 'Java_com_example_apphttpclientdemo1_Controls_pOnListeningSensor',
-  pOnUnregisterListeningSensor name 'Java_com_example_apphttpclientdemo1_Controls_pOnUnregisterListeningSensor',
-  pOnBroadcastReceiver name 'Java_com_example_apphttpclientdemo1_Controls_pOnBroadcastReceiver',
-  pOnTimePicker name 'Java_com_example_apphttpclientdemo1_Controls_pOnTimePicker',
-  pOnDatePicker name 'Java_com_example_apphttpclientdemo1_Controls_pOnDatePicker',
   pOnFlingGestureDetected name 'Java_com_example_apphttpclientdemo1_Controls_pOnFlingGestureDetected',
   pOnPinchZoomGestureDetected name 'Java_com_example_apphttpclientdemo1_Controls_pOnPinchZoomGestureDetected',
-  pOnShellCommandExecuted name 'Java_com_example_apphttpclientdemo1_Controls_pOnShellCommandExecuted',
-  pOnTCPSocketClientMessageReceived name 'Java_com_example_apphttpclientdemo1_Controls_pOnTCPSocketClientMessageReceived',
-  pOnTCPSocketClientConnected name 'Java_com_example_apphttpclientdemo1_Controls_pOnTCPSocketClientConnected',
   pOnHttpClientContentResult name 'Java_com_example_apphttpclientdemo1_Controls_pOnHttpClientContentResult',
   pOnHttpClientCodeResult name 'Java_com_example_apphttpclientdemo1_Controls_pOnHttpClientCodeResult',
-  pOnSurfaceViewCreated name 'Java_com_example_apphttpclientdemo1_Controls_pOnSurfaceViewCreated',
-  pOnSurfaceViewDraw name 'Java_com_example_apphttpclientdemo1_Controls_pOnSurfaceViewDraw',
-  pOnSurfaceViewChanged name 'Java_com_example_apphttpclientdemo1_Controls_pOnSurfaceViewChanged',
-  pOnMediaPlayerPrepared name 'Java_com_example_apphttpclientdemo1_Controls_pOnMediaPlayerPrepared',
-  pOnMediaPlayerVideoSizeChanged name 'Java_com_example_apphttpclientdemo1_Controls_pOnMediaPlayerVideoSizeChanged',
-  pOnMediaPlayerCompletion name 'Java_com_example_apphttpclientdemo1_Controls_pOnMediaPlayerCompletion',
-  pOnMediaPlayerTimedText name 'Java_com_example_apphttpclientdemo1_Controls_pOnMediaPlayerTimedText',
-  pOnSurfaceViewTouch name 'Java_com_example_apphttpclientdemo1_Controls_pOnSurfaceViewTouch',
-  pOnSurfaceViewDrawingInBackground name 'Java_com_example_apphttpclientdemo1_Controls_pOnSurfaceViewDrawingInBackground',
-  pOnSurfaceViewDrawingPostExecute name 'Java_com_example_apphttpclientdemo1_Controls_pOnSurfaceViewDrawingPostExecute',
-  pOnContactManagerContactsExecuted name 'Java_com_example_apphttpclientdemo1_Controls_pOnContactManagerContactsExecuted',
-  pOnContactManagerContactsProgress name 'Java_com_example_apphttpclientdemo1_Controls_pOnContactManagerContactsProgress',
-  pOnSeekBarProgressChanged name 'Java_com_example_apphttpclientdemo1_Controls_pOnSeekBarProgressChanged',
-  pOnSeekBarStartTrackingTouch name 'Java_com_example_apphttpclientdemo1_Controls_pOnSeekBarStartTrackingTouch',
-  pOnSeekBarStopTrackingTouch name 'Java_com_example_apphttpclientdemo1_Controls_pOnSeekBarStopTrackingTouch',
-  pOnRatingBarChanged name 'Java_com_example_apphttpclientdemo1_Controls_pOnRatingBarChanged',
-  pRadioGroupCheckedChanged name 'Java_com_example_apphttpclientdemo1_Controls_pRadioGroupCheckedChanged';
+  pOnWebViewStatus name 'Java_com_example_apphttpclientdemo1_Controls_pOnWebViewStatus';
 
 begin
   gApp:= jApp.Create(nil);{AndroidWidget.pas}
@@ -1251,4 +495,4 @@ begin
   gApp.Initialize;
   gApp.CreateForm(TAndroidModule1, AndroidModule1);
 end.
-(*last [template] upgrade: 4/10/2016 16:15:29*)
+(*last [smart] upgrade: 7/4/2016 0:14:44*)

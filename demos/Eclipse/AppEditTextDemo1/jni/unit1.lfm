@@ -7,6 +7,7 @@ object AndroidModule1: TAndroidModule1
   MarginTop = 0
   MarginRight = 0
   MarginBottom = 0
+  OnDestroy = AndroidModule1Destroy
   Text = 'AndroidModule1'
   ActivityMode = actMain
   BackgroundColor = colbrDefault
@@ -32,12 +33,13 @@ object AndroidModule1: TAndroidModule1
     FontColor = colbrDefault
     FontSize = 0
     TextTypeFace = tfNormal
+    FontSizeUnit = unitDefault
     Id = 7247068
   end
   object jEditText1: jEditText
     Left = 5
     Top = 40
-    Width = 290
+    Width = 285
     Height = 39
     MarginLeft = 5
     MarginTop = 10
@@ -63,6 +65,7 @@ object AndroidModule1: TAndroidModule1
     VerScrollBar = False
     WrappingLine = False
     Editable = True
+    FontSizeUnit = unitDefault
     OnEnter = jEditText1Enter
     OnChange = jEditText1Change
     OnChanged = jEditText1Changed
@@ -72,7 +75,7 @@ object AndroidModule1: TAndroidModule1
   object jButton1: jButton
     Left = 2
     Top = 93
-    Width = 296
+    Width = 294
     Height = 40
     MarginLeft = 2
     MarginTop = 4
@@ -88,6 +91,7 @@ object AndroidModule1: TAndroidModule1
     BackgroundColor = colbrDefault
     FontColor = colbrDefault
     FontSize = 0
+    FontSizeUnit = unitDefault
     OnClick = jButton1Click
     Id = 6616321
   end

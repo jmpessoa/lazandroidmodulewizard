@@ -1,0 +1,352 @@
+**Tutorial: Lamw: Lazarus Android Module Wizard
+
+	"Form Designer and Components development model! 		
+	A wizard to create JNI Android loadable module (.so) and Android Apk in Lazarus/Free Pascal using 
+	[datamodule like] Form Designer and Components!" 
+
+		ref. https://github.com/jmpessoa/lazandroidmodulewizard
+
+
+Note 1:	Linux Users:	Please, go to " lazandroidmodulewizard folder  "...docs\linux" 
+			and read: "new_how_to_install_by_renabor.txt"
+
+
+[I]. Infrastructure
+
+.Java  sdk_x86 [32 bits]
+
+.Android sdk, NDK-r10e
+
+.Laz4Android win32[All in one!] =
+	FPC: 3.1.1 trunk svn 31903 
+		-->> win32/arm-android/i386-android/jvm-android
+		Note: Need Android NDK: r10e (arm-linux-androideabi-4.9 + x86-4.9)
+
+	Lazarus:1.5 trunk svn 49903
+		-->> http://sourceforge.net/projects/laz4android/files/?source=navbar
+		:To Install [*.7z], execute "build.bat"
+
+.Android sdk
+
+.Android ndk-r10e   - 	this version is required by "Laz4Android" [Last update:2015-10-02]
+			http://dl.google.com/android/ndk/android-ndk-r10e-windows-x86.exe
+
+.Ant [to build Apk]
+	http://ant.apache.org/bindownload.cgi 
+	Simply extract the zip file to a convenient location...
+
+.Eclipse is not mandatory!  [but to facilitate, all projects are Eclipse compatible!]  
+
+
+[II]. LAMW:  Lazarus Android Module Wizard
+
+	ref. https://github.com/jmpessoa/lazandroidmodulewizard
+
+	.Install ordem.
+
+		"tfpandroidbridge_pack.lpk"
+		"lazandroidwizardpack.lpk"
+		"amw_ide_tools.lpk"		[../ide-tools]
+
+		1. From Laz4Android IDE - Install Wizard Packages
+
+				HINT: to compile/install/reinstall a package [Lamw] in Laz4Android,
+					please, open a "dummy" windows project.... you always MUST close the cross compile project!  
+
+			1.1 Package -> Open Package -> "tfpandroidbridge_pack.lpk"  [Android Components Bridges!]
+			1.1.1 From Package Wizard
+				- Compile
+				- Use -> Install
+
+ 			1.2 Package -> Open Package -> "lazandroidwizardpack.lpk"
+   			1.2.1 From Package Wizard
+				- Compile
+				- Use -> Install    
+
+ 			1.3 Package -> Open Package -> "amw_ide_tools.lpk"  [folder: ..\LazAndroidWizard\ide_tools]
+   			1.3.1 From Package Wizard
+				- Compile
+				- Use -> Install   
+
+[III]. USE
+
+1. Configure Paths:
+
+	Lazarus IDE menu "Tools" ---> "[Lamw] Android Module Wizard" -->  "Path Settings ..."		
+
+   		-Path to Java JDK
+     	
+	          ex. C:\Program Files (x86)\Java\jdk1.7.0_21    {java win32}
+
+       		-Path to Android SDK
+
+                  ex. C:\adt32\sdk
+
+		-Select Ndk version: [ex 10e]
+
+	     	-Path to Ndk 
+
+	          ex.  C:\adt32\ndk10e   
+   
+		-Path to Java Resources  [Simonsayz's templates "*.java" and others: *.xml,  default Icons, etc...
+     	
+		  ex. C:\Laz4Android\components\LazAndroidWizard\java
+
+
+[IV]. New "Lamw GUI" Project  //<<----- support to "Android Bridges" and "Android Bridges Extra" components ...
+
+	1.1 Lazarus IDE menu "Project" ---> New Project ---> JNI Android Module [Lamw GUI]
+
+		ref. image: https://jmpessoa.opendrive.com/files?Ml85OTEwMDQ3OV9BRW45VA
+
+		[Workspace Form]
+
+		ref. image: https://jmpessoa.opendrive.com/files?Ml85OTEwMDU1Nl9YVE5qUg
+
+          	-Path to Workspace ...yours main projects folder [like eclipse workspace]
+			
+			ex. C:\android\ant\workspace
+
+ 	        -Project Name: "GUIProject1	
+		
+		-Ant Package Preface Name	                                             
+			
+			ex. "org.lamw"   --->>  final package name = "org.lamw.guiproject1"	  
+
+		-[Include] "android-support-v4.jar" [add support to "olds" 2.x android devices...]
+
+		-Plataform [Select]
+		-MinSdk [Select]
+		-TargetApi [Select] ...your [real] device api...
+                                                  
+	        -Instructions [Select]
+
+			-Arm Fpu  [Select] <<---- just for Arm!!
+
+		OK!   // <<--------
+
+	1.2 Save all ...
+
+2. From "Android Bridge" component tab drag/drop a jTextView in jForm
+
+		set property: PosRelativeToParent  = [rpTop,rpCenterHorizontal]
+
+3. From "Android Bridge" component tab drag/drop a jButton in jForm
+
+		set property: Anchor = jTextView1
+		set property: PosRelativeToAnchor : [raBelow]
+		set property:PosRelativeToParent = [rpCenter]
+		write some code for event property "OnClick"  -->>  ShowMessage('Hello!');
+
+4.  Lazarus IDE menu "Run" ---> "Build"    
+	
+		.Yes! You got it! ".so" was created! see project "..\libs\armeabi" folder...
+
+        	.For multi build modes, please, read "readme.txt" in "..\jni\build-modes" folder 
+
+        	.Please, read the "readme.txt" in your project folder to learn how to build Android Application [Apk]
+		
+		.All projects are Ant and Eclipse compatibles!
+
+		.You can build/install all projects just with "Ant",  but you can "import" its from Eclipse
+
+		.see "build.bat" [or .sh] and "install.bat" or [.sh]
+
+5. Connect your Device to Computer [usb] and configure it to "debug mode"     
+
+		"App settings"  ---> more/aditional -- developer options [*]:  
+		stay awake  [checked!]
+		usb debugging [checked!]
+		verify apps via usb [checked!]
+
+		[*]PANIC! [No developer options found!]! 
+			Go to Google search with "android usb debugging <device name>" to get the operating mode adapted to your device...
+			ex. Galaxy S3/S4 --> app settings --> about -->> Build number -->> [tap,tap,tap,...]
+        		ex. MI 2 --> app settings --> about -->> MIUI Version -->> [tap,tap,tap,...]
+
+
+6.Lazarus IDE menu "Run" ---> "[Lamw] Build Apk and Run" [Congratulations!!!]
+
+7.PANIC!!! Fail to buid "Apk"
+
+		.Try change project  "AndroidManifest.xml" according your system installation....
+
+			<uses-sdk android:minSdkVersion="15" android:targetSdkVersion="17"/>
+
+		hint: other target:   "android:targetSdkVersion" !!
+		
+		.Change your project "build.xml"  according your system installation...
+
+			<property name="target"  value="android-17"/>
+
+
+[V]. New [Lamw NoGUI] Project //<<-------- just a basic/raw android ".so" 
+
+	.No Support for "Android Bridges" components
+     
+1. Lazarus IDE menu "Project" ---> New Project ---> JNI Android Module [Lamw NoGUI]
+
+		[Workspace Form]
+
+		ref. image:https://jmpessoa.opendrive.com/files?Ml85OTEwMDY0NF9oT0x4TQ
+
+          	-Path to Workspace ...yours main projects folder [like eclipse workspace]
+
+			ex. C:\android\ant\workspace
+
+ 	        -Project Name: "NoGUIProject1	
+		
+		-Ant Package Preface Name	                                            
+			
+			ex. org.lamw   ::warning: final package name = "org.lamw.noguiproject1"	  
+
+		-[Include] "android-support-v4.jar" [add support to "olds 2." android devices...]
+
+		-Plataform [Select]
+		-MinSdk [Select]
+		-TargetApi [Select] ...your [real] device api...
+                                                  
+	        -Instructions [Select]
+		-Arm Fpu  [Select]
+
+		OK!   //<<---------
+
+		[Project Form] :
+
+		ref. image: https://jmpessoa.opendrive.com/files?Ml85OTEwMDY2NF9mdGF6Vw
+
+		//HINT: You can change/edit "App.java" and "NoGUIProject1.java" 
+		//to accomplish/fill  yours requirements...
+
+		-----------------------------------------------------------------------
+		/*App.java*/ 
+		public class App extends Activity {
+  
+   			NoGUIProject1 mNoGUIProject1;  //just for demo...
+  
+			@Override
+			protected void onCreate(Bundle savedInstanceState) {
+				.....
+				mNoGUIProject1 = new NoGUIProject1(); //just for demo...
+
+				int sum = mNoGUIProject1.getSum(2,3); //just for demo...
+ 				String mens = mNoGUIProject1.getString(1); //just for demo...
+				......				
+   			}
+		}	
+		------------------------------------------------------------------------
+
+		/*NoGUIProject1.java*/		
+		public class NoGUIProject1 {   // <<---your library java wrapper class! 
+
+			public native String getString(int flag);  //just for demo...
+			public native int getSum(int x, int y);    //just for demo...
+
+			static {
+				try {
+					System.loadLibrary("noguiproject1");  // <<------ load your Pascal library!!!
+				} catch(UnsatisfiedLinkError ule) {
+					ule.printStackTrace();
+				}
+			}
+		}    			
+		---------------------------------------------------------------------------
+
+			.[Generated!] Pascal library JNI [Methods] Interface  ---->> "noguiproject1.lpr"
+
+			function getString(PEnv: PJNIEnv; this: JObject; flag: JInt): JString; cdecl;
+			begin
+  				{your code....}
+			end;
+
+			function getSum(PEnv: PJNIEnv; this: JObject; x: JInt; y: JInt): JInt; cdecl;
+			begin
+  				{your code....}
+			end;
+		---------------------------------------------------------------------------		
+
+		.OK! // <<-------------
+
+		.Save all! // <<-------------
+
+2. ["noguiproject1.lpr"] Implement the Pascal JNI Interface methods.....
+
+			function getString(PEnv: PJNIEnv; this: JObject; flag: JInt): JString; cdecl;
+			begin
+  				{your code....}
+   				if flag = 1  then
+      					Result:= (PEnv^).NewStringUTF(PEnv, '1. Message One from JNI Pascal')
+    				else
+      					Result:= (PEnv^).NewStringUTF(PEnv, '2. Message Two from JNI Pascal');
+			end;
+
+			function getSum(PEnv: PJNIEnv; this: JObject; x: JInt; y: JInt): JInt; cdecl;
+			begin
+  				{your code....}
+  				Result:= x + y;
+			end;
+
+		.Save all!  // <<-------------
+
+3.  Lazarus IDE menu "Run" ---> "Build"    
+	
+		.Yes! You got it! ".so" was created! see "..\libs\armeabi" folder...
+
+        	.For multi build modes, please, read "readme.txt" in "..\jni\build-modes" folder 
+
+        	.Please, read the "readme.txt" in your project folder to learn how to build Android Application [Apk]
+		
+		.All projects are Ant and Eclipse compatibles!
+
+		.You can build/install all projects just with "Ant",  but you can "import" it from Eclipse 
+
+		.see "build.bat" [or .sh] and "install.bat" or [.sh]
+
+4. Connect your Device to Computer [usb] and configure it to "debug mode"     
+
+		"App settings"  ---> more/aditional -- developer options [*]:  
+		stay awake  [checked!]
+		usb debugging [checked!]
+		verify apps via usb [checked!]
+
+		PANIC! [No developer options found!]! 
+			Go to Google search with "android usb debugging <device name>" to get the operating mode adapted to your device...
+			ex. Galaxy S3/S4 --> app settings --> about -->> Build number -->> [tap,tap,tap,...]
+        		ex. MI 2 --> app settings --> about -->> MIUI Version -->> [tap,tap,tap,...]
+
+
+5.Lazarus IDE menu "Run" ---> "[Lamw] Build Apk and Run" [Congratulations!!!]
+
+
+6.PANIC!!! Fail to buid "Apk"
+
+		.Try change project  "AndroidManifest.xml" according your system installation....
+
+			<uses-sdk android:minSdkVersion="15" android:targetSdkVersion="17"/>
+
+		hint: other target:   "android:targetSdkVersion" !!
+		
+		.Change your project "build.xml"  according your system installation...
+
+			<property name="target"  value="android-17"/>
+
+[VI]. How to configure a Demo to Use/Test:
+
+		.Lazarus IDE menu -->> "Open" a [*.lpi] Demo Project   [...\jni]
+
+		.Lazarus IDE menu:  "Project" --> "View Project Source" 
+		.Lazarus IDE menu:  "Project" --> "Forms...."
+
+		.Lazarus IDE menu -->> "Tools" ---> "[Lamw] Android Module Wizard" -->  "Change Project [*.lpi] Ndk Path"
+
+      		.set your "NDK" path!
+
+      		.change/edit project "build.xml"   according your system.. [notepad like editor]
+			<property name="sdk.dir" location="C:\adt32\sdk"/>
+
+
+Thanks to All!
+
+by jmpessoa at [josemarquespessoa_gmail_com]
+
+[updated: 04 august 2015]

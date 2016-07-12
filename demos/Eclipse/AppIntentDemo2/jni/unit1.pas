@@ -17,10 +17,11 @@ type
       jButton1: jButton;
       jButton2: jButton;
       jButton3: jButton;
+      jCheckBox1: jCheckBox;
       jIntentManager1: jIntentManager;
       jTextView1: jTextView;
-      procedure AndroidModule1ActivityRst(Sender: TObject; requestCode,
-        resultCode: Integer; jData: jObject);
+      procedure AndroidModule1ActivityResult(Sender: TObject;
+        requestCode: integer; resultCode: TAndroidResult; intentData: jObject);
       procedure AndroidModule1JNIPrompt(Sender: TObject);
       procedure jButton1Click(Sender: TObject);
       procedure jButton2Click(Sender: TObject);
@@ -143,15 +144,15 @@ begin
 
 end;
 
-procedure TAndroidModule1.AndroidModule1ActivityRst(Sender: TObject;
-  requestCode, resultCode: Integer; jData: jObject);
+procedure TAndroidModule1.AndroidModule1ActivityResult(Sender: TObject;
+  requestCode: integer; resultCode: TAndroidResult; intentData: jObject);
 begin
   if  requestCode =  1001 then  //user-defined requestCode=1001
   begin
-    if resultCode = -1 then  //ok
+    if resultCode = RESULT_OK then  //ok
     begin
        FjUri:= nil;
-       FjUri:= jIntentManager1.GetDataUri(jData);
+       FjUri:= jIntentManager1.GetDataUri(intentData);
       if FjUri <> nil then
       begin
           jIntentManager1.SetAction(jIntentManager1.GetActionSendtoAsString());
@@ -182,7 +183,17 @@ end;
 
 procedure TAndroidModule1.AndroidModule1JNIPrompt(Sender: TObject);
 begin
-  if not Self.IsWifiEnabled() then Self.SetWifiEnabled(True);
+  if not Self.isConnected() then
+  begin //try wifi
+    if Self.SetWifiEnabled(True) then
+      jCheckBox1.Checked:= True
+    else
+      ShowMessage('Please,  try enable some connection...');
+  end
+  else
+  begin
+     if Self.isConnectedWifi() then jCheckBox1.Checked:= True
+  end;
 end;
 
 end.

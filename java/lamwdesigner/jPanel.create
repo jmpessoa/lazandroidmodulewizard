@@ -1,0 +1,3 @@
+public  java.lang.Object jPanel_Create(long pasobj ) {
+  return (java.lang.Object)(new jPanel(this.activity,this,pasobj));
+}

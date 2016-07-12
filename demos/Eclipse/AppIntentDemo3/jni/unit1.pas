@@ -18,8 +18,8 @@ type
       jButton2: jButton;
       jIntentManager1: jIntentManager;
       jTextView1: jTextView;
-      procedure AndroidModule1ActivityRst(Sender: TObject; requestCode,
-        resultCode: Integer; jIntent: jObject);
+      procedure AndroidModule1ActivityResult(Sender: TObject;
+        requestCode: integer; resultCode: TAndroidResult; intentData: jObject);
       procedure jButton1Click(Sender: TObject);
       procedure jButton2Click(Sender: TObject);
     private
@@ -52,14 +52,14 @@ begin
        ShowMessage('Unable to find an App to perform this action...');
 end;
 
-procedure TAndroidModule1.AndroidModule1ActivityRst(Sender: TObject;
-  requestCode, resultCode: Integer; jIntent: jObject);
+procedure TAndroidModule1.AndroidModule1ActivityResult(Sender: TObject;
+  requestCode: integer; resultCode: TAndroidResult; intentData: jObject);
 var
    jContactUri: jObject;
    strContactNumber: string;
 begin
    strContactNumber:= '';
-   jContactUri:= jIntentManager1.GetDataUri(jIntent);
+   jContactUri:= jIntentManager1.GetDataUri(intentData);
    strContactNumber:= jIntentManager1.GetContactNumber(jContactUri);
    if strContactNumber <> '' then
    begin

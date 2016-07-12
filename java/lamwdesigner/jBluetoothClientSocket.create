@@ -1,0 +1,3 @@
+public java.lang.Object jBluetoothClientSocket_jCreate(long _Self) {
+   return (java.lang.Object)(new jBluetoothClientSocket(this,_Self));
+}

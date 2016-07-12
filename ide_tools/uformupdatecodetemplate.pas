@@ -76,7 +76,7 @@ uses LazFileUtils, CompOptsIntf, IDEExternToolIntf;
 procedure TFormUpdateCodeTemplate.DoTerminated(Sender: TObject);
 begin
   Clipboard.AsText:=(MemoLog.Text);
-  ShowMessage('The Upgrade is Done! Please, Get the Log from Clipboard!');
+  ShowMessage('The Upgrade was Done! Please, Get the Log from Clipboard!');
 end;
 
 procedure TFormUpdateCodeTemplate.FormClose(Sender: TObject;
@@ -117,9 +117,8 @@ begin
     end;
 end;
 
-procedure TFormUpdateCodeTemplate.RebuildLibrary; //by jmpessoa
+procedure TFormUpdateCodeTemplate.RebuildLibrary;
 var
-  //str: string;
   Tool: TIDEExternalToolOptions;
 begin
   if JNIProjectPath = '' then
@@ -139,23 +138,6 @@ begin
   finally
     Tool.Free
   end;
-(*  if Assigned(APKProcess) then
-  begin
-    if not APKProcess.IsTerminated then APKProcess.Terminate;
-  end; *)
-  //MemoLog.Clear;
-(*  APKProcess:= TThreadProcess.Create(True);
-  with APKProcess do
-  begin
-    OnTerminated:= @DoTerminated;
-    Dir:= Self.JNIProjectPath;  //controls.lpi
-    str := '$MakeDir($(LazarusDir))lazbuild';
-    IDEMacros.SubstituteMacros(str);
-    Executable:= str;
-    Parameters.Add('controls.lpi');
-    OnDisplayOutput:= @ShowProcOutput; // <<-- it cannot be used since MemoLog will be destroyed before lazbuild to be executed
-    Start;
-  end; *)
 end;
 
 procedure TFormUpdateCodeTemplate.BitBtnOKClick(Sender: TObject);
@@ -430,8 +412,6 @@ begin
   ComboBoxSelectProject.Text:='';
 end;
 
-//helper... by jmpessoa
-
 //http://delphi.about.com/od/delphitips2008/qt/subdirectories.htm
 //fils the "list" TStrings with the subdirectories of the "directory" directory
 //Warning: if not  subdirectories was found return empty list [list.count = 0]!
@@ -453,7 +433,6 @@ begin
    end;
 end;
 
-//helper... by jmpessoa
 function ReplaceChar(query: string; oldchar, newchar: char):string;
 begin
   if query <> '' then

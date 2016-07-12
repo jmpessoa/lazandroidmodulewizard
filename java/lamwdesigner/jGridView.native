@@ -1,0 +1,4 @@
+public native void pOnClickGridItem(long pasobj, int position, String caption);
+public native void pOnLongClickGridItem(long pasobj, int position, String caption);
+public native int pOnGridDrawItemCaptionColor(long pasobj, int position, String caption);
+public native Bitmap pOnGridDrawItemBitmap(long pasobj, int position, String caption);

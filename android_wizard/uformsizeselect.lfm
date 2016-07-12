@@ -1,0 +1,126 @@
+object frmFormSizeSelect: TfrmFormSizeSelect
+  Left = 239
+  Height = 283
+  Top = 136
+  Width = 320
+  Caption = 'Change Android Form Size'
+  ClientHeight = 283
+  ClientWidth = 320
+  OnCreate = FormCreate
+  OnDestroy = FormDestroy
+  Position = poScreenCenter
+  LCLVersion = '1.5'
+  object Label1: TLabel
+    AnchorSideLeft.Control = Owner
+    AnchorSideTop.Control = seWidth
+    AnchorSideTop.Side = asrCenter
+    Left = 6
+    Height = 13
+    Top = 10
+    Width = 28
+    BorderSpacing.Around = 6
+    Caption = 'Width'
+    ParentColor = False
+  end
+  object seWidth: TSpinEdit
+    AnchorSideLeft.Control = Label1
+    AnchorSideLeft.Side = asrBottom
+    AnchorSideTop.Control = Owner
+    Left = 40
+    Height = 21
+    Top = 6
+    Width = 66
+    BorderSpacing.Around = 6
+    MaxValue = 10000
+    TabOrder = 0
+  end
+  object Label2: TLabel
+    AnchorSideLeft.Control = seWidth
+    AnchorSideLeft.Side = asrBottom
+    AnchorSideTop.Control = seHeight
+    AnchorSideTop.Side = asrCenter
+    Left = 124
+    Height = 13
+    Top = 10
+    Width = 31
+    BorderSpacing.Left = 12
+    BorderSpacing.Around = 6
+    Caption = 'Height'
+    ParentColor = False
+  end
+  object seHeight: TSpinEdit
+    AnchorSideLeft.Control = Label2
+    AnchorSideLeft.Side = asrBottom
+    AnchorSideTop.Control = Owner
+    Left = 161
+    Height = 21
+    Top = 6
+    Width = 66
+    BorderSpacing.Around = 6
+    MaxValue = 10000
+    TabOrder = 1
+  end
+  object DrawGrid1: TDrawGrid
+    AnchorSideLeft.Control = Owner
+    AnchorSideTop.Control = seWidth
+    AnchorSideTop.Side = asrBottom
+    AnchorSideRight.Control = Owner
+    AnchorSideRight.Side = asrBottom
+    AnchorSideBottom.Control = ButtonPanel1
+    Left = 6
+    Height = 204
+    Top = 33
+    Width = 308
+    Anchors = [akTop, akLeft, akRight, akBottom]
+    AutoFillColumns = True
+    BorderSpacing.Around = 6
+    ColCount = 3
+    ColumnClickSorts = True
+    Columns = <    
+      item
+        SizePriority = 0
+        Title.Caption = 'Name'
+        Width = 150
+      end    
+      item
+        Title.Caption = 'Width'
+        Width = 77
+      end    
+      item
+        Title.Caption = 'Height'
+        Width = 77
+      end>
+    ExtendedSelect = False
+    FixedCols = 0
+    MouseWheelOption = mwGrid
+    Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goRowSelect, goThumbTracking, goSmoothScroll]
+    RowCount = 1
+    TabOrder = 2
+    OnColRowExchanged = DrawGrid1ColRowExchanged
+    OnCompareCells = DrawGrid1CompareCells
+    OnDblClick = DrawGrid1DblClick
+    OnDrawCell = DrawGrid1DrawCell
+    OnSelectCell = DrawGrid1SelectCell
+    ColWidths = (
+      150
+      77
+      77
+    )
+  end
+  object ButtonPanel1: TButtonPanel
+    Left = 6
+    Height = 34
+    Top = 243
+    Width = 308
+    OKButton.Name = 'OKButton'
+    OKButton.DefaultCaption = True
+    HelpButton.Name = 'HelpButton'
+    HelpButton.DefaultCaption = True
+    CloseButton.Name = 'CloseButton'
+    CloseButton.DefaultCaption = True
+    CancelButton.Name = 'CancelButton'
+    CancelButton.DefaultCaption = True
+    TabOrder = 3
+    ShowButtons = [pbOK, pbCancel]
+  end
+end

@@ -19,8 +19,8 @@ type
       jImageView1: jImageView;
       jIntentManager1: jIntentManager;
       jTextView1: jTextView;
-      procedure AndroidModule1ActivityRst(Sender: TObject; requestCode,
-        resultCode: Integer; jData: jObject);
+      procedure AndroidModule1ActivityResult(Sender: TObject;
+        requestCode: integer; resultCode: TAndroidResult; intentData: jObject);
       procedure jButton1Click(Sender: TObject);
     private
       {private declarations}
@@ -54,15 +54,16 @@ begin
   jIntentManager1.StartActivityForResult(1001);      //user-defined requestCode=1001
 end;
 
-procedure TAndroidModule1.AndroidModule1ActivityRst(Sender: TObject; requestCode, resultCode: Integer; jData: jObject);
+procedure TAndroidModule1.AndroidModule1ActivityResult(Sender: TObject;
+  requestCode: integer; resultCode: TAndroidResult; intentData: jObject);
 var
   jUri: jObject;
 begin
   if  requestCode =  1001 then  //user-defined requestCode=1001
   begin
-    if resultCode = -1 then  //ok
+    if resultCode = RESULT_OK then  //ok
     begin
-      jUri:= jIntentManager1.GetDataUri(jData);
+      jUri:= jIntentManager1.GetDataUri(intentData);
       jImageView1.SetImageBitmap(jImageFileManager1.LoadFromUri(jUri));
       //curiosity: You can try this ....
       //jImageView1.SetImageBitmap(jImageFileManager1.AnticlockWise(jImageFileManager1.LoadFromUri(jUri),jImageView1.jSelf));

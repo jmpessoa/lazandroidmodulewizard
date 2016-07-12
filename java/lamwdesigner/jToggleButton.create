@@ -1,0 +1,3 @@
+public java.lang.Object jToggleButton_jCreate(long _Self) {
+   return (java.lang.Object)(new jToggleButton(this,_Self));
+}

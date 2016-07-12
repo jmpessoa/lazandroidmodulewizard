@@ -63,7 +63,17 @@ end;
 
 procedure TAndroidModule1.DataModuleJNIPrompt(Sender: TObject);
 begin
-  if jLocation1.IsWifiEnabled() then  jCheckBox1.Checked:= True;
+  if not Self.isConnected() then
+  begin //try wifi
+    if Self.SetWifiEnabled(True) then
+      jCheckBox1.Checked:= True
+    else
+      ShowMessage('Please,  try enable some connection...');
+  end
+  else
+  begin
+     if Self.isConnectedWifi() then jCheckBox1.Checked:= True
+  end;
 end;
 
 procedure TAndroidModule1.jCheckBox1Click(Sender: TObject);
@@ -80,7 +90,6 @@ begin
       jLocation1.SetWifiEnabled(False);
       ShowMessage('Wifi was Disabled!');
    end;
-
 end;
 
 procedure TAndroidModule1.jLocation1LocationChanged(Sender: TObject;

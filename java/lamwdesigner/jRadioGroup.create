@@ -1,0 +1,3 @@
+public java.lang.Object jRadioGroup_jCreate(long _Self, int _orientation) {
+   return (java.lang.Object)(new jRadioGroup(this,_Self, _orientation));
+}

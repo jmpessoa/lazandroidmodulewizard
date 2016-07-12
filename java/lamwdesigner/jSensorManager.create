@@ -1,0 +1,3 @@
+public java.lang.Object jSensorManager_jCreate(long _Self) {
+   return (java.lang.Object)(new jSensorManager(this,_Self));
+}      

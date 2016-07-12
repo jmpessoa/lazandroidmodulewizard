@@ -2,7 +2,7 @@
 	Lamw: Lazarus Android Module Wizard: 
 		:: RAD Android! Form Designer and Components development model! 
 		
-	"A wizard to create JNI Android loadable module (.so) 
+	"A wizard to create JNI Android loadable module (.so) and Android Apk
 		widh Lazarus/Free Pascal using Form Designer and Components!" 
 
 	Authors: 
@@ -94,45 +94,11 @@
 
 
 	****************************************************************************************************
-	*How to use [projects] demos :
+	*Using [projects] demos :
 	*
-	*1. Open the lazarus project "controls.lpi" [...\jni] 
+	*PANIC ? When prompt "Read error" [Unknown Property] just choice "Continue Loading" !
 	*
-	*	Lazarus IDE menu:  "Project" --> "View Project Source" 
-	*	Lazarus IDE menu:  "Project" --> "Forms...."
-	*
-	*2. Change this informations in "controls.lpi" to correct one!
-	*
-	*	"C:\adt32\ndk10"	-- just my system NDK path
-	*
-	*3. Change this informations in  "build.xml"   according your system..
-	*	"C:\adt32\sdk"		-- just my system NDK path
-	*			
-	*	Option 1: NEW !!
-	*		.IDE --> Tools --> 
-	*				[Lamw] Android Module Wizard --> Change Project [*.lpi] Ndk Path [Demos]
-	*		.Change/edit "build.xml" [location="C:\adt32\sdk"] according your system..
-	*		.Change/edit "AndroidManifest.xml" [minSdkVersion="15" android:targetSdkVersion="17"] according your system..
-	*
-	*	Option 2: Go to Lazarus IDE:
-	*			->Project
-	*			->Project -> Option
-	*			->Path -->> change/modify paths according to your system ..
-	*
-	*	Option 3: Open/edit the "controls.lpi" [...\jni] and "build.xml" and "AndroidManifest.xml". You can use Notepad like editor....
-	*			
-	*
-	*4. All [compatible] Eclipse projects support Ant!
-	*			You can build/install/Run all Eclipse projects just with "Ant"... 
-	*			see "build.bat" [or .sh] and "install.bat" or [.sh]
-	*			or Go To: Lazarus IDE menu "Run--> [Lamw] Build and Run"! Thanks to Anton!!!
-	*
-	*5.PANIC ? [upgrade your project [or demo] code templates!] !
-	*	Lazarus IDE --> menu Tools --> [Lamw] Android Module Wizard --> Upgrade code Templates [*.lpr, *.java]
-	*
-	*6.PANIC ? When prompt "Read error" [Unknown Property] just choice "Continue Loading" !
-	*
-	*7.PANIC ? Fail to build Apk. Change according your system installation:
+	*PANIC ? Fail to build Apk. Change according your sdk system installation this properties:
 	*
 	*	"AndroidManifest.xml" 		
 	*		<uses-sdk android:minSdkVersion="15" android:targetSdkVersion="17"/>
@@ -140,10 +106,45 @@
 	*	"build.xml"	
 	*		<property name="target"  value="android-17"/>
 	*
-	*	"build.xml"
-	*		<property name="sdk.dir" location="C:\adt32\sdk"/>
 	*
 	****************************************************************************************************
+
+Version 0.7 - 11 July 2016
+
+	WARNING!
+		.Uninstall all LAMW package before install the new version 0.7
+			.uninstall [amw_ide_tools.lpk]
+			.uninstall [lazandroidwizardpack.lpk]
+			.uninstall [tfpandroidbridge_pack.lpk]   // <--- uninstall at last!
+	
+	IMPROVEMENTS!
+		.Smart code composition/generation
+		.Smart "Demos" perception/detection and [ndk/sdk] paths auto-fixed
+		.Automatic java templates update/synchronization
+
+	CLEANUP! [new folders organization]
+		.android_bridges	[tfpandroidbridge_pack.lpk] // <<-- install first
+		.android_wizard		[lazandroidwizardpack.lpk]
+		.ide_tools		[amw_ide_tools.lpk]
+		.java
+			.lamwdesigner
+		.docs
+			.linux
+
+	CLEANUP!
+		.Component tabs organization
+
+
+	WARNING!
+		.Please, whenever a dialog prompt, select "Reload from disk"
+
+
+	NEW!	jChronometer component
+	NEW!	jMediaRecorder component	//thanks to  Mario H. D. suggestion!
+
+	NEW!	AppChronometerDemo1
+	NEW!	AppMediaRecorderDemo1		//thanks to  Mario H. D. suggestion!
+
 
 Version 0.6 - rev. 47 - 11 June 2016 - 
 

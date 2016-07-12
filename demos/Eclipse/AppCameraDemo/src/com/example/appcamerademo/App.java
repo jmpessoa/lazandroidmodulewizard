@@ -1,6 +1,6 @@
 package com.example.appcamerademo;
 
-//Lamw: Lazarus Android Module Wizard - Version 0.6 - revision 40.01 - 01 May - 2016
+//Lamw: Lazarus Android Module Wizard - Version 0.7 - 04 July - 2016
 //Form Designer and Components development model!
 //https://github.com/jmpessoa/lazandroidmodulewizard
 //http://forum.lazarus.freepascal.org/index.php/topic,21919.270.html
@@ -25,7 +25,6 @@ import java.lang.Override;
 
 
 import android.app.Activity;
-
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.content.pm.ActivityInfo; 
@@ -33,20 +32,14 @@ import android.widget.RelativeLayout;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.KeyEvent;
-
 import android.view.Menu;
 import android.view.MenuItem;
-
 import android.view.View;
-
 import android.view.WindowManager;
-
-//import android.view.View;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.util.Log;
 
-// http://stackoverflow.com/questions/16282294/show-title-bar-from-code
 public class App extends Activity {
     
 	private Controls       controls;
@@ -55,7 +48,6 @@ public class App extends Activity {
     public void onCreate(Bundle savedInstanceState) {
      super.onCreate(savedInstanceState);                            
      
-      //by jmpessoa --- fix for http get    
       //ref. http://stackoverflow.com/questions/8706464/defaulthttpclient-to-androidhttpclient 
      int systemVersion = android.os.Build.VERSION.SDK_INT; 
      if (systemVersion > 9) {
@@ -200,55 +192,54 @@ public boolean onOptionsItemSelected(MenuItem item) {
    //or false to indicate that you have not handled this event and it should continue to be propagated.  
    
    @Override
-   public boolean onKeyDown(int keyCode, KeyEvent event) {
-	   
-	  char c = event.getDisplayLabel();	  
-      
+   public boolean onKeyDown(int keyCode, KeyEvent event) {	   
+	  char c = event.getDisplayLabel();	        
 	  //boolean mute = controls.jAppOnKeyDown(c,keyCode,KeyEvent.keyCodeToString(keyCode));  //TODO
-      //if (mute) return false;
-	  
+      //if (mute) return false;	  
       switch(keyCode) {
-      
+            
+      case KeyEvent.KEYCODE_BACK:
+    	 boolean mute = controls.jAppOnKeyDown(c,keyCode,KeyEvent.keyCodeToString(keyCode));    	  
+         if (!mute) { //continue ...
+        	 onBackPressed();
+             return true;
+         } else {  // exit! 
+        	 return false;  //caution!! the back_key will not close the App, no more!!
+         }
+         
       case KeyEvent.KEYCODE_MENU:     	     	      	          
     	 controls.jAppOnKeyDown(c,keyCode,KeyEvent.keyCodeToString(keyCode));
-         return true;
-         
+         break;
+              
         case KeyEvent.KEYCODE_SEARCH:
           controls.jAppOnKeyDown(c,keyCode,KeyEvent.keyCodeToString(keyCode));
-          return true;
-          
-        case KeyEvent.KEYCODE_BACK:
-          onBackPressed();
-          return true;
-          
+          break;
+                    
         case KeyEvent.KEYCODE_VOLUME_UP:
-          //event.startTracking();
+          //event.startTracking();  //TODO
           controls.jAppOnKeyDown(c,keyCode,KeyEvent.keyCodeToString(keyCode));
-          return true;
+          break;
           
         case KeyEvent.KEYCODE_VOLUME_DOWN:
-          //Toast.makeText(this,"Volume Down pressed", Toast.LENGTH_SHORT).show();
           controls.jAppOnKeyDown(c,keyCode,KeyEvent.keyCodeToString(keyCode));
-          return false;
+          break;
           
           /*commented! need SDK API >= 18 [Android 4.3] to compile!*/
           /*
         case KeyEvent.KEYCODE_BRIGHTNESS_DOWN:
             controls.jAppOnKeyDown(c,keyCode,KeyEvent.keyCodeToString(keyCode));
-            return true;                   
+            break;                   
         case KeyEvent.KEYCODE_BRIGHTNESS_UP:
             controls.jAppOnKeyDown(c,keyCode,KeyEvent.keyCodeToString(keyCode));
-            return true;
+            break;
          */
           
         case KeyEvent.KEYCODE_HEADSETHOOK:
             controls.jAppOnKeyDown(c,keyCode,KeyEvent.keyCodeToString(keyCode));
-            return true;
+            break;
             
-        //default: controls.jAppOnKeyDown(c,keyCode,KeyEvent.keyCodeToString(keyCode));            
-      }
-      
-      return super.onKeyDown(keyCode, event);
-      
+        //default:  controls.jAppOnKeyDown(c,keyCode,KeyEvent.keyCodeToString(keyCode));         	
+      }      
+      return super.onKeyDown(keyCode, event);      
    }        
 }

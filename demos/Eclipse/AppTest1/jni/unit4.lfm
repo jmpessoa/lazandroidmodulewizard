@@ -10,6 +10,7 @@ object AndroidModule4: TAndroidModule4
   Text = 'AndroidModule4'
   ActivityMode = actRecyclable
   BackgroundColor = colbrDarkKhaki
+  ActionBarTitle = abtDefault
   OnJNIPrompt = AndroidModule4JNIPrompt
   object jButton1: jButton
     Left = 87
@@ -29,6 +30,7 @@ object AndroidModule4: TAndroidModule4
     BackgroundColor = colbrDefault
     FontColor = colbrForestGreen
     FontSize = 0
+    FontSizeUnit = unitDefault
     OnClick = jButton1Click
     Id = 0
   end
@@ -53,6 +55,7 @@ object AndroidModule4: TAndroidModule4
     FontColor = colbrForestGreen
     FontSize = 0
     TextTypeFace = tfNormal
+    FontSizeUnit = unitDefault
     Id = 0
   end
 end

@@ -10,12 +10,13 @@ object AndroidModule1: TAndroidModule1
   Text = 'AndroidModule1'
   ActivityMode = actMain
   BackgroundColor = colbrDefault
-  OnActivityRst = AndroidModule1ActivityRst
+  ActionBarTitle = abtDefault
+  OnActivityResult = AndroidModule1ActivityResult
   object jTextView1: jTextView
-    Left = 64
-    Top = 16
-    Width = 167
-    Height = 25
+    Left = 67
+    Top = 5
+    Width = 166
+    Height = 20
     MarginLeft = 5
     MarginTop = 5
     MarginRight = 5
@@ -32,12 +33,13 @@ object AndroidModule1: TAndroidModule1
     FontColor = colbrDefault
     FontSize = 0
     TextTypeFace = tfNormal
+    FontSizeUnit = unitDefault
     Id = 2899912
   end
   object jButton1: jButton
-    Left = 8
-    Top = 48
-    Width = 288
+    Left = 2
+    Top = 34
+    Width = 294
     Height = 40
     MarginLeft = 2
     MarginTop = 4
@@ -53,13 +55,14 @@ object AndroidModule1: TAndroidModule1
     BackgroundColor = colbrDefault
     FontColor = colbrDefault
     FontSize = 0
+    FontSizeUnit = unitDefault
     OnClick = jButton1Click
     Id = 5615141
   end
   object jButton2: jButton
-    Left = 8
-    Top = 104
-    Width = 287
+    Left = 2
+    Top = 82
+    Width = 294
     Height = 40
     MarginLeft = 2
     MarginTop = 4
@@ -75,6 +78,7 @@ object AndroidModule1: TAndroidModule1
     BackgroundColor = colbrDefault
     FontColor = colbrDefault
     FontSize = 0
+    FontSizeUnit = unitDefault
     OnClick = jButton2Click
     Id = 3962920
   end

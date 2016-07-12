@@ -92,7 +92,7 @@ begin
   FInBackground:= True;
   jSurfaceView1.PaintColor:= colbrRed;
   jSurfaceView1.BackgroundColor:= colbrLightCyan;
-  jSurfaceView1.SetDrawingInBackgroundSleeptime(10); //default = 20 miliseconds
+  jSurfaceView1.SetDrawingInBackgroundSleeptime(20); //default/min = 20 miliseconds
   jSurfaceView1.DoDrawingInBackground(True);  //fires  OnDrawingInBackgroundRunning  !!
 end;
 

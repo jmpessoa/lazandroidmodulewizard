@@ -1,0 +1,1 @@
+public native void pOnClickToggleButton(long pasobj, boolean state);

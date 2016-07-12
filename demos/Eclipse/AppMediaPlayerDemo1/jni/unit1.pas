@@ -39,7 +39,6 @@ type
 
   private
     {private declarations}
-    FIsPrepared: boolean;
     FVolumeR: real;
     FVolumeL: real;
 
@@ -58,7 +57,6 @@ implementation
 
 procedure TAndroidModule1.AndroidModule1Create(Sender: TObject);
 begin
-   FIsPrepared:= False;
    FVolumeR:= 0.6;  //[0.0 --> 1.0]
    FVolumeL:= 0.6;  //[0.0 --> 1.0]
 end;
@@ -68,22 +66,54 @@ begin
  // FSaveBackColor:= jSurfaceView1.BackgroundColor;
 end;
 
+{others source options samples:
+
+   http://mysite.com/audio/audio.mp3
+   file:///sdcard/localfile.mp3
+   /sdcard/localfile.mp3
+
+}
+
 procedure TAndroidModule1.jButton1Click(Sender: TObject);
 begin
-  if FIsPrepared then
+  //jMediaPlayer1.SeekTo(0);  //play from beginning ...
+
+  if jButton1.Text = 'Play' then
   begin
-    if jButton1.Text = 'Play' then
+
+    jButton1.Text:= 'Pause';
+
+    if jMediaPlayer1.IsPaused() then
     begin
-      jButton1.Text:= 'Pause';
-      //jMediaPlayer1.SeekTo(0);  //play from beginning ...
       jMediaPlayer1.Start();
-    end
-    else
-    begin
-       jButton1.Text:= 'Play';
-       jMediaPlayer1.Pause();
+      Exit;
     end;
+
+    if jRadioButton1.Checked then //music
+    begin
+       jRadioButton2.Checked:= False;
+       jMediaPlayer1.SetDataSource('pipershut2.mp3');  //from  .../assets
+       //jMediaPlayer1.SetDataSource(Self.GetEnvironmentDirectoryPath(dirDownloads), 'pipershut2.mp3');  //from download...
+       ShowMessage('Music "pipershut2.mp3" Loaded ...  Preparing.. ');
+       jMediaPlayer1.Prepare();  //Dispatch --> OnPrepared !
+    end;
+
+    if jRadioButton2.Checked then //video
+    begin
+        jRadioButton1.Checked:= False;
+        //jMediaPlayer1.SetDataSource('http://bffmedia.com/bigbunny.mp4');
+        jMediaPlayer1.SetDataSource('bigbunny.mp4'); //from assets ...
+        ShowMessage('Video "bigbunny.mp4" Loaded ... Preparing.. ');
+        jMediaPlayer1.Prepare();  //Dispatch --> OnPrepared !
+    end;
+
+  end
+  else
+  begin
+     jButton1.Text:= 'Play';
+     jMediaPlayer1.Pause();
   end;
+
 end;
 
 procedure TAndroidModule1.jButton2Click(Sender: TObject);
@@ -101,54 +131,45 @@ end;
 
 procedure TAndroidModule1.jMediaPlayer1Completion(Sender: TObject);
 begin
-   ShowMessage('The End');
+   ShowMessage('The End [Reset]');
    jButton1.Text:= 'Play';
+   jMediaPlayer1.Reset();
 end;
 
 
 //NOTE:  here is a good place to put "Start()"
 procedure TAndroidModule1.jMediaPlayer1Prepared(Sender: TObject; videoWidth: integer; videoHeigh: integer);
 begin
-   FIsPrepared:= True;
-   ShowMessage('Prepared ...');
-   jButton1.Text:= 'Play';
+   jMediaPlayer1.Start();
 end;
 
 procedure TAndroidModule1.jMediaPlayer1TimedText(Sender: TObject;
   timedText: string);
 begin
-    ShowMessage('TimedText ...'+ timedText);
+   ShowMessage('TimedText ...'+ timedText);
 end;
 
 procedure TAndroidModule1.jRadioButton1Click(Sender: TObject);
 begin
-  {http://site.com/audio/audio.mp3}
-  {file:///sdcard/localfile.mp3  or /sdcard/localfile.mp3}
-   if jRadioButton1.Checked then //music
+   if (jMediaPlayer1.IsPlaying()) or (jMediaPlayer1.IsPaused()) then
    begin
-      if jMediaPlayer1.IsPlaying() then jMediaPlayer1.Stop();
-      jRadioButton2.Checked:= False;
-      jMediaPlayer1.SetDataSource('pipershut2.mp3');  //from  .../assets
-      ShowMessage('Music "pipershut2.mp3" Loaded ...  Preparing.. ');
-      FIsPrepared:= False;
-      jMediaPlayer1.Prepare();  //Dispatch --> OnPrepared !
+     jMediaPlayer1.Stop();
    end;
+   jMediaPlayer1.Reset();
+   jRadioButton2.Checked:= False;
+   jButton1.Text:= 'Play';
 end;
 
 procedure TAndroidModule1.jRadioButton2Click(Sender: TObject);
 begin
-   {http://site.com/audio/audio.mp3}
-   {file:///sdcard/localfile.mp3  or /sdcard/localfile.mp3}
-   {bigbunny.mp4}   //default: from "assets"
-    if jRadioButton2.Checked then //music
-    begin
-       if jMediaPlayer1.IsPlaying() then jMediaPlayer1.Stop();
-       jRadioButton1.Checked:= False;
-       jMediaPlayer1.SetDataSource('http://bffmedia.com/bigbunny.mp4');  {'bigbunny.mp4'}//from  .../assets or
-       ShowMessage('Video "bigbunny.mp4" Loaded ... Preparing.. ');
-       FIsPrepared:= False;
-       jMediaPlayer1.Prepare();  //Dispatch --> OnPrepared !
-    end;
+
+   if (jMediaPlayer1.IsPlaying()) or (jMediaPlayer1.IsPaused()) then
+   begin
+     jMediaPlayer1.Stop();
+   end;
+   jMediaPlayer1.Reset();
+   jRadioButton1.Checked:= False;
+   jButton1.Text:= 'Play';
 end;
 
 procedure TAndroidModule1.jSurfaceView1SurfaceChanged(Sender: TObject;

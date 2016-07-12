@@ -101,6 +101,7 @@ end;
 
 procedure TAndroidModule1.jButton1Click(Sender: TObject);
 begin
+
    if not jAsyncTask1.Running then
    begin
      //ShowMessage('Execute ... ');
@@ -113,8 +114,6 @@ end;
 procedure TAndroidModule1.jButton2Click(Sender: TObject);
 begin
    ShowMessage('Hello!');
-  //Self.Vibrate(200);   //need manifest add on:  "<uses-permission android:name="android.permission.VIBRATE"/>"
-  //Self.TakeScreenshot(Self.GetEnvironmentDirectoryPath(dirDownloads), 'myscreenshot.jpg');
 end;
 
 end.

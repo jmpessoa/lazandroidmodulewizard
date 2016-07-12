@@ -21,13 +21,14 @@ public class jDownloadManager /*extends ...*/ {
  private long     pascalObj = 0;      // Pascal Object
  private Controls controls  = null;   // Control Class -> Java/Pascal Interface ...
  private Context  context   = null;
- 
- String mUrl = "";
+
  DownloadManager mManager;
  DownloadManager.Request mRequest;
  String notifyTitle= "Downloading...";
  String notifyDescription = "Please, wait...";
- String mFilename = "downloaded-file.ext";
+ 
+ String mUrl = "//http://www.freemediagoo.com/free-media/wildlife/o_o_bird-med.jpg";
+ String mFilename = "o_o_bird-med.jpg";  
  String mPath = Environment.DIRECTORY_DOWNLOADS; // default ...
  
  String mLocalFileName= "";
@@ -75,10 +76,10 @@ public class jDownloadManager /*extends ...*/ {
      notifyDescription = _description;
  }
  
- private boolean SetUrl(String _urlString) {
-	 if (! _urlString.equals("") ) {
-	     mUrl = _urlString;	   
-	 }
+ private boolean SetUrl(String _urlString) {	   
+      if (! _urlString.equals("") ) {
+	 mUrl = _urlString;	   
+      }           
      // in order for this if to run, you must use the android 3.2 to compile your app [API Level: 13]      
      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
          mRequest = new DownloadManager.Request( Uri.parse(mUrl) );   

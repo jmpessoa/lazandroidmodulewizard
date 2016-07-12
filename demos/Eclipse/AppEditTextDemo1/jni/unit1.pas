@@ -18,6 +18,10 @@ type
       jEditText1: jEditText;
       jTextFileManager1: jTextFileManager;
       jTextView1: jTextView;
+
+      jEditTemp: jEditText;
+
+      procedure AndroidModule1Destroy(Sender: TObject);
       procedure AndroidModule1JNIPrompt(Sender: TObject);
       procedure jButton1Click(Sender: TObject);
       procedure jEditText1Change(Sender: TObject; txt: string; count: integer);
@@ -40,13 +44,39 @@ implementation
 { TAndroidModule1 }
 
 procedure TAndroidModule1.jButton1Click(Sender: TObject);
-var
+//var
+  //jButtonTemp: jButton;
+begin
+
+  jEditTemp := jEditText.Create(Self);
+ // jEditTemp.Parent := jPanel1;
+ // jEditTemp.Text:='test';
+  jEditTemp.LayoutParamWidth:=lpMatchParent;
+ // jEditTemp.LayoutParamHeight:=lpWrapContent;
+ // jEditTemp.FontSize:=18;
+  jEditTemp.PosRelativeToParent:=[rpCenterInParent];
+
+  jEditTemp.Init(gApp);
+
+ {jButtonTemp := jButton.Create(Self);
+  jButtonTemp.Parent:=jPanel1;
+  jButtonTemp.Text:='press me';
+  jButtonTemp.LayoutParamWidth:=lpMatchParent;
+  jButtonTemp.LayoutParamHeight:=lpWrapContent;
+  jButtonTemp.Anchor:=jEditTemp;
+  jButtonTemp.PosRelativeToAnchor:=[raAbove];}
+
+end;
+
+{var
    strFromAssets: string;
 begin
    strFromAssets:= jTextFileManager1.LoadFromAssets('name1.txt');
-   ShowMessage(jTextFileManager1.LoadFromAssets('name1.txt'));
-end;
+   ShowMessage(strFromAssets);
 
+   jEditText1.SelectAll();  //just test!
+end;
+}
 {
 TImeOptions = (imeFlagNoFullScreen,
                imeActionNone,
@@ -66,9 +96,20 @@ begin
   jEditText1.SetImeOptions(imeFlagNoFullScreen); //Thanks to @Ps !!
                                                    //IMEs will never go into full screen mode,
                                                    //and always leave some space to display the application UI
+
   jTextView1.TextTypeFace:= tfBold;
   jTextView1.CustomColor:= $FF2C2F3E;   //Thanks to @Ps  !!
   jTextView1.FontColor:= colbrCustom;
+
+  jEditText1.SetSelectAllOnFocus(True);  //just test!
+  jEditText1.SetFocus;    //OK!
+
+
+end;
+
+procedure TAndroidModule1.AndroidModule1Destroy(Sender: TObject);
+begin
+  jEditTemp.Free;
 end;
 
 procedure TAndroidModule1.jEditText1Change(Sender: TObject; txt: string;
@@ -85,7 +126,7 @@ end;
 
 procedure TAndroidModule1.jEditText1Click(Sender: TObject);
 begin
-  ShowMessage('Clicked....');
+  //ShowMessage('Clicked....');
 end;
 
 procedure TAndroidModule1.jEditText1Enter(Sender: TObject);

@@ -1,0 +1,3 @@
+public java.lang.Object jDatePickerDialog_jCreate(long _Self) {
+   return (java.lang.Object)(new jDatePickerDialog(this,_Self));
+}

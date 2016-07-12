@@ -1,0 +1,3 @@
+public java.lang.Object jShareFile_jCreate(long _Self) {
+   return (java.lang.Object)(new jShareFile(this,_Self));
+}

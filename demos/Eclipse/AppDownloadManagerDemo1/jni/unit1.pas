@@ -87,6 +87,10 @@ begin
       jCheckBox1.Checked:= True
     else
       ShowMessage('Please,  try enable some connection...');
+  end
+  else
+  begin
+     if Self.isConnectedWifi() then jCheckBox1.Checked:= True
   end;
 end;
 

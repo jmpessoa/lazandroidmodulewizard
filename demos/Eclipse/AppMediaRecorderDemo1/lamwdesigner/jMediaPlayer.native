@@ -1,0 +1,4 @@
+public native void pOnMediaPlayerPrepared(long pasobj, int videoWidth, int videoHeigh);
+public native void pOnMediaPlayerVideoSizeChanged(long pasobj, int videoWidth, int videoHeight);
+public native void pOnMediaPlayerCompletion(long pasobj);
+public native void pOnMediaPlayerTimedText(long pasobj, String timedText);

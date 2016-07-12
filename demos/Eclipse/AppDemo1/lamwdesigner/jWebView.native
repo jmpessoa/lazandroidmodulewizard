@@ -1,0 +1,1 @@
+public native int pOnWebViewStatus(long pasobj, int EventType, String url);

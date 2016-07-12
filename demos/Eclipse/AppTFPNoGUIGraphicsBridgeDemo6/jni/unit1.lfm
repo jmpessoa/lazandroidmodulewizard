@@ -1,8 +1,8 @@
 object AndroidModule1: TAndroidModule1
   Left = 287
-  Top = 8
+  Top = 200
   Width = 314
-  Height = 687
+  Height = 495
   MarginLeft = 0
   MarginTop = 0
   MarginRight = 0
@@ -11,6 +11,7 @@ object AndroidModule1: TAndroidModule1
   Text = 'AndroidModule1'
   ActivityMode = actMain
   BackgroundColor = colbrDefault
+  ActionBarTitle = abtDefault
   OnRotate = AndroidModule1Rotate
   OnJNIPrompt = AndroidModule1JNIPrompt
   object jPanel1: jPanel
@@ -220,7 +221,7 @@ object AndroidModule1: TAndroidModule1
     Left = 0
     Top = 216
     Width = 314
-    Height = 329
+    Height = 233
     MarginLeft = 0
     MarginTop = 0
     MarginRight = 0
@@ -236,10 +237,10 @@ object AndroidModule1: TAndroidModule1
     MaxPinchZoomFactor = 4
     Id = 0
     object jImageView1: jImageView
-      Left = 8
-      Top = 10
-      Width = 293
-      Height = 312
+      Left = 6
+      Top = 4
+      Width = 302
+      Height = 224
       MarginTop = 2
       Visible = True
       PosRelativeToAnchor = []

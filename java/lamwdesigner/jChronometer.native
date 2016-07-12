@@ -1,0 +1,1 @@
+public native void pOnChronometerTick(long pasobj, long elapsedTimeMillis);

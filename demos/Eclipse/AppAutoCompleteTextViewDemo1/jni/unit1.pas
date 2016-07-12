@@ -15,8 +15,6 @@ type
 
   TAndroidModule1 = class(jForm)
     jAutoTextView1: jAutoTextView;
-    jButton1: jButton;
-    jEditText1: jEditText;
     jTextView1: jTextView;
     procedure AndroidModule1SpecialKeyDown(Sender: TObject; keyChar: char;
       keyCode: integer; keyCodeString: string; var mute: boolean);
@@ -42,6 +40,7 @@ implementation
 procedure TAndroidModule1.jAutoTextView1Click(Sender: TObject);
 begin
   //ShowMessage('Click me ....');
+  jAutoTextView1.Clear();
   jAutoTextView1.ShowDropDown();
 end;
 
@@ -49,7 +48,6 @@ procedure TAndroidModule1.AndroidModule1SpecialKeyDown(Sender: TObject;
   keyChar: char; keyCode: integer; keyCodeString: string; var mute: boolean);
 begin
    ShowMessage(keyCodeString);
-
 
    //if keyCodeString = 'KEYCODE_BACK' then mute:= True;
    //caution!! OnBackButton will be not fired !
@@ -62,5 +60,6 @@ procedure TAndroidModule1.jAutoTextView1ClickDropDownItem(Sender: TObject;
 begin
   ShowMessage('Caption= ' + itemCaption + '  ::  Index= ' + IntToStr(itemIndex));
 end;
+
 
 end.

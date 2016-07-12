@@ -1,0 +1,3 @@
+public java.lang.Object jPreferences_jCreate(long _Self, boolean _IsShared) {
+   return (java.lang.Object)(new jPreferences(this,_Self,_IsShared));
+}

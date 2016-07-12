@@ -1,6 +1,6 @@
 package com.example.appradiogroupdemo1;
 
-//Lamw: Lazarus Android Module Wizard - Version 0.6 - revision 38 - 26 December - 2015
+//Lamw: Lazarus Android Module Wizard - Version 0.7 - 04 July - 2016
 //Form Designer and Components development model!
 //https://github.com/jmpessoa/lazandroidmodulewizard
 //http://forum.lazarus.freepascal.org/index.php/topic,21919.270.html
@@ -25,27 +25,21 @@ import java.lang.Override;
 
 
 import android.app.Activity;
-
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.content.pm.ActivityInfo; 
 import android.widget.RelativeLayout;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
-
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
-
 import android.view.View;
-
 import android.view.WindowManager;
-
-//import android.view.View;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.util.Log;
 
-// http://stackoverflow.com/questions/16282294/show-title-bar-from-code
 public class App extends Activity {
     
 	private Controls       controls;
@@ -54,9 +48,9 @@ public class App extends Activity {
     public void onCreate(Bundle savedInstanceState) {
      super.onCreate(savedInstanceState);                            
      
-      //by jmpessoa --- fix for http get    
       //ref. http://stackoverflow.com/questions/8706464/defaulthttpclient-to-androidhttpclient 
-     if (android.os.Build.VERSION.SDK_INT > 9) {
+     int systemVersion = android.os.Build.VERSION.SDK_INT; 
+     if (systemVersion > 9) {
          StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
          StrictMode.setThreadPolicy(policy);
      }
@@ -67,6 +61,7 @@ public class App extends Activity {
       controls.appLayout   = new RelativeLayout(this);
       controls.appLayout.getRootView().setBackgroundColor (0x00FFFFFF);
       controls.screenStyle = controls.jAppOnScreenStyle();
+      controls.systemVersion = systemVersion;
       switch( controls.screenStyle ) {
       	case 1  : this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT );  break;
       	case 2  : this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);  break;
@@ -109,7 +104,7 @@ public class App extends Activity {
     public    void onConfigurationChanged(Configuration newConfig) {
     	super.onConfigurationChanged(newConfig);
     	controls.jAppOnRotate(newConfig.orientation);
-    	controls.jAppOnConfigurationChanged();
+    	//controls.jAppOnConfigurationChanged();
     }	   	
  
     @Override
@@ -189,5 +184,62 @@ public boolean onOptionsItemSelected(MenuItem item) {
 	   //TODO!!!!
      return super.onMenuOpened(featureId, menu);
    }
-        
+   
+   //https://abhik1987.wordpress.com/tag/android-disable-home-button/
+   //http://code.tutsplus.com/tutorials/android-sdk-intercepting-physical-key-events--mobile-10379 //otimo!
+   
+   //Return true to prevent this event from being propagated further, 
+   //or false to indicate that you have not handled this event and it should continue to be propagated.  
+   
+   @Override
+   public boolean onKeyDown(int keyCode, KeyEvent event) {	   
+	  char c = event.getDisplayLabel();	        
+	  //boolean mute = controls.jAppOnKeyDown(c,keyCode,KeyEvent.keyCodeToString(keyCode));  //TODO
+      //if (mute) return false;	  
+      switch(keyCode) {
+            
+      case KeyEvent.KEYCODE_BACK:
+    	 boolean mute = controls.jAppOnKeyDown(c,keyCode,KeyEvent.keyCodeToString(keyCode));    	  
+         if (!mute) { //continue ...
+        	 onBackPressed();
+             return true;
+         } else {  // exit! 
+        	 return false;  //caution!! the back_key will not close the App, no more!!
+         }
+         
+      case KeyEvent.KEYCODE_MENU:     	     	      	          
+    	 controls.jAppOnKeyDown(c,keyCode,KeyEvent.keyCodeToString(keyCode));
+         break;
+              
+        case KeyEvent.KEYCODE_SEARCH:
+          controls.jAppOnKeyDown(c,keyCode,KeyEvent.keyCodeToString(keyCode));
+          break;
+                    
+        case KeyEvent.KEYCODE_VOLUME_UP:
+          //event.startTracking();  //TODO
+          controls.jAppOnKeyDown(c,keyCode,KeyEvent.keyCodeToString(keyCode));
+          break;
+          
+        case KeyEvent.KEYCODE_VOLUME_DOWN:
+          controls.jAppOnKeyDown(c,keyCode,KeyEvent.keyCodeToString(keyCode));
+          break;
+          
+          /*commented! need SDK API >= 18 [Android 4.3] to compile!*/
+          /*
+        case KeyEvent.KEYCODE_BRIGHTNESS_DOWN:
+            controls.jAppOnKeyDown(c,keyCode,KeyEvent.keyCodeToString(keyCode));
+            break;                   
+        case KeyEvent.KEYCODE_BRIGHTNESS_UP:
+            controls.jAppOnKeyDown(c,keyCode,KeyEvent.keyCodeToString(keyCode));
+            break;
+         */
+          
+        case KeyEvent.KEYCODE_HEADSETHOOK:
+            controls.jAppOnKeyDown(c,keyCode,KeyEvent.keyCodeToString(keyCode));
+            break;
+            
+        //default:  controls.jAppOnKeyDown(c,keyCode,KeyEvent.keyCodeToString(keyCode));         	
+      }      
+      return super.onKeyDown(keyCode, event);      
+   }        
 }

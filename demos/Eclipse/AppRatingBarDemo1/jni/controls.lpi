@@ -21,8 +21,11 @@
     <VersionInfo>
       <StringTable ProductVersion=""/>
     </VersionInfo>
-    <CustomData Count="1">
+    <CustomData Count="4">		
       <Item0 Name="LAMW" Value="GUI"/>
+      <Item1 Name="Package" Value="com.example.appratingbardemo1"/>
+      <Item2 Name="NdkPath" Value="C:\adt32\ndk10e"/>
+      <Item3 Name="SdkPath" Value="C:\adt32\sdk"/>
     </CustomData>
     <BuildModes Count="1">
       <Item1 Name="Default" Default="True"/>

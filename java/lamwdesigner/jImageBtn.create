@@ -1,0 +1,3 @@
+public  java.lang.Object jImageBtn_Create(long pasobj ) {
+   return (java.lang.Object)( new jImageBtn(this.activity,this,pasobj));
+}

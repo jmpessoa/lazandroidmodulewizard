@@ -10,10 +10,11 @@ object AndroidModule1: TAndroidModule1
   Text = 'AndroidModule1'
   ActivityMode = actMain
   BackgroundColor = colbrDefault
+  ActionBarTitle = abtDefault
   object jButton1: jButton
-    Left = 114
+    Left = 4
     Top = 180
-    Width = 92
+    Width = 312
     Height = 40
     MarginLeft = 2
     MarginTop = 4
@@ -22,9 +23,9 @@ object AndroidModule1: TAndroidModule1
     Visible = True
     PosRelativeToAnchor = []
     PosRelativeToParent = [rpCenterInParent]
-    LayoutParamWidth = lpOneThirdOfParent
+    LayoutParamWidth = lpMatchParent
     LayoutParamHeight = lpWrapContent
-    Text = 'jButton1'
+    Text = 'Try Pascal Exception'
     BackgroundColor = colbrDefault
     FontColor = colbrDefault
     FontSize = 0
