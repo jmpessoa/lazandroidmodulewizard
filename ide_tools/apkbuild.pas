@@ -9,7 +9,7 @@ interface
 
 uses
   {$ifdef Windows}Windows,{$endif}
-  Classes, SysUtils, ProjectIntf, Forms;
+  Classes, SysUtils, ProjectIntf, Forms, LamwSettings;
 
 type
 
@@ -38,8 +38,8 @@ procedure RegisterExtToolParser;
 implementation
 
 uses
-  IDEExternToolIntf, LazIDEIntf, UTF8Process, Controls, EditBtn, StdCtrls,
-  ButtonPanel, Dialogs, uFormStartEmulator, IniFiles, process, strutils,
+  IDEExternToolIntf, UTF8Process, Controls, StdCtrls,
+  ButtonPanel, Dialogs, uFormStartEmulator, process, strutils,
   laz2_XMLRead, Laz2_DOM, laz2_XMLWrite, LazFileUtils;
 
 const
@@ -54,67 +54,6 @@ type
     procedure ReadLine(Line: string; OutputIndex: integer; var Handled: boolean); override;
     class function DefaultSubTool: string; override;
   end;
-
-function QueryPath(APrompt: string; out Path: string;
-  ACaption: string = 'Android Wizard: Path Missing!'): Boolean;
-var
-  f: TForm;
-  l: TLabel;
-  de: TDirectoryEdit;
-begin
-  Result := False;
-  f := TForm.Create(nil);
-  with f do
-  try
-    Caption := ACaption;
-    Position := poScreenCenter;
-    AutoSize := True;
-    Constraints.MinWidth := 440;
-    BorderStyle := bsSingle;
-    BorderIcons := [biSystemMenu];
-    l := TLabel.Create(f);
-    with l do
-    begin
-      Parent := f;
-      Caption := APrompt;
-      AnchorSideLeft.Control := f;
-      AnchorSideTop.Control := f;
-      BorderSpacing.Around := 8;
-    end;
-    de := TDirectoryEdit.Create(f);
-    with de do
-    begin
-      Parent := f;
-      if Pos(':', APrompt) > 0 then
-        DialogTitle := Copy(APrompt, 1, Pos(':', APrompt) - 1)
-      else
-        DialogTitle := APrompt;
-      AnchorSideLeft.Control := f;
-      AnchorSideTop.Control := l;
-      AnchorSideTop.Side := asrBottom;
-      AnchorSideRight.Control := f;
-      AnchorSideRight.Side := asrRight;
-      Anchors := [akTop, akLeft, akRight];
-      BorderSpacing.Around := 8;
-    end;
-    with TButtonPanel.Create(f) do
-    begin
-      Parent := f;
-      ShowButtons := [pbOK, pbCancel];
-      AnchorSideTop.Control := de;
-      AnchorSideTop.Side := asrBottom;
-      Anchors := [akTop, akLeft, akRight];
-      ShowBevel := False;
-    end;
-    if ShowModal = mrOK then
-    begin
-      Path := de.Directory;
-      Result := True;
-    end;
-  finally
-    Free;
-  end;
-end;
 
 { TAntParser }
 
@@ -144,28 +83,11 @@ end;
 
 procedure TApkBuilder.LoadPaths;
 begin
-  with TIniFile.Create(IncludeTrailingPathDelimiter(LazarusIDE.GetPrimaryConfigPath)
-    + 'JNIAndroidProject.ini') do
-  try
-    FSdkPath := ReadString('NewProject', 'PathToAndroidSDK', '');
-    FAntPath := ReadString('NewProject', 'PathToAntBin', '');
-    FJdkPath := ReadString('NewProject', 'PathToJavaJDK', '');
-    FNdkPath := ReadString('NewProject', 'PathToAndroidNDK', '');
-  finally
-    Free
-  end;
-  if FAntPath = '' then
-    if not QueryPath('Path to Ant bin: [ex. C:\adt32\Ant\bin]', FAntPath) then
-      Exit;
-  if FSdkPath = '' then
-    if not QueryPath('Path to Android SDK: [ex. C:\adt32\sdk]', FSdkPath) then
-      Exit;
-  if FJdkPath = '' then
-    if not QueryPath('Path to Java JDK: [ex. C:\Program Files (x86)\Java\jdk1.7.0_21]', FJdkPath) then
-      Exit;
-  if FNdkPath = '' then
-    if not QueryPath('Path to Android NDK: [ex. C:\adt32\ndk10]', FNdkPath) then
-      Exit;
+  LamwGlobalSettings.QueryPaths := True;
+  FSdkPath := LamwGlobalSettings.PathToAndroidSDK;
+  FAntPath := LamwGlobalSettings.PathToAntBin;
+  FJdkPath := LamwGlobalSettings.PathToJavaJDK;
+  FNdkPath := LamwGlobalSettings.PathToAndroidNDK;
 end;
 
 function TApkBuilder.RunAndGetOutput(const cmd, params: string;
@@ -404,7 +326,7 @@ begin
   ForceFixPaths := False;
   if not DirectoryExists(FNdkPath) then
     raise Exception.Create('NDK path (' + FNdkPath + ') does not exist! '
-      + 'Fix NDK path with Path settings in Tools menu.');
+      + 'Fix NDK path by Path settings in Tools menu.');
   sl := TStringList.Create;
   try
     // Libraries

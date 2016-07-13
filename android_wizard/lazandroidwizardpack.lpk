@@ -14,7 +14,7 @@
         <CustomOptions Value="$(IDEBuildOptions)"/>
       </Other>
     </CompilerOptions>
-    <Files Count="15">
+    <Files Count="16">
       <Item1>
         <Filename Value="androidwizard_intf.pas"/>
         <HasRegisterProc Value="True"/>
@@ -74,8 +74,12 @@
       </Item14>
       <Item15>
         <Filename Value="imgcache.pas"/>
-        <UnitName Value="imgcache"/>
+        <UnitName Value="ImgCache"/>
       </Item15>
+      <Item16>
+        <Filename Value="lamwsettings.pas"/>
+        <UnitName Value="LamwSettings"/>
+      </Item16>
     </Files>
     <RequiredPkgs Count="4">
       <Item1>
