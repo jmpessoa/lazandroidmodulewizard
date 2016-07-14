@@ -1034,6 +1034,7 @@ begin
      if added then
         if nativeExists then UpdateProjectLPR;
   end;
+
 end;
 
 procedure TAndroidWidgetMediator.OnSetSelection(const ASelection: TPersistentSelectionList);
@@ -1201,7 +1202,7 @@ begin
   GetAllJControlsFromForms(jcontrolsList);
 
   //cleanup all... [force update all templates !!]
-  for j:= 0 to jcontrolsList.Count - 1 do
+  for j:= 0 to jcontrolsList.Count - 1 do      //TFPNoGUIGraphicsBridge
   begin
 
     if FileExists(FPathToJavaTemplates+DirectorySeparator+'lamwdesigner'+DirectorySeparator+jcontrolsList.Strings[j]+'.java') then
@@ -1240,6 +1241,15 @@ begin
           TryAddJControl(jcontrolsList.Strings[j], nativeExists);
        end;
     end;
+  end;
+
+  if Pos('TFPNoGUIGraphicsBridge', jcontrolsList.Text) > 0 then   //handle lib freetype need by TFPNoGUIGraphicsBridge
+  begin
+    auxList.LoadFromFile(FPathToJavaSource+DirectorySeparator+'Controls.java');
+    aux:=  StringReplace(auxList.Text, '/*--nogui--' , '/*--nogui--*/' , [rfReplaceAll,rfIgnoreCase]);
+    aux:=  StringReplace(aux, '--graphics--*/' , '/*--graphics--*/' , [rfReplaceAll,rfIgnoreCase]);
+    auxList.Text:= aux;
+    auxList.SaveToFile(FPathToJavaSource+DirectorySeparator+'Controls.java');
   end;
 
   list.Free;
