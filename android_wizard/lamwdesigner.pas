@@ -65,6 +65,8 @@ type
     function TryRemoveJControl(jclassname: string; out nativeRemoved: boolean): boolean;
     function TryAddJControl(jclassname: string; out nativeAdded: boolean): boolean;
     procedure GetAllJControlsFromForms(const jcontrolsList: TStrings);
+    procedure CleanupAllJControlsSource();
+
     procedure TryChangeDemoProjecPaths;
     function IsDemoProject(): boolean;
     procedure TryFindDemoPathsFromReadme(out pathToDemoNDK: string; out pathToDemoSDK: string);
@@ -90,12 +92,11 @@ type
     procedure GetClientArea(AComponent: TComponent; out CurClientArea: TRect; out ScrollOffset: TPoint); override;
     procedure InitComponent(AComponent, NewParent: TComponent; NewBounds: TRect); override;
     procedure Paint; override;
-    procedure KeyDown(Sender: TControl; var {%H-}Key: word; {%H-}Shift: TShiftState); override;
+    procedure KeyUp(Sender: TControl; var {%H-}Key: word; {%H-}Shift: TShiftState); override;
     function ComponentIsIcon(AComponent: TComponent): boolean; override;
     function ParentAcceptsChild(Parent: TComponent; Child: TComponentClass): boolean; override;
     procedure UpdateTheme;
     procedure MouseDown(Button: TMouseButton; Shift: TShiftState; p: TPoint; var Handled: boolean); override;
-    //procedure MouseMove(Shift: TShiftState; p: TPoint; var Handled: boolean); override;
     procedure MouseUp(Button: TMouseButton; Shift: TShiftState; p: TPoint; var Handled: boolean); override;
 
   public
@@ -1077,7 +1078,7 @@ var
   list, auxList, jcontrolsList: TStringList;
   j, p1: integer;
   aux, dlgMessage: string;
-  doUpdatedLPR, nativeExists: boolean;
+  doUpdateLPR, nativeExists: boolean;
 begin
 
   //it is not necessary repeat "InitSmartDesignerHelpers" tasks for each form...
@@ -1085,7 +1086,7 @@ begin
 
   LazarusIDE.ActiveProject.Tag:= 1010;  //break "InitSmartDesignerHelpers" repetition...
 
-  doUpdatedLPR:= False;
+  doUpdateLPR:= False;
 
   p1:= Pos(DirectorySeparator+'jni'+DirectorySeparator, LazarusIDE.ActiveProject.ProjectInfoFile);
   if p1 > 0 then
@@ -1150,88 +1151,40 @@ begin
         end;
     end;
     ForceDirectory(FPathToAndroidProject+DirectorySeparator+'lamwdesigner');
-    doUpdatedLPR:= True;  //force cleanup old [fat]  *.lpr !!
+    doUpdateLPR:= True;  //force cleanup old [fat]  *.lpr !!
   end;
 
-  //update project 'Controls.java' 'App.java'... etc..
-  if FileExists(FPathToJavaTemplates+DirectorySeparator+'Controls.java') then
+  CleanupAllJControlsSource();  //force cleanup all java code
+
+  SetStartModuleTypeNameAndVarName(); //need to update/change .lpr
+
+  //update all java code ...
+  if FileExists(FPathToJavaTemplates+DirectorySeparator+'App.java') then
   begin
-
-    if FileExists(FPathToJavaSource+DirectorySeparator+'Controls.java') then
-    begin
-      CopyFile(FPathToJavaSource+DirectorySeparator+'Controls.java',
-               FPathToJavaSource+DirectorySeparator+'bak'+DirectorySeparator+'Controls.java.bak');
-    end;
-
-    auxList.LoadFromFile(FPathToJavaTemplates+DirectorySeparator+'Controls.java');
-    auxList.Strings[0]:= 'package '+FPackageName+';';
-    auxList.SaveToFile(FPathToJavaSource+DirectorySeparator+'Controls.java');
-
-    if FileExists(FPathToJavaSource+DirectorySeparator+'App.java') then
-    begin
-      CopyFile(FPathToJavaSource+DirectorySeparator+'App.java',
-               FPathToJavaSource+DirectorySeparator+'bak'+DirectorySeparator+'App.java.bak');
-
-    end;
-
     auxList.LoadFromFile(FPathToJavaTemplates+DirectorySeparator+'App.java');
     auxList.Strings[0]:= 'package '+FPackageName+';';
     auxList.SaveToFile(FPathToJavaSource+DirectorySeparator+'App.java');
-
-    if FileExists(FPathToJavaTemplates + DirectorySeparator + 'Controls.native') then
-    begin
-
-       if FileExists(FPathToAndroidProject+DirectorySeparator+'lamwdesigner'+DirectorySeparator+ 'Controls.native') then
-       begin
-         RenameFile(FPathToAndroidProject+DirectorySeparator+'lamwdesigner'+DirectorySeparator+ 'Controls.native',
-                    FPathToAndroidProject+DirectorySeparator+'lamwdesigner'+DirectorySeparator+ 'Controls.native.bak');
-       end;
-
-       CopyFile(FPathToJavaTemplates + DirectorySeparator + 'Controls.native',
-                FPathToAndroidProject+ DirectorySeparator+'lamwdesigner'+DirectorySeparator+ 'Controls.native');
-
-       doUpdatedLPR:= True;  //force .lpr update  !!
-    end;
-
   end;
 
-   //update all ...
-  SetStartModuleTypeNameAndVarName(); //need to update/change .lpr
+  if FileExists(FPathToJavaTemplates+DirectorySeparator+'Controls.java') then
+  begin
+    auxList.LoadFromFile(FPathToJavaTemplates+DirectorySeparator+'Controls.java');
+    auxList.Strings[0]:= 'package '+FPackageName+';';
+    auxList.SaveToFile(FPathToJavaSource+DirectorySeparator+'Controls.java');
+  end;
+
+  if FileExists(FPathToJavaTemplates + DirectorySeparator + 'Controls.native') then
+  begin
+     CopyFile(FPathToJavaTemplates + DirectorySeparator + 'Controls.native',
+              FPathToAndroidProject+ DirectorySeparator+'lamwdesigner'+DirectorySeparator+ 'Controls.native');
+
+     doUpdateLPR:= True;  //force .lpr update  !!
+  end;
 
   jcontrolsList:= TStringList.Create;
   GetAllJControlsFromForms(jcontrolsList);
 
-  //cleanup all... [force update all templates !!]
-  for j:= 0 to jcontrolsList.Count - 1 do      //TFPNoGUIGraphicsBridge
-  begin
-
-    if FileExists(FPathToJavaTemplates+DirectorySeparator+'lamwdesigner'+DirectorySeparator+jcontrolsList.Strings[j]+'.java') then
-    begin
-      if FileExists(FPathToJavaSource+DirectorySeparator+jcontrolsList.Strings[j]+'.java') then
-      begin
-         CopyFile(FPathToJavaSource+DirectorySeparator+jcontrolsList.Strings[j]+'.java',
-                  FPathToJavaSource+DirectorySeparator+'bak'+DirectorySeparator+jcontrolsList.Strings[j]+'.java.bak');
-
-         //cleanup to force update
-         DeleteFile(FPathToJavaSource+DirectorySeparator+jcontrolsList.Strings[j]+'.java');
-      end;
-    end;
-
-    if FileExists(FPathToJavaTemplates+DirectorySeparator+'lamwdesigner'+DirectorySeparator+jcontrolsList.Strings[j]+'.native') then
-    begin
-       if FileExists(FPathToAndroidProject+DirectorySeparator+'lamwdesigner'+jcontrolsList.Strings[j]+'.native') then
-       begin
-         //an update ".native" file will be added ...
-         RenameFile (FPathToAndroidProject+DirectorySeparator+'lamwdesigner'+jcontrolsList.Strings[j]+'.native',
-                     FPathToAndroidProject+DirectorySeparator+'lamwdesigner'+jcontrolsList.Strings[j]+'.native.bak');
-
-         doUpdatedLPR:= True; // force .lpr update
-       end;
-    end;
-
-  end;
-
-  //re-add all [updated all !]...
+  //re-add all [updated] java code ...
   for j:= 0 to jcontrolsList.Count - 1 do
   begin
     if FileExists(FPathToJavaTemplates+DirectorySeparator+'lamwdesigner'+DirectorySeparator+jcontrolsList.Strings[j]+'.java') then
@@ -1256,18 +1209,18 @@ begin
   jcontrolsList.Free;
   auxList.Free;
 
-  //try fix/repair project paths [demos, etc..]
+  // try fix/repair project paths [demos, etc..]
   if IsDemoProject() then
   begin
     TryChangeDemoProjecPaths();
   end
   else
-  begin  //add/update custom
+  begin  // add/update custom
     LazarusIDE.ActiveProject.CustomData.Values['NdkPath']:= FPathToAndroidNDK;
     LazarusIDE.ActiveProject.CustomData.Values['SdkPath']:= FPathToAndroidSDK
   end;
 
-  if doUpdatedLPR then UpdateProjectLPR;
+  if doUpdateLPR then UpdateProjectLPR;
 
 end;
 
@@ -1531,6 +1484,36 @@ begin
 
 end;
 
+procedure TAndroidWidgetMediator.CleanupAllJControlsSource();
+var
+   contentList: TStringList;
+   i: integer;
+begin
+
+   //No need to create the stringlist...
+   contentList := FindAllFiles(FPathToJavaSource, '*.java', False);
+   for i:= 0 to contentList.Count-1 do
+   begin         //do backup
+      CopyFile(contentList.Strings[i],
+            FPathToJavaSource+DirectorySeparator+'bak'+DirectorySeparator+ExtractFileName(contentList.Strings[i])+'.bak');
+
+      DeleteFile(contentList.Strings[i]);
+   end;
+   contentList.Free;
+
+   ForceDirectory(FPathToAndroidProject+DirectorySeparator+'lamwdesigner'+DirectorySeparator+'bak');
+   contentList := FindAllFiles(FPathToAndroidProject+ DirectorySeparator+'lamwdesigner', '*.native', False);
+   for i:= 0 to contentList.Count-1 do
+   begin     //do backup
+     CopyFile(contentList.Strings[i],
+           FPathToAndroidProject+ DirectorySeparator+'lamwdesigner'+DirectorySeparator+'bak'+DirectorySeparator+ExtractFileName(contentList.Strings[i])+'.bak');
+
+     DeleteFile(contentList.Strings[i]);
+   end;
+   contentList.Free;
+
+end;
+
 function TAndroidWidgetMediator.GetEventSignature(nativeMethod: string): string;
 var
   method: string;
@@ -1744,6 +1727,7 @@ begin
   GetAllJControlsFromForms(allFormsControlsList);
 
   i:= allFormsControlsList.IndexOf(jclassname);
+
   if i >= 0 then
   begin
     allFormsControlsList.Delete(i); //delete one ocorrence of the java class ...
@@ -2126,7 +2110,7 @@ begin
 end;
 
 
-procedure TAndroidWidgetMediator.KeyDown(Sender: TControl; var {%H-}Key: word; {%H-}Shift: TShiftState);
+procedure TAndroidWidgetMediator.KeyUp(Sender: TControl; var {%H-}Key: word; {%H-}Shift: TShiftState);
 var
   hadNative: boolean;
   removed: boolean;
