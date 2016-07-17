@@ -1687,7 +1687,6 @@ begin
   SynMemo2.Add('  gApp.Initialize;');
   SynMemo2.Add('  gApp.CreateForm('+FStartModuleTypeName+', '+FStartModuleVarName+');');
   SynMemo2.Add('end.');
-  SynMemo2.Add('(*last [smart] upgrade: '+DateTimeToStr(Now)+'*)');
 
   if FileExists(FPathToAndroidProject+DirectorySeparator+'jni'+DirectorySeparator+'controls.lpr') then
   begin
@@ -1736,7 +1735,7 @@ begin
   if allFormsControlsList.IndexOf(jclassname) >= 0 then
   begin
     allFormsControlsList.Free;
-    Exit;  //stop removing... still exists others component of the same java class..
+    Exit;  //stop removing java stuff... still exists others component of the same java class..
   end;
 
   list:= TStringList.Create;
