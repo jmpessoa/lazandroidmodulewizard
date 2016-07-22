@@ -1197,6 +1197,8 @@ type
     function GetWidth: integer;  override;
     function GetHeight: integer; override;
 
+    procedure SetId(_id: DWord);
+
     property AnchorId: integer read FAnchorId write FAnchorId;
     property ScreenStyle   : TScreenStyle read FScreenStyle  write FScreenStyle   ;
     property ViewParent {ViewParent}: jObject  read  GetViewParent write SetViewParent; // Java : Parent Relative Layout
@@ -1442,7 +1444,12 @@ function jForm_IsSdCardMounted(env: PJNIEnv;  _jform: JObject): boolean;
 //------------------------------------------------------------------------------
 
 Procedure View_SetVisible             (env:PJNIEnv;this:jobject; view : jObject; visible : Boolean); overload;
+
 Procedure View_SetVisible             (env:PJNIEnv;view : jObject; visible : Boolean); overload;
+
+
+Procedure View_SetId                  (env:PJNIEnv;this:jobject; view : jObject; Id: DWord); overload;
+Procedure View_SetId                  (env:PJNIEnv; view : jObject; Id :DWord); overload;
 
 Procedure View_SetBackGroundColor     (env:PJNIEnv;this:jobject; view : jObject; color : DWord);  overload;
 Procedure View_SetBackGroundColor     (env:PJNIEnv;view : jObject; color : DWord);  overload;
@@ -2096,13 +2103,26 @@ begin
      if Value <> nil then  //re- add free notification...
      begin
         Value.FreeNotification(Self);
+
+        if Value.Initialized then  //added to run time component create!
+        begin
+          if Value.Id = 0 then
+          begin
+            Randomize;
+            Value.Id:= Random(10000000);
+            Value.SetId(Value.Id); //JNI call
+          end;
+        end;
+
         if not (csDesigning in ComponentState) then Exit;
         if (csLoading in ComponentState) then Exit;
-        if  Value.Id = 0 then   //Id must be published for data persistence!
+
+        if Value.Id = 0 then   //Id must be published for data persistence!
         begin
           Randomize;
           Value.Id:= Random(10000000);  //warning: remember the law of Murphi...
         end;
+
      end;
   end;
 end;
@@ -2161,6 +2181,13 @@ procedure jVisualControl.WriteIntId(Writer: TWriter);
 begin
   Writer.WriteInteger(FId);
 end;
+
+procedure jVisualControl.SetId(_id: DWord);
+begin
+  if FInitialized then
+      View_SetId(FjEnv, FjObject, FId);
+end;
+
 
 // needed by jForm process logic ...
 procedure jVisualControl.UpdateLayout;
@@ -5552,6 +5579,34 @@ end;
 // View  - generics - "controls.java"
 //------------------------------------------------------------------------------
 
+Procedure View_SetId(env:PJNIEnv; view : jObject; Id :DWord);
+var
+  method: jmethodID;
+  _jParams : array[0..0] of jValue;
+    cls: jClass;
+begin
+  _jParams[0].i := Id;
+  cls:= env^.GetObjectClass(env, view);
+  method:= env^.GetMethodID(env, cls, 'setId', '(I)V');
+  env^.CallVoidMethodA(env, view, method, @_jParams);
+  env^.DeleteLocalRef(env, cls);
+end;
+
+
+Procedure View_SetId(env:PJNIEnv; this:jobject; view : jObject; Id : DWord);
+var
+  method: jmethodID;
+  _jParams : array[0..1] of jValue;
+    cls: jClass;
+begin
+  _jParams[0].l := view;
+ _jParams[1].i := Id;
+  cls:= Get_gjClass(env);
+  method:= env^.GetMethodID(env, cls, 'view_SetId', '(Landroid/view/View;I)V');
+  env^.CallVoidMethodA(env, this, method, @_jParams);
+end;
+
+
 //by jmpessoa
 Procedure View_SetVisible(env:PJNIEnv; this:jobject; view : jObject; visible : Boolean);
 var
@@ -5584,7 +5639,6 @@ begin
   env^.CallVoidMethodA(env, view, method, @_jParams);
   env^.DeleteLocalRef(env, cls);
 end;
-
 
 //by jmpessoa
 Procedure View_SetBackGroundColor(env:PJNIEnv;this:jobject; view : jObject; color : DWord);
