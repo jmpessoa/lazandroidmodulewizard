@@ -5585,7 +5585,7 @@ var
   _jParams : array[0..0] of jValue;
     cls: jClass;
 begin
-  _jParams[0].i := Id;
+  _jParams[0].i:= Id;
   cls:= env^.GetObjectClass(env, view);
   method:= env^.GetMethodID(env, cls, 'setId', '(I)V');
   env^.CallVoidMethodA(env, view, method, @_jParams);

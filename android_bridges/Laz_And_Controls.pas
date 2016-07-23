@@ -2571,6 +2571,7 @@ begin
     jScrollView(FParent).Init(refApp);
     FjPRLayout:= jScrollView_getView(FjEnv, jScrollView(FParent).jSelf);
   end;
+
   if FParent is jHorizontalScrollView then
   begin
     jHorizontalScrollView(FParent).Init(refApp);
@@ -2585,7 +2586,7 @@ begin
 
   jTextView_setParent(FjEnv, FjObject , FjPRLayout);
 
-  jTextView_setId(FjEnv, FjObject , Self.Id);
+  jTextView_setId(FjEnv, FjObject, Self.Id);
 
   jTextView_setLeftTopRightBottomWidthHeight(FjEnv, FjObject ,
                                            FMarginLeft,FMarginTop,FMarginRight,FMarginBottom,
@@ -2896,11 +2897,13 @@ begin
     jPanel(FParent).Init(refApp);
     FjPRLayout:= jPanel(FParent).View;
   end;
+
   if FParent is jScrollView then
   begin
     jScrollView(FParent).Init(refApp);
     FjPRLayout:= jScrollView_getView(FjEnv, jScrollView(FParent).jSelf);
   end;
+
   if FParent is jHorizontalScrollView then
   begin
     jHorizontalScrollView(FParent).Init(refApp);
@@ -4531,7 +4534,9 @@ var
   foundIndex: integer;
 begin
    If not Self.Initialized then Exit;
+   if FImageList = nil then Exit;
    if Value = '' then Exit;
+
    foundIndex:= -1;
    for i:=0 to FImageList.Images.Count-1 do
    begin    //simply compares ASCII values...
@@ -4554,6 +4559,8 @@ end;
 Procedure jImageView.SetImageByIndex(Value: integer);
 begin
    if not Self.Initialized then Exit;
+   if FImageList = nil then Exit;
+
    if (Value >= 0) and (Value < FImageList.Images.Count) then
    begin
       FImageName:= Trim(FImageList.Images.Strings[Value]);
@@ -4578,12 +4585,17 @@ end;
 procedure jImageView.SetImageIndex(Value: integer);
 begin
   FImageIndex:= Value;
-  if FInitialized then
+
+  if FImageList <> nil then
   begin
-    if Value > FImageList.Images.Count then FImageIndex:= FImageList.Images.Count;
-    if Value < 0 then FImageIndex:= 0;
-    SetImageByIndex(Value);
+    if FInitialized then
+    begin
+      if Value > FImageList.Images.Count then FImageIndex:= FImageList.Images.Count;
+      if Value < 0 then FImageIndex:= 0;
+      SetImageByIndex(Value);
+    end;
   end;
+
 end;
 
 function jImageView.GetImageIndex: integer;
@@ -5628,7 +5640,7 @@ begin
   begin
      FImageItem.Init(refApp);
      FjObject := jListView_Create2(FjEnv, FjThis, Self,
-                               Ord(FWidgetItem), FWidgetText, FImageItem.GetJavaBitmap,
+                               Ord(FWidgetItem), FWidgetText, FImageItem.GetImage,
                                Ord(FTextDecorated),Ord(FItemLayout), Ord(FTextSizeDecorated), Ord(FTextAlign));
 
     if FFontColor <> colbrDefault then
@@ -5648,9 +5660,9 @@ begin
 
      for i:= 0 to Self.Items.Count-1 do
      begin
-       FImageItem.ImageIndex:= i;
-       jListView_add22(FjEnv, FjObject , Self.Items.Strings[i], FDelimiter, FImageItem.GetJavaBitmap);
+       jListView_add22(FjEnv, FjObject , Self.Items.Strings[i], FDelimiter, FImageItem.GetImage);
      end;
+
   end
   else
   begin
@@ -5918,12 +5930,11 @@ begin
     Result:= jListView_GetCount(FjEnv, FjObject );
 end;
 
-//
 Procedure jListView.Delete(index: Integer);
 begin
   if FInitialized then
   begin
-     if (index >= 0) and (index < Self.Items.Count) then    //bug fix 27-april-2014
+     if (index >= 0) and (index < Self.Items.Count) then
      begin
        jListView_delete(FjEnv, FjObject , index);
        Self.Items.Delete(index);
@@ -5931,7 +5942,6 @@ begin
   end;
 end;
 
-//
 Procedure jListView.Clear;
 begin
   if FInitialized then
@@ -7093,6 +7103,9 @@ end;
 Procedure jBitmap.SetImageByIndex(Value: integer);
 begin
    if not Self.Initialized then Exit;
+
+   if FImageList = nil then Exit;
+
    if (Value >= 0) and (Value < FImageList.Images.Count) then
    begin
       FImageName:= Trim(FImageList.Images.Strings[Value]);
@@ -7109,9 +7122,15 @@ begin
   FImageIndex:= Value;
   if FInitialized then
   begin
-    if Value > FImageList.Images.Count then  FImageIndex:= FImageList.Images.Count;
-    if Value < 0 then  FImageIndex:= 0;
-    SetImageByIndex(FImageIndex);
+    if  FImageList <> nil then
+    begin
+      if Value > FImageList.Images.Count then
+        FImageIndex:= FImageList.Images.Count;
+      if Value < 0 then
+        FImageIndex:= 0;
+
+       SetImageByIndex(FImageIndex);
+    end;
   end;
 end;
 

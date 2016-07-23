@@ -33,6 +33,7 @@ TOnItemSelected = procedure(Sender: TObject; itemCaption: string; itemIndex: int
 
     procedure UpdateLParamHeight;
     procedure UpdateLParamWidth;
+    //procedure ListViewChange  (Sender: TObject);  //TODO
   public
     constructor Create(AOwner: TComponent); override;
     destructor  Destroy; override;
@@ -61,6 +62,7 @@ TOnItemSelected = procedure(Sender: TObject; itemCaption: string; itemIndex: int
     procedure Delete(_index: integer);
     procedure SetSelection(_index: integer);
     procedure SetItem(_index: integer; _item: string);
+    function GetItems(_delimiter: char): string;
     procedure SetFontSize(_txtFontSize: DWord);
     procedure SetFontSizeUnit(_unit: TFontSizeUnit);
 
@@ -128,8 +130,11 @@ begin
   FWidth        := 96;
   FLParamWidth  := lpMatchParent;  //lpWrapContent
   FLParamHeight := lpWrapContent; //lpMatchParent
+
   //your code here....
   FItems:= TStringList.Create;
+  //TStringList(FItems).OnChange:= ListViewChange;  //TODO
+
   FSelectedFontColor:= colbrDefault;
   FDropListTextColor:=  colbrDefault;
   FDropListBackgroundColor:=  colbrDefault;
@@ -230,7 +235,7 @@ begin
   if FDropListTextColor <> colbrDefault then self.SetDropListTextColor(FDropListTextColor);
   if FDropListBackgroundColor <> colbrDefault then  Self.SetDropListBackgroundColor(FDropListBackgroundColor);
 
-  if (FLastItemAsPrompt) then Self.SetLastItemAsPrompt(FLastItemAsPrompt);
+  if FLastItemAsPrompt then Self.SetLastItemAsPrompt(FLastItemAsPrompt);
 
   if FFontSizeUnit <> unitDefault then
        jSpinner_SetFontSizeUnit(FjEnv, FjObject, Ord(FFontSizeUnit));
@@ -240,7 +245,7 @@ begin
 
   for i:= 0 to FItems.Count-1 do
   begin
-    Self.Add(FItems.Strings[i]);
+     jSpinner_Add(FjEnv, FjObject , FItems.Strings[i]);
   end;
 
   View_SetVisible(FjEnv, FjThis, FjObject , FVisible);
@@ -398,12 +403,14 @@ end;
 procedure jSpinner.Add(_item: string);
 begin
   //in designing component state: set value here...
+  FItems.Add(_item);
   if FInitialized then
      jSpinner_Add(FjEnv, FjObject , _item);
 end;
 
 procedure jSpinner.Clear; 
-begin 
+begin
+  FItems.Clear;
   JSpinner_Clear(FjEnv, FjObject); 
 end; 
 
@@ -441,6 +448,7 @@ end;
 function jSpinner.GetSize(): integer;
 begin
   //in designing component state: result value here...
+  Result:= FItems.Count;
   if FInitialized then
    Result:= jSpinner_GetSize(FjEnv, FjObject );
 end;
@@ -448,6 +456,7 @@ end;
 procedure jSpinner.Delete(_index: integer);
 begin
   //in designing component state: set value here...
+  FItems.Delete(_index);
   if FInitialized then
      jSpinner_Delete(FjEnv, FjObject , _index);
 end;
@@ -462,6 +471,7 @@ end;
 procedure jSpinner.SetItem(_index: integer; _item: string);
 begin
   //in designing component state: set value here...
+  FItems.Strings[_index]:= _item;
   if FInitialized then
      jSpinner_SetItem(FjEnv, FjObject , _index ,_item);
 end;
@@ -471,6 +481,15 @@ begin
   FItems.Assign(Value);
 end;
 
+function jSpinner.GetItems(_delimiter: char): string;
+var
+  saveDelimiter: char;
+begin
+  saveDelimiter:= FItems.Delimiter;
+  FItems.Delimiter:= _delimiter;
+  Result:= FItems.DelimitedText;
+  FItems.Delimiter:= saveDelimiter;
+end;
 
 procedure jSpinner.GenEvent_OnSpinnerItemSeleceted(Obj: TObject; caption: string; position: integer);
 begin
@@ -499,6 +518,23 @@ begin
   if FInitialized then
      jSpinner_SetFontSizeUnit(FjEnv, FjObject, Ord(_unit));
 end;
+
+//TODO
+(*
+procedure jSpinner.ListViewChange(Sender: TObject);
+var
+  i: integer;
+begin
+  {if FInitialized then
+  begin
+    jSpinner_Clear(FjEnv, FjObject );
+    for i:= 0 to FItems.Count - 1 do
+    begin
+       jSpinner_Add(FjEnv, FjObject , FItems.Strings[i]);
+    end;
+  end;}
+end;
+*)
 
 {-------- jSpinner_JNI_Bridge ----------}
 
