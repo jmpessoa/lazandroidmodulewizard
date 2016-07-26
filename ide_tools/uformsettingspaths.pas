@@ -57,7 +57,7 @@ type
     FPathToAndroidSDK: string;
     FPathToAndroidNDK: string;
     FPathToAntBin: string;
-    FPrebuildOSYS: string;
+    FPrebuildOSYS: string;  
   public
     { public declarations }
     FOk: boolean;
@@ -116,7 +116,7 @@ begin
        if DirectoryExists(pathToNdkToolchainsArm49 + 'windows-x86_64') then Result:= 'windows-x86_64';
      {$endif}
    {$else}
-     {$ifdef darvin}
+     {$ifdef darwin}
         if DirectoryExists(pathToNdkToolchainsArm49+ 'darwin-x86_64') then Result:= 'darwin-x86_64';
      {$else}
        {$ifdef cpu64}
@@ -271,10 +271,10 @@ begin
 
     WriteString('NewProject', 'NDK', IntToStr(RGNDKVersion.ItemIndex));
 
-    FPathToAndroidNDK:= EditPathToAndroidSDK.Text;
+    FPathToAndroidNDK:= EditPathToAndroidNDK.Text;
 
     if FPathToAndroidNDK <> '' then
-        FPrebuildOSYS:= GetPrebuiltDirectory();
+      FPrebuildOSYS:= GetPrebuiltDirectory();
 
     if FPrebuildOSYS <> '' then
       WriteString('NewProject', 'PrebuildOSYS', FPrebuildOSYS);
