@@ -1011,7 +1011,8 @@ procedure TAndroidWidgetMediator.OnPersistentAdded(APersistent: TPersistent; {%H
 var
   auxClassName: string;
   added, nativeExists: boolean;
-
+  auxList: TStringList;
+  aux, chipArchitecture: string;
 begin
   if (APersistent is jVisualControl)
   and (jVisualControl(APersistent).Parent = nil)
@@ -1034,6 +1035,34 @@ begin
 
      if added then
         if nativeExists then UpdateProjectLPR;
+  end;
+
+  if auxClassName = 'TFPNoGUIGraphicsBridge' then   //handle lib freetype need by TFPNoGUIGraphicsBridge
+  begin
+    auxList:= TStringList.Create;
+    auxList.LoadFromFile(FPathToJavaSource+DirectorySeparator+'Controls.java');
+    if Pos('/*--nogui--*/', auxList.Text) <= 0 then
+    begin
+
+      aux:=  StringReplace(auxList.Text, '/*--nogui--' , '/*--nogui--*/' , [rfReplaceAll,rfIgnoreCase]);
+      aux:=  StringReplace(aux, '--graphics--*/' , '/*--graphics--*/' , [rfReplaceAll,rfIgnoreCase]);
+      auxList.Text:= aux;
+      auxList.SaveToFile(FPathToJavaSource+DirectorySeparator+'Controls.java');
+
+      chipArchitecture:= 'x86';
+      auxList.LoadFromFile(LazarusIDE.ActiveProject.ProjectInfoFile); //full path to 'controls.lpi';
+      if Pos('-CpARMV6', auxList.Text) > 0  then chipArchitecture:= 'armeabi'
+      else if Pos('-CpARMV7A', auxList.Text) > 0  then chipArchitecture:= 'armeabi-v7a';
+
+      if FileExists(FPathToJavaTemplates +DirectorySeparator+'lamwdesigner'+DirectorySeparator+ 'libfreetype.so') then
+      begin
+        CopyFile(FPathToJavaTemplates+DirectorySeparator+'lamwdesigner'+DirectorySeparator+'libfreetype.so',
+                    FPathToAndroidProject+DirectorySeparator+'libs'+DirectorySeparator+
+                    chipArchitecture+DirectorySeparator+'libfreetype.so');
+      end;
+
+    end;
+    auxList.Free;
   end;
 
 end;
@@ -1079,6 +1108,7 @@ var
   j, p1: integer;
   aux, dlgMessage: string;
   doUpdateLPR, nativeExists: boolean;
+  chipArchitecture: string;
 begin
 
   //it is not necessary repeat "InitSmartDesignerHelpers" tasks for each form...
@@ -1203,6 +1233,19 @@ begin
     aux:=  StringReplace(aux, '--graphics--*/' , '/*--graphics--*/' , [rfReplaceAll,rfIgnoreCase]);
     auxList.Text:= aux;
     auxList.SaveToFile(FPathToJavaSource+DirectorySeparator+'Controls.java');
+
+    chipArchitecture:= 'x86';
+    auxList.LoadFromFile(LazarusIDE.ActiveProject.ProjectInfoFile); //full path to 'controls.lpi';
+    if Pos('-CpARMV6', auxList.Text) > 0  then chipArchitecture:= 'armeabi'
+    else if Pos('-CpARMV7A', auxList.Text) > 0  then chipArchitecture:= 'armeabi-v7a';
+
+    if FileExists(FPathToJavaTemplates +DirectorySeparator+'lamwdesigner'+DirectorySeparator+ 'libfreetype.so') then
+    begin
+      CopyFile(FPathToJavaTemplates+DirectorySeparator+'lamwdesigner'+DirectorySeparator+'libfreetype.so',
+                  FPathToAndroidProject+DirectorySeparator+'libs'+DirectorySeparator+
+                  chipArchitecture+DirectorySeparator+'libfreetype.so');
+    end;
+
   end;
 
   list.Free;
@@ -1318,7 +1361,6 @@ procedure TAndroidWidgetMediator.TryFindDemoPathsFromReadme(out pathToDemoNDK: s
                                               out pathToDemoSDK: string);
 var
   strList: TStringList;
-  aux: string;
   p: integer;
   p2: integer;
 begin

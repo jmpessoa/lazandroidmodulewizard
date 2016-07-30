@@ -6,7 +6,7 @@ interface
 
 uses
   inifiles, Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs,
-  StdCtrls, Buttons, ExtCtrls, ComCtrls, LazIDEIntf;
+  StdCtrls, Buttons, ExtCtrls, ComCtrls, LazIDEIntf, PackageIntf;
 
 type
 
@@ -14,41 +14,39 @@ type
 
   TFormSettingsPaths  = class(TForm)
     BitBtnOK: TBitBtn;
-    BevelSDKNDKAndSimonsayzTemplateLazBuild: TBevel;
     BevelJDKAntAndSDKNDK: TBevel;
     BitBtnCancel: TBitBtn;
+    ComboBoxPrebuild: TComboBox;
     EditPathToAndroidNDK: TEdit;
-    EditPathToSimonsayzTemplate: TEdit;
     EditPathToJavaJDK: TEdit;
     EditPathToAndroidSDK: TEdit;
     EditPathToAntBinary: TEdit;
+    GroupBoxPrebuild: TGroupBox;
+    Image1: TImage;
     LabelPathToAndroidNDK: TLabel;
-    LabelPathToSimonsayzTemplate: TLabel;
     LabelPathToJavaJDK: TLabel;
     LabelPathToAndroidSDK: TLabel;
     LabelPathToAntBinary: TLabel;
     RGNDKVersion: TRadioGroup;
     SelDirDlgPathToAndroidNDK: TSelectDirectoryDialog;
-    SelDirDlgPathToSimonsayzTemplate: TSelectDirectoryDialog;
     SelDirDlgPathToJavaJDK: TSelectDirectoryDialog;
     SelDirDlgPathToAndroidSDK: TSelectDirectoryDialog;
     SelDirDlgPathToAntBinary: TSelectDirectoryDialog;
     SpBPathToAndroidNDK: TSpeedButton;
-    SpBPathToSimonsayzTemplate: TSpeedButton;
     SpBPathToJavaJDK: TSpeedButton;
     SpBPathToAndroidSDK: TSpeedButton;
     SpBPathToAntBinary: TSpeedButton;
+    SpeedButtonInfo: TSpeedButton;
     StatusBar1: TStatusBar;
     procedure BitBtnOKClick(Sender: TObject);
     procedure BitBtnCancelClick(Sender: TObject);
     procedure FormActivate(Sender: TObject);
     procedure FormClose(Sender: TObject; var CloseAction: TCloseAction);
-    procedure FormShow(Sender: TObject);
     procedure SpBPathToAndroidNDKClick(Sender: TObject);
-    procedure SpBPathToSimonsayzTemplateClick(Sender: TObject);
     procedure SpBPathToJavaJDKClick(Sender: TObject);
     procedure SpBPathToAndroidSDKClick(Sender: TObject);
     procedure SpBPathToAntBinaryClick(Sender: TObject);
+    procedure SpeedButtonInfoClick(Sender: TObject);
 
   private
     { private declarations }
@@ -57,14 +55,14 @@ type
     FPathToAndroidSDK: string;
     FPathToAndroidNDK: string;
     FPathToAntBin: string;
-    FPrebuildOSYS: string;  
+    FPrebuildOSYS: string;
+    FPathToTemplatePresumed: string;
   public
     { public declarations }
     FOk: boolean;
     procedure LoadSettings(const fileName: string);
     procedure SaveSettings(const fileName: string);
     function GetPrebuiltDirectory: string;
-
   end;
 
 var
@@ -78,61 +76,61 @@ implementation
 
 function TFormSettingsPaths.GetPrebuiltDirectory: string;
 var
-   pathToNdkToolchainsArm46,
-   pathToNdkToolchainsArm49,
-   pathToNdkToolchainsArm443: string;
+   pathToNdkToolchains46,
+   pathToNdkToolchains49,
+   pathToNdkToolchains443: string;  //FInstructionSet   [ARM or x86]
 begin
-   Result:= '';
+    Result:= '';
 
-   pathToNdkToolchainsArm443:= FPathToAndroidNDK+DirectorySeparator+'toolchains'+DirectorySeparator+
+    pathToNdkToolchains443:= FPathToAndroidNDK+DirectorySeparator+'toolchains'+DirectorySeparator+
                                                  'arm-linux-androideabi-4.4.3'+DirectorySeparator+
                                                  'prebuilt'+DirectorySeparator;
 
-   pathToNdkToolchainsArm46:= FPathToAndroidNDK+DirectorySeparator+'toolchains'+DirectorySeparator+
+    pathToNdkToolchains46:= FPathToAndroidNDK+DirectorySeparator+'toolchains'+DirectorySeparator+
                                               'arm-linux-androideabi-4.6'+DirectorySeparator+
                                               'prebuilt'+DirectorySeparator;
 
-   pathToNdkToolchainsArm49:= FPathToAndroidNDK+DirectorySeparator+'toolchains'+DirectorySeparator+
+    pathToNdkToolchains49:= FPathToAndroidNDK+DirectorySeparator+'toolchains'+DirectorySeparator+
                                                 'arm-linux-androideabi-4.9'+DirectorySeparator+
                                                 'prebuilt'+DirectorySeparator;
 
    {$ifdef windows}
-     if DirectoryExists(pathToNdkToolchainsArm49+ 'windows') then
+     if DirectoryExists(pathToNdkToolchains49+ 'windows') then
      begin
        Result:= 'windows';
        Exit;
      end;
-     if DirectoryExists(pathToNdkToolchainsArm46+ 'windows') then
+     if DirectoryExists(pathToNdkToolchains46+ 'windows') then
      begin
        Result:= 'windows';
        Exit;
      end;
-     if DirectoryExists(pathToNdkToolchainsArm443+ 'windows') then
+     if DirectoryExists(pathToNdkToolchains443+ 'windows') then
      begin
        Result:= 'windows';
        Exit;
      end;
      {$ifdef win64}
-       if DirectoryExists(pathToNdkToolchainsArm49 + 'windows-x86_64') then Result:= 'windows-x86_64';
+        if DirectoryExists(pathToNdkToolchains49 + 'windows-x86_64') then Result:= 'windows-x86_64';
      {$endif}
    {$else}
      {$ifdef darwin}
-        if DirectoryExists(pathToNdkToolchainsArm49+ 'darwin-x86_64') then Result:= 'darwin-x86_64';
+        if DirectoryExists(pathToNdkToolchains49+ 'darwin-x86_64') then Result:= 'darwin-x86_64';
      {$else}
        {$ifdef cpu64}
-         if DirectoryExists(pathToNdkToolchainsArm49+ 'linux-x86_64') then Result:= 'linux-x86_64';
+         if DirectoryExists(pathToNdkToolchains49+ 'linux-x86_64') then Result:= 'linux-x86_64';
        {$else}
-         if DirectoryExists(pathToNdkToolchainsArm49+ 'linux-x86_32') then
+         if DirectoryExists(pathToNdkToolchains49+ 'linux-x86_32') then
          begin
             Result:= 'linux-x86_32';
             Exit;
          end;
-         if DirectoryExists(pathToNdkToolchainsArm46+ 'linux-x86_32') then
+         if DirectoryExists(pathToNdkToolchains46+ 'linux-x86_32') then
          begin
            Result:= 'linux-x86_32';
            Exit;
          end;
-         if DirectoryExists(pathToNdkToolchainsArm443+ 'linux-x86_32') then
+         if DirectoryExists(pathToNdkToolchains443+ 'linux-x86_32') then
          begin
            Result:= 'linux-x86_32';
            Exit;
@@ -142,21 +140,45 @@ begin
    {$endif}
 
 end;
+
+
 procedure TFormSettingsPaths.FormClose(Sender: TObject; var CloseAction: TCloseAction);
 begin
   if FOk then
     Self.SaveSettings(IncludeTrailingPathDelimiter(LazarusIDE.GetPrimaryConfigPath) + 'JNIAndroidProject.ini' );
 end;
 
-
-procedure TFormSettingsPaths.FormShow(Sender: TObject);
-begin
-   FOk:= False;
-   Self.LoadSettings(IncludeTrailingPathDelimiter(LazarusIDE.GetPrimaryConfigPath) + 'JNIAndroidProject.ini');
-end;
-
 procedure TFormSettingsPaths.FormActivate(Sender: TObject);
+var
+  p: integer;
+  Pkg: TIDEPackage;
 begin
+  Pkg:=PackageEditingInterface.FindPackageWithName('amw_ide_tools');
+  if Pkg<>nil then
+  begin
+    p:= Pos('ide_tools', ExtractFilePath(Pkg.Filename));
+    FPathToTemplatePresumed:= Copy(ExtractFilePath(Pkg.Filename), 1, p-1) + 'java';
+  end;
+  FOk:= False;
+  Self.LoadSettings(IncludeTrailingPathDelimiter(LazarusIDE.GetPrimaryConfigPath) + 'JNIAndroidProject.ini');
+
+  {$ifdef windows}
+  ComboBoxPrebuild.Items.Add('windows');
+  ComboBoxPrebuild.Items.Add('windows-x86_64');
+  ComboBoxPrebuild.Text:= 'windows';
+  {$endif}
+
+  {$ifdef linux}
+  ComboBoxPrebuild.Items.Add('linux-x86_32');
+  ComboBoxPrebuild.Items.Add('linux-x86_64');
+  ComboBoxPrebuild.Text:= 'linux-x86_64';
+  {$endif}
+
+  {$ifdef darwin}
+  ComboBoxPrebuild.Items.Add('darwin-x86_64');
+  ComboBoxPrebuild.Text:= 'darwin-x86_64';
+  {$endif}
+
   EditPathToJavaJDK.SetFocus;
 end;
 
@@ -181,20 +203,11 @@ begin
   end;
 end;
 
-procedure TFormSettingsPaths.SpBPathToSimonsayzTemplateClick(Sender: TObject);
-begin
-  if SelDirDlgPathToSimonsayzTemplate.Execute then
-  begin
-    EditPathToSimonsayzTemplate.Text := SelDirDlgPathToSimonsayzTemplate.FileName;
-    FPathToJavaTemplates:= SelDirDlgPathToSimonsayzTemplate.FileName;
-  end;
-end;
-
 procedure TFormSettingsPaths.SpBPathToJavaJDKClick(Sender: TObject);
 begin
   if SelDirDlgPathToJavaJDK.Execute then
   begin
-    EditPathToJavaJDK.Text := SelDirDlgPathToJavaJDK.FileName;
+    EditPathToJavaJDK.Text:= SelDirDlgPathToJavaJDK.FileName;
     FPathToJavaJDK:= SelDirDlgPathToJavaJDK.FileName;
   end;
 end;
@@ -205,6 +218,12 @@ begin
   begin
     EditPathToAndroidSDK.Text := SelDirDlgPathToAndroidSDK.FileName;
     FPathToAndroidSDK:= SelDirDlgPathToAndroidSDK.FileName;
+
+    if FPrebuildOSYS = '' then
+    begin
+      if FPathToAndroidSDK <> '' then
+        ComboBoxPrebuild.Text:= Self.GetPrebuiltDirectory()  //try guess
+    end;
   end;
 end;
 
@@ -217,6 +236,11 @@ begin
   end;
 end;
 
+procedure TFormSettingsPaths.SpeedButtonInfoClick(Sender: TObject);
+begin
+  ShowMessage('All settings are stored in the file '+sLineBreak+'"JNIAndroidProject.ini" [lazarus/config]');
+end;
+
 procedure TFormSettingsPaths.LoadSettings(const fileName: string);
 var
    indexNdk: integer;
@@ -226,10 +250,16 @@ begin
     with TIniFile.Create(fileName) do
     try
       EditPathToAndroidNDK.Text := ReadString('NewProject','PathToAndroidNDK', '');
-      EditPathToSimonsayzTemplate.Text := ReadString('NewProject','PathToJavaTemplates', '');
+
+      FPathToJavaTemplates:= ReadString('NewProject','PathToJavaTemplates', '');
+
+      if FPathToJavaTemplates = '' then
+      begin
+        FPathToJavaTemplates:= FPathToTemplatePresumed;
+      end;
+
       EditPathToJavaJDK.Text := ReadString('NewProject','PathToJavaJDK', '');
       EditPathToAndroidSDK.Text := ReadString('NewProject','PathToAndroidSDK', '');
-
       EditPathToAntBinary.Text := ReadString('NewProject','PathToAntBin', '');
 
       if ReadString('NewProject','NDK', '') <> '' then
@@ -240,6 +270,9 @@ begin
       RGNDKVersion.ItemIndex:= indexNdk;
 
       FPrebuildOSYS:= ReadString('NewProject','PrebuildOSYS', '');
+
+      if FPrebuildOSYS <> '' then
+       ComboBoxPrebuild.Text:= FPrebuildOSYS;
 
     finally
       Free;
@@ -254,8 +287,7 @@ begin
     if EditPathToAndroidNDK.Text <> '' then
       WriteString('NewProject', 'PathToNdkPlataforms', EditPathToAndroidNDK.Text);
 
-    if EditPathToSimonsayzTemplate.Text <> '' then
-      WriteString('NewProject', 'PathToJavaTemplates', EditPathToSimonsayzTemplate.Text);
+    WriteString('NewProject', 'PathToJavaTemplates', FPathToJavaTemplates);
 
     if EditPathToJavaJDK.Text <> '' then
       WriteString('NewProject', 'PathToJavaJDK', EditPathToJavaJDK.Text);
@@ -271,13 +303,7 @@ begin
 
     WriteString('NewProject', 'NDK', IntToStr(RGNDKVersion.ItemIndex));
 
-    FPathToAndroidNDK:= EditPathToAndroidNDK.Text;
-
-    if FPathToAndroidNDK <> '' then
-      FPrebuildOSYS:= GetPrebuiltDirectory();
-
-    if FPrebuildOSYS <> '' then
-      WriteString('NewProject', 'PrebuildOSYS', FPrebuildOSYS);
+    WriteString('NewProject', 'FPrebuildOSYS', ComboBoxPrebuild.Text);
 
   finally
     Free;

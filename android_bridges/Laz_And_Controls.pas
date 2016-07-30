@@ -5589,7 +5589,6 @@ end;
 //------------------------------------------------------------------------------
 // jListlView
 //------------------------------------------------------------------------------
-//TWidgetItem = (hasNone,hasCheckBox,hasRadioButton,hasButton,hasTextView,hastEditText,hasImageView);
 
 constructor jListView.Create(AOwner: TComponent);
 begin

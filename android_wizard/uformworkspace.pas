@@ -15,7 +15,6 @@ type
   TFormWorkspace  = class(TForm)
     BitBtnCancel: TBitBtn;
     BitBtnOK: TBitBtn;
-    CheckBox1: TCheckBox;
     CheckBox2: TCheckBox;
     ComboBoxTheme: TComboBox;
     ComboSelectProjectName: TComboBox;
@@ -46,13 +45,12 @@ type
     SpeedButtonHintTheme: TSpeedButton;
     StatusBarInfo: TStatusBar;
 
-    procedure CheckBox1Click(Sender: TObject);
     procedure ComboBoxThemeChange(Sender: TObject);
     procedure ComboSelectProjectNameKeyPress(Sender: TObject; var Key: char);
     procedure FormActivate(Sender: TObject);
     procedure FormClose(Sender: TObject; var CloseAction: TCloseAction);
     procedure FormCreate(Sender: TObject);
-
+    procedure GroupBox1Click(Sender: TObject);
     procedure ListBoxMinSDKClick(Sender: TObject);
     procedure ListBoxMinSDKSelectionChange(Sender: TObject; User: boolean);
     procedure ListBoxPlatformSelectionChange(Sender: TObject; User: boolean);
@@ -316,61 +314,79 @@ end;
 
 function TFormWorkspace.GetPrebuiltDirectory: string;
 var
-   pathToNdkToolchainsArm46,
-   pathToNdkToolchainsArm49,
-   pathToNdkToolchainsArm443: string;
+   pathToNdkToolchains46,
+   pathToNdkToolchains49,
+   pathToNdkToolchains443: string;  //FInstructionSet   [ARM or x86]
 begin
-   Result:= '';
+    Result:= '';
 
-   pathToNdkToolchainsArm443:= FPathToAndroidNDK+DirectorySeparator+'toolchains'+DirectorySeparator+
+    if Pos('x86', FInstructionSet) > 0 then
+    begin
+       pathToNdkToolchains443:= FPathToAndroidNDK+DirectorySeparator+'toolchains'+DirectorySeparator+
+                                                     'x86-4.4.3'+DirectorySeparator+
+                                                     'prebuilt'+DirectorySeparator;
+
+       pathToNdkToolchains46:= FPathToAndroidNDK+DirectorySeparator+'toolchains'+DirectorySeparator+
+                                                  'x86-4.6'+DirectorySeparator+
+                                                  'prebuilt'+DirectorySeparator;
+
+       pathToNdkToolchains49:= FPathToAndroidNDK+DirectorySeparator+'toolchains'+DirectorySeparator+
+                                                    'x86-4.9'+DirectorySeparator+
+                                                    'prebuilt'+DirectorySeparator;
+    end
+    else  //ARM
+    begin
+     pathToNdkToolchains443:= FPathToAndroidNDK+DirectorySeparator+'toolchains'+DirectorySeparator+
                                                  'arm-linux-androideabi-4.4.3'+DirectorySeparator+
                                                  'prebuilt'+DirectorySeparator;
 
-   pathToNdkToolchainsArm46:= FPathToAndroidNDK+DirectorySeparator+'toolchains'+DirectorySeparator+
+     pathToNdkToolchains46:= FPathToAndroidNDK+DirectorySeparator+'toolchains'+DirectorySeparator+
                                               'arm-linux-androideabi-4.6'+DirectorySeparator+
                                               'prebuilt'+DirectorySeparator;
 
-   pathToNdkToolchainsArm49:= FPathToAndroidNDK+DirectorySeparator+'toolchains'+DirectorySeparator+
+     pathToNdkToolchains49:= FPathToAndroidNDK+DirectorySeparator+'toolchains'+DirectorySeparator+
                                                 'arm-linux-androideabi-4.9'+DirectorySeparator+
                                                 'prebuilt'+DirectorySeparator;
 
+    end;
+
    {$ifdef windows}
-     if DirectoryExists(pathToNdkToolchainsArm49+ 'windows') then
+     if DirectoryExists(pathToNdkToolchains49+ 'windows') then
      begin
        Result:= 'windows';
        Exit;
      end;
-     if DirectoryExists(pathToNdkToolchainsArm46+ 'windows') then
+     if DirectoryExists(pathToNdkToolchains46+ 'windows') then
      begin
        Result:= 'windows';
        Exit;
      end;
-     if DirectoryExists(pathToNdkToolchainsArm443+ 'windows') then
+     if DirectoryExists(pathToNdkToolchains443+ 'windows') then
      begin
        Result:= 'windows';
        Exit;
      end;
      {$ifdef win64}
-       if DirectoryExists(pathToNdkToolchainsArm49 + 'windows-x86_64') then Result:= 'windows-x86_64';
+       if DirectoryExists(pathToNdkToolchains49 + 'windows-x86_64') then Result:= 'windows-x86_64';
      {$endif}
    {$else}
-     {$ifdef darvin}
-        if DirectoryExists(pathToNdkToolchainsArm49+ 'darwin-x86_64') then Result:= 'darwin-x86_64';
+     {$ifdef darwin}
+        if DirectoryExists(pathToNdkToolchains49+ 'darwin-x86_64') then Result:= 'darwin-x86_64';
      {$else}
        {$ifdef cpu64}
-         if DirectoryExists(pathToNdkToolchainsArm49+ 'linux-x86_64') then Result:= 'linux-x86_64';
+         if DirectoryExists(pathToNdkToolchains49+ 'linux-x86_64') then Result:= 'linux-x86_64';
        {$else}
-         if DirectoryExists(pathToNdkToolchainsArm49+ 'linux-x86_32') then
+         if DirectoryExists(pathToNdkToolchains49+ 'linux-x86_32') then
          begin
             Result:= 'linux-x86_32';
             Exit;
          end;
-         if DirectoryExists(pathToNdkToolchainsArm46+ 'linux-x86_32') then
+         if DirectoryExists(pathToNdkToolchains46+ 'linux-x86_32') then
          begin
            Result:= 'linux-x86_32';
            Exit;
          end;
-         if DirectoryExists(pathToNdkToolchainsArm443+ 'linux-x86_32') then
+         if DirectoryExists(pathToNdkToolchains443+ 'linux-x86_32') then
          begin
            Result:= 'linux-x86_32';
            Exit;
@@ -378,7 +394,6 @@ begin
        {$endif}
      {$endif}
    {$endif}
-
 end;
 
 procedure TFormWorkspace.FormClose(Sender: TObject; var CloseAction: TCloseAction);
@@ -558,6 +573,12 @@ begin   //here ModuleType already know!
   end;
 end;
 
+procedure TFormWorkspace.GroupBox1Click(Sender: TObject);
+begin
+
+end;
+
+
 function TFormWorkspace.GetEventSignature(nativeMethod: string): string;
 var
   method: string;
@@ -693,6 +714,7 @@ begin
       end;
 
       FPrebuildOSYS:= ReadString('NewProject','PrebuildOSYS', '');
+
       if FPrebuildOSYS = '' then
         if FPathToAndroidNDK <> '' then
            FPrebuildOSYS:= GetPrebuiltDirectory();
@@ -765,10 +787,11 @@ begin
       tempList.Free;
       fileList.Free;
 
-      CheckBox1.Checked:= False;
+      {CheckBox1.Checked:= False;
       FSupportV4:= ReadString('NewProject','SupportV4', '');
       if FSupportV4 = 'yes' then CheckBox1.Checked:= True
       else FSupportV4 := 'no';
+      }
     finally
       Free;
     end;
@@ -879,12 +902,6 @@ begin
 
 end;
 
-procedure TFormWorkspace.CheckBox1Click(Sender: TObject);
-begin
-    if  CheckBox1.Checked then FSupportV4:= 'yes'
-    else FSupportV4:= 'no';
-end;
-
 procedure TFormWorkspace.ComboBoxThemeChange(Sender: TObject);
 var
   api21Index, api, apiTarget, i: integer;
@@ -948,6 +965,7 @@ begin
   end;
 end;
 
+
 procedure TFormWorkspace.SpdBtnPathToWorkspaceClick(Sender: TObject);
 begin
   if SelDirDlgPathToWorkspace.Execute then
@@ -969,24 +987,24 @@ end;
 
 procedure TFormWorkspace.SpeedButton1Click(Sender: TObject);
 begin
-  ShowMessage('Lamw: Lazarus Android Module Wizard' +#10#13+ '[ver. 0.6 - rev. 38.3 - 07 January 2016]');
+  ShowMessage('Lamw: Lazarus Android Module Wizard' +sLineBreak+ '[Version 0.7 - 11 July - 2016]');
 end;
 
 procedure TFormWorkspace.SpeedButtonHintThemeClick(Sender: TObject);
 begin
   ShowMessage('Warning:'+
-               #10#13+'"Holo Theme" need TargetSdkApi >= 11'+
-               #10#13+'"Holo Theme + ActionBar" need TargetSdkApi >= 14'+
-               #10#13+'"Material Theme" need TargetSdkApi >= 21'+
-               #10#13+' ' +
-               #10#13+'Old Projects [target >= 11]:'+
-               #10#13+'Go to ..\res\values-vXX'+
-               #10#13+'and modifier "styles.xml" [parent attribute]'+
-               #10#13+'Example:'+
-               #10#13+'<style name="AppBaseTheme" parent="android:Theme.Holo.Light">');
+               sLineBreak+'"Holo Theme" need TargetSdkApi >= 11'+
+               sLineBreak+'"Holo Theme + ActionBar" need TargetSdkApi >= 14'+
+               sLineBreak+'"Material Theme" need TargetSdkApi >= 21'+
+               sLineBreak+' ' +
+               sLineBreak+'Old Projects [target >= 11]:'+
+               sLineBreak+'Go to ..\res\values-vXX'+
+               sLineBreak+'and modifier "styles.xml" [parent attribute]'+
+               sLineBreak+'Example:'+
+               sLineBreak+'<style name="AppBaseTheme" parent="android:Theme.Holo.Light">');
 end;
 
-procedure TFormWorkspace.LoadSettings(const pFilename: string);  //called by
+procedure TFormWorkspace.LoadSettings(const pFilename: string);  //called by ...
 var
   i1,  i3,  j1: integer;
 begin

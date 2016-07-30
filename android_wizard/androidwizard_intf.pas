@@ -66,6 +66,8 @@ type
 
      FAndroidTheme: string;
 
+     //FEclipseTooling: TEclipseTooling;
+
      function SettingsFilename: string;
      function TryNewJNIAndroidInterfaceCode(projectType: integer): boolean; //0: GUI  project --- 1:NoGUI project
      function GetPathToJNIFolder(fullPath: string): string;
@@ -438,24 +440,22 @@ begin
 
       if FProjectModel = 'Ant' then
       begin
-
         auxList:= TStringList.Create;
-        //eclipe compatibility!
+        //eclipe compatibility [Neon!]
         CreateDir(FAndroidProjectName+DirectorySeparator+'.settings');
         auxList.Add('eclipse.preferences.version=1');
-        auxList.Add('org.eclipse.jdt.core.compiler.codegen.targetPlatform=1.6');
-        auxList.Add('org.eclipse.jdt.core.compiler.compliance=1.6');
-        auxList.Add('org.eclipse.jdt.core.compiler.source=1.6');
+        auxList.Add('org.eclipse.jdt.core.compiler.codegen.targetPlatform=1.7');
+        auxList.Add('org.eclipse.jdt.core.compiler.compliance=1.7');
+        auxList.Add('org.eclipse.jdt.core.compiler.source=1.7');
         auxList.SaveToFile(FAndroidProjectName+DirectorySeparator+'.settings'+DirectorySeparator+'org.eclipse.jdt.core.prefs');
-
         auxList.Clear;
         auxList.Add('<?xml version="1.0" encoding="UTF-8"?>');
         auxList.Add('<classpath>');
 	auxList.Add('<classpathentry kind="src" path="src"/>');
 	auxList.Add('<classpathentry kind="src" path="gen"/>');
-	auxList.Add('<classpathentry kind="con" path="com.android.ide.eclipse.adt.ANDROID_FRAMEWORK"/>');
-	auxList.Add('<classpathentry exported="true" kind="con" path="com.android.ide.eclipse.adt.LIBRARIES"/>');
-	auxList.Add('<classpathentry exported="true" kind="con" path="com.android.ide.eclipse.adt.DEPENDENCIES"/>');
+	auxList.Add('<classpathentry kind="con" path="org.eclipse.andmore.ANDROID_FRAMEWORK"/>');
+	auxList.Add('<classpathentry exported="true" kind="con" path="org.eclipse.andmore.LIBRARIES"/>');
+	auxList.Add('<classpathentry exported="true" kind="con" path="org.eclipse.andmore.DEPENDENCIES"/>');
 	auxList.Add('<classpathentry kind="output" path="bin/classes"/>');
         auxList.Add('</classpath>');
         auxList.SaveToFile(FAndroidProjectName+DirectorySeparator+'.classpath');
@@ -468,12 +468,12 @@ begin
         auxList.Add('	</projects>');
         auxList.Add('	<buildSpec>');
         auxList.Add('		<buildCommand>');
-        auxList.Add('			<name>com.android.ide.eclipse.adt.ResourceManagerBuilder</name>');
+        auxList.Add('			<name>org.eclipse.andmore.ResourceManagerBuilder</name>');
         auxList.Add('			<arguments>');
         auxList.Add('			</arguments>');
         auxList.Add('		</buildCommand>');
         auxList.Add('		<buildCommand>');
-        auxList.Add('			<name>com.android.ide.eclipse.adt.PreCompilerBuilder</name>');
+        auxList.Add('			<name>org.eclipse.andmore.PreCompilerBuilder</name>');
         auxList.Add('			<arguments>');
         auxList.Add('			</arguments>');
         auxList.Add('		</buildCommand>');
@@ -483,13 +483,13 @@ begin
         auxList.Add('			</arguments>');
         auxList.Add('		</buildCommand>');
         auxList.Add('		<buildCommand>');
-        auxList.Add('			<name>com.android.ide.eclipse.adt.ApkBuilder</name>');
+        auxList.Add('			<name>org.eclipse.andmore.ApkBuilder</name>');
         auxList.Add('			<arguments>');
         auxList.Add('			</arguments>');
         auxList.Add(' 		</buildCommand>');
         auxList.Add('	</buildSpec>');
         auxList.Add('	<natures>');
-        auxList.Add('		<nature>com.android.ide.eclipse.adt.AndroidNature</nature>');
+        auxList.Add('		<nature>org.eclipse.andmore.AndroidNature</nature>');
         auxList.Add('		<nature>org.eclipse.jdt.core.javanature</nature>');
         auxList.Add('	</natures>');
         auxList.Add('</projectDescription>');
@@ -534,7 +534,6 @@ begin
         auxList.Add('# Project target.');
         auxList.Add('target='+FTargetApi);
         auxList.SaveToFile(FAndroidProjectName+DirectorySeparator+'project.properties');
-
         auxList.Free;
       end;
 
@@ -734,7 +733,6 @@ begin
       frm.EditPackagePrefaceName.Text:= '';
       frm.EditPackagePrefaceName.Enabled:= False;
 
-      frm.CheckBox1.Visible:= False;
       frm.ComboBoxTheme.Visible:= False;
       frm.SpeedButtonHintTheme.Visible:= False;
 

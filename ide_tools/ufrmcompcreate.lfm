@@ -33,9 +33,9 @@ object FrmCompCreate: TFrmCompCreate
     Height = 358
     Top = 50
     Width = 724
-    ActivePage = TabSheet1
+    ActivePage = TabSheet3
     Align = alClient
-    TabIndex = 0
+    TabIndex = 2
     TabOrder = 2
     object TabSheet1: TTabSheet
       Caption = 'Java'
@@ -1081,7 +1081,8 @@ object FrmCompCreate: TFrmCompCreate
           ' '
           '   2.5. Right click Pascal tab [popup] and select "Register Component...";'
           ''
-          '          warning: Mac users: please, you must copy the console app "lazres" [lazarus/tools] to the folder /LazAndroidWizard; '
+          '          warning: Mac users: please, you must copy the console app "lazres" [lazarus/tools] to the folder '
+          '".../LazAndroidWizard/ide_tools"; '
           ''
           '   2.6. [Dialog]:  select a 16x16 PNG icon file;'
           ''
@@ -1090,19 +1091,21 @@ object FrmCompCreate: TFrmCompCreate
           '      hint: you can select "register_template.pas" to write a custom register file, '
           '               but, then,  you must insert it to  "tfpandroidbridge_pack.lpk".'
           ''
-          '   2.8. Ok. You got you DRAFT pascal component jni stuff! Please, look in  ../LazAndroidWizard directory:'
+          '   2.8. Ok. You got you DRAFT pascal component jni stuff! Please, look in the folder   "..../LazAndroidWizard/android_bridges" '
+          'directory:'
           '         '
           '        :: *.pas           <--- open and fix/complete the pascal code with your others events/properties/methods/variables/overload! '
           ''
           '        :: *_icon.lrs    <--- new icon resource'
           '        :: register_extras.pas   <--- updated!  The new component was included there!'
           ''
-          '   2.9. [Lazarus IDE Menu]: Package -> Open Package File (*.lpk) --> "tfpandroidbridge_pack.pas" [ ../LazAndroidWizard].'
+          '   2.9. [Lazarus IDE Menu]: Package -> Open Package File (*.lpk) --> "tfpandroidbridge_pack.pas" in folder  '
+          '"....../LazAndroidWizard/android_bridges".'
           ''
           '   2.10. [Package Wizard]: Compile --->> Use ---> Install.'
           ''
-          '            Warning: to compile/install/reinstall a package in Laz4Android [windows!],'
-          '  '#9'          please, open a "dummy" windows project.... you always MUST close the cross compile project! '
+          '            Warning: to compile/install/reinstall a LAMW package in  Lazarus/Laz4Android [windows],'
+          '  '#9'          please, open a "dummy" pure windows project.... you MUST always close the cross compile project! '
           '   '
           '   2.11. Wait .... Lazarus re-building ...'
           ''
