@@ -1,6 +1,6 @@
 package com.example.applocationdemo1;
 
-//LAMW: Lazarus Android Module Wizard  - version 0.7 - 04 July - 2016 
+//LAMW: Lazarus Android Module Wizard  - version 0.7 - rev. 0.1 - 13 July - 2016 
 //RAD Android: Project Wizard, Form Designer and Components Development Model!
 
 //https://github.com/jmpessoa/lazandroidmodulewizard
@@ -982,13 +982,13 @@ public native void pOnPinchZoomGestureDetected(long pasobj, float scaleFactor, i
  
 //Load Pascal Library
 static {
-	/*
+/*--nogui--
     try {
     	System.loadLibrary("freetype"); // need by TFPNoGUIGraphicsBridge [ref. www.github.com/jmpessoa/tfpnoguigraphicsbridge]
     } catch (UnsatisfiedLinkError e) {
          Log.e("JNI_Load_LibFreetype", "exception", e);
     }
-    */	
+--graphics--*/	
     try {
     	System.loadLibrary("controls");
     } catch (UnsatisfiedLinkError e) {

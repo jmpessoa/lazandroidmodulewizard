@@ -17,17 +17,14 @@ type
       jButton1: jButton;
       jButton2: jButton;
       jButton3: jButton;
-      jButton4: jButton;
       jCheckBox1: jCheckBox;
       jLocation1: jLocation;
       jTextView1: jTextView;
       jWebView1: jWebView;
-      procedure DataModuleCreate(Sender: TObject);
       procedure DataModuleJNIPrompt(Sender: TObject);
       procedure jButton1Click(Sender: TObject);
       procedure jButton2Click(Sender: TObject);
       procedure jButton3Click(Sender: TObject);
-      procedure jButton4Click(Sender: TObject);
       procedure jCheckBox1Click(Sender: TObject);
       procedure jLocation1LocationChanged(Sender: TObject; latitude: double;
         longitude: double; altitude: double; address: string);
@@ -39,10 +36,6 @@ type
         status: integer; provider: string; msgStatus: string);
     private
       {private declarations}
-        FLatitudeVisited: double;
-        FLongitudeVisited: double;
-        FAltitudeVisited: double;
-        FAddress: string;
     public
       {public declarations}
   end;
@@ -55,11 +48,6 @@ implementation
 {$R *.lfm}
 
 { TAndroidModule1 }
-
-procedure TAndroidModule1.DataModuleCreate(Sender: TObject);
-begin
-  //
-end;
 
 procedure TAndroidModule1.DataModuleJNIPrompt(Sender: TObject);
 begin
@@ -94,71 +82,52 @@ end;
 
 procedure TAndroidModule1.jLocation1LocationChanged(Sender: TObject;
   latitude: double; longitude: double; altitude: double; address: string);
+var
+  urlLocation: string;
 begin
-  FLatitudeVisited:= latitude;
-  FLongitudeVisited:= longitude;
-  FAltitudeVisited:= altitude;
-  FAddress:= address;
-
-  ShowMessage('latitude= ' + IntToStr(Trunc(FLongitudeVisited))       +
-              '  :::  longitude= '+IntToStr(Trunc(FLongitudeVisited))+
-              '  :::  altitude= '+IntToStr(Trunc(FAltitudeVisited)) +
-              '  :::  address= '+FAddress);
-
+  urlLocation:= jLocation1.GetGoogleMapsUrl(latitude, longitude);
+  jWebView1.Navigate(urlLocation);
 end;
 
 procedure TAndroidModule1.jButton1Click(Sender: TObject);
 begin
   if not jLocation1.IsGPSProvider then
+  begin
+     ShowMessage('Sorry, GPS is Off. Please, active it and try again.');
      jLocation1.ShowLocationSouceSettings()
+  end
   else
-     ShowMessage('GPS is On!');
+  begin
+     ShowMessage('GPS is On! Starting Tracker...');
+     jLocation1.MapType:= mtHybrid;  // default/mtRoadmap, mtSatellite, mtTerrain, mtHybrid
+     jLocation1.StartTracker();  //handled by "OnLocationChanged"
+  end;
 end;
 
 procedure TAndroidModule1.jButton2Click(Sender: TObject);
-begin
-   if not jLocation1.StartTracker() then
-   begin
-      ShowMessage('Please, Wait... No Location Yet!!')
-   end
-   else
-   begin
-      FLatitudeVisited:= jLocation1.GetLatitude();
-      FLongitudeVisited:= jLocation1.GetLongitude();;
-      FAltitudeVisited:= jLocation1.GetAltitude();
-      FAddress:=  jLocation1.GetAddress();
-
-      ShowMessage('last lat= ' + IntToStr(Trunc(FLongitudeVisited))       +
-                  ' * last long= '+IntToStr(Trunc(FLongitudeVisited))+
-                  ' * last alt= '+IntToStr(Trunc(FAltitudeVisited)) +
-                  ' * last address= '+FAddress);
-
-   end;
-end;
-
-procedure TAndroidModule1.jButton3Click(Sender: TObject);
 begin
    jLocation1.StopTracker();
    jLocation1.ShowLocationSouceSettings()
 end;
 
-procedure TAndroidModule1.jButton4Click(Sender: TObject);
+procedure TAndroidModule1.jButton3Click(Sender: TObject); //no GPS is need! only wifi...
 var
+  al: TDynArrayOfDouble;
   urlLocation: string;
-begin
-    //jLocation1.MapType:= mtSatellite;
-    urlLocation:= jLocation1.GetGoogleMapsUrl(FLatitudeVisited, FLongitudeVisited);
-    ShowMessage(urlLocation);
-    jWebView1.Navigate(urlLocation);
+begin                               // 'UFMT,  Barra do Garças, Mato Grosso, Brasil'
+  al:= jLocation1.GetLatitudeLongitude('Super Center Mendonça, AV. Minstro João Alberto, centro, Barra do Garças, Mato Grosso, Brasil');
+  jLocation1.MapType:= mtHybrid;     // default/mtRoadmap, mtSatellite, mtTerrain, mtHybrid
+  urlLocation:= jLocation1.GetGoogleMapsUrl(al[0], al[1]);
+  jWebView1.Navigate(urlLocation);
 end;
 
-procedure TAndroidModule1.jLocation1LocationProviderDisabled(Sender: TObject;
+procedure TAndroidModule1.jLocation1LocationProviderDisabled(Sender: TObject; //GPS OFF
   provider: string);
 begin
    ShowMessage('provider= '+provider +' : Disabled!');
 end;
 
-procedure TAndroidModule1.jLocation1LocationProviderEnabled(Sender: TObject;
+procedure TAndroidModule1.jLocation1LocationProviderEnabled(Sender: TObject; //GPS ON
   provider: string);
 begin
   ShowMessage('New provider= '+provider +' : Enabled!');

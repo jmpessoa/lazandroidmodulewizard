@@ -39,9 +39,6 @@ public class jLocation /*extends ...*/ {
     private LocationManager mLocationManager;
     private Criteria mCriteria;
     private String mProvider;
-    private String mLatitude;
-    private String mLongitude;
-    private String mAltitude;
         
     private String mAddress;
     private String mStatus;
@@ -61,7 +58,7 @@ public class jLocation /*extends ...*/ {
     private int mMapZoom;
     private int mMapSizeW;
     private int mMapSizeH;
-    
+    private Location location;
     
     //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
     public jLocation(Controls _ctrls, long _Self, long _TimeForUpdates, long _DistanceForUpdates, int _CriteriaAccuracy, int _MapType) { //Add more others news "_xxx" params if needed!
@@ -72,6 +69,7 @@ public class jLocation /*extends ...*/ {
        
        //Get the location manager
        mLocationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
+       
        //Define the criteria how to select the location provider
        mCriteria = new Criteria();
        
@@ -95,19 +93,21 @@ public class jLocation /*extends ...*/ {
         *  your Android phone will send back publicly broadcast Wi-Fi access points' Service set identifier (SSID) 
         *  and Media Access Control (MAC) data.
         *  ref: http://www.zdnet.com/blog/networking/how-google-and-everyone-else-gets-wi-fi-location-data/1664
-        */
-       
-       mlistener = new MyLocationListener();
-       
+        */       
+       mlistener = new MyLocationListener();     
        mLat = 0.0; 
-       mLng = 0.0;
-       
+       mLng = 0.0;       
        mTimeForUpdates = _TimeForUpdates;           //(long) (1000 * 60 * 1)/4; // 1 minute
        mDistanceForUpdates = _DistanceForUpdates;  //1; //meters
        
        mMapZoom = 14;
        mMapSizeW = 512;
        mMapSizeH = 512;
+
+	   //get the best provider depending on the criteria
+       mProvider = mLocationManager.getBestProvider(mCriteria, true);       
+       //Register the listener with the Location Manager to receive location updates
+       mLocationManager.requestLocationUpdates(mProvider, mTimeForUpdates, mDistanceForUpdates, mlistener);
        
     }
 
@@ -115,50 +115,83 @@ public class jLocation /*extends ...*/ {
       //free local objects...
       mLocationManager = null;
       mCriteria = null;
-      mlistener = null;    	
+      mlistener = null;
+      location = null;
     }
     
   //write others [public] methods code here......
   //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
     
   public boolean StartTracker() {
-        boolean result;
-        
-	    mCriteria.setAccuracy(mCriteriaAccuracy);                     
-	    mCriteria.setCostAllowed(false);
-	                                 
-	    //get the best provider depending on the criteria
-        mProvider = mLocationManager.getBestProvider(mCriteria, false);       
-
-        //the last known location of this provider		 		 
-        Location location = mLocationManager.getLastKnownLocation(mProvider);                    
-                
+        boolean res= false;        
+	    mCriteria.setAccuracy(mCriteriaAccuracy);	    
+	    //mCriteria.setCostAllowed(false);	                                 		 		            
         if (location != null) {
-          mLat = location.getLatitude(); 
-          mLng = location.getLongitude();
-          mAlt = location.getAltitude();
-          mAddress = GetAddress(mLat, mLng);          
           mlistener.onLocationChanged(location);
-          result = true;
+          res = true;
         }            
-        else {
-        	// Log.i("jLocation", "Wait... No Location Yet!!");                	        
-        	 result = false;
-        }    
-        
-        mLocationManager.requestLocationUpdates(mProvider, mTimeForUpdates, mDistanceForUpdates, mlistener);
-        
-        return result;
+        return res;
    }
 
+  
+  public double[] GetLatitudeLongitude(String _locationAddress) {  //double _latitude, double _longitude
+	  	 
+      Geocoder geocoder = new Geocoder(context, Locale.getDefault());      
+      double[] d;
+      d = new double[]{0, 0};     
+      // Create a list to contain the result address      
+      List<Address> addresses = null;            
+      try {
+          /* Return 1 address. */
+          addresses = geocoder.getFromLocationName(_locationAddress, 1);       		   
+      } catch (IOException e1) {
+          e1.printStackTrace();          
+      } catch (IllegalArgumentException e2) {          
+          e2.printStackTrace();
+          return d;
+      }
+      // If the reverse geocode returned an address
+      if (addresses != null && addresses.size() > 0) {
+          // Get the first address
+          Address address = addresses.get(0);                   
+          d[0] = address.getLatitude();                         
+          d[1] = address.getLongitude(); 
+      }
+      return d;
+      
+  }
+    
+  public boolean StartTracker(String _locationName) {	  
+      boolean res = false;
+      double[] d;      
+	  mCriteria.setAccuracy(mCriteriaAccuracy);                     
+	  //mCriteria.setCostAllowed(false);	    	                 
+      if (location != null) {    	  
+    	d = this.GetLatitudeLongitude(_locationName);    	
+        location.reset();
+        location.setLatitude(d[0]);
+        location.setLongitude(d[1]);
+        mlistener.onLocationChanged(location); //force        
+        res = true;
+      }                           
+      return res;
+   }  
+  
    public void ShowLocationSouceSettings() {
 	  Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
       context.startActivity(intent); 
    }   
    
    public void RequestLocationUpdates() {          	      
-      mLocationManager.requestLocationUpdates(mProvider, mTimeForUpdates, mDistanceForUpdates, mlistener);
-   } 	
+      mLocationManager.requestLocationUpdates(mProvider, mTimeForUpdates, mDistanceForUpdates, mlistener);            
+   }
+      
+   public void RequestLocationUpdates(int _provider) {          	      
+	  if (_provider == 0) 
+	    mLocationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,mTimeForUpdates, mDistanceForUpdates, mlistener);
+	  else
+	    mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,mTimeForUpdates, mDistanceForUpdates, mlistener);	      
+   }
        
    public void StopTracker() {  // finalize ....
       mlistener.RemoveUpdates(mLocationManager);
@@ -172,12 +205,22 @@ public class jLocation /*extends ...*/ {
        }          
     }       
         
-    public boolean IsGPSProvider() {
-       return mLocationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+    public boolean IsGPSProvider() {    	
+    	if (mLocationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) { 
+          //the last known location of this provider        
+          location = mLocationManager.getLastKnownLocation(mProvider);
+          return true;
+    	}
+    	else return false;    	              
     }
     
-    public boolean IsNetProvider() {
-       return mLocationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
+    public boolean IsNetProvider() {    	
+    	if ( mLocationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER) ) { 
+          //the last known location of this provider        
+          location = mLocationManager.getLastKnownLocation(mProvider);
+          return true;
+    	}
+    	else return false;    	       
     }
     
     public void SetTimeForUpdates(long _time) { // millsecs 
@@ -248,10 +291,9 @@ public class jLocation /*extends ...*/ {
 	     return mAddress;
    }
 
-    public String GetAddress(double _latitude, double _longitude) {
+   public String GetAddress(double _latitude, double _longitude) {
   	 
            Geocoder geocoder = new Geocoder(context, Locale.getDefault());
-           // Get the current location from the input parameter list
            // Create a list to contain the result address
            List<Address> addresses = null;
            try {
@@ -268,6 +310,7 @@ public class jLocation /*extends ...*/ {
                e2.printStackTrace();
                return errorString;
            }
+           
            // If the reverse geocode returned an address
            if (addresses != null && addresses.size() > 0) {
                // Get the first address
@@ -291,25 +334,17 @@ public class jLocation /*extends ...*/ {
                return "No address found by the service: Note to the developers, If no address is found by google itself, there is nothing you can do about it. :(";
            }
     }
-       
+          
     private class MyLocationListener implements LocationListener {    	    	
     	
         @Override
-        /*.*/public void onLocationChanged(Location location) {
-             //Initialize the location fields
-                          
-             mLat = location.getLatitude();
-             mLng = location.getLongitude();
-             mAlt= location.getAltitude();
-                         
-             mLatitude= String.valueOf(mLat);
-             mLongitude= String.valueOf(mLng);
-             mAltitude= String.valueOf(mAlt);
-             
+        /*.*/public void onLocationChanged(Location _location) {
+                                   
+             mLat = _location.getLatitude();
+             mLng = _location.getLongitude();
+             mAlt = _location.getAltitude();                                   
              mAddress = GetAddress(mLat, mLng);
              
-            // Log.i("jLocation", "Latitude: "+ mLatitude+ " ... Longitude: "+mLongitude+" ... Altitude: " + mAltitude);
-                          
         	 controls.pOnLocationChanged(pascalObj,mLat,mLng,mAlt,mAddress);        		
         }
 
@@ -327,19 +362,17 @@ public class jLocation /*extends ...*/ {
     			 mStatus="Available";    		
               break;
     		}        	        	
-        	//Log.i("jLocation", "mStatus: "+mStatus);
-        	
         	controls.pOnLocationStatusChanged(pascalObj, status, provider, mStatus);
         }
 
         @Override
-        /*.*/public void onProviderEnabled(String provider) {
-        	//Log.i("jLocation", "Enabled: "+provider);
-        	controls.pOnLocationProviderEnabled(pascalObj, provider);
+        /*.*/public void onProviderEnabled(String provider) {  // "Gps is turned on!!
+         	//Log.i("jLocation", "Enabled: "+provider);  
+         	controls.pOnLocationProviderEnabled(pascalObj, provider);
         }
         
         @Override
-        /*.*/public void onProviderDisabled(String provider) {        
+        /*.*/public void onProviderDisabled(String provider) {   // "Gps is turned off!!     
         	///* this is called if/when the GPS is disabled in settings */
         	//Log.i("jLocation", "Disabled: "+provider);
         	controls.pOnLocationProviderDisabled(pascalObj, provider);        	
@@ -347,7 +380,8 @@ public class jLocation /*extends ...*/ {
                 
         /*.*/public void RemoveUpdates(LocationManager lm) {
         	lm.removeUpdates(this);
-        } 
+        }
+        
     }
 }
 

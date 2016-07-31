@@ -303,7 +303,7 @@ begin
 
     WriteString('NewProject', 'NDK', IntToStr(RGNDKVersion.ItemIndex));
 
-    WriteString('NewProject', 'FPrebuildOSYS', ComboBoxPrebuild.Text);
+    WriteString('NewProject', 'PrebuildOSYS', ComboBoxPrebuild.Text);
 
   finally
     Free;

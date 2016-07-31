@@ -519,4 +519,3 @@ begin
   gApp.Initialize;
   gApp.CreateForm(TAndroidModule1, AndroidModule1);
 end.
-(*last [smart] upgrade: 7/4/2016 0:47:05*)

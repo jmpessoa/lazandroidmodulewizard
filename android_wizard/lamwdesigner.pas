@@ -1104,17 +1104,20 @@ end;
 
 procedure TAndroidWidgetMediator.InitSmartDesignerHelpers;
 var
-  list, auxList, jcontrolsList: TStringList;
+  auxList: TStringList;
   j, p1: integer;
   aux, dlgMessage: string;
   doUpdateLPR, nativeExists: boolean;
   chipArchitecture: string;
+  CanUpdateJavaTemplate: string;
 begin
 
   //it is not necessary repeat "InitSmartDesignerHelpers" tasks for each form...
   if LazarusIDE.ActiveProject.Tag <> 0  then Exit;
 
-  LazarusIDE.ActiveProject.Tag:= 1010;  //break "InitSmartDesignerHelpers" repetition...
+  LazarusIDE.ActiveProject.Tag:= 1010;  //break "InitSmartDesignerHelpers" repetition to all forms ...
+
+  auxList:= TStringList.Create;
 
   doUpdateLPR:= False;
 
@@ -1136,7 +1139,6 @@ begin
        ShowMessage('Warning: "AndroidManifest.xml" not Found!');
        Exit;
     end;
-
      //try add custom
      LazarusIDE.ActiveProject.CustomData.Values['Package']:= FPackageName;
   end;
@@ -1145,18 +1147,17 @@ begin
   FPathToJavaSource:= FPathToAndroidProject + DirectorySeparator+ 'src' + DirectorySeparator + ReplaceChar(aux, '.', DirectorySeparator);
   ForceDirectory(FPathToJavaSource);
 
-  auxList:=  TStringList.Create;
-  list:= TStringList.Create;
-
   if FileExists(LazarusIDE.GetPrimaryConfigPath+DirectorySeparator+'JNIAndroidProject.ini') then
   begin
-    list.LoadFromFile(LazarusIDE.GetPrimaryConfigPath+DirectorySeparator+'JNIAndroidProject.ini');
-    FPathToJavaTemplates:= Trim(list.Values['PathToJavaTemplates']);
+    auxList.LoadFromFile(LazarusIDE.GetPrimaryConfigPath+DirectorySeparator+'JNIAndroidProject.ini');
+    FPathToJavaTemplates:= Trim(auxList.Values['PathToJavaTemplates']);
 
     //will be used to try update/change project NDK/SDK paths [demos,  etc...]
-    FNDKIndex:=  Trim(list.Values['NDK']);
-    FPathToAndroidNDK:= Trim(list.Values['PathToAndroidNDK']);
-    FPathToAndroidSDK:= Trim(list.Values['PathToAndroidSDK']);
+    FNDKIndex:=  Trim(auxList.Values['NDK']);
+    FPathToAndroidNDK:= Trim(auxList.Values['PathToAndroidNDK']);
+    FPathToAndroidSDK:= Trim(auxList.Values['PathToAndroidSDK']);
+    if Pos('CanUpdateJavaTemplate=', auxList.Text) > 0 then
+       CanUpdateJavaTemplate:= auxList.Values['CanUpdateJavaTemplate']; //renabor request...
   end;
 
   ForceDirectory(FPathToJavaSource+DirectorySeparator+'bak');
@@ -1165,7 +1166,7 @@ begin
 
     dlgMessage:= 'Hello!'+sLineBreak+sLineBreak+'We need to do an important change/update in your project.'+sLineBreak+sLineBreak+
                  'Don''t worry.'+sLineBreak+sLineBreak+'The project''s backup files will be saved as *.bak.OLD'+sLineBreak+sLineBreak+
-                 'Please, whenever a dialog prompt select "Reload from disk" ';
+                 'Please, whenever a dialog prompt, select "Reload from disk"';
 
     case QuestionDlg ('\o/ \o/ \o/    Welcome to LAMW version 0.7!',dlgMessage,mtCustom,[mrYes,'OK'],'') of
         mrYes:
@@ -1178,81 +1179,85 @@ begin
 
           CopyFile(FPathToAndroidProject+DirectorySeparator+'jni'+DirectorySeparator+'controls.lpr',
                    FPathToAndroidProject+DirectorySeparator+'jni'+DirectorySeparator+'controls.lpr.bak.OLD');
+
         end;
     end;
     ForceDirectory(FPathToAndroidProject+DirectorySeparator+'lamwdesigner');
     doUpdateLPR:= True;  //force cleanup old [fat]  *.lpr !!
+    CanUpdateJavaTemplate:='t';  //force true
   end;
-
-  CleanupAllJControlsSource();  //force cleanup all java code
 
   SetStartModuleTypeNameAndVarName(); //need to update/change .lpr
 
-  //update all java code ...
-  if FileExists(FPathToJavaTemplates+DirectorySeparator+'App.java') then
+  if CanUpdateJavaTemplate <> 'f' then  //if "f" not update templates... renabor request
   begin
-    auxList.LoadFromFile(FPathToJavaTemplates+DirectorySeparator+'App.java');
-    auxList.Strings[0]:= 'package '+FPackageName+';';
-    auxList.SaveToFile(FPathToJavaSource+DirectorySeparator+'App.java');
-  end;
+    //force cleanup/update all java templates code
+    CleanupAllJControlsSource();
 
-  if FileExists(FPathToJavaTemplates+DirectorySeparator+'Controls.java') then
-  begin
-    auxList.LoadFromFile(FPathToJavaTemplates+DirectorySeparator+'Controls.java');
-    auxList.Strings[0]:= 'package '+FPackageName+';';
-    auxList.SaveToFile(FPathToJavaSource+DirectorySeparator+'Controls.java');
-  end;
-
-  if FileExists(FPathToJavaTemplates + DirectorySeparator + 'Controls.native') then
-  begin
-     CopyFile(FPathToJavaTemplates + DirectorySeparator + 'Controls.native',
-              FPathToAndroidProject+ DirectorySeparator+'lamwdesigner'+DirectorySeparator+ 'Controls.native');
-
-     doUpdateLPR:= True;  //force .lpr update  !!
-  end;
-
-  jcontrolsList:= TStringList.Create;
-  GetAllJControlsFromForms(jcontrolsList);
-
-  //re-add all [updated] java code ...
-  for j:= 0 to jcontrolsList.Count - 1 do
-  begin
-    if FileExists(FPathToJavaTemplates+DirectorySeparator+'lamwdesigner'+DirectorySeparator+jcontrolsList.Strings[j]+'.java') then
+    //update all java templates
+    if FileExists(FPathToJavaTemplates+DirectorySeparator+'App.java') then
     begin
-       if not FileExists(FPathToJavaSource+DirectorySeparator+jcontrolsList.Strings[j]+'.java') then
-       begin
-          TryAddJControl(jcontrolsList.Strings[j], nativeExists);
-       end;
-    end;
-  end;
-
-  if Pos('TFPNoGUIGraphicsBridge', jcontrolsList.Text) > 0 then   //handle lib freetype need by TFPNoGUIGraphicsBridge
-  begin
-    auxList.LoadFromFile(FPathToJavaSource+DirectorySeparator+'Controls.java');
-    aux:=  StringReplace(auxList.Text, '/*--nogui--' , '/*--nogui--*/' , [rfReplaceAll,rfIgnoreCase]);
-    aux:=  StringReplace(aux, '--graphics--*/' , '/*--graphics--*/' , [rfReplaceAll,rfIgnoreCase]);
-    auxList.Text:= aux;
-    auxList.SaveToFile(FPathToJavaSource+DirectorySeparator+'Controls.java');
-
-    chipArchitecture:= 'x86';
-    auxList.LoadFromFile(LazarusIDE.ActiveProject.ProjectInfoFile); //full path to 'controls.lpi';
-    if Pos('-CpARMV6', auxList.Text) > 0  then chipArchitecture:= 'armeabi'
-    else if Pos('-CpARMV7A', auxList.Text) > 0  then chipArchitecture:= 'armeabi-v7a';
-
-    if FileExists(FPathToJavaTemplates +DirectorySeparator+'lamwdesigner'+DirectorySeparator+ 'libfreetype.so') then
-    begin
-      CopyFile(FPathToJavaTemplates+DirectorySeparator+'lamwdesigner'+DirectorySeparator+'libfreetype.so',
-                  FPathToAndroidProject+DirectorySeparator+'libs'+DirectorySeparator+
-                  chipArchitecture+DirectorySeparator+'libfreetype.so');
+      auxList.LoadFromFile(FPathToJavaTemplates+DirectorySeparator+'App.java');
+      auxList.Strings[0]:= 'package '+FPackageName+';';
+      auxList.SaveToFile(FPathToJavaSource+DirectorySeparator+'App.java');
     end;
 
+    if FileExists(FPathToJavaTemplates+DirectorySeparator+'Controls.java') then
+    begin
+      auxList.LoadFromFile(FPathToJavaTemplates+DirectorySeparator+'Controls.java');
+      auxList.Strings[0]:= 'package '+FPackageName+';';
+      auxList.SaveToFile(FPathToJavaSource+DirectorySeparator+'Controls.java');
+    end;
+
+    if FileExists(FPathToJavaTemplates + DirectorySeparator + 'Controls.native') then
+    begin
+       CopyFile(FPathToJavaTemplates + DirectorySeparator + 'Controls.native',
+                FPathToAndroidProject+ DirectorySeparator+'lamwdesigner'+DirectorySeparator+ 'Controls.native');
+
+       doUpdateLPR:= True;  //force .lpr update  !!
+    end;
+
+    auxList.Clear;
+    GetAllJControlsFromForms(auxList);
+
+    //re-add all [updated] components java code ...
+    for j:= 0 to auxList.Count - 1 do
+    begin
+      if FileExists(FPathToJavaTemplates+DirectorySeparator+'lamwdesigner'+DirectorySeparator+auxList.Strings[j]+'.java') then
+      begin
+         if not FileExists(FPathToJavaSource+DirectorySeparator+auxList.Strings[j]+'.java') then
+         begin
+            TryAddJControl(auxList.Strings[j], nativeExists);
+         end;
+      end;
+    end;
+
+    if Pos('TFPNoGUIGraphicsBridge', auxList.Text) > 0 then   //handle lib freetype need by TFPNoGUIGraphicsBridge
+    begin
+     auxList.LoadFromFile(FPathToJavaSource+DirectorySeparator+'Controls.java');
+     aux:=  StringReplace(auxList.Text, '/*--nogui--' , '/*--nogui--*/' , [rfReplaceAll,rfIgnoreCase]);
+     aux:=  StringReplace(aux, '--graphics--*/' , '/*--graphics--*/' , [rfReplaceAll,rfIgnoreCase]);
+     auxList.Text:= aux;
+     auxList.SaveToFile(FPathToJavaSource+DirectorySeparator+'Controls.java');
+
+     chipArchitecture:= 'x86';
+     auxList.LoadFromFile(LazarusIDE.ActiveProject.ProjectInfoFile); //full path to 'controls.lpi';
+     if Pos('-CpARMV6', auxList.Text) > 0  then chipArchitecture:= 'armeabi'
+     else if Pos('-CpARMV7A', auxList.Text) > 0  then chipArchitecture:= 'armeabi-v7a';
+
+     if FileExists(FPathToJavaTemplates +DirectorySeparator+'lamwdesigner'+DirectorySeparator+ 'libfreetype.so') then
+     begin
+       CopyFile(FPathToJavaTemplates+DirectorySeparator+'lamwdesigner'+DirectorySeparator+'libfreetype.so',
+                   FPathToAndroidProject+DirectorySeparator+'libs'+DirectorySeparator+
+                   chipArchitecture+DirectorySeparator+'libfreetype.so');
+     end;
+    end;
+
   end;
 
-  list.Free;
-  jcontrolsList.Free;
   auxList.Free;
 
-  // try fix/repair project paths [demos, etc..]
+  //try fix/repair project paths [demos, etc..]
   if IsDemoProject() then
   begin
     TryChangeDemoProjecPaths();
