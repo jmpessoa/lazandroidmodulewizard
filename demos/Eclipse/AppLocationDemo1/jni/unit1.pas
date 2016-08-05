@@ -106,18 +106,63 @@ end;
 
 procedure TAndroidModule1.jButton2Click(Sender: TObject);
 begin
-   jLocation1.StopTracker();
-   jLocation1.ShowLocationSouceSettings()
+  jLocation1.StopTracker();
+  jLocation1.ShowLocationSouceSettings()
 end;
+
+{
+40.737102,-73.990318
+40.749825,-73.987963
+40.752946,-73.987384
+40.755823,-73.986397
+}
 
 procedure TAndroidModule1.jButton3Click(Sender: TObject); //no GPS is need! only wifi...
 var
-  al: TDynArrayOfDouble;
+  //lat: TDynArrayOfDouble;
+  //lon: TDynArrayOfDouble;
+  //ll: TDynArrayOfDouble;
   urlLocation: string;
-begin                               // 'UFMT,  Barra do Garças, Mato Grosso, Brasil'
-  al:= jLocation1.GetLatitudeLongitude('Super Center Mendonça, AV. Minstro João Alberto, centro, Barra do Garças, Mato Grosso, Brasil');
-  jLocation1.MapType:= mtHybrid;     // default/mtRoadmap, mtSatellite, mtTerrain, mtHybrid
-  urlLocation:= jLocation1.GetGoogleMapsUrl(al[0], al[1]);
+begin
+  //jLocation1.MapType:= mtHybrid;     // default/mtRoadmap, mtSatellite, mtTerrain, mtHybrid
+
+  (* TEST 1       //'UFMT,  Barra do Garças, Mato Grosso, Brasil'
+  ll:= jLocation1.GetLatitudeLongitude('Super Center Mendonça, AV. Minstro João Alberto, centro, Barra do Garças, Mato Grosso, Brasil');
+  urlLocation:= jLocation1.GetGoogleMapsUrl(ll[0], ll[1]);
+  jWebView1.Navigate(urlLocation);
+  SetLength(ll,0);
+  *)
+
+  (*TEST 2
+  urlLocation:= jLocation1.GetGoogleMapsUrl('Super Center Mendonça, AV. Minstro João Alberto, centro, Barra do Garças, Mato Grosso, Brasil');
+  jWebView1.Navigate(urlLocation);
+  *)
+
+  (*TEST 3
+  SetLength(lat,4);
+  SetLength(lon,4);
+  lat[0]:=  40.737102;
+  lat[1]:=  40.749825;
+  lat[2]:=  40.752946;
+  lat[3]:=  40.755823;
+
+  lon[0]:= -73.990318;
+  lon[1]:= -73.987963;
+  lon[2]:= -73.987384;
+  lon[3]:= -73.986397;
+
+  urlLocation:= jLocation1.GetGoogleMapsUrl(lat, lon);
+  jWebView1.Navigate(urlLocation);
+  SetLength(lat,0);
+  SetLength(lon,0);
+  *)
+
+  //Test 4
+  urlLocation:= jLocation1.GetGoogleMapsUrl([GeoPoint2D(40.737102,-73.990318),
+                                             GeoPoint2D(40.749825,-73.987963),
+                                             GeoPoint2D(40.752946,-73.987384),
+                                             GeoPoint2D(40.755823,-73.986397)
+                                            ]);
   jWebView1.Navigate(urlLocation);
 end;
 

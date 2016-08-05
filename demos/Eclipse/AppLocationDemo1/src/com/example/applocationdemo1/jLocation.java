@@ -16,6 +16,7 @@ import android.location.LocationProvider;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.provider.Settings;
+import android.util.Log;
 
 /*Draft java code by "Lazarus Android Module Wizard" [8/9/2014 20:25:55]*/
 /*https://github.com/jmpessoa/lazandroidmodulewizard*/
@@ -132,9 +133,8 @@ public class jLocation /*extends ...*/ {
         }            
         return res;
    }
-
   
-  public double[] GetLatitudeLongitude(String _locationAddress) {  //double _latitude, double _longitude
+  public double[] GetLatitudeLongitude(String _fullAddress) {  //double _latitude, double _longitude
 	  	 
       Geocoder geocoder = new Geocoder(context, Locale.getDefault());      
       double[] d;
@@ -143,7 +143,8 @@ public class jLocation /*extends ...*/ {
       List<Address> addresses = null;            
       try {
           /* Return 1 address. */
-          addresses = geocoder.getFromLocationName(_locationAddress, 1);       		   
+          addresses = geocoder.getFromLocationName(_fullAddress, 1);   
+         
       } catch (IOException e1) {
           e1.printStackTrace();          
       } catch (IllegalArgumentException e2) {          
@@ -171,7 +172,7 @@ public class jLocation /*extends ...*/ {
         location.reset();
         location.setLatitude(d[0]);
         location.setLongitude(d[1]);
-        mlistener.onLocationChanged(location); //force        
+        mlistener.onLocationChanged(location); //force
         res = true;
       }                           
       return res;
@@ -254,12 +255,34 @@ public class jLocation /*extends ...*/ {
     }
         
     //https://developers.google.com/maps/documentation/staticmaps
-    public String GetGoogleMapsUrl(double _latitude, double _longitude) {        
-      String url = "http://maps.googleapis.com/maps/api/staticmap?center="+_latitude + "," + _longitude+
+    public String GetGoogleMapsUrl(double _latitude, double _longitude) {   //sensor=false ??        
+      String url = "http://maps.googleapis.com/maps/api/staticmap?sensor=false&center="+_latitude + "," + _longitude+
                     "&zoom="+mMapZoom+"&size="+mMapSizeW+"x"+mMapSizeH+"&maptype="+mMapType+"&markers="+_latitude + "," + _longitude;          		                         
       return url;
     }
     
+    //http://maps.google.com/maps?f=d&daddr=" + fullAddress
+    public String GetGoogleMapsUrl(String _fullAddress) {         //sensor=false ??
+        String url = "http://maps.googleapis.com/maps/api/staticmap?f=d&daddr="+ _fullAddress +
+                      "&zoom="+mMapZoom+"&size="+mMapSizeW+"x"+mMapSizeH+"&maptype="+mMapType+"&markers="+ _fullAddress;          		                         
+        return url;
+    }
+           
+    //http://maps.googleapis.com/maps/api/staticmap?size=400x400&path=40.737102,-73.990318|40.749825,-73.987963|40.752946,-73.987384|40.755823,-73.986397
+    public String GetGoogleMapsUrl(double[] _latitude, double[] _longitude) {
+    	String path ="";
+    	int count = _latitude.length;
+   
+    	path = String.valueOf(_latitude[0]) +","+ String.valueOf(_longitude[0]);    	
+    	for (int i = 1; i < count; i++) {
+    		path = path + "|" + String.valueOf(_latitude[i]) +","+ String.valueOf(_longitude[i]); 	
+    	}
+    	
+        String url = "http://maps.googleapis.com/maps/api/staticmap?f=d&sensor=false&path="+ path +
+                      "&zoom="+mMapZoom+"&size="+mMapSizeW+"x"+mMapSizeH+"&maptype="+mMapType+"&markers="+path;                            
+        return url;
+    }
+        
     public void SetMapWidth(int _mapwidth) {
 	   mMapSizeW = _mapwidth;    	
     }
@@ -334,12 +357,32 @@ public class jLocation /*extends ...*/ {
                return "No address found by the service: Note to the developers, If no address is found by google itself, there is nothing you can do about it. :(";
            }
     }
-          
-    private class MyLocationListener implements LocationListener {    	    	
+   
+   public float GetDistanceBetween(double _startLatitude, double _startLongitude, double _endLatitude, double _endLongitude) {
+	 float[] result=new float[1];
+	 result[0] = 0;
+	 if (location != null)   
+        Location.distanceBetween(_startLatitude, _startLongitude, _endLatitude, _endLongitude, result);	 
+	 return result[0];  // it's output is a WGS84 ellipsoid !!
+   }
+
+   public float GetDistanceTo(double _latitude, double _longitude) {
+	 float r = 0;  
+	 if (location != null) {
+	   Location loc = new Location(location); //or new Location(String provider)   
+	   loc.reset();
+	   loc.setLatitude(_latitude);
+	   loc.setLongitude(_longitude);	   
+       r = location.distanceTo(loc);   // meters   
+	 }
+	 return r;
+   }
+   
+   private class MyLocationListener implements LocationListener {    	    	
     	
         @Override
         /*.*/public void onLocationChanged(Location _location) {
-                                   
+                                           	 
              mLat = _location.getLatitude();
              mLng = _location.getLongitude();
              mAlt = _location.getAltitude();                                   

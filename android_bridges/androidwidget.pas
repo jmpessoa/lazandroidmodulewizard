@@ -2108,7 +2108,7 @@ begin
         begin
           if Value.Id = 0 then
           begin
-            Randomize;
+            //Randomize;
             Value.Id:= Random(10000000);
             Value.SetId(Value.Id); //JNI call
           end;
@@ -2119,7 +2119,7 @@ begin
 
         if Value.Id = 0 then   //Id must be published for data persistence!
         begin
-          Randomize;
+          //Randomize;
           Value.Id:= Random(10000000);  //warning: remember the law of Murphi...
         end;
 
@@ -2370,6 +2370,12 @@ begin
   if not refApp.Initialized then Exit;
 
   Inherited Init(refApp);
+
+  if FActivityMode = actSplash then
+     Randomize; //thanks to Gerrit
+
+  if FActivityMode = actMain then
+     Randomize; //thanks to Gerrit
 
   FScreenStyle:= refApp.Orientation;
 

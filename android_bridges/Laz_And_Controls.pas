@@ -6703,9 +6703,9 @@ end;
 constructor jWebView.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
-  FJavaScript := True;
-  FZoomControl := False;
-  FOnStatus   := nil;
+  FJavaScript:= True;
+  FZoomControl:= True;
+  FOnStatus:= nil;
   FLParamWidth:= lpMatchParent;
   FLParamHeight:= lpWrapContent;
   FHeight:= 96;

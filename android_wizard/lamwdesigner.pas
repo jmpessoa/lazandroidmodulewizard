@@ -1449,6 +1449,7 @@ begin
       FStartModuleVarName:= SplitStr(aux, ':');  //object AndroidModule1
       FStartModuleTypeName:= Trim(aux);   //TAndroidModule1
       SplitStr(FStartModuleVarName, ' ');  //AndroidModule1
+      Randomize;
     end;
 
     if (FStartModuleVarName='') and (FStartModuleTypeName='') then
@@ -1459,6 +1460,7 @@ begin
          FStartModuleVarName:= SplitStr(aux, ':');  //object AndroidModule1
          FStartModuleTypeName:= Trim(aux);   //TAndroidModule1
          SplitStr(FStartModuleVarName, ' ');  //AndroidModule1
+         Randomize;
       end
     end;
   end;
