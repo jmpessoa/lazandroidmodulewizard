@@ -13,14 +13,14 @@ object FormPathMissing: TFormPathMissing
   OnClose = FormClose
   Position = poScreenCenter
   LCLVersion = '1.5'
-  object Edit1: TEdit
+  object EditPath: TEdit
     AnchorSideLeft.Control = Owner
     AnchorSideTop.Control = LabelPathTo
     AnchorSideTop.Side = asrBottom
     AnchorSideRight.Control = SpeedButton1
     Left = 8
-    Height = 21
-    Top = 29
+    Height = 23
+    Top = 31
     Width = 396
     Anchors = [akTop, akLeft, akRight]
     BorderSpacing.Bottom = 8
@@ -31,21 +31,21 @@ object FormPathMissing: TFormPathMissing
     AnchorSideLeft.Control = Owner
     AnchorSideTop.Control = Owner
     Left = 8
-    Height = 13
+    Height = 15
     Top = 8
-    Width = 39
+    Width = 41
     BorderSpacing.Around = 8
     Caption = 'Path to:'
     ParentColor = False
   end
   object SpeedButton1: TSpeedButton
-    AnchorSideTop.Control = Edit1
+    AnchorSideTop.Control = EditPath
     AnchorSideTop.Side = asrCenter
     AnchorSideRight.Control = Owner
     AnchorSideRight.Side = asrBottom
     Left = 412
     Height = 22
-    Top = 28
+    Top = 31
     Width = 23
     Anchors = [akTop, akRight]
     BorderSpacing.Around = 8
@@ -53,11 +53,11 @@ object FormPathMissing: TFormPathMissing
     OnClick = SpeedButton1Click
   end
   object ButtonPanel1: TButtonPanel
-    AnchorSideTop.Control = Edit1
+    AnchorSideTop.Control = EditPath
     AnchorSideTop.Side = asrBottom
     Left = 6
-    Height = 30
-    Top = 66
+    Height = 26
+    Top = 70
     Width = 431
     Anchors = [akTop, akLeft, akRight]
     OKButton.Name = 'OKButton'

@@ -14,7 +14,7 @@ type
 
   TFormPathMissing = class(TForm)
     ButtonPanel1: TButtonPanel;
-    Edit1: TEdit;
+    EditPath: TEdit;
     LabelPathTo: TLabel;
     SelectDirectoryDialog1: TSelectDirectoryDialog;
     SpeedButton1: TSpeedButton;
@@ -40,7 +40,7 @@ implementation
 procedure TFormPathMissing.FormClose(Sender: TObject;
   var CloseAction: TCloseAction);
 begin
-  PathMissing:= Edit1.Text;
+  PathMissing:= EditPath.Text;
 end;
 
 procedure TFormPathMissing.SpeedButton1Click(Sender: TObject);
@@ -48,8 +48,8 @@ begin
   SelectDirectoryDialog1.Title:= '[Android Wizard] Path Missing:';
   if SelectDirectoryDialog1.Execute then
   begin
-    Edit1.Text := SelectDirectoryDialog1.FileName;
-    PathMissing:= Edit1.Text;
+    EditPath.Text := SelectDirectoryDialog1.FileName;
+    PathMissing:= EditPath.Text;
   end;
 end;
 

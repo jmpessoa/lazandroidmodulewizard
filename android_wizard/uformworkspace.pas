@@ -6,7 +6,7 @@ interface
 
 uses
   inifiles, Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, LazIDEIntf,
-  StdCtrls, Buttons, ExtCtrls, ComCtrls, FormPathMissing, uFormOSystem;
+  StdCtrls, Buttons, ExtCtrls, ComCtrls, FormPathMissing, uFormOSystem, PackageIntf;
 
 type
 
@@ -118,12 +118,11 @@ type
 
     function GetFullJavaSrcPath(fullProjectName: string): string;
     function GetPrebuiltDirectory: string;
-
     procedure LoadPathsSettings(const fileName: string);
     function GetEventSignature(nativeMethod: string): string;
+    function GetPathToTemplatePresumed(): string;
 
     property PathToWorkspace: string read FPathToWorkspace write FPathToWorkspace;
-
     property InstructionSet: string read FInstructionSet write FInstructionSet;
     property FPUSet: string  read FFPUSet write FFPUSet;
     property PathToJavaTemplates: string read FPathToJavaTemplates write FPathToJavaTemplates;
@@ -633,6 +632,19 @@ begin
   listParam.Free;
 end;
 
+function TFormWorkspace.GetPathToTemplatePresumed(): string;
+var
+  p: integer;
+  Pkg: TIDEPackage;
+begin
+  Pkg:=PackageEditingInterface.FindPackageWithName('amw_ide_tools');
+  if Pkg<>nil then
+  begin
+    p:= Pos('ide_tools', ExtractFilePath(Pkg.Filename));
+    Result:= Copy(ExtractFilePath(Pkg.Filename), 1, p-1) + 'java';
+  end;
+end;
+
 procedure TFormWorkspace.LoadPathsSettings(const fileName: string);
 var
   indexNdk: integer;
@@ -730,20 +742,40 @@ begin
       end;
 
       FPathToJavaTemplates:= ReadString('NewProject','PathToJavaTemplates', '');
-      if  FPathToJavaTemplates = '' then
+      if FPathToJavaTemplates = '' then
       begin
+        frm:= TFormPathMissing.Create(nil);
+        frm.LabelPathTo.Caption:= 'WARNING! Path [missing] to Java templates:';
+        frm.EditPath.Text:= GetPathToTemplatePresumed();
+        if frm.ShowModal = mrOK then
+        begin
+           FPathToJavaTemplates:= frm.PathMissing;
+           frm.Free;
+        end
+        else
+        begin
+           frm.Free;
+           Exit;
+        end;
+      end
+      else
+      begin
+        if FPathToJavaTemplates <> GetPathToTemplatePresumed() then
+        begin
           frm:= TFormPathMissing.Create(nil);
-          frm.LabelPathTo.Caption:= 'WARNING! Path to Java templates: [ex. ..\LazAndroidWizard\java]';
+          frm.LabelPathTo.Caption:= 'WARNING! Path to Java templates was changed to:';
+          frm.EditPath.Text:= GetPathToTemplatePresumed();
           if frm.ShowModal = mrOK then
           begin
-             FPathToJavaTemplates:= frm.PathMissing;
-             frm.Free;
+            FPathToJavaTemplates:= frm.PathMissing;
+            frm.Free;
           end
           else
           begin
-             frm.Free;
-             Exit;
+            frm.Free;
+            Exit;
           end;
+        end;
       end;
 
       fileList:= TStringList.Create;
@@ -768,7 +800,7 @@ begin
           tempList.LoadFromFile(fileList.Strings[i]);
           for j:= 0 to tempList.Count-1 do
           begin
-             if Pos(' native ', tempList.Strings[j]) > 0 then
+            if Pos(' native ', tempList.Strings[j]) > 0 then
                 nativeMethodList.Add(Trim(tempList.Strings[j]));
           end;
         end;
@@ -792,6 +824,7 @@ begin
       if FSupportV4 = 'yes' then CheckBox1.Checked:= True
       else FSupportV4 := 'no';
       }
+
     finally
       Free;
     end;
