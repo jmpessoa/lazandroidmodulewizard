@@ -178,7 +178,7 @@ public class jCustomDialog extends RelativeLayout {
 			mDialog.show();
 		}	
 		else {			
-		  if (this.getVisibility()==0) { //visible   
+		  if (this.getVisibility()==android.view.View.VISIBLE) { //0 visible   
 			this.setVisibility(android.view.View.INVISIBLE); //4
 		  }	  		   
 		  if (!mRemovedFromParent) {

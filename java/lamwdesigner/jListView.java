@@ -417,6 +417,8 @@ private int             widgetItem;
 private String          widgetText;
 private int             textColor; 
 private int             textSize;
+private int 		lastSelectedItem;
+private String 		selectedItemCaption;
 //private int             fontTextStyle;
 private Typeface        typeFace = Typeface.DEFAULT;
 
