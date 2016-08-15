@@ -26,6 +26,11 @@ TMapType = (mtRoadmap, mtSatellite, mtTerrain, mtHybrid);
 
 TProvider = (pvNetwork, pvGPS);
 
+TPictureStyle = (pfDefault, pfMarkers, pfPath);
+
+TMarkerHighlightColor = (markBlack, markBrown, markGreen, markPurple,
+                         markYellow, markBlue, markGray, markOrange, markRed, markWhite);
+
 {Draft Component code by "Lazarus Android Module Wizard" [8/11/2014 19:15:07]}
 {https://github.com/jmpessoa/lazandroidmodulewizard}
 
@@ -80,12 +85,24 @@ jLocation = class(jControl)
     function GetAddress(_latitude: double; _longitude: double): string; overload;
     function StartTracker(_locationName: string): boolean; overload;
     procedure RequestLocationUpdates(_provider: TProvider); overload;
+
     function GetLatitudeLongitude(_fullAddress: string): TDynArrayOfDouble;
+    function GetGeoPoint2D(_fullAddress: string): TGeoPoint2D;
+
     function GetGoogleMapsUrl(_fullAddress: string): string; overload;
     function GetDistanceBetween(_startLatitude: double; _startLongitude: double; _endLatitude: double; _endLongitude: double): single;
     function GetDistanceTo(_latitude: double; _longitude: double): single;
+
     function GetGoogleMapsUrl(var _latitude: TDynArrayOfDouble; var _longitude: TDynArrayOfDouble): string; overload;
+
     function GetGoogleMapsUrl(geoPoints: array of TGeoPoint2D): string; overload;
+    function GetGoogleMapsUrl(geoPoints: array of TGeoPoint2D; pictureStyle: TPictureStyle): string; overload;
+    function GetGoogleMapsUrl(geoPoints: array of TGeoPoint2D; pictureStyle: TPictureStyle; markerHighlightIndex: integer): string; overload;
+
+    function GetGoogleMapsUrl(var _latitude: TDynArrayOfDouble; var _longitude: TDynArrayOfDouble; pictureStyle: TPictureStyle): string; overload;
+    function GetGoogleMapsUrl(var _latitude: TDynArrayOfDouble; var _longitude: TDynArrayOfDouble; pictureStyle: TPictureStyle; _markerHighlightIndex: integer): string; overload;
+
+    procedure SetMarkerHighlightColor(_color: TMarkerHighlightColor);
 
     procedure GenEvent_OnLocationChanged(Obj: TObject; latitude: double; longitude: double; altitude: double; address: string);
     procedure GenEvent_OnLocationStatusChanged(Obj: TObject; status: integer; provider: string; msgStatus: string);
@@ -140,7 +157,11 @@ function jLocation_GetLatitudeLongitude(env: PJNIEnv; _jlocation: JObject; _loca
 function jLocation_GetGoogleMapsUrl(env: PJNIEnv; _jlocation: JObject; _fullAddress: string): string; overload;
 function jLocation_GetDistanceBetween(env: PJNIEnv; _jlocation: JObject; _startLatitude: double; _startLongitude: double; _endLatitude: double; _endLongitude: double): single;
 function jLocation_GetDistanceTo(env: PJNIEnv; _jlocation: JObject; _latitude: double; _longitude: double): single;
+
 function jLocation_GetGoogleMapsUrl(env: PJNIEnv; _jlocation: JObject; var _latitude: TDynArrayOfDouble; var _longitude: TDynArrayOfDouble): string; overload;
+function jLocation_GetGoogleMapsUrl(env: PJNIEnv; _jlocation: JObject; var _latitude: TDynArrayOfDouble; var _longitude: TDynArrayOfDouble; _pathFlag: integer): string; overload;
+function jLocation_GetGoogleMapsUrl(env: PJNIEnv; _jlocation: JObject; var _latitude: TDynArrayOfDouble; var _longitude: TDynArrayOfDouble; _pathFlag: integer; _markerHighlightIndex: integer): string; overload;
+procedure jLocation_SetMarkerHighlightColor(env: PJNIEnv; _jlocation: JObject; _color: integer);
 
 function GeoPoint2D(latitute: double; longitude: double): TGeoPoint2D;
 
@@ -377,6 +398,20 @@ begin
    Result:= jLocation_GetLatitudeLongitude(FjEnv, FjObject, _fullAddress);
 end;
 
+function jLocation.GetGeoPoint2D(_fullAddress: string): TGeoPoint2D;
+var
+  ll: TDynArrayOfDouble;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+  begin
+   ll:= jLocation_GetLatitudeLongitude(FjEnv, FjObject, _fullAddress);
+   Result.latitude:= ll[0];
+   Result.longitude:= ll[1];
+  end;
+  SetLength(ll, 0);
+end;
+
 function jLocation.GetGoogleMapsUrl(_fullAddress: string): string;
 begin
   //in designing component state: result value here...
@@ -427,6 +462,75 @@ begin
     SetLength(latitude,  0);
     SetLength(longitude, 0);
   end;
+end;
+
+function jLocation.GetGoogleMapsUrl(geoPoints: array of TGeoPoint2D; pictureStyle: TPictureStyle): string;
+var
+  count, i: integer;
+  latitude: TDynArrayOfDouble;
+  longitude: TDynArrayOfDouble;
+  p: TGeoPoint2D;
+begin
+  if FInitialized then
+  begin
+    count:= Length(geoPoints);
+    SetLength(latitude,  count);
+    SetLength(longitude,  count);
+    for i:= 0 to count-1 do
+    begin
+      p:= geoPoints[i];
+      latitude[i]:= p.latitude;
+      longitude[i]:= p.longitude;
+    end;
+    Result:= jLocation_GetGoogleMapsUrl(FjEnv, FjObject, latitude ,longitude, Ord(pictureStyle));
+    SetLength(latitude,  0);
+    SetLength(longitude, 0);
+  end;
+end;
+
+function jLocation.GetGoogleMapsUrl(geoPoints: array of TGeoPoint2D; pictureStyle: TPictureStyle; markerHighlightIndex: integer): string;
+var
+  count, i: integer;
+  latitude: TDynArrayOfDouble;
+  longitude: TDynArrayOfDouble;
+  p: TGeoPoint2D;
+begin
+  if FInitialized then
+  begin
+    count:= Length(geoPoints);
+    SetLength(latitude,  count);
+    SetLength(longitude,  count);
+    for i:= 0 to count-1 do
+    begin
+      p:= geoPoints[i];
+      latitude[i]:= p.latitude;
+      longitude[i]:= p.longitude;
+    end;
+    Result:= jLocation_GetGoogleMapsUrl(FjEnv, FjObject, latitude ,longitude, Ord(pictureStyle), markerHighlightIndex);
+    SetLength(latitude,  0);
+    SetLength(longitude, 0);
+  end;
+end;
+
+function jLocation.GetGoogleMapsUrl(var _latitude: TDynArrayOfDouble; var _longitude: TDynArrayOfDouble; pictureStyle: TPictureStyle): string;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jLocation_GetGoogleMapsUrl(FjEnv, FjObject, _latitude ,_longitude, Ord(pictureStyle));
+end;
+
+function jLocation.GetGoogleMapsUrl(var _latitude: TDynArrayOfDouble; var _longitude: TDynArrayOfDouble; pictureStyle: TPictureStyle; _markerHighlightIndex: integer): string;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jLocation_GetGoogleMapsUrl(FjEnv, FjObject, _latitude ,_longitude ,Ord(pictureStyle) ,_markerHighlightIndex);
+end;
+
+procedure jLocation.SetMarkerHighlightColor(_color: TMarkerHighlightColor);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jLocation_SetMarkerHighlightColor(FjEnv, FjObject, Ord(_color) );
 end;
 
 procedure jLocation.GenEvent_OnLocationChanged(Obj: TObject; latitude: double; longitude: double; altitude: double; address: string);
@@ -928,6 +1032,90 @@ begin
   env^.DeleteLocalRef(env, jCls);
 end;
 
+function jLocation_GetGoogleMapsUrl(env: PJNIEnv; _jlocation: JObject; var _latitude: TDynArrayOfDouble; var _longitude: TDynArrayOfDouble; _pathFlag: integer): string;
+var
+  jStr: JString;
+  jBoo: JBoolean;
+  jParams: array[0..2] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+  newSize0: integer;
+  jNewArray0: jObject=nil;
+  newSize1: integer;
+  jNewArray1: jObject=nil;
+begin
+  newSize0:= Length(_latitude);
+  jNewArray0:= env^.NewDoubleArray(env, newSize0);  // allocate
+  env^.SetDoubleArrayRegion(env, jNewArray0, 0 , newSize0, @_latitude[0] {source});
+  jParams[0].l:= jNewArray0;
+  newSize1:= Length(_longitude);
+  jNewArray1:= env^.NewDoubleArray(env, newSize1);  // allocate
+  env^.SetDoubleArrayRegion(env, jNewArray1, 0 , newSize1, @_longitude[0] {source});
+  jParams[1].l:= jNewArray1;
+  jParams[2].i:= _pathFlag;
+  jCls:= env^.GetObjectClass(env, _jlocation);
+  jMethod:= env^.GetMethodID(env, jCls, 'GetGoogleMapsUrl', '([D[DI)Ljava/lang/String;');
+  jStr:= env^.CallObjectMethodA(env, _jlocation, jMethod, @jParams);
+  case jStr = nil of
+     True : Result:= '';
+     False: begin
+              jBoo:= JNI_False;
+              Result:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
+            end;
+  end;
+  env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env,jParams[1].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
 
+function jLocation_GetGoogleMapsUrl(env: PJNIEnv; _jlocation: JObject; var _latitude: TDynArrayOfDouble; var _longitude: TDynArrayOfDouble; _pathFlag: integer; _markerHighlightIndex: integer): string;
+var
+  jStr: JString;
+  jBoo: JBoolean;
+  jParams: array[0..3] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+  newSize0: integer;
+  jNewArray0: jObject=nil;
+  newSize1: integer;
+  jNewArray1: jObject=nil;
+begin
+  newSize0:= Length(_latitude);
+  jNewArray0:= env^.NewDoubleArray(env, newSize0);  // allocate
+  env^.SetDoubleArrayRegion(env, jNewArray0, 0 , newSize0, @_latitude[0] {source});
+  jParams[0].l:= jNewArray0;
+  newSize1:= Length(_longitude);
+  jNewArray1:= env^.NewDoubleArray(env, newSize1);  // allocate
+  env^.SetDoubleArrayRegion(env, jNewArray1, 0 , newSize1, @_longitude[0] {source});
+  jParams[1].l:= jNewArray1;
+  jParams[2].i:= _pathFlag;
+  jParams[3].i:= _markerHighlightIndex;
+  jCls:= env^.GetObjectClass(env, _jlocation);
+  jMethod:= env^.GetMethodID(env, jCls, 'GetGoogleMapsUrl', '([D[DII)Ljava/lang/String;');
+  jStr:= env^.CallObjectMethodA(env, _jlocation, jMethod, @jParams);
+  case jStr = nil of
+     True : Result:= '';
+     False: begin
+              jBoo:= JNI_False;
+              Result:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
+            end;
+  end;
+  env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env,jParams[1].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jLocation_SetMarkerHighlightColor(env: PJNIEnv; _jlocation: JObject; _color: integer);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].i:= _color;
+  jCls:= env^.GetObjectClass(env, _jlocation);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetMarkerHighlightColor', '(I)V');
+  env^.CallVoidMethodA(env, _jlocation, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
 
 end.
