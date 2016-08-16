@@ -145,11 +145,10 @@ function SplitStr(var theString: string; delimiter: string): string;
 implementation
 
 uses
-   Laz_And_GLESv2_Canvas, uJavaParser, LamwDesigner;
+  uJavaParser, LamwDesigner, SmartDesigner;
 
 procedure Register;
 begin
-
   FormEditingHook.RegisterDesignerMediator(TAndroidWidgetMediator);
   AndroidFileDescriptor := TAndroidFileDescPascalUnitWithResource.Create;
 
@@ -168,7 +167,7 @@ begin
   FormEditingHook.RegisterDesignerBaseClass(TNoGUIAndroidModule);
   FormEditingHook.RegisterDesignerBaseClass(TAndroidConsoleDataForm);
 
-
+  LamwSmartDesigner.Init;
 end;
 
 {TAndroidNoGUIExeProjectDescriptor}
@@ -401,7 +400,7 @@ begin
 
           if FileExists(FPathToJavaTemplates+DirectorySeparator + 'Controls.native') then
           begin
-           CopyFile(FPathToJavaTemplates+DirectorySeparator + 'Controls.native',
+            CopyFile(FPathToJavaTemplates+DirectorySeparator + 'Controls.native',
               FAndroidProjectName+DirectorySeparator+'lamwdesigner'+DirectorySeparator+'Controls.native');
           end;
 
@@ -1313,7 +1312,7 @@ begin
           strList.Add('export JAVA_HOME='+linuxPathToJavaJDK);     //export JAVA_HOME=/usr/lib/jvm/java-6-openjdk
           strList.Add('cd '+linuxAndroidProjectName);
           strList.Add('ant -Dtouchtest.enabled=true debug');
-          strList.SaveToFile(linuxAndroidProjectName+linuxDirSeparator+'build-debug.sh');
+          strList.SaveToFile(FAndroidProjectName+PathDelim+'build-debug.sh');
 
           strList.Clear;
           if FPathToAntBin <> '' then
@@ -1322,7 +1321,7 @@ begin
           strList.Add('export JAVA_HOME='+linuxPathToJavaJDK);     //export JAVA_HOME=/usr/lib/jvm/java-6-openjdk
           strList.Add('cd '+linuxAndroidProjectName);
           strList.Add('ant clean release');
-          strList.SaveToFile(linuxAndroidProjectName+linuxDirSeparator+'build-release.sh');
+          strList.SaveToFile(FAndroidProjectName+PathDelim+'build-release.sh');
 
           linuxPathToAdbBin:= linuxPathToAndroidSdk+linuxDirSeparator+'platform-tools';
 
@@ -1335,30 +1334,30 @@ begin
           strList.Add(linuxPathToAdbBin+linuxDirSeparator+'adb install -r bin'+linuxDirSeparator+FSmallProjName+'-'+FAntBuildMode+'.apk');
 
           strList.Add(linuxPathToAdbBin+linuxDirSeparator+'adb logcat');
-          strList.SaveToFile(linuxAndroidProjectName+linuxDirSeparator+'install.sh');
+          strList.SaveToFile(FAndroidProjectName+PathDelim+'install.sh');
 
           //linux uninstall  - thanks to Stephano!
           strList.Clear;
           strList.Add(linuxPathToAdbBin+linuxDirSeparator+'adb uninstall '+FPackagePrefaceName+'.'+LowerCase(FSmallProjName));
-          strList.SaveToFile(linuxAndroidProjectName+linuxDirSeparator+'uninstall.sh');
+          strList.SaveToFile(FAndroidProjectName+PathDelim+'uninstall.sh');
 
           //linux logcat  - thanks to Stephano!
           strList.Clear;
           strList.Add(linuxPathToAdbBin+linuxDirSeparator+'adb logcat');
-          strList.SaveToFile(linuxAndroidProjectName+linuxDirSeparator+'logcat.sh');
+          strList.SaveToFile(FAndroidProjectName+PathDelim+'logcat.sh');
 
           strList.Clear;
           strList.Add('export JAVA_HOME='+linuxPathToJavaJDK);     //export JAVA_HOME=/usr/lib/jvm/java-6-openjdk
           strList.Add('cd '+linuxAndroidProjectName);
           strList.Add('keytool -genkey -v -keystore '+FSmallProjName+'-release.keystore -alias '+dummy+'aliaskey -keyalg RSA -keysize 2048 -validity 10000 < '+
                        linuxAndroidProjectName+linuxDirSeparator+dummy+'keytool_input.txt');
-          strList.SaveToFile(linuxAndroidProjectName+linuxDirSeparator+'release-keystore.sh');
+          strList.SaveToFile(FAndroidProjectName+PathDelim+'release-keystore.sh');
 
           strList.Clear;
           strList.Add('export JAVA_HOME='+linuxPathToJavaJDK);     //export JAVA_HOME=/usr/lib/jvm/java-6-openjdk
           strList.Add('cd '+linuxAndroidProjectName);
           strList.Add('jarsigner -verify -verbose -certs '+linuxAndroidProjectName+linuxDirSeparator+'bin'+linuxDirSeparator+FSmallProjName+'-release.apk');
-          strList.SaveToFile(linuxAndroidProjectName+linuxDirSeparator+'jarsigner-verify.sh');
+          strList.SaveToFile(FAndroidProjectName+PathDelim+'jarsigner-verify.sh');
 
         end;
         Result := True;
@@ -1695,7 +1694,10 @@ begin
     sourceList.Add('');
   end;
 
+  sourceList.Add('{%region /fold ''LAMW generated code''}');
+  sourceList.Add('');
   sourceList.Add(FPascalJNIInterfaceCode);
+  sourceList.Add('{%endregion}');
 
   sourceList.Add(' ');
   sourceList.Add('begin');
@@ -1891,7 +1893,7 @@ begin
   AProject.LazCompilerOptions.SmallerCode:= True;    //added 21-december-2014
   AProject.LazCompilerOptions.SmartLinkUnit:= True;  //added 21-december-2014
 
-  if FModuleType =  2 then
+  if FModuleType = 2 then
   begin
     if FPieChecked then  //here PIE support .. ok sorry... :(  ...bad code reuse!
     begin
@@ -2025,7 +2027,7 @@ begin
   else
     auxList.SaveToFile(FPathToJNIFolder+DirectorySeparator+'build-modes'+DirectorySeparator+'readme.txt');
 
-  if  FModuleType <> 2 then
+  if FModuleType <> 2 then
   begin
     AProject.LazCompilerOptions.TargetFilename:=
           '..'+DirectorySeparator+'libs'+DirectorySeparator+auxStr+DirectorySeparator+'lib'+LowerCase(FJavaClassName){+'.so'};
@@ -2065,34 +2067,34 @@ var
   c: TComponent;
   s: TLazProjectFile;
 begin
-  if FModuleType = 0 then  //GUI Controls
-  begin
+  case FModuleType of
+  0: // GUI Controls
     AndroidFileDescriptor.ResourceClass:= TAndroidModule;
-  end
-  else if FModuleType = 1 then // =1 -> NoGUI Controls
-  begin
+  1: // NoGUI Controls
     AndroidFileDescriptor.ResourceClass:= TNoGUIAndroidModule;
-  end
   else // =2 -> NoGUI Exe
-  begin
     AndroidFileDescriptor.ResourceClass:= TAndroidConsoleDataForm;
   end;
 
-  LazarusIDE.DoNewEditorFile(AndroidFileDescriptor, '', '',
-                             [nfIsPartOfProject,nfOpenInEditor,nfCreateDefaultSrc]);
   LazarusIDE.DoSaveProject([]); // TODO: change hardcoded "controls"
 
-  if FModuleType = 0 then
+  LazarusIDE.DoNewEditorFile(AndroidFileDescriptor, '', '',
+                             [nfIsPartOfProject,nfOpenInEditor,nfCreateDefaultSrc]);
+
+  if FModuleType = 0 then // GUI
   begin
     // refresh theme
     with LazarusIDE do
-    begin
-      s := ActiveProject.Files[1];
-      d := GetDesignerWithProjectFile(s, True);
-    end;
-    c := d.LookupRoot;
-    (TAndroidModule(c).Designer as TAndroidWidgetMediator).UpdateTheme;
+      if ActiveProject.FileCount > 1 then
+      begin
+        s := ActiveProject.Files[1];
+        d := GetDesignerWithProjectFile(s, True);
+        c := d.LookupRoot;
+        (TAndroidModule(c).Designer as TAndroidWidgetMediator).UpdateTheme;
+      end;
   end;
+
+  LazarusIDE.DoSaveProject([]); // save prompt for unit1
 
   Result := mrOK;
 end;

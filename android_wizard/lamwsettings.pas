@@ -5,17 +5,18 @@ unit LamwSettings;
 interface
 
 uses
-  Classes, SysUtils;
+  Classes, SysUtils, ProjectIntf, Forms;
 
 type
 
   { TLamwGlobalSettings }
 
   TLamwGlobalSettings = class
-  private
-    const
-      IniFileName = 'JNIAndroidProject.ini';
-      IniFileSection = 'NewProject';
+  public const
+    Version = '0.7';
+  private const
+    IniFileName = 'JNIAndroidProject.ini';
+    IniFileSection = 'NewProject';
   private
     FQueryPaths: Boolean; // prompt dialog if path is empty
     FPathToJavaTemplates: string;
@@ -23,6 +24,7 @@ type
     FPathToAndroidSDK: string;
     FPathToJavaJDK: string;
     FPathToAntBin: string;
+    function GetCanUpdateJavaTemplate: Boolean;
     function GetPath(var APath: string; const IniIdent, QueryPrompt: string): string;
     function GetPathToAndroidNDK: string;
     function GetPathToAndroidSDK: string;
@@ -32,11 +34,16 @@ type
   public
     constructor Create;
     procedure ReloadPaths; // loading paths from INI
+    function GetNDK: string;
 
-    // if QueryPaths=True then quering paths through PathToXXX properties
-    // will invoke path prompt dialog when FPathToXXX is empty
+    // if QueryPaths=True then retreiving paths through PathToXXX properties
+    // will invoke a path prompt dialog when FPathToXXX is empty
     property QueryPaths: Boolean read FQueryPaths write FQueryPaths;
 
+    // volatile :: <> 'f'
+    property CanUpdateJavaTemplate: Boolean read GetCanUpdateJavaTemplate;
+
+    // all paths have trailing path delim
     property PathToJavaTemplates: string read GetPathToJavaTemplates;
     property PathToAndroidNDK: string read GetPathToAndroidNDK;
     property PathToAndroidSDK: string read GetPathToAndroidSDK;
@@ -49,7 +56,8 @@ var
 
 implementation
 
-uses LazIDEIntf, Forms, StdCtrls, EditBtn, Controls, ButtonPanel, IniFiles;
+uses LazIDEIntf, SrcEditorIntf, StdCtrls, EditBtn, Controls,
+  ButtonPanel, IniFiles;
 
 function QueryPath(APrompt: string; out Path: string;
   ACaption: string = 'Android Wizard: Path Missing!'): Boolean;
@@ -134,7 +142,21 @@ begin
         Free;
       end;
   end;
-  Result := APath;
+  Result := IncludeTrailingPathDelimiter(APath);
+end;
+
+function TLamwGlobalSettings.GetCanUpdateJavaTemplate: Boolean;
+var
+  str: string;
+begin
+  with TIniFile.Create(IniFileName) do
+  try
+    str := ReadString(IniFileSection, 'CanUpdateJavaTemplate', 't');
+    if str = '' then str := 't';
+    Result := str <> 'f';
+  finally
+    Free;
+  end;
 end;
 
 function TLamwGlobalSettings.GetPathToAndroidNDK: string;
@@ -168,7 +190,7 @@ end;
 
 procedure TLamwGlobalSettings.ReloadPaths;
 var
-  fname: RawByteString;
+  fname: string;
 begin
   fname := IncludeTrailingPathDelimiter(LazarusIDE.GetPrimaryConfigPath) + IniFileName;
   if not FileExists(fname) then Exit;
@@ -179,6 +201,17 @@ begin
     FPathToAntBin        := ReadString(IniFileSection, 'PathToAntBin',        '');
     FPathToJavaJDK       := ReadString(IniFileSection, 'PathToJavaJDK',       '');
     FPathToAndroidNDK    := ReadString(IniFileSection, 'PathToAndroidNDK',    '');
+  finally
+    Free
+  end;
+end;
+
+function TLamwGlobalSettings.GetNDK: string;
+begin
+  with TIniFile.Create(IncludeTrailingPathDelimiter(LazarusIDE.GetPrimaryConfigPath)
+    + IniFileName) do
+  try
+    Result := ReadString(IniFileSection, 'NDK', '');
   finally
     Free
   end;

@@ -14,7 +14,7 @@
         <CustomOptions Value="$(IDEBuildOptions)"/>
       </Other>
     </CompilerOptions>
-    <Files Count="16">
+    <Files Count="17">
       <Item1>
         <Filename Value="androidwizard_intf.pas"/>
         <HasRegisterProc Value="True"/>
@@ -80,6 +80,10 @@
         <Filename Value="lamwsettings.pas"/>
         <UnitName Value="LamwSettings"/>
       </Item16>
+      <Item17>
+        <Filename Value="smartdesigner.pas"/>
+        <UnitName Value="smartdesigner"/>
+      </Item17>
     </Files>
     <RequiredPkgs Count="5">
       <Item1>

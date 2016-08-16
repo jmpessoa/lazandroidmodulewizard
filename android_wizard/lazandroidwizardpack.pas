@@ -9,7 +9,7 @@ interface
 uses
   AndroidWizard_intf, uformworkspace, uFormAndroidProject, uRegisterForm, 
   FormPathMissing, uFormOSystem, uJavaParser, LamwDesigner, uFormSizeSelect, 
-  ImgCache, LamwSettings, LazarusPackageIntf;
+  ImgCache, LamwSettings, SmartDesigner, LazarusPackageIntf;
 
 implementation
 

@@ -6,7 +6,8 @@ interface
 
 uses
   Classes, SysUtils, Graphics, Controls, FormEditingIntf, PropEdits,
-  ComponentEditors, ProjectIntf, Laz2_DOM, AndroidWidget, LCLVersion, fileutil, Dialogs;
+  ComponentEditors, ProjectIntf, Laz2_DOM, AndroidWidget, LCLVersion,
+  Dialogs, Forms;
 
 type
   TDraftWidget = class;
@@ -42,45 +43,21 @@ type
     FStarted, FDone: TFPList;
     FLastSelectedContainer: jVisualControl;
     FSelection: TFPList;
-
-    // smart designer helpers
-    FSelectedJControlClassName: String;
-    FPathToJavaTemplates: string;
-    FPathToAndroidProject: string;
-    FPackageName: string;
-    FPathToJavaSource: string;
-    FStartModuleVarName: string;
-    FStartModuleTypeName: string;
-    FNDKIndex: string;
-    FPathToAndroidNDK: string;
-    FPathToAndroidSDK: string;
+    FProjFile: TLazProjectFile;
+    FjControlDeleted: Boolean;
 
     function GetAndroidForm: jForm;
 
     //Smart Designer helpers
     procedure InitSmartDesignerHelpers;
-    function IsStartModule(uName: string): boolean;
-    function GetStartModuleMode(): string;
-    procedure SetStartModuleTypeNameAndVarName();
-    function TryRemoveJControl(jclassname: string; out nativeRemoved: boolean): boolean;
-    function TryAddJControl(jclassname: string; out nativeAdded: boolean): boolean;
-    procedure GetAllJControlsFromForms(const jcontrolsList: TStrings);
-    procedure CleanupAllJControlsSource();
-
-    procedure TryChangeDemoProjecPaths;
-    function IsDemoProject(): boolean;
-    procedure TryFindDemoPathsFromReadme(out pathToDemoNDK: string; out pathToDemoSDK: string);
-    procedure UpdateProjectLPR;
-    function GetEventSignature(nativeMethod: string): string;
+    procedure UpdateJControlsList; inline;
 
   protected
     procedure OnDesignerModified(Sender: TObject{$If lcl_fullversion>1060004}; {%H-}PropName: ShortString{$ENDIF});
     procedure OnPersistentAdded(APersistent: TPersistent; {%H-}Select: boolean);
+    procedure OnPersistentDeleted;
+    procedure OnPersistentDeleting(APersistent: TPersistent);
     procedure OnSetSelection(const ASelection: TPersistentSelectionList);
-
-    //smart designer helper
-    procedure OnComponentRenamed(AComponent: TComponent);
-
   public
 
     //needed by the lazarus form editor
@@ -92,7 +69,6 @@ type
     procedure GetClientArea(AComponent: TComponent; out CurClientArea: TRect; out ScrollOffset: TPoint); override;
     procedure InitComponent(AComponent, NewParent: TComponent; NewBounds: TRect); override;
     procedure Paint; override;
-    procedure KeyUp(Sender: TControl; var {%H-}Key: word; {%H-}Shift: TShiftState); override;
     function ComponentIsIcon(AComponent: TComponent): boolean; override;
     function ParentAcceptsChild(Parent: TComponent; Child: TComponentClass): boolean; override;
     procedure UpdateTheme;
@@ -406,42 +382,19 @@ implementation
 
 uses
   LCLIntf, LCLType, strutils, ObjInspStrConsts, IDEMsgIntf, LazIDEIntf,
-  IDEExternToolIntf, laz2_XMLRead, LazFileUtils, FPimage, IniFiles, typinfo,uJavaParser,
-  Laz_And_Controls, customdialog, togglebutton, switchbutton,
-  Laz_And_GLESv1_Canvas, Laz_And_GLESv2_Canvas, gridview, Spinner, seekbar,
-  uFormSizeSelect, radiogroup, ratingbar, digitalclock, analogclock,
-  surfaceview, autocompletetextview, drawingview, chronometer;
+  IDEExternToolIntf, laz2_XMLRead, LazFileUtils,
+  FPimage, typinfo, uFormSizeSelect, LamwSettings, SmartDesigner,
+  Laz_And_Controls,
+  customdialog, togglebutton, switchbutton, Laz_And_GLESv1_Canvas,
+  Laz_And_GLESv2_Canvas, gridview, Spinner, seekbar,  radiogroup, ratingbar,
+  digitalclock, analogclock, surfaceview, autocompletetextview, drawingview,
+  chronometer;
 
 const
   MaxRGB2Inverse = 64;
 
 var
   DraftClassesMap: TDraftControlHash;
-
-
-function GetPackageNameFromAndroidManifest(pathToAndroidManifest: string): string;
-var
-  str: string;
-  xml: TXMLDocument;
-begin
-  str := pathToAndroidManifest+DirectorySeparator + 'AndroidManifest.xml';
-  if not FileExists(str) then Exit('');
-  ReadXMLFile(xml, str);
-  try
-    Result := xml.DocumentElement.AttribStrings['package'];
-  finally
-    xml.Free
-  end;
-end;
-
-function ReplaceChar(const query: string; oldchar, newchar: char): string;
-var
-  i: Integer;
-begin
-  Result := query;
-  for i := 1 to Length(Result) do
-    if Result[i] = oldchar then Result[i] := newchar;
-end;
 
 function FindNodeAtrib(root: TDOMElement; const ATag, AAttr, AVal: string): TDOMElement;
 var
@@ -550,7 +503,10 @@ begin
 
   if proj <> nil then
   begin
-    fn := proj.GetFullFilename;
+    if proj.IsPartOfProject then
+      fn := LazarusIDE.ActiveProject.MainFile.GetFullFilename
+    else
+      fn := proj.GetFullFilename;
     if (Pos(PathDelim + 'jni' + PathDelim, fn) = 0)
     and (proj.GetFileOwner is TLazProject) then
     begin
@@ -585,13 +541,8 @@ begin
               begin
                 Theme := TDOMElement(n).AttribStrings['parent'];
                 Delete(Theme, 1, Pos(':', Theme));
-                with TIniFile.Create(AppendPathDelim(LazarusIDE.GetPrimaryConfigPath) + 'JNIAndroidProject.ini') do
-                try
-                  SdkPath := ReadString('NewProject', 'PathToAndroidSDK', '');
-                finally
-                  Free
-                end;
-                SdkPath := AppendPathDelim(SdkPath) + 'platforms' + PathDelim
+                SdkPath := LamwGlobalSettings.PathToAndroidSDK;
+                SdkPath := SdkPath + 'platforms' + PathDelim
                   + 'android-' + TargetSDK + PathDelim + 'data' + PathDelim
                   + 'res' + PathDelim + 'values' + PathDelim;
                 TryGetBackgroudColorByTheme(Theme, SdkPath, Result);
@@ -915,21 +866,18 @@ end;
 constructor TAndroidWidgetMediator.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
-  FDefaultBrushColor:= clForm;
-  FDefaultPenColor:= clMedGray;
-  FDefaultFontColor:= clMedGray;
+  FDefaultBrushColor := clForm;
+  FDefaultPenColor := clMedGray;
+  FDefaultFontColor := clMedGray;
   GlobalDesignHook.AddHandlerModified(@OnDesignerModified);
   GlobalDesignHook.AddHandlerPersistentAdded(@OnPersistentAdded);
+  GlobalDesignHook.AddHandlerPersistentDeleted(@OnPersistentDeleted);
+  GlobalDesignHook.AddHandlerPersistentDeleting(@OnPersistentDeleting);
   GlobalDesignHook.AddHandlerSetSelection(@OnSetSelection);
-  GlobalDesignHook.AddHandlerComponentRenamed(@OnComponentRenamed);
 
   FStarted := TFPList.Create;
   FDone := TFPList.Create;
   FSelection := TFPList.Create;
-
-  //smart designer helper
-  InitSmartDesignerHelpers;
-
 end;
 
 destructor TAndroidWidgetMediator.Destroy;
@@ -944,6 +892,8 @@ begin
 
   if GlobalDesignHook <> nil then
     GlobalDesignHook.RemoveAllHandlersForObject(Self);
+  if LazarusIDE <> nil then
+    LazarusIDE.RemoveAllHandlersOfObject(Self);
 
   inherited Destroy;
 end;
@@ -959,6 +909,10 @@ begin
   for i := 0 to TPropertyEditor(Sender).PropCount - 1 do
   begin
     Instance := TPropertyEditor(Sender).GetComponent(i);
+    if (Instance = AndroidForm)
+    and (AndroidForm.ActivityMode in [actMain, actSplash])
+    and FProjFile.IsPartOfProject then
+      LamwSmartDesigner.UpdateProjectStartModule(AndroidForm.Name);
     if (Instance = AndroidForm) or (Instance is jVisualControl)
     and (jVisualControl(Instance).Owner = AndroidForm) then
     begin
@@ -968,51 +922,9 @@ begin
   end;
   if InvalidateNeeded then
     LCLForm.Invalidate;
-
-end;
-
-//smart designer helper
-function TAndroidWidgetMediator.IsStartModule(uName: string): boolean;
-var
-  list: TStringList;
-begin
-
-  Result:= False;
-
-  list:= TStringList.Create;
-  if FileExists(FPathToAndroidProject+DirectorySeparator+'jni'+DirectorySeparator+uName+'.lfm') then
-  begin
-
-    list.LoadFromFile(FPathToAndroidProject+DirectorySeparator+'jni'+DirectorySeparator+uName+'.lfm');
-    if Pos(GetStartModuleMode(), list.Text) > 0 then
-    begin
-      Result:= True;
-    end;
-
-  end;
-
-  list.Free;
-end;
-
-procedure TAndroidWidgetMediator.OnComponentRenamed(AComponent: TComponent);
-begin
-   if AComponent is jForm then
-   begin
-      if IsStartModule( (AComponent as jForm).UnitName ) then
-      begin
-         FStartModuleVarName:= (AComponent as jForm).Name;
-         FStartModuleTypeName:= (AComponent as jForm).ClassName;
-         UpdateProjectLPR;   //force update .lpr
-      end;
-   end;
 end;
 
 procedure TAndroidWidgetMediator.OnPersistentAdded(APersistent: TPersistent; {%H-}Select: boolean);
-var
-  auxClassName: string;
-  added, nativeExists: boolean;
-  auxList: TStringList;
-  aux, chipArchitecture: string;
 begin
   if (APersistent is jVisualControl)
   and (jVisualControl(APersistent).Parent = nil)
@@ -1024,46 +936,10 @@ begin
       jVisualControl(APersistent).Parent := AndroidForm;
 
   //smart designer helpers
-  added:= False;
-  nativeExists:= False;
 
-  auxClassName:= APersistent.ClassName;
-  if FileExists(FPathToJavaTemplates+DirectorySeparator+'lamwdesigner'+DirectorySeparator+auxClassName+'.java') then
-  begin
-     if not FileExists(FPathToJavaSource+DirectorySeparator+auxClassName+'.java') then
-        added:= TryAddJControl(auxClassName, nativeExists);
-
-     if added then
-        if nativeExists then UpdateProjectLPR;
-  end;
-
-  if auxClassName = 'TFPNoGUIGraphicsBridge' then   //handle lib freetype need by TFPNoGUIGraphicsBridge
-  begin
-    auxList:= TStringList.Create;
-    auxList.LoadFromFile(FPathToJavaSource+DirectorySeparator+'Controls.java');
-    if Pos('/*--nogui--*/', auxList.Text) <= 0 then
-    begin
-
-      aux:=  StringReplace(auxList.Text, '/*--nogui--' , '/*--nogui--*/' , [rfReplaceAll,rfIgnoreCase]);
-      aux:=  StringReplace(aux, '--graphics--*/' , '/*--graphics--*/' , [rfReplaceAll,rfIgnoreCase]);
-      auxList.Text:= aux;
-      auxList.SaveToFile(FPathToJavaSource+DirectorySeparator+'Controls.java');
-
-      chipArchitecture:= 'x86';
-      auxList.LoadFromFile(LazarusIDE.ActiveProject.ProjectInfoFile); //full path to 'controls.lpi';
-      if Pos('-CpARMV6', auxList.Text) > 0  then chipArchitecture:= 'armeabi'
-      else if Pos('-CpARMV7A', auxList.Text) > 0  then chipArchitecture:= 'armeabi-v7a';
-
-      if FileExists(FPathToJavaTemplates +DirectorySeparator+'lamwdesigner'+DirectorySeparator+ 'libfreetype.so') then
-      begin
-        CopyFile(FPathToJavaTemplates+DirectorySeparator+'lamwdesigner'+DirectorySeparator+'libfreetype.so',
-                    FPathToAndroidProject+DirectorySeparator+'libs'+DirectorySeparator+
-                    chipArchitecture+DirectorySeparator+'libfreetype.so');
-      end;
-
-    end;
-    auxList.Free;
-  end;
+  if (APersistent is jControl)
+  and (jControl(APersistent).Owner = AndroidForm) then
+    UpdateJControlsList;
 
 end;
 
@@ -1071,7 +947,6 @@ procedure TAndroidWidgetMediator.OnSetSelection(const ASelection: TPersistentSel
 var
   i: Integer;
 begin
-
   FLastSelectedContainer := nil;
   if (ASelection.Count = 1) and (ASelection[0] is jVisualControl) then
     with jVisualControl(ASelection[0]) do
@@ -1081,20 +956,6 @@ begin
   FSelection.Clear;
   for i := 0 to ASelection.Count - 1 do
     FSelection.Add(ASelection[i]);
-
-  //smart deginer helper
-  if ASelection <> nil then
-  begin
-    if ASelection.Count > 0 then
-    begin
-      FSelectedJControlClassName:= '';
-      if (ASelection[0] is jControl) then
-      begin
-        FSelectedJControlClassName:= (ASelection[0] as jControl).ClassName;
-      end;
-    end;
-  end;
-
 end;
 
 function TAndroidWidgetMediator.GetAndroidForm: jForm;
@@ -1103,1008 +964,45 @@ begin
 end;
 
 procedure TAndroidWidgetMediator.InitSmartDesignerHelpers;
-var
-  auxList: TStringList;
-  j, p1: integer;
-  aux, dlgMessage: string;
-  doUpdateLPR, nativeExists: boolean;
-  chipArchitecture: string;
-  CanUpdateJavaTemplate: string;
 begin
-
-  //it is not necessary repeat "InitSmartDesignerHelpers" tasks for each form...
-  if LazarusIDE.ActiveProject.Tag <> 0  then Exit;
-
-  LazarusIDE.ActiveProject.Tag:= 1010;  //break "InitSmartDesignerHelpers" repetition to all forms ...
-
-  auxList:= TStringList.Create;
-
-  doUpdateLPR:= False;
-
-  p1:= Pos(DirectorySeparator+'jni'+DirectorySeparator, LazarusIDE.ActiveProject.ProjectInfoFile);
-  if p1 > 0 then
-    FPathToAndroidProject:= Trim(Copy(LazarusIDE.ActiveProject.ProjectInfoFile, 1, p1-1))
-  else
-  begin
-    FPathToAndroidProject:= ExtractFilePath(LazarusIDE.ActiveProject.ProjectInfoFile);
-    FPathToAndroidProject:= Copy(FPathToAndroidProject,1, Length(FPathToAndroidProject)-1);
-  end;
-
-  FPackageName:= LazarusIDE.ActiveProject.CustomData.Values['Package'];
-  if FPackageName = '' then
-  begin
-    FPackageName:= GetPackageNameFromAndroidManifest(FPathToAndroidProject);
-    if FPackageName = '' then
-    begin
-       ShowMessage('Warning: "AndroidManifest.xml" not Found!');
-       Exit;
-    end;
-     //try add custom
-     LazarusIDE.ActiveProject.CustomData.Values['Package']:= FPackageName;
-  end;
-
-  aux:= FPackageName;
-  FPathToJavaSource:= FPathToAndroidProject + DirectorySeparator+ 'src' + DirectorySeparator + ReplaceChar(aux, '.', DirectorySeparator);
-  ForceDirectory(FPathToJavaSource);
-
-  if FileExists(LazarusIDE.GetPrimaryConfigPath+DirectorySeparator+'JNIAndroidProject.ini') then
-  begin
-    auxList.LoadFromFile(LazarusIDE.GetPrimaryConfigPath+DirectorySeparator+'JNIAndroidProject.ini');
-    FPathToJavaTemplates:= Trim(auxList.Values['PathToJavaTemplates']);
-
-    //will be used to try update/change project NDK/SDK paths [demos,  etc...]
-    FNDKIndex:=  Trim(auxList.Values['NDK']);
-    FPathToAndroidNDK:= Trim(auxList.Values['PathToAndroidNDK']);
-    FPathToAndroidSDK:= Trim(auxList.Values['PathToAndroidSDK']);
-    if Pos('CanUpdateJavaTemplate=', auxList.Text) > 0 then
-       CanUpdateJavaTemplate:= auxList.Values['CanUpdateJavaTemplate']; //renabor request...
-  end;
-
-  ForceDirectory(FPathToJavaSource+DirectorySeparator+'bak');
-  if not DirectoryExists(FPathToAndroidProject+DirectorySeparator+'lamwdesigner') then
-  begin
-
-    dlgMessage:= 'Hello!'+sLineBreak+sLineBreak+'We need to do an important change/update in your project.'+sLineBreak+sLineBreak+
-                 'Don''t worry.'+sLineBreak+sLineBreak+'The project''s backup files will be saved as *.bak.OLD'+sLineBreak+sLineBreak+
-                 'Please, whenever a dialog prompt, select "Reload from disk"';
-
-    case QuestionDlg ('\o/ \o/ \o/    Welcome to LAMW version 0.7!',dlgMessage,mtCustom,[mrYes,'OK'],'') of
-        mrYes:
-        begin
-          CopyFile(FPathToJavaSource+DirectorySeparator+'Controls.java',
-                   FPathToJavaSource+DirectorySeparator+'bak'+DirectorySeparator+'Controls.java.bak.OLD');
-
-          CopyFile(FPathToJavaSource+DirectorySeparator+'App.java',
-                   FPathToJavaSource+DirectorySeparator+'bak'+DirectorySeparator+'App.java.bak.OLD');
-
-          CopyFile(FPathToAndroidProject+DirectorySeparator+'jni'+DirectorySeparator+'controls.lpr',
-                   FPathToAndroidProject+DirectorySeparator+'jni'+DirectorySeparator+'controls.lpr.bak.OLD');
-
-        end;
-    end;
-    ForceDirectory(FPathToAndroidProject+DirectorySeparator+'lamwdesigner');
-    doUpdateLPR:= True;  //force cleanup old [fat]  *.lpr !!
-    CanUpdateJavaTemplate:='t';  //force true
-  end;
-
-  SetStartModuleTypeNameAndVarName(); //need to update/change .lpr
-
-  if CanUpdateJavaTemplate <> 'f' then  //if "f" not update templates... renabor request
-  begin
-    //force cleanup/update all java templates code
-    CleanupAllJControlsSource();
-
-    //update all java templates
-    if FileExists(FPathToJavaTemplates+DirectorySeparator+'App.java') then
-    begin
-      auxList.LoadFromFile(FPathToJavaTemplates+DirectorySeparator+'App.java');
-      auxList.Strings[0]:= 'package '+FPackageName+';';
-      auxList.SaveToFile(FPathToJavaSource+DirectorySeparator+'App.java');
-    end;
-
-    if FileExists(FPathToJavaTemplates+DirectorySeparator+'Controls.java') then
-    begin
-      auxList.LoadFromFile(FPathToJavaTemplates+DirectorySeparator+'Controls.java');
-      auxList.Strings[0]:= 'package '+FPackageName+';';
-      auxList.SaveToFile(FPathToJavaSource+DirectorySeparator+'Controls.java');
-    end;
-
-    if FileExists(FPathToJavaTemplates + DirectorySeparator + 'Controls.native') then
-    begin
-       CopyFile(FPathToJavaTemplates + DirectorySeparator + 'Controls.native',
-                FPathToAndroidProject+ DirectorySeparator+'lamwdesigner'+DirectorySeparator+ 'Controls.native');
-
-       doUpdateLPR:= True;  //force .lpr update  !!
-    end;
-
-    auxList.Clear;
-    GetAllJControlsFromForms(auxList);
-
-    //re-add all [updated] components java code ...
-    for j:= 0 to auxList.Count - 1 do
-    begin
-      if FileExists(FPathToJavaTemplates+DirectorySeparator+'lamwdesigner'+DirectorySeparator+auxList.Strings[j]+'.java') then
-      begin
-         if not FileExists(FPathToJavaSource+DirectorySeparator+auxList.Strings[j]+'.java') then
-         begin
-            TryAddJControl(auxList.Strings[j], nativeExists);
-         end;
-      end;
-    end;
-
-    if Pos('TFPNoGUIGraphicsBridge', auxList.Text) > 0 then   //handle lib freetype need by TFPNoGUIGraphicsBridge
-    begin
-     auxList.LoadFromFile(FPathToJavaSource+DirectorySeparator+'Controls.java');
-     aux:=  StringReplace(auxList.Text, '/*--nogui--' , '/*--nogui--*/' , [rfReplaceAll,rfIgnoreCase]);
-     aux:=  StringReplace(aux, '--graphics--*/' , '/*--graphics--*/' , [rfReplaceAll,rfIgnoreCase]);
-     auxList.Text:= aux;
-     auxList.SaveToFile(FPathToJavaSource+DirectorySeparator+'Controls.java');
-
-     chipArchitecture:= 'x86';
-     auxList.LoadFromFile(LazarusIDE.ActiveProject.ProjectInfoFile); //full path to 'controls.lpi';
-     if Pos('-CpARMV6', auxList.Text) > 0  then chipArchitecture:= 'armeabi'
-     else if Pos('-CpARMV7A', auxList.Text) > 0  then chipArchitecture:= 'armeabi-v7a';
-
-     if FileExists(FPathToJavaTemplates +DirectorySeparator+'lamwdesigner'+DirectorySeparator+ 'libfreetype.so') then
-     begin
-       CopyFile(FPathToJavaTemplates+DirectorySeparator+'lamwdesigner'+DirectorySeparator+'libfreetype.so',
-                   FPathToAndroidProject+DirectorySeparator+'libs'+DirectorySeparator+
-                   chipArchitecture+DirectorySeparator+'libfreetype.so');
-     end;
-    end;
-
-  end;
-
-  auxList.Free;
-
-  //try fix/repair project paths [demos, etc..]
-  if IsDemoProject() then
-  begin
-    TryChangeDemoProjecPaths();
-  end
-  else
-  begin  // add/update custom
-    LazarusIDE.ActiveProject.CustomData.Values['NdkPath']:= FPathToAndroidNDK;
-    LazarusIDE.ActiveProject.CustomData.Values['SdkPath']:= FPathToAndroidSDK
-  end;
-
-  if doUpdateLPR then UpdateProjectLPR;
-
+  if (FProjFile<>nil)
+  and FProjFile.IsPartOfProject
+  and not FProjFile.CustomData.Contains('jControls') then
+    UpdateJControlsList;
 end;
 
-function GetPathToSDKFromBuildXML(fullPathToBuildXML: string): string;
-var
-  i, pk: integer;
-  strAux: string;
-  packList: TStringList;
+procedure TAndroidWidgetMediator.OnPersistentDeleting(APersistent: TPersistent);
 begin
-  Result:= '';
-  if FileExists(fullPathToBuildXML) then
-  begin
-    packList:= TStringList.Create;
-    packList.LoadFromFile(fullPathToBuildXML);
-    pk:= Pos('location="',packList.Text);  //ex. location="C:\adt32\sdk"
-    strAux:= Copy(packList.Text, pk+Length('location="'), 300 {dummy});
-    i:= 2; //scape first "
-    while strAux[i]<>'"' do
-    begin
-      i:= i+1;
-    end;
-    Result:= Trim(Copy(strAux, 1, i-1));
-    packList.Free;
-  end;
+  FjControlDeleted := (APersistent is jControl)
+    and (Root <> nil) and (TComponent(APersistent).Owner = Root)
 end;
 
-procedure TAndroidWidgetMediator.TryChangeDemoProjecPaths();
-var
-  strList: TStringList;
-  strResult: string;
-  lpiFileName: string;
-  strLibraries: string;
-  strCustom: string;
-  pathToDemoNDK: string;
-  pathToDemoSDK: string;
+procedure TAndroidWidgetMediator.UpdateJControlsList;
 begin
-
-  strList:= TStringList.Create;
-
-  if FPathToAndroidSDK <> '' then
-  begin
-    if FileExists(FPathToAndroidProject + DirectorySeparator+'build.xml') then
-    begin
-
-      pathToDemoSDK:= GetPathToSDKFromBuildXML(FPathToAndroidProject + DirectorySeparator+'build.xml');
-      if pathToDemoSDK <> '' then
-      begin
-        strList.LoadFromFile(FPathToAndroidProject + DirectorySeparator+'build.xml');
-        strList.SaveToFile(FPathToAndroidProject+ DirectorySeparator+'build.xml.bak2');
-        strResult:=  StringReplace(strList.Text, pathToDemoSDK, FPathToAndroidSDK , [rfReplaceAll,rfIgnoreCase]);
-        strList.Text:= strResult;
-        strList.SaveToFile(FPathToAndroidProject + DirectorySeparator+'build.xml');
-      end;
-
-    end;
-  end else
-    ShowMessage('Sorry.. Project "build.xml" Path  to SDK not fixed... [Please, change it by hand!]');
-
-  lpiFileName:= LazarusIDE.ActiveProject.ProjectInfoFile; //full path to 'controls.lpi';
-  strList.LoadFromFile(lpiFileName);
-  strList.SaveToFile(lpiFileName+'.bak2');
-
-  strList:= TStringList.Create;
-
-  pathToDemoNDK:= LazarusIDE.ActiveProject.CustomData.Values['NdkPath'];
-  if (pathToDemoNDK <> '') and (FPathToAndroidNDK <> '') then
-  begin
-      strLibraries:= LazarusIDE.ActiveProject.LazCompilerOptions.Libraries;
-      strResult:= StringReplace(strLibraries, pathToDemoNDK, FPathToAndroidNDK, [rfReplaceAll,rfIgnoreCase]);
-      if (FNDKIndex = '3') or  (FNDKIndex = '4') then
-      begin
-        strResult:= StringReplace(strResult, '4.6', '4.9', [rfReplaceAll,rfIgnoreCase]);
-      end;
-      LazarusIDE.ActiveProject.LazCompilerOptions.Libraries:= strResult;
-
-      strCustom:= LazarusIDE.ActiveProject.LazCompilerOptions.CustomOptions;
-      strResult:= StringReplace(strCustom, pathToDemoNDK, FPathToAndroidNDK, [rfReplaceAll,rfIgnoreCase]);
-      if (FNDKIndex = '3') or  (FNDKIndex = '4') then
-      begin
-        strResult:= StringReplace(strResult, '4.6', '4.9', [rfReplaceAll,rfIgnoreCase]);
-      end;
-      LazarusIDE.ActiveProject.LazCompilerOptions.CustomOptions:= strResult;
-
-      //  add/update  custom ...
-      LazarusIDE.ActiveProject.CustomData.Values['NdkPath']:= FPathToAndroidNDK;
-      LazarusIDE.ActiveProject.CustomData.Values['SdkPath']:= FPathToAndroidSDK;
-
-  end else
-    ShowMessage('Sorry.. path to NDK not fixed ... [Please, change it by hand!]');
-
-  strList.Free;
-end;
-
-procedure TAndroidWidgetMediator.TryFindDemoPathsFromReadme(out pathToDemoNDK: string;
-                                              out pathToDemoSDK: string);
-var
-  strList: TStringList;
-  p: integer;
-  p2: integer;
-begin
-
-  strList:= TStringList.Create;
-  if FileExists(FPathToAndroidProject + DirectorySeparator+'readme.txt') then
-  begin
-    strList.LoadFromFile(FPathToAndroidProject + DirectorySeparator+'readme.txt');
-
-    p := Pos('System Path to Android SDK=', strList.Text);
-    p := p+length('System Path to Android SDK=');
-
-    p2 := Pos('System Path to Android NDK=', strList.Text);
-    pathToDemoSDK := Trim(copy(strList.Text,p,p2-p));
-
-    p := Pos('System Path to Android NDK=', strList.Text);
-    p := p+length('System Path to Android NDK=');
-
-    pathToDemoNDK := Trim(copy(strList.Text,p,strList.Count));
-  end;
-
-  strList.Free;
-end;
-
-function TAndroidWidgetMediator.IsDemoProject(): boolean;
-var
-  pathToDemoNDK: string;
-  pathToDemoSDK: string;
-begin
-
-  Result := False;
-
-  pathToDemoNDK:= LazarusIDE.ActiveProject.CustomData.Values['NdkPath'];
-  pathToDemoSDK:= LazarusIDE.ActiveProject.CustomData.Values['SdkPath'];
-
-  if (pathToDemoNDK = '') and (pathToDemoSDK = '') then
-  begin
-
-    TryFindDemoPathsFromReadme(pathToDemoNDK, pathToDemoSDK);  // try "readme.txt"
-
-    if (pathToDemoNDK = '') and (pathToDemoSDK = '') then Exit;
-
-    //create custom data
-    LazarusIDE.ActiveProject.CustomData.Values['NdkPath']:= pathToDemoNDK;
-    LazarusIDE.ActiveProject.CustomData.Values['SdkPath']:= pathToDemoSDK
-
-  end;
-
-  if (pathToDemoNDK = FPathToAndroidNDK) and (pathToDemoSDK = FPathToAndroidSDK) then Exit;
-
-  Result:= True;
-end;
-
-procedure TAndroidWidgetMediator.SetStartModuleTypeNameAndVarName();
-var
-  list, contentList: TStringList;
-  i: integer;
-  aux: string;
-begin
-  contentList := FindAllFiles(FPathToAndroidProject+DirectorySeparator+'jni', '*.lfm', False);
-  if contentList.Count = 0 then
-  begin
-    //new project created ... no file yet;
-    FStartModuleVarName:= 'AndroidModule1';    //default
-    FStartModuleTypeName:= 'TAndroidModule1';  //default
-    contentList.Free;
-    Exit;
-  end;
-
-  list:= TStringList.Create;
-
-  FStartModuleVarName:= ''; //reset...
-  FStartModuleTypeName:= ''; //reset...
-  for i:= 0 to contentList.Count-1 do
-  begin
-    list.LoadFromFile(contentList.Strings[i]);
-
-    if Pos('= actSplash', list.Text) > 0  then  //there is a SplashActivity
-    begin
-      aux:= list.Strings[0]; //format:  "object AndroidModule1: TAndroidModule1"
-      FStartModuleVarName:= SplitStr(aux, ':');  //object AndroidModule1
-      FStartModuleTypeName:= Trim(aux);   //TAndroidModule1
-      SplitStr(FStartModuleVarName, ' ');  //AndroidModule1
-      Randomize;
-    end;
-
-    if (FStartModuleVarName='') and (FStartModuleTypeName='') then
-    begin
-      if Pos('= actMain', list.Text) > 0  then  //isMainActvity
-      begin
-         aux:= list.Strings[0]; //format:  "object AndroidModule1: TAndroidModule1"
-         FStartModuleVarName:= SplitStr(aux, ':');  //object AndroidModule1
-         FStartModuleTypeName:= Trim(aux);   //TAndroidModule1
-         SplitStr(FStartModuleVarName, ' ');  //AndroidModule1
-         Randomize;
-      end
-    end;
-  end;
-
-  list.Free;
-  contentList.Free;
-end;
-
-function TAndroidWidgetMediator.GetStartModuleMode(): string;
-var
-  list, contentList: TStringList;
-  i: integer;
-begin
-  Result:= 'actMain';  //default
-
-  contentList := FindAllFiles(FPathToAndroidProject+DirectorySeparator+'jni', '*.lfm', False);
-  if contentList.Count = 0 then
-  begin
-    contentList.Free;
-    Exit;
-  end;
-
-  list:= TStringList.Create;
-  for i:= 0 to contentList.Count-1 do
-  begin
-    list.LoadFromFile(contentList.Strings[i]);
-
-    if Pos('= actSplash', list.Text) > 0  then  //start module is a "Splash" Activity
-    begin
-      Result:= '= actSplash';
-      Break;
-    end;
-
-    if Pos('= actMain', list.Text) > 0  then  //start module is a "Main" Actvity
-       Result:= '= actMain';
-
-  end;
-  list.Free;
-  contentList.Free;
-end;
-
-procedure TAndroidWidgetMediator.GetAllJControlsFromForms(const jcontrolsList: TStrings);
-var
-  list, contentList: TStringList;
-  i, j, p1: integer;
-  aux: string;
-begin
-  //No need to create the stringlist...
-  if jcontrolsList <> nil then
-  begin
-    list:= TStringList.Create;
-    contentList := FindAllFiles(FPathToAndroidProject+DirectorySeparator+'jni', '*.lfm', False);
-    for i:= 0 to contentList.Count-1 do
-    begin
-      list.LoadFromFile(contentList.Strings[i]);
-      for j:= 1 to list.Count - 1 do  // "1" --> skip form
-      begin
-        aux:= list.Strings[j];
-        if Pos('object ', aux) > 0 then  //object jTextView1: jTextView
-        begin
-           p1:= Pos(':', aux);
-           aux:=  Copy(aux, p1+1, Length(aux));
-           jcontrolsList.Add(Trim(aux));
-        end;
-      end;
-    end;
-    list.Free;
-    contentList.Free;
-  end;
-
-end;
-
-procedure TAndroidWidgetMediator.CleanupAllJControlsSource();
-var
-   contentList: TStringList;
-   i: integer;
-begin
-
-   //No need to create the stringlist...
-   contentList := FindAllFiles(FPathToJavaSource, '*.java', False);
-   for i:= 0 to contentList.Count-1 do
-   begin         //do backup
-      CopyFile(contentList.Strings[i],
-            FPathToJavaSource+DirectorySeparator+'bak'+DirectorySeparator+ExtractFileName(contentList.Strings[i])+'.bak');
-
-      DeleteFile(contentList.Strings[i]);
-   end;
-   contentList.Free;
-
-   ForceDirectory(FPathToAndroidProject+DirectorySeparator+'lamwdesigner'+DirectorySeparator+'bak');
-   contentList := FindAllFiles(FPathToAndroidProject+ DirectorySeparator+'lamwdesigner', '*.native', False);
-   for i:= 0 to contentList.Count-1 do
-   begin     //do backup
-     CopyFile(contentList.Strings[i],
-           FPathToAndroidProject+ DirectorySeparator+'lamwdesigner'+DirectorySeparator+'bak'+DirectorySeparator+ExtractFileName(contentList.Strings[i])+'.bak');
-
-     DeleteFile(contentList.Strings[i]);
-   end;
-   contentList.Free;
-
-end;
-
-function TAndroidWidgetMediator.GetEventSignature(nativeMethod: string): string;
-var
-  method: string;
-  signature: string;
-  params, paramName: string;
-  i, d, p, p1, p2: integer;
-  listParam: TStringList;
-begin
-
-  listParam:= TStringList.Create;
-  method:= nativeMethod;
-
-  p:= Pos('native', method);
-  method:= Copy(method, p+Length('native'), Length(method));
-  p1:= Pos('(', method);
-  p2:= Pos(')', method);
-  d:=(p2-p1);
-
-  params:= Copy(method, p1+1, d-1); //long pasobj, long elapsedTimeMillis
-  method:= Copy(method, 1, p1-1);
-  method:= Trim(method); //void pOnChronometerTick
-  SplitStr(method,' ');
-  method:=  Trim(method); //pOnChronometerTick
-
-  signature:= '(PEnv,this';  //no param...
-
-  if  Length(params) > 3 then
-  begin
-    listParam.Delimiter:= ',';
-    listParam.StrictDelimiter:= True;
-    listParam.DelimitedText:= params;
-
-    for i:= 0 to listParam.Count-1 do
-    begin
-       paramName:= Trim(listParam.Strings[i]); //long pasobj
-       SplitStr(paramName,' ');
-       listParam.Strings[i]:= Trim(paramName);
-    end;
-
-    for i:= 0 to listParam.Count-1 do
-    begin
-      if Pos('pasobj', listParam.Strings[i]) > 0 then
-         signature:= signature + ',TObject(' + listParam.Strings[i]+')'
-      else
-        signature:= signature + ',' + listParam.Strings[i];
-    end;
-  end;
-
-  Result:= method+'=Java_Event_'+method+signature+');';
-
-  if Pos('pAppOnCreate=', Result) > 0 then
-  begin
-    if FStartModuleVarName <> '' then
-      Result:= Result+Trim(FStartModuleVarName)+'.Init(gApp);'
-    else
-      Result:= Result+'AndroidModule1.Init(gApp);'
-  end;
-
-  listParam.Free;
-end;
-
-procedure TAndroidWidgetMediator.UpdateProjectLPR;
-var
-   tempList, importList, javaClassList, nativeMethodList,  SynMemo1, SynMemo2: TStringList;
-   i, k: integer;
-begin
-
-  if FPackageName = '' then Exit;
-
-  nativeMethodList:= TStringList.Create;
-  tempList:= TStringList.Create;
-  SynMemo1:= TStringList.Create;
-  SynMemo2:= TStringList.Create;
-  importList:= TStringList.Create;
-
-  javaClassList := FindAllFiles(FPathToAndroidProject+DirectorySeparator+'lamwdesigner', '*.native', False);
-
-  for k:= 0 to javaClassList.Count - 1 do
-  begin
-    tempList.LoadFromFile(javaClassList.Strings[k]);
-    for i:= 0 to  tempList.Count - 1 do
-    begin
-      nativeMethodList.Add(Trim(tempList.Strings[i]));
-    end;
-  end;
-  javaClassList.Free;
-
-  javaClassList := FindAllFiles(FPathToJavaSource, '*.java', False);
-  for k:= 0 to javaClassList.Count - 1 do
-  begin
-    tempList.LoadFromFile(javaClassList.Strings[k]);
-    for i:= 0 to tempList.Count - 1 do
-    begin
-       if Pos('import ', tempList.Strings[i]) > 0 then
-       begin
-         importList.Add(Trim(tempList.Strings[i]));
-       end;
-    end;
-  end;
-
-  tempList.Clear;
-  for i:= 0 to nativeMethodList.Count-1 do
-  begin
-    tempList.Add(GetEventSignature(nativeMethodList.Strings[i]));
-  end;
-
-  tempList.SaveToFile(FPathToAndroidProject+DirectorySeparator+'lamwdesigner'+DirectorySeparator+'ControlsEvents.txt');
-
-  tempList.Clear;
-  tempList.Add('package '+ FPackageName+';');
-  tempList.Add(' ');
-  tempList.Add(importList.Text);
-  tempList.Add('public class Controls {');
-  tempList.Add(' ');
-  tempList.Add(nativeMethodList.Text);
-  tempList.Add('}');
-  tempList.SaveToFile(FPathToAndroidProject+DirectorySeparator+'lamwdesigner'+DirectorySeparator+'Controls.dummy');
-
-  //upgrade [library] controls.lpr
-  SynMemo1.Clear;
-  SynMemo2.Clear;
-  if FileExists(FPathToAndroidProject+PathDelim+'jni'+PathDelim+'controls.lpr') then
-  begin
-    // from old "controls.lpr"
-    SynMemo1.LoadFromFile(FPathToAndroidProject+PathDelim+'jni'+PathDelim+'controls.lpr');
-    i := 0;
-    while i < SynMemo1.Count do
-    begin
-      if Copy(Trim(SynMemo1[i]) + ' ', 1, 5) = 'uses ' then
-      begin
-        repeat
-          SynMemo2.Add(SynMemo1[i]);
-          Inc(i);
-        until (i >= SynMemo1.Count) or (Pos(';', SynMemo1[i - 1]) > 0);
-        SynMemo2.Add('');
-        Break;
-      end else
-        SynMemo2.Add(SynMemo1[i]);
-      Inc(i);
-    end;
-  end else begin
-    SynMemo2.Add('{hint: save all files to location: '+FPathToAndroidProject+DirectorySeparator+'jni}');
-    SynMemo2.Add('library controls;  //by Lamw: Lazarus Android Module Wizard: '+DateTimeToStr(Now)+']');
-    SynMemo2.Add(' ');
-    SynMemo2.Add('{$mode delphi}');
-    SynMemo2.Add(' ');
-    SynMemo2.Add('uses');
-    SynMemo2.Add('  Classes, SysUtils, And_jni, And_jni_Bridge, AndroidWidget, Laz_And_Controls,');
-    SynMemo2.Add('  Laz_And_Controls_Events, unit1;');
-    SynMemo2.Add(' ');
-  end;
-
-  if nativeMethodList.Count > 0 then
-  begin
-    with TJavaParser.Create(FPathToAndroidProject+DirectorySeparator+'lamwdesigner'+DirectorySeparator+'Controls.dummy') do
-    try
-      SynMemo2.Add(GetPascalJNIInterfaceCode(FPathToAndroidProject+DirectorySeparator+'lamwdesigner'+DirectorySeparator+'ControlsEvents.txt'));
-    finally
-      Free
-    end;
-  end;
-
-  // TODO: should be taken from old "controls.lpr" (SynMemo1)
-  SynMemo2.Add('begin');
-  SynMemo2.Add('  gApp:= jApp.Create(nil);{AndroidWidget.pas}');
-  SynMemo2.Add('  gApp.Title:= ''My Android Bridges Library'';');
-  SynMemo2.Add('  gjAppName:= '''+FPackageName+''';{AndroidWidget.pas}');
-  SynMemo2.Add('  gjClassName:= '''+ReplaceChar(FPackageName, '.','/')+'/Controls'';{AndroidWidget.pas}');
-  SynMemo2.Add('  gApp.AppName:=gjAppName;');
-  SynMemo2.Add('  gApp.ClassName:=gjClassName;');
-  SynMemo2.Add('  gApp.Initialize;');
-  SynMemo2.Add('  gApp.CreateForm('+FStartModuleTypeName+', '+FStartModuleVarName+');');
-  SynMemo2.Add('end.');
-
-  if FileExists(FPathToAndroidProject+DirectorySeparator+'jni'+DirectorySeparator+'controls.lpr') then
-  begin
-    CopyFile(FPathToAndroidProject+DirectorySeparator+'jni'+DirectorySeparator+'controls.lpr',
-       FPathToAndroidProject+DirectorySeparator+'jni'+DirectorySeparator+'controls.lpr.bak');
-  end;
-
-  SynMemo2.SaveToFile(FPathToAndroidProject+DirectorySeparator+'jni'+DirectorySeparator+'controls.lpr');
-
-  importList.Free;
-  nativeMethodList.Free;
-  tempList.Free;
-  SynMemo1.Free;
-  SynMemo2.Free;
-  javaClassList.Free;
-
-  //[clenup ?????]
-  //DeleteFile(FPathToAndroidProject+DirectorySeparator+'lamwdesigner'+DirectorySeparator+'Controls.dummy');
-  //DeleteFile(FPathToAndroidProject+DirectorySeparator+'lamwdesigner'+DirectorySeparator+'ControlsEvents.txt');
-
-
-end;
-
-//smart designer helper
-function TAndroidWidgetMediator.TryRemoveJControl(jclassname: string; out nativeRemoved: boolean): boolean;
-var
-  list, auxList, listRequirements, manifestList, allFormsControlsList: TStringList;
-  i, j, count: integer;
-  aux: string;
-  flagFoundRequirement: boolean;
-begin
-
-  Result:= False;
-  nativeRemoved:= False;
-
-  allFormsControlsList:= TStringList.Create;
-  GetAllJControlsFromForms(allFormsControlsList);
-
-  i:= allFormsControlsList.IndexOf(jclassname);
-
-  if i >= 0 then
-  begin
-    allFormsControlsList.Delete(i); //delete one ocorrence of the java class ...
-  end;
-
-  if allFormsControlsList.IndexOf(jclassname) >= 0 then
-  begin
-    allFormsControlsList.Free;
-    Exit;  //stop removing java stuff... still exists others component of the same java class..
-  end;
-
-  list:= TStringList.Create;
-  manifestList:= TStringList.Create;
-  listRequirements:= TStringList.Create;
-  auxList:= TStringList.Create;
-
-  if FileExists(FPathToJavaSource+DirectorySeparator+jclassname+'.java') then
-  begin
-    DeleteFile(FPathToJavaSource+DirectorySeparator+jclassname+'.java');
-    if FileExists(FPathToJavaTemplates+DirectorySeparator+'lamwdesigner'+DirectorySeparator +jclassname+'.create') then
-    begin
-      auxlist.LoadFromFile(FPathToJavaTemplates+DirectorySeparator+'lamwdesigner'+DirectorySeparator +jclassname+'.create');
-
-      if FileExists(FPathToAndroidProject+DirectorySeparator+'lamwdesigner'+DirectorySeparator+jclassname+'.native') then
-      begin
-        list.LoadFromFile(FPathToAndroidProject+DirectorySeparator+'lamwdesigner'+DirectorySeparator+jclassname+'.native');
-        for i:= 0 to list.Count-1 do
-             auxlist.Add(list.Strings[i]);
-        //warning: do not delete ".native" here!
-      end;
-      count:= auxlist.Count; //count inserted lines
-      aux:= auxList.Strings[0]; //insert reference
-      list.LoadFromFile(FPathToJavaSource+DirectorySeparator+'Controls.java');
-      for i:= list.Count-1 downto 0 do
-      begin
-        if list.Strings[i] = aux then //insert reference
-        begin
-          for j:= 0 to count do list.Delete(i);  //delete count+1 lines
-          list.SaveToFile(FPathToJavaSource+DirectorySeparator+'Controls.java');
-          Break;
-        end;
-      end;
-    end;
-  end;
-
-  //try delete all reference added by the component in AndroidManifest ...
-  if FileExists(FPathToAndroidProject+DirectorySeparator+'lamwdesigner'+DirectorySeparator+jclassname+'.required') then
-  begin
-    listRequirements.LoadFromFile(FPathToAndroidProject+DirectorySeparator+'lamwdesigner'+DirectorySeparator+jclassname+'.required');
-    manifestList.LoadFromFile(FPathToAndroidProject+DirectorySeparator+'AndroidManifest.xml');
-    aux:= manifestList.Text;
-
-    for i:=0 to listRequirements.Count-1 do
-    begin
-      if Pos(Trim(listRequirements.Strings[i]), aux) > 0 then
-      begin
-        flagFoundRequirement:= False;
-        for j:= 0 to allFormsControlsList.Count-1 do
-        begin
-           if allFormsControlsList.Strings[j] <> jclassname then
-           begin
-              if FileExists(FPathToAndroidProject+DirectorySeparator+'lamwdesigner'+DirectorySeparator+allFormsControlsList.Strings[j]+'.required') then
-              begin
-                auxlist.LoadFromFile(FPathToAndroidProject+DirectorySeparator+'lamwdesigner'+DirectorySeparator+allFormsControlsList.Strings[j]+'.required');
-                if auxlist.Count > 0 then
-                begin
-                  if Pos(Trim(listRequirements.Strings[i]), auxlist.Text) > 0 then
-                  begin
-                    flagFoundRequirement:= True; //Requirement can NOT be deleted...
-                    Break;
-                  end;
-                end;
-              end;
-           end;
-        end;
-        if not flagFoundRequirement then //Requirement can be deleted ..
-           aux:= StringReplace(aux,sLineBreak+Trim(listRequirements.Strings[i]),'',[rfIgnoreCase]);
-      end;
-    end;
-    manifestList.Text:= aux;
-    manifestList.SaveToFile(FPathToAndroidProject+DirectorySeparator+'AndroidManifest.xml');
-    DeleteFile(FPathToAndroidProject+DirectorySeparator+'lamwdesigner'+DirectorySeparator+jclassname+'.required');
-  end;
-
-  if FileExists(FPathToAndroidProject+DirectorySeparator+'lamwdesigner'+DirectorySeparator+jclassname+'.native') then
-  begin
-    DeleteFile(FPathToAndroidProject+DirectorySeparator+'lamwdesigner'+DirectorySeparator+jclassname+'.native');
-    nativeRemoved:= True;
-  end;
-
-  manifestList.Free;
-  listRequirements.Free;
-  list.Free;
-  auxList.Free;
-  allFormsControlsList.Free;
-
-  Result:= True;
-
-end;
-
-//experimental....
-function TAndroidWidgetMediator.TryAddJControl(jclassname: string;  out nativeAdded: boolean): boolean;
-var
-   list, listRequirements, auxList, manifestList: TStringList;
-   p1, p2, i: integer;
-   aux: string;
-   insertRef: string;
-   c: char;
-begin
-   nativeAdded:= False;
-   Result:= False;
-
-   if FPackageName = '' then Exit;
-
-   if FileExists(FPathToJavaSource+DirectorySeparator+jclassname+'.java') then
-     Exit; //do not duplicated!
-
-   list:= TStringList.Create;
-   manifestList:= TStringList.Create;
-   listRequirements:= TStringList.Create;  //android maninfest Requirements
-   auxList:= TStringList.Create;
-
-   //try insert "jControl.java" in java project source
-   if FileExists(FPathToJavaTemplates+DirectorySeparator+'lamwdesigner'+DirectorySeparator +jclassname+'.java') then
-   begin
-     list.LoadFromFile(FPathToJavaTemplates+DirectorySeparator+'lamwdesigner'+DirectorySeparator +jclassname+'.java');
-     list.Strings[0]:= 'package '+FPackageName+';';
-     list.SaveToFile(FPathToJavaSource+DirectorySeparator+jclassname+'.java');
-     Result:= True;
-   end;
-
-   if FileExists(FPathToJavaTemplates+DirectorySeparator+'lamwdesigner'+DirectorySeparator+jclassname+'.native') then
-   begin
-       CopyFile(FPathToJavaTemplates+DirectorySeparator+'lamwdesigner'+DirectorySeparator+jclassname+'.native',
-                FPathToAndroidProject+DirectorySeparator+'lamwdesigner'+DirectorySeparator+jclassname+'.native');
-        nativeAdded:= True;
-   end;
-
-   //try insert "jControl.create" constructor in "Controls.java"
-   if FileExists(FPathToJavaTemplates+DirectorySeparator+'lamwdesigner'+DirectorySeparator +jclassname+'.create') then
-   begin
-     list.LoadFromFile(FPathToJavaTemplates+DirectorySeparator+'lamwdesigner'+DirectorySeparator +jclassname+'.create');
-     if FileExists(FPathToAndroidProject+DirectorySeparator+'lamwdesigner'+DirectorySeparator+jclassname+'.native') then
-     begin
-       auxList.LoadFromFile(FPathToJavaTemplates+DirectorySeparator+'lamwdesigner'+DirectorySeparator +jclassname+'.native');
-       for i:= 0 to auxList.Count-1 do
-           list.Add(auxList.Strings[i]);
-     end;
-     aux:= list.Text;
-     list.LoadFromFile(FPathToJavaSource+DirectorySeparator+'Controls.java');
-     list.Insert(list.Count-1, aux);
-     list.SaveToFile(FPathToJavaSource+DirectorySeparator+'Controls.java');
-   end;
-
-   //try insert reference required by the jControl in AndroidManifest ..
-   if FileExists(FPathToJavaTemplates+DirectorySeparator+'lamwdesigner'+DirectorySeparator +jclassname+'.permission') then
-   begin
-     auxList.LoadFromFile(FPathToJavaTemplates+DirectorySeparator+'lamwdesigner'+DirectorySeparator +jclassname+'.permission');
-     if auxList.Count > 0 then
-     begin
-       insertRef:= '<uses-sdk android:minSdkVersion'; //insert reference point
-       manifestList.LoadFromFile(FPathToAndroidProject+DirectorySeparator+'AndroidManifest.xml');
-       aux:= manifestList.Text;
-
-       listRequirements.Add(Trim(auxList.Text));  //Add permissions
-       list.Clear;
-       for i:= 0 to auxList.Count-1 do
-       begin
-         if Pos(Trim(auxList.Strings[i]), aux) <= 0 then list.Add(Trim(auxList.Strings[i])); //not duplicate..
-       end;
-
-       if list.Count > 0 then
-       begin
-         p1:= Pos(insertRef, aux);
-         p2:= p1 + Length(insertRef);
-         c:= aux[p2];
-         while c <> '>' do
-         begin
-            Inc(p2);
-            c:= aux[p2];
-         end;
-         Inc(p2);
-         insertRef:= Trim(Copy(aux, p1, p2-p1));
-         p1:= Pos(insertRef, aux);
-         if Length(list.Text) >  10 then  //dummy
-         begin
-           Insert(sLineBreak + Trim(list.Text), aux, p1+Length(insertRef) );
-           manifestList.Text:= aux;
-           manifestList.SaveToFile(FPathToAndroidProject+DirectorySeparator+'AndroidManifest.xml');
-         end;
-       end;
-     end;
-   end;
-
-   if FileExists(FPathToJavaTemplates+DirectorySeparator+'lamwdesigner'+DirectorySeparator +jclassname+'.feature') then
-   begin
-     auxList.LoadFromFile(FPathToJavaTemplates+DirectorySeparator+'lamwdesigner'+DirectorySeparator +jclassname+'.feature');
-     if auxList.Count > 0 then
-     begin
-       insertRef:= '<uses-sdk android:minSdkVersion'; //insert reference point
-
-       manifestList.LoadFromFile(FPathToAndroidProject+DirectorySeparator+'AndroidManifest.xml');
-       aux:= manifestList.Text;
-
-       listRequirements.Add(Trim(auxList.Text));  //Add feature
-       list.Clear;
-       for i:= 0 to auxList.Count-1 do
-       begin
-         if Pos(Trim(auxList.Strings[i]), aux) <= 0 then
-           list.Add(Trim(auxList.Strings[i])); //do not insert duplicate..
-       end;
-
-       if list.Count > 0 then
-       begin
-         p1:= Pos(insertRef, aux);
-         p2:= p1 + Length(insertRef);
-         c:= aux[p2];
-         while c <> '>' do
-         begin
-            Inc(p2);
-            c:= aux[p2];
-         end;
-         Inc(p2);
-         insertRef:= Trim(Copy(aux, p1, p2-p1));
-         p1:= Pos(insertRef, aux);
-         if Length(list.Text) > 10 then  //dummy
-         begin
-           Insert(sLineBreak + Trim(list.Text), aux, p1+Length(insertRef) );
-           manifestList.Text:= aux;
-           manifestList.SaveToFile(FPathToAndroidProject+DirectorySeparator+'AndroidManifest.xml');
-         end;
-       end;
-     end;
-   end;
-
-   if FileExists(FPathToJavaTemplates+DirectorySeparator+'lamwdesigner'+DirectorySeparator +jclassname+'.intentfilter') then
-   begin
-     auxList.LoadFromFile(FPathToJavaTemplates+DirectorySeparator+'lamwdesigner'+DirectorySeparator +jclassname+'.intentfilter');
-     if auxList.Count > 0 then
-     begin
-       insertRef:= '<intent-filter>'; //insert reference point
-
-       manifestList.LoadFromFile(FPathToAndroidProject+DirectorySeparator+'AndroidManifest.xml');
-       aux:= manifestList.Text;
-
-       listRequirements.Add(Trim(auxList.Text));  //Add intentfilters
-
-       list.Clear;
-       for i:= 0 to auxList.Count-1 do
-       begin
-         if Pos(Trim(auxList.Strings[i]), aux) <= 0 then list.Add(Trim(auxList.Strings[i])); //not duplicate..
-       end;
-
-       if list.Count > 0 then
-       begin
-         p1:= Pos(insertRef, aux);
-         if Length(list.Text) > 10 then  //dummy
-         begin
-           Insert(sLineBreak + Trim(list.Text), aux, p1+Length(insertRef) );
-           manifestList.Text:= aux;
-           manifestList.SaveToFile(FPathToAndroidProject+DirectorySeparator+'AndroidManifest.xml');
-         end;
-       end;
-     end;
-   end;
-
-   if FileExists(FPathToJavaTemplates+DirectorySeparator+'lamwdesigner'+DirectorySeparator +jclassname+'.service') then
-   begin
-     auxList.LoadFromFile(FPathToJavaTemplates+DirectorySeparator+'lamwdesigner'+DirectorySeparator +jclassname+'.service');
-     if auxList.Count > 0 then
-     begin
-       insertRef:= '</activity>'; //insert reference point
-
-       manifestList.LoadFromFile(FPathToAndroidProject+DirectorySeparator+'AndroidManifest.xml');
-       aux:= manifestList.Text;
-
-       listRequirements.Add(Trim(auxList.Text));  //Add services
-
-       list.Clear;
-       for i:= 0 to auxList.Count-1 do
-       begin
-         if Pos(Trim(auxList.Strings[i]), aux) <= 0 then list.Add(Trim(auxList.Strings[i])); //not duplicate..
-       end;
-
-       if list.Count > 0 then
-       begin
-         p1:= Pos(insertRef, aux);
-         if Length(list.Text) > 10 then //dummy
-         begin
-           Insert(sLineBreak+Trim(list.Text), aux, p1+Length(insertRef) );
-           manifestList.Text:= aux;
-           manifestList.SaveToFile(FPathToAndroidProject+DirectorySeparator+'AndroidManifest.xml');
-         end;
-       end;
-     end;
-   end;
-
-   if listRequirements.Count > 0 then
-     listRequirements.SaveToFile(FPathToAndroidProject+DirectorySeparator+'lamwdesigner'+DirectorySeparator+jclassname+'.required');
-
-   manifestList.Free;
-   listRequirements.Free;
-   list.Free;
-   auxList.Free;
-
-   //if doUpdateLPR then UpdateLPRProject;
-
+  LamwSmartDesigner.UpdateJContros(FProjFile, AndroidForm);
 end;
 
 class function TAndroidWidgetMediator.CreateMediator(TheOwner, TheForm: TComponent): TDesignerMediator;
 var
   Mediator: TAndroidWidgetMediator;
 begin
-  Result:=inherited CreateMediator(TheOwner,nil);
+  Result := inherited CreateMediator(TheOwner, nil);
 
-  Mediator:= TAndroidWidgetMediator(Result);
+  Mediator := TAndroidWidgetMediator(Result);
   Mediator.Root := TheForm;
+  Mediator.AndroidForm.Designer := Mediator;
 
   Mediator.FDefaultBrushColor := clWhite;
-  Mediator.FDefaultPenColor:= clMedGray;
-  Mediator.FDefaultFontColor:= clMedGray;
+  Mediator.FDefaultPenColor := clMedGray;
+  Mediator.FDefaultFontColor := clMedGray;
   Mediator.UpdateTheme;
-
-  Mediator.AndroidForm.Designer:= Mediator;
+  Mediator.FProjFile := LazarusIDE.GetProjectFileWithRootComponent(TheForm);
+  Mediator.InitSmartDesignerHelpers;
 end;
 
 class function TAndroidWidgetMediator.FormClass: TComponentClass;
 begin
-  Result:=TAndroidForm;
+  Result := TAndroidForm;
 end;
 
 procedure TAndroidWidgetMediator.GetBounds(AComponent: TComponent; out CurBounds: TRect);
@@ -2113,9 +1011,15 @@ var
 begin
   if AComponent is TAndroidWidget then
   begin
-    w:=TAndroidWidget(AComponent);
-    CurBounds:=Bounds(w.Left,w.Top,w.Width,w.Height);
+    w := TAndroidWidget(AComponent);
+    CurBounds := Bounds(w.Left, w.Top, w.Width, w.Height);
   end else inherited GetBounds(AComponent,CurBounds);
+end;
+
+procedure TAndroidWidgetMediator.OnPersistentDeleted;
+begin
+  if FjControlDeleted then
+    UpdateJControlsList;
 end;
 
 procedure TAndroidWidgetMediator.InvalidateRect(Sender: TObject; ARect: TRect; Erase: boolean);
@@ -2157,23 +1061,6 @@ begin
   else inherited GetClientArea(AComponent, CurClientArea, ScrollOffset);
 end;
 
-
-procedure TAndroidWidgetMediator.KeyUp(Sender: TControl; var {%H-}Key: word; {%H-}Shift: TShiftState);
-var
-  hadNative: boolean;
-  removed: boolean;
-begin
-  //smart desgner helper
-  if Key = VK_DELETE then //called before "OnPersistentDeleting"
-  begin
-    if FSelectedJControlClassName <> '' then
-    begin
-       removed:= TryRemoveJControl(FSelectedJControlClassName, hadNative);
-       if removed then
-         if hadNative then UpdateProjectLPR;
-    end;
-  end;
-end;
 
 procedure TAndroidWidgetMediator.InitComponent(AComponent, NewParent: TComponent; NewBounds: TRect);
 begin
@@ -2364,6 +1251,7 @@ procedure TAndroidWidgetMediator.UpdateTheme;
 begin
   try
     FDefaultBrushColor := GetColorBackgroundByTheme(Root);
+    if Assigned(LCLForm) then LCLForm.Invalidate;
   except
     on e: Exception do
       IDEMessagesWindow.AddCustomMessage(mluError, e.Message);
@@ -2390,7 +1278,7 @@ end;
 constructor TDraftWidget.Create(AWidget: TAndroidWidget; Canvas: TCanvas);
 var
   x: TLayoutParams;
-  y, z: DWORD;
+  y, z: Integer;
 begin
   TextColor:= clNone;
   BackGroundColor:= clNone;
@@ -3818,7 +2706,6 @@ begin
 end;
 
 initialization
-
   DraftClassesMap := TDraftControlHash.Create(64); // should be power of 2 for efficiency
   RegisterPropertyEditor(TypeInfo(TARGBColorBridge), nil, '', TARGBColorBridgePropertyEditor);
   RegisterPropertyEditor(TypeInfo(jVisualControl), jVisualControl, 'Anchor', TAnchorPropertyEditor);
