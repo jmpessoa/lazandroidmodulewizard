@@ -40,6 +40,7 @@ type
   public
     constructor Create(Stream: TStream);
     constructor Create(FileName: string);
+    constructor Create(Strings: TStrings);
     destructor Destroy; override;
 
     function GetPascalJNIInterfaceCode(Bodies: TStrings): string;
@@ -260,7 +261,7 @@ begin
   FPascalJNI.Add('  Result:= RegisterNativeMethodsArray(PEnv, className, @NativeMethods[0], Length(NativeMethods));');
   FPascalJNI.Add('end;');
   FPascalJNI.Add('');
-  FPascalJNI.Add('function JNI_OnLoad(VM: PJavaVM; reserved: pointer): JInt; cdecl;');
+  FPascalJNI.Add('function JNI_OnLoad(VM: PJavaVM; {%H-}reserved: pointer): JInt; cdecl;');
   FPascalJNI.Add('var');
   FPascalJNI.Add('  PEnv: PPointer;');
   FPascalJNI.Add('  curEnv: PJNIEnv;');
@@ -276,7 +277,7 @@ begin
   FPascalJNI.Add('  gVM:= VM; {AndroidWidget.pas}');
   FPascalJNI.Add('end;');
   FPascalJNI.Add('');
-  FPascalJNI.Add('procedure JNI_OnUnload(VM: PJavaVM; reserved: pointer); cdecl;');
+  FPascalJNI.Add('procedure JNI_OnUnload(VM: PJavaVM; {%H-}reserved: pointer); cdecl;');
   FPascalJNI.Add('var');
   FPascalJNI.Add('  PEnv: PPointer;');
   FPascalJNI.Add('  curEnv: PJNIEnv;');
@@ -521,6 +522,14 @@ constructor TJavaParser.Create(FileName: string);
 begin
   FMemStream := TMemoryStream.Create;
   FMemStream.LoadFromFile(FileName);
+  FMemStream.Position := 0;
+  Create(FMemStream);
+end;
+
+constructor TJavaParser.Create(Strings: TStrings);
+begin
+  FMemStream := TMemoryStream.Create;
+  Strings.SaveToStream(FMemStream);
   FMemStream.Position := 0;
   Create(FMemStream);
 end;
