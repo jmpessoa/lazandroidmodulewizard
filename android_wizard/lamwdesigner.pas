@@ -659,22 +659,44 @@ begin
 end;
 
 procedure TAndroidFormComponentEditor.ExecuteVerb(Index: Integer);
+var
+  pr: TLazProjectFile;
 begin
   case Index of
   0: // Rotate
     with jForm(Component) do
       ChangeSize(Height, Width);
   1: ShowSelectSizeDialog; // Select size
+  2: begin
+       pr := LazarusIDE.GetProjectFileWithRootComponent(Component);
+       if pr <> nil then
+         if not SameText(pr.CustomData['DisableLayout'], 'True') then
+           pr.CustomData['DisableLayout'] := 'True'
+         else
+           pr.CustomData['DisableLayout'] := 'False';
+     end;
   else
     inherited ExecuteVerb(Index);
   end;
 end;
 
 function TAndroidFormComponentEditor.GetVerb(Index: Integer): string;
+var
+  pr: TLazProjectFile;
 begin
   case Index of
   0: Result := 'Rotate';
   1: Result := 'Select size...';
+  2: begin
+       pr := LazarusIDE.GetProjectFileWithRootComponent(Component);
+       if pr = nil then
+         Result := '[--------------]'
+       else
+       if not SameText(pr.CustomData['DisableLayout'], 'True') then
+         Result := 'Disable design-time layout'
+       else
+         Result := 'Enable design-time layout';
+     end;
   else
     Result := inherited;
   end
@@ -682,7 +704,7 @@ end;
 
 function TAndroidFormComponentEditor.GetVerbCount: Integer;
 begin
-  Result := 2;
+  Result := 3;
 end;
 
 { TAnchorPropertyEditor }
@@ -1088,6 +1110,8 @@ begin
 end;
 
 procedure TAndroidWidgetMediator.Paint;
+var
+  CanUpdateLayout: Boolean;
 
   procedure PaintWidget(AWidget: TAndroidWidget);
   var
@@ -1171,7 +1195,8 @@ procedure TAndroidWidgetMediator.Paint;
         if Assigned(fWidgetClass) then
         begin
           fWidget := fWidgetClass.Create(AWidget, LCLForm.Canvas);
-          if not FSizing or (FSelection.IndexOf(AWidget) < 0) then
+          if CanUpdateLayout
+          and (not FSizing or (FSelection.IndexOf(AWidget) < 0)) then
             fWidget.UpdateLayout;
           fWidget.Draw;
           fWidget.Free;
@@ -1229,6 +1254,7 @@ procedure TAndroidWidgetMediator.Paint;
   end;
 
 begin
+  CanUpdateLayout := (FProjFile = nil) or not SameText(FProjFile.CustomData['DisableLayout'], 'True');
   FStarted.Clear;
   FDone.Clear;
   PaintWidget(AndroidForm);
