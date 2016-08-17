@@ -185,7 +185,7 @@ public class jSpinner extends Spinner /*dummy*/ { //please, fix what GUI object 
       mStrList = null; 
       mSpAdapter = null;    
       lparams = null;
-      setOnClickListener(null);
+      setOnItemSelectedListener(null);
    }
 
    public void SetjParent(ViewGroup _viewgroup) {
