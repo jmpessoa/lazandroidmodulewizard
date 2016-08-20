@@ -4,11 +4,13 @@ import java.util.ArrayList;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.graphics.Typeface;
+import android.util.Log;
 import android.util.TypedValue;
+import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
 import android.widget.RelativeLayout;
 import android.widget.Spinner;
@@ -25,12 +27,17 @@ class CustomSpinnerArrayAdapter<T> extends ArrayAdapter<String>{
 	private int flag = 0;
 	private boolean mLastItemAsPrompt = false;
 	private int mTextFontSize = 0;
-	int mTextSizeTypedValue;
+	private int mTextSizeTypedValue;
+	
+	private int mTextAlignment;
+	private Typeface mFontFace; 
+	private int mFontStyle;		 
 	
 public CustomSpinnerArrayAdapter(Context context, int simpleSpinnerItem, ArrayList<String> alist) {
    super(context, simpleSpinnerItem, alist);
    ctx = context;
    mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_SP;
+   mTextAlignment = Gravity.CENTER; 
 }
 
 
@@ -45,26 +52,44 @@ public void SetFontSizeUnit(int _unit) {
 	      case 6: mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_SP; break; 	      
      }   
 }
+
+public void SetTextAlignment(int _alignment) {
+	mTextAlignment = _alignment;
+}
+
+public void SetFontAndTextTypeFace(Typeface fontFace, int fontStyle) { 
+  mFontFace = fontFace; 
+  mFontStyle = fontStyle;
+}
+
+
 //This method is used to display the dropdown popup that contains data.
 	@Override
 public View getDropDownView(int position, View convertView, ViewGroup parent)
-{
-    View view = super.getView(position, convertView, parent);        
-    //we know that simple_spinner_item has android.R.id.text1 TextView:         
-    TextView text = (TextView)view.findViewById(android.R.id.text1);
+{			
+    View view = super.getView(position, convertView, parent);
     
-    text.setPadding(10, 15, 10, 15);      
-    text.setTextColor(mTextColor);
+    //we know that simple_spinner_item has android.R.id.text1 TextView:         
+    //TextView text = (TextView)view.findViewById(android.R.id.text1);
+         
+    ((TextView) view).setPadding(10, 15, 10, 15);      
+    ((TextView) view).setTextColor(mTextColor);
                
     if (mTextFontSize != 0) {
   	  
   	  if (mTextSizeTypedValue != TypedValue.COMPLEX_UNIT_SP)
-          text.setTextSize(mTextSizeTypedValue, mTextFontSize);
+  		((TextView) view).setTextSize(mTextSizeTypedValue, mTextFontSize);
   	  else
-  		 text.setTextSize(mTextFontSize);  
+  		((TextView) view).setTextSize(mTextFontSize);  
     }    
     
-    text.setBackgroundColor(mTexBackgroundtColor);
+    ((TextView) view).setBackgroundColor(mTexBackgroundtColor);      
+    ((TextView) view).setTypeface(mFontFace, mFontStyle);
+    
+    
+    ((TextView)view).setGravity(mTextAlignment);
+    //((TextView) view).setGravity(Gravity.CENTER);
+    
     return view;        
 }
 		
@@ -73,20 +98,21 @@ public View getDropDownView(int position, View convertView, ViewGroup parent)
 	public View getView(int pos, View cnvtView, ViewGroup prnt) {
 		
 	  View view = super.getView(pos, cnvtView, prnt);	    
-	  TextView text = (TextView)view.findViewById(android.R.id.text1);
-	       
-	  text.setPadding(10, 15, 10, 15); //improve here.... 17-jan-2015	  
-    text.setTextColor(mSelectedTextColor);      
-    
+		      
+	  ((TextView) view).setPadding(10, 15, 10, 15); 	  
+	  ((TextView) view).setTextColor(mSelectedTextColor);      	
+	  ((TextView) view).setTypeface(mFontFace, mFontStyle);
+      	 
     if (mTextFontSize != 0) {
   	  
   	  if (mTextSizeTypedValue != TypedValue.COMPLEX_UNIT_SP)
-           text.setTextSize(mTextSizeTypedValue, mTextFontSize);
+  		((TextView) view).setTextSize(mTextSizeTypedValue, mTextFontSize);
   	  else
-   		 text.setTextSize(mTextFontSize);
+  		((TextView) view).setTextSize(mTextFontSize);
     }    
     
     if (mLastItemAsPrompt) flag = 1;
+        
     return view; 
   }
 	
@@ -146,21 +172,8 @@ public class jSpinner extends Spinner /*dummy*/ { //please, fix what GUI object 
    private ArrayList<String>  mStrList;
    private CustomSpinnerArrayAdapter<String> mSpAdapter;
    private boolean mLastItemAsPrompt = false;
+   private int mTextAlignment;
    
-   //implement action listener type of OnItemSelectedListener
-   private OnItemSelectedListener spinnerListener =new OnItemSelectedListener() {
-	   
-        @Override   
-   /*.*/public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {        	
-    	     String caption = mStrList.get(position).toString();
-	         setSelection(position);	          		            		          		            
-    	     controls.pOnSpinnerItemSeleceted(pascalObj,position,caption);              
-        }
-        
-        @Override
-   /*.*/public void onNothingSelected(AdapterView<?> parent) {}    
-        
-   };
    
    //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
    public jSpinner(Controls _ctrls, long _Self) { //Add more others news "_xxx" params if needed!
@@ -171,10 +184,14 @@ public class jSpinner extends Spinner /*dummy*/ { //please, fix what GUI object 
       
       lparams = new RelativeLayout.LayoutParams(100,100); //lparamW, lparamH
      
+      mTextAlignment = Gravity.CENTER;
+      
       mStrList = new ArrayList<String>();
-                  
-      mSpAdapter = new CustomSpinnerArrayAdapter<String>(context, android.R.layout.simple_spinner_item,mStrList);
+ 
+      mSpAdapter = new CustomSpinnerArrayAdapter<String>(context, android.R.layout.simple_spinner_item, mStrList);
+      
       mSpAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+           
       setAdapter(mSpAdapter);                  
       setOnItemSelectedListener(spinnerListener);      
    } //end constructor
@@ -188,6 +205,22 @@ public class jSpinner extends Spinner /*dummy*/ { //please, fix what GUI object 
       setOnItemSelectedListener(null);
    }
 
+   //implement action listener type of OnItemSelectedListener
+   private OnItemSelectedListener spinnerListener =new OnItemSelectedListener() {
+	   
+        @Override   
+   /*.*/public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {        	      
+        	 ((TextView) parent.getChildAt(0)).setGravity(mTextAlignment); //Gravity.CENTER        	
+    	     String caption = mStrList.get(position).toString();
+	         setSelection(position);	          		            		          		            
+    	     controls.pOnSpinnerItemSeleceted(pascalObj,position,caption);              
+        }
+        
+        @Override
+   /*.*/public void onNothingSelected(AdapterView<?> parent) {}    
+        
+   };
+   
    public void SetjParent(ViewGroup _viewgroup) {
       if (parent != null) { parent.removeView(this); }
       parent = _viewgroup;
@@ -321,6 +354,33 @@ public class jSpinner extends Spinner /*dummy*/ { //please, fix what GUI object 
    
    public void SetFontSizeUnit(int _unit) {
 	   mSpAdapter.SetFontSizeUnit(_unit);   
+   }
+   
+   //TTextAlignment  = (taLeft, taRight, taTop, taBottom, taCenter, taCenterHorizontal, taCenterVertical);
+   public void SetTextAlignment(int _alignment) {
+	   mTextAlignment = android.view.Gravity.CENTER;
+	   switch(_alignment) {
+	   case 0 : mTextAlignment = android.view.Gravity.START; break;
+	   case 1 : mTextAlignment = android.view.Gravity.END; break;
+	   case 2 : mTextAlignment = android.view.Gravity.TOP; break;
+	   case 3 : mTextAlignment = android.view.Gravity.BOTTOM; break;
+	   case 4 : mTextAlignment = android.view.Gravity.CENTER; break;
+	   case 5 : mTextAlignment = android.view.Gravity.CENTER_HORIZONTAL; break;
+	   case 6 : mTextAlignment = android.view.Gravity.CENTER_VERTICAL; break;
+	   }	   
+	   mSpAdapter.SetTextAlignment(mTextAlignment);
+   }
+   
+   
+   public void SetFontAndTextTypeFace(int _fontFace, int _fontStyle) {	   
+	   Typeface t = null; 
+	   switch (_fontFace) { 
+	    case 0: t = Typeface.DEFAULT; break; 
+	    case 1: t = Typeface.SANS_SERIF; break; 
+	    case 2: t = Typeface.SERIF; break; 
+	    case 3: t = Typeface.MONOSPACE; break; 
+	   } 	   
+	   mSpAdapter.SetFontAndTextTypeFace(t, _fontStyle);	   
    }
    
 }  //end class

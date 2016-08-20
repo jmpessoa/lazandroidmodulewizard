@@ -26,10 +26,15 @@ TOnItemSelected = procedure(Sender: TObject; itemCaption: string; itemIndex: int
     FDropListBackgroundColor: TARGBColorBridge;
     FLastItemAsPrompt: boolean;
 
+    FTextTypeFace: TTextTypeFace;
+
     procedure SetColor(Value: TARGBColorBridge);
 
     procedure SetItems(Value: TStrings);
     procedure SetSelectedFontColor(Value : TARGBColorBridge);
+
+    procedure SetFontFace(AValue: TFontFace);
+    procedure SetTextTypeFace(Value: TTextTypeFace);
 
     procedure UpdateLParamHeight;
     procedure UpdateLParamWidth;
@@ -65,6 +70,7 @@ TOnItemSelected = procedure(Sender: TObject; itemCaption: string; itemIndex: int
     function GetItems(_delimiter: char): string;
     procedure SetFontSize(_txtFontSize: DWord);
     procedure SetFontSizeUnit(_unit: TFontSizeUnit);
+    procedure SetTextAlignment(_alignment: TTextAlignment);
 
     property jParent: jObject  read  FjPRLayout write SetjParent; // Java : Parent Relative Layout
 
@@ -83,6 +89,11 @@ TOnItemSelected = procedure(Sender: TObject; itemCaption: string; itemIndex: int
     property LastItemAsPrompt: boolean read FLastItemAsPrompt write SetLastItemAsPrompt;
     property FontSize: Dword read FFontSize write SetFontSize;
     property FontSizeUnit: TFontSizeUnit read FFontSizeUnit write SetFontSizeUnit;
+    property Alignment: TTextAlignment read FTextAlignment write SetTextAlignment;
+
+    property FontFace: TFontFace read FFontFace write SetFontFace default ffNormal;
+    property TextTypeFace: TTextTypeFace read FTextTypeFace write SetTextTypeFace;
+
   end;
 
 function jSpinner_jCreate(env: PJNIEnv; this: JObject;_Self: int64): jObject;
@@ -110,6 +121,8 @@ procedure jSpinner_SetItem(env: PJNIEnv; _jspinner: JObject; _index: integer; _i
 
 procedure jSpinner_SetTextFontSize(env: PJNIEnv; _jspinner: JObject; _txtFontSize: integer);
 procedure jSpinner_SetFontSizeUnit(env: PJNIEnv; _jspinner: JObject; _unit: integer);
+procedure jSpinner_SetTextAlignment(env: PJNIEnv; _jspinner: JObject; _alignment: integer);
+procedure jSpinner_SetFontAndTextTypeFace(env: PJNIEnv; _jspinner: JObject; _fontFace: integer; _fontStyle: integer);
 
 
 implementation
@@ -140,6 +153,12 @@ begin
   FDropListBackgroundColor:=  colbrDefault;
   FLastItemAsPrompt:= False;
   FFontSize:= 0;
+
+  FTextAlignment:= taCenter;
+
+  FFontFace:= ffNormal;
+  FTextTypeFace:= tfNormal;
+
 end;
 
 destructor jSpinner.Destroy;
@@ -242,6 +261,9 @@ begin
 
   if FFontSize <> 0 then
      jSpinner_SetTextFontSize(FjEnv, FjObject , FFontSize);
+
+  jSpinner_SetTextAlignment(FjEnv, FjObject , Ord(FTextAlignment));
+  jSpinner_SetFontAndTextTypeFace(FjEnv, FjObject, Ord(FFontFace), Ord(FTextTypeFace));
 
   for i:= 0 to FItems.Count-1 do
   begin
@@ -517,6 +539,28 @@ begin
   FFontSizeUnit:= _unit;
   if FInitialized then
      jSpinner_SetFontSizeUnit(FjEnv, FjObject, Ord(_unit));
+end;
+
+procedure jSpinner.SetTextAlignment(_alignment: TTextAlignment);
+begin
+  //in designing component state: set value here...
+  FTextAlignment:= _alignment;
+  if FInitialized then
+     jSpinner_SetTextAlignment(FjEnv, FjObject, Ord(_alignment));
+end;
+
+procedure jSpinner.SetFontFace(AValue: TFontFace);
+begin
+ FFontFace:= AValue;
+ if(FInitialized) then
+   jSpinner_SetFontAndTextTypeFace(FjEnv, FjObject, Ord(FFontFace), Ord(FTextTypeFace));
+end;
+
+procedure jSpinner.SetTextTypeFace(Value: TTextTypeFace);
+begin
+  FTextTypeFace:= Value;
+  if(FInitialized) then
+    jSpinner_SetFontAndTextTypeFace(FjEnv, FjObject, Ord(FFontFace), Ord(FTextTypeFace));
 end;
 
 //TODO
@@ -882,5 +926,33 @@ begin
    env^.CallVoidMethodA(env, _jspinner, jMethod, @jParams);
    env^.DeleteLocalRef(env, jCls);
 end;
+
+procedure jSpinner_SetTextAlignment(env: PJNIEnv; _jspinner: JObject; _alignment: integer);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].i:= _alignment;
+  jCls:= env^.GetObjectClass(env, _jspinner);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetTextAlignment', '(I)V');
+  env^.CallVoidMethodA(env, _jspinner, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jSpinner_SetFontAndTextTypeFace(env: PJNIEnv; _jspinner: JObject; _fontFace: integer; _fontStyle: integer);
+var
+  jParams: array[0..1] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].i:= _fontFace;
+  jParams[1].i:= _fontStyle;
+  jCls:= env^.GetObjectClass(env, _jspinner);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetFontAndTextTypeFace', '(II)V');
+  env^.CallVoidMethodA(env, _jspinner, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
 
 end.

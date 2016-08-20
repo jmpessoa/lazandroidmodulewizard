@@ -395,7 +395,7 @@ type
                       scrlPositionLeft,
                       scrlPositionRight, scrNone);
   //by jmpessoa
-  TTextAlignment  = (taLeft, taRight, taTop, taBottom, taCenter, taCenterHorizontal, taCenterVertica);
+  TTextAlignment  = (taLeft, taRight, taTop, taBottom, taCenter, taCenterHorizontal, taCenterVertical);
 
   TGravity = (gvBottom, gvCenter, gvCenterHorizontal, gvCenterVertical, gvLeft, gvNoGravity,
               gvRight, gvStart, gvTop, gvEnd, gvFillHorizontal, gvFillVertical);

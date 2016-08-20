@@ -2711,15 +2711,9 @@ end;
 
 procedure jTextView.SetTextTypeFace(Value: TTextTypeFace);
 begin
-  //inherited SetTextTypeFace(Value);
-
-{  if FInitialized  then
-    jTextView_SetTextTypeFace(FjEnv, FjObject, Ord(Value));}
-
   FTextTypeFace:= Value ;
   if(FInitialized) then 
-    jTextView_setFontAndTextTypeFace(FjEnv, FjObject, Ord(FFontFace), Ord(FTextTypeFace)); 
-
+    jTextView_setFontAndTextTypeFace(FjEnv, FjObject, Ord(FFontFace), Ord(FTextTypeFace));
 end;
 
 procedure jTextView.UpdateLParamWidth;
@@ -5637,13 +5631,14 @@ begin
   inherited Init(refApp);
   if FImageItem <> nil then
   begin
-     FImageItem.Init(refApp);
-     FjObject := jListView_Create2(FjEnv, FjThis, Self,
+    FImageItem.Init(refApp);
+
+    FjObject := jListView_Create2(FjEnv, FjThis, Self,
                                Ord(FWidgetItem), FWidgetText, FImageItem.GetImage,
-                               Ord(FTextDecorated),Ord(FItemLayout), Ord(FTextSizeDecorated), Ord(FTextAlign));
+                               Ord(FTextDecorated), Ord(FItemLayout), Ord(FTextSizeDecorated), Ord(FTextAlign));
 
     if FFontColor <> colbrDefault then
-       jListView_setTextColor(FjEnv, FjObject , GetARGB(FCustomColor, FFontColor));
+       jListView_setTextColor(FjEnv, FjObject, GetARGB(FCustomColor, FFontColor));
 
     if FFontSizeUnit <> unitDefault then
         jListView_SetFontSizeUnit(FjEnv, FjObject, Ord(FFontSizeUnit));
@@ -5657,35 +5652,39 @@ begin
     if FColor <> colbrDefault then
        View_SetBackGroundColor(FjEnv, FjThis, FjObject , GetARGB(FCustomColor, FColor));
 
-     for i:= 0 to Self.Items.Count-1 do
-     begin
-       jListView_add22(FjEnv, FjObject , Self.Items.Strings[i], FDelimiter, FImageItem.GetImage);
-     end;
+    for i:= 0 to FItems.Count-1 do
+    begin
+      if FItems.Strings[i] <> '' then
+        jListView_add22(FjEnv, FjObject , FItems.Strings[i], FDelimiter, FImageItem.GetImage);
+    end;
 
   end
   else
   begin
-     FjObject := jListView_Create3(FjEnv, FjThis, Self,
+    FjObject := jListView_Create3(FjEnv, FjThis, Self,
                                Ord(FWidgetItem), FWidgetText,
                                Ord(FTextDecorated),Ord(FItemLayout), Ord(FTextSizeDecorated), Ord(FTextAlign));
 
-     if FFontColor <> colbrDefault then
-        jListView_setTextColor(FjEnv, FjObject , GetARGB(FCustomColor, FFontColor));
+    if FFontColor <> colbrDefault then
+      jListView_setTextColor(FjEnv, FjObject , GetARGB(FCustomColor, FFontColor));
 
-     if FFontSizeUnit <> unitDefault then
-          jListView_SetFontSizeUnit(FjEnv, FjObject, Ord(FFontSizeUnit));
+    if FFontSizeUnit <> unitDefault then
+      jListView_SetFontSizeUnit(FjEnv, FjObject, Ord(FFontSizeUnit));
 
-     if FFontSize > 0 then
-        jListView_setTextSize(FjEnv, FjObject , FFontSize);
+    if FFontSize > 0 then
+      jListView_setTextSize(FjEnv, FjObject , FFontSize);
 
-     if FFontFace <> ffNormal then
-          jListView_SetFontFace(FjEnv, FjObject, Ord(FFontFace));
+    if FFontFace <> ffNormal then
+      jListView_SetFontFace(FjEnv, FjObject, Ord(FFontFace));
 
-     if FColor <> colbrDefault then
-        View_SetBackGroundColor(FjEnv, FjThis, FjObject , GetARGB(FCustomColor, FColor));
+    if FColor <> colbrDefault then
+      View_SetBackGroundColor(FjEnv, FjThis, FjObject , GetARGB(FCustomColor, FColor));
 
-     for i:= 0 to Self.Items.Count-1 do
-        jListView_add2(FjEnv, FjObject , Self.Items.Strings[i], FDelimiter);
+    for i:= 0 to FItems.Count-1 do
+    begin
+       if FItems.Strings[i] <> '' then
+         jListView_add2(FjEnv, FjObject , FItems.Strings[i], FDelimiter);
+    end;
 
   end;
 
@@ -5712,6 +5711,7 @@ begin
       FjPRLayout:= jCustomDialog(FParent).View;
     end;
   end;
+
   jListView_setParent(FjEnv, FjObject , FjPRLayout);
   jListView_setId(FjEnv, FjObject , Self.Id);
 
@@ -5881,38 +5881,35 @@ begin
      jListView_setItemPosition(FjEnv, FjObject , Value.X, Value.Y);
 end;
 
-//
 Procedure jListView.Add(item: string; delim: string);
 begin
-  if FInitialized then
+  if item <> '' then
   begin
-     if delim = '' then delim:= '+';
-     if item = '' then item:= 'item_dummy';
-     jListView_add2(FjEnv, FjObject , item,delim);
-     Self.Items.Add(item);
+    FItems.Add(item);
+    if FInitialized then
+      jListView_add2(FjEnv, FjObject, item, delim);
   end;
 end;
 
 Procedure jListView.Add(item: string);
 begin
-  if FInitialized then
+  if item <> '' then
   begin
-     if item = '' then item:= 'item_dummy';
-     jListView_add2(FjEnv, FjObject , item,'+');
-     Self.Items.Add(item);
+    FItems.Add(item);
+    if FInitialized then
+       jListView_add2(FjEnv, FjObject , item, FDelimiter);
   end;
 end;
 
 Procedure jListView.Add(item: string; delim: string; fontColor: TARGBColorBridge; fontSize: integer; hasWidget:
                                       TWidgetItem; widgetText: string; image: jObject);
 begin
-  if FInitialized then
+  if item <> '' then
   begin
-     if delim = '' then delim:= '+';
-     if item = '' then delim:= 'dummy';
-     jListView_add3(FjEnv, FjObject , item,
-     delim, GetARGB(FCustomColor, fontColor), fontSize, Ord(hasWidget), widgetText, image);
-     Self.Items.Add(item);
+     FItems.Add(item);
+     if FInitialized then
+       jListView_add3(FjEnv, FjObject , item,
+          delim, GetARGB(FCustomColor, fontColor), fontSize, Ord(hasWidget), widgetText, image);
   end;
 end;
 
@@ -5931,29 +5928,37 @@ end;
 
 Procedure jListView.Delete(index: Integer);
 begin
-  if FInitialized then
+  if (index >= 0) and (index < FItems.Count) then
   begin
-     if (index >= 0) and (index < Self.Items.Count) then
-     begin
+     FItems.Delete(index);
+     if FInitialized then
        jListView_delete(FjEnv, FjObject , index);
-       Self.Items.Delete(index);
-     end;
   end;
 end;
 
 Procedure jListView.Clear;
 begin
+  FItems.Clear;
   if FInitialized then
-  begin
     jListView_clear(FjEnv, FjObject );
-    Self.Items.Clear;
-  end;
 end;
 
 //by jmpessoa
 procedure jListView.SetItems(Value: TStrings);
+var
+  i: integer;
 begin
   FItems.Assign(Value);
+
+  if FInitialized then
+  begin
+    for i:= 0 to FItems.Count - 1 do
+    begin
+       if FItems.Strings[i] <> '' then
+         jListView_add2(FjEnv, FjObject , FItems.Strings[i], FDelimiter);
+    end;
+  end;
+
 end;
 
 //by jmpessoa
@@ -6080,7 +6085,6 @@ begin
   if (outColor <> colbrNone) and  (outColor <> colbrDefault) then
       color:= GetARGB(FCustomColor, outColor);
 end;
-
 
 procedure jListView.GenEvent_OnDrawItemBitmap(Obj: TObject; index: integer; caption: string;  out bitmap: JObject);
 begin
