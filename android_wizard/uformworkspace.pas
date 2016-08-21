@@ -50,7 +50,6 @@ type
     procedure FormActivate(Sender: TObject);
     procedure FormClose(Sender: TObject; var CloseAction: TCloseAction);
     procedure FormCreate(Sender: TObject);
-    procedure GroupBox1Click(Sender: TObject);
     procedure ListBoxMinSDKClick(Sender: TObject);
     procedure ListBoxMinSDKSelectionChange(Sender: TObject; User: boolean);
     procedure ListBoxPlatformSelectionChange(Sender: TObject; User: boolean);
@@ -571,12 +570,6 @@ begin   //here ModuleType already know!
     SaveSettings(fileName);  //force to create empty/initial file!
   end;
 end;
-
-procedure TFormWorkspace.GroupBox1Click(Sender: TObject);
-begin
-
-end;
-
 
 function TFormWorkspace.GetEventSignature(nativeMethod: string): string;
 var

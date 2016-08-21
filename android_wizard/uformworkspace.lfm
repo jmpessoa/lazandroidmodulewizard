@@ -77,11 +77,11 @@ object FormWorkspace: TFormWorkspace
   OnClose = FormClose
   OnCreate = FormCreate
   Position = poScreenCenter
-  LCLVersion = '1.5'
+  LCLVersion = '1.7'
   object StatusBarInfo: TStatusBar
     Left = 0
-    Height = 23
-    Top = 537
+    Height = 20
+    Top = 540
     Width = 400
     Panels = <    
       item
@@ -100,8 +100,8 @@ object FormWorkspace: TFormWorkspace
   end
   object PanelRadioGroup: TPanel
     Left = 8
-    Height = 155
-    Top = 296
+    Height = 169
+    Top = 285
     Width = 384
     Align = alClient
     BorderSpacing.Around = 8
@@ -114,7 +114,7 @@ object FormWorkspace: TFormWorkspace
     ChildSizing.ShrinkVertical = crsHomogenousChildResize
     ChildSizing.Layout = cclLeftToRightThenTopToBottom
     ChildSizing.ControlsPerLine = 4
-    ClientHeight = 155
+    ClientHeight = 169
     ClientWidth = 384
     Constraints.MinHeight = 80
     TabOrder = 1
@@ -122,9 +122,9 @@ object FormWorkspace: TFormWorkspace
       AnchorSideLeft.Side = asrBottom
       AnchorSideTop.Side = asrBottom
       Left = 0
-      Height = 147
+      Height = 161
       Top = 4
-      Width = 251
+      Width = 246
       AutoFill = True
       Caption = 'Architecture/Instructions:'
       ChildSizing.LeftRightSpacing = 6
@@ -135,8 +135,8 @@ object FormWorkspace: TFormWorkspace
       ChildSizing.ShrinkVertical = crsScaleChilds
       ChildSizing.Layout = cclLeftToRightThenTopToBottom
       ChildSizing.ControlsPerLine = 2
-      ClientHeight = 127
-      ClientWidth = 247
+      ClientHeight = 143
+      ClientWidth = 242
       Columns = 2
       ItemIndex = 0
       Items.Strings = (
@@ -149,10 +149,10 @@ object FormWorkspace: TFormWorkspace
       TabOrder = 0
     end
     object Image1: TImage
-      Left = 255
-      Height = 147
+      Left = 250
+      Height = 161
       Top = 4
-      Width = 129
+      Width = 134
       AutoSize = True
       Picture.Data = {
         1754506F727461626C654E6574776F726B47726170686963924E000089504E47
@@ -792,7 +792,7 @@ object FormWorkspace: TFormWorkspace
   object PanelButtons: TPanel
     Left = 0
     Height = 78
-    Top = 459
+    Top = 462
     Width = 400
     Align = alBottom
     BevelOuter = bvNone
@@ -825,20 +825,29 @@ object FormWorkspace: TFormWorkspace
       TabOrder = 1
     end
     object LabelTheme: TLabel
-      Left = 16
-      Height = 15
-      Top = 0
-      Width = 40
+      AnchorSideLeft.Control = PanelButtons
+      AnchorSideTop.Control = PanelButtons
+      Left = 6
+      Height = 13
+      Top = 6
+      Width = 36
+      BorderSpacing.Left = 6
+      BorderSpacing.Top = 6
       Caption = 'Theme:'
       ParentColor = False
     end
     object ComboBoxTheme: TComboBox
-      Left = 16
-      Height = 23
-      Top = 24
-      Width = 257
+      AnchorSideLeft.Control = PanelButtons
+      AnchorSideTop.Control = LabelTheme
+      AnchorSideTop.Side = asrBottom
+      Left = 4
+      Height = 21
+      Top = 23
+      Width = 269
       Anchors = [akTop, akLeft, akRight]
-      ItemHeight = 15
+      BorderSpacing.Left = 4
+      BorderSpacing.Top = 4
+      ItemHeight = 13
       ItemIndex = 0
       Items.Strings = (
         'DeviceDefault'
@@ -850,6 +859,7 @@ object FormWorkspace: TFormWorkspace
         'Material'
       )
       OnChange = ComboBoxThemeChange
+      Style = csDropDownList
       TabOrder = 2
       Text = 'DeviceDefault'
     end
@@ -857,7 +867,7 @@ object FormWorkspace: TFormWorkspace
       AnchorSideTop.Control = ComboBoxTheme
       Left = 277
       Height = 22
-      Top = 24
+      Top = 23
       Width = 23
       Anchors = [akTop, akRight]
       Glyph.Data = {
@@ -899,10 +909,10 @@ object FormWorkspace: TFormWorkspace
       OnClick = SpeedButtonHintThemeClick
     end
     object CheckBox2: TCheckBox
-      Left = 120
-      Height = 19
+      Left = 125
+      Height = 17
       Top = 47
-      Width = 153
+      Width = 148
       Anchors = [akTop, akRight]
       Caption = 'Enable PIE [Target >= 21]'
       TabOrder = 3
@@ -910,18 +920,18 @@ object FormWorkspace: TFormWorkspace
   end
   object Panel1: TPanel
     Left = 0
-    Height = 107
+    Height = 100
     Top = 0
     Width = 400
     Align = alTop
     AutoSize = True
     BevelOuter = bvNone
-    ClientHeight = 107
+    ClientHeight = 100
     ClientWidth = 400
     TabOrder = 3
     object LabelPathToWorkspace: TLabel
       Left = 8
-      Height = 15
+      Height = 13
       Top = 8
       Width = 384
       Align = alTop
@@ -936,8 +946,8 @@ object FormWorkspace: TFormWorkspace
       AnchorSideTop.Side = asrBottom
       AnchorSideRight.Control = SpdBtnPathToWorkspace
       Left = 5
-      Height = 23
-      Top = 27
+      Height = 21
+      Top = 25
       Width = 356
       Anchors = [akTop, akLeft, akRight]
       BorderSpacing.Left = 8
@@ -953,7 +963,7 @@ object FormWorkspace: TFormWorkspace
       Left = 369
       Height = 22
       Hint = 'Select directory'
-      Top = 27
+      Top = 24
       Width = 23
       Anchors = [akTop, akRight]
       BorderSpacing.Around = 8
@@ -965,13 +975,13 @@ object FormWorkspace: TFormWorkspace
       AnchorSideTop.Side = asrBottom
       AnchorSideRight.Control = SpdBtnRefreshProjectName
       Left = 8
-      Height = 23
-      Top = 77
+      Height = 21
+      Top = 71
       Width = 353
       Anchors = [akTop, akLeft, akRight]
       BorderSpacing.Left = 8
       BorderSpacing.Top = 4
-      ItemHeight = 15
+      ItemHeight = 13
       OnKeyPress = ComboSelectProjectNameKeyPress
       ParentShowHint = False
       ShowHint = True
@@ -985,7 +995,7 @@ object FormWorkspace: TFormWorkspace
       AnchorSideRight.Side = asrBottom
       Left = 369
       Height = 22
-      Top = 77
+      Top = 70
       Width = 23
       Anchors = [akTop, akRight]
       BorderSpacing.Around = 8
@@ -1030,7 +1040,7 @@ object FormWorkspace: TFormWorkspace
     object SpeedButton1: TSpeedButton
       Left = 370
       Height = 22
-      Top = 1
+      Top = 0
       Width = 23
       Anchors = [akTop, akRight]
       Glyph.Data = {
@@ -1075,9 +1085,9 @@ object FormWorkspace: TFormWorkspace
       AnchorSideTop.Control = EditPathToWorkspace
       AnchorSideTop.Side = asrBottom
       Left = 8
-      Height = 15
-      Top = 58
-      Width = 161
+      Height = 13
+      Top = 54
+      Width = 148
       BorderSpacing.Left = 8
       BorderSpacing.Top = 8
       Caption = 'New Project Name  [or Select]:'
@@ -1086,32 +1096,32 @@ object FormWorkspace: TFormWorkspace
   end
   object Panel2: TPanel
     Left = 0
-    Height = 55
-    Top = 107
+    Height = 51
+    Top = 100
     Width = 400
     Align = alTop
     AutoSize = True
     BevelOuter = bvNone
-    ClientHeight = 55
+    ClientHeight = 51
     ClientWidth = 400
     TabOrder = 4
     object GroupBox1: TGroupBox
       Left = 3
-      Height = 55
+      Height = 51
       Top = 0
       Width = 394
       Align = alClient
       BorderSpacing.Left = 3
       BorderSpacing.Right = 3
       Caption = 'Default Package Name:'
-      ClientHeight = 35
+      ClientHeight = 33
       ClientWidth = 390
       TabOrder = 0
       object EditPackagePrefaceName: TEdit
         AnchorSideLeft.Control = GroupBox1
         AnchorSideTop.Control = GroupBox1
         Left = 6
-        Height = 23
+        Height = 21
         Top = 4
         Width = 158
         Anchors = [akTop, akLeft, akRight]
@@ -1127,7 +1137,7 @@ object FormWorkspace: TFormWorkspace
   object PanelPlatform: TPanel
     Left = 8
     Height = 118
-    Top = 170
+    Top = 159
     Width = 384
     Align = alTop
     BorderSpacing.Around = 8
@@ -1149,19 +1159,19 @@ object FormWorkspace: TFormWorkspace
       Top = 4
       Width = 126
       Caption = 'NdkPlatform:'
-      ClientHeight = 90
+      ClientHeight = 92
       ClientWidth = 122
       TabOrder = 0
       object ListBoxPlatform: TListBox
         Left = 0
-        Height = 90
+        Height = 92
         Top = 0
         Width = 122
         Align = alClient
         Items.Strings = (
           ''
         )
-        ItemHeight = 15
+        ItemHeight = 13
         OnClick = ListBoxPlatformClick
         OnSelectionChange = ListBoxPlatformSelectionChange
         TabOrder = 0
@@ -1173,12 +1183,12 @@ object FormWorkspace: TFormWorkspace
       Top = 4
       Width = 126
       Caption = 'MinSdkApi:'
-      ClientHeight = 90
+      ClientHeight = 92
       ClientWidth = 122
       TabOrder = 1
       object ListBoxMinSDK: TListBox
         Left = 0
-        Height = 90
+        Height = 92
         Top = 0
         Width = 122
         Align = alClient
@@ -1194,7 +1204,7 @@ object FormWorkspace: TFormWorkspace
           '21'
           '22'
         )
-        ItemHeight = 15
+        ItemHeight = 13
         OnClick = ListBoxMinSDKClick
         OnSelectionChange = ListBoxMinSDKSelectionChange
         TabOrder = 0
@@ -1206,12 +1216,12 @@ object FormWorkspace: TFormWorkspace
       Top = 4
       Width = 124
       Caption = 'TargetSdkApi:'
-      ClientHeight = 90
+      ClientHeight = 92
       ClientWidth = 120
       TabOrder = 2
       object ListBoxTargetAPI: TListBox
         Left = 0
-        Height = 90
+        Height = 92
         Top = 0
         Width = 120
         Align = alClient
