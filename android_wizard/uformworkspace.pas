@@ -819,11 +819,11 @@ begin
       tempList.Free;
       fileList.Free;
 
-      {CheckBox1.Checked:= False;
+      (*CheckBox1.Checked:= False;
       FSupportV4:= ReadString('NewProject','SupportV4', '');
       if FSupportV4 = 'yes' then CheckBox1.Checked:= True
       else FSupportV4 := 'no';
-      }
+      *)
 
     finally
       Free;
