@@ -7,7 +7,7 @@ interface
 uses
   Classes, SysUtils, Graphics, Controls, FormEditingIntf, PropEdits,
   ComponentEditors, ProjectIntf, Laz2_DOM, AndroidWidget, LCLVersion,
-  Dialogs, Forms;
+  Dialogs, Forms, AndroidThemes;
 
 type
   TDraftWidget = class;
@@ -45,6 +45,7 @@ type
     FSelection: TFPList;
     FProjFile: TLazProjectFile;
     FjControlDeleted: Boolean;
+    FTheme: TAndroidTheme;
 
     function GetAndroidForm: jForm;
 
@@ -395,167 +396,6 @@ const
 
 var
   DraftClassesMap: TDraftControlHash;
-
-function FindNodeAtrib(root: TDOMElement; const ATag, AAttr, AVal: string): TDOMElement;
-var
-  n: TDOMNode;
-begin
-  if not root.HasChildNodes then Exit(nil);
-  n := root.FirstChild;
-  while n <> nil do
-  begin
-    if n is TDOMElement then
-      with TDOMElement(n) do
-        if (TagName = ATag) and (AttribStrings[AAttr] = AVal) then
-        begin
-          Result := TDOMElement(n);
-          Exit;
-        end;
-    n := n.NextSibling;
-  end;
-  Result := nil;
-end;
-
-function TryGetBackgroudColorByTheme(Theme, SdkValuesPath: string; out Color: TColor): Boolean;
-var
-  xml_themes, xml_themes_device: TXMLDocument;
-
-  function FindTheme(AThemeName: string): TDOMElement;
-  begin
-    Result := nil;
-    if (Copy(AThemeName, 1, 19) = 'Theme.DeviceDefault') then
-    begin
-      if Assigned(xml_themes_device) then
-        Result := FindNodeAtrib(xml_themes_device.DocumentElement, 'style', 'name', AThemeName);
-    end else
-    if Assigned(xml_themes) then
-      Result := FindNodeAtrib(xml_themes.DocumentElement, 'style', 'name', AThemeName);
-  end;
-
-var
-  xml: TXMLDocument;
-  n, nn: TDOMElement;
-  colr: string;
-  i: Integer;
-begin
-  Result := False;
-  xml_themes := nil; xml_themes_device := nil;
-  try
-    if FileExists(SdkValuesPath + 'themes.xml') then
-      ReadXMLFile(xml_themes, SdkValuesPath + 'themes.xml');
-    if FileExists(SdkValuesPath + 'themes_device_defaults.xml') then
-      ReadXMLFile(xml_themes_device, SdkValuesPath + 'themes_device_defaults.xml');
-
-    colr := '';
-    repeat
-      n := FindTheme(Theme);
-      if n = nil then Exit;
-      nn := FindNodeAtrib(n, 'item', 'name', 'colorBackground');
-      while (nn = nil) and (n.AttribStrings['parent'] <> '') do
-      begin
-        Theme := n.AttribStrings['parent'];
-        n := FindTheme(Theme);
-        nn := FindNodeAtrib(n, 'item', 'name', 'colorBackground');
-      end;
-      if nn <> nil then
-        colr := nn.TextContent
-      else begin
-        i := RPos('.', Theme);
-        if i = 0 then Exit;
-        Theme := Copy(Theme, 1, i - 1)
-      end;
-    until colr <> ''
-  finally
-    xml_themes.Free;
-    xml_themes_device.Free;
-  end;
-  if Pos('@android:color/', colr) = 1 then
-  begin
-    ReadXMLFile(xml, SdkValuesPath + 'colors.xml');
-    try
-      Delete(colr, 1, 15);
-      n := FindNodeAtrib(xml.DocumentElement, 'color', 'name', colr);
-      if n = nil then Exit;
-      colr := n.TextContent;
-    finally
-      xml.Free
-    end;
-  end;
-  if (colr = '') or (colr[1] <> '#') then Exit;
-  colr := RightStr(colr, 6);
-  Color := RGBToColor(StrToInt('$' + Copy(colr, 1, 2)),
-                      StrToInt('$' + Copy(colr, 3, 2)),
-                      StrToInt('$' + Copy(colr, 5, 2)));
-  Result := True;
-end;
-
-function GetColorBackgroundByTheme(Root: TComponent): TColor;
-var
-  proj: TLazProjectFile;
-  xml: TXMLDocument;
-  fn, TargetSDK, Theme, SdkPath: string;
-  n: TDOMNode;
-  SDK: Longint;
-  Found: Boolean;
-begin
-  Result := clWhite; // fallback
-  proj := LazarusIDE.GetProjectFileWithRootComponent(Root);
-
-  if proj <> nil then
-  begin
-    if proj.IsPartOfProject then
-      fn := LazarusIDE.ActiveProject.MainFile.GetFullFilename
-    else
-      fn := proj.GetFullFilename;
-    if (Pos(PathDelim + 'jni' + PathDelim, fn) = 0)
-    and (proj.GetFileOwner is TLazProject) then
-    begin
-      proj := TLazProject(proj.GetFileOwner).Files[1];
-      fn := proj.GetFullFilename;
-    end;
-    fn := Copy(fn, 1, Pos(PathDelim + 'jni' + PathDelim, fn));
-    fn := fn + 'AndroidManifest.xml';
-    if FileExists(fn) then
-    begin
-      ReadXMLFile(xml, fn);
-      try
-        n := xml.DocumentElement.FindNode('uses-sdk');
-        if n is TDOMElement then
-        begin
-          TargetSDK := TDOMElement(n).AttribStrings['android:targetSdkVersion'];
-          if TryStrToInt(TargetSDK, SDK) then
-          begin
-            fn := ExtractFilePath(fn) + 'res' + PathDelim + 'values-v';
-            Found := False;
-            while (SDK > 0) and not Found do
-              if FileExists(fn + IntToStr(SDK) + PathDelim + 'styles.xml') then
-                Found := True
-              else
-                Dec(SDK);
-            if Found then
-            begin
-              xml.Free;
-              ReadXMLFile(xml, fn + IntToStr(SDK) + PathDelim + 'styles.xml');
-              n := FindNodeAtrib(xml.DocumentElement, 'style', 'name', 'AppBaseTheme');
-              if n <> nil then
-              begin
-                Theme := TDOMElement(n).AttribStrings['parent'];
-                Delete(Theme, 1, Pos(':', Theme));
-                SdkPath := LamwGlobalSettings.PathToAndroidSDK;
-                SdkPath := SdkPath + 'platforms' + PathDelim
-                  + 'android-' + TargetSDK + PathDelim + 'data' + PathDelim
-                  + 'res' + PathDelim + 'values' + PathDelim;
-                TryGetBackgroudColorByTheme(Theme, SdkPath, Result);
-              end;
-            end;
-          end;
-        end;
-      finally
-        xml.Free;
-      end;
-    end;
-  end;
-end;
 
 procedure GetRedGreenBlue(rgb: longInt; out Red, Green, Blue: word); inline;
 begin
@@ -1274,10 +1114,34 @@ begin
 end;
 
 procedure TAndroidWidgetMediator.UpdateTheme;
+var
+  proj: TLazProjectFile;
+  fn: string;
 begin
   try
-    FDefaultBrushColor := GetColorBackgroundByTheme(Root);
-    if Assigned(LCLForm) then LCLForm.Invalidate;
+    proj := LazarusIDE.GetProjectFileWithRootComponent(Root);
+
+    if proj <> nil then
+    begin
+      if proj.IsPartOfProject then
+        fn := LazarusIDE.ActiveProject.MainFile.GetFullFilename
+      else
+        fn := proj.GetFullFilename;
+      if (Pos(PathDelim + 'jni' + PathDelim, fn) = 0)
+      and (proj.GetFileOwner is TLazProject) then
+      begin // main file is not saved yet => get path of first module
+        proj := TLazProject(proj.GetFileOwner).Files[1];
+        fn := proj.GetFullFilename;
+      end;
+      fn := Copy(fn, 1, Pos(PathDelim + 'jni' + PathDelim, fn));
+      fn := fn + 'AndroidManifest.xml';
+      FTheme := Themes.GetTheme(fn);
+      if FTheme <> nil then
+      begin
+        FDefaultBrushColor := FTheme.GetColorDef('colorBackground', clWhite);
+        if Assigned(LCLForm) then LCLForm.Invalidate;
+      end;
+    end;
   except
     on e: Exception do
       IDEMessagesWindow.AddCustomMessage(mluError, e.Message);
