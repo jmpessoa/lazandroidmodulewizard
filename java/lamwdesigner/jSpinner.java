@@ -99,9 +99,10 @@ public View getDropDownView(int position, View convertView, ViewGroup parent)
 		
 	  View view = super.getView(pos, cnvtView, prnt);	    
 		      
-	  ((TextView) view).setPadding(10, 15, 10, 15); 	  
-	  ((TextView) view).setTextColor(mSelectedTextColor);      	
-	  ((TextView) view).setTypeface(mFontFace, mFontStyle);
+	  ((TextView)view).setPadding(10, 15, 10, 15); 	  
+	  ((TextView)view).setTextColor(mSelectedTextColor);      	
+	  ((TextView)view).setTypeface(mFontFace, mFontStyle);
+	  ((TextView)view).setGravity(mTextAlignment);
       	 
     if (mTextFontSize != 0) {
   	  
