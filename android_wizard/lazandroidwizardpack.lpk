@@ -14,7 +14,7 @@
         <CustomOptions Value="$(IDEBuildOptions)"/>
       </Other>
     </CompilerOptions>
-    <Files Count="17">
+    <Files Count="18">
       <Item1>
         <Filename Value="androidwizard_intf.pas"/>
         <HasRegisterProc Value="True"/>
@@ -84,6 +84,10 @@
         <Filename Value="smartdesigner.pas"/>
         <UnitName Value="smartdesigner"/>
       </Item17>
+      <Item18>
+        <Filename Value="androidthemes.pas"/>
+        <UnitName Value="androidthemes"/>
+      </Item18>
     </Files>
     <RequiredPkgs Count="5">
       <Item1>
