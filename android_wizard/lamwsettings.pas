@@ -149,11 +149,12 @@ function TLamwGlobalSettings.GetCanUpdateJavaTemplate: Boolean;
 var
   str: string;
 begin
-  with TIniFile.Create(IniFileName) do
+  Result:= True;
+  with TIniFile.Create(IncludeTrailingPathDelimiter(LazarusIDE.GetPrimaryConfigPath)
+    + IniFileName) do
   try
-    str := ReadString(IniFileSection, 'CanUpdateJavaTemplate', 't');
-    if str = '' then str := 't';
-    Result := str <> 'f';
+    str := ReadString(IniFileSection, 'CanUpdateJavaTemplate', '');
+    if str = 'f' then Result:= False;
   finally
     Free;
   end;
