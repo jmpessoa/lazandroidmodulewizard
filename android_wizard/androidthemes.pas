@@ -20,15 +20,29 @@ type
     FLoaded: Boolean;
     FParent: TAndroidTheme;
     FContent: TDOMElement;
-    function Loaded: Boolean; // node from themes.xml
+    FColorCache: TStringList; // x>y>z -> TColorCacheItem
+    function PathToKey(const APath: array of string): string; { TODO: inline }
+    function FindInColorCache(const APath: array of string;
+      out WasFound: Boolean; out ARed, AGreen, ABlue, AAlpha: Byte): Boolean;
+    function FindInColorCache(const APathStr: string;
+      out WasFound: Boolean; out ARed, AGreen, ABlue, AAlpha: Byte): Boolean;
+    procedure AddToColorCache(const APath: array of string;
+      WasFound: Boolean; ARed, AGreen, ABlue, AAlpha: Byte);
+    function Loaded: Boolean; // FContent = node from themes.xml
   public
     constructor Create(const AName: string);
     destructor Destroy; override;
+    procedure ClearColorCache;
     function ShortName: string;
     function GetColor(const colorName: string): TColor;
-    function TryGetColor(const colorName: string; out
-      Red, Green, Blue, Alpha: Byte): Boolean;
+    function TryGetColor(const colorName: string;
+      out Red, Green, Blue, Alpha: Byte): Boolean;
+    function TryGetColor(const Path: array of string;
+      out Red, Green, Blue, Alpha: Byte): Boolean;
+    function TryGetColor(const Path: array of string;
+      out Color: TColor): Boolean;
     function GetColorDef(const colorName: string; DefValue: TColor): TColor;
+    function Find(const tagName, attrName, attrVal: string): TDOMElement;
     property MinAPI: Integer read FMinAPI;
     property Name: string read FName;
   end;
@@ -46,9 +60,8 @@ type
     procedure Clear;
     function LoadXML(FileName: string): TXMLDocument;
     procedure ClearXMLCache(const ProjRoot: string);
-    function Resolve(link: string;
-      const PathToProjRoot: string = '';
-      TargetAPI: Integer = 0): TDOMElement;
+    function Resolve(link: string; const PathToProjRoot: string = '';
+      TargetAPI: Integer = 0): TDOMNode;
   public
     constructor Create;
     destructor Destroy; override;
@@ -66,7 +79,13 @@ implementation
 
 uses LamwSettings, strutils, laz2_XMLRead;
 
-function FindNodeAtrib(root: TDOMElement; const ATag, AAttr, AVal: string): TDOMElement;
+type
+  TColorCacheItem = class
+  public
+    Red, Green, Blue, Alpha: Byte;
+  end;
+
+function FindNodeAttrib(root: TDOMElement; const ATag, AAttr, AVal: string): TDOMElement;
 var
   n: TDOMNode;
 begin
@@ -239,7 +258,7 @@ begin
 end;
 
 function TAndroidThemes.Resolve(link: string; const PathToProjRoot: string;
-  TargetAPI: Integer): TDOMElement;
+  TargetAPI: Integer): TDOMNode;
 
   function ResolveStyle(const search: string): TDOMElement;
   var
@@ -260,26 +279,64 @@ function TAndroidThemes.Resolve(link: string; const PathToProjRoot: string;
     if not Found then Exit;
     xml := LoadXML(s);
     if xml = nil then Exit;
-    n := FindNodeAtrib(xml.DocumentElement, 'style', 'name', search);
+    n := FindNodeAttrib(xml.DocumentElement, 'style', 'name', search);
     if n <> nil then Exit(n);
     s := PathToProjRoot + 'res' + PathDelim + 'values' + PathDelim + 'styles.xml';
     xml := LoadXML(s);
     if xml = nil then Exit;
-    n := FindNodeAtrib(xml.DocumentElement, 'style', 'name', search);
+    n := FindNodeAttrib(xml.DocumentElement, 'style', 'name', search);
     if n <> nil then Exit(n);
     xml := LoadXML('styles.xml');
     if xml = nil then Exit;
-    Result := FindNodeAtrib(xml.DocumentElement, 'style', 'name', search);
+    Result := FindNodeAttrib(xml.DocumentElement, 'style', 'name', search);
   end;
 
-  function ResolveAndroidColor(const search: string): TDOMElement;
+  function ResolveAndroidStyle(const search: string): TDOMNode;
   var
     xml: TXMLDocument;
   begin
     Result := nil;
+    xml := LoadXML('styles.xml');
+    if xml = nil then Exit;
+    Result := FindNodeAttrib(xml.DocumentElement, 'style', 'name', search);
+    if Result = nil then
+    begin
+      xml := LoadXML('styles_device_defaults.xml');
+      if xml = nil then Exit;
+      Result := FindNodeAttrib(xml.DocumentElement, 'style', 'name', search);
+    end;
+  end;
+
+  function ResolveAndroidColor(const search: string): TDOMNode;
+  var
+    xml: TXMLDocument;
+    fn: string;
+    n, n1: TDOMNode;
+  begin
+    Result := nil;
     xml := LoadXML('colors.xml');
     if xml = nil then Exit;
-    Result := FindNodeAtrib(xml.DocumentElement, 'color', 'name', search);
+    Result := FindNodeAttrib(xml.DocumentElement, 'color', 'name', search);
+    if Result = nil then
+    begin
+      fn := FBasePath;
+      fn := Copy(fn, 1, RPosEX(PathDelim, fn, Length(fn) - 1));
+      fn := fn + 'color' + PathDelim + search + '.xml';
+      if FileExists(fn) then
+      begin
+        xml := LoadXML(fn);
+        n := xml.DocumentElement.LastChild;
+        while n <> nil do
+        begin
+          if (n is TDOMElement) and (n.Attributes.Length = 1) then
+          begin
+            n1 := n.Attributes.GetNamedItem('android:color');
+            if n1 <> nil then Exit(n1);
+          end;
+          n := n.PreviousSibling;
+        end;
+      end;
+    end;
   end;
 
 var
@@ -292,6 +349,9 @@ begin
   if LinkType = 'style' then
     Result := ResolveStyle(link)
   else
+  if LinkType = 'android:style' then
+    Result := ResolveAndroidStyle(link)
+  else
   if LinkType = 'android:color' then
     Result := ResolveAndroidColor(link)
   else
@@ -303,7 +363,6 @@ var
   TargetAPI: Integer;
   xml: TXMLDocument;
   n: TDOMNode;
-  e: TDOMElement;
   s, pp: string;
 begin
   Result := nil;
@@ -323,9 +382,9 @@ begin
   ClearXMLCache(pp);
   while s[1] = '@' do
   begin
-    e := Resolve(s, pp, TargetAPI);
-    if e = nil then Exit;
-    s := e.AttribStrings['parent'];
+    n := Resolve(s, pp, TargetAPI);
+    if not (n is TDOMElement) then Exit;
+    s := TDOMElement(n).AttribStrings['parent'];
     if s = '' then Exit;
     if Pos(':', s) = 0 then
       s := '@style/' + s;
@@ -348,6 +407,64 @@ begin
 end;
 
 { TAndroidTheme }
+
+function TAndroidTheme.PathToKey(const APath: array of string): string;
+var
+  i: Integer;
+begin
+  Result := APath[0];
+  for i := 1 to High(APath) do
+    Result := Result + '>' + APath[i];
+end;
+
+function TAndroidTheme.FindInColorCache(const APath: array of string;
+  out WasFound: Boolean; out ARed, AGreen, ABlue, AAlpha: Byte): Boolean;
+begin
+  Result := FindInColorCache(PathToKey(APath), WasFound, ARed, AGreen, ABlue, AAlpha);
+end;
+
+function TAndroidTheme.FindInColorCache(const APathStr: string;
+  out WasFound: Boolean; out ARed, AGreen, ABlue, AAlpha: Byte): Boolean;
+var
+  i: Integer;
+begin
+  i := FColorCache.IndexOf(APathStr);
+  Result := i >= 0;
+  if Result then
+  begin
+    WasFound := FColorCache.Objects[i] <> nil;
+    if WasFound then
+      with TColorCacheItem(FColorCache.Objects[i]) do
+      begin
+        ARed := Red;
+        AGreen := Green;
+        ABlue := Blue;
+        AAlpha := Alpha;
+      end;
+  end;
+end;
+
+procedure TAndroidTheme.AddToColorCache(const APath: array of string;
+  WasFound: Boolean; ARed, AGreen, ABlue, AAlpha: Byte);
+var
+  i: Integer;
+  key: string;
+  it: TColorCacheItem;
+begin
+  key := PathToKey(APath);
+  i := FColorCache.IndexOf(key);
+  if i >= 0 then Exit;
+  i := FColorCache.Add(key);
+  if WasFound then
+  begin
+    it := TColorCacheItem.Create;
+    it.Red := ARed;
+    it.Green := AGreen;
+    it.Blue := ABlue;
+    it.Alpha := AAlpha;
+    FColorCache.Objects[i] := it;
+  end;
+end;
 
 function TAndroidTheme.Loaded: Boolean;
 
@@ -395,11 +512,21 @@ end;
 constructor TAndroidTheme.Create(const AName: string);
 begin
   FName := AName;
+  FColorCache := TStringList.Create;
+  FColorCache.Sorted := True;
+  FColorCache.OwnsObjects := True;
+  FColorCache.CaseSensitive := True;
 end;
 
 destructor TAndroidTheme.Destroy;
 begin
+  FColorCache.Free;
   inherited Destroy;
+end;
+
+procedure TAndroidTheme.ClearColorCache;
+begin
+  FColorCache.Clear;
 end;
 
 function TAndroidTheme.ShortName: string;
@@ -419,53 +546,130 @@ end;
 
 function TAndroidTheme.TryGetColor(const colorName: string; out Red, Green, Blue, Alpha: Byte): Boolean;
 var
-  n: TDOMElement;
   i: Integer;
   t: TAndroidTheme;
   s: string;
+  n: TDOMNode;
 begin
+  if FindInColorCache([colorName], Result, Red, Green, Blue, Alpha) then Exit;
   Result := False;
   if not Loaded then Exit;
-  n := FindNodeAtrib(FContent, 'item', 'name', colorName);
-  if n <> nil then
-  begin
-    s := n.TextContent;
-    if s = '' then Exit;
-    while s[1] = '@' do
-    begin
-      n := FOwner.Resolve(s);
-      if n = nil then Exit;
-      s := n.TextContent;
-    end;
-    if (s <> '') and (s[1] = '#') then
-    begin
-      Result := True;
-      Delete(s, 1, 1);
-      if Length(s) > 8 then
-        s := RightStr(s, 8);
-      while Length(s) < 6 do s := '0' + s;
-      case Length(s) of
-      6: s := 'ff' + s;
-      7: s := '0' + s;
+  try
+    s := colorName;
+    while s <> '' do
+      case s[1] of
+      '#':
+        begin
+          Result := True;
+          Delete(s, 1, 1);
+          if Length(s) > 8 then
+            s := RightStr(s, 8);
+          while Length(s) < 6 do s := '0' + s;
+          case Length(s) of
+          6: s := 'ff' + s;
+          7: s := '0' + s;
+          end;
+          Alpha := StrToInt('$' + Copy(s, 1, 2));
+          Red := StrToInt('$' + Copy(s, 3, 2));
+          Green := StrToInt('$' + Copy(s, 5, 2));
+          Blue := StrToInt('$' + Copy(s, 7, 2));
+          Exit;
+        end;
+      '?':
+        begin
+          i := Pos('/', s);
+          if i = 0 then i := 1;
+          Delete(s, 1, i);
+        end;
+      '@':
+        begin
+          n := FOwner.Resolve(s);
+          if n = nil then Break;
+          s := n.TextContent;
+        end;
+      else
+        n := FindNodeAttrib(FContent, 'item', 'name', s);
+        if n = nil then Break;
+        s := n.TextContent;
       end;
-      Alpha := StrToInt('$' + Copy(s, 1, 2));
-      Red := StrToInt('$' + Copy(s, 3, 2));
-      Green := StrToInt('$' + Copy(s, 5, 2));
-      Blue := StrToInt('$' + Copy(s, 7, 2));
-    end;
-  end;
-  if FParent <> nil then
-    Result := FParent.TryGetColor(colorName, Red, Green, Blue, Alpha);
-  if not Result then
-  begin
-    i := RPos('.', Name);
-    if i > 0 then
+    if FParent <> nil then
+      Result := FParent.TryGetColor(colorName, Red, Green, Blue, Alpha);
+    if not Result then
     begin
-      t := FOwner.FindTheme(Copy(Name, 1, i - 1));
-      if t <> nil then
-        Result := t.TryGetColor(colorName, Red, Green, Blue, Alpha);
+      i := RPos('.', Name);
+      if i > 0 then
+      begin
+        t := FOwner.FindTheme(Copy(Name, 1, i - 1));
+        if t <> nil then
+          Result := t.TryGetColor(colorName, Red, Green, Blue, Alpha);
+      end;
+    end;
+  finally
+    AddToColorCache([colorName], Result, Red, Green, Blue, Alpha);
+  end;
+end;
+
+function TAndroidTheme.TryGetColor(const Path: array of string;
+  out Red, Green, Blue, Alpha: Byte): Boolean;
+
+  function FindNodeUsingParent(root: TDOMElement; const tag, attr, val: string): TDOMNode;
+  begin
+    Result := FindNodeAttrib(root, tag, attr, val);
+    if (Result = nil) and (root.AttribStrings['parent'] <> '') then
+    begin
+      root := FOwner.Resolve('@android:' + root.TagName + '/' + root.AttribStrings['parent']) as TDOMElement;
+      if root <> nil then
+        Result := FindNodeUsingParent(root, tag, attr, val);
     end;
   end;
+
+var
+  i: Integer;
+  s: DOMString;
+  n: TDOMNode;
+begin
+  if FindInColorCache(Path, Result, Red, Green, Blue, Alpha) then Exit;
+  Result := False;
+  if not Loaded then Exit;
+  try
+    n := Find('item', 'name', Path[0]);
+    for i := 1 to High(Path) do
+    begin
+      repeat
+        if not (n is TDOMElement) then Exit;
+        if (n.ChildNodes.Count > 0) and (n.ChildNodes.Item[0].NodeType = TEXT_NODE) then
+        begin
+          s := TDOMElement(n).TextContent;
+          if (s <> '') and (s[1] = '@') then
+            n := FOwner.Resolve(s)
+          else
+          if (s <> '') and (s[1] = '?') then
+          begin
+            Delete(s, 1, Pos('/', s));
+            n := Find('item', 'name', s);
+          end else
+            Break;
+        end else
+          Break;
+      until False;
+      n := FindNodeUsingParent(TDOMElement(n), 'item', 'name', Path[i]);
+      if n = nil then Exit;
+    end;
+    s := TDOMElement(n).TextContent;
+    if (s = '') then Exit;
+    Result := TryGetColor(s, Red, Green, Blue, Alpha);
+  finally
+    AddToColorCache(Path, Result, Red, Green, Blue, Alpha);
+  end;
+end;
+
+function TAndroidTheme.TryGetColor(const Path: array of string; out Color: TColor): Boolean;
+var
+  r, g, b, a: Byte;
+begin
+  Result := TryGetColor(Path, r, g, b, a);
+  if Result then
+    Color := RGBToColor(r, g, b);
 end;
 
 function TAndroidTheme.GetColorDef(const colorName: string;
@@ -477,6 +681,31 @@ begin
     Result := DefValue
   else
     Result := RGBToColor(r, g, b);
+end;
+
+function TAndroidTheme.Find(const tagName, attrName, attrVal: string): TDOMElement;
+var
+  i: Integer;
+  t: TAndroidTheme;
+begin
+  Result := nil;
+  if not Loaded then Exit;
+  Result := FindNodeAttrib(FContent, tagName, attrName, attrVal);
+  if Result = nil then
+  begin
+    if FParent <> nil then
+      Result := FParent.Find(tagName, attrName, attrVal)
+    else
+    begin
+      i := RPos('.', Name);
+      if i > 0 then
+      begin
+        t := FOwner.FindTheme(Copy(Name, 1, i - 1));
+        if t <> nil then
+          Result := t.Find(tagName, attrName, attrVal);
+      end;
+    end;
+  end;
 end;
 
 initialization
