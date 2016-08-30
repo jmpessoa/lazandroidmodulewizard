@@ -26,7 +26,6 @@ Type
     function GetNameFromIndex(AIndex: integer): string;
     procedure SetNameFromIndex(AIndex: integer; AValue: string);
   protected
-    XmlRes: TXMLDocument;
     FFileName: string;
     FStringRes: TStringList;
   public
@@ -115,19 +114,24 @@ end;
 procedure TXMLResString.Open;
 Var
   Res: TDOMNode;
+  XmlRes: TXMLDocument;
 begin
 
   if Pos('strings.xml', FFileName) > 0 then
   begin
     ReadXMLFile(XmlRes, FFileName);
-    FStringRes.Clear;
-    Res:= XmlRes.DocumentElement.FirstChild;
-    while Assigned(Res) do
-    begin
-      FStringRes.Add(Res.Attributes.Item[0].NodeValue + '=' + Res.ChildNodes.Item[0].NodeValue);
-      Res:= Res.NextSibling;
+    try
+      FStringRes.Clear;
+      Res:= XmlRes.DocumentElement.FirstChild;
+      while Assigned(Res) do
+      begin
+        FStringRes.Add(Res.Attributes.Item[0].NodeValue + '=' + Res.ChildNodes.Item[0].NodeValue);
+        Res:= Res.NextSibling;
+      end;
+      FSaved:= True;
+    finally
+      XmlRes.Free
     end;
-    FSaved:= True;
   end;
 
   //TODO:
@@ -172,7 +176,6 @@ end;
 
 constructor TXMLResString.Create(AFileName: string = '');
 begin
-  XmlRes:= TXMLDocument.Create;
   FStringRes:= TStringList.Create;
   if AFileName <> '' then
     FFileName:= AFileName;
@@ -180,7 +183,6 @@ end;
 
 destructor TXMLResString.Destroy;
 begin
-  XmlRes.Free;
   FStringRes.Free;
 end;
 
