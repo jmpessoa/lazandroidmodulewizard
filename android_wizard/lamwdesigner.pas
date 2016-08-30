@@ -82,6 +82,7 @@ type
     destructor Destroy; override;
     procedure InvalidateRect(Sender: TObject; ARect: TRect; Erase: boolean);
     property AndroidForm: jForm read GetAndroidForm;
+    property AndroidTheme: TAndroidTheme read FTheme;
 
   public
     procedure GetObjInspNodeImageIndex(APersistent: TPersistent; var AIndex: integer); override;
@@ -94,7 +95,8 @@ type
   private
     FColor: TARGBColorBridge;
     FFontColor: TARGBColorBridge;
-    procedure SetColor(color: TARGBColorBridge);
+    BaseStyle: string;
+    procedure SetColor(AColor: TARGBColorBridge);
     procedure SetFontColor(AColor: TARGBColorBridge);
     function Designer: TAndroidWidgetMediator;
   protected
@@ -104,6 +106,7 @@ type
     FminW, FminH: Integer;
     function GetParentBackgroundColor: TARGBColorBridge;
     function GetBackGroundColor: TColor;
+    function DefaultTextColor: TColor; virtual;
   public
     BackGroundColor: TColor;
     TextColor: TColor;
@@ -382,7 +385,7 @@ type
 implementation
 
 uses
-  LCLIntf, LCLType, strutils, ObjInspStrConsts, IDEMsgIntf, LazIDEIntf,
+  LCLIntf, LCLType, ObjInspStrConsts, IDEMsgIntf, LazIDEIntf,
   IDEExternToolIntf, laz2_XMLRead, LazFileUtils,
   FPimage, typinfo, uFormSizeSelect, LamwSettings, SmartDesigner,
   Laz_And_Controls,
@@ -427,16 +430,6 @@ begin
   1: Result := 1;
   else Result := asize * 3 div 4;
   end;
-end;
-
-function MaxRGB(c: TColor): Byte;
-var
-  r, g, b: Byte;
-begin
-  RedGreenBlue(ColorToRGB(c), r, g, b);
-  if g > r then r := g;
-  if b > r then r := b;
-  Result := r;
 end;
 
 function BlendColors(c: TColor; alpha: Double; r, g, b: Byte): TColor; inline;
@@ -728,9 +721,11 @@ end;
 constructor TAndroidWidgetMediator.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
-  FDefaultBrushColor := clForm;
+
+  FDefaultBrushColor := clWhite;
   FDefaultPenColor := clMedGray;
   FDefaultFontColor := clMedGray;
+
   GlobalDesignHook.AddHandlerModified(@OnDesignerModified);
   GlobalDesignHook.AddHandlerPersistentAdded(@OnPersistentAdded);
   GlobalDesignHook.AddHandlerPersistentDeleted(@OnPersistentDeleted);
@@ -744,13 +739,12 @@ end;
 
 destructor TAndroidWidgetMediator.Destroy;
 begin
-
   if Assigned(AndroidForm) then
     AndroidForm.Designer := nil;
 
-  FSelection.Free;
   FStarted.Free;
   FDone.Free;
+  FSelection.Free;
 
   if GlobalDesignHook <> nil then
     GlobalDesignHook.RemoveAllHandlersForObject(Self);
@@ -802,7 +796,6 @@ begin
   if (APersistent is jControl)
   and (jControl(APersistent).Owner = AndroidForm) then
     UpdateJControlsList;
-
 end;
 
 procedure TAndroidWidgetMediator.OnSetSelection(const ASelection: TPersistentSelectionList);
@@ -854,9 +847,6 @@ begin
   Mediator.Root := TheForm;
   Mediator.AndroidForm.Designer := Mediator;
 
-  Mediator.FDefaultBrushColor := clWhite;
-  Mediator.FDefaultPenColor := clMedGray;
-  Mediator.FDefaultFontColor := clMedGray;
   Mediator.UpdateTheme;
   Mediator.FProjFile := LazarusIDE.GetProjectFileWithRootComponent(TheForm);
   Mediator.InitSmartDesignerHelpers;
@@ -1139,6 +1129,7 @@ begin
       if FTheme <> nil then
       begin
         FDefaultBrushColor := FTheme.GetColorDef('colorBackground', clWhite);
+        FDefaultFontColor := FTheme.GetColorDef('textColorPrimary', clBlack);
         if Assigned(LCLForm) then LCLForm.Invalidate;
       end;
     end;
@@ -1310,13 +1301,13 @@ begin
   end;
 end;
 
-procedure TDraftWidget.SetColor(color: TARGBColorBridge);
+procedure TDraftWidget.SetColor(AColor: TARGBColorBridge);
 begin
-  FColor:= color;
-  if color <> colbrDefault then
-    BackGroundColor:= FPColorToTColor(ToTFPColor(color))
+  FColor := AColor;
+  if AColor <> colbrDefault then
+    BackGroundColor := FPColorToTColor(ToTFPColor(AColor))
   else
-    BackGroundColor:= clNone;
+    BackGroundColor := clNone;
 end;
 
 procedure TDraftWidget.SetFontColor(AColor: TARGBColorBridge);
@@ -1325,7 +1316,7 @@ begin
   if AColor <> colbrDefault then
     TextColor := FPColorToTColor(ToTFPColor(AColor))
   else
-    TextColor := clNone;
+    TextColor := DefaultTextColor;
 end;
 
 function TDraftWidget.Designer: TAndroidWidgetMediator;
@@ -1382,10 +1373,29 @@ begin
   end;
 end;
 
+function TDraftWidget.DefaultTextColor: TColor;
+var
+  t: TAndroidTheme;
+begin
+  if BaseStyle <> '' then
+  begin
+    t := Designer.AndroidTheme;
+    if t <> nil then
+    begin
+      if t.TryGetColor([BaseStyle, 'android:textColor'], Result) then Exit;
+      if t.TryGetColor([BaseStyle,
+                       'android:textAppearance',
+                       'android:textColor'], Result) then Exit;
+    end;
+  end;
+  Result := Designer.FDefaultFontColor;
+end;
+
 { TDraftButton }
 
 constructor TDraftButton.Create(AWidget: TAndroidWidget; Canvas: TCanvas);
 begin
+  BaseStyle := 'buttonStyle';
   inherited;
 
   Color := jButton(AWidget).BackgroundColor;
@@ -1408,10 +1418,8 @@ begin
     Font.Color := TextColor;
 
     if BackGroundColor = clNone then
-      Brush.Color := RGBToColor($cc, $cc, $cc);
+      Brush.Color := BlendColors(GetBackGroundColor, 2/5, 153, 153, 153);
 
-    if TextColor = clNone then
-      Font.Color:= clBlack;
     lastFontSize := Font.Size;
     Font.Size := AndroidToLCLFontSize(jButton(FAndroidWidget).FontSize, 13);
 
@@ -1448,6 +1456,7 @@ end;
 
 constructor TDraftTextView.Create(AWidget: TAndroidWidget; Canvas: TCanvas);
 begin
+  BaseStyle := 'textViewStyle';
   inherited;
   Color := jTextView(AWidget).BackgroundColor;
   if Color = colbrDefault then
@@ -1472,13 +1481,7 @@ begin
     else
       Brush.Style := bsClear;
 
-    if TextColor = clNone then
-    begin
-      Font.Color := RGBToColor($3A,$3A,$3A);
-      if MaxRGB(GetBackGroundColor) < MaxRGB2Inverse then
-        Font.Color := InvertColor(Font.Color);
-    end else
-      Font.Color := TextColor;
+    Font.Color := TextColor;
 
     TextOut(0, (ps + 5) div 10, FAndroidWidget.Text);
     Font.Size := lastSize;
@@ -1512,6 +1515,7 @@ end;
 
 constructor TDraftEditText.Create(AWidget: TAndroidWidget; Canvas: TCanvas);
 begin
+  BaseStyle := 'editTextStyle';
   inherited;
   Color := jEditText(AWidget).BackgroundColor;
   if Color = colbrDefault then
@@ -1531,13 +1535,7 @@ begin
       FillRect(0, 0, FAndroidWidget.Width, FAndroidWidget.Height);
     end else
       Brush.Style := bsClear;
-    if TextColor = clNone then
-    begin
-      Font.Color := clBlack;
-      if MaxRGB(GetBackGroundColor) < MaxRGB2Inverse then
-        Font.Color := InvertColor(Font.Color);
-    end else
-      Font.Color := TextColor;
+    Font.Color := TextColor;
     ls := Font.Size;
     Font.Size := AndroidToLCLFontSize(jEditText(FAndroidWidget).FontSize, 13);
     TextOut(12, 9, jEditText(FAndroidWidget).Text);
@@ -1574,6 +1572,7 @@ end;
 
 constructor TDraftAutoTextView.Create(AWidget: TAndroidWidget; Canvas: TCanvas);
 begin
+  BaseStyle := 'autoTextViewStyle';
   inherited;
   Color := jAutoTextView(AWidget).BackgroundColor;
   FontColor := jAutoTextView(AWidget).FontColor;
@@ -1591,13 +1590,7 @@ begin
       FillRect(0, 0, FAndroidWidget.Width, FAndroidWidget.Height);
     end else
       Brush.Style := bsClear;
-    if TextColor = clNone then
-    begin
-      Font.Color := clBlack;
-      if MaxRGB(GetBackGroundColor) < MaxRGB2Inverse then
-        Font.Color := InvertColor(Font.Color);
-    end else
-      Font.Color := TextColor;
+    Font.Color := TextColor;
 
     ls := Font.Size;
     Font.Size := AndroidToLCLFontSize(jAutoTextView(FAndroidWidget).FontSize, 13);
@@ -1636,6 +1629,7 @@ end;
 
 constructor TDraftCheckBox.Create(AWidget: TAndroidWidget; Canvas: TCanvas);
 begin
+  BaseStyle := 'checkboxStyle';
   inherited;
   Color := jCheckBox(AWidget).BackgroundColor;
   FontColor := jCheckBox(AWidget).FontColor;
@@ -1653,13 +1647,7 @@ begin
     else
       Brush.Style := bsClear;
 
-    if TextColor = clNone then
-    begin
-      Font.Color := clBlack;
-      if MaxRGB(GetBackGroundColor) < MaxRGB2Inverse then
-        Font.Color := InvertColor(Font.Color);
-    end else
-      Font.Color := TextColor;
+    Font.Color := TextColor;
 
     lastSize := Font.Size;
     ps := AndroidToLCLFontSize(jCheckBox(FAndroidWidget).FontSize, 12);
@@ -1708,6 +1696,7 @@ end;
 
 constructor TDraftRadioButton.Create(AWidget: TAndroidWidget; Canvas: TCanvas);
 begin
+  BaseStyle := 'radioButtonStyle';
   inherited;
   Color := jRadioButton(AWidget).BackgroundColor;
   FontColor := jRadioButton(AWidget).FontColor;
@@ -1725,13 +1714,7 @@ begin
     else
       Brush.Style := bsClear;
 
-    if TextColor = clNone then
-    begin
-      Font.Color := clBlack;
-      if MaxRGB(GetBackGroundColor) < MaxRGB2Inverse then
-        Font.Color := InvertColor(Font.Color);
-    end else
-      Font.Color := Self.TextColor;
+    Font.Color := TextColor;
 
     lastSize := Font.Size;
     Font.Size := AndroidToLCLFontSize(jCheckBox(FAndroidWidget).FontSize, 12);
