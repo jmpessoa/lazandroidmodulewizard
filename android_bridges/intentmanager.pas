@@ -110,12 +110,13 @@ jIntentManager = class(jControl)
 
     procedure AddCategory(_intentCategory: integer);
     procedure SetFlag(_intentFlag: integer);
-    procedure SetComponent(_packageName: string; _className: string);
+    procedure SetComponent(_packageName: string; _javaClassName: string);
 
-    procedure SetClassName(_packageName: string; _className: string);
-    procedure SetClass(_className: string);
+    procedure SetClassName(_packageName: string; _javaClassName: string);
+    procedure SetClass(_fullJavaClassName: string); overload;
     procedure StartService();
-
+    procedure SetClass(_packageName: string; _javaClassName: string); overload;
+    procedure PutExtratText(_text: string);
 
  published
     property IntentAction: TIntentAction read FIntentAction write SetIntentAction;
@@ -199,8 +200,11 @@ procedure jIntentManager_SetFlag(env: PJNIEnv; _jintentmanager: JObject; _intent
 procedure jIntentManager_SetComponent(env: PJNIEnv; _jintentmanager: JObject; _packageName: string; _className: string);
 
 procedure jIntentManager_SetClassName(env: PJNIEnv; _jintentmanager: JObject; _packageName: string; _className: string);
-procedure jIntentManager_SetClass(env: PJNIEnv; _jintentmanager: JObject; _className: string);
+procedure jIntentManager_SetClass(env: PJNIEnv; _jintentmanager: JObject; _className: string); overload;
 procedure jIntentManager_StartService(env: PJNIEnv; _jintentmanager: JObject);
+
+procedure jIntentManager_SetClass(env: PJNIEnv; _jintentmanager: JObject; _packageName: string; _javaClassName: string);overload;
+procedure jIntentManager_PutExtratText(env: PJNIEnv; _jintentmanager: JObject; _text: string);
 
 implementation
 
@@ -743,25 +747,25 @@ begin
      jIntentManager_SetFlag(FjEnv, FjObject, _intentFlag);
 end;
 
-procedure jIntentManager.SetComponent(_packageName: string; _className: string);
+procedure jIntentManager.SetComponent(_packageName: string; _javaClassName: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jIntentManager_SetComponent(FjEnv, FjObject, _packageName ,_className);
+     jIntentManager_SetComponent(FjEnv, FjObject, _packageName ,_javaClassName);
 end;
 
-procedure jIntentManager.SetClassName(_packageName: string; _className: string);
+procedure jIntentManager.SetClassName(_packageName: string; _javaClassName: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jIntentManager_SetClassName(FjEnv, FjObject, _packageName ,_className);
+     jIntentManager_SetClassName(FjEnv, FjObject, _packageName ,_javaClassName);
 end;
 
-procedure jIntentManager.SetClass(_className: string);
+procedure jIntentManager.SetClass(_fullJavaClassName: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jIntentManager_SetClass(FjEnv, FjObject, _className);
+     jIntentManager_SetClass(FjEnv, FjObject, _fullJavaClassName);
 end;
 
 procedure jIntentManager.StartService();
@@ -769,6 +773,20 @@ begin
   //in designing component state: set value here...
   if FInitialized then
      jIntentManager_StartService(FjEnv, FjObject);
+end;
+
+procedure jIntentManager.SetClass(_packageName: string; _javaClassName: string);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jIntentManager_SetClass(FjEnv, FjObject, _packageName ,_javaClassName);
+end;
+
+procedure jIntentManager.PutExtratText(_text: string);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jIntentManager_PutExtratText(FjEnv, FjObject, _text);
 end;
 
 {-------- jIntentManager_JNI_Bridge ----------}
@@ -2126,6 +2144,37 @@ begin
   jCls:= env^.GetObjectClass(env, _jintentmanager);
   jMethod:= env^.GetMethodID(env, jCls, 'StartService', '()V');
   env^.CallVoidMethod(env, _jintentmanager, jMethod);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jIntentManager_SetClass(env: PJNIEnv; _jintentmanager: JObject; _packageName: string; _javaClassName: string);
+var
+  jParams: array[0..1] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_packageName));
+  jParams[1].l:= env^.NewStringUTF(env, PChar(_javaClassName));
+  jCls:= env^.GetObjectClass(env, _jintentmanager);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetClass', '(Ljava/lang/String;Ljava/lang/String;)V');
+  env^.CallVoidMethodA(env, _jintentmanager, jMethod, @jParams);
+env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env,jParams[1].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+
+procedure jIntentManager_PutExtratText(env: PJNIEnv; _jintentmanager: JObject; _text: string);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_text));
+  jCls:= env^.GetObjectClass(env, _jintentmanager);
+  jMethod:= env^.GetMethodID(env, jCls, 'PutExtratText', '(Ljava/lang/String;)V');
+  env^.CallVoidMethodA(env, _jintentmanager, jMethod, @jParams);
+  env^.DeleteLocalRef(env,jParams[0].l);
   env^.DeleteLocalRef(env, jCls);
 end;
 

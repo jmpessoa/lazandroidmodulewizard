@@ -1,4 +1,4 @@
-package com.example.appchronometerdemo1;
+package com.example.appactivitydemo1;
 
 import java.util.Iterator;
 import java.util.List;
@@ -566,20 +566,20 @@ Sending Data: Extras vs. URI Parameters
    }
    
    //params: "packagename whos activity u want to  launch","jClassname"
-   public void SetComponent(String _packageName, String _className) {
-	   ComponentName cn = new ComponentName(_packageName, _packageName+"."+_className); //"full class name" ??? 
+   public void SetComponent(String _packageName, String _javaClassName) {
+	   ComponentName cn = new ComponentName(_packageName, _packageName+"."+_javaClassName); //"full class name" ??? 
 	   mIntent.setComponent(cn);
    }  
    
-   public void SetClassName(String _packageName, String _className) {
-		mIntent.setClassName(_packageName, _packageName+"."+_className);
+   public void SetClassName(String _packageName, String _javaClassName) {
+		mIntent.setClassName(_packageName, _packageName+"."+_javaClassName);
    }
    
-   public void SetClass(String _className) {	   
+   public void SetClass(String _fullJavaClassName) {	   
 	    Class cls = null;
 	    //String className = 'com.almondmendoza.library.openActivity';
 	    try {
-			cls = Class.forName(_className);
+			cls = Class.forName(_fullJavaClassName);
 		} catch (ClassNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -588,8 +588,25 @@ Sending Data: Extras vs. URI Parameters
 		    mIntent.setClass(controls.activity, cls);
    }
    
+   public void SetClass(String _packageName, String _javaClassName) {	   
+	    Class cls = null;
+	    //String className = 'com.almondmendoza.library.openActivity';
+	    try {
+			cls = Class.forName(_packageName+'.'+_javaClassName);
+		} catch (ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	    if (cls != null)
+		    mIntent.setClass(controls.activity, cls);
+  }
+   
    public void StartService() { 
 	   controls.activity.startService(mIntent);
+   }
+
+   public void PutExtratText(String _text) {	  
+	   mIntent.putExtra(android.content.Intent.EXTRA_TEXT, _text);
    }
    
 }
