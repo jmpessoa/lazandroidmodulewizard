@@ -605,7 +605,7 @@ Sending Data: Extras vs. URI Parameters
 	   controls.activity.startService(mIntent);
    }
 
-   public void PutExtratText(String _text) {	  
+   public void PutExtraText(String _text) {	  
 	   mIntent.putExtra(android.content.Intent.EXTRA_TEXT, _text);
    }
    

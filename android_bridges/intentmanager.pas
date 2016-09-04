@@ -116,7 +116,7 @@ jIntentManager = class(jControl)
     procedure SetClass(_fullJavaClassName: string); overload;
     procedure StartService();
     procedure SetClass(_packageName: string; _javaClassName: string); overload;
-    procedure PutExtratText(_text: string);
+    procedure PutExtraText(_text: string);
 
  published
     property IntentAction: TIntentAction read FIntentAction write SetIntentAction;
@@ -204,7 +204,7 @@ procedure jIntentManager_SetClass(env: PJNIEnv; _jintentmanager: JObject; _class
 procedure jIntentManager_StartService(env: PJNIEnv; _jintentmanager: JObject);
 
 procedure jIntentManager_SetClass(env: PJNIEnv; _jintentmanager: JObject; _packageName: string; _javaClassName: string);overload;
-procedure jIntentManager_PutExtratText(env: PJNIEnv; _jintentmanager: JObject; _text: string);
+procedure jIntentManager_PutExtraText(env: PJNIEnv; _jintentmanager: JObject; _text: string);
 
 implementation
 
@@ -782,11 +782,11 @@ begin
      jIntentManager_SetClass(FjEnv, FjObject, _packageName ,_javaClassName);
 end;
 
-procedure jIntentManager.PutExtratText(_text: string);
+procedure jIntentManager.PutExtraText(_text: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jIntentManager_PutExtratText(FjEnv, FjObject, _text);
+     jIntentManager_PutExtraText(FjEnv, FjObject, _text);
 end;
 
 {-------- jIntentManager_JNI_Bridge ----------}
@@ -2164,7 +2164,7 @@ env^.DeleteLocalRef(env,jParams[0].l);
 end;
 
 
-procedure jIntentManager_PutExtratText(env: PJNIEnv; _jintentmanager: JObject; _text: string);
+procedure jIntentManager_PutExtraText(env: PJNIEnv; _jintentmanager: JObject; _text: string);
 var
   jParams: array[0..0] of jValue;
   jMethod: jMethodID=nil;
@@ -2172,7 +2172,7 @@ var
 begin
   jParams[0].l:= env^.NewStringUTF(env, PChar(_text));
   jCls:= env^.GetObjectClass(env, _jintentmanager);
-  jMethod:= env^.GetMethodID(env, jCls, 'PutExtratText', '(Ljava/lang/String;)V');
+  jMethod:= env^.GetMethodID(env, jCls, 'PutExtraText', '(Ljava/lang/String;)V');
   env^.CallVoidMethodA(env, _jintentmanager, jMethod, @jParams);
   env^.DeleteLocalRef(env,jParams[0].l);
   env^.DeleteLocalRef(env, jCls);
