@@ -109,6 +109,28 @@
 	*
 	****************************************************************************************************
 
+Version 0.7.1 - 03 September - 2016
+
+	NEW! Added Support to java code/stuff reuse [ide_tools]
+		IDE menu "Tools" --> "[Lamw] Android Module Wizard" --> "Use/Import Java Stuff..."
+
+	NEW! jActivityLauncher component  [support to native android "Activity" code reuse]
+
+	NEW! AppActivityLauncherDemo1
+	    Note/hint:  "AndroidManifest.xml" requires:
+
+			<activity
+				android:name="com.example.appactivitylauncherdemo1.MyActivity1"
+				android:label="@string/app_name"
+				android:launchMode="standard" android:enabled="true">
+			</activity>
+			<activity
+				android:name="com.example.appactivitylauncherdemo1.MyActivity2"
+				android:label="@string/app_name"
+				android:launchMode="standard" android:enabled="true">
+			</activity>
+
+			
 Version 0.7 - 11 July 2016
 
 	WARNING!
