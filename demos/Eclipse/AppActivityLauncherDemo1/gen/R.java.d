@@ -1,0 +1,23 @@
+C:\android-neon\eclipse\workspace\AppActivityLauncherDemo1\gen\com\example\appactivitylauncherdemo1\R.java \
+ : C:\android-neon\eclipse\workspace\AppActivityLauncherDemo1\res\drawable-hdpi\ic_launcher.png \
+C:\android-neon\eclipse\workspace\AppActivityLauncherDemo1\res\drawable-mdpi\ic_launcher.png \
+C:\android-neon\eclipse\workspace\AppActivityLauncherDemo1\res\drawable-mdpi\pic1.png \
+C:\android-neon\eclipse\workspace\AppActivityLauncherDemo1\res\drawable-mdpi\pic2.png \
+C:\android-neon\eclipse\workspace\AppActivityLauncherDemo1\res\drawable-mdpi\pic3.png \
+C:\android-neon\eclipse\workspace\AppActivityLauncherDemo1\res\drawable-mdpi\pic4.png \
+C:\android-neon\eclipse\workspace\AppActivityLauncherDemo1\res\drawable-mdpi\pic5.png \
+C:\android-neon\eclipse\workspace\AppActivityLauncherDemo1\res\drawable-mdpi\pic6.png \
+C:\android-neon\eclipse\workspace\AppActivityLauncherDemo1\res\drawable-mdpi\pic7.png \
+C:\android-neon\eclipse\workspace\AppActivityLauncherDemo1\res\drawable-mdpi\pic8.png \
+C:\android-neon\eclipse\workspace\AppActivityLauncherDemo1\res\drawable-xhdpi\ic_launcher.png \
+C:\android-neon\eclipse\workspace\AppActivityLauncherDemo1\res\layout\activity_app.xml \
+C:\android-neon\eclipse\workspace\AppActivityLauncherDemo1\res\layout\activity_main.xml \
+C:\android-neon\eclipse\workspace\AppActivityLauncherDemo1\res\layout\mylist.xml \
+C:\android-neon\eclipse\workspace\AppActivityLauncherDemo1\res\menu\app.xml \
+C:\android-neon\eclipse\workspace\AppActivityLauncherDemo1\res\values\dimens.xml \
+C:\android-neon\eclipse\workspace\AppActivityLauncherDemo1\res\values\strings.xml \
+C:\android-neon\eclipse\workspace\AppActivityLauncherDemo1\res\values\styles.xml \
+C:\android-neon\eclipse\workspace\AppActivityLauncherDemo1\res\values-v11\styles.xml \
+C:\android-neon\eclipse\workspace\AppActivityLauncherDemo1\res\values-v14\styles.xml \
+C:\android-neon\eclipse\workspace\AppActivityLauncherDemo1\res\values-w820dp\dimens.xml \
+C:\android-neon\eclipse\workspace\AppActivityLauncherDemo1\bin\AndroidManifest.xml \

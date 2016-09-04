@@ -841,8 +841,8 @@ type
     procedure SetScrollBarFadingEnabled(Value: boolean);
     //
     Procedure SetFocus;
-    Procedure immShow;
-    Procedure immHide;
+    Procedure ImmShow;
+    Procedure ImmHide;
     Procedure UpdateLayout; override;
     procedure AllCaps;
     procedure DispatchOnChangeEvent(value: boolean);
@@ -3107,14 +3107,14 @@ mgr.hideSoftInputFromWindow(myView.getWindowToken(), 0);
 }
 
 // LORDMAN - 2013-07-26
-Procedure jEditText.immShow;
+Procedure jEditText.ImmShow;
 begin
   if FInitialized then
      jEditText_immShow(FjEnv, FjObject  );
 end;
 
 // LORDMAN - 2013-07-26
-Procedure jEditText.immHide;
+Procedure jEditText.ImmHide;
 begin
   if FInitialized then
       jEditText_immHide(FjEnv, FjObject  );

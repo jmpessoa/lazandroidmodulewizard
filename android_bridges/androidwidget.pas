@@ -762,7 +762,7 @@ type
     procedure Init(refApp: jApp); virtual;
     procedure AttachCurrentThread();  overload;
     procedure AttachCurrentThread(env: PJNIEnv); overload;
-    property jSelf: jObject read FjObject ;
+    property jSelf: jObject read FjObject;
   end;
 
   TAndroidWidget = class(jControl)
@@ -1373,6 +1373,7 @@ function Call_jCallStaticBooleanMethodA(fullClassName: string;
                        funcName: string; funcSignature: string; var jParams: array of jValue): boolean;
 procedure Call_jCallStaticVoidMethod(fullClassName: string; funcName: string; funcSignature: string);
 procedure Call_jCallStaticVoidMethodA(fullClassName: string; funcName: string; funcSignature: string; var jParams: array of jValue);
+
 
 //------------------------------------------------------------------------------
 // App - Main Activity

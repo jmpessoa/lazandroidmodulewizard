@@ -10,7 +10,8 @@ uses
   amw_ide_menu_items, lazandroidtoolsexpert, uformsettingspaths, 
   AndroidXMLResString, ufrmEditor, ufrmCompCreate, uregistercompform, 
   ApkBuild, uFormStartEmulator, AndroidProjOptions, uFormBuildFPCCross, 
-  uFormGetFPCSource, LazarusPackageIntf;
+  uFormGetFPCSource, uimportjavastuff, uimportjavastuffchecked, 
+  LazarusPackageIntf;
 
 implementation
 

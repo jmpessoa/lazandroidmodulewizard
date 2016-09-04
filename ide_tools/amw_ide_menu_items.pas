@@ -5,26 +5,25 @@ unit amw_ide_menu_items; //By Thierrydijoux!
 interface
 
 uses
-  Classes, SysUtils, Dialogs, IDECommands, MenuIntf, Forms,
-  uformsettingspaths, lazandroidtoolsexpert, {uformupdatecodetemplate,} ufrmEditor, ufrmCompCreate,
-  {uformchangepathtondk,} uFormBuildFPCCross, uFormGetFPCSource;
+  Classes, SysUtils, FileUtil, Dialogs, IDECommands, MenuIntf, Forms,
+  uformsettingspaths, lazandroidtoolsexpert, ufrmEditor, ufrmCompCreate,
+  uFormBuildFPCCross, uFormGetFPCSource, uimportjavastuff, uimportjavastuffchecked;
 
 procedure StartPathTool(Sender: TObject);
 procedure StartLateTool(Sender: TObject);   //By Thierrydijoux!
-//procedure StartUpdateCodeTemplateTool(Sender: TObject);
 procedure StartResEditor(Sender: TObject);   //By Thierrydijoux!
 procedure StartComponentCreate(Sender: TObject);
-//procedure StartPathToNDKDemo(Sender: TObject);
 procedure StartPathToBuildFPCCross(Sender: TObject);
 procedure StartFPCTrunkSource(Sender: TObject);
 procedure StartEclipseToggleTooling(Sender: TObject);
+procedure StartImportJavaStuff(Sender: TObject);
 
 procedure Register;
 
 implementation
 
 uses LazIDEIntf, CompOptsIntf, IDEMsgIntf, IDEExternToolIntf, ProjectIntf,
-  Controls, ApkBuild;
+  Controls, ApkBuild, IniFiles;
 
 
 procedure StartFPCTrunkSource(Sender: TObject);
@@ -32,7 +31,6 @@ begin
   FormGetFPCSource:= TFormGetFPCSource.Create(Application);
   FormGetFPCSource.ShowModal;
 end;
-
 
 procedure StartPathTool(Sender: TObject);  //by jmpessoa
 begin
@@ -68,7 +66,6 @@ begin
   // Call componente create expert
   FrmCompCreate:= TFrmCompCreate.Create(Application);
   FrmCompCreate.Show;
-     //ShowMessage('Component create assistencie...');	
 end;
 
 procedure StartPathToBuildFPCCross(Sender: TObject);
@@ -103,6 +100,203 @@ begin
           '[' + e.ClassName + '] Failed: ' + e.Message, '', 0, 0, 'Exception'));
   end else
     ShowMessage('The active project is not LAMW project!');
+end;
+
+procedure StartImportJavaStuff(Sender: TObject);
+var
+  Project: TLazProject;
+  pathTojavacode: string;
+  pathToDrawable: string;
+  pathToLayout: string;
+  pathToAssets: string;
+  pathToProject: string;
+  package: string;
+  list, listSaveTo: TStringList;
+  p, i: integer;
+  drawable_xx: string;
+  saveCodeTo, saveLayoutTo: string;
+  saveDrawableTo, saveAssetsTo: string;
+begin
+  Project := LazarusIDE.ActiveProject;
+  if Assigned(Project) and (Project.CustomData.Values['LAMW'] <> '') then
+  begin
+     FormImportJavaStuff:= TFormImportJavaStuff.Create(Application);
+     if FormImportJavaStuff.ShowModal = mrOK then
+     begin
+
+       package:= Project.CustomData.Values['Package'];
+       p:= Pos(DirectorySeparator+'jni', Project.ProjectInfoFile);
+       pathToProject:= Copy(Project.ProjectInfoFile, 1, p);
+
+       pathTojavacode:= FormImportJavaStuff.EditImportCode.Text;
+       pathToLayout:= FormImportJavaStuff.EditImportLayout.Text;
+       pathToDrawable:= FormImportJavaStuff.EditImportResource.Text;
+       pathToAssets:=  FormImportJavaStuff.EditImportAssets.Text;
+
+       listSaveTo:= TStringList.Create;
+
+       if pathTojavacode <> '' then
+       begin
+         list:= FindAllFiles(pathTojavacode, '*.java', False); //***
+
+         saveCodeTo:= pathToProject+'src'+DirectorySeparator+StringReplace(package,'.',DirectorySeparator,[rfReplaceAll,rfIgnoreCase]);
+
+         FormImportJavaStuffChecked:= TFormImportJavaStuffChecked.Create(Application);
+         for i:=0 to list.Count-1 do
+         begin
+           FormImportJavaStuffChecked.CheckGroupImport.Items.Add(ExtractFileName(list.Strings[i]));
+         end;
+
+         if FormImportJavaStuffChecked.ShowModal = mrOK then
+         begin
+           for i:=0 to list.Count-1 do
+           begin
+              if FormImportJavaStuffChecked.CheckGroupImport.Checked[i] then
+              begin
+                listSaveTo.LoadFromFile(list.Strings[i]);
+                listSaveTo.Strings[0]:= 'package '+package+';';
+                listSaveTo.SaveToFile(saveCodeTo + DirectorySeparator+FormImportJavaStuffChecked.CheckGroupImport.Items.Strings[i]);
+              end;
+           end;
+         end;
+         list.Free;
+       end;
+
+       if pathToLayout <> '' then
+       begin
+         list:= FindAllFiles(pathToLayout, '*.xml', False);
+
+         saveLayoutTo:=  pathToProject+'res'+DirectorySeparator+'layout';
+
+         FormImportJavaStuffChecked:= TFormImportJavaStuffChecked.Create(Application);
+         for i:=0 to list.Count-1 do
+         begin
+           FormImportJavaStuffChecked.CheckGroupImport.Items.Add(ExtractFileName(list.Strings[i]));
+         end;
+
+         if FormImportJavaStuffChecked.ShowModal = mrOK then
+         begin
+           for i:=0 to list.Count-1 do
+           begin
+              if FormImportJavaStuffChecked.CheckGroupImport.Checked[i] then
+              begin
+                listSaveTo.LoadFromFile(list.Strings[i]);
+                listSaveTo.SaveToFile(saveLayoutTo + DirectorySeparator+FormImportJavaStuffChecked.CheckGroupImport.Items.Strings[i]);
+              end;
+           end;
+         end;
+         list.Free;
+       end;
+
+       listSaveTo.Free;
+
+       if pathToDrawable <> '' then
+       begin
+         list:= FindAllFiles(pathToDrawable, '*.*', False);
+
+         p:= Pos('drawable', pathToDrawable);
+         drawable_xx:= Copy(pathToDrawable, p, Length(pathToDrawable));
+
+         saveDrawableTo:=  pathToProject+'res'+DirectorySeparator+drawable_xx;
+
+         FormImportJavaStuffChecked:= TFormImportJavaStuffChecked.Create(Application);
+         for i:=0 to list.Count-1 do
+         begin
+           FormImportJavaStuffChecked.CheckGroupImport.Items.Add(ExtractFileName(list.Strings[i]));
+         end;
+
+         if FormImportJavaStuffChecked.ShowModal = mrOK then
+         begin
+           for i:=0 to list.Count-1 do
+           begin
+              if FormImportJavaStuffChecked.CheckGroupImport.Checked[i] then
+              begin
+                CopyFile(list.Strings[i], saveDrawableTo + DirectorySeparator+FormImportJavaStuffChecked.CheckGroupImport.Items.Strings[i]);
+              end;
+           end;
+         end;
+         list.Free;
+       end;
+
+       if pathToAssets <> '' then
+       begin
+         list:= FindAllFiles(pathToAssets, '*.*', False);
+
+         saveAssetsTo:=  pathToProject+'assets'+DirectorySeparator;
+
+         FormImportJavaStuffChecked:= TFormImportJavaStuffChecked.Create(Application);
+         for i:=0 to list.Count-1 do
+         begin
+           FormImportJavaStuffChecked.CheckGroupImport.Items.Add(ExtractFileName(list.Strings[i]));
+         end;
+
+         if FormImportJavaStuffChecked.ShowModal = mrOK then
+         begin
+           for i:= 0 to list.Count-1 do
+           begin
+              if FormImportJavaStuffChecked.CheckGroupImport.Checked[i] then
+              begin
+                CopyFile(list.Strings[i], saveAssetsTo + DirectorySeparator+FormImportJavaStuffChecked.CheckGroupImport.Items.Strings[i]);
+              end;
+           end;
+         end;
+         list.Free;
+       end;
+       ShowMessage('Java Stuff Imported !');
+     end
+     else
+        ShowMessage('Cancel');
+
+  end else
+    ShowMessage('Sorry, the active project is not a LAMW project!');
+end;
+
+procedure StartCanUpdateJavaTemplates(Sender: TObject);
+var
+  Project: TLazProject;
+  dlgMessage: string;
+  canUpdate: string;
+  setting: string;
+  fileName: string;
+begin
+  Project := LazarusIDE.ActiveProject;
+  {if Assigned(Project) and (Project.CustomData.Values['LAMW'] <> '') then
+  begin}
+    fileName:= IncludeTrailingPathDelimiter(LazarusIDE.GetPrimaryConfigPath) + 'JNIAndroidProject.ini';
+    with TIniFile.Create(fileName) do
+    try
+      setting:= ReadString('NewProject','CanUpdateJavaTemplate', '');
+
+      if setting = 'f' then
+      begin
+        canUpdate:='t';
+        dlgMessage:= '[CanUpdateJavaTemplate]'+sLineBreak+'CanUpdateJavaTemplate = "False". Change it to "True" ?';
+      end
+      else
+      begin
+         canUpdate:='f';
+         dlgMessage:= '[CanUpdateJavaTemplate]'+sLineBreak+'CanUpdateJavaTemplate = "True". Change it to "False" ?';
+      end;
+
+      case QuestionDlg ('CanUpdateJavaTemplate [Toogle]',dlgMessage,mtCustom,[mrYes,'Yes', mrNo,'No'],'') of
+         mrNo: canUpdate:='';
+      end;
+
+      if canUpdate = 't' then
+      begin
+         WriteString('NewProject','CanUpdateJavaTemplate', 't');
+      end;
+
+      if canUpdate = 'f' then
+      begin
+         WriteString('NewProject','CanUpdateJavaTemplate', 'f');
+      end;
+
+    finally
+       Free;
+    end;
+  {end else
+    ShowMessage('Sorry, the active project is not a LAMW project!');}
 end;
 
 procedure StartEclipseToggleTooling(Sender: TObject);
@@ -295,6 +489,11 @@ begin
   RegisterIDEMenuCommand(ideSubMnuAMW, 'PathToFPCTrunkSource', 'Get FPC Source [Trunk]', nil, @StartFPCTrunkSource);
   // Adding 8a. entry
   RegisterIDEMenuCommand(ideSubMnuAMW, 'PathToEclipseToggleTooling', 'Eclipse Compatibility [ADT<->Andmore] ...', nil, @StartEclipseToggleTooling);
+  // Adding 9a. entry
+  RegisterIDEMenuCommand(ideSubMnuAMW, 'PathToCanUpdateJavaTemplates', '[Configure] CanUpdateJavaTemplates ...', nil, @StartCanUpdateJavaTemplates);
+
+  // Adding 10a. entry
+  RegisterIDEMenuCommand(ideSubMnuAMW, 'PathToImportJava', 'Use/Import Java Stuff...', nil, @StartImportJavaStuff);
 
   // And so on...
   RegisterIDEMenuCommand(itmRunBuilding, 'BuildAPKandRun', '[Lamw] Build Android Apk and Run',nil, @BuildAPKandRun);

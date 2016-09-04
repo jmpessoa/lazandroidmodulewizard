@@ -245,6 +245,7 @@ procedure TLamwSmartDesigner.CleanupAllJControlsSource;
 var
   contentList: TStringList;
   i: integer;
+  fileName: string;
 begin
   ForceDirectory(FPathToJavaSource+DirectorySeparator+'bak');
   contentList := FindAllFiles(FPathToJavaSource, '*.java', False);
@@ -253,7 +254,10 @@ begin
     CopyFile(contentList.Strings[i],
           FPathToJavaSource+DirectorySeparator+'bak'+DirectorySeparator+ExtractFileName(contentList.Strings[i])+'.bak');
 
-    DeleteFile(contentList.Strings[i]);
+    fileName:= ExtractFileName(contentList.Strings[i]); //not delete custom java code [support to jActivityLauncher]
+    if FileExists(LamwGlobalSettings.PathToJavaTemplates+'lamwdesigner'+DirectorySeparator + fileName) then
+      DeleteFile(contentList.Strings[i]);
+
   end;
   contentList.Free;
 
@@ -826,7 +830,6 @@ begin
   if LamwGlobalSettings.CanUpdateJavaTemplate then
   begin
     CleanupAllJControlsSource;
-
     //update all java code ...
     if FileExists(PathToJavaTemplates+DirectorySeparator+'App.java') then
     begin
@@ -853,6 +856,7 @@ begin
   jcontrolsList.Sorted := True;
   jcontrolsList.Duplicates := dupIgnore;
   GetAllJControlsFromForms(jcontrolsList);
+
 
   //re-add all [updated] java code ...
   for j := 0 to jcontrolsList.Count - 1 do
@@ -881,6 +885,11 @@ begin
                FPathToAndroidProject+'libs'+PathDelim+
                chipArchitecture+PathDelim+'libfreetype.so');
     end;
+  end;
+
+  if jcontrolsList.IndexOf('jActive') >= 0 then
+  begin
+
   end;
 
   jcontrolsList.Free;
