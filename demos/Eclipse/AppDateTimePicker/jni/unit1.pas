@@ -17,11 +17,15 @@ type
   TAndroidModule1 = class(jForm)
       jButton1: jButton;
       jButton2: jButton;
+      jButton3: jButton;
+      jButton4: jButton;
       jDatePickerDialog1: jDatePickerDialog;
       jTextView1: jTextView;
       jTimePickerDialog1: jTimePickerDialog;
       procedure jButton1Click(Sender: TObject);
       procedure jButton2Click(Sender: TObject);
+      procedure jButton3Click(Sender: TObject);
+      procedure jButton4Click(Sender: TObject);
       procedure jDatePickerDialog1DatePicker(Sender: TObject; year: integer;
         monthOfYear: integer; dayOfMonth: integer);
       procedure jTimePickerDialog1TimePicker(Sender: TObject;
@@ -49,6 +53,16 @@ end;
 procedure TAndroidModule1.jButton2Click(Sender: TObject);
 begin
   jDatePickerDialog1.Show();
+end;
+
+procedure TAndroidModule1.jButton3Click(Sender: TObject);
+begin
+  jTimePickerDialog1.Show(15, 15);
+end;
+
+procedure TAndroidModule1.jButton4Click(Sender: TObject);
+begin
+  jDatePickerDialog1.Show(2015, 2, 3);
 end;
 
 procedure TAndroidModule1.jDatePickerDialog1DatePicker(Sender: TObject;

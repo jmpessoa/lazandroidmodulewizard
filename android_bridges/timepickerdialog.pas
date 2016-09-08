@@ -27,7 +27,8 @@ jTimePickerDialog = class(jControl)
     procedure Init(refApp: jApp); override;
     function jCreate(): jObject;
     procedure jFree();
-    procedure Show();
+    procedure Show(); overload;
+    procedure Show(_hourOfDay24Based: integer; _minute: integer); overload;
 
     procedure GenEvent_OnTimePicker(Obj: TObject; hourOfDay: integer; minute: integer);
 
@@ -37,10 +38,11 @@ end;
 
 function jTimePickerDialog_jCreate(env: PJNIEnv;_Self: int64; this: jObject): jObject;
 procedure jTimePickerDialog_jFree(env: PJNIEnv; _jtimepickerdialog: JObject);
-procedure jTimePickerDialog_Show(env: PJNIEnv; _jtimepickerdialog: JObject);
+procedure jTimePickerDialog_Show(env: PJNIEnv; _jtimepickerdialog: JObject); overload;
+procedure jTimePickerDialog_Show(env: PJNIEnv; _jtimepickerdialog: JObject; _hourOfDay24Based: integer; _minute: integer); overload;
+
 
 implementation
-
 
 {---------  jTimePickerDialog  --------------}
 
@@ -98,6 +100,13 @@ begin
   if Assigned(FOnTimePicker) then FOnTimePicker(Obj, hourOfDay, minute);
 end;
 
+procedure jTimePickerDialog.Show(_hourOfDay24Based: integer; _minute: integer);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jTimePickerDialog_Show(FjEnv, FjObject, _hourOfDay24Based ,_minute);
+end;
+
 {-------- jTimePickerDialog_JNI_Bridge ----------}
 
 function jTimePickerDialog_jCreate(env: PJNIEnv;_Self: int64; this: jObject): jObject;
@@ -146,5 +155,21 @@ begin
   env^.CallVoidMethod(env, _jtimepickerdialog, jMethod);
   env^.DeleteLocalRef(env, jCls);
 end;
+
+procedure jTimePickerDialog_Show(env: PJNIEnv; _jtimepickerdialog: JObject; _hourOfDay24Based: integer; _minute: integer);
+var
+  jParams: array[0..1] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].i:= _hourOfDay24Based;
+  jParams[1].i:= _minute;
+  jCls:= env^.GetObjectClass(env, _jtimepickerdialog);
+  jMethod:= env^.GetMethodID(env, jCls, 'Show', '(II)V');
+  env^.CallVoidMethodA(env, _jtimepickerdialog, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+
 
 end.

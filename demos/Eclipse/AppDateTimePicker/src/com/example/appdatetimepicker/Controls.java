@@ -1,6 +1,6 @@
 package com.example.appdatetimepicker;
 
-//LAMW: Lazarus Android Module Wizard  - version 0.7 - 04 July - 2016 
+//LAMW: Lazarus Android Module Wizard  - version 0.7 - rev. 0.1 - 13 July - 2016 
 //RAD Android: Project Wizard, Form Designer and Components Development Model!
 
 //https://github.com/jmpessoa/lazandroidmodulewizard
@@ -982,13 +982,13 @@ public native void pOnPinchZoomGestureDetected(long pasobj, float scaleFactor, i
  
 //Load Pascal Library
 static {
-	/*
+/*--nogui--
     try {
     	System.loadLibrary("freetype"); // need by TFPNoGUIGraphicsBridge [ref. www.github.com/jmpessoa/tfpnoguigraphicsbridge]
     } catch (UnsatisfiedLinkError e) {
          Log.e("JNI_Load_LibFreetype", "exception", e);
     }
-    */	
+--graphics--*/	
     try {
     	System.loadLibrary("controls");
     } catch (UnsatisfiedLinkError e) {
@@ -1602,10 +1602,6 @@ public String jCamera_takePhoto(String path, String filename, int requestCode) {
 //SMART LAMW DESIGNER
 //-------------------------------------------------------------------------------------------------------
 
-public  java.lang.Object jTextView_Create(long pasobj) {
-  return (java.lang.Object)( new jTextView(this.activity,this,pasobj));
-}
-
 public  java.lang.Object jButton_Create(long pasobj ) {
   return (java.lang.Object)( new jButton(this.activity,this,pasobj));
 }
@@ -1614,6 +1610,10 @@ public java.lang.Object jDatePickerDialog_jCreate(long _Self) {
    return (java.lang.Object)(new jDatePickerDialog(this,_Self));
 }
 public native void pOnDatePicker(long pasobj, int year, int monthOfYear, int dayOfMonth);
+
+public  java.lang.Object jTextView_Create(long pasobj) {
+  return (java.lang.Object)( new jTextView(this.activity,this,pasobj));
+}
 
 public java.lang.Object jTimePickerDialog_jCreate(long _Self) {
   return (java.lang.Object)(new jTimePickerDialog(this,_Self));

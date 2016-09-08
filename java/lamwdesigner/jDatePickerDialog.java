@@ -1,4 +1,4 @@
-package com.example.appchronometerdemo1;
+package com.example.appdatetimepicker;
 
 import java.util.Calendar;
 
@@ -38,7 +38,7 @@ public class jDatePickerDialog /*extends ...*/ {
        final Calendar c = Calendar.getInstance();
        mYear = c.get(Calendar.YEAR);
        mMonth = c.get(Calendar.MONTH);
-       mDay = c.get(Calendar.DAY_OF_MONTH);
+       mDay = c.get(Calendar.DAY_OF_MONTH);  //1,2,3...
 
        // Launch Date Picker Dialog
        DatePickerDialog dpd = new DatePickerDialog(controls.activity, new DatePickerDialog.OnDateSetListener() {
@@ -50,6 +50,27 @@ public class jDatePickerDialog /*extends ...*/ {
                    }
                }, mYear, mMonth, mDay);
        dpd.show();
-   }    
+   }
+   
+   
+   public void Show(int _year, int _monthOfYear, int _dayOfMonth) {
+	   
+       // Process to get Current Date
+       //final Calendar c = Calendar.getInstance();
+       mYear = _year;
+       mMonth =_monthOfYear-1;  //0 .. 11
+       mDay = _dayOfMonth; //1,2,3...
+
+       // Launch Date Picker Dialog
+       DatePickerDialog dpd = new DatePickerDialog(controls.activity, new DatePickerDialog.OnDateSetListener() {
+                   @Override
+                   /*.*/public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
+                       // Display Selected date in textbox
+                       //Log.i("DatePicker",dayOfMonth + "-" + (monthOfYear + 1) + "-" + year);
+                       controls.pOnDatePicker(pascalObj, year, monthOfYear+1, dayOfMonth);
+                   }
+               }, mYear, mMonth, mDay);
+       dpd.show();
+   }   
 }
 

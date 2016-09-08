@@ -50,7 +50,7 @@ object AndroidModule1: TAndroidModule1
     PosRelativeToParent = []
     LayoutParamWidth = lpMatchParent
     LayoutParamHeight = lpWrapContent
-    Text = 'Show Time Picker Dialog'
+    Text = 'Show Time Picker Dialog [Now]'
     BackgroundColor = colbrDefault
     FontColor = colbrDefault
     FontSize = 0
@@ -73,13 +73,59 @@ object AndroidModule1: TAndroidModule1
     PosRelativeToParent = []
     LayoutParamWidth = lpMatchParent
     LayoutParamHeight = lpWrapContent
-    Text = 'Show Date Picker Dialog'
+    Text = 'Show Date Picker Dialog [Now]'
     BackgroundColor = colbrDefault
     FontColor = colbrDefault
     FontSize = 0
     FontSizeUnit = unitDefault
     OnClick = jButton2Click
     Id = 2373117
+  end
+  object jButton3: jButton
+    Left = 2
+    Top = 130
+    Width = 294
+    Height = 40
+    MarginLeft = 2
+    MarginTop = 4
+    MarginRight = 2
+    MarginBottom = 4
+    Visible = True
+    Anchor = jButton2
+    PosRelativeToAnchor = [raBelow]
+    PosRelativeToParent = []
+    LayoutParamWidth = lpMatchParent
+    LayoutParamHeight = lpWrapContent
+    Text = 'Show Time Picker Dialog [Custom]'
+    BackgroundColor = colbrDefault
+    FontColor = colbrDefault
+    FontSize = 0
+    FontSizeUnit = unitDefault
+    OnClick = jButton3Click
+    Id = 9847331
+  end
+  object jButton4: jButton
+    Left = 2
+    Top = 178
+    Width = 294
+    Height = 40
+    MarginLeft = 2
+    MarginTop = 4
+    MarginRight = 2
+    MarginBottom = 4
+    Visible = True
+    Anchor = jButton3
+    PosRelativeToAnchor = [raBelow]
+    PosRelativeToParent = []
+    LayoutParamWidth = lpMatchParent
+    LayoutParamHeight = lpWrapContent
+    Text = 'Show Date Picker Dialog [Custom]'
+    BackgroundColor = colbrDefault
+    FontColor = colbrDefault
+    FontSize = 0
+    FontSizeUnit = unitDefault
+    OnClick = jButton4Click
+    Id = 0
   end
   object jDatePickerDialog1: jDatePickerDialog
     OnDatePicker = jDatePickerDialog1DatePicker

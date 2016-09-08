@@ -55,5 +55,26 @@ public class jTimePickerDialog /*extends ...*/ {
        tpd.show();      
    }
    
+  public void Show(int _hourOfDay24Based, int _minute) {
+	   
+       // Process to get Current Time
+      // final Calendar c = Calendar.getInstance();
+       mHour = _hourOfDay24Based; //24h FORMAT
+       mMinute = _minute; 
+
+       // Launch Time Picker Dialog
+       TimePickerDialog tpd = new TimePickerDialog(controls.activity,new TimePickerDialog.OnTimeSetListener() {
+                   @Override
+                   /*.*/public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+                       // Display Selected time in textbox
+                       //Log.i("TimePicker", hourOfDay + ":" + minute);
+                       controls.pOnTimePicker(pascalObj, hourOfDay, minute);
+                   }
+               }, mHour, mMinute, false);
+       
+       tpd.show();      
+   }
+   
+   
 }
 
