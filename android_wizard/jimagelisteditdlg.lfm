@@ -1,0 +1,188 @@
+object jImagesEditorDlg: TjImagesEditorDlg
+  Left = 240
+  Height = 376
+  Top = 138
+  Width = 711
+  Caption = 'jImages Editor Dialog'
+  ClientHeight = 376
+  ClientWidth = 711
+  Position = poScreenCenter
+  LCLVersion = '1.7'
+  object ScrollBox1: TScrollBox
+    AnchorSideLeft.Control = ButtonAdd
+    AnchorSideLeft.Side = asrBottom
+    AnchorSideRight.Control = Owner
+    AnchorSideRight.Side = asrBottom
+    AnchorSideBottom.Control = ButtonPanel1
+    Left = 310
+    Height = 322
+    Top = 8
+    Width = 395
+    HorzScrollBar.Page = 90
+    HorzScrollBar.Tracking = True
+    VertScrollBar.Page = 90
+    VertScrollBar.Tracking = True
+    Anchors = [akTop, akLeft, akRight, akBottom]
+    BorderSpacing.Left = 6
+    BorderSpacing.Top = 6
+    BorderSpacing.Right = 6
+    BorderSpacing.Bottom = 6
+    ClientHeight = 318
+    ClientWidth = 391
+    TabOrder = 0
+    object Image1: TImage
+      Left = 0
+      Height = 90
+      Top = 0
+      Width = 90
+      AutoSize = True
+    end
+  end
+  object ButtonPanel1: TButtonPanel
+    Left = 6
+    Height = 34
+    Top = 336
+    Width = 699
+    OKButton.Name = 'OKButton'
+    OKButton.DefaultCaption = True
+    HelpButton.Name = 'HelpButton'
+    HelpButton.DefaultCaption = True
+    CloseButton.Name = 'CloseButton'
+    CloseButton.DefaultCaption = True
+    CancelButton.Name = 'CancelButton'
+    CancelButton.DefaultCaption = True
+    TabOrder = 1
+    ShowButtons = [pbOK, pbCancel]
+  end
+  object Splitter1: TSplitter
+    AnchorSideLeft.Side = asrBottom
+    AnchorSideTop.Control = Owner
+    AnchorSideBottom.Control = ButtonPanel1
+    Left = 224
+    Height = 330
+    Top = 0
+    Width = 5
+    Align = alCustom
+    Anchors = [akTop, akLeft, akBottom]
+  end
+  object ButtonAdd: TButton
+    AnchorSideLeft.Control = Splitter1
+    AnchorSideLeft.Side = asrBottom
+    AnchorSideTop.Control = Owner
+    Left = 229
+    Height = 25
+    Top = 12
+    Width = 75
+    Action = acAdd
+    BorderSpacing.Top = 12
+    TabOrder = 3
+  end
+  object ButtonRemove: TButton
+    AnchorSideLeft.Control = Splitter1
+    AnchorSideLeft.Side = asrBottom
+    AnchorSideTop.Control = ButtonAdd
+    AnchorSideTop.Side = asrBottom
+    Left = 229
+    Height = 25
+    Top = 43
+    Width = 75
+    Action = acRemove
+    BorderSpacing.Top = 6
+    TabOrder = 4
+  end
+  object ButtonUp: TButton
+    AnchorSideLeft.Control = Splitter1
+    AnchorSideLeft.Side = asrBottom
+    AnchorSideTop.Control = ButtonRemove
+    AnchorSideTop.Side = asrBottom
+    Left = 229
+    Height = 25
+    Top = 74
+    Width = 75
+    Action = acMoveUp
+    BorderSpacing.Top = 6
+    TabOrder = 5
+  end
+  object ButtonDown: TButton
+    AnchorSideLeft.Control = Splitter1
+    AnchorSideLeft.Side = asrBottom
+    AnchorSideTop.Control = ButtonUp
+    AnchorSideTop.Side = asrBottom
+    Left = 229
+    Height = 25
+    Top = 105
+    Width = 75
+    Action = acMoveDown
+    BorderSpacing.Top = 6
+    TabOrder = 6
+  end
+  object ImagesGrid: TDrawGrid
+    AnchorSideLeft.Control = Owner
+    AnchorSideTop.Control = Owner
+    AnchorSideRight.Control = Splitter1
+    AnchorSideBottom.Control = ButtonPanel1
+    Left = 6
+    Height = 324
+    Top = 6
+    Width = 218
+    Anchors = [akTop, akLeft, akRight, akBottom]
+    AutoEdit = False
+    AutoFillColumns = True
+    BorderSpacing.Left = 6
+    BorderSpacing.Top = 6
+    BorderSpacing.Bottom = 6
+    ColCount = 3
+    Columns = <    
+      item
+        SizePriority = 0
+        Title.Caption = 'Img'
+        Width = 30
+      end    
+      item
+        SizePriority = 0
+        Title.Caption = 'Index'
+        Width = 30
+      end    
+      item
+        Title.Caption = 'File'
+        Width = 154
+      end>
+    DefaultDrawing = False
+    DefaultRowHeight = 30
+    ExtendedSelect = False
+    FixedCols = 0
+    FixedRows = 0
+    Options = [goFixedVertLine, goFixedHorzLine, goThumbTracking, goSmoothScroll, goRowHighlight]
+    TabOrder = 7
+    OnDrawCell = ImagesGridDrawCell
+    OnSelection = ImagesGridSelection
+    ColWidths = (
+      30
+      30
+      154
+    )
+  end
+  object ActionList1: TActionList
+    left = 197
+    top = 199
+    object acMoveUp: TAction
+      Caption = 'Move Up'
+      OnExecute = acMoveUpExecute
+      OnUpdate = acMoveUpUpdate
+    end
+    object acMoveDown: TAction
+      Caption = 'Move Down'
+      OnExecute = acMoveDownExecute
+      OnUpdate = acMoveDownUpdate
+    end
+    object acAdd: TAction
+      Caption = 'Add'
+      OnExecute = acAddExecute
+    end
+    object acRemove: TAction
+      Caption = 'Remove'
+      OnExecute = acRemoveExecute
+      OnUpdate = acRemoveUpdate
+    end
+  end
+end

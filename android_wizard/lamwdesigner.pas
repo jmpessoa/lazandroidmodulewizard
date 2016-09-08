@@ -7,7 +7,7 @@ interface
 uses
   Classes, SysUtils, Graphics, Controls, FormEditingIntf, PropEdits,
   ComponentEditors, ProjectIntf, Laz2_DOM, AndroidWidget, LCLVersion,
-  Dialogs, Forms, AndroidThemes;
+  Dialogs, Forms, AndroidThemes, ImgCache;
 
 type
   TDraftWidget = class;
@@ -39,6 +39,7 @@ type
     FDefaultBrushColor: TColor;
     FDefaultPenColor: TColor;
     FDefaultFontColor: TColor;
+    FImageCache: TImageCache;
     FSizing: Boolean;
     FStarted, FDone: TFPList;
     FLastSelectedContainer: jVisualControl;
@@ -83,6 +84,7 @@ type
     procedure InvalidateRect(Sender: TObject; ARect: TRect; Erase: boolean);
     property AndroidForm: jForm read GetAndroidForm;
     property AndroidTheme: TAndroidTheme read FTheme;
+    property ImageCache: TImageCache read FImageCache;
 
   public
     procedure GetObjInspNodeImageIndex(APersistent: TPersistent; var AIndex: integer); override;
@@ -382,20 +384,34 @@ type
      function GetAttributes: TPropertyAttributes; override;
    end;
 
+   { TjImageListImagesEditor }
+
+   TjImageListImagesEditor = class(TClassPropertyEditor)
+   public
+     procedure Edit; override;
+     function GetAttributes: TPropertyAttributes; override;
+   end;
+
+   { TjImageListEditor }
+
+   TjImageListEditor = class(TDefaultComponentEditor)
+   public
+     procedure Edit; override;
+     procedure ExecuteVerb({%H-}Index: Integer); override;
+     function GetVerb({%H-}Index: Integer): string; override;
+     function GetVerbCount: Integer; override;
+   end;
+
 implementation
 
 uses
-  LCLIntf, LCLType, ObjInspStrConsts, IDEMsgIntf, LazIDEIntf,
-  IDEExternToolIntf, laz2_XMLRead, LazFileUtils,
-  FPimage, typinfo, uFormSizeSelect, LamwSettings, SmartDesigner,
-  Laz_And_Controls,
-  customdialog, togglebutton, switchbutton, Laz_And_GLESv1_Canvas,
-  Laz_And_GLESv2_Canvas, gridview, Spinner, seekbar,  radiogroup, ratingbar,
-  digitalclock, analogclock, surfaceview, autocompletetextview, drawingview,
-  chronometer;
-
-const
-  MaxRGB2Inverse = 64;
+  LCLIntf, LCLType, strutils, ObjInspStrConsts, IDEMsgIntf, LazIDEIntf,
+  IDEExternToolIntf, laz2_XMLRead, LazFileUtils, FPimage, typinfo,
+  uFormSizeSelect, LamwSettings, SmartDesigner, jImageListEditDlg,
+  Laz_And_Controls, customdialog, togglebutton, switchbutton,
+  Laz_And_GLESv1_Canvas, Laz_And_GLESv2_Canvas, gridview, Spinner, seekbar,
+  radiogroup, ratingbar, digitalclock, analogclock, surfaceview,
+  autocompletetextview, drawingview, chronometer;
 
 var
   DraftClassesMap: TDraftControlHash;
@@ -446,6 +462,98 @@ procedure RegisterAndroidWidgetDraftClass(AWidgetClass: jVisualControlClass;
   ADraftClass: TDraftWidgetClass);
 begin
   DraftClassesMap.Add(AWidgetClass, ADraftClass);
+end;
+
+{ TjImageListEditor }
+
+procedure TjImageListEditor.Edit;
+var
+  o: TComponent;
+  d: TAndroidWidgetMediator;
+  pr: TLazProjectFile;
+  fn: string;
+  TheDialog: TjImagesEditorDlg;
+begin
+  try
+    o := TComponent(GetComponent).Owner;
+    if not (o is TAndroidForm) then
+      raise Exception.CreateFmt('%s owner is not TAndroidForm', [TComponent(GetComponent).Name]);
+    d := TAndroidForm(o).Designer as TAndroidWidgetMediator;
+    pr := LazarusIDE.GetProjectFileWithRootComponent(o);
+    if pr = nil then
+      raise Exception.CreateFmt('Project file for %s is not available!', [o.Name]);
+    if not (pr.GetFileOwner is TLazProject) then
+      raise Exception.Create('!!! ' + pr.GetFileOwner.ClassName);
+    fn := ExtractFilePath(TLazProject(pr.GetFileOwner).MainFile.GetFullFilename);
+    fn := System.Copy(fn, 1, RPosEx(PathDelim, fn, Length(fn) - 1)) + 'assets' + PathDelim;
+    TheDialog := TjImagesEditorDlg.Create(Application, jImageList(GetComponent).Images,
+      fn, d.ImageCache);
+    try
+      if TheDialog.ShowModal = mrOK then
+        jImageList(GetComponent).Images.Assign(TheDialog.ImageList);
+    finally
+      TheDialog.Free;
+    end;
+  except
+    on e: Exception do
+      MessageDlg(e.Message, mtError, [mbOK], 0)
+  end;
+end;
+
+procedure TjImageListEditor.ExecuteVerb(Index: Integer);
+begin
+  Edit;
+end;
+
+function TjImageListEditor.GetVerb(Index: Integer): string;
+begin
+  Result := 'jImages Editor...';
+end;
+
+function TjImageListEditor.GetVerbCount: Integer;
+begin
+  Result := 1;
+end;
+
+{ TjImageListImagesEditor }
+
+procedure TjImageListImagesEditor.Edit;
+var
+  o: TComponent;
+  d: TAndroidWidgetMediator;
+  pr: TLazProjectFile;
+  fn: string;
+  TheDialog: TjImagesEditorDlg;
+begin
+  try
+    o := TComponent(GetComponent(0)).Owner;
+    if not (o is TAndroidForm) then
+      raise Exception.CreateFmt('%s owner is not TAndroidForm', [TComponent(GetComponent(0)).Name]);
+    d := TAndroidForm(o).Designer as TAndroidWidgetMediator;
+    pr := LazarusIDE.GetProjectFileWithRootComponent(o);
+    if pr = nil then
+      raise Exception.CreateFmt('Project file for %s is not available!', [o.Name]);
+    if not (pr.GetFileOwner is TLazProject) then
+      raise Exception.Create('!!! ' + pr.GetFileOwner.ClassName);
+    fn := ExtractFilePath(TLazProject(pr.GetFileOwner).MainFile.GetFullFilename);
+    fn := Copy(fn, 1, RPosEx(PathDelim, fn, Length(fn) - 1)) + 'assets' + PathDelim;
+    TheDialog := TjImagesEditorDlg.Create(Application, TStrings(GetObjectValue),
+      fn, d.ImageCache);
+    try
+      if TheDialog.ShowModal = mrOK then
+        SetPtrValue(TheDialog.ImageList);
+    finally
+      TheDialog.Free;
+    end;
+  except
+    on e: Exception do
+      MessageDlg(e.Message, mtError, [mbOK], 0)
+  end;
+end;
+
+function TjImageListImagesEditor.GetAttributes: TPropertyAttributes;
+begin
+  Result := [paDialog, paReadOnly];
 end;
 
 { TAndroidFormSizeEditor }
@@ -735,6 +843,8 @@ begin
   FStarted := TFPList.Create;
   FDone := TFPList.Create;
   FSelection := TFPList.Create;
+
+  FImageCache := TImageCache.Create;
 end;
 
 destructor TAndroidWidgetMediator.Destroy;
@@ -742,6 +852,7 @@ begin
   if Assigned(AndroidForm) then
     AndroidForm.Designer := nil;
 
+  FImageCache.Free;
   FStarted.Free;
   FDone.Free;
   FSelection.Free;
@@ -2585,6 +2696,8 @@ initialization
   RegisterComponentEditor(jForm, TAndroidFormComponentEditor);
   RegisterPropertyEditor(TypeInfo(Integer), jForm, 'Width', TAndroidFormSizeEditor);
   RegisterPropertyEditor(TypeInfo(Integer), jForm, 'Height', TAndroidFormSizeEditor);
+  RegisterPropertyEditor(TypeInfo(TStrings), jImageList, 'Images', TjImageListImagesEditor);
+  RegisterComponentEditor(jImageList, TjImageListEditor);
 
   // DraftClasses registeration:
   //  * default drawing and anchoring => use TDraftWidget
