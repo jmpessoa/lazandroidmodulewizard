@@ -4418,6 +4418,7 @@ begin
      lpThreeFifthOfParent:   Result:= Trunc((3/5)*GetParamByParentSide(paren, side)-14);
      lpThreeQuarterOfParent: Result:= Trunc((3/4)*GetParamByParentSide(paren, side)-14);
      lpFourFifthOfParent:    Result:= Trunc((4/5)*GetParamByParentSide(paren, side)-14);
+     lpFiveSixthOfParent:    Result:= Trunc((5/6)*GetParamByParentSide(paren, side)-14);
      lp16px: Result:= 16;
      lp24px: Result:= 24;
      lp32px: Result:= 32;
@@ -4446,6 +4447,7 @@ begin
      lpThreeFifthOfParent:   Result:= Trunc((3/5)*GetParamByParentSide2(paren, side)-14);
      lpThreeQuarterOfParent: Result:= Trunc((3/4)*GetParamByParentSide2(paren, side)-14);
      lpFourFifthOfParent:    Result:= Trunc((4/5)*GetParamByParentSide2(paren, side)-14);
+     lpFiveSixthOfParent:    Result:= Trunc((5/6)*GetParamByParentSide2(paren, side)-14);
      lp16px: Result:= 16;
      lp24px: Result:= 24;
      lp32px: Result:= 32;
