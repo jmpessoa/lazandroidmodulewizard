@@ -239,23 +239,23 @@ type
   { TDraftImageView }
 
   TDraftImageView = class(TDraftWidget)
-   public
-     constructor Create(AWidget: TAndroidWidget; Canvas: TCanvas); override;
-   end;
+  public
+    constructor Create(AWidget: TAndroidWidget; Canvas: TCanvas); override;
+  end;
 
   {TDraftDrawingView}
 
   TDraftDrawingView = class(TDraftWidget)
-   public
-     constructor Create(AWidget: TAndroidWidget; Canvas: TCanvas); override;
-   end;
+  public
+    constructor Create(AWidget: TAndroidWidget; Canvas: TCanvas); override;
+  end;
 
   {TDraftSurfaceView}
 
   TDraftSurfaceView = class(TDraftWidget)
-   public
-     constructor Create(AWidget: TAndroidWidget; Canvas: TCanvas); override;
-   end;
+  public
+    constructor Create(AWidget: TAndroidWidget; Canvas: TCanvas); override;
+  end;
 
   { TDraftSpinner }
 
@@ -275,44 +275,44 @@ type
     procedure SetSelectedFontColor(Acolor: TARGBColorBridge);
 
   public
-     constructor Create(AWidget: TAndroidWidget; Canvas: TCanvas); override;
-     procedure Draw; override;
+    constructor Create(AWidget: TAndroidWidget; Canvas: TCanvas); override;
+    procedure Draw; override;
 
-     property DropListTextColor: TARGBColorBridge read FDropListTextColor write SetDropListTextColor;
-     property DropListBackgroundColor: TARGBColorBridge  read FDropListBackgroundColor write SetDropListBackgroundColor;
-     property SelectedFontColor: TARGBColorBridge  read FSelectedFontColor write SetSelectedFontColor;
+    property DropListTextColor: TARGBColorBridge read FDropListTextColor write SetDropListTextColor;
+    property DropListBackgroundColor: TARGBColorBridge  read FDropListBackgroundColor write SetDropListBackgroundColor;
+    property SelectedFontColor: TARGBColorBridge  read FSelectedFontColor write SetSelectedFontColor;
   end;
 
   { TDraftWebView }
 
   TDraftWebView = class(TDraftWidget)
   public
-     constructor Create(AWidget: TAndroidWidget; Canvas: TCanvas); override;
-     procedure Draw; override;
+    constructor Create(AWidget: TAndroidWidget; Canvas: TCanvas); override;
+    procedure Draw; override;
   end;
 
   { TDraftScrollView }
 
   TDraftScrollView = class(TDraftWidget)
   public
-     constructor Create(AWidget: TAndroidWidget; Canvas: TCanvas); override;
-     procedure Draw; override;
+    constructor Create(AWidget: TAndroidWidget; Canvas: TCanvas); override;
+    procedure Draw; override;
   end;
 
   TDraftHorizontalScrollView = class(TDraftWidget)
   public
-     constructor Create(AWidget: TAndroidWidget; Canvas: TCanvas); override;
-     procedure Draw; override;
+    constructor Create(AWidget: TAndroidWidget; Canvas: TCanvas); override;
+    procedure Draw; override;
   end;
 
   { TDraftToggleButton }
 
   TDraftToggleButton = class(TDraftWidget)
   private
-     FOnOff: boolean;
+    FOnOff: boolean;
   public
-     constructor Create(AWidget: TAndroidWidget; Canvas: TCanvas); override;
-     procedure Draw; override;
+    constructor Create(AWidget: TAndroidWidget; Canvas: TCanvas); override;
+    procedure Draw; override;
   end;
 
   { TDraftSwitchButton }
@@ -327,15 +327,15 @@ type
 
   TDraftGridView = class(TDraftWidget)
   public
-     constructor Create(AWidget: TAndroidWidget; Canvas: TCanvas); override;
-     procedure Draw; override;
+    constructor Create(AWidget: TAndroidWidget; Canvas: TCanvas); override;
+    procedure Draw; override;
   end;
 
   { TDraftView }
 
   TDraftView = class(TDraftWidget)
   public
-     constructor Create(AWidget: TAndroidWidget; Canvas: TCanvas); override;
+    constructor Create(AWidget: TAndroidWidget; Canvas: TCanvas); override;
   end;
 
   { TDraftPanel }
@@ -378,29 +378,29 @@ type
 
   { TAndroidFormSizeEditor }
 
-   TAndroidFormSizeEditor = class(TIntegerPropertyEditor)
-   public
-     procedure Edit; override;
-     function GetAttributes: TPropertyAttributes; override;
-   end;
+  TAndroidFormSizeEditor = class(TIntegerPropertyEditor)
+  public
+    procedure Edit; override;
+    function GetAttributes: TPropertyAttributes; override;
+  end;
 
-   { TjImageListImagesEditor }
+  { TjImageListImagesEditor }
 
-   TjImageListImagesEditor = class(TClassPropertyEditor)
-   public
-     procedure Edit; override;
-     function GetAttributes: TPropertyAttributes; override;
-   end;
+  TjImageListImagesEditor = class(TClassPropertyEditor)
+  public
+    procedure Edit; override;
+    function GetAttributes: TPropertyAttributes; override;
+  end;
 
-   { TjImageListEditor }
+  { TjImageListEditor }
 
-   TjImageListEditor = class(TDefaultComponentEditor)
-   public
-     procedure Edit; override;
-     procedure ExecuteVerb({%H-}Index: Integer); override;
-     function GetVerb({%H-}Index: Integer): string; override;
-     function GetVerbCount: Integer; override;
-   end;
+  TjImageListEditor = class(TDefaultComponentEditor)
+  public
+    procedure Edit; override;
+    procedure ExecuteVerb({%H-}Index: Integer); override;
+    function GetVerb({%H-}Index: Integer): string; override;
+    function GetVerbCount: Integer; override;
+  end;
 
 implementation
 
