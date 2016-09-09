@@ -467,19 +467,18 @@ type
   TPositionRelativeToParentSet = set of TPositionRelativeToParent;
 
   //by jmpessoa
-  TLayoutParams = (lpMatchParent, lpWrapContent, lpHalfOfParent, lpOneQuarterOfParent,
-                   lpTwoThirdOfParent ,lpOneThirdOfParent, lpOneEighthOfParent,
-                   lpThreeEighthOfParent, lpFiveEighthOfParent, lpSevenEighthOfParent,
-                   lpOneSixthOfParent, lpFiveSixthOfParent,
-                   lpOneFifthOfParent, lpTwoFifthOfParent, lpThreeFifthOfParent, lpThreeQuarterOfParent,
-                   lpFourFifthOfParent,lp16px, lp24px, lp32px, lp40px, lp48px, lp72px, lp96px);
+  TLayoutParams = (lpMatchParent, lpWrapContent, lpHalfOfParent, lpOneQuarterOfParent, lpTwoThirdOfParent,
+                   lpOneThirdOfParent, lpOneEighthOfParent,lpThreeEighthOfParent, lpFiveEighthOfParent,
+                   lpSevenEighthOfParent, lpOneSixthOfParent, lpFiveSixthOfParent, lpOneFifthOfParent,
+                   lpTwoFifthOfParent, lpThreeFifthOfParent, lpThreeQuarterOfParent, lpFourFifthOfParent,
+                   lp16px, lp24px, lp32px, lp40px, lp48px, lp72px, lp96px);
 
   TSide = (sdW, sdH);
 
-  TScreenStyle   = (ssPortrait = 1,     // Force Portrait
-                    ssLandscape = 2,    // Force LandScape
-                    ssUnknown = 3,
-                    ssSensor = 4); // by Device Status
+  TScreenStyle   = (ssPortrait  = 1,  //Force Portrait
+                    ssLandscape = 2, //Force LandScape
+                    ssUnknown   = 3,
+                    ssSensor    = 4);   //by Device Status
 
   //TRotateOrientation = (orientUnknown, orientVertical, orientHorizontal, orientSensor);
 
@@ -1070,7 +1069,7 @@ type
     function ParseUri(_uriAsString: string): jObject;
     function UriToString(_uri: jObject): string;
     function IsConnectedTo(_connectionType: TConnectionType): boolean;
-     function IsMobileDataEnabled(): boolean;
+    function IsMobileDataEnabled(): boolean;
 
     // Property
     property View         : jObject        read FjRLayout; //layout!
@@ -4418,7 +4417,13 @@ begin
      lpThreeFifthOfParent:   Result:= Trunc((3/5)*GetParamByParentSide(paren, side)-14);
      lpThreeQuarterOfParent: Result:= Trunc((3/4)*GetParamByParentSide(paren, side)-14);
      lpFourFifthOfParent:    Result:= Trunc((4/5)*GetParamByParentSide(paren, side)-14);
-     lpFiveSixthOfParent:    Result:= Trunc((5/6)*GetParamByParentSide(paren, side)-14);
+
+     lpThreeEighthOfParent:  Result:= Trunc((3/8)*GetParamByParentSide(paren, side)-14); //0.375
+     lpFiveEighthOfParent:   Result:= Trunc((5/8)*GetParamByParentSide(paren, side)-14); //0.625
+     lpSevenEighthOfParent:  Result:= Trunc((7/8)*GetParamByParentSide(paren, side)-14); //0.875
+     lpOneSixthOfParent:     Result:= Trunc((1/6)*GetParamByParentSide(paren, side)-14); //0.167
+     lpFiveSixthOfParent:    Result:= Trunc((5/6)*GetParamByParentSide(paren, side)-14); //0.833
+
      lp16px: Result:= 16;
      lp24px: Result:= 24;
      lp32px: Result:= 32;
@@ -4435,19 +4440,25 @@ begin
   case lpParam of
      lpMatchParent:          Result:= TLayoutParamsArray[0];
      lpWrapContent:          Result:= TLayoutParamsArray[1];
-     lpTwoThirdOfParent:     Result:= Trunc((2/3)*GetParamByParentSide2(paren, side)-14);
-     lpOneThirdOfParent:     Result:= Trunc((1/3)*GetParamByParentSide2(paren, side)-14);
+     lpTwoThirdOfParent:     Result:= Trunc((2/3)*GetParamByParentSide2(paren, side)-14); //0.66
+     lpOneThirdOfParent:     Result:= Trunc((1/3)*GetParamByParentSide2(paren, side)-14); //0.33
+     lpHalfOfParent:         Result:= Trunc((1/2)*GetParamByParentSide2(paren, side)-14); //0.50
 
-     lpHalfOfParent:         Result:= Trunc((1/2)*GetParamByParentSide2(paren, side)-14);
+     lpOneQuarterOfParent:   Result:= Trunc((1/4)*GetParamByParentSide2(paren, side)-14); //0.25
+     lpOneEighthOfParent:    Result:= Trunc((1/8)*GetParamByParentSide2(paren, side)-14); //0.125
+     lpOneFifthOfParent:     Result:= Trunc((1/5)*GetParamByParentSide2(paren, side)-14);  //0.20
+     lpTwoFifthOfParent:     Result:= Trunc((2/5)*GetParamByParentSide2(paren, side)-14);  //0.40
+     lpThreeFifthOfParent:   Result:= Trunc((3/5)*GetParamByParentSide2(paren, side)-14);  //0.60
 
-     lpOneQuarterOfParent:   Result:= Trunc((1/4)*GetParamByParentSide2(paren, side)-14);
-     lpOneEighthOfParent:    Result:= Trunc((1/8)*GetParamByParentSide2(paren, side)-14);
-     lpOneFifthOfParent:     Result:= Trunc((1/5)*GetParamByParentSide2(paren, side)-14);
-     lpTwoFifthOfParent:     Result:= Trunc((2/5)*GetParamByParentSide2(paren, side)-14);
-     lpThreeFifthOfParent:   Result:= Trunc((3/5)*GetParamByParentSide2(paren, side)-14);
-     lpThreeQuarterOfParent: Result:= Trunc((3/4)*GetParamByParentSide2(paren, side)-14);
-     lpFourFifthOfParent:    Result:= Trunc((4/5)*GetParamByParentSide2(paren, side)-14);
-     lpFiveSixthOfParent:    Result:= Trunc((5/6)*GetParamByParentSide2(paren, side)-14);
+     lpThreeQuarterOfParent: Result:= Trunc((3/4)*GetParamByParentSide2(paren, side)-14); //0.75
+     lpFourFifthOfParent:    Result:= Trunc((4/5)*GetParamByParentSide2(paren, side)-14); //0.80
+
+     lpThreeEighthOfParent:  Result:= Trunc((3/8)*GetParamByParentSide2(paren, side)-14); //0.375
+     lpFiveEighthOfParent:   Result:= Trunc((5/8)*GetParamByParentSide2(paren, side)-14); //0.625
+     lpSevenEighthOfParent:  Result:= Trunc((7/8)*GetParamByParentSide2(paren, side)-14); //0.875
+     lpOneSixthOfParent:     Result:= Trunc((1/6)*GetParamByParentSide2(paren, side)-14); //0.167
+     lpFiveSixthOfParent:    Result:= Trunc((5/6)*GetParamByParentSide2(paren, side)-14); //0.833
+
      lp16px: Result:= 16;
      lp24px: Result:= 24;
      lp32px: Result:= 32;
@@ -4468,7 +4479,6 @@ begin
    end;
 end;
 
-
 function GetLayoutParamsName(ordIndex: DWord): TLayoutParams;
 begin
    case  ordIndex of
@@ -4479,19 +4489,26 @@ begin
      4: Result:= lpTwoThirdOfParent;
      5: Result:= lpOneThirdOfParent;
      6: Result:= lpOneEighthOfParent;
-     7: Result:= lpOneFifthOfParent;
-     8: Result:= lpTwoFifthOfParent;
-     9: Result:= lpThreeFifthOfParent;
-     10: Result:= lpThreeQuarterOfParent;
-     11: Result:= lpFourFifthOfParent;
-     12: Result:= lp16px;
-     13: Result:= lp24px;
-     14: Result:= lp32px;
-     15: Result:= lp40px;
-     16: Result:= lp48px;
-     17: Result:= lp72px;
-     18: Result:= lp96px;
-     //19: Result:= lpDesigner;
+     7: Result:= lpThreeEighthOfParent;
+     8: Result:= lpFiveEighthOfParent;
+     9: Result:= lpSevenEighthOfParent;
+     10: Result:= lpOneSixthOfParent;
+     11: Result:= lpFiveSixthOfParent;
+     12: Result:= lpOneFifthOfParent;
+     13: Result:= lpTwoFifthOfParent;
+     14: Result:= lpThreeFifthOfParent;
+     15: Result:= lpThreeQuarterOfParent;
+     16: Result:= lpFourFifthOfParent;
+
+     17: Result:= lp16px;
+     18: Result:= lp24px;
+     19: Result:= lp32px;
+     20: Result:= lp40px;
+     21: Result:= lp48px;
+     22: Result:= lp72px;
+     23: Result:= lp96px;
+
+     //24: Result:= lpDesigner;
    end;
 end;
 
@@ -4503,25 +4520,36 @@ end;
 function GetLayoutParams(App:jApp; lpParam: TLayoutParams; side: TSide): DWord;
 begin
   case lpParam of
-     lpMatchParent:          Result:= TLayoutParamsArray[0];
-     lpWrapContent:          Result:= TLayoutParamsArray[1];
-     lpTwoThirdOfParent:     Result:= Trunc((2/3)*GetParamBySide(App, side)-14);
-     lpOneThirdOfParent:     Result:= Trunc((1/3)*GetParamBySide(App, side)-14);
-     lpHalfOfParent:         Result:= Trunc((1/2)*GetParamBySide(App, side)-14);
-     lpOneQuarterOfParent:   Result:= Trunc((1/4)*GetParamBySide(App, side)-14);
-     lpOneEighthOfParent:    Result:= Trunc((1/8)*GetParamBySide(App, side)-14);
-     lpOneFifthOfParent:     Result:= Trunc((1/5)*GetParamBySide(App, side)-14);
-     lpTwoFifthOfParent:     Result:= Trunc((2/5)*GetParamBySide(App, side)-14);
-     lpThreeFifthOfParent:   Result:= Trunc((3/5)*GetParamBySide(App, side)-14);
-     lpThreeQuarterOfParent: Result:= Trunc((3/4)*GetParamBySide(App, side)-14);
-     lpFourFifthOfParent:    Result:= Trunc((4/5)*GetParamBySide(App, side)-14);
-     lp16px: Result:= 16;
-     lp24px: Result:= 24;
-     lp32px: Result:= 32;
-     lp40px: Result:= 40;
-     lp48px: Result:= 48;
-     lp72px: Result:= 72;
-     lp96px: Result:= 96;
+
+   lpMatchParent:          Result:= TLayoutParamsArray[0];
+   lpWrapContent:          Result:= TLayoutParamsArray[1];
+   lpTwoThirdOfParent:     Result:= Trunc((2/3)*GetParamBySide(App, side)-14);
+   lpOneThirdOfParent:     Result:= Trunc((1/3)*GetParamBySide(App, side)-14);
+
+   lpHalfOfParent:         Result:= Trunc((1/2)*GetParamBySide(App, side)-14);
+
+   lpOneQuarterOfParent:   Result:= Trunc((1/4)*GetParamBySide(App, side)-14);
+   lpOneEighthOfParent:    Result:= Trunc((1/8)*GetParamBySide(App, side)-14);
+   lpOneFifthOfParent:     Result:= Trunc((1/5)*GetParamBySide(App, side)-14);
+   lpTwoFifthOfParent:     Result:= Trunc((2/5)*GetParamBySide(App, side)-14);
+   lpThreeFifthOfParent:   Result:= Trunc((3/5)*GetParamBySide(App, side)-14);
+   lpThreeQuarterOfParent: Result:= Trunc((3/4)*GetParamBySide(App, side)-14);
+   lpFourFifthOfParent:    Result:= Trunc((4/5)*GetParamBySide(App, side)-14);
+
+   lpThreeEighthOfParent:  Result:= Trunc((3/8)*GetParamBySide(App, side)-14); //0.375
+   lpFiveEighthOfParent:   Result:= Trunc((5/8)*GetParamBySide(App, side)-14); //0.625
+   lpSevenEighthOfParent:  Result:= Trunc((7/8)*GetParamBySide(App, side)-14); //0.875
+   lpOneSixthOfParent:     Result:= Trunc((1/6)*GetParamBySide(App, side)-14); //0.167
+   lpFiveSixthOfParent:    Result:= Trunc((5/6)*GetParamBySide(App, side)-14); //0.833
+
+   lp16px: Result:= 16;
+   lp24px: Result:= 24;
+   lp32px: Result:= 32;
+   lp40px: Result:= 40;
+   lp48px: Result:= 48;
+   lp72px: Result:= 72;
+   lp96px: Result:= 96;
+
      //lpDesigner: Result:= 0;
   end;
 end;
@@ -4529,26 +4557,37 @@ end;
 function GetDesignerLayoutParams(lpParam: TLayoutParams;  L: integer): DWord;
 begin
   case lpParam of
-     lpMatchParent:          Result:= TLayoutParamsArray[0];
-     lpWrapContent:          Result:= TLayoutParamsArray[1];
-     lpTwoThirdOfParent:     Result:= Trunc((2/3)*L-14);
-     lpOneThirdOfParent:     Result:= Trunc((1/3)*L-14);
-     lpHalfOfParent:         Result:= Trunc((1/2)*L-14);
-     lpOneQuarterOfParent:   Result:= Trunc((1/4)*L-14);
-     lpOneEighthOfParent:    Result:= Trunc((1/8)*L-14);
-     lpOneFifthOfParent:     Result:= Trunc((1/5)*L-14);
-     lpTwoFifthOfParent:     Result:= Trunc((2/5)*L-14);
-     lpThreeFifthOfParent:   Result:= Trunc((3/5)*L-14);
-     lpThreeQuarterOfParent: Result:= Trunc((3/4)*L-14);
-     lpFourFifthOfParent:    Result:= Trunc((4/5)*L-14);
-     lp16px: Result:= 16;
-     lp24px: Result:= 24;
-     lp32px: Result:= 32;
-     lp40px: Result:= 40;
-     lp48px: Result:= 48;
-     lp72px: Result:= 72;
-     lp96px: Result:= 96;
+
+   lpMatchParent:          Result:= TLayoutParamsArray[0];
+   lpWrapContent:          Result:= TLayoutParamsArray[1];
+   lpTwoThirdOfParent:     Result:= Trunc((2/3)*L-14);
+   lpOneThirdOfParent:     Result:= Trunc((1/3)*L-14);
+
+   lpHalfOfParent:         Result:= Trunc((1/2)*L-14);
+
+   lpOneQuarterOfParent:   Result:= Trunc((1/4)*L-14);
+   lpOneEighthOfParent:    Result:= Trunc((1/8)*L-14);
+   lpOneFifthOfParent:     Result:= Trunc((1/5)*L-14);
+   lpTwoFifthOfParent:     Result:= Trunc((2/5)*L-14);
+   lpThreeFifthOfParent:   Result:= Trunc((3/5)*L-14);
+   lpThreeQuarterOfParent: Result:= Trunc((3/4)*L-14);
+   lpFourFifthOfParent:    Result:= Trunc((4/5)*L-14);
+
+   lpThreeEighthOfParent:  Result:= Trunc((3/8)*L-14); //0.375
+   lpFiveEighthOfParent:   Result:= Trunc((5/8)*L-14); //0.625
+   lpSevenEighthOfParent:  Result:= Trunc((7/8)*L-14); //0.875
+   lpOneSixthOfParent:     Result:= Trunc((1/6)*L-14); //0.167
+   lpFiveSixthOfParent:    Result:= Trunc((5/6)*L-14); //0.833
+
+   lp16px: Result:= 16;
+   lp24px: Result:= 24;
+   lp32px: Result:= 32;
+   lp40px: Result:= 40;
+   lp48px: Result:= 48;
+   lp72px: Result:= 72;
+   lp96px: Result:= 96;
      //lpDesigner: Result:= 0;
+
   end;
 end;
 
@@ -4561,17 +4600,22 @@ begin
    else if Value = 48 then Result:= lp48px
    else if Value = 72 then Result:= lp72px
    else if Value = 96 then Result:= lp96px
-   else if Value <= Trunc((1/8)*L) then Result:=lpOneEighthOfParent    //12.5
-   else if Value <= Trunc((1/5)*L) then Result:=lpOneFifthOfParent     //20
-   else if Value <= Trunc((1/4)*L) then Result:=lpOneQuarterOfParent   //25.00
-   else if Value <= Trunc((1/3)*L) then Result:=lpOneThirdOfParent     //33.33
-   else if Value <= Trunc((2/5)*L) then Result:=lpTwoFifthOfParent     //40
-   else if Value <= Trunc((1/2)*L) then Result:=lpHalfOfParent         //50.00
-   else if Value <= Trunc((3/5)*L) then Result:=lpThreeFifthOfParent   //60
-   else if Value <= Trunc((2/3)*L) then Result:=lpTwoThirdOfParent     //66.66
-   else if Value <= Trunc((3/4)*L) then Result:=lpThreeQuarterOfParent //75
-   else if Value <= Trunc((4/5)*L) then Result:=lpFourFifthOfParent    //80
+   else if Value <= Trunc((1/8)*L) then Result:= lpOneEighthOfParent   //0.125
+   else if Value <= Trunc((1/5)*L) then Result:= lpOneFifthOfParent    //0.20
+   else if Value <= Trunc((1/4)*L) then Result:= lpOneQuarterOfParent  //0.25
+   else if Value <= Trunc((1/3)*L) then Result:= lpOneThirdOfParent    //0.33
+   else if Value <= Trunc((3/8)*L) then Result:= lpThreeEighthOfParent //0.375
+   else if Value <= Trunc((2/5)*L) then Result:= lpTwoFifthOfParent    //0.40
+   else if Value <= Trunc((1/2)*L) then Result:= lpHalfOfParent        //0.50
+   else if Value <= Trunc((3/5)*L) then Result:= lpThreeFifthOfParent  //0.60
+   else if Value <= Trunc((5/8)*L) then Result:= lpFiveEighthOfParent  //0.625
+   else if Value <= Trunc((2/3)*L) then Result:= lpTwoThirdOfParent    //0.66
+   else if Value <= Trunc((3/4)*L) then Result:= lpThreeQuarterOfParent//0.75
+   else if Value <= Trunc((4/5)*L) then Result:= lpFourFifthOfParent   //0.80
+   else if Value <= Trunc((5/6)*L) then Result:= lpFiveSixthOfParent   //0.833
+   else if Value <= Trunc((7/8)*L) then Result:= lpSevenEighthOfParent //0.875
    else Result:= lpMatchParent;
+
 end;
 
 {
