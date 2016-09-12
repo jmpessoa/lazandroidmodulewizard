@@ -155,11 +155,11 @@ type
                  imeActionPrevious,
                  imeFlagForceASCII);
 
+  TImageListIndex = type Integer;
+
   jCanvas = class;
 
   TOnDraw  = Procedure(Sender: TObject; Canvas: jCanvas) of object;
-
-  jPanel = class;
 
   TSqliteFieldType = (ftNull,ftInteger,ftFloat,ftString,ftBlob);
 
@@ -452,7 +452,7 @@ type
     FFlags  : Cardinal; //uint32_t      // 0 for now
 
     FImageName: string;
-    FImageIndex: integer;
+    FImageIndex: TImageListIndex;
     FImageList : jImageList;  //by jmpessoa
 
     { TFilePath = (fpathApp, fpathData, fpathExt, fpathDCIM); }
@@ -461,7 +461,7 @@ type
     FBitmapInfo : AndroidBitmapInfo;
     procedure SetImages(Value: jImageList);   //by jmpessoa
 
-    procedure SetImageIndex(Value: integer);
+    procedure SetImageIndex(Value: TImageListIndex);
 
     procedure SetImageByIndex(Value: integer);
 
@@ -520,7 +520,7 @@ type
 
   published
     property FilePath: TFilePath read FFilePath write FFilePath;
-    property ImageIndex: integer read FImageIndex write SetImageIndex;
+    property ImageIndex: TImageListIndex read FImageIndex write SetImageIndex default -1;
     property Images    : jImageList read FImageList write SetImages;     //by jmpessoa
 
     property ImageIdentifier: string read FImageName write SetImageIdentifier;
@@ -1046,7 +1046,7 @@ type
   jImageView = class(jVisualControl)
   private
     FImageName : string;
-    FImageIndex: integer;
+    FImageIndex: TImageListIndex;
     FImageList : jImageList;  //by jmpessoa
     FFilePath: TFilePath;
     FImageScaleType: TImageScaleType;
@@ -1056,8 +1056,7 @@ type
     procedure SetImages(Value: jImageList);   //by jmpessoa
     function GetCount: integer;
     procedure SetImageName(Value: string);
-    procedure SetImageIndex(Value: integer);
-    function  GetImageIndex: integer;
+    procedure SetImageIndex(Value: TImageListIndex);
     procedure UpdateLParamHeight;
     procedure UpdateLParamWidth;
   protected
@@ -1104,7 +1103,7 @@ type
 
     property Count: integer read GetCount;
   published
-    property ImageIndex: integer read GetImageIndex write SetImageIndex;
+    property ImageIndex: TImageListIndex read FImageIndex write SetImageIndex default -1;
     property Images    : jImageList read FImageList write SetImages;     //by jmpessoa
 
     property BackgroundColor     : TARGBColorBridge read FColor       write SetColor;
@@ -1460,8 +1459,8 @@ type
   private
     FImageUpName: string;
     FImageDownName: string;
-    FImageUpIndex: integer;
-    FImageDownIndex: integer;
+    FImageUpIndex: TImageListIndex;
+    FImageDownIndex: TImageListIndex;
 
     FImageList : jImageList;  //by jmpessoa
     FFilePath: TFilePath;
@@ -1495,8 +1494,8 @@ type
     property BackgroundColor   : TARGBColorBridge read FColor     write SetColor;
     property Enabled : Boolean   read FEnabled   write SetEnabled;
     property Images    : jImageList read FImageList write SetImages;     //by jmpessoa
-    property IndexImageUp: integer read FImageUpIndex write FImageUpIndex;
-    property IndexImageDown: integer read FImageDownIndex write FImageDownIndex;
+    property IndexImageUp: TImageListIndex read FImageUpIndex write FImageUpIndex default -1;
+    property IndexImageDown: TImageListIndex read FImageDownIndex write FImageDownIndex default -1;
 
     property ImageUpIdentifier: string read FImageUpName write SetImageUpByRes;
     property ImageDownIdentifier: string read FImageDownName write SetImageDownByRes;
@@ -4641,7 +4640,7 @@ begin
   if FInitialized then SetImageByName(Value);
 end;
 
-procedure jImageView.SetImageIndex(Value: integer);
+procedure jImageView.SetImageIndex(Value: TImageListIndex);
 begin
   FImageIndex:= Value;
 
@@ -4655,11 +4654,6 @@ begin
     end;
   end;
 
-end;
-
-function jImageView.GetImageIndex: integer;
-begin
-  Result:= FImageIndex;
 end;
 
 procedure jImageView.SetImageBitmap(bitmap: jObject); //deprecated..
@@ -7232,15 +7226,15 @@ begin
    end;
 end;
 
-procedure jBitmap.SetImageIndex(Value: integer);
+procedure jBitmap.SetImageIndex(Value: TImageListIndex);
 begin
   FImageIndex:= Value;
   if FInitialized then
   begin
     if  FImageList <> nil then
     begin
-      if Value > FImageList.Images.Count then
-        FImageIndex:= FImageList.Images.Count;
+      if Value >= FImageList.Images.Count then
+        FImageIndex:= FImageList.Images.Count - 1;
       if Value < 0 then
         FImageIndex:= 0;
 
