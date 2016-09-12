@@ -6,8 +6,8 @@ interface
 
 uses
   Classes, SysUtils, Graphics, Controls, FormEditingIntf, PropEdits,
-  ComponentEditors, ProjectIntf, Laz2_DOM, AndroidWidget, LCLVersion,
-  Dialogs, Forms, AndroidThemes, ImgCache;
+  ComponentEditors, ProjectIntf, Laz2_DOM, AndroidWidget, Laz_And_Controls,
+  LCLVersion, Dialogs, Forms, AndroidThemes, ImgCache;
 
 type
   TDraftWidget = class;
@@ -346,6 +346,7 @@ type
     procedure UpdateLayout; override;
   end;
 
+
   { TARGBColorBridgePropertyEditor }
 
   TARGBColorBridgePropertyEditor = class(TEnumPropertyEditor)
@@ -402,13 +403,33 @@ type
     function GetVerbCount: Integer; override;
   end;
 
+  { TImageIndexPropertyEditor }
+
+  TImageIndexPropertyEditor = class(TIntegerPropertyEditor)
+  private
+    FAssetsPath: string;
+    FImageCache: TImageCache;
+    FImages: jImageList;
+    function GetImageList: jImageList;
+    procedure GetAssets;
+  public
+    procedure Activate; override;
+    function GetAttributes: TPropertyAttributes; override;
+    procedure GetValues(Proc: TGetStrProc); override;
+    procedure SetValue(const NewValue: ansistring); override;
+{    procedure ListMeasureHeight(const {%H-}AValue: ansistring; {%H-}Index:integer;
+      ACanvas:TCanvas; var AHeight: Integer); override;}
+    procedure ListDrawValue(const CurValue: ansistring; Index:integer;
+      ACanvas: TCanvas;  const ARect: TRect; AState: TPropEditDrawState); override;
+  end;
+
 implementation
 
 uses
   LCLIntf, LCLType, strutils, ObjInspStrConsts, IDEMsgIntf, LazIDEIntf,
   IDEExternToolIntf, laz2_XMLRead, LazFileUtils, FPimage, typinfo,
   uFormSizeSelect, LamwSettings, SmartDesigner, jImageListEditDlg,
-  Laz_And_Controls, customdialog, togglebutton, switchbutton,
+  customdialog, togglebutton, switchbutton,
   Laz_And_GLESv1_Canvas, Laz_And_GLESv2_Canvas, gridview, Spinner, seekbar,
   radiogroup, ratingbar, digitalclock, analogclock, surfaceview,
   autocompletetextview, drawingview, chronometer;
@@ -462,6 +483,124 @@ procedure RegisterAndroidWidgetDraftClass(AWidgetClass: jVisualControlClass;
   ADraftClass: TDraftWidgetClass);
 begin
   DraftClassesMap.Add(AWidgetClass, ADraftClass);
+end;
+
+{ TImageIndexPropertyEditor }
+
+function TImageIndexPropertyEditor.GetImageList: jImageList;
+var
+  Persistent: TPersistent;
+  Component: jVisualControl;
+  PropInfo: PPropInfo;
+  Obj: TObject;
+begin
+  Result := nil;
+  Persistent := GetComponent(0);
+  if not (Persistent is jControl) then
+    Exit;
+
+  Component := jVisualControl(Persistent);
+  PropInfo := TypInfo.GetPropInfo(Component, 'Images');
+  if PropInfo = nil then
+    Exit;
+
+  Obj := GetObjectProp(Component, PropInfo);
+  if Obj is jImageList then
+    Exit(jImageList(Obj));
+end;
+
+procedure TImageIndexPropertyEditor.GetAssets;
+var
+  o: TPersistent;
+  d: TAndroidWidgetMediator;
+  pr: TLazProjectFile;
+begin
+  o := GetComponent(0);
+  if not (o is TComponent) then
+    Exit;
+  o := TComponent(o).Owner;
+  if not (o is TAndroidForm) then
+    Exit;
+  d := TAndroidForm(o).Designer as TAndroidWidgetMediator;
+  pr := LazarusIDE.GetProjectFileWithRootComponent(TComponent(o));
+  if pr = nil then
+    Exit;
+  if not (pr.GetFileOwner is TLazProject) then
+    Exit;
+  FAssetsPath := ExtractFilePath(TLazProject(pr.GetFileOwner).MainFile.GetFullFilename);
+  FAssetsPath := System.Copy(FAssetsPath, 1, RPosEx(PathDelim, FAssetsPath, Length(FAssetsPath) - 1)) + 'assets' + PathDelim;
+  FImageCache := d.ImageCache;
+end;
+
+procedure TImageIndexPropertyEditor.Activate;
+begin
+  inherited Activate;
+  GetAssets;
+  FImages := GetImageList;
+end;
+
+function TImageIndexPropertyEditor.GetAttributes: TPropertyAttributes;
+begin
+  Result := [paValueList, paCustomDrawn, paRevertable];
+  if GetDefaultOrdValue <> NoDefaultValue then
+    Result := Result + [paHasDefaultValue];
+end;
+
+procedure TImageIndexPropertyEditor.GetValues(Proc: TGetStrProc);
+var
+  i: Integer;
+begin
+  if GetDefaultOrdValue <> NoDefaultValue then
+    Proc(IntToStr(GetDefaultOrdValue));
+  if Assigned(FImages) then
+    for i := 0 to FImages.Count - 1 do
+      Proc(IntToStr(i) + ' (' + FImages.Images[i] + ')');
+end;
+
+procedure TImageIndexPropertyEditor.SetValue(const NewValue: ansistring);
+var
+  Value: string;
+  i: Integer;
+begin
+  Value := NewValue;
+  i := Pos(' ', Value);
+  if i > 0 then
+    SetLength(Value, i - 1);
+  inherited SetValue(Value);
+end;
+
+procedure TImageIndexPropertyEditor.ListDrawValue(const CurValue: ansistring;
+  Index: integer; ACanvas: TCanvas; const ARect: TRect;
+  AState: TPropEditDrawState);
+var
+  R: TRect;
+  OldColor: TColor;
+  png: TPortableNetworkGraphic;
+  x: Integer;
+begin
+  if GetDefaultOrdValue <> NoDefaultValue then
+    Dec(Index);
+  R := ARect;
+  x := R.Bottom - R.Top - 2;
+  if Assigned(FImages) and Assigned(FImageCache)
+  and (Index >= 0) and (Index < FImages.Images.Count) then
+  begin
+    if (pedsInComboList in AState) and not (pedsInEdit in AState) then
+    begin
+      OldColor := ACanvas.Brush.Color;
+      if pedsSelected in AState then
+        ACanvas.Brush.Color := clHighlight
+      else
+        ACanvas.Brush.Color := clWhite;
+      ACanvas.FillRect(R);
+      ACanvas.Brush.Color := OldColor;
+    end;
+
+    png := FImageCache.GetImageAsPNG(FAssetsPath + FImages.Images[Index]);
+    ACanvas.StretchDraw(Rect(R.Left+1, R.Top+1, R.Left+x+1, R.Top+x+1), png);
+  end;
+  R.Left := R.Left + x + 3;
+  inherited ListDrawValue(CurValue, Index, ACanvas, R, AState);
 end;
 
 { TjImageListEditor }
@@ -2698,6 +2837,7 @@ initialization
   RegisterPropertyEditor(TypeInfo(Integer), jForm, 'Height', TAndroidFormSizeEditor);
   RegisterPropertyEditor(TypeInfo(TStrings), jImageList, 'Images', TjImageListImagesEditor);
   RegisterComponentEditor(jImageList, TjImageListEditor);
+  RegisterPropertyEditor(TypeInfo(TImageListIndex), jControl, '', TImageIndexPropertyEditor);
 
   // DraftClasses registeration:
   //  * default drawing and anchoring => use TDraftWidget
