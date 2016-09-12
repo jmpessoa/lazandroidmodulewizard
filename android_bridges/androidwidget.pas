@@ -470,7 +470,8 @@ type
   TLayoutParams = (lpMatchParent, lpWrapContent, lpHalfOfParent, lpOneQuarterOfParent, lpTwoThirdOfParent,
                    lpOneThirdOfParent, lpOneEighthOfParent,lpThreeEighthOfParent, lpFiveEighthOfParent,
                    lpSevenEighthOfParent, lpOneSixthOfParent, lpFiveSixthOfParent, lpOneFifthOfParent,
-                   lpTwoFifthOfParent, lpThreeFifthOfParent, lpThreeQuarterOfParent, lpFourFifthOfParent,
+                   lpTwoFifthOfParent, lpThreeFifthOfParent, lpThreeQuarterOfParent,
+                   lpFourFifthOfParent, lpNineTenthsOfParent,
                    lp16px, lp24px, lp32px, lp40px, lp48px, lp72px, lp96px);
 
   TSide = (sdW, sdH);
@@ -590,7 +591,11 @@ type
   TOnClickItem       = Procedure(Sender: TObject; itemIndex: Integer) of object;
 
   TOnClickWidgetItem = Procedure(Sender: TObject; itemIndex: integer; checked: boolean) of object;
-  TOnClickCaptionItem= Procedure(Sender: TObject; itemIndex: integer; itemCaption: string) of object;
+
+  TOnClickCaptionItem = Procedure(Sender: TObject; itemIndex: integer; itemCaption: string) of object;
+
+  TOnWidgeItemLostFocus = Procedure(Sender: TObject; itemIndex: integer; widgetText: string) of object;
+  TOnEditLostFocus = Procedure(Sender: TObject; text: string) of object;
 
   TOnDrawItemTextColor = Procedure(Sender: TObject; itemIndex: integer; itemCaption: string; out textColor: TARGBColorBridge) of Object;
   TOnDrawItemBitmap  = Procedure(Sender: TObject; itemIndex: integer; itemCaption: string; out bimap: JObject) of Object;
@@ -1202,8 +1207,8 @@ type
     property ScreenStyle   : TScreenStyle read FScreenStyle  write FScreenStyle   ;
     property ViewParent {ViewParent}: jObject  read  GetViewParent write SetViewParent; // Java : Parent Relative Layout
 
-    property View: jObject read GetView; //FjObject; //View/Layout
-    property Id: DWord read FId write FId;
+    property View: jObject read GetView;     //FjObject; //View/Layout
+    property Id: DWord read FId write SetId; //FId;
 
     //property FontColor: TARGBColorBridge read FFontColor write SetFontColor;
     //property FontSize: DWord read FFontSize write SetFontSize;
@@ -2109,8 +2114,8 @@ begin
           if Value.Id = 0 then
           begin
             //Randomize;
-            Value.Id:= Random(10000000);
-            Value.SetId(Value.Id); //JNI call
+            //Value.Id:= Random(10000000);
+            Value.SetId(Random(10000000){Value.Id}); //JNI call
           end;
         end;
 
@@ -2184,6 +2189,7 @@ end;
 
 procedure jVisualControl.SetId(_id: DWord);
 begin
+  FId:= _id;
   if FInitialized then
       View_SetId(FjEnv, FjObject, FId);
 end;
@@ -4423,6 +4429,7 @@ begin
      lpSevenEighthOfParent:  Result:= Trunc((7/8)*GetParamByParentSide(paren, side)-14); //0.875
      lpOneSixthOfParent:     Result:= Trunc((1/6)*GetParamByParentSide(paren, side)-14); //0.167
      lpFiveSixthOfParent:    Result:= Trunc((5/6)*GetParamByParentSide(paren, side)-14); //0.833
+     lpNineTenthsOfParent:   Result:= Trunc((9/10)*GetParamByParentSide(paren, side)-14); //0.90
 
      lp16px: Result:= 16;
      lp24px: Result:= 24;
@@ -4431,6 +4438,7 @@ begin
      lp48px: Result:= 48;
      lp72px: Result:= 72;
      lp96px: Result:= 96;
+
      //lpDesigner: Result:= 0;
   end;
 end;
@@ -4458,6 +4466,7 @@ begin
      lpSevenEighthOfParent:  Result:= Trunc((7/8)*GetParamByParentSide2(paren, side)-14); //0.875
      lpOneSixthOfParent:     Result:= Trunc((1/6)*GetParamByParentSide2(paren, side)-14); //0.167
      lpFiveSixthOfParent:    Result:= Trunc((5/6)*GetParamByParentSide2(paren, side)-14); //0.833
+     lpNineTenthsOfParent:    Result:= Trunc((9/10)*GetParamByParentSide2(paren, side)-14); //0.90
 
      lp16px: Result:= 16;
      lp24px: Result:= 24;
@@ -4482,6 +4491,7 @@ end;
 function GetLayoutParamsName(ordIndex: DWord): TLayoutParams;
 begin
    case  ordIndex of
+
      0: Result:= lpMatchParent;
      1: Result:= lpWrapContent;
      2: Result:= lpHalfOfParent;
@@ -4499,16 +4509,17 @@ begin
      14: Result:= lpThreeFifthOfParent;
      15: Result:= lpThreeQuarterOfParent;
      16: Result:= lpFourFifthOfParent;
+     17: Result:= lpNineTenthsOfParent;
 
-     17: Result:= lp16px;
-     18: Result:= lp24px;
-     19: Result:= lp32px;
-     20: Result:= lp40px;
-     21: Result:= lp48px;
-     22: Result:= lp72px;
-     23: Result:= lp96px;
+     18: Result:= lp16px;
+     19: Result:= lp24px;
+     20: Result:= lp32px;
+     21: Result:= lp40px;
+     22: Result:= lp48px;
+     23: Result:= lp72px;
+     24: Result:= lp96px;
 
-     //24: Result:= lpDesigner;
+     //25: Result:= lpDesigner;
    end;
 end;
 
@@ -4541,6 +4552,7 @@ begin
    lpSevenEighthOfParent:  Result:= Trunc((7/8)*GetParamBySide(App, side)-14); //0.875
    lpOneSixthOfParent:     Result:= Trunc((1/6)*GetParamBySide(App, side)-14); //0.167
    lpFiveSixthOfParent:    Result:= Trunc((5/6)*GetParamBySide(App, side)-14); //0.833
+   lpNineTenthsOfParent:   Result:= Trunc((9/10)*GetParamBySide(App, side)-14); //0.90
 
    lp16px: Result:= 16;
    lp24px: Result:= 24;
@@ -4578,6 +4590,7 @@ begin
    lpSevenEighthOfParent:  Result:= Trunc((7/8)*L-14); //0.875
    lpOneSixthOfParent:     Result:= Trunc((1/6)*L-14); //0.167
    lpFiveSixthOfParent:    Result:= Trunc((5/6)*L-14); //0.833
+   lpNineTenthsOfParent:   Result:= Trunc((9/10)*L-14); //0.90
 
    lp16px: Result:= 16;
    lp24px: Result:= 24;
@@ -4614,6 +4627,7 @@ begin
    else if Value <= Trunc((4/5)*L) then Result:= lpFourFifthOfParent   //0.80
    else if Value <= Trunc((5/6)*L) then Result:= lpFiveSixthOfParent   //0.833
    else if Value <= Trunc((7/8)*L) then Result:= lpSevenEighthOfParent //0.875
+   else if Value <= Trunc((9/10)*L)then Result:= lpNineTenthsOfParent  //0.90
    else Result:= lpMatchParent;
 
 end;

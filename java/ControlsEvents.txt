@@ -30,3 +30,4 @@ pAppOnViewClick=Java_Event_pAppOnViewClick(PEnv,this,view,id);
 pAppOnListItemClick=Java_Event_pAppOnListItemClick(PEnv,this,adapter,view,position,id);
 pOnFlingGestureDetected=Java_Event_pOnFlingGestureDetected(PEnv,this,TObject(pasobj),direction);
 pOnPinchZoomGestureDetected=Java_Event_pOnPinchZoomGestureDetected(PEnv,this,TObject(pasobj),scaleFactor,state);
+pOnLostFocus=Java_Event_pOnLostFocus(PEnv,this,TObject(pasobj),text);

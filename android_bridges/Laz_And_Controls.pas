@@ -790,6 +790,7 @@ type
     FVerticalScrollBar: boolean;
     FWrappingLine: boolean;
 
+    FOnLostFocus: TOnEditLostFocus;
     FOnEnter  : TOnNotify;
     FOnChange : TOnChange;
     FOnChanged : TOnChange;
@@ -830,6 +831,7 @@ type
     Procedure GenEvent_OnChange(Obj: TObject; txt: string; count : Integer);
     Procedure GenEvent_OnChanged(Obj: TObject; txt : string; count: integer);
     Procedure GenEvent_OnClick(Obj: TObject);
+    Procedure GenEvent_OnOnLostFocus(Obj: TObject; txt: string);
 
   public
     constructor Create(AOwner: TComponent); override;
@@ -891,6 +893,7 @@ type
     property FontSizeUnit: TFontSizeUnit read FFontSizeUnit write SetFontSizeUnit;
 
     // Event
+    property OnLostFocus: TOnEditLostFocus read FOnLostFocus write FOnLostFocus;
     property OnEnter: TOnNotify  read FOnEnter write FOnEnter;
     property OnChange: TOnChange read FOnChange write FOnChange;
     property OnChanged: TOnChange read FOnChanged write FOnChanged;
@@ -1133,6 +1136,7 @@ type
     FOnLongClickItem:  TOnClickCaptionItem;
     FOnDrawItemTextColor: TOnDrawItemTextColor;
     FOnDrawItemBitmap: TOnDrawItemBitmap;
+    FOnWidgeItemLostFocus: TOnWidgeItemLostFocus;
 
     FItems        : TStrings;
     FWidgetItem   : TWidgetItem;
@@ -1167,7 +1171,6 @@ type
 
     procedure SetFontFace(AValue: TFontFace);
 
-
   protected
     procedure SetViewParent(Value: jObject);  override;
     procedure GenEvent_OnClickWidgetItem(Obj: TObject; index: integer; checked: boolean);
@@ -1176,6 +1179,7 @@ type
     procedure GenEvent_OnLongClickCaptionItem(Obj: TObject; index: integer; caption: string);
     procedure GenEvent_OnDrawItemCaptionColor(Obj: TObject; index: integer; caption: string;  out color: dword);
     procedure GenEvent_OnDrawItemBitmap(Obj: TObject; index: integer; caption: string;  out bitmap: JObject);
+    procedure GenEvent_OnWidgeItemLostFocus(Obj: TObject; index: integer; caption: string);
 
     procedure Notification(AComponent: TComponent; Operation: TOperation); override;
   public
@@ -1213,11 +1217,19 @@ type
     function GetItemCaption(): string;
     procedure DispatchOnDrawItemTextColor(_value: boolean);
     procedure DispatchOnDrawItemBitmap(_value: boolean);
+    function GetWidgetText(_index: integer): string;
 
-    // Property
+    procedure SetWidgetCheck(_value: boolean; _index: integer);
+    procedure SetItemTagString(_tagString: string; _index: integer);
+    function GetItemTagString(_index: integer): string;
+
+
+    //Property
     property setItemIndex: TXY write SetItemPosition;
     property Count: integer read GetCount;
     property HighLightSelectedItem: boolean read FHighLightSelectedItem write SetHighLightSelectedItem;
+
+    property OnWidgeItemLostFocus: TOnWidgeItemLostFocus read FOnWidgeItemLostFocus write FOnWidgeItemLostFocus;
   published
     property Items: TStrings read FItems write SetItems;
     property BackgroundColor: TARGBColorBridge read FColor     write SetColor;
@@ -1240,12 +1252,12 @@ type
     property OnLongClickItem: TOnClickCaptionItem read FOnLongClickItem write FOnLongClickItem;
     property OnDrawItemTextColor: TOnDrawItemTextColor read FOnDrawItemTextColor write FOnDrawItemTextColor;
     property OnDrawItemBitmap: TOnDrawItemBitmap  read FOnDrawItemBitmap write FOnDrawItemBitmap;
-
   end;
 
   jScrollView = class(jVisualControl)
   private
     FScrollSize : integer;
+    FFillViewportEnabled: boolean;
     Procedure SetColor      (Value : TARGBColorBridge);
     Procedure SetScrollSize (Value : integer);
     procedure UpdateLParamHeight;
@@ -1260,12 +1272,13 @@ type
     Procedure Refresh;
     Procedure UpdateLayout; override;
     procedure Init(refApp: jApp);  override;
+    procedure SetFillViewport(fillenabled: boolean);
     // Property
   published
+    property FillViewportEnabled: boolean read FFillViewportEnabled write SetFillViewport;
     property ScrollSize: integer read FScrollSize write SetScrollSize;
     property BackgroundColor: TARGBColorBridge read FColor      write SetColor;
   end;
-
 
   jHorizontalScrollView = class(jVisualControl)
   private
@@ -1289,7 +1302,8 @@ type
     property BackgroundColor     : TARGBColorBridge read FColor      write SetColor;
   end;
 
-  // ------------------------------------------------------------------
+  //------------------------------------------------------------------
+
   jViewFlipper = class(jVisualControl)
   private
     //FOnClick  : TOnNotify;
@@ -1304,12 +1318,12 @@ type
     Procedure Refresh;
     Procedure UpdateLayout; override;
     procedure Init(refApp: jApp);  override;
-
-    // Property
     //property Parent: jObject  read  FjPRLayout write SetParent; // Java : Parent Relative Layout
+
   published
-    //property Visible   : Boolean read FVisible   write SetVisible;
-    property BackgroundColor     : TARGBColorBridge read FColor     write SetColor;
+
+    //property Visible: Boolean read FVisible   write SetVisible;
+    property BackgroundColor: TARGBColorBridge read FColor     write SetColor;
   end;
 
   jWebView = class(jVisualControl)
@@ -1337,11 +1351,9 @@ type
 
     Procedure Navigate(url: string);
     procedure SetHttpAuthUsernamePassword(_hostName: string; _domain: string; _username: string; _password: string);
-    //Property
-    //property Parent: jObject  read  FjPRLayout write SetParent; // Java : Parent Relative Layout
+
   published
     property JavaScript: Boolean          read FJavaScript write SetJavaScript;
-    //property Visible   : Boolean          read FVisible    write SetVisible;
     property BackgroundColor     : TARGBColorBridge read FColor      write SetColor;
     // Event
     property OnStatus  : TOnWebViewStatus read FOnStatus   write FOnStatus;
@@ -1584,6 +1596,7 @@ type
   Procedure Java_Event_pOnListViewLongClickCaptionItem(env: PJNIEnv; this: jobject; Obj: TObject;index: integer; caption: JString);
   function  Java_Event_pOnListViewDrawItemCaptionColor(env: PJNIEnv; this: jobject; Obj: TObject; index: integer; caption: JString): JInt;
   function  Java_Event_pOnListViewDrawItemBitmap(env: PJNIEnv; this: jobject; Obj: TObject; index: integer; caption: JString): JObject;
+  procedure Java_Event_pOnWidgeItemLostFocus(env: PJNIEnv; this: jobject; Obj: TObject; index: integer;  caption: JString);
 
   Procedure Java_Event_pOnChange(env: PJNIEnv; this: jobject; Obj: TObject; txt: JString; count : integer);
   Procedure Java_Event_pOnChanged(env: PJNIEnv; this: jobject; Obj: TObject; txt: JString; count : integer);
@@ -1615,6 +1628,8 @@ type
   Procedure Java_Event_pOnPinchZoomGestureDetected(env: PJNIEnv; this: jobject; Obj: TObject; scaleFactor: single; state: integer);
   procedure Java_Event_pOnHttpClientContentResult(env: PJNIEnv; this: jobject; Obj: TObject; content: jString);
   procedure Java_Event_pOnHttpClientCodeResult(env: PJNIEnv; this: jobject; Obj: TObject; code: integer);
+
+   Procedure Java_Event_pOnLostFocus(env: PJNIEnv; this: jobject; Obj: TObject; content: JString);
 
   // Asset Function (P : Pascal Native)
   Function  Asset_SaveToFile (srcFile,outFile : String; SkipExists : Boolean = False) : Boolean;
@@ -2128,6 +2143,27 @@ begin
   end;
 end;
 
+//...
+procedure Java_Event_pOnWidgeItemLostFocus(env: PJNIEnv; this: jobject; Obj: TObject; index: integer;  caption: JString);
+var
+   pasCaption: string;
+ _jBoolean: JBoolean;
+begin
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+
+  if Obj is jListVIew then
+  begin
+    jForm(jListVIew(Obj).Owner).UpdateJNI(gApp);
+    pasCaption := '';
+    if caption <> nil then
+    begin
+      _jBoolean:= JNI_False;
+      pasCaption:= string( env^.GetStringUTFChars(env,caption,@_jBoolean) );
+    end;
+    jListVIew(Obj).GenEvent_OnWidgeItemLostFocus(Obj, index, pasCaption);
+  end;
+end;
 function  Java_Event_pOnListViewDrawItemCaptionColor(env: PJNIEnv; this: jobject; Obj: TObject; index: integer; caption: JString): JInt;
 var
   pasCaption: string;
@@ -2488,6 +2524,30 @@ begin
 
 end;
 
+Procedure Java_Event_pOnLostFocus(env: PJNIEnv; this: jobject; Obj: TObject; content: JString);
+var
+  pascontent    : String;
+  _jBoolean  : jBoolean;
+begin
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+  //
+  if not Assigned(Obj) then Exit;
+
+  if Obj is jEditText then
+  begin
+    pascontent := '';
+    if content <> nil then
+    begin
+      _jBoolean := JNI_False;
+      pascontent    := String( env^.GetStringUTFChars(Env,content,@_jBoolean) );
+    end;
+    jForm(jHttpClient(Obj).Owner).UpdateJNI(gApp);
+    jEditText(Obj).GenEvent_OnOnLostFocus(Obj, pascontent);
+  end;
+
+end;
+
 procedure Java_Event_pOnHttpClientCodeResult(env: PJNIEnv; this: jobject; Obj: TObject; code: integer);
 
 begin
@@ -2834,6 +2894,7 @@ begin
   inherited Create(AOwner);
   FText      :='';
   //FColor     := colbrDefault; //colbrWhite;
+  FOnLostFocus:= nil;
   FOnEnter   := nil;
   FOnChange  := nil;
   FEditable := True;
@@ -3239,6 +3300,10 @@ begin
   if Assigned(FOnClick) then FOnClick(Obj);
 end;
 
+Procedure jEditText.GenEvent_OnOnLostFocus(Obj: TObject; txt: string);
+begin
+  if Assigned(FOnLostFocus) then FOnLostFocus(Obj, txt);
+end;
 
 procedure jEditText.UpdateLParamWidth;
 var
@@ -6065,6 +6130,11 @@ begin
   if Assigned(FOnClickItem) then FOnClickItem(Obj,index, caption);
 end;
 
+procedure jListView.GenEvent_OnWidgeItemLostFocus(Obj: TObject; index: integer; caption: string);
+begin
+  if Assigned(FOnWidgeItemLostFocus) then FOnWidgeItemLostFocus(Obj,index, caption);
+end;
+
 procedure jListView.GenEvent_OnClickWidgetItem(Obj: TObject; index: integer; checked: boolean);
 begin
   if Assigned(FOnClickWidgetItem) then FOnClickWidgetItem(Obj,index,checked);
@@ -6151,6 +6221,36 @@ begin
    jListView_SetFontFace(FjEnv, FjObject, Ord(FFontFace));
 end;
 
+function jListView.GetWidgetText(_index: integer): string;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jListView_GetWidgetText(FjEnv, FjObject, _index);
+end;
+
+procedure jListView.SetWidgetCheck(_value: boolean; _index: integer);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jListView_setWidgetCheck(FjEnv, FjObject, _value ,_index);
+end;
+
+procedure jListView.SetItemTagString(_tagString: string; _index: integer);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jListView_setItemTagString(FjEnv, FjObject, _tagString ,_index);
+end;
+
+
+function jListView.GetItemTagString(_index: integer): string;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jListView_getItemTagString(FjEnv, FjObject, _index);
+end;
+
+
 //------------------------------------------------------------------------------
 // jScrollView
 //------------------------------------------------------------------------------
@@ -6165,6 +6265,7 @@ begin
   FWidth:= 100;
   //FAcceptChildsAtDesignTime:= True;
   FAcceptChildrenAtDesignTime:= True;
+  FFillViewportEnabled:= False;
 end;
 
 Destructor jScrollView.Destroy;
@@ -6221,7 +6322,6 @@ begin
                                            FMarginLeft,FMarginTop,FMarginRight,FMarginBottom,
                                            GetLayoutParams(gApp, FLParamWidth, sdW),
                                            GetLayoutParams(gApp, FLParamHeight, sdH));
-
   FInitialized:= True;
   if FParent is jPanel then
   begin
@@ -6244,9 +6344,13 @@ begin
   end;
   if Self.Anchor <> nil then Self.AnchorId:= Self.Anchor.Id
   else Self.AnchorId:= -1;
+
   jScrollView_setLayoutAll(FjEnv, FjObject , Self.AnchorId);
 
   jScrollView_setScrollSize(FjEnv,FjObject , FScrollSize);
+
+  if FFillViewportEnabled then
+      jScrollView_setFillViewport(FjEnv, FjObject, FFillViewportEnabled);
 
   if FColor <> colbrDefault then
      View_SetBackGroundColor(FjEnv, FjThis, FjObject , GetARGB(FCustomColor, FColor));
@@ -6346,6 +6450,14 @@ begin
     UpdateLParamHeight;
     jScrollView_setLayoutAll(FjEnv, FjObject , Self.AnchorId);
   end;
+end;
+
+procedure jScrollView.SetFillViewport(fillenabled: boolean);
+begin
+  //in designing component state: set value here...
+  FFillViewportEnabled:= fillenabled;
+  if FInitialized then
+     jScrollView_setFillViewport(FjEnv, FjObject, fillenabled);
 end;
 
 

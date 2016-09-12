@@ -297,7 +297,7 @@ begin
       list.Add('		NOTE 2: Project settings: Targeg Api = '+FTargetApi+ ' and PIE  not enabled!' );
 
       list.Add(' ');
-      list.Add('		NOTE 3: To run in AVD/Emulator, please, "readme_How_To_Run_Real_Device.txt"');
+      list.Add('		NOTE 3: To run in AVD/Emulator, please, "readme_How_To_Run_AVD_Emulator.txt"');
       list.Add(' ');
       list.Add('		NOTE 4: Android >=5.0 [Target API >= 21] need to enable PIE [Position Independent Executables] enabled: ');
       list.Add(' ');
@@ -704,7 +704,8 @@ begin
     frm.ComboBoxTheme.Visible:= True;
     frm.SpeedButtonHintTheme.Visible:= True;
 
-    frm.CheckBox2.Visible:= False;
+    frm.CheckBoxPIE.Visible:= False;
+
     if projectType = 1 then //No GUI
     begin
       frm.Color:= clWhite;
@@ -735,7 +736,7 @@ begin
       frm.ComboBoxTheme.Visible:= False;
       frm.SpeedButtonHintTheme.Visible:= False;
 
-      frm.CheckBox2.Visible:= True;
+      frm.CheckBoxPIE.Visible:= True;
     end;
 
 
@@ -771,7 +772,7 @@ begin
       FMinApi:= frm.MinApi;
       FTargetApi:= frm.TargetApi;
       FSupportV4:= frm.SupportV4;
-      FPieChecked:= frm.CheckBox2.Checked;
+      FPieChecked:= frm.PieChecked;
 
       FMainActivity:= frm.MainActivity;
       FJavaClassName:= frm.JavaClassName;
@@ -2132,7 +2133,7 @@ end;
 
 function TAndroidFileDescPascalUnitWithResource.GetLocalizedName: string;
 begin
-   Result := 'AndroidModule GUI jForm [Lamw]';
+   Result := 'jForm Android [GUI] Module [Lamw]';
 end;
 
 function TAndroidFileDescPascalUnitWithResource.GetLocalizedDescription: string;

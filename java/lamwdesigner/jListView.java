@@ -1,10 +1,9 @@
-package com.example.appchronometerdemo1;
+package com.example.applistviewdemo;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
-
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Color;
@@ -15,21 +14,25 @@ import android.util.Log;
 import android.util.TypedValue;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.View.OnFocusChangeListener;
 import android.view.ViewGroup;
-import android.view.View.OnTouchListener;
+import android.view.inputmethod.InputMethodManager;
+//import android.view.View.OnTouchListener;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RadioButton;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.AdapterView.OnItemClickListener;
+//import android.widget.AdapterView.OnItemClickListener;
 import android.widget.RelativeLayout.LayoutParams;
+import android.widget.Spinner;
 
 class jListItemRow{
 	String label = "";
@@ -37,6 +40,7 @@ class jListItemRow{
 	int widget = 0;
 	View jWidget; //needed to fix  the RadioButton Group default behavior: thanks to Leledumbo.
 	String widgetText;
+	int savePosition = -1;
 	String delimiter;
 	boolean checked;
 	int textSize;
@@ -45,16 +49,18 @@ class jListItemRow{
 	int textSizeDecorated;
 	int itemLayout;
 	int textAlign;
+	String tagString="";
+	
 	Context ctx;
 	Bitmap bmp;	
 	Typeface typeFace;          
 	//TFontFace = (ffNormal, ffSans, ffSerif, ffMonospace);
-		  
+	        
 	public  jListItemRow(Context context) {
 		ctx = context;
-		label = "";
-	}
-	
+		label = "";		
+	    // Creating adapter for spinner	      	    
+	}	
 }
 
 //http://stackoverflow.com/questions/7361135/how-to-change-color-and-font-on-listview
@@ -269,39 +275,71 @@ if (position >= 0 && ( !items.get(position).label.equals("") ) ) {
         	}   
         }
 	    
-	      txtLayout.addView(itemText[i]);   
+	    txtLayout.addView(itemText[i]);   
  }
  
  View itemWidget = null;
  
  switch(items.get(position).widget) {
-   case 1:  itemWidget = new CheckBox(ctx);  ((CheckBox)itemWidget).setText(items.get(position).widgetText);                                                    
+   case 1:  itemWidget = new CheckBox(ctx);
+                        ((CheckBox)itemWidget).setId(position);                                                                             
                          ((CheckBox)itemWidget).setText(items.get(position).widgetText);                           
                          items.get(position).jWidget = itemWidget; //                           
                          ((CheckBox)itemWidget).setChecked(items.get(position).checked);                                                      
    break;
    case 2:  itemWidget = new RadioButton(ctx); 
+                         ((RadioButton)itemWidget).setId(position);
                          ((RadioButton)itemWidget).setText(items.get(position).widgetText);                           
                          items.get(position).jWidget = itemWidget; //                           
                          ((RadioButton)itemWidget).setChecked(items.get(position).checked);                          
    break;
-   case 3:  itemWidget = new Button(ctx);  ((Button)itemWidget).setText(items.get(position).widgetText);
+   case 3:  itemWidget = new Button(ctx);  
+                         ((Button)itemWidget).setId(position);
+                         ((Button)itemWidget).setText(items.get(position).widgetText);
                          items.get(position).jWidget = itemWidget;
    break;
-   case 4:  itemWidget = new TextView(ctx); 
+   case 4:  itemWidget = new TextView(ctx);
+                         ((TextView)itemWidget).setId(position);
                          ((TextView)itemWidget).setText(" "+items.get(position).widgetText+" ");
                          items.get(position).jWidget = itemWidget;
    break;
+   
+   case 5:  itemWidget = new EditText(ctx);
+	
+   ((EditText)itemWidget).setId(position);
+   ((EditText)itemWidget).setText(items.get(position).widgetText);
+   ((EditText)itemWidget).setLines(1);
+   ((EditText)itemWidget).setMaxLines(1);
+   ((EditText)itemWidget).setMinLines(1);
+   
+    items.get(position).jWidget = itemWidget;
+   
+   ((EditText)itemWidget).setOnFocusChangeListener(new OnFocusChangeListener() {	   
+		public void onFocusChange(View v, boolean hasFocus) {
+			final int p = v.getId();	 
+			final EditText Caption = (EditText)v;			
+			if (!hasFocus){			
+				if (p >= 0) {					
+				   items.get(p).widgetText = Caption.getText().toString();				   
+				   items.get(p).jWidget.setFocusable(false);	  
+				   items.get(p).jWidget.setFocusableInTouchMode(false);
+				   controls.pOnWidgeItemLostFocus(PasObj, p, Caption.getText().toString());
+				}  							
+			}
+		}
+	});
+                          
+   break;
    //default: ;
- }
-         
+ }	
+
  LayoutParams widgetParam = null;
 
  if (itemWidget != null) {
 	  widgetParam = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT); //w,h	   
-	  itemWidget.setFocusable(false);
-    itemWidget.setFocusableInTouchMode(false);
-    itemWidget.setOnClickListener(getOnCheckItem(itemWidget, position));       
+	  itemWidget.setFocusable(false);	  
+      itemWidget.setFocusableInTouchMode(false);     
+      itemWidget.setOnClickListener(getOnCheckItem(itemWidget, position));       
  }
                         
  if (items.get(position).itemLayout == 0) {	//default...   
@@ -373,21 +411,17 @@ View.OnClickListener getOnCheckItem(final View cb, final int position) {
 	                  items.get(position).checked = ((CheckBox)cb).isChecked();	                 	                  
 	                  controls.pOnClickWidgetItem(PasObj, position, ((CheckBox)cb).isChecked());
 	               }
-	               else if (cb.getClass().getName().equals("android.widget.RadioButton")) {
-	            	   
+	               else if (cb.getClass().getName().equals("android.widget.RadioButton")) {	            	   
 	            	     //new code: fix to RadioButton Group  default behavior: thanks to Leledumbo.
-	            	      boolean doCheck = ((RadioButton)cb).isChecked(); //new code
-	            	      
+	            	      boolean doCheck = ((RadioButton)cb).isChecked(); //new code	            	      
 	            	      for (int i=0; i < items.size(); i++) {
 	            	    	  ((RadioButton)items.get(i).jWidget).setChecked(false);
 	            	    	  items.get(i).checked = false;	 	            	    	 
 	            	    	  thisAdapter.notifyDataSetChanged(); //fix 16-febr-2015 
-	            	      }	            	
+	            	      }
 	            	      
-		                  items.get(position).checked = doCheck;
-		                   
-		                  ((RadioButton)items.get(position).jWidget).setChecked(doCheck);
-		                  
+		                  items.get(position).checked = doCheck;		                   
+		                  ((RadioButton)items.get(position).jWidget).setChecked(doCheck);		                  
 		                  controls.pOnClickWidgetItem(PasObj, position, doCheck);
 		                  
 		           }
@@ -396,6 +430,16 @@ View.OnClickListener getOnCheckItem(final View cb, final int position) {
 		           }
 	               else if (cb.getClass().getName().equals("android.widget.TextView")) { //textview  
 			             controls.pOnClickWidgetItem(PasObj, position, items.get(position).checked); 		                  
+		           }
+	               else if (cb.getClass().getName().equals("android.widget.EditText")) { //edittext
+	            	   
+	 		           if (!cb.isFocusable()) {		        	  	 			        			        	  
+	 	                    cb.setFocusable(true);	  
+	 	         	        cb.setFocusableInTouchMode(true);	 	         	        
+	 			       }
+	 		           
+	 		           cb.requestFocus();	 		          
+			           controls.pOnClickWidgetItem(PasObj, position, items.get(position).checked); 		                  
 		           }	               
               } 
 	}; 
@@ -549,11 +593,11 @@ onTouchListener = new OnTouchListener() {
 
 setOnTouchListener(onTouchListener);
 
-
 //fixed! thanks to @renabor
-onItemClickListener = new OnItemClickListener() {@Override
-	public void onItemClick(AdapterView <? > parent, View v, int position, long id) {
-	  if (canClick) { 
+onItemClickListener = new OnItemClickListener() {
+	@Override
+	public void onItemClick(AdapterView <?> parent, View v, int position, long id) {		
+	  if (canClick) {
 	    	lastSelectedItem = (int) position;
 			if (!isEmpty(alist)) { // this test is necessary !  //  <----- thanks to @renabor
 				if (highLightSelectedItem) {
@@ -569,13 +613,28 @@ onItemClickListener = new OnItemClickListener() {@Override
 					alist.get((int) id).checked = true;
 					aadapter.notifyDataSetChanged();
 				}
+				
+				if (alist.get((int)id).widget == 5  ) { //radio fix 16-febr-2015
+					
+		      	  parent.setDescendantFocusability(ViewGroup.FOCUS_BEFORE_DESCENDANTS);
+		      	  parent.requestFocus();
+					
+		          if (!alist.get((int)id).jWidget.isFocusable()) {		        	  
+		        	parent.setDescendantFocusability(ViewGroup.FOCUS_AFTER_DESCENDANTS);		        	  
+		          }
+		          
+				}
+															
 				controls.pOnClickCaptionItem(PasObj, (int) id, alist.get((int) id).label);
+				
 			} else {
 				controls.pOnClickCaptionItem(PasObj, lastSelectedItem, ""); // avoid passing possibly undefined Caption
-			}
+			}		
+									
 		}
 	} 
 };
+
 setOnItemClickListener(onItemClickListener);
 
 this.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {@Override
@@ -601,6 +660,11 @@ public static boolean isEmpty(ArrayList<?> coll) {
 
 public boolean isItemChecked(int index) {
 return alist.get(index).checked;	  
+}
+
+
+public String GetWidgetText(int index) {
+  return alist.get(index).widgetText;	
 }
 
 public void setLeftTopRightBottomWidthHeight(int left, int top, int right, int bottom, int w, int h) {
@@ -736,7 +800,8 @@ info.itemLayout =itemLayout;
 info.textSizeDecorated = textSizeDecorated;
 info.textAlign = textAlign;
 
-info.typeFace = this.typeFace;    
+info.typeFace = this.typeFace;
+info.tagString = "";
 
 alist.add(info);
 aadapter.notifyDataSetChanged();
@@ -761,12 +826,11 @@ info.textSizeDecorated = textSizeDecorated;
 info.textAlign = textAlign;
 
 info.typeFace = this.typeFace;
-
-//Log.i("typeFace", item);
-//info.fontTextStyle = Typeface.NORMAL;
+info.tagString = "";
 
 alist.add(info);
 aadapter.notifyDataSetChanged();
+
 }
 
 public  void add3(String item, String delimiter, int fontColor, int fontSize, int widgetItem, String wgtText, Bitmap img) {
@@ -789,7 +853,8 @@ public  void add3(String item, String delimiter, int fontColor, int fontSize, in
 
 	  info.typeFace = this.typeFace;    
 	  //info.fontTextStyle = Typeface.NORMAL;	  
-
+	  info.tagString = "";
+	  
 	  alist.add(info);
 	  aadapter.notifyDataSetChanged();
 }
@@ -814,6 +879,7 @@ public  void add4(String item, String delimiter, int fontColor, int fontSize, in
 	  
 	  info.typeFace = this.typeFace;    
 	 // info.fontTextStyle = Typeface.NORMAL;	  
+	  info.tagString = "";
 	  
 	  alist.add(info);
 	  aadapter.notifyDataSetChanged();
@@ -897,10 +963,21 @@ public void setWidgetText(String value, int index){
 	aadapter.notifyDataSetChanged();
 }
 
-public void setWidgetCheck(boolean value, int index){
-	alist.get(index).checked = value;	
+public void setWidgetCheck(boolean _value, int _index){
+	alist.get(_index).checked = _value;	
 	aadapter.notifyDataSetChanged();
 }
+
+public void setItemTagString(String _tagString, int _index){
+	alist.get(_index).tagString = _tagString;
+	aadapter.notifyDataSetChanged();
+}
+
+
+public String getItemTagString(int _index){
+	return alist.get(_index).tagString;
+}
+
 
 private void DoHighlight(int position, int _color) {
  	alist.get(position).textColor = _color;
@@ -916,7 +993,7 @@ public void SetHighLightSelectedItemColor(int _color)  {
 }
 
 public int GetItemIndex() { 
-return lastSelectedItem;
+  return lastSelectedItem;
 }
 
 public String GetItemCaption() {

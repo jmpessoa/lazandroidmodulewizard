@@ -525,6 +525,13 @@ procedure jListView_SetFontSizeUnit(env: PJNIEnv; _jlistview: JObject; _unit: in
 
 procedure jListView_SetFontFace(env: PJNIEnv; _jlistview: jObject; FontFace: DWord);
 
+function jListView_GetWidgetText(env: PJNIEnv; _jlistview: JObject; _index: integer): string;
+
+procedure jListView_setWidgetCheck(env: PJNIEnv; _jlistview: JObject; _value: boolean; _index: integer);
+procedure jListView_setItemTagString(env: PJNIEnv; _jlistview: JObject; _tagString: string; _index: integer);
+function  jListView_getItemTagString(env: PJNIEnv; _jlistview: JObject; _index: integer): string;
+
+
 
 // ScrollView
 Function  jScrollView_Create           (env:PJNIEnv;  this:jobject; SelfObj: TObject): jObject;
@@ -551,6 +558,11 @@ Procedure jScrollView_setLeftTopRightBottomWidthHeight(env:PJNIEnv;
 Procedure jScrollView_addLParamsParentRule(env:PJNIEnv; ScrollView : jObject; rule: DWord);
 Procedure jScrollView_addLParamsAnchorRule(env:PJNIEnv; ScrollView : jObject; rule: DWord);
 Procedure jScrollView_setLayoutAll(env:PJNIEnv; ScrollView : jObject;  idAnchor: DWord);
+
+//thanks to DonAlfredo
+Procedure jScrollView_setFillViewport  (env:PJNIEnv; ScrollView : jObject; fillenabled : boolean);
+
+
 //---------------
 
 // jPanel by jmpessoa
@@ -4374,6 +4386,81 @@ begin
   env^.DeleteLocalRef(env, cls);
 end;
 
+function jListView_GetWidgetText(env: PJNIEnv; _jlistview: JObject; _index: integer): string;
+var
+  jStr: JString;
+  jBoo: JBoolean;
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].i:= _index;
+  jCls:= env^.GetObjectClass(env, _jlistview);
+  jMethod:= env^.GetMethodID(env, jCls, 'GetWidgetText', '(I)Ljava/lang/String;');
+  jStr:= env^.CallObjectMethodA(env, _jlistview, jMethod, @jParams);
+  case jStr = nil of
+     True : Result:= '';
+     False: begin
+              jBoo:= JNI_False;
+              Result:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
+            end;
+  end;
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jListView_setWidgetCheck(env: PJNIEnv; _jlistview: JObject; _value: boolean; _index: integer);
+var
+  jParams: array[0..1] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].z:= JBool(_value);
+  jParams[1].i:= _index;
+  jCls:= env^.GetObjectClass(env, _jlistview);
+  jMethod:= env^.GetMethodID(env, jCls, 'setWidgetCheck', '(ZI)V');
+  env^.CallVoidMethodA(env, _jlistview, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+
+procedure jListView_setItemTagString(env: PJNIEnv; _jlistview: JObject; _tagString: string; _index: integer);
+var
+  jParams: array[0..1] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_tagString));
+  jParams[1].i:= _index;
+  jCls:= env^.GetObjectClass(env, _jlistview);
+  jMethod:= env^.GetMethodID(env, jCls, 'setItemTagString', '(Ljava/lang/String;I)V');
+  env^.CallVoidMethodA(env, _jlistview, jMethod, @jParams);
+env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+function jListView_getItemTagString(env: PJNIEnv; _jlistview: JObject; _index: integer): string;
+var
+  jStr: JString;
+  jBoo: JBoolean;
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].i:= _index;
+  jCls:= env^.GetObjectClass(env, _jlistview);
+  jMethod:= env^.GetMethodID(env, jCls, 'getItemTagString', '(I)Ljava/lang/String;');
+  jStr:= env^.CallObjectMethodA(env, _jlistview, jMethod, @jParams);
+  case jStr = nil of
+     True : Result:= '';
+     False: begin
+              jBoo:= JNI_False;
+              Result:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
+            end;
+  end;
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+
 //------------------------------------------------------------------------------
 // ScrollView
 //------------------------------------------------------------------------------
@@ -4546,6 +4633,20 @@ _jMethod:= env^.GetMethodID(env, cls, 'setLayoutAll', '(I)V');
  env^.DeleteLocalRef(env, cls);
 end;
 
+//thanks to DonAlfredo!
+Procedure jScrollView_setFillViewport  (env:PJNIEnv;
+                                        ScrollView : jObject; fillenabled : boolean);
+ var
+  _jMethod : jMethodID = nil;
+  _jParams : array[0..0] of jValue;
+  cls: jClass;
+ begin
+  _jParams[0].z := JBool(fillenabled);
+    cls := env^.GetObjectClass(env, ScrollView);
+ _jMethod:= env^.GetMethodID(env, cls, 'setFillViewport', '(Z)V');
+  env^.CallVoidMethodA(env,ScrollView,_jMethod,@_jParams);
+  env^.DeleteLocalRef(env, cls);
+ end;
 
 //----------------------------------------
 //Panel - new by jmpessoa

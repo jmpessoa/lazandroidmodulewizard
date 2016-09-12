@@ -1,4 +1,4 @@
-package com.example.appdatetimepicker;
+package com.example.applistviewdemo;
 
 import android.content.ClipData;
 import android.content.ClipboardManager;
@@ -14,6 +14,7 @@ import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.View.OnFocusChangeListener;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
@@ -79,6 +80,19 @@ lparams.setMargins(5, 5,5,5);
 
 mClipBoard = (ClipboardManager) controls.activity.getSystemService(Context.CLIPBOARD_SERVICE);
 
+
+setOnFocusChangeListener(new OnFocusChangeListener() {	   
+	public void onFocusChange(View v, boolean hasFocus) {
+		final int p = v.getId();	 
+		final EditText Caption = (EditText)v;			
+		if (!hasFocus){			
+			if (p >= 0) {					
+			   controls.pOnLostFocus(PasObj, Caption.getText().toString());
+			}  							
+		}
+	}
+});
+
 //Event
 onClickListener = new OnClickListener() {
  public  void onClick(View view) {
@@ -87,7 +101,6 @@ onClickListener = new OnClickListener() {
   //}
  };
 };
-
 setOnClickListener(onClickListener);
 
 //Init Event : http://socome.tistory.com/15

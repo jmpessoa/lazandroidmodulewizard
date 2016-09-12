@@ -1,6 +1,6 @@
-package com.example.appdemo1;
+package com.example.applistviewdemo;
 
-//LAMW: Lazarus Android Module Wizard  - version 0.7 - rev. 0.1 - 13 July - 2016 
+//LAMW: Lazarus Android Module Wizard  - version 0.7 - rev. 0.2 - 11 September - 2016 
 //RAD Android: Project Wizard, Form Designer and Components Development Model!
 
 //https://github.com/jmpessoa/lazandroidmodulewizard
@@ -979,6 +979,7 @@ public native void pAppOnViewClick(View view, int id);
 public native void pAppOnListItemClick(AdapterView adapter, View view, int position, int id);
 public native void pOnFlingGestureDetected(long pasobj, int direction);
 public native void pOnPinchZoomGestureDetected(long pasobj, float scaleFactor, int state);
+public native void pOnLostFocus(long pasobj, String text);
  
 //Load Pascal Library
 static {

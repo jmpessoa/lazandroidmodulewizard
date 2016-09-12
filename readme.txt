@@ -109,6 +109,27 @@
 	*
 	****************************************************************************************************
 
+Version 0.7.2 - 12 September - 2016
+
+	IMPROVED! jListView 
+
+		Expanded Property WidgetItem: Added "wgEditText"
+
+		Added event property [not plublished] "OnWidgeItemLostFocus"
+		
+		use:
+
+		procedure TAndroidModule1.AndroidModule1Create(Sender: TObject);
+		begin
+			jListView2.OnWidgeItemLostFocus:= MyWidgeItemLostFocus; //handle by AndroidModule1's method  
+		end;
+
+	IMPROVED! jScrollView
+		Added method SetFillViewport  // <--- thanks to DonAlfredo
+
+	IMPROVED! jEditText
+		Added event "OnLostFocus"
+
 Version 0.7.1 - 03 September - 2016
 
 	NEW! Added Support to java code/stuff reuse [ide_tools]

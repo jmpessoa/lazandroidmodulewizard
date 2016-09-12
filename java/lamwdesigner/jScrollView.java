@@ -147,6 +147,13 @@ public void setLayoutAll(int idAnchor) {
 	
 }
 
+//thanks to DonAlfredo
+public  void setFillViewport(boolean fillenabled) {
+  //seee: https://developer.android.com/reference/android/widget/ScrollView.html#setFillViewport(boolean)
+  super.setFillViewport(fillenabled);
+}
+
+
 }
 
 
