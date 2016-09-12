@@ -32,6 +32,7 @@ type
   TImageCache = class
   private
     FItems: TAvgLvlTree; // list of TImageCacheItem
+    function GetImageCacheItem(const FileName: string): TImageCacheItem;
   public
     constructor Create;
     destructor Destroy; override;
@@ -55,6 +56,19 @@ end;
 
 { TImageCache }
 
+function TImageCache.GetImageCacheItem(const FileName: string): TImageCacheItem;
+var
+  n: TAvgLvlTreeNode;
+begin
+  n := FItems.FindKey(@FileName, @FindImgCacheItem);
+  if Assigned(n) then
+    Result := TImageCacheItem(n.Data)
+  else begin
+    Result := TImageCacheItem.Create(FileName);
+    FItems.Add(Result);
+  end;
+end;
+
 constructor TImageCache.Create;
 begin
   FItems := TAvgLvlTree.Create(@CmpImgCacheItems);
@@ -68,31 +82,15 @@ begin
 end;
 
 function TImageCache.GetImage(const FileName: string): TFPCustomImage;
-var
-  n: TAvgLvlTreeNode;
-  ci: TImageCacheItem;
 begin
-  n := FItems.FindKey(@FileName, @FindImgCacheItem);
-  if Assigned(n) then
-    ci := TImageCacheItem(n.Data)
-  else
-    ci := TImageCacheItem.Create(FileName);
-  Result := ci.Img;
+  with GetImageCacheItem(FileName) do
+    Result := Img;
 end;
 
 function TImageCache.GetImageAsPNG(const FileName: string): TPortableNetworkGraphic;
-var
-  n: TAvgLvlTreeNode;
-  ci: TImageCacheItem;
 begin
-  n := FItems.FindKey(@FileName, @FindImgCacheItem);
-  if Assigned(n) then
-    ci := TImageCacheItem(n.Data)
-  else begin
-    ci := TImageCacheItem.Create(FileName);
-    FItems.Add(ci);
-  end;
-  Result := ci.PNG;
+  with GetImageCacheItem(FileName) do
+    Result := PNG;
 end;
 
 { TImageCacheItem }
