@@ -124,7 +124,7 @@ procedure TjImagesEditorDlg.ImagesGridDrawCell(Sender: TObject; aCol,
 
 var
   li: TImageListItem;
-  png: TPortableNetworkGraphic;
+  bmp: TBitmap;
   s: string;
 begin
   if aRow >= FImages.Count then Exit;
@@ -141,9 +141,9 @@ begin
   case aCol of
   0:
     begin
-      png := FImgCache.GetImageAsPNG(li.FullFileName);
-      if png <> nil then
-        ImagesGrid.Canvas.StretchDraw(InsertRect(png.Width, png.Height, aRect), png);
+      bmp := FImgCache.GetImageAsBMP(li.FullFileName);
+      if bmp <> nil then
+        ImagesGrid.Canvas.StretchDraw(InsertRect(bmp.Width, bmp.Height, aRect), bmp);
     end;
   1:
     if li.InUse then
@@ -408,8 +408,8 @@ end;
 procedure TjImagesEditorDlg.ShowImage(Index: Integer);
 begin
   if Index < FImages.Count then
-    Image1.Picture.PNG :=
-      FImgCache.GetImageAsPNG(TImageListItem(FImages[Index]).FullFileName)
+    Image1.Picture.Bitmap :=
+      FImgCache.GetImageAsBMP(TImageListItem(FImages[Index]).FullFileName)
   else
     Image1.Picture.Clear;
 end;
@@ -451,7 +451,7 @@ begin
     CreateDir(FAssetsDir);
   ScanForImages;
   for i := 0 to FImages.Count - 1 do
-    FImgCache.GetImageAsPNG(TImageListItem(FImages[i]).FullFileName);
+    FImgCache.GetImageAsBMP(TImageListItem(FImages[i]).FullFileName);
   PrepareGrid;
   ShowImage;
 end;

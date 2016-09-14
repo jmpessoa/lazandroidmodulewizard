@@ -15,18 +15,18 @@ type
   private
     FFileName: string;
     FImg: TFPCustomImage;
-    FPng: TPortableNetworkGraphic;
+    FBmp: TBitmap;
     FImgFileSize: QWord;
     FImgFileTime: LongInt;
     function GetImage: TFPCustomImage;
     function CheckAttribs: Boolean;
-    function GetPNG: TPortableNetworkGraphic;
+    function GetBMP: TBitmap;
     procedure LoadImage;
   public
     constructor Create(const AFileName: string);
     destructor Destroy; override;
     property Img: TFPCustomImage read GetImage;
-    property PNG: TPortableNetworkGraphic read GetPNG;
+    property BMP: TBitmap read GetBMP;
   end;
 
   TImageCache = class
@@ -37,12 +37,12 @@ type
     constructor Create;
     destructor Destroy; override;
     function GetImage(const FileName: string): TFPCustomImage;
-    function GetImageAsPNG(const FileName: string): TPortableNetworkGraphic;
+    function GetImageAsBMP(const FileName: string): TBitmap;
   end;
 
 implementation
 
-uses FPWritePNG;
+uses FPWriteBMP;
 
 function CmpImgCacheItems(p1, p2: Pointer): Integer;
 begin
@@ -87,10 +87,10 @@ begin
     Result := Img;
 end;
 
-function TImageCache.GetImageAsPNG(const FileName: string): TPortableNetworkGraphic;
+function TImageCache.GetImageAsBMP(const FileName: string): TBitmap;
 begin
   with GetImageCacheItem(FileName) do
-    Result := PNG;
+    Result := BMP;
 end;
 
 { TImageCacheItem }
@@ -100,7 +100,7 @@ begin
   if not FileExists(FFileName) and Assigned(Fimg) then
   begin
     FreeAndNil(FImg);
-    FreeAndNil(FPng);
+    FreeAndNil(FBmp);
   end else
   if not CheckAttribs then LoadImage;
   Result := FImg
@@ -115,26 +115,26 @@ begin
   FindClose(sr);
 end;
 
-function TImageCacheItem.GetPNG: TPortableNetworkGraphic;
+function TImageCacheItem.GetBMP: TBitmap;
 var
   im: TFPCustomImage;
-  pngW: TFPWriterPNG;
+  bmpW: TFPWriterBMP;
   ms: TMemoryStream;
 begin
   im := GetImage;
-  if Assigned(FPng) then Exit(FPng);
+  if Assigned(FBmp) then Exit(FBmp);
   if Assigned(im) then
   begin
-    pngW := TFPWriterPNG.Create;
+    bmpW := TFPWriterBMP.Create;
     ms := TMemoryStream.Create;
-    im.SaveToStream(ms, pngW);
-    pngW.Free;
+    im.SaveToStream(ms, bmpW);
+    bmpW.Free;
     ms.Position := 0;
-    FPng := TPortableNetworkGraphic.Create;
-    FPng.LoadFromStream(ms);
+    FBmp := TBitmap.Create;
+    FBmp.LoadFromStream(ms);
     ms.Free;
   end;
-  Result := FPng;
+  Result := FBmp;
 end;
 
 procedure TImageCacheItem.LoadImage;
@@ -144,7 +144,7 @@ begin
   if Assigned(FImg) then
   begin
     FreeAndNil(FImg);
-    FreeAndNil(FPng);
+    FreeAndNil(FBmp);
   end;
   Fimg := TFPMemoryImage.Create(0, 0);
   try
@@ -168,7 +168,7 @@ end;
 destructor TImageCacheItem.Destroy;
 begin
   FImg.Free;
-  FPng.Free;
+  FBmp.Free;
   inherited Destroy;
 end;
 

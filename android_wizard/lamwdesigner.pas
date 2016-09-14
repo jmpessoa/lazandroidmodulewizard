@@ -575,29 +575,28 @@ procedure TImageIndexPropertyEditor.ListDrawValue(const CurValue: ansistring;
 var
   R: TRect;
   OldColor: TColor;
-  png: TPortableNetworkGraphic;
+  bmp: TBitmap;
   x: Integer;
 begin
   if GetDefaultOrdValue <> NoDefaultValue then
     Dec(Index);
   R := ARect;
   x := R.Bottom - R.Top - 2;
+  if (pedsInComboList in AState) and not (pedsInEdit in AState) then
+  begin
+    OldColor := ACanvas.Brush.Color;
+    if pedsSelected in AState then
+      ACanvas.Brush.Color := clHighlight
+    else
+      ACanvas.Brush.Color := clWhite;
+    ACanvas.FillRect(R);
+    ACanvas.Brush.Color := OldColor;
+  end;
   if Assigned(FImages) and Assigned(FImageCache)
   and (Index >= 0) and (Index < FImages.Images.Count) then
   begin
-    if (pedsInComboList in AState) and not (pedsInEdit in AState) then
-    begin
-      OldColor := ACanvas.Brush.Color;
-      if pedsSelected in AState then
-        ACanvas.Brush.Color := clHighlight
-      else
-        ACanvas.Brush.Color := clWhite;
-      ACanvas.FillRect(R);
-      ACanvas.Brush.Color := OldColor;
-    end;
-
-    png := FImageCache.GetImageAsPNG(FAssetsPath + FImages.Images[Index]);
-    ACanvas.StretchDraw(Rect(R.Left+1, R.Top+1, R.Left+x+1, R.Top+x+1), png);
+    bmp := FImageCache.GetImageAsBMP(FAssetsPath + FImages.Images[Index]);
+    ACanvas.StretchDraw(Rect(R.Left+1, R.Top+1, R.Left+x+1, R.Top+x+1), bmp);
   end;
   R.Left := R.Left + x + 3;
   inherited ListDrawValue(CurValue, Index, ACanvas, R, AState);
@@ -629,7 +628,10 @@ begin
       fn, d.ImageCache);
     try
       if TheDialog.ShowModal = mrOK then
+      begin
         jImageList(GetComponent).Images.Assign(TheDialog.ImageList);
+        Modified;
+      end;
     finally
       TheDialog.Free;
     end;
