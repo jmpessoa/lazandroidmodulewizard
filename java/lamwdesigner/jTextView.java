@@ -38,6 +38,8 @@ public class jTextView extends TextView {
     int marginTop = 5;
     int marginRight = 5;
     int marginBottom = 5;
+    private int lgravity = Gravity.TOP | Gravity.START;
+    private float lweight = 0;
 
     float mTextSize = 0; //default
     int mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_SP; //default
