@@ -32,6 +32,7 @@ import android.widget.TextView;
 //import android.widget.AdapterView.OnItemClickListener;
 import android.widget.Spinner;
 import android.widget.RelativeLayout;
+import android.widget.RelativeLayout.LayoutParams;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.view.Gravity;
@@ -135,11 +136,11 @@ class jArrayAdapter extends ArrayAdapter {
 					AbsListView.LayoutParams.WRAP_CONTENT); //w, h
 			listLayout.setLayoutParams(lparam);
 
-			LayoutParams imgParam = null;
+			RelativeLayout.LayoutParams imgParam = null;
 			ImageView itemImage = null;
 
 			if (items.get(position).bmp !=  null) {
-				imgParam = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT); //w,h
+				imgParam = new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT); //w,h
 				itemImage = new ImageView(ctx);
 				itemImage.setId(position);
 				itemImage.setImageBitmap(items.get(position).bmp);
