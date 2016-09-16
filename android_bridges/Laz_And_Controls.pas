@@ -1370,11 +1370,13 @@ type
     FPaintStyle: TPaintStyle;
     FPaintTextSize: single;
     FPaintColor: TARGBColorBridge;
+    FTypeface: TFontFace;
 
     Procedure setStrokeWidth       (Value : single );
     Procedure setStyle             (Value : TPaintStyle{integer});
     Procedure setColor             (Value : TARGBColorBridge);
     Procedure setTextSize          (Value : single );
+    Procedure setTypeface          (Value : TFontFace);
 
   protected
   public
@@ -1389,23 +1391,27 @@ type
     Procedure drawPoint            (x1,y1 : single);
     Procedure drawText             (Text : String; x,y : single);
 
+    procedure drawCircle(_cx: single; _cy: single; _radius: single);
+    procedure drawOval(_left, _top, _right, _bottom: single);
+    procedure drawBackground(_color: integer);
+    procedure drawRect(_left, _top, _right, _bottom: single);
+    procedure drawRoundRect(_left, _top, _right, _bottom, _rx, _ry: single);
+
     Procedure DrawBitmap(bmp: jObject; b,l,r,t: integer); overload;
-
     Procedure DrawBitmap(bmp: jBitmap; x1, y1, size: integer; ratio: single); overload;
-
     Procedure DrawBitmap(bmp: jObject; x1, y1, size: integer; ratio: single); overload;
-
     Procedure DrawBitmap(bmp: jBitmap; b,l,r,t: integer); overload;
-
     procedure DrawBitmap(_bitmap: jObject; _width: integer; _height: integer); overload;
 
     // Property
     property  JavaObj : jObject read FjObject;
   published
     property PaintStrokeWidth: single read FPaintStrokeWidth write setStrokeWidth;
-    property PaintStyle: TPaintStyle read FPaintStyle write SetStyle;
-    property PaintTextSize: single read FPaintTextSize write SetTextSize;
-    property PaintColor: TARGBColorBridge read FPaintColor write SetColor;
+    property PaintStyle: TPaintStyle read FPaintStyle write setStyle;
+    property PaintTextSize: single read FPaintTextSize write setTextSize;
+    property PaintColor: TARGBColorBridge read FPaintColor write setColor;
+    property Typeface: TFontFace read FTypeFace write setTypeFace;
+
   end;
 
   jView = class(jVisualControl)
@@ -7482,7 +7488,6 @@ end;
 //------------------------------------------------------------------------------
 // jCanvas
 //------------------------------------------------------------------------------
-
 constructor jCanvas.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
@@ -7547,6 +7552,20 @@ begin
      jCanvas_setTextSize(FjEnv, FjObject ,FPaintTextSize);
 end;
 
+procedure jCanvas.SetTypeface(Value: TFontFace);
+begin
+  //in designing component state: set value here...
+  FTypeFace:= Value;
+  if FInitialized then
+     jCanvas_SetTypeface(FjEnv, FjObject, Ord(FTypeFace));
+end;
+
+Procedure jCanvas.drawText(Text: string; x,y: single);
+begin
+  if FInitialized then
+     jCanvas_drawText(FjEnv, FjObject ,text,x,y);
+end;
+
 Procedure jCanvas.DrawLine(x1,y1,x2,y2 : single);
 begin
   if FInitialized then
@@ -7559,11 +7578,36 @@ begin
      jCanvas_drawPoint(FjEnv, FjObject ,x1,y1);
 end;
 
-Procedure jCanvas.drawText(Text: string; x,y: single);
+procedure jCanvas.drawCircle(_cx: single; _cy: single; _radius: single);
 begin
   if FInitialized then
-     jCanvas_drawText(FjEnv, FjObject ,text,x,y);
+     jCanvas_drawCircle(FjEnv, FjObject , _cx, _cy, _radius);
 end;
+
+procedure jCanvas.drawOval(_left, _top, _right, _bottom: single);
+begin
+  if FInitialized then
+     jCanvas_drawOval(FjEnv, FjObject , _left, _top, _right, _bottom);
+end;
+
+procedure jCanvas.drawBackground(_color: integer);
+begin
+  if FInitialized then
+     jCanvas_drawBackground(FjEnv, FjObject ,_color);
+end;
+
+procedure jCanvas.drawRect(_left, _top, _right, _bottom: single);
+begin
+  if FInitialized then
+     jCanvas_drawRect(FjEnv, FjObject , _left, _top, _right, _bottom);
+end;
+
+procedure jCanvas.drawRoundRect(_left, _top, _right, _bottom, _rx, _ry: single);
+begin
+  if FInitialized then
+     jCanvas_drawRoundRect(FjEnv, FjObject , _left, _top, _right, _bottom, _rx, _ry);
+end;
+
 
 Procedure jCanvas.DrawBitmap(bmp: jObject; b,l,r,t: integer);
 begin

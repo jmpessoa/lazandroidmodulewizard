@@ -695,21 +695,41 @@ Procedure jCanvas_setStyle             (env:PJNIEnv;
 Procedure jCanvas_setColor             (env:PJNIEnv;
                                         Canv : jObject; color : DWord  );
 
+Procedure jCanvas_drawBackground       (env:PJNIEnv;
+                                        Canv : jObject; _color : DWord);
+
 Procedure jCanvas_setTextSize          (env:PJNIEnv;
                                         Canv : jObject; textsize : single);
+
+Procedure jCanvas_SetTypeface          (env:PJNIEnv;
+                                        Canv : jObject; _typeface: integer);
+
+Procedure jCanvas_drawText             (env:PJNIEnv;
+                                        Canv : jObject; const text : string; x, y : single);
+
 Procedure jCanvas_drawLine             (env:PJNIEnv;
                                         Canv : jObject; x1,y1,x2,y2 : single);
 // LORDMAN 2013-08-13
-Procedure jCanvas_drawPoint           (env:PJNIEnv; Canv:jObject; x1,y1:single);
+Procedure jCanvas_drawPoint            (env:PJNIEnv;
+                                        Canv:jObject; x1,y1:single);
 
-Procedure jCanvas_drawText             (env:PJNIEnv;
-                                        Canv : jObject; const text : string; x,y : single);
+Procedure jCanvas_drawCircle           (env:PJNIEnv;
+                                        Canv : jObject; _cx, _cy, _radius : single);
+
+Procedure jCanvas_drawOval             (env:PJNIEnv;
+                                        Canv : jObject; _left, _top, _right, _bottom : single);
+
+Procedure jCanvas_drawRect             (env:PJNIEnv;
+                                        Canv : jObject; _left, _top, _right, _bottom : single);
+
+Procedure jCanvas_drawRoundRect        (env:PJNIEnv;
+                                        Canv : jObject; _left, _top, _right, _bottom, _rx, _ry : single);
 
 Procedure jCanvas_drawBitmap           (env:PJNIEnv;
                                         Canv : jObject; bmp : jObject; left, top, right, bottom : integer); overload;
 
-procedure jCanvas_drawBitmap(env: PJNIEnv; _jcanvas: JObject; _bitmap: jObject; _width: integer; _height: integer); overload;
-
+procedure jCanvas_drawBitmap           (env: PJNIEnv;
+                                        _jcanvas: JObject; _bitmap: jObject; _width: integer; _height: integer); overload;
 
 // Bitmap
 Function  jBitmap_Create               (env:PJNIEnv;
@@ -5498,8 +5518,7 @@ _jMethod:= env^.GetMethodID(env, cls, 'setStyle', '(I)V');
  env^.DeleteLocalRef(env, cls);
 end;
 
-Procedure jCanvas_setColor(env:PJNIEnv;
-                                        Canv : jObject; color : DWord  );
+Procedure jCanvas_setColor(env:PJNIEnv; Canv : jObject; color : DWord  );
 var
  _jMethod : jMethodID = nil;
  _jParams : Array[0..0] of jValue;
@@ -5512,9 +5531,20 @@ _jMethod:= env^.GetMethodID(env, cls, 'setColor', '(I)V');
  env^.DeleteLocalRef(env, cls);
 end;
 
+Procedure jCanvas_drawBackground(env:PJNIEnv; Canv : jObject; _color : DWord);
+var
+ _jMethod : jMethodID = nil;
+ _jParams : Array[0..0] of jValue;
+ cls: jClass;
+begin
+ _jParams[0].i := _color;
+ cls := env^.GetObjectClass(env, Canv);
+ _jMethod:= env^.GetMethodID(env, cls, 'drawBackground', '(I)V');
+ env^.CallVoidMethodA(env,Canv,_jMethod,@_jParams);
+ env^.DeleteLocalRef(env, cls);
+end;
 
-Procedure jCanvas_setTextSize(env:PJNIEnv;
-                                        Canv : jObject; textsize : single );
+Procedure jCanvas_setTextSize(env:PJNIEnv; Canv : jObject; textsize : single );
 Var
  _jMethod : jMethodID = nil;
  _jParams : Array[0..0] of jValue;
@@ -5527,8 +5557,36 @@ _jMethod:= env^.GetMethodID(env, cls, 'setTextSize', '(F)V');
  env^.DeleteLocalRef(env, cls);
 end;
 
-Procedure jCanvas_drawLine(env:PJNIEnv;
-                                        Canv : jObject; x1,y1,x2,y2 : single);
+Procedure jCanvas_SetTypeface(env:PJNIEnv; Canv : jObject; _typeface: integer);
+var
+  _jMethod : jMethodID = nil;
+  _jParams : Array[0..0] of jValue;
+  cls: jClass;
+begin
+  _jParams[0].i := _typeface;
+  cls := env^.GetObjectClass(env, Canv);
+  _jMethod:= env^.GetMethodID(env, cls, 'setTypeface', '(I)V');
+  env^.CallVoidMethodA(env,Canv,_jMethod,@_jParams);
+  env^.DeleteLocalRef(env, cls);
+end;
+
+Procedure jCanvas_drawText(env:PJNIEnv; Canv : jObject; const text : string; x,y : single);
+var
+ _jMethod : jMethodID = nil;
+ _jParams : Array[0..2] of jValue;
+ cls: jClass;
+begin
+ _jParams[0].l := env^.NewStringUTF(env, pchar(text) );
+ _jParams[1].F := x;
+ _jParams[2].F := y;
+ cls := env^.GetObjectClass(env, Canv);
+ _jMethod:= env^.GetMethodID(env, cls, 'drawText', '(Ljava/lang/String;FF)V');
+ env^.CallVoidMethodA(env,Canv,_jMethod,@_jParams);
+ env^.DeleteLocalRef(env,_jParams[0].l);
+ env^.DeleteLocalRef(env, cls);
+end;
+
+Procedure jCanvas_drawLine(env:PJNIEnv; Canv : jObject; x1,y1,x2,y2 : single);
 var
  _jMethod: jMethodID = nil;
  _jParams: Array[0..3] of jValue;
@@ -5548,35 +5606,83 @@ end;
 
 Procedure jCanvas_drawPoint(env:PJNIEnv; Canv:jObject; x1,y1:single);
 var
-_jMethod : jMethodID = nil;
-_jParams : Array[0..1] of jValue;
-cls: jClass;
+ _jMethod : jMethodID = nil;
+ _jParams : Array[0..1] of jValue;
+ cls: jClass;
 begin
-_jParams[0].F := x1;
-_jParams[1].F := y1;
-cls := env^.GetObjectClass(env, Canv);
-_jMethod:= env^.GetMethodID(env, cls, 'drawPoint', '(FF)V');
-env^.CallVoidMethodA(env,Canv,_jMethod,@_jParams);
-env^.DeleteLocalRef(env, cls);
+ _jParams[0].F := x1;
+ _jParams[1].F := y1;
+ cls := env^.GetObjectClass(env, Canv);
+ _jMethod:= env^.GetMethodID(env, cls, 'drawPoint', '(FF)V');
+ env^.CallVoidMethodA(env,Canv,_jMethod,@_jParams);
+ env^.DeleteLocalRef(env, cls);
 end;
 
-Procedure jCanvas_drawText             (env:PJNIEnv;
-                                        Canv : jObject; const text : string; x,y : single);
+Procedure jCanvas_drawCircle(env:PJNIEnv; Canv : jObject; _cx, _cy, _radius : single);
 var
  _jMethod : jMethodID = nil;
  _jParams : Array[0..2] of jValue;
  cls: jClass;
 begin
- _jParams[0].l := env^.NewStringUTF(env, pchar(text) );
- _jParams[1].F := x;
- _jParams[2].F := y;
+ _jParams[0].F := _cx;
+ _jParams[1].F := _cy;
+ _jParams[2].F := _radius;
  cls := env^.GetObjectClass(env, Canv);
- _jMethod:= env^.GetMethodID(env, cls, 'drawText', '(Ljava/lang/String;FF)V');
+ _jMethod:= env^.GetMethodID(env, cls, 'drawCircle', '(FFF)V');
  env^.CallVoidMethodA(env,Canv,_jMethod,@_jParams);
- env^.DeleteLocalRef(env,_jParams[0].l);
  env^.DeleteLocalRef(env, cls);
 end;
 
+Procedure jCanvas_drawOval(env:PJNIEnv; Canv : jObject; _left, _top, _right, _bottom : single);
+var
+ _jMethod : jMethodID = nil;
+ _jParams : Array[0..3] of jValue;
+ cls: jClass;
+begin
+ _jParams[0].F := _left;
+ _jParams[1].F := _top;
+ _jParams[2].F := _right;
+ _jParams[3].F := _bottom;
+ cls := env^.GetObjectClass(env, Canv);
+ _jMethod:= env^.GetMethodID(env, cls, 'drawOval', '(FFFF)V');
+ env^.CallVoidMethodA(env,Canv,_jMethod,@_jParams);
+ env^.DeleteLocalRef(env, cls);
+end;
+
+
+Procedure jCanvas_drawRect(env:PJNIEnv; Canv : jObject; _left, _top, _right, _bottom : single);
+var
+ _jMethod : jMethodID = nil;
+ _jParams : Array[0..3] of jValue;
+ cls: jClass;
+begin
+ _jParams[0].F := _left;
+ _jParams[1].F := _top;
+ _jParams[2].F := _right;
+ _jParams[3].F := _bottom;
+ cls := env^.GetObjectClass(env, Canv);
+ _jMethod:= env^.GetMethodID(env, cls, 'drawRect', '(FFFF)V');
+ env^.CallVoidMethodA(env,Canv,_jMethod,@_jParams);
+ env^.DeleteLocalRef(env, cls);
+end;
+
+Procedure jCanvas_drawRoundRect(env:PJNIEnv; Canv : jObject; _left, _top, _right, _bottom, _rx, _ry : single);
+var
+ _jMethod : jMethodID = nil;
+ _jParams : Array[0..5] of jValue;
+ cls: jClass;
+begin
+ _jParams[0].F := _left;
+ _jParams[1].F := _top;
+ _jParams[2].F := _right;
+ _jParams[3].F := _bottom;
+ _jParams[4].F := _rx;
+ _jParams[5].F := _ry;
+ cls := env^.GetObjectClass(env, Canv);
+ _jMethod:= env^.GetMethodID(env, cls, 'drawRoundRect', '(FFFFFF)V');
+ env^.CallVoidMethodA(env,Canv,_jMethod,@_jParams);
+ env^.DeleteLocalRef(env, cls);
+end;
 
 Procedure jCanvas_drawBitmap(env:PJNIEnv; Canv : jObject; bmp : jObject; left, top, right, bottom: integer);
 var

@@ -6,6 +6,8 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Rect;
+import android.graphics.RectF;
+import android.graphics.Typeface;
 
 public class jCanvas {
 	//Java-Pascal Interface
@@ -47,16 +49,51 @@ public class jCanvas {
 		paint.setColor(color);
 	}
 
+	public void drawBackground(int _color) {
+		canvas.drawColor(_color);
+	}
+
 	public  void setTextSize(float textsize) {
 		paint.setTextSize(textsize);
+	}
+
+	public  void setTypeface(int _typeface) {
+		Typeface t = null;
+		switch (_typeface) {
+			case 0: t = Typeface.DEFAULT; break;
+			case 1: t = Typeface.SANS_SERIF; break;
+			case 2: t = Typeface.SERIF; break;
+			case 3: t = Typeface.MONOSPACE; break;
+		}
+		paint.setTypeface(t);
+	}
+
+	public  void drawText(String text, float x, float y ) {
+		canvas.drawText(text,x,y,paint);
+	}
+
+	public void drawPoint(float _x1, float _y1) {
+		canvas.drawPoint(_x1,_y1,paint);
+	}
+
+	public void drawCircle(float _cx, float _cy, float _radius) {
+		canvas.drawCircle(_cx, _cy, _radius, paint);
+	}
+
+	public void drawOval(float _left, float _top, float _right, float _bottom) {
+		canvas.drawOval(new RectF(_left, _top, _right, _bottom), paint);
 	}
 
 	public  void drawLine(float x1, float y1, float x2, float y2) {
 		canvas.drawLine(x1,y1,x2,y2,paint);
 	}
 
-	public  void drawText(String text, float x, float y ) {
-		canvas.drawText(text,x,y,paint);
+	public void drawRect(float _left, float _top, float _right, float _bottom) {
+		canvas.drawRect(_left, _top, _right, _bottom, paint);
+	}
+
+	public void drawRoundRect(float _left, float _top, float _right, float _bottom, float _rx, float _ry) {
+		canvas.drawRoundRect(new RectF(_left, _top, _right, _bottom), _rx, _ry, paint);
 	}
 
 	private Bitmap GetResizedBitmap(Bitmap _bmp, int _newWidth, int _newHeight){
