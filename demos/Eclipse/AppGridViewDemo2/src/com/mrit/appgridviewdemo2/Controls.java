@@ -1,6 +1,6 @@
-package com.example.applistviewdemo;
+package com.mrit.appgridviewdemo2;
 
-//LAMW: Lazarus Android Module Wizard  - version 0.7 - rev. 0.3 - 13 September - 2016 
+//LAMW: Lazarus Android Module Wizard  - version 0.7 - rev. 0.1 - 13 July - 2016 
 //RAD Android: Project Wizard, Form Designer and Components Development Model!
 
 //https://github.com/jmpessoa/lazandroidmodulewizard
@@ -889,16 +889,6 @@ public void ToggleSoftInput() {
 	  imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
 }
 
-public void HideSoftInput() {
-	  InputMethodManager imm =(InputMethodManager) controls.activity.getSystemService(Context.INPUT_METHOD_SERVICE);
-	  imm.toggleSoftInput(InputMethodManager.RESULT_HIDDEN, 0);
-}
-
-public void ShowSoftInput() {
-	  InputMethodManager imm =(InputMethodManager) controls.activity.getSystemService(Context.INPUT_METHOD_SERVICE);
-	  imm.toggleSoftInput(InputMethodManager.RESULT_SHOWN, 0);
-}
-
 //thanks to Mladen
 public String GetDeviceModel() {
   return android.os.Build.MODEL;  
@@ -989,7 +979,6 @@ public native void pAppOnViewClick(View view, int id);
 public native void pAppOnListItemClick(AdapterView adapter, View view, int position, int id);
 public native void pOnFlingGestureDetected(long pasobj, int direction);
 public native void pOnPinchZoomGestureDetected(long pasobj, float scaleFactor, int state);
-public native void pOnLostFocus(long pasobj, String text);
  
 //Load Pascal Library
 static {
@@ -1612,5 +1601,29 @@ public String jCamera_takePhoto(String path, String filename, int requestCode) {
 //-------------------------------------------------------------------------------------------------------
 //SMART LAMW DESIGNER
 //-------------------------------------------------------------------------------------------------------
+
+public  java.lang.Object jButton_Create(long pasobj ) {
+  return (java.lang.Object)( new jButton(this.activity,this,pasobj));
+}
+
+public java.lang.Object jEditText_Create(long pasobj ) {
+  return (java.lang.Object)( new jEditText(this.activity,this,pasobj));
+}
+
+public java.lang.Object jGridView_jCreate(long _Self) {
+   return (java.lang.Object)(new jGridView(this,_Self));
+}
+public native void pOnClickGridItem(long pasobj, int position, String caption);
+public native void pOnLongClickGridItem(long pasobj, int position, String caption);
+public native int pOnGridDrawItemCaptionColor(long pasobj, int position, String caption);
+public native Bitmap pOnGridDrawItemBitmap(long pasobj, int position, String caption);
+
+public  java.lang.Object jPanel_Create(long pasobj ) {
+  return (java.lang.Object)(new jPanel(this.activity,this,pasobj));
+}
+
+public  java.lang.Object jTextView_Create(long pasobj) {
+  return (java.lang.Object)( new jTextView(this.activity,this,pasobj));
+}
 
 }

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="AppGridViewDemo2" default="help">
+  <property name="sdk.dir" location="C:\lamw\android-sdk-windows"/>
+  <property name="target" value="android-17"/>
+  <property file="ant.properties"/>
+  <fail message="sdk.dir is missing." unless="sdk.dir"/>
+  <import file="${sdk.dir}/tools/ant/build.xml"/>
+</project>

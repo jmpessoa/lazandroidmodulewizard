@@ -109,7 +109,7 @@ uses
    spinner, location, actionbartab, customdialog, togglebutton, switchbutton, gridview,
    sensormanager, broadcastreceiver, datepickerdialog, timepickerdialog, shellcommand,
    tcpsocketclient, surfaceview, mediaplayer, contactmanager, seekbar, ratingbar, radiogroup,
-   autocompletetextview, chronometer, activity;
+   autocompletetextview, chronometer;
 
 procedure Java_Event_pOnBluetoothEnabled(env: PJNIEnv; this: jobject; Obj: TObject);
 begin

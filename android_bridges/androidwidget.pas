@@ -595,6 +595,7 @@ type
   TOnClickCaptionItem = Procedure(Sender: TObject; itemIndex: integer; itemCaption: string) of object;
 
   TOnWidgeItemLostFocus = Procedure(Sender: TObject; itemIndex: integer; widgetText: string) of object;
+
   TOnEditLostFocus = Procedure(Sender: TObject; text: string) of object;
 
   TOnDrawItemTextColor = Procedure(Sender: TObject; itemIndex: integer; itemCaption: string; out textColor: TARGBColorBridge) of Object;
@@ -1076,6 +1077,10 @@ type
     function IsConnectedTo(_connectionType: TConnectionType): boolean;
     function IsMobileDataEnabled(): boolean;
 
+    procedure HideSoftInput();
+    procedure ShowSoftInput();
+
+
     // Property
     property View         : jObject        read FjRLayout; //layout!
 
@@ -1331,6 +1336,10 @@ end;
   function jForm_UriToString(env: PJNIEnv; _jform: JObject; _uri: jObject): string;
   function jForm_IsConnectedTo(env: PJNIEnv; _jform: JObject; _connectionType: integer): boolean;
   function jForm_IsMobileDataEnabled(env: PJNIEnv; _jform: JObject): boolean;
+
+  procedure jForm_HideSoftInput(env: PJNIEnv; _jform: JObject);
+  procedure jForm_ShowSoftInput(env: PJNIEnv; _jform: JObject);
+
 
 
 //jni API Bridge
@@ -3168,6 +3177,21 @@ begin
    Result:= jForm_IsMobileDataEnabled(FjEnv, FjObject);
 end;
 
+procedure jForm.HideSoftInput();
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jForm_HideSoftInput(FjEnv, FjObject);
+end;
+
+procedure jForm.ShowSoftInput();
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jForm_ShowSoftInput(FjEnv, FjObject);
+end;
+
+
 {-------- jForm_JNI_Bridge ----------}
 
 procedure jForm_ShowCustomMessage(env: PJNIEnv; _jform: JObject; _layout: jObject; _gravity: integer);
@@ -4095,6 +4119,29 @@ begin
   jMethod:= env^.GetMethodID(env, jCls, 'IsMobileDataEnabled', '()Z');
   jBoo:= env^.CallBooleanMethod(env, _jform, jMethod);
   Result:= boolean(jBoo);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jForm_HideSoftInput(env: PJNIEnv; _jform: JObject);
+var
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jform);
+  jMethod:= env^.GetMethodID(env, jCls, 'HideSoftInput', '()V');
+  env^.CallVoidMethod(env, _jform, jMethod);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+
+procedure jForm_ShowSoftInput(env: PJNIEnv; _jform: JObject);
+var
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jform);
+  jMethod:= env^.GetMethodID(env, jCls, 'ShowSoftInput', '()V');
+  env^.CallVoidMethod(env, _jform, jMethod);
   env^.DeleteLocalRef(env, jCls);
 end;
 
