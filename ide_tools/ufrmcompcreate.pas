@@ -1308,6 +1308,7 @@ begin
     FHackListPascalClassImpl:= TStringList.Create;
     Memo2List:= TStringList.Create;
     FImportsList:= TStringLIst.Create;
+    FImportsList.Sorted:=true;
     Self.LoadSettings(AppendPathDelim(LazarusIDE.GetPrimaryConfigPath) + 'JNIAndroidProject.ini');
     FFirstFocus:= True;
     PageControl1.ActivePage:= TabSheet1;
