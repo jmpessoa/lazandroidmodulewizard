@@ -15,7 +15,7 @@ type
   TFormWorkspace  = class(TForm)
     BitBtnCancel: TBitBtn;
     BitBtnOK: TBitBtn;
-    CheckBox2: TCheckBox;
+    CheckBoxPIE: TCheckBox;
     ComboBoxTheme: TComboBox;
     ComboSelectProjectName: TComboBox;
     EditPackagePrefaceName: TEdit;
@@ -45,11 +45,13 @@ type
     SpeedButtonHintTheme: TSpeedButton;
     StatusBarInfo: TStatusBar;
 
+    procedure CheckBoxPIEClick(Sender: TObject);
     procedure ComboBoxThemeChange(Sender: TObject);
     procedure ComboSelectProjectNameKeyPress(Sender: TObject; var Key: char);
     procedure FormActivate(Sender: TObject);
     procedure FormClose(Sender: TObject; var CloseAction: TCloseAction);
     procedure FormCreate(Sender: TObject);
+    procedure GroupBox1Click(Sender: TObject);
     procedure ListBoxMinSDKClick(Sender: TObject);
     procedure ListBoxMinSDKSelectionChange(Sender: TObject; User: boolean);
     procedure ListBoxPlatformSelectionChange(Sender: TObject; User: boolean);
@@ -103,6 +105,7 @@ type
     FIndexTargetApi: integer;
     FIndexNdkPlatformApi: integer;
     FAndroidTheme: string;
+    FPieChecked: boolean;
 
   public
     { public declarations }
@@ -147,6 +150,7 @@ type
     property ModuleType: integer read FModuleType write FModuleType;  //0: GUI project   1: NoGui project
     property SmallProjName: string read FSmallProjName write FSmallProjName;
     property AndroidTheme: string read FAndroidTheme write FAndroidTheme;
+    property PieChecked: boolean read FPieChecked write FPieChecked;
   end;
 
 
@@ -571,6 +575,12 @@ begin   //here ModuleType already know!
   end;
 end;
 
+procedure TFormWorkspace.GroupBox1Click(Sender: TObject);
+begin
+
+end;
+
+
 function TFormWorkspace.GetEventSignature(nativeMethod: string): string;
 var
   method: string;
@@ -812,12 +822,6 @@ begin
       tempList.Free;
       fileList.Free;
 
-      (*CheckBox1.Checked:= False;
-      FSupportV4:= ReadString('NewProject','SupportV4', '');
-      if FSupportV4 = 'yes' then CheckBox1.Checked:= True
-      else FSupportV4 := 'no';
-      *)
-
     finally
       Free;
     end;
@@ -979,6 +983,11 @@ begin
           ComboBoxTheme.ItemIndex:= 0; //default
         end;
   end;
+end;
+
+procedure TFormWorkspace.CheckBoxPIEClick(Sender: TObject);
+begin
+  FPieChecked:= CheckBoxPIE.Checked;
 end;
 
 procedure TFormWorkspace.ComboSelectProjectNameKeyPress(Sender: TObject;
