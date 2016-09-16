@@ -149,7 +149,7 @@ public class jRadioButton extends RadioButton {
 				//lparams.addRule(RelativeLayout.ALIGN_BASELINE, id)
 				//lparams.addRule(RelativeLayout.LEFT_OF, id); //lparams.addRule(RelativeLayout.RIGHT_OF, id)
 				for (int i = 0; i < countAnchorRule; i++) {
-					((RelativeLayout.LayoutParams)lparams)addRule(lparamsAnchorRule[i], idAnchor);
+					((RelativeLayout.LayoutParams)lparams).addRule(lparamsAnchorRule[i], idAnchor);
 				}
 			}
 			for (int j = 0; j < countParentRule; j++) {
