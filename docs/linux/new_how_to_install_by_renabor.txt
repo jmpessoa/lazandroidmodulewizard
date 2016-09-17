@@ -1,278 +1,35 @@
+# Original Author of this script: Renato Bordin
+# you can find me on http://forum.lazarus.freepascal.org as renabor
+
+# If you need to fix something and or want to contribute, send your 
+# changes to renabor at iol dot it with "new_how_to_install_by_renabor"
+# in the subject line.
+
+#############################
 How to install LAMW on Linux.
+#############################
 
-################
-Befor you begin
-################
+The old new_how_to_install_by_renabor has been converted in several scripts that, after downloading all necessary program, make your computer able to crosscompile to arm, win32, win64 and i386-android too!
 
-Replace x86_64 with i386 if your Linux distribution is not 64 bit. 
-Replace $HOME with your username !!! 
 
-Take note that fpc version for compiling the trunk version (3.1.1) is 2.6.4.
-You can download the correct version from here:
-http://packages.ubuntu.com/vivid/fpc-2.6.4
+All you have to do is run first script, "1-master-script.sh", that will call other scripts in the right sequence.
 
-[NOTE] :by tintinux
-I suppose that when fpc 3.0 or newer was installed, LAMW will work fine with the 3.0 binary compiler. 
-Can someone confirm ?
-If true, is it possible to update the documentation :
-- remove fp-compiler automatic installation in the apt-get line of documentation
-- add a note specifying the fpc version(s) required  ?
-ref. http://forum.lazarus.freepascal.org/index.php/topic,32304.0.html
-[/NOTE]
+At the end you will have:
 
-################
-install some necessary programs:
-################
+1) /etc/fpc.cfg moved to /etc/fpc.cfg.bak and substituded by a symlink
+2) ndk, sdk and lamw code placed in a new directory $HOME/Android
+3) fpc and lazarus code placed in a new directory $HOME/bin/freepascal
+4) a lot of scripts in $HOME/bin/freepascal
 
-(CMD) sudo apt-get install android-tools-adb ant fp-compiler openjdk-7-jdk subversion freeglut3 freeglut3-dev
-(CMD) sudo apt-get install libgtk2-gladexml-perl libgtk2.0-bin libgtk2.0-cil libwxgtk2.8-0 
+and a running compiled full suite of freepascal and lazarus ready to crosscompile to android!
 
-################
-initial setup
-################
+Version of software downloaded:
 
-(CMD) mkdir ~/Android
-(CMD) cd ~/Android
+ndk				android-ndk-r11c-linux-x86_64
+sdk				android-sdk_r24.4.1-linux
+fpc (fixes)			3.0.1
+lazarus 			1.7
 
-################
-install Android NDK
-################
+enjoy!
 
-Download Android NDK from https://developer.android.com/ndk/downloads/index.html#download 
-follow instruction to install it
-
-create a symbolic link for later use
-
-(CMD) ln -s /home/$HOME/Android/android-ndk-r10e /home/$HOME/Android/ndk
-
-[NOTE] :by tintinux
-$HOME variable is usually on Linux the home directory, and $USER is the username.  
-So, it is better to replace, for example:
-	(CMD) ln -s $HOME/Android/android-ndk-r10e $HOME/Android/ndk
-Or when possible:
-	(CMD) ln -s ~/Android/android-ndk-r10e ~/Android/ndk/code 
-ref. http://forum.lazarus.freepascal.org/index.php/topic,32304.0.html
-[/NOTE]
-
-################
-create symbolic link for linker
-################
-
-(CMD) cd /usr/bin
-(CMD) sudo ln -s /home/$HOME/Android/ndk/toolchains/arm-linux-androideabi-4.8/prebuilt/linux-x86_64/bin/arm-linux-androideabi-as arm-linux-androideabi-as
-(CMD) sudo ln -s /home/$HOME/Android/ndk/toolchains/arm-linux-androideabi-4.8/prebuilt/linux-x86_64/bin/arm-linux-androideabi-ld.bfd arm-linux-androideabi-ld
-(CMD) sudo ln -s /usr/bin/arm-linux-androideabi-as arm-linux-as
-(CMD) sudo ln -s /usr/bin/arm-linux-androideabi-ld arm-linux-ld
-
-################
-install Android Sdk
-################
-
-Download Android Sdk from https://developer.android.com/sdk/index.html#Other (SDK Tools Only)
-and extract it 
-
-(CMD) tar xzvf android-sdk_r24.3.4-linux.tgz
-
-create a symbolik link for later use
-
-(CMD) ln -s /home/$HOME/Android/android-sdk-linux /home/$HOME/Android/sdk
-
-################
-install SDK packages
-################
-
-Follow these instructions
-https://developer.android.com/sdk/installing/adding-packages.html
-
-and install SDK packages
-(CMD) ~/Android/sdk/tools/android sdk
-
-################
-modify your PATH
-################
-
-Add to your ~/.bashrc:
-export PATH=$PATH:~/Android/ndk/toolchains/arm-linux-androideabi-4.8/prebuilt/linux-x86_64/bin
-
-################
-download FPC and LAZARUS
-################
-
-svn co -r 49563 http://svn.freepascal.org/svn/lazarus/trunk lazarus
-svn co -r 31226 http://svn.freepascal.org/svn/fpc/trunk fpc
-
-################
-install other needed packages
-################
-(ref.: http://wiki.freepascal.org/How_to_setup_a_FPC_and_Lazarus_Ubuntu_repository)
-sudo apt-get install libgtk2.0-dev libgdk-pixbuf2.0-dev libgpm-dev fakeroot libncurses5-dev libtinfo-dev
-
-################
-BUILD FPC.DEB AND FPC-SRC.DEB
-################
-
-(CMD) cd ~/Android/lazarus/tools/install 
-(CMD) ./create_fpc_deb.sh fpc /home/$HOME/Android/fpc/
-(CMD) ./create_fpc_deb.sh fpc-src /home/$HOME/Android/fpc/
-
-################
-purge fpc from system 
-################
-
-REMOVE all fpc deb and fp_ deb (fpc, fpc-src, fp_compiler and so on)
-(EX) sudo dpkg --remove fpc* fp-*
-
-################
-INSTALL the new trunk fpc package
-################
-
-(CMD) sudo dpkg -i fpc_3.1.1-150830_amd64.deb
-(CMD) sudo dpkg -i fpc-src_3.1.1-150830_amd64.deb
-
-################
-BUILD LAZARUS.DEB AND INSTALL IT
-################
-
-(CMD) cd ~/Android/lazarus/tools/install
-(CMD) ln -s `which fpcres`
-(CMD) ./create_lazarus_deb.sh append-revision
-(CMD) sudo dpkg -i lazarus_1.5.49563-0_amd64.deb
-
-################
-BUILD THE CROSS COMPILER
-################
-
-cd ~/Android/fpc
-make clean crossall OS_TARGET=android CPU_TARGET=arm
-sudo make crossinstall OS_TARGET=android CPU_TARGET=arm INSTALL_PREFIX=/usr
-
-################
-create symbolic link for newly created arm compiler
-################
-
-(CMD) cd /usr/bin
-(CMD) sudo ln -s /usr/lib/fpc/3.1.1/ppcrossarm .
-(CMD) sudo ln -s /usr/bin/ppcrossarm ppcarm
-
-
-
-################
-update /etc/fpc.cfg
-################
-Add these lines to /etc/fpc.cfg
-
-#IFDEF ANDROID
-#IFDEF CPUARM
--Fu/usr/lib/fpc/$fpcversion/units/$fpctarget
--Fu/usr/lib/fpc/$fpcversion/units/$fpctarget/*
--Fu/usr/lib/fpc/$fpcversion/units/$fpctarget/rtl
-#ENDIF
-#ENDIF
-
-################
-install LAMW
-################
-
-(CMD) svn co https://github.com/jmpessoa/lazandroidmodulewizard.git
-(CMD) ln -s /home/$HOME/Android/svn-lazandroidmodulewizard/trunk /home/$HOME/Android/lazandroidmodulewizard
-( for further updating: cd /home/$HOME/Android/svn-lazandroidmodulewizard/ && svn up )
-
-################
-Install LAMW on Lazarus 
-################
-
-1. From Lazarus IDE - Install Wizard Packages
-  1.1 Package -> Open Package -> "tfpandroidbridge_pack.lpk"  [Android Components Bridges!]
-     1.1.1 From Package Wizard
-                                - Compile
-                                - Use -> Install
-  1.2 Package -> Open Package -> "lazandroidwizardpack.lpk"
-     1.2.1 From Package Wizard
-                                - Compile
-                                - Use -> Install
-  1.3 Package -> Open Package -> "amw_ide_tools.lpk"  [folder: ..\LazAndroidWizard\ide_tools]
-     1.3.1 From Package Wizard
-                                - Compile
-                                - Use -> Install
-
-2. From Lazarus IDE menu Tools -->> "Android Module Wizard" --> Paths Settings"
-  update paths settings according to your system
-(ref. https://jmpessoa.opendrive.com/files?Ml82Nzg4MzA1OF9yVVU3RA)
-
-     -Path to Java JDK (ex. /usr/lib/jvm/java-7-openjdk-amd64)
-     -Path to Android SDK( ex. /home/$HOME/Android/sdk)
-     -Path to Ant bin (ex. /usr/bin)
-     -Select Ndk version: [10]
-     -Path to Ndk (ex.  /home/$HOME/Android/android-ndk-r10e)
-     -Path to Java Resources  [Simonsayz's Controls.java,  *.xml and default Icons]: (ex. /home/$HOME/Android/svn-lazandroidmodulewizard/trunk/java)
-
-################
-BUILD YOUR FIRST PROJECT
-################
-
-Open a project from lazandroidmodulewizard/demos/Ant or lazandroidmodulewizard/demos/Eclipse directory
-open ~/Android/lazandroidmodulewizard/demos/Eclipse/AppDemo1/jni/controls.lpi
-from Project->Options, change/modify paths according to your system (under «paths» and «other»)
-
-(ex. for «paths» ../../../Android/android-ndk-r10e/platforms/android-21/arch-arm/usr/lib;/home/$HOME/Android/android-ndk-r10e/toolchains/arm-linux-androideabi-4.8/prebuilt/linux-x86_64/lib/gcc/arm-linux-androideabi/4.8/)
-
-(ex. for «other» -Xd -CfSoft -CpARMV6 -XParm-linux-androideabi- -FD/home/$HOME/Android/android-ndk-r10e/toolchains/arm-linux-androideabi-4.8/prebuilt/linux-x86_64/bin)
-
-build it!
-
-################
-################
-compile for ARM
-################
-################
-
-from shell
-(CMD) cd ~/Android/lazandroidmodulewizard/demos/Eclipse/AppDemo1
-
-################
-build.xml
-################
-
-<?xml version="1.0" encoding="UTF-8"?>
-<project name="AppDemo1" default="help">
-<property name="sdk.dir" location="/home/$HOME/Android/sdk"/>
-<property name="target"  value="android-19"/>
-<property file="ant.properties"/>
-<fail message="sdk.dir is missing." unless="sdk.dir"/>
-<import file="${sdk.dir}/tools/ant/build.xml"/>
-</project>
-
-################
-build.sh
-################
-edit build.sh and leave only this line:
-
-   ant -Dtouchtest.enabled=true debug
-
-################
-install.sh
-################
-
-remove content of install.sh with:
-
-/home/$HOME/Android/sdk/platform-tools/adb uninstall com.example.appdemo1
-/home/$HOME/Android/sdk/platform-tools/adb install -r bin/AppDemo1-debug.apk
-/home/$HOME/Android/sdk/platform-tools/adb logcat
-
-################
-Connect a device
-################
-
-run an emulator
-(CMD) ~/Android/sdk/tools/android avd &
-
-################
-COMPILE AND INSTALL
-################
-
-(CMD) chmod +x ./build.sh && chmod +x ./install.sh
-(CMD) ./build.sh
-(CMD) ./install.sh
-
-Enjoy!
 

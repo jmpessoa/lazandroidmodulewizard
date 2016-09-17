@@ -1,0 +1,32 @@
+#!/bin/bash
+# Original Author of this script: Renato Bordin
+# you can find me on http://forum.lazarus.freepascal.org as renabor
+
+# If you need to fix something and or want to contribute, send your 
+# changes to renabor at iol dot it with "new_how_to_install_by_renabor"
+# in the subject line.
+
+# Change the line below to define your own install folder
+
+BASE=$HOME/bin/freepascal
+FPC_STABLE=3.0.1
+FPC_TARGET=fpc_fixes_3_0
+PPC_CONFIG_PATH=$BASE/fpc-bin
+
+unlink $BASE/fpc
+ln -s $BASE/$FPC_STABLE $BASE/fpc
+
+unlink $BASE/fpc
+ln -s $BASE/$FPC_TARGET $BASE/fpc
+
+unlink $BASE/fpc-bin
+ln -s $BASE/$FPC_TARGET/bin $BASE/fpc-bin
+
+#unlink $BASE/fpc.cfg
+#ln -s $PPC_CONFIG_PATH/fpc.cfg $BASE/fpc.cfg
+#echo $PPC_CONFIG_PATH/fpc.cfg
+
+# Generate a valid fpc.cfg file
+$PPC_CONFIG_PATH/fpcmkcfg -d basepath=$BASE/fpc-$FPC_STABLE/lib/fpc/\$FPCVERSION -o $PPC_CONFIG_PATH/fpc.cfg
+
+
