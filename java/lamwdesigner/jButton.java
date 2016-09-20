@@ -1,5 +1,19 @@
-package org.lamw.lamwguiproject5;
+package org.lamw.lamwguiprojectalfred1;
 
+//common LAMW library functions
+import org.lamw.common.jLAMWcommons;
+
+
+//common LAMW library functions
+//import org.lamw.common;
+
+
+import java.lang.reflect.Field;
+
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
@@ -145,6 +159,18 @@ public class jButton extends Button {
 		this.performLongClick();
 	}
 
+	private int GetDrawableResourceId(String _resName) {
+		  try {
+		     Class<?> res = R.drawable.class;
+		     Field field = res.getField(_resName);  //"drawableName" ex. "ic_launcher"
+		     int drawableId = field.getInt(null);
+		     return drawableId;
+		  }
+		  catch (Exception e) {
+		     return 0;
+		  }
+	}
+
 	public  void SetBackgroundByResIdentifier(String _imgResIdentifier) {	   // ..res/drawable  ex. "ic_launcher"
 		this.setBackgroundResource(GetDrawableResourceId(_imgResIdentifier));			
 	}	
@@ -158,12 +184,12 @@ public class jButton extends Button {
 	protected void dispatchDraw(Canvas canvas) {
 	 	
 	    //DO YOUR DRAWING ON UNDER THIS VIEWS CHILDREN
-		controls.pOnBeforeDispatchDraw(PasObj, canvas, 1);  //handle by pascal side
+		controls.pOnBeforeDispatchDraw(jLAMWcommon.getPasObj(), canvas, 1);  //handle by pascal side
 		
 	    super.dispatchDraw(canvas);
 	    
 	    //DO YOUR DRAWING ON TOP OF THIS VIEWS CHILDREN
-	    controls.pOnAfterDispatchDraw(PasObj, canvas, 1);	 //handle by pascal side    
+	    controls.pOnAfterDispatchDraw(jLAMWcommon.getPasObj(), canvas, 1);	 //handle by pascal side    
 	}
 
 }
