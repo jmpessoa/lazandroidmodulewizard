@@ -1,4 +1,4 @@
-package com.example.appdemo1;
+package com.example.applistviewdemo;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.regex.Pattern;
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.graphics.drawable.BitmapDrawable;
@@ -775,6 +776,22 @@ public class jListView extends ListView {
 	public void setLParamHeight(int _h) {
 		lparamH = _h;
 	}
+	
+	public int getLParamHeight() {
+		int r = lparamH;		
+		if (r == android.view.ViewGroup.LayoutParams.WRAP_CONTENT) {
+			r = this.getHeight();
+		}		
+		return r;
+	}
+
+	public int getLParamWidth() {				
+		int r = lparamW;		
+		if (r == android.view.ViewGroup.LayoutParams.WRAP_CONTENT) {
+			r = this.getWidth();
+		}		
+		return r;		
+	}
 
 	public void setLGravity(int _g) {
 		lgravity = _g;
@@ -1069,6 +1086,21 @@ public class jListView extends ListView {
 
 	public void SetFontSizeUnit(int _unit) {
 		aadapter.SetFontSizeUnit(_unit);
+	}
+	
+	@Override
+	protected void dispatchDraw(Canvas canvas) {
+
+	    View c = super.getChildAt(0);
+        int scrollposition = -c.getTop() + super.getFirstVisiblePosition() * (c.getHeight()+super.getDividerHeight());			
+		
+	    //DO YOUR DRAWING ON UNDER THIS VIEWS CHILDREN
+		controls.pOnBeforeDispatchDraw(PasObj, canvas, scrollposition);  //handle by pascal side
+		
+	    super.dispatchDraw(canvas);
+	    
+	    //DO YOUR DRAWING ON TOP OF THIS VIEWS CHILDREN
+	    controls.pOnAfterDispatchDraw(PasObj, canvas,scrollposition);	 //handle by pascal side    
 	}
 
 }

@@ -1,9 +1,15 @@
-package com.example.appdemo1;
+package com.example.applistviewdemo;
+
+import java.lang.reflect.Field;
 
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
 import android.graphics.Typeface;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.text.Editable;
 import android.text.InputFilter;
 import android.text.InputType;
@@ -460,6 +466,51 @@ public class jEditText extends EditText {
 	public void SelectAll() {
 		this.selectAll();
 	}
+	
+	private int GetDrawableResourceId(String _resName) {
+		  try {
+		     Class<?> res = R.drawable.class;
+		     Field field = res.getField(_resName);  //"drawableName" ex. "ic_launcher"
+		     int drawableId = field.getInt(null);
+		     return drawableId;
+		  }
+		  catch (Exception e) {
+		     return 0;
+		  }
+	}	
+	
+	public  void SetBackgroundByResIdentifier(String _imgResIdentifier) {	   // ..res/drawable  ex. "ic_launcher"
+		this.setBackgroundResource(GetDrawableResourceId(_imgResIdentifier));
+	}		
 
+	public  void SetBackgroundByImage(Bitmap _image) {	
+		Drawable d = new BitmapDrawable(controls.activity.getResources(), _image);
+		this.setBackground(d);
+	}	
+	
+	
+	public int getLParamHeight() {
+		int r = lparamH;		
+		if (r == android.view.ViewGroup.LayoutParams.WRAP_CONTENT) {
+			r = this.getHeight();
+		}		
+		return r;
+	}
+
+	public int getLParamWidth() {				
+		int r = lparamW;		
+		if (r == android.view.ViewGroup.LayoutParams.WRAP_CONTENT) {
+			r = this.getWidth();
+		}		
+		return r;		
+	}	
+	@Override
+	protected void dispatchDraw(Canvas canvas) {
+	     //DO YOUR DRAWING ON UNDER THIS VIEWS CHILDREN
+		controls.pOnBeforeDispatchDraw(PasObj, canvas, 1);  //handle by pascal side
+	    super.dispatchDraw(canvas);
+	    //DO YOUR DRAWING ON TOP OF THIS VIEWS CHILDREN
+	    controls.pOnAfterDispatchDraw(PasObj, canvas, 1);	 //handle by pascal side    
+	}	
 }
 

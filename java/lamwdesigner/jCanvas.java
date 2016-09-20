@@ -1,4 +1,4 @@
-package com.example.appdemo1;
+package com.example.applistviewdemo;
 
 import javax.microedition.khronos.opengles.GL10;
 
@@ -28,8 +28,8 @@ public class jCanvas {
 		paint   = new Paint();
 	}
 
-	public  void setCanvas(Canvas scanvas) {
-		canvas = scanvas;
+	public  void setCanvas(Canvas _canvas) {
+		canvas = _canvas;
 	}
 
 	public  void setStrokeWidth(float width) {

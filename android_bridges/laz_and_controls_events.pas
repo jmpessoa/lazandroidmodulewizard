@@ -99,6 +99,7 @@ uses
    Procedure Java_Event_pOnClickGeneric(env: PJNIEnv; this: jobject; Obj: TObject; Value: integer);
    Procedure Java_Event_pOnClickAutoDropDownItem(env: PJNIEnv; this: jobject; Obj: TObject;index: integer; caption: JString);
    procedure Java_Event_pOnChronometerTick(env: PJNIEnv; this: jobject; Obj: TObject; elapsedTimeMillis: JLong);
+   Procedure Java_Event_pOnNumberPicker(env: PJNIEnv; this: jobject; Obj: TObject; oldValue: integer; newValue: integer);
 
 
 implementation
@@ -109,7 +110,7 @@ uses
    spinner, location, actionbartab, customdialog, togglebutton, switchbutton, gridview,
    sensormanager, broadcastreceiver, datepickerdialog, timepickerdialog, shellcommand,
    tcpsocketclient, surfaceview, mediaplayer, contactmanager, seekbar, ratingbar, radiogroup,
-   autocompletetextview, chronometer;
+   autocompletetextview, chronometer, numberpicker;
 
 procedure Java_Event_pOnBluetoothEnabled(env: PJNIEnv; this: jobject; Obj: TObject);
 begin
@@ -1166,6 +1167,17 @@ begin
   begin
     jForm(jChronometer(Obj).Owner).UpdateJNI(gApp);
     jChronometer(Obj).GenEvent_OnChronometerTick(Obj, int64(elapsedTimeMillis));
+  end;
+end;
+
+Procedure Java_Event_pOnNumberPicker(env: PJNIEnv; this: jobject; Obj: TObject; oldValue: integer; newValue: integer);
+begin
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+  if Obj is jNumberPicker then
+  begin
+    jForm(jNumberPicker(Obj).Owner).UpdateJNI(gApp);
+    jNumberPicker(Obj).GenEvent_OnNumberPicker(Obj, oldValue, newValue);
   end;
 end;
 

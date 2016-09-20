@@ -170,7 +170,7 @@ const
                                                           $0000000f
                                                           {ffffffff});
 
-  TLayoutParamsArray: array[0..1] of  DWord = ($ffffffff, $fffffffe);
+  TLayoutParamsArray: array[0..1] of  DWord = ($ffffffff, $fffffffe);  //-1 , -2
 
   TGravityArray: array[0..11] of  DWord = ($00000050,
                                           $00000011,
@@ -255,6 +255,9 @@ const
 
 
 type
+
+ TOnBeforeDispatchDraw = procedure(Obj: TObject; canvas: JObject; tag: integer) of Object;
+ TOnAfterDispatchDraw = procedure(Obj: TObject; canvas: JObject; tag: integer) of Object;
 
  TConnectionType = (ctMobile, ctWifi, ctBluetooch, ctEthernet);
 
@@ -1173,6 +1176,9 @@ type
     FLParamHeight: TLayoutParams;
 
     FOnClick: TOnNotify;
+
+    FOnBeforeDispatchDraw: TOnBeforeDispatchDraw;
+    FOnAfterDispatchDraw: TOnAfterDispatchDraw;
 
     procedure SetAnchor(Value: jVisualControl);
     procedure DefineProperties(Filer: TFiler); override;
@@ -4456,8 +4462,8 @@ end;
 function GetLayoutParamsByParent(paren: jVisualControl; lpParam: TLayoutParams;  side: TSide): DWord;
 begin
   case lpParam of
-     lpMatchParent:          Result:= TLayoutParamsArray[0];
-     lpWrapContent:          Result:= TLayoutParamsArray[1];
+     lpMatchParent:          Result:= TLayoutParamsArray[0];  //-1
+     lpWrapContent:          Result:= TLayoutParamsArray[1];  //-2
      lpTwoThirdOfParent:     Result:= Trunc((2/3)*GetParamByParentSide(paren, side)-14);
      lpOneThirdOfParent:     Result:= Trunc((1/3)*GetParamByParentSide(paren, side)-14);
 

@@ -161,6 +161,9 @@ procedure jTextView_PasteFromClipboard(env: PJNIEnv; _jtextview: JObject);
 
 procedure jTextView_SetFontSizeUnit(env: PJNIEnv; _jtextview: JObject; _unit: integer);
 
+function jTextView_getLParamWidth(env:PJNIEnv; _jtextview : jObject): integer;
+function jTextView_getLParamHeight(env:PJNIEnv; _jtextview : jObject ): integer;
+
 //-----------------------------------
 // EditText  :: changed by jmpessoa [support Api > 13]
 //--------------------------------------
@@ -240,7 +243,11 @@ procedure jEditText_PasteFromClipboard(env: PJNIEnv; _jedittext: JObject);
 procedure jEditText_SetFontSizeUnit(env: PJNIEnv; _jedittext: JObject; _unit: integer);
 procedure jEditText_SetSelectAllOnFocus(env: PJNIEnv; _jedittext: JObject; _value: boolean);
 procedure jEditText_SelectAll(env: PJNIEnv; _jedittext: JObject);
+procedure jEditText_SetBackgroundByResIdentifier(env: PJNIEnv; _jedittext: JObject; _imgResIdentifier: string);
+procedure jEditText_SetBackgroundByImage(env: PJNIEnv; _jedittext: JObject; _image: jObject);
 
+function jEditText_getLParamWidth(env:PJNIEnv; _jedittext : jObject): integer;
+function jEditText_getLParamHeight(env:PJNIEnv; _jedittext : jObject ): integer;
 
 // Button
 Function jButton_Create(env: PJNIEnv;   this:jobject; SelfObj: TObject): jObject;
@@ -275,7 +282,11 @@ procedure jButton_SetFontSizeUnit(env: PJNIEnv; _jbutton: JObject; _unit: intege
 
 procedure jButton_PerformClick(env: PJNIEnv; _jbutton: JObject);
 procedure jButton_PerformLongClick(env: PJNIEnv; _jbutton: JObject);
+procedure jButton_SetBackgroundByResIdentifier(env: PJNIEnv; _jbutton: JObject; _imgResIdentifier: string);
+procedure jButton_SetBackgroundByImage(env: PJNIEnv; _jbutton: JObject; _image: jObject);
 
+function jButton_getLParamHeight(env:PJNIEnv; _jbutton : jObject ): integer;
+function jButton_getLParamWidth(env:PJNIEnv; _jbutton : jObject): integer;
 
 // CheckBox
 Function  jCheckBox_Create            (env:PJNIEnv;  this:jobject; SelfObj: TObject ): jObject;
@@ -531,6 +542,8 @@ procedure jListView_setWidgetCheck(env: PJNIEnv; _jlistview: JObject; _value: bo
 procedure jListView_setItemTagString(env: PJNIEnv; _jlistview: JObject; _tagString: string; _index: integer);
 function  jListView_getItemTagString(env: PJNIEnv; _jlistview: JObject; _index: integer): string;
 
+function jListView_getLParamHeight(env:PJNIEnv; _jlistview : jObject ): integer;
+function jListView_getLParamWidth(env:PJNIEnv; _jlistview : jObject): integer;
 
 
 // ScrollView
@@ -730,6 +743,8 @@ Procedure jCanvas_drawBitmap           (env:PJNIEnv;
 
 procedure jCanvas_drawBitmap           (env: PJNIEnv;
                                         _jcanvas: JObject; _bitmap: jObject; _width: integer; _height: integer); overload;
+
+procedure jCanvas_setCanvas(env: PJNIEnv; _jcanvas: JObject; _canvas: jObject);
 
 // Bitmap
 Function  jBitmap_Create               (env:PJNIEnv;
@@ -1672,6 +1687,28 @@ begin
 end;
 
 
+function jTextView_getLParamHeight(env:PJNIEnv; _jtextview : jObject ): integer;
+var
+ _jMethod : jMethodID = nil;
+ cls: jClass;
+begin
+   cls := env^.GetObjectClass(env, _jtextview);
+ _jMethod:= env^.GetMethodID(env, cls, 'getLParamHeight', '()I');
+ Result:= env^.CallIntMethod(env,_jtextview,_jMethod);
+ env^.DeleteLocalRef(env, cls);
+end;
+
+function jTextView_getLParamWidth(env:PJNIEnv; _jtextview : jObject): integer;
+var
+  _jMethod : jMethodID = nil;
+  cls: jClass;
+begin
+  cls := env^.GetObjectClass(env, _jtextview);
+ _jMethod:= env^.GetMethodID(env, cls, 'getLParamWidth', '()I');
+  Result:= env^.CallIntMethod(env,_jtextview,_jMethod);
+  env^.DeleteLocalRef(env, cls);
+end;
+
 //------------------------------------------------------------------------------
 // EditText
 //------------------------------------------------------------------------------
@@ -2383,6 +2420,57 @@ begin
   env^.DeleteLocalRef(env, jCls);
 end;
 
+
+procedure jEditText_SetBackgroundByResIdentifier(env: PJNIEnv; _jedittext: JObject; _imgResIdentifier: string);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_imgResIdentifier));
+  jCls:= env^.GetObjectClass(env, _jedittext);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetBackgroundByResIdentifier', '(Ljava/lang/String;)V');
+  env^.CallVoidMethodA(env, _jedittext, jMethod, @jParams);
+  env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jEditText_SetBackgroundByImage(env: PJNIEnv; _jedittext: JObject; _image: jObject);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= _image;
+  jCls:= env^.GetObjectClass(env, _jedittext);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetBackgroundByImage', '(Landroid/graphics/Bitmap;)V');
+  env^.CallVoidMethodA(env, _jedittext, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+
+function jEditText_getLParamHeight(env:PJNIEnv; _jedittext : jObject ): integer;
+var
+ _jMethod : jMethodID = nil;
+ cls: jClass;
+begin
+   cls := env^.GetObjectClass(env, _jedittext);
+ _jMethod:= env^.GetMethodID(env, cls, 'getLParamHeight', '()I');
+ Result:= env^.CallIntMethod(env,_jedittext,_jMethod);
+ env^.DeleteLocalRef(env, cls);
+end;
+
+function jEditText_getLParamWidth(env:PJNIEnv; _jedittext : jObject): integer;
+var
+  _jMethod : jMethodID = nil;
+  cls: jClass;
+begin
+  cls := env^.GetObjectClass(env, _jedittext);
+ _jMethod:= env^.GetMethodID(env, cls, 'getLParamWidth', '()I');
+  Result:= env^.CallIntMethod(env,_jedittext,_jMethod);
+  env^.DeleteLocalRef(env, cls);
+end;
+
 //------------------------------------------------------------------------------
 // Button
 //------------------------------------------------------------------------------
@@ -2644,6 +2732,56 @@ begin
   env^.DeleteLocalRef(env, jCls);
 end;
 
+procedure jButton_SetBackgroundByResIdentifier(env: PJNIEnv; _jbutton: JObject; _imgResIdentifier: string);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_imgResIdentifier));
+  jCls:= env^.GetObjectClass(env, _jbutton);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetBackgroundByResIdentifier', '(Ljava/lang/String;)V');
+  env^.CallVoidMethodA(env, _jbutton, jMethod, @jParams);
+env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+
+procedure jButton_SetBackgroundByImage(env: PJNIEnv; _jbutton: JObject; _image: jObject);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= _image;
+  jCls:= env^.GetObjectClass(env, _jbutton);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetBackgroundByImage', '(Landroid/graphics/Bitmap;)V');
+  env^.CallVoidMethodA(env, _jbutton, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+
+function jButton_getLParamHeight(env:PJNIEnv; _jbutton : jObject ): integer;
+var
+ _jMethod : jMethodID = nil;
+ cls: jClass;
+begin
+   cls := env^.GetObjectClass(env, _jbutton);
+ _jMethod:= env^.GetMethodID(env, cls, 'getLParamHeight', '()I');
+ Result:= env^.CallIntMethod(env,_jbutton,_jMethod);
+ env^.DeleteLocalRef(env, cls);
+end;
+
+function jButton_getLParamWidth(env:PJNIEnv; _jbutton : jObject): integer;
+var
+  _jMethod : jMethodID = nil;
+  cls: jClass;
+begin
+  cls := env^.GetObjectClass(env, _jbutton);
+ _jMethod:= env^.GetMethodID(env, cls, 'getLParamWidth', '()I');
+  Result:= env^.CallIntMethod(env,_jbutton,_jMethod);
+  env^.DeleteLocalRef(env, cls);
+end;
 
 //------------------------------------------------------------------------------
 // CheckBox
@@ -4481,6 +4619,29 @@ begin
 end;
 
 
+function jListView_getLParamHeight(env:PJNIEnv; _jlistview : jObject ): integer;
+var
+ _jMethod : jMethodID = nil;
+ cls: jClass;
+begin
+   cls := env^.GetObjectClass(env, _jlistview);
+ _jMethod:= env^.GetMethodID(env, cls, 'getLParamHeight', '()I');
+ Result:= env^.CallIntMethod(env,_jlistview,_jMethod);
+ env^.DeleteLocalRef(env, cls);
+end;
+
+function jListView_getLParamWidth(env:PJNIEnv; _jlistview : jObject): integer;
+var
+  _jMethod : jMethodID = nil;
+  cls: jClass;
+begin
+  cls := env^.GetObjectClass(env, _jlistview);
+ _jMethod:= env^.GetMethodID(env, cls, 'getLParamWidth', '()I');
+  Result:= env^.CallIntMethod(env,_jlistview,_jMethod);
+  env^.DeleteLocalRef(env, cls);
+end;
+
+
 //------------------------------------------------------------------------------
 // ScrollView
 //------------------------------------------------------------------------------
@@ -5714,6 +5875,20 @@ begin
   jParams[2].i:= _height;
   jCls:= env^.GetObjectClass(env, _jcanvas);
   jMethod:= env^.GetMethodID(env, jCls, 'drawBitmap', '(Landroid/graphics/Bitmap;II)V');
+  env^.CallVoidMethodA(env, _jcanvas, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+
+procedure jCanvas_setCanvas(env: PJNIEnv; _jcanvas: JObject; _canvas: jObject);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= _canvas;
+  jCls:= env^.GetObjectClass(env, _jcanvas);
+  jMethod:= env^.GetMethodID(env, jCls, 'setCanvas', '(Landroid/graphics/Canvas;)V');
   env^.CallVoidMethodA(env, _jcanvas, jMethod, @jParams);
   env^.DeleteLocalRef(env, jCls);
 end;

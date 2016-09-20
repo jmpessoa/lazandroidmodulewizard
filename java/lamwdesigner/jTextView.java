@@ -1,8 +1,9 @@
-package com.example.appdemo1;
+package com.example.applistviewdemo;
 
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
+import android.graphics.Canvas;
 import android.graphics.Typeface;
 import android.util.TypedValue;
 import android.view.View;
@@ -274,5 +275,30 @@ public class jTextView extends TextView {
         this.setTextSize(mTextSizeTypedValue, mTextSize);
         this.setText(t);
     }
+    
+	public int getLParamHeight() {
+		int r = lparamH;		
+		if (r == android.view.ViewGroup.LayoutParams.WRAP_CONTENT) {
+			r = this.getHeight();
+		}		
+		return r;
+	}
+
+	public int getLParamWidth() {				
+		int r = lparamW;		
+		if (r == android.view.ViewGroup.LayoutParams.WRAP_CONTENT) {
+			r = this.getWidth();
+		}		
+		return r;		
+	}
+	
+	@Override
+	protected void dispatchDraw(Canvas canvas) {
+	     //DO YOUR DRAWING ON UNDER THIS VIEWS CHILDREN
+		controls.pOnBeforeDispatchDraw(PasObj, canvas, 1);  //handle by pascal side
+	    super.dispatchDraw(canvas);
+	    //DO YOUR DRAWING ON TOP OF THIS VIEWS CHILDREN
+	    controls.pOnAfterDispatchDraw(PasObj, canvas, 1);	 //handle by pascal side    
+	}
 
 }

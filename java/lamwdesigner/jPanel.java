@@ -92,11 +92,19 @@ public class jPanel extends RelativeLayout {
 	}
 
 	public int getLParamHeight() {
-		return lparamH; //getHeight();
+		int r = lparamH;		
+		if (r == android.view.ViewGroup.LayoutParams.WRAP_CONTENT) {
+			r = this.getHeight();
+		}		
+		return r;
 	}
 
-	public int getLParamWidth() {
-		return lparamW; //getWidth();
+	public int getLParamWidth() {				
+		int r = lparamW;		
+		if (r == android.view.ViewGroup.LayoutParams.WRAP_CONTENT) {
+			r = this.getWidth();
+		}		
+		return r;		
 	}
 
 	public void resetLParamsRules() {

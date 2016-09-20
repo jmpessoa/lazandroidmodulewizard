@@ -237,14 +237,20 @@ public class jImageView extends ImageView {
 		lweight = _w;
 	}
 
-	//by jmpessoa
 	public int getLParamHeight() {
-		return lparamH;
+		int r = lparamH;		
+		if (r == android.view.ViewGroup.LayoutParams.WRAP_CONTENT) {
+			r = this.getHeight();
+		}		
+		return r;
 	}
 
-	//by jmpessoa
-	public int getLParamWidth() {
-		return lparamW;
+	public int getLParamWidth() {				
+		int r = lparamW;		
+		if (r == android.view.ViewGroup.LayoutParams.WRAP_CONTENT) {
+			r = this.getWidth();
+		}		
+		return r;		
 	}
 
 	//by jmpessoa

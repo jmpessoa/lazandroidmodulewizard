@@ -740,6 +740,8 @@ type
   protected
     Procedure SetText(Value: string ); override;
     Function  GetText: string;   override;
+    function GetWidth: integer;  override;
+    function GetHeight: integer; override;
 
     procedure SetFontFace(AValue: TFontFace); //override;
     procedure SetTextTypeFace(Value: TTextTypeFace); //override;
@@ -748,6 +750,9 @@ type
 
     procedure SetViewParent(Value: jObject);  override;
     Procedure GenEvent_OnClick(Obj: TObject);
+    procedure GenEvent_OnBeforeDispatchDraw(Obj: TObject; canvas: JObject; tag: integer);
+    procedure GenEvent_OnAfterDispatchDraw(Obj: TObject; canvas: JObject; tag: integer);
+
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -763,18 +768,17 @@ type
     property Text: string read GetText write SetText;
     property Alignment : TTextAlignment read FTextAlignment write SetTextAlignment;
     property Enabled   : Boolean read FEnabled   write SetEnabled;
-
     property BackgroundColor     : TARGBColorBridge read FColor     write SetColor;
-
     property FontColor : TARGBColorBridge  read FFontColor write SetFontColor;
     property FontSize  : DWord   read FFontSize  write SetFontSize;
     property FontFace: TFontFace read FFontFace write SetFontFace default ffNormal;
     property TextTypeFace: TTextTypeFace read FTextTypeFace write SetTextTypeFace;
-
     property FontSizeUnit: TFontSizeUnit read FFontSizeUnit write SetFontSizeUnit;
 
     // Event - if enabled!
     property OnClick : TOnNotify read FOnClick   write FOnClick;
+    property OnBeforeDispatchDraw: TOnBeforeDispatchDraw read FOnBeforeDispatchDraw write FOnBeforeDispatchDraw;
+    property OnAfterDispatchDraw: TOnBeforeDispatchDraw read FOnAfterDispatchDraw write FOnAfterDispatchDraw;
   end;
 
   jEditText = class(jVisualControl)
@@ -820,6 +824,8 @@ type
   protected
     Procedure SetText(Value: string ); override;
     Function  GetText: string; override;
+    function GetWidth: integer;  override;
+    function GetHeight: integer; override;
 
     procedure SetFontFace(AValue: TFontFace); //override; 
     procedure SetTextTypeFace(Value: TTextTypeFace); //override; 
@@ -832,6 +838,9 @@ type
     Procedure GenEvent_OnChanged(Obj: TObject; txt : string; count: integer);
     Procedure GenEvent_OnClick(Obj: TObject);
     Procedure GenEvent_OnOnLostFocus(Obj: TObject; txt: string);
+
+    procedure GenEvent_OnBeforeDispatchDraw(Obj: TObject; canvas: JObject; tag: integer);
+    procedure GenEvent_OnAfterDispatchDraw(Obj: TObject; canvas: JObject; tag: integer);
 
   public
     constructor Create(AOwner: TComponent); override;
@@ -864,6 +873,8 @@ type
     procedure SetFontSizeUnit(_unit: TFontSizeUnit);
     procedure SetSelectAllOnFocus(_value: boolean);
     procedure SelectAll();
+    procedure SetBackgroundByResIdentifier(_imgResIdentifier: string);
+    procedure SetBackgroundByImage(_image: jObject);
 
     // Property
     property CursorPos : TXY        read GetCursorPos  write SetCursorPos;
@@ -898,6 +909,8 @@ type
     property OnChange: TOnChange read FOnChange write FOnChange;
     property OnChanged: TOnChange read FOnChanged write FOnChanged;
     property OnClick : TOnNotify read FOnClick   write FOnClick;
+    property OnBeforeDispatchDraw: TOnBeforeDispatchDraw read FOnBeforeDispatchDraw write FOnBeforeDispatchDraw;
+    property OnAfterDispatchDraw: TOnBeforeDispatchDraw read FOnAfterDispatchDraw write FOnAfterDispatchDraw;
 
   end;
 
@@ -911,9 +924,16 @@ type
     procedure UpdateLParamWidth;
   protected
     procedure SetViewParent(Value: jObject);  override;
+
     Procedure GenEvent_OnClick(Obj: TObject);
-    Function  GetText            : string;   override;
+    procedure GenEvent_OnBeforeDispatchDraw(Obj: TObject; canvas: JObject; tag: integer);
+    procedure GenEvent_OnAfterDispatchDraw(Obj: TObject; canvas: JObject; tag: integer);
+
+    function  GetText            : string;   override;
     Procedure SetText     (Value   : string );  override;
+    function GetWidth: integer;  override;
+    function GetHeight: integer; override;
+
   public
     constructor Create(AOwner: TComponent); override;
     Destructor  Destroy; override;
@@ -924,7 +944,8 @@ type
     procedure SetFontSizeUnit(_unit: TFontSizeUnit);
     procedure PerformClick();
     procedure PerformLongClick();
-
+    procedure SetBackgroundByResIdentifier(_imgResIdentifier: string);
+    procedure SetBackgroundByImage(_image: jObject);
 
   published
     property Text: string read GetText write SetText;
@@ -932,8 +953,12 @@ type
     property FontColor : TARGBColorBridge read FFontColor write SetFontColor;
     property FontSize  : DWord     read FFontSize  write SetFontSize;
     property FontSizeUnit: TFontSizeUnit read FFontSizeUnit write SetFontSizeUnit;
+
     // Event
     property OnClick   : TOnNotify read FOnClick   write FOnClick;
+    property OnBeforeDispatchDraw: TOnBeforeDispatchDraw read FOnBeforeDispatchDraw write FOnBeforeDispatchDraw;
+    property OnAfterDispatchDraw: TOnBeforeDispatchDraw read FOnAfterDispatchDraw write FOnAfterDispatchDraw;
+
   end;
 
   jCheckBox = class(jVisualControl)
@@ -1171,14 +1196,19 @@ type
     procedure SetFontFace(AValue: TFontFace);
 
   protected
+    function GetWidth: integer;  override;
+    function GetHeight: integer; override;
+
     procedure SetViewParent(Value: jObject);  override;
     procedure GenEvent_OnClickWidgetItem(Obj: TObject; index: integer; checked: boolean);
-
     procedure GenEvent_OnClickCaptionItem(Obj: TObject; index: integer; caption: string);
     procedure GenEvent_OnLongClickCaptionItem(Obj: TObject; index: integer; caption: string);
     procedure GenEvent_OnDrawItemCaptionColor(Obj: TObject; index: integer; caption: string;  out color: dword);
     procedure GenEvent_OnDrawItemBitmap(Obj: TObject; index: integer; caption: string;  out bitmap: JObject);
     procedure GenEvent_OnWidgeItemLostFocus(Obj: TObject; index: integer; caption: string);
+
+    procedure GenEvent_OnBeforeDispatchDraw(Obj: TObject; canvas: JObject; scrollposition: integer);
+    procedure GenEvent_OnAfterDispatchDraw(Obj: TObject; canvas: JObject; scrollposition: integer);
 
     procedure Notification(AComponent: TComponent; Operation: TOperation); override;
   public
@@ -1222,7 +1252,6 @@ type
     procedure SetItemTagString(_tagString: string; _index: integer);
     function GetItemTagString(_index: integer): string;
 
-
     //Property
     property setItemIndex: TXY write SetItemPosition;
     property Count: integer read GetCount;
@@ -1251,6 +1280,10 @@ type
     property OnLongClickItem: TOnClickCaptionItem read FOnLongClickItem write FOnLongClickItem;
     property OnDrawItemTextColor: TOnDrawItemTextColor read FOnDrawItemTextColor write FOnDrawItemTextColor;
     property OnDrawItemBitmap: TOnDrawItemBitmap  read FOnDrawItemBitmap write FOnDrawItemBitmap;
+
+    property OnBeforeDispatchDraw: TOnBeforeDispatchDraw read FOnBeforeDispatchDraw write FOnBeforeDispatchDraw;
+    property OnAfterDispatchDraw: TOnAfterDispatchDraw read FOnAfterDispatchDraw write FOnAfterDispatchDraw;
+
   end;
 
   jScrollView = class(jVisualControl)
@@ -1373,7 +1406,7 @@ type
     FTypeface: TFontFace;
 
     Procedure setStrokeWidth       (Value : single );
-    Procedure setStyle             (Value : TPaintStyle{integer});
+    Procedure setStyle             (Value : TPaintStyle);
     Procedure setColor             (Value : TARGBColorBridge);
     Procedure setTextSize          (Value : single );
     Procedure setTypeface          (Value : TFontFace);
@@ -1403,8 +1436,11 @@ type
     Procedure DrawBitmap(bmp: jBitmap; b,l,r,t: integer); overload;
     procedure DrawBitmap(_bitmap: jObject; _width: integer; _height: integer); overload;
 
+    procedure SetCanvas(_canvas: jObject);
+
     // Property
     property  JavaObj : jObject read FjObject;
+
   published
     property PaintStrokeWidth: single read FPaintStrokeWidth write setStrokeWidth;
     property PaintStyle: TPaintStyle read FPaintStyle write setStyle;
@@ -1602,6 +1638,9 @@ type
   function  Java_Event_pOnListViewDrawItemCaptionColor(env: PJNIEnv; this: jobject; Obj: TObject; index: integer; caption: JString): JInt;
   function  Java_Event_pOnListViewDrawItemBitmap(env: PJNIEnv; this: jobject; Obj: TObject; index: integer; caption: JString): JObject;
   procedure Java_Event_pOnWidgeItemLostFocus(env: PJNIEnv; this: jobject; Obj: TObject; index: integer;  caption: JString);
+
+  procedure Java_Event_pOnBeforedispatchDraw(env: PJNIEnv; this: jobject; Obj: TObject; canvas: JObject; tag: integer);
+  procedure Java_Event_pOnAfterdispatchDraw(env: PJNIEnv; this: jobject; Obj: TObject; canvas: JObject; tag: integer);
 
   Procedure Java_Event_pOnChange(env: PJNIEnv; this: jobject; Obj: TObject; txt: JString; count : integer);
   Procedure Java_Event_pOnChanged(env: PJNIEnv; this: jobject; Obj: TObject; txt: JString; count : integer);
@@ -2127,6 +2166,64 @@ begin
   end;
 end;
 
+procedure Java_Event_pOnBeforeDispatchDraw(env: PJNIEnv; this: jobject; Obj: TObject; canvas: JObject; tag: integer);
+begin
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+  if Obj is jListView then
+  begin
+    jForm(jListVIew(Obj).Owner).UpdateJNI(gApp);
+    jListVIew(Obj).GenEvent_OnBeforeDispatchDraw(Obj, canvas, tag);
+    Exit;
+  end;
+  if Obj is jTextView then
+  begin
+    jForm(jTextView(Obj).Owner).UpdateJNI(gApp);
+    jTextView(Obj).GenEvent_OnBeforeDispatchDraw(Obj, canvas, tag);
+    Exit;
+  end;
+  if Obj is jEditText then
+  begin
+    jForm(jEditText(Obj).Owner).UpdateJNI(gApp);
+    jEditText(Obj).GenEvent_OnBeforeDispatchDraw(Obj, canvas, tag);
+    Exit;
+  end;
+  if Obj is jButton then
+  begin
+    jForm(jButton(Obj).Owner).UpdateJNI(gApp);
+    jButton(Obj).GenEvent_OnBeforeDispatchDraw(Obj, canvas, tag);
+  end;
+end;
+
+procedure Java_Event_pOnAfterDispatchDraw(env: PJNIEnv; this: jobject; Obj: TObject; canvas: JObject; tag: integer);
+begin
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+  if Obj is jListView then
+  begin
+    jForm(jListVIew(Obj).Owner).UpdateJNI(gApp);
+    jListVIew(Obj).GenEvent_OnAfterDispatchDraw(Obj, canvas, tag);
+    Exit;
+  end;
+  if Obj is jTextView then
+  begin
+    jForm(jTextView(Obj).Owner).UpdateJNI(gApp);
+    jTextView(Obj).GenEvent_OnAfterDispatchDraw(Obj, canvas, tag);
+    Exit;
+  end;
+  if Obj is jEditText then
+  begin
+    jForm(jEditText(Obj).Owner).UpdateJNI(gApp);
+    jEditText(Obj).GenEvent_OnAfterDispatchDraw(Obj, canvas, tag);
+    Exit;
+  end;
+  if Obj is jButton then
+  begin
+    jForm(jButton(Obj).Owner).UpdateJNI(gApp);
+    jButton(Obj).GenEvent_OnAfterDispatchDraw(Obj, canvas, tag);
+  end;
+end;
+
 Procedure Java_Event_pOnClickCaptionItem(env: PJNIEnv; this: jobject; Obj: TObject;index: integer; caption: JString);
 var
    pasCaption: string;
@@ -2169,6 +2266,7 @@ begin
     jListVIew(Obj).GenEvent_OnWidgeItemLostFocus(Obj, index, pasCaption);
   end;
 end;
+
 function  Java_Event_pOnListViewDrawItemCaptionColor(env: PJNIEnv; this: jobject; Obj: TObject; index: integer; caption: JString): JInt;
 var
   pasCaption: string;
@@ -2890,6 +2988,62 @@ begin
      jTextView_SetFontSizeUnit(FjEnv, FjObject, Ord(_unit));
 end;
 
+Procedure jTextView.GenEvent_OnBeforeDispatchDraw(Obj: TObject; canvas: jObject; tag: integer);
+begin
+  if Assigned(FOnBeforeDispatchDraw) then FOnBeforeDispatchDraw(Obj, canvas, tag);
+end;
+
+Procedure jTextView.GenEvent_OnAfterDispatchDraw(Obj: TObject; canvas: jObject; tag: integer);
+begin
+  if Assigned(FOnAfterDispatchDraw) then FOnAfterDispatchDraw(Obj, canvas, tag);
+end;
+
+function jTextView.GetWidth: integer;
+begin
+  Result:= FWidth;
+  if FInitialized then
+  begin
+     Result:= jTextView_getLParamWidth(FjEnv, FjObject );
+     if Result = -1 then //lpMatchParent
+     begin
+       if FParent is jForm then
+       begin
+         if (FParent as jForm).ScreenStyle = (FParent as jForm).ScreenStyleAtStart then
+           Result:= (FParent as jForm).ScreenWH.Width
+         else
+           Result:= (FParent as jForm).ScreenWH.Height;
+       end
+       else
+       begin
+           Result:= (FParent as jVisualControl).GetWidth;
+       end;
+     end;
+  end;
+end;
+
+function jTextView.GetHeight: integer;
+begin
+  Result:= FHeight;
+  if FInitialized then
+  begin
+     Result:= jTextView_getLParamHeight(FjEnv, FjObject );
+     if Result = -1 then //lpMatchParent
+     begin
+       if FParent is jForm then
+       begin
+          if (FParent as jForm).ScreenStyle = (FParent as jForm).ScreenStyleAtStart then
+             Result:= (FParent as jForm).ScreenWH.Height   //take from start!
+          else
+             Result:= (FParent as jForm).ScreenWH.Width;
+       end
+       else
+       begin
+          Result:= (FParent as jVisualControl).GetHeight;
+       end;
+     end;
+  end;
+end;
+
 //------------------------------------------------------------------------------
 // jEditText
 //------------------------------------------------------------------------------
@@ -3466,6 +3620,76 @@ begin
      jEditText_SelectAll(FjEnv, FjObject);
 end;
 
+procedure jEditText.SetBackgroundByResIdentifier(_imgResIdentifier: string);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jEditText_SetBackgroundByResIdentifier(FjEnv, FjObject, _imgResIdentifier);
+end;
+
+procedure jEditText.SetBackgroundByImage(_image: jObject);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jEditText_SetBackgroundByImage(FjEnv, FjObject, _image);
+end;
+
+Procedure jEditText.GenEvent_OnBeforeDispatchDraw(Obj: TObject; canvas: jObject; tag: integer);
+begin
+  if Assigned(FOnBeforeDispatchDraw) then FOnBeforeDispatchDraw(Obj, canvas, tag);
+end;
+
+Procedure jEditText.GenEvent_OnAfterDispatchDraw(Obj: TObject; canvas: jObject; tag: integer);
+begin
+  if Assigned(FOnAfterDispatchDraw) then FOnAfterDispatchDraw(Obj, canvas, tag);
+end;
+
+function jEditText.GetWidth: integer;
+begin
+  Result:= FWidth;
+  if FInitialized then
+  begin
+     Result:= jEditText_getLParamWidth(FjEnv, FjObject );
+     if Result = -1 then //lpMatchParent
+     begin
+       if FParent is jForm then
+       begin
+         if (FParent as jForm).ScreenStyle = (FParent as jForm).ScreenStyleAtStart then
+           Result:= (FParent as jForm).ScreenWH.Width
+         else
+           Result:= (FParent as jForm).ScreenWH.Height;
+       end
+       else
+       begin
+           Result:= (FParent as jVisualControl).GetWidth;
+       end;
+     end;
+  end;
+end;
+
+function jEditText.GetHeight: integer;
+begin
+  Result:= FHeight;
+  if FInitialized then
+  begin
+     Result:= jEditText_getLParamHeight(FjEnv, FjObject );
+     if Result = -1 then //lpMatchParent
+     begin
+       if FParent is jForm then
+       begin
+          if (FParent as jForm).ScreenStyle = (FParent as jForm).ScreenStyleAtStart then
+             Result:= (FParent as jForm).ScreenWH.Height   //take from start!
+          else
+             Result:= (FParent as jForm).ScreenWH.Width;
+       end
+       else
+       begin
+          Result:= (FParent as jVisualControl).GetHeight;
+       end;
+     end;
+  end;
+end;
+
 //------------------------------------------------------------------------------
 // jButton
 //------------------------------------------------------------------------------
@@ -3701,11 +3925,80 @@ begin
      jButton_PerformLongClick(FjEnv, FjObject);
 end;
 
+procedure jButton.SetBackgroundByResIdentifier(_imgResIdentifier: string);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jButton_SetBackgroundByResIdentifier(FjEnv, FjObject, _imgResIdentifier);
+end;
+
+procedure jButton.SetBackgroundByImage(_image: jObject);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jButton_SetBackgroundByImage(FjEnv, FjObject, _image);
+end;
 
 // Event : Java -> Pascal
 Procedure jButton.GenEvent_OnClick(Obj: TObject);
 begin
   if Assigned(FOnClick) then FOnClick(Obj);
+end;
+
+Procedure jButton.GenEvent_OnBeforeDispatchDraw(Obj: TObject; canvas: jObject; tag: integer);
+begin
+  if Assigned(FOnBeforeDispatchDraw) then FOnBeforeDispatchDraw(Obj, canvas, tag);
+end;
+
+Procedure jButton.GenEvent_OnAfterDispatchDraw(Obj: TObject; canvas: jObject; tag: integer);
+begin
+  if Assigned(FOnAfterDispatchDraw) then FOnAfterDispatchDraw(Obj, canvas, tag);
+end;
+
+function jButton.GetWidth: integer;
+begin
+  Result:= FWidth;
+  if FInitialized then
+  begin
+     Result:= jButton_getLParamWidth(FjEnv, FjObject );
+     if Result = -1 then //lpMatchParent
+     begin
+       if FParent is jForm then
+       begin
+         if (FParent as jForm).ScreenStyle = (FParent as jForm).ScreenStyleAtStart then
+           Result:= (FParent as jForm).ScreenWH.Width
+         else
+           Result:= (FParent as jForm).ScreenWH.Height;
+       end
+       else
+       begin
+           Result:= (FParent as jVisualControl).GetWidth;
+       end;
+     end;
+  end;
+end;
+
+function jButton.GetHeight: integer;
+begin
+  Result:= FHeight;
+  if FInitialized then
+  begin
+     Result:= jButton_getLParamHeight(FjEnv, FjObject );
+     if Result = -1 then //lpMatchParent
+     begin
+       if FParent is jForm then
+       begin
+          if (FParent as jForm).ScreenStyle = (FParent as jForm).ScreenStyleAtStart then
+             Result:= (FParent as jForm).ScreenWH.Height   //take from start!
+          else
+             Result:= (FParent as jForm).ScreenWH.Width;
+       end
+       else
+       begin
+          Result:= (FParent as jVisualControl).GetHeight;
+       end;
+     end;
+  end;
 end;
 
 //------------------------------------------------------------------------------
@@ -6135,6 +6428,16 @@ begin
   if Assigned(FOnWidgeItemLostFocus) then FOnWidgeItemLostFocus(Obj,index, caption);
 end;
 
+procedure jListView.GenEvent_OnBeforeDispatchDraw(Obj: TObject; canvas: JObject; scrollposition: integer);
+begin
+  if Assigned(FOnBeforeDispatchDraw) then FOnBeforeDispatchDraw(Obj, canvas, scrollposition);
+end;
+
+procedure jListView.GenEvent_OnAfterDispatchDraw(Obj: TObject; canvas: JObject; scrollposition: integer);
+begin
+  if Assigned(FOnAfterDispatchDraw) then FOnAfterDispatchDraw(Obj, canvas, scrollposition);
+end;
+
 procedure jListView.GenEvent_OnClickWidgetItem(Obj: TObject; index: integer; checked: boolean);
 begin
   if Assigned(FOnClickWidgetItem) then FOnClickWidgetItem(Obj,index,checked);
@@ -6250,6 +6553,51 @@ begin
    Result:= jListView_getItemTagString(FjEnv, FjObject, _index);
 end;
 
+function jListView.GetWidth: integer;
+begin
+  Result:= FWidth;
+  if FInitialized then
+  begin
+     Result:= jListView_getLParamWidth(FjEnv, FjObject );
+     if Result = -1 then //lpMatchParent
+     begin
+       if FParent is jForm then
+       begin
+         if (FParent as jForm).ScreenStyle = (FParent as jForm).ScreenStyleAtStart then
+           Result:= (FParent as jForm).ScreenWH.Width
+         else
+           Result:= (FParent as jForm).ScreenWH.Height;
+       end
+       else
+       begin
+           Result:= (FParent as jVisualControl).GetWidth;
+       end;
+     end;
+  end;
+end;
+
+function jListView.GetHeight: integer;
+begin
+  Result:= FHeight;
+  if FInitialized then
+  begin
+     Result:= jListView_getLParamHeight(FjEnv, FjObject );
+     if Result = -1 then //lpMatchParent
+     begin
+       if FParent is jForm then
+       begin
+          if (FParent as jForm).ScreenStyle = (FParent as jForm).ScreenStyleAtStart then
+             Result:= (FParent as jForm).ScreenWH.Height   //take from start!
+          else
+             Result:= (FParent as jForm).ScreenWH.Width;
+       end
+       else
+       begin
+          Result:= (FParent as jVisualControl).GetHeight;
+       end;
+     end;
+  end;
+end;
 
 //------------------------------------------------------------------------------
 // jScrollView
@@ -7493,7 +7841,7 @@ begin
   inherited Create(AOwner);
   FjObject  := nil;
   FPaintStrokeWidth:= 1;
-  FPaintStyle:= psFillAndStroke;
+  FPaintStyle:= psStroke;
   FPaintTextSize:= 20;
   FPaintColor:= colbrBlue;
   FInitialized:= False;
@@ -7531,7 +7879,7 @@ begin
      jCanvas_setStrokeWidth(FjEnv, FjObject ,FPaintStrokeWidth);
 end;
 
-Procedure jCanvas.SetStyle(Value : TPaintStyle{integer});
+Procedure jCanvas.SetStyle(Value : TPaintStyle);
 begin
   FPaintStyle:= Value;
   if FInitialized then
@@ -7650,6 +7998,12 @@ begin
      jCanvas_drawBitmap(FjEnv, FjObject, _bitmap ,_width ,_height);
 end;
 
+procedure jCanvas.SetCanvas(_canvas: jObject);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jCanvas_setCanvas(FjEnv, FjObject, _canvas);
+end;
 
 //------------------------------------------------------------------------------
 // jView

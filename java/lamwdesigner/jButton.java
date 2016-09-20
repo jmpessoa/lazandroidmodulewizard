@@ -145,4 +145,25 @@ public class jButton extends Button {
 		this.performLongClick();
 	}
 
+	public  void SetBackgroundByResIdentifier(String _imgResIdentifier) {	   // ..res/drawable  ex. "ic_launcher"
+		this.setBackgroundResource(GetDrawableResourceId(_imgResIdentifier));			
+	}	
+	
+	public  void SetBackgroundByImage(Bitmap _image) {	
+		Drawable d = new BitmapDrawable(controls.activity.getResources(), _image);
+		this.setBackground(d);
+	}
+	
+	@Override
+	protected void dispatchDraw(Canvas canvas) {
+	 	
+	    //DO YOUR DRAWING ON UNDER THIS VIEWS CHILDREN
+		controls.pOnBeforeDispatchDraw(PasObj, canvas, 1);  //handle by pascal side
+		
+	    super.dispatchDraw(canvas);
+	    
+	    //DO YOUR DRAWING ON TOP OF THIS VIEWS CHILDREN
+	    controls.pOnAfterDispatchDraw(PasObj, canvas, 1);	 //handle by pascal side    
+	}
+
 }
