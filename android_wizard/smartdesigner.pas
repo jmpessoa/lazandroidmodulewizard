@@ -63,10 +63,6 @@ uses
   CodeCache, SourceChanger, LinkScanner, Laz2_DOM, laz2_XMLRead, FileUtil,
   LazFileUtils, LamwSettings, uJavaParser, strutils;
 
-const
-  LAMW_JAVA_NAMESPACE = 'org.lamw.common';
-  LAMW_JAVA_LIBRARY = 'jLAMWcommons';
-
 function ReplaceChar(const query: string; oldchar, newchar: char): string;
 var
   i: Integer;
@@ -342,41 +338,10 @@ begin
    listRequirements:= TStringList.Create;  //android maninfest Requirements
    auxList:= TStringList.Create;
 
-   //try insert "jControl.java" in java project source
    if FileExists(LamwGlobalSettings.PathToJavaTemplates+'lamwdesigner'+DirectorySeparator +jclassname+'.java') then
    begin
      list.LoadFromFile(LamwGlobalSettings.PathToJavaTemplates+'lamwdesigner'+DirectorySeparator +jclassname+'.java');
-     if (jclassname<>LAMW_JAVA_LIBRARY) then
-     begin
-       list.Strings[0]:= 'package '+FPackageName+';';
-       if FileExists(FPathToJavaSource+LAMW_JAVA_LIBRARY+'.java') then
-       begin
-         if list.IndexOf('import '+LAMW_JAVA_NAMESPACE+'.'+LAMW_JAVA_LIBRARY+';') = -1 then
-         begin
-           list.Insert(1,'');
-           list.Insert(1,'import '+LAMW_JAVA_NAMESPACE+'.'+LAMW_JAVA_LIBRARY+';');
-           list.Insert(1,'//common LAMW library functions');
-           list.Insert(1,'');
-         end;
-       end;
-     end;
-
-     // to be decided
-     // we could add the Controls, to also include the controls variables
-     if (jclassname=LAMW_JAVA_LIBRARY) then
-     begin
-       if FileExists(FPathToJavaSource+'Controls.java') then
-       begin
-         if list.IndexOf('import '+FPackageName+'.Controls;') = -1 then
-         begin
-           list.Insert(1,'');
-           list.Insert(1,'import '+FPackageName+'.Controls;');
-           list.Insert(1,'//LAMW Controls');
-           list.Insert(1,'');
-         end;
-       end;
-     end;
-
+     list.Strings[0]:= 'package '+FPackageName+';';
      list.SaveToFile(FPathToJavaSource+jclassname+'.java');
      Result:= True;
    end;
@@ -388,7 +353,6 @@ begin
         nativeAdded:= True;
    end;
 
-   //try insert "jControl.create" constructor in "Controls.java"
    if FileExists(LamwGlobalSettings.PathToJavaTemplates+'lamwdesigner'+DirectorySeparator +jclassname+'.create') then
    begin
      list.LoadFromFile(LamwGlobalSettings.PathToJavaTemplates+'lamwdesigner'+DirectorySeparator +jclassname+'.create');
@@ -878,6 +842,14 @@ begin
       auxList.Strings[0]:= 'package '+FPackageName+';';
       auxList.SaveToFile(FPathToJavaSource+'Controls.java');
     end;
+
+    if FileExists(LamwGlobalSettings.PathToJavaTemplates+'lamwdesigner'+DirectorySeparator +'jCommons.java') then
+    begin
+      auxList.LoadFromFile(LamwGlobalSettings.PathToJavaTemplates+'lamwdesigner'+DirectorySeparator +'jCommons.java');
+      auxList.Strings[0]:= 'package '+FPackageName+';';
+      auxList.SaveToFile(FPathToJavaSource+'jCommons.java');
+    end;
+
   end;
 
   if FileExists(PathToJavaTemplates + 'Controls.native') then
@@ -891,8 +863,6 @@ begin
   jcontrolsList.Duplicates := dupIgnore;
   GetAllJControlsFromForms(jcontrolsList);
 
-  if FileExists(PathToJavaTemplates+'lamwdesigner'+PathDelim+LAMW_JAVA_LIBRARY+'.java') then
-    TryAddJControl(LAMW_JAVA_LIBRARY, nativeExists);
 
   //re-add all [updated] java code ...
   for j := 0 to jcontrolsList.Count - 1 do

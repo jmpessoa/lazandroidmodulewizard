@@ -1,13 +1,5 @@
 package org.lamw.lamwguiprojectalfred1;
 
-//common LAMW library functions
-import org.lamw.common.jLAMWcommons;
-
-
-//common LAMW library functions
-//import org.lamw.common;
-
-
 import java.lang.reflect.Field;
 
 import android.graphics.Bitmap;
@@ -36,7 +28,7 @@ public class jButton extends Button {
 	float mTextSize = 0; //default
 	int mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_SP; //default
 
-  jLAMWcommons jLAMWcommon;
+  jCommons jLAMWcommon;
 
 	public void setLeftTopRightBottomWidthHeight(int left, int top, int right, int bottom, int w, int h) {
      jLAMWcommon.setLeftTopRightBottomWidthHeight(left,top,right,bottom,w,h);
@@ -49,7 +41,7 @@ public class jButton extends Button {
 
     controls  = ctrls;
 
-    jLAMWcommon = new jLAMWcommons(this,context,pasobj);
+    jLAMWcommon = new jCommons(this,context,pasobj);
 
 		//Init Event
 		onClickListener = new OnClickListener() {

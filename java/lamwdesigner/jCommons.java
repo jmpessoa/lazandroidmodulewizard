@@ -9,7 +9,7 @@ import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.view.Gravity;
 
-public class jLAMWcommons {
+public class jCommons {
 
   // owner of this instance
 	private View aOwnerView = null;
@@ -39,7 +39,7 @@ public class jLAMWcommons {
   private boolean mRemovedFromParent = false;
 
 	//Constructor
-	public jLAMWcommons(View _view, android.content.Context _context, long _pasobj) {
+	public jCommons(View _view, android.content.Context _context, long _pasobj) {
 
     // set owner
     aOwnerView = _view;
