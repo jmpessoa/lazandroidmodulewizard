@@ -1,4 +1,4 @@
-package com.example.applistviewdemo;
+package org.lamw.appdemo1;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -1087,7 +1087,30 @@ public class jListView extends ListView {
 	public void SetFontSizeUnit(int _unit) {
 		aadapter.SetFontSizeUnit(_unit);
 	}
-	
+
+	public int getTotalHeight() {
+    int totalHeight = 0;
+    for (int i = 0; i < aadapter.getCount(); i++) {
+        View listItem = aadapter.getView(i, null, this);
+        listItem.measure(0, 0);
+        totalHeight += listItem.getMeasuredHeight();
+    }
+		return totalHeight;
+	}
+
+	public int getItemHeight(int aItemIndex) {
+    if ( (aItemIndex < aadapter.getCount()) && (aItemIndex>=0) )  {
+      View listItem = aadapter.getView(aItemIndex, null, this);
+      listItem.measure(0, 0);
+		  return (int)listItem.getMeasuredHeight();
+    } else
+    {
+      return -1;
+    }
+
+	}
+
+
 	@Override
 	protected void dispatchDraw(Canvas canvas) {
 

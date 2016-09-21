@@ -545,6 +545,9 @@ function  jListView_getItemTagString(env: PJNIEnv; _jlistview: JObject; _index: 
 function jListView_getLParamHeight(env:PJNIEnv; _jlistview : jObject ): integer;
 function jListView_getLParamWidth(env:PJNIEnv; _jlistview : jObject): integer;
 
+function  jListView_getTotalHeight(env: PJNIEnv; _jlistview: JObject): integer;
+function  jListView_getItemHeight(env: PJNIEnv; _jlistview: JObject; _index: integer): integer;
+
 
 // ScrollView
 Function  jScrollView_Create           (env:PJNIEnv;  this:jobject; SelfObj: TObject): jObject;
@@ -4640,6 +4643,29 @@ begin
   env^.DeleteLocalRef(env, cls);
 end;
 
+function jListView_getTotalHeight(env: PJNIEnv; _jlistview: JObject): integer;
+var
+ _jMethod : jMethodID = nil;
+ cls: jClass;
+begin
+ cls := env^.GetObjectClass(env, _jlistview);
+ _jMethod:= env^.GetMethodID(env, cls, 'getTotalHeight', '()I');
+ Result:= env^.CallIntMethod(env,_jlistview,_jMethod);
+ env^.DeleteLocalRef(env, cls);
+end;
+
+function jListView_getItemHeight(env: PJNIEnv; _jlistview: JObject; _index: integer): integer;
+var
+ _jMethod : jMethodID = nil;
+ cls: jClass;
+ _jParams : array[0..0] of jValue;
+begin
+ _jParams[0].i:= _index;
+ cls := env^.GetObjectClass(env, _jlistview);
+ _jMethod:= env^.GetMethodID(env, cls, 'getItemHeight', '(I)I');
+ Result:= env^.CallIntMethodA(env,_jlistview,_jMethod, @_jParams);
+ env^.DeleteLocalRef(env, cls);
+end;
 
 //------------------------------------------------------------------------------
 // ScrollView

@@ -1198,7 +1198,6 @@ type
   protected
     function GetWidth: integer;  override;
     function GetHeight: integer; override;
-
     procedure SetViewParent(Value: jObject);  override;
     procedure GenEvent_OnClickWidgetItem(Obj: TObject; index: integer; checked: boolean);
     procedure GenEvent_OnClickCaptionItem(Obj: TObject; index: integer; caption: string);
@@ -1241,6 +1240,9 @@ type
     procedure SetTextAlignByIndex(Value: TTextAlign; index: integer);
 
     procedure SetLayoutByIndex(Value: TItemLayout; index: integer);
+
+    function GetTotalHeight: integer;
+    function GetItemHeight(aItemIndex:integer): integer;
 
     function GetItemIndex(): integer;
     function GetItemCaption(): string;
@@ -6593,6 +6595,25 @@ begin
      end;
   end;
 end;
+
+function jListView.GetTotalHeight: integer;
+begin
+  Result:= FHeight;
+  if FInitialized then
+  begin
+    result:=jListView_getTotalHeight(FjEnv, FjObject);
+  end;
+end;
+
+function jListView.GetItemHeight(aItemIndex:integer): integer;
+begin
+  result:=0;
+  if FInitialized then
+  begin
+    result:=jListView_getItemHeight(FjEnv, FjObject, aItemIndex);
+  end;
+end;
+
 
 //------------------------------------------------------------------------------
 // jScrollView
