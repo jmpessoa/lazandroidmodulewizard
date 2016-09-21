@@ -1,4 +1,4 @@
-package org.lamw.lamwguiprojectalfred1;
+package com.example.applistviewdemo;
 
 import java.lang.reflect.Field;
 
@@ -20,7 +20,7 @@ public class jButton extends Button {
 
 	private OnClickListener onClickListener;   // event
 
-  private Controls controls = null;   // Control Class for Event
+    private Controls controls = null;   // Control Class for Event
 
 	int textColor;
 
@@ -28,10 +28,10 @@ public class jButton extends Button {
 	float mTextSize = 0; //default
 	int mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_SP; //default
 
-  jCommons jLAMWcommon;
+    jCommons jLAMWcommon;
 
 	public void setLeftTopRightBottomWidthHeight(int left, int top, int right, int bottom, int w, int h) {
-     jLAMWcommon.setLeftTopRightBottomWidthHeight(left,top,right,bottom,w,h);
+        jLAMWcommon.setLeftTopRightBottomWidthHeight(left,top,right,bottom,w,h);
 	}
 
 	//Constructor
@@ -39,10 +39,10 @@ public class jButton extends Button {
 					Controls ctrls,long pasobj ) {
 		super(context);
 
-    controls  = ctrls;
-
-    jLAMWcommon = new jCommons(this,context,pasobj);
-
+        controls  = ctrls;
+        
+        jLAMWcommon = new jCommons(this,context,pasobj);
+        
 		//Init Event
 		onClickListener = new OnClickListener() {
 			public  void onClick(View view) {
@@ -50,19 +50,20 @@ public class jButton extends Button {
 				controls.pOnClick(jLAMWcommon.getPasObj(),Const.Click_Default);
 			}
 		};
+		
 		setOnClickListener(onClickListener);
 		//Log.i("jButton","created!");
 	}
 
 	public  void setParent( android.view.ViewGroup _viewgroup ) {
-    jLAMWcommon.setParent(_viewgroup);
+       jLAMWcommon.setParent(_viewgroup);
 	}
 
 	//Free object except Self, Pascal Code Free the class.
 	public  void Free() {
 		setOnKeyListener(null);
 		setText("");
-    jLAMWcommon.Free();
+        jLAMWcommon.Free();
 	}
 
 	public void setLParamWidth(int w) {
@@ -70,29 +71,30 @@ public class jButton extends Button {
 	}
 
 	public void setLParamHeight(int h) {
-    jLAMWcommon.setLParamHeight(h);
+        jLAMWcommon.setLParamHeight(h);
 	}
 
 	public void setLGravity(int _g) {
-    jLAMWcommon.setLGravity(_g);
+        jLAMWcommon.setLGravity(_g);
 	}
 
 	public void setLWeight(float _w) {
-    jLAMWcommon.setLWeight(_w);
+        jLAMWcommon.setLWeight(_w);
 	}
 
 	//by jmpessoa
 	public void addLParamsAnchorRule(int rule) {
-    jLAMWcommon.addLParamsAnchorRule(rule);
+        jLAMWcommon.addLParamsAnchorRule(rule);
 	}
+	
 	//by jmpessoa
 	public void addLParamsParentRule(int rule) {
-    jLAMWcommon.addLParamsParentRule(rule);
+        jLAMWcommon.addLParamsParentRule(rule);
 	}
 
 	//by jmpessoa
 	public void setLayoutAll(int idAnchor) {
-    jLAMWcommon.setLayoutAll(idAnchor);
+       jLAMWcommon.setLayoutAll(idAnchor);
 	}
 
 	/*
@@ -171,6 +173,23 @@ public class jButton extends Button {
 		Drawable d = new BitmapDrawable(controls.activity.getResources(), _image);
 		this.setBackground(d);
 	}
+	
+	public int getLParamHeight() {
+		int r = jLAMWcommon.getLParamHeight();
+		
+		if (r == android.view.ViewGroup.LayoutParams.WRAP_CONTENT) {
+			r = this.getHeight();
+		}		
+		return r;
+	}
+
+	public int getLParamWidth() {				
+		int r = jLAMWcommon.getLParamWidth();		
+		if (r == android.view.ViewGroup.LayoutParams.WRAP_CONTENT) {
+			r = this.getWidth();
+		}		
+		return r;		
+	}  
 	
 	@Override
 	protected void dispatchDraw(Canvas canvas) {

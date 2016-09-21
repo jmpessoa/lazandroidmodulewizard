@@ -1,4 +1,4 @@
-package org.lamw.common;
+package com.example.applistviewdemo;
 
 import android.content.Context;
 import android.view.View;
@@ -16,7 +16,7 @@ public class jCommons {
 
 	//Java-Pascal Interface
 	private long PasObj = 0; // Pascal Obj
-  private Controls        controls = null;   // Control Class for Event
+    private Controls        controls = null;   // Control Class for Event
 
 	private ViewGroup parent = null; // parent view
 	private ViewGroup.MarginLayoutParams lparams = null; // layout XYWH
@@ -40,14 +40,10 @@ public class jCommons {
 
 	//Constructor
 	public jCommons(View _view, android.content.Context _context, long _pasobj) {
-
     // set owner
     aOwnerView = _view;
-
 		//Connect Pascal I/F
-		PasObj   = _pasobj;
-
-
+    PasObj   = _pasobj;
 		//Init Class
     if (aOwnerView != null) {
        ViewGroup.LayoutParams lp = aOwnerView.getLayoutParams();
@@ -128,6 +124,14 @@ public class jCommons {
     lparamH = _h;
   }
 
+  public int getLParamWidth() {
+	    return lparamW;
+  }
+
+  public int getLParamHeight() {
+	    return lparamH;
+  }  
+  
   public void setLGravity(int _g) {
     lgravity = _g;
   }
