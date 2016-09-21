@@ -189,12 +189,6 @@ const
   cjActivity_RESULT_CANCELED             =  0;
   //
 
-  //commented by jmpessoa
-  {
-  cjProgressBarStyleHorizontal           = $01010078;
-  cjProgressBarStyleLarge                = $0101007a;
-  }
-
   //
   cjORIENTATION_PORTRAIT                 =  1;
   cjORIENTATION_LANDSCAPE                =  2;

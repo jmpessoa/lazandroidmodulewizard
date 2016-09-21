@@ -1207,8 +1207,8 @@ type
     procedure GenEvent_OnDrawItemBitmap(Obj: TObject; index: integer; caption: string;  out bitmap: JObject);
     procedure GenEvent_OnWidgeItemLostFocus(Obj: TObject; index: integer; caption: string);
 
-    procedure GenEvent_OnBeforeDispatchDraw(Obj: TObject; canvas: JObject; scrollposition: integer);
-    procedure GenEvent_OnAfterDispatchDraw(Obj: TObject; canvas: JObject; scrollposition: integer);
+    procedure GenEvent_OnBeforeDispatchDraw(Obj: TObject; canvas: JObject; tag: integer);
+    procedure GenEvent_OnAfterDispatchDraw(Obj: TObject; canvas: JObject; tag: integer);
 
     procedure Notification(AComponent: TComponent; Operation: TOperation); override;
   public
@@ -2664,11 +2664,6 @@ begin
     jHttpClient(Obj).GenEvent_OnHttpClientCodeResult(Obj, code);
   end;
 end;
-
-//------------------------------------------------------------------------------
-// jApp
-//------------------------------------------------------------------------------
-
 
 //------------------------------------------------------------------------------
 // jTextView
@@ -6428,14 +6423,14 @@ begin
   if Assigned(FOnWidgeItemLostFocus) then FOnWidgeItemLostFocus(Obj,index, caption);
 end;
 
-procedure jListView.GenEvent_OnBeforeDispatchDraw(Obj: TObject; canvas: JObject; scrollposition: integer);
+procedure jListView.GenEvent_OnBeforeDispatchDraw(Obj: TObject; canvas: JObject; tag: integer);
 begin
-  if Assigned(FOnBeforeDispatchDraw) then FOnBeforeDispatchDraw(Obj, canvas, scrollposition);
+  if Assigned(FOnBeforeDispatchDraw) then FOnBeforeDispatchDraw(Obj, canvas, tag);
 end;
 
-procedure jListView.GenEvent_OnAfterDispatchDraw(Obj: TObject; canvas: JObject; scrollposition: integer);
+procedure jListView.GenEvent_OnAfterDispatchDraw(Obj: TObject; canvas: JObject; tag: integer);
 begin
-  if Assigned(FOnAfterDispatchDraw) then FOnAfterDispatchDraw(Obj, canvas, scrollposition);
+  if Assigned(FOnAfterDispatchDraw) then FOnAfterDispatchDraw(Obj, canvas, tag);
 end;
 
 procedure jListView.GenEvent_OnClickWidgetItem(Obj: TObject; index: integer; checked: boolean);

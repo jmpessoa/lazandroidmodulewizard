@@ -1425,7 +1425,6 @@ begin
  env^.DeleteLocalRef(env, cls);
 end;
 
-//by jmpessoa
 Procedure jTextView_setParent(env:PJNIEnv; TextView: jObject; ViewGroup : jObject);
  var
     cls: jClass;
