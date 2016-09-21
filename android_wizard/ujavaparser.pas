@@ -198,6 +198,13 @@ var
   cls, str: string;
 begin
   FPascalJNI.Clear;
+
+  FNativeMethods.Add(TNativeMetodDesc.Create('pOnBeforeDispatchDraw', '(JLandroid/graphics/Canvas;I)V', '(PEnv: PJNIEnv; this: JObject; pasobj: JLong; canvas: JObject; tag: integer)', ''));
+  Bodies.Append('pOnBeforeDispatchDraw'+'='+'Java_Event_pOnBeforeDispatchDraw(PEnv, this, TObject(pasobj), canvas, tag);');
+
+  FNativeMethods.Add(TNativeMetodDesc.Create('pOnAfterDispatchDraw', '(JLandroid/graphics/Canvas;I)V', '(PEnv: PJNIEnv; this: JObject; pasobj: JLong; canvas: JObject; tag: integer)', ''));
+  Bodies.Append('pOnAfterDispatchDraw'+'='+'Java_Event_pOnAfterDispatchDraw(PEnv, this, TObject(pasobj), canvas, tag);');
+
   cls := StringReplace(FRootClass, '.', '_', [rfReplaceAll]);
   if FNativeMethods.Count = 0 then
     raise Exception.Create('[MakePascalJNI] No native methods in public class!');

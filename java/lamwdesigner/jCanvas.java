@@ -26,6 +26,8 @@ public class jCanvas {
 
 		//Init Class
 		paint   = new Paint();
+
+    paint.setFlags(Paint.ANTI_ALIAS_FLAG);
 	}
 
 	public  void setCanvas(Canvas _canvas) {

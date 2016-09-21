@@ -55,7 +55,7 @@ type
     procedure UpdateJControlsList; inline;
 
   protected
-    procedure OnDesignerModified(Sender: TObject{$If lcl_fullversion>1060004}; {%H-}PropName: ShortString{$ENDIF});
+    procedure OnDesignerModified(Sender: TObject{$If lcl_fullversion>=1070000}; {%H-}PropName: ShortString{$ENDIF});
     procedure OnPersistentAdded(APersistent: TPersistent; {%H-}Select: boolean);
     procedure OnPersistentDeleted;
     procedure OnPersistentDeleting(APersistent: TPersistent);
@@ -1006,7 +1006,7 @@ begin
   inherited Destroy;
 end;
 
-procedure TAndroidWidgetMediator.OnDesignerModified(Sender: TObject{$If lcl_fullversion>1060004}; {%H-}PropName: ShortString{$ENDIF});
+procedure TAndroidWidgetMediator.OnDesignerModified(Sender: TObject{$If lcl_fullversion>=1070000}; {%H-}PropName: ShortString{$ENDIF});
 var
   Instance: TPersistent;
   InvalidateNeeded: Boolean;

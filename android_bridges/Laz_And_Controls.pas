@@ -1639,8 +1639,8 @@ type
   function  Java_Event_pOnListViewDrawItemBitmap(env: PJNIEnv; this: jobject; Obj: TObject; index: integer; caption: JString): JObject;
   procedure Java_Event_pOnWidgeItemLostFocus(env: PJNIEnv; this: jobject; Obj: TObject; index: integer;  caption: JString);
 
-  procedure Java_Event_pOnBeforedispatchDraw(env: PJNIEnv; this: jobject; Obj: TObject; canvas: JObject; tag: integer);
-  procedure Java_Event_pOnAfterdispatchDraw(env: PJNIEnv; this: jobject; Obj: TObject; canvas: JObject; tag: integer);
+  procedure Java_Event_pOnBeforeDispatchDraw(env: PJNIEnv; this: jobject; Obj: TObject; canvas: JObject; tag: integer);
+  procedure Java_Event_pOnAfterDispatchDraw(env: PJNIEnv; this: jobject; Obj: TObject; canvas: JObject; tag: integer);
 
   Procedure Java_Event_pOnChange(env: PJNIEnv; this: jobject; Obj: TObject; txt: JString; count : integer);
   Procedure Java_Event_pOnChanged(env: PJNIEnv; this: jobject; Obj: TObject; txt: JString; count : integer);

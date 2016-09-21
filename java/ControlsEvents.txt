@@ -31,3 +31,5 @@ pAppOnListItemClick=Java_Event_pAppOnListItemClick(PEnv,this,adapter,view,positi
 pOnFlingGestureDetected=Java_Event_pOnFlingGestureDetected(PEnv,this,TObject(pasobj),direction);
 pOnPinchZoomGestureDetected=Java_Event_pOnPinchZoomGestureDetected(PEnv,this,TObject(pasobj),scaleFactor,state);
 pOnLostFocus=Java_Event_pOnLostFocus(PEnv,this,TObject(pasobj),text);
+pOnBeforeDispatchDraw=Java_Event_pOnBeforeDispatchDraw(PEnv,this,TObject(pasobj),canvas,tag);
+pOnAfterDispatchDraw=Java_Event_pOnAfterDispatchDraw(PEnv,this,TObject(pasobj),canvas,tag);
