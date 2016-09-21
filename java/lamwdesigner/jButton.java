@@ -175,20 +175,11 @@ public class jButton extends Button {
 	}
 	
 	public int getLParamHeight() {
-		int r = jLAMWcommon.getLParamHeight();
-		
-		if (r == android.view.ViewGroup.LayoutParams.WRAP_CONTENT) {
-			r = this.getHeight();
-		}		
-		return r;
+		return  jLAMWcommon.getLParamHeight();
 	}
 
 	public int getLParamWidth() {				
-		int r = jLAMWcommon.getLParamWidth();		
-		if (r == android.view.ViewGroup.LayoutParams.WRAP_CONTENT) {
-			r = this.getWidth();
-		}		
-		return r;		
+		return jLAMWcommon.getLParamWidth();					
 	}  
 	
 	@Override

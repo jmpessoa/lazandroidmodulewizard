@@ -124,12 +124,20 @@ public class jCommons {
     lparamH = _h;
   }
 
-  public int getLParamWidth() {
-	    return lparamW;
+  public int getLParamWidth() {	    
+		int r =  lparamW;	 		
+		if (r == android.view.ViewGroup.LayoutParams.WRAP_CONTENT) {
+			r = aOwnerView.getWidth();
+		}		
+	    return r;
   }
 
   public int getLParamHeight() {
-	    return lparamH;
+	    int r = lparamH;	  
+		if (r == android.view.ViewGroup.LayoutParams.WRAP_CONTENT) {
+			r = aOwnerView.getHeight();
+		}
+		return r;
   }  
   
   public void setLGravity(int _g) {
