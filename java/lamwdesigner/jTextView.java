@@ -7,163 +7,97 @@ import android.graphics.Canvas;
 import android.graphics.Typeface;
 import android.util.TypedValue;
 import android.view.View;
-import android.view.ViewGroup;
-import android.view.ViewGroup.MarginLayoutParams;
-import android.widget.RelativeLayout;
-import android.widget.FrameLayout;
-import android.widget.LinearLayout;
 import android.view.Gravity;
 import android.widget.TextView;
 
 
 public class jTextView extends TextView {
     //Java-Pascal Interface
-    private long             PasObj   = 0;      // Pascal Obj
     private Controls        controls = null;   // Control Class for Event
-    //
-    private ViewGroup       parent   = null;   // parent view
-    private ViewGroup.MarginLayoutParams lparams = null;              // layout XYWH
-    private OnClickListener onClickListener;   // event
-    private Boolean         enabled  = true;   //
+    private jCommons LAMWCommon;
+        
+    private OnClickListener onClickListener;   
+    private Boolean         enabled  = true;  
 
-    //by jmpessoa
-    private int lparamsAnchorRule[] = new int[30];
-    int countAnchorRule = 0;
-
-    private int lparamsParentRule[] = new int[30];
-    int countParentRule = 0;
-
-    int lparamH = android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
-    int lparamW = android.view.ViewGroup.LayoutParams.MATCH_PARENT;
-    int marginLeft = 5;
-    int marginTop = 5;
-    int marginRight = 5;
-    int marginBottom = 5;
-    private int lgravity = Gravity.TOP | Gravity.START;
-    private float lweight = 0;
-
-    float mTextSize = 0; //default
-    int mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_SP; //default
+    float mTextSize = 0; 
+    int mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_SP; 
 
     private ClipboardManager mClipBoard = null;
     private ClipData mClipData = null;
 
-    //Constructor
     public  jTextView(android.content.Context context,
                       Controls ctrls,long pasobj ) {
         super(context);
-
-        //Connect Pascal I/F
-        PasObj   = pasobj;
         controls = ctrls;
-
-        //Init Class
+		LAMWCommon = new jCommons(this,context,pasobj);
+        
         mClipBoard = (ClipboardManager) controls.activity.getSystemService(Context.CLIPBOARD_SERVICE);
 
-        //Init Event
         onClickListener = new OnClickListener() {
             public  void onClick(View view) {
                 if (enabled) {
-                    controls.pOnClick(PasObj,Const.Click_Default);
+                    controls.pOnClick(LAMWCommon.getPasObj(),Const.Click_Default);
                 }
             };
         };
         setOnClickListener(onClickListener);
 
-        lparams = new ViewGroup.MarginLayoutParams(lparamW, lparamH);     // W,H
-        lparams.setMargins(marginLeft,marginTop,marginRight,marginBottom); // L,T,R,B
     }
 
-    //by jmpessoa
-    public void setLeftTopRightBottomWidthHeight(int _left, int _top, int _right, int _bottom, int _w, int _h) {
-        marginLeft = _left;
-        marginTop = _top;
-        marginRight = _right;
-        marginBottom = _bottom;
-        lparamH = _h;
-        lparamW = _w;
-    }
+	public void setLeftTopRightBottomWidthHeight(int left, int top, int right, int bottom, int w, int h) {
+		LAMWCommon.setLeftTopRightBottomWidthHeight(left,top,right,bottom,w,h);
+	}
+	
+	public  void setParent( android.view.ViewGroup _viewgroup ) {
+		LAMWCommon.setParent(_viewgroup);
+	}
 
-    //by jmpessoa
-    public void setLayoutAll(int idAnchor) {
-        lparams.width  = lparamW; //matchParent;
-        lparams.height = lparamH; //wrapContent;
-        lparams.setMargins(marginLeft, marginTop,marginRight,marginBottom);
+	//Free object except Self, Pascal Code Free the class.
+	public  void Free() {
+		setOnKeyListener(null);
+		setText("");
+		LAMWCommon.Free();
+	}
 
-        if (lparams instanceof RelativeLayout.LayoutParams) {
-            if (idAnchor > 0) {
-                for (int i=0; i < countAnchorRule; i++) {
-                    ((RelativeLayout.LayoutParams)lparams).addRule(lparamsAnchorRule[i], idAnchor);
-                }
-            }
-            for (int j=0; j < countParentRule; j++) {
-                ((RelativeLayout.LayoutParams)lparams).addRule(lparamsParentRule[j]);
-            }
-        }
-        if (lparams instanceof FrameLayout.LayoutParams) {
-            ((FrameLayout.LayoutParams)lparams).gravity = lgravity;
-        }
-        if (lparams instanceof LinearLayout.LayoutParams) {
-            ((LinearLayout.LayoutParams)lparams).weight = lweight;
-        }
-        //
-        this.setLayoutParams(lparams);
-    }
+	public void setLParamWidth(int w) {
+		LAMWCommon.setLParamWidth(w);
+	}
 
-    public void clearLayoutAll() {
-        if (lparams instanceof RelativeLayout.LayoutParams) {
-            for (int i=0; i < countAnchorRule; i++) {
-                ((RelativeLayout.LayoutParams)lparams).removeRule(lparamsAnchorRule[i]);
-            }
-            for (int j=0; j < countParentRule; j++) {
-                ((RelativeLayout.LayoutParams)lparams).removeRule(lparamsParentRule[j]);
-            }
-        }
-        countAnchorRule = 0;
-        countParentRule = 0;
-    }
+	public void setLParamHeight(int h) {
+		LAMWCommon.setLParamHeight(h);
+	}
 
-    //by jmpessoa
-    public void setLParamWidth(int _w) {
-        lparamW = _w;
-    }
+	public void setLGravity(int _g) {
+		LAMWCommon.setLGravity(_g);
+	}
 
-    //by jmpessoa
-    public void setLParamHeight(int _h) {
-        lparamH = _h;
-    }
+	public void setLWeight(float _w) {
+		LAMWCommon.setLWeight(_w);
+	}
 
-    public void setLGravity(int _g) {
-        lgravity = _g;
-    }
+	public void addLParamsAnchorRule(int rule) {
+		LAMWCommon.addLParamsAnchorRule(rule);
+	}
+	
+	public void addLParamsParentRule(int rule) {
+		LAMWCommon.addLParamsParentRule(rule);
+	}
 
-    public void setLWeight(float _w) {
-        lweight = _w;
-    }
-
-    //by jmpessoa
-    public void addLParamsAnchorRule(int rule) {
-        lparamsAnchorRule[countAnchorRule] = rule;
-        countAnchorRule = countAnchorRule + 1;
-    }
-
-    //by jmpessoa
-    public void addLParamsParentRule(int rule) {
-        lparamsParentRule[countParentRule] = rule;
-        countParentRule = countParentRule + 1;
-    }
-
+	public void setLayoutAll(int idAnchor) {
+		LAMWCommon.setLayoutAll(idAnchor);
+	}
+	
     //LORDMAN 2013-08-13
     public  void setTextAlignment( int align ) {
         switch ( align ) {
-            case 0 : { setGravity( Gravity.LEFT              ); }; break;
-            case 1 : { setGravity( Gravity.RIGHT             ); }; break;
+            case 0 : { setGravity( Gravity.START             ); }; break;
+            case 1 : { setGravity( Gravity.END             ); }; break;
             case 2 : { setGravity( Gravity.TOP               ); }; break;
             case 3 : { setGravity( Gravity.BOTTOM            ); }; break;
             case 4 : { setGravity( Gravity.CENTER            ); }; break;
             case 5 : { setGravity( Gravity.CENTER_HORIZONTAL ); }; break;
             case 6 : { setGravity( Gravity.CENTER_VERTICAL   ); }; break;
-            default : { setGravity( Gravity.LEFT              ); }; break;
+            default : { setGravity( Gravity.START              ); }; break;
         };
     }
 
@@ -178,53 +112,9 @@ public class jTextView extends TextView {
         this.setText(item.getText().toString());
     }
 
-    public void setParent3( android.view.ViewGroup viewgroup ) {  //deprec...
-        if (parent != null) { parent.removeView(this); }
-        parent = viewgroup;
-        viewgroup.addView(this, lparams);
-    }
-
-    private static MarginLayoutParams newLayoutParams(ViewGroup aparent, ViewGroup.MarginLayoutParams baseparams) {
-        if (aparent instanceof FrameLayout) {
-            return new FrameLayout.LayoutParams(baseparams);
-        } else if (aparent instanceof RelativeLayout) {
-            return new RelativeLayout.LayoutParams(baseparams);
-        } else if (aparent instanceof LinearLayout) {
-            return new LinearLayout.LayoutParams(baseparams);
-        } else if (aparent == null) {
-            throw new NullPointerException("Parent is null");
-        } else {
-            throw new IllegalArgumentException("Parent is neither FrameLayout or RelativeLayout or LinearLayout: "
-                    + aparent.getClass().getName());
-        }
-    }
-
-    public void setParent( android.view.ViewGroup _viewgroup ) {
-        if (parent != null) { parent.removeView(this); }
-        parent = _viewgroup;
-        parent.addView(this,newLayoutParams(parent,(ViewGroup.MarginLayoutParams)lparams));
-        lparams = null;
-        lparams = (ViewGroup.MarginLayoutParams)this.getLayoutParams();
-    }
-
     public  void setEnabled( boolean value ) {
         enabled = value;
     }
-
-    //Free object except Self, Pascal Code Free the class.
-    public  void Free() {
-        if (parent != null) { parent.removeView(this); }
-        setText("");
-        lparams = null;
-        setOnClickListener(null);
-    }
-
-/*
-* 	this.setTypeface(null, Typeface.BOLD_ITALIC);
-	this.setTypeface(null, Typeface.BOLD);
-  this.setTypeface(null, Typeface.ITALIC);
-  this.setTypeface(null, Typeface.NORMAL);
-*/
 
     public void SetTextTypeFace(int _typeface) {
         this.setTypeface(null, _typeface);
@@ -277,28 +167,20 @@ public class jTextView extends TextView {
     }
     
 	public int getLParamHeight() {
-		int r = lparamH;		
-		if (r == android.view.ViewGroup.LayoutParams.WRAP_CONTENT) {
-			r = this.getHeight();
-		}		
-		return r;
+		return  LAMWCommon.getLParamHeight();
 	}
 
 	public int getLParamWidth() {				
-		int r = lparamW;		
-		if (r == android.view.ViewGroup.LayoutParams.WRAP_CONTENT) {
-			r = this.getWidth();
-		}		
-		return r;		
-	}
+		return LAMWCommon.getLParamWidth();					
+	}  
 	
 	@Override
-	protected void dispatchDraw(Canvas canvas) {
-	     //DO YOUR DRAWING ON UNDER THIS VIEWS CHILDREN
-		controls.pOnBeforeDispatchDraw(PasObj, canvas, 1);  //handle by pascal side
-	    super.dispatchDraw(canvas);
+	protected void dispatchDraw(Canvas canvas) {	 	
+	    //DO YOUR DRAWING ON UNDER THIS VIEWS CHILDREN
+		controls.pOnBeforeDispatchDraw(LAMWCommon.getPasObj(), canvas, 1);  //event handle by pascal side		
+	    super.dispatchDraw(canvas);	    
 	    //DO YOUR DRAWING ON TOP OF THIS VIEWS CHILDREN
-	    controls.pOnAfterDispatchDraw(PasObj, canvas, 1);	 //handle by pascal side    
+	    controls.pOnAfterDispatchDraw(LAMWCommon.getPasObj(), canvas, 1);	 //event handle by pascal side    
 	}
 
 }

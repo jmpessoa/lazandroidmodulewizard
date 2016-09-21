@@ -8,93 +8,74 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.util.TypedValue;
 import android.view.View;
-import android.view.ViewGroup;
-import android.view.ViewGroup.MarginLayoutParams;
 import android.widget.Button;
-import android.widget.RelativeLayout;
-import android.widget.FrameLayout;
-import android.widget.LinearLayout;
-import android.view.Gravity;
 
 public class jButton extends Button {
 
+	private Controls controls = null;   // Control Class for Event
+	private jCommons LAMWCommon;
+	
 	private OnClickListener onClickListener;   // event
-
-    private Controls controls = null;   // Control Class for Event
-
+	
 	int textColor;
-
 	boolean mChangeFontSizeByComplexUnitPixel = false;
-	float mTextSize = 0; //default
-	int mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_SP; //default
-
-    jCommons jLAMWcommon;
-
-	public void setLeftTopRightBottomWidthHeight(int left, int top, int right, int bottom, int w, int h) {
-        jLAMWcommon.setLeftTopRightBottomWidthHeight(left,top,right,bottom,w,h);
-	}
+	float mTextSize = 0; 
+	int mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_SP;
 
 	//Constructor
-	public  jButton(android.content.Context context,
-					Controls ctrls,long pasobj ) {
+	public  jButton(android.content.Context context, Controls ctrls,long pasobj ) {
 		super(context);
-
-        controls  = ctrls;
-        
-        jLAMWcommon = new jCommons(this,context,pasobj);
-        
-		//Init Event
+		controls  = ctrls;        
+		LAMWCommon = new jCommons(this,context,pasobj);
 		onClickListener = new OnClickListener() {
 			public  void onClick(View view) {
-				//Log.i("TAG_CLICK", "jButton_Clicked!"); //just demo for LATE logcat filter!
-				controls.pOnClick(jLAMWcommon.getPasObj(),Const.Click_Default);
+				controls.pOnClick(LAMWCommon.getPasObj(),Const.Click_Default);
 			}
-		};
-		
+		};		
 		setOnClickListener(onClickListener);
-		//Log.i("jButton","created!");
 	}
 
+	public void setLeftTopRightBottomWidthHeight(int left, int top, int right, int bottom, int w, int h) {
+		LAMWCommon.setLeftTopRightBottomWidthHeight(left,top,right,bottom,w,h);
+	}
+	
 	public  void setParent( android.view.ViewGroup _viewgroup ) {
-       jLAMWcommon.setParent(_viewgroup);
+		LAMWCommon.setParent(_viewgroup);
 	}
 
 	//Free object except Self, Pascal Code Free the class.
 	public  void Free() {
 		setOnKeyListener(null);
 		setText("");
-        jLAMWcommon.Free();
+		LAMWCommon.Free();
 	}
 
 	public void setLParamWidth(int w) {
-		jLAMWcommon.setLParamWidth(w);
+		LAMWCommon.setLParamWidth(w);
 	}
 
 	public void setLParamHeight(int h) {
-        jLAMWcommon.setLParamHeight(h);
+		LAMWCommon.setLParamHeight(h);
 	}
 
 	public void setLGravity(int _g) {
-        jLAMWcommon.setLGravity(_g);
+		LAMWCommon.setLGravity(_g);
 	}
 
 	public void setLWeight(float _w) {
-        jLAMWcommon.setLWeight(_w);
+		LAMWCommon.setLWeight(_w);
 	}
 
-	//by jmpessoa
 	public void addLParamsAnchorRule(int rule) {
-        jLAMWcommon.addLParamsAnchorRule(rule);
+		LAMWCommon.addLParamsAnchorRule(rule);
 	}
 	
-	//by jmpessoa
 	public void addLParamsParentRule(int rule) {
-        jLAMWcommon.addLParamsParentRule(rule);
+		LAMWCommon.addLParamsParentRule(rule);
 	}
 
-	//by jmpessoa
 	public void setLayoutAll(int idAnchor) {
-       jLAMWcommon.setLayoutAll(idAnchor);
+		LAMWCommon.setLayoutAll(idAnchor);
 	}
 
 	/*
@@ -102,13 +83,11 @@ public class jButton extends Button {
     * but then at the same time,
     * i need to click twice on the button to perform the actual click event.
     */
-//by jmpessoa
 	public  void SetFocusable(boolean enabled ) {
 		this.setClickable            (enabled);
 		this.setEnabled              (enabled);
-		this.setFocusable            (enabled);//*
-		this.setFocusableInTouchMode (enabled);//*
-//obj.requestFocus(); 
+		this.setFocusable            (enabled);
+		this.setFocusableInTouchMode (enabled); 
 	}
 
 	public void SetTextSize(float size) {
@@ -129,16 +108,15 @@ public class jButton extends Button {
 		this.setText(t);
 	}
 
-	//TTextSizeTyped =(tsDefault, tsUnitPixels, tsUnitDIP, tsUnitInches, tsUnitMillimeters, tsUnitPoints, tsUnitScaledPixel);
 	public void SetFontSizeUnit(int _unit) {
 		switch (_unit) {
-			case 0: mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_SP; break; //default
-			case 1: mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_PX; break; //default
-			case 2: mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_DIP; break; //default
-			case 3: mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_IN; break; //default
-			case 4: mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_MM; break; //default
-			case 5: mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_PT; break; //default
-			case 6: mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_SP; break; //default
+			case 0: mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_SP; break; 
+			case 1: mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_PX; break; 
+			case 2: mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_DIP; break;
+			case 3: mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_IN; break; 
+			case 4: mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_MM; break; 
+			case 5: mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_PT; break; 
+			case 6: mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_SP; break; 
 		}
 		String t = this.getText().toString();
 		this.setTextSize(mTextSizeTypedValue, mTextSize);
@@ -175,23 +153,19 @@ public class jButton extends Button {
 	}
 	
 	public int getLParamHeight() {
-		return  jLAMWcommon.getLParamHeight();
+		return  LAMWCommon.getLParamHeight();
 	}
 
 	public int getLParamWidth() {				
-		return jLAMWcommon.getLParamWidth();					
+		return LAMWCommon.getLParamWidth();					
 	}  
 	
 	@Override
-	protected void dispatchDraw(Canvas canvas) {
-	 	
+	protected void dispatchDraw(Canvas canvas) {	 	
 	    //DO YOUR DRAWING ON UNDER THIS VIEWS CHILDREN
-		controls.pOnBeforeDispatchDraw(jLAMWcommon.getPasObj(), canvas, 1);  //handle by pascal side
-		
-	    super.dispatchDraw(canvas);
-	    
+		controls.pOnBeforeDispatchDraw(LAMWCommon.getPasObj(), canvas, 1);  //event handle by pascal side		
+	    super.dispatchDraw(canvas);	    
 	    //DO YOUR DRAWING ON TOP OF THIS VIEWS CHILDREN
-	    controls.pOnAfterDispatchDraw(jLAMWcommon.getPasObj(), canvas, 1);	 //handle by pascal side    
+	    controls.pOnAfterDispatchDraw(LAMWCommon.getPasObj(), canvas, 1);	 //event handle by pascal side    
 	}
-
 }

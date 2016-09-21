@@ -1,6 +1,5 @@
 package com.example.applistviewdemo;
 
-import android.content.Context;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewGroup.MarginLayoutParams;
@@ -16,17 +15,14 @@ public class jCommons {
 
 	//Java-Pascal Interface
 	private long PasObj = 0; // Pascal Obj
-    private Controls        controls = null;   // Control Class for Event
 
-	private ViewGroup parent = null; // parent view
+	private ViewGroup parent = null;                     // parent view
 	private ViewGroup.MarginLayoutParams lparams = null; // layout XYWH
 
 	private int lparamsAnchorRule[] = new int[30];
 	private int countAnchorRule = 0;
-
 	private int lparamsParentRule[] = new int[30];
 	private int countParentRule = 0;
-
 	private int lparamH = android.view.ViewGroup.LayoutParams.MATCH_PARENT;
 	private int lparamW = android.view.ViewGroup.LayoutParams.MATCH_PARENT;
 	private int marginLeft = 5;
@@ -35,34 +31,27 @@ public class jCommons {
 	private int marginBottom = 5;
 	private int lgravity = Gravity.TOP | Gravity.START;
 	private float lweight = 0;
-
-  private boolean mRemovedFromParent = false;
-
-	//Constructor
+	private boolean mRemovedFromParent = false;
+	
 	public jCommons(View _view, android.content.Context _context, long _pasobj) {
-    // set owner
-    aOwnerView = _view;
-		//Connect Pascal I/F
-    PasObj   = _pasobj;
-		//Init Class
-    if (aOwnerView != null) {
-       ViewGroup.LayoutParams lp = aOwnerView.getLayoutParams();
-       if (lp instanceof MarginLayoutParams) {
-          lparams = (MarginLayoutParams)lp;
-		      lparams.setMargins(marginLeft,marginTop,marginRight,marginBottom); // L,T,R,B
-        }
-    }
-    if (lparams == null)
-    {
-      lparams = new ViewGroup.MarginLayoutParams(lparamW, lparamH);     // W,H
-      lparams.setMargins(marginLeft,marginTop,marginRight,marginBottom); // L,T,R,B
-    }
-
+		aOwnerView = _view;       // set owner
+		PasObj   = _pasobj; 	//Connect Pascal I/F
+		if (aOwnerView != null) {
+			ViewGroup.LayoutParams lp = aOwnerView.getLayoutParams();
+			if (lp instanceof MarginLayoutParams) {
+				lparams = (MarginLayoutParams)lp;
+				lparams.setMargins(marginLeft,marginTop,marginRight,marginBottom); // L,T,R,B
+			}
+		}
+		if (lparams == null) {
+			lparams = new ViewGroup.MarginLayoutParams(lparamW, lparamH);     // W,H
+			lparams.setMargins(marginLeft,marginTop,marginRight,marginBottom); // L,T,R,B
+		}
 	}
-
-  public long getPasObj() {
-    return PasObj;
-  }
+	
+	public long getPasObj() {
+		return PasObj;
+	}
 
 	public static MarginLayoutParams newLayoutParams(ViewGroup aparent, ViewGroup.MarginLayoutParams baseparams) {
 		if (aparent instanceof FrameLayout) {
@@ -78,35 +67,32 @@ public class jCommons {
 					+ aparent.getClass().getName());
 		}
 	}
-
+	
 	public void setParent( android.view.ViewGroup _viewgroup) {
 		if ( (parent != null) && (aOwnerView != null) ) { parent.removeView(aOwnerView); }
 		parent = _viewgroup;
-    if ( (parent != null) && (aOwnerView != null) )
-    {
-		  parent.addView(aOwnerView,newLayoutParams(parent,(ViewGroup.MarginLayoutParams)lparams));
-		  lparams = null;
-		  lparams = (ViewGroup.MarginLayoutParams)aOwnerView.getLayoutParams();
-    }
-
-    mRemovedFromParent = false;
+		if ( (parent != null) && (aOwnerView != null) ) {
+			parent.addView(aOwnerView,newLayoutParams(parent,(ViewGroup.MarginLayoutParams)lparams));
+			lparams = null;
+			lparams = (ViewGroup.MarginLayoutParams)aOwnerView.getLayoutParams();
+		}
+		mRemovedFromParent = false;
 	}
-
-  public ViewGroup getParent() {
-    return parent;
-  }
-
-  public void RemoveFromViewParent() {
-      if (!mRemovedFromParent) {
-         if (aOwnerView != null)  {
-            aOwnerView.setVisibility(android.view.View.INVISIBLE);
-            if (parent != null)
-                parent.removeView(aOwnerView);
-         }
-         mRemovedFromParent = true;
-      }
-  }
-
+	
+	public ViewGroup getParent() {
+		return parent;
+	}
+	
+	public void RemoveFromViewParent() {
+		if (!mRemovedFromParent) {
+			if (aOwnerView != null)  {
+				aOwnerView.setVisibility(android.view.View.INVISIBLE);
+				if (parent != null) parent.removeView(aOwnerView);
+			}
+			mRemovedFromParent = true;
+		}
+	}
+	
 	public void setLeftTopRightBottomWidthHeight(int _left, int _top, int _right, int _bottom, int _w, int _h) {
 		marginLeft = _left;
 		marginTop = _top;
@@ -115,91 +101,87 @@ public class jCommons {
 		lparamH = _h;
 		lparamW = _w;
 	}
-
-  public void setLParamWidth(int _w) {
-    lparamW = _w;
-  }
-
-  public void setLParamHeight(int _h) {
-    lparamH = _h;
-  }
-
-  public int getLParamWidth() {	    
-		int r =  lparamW;	 		
+	
+	public void setLParamWidth(int _w) {
+		lparamW = _w;
+	}
+	
+	public void setLParamHeight(int _h) {
+		lparamH = _h;
+	}
+	
+	public int getLParamWidth() { 
+		int r =  lparamW;
 		if (r == android.view.ViewGroup.LayoutParams.WRAP_CONTENT) {
 			r = aOwnerView.getWidth();
 		}		
-	    return r;
-  }
-
-  public int getLParamHeight() {
-	    int r = lparamH;	  
+		return r;
+	}
+	
+	public int getLParamHeight() {
+		int r = lparamH;
 		if (r == android.view.ViewGroup.LayoutParams.WRAP_CONTENT) {
 			r = aOwnerView.getHeight();
 		}
 		return r;
-  }  
-  
-  public void setLGravity(int _g) {
-    lgravity = _g;
-  }
-
-  public void setLWeight(float _w) {
-    lweight = _w;
-  }
-
-  public void addLParamsAnchorRule(int _rule) {
-    lparamsAnchorRule[countAnchorRule] = _rule;
-    countAnchorRule = countAnchorRule + 1;
-  }
-
-  public void addLParamsParentRule(int _rule) {
-    lparamsParentRule[countParentRule] = _rule;
-    countParentRule = countParentRule + 1;
-  }
-
-  public void setLayoutAll(int _idAnchor) {
-    lparams.width  = lparamW;
-    lparams.height = lparamH;
-    lparams.setMargins(marginLeft,marginTop,marginRight,marginBottom);
-
-    if (lparams instanceof RelativeLayout.LayoutParams) {
-          if (_idAnchor > 0) {
-              for (int i = 0; i < countAnchorRule; i++) {
-                  ((RelativeLayout.LayoutParams)lparams).addRule(lparamsAnchorRule[i], _idAnchor);
-              }
-          }
-          for (int j = 0; j < countParentRule; j++) {
-              ((RelativeLayout.LayoutParams)lparams).addRule(lparamsParentRule[j]);
-          }
-    }
-    if (lparams instanceof FrameLayout.LayoutParams) {
-        ((FrameLayout.LayoutParams)lparams).gravity = lgravity;
-    }
-    if (lparams instanceof LinearLayout.LayoutParams) {
-        ((LinearLayout.LayoutParams)lparams).weight = lweight;
-    }
-    //
-    if (aOwnerView != null) { aOwnerView.setLayoutParams(lparams); }
-  }
-
-  public void clearLayoutAll() {
-    if (lparams instanceof RelativeLayout.LayoutParams) {
-          for (int i = 0; i < countAnchorRule; i++) {
-              ((RelativeLayout.LayoutParams)lparams).removeRule(lparamsAnchorRule[i]);
-          }
-           for (int j = 0; j < countParentRule; j++) {
-              ((RelativeLayout.LayoutParams)lparams).removeRule(lparamsParentRule[j]);
-          }
-    }
-    countAnchorRule = 0;
-    countParentRule = 0;
-  }
-
+	}
+	
+	public void setLGravity(int _g) {
+		lgravity = _g;
+	}
+	
+	public void setLWeight(float _w) {
+		lweight = _w;
+	}
+	
+	public void addLParamsAnchorRule(int _rule) {
+		lparamsAnchorRule[countAnchorRule] = _rule;
+		countAnchorRule = countAnchorRule + 1;
+	}
+	
+	public void addLParamsParentRule(int _rule) {
+		lparamsParentRule[countParentRule] = _rule;
+		countParentRule = countParentRule + 1;
+	}
+	
+	public void setLayoutAll(int _idAnchor) {
+		lparams.width  = lparamW;
+		lparams.height = lparamH;
+		lparams.setMargins(marginLeft,marginTop,marginRight,marginBottom);
+		if (lparams instanceof RelativeLayout.LayoutParams) {
+			if (_idAnchor > 0) {
+				for (int i = 0; i < countAnchorRule; i++) {
+					((RelativeLayout.LayoutParams)lparams).addRule(lparamsAnchorRule[i], _idAnchor);
+				}
+			}
+			for (int j = 0; j < countParentRule; j++) {
+				((RelativeLayout.LayoutParams)lparams).addRule(lparamsParentRule[j]);
+			}
+		}
+		if (lparams instanceof FrameLayout.LayoutParams) {
+			((FrameLayout.LayoutParams)lparams).gravity = lgravity;
+		}
+		if (lparams instanceof LinearLayout.LayoutParams) {
+			((LinearLayout.LayoutParams)lparams).weight = lweight;
+		}
+		if (aOwnerView != null) { aOwnerView.setLayoutParams(lparams); }
+	}
+	
+	public void clearLayoutAll() {
+		if (lparams instanceof RelativeLayout.LayoutParams) {
+			for (int i = 0; i < countAnchorRule; i++) {
+				((RelativeLayout.LayoutParams)lparams).removeRule(lparamsAnchorRule[i]);
+			}
+			for (int j = 0; j < countParentRule; j++) {
+				((RelativeLayout.LayoutParams)lparams).removeRule(lparamsParentRule[j]);
+			}
+		}
+		countAnchorRule = 0;
+		countParentRule = 0;
+	}
+	
 	public void Free() {
 		if ( (parent != null) && (aOwnerView != null))  { parent.removeView(aOwnerView); }
 		lparams = null;
 	}
-
 }
-
