@@ -20,6 +20,7 @@ type
     FPathToJavaSource: string;
     FPathToAndroidProject: string;
 
+
     {%region 'To remove'}
     FPathToAndroidSDK: string;
     FPathToAndroidNDK: string;
@@ -162,15 +163,15 @@ begin
   end;
 
   {%region 'To remove'}
-  FPathToAndroidSDK := LamwGlobalSettings.PathToAndroidSDK;
-  FPathToAndroidNDK := LamwGlobalSettings.PathToAndroidNDK;
+   FPathToAndroidSDK := LamwGlobalSettings.PathToAndroidSDK; //Included Path Delimiter!
+   FPathToAndroidNDK := LamwGlobalSettings.PathToAndroidNDK; //Included Path Delimiter!
   {%endregion}
 
   if not DirectoryExists(FPathToAndroidProject + 'lamwdesigner') then
     InitSmartDesignerHelpers;
 
-{%region 'To remove'}
-  // try fix/repair project paths [demos, etc..]
+  {%region 'To remove'}
+  // try fix/repair project paths [demos, etc..] in "Run" --> "build"  time ...
   if IsDemoProject() then
   begin
     TryChangeDemoProjecPaths();
@@ -178,7 +179,7 @@ begin
   else
   begin  // add/update custom
     LazarusIDE.ActiveProject.CustomData.Values['NdkPath']:= FPathToAndroidNDK;
-    LazarusIDE.ActiveProject.CustomData.Values['SdkPath']:= FPathToAndroidSDK
+    LazarusIDE.ActiveProject.CustomData.Values['SdkPath']:= FPathToAndroidSDK;
   end;
 {%endregion}
 
@@ -934,7 +935,6 @@ begin
   begin
     if FileExists(FPathToAndroidProject+'build.xml') then
     begin
-
       pathToDemoSDK:= GetPathToSDKFromBuildXML(FPathToAndroidProject+'build.xml');
       if pathToDemoSDK <> '' then
       begin
@@ -944,7 +944,6 @@ begin
         strList.Text := strResult;
         strList.SaveToFile(FPathToAndroidProject+'build.xml');
       end;
-
     end;
   end else
     ShowMessage('Sorry.. Project "build.xml" Path  to SDK not fixed... [Please, change it by hand!]');
@@ -963,7 +962,6 @@ begin
         strResult:= StringReplace(strResult, '4.6', '4.9', [rfReplaceAll,rfIgnoreCase]);
       end;
       LazarusIDE.ActiveProject.LazCompilerOptions.Libraries:= strResult;
-
       strCustom:= LazarusIDE.ActiveProject.LazCompilerOptions.CustomOptions;
       strResult:= StringReplace(strCustom, pathToDemoNDK, FPathToAndroidNDK, [rfReplaceAll,rfIgnoreCase]);
       if (FNDKIndex = '3') or  (FNDKIndex = '4') then
@@ -971,11 +969,9 @@ begin
         strResult:= StringReplace(strResult, '4.6', '4.9', [rfReplaceAll,rfIgnoreCase]);
       end;
       LazarusIDE.ActiveProject.LazCompilerOptions.CustomOptions:= strResult;
-
       //  add/update  custom ...
       LazarusIDE.ActiveProject.CustomData.Values['NdkPath']:= FPathToAndroidNDK;
       LazarusIDE.ActiveProject.CustomData.Values['SdkPath']:= FPathToAndroidSDK;
-
   end else
     ShowMessage('Sorry.. path to NDK not fixed ... [Please, change it by hand!]');
 
@@ -1023,15 +1019,13 @@ begin
 
   if (pathToDemoNDK = '') and (pathToDemoSDK = '') then
   begin
-
     TryFindDemoPathsFromReadme(pathToDemoNDK, pathToDemoSDK);  // try "readme.txt"
-
     if (pathToDemoNDK = '') and (pathToDemoSDK = '') then Exit;
-
     //create custom data
+    pathToDemoNDK:= IncludeTrailingPathDelimiter(pathToDemoNDK);
+    pathToDemoSDK:= IncludeTrailingPathDelimiter(pathToDemoSDK);
     LazarusIDE.ActiveProject.CustomData.Values['NdkPath']:= pathToDemoNDK;
-    LazarusIDE.ActiveProject.CustomData.Values['SdkPath']:= pathToDemoSDK
-
+    LazarusIDE.ActiveProject.CustomData.Values['SdkPath']:= pathToDemoSDK;
   end;
 
   if (pathToDemoNDK = FPathToAndroidNDK) and (pathToDemoSDK = FPathToAndroidSDK) then Exit;

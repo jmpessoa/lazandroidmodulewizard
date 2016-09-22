@@ -1582,8 +1582,8 @@ begin
   else  AProject.CustomData.Values['LAMW'] := 'NoGUIConsoleApp';
 
   AProject.CustomData.Values['Package']:= FPackagePrefaceName + '.' + LowerCase(FSmallProjName);
-  AProject.CustomData.Values['NdkPath']:= FPathToAndroidNDK;
-  AProject.CustomData.Values['SdkPath']:= FPathToAndroidSDK;
+  AProject.CustomData.Values['NdkPath']:= IncludeTrailingPathDelimiter(FPathToAndroidNDK);
+  AProject.CustomData.Values['SdkPath']:= IncludeTrailingPathDelimiter(FPathToAndroidSDK);
 
   AProject.ProjectInfoFile := projDir + ChangeFileExt(projName, '.lpi');
 
@@ -1942,6 +1942,7 @@ begin
   customOptions_armV7a:= customOptions_armV7a+' -FD'+pathToNdkToolchainsBinArm;
   customOptions_x86:= customOptions_x86+' -FD'+pathToNdkToolchainsBinX86;
 
+
   (*FIXED !!!   lazarus  rev  >> 46598  !!!
   {$IFDEF WINDOWS}
      //to others :: just to [fix a bug]  lazarus  rev < 46598 .... //thanks to Stephano!
@@ -1952,6 +1953,9 @@ begin
      customOptions_x86:=     customOptions_x86    +' -o..'+DirectorySeparator+'libs'+DirectorySeparator+'x86'        +DirectorySeparator+'lib'+LowerCase(FJavaClassName)+'.so';
   {$ENDIF}
   *)
+
+  {Others}
+  AProject.LazCompilerOptions.CustomOptions:= customOptions_default;
 
   auxList:= TStringList.Create;
   auxList.Add('<Libraries Value="'+libraries_x86+'"/>');
@@ -1986,7 +1990,7 @@ begin
   auxList.Clear;
   auxList.Add('How To Get More Builds:');
   auxList.Add(' ');
-  auxList.Add('   :: Warning: Your system [Laz4Android ?] needs to be prepared for the various builds!');
+  auxList.Add('   :: Warning: Your system [Laz4Android ?] needs to be prepared [cross-compile] for the various builds!');
   auxList.Add(' ');
   auxList.Add('1. Edit Lazarus project file "*.lpi": [use notepad like editor]');
   auxList.Add(' ');
@@ -2052,9 +2056,6 @@ begin
   if FInstructionSet <> 'x86' then
      AProject.LazCompilerOptions.TargetProcessor:= UpperCase(FInstructionSet); {-Cp}
   *)
-
-  {Others}
-  AProject.LazCompilerOptions.CustomOptions:= customOptions_default;
 
   auxList.Free;
   sourceList.Free;
