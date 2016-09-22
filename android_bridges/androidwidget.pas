@@ -14,6 +14,9 @@ interface
 uses
   Classes, SysUtils, Math, types, And_jni, CustApp;
 
+type
+  TAndroidLayoutType = (altMATCHPARENT,altWRAPCONTENT);
+
 const
 
   // Event id for Pascal & Java
@@ -170,7 +173,11 @@ const
                                                           $0000000f
                                                           {ffffffff});
 
-  TLayoutParamsArray: array[0..1] of  DWord = ($ffffffff, $fffffffe);  //-1 , -2
+  TLayoutParamsArray: array[TAndroidLayoutType] of DWord =
+  (
+    $ffffffff, // match_parent  = -1
+    $fffffffe  // wrap_contents = -2
+  );
 
   TGravityArray: array[0..11] of  DWord = ($00000050,
                                           $00000011,
@@ -469,7 +476,7 @@ type
                    lpSevenEighthOfParent, lpOneSixthOfParent, lpFiveSixthOfParent, lpOneFifthOfParent,
                    lpTwoFifthOfParent, lpThreeFifthOfParent, lpThreeQuarterOfParent,
                    lpFourFifthOfParent, lpNineTenthsOfParent,
-                   lp16px, lp24px, lp32px, lp40px, lp48px, lp72px, lp96px);
+                   lp16px, lp24px, lp32px, lp40px, lp48px, lp72px, lp96px, lpExact, lpUseWeight);
 
   TSide = (sdW, sdH);
 
@@ -1821,10 +1828,12 @@ begin
   inherited Create(AOwner);
   FParent:= nil;
   FChilds:=TFPList.Create;
-  FMarginLeft:= 3;
-  FMarginRight:= 3;
-  FMarginBottom:= 3;
-  FMarginTop:= 3;
+  FMarginLeft   := 5;
+  FMarginRight  := 5;
+  FMarginBottom := 5;
+  FMarginTop    := 5;
+  FHeight       := 100;
+  FWidth        := 100;
   FAcceptChildrenAtDesignTime:= False;
   FColor:= colbrDefault;
   FFontColor:= colbrDefault;
@@ -4456,8 +4465,8 @@ end;
 function GetLayoutParamsByParent(paren: jVisualControl; lpParam: TLayoutParams;  side: TSide): DWord;
 begin
   case lpParam of
-     lpMatchParent:          Result:= TLayoutParamsArray[0];  //-1
-     lpWrapContent:          Result:= TLayoutParamsArray[1];  //-2
+     lpMatchParent:          Result:= TLayoutParamsArray[altMATCHPARENT];  //-1
+     lpWrapContent:          Result:= TLayoutParamsArray[altWRAPCONTENT];  //-2
      lpTwoThirdOfParent:     Result:= Trunc((2/3)*GetParamByParentSide(paren, side)-14);
      lpOneThirdOfParent:     Result:= Trunc((1/3)*GetParamByParentSide(paren, side)-14);
 
@@ -4486,6 +4495,11 @@ begin
      lp72px: Result:= 72;
      lp96px: Result:= 96;
 
+     // not yet implemented
+     // lpUseWeight: Result:= 0;
+     // so, for now:
+     lpUseWeight: Result:= TLayoutParamsArray[altMATCHPARENT];
+
      //lpDesigner: Result:= 0;
   end;
 end;
@@ -4493,8 +4507,8 @@ end;
 function GetLayoutParamsByParent2(paren: TAndroidWidget; lpParam: TLayoutParams;  side: TSide): DWord;
 begin
   case lpParam of
-     lpMatchParent:          Result:= TLayoutParamsArray[0];
-     lpWrapContent:          Result:= TLayoutParamsArray[1];
+     lpMatchParent:          Result:= TLayoutParamsArray[altMATCHPARENT];
+     lpWrapContent:          Result:= TLayoutParamsArray[altWRAPCONTENT];
      lpTwoThirdOfParent:     Result:= Trunc((2/3)*GetParamByParentSide2(paren, side)-14); //0.66
      lpOneThirdOfParent:     Result:= Trunc((1/3)*GetParamByParentSide2(paren, side)-14); //0.33
      lpHalfOfParent:         Result:= Trunc((1/2)*GetParamByParentSide2(paren, side)-14); //0.50
@@ -4522,6 +4536,10 @@ begin
      lp48px: Result:= 48;
      lp72px: Result:= 72;
      lp96px: Result:= 96;
+
+     //lpUseWeight: Result:= 0;
+     lpUseWeight: Result:= TLayoutParamsArray[altMATCHPARENT];
+
      //lpDesigner: Result:= 0;
   end;
 end;
@@ -4565,6 +4583,8 @@ begin
      22: Result:= lp48px;
      23: Result:= lp72px;
      24: Result:= lp96px;
+     25: Result:= lpExact;
+     26: Result:= lpUseWeight;
 
      //25: Result:= lpDesigner;
    end;
@@ -4579,8 +4599,8 @@ function GetLayoutParams(App:jApp; lpParam: TLayoutParams; side: TSide): DWord;
 begin
   case lpParam of
 
-   lpMatchParent:          Result:= TLayoutParamsArray[0];
-   lpWrapContent:          Result:= TLayoutParamsArray[1];
+   lpMatchParent:          Result:= TLayoutParamsArray[altMATCHPARENT];
+   lpWrapContent:          Result:= TLayoutParamsArray[altWRAPCONTENT];
    lpTwoThirdOfParent:     Result:= Trunc((2/3)*GetParamBySide(App, side)-14);
    lpOneThirdOfParent:     Result:= Trunc((1/3)*GetParamBySide(App, side)-14);
 
@@ -4609,6 +4629,9 @@ begin
    lp72px: Result:= 72;
    lp96px: Result:= 96;
 
+   //lpUseWeight: Result:= 0;
+   lpUseWeight: Result:= TLayoutParamsArray[altMATCHPARENT];
+
      //lpDesigner: Result:= 0;
   end;
 end;
@@ -4617,8 +4640,8 @@ function GetDesignerLayoutParams(lpParam: TLayoutParams;  L: integer): DWord;
 begin
   case lpParam of
 
-   lpMatchParent:          Result:= TLayoutParamsArray[0];
-   lpWrapContent:          Result:= TLayoutParamsArray[1];
+   lpMatchParent:          Result:= TLayoutParamsArray[altMATCHPARENT];
+   lpWrapContent:          Result:= TLayoutParamsArray[altWRAPCONTENT];
    lpTwoThirdOfParent:     Result:= Trunc((2/3)*L-14);
    lpOneThirdOfParent:     Result:= Trunc((1/3)*L-14);
 
@@ -4646,6 +4669,8 @@ begin
    lp48px: Result:= 48;
    lp72px: Result:= 72;
    lp96px: Result:= 96;
+
+   lpExact: Result:= L;
      //lpDesigner: Result:= 0;
 
   end;
@@ -4653,7 +4678,8 @@ end;
 
 function GetDesignerLayoutByWH(Value: DWord; L: integer): TLayoutParams;  //just for design time...
 begin
-        if Value = 16 then Result:= lp16px
+  if Value = 0 then Result:= lpUseWeight
+   else if Value = 16 then Result:= lp16px
    else if Value = 24 then Result:= lp24px
    else if Value = 32 then Result:= lp32px
    else if Value = 40 then Result:= lp40px
@@ -4675,6 +4701,7 @@ begin
    else if Value <= Trunc((5/6)*L) then Result:= lpFiveSixthOfParent   //0.833
    else if Value <= Trunc((7/8)*L) then Result:= lpSevenEighthOfParent //0.875
    else if Value <= Trunc((9/10)*L)then Result:= lpNineTenthsOfParent  //0.90
+   else if Value = L then Result:= lpExact
    else Result:= lpMatchParent;
 
 end;

@@ -184,15 +184,17 @@ uses
 constructor jDrawingView.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
+
   FMarginLeft   := 10;
   FMarginTop    := 10;
   FMarginBottom := 10;
   FMarginRight  := 10;
-  FLParamWidth:= lpWrapContent; //lpMatchParent;
-  FLParamHeight:= lpWrapContent;
-  FHeight       := 96; //??
-  FWidth        := 96; //??
+  FLParamWidth  := lpWrapContent; //lpMatchParent;
+  FLParamHeight := lpWrapContent;
+  FHeight       := 100;
+  FWidth        := 100;
   FAcceptChildrenAtDesignTime:= False;
+
 //your code here....
   FMouches.Mouch.Active := False;
   FMouches.Mouch.Start  := False;
@@ -228,6 +230,7 @@ procedure jDrawingView.Init(refApp: jApp);
 var
   rToP: TPositionRelativeToParent;
   rToA: TPositionRelativeToAnchorID;
+  aWidth,aHeight:DWORD;
 begin
   if FInitialized  then Exit;
   inherited Init(refApp); //set default ViewParent/FjPRLayout as jForm.View!
@@ -259,10 +262,15 @@ begin
   end;
   jDrawingView_SetViewParent(FjEnv, FjObject, FjPRLayout);
   jDrawingView_SetId(FjEnv, FjObject, Self.Id);
+
+  aWidth  := GetLayoutParams(gApp, FLParamWidth, sdW);
+  aHeight := GetLayoutParams(gApp, FLParamHeight, sdH);
+  if LayoutParamWidth = lpExact then aWidth := FWidth;
+  if LayoutParamHeight = lpExact then aHeight := FHeight;
   jDrawingView_SetLeftTopRightBottomWidthHeight(FjEnv, FjObject,
                         FMarginLeft,FMarginTop,FMarginRight,FMarginBottom,
-                        GetLayoutParams(gApp, FLParamWidth, sdW),
-                        GetLayoutParams(gApp, FLParamHeight, sdH));
+                        aWidth,
+                        aHeight);
 
   if FParent is jPanel then
   begin
@@ -322,17 +330,23 @@ var
 begin
   if FInitialized then
   begin
-    if Self.Parent is jForm then
+
+    if LayoutParamWidth = lpExact then jDrawingView_setLParamWidth(FjEnv, FjObject , FWidth) else
     begin
-      if jForm(Owner).ScreenStyle = (FParent as jForm).ScreenStyleAtStart  then side:= sdW else side:= sdH;
-      jDrawingView_SetLParamWidth(FjEnv, FjObject, GetLayoutParams(gApp, FLParamWidth, side));
-    end
-    else
-    begin
-      if (Self.Parent as jVisualControl).LayoutParamWidth = lpWrapContent then
-        jDrawingView_setLParamWidth(FjEnv, FjObject , GetLayoutParams(gApp, FLParamWidth, sdW))
-      else //lpMatchParent or others
-        jDrawingView_setLParamWidth(FjEnv,FjObject,GetLayoutParamsByParent((Self.Parent as jVisualControl), FLParamWidth, sdW));
+
+      if Self.Parent is jForm then
+      begin
+        if jForm(Owner).ScreenStyle = (FParent as jForm).ScreenStyleAtStart  then side:= sdW else side:= sdH;
+        jDrawingView_SetLParamWidth(FjEnv, FjObject, GetLayoutParams(gApp, FLParamWidth, side));
+      end
+      else
+      begin
+        if (Self.Parent as jVisualControl).LayoutParamWidth = lpWrapContent then
+          jDrawingView_setLParamWidth(FjEnv, FjObject , GetLayoutParams(gApp, FLParamWidth, sdW))
+        else //lpMatchParent or others
+          jDrawingView_setLParamWidth(FjEnv,FjObject,GetLayoutParamsByParent((Self.Parent as jVisualControl), FLParamWidth, sdW));
+      end;
+
     end;
   end;
 end;
@@ -343,17 +357,23 @@ var
 begin
   if FInitialized then
   begin
-    if Self.Parent is jForm then
+
+    if LayoutParamHeight = lpExact then jDrawingView_setLParamHeight(FjEnv, FjObject , FHeight) else
     begin
-      if jForm(Owner).ScreenStyle = (FParent as jForm).ScreenStyleAtStart then side:= sdH else side:= sdW;
-      jDrawingView_SetLParamHeight(FjEnv, FjObject, GetLayoutParams(gApp, FLParamHeight, side));
-    end
-    else
-    begin
-      if (Self.Parent as jVisualControl).LayoutParamHeight = lpWrapContent then
-        jDrawingView_setLParamHeight(FjEnv, FjObject , GetLayoutParams(gApp, FLParamHeight, sdH))
-      else //lpMatchParent and others
-        jDrawingView_setLParamHeight(FjEnv,FjObject,GetLayoutParamsByParent((Self.Parent as jVisualControl), FLParamHeight, sdH));
+
+      if Self.Parent is jForm then
+      begin
+        if jForm(Owner).ScreenStyle = (FParent as jForm).ScreenStyleAtStart then side:= sdH else side:= sdW;
+        jDrawingView_SetLParamHeight(FjEnv, FjObject, GetLayoutParams(gApp, FLParamHeight, side));
+      end
+      else
+      begin
+        if (Self.Parent as jVisualControl).LayoutParamHeight = lpWrapContent then
+          jDrawingView_setLParamHeight(FjEnv, FjObject , GetLayoutParams(gApp, FLParamHeight, sdH))
+        else //lpMatchParent and others
+          jDrawingView_setLParamHeight(FjEnv,FjObject,GetLayoutParamsByParent((Self.Parent as jVisualControl), FLParamHeight, sdH));
+      end;
+
     end;
   end;
 end;
@@ -365,7 +385,7 @@ begin
     inherited UpdateLayout;
     UpdateLParamWidth;
     UpdateLParamHeight;
-  jDrawingView_SetLayoutAll(FjEnv, FjObject, Self.AnchorId);
+    jDrawingView_SetLayoutAll(FjEnv, FjObject, Self.AnchorId);
   end;
 end;
 
@@ -510,7 +530,7 @@ begin
    if FInitialized then
    begin
       Result:= jDrawingView_GetWidth(FjEnv, FjObject );
-      if Result = -1 then //lpMatchParent
+      if Result = TLayoutParamsArray[altMATCHPARENT] then //lpMatchParent
       begin
           if FParent is jForm then Result:= (FParent as jForm).ScreenWH.Width
           else Result:= Self.Parent.Width;
@@ -523,7 +543,7 @@ begin
    Result:= FHeight;
    if FInitialized then
       Result:= jDrawingView_GetHeight(FjEnv, FjObject );
-   if Result = -1 then //lpMatchParent
+   if Result = TLayoutParamsArray[altMATCHPARENT] then //lpMatchParent
    begin
        if FParent is jForm then Result:= (FParent as jForm).ScreenWH.Height
        else Result:= Self.Parent.Height;

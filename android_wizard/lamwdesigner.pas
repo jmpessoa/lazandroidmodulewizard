@@ -1183,10 +1183,10 @@ begin
      and Assigned(jVisualControl(AComponent).Parent) then
        with jVisualControl(AComponent) do
        begin
-         if not (LayoutParamWidth in [lpWrapContent]) then
-           LayoutParamWidth := GetDesignerLayoutByWH(Width, Parent.Width);
-         if not (LayoutParamHeight in [lpWrapContent]) then
-           LayoutParamHeight := GetDesignerLayoutByWH(Height, Parent.Height);
+         if not (LayoutParamWidth in [lpWrapContent, lpExact, lpUseWeight]) then
+           LayoutParamWidth := GetDesignerLayoutByWH(Width, Parent.Width) else
+         if not (LayoutParamHeight in [lpWrapContent, lpExact, lpUseWeight]) then
+           LayoutParamHeight := GetDesignerLayoutByWH(Height, Parent.Height) else
        end;
    end;
 end;
@@ -1429,7 +1429,7 @@ begin
       if FSizing and (FSelection.IndexOf(AWidget) >= 0)
       and (Parent <> nil) then
       begin
-        if not (LayoutParamWidth in [lpWrapContent]) then
+        if not (LayoutParamWidth in [lpWrapContent, lpExact, lpUseWeight]) then
         begin
           x := GetDesignerLayoutByWH(FnewW, Parent.Width);
           y := GetLayoutParamsByParent2(Parent, x, sdW);
@@ -1440,7 +1440,7 @@ begin
           if (z <> FnewW) and (Abs(y - FnewW) < Abs(z - FnewW)) then
             LayoutParamWidth := x;
         end;
-        if not (LayoutParamHeight in [lpWrapContent]) then
+        if not (LayoutParamHeight in [lpWrapContent, lpExact, lpUseWeight]) then
         begin
           x := GetDesignerLayoutByWH(FnewH, Parent.Height);
           y := GetLayoutParamsByParent2(Parent, x, sdH);
@@ -1484,10 +1484,15 @@ begin
   begin
     if Assigned(Parent) then
     begin
-      if not (LayoutParamWidth in [lpWrapContent, lpMatchParent]) then
+      if not (LayoutParamWidth in [lpWrapContent, lpMatchParent, lpExact]) then
         FnewW := GetLayoutParamsByParent2(Parent, LayoutParamWidth, sdW);
-      if not (LayoutParamHeight in [lpWrapContent, lpMatchParent]) then
+      if (LayoutParamWidth in [lpExact]) then
+        FnewW := Width;
+      if not (LayoutParamHeight in [lpWrapContent, lpMatchParent, lpExact]) then
         FnewH := GetLayoutParamsByParent2(Parent, LayoutParamHeight, sdH);
+      if (LayoutParamWidth in [lpExact]) then
+        FnewH := Height;
+
       if FnewW < FminW then FnewW := FminW;
       if FnewH < FminH then FnewH := FminH;
       if (PosRelativeToParent <> []) or (PosRelativeToAnchor <> []) then
