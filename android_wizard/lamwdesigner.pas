@@ -1184,9 +1184,9 @@ begin
        with jVisualControl(AComponent) do
        begin
          if not (LayoutParamWidth in [lpWrapContent, lpExact, lpUseWeight]) then
-           LayoutParamWidth := GetDesignerLayoutByWH(Width, Parent.Width) else
+           LayoutParamWidth := GetDesignerLayoutByWH(Width, Parent.Width);
          if not (LayoutParamHeight in [lpWrapContent, lpExact, lpUseWeight]) then
-           LayoutParamHeight := GetDesignerLayoutByWH(Height, Parent.Height) else
+           LayoutParamHeight := GetDesignerLayoutByWH(Height, Parent.Height);
        end;
    end;
 end;
