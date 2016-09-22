@@ -1490,7 +1490,7 @@ begin
         FnewW := Width;
       if not (LayoutParamHeight in [lpWrapContent, lpMatchParent, lpExact]) then
         FnewH := GetLayoutParamsByParent2(Parent, LayoutParamHeight, sdH);
-      if (LayoutParamWidth in [lpExact]) then
+      if (LayoutParamHeight in [lpExact]) then
         FnewH := Height;
 
       if FnewW < FminW then FnewW := FminW;
