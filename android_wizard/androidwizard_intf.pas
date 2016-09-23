@@ -762,6 +762,11 @@ begin
       FPathToJavaJDK:= frm.PathToJavaJDK;
       FPathToAndroidSDK:= frm.PathToAndroidSDK;
       FPathToAndroidNDK:= frm.PathToAndroidNDK;
+
+      //prepare to LamwSettings model ...
+      FPathToAndroidNDK:= IncludeTrailingPathDelimiter(FPathToAndroidNDK);
+      FPathToAndroidSDK:= IncludeTrailingPathDelimiter(FPathToAndroidSDK);
+
       FPrebuildOSys:= frm.PrebuildOSys;
 
       FNDK:= frm.NDK;
@@ -1044,7 +1049,7 @@ begin
 
           {"android list targets" to see the available targets...}
           strList.Clear;
-          strList.Add('cd '+FPathToAndroidSDK+DirectorySeparator+'tools');
+          strList.Add('cd '+FPathToAndroidSDK+'tools');
           strList.Add('android list targets');
           strList.Add('cd '+FAndroidProjectName);
           strList.Add('pause');
@@ -1056,7 +1061,7 @@ begin
           strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'utils'+DirectorySeparator+'paused_list_target.bat');
 
           strList.Clear;
-          strList.Add('cd '+FPathToAndroidSDK+DirectorySeparator+'tools');
+          strList.Add('cd '+FPathToAndroidSDK+'tools');
           strList.Add('android create avd -n avd_default -t 1 -c 32M');
           strList.Add('cd '+FAndroidProjectName);
           strList.Add('pause');
@@ -1068,7 +1073,7 @@ begin
           strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'utils'+DirectorySeparator+'paused_create_avd_default.bat');
 
           strList.Clear;
-          strList.Add('cd '+FPathToAndroidSDK+DirectorySeparator+'tools');
+          strList.Add('cd '+FPathToAndroidSDK+'tools');
           if StrToInt(FMinApi) >= 15 then
             strList.Add('emulator -avd avd_default +  -gpu on &')  //gpu: api >= 15,,,
           else
@@ -1078,7 +1083,7 @@ begin
 
           strList.Clear;
           strList.Add('cd '+FAndroidProjectName+DirectorySeparator+'bin');
-          strList.Add(FPathToAndroidSDK+DirectorySeparator+'platform-tools'+
+          strList.Add(FPathToAndroidSDK+'platform-tools'+
                      DirectorySeparator+'adb install -r '+FSmallProjName+'-'+FAntBuildMode+'.apk');
           strList.Add('cd ..');
           strList.Add('pause');
@@ -1086,13 +1091,13 @@ begin
 
           strList.Clear;
           strList.Add('cd '+FAndroidProjectName+DirectorySeparator+'bin');
-          strList.Add(FPathToAndroidSDK+DirectorySeparator+'platform-tools'+
+          strList.Add(FPathToAndroidSDK+'platform-tools'+
                      DirectorySeparator+'adb uninstall '+FPackagePrefaceName+'.'+LowerCase(FSmallProjName));
           strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'uninstall.bat');
 
           strList.Clear;
           strList.Add('cd '+FAndroidProjectName+DirectorySeparator+'bin');
-          strList.Add(FPathToAndroidSDK+DirectorySeparator+'platform-tools'+
+          strList.Add(FPathToAndroidSDK+'platform-tools'+
                      DirectorySeparator+'adb logcat');
           strList.Add('cd ..');
           strList.Add('pause');
@@ -1100,7 +1105,7 @@ begin
 
           strList.Clear;
           strList.Add('cd '+FAndroidProjectName+DirectorySeparator+'bin');
-          strList.Add(FPathToAndroidSDK+DirectorySeparator+'platform-tools'+
+          strList.Add(FPathToAndroidSDK+'platform-tools'+
                      DirectorySeparator+'adb logcat AndroidRuntime:E *:S');
           strList.Add('cd ..');
           strList.Add('pause');
@@ -1108,7 +1113,7 @@ begin
 
           strList.Clear;
           strList.Add('cd '+FAndroidProjectName+DirectorySeparator+'bin');
-          strList.Add(FPathToAndroidSDK+DirectorySeparator+'platform-tools'+DirectorySeparator+
+          strList.Add(FPathToAndroidSDK+'platform-tools'+DirectorySeparator+
                      'adb logcat ActivityManager:I '+FSmallProjName+'-'+FAntBuildMode+'.apk:D *:S');
           strList.Add('cd ..');
           strList.Add('pause');
@@ -1117,7 +1122,7 @@ begin
           (*//causes instability in the simulator! why ?
           strList.Clear;
           strList.Add('cd '+FAndroidProjectName+DirectorySeparator+'bin');
-          strList.Add(FPathToAndroidSDK+DirectorySeparator+'platform-tools'+DirectorySeparator+
+          strList.Add(FPathToAndroidSDK+'platform-tools'+DirectorySeparator+
                      'adb shell am start -a android.intent.action.MAIN -n '+
                       FAntPackageName+'.'+LowerCase(projName)+'/.'+FMainActivity);
           strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'launch_apk.bat');
@@ -1125,7 +1130,7 @@ begin
 
           strList.Clear;
           strList.Add('cd '+FAndroidProjectName+DirectorySeparator+'bin');
-          strList.Add(FPathToAndroidSDK+DirectorySeparator+
+          strList.Add(FPathToAndroidSDK+
                      'build-tools'+DirectorySeparator+ GetFolderFromApi(StrToInt(FMinApi))+
                      DirectorySeparator + 'aapt list '+FSmallProjName+'-'+FAntBuildMode+'.apk');
           strList.Add('cd ..');
@@ -1194,8 +1199,8 @@ begin
           strList.Add(' ');
           strList.Add('....  by jmpessoa_hotmail_com');
           strList.Add(' ');
-          strList.Add('System Path to Android SDK='+FPathToAndroidSDK);
-          strList.Add('System Path to Android NDK='+FPathToAndroidNDK);
+          //strList.Add('System Path to Android SDK='+FPathToAndroidSDK);
+          //strList.Add('System Path to Android NDK='+FPathToAndroidNDK);
           strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'readme.txt');
 
           dummy:= LowerCase(FSmallProjName);
@@ -1582,8 +1587,8 @@ begin
   else  AProject.CustomData.Values['LAMW'] := 'NoGUIConsoleApp';
 
   AProject.CustomData.Values['Package']:= FPackagePrefaceName + '.' + LowerCase(FSmallProjName);
-  AProject.CustomData.Values['NdkPath']:= IncludeTrailingPathDelimiter(FPathToAndroidNDK);
-  AProject.CustomData.Values['SdkPath']:= IncludeTrailingPathDelimiter(FPathToAndroidSDK);
+  AProject.CustomData.Values['NdkPath']:= FPathToAndroidNDK;
+  AProject.CustomData.Values['SdkPath']:= FPathToAndroidSDK;
 
   AProject.ProjectInfoFile := projDir + ChangeFileExt(projName, '.lpi');
 
@@ -1747,87 +1752,87 @@ begin
 
   {Set compiler options for Android requirements}
 
-  PathToNdkPlatformsArm:= FPathToAndroidNDK+DirectorySeparator+'platforms'+DirectorySeparator+
+  PathToNdkPlatformsArm:= FPathToAndroidNDK+'platforms'+DirectorySeparator+
                                                 FAndroidPlatform +DirectorySeparator+'arch-arm'+DirectorySeparator+
                                                 'usr'+DirectorySeparator+'lib';
 
   if FNDK = '7' then
-      pathToNdkToolchainsArm:= FPathToAndroidNDK+DirectorySeparator+'toolchains'+DirectorySeparator+
+      pathToNdkToolchainsArm:= FPathToAndroidNDK+'toolchains'+DirectorySeparator+
                                                  'arm-linux-androideabi-4.4.3'+DirectorySeparator+
                                                  'prebuilt'+DirectorySeparator+osys+DirectorySeparator+
                                                  'lib'+DirectorySeparator+'gcc'+DirectorySeparator+
                                                  'arm-linux-androideabi'+DirectorySeparator+'4.4.3';
 
   if (FNDK = '9') or (FNDK = '10') or (FNDK = '10c') then          //arm-linux-androideabi-4.9
-      pathToNdkToolchainsArm:= FPathToAndroidNDK+DirectorySeparator+'toolchains'+DirectorySeparator+
+      pathToNdkToolchainsArm:= FPathToAndroidNDK+'toolchains'+DirectorySeparator+
                                                  'arm-linux-androideabi-4.6'+DirectorySeparator+
                                                  'prebuilt'+DirectorySeparator+osys+DirectorySeparator+
                                                  'lib'+DirectorySeparator+'gcc'+DirectorySeparator+
                                                  'arm-linux-androideabi'+DirectorySeparator+'4.6';
 
   if FNDK = '10e' then          //arm-linux-androideabi-4.9
-      pathToNdkToolchainsArm:= FPathToAndroidNDK+DirectorySeparator+'toolchains'+DirectorySeparator+
+      pathToNdkToolchainsArm:= FPathToAndroidNDK+'toolchains'+DirectorySeparator+
                                                  'arm-linux-androideabi-4.9'+DirectorySeparator+
                                                  'prebuilt'+DirectorySeparator+osys+DirectorySeparator+
                                                  'lib'+DirectorySeparator+'gcc'+DirectorySeparator+
                                                  'arm-linux-androideabi'+DirectorySeparator+'4.9';
 
   if FNDK = '11c' then          //arm-linux-androideabi-4.9
-      pathToNdkToolchainsArm:= FPathToAndroidNDK+DirectorySeparator+'toolchains'+DirectorySeparator+
+      pathToNdkToolchainsArm:= FPathToAndroidNDK+'toolchains'+DirectorySeparator+
                                                  'arm-linux-androideabi-4.9'+DirectorySeparator+
                                                  'prebuilt'+DirectorySeparator+osys+DirectorySeparator+
                                                  'lib'+DirectorySeparator+'gcc'+DirectorySeparator+
                                                  'arm-linux-androideabi'+DirectorySeparator+'4.9';
   if FNDK = '7' then
-      pathToNdkToolchainsBinArm:= FPathToAndroidNDK+DirectorySeparator+'toolchains'+DirectorySeparator+
+      pathToNdkToolchainsBinArm:= FPathToAndroidNDK+'toolchains'+DirectorySeparator+
                                                  'arm-linux-androideabi-4.4.3'+DirectorySeparator+
                                                  'prebuilt'+DirectorySeparator+osys+DirectorySeparator+
                                                  'bin';
 
   if (FNDK = '9') or (FNDK = '10') or (FNDK = '10c') then
-      pathToNdkToolchainsBinArm:= FPathToAndroidNDK+DirectorySeparator+'toolchains'+DirectorySeparator+
+      pathToNdkToolchainsBinArm:= FPathToAndroidNDK+'toolchains'+DirectorySeparator+
                                                  'arm-linux-androideabi-4.6'+DirectorySeparator+
                                                  'prebuilt'+DirectorySeparator+osys+DirectorySeparator+
                                                  'bin';
 
   if FNDK = '10e' then
-      pathToNdkToolchainsBinArm:= FPathToAndroidNDK+DirectorySeparator+'toolchains'+DirectorySeparator+
+      pathToNdkToolchainsBinArm:= FPathToAndroidNDK+'toolchains'+DirectorySeparator+
                                                  'arm-linux-androideabi-4.9'+DirectorySeparator+
                                                  'prebuilt'+DirectorySeparator+osys+DirectorySeparator+
                                                  'bin';
 
   if FNDK = '11c' then
-      pathToNdkToolchainsBinArm:= FPathToAndroidNDK+DirectorySeparator+'toolchains'+DirectorySeparator+
+      pathToNdkToolchainsBinArm:= FPathToAndroidNDK+'toolchains'+DirectorySeparator+
                                                  'arm-linux-androideabi-4.9'+DirectorySeparator+
                                                  'prebuilt'+DirectorySeparator+osys+DirectorySeparator+
                                                  'bin';
 
   libraries_arm:= PathToNdkPlatformsArm+';'+pathToNdkToolchainsArm;
 
-  PathToNdkPlatformsX86:= FPathToAndroidNDK+DirectorySeparator+'platforms'+DirectorySeparator+
+  PathToNdkPlatformsX86:= FPathToAndroidNDK+'platforms'+DirectorySeparator+
                                              FAndroidPlatform+DirectorySeparator+'arch-x86'+DirectorySeparator+
                                              'usr'+DirectorySeparator+'lib';
 
   if FNdk = '7' then
-      pathToNdkToolchainsX86:= FPathToAndroidNDK+DirectorySeparator+'toolchains'+DirectorySeparator+
+      pathToNdkToolchainsX86:= FPathToAndroidNDK+'toolchains'+DirectorySeparator+
                                                  'x86-4.4.3'+DirectorySeparator+'prebuilt'+DirectorySeparator+
                                                  osys+DirectorySeparator+'lib'+DirectorySeparator+
                                                  'gcc'+DirectorySeparator+'i686-android-linux'+DirectorySeparator+'4.4.3';
 
   if (FNDK = '9') or (FNDK = '10') or (FNDK = '10c') then
-      pathToNdkToolchainsX86:= FPathToAndroidNDK+DirectorySeparator+'toolchains'+DirectorySeparator+
+      pathToNdkToolchainsX86:= FPathToAndroidNDK+'toolchains'+DirectorySeparator+
                                                  'x86-4.6'+DirectorySeparator+'prebuilt'+DirectorySeparator+
                                                  osys+DirectorySeparator+'lib'+DirectorySeparator+'gcc'+DirectorySeparator+
                                                  'i686-android-linux'+DirectorySeparator+'4.6';
 
   if FNDK = '10e' then
-      pathToNdkToolchainsX86:= FPathToAndroidNDK+DirectorySeparator+'toolchains'+DirectorySeparator+
+      pathToNdkToolchainsX86:= FPathToAndroidNDK+'toolchains'+DirectorySeparator+
                                                  'x86-4.9'+DirectorySeparator+'prebuilt'+DirectorySeparator+
                                                  osys+DirectorySeparator+'lib'+DirectorySeparator+'gcc'+DirectorySeparator+
                                                  'i686-android-linux'+DirectorySeparator+'4.9';
 
   if FNDK = '11c' then
-      pathToNdkToolchainsX86:= FPathToAndroidNDK+DirectorySeparator+'toolchains'+DirectorySeparator+
+      pathToNdkToolchainsX86:= FPathToAndroidNDK+'toolchains'+DirectorySeparator+
                                                  'x86-4.9'+DirectorySeparator+'prebuilt'+DirectorySeparator+
                                                  osys+DirectorySeparator+'lib'+DirectorySeparator+'gcc'+DirectorySeparator+
                                                  'i686-android-linux'+DirectorySeparator+'4.9';
@@ -1835,23 +1840,23 @@ begin
 
 
   if FNDK = '7' then
-      pathToNdkToolchainsBinX86:= FPathToAndroidNDK+DirectorySeparator+'toolchains'+DirectorySeparator+
+      pathToNdkToolchainsBinX86:= FPathToAndroidNDK+'toolchains'+DirectorySeparator+
                                                  'x86-4.4.3'+DirectorySeparator+'prebuilt'+DirectorySeparator+
                                                  osys+DirectorySeparator+'bin';
 
 
   if (FNDK = '9') or (FNDK = '10') or (FNDK = '10c') then
-      pathToNdkToolchainsBinX86:= FPathToAndroidNDK+DirectorySeparator+'toolchains'+DirectorySeparator+
+      pathToNdkToolchainsBinX86:= FPathToAndroidNDK+'toolchains'+DirectorySeparator+
                                                  'x86-4.6'+DirectorySeparator+'prebuilt'+DirectorySeparator+
                                                  osys+DirectorySeparator+'bin';
 
   if FNDK = '10e' then
-      pathToNdkToolchainsBinX86:= FPathToAndroidNDK+DirectorySeparator+'toolchains'+DirectorySeparator+
+      pathToNdkToolchainsBinX86:= FPathToAndroidNDK+'toolchains'+DirectorySeparator+
                                                  'x86-4.9'+DirectorySeparator+'prebuilt'+DirectorySeparator+
                                                  osys+DirectorySeparator+'bin';
 
   if FNDK = '11c' then
-      pathToNdkToolchainsBinX86:= FPathToAndroidNDK+DirectorySeparator+'toolchains'+DirectorySeparator+
+      pathToNdkToolchainsBinX86:= FPathToAndroidNDK+'toolchains'+DirectorySeparator+
                                                  'x86-4.9'+DirectorySeparator+'prebuilt'+DirectorySeparator+
                                                  osys+DirectorySeparator+'bin';
 
