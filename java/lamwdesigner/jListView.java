@@ -1115,15 +1115,17 @@ public class jListView extends ListView {
 	protected void dispatchDraw(Canvas canvas) {
 
 	    View c = super.getChildAt(0);
-        int scrollposition = -c.getTop() + super.getFirstVisiblePosition() * (c.getHeight()+super.getDividerHeight());			
+	    if ( c != null ) {
+        	int scrollposition = -c.getTop() + super.getFirstVisiblePosition() * (c.getHeight()+super.getDividerHeight());			
 		
 	    //DO YOUR DRAWING ON UNDER THIS VIEWS CHILDREN
 		controls.pOnBeforeDispatchDraw(PasObj, canvas, scrollposition);  //handle by pascal side
 		
-	    super.dispatchDraw(canvas);
+	        super.dispatchDraw(canvas);
 	    
 	    //DO YOUR DRAWING ON TOP OF THIS VIEWS CHILDREN
-	    controls.pOnAfterDispatchDraw(PasObj, canvas,scrollposition);	 //handle by pascal side    
+	        controls.pOnAfterDispatchDraw(PasObj, canvas,scrollposition);	 //handle by pascal side    
+	    }  
 	}
 
 }
