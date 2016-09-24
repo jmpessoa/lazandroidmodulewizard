@@ -1,4 +1,4 @@
-package org.lamw.appdemo1;
+package com.example.applistviewdemo;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -304,7 +304,7 @@ class jArrayAdapter extends ArrayAdapter {
 					break;
 				case 4:  itemWidget = new TextView(ctx);
 					((TextView)itemWidget).setId(position);
-					((TextView)itemWidget).setText(" "+items.get(position).widgetText+" ");
+					((TextView)itemWidget).setText(items.get(position).widgetText);
 					items.get(position).jWidget = itemWidget;
 					break;
 
@@ -315,7 +315,6 @@ class jArrayAdapter extends ArrayAdapter {
 					((EditText)itemWidget).setLines(1);
 					((EditText)itemWidget).setMaxLines(1);
 					((EditText)itemWidget).setMinLines(1);
-
 					items.get(position).jWidget = itemWidget;
 
 					((EditText)itemWidget).setOnFocusChangeListener(new OnFocusChangeListener() {
@@ -324,7 +323,7 @@ class jArrayAdapter extends ArrayAdapter {
 							final EditText Caption = (EditText)v;
 							if (!hasFocus){
 								if (p >= 0) {
-									items.get(p).widgetText = Caption.getText().toString();
+									//items.get(p).widgetText = Caption.getText().toString();
 									items.get(p).jWidget.setFocusable(false);
 									items.get(p).jWidget.setFocusableInTouchMode(false);
 									controls.pOnWidgeItemLostFocus(PasObj, p, Caption.getText().toString());
@@ -1087,45 +1086,19 @@ public class jListView extends ListView {
 	public void SetFontSizeUnit(int _unit) {
 		aadapter.SetFontSizeUnit(_unit);
 	}
-
-	public int getTotalHeight() {
-    int totalHeight = 0;
-    for (int i = 0; i < aadapter.getCount(); i++) {
-        View listItem = aadapter.getView(i, null, this);
-        listItem.measure(0, 0);
-        totalHeight += listItem.getMeasuredHeight();
-    }
-		return totalHeight;
-	}
-
-	public int getItemHeight(int aItemIndex) {
-    if ( (aItemIndex < aadapter.getCount()) && (aItemIndex>=0) )  {
-      View listItem = aadapter.getView(aItemIndex, null, this);
-      listItem.measure(0, 0);
-		  return (int)listItem.getMeasuredHeight();
-    } else
-    {
-      return -1;
-    }
-
-	}
-
-
+	
 	@Override
 	protected void dispatchDraw(Canvas canvas) {
-
-	    View c = super.getChildAt(0);
-	    if ( c != null ) {
-        	int scrollposition = -c.getTop() + super.getFirstVisiblePosition() * (c.getHeight()+super.getDividerHeight());			
-		
-	    //DO YOUR DRAWING ON UNDER THIS VIEWS CHILDREN
+		int scrollposition = 0;
+		View c = super.getChildAt(0);
+		if (c!=null) {
+			scrollposition = -c.getTop() + super.getFirstVisiblePosition() * (c.getHeight()+super.getDividerHeight());
+		}
+		//DO YOUR DRAWING ON UNDER THIS VIEWS CHILDREN
 		controls.pOnBeforeDispatchDraw(PasObj, canvas, scrollposition);  //handle by pascal side
-		
-	        super.dispatchDraw(canvas);
-	    
-	    //DO YOUR DRAWING ON TOP OF THIS VIEWS CHILDREN
-	        controls.pOnAfterDispatchDraw(PasObj, canvas,scrollposition);	 //handle by pascal side    
-	    }  
+		super.dispatchDraw(canvas);
+		//DO YOUR DRAWING ON TOP OF THIS VIEWS CHILDREN
+		controls.pOnAfterDispatchDraw(PasObj, canvas,scrollposition);	 //handle by pascal side
 	}
 
 }
