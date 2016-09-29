@@ -484,7 +484,7 @@ begin
      strList:= TStringList.Create;
      if not DirectoryExists(FAndroidProjectName+DirectorySeparator+'.settings') then
      begin
-       ForceDirectory(FAndroidProjectName+DirectorySeparator+'.settings');
+       CreateDir(FAndroidProjectName+DirectorySeparator+'.settings');
        strList.Add('eclipse.preferences.version=1');
        strList.Add('org.eclipse.jdt.core.compiler.codegen.targetPlatform=1.7');
        strList.Add('org.eclipse.jdt.core.compiler.compliance=1.7');
