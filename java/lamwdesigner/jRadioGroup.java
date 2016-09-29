@@ -36,6 +36,8 @@ public class jRadioGroup extends RadioGroup /*dummy*/ { //please, fix what GUI o
     private int marginTop = 5;
     private int marginRight = 5;
     private int marginBottom = 5;
+    private int lgravity = Gravity.TOP | Gravity.START;
+    private float lweight = 0;
 
     private boolean mRemovedFromParent = false;
     public int checkedIndex = -1;
