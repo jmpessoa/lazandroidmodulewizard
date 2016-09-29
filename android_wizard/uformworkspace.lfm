@@ -1194,8 +1194,7 @@ object FormWorkspace: TFormWorkspace
         Width = 122
         Align = alClient
         Items.Strings = (
-          '8'
-          '10'
+          '14'
           '15'
           '16'
           '17'
@@ -1204,6 +1203,7 @@ object FormWorkspace: TFormWorkspace
           '20'
           '21'
           '22'
+          '23'
         )
         ItemHeight = 15
         OnClick = ListBoxMinSDKClick

@@ -534,7 +534,7 @@ begin
      strList.Add('   ');
      strList.Add('   //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...');
      strList.Add('   ');
-     strList.Add('   public j'+newJavaClassName+'(Controls _ctrls, long _Self) { //Add more others news "_xxx"p arams if needed!');
+     strList.Add('   public j'+newJavaClassName+'(Controls _ctrls, long _Self) { //Add more others news "_xxx" params if needed!');
      strList.Add('      super(_ctrls.activity);');
      strList.Add('      context   = _ctrls.activity;');
      strList.Add('      pascalObj = _Self;');

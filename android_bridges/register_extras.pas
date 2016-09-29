@@ -8,6 +8,7 @@ interface
 
 uses 
   Classes,
+  udpsocket,
   numberpicker,
   activitylauncher,
   mediaplayer,
@@ -46,7 +47,8 @@ implementation
   
 Procedure Register;
 begin
-  {$I jnumberpicker_icon.lrs}
+  {$I judpsocket_icon.lrs}
+  {$I jnumberpickerdialog_icon.lrs}
   {$I jactivitylauncher_icon.lrs}
   {$I jdatepickerdialog_icon.lrs}
   {$I jtimepickerdialog_icon.lrs}
@@ -85,7 +87,8 @@ begin
 
   RegisterComponents('Android Bridges Extra',
    [
-      jNumberPicker,
+      jUDPSocket,
+      jNumberPickerDialog,
       jActivityLauncher,
       jDatePickerDialog,
       jTimePickerDialog,

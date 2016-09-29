@@ -51,7 +51,7 @@ type
     procedure FormActivate(Sender: TObject);
     procedure FormClose(Sender: TObject; var CloseAction: TCloseAction);
     procedure FormCreate(Sender: TObject);
-    procedure GroupBox1Click(Sender: TObject);
+
     procedure ListBoxMinSDKClick(Sender: TObject);
     procedure ListBoxMinSDKSelectionChange(Sender: TObject; User: boolean);
     procedure ListBoxPlatformSelectionChange(Sender: TObject; User: boolean);
@@ -480,7 +480,19 @@ begin
 
   if FProjectModel = 'Eclipse' then
   begin
+
      strList:= TStringList.Create;
+     if not DirectoryExists(FAndroidProjectName+DirectorySeparator+'.settings') then
+     begin
+       ForceDirectory(FAndroidProjectName+DirectorySeparator+'.settings');
+       strList.Add('eclipse.preferences.version=1');
+       strList.Add('org.eclipse.jdt.core.compiler.codegen.targetPlatform=1.7');
+       strList.Add('org.eclipse.jdt.core.compiler.compliance=1.7');
+       strList.Add('org.eclipse.jdt.core.compiler.source=1.7');
+       strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'.settings'+DirectorySeparator+'org.eclipse.jdt.core.prefs');
+     end;
+
+     strList.Clear;
      path:= FAndroidProjectName+DirectorySeparator+'src';
      FindAllDirectories(strList, path, False);
 
@@ -574,12 +586,6 @@ begin   //here ModuleType already know!
     SaveSettings(fileName);  //force to create empty/initial file!
   end;
 end;
-
-procedure TFormWorkspace.GroupBox1Click(Sender: TObject);
-begin
-
-end;
-
 
 function TFormWorkspace.GetEventSignature(nativeMethod: string): string;
 var
@@ -1057,7 +1063,6 @@ begin
 
     ListBoxPlatform.Clear;
 
-
     i1:= StrToIntDef(ReadString('NewProject','InstructionSet', ''), 0);
 
     i3:= StrToIntDef(ReadString('NewProject','ProjectModel', ''), 0);
@@ -1096,9 +1101,7 @@ begin
   if RGInstruction.ItemIndex = 2  then begin FFPUSet:= 'VFPv3'; FInstructionSet:='ARMv7a';end;
 
   EditPathToWorkspace.Text := FPathToWorkspace;
-
   EditPackagePrefaceName.Text := FPackagePrefaceName;
-
   //verify if some was not load!
   Self.LoadPathsSettings(FFileName);
 

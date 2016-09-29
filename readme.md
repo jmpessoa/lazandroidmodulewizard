@@ -109,6 +109,31 @@
 	*
 	****************************************************************************************************
 
+Version 0.7.4 - 28 September - 2016
+
+	NEW! jUDPSocket component   // <<---  rime's suggestion!
+
+	IMPROVED! jForm: added news methods:
+			GetNetworkStatus
+			GetDeviceWifiIPAddress
+			GetDeviceDataMobileIPAddress
+			GetWifiBroadcastIPAddress
+
+	NEW! demo AppUDPSocketDemo1
+	NEW! demo AppNumberPickerDemo1
+
+
+Version 0.7.3 - 21 September - 2016
+
+	NEW! jComponent jNumberPickerDialog
+
+        IMPROVED!  jVisualControl: added events "OnBeforeDispatchDraw" and "OnAfterDispatchDraw"
+			Implemented in:
+				jListView
+				jTextView
+				jEditText
+				jButton 
+
 Version 0.7.2 - 12 September - 2016
 
 	IMPROVED! jListView 

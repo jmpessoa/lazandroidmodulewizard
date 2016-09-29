@@ -15,7 +15,7 @@ TOnNumberPicker = procedure(Sender: TObject; oldValue: integer; newValue: intege
 
 {jControl template}
 
-jNumberPicker = class(jControl)
+ jNumberPickerDialog = class(jControl)
  private
     FOnNumberPicker: TOnNumberPicker;
     FMinValue: integer;
@@ -74,7 +74,7 @@ implementation
 
 {---------  jNumberPicker  --------------}
 
-constructor jNumberPicker.Create(AOwner: TComponent);
+constructor jNumberPickerDialog.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
 //your code here....
@@ -85,7 +85,7 @@ begin
  FWrapSelectorWheel:= True;
 end;
 
-destructor jNumberPicker.Destroy;
+destructor jNumberPickerDialog.Destroy;
 begin
   if not (csDesigning in ComponentState) then
   begin
@@ -99,7 +99,7 @@ begin
   inherited Destroy;
 end;
 
-procedure jNumberPicker.Init(refApp: jApp);
+procedure jNumberPickerDialog.Init(refApp: jApp);
 begin
   if FInitialized  then Exit;
   inherited Init(refApp); //set default ViewParent/FjPRLayout as jForm.View!
@@ -125,33 +125,33 @@ begin
 end;
 
 
-function jNumberPicker.jCreate(): jObject;
+function jNumberPickerDialog.jCreate(): jObject;
 begin
    Result:= jNumberPicker_jCreate(FjEnv, int64(Self), FjThis);
 end;
 
-procedure jNumberPicker.jFree();
+procedure jNumberPickerDialog.jFree();
 begin
   //in designing component state: set value here...
   if FInitialized then
      jNumberPicker_jFree(FjEnv, FjObject);
 end;
 
-procedure jNumberPicker.Show();
+procedure jNumberPickerDialog.Show();
 begin
   //in designing component state: set value here...
   if FInitialized then
      jNumberPicker_Show(FjEnv, FjObject);
 end;
 
-procedure jNumberPicker.Cancel();
+procedure jNumberPickerDialog.Cancel();
 begin
   //in designing component state: set value here...
   if FInitialized then
      jNumberPicker_Cancel(FjEnv, FjObject);
 end;
 
-procedure jNumberPicker.SetMinValue(_minValue: integer);
+procedure jNumberPickerDialog.SetMinValue(_minValue: integer);
 begin
   //in designing component state: set value here...
   FMinValue:= _minValue;
@@ -159,7 +159,7 @@ begin
      jNumberPicker_SetMinValue(FjEnv, FjObject, _minValue);
 end;
 
-procedure jNumberPicker.SetMaxValue(_maxValue: integer);
+procedure jNumberPickerDialog.SetMaxValue(_maxValue: integer);
 begin
   //in designing component state: set value here...
   FMaxValue:= _maxValue;
@@ -167,7 +167,7 @@ begin
      jNumberPicker_SetMaxValue(FjEnv, FjObject, _maxValue);
 end;
 
-procedure jNumberPicker.SetValue(_value: integer);
+procedure jNumberPickerDialog.SetValue(_value: integer);
 begin
   //in designing component state: set value here...
   FValue:= _value;
@@ -175,7 +175,7 @@ begin
      jNumberPicker_SetValue(FjEnv, FjObject, _value);
 end;
 
-procedure jNumberPicker.SetTitle(_title: string);
+procedure jNumberPickerDialog.SetTitle(_title: string);
 begin
   //in designing component state: set value here...
   FTitle:= _title;
@@ -183,7 +183,7 @@ begin
      jNumberPicker_SetTitle(FjEnv, FjObject, _title);
 end;
 
-procedure jNumberPicker.SetWrapSelectorWheel(_value: boolean);
+procedure jNumberPickerDialog.SetWrapSelectorWheel(_value: boolean);
 begin
   //in designing component state: set value here...
   FWrapSelectorWheel:= _value;
@@ -191,28 +191,28 @@ begin
      jNumberPicker_SetWrapSelectorWheel(FjEnv, FjObject, _value);
 end;
 
-procedure jNumberPicker.Show(_title: string);
+procedure jNumberPickerDialog.Show(_title: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
      jNumberPicker_Show(FjEnv, FjObject, _title);
 end;
 
-procedure jNumberPicker.SetDisplayedValues(var _values: TDynArrayOfString);
+procedure jNumberPickerDialog.SetDisplayedValues(var _values: TDynArrayOfString);
 begin
   //in designing component state: set value here...
   if FInitialized then
      jNumberPicker_SetDisplayedValues(FjEnv, FjObject, _values);
 end;
 
-procedure jNumberPicker.ClearDisplayedValues();
+procedure jNumberPickerDialog.ClearDisplayedValues();
 begin
   //in designing component state: set value here...
   if FInitialized then
      jNumberPicker_ClearDisplayedValues(FjEnv, FjObject);
 end;
 
-procedure jNumberPicker.GenEvent_OnNumberPicker(Obj: TObject; oldValue: integer; newValue: integer);
+procedure jNumberPickerDialog.GenEvent_OnNumberPicker(Obj: TObject; oldValue: integer; newValue: integer);
 begin
    if Assigned(FOnNumberPicker) then FOnNumberPicker(Obj, oldValue, newValue);
 end;
@@ -227,7 +227,7 @@ var
 begin
   jParams[0].j:= _Self;
   jCls:= Get_gjClass(env);
-  jMethod:= env^.GetMethodID(env, jCls, 'jNumberPicker_jCreate', '(J)Ljava/lang/Object;');
+  jMethod:= env^.GetMethodID(env, jCls, 'jNumberPickerDialog_jCreate', '(J)Ljava/lang/Object;');
   Result:= env^.CallObjectMethodA(env, this, jMethod, @jParams);
   Result:= env^.NewGlobalRef(env, Result);
 end;
@@ -235,8 +235,8 @@ end;
 (*
 //Please, you need insert:
 
-public java.lang.Object jNumberPicker_jCreate(long _Self) {
-  return (java.lang.Object)(new jNumberPicker(this,_Self));
+public java.lang.Object jNumberPickerDialog_jCreate(long _Self) {
+  return (java.lang.Object)(new jNumberPickerDialog(this,_Self));
 }
 
 //to end of "public class Controls" in "Controls.java"

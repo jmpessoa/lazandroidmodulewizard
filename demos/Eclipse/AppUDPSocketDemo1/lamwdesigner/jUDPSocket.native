@@ -1,0 +1,1 @@
+public native boolean pOnUDPSocketReceived(long pasobj, String content, String fromIP, int fromPort);

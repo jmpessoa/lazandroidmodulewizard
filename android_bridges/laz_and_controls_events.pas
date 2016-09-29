@@ -100,6 +100,8 @@ uses
    Procedure Java_Event_pOnClickAutoDropDownItem(env: PJNIEnv; this: jobject; Obj: TObject;index: integer; caption: JString);
    procedure Java_Event_pOnChronometerTick(env: PJNIEnv; this: jobject; Obj: TObject; elapsedTimeMillis: JLong);
    Procedure Java_Event_pOnNumberPicker(env: PJNIEnv; this: jobject; Obj: TObject; oldValue: integer; newValue: integer);
+   function Java_Event_pOnUDPSocketReceived(env: PJNIEnv; this: jobject; Obj: TObject;
+                             content: JString; fromIP: JString; fromPort: integer): JBoolean;
 
 
 implementation
@@ -110,7 +112,7 @@ uses
    spinner, location, actionbartab, customdialog, togglebutton, switchbutton, gridview,
    sensormanager, broadcastreceiver, datepickerdialog, timepickerdialog, shellcommand,
    tcpsocketclient, surfaceview, mediaplayer, contactmanager, seekbar, ratingbar, radiogroup,
-   autocompletetextview, chronometer, numberpicker;
+   autocompletetextview, chronometer, numberpicker, udpsocket;
 
 procedure Java_Event_pOnBluetoothEnabled(env: PJNIEnv; this: jobject; Obj: TObject);
 begin
@@ -1124,7 +1126,6 @@ var
 begin
   gApp.Jni.jEnv:= env;
   gApp.Jni.jThis:= this;
-
   if Obj is jAutoTextVIew then
   begin
     jForm(jAutoTextVIew(Obj).Owner).UpdateJNI(gApp);
@@ -1174,11 +1175,41 @@ Procedure Java_Event_pOnNumberPicker(env: PJNIEnv; this: jobject; Obj: TObject; 
 begin
   gApp.Jni.jEnv:= env;
   gApp.Jni.jThis:= this;
-  if Obj is jNumberPicker then
+  if Obj is jNumberPickerDialog then
   begin
-    jForm(jNumberPicker(Obj).Owner).UpdateJNI(gApp);
-    jNumberPicker(Obj).GenEvent_OnNumberPicker(Obj, oldValue, newValue);
+    jForm(jNumberPickerDialog(Obj).Owner).UpdateJNI(gApp);
+    jNumberPickerDialog(Obj).GenEvent_OnNumberPicker(Obj, oldValue, newValue);
   end;
+end;
+
+function Java_Event_pOnUDPSocketReceived(env: PJNIEnv; this: jobject; Obj: TObject;
+                               content: JString; fromIP: JString; fromPort: integer): JBoolean;
+var
+   pascontent, pasfromIP:  string;
+   jBoo: jBoolean;
+   outListening: boolean;
+begin
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+  outListening:= True;  //continue listening
+  if Obj is jUDPSocket then
+  begin
+    jForm(jUDPSocket(Obj).Owner).UpdateJNI(gApp);
+    pascontent := '';
+    if content <> nil then
+    begin
+      jBoo := JNI_False;
+      pascontent:= string( env^.GetStringUTFChars(Env,content,@jBoo) );
+    end;
+    pasfromIP:= '';
+    if fromIP <> nil then
+    begin
+      jBoo := JNI_False;
+      pasfromIP:= string( env^.GetStringUTFChars(Env,fromIP,@jBoo) );
+    end;
+    jUDPSocket(Obj).GenEvent_OnUDPSocketReceived(Obj, pascontent, pasfromIP, fromPort, outListening);
+  end;
+  Result:= JBool(outListening);
 end;
 
 end.

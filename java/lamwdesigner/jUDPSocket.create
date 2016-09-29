@@ -1,0 +1,3 @@
+public java.lang.Object jUDPSocket_jCreate(long _Self) {
+  return (java.lang.Object)(new jUDPSocket(this,_Self));
+}

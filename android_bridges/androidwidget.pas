@@ -262,6 +262,8 @@ type
 
  TConnectionType = (ctMobile, ctWifi, ctBluetooch, ctEthernet);
 
+ TNetworkStatus = (nsOff, nsWifiOn, nsMobileDataOn);
+
  TAndroidResult = (RESULT_OK = -1, RESULT_CANCELED = 0);
 
  TImageScaleType = (scaleCenter, scaleCenterCrop, scaleCenterInside, scaleFitCenter,
@@ -1084,6 +1086,10 @@ type
     procedure HideSoftInput();
     procedure ShowSoftInput();
 
+    function GetNetworkStatus(): TNetworkStatus;
+    function GetDeviceWifiIPAddress(): string;
+    function GetDeviceDataMobileIPAddress(): string;
+    function GetWifiBroadcastIPAddress(): string;
 
     // Property
     property View         : jObject        read FjRLayout; //layout!
@@ -1347,7 +1353,10 @@ end;
   procedure jForm_HideSoftInput(env: PJNIEnv; _jform: JObject);
   procedure jForm_ShowSoftInput(env: PJNIEnv; _jform: JObject);
 
-
+  function jForm_GetNetworkStatus(env: PJNIEnv; _jform: JObject): integer;
+  function jForm_GetDeviceDataMobileIPAddress(env: PJNIEnv; _jform: JObject): string;
+  function jForm_GetDeviceWifiIPAddress(env: PJNIEnv; _jform: JObject): string;
+  function jForm_GetWifiBroadcastIPAddress(env: PJNIEnv; _jform: JObject): string;
 
 //jni API Bridge
 
@@ -3200,6 +3209,34 @@ begin
      jForm_ShowSoftInput(FjEnv, FjObject);
 end;
 
+function jForm.GetNetworkStatus(): TNetworkStatus;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= TNetworkStatus(jForm_GetNetworkStatus(FjEnv, FjObject));
+end;
+
+function jForm.GetDeviceDataMobileIPAddress(): string;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jForm_GetDeviceDataMobileIPAddress(FjEnv, FjObject);
+end;
+
+function jForm.GetDeviceWifiIPAddress(): string;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jForm_GetDeviceWifiIPAddress(FjEnv, FjObject);
+end;
+
+function jForm.GetWifiBroadcastIPAddress(): string;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jForm_GetWifiBroadcastIPAddress(FjEnv, FjObject);
+end;
+
 
 {-------- jForm_JNI_Bridge ----------}
 
@@ -4151,6 +4188,78 @@ begin
   jCls:= env^.GetObjectClass(env, _jform);
   jMethod:= env^.GetMethodID(env, jCls, 'ShowSoftInput', '()V');
   env^.CallVoidMethod(env, _jform, jMethod);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+function jForm_GetNetworkStatus(env: PJNIEnv; _jform: JObject): integer;
+var
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jform);
+  jMethod:= env^.GetMethodID(env, jCls, 'GetNetworkStatus', '()I');
+  Result:= env^.CallIntMethod(env, _jform, jMethod);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+function jForm_GetDeviceDataMobileIPAddress(env: PJNIEnv; _jform: JObject): string;
+var
+  jStr: JString;
+  jBoo: JBoolean;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jform);
+  jMethod:= env^.GetMethodID(env, jCls, 'GetDeviceDataMobileIPAddress', '()Ljava/lang/String;');
+  jStr:= env^.CallObjectMethod(env, _jform, jMethod);
+  case jStr = nil of
+     True : Result:= '';
+     False: begin
+              jBoo:= JNI_False;
+              Result:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
+            end;
+  end;
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+
+function jForm_GetDeviceWifiIPAddress(env: PJNIEnv; _jform: JObject): string;
+var
+  jStr: JString;
+  jBoo: JBoolean;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jform);
+  jMethod:= env^.GetMethodID(env, jCls, 'GetDeviceWifiIPAddress', '()Ljava/lang/String;');
+  jStr:= env^.CallObjectMethod(env, _jform, jMethod);
+  case jStr = nil of
+     True : Result:= '';
+     False: begin
+              jBoo:= JNI_False;
+              Result:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
+            end;
+  end;
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+function jForm_GetWifiBroadcastIPAddress(env: PJNIEnv; _jform: JObject): string;
+var
+  jStr: JString;
+  jBoo: JBoolean;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jform);
+  jMethod:= env^.GetMethodID(env, jCls, 'GetWifiBroadcastIPAddress', '()Ljava/lang/String;');
+  jStr:= env^.CallObjectMethod(env, _jform, jMethod);
+  case jStr = nil of
+     True : Result:= '';
+     False: begin
+              jBoo:= JNI_False;
+              Result:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
+            end;
+  end;
   env^.DeleteLocalRef(env, jCls);
 end;
 

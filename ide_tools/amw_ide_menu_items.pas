@@ -347,6 +347,8 @@ begin
        mrNo: eclipseTooling:='';
     end;
 
+    ForceDirectory(PathToAndroidProject+DirectorySeparator+'.settings');
+
     auxList.Clear;
     if eclipseTooling = 'EclipseAndmore' then  //toggle to ADT
     begin

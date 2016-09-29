@@ -1,3 +1,0 @@
-public java.lang.Object jNumberPicker_jCreate(long _Self) {
-  return (java.lang.Object)(new jNumberPicker(this,_Self));
-}

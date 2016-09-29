@@ -15,7 +15,7 @@ import android.widget.RelativeLayout;
 /*https://github.com/jmpessoa/lazandroidmodulewizard*/
 /*jControl template*/
 
-public class jNumberPicker /*extends ...*/ {
+public class jNumberPickerDialog /*extends ...*/ {
  
    private long     pascalObj = 0;      // Pascal Object
    private Controls controls  = null;   // Control Class -> Java/Pascal Interface ...
@@ -35,7 +35,7 @@ public class jNumberPicker /*extends ...*/ {
    
    //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
  
-   public jNumberPicker(Controls _ctrls, long _Self) { //Add more others news "_xxx" params if needed!
+   public jNumberPickerDialog(Controls _ctrls, long _Self) { //Add more others news "_xxx" params if needed!
       //super(_ctrls.activity);
       context   = _ctrls.activity;
       pascalObj = _Self;

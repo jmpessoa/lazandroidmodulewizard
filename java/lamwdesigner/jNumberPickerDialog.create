@@ -1,0 +1,3 @@
+public java.lang.Object jNumberPickerDialog_jCreate(long _Self) {
+  return (java.lang.Object)(new jNumberPickerDialog(this,_Self));
+}
