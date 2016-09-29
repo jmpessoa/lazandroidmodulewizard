@@ -1,4 +1,4 @@
-package com.example.appdemo1;
+package com.example.appgridviewdemo1;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -10,6 +10,7 @@ import android.util.Log;
 import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewGroup.LayoutParams;
 import android.view.ViewGroup.MarginLayoutParams;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -107,17 +108,17 @@ class jGridViewCustomAdapter extends ArrayAdapter {
         LinearLayout listLayout = new LinearLayout(context);
         listLayout.setLayoutParams(new GridView.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
 
-        RelativeLayout itemLayout = new RelativeLayout(context);
-        itemLayout.setLayoutParams(new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
+        android.widget.RelativeLayout itemLayout = new android.widget.RelativeLayout(context);
+        itemLayout.setLayoutParams(new android.widget.RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
 
         TextView textViewTitle = new TextView(context);
 
         textViewTitle.setPadding(10, 10, 10, 10); //try improve here ... 17-jan-2015
 
         ImageView imageViewItem = new ImageView(context);
-        LayoutParams imgParam = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT); //w,h
+        android.widget.RelativeLayout.LayoutParams imgParam = new android.widget.RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT); //w,h
 
-        LayoutParams txtParam = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT); //w,h        
+        android.widget.RelativeLayout.LayoutParams txtParam = new android.widget.RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT); //w,h        
         txtParam.addRule(RelativeLayout.CENTER_HORIZONTAL);
         if ( this.itemsLayout == 0 ) {
             imageViewItem.setPadding(25,20,25,40);

@@ -1,6 +1,6 @@
 package com.example.appgridviewdemo1;
 
-//LAMW: Lazarus Android Module Wizard  - version 0.7 - 04 July - 2016 
+//LAMW: Lazarus Android Module Wizard  - version 0.7 - rev. 0.4 - 28 September - 2016 
 //RAD Android: Project Wizard, Form Designer and Components Development Model!
 
 //https://github.com/jmpessoa/lazandroidmodulewizard
@@ -81,8 +81,10 @@ import android.provider.MediaStore;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.net.ConnectivityManager;
+import android.net.DhcpInfo;
 import android.net.NetworkInfo;
 import android.net.Uri;
+import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.util.Log;
 import android.view.ContextMenu;
@@ -106,9 +108,14 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.Enumeration;
+
 import java.util.List;
 import java.util.Locale;
 import java.lang.reflect.*;
+import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.net.SocketException;
 
 //-------------------------------------------------------------------------
 //Constants
@@ -889,6 +896,16 @@ public void ToggleSoftInput() {
 	  imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
 }
 
+public void HideSoftInput() {
+	  InputMethodManager imm =(InputMethodManager) controls.activity.getSystemService(Context.INPUT_METHOD_SERVICE);
+	  imm.toggleSoftInput(InputMethodManager.RESULT_HIDDEN, 0);
+}
+
+public void ShowSoftInput() {
+	  InputMethodManager imm =(InputMethodManager) controls.activity.getSystemService(Context.INPUT_METHOD_SERVICE);
+	  imm.toggleSoftInput(InputMethodManager.RESULT_SHOWN, 0);
+}
+
 //thanks to Mladen
 public String GetDeviceModel() {
   return android.os.Build.MODEL;  
@@ -933,6 +950,92 @@ public Uri ParseUri(String _uriAsString) {
 public String UriToString(Uri _uri) {
   return _uri.toString();
 }
+
+// ref. http://www.android-examples.com/get-display-ip-address-of-android-phone-device-programmatically/
+public int GetNetworkStatus() {
+  boolean WIFI = false;
+  boolean MOBILE = false;
+  int r = 0; //NOT_CONNECTED
+  ConnectivityManager CM = (ConnectivityManager) controls.activity.getSystemService(Context.CONNECTIVITY_SERVICE);
+  NetworkInfo[] networkInfo = CM.getAllNetworkInfo();
+  for (NetworkInfo netInfo : networkInfo) {
+     if (netInfo.getTypeName().equalsIgnoreCase("WIFI"))
+     if (netInfo.isConnected()) WIFI = true;
+     if (netInfo.getTypeName().equalsIgnoreCase("MOBILE"))
+     if (netInfo.isConnected())
+     MOBILE = true;
+  }
+  
+  if(WIFI == true) {
+    r = 1; //WIFI_CONNECTED
+  }
+  
+  if(MOBILE == true) {
+	r = 2; //MOBILE_DATA_CONNECTED
+  }
+  
+  return  r;
+} 
+
+public String GetDeviceDataMobileIPAddress(){
+	String r = "";
+try {
+    for (Enumeration<NetworkInterface> en = NetworkInterface.getNetworkInterfaces(); 
+      en.hasMoreElements();) {
+      NetworkInterface networkinterface = en.nextElement();
+      for (Enumeration<InetAddress> enumIpAddr = networkinterface.getInetAddresses(); enumIpAddr.hasMoreElements();) {
+         InetAddress inetAddress = enumIpAddr.nextElement();
+         if (!inetAddress.isLoopbackAddress()) {        	                      
+           boolean isIPv4 = inetAddress.getHostAddress().indexOf(':') < 0;              
+           if (isIPv4)  return r = inetAddress.getHostAddress();     
+           if (!isIPv4) {
+                   int delim = inetAddress.getHostAddress().indexOf('%'); // drop ip6 zone suffix
+                   r = delim < 0 ? inetAddress.getHostAddress().toUpperCase() : inetAddress.getHostAddress().substring(0, delim).toUpperCase();
+           }                                
+         }
+      }
+    }
+}catch (Exception ex) {
+Log.e("Current IP", ex.toString());
+}
+return r;
+}
+
+//ref. http://www.devlper.com/2010/07/getting-ip-address-of-the-device-in-android/
+public String GetDeviceWifiIPAddress() {
+    WifiManager mWifi = (WifiManager) controls.activity.getSystemService(Context.WIFI_SERVICE);  
+    //String ip = Formatter.formatIpAddress(    		
+    int  ipAddress = mWifi.getConnectionInfo().getIpAddress();
+    String sIP =String.format("%d.%d.%d.%d",
+    		(ipAddress & 0xff),
+    		(ipAddress >> 8 & 0xff),
+    		(ipAddress >> 16 & 0xff),
+    		(ipAddress >> 24 & 0xff));
+   return sIP;
+}
+
+  /** 
+  * Calculate the broadcast IP we need to send the packet along.
+  * ref. http://www.ece.ncsu.edu/wireless/MadeInWALAN/AndroidTutorial/ 
+  */
+  public String GetWifiBroadcastIPAddress() throws IOException {
+	String r = null;
+    WifiManager mWifi = (WifiManager) controls.activity.getSystemService(Context.WIFI_SERVICE);  
+	// DhcpInfo  is a simple object for retrieving the results of a DHCP request
+    DhcpInfo dhcp = mWifi.getDhcpInfo(); 
+    if (dhcp == null) {     
+      return null; 
+    }        
+    int broadcast = (dhcp.ipAddress & dhcp.netmask) | ~dhcp.netmask;     
+    byte[] quads = new byte[4];    
+    for (int k = 0; k < 4; k++) 
+      quads[k] = (byte) ((broadcast >> k * 8) & 0xFF);      
+    // Returns the InetAddress corresponding to the array of bytes. 
+    // The high order byte is quads[0].
+    r = InetAddress.getByAddress(quads).getHostAddress();    
+    if  (r == null) r = "";    
+    return r;
+  }
 
 }
  
@@ -979,16 +1082,19 @@ public native void pAppOnViewClick(View view, int id);
 public native void pAppOnListItemClick(AdapterView adapter, View view, int position, int id);
 public native void pOnFlingGestureDetected(long pasobj, int direction);
 public native void pOnPinchZoomGestureDetected(long pasobj, float scaleFactor, int state);
+public native void pOnLostFocus(long pasobj, String text);
+public native void pOnBeforeDispatchDraw(long pasobj, Canvas canvas, int tag);
+public native void pOnAfterDispatchDraw(long pasobj, Canvas canvas, int tag);
  
 //Load Pascal Library
 static {
-	/*
+/*--nogui--
     try {
     	System.loadLibrary("freetype"); // need by TFPNoGUIGraphicsBridge [ref. www.github.com/jmpessoa/tfpnoguigraphicsbridge]
     } catch (UnsatisfiedLinkError e) {
          Log.e("JNI_Load_LibFreetype", "exception", e);
     }
-    */	
+--graphics--*/	
     try {
     	System.loadLibrary("controls");
     } catch (UnsatisfiedLinkError e) {
@@ -1602,8 +1708,8 @@ public String jCamera_takePhoto(String path, String filename, int requestCode) {
 //SMART LAMW DESIGNER
 //-------------------------------------------------------------------------------------------------------
 
-public  java.lang.Object jTextView_Create(long pasobj) {
-  return (java.lang.Object)( new jTextView(this.activity,this,pasobj));
+public  java.lang.Object jButton_Create(long pasobj ) {
+  return (java.lang.Object)( new jButton(this.activity,this,pasobj));
 }
 
 public java.lang.Object jGridView_jCreate(long _Self) {
@@ -1614,12 +1720,12 @@ public native void pOnLongClickGridItem(long pasobj, int position, String captio
 public native int pOnGridDrawItemCaptionColor(long pasobj, int position, String caption);
 public native Bitmap pOnGridDrawItemBitmap(long pasobj, int position, String caption);
 
-public  java.lang.Object jButton_Create(long pasobj ) {
-  return (java.lang.Object)( new jButton(this.activity,this,pasobj));
-}
-
 public java.lang.Object jImageFileManager_jCreate(long _Self) {
    return (java.lang.Object)(new jImageFileManager(this,_Self));
+}
+
+public  java.lang.Object jTextView_Create(long pasobj) {
+  return (java.lang.Object)( new jTextView(this.activity,this,pasobj));
 }
 
 }
