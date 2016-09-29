@@ -98,9 +98,12 @@ type
     FColor: TARGBColorBridge;
     FFontColor: TARGBColorBridge;
     BaseStyle: string;
+    lpHeight, lpWidth: TLayoutParams;
     procedure SetColor(AColor: TARGBColorBridge);
     procedure SetFontColor(AColor: TARGBColorBridge);
     function Designer: TAndroidWidgetMediator;
+    function WrapContentHeightByChildren: Integer;
+    function WrapContentWidthByChildren: Integer;
   protected
     FAndroidWidget: TAndroidWidget;      // original
     FCanvas: TCanvas;                    // canvas to draw onto
@@ -178,6 +181,8 @@ type
     procedure Draw; override;
     procedure UpdateLayout; override;
   end;
+
+  { TDraftRadioGroup }
 
   TDraftRadioGroup = class(TDraftWidget)
   public
@@ -343,7 +348,6 @@ type
   TDraftPanel = class(TDraftWidget)
   public
     procedure Draw; override;
-    procedure UpdateLayout; override;
   end;
 
 
@@ -833,26 +837,6 @@ begin
     end;
     Rectangle(0, 0, FAndroidWidget.Width, FAndroidWidget.Height);    // outer frame
   end;
-end;
-
-procedure TDraftPanel.UpdateLayout;
-var
-  maxH, i, t: Integer;
-begin
-   with jPanel(FAndroidWidget) do
-    if (LayoutParamHeight = lpWrapContent) and (ChildCount > 0) then
-    begin
-      with Children[0] do
-        maxH := Top + Height + MarginBottom;
-      for i := 1 to ChildCount - 1 do
-        with Children[i] do
-        begin
-          t := Top + Height + MarginBottom;
-          if t > maxH then maxH := t;
-        end;
-      FnewH := maxH;
-    end;
-  inherited;
 end;
 
 { TDraftControlHash }
@@ -1482,17 +1466,28 @@ procedure TDraftWidget.UpdateLayout;
 begin
   with jVisualControl(FAndroidWidget) do
   begin
+    lpWidth := LayoutParamWidth;
+    lpHeight := LayoutParamHeight;
     if Assigned(Parent) then
     begin
-      if not (LayoutParamWidth in [lpWrapContent, lpMatchParent, lpExact]) then
-        FnewW := GetLayoutParamsByParent2(Parent, LayoutParamWidth, sdW);
-      if (LayoutParamWidth in [lpExact]) then
-        FnewW := Width;
-      if not (LayoutParamHeight in [lpWrapContent, lpMatchParent, lpExact]) then
-        FnewH := GetLayoutParamsByParent2(Parent, LayoutParamHeight, sdH);
-      if (LayoutParamHeight in [lpExact]) then
-        FnewH := Height;
-
+      case lpWidth of
+        lpExact: FNewW := Width;
+        lpMatchParent: { will be handled after NewL };
+        lpWrapContent:
+          if ChildCount > 0 then
+            FNewW := WrapContentWidthByChildren;
+        else
+          FnewW := GetLayoutParamsByParent2(Parent, LayoutParamWidth, sdW);
+      end;
+      case lpHeight of
+        lpExact: FNewH := Height;
+        lpMatchParent: { will be handled after NewT };
+        lpWrapContent:
+          if ChildCount > 0 then
+            FNewH := WrapContentHeightByChildren;
+        else
+          FnewH := GetLayoutParamsByParent2(Parent, LayoutParamWidth, sdH);
+      end;
       if FnewW < FminW then FnewW := FminW;
       if FnewH < FminH then FnewH := FminH;
       if (PosRelativeToParent <> []) or (PosRelativeToAnchor <> []) then
@@ -1549,9 +1544,9 @@ begin
     end;
     if Assigned(Parent) then
     begin
-      if LayoutParamWidth = lpMatchParent then
+      if lpWidth = lpMatchParent then
         FnewW := Parent.Width - MarginLeft - FnewL - MarginRight;
-      if LayoutParamHeight = lpMatchParent then
+      if lpHeight = lpMatchParent then
         FnewH := Parent.Height - MarginTop - FnewT - MarginBottom;
     end;
     SetBounds(FnewL, FnewT, FnewW, FnewH);
@@ -1586,6 +1581,42 @@ begin
   while Assigned(t.Parent) do t := t.Parent;
   if t is TAndroidForm then
     Result := TAndroidForm(t).Designer as TAndroidWidgetMediator;
+end;
+
+function TDraftWidget.WrapContentWidthByChildren: Integer;
+var
+  i, t: Integer;
+begin
+  with jVisualControl(FAndroidWidget) do
+  begin
+    Result := 0;
+    for i := 0 to ChildCount - 1 do
+      with jVisualControl(Children[i]) do
+      begin
+        if LayoutParamWidth = lpMatchParent then
+          lpWidth := lpMatchParent;
+        t := Left + Width + MarginRight;
+        if t > Result then Result := t;
+      end;
+  end;
+end;
+
+function TDraftWidget.WrapContentHeightByChildren: Integer;
+var
+  i, t: Integer;
+begin
+  with jVisualControl(FAndroidWidget) do
+  begin
+    Result := 0;
+    for i := 0 to ChildCount - 1 do
+      with jVisualControl(Children[i]) do
+      begin
+        if (LayoutParamHeight = lpMatchParent) then
+          lpHeight := lpMatchParent;
+        t := Top + Height + MarginBottom;
+        if t > Result then Result := t;
+      end;
+  end;
 end;
 
 function TDraftWidget.GetParentBackgroundColor: TARGBColorBridge;
