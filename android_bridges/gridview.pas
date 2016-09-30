@@ -56,12 +56,15 @@ type
     // added by tintinux
     FCells: TCells;
 
+    function GetImages(ACol, ARow: integer): string;
     procedure SetColor(Value: TARGBColorBridge); //background
+    procedure SetImages(ACol, ARow: integer; AImgIdentifier: string);
     procedure SetRowCount(AValue: integer);
     procedure UpdateLParamHeight;
     procedure UpdateLParamWidth;
 
     // added by tintinux
+    function GetImgIdentifier(const col, row: integer): string;
     procedure BlankValue(const I: integer);
     procedure DeleteItems(const Start: integer);
     procedure RestoreItems(const Start: integer);
@@ -123,17 +126,17 @@ type
     procedure GenEvent_OnDrawItemBitmap(Obj: TObject; index: integer;
       Caption: string; out bitmap: JObject);
     // added by Tintinux
-    procedure Add(const Item: string = ''; const ImgIdentifier: string = '');
-    function GetImgIdentifier(const col, row: integer): string;
     procedure IndexToCoord(const index: integer; out col, row: integer);
+    procedure Add(const Item: string = ''; const ImgIdentifier: string = '');
     procedure AddRow(AfterRow: integer = -1);
     procedure DeleteRow(const Row: integer);
     procedure AddCol(const AfterCol: integer = -1);
     procedure DeleteCol(const Col: integer);
     property Cells[ACol, ARow: integer]: string read GetCells write SetCells;
+    property Images[ACol, ARow: integer]: string read GetImages write SetImages;
   published
     property BackgroundColor: TARGBColorBridge read FColor write SetColor;
-    property Columns: integer read FColCount write SetNumColumns; deprecated;
+    property Columns: integer read FColCount write SetNumColumns; deprecated 'Please, use ColCount instead';
     property ItemsLayout: TGridItemLayout read FItemsLayout write SetItemsLayout;
     property FontSize: Dword read FFontSize write SetFontSize;
     property FontColor: TARGBColorBridge read FFontColor write SetFontColor;
@@ -380,21 +383,34 @@ begin
     Result := FCells[CoordToIndex(aCol, aRow)].Item;
 end;
 
+//--------------------------------------------------------------------------
+// returns image in a cell by its coordinates
+// don't raise an error but returns empty string if col or row is out of range
+//--------------------------------------------------------------------------
+function jGridView.GetImages(ACol, ARow: integer): string;
+
+begin
+  if (Acol < 0) or (Acol >= ColCount) or (aRow < 0) or (ARow >= RowCount) then
+    Result := ''
+  else
+    Result := FCells[CoordToIndex(aCol, aRow)].ImgIdentifier;
+end;
+
 function jGridView.GetRowCount: integer;
 
 begin
   result := FRowCount;
-  {
-  if FColCount > 0 then
-    Result := (Count + FColCount - 1) div FColCount
-  else
-    Result := -1;
-  }
 end;
 
 procedure jGridView.SetCells(ACol, ARow: integer; AValue: string);
 begin
   SetCellAndImg(aCol, aRow, aValue);
+end;
+
+procedure jGridView.SetImages(ACol, ARow: integer; AImgIdentifier: string);
+
+begin
+  SetCellAndImg(aCol, aRow, Cells[ACol,ARow], aImgIdentifier);
 end;
 
 //==== end added by tintinux
@@ -997,7 +1013,6 @@ begin
     end;
   DeleteItems ( Start);
   RestoreItems(Start);
-  // to avoid use of deprecated Columns setter
   FColCount := NbCols;
   jGridView_SetNumColumns(FjEnv, FjObject, NbCols);
 end;
@@ -1041,7 +1056,7 @@ end;
 
 procedure jGridView.SetColCount(AValue: integer);
 begin
-  if (AValue = FColCount) {or not Finitialized} then
+  if AValue = FColCount then
     exit;
   while ColCount > aValue do
     DeleteCol(ColCount - 1);
