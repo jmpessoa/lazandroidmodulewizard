@@ -1477,7 +1477,7 @@ begin
           if ChildCount > 0 then
             FNewW := WrapContentWidthByChildren;
         else
-          FnewW := GetLayoutParamsByParent2(Parent, LayoutParamWidth, sdW);
+          FnewW := GetLayoutParamsByParent2(Parent, lpWidth, sdW);
       end;
       case lpHeight of
         lpExact: FNewH := Height;
@@ -1486,7 +1486,7 @@ begin
           if ChildCount > 0 then
             FNewH := WrapContentHeightByChildren;
         else
-          FnewH := GetLayoutParamsByParent2(Parent, LayoutParamWidth, sdH);
+          FnewH := GetLayoutParamsByParent2(Parent, lpHeight, sdH);
       end;
       if FnewW < FminW then FnewW := FminW;
       if FnewH < FminH then FnewH := FminH;
