@@ -1087,6 +1087,29 @@ public class jListView extends ListView {
 		aadapter.SetFontSizeUnit(_unit);
 	}
 	
+	
+  public int getTotalHeight() {
+	    int totalHeight = 0;
+	    for (int i = 0; i < aadapter.getCount(); i++) {
+	        View listItem = aadapter.getView(i, null, this);
+	        listItem.measure(0, 0);
+	        totalHeight += listItem.getMeasuredHeight();
+	    }
+		return totalHeight;
+   }
+
+   public int getItemHeight(int aItemIndex) {
+	    if ( (aItemIndex < aadapter.getCount()) && (aItemIndex>=0) )  {
+	      View listItem = aadapter.getView(aItemIndex, null, this);
+	      listItem.measure(0, 0);
+			  return (int)listItem.getMeasuredHeight();
+	    } else
+	    {
+	      return -1;
+	    }
+
+	}
+		
 	@Override
 	protected void dispatchDraw(Canvas canvas) {
 		int scrollposition = 0;
@@ -1100,5 +1123,5 @@ public class jListView extends ListView {
 		//DO YOUR DRAWING ON TOP OF THIS VIEWS CHILDREN
 		controls.pOnAfterDispatchDraw(PasObj, canvas,scrollposition);	 //handle by pascal side
 	}
-
+	
 }
