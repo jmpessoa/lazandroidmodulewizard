@@ -1,4 +1,4 @@
-package com.example.applistviewdemo;
+package com.example.appautocompletetextviewdemo1;
 
 import android.content.ClipData;
 import android.content.ClipboardManager;
@@ -7,6 +7,7 @@ import android.graphics.Canvas;
 import android.graphics.Typeface;
 import android.util.TypedValue;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.Gravity;
 import android.widget.TextView;
 
@@ -44,51 +45,79 @@ public class jTextView extends TextView {
 
     }
 
-	public void setLeftTopRightBottomWidthHeight(int left, int top, int right, int bottom, int w, int h) {
-		LAMWCommon.setLeftTopRightBottomWidthHeight(left,top,right,bottom,w,h);
-	}
-	
-	public  void setParent( android.view.ViewGroup _viewgroup ) {
-		LAMWCommon.setParent(_viewgroup);
-	}
-
 	//Free object except Self, Pascal Code Free the class.
 	public  void Free() {
-		setOnKeyListener(null);
-		setText("");
-		LAMWCommon.Free();
+		this.setOnKeyListener(null);
+		this.setText("");
+		LAMWCommon.free();
 	}
 
-	public void setLParamWidth(int w) {
+	public long GetPasObj() {
+		return LAMWCommon.getPasObj();
+	}
+
+	public  void SetViewParent(ViewGroup _viewgroup ) {
+		LAMWCommon.setParent(_viewgroup);
+	}
+	
+	public ViewGroup GetParent() {
+		return LAMWCommon.getParent();
+	}
+	
+	public void RemoveFromViewParent() {
+		LAMWCommon.removeFromViewParent();
+	}
+
+	public void SetLeftTopRightBottomWidthHeight(int left, int top, int right, int bottom, int w, int h) {
+		LAMWCommon.setLeftTopRightBottomWidthHeight(left,top,right,bottom,w,h);
+	}
+		
+	public void SetLParamWidth(int w) {
 		LAMWCommon.setLParamWidth(w);
 	}
 
-	public void setLParamHeight(int h) {
+	public void SetLParamHeight(int h) {
 		LAMWCommon.setLParamHeight(h);
 	}
+    
+	public int GetLParamHeight() {
+		return  LAMWCommon.getLParamHeight();
+	}
 
-	public void setLGravity(int _g) {
+	public int GetLParamWidth() {				
+		return LAMWCommon.getLParamWidth();					
+	}  
+
+	public void SetLGravity(int _g) {
 		LAMWCommon.setLGravity(_g);
 	}
 
-	public void setLWeight(float _w) {
+	public void SetLWeight(float _w) {
 		LAMWCommon.setLWeight(_w);
 	}
 
-	public void addLParamsAnchorRule(int rule) {
+	public void AddLParamsAnchorRule(int rule) {
 		LAMWCommon.addLParamsAnchorRule(rule);
 	}
 	
-	public void addLParamsParentRule(int rule) {
+	public void AddLParamsParentRule(int rule) {
 		LAMWCommon.addLParamsParentRule(rule);
 	}
 
-	public void setLayoutAll(int idAnchor) {
+	public void SetLayoutAll(int idAnchor) {
 		LAMWCommon.setLayoutAll(idAnchor);
 	}
 	
+	public void ClearLayoutAll() {		
+		LAMWCommon.clearLayoutAll();
+	}
+
+	public View GetView() {
+	   return this;
+    }
+
     //LORDMAN 2013-08-13
-    public  void setTextAlignment( int align ) {
+    public  void SetTextAlignment( int align ) {
         switch ( align ) {
             case 0 : { setGravity( Gravity.START             ); }; break;
             case 1 : { setGravity( Gravity.END             ); }; break;
@@ -112,7 +141,7 @@ public class jTextView extends TextView {
         this.setText(item.getText().toString());
     }
 
-    public  void setEnabled( boolean value ) {
+    public  void SetEnabled( boolean value ) {
         enabled = value;
     }
 
@@ -132,7 +161,7 @@ public class jTextView extends TextView {
         this.append("\t");
     }
 
-    public void setFontAndTextTypeFace(int fontFace, int fontStyle) {
+    public void SetFontAndTextTypeFace(int fontFace, int fontStyle) {
         Typeface t = null;
         switch (fontFace) {
             case 0: t = Typeface.DEFAULT; break;
@@ -165,14 +194,6 @@ public class jTextView extends TextView {
         this.setTextSize(mTextSizeTypedValue, mTextSize);
         this.setText(t);
     }
-    
-	public int getLParamHeight() {
-		return  LAMWCommon.getLParamHeight();
-	}
-
-	public int getLParamWidth() {				
-		return LAMWCommon.getLParamWidth();					
-	}  
 	
 	@Override
 	protected void dispatchDraw(Canvas canvas) {	 	

@@ -1,4 +1,4 @@
-package com.example.applistviewdemo;
+package com.example.appautocompletetextviewdemo1;
 
 import android.view.View;
 import android.view.ViewGroup;
@@ -6,6 +6,7 @@ import android.view.ViewGroup.MarginLayoutParams;
 import android.widget.RelativeLayout;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
+import android.os.Build;
 import android.view.Gravity;
 
 public class jCommons {
@@ -17,8 +18,9 @@ public class jCommons {
 	private long PasObj = 0; // Pascal Obj
 
 	private ViewGroup parent = null;                     // parent view
+	
 	private ViewGroup.MarginLayoutParams lparams = null; // layout XYWH
-
+	
 	private int lparamsAnchorRule[] = new int[30];
 	private int countAnchorRule = 0;
 	private int lparamsParentRule[] = new int[30];
@@ -35,7 +37,8 @@ public class jCommons {
 	
 	public jCommons(View _view, android.content.Context _context, long _pasobj) {
 		aOwnerView = _view;       // set owner
-		PasObj   = _pasobj; 	//Connect Pascal I/F
+		PasObj   = _pasobj; 	//Connect Pascal I/F						
+		
 		if (aOwnerView != null) {
 			ViewGroup.LayoutParams lp = aOwnerView.getLayoutParams();
 			if (lp instanceof MarginLayoutParams) {
@@ -43,16 +46,13 @@ public class jCommons {
 				lparams.setMargins(marginLeft,marginTop,marginRight,marginBottom); // L,T,R,B
 			}
 		}
+		
 		if (lparams == null) {
 			lparams = new ViewGroup.MarginLayoutParams(lparamW, lparamH);     // W,H
 			lparams.setMargins(marginLeft,marginTop,marginRight,marginBottom); // L,T,R,B
 		}
 	}
 	
-	public long getPasObj() {
-		return PasObj;
-	}
-
 	public static MarginLayoutParams newLayoutParams(ViewGroup aparent, ViewGroup.MarginLayoutParams baseparams) {
 		if (aparent instanceof FrameLayout) {
 			return new FrameLayout.LayoutParams(baseparams);
@@ -66,6 +66,10 @@ public class jCommons {
 			throw new IllegalArgumentException("Parent is neither FrameLayout or RelativeLayout or LinearLayout: "
 					+ aparent.getClass().getName());
 		}
+	}
+	
+	public long getPasObj() {
+		return PasObj;
 	}
 	
 	public void setParent( android.view.ViewGroup _viewgroup) {
@@ -83,7 +87,7 @@ public class jCommons {
 		return parent;
 	}
 	
-	public void RemoveFromViewParent() {
+	public void removeFromViewParent() {
 		if (!mRemovedFromParent) {
 			if (aOwnerView != null)  {
 				aOwnerView.setVisibility(android.view.View.INVISIBLE);
@@ -169,18 +173,26 @@ public class jCommons {
 	
 	public void clearLayoutAll() {
 		if (lparams instanceof RelativeLayout.LayoutParams) {
-			for (int i = 0; i < countAnchorRule; i++) {
-				((RelativeLayout.LayoutParams)lparams).removeRule(lparamsAnchorRule[i]);
+			for (int i = 0; i < countAnchorRule; i++) {								
+				if(Build.VERSION.SDK_INT < 17)
+				  ((android.widget.RelativeLayout.LayoutParams) lparams).addRule(lparamsAnchorRule[i], 0);
+				
+				if(Build.VERSION.SDK_INT >= 17)
+				 ((android.widget.RelativeLayout.LayoutParams) lparams).removeRule(lparamsAnchorRule[i]); //need API >= 17!
 			}
 			for (int j = 0; j < countParentRule; j++) {
-				((RelativeLayout.LayoutParams)lparams).removeRule(lparamsParentRule[j]);
+				if(Build.VERSION.SDK_INT < 17) 
+				  ((android.widget.RelativeLayout.LayoutParams) lparams).addRule(lparamsParentRule[j], 0);
+				
+				if(Build.VERSION.SDK_INT >= 17)
+				  ((android.widget.RelativeLayout.LayoutParams) lparams).removeRule(lparamsParentRule[j]);  //need API >= 17!
 			}
 		}
 		countAnchorRule = 0;
 		countParentRule = 0;
-	}
+	}	
 	
-	public void Free() {
+	public void free() {
 		if ( (parent != null) && (aOwnerView != null))  { parent.removeView(aOwnerView); }
 		lparams = null;
 	}

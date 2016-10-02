@@ -1,4 +1,4 @@
-package com.example.applistviewdemo;
+package com.example.appautocompletetextviewdemo1;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -17,9 +17,6 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnFocusChangeListener;
 import android.view.ViewGroup;
-import android.view.ViewGroup.MarginLayoutParams;
-import android.view.inputmethod.InputMethodManager;
-//import android.view.View.OnTouchListener;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -30,13 +27,9 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.RadioButton;
 import android.widget.TextView;
-//import android.widget.AdapterView.OnItemClickListener;
-import android.widget.Spinner;
 import android.widget.RelativeLayout;
 import android.widget.RelativeLayout.LayoutParams;
-import android.widget.FrameLayout;
 import android.widget.LinearLayout;
-import android.view.Gravity;
 
 class jListItemRow{
 	String label = "";
@@ -456,8 +449,9 @@ class jArrayAdapter extends ArrayAdapter {
 
 public class jListView extends ListView {
 	//Java-Pascal Interface
-	private long            PasObj   = 0;      // Pascal Obj
+	//private long            PasObj   = 0;      // Pascal Obj
 	private Controls        controls = null;   // Control Class for Event
+	private jCommons LAMWCommon;
 
 	private Bitmap          genericBmp;
 	private int             widgetItem;
@@ -481,30 +475,12 @@ public class jListView extends ListView {
 
 	String delimiter;
 
-	private ViewGroup       parent    = null;       // parent view
-	private ViewGroup.MarginLayoutParams lparams = null;              // layout XYWH
-
 	private ArrayList<jListItemRow>    alist;
 
 	private jArrayAdapter        aadapter;
 
 	private OnItemClickListener  onItemClickListener;
 	private OnTouchListener onTouchListener;
-
-	private int lparamsAnchorRule[] = new int[30];
-	int countAnchorRule = 0;
-
-	private int lparamsParentRule[] = new int[30];
-	int countParentRule = 0;
-
-	int lparamH = android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
-	int lparamW = android.view.ViewGroup.LayoutParams.MATCH_PARENT; //w
-	int marginLeft = 5;
-	int marginTop = 5;
-	int marginRight = 5;
-	int marginBottom = 5;
-	private int lgravity = Gravity.TOP | Gravity.START;
-	private float lweight = 0;
 
 	boolean highLightSelectedItem = false;
 	int highLightColor = Color.RED;
@@ -521,21 +497,12 @@ public class jListView extends ListView {
 		super(context);
 
 		//Connect Pascal I/F
-		PasObj   = pasobj;
+		
 		controls = ctrls;
+		LAMWCommon = new jCommons(this,context,pasobj);		
 
 		textColor = 0; //dummy: default
 		textSize  = 0; //dummy: default
-
-		//fontFace =  Typeface.BOLD;
-		//fontFace =  Typeface.BOLD_ITALIC;
-		//fontFace =  Typeface.ITALIC;
-		//fontTextStyle=  Typeface.NORMAL;
-		//fontFace =  Typeface.MONOSPACE;
-		//fontFace =  Typeface.DEFAULT;
-		//fontFace =  Typeface.DEFAULT_BOLD;
-		//fontFace =  Typeface.SANS_SERIF;
-		//fontFace =  Typeface.SERIF;
 
 		widgetItem = widget;
 		widgetText = widgetTxt;
@@ -546,23 +513,18 @@ public class jListView extends ListView {
 		textAlign = txtAlign;
 		typeFace = Typeface.DEFAULT;
 
-		//Init Class
-		lparams = new ViewGroup.MarginLayoutParams(lparamW, lparamH);     // W,H
-		lparams.setMargins(marginLeft,marginTop,marginRight,marginBottom); // L,T,R,B
-
 		setBackgroundColor (0x00000000);
 		setCacheColorHint  (0);
 
 		alist = new ArrayList<jListItemRow>();
 		//simple_list_item_1
-		aadapter = new jArrayAdapter(context, controls, PasObj, android.R.layout.simple_list_item_1, alist);
+		aadapter = new jArrayAdapter(context, controls, LAMWCommon.getPasObj(), android.R.layout.simple_list_item_1, alist);
 
 		setAdapter(aadapter);
 
 		setChoiceMode(ListView.CHOICE_MODE_SINGLE);
 
 		//Init Event
-
 		//renabor gesture
 		onTouchListener = new OnTouchListener() {
 			@Override
@@ -631,10 +593,10 @@ public class jListView extends ListView {
 
 						}
 
-						controls.pOnClickCaptionItem(PasObj, (int) id, alist.get((int) id).label);
+						controls.pOnClickCaptionItem(LAMWCommon.getPasObj(), (int) id, alist.get((int) id).label);
 
 					} else {
-						controls.pOnClickCaptionItem(PasObj, lastSelectedItem, ""); // avoid passing possibly undefined Caption
+						controls.pOnClickCaptionItem(LAMWCommon.getPasObj(), lastSelectedItem, ""); // avoid passing possibly undefined Caption
 					}
 
 				}
@@ -649,7 +611,7 @@ public class jListView extends ListView {
 			if (canClick) {
 				if (!isEmpty(alist)) {  //  <----- thanks to @renabor
 					selectedItemCaption = alist.get((int) id).label;
-					controls.pOnListViewLongClickCaptionItem(PasObj, (int)id, alist.get((int)id).label);
+					controls.pOnListViewLongClickCaptionItem(LAMWCommon.getPasObj(), (int)id, alist.get((int)id).label);
 					return false;
 				};
 			};
@@ -673,38 +635,6 @@ public class jListView extends ListView {
 		return alist.get(index).widgetText;
 	}
 
-	public void setLeftTopRightBottomWidthHeight(int _left, int _top, int _right, int _bottom, int _w, int _h) {
-		marginLeft = _left;
-		marginTop = _top;
-		marginRight = _right;
-		marginBottom = _bottom;
-		lparamH = _h;
-		lparamW = _w;
-	}
-
-	private static MarginLayoutParams newLayoutParams(ViewGroup aparent, ViewGroup.MarginLayoutParams baseparams) {
-		if (aparent instanceof FrameLayout) {
-			return new FrameLayout.LayoutParams(baseparams);
-		} else if (aparent instanceof RelativeLayout) {
-			return new RelativeLayout.LayoutParams(baseparams);
-		} else if (aparent instanceof LinearLayout) {
-			return new LinearLayout.LayoutParams(baseparams);
-		} else if (aparent == null) {
-			throw new NullPointerException("Parent is null");
-		} else {
-			throw new IllegalArgumentException("Parent is neither FrameLayout or RelativeLayout or LinearLayout: "
-					+ aparent.getClass().getName());
-		}
-	}
-
-	public  void setParent( android.view.ViewGroup _viewgroup ) {
-		if (parent != null) { parent.removeView(this); }
-		parent = _viewgroup;
-
-		parent.addView(this,newLayoutParams(parent,(ViewGroup.MarginLayoutParams)lparams));
-		lparams = null;
-		lparams = (ViewGroup.MarginLayoutParams)this.getLayoutParams();
-	}
 
 	public  void setTextColor( int textcolor) {
 		this.textColor =textcolor;
@@ -744,114 +674,90 @@ public class jListView extends ListView {
 	}
 
 	public  String  getItemText(int index) {
-		return alist.get(index).label;
-//aadapter.notifyDataSetChanged();
+		return alist.get(index).label;        
 	}
-
 
 	public int GetSize() {
 		return alist.size();
-//aadapter.notifyDataSetChanged();
 	}
 
 	//Free object except Self, Pascal Code Free the class.
 	public  void Free() {
-		if (parent != null) { parent.removeView(this); }
 		alist.clear();
 		genericBmp = null;
 		alist    = null;
 		setAdapter(null);
-
-		aadapter = null;
-		lparams  = null;
+		aadapter = null;		
 		setOnItemClickListener(null);
 		setOnItemLongClickListener(null); //thanks @renabor
+		LAMWCommon.free();
 	}
 
-	public void setLParamWidth(int _w) {
-		lparamW = _w;
+	public long GetPasObj() {
+		return LAMWCommon.getPasObj();
 	}
 
-	public void setLParamHeight(int _h) {
-		lparamH = _h;
+	public  void SetViewParent(ViewGroup _viewgroup ) {
+		LAMWCommon.setParent(_viewgroup);
 	}
 	
-	public int getLParamHeight() {
-		int r = lparamH;		
-		if (r == android.view.ViewGroup.LayoutParams.WRAP_CONTENT) {
-			r = this.getHeight();
-		}		
-		return r;
+	public ViewGroup GetParent() {
+		return LAMWCommon.getParent();
+	}
+	
+	public void RemoveFromViewParent() {
+		LAMWCommon.removeFromViewParent();
 	}
 
-	public int getLParamWidth() {				
-		int r = lparamW;		
-		if (r == android.view.ViewGroup.LayoutParams.WRAP_CONTENT) {
-			r = this.getWidth();
-		}		
-		return r;		
+	public void SetLeftTopRightBottomWidthHeight(int left, int top, int right, int bottom, int w, int h) {
+		LAMWCommon.setLeftTopRightBottomWidthHeight(left,top,right,bottom,w,h);
+	}
+		
+	public void SetLParamWidth(int w) {
+		LAMWCommon.setLParamWidth(w);
 	}
 
-	public void setLGravity(int _g) {
-		lgravity = _g;
+	public void SetLParamHeight(int h) {
+		LAMWCommon.setLParamHeight(h);
+	}
+    
+	public int GetLParamHeight() {
+		return  LAMWCommon.getLParamHeight();
 	}
 
-	public void setLWeight(float _w) {
-		lweight = _w;
+	public int GetLParamWidth() {				
+		return LAMWCommon.getLParamWidth();					
+	}  
+
+	public void SetLGravity(int _g) {
+		LAMWCommon.setLGravity(_g);
 	}
 
-	public void addLParamsAnchorRule(int rule) {
-		lparamsAnchorRule[countAnchorRule] = rule;
-		countAnchorRule = countAnchorRule + 1;
+	public void SetLWeight(float _w) {
+		LAMWCommon.setLWeight(_w);
 	}
 
-	public void addLParamsParentRule(int rule) {
-		lparamsParentRule[countParentRule] = rule;
-		countParentRule = countParentRule + 1;
+	public void AddLParamsAnchorRule(int rule) {
+		LAMWCommon.addLParamsAnchorRule(rule);
+	}
+	
+	public void AddLParamsParentRule(int rule) {
+		LAMWCommon.addLParamsParentRule(rule);
 	}
 
-	public void setLayoutAll(int idAnchor) {
-		lparams.width  = lparamW; //matchParent;
-		lparams.height = lparamH; //wrapContent;
-		lparams.setMargins(marginLeft, marginTop,marginRight,marginBottom);
-
-		if (lparams instanceof RelativeLayout.LayoutParams) {
-			if (idAnchor > 0) {
-				//lparams.addRule(RelativeLayout.BELOW, id);
-				//lparams.addRule(RelativeLayout.ALIGN_BASELINE, id)
-				//lparams.addRule(RelativeLayout.LEFT_OF, id); //lparams.addRule(RelativeLayout.RIGHT_OF, id)
-				for (int i = 0; i < countAnchorRule; i++) {
-					((RelativeLayout.LayoutParams)lparams).addRule(lparamsAnchorRule[i], idAnchor);
-				}
-			}
-			for (int j = 0; j < countParentRule; j++) {
-				((RelativeLayout.LayoutParams)lparams).addRule(lparamsParentRule[j]);
-			}
-		}
-		if (lparams instanceof FrameLayout.LayoutParams) {
-			((FrameLayout.LayoutParams)lparams).gravity = lgravity;
-		}
-		if (lparams instanceof LinearLayout.LayoutParams) {
-			((LinearLayout.LayoutParams)lparams).weight = lweight;
-		}
-		//
-		setLayoutParams(lparams);
+	public void SetLayoutAll(int idAnchor) {
+		LAMWCommon.setLayoutAll(idAnchor);
+	}
+	
+	public void ClearLayoutAll() {		
+		LAMWCommon.clearLayoutAll();
 	}
 
-	public void ClearLayoutAll() {
-		if (lparams instanceof RelativeLayout.LayoutParams) {
-			for (int i = 0; i < countAnchorRule; i++) {
-				((RelativeLayout.LayoutParams)lparams).removeRule(lparamsAnchorRule[i]);
-			}
-
-			for (int j = 0; j < countParentRule; j++) {
-				((RelativeLayout.LayoutParams)lparams).removeRule(lparamsParentRule[j]);
-			}
-		}
-		countAnchorRule = 0;
-		countParentRule = 0;
-	}
-
+	public View GetView() {
+	   return this;
+    }
+	
+	
 	public  void add2(String item, String delimiter) {
 		jListItemRow info = new jListItemRow(controls.activity);
 		info.label = item;
@@ -1118,10 +1024,10 @@ public class jListView extends ListView {
 			scrollposition = -c.getTop() + super.getFirstVisiblePosition() * (c.getHeight()+super.getDividerHeight());
 		}
 		//DO YOUR DRAWING ON UNDER THIS VIEWS CHILDREN
-		controls.pOnBeforeDispatchDraw(PasObj, canvas, scrollposition);  //handle by pascal side
+		controls.pOnBeforeDispatchDraw(LAMWCommon.getPasObj(), canvas, scrollposition);  //handle by pascal side
 		super.dispatchDraw(canvas);
 		//DO YOUR DRAWING ON TOP OF THIS VIEWS CHILDREN
-		controls.pOnAfterDispatchDraw(PasObj, canvas,scrollposition);	 //handle by pascal side
+		controls.pOnAfterDispatchDraw(LAMWCommon.getPasObj(), canvas,scrollposition);	 //handle by pascal side
 	}
 	
 }

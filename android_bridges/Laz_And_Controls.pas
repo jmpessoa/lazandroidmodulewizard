@@ -1686,7 +1686,7 @@ implementation
 
 
 uses
-  customdialog, radiogroup, drawingview;
+  customdialog, radiogroup, drawingview, autocompletetextview;
 
 //-----------------------------------------------------------------------------
 // Asset
@@ -2194,6 +2194,12 @@ begin
   begin
     jForm(jButton(Obj).Owner).UpdateJNI(gApp);
     jButton(Obj).GenEvent_OnBeforeDispatchDraw(Obj, canvas, tag);
+    Exit;
+  end;
+  if Obj is jAutoTextView then
+  begin
+    jForm(jAutoTextView(Obj).Owner).UpdateJNI(gApp);
+    jAutoTextView(Obj).GenEvent_OnBeforeDispatchDraw(Obj, canvas, tag);
   end;
 end;
 
@@ -2223,6 +2229,12 @@ begin
   begin
     jForm(jButton(Obj).Owner).UpdateJNI(gApp);
     jButton(Obj).GenEvent_OnAfterDispatchDraw(Obj, canvas, tag);
+    Exit;
+  end;
+  if Obj is jAutoTextView then
+  begin
+    jForm(jAutoTextView(Obj).Owner).UpdateJNI(gApp);
+    jAutoTextView(Obj).GenEvent_OnBeforeDispatchDraw(Obj, canvas, tag);
   end;
 end;
 

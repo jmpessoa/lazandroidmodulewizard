@@ -1,4 +1,4 @@
-package com.example.applistviewdemo;
+package com.example.appautocompletetextviewdemo1;
 
 import java.lang.reflect.Field;
 
@@ -10,6 +10,7 @@ import android.graphics.Canvas;
 import android.graphics.Typeface;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.text.Editable;
 import android.text.InputFilter;
 import android.text.InputType;
@@ -19,43 +20,22 @@ import android.util.TypedValue;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewGroup.MarginLayoutParams;
-import android.view.View.OnFocusChangeListener;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.Scroller;
-import android.widget.RelativeLayout;
-import android.widget.FrameLayout;
-import android.widget.LinearLayout;
 import android.view.Gravity;
 
 public class jEditText extends EditText {
 	//Pascal Interface
-	private long           PasObj   = 0;      // Pascal Obj
+	//private long           PasObj   = 0;      // Pascal Obj
 	private Controls      controls = null;   // Control Class for Event
+	private jCommons LAMWCommon;
 	//
-	private ViewGroup     parent   = null;   // parent view
-	private ViewGroup.MarginLayoutParams lparams = null;              // layout XYWH
 	private OnKeyListener onKeyListener;     //  thanks to @renabor
 	private TextWatcher   textwatcher;       // OnChange
 
 	private OnClickListener onClickListener;   // event
-
-	private int lparamsAnchorRule[] = new int[30];
-	int countAnchorRule = 0;
-
-	private int lparamsParentRule[] = new int[30];
-	int countParentRule = 0;
-
-	int lparamH = android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
-	int lparamW = android.view.ViewGroup.LayoutParams.MATCH_PARENT; //w
-	int marginLeft = 5;
-	int marginTop = 5;
-	int marginRight = 5;
-	int marginBottom = 5;
-	private int lgravity = Gravity.TOP | Gravity.START;
-	private float lweight = 0;
 
 	String bufStr;
 	private boolean canDispatchChangeEvent = false;
@@ -75,17 +55,10 @@ public class jEditText extends EditText {
 		canDispatchChangeEvent = false;
 		canDispatchChangedEvent = false;
 
-		//Connect Pascal I/F
-		PasObj   = pasobj;
 		controls = ctrls;
-
-		//Init Class
-		lparams = new ViewGroup.MarginLayoutParams(lparamW, lparamH);     // W,H
-		lparams.setMargins(marginLeft,marginTop,marginRight,marginBottom); // L,T,R,B
-		//this.setHintTextColor(Color.LTGRAY); //default...
+		LAMWCommon = new jCommons(this,context,pasobj);
 
 		mClipBoard = (ClipboardManager) controls.activity.getSystemService(Context.CLIPBOARD_SERVICE);
-
 
 		setOnFocusChangeListener(new OnFocusChangeListener() {
 			public void onFocusChange(View v, boolean hasFocus) {
@@ -93,7 +66,7 @@ public class jEditText extends EditText {
 				final EditText Caption = (EditText)v;
 				if (!hasFocus){
 					if (p >= 0) {
-						controls.pOnLostFocus(PasObj, Caption.getText().toString());
+						controls.pOnLostFocus(LAMWCommon.getPasObj(), Caption.getText().toString());
 					}
 				}
 			}
@@ -103,7 +76,7 @@ public class jEditText extends EditText {
 		onClickListener = new OnClickListener() {
 			public  void onClick(View view) {
 				//if (enabled) {
-				controls.pOnClick(PasObj,Const.Click_Default);
+				controls.pOnClick(LAMWCommon.getPasObj(),Const.Click_Default);
 				//}
 			};
 		};
@@ -118,7 +91,7 @@ public class jEditText extends EditText {
 						imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
 						//Log.i("OnKeyListener","OnEnter, Hide KeyBoard");
 						// LoadMan
-						controls.pOnEnter(PasObj);  //just Enter/Done/Next/backbutton ....!
+						controls.pOnEnter(LAMWCommon.getPasObj());  //just Enter/Done/Next/backbutton ....!
 						return true;
 					}
 				}
@@ -132,13 +105,13 @@ public class jEditText extends EditText {
 			@Override
 			public  void beforeTextChanged(CharSequence s, int start, int count, int after) {
 				if (canDispatchChangeEvent) {
-					controls.pOnChange(PasObj, s.toString(), (s.toString()).length());
+					controls.pOnChange(LAMWCommon.getPasObj(), s.toString(), (s.toString()).length());
 				}
 			}
 			@Override
 			public  void onTextChanged(CharSequence s, int start, int before, int count) {
 				if (canDispatchChangedEvent) {
-					controls.pOnChanged(PasObj,s.toString(), (s.toString()).length());
+					controls.pOnChanged(LAMWCommon.getPasObj(),s.toString(), (s.toString()).length());
 				}
 			}
 			@Override
@@ -150,61 +123,81 @@ public class jEditText extends EditText {
 		addTextChangedListener(textwatcher);
 	}
 
-	public void setLeftTopRightBottomWidthHeight(int _left, int _top, int _right, int _bottom, int _w, int _h) {
-		marginLeft = _left;
-		marginTop = _top;
-		marginRight = _right;
-		marginBottom = _bottom;
-		lparamH = _h;
-		lparamW = _w;
+	//Free object except Self, Pascal Code Free the class.
+	public  void Free() {
+		removeTextChangedListener(textwatcher);
+		textwatcher = null;
+		setOnKeyListener(null);	
+		setText("");
+		LAMWCommon.free();
+	
+	}
+	
+	public long GetPasObj() {
+		return LAMWCommon.getPasObj();
 	}
 
-	public void setLParamWidth(int _w) {
-		lparamW = _w;
+	public  void SetViewParent(ViewGroup _viewgroup ) {
+		LAMWCommon.setParent(_viewgroup);
+	}
+	
+	public ViewGroup GetParent() {
+		return LAMWCommon.getParent();
+	}
+	
+	public void RemoveFromViewParent() {
+		LAMWCommon.removeFromViewParent();
 	}
 
-	public void setLParamHeight(int _h) {
-		lparamH = _h;
+	public void SetLeftTopRightBottomWidthHeight(int left, int top, int right, int bottom, int w, int h) {
+		LAMWCommon.setLeftTopRightBottomWidthHeight(left,top,right,bottom,w,h);
+	}
+		
+	public void SetLParamWidth(int w) {
+		LAMWCommon.setLParamWidth(w);
 	}
 
-
-	public void addLParamsAnchorRule(int rule) {
-		lparamsAnchorRule[countAnchorRule] = rule;
-		countAnchorRule = countAnchorRule + 1;
+	public void SetLParamHeight(int h) {
+		LAMWCommon.setLParamHeight(h);
+	}
+    
+	public int GetLParamHeight() {
+		return  LAMWCommon.getLParamHeight();
 	}
 
-	public void addLParamsParentRule(int rule) {
-		lparamsParentRule[countParentRule] = rule;
-		countParentRule = countParentRule + 1;
+	public int GetLParamWidth() {				
+		return LAMWCommon.getLParamWidth();					
+	}  
+
+	public void SetLGravity(int _g) {
+		LAMWCommon.setLGravity(_g);
 	}
 
-	//by jmpessoa
-	public void setLayoutAll(int idAnchor) {
-		lparams.width  = lparamW; //matchParent;
-		lparams.height = lparamH; //wrapContent;
-		lparams.setMargins(marginLeft, marginTop,marginRight,marginBottom);
-
-		if (lparams instanceof RelativeLayout.LayoutParams) {
-			if (idAnchor > 0) {
-				for (int i = 0; i < countAnchorRule; i++) {
-					((RelativeLayout.LayoutParams)lparams).addRule(lparamsAnchorRule[i], idAnchor);
-				}
-			}
-			for (int j = 0; j < countParentRule; j++) {
-				((RelativeLayout.LayoutParams)lparams).addRule(lparamsParentRule[j]);
-			}
-		}
-		if (lparams instanceof FrameLayout.LayoutParams) {
-			((FrameLayout.LayoutParams)lparams).gravity = lgravity;
-		}
-		if (lparams instanceof LinearLayout.LayoutParams) {
-			((LinearLayout.LayoutParams)lparams).weight = lweight;
-		}
-		//
-		setLayoutParams(lparams);
+	public void SetLWeight(float _w) {
+		LAMWCommon.setLWeight(_w);
 	}
-	//CURRENCY
-	public  void setInputTypeEx(String str) {
+
+	public void AddLParamsAnchorRule(int rule) {
+		LAMWCommon.addLParamsAnchorRule(rule);
+	}
+	
+	public void AddLParamsParentRule(int rule) {
+		LAMWCommon.addLParamsParentRule(rule);
+	}
+
+	public void SetLayoutAll(int idAnchor) {
+		LAMWCommon.setLayoutAll(idAnchor);
+	}
+	
+	public void ClearLayoutAll() {		
+		LAMWCommon.clearLayoutAll();
+	}
+
+	public View GetView() {
+	   return this;
+    }
+	//CURRENCY   
+	public  void SetInputTypeEx(String str) {  
 		bufStr = new String(str.toString());
 		if(str.equals("NUMBER")) {
 			this.setInputType(android.text.InputType.TYPE_CLASS_NUMBER);
@@ -242,51 +235,17 @@ public class jEditText extends EditText {
 	}
 
 	//LORDMAN 2013-08-13
-	public  void setTextAlignment( int align ) {
+	public  void SetTextAlignment( int align ) {
 		switch ( align ) {
-			case 0 : { setGravity( Gravity.LEFT              ); }; break;
-			case 1 : { setGravity( Gravity.RIGHT             ); }; break;
+			case 0 : { setGravity( Gravity.START              ); }; break;
+			case 1 : { setGravity( Gravity.END             ); }; break;
 			case 2 : { setGravity( Gravity.TOP               ); }; break;
 			case 3 : { setGravity( Gravity.BOTTOM            ); }; break;
 			case 4 : { setGravity( Gravity.CENTER            ); }; break;
 			case 5 : { setGravity( Gravity.CENTER_HORIZONTAL ); }; break;
 			case 6 : { setGravity( Gravity.CENTER_VERTICAL   ); }; break;
-			default : { setGravity( Gravity.LEFT              ); }; break;
+			default : { setGravity( Gravity.START              ); }; break;
 		};
-	}
-
-	private static MarginLayoutParams newLayoutParams(ViewGroup aparent, ViewGroup.MarginLayoutParams baseparams) {
-		if (aparent instanceof FrameLayout) {
-			return new FrameLayout.LayoutParams(baseparams);
-		} else if (aparent instanceof RelativeLayout) {
-			return new RelativeLayout.LayoutParams(baseparams);
-		} else if (aparent instanceof LinearLayout) {
-			return new LinearLayout.LayoutParams(baseparams);
-		} else if (aparent == null) {
-			throw new NullPointerException("Parent is null");
-		} else {
-			throw new IllegalArgumentException("Parent is neither FrameLayout or RelativeLayout or LinearLayout: "
-					+ aparent.getClass().getName());
-		}
-	}
-
-	public  void setParent( android.view.ViewGroup _viewgroup ) {
-		if (parent != null) { parent.removeView(this); }
-		parent = _viewgroup;
-
-		parent.addView(this,newLayoutParams(parent,(ViewGroup.MarginLayoutParams)lparams));
-		lparams = null;
-		lparams = (ViewGroup.MarginLayoutParams)this.getLayoutParams();
-	}
-
-	//Free object except Self, Pascal Code Free the class.
-	public  void Free() {
-		if (parent != null) { parent.removeView(this); }
-		removeTextChangedListener(textwatcher);
-		textwatcher = null;
-		setOnKeyListener(null);
-		setText("");
-		lparams = null;
 	}
 
 	//by jmpessoa
@@ -294,17 +253,17 @@ public class jEditText extends EditText {
 		this.setScroller(new Scroller(controls.activity));
 	}
 
-	public void setFocus2() {
+	public void SetFocus() {
 		this.requestFocus();
 	}
 
-	public  void immShow2() {
+	public  void InputMethodShow() {
 		InputMethodManager imm = (InputMethodManager) controls.activity.getSystemService(Context.INPUT_METHOD_SERVICE);
 		imm.toggleSoftInput(0, InputMethodManager.SHOW_IMPLICIT);
 	}
 
 
-	public  void immHide2() {
+	public  void InputMethodHide() {
 		InputMethodManager imm = (InputMethodManager) controls.activity.getSystemService(Context.INPUT_METHOD_SERVICE);
 		imm.hideSoftInputFromWindow(this.getWindowToken(), 0);
 	}
@@ -322,7 +281,7 @@ public class jEditText extends EditText {
 	}
 
 	//LORDMAN - 2013-07-26
-	public  void maxLength(int mLength) { //not make the length of the text greater than the specified length
+	public  void MaxLength(int mLength) { //not make the length of the text greater than the specified length
 		if (mLength >= 0) {
 			InputFilter[] FilterArray = new InputFilter[1];
 			FilterArray[0] = new InputFilter.LengthFilter(mLength);
@@ -376,7 +335,7 @@ public class jEditText extends EditText {
 	}
 
 
-	public void SetInputType(int ipt){  //TODO!
+	public void SetInputType(int ipt){  
 		this.setInputType(0);
 	}
 
@@ -402,7 +361,7 @@ public class jEditText extends EditText {
 			case 5: this.setImeOptions(EditorInfo.IME_MASK_ACTION|EditorInfo.IME_ACTION_NEXT); break;
 			case 6: this.setImeOptions(EditorInfo.IME_MASK_ACTION|EditorInfo.IME_ACTION_DONE); break;
 			case 7: this.setImeOptions(EditorInfo.IME_MASK_ACTION|EditorInfo.IME_ACTION_PREVIOUS ); break;
-			case 8: this.setImeOptions(EditorInfo.IME_FLAG_FORCE_ASCII); break;
+			//case 8: this.setImeOptions(EditorInfo.IME_FLAG_FORCE_ASCII); break;  //api >= 16
 		}
 	}
 
@@ -485,32 +444,16 @@ public class jEditText extends EditText {
 
 	public  void SetBackgroundByImage(Bitmap _image) {	
 		Drawable d = new BitmapDrawable(controls.activity.getResources(), _image);
-		this.setBackground(d);
+		if(Build.VERSION.SDK_INT >= 16) this.setBackground(d);
 	}	
-	
-	
-	public int getLParamHeight() {
-		int r = lparamH;		
-		if (r == android.view.ViewGroup.LayoutParams.WRAP_CONTENT) {
-			r = this.getHeight();
-		}		
-		return r;
-	}
-
-	public int getLParamWidth() {				
-		int r = lparamW;		
-		if (r == android.view.ViewGroup.LayoutParams.WRAP_CONTENT) {
-			r = this.getWidth();
-		}		
-		return r;		
-	}	
+		
 	@Override
 	protected void dispatchDraw(Canvas canvas) {
 	     //DO YOUR DRAWING ON UNDER THIS VIEWS CHILDREN
-		controls.pOnBeforeDispatchDraw(PasObj, canvas, 1);  //handle by pascal side
+		controls.pOnBeforeDispatchDraw(LAMWCommon.getPasObj(), canvas, 1);  //handle by pascal side
 	    super.dispatchDraw(canvas);
 	    //DO YOUR DRAWING ON TOP OF THIS VIEWS CHILDREN
-	    controls.pOnAfterDispatchDraw(PasObj, canvas, 1);	 //handle by pascal side    
+	    controls.pOnAfterDispatchDraw(LAMWCommon.getPasObj(), canvas, 1);	 //handle by pascal side    
 	}	
 }
 

@@ -1405,7 +1405,7 @@ Var
 begin
  _jParams[0].z := JBool(enabled);
   cls := env^.GetObjectClass(env, TextView);
-  _jMethod:= env^.GetMethodID(env, cls, 'setEnabled', '(Z)V');
+  _jMethod:= env^.GetMethodID(env, cls, 'SetEnabled', '(Z)V');
  env^.CallVoidMethodA(env,TextView,_jMethod,@_jParams);
  env^.DeleteLocalRef(env, cls);
 end;
@@ -1423,7 +1423,7 @@ begin
  _jParams[4].i := w;
  _jParams[5].i := h;
  cls := env^.GetObjectClass(env, TextView);
- _jMethod:= env^.GetMethodID(env, cls, 'setLeftTopRightBottomWidthHeight', '(IIIIII)V');
+ _jMethod:= env^.GetMethodID(env, cls, 'SetLeftTopRightBottomWidthHeight', '(IIIIII)V');
  env^.CallVoidMethodA(env,TextView,_jMethod,@_jParams);
  env^.DeleteLocalRef(env, cls);
 end;
@@ -1436,7 +1436,7 @@ Procedure jTextView_setParent(env:PJNIEnv; TextView: jObject; ViewGroup : jObjec
  begin
      _jParams[0].l := ViewGroup;
      cls := env^.GetObjectClass(env, TextView);
-     method:= env^.GetMethodID(env, cls, 'setParent', '(Landroid/view/ViewGroup;)V');
+     method:= env^.GetMethodID(env, cls, 'SetViewParent', '(Landroid/view/ViewGroup;)V');
      env^.CallVoidMethodA(env, TextView, method, @_jParams);
      env^.DeleteLocalRef(env, cls);
  end;
@@ -1449,7 +1449,7 @@ var
   cls: jClass;
 begin
   cls := env^.GetObjectClass(env, TextView);
-  _jMethod:= env^.GetMethodID(env, cls, 'getText', '()Ljava/lang/CharSequence;');
+  _jMethod:= env^.GetMethodID(env, cls, 'getText', '()Ljava/lang/CharSequence;');  //direct jni api
   _jString   := env^.CallObjectMethod(env,TextView,_jMethod);
   Case _jString = nil of
    True : Result    := '';
@@ -1470,7 +1470,7 @@ var
 begin
   _jParams[0].l := env^.NewStringUTF(env, pchar(Str));
   cls := env^.GetObjectClass(env, TextView);
-  method:= env^.GetMethodID(env, cls, 'setText', '(Ljava/lang/CharSequence;)V');
+  method:= env^.GetMethodID(env, cls, 'setText', '(Ljava/lang/CharSequence;)V'); //direct jni api
   env^.CallVoidMethodA(env, TextView, method,@_jParams);
   env^.DeleteLocalRef(env,_jParams[0].l);
   env^.DeleteLocalRef(env, cls);
@@ -1484,7 +1484,7 @@ var
 begin
   _jParams[0].i := color;
   cls := env^.GetObjectClass(env, TextView);
-  _jMethod:= env^.GetMethodID(env, cls, 'setTextColor', '(I)V');
+  _jMethod:= env^.GetMethodID(env, cls, 'setTextColor', '(I)V'); //direct jni api
   env^.CallVoidMethodA(env,TextView,_jMethod,@_jParams);
   env^.DeleteLocalRef(env, cls);
 end;
@@ -1525,7 +1525,7 @@ begin
   _jParams[0].i := FontFace;
   _jParams[1].i := TextTypeFace;
   cls := env^.GetObjectClass(env, TextView);
-  _jMethod:= env^.GetMethodID(env, cls, 'setFontAndTextTypeFace', '(II)V');
+  _jMethod:= env^.GetMethodID(env, cls, 'SetFontAndTextTypeFace', '(II)V');
   env^.CallVoidMethodA(env,TextView,_jMethod,@_jParams);
   env^.DeleteLocalRef(env, cls);
 end;
@@ -1539,7 +1539,7 @@ Var
 begin
  _jParams[0].i := align;
   cls := env^.GetObjectClass(env, TextView);
- _jMethod:= env^.GetMethodID(env, cls, 'setTextAlignment', '(I)V');
+ _jMethod:= env^.GetMethodID(env, cls, 'SetTextAlignment', '(I)V');
  env^.CallVoidMethodA(env,TextView,_jMethod,@_jParams);
  env^.DeleteLocalRef(env, cls);
 end;
@@ -1553,7 +1553,7 @@ Var
 begin
  _jParams[0].i := rule;
  cls := env^.GetObjectClass(env, TextView);
- _jMethod:= env^.GetMethodID(env, cls, 'addLParamsParentRule', '(I)V');
+ _jMethod:= env^.GetMethodID(env, cls, 'AddLParamsParentRule', '(I)V');
  env^.CallVoidMethodA(env,TextView,_jMethod,@_jParams);
  env^.DeleteLocalRef(env, cls);
 end;
@@ -1567,7 +1567,7 @@ Var
 begin
  _jParams[0].i := rule;
   cls := env^.GetObjectClass(env, TextView);
-  _jMethod:= env^.GetMethodID(env, cls, 'addLParamsAnchorRule', '(I)V');
+  _jMethod:= env^.GetMethodID(env, cls, 'AddLParamsAnchorRule', '(I)V');
   env^.CallVoidMethodA(env,TextView,_jMethod,@_jParams);
   env^.DeleteLocalRef(env, cls);
 end;
@@ -1580,7 +1580,7 @@ var
 begin
  _jParams[0].i := idAnchor;
  cls := env^.GetObjectClass(env, TextView);
-  _jMethod:= env^.GetMethodID(env, cls, 'setLayoutAll', '(I)V');
+  _jMethod:= env^.GetMethodID(env, cls, 'SetLayoutAll', '(I)V');
  env^.CallVoidMethodA(env,TextView,_jMethod,@_jParams);
  env^.DeleteLocalRef(env, cls);
 end;
@@ -1593,7 +1593,7 @@ var
 begin
  _jParams[0].i := w;
  cls := env^.GetObjectClass(env, TextView);
-  _jMethod:= env^.GetMethodID(env, cls, 'setLParamWidth', '(I)V');
+  _jMethod:= env^.GetMethodID(env, cls, 'SetLParamWidth', '(I)V');
  env^.CallVoidMethodA(env,TextView,_jMethod,@_jParams);
  env^.DeleteLocalRef(env, cls);
 end;
@@ -1606,7 +1606,7 @@ var
 begin
  _jParams[0].i := h;
  cls := env^.GetObjectClass(env, TextView);
-  _jMethod:= env^.GetMethodID(env, cls, 'setLParamHeight', '(I)V');
+  _jMethod:= env^.GetMethodID(env, cls, 'SetLParamHeight', '(I)V');
  env^.CallVoidMethodA(env,TextView,_jMethod,@_jParams);
  env^.DeleteLocalRef(env, cls);
 end;
@@ -1619,7 +1619,7 @@ Var
 begin
  _jParams[0].i := id;
   cls := env^.GetObjectClass(env, TextView);
-  _jMethod:= env^.GetMethodID(env, cls, 'setId', '(I)V');
+  _jMethod:= env^.GetMethodID(env, cls, 'setId', '(I)V'); //direct jni api
  env^.CallVoidMethodA(env,TextView,_jMethod,@_jParams);
  env^.DeleteLocalRef(env, cls);
 end;
@@ -1695,7 +1695,7 @@ var
  cls: jClass;
 begin
    cls := env^.GetObjectClass(env, _jtextview);
- _jMethod:= env^.GetMethodID(env, cls, 'getLParamHeight', '()I');
+ _jMethod:= env^.GetMethodID(env, cls, 'GetLParamHeight', '()I');
  Result:= env^.CallIntMethod(env,_jtextview,_jMethod);
  env^.DeleteLocalRef(env, cls);
 end;
@@ -1706,7 +1706,7 @@ var
   cls: jClass;
 begin
   cls := env^.GetObjectClass(env, _jtextview);
- _jMethod:= env^.GetMethodID(env, cls, 'getLParamWidth', '()I');
+ _jMethod:= env^.GetMethodID(env, cls, 'GetLParamWidth', '()I');
   Result:= env^.CallIntMethod(env,_jtextview,_jMethod);
   env^.DeleteLocalRef(env, cls);
 end;
@@ -1754,7 +1754,7 @@ begin
  _jParams[4].i := w;
  _jParams[5].i := h;
  cls := env^.GetObjectClass(env, EditText);
- _jMethod:= env^.GetMethodID(env, cls, 'setLeftTopRightBottomWidthHeight', '(IIIIII)V');
+ _jMethod:= env^.GetMethodID(env, cls, 'SetLeftTopRightBottomWidthHeight', '(IIIIII)V');
  env^.CallVoidMethodA(env, EditText, _jMethod, @_jParams);
  env^.DeleteLocalRef(env, cls);
 end;
@@ -1769,7 +1769,7 @@ Procedure jEditText_setParent(env:PJNIEnv;
  begin
      _jParams[0].l := ViewGroup;
      cls := env^.GetObjectClass(env, EditText);
-     method:= env^.GetMethodID(env, cls, 'setParent', '(Landroid/view/ViewGroup;)V');
+     method:= env^.GetMethodID(env, cls, 'SetViewParent', '(Landroid/view/ViewGroup;)V');
      env^.CallVoidMethodA(env, EditText, method, @_jParams);
      env^.DeleteLocalRef(env, cls);
  end;
@@ -1805,7 +1805,7 @@ begin
   if Str <> '' then
   begin
     _jParams[0].l:= env^.NewStringUTF(env, PChar(Str));
-    method:= env^.GetMethodID(env, cls, 'setText', '(Ljava/lang/CharSequence;)V');
+    method:= env^.GetMethodID(env, cls, 'setText', '(Ljava/lang/CharSequence;)V'); //direct jni api
     env^.CallVoidMethodA(env, EditText,method, @_jParams);
     env^.DeleteLocalRef(env, _jParams[0].l);
   end
@@ -1826,7 +1826,7 @@ var
 begin
  _jParams[0].i := color;
  cls := env^.GetObjectClass(env, EditText);
- _jMethod:= env^.GetMethodID(env, cls, 'setTextColor', '(I)V');
+ _jMethod:= env^.GetMethodID(env, cls, 'setTextColor', '(I)V'); //direct jni api
  env^.CallVoidMethodA(env,EditText,_jMethod,@_jParams);
  env^.DeleteLocalRef(env, cls);
 end;
@@ -1855,9 +1855,7 @@ var
 begin
  _jParams[0].l := env^.NewStringUTF(env, pchar(Str) );
  cls := env^.GetObjectClass(env, EditText);
- // Changed: String -> CharSequence - Fatih
- //_jMethod:= env^.GetMethodID(env, cls, 'setHint', '(Ljava/lang/String;)V');
- _jMethod:= env^.GetMethodID(env, cls, 'setHint', '(Ljava/lang/CharSequence;)V');
+ _jMethod:= env^.GetMethodID(env, cls, 'setHint', '(Ljava/lang/CharSequence;)V'); //direct jni api
  env^.CallVoidMethodA(env,EditText,_jMethod,@_jParams);
  env^.DeleteLocalRef(env,_jParams[0].l);
  env^.DeleteLocalRef(env, cls);
@@ -1871,7 +1869,7 @@ var
 begin
   jParams[0].i:= _color;
   jCls:= env^.GetObjectClass(env, _jedittext);
-  jMethod:= env^.GetMethodID(env, jCls, 'setHintTextColor', '(I)V');
+  jMethod:= env^.GetMethodID(env, jCls, 'setHintTextColor', '(I)V');   //direct jni api
   env^.CallVoidMethodA(env, _jedittext, jMethod, @jParams);
   env^.DeleteLocalRef(env, jCls);
 end;
@@ -1883,31 +1881,31 @@ var
  cls: jClass;
 begin
    cls := env^.GetObjectClass(env, EditText);
-  _jMethod:= env^.GetMethodID(env, cls, 'setFocus2', '()V');
+  _jMethod:= env^.GetMethodID(env, cls, 'SetFocus', '()V');
  env^.CallVoidMethod(env,EditText,_jMethod);
  env^.DeleteLocalRef(env, cls);
 end;
 
 // LORDMAN - 2013-07-26
-Procedure jEditText_immShow(env:PJNIEnv; EditText : jObject );
+Procedure jEditText_immShow(env:PJNIEnv; EditText : jObject );  //InputMethodShow
 Var
  _jMethod : jMethodID = nil;
  cls: jClass;
 begin
   cls := env^.GetObjectClass(env, EditText);
-  _jMethod:= env^.GetMethodID(env, cls, 'immShow2', '()V');
+  _jMethod:= env^.GetMethodID(env, cls, 'InputMethodShow', '()V');
   env^.CallVoidMethod(env,EditText,_jMethod);
   env^.DeleteLocalRef(env, cls);
 end;
 
 // LORDMAN - 2013-07-26
-Procedure jEditText_immHide(env:PJNIEnv; EditText : jObject );
+Procedure jEditText_immHide(env:PJNIEnv; EditText : jObject );  ////InputMethodManager Hide
 var
  _jMethod : jMethodID = nil;
  cls: jClass;
 begin
    cls := env^.GetObjectClass(env, EditText);
-  _jMethod:= env^.GetMethodID(env, cls, 'immHide2', '()V');
+  _jMethod:= env^.GetMethodID(env, cls, 'InputMethodHide', '()V');
   env^.CallVoidMethod(env,EditText,_jMethod);
   env^.DeleteLocalRef(env, cls);
 end;
@@ -1922,7 +1920,7 @@ var
 begin
  _jParams[0].l := env^.NewStringUTF(env, pchar(Str) );
  cls:= env^.GetObjectClass(env, EditText);
- _jMethod:= env^.GetMethodID(env, cls, 'setInputTypeEx', '(Ljava/lang/String;)V');
+ _jMethod:= env^.GetMethodID(env, cls, 'SetInputTypeEx', '(Ljava/lang/String;)V');
  env^.CallVoidMethodA(env,EditText,_jMethod,@_jParams);
  env^.DeleteLocalRef(env,_jParams[0].l);
  env^.DeleteLocalRef(env, cls);
@@ -1937,7 +1935,7 @@ var
 begin
   _jParams[0].i := itType;
   cls:= env^.GetObjectClass(env, EditText);
-  _jMethod:= env^.GetMethodID(env, cls, 'setInputType', '(I)V');
+  _jMethod:= env^.GetMethodID(env, cls, 'SetInputType', '(I)V');
   env^.CallVoidMethodA(env,EditText,_jMethod,@_jParams);
   env^.DeleteLocalRef(env, cls);
 end;
@@ -1952,7 +1950,7 @@ var
 begin
  _jParams[0].i := size;
  cls:= env^.GetObjectClass(env, EditText);
-_jMethod:= env^.GetMethodID(env, cls, 'maxLength', '(I)V');
+_jMethod:= env^.GetMethodID(env, cls, 'MaxLength', '(I)V');
  env^.CallVoidMethodA(env,EditText,_jMethod,@_jParams);
  env^.DeleteLocalRef(env, cls);
 end;
@@ -2004,7 +2002,7 @@ Var
   cls: jClass;
 begin
   cls:= env^.GetObjectClass(env, EditText);
-_jMethod:= env^.GetMethodID(env, cls, 'setMaxLines', '(I)V');
+_jMethod:= env^.GetMethodID(env, cls, 'setMaxLines', '(I)V');   //direct jni api
  _jParams[0].i := max;
   env^.CallVoidMethodA(env,EditText,_jMethod,@_jParams);
   env^.DeleteLocalRef(env, cls);
@@ -2019,7 +2017,7 @@ var
 begin
  _jParams[0].z:= JBool(isSingle);
   cls:= env^.GetObjectClass(env, EditText);
- _jMethod:= env^.GetMethodID(env, cls, 'setSingleLine', '(Z)V');
+ _jMethod:= env^.GetMethodID(env, cls, 'setSingleLine', '(Z)V');  //direct jni api
  env^.CallVoidMethodA(env,EditText,_jMethod,@_jParams);
  env^.DeleteLocalRef(env, cls);
 end;
@@ -2033,7 +2031,7 @@ Var
 begin
   _jParams[0].z := JBool(wrapping);
    cls:= env^.GetObjectClass(env, EditText);
-  _jMethod:= env^.GetMethodID(env, cls, 'setHorizontallyScrolling', '(Z)V');
+  _jMethod:= env^.GetMethodID(env, cls, 'setHorizontallyScrolling', '(Z)V');  //direct jni api
    env^.CallVoidMethodA(env,EditText,_jMethod,@_jParams);
    env^.DeleteLocalRef(env, cls);
 end;
@@ -2047,7 +2045,7 @@ Var
 begin
  _jParams[0].i := rule;
    cls:= env^.GetObjectClass(env, EditText);
-  _jMethod:= env^.GetMethodID(env, cls, 'addLParamsParentRule', '(I)V');
+  _jMethod:= env^.GetMethodID(env, cls, 'AddLParamsParentRule', '(I)V');
     env^.CallVoidMethodA(env,EditText,_jMethod,@_jParams);
     env^.DeleteLocalRef(env, cls);
 end;
@@ -2061,7 +2059,7 @@ var
 begin
  _jParams[0].i := rule;
    cls:= env^.GetObjectClass(env, EditText);
-  _jMethod:= env^.GetMethodID(env, cls, 'addLParamsAnchorRule', '(I)V');
+  _jMethod:= env^.GetMethodID(env, cls, 'AddLParamsAnchorRule', '(I)V');
   env^.CallVoidMethodA(env,EditText,_jMethod,@_jParams);
   env^.DeleteLocalRef(env, cls);
 end;
@@ -2075,7 +2073,7 @@ var
 begin
  _jParams[0].i := idAnchor;
  cls := env^.GetObjectClass(env, EditText);
-_jMethod:= env^.GetMethodID(env, cls, 'setLayoutAll', '(I)V');
+_jMethod:= env^.GetMethodID(env, cls, 'SetLayoutAll', '(I)V');
  env^.CallVoidMethodA(env,EditText,_jMethod,@_jParams);
  env^.DeleteLocalRef(env, cls);
 end;
@@ -2089,7 +2087,7 @@ var
 begin
  _jParams[0].i := w;
   cls := env^.GetObjectClass(env, EditText);
-_jMethod:= env^.GetMethodID(env, cls, 'setLParamWidth', '(I)V');
+_jMethod:= env^.GetMethodID(env, cls, 'SetLParamWidth', '(I)V');
  env^.CallVoidMethodA(env,EditText,_jMethod,@_jParams);
  env^.DeleteLocalRef(env, cls);
 end;
@@ -2103,7 +2101,7 @@ var
 begin
  _jParams[0].i := h;
   cls := env^.GetObjectClass(env, EditText);
-_jMethod:= env^.GetMethodID(env, cls, 'setLParamHeight', '(I)V');
+_jMethod:= env^.GetMethodID(env, cls, 'SetLParamHeight', '(I)V');
  env^.CallVoidMethodA(env,EditText,_jMethod,@_jParams);
  env^.DeleteLocalRef(env, cls);
 end;
@@ -2116,7 +2114,7 @@ var
 begin
  _jParams[0].i := id;
   cls := env^.GetObjectClass(env, EditText);
-_jMethod:= env^.GetMethodID(env, cls, 'setId', '(I)V');
+_jMethod:= env^.GetMethodID(env, cls, 'setId', '(I)V');  //direct jni api
  env^.CallVoidMethodA(env,EditText,_jMethod,@_jParams);
  env^.DeleteLocalRef(env, cls);
 end;
@@ -2129,7 +2127,7 @@ var
  begin
   _jParams[0].z := JBool(value);
    cls := env^.GetObjectClass(env, EditText);
- _jMethod:= env^.GetMethodID(env, cls, 'setVerticalScrollBarEnabled', '(Z)V');
+ _jMethod:= env^.GetMethodID(env, cls, 'setVerticalScrollBarEnabled', '(Z)V');    ////direct jni api
   env^.CallVoidMethodA(env,EditText,_jMethod,@_jParams);
   env^.DeleteLocalRef(env, cls);
 end;
@@ -2142,7 +2140,7 @@ var
 begin
    _jParams[0].z := JBool(value);
     cls := env^.GetObjectClass(env, EditText);
-  _jMethod:= env^.GetMethodID(env, cls, 'setHorizontalScrollBarEnabled', '(Z)V');
+  _jMethod:= env^.GetMethodID(env, cls, 'setHorizontalScrollBarEnabled', '(Z)V');  //direct jni api
    env^.CallVoidMethodA(env,EditText,_jMethod,@_jParams);
    env^.DeleteLocalRef(env, cls);
 end;
@@ -2155,7 +2153,7 @@ var
 begin
    _jParams[0].z := JBool(value);
     cls := env^.GetObjectClass(env, EditText);
-  _jMethod:= env^.GetMethodID(env, cls, 'setScrollbarFadingEnabled', '(Z)V');
+  _jMethod:= env^.GetMethodID(env, cls, 'setScrollbarFadingEnabled', '(Z)V'); //direct jni api
    env^.CallVoidMethodA(env,EditText,_jMethod,@_jParams);
    env^.DeleteLocalRef(env, cls);
 end;
@@ -2168,7 +2166,7 @@ var
 begin
    _jParams[0].i := style;
     cls := env^.GetObjectClass(env, EditText);
-  _jMethod:= env^.GetMethodID(env, cls, 'setScrollBarStyle', '(I)V');
+  _jMethod:= env^.GetMethodID(env, cls, 'setScrollBarStyle', '(I)V');  //direct jni api
    env^.CallVoidMethodA(env,EditText,_jMethod,@_jParams);
    env^.DeleteLocalRef(env, cls);
 end;
@@ -2243,7 +2241,7 @@ var
 begin
  _jParams[0].i := align;
  cls := env^.GetObjectClass(env, EditText);
- _jMethod:= env^.GetMethodID(env, cls, 'setTextAlignment', '(I)V');
+ _jMethod:= env^.GetMethodID(env, cls, 'SetTextAlignment', '(I)V');
  env^.CallVoidMethodA(env,EditText,_jMethod,@_jParams);
  env^.DeleteLocalRef(env, cls);
 end;
@@ -2457,7 +2455,7 @@ var
  cls: jClass;
 begin
    cls := env^.GetObjectClass(env, _jedittext);
- _jMethod:= env^.GetMethodID(env, cls, 'getLParamHeight', '()I');
+ _jMethod:= env^.GetMethodID(env, cls, 'GetLParamHeight', '()I');
  Result:= env^.CallIntMethod(env,_jedittext,_jMethod);
  env^.DeleteLocalRef(env, cls);
 end;
@@ -2468,7 +2466,7 @@ var
   cls: jClass;
 begin
   cls := env^.GetObjectClass(env, _jedittext);
- _jMethod:= env^.GetMethodID(env, cls, 'getLParamWidth', '()I');
+ _jMethod:= env^.GetMethodID(env, cls, 'GetLParamWidth', '()I');
   Result:= env^.CallIntMethod(env,_jedittext,_jMethod);
   env^.DeleteLocalRef(env, cls);
 end;
@@ -2518,7 +2516,7 @@ begin
  _jParams[4].i := w;
  _jParams[5].i := h;
   cls:= env^.GetObjectClass(env, Button);
- _jMethod:= env^.GetMethodID(env, cls, 'setLeftTopRightBottomWidthHeight', '(IIIIII)V');
+ _jMethod:= env^.GetMethodID(env, cls, 'SetLeftTopRightBottomWidthHeight', '(IIIIII)V');
   env^.CallVoidMethodA(env,Button,_jMethod,@_jParams);
   env^.DeleteLocalRef(env, cls);
 end;
@@ -2532,7 +2530,7 @@ var
 begin
   _jParams[0].l := ViewGroup;
   cls := env^.GetObjectClass(env, Button);
-  _jMethod:= env^.GetMethodID(env, cls, 'setParent', '(Landroid/view/ViewGroup;)V');
+  _jMethod:= env^.GetMethodID(env, cls, 'SetViewParent', '(Landroid/view/ViewGroup;)V');
   env^.CallVoidMethodA(env,Button,_jMethod,@_jParams);
   env^.DeleteLocalRef(env, cls);
 end;
@@ -2547,7 +2545,7 @@ var
 begin
   _jParams[0].l := env^.NewStringUTF(env, pchar(Str) );
   cls := env^.GetObjectClass(env, Button);
-  _jMethod:= env^.GetMethodID(env, cls, 'setText', '(Ljava/lang/CharSequence;)V');
+  _jMethod:= env^.GetMethodID(env, cls, 'setText', '(Ljava/lang/CharSequence;)V');  //direct jni api
   env^.CallVoidMethodA(env, Button,_jMethod,@_jParams);
   env^.DeleteLocalRef(env,_jParams[0].l);
   env^.DeleteLocalRef(env, cls);
@@ -2563,7 +2561,7 @@ var
   cls: jClass;
 begin
   cls := env^.GetObjectClass(env, Button);
-  _jMethod:= env^.GetMethodID(env, cls, 'getText', '()Ljava/lang/CharSequence;');
+  _jMethod:= env^.GetMethodID(env, cls, 'getText', '()Ljava/lang/CharSequence;');  //direct jni api
   _jString   := env^.CallObjectMethod(env,Button,_jMethod);
   Case _jString = nil of
    True : Result    := '';
@@ -2584,7 +2582,7 @@ var
 begin
     _jParams[0].i := color;
     cls := env^.GetObjectClass(env, Button);
-    _jMethod:= env^.GetMethodID(env, cls, 'setTextColor', '(I)V');
+    _jMethod:= env^.GetMethodID(env, cls, 'setTextColor', '(I)V'); //direct jni api
     env^.CallVoidMethodA(env,Button,_jMethod,@_jParams);
     env^.DeleteLocalRef(env, cls);
 end;
@@ -2613,7 +2611,7 @@ var
 begin
  _jParams[0].i := rule;
  cls := env^.GetObjectClass(env, Button);
- _jMethod:= env^.GetMethodID(env, cls, 'addLParamsParentRule', '(I)V');
+ _jMethod:= env^.GetMethodID(env, cls, 'AddLParamsParentRule', '(I)V');
  env^.CallVoidMethodA(env,Button,_jMethod,@_jParams);
  env^.DeleteLocalRef(env, cls);
 end;
@@ -2627,7 +2625,7 @@ var
 begin
  _jParams[0].i := rule;
  cls := env^.GetObjectClass(env, Button);
- _jMethod:= env^.GetMethodID(env, cls, 'addLParamsAnchorRule', '(I)V');
+ _jMethod:= env^.GetMethodID(env, cls, 'AddLParamsAnchorRule', '(I)V');
  env^.CallVoidMethodA(env,Button,_jMethod,@_jParams);
  env^.DeleteLocalRef(env, cls);
 end;
@@ -2640,7 +2638,7 @@ var
 begin
  _jParams[0].i := idAnchor;
  cls := env^.GetObjectClass(env, Button);
-_jMethod:= env^.GetMethodID(env, cls, 'setLayoutAll', '(I)V');
+_jMethod:= env^.GetMethodID(env, cls, 'SetLayoutAll', '(I)V');
  env^.CallVoidMethodA(env,Button,_jMethod,@_jParams);
  env^.DeleteLocalRef(env, cls);
 end;
@@ -2654,7 +2652,7 @@ var
 begin
  _jParams[0].i := w;
  cls := env^.GetObjectClass(env, Button);
-  _jMethod:= env^.GetMethodID(env, cls, 'setLParamWidth', '(I)V');
+  _jMethod:= env^.GetMethodID(env, cls, 'SetLParamWidth', '(I)V');
  env^.CallVoidMethodA(env,Button,_jMethod,@_jParams);
  env^.DeleteLocalRef(env, cls);
 end;
@@ -2667,7 +2665,7 @@ var
 begin
  _jParams[0].i := h;
   cls := env^.GetObjectClass(env, Button);
-_jMethod:= env^.GetMethodID(env, cls, 'setLParamHeight', '(I)V');
+_jMethod:= env^.GetMethodID(env, cls, 'SetLParamHeight', '(I)V');
  env^.CallVoidMethodA(env,Button,_jMethod,@_jParams);
  env^.DeleteLocalRef(env, cls);
 end;
@@ -2680,7 +2678,7 @@ var
 begin
  _jParams[0].i := id;
  cls := env^.GetObjectClass(env, Button);
-  _jMethod:= env^.GetMethodID(env, cls, 'setId', '(I)V');
+  _jMethod:= env^.GetMethodID(env, cls, 'setId', '(I)V');  //direct jni api
  env^.CallVoidMethodA(env,Button,_jMethod,@_jParams);
  env^.DeleteLocalRef(env, cls);
 end;
@@ -2769,7 +2767,7 @@ var
  cls: jClass;
 begin
    cls := env^.GetObjectClass(env, _jbutton);
- _jMethod:= env^.GetMethodID(env, cls, 'getLParamHeight', '()I');
+ _jMethod:= env^.GetMethodID(env, cls, 'GetLParamHeight', '()I');
  Result:= env^.CallIntMethod(env,_jbutton,_jMethod);
  env^.DeleteLocalRef(env, cls);
 end;
@@ -2780,7 +2778,7 @@ var
   cls: jClass;
 begin
   cls := env^.GetObjectClass(env, _jbutton);
- _jMethod:= env^.GetMethodID(env, cls, 'getLParamWidth', '()I');
+ _jMethod:= env^.GetMethodID(env, cls, 'GetLParamWidth', '()I');
   Result:= env^.CallIntMethod(env,_jbutton,_jMethod);
   env^.DeleteLocalRef(env, cls);
 end;
@@ -3934,7 +3932,7 @@ begin
  _jParams[4].i := w;
  _jParams[5].i := h;
  cls:= env^.GetObjectClass(env, ListView);
- _jMethod:= env^.GetMethodID(env, cls, 'setLeftTopRightBottomWidthHeight', '(IIIIII)V');
+ _jMethod:= env^.GetMethodID(env, cls, 'SetLeftTopRightBottomWidthHeight', '(IIIIII)V');
  env^.CallVoidMethodA(env,ListView,_jMethod,@_jParams);
  env^.DeleteLocalRef(env, cls);
 end;
@@ -3948,7 +3946,7 @@ var
 begin
   _jParams[0].l := ViewGroup;
     cls := env^.GetObjectClass(env, ListView);
- _jMethod:= env^.GetMethodID(env, cls, 'setParent', '(Landroid/view/ViewGroup;)V');
+ _jMethod:= env^.GetMethodID(env, cls, 'SetViewParent', '(Landroid/view/ViewGroup;)V');
   env^.CallVoidMethodA(env,ListView,_jMethod,@_jParams);
   env^.DeleteLocalRef(env, cls);
 end;
@@ -4376,7 +4374,7 @@ var
 begin
  _jParams[0].i := w;
  cls := env^.GetObjectClass(env, ListView);
-  _jMethod:= env^.GetMethodID(env, cls, 'setLParamWidth', '(I)V');
+  _jMethod:= env^.GetMethodID(env, cls, 'SetLParamWidth', '(I)V');
  env^.CallVoidMethodA(env,ListView,_jMethod,@_jParams);
  env^.DeleteLocalRef(env, cls);
 end;
@@ -4389,7 +4387,7 @@ var
 begin
  _jParams[0].i := h;
   cls := env^.GetObjectClass(env, ListView);
-_jMethod:= env^.GetMethodID(env, cls, 'setLParamHeight', '(I)V');
+_jMethod:= env^.GetMethodID(env, cls, 'SetLParamHeight', '(I)V');
  env^.CallVoidMethodA(env,ListView,_jMethod,@_jParams);
  env^.DeleteLocalRef(env, cls);
 end;
@@ -4403,7 +4401,7 @@ var
 begin
  _jParams[0].i := rule;
  cls := env^.GetObjectClass(env, ListView);
-_jMethod:= env^.GetMethodID(env, cls, 'addLParamsParentRule', '(I)V');
+_jMethod:= env^.GetMethodID(env, cls, 'AddLParamsParentRule', '(I)V');
  env^.CallVoidMethodA(env,ListView,_jMethod,@_jParams);
  env^.DeleteLocalRef(env, cls);
 end;
@@ -4417,7 +4415,7 @@ var
 begin
  _jParams[0].i := rule;
  cls := env^.GetObjectClass(env, ListView);
-_jMethod:= env^.GetMethodID(env, cls, 'addLParamsAnchorRule', '(I)V');
+_jMethod:= env^.GetMethodID(env, cls, 'AddLParamsAnchorRule', '(I)V');
  env^.CallVoidMethodA(env,ListView,_jMethod,@_jParams);
  env^.DeleteLocalRef(env, cls);
 end;
@@ -4430,7 +4428,7 @@ var
 begin
  _jParams[0].i := idAnchor;
  cls := env^.GetObjectClass(env, ListView);
-_jMethod:= env^.GetMethodID(env, cls, 'setLayoutAll', '(I)V');
+_jMethod:= env^.GetMethodID(env, cls, 'SetLayoutAll', '(I)V');
  env^.CallVoidMethodA(env,ListView,_jMethod,@_jParams);
  env^.DeleteLocalRef(env, cls);
 end;
@@ -4627,7 +4625,7 @@ var
  cls: jClass;
 begin
    cls := env^.GetObjectClass(env, _jlistview);
- _jMethod:= env^.GetMethodID(env, cls, 'getLParamHeight', '()I');
+ _jMethod:= env^.GetMethodID(env, cls, 'GetLParamHeight', '()I');
  Result:= env^.CallIntMethod(env,_jlistview,_jMethod);
  env^.DeleteLocalRef(env, cls);
 end;
@@ -4638,7 +4636,7 @@ var
   cls: jClass;
 begin
   cls := env^.GetObjectClass(env, _jlistview);
- _jMethod:= env^.GetMethodID(env, cls, 'getLParamWidth', '()I');
+ _jMethod:= env^.GetMethodID(env, cls, 'GetLParamWidth', '()I');
   Result:= env^.CallIntMethod(env,_jlistview,_jMethod);
   env^.DeleteLocalRef(env, cls);
 end;

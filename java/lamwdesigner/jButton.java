@@ -1,4 +1,4 @@
-package com.example.applistviewdemo;
+package com.example.appautocompletetextviewdemo1;
 
 import java.lang.reflect.Field;
 
@@ -6,8 +6,10 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.util.TypedValue;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 
 public class jButton extends Button {
@@ -35,48 +37,77 @@ public class jButton extends Button {
 		setOnClickListener(onClickListener);
 	}
 
-	public void setLeftTopRightBottomWidthHeight(int left, int top, int right, int bottom, int w, int h) {
-		LAMWCommon.setLeftTopRightBottomWidthHeight(left,top,right,bottom,w,h);
-	}
-	
-	public  void setParent( android.view.ViewGroup _viewgroup ) {
-		LAMWCommon.setParent(_viewgroup);
-	}
 
 	//Free object except Self, Pascal Code Free the class.
 	public  void Free() {
 		setOnKeyListener(null);
 		setText("");
-		LAMWCommon.Free();
+		LAMWCommon.free();
 	}
 
-	public void setLParamWidth(int w) {
+	public long GetPasObj() {
+		return LAMWCommon.getPasObj();
+	}
+
+	public  void SetViewParent(ViewGroup _viewgroup ) {
+		LAMWCommon.setParent(_viewgroup);
+	}
+	
+	public ViewGroup GetParent() {
+		return LAMWCommon.getParent();
+	}
+	
+	public void RemoveFromViewParent() {
+		LAMWCommon.removeFromViewParent();
+	}
+
+	public void SetLeftTopRightBottomWidthHeight(int left, int top, int right, int bottom, int w, int h) {
+		LAMWCommon.setLeftTopRightBottomWidthHeight(left,top,right,bottom,w,h);
+	}
+		
+	public void SetLParamWidth(int w) {
 		LAMWCommon.setLParamWidth(w);
 	}
 
-	public void setLParamHeight(int h) {
+	public void SetLParamHeight(int h) {
 		LAMWCommon.setLParamHeight(h);
 	}
+    
+	public int GetLParamHeight() {
+		return  LAMWCommon.getLParamHeight();
+	}
 
-	public void setLGravity(int _g) {
+	public int GetLParamWidth() {				
+		return LAMWCommon.getLParamWidth();					
+	}  
+
+	public void SetLGravity(int _g) {
 		LAMWCommon.setLGravity(_g);
 	}
 
-	public void setLWeight(float _w) {
+	public void SetLWeight(float _w) {
 		LAMWCommon.setLWeight(_w);
 	}
 
-	public void addLParamsAnchorRule(int rule) {
+	public void AddLParamsAnchorRule(int rule) {
 		LAMWCommon.addLParamsAnchorRule(rule);
 	}
 	
-	public void addLParamsParentRule(int rule) {
+	public void AddLParamsParentRule(int rule) {
 		LAMWCommon.addLParamsParentRule(rule);
 	}
 
-	public void setLayoutAll(int idAnchor) {
+	public void SetLayoutAll(int idAnchor) {
 		LAMWCommon.setLayoutAll(idAnchor);
 	}
+	
+	public void ClearLayoutAll() {		
+		LAMWCommon.clearLayoutAll();
+	}
+
+	public View GetView() {
+	   return this;
+    }
 
 	/*
     * If i set android:focusable="true" then button is highlighted and focused,
@@ -149,17 +180,9 @@ public class jButton extends Button {
 	
 	public  void SetBackgroundByImage(Bitmap _image) {	
 		Drawable d = new BitmapDrawable(controls.activity.getResources(), _image);
-		this.setBackground(d);
+		if(Build.VERSION.SDK_INT >= 16) this.setBackground(d);
 	}
-	
-	public int getLParamHeight() {
-		return  LAMWCommon.getLParamHeight();
-	}
-
-	public int getLParamWidth() {				
-		return LAMWCommon.getLParamWidth();					
-	}  
-	
+		
 	@Override
 	protected void dispatchDraw(Canvas canvas) {	 	
 	    //DO YOUR DRAWING ON UNDER THIS VIEWS CHILDREN

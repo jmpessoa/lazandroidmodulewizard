@@ -1,22 +1,19 @@
-package com.example.appdemo1;
+package com.example.appautocompletetextviewdemo1;
 
 import java.util.ArrayList;
 
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
+import android.graphics.Canvas;
 import android.graphics.Typeface;
 import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewGroup.MarginLayoutParams;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
-import android.widget.RelativeLayout;
-import android.widget.FrameLayout;
-import android.widget.LinearLayout;
 import android.view.Gravity;
 
 /*Draft java code by "Lazarus Android Module Wizard" [4/21/2016 19:42:01]*/
@@ -25,31 +22,15 @@ import android.view.Gravity;
 
 public class jAutoTextView extends AutoCompleteTextView /*dummy*/ { //please, fix what GUI object will be extended!
 
-   private long       pascalObj = 0;    // Pascal Object
    private Controls   controls  = null; // Control Class for events
+   private jCommons LAMWCommon;
 
    private Context context = null;
    private ViewGroup parent   = null;         // parent view
-   private ViewGroup.MarginLayoutParams lparams = null;              // layout XYWH
-
+ 
    private OnClickListener onClickListener;   // click event
 
    private Boolean enabled  = true;           // click-touch enabled!
-
-   private int lparamsAnchorRule[] = new int[30];
-   private int countAnchorRule = 0;
-   private int lparamsParentRule[] = new int[30];
-   private int countParentRule = 0;
-
-   //private int lparamH = android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
-   //private int lparamW = android.view.ViewGroup.LayoutParams.MATCH_PARENT;
-   private int lparamH = 100;
-   private int lparamW = 100;
-   private int marginLeft = 0;
-   private int marginTop = 0;
-   private int marginRight = 0;
-   private int marginBottom = 0;
-   private boolean mRemovedFromParent = false;
 
    ArrayList<String> mStrList;
    ArrayAdapter<String> mAdapter;
@@ -65,11 +46,9 @@ public class jAutoTextView extends AutoCompleteTextView /*dummy*/ { //please, fi
    public jAutoTextView(Controls _ctrls, long _Self) { //Add more others news "_xxx"p arams if needed!
       super(_ctrls.activity);
       context   = _ctrls.activity;
-      pascalObj = _Self;
       controls  = _ctrls;
-
-      lparams = new ViewGroup.MarginLayoutParams(lparamW, lparamH);     // W,H
-      lparams.setMargins(marginLeft,marginTop,marginRight,marginBottom); // L,T,R,B
+      
+      LAMWCommon = new jCommons(this,context,_Self);
 
       mStrList = new ArrayList<String>();
       mAdapter = new ArrayAdapter<String>(context,android.R.layout.simple_list_item_1,mStrList);
@@ -81,7 +60,7 @@ public class jAutoTextView extends AutoCompleteTextView /*dummy*/ { //please, fi
       onClickListener = new OnClickListener(){
          /*.*/public void onClick(View view){  //please, do not remove /*.*/ mask for parse invisibility!
             if (enabled) {
-               controls.pOnClickGeneric(pascalObj, Const.Click_Default); //JNI event onClick!
+               controls.pOnClickGeneric(LAMWCommon.getPasObj(), Const.Click_Default); //JNI event onClick!
             }
          };
       };
@@ -96,7 +75,7 @@ public class jAutoTextView extends AutoCompleteTextView /*dummy*/ { //please, fi
                                   "you add color "+arg0.getItemAtPosition(arg2), //mStrList.get((int)arg3)
                                   Toast.LENGTH_LONG).show();
                        */
-            controls.pOnClickAutoDropDownItem(pascalObj, (int)arg3, arg0.getItemAtPosition(arg2).toString());
+            controls.pOnClickAutoDropDownItem(LAMWCommon.getPasObj(), (int)arg3, arg0.getItemAtPosition(arg2).toString());
          }
       });
 
@@ -105,123 +84,74 @@ public class jAutoTextView extends AutoCompleteTextView /*dummy*/ { //please, fi
    public void jFree() {
       if (parent != null) { parent.removeView(this); }
       //free local objects...
-      lparams = null;
       setOnClickListener(null);
+      LAMWCommon.free();
    }
 
-   private static MarginLayoutParams newLayoutParams(ViewGroup _aparent, ViewGroup.MarginLayoutParams _baseparams) {
-      if (_aparent instanceof FrameLayout) {
-         return new FrameLayout.LayoutParams(_baseparams);
-      } else if (_aparent instanceof RelativeLayout) {
-         return new RelativeLayout.LayoutParams(_baseparams);
-      } else if (_aparent instanceof LinearLayout) {
-         return new LinearLayout.LayoutParams(_baseparams);
-      } else if (_aparent == null) {
-         throw new NullPointerException("Parent is null");
-      } else {
-         throw new IllegalArgumentException("Parent is neither FrameLayout or RelativeLayout or LinearLayout: "
-                 + _aparent.getClass().getName());
-      }
-   }
+	public long GetPasObj() {
+		return LAMWCommon.getPasObj();
+	}
 
-   public void SetViewParent(ViewGroup _viewgroup) {
-      if (parent != null) { parent.removeView(this); }
-      parent = _viewgroup;
+	public  void SetViewParent(ViewGroup _viewgroup ) {
+		LAMWCommon.setParent(_viewgroup);
+	}
+	
+	public ViewGroup GetParent() {
+		return LAMWCommon.getParent();
+	}
+	
+	public void RemoveFromViewParent() {
+		LAMWCommon.removeFromViewParent();
+	}
 
-      parent.addView(this,newLayoutParams(parent,(ViewGroup.MarginLayoutParams)lparams));
-      lparams = null;
-      lparams = (ViewGroup.MarginLayoutParams)this.getLayoutParams();
+	public void SetLeftTopRightBottomWidthHeight(int left, int top, int right, int bottom, int w, int h) {
+		LAMWCommon.setLeftTopRightBottomWidthHeight(left,top,right,bottom,w,h);
+	}
+		
+	public void SetLParamWidth(int w) {
+		LAMWCommon.setLParamWidth(w);
+	}
 
-      mRemovedFromParent = false;
-   }
+	public void SetLParamHeight(int h) {
+		LAMWCommon.setLParamHeight(h);
+	}
+    
+	public int GetLParamHeight() {
+		return  LAMWCommon.getLParamHeight();
+	}
 
-   public void RemoveFromViewParent() {
-      if (!mRemovedFromParent) {
-         this.setVisibility(android.view.View.INVISIBLE);
-         if (parent != null)
-            parent.removeView(this);
-         mRemovedFromParent = true;
-      }
-   }
+	public int GetLParamWidth() {				
+		return LAMWCommon.getLParamWidth();					
+	}  
 
+	public void SetLGravity(int _g) {
+		LAMWCommon.setLGravity(_g);
+	}
+
+	public void SetLWeight(float _w) {
+		LAMWCommon.setLWeight(_w);
+	}
+
+	public void AddLParamsAnchorRule(int rule) {
+		LAMWCommon.addLParamsAnchorRule(rule);
+	}
+	
+	public void AddLParamsParentRule(int rule) {
+		LAMWCommon.addLParamsParentRule(rule);
+	}
+
+	public void SetLayoutAll(int idAnchor) {
+		LAMWCommon.setLayoutAll(idAnchor);
+	}
+	
+	public void ClearLayoutAll() {		
+		LAMWCommon.clearLayoutAll();
+	}
+	
    public View GetView() {
       return this;
    }
-
-   public void SetLParamWidth(int _w) {
-      lparamW = _w;
-   }
-
-   public void SetLParamHeight(int _h) {
-      lparamH = _h;
-   }
-
-   public void setLGravity(int _g) {
-      lgravity = _g;
-   }
-
-   public void setLWeight(float _w) {
-      lweight = _w;
-   }
-
-   public void SetLeftTopRightBottomWidthHeight(int _left, int _top, int _right, int _bottom, int _w, int _h) {
-      marginLeft = _left;
-      marginTop = _top;
-      marginRight = _right;
-      marginBottom = _bottom;
-      lparamH = _h;
-      lparamW = _w;
-   }
-
-   public void AddLParamsAnchorRule(int _rule) {
-      lparamsAnchorRule[countAnchorRule] = _rule;
-      countAnchorRule = countAnchorRule + 1;
-   }
-
-   public void AddLParamsParentRule(int _rule) {
-      lparamsParentRule[countParentRule] = _rule;
-      countParentRule = countParentRule + 1;
-   }
-
-   public void SetLayoutAll(int _idAnchor) {
-      lparams.width  = lparamW;
-      lparams.height = lparamH;
-      lparams.setMargins(marginLeft,marginTop,marginRight,marginBottom);
-
-      if (lparams instanceof RelativeLayout.LayoutParams) {
-         if (_idAnchor > 0) {
-            for (int i = 0; i < countAnchorRule; i++) {
-               ((RelativeLayout.LayoutParams)lparams).addRule(lparamsAnchorRule[i], _idAnchor);
-            }
-         }
-         for (int j = 0; j < countParentRule; j++) {
-            ((RelativeLayout.LayoutParams)lparams).addRule(lparamsParentRule[j]);
-         }
-      }
-      if (lparams instanceof FrameLayout.LayoutParams) {
-         ((FrameLayout.LayoutParams)lparams).gravity = lgravity;
-      }
-      if (lparams instanceof LinearLayout.LayoutParams) {
-         ((LinearLayout.LayoutParams)lparams).weight = lweight;
-      }
-      //
-      this.setLayoutParams(lparams);
-   }
-
-   public void ClearLayoutAll() {
-      if (lparams instanceof RelativeLayout.LayoutParams) {
-         for (int i = 0; i < countAnchorRule; i++) {
-            ((RelativeLayout.LayoutParams)lparams).removeRule(lparamsAnchorRule[i]);
-         }
-
-         for (int j = 0; j < countParentRule; j++) {
-            ((RelativeLayout.LayoutParams)lparams).removeRule(lparamsParentRule[j]);
-         }
-      }
-      countAnchorRule = 0;
-      countParentRule = 0;
-   }
-
+   
    public void SetId(int _id) { //wrapper method pattern ...
       this.setId(_id);
    }
@@ -301,14 +231,14 @@ public class jAutoTextView extends AutoCompleteTextView /*dummy*/ { //please, fi
 
    public  void SetTextAlignment( int align ) {
       switch ( align ) {
-         case 0 : { setGravity( Gravity.LEFT              ); }; break;
-         case 1 : { setGravity( Gravity.RIGHT             ); }; break;
+         case 0 : { setGravity( Gravity.START              ); }; break;
+         case 1 : { setGravity( Gravity.END             ); }; break;
          case 2 : { setGravity( Gravity.TOP               ); }; break;
          case 3 : { setGravity( Gravity.BOTTOM            ); }; break;
          case 4 : { setGravity( Gravity.CENTER            ); }; break;
          case 5 : { setGravity( Gravity.CENTER_HORIZONTAL ); }; break;
          case 6 : { setGravity( Gravity.CENTER_VERTICAL   ); }; break;
-         default : { setGravity( Gravity.LEFT              ); }; break;
+         default : { setGravity( Gravity.START              ); }; break;
       };
    }
 
@@ -368,6 +298,15 @@ public class jAutoTextView extends AutoCompleteTextView /*dummy*/ { //please, fi
       this.setTextSize(mTextSizeTypedValue, mTextSize);
       this.setText(t);
    }
+   
+	@Override
+	protected void dispatchDraw(Canvas canvas) {	 	
+	    //DO YOUR DRAWING ON UNDER THIS VIEWS CHILDREN
+		controls.pOnBeforeDispatchDraw(LAMWCommon.getPasObj(), canvas, 1);  //event handle by pascal side		
+	    super.dispatchDraw(canvas);	    
+	    //DO YOUR DRAWING ON TOP OF THIS VIEWS CHILDREN
+	    controls.pOnAfterDispatchDraw(LAMWCommon.getPasObj(), canvas, 1);	 //event handle by pascal side    
+	}   
 
 } //end class
 

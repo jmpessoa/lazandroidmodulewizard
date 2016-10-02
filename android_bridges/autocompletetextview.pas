@@ -27,7 +27,9 @@ jAutoTextView = class(jVisualControl)
     procedure SetColor(Value: TARGBColorBridge); //background
     procedure UpdateLParamHeight;
     procedure UpdateLParamWidth;
-
+ protected
+    function GetWidth: integer;  override;
+    function GetHeight: integer; override;
  public
     constructor Create(AOwner: TComponent); override;
     destructor  Destroy; override;
@@ -83,7 +85,8 @@ jAutoTextView = class(jVisualControl)
     procedure SetItems(AValue: TStrings);
 
     procedure GenEvent_OnClickAutoDropDownItem(Obj: TObject; index: integer; caption: string);
-
+    procedure GenEvent_OnBeforeDispatchDraw(Obj: TObject; canvas: JObject; tag: integer);
+    procedure GenEvent_OnAfterDispatchDraw(Obj: TObject; canvas: JObject; tag: integer);
 
  published
 
@@ -103,6 +106,8 @@ jAutoTextView = class(jVisualControl)
     property Items: TStrings read FItems write SetItems;
     property OnClick: TOnNotify read FOnClick write FOnClick;
     property OnClickDropDownItem: TOnClickCaptionItem read FOnClickDropDownItem write FOnClickDropDownItem;
+    property OnBeforeDispatchDraw: TOnBeforeDispatchDraw read FOnBeforeDispatchDraw write FOnBeforeDispatchDraw;
+    property OnAfterDispatchDraw: TOnBeforeDispatchDraw read FOnAfterDispatchDraw write FOnAfterDispatchDraw;
 
 end;
 
@@ -111,8 +116,10 @@ procedure jAutoTextView_jFree(env: PJNIEnv; _jAutoTextView: JObject);
 procedure jAutoTextView_SetViewParent(env: PJNIEnv; _jAutoTextView: JObject; _viewgroup: jObject);
 procedure jAutoTextView_RemoveFromViewParent(env: PJNIEnv; _jAutoTextView: JObject);
 function jAutoTextView_GetView(env: PJNIEnv; _jAutoTextView: JObject): jObject;
+
 procedure jAutoTextView_SetLParamWidth(env: PJNIEnv; _jAutoTextView: JObject; _w: integer);
 procedure jAutoTextView_SetLParamHeight(env: PJNIEnv; _jAutoTextView: JObject; _h: integer);
+
 procedure jAutoTextView_SetLeftTopRightBottomWidthHeight(env: PJNIEnv; _jAutoTextView: JObject; _left: integer; _top: integer; _right: integer; _bottom: integer; _w: integer; _h: integer);
 procedure jAutoTextView_AddLParamsAnchorRule(env: PJNIEnv; _jAutoTextView: JObject; _rule: integer);
 procedure jAutoTextView_AddLParamsParentRule(env: PJNIEnv; _jAutoTextView: JObject; _rule: integer);
@@ -139,6 +146,10 @@ procedure jAutoTextView_SetFontAndTextTypeFace(env: PJNIEnv; _jAutoTextView: JOb
 procedure jAutoTextView_SetTextSize(env: PJNIEnv; _jAutoTextView: JObject; AValue: DWord);
 procedure jAutoTextView_SetFontSizeUnit(env: PJNIEnv; _jAutoTextView: JObject; _unit: integer);
 Procedure jAutoTextView_setTextColor(env:PJNIEnv; TextView: jObject; color : DWord);
+
+function jAutoTextView_GetLParamHeight(env: PJNIEnv; _jautotextview: JObject): integer;
+function jAutoTextView_GetLParamWidth(env: PJNIEnv; _jautotextview: JObject): integer;
+
 
 
 
@@ -643,6 +654,62 @@ begin
    FItems.Assign(AValue);
 end;
 
+function jAutoTextView.GetWidth: integer;
+begin
+  Result:= FWidth;
+  if FInitialized then
+  begin
+     Result:= jAutoTextView_GetLParamWidth(FjEnv, FjObject );
+     if Result = -1 then //lpMatchParent
+     begin
+       if FParent is jForm then
+       begin
+         if (FParent as jForm).ScreenStyle = (FParent as jForm).ScreenStyleAtStart then
+           Result:= (FParent as jForm).ScreenWH.Width
+         else
+           Result:= (FParent as jForm).ScreenWH.Height;
+       end
+       else
+       begin
+           Result:= (FParent as jVisualControl).GetWidth;
+       end;
+     end;
+  end;
+end;
+
+function jAutoTextView.GetHeight: integer;
+begin
+  Result:= FHeight;
+  if FInitialized then
+  begin
+     Result:= jAutoTextView_GetLParamHeight(FjEnv, FjObject );
+     if Result = -1 then //lpMatchParent
+     begin
+       if FParent is jForm then
+       begin
+          if (FParent as jForm).ScreenStyle = (FParent as jForm).ScreenStyleAtStart then
+             Result:= (FParent as jForm).ScreenWH.Height   //take from start!
+          else
+             Result:= (FParent as jForm).ScreenWH.Width;
+       end
+       else
+       begin
+          Result:= (FParent as jVisualControl).GetHeight;
+       end;
+     end;
+  end;
+end;
+
+Procedure jAutoTextView.GenEvent_OnBeforeDispatchDraw(Obj: TObject; canvas: jObject; tag: integer);
+begin
+  if Assigned(FOnBeforeDispatchDraw) then FOnBeforeDispatchDraw(Obj, canvas, tag);
+end;
+
+Procedure jAutoTextView.GenEvent_OnAfterDispatchDraw(Obj: TObject; canvas: jObject; tag: integer);
+begin
+  if Assigned(FOnAfterDispatchDraw) then FOnAfterDispatchDraw(Obj, canvas, tag);
+end;
+
 Procedure jAutoTextView.GenEvent_OnClickAutoDropDownItem(Obj: TObject; index: integer;  caption: string);
 begin
   if Assigned(FOnClickDropDownItem) then FOnClickDropDownItem(Obj,index, caption);
@@ -1111,5 +1178,29 @@ begin
   env^.CallVoidMethodA(env,TextView,_jMethod,@_jParams);
   env^.DeleteLocalRef(env, cls);
 end;
+
+function jAutoTextView_GetLParamHeight(env: PJNIEnv; _jautotextview: JObject): integer;
+var
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jautotextview);
+  jMethod:= env^.GetMethodID(env, jCls, 'GetLParamHeight', '()I');
+  Result:= env^.CallIntMethod(env, _jautotextview, jMethod);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+
+function jAutoTextView_GetLParamWidth(env: PJNIEnv; _jautotextview: JObject): integer;
+var
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jautotextview);
+  jMethod:= env^.GetMethodID(env, jCls, 'GetLParamWidth', '()I');
+  Result:= env^.CallIntMethod(env, _jautotextview, jMethod);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
 
 end.
