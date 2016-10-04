@@ -76,13 +76,14 @@ object FormSettingsPaths: TFormSettingsPaths
   OnActivate = FormActivate
   OnClose = FormClose
   Position = poScreenCenter
-  LCLVersion = '1.5'
+  LCLVersion = '1.7'
   object BitBtnOK: TBitBtn
     AnchorSideTop.Side = asrBottom
+    AnchorSideRight.Control = Owner
     AnchorSideRight.Side = asrBottom
-    Left = 318
+    Left = 347
     Height = 30
-    Top = 398
+    Top = 403
     Width = 75
     Anchors = [akRight]
     BorderSpacing.Around = 8
@@ -96,9 +97,9 @@ object FormSettingsPaths: TFormSettingsPaths
     AnchorSideTop.Control = BitBtnOK
     AnchorSideTop.Side = asrCenter
     AnchorSideRight.Control = BitBtnOK
-    Left = 235
+    Left = 264
     Height = 30
-    Top = 398
+    Top = 403
     Width = 75
     Anchors = [akTop, akRight]
     BorderSpacing.Around = 8
@@ -113,8 +114,8 @@ object FormSettingsPaths: TFormSettingsPaths
     AnchorSideTop.Control = LabelPathToAndroidNDK
     AnchorSideTop.Side = asrBottom
     Left = 8
-    Height = 23
-    Top = 203
+    Height = 21
+    Top = 189
     Width = 383
     Anchors = [akTop, akLeft, akRight]
     BorderSpacing.Around = 8
@@ -125,9 +126,9 @@ object FormSettingsPaths: TFormSettingsPaths
     AnchorSideTop.Control = EditPathToAndroidSDK
     AnchorSideTop.Side = asrBottom
     Left = 8
-    Height = 15
-    Top = 180
-    Width = 114
+    Height = 13
+    Top = 168
+    Width = 102
     BorderSpacing.Around = 8
     Caption = 'Path to Android NDK:'
     ParentColor = False
@@ -136,9 +137,9 @@ object FormSettingsPaths: TFormSettingsPaths
     AnchorSideLeft.Control = Owner
     AnchorSideTop.Control = Owner
     Left = 8
-    Height = 15
+    Height = 13
     Top = 8
-    Width = 330
+    Width = 322
     BorderSpacing.Around = 8
     Caption = 'Path to Java JDK:  [ex.  C:\Program Files (x86)\Java\jdk1.7.0_21 ]'
     ParentColor = False
@@ -149,8 +150,8 @@ object FormSettingsPaths: TFormSettingsPaths
     AnchorSideTop.Side = asrBottom
     AnchorSideRight.Control = SpBPathToJavaJDK
     Left = 8
-    Height = 23
-    Top = 31
+    Height = 21
+    Top = 29
     Width = 383
     Anchors = [akTop, akLeft, akRight]
     BorderSpacing.Around = 8
@@ -161,9 +162,9 @@ object FormSettingsPaths: TFormSettingsPaths
     AnchorSideTop.Control = BevelJDKAntAndSDKNDK
     AnchorSideTop.Side = asrBottom
     Left = 8
-    Height = 15
-    Top = 126
-    Width = 111
+    Height = 13
+    Top = 118
+    Width = 101
     BorderSpacing.Around = 8
     Caption = 'Path to Android SDK:'
     ParentColor = False
@@ -174,8 +175,8 @@ object FormSettingsPaths: TFormSettingsPaths
     AnchorSideTop.Side = asrBottom
     AnchorSideRight.Control = SpBPathToAndroidSDK
     Left = 8
-    Height = 23
-    Top = 149
+    Height = 21
+    Top = 139
     Width = 383
     Anchors = [akTop, akLeft, akRight]
     BorderSpacing.Around = 8
@@ -186,9 +187,9 @@ object FormSettingsPaths: TFormSettingsPaths
     AnchorSideTop.Control = EditPathToJavaJDK
     AnchorSideTop.Side = asrBottom
     Left = 8
-    Height = 15
-    Top = 62
-    Width = 170
+    Height = 13
+    Top = 58
+    Width = 162
     BorderSpacing.Around = 8
     Caption = 'Path to Ant bin: [ex.   ...\ant\bin]'
     ParentColor = False
@@ -199,8 +200,8 @@ object FormSettingsPaths: TFormSettingsPaths
     AnchorSideTop.Side = asrBottom
     AnchorSideRight.Control = SpBPathToAntBinary
     Left = 8
-    Height = 23
-    Top = 85
+    Height = 21
+    Top = 79
     Width = 383
     Anchors = [akTop, akLeft, akRight]
     BorderSpacing.Around = 8
@@ -213,7 +214,7 @@ object FormSettingsPaths: TFormSettingsPaths
     AnchorSideRight.Side = asrBottom
     Left = 399
     Height = 22
-    Top = 31
+    Top = 28
     Width = 23
     Anchors = [akTop, akRight]
     BorderSpacing.Around = 8
@@ -227,7 +228,7 @@ object FormSettingsPaths: TFormSettingsPaths
     AnchorSideRight.Side = asrBottom
     Left = 399
     Height = 22
-    Top = 149
+    Top = 138
     Width = 23
     Anchors = [akTop, akRight]
     BorderSpacing.Around = 8
@@ -241,7 +242,7 @@ object FormSettingsPaths: TFormSettingsPaths
     AnchorSideRight.Side = asrBottom
     Left = 399
     Height = 22
-    Top = 85
+    Top = 78
     Width = 23
     Anchors = [akTop, akRight]
     BorderSpacing.Around = 8
@@ -256,31 +257,33 @@ object FormSettingsPaths: TFormSettingsPaths
     AnchorSideRight.Side = asrBottom
     Left = 0
     Height = 2
-    Top = 116
+    Top = 108
     Width = 430
     Anchors = [akTop, akLeft, akRight]
   end
   object RGNDKVersion: TRadioGroup
+    AnchorSideLeft.Control = Owner
     AnchorSideTop.Control = EditPathToAndroidNDK
     AnchorSideTop.Side = asrBottom
     Left = 8
-    Height = 51
-    Top = 234
-    Width = 182
+    Height = 47
+    Top = 218
+    Width = 196
     AutoFill = True
     AutoSize = True
     BorderSpacing.Around = 8
     Caption = 'NDK version'
     ChildSizing.LeftRightSpacing = 6
     ChildSizing.TopBottomSpacing = 6
+    ChildSizing.HorizontalSpacing = 4
     ChildSizing.EnlargeHorizontal = crsHomogenousChildResize
     ChildSizing.EnlargeVertical = crsHomogenousChildResize
     ChildSizing.ShrinkHorizontal = crsScaleChilds
     ChildSizing.ShrinkVertical = crsScaleChilds
     ChildSizing.Layout = cclLeftToRightThenTopToBottom
     ChildSizing.ControlsPerLine = 5
-    ClientHeight = 31
-    ClientWidth = 178
+    ClientHeight = 29
+    ClientWidth = 192
     Columns = 5
     ItemIndex = 3
     Items.Strings = (
@@ -290,44 +293,50 @@ object FormSettingsPaths: TFormSettingsPaths
       '10e'
       '11c'
     )
-    ParentColor = False
-    ParentShowHint = False
-    ShowHint = True
     TabOrder = 3
   end
   object StatusBar1: TStatusBar
     Left = 0
-    Height = 23
-    Top = 438
+    Height = 20
+    Top = 441
     Width = 430
     Panels = <>
   end
   object GroupBoxPrebuild: TGroupBox
-    Left = 192
-    Height = 51
-    Top = 234
-    Width = 200
+    AnchorSideLeft.Control = RGNDKVersion
+    AnchorSideLeft.Side = asrBottom
+    AnchorSideTop.Control = EditPathToAndroidNDK
+    AnchorSideTop.Side = asrBottom
+    Left = 212
+    Height = 47
+    Top = 218
+    Width = 180
     Anchors = [akTop, akLeft, akRight]
     Caption = 'NDK Toolchains Prebuild'
-    ClientHeight = 31
-    ClientWidth = 196
+    ClientHeight = 29
+    ClientWidth = 176
     TabOrder = 8
     object ComboBoxPrebuild: TComboBox
       Left = 8
-      Height = 23
+      Height = 21
       Top = 0
-      Width = 182
+      Width = 162
       Anchors = [akTop, akLeft, akRight]
-      ItemHeight = 15
+      BorderSpacing.Bottom = 8
+      ItemHeight = 13
       TabOrder = 0
     end
   end
   object Image1: TImage
+    AnchorSideLeft.Control = Owner
+    AnchorSideTop.Control = RGNDKVersion
+    AnchorSideTop.Side = asrBottom
     Left = 8
-    Height = 139
-    Top = 297
-    Width = 100
-    Anchors = [akLeft]
+    Height = 133
+    Top = 273
+    Width = 103
+    AutoSize = True
+    BorderSpacing.Around = 8
     Picture.Data = {
       1754506F727461626C654E6574776F726B47726170686963924E000089504E47
       0D0A1A0A0000000D494844520000006700000085080600000046CDE670000000
@@ -963,11 +972,14 @@ object FormSettingsPaths: TFormSettingsPaths
   end
   object SpeedButtonInfo: TSpeedButton
     AnchorSideTop.Control = GroupBoxPrebuild
-    Left = 399
+    AnchorSideRight.Control = Owner
+    AnchorSideRight.Side = asrBottom
+    Left = 400
     Height = 22
-    Top = 234
+    Top = 225
     Width = 23
     Anchors = [akTop, akRight]
+    BorderSpacing.Around = 7
     Glyph.Data = {
       36040000424D3604000000000000360000002800000010000000100000000100
       2000000000000004000064000000640000000000000000000000000000000000
@@ -1013,7 +1025,7 @@ object FormSettingsPaths: TFormSettingsPaths
     AnchorSideRight.Side = asrBottom
     Left = 399
     Height = 22
-    Top = 203
+    Top = 188
     Width = 23
     Anchors = [akTop, akRight]
     BorderSpacing.Around = 8
