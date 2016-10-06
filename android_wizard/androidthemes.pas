@@ -497,7 +497,7 @@ begin
   FContent := FindIn('themes.xml');
   if (FContent = nil) and (Copy(FName, 1, 19) = 'Theme.DeviceDefault') then
     FContent := FindIn('themes_device_defaults.xml');
-  if FContent = nil then Exit;
+  if FContent = nil then Exit(False);
   parent := FContent.AttribStrings['parent'];
   if parent <> '' then
   begin
