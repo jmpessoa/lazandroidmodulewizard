@@ -59,6 +59,7 @@ type
     function AddTheme(const ThemeName: string; MinAPI: Integer): TAndroidTheme;
     procedure Clear;
     function LoadXML(FileName: string): TXMLDocument;
+    function FindNodeAttribInFiles(const BaseFileName, ATag, AAttr, AVal: string): TDOMElement;
     procedure ClearXMLCache(const ProjRoot: string);
     function Resolve(link: string; const PathToProjRoot: string = '';
       TargetAPI: Integer = 0): TDOMNode;
@@ -77,7 +78,7 @@ var
 
 implementation
 
-uses LamwSettings, strutils, laz2_XMLRead;
+uses LamwSettings, strutils, laz2_XMLRead, FileUtil;
 
 type
   TColorCacheItem = class
@@ -152,6 +153,35 @@ begin
     ReadXMLFile(Result, FileName);
     FXMLs.AddObject(FileName, Result);
   end
+end;
+
+function TAndroidThemes.FindNodeAttribInFiles(const BaseFileName, ATag, AAttr, AVal: string): TDOMElement;
+var
+  xml: TXMLDocument;
+  files: TStringList;
+  i: Integer;
+begin
+  Result := nil;
+  xml := LoadXML(BaseFileName + '.xml');
+  if xml <> nil then
+  begin
+    Result := FindNodeAttrib(xml.DocumentElement, ATag, AAttr, AVal);
+    if Result <> nil then Exit;
+  end;
+  files := FindAllFiles(FBasePath, BaseFileName + '_*.xml', False);
+  try
+    for i := 0 to files.Count - 1 do
+    begin
+      xml := LoadXML(files[i]);
+      if xml <> nil then
+      begin
+        Result := FindNodeAttrib(xml.DocumentElement, ATag, AAttr, AVal);
+        if Result <> nil then Exit;
+      end;
+    end;
+  finally
+    files.Free
+  end;
 end;
 
 procedure TAndroidThemes.ClearXMLCache(const ProjRoot: string);
@@ -286,9 +316,7 @@ function TAndroidThemes.Resolve(link: string; const PathToProjRoot: string;
     if xml = nil then Exit;
     n := FindNodeAttrib(xml.DocumentElement, 'style', 'name', search);
     if n <> nil then Exit(n);
-    xml := LoadXML('styles.xml');
-    if xml = nil then Exit;
-    Result := FindNodeAttrib(xml.DocumentElement, 'style', 'name', search);
+    Result := FindNodeAttribInFiles('styles', 'style', 'name', search);
   end;
 
   function ResolveAndroidStyle(const search: string): TDOMNode;
@@ -313,10 +341,7 @@ function TAndroidThemes.Resolve(link: string; const PathToProjRoot: string;
     fn: string;
     n, n1: TDOMNode;
   begin
-    Result := nil;
-    xml := LoadXML('colors.xml');
-    if xml = nil then Exit;
-    Result := FindNodeAttrib(xml.DocumentElement, 'color', 'name', search);
+    Result := FindNodeAttribInFiles('colors', 'color', 'name', search);
     if Result = nil then
     begin
       fn := FBasePath;
@@ -352,7 +377,7 @@ begin
   if LinkType = 'android:style' then
     Result := ResolveAndroidStyle(link)
   else
-  if LinkType = 'android:color' then
+  if (LinkType = 'android:color') or (LinkType = 'color') then
     Result := ResolveAndroidColor(link)
   else
     Result := nil;
@@ -494,9 +519,7 @@ var
   parent: string;
 begin
   if FLoaded then Exit(True);
-  FContent := FindIn('themes.xml');
-  if (FContent = nil) and (Copy(FName, 1, 19) = 'Theme.DeviceDefault') then
-    FContent := FindIn('themes_device_defaults.xml');
+  FContent := FOwner.FindNodeAttribInFiles('themes', 'style', 'name', FName);
   if FContent = nil then Exit(False);
   parent := FContent.AttribStrings['parent'];
   if parent <> '' then
