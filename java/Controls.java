@@ -1,6 +1,6 @@
-package com.example.appudpsocketdemo1;
+package com.example.appactivitylauncherdemo1;
 
-//LAMW: Lazarus Android Module Wizard  - version 0.7 - rev. 0.4 - 28 September - 2016 
+//LAMW: Lazarus Android Module Wizard  - version 0.7 - rev. 0.5 - 04 October - 2016 
 //RAD Android: Project Wizard, Form Designer and Components Development Model!
 
 //https://github.com/jmpessoa/lazandroidmodulewizard
@@ -50,6 +50,7 @@ package com.example.appudpsocketdemo1;
 //                              rename example Name
 //			12.2013 LAMW Started by jmpessoa
 
+import android.R;
 import android.annotation.SuppressLint;
 import android.app.ActionBar;
 import android.app.Activity;
@@ -116,6 +117,7 @@ import java.lang.reflect.*;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
+import java.lang.Object;
 
 //-------------------------------------------------------------------------
 //Constants
@@ -1094,7 +1096,8 @@ static {
     } catch (UnsatisfiedLinkError e) {
          Log.e("JNI_Load_LibFreetype", "exception", e);
     }
---graphics--*/	
+--graphics--*/
+	    		    
     try {
     	System.loadLibrary("controls");
     } catch (UnsatisfiedLinkError e) {
