@@ -10,13 +10,14 @@
 BASE=$HOME/bin/freepascal
 FPC_TARGET=fpc_fixes_3_0
 FPC_BUILD=3.0.1
+NDK_TARGET=4.9
 
 FPC_BIN=fpc-bin
 PPC_CONFIG_PATH=$BASE/fpc-bin
 
 if [[ ! ":$PATH:" == *":$PPC_CONFIG_PATH:"* ]]; then
-  echo export PATH=$PATH:$PPC_CONFIG_PATH:~/Android/ndk/toolchains/arm-linux-androideabi-4.9/prebuilt/linux-x86_64/bin >> ~/.bashrc
-  export PATH=$PATH:$PPC_CONFIG_PATH:~/Android/ndk/toolchains/arm-linux-androideabi-4.9/prebuilt/linux-x86_64/bin
+  echo export PATH=$PATH:$PPC_CONFIG_PATH:~/Android/ndk/toolchains/arm-linux-androideabi-$NDK_TARGET/prebuilt/linux-x86_64/bin >> ~/.bashrc
+  export PATH=$PATH:$PPC_CONFIG_PATH:~/Android/ndk/toolchains/arm-linux-androideabi-$NDK_TARGET/prebuilt/linux-x86_64/bin
   echo export ANDROID_HOME=$HOME/Android/sdk >> ~/.bashrc
 fi
 
@@ -49,4 +50,19 @@ fi
 if [ ! -d $BASE/lazarus ]; then
   mkdir $BASE/lazarus
 fi 
+
+if [ ! -L /usr/bin/arm-linux-androideabi-as ]; then
+  ln -s /home/renabor/Android/ndk/toolchains/arm-linux-androideabi-$NDK_TARGET/prebuilt/linux-x86_64/bin/arm-linux-androideabi-as /usr/bin/arm-linux-androideabi-as
+fi
+if [ ! -L /usr/bin/arm-linux-androideabi-ld ]; then
+  ln -s /home/renabor/Android/ndk/toolchains/arm-linux-androideabi-$NDK_TARGET/prebuilt/linux-x86_64/bin/arm-linux-androideabi-ld.bfd /usr/bin/arm-linux-androideabi-ld
+fi
+if [ ! -L /usr/bin/arm-linux-as ]; then
+  ln -s /usr/bin/arm-linux-androideabi-as /usr/bin/arm-linux-as
+fi
+
+if [ ! -L /usr/bin/arm-linux-ld ]; then
+  ln -s /usr/bin/arm-linux-androideabi-ld /usr/bin/arm-linux-ld
+fi
+
 
