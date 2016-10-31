@@ -1,6 +1,6 @@
-package com.example.appactivitylauncherdemo1;
+package com.example.appopenglsurfaceviewdemo1;
 
-//LAMW: Lazarus Android Module Wizard  - version 0.7 - rev. 0.5 - 04 October - 2016 
+//LAMW: Lazarus Android Module Wizard  - version 0.7 - rev. 0.6 - 31 October - 2016 
 //RAD Android: Project Wizard, Form Designer and Components Development Model!
 
 //https://github.com/jmpessoa/lazandroidmodulewizard
@@ -50,7 +50,6 @@ package com.example.appactivitylauncherdemo1;
 //                              rename example Name
 //			12.2013 LAMW Started by jmpessoa
 
-import android.R;
 import android.annotation.SuppressLint;
 import android.app.ActionBar;
 import android.app.Activity;
@@ -118,6 +117,13 @@ import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.lang.Object;
+
+import javax.microedition.khronos.opengles.GL10;
+import javax.microedition.khronos.egl.EGL10;
+import javax.microedition.khronos.egl.EGLContext;
+import javax.microedition.khronos.egl.EGLDisplay;
+import javax.microedition.khronos.egl.EGLSurface;
+
 
 //-------------------------------------------------------------------------
 //Constants
@@ -444,7 +450,8 @@ public String LoadFromAssets(String _filename){
 			
 			for (int c = is.read(buffer); c != -1; c = is.read(buffer)){
 		      fos.write(buffer, 0, c);
-			}	     								
+			}	     		
+			
 			is.close();								
 			fos.close();
 			pathRes= PathDat +"/"+ _filename;
@@ -455,6 +462,7 @@ public String LoadFromAssets(String _filename){
 		
 		return pathRes;
 }
+
 
 public boolean IsSdCardMounted() {		  
    return Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED); 
@@ -1037,6 +1045,33 @@ public String GetDeviceWifiIPAddress() {
     r = InetAddress.getByAddress(quads).getHostAddress();    
     if  (r == null) r = "";    
     return r;
+  }
+  
+  //https://xjaphx.wordpress.com/2011/10/02/store-and-use-files-in-assets/    
+  public String LoadFromAssetsTextContent(String _filename) {
+	   String str;
+      // load text
+      try {
+   	   //Log.i("loadFromAssets", "name: "+_filename);
+          // get input stream for text
+          InputStream is = controls.activity.getAssets().open(_filename);
+          // check size
+          int size = is.available();
+          // create buffer for IO
+          byte[] buffer = new byte[size];
+          // get data to buffer
+          is.read(buffer);
+          // close stream
+          is.close();
+          // set result to TextView
+          str = new String(buffer);
+          //Log.i("loadFromAssets", ":: "+ str);
+          return str.toString();
+      }
+      catch (IOException ex) {
+   	   //Log.i("loadFromAssets", "error!");
+          return "";
+      }       
   }
 
 }
