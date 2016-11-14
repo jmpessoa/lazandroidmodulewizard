@@ -20,7 +20,6 @@ type
     FPathToJavaSource: string;
     FPathToAndroidProject: string;
 
-
     {%region 'To remove'}
     FPathToAndroidSDK: string;
     FPathToAndroidNDK: string;
@@ -120,18 +119,15 @@ end;
 
 procedure TLamwSmartDesigner.Init4Project(AProject: TLazProject);
 var
-  i: Integer;
   auxList: TStringList;
 begin
-
   if not AProject.CustomData.Contains('LAMW') then
   begin
     if not FileExists(AProject.ProjectInfoFile) then Exit;
     auxList:= TStringList.Create;
     try
       auxList.LoadFromFile(AProject.ProjectInfoFile); //full path to 'controls.lpi';
-      if Pos('tfpandroidbridge_pack', auxList.Text) <= 0 then
-         Exit;
+      if Pos('tfpandroidbridge_pack', auxList.Text) <= 0 then  Exit;
       AProject.CustomData['LAMW']:= 'GUI';
     finally
       auxList.Free;
@@ -148,6 +144,7 @@ begin
       CustomData['LamwVersion'] := LamwGlobalSettings.Version;
       UpdateAllJControls(AProject);
     end;
+
     FPathToAndroidProject := ExtractFilePath(AProject.MainFile.Filename);
     FPathToAndroidProject := Copy(FPathToAndroidProject, 1, RPosEX(PathDelim, FPathToAndroidProject, Length(FPathToAndroidProject) - 1));
 
@@ -158,7 +155,7 @@ begin
       CustomData['Package'] := FPackageName;
     end;
 
-    FPathToJavaSource := FPathToAndroidProject + 'src' + PathDelim
+    FPathToJavaSource:= FPathToAndroidProject + 'src' + PathDelim
       + AppendPathDelim(ReplaceChar(FPackageName, '.', PathDelim));
   end;
 
@@ -168,7 +165,9 @@ begin
   {%endregion}
 
   if not DirectoryExists(FPathToAndroidProject + 'lamwdesigner') then
-    InitSmartDesignerHelpers;
+  begin
+    if AProject.CustomData['LAMW'] = 'GUI' then InitSmartDesignerHelpers;
+  end;
 
   {%region 'To remove'}
   // try fix/repair project paths [demos, etc..] in "Run" --> "build"  time ...
@@ -248,12 +247,12 @@ var
   i: integer;
   fileName: string;
 begin
-  ForceDirectory(FPathToJavaSource+DirectorySeparator+'bak');
+  ForceDirectory(FPathToJavaSource+'bak');
   contentList := FindAllFiles(FPathToJavaSource, '*.java', False);
   for i:= 0 to contentList.Count-1 do
   begin         //do backup
     CopyFile(contentList.Strings[i],
-          FPathToJavaSource+DirectorySeparator+'bak'+DirectorySeparator+ExtractFileName(contentList.Strings[i])+'.bak');
+          FPathToJavaSource+'bak'+DirectorySeparator+ExtractFileName(contentList.Strings[i])+'.bak');
 
     fileName:= ExtractFileName(contentList.Strings[i]); //not delete custom java code [support to jActivityLauncher]
     if FileExists(LamwGlobalSettings.PathToJavaTemplates+'lamwdesigner'+DirectorySeparator + fileName) then
@@ -331,7 +330,7 @@ begin
 
    if FPackageName = '' then Exit;
 
-   if FileExists(FPathToJavaSource+DirectorySeparator+jclassname+'.java') then
+   if FileExists(FPathToJavaSource+jclassname+'.java') then
      Exit; //do not duplicated!
 
    list:= TStringList.Create;
@@ -814,34 +813,59 @@ end;
 
 function TLamwSmartDesigner.OnProjectSavingAll(Sender: TObject): TModalResult;
 var
-  auxList, jcontrolsList: TStringList;
-  j: Integer;
+  auxList, jcontrolsList, libList: TStringList;
+  j, p: Integer;
   nativeExists: Boolean;
   aux, PathToJavaTemplates, chipArchitecture: string;
 begin
   Result := mrOk;
   if not LazarusIDE.ActiveProject.CustomData.Contains('LAMW') then Exit;
 
-  PathToJavaTemplates := LamwGlobalSettings.PathToJavaTemplates;
+  PathToJavaTemplates := LamwGlobalSettings.PathToJavaTemplates;   //included path delimiter
   UpdateStartModuleVarName;
-  auxList := TStringList.Create;
+
+  chipArchitecture:= 'x86';
+  aux := LazarusIDE.ActiveProject.LazCompilerOptions.CustomOptions;
+  if Pos('-CpARMV6', aux) > 0 then chipArchitecture:= 'armeabi'
+  else
+  if Pos('-CpARMV7A', aux) > 0 then chipArchitecture:= 'armeabi-v7a';
+
+  auxList:= TStringList.Create;
 
   if LamwGlobalSettings.CanUpdateJavaTemplate then
   begin
     CleanupAllJControlsSource;
+
     //update all java code ...
-    if FileExists(PathToJavaTemplates+DirectorySeparator+'App.java') then
+    libList:= FindAllFiles(FPathToAndroidProject + 'libs'+DirectorySeparator+chipArchitecture, '*.so', False);
+    for j:= 0 to libList.Count-1 do
     begin
-      auxList.LoadFromFile(PathToJavaTemplates+DirectorySeparator+'App.java');
-      auxList.Strings[0]:= 'package '+FPackageName+';';
-      auxList.SaveToFile(FPathToJavaSource+'App.java');
+      aux:= ExtractFileName(libList.Strings[j]);
+      p:= Pos('.', aux);
+      aux:= Trim(copy(aux,4, p-4));
+      auxList.Add(aux);
+    end;
+
+    libList.Clear;
+    for j:= 0 to auxList.Count-1 do
+    begin
+      libList.Add('try{System.loadLibrary("'+auxList.Strings[j]+'");} catch (UnsatisfiedLinkError e) {Log.e("JNI_Loading_lib'+auxList.Strings[j]+'", "exception", e);}');
     end;
 
     if FileExists(PathToJavaTemplates+'Controls.java') then
     begin
       auxList.LoadFromFile(PathToJavaTemplates+'Controls.java');
       auxList.Strings[0]:= 'package '+FPackageName+';';
+      aux:=  StringReplace(auxList.Text, '/*libsmartload*/' ,Trim(libList.Text), [rfReplaceAll,rfIgnoreCase]);
+      auxList.Text:= aux;
       auxList.SaveToFile(FPathToJavaSource+'Controls.java');
+    end;
+
+    if FileExists(PathToJavaTemplates+'App.java') then
+    begin
+      auxList.LoadFromFile(PathToJavaTemplates+'App.java');
+      auxList.Strings[0]:= 'package '+FPackageName+';';
+      auxList.SaveToFile(FPathToJavaSource+'App.java');
     end;
 
     if FileExists(LamwGlobalSettings.PathToJavaTemplates+'lamwdesigner'+DirectorySeparator +'jCommons.java') then
@@ -850,8 +874,8 @@ begin
       auxList.Strings[0]:= 'package '+FPackageName+';';
       auxList.SaveToFile(FPathToJavaSource+'jCommons.java');
     end;
-
-  end;
+    libList.Free;
+  end;  //CanUpdateJavaTemplate
 
   if FileExists(PathToJavaTemplates + 'Controls.native') then
   begin
@@ -864,7 +888,6 @@ begin
   jcontrolsList.Duplicates := dupIgnore;
   GetAllJControlsFromForms(jcontrolsList);
 
-
   //re-add all [updated] java code ...
   for j := 0 to jcontrolsList.Count - 1 do
     if FileExists(PathToJavaTemplates+'lamwdesigner'+PathDelim+jcontrolsList.Strings[j]+'.java') then
@@ -872,31 +895,12 @@ begin
 
   if jcontrolsList.IndexOf('TFPNoGUIGraphicsBridge') >= 0 then   //handle lib freetype need by TFPNoGUIGraphicsBridge
   begin
-    auxList.LoadFromFile(FPathToJavaSource+DirectorySeparator+'Controls.java');
-    aux:=  StringReplace(auxList.Text, '/*--nogui--' , '/*--nogui--*/' , [rfReplaceAll,rfIgnoreCase]);
-    aux:=  StringReplace(aux, '--graphics--*/' , '/*--graphics--*/' , [rfReplaceAll,rfIgnoreCase]);
-    auxList.Text:= aux;
-    auxList.SaveToFile(FPathToJavaSource+DirectorySeparator+'Controls.java');
-
-    chipArchitecture:= 'x86';
-    //aux := LazarusIDE.ActiveProject.LazCompilerOptions.TargetProcessor;
-    aux := LazarusIDE.ActiveProject.LazCompilerOptions.CustomOptions;
-//    auxList.LoadFromFile(LazarusIDE.ActiveProject.ProjectInfoFile); //full path to 'controls.lpi';
-    if Pos('-CpARMV6', aux) > 0 then chipArchitecture:= 'armeabi'
-    else
-    if Pos('-CpARMV7A', aux) > 0 then chipArchitecture:= 'armeabi-v7a';
-
-    if FileExists(PathToJavaTemplates+'lamwdesigner'+PathDelim+'libfreetype.so') then
+    if FileExists(PathToJavaTemplates+'lamwdesigner'+PathDelim+'libs'+PathDelim+'libfreetype.so') then
     begin
-      CopyFile(PathToJavaTemplates+'lamwdesigner'+PathDelim+'libfreetype.so',
+      CopyFile(PathToJavaTemplates+'lamwdesigner'+PathDelim+'libs'+PathDelim+'libfreetype.so',
                FPathToAndroidProject+'libs'+PathDelim+
                chipArchitecture+PathDelim+'libfreetype.so');
     end;
-  end;
-
-  if jcontrolsList.IndexOf('jActive') >= 0 then
-  begin
-
   end;
 
   jcontrolsList.Free;

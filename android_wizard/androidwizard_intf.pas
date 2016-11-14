@@ -14,7 +14,7 @@ type
   TAndroidModule = class(jForm)            //support to Adroid Bridges [components]
   end;
 
-  TNoGUIAndroidModule = class(TDataModule) //raw ".so"
+  TNoGUIAndroidModule = class(TDataModule) //raw JNI ".so"
   end;
 
 
@@ -36,7 +36,7 @@ type
      FFPUSet: string;            {Soft}
      FPathToJavaTemplates: string;
      FAndroidProjectName: string;
-     FModuleType: integer;     {0: GUI; 1: NoGUI; 2: NoGUI EXE}
+     FModuleType: integer;     {0: GUI; 1: NoGUI; 2: NoGUI EXE Console}
      FSyntaxMode: TSyntaxMode;   {}
 
      FPieChecked: boolean;
@@ -196,17 +196,17 @@ var
   list: TStringList;
 begin
   try
-    FModuleType := 2; //0: GUI --- 1:NoGUI --- 2: NoGUI EXE
+    FModuleType := 2; //0: GUI --- 1:NoGUI --- 2: NoGUI EXE Console
     FPathToClassName := '';
     if GetWorkSpaceFromForm(2) then
     begin
 
       FPathToJNIFolder := FAndroidProjectName;
       AndroidFileDescriptor.PathToJNIFolder:= FPathToJNIFolder;
-      AndroidFileDescriptor.ModuleType:= 2;
+      AndroidFileDescriptor.ModuleType:= 2; //Console
 
       CreateDir(FAndroidProjectName+DirectorySeparator+'build-modes');
-      CreateDir(FAndroidProjectName+DirectorySeparator+'lamwdesigner');
+      //CreateDir(FAndroidProjectName+DirectorySeparator+'lamwdesigner');
 
       CreateDir(FAndroidProjectName+DirectorySeparator+'libs');
       CreateDir(FAndroidProjectName+DirectorySeparator+'libs'+DirectorySeparator+'armeabi');
@@ -372,11 +372,11 @@ end;
 
 function TAndroidGUIProjectDescriptor.DoInitDescriptor: TModalResult;    //GUI
 var
-  strAfterReplace, strPack: string;
+  strAfterReplace, strPack, aux: string;
   auxList: TStringList;
 begin
   try
-    FModuleType := 0; //0: GUI --- 1:NoGUI --- 2: NoGUI EXE
+    FModuleType := 0; //0: GUI --- 1:NoGUI --- 2: NoGUI EXE Console
     FJavaClassName := 'Controls';
     FPathToClassName := '';
     if GetWorkSpaceFromForm(0) then
@@ -387,7 +387,10 @@ begin
 
           LoadFromFile(FPathToJavaTemplates + DirectorySeparator + 'Controls.java');
           Strings[0] := 'package ' + strPack + ';';  //replace dummy - Controls.java
-
+          aux:=  StringReplace(Text, '/*libsmartload*/' ,
+                 'try{System.loadLibrary("controls");} catch (UnsatisfiedLinkError e) {Log.e("JNI_Loading_libcontrols", "exception", e);}',
+                 [rfReplaceAll,rfIgnoreCase]);
+          Text:= aux;
           SaveToFile(FFullJavaSrcPath + DirectorySeparator + 'Controls.java');
 
           Clear;
@@ -402,6 +405,14 @@ begin
           begin
             CopyFile(FPathToJavaTemplates+DirectorySeparator + 'Controls.native',
               FAndroidProjectName+DirectorySeparator+'lamwdesigner'+DirectorySeparator+'Controls.native');
+          end;
+
+          if FileExists(FPathToJavaTemplates+DirectorySeparator +'lamwdesigner'+DirectorySeparator+ 'jCommons.java') then
+          begin
+            Clear;
+            LoadFromFile(FPathToJavaTemplates+DirectorySeparator +'lamwdesigner'+DirectorySeparator+ 'jCommons.java');
+            Strings[0] := 'package ' + strPack + ';';  //replace dummy
+            SaveToFile(FFullJavaSrcPath + DirectorySeparator + 'jCommons.java');
           end;
 
       finally
@@ -686,7 +697,7 @@ var
   dummy, strText: string;
 begin
   Result:= False;
-  FModuleType:= projectType; //0:GUI  1:NoGUI 2: NoGUI EXE
+  FModuleType:= projectType; //0:GUI  1:NoGUI 2: NoGUI EXE Console
 
   AndroidFileDescriptor.ModuleType:= projectType;
 
@@ -1584,9 +1595,11 @@ begin
     AProject.CustomData.Values['LAMW'] := 'GUI'
   else if  FModuleType = 1 then
     AProject.CustomData.Values['LAMW'] := 'NoGUI'
-  else  AProject.CustomData.Values['LAMW'] := 'NoGUIConsoleApp';
+  else  AProject.CustomData.Values['LAMW'] := 'NoGUIConsoleApp';    // FModuleType =2
 
-  AProject.CustomData.Values['Package']:= FPackagePrefaceName + '.' + LowerCase(FSmallProjName);
+  if FModuleType <> 2 then
+    AProject.CustomData.Values['Package']:= FPackagePrefaceName + '.' + LowerCase(FSmallProjName);
+
   AProject.CustomData.Values['NdkPath']:= FPathToAndroidNDK;
   AProject.CustomData.Values['SdkPath']:= FPathToAndroidSDK;
 
@@ -2227,7 +2240,7 @@ begin
     else
       strList.Add('  TNoGUIAndroidModuleXX  = class(TDataModule)');
   end
-  else //2
+  else //2  console
   begin
     if ResourceName <> '' then
       strList.Add('  T' + ResourceName + ' = class(TDataModule)')
@@ -2256,7 +2269,7 @@ begin
     else
       strList.Add('  NoGUIAndroidModuleXX: TNoGUIDataMoule');
   end
-  else //2
+  else //2  console
   begin
     if ResourceName <> '' then
      strList.Add('  ' + ResourceName + ': T' + ResourceName + ';')

@@ -1,6 +1,6 @@
 package com.example.appopenglsurfaceviewdemo1;
 
-//LAMW: Lazarus Android Module Wizard  - version 0.7 - rev. 0.6 - 31 October - 2016 
+//LAMW: Lazarus Android Module Wizard  - version 0.7 - rev. 0.7 - 13 November - 2016 
 //RAD Android: Project Wizard, Form Designer and Components Development Model!
 
 //https://github.com/jmpessoa/lazandroidmodulewizard
@@ -1122,29 +1122,17 @@ public native void pOnPinchZoomGestureDetected(long pasobj, float scaleFactor, i
 public native void pOnLostFocus(long pasobj, String text);
 public native void pOnBeforeDispatchDraw(long pasobj, Canvas canvas, int tag);
 public native void pOnAfterDispatchDraw(long pasobj, Canvas canvas, int tag);
- 
-//Load Pascal Library
-static {
-/*--nogui--
-    try {
-    	System.loadLibrary("freetype"); // need by TFPNoGUIGraphicsBridge [ref. www.github.com/jmpessoa/tfpnoguigraphicsbridge]
-    } catch (UnsatisfiedLinkError e) {
-         Log.e("JNI_Load_LibFreetype", "exception", e);
-    }
---graphics--*/
-	    		    
-    try {
-    	System.loadLibrary("controls");
-    } catch (UnsatisfiedLinkError e) {
-         Log.e("JNI_Load_LibControls", "exception", e);
-    }  
-}
 
+// -------------------------------------------------------------------------
+//Load Pascal Library
+// -------------------------------------------------------------------------
+static {
+/*libsmartload*/
+}
 // -------------------------------------------------------------------------
 //  Activity Event
 // -------------------------------------------------------------------------
 public  int  jAppOnScreenStyle()          { return(pAppOnScreenStyle());   }     
-//
 public  void jAppOnCreate(Context context,RelativeLayout layout )
                                           { pAppOnCreate(context,layout);  }
 
