@@ -856,7 +856,14 @@ begin
     begin
       auxList.LoadFromFile(PathToJavaTemplates+'Controls.java');
       auxList.Strings[0]:= 'package '+FPackageName+';';
-      aux:=  StringReplace(auxList.Text, '/*libsmartload*/' ,Trim(libList.Text), [rfReplaceAll,rfIgnoreCase]);
+
+      if libList.Count > 0 then
+         aux:=  StringReplace(auxList.Text, '/*libsmartload*/' ,Trim(libList.Text), [rfReplaceAll,rfIgnoreCase])
+      else
+         aux:=  StringReplace(auxList.Text, '/*libsmartload*/' ,
+                 'try{System.loadLibrary("controls");} catch (UnsatisfiedLinkError e) {Log.e("JNI_Loading_libcontrols", "exception", e);}',
+                 [rfReplaceAll,rfIgnoreCase]);
+
       auxList.Text:= aux;
       auxList.SaveToFile(FPathToJavaSource+'Controls.java');
     end;
@@ -895,9 +902,9 @@ begin
 
   if jcontrolsList.IndexOf('TFPNoGUIGraphicsBridge') >= 0 then   //handle lib freetype need by TFPNoGUIGraphicsBridge
   begin
-    if FileExists(PathToJavaTemplates+'lamwdesigner'+PathDelim+'libs'+PathDelim+'libfreetype.so') then
+    if FileExists(PathToJavaTemplates+'lamwdesigner'+PathDelim+'libs'+PathDelim+chipArchitecture+PathDelim+'libfreetype.so') then
     begin
-      CopyFile(PathToJavaTemplates+'lamwdesigner'+PathDelim+'libs'+PathDelim+'libfreetype.so',
+      CopyFile(PathToJavaTemplates+'lamwdesigner'+PathDelim+'libs'+PathDelim+chipArchitecture+PathDelim+'libfreetype.so',
                FPathToAndroidProject+'libs'+PathDelim+
                chipArchitecture+PathDelim+'libfreetype.so');
     end;
