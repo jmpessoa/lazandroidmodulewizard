@@ -119,14 +119,25 @@ public class jTextView extends TextView {
     //LORDMAN 2013-08-13
     public  void SetTextAlignment( int align ) {
         switch ( align ) {
+ //[ifdef_api14up]
             case 0 : { setGravity( Gravity.START             ); }; break;
-            case 1 : { setGravity( Gravity.END             ); }; break;
+            case 1 : { setGravity( Gravity.END               ); }; break;
+ //[endif_api14up]
+ /* //[endif_api14up]
+            case 0 : { setGravity( Gravity.LEFT              ); }; break;
+            case 1 : { setGravity( Gravity.RIGHT             ); }; break;
+ //[ifdef_api14up] */
             case 2 : { setGravity( Gravity.TOP               ); }; break;
             case 3 : { setGravity( Gravity.BOTTOM            ); }; break;
             case 4 : { setGravity( Gravity.CENTER            ); }; break;
             case 5 : { setGravity( Gravity.CENTER_HORIZONTAL ); }; break;
             case 6 : { setGravity( Gravity.CENTER_VERTICAL   ); }; break;
-            default : { setGravity( Gravity.START              ); }; break;
+ //[ifdef_api14up]
+            default : { setGravity( Gravity.START            ); }; break;
+ //[endif_api14up]
+ /* //[endif_api14up]
+            default : { setGravity( Gravity.LEFT             ); }; break;
+ //[ifdef_api14up] */
         };
     }
 

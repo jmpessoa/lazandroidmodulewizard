@@ -23,7 +23,7 @@ import android.view.Gravity;
 
 public class jCustomDialog extends RelativeLayout {
 
-	private long       pascalObj = 0;    // Pascal Object
+ private long       pascalObj = 0;    // Pascal Object
 	private Controls   controls  = null; // Control Class for events
 
 	private Context context = null;
@@ -46,9 +46,14 @@ public class jCustomDialog extends RelativeLayout {
 	private int marginTop = 0;
 	private int marginRight = 0;
 	private int marginBottom = 0;
-	private int lgravity = Gravity.TOP | Gravity.START;
 	private float lweight = 0;
-
+ //[ifdef_api14up]
+ private int lgravity = Gravity.TOP | Gravity.START;
+ //[endif_api14up]
+ /* //[endif_api14up]
+ private int lgravity = Gravity.TOP | Gravity.LEFT;
+ //[ifdef_api14up] */
+ 
 	Dialog mDialog = null;
 	private String mIconIdentifier = "ic_launcher";   //default icon  ../res/drawable
 	private String mTitle = "Information";
@@ -181,12 +186,22 @@ public class jCustomDialog extends RelativeLayout {
 
 	public void ClearLayoutAll() {
 		if (lparams instanceof RelativeLayout.LayoutParams) {
-			for (int i = 0; i < countAnchorRule; i++) {
+			for (int i = 0; i < countAnchorRule; i++) {   
+ //[ifdef_api17up]
 				((RelativeLayout.LayoutParams)lparams).removeRule(lparamsAnchorRule[i]);
+ //[endif_api17up]
+	/* //[endif_api17up]
+ 			((RelativeLayout.LayoutParams)lparams).addRule(lparamsAnchorRule[i], 0);
+ //[ifdef_api17up] */
 			}
 
 			for (int j = 0; j < countParentRule; j++) {
-				((RelativeLayout.LayoutParams) lparams).removeRule(lparamsParentRule[j]);
+ //[ifdef_api17up]
+				((RelativeLayout.LayoutParams)lparams).removeRule(lparamsParentRule[j]);
+ //[endif_api17up]
+ /* //[endif_api17up]
+ 			((RelativeLayout.LayoutParams)lparams).addRule(lparamsAnchorRule[j], 0);
+	//[ifdef_api17up] */
 			}
 		}
 		countAnchorRule = 0;

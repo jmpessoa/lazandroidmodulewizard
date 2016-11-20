@@ -32,7 +32,12 @@ public class jCheckBox extends CheckBox {
 	int marginTop = 5;
 	int marginRight = 5;
 	int marginBottom = 5;
-	private int lgravity = Gravity.TOP | Gravity.START;
+ //[ifdef_api14up]
+ private int lgravity = Gravity.TOP | Gravity.START;
+ //[endif_api14up]
+ /* //[endif_api14up]
+ private int lgravity = Gravity.TOP | Gravity.LEFT;
+ //[ifdef_api14up] */
 	private float lweight = 0;
 
 	float mTextSize = 0; //default

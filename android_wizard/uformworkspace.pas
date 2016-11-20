@@ -172,6 +172,11 @@ begin
   Result:= 'Unknown';
   if api='8' then Result:= 'Froyo 2.2'
   else if api='10' then Result:= 'Gingerbread 2.3'
+// tk
+  else if api='11' then Result:= 'Honeycomb 3.0x'
+  else if api='12' then Result:= 'Honeycomb 3.1x'
+  else if api='13' then Result:= 'Honeycomb 3.2'
+// end tk
   else if api='14' then Result:= 'IceCream 4.0'
   else if api='15' then Result:= 'IceCream 4.0x'
   else if api='16' then Result:= 'JellyBean 4.1'
@@ -207,14 +212,19 @@ begin
    case index of
      0: Result:= 'Froyo 2.2'; // Api(8)    -Froyo 2.2
      1: Result:= 'Gingerbread 2.3'; // Api(10)   -Gingerbread 2.3
-     2: Result:= 'IceCream 4.0'; // Api(15)  -Ice Cream 4.0x
-     3: Result:= 'JellyBean 4.1'; // Api(16)  -Jelly Bean 4.1
-     4: Result:= 'JellyBean 4.2'; // Api(17)  -Jelly Bean 4.2
-     5: Result:= 'JellyBean 4.3'; // Api(18)  -Jelly Bean 4.3
-     6: Result:= 'KitKat 4.4'; // Api(19)  -KitKat 4.4
-     7: Result:= 'KitKat 4.4W'; // Api(20)  -KitKat 4.4
-     8: Result:= 'Lollipop 5.0'; // Api(21)  -Lollipop [5.0]
-     9: Result:= 'Lollipop 5.1'; // Api(22)  -Lollipop [5.1]
+     // tk
+     2: Result:= 'Honeycomb 3.0x'; // Api(11) -Honeycomb 3.0x
+     3: Result:= 'Honeycomb 3.1x'; // Api(12) -Honeycomb 3.1x
+     4: Result:= 'Honeycomb 3.2'; // Api(13) -Honeycomb 3.2
+     // end tk
+     5: Result:= 'IceCream 4.0'; // Api(15)  -Ice Cream 4.0x
+     6: Result:= 'JellyBean 4.1'; // Api(16)  -Jelly Bean 4.1
+     7: Result:= 'JellyBean 4.2'; // Api(17)  -Jelly Bean 4.2
+     8: Result:= 'JellyBean 4.3'; // Api(18)  -Jelly Bean 4.3
+     9: Result:= 'KitKat 4.4'; // Api(19)  -KitKat 4.4
+     10: Result:= 'KitKat 4.4W'; // Api(20)  -KitKat 4.4
+     11: Result:= 'Lollipop 5.0'; // Api(21)  -Lollipop [5.0]
+     12: Result:= 'Lollipop 5.1'; // Api(22)  -Lollipop [5.1]
    end;
 end;
 
@@ -277,7 +287,8 @@ function TFormWorkspace.GetNDKPlatform(identName: string): string;
 begin
     Result:= 'android-14'; //default
          if identName = 'Froyo'          then Result:= 'android-8'
-    else if identName = 'Gingerbread'    then Result:= 'android-13'
+    else if identName = 'Gingerbread'    then Result:= 'android-10'
+    else if identName = 'Honeycomb'      then Result:= 'android-13'
     else if identName = 'Ice Cream 4.0x' then Result:= 'android-15'
     else if identName = 'Jelly Bean 4.1' then Result:= 'android-16'
     else if identName = 'Jelly Bean 4.2' then Result:= 'android-17'

@@ -235,18 +235,29 @@ public class jEditText extends EditText {
 	}
 
 	//LORDMAN 2013-08-13
-	public  void SetTextAlignment( int align ) {
-		switch ( align ) {
-			case 0 : { setGravity( Gravity.START              ); }; break;
-			case 1 : { setGravity( Gravity.END             ); }; break;
-			case 2 : { setGravity( Gravity.TOP               ); }; break;
-			case 3 : { setGravity( Gravity.BOTTOM            ); }; break;
-			case 4 : { setGravity( Gravity.CENTER            ); }; break;
-			case 5 : { setGravity( Gravity.CENTER_HORIZONTAL ); }; break;
-			case 6 : { setGravity( Gravity.CENTER_VERTICAL   ); }; break;
-			default : { setGravity( Gravity.START              ); }; break;
-		};
-	}
+    public  void SetTextAlignment( int align ) {
+        switch ( align ) {
+ //[ifdef_api14up]
+            case 0 : { setGravity( Gravity.START             ); }; break;
+            case 1 : { setGravity( Gravity.END               ); }; break;
+ //[endif_api14up]
+ /* //[endif_api14up]
+            case 0 : { setGravity( Gravity.LEFT              ); }; break;
+            case 1 : { setGravity( Gravity.RIGHT             ); }; break;
+ //[ifdef_api14up] */
+            case 2 : { setGravity( Gravity.TOP               ); }; break;
+            case 3 : { setGravity( Gravity.BOTTOM            ); }; break;
+            case 4 : { setGravity( Gravity.CENTER            ); }; break;
+            case 5 : { setGravity( Gravity.CENTER_HORIZONTAL ); }; break;
+            case 6 : { setGravity( Gravity.CENTER_VERTICAL   ); }; break;
+ //[ifdef_api14up]
+            default : { setGravity( Gravity.START            ); }; break;
+ //[endif_api14up]
+ /* //[endif_api14up]
+            default : { setGravity( Gravity.LEFT             ); }; break;
+ //[ifdef_api14up] */
+        };
+    }
 
 	//by jmpessoa
 	public void setScrollerEx() {
@@ -444,7 +455,10 @@ public class jEditText extends EditText {
 
 	public  void SetBackgroundByImage(Bitmap _image) {	
 		Drawable d = new BitmapDrawable(controls.activity.getResources(), _image);
-		if(Build.VERSION.SDK_INT >= 16) this.setBackground(d);
+//[ifdef_api16up]
+		//if(Build.VERSION.SDK_INT >= 16) 
+  this.setBackground(d);
+//[endif_api16up]
 	}	
 		
 	@Override

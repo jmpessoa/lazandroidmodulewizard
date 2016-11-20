@@ -180,7 +180,10 @@ public class jButton extends Button {
 	
 	public  void SetBackgroundByImage(Bitmap _image) {	
 		Drawable d = new BitmapDrawable(controls.activity.getResources(), _image);
-		if(Build.VERSION.SDK_INT >= 16) this.setBackground(d);
+//[ifdef_api16up]
+			//if(Build.VERSION.SDK_INT >= 16) 
+   this.setBackground(d);
+//[endif_api16up]
 	}
 		
 	@Override

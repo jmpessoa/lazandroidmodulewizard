@@ -31,7 +31,12 @@ public class jCommons {
 	private int marginTop = 5;
 	private int marginRight = 5;
 	private int marginBottom = 5;
-	private int lgravity = Gravity.TOP | Gravity.START;
+ //[ifdef_api14up]
+ private int lgravity = Gravity.TOP | Gravity.START;
+ //[endif_api14up]
+ /* //[endif_api14up]
+ private int lgravity = Gravity.TOP | Gravity.LEFT;
+ //[ifdef_api14up] */
 	private float lweight = 0;
 	private boolean mRemovedFromParent = false;
 	
@@ -174,18 +179,22 @@ public class jCommons {
 	public void clearLayoutAll() {
 		if (lparams instanceof RelativeLayout.LayoutParams) {
 			for (int i = 0; i < countAnchorRule; i++) {								
-				if(Build.VERSION.SDK_INT < 17)
+				//if(Build.VERSION.SDK_INT < 17)
 				  ((android.widget.RelativeLayout.LayoutParams) lparams).addRule(lparamsAnchorRule[i], 0);
 				
-				if(Build.VERSION.SDK_INT >= 17)
-				 ((android.widget.RelativeLayout.LayoutParams) lparams).removeRule(lparamsAnchorRule[i]); //need API >= 17!
+//[ifdef_api17up]
+				//if(Build.VERSION.SDK_INT >= 17)
+				((android.widget.RelativeLayout.LayoutParams) lparams).removeRule(lparamsAnchorRule[i]); //need API >= 17!
+//[endif_api17up]
 			}
 			for (int j = 0; j < countParentRule; j++) {
-				if(Build.VERSION.SDK_INT < 17) 
+				//if(Build.VERSION.SDK_INT < 17) 
 				  ((android.widget.RelativeLayout.LayoutParams) lparams).addRule(lparamsParentRule[j], 0);
 				
-				if(Build.VERSION.SDK_INT >= 17)
+//[ifdef_api17up]
+				//if(Build.VERSION.SDK_INT >= 17)
 				  ((android.widget.RelativeLayout.LayoutParams) lparams).removeRule(lparamsParentRule[j]);  //need API >= 17!
+//[endif_api17up]
 			}
 		}
 		countAnchorRule = 0;

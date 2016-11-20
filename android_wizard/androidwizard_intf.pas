@@ -145,7 +145,7 @@ function SplitStr(var theString: string; delimiter: string): string;
 implementation
 
 uses
-  uJavaParser, LamwDesigner, SmartDesigner;
+  LazFileUtils, uJavaParser, LamwDesigner, SmartDesigner;
 
 procedure Register;
 begin
@@ -695,6 +695,7 @@ var
   linuxPathToAdbBin: string;
   linuxPathToAntBin: string;
   dummy, strText: string;
+  strPack: string;
 begin
   Result:= False;
   FModuleType:= projectType; //0:GUI  1:NoGUI 2: NoGUI EXE Console
@@ -1155,7 +1156,56 @@ begin
           strList.Add('<property name="target"  value="android-'+Trim(FTargetApi)+'"/>');
           strList.Add('<property file="ant.properties"/>');
           strList.Add('<fail message="sdk.dir is missing." unless="sdk.dir"/>');
+          //strList.Add('<import file="${sdk.dir}/tools/ant/build.xml"/>'); tk: moved below as it uses source.dir property
+
+          // tk Generate code to allow conditional compilation in our java sources
+          strPack := FPackagePrefaceName + '.' + LowerCase(FSmallProjName);
+          strList.Add('');
+          strList.Add('<!-- Tags required to enable conditional compilation in java sources -->');
+          strList.Add('<property name="src.dir" location=".'+PathDelim+'src'+PathDelim+AppendPathDelim(ReplaceChar(strPack, '.', PathDelim))+'"/>');
+          strList.Add('<property name="source.dir" value="${src.dir}/${target}" />');
           strList.Add('<import file="${sdk.dir}/tools/ant/build.xml"/>');
+
+          strList.Add('');
+          strList.Add('<!-- API version properties, modify according to your API level -->');
+          for i := cMinAPI to cMaxAPI do
+          begin
+            if i <= intAPI then
+              strList.Add('<property name="api'+IntToStr(i)+'" value="true"/>')
+            else
+              strList.Add('<property name="api'+IntToStr(i)+'" value="false"/>');
+          end;
+
+          strList.Add('');
+          strList.Add('<!-- API conditions, do not modify -->');
+          for i := cMinAPI to cMaxAPI do
+          begin
+            strList.Add('<condition property="ifdef_api'+IntToStr(i)+'up" value="/*">');
+            strList.Add('  <equals arg1="${api'+IntToStr(i)+'}" arg2="false"/>');
+            strList.Add('</condition>');
+            strList.Add('<condition property="endif_api'+IntToStr(i)+'up" value="*/">');
+            strList.Add('  <equals arg1="${api'+IntToStr(i)+'}" arg2="false"/>');
+            strList.Add('</condition>');
+            strList.Add('<property name="ifdef_api'+IntToStr(i)+'up" value=""/>');
+            strList.Add('<property name="endif_api'+IntToStr(i)+'up" value=""/>');
+          end;
+
+          strList.Add('');
+          strList.Add('<!-- Copy & filter java sources for defined Android target, do not modify -->');
+          strList.Add('<copy todir="${src.dir}/${target}">');
+          strList.Add('  <fileset dir="${src.dir}">');
+          strList.Add('    <include name="*.java"/>');
+          strList.Add('  </fileset>');
+          strList.Add('  <filterset begintoken="//[" endtoken="]">');
+          for i := cMinAPI to cMaxAPI do
+          begin
+            strList.Add('    <filter token="ifdef_api'+IntToStr(i)+'up" value="${ifdef_api'+IntToStr(i)+'up}"/>');
+            strList.Add('    <filter token="endif_api'+IntToStr(i)+'up" value="${endif_api'+IntToStr(i)+'up}"/>');
+          end;
+          strList.Add('  </filterset>');
+          strList.Add('</copy>');
+          // end tk
+
           strList.Add('</project>');
           strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'build.xml');
 

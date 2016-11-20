@@ -34,7 +34,12 @@ public class jPanel extends RelativeLayout {
 	int marginTop = 0;
 	int marginRight  = 0;
 	int marginBottom = 0;
-	private int lgravity = Gravity.TOP | Gravity.START;
+ //[ifdef_api14up]
+ private int lgravity = Gravity.TOP | Gravity.START;
+ //[endif_api14up]
+ /* //[endif_api14up]
+ private int lgravity = Gravity.TOP | Gravity.LEFT;
+ //[ifdef_api14up] */
 	private float lweight = 0;
 
 
@@ -110,11 +115,21 @@ public class jPanel extends RelativeLayout {
 	public void resetLParamsRules() {
 		if (lparams instanceof RelativeLayout.LayoutParams) {
 			for (int i = 0; i < countAnchorRule; i++) {
+ //[ifdef_api17up]
 				((RelativeLayout.LayoutParams)lparams).removeRule(lparamsAnchorRule[i]);
+ //[endif_api17up]
+	/* //[endif_api17up]
+ 			((RelativeLayout.LayoutParams)lparams).addRule(lparamsAnchorRule[i], 0);
+ //[ifdef_api17up] */
 			}
 
 			for (int j = 0; j < countParentRule; j++) {
+ //[ifdef_api17up]
 				((RelativeLayout.LayoutParams)lparams).removeRule(lparamsParentRule[j]);
+ //[endif_api17up]
+ /* //[endif_api17up]
+ 			((RelativeLayout.LayoutParams)lparams).addRule(lparamsAnchorRule[j], 0);
+	//[ifdef_api17up] */
 			}
 		}
 		countAnchorRule = 0;

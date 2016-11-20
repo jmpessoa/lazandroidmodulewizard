@@ -9,7 +9,7 @@ interface
 
 uses
   {$ifdef Windows}Windows,{$endif}
-  Classes, SysUtils, ProjectIntf, Forms, LamwSettings;
+  Classes, SysUtils, ProjectIntf, Forms, LamwSettings, LCLVersion;
 
 type
 
@@ -579,6 +579,11 @@ begin
     Tool.CmdLineParams := 'clean -Dtouchtest.enabled=true debug';
     if Install then
       Tool.CmdLineParams := Tool.CmdLineParams + ' install';
+    // tk Required for Lazarus >=1.7 to capture output correctly
+{$if lcl_fullversion >= 1070000}
+    Tool.ShowConsole := True;
+{$endif}
+    // end tk
     Tool.Scanners.Add(SubToolAnt);
     if not RunExternalTool(Tool) then
       raise Exception.Create('Cannot build APK!');
@@ -601,6 +606,11 @@ begin
     Tool.WorkingDirectory := FProjPath;
     Tool.Executable := IncludeTrailingPathDelimiter(FAntPath) + 'ant'{$ifdef windows}+'.bat'{$endif};
     Tool.CmdLineParams := 'installd';
+    // tk Required for Lazarus >=1.7 to capture output correctly
+{$if lcl_fullversion >= 1070000}
+    Tool.ShowConsole := True;
+{$endif}
+    // end tk
     Tool.Scanners.Add(SubToolAnt);
     if not RunExternalTool(Tool) then
       raise Exception.Create('Cannot install APK!');

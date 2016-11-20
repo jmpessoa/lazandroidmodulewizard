@@ -17,22 +17,26 @@ type
     BevelJDKAntAndSDKNDK: TBevel;
     BitBtnCancel: TBitBtn;
     ComboBoxPrebuild: TComboBox;
+    EditPathToJavaTemplates: TEdit;
     EditPathToAndroidNDK: TEdit;
     EditPathToJavaJDK: TEdit;
     EditPathToAndroidSDK: TEdit;
     EditPathToAntBinary: TEdit;
     GroupBoxPrebuild: TGroupBox;
     Image1: TImage;
+    LBPathToJavaTemplates: TLabel;
     LabelPathToAndroidNDK: TLabel;
     LabelPathToJavaJDK: TLabel;
     LabelPathToAndroidSDK: TLabel;
     LabelPathToAntBinary: TLabel;
     RGNDKVersion: TRadioGroup;
     SelDirDlgPathToAndroidNDK: TSelectDirectoryDialog;
+    SelDirDlgPathToJavaTemplates: TSelectDirectoryDialog;
     SelDirDlgPathToJavaJDK: TSelectDirectoryDialog;
     SelDirDlgPathToAndroidSDK: TSelectDirectoryDialog;
     SelDirDlgPathToAntBinary: TSelectDirectoryDialog;
     SpBPathToAndroidNDK: TSpeedButton;
+    SpBPathToJavaTemplates: TSpeedButton;
     SpBPathToJavaJDK: TSpeedButton;
     SpBPathToAndroidSDK: TSpeedButton;
     SpBPathToAntBinary: TSpeedButton;
@@ -46,6 +50,7 @@ type
     procedure SpBPathToJavaJDKClick(Sender: TObject);
     procedure SpBPathToAndroidSDKClick(Sender: TObject);
     procedure SpBPathToAntBinaryClick(Sender: TObject);
+    procedure SpBPathToJavaTemplatesClick(Sender: TObject);
     procedure SpeedButtonInfoClick(Sender: TObject);
 
   private
@@ -236,6 +241,15 @@ begin
   end;
 end;
 
+procedure TFormSettingsPaths.SpBPathToJavaTemplatesClick(Sender: TObject);
+begin
+  if SelDirDlgPathToJavaTemplates.Execute then
+  begin
+    EditPathToJavaTemplates.Text := SelDirDlgPathToJavaTemplates.FileName;
+    FPathToJavaTemplates:= SelDirDlgPathToJavaTemplates.FileName;
+  end;
+end;
+
 procedure TFormSettingsPaths.SpeedButtonInfoClick(Sender: TObject);
 begin
   ShowMessage('All settings are stored in the file '+sLineBreak+'"JNIAndroidProject.ini" [lazarus/config]');
@@ -262,6 +276,8 @@ begin
       EditPathToAndroidSDK.Text := ReadString('NewProject','PathToAndroidSDK', '');
       EditPathToAntBinary.Text := ReadString('NewProject','PathToAntBin', '');
 
+      EditPathToJavaTemplates.Text := FPathToJavaTemplates;
+
       if ReadString('NewProject','NDK', '') <> '' then
           indexNdk:= StrToInt(ReadString('NewProject','NDK', ''))
       else
@@ -287,7 +303,8 @@ begin
     if EditPathToAndroidNDK.Text <> '' then
       WriteString('NewProject', 'PathToNdkPlataforms', EditPathToAndroidNDK.Text);
 
-    WriteString('NewProject', 'PathToJavaTemplates', FPathToJavaTemplates);
+    if EditPathToJavaTemplates.Text <> '' then
+      WriteString('NewProject', 'PathToJavaTemplates', EditPathToJavaTemplates.Text);
 
     if EditPathToJavaJDK.Text <> '' then
       WriteString('NewProject', 'PathToJavaJDK', EditPathToJavaJDK.Text);

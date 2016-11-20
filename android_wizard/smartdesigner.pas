@@ -7,6 +7,12 @@ interface
 uses
   Classes, SysUtils, ProjectIntf, Forms, AndroidWidget;
 
+// tk min and max API versions for build.xml
+const
+  cMinAPI = 10;
+  cMaxAPI = 25;
+// end tk
+
 type
 
   { TLamwSmartDesigner }
@@ -53,13 +59,18 @@ type
   end;
 
 
+// tk ReplaceChar made public
+function ReplaceChar(const query: string; oldchar, newchar: char): string;
+// end tk
+
 var
   LamwSmartDesigner: TLamwSmartDesigner;
 
 implementation
 
 uses
-  Controls, Dialogs, SrcEditorIntf, LazIDEIntf, CodeToolManager, CodeTree,
+  Controls, Dialogs, SrcEditorIntf, LazIDEIntf, IDEMsgIntf, IDEExternToolIntf,
+  CodeToolManager, CodeTree,
   CodeCache, SourceChanger, LinkScanner, Laz2_DOM, laz2_XMLRead, FileUtil,
   LazFileUtils, LamwSettings, uJavaParser, strutils;
 
@@ -816,7 +827,7 @@ var
   auxList, jcontrolsList, libList: TStringList;
   j, p: Integer;
   nativeExists: Boolean;
-  aux, PathToJavaTemplates, chipArchitecture: string;
+  aux, PathToJavaTemplates, chipArchitecture, LibPath: string;
 begin
   Result := mrOk;
   if not LazarusIDE.ActiveProject.CustomData.Contains('LAMW') then Exit;
@@ -836,11 +847,20 @@ begin
   begin
     CleanupAllJControlsSource;
 
+    // tk Output some useful messages about libraries
+    LibPath := FPathToAndroidProject + 'libs'+DirectorySeparator+chipArchitecture;
+    IDEMessagesWindow.AddCustomMessage(mluVerbose, 'Selected chip architecture: ' + chipArchitecture);
+    IDEMessagesWindow.AddCustomMessage(mluVerbose, 'Taking libraries from folder: ' + LibPath);
+    // end tk
+
     //update all java code ...
-    libList:= FindAllFiles(FPathToAndroidProject + 'libs'+DirectorySeparator+chipArchitecture, '*.so', False);
+    libList:= FindAllFiles(LibPath, '*.so', False);
     for j:= 0 to libList.Count-1 do
     begin
       aux:= ExtractFileName(libList.Strings[j]);
+      // tk Show what library has been added
+      IDEMessagesWindow.AddCustomMessage(mluVerbose, 'Found library: ' + aux);
+      // end tk
       p:= Pos('.', aux);
       aux:= Trim(copy(aux,4, p-4));
       auxList.Add(aux);

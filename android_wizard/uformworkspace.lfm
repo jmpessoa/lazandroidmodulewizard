@@ -1,7 +1,7 @@
 object FormWorkspace: TFormWorkspace
-  Left = 492
+  Left = 580
   Height = 560
-  Top = 25
+  Top = 29
   Width = 400
   AutoSize = True
   BorderIcons = [biSystemMenu]
@@ -1194,6 +1194,10 @@ object FormWorkspace: TFormWorkspace
         Width = 122
         Align = alClient
         Items.Strings = (
+          '10'
+          '11'
+          '12'
+          '13'
           '14'
           '15'
           '16'
