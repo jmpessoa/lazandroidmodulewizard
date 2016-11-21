@@ -1226,7 +1226,6 @@ type
     property ViewParent {ViewParent}: jObject  read  GetViewParent write SetViewParent; // Java : Parent Relative Layout
 
     property View: jObject read GetView;     //FjObject; //View/Layout
-    property Id: DWord read FId write SetId; //FId;
 
     //property FontColor: TARGBColorBridge read FFontColor write SetFontColor;
     //property FontSize: DWord read FFontSize write SetFontSize;
@@ -1237,6 +1236,7 @@ type
   published
     property Visible: boolean read FVisible write SetVisible;
     property Anchor  : jVisualControl read FAnchor write SetAnchor;
+    property Id: DWord read FId write SetId; //FId; // quickfix #25
     property PosRelativeToAnchor: TPositionRelativeToAnchorIDSet read FPositionRelativeToAnchor
                                                                        write FPositionRelativeToAnchor;
     property PosRelativeToParent: TPositionRelativeToParentSet read FPositionRelativeToParent
@@ -2201,7 +2201,8 @@ procedure jVisualControl.DefineProperties(Filer: TFiler);
 begin
  inherited DefineProperties(Filer);
   {Define new properties and reader/writer methods }
-  Filer.DefineProperty('Id', ReadIntId, WriteIntId, True);
+  //quickfix #25
+  //Filer.DefineProperty('Id', ReadIntId, WriteIntId, True);
 end;
 
 procedure jVisualControl.ReadIntId(Reader: TReader);
