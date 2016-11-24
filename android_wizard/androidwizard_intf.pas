@@ -40,6 +40,7 @@ type
      FSyntaxMode: TSyntaxMode;   {}
 
      FPieChecked: boolean;
+     FLibraryChecked: boolean;
 
      FPathToJavaJDK: string;
      FPathToAndroidSDK: string;
@@ -71,7 +72,7 @@ type
      function SettingsFilename: string;
      function TryNewJNIAndroidInterfaceCode(projectType: integer): boolean; //0: GUI  project --- 1:NoGUI project
      function GetPathToJNIFolder(fullPath: string): string;
-     function GetWorkSpaceFromForm(projectType: integer): boolean;
+     function GetWorkSpaceFromForm(projectType: integer; out outTag: integer): boolean;
      function GetAppName(className: string): string;
 
      function GetFolderFromApi(api: integer): string;
@@ -108,7 +109,7 @@ type
   public
     SyntaxMode: TSyntaxMode; {mdDelphi, mdObjFpc}
     PathToJNIFolder: string;
-    ModuleType: integer;   //0: GUI; 1: No GUI ; 2: console executable App
+    ModuleType: integer;   //0: GUI; 1: No GUI ; 2: console executable App; 3: generic library
 
     constructor Create; override;
 
@@ -145,7 +146,7 @@ function SplitStr(var theString: string; delimiter: string): string;
 implementation
 
 uses
-  LazFileUtils, uJavaParser, LamwDesigner, SmartDesigner;
+   LazFileUtils, uJavaParser, LamwDesigner, SmartDesigner;
 
 procedure Register;
 begin
@@ -194,148 +195,156 @@ end;
 function TAndroidNoGUIExeProjectDescriptor.DoInitDescriptor: TModalResult;    //NoGUI Exe
 var
   list: TStringList;
+  outTag: integer;
 begin
   try
-    FModuleType := 2; //0: GUI --- 1:NoGUI --- 2: NoGUI EXE Console
+    FModuleType := 2; //0: GUI --- 1:NoGUI --- 2: NoGUI EXE Console  3: generic library
     FPathToClassName := '';
-    if GetWorkSpaceFromForm(2) then
+    if GetWorkSpaceFromForm(2, outTag) then
     begin
 
       FPathToJNIFolder := FAndroidProjectName;
       AndroidFileDescriptor.PathToJNIFolder:= FPathToJNIFolder;
       AndroidFileDescriptor.ModuleType:= 2; //Console
 
-      CreateDir(FAndroidProjectName+DirectorySeparator+'build-modes');
-      //CreateDir(FAndroidProjectName+DirectorySeparator+'lamwdesigner');
+      if outTag = 3 then
+      begin
+        FModuleType:= 3;
+        AndroidFileDescriptor.ModuleType:= 3; // generic/custom library
+      end;
 
+      CreateDir(FAndroidProjectName+DirectorySeparator+'build-modes');
       CreateDir(FAndroidProjectName+DirectorySeparator+'libs');
       CreateDir(FAndroidProjectName+DirectorySeparator+'libs'+DirectorySeparator+'armeabi');
       CreateDir(FAndroidProjectName+DirectorySeparator+'libs'+DirectorySeparator+'armeabi-v7a');
       CreateDir(FAndroidProjectName+DirectorySeparator+'libs'+DirectorySeparator+'x86');
       CreateDir(FAndroidProjectName+DirectorySeparator+'obj');
 
-      list:= TStringList.Create;
+      if FModuleType = 2 then //default
+      begin
+        list:= TStringList.Create;
 
+        list.Add('How to Run your native console App in "AVD/Emulator"');
+        list.Add(' ');
+        list.Add('		NOTE 1: To get the executable app, go to Lazarus menu  ---> "Run" --> "Build"' );
+        list.Add(' ');
+        if FPieChecked then
+        list.Add('		NOTE 2: Project settings: Target Api = '+FTargetApi+ ' and PIE enabled!' )
+        else
+        list.Add('		NOTE 2: Project settings: Targeg Api = '+FTargetApi+ ' and PIE  not enabled!' );
 
-      list.Add('How to Run your native console App in "AVD/Emulator"');
-      list.Add(' ');
-      list.Add('		NOTE 1: To get the executable app, go to Lazarus menu  ---> "Run" --> "Build"' );
-      list.Add(' ');
-      if FPieChecked then
-      list.Add('		NOTE 2: Project settings: Target Api = '+FTargetApi+ ' and PIE enabled!' )
-      else
-      list.Add('		NOTE 2: Project settings: Targeg Api = '+FTargetApi+ ' and PIE  not enabled!' );
+        list.Add(' ');
+        list.Add('		NOTE 3: To run in a real device, please, "readme_How_To_Run_Real_Device.txt" [ref. http://kevinboone.net/android_native.html] ');
+        list.Add(' ');
+        list.Add('		NOTE 4: Android >=5.0 [Target API >= 21] need to enable PIE [Position Independent Executables]: ');
+        list.Add(' ');
+        list.Add('			"Project" --->> "Project Options" -->> "Compile Options" --->> "Compilation and Linking" ');
+        list.Add('			--->> "Pas options to linker"  [check it !] and enter: -pie into edit below ');
+        list.Add(' ');
+        list.Add('		NOTE 5: Handle the form OnCreate event to start the program''s tasks!');
+        list.Add(' ');
+        list.Add('1. Execute the AVD/Emulator ');
+        list.Add(' ');
+        list.Add('2. Execute the  "cmd"  terminal [windows] ');
+        list.Add(' ');
+        list.Add('3. Go to folder  ".../skd/platform-tools"  and run the adb shell  [note: "-e" ---> emulator ... and "-d" ---> device] ');
+        list.Add(' ');
+        list.Add('adb -e shell ');
+        list.Add(' ');
+        list.Add('4. Create a new dir/folder "tmp" in  "/sdcard" ');
+        list.Add(' ');
+        list.Add('cd /sdcard ');
+        list.Add(' ');
+        list.Add('mkdir tmp ');
+        list.Add(' ');
+        list.Add('exit ');
+        list.Add(' ');
+        list.Add('5. Copy your program file  "'+LowerCase(FSmallProjName)+'" from project folder "...\libs\armeabi\" to Emulator "/sdcard/tmp" ');
+        list.Add(' ');
+        list.Add('adb push C:\adt32\workspace\'+FSmallProjName+'\libs\armeabi\'+LowerCase(FSmallProjName)+'  /sdcard/tmp/'+LowerCase(FSmallProjName));
+        list.Add(' ');
+        list.Add('6. go to "adb shell" again ');
+        list.Add(' ');
+        list.Add('adb -e shell. ');
+        list.Add(' ');
+        list.Add('7. Go to folder "/sdcard/tmp" ');
+        list.Add(' ');
+        list.Add('root@android:/ # cd /sdcard/tmp ');
+        list.Add(' ');
+        list.Add('8. Now copy your programa file "' + LowerCase(FSmallProjName)+'" to an executable place ');
+        list.Add(' ');
+        list.Add('root@android:/sdcard/tmp # cp ' + LowerCase(FSmallProjName)+' /data/local/tmp/'+LowerCase(FSmallProjName));
+        list.Add(' ');
+        list.Add('9. Go to folder /data/local/tmp and Change permission to run executable ');
+        list.Add(' ');
+        list.Add('root@android:/ # cd /data/local/tmp');
+        list.Add('root@android:/data/local/tmp # chmod 755 ' + LowerCase(FSmallProjName));
+        list.Add(' ');
+        list.Add('10. Execute your program! ');
+        list.Add(' ');
+        list.Add('root@android:/data/local/tmp # ./' + LowerCase(FSmallProjName));
+        list.Add(' ');
+        list.Add('Hello Lamw''s World!');
+        list.Add(' ');
+        list.Add('11. Congratulations !!!! ');
+        list.Add(' ');
+        list.Add('    by jmpessoa_hotmail_com');
+        list.Add(' ');
+        list.Add('    Thanks to @gtyhn,  @engkin and Prof. Claudio Z. M. [Suggestion/Motivation] ');
+        list.SaveToFile(FAndroidProjectName+DirectorySeparator+'readme_How_To_Run_AVD_Emulator.txt');
 
-      list.Add(' ');
-      list.Add('		NOTE 3: To run in a real device, please, "readme_How_To_Run_Real_Device.txt" [ref. http://kevinboone.net/android_native.html] ');
-      list.Add(' ');
-      list.Add('		NOTE 4: Android >=5.0 [Target API >= 21] need to enable PIE [Position Independent Executables]: ');
-      list.Add(' ');
-      list.Add('			"Project" --->> "Project Options" -->> "Compile Options" --->> "Compilation and Linking" ');
-      list.Add('			--->> "Pas options to linker"  [check it !] and enter: -pie into edit below ');
-      list.Add(' ');
-      list.Add('		NOTE 5: Handle the form OnCreate event to start the program''s tasks!');
-      list.Add(' ');
-      list.Add('1. Execute the AVD/Emulator ');
-      list.Add(' ');
-      list.Add('2. Execute the  "cmd"  terminal [windows] ');
-      list.Add(' ');
-      list.Add('3. Go to folder  ".../skd/platform-tools"  and run the adb shell  [note: "-e" ---> emulator ... and "-d" ---> device] ');
-      list.Add(' ');
-      list.Add('adb -e shell ');
-      list.Add(' ');
-      list.Add('4. Create a new dir/folder "tmp" in  "/sdcard" ');
-      list.Add(' ');
-      list.Add('cd /sdcard ');
-      list.Add(' ');
-      list.Add('mkdir tmp ');
-      list.Add(' ');
-      list.Add('exit ');
-      list.Add(' ');
-      list.Add('5. Copy your program file  "'+LowerCase(FSmallProjName)+'" from project folder "...\libs\armeabi\" to Emulator "/sdcard/tmp" ');
-      list.Add(' ');
-      list.Add('adb push C:\adt32\workspace\'+FSmallProjName+'\libs\armeabi\'+LowerCase(FSmallProjName)+'  /sdcard/tmp/'+LowerCase(FSmallProjName));
-      list.Add(' ');
-      list.Add('6. go to "adb shell" again ');
-      list.Add(' ');
-      list.Add('adb -e shell. ');
-      list.Add(' ');
-      list.Add('7. Go to folder "/sdcard/tmp" ');
-      list.Add(' ');
-      list.Add('root@android:/ # cd /sdcard/tmp ');
-      list.Add(' ');
-      list.Add('8. Now copy your programa file "' + LowerCase(FSmallProjName)+'" to an executable place ');
-      list.Add(' ');
-      list.Add('root@android:/sdcard/tmp # cp ' + LowerCase(FSmallProjName)+' /data/local/tmp/'+LowerCase(FSmallProjName));
-      list.Add(' ');
-      list.Add('9. Go to folder /data/local/tmp and Change permission to run executable ');
-      list.Add(' ');
-      list.Add('root@android:/ # cd /data/local/tmp');
-      list.Add('root@android:/data/local/tmp # chmod 755 ' + LowerCase(FSmallProjName));
-      list.Add(' ');
-      list.Add('10. Execute your program! ');
-      list.Add(' ');
-      list.Add('root@android:/data/local/tmp # ./' + LowerCase(FSmallProjName));
-      list.Add(' ');
-      list.Add('Hello Lamw''s World!');
-      list.Add(' ');
-      list.Add('11. Congratulations !!!! ');
-      list.Add(' ');
-      list.Add('    by jmpessoa_hotmail_com');
-      list.Add(' ');
-      list.Add('    Thanks to @gtyhn,  @engkin and Prof. Claudio Z. M. [Suggestion/Motivation] ');
-      list.SaveToFile(FAndroidProjectName+DirectorySeparator+'readme_How_To_Run_AVD_Emulator.txt');
+        list.Clear;
+        list.Add('How to run your native console app in "Real Device" [ref. http://kevinboone.net/android_native.html] ');
+        list.Add(' ');
+        list.Add('		NOTE 1: To get the executable app, go to Lazarus menu  ---> "Run" --> "Build"' );
+        list.Add(' ');
+        if FPieChecked then
+        list.Add('		NOTE 2: Project settings: Target Api = '+FTargetApi+ ' and PIE enabled!' )
+        else
+        list.Add('		NOTE 2: Project settings: Targeg Api = '+FTargetApi+ ' and PIE  not enabled!' );
 
-      list.Clear;
-      list.Add('How to run your native console app in "Real Device" [ref. http://kevinboone.net/android_native.html] ');
-      list.Add(' ');
-      list.Add('		NOTE 1: To get the executable app, go to Lazarus menu  ---> "Run" --> "Build"' );
-      list.Add(' ');
-      if FPieChecked then
-      list.Add('		NOTE 2: Project settings: Target Api = '+FTargetApi+ ' and PIE enabled!' )
-      else
-      list.Add('		NOTE 2: Project settings: Targeg Api = '+FTargetApi+ ' and PIE  not enabled!' );
+        list.Add(' ');
+        list.Add('		NOTE 3: To run in AVD/Emulator, please, "readme_How_To_Run_AVD_Emulator.txt"');
+        list.Add(' ');
+        list.Add('		NOTE 4: Android >=5.0 [Target API >= 21] need to enable PIE [Position Independent Executables] enabled: ');
+        list.Add(' ');
+        list.Add('			"Project" --->> "Project Options" -->> "Compile Options" --->> "Compilation and Linking"');
+        list.Add('			--->> "Pas options to linker"  [check it !] and enter: -pie into edit below');
+        list.Add(' ');
+        list.Add('		NOTE 5: Handle the form OnCreate event to start the program''s tasks!');
+        list.Add(' ');
+        list.Add('1. Go to Google Play Store and get "Terminal Emulador" by Jack Palevich [thanks to jack!]');
+        list.Add(' ');
+        list.Add('2. Connect PC <---> Device via an USB cable  and  copy your program file  "'+LowerCase(FSmallProjName)+'" from project folder "...\libs\armeabi\" to Device folder "Download"');
+        list.Add(' ');
+        list.Add('3. Go to your Device and run  the app "Terminal Emulador"  and go to internal "Terminal Emulador" storage folder');
+        list.Add(' ');
+        list.Add('$ cd /data/data/jackpal.androidterm/shared_prefs');
+        list.Add(' ');
+        list.Add('5. Copy [cat] your program file  "'+LowerCase(FSmallProjName)+'" from Device folder "Download" to internal "Terminal Emulador" storage folder');
+        list.Add(' ');
+        list.Add('$ cat /sdcard/Download/'+LowerCase(FSmallProjName)+' > '+LowerCase(FSmallProjName));
+        list.Add(' ');
+        list.Add('6. Change your program file  "'+LowerCase(FSmallProjName)+'" permission to "executable" mode');
+        list.Add(' ');
+        list.Add('$ chmod 755 '+LowerCase(FSmallProjName));
+        list.Add(' ');
+        list.Add('7. Execute your program!');
+        list.Add(' ');
+        list.Add('$ ./'+LowerCase(FSmallProjName));
+        list.Add(' ');
+        list.Add('Hello Lamw''s World!');
+        list.Add(' ');
+        list.Add('8. Congratulations !!!!');
+        list.Add(' ');
+        list.Add('    by jmpessoa_hotmail_com');
+        list.Add(' ');
+        list.Add('    Thanks to @gtyhn,  @engkin and Prof. Claudio Z. M. [Suggestion/Motivation]');
 
-      list.Add(' ');
-      list.Add('		NOTE 3: To run in AVD/Emulator, please, "readme_How_To_Run_AVD_Emulator.txt"');
-      list.Add(' ');
-      list.Add('		NOTE 4: Android >=5.0 [Target API >= 21] need to enable PIE [Position Independent Executables] enabled: ');
-      list.Add(' ');
-      list.Add('			"Project" --->> "Project Options" -->> "Compile Options" --->> "Compilation and Linking"');
-      list.Add('			--->> "Pas options to linker"  [check it !] and enter: -pie into edit below');
-      list.Add(' ');
-      list.Add('		NOTE 5: Handle the form OnCreate event to start the program''s tasks!');
-      list.Add(' ');
-      list.Add('1. Go to Google Play Store and get "Terminal Emulador" by Jack Palevich [thanks to jack!]');
-      list.Add(' ');
-      list.Add('2. Connect PC <---> Device via an USB cable  and  copy your program file  "'+LowerCase(FSmallProjName)+'" from project folder "...\libs\armeabi\" to Device folder "Download"');
-      list.Add(' ');
-      list.Add('3. Go to your Device and run  the app "Terminal Emulador"  and go to internal "Terminal Emulador" storage folder');
-      list.Add(' ');
-      list.Add('$ cd /data/data/jackpal.androidterm/shared_prefs');
-      list.Add(' ');
-      list.Add('5. Copy [cat] your program file  "'+LowerCase(FSmallProjName)+'" from Device folder "Download" to internal "Terminal Emulador" storage folder');
-      list.Add(' ');
-      list.Add('$ cat /sdcard/Download/'+LowerCase(FSmallProjName)+' > '+LowerCase(FSmallProjName));
-      list.Add(' ');
-      list.Add('6. Change your program file  "'+LowerCase(FSmallProjName)+'" permission to "executable" mode');
-      list.Add(' ');
-      list.Add('$ chmod 755 '+LowerCase(FSmallProjName));
-      list.Add(' ');
-      list.Add('7. Execute your program!');
-      list.Add(' ');
-      list.Add('$ ./'+LowerCase(FSmallProjName));
-      list.Add(' ');
-      list.Add('Hello Lamw''s World!');
-      list.Add(' ');
-      list.Add('8. Congratulations !!!!');
-      list.Add(' ');
-      list.Add('    by jmpessoa_hotmail_com');
-      list.Add(' ');
-      list.Add('    Thanks to @gtyhn,  @engkin and Prof. Claudio Z. M. [Suggestion/Motivation]');
+        list.SaveToFile(FAndroidProjectName+DirectorySeparator+'readme_How_To_Run_Real_Device.txt');
+        list.Free;
+      end;
 
-      list.SaveToFile(FAndroidProjectName+DirectorySeparator+'readme_How_To_Run_Real_Device.txt');
-      list.Free;
       Result := mrOK
     end else
       Result := mrAbort;
@@ -374,12 +383,13 @@ function TAndroidGUIProjectDescriptor.DoInitDescriptor: TModalResult;    //GUI
 var
   strAfterReplace, strPack, aux: string;
   auxList: TStringList;
+  outTag: integer;
 begin
   try
     FModuleType := 0; //0: GUI --- 1:NoGUI --- 2: NoGUI EXE Console
     FJavaClassName := 'Controls';
     FPathToClassName := '';
-    if GetWorkSpaceFromForm(0) then
+    if GetWorkSpaceFromForm(0, outTag) then
     begin
       with TStringList.Create do
         try
@@ -438,7 +448,7 @@ begin
       CreateDir(FAndroidProjectName+DirectorySeparator+'libs'+DirectorySeparator+'x86');
       CreateDir(FAndroidProjectName+DirectorySeparator+'obj');
 
-      if  FModuleType <> 2 then
+      if  FModuleType < 2 then
         CreateDir(FAndroidProjectName+DirectorySeparator+'obj'+DirectorySeparator+'controls');
 
       if FSupportV4 = 'yes' then  //add android 4.0 support to olds devices ...
@@ -667,7 +677,7 @@ begin
   end;
 end;
 
-function TAndroidProjectDescriptor.GetWorkSpaceFromForm(projectType: integer): boolean;
+function TAndroidProjectDescriptor.GetWorkSpaceFromForm(projectType: integer; out outTag: integer): boolean;
 
   function MakeUniqueName(const Orig: string; sl: TStrings): string;
   var
@@ -697,8 +707,9 @@ var
   dummy, strText: string;
   strPack: string;
 begin
+  //outTag:= 0;
   Result:= False;
-  FModuleType:= projectType; //0:GUI  1:NoGUI 2: NoGUI EXE Console
+  FModuleType:= projectType; //0:GUI  1:NoGUI 2: NoGUI EXE Console 3: generic library
 
   AndroidFileDescriptor.ModuleType:= projectType;
 
@@ -717,6 +728,7 @@ begin
     frm.SpeedButtonHintTheme.Visible:= True;
 
     frm.CheckBoxPIE.Visible:= False;
+    frm.CheckBoxLibrary.Visible:= False;
 
     if projectType = 1 then //No GUI
     begin
@@ -730,7 +742,7 @@ begin
       frm.SpeedButtonHintTheme.Visible:= False;
     end;
 
-    if projectType = 2 then //No GUI console executable
+    if projectType = 2 then //No GUI console executable or generic library [.so]
     begin
       frm.GroupBox1.Visible:= False;
 
@@ -749,8 +761,9 @@ begin
       frm.SpeedButtonHintTheme.Visible:= False;
 
       frm.CheckBoxPIE.Visible:= True;
-    end;
+      frm.CheckBoxLibrary.Visible:= True;  //support to generic [not jni] .so library
 
+    end;
 
     frm.ModuleType:= projectType;  //<-- input to form
 
@@ -790,11 +803,18 @@ begin
       FTargetApi:= frm.TargetApi;
       FSupportV4:= frm.SupportV4;
       FPieChecked:= frm.PieChecked;
+      FLibraryChecked:= frm.LibraryChecked;
+
+      if FLibraryChecked then
+      begin
+        outTag:= 3;
+        FModuleType:= 3;
+      end;
 
       FMainActivity:= frm.MainActivity;
       FJavaClassName:= frm.JavaClassName;
 
-      FProjectModel:= frm.ProjectModel;   //<-- output from from  [Eclipse or Ant Project]
+      FProjectModel:= frm.ProjectModel;   //<-- output from [Eclipse or Ant Project]
       if FProjectModel = 'Eclipse' then
            FFullJavaSrcPath:= frm.FullJavaSrcPath;
 
@@ -805,13 +825,12 @@ begin
 
       FAntBuildMode:= frm.AntBuildMode;
       FPackagePrefaceName:= frm.PackagePrefaceName; // ex.: org.lamw  or  example.com
-
       AndroidFileDescriptor.PathToJNIFolder:= FAndroidProjectName;
 
       try
         if  FProjectModel = 'Ant' then
         begin
-          if FModuleType <> 2 then
+          if FModuleType < 2 then
           begin
             ForceDirectories(FAndroidProjectName + DirectorySeparator + 'src');
 
@@ -884,8 +903,7 @@ begin
 
             //replace "dummyTheme" ..res\values-v14
             strList.Clear;
-            {CopyFile(FPathToJavaTemplates+DirectorySeparator+'values-v14'+DirectorySeparator+'styles.xml',
-                         FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'values-v14'+DirectorySeparator+'styles.xml');}
+
             strList.LoadFromFile(FPathToJavaTemplates+DirectorySeparator+'values-v14'+DirectorySeparator+'styles.xml');
 
             if (intApi >= 14) and (intApi < 21) then
@@ -900,8 +918,7 @@ begin
 
             //replace "dummyTheme" ..res\values-v21
             strList.Clear;
-             {CopyFile(FPathToJavaTemplates+DirectorySeparator+'values-v14'+DirectorySeparator+'styles.xml',
-                          FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'values-v14'+DirectorySeparator+'styles.xml');}
+
             strList.LoadFromFile(FPathToJavaTemplates+DirectorySeparator+'values-v21'+DirectorySeparator+'styles.xml');
 
             if (intApi >= 21) then
@@ -1037,11 +1054,9 @@ begin
 
         end; // Ant
 
-
-        if FModuleType <> 2 then
+        if FModuleType < 2 then
         begin
           strList.Clear;
-
 
           strList.Add('set Path=%PATH%;'+FPathToAntBin); //<--- thanks to andersonscinfo !  [set path=%path%;C:\and32\ant\bin]
           strList.Add('set JAVA_HOME='+FPathToJavaJDK);  //set JAVA_HOME=C:\Program Files (x86)\Java\jdk1.7.0_21
@@ -1205,7 +1220,6 @@ begin
           strList.Add('  </filterset>');
           strList.Add('</copy>');
           // end tk
-
           strList.Add('</project>');
           strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'build.xml');
 
@@ -1443,9 +1457,10 @@ end;
 function TAndroidProjectDescriptor.DoInitDescriptor: TModalResult;  //No GUI
 var
    auxList: TStringList;
+   outTag: integer;
 begin
    FModuleType := 1;
-   if GetWorkSpaceFromForm(1) then //1: noGUI project
+   if GetWorkSpaceFromForm(1, outTag) then //1: noGUI project
    begin
       if TryNewJNIAndroidInterfaceCode(1) then //1: noGUI project
       begin
@@ -1458,7 +1473,7 @@ begin
         CreateDir(FAndroidProjectName+DirectorySeparator+'obj');
         CreateDir(FAndroidProjectName+DirectorySeparator+'lamwdesigner');
 
-        if FModuleType <> 2 then
+        if FModuleType < 2 then
            CreateDir(FAndroidProjectName+DirectorySeparator+'obj'+DirectorySeparator+'controls');
 
         if FSupportV4 = 'yes' then  //add android 4.0 support to olds devices ...
@@ -1623,12 +1638,12 @@ var
   pathToNdkToolchainsBinArm: string;
 
   osys: string;      {windows or linux-x86 or linux-x86_64}
-
+  headerList: TStringList;
 begin
 
   inherited InitProject(AProject);
 
-  if  FModuleType <> 2 then
+  if  FModuleType < 2 then
     projName:= LowerCase(FJavaClassName) + '.lpr'
   else
     projName:= LowerCase(FSmallProjName) + '.lpr';
@@ -1636,7 +1651,7 @@ begin
   if   FPathToClassName = '' then
       FPathToClassName:= StringReplace(FPackagePrefaceName, '.', '/', [rfReplaceAll])+'/'+LowerCase(FSmallProjName)+'/'+ FJavaClassName; //ex. 'com/example/appasynctaskdemo1/Controls'
 
-  if  FModuleType <> 2 then
+  if  FModuleType < 2 then
      projDir:= FPathToJNIFolder+DirectorySeparator+'jni'+DirectorySeparator
   else
      projDir:= FPathToJNIFolder+DirectorySeparator;
@@ -1645,9 +1660,12 @@ begin
     AProject.CustomData.Values['LAMW'] := 'GUI'
   else if  FModuleType = 1 then
     AProject.CustomData.Values['LAMW'] := 'NoGUI'
-  else  AProject.CustomData.Values['LAMW'] := 'NoGUIConsoleApp';    // FModuleType =2
+  else if FModuleType = 2 then
+    AProject.CustomData.Values['LAMW'] := 'NoGUIConsoleApp'    // FModuleType =2
+  else
+    AProject.CustomData.Values['LAMW'] := 'NoGUIGenericLibrary';    // FModuleType = 3
 
-  if FModuleType <> 2 then
+  if FModuleType < 2 then
     AProject.CustomData.Values['Package']:= FPackagePrefaceName + '.' + LowerCase(FSmallProjName);
 
   AProject.CustomData.Values['NdkPath']:= FPathToAndroidNDK;
@@ -1667,14 +1685,17 @@ begin
   sourceList:= TStringList.Create;
   sourceList.Add('{hint: save all files to location: ' + projDir + ' }');
 
-  if FModuleType <> 2 then
-    sourceList.Add('library '+ LowerCase(FJavaClassName) +'; '+ ' //[by Lamw: Lazarus Android Module Wizard: '+DateTimeToStr(Now)+']')
+  if FModuleType = 2 then  //console executavel
+    sourceList.Add('program '+ LowerCase(FSmallProjName) +'; '+ ' //[by Lamw: Lazarus Android Module Wizard: '+DateTimeToStr(Now)+']')
+  else if  FModuleType = 3 then
+    sourceList.Add('library '+ LowerCase(FSmallProjName) +'; '+ ' //[by Lamw: Lazarus Android Module Wizard: '+DateTimeToStr(Now)+']')
   else
-    sourceList.Add('program '+ LowerCase(FSmallProjName) +'; '+ ' //[by Lamw: Lazarus Android Module Wizard: '+DateTimeToStr(Now)+']');
+    sourceList.Add('library '+ LowerCase(FJavaClassName) +'; '+ ' //[by Lamw: Lazarus Android Module Wizard: '+DateTimeToStr(Now)+']');
 
   sourceList.Add(' ');
   sourceList.Add('{$mode delphi}');
   sourceList.Add(' ');
+
   sourceList.Add('uses');
 
   if FModuleType = 0 then  //GUI controls
@@ -1725,7 +1746,7 @@ begin
 
     sourceList.Add('');
   end
-  else   // 2 - NoGUI console executable
+  else if FModuleType = 2 then// 2 - NoGUI console executable
   begin
     sourceList.Add('  Classes, SysUtils, CustApp;');
     sourceList.Add(' ');
@@ -1761,15 +1782,24 @@ begin
     sourceList.Add('var');
     sourceList.Add('  AndroidConsoleApp: TAndroidConsoleApp;');
     sourceList.Add('');
+  end
+  else //generic .so library
+  begin
+    sourceList.Add('  Unit1;');  //ok
   end;
 
-  sourceList.Add('{%region /fold ''LAMW generated code''}');
-  sourceList.Add('');
-  sourceList.Add(FPascalJNIInterfaceCode);
-  sourceList.Add('{%endregion}');
+  if FModuleType = 0 then //GUI
+  begin
+    sourceList.Add('{%region /fold ''LAMW generated code''}');
+    sourceList.Add('');
+    sourceList.Add(FPascalJNIInterfaceCode);
+    sourceList.Add('{%endregion}');
+  end;
 
   sourceList.Add(' ');
-  sourceList.Add('begin');
+
+  if FModuleType < 3 then sourceList.Add('begin');
+
   if FModuleType = 0 then  //Android Bridges controls...
   begin
     sourceList.Add('  gApp:= jApp.Create(nil);');
@@ -1794,15 +1824,41 @@ begin
      sourceList.Add('  gNoGUIApp.Initialize;');
      sourceList.Add('  gNoGUIApp.CreateForm(TNoGUIAndroidModule1, NoGUIAndroidModule1);');
   end
-  else // 2  - console executable
+  else if FModuleType = 2 then // 2  - console executable
   begin
      sourceList.Add('  AndroidConsoleApp:= TAndroidConsoleApp.Create(nil);');
      sourceList.Add('  AndroidConsoleApp.Title:= ''Android Executable Console App'';');
      sourceList.Add('  AndroidConsoleApp.Initialize;');
      sourceList.Add('  AndroidConsoleApp.CreateForm(TAndroidConsoleDataForm1,AndroidConsoleDataForm1);');
-  end;
-  sourceList.Add('end.');
+  end
+  else
+  begin  //generic library
+    sourceList.Add(' ');
+    sourceList.Add('function Sum(a: longint; b: longint): longint; cdecl;');
+    sourceList.Add('begin');
+    sourceList.Add('  Result:= SumAB(a, b);');
+    sourceList.Add('end;');
+    sourceList.Add(' ');
+    sourceList.Add('exports');
+    sourceList.Add('  Sum;');
+    sourceList.Add(' ');
 
+    headerList:= TStringList.Create;
+    headerList.Add('unit '+LowerCase(FSmallProjName)+'_h');
+    headerList.Add(' ');
+    headerList.Add('interface');
+    headerList.Add(' ');
+    headerList.Add('  function Sum(a: longint; b: longint): longint; cdecl; external ''lib'+LowerCase(FSmallProjName)+'.so'' name ''Sum'';');
+    headerList.Add(' ');
+    headerList.Add('implementation');
+    headerList.Add(' ');
+    headerList.Add('end.');
+    headerList.SaveToFile(projDir+'libs'+DirectorySeparator+LowerCase(FSmallProjName)+'_h.pas');
+    headerList.Free;
+
+  end;
+
+   sourceList.Add('end.');
   AProject.MainFile.SetSourceText(sourceList.Text, True);
 
   AProject.Flags := AProject.Flags - [pfMainUnitHasCreateFormStatements,
@@ -1899,8 +1955,6 @@ begin
                                                  'x86-4.9'+DirectorySeparator+'prebuilt'+DirectorySeparator+
                                                  osys+DirectorySeparator+'lib'+DirectorySeparator+'gcc'+DirectorySeparator+
                                                  'i686-android-linux'+DirectorySeparator+'4.9';
-
-
 
   if FNDK = '7' then
       pathToNdkToolchainsBinX86:= FPathToAndroidNDK+'toolchains'+DirectorySeparator+
@@ -2030,7 +2084,7 @@ begin
   auxList.Add('<TargetCPU Value="i386"/>');
   auxList.Add('<CustomOptions Value="'+customOptions_x86+'"/>');
   //auxList.Add('<TargetProcessor Value=""/>');  //commented until lazarus fix bug for missing ARMV7A  //again thanks to Stephano!
-  if FModuleType <> 2 then
+  if FModuleType < 2 then
     auxList.SaveToFile(FPathToJNIFolder+DirectorySeparator+'jni'+DirectorySeparator+'build-modes'+DirectorySeparator+'build_x86.txt')
   else
      auxList.SaveToFile(FPathToJNIFolder+DirectorySeparator+'build-modes'+DirectorySeparator+'build_x86.txt');
@@ -2040,7 +2094,7 @@ begin
   auxList.Add('<TargetCPU Value="arm"/>');
   auxList.Add('<CustomOptions Value="'+customOptions_armV6+'"/>');
   //auxList.Add('<TargetProcessor Value="ARMV6"/>');  //commented until lazarus fix bug for missing ARMV7A  //again thanks to Stephano!
-  if FModuleType <> 2 then
+  if FModuleType < 2 then
     auxList.SaveToFile(FPathToJNIFolder+DirectorySeparator+'jni'+DirectorySeparator+'build-modes'+DirectorySeparator+'build_armV6.txt')
   else
     auxList.SaveToFile(FPathToJNIFolder+DirectorySeparator+'build-modes'+DirectorySeparator+'build_armV6.txt');
@@ -2050,7 +2104,7 @@ begin
   auxList.Add('<TargetCPU Value="arm"/>');
   auxList.Add('<CustomOptions Value="'+customOptions_armV7a+'"/>');
   //auxList.Add('<TargetProcessor Value="ARMV7A"/>');  //commented until lazarus fix bug for missing ARMV7A  //again thanks to Stephano!
-  if FModuleType <> 2 then
+  if FModuleType < 2 then
      auxList.SaveToFile(FPathToJNIFolder+DirectorySeparator+'jni'+DirectorySeparator+'build-modes'+DirectorySeparator+'build_armV7a.txt')
   else
      auxList.SaveToFile(FPathToJNIFolder+DirectorySeparator+'build-modes'+DirectorySeparator+'build_armV7a.txt');
@@ -2095,12 +2149,12 @@ begin
   auxList.Add('      Thank you!');
   auxList.Add('      By  ___jmpessoa_hotmail.com_____');
 
-  if FModuleType <> 2 then
+  if FModuleType < 2 then
     auxList.SaveToFile(FPathToJNIFolder+DirectorySeparator+'jni'+DirectorySeparator+'build-modes'+DirectorySeparator+'readme.txt')
   else
     auxList.SaveToFile(FPathToJNIFolder+DirectorySeparator+'build-modes'+DirectorySeparator+'readme.txt');
 
-  if FModuleType <> 2 then
+  if FModuleType < 2 then
   begin
     AProject.LazCompilerOptions.TargetFilename:=
           '..'+DirectorySeparator+'libs'+DirectorySeparator+auxStr+DirectorySeparator+'lib'+LowerCase(FJavaClassName){+'.so'};
@@ -2142,8 +2196,10 @@ begin
     AndroidFileDescriptor.ResourceClass:= TAndroidModule;
   1: // NoGUI Controls
     AndroidFileDescriptor.ResourceClass:= TNoGUIAndroidModule;
-  else // =2 -> NoGUI Exe
+  2: // NoGUI Exe
     AndroidFileDescriptor.ResourceClass:= TAndroidConsoleDataForm;
+  3: // NoGUI generic library
+    AndroidFileDescriptor.ResourceClass:= nil;
   end;
 
   LazarusIDE.DoSaveProject([]); // TODO: change hardcoded "controls"
@@ -2175,24 +2231,26 @@ constructor TAndroidFileDescPascalUnitWithResource.Create;
 begin
   inherited Create;
 
-  Name:= 'AndroidDataModule';
-
-  if ModuleType = 0 then
+  if  ModuleType < 3 then
   begin
     Name:= 'AndroidDataModule';
-    ResourceClass := TAndroidModule
-  end
-  else if ModuleType = 1 then
-  begin
-     Name:= 'NoGUIAndroidDataModule';
-     ResourceClass := TNoGUIAndroidModule
-  end
-  else  //2
-  begin
-     Name:= 'AndroidConsoleDataForm';
-     ResourceClass:= TAndroidConsoleDataForm;
+    if ModuleType = 0 then
+    begin
+      Name:= 'AndroidDataModule';
+      ResourceClass := TAndroidModule
+    end
+    else if ModuleType = 1 then
+    begin
+       Name:= 'NoGUIAndroidDataModule';
+       ResourceClass := TNoGUIAndroidModule
+    end
+    else  if ModuleType = 2 then
+    begin
+       Name:= 'AndroidConsoleDataForm';
+       ResourceClass:= TAndroidConsoleDataForm;
+    end;
+    UseCreateFormStatements:= True;
   end;
-  UseCreateFormStatements:= True;
 end;
 
 function TAndroidFileDescPascalUnitWithResource.GetResourceType: TResourceType;
@@ -2222,7 +2280,7 @@ begin
    uName:= SplitStr(uName,'.');
    sourceList:= TStringList.Create;
 
-   if ModuleType <> 2 then
+   if ModuleType < 2 then
      sourceList.Add('{Hint: save all files to location: ' +PathToJNIFolder+DirectorySeparator+'jni }')
    else
      sourceList.Add('{Hint: save all files to location: ' +PathToJNIFolder +'}');
@@ -2236,8 +2294,14 @@ begin
    sourceList.Add('');
    sourceList.Add('interface');
    sourceList.Add('');
+
+   if ModuleType = 3 then    sourceList.Add('{');
+
    sourceList.Add('uses');
    sourceList.Add('  ' + GetInterfaceUsesSection);
+
+   if ModuleType = 3 then    sourceList.Add('}');
+
    if ModuleType = 1 then //no GUI
    begin
     sourceList.Add('');
@@ -2246,24 +2310,49 @@ begin
     sourceList.Add('  gNoGUIjClass: JClass=nil;');
     sourceList.Add('  gNoGUIPDalvikVM: PJavaVM=nil;');
    end;
-   sourceList.Add(GetInterfaceSource(Filename, SourceName, ResourceName));
+
+   if ModuleType < 3 then
+   begin
+     sourceList.Add(GetInterfaceSource(Filename, SourceName, ResourceName));
+   end
+   else
+   begin
+      sourceList.Add(' ');
+     sourceList.Add('function SumAB(A: longint; B: longint): longint;');
+     sourceList.Add(' ');
+   end;
+
    sourceList.Add('implementation');
-   sourceList.Add('');
-   sourceList.Add(GetImplementationSource(Filename, SourceName, ResourceName));
+   sourceList.Add(' ');
+
+   if ModuleType < 3 then
+   begin
+      sourceList.Add(GetImplementationSource(Filename, SourceName, ResourceName));
+   end
+   else
+   begin
+      sourceList.Add('function SumAB(A: longint; B: longint): longint;');
+      sourceList.Add('begin');
+      sourceList.Add('  Result:= A + B;');
+      sourceList.Add('end;');
+      sourceList.Add(' ');
+   end;
+
    sourceList.Add('end.');
+
    Result:= sourceList.Text;
+
    sourceList.Free;
 end;
 
 function TAndroidFileDescPascalUnitWithResource.GetInterfaceUsesSection: string;
 begin
-  if ModuleType = 1 then //generic module: No GUI Controls
-    Result := 'Classes, SysUtils, jni;'
-  else if ModuleType = 0  then//GUI controls module
-    Result := 'Classes, SysUtils, AndroidWidget;'
-  else // 2
-    Result := 'Classes, SysUtils;'
-
+  if ModuleType = 0 then //GUI controls module
+     Result := 'Classes, SysUtils, AndroidWidget;'
+  else if ModuleType = 1  then  //generic module: No GUI Controls
+     Result := 'Classes, SysUtils, jni;'
+  else // console app or generic library
+     Result := 'Classes, SysUtils;'
 end;
 
 function TAndroidFileDescPascalUnitWithResource.GetInterfaceSource(const Filename     : string;
@@ -2273,9 +2362,9 @@ var
   strList: TStringList;
 begin
   strList:= TStringList.Create;
-  strList.Add('');
-  strList.Add('type');
 
+  strList.Add(' ');
+  strList.Add('type');
   if ModuleType = 0 then //GUI controls module
   begin
     if ResourceName <> '' then
@@ -2290,7 +2379,7 @@ begin
     else
       strList.Add('  TNoGUIAndroidModuleXX  = class(TDataModule)');
   end
-  else //2  console
+  else if ModuleType = 2 then //  console
   begin
     if ResourceName <> '' then
       strList.Add('  T' + ResourceName + ' = class(TDataModule)')
@@ -2305,6 +2394,7 @@ begin
   strList.Add('  end;');
   strList.Add('');
   strList.Add('var');
+
   if ModuleType = 0 then //GUI controls module
   begin
     if ResourceName <> '' then
@@ -2319,7 +2409,7 @@ begin
     else
       strList.Add('  NoGUIAndroidModuleXX: TNoGUIDataMoule');
   end
-  else //2  console
+  else if ModuleType = 2 then//2  console
   begin
     if ResourceName <> '' then
      strList.Add('  ' + ResourceName + ': T' + ResourceName + ';')
@@ -2327,7 +2417,11 @@ begin
       strList.Add('  AndroidConsoleDataFormXX: TAndroidConsoleDataForm');
   end;
 
-  Result := strList.Text;
+  if ModuleType < 3 then
+    Result := strList.Text
+  else
+    Result:= '';
+
   strList.Free;
 end;
 

@@ -1090,7 +1090,7 @@ type
     function GetDeviceWifiIPAddress(): string;
     function GetDeviceDataMobileIPAddress(): string;
     function GetWifiBroadcastIPAddress(): string;
-
+    function LoadFromAssetsTextContent(_filename: string): string;
     // Property
     property View         : jObject        read FjRLayout; //layout!
 
@@ -1468,6 +1468,7 @@ function jForm_GetInternalAppStoragePath(env: PJNIEnv;  _jform: JObject): string
 function jForm_CopyFile(env: PJNIEnv;  _jform: JObject; _srcFullName: string; _destFullName: string): boolean;
 function jForm_LoadFromAssets(env: PJNIEnv;  _jform: JObject; _fileName: string): string;
 function jForm_IsSdCardMounted(env: PJNIEnv;  _jform: JObject): boolean;
+function jForm_LoadFromAssetsTextContent(env: PJNIEnv; _jform: JObject; _filename: string): string;
 
 //------------------------------------------------------------------------------
 // View  - Generics
@@ -1514,6 +1515,7 @@ Function  jSysInfo_DeviceID            (env:PJNIEnv;this:jobject) : String;
   function jSystem_GetOrientation        (env:PJNIEnv;this:jobject): integer;
   Procedure jClassMethod(FuncName, FuncSig : PChar;
                        env : PJNIEnv; var Class_ : jClass; var Method_ :jMethodID);
+
   function Get_gjClass(env: PJNIEnv): jClass; //by jmpessoa
 
 //-----
@@ -1673,14 +1675,14 @@ begin
            False: Angle := (90 -ArcSin( Pt.Y*-1 / Len ) * (180/pi))+90;
            True : Angle :=      ArcSin( Pt.Y    / Len ) * (180/pi)+180;
           End;
-end;
+  end;
   //
   Angle := 360-Angle;
   While Angle >= 360 do Angle := Angle - 360;
   While Angle <    0 do Angle := Angle + 360;
 
   Result := Angle;
- end;
+end;
 
 // Input  Touches
 // Output MTouch
@@ -1779,7 +1781,7 @@ Procedure VHandler_touchesEnded_withEvent(Sender         : TObject;
 function Get_gjClass(env: PJNIEnv): jClass;
 begin
   if gjClass {global} = nil then
-  begin
+  begin                                   //com/example/appsdl2demo1/Controls
      gjClass:= jClass(env^.FindClass(env, gjClassName {global class name: "../Controls"}));
      if gjClass <> nil then gjClass := env^.NewGlobalRef(env, gjClass); //needed for Appi > 13
   end;
@@ -3238,6 +3240,12 @@ begin
    Result:= jForm_GetWifiBroadcastIPAddress(FjEnv, FjObject);
 end;
 
+function jForm.LoadFromAssetsTextContent(_filename: string): string;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jForm_LoadFromAssetsTextContent(FjEnv, FjObject, _filename);
+end;
 
 {-------- jForm_JNI_Bridge ----------}
 
@@ -5499,7 +5507,7 @@ end;
 // Form
 //------------------------------------------------------------------------------
 
-Function  jForm_Create (env:PJNIEnv;this:jobject; SelfObj : TObject) : jObject;
+Function  jForm_Create (env:PJNIEnv; this: jobject; SelfObj : TObject) : jObject;
 var
  _jMethod : jMethodID = nil;
  _jParam  : jValue;
@@ -5508,7 +5516,7 @@ begin
   _cls:= Get_gjClass(env);
  _jMethod:= env^.GetMethodID(env, _cls, 'jForm_Create', '(J)Ljava/lang/Object;');
  _jParam.j := Int64(SelfObj);
- Result := env^.CallObjectMethodA(env,this,_jMethod,@_jParam);
+ Result := env^.CallObjectMethodA(env, this,_jMethod,@_jParam);
  Result := env^.NewGlobalRef(env,Result);
 end;
 
@@ -5826,6 +5834,29 @@ begin
   env^.DeleteLocalRef(env, _jCls);
 end;
 
+function jForm_LoadFromAssetsTextContent(env: PJNIEnv; _jform: JObject; _filename: string): string;
+var
+  jStr: JString;
+  jBoo: JBoolean;
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_filename));
+  jCls:= env^.GetObjectClass(env, _jform);
+  jMethod:= env^.GetMethodID(env, jCls, 'LoadFromAssetsTextContent', '(Ljava/lang/String;)Ljava/lang/String;');
+  jStr:= env^.CallObjectMethodA(env, _jform, jMethod, @jParams);
+  case jStr = nil of
+     True : Result:= '';
+     False: begin
+              jBoo:= JNI_False;
+              Result:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
+            end;
+  end;
+env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
 //------------------------------------------------------------------------------
 // View  - generics - "controls.java"
 //------------------------------------------------------------------------------
@@ -5918,7 +5949,7 @@ begin
  env^.DeleteLocalRef(env, cls);
 end;
 
-Procedure View_Invalidate(env:PJNIEnv;this:jobject; view : jObject);
+Procedure View_Invalidate(env:PJNIEnv; this:jobject; view : jObject);
 var
  _jMethod : jMethodID = nil;
  _jParam  : jValue;

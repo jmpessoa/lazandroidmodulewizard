@@ -7,7 +7,7 @@ interface
 uses
   Classes, SysUtils, FileUtil, Dialogs, IDECommands, MenuIntf, Forms,
   uformsettingspaths, lazandroidtoolsexpert, ufrmEditor, ufrmCompCreate,
-  uFormBuildFPCCross, uFormGetFPCSource, uimportjavastuff, uimportjavastuffchecked;
+  uFormBuildFPCCross, uFormGetFPCSource, uimportjavastuff, uimportjavastuffchecked, uimportcstuff, process;
 
 procedure StartPathTool(Sender: TObject);
 procedure StartLateTool(Sender: TObject);   //By Thierrydijoux!
@@ -17,6 +17,7 @@ procedure StartPathToBuildFPCCross(Sender: TObject);
 procedure StartFPCTrunkSource(Sender: TObject);
 procedure StartEclipseToggleTooling(Sender: TObject);
 procedure StartImportJavaStuff(Sender: TObject);
+procedure StartImportCStuff(Sender: TObject);
 
 procedure Register;
 
@@ -100,6 +101,427 @@ begin
           '[' + e.ClassName + '] Failed: ' + e.Message, '', 0, 0, 'Exception'));
   end else
     ShowMessage('The active project is not LAMW project!');
+end;
+
+procedure SaveAndroidMK(pathToNdk: string; ndkPlataform: string; libChip: string; pathToProject: string; libname: string; listCFile: string);
+var
+  auxList: TStringList;
+  AProcess: TProcess;
+begin
+  auxList:= TStringList.Create;
+  auxList.Add('LOCAL_PATH:= $(call my-dir)');
+  auxList.Add('');
+  auxList.Add('include $(CLEAR_VARS)');
+  auxList.Add('');
+  auxList.Add('LOCAL_CFLAGS := -DANDROID_NDK \');
+  auxList.Add('	-DFT2_BUILD_LIBRARY=1');
+  auxList.Add('');
+  auxList.Add('C_SRC_PATH:= ../');
+  auxList.Add('');
+  auxList.Add('LOCAL_SRC_FILES:= \');
+  auxList.Add(listCFile);
+  auxList.Add('LOCAL_MODULE:= '+libname);
+  auxList.Add('');
+  auxList.Add('include $(BUILD_SHARED_LIBRARY)');
+  auxList.SaveToFile(pathToProject+'jni'+DirectorySeparator+'Android.mk');
+
+  auxList.Clear;
+  auxList.Add('APP_ABI := '+libChip);  //armeabi armeabi-v7a x86
+  auxList.Add('APP_PLATFORM := '+ndkPlataform);  //android-13
+  auxList.SaveToFile(pathToProject+'jni'+DirectorySeparator+'Application.mk');
+
+  auxList.Clear;
+
+  {$IFDEF Windows}
+  auxList.Add('cd '+pathToProject);
+  auxList.Add(pathToNdk+'ndk-build.cmd V=1 -B');
+  auxList.SaveToFile(pathToProject+'lib'+libname+'-builder.bat');
+  {$Endif}
+
+  {$IFDEF Linux}
+  auxList.Add('cd '+pathToProject);
+  auxList.Add(pathToNdk+'ndk-build.cmd V=1 -B');
+  auxList.SaveToFile(pathToProject+'lib'+libname+'-builder.sh');
+  {$Endif}
+
+  auxList.Free;
+  try
+    AProcess:= TProcess.Create(nil);
+    AProcess.CurrentDirectory:= pathToProject;
+    AProcess.Executable:= pathToNdk+'ndk-build.cmd';
+    {$IFDEF Linux}
+    AProcess.Executable:= pathToNdk+'ndk-build.cmd'; //need fix here ?
+    {$Endif}
+    {$IFDEF Darwin}
+    AProcess.Executable:= pathToNdk+'ndk-build.cmd'; //need fix here ?
+    {$Endif}
+    (*
+    ndk-build clean       --> clean all generated binaries.
+    ndk-build NDK_DEBUG=1 --> generate debuggable native code.
+    ndk-build NDK_DEBUG=0 --> force a release build
+    ndk-build V=1 --> launch build, displaying build commands.
+    ndk-build -B --> force a complete rebuild.
+    ndk-build -B V=1 --> force a complete rebuild and display build commands.
+    *)
+    //AProcess.Parameters.Add('V=1');
+    //AProcess.Parameters.Add('-B');
+    AProcess.Parameters.Add('NDK_DEBUG=0');
+    AProcess.Options:= AProcess.Options + [poWaitOnExit];
+    AProcess.Execute;
+  finally
+    AProcess.Free;
+  end;
+
+end;
+
+function GetNdkPlatform(const fileName: string): string;
+var
+  indexStr: string;
+  index: integer;
+begin
+  if FileExists(fileName) then
+  begin
+    with TIniFile.Create(fileName) do
+    try
+      indexStr:= ReadString('NewProject','AndroidPlatform', '');
+    finally
+      Free;
+    end;
+  end;
+  if indexStr <> '' then
+  begin
+     index:= StrToInt(indexStr);
+     case index of
+        0: Result:= 'android-13';
+        1: Result:= 'android-14';
+        2: Result:= 'android-15';
+        3: Result:= 'android-16';
+        4: Result:= 'android-17';
+        5: Result:= 'android-18';
+        6: Result:= 'android-19';
+        7: Result:= 'android-20';
+        8: Result:= 'android-21';
+        9: Result:= 'android-22';
+        10: Result:= 'android-23';
+        11: Result:= 'android-24';
+        12: Result:= 'android-25';
+        13: Result:= 'android-26';
+     end;
+  end;
+end;
+
+function GetPathToLamwWizard(const fileName: string): string;
+var
+  k: integer;
+  PathToJavaTemplates: string;
+begin
+  if FileExists(fileName) then
+  begin
+    with TIniFile.Create(fileName) do
+    try
+       PathToJavaTemplates := ReadString('NewProject','PathToJavaTemplates', '');
+    finally
+      Free;
+    end;
+  end;
+  k:= LastPos(DirectorySeparator, PathToJavaTemplates);
+  Result:= Copy(PathToJavaTemplates, 1, k-1);
+end;
+
+//function add(a:longint; b:longint):longint;cdecl;
+function GetMethodName(methodHeader: string): string;
+var
+  p: integer;
+  aux, firstPart: string;
+begin
+  p:= Pos('(', methodHeader);
+  aux:= Copy(methodHeader, 1, p-1); //function add
+  aux:= Trim(aux);
+  firstPart:= SplitStr(aux, ' ');
+  Result:= Trim(aux);
+end;
+
+procedure MakePascalInterface(pathToProject: string; fileName_h: string; libName: string);
+var
+  pathToLamwIdeTools: string;
+  fileName_pp: string;
+  pathToHFile: string;
+  AProcess: TProcess;
+  auxList: TStringList;
+  flag: boolean;
+  i: integer;
+  mylib: string;
+  methodName: string;
+begin
+  mylib:= 'lib'+libName+'.so';
+
+  pathToHFile:= pathToProject+libName;
+  pathToLamwIdeTools:= GetPathToLamwWizard(AppendPathDelim(LazarusIDE.GetPrimaryConfigPath) + 'JNIAndroidProject.ini')+DirectorySeparator+ 'ide_tools';
+  {$IFDEF Windows}
+  if not FileExists(pathToLamwIdeTools + DirectorySeparator + 'h2pas.exe') then Exit;
+  {$Endif}
+  {$IFDEF Linux}
+  if not FileExists(pathToLamwIdeTools + DirectorySeparator + 'h2pas') then
+  begin
+     ShowMessage(pathToLamwIdeTools + DirectorySeparator + 'h2pas' not found!);
+     Exit;
+  end;
+  {$Endif}
+  {$IFDEF Darwin}
+  if not FileExists(pathToLamwIdeTools + DirectorySeparator + 'h2pas.app') then
+  begin
+    ShowMessage(pathToLamwIdeTools + DirectorySeparator + 'h2pas' not found!);
+    Exit;
+  end
+  {$Endif}
+  try
+    flag:= False;
+    AProcess:= TProcess.Create(nil);
+    AProcess.CurrentDirectory:= pathToHFile;
+    AProcess.Executable:= pathToLamwIdeTools+DirectorySeparator+'h2pas.exe';
+    {$IFDEF Linux}
+    AProcess.Executable:= pathHtoPas+DirectorySeparator+'h2pas';
+    {$Endif}
+    {$IFDEF Darwin}
+    AProcess.Executable:= pathHtoPas+DirectorySeparator+'h2pas.app';
+    {$Endif}
+    AProcess.Parameters.Add(fileName_h); // .h
+    AProcess.Options:= AProcess.Options + [poWaitOnExit];
+    AProcess.Execute;      //produce .pp
+    flag:= True;
+  finally
+    AProcess.Free;
+    if flag then
+    begin
+      fileName_pp:=StringReplace(fileName_h, '.h', '.pp', [rfIgnoreCase]);
+      CopyFile(pathToHFile+DirectorySeparator+fileName_pp, pathToProject+'jni'+DirectorySeparator + fileName_pp);
+      auxList:= TStringList.Create;
+      auxList.LoadFromFile(pathToProject+'jni'+DirectorySeparator + fileName_pp);
+      for i:= 0 to auxList.Count - 1 do
+      begin
+         if Pos('cdecl', auxList.Strings[i]) > 0 then
+         begin
+           methodName:= GetMethodName(auxList.Strings[i]);
+           auxList.Strings[i]:= auxList.Strings[i]+ ' external '''+mylib+''' name '''+methodName+''';';
+         end;
+      end;
+      auxList.SaveToFile(pathToProject+'jni'+DirectorySeparator + fileName_pp);
+    end;
+  end;
+end;
+
+procedure StartImportCStuff(Sender: TObject);
+var
+  Project: TLazProject;
+  pathToImportCcode: string;
+  pathToImportHCode: string;
+  pathToProject: string;
+  list, listSaveTo: TStringList;
+  p, i, k: integer;
+  saveCStuffTo: string;
+  srcFile: string;
+  SRC_FILES: TStringList;
+  pathToNdk, ndkPlatform: string;
+  myLibName: string;
+  linkLibrariesPath: string;
+  chip: string;
+  libChip: string;
+  pathToNewLib: string;
+  aux: string;
+  listBackup: TStringList;
+  saveLibBackupTo: string;
+begin
+  Project:= LazarusIDE.ActiveProject;
+  if Assigned(Project) and (Project.CustomData.Values['LAMW'] <> '' ) then
+  begin
+     FormImportCStuff:= TFormImportCStuff.Create(Application);
+
+     if FormImportCStuff.ShowModal = mrOK then
+     begin
+       linkLibrariesPath:='';                       //C:\adt32\ndk10e\platforms\android-15\arch-x86\usr\lib\
+       aux:= Project.LazCompilerOptions.Libraries; //C:\adt32\ndk10e\platforms\android-15\arch-arm\usr\lib\; .....
+       p:= Pos(';', aux);
+       if p > 0 then
+       begin
+          linkLibrariesPath:= Trim(Copy(aux, 1, p-1));
+          chip:= 'arm';
+          if Pos('-x86', linkLibrariesPath) > 0 then chip:= 'x86';
+          if chip = 'arm' then
+          begin
+             libChip:= 'armeabi';       //armeabi armeabi-v7a x86
+             if Pos('-CpARMV7', Project.LazCompilerOptions.CustomOptions) > 0 then
+               libChip:= 'armeabi-v7a'; //-Xd -CfSoft -CpARMV6 -XParm-linux-androideabi-
+          end
+          else
+            libChip:= 'x86';
+       end;
+
+       pathToNdk:= Project.CustomData.Values['NdkPath'];  //<Item2 Name="NdkPath" Value="C:\adt32\ndk10e\"/>
+       ndkPlatform:= GetNdkPlatform(AppendPathDelim(LazarusIDE.GetPrimaryConfigPath) + 'JNIAndroidProject.ini');
+
+       p:= Pos(DirectorySeparator+'jni', Project.ProjectInfoFile);
+       pathToProject:= Copy(Project.ProjectInfoFile, 1, p);
+
+       pathToImportCcode:= Trim(FormImportCStuff.EditImportC.Text);
+       pathToImportHCode:= Trim(FormImportCStuff.EditImportH.Text);
+
+       myLibName:=  LowerCase(Trim(FormImportCStuff.EditLibName.Text));
+       if myLibName = '' then myLibName:= 'mycstuff1';
+
+       saveCStuffTo:= pathToProject + myLibName;
+       CreateDir(saveCStuffTo);
+
+       saveLibBackupTo:= saveCStuffTo + DirectorySeparator + 'libsaved';
+       CreateDir(saveLibBackupTo);
+
+       pathToNewLib:= pathToProject+'libs'+ DirectorySeparator + libChip;
+       listBackup:= FindAllFiles(pathToNewLib, '*.so', False);
+
+       listSaveTo:= TStringList.Create;
+       //------------------
+       if pathToImportHcode <> '' then
+       begin
+          list:= FindAllFiles(pathToImportHcode, '*.h', False);
+          if not FormImportCStuff.CheckBoxAllC.Checked then
+          begin
+            FormImportJavaStuffChecked:= TFormImportJavaStuffChecked.Create(Application);
+
+            for i:=0 to list.Count-1 do
+            begin
+              FormImportJavaStuffChecked.CheckGroupImport.Items.Add(ExtractFileName(list.Strings[i]));
+            end;
+
+            if FormImportJavaStuffChecked.ShowModal = mrOK then
+            begin
+              for i:=0 to list.Count-1 do
+              begin
+                 if FormImportJavaStuffChecked.CheckGroupImport.Checked[i] then
+                 begin
+                   listSaveTo.LoadFromFile(list.Strings[i]);
+                   srcFile:= FormImportJavaStuffChecked.CheckGroupImport.Items.Strings[i];
+                   listSaveTo.SaveToFile(saveCStuffTo + DirectorySeparator+ srcFile);
+                   MakePascalInterface(pathToProject , srcFile,  myLibName);
+                 end;
+              end;
+            end
+            else
+            begin
+              //ShowMessage('Cancel');
+            end;
+          end
+          else
+          begin
+             for i:=0 to list.Count-1 do
+             begin
+               listSaveTo.LoadFromFile(list.Strings[i]);
+               srcFile:= ExtractFileName(list.Strings[i]);
+               listSaveTo.SaveToFile(saveCStuffTo + DirectorySeparator+ srcFile);
+               MakePascalInterface(pathToProject, srcFile, myLibName);
+             end;
+          end;
+          list.Free;
+       end;
+       //--------------------------
+       if pathToImportCcode <> '' then
+       begin
+         list:= FindAllFiles(pathToImportCcode, '*.c', False);
+         if not FormImportCStuff.CheckBoxAllC.Checked then
+         begin   //ok, a bad code reuse ....
+           FormImportJavaStuffChecked:= TFormImportJavaStuffChecked.Create(Application);
+
+           for i:=0 to list.Count-1 do
+           begin
+             FormImportJavaStuffChecked.CheckGroupImport.Items.Add(ExtractFileName(list.Strings[i]));
+           end;
+
+           if FormImportJavaStuffChecked.ShowModal = mrOK then
+           begin
+             SRC_FILES:= TStringList.Create;
+             for i:=0 to list.Count-1 do
+             begin
+                if FormImportJavaStuffChecked.CheckGroupImport.Checked[i] then
+                begin
+                  listSaveTo.LoadFromFile(list.Strings[i]);
+                  srcFile:= FormImportJavaStuffChecked.CheckGroupImport.Items.Strings[i];
+                  listSaveTo.SaveToFile(saveCStuffTo + DirectorySeparator+ srcFile);
+                  SRC_FILES.Add('$(C_SRC_PATH)'+myLibName+'/'+srcFile+' \');
+                end;
+             end;
+             if SRC_FILES.Count > 0 then
+             begin
+                SRC_FILES.Strings[SRC_FILES.Count-1]:= '$(C_SRC_PATH)'+myLibName+'/'+srcFile;
+                if listBackup.Count > 0 then
+                begin
+                  //save
+                  for k:= 0 to listBackup.Count-1 do
+                  begin
+                     aux:= ExtractFileName(listBackup.Strings[k]);
+                     CopyFile(listBackup.Strings[k], saveLibBackupTo + DirectorySeparator + aux);
+                  end;
+                  SaveAndroidMK(pathToNdk, ndkPlatform, libChip, pathToProject, myLibName, SRC_FILES.Text);
+                  //restore
+                  for k:= 0 to listBackup.Count-1 do
+                  begin
+                     aux:= ExtractFileName(listBackup.Strings[k]);
+                     if aux <> ('lib'+myLibName+'.so') then
+                        CopyFile(saveLibBackupTo+DirectorySeparator+aux, pathToNewLib+DirectorySeparator+aux);
+                  end;
+                end;
+             end;
+             SRC_FILES.Free;
+           end
+           else
+           begin
+             //ShowMessage('Cancel');
+           end;
+         end
+         else
+         begin
+            SRC_FILES:= TStringList.Create;
+            for i:=0 to list.Count-1 do
+            begin
+              listSaveTo.LoadFromFile(list.Strings[i]);
+              srcFile:= ExtractFileName(list.Strings[i]);
+              listSaveTo.SaveToFile(saveCStuffTo + DirectorySeparator+ srcFile);
+              if i = list.Count-1 then
+                 SRC_FILES.Add('$(C_SRC_PATH)'+myLibName+'/'+srcFile)
+              else
+                 SRC_FILES.Add('$(C_SRC_PATH)'+myLibName+'/'+srcFile+' \');
+            end;
+            if SRC_FILES.Count > 0 then
+            begin
+              //save
+              for k:= 0 to listBackup.Count-1 do
+              begin
+                 aux:= ExtractFileName(listBackup.Strings[k]);
+                 CopyFile(listBackup.Strings[k], saveLibBackupTo + DirectorySeparator + aux);
+              end;
+              SaveAndroidMK(pathToNdk, ndkPlatform, libChip, pathToProject, myLibName, SRC_FILES.Text);
+              //restore
+              for k:= 0 to listBackup.Count-1 do
+              begin
+                 aux:= ExtractFileName(listBackup.Strings[k]);
+                 if aux <> ('lib'+myLibName+'.so') then
+                    CopyFile(saveLibBackupTo+DirectorySeparator+aux, pathToNewLib+DirectorySeparator+aux);
+              end;
+            end;
+            SRC_FILES.Free;
+         end;
+         ShowMessage('C Stuff Imported ! (lib'+myLibName+'.so)');
+         if FileExists(pathToNewLib + DirectorySeparator + 'lib'+myLibName+'.so') then
+         begin
+            if linkLibrariesPath <> '' then
+               CopyFile(pathToNewLib + DirectorySeparator + 'lib'+myLibName+'.so',linkLibrariesPath+'lib'+myLibName+'.so');
+         end;
+         list.Free;
+       end;
+       listSaveTo.Free;
+       listBackup.Free;
+     end
+     else
+       ShowMessage('Cancel');
+  end else
+    ShowMessage('Sorry, the active project is not a LAMW project!');
 end;
 
 procedure StartImportJavaStuff(Sender: TObject);
@@ -496,6 +918,10 @@ begin
 
   // Adding 10a. entry
   RegisterIDEMenuCommand(ideSubMnuAMW, 'PathToImportJava', 'Use/Import Java Stuff...', nil, @StartImportJavaStuff);
+
+  // Adding 11a. entry
+  RegisterIDEMenuCommand(ideSubMnuAMW, 'PathToImportCCode', 'Use/Import C Stuff...', nil, @StartImportCStuff);
+
 
   // And so on...
   RegisterIDEMenuCommand(itmRunBuilding, 'BuildAPKandRun', '[Lamw] Build Android Apk and Run',nil, @BuildAPKandRun);

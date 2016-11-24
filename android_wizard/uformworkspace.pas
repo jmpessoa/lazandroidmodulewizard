@@ -6,7 +6,7 @@ interface
 
 uses
   inifiles, Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, LazIDEIntf,
-  StdCtrls, Buttons, ExtCtrls, ComCtrls, FormPathMissing, uFormOSystem, PackageIntf;
+  StdCtrls, Buttons, ExtCtrls, ComCtrls, FormPathMissing, uFormOSystem, PackageIntf, Types;
 
 type
 
@@ -15,6 +15,7 @@ type
   TFormWorkspace  = class(TForm)
     BitBtnCancel: TBitBtn;
     BitBtnOK: TBitBtn;
+    CheckBoxLibrary: TCheckBox;
     CheckBoxPIE: TCheckBox;
     ComboBoxTheme: TComboBox;
     ComboSelectProjectName: TComboBox;
@@ -45,13 +46,13 @@ type
     SpeedButtonHintTheme: TSpeedButton;
     StatusBarInfo: TStatusBar;
 
+    procedure CheckBoxLibraryClick(Sender: TObject);
     procedure CheckBoxPIEClick(Sender: TObject);
     procedure ComboBoxThemeChange(Sender: TObject);
     procedure ComboSelectProjectNameKeyPress(Sender: TObject; var Key: char);
     procedure FormActivate(Sender: TObject);
     procedure FormClose(Sender: TObject; var CloseAction: TCloseAction);
     procedure FormCreate(Sender: TObject);
-
     procedure ListBoxMinSDKClick(Sender: TObject);
     procedure ListBoxMinSDKSelectionChange(Sender: TObject; User: boolean);
     procedure ListBoxPlatformSelectionChange(Sender: TObject; User: boolean);
@@ -106,6 +107,7 @@ type
     FIndexNdkPlatformApi: integer;
     FAndroidTheme: string;
     FPieChecked: boolean;
+    FLibraryChecked: boolean;
 
   public
     { public declarations }
@@ -151,6 +153,7 @@ type
     property SmallProjName: string read FSmallProjName write FSmallProjName;
     property AndroidTheme: string read FAndroidTheme write FAndroidTheme;
     property PieChecked: boolean read FPieChecked write FPieChecked;
+    property LibraryChecked: boolean read FLibraryChecked write FLibraryChecked;
   end;
 
 
@@ -172,11 +175,11 @@ begin
   Result:= 'Unknown';
   if api='8' then Result:= 'Froyo 2.2'
   else if api='10' then Result:= 'Gingerbread 2.3'
-// tk
+  // tk
   else if api='11' then Result:= 'Honeycomb 3.0x'
   else if api='12' then Result:= 'Honeycomb 3.1x'
   else if api='13' then Result:= 'Honeycomb 3.2'
-// end tk
+  // end tk
   else if api='14' then Result:= 'IceCream 4.0'
   else if api='15' then Result:= 'IceCream 4.0x'
   else if api='16' then Result:= 'JellyBean 4.1'
@@ -243,6 +246,7 @@ procedure TFormWorkspace.ListBoxTargetAPIClick(Sender: TObject);
 var
  tApi, mApi: integer;
 begin
+
   FTargetApi:= ListBoxTargetAPI.Items[ListBoxTargetAPI.ItemIndex];
 
   tApi:= StrToInt(FTargetApi);
@@ -1006,6 +1010,13 @@ procedure TFormWorkspace.CheckBoxPIEClick(Sender: TObject);
 begin
   FPieChecked:= CheckBoxPIE.Checked;
 end;
+
+procedure TFormWorkspace.CheckBoxLibraryClick(Sender: TObject);
+begin
+  FLibraryChecked:=  CheckBoxLibrary.Checked;
+end;
+
+
 
 procedure TFormWorkspace.ComboSelectProjectNameKeyPress(Sender: TObject;
   var Key: char);

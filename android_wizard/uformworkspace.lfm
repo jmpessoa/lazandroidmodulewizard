@@ -1,13 +1,13 @@
 object FormWorkspace: TFormWorkspace
-  Left = 580
-  Height = 560
-  Top = 29
+  Left = 492
+  Height = 733
+  Top = 0
   Width = 400
   AutoSize = True
   BorderIcons = [biSystemMenu]
   BorderStyle = bsSizeToolWin
   Caption = 'Android Module Wizard: Configure Project Workspace and Builds'
-  ClientHeight = 560
+  ClientHeight = 733
   ClientWidth = 400
   Constraints.MinHeight = 560
   Constraints.MinWidth = 400
@@ -81,7 +81,7 @@ object FormWorkspace: TFormWorkspace
   object StatusBarInfo: TStatusBar
     Left = 0
     Height = 23
-    Top = 537
+    Top = 710
     Width = 400
     Panels = <    
       item
@@ -100,7 +100,7 @@ object FormWorkspace: TFormWorkspace
   end
   object PanelRadioGroup: TPanel
     Left = 8
-    Height = 155
+    Height = 328
     Top = 296
     Width = 384
     Align = alClient
@@ -114,7 +114,7 @@ object FormWorkspace: TFormWorkspace
     ChildSizing.ShrinkVertical = crsHomogenousChildResize
     ChildSizing.Layout = cclLeftToRightThenTopToBottom
     ChildSizing.ControlsPerLine = 4
-    ClientHeight = 155
+    ClientHeight = 328
     ClientWidth = 384
     Constraints.MinHeight = 80
     TabOrder = 1
@@ -122,7 +122,7 @@ object FormWorkspace: TFormWorkspace
       AnchorSideLeft.Side = asrBottom
       AnchorSideTop.Side = asrBottom
       Left = 0
-      Height = 147
+      Height = 320
       Top = 4
       Width = 251
       AutoFill = True
@@ -135,7 +135,7 @@ object FormWorkspace: TFormWorkspace
       ChildSizing.ShrinkVertical = crsScaleChilds
       ChildSizing.Layout = cclLeftToRightThenTopToBottom
       ChildSizing.ControlsPerLine = 2
-      ClientHeight = 127
+      ClientHeight = 300
       ClientWidth = 247
       Columns = 2
       ItemIndex = 0
@@ -150,7 +150,7 @@ object FormWorkspace: TFormWorkspace
     end
     object Image1: TImage
       Left = 255
-      Height = 147
+      Height = 320
       Top = 4
       Width = 129
       AutoSize = True
@@ -792,7 +792,7 @@ object FormWorkspace: TFormWorkspace
   object PanelButtons: TPanel
     Left = 0
     Height = 78
-    Top = 459
+    Top = 632
     Width = 400
     Align = alBottom
     BevelOuter = bvNone
@@ -911,12 +911,22 @@ object FormWorkspace: TFormWorkspace
     object CheckBoxPIE: TCheckBox
       Left = 120
       Height = 19
-      Top = 47
+      Top = 53
       Width = 153
       Anchors = [akTop, akRight]
       Caption = 'Enable PIE [Target >= 21]'
       OnClick = CheckBoxPIEClick
       TabOrder = 3
+    end
+    object CheckBoxLibrary: TCheckBox
+      Left = 5
+      Height = 19
+      Top = 52
+      Width = 56
+      Caption = 'Library'
+      OnClick = CheckBoxLibraryClick
+      TabOrder = 4
+      Visible = False
     end
   end
   object Panel1: TPanel
@@ -1194,9 +1204,6 @@ object FormWorkspace: TFormWorkspace
         Width = 122
         Align = alClient
         Items.Strings = (
-          '10'
-          '11'
-          '12'
           '13'
           '14'
           '15'

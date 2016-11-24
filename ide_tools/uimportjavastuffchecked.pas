@@ -16,6 +16,7 @@ type
     BitBtn1: TBitBtn;
     BitBtn2: TBitBtn;
     CheckGroupImport: TCheckGroup;
+    ScrollBox1: TScrollBox;
     StatusBar1: TStatusBar;
     procedure FormCreate(Sender: TObject);
   private

@@ -16,7 +16,7 @@
         <CustomOptions Value="$(IDEBuildOptions)"/>
       </Other>
     </CompilerOptions>
-    <Files Count="28">
+    <Files Count="30">
       <Item1>
         <Filename Value="amw_ide_menu_items.pas"/>
         <HasRegisterProc Value="True"/>
@@ -127,6 +127,14 @@
       <Item28>
         <AddToUsesPkgSection Value="False"/>
       </Item28>
+      <Item29>
+        <Filename Value="uimportcstuff.lfm"/>
+        <Type Value="LFM"/>
+      </Item29>
+      <Item30>
+        <Filename Value="uimportcstuff.pas"/>
+        <UnitName Value="uimportcstuff"/>
+      </Item30>
     </Files>
     <RequiredPkgs Count="3">
       <Item1>

@@ -515,17 +515,14 @@ type
 
     function GetByteBufferFromBitmap(_bmap: jObject): jObject; overload;
     function GetByteBufferFromBitmap(): jObject; overload;
-
     function GetDirectBufferAddress(byteBuffer: jObject): PJByte;
 
   published
     property FilePath: TFilePath read FFilePath write FFilePath;
     property ImageIndex: TImageListIndex read FImageIndex write SetImageIndex default -1;
     property Images    : jImageList read FImageList write SetImages;     //by jmpessoa
-
     property ImageIdentifier: string read FImageName write SetImageIdentifier;
     //property ImageName: string read FImageName write SetImageName;
-
     property  Width   : integer           read FWidth      write FWidth;
     property  Height  : integer           read FHeight     write FHeight;
   end;
@@ -1384,6 +1381,7 @@ type
     Procedure UpdateLayout; override;
 
     Procedure Navigate(url: string);
+    Procedure LoadFromHtmlFile(environmentDirectoryPath: string; htmlFileName: string);
     procedure SetHttpAuthUsernamePassword(_hostName: string; _domain: string; _username: string; _password: string);
 
   published
@@ -7334,6 +7332,14 @@ begin
   if not FInitialized then Exit;
   jWebView_loadURL(FjEnv, FjObject , url);
 end;
+
+Procedure jWebView.LoadFromHtmlFile(environmentDirectoryPath: string; htmlFileName: string);
+var
+  path: string;
+begin;
+   Navigate('file://'+environmentDirectoryPath+'/'+htmlFileName);
+end;
+
 
 procedure jWebView.UpdateLParamWidth;
 var

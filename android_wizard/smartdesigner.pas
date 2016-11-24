@@ -58,10 +58,9 @@ type
     procedure UpdateProjectStartModule(const NewName: string);
   end;
 
-
-// tk ReplaceChar made public
-function ReplaceChar(const query: string; oldchar, newchar: char): string;
-// end tk
+  // tk ReplaceChar made public
+  function ReplaceChar(const query: string; oldchar, newchar: char): string;
+  // end tk
 
 var
   LamwSmartDesigner: TLamwSmartDesigner;
@@ -69,8 +68,7 @@ var
 implementation
 
 uses
-  Controls, Dialogs, SrcEditorIntf, LazIDEIntf, IDEMsgIntf, IDEExternToolIntf,
-  CodeToolManager, CodeTree,
+  Controls, Dialogs, SrcEditorIntf, LazIDEIntf, IDEMsgIntf, IDEExternToolIntf, CodeToolManager, CodeTree,
   CodeCache, SourceChanger, LinkScanner, Laz2_DOM, laz2_XMLRead, FileUtil,
   LazFileUtils, LamwSettings, uJavaParser, strutils;
 
@@ -831,6 +829,7 @@ var
 begin
   Result := mrOk;
   if not LazarusIDE.ActiveProject.CustomData.Contains('LAMW') then Exit;
+  if LazarusIDE.ActiveProject.CustomData.Values['LAMW'] <> 'GUI' then Exit;
 
   PathToJavaTemplates := LamwGlobalSettings.PathToJavaTemplates;   //included path delimiter
   UpdateStartModuleVarName;
@@ -858,9 +857,11 @@ begin
     for j:= 0 to libList.Count-1 do
     begin
       aux:= ExtractFileName(libList.Strings[j]);
+
       // tk Show what library has been added
       IDEMessagesWindow.AddCustomMessage(mluVerbose, 'Found library: ' + aux);
       // end tk
+
       p:= Pos('.', aux);
       aux:= Trim(copy(aux,4, p-4));
       auxList.Add(aux);
