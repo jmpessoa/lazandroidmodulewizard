@@ -3138,7 +3138,7 @@ begin
 
   jEditText_setParent(FjEnv, FjObject , FjPRLayout);
 
-  jEditText_setId(FjEnv, FjObject , FId);
+  jEditText_setId(FjEnv, FjObject , Self.Id);
 
   jEditText_setLeftTopRightBottomWidthHeight(FjEnv, FjObject ,
                                            FMarginLeft,FMarginTop,FMarginRight,FMarginBottom,
@@ -4333,7 +4333,11 @@ begin
     jRadioButton_setParent2(FjEnv, FjObject , FjPRLayout);
   end;
 
-  if  Self.Id = 0 then Self.Id:= Random(10000000);
+  // tk
+  if (Self.Id = 0) or Self.IDExistsInParent then
+    Self.AssignNewId;
+  //if  Self.Id = 0 then Self.Id:= Random(10000000);
+  // end tk
 
   jRadioButton_setId(FjEnv, FjObject , Self.Id);
 

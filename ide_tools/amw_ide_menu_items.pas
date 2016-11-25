@@ -23,7 +23,7 @@ procedure Register;
 
 implementation
 
-uses LazIDEIntf, CompOptsIntf, IDEMsgIntf, IDEExternToolIntf, ProjectIntf,
+uses LazIDEIntf, LazFileUtils, CompOptsIntf, IDEMsgIntf, IDEExternToolIntf, ProjectIntf,
   Controls, ApkBuild, IniFiles;
 
 

@@ -60,6 +60,10 @@ type
     procedure OnPersistentDeleted;
     procedure OnPersistentDeleting(APersistent: TPersistent);
     procedure OnSetSelection(const ASelection: TPersistentSelectionList);
+    // tk
+    procedure OnAutoAssignIDs(Sender: TObject);
+    procedure SetRoot(const AValue: TComponent); override;
+    // end tk
   public
 
     //needed by the lazarus form editor
@@ -1047,6 +1051,20 @@ begin
   FSelection.Clear;
   for i := 0 to ASelection.Count - 1 do
     FSelection.Add(ASelection[i]);
+end;
+
+procedure TAndroidWidgetMediator.OnAutoAssignIDs(Sender: TObject);
+begin
+  if (Sender is TAndroidForm) and (Sender as TAndroidForm).AutoAssignIDs then
+    if QuestionDlg('LAMW', 'Reassign Id properties now (otherwise they will be reassigned on next form open)?', mtConfirmation, [mrYes, mrNo], 0) = mrYes then
+      (Sender as TAndroidForm).ReassignIds;
+end;
+
+procedure TAndroidWidgetMediator.SetRoot(const AValue: TComponent);
+begin
+  inherited SetRoot(AValue);
+  if AValue is jForm then
+    jForm(AValue).OnAutoAssignIDs := @OnAutoAssignIDs;
 end;
 
 function TAndroidWidgetMediator.GetAndroidForm: jForm;

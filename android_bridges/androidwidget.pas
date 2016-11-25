@@ -776,6 +776,8 @@ type
     property jSelf: jObject read FjObject;
   end;
 
+  { TAndroidWidget }
+
   TAndroidWidget = class(jControl)
   private
     FLeft: integer;
@@ -809,7 +811,7 @@ type
     FVisible: boolean;
     FAcceptChildrenAtDesignTime: boolean;
 
-    procedure SetParent(const AValue: TAndroidWidget);
+    procedure SetParent(const AValue: TAndroidWidget); virtual;
     procedure Notification(AComponent: TComponent; Operation: TOperation); override;
     procedure InternalInvalidateRect({%H-}ARect: TRect; {%H-}Erase: boolean); virtual;
     procedure SetName(const NewName: TComponentName); override;
@@ -833,6 +835,10 @@ type
     procedure SetBounds(NewLeft, NewTop, NewWidth, NewHeight: integer); virtual;
     procedure InvalidateRect(ARect: TRect; Erase: boolean);
     procedure Invalidate;
+
+    // tk
+    procedure ReassignIDs; virtual;
+    // end tk
 
     property AcceptChildrenAtDesignTime:boolean read FAcceptChildrenAtDesignTime;
     property Parent: TAndroidWidget read FParent write SetParent;
@@ -861,11 +867,17 @@ type
 
   TAndroidForm = class(TAndroidWidget)
   private
+    FAutoAssignIDs: Boolean;
     FDesigner: IAndroidWidgetDesigner;
     FOnCreate: TNotifyEvent;
     FOnDestroy: TNotifyEvent;
+    FOnAutoAssignIDs: TNotifyEvent;
+    procedure SetAutoAssignIDs(AValue: Boolean);
   protected
     procedure InternalInvalidateRect(ARect: TRect; Erase: boolean); override;
+    // tk
+    procedure Loaded; override;
+    // end tk
   public
     constructor CreateNew(AOwner: TComponent);
     constructor Create(AOwner: TComponent); override;
@@ -876,7 +888,13 @@ type
     procedure AfterConstruction; override;
     procedure BeforeDestruction; override;
     property Designer: IAndroidWidgetDesigner read FDesigner write FDesigner;
+    // tk
+    property OnAutoAssignIDs: TNotifyEvent read FOnAutoAssignIDs write FOnAutoAssignIDs;
+    // end tk
   published
+    // tk
+    property AutoAssignIDs: Boolean read FAutoAssignIDs write SetAutoAssignIDs default False;
+    // end tk
     property OnCreate: TNotifyEvent read FOnCreate write FOnCreate;
     property OnDestroy: TNotifyEvent read FOnDestroy write FOnDestroy;
   end;
@@ -1209,9 +1227,21 @@ type
 
     function GetView: jObject; virtual;
 
+    // tk
+    function InternalIDExistsInParent(const ID: DWord): Boolean; virtual;
+    function InternalIDExistsInChildren(const ID: DWord): Boolean; virtual;
+    function InternalNewIDFromParent: DWord; virtual;
+    procedure SetParent(const AValue: TAndroidWidget); override;
+    // end tk
+
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
+
+    // tk
+    procedure AssignNewId; virtual;
+    function IDExistsInParent: Boolean; virtual;
+    // end tk
 
     procedure Init(refApp: jApp); override;
     procedure UpdateLayout; virtual;
@@ -2017,6 +2047,26 @@ begin
         Proc(Components[i]);
 end;
 
+procedure TAndroidWidget.ReassignIDs;
+var
+  I: Integer;
+  Widget: TAndroidWidget;
+  NewID: DWord;
+begin
+  // Reassign IDs when holes found, this makes 'nice' IDs from those assigned by older LAMW versions
+  NewID := 1;
+  for I := 0 to ChildCount - 1 do
+  begin
+    Widget := Children[I];
+    if Widget is jVisualControl then
+    begin
+      jVisualControl(Widget).FId := NewId; // directly set property value
+      Inc(NewId);
+    end;
+    Widget.ReassignIDs; // reassign IDs for all children
+  end;
+end;
+
 function TAndroidWidget.ChildCount: integer;
 begin
   Result:=FChilds.Count;
@@ -2090,9 +2140,19 @@ begin
 end;
 
 //
-Destructor jVisualControl.Destroy;
+destructor jVisualControl.Destroy;
 begin
   inherited Destroy;
+end;
+
+procedure jVisualControl.AssignNewId;
+begin
+  ID := InternalNewIDFromParent;
+end;
+
+function jVisualControl.IDExistsInParent: Boolean;
+begin
+  Result := InternalIDExistsInParent(ID);
 end;
 
 
@@ -2138,6 +2198,8 @@ begin
      begin
         Value.FreeNotification(Self);
 
+        // tk
+(*
         if Value.Initialized then  //added to run time component create!
         begin
           if Value.Id = 0 then
@@ -2156,9 +2218,18 @@ begin
           //Randomize;
           Value.Id:= Random(10000000);  //warning: remember the law of Murphi...
         end;
+*)
+        // end tk
 
      end;
   end;
+end;
+
+procedure jVisualControl.SetParent(const AValue: TAndroidWidget);
+begin
+  inherited SetParent(AValue);
+  if (ID = 0) or IDExistsInParent then
+    AssignNewId;
 end;
 
 procedure jVisualControl.SetParentComponent(Value: TComponent);
@@ -2180,6 +2251,58 @@ end;
 function jVisualControl.GetView: jObject;
 begin
   Result:= FjObject;
+end;
+
+function jVisualControl.InternalIDExistsInParent(const ID: DWord): Boolean;
+var
+  I: Integer;
+  Widget: TAndroidWidget;
+begin
+  Result := False;
+  if HasParent then
+  begin
+    for I := 0 to Parent.ChildCount - 1 do
+    begin
+      Widget := Parent.Children[I];
+      if (Widget is jVisualControl) and (Widget <> Self) then
+        if jVisualControl(Widget).Id = ID then
+          Exit(True);
+    end;
+  end;
+end;
+
+function jVisualControl.InternalIDExistsInChildren(const ID: DWord): Boolean;
+var
+  I: Integer;
+  Widget: TAndroidWidget;
+begin
+  Result := False;
+  for I := 0 to ChildCount - 1 do
+  begin
+    Widget := Children[I];
+    if Widget is jVisualControl then
+      if jVisualControl(Widget).Id = ID then
+        Exit(True);
+  end;
+end;
+
+function jVisualControl.InternalNewIDFromParent: DWord;
+var
+  I: Integer;
+  Widget: TAndroidWidget;
+  MaxID: DWord;
+begin
+  MaxID := 0;
+  if HasParent then
+  begin
+    for I := 0 to Parent.ChildCount - 1 do
+    begin
+      Widget := Parent.Children[I];
+      if (Widget is jVisualControl) and (Widget <> Self) then
+        MaxID := Max(MaxID, jVisualControl(Widget).Id);
+    end;
+  end;
+  Result := MaxID + 1;
 end;
 
 function jVisualControl.GetWidth: integer;
@@ -2219,9 +2342,14 @@ end;
 
 procedure jVisualControl.SetId(_id: DWord);
 begin
-  FId:= _id;
+  // tk
+  if InternalIDExistsInParent(_id) then
+    FId := InternalNewIDFromParent // silently assign a new ID
+  else
+    FId:= _id;
+  // end tk
   if FInitialized then
-      View_SetId(FjEnv, FjObject, FId);
+    View_SetId(FjEnv, FjObject, FId);
 end;
 
 
@@ -2278,6 +2406,9 @@ constructor TAndroidForm.Create(AOwner: TComponent);
 begin
   CreateNew(AOwner); //no stream loaded yet.
   FAcceptChildrenAtDesignTime:= True;
+  // tk
+  FAutoAssignIDs := False;
+  // end tk
 end;
 
 destructor TAndroidForm.Destroy;
@@ -2305,10 +2436,25 @@ begin
      if Assigned(FOnDestroy) then FOnDestroy(Self);
 end;
 
+procedure TAndroidForm.SetAutoAssignIDs(AValue: Boolean);
+begin
+  if FAutoAssignIDs=AValue then Exit;
+  FAutoAssignIDs:=AValue;
+  if Assigned(FOnAutoAssignIDs) then
+    FOnAutoAssignIDs(Self);
+end;
+
 procedure TAndroidForm.InternalInvalidateRect(ARect: TRect; Erase: boolean);
 begin
  if (Parent=nil) and (Designer<>nil) then
    Designer.InvalidateRect(Self,ARect,Erase);
+end;
+
+procedure TAndroidForm.Loaded;
+begin
+  inherited Loaded;
+  if AutoAssignIDs and (csDesigning in ComponentState) then
+    ReassignIDs;
 end;
 
 { jForm }
@@ -2494,28 +2640,28 @@ begin
   Result:= jForm_GetDateTime(FjEnv,FjObject);
 end;
 
-Procedure jForm.SetEnabled(Value: Boolean);
+procedure jForm.SetEnabled(Value: Boolean);
 begin
   FEnabled:= Value;
   if FInitialized then
     jForm_SetEnabled2(FjEnv, FjObject, FEnabled);
 end;
 
-Procedure jForm.SetVisible(Value: Boolean);
+procedure jForm.SetVisible(Value: Boolean);
 begin
  FVisible:= Value;
  if FInitialized then
    jForm_SetVisibility2(FjEnv, FjObject, FVisible);
 end;
 
-Procedure jForm.SetColor(Value: TARGBColorBridge);
+procedure jForm.SetColor(Value: TARGBColorBridge);
 begin
   FColor:= Value;
   if (FInitialized = True) and (FColor <> colbrDefault)  then
       View_SetBackGroundColor(FjEnv, FjRLayout,GetARGB(FCustomColor, FColor));
 end;
 
-Procedure jForm.UpdateLayout;
+procedure jForm.UpdateLayout;
 var
   i: integer;
 begin
@@ -2528,7 +2674,7 @@ begin
   end;
 end;
 
-Procedure jForm.Show;
+procedure jForm.Show;
 begin
   if not FInitialized then Exit;
   if FVisible then Exit;
@@ -2544,7 +2690,7 @@ begin
   if Assigned(FOnJNIPrompt) then FOnJNIPrompt(Self);    //*****
 end;
 
-Procedure jForm.DoJNIPrompt;
+procedure jForm.DoJNIPrompt;
 begin
   if not FInitialized then Exit;
   if Assigned(FOnJNIPrompt) then FOnJNIPrompt(Self);    //*****
@@ -2618,26 +2764,26 @@ begin
 
 end;
 
-Procedure jForm.Refresh;
+procedure jForm.Refresh;
 begin
   if FInitialized then
     View_Invalidate(FjEnv, Self.View);
 end;
 
-Procedure jForm.SetCloseCallBack(func : TOnNotify; Sender : TObject);
+procedure jForm.SetCloseCallBack(Func: TOnNotify; Sender: TObject);
 begin
   FCloseCallBack.Event:= func;
   FCloseCallBack.Sender:= Sender;
 end;
 
-Procedure jForm.SetCloseCallBack(func : TOnCallBackData; Sender : TObject);
+procedure jForm.SetCloseCallBack(Func: TOnCallBackData; Sender: TObject);
 begin
   FCloseCallBack.EventData:= func;
   FCloseCallBack.Sender:= Sender;
 end;
 
 // Event : Java -> Pascal
-Procedure jForm.GenEvent_OnClick(Obj: TObject);
+procedure jForm.GenEvent_OnClick(Obj: TObject);
 begin
   if Assigned(FOnClick) then FOnClick(Obj);
 end;
@@ -2654,14 +2800,15 @@ begin
     Result:= jForm_GetOnListItemClickListener(FjEnv, jObjForm);
 end;
 
-Procedure jForm.GenEvent_OnListItemClick(jObjAdapterView: jObject; jObjView: jObject; position: integer; Id: integer);
+procedure jForm.GenEvent_OnListItemClick(jObjAdapterView: jObject;
+  jObjView: jObject; position: integer; Id: integer);
 begin
   if FInitialized then
     if Assigned(FOnListItemClick) then FOnListItemClick(jObjAdapterView, jObjView,position,Id);
 end;
 
 
-Procedure jForm.GenEvent_OnViewClick(jObjView: jObject; Id: integer);
+procedure jForm.GenEvent_OnViewClick(jObjView: jObject; Id: integer);
 begin
    if Assigned(FOnViewClick) then FOnViewClick(jObjView,Id);
 end;
