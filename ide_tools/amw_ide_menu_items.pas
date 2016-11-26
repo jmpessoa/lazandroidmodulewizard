@@ -23,8 +23,8 @@ procedure Register;
 
 implementation
 
-uses LazIDEIntf, LazFileUtils, CompOptsIntf, IDEMsgIntf, IDEExternToolIntf, ProjectIntf,
-  Controls, ApkBuild, IniFiles;
+uses LazIDEIntf, LazFileUtils, CompOptsIntf, IDEMsgIntf, IDEExternToolIntf,
+  ProjectIntf, MacroIntf, Controls, ApkBuild, IniFiles;
 
 
 procedure StartFPCTrunkSource(Sender: TObject);
@@ -243,9 +243,8 @@ end;
 
 procedure MakePascalInterface(pathToProject: string; fileName_h: string; libName: string);
 var
-  pathToLamwIdeTools: string;
   fileName_pp: string;
-  pathToHFile: string;
+  pathToHFile, pathToH2PAS: string;
   AProcess: TProcess;
   auxList: TStringList;
   flag: boolean;
@@ -256,35 +255,18 @@ begin
   mylib:= 'lib'+libName+'.so';
 
   pathToHFile:= pathToProject+libName;
-  pathToLamwIdeTools:= GetPathToLamwWizard(AppendPathDelim(LazarusIDE.GetPrimaryConfigPath) + 'JNIAndroidProject.ini')+DirectorySeparator+ 'ide_tools';
-  {$IFDEF Windows}
-  if not FileExists(pathToLamwIdeTools + DirectorySeparator + 'h2pas.exe') then Exit;
-  {$Endif}
-  {$IFDEF Linux}
-  if not FileExists(pathToLamwIdeTools + DirectorySeparator + 'h2pas') then
+  pathToH2PAS := '$Path($(CompPath))h2pas$(ExeExt)';
+  IDEMacros.SubstituteMacros(pathToH2PAS);
+  if not FileExists(pathToH2PAS) then
   begin
-     ShowMessage(pathToLamwIdeTools + DirectorySeparator + 'h2pas not found!');
-     Exit;
-  end;
-  {$Endif}
-  {$IFDEF Darwin}
-  if not FileExists(pathToLamwIdeTools + DirectorySeparator + 'h2pas.app') then
-  begin
-    ShowMessage(pathToLamwIdeTools + DirectorySeparator + 'h2pas not found!');
+    ShowMessage(pathToH2PAS + ' not found!');
     Exit;
-  end
-  {$Endif}
+  end;
   try
     flag:= False;
     AProcess:= TProcess.Create(nil);
     AProcess.CurrentDirectory:= pathToHFile;
-    AProcess.Executable:= pathToLamwIdeTools+DirectorySeparator+'h2pas.exe';
-    {$IFDEF Linux}
-    AProcess.Executable:= pathHtoPas+DirectorySeparator+'h2pas';
-    {$Endif}
-    {$IFDEF Darwin}
-    AProcess.Executable:= pathHtoPas+DirectorySeparator+'h2pas.app';
-    {$Endif}
+    AProcess.Executable:= pathToH2PAS;
     AProcess.Parameters.Add(fileName_h); // .h
     AProcess.Options:= AProcess.Options + [poWaitOnExit];
     AProcess.Execute;      //produce .pp
