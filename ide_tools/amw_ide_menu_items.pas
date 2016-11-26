@@ -263,14 +263,14 @@ begin
   {$IFDEF Linux}
   if not FileExists(pathToLamwIdeTools + DirectorySeparator + 'h2pas') then
   begin
-     ShowMessage(pathToLamwIdeTools + DirectorySeparator + 'h2pas' not found!);
+     ShowMessage(pathToLamwIdeTools + DirectorySeparator + 'h2pas not found!');
      Exit;
   end;
   {$Endif}
   {$IFDEF Darwin}
   if not FileExists(pathToLamwIdeTools + DirectorySeparator + 'h2pas.app') then
   begin
-    ShowMessage(pathToLamwIdeTools + DirectorySeparator + 'h2pas' not found!);
+    ShowMessage(pathToLamwIdeTools + DirectorySeparator + 'h2pas not found!');
     Exit;
   end
   {$Endif}
