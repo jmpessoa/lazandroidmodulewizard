@@ -364,7 +364,7 @@ begin
        if pathToImportHcode <> '' then
        begin
           list:= FindAllFiles(pathToImportHcode, '*.h', False);
-          if not FormImportCStuff.CheckBoxAllC.Checked then
+          if not FormImportCStuff.CheckBoxAllH.Checked then
           begin
             FormImportJavaStuffChecked:= TFormImportJavaStuffChecked.Create(Application);
 
