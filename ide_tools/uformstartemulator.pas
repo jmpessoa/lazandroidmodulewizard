@@ -5,7 +5,7 @@ unit uFormStartEmulator;
 interface
 
 uses
-  {$ifdef Windows}Windows,{$endif}
+  {$ifdef Windows}Windows{$else}XWindow{$endif},
   Classes, SysUtils, process, FileUtil, Forms, Controls, Graphics, Dialogs,
   Grids, ExtCtrls, Buttons, ActnList;
 
@@ -50,11 +50,7 @@ type
 var
   frmStartEmulator: TfrmStartEmulator;
 
-{$ifdef Windows}
 function FindEmulatorWindows(_para1: HWND; _para2: LPARAM): WINBOOL; stdcall;
-{$else}
-procedure GetEmulatorWindows(RunProc: TRunAndGetOutputProc; emul_wnds: TStrings);
-{$endif}
 
 implementation
 
@@ -64,50 +60,20 @@ uses LazFileUtils, UTF8Process;
 
 { TfrmStartEmulator }
 
-{$ifdef Windows}
 function FindEmulatorWindows(_para1: HWND; _para2: LPARAM): WINBOOL; stdcall;
 var s: string;
 begin
   SetLength(s, 255);
+  {$ifdef windows}
   GetClassName(_para1, PChar(s), Length(s));
   if PChar(s) = 'SDL_app' then
+  {$endif}
   begin
     GetWindowText(_para1, PChar(s), Length(s));
     TStrings(_para2).AddObject(PChar(s), TObject(_para1));
   end;
   Result := True;
 end;
-{$else}
-procedure GetEmulatorWindows(RunProc: TRunAndGetOutputProc; emul_wnds: TStrings);
-var
-  i: Integer;
-  str: string;
-  sl: TStringList;
-  hwnd: PtrUInt;
-begin
-  try
-    sl := TStringList.Create;
-    try
-      RunProc('xwininfo', '-root' + sLineBreak + '-tree', sl);
-      for i := 0 to sl.Count - 1 do
-      begin
-        str := sl[i];
-        if Pos('("emulator', str) > 0 then
-        begin
-          Delete(str, 1, Pos('0x', str) + 1);
-          hwnd := PtrUInt(StrToInt64('$' + Copy(str, 1, Pos(' ', str) - 1)));
-          Delete(str, 1, Pos('"', str));
-          emul_wnds.AddObject(Copy(str, 1, Pos('"', str) - 1), TObject(hwnd));
-        end;
-      end;
-    finally
-      sl.Free;
-    end;
-  except
-    emul_wnds.Clear;
-  end;
-end;
-{$endif}
 
 function TfrmStartEmulator.GetAvdState(Index: Integer): TAvdState;
 var
@@ -240,11 +206,7 @@ begin
     if Trim(avds[i]) = '' then avds.Delete(i);
   FRun(AppendPathDelim(FSDKPath) + 'platform-tools' + PathDelim + 'adb', 'devices', devs);
   DrawGrid1.RowCount := avds.Count + 1 + Ord(avds.Count = 0);
-  {$ifdef WINDOWS}
   EnumWindows(@FindEmulatorWindows, LPARAM(emul_wnds));
-  {$else}
-  GetEmulatorWindows(FRun, emul_wnds);
-  {$endif}
   DrawGrid1.Invalidate;
 end;
 

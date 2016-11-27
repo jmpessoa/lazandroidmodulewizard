@@ -1,14 +1,11 @@
 unit ApkBuild;
 
-{ TODO:
-    - implement TApkBuilder.BringToFrontEmulator for linux }
-
 {$mode objfpc}{$H+}
 
 interface
 
 uses
-  {$ifdef Windows}Windows,{$endif}
+  {$ifdef Windows}Windows{$else}XWindow{$endif},
   Classes, SysUtils, ProjectIntf, Forms, LamwSettings, LCLVersion;
 
 type
@@ -481,9 +478,7 @@ begin
   if Pos('emulator-', FDevice) <> 1 then Exit;
   emul_win := TStringList.Create;
   try
-    {$ifdef Windows}
     EnumWindows(@FindEmulatorWindows, LPARAM(emul_win));
-    {$endif}
     str := FDevice;
     Delete(str, 1, Pos('-', str));
     i := 1;
@@ -492,9 +487,7 @@ begin
     for i := 0 to emul_win.Count - 1 do
       if Pos(str, emul_win[i]) = 1 then
       begin
-        {$ifdef Windows}
         SetForegroundWindow(HWND(emul_win.Objects[i]));
-        {$endif}
         Break;
       end;
   finally
