@@ -10,15 +10,15 @@ object frmStartEmulator: TfrmStartEmulator
   Position = poScreenCenter
   LCLVersion = '1.7'
   object Panel1: TPanel
-    Left = 224
+    Left = 217
     Height = 242
     Top = 0
-    Width = 96
+    Width = 103
     Align = alRight
     AutoSize = True
     BevelOuter = bvNone
     ClientHeight = 242
-    ClientWidth = 96
+    ClientWidth = 103
     TabOrder = 0
     object BitBtn1: TBitBtn
       AnchorSideLeft.Control = Panel1
@@ -29,7 +29,7 @@ object frmStartEmulator: TfrmStartEmulator
       Left = 6
       Height = 26
       Top = 38
-      Width = 84
+      Width = 91
       Action = acStart
       Anchors = [akTop, akLeft, akRight]
       AutoSize = True
@@ -75,11 +75,14 @@ object frmStartEmulator: TfrmStartEmulator
     object BitBtn2: TBitBtn
       AnchorSideLeft.Control = Panel1
       AnchorSideTop.Control = Panel1
+      AnchorSideRight.Control = Panel1
+      AnchorSideRight.Side = asrBottom
       Left = 6
       Height = 26
       Top = 6
-      Width = 84
+      Width = 91
       Action = acRefresh
+      Anchors = [akTop, akLeft, akRight]
       AutoSize = True
       BorderSpacing.Around = 6
       Glyph.Data = {
@@ -118,9 +121,9 @@ object frmStartEmulator: TfrmStartEmulator
         FF00FFFFFF00A465341DA7693A9FA76A3ADEA56736F6A76939E5A76A3ABCA465
         3453A4653405FFFFFF00FFFFFF00FFFFFF00A4653479A4653410
       }
-      TabOrder = 1
+      TabOrder = 4
     end
-    object BitBtn3: TBitBtn
+    object bbOK: TBitBtn
       AnchorSideLeft.Control = Panel1
       AnchorSideTop.Side = asrBottom
       AnchorSideRight.Control = Panel1
@@ -129,7 +132,7 @@ object frmStartEmulator: TfrmStartEmulator
       Left = 6
       Height = 26
       Top = 178
-      Width = 84
+      Width = 91
       Anchors = [akLeft, akRight, akBottom]
       AutoSize = True
       BorderSpacing.Around = 6
@@ -149,7 +152,7 @@ object frmStartEmulator: TfrmStartEmulator
       Left = 6
       Height = 26
       Top = 210
-      Width = 84
+      Width = 91
       Anchors = [akLeft, akRight, akBottom]
       AutoSize = True
       BorderSpacing.Around = 6
@@ -157,6 +160,23 @@ object frmStartEmulator: TfrmStartEmulator
       Kind = bkCancel
       ModalResult = 2
       TabOrder = 3
+    end
+    object bbAvdManager: TBitBtn
+      AnchorSideLeft.Control = Panel1
+      AnchorSideTop.Control = BitBtn1
+      AnchorSideTop.Side = asrBottom
+      AnchorSideRight.Control = Panel1
+      AnchorSideRight.Side = asrBottom
+      Left = 6
+      Height = 23
+      Top = 70
+      Width = 91
+      Anchors = [akTop, akLeft, akRight]
+      AutoSize = True
+      BorderSpacing.Around = 6
+      Caption = 'AVD manager'
+      OnClick = bbAvdManagerClick
+      TabOrder = 1
     end
   end
   object DrawGrid1: TDrawGrid
@@ -168,7 +188,7 @@ object frmStartEmulator: TfrmStartEmulator
     Left = 6
     Height = 230
     Top = 6
-    Width = 212
+    Width = 205
     Anchors = [akTop, akLeft, akRight, akBottom]
     AutoFillColumns = True
     BorderSpacing.Around = 6
@@ -176,11 +196,11 @@ object frmStartEmulator: TfrmStartEmulator
     Columns = <    
       item
         Title.Caption = 'Name'
-        Width = 96
+        Width = 100
       end    
       item
         Title.Caption = 'State'
-        Width = 96
+        Width = 101
       end>
     ExtendedSelect = False
     FixedCols = 0
@@ -188,8 +208,8 @@ object frmStartEmulator: TfrmStartEmulator
     TabOrder = 1
     OnDrawCell = DrawGrid1DrawCell
     ColWidths = (
-      96
-      96
+      100
+      101
     )
   end
   object ActionList1: TActionList

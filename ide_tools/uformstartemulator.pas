@@ -22,14 +22,16 @@ type
     ActionList1: TActionList;
     BitBtn1: TBitBtn;
     BitBtn2: TBitBtn;
-    BitBtn3: TBitBtn;
+    bbOK: TBitBtn;
     BitBtn4: TBitBtn;
+    bbAvdManager: TBitBtn;
     DrawGrid1: TDrawGrid;
     Panel1: TPanel;
     Timer1: TTimer;
     procedure acRefreshExecute(Sender: TObject);
     procedure acStartExecute(Sender: TObject);
     procedure acStartUpdate(Sender: TObject);
+    procedure bbAvdManagerClick(Sender: TObject);
     procedure DrawGrid1DrawCell(Sender: TObject; aCol, aRow: Integer;
       aRect: TRect; {%H-}aState: TGridDrawState);
     procedure Timer1Timer(Sender: TObject);
@@ -54,7 +56,7 @@ function FindEmulatorWindows(_para1: HWND; _para2: LPARAM): WINBOOL; stdcall;
 
 implementation
 
-uses LazFileUtils, UTF8Process;
+uses LazFileUtils, UTF8Process, LamwSettings;
 
 {$R *.lfm}
 
@@ -140,9 +142,24 @@ begin
     and (GetAvdState(DrawGrid1.Row - 1) = asOffLine);
 end;
 
+procedure TfrmStartEmulator.bbAvdManagerClick(Sender: TObject);
+begin
+  with TProcessUTF8.Create(nil) do
+  try
+    Executable := LamwGlobalSettings.PathToAndroidSDK + 'tools'
+      + PathDelim + 'android' {$ifdef windows} + '.bat'{$endif};
+    Parameters.Add('avd');
+    ShowWindow := swoHIDE;
+    Execute;
+  finally
+    Free;
+  end;
+end;
+
 procedure TfrmStartEmulator.acStartExecute(Sender: TObject);
 begin
   StartPushed := DrawGrid1.Row;
+  bbOK.SetFocus;
   with TProcessUTF8.Create(nil) do
   try
     ShowWindow := swoHIDE;
@@ -172,6 +189,8 @@ begin
   devs := TStringList.Create;
   emul_wnds := TStringList.Create;
   GetAVDList;
+  if avds.Count = 0 then
+    ActiveControl := bbAvdManager;
 end;
 
 destructor TfrmStartEmulator.Destroy;
