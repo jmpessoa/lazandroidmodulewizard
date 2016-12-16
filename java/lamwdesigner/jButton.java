@@ -1,4 +1,4 @@
-package com.example.appautocompletetextviewdemo1;
+package com.example.appopenglsurfaceviewdemo1;
 
 import java.lang.reflect.Field;
 
@@ -179,11 +179,11 @@ public class jButton extends Button {
 	}	
 	
 	public  void SetBackgroundByImage(Bitmap _image) {	
-		Drawable d = new BitmapDrawable(controls.activity.getResources(), _image);
-//[ifdef_api16up]
-			//if(Build.VERSION.SDK_INT >= 16) 
-   this.setBackground(d);
-//[endif_api16up]
+	  Drawable d = new BitmapDrawable(controls.activity.getResources(), _image);
+      //[ifdef_api16up]
+	  if(Build.VERSION.SDK_INT >= 16) 
+          this.setBackground(d);
+      //[endif_api16up]
 	}
 		
 	@Override
