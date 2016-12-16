@@ -65,6 +65,7 @@ type
   public
     { public declarations }
     FOk: boolean;
+    FPathTemplatesEdited: boolean;
     procedure LoadSettings(const fileName: string);
     procedure SaveSettings(const fileName: string);
     function GetPrebuiltDirectory: string;
@@ -148,9 +149,22 @@ end;
 
 
 procedure TFormSettingsPaths.FormClose(Sender: TObject; var CloseAction: TCloseAction);
+var
+   fName: string;
 begin
+  fName:= IncludeTrailingPathDelimiter(LazarusIDE.GetPrimaryConfigPath) + 'JNIAndroidProject.ini';
   if FOk then
-    Self.SaveSettings(IncludeTrailingPathDelimiter(LazarusIDE.GetPrimaryConfigPath) + 'JNIAndroidProject.ini' );
+    SaveSettings(fName)
+  else if FPathTemplatesEdited = True then
+       begin
+         with TInifile.Create(fName) do
+         try
+           if EditPathToJavaTemplates.Text <> '' then
+               WriteString('NewProject', 'PathToJavaTemplates', EditPathToJavaTemplates.Text);
+         finally
+           Free;
+         end;
+       end;
 end;
 
 procedure TFormSettingsPaths.FormActivate(Sender: TObject);
@@ -158,15 +172,22 @@ var
   p: integer;
   Pkg: TIDEPackage;
 begin
+  FOk:= False;
+  FPathTemplatesEdited:= False;
+  LoadSettings(IncludeTrailingPathDelimiter(LazarusIDE.GetPrimaryConfigPath) + 'JNIAndroidProject.ini');
   Pkg:=PackageEditingInterface.FindPackageWithName('amw_ide_tools');
   if Pkg<>nil then
-  begin
-    p:= Pos('ide_tools', ExtractFilePath(Pkg.Filename));
-    FPathToTemplatePresumed:= Copy(ExtractFilePath(Pkg.Filename), 1, p-1) + 'java';
+  begin // C:\laz4android\components\androidmodulewizard\ide_tools\  + amw_ide_tools.lpk
+    FPathToTemplatePresumed:= ExtractFilePath(Pkg.Filename);
+    p:= Pos('ide_tools', FPathToTemplatePresumed);
+    FPathToTemplatePresumed:= Copy(FPathToTemplatePresumed, 1, p-1) + 'java';
+    if EditPathToJavaTemplates.Text = '' then
+    begin
+      FPathToJavaTemplates:= FPathToTemplatePresumed;
+      EditPathToJavaTemplates.Text:= FPathToTemplatePresumed;
+      FPathTemplatesEdited:= True;
+    end;
   end;
-  FOk:= False;
-  Self.LoadSettings(IncludeTrailingPathDelimiter(LazarusIDE.GetPrimaryConfigPath) + 'JNIAndroidProject.ini');
-
   {$ifdef windows}
   ComboBoxPrebuild.Items.Add('windows');
   ComboBoxPrebuild.Items.Add('windows-x86_64');
@@ -189,7 +210,6 @@ end;
 
 procedure TFormSettingsPaths.BitBtnCancelClick(Sender: TObject);
 begin
-  FOk:= False;
   Close;
 end;
 
@@ -264,20 +284,17 @@ begin
     with TIniFile.Create(fileName) do
     try
       EditPathToAndroidNDK.Text := ReadString('NewProject','PathToAndroidNDK', '');
-
       FPathToJavaTemplates:= ReadString('NewProject','PathToJavaTemplates', '');
 
       if FPathToJavaTemplates = '' then
       begin
         FPathToJavaTemplates:= FPathToTemplatePresumed;
       end;
+      EditPathToJavaTemplates.Text := FPathToJavaTemplates;
 
       EditPathToJavaJDK.Text := ReadString('NewProject','PathToJavaJDK', '');
       EditPathToAndroidSDK.Text := ReadString('NewProject','PathToAndroidSDK', '');
       EditPathToAntBinary.Text := ReadString('NewProject','PathToAntBin', '');
-
-      EditPathToJavaTemplates.Text := FPathToJavaTemplates;
-
       if ReadString('NewProject','NDK', '') <> '' then
           indexNdk:= StrToInt(ReadString('NewProject','NDK', ''))
       else

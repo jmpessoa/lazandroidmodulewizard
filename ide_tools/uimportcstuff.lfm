@@ -130,8 +130,8 @@ object FormImportCStuff: TFormImportCStuff
     Left = 26
     Height = 15
     Top = 197
-    Width = 186
-    Caption = 'Warnig: ["as is" nedd Android 4.1+]'
+    Width = 193
+    Caption = 'Warning: ["as is" nedd Android 4.1+]'
     ParentColor = False
   end
   object SelectDirectoryDialog1: TSelectDirectoryDialog

@@ -1,12 +1,12 @@
 object FormSettingsPaths: TFormSettingsPaths
-  Left = 527
+  Left = 447
   Height = 520
-  Top = 381
+  Top = 164
   Width = 430
   Anchors = []
   AutoSize = True
   BorderStyle = bsSizeToolWin
-  Caption = 'Android Module Wizard: Path Settings'
+  Caption = 'LAMW: Android Module Wizard: Path Settings'
   ClientHeight = 520
   ClientWidth = 430
   Constraints.MinHeight = 520
@@ -76,7 +76,7 @@ object FormSettingsPaths: TFormSettingsPaths
   OnActivate = FormActivate
   OnClose = FormClose
   Position = poScreenCenter
-  LCLVersion = '1.7'
+  LCLVersion = '1.5'
   object BitBtnOK: TBitBtn
     AnchorSideTop.Side = asrBottom
     AnchorSideRight.Control = Owner
@@ -1053,9 +1053,9 @@ object FormSettingsPaths: TFormSettingsPaths
     Left = 8
     Height = 15
     Top = 234
-    Width = 124
+    Width = 170
     BorderSpacing.Around = 8
-    Caption = 'Path to Java Templates:'
+    Caption = 'Path to [LAMW] Java Templates:'
     ParentColor = False
   end
   object SpBPathToJavaTemplates: TSpeedButton
