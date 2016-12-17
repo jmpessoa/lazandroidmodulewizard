@@ -1,0 +1,114 @@
+object AndroidModule1: TAndroidModule1
+  Left = 300
+  Top = 165
+  Width = 320
+  Height = 400
+  MarginLeft = 0
+  MarginTop = 0
+  MarginRight = 0
+  MarginBottom = 0
+  Text = 'AndroidModule1'
+  ActivityMode = actMain
+  BackgroundColor = colbrDefault
+  ActionBarTitle = abtDefault
+  object jTextView1: jTextView
+    Left = 129
+    Top = 5
+    Width = 61
+    Height = 20
+    MarginLeft = 5
+    MarginTop = 5
+    MarginRight = 5
+    MarginBottom = 5
+    Visible = True
+    Id = 1
+    PosRelativeToAnchor = []
+    PosRelativeToParent = [rpTop, rpCenterHorizontal]
+    LayoutParamWidth = lpWrapContent
+    LayoutParamHeight = lpWrapContent
+    Text = 'jTextView1'
+    Alignment = taLeft
+    Enabled = True
+    BackgroundColor = colbrDefault
+    FontColor = colbrDefault
+    FontSize = 0
+    TextTypeFace = tfNormal
+    FontSizeUnit = unitDefault
+  end
+  object jButton1: jButton
+    Left = 114
+    Top = 34
+    Width = 92
+    Height = 40
+    MarginLeft = 2
+    MarginTop = 4
+    MarginRight = 2
+    MarginBottom = 4
+    Visible = True
+    Anchor = jTextView1
+    Id = 2
+    PosRelativeToAnchor = [raBelow]
+    PosRelativeToParent = [rpCenterHorizontal]
+    LayoutParamWidth = lpOneThirdOfParent
+    LayoutParamHeight = lpWrapContent
+    Text = 'jButton1'
+    BackgroundColor = colbrDefault
+    FontColor = colbrDefault
+    FontSize = 0
+    FontSizeUnit = unitDefault
+    OnClick = jButton1Click
+  end
+  object jImageBtn1: jImageBtn
+    Left = 136
+    Top = 83
+    Width = 48
+    Height = 48
+    MarginLeft = 5
+    MarginTop = 5
+    MarginRight = 5
+    MarginBottom = 5
+    Visible = True
+    Anchor = jButton1
+    Id = 3
+    PosRelativeToAnchor = [raBelow]
+    PosRelativeToParent = [rpCenterHorizontal]
+    LayoutParamWidth = lpWrapContent
+    LayoutParamHeight = lpWrapContent
+    BackgroundColor = colbrDefault
+    Enabled = True
+    ImageUpIdentifier = 'btn1_1'
+    ImageDownIdentifier = 'btn1_2'
+    OnClick = jImageBtn1Click
+  end
+  object jImageBtn2: jImageBtn
+    Left = 267
+    Top = 141
+    Width = 48
+    Height = 48
+    MarginLeft = 5
+    MarginTop = 5
+    MarginRight = 5
+    MarginBottom = 5
+    Visible = True
+    Anchor = jImageBtn1
+    Id = 4
+    PosRelativeToAnchor = [raBelow]
+    PosRelativeToParent = [rpRight]
+    LayoutParamWidth = lpWrapContent
+    LayoutParamHeight = lpWrapContent
+    BackgroundColor = colbrDefault
+    Enabled = True
+    Images = jImageList1
+    IndexImageUp = 1
+    IndexImageDown = 0
+    OnClick = jImageBtn2Click
+  end
+  object jImageList1: jImageList
+    Images.Strings = (
+      'btn_blue.jpg'
+      'btn_red.jpg'
+    )
+    left = 270
+    top = 203
+  end
+end

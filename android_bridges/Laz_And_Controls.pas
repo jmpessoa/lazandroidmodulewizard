@@ -7481,7 +7481,7 @@ begin
        if path <> '' then FImageName:= ExtractFileName(fullFileName)
        else  FImageName:= fullFileName;
 
-       jBitmap_loadFile(FjEnv, FjObject , GetFilePath(FFilePath)+'/'+FImageName);
+       jBitmap_loadFile(FjEnv, FjObject, GetFilePath(FFilePath)+'/'+FImageName);
 
        FWidth:= jBitmap_GetWidth(FjEnv, FjObject );
        FHeight:= jBitmap_GetHeight(FjEnv, FjObject );
@@ -7612,7 +7612,7 @@ begin
       FImageName:= Trim(FImageList.Images.Strings[Value]);
       if  (FImageName <> '') then
       begin
-        jBitmap_loadFile(FjEnv, FjObject , GetFilePath(FFilePath)+'/'+FImageName);
+        jBitmap_loadFile(FjEnv, FjObject, GetFilePath(FFilePath)+'/'+FImageName);
         jBitmap_getWH(FjEnv, FjObject , integer(FWidth),integer(FHeight));
       end;
    end;
@@ -8564,7 +8564,7 @@ begin
   FMarginBottom := 5;
   FMarginRight  := 5;
   FWidth        := 48;
-  FHeight       :=48;
+  FHeight       := 48;
 end;
 
 Destructor jImageBtn.Destroy;
@@ -8590,8 +8590,8 @@ begin
   FjObject := jImageBtn_Create(FjEnv, FjThis, Self);
   FInitialized:= True;
 
-  if FParent <> nil then
-  begin
+//  if FParent <> nil then
+ // begin
     if FParent is jPanel then
     begin
       jPanel(FParent).Init(refApp);
@@ -8612,7 +8612,7 @@ begin
       jCustomDialog(FParent).Init(refApp);
       FjPRLayout:= jCustomDialog(FParent).View;
     end;
-  end;
+  //end;
 
   jImageBtn_setParent(FjEnv, FjObject , FjPRLayout);
   jImageBtn_setId(FjEnv, FjObject , Self.Id);
@@ -8643,7 +8643,8 @@ begin
 
   if Self.Anchor <> nil then Self.AnchorId:= Self.Anchor.Id
   else Self.AnchorId:= -1;
-  jImageBtn_setLayoutAll(FjEnv, FjObject , Self.AnchorId);
+
+  jImageBtn_SetEnabled(FjEnv, FjObject ,FEnabled);
 
   if FImageDownName <> '' then
       jImageBtn_setButtonDownByRes(FjEnv, FjObject , FImageDownName);
@@ -8661,7 +8662,7 @@ begin
     end;
   end;
 
-  jImageBtn_SetEnabled(FjEnv, FjObject ,FEnabled);
+  jImageBtn_setLayoutAll(FjEnv, FjObject , Self.AnchorId);
 
   if FColor <> colbrDefault then
      View_SetBackGroundColor(FjEnv, FjThis, FjObject , GetARGB(FCustomColor, FColor));
