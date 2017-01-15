@@ -9,7 +9,8 @@ uses
 
 type
 
- TOnDrawing  = Procedure(Sender: TObject) of object;
+ //TOnDrawing  = Procedure(Sender: TObject) of object;
+
 {Draft Component code by "Lazarus Android Module Wizard" [5/20/2016 4:14:09]}
 {https://github.com/jmpessoa/lazandroidmodulewizard}
 
@@ -17,13 +18,10 @@ type
 
 jDrawingView = class(jVisualControl)    //jDrawingView   jGraphicsView
  private
-    FMouches     : TMouches;
-    //
-    FOnDraw      : TOnDrawing;
-    //
-    FOnTouchDown : TOnTouchEvent;
-    FOnTouchMove : TOnTouchEvent;
-    FOnTouchUp   : TOnTouchEvent;
+    FOnDraw      : TOnTouchExtended;
+    FOnTouchDown : TOnTouchExtended;
+    FOnTouchMove : TOnTouchExtended;
+    FOnTouchUp   : TOnTouchExtended;
 
     FPaintStrokeWidth: single;
     FPaintStyle: TPaintStyle;
@@ -31,8 +29,6 @@ jDrawingView = class(jVisualControl)    //jDrawingView   jGraphicsView
 
     FImageIdentifier: string;
 
-    FOnFling: TOnFling;
-    FOnPinchGesture: TOnPinchZoom;
     FMinZoomFactor: single;
     FMaxZoomFactor: single;
 
@@ -53,9 +49,9 @@ jDrawingView = class(jVisualControl)    //jDrawingView   jGraphicsView
    // procedure GenEvent_OnClick(Obj: TObject);
     function jCreate(): jObject;
     procedure jFree();
-    procedure SetViewParent(_viewgroup: jObject); //
+    procedure SetViewParent(_viewgroup: jObject); override;
     procedure RemoveFromViewParent();
-    function GetView(): jObject;   //
+    function GetView(): jObject; override;
     procedure SetLParamWidth(_w: integer);
     procedure SetLParamHeight(_h: integer);
     procedure SetLeftTopRightBottomWidthHeight(_left: integer; _top: integer; _right: integer; _bottom: integer; _w: integer; _h: integer);
@@ -95,11 +91,12 @@ jDrawingView = class(jVisualControl)    //jDrawingView   jGraphicsView
 
     procedure SetMinZoomFactor(_minZoomFactor: single);
     procedure SetMaxZoomFactor(_maxZoomFactor: single);
-    procedure GenEvent_OnFlingGestureDetected(Obj: TObject; direction: integer);
-    procedure GenEvent_OnPinchZoomGestureDetected(Obj: TObject; scaleFactor: single; state: integer);
 
-    Procedure GenEvent_OnTouch(Obj: TObject; Act,Cnt: integer; X1,Y1,X2,Y2: single);
-    Procedure GenEvent_OnDraw (Obj: TObject; jCanvas: jObject);
+    Procedure GenEvent_OnDrawingViewTouch(Obj: TObject; Act, Cnt: integer; X,Y: array of Single;
+                                 fligGesture: integer; pinchZoomGestureState: integer; zoomScaleFactor: single);
+
+    Procedure GenEvent_OnDrawingViewDraw(Obj: TObject; Act, Cnt: integer; X,Y: array of Single;
+                                 fligGesture: integer; pinchZoomGestureState: integer; zoomScaleFactor: single);
 
  published
     property BackgroundColor: TARGBColorBridge read FColor write SetColor;
@@ -114,20 +111,14 @@ jDrawingView = class(jVisualControl)    //jDrawingView   jGraphicsView
 
     property MinPinchZoomFactor: single read FMinZoomFactor write FMinZoomFactor;
     property MaxPinchZoomFactor: single read FMaxZoomFactor write FMaxZoomFactor;
-
     // Event - Click
     //property OnClick: TOnNotify read FOnClick write FOnClick;
-
     // Event - Drawing
-    property OnDraw      : TOnDrawing read FOnDraw write FOnDraw;
-
+    property OnDraw      : TOnTouchExtended read FOnDraw write FOnDraw;
     // Event - Touch
-    property OnTouchDown : TOnTouchEvent read FOnTouchDown write FOnTouchDown;
-    property OnTouchMove : TOnTouchEvent read FOnTouchMove write FOnTouchMove;
-    property OnTouchUp   : TOnTouchEvent read FOnTouchUp   write FOnTouchUp;
-
-    property OnFlingGesture: TOnFling read FOnFling write FOnFling;
-    property OnPinchZoomGesture: TOnPinchZoom read FOnPinchGesture write FOnPinchGesture;
+    property OnTouchDown : TOnTouchExtended read FOnTouchDown write FOnTouchDown;
+    property OnTouchMove : TOnTouchExtended read FOnTouchMove write FOnTouchMove;
+    property OnTouchUp   : TOnTouchExtended read FOnTouchUp   write FOnTouchUp;
 
 end;
 
@@ -196,10 +187,10 @@ begin
   FAcceptChildrenAtDesignTime:= False;
 
 //your code here....
-  FMouches.Mouch.Active := False;
+(*  FMouches.Mouch.Active := False;
   FMouches.Mouch.Start  := False;
   FMouches.Mouch.Zoom   := 1.0;
-  FMouches.Mouch.Angle  := 0.0;
+  FMouches.Mouch.Angle  := 0.0; *)
 
   FFontFace:= ffNormal;
   FFontSize:= 20;
@@ -618,6 +609,7 @@ begin
      jDrawingView_DrawText(FjEnv, FjObject, _text ,_x ,_y);
 end;
 
+(*
 // Event : Java Event -> Pascal
 Procedure jDrawingView.GenEvent_OnTouch(Obj: TObject; Act,Cnt: integer; X1,Y1,X2,Y2: Single);
 begin
@@ -627,11 +619,33 @@ begin
    cTouchUp   : VHandler_touchesEnded_withEvent(Obj,Cnt,fXY(X1,Y1),fXY(X2,Y2),FOnTouchUp  ,FMouches);
   end;
 end;
+*)
 
-// Event : Java Event -> Pascal
-Procedure jDrawingView.GenEvent_OnDraw(Obj: TObject; jCanvas: jObject);
+Procedure jDrawingView.GenEvent_OnDrawingViewTouch(Obj: TObject; Act, Cnt: integer; X,Y: array of single;
+                             fligGesture: integer; pinchZoomGestureState: integer; zoomScaleFactor: single);
 begin
-  if Assigned(FOnDraw) then FOnDraw(Obj{,jCanvas});
+  case Act of
+   cTouchDown : begin
+                   if Assigned(FOnTouchDown) then
+                      FOnTouchDown(Obj,Cnt,X,Y,TFlingGesture(fligGesture),TPinchZoomScaleState(pinchZoomGestureState),zoomScaleFactor)
+                end;
+   cTouchMove : begin
+                   if Assigned(FOnTouchMove) then
+                      FOnTouchMove(Obj,Cnt,X,Y,TFlingGesture(fligGesture), TPinchZoomScaleState(pinchZoomGestureState),zoomScaleFactor)
+                end;
+   cTouchUp   : begin
+                   if Assigned(FOnTouchUp) then
+                      FOnTouchUp(Obj,Cnt,X,Y,TFlingGesture(fligGesture), TPinchZoomScaleState(pinchZoomGestureState),zoomScaleFactor)
+                end;
+  end;
+end;
+// Event : Java Event -> Pascal
+
+Procedure jDrawingView.GenEvent_OnDrawingViewDraw(Obj: TObject; Act, Cnt: integer; X,Y: array of Single;
+                             fligGesture: integer; pinchZoomGestureState: integer; zoomScaleFactor: single);
+begin
+  if Assigned(FOnDraw) then
+      FOnDraw(Obj,Cnt,X,Y,TFlingGesture(fligGesture), TPinchZoomScaleState(pinchZoomGestureState),zoomScaleFactor)
 end;
 
 procedure jDrawingView.DrawLine(var _points: TDynArrayOfSingle);
@@ -712,6 +726,7 @@ begin
      jDrawingView_SetMaxZoomFactor(FjEnv, FjObject, _maxZoomFactor);
 end;
 
+(*
 procedure jDrawingView.GenEvent_OnFlingGestureDetected(Obj: TObject; direction: integer);
 begin
   if Assigned(FOnFling) then  FOnFling(Obj, TFlingGesture(direction));
@@ -721,6 +736,7 @@ procedure jDrawingView.GenEvent_OnPinchZoomGestureDetected(Obj: TObject; scaleFa
 begin
   if Assigned(FOnPinchGesture) then  FOnPinchGesture(Obj, scaleFactor, TPinchZoomScaleState(state));
 end;
+*)
 
 function jDrawingView.GetCanvas(): jObject;
 begin

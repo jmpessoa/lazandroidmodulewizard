@@ -221,9 +221,15 @@ type
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
+
     procedure Init(refApp: jApp) override;
+    function jCreate(): jObject;
+    procedure jFree();
+
     function GetImageByIndex(index: integer): string;
     function GetImageExByIndex(index: integer): string;
+    function GetBitmap(imageIndex: integer): jObject;
+
     // Property
     property Count: integer read  GetCount;
   published
@@ -445,11 +451,11 @@ type
 
   jBitmap = class(jControl)
   private
-    FWidth  : integer; //Cardinal;  //uint32_t;; //
-    FHeight : integer; //Cardinal; ////uint32_t;
-    FStride : Cardinal; //uint32_t
-    FFormat : Integer;  //int32_t
-    FFlags  : Cardinal; //uint32_t      // 0 for now
+    FWidth  : integer;
+    FHeight : integer;
+    FStride : Cardinal;
+    FFormat : Integer;
+    FFlags  : Cardinal;
 
     FImageName: string;
     FImageIndex: TImageListIndex;
@@ -516,6 +522,7 @@ type
     function GetByteBufferFromBitmap(_bmap: jObject): jObject; overload;
     function GetByteBufferFromBitmap(): jObject; overload;
     function GetDirectBufferAddress(byteBuffer: jObject): PJByte;
+    function GetImageFromFile(_fullFilename: string): jObject;
 
   published
     property FilePath: TFilePath read FFilePath write FFilePath;
@@ -2070,19 +2077,12 @@ Procedure Java_Event_pOnDraw(env: PJNIEnv; this: jobject;
 begin
   gApp.Jni.jEnv:= env;
   gApp.Jni.jThis:= this;
-
   if not Assigned(Obj) then Exit;
   if Obj is jView  then
   begin
     jView(Obj).UpdateJNI(gApp);
     jForm(jView(Obj).Owner).UpdateJNI(gApp);
     jView(Obj).GenEvent_OnDraw(Obj, jCanvas);
-  end;
-  if Obj is jDrawingView  then
-  begin
-    jDrawingView(Obj).UpdateJNI(gApp);
-    jForm(jView(Obj).Owner).UpdateJNI(gApp);
-    jDrawingView(Obj).GenEvent_OnDraw(Obj, jCanvas);
   end;
 end;
 
@@ -2447,12 +2447,14 @@ begin
     jView(Obj).GenEvent_OnTouch(Obj,act,cnt,x1,y1,x2,y2);
     Exit;
   end;
+  (*
   if Obj is jDrawingView then
   begin
     jForm(jView(Obj).Owner).UpdateJNI(gApp);
     jDrawingView(Obj).GenEvent_OnTouch(Obj,act,cnt,x1,y1,x2,y2);
     Exit;
   end;
+  *)
 end;
 
 procedure Java_Event_pOnGLRenderer(env: PJNIEnv; this: jobject; Obj: TObject; EventType, w, h: integer);
@@ -5224,7 +5226,6 @@ begin
      jImageView_SetBitmapImage(FjEnv, FjObject, _bitmap ,_width ,_height);
 end;
 
-//  new by jmpessoa
 {jImageList}
 
 constructor jImageList.Create(AOwner: TComponent);
@@ -5240,8 +5241,13 @@ destructor jImageList.Destroy;
 begin
   if not (csDesigning in ComponentState) then
   begin
-     //
+     if FjObject <> nil then
+     begin
+       jFree();
+       FjObject:= nil;
+     end;
   end;
+  //you others free code here...
   FImages.Free;
   inherited Destroy;
 end;
@@ -5252,12 +5258,25 @@ var
 begin
   if FInitialized  then Exit;
   inherited Init(refApp);
+  FjObject:= jCreate(); //jSelf !
+  FInitialized:= True;
   for i:= 0 to FImages.Count - 1 do
   begin
      if Trim(FImages.Strings[i]) <> '' then
         Asset_SaveToFile(Trim(FImages.Strings[i]),GetFilePath(FFilePath){jForm(Owner).App.Path.Dat}+'/'+Trim(FImages.Strings[i]));
   end;
-  FInitialized:= True;
+end;
+
+function jImageList.jCreate(): jObject;
+begin
+   Result:= jImageList_jCreate(FjEnv, int64(Self), FjThis);
+end;
+
+procedure jImageList.jFree();
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jImageList_jFree(FjEnv, FjObject);
 end;
 
 procedure jImageList.SetImages(Value: TStrings);
@@ -5282,6 +5301,20 @@ begin
   begin
      if (index < FImages.Count) and (index >= 0) then
         Result:= GetFilePath(FFilePath){jForm(Owner).App.Path.Dat}+'/'+Trim(FImages.Strings[index]);
+  end;
+end;
+
+function jImageList.GetBitmap(imageIndex: integer): jObject;
+var
+  path: string;
+begin
+  if Initialized then
+  begin
+     if (imageIndex < FImages.Count) and (imageIndex >= 0) then
+     begin
+         path:= GetFilePath(FFilePath){jForm(Owner).App.Path.Dat}+'/'+Trim(FImages.Strings[imageIndex]);
+         Result:= jImageList_LoadFromFile(FjEnv, FjObject, path);
+     end;
   end;
 end;
 
@@ -7871,6 +7904,13 @@ begin
    Result:= jBitmap_GetByteBufferFromBitmap(FjEnv, FjObject);
 end;
 
+function jBitmap.GetImageFromFile(_fullFilename: string): jObject;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jBitmap_LoadFromFile(FjEnv, FjObject, _fullFilename);
+end;
+
 //------------------------------------------------------------------------------
 // jCanvas
 //------------------------------------------------------------------------------
@@ -9673,11 +9713,13 @@ begin
     jPanel(Obj).UpdateJNI(gApp);
     jPanel(Obj).GenEvent_OnFlingGestureDetected(Obj, direction);
   end;
+  (*
   if Obj is jDrawingView then
   begin
     jDrawingView(Obj).UpdateJNI(gApp);
     jDrawingView(Obj).GenEvent_OnFlingGestureDetected(Obj, direction);
   end;
+  *)
 end;
 
 procedure jPanel.GenEvent_OnPinchZoomGestureDetected(Obj: TObject; scaleFactor: single; state: integer);
@@ -9694,11 +9736,13 @@ begin
     jPanel(Obj).UpdateJNI(gApp);
     jPanel(Obj).GenEvent_OnPinchZoomGestureDetected(Obj,  scaleFactor, state);
   end;
+  (*
   if Obj is jDrawingView then
   begin
     jDrawingView(Obj).UpdateJNI(gApp);
     jDrawingView(Obj).GenEvent_OnPinchZoomGestureDetected(Obj,  scaleFactor, state);
   end;
+  *)
 end;
 
 

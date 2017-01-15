@@ -796,6 +796,7 @@ function jBitmap_GetBitmapFromByteArray(env: PJNIEnv; _jbitmap: JObject; var _im
 
 function jBitmap_GetByteBufferFromBitmap(env: PJNIEnv; _jbitmap: JObject; _bmap: jObject): jObject; overload;
 function jBitmap_GetByteBufferFromBitmap(env: PJNIEnv; _jbitmap: JObject): jObject; overload;
+function jBitmap_LoadFromFile(env: PJNIEnv; _jbitmap: JObject; _fullFilename: string): jObject;
 
 //GLSurfaceView
 Function  jGLSurfaceView_Create1       (env:PJNIEnv;  this:jobject; SelfObj: TObject; version: integer): jObject;
@@ -1100,6 +1101,10 @@ function jHttpClient_AddRequestProperty(env: PJNIEnv; _jhttpclient: JObject; _ht
 function jHttpClient_Post(env: PJNIEnv; _jhttpclient: JObject; _httpConnection: jObject): string; overload;
 function jHttpClient_GetResponseCode(env: PJNIEnv; _jhttpclient: JObject): integer;
 function jHttpClient_GetDefaultConnection(env: PJNIEnv; _jhttpclient: JObject): jObject;
+
+function jImageList_jCreate(env: PJNIEnv;_Self: int64; this: jObject): jObject;
+procedure jImageList_jFree(env: PJNIEnv; _jimagelist: JObject);
+function jImageList_LoadFromFile(env: PJNIEnv; _jimagelist: JObject; _fullFilename: string): jObject;
 
 //by jmpessoa
 procedure jSend_Email(env:PJNIEnv; this:jobject;
@@ -6275,6 +6280,21 @@ begin
   env^.DeleteLocalRef(env, jCls);
 end;
 
+function jBitmap_LoadFromFile(env: PJNIEnv; _jbitmap: JObject; _fullFilename: string): jObject;
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_fullFilename));
+  jCls:= env^.GetObjectClass(env, _jbitmap);
+  jMethod:= env^.GetMethodID(env, jCls, 'LoadFromFile', '(Ljava/lang/String;)Landroid/graphics/Bitmap;');
+  Result:= env^.CallObjectMethodA(env, _jbitmap, jMethod, @jParams);
+env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+
 
 //------------------------------------------------------------------------------
 // jGLSurfaceView
@@ -8971,6 +8991,46 @@ begin
   jCls:= env^.GetObjectClass(env, _jhttpclient);
   jMethod:= env^.GetMethodID(env, jCls, 'GetDefaultConnection', '()Ljava/net/HttpURLConnection;');
   Result:= env^.CallObjectMethod(env, _jhttpclient, jMethod);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+  {jImageList}
+
+function jImageList_jCreate(env: PJNIEnv;_Self: int64; this: jObject): jObject;
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].j:= _Self;
+  jCls:= Get_gjClass(env);
+  jMethod:= env^.GetMethodID(env, jCls, 'jImageList_jCreate', '(J)Ljava/lang/Object;');
+  Result:= env^.CallObjectMethodA(env, this, jMethod, @jParams);
+  Result:= env^.NewGlobalRef(env, Result);
+end;
+
+procedure jImageList_jFree(env: PJNIEnv; _jimagelist: JObject);
+var
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jimagelist);
+  jMethod:= env^.GetMethodID(env, jCls, 'jFree', '()V');
+  env^.CallVoidMethod(env, _jimagelist, jMethod);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+function jImageList_LoadFromFile(env: PJNIEnv; _jimagelist: JObject; _fullFilename: string): jObject;
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_fullFilename));
+  jCls:= env^.GetObjectClass(env, _jimagelist);
+  jMethod:= env^.GetMethodID(env, jCls, 'LoadFromFile', '(Ljava/lang/String;)Landroid/graphics/Bitmap;');
+  Result:= env^.CallObjectMethodA(env, _jimagelist, jMethod, @jParams);
+env^.DeleteLocalRef(env,jParams[0].l);
   env^.DeleteLocalRef(env, jCls);
 end;
 

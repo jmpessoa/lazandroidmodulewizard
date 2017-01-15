@@ -1,4 +1,4 @@
-package com.example.appautocompletetextviewdemo1;
+package com.example.appdrawingviewdemo1;
 
 import android.view.View;
 import android.view.ViewGroup;
@@ -179,20 +179,20 @@ public class jCommons {
 	public void clearLayoutAll() {
 		if (lparams instanceof RelativeLayout.LayoutParams) {
 			for (int i = 0; i < countAnchorRule; i++) {								
-				//if(Build.VERSION.SDK_INT < 17)
+			  if(Build.VERSION.SDK_INT < 17)
 				  ((android.widget.RelativeLayout.LayoutParams) lparams).addRule(lparamsAnchorRule[i], 0);
 				
 //[ifdef_api17up]
-				//if(Build.VERSION.SDK_INT >= 17)
+			 if(Build.VERSION.SDK_INT >= 17)
 				((android.widget.RelativeLayout.LayoutParams) lparams).removeRule(lparamsAnchorRule[i]); //need API >= 17!
 //[endif_api17up]
 			}
 			for (int j = 0; j < countParentRule; j++) {
-				//if(Build.VERSION.SDK_INT < 17) 
+			  if(Build.VERSION.SDK_INT < 17) 
 				  ((android.widget.RelativeLayout.LayoutParams) lparams).addRule(lparamsParentRule[j], 0);
 				
 //[ifdef_api17up]
-				//if(Build.VERSION.SDK_INT >= 17)
+			if(Build.VERSION.SDK_INT >= 17)
 				  ((android.widget.RelativeLayout.LayoutParams) lparams).removeRule(lparamsParentRule[j]);  //need API >= 17!
 //[endif_api17up]
 			}

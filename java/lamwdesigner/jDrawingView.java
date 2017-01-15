@@ -1,4 +1,4 @@
-package com.example.appdemo1;
+package com.example.appdrawingviewdemo1;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -10,22 +10,19 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Paint;
+import android.graphics.PointF;
 import android.graphics.Rect;
 import android.graphics.Typeface;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.util.Log;
+import android.util.SparseArray;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.view.ScaleGestureDetector.SimpleOnScaleGestureListener;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewGroup.MarginLayoutParams;
-import android.widget.RelativeLayout;
-import android.widget.FrameLayout;
-import android.widget.LinearLayout;
-import android.view.Gravity;
 
 /*Draft java code by "Lazarus Android Module Wizard" [5/20/2016 3:18:58]*/
 /*https://github.com/jmpessoa/lazandroidmodulewizard*/
@@ -33,58 +30,51 @@ import android.view.Gravity;
 
 public class jDrawingView extends View /*dummy*/ { //please, fix what GUI object will be extended!
 
-	private long       PasObj = 0;    // Pascal Object
+	private long       pascalObj = 0;    // Pascal Object
 	private Controls   controls  = null; // Control Class for events
+	
+	private jCommons LAMWCommon;
 
 	private Context context = null;
-	private ViewGroup parent   = null;         // parent view
-	private ViewGroup.MarginLayoutParams lparams = null;              // layout XYWH
-	private OnClickListener onClickListener;   // click event
 
 	private Boolean enabled  = true;           // click-touch enabled!
 
-	private int lparamsAnchorRule[] = new int[30];
-	private int countAnchorRule = 0;
-	private int lparamsParentRule[] = new int[30];
-	private int countParentRule = 0;
-
-	//private int lparamH = android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
-	//private int lparamW = android.view.ViewGroup.LayoutParams.MATCH_PARENT;
-	private int lparamH = 100;
-	private int lparamW = 100;
-	private int marginLeft = 0;
-	private int marginTop = 0;
-	private int marginRight = 0;
-	private int marginBottom = 0;
-	private int lgravity = Gravity.TOP | Gravity.START;
-	private float lweight = 0;
-
-	private boolean mRemovedFromParent = false;
-
 	private Canvas          mCanvas = null;
 	private Paint           mPaint  = null;
-
+	
+	private OnClickListener onClickListener;   // click event
 	private GestureDetector gDetect;
 	private ScaleGestureDetector scaleGestureDetector;
 
 	private float mScaleFactor = 1.0f;
 	private float MIN_ZOOM = 0.25f;
 	private float MAX_ZOOM = 4.0f;
-
+	
+	int mPinchZoomGestureState = 3;//pzNone	
+	int mFling = 0 ;
+	
+	float mPointX[];  //five fingers
+	float mPointY[];  //five fingers
+			
+	int mCountPoint = 0;
+	
+	private SparseArray<PointF> mActivePointers;
+	 
 	//GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
 	public jDrawingView(Controls _ctrls, long _Self) { //Add more others news "_xxx"p arams if needed!
 		super(_ctrls.activity);
 		context   = _ctrls.activity;
-		PasObj = _Self;
+		pascalObj = _Self;
 		controls  = _ctrls;
 
-		lparams = new ViewGroup.MarginLayoutParams(lparamW, lparamH);     // W,H
-		lparams.setMargins(marginLeft,marginTop,marginRight,marginBottom); // L,T,R,B
-
+		LAMWCommon = new jCommons(this,context,pascalObj);
+		
 		mPaint   = new Paint();
-
 		//this.setWillNotDraw(false); //fire OnDraw
-
+		
+		mCountPoint = 0;		 
+		mActivePointers = new SparseArray<PointF>();
+		
 		onClickListener = new OnClickListener(){
 			/*.*/public void onClick(View view){  //please, do not remove /*.*/ mask for parse invisibility!
 				if (enabled) {
@@ -93,135 +83,86 @@ public class jDrawingView extends View /*dummy*/ { //please, fix what GUI object
 			};
 		};
 		setOnClickListener(onClickListener);
-
+		
 		gDetect = new GestureDetector(controls.activity, new GestureListener());
 		scaleGestureDetector = new ScaleGestureDetector(controls.activity, new simpleOnScaleGestureListener());
 
 	} //end constructor
 
 	public void jFree() {
-		if (parent != null) { parent.removeView(this); }
 		//free local objects...
-		lparams = null;
-		setOnClickListener(null);
 		mPaint = null;
 		mCanvas = null;
 		gDetect = null;
+		setOnClickListener(null);		
 		scaleGestureDetector = null;
+		LAMWCommon.free();
 	}
 
-	private static MarginLayoutParams newLayoutParams(ViewGroup aparent, ViewGroup.MarginLayoutParams baseparams) {
-		if (aparent instanceof FrameLayout) {
-			return new FrameLayout.LayoutParams(baseparams);
-		} else if (aparent instanceof RelativeLayout) {
-			return new RelativeLayout.LayoutParams(baseparams);
-		} else if (aparent instanceof LinearLayout) {
-			return new LinearLayout.LayoutParams(baseparams);
-		} else if (aparent == null) {
-			throw new NullPointerException("Parent is null");
-		} else {
-			throw new IllegalArgumentException("Parent is neither FrameLayout or RelativeLayout or LinearLayout: "
-					+ aparent.getClass().getName());
-		}
+	public long GetPasObj() {
+		return LAMWCommon.getPasObj();
 	}
 
-	public void SetViewParent(ViewGroup _viewgroup) {
-		if (parent != null) { parent.removeView(this); }
-		parent = _viewgroup;
-
-		parent.addView(this,newLayoutParams(parent,(ViewGroup.MarginLayoutParams)lparams));
-		lparams = null;
-		lparams = (ViewGroup.MarginLayoutParams)this.getLayoutParams();
-
-		mRemovedFromParent = false;
+	public  void SetViewParent(ViewGroup _viewgroup ) {
+		LAMWCommon.setParent(_viewgroup);
 	}
-
+	
+	public ViewGroup GetParent() {
+		return LAMWCommon.getParent();
+	}
+	
 	public void RemoveFromViewParent() {
-		if (!mRemovedFromParent) {
-			this.setVisibility(android.view.View.INVISIBLE);
-			if (parent != null)
-				parent.removeView(this);
-			mRemovedFromParent = true;
-		}
+		LAMWCommon.removeFromViewParent();
 	}
 
+	public void SetLeftTopRightBottomWidthHeight(int left, int top, int right, int bottom, int w, int h) {
+		LAMWCommon.setLeftTopRightBottomWidthHeight(left,top,right,bottom,w,h);
+	}
+		
+	public void SetLParamWidth(int w) {
+		LAMWCommon.setLParamWidth(w);
+	}
+
+	public void SetLParamHeight(int h) {
+		LAMWCommon.setLParamHeight(h);
+	}
+    
+	public int GetLParamHeight() {
+		return  LAMWCommon.getLParamHeight();
+	}
+
+	public int GetLParamWidth() {				
+		return LAMWCommon.getLParamWidth();					
+	}  
+
+	public void SetLGravity(int _g) {
+		LAMWCommon.setLGravity(_g);
+	}
+
+	public void SetLWeight(float _w) {
+		LAMWCommon.setLWeight(_w);
+	}
+
+	public void AddLParamsAnchorRule(int rule) {
+		LAMWCommon.addLParamsAnchorRule(rule);
+	}
+	
+	public void AddLParamsParentRule(int rule) {
+		LAMWCommon.addLParamsParentRule(rule);
+	}
+
+	public void SetLayoutAll(int idAnchor) {
+		LAMWCommon.setLayoutAll(idAnchor);
+	}
+	
+	public void ClearLayoutAll() {		
+		LAMWCommon.clearLayoutAll();
+	}
+	
 	public View GetView() {
 		return this;
 	}
 
-	public void SetLParamWidth(int _w) {
-		lparamW = _w;
-	}
-
-	public void SetLParamHeight(int _h) {
-		lparamH = _h;
-	}
-
-	public void setLGravity(int _g) {
-		lgravity = _g;
-	}
-
-	public void setLWeight(float _w) {
-		lweight = _w;
-	}
-
-	public void SetLeftTopRightBottomWidthHeight(int _left, int _top, int _right, int _bottom, int _w, int _h) {
-		marginLeft = _left;
-		marginTop = _top;
-		marginRight = _right;
-		marginBottom = _bottom;
-		lparamH = _h;
-		lparamW = _w;
-	}
-
-	public void AddLParamsAnchorRule(int _rule) {
-		lparamsAnchorRule[countAnchorRule] = _rule;
-		countAnchorRule = countAnchorRule + 1;
-	}
-
-	public void AddLParamsParentRule(int _rule) {
-		lparamsParentRule[countParentRule] = _rule;
-		countParentRule = countParentRule + 1;
-	}
-
-	public void SetLayoutAll(int _idAnchor) {
-		lparams.width  = lparamW;
-		lparams.height = lparamH;
-		lparams.setMargins(marginLeft,marginTop,marginRight,marginBottom);
-
-		if (lparams instanceof RelativeLayout.LayoutParams) {
-			if (_idAnchor > 0) {
-				for (int i = 0; i < countAnchorRule; i++) {
-					((RelativeLayout.LayoutParams)lparams).addRule(lparamsAnchorRule[i], _idAnchor);
-				}
-			}
-			for (int j = 0; j < countParentRule; j++) {
-				((RelativeLayout.LayoutParams)lparams).addRule(lparamsParentRule[j]);
-			}
-		}
-		if (lparams instanceof FrameLayout.LayoutParams) {
-			((FrameLayout.LayoutParams)lparams).gravity = lgravity;
-		}
-		if (lparams instanceof LinearLayout.LayoutParams) {
-			((LinearLayout.LayoutParams)lparams).weight = lweight;
-		}
-		//
-		this.setLayoutParams(lparams);
-	}
-
-	public void ClearLayoutAll() {
-		if (lparams instanceof RelativeLayout.LayoutParams) {
-			for (int i = 0; i < countAnchorRule; i++) {
-				((RelativeLayout.LayoutParams)lparams).removeRule(lparamsAnchorRule[i]);
-			}
-
-			for (int j = 0; j < countParentRule; j++) {
-				((RelativeLayout.LayoutParams)lparams).removeRule(lparamsParentRule[j]);
-			}
-		}
-		countAnchorRule = 0;
-		countParentRule = 0;
-	}
 
 	public void SetId(int _id) { //wrapper method pattern ...
 		this.setId(_id);
@@ -229,60 +170,7 @@ public class jDrawingView extends View /*dummy*/ { //please, fix what GUI object
 
 	//write others [public] methods code here......
 	//GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
-
-	@Override
-	/*.*/public  boolean onTouchEvent( MotionEvent event) {
-		int act     = event.getAction() & MotionEvent.ACTION_MASK;
-		switch(act) {
-			case MotionEvent.ACTION_DOWN: {
-				switch (event.getPointerCount()) {
-					case 1 : { controls.pOnTouch (PasObj,Const.TouchDown,1,
-							event.getX(0),event.getY(0),0,0); break; }
-					default: { controls.pOnTouch (PasObj,Const.TouchDown,2,
-							event.getX(0),event.getY(0),
-							event.getX(1),event.getY(1));     break; }
-				}
-				break;}
-			case MotionEvent.ACTION_MOVE: {
-				switch (event.getPointerCount()) {
-					case 1 : { controls.pOnTouch (PasObj,Const.TouchMove,1,
-							event.getX(0),event.getY(0),0,0); break; }
-					default: { controls.pOnTouch (PasObj,Const.TouchMove,2,
-							event.getX(0),event.getY(0),
-							event.getX(1),event.getY(1));     break; }
-				}
-				break;}
-			case MotionEvent.ACTION_UP: {
-				switch (event.getPointerCount()) {
-					case 1 : { controls.pOnTouch (PasObj,Const.TouchUp  ,1,
-							event.getX(0),event.getY(0),0,0); break; }
-					default: { controls.pOnTouch (PasObj,Const.TouchUp  ,2,
-							event.getX(0),event.getY(0),
-							event.getX(1),event.getY(1));     break; }
-				}
-				break;}
-			case MotionEvent.ACTION_POINTER_DOWN: {
-				switch (event.getPointerCount()) {
-					case 1 : { controls.pOnTouch (PasObj,Const.TouchDown,1,
-							event.getX(0),event.getY(0),0,0); break; }
-					default: { controls.pOnTouch (PasObj,Const.TouchDown,2,
-							event.getX(0),event.getY(0),
-							event.getX(1),event.getY(1));     break; }
-				}
-				break;}
-			case MotionEvent.ACTION_POINTER_UP  : {
-				switch (event.getPointerCount()) {
-					case 1 : { controls.pOnTouch (PasObj,Const.TouchUp  ,1,
-							event.getX(0),event.getY(0),0,0); break; }
-					default: { controls.pOnTouch (PasObj,Const.TouchUp  ,2,
-							event.getX(0),event.getY(0),
-							event.getX(1),event.getY(1));     break; }
-				}
-				break;}
-		}
-		return true;
-	}
-
+	
 	@Override
 	/*.*/public boolean dispatchTouchEvent(MotionEvent e) {
 		super.dispatchTouchEvent(e);
@@ -291,6 +179,162 @@ public class jDrawingView extends View /*dummy*/ { //please, fix what GUI object
 		return true;
 	}
 
+	//http://android-er.blogspot.com.br/2014/05/cannot-detect-motioneventactionmove-and.html
+	//http://www.vogella.com/tutorials/AndroidTouch/article.html
+    @Override
+    public  boolean onTouchEvent( MotionEvent event) {    	
+        int act = event.getAction() & MotionEvent.ACTION_MASK;      
+        
+        //get pointer index from the event object
+        int pointerIndex = event.getActionIndex();
+        // get pointer ID
+        int pointerId = event.getPointerId(pointerIndex);
+        
+        switch(act) {
+                           
+            case MotionEvent.ACTION_DOWN: {
+            	
+            	PointF f = new PointF();            	
+                f.x = event.getX(pointerIndex);
+                f.y = event.getY(pointerIndex);
+                mActivePointers.put(pointerId, f);
+                
+                
+        		mPointX = new float[mActivePointers.size()];  //fingers
+        		mPointY = new float[mActivePointers.size()];  //fingers
+
+            	for (int size = mActivePointers.size(), i = 0; i < size; i++) {
+                    PointF point = mActivePointers.valueAt(i);
+                    if (point != null) {                        
+                    	mPointX[i] = point.x;                     		
+                        mPointY[i] = point.y;
+                    }    
+                }
+            	
+                controls.pOnDrawingViewTouch (pascalObj,Const.TouchDown,mActivePointers.size(),
+                		mPointX, mPointY, mFling, mPinchZoomGestureState, mScaleFactor);                         
+                
+                break;
+            } 
+            
+        
+            case MotionEvent.ACTION_MOVE: {            	
+            	
+            	for (int size = event.getPointerCount(), i = 0; i < size; i++) {
+                    PointF point = mActivePointers.get(event.getPointerId(i));
+                    if (point != null) {                          	
+                    	point.x = event.getX(i);
+                        point.y = event.getY(i);
+                    }
+                }
+            	            	
+        		mPointX = new float[mActivePointers.size()];  //fingers
+        		mPointY = new float[mActivePointers.size()];  //fingers
+            	
+            	for (int size = mActivePointers.size(), i = 0; i < size; i++) {
+                    PointF point = mActivePointers.valueAt(i);
+                    if (point != null) {                        
+                    	mPointX[i] = point.x;                     		
+                        mPointY[i] = point.y;
+                    }    
+                }
+            	
+                controls.pOnDrawingViewTouch (pascalObj, Const.TouchMove, mActivePointers.size(), 
+                		mPointX, mPointY, mFling, mPinchZoomGestureState, mScaleFactor);                                                                                                          
+                break;
+            }
+            
+            
+            case MotionEvent.ACTION_UP: {
+            	
+            	for (int size = event.getPointerCount(), i = 0; i < size; i++) {
+                    PointF point = mActivePointers.get(event.getPointerId(i));
+                    if (point != null) {                          	
+                    	point.x = event.getX(i);
+                        point.y = event.getY(i);
+                    }
+                }
+            	
+        		mPointX = new float[mActivePointers.size()];  //fingers
+        		mPointY = new float[mActivePointers.size()];  //fingers
+            	            	
+            	for (int size = mActivePointers.size(), i = 0; i < size; i++) {
+                    PointF point = mActivePointers.valueAt(i);
+                    if (point != null) {                        
+                    	mPointX[i] = point.x;                     		
+                        mPointY[i] = point.y;
+                    }    
+                }
+            	
+               controls.pOnDrawingViewTouch (pascalObj,Const.TouchUp, mActivePointers.size(),
+            		   mPointX, mPointY, mFling, mPinchZoomGestureState, mScaleFactor);              
+               break;
+             }  
+            
+            
+            case MotionEvent.ACTION_POINTER_DOWN: {
+            	
+            	PointF f = new PointF();            	
+                f.x = event.getX(pointerIndex);
+                f.y = event.getY(pointerIndex);
+                mActivePointers.put(pointerId, f);
+                
+        		mPointX = new float[mActivePointers.size()];  //fingers
+        		mPointY = new float[mActivePointers.size()];  //fingers
+                
+            	for (int size = mActivePointers.size(), i = 0; i < size; i++) {
+                    PointF point = mActivePointers.valueAt(i);
+                    if (point != null) {                        
+                    	mPointX[i] = point.x;                     		
+                        mPointY[i] = point.y;
+                    }    
+                }
+            	
+                controls.pOnDrawingViewTouch (pascalObj,Const.TouchDown, mActivePointers.size(),
+                		mPointX, mPointY, mFling, mPinchZoomGestureState, mScaleFactor);
+                
+                break;
+            }
+    
+            case MotionEvent.ACTION_POINTER_UP: {
+            	
+            	for (int size = event.getPointerCount(), i = 0; i < size; i++) {
+                    PointF point = mActivePointers.get(event.getPointerId(i));
+                    if (point != null) {                          	
+                    	point.x = event.getX(i);
+                        point.y = event.getY(i);
+                    }
+                }
+            	
+        		mPointX = new float[mActivePointers.size()];  //fingers
+        		mPointY = new float[mActivePointers.size()];  //fingers
+            	
+            	for (int size = mActivePointers.size(), i = 0; i < size; i++) {
+                    PointF point = mActivePointers.valueAt(i);
+                    if (point != null) {                        
+                    	mPointX[i] = point.x;                     		
+                        mPointX[i] = point.y;
+                    }    
+                }
+            	
+                controls.pOnDrawingViewTouch (pascalObj,Const.TouchUp, mActivePointers.size(),
+                		mPointX, mPointY, mFling, mPinchZoomGestureState, mScaleFactor);
+                
+                break;
+            }
+            
+            case MotionEvent.ACTION_CANCEL: {
+                mActivePointers.remove(pointerId);
+                break;
+            }
+
+            
+            
+        }
+
+        return true;
+    }
+	
 	//ref1. http://code.tutsplus.com/tutorials/android-sdk-detecting-gestures--mobile-21161
 	//ref2. http://stackoverflow.com/questions/9313607/simpleongesturelistener-never-goes-in-to-the-onfling-method
 	//ref3. http://x-tutorials.blogspot.com.br/2011/11/detect-pinch-zoom-using.html
@@ -309,50 +353,54 @@ public class jDrawingView extends View /*dummy*/ { //please, fix what GUI object
 		public boolean onFling(MotionEvent event1, MotionEvent event2, float velocityX, float velocityY) {
 
 			if(event1.getX() - event2.getX() > SWIPE_MIN_DISTANCE && Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY) {
-				controls.pOnFlingGestureDetected(PasObj, 0);                //onRightToLeft;
+				 mFling = 0; //onRightToLeft;
 				return  true;
 			} else if (event2.getX() - event1.getX() > SWIPE_MIN_DISTANCE && Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY) {
-				controls.pOnFlingGestureDetected(PasObj, 1);//onLeftToRight();
+				 mFling = 1; //onLeftToRight();
 				return true;
 			}
+			
 			if(event1.getY() - event2.getY() > SWIPE_MIN_DISTANCE && Math.abs(velocityY) > SWIPE_THRESHOLD_VELOCITY) {
-				controls.pOnFlingGestureDetected(PasObj, 2);//onBottomToTop();
+				 mFling = 2; //onBottomToTop();
 				return false;
 			} else if (event2.getY() - event1.getY() > SWIPE_MIN_DISTANCE && Math.abs(velocityY) > SWIPE_THRESHOLD_VELOCITY) {
-				controls.pOnFlingGestureDetected(PasObj, 3); //onTopToBottom();
+				 mFling = 3; //onTopToBottom();
 				return false;
 			}
+			
 			return false;
 		}
 	}
-
+        
 	//ref. http://vivin.net/2011/12/04/implementing-pinch-zoom-and-pandrag-in-an-android-view-on-the-canvas/
 	private class simpleOnScaleGestureListener extends SimpleOnScaleGestureListener {
-
+        //TPinchZoomScaleState = (pzScaleBegin, pzScaling, pzScaleEnd, pxNone);
 		@Override
 		public boolean onScale(ScaleGestureDetector detector) {
 			mScaleFactor *= detector.getScaleFactor();
 			mScaleFactor = Math.max(MIN_ZOOM, Math.min(mScaleFactor, MAX_ZOOM));
 			// Log.i("tag", "onScale = "+ mScaleFactor);
-			controls.pOnPinchZoomGestureDetected(PasObj, mScaleFactor, 1); //scalefactor->float
+	        mPinchZoomGestureState = 1;	
 			return true;
 		}
 
 		@Override
 		public boolean onScaleBegin(ScaleGestureDetector detector) {
-			controls.pOnPinchZoomGestureDetected(PasObj, detector.getScaleFactor(), 0); //scalefactor->float
+			mScaleFactor = detector.getScaleFactor();
+			mPinchZoomGestureState = 0;
 			//Log.i("tag", "onScaleBegin");
 			return true;
 		}
 
 		@Override
 		public void onScaleEnd(ScaleGestureDetector detector) {
-			controls.pOnPinchZoomGestureDetected(PasObj, detector.getScaleFactor(), 2); //scalefactor->float
+			mScaleFactor = detector.getScaleFactor();
+			mPinchZoomGestureState = 2;
 			//Log.i("tag", "onScaleEnd");
 			super.onScaleEnd(detector);
 		}
 
-	}
+	}	
 
 	public Bitmap GetDrawingCache(){
 		this.setDrawingCacheEnabled(true);
@@ -363,9 +411,11 @@ public class jDrawingView extends View /*dummy*/ { //please, fix what GUI object
 
 	//
 	@Override
-	/*.*/public  void onDraw(Canvas canvas) {
-		mCanvas = canvas;
-		controls.pOnDraw(PasObj, canvas);
+	/*.*/public void onDraw(Canvas canvas) {
+		mCanvas = canvas;		
+        controls.pOnDrawingViewDraw(pascalObj,Const.TouchUp, mActivePointers.size(),
+        		mPointX, mPointY, mFling, mPinchZoomGestureState, mScaleFactor);
+		
 	}
 
 	public void SaveToFile(String _filename ) {

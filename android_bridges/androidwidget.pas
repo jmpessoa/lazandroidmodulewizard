@@ -269,11 +269,21 @@ type
  TImageScaleType = (scaleCenter, scaleCenterCrop, scaleCenterInside, scaleFitCenter,
                 scaleFitEnd, scaleFitStart, scaleFitXY, scaleMatrix);
 
- TPinchZoomScaleState = (pzScaleBegin, pzScaling, pzScaleEnd);
+ TPinchZoomScaleState = (pzScaleBegin, pzScaling, pzScaleEnd, pzNone);
  TFlingGesture = (fliRightToLeft, fliLeftToRight, fliBottomToTop, fliTopToBottom);  // on swipe!
 
  TOnFling = procedure(Sender: TObject; flingGesture: TFlingGesture) of Object;
  TOnPinchZoom = procedure(Sender: TObject; scaleFactor: single; scaleState: TPinchZoomScaleState) of Object;
+
+ TTouchPoint = record
+       X: single;
+       Y: single;
+ end;
+
+ TOnTouchExtended = procedure(Sender: TObject; countXY: integer;
+                                 X: array of single;  Y: array of single;
+                                 flingGesture: TFlingGesture; pinchZoomScaleState: TPinchZoomScaleState; zoomScale: single) of Object;
+
 
  TDynArrayOfSmallint = array of smallint;
 
@@ -298,10 +308,9 @@ type
  TScanLine = Array[0..0] of DWord;
  PScanLine = ^TScanline;
 
+ TItemLayout = (layImageTextWidget, layWidgetTextImage);
 
-  TItemLayout = (layImageTextWidget, layWidgetTextImage);
-
-  TToggleState = (tsOff, tsOn);
+ TToggleState = (tsOff, tsOn);
 
   TOnClickToggleButton = procedure (Sender: TObject; state: boolean) of Object;
 
@@ -899,6 +908,14 @@ type
     property OnDestroy: TNotifyEvent read FOnDestroy write FOnDestroy;
   end;
 
+
+TSimpleRGBAColor = record
+  r: single;    //red
+  g: single;   //green
+  b: single;  //blue
+  a: single; //alfa
+end;
+
   { jForm }
 
   jForm = class(TAndroidForm)
@@ -1079,7 +1096,7 @@ type
     function GetSubTitleActionBar(): string;
     function GetFormByIndex(index: integer): jForm;
 
-    procedure CopyFromAssetsToInternalAppStorage(_filename: string);
+    function  CopyFromAssetsToInternalAppStorage(_filename: string): string;
     procedure CopyFromInternalAppStorageToEnvironmentDir(_filename: string; _environmentDirPath: string);
     procedure CopyFromAssetsToEnvironmentDir(_filename: string; _environmentDirPath: string);
 
@@ -1109,6 +1126,12 @@ type
     function GetDeviceDataMobileIPAddress(): string;
     function GetWifiBroadcastIPAddress(): string;
     function LoadFromAssetsTextContent(_filename: string): string;
+
+    function RGBA(color: string): TSimpleRGBAColor;
+    function GetPathFromAssetsFile(_assetsFileName: string): string;
+    function GetImageFromAssetsFile(_assetsImageFileName: string): jObject;
+
+
     // Property
     property View         : jObject        read FjRLayout; //layout!
 
@@ -1161,9 +1184,7 @@ type
 
   end;
 
-
   {jVisualControl}
-
 
   TFontSizeUnit =(unitDefault, unitPixel, unitDIP, unitInch, unitMillimeter, unitPoint, unitScaledPixel);
 
@@ -1171,12 +1192,14 @@ type
   private
     procedure ReadIntId(Reader: TReader);
     procedure WriteIntId(Writer: TWriter);
+
     {
     procedure ReadIntOrdLParamWidth(Reader: TReader);
     procedure WriteIntOrdLParamWidth(Writer: TWriter);
     procedure ReadIntOrdLParamHeight(Reader: TReader);
     procedure WriteIntOrdLParamHeight(Writer: TWriter);
     }
+
   protected
     // Java
     FId: DWord;
@@ -1359,7 +1382,7 @@ end;
   function jForm_GetTitleActionBar(env: PJNIEnv; _jform: JObject): string;
   function jForm_GetSubTitleActionBar(env: PJNIEnv; _jform: JObject): string;
 
-  procedure jForm_CopyFromAssetsToInternalAppStorage(env: PJNIEnv; _jform: JObject; _filename: string);
+  function jForm_CopyFromAssetsToInternalAppStorage(env: PJNIEnv; _jform: JObject; _filename: string): string;
   procedure jForm_CopyFromInternalAppStorageToEnvironmentDir(env: PJNIEnv; _jform: JObject; _filename: string; _environmentDir: string);
   procedure jForm_CopyFromAssetsToEnvironmentDir(env: PJNIEnv; _jform: JObject; _filename: string; _environmentDir: string);
 
@@ -1499,6 +1522,8 @@ function jForm_CopyFile(env: PJNIEnv;  _jform: JObject; _srcFullName: string; _d
 function jForm_LoadFromAssets(env: PJNIEnv;  _jform: JObject; _fileName: string): string;
 function jForm_IsSdCardMounted(env: PJNIEnv;  _jform: JObject): boolean;
 function jForm_LoadFromAssetsTextContent(env: PJNIEnv; _jform: JObject; _filename: string): string;
+function jForm_GetPathFromAssetsFile(env: PJNIEnv; _jform: JObject; _assetsFileName: string): string;
+function jForm_GetImageFromAssetsFile(env: PJNIEnv; _jform: JObject; _assetsImageFileName: string): jObject;
 
 //------------------------------------------------------------------------------
 // View  - Generics
@@ -1552,9 +1577,9 @@ Function  jSysInfo_DeviceID            (env:PJNIEnv;this:jobject) : String;
 // Helper Function
 Function  xy  (x, y: integer): TXY;
 Function  xyWH(x, y, w, h: integer): TXYWH;
-Function  fxy (x, y: Single ): TfXY;
+Function  fxy (x, y: Single): TfXY;
 Function  getAnimation(i,o : TEffect ): TAnimation;
-
+function DoTouchPoint(x, y: Single): TTouchPoint;
 // App
 Procedure App_Lock; {just for Object Orientad model!}
 Procedure App_UnLock;
@@ -1624,6 +1649,12 @@ Function  fxy(x, y: single): TfXY;
   Result.x := x;
   Result.y := y;
  end;
+
+function DoTouchPoint(x, y: Single): TTouchPoint;
+begin
+  Result.X := x;
+  Result.Y := y;
+end;
 
 Function  getAnimation(i,o : TEffect ): TAnimation;
  begin
@@ -3219,11 +3250,11 @@ begin
    Result:= jForm_GetSubTitleActionBar(FjEnv, FjObject);
 end;
 
-procedure jForm.CopyFromAssetsToInternalAppStorage(_filename: string);
+function jForm.CopyFromAssetsToInternalAppStorage(_filename: string): string;
 begin
-  //in designing component state: set value here...
+  //in designing component state: result value here...
   if FInitialized then
-     jForm_CopyFromAssetsToInternalAppStorage(FjEnv, FjObject, _filename);
+   Result:= jForm_CopyFromAssetsToInternalAppStorage(FjEnv, FjObject, _filename);
 end;
 
 procedure jForm.CopyFromInternalAppStorageToEnvironmentDir(_filename: string; _environmentDirPath: string);
@@ -3394,7 +3425,112 @@ begin
    Result:= jForm_LoadFromAssetsTextContent(FjEnv, FjObject, _filename);
 end;
 
+function jForm.RGBA(color: string): TSimpleRGBAColor;
+var
+  cor: string;
+begin
+  cor:= UpperCase(color);
+
+  Result.r:= 1.0;
+  Result.g:= 1.0;
+  Result.b:= 1.0;
+  Result.a:= 1.0; //alfa ..
+
+  if cor = 'BLUE' then
+  begin
+    Result.r:= 0.0; Result.g:= 0.0; Result.b:= 1.0; Exit;
+  end;
+
+  if cor = 'VIOLET' then
+  begin
+    Result.r:= 1.0; Result.g:= 0.0; Result.b:= 1.0; Exit;
+  end;
+
+  if cor = 'GREEN' then
+  begin
+    Result.r:= 0.0; Result.g:= 1.0; Result.b:= 0.0; Exit;
+  end;
+
+  if cor = 'YELLOW' then
+  begin
+    Result.r:= 1.0; Result.g:= 1.0; Result.b:= 0.0; Exit;
+  end;
+
+  if cor = 'RED' then
+  begin
+    Result.r:= 1.0; Result.g:= 0.0; Result.b:= 0.0; Exit;
+  end;
+
+  if cor = 'ORANGE' then
+  begin
+    Result.r:= 1.0; Result.g:= 0.5; Result.b:= 0.0; Exit;
+  end;
+
+  if cor = 'WHITE' then
+  begin
+    Result.r:= 1.0; Result.g:= 1.0; Result.b:= 1.0; Exit;
+  end;
+
+  if cor = 'BLACK' then
+  begin
+    Result.r:= 0.0; Result.g:= 0.0; Result.b:= 0.0; Exit;
+  end;
+
+end;
+
+function jForm.GetPathFromAssetsFile(_assetsFileName: string): string;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jForm_GetPathFromAssetsFile(FjEnv, FjObject, _assetsFileName);
+end;
+
+function jForm.GetImageFromAssetsFile(_assetsImageFileName: string): jObject;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jForm_GetImageFromAssetsFile(FjEnv, FjObject, _assetsImageFileName);
+end;
+
 {-------- jForm_JNI_Bridge ----------}
+
+function jForm_GetPathFromAssetsFile(env: PJNIEnv; _jform: JObject; _assetsFileName: string): string;
+var
+  jStr: JString;
+  jBoo: JBoolean;
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_assetsFileName));
+  jCls:= env^.GetObjectClass(env, _jform);
+  jMethod:= env^.GetMethodID(env, jCls, 'GetPathFromAssetsFile', '(Ljava/lang/String;)Ljava/lang/String;');
+  jStr:= env^.CallObjectMethodA(env, _jform, jMethod, @jParams);
+  case jStr = nil of
+     True : Result:= '';
+     False: begin
+              jBoo:= JNI_False;
+              Result:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
+            end;
+  end;
+env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+
+function jForm_GetImageFromAssetsFile(env: PJNIEnv; _jform: JObject; _assetsImageFileName: string): jObject;
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_assetsImageFileName));
+  jCls:= env^.GetObjectClass(env, _jform);
+  jMethod:= env^.GetMethodID(env, jCls, 'GetImageFromAssetsFile', '(Ljava/lang/String;)Landroid/graphics/Bitmap;');
+  Result:= env^.CallObjectMethodA(env, _jform, jMethod, @jParams);
+env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
 
 procedure jForm_ShowCustomMessage(env: PJNIEnv; _jform: JObject; _layout: jObject; _gravity: integer);
 var
@@ -4079,16 +4215,25 @@ begin
 end;
 
 
-procedure jForm_CopyFromAssetsToInternalAppStorage(env: PJNIEnv; _jform: JObject; _filename: string);
+function jForm_CopyFromAssetsToInternalAppStorage(env: PJNIEnv; _jform: JObject; _filename: string): string;
 var
+  jStr: JString;
+  jBoo: JBoolean;
   jParams: array[0..0] of jValue;
   jMethod: jMethodID=nil;
   jCls: jClass=nil;
 begin
   jParams[0].l:= env^.NewStringUTF(env, PChar(_filename));
   jCls:= env^.GetObjectClass(env, _jform);
-  jMethod:= env^.GetMethodID(env, jCls, 'CopyFromAssetsToInternalAppStorage', '(Ljava/lang/String;)V');
-  env^.CallVoidMethodA(env, _jform, jMethod, @jParams);
+  jMethod:= env^.GetMethodID(env, jCls, 'CopyFromAssetsToInternalAppStorage', '(Ljava/lang/String;)Ljava/lang/String;');
+  jStr:= env^.CallObjectMethodA(env, _jform, jMethod, @jParams);
+  case jStr = nil of
+     True : Result:= '';
+     False: begin
+              jBoo:= JNI_False;
+              Result:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
+            end;
+  end;
 env^.DeleteLocalRef(env,jParams[0].l);
   env^.DeleteLocalRef(env, jCls);
 end;
@@ -4987,10 +5132,10 @@ begin
   Result:='';
   case filePath of
       fpathNone: Result:='';
-      fpathExt: Result:= gApp.Path.Ext;
+      fpathExt: Result:=  gApp.Path.Ext;
       fpathData: Result:= gApp.Path.Dat;
       fpathDCIM: Result:= gApp.Path.DCIM;
-      fpathApp: Result:= gApp.Path.App;
+      fpathApp: Result:=  gApp.Path.App;
       fpathDataBase: Result:= gApp.Path.DataBase;
   end;
 end;

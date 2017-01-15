@@ -248,9 +248,17 @@ var
   AProcess: TProcess;
   auxList: TStringList;
   flag: boolean;
-  i: integer;
+  i, p1, p2: integer;
   mylib: string;
   methodName: string;
+  auxSignature: string;
+  foundResult: string;
+  fixedResult: string;
+  len: integer;
+  index_TYPE_line: integer;
+  index_IFDEF_line: integer;
+
+  new_TYPE: string;
 begin
   mylib:= 'lib'+libName+'.so';
 
@@ -278,16 +286,58 @@ begin
       fileName_pp:=StringReplace(fileName_h, '.h', '.pp', [rfIgnoreCase]);
       CopyFile(pathToHFile+DirectorySeparator+fileName_pp, pathToProject+'jni'+DirectorySeparator + fileName_pp);
       auxList:= TStringList.Create;
-      auxList.LoadFromFile(pathToProject+'jni'+DirectorySeparator + fileName_pp);
-      for i:= 0 to auxList.Count - 1 do
+      auxList.LoadFromFile(pathToProject+'jni' + DirectorySeparator + fileName_pp);
+      index_TYPE_line:= -1; //dummy
+      index_IFDEF_line:= -1; //dummy;
+      for i:= 2 to auxList.Count - 1 do  //escape 2 initial lines
       begin
+
+         if Pos('Type', auxList.Strings[i]) > 0 then index_TYPE_line:= i;
+         if Pos('{$IFDEF FPC}', auxList.Strings[i]) > 0 then index_IFDEF_line:= i;
+
+         p1:= Pos('):^', auxList.Strings[i]);
+         if  p1 > 0 then //try fix Function result ...
+         begin
+           if Pos('^^', auxList.Strings[i]) = 0 then  //try fix Function result only for one '^'
+           begin
+             foundResult:= Copy(auxList.Strings[i], p1+2, Length(auxList.Strings[i]));
+             len:= 1;
+             while foundResult[len] <> ';' do
+             begin
+               inc(len);
+             end;
+             foundResult:= Copy(foundResult, 1, len-1);   //ex. ^longint
+             fixedResult:=  StringReplace(foundResult, '^' , 'P', [rfIgnoreCase]);  //ex. Plongint
+             auxSignature:= auxList.Strings[i];
+             auxSignature:= StringReplace(auxSignature, foundResult , fixedResult, [rfIgnoreCase]);
+             auxList.Strings[i]:= auxSignature;
+
+             new_TYPE:= fixedResult + ' = ' + foundResult+';';  //try add new type ...
+             if Pos(new_TYPE, auxList.Text) = 0 then
+             begin
+                if (index_TYPE_line > 0) and (index_TYPE_line < auxList.Count) then
+                begin
+                   auxList.Strings[index_TYPE_line]:= auxList.Strings[index_TYPE_line]+' '+new_TYPE
+                end
+                else if ((index_IFDEF_line-1) > 0) and ((index_IFDEF_line-1) < auxList.Count) then
+                begin
+                   auxList.Strings[index_IFDEF_line-1]:= 'Type ' + new_TYPE;
+                   index_TYPE_line:= index_IFDEF_line-1;
+                end;
+             end;
+
+           end;
+         end;
+
          if Pos('cdecl', auxList.Strings[i]) > 0 then
          begin
            methodName:= GetMethodName(auxList.Strings[i]);
            auxList.Strings[i]:= auxList.Strings[i]+ ' external '''+mylib+''' name '''+methodName+''';';
          end;
+
       end;
       auxList.SaveToFile(pathToProject+'jni'+DirectorySeparator + fileName_pp);
+      auxList.Free;
     end;
   end;
 end;

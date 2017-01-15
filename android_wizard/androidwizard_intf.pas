@@ -2260,7 +2260,7 @@ end;
 
 function TAndroidFileDescPascalUnitWithResource.GetLocalizedName: string;
 begin
-   Result := 'jForm Android [GUI] Module [Lamw]';
+   Result := 'LAMW Android GUI Module [jForm]';
 end;
 
 function TAndroidFileDescPascalUnitWithResource.GetLocalizedDescription: string;

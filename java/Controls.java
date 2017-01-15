@@ -1,6 +1,6 @@
-package com.example.appopenglsurfaceviewdemo1;
+package com.example.appopenglsurfaceviewdemo2;
 
-//LAMW: Lazarus Android Module Wizard  - version 0.7 - rev. 0.7 - 13 November - 2016 
+//LAMW: Lazarus Android Module Wizard  - version 0.7 - rev. 0.8 - 13 Jan - 2017 
 //RAD Android: Project Wizard, Form Designer and Components Development Model!
 
 //https://github.com/jmpessoa/lazandroidmodulewizard
@@ -463,7 +463,6 @@ public String LoadFromAssets(String _filename){
 		return pathRes;
 }
 
-
 public boolean IsSdCardMounted() {		  
    return Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED); 
 }
@@ -869,7 +868,7 @@ public String GetSubTitleActionBar() {
 }
 
 //https://xjaphx.wordpress.com/2011/10/02/store-and-use-files-in-assets/
-public void CopyFromAssetsToInternalAppStorage(String _filename){				    		   
+public String CopyFromAssetsToInternalAppStorage(String _filename) {				    		   
 		InputStream is = null;
 		FileOutputStream fos = null;			
 		String PathDat = controls.activity.getFilesDir().getAbsolutePath();			 			
@@ -891,8 +890,20 @@ public void CopyFromAssetsToInternalAppStorage(String _filename){
 		}catch (IOException e) {
 			// Log.i("ShareFromAssets","fail!!");
 		     e.printStackTrace();			     
-		}									
+		}
+		return PathDat+"/"+_filename;
 }	
+
+public String GetPathFromAssetsFile(String _assetsFileName) {  
+   return LoadFromAssets(_assetsFileName);
+}
+
+public Bitmap GetImageFromAssetsFile(String _assetsImageFileName) {
+	  String path =  LoadFromAssets(_assetsImageFileName);
+	  BitmapFactory.Options bo = new BitmapFactory.Options();
+	  bo.inScaled = false;
+	  return BitmapFactory.decodeFile(path, bo);
+}
 
 public void CopyFromInternalAppStorageToEnvironmentDir(String _filename, String _environmentDir) {	 
     String srcPath = controls.activity.getFilesDir().getAbsolutePath()+"/"+ _filename;       //Result : /data/data/com/MyApp/files	 
@@ -1132,7 +1143,13 @@ public native void pOnAfterDispatchDraw(long pasobj, Canvas canvas, int tag);
 //Load Pascal Library
 // -------------------------------------------------------------------------
 static {
-/*libsmartload*/
+try{System.loadLibrary("controls");} catch (UnsatisfiedLinkError e) {Log.e("JNI_Loading_libcontrols", "exception", e);}
+try{System.loadLibrary("mycstuff1");} catch (UnsatisfiedLinkError e) {Log.e("JNI_Loading_libmycstuff1", "exception", e);}
+try{System.loadLibrary("mycstuff2");} catch (UnsatisfiedLinkError e) {Log.e("JNI_Loading_libmycstuff2", "exception", e);}
+try{System.loadLibrary("mycstuff3");} catch (UnsatisfiedLinkError e) {Log.e("JNI_Loading_libmycstuff3", "exception", e);}
+try{System.loadLibrary("mycstuff4");} catch (UnsatisfiedLinkError e) {Log.e("JNI_Loading_libmycstuff4", "exception", e);}
+try{System.loadLibrary("mycstuff6");} catch (UnsatisfiedLinkError e) {Log.e("JNI_Loading_libmycstuff6", "exception", e);}
+try{System.loadLibrary("myquicksort1");} catch (UnsatisfiedLinkError e) {Log.e("JNI_Loading_libmyquicksort1", "exception", e);}
 }
 // -------------------------------------------------------------------------
 //  Activity Event

@@ -72,9 +72,15 @@ uses
    procedure Java_Event_pOnSurfaceViewTouch(env: PJNIEnv; this: jobject;
                               Obj: TObject;
                               act,cnt: integer; x1,y1,x2,y2 : single);
+
    function Java_Event_pOnSurfaceViewDrawingInBackground(env: PJNIEnv; this: jobject; Obj: TObject; progress: single): JBoolean;
    procedure Java_Event_pOnSurfaceViewDrawingPostExecute(env: PJNIEnv; this: jobject; Obj: TObject; progress: single);
 
+   procedure Java_Event_pOnDrawingViewTouch(env: PJNIEnv; this: jobject; Obj: TObject; action, countPoints: integer;
+                                 arrayX: jObject; arrayY: jObject; flingGesture: integer; pinchZoomGestureState: integer; zoomScaleFactor: single);
+
+   procedure Java_Event_pOnDrawingViewDraw(env: PJNIEnv; this: jobject; Obj: TObject; action, countPoints: integer;
+                                      arrayX: jObject; arrayY: jObject; flingGesture: integer; pinchZoomGestureState: integer; zoomScaleFactor: single);
    Procedure Java_Event_pOnContactManagerContactsExecuted(env: PJNIEnv; this: jobject; Obj: TObject; count: integer);
 
    function Java_Event_pOnContactManagerContactsProgress(env: PJNIEnv; this: jobject; Obj: TObject; contactInfo: JString;
@@ -111,7 +117,7 @@ uses
    AndroidWidget, bluetooth, bluetoothclientsocket, bluetoothserversocket,
    spinner, location, actionbartab, customdialog, togglebutton, switchbutton, gridview,
    sensormanager, broadcastreceiver, datepickerdialog, timepickerdialog, shellcommand,
-   tcpsocketclient, surfaceview, mediaplayer, contactmanager, seekbar, ratingbar, radiogroup,
+   tcpsocketclient, surfaceview, mediaplayer, contactmanager, seekbar, ratingbar, radiogroup, drawingview,
    autocompletetextview, chronometer, numberpicker, udpsocket;
 
 procedure Java_Event_pOnBluetoothEnabled(env: PJNIEnv; this: jobject; Obj: TObject);
@@ -943,6 +949,80 @@ begin
   end;
 end;
 
+procedure Java_Event_pOnDrawingViewTouch(env: PJNIEnv; this: jobject; Obj: TObject; action, countPoints: integer;
+                              arrayX: jObject; arrayY: jObject; flingGesture: integer; pinchZoomGestureState: integer; zoomScaleFactor: single);
+var
+  sizeArray: integer;
+  arrayResultX: array of single;
+  arrayResultY: array of single;
+begin
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+
+  if not Assigned(Obj)  then Exit;
+
+  if Obj is jDrawingView then
+  begin
+      sizeArray:= countPoints;
+      if arrayX <> nil then
+      begin
+        //sizeArray:=  env^.GetArrayLength(env, arrayX);
+        SetLength(arrayResultX, sizeArray);
+        env^.GetFloatArrayRegion(env, arrayX, 0, sizeArray, @arrayResultX[0] {target});
+      end;
+
+      if arrayY <> nil then
+      begin
+        //sizeArray:=  env^.GetArrayLength(env, arrayX);
+        SetLength(arrayResultY, sizeArray);
+        env^.GetFloatArrayRegion(env, arrayY, 0, sizeArray, @arrayResultY[0] {target});
+      end;
+      jDrawingView(Obj).UpdateJNI(gApp);
+      jForm(jDrawingView(Obj).Owner).UpdateJNI(gApp);
+
+      jDrawingView(Obj).GenEvent_OnDrawingViewTouch(Obj,action,countPoints,
+                                                    arrayResultX,arrayResultY,
+                                                    flingGesture,pinchZoomGestureState, zoomScaleFactor);
+  end;
+end;
+
+procedure Java_Event_pOnDrawingViewDraw(env: PJNIEnv; this: jobject; Obj: TObject; action, countPoints: integer;
+                                   arrayX: jObject; arrayY: jObject; flingGesture: integer; pinchZoomGestureState: integer; zoomScaleFactor: single);
+var
+  sizeArray: integer;
+  arrayResultX: array of single;
+  arrayResultY: array of single;
+begin
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+
+  if not Assigned(Obj)  then Exit;
+
+  if Obj is jDrawingView then
+  begin
+      sizeArray:= countPoints;
+      if arrayX <> nil then
+      begin
+        //sizeArray:=  env^.GetArrayLength(env, arrayX);
+        SetLength(arrayResultX, sizeArray);
+        env^.GetFloatArrayRegion(env, arrayX, 0, sizeArray, @arrayResultX[0] {target});
+      end;
+
+      if arrayY <> nil then
+      begin
+        //sizeArray:=  env^.GetArrayLength(env, arrayX);
+        SetLength(arrayResultY, sizeArray);
+        env^.GetFloatArrayRegion(env, arrayY, 0, sizeArray, @arrayResultY[0] {target});
+      end;
+      jDrawingView(Obj).UpdateJNI(gApp);
+      jForm(jDrawingView(Obj).Owner).UpdateJNI(gApp);
+
+      jDrawingView(Obj).GenEvent_OnDrawingViewDraw(Obj,action,countPoints,
+                                                    arrayResultX,arrayResultY,
+                                                    flingGesture,pinchZoomGestureState, zoomScaleFactor);
+  end;
+end;
+
 procedure Java_Event_pOnRatingBarChanged(env: PJNIEnv; this: jobject; Obj: TObject; rating: single);
 begin
   gApp.Jni.jEnv:= env;
@@ -1126,16 +1206,16 @@ var
 begin
   gApp.Jni.jEnv:= env;
   gApp.Jni.jThis:= this;
-  if Obj is jAutoTextVIew then
+  if Obj is jAutoTextView then
   begin
-    jForm(jAutoTextVIew(Obj).Owner).UpdateJNI(gApp);
+    jForm(jAutoTextView(Obj).Owner).UpdateJNI(gApp);
     pasCaption := '';
     if caption <> nil then
     begin
       _jBoolean:= JNI_False;
       pasCaption:= string( env^.GetStringUTFChars(env,caption,@_jBoolean) );
     end;
-    jAutoTextVIew(Obj).GenEvent_OnClickAutoDropDownItem(Obj, index, pasCaption);
+    jAutoTextView(Obj).GenEvent_OnClickAutoDropDownItem(Obj, index, pasCaption);
   end;
 end;
 
@@ -1146,10 +1226,10 @@ begin
   gApp.Jni.jThis:= this;
   //------------------------------------------------------
   if not (Assigned(Obj)) then Exit;
-  if Obj is jAutoTextVIew then
+  if Obj is jAutoTextView then
   begin
-    jForm(jAutoTextVIew(Obj).Owner).UpdateJNI(gApp);
-    jAutoTextVIew(Obj).GenEvent_OnClick(Obj);
+    jForm(jAutoTextView(Obj).Owner).UpdateJNI(gApp);
+    jAutoTextView(Obj).GenEvent_OnClick(Obj);
     Exit;
   end;
   if Obj is jChronometer then
