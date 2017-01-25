@@ -1389,7 +1389,10 @@ type
 
     Procedure Navigate(url: string);
     Procedure LoadFromHtmlFile(environmentDirectoryPath: string; htmlFileName: string);
+    procedure LoadFromHtmlString(_htmlString: string); //thanks to Anton!
+
     procedure SetHttpAuthUsernamePassword(_hostName: string; _domain: string; _username: string; _password: string);
+
 
   published
     property JavaScript: Boolean          read FJavaScript write SetJavaScript;
@@ -7377,6 +7380,12 @@ begin;
    Navigate('file://'+environmentDirectoryPath+'/'+htmlFileName);
 end;
 
+procedure jWebView.LoadFromHtmlString(_htmlString: string);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jWebView_LoadFromHtmlString(FjEnv, FjObject, _htmlString);
+end;
 
 procedure jWebView.UpdateLParamWidth;
 var

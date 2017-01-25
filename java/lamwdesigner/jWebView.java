@@ -1,4 +1,4 @@
-package com.example.appdemo1;
+package com.example.appfileproviderdemo1;
 
 import android.view.ViewGroup;
 import android.view.ViewGroup.MarginLayoutParams;
@@ -248,5 +248,9 @@ public class jWebView extends WebView {
         this.setHttpAuthUsernamePassword(_hostName, _hostDomain, _username, _password);
         webclient.mUsername = _username;
         webclient.mPassword = _password;
+    }
+               
+    public void LoadFromHtmlString(String _htmlString) {  //thanks to Anton!
+       this.loadData(_htmlString, "text/html", null);
     }
 }

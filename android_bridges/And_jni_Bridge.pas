@@ -694,6 +694,7 @@ Procedure jWebView_addLParamsParentRule(env:PJNIEnv; WebView : jObject; rule: DW
 Procedure jWebView_addLParamsAnchorRule(env:PJNIEnv; WebView : jObject; rule: DWord);
 Procedure jWebView_setLayoutAll(env:PJNIEnv; WebView : jObject;  idAnchor: DWord);
 procedure jWebView_SetHttpAuthUsernamePassword(env: PJNIEnv; _jwebview: JObject; _hostName: string; _hostDomain: string; _username: string; _password: string);
+procedure jWebView_LoadFromHtmlString(env: PJNIEnv; _jwebview: JObject; _htmlString: string);
 
 
 // Canvas
@@ -5645,6 +5646,20 @@ begin
   env^.DeleteLocalRef(env,jParams[1].l);
   env^.DeleteLocalRef(env,jParams[2].l);
   env^.DeleteLocalRef(env,jParams[3].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jWebView_LoadFromHtmlString(env: PJNIEnv; _jwebview: JObject; _htmlString: string);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_htmlString));
+  jCls:= env^.GetObjectClass(env, _jwebview);
+  jMethod:= env^.GetMethodID(env, jCls, 'LoadFromHtmlString', '(Ljava/lang/String;)V');
+  env^.CallVoidMethodA(env, _jwebview, jMethod, @jParams);
+env^.DeleteLocalRef(env,jParams[0].l);
   env^.DeleteLocalRef(env, jCls);
 end;
 

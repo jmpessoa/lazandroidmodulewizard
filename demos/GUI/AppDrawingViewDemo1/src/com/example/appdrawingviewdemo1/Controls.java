@@ -1144,12 +1144,6 @@ public native void pOnAfterDispatchDraw(long pasobj, Canvas canvas, int tag);
 // -------------------------------------------------------------------------
 static {
 try{System.loadLibrary("controls");} catch (UnsatisfiedLinkError e) {Log.e("JNI_Loading_libcontrols", "exception", e);}
-try{System.loadLibrary("mycstuff1");} catch (UnsatisfiedLinkError e) {Log.e("JNI_Loading_libmycstuff1", "exception", e);}
-try{System.loadLibrary("mycstuff2");} catch (UnsatisfiedLinkError e) {Log.e("JNI_Loading_libmycstuff2", "exception", e);}
-try{System.loadLibrary("mycstuff3");} catch (UnsatisfiedLinkError e) {Log.e("JNI_Loading_libmycstuff3", "exception", e);}
-try{System.loadLibrary("mycstuff4");} catch (UnsatisfiedLinkError e) {Log.e("JNI_Loading_libmycstuff4", "exception", e);}
-try{System.loadLibrary("mycstuff6");} catch (UnsatisfiedLinkError e) {Log.e("JNI_Loading_libmycstuff6", "exception", e);}
-try{System.loadLibrary("myquicksort1");} catch (UnsatisfiedLinkError e) {Log.e("JNI_Loading_libmyquicksort1", "exception", e);}
 }
 // -------------------------------------------------------------------------
 //  Activity Event
