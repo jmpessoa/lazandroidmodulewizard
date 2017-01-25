@@ -468,6 +468,12 @@ begin
   Result.Alpha := AlphaOpaque;
 end;
 
+function ToTColor(colbrColor: TARGBColorBridge): TColor; inline;
+begin
+  // note: it can be done in more efficient way, but...
+  Result := FPColorToTColor(ToTFPColor(colbrColor));
+end;
+
 function AndroidToLCLFontSize(asize: DWord; Default: Integer): Integer; inline;
 begin
   case asize of
@@ -827,7 +833,7 @@ begin
   with Fcanvas do
   begin
     if jPanel(FAndroidWidget).BackgroundColor <> colbrDefault then
-      Brush.Color := FPColorToTColor(ToTFPColor(jPanel(FAndroidWidget).BackgroundColor))
+      Brush.Color := ToTColor(jPanel(FAndroidWidget).BackgroundColor)
     else begin
       Brush.Color:= clNone;
       Brush.Style:= bsClear;
@@ -920,7 +926,7 @@ begin
     end else begin
       Pen.Color := bc;
       bc := Brush.Color;
-      Brush.Color := FPColorToTColor(ToTFPColor(TARGBColorBridge(Index)));
+      Brush.Color := ToTColor(TARGBColorBridge(Index));
       InflateRect(r, -1, -1);
       FillRect(r);
       Brush.Color := bc;
@@ -1476,7 +1482,7 @@ begin
   with FCanvas do
   begin
     if Color <> colbrDefault then
-      Brush.Color := FPColorToTColor(ToTFPColor(Color))
+      Brush.Color := ToTColor(Color)
     else begin
       Brush.Color:= clNone;
       Brush.Style:= bsClear;
@@ -1581,7 +1587,7 @@ procedure TDraftWidget.SetColor(AColor: TARGBColorBridge);
 begin
   FColor := AColor;
   if AColor <> colbrDefault then
-    BackGroundColor := FPColorToTColor(ToTFPColor(AColor))
+    BackGroundColor := ToTColor(AColor)
   else
     BackGroundColor := clNone;
 end;
@@ -1590,7 +1596,7 @@ procedure TDraftWidget.SetFontColor(AColor: TARGBColorBridge);
 begin
   FFontColor := AColor;
   if AColor <> colbrDefault then
-    TextColor := FPColorToTColor(ToTFPColor(AColor))
+    TextColor := ToTColor(AColor)
   else
     TextColor := DefaultTextColor;
 end;
@@ -1679,7 +1685,7 @@ begin
     end;
     if (Result = clNone) and (w is jForm)
     and (jForm(w).BackgroundColor <> colbrDefault) then
-      Result := FPColorToTColor(ToTFPColor(jForm(w).BackgroundColor))
+      Result := ToTColor(jForm(w).BackgroundColor)
     else
       Result := Designer.FDefaultBrushColor;
   end;
@@ -2308,7 +2314,7 @@ procedure TDraftSpinner.SetDropListBackgroundColor(Acolor: TARGBColorBridge);
 begin
   FDropListBackgroundColor:= Acolor;
   if Acolor <> colbrDefault then
-    DropListColor:= FPColorToTColor(ToTFPColor(Acolor))
+    DropListColor:= ToTColor(Acolor)
   else
     DropListColor:= clNone;
 end;
