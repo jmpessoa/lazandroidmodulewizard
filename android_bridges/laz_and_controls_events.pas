@@ -67,8 +67,10 @@ uses
 
    Procedure Java_Event_pOnSurfaceViewCreated(env: PJNIEnv; this: jobject; Obj: TObject;
                                   surfaceHolder: jObject);
+
    Procedure Java_Event_pOnSurfaceViewDraw (env: PJNIEnv; this: jobject; Obj: TObject; canvas: jObject);
    Procedure Java_Event_pOnSurfaceViewChanged(env: PJNIEnv; this: jobject; Obj: TObject; width: integer; height: integer);
+
    procedure Java_Event_pOnSurfaceViewTouch(env: PJNIEnv; this: jobject;
                               Obj: TObject;
                               act,cnt: integer; x1,y1,x2,y2 : single);
@@ -81,6 +83,7 @@ uses
 
    procedure Java_Event_pOnDrawingViewDraw(env: PJNIEnv; this: jobject; Obj: TObject; action, countPoints: integer;
                                       arrayX: jObject; arrayY: jObject; flingGesture: integer; pinchZoomGestureState: integer; zoomScaleFactor: single);
+
    Procedure Java_Event_pOnContactManagerContactsExecuted(env: PJNIEnv; this: jobject; Obj: TObject; count: integer);
 
    function Java_Event_pOnContactManagerContactsProgress(env: PJNIEnv; this: jobject; Obj: TObject; contactInfo: JString;
@@ -117,7 +120,7 @@ uses
    AndroidWidget, bluetooth, bluetoothclientsocket, bluetoothserversocket,
    spinner, location, actionbartab, customdialog, togglebutton, switchbutton, gridview,
    sensormanager, broadcastreceiver, datepickerdialog, timepickerdialog, shellcommand,
-   tcpsocketclient, surfaceview, mediaplayer, contactmanager, seekbar, ratingbar, radiogroup, drawingview,
+   tcpsocketclient, surfaceview, mediaplayer, contactmanager, seekbar, ratingbar, radiogroup,drawingview,
    autocompletetextview, chronometer, numberpicker, udpsocket;
 
 procedure Java_Event_pOnBluetoothEnabled(env: PJNIEnv; this: jobject; Obj: TObject);
@@ -907,6 +910,7 @@ begin
   end;
 end;
 
+
 Procedure Java_Event_pOnSurfaceViewChanged(env: PJNIEnv; this: jobject;
                               Obj: TObject; width: integer; height: integer);
 begin
@@ -1022,6 +1026,7 @@ begin
                                                     flingGesture,pinchZoomGestureState, zoomScaleFactor);
   end;
 end;
+
 
 procedure Java_Event_pOnRatingBarChanged(env: PJNIEnv; this: jobject; Obj: TObject; rating: single);
 begin

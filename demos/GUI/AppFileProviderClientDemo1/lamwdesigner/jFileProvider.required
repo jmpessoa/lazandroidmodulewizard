@@ -1,0 +1,1 @@
+<provider android:name=".jFileProvider" android:authorities="com.example.appfileproviderclientdemo1" android:exported="true" android:grantUriPermissions="true"/>

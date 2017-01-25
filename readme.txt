@@ -67,6 +67,10 @@
 
 		-tintinux and Dieselnutjob
 			ref. http://wiki.freepascal.org/LAMW
+
+		-Dio Affriza - Tutorial
+			ref. https://afuriza.wordpress.com/2016/10/28/koding-pascal-untuk-android-menggunakan-lazarus/#more-705
+			ref. https://www.youtube.com/watch?v=1BH460c9_Aw&feature=youtu.be
 				
 		-Lazarus forum community!
 		
@@ -109,6 +113,27 @@
 	*
 	****************************************************************************************************
 
+
+Version 0.7.8 - 25 - January - 2017
+
+	NEW! jFileProvider component 
+
+	NEW! demo AppFileProviderDemo1   <-- Run First!!
+	NEW! demo AppFileProviderClientDemo1
+
+Version 0.7.7 - 13 November - 2016
+
+	Added support to load custom lubrary
+
+Version 0.7.6 - 31 October - 2016
+
+	New! LoadFromAssetsTextContent [jForm]
+	Fixed! [removed "import android.R" from jControls.java]
+
+Version 0.7.5 - 04 October - 2016
+
+	Minor Changed: jControls.java [Added "import android.R']
+
 Version 0.7.4 - 28 September - 2016
 
 	NEW! jUDPSocket component   // <<---  rime's suggestion!
@@ -121,6 +146,7 @@ Version 0.7.4 - 28 September - 2016
 
 	NEW! demo AppUDPSocketDemo1
 	NEW! demo AppNumberPickerDemo1
+
 
 Version 0.7.3 - 21 September - 2016
 

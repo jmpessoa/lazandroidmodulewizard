@@ -8,6 +8,7 @@ interface
 
 uses 
   Classes,
+  fileprovider,
   udpsocket,
   numberpicker,
   activitylauncher,
@@ -47,6 +48,7 @@ implementation
   
 Procedure Register;
 begin
+  {$I jfileprovider_icon.lrs}
   {$I judpsocket_icon.lrs}
   {$I jnumberpickerdialog_icon.lrs}
   {$I jactivitylauncher_icon.lrs}
@@ -87,6 +89,7 @@ begin
 
   RegisterComponents('Android Bridges Extra',
    [
+      jFileProvider,
       jUDPSocket,
       jNumberPickerDialog,
       jActivityLauncher,
