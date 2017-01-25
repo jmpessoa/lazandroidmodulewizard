@@ -86,10 +86,10 @@ type
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
     procedure InvalidateRect(Sender: TObject; ARect: TRect; Erase: boolean);
+    function AssetsDir: string;
     property AndroidForm: jForm read GetAndroidForm;
     property AndroidTheme: TAndroidTheme read FTheme;
     property ImageCache: TImageCache read FImageCache;
-
   public
     procedure GetObjInspNodeImageIndex(APersistent: TPersistent; var AIndex: integer); override;
   end;
@@ -616,7 +616,6 @@ procedure TjImageListEditor.Edit;
 var
   o: TComponent;
   d: TAndroidWidgetMediator;
-  pr: TLazProjectFile;
   fn: string;
   TheDialog: TjImagesEditorDlg;
 begin
@@ -625,13 +624,7 @@ begin
     if not (o is TAndroidForm) then
       raise Exception.CreateFmt('%s owner is not TAndroidForm', [TComponent(GetComponent).Name]);
     d := TAndroidForm(o).Designer as TAndroidWidgetMediator;
-    pr := LazarusIDE.GetProjectFileWithRootComponent(o);
-    if pr = nil then
-      raise Exception.CreateFmt('Project file for %s is not available!', [o.Name]);
-    if not (pr.GetFileOwner is TLazProject) then
-      raise Exception.Create('!!! ' + pr.GetFileOwner.ClassName);
-    fn := ExtractFilePath(TLazProject(pr.GetFileOwner).MainFile.GetFullFilename);
-    fn := System.Copy(fn, 1, RPosEx(PathDelim, fn, Length(fn) - 1)) + 'assets' + PathDelim;
+    fn := d.AssetsDir;
     TheDialog := TjImagesEditorDlg.Create(Application, jImageList(GetComponent).Images,
       fn, d.ImageCache);
     try
@@ -1132,6 +1125,19 @@ procedure TAndroidWidgetMediator.InvalidateRect(Sender: TObject; ARect: TRect; E
 begin
   if (LCLForm=nil) or (not LCLForm.HandleAllocated) then exit;
   LCLIntf.InvalidateRect(LCLForm.Handle,@ARect,Erase);
+end;
+
+function TAndroidWidgetMediator.AssetsDir: string;
+var
+  pr: TLazProjectFile;
+begin
+  pr := LazarusIDE.GetProjectFileWithRootComponent(Root);
+  if pr = nil then
+    raise Exception.CreateFmt('Project file for %s is not available!', [Root.Name]);
+  if not (pr.GetFileOwner is TLazProject) then
+    raise Exception.Create('!!! ' + pr.GetFileOwner.ClassName);
+  Result := ExtractFilePath(TLazProject(pr.GetFileOwner).MainFile.GetFullFilename);
+  Result := Copy(Result, 1, RPosEx(PathDelim, Result, Length(Result) - 1)) + 'assets' + PathDelim;
 end;
 
 procedure TAndroidWidgetMediator.GetObjInspNodeImageIndex(APersistent: TPersistent; var AIndex: integer);
