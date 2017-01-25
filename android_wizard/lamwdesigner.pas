@@ -382,6 +382,14 @@ type
     procedure GetValues(Proc: TGetStrProc); override;
   end;
 
+  { TImageListPropertyEditor
+    Only jImageList from the same form can be used }
+
+  TImageListPropertyEditor = class(TPersistentPropertyEditor)
+  public
+    procedure GetValues(Proc: TGetStrProc); override;
+  end;
+
   { TAndroidFormComponentEditor }
 
   TAndroidFormComponentEditor = class(TDefaultComponentEditor)
@@ -506,6 +514,25 @@ procedure RegisterAndroidWidgetDraftClass(AWidgetClass: jVisualControlClass;
   ADraftClass: TDraftWidgetClass);
 begin
   DraftClassesMap.Add(AWidgetClass, ADraftClass);
+end;
+
+{ TImageListPropertyEditor }
+
+procedure TImageListPropertyEditor.GetValues(Proc: TGetStrProc);
+
+  procedure TraverseComponents(Root: TComponent);
+  var
+    i: Integer;
+  begin
+    for i := 0 to Root.ComponentCount - 1 do
+      if Root.Components[i] is jImageList then // in general "is GetTypeData(GetPropType)^.ClassType"
+        Proc(Root.Components[i].Name);
+  end;
+
+begin
+  Proc(oisNone);
+  if Assigned(PropertyHook) and (PropertyHook.LookupRoot is TComponent) then
+    TraverseComponents(TComponent(PropertyHook.LookupRoot));
 end;
 
 { TImageIndexPropertyEditor }
@@ -2994,6 +3021,7 @@ initialization
   RegisterPropertyEditor(TypeInfo(TStrings), jImageList, 'Images', TjImageListImagesEditor);
   RegisterComponentEditor(jImageList, TjImageListEditor);
   RegisterPropertyEditor(TypeInfo(TImageListIndex), jControl, '', TImageIndexPropertyEditor);
+  RegisterPropertyEditor(TypeInfo(jImageList), nil, '', TImageListPropertyEditor);
 
   // DraftClasses registeration:
   //  * default drawing and anchoring => use TDraftWidget
