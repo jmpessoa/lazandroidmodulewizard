@@ -240,9 +240,13 @@ type
   { TDraftImageBtn }
 
   TDraftImageBtn = class(TDraftWidget)
+  private
+    FImage: TPortableNetworkGraphic;
+    function GetImage: TPortableNetworkGraphic;
   public
     constructor Create(AWidget: TAndroidWidget; Canvas: TCanvas); override;
     procedure Draw; override;
+    procedure UpdateLayout; override;
   end;
 
   { TDraftImageView }
@@ -2219,6 +2223,21 @@ end;
 
 { TDraftImageBtn }
 
+function TDraftImageBtn.GetImage: TPortableNetworkGraphic;
+begin
+  if FImage <> nil then
+    Result := FImage
+  else
+    with jImageBtn(FAndroidWidget) do
+      if (Images <> nil)
+      and (IndexImageUp >= 0) and (IndexImageUp < Images.Count) then
+      begin
+        FImage := Designer.ImageCache.GetImageAsPNG(Designer.AssetsDir + Images.Images[IndexImageUp]);
+        Result := FImage;
+      end else
+        Result := nil;
+end;
+
 constructor TDraftImageBtn.Create(AWidget: TAndroidWidget; Canvas: TCanvas);
 begin
   inherited;
@@ -2237,8 +2256,11 @@ begin
   Fcanvas.Pen.Color:= clWhite;
   if Self.BackGroundColor = clNone then
      Fcanvas.Brush.Color:= clSilver; //clMedGray;
-  Fcanvas.FillRect(0,0,Self.Width,Self.Height);
-      // outer frame
+  if GetImage = nil then
+    Fcanvas.FillRect(0,0,Self.Width,Self.Height)
+  else
+    Fcanvas.Brush.Style := bsClear;
+  // outer frame
   Fcanvas.Rectangle(0,0,Self.Width,Self.Height);
   Fcanvas.Pen.Color:= clWindowFrame;
   Fcanvas.Line(Self.Width-Self.MarginRight+3, {x2}
@@ -2250,6 +2272,26 @@ begin
              Self.Height-Self.MarginBottom+3,{y2}
              Self.MarginLeft-4,                {x1}
              Self.Height-Self.MarginBottom+3);  {y2}
+  if GetImage <> nil then
+    Fcanvas.Draw(1, 1, GetImage);
+end;
+
+procedure TDraftImageBtn.UpdateLayout;
+var
+  im: TPortableNetworkGraphic;
+begin
+  im := GetImage;
+  with jImageBtn(FAndroidWidget) do
+  begin
+    if im <> nil then
+    begin
+      if LayoutParamHeight = lpWrapContent then
+        FnewH := im.Height + 3;
+      if LayoutParamWidth = lpWrapContent then
+        FnewW := im.Width + 3;
+    end;
+  end;
+  inherited UpdateLayout;
 end;
 
 { TDraftImageView }
