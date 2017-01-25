@@ -1642,7 +1642,12 @@ begin
         FnewL := Anchor.Left + MarginLeft;
       if raToEndOf in PosRelativeToAnchor then
         FnewL := Anchor.Left + Anchor.Width + Anchor.MarginRight + MarginLeft;
+      if raAlignTop in PosRelativeToAnchor then
+        FnewT := Anchor.Top + MarginTop;
       { TODO: other combinations }
+      if ([raBelow, raAlignBottom] * PosRelativeToAnchor <> [])
+      and Assigned(Parent) and (rpBottom in PosRelativeToParent) then
+        FnewH := Parent.Height - MarginBottom - FnewT;
     end;
     if Assigned(Parent) then
     begin
