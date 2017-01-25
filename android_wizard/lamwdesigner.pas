@@ -252,8 +252,13 @@ type
   { TDraftImageView }
 
   TDraftImageView = class(TDraftWidget)
+  private
+    FImage: TPortableNetworkGraphic;
+    function GetImage: TPortableNetworkGraphic;
   public
     constructor Create(AWidget: TAndroidWidget; Canvas: TCanvas); override;
+    procedure Draw; override;
+    procedure UpdateLayout; override;
   end;
 
   {TDraftDrawingView}
@@ -2296,6 +2301,21 @@ end;
 
 { TDraftImageView }
 
+function TDraftImageView.GetImage: TPortableNetworkGraphic;
+begin
+  if FImage <> nil then
+    Result := FImage
+  else
+    with jImageView(FAndroidWidget) do
+      if (Images <> nil)
+      and (ImageIndex >= 0) and (ImageIndex < Images.Count) then
+      begin
+        FImage := Designer.ImageCache.GetImageAsPNG(Designer.AssetsDir + Images.Images[ImageIndex]);
+        Result := FImage;
+      end else
+        Result := nil;
+end;
+
 constructor TDraftImageView.Create(AWidget: TAndroidWidget; Canvas: TCanvas);
 begin
   inherited;
@@ -2306,6 +2326,32 @@ begin
 
   if jImageView(AWidget).BackgroundColor = colbrDefault then
     Color := GetParentBackgroundColor;
+end;
+
+procedure TDraftImageView.Draw;
+begin
+  if GetImage <> nil then
+    Fcanvas.Draw(0, 0, GetImage)
+  else
+    inherited Draw;
+end;
+
+procedure TDraftImageView.UpdateLayout;
+var
+  im: TPortableNetworkGraphic;
+begin
+  im := GetImage;
+  with jImageView(FAndroidWidget) do
+  begin
+    if im <> nil then
+    begin
+      if LayoutParamHeight = lpWrapContent then
+        FnewH := im.Height;
+      if LayoutParamWidth = lpWrapContent then
+        FnewW := im.Width;
+    end;
+  end;
+  inherited UpdateLayout;
 end;
 
 { TDrafDrawingView }
