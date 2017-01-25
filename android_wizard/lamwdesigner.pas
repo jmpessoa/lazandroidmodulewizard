@@ -368,6 +368,7 @@ type
 
   TARGBColorBridgePropertyEditor = class(TEnumPropertyEditor)
   public
+    procedure Edit; override;
     function GetAttributes: TPropertyAttributes; override;
     procedure ListDrawValue(const CurValue: ansistring; Index: integer;
       ACanvas: TCanvas; const ARect:TRect; AState: TPropEditDrawState); override;
@@ -930,9 +931,44 @@ end;
 
 { TARGBColorBridgePropertyEditor }
 
+procedure TARGBColorBridgePropertyEditor.Edit;
+var
+  r1, g1, b1, r2, g2, b2: Byte;
+  i, nearest: TARGBColorBridge;
+  d, diff: Integer;
+begin
+  with TColorDialog.Create(nil) do
+  try
+    Color := ToTColor(TARGBColorBridge(GetOrdValue));
+    if Execute then
+    begin
+      RedGreenBlue(Color, r1, g1, b1);
+      i := Low(TARGBColorBridge);
+      RedGreenBlue(ToTColor(i), r2, g2, b2);
+      diff := Sqr(r1 - r2) + Sqr(g1 - g2) + Sqr(b1 - b2);
+      nearest := i;
+      if diff > 0 then
+        for i := Succ(i) to High(TARGBColorBridge) do
+        begin
+          RedGreenBlue(ToTColor(i), r2, g2, b2);
+          d := Sqr(r1 - r2) + Sqr(g1 - g2) + Sqr(b1 - b2);
+          if diff > d then
+          begin
+            diff := d;
+            nearest := i;
+            if diff = 0 then Break;
+          end;
+        end;
+      SetOrdValue(Ord(nearest));
+    end;
+  finally
+    Free;
+  end;
+end;
+
 function TARGBColorBridgePropertyEditor.GetAttributes: TPropertyAttributes;
 begin
-  Result := [paMultiSelect,paValueList,paCustomDrawn];
+  Result := [paMultiSelect,paValueList,paCustomDrawn,paDialog];
 end;
 
 procedure TARGBColorBridgePropertyEditor.ListDrawValue(const CurValue: ansistring;
