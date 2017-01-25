@@ -368,7 +368,7 @@ type
 
   { TAnchorPropertyEditor }
 
-  TAnchorPropertyEditor = class(TComponentOneFormPropertyEditor)
+  TAnchorPropertyEditor = class(TPersistentPropertyEditor)
   public
     procedure GetValues(Proc: TGetStrProc); override;
   end;
@@ -1054,9 +1054,9 @@ end;
 
 procedure TAndroidWidgetMediator.OnAutoAssignIDs(Sender: TObject);
 begin
-  if (Sender is TAndroidForm) and (Sender as TAndroidForm).AutoAssignIDs then
+  if (Sender is TAndroidForm) and TAndroidForm(Sender).AutoAssignIDs then
     if QuestionDlg('LAMW', 'Reassign Id properties now (otherwise they will be reassigned on next form open)?', mtConfirmation, [mrYes, mrNo], 0) = mrYes then
-      (Sender as TAndroidForm).ReassignIds;
+      TAndroidForm(Sender).ReassignIds;
 end;
 
 procedure TAndroidWidgetMediator.SetRoot(const AValue: TComponent);
@@ -2911,7 +2911,7 @@ initialization
   //  * default drawing and anchoring => use TDraftWidget
   //    (it is not needed to create draft class without custom drawing)
   //  * do not register custom draft class for default drawing w/o anchoring
-  //    (default drawing implemented in Mediator.Paint)
+  //    (default drawing is implemented in Mediator.Paint)
   RegisterAndroidWidgetDraftClass(jProgressBar, TDraftProgressBar);
   RegisterAndroidWidgetDraftClass(jSeekBar, TDraftSeekBar);
   RegisterAndroidWidgetDraftClass(jButton, TDraftButton);
