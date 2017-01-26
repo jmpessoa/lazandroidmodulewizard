@@ -5652,14 +5652,14 @@ end;
 procedure jWebView_LoadFromHtmlString(env: PJNIEnv; _jwebview: JObject; _htmlString: string);
 var
   jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
+  jMethod: jMethodID;
+  jCls: jClass;
 begin
   jParams[0].l:= env^.NewStringUTF(env, PChar(_htmlString));
   jCls:= env^.GetObjectClass(env, _jwebview);
   jMethod:= env^.GetMethodID(env, jCls, 'LoadFromHtmlString', '(Ljava/lang/String;)V');
   env^.CallVoidMethodA(env, _jwebview, jMethod, @jParams);
-env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jParams[0].l);
   env^.DeleteLocalRef(env, jCls);
 end;
 
@@ -5676,7 +5676,7 @@ begin
   {warning: a jmethodID is not an object. So don't need to convert it to a GlobalRef!}
   _jMethod:= env^.GetMethodID(env, cls, 'jCanvas_Create', '(J)Ljava/lang/Object;');
   _jParams[0].j := Int64(SelfObj);
-  Result := env^.CallObjectMethodA(env, this, _jMethod,@_jParams);
+  Result := env^.CallObjectMethodA(env, this, _jMethod, @_jParams);
   Result := env^.NewGlobalRef(env,Result);
 end;
 
