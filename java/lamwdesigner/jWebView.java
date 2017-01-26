@@ -251,6 +251,6 @@ public class jWebView extends WebView {
     }
                
     public void LoadFromHtmlString(String _htmlString) {  //thanks to Anton!
-       this.loadData(_htmlString, "text/html", null);
+       loadDataWithBaseURL(null, _htmlString, null, null, null);
     }
 }
