@@ -330,7 +330,7 @@ function TLamwSmartDesigner.TryAddJControl(jclassname: string;
 var
   list, listRequirements, auxList, manifestList: TStringList;
   p1, p2, i: integer;
-  aux: string;
+  aux, tempStr: string;
   insertRef: string;
   c: char;
 begin
@@ -369,7 +369,9 @@ begin
      begin
        auxList.LoadFromFile(LamwGlobalSettings.PathToJavaTemplates+'lamwdesigner'+DirectorySeparator +jclassname+'.native');
        for i:= 0 to auxList.Count-1 do
-           list.Add(auxList.Strings[i]);
+       begin
+         list.Add(auxList.Strings[i]);
+       end;
      end;
      aux:= list.Text;
      list.LoadFromFile(FPathToJavaSource+'Controls.java');
@@ -492,34 +494,44 @@ begin
    if FileExists(LamwGlobalSettings.PathToJavaTemplates+'lamwdesigner'+DirectorySeparator +jclassname+'.service') then
    begin
      auxList.LoadFromFile(LamwGlobalSettings.PathToJavaTemplates+'lamwdesigner'+DirectorySeparator +jclassname+'.service');
-     if auxList.Count > 0 then
+     if auxList.Text <> '' then
      begin
+       tempStr:= Trim(auxList.Text);
        insertRef:= '</activity>'; //insert reference point
-
        manifestList.LoadFromFile(FPathToAndroidProject+'AndroidManifest.xml');
        aux:= manifestList.Text;
-
-       listRequirements.Add(Trim(auxList.Text));  //Add services
-
-       list.Clear;
-       for i:= 0 to auxList.Count-1 do
-       begin
-         if Pos(Trim(auxList.Strings[i]), aux) <= 0 then list.Add(Trim(auxList.Strings[i])); //not duplicate..
-       end;
-
-       if list.Count > 0 then
+       listRequirements.Add(tempStr);  //Add providers
+       if Pos(tempStr , aux) <= 0 then
        begin
          p1:= Pos(insertRef, aux);
-         if Length(list.Text) > 10 then //dummy
-         begin
-           Insert(sLineBreak+Trim(list.Text), aux, p1+Length(insertRef) );
-           manifestList.Text:= aux;
-           manifestList.SaveToFile(FPathToAndroidProject+'AndroidManifest.xml');
-         end;
+         Insert(sLineBreak + tempStr, aux, p1+Length(insertRef) );
+         manifestList.Text:= aux;
+         manifestList.SaveToFile(FPathToAndroidProject+'AndroidManifest.xml');
        end;
      end;
    end;
-
+   //-----
+   if FileExists(LamwGlobalSettings.PathToJavaTemplates+'lamwdesigner'+DirectorySeparator +jclassname+'.provider') then
+   begin
+     auxList.LoadFromFile(LamwGlobalSettings.PathToJavaTemplates+'lamwdesigner'+DirectorySeparator +jclassname+'.provider');
+     if auxList.Text <> '' then
+     begin
+       tempStr:= Trim(auxList.Text);
+       tempStr:= Trim( StringReplace(tempStr, 'org.lamw.provider', FPackageName, [rfReplaceAll,rfIgnoreCase]) );
+       insertRef:= '</activity>'; //insert reference point
+       manifestList.LoadFromFile(FPathToAndroidProject+'AndroidManifest.xml');
+       aux:= manifestList.Text;
+       listRequirements.Add(tempStr);  //Add providers
+       if Pos(tempStr , aux) <= 0 then
+       begin
+         p1:= Pos(insertRef, aux);
+         Insert(sLineBreak + tempStr, aux, p1+Length(insertRef) );
+         manifestList.Text:= aux;
+         manifestList.SaveToFile(FPathToAndroidProject+'AndroidManifest.xml');
+       end;
+     end;
+   end;
+   //-----
    if listRequirements.Count > 0 then
      listRequirements.SaveToFile(FPathToAndroidProject+'lamwdesigner'+DirectorySeparator+jclassname+'.required');
 

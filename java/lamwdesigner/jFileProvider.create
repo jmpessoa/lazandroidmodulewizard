@@ -1,0 +1,4 @@
+public java.lang.Object jFileProvider_jCreate(long _Self) {
+  return (java.lang.Object)(new jFileProvider(this,_Self));
+}
+  

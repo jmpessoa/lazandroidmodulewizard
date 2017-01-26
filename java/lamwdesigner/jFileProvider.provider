@@ -1,0 +1,1 @@
+<provider android:name=".jFileProvider" android:authorities="org.lamw.provider" android:exported="true" android:grantUriPermissions="true"/>  
