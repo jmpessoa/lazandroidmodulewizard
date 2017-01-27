@@ -90,7 +90,7 @@ begin
    if  jEditText1.Text <> '' then
    begin
      strURL:=  jEditText1.Text;
-     if Pos('http://', strURL)  < 0 then strURL:=  'http://' +  Trim(strURL);
+     if Pos('http://', strURL) = 0 then strURL:=  'http://' +  Trim(strURL);
      jWebView1.Navigate(strURL);
    end
    else
