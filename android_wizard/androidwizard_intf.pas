@@ -1398,7 +1398,7 @@ begin
           strList.Add('ant clean release');
           strList.SaveToFile(FAndroidProjectName+PathDelim+'build-release.sh');
 
-          linuxPathToAdbBin:= linuxPathToAndroidSdk+linuxDirSeparator+'platform-tools';
+          linuxPathToAdbBin:= linuxPathToAndroidSdk+'platform-tools';
 
           //linux install - thanks to Stephano!
           strList.Clear;
