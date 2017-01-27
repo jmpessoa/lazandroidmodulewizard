@@ -1123,26 +1123,20 @@ begin
           strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'uninstall.bat');
 
           strList.Clear;
-          strList.Add('cd '+FAndroidProjectName+DirectorySeparator+'bin');
           strList.Add(FPathToAndroidSDK+'platform-tools'+
                      DirectorySeparator+'adb logcat');
-          strList.Add('cd ..');
           strList.Add('pause');
           strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'logcat.bat');
 
           strList.Clear;
-          strList.Add('cd '+FAndroidProjectName+DirectorySeparator+'bin');
           strList.Add(FPathToAndroidSDK+'platform-tools'+
                      DirectorySeparator+'adb logcat AndroidRuntime:E *:S');
-          strList.Add('cd ..');
           strList.Add('pause');
           strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'utils'+DirectorySeparator+'logcat_error.bat');
 
           strList.Clear;
-          strList.Add('cd '+FAndroidProjectName+DirectorySeparator+'bin');
           strList.Add(FPathToAndroidSDK+'platform-tools'+DirectorySeparator+
                      'adb logcat ActivityManager:I '+FSmallProjName+'-'+FAntBuildMode+'.apk:D *:S');
-          strList.Add('cd ..');
           strList.Add('pause');
           strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'utils'+DirectorySeparator+'logcat_app_perform.bat');
 
