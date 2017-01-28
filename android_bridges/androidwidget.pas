@@ -1131,6 +1131,11 @@ end;
     function GetPathFromAssetsFile(_assetsFileName: string): string;
     function GetImageFromAssetsFile(_assetsImageFileName: string): jObject;
 
+    function GetAssetContentList(_path: string): TDynArrayOfString;
+    function GetDriverList(): TDynArrayOfString;
+    function GetFolderList(_envPath: string): TDynArrayOfString;
+    function GetFileList(_envPath: string): TDynArrayOfString;
+
 
     // Property
     property View         : jObject        read FjRLayout; //layout!
@@ -1524,6 +1529,11 @@ function jForm_IsSdCardMounted(env: PJNIEnv;  _jform: JObject): boolean;
 function jForm_LoadFromAssetsTextContent(env: PJNIEnv; _jform: JObject; _filename: string): string;
 function jForm_GetPathFromAssetsFile(env: PJNIEnv; _jform: JObject; _assetsFileName: string): string;
 function jForm_GetImageFromAssetsFile(env: PJNIEnv; _jform: JObject; _assetsImageFileName: string): jObject;
+
+function jForm_GetAssetContentList(env: PJNIEnv; _jform: JObject; _path: string): TDynArrayOfString;
+function jForm_GetDriverList(env: PJNIEnv; _jform: JObject): TDynArrayOfString;
+function jForm_GetFolderList(env: PJNIEnv; _jform: JObject; _envPath: string): TDynArrayOfString;
+function jForm_GetFileList(env: PJNIEnv; _jform: JObject; _envPath: string): TDynArrayOfString;
 
 //------------------------------------------------------------------------------
 // View  - Generics
@@ -3492,6 +3502,34 @@ begin
    Result:= jForm_GetImageFromAssetsFile(FjEnv, FjObject, _assetsImageFileName);
 end;
 
+function jForm.GetAssetContentList(_path: string): TDynArrayOfString;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jForm_GetAssetContentList(FjEnv, FjObject, _path);
+end;
+
+function jForm.GetDriverList(): TDynArrayOfString;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jForm_GetDriverList(FjEnv, FjObject);
+end;
+
+function jForm.GetFolderList(_envPath: string): TDynArrayOfString;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jForm_GetFolderList(FjEnv, FjObject, _envPath);
+end;
+
+function jForm.GetFileList(_envPath: string): TDynArrayOfString;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jForm_GetFileList(FjEnv, FjObject, _envPath);
+end;
+
 {-------- jForm_JNI_Bridge ----------}
 
 function jForm_GetPathFromAssetsFile(env: PJNIEnv; _jform: JObject; _assetsFileName: string): string;
@@ -4563,6 +4601,147 @@ begin
   end;
   env^.DeleteLocalRef(env, jCls);
 end;
+
+function jForm_GetAssetContentList(env: PJNIEnv; _jform: JObject; _path: string): TDynArrayOfString;
+var
+  jStr: JString;
+  jBoo: JBoolean;
+  resultSize: integer;
+  jResultArray: jObject;
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+  i: integer;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_path));
+  jCls:= env^.GetObjectClass(env, _jform);
+  jMethod:= env^.GetMethodID(env, jCls, 'GetAssetContentList', '(Ljava/lang/String;)[Ljava/lang/String;');
+  jResultArray:= env^.CallObjectMethodA(env, _jform, jMethod,  @jParams);
+  if jResultArray <> nil then
+  begin
+    resultSize:= env^.GetArrayLength(env, jResultArray);
+    SetLength(Result, resultSize);
+    for i:= 0 to resultsize - 1 do
+    begin
+      jStr:= env^.GetObjectArrayElement(env, jresultArray, i);
+      case jStr = nil of
+         True : Result[i]:= '';
+         False: begin
+                  jBoo:= JNI_False;
+                  Result[i]:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
+                end;
+      end;
+    end;
+  end;
+  env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+
+function jForm_GetDriverList(env: PJNIEnv; _jform: JObject): TDynArrayOfString;
+var
+  jStr: JString;
+  jBoo: JBoolean;
+  resultSize: integer;
+  jResultArray: jObject;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+  i: integer;
+begin
+  jCls:= env^.GetObjectClass(env, _jform);
+  jMethod:= env^.GetMethodID(env, jCls, 'GetDriverList', '()[Ljava/lang/String;');
+  jresultArray:= env^.CallObjectMethod(env, _jform, jMethod);
+  if jResultArray <> nil then
+  begin
+    resultsize:= env^.GetArrayLength(env, jresultArray);
+    SetLength(Result, resultsize);
+    for i:= 0 to resultsize - 1 do
+    begin
+      jStr:= env^.GetObjectArrayElement(env, jresultArray, i);
+      case jStr = nil of
+         True : Result[i]:= '';
+         False: begin
+                  jBoo:= JNI_False;
+                  Result[i]:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
+                 end;
+      end;
+    end;
+  end;
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+
+function jForm_GetFolderList(env: PJNIEnv; _jform: JObject; _envPath: string): TDynArrayOfString;
+var
+  jStr: JString;
+  jBoo: JBoolean;
+  resultSize: integer;
+  jResultArray: jObject;
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+  i: integer;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_envPath));
+  jCls:= env^.GetObjectClass(env, _jform);
+  jMethod:= env^.GetMethodID(env, jCls, 'GetFolderList', '(Ljava/lang/String;)[Ljava/lang/String;');
+  jResultArray:= env^.CallObjectMethodA(env, _jform, jMethod,  @jParams);
+  if jResultArray <> nil then
+  begin
+    resultSize:= env^.GetArrayLength(env, jResultArray);
+    SetLength(Result, resultSize);
+    for i:= 0 to resultsize - 1 do
+    begin
+      jStr:= env^.GetObjectArrayElement(env, jresultArray, i);
+      case jStr = nil of
+         True : Result[i]:= '';
+         False: begin
+                  jBoo:= JNI_False;
+                  Result[i]:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
+                end;
+      end;
+    end;
+  end;
+  env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+
+function jForm_GetFileList(env: PJNIEnv; _jform: JObject; _envPath: string): TDynArrayOfString;
+var
+  jStr: JString;
+  jBoo: JBoolean;
+  resultSize: integer;
+  jResultArray: jObject;
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+  i: integer;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_envPath));
+  jCls:= env^.GetObjectClass(env, _jform);
+  jMethod:= env^.GetMethodID(env, jCls, 'GetFileList', '(Ljava/lang/String;)[Ljava/lang/String;');
+  jResultArray:= env^.CallObjectMethodA(env, _jform, jMethod,  @jParams);
+  if jResultArray <> nil then
+  begin
+    resultSize:= env^.GetArrayLength(env, jResultArray);
+    SetLength(Result, resultSize);
+    for i:= 0 to resultsize - 1 do
+    begin
+      jStr:= env^.GetObjectArrayElement(env, jresultArray, i);
+      case jStr = nil of
+         True : Result[i]:= '';
+         False: begin
+                  jBoo:= JNI_False;
+                  Result[i]:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
+                end;
+      end;
+    end;
+  end;
+  env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
 
 
 //-----------------------------------------------

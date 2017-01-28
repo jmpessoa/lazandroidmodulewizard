@@ -114,6 +114,18 @@
 	****************************************************************************************************
 
 
+Version 0.7.9 - 28 - January - 2017
+
+	NEW! jOpenDialog component   [thanks to @majid.ebru's suggestion!]
+
+	NEW! demo AppOpenFileDialogDemo1
+
+	IMPROVED! jForm: added news methods:  [thanks to @Fatih !]
+		GetAssetContentList
+		GetDriverList
+		GetFolderList
+		GetFileList
+
 Version 0.7.8 - 25 - January - 2017
 
 	NEW! jFileProvider component 

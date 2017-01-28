@@ -1832,4 +1832,33 @@ public String jCamera_takePhoto(String path, String filename, int requestCode) {
 //SMART LAMW DESIGNER
 //-------------------------------------------------------------------------------------------------------
 
+public  java.lang.Object jBitmap_Create( long pasobj ) {
+   return (java.lang.Object)( new jBitmap(this,pasobj));
+}
+
+public  java.lang.Object jButton_Create(long pasobj ) {
+  return (java.lang.Object)( new jButton(this.activity,this,pasobj));
+}
+
+public java.lang.Object jImageFileManager_jCreate(long _Self) {
+   return (java.lang.Object)(new jImageFileManager(this,_Self));
+}
+
+public  java.lang.Object jImageView_Create(long pasobj ) {
+  return (java.lang.Object)( new jImageView(this.activity,this,pasobj));
+}
+
+public java.lang.Object jOpenDialog_jCreate(long _Self) {
+  return (java.lang.Object)(new jOpenDialog(this,_Self));
+}
+public native void pOnFileSelected(long pasobj, String path, String fileName);
+
+public java.lang.Object jTextFileManager_jCreate(long _Self) {
+   return (java.lang.Object)(new jTextFileManager(this,_Self));
+}
+
+public  java.lang.Object jTextView_Create(long pasobj) {
+  return (java.lang.Object)( new jTextView(this.activity,this,pasobj));
+}
+
 }

@@ -112,6 +112,8 @@ uses
    function Java_Event_pOnUDPSocketReceived(env: PJNIEnv; this: jobject; Obj: TObject;
                              content: JString; fromIP: JString; fromPort: integer): JBoolean;
 
+   procedure Java_Event_pOnFileSelected(env: PJNIEnv; this: jobject; Obj: TObject; path: JString; fileName: JString);
+
 
 implementation
 
@@ -121,7 +123,7 @@ uses
    spinner, location, actionbartab, customdialog, togglebutton, switchbutton, gridview,
    sensormanager, broadcastreceiver, datepickerdialog, timepickerdialog, shellcommand,
    tcpsocketclient, surfaceview, mediaplayer, contactmanager, seekbar, ratingbar, radiogroup,drawingview,
-   autocompletetextview, chronometer, numberpicker, udpsocket;
+   autocompletetextview, chronometer, numberpicker, udpsocket, opendialog;
 
 procedure Java_Event_pOnBluetoothEnabled(env: PJNIEnv; this: jobject; Obj: TObject);
 begin
@@ -1295,6 +1297,35 @@ begin
     jUDPSocket(Obj).GenEvent_OnUDPSocketReceived(Obj, pascontent, pasfromIP, fromPort, outListening);
   end;
   Result:= JBool(outListening);
+end;
+
+procedure Java_Event_pOnFileSelected(env: PJNIEnv; this: jobject; Obj: TObject; path: JString; fileName: JString);
+var
+   pasFileName: string;
+   pasPath: string;
+ _jBoolean: JBoolean;
+begin
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+  if Obj is jOpenDialog then
+  begin
+    jForm(jOpenDialog(Obj).Owner).UpdateJNI(gApp);
+    pasFileName := '';
+    if fileName <> nil then
+    begin
+      _jBoolean:= JNI_False;
+      pasFileName:= string( env^.GetStringUTFChars(env,fileName,@_jBoolean) );
+    end;
+
+    pasPath := '';
+    if path <> nil then
+    begin
+      _jBoolean:= JNI_False;
+      pasPath:= string( env^.GetStringUTFChars(env,path,@_jBoolean) );
+    end;
+
+    jOpenDialog(Obj).GenEvent_OnFileSelected(Obj, pasPath, pasFileName);
+  end;
 end;
 
 end.
