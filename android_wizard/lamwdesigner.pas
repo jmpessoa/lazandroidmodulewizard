@@ -849,7 +849,8 @@ begin
   sl := TStringList.Create;
   try
     for i := 0 to p.ChildCount - 1 do
-      sl.Add(p.Children[i].Name);
+      if not (p is jCustomDialog) then
+        sl.Add(p.Children[i].Name);
     sl.Sorted := True;
     for i := 0 to PropCount - 1 do
     begin
