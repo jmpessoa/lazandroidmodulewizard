@@ -1207,15 +1207,10 @@ begin
 end;
 
 function TAndroidWidgetMediator.AssetsDir: string;
-var
-  pr: TLazProjectFile;
 begin
-  pr := LazarusIDE.GetProjectFileWithRootComponent(Root);
-  if pr = nil then
+  if FProjFile = nil then
     raise Exception.CreateFmt('Project file for %s is not available!', [Root.Name]);
-  if not (pr.GetFileOwner is TLazProject) then
-    raise Exception.Create('!!! ' + pr.GetFileOwner.ClassName);
-  Result := ExtractFilePath(TLazProject(pr.GetFileOwner).MainFile.GetFullFilename);
+  Result := ExtractFilePath(TLazProject(FProjFile.GetFileOwner).MainFile.GetFullFilename);
   Result := Copy(Result, 1, RPosEx(PathDelim, Result, Length(Result) - 1)) + 'assets' + PathDelim;
 end;
 
