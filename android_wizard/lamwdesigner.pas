@@ -41,7 +41,7 @@ type
     FDefaultFontColor: TColor;
     FImageCache: TImageCache;
     FSizing: Boolean;
-    FStarted, FDone: TFPList;
+    FStarted, FDone, FCustomDialogs: TFPList;
     FLastSelectedContainer: jVisualControl;
     FSelection: TFPList;
     FProjFile: TLazProjectFile;
@@ -76,6 +76,7 @@ type
     procedure InitComponent(AComponent, NewParent: TComponent; NewBounds: TRect); override;
     procedure Paint; override;
     function ComponentIsIcon(AComponent: TComponent): boolean; override;
+    function ComponentIsVisible(AComponent: TComponent): Boolean; override;
     function ParentAcceptsChild(Parent: TComponent; Child: TComponentClass): boolean; override;
     procedure UpdateTheme;
     procedure MouseDown(Button: TMouseButton; Shift: TShiftState; p: TPoint; var Handled: boolean); override;
@@ -443,10 +444,17 @@ type
     function GetAttributes: TPropertyAttributes; override;
     procedure GetValues(Proc: TGetStrProc); override;
     procedure SetValue(const NewValue: ansistring); override;
-{    procedure ListMeasureHeight(const {%H-}AValue: ansistring; {%H-}Index:integer;
-      ACanvas:TCanvas; var AHeight: Integer); override;}
     procedure ListDrawValue(const CurValue: ansistring; Index:integer;
       ACanvas: TCanvas;  const ARect: TRect; AState: TPropEditDrawState); override;
+  end;
+
+  { TjCustomDialogComponentEditor }
+
+  TjCustomDialogComponentEditor = class(TComponentEditor)
+  public
+    function GetVerbCount: Integer; override;
+    function GetVerb({%H-}Index: Integer): string; override;
+    procedure ExecuteVerb({%H-}Index: Integer); override;
   end;
 
 implementation
@@ -515,6 +523,59 @@ procedure RegisterAndroidWidgetDraftClass(AWidgetClass: jVisualControlClass;
   ADraftClass: TDraftWidgetClass);
 begin
   DraftClassesMap.Add(AWidgetClass, ADraftClass);
+end;
+
+{ TjCustomDialogComponentEditor }
+
+function TjCustomDialogComponentEditor.GetVerbCount: Integer;
+begin
+  Result := 1;
+end;
+
+function TjCustomDialogComponentEditor.GetVerb(Index: Integer): string;
+begin
+  with ((Component.Owner as TAndroidForm).Designer as TAndroidWidgetMediator) do
+    if ComponentIsIcon(Self.Component) then
+      Result := 'Show custom dialog'
+    else
+      Result := 'Hide custom dialog';
+end;
+
+procedure TjCustomDialogComponentEditor.ExecuteVerb(Index: Integer);
+var
+  sl: TStringList;
+  i, maxH: Integer;
+begin
+  with ((Component.Owner as TAndroidForm).Designer as TAndroidWidgetMediator) do
+  begin
+    sl := TStringList.Create;
+    sl.Delimiter := ';';
+    sl.DelimitedText := FProjFile.CustomSessionData['ShownCustDialogs'];
+    i := sl.IndexOf(Component.Name);
+    if i >= 0 then
+    begin
+      sl.Delete(i);
+      TAndroidWidget(Component).Left := LeftFromDesignInfo(Component.DesignInfo);
+      TAndroidWidget(Component).Top := TopFromDesignInfo(Component.DesignInfo);
+    end else begin
+      sl.Add(Component.Name);
+      with TAndroidWidget(Component) do
+      begin
+        Left := 5;
+        Width := TAndroidForm(Owner).Width - 10;
+        maxH := 100;
+        for i := 0 to ChildCount - 1 do
+          with Children[i] do
+            if maxH < Top + Height + MarginBottom then
+              maxH := Top + Height + MarginBottom;
+        Height := maxH;
+        Top := (TAndroidForm(Owner).Height - maxH) div 2;
+        if Top < 0 then Top := 0;
+      end;
+    end;
+    FProjFile.CustomSessionData['ShownCustDialogs'] := sl.DelimitedText;
+    sl.Free;
+  end;
 end;
 
 { TImageListPropertyEditor }
@@ -1043,6 +1104,7 @@ begin
 
   FStarted := TFPList.Create;
   FDone := TFPList.Create;
+  FCustomDialogs := TFPList.Create;
   FSelection := TFPList.Create;
 
   FImageCache := TImageCache.Create;
@@ -1057,6 +1119,7 @@ begin
   FStarted.Free;
   FDone.Free;
   FSelection.Free;
+  FCustomDialogs.Free;
 
   if GlobalDesignHook <> nil then
     GlobalDesignHook.RemoveAllHandlersForObject(Self);
@@ -1166,6 +1229,7 @@ end;
 class function TAndroidWidgetMediator.CreateMediator(TheOwner, TheForm: TComponent): TDesignerMediator;
 var
   Mediator: TAndroidWidgetMediator;
+  i: Integer;
 begin
   Result := inherited CreateMediator(TheOwner, nil);
 
@@ -1175,7 +1239,13 @@ begin
 
   Mediator.UpdateTheme;
   Mediator.FProjFile := LazarusIDE.GetProjectFileWithRootComponent(TheForm);
+  Mediator.FProjFile.CustomSessionData['ShownCustDialogs'] := '';
   Mediator.InitSmartDesignerHelpers;
+
+  for i := 0 to TheForm.ComponentCount - 1 do
+    if TheForm.Components[i] is jCustomDialog then
+      with jCustomDialog(TheForm.Components[i]) do
+        DesignInfo := LeftTopToDesignInfo(Left, Top);
 end;
 
 class function TAndroidWidgetMediator.FormClass: TComponentClass;
@@ -1190,7 +1260,11 @@ begin
   if AComponent is TAndroidWidget then
   begin
     w := TAndroidWidget(AComponent);
-    CurBounds := Bounds(w.Left, w.Top, w.Width, w.Height);
+    if ComponentIsIcon(AComponent) then
+      CurBounds := Bounds(LeftFromDesignInfo(w.DesignInfo),
+                          TopFromDesignInfo(w.DesignInfo), 28, 28)
+    else
+      CurBounds := Bounds(w.Left, w.Top, w.Width, w.Height);
   end else inherited GetBounds(AComponent,CurBounds);
 end;
 
@@ -1230,6 +1304,9 @@ begin
   begin
     TAndroidWidget(AComponent).SetBounds(NewBounds.Left,NewBounds.Top,
       NewBounds.Right-NewBounds.Left,NewBounds.Bottom-NewBounds.Top);
+    if ComponentIsIcon(AComponent) then
+      with TAndroidWidget(AComponent) do
+        DesignInfo := LeftTopToDesignInfo(NewBounds.Left, NewBounds.Top);
   end else inherited SetBounds(AComponent,NewBounds);
 end;
 
@@ -1238,7 +1315,7 @@ procedure TAndroidWidgetMediator.GetClientArea(AComponent: TComponent; out
 var
   Widget: TAndroidWidget;
 begin
-  if AComponent is TAndroidWidget then
+  if (AComponent is TAndroidWidget) and not ComponentIsIcon(AComponent) then
   begin
     Widget:=TAndroidWidget(AComponent);
     CurClientArea:=Rect(0, 0, Widget.Width, Widget.Height);
@@ -1247,30 +1324,31 @@ begin
   else inherited GetClientArea(AComponent, CurClientArea, ScrollOffset);
 end;
 
-
 procedure TAndroidWidgetMediator.InitComponent(AComponent, NewParent: TComponent; NewBounds: TRect);
 begin
-   if AComponent <> AndroidForm then // to preserve jForm size
-   begin
-     if AComponent is TAndroidWidget then
-       with NewBounds do
-         if (Right - Left = 50) and (Bottom - Top = 50) then // ugly check, but IDE makes 50x50 default size for non TControl
-         begin
-           // restore default size
-           Right := Left + TAndroidWidget(AComponent).Width;
-           Bottom := Top + TAndroidWidget(AComponent).Height
-         end;
-     inherited InitComponent(AComponent, NewParent, NewBounds);
-     if (AComponent is jVisualControl)
-     and Assigned(jVisualControl(AComponent).Parent) then
-       with jVisualControl(AComponent) do
-       begin
-         if not (LayoutParamWidth in [lpWrapContent, lpExact, lpUseWeight]) then
-           LayoutParamWidth := GetDesignerLayoutByWH(Width, Parent.Width);
-         if not (LayoutParamHeight in [lpWrapContent, lpExact, lpUseWeight]) then
-           LayoutParamHeight := GetDesignerLayoutByWH(Height, Parent.Height);
-       end;
-   end;
+  if AComponent <> AndroidForm then // to preserve jForm size
+  begin
+    if AComponent is TAndroidWidget then
+    begin
+      with NewBounds do
+        if (Right - Left = 50) and (Bottom - Top = 50) then // ugly check, but IDE makes 50x50 default size for non TControl
+        begin
+          // restore default size
+          Right := Left + TAndroidWidget(AComponent).Width;
+          Bottom := Top + TAndroidWidget(AComponent).Height
+        end;
+    end;
+    inherited InitComponent(AComponent, NewParent, NewBounds);
+    if (AComponent is jVisualControl)
+    and Assigned(jVisualControl(AComponent).Parent) then
+      with jVisualControl(AComponent) do
+      begin
+        if not (LayoutParamWidth in [lpWrapContent, lpExact, lpUseWeight]) then
+          LayoutParamWidth := GetDesignerLayoutByWH(Width, Parent.Width);
+        if not (LayoutParamHeight in [lpWrapContent, lpExact, lpUseWeight]) then
+          LayoutParamHeight := GetDesignerLayoutByWH(Height, Parent.Height);
+      end;
+  end;
 end;
 
 procedure TAndroidWidgetMediator.Paint;
@@ -1334,26 +1412,7 @@ var
             gdVertical);
         end;
       end else
-      if (AWidget is jCustomDialog) then
-      begin
-        if jCustomDialog(AWidget).BackgroundColor <> colbrDefault then
-        begin
-          fpcolor:= ToTFPColor(jCustomDialog(AWidget).BackgroundColor);
-          Brush.Color:= FPColorToTColor(fpcolor);
-        end;
-        {
-        else
-        begin
-          Brush.Color:= clNone;
-          Brush.Style:= bsClear;
-        end;
-        }
-        Rectangle(0,0,AWidget.Width,AWidget.Height);    // outer frame
-        Font.Color:= clMedGray;
-        TextOut(6,4,(AWidget as jVisualControl).Text);
-
-      end
-      else // generic
+      // generic
       begin
         fWidgetClass := DraftClassesMap.Find(AWidget.ClassType);
         if Assigned(fWidgetClass) then
@@ -1379,12 +1438,6 @@ var
 
       if AWidget.AcceptChildrenAtDesignTime then
       begin       //inner rect...
-        if (AWidget is jCustomDialog) then
-        begin
-          Pen.Color:= clSilver; //clWhite;
-          Frame(4,4,AWidget.Width-4,AWidget.Height-4); // inner frame
-        end
-        else
         if not (AWidget is jForm) then
         begin
           Pen.Color:= clSilver;
@@ -1401,8 +1454,14 @@ var
         begin
           for i:=0 to AWidget.ChildCount-1 do
           begin
-            SaveHandleState;
             Child:=AWidget.Children[i];
+            if Child is jCustomDialog then
+            begin
+              if not ComponentIsIcon(Child) then
+                FCustomDialogs.Add(Child);
+              Continue;
+            end;
+            SaveHandleState;
             // clip child area
             MoveWindowOrgEx(Handle,Child.Left,Child.Top);
             if IntersectClipRect(Handle,0,0,Child.Width,Child.Height)<>NullRegion then
@@ -1417,17 +1476,82 @@ var
     FDone.Add(AWidget);
   end;
 
+  procedure PaintCustomDialog(cd: jCustomDialog);
+  var
+     i: Integer;
+    Child: TAndroidWidget;
+  begin
+    with LCLForm.Canvas do begin
+      SaveHandleState;
+      if cd.BackgroundColor <> colbrDefault then
+        Brush.Color:= FPColorToTColor(ToTFPColor(cd.BackgroundColor))
+      else
+        Brush.Color:= FDefaultBrushColor;
+      MoveWindowOrgEx(Handle,cd.Left,cd.Top);
+      IntersectClipRect(Handle, 0, 0, cd.Width, cd.Height);
+      Brush.Style := bsSolid;
+      Rectangle(0, 0, cd.Width, cd.Height);    // outer frame
+      Brush.Style := bsClear;
+      Font.Color := clMedGray;
+      TextOut(6, 4, cd.Text);
+      Pen.Color:= clSilver; //clWhite;
+      Frame(4, 4, cd.Width-4, cd.Height-4); // inner frame
+
+      // children
+      if cd.ChildCount > 0 then
+        for i := 0 to cd.ChildCount - 1 do
+        begin
+          SaveHandleState;
+          Child := cd.Children[i];
+          // clip child area
+          MoveWindowOrgEx(Handle, Child.Left, Child.Top);
+          if IntersectClipRect(Handle, 0, 0, Child.Width, Child.Height) <> NullRegion then
+            PaintWidget(Child);
+          RestoreHandleState;
+        end;
+      RestoreHandleState;
+    end;
+  end;
+
+var
+  i: Integer;
 begin
-  CanUpdateLayout := (FProjFile = nil) or not SameText(FProjFile.CustomData['DisableLayout'], 'True');
+  CanUpdateLayout := (FProjFile = nil)
+    or not SameText(FProjFile.CustomData['DisableLayout'], 'True');
   FStarted.Clear;
   FDone.Clear;
+  FCustomDialogs.Clear; // jCustomDialogs are drawn after all other components
   PaintWidget(AndroidForm);
+  for i := 0 to FCustomDialogs.Count - 1 do
+    PaintCustomDialog(jCustomDialog(FCustomDialogs[i]));
+
   inherited Paint;
 end;
 
 function TAndroidWidgetMediator.ComponentIsIcon(AComponent: TComponent): boolean;
+var
+  sl: TStringList;
 begin
   Result := not (AComponent is TAndroidWidget);
+  if not Result and (AComponent is jCustomDialog) then
+  begin
+    sl := TStringList.Create;
+    sl.Delimiter := ';';
+    sl.DelimitedText := FProjFile.CustomSessionData['ShownCustDialogs'];
+    Result := sl.IndexOf(AComponent.Name) < 0;
+    sl.Free;
+  end;
+end;
+
+function TAndroidWidgetMediator.ComponentIsVisible(AComponent: TComponent): Boolean;
+begin
+  Result := inherited ComponentIsVisible(AComponent);
+  while Result and (AComponent is jVisualControl) do
+  begin
+    AComponent := jVisualControl(AComponent).Parent;
+    if AComponent is jCustomDialog then
+      Result := not ComponentIsIcon(AComponent)
+  end;
 end;
 
 function TAndroidWidgetMediator.ParentAcceptsChild(Parent: TComponent; Child: TComponentClass): boolean;
@@ -3057,6 +3181,7 @@ initialization
   RegisterPropertyEditor(TypeInfo(Integer), jForm, 'Height', TAndroidFormSizeEditor);
   RegisterPropertyEditor(TypeInfo(TStrings), jImageList, 'Images', TjImageListImagesEditor);
   RegisterComponentEditor(jImageList, TjImageListEditor);
+  RegisterComponentEditor(jCustomDialog, TjCustomDialogComponentEditor);
   RegisterPropertyEditor(TypeInfo(TImageListIndex), jControl, '', TImageIndexPropertyEditor);
   RegisterPropertyEditor(TypeInfo(jImageList), nil, '', TImageListPropertyEditor);
 
