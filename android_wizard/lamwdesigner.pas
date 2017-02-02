@@ -421,7 +421,7 @@ type
 
   { TjImageListEditor }
 
-  TjImageListEditor = class(TDefaultComponentEditor)
+  TjImageListEditor = class(TComponentEditor)
   public
     procedure Edit; override;
     procedure ExecuteVerb({%H-}Index: Integer); override;
