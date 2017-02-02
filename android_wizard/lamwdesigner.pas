@@ -392,9 +392,9 @@ type
     procedure GetValues(Proc: TGetStrProc); override;
   end;
 
-  { TAndroidFormComponentEditor }
+  { TAndroidFormSizeComponentEditor }
 
-  TAndroidFormComponentEditor = class(TDefaultComponentEditor)
+  TAndroidFormSizeComponentEditor = class(TDefaultComponentEditor)
   private
     procedure ChangeSize(AWidth, AHeight: Integer);
     procedure ShowSelectSizeDialog;
@@ -404,9 +404,9 @@ type
     function GetVerbCount: Integer; override;
   end;
 
-  { TAndroidFormSizeEditor }
+  { TAndroidFormSizePropertyEditor }
 
-  TAndroidFormSizeEditor = class(TIntegerPropertyEditor)
+  TAndroidFormSizePropertyEditor = class(TIntegerPropertyEditor)
   public
     procedure Edit; override;
     function GetAttributes: TPropertyAttributes; override;
@@ -802,11 +802,11 @@ begin
   Result := [paDialog, paReadOnly];
 end;
 
-{ TAndroidFormSizeEditor }
+{ TAndroidFormSizePropertyEditor }
 
-procedure TAndroidFormSizeEditor.Edit;
+procedure TAndroidFormSizePropertyEditor.Edit;
 begin
-  with TAndroidFormComponentEditor.Create(GetComponent(0) as TComponent, nil) do
+  with TAndroidFormSizeComponentEditor.Create(GetComponent(0) as TComponent, nil) do
   try
     ShowSelectSizeDialog
   finally
@@ -814,14 +814,14 @@ begin
   end;
 end;
 
-function TAndroidFormSizeEditor.GetAttributes: TPropertyAttributes;
+function TAndroidFormSizePropertyEditor.GetAttributes: TPropertyAttributes;
 begin
   Result := inherited GetAttributes + [paDialog];
 end;
 
-{ TAndroidFormComponentEditor }
+{ TAndroidFormSizeComponentEditor }
 
-procedure TAndroidFormComponentEditor.ChangeSize(AWidth, AHeight: Integer);
+procedure TAndroidFormSizeComponentEditor.ChangeSize(AWidth, AHeight: Integer);
 begin
   with jForm(Component) do
   begin
@@ -832,7 +832,7 @@ begin
   end;
 end;
 
-procedure TAndroidFormComponentEditor.ShowSelectSizeDialog;
+procedure TAndroidFormSizeComponentEditor.ShowSelectSizeDialog;
 begin
   with TfrmFormSizeSelect.Create(nil) do
   try
@@ -845,7 +845,7 @@ begin
   end;
 end;
 
-procedure TAndroidFormComponentEditor.ExecuteVerb(Index: Integer);
+procedure TAndroidFormSizeComponentEditor.ExecuteVerb(Index: Integer);
 var
   pr: TLazProjectFile;
 begin
@@ -867,7 +867,7 @@ begin
   end;
 end;
 
-function TAndroidFormComponentEditor.GetVerb(Index: Integer): string;
+function TAndroidFormSizeComponentEditor.GetVerb(Index: Integer): string;
 var
   pr: TLazProjectFile;
 begin
@@ -889,7 +889,7 @@ begin
   end
 end;
 
-function TAndroidFormComponentEditor.GetVerbCount: Integer;
+function TAndroidFormSizeComponentEditor.GetVerbCount: Integer;
 begin
   Result := 3;
 end;
@@ -3176,9 +3176,9 @@ initialization
   DraftClassesMap := TDraftControlHash.Create(64); // should be power of 2 for efficiency
   RegisterPropertyEditor(TypeInfo(TARGBColorBridge), nil, '', TARGBColorBridgePropertyEditor);
   RegisterPropertyEditor(TypeInfo(jVisualControl), jVisualControl, 'Anchor', TAnchorPropertyEditor);
-  RegisterComponentEditor(jForm, TAndroidFormComponentEditor);
-  RegisterPropertyEditor(TypeInfo(Integer), jForm, 'Width', TAndroidFormSizeEditor);
-  RegisterPropertyEditor(TypeInfo(Integer), jForm, 'Height', TAndroidFormSizeEditor);
+  RegisterComponentEditor(jForm, TAndroidFormSizeComponentEditor);
+  RegisterPropertyEditor(TypeInfo(Integer), jForm, 'Width', TAndroidFormSizePropertyEditor);
+  RegisterPropertyEditor(TypeInfo(Integer), jForm, 'Height', TAndroidFormSizePropertyEditor);
   RegisterPropertyEditor(TypeInfo(TStrings), jImageList, 'Images', TjImageListImagesEditor);
   RegisterComponentEditor(jImageList, TjImageListEditor);
   RegisterComponentEditor(jCustomDialog, TjCustomDialogComponentEditor);
