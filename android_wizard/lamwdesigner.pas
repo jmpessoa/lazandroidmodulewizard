@@ -1239,13 +1239,16 @@ begin
 
   Mediator.UpdateTheme;
   Mediator.FProjFile := LazarusIDE.GetProjectFileWithRootComponent(TheForm);
-  Mediator.FProjFile.CustomSessionData['ShownCustDialogs'] := '';
+
+  //Mediator.FProjFile.CustomSessionData['ShownCustDialogs'] := '';   bug!
+
   Mediator.InitSmartDesignerHelpers;
 
   for i := 0 to TheForm.ComponentCount - 1 do
     if TheForm.Components[i] is jCustomDialog then
       with jCustomDialog(TheForm.Components[i]) do
         DesignInfo := LeftTopToDesignInfo(Left, Top);
+
 end;
 
 class function TAndroidWidgetMediator.FormClass: TComponentClass;
