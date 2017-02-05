@@ -1240,7 +1240,8 @@ begin
   Mediator.UpdateTheme;
   Mediator.FProjFile := LazarusIDE.GetProjectFileWithRootComponent(TheForm);
 
-  //Mediator.FProjFile.CustomSessionData['ShownCustDialogs'] := '';   bug!
+  if Assigned(Mediator.FProjFile) then
+    Mediator.FProjFile.CustomSessionData['ShownCustDialogs'] := '';
 
   Mediator.InitSmartDesignerHelpers;
 
