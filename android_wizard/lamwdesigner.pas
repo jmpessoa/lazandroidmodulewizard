@@ -41,7 +41,7 @@ type
     FDefaultFontColor: TColor;
     FImageCache: TImageCache;
     FSizing: Boolean;
-    FStarted, FDone, FCustomDialogs: TFPList;
+    FStarted, FDone, FCustomDialogs, FShownCustomDialogs: TFPList;
     FLastSelectedContainer: jVisualControl;
     FSelection: TFPList;
     FProjFile: TLazProjectFile;
@@ -543,22 +543,18 @@ end;
 
 procedure TjCustomDialogComponentEditor.ExecuteVerb(Index: Integer);
 var
-  sl: TStringList;
   i, maxH: Integer;
 begin
   with ((Component.Owner as TAndroidForm).Designer as TAndroidWidgetMediator) do
   begin
-    sl := TStringList.Create;
-    sl.Delimiter := ';';
-    sl.DelimitedText := FProjFile.CustomSessionData['ShownCustDialogs'];
-    i := sl.IndexOf(Component.Name);
+    i := FShownCustomDialogs.IndexOf(Component);
     if i >= 0 then
     begin
-      sl.Delete(i);
+      FShownCustomDialogs.Delete(i);
       TAndroidWidget(Component).Left := LeftFromDesignInfo(Component.DesignInfo);
       TAndroidWidget(Component).Top := TopFromDesignInfo(Component.DesignInfo);
     end else begin
-      sl.Add(Component.Name);
+      FShownCustomDialogs.Add(Component);
       with TAndroidWidget(Component) do
       begin
         Left := 5;
@@ -573,8 +569,6 @@ begin
         if Top < 0 then Top := 0;
       end;
     end;
-    FProjFile.CustomSessionData['ShownCustDialogs'] := sl.DelimitedText;
-    sl.Free;
   end;
 end;
 
@@ -1105,6 +1099,7 @@ begin
   FStarted := TFPList.Create;
   FDone := TFPList.Create;
   FCustomDialogs := TFPList.Create;
+  FShownCustomDialogs := TFPList.Create;
   FSelection := TFPList.Create;
 
   FImageCache := TImageCache.Create;
@@ -1120,6 +1115,7 @@ begin
   FDone.Free;
   FSelection.Free;
   FCustomDialogs.Free;
+  FShownCustomDialogs.Free;
 
   if GlobalDesignHook <> nil then
     GlobalDesignHook.RemoveAllHandlersForObject(Self);
@@ -1218,7 +1214,9 @@ end;
 procedure TAndroidWidgetMediator.OnPersistentDeleting(APersistent: TPersistent);
 begin
   FjControlDeleted := (APersistent is jControl)
-    and (Root <> nil) and (TComponent(APersistent).Owner = Root)
+    and (Root <> nil) and (TComponent(APersistent).Owner = Root);
+  if FjControlDeleted then
+    FShownCustomDialogs.Remove(APersistent);
 end;
 
 procedure TAndroidWidgetMediator.UpdateJControlsList;
@@ -1239,10 +1237,6 @@ begin
 
   Mediator.UpdateTheme;
   Mediator.FProjFile := LazarusIDE.GetProjectFileWithRootComponent(TheForm);
-
-  if Assigned(Mediator.FProjFile) then
-    Mediator.FProjFile.CustomSessionData['ShownCustDialogs'] := '';
-
   Mediator.InitSmartDesignerHelpers;
 
   for i := 0 to TheForm.ComponentCount - 1 do
@@ -1533,18 +1527,10 @@ begin
 end;
 
 function TAndroidWidgetMediator.ComponentIsIcon(AComponent: TComponent): boolean;
-var
-  sl: TStringList;
 begin
-  Result := not (AComponent is TAndroidWidget);
-  if not Result and (AComponent is jCustomDialog) then
-  begin
-    sl := TStringList.Create;
-    sl.Delimiter := ';';
-    sl.DelimitedText := FProjFile.CustomSessionData['ShownCustDialogs'];
-    Result := sl.IndexOf(AComponent.Name) < 0;
-    sl.Free;
-  end;
+  Result := not (AComponent is TAndroidWidget)
+    or (AComponent is jCustomDialog)
+       and (FShownCustomDialogs.IndexOf(AComponent) < 0);
 end;
 
 function TAndroidWidgetMediator.ComponentIsVisible(AComponent: TComponent): Boolean;
