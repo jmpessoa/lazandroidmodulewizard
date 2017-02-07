@@ -1,0 +1,127 @@
+object AndroidModule1: TAndroidModule1
+  Left = 327
+  Top = 154
+  Width = 320
+  Height = 400
+  MarginLeft = 0
+  MarginTop = 0
+  MarginRight = 0
+  MarginBottom = 0
+  Text = 'AndroidModule1'
+  ActivityMode = actMain
+  BackgroundColor = colbrDefault
+  ActionBarTitle = abtDefault
+  OnJNIPrompt = AndroidModule1JNIPrompt
+  object jTextView1: jTextView
+    Left = 129
+    Top = 5
+    Width = 61
+    Height = 20
+    MarginLeft = 5
+    MarginTop = 5
+    MarginRight = 5
+    MarginBottom = 5
+    Visible = True
+    Id = 1
+    PosRelativeToAnchor = []
+    PosRelativeToParent = [rpTop, rpCenterHorizontal]
+    LayoutParamWidth = lpWrapContent
+    LayoutParamHeight = lpWrapContent
+    Text = 'jTextView1'
+    Alignment = taLeft
+    Enabled = True
+    BackgroundColor = colbrDefault
+    FontColor = colbrDefault
+    FontSize = 0
+    TextTypeFace = tfNormal
+    FontSizeUnit = unitDefault
+  end
+  object jViewFlipper1: jViewFlipper
+    Left = 24
+    Top = 33
+    Width = 279
+    Height = 184
+    MarginLeft = 10
+    MarginTop = 10
+    MarginRight = 10
+    MarginBottom = 10
+    Visible = True
+    Anchor = jTextView1
+    Id = 2
+    PosRelativeToAnchor = [raBelow]
+    PosRelativeToParent = []
+    LayoutParamWidth = lpMatchParent
+    LayoutParamHeight = lpWrapContent
+    BackgroundColor = colbrMediumSpringGreen
+    OnFlingGesture = jViewFlipper1FlingGesture
+    object jImageView1: jImageView
+      Left = 9
+      Top = 9
+      Width = 260
+      Height = 165
+      MarginLeft = 5
+      MarginTop = 5
+      MarginRight = 5
+      MarginBottom = 5
+      Visible = True
+      Id = 1
+      PosRelativeToAnchor = []
+      PosRelativeToParent = [rpCenterInParent]
+      LayoutParamWidth = lpMatchParent
+      LayoutParamHeight = lpMatchParent
+      ImageIndex = 0
+      Images = jImageList1
+      BackgroundColor = colbrDefault
+      ImageScaleType = scaleCenter
+    end
+    object jImageView2: jImageView
+      Left = 9
+      Top = 9
+      Width = 260
+      Height = 165
+      MarginLeft = 5
+      MarginTop = 5
+      MarginRight = 5
+      MarginBottom = 5
+      Visible = True
+      Id = 2
+      PosRelativeToAnchor = []
+      PosRelativeToParent = [rpCenterInParent]
+      LayoutParamWidth = lpMatchParent
+      LayoutParamHeight = lpMatchParent
+      ImageIndex = 1
+      Images = jImageList1
+      BackgroundColor = colbrDefault
+      ImageScaleType = scaleCenter
+    end
+    object jImageView3: jImageView
+      Left = 9
+      Top = 9
+      Width = 260
+      Height = 165
+      MarginLeft = 5
+      MarginTop = 5
+      MarginRight = 5
+      MarginBottom = 5
+      Visible = True
+      Id = 3
+      PosRelativeToAnchor = []
+      PosRelativeToParent = [rpCenterInParent]
+      LayoutParamWidth = lpMatchParent
+      LayoutParamHeight = lpMatchParent
+      ImageIndex = 2
+      Images = jImageList1
+      BackgroundColor = colbrDefault
+      ImageScaleType = scaleCenter
+    end
+  end
+  object jImageList1: jImageList
+    Images.Strings = (
+      'lightning.jpg'
+      'natural_wall.jpg'
+      'color_baloons.jpg'
+    )
+    left = 100
+    top = 257
+  end
+end
