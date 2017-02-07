@@ -40,9 +40,9 @@ jRatingBar = class(jVisualControl)
 
     function jCreate( _numStars: integer; _step: single): jObject;
     procedure jFree();
-    procedure SetViewParent(_viewgroup: jObject);
+    procedure SetViewParent(_viewgroup: jObject);  override;
     procedure RemoveFromViewParent();
-    function GetView(): jObject;
+    function GetView(): jObject;  override;
     procedure SetLParamWidth(_w: integer);
     procedure SetLParamHeight(_h: integer);
     procedure SetLeftTopRightBottomWidthHeight(_left: integer; _top: integer; _right: integer; _bottom: integer; _w: integer; _h: integer);

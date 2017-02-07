@@ -1040,6 +1040,7 @@ function jSqliteDataAccess_CheckDataBaseExistsByName(env: PJNIEnv; _jsqlitedataa
 
 procedure jSqliteDataAccess_UpdateImageBatch(env: PJNIEnv; _jsqlitedataaccess: JObject; var _imageResIdentifierDataArray: TDynArrayOfString; _delimiter: string);
 procedure jSqliteDataAccess_SetDataBaseName(env: PJNIEnv; _jsqlitedataaccess: JObject; _dbName: string);
+function jSqliteDataAccess_DatabaseExists(env: PJNIEnv; _jsqlitedataaccess: JObject; _databaseName: string): boolean;
 
 // Http
 //Function  jHttp_Get(env:PJNIEnv;  this:jobject; URL: String) : String;
@@ -8158,6 +8159,23 @@ begin
 env^.DeleteLocalRef(env,jParams[0].l);
   env^.DeleteLocalRef(env, jCls);
 end;
+
+function jSqliteDataAccess_DatabaseExists(env: PJNIEnv; _jsqlitedataaccess: JObject; _databaseName: string): boolean;
+var
+  jBoo: JBoolean;
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_databaseName));
+  jCls:= env^.GetObjectClass(env, _jsqlitedataaccess);
+  jMethod:= env^.GetMethodID(env, jCls, 'DatabaseExists', '(Ljava/lang/String;)Z');
+  jBoo:= env^.CallBooleanMethodA(env, _jsqlitedataaccess, jMethod, @jParams);
+  Result:= boolean(jBoo);
+  env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
 
 {-------- jHttpClient_JNI_Bridge ----------}
 

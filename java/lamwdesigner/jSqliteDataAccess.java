@@ -1,6 +1,7 @@
-package com.example.appchronometerdemo1;
+package com.example.appopenfiledialogdemo1;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.lang.reflect.Field;
 import java.util.Locale;
 
@@ -461,6 +462,18 @@ public class jSqliteDataAccess {
     
     public void SetDataBaseName(String _dbName) {
     	DATABASE_NAME = _dbName;
+    }
+    
+    public boolean DatabaseExists(String _databaseName) {
+      File database=controls.activity.getDatabasePath(_databaseName);  //"databasename.db"
+      if (!database.exists()) {
+          // Database does not exist so copy it from assets here
+          //Log.i("Database", "Not Found");
+          return false;
+      } else {
+          //Log.i("Database", "Found");
+          return true;
+      }     
     }
     
 }

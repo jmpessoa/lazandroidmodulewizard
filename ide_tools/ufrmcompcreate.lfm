@@ -33,9 +33,9 @@ object FrmCompCreate: TFrmCompCreate
     Height = 358
     Top = 50
     Width = 724
-    ActivePage = TabSheet3
+    ActivePage = TabSheet1
     Align = alClient
-    TabIndex = 2
+    TabIndex = 0
     TabOrder = 2
     object TabSheet1: TTabSheet
       Caption = 'Java'

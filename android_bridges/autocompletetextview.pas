@@ -28,12 +28,15 @@ jAutoTextView = class(jVisualControl)
     procedure UpdateLParamHeight;
     procedure UpdateLParamWidth;
  protected
-    function GetWidth: integer;  override;
-    function GetHeight: integer; override;
+    //
  public
     constructor Create(AOwner: TComponent); override;
     destructor  Destroy; override;
     procedure Init(refApp: jApp); override;
+
+    function GetWidth: integer;  override;
+    function GetHeight: integer; override;
+
     procedure Refresh;
     procedure UpdateLayout; override;
     procedure ClearLayout;
@@ -43,7 +46,7 @@ jAutoTextView = class(jVisualControl)
     procedure jFree();
     procedure SetViewParent(_viewgroup: jObject); override;
     procedure RemoveFromViewParent();
-    function GetView(): jObject;
+    function GetView(): jObject; override;
 
     procedure SetLParamWidth(_w: integer);
     procedure SetLParamHeight(_h: integer);
@@ -164,7 +167,6 @@ constructor jAutoTextView.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
 
-
   FMarginBottom := 10;
   FMarginLeft   := 5;
   FMarginRight  := 5;
@@ -181,6 +183,7 @@ begin
   FText:= '';
   FFontFace := ffNormal;
   FTextTypeFace:= tfNormal;
+
   FItems:= TStringList.Create;
 
 end;
@@ -651,7 +654,8 @@ end;
 
 procedure jAutoTextView.SetItems(AValue: TStrings);
 begin
-   FItems.Assign(AValue);
+   if AValue <> nil then
+       FItems.Assign(AValue);
 end;
 
 function jAutoTextView.GetWidth: integer;

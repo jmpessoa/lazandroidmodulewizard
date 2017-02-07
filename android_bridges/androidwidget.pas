@@ -1136,6 +1136,8 @@ end;
     function GetFolderList(_envPath: string): TDynArrayOfString;
     function GetFileList(_envPath: string): TDynArrayOfString;
 
+    function FileExists(_fullFileName: string): boolean;
+    function DirectoryExists(_fullDirectoryName: string): boolean;
 
     // Property
     property View         : jObject        read FjRLayout; //layout!
@@ -1534,6 +1536,10 @@ function jForm_GetAssetContentList(env: PJNIEnv; _jform: JObject; _path: string)
 function jForm_GetDriverList(env: PJNIEnv; _jform: JObject): TDynArrayOfString;
 function jForm_GetFolderList(env: PJNIEnv; _jform: JObject; _envPath: string): TDynArrayOfString;
 function jForm_GetFileList(env: PJNIEnv; _jform: JObject; _envPath: string): TDynArrayOfString;
+
+function jForm_FileExists(env: PJNIEnv; _jform: JObject; _fullFileName: string): boolean;
+function jForm_DirectoryExists(env: PJNIEnv; _jform: JObject; _fullDirectoryName: string): boolean;
+
 
 //------------------------------------------------------------------------------
 // View  - Generics
@@ -3530,6 +3536,22 @@ begin
    Result:= jForm_GetFileList(FjEnv, FjObject, _envPath);
 end;
 
+function jForm.FileExists(_fullFileName: string): boolean;
+begin
+  //in designing component state: result value here...
+  Result:= False;
+  if FInitialized then
+   Result:= jForm_FileExists(FjEnv, FjObject, _fullFileName);
+end;
+
+function jForm.DirectoryExists(_fullDirectoryName: string): boolean;
+begin
+  //in designing component state: result value here...
+  Result:= False;
+  if FInitialized then
+   Result:= jForm_DirectoryExists(FjEnv, FjObject, _fullDirectoryName);
+end;
+
 {-------- jForm_JNI_Bridge ----------}
 
 function jForm_GetPathFromAssetsFile(env: PJNIEnv; _jform: JObject; _assetsFileName: string): string;
@@ -4742,6 +4764,38 @@ begin
   env^.DeleteLocalRef(env, jCls);
 end;
 
+
+function jForm_FileExists(env: PJNIEnv; _jform: JObject; _fullFileName: string): boolean;
+var
+  jBoo: JBoolean;
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_fullFileName));
+  jCls:= env^.GetObjectClass(env, _jform);
+  jMethod:= env^.GetMethodID(env, jCls, 'FileExists', '(Ljava/lang/String;)Z');
+  jBoo:= env^.CallBooleanMethodA(env, _jform, jMethod, @jParams);
+  Result:= boolean(jBoo);
+  env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+function jForm_DirectoryExists(env: PJNIEnv; _jform: JObject; _fullDirectoryName: string): boolean;
+var
+  jBoo: JBoolean;
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_fullDirectoryName));
+  jCls:= env^.GetObjectClass(env, _jform);
+  jMethod:= env^.GetMethodID(env, jCls, 'DirectoryExists', '(Ljava/lang/String;)Z');
+  jBoo:= env^.CallBooleanMethodA(env, _jform, jMethod, @jParams);
+  Result:= boolean(jBoo);
+  env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
 
 
 //-----------------------------------------------

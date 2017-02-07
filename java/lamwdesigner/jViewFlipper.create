@@ -1,0 +1,3 @@
+public java.lang.Object jViewFlipper_jCreate(long _Self) {
+  return (java.lang.Object)(new jViewFlipper(this,_Self));
+}

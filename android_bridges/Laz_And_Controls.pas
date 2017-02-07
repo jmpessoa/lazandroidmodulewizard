@@ -708,6 +708,8 @@ type
     procedure SetDataBaseName(_dbName: string);
     function GetFullPathDataBaseName(): string;
 
+    function DatabaseExists(_databaseName: string): boolean;
+
     property FullPathDataBaseName: string read GetFullPathDataBaseName;
 
   published
@@ -744,8 +746,6 @@ type
   protected
     Procedure SetText(Value: string ); override;
     Function  GetText: string;   override;
-    function GetWidth: integer;  override;
-    function GetHeight: integer; override;
 
     procedure SetFontFace(AValue: TFontFace); //override;
     procedure SetTextTypeFace(Value: TTextTypeFace); //override;
@@ -767,6 +767,9 @@ type
     procedure AppendLn(_txt: string);
     procedure CopyToClipboard();
     procedure PasteFromClipboard();
+
+    function GetWidth: integer;  override;
+    function GetHeight: integer; override;
 
   published
     property Text: string read GetText write SetText;
@@ -828,8 +831,6 @@ type
   protected
     Procedure SetText(Value: string ); override;
     Function  GetText: string; override;
-    function GetWidth: integer;  override;
-    function GetHeight: integer; override;
 
     procedure SetFontFace(AValue: TFontFace); //override; 
     procedure SetTextTypeFace(Value: TTextTypeFace); //override; 
@@ -851,6 +852,9 @@ type
     Destructor  Destroy; override;
     procedure Init(refApp: jApp); override;
     Procedure Refresh;
+
+    function GetWidth: integer;  override;
+    function GetHeight: integer; override;
 
     procedure SetMovementMethod;
     procedure SetScrollBarFadingEnabled(Value: boolean);
@@ -935,8 +939,6 @@ type
 
     function  GetText            : string;   override;
     Procedure SetText     (Value   : string );  override;
-    function GetWidth: integer;  override;
-    function GetHeight: integer; override;
 
   public
     constructor Create(AOwner: TComponent); override;
@@ -944,6 +946,9 @@ type
     procedure Init(refApp: jApp); override;
     Procedure Refresh;
     Procedure UpdateLayout; override;
+
+    function GetWidth: integer;  override;
+    function GetHeight: integer; override;
 
     procedure SetFontSizeUnit(_unit: TFontSizeUnit);
     procedure PerformClick();
@@ -1200,8 +1205,6 @@ type
     procedure SetFontFace(AValue: TFontFace);
 
   protected
-    function GetWidth: integer;  override;
-    function GetHeight: integer; override;
     procedure SetViewParent(Value: jObject);  override;
     procedure GenEvent_OnClickWidgetItem(Obj: TObject; index: integer; checked: boolean);
     procedure GenEvent_OnClickCaptionItem(Obj: TObject; index: integer; caption: string);
@@ -1220,6 +1223,10 @@ type
     procedure Refresh;
     procedure UpdateLayout; override;
     procedure Init(refApp: jApp);  override;
+
+    function GetWidth: integer;  override;
+    function GetHeight: integer; override;
+
     function IsItemChecked(index: integer): boolean;
     procedure Add(item: string); overload;
     procedure Add(item: string; delim: string); overload;
@@ -1341,28 +1348,6 @@ type
   end;
 
   //------------------------------------------------------------------
-
-  jViewFlipper = class(jVisualControl)
-  private
-    //FOnClick  : TOnNotify;
-    Procedure SetColor    (Value : TARGBColorBridge);
-    procedure UpdateLParamHeight;
-    procedure UpdateLParamWidth;
-  protected
-    procedure SetViewParent(Value: jObject);  override;
-  public
-    constructor Create(AOwner: TComponent); override;
-    Destructor  Destroy; override;
-    Procedure Refresh;
-    Procedure UpdateLayout; override;
-    procedure Init(refApp: jApp);  override;
-    //property Parent: jObject  read  FjPRLayout write SetParent; // Java : Parent Relative Layout
-
-  published
-
-    //property Visible: Boolean read FVisible   write SetVisible;
-    property BackgroundColor: TARGBColorBridge read FColor     write SetColor;
-  end;
 
   jWebView = class(jVisualControl)
   private
@@ -1694,7 +1679,7 @@ implementation
 
 
 uses
-  customdialog, radiogroup, drawingview, autocompletetextview;
+  customdialog, radiogroup, autocompletetextview, viewflipper;
 
 //-----------------------------------------------------------------------------
 // Asset
@@ -2450,14 +2435,6 @@ begin
     jView(Obj).GenEvent_OnTouch(Obj,act,cnt,x1,y1,x2,y2);
     Exit;
   end;
-  (*
-  if Obj is jDrawingView then
-  begin
-    jForm(jView(Obj).Owner).UpdateJNI(gApp);
-    jDrawingView(Obj).GenEvent_OnTouch(Obj,act,cnt,x1,y1,x2,y2);
-    Exit;
-  end;
-  *)
 end;
 
 procedure Java_Event_pOnGLRenderer(env: PJNIEnv; this: jobject; Obj: TObject; EventType, w, h: integer);
@@ -4829,6 +4806,11 @@ begin
     jCustomDialog(FParent).Init(refApp);
     FjPRLayout:= jCustomDialog(FParent).View;
   end;
+  if FParent is jViewFlipper then
+  begin
+    jViewFlipper(FParent).Init(refApp);
+    FjPRLayout:= jViewFlipper(FParent).View;
+  end;
 
   jImageView_setParent(FjEnv,FjObject , FjPRLayout);
   jImageView_setId(FjEnv, FjObject , Self.Id);
@@ -7061,172 +7043,6 @@ begin
 end;
 
 //------------------------------------------------------------------------------
-// jViewFlipper
-//------------------------------------------------------------------------------
-
-Constructor jViewFlipper.Create(AOwner: TComponent);
-begin
-  inherited Create(AOwner);
-  FLParamWidth:= lpMatchParent;
-  FLParamHeight:= lpWrapContent;
-  FHeight:= 96;
-  FWidth:= 100;
-end;
-
-Destructor jViewFlipper.Destroy;
-begin
-  if not (csDesigning in ComponentState) then
-  begin
-    if FjObject  <> nil then
-    begin
-      jViewFlipper_Free(FjEnv, FjObject );
-      FjObject := nil;
-    end;
-  end;
-  inherited Destroy;
-end;
-
-Procedure jViewFlipper.Init(refApp: jApp);
-var
-  rToP: TPositionRelativeToParent;
-  rToA: TPositionRelativeToAnchorID;
-begin
-  if FInitialized  then Exit;
-  inherited Init(refApp);
-  FjObject  := jViewFlipper_Create(FjEnv, FjThis, Self);
-  if FParent <> nil then
-  begin
-    if FParent is jPanel then
-    begin
-      jPanel(FParent).Init(refApp);
-      FjPRLayout:= jPanel(FParent).View;
-    end;
-    if FParent is jScrollView then
-    begin
-      jScrollView(FParent).Init(refApp);
-      FjPRLayout:= jScrollView_getView(FjEnv, jScrollView(FParent).jSelf);
-    end;
-    if FParent is jHorizontalScrollView then
-    begin
-      jHorizontalScrollView(FParent).Init(refApp);
-      FjPRLayout:= jHorizontalScrollView_getView(FjEnv, jHorizontalScrollView(FParent).jSelf);
-    end;
-    if FParent is jCustomDialog then
-    begin
-      jCustomDialog(FParent).Init(refApp);
-      FjPRLayout:= jCustomDialog(FParent).View;
-    end;
-  end;
-  jViewFlipper_setParent(FjEnv, FjObject , FjPRLayout);
-  jViewFlipper_setId(FjEnv, FjObject , Self.Id);
-  jViewFlipper_setLeftTopRightBottomWidthHeight(FjEnv, FjObject ,
-                                           FMarginLeft,FMarginTop,FMarginRight,FMarginBottom,
-                                           GetLayoutParams(gApp, FLParamWidth, sdW),
-                                           GetLayoutParams(gApp, FLParamHeight, sdH));
-
-  FInitialized:= True;
-  if FParent is jPanel then
-  begin
-     Self.UpdateLayout;
-  end;
-
-  for rToA := raAbove to raAlignRight do
-  begin
-    if rToA in FPositionRelativeToAnchor then
-    begin
-      jViewFlipper_addlParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
-    end;
-  end;
-  for rToP := rpBottom to rpCenterVertical do
-  begin
-     if rToP in FPositionRelativeToParent then
-     begin
-       jViewFlipper_addlParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
-     end;
-  end;
-  if Self.Anchor <> nil then Self.AnchorId:= Self.Anchor.Id
-  else Self.AnchorId:= -1;
-  jViewFlipper_setLayoutAll(FjEnv, FjObject , Self.AnchorId);
-  if FColor <> colbrDefault then
-    View_SetBackGroundColor(FjEnv, FjThis, FjObject , GetARGB(FCustomColor, FColor));
-  View_SetVisible(FjEnv, FjThis, FjObject , FVisible);
-  FInitialized:= True;
-end;
-
-procedure jViewFlipper.SetViewParent(Value: jObject);
-begin
-  FjPRLayout:= Value;
-  if FInitialized then
-    jViewFlipper_setParent(FjEnv, FjObject , FjPRLayout);
-end;
-
-Procedure jViewFlipper.SetColor(Value: TARGBColorBridge);
-begin
-  FColor:= Value;
-  if (FInitialized = True) and (FColor <> colbrDefault) then
-     View_SetBackGroundColor(FjEnv, FjObject , GetARGB(FCustomColor, FColor));
-end;
-
-Procedure jViewFlipper.Refresh;
-begin
-  if not FInitialized then Exit;
-  View_Invalidate(FjEnv, FjObject );
-end;
-
-procedure jViewFlipper.UpdateLParamWidth;
-var
-  side: TSide;
-begin
-  if FInitialized then
-  begin
-    if Self.Parent is jForm then
-    begin
-      if jForm(Owner).ScreenStyle = gApp.Orientation then side:= sdW else side:= sdH;
-      jViewFlipper_setLParamWidth(FjEnv, FjObject , GetLayoutParams(gApp, FLParamWidth, side));
-    end
-    else
-    begin
-       if (Self.Parent as jVisualControl).LayoutParamWidth = lpWrapContent then
-           jViewFlipper_setLParamWidth(FjEnv, FjObject , GetLayoutParams(gApp, FLParamWidth, sdW))
-        else //lpMatchParent or others
-           jViewFlipper_setLParamWidth(FjEnv,FjObject,GetLayoutParamsByParent((Self.Parent as jVisualControl), FLParamWidth, sdW));
-    end;
-  end;
-end;
-
-procedure jViewFlipper.UpdateLParamHeight;
-var
-  side: TSide;
-begin
-  if FInitialized then
-  begin
-    if Self.Parent is jForm then
-    begin
-      if jForm(Owner).ScreenStyle = gApp.Orientation then side:= sdH else side:= sdW;
-      jViewFlipper_setLParamHeight(FjEnv, FjObject , GetLayoutParams(gApp, FLParamHeight, side));
-    end
-    else
-    begin
-       if (Self.Parent as jVisualControl).LayoutParamHeight = lpWrapContent then
-          jViewFlipper_setLParamHeight(FjEnv, FjObject , GetLayoutParams(gApp, FLParamHeight, sdH))
-       else //lpMatchParent and others
-          jViewFlipper_setLParamHeight(FjEnv,FjObject,GetLayoutParamsByParent((Self.Parent as jVisualControl), FLParamHeight, sdH));
-    end;
-  end;
-end;
-
-procedure jViewFlipper.UpdateLayout;
-begin
-  if FInitialized then
-  begin
-    inherited UpdateLayout;
-    UpdateLParamWidth;
-    UpdateLParamHeight;
-    jViewFlipper_setLayoutAll(FjEnv, FjObject , Self.AnchorId);
-  end;
-end;
-
-//------------------------------------------------------------------------------
 // jWebView
 //------------------------------------------------------------------------------
 
@@ -7374,8 +7190,6 @@ begin
 end;
 
 Procedure jWebView.LoadFromHtmlFile(environmentDirectoryPath: string; htmlFileName: string);
-var
-  path: string;
 begin;
    Navigate('file://'+environmentDirectoryPath+'/'+htmlFileName);
 end;
@@ -9410,6 +9224,7 @@ end;
 function jSqliteDataAccess.CheckDataBaseExistsByName(_dbName: string): boolean;
 begin
   //in designing component state: result value here...
+  Result:= False;
   if FInitialized then
    Result:= jSqliteDataAccess_CheckDataBaseExistsByName(FjEnv, FjObject, _dbName);
 end;
@@ -9437,6 +9252,15 @@ begin
   end;
   Result:= FFullPathDataBaseName;
 end;
+
+function jSqliteDataAccess.DatabaseExists(_databaseName: string): boolean;
+begin
+  //in designing component state: result value here...
+  Result:= False;
+  if FInitialized then
+   Result:= jSqliteDataAccess_DatabaseExists(FjEnv, FjObject, _databaseName);
+end;
+
    {jPanel}
 
 constructor jPanel.Create(AOwner: TComponent);
@@ -9501,6 +9325,13 @@ begin
       jCustomDialog(FParent).Init(refApp);
       FjPRLayout:= jCustomDialog(FParent).View;
     end;
+
+    if FParent is jViewFlipper then
+    begin
+      jViewFlipper(FParent).Init(refApp);
+      FjPRLayout:= jViewFlipper(FParent).View;
+    end;
+
   end;
 
   jPanel_setParent(FjEnv, FjObject , FjPRLayout);
@@ -9722,13 +9553,11 @@ begin
     jPanel(Obj).UpdateJNI(gApp);
     jPanel(Obj).GenEvent_OnFlingGestureDetected(Obj, direction);
   end;
-  (*
-  if Obj is jDrawingView then
+  if Obj is jViewFlipper then
   begin
-    jDrawingView(Obj).UpdateJNI(gApp);
-    jDrawingView(Obj).GenEvent_OnFlingGestureDetected(Obj, direction);
+    jViewFlipper(Obj).UpdateJNI(gApp);
+    jViewFlipper(Obj).GenEvent_OnFlingGestureDetected(Obj, direction);
   end;
-  *)
 end;
 
 procedure jPanel.GenEvent_OnPinchZoomGestureDetected(Obj: TObject; scaleFactor: single; state: integer);
@@ -9745,13 +9574,6 @@ begin
     jPanel(Obj).UpdateJNI(gApp);
     jPanel(Obj).GenEvent_OnPinchZoomGestureDetected(Obj,  scaleFactor, state);
   end;
-  (*
-  if Obj is jDrawingView then
-  begin
-    jDrawingView(Obj).UpdateJNI(gApp);
-    jDrawingView(Obj).GenEvent_OnPinchZoomGestureDetected(Obj,  scaleFactor, state);
-  end;
-  *)
 end;
 
 

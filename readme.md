@@ -28,14 +28,6 @@
 		-Felipemdc [Android support...]
 
 		-TrueTom [Laz4Android Package]			
-			Last update:2016-02-21
-			FPC: 3.0.0 (win32/arm-android/i386-android/jvm-android)
-
-			Lazarus:1.6.0
-
-			Android NDK: r10e (arm-linux-androideabi-4.9 + x86-4.9)
-
-			:To Install [*.7z], execute "build.bat"
 
 		-Simonsayz [great work on Android [GUI] Controls!]
 			Simon,Choi / Choi,Won-sik
@@ -62,15 +54,30 @@
 
 		-Anton [at github/odisey1245] - many many contributions!
 
-		-JC99 - The Wiki-Page "get_start"
+		-JC99 - The Wiki-Page - Tutorial 
 			Ref. http://wiki.freepascal.org/Talk:Android_tutorial
 
-		-tintinux and Dieselnutjob
+		-tintinux and Dieselnutjob - The Wiki-Page Tutorial
 			ref. http://wiki.freepascal.org/LAMW
 
-		-Dio Affriza - Tutorial
+		-Dio Affriza - Tutorial  [https://afuriza.wordpress.com/]
 			ref. https://afuriza.wordpress.com/2016/10/28/koding-pascal-untuk-android-menggunakan-lazarus/#more-705
 			ref. https://www.youtube.com/watch?v=1BH460c9_Aw&feature=youtu.be
+
+		-m4u_hoahoctro - Tutorial
+			https://vozforums.com/showthread.php?p=77539041			
+
+		-Cong Tuan Hoang - Tutorial
+			https://www.youtube.com/watch?v=O7JO6HAfgZ4
+
+		-Renabor  - Linux - Tutorial
+			https://github.com/jmpessoa/lazandroidmodulewizard/tree/master/docs/linux
+
+		-xinyiman - Linux - Tutorial
+			http://www.lazaruspascal.it/index.php?topic=1583.0
+
+		-tendra tendra - Tutorial
+			https://www.youtube.com/watch?v=Tqp7vU9vPVs
 				
 		-Lazarus forum community!
 		
@@ -113,6 +120,19 @@
 	*
 	****************************************************************************************************
 
+
+Version 0.7.10 - 02 - Feb - 2017
+
+	NEW! jViewFlipper component
+
+	NEW! demo AppViewFlipperDemo1
+
+	IMPROVED! jForm: added news methods:
+		FileExists
+		DirectoryExists
+
+	IMPROVED! jSqliteDataAccess: added new method:
+		DatabaseExists
 
 Version 0.7.9 - 28 - January - 2017
 

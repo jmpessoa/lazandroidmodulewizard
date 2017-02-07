@@ -5,12 +5,14 @@ unit intentmanager;
 interface
 
 uses
-  Classes, SysUtils, And_jni, And_jni_Bridge, AndroidWidget, Laz_And_Controls;
+  Classes, SysUtils, And_jni, AndroidWidget;
 
 type
 
-TIntentAction = (iaView, iaPick, iaSendto, idDial, iaCallbutton, iaCall, iaImageCapture, iaDataRoaming,
-                 iaQuickLaunch, iaDate,iaSystem, iaWireless, iaDeviceInfo, iaNone);
+TIntentAction = (iaView, iaPick, iaSendto, idDial, iaCallbutton, iaCall, iaImageCapture,
+                 iaDataRoaming,iaQuickLaunch, iaDate,iaSystem, iaWireless, iaDeviceInfo,
+                 iaSend, iaSendMultiple, iaPickActivity, iaEdit, iaGetContent,
+                 iaTimePick, iaVoiceCommand, iaWebSearch, iaNone);
 
 TIntentCategory = (icDefault, icLauncher, icHome, icInfo, icPreference, icAppBrowser,
                    icAppCalculator, icAppCalendar, icAppContacts, icAppEmail,

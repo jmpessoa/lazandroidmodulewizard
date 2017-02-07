@@ -50,9 +50,9 @@ jSurfaceView = class(jVisualControl)
     //procedure GenEvent_OnClick(Obj: TObject);
     function jCreate(): jObject;
     procedure jFree();
-    procedure SetViewParent(_viewgroup: jObject);
+    procedure SetViewParent(_viewgroup: jObject); override;
     procedure RemoveFromViewParent();
-    function GetView(): jObject;
+    function GetView(): jObject; override;
     procedure SetLParamWidth(_w: integer);
     procedure SetLParamHeight(_h: integer);
     procedure SetLeftTopRightBottomWidthHeight(_left: integer; _top: integer; _right: integer; _bottom: integer; _w: integer; _h: integer);
@@ -102,7 +102,6 @@ jSurfaceView = class(jVisualControl)
     procedure GenEvent_OnSurfaceViewDraw(Obj: TObject; canvas: jObject);
     procedure GenEvent_OnSurfaceViewTouch(Obj: TObject; Act,Cnt: integer; X1,Y1,X2,Y2: Single);
     procedure GenEvent_OnSurfaceViewChanged(Obj: TObject;  width: integer; height: integer);
-
     procedure GenEvent_OnSurfaceViewDrawingInBackground(Obj: TObject; progress: single; out running: boolean);
     procedure GenEvent_OnSurfaceViewDrawingPostExecute(Obj: TObject; progress: single);
 

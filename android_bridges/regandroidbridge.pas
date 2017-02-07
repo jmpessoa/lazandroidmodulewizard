@@ -11,6 +11,7 @@ uses
   SysUtils,
   LResources,
   AndroidWidget,
+  viewflipper,
   Laz_And_Controls, 
   Laz_And_GLESv1_Canvas,
   Laz_And_GLESv2_Canvas,
@@ -76,6 +77,7 @@ begin
   {$I jcanvas_icon.lrs}
   {$I jcanvases1_icon.lrs}
   {$I jcanvases2_icon.lrs}
+  {$I jviewflipper_icon.lrs}
 
   RegisterComponents('Android Bridges',
     [
@@ -114,7 +116,8 @@ begin
       jView,
       jCanvas,
       jCanvasES1,
-      jCanvasES2
+      jCanvasES2,
+      jViewFlipper
     ]
   );
   RegisterClasses([jApp, jForm, jControl, jVisualControl, jGLViewEvent]);

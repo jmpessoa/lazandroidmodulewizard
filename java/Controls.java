@@ -1,6 +1,6 @@
 package com.example.appopenfiledialogdemo1;
 
-//LAMW: Lazarus Android Module Wizard  - version 0.7 - rev. 0.9 - 28 Jan - 2017 
+//LAMW: Lazarus Android Module Wizard  - version 0.7 - rev. 10 - 02 Feb - 2017 
 //RAD Android: Project Wizard, Form Designer and Components Development Model!
 
 //https://github.com/jmpessoa/lazandroidmodulewizard
@@ -1172,8 +1172,15 @@ public String[] GetFileList(String _envPath) {
 	return sFolders; 
 }  
 
+public boolean FileExists(String _fullFileName) {	
+	return new File(_fullFileName).isFile();	
 }
- 
+
+public boolean DirectoryExists(String _fullDirectoryName) {
+	return new File(_fullDirectoryName).isDirectory();
+}
+
+}
 //**class entrypoint**//please, do not remove/change this line!
 
 //Main Java/Pascal Interface Class
