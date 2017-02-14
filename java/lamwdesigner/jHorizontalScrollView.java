@@ -1,4 +1,4 @@
-package com.example.appdemo1;
+package com.example.apphorizontalscrollviewdemo1;
 
 import android.view.MotionEvent;
 import android.view.ViewGroup;
@@ -7,6 +7,7 @@ import android.widget.HorizontalScrollView;
 import android.widget.RelativeLayout;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
+import android.os.Build;
 import android.view.Gravity;
 
 //-------------------------------------------------------------------------
@@ -40,7 +41,14 @@ public class jHorizontalScrollView extends HorizontalScrollView {
 	int marginRight = 5;
 	int marginBottom = 5;
 
-
+	//[ifdef_api14up]
+	 private int lgravity = Gravity.TOP | Gravity.START;
+	 //[endif_api14up]
+	 /* //[endif_api14up]
+	 private int lgravity = Gravity.TOP | Gravity.LEFT;
+	 //[ifdef_api14up] */
+	 private float lweight = 0;
+	
 	//Constructor
 	public  jHorizontalScrollView(android.content.Context context,
 								  Controls ctrls,long pasobj ) {
@@ -188,14 +196,25 @@ public class jHorizontalScrollView extends HorizontalScrollView {
 		scrollview.setLayoutParams(scrollxywh);
 	}
 
-	public void ClearLayoutAll() {
+	public void clearLayoutAll() {
 		if (lparams instanceof RelativeLayout.LayoutParams) {
-			for (int i = 0; i < countAnchorRule; i++) {
-				((RelativeLayout.LayoutParams)lparams).removeRule(lparamsAnchorRule[i]);
+			for (int i = 0; i < countAnchorRule; i++) {								
+			  if(Build.VERSION.SDK_INT < 17)
+				  ((android.widget.RelativeLayout.LayoutParams) lparams).addRule(lparamsAnchorRule[i], 0);
+				
+//[ifdef_api17up]
+			 if(Build.VERSION.SDK_INT >= 17)
+				((android.widget.RelativeLayout.LayoutParams) lparams).removeRule(lparamsAnchorRule[i]); //need API >= 17!
+//[endif_api17up]
 			}
-
 			for (int j = 0; j < countParentRule; j++) {
-				((RelativeLayout.LayoutParams)lparams).removeRule(lparamsParentRule[j]);
+			  if(Build.VERSION.SDK_INT < 17) 
+				  ((android.widget.RelativeLayout.LayoutParams) lparams).addRule(lparamsParentRule[j], 0);
+				
+//[ifdef_api17up]
+			if(Build.VERSION.SDK_INT >= 17)
+				  ((android.widget.RelativeLayout.LayoutParams) lparams).removeRule(lparamsParentRule[j]);  //need API >= 17!
+//[endif_api17up]
 			}
 		}
 		countAnchorRule = 0;
