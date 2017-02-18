@@ -1,6 +1,6 @@
 package com.example.applocationdemo1;
 
-//Lamw: Lazarus Android Module Wizard - Version 0.7 - rev. 0.1 - 13 July - 2016
+//Lamw: Lazarus Android Module Wizard - Version 0.7 - rev. 0.4 - 28 September - 2016
 //Form Designer and Components development model!
 //https://github.com/jmpessoa/lazandroidmodulewizard
 //http://forum.lazarus.freepascal.org/index.php/topic,21919.270.html

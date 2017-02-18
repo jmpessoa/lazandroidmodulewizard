@@ -61,6 +61,8 @@ public class jLocation /*extends ...*/ {
     private int mMapSizeH;
     private Location location;
     
+    private String mMarkerHighlightColor = "blue";
+    
     //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
     public jLocation(Controls _ctrls, long _Self, long _TimeForUpdates, long _DistanceForUpdates, int _CriteriaAccuracy, int _MapType) { //Add more others news "_xxx" params if needed!
        //super(_ctrls.activity);
@@ -279,10 +281,89 @@ public class jLocation /*extends ...*/ {
     	}
     	
         String url = "http://maps.googleapis.com/maps/api/staticmap?f=d&sensor=false&path="+ path +
-                      "&zoom="+mMapZoom+"&size="+mMapSizeW+"x"+mMapSizeH+"&maptype="+mMapType+"&markers="+path;                            
+                      "&zoom="+mMapZoom+"&size="+mMapSizeW+"x"+mMapSizeH+"&maptype="+mMapType+"&markers="+path;                        
         return url;
     }
+     
+    
+    public String GetGoogleMapsUrl(double[] _latitude, double[] _longitude, int _pathFlag) {
+    	String path ="";
+    	int count = _latitude.length;
+    	String url="";
+   
+    	path = String.valueOf(_latitude[0]) +","+ String.valueOf(_longitude[0]);    	
+    	for (int i = 1; i < count; i++) {
+    		path = path + "|" + String.valueOf(_latitude[i]) +","+ String.valueOf(_longitude[i]); 	
+    	}
+    	
+    	switch(_pathFlag) {
+    	case 0: url = "http://maps.googleapis.com/maps/api/staticmap?f=d&sensor=false&path=" + path +
+                "&zoom="+mMapZoom+"&size="+mMapSizeW+"x"+mMapSizeH+"&maptype="+mMapType+"&markers=" +path; break;
+                
+    	case 1: url = "http://maps.googleapis.com/maps/api/staticmap?f=d&sensor=false"+
+                "&zoom="+mMapZoom+"&size="+mMapSizeW+"x"+mMapSizeH+"&maptype="+mMapType+"&markers="+path; break;
+    	
+    	case 2: url = "http://maps.googleapis.com/maps/api/staticmap?f=d&sensor=false&path="+ path +
+                "&zoom="+mMapZoom+"&size="+mMapSizeW+"x"+mMapSizeH+"&maptype="+mMapType; break;   	
+                
+    	}
+    	
+        return url;
+    }
+    
+    
+    public String GetGoogleMapsUrl(double[] _latitude, double[] _longitude, int _pathFlag, int _markerHighlightIndex) {
+    	String path ="";
+    	int count = _latitude.length;
+    	String url="";
+        int index = _markerHighlightIndex;
+                       
+        int flag = _pathFlag;             
+        if (flag > 1) flag = 1;
         
+        
+        
+        if (index >= count) index = count-1;        
+        String markerHighlight = String.valueOf(_latitude[index]) +","+ String.valueOf(_longitude[index]);
+        
+    	
+    	path = String.valueOf(_latitude[0]) +","+ String.valueOf(_longitude[0]);    	
+    	for (int i = 1; i < count; i++) {    		
+    	   path = path + "|" + String.valueOf(_latitude[i]) +","+ String.valueOf(_longitude[i]);    		
+    	}
+    	
+    	if (flag == 0)  {    
+    	   url = "http://maps.googleapis.com/maps/api/staticmap?f=d&sensor=false&path=" + path +
+                "&zoom="+mMapZoom+"&size="+mMapSizeW+"x"+mMapSizeH+"&maptype="+mMapType+
+                "&markers=color:"+mMarkerHighlightColor+"|"+markerHighlight+"&markers=" +path;
+    	}        
+                
+    	if (flag == 1)  {
+    	  url = "http://maps.googleapis.com/maps/api/staticmap?f=d&sensor=false"+
+                "&zoom="+mMapZoom+"&size="+mMapSizeW+"x"+mMapSizeH+"&maptype="+mMapType+
+                "&markers=color:"+mMarkerHighlightColor+"|"+markerHighlight+"&markers="+path;
+    	}
+    	
+        return url;
+    }    
+    
+    //black, brown, green, purple, yellow, blue, gray, orange, red, white
+    public void SetMarkerHighlightColor(int _color) {
+    	switch (_color) {
+    	case 0: mMarkerHighlightColor = "black"; break;
+    	case 1: mMarkerHighlightColor = "brown"; break;
+    	case 2: mMarkerHighlightColor = "green"; break;
+    	case 3: mMarkerHighlightColor = "purple"; break;
+    	case 4: mMarkerHighlightColor = "yellow"; break;
+    	case 5: mMarkerHighlightColor = "blue"; break;
+    	case 6: mMarkerHighlightColor = "gray"; break;    	
+    	case 7: mMarkerHighlightColor = "orange"; break;
+    	case 8: mMarkerHighlightColor = "red"; break;
+    	case 9: mMarkerHighlightColor = "white"; break;  
+    	default: mMarkerHighlightColor = "blue";;
+    	}            
+    }
+    
     public void SetMapWidth(int _mapwidth) {
 	   mMapSizeW = _mapwidth;    	
     }
@@ -292,7 +373,7 @@ public class jLocation /*extends ...*/ {
     }
     
     public void SetMapZoom(int _mapzoom) {
-      if (_mapzoom < 15) {	
+      if (_mapzoom < 14) {	
 	     mMapZoom = _mapzoom;
       }
       else {

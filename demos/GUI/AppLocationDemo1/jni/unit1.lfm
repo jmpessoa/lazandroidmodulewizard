@@ -1,6 +1,6 @@
 object AndroidModule1: TAndroidModule1
-  Left = 280
-  Top = 69
+  Left = 376
+  Top = 110
   Width = 300
   Height = 600
   MarginLeft = 0
@@ -23,6 +23,7 @@ object AndroidModule1: TAndroidModule1
     MarginBottom = 5
     Visible = True
     Anchor = jCheckBox1
+    Id = 1712792
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = []
     LayoutParamWidth = lpMatchParent
@@ -33,7 +34,6 @@ object AndroidModule1: TAndroidModule1
     FontSize = 0
     FontSizeUnit = unitDefault
     OnClick = jButton1Click
-    Id = 1712792
   end
   object jButton2: jButton
     Left = 5
@@ -46,29 +46,7 @@ object AndroidModule1: TAndroidModule1
     MarginBottom = 5
     Visible = True
     Anchor = jButton1
-    PosRelativeToAnchor = [raBelow]
-    PosRelativeToParent = []
-    LayoutParamWidth = lpMatchParent
-    LayoutParamHeight = lpWrapContent
-    Text = 'StopTracker '
-    BackgroundColor = colbrDefault
-    FontColor = colbrDefault
-    FontSize = 0
-    FontSizeUnit = unitDefault
-    OnClick = jButton2Click
-    Id = 1986420
-  end
-  object jButton3: jButton
-    Left = 5
-    Top = 187
-    Width = 285
-    Height = 40
-    MarginLeft = 5
-    MarginTop = 5
-    MarginRight = 5
-    MarginBottom = 5
-    Visible = True
-    Anchor = jButton2
+    Id = 5497825
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = []
     LayoutParamWidth = lpMatchParent
@@ -78,8 +56,7 @@ object AndroidModule1: TAndroidModule1
     FontColor = colbrDefault
     FontSize = 0
     FontSizeUnit = unitDefault
-    OnClick = jButton3Click
-    Id = 5497825
+    OnClick = jButton2Click
   end
   object jCheckBox1: jCheckBox
     Left = 5
@@ -92,22 +69,22 @@ object AndroidModule1: TAndroidModule1
     MarginBottom = 5
     Visible = True
     Anchor = jTextView1
+    Id = 3200406
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = []
     LayoutParamWidth = lpMatchParent
     LayoutParamHeight = lpWrapContent
-    Text = 'Enable Wifi'
+    Text = 'Wifi Enabled '
     BackgroundColor = colbrDefault
     FontColor = colbrYellow
     FontSize = 0
     Checked = False
     FontSizeUnit = unitDefault
     OnClick = jCheckBox1Click
-    Id = 3200406
   end
   object jWebView1: jWebView
     Left = 0
-    Top = 232
+    Top = 182
     Width = 300
     Height = 346
     MarginLeft = 0
@@ -115,7 +92,8 @@ object AndroidModule1: TAndroidModule1
     MarginRight = 0
     MarginBottom = 0
     Visible = True
-    Anchor = jButton3
+    Anchor = jButton2
+    Id = 0
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = []
     LayoutParamWidth = lpMatchParent
@@ -123,7 +101,6 @@ object AndroidModule1: TAndroidModule1
     JavaScript = True
     BackgroundColor = colbrDefault
     ZoomControl = True
-    Id = 0
   end
   object jTextView1: jTextView
     Left = 87
@@ -135,6 +112,7 @@ object AndroidModule1: TAndroidModule1
     MarginRight = 10
     MarginBottom = 10
     Visible = True
+    Id = 804639
     PosRelativeToAnchor = []
     PosRelativeToParent = [rpTop, rpCenterHorizontal]
     LayoutParamWidth = lpWrapContent
@@ -147,10 +125,9 @@ object AndroidModule1: TAndroidModule1
     FontSize = 0
     TextTypeFace = tfNormal
     FontSizeUnit = unitDefault
-    Id = 804639
   end
   object jLocation1: jLocation
-    MapType = mtTerrain
+    MapType = mtRoadmap
     CriteriaAccuracy = crCoarse
     TimeForUpdates = 15000
     DistanceForUpdates = 1
