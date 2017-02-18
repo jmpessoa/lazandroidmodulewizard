@@ -8,9 +8,13 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.graphics.Matrix;
+import android.graphics.PorterDuff.Mode;
 import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
+import android.graphics.drawable.PaintDrawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -57,6 +61,7 @@ public class jImageView extends ImageView {
 	private float lweight = 0;
 
 	Matrix mMatrix;
+	int mRadius = 20;
 
 	//by jmpessoa
 	public void setMarginRight(int x) {
@@ -313,22 +318,23 @@ public class jImageView extends ImageView {
 
 	public void ClearLayoutAll() {
 		if (lparams instanceof RelativeLayout.LayoutParams) {
-			for (int i = 0; i < countAnchorRule; i++) {
+			for (int i = 0; i < countAnchorRule; i++) {								
+			  if(Build.VERSION.SDK_INT < 17)
+				  ((android.widget.RelativeLayout.LayoutParams) lparams).addRule(lparamsAnchorRule[i], 0);
+				
 //[ifdef_api17up]
-				((RelativeLayout.LayoutParams)lparams).removeRule(lparamsAnchorRule[i]);
- //[endif_api17up]
-	/* //[endif_api17up]
- 			((RelativeLayout.LayoutParams)lparams).addRule(lparamsAnchorRule[i], 0);
- //[ifdef_api17up] */
-				}
-
+			 if(Build.VERSION.SDK_INT >= 17)
+				((android.widget.RelativeLayout.LayoutParams) lparams).removeRule(lparamsAnchorRule[i]); //need API >= 17!
+//[endif_api17up]
+			}
 			for (int j = 0; j < countParentRule; j++) {
-	 //[ifdef_api17up]
-				((RelativeLayout.LayoutParams)lparams).removeRule(lparamsParentRule[j]);
- //[endif_api17up]
- /* //[endif_api17up]
- 			((RelativeLayout.LayoutParams)lparams).addRule(lparamsAnchorRule[j], 0);
-	//[ifdef_api17up] */
+			  if(Build.VERSION.SDK_INT < 17) 
+				  ((android.widget.RelativeLayout.LayoutParams) lparams).addRule(lparamsParentRule[j], 0);
+				
+//[ifdef_api17up]
+			if(Build.VERSION.SDK_INT >= 17)
+				  ((android.widget.RelativeLayout.LayoutParams) lparams).removeRule(lparamsParentRule[j]);  //need API >= 17!
+//[endif_api17up]
 			}
 		}
 		countAnchorRule = 0;
@@ -415,6 +421,26 @@ public class jImageView extends ImageView {
 		this.setDrawingCacheEnabled(false);
 		return b;
 	}
+	
+	public void SetRoundCorner() {
+		   if (this != null) {  		
+			        PaintDrawable  shape =  new PaintDrawable();
+			        shape.setCornerRadius(mRadius);                
+			        int color = Color.TRANSPARENT;
+			        Drawable background = this.getBackground();        
+			        if (background instanceof ColorDrawable) {
+			          color = ((ColorDrawable)this.getBackground()).getColor();
+				        shape.setColorFilter(color, Mode.SRC_ATOP);        		           		        		        
+				        //[ifdef_api16up]
+				  	    if(Build.VERSION.SDK_INT >= 16) 
+				             this.setBackground((Drawable)shape);
+				        //[endif_api16up]			          
+			        }                		  	  
+		    }
+	}
 
+	public void SetRadiusRoundCorner(int _radius) {
+		mRadius =  _radius;
+	}
 }
 

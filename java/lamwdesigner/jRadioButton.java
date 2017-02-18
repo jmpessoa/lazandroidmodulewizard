@@ -1,5 +1,10 @@
-package com.example.appdemo1;
+package com.example.appwindowmanagerdemo1;
 
+import java.lang.reflect.Field;
+
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
@@ -219,5 +224,53 @@ public class jRadioButton extends RadioButton {
 		this.setTextSize(mTextSizeTypedValue, mTextSize);
 		this.setText(t);
 	}
+	
+	
+	private Drawable GetDrawableResourceById(int _resID) {
+		return (Drawable)( this.controls.activity.getResources().getDrawable(_resID));
+	}
+	
+	private int GetDrawableResourceId(String _resName) {
+		  try {
+		     Class<?> res = R.drawable.class;
+		     Field field = res.getField(_resName);  //"drawableName" ex. "ic_launcher"
+		     int drawableId = field.getInt(null);
+		     return drawableId;
+		  }
+		  catch (Exception e) {
+		     return 0;
+		  }
+	}
+	
+	
+	public void SetCompoundDrawables(Bitmap _image, int _side) {		
+		Drawable d = new BitmapDrawable(controls.activity.getResources(), _image);
+		int h = d.getIntrinsicHeight(); 
+		int w = d.getIntrinsicWidth();   
+		d.setBounds( 0, 0, w, h );		
+		
+		switch(_side) {
+		  case 0: this.setCompoundDrawables(d, null, null, null); break; //left
+		  case 1: this.setCompoundDrawables(null, null, d, null);   break;  //right
+		  case 2: this.setCompoundDrawables(null, d, null, null);  break; //above
+		  case 3: this.setCompoundDrawables(null, null, null, d); 		
+		}		
+		   		
+	}
+		
+	public void SetCompoundDrawables(String _imageResIdentifier, int _side) {
+		int id = GetDrawableResourceId(_imageResIdentifier);
+		Drawable d = GetDrawableResourceById(id);  		
+		int h = d.getIntrinsicHeight(); 
+		int w = d.getIntrinsicWidth();   
+		d.setBounds( 0, 0, w, h );		
+		
+		switch(_side) {
+		  case 0: this.setCompoundDrawables(d, null, null, null); break; //left
+		  case 1: this.setCompoundDrawables(null, null, d, null);   break;  //right
+		  case 2: this.setCompoundDrawables(null, d, null, null);  break; //above
+		  case 3: this.setCompoundDrawables(null, null, null, d); 		
+		}				
+	}		
 
 }

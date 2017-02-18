@@ -1,6 +1,6 @@
-package com.example.appopenfiledialogdemo1;
+package com.example.appwindowmanagerdemo1;
 
-//LAMW: Lazarus Android Module Wizard  - version 0.7 - rev. 10 - 02 Feb - 2017 
+//LAMW: Lazarus Android Module Wizard  - version 0.7 - rev. 11 - 17 Feb - 2017 
 //RAD Android: Project Wizard, Form Designer and Components Development Model!
 
 //https://github.com/jmpessoa/lazandroidmodulewizard
@@ -53,6 +53,7 @@ package com.example.appopenfiledialogdemo1;
 import android.annotation.SuppressLint;
 import android.app.ActionBar;
 import android.app.Activity;
+import android.app.AlarmManager;
 import android.app.Dialog;
 import android.app.PendingIntent;
 import android.content.Context;
@@ -927,6 +928,11 @@ public void HideSoftInput() {
 	  imm.toggleSoftInput(InputMethodManager.RESULT_HIDDEN, 0);
 }
 
+public void HideSoftInput(View _view) {
+  InputMethodManager imm = (InputMethodManager)controls.activity.getSystemService(Context.INPUT_METHOD_SERVICE);
+  imm.hideSoftInputFromWindow(_view.getWindowToken(), 0);
+}
+
 public void ShowSoftInput() {
 	  InputMethodManager imm =(InputMethodManager) controls.activity.getSystemService(Context.INPUT_METHOD_SERVICE);
 	  imm.toggleSoftInput(InputMethodManager.RESULT_SHOWN, 0);
@@ -1178,6 +1184,24 @@ public boolean FileExists(String _fullFileName) {
 
 public boolean DirectoryExists(String _fullDirectoryName) {
 	return new File(_fullDirectoryName).isDirectory();
+}
+
+
+//http://blog.scriptico.com/category/dev/java/android/
+public void Minimize() {
+  Intent main = new Intent(Intent.ACTION_MAIN);
+  main.addCategory(Intent.CATEGORY_HOME);
+  main.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+  controls.activity.startActivity(main);
+}
+
+public void Restart(int _delay) {
+  PendingIntent intent = PendingIntent.getActivity(controls.activity.getBaseContext(), 0, 
+		                                           new Intent( controls.activity.getIntent() ), 
+		                                           controls.activity.getIntent().getFlags());  
+  AlarmManager manager = (AlarmManager) controls.activity.getSystemService(Context.ALARM_SERVICE);  
+  manager.set(AlarmManager.RTC, System.currentTimeMillis() + _delay, intent);
+  System.exit(2);
 }
 
 }

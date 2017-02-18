@@ -199,6 +199,8 @@ type
      procedure CenterInParent();
      procedure MatchParent();
      procedure WrapContent();
+     procedure SetRoundCorner();
+     procedure SetRadiusRoundCorner(_radius: integer);
 
    published
      property BackgroundColor     : TARGBColorBridge read FColor write SetColor;
@@ -771,6 +773,14 @@ type
     function GetWidth: integer;  override;
     function GetHeight: integer; override;
 
+    procedure SetCompoundDrawables(_image: jObject; _side: TCompoundDrawablesSide); overload;
+    procedure SetCompoundDrawables(_imageResIdentifier: string; _side: TCompoundDrawablesSide); overload;
+    procedure SetRoundCorner();
+    procedure SetRadiusRoundCorner(_radius: integer);
+
+
+
+
   published
     property Text: string read GetText write SetText;
     property Alignment : TTextAlignment read FTextAlignment write SetTextAlignment;
@@ -884,6 +894,9 @@ type
     procedure SetBackgroundByResIdentifier(_imgResIdentifier: string);
     procedure SetBackgroundByImage(_image: jObject);
 
+    procedure SetCompoundDrawables(_image: jObject; _side: TCompoundDrawablesSide); overload;
+    procedure SetCompoundDrawables(_imageResIdentifier: string; _side: TCompoundDrawablesSide); overload;
+
     // Property
     property CursorPos : TXY        read GetCursorPos  write SetCursorPos;
     //property Scroller: boolean  read FScroller write SetScroller;
@@ -956,6 +969,11 @@ type
     procedure SetBackgroundByResIdentifier(_imgResIdentifier: string);
     procedure SetBackgroundByImage(_image: jObject);
 
+    procedure SetCompoundDrawables(_image: jObject; _side: TCompoundDrawablesSide); overload;
+    procedure SetCompoundDrawables(_imageResIdentifier: string; _side: TCompoundDrawablesSide); overload;
+    procedure SetRoundCorner();
+    procedure SetRadiusRoundCorner(_radius: integer);
+
   published
     property Text: string read GetText write SetText;
     property BackgroundColor     : TARGBColorBridge read FColor     write SetColor;
@@ -993,8 +1011,10 @@ type
     procedure Init(refApp: jApp); override;
     Procedure Refresh;
     Procedure UpdateLayout; override;
-
     procedure SetFontSizeUnit(_unit: TFontSizeUnit);
+
+    procedure SetCompoundDrawables(_image: jObject; _side: TCompoundDrawablesSide); overload;
+    procedure SetCompoundDrawables(_imageResIdentifier: string; _side: TCompoundDrawablesSide); overload;
 
   published
     property Text: string read GetText write SetText;
@@ -1031,6 +1051,9 @@ type
     procedure Refresh;
     Procedure UpdateLayout; override;
     procedure SetFontSizeUnit(_unit: TFontSizeUnit);
+
+    procedure SetCompoundDrawables(_image: jObject; _side: TCompoundDrawablesSide); overload;
+    procedure SetCompoundDrawables(_imageResIdentifier: string; _side: TCompoundDrawablesSide); overload;
 
   published
     property Text: string read GetText write SetText;
@@ -1134,6 +1157,8 @@ type
     procedure SetImageBitmap(_bitmap: jObject; _width: integer; _height: integer); overload; //deprecated
     procedure SetImage(_bitmap: jObject; _width: integer; _height: integer); overload;
     Procedure SetImage(_fullFilename: string); overload;
+    procedure SetRoundCorner();
+    procedure SetRadiusRoundCorner(_radius: integer);
 
     property Count: integer read GetCount;
   published
@@ -3033,6 +3058,35 @@ begin
   end;
 end;
 
+procedure jTextView.SetCompoundDrawables(_image: jObject; _side: TCompoundDrawablesSide);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jTextView_SetCompoundDrawables(FjEnv, FjObject, _image, Ord(_side));
+end;
+
+procedure jTextView.SetCompoundDrawables(_imageResIdentifier: string; _side: TCompoundDrawablesSide);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jTextView_SetCompoundDrawables(FjEnv, FjObject, _imageResIdentifier, Ord(_side));
+end;
+
+procedure jTextView.SetRoundCorner();
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jTextView_SetRoundCorner(FjEnv, FjObject);
+end;
+
+procedure jTextView.SetRadiusRoundCorner(_radius: integer);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jTextView_SetRadiusRoundCorner(FjEnv, FjObject, _radius);
+end;
+
+
 //------------------------------------------------------------------------------
 // jEditText
 //------------------------------------------------------------------------------
@@ -3623,6 +3677,20 @@ begin
      jEditText_SetBackgroundByImage(FjEnv, FjObject, _image);
 end;
 
+procedure jEditText.SetCompoundDrawables(_image: jObject; _side: TCompoundDrawablesSide);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jEditText_SetCompoundDrawables(FjEnv, FjObject, _image,Ord(_side));
+end;
+
+procedure jEditText.SetCompoundDrawables(_imageResIdentifier: string; _side: TCompoundDrawablesSide);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jEditText_SetCompoundDrawables(FjEnv, FjObject, _imageResIdentifier, Ord(_side));
+end;
+
 Procedure jEditText.GenEvent_OnBeforeDispatchDraw(Obj: TObject; canvas: jObject; tag: integer);
 begin
   if Assigned(FOnBeforeDispatchDraw) then FOnBeforeDispatchDraw(Obj, canvas, tag);
@@ -3990,6 +4058,34 @@ begin
   end;
 end;
 
+procedure jButton.SetCompoundDrawables(_image: jObject; _side: TCompoundDrawablesSide);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jButton_SetCompoundDrawables(FjEnv, FjObject, _image, Ord(_side));
+end;
+
+procedure jButton.SetCompoundDrawables(_imageResIdentifier: string; _side: TCompoundDrawablesSide);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jButton_SetCompoundDrawables(FjEnv, FjObject, _imageResIdentifier, Ord(_side));
+end;
+
+procedure jButton.SetRoundCorner();
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jButton_SetRoundCorner(FjEnv, FjObject);
+end;
+
+procedure jButton.SetRadiusRoundCorner(_radius: integer);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jButton_SetRadiusRoundCorner(FjEnv, FjObject, _radius);
+end;
+
 //------------------------------------------------------------------------------
 // jCheckBox
 //------------------------------------------------------------------------------
@@ -4230,6 +4326,20 @@ end;
 Procedure jCheckBox.GenEvent_OnClick(Obj: TObject);
 begin
   if Assigned(FOnClick) then FOnClick(Obj);
+end;
+
+procedure jCheckBox.SetCompoundDrawables(_image: jObject; _side: TCompoundDrawablesSide);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jCheckBox_SetCompoundDrawables(FjEnv, FjObject, _image, Ord(_side));
+end;
+
+procedure jCheckBox.SetCompoundDrawables(_imageResIdentifier: string; _side: TCompoundDrawablesSide);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jCheckBox_SetCompoundDrawables(FjEnv, FjObject, _imageResIdentifier, Ord(_side));
 end;
 
 //------------------------------------------------------------------------------
@@ -4501,6 +4611,20 @@ end;
 Procedure jRadioButton.GenEvent_OnClick(Obj: TObject);
 begin
   if Assigned(FOnClick) then FOnClick(Obj);
+end;
+
+procedure jRadioButton.SetCompoundDrawables(_image: jObject; _side: TCompoundDrawablesSide);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jRadioButton_SetCompoundDrawables(FjEnv, FjObject, _image, Ord(_side));
+end;
+
+procedure jRadioButton.SetCompoundDrawables(_imageResIdentifier: string; _side: TCompoundDrawablesSide);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jRadioButton_SetCompoundDrawables(FjEnv, FjObject, _imageResIdentifier, Ord(_side));
 end;
 
 //------------------------------------------------------------------------------
@@ -5210,6 +5334,21 @@ begin
   if FInitialized then
      jImageView_SetBitmapImage(FjEnv, FjObject, _bitmap ,_width ,_height);
 end;
+
+procedure jImageView.SetRoundCorner();
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jImageView_SetRoundCorner(FjEnv, FjObject);
+end;
+
+procedure jImageView.SetRadiusRoundCorner(_radius: integer);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jImageView_SetRadiusRoundCorner(FjEnv, FjObject, _radius);
+end;
+
 
 {jImageList}
 
@@ -9613,5 +9752,20 @@ begin
   if FInitialized then
      jPanel_WrapContent(FjEnv, FjObject);
 end;
+
+procedure jPanel.SetRoundCorner();
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jPanel_SetRoundCorner(FjEnv, FjObject);
+end;
+
+procedure jPanel.SetRadiusRoundCorner(_radius: integer);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jPanel_SetRadiusRoundCorner(FjEnv, FjObject, _radius);
+end;
+
 
 end.

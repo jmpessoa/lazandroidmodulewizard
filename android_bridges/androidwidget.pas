@@ -257,6 +257,8 @@ const
 
 type
 
+ TCompoundDrawablesSide = (cdsLeft, cdsRight, cdsAbove, cdsBelow);
+
  TOnBeforeDispatchDraw = procedure(Obj: TObject; canvas: JObject; tag: integer) of Object;
  TOnAfterDispatchDraw = procedure(Obj: TObject; canvas: JObject; tag: integer) of Object;
 
@@ -1118,7 +1120,7 @@ end;
     function IsConnectedTo(_connectionType: TConnectionType): boolean;
     function IsMobileDataEnabled(): boolean;
 
-    procedure HideSoftInput();
+    procedure HideSoftInput(); overload;
     procedure ShowSoftInput();
 
     function GetNetworkStatus(): TNetworkStatus;
@@ -1138,6 +1140,12 @@ end;
 
     function FileExists(_fullFileName: string): boolean;
     function DirectoryExists(_fullDirectoryName: string): boolean;
+
+    procedure Minimize();
+    procedure Restart(_delay: integer);
+    procedure HideSoftInput(_view: jObject); overload;
+
+
 
     // Property
     property View         : jObject        read FjRLayout; //layout!
@@ -1410,7 +1418,7 @@ end;
   function jForm_IsConnectedTo(env: PJNIEnv; _jform: JObject; _connectionType: integer): boolean;
   function jForm_IsMobileDataEnabled(env: PJNIEnv; _jform: JObject): boolean;
 
-  procedure jForm_HideSoftInput(env: PJNIEnv; _jform: JObject);
+  procedure jForm_HideSoftInput(env: PJNIEnv; _jform: JObject); overload;
   procedure jForm_ShowSoftInput(env: PJNIEnv; _jform: JObject);
 
   function jForm_GetNetworkStatus(env: PJNIEnv; _jform: JObject): integer;
@@ -1539,6 +1547,10 @@ function jForm_GetFileList(env: PJNIEnv; _jform: JObject; _envPath: string): TDy
 
 function jForm_FileExists(env: PJNIEnv; _jform: JObject; _fullFileName: string): boolean;
 function jForm_DirectoryExists(env: PJNIEnv; _jform: JObject; _fullDirectoryName: string): boolean;
+
+procedure jForm_Minimize(env: PJNIEnv; _jform: JObject);
+procedure jForm_Restart(env: PJNIEnv; _jform: JObject; _delay: integer);
+procedure jForm_HideSoftInput(env: PJNIEnv; _jform: JObject; _view: jObject);  overload;
 
 
 //------------------------------------------------------------------------------
@@ -3552,6 +3564,27 @@ begin
    Result:= jForm_DirectoryExists(FjEnv, FjObject, _fullDirectoryName);
 end;
 
+procedure jForm.Minimize();
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jForm_Minimize(FjEnv, FjObject);
+end;
+
+procedure jForm.Restart(_delay: integer);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jForm_Restart(FjEnv, FjObject, _delay);
+end;
+
+procedure jForm.HideSoftInput(_view: jObject);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jForm_HideSoftInput(FjEnv, FjObject, _view);
+end;
+
 {-------- jForm_JNI_Bridge ----------}
 
 function jForm_GetPathFromAssetsFile(env: PJNIEnv; _jform: JObject; _assetsFileName: string): string;
@@ -4797,6 +4830,42 @@ begin
   env^.DeleteLocalRef(env, jCls);
 end;
 
+procedure jForm_Minimize(env: PJNIEnv; _jform: JObject);
+var
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jform);
+  jMethod:= env^.GetMethodID(env, jCls, 'Minimize', '()V');
+  env^.CallVoidMethod(env, _jform, jMethod);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jForm_Restart(env: PJNIEnv; _jform: JObject; _delay: integer);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].i:= _delay;
+  jCls:= env^.GetObjectClass(env, _jform);
+  jMethod:= env^.GetMethodID(env, jCls, 'Restart', '(I)V');
+  env^.CallVoidMethodA(env, _jform, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jForm_HideSoftInput(env: PJNIEnv; _jform: JObject; _view: jObject);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= _view;
+  jCls:= env^.GetObjectClass(env, _jform);
+  jMethod:= env^.GetMethodID(env, jCls, 'HideSoftInput', '(Landroid/view/View;)V');
+  env^.CallVoidMethodA(env, _jform, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
 
 //-----------------------------------------------
    {jApp by jmpessoa}

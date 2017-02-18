@@ -1,6 +1,6 @@
 object AndroidModule1: TAndroidModule1
-  Left = 327
-  Top = 154
+  Left = 313
+  Top = 112
   Width = 320
   Height = 400
   MarginLeft = 0
@@ -12,35 +12,11 @@ object AndroidModule1: TAndroidModule1
   BackgroundColor = colbrDefault
   ActionBarTitle = abtDefault
   OnJNIPrompt = AndroidModule1JNIPrompt
-  object jTextView1: jTextView
-    Left = 129
-    Top = 5
-    Width = 61
-    Height = 20
-    MarginLeft = 5
-    MarginTop = 5
-    MarginRight = 5
-    MarginBottom = 5
-    Visible = True
-    Id = 1
-    PosRelativeToAnchor = []
-    PosRelativeToParent = [rpTop, rpCenterHorizontal]
-    LayoutParamWidth = lpWrapContent
-    LayoutParamHeight = lpWrapContent
-    Text = 'jTextView1'
-    Alignment = taLeft
-    Enabled = True
-    BackgroundColor = colbrDefault
-    FontColor = colbrDefault
-    FontSize = 0
-    TextTypeFace = tfNormal
-    FontSizeUnit = unitDefault
-  end
   object jViewFlipper1: jViewFlipper
-    Left = 24
-    Top = 33
-    Width = 279
-    Height = 184
+    Left = 10
+    Top = 40
+    Width = 290
+    Height = 340
     MarginLeft = 10
     MarginTop = 10
     MarginRight = 10
@@ -55,10 +31,10 @@ object AndroidModule1: TAndroidModule1
     BackgroundColor = colbrMediumSpringGreen
     OnFlingGesture = jViewFlipper1FlingGesture
     object jImageView1: jImageView
-      Left = 9
-      Top = 9
-      Width = 260
-      Height = 165
+      Left = 10
+      Top = 10
+      Width = 270
+      Height = 320
       MarginLeft = 5
       MarginTop = 5
       MarginRight = 5
@@ -75,10 +51,10 @@ object AndroidModule1: TAndroidModule1
       ImageScaleType = scaleCenter
     end
     object jImageView2: jImageView
-      Left = 9
-      Top = 9
-      Width = 260
-      Height = 165
+      Left = 10
+      Top = 10
+      Width = 270
+      Height = 320
       MarginLeft = 5
       MarginTop = 5
       MarginRight = 5
@@ -95,10 +71,10 @@ object AndroidModule1: TAndroidModule1
       ImageScaleType = scaleCenter
     end
     object jImageView3: jImageView
-      Left = 9
-      Top = 9
-      Width = 260
-      Height = 165
+      Left = 10
+      Top = 10
+      Width = 270
+      Height = 320
       MarginLeft = 5
       MarginTop = 5
       MarginRight = 5
@@ -114,6 +90,30 @@ object AndroidModule1: TAndroidModule1
       BackgroundColor = colbrDefault
       ImageScaleType = scaleCenter
     end
+  end
+  object jTextView1: jTextView
+    Left = 89
+    Top = 5
+    Width = 141
+    Height = 20
+    MarginLeft = 5
+    MarginTop = 5
+    MarginRight = 5
+    MarginBottom = 5
+    Visible = True
+    Id = 3
+    PosRelativeToAnchor = []
+    PosRelativeToParent = [rpTop, rpCenterHorizontal]
+    LayoutParamWidth = lpWrapContent
+    LayoutParamHeight = lpWrapContent
+    Text = 'App ViewFlipper Demo1'
+    Alignment = taLeft
+    Enabled = True
+    BackgroundColor = colbrDefault
+    FontColor = colbrDefault
+    FontSize = 0
+    TextTypeFace = tfNormal
+    FontSizeUnit = unitDefault
   end
   object jImageList1: jImageList
     Images.Strings = (

@@ -1,0 +1,3 @@
+public java.lang.Object jObj3DModel_jCreate(long _Self) {
+  return (java.lang.Object)(new jObj3DModel(this,_Self));
+}

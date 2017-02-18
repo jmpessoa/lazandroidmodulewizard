@@ -62,6 +62,9 @@ jRadioGroup = class(jVisualControl)
     function IsChekedRadioButtonById(_id: integer): boolean;
     function IsChekedRadioButtonByIndex(_index: integer): boolean;
 
+    procedure SetRoundCorner();
+    procedure SetRadiusRoundCorner(_radius: integer);
+
     procedure GenEvent_CheckedChanged(Sender: TObject; checkedIndex: integer; checkedCaption: string);
     property CheckedIndex: integer read GetChekedRadioButtonIndex write CheckRadioButtonByIndex;
  published
@@ -96,8 +99,8 @@ function jRadioGroup_GetChekedRadioButtonIndex(env: PJNIEnv; _jradiogroup: JObje
 function jRadioGroup_IsChekedRadioButtonByCaption(env: PJNIEnv; _jradiogroup: JObject; _caption: string): boolean;
 function jRadioGroup_IsChekedRadioButtonById(env: PJNIEnv; _jradiogroup: JObject; _id: integer): boolean;
 function jRadioGroup_IsChekedRadioButtonByIndex(env: PJNIEnv; _jradiogroup: JObject; _index: integer): boolean;
-
-
+procedure jRadioGroup_SetRoundCorner(env: PJNIEnv; _jradiogroup: JObject);
+procedure jRadioGroup_SetRadiusRoundCorner(env: PJNIEnv; _jradiogroup: JObject; _radius: integer);
 
 implementation
 
@@ -484,6 +487,20 @@ begin
    Result:= jRadioGroup_IsChekedRadioButtonByIndex(FjEnv, FjObject, _index);
 end;
 
+procedure jRadioGroup.SetRoundCorner();
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jRadioGroup_SetRoundCorner(FjEnv, FjObject);
+end;
+
+procedure jRadioGroup.SetRadiusRoundCorner(_radius: integer);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jRadioGroup_SetRadiusRoundCorner(FjEnv, FjObject, _radius);
+end;
+
 {-------- jRadioGroup_JNI_Bridge ----------}
 
 function jRadioGroup_jCreate(env: PJNIEnv;_Self: int64; this: jObject; _orientation: integer): jObject;
@@ -849,6 +866,29 @@ begin
   env^.DeleteLocalRef(env, jCls);
 end;
 
+procedure jRadioGroup_SetRoundCorner(env: PJNIEnv; _jradiogroup: JObject);
+var
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jradiogroup);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetRoundCorner', '()V');
+  env^.CallVoidMethod(env, _jradiogroup, jMethod);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jRadioGroup_SetRadiusRoundCorner(env: PJNIEnv; _jradiogroup: JObject; _radius: integer);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].i:= _radius;
+  jCls:= env^.GetObjectClass(env, _jradiogroup);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetRadiusRoundCorner', '(I)V');
+  env^.CallVoidMethodA(env, _jradiogroup, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
 
 
 end.

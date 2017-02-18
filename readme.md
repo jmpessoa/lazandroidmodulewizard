@@ -1,6 +1,6 @@
 
 	Lamw: Lazarus Android Module Wizard: 
-		:: RAD Android! Form Designer and Components development model! 
+		:: RAD Android! Form Designer and Components Development Model! 
 		
 	"A wizard to create JNI Android loadable module (.so) and Android Apk
 		widh Lazarus/Free Pascal using Form Designer and Components!" 
@@ -47,8 +47,8 @@
 		-x2nie [Lazarus 1.3 patch to No LCL form designer!] 
 			http://github.com/x2nie/LiteZarus
 
-                -Fatih KILIÇ - How To Install!       
-                  http://www.youtube.com/watch?v=sQnFYJyltwY&list=UUkQrLhaIXrKY4eq9zTymxpQ
+		-Fatih KILIÇ - How To Install!
+			http://www.youtube.com/watch?v=sQnFYJyltwY&list=UUkQrLhaIXrKY4eq9zTymxpQ
 
 		-Thierry Dijoux - Late: Apk Expert Tools [Build, Install, ...]
 
@@ -78,6 +78,11 @@
 
 		-tendra tendra - Tutorial
 			https://www.youtube.com/watch?v=Tqp7vU9vPVs
+
+		-Ali Abidin - Tutorial
+			http://xperia-mewah.blogspot.com.br/2017/02/lazarus-for-android-laz4android.html
+			http://xperia-mewah.blogspot.com.br/2017/02/laz4android-lazandroidmodulewizard-lamw.html
+
 				
 		-Lazarus forum community!
 		
@@ -120,6 +125,48 @@
 	*
 	****************************************************************************************************
 
+Version 0.7.11 - 17 - Feb - 2017
+
+	NEW! jWindowManager component
+
+	NEW! demo AppWindowManagerDemo1
+		[floating and draggable View!]
+
+	IMPROVED! 
+		jForm: news methods:
+			Minimize
+			Restart
+
+		jButton: news methods
+			SetCompoundDrawables
+			SetRoundCorner
+			SetRadiusRoundCorner
+
+		jTextView: news methods
+			SetCompoundDrawables
+			SetRoundCorner
+			SetRadiusRoundCorner
+
+		jRadioGroup: news methods
+			SetRoundCorner
+			SetRadiusRoundCorner
+			
+		jPanel:: news methods
+			SetRoundCorner
+			SetRadiusRoundCorner
+
+		jImageView: news methods		
+			SetRoundCorner
+			SetRadiusRoundCorner
+
+		jEditText: news method
+			SetCompoundDrawables
+
+		jCheckBox: news method
+			SetCompoundDrawables
+
+		jRadioButton: news method
+			SetCompoundDrawables				
 
 Version 0.7.10 - 02 - Feb - 2017
 

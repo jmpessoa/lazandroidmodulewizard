@@ -164,6 +164,12 @@ procedure jTextView_SetFontSizeUnit(env: PJNIEnv; _jtextview: JObject; _unit: in
 function jTextView_getLParamWidth(env:PJNIEnv; _jtextview : jObject): integer;
 function jTextView_getLParamHeight(env:PJNIEnv; _jtextview : jObject ): integer;
 
+procedure jTextView_SetCompoundDrawables(env: PJNIEnv; _jtextview: JObject; _image: jObject; _side: integer); overload;
+procedure jTextView_SetCompoundDrawables(env: PJNIEnv; _jtextview: JObject; _imageResIdentifier: string; _side: integer);  overload;
+procedure jTextView_SetRoundCorner(env: PJNIEnv; _jtextview: JObject);
+procedure jTextView_SetRadiusRoundCorner(env: PJNIEnv; _jtextview: JObject; _radius: integer);
+
+
 //-----------------------------------
 // EditText  :: changed by jmpessoa [support Api > 13]
 //--------------------------------------
@@ -246,6 +252,10 @@ procedure jEditText_SelectAll(env: PJNIEnv; _jedittext: JObject);
 procedure jEditText_SetBackgroundByResIdentifier(env: PJNIEnv; _jedittext: JObject; _imgResIdentifier: string);
 procedure jEditText_SetBackgroundByImage(env: PJNIEnv; _jedittext: JObject; _image: jObject);
 
+procedure jEditText_SetCompoundDrawables(env: PJNIEnv; _jedittext: JObject; _image: jObject; _side: integer); overload;
+procedure jEditText_SetCompoundDrawables(env: PJNIEnv; _jedittext: JObject; _imageResIdentifier: string; _side: integer);  overload;
+
+
 function jEditText_getLParamWidth(env:PJNIEnv; _jedittext : jObject): integer;
 function jEditText_getLParamHeight(env:PJNIEnv; _jedittext : jObject ): integer;
 
@@ -288,6 +298,11 @@ procedure jButton_SetBackgroundByImage(env: PJNIEnv; _jbutton: JObject; _image: 
 function jButton_getLParamHeight(env:PJNIEnv; _jbutton : jObject ): integer;
 function jButton_getLParamWidth(env:PJNIEnv; _jbutton : jObject): integer;
 
+procedure jButton_SetCompoundDrawables(env: PJNIEnv; _jbutton: JObject; _image: jObject; _side: integer); overload;
+procedure jButton_SetCompoundDrawables(env: PJNIEnv; _jbutton: JObject; _imageResIdentifier: string; _side: integer);  overload;
+procedure jButton_SetRoundCorner(env: PJNIEnv; _jbutton: JObject);
+procedure jButton_SetRadiusRoundCorner(env: PJNIEnv; _jbutton: JObject; _radius: integer);
+
 // CheckBox
 Function  jCheckBox_Create            (env:PJNIEnv;  this:jobject; SelfObj: TObject ): jObject;
 Procedure jCheckBox_Free               (env:PJNIEnv; CheckBox : jObject);
@@ -315,6 +330,9 @@ Procedure jCheckBox_addLParamsAnchorRule(env:PJNIEnv; CheckBox : jObject; rule: 
 Procedure jCheckBox_setLayoutAll(env:PJNIEnv; CheckBox : jObject;  idAnchor: DWord);
 
 procedure jCheckBox_SetFontSizeUnit(env: PJNIEnv; _jcheckbox: JObject; _unit: integer);
+
+procedure jCheckBox_SetCompoundDrawables(env: PJNIEnv; _jcheckbox: JObject; _image: jObject; _side: integer); overload;
+procedure jCheckBox_SetCompoundDrawables(env: PJNIEnv; _jcheckbox: JObject; _imageResIdentifier: string; _side: integer);  overload;
 
 // RadioButton
 
@@ -346,6 +364,9 @@ Procedure jRadioButton_addLParamsAnchorRule(env:PJNIEnv; RadioButton : jObject; 
 Procedure jRadioButton_setLayoutAll(env:PJNIEnv; RadioButton : jObject;  idAnchor: DWord);
 
 procedure jRadioButton_SetFontSizeUnit(env: PJNIEnv; _jradiobutton: JObject; _unit: integer);
+
+procedure jRadioButton_SetCompoundDrawables(env: PJNIEnv; _jradiobutton: JObject; _image: jObject; _side: integer); overload;
+procedure jRadioButton_SetCompoundDrawables(env: PJNIEnv; _jradiobutton: JObject; _imageResIdentifier: string; _side: integer);  overload;
 
 // ProgressBar
 
@@ -432,6 +453,8 @@ procedure jImageView_SetImageFromIntentResult(env: PJNIEnv; _jimageview: JObject
 procedure jImageView_SetImageThumbnailFromCamera(env: PJNIEnv; _jimageview: JObject; _intentData: jObject);
 procedure jImageView_SetImageFromByteArray(env: PJNIEnv; _jimageview: JObject; var _image: TDynArrayOfJByte);
 procedure jImageView_SetBitmapImage(env: PJNIEnv; _jimageview: JObject; _bitmap: jObject; _width: integer; _height: integer); overload;
+procedure jImageView_SetRoundCorner(env: PJNIEnv; _jimageview: JObject);
+procedure jImageView_SetRadiusRoundCorner(env: PJNIEnv; _jimageview: JObject; _radius: integer);
 
 
 // ListView
@@ -617,7 +640,8 @@ procedure jPanel_SetMaxZoomFactor(env: PJNIEnv; _jpanel: JObject; _maxZoomFactor
 procedure jPanel_CenterInParent(env: PJNIEnv; _jpanel: JObject);
 procedure jPanel_MatchParent(env: PJNIEnv; _jpanel: JObject);
 procedure jPanel_WrapContent(env: PJNIEnv; _jpanel: JObject);
-
+procedure jPanel_SetRoundCorner(env: PJNIEnv; _jpanel: JObject);
+procedure jPanel_SetRadiusRoundCorner(env: PJNIEnv; _jpanel: JObject; _radius: integer);
 //-----------------
 // HorizontalScrollView
 //by jmpessoa
@@ -1718,6 +1742,59 @@ begin
   env^.DeleteLocalRef(env, cls);
 end;
 
+procedure jTextView_SetCompoundDrawables(env: PJNIEnv; _jtextview: JObject; _image: jObject; _side: integer);
+var
+  jParams: array[0..1] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= _image;
+  jParams[1].i:= _side;
+  jCls:= env^.GetObjectClass(env, _jtextview);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetCompoundDrawables', '(Landroid/graphics/Bitmap;I)V');
+  env^.CallVoidMethodA(env, _jtextview, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jTextView_SetCompoundDrawables(env: PJNIEnv; _jtextview: JObject; _imageResIdentifier: string; _side: integer);  overload;
+var
+  jParams: array[0..1] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_imageResIdentifier));
+  jParams[1].i:= _side;
+  jCls:= env^.GetObjectClass(env, _jtextview);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetCompoundDrawables', '(Ljava/lang/String;I)V');
+  env^.CallVoidMethodA(env, _jtextview, jMethod, @jParams);
+env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jTextView_SetRoundCorner(env: PJNIEnv; _jtextview: JObject);
+var
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jtextview);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetRoundCorner', '()V');
+  env^.CallVoidMethod(env, _jtextview, jMethod);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jTextView_SetRadiusRoundCorner(env: PJNIEnv; _jtextview: JObject; _radius: integer);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].i:= _radius;
+  jCls:= env^.GetObjectClass(env, _jtextview);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetRadiusRoundCorner', '(I)V');
+  env^.CallVoidMethodA(env, _jtextview, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
 //------------------------------------------------------------------------------
 // EditText
 //------------------------------------------------------------------------------
@@ -2455,6 +2532,34 @@ begin
   env^.DeleteLocalRef(env, jCls);
 end;
 
+procedure jEditText_SetCompoundDrawables(env: PJNIEnv; _jedittext: JObject; _image: jObject; _side: integer);
+var
+  jParams: array[0..1] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= _image;
+  jParams[1].i:= _side;
+  jCls:= env^.GetObjectClass(env, _jedittext);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetCompoundDrawables', '(Landroid/graphics/Bitmap;I)V');
+  env^.CallVoidMethodA(env, _jedittext, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jEditText_SetCompoundDrawables(env: PJNIEnv; _jedittext: JObject; _imageResIdentifier: string; _side: integer);
+var
+  jParams: array[0..1] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_imageResIdentifier));
+  jParams[1].i:= _side;
+  jCls:= env^.GetObjectClass(env, _jedittext);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetCompoundDrawables', '(Ljava/lang/String;I)V');
+  env^.CallVoidMethodA(env, _jedittext, jMethod, @jParams);
+env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
 
 function jEditText_getLParamHeight(env:PJNIEnv; _jedittext : jObject ): integer;
 var
@@ -2790,6 +2895,59 @@ begin
   env^.DeleteLocalRef(env, cls);
 end;
 
+procedure jButton_SetCompoundDrawables(env: PJNIEnv; _jbutton: JObject; _image: jObject; _side: integer); overload;
+var
+  jParams: array[0..1] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= _image;
+  jParams[1].i:= _side;
+  jCls:= env^.GetObjectClass(env, _jbutton);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetCompoundDrawables', '(Landroid/graphics/Bitmap;I)V');
+  env^.CallVoidMethodA(env, _jbutton, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jButton_SetCompoundDrawables(env: PJNIEnv; _jbutton: JObject; _imageResIdentifier: string; _side: integer);  overload;
+var
+  jParams: array[0..1] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_imageResIdentifier));
+  jParams[1].i:= _side;
+  jCls:= env^.GetObjectClass(env, _jbutton);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetCompoundDrawables', '(Ljava/lang/String;I)V');
+  env^.CallVoidMethodA(env, _jbutton, jMethod, @jParams);
+env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jButton_SetRoundCorner(env: PJNIEnv; _jbutton: JObject);
+var
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jbutton);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetRoundCorner', '()V');
+  env^.CallVoidMethod(env, _jbutton, jMethod);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jButton_SetRadiusRoundCorner(env: PJNIEnv; _jbutton: JObject; _radius: integer);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].i:= _radius;
+  jCls:= env^.GetObjectClass(env, _jbutton);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetRadiusRoundCorner', '(I)V');
+  env^.CallVoidMethodA(env, _jbutton, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
 //------------------------------------------------------------------------------
 // CheckBox
 //------------------------------------------------------------------------------
@@ -3039,6 +3197,36 @@ begin
   env^.CallVoidMethodA(env, _jcheckbox, jMethod, @jParams);
   env^.DeleteLocalRef(env, jCls);
 end;
+
+procedure jCheckBox_SetCompoundDrawables(env: PJNIEnv; _jcheckbox: JObject; _image: jObject; _side: integer);
+var
+  jParams: array[0..1] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= _image;
+  jParams[1].i:= _side;
+  jCls:= env^.GetObjectClass(env, _jcheckbox);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetCompoundDrawables', '(Landroid/graphics/Bitmap;I)V');
+  env^.CallVoidMethodA(env, _jcheckbox, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jCheckBox_SetCompoundDrawables(env: PJNIEnv; _jcheckbox: JObject; _imageResIdentifier: string; _side: integer);
+var
+  jParams: array[0..1] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_imageResIdentifier));
+  jParams[1].i:= _side;
+  jCls:= env^.GetObjectClass(env, _jcheckbox);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetCompoundDrawables', '(Ljava/lang/String;I)V');
+  env^.CallVoidMethodA(env, _jcheckbox, jMethod, @jParams);
+  env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
 //------------------------------------------------------------------------------
 // RadioButton
 //------------------------------------------------------------------------------
@@ -3299,6 +3487,35 @@ begin
   jCls:= env^.GetObjectClass(env, _jradiobutton);
   jMethod:= env^.GetMethodID(env, jCls, 'SetFontSizeUnit', '(I)V');
   env^.CallVoidMethodA(env, _jradiobutton, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jRadioButton_SetCompoundDrawables(env: PJNIEnv; _jradiobutton: JObject; _image: jObject; _side: integer);
+var
+  jParams: array[0..1] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= _image;
+  jParams[1].i:= _side;
+  jCls:= env^.GetObjectClass(env, _jradiobutton);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetCompoundDrawables', '(Landroid/graphics/Bitmap;I)V');
+  env^.CallVoidMethodA(env, _jradiobutton, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jRadioButton_SetCompoundDrawables(env: PJNIEnv; _jradiobutton: JObject; _imageResIdentifier: string; _side: integer);
+var
+  jParams: array[0..1] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_imageResIdentifier));
+  jParams[1].i:= _side;
+  jCls:= env^.GetObjectClass(env, _jradiobutton);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetCompoundDrawables', '(Ljava/lang/String;I)V');
+  env^.CallVoidMethodA(env, _jradiobutton, jMethod, @jParams);
+  env^.DeleteLocalRef(env,jParams[0].l);
   env^.DeleteLocalRef(env, jCls);
 end;
 
@@ -3852,6 +4069,29 @@ begin
   env^.DeleteLocalRef(env, jCls);
 end;
 
+procedure jImageView_SetRoundCorner(env: PJNIEnv; _jimageview: JObject);
+var
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jimageview);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetRoundCorner', '()V');
+  env^.CallVoidMethod(env, _jimageview, jMethod);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jImageView_SetRadiusRoundCorner(env: PJNIEnv; _jimageview: JObject; _radius: integer);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].i:= _radius;
+  jCls:= env^.GetObjectClass(env, _jimageview);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetRadiusRoundCorner', '(I)V');
+  env^.CallVoidMethodA(env, _jimageview, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
 
 //------------------------------------------------------------------------------
 // ListView
@@ -5120,6 +5360,30 @@ begin
   jCls:= env^.GetObjectClass(env, _jpanel);
   jMethod:= env^.GetMethodID(env, jCls, 'WrapContent', '()V');
   env^.CallVoidMethod(env, _jpanel, jMethod);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jPanel_SetRoundCorner(env: PJNIEnv; _jpanel: JObject);
+var
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jpanel);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetRoundCorner', '()V');
+  env^.CallVoidMethod(env, _jpanel, jMethod);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jPanel_SetRadiusRoundCorner(env: PJNIEnv; _jpanel: JObject; _radius: integer);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].i:= _radius;
+  jCls:= env^.GetObjectClass(env, _jpanel);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetRadiusRoundCorner', '(I)V');
+  env^.CallVoidMethodA(env, _jpanel, jMethod, @jParams);
   env^.DeleteLocalRef(env, jCls);
 end;
 

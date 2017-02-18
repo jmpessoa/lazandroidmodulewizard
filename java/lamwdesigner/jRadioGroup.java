@@ -1,6 +1,12 @@
-package com.example.appdemo1;
+package com.example.appwindowmanagerdemo1;
 
 import android.content.Context;
+import android.graphics.Color;
+import android.graphics.PorterDuff.Mode;
+import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.PaintDrawable;
+import android.os.Build;
 import android.view.ViewGroup;
 import android.view.ViewGroup.MarginLayoutParams;
 import android.widget.RadioButton;
@@ -41,6 +47,8 @@ public class jRadioGroup extends RadioGroup /*dummy*/ { //please, fix what GUI o
 
     private boolean mRemovedFromParent = false;
     public int checkedIndex = -1;
+   
+    int mRadius = 20; 
 
     //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
 
@@ -302,6 +310,27 @@ public class jRadioGroup extends RadioGroup /*dummy*/ { //please, fix what GUI o
         else
             return false;
     }
+    
+	public void SetRoundCorner() {
+		   if (this != null) {  		
+			        PaintDrawable  shape =  new PaintDrawable();
+			        shape.setCornerRadius(mRadius);                
+			        int color = Color.TRANSPARENT;
+			        Drawable background = this.getBackground();        
+			        if (background instanceof ColorDrawable) {
+			          color = ((ColorDrawable)this.getBackground()).getColor();
+				        shape.setColorFilter(color, Mode.SRC_ATOP);        		           		        		        
+				        //[ifdef_api16up]
+				  	    if(Build.VERSION.SDK_INT >= 16) 
+				             this.setBackground((Drawable)shape);
+				        //[endif_api16up]			          
+			        }                		  	  
+		    }
+	}		
+	
+	public void SetRadiusRoundCorner(int _radius) {
+		mRadius =  _radius;
+	}    
 
 } //end class
 

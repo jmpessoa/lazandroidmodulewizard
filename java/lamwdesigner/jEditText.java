@@ -1,4 +1,4 @@
-package com.example.appautocompletetextviewdemo1;
+package com.example.appwindowmanagerdemo1;
 
 import java.lang.reflect.Field;
 
@@ -437,6 +437,10 @@ public class jEditText extends EditText {
 		this.selectAll();
 	}
 	
+	private Drawable GetDrawableResourceById(int _resID) {
+		return (Drawable)( this.controls.activity.getResources().getDrawable(_resID));
+	}
+	
 	private int GetDrawableResourceId(String _resName) {
 		  try {
 		     Class<?> res = R.drawable.class;
@@ -449,11 +453,11 @@ public class jEditText extends EditText {
 		  }
 	}	
 	
-	public  void SetBackgroundByResIdentifier(String _imgResIdentifier) {	   // ..res/drawable  ex. "ic_launcher"
+	public void SetBackgroundByResIdentifier(String _imgResIdentifier) {	   // ..res/drawable  ex. "ic_launcher"
 		this.setBackgroundResource(GetDrawableResourceId(_imgResIdentifier));
 	}		
 
-	public  void SetBackgroundByImage(Bitmap _image) {	
+	public void SetBackgroundByImage(Bitmap _image) {	
 		Drawable d = new BitmapDrawable(controls.activity.getResources(), _image);
 //[ifdef_api16up]
 		//if(Build.VERSION.SDK_INT >= 16) 
@@ -469,5 +473,35 @@ public class jEditText extends EditText {
 	    //DO YOUR DRAWING ON TOP OF THIS VIEWS CHILDREN
 	    controls.pOnAfterDispatchDraw(LAMWCommon.getPasObj(), canvas, 1);	 //handle by pascal side    
 	}	
+	
+	public void SetCompoundDrawables(Bitmap _image, int _side) {		
+		Drawable d = new BitmapDrawable(controls.activity.getResources(), _image);
+		int h = d.getIntrinsicHeight(); 
+		int w = d.getIntrinsicWidth();   
+		d.setBounds( 0, 0, w, h );		
+		
+		switch(_side) {
+		  case 0: this.setCompoundDrawables(d, null, null, null); break; //left
+		  case 1: this.setCompoundDrawables(null, null, d, null);   break;  //right
+		  case 2: this.setCompoundDrawables(null, d, null, null);  break; //above
+		  case 3: this.setCompoundDrawables(null, null, null, d); 		
+		}		
+	}
+		
+	public void SetCompoundDrawables(String _imageResIdentifier, int _side) {
+		int id = GetDrawableResourceId(_imageResIdentifier);
+		Drawable d = GetDrawableResourceById(id);  		
+		int h = d.getIntrinsicHeight(); 
+		int w = d.getIntrinsicWidth();   
+		d.setBounds( 0, 0, w, h );
+		
+		switch(_side) {
+		  case 0: this.setCompoundDrawables(d, null, null, null); break; //left
+		  case 1: this.setCompoundDrawables(null, null, d, null);   break;  //right
+		  case 2: this.setCompoundDrawables(null, d, null, null);  break; //above
+		  case 3: this.setCompoundDrawables(null, null, null, d); 		
+		}				
+	}
+	
 }
 

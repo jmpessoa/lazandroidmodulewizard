@@ -1,0 +1,3 @@
+<provider android:name=".jAssetsProvider" android:authorities="org.lamw.provider" android:exported="true" android:grantUriPermissions="true"/>
+
+  

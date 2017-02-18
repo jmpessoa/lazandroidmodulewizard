@@ -1,7 +1,3 @@
-ref. https://github.com/jmpessoa/lazandroidmodulewizard
-
-ref. http://forum.lazarus.freepascal.org/index.php/topic,21919.0.html
-
 
 		[readme_get_start.txt]
 					
@@ -11,10 +7,11 @@ ref. http://forum.lazarus.freepascal.org/index.php/topic,21919.0.html
 
 	"Get Start" for Windows
 
-
 Note 1:	Linux:  please, go to lazandroidmodulewizard folder  "...\linux" 
 	and read: "new_how_to_install_by_renabor.txt"
 
+ref. https://github.com/jmpessoa/lazandroidmodulewizard
+ref. http://forum.lazarus.freepascal.org/index.php/topic,21919.0.html
 
 I. Infrastructure
 
@@ -25,8 +22,9 @@ I. Infrastructure
 .Android NDK-r10e   - 	http://dl.google.com/android/ndk/android-ndk-r10e-windows-x86.exe
 
 .Laz4Android [cross Android compiler installed!] 
+			http://sourceforge.net/projects/laz4android/files/?source=navbar
 
-	.OR Lazarus (canonical/trunk) 
+	:: OR Lazarus (canonical/trunk) 
 
 		Do It Yourself cross compile! [windows]: 			
 

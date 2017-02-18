@@ -8,6 +8,7 @@ interface
 
 uses 
   Classes,
+  windowmanager,
   opendialog,
   fileprovider,
   udpsocket,
@@ -49,6 +50,7 @@ implementation
   
 Procedure Register;
 begin
+  {$I jwindowmanager_icon.lrs}
   {$I jopendialog_icon.lrs}
   {$I jfileprovider_icon.lrs}
   {$I judpsocket_icon.lrs}
@@ -91,6 +93,7 @@ begin
 
   RegisterComponents('Android Bridges Extra',
    [
+      jWindowManager,
       jOpenDialog,
       jFileProvider,
       jUDPSocket,

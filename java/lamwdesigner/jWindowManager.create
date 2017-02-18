@@ -1,0 +1,3 @@
+public java.lang.Object jWindowManager_jCreate(long _Self) {
+  return (java.lang.Object)(new jWindowManager(this,_Self));
+}

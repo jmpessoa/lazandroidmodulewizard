@@ -1,0 +1,4 @@
+public java.lang.Object jActivity_jCreate(long _Self) {
+  return (java.lang.Object)(new jActivity(this,_Self));
+}
+  

@@ -2,9 +2,6 @@ package com.example.appviewflipperdemo1;
 
 
 import android.content.Context;
-import android.util.Log;
-import android.view.GestureDetector;
-import android.view.GestureDetector.SimpleOnGestureListener;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
