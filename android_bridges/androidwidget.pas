@@ -257,10 +257,13 @@ const
 
 type
 
+ TTextDirection = (tdInherit,tdFirstStrong, tdAnyRTL, tdLTR, tdRTL);
+
  TCompoundDrawablesSide = (cdsLeft, cdsRight, cdsAbove, cdsBelow);
 
  TOnBeforeDispatchDraw = procedure(Obj: TObject; canvas: JObject; tag: integer) of Object;
  TOnAfterDispatchDraw = procedure(Obj: TObject; canvas: JObject; tag: integer) of Object;
+ TOnLayouting = procedure(Obj: TObject; changed: boolean) of Object;
 
  TConnectionType = (ctMobile, ctWifi, ctBluetooch, ctEthernet);
 
@@ -1242,6 +1245,7 @@ end;
 
     FOnBeforeDispatchDraw: TOnBeforeDispatchDraw;
     FOnAfterDispatchDraw: TOnAfterDispatchDraw;
+    FOnLayouting: TOnLayouting;
 
     procedure SetAnchor(Value: jVisualControl);
     procedure DefineProperties(Filer: TFiler); override;

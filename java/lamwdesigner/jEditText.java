@@ -1,4 +1,4 @@
-package com.example.appwindowmanagerdemo1;
+package com.example.apptextviewshaderandshadowdemo1;
 
 import java.lang.reflect.Field;
 
@@ -16,6 +16,7 @@ import android.text.InputFilter;
 import android.text.InputType;
 import android.text.TextWatcher;
 import android.text.method.ScrollingMovementMethod;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.KeyEvent;
 import android.view.View;
@@ -501,6 +502,32 @@ public class jEditText extends EditText {
 		  case 2: this.setCompoundDrawables(null, d, null, null);  break; //above
 		  case 3: this.setCompoundDrawables(null, null, null, d); 		
 		}				
+	}
+		
+	// https://blog.stylingandroid.com/gradient-text/
+	@Override
+    protected void onLayout( boolean changed, int left, int top, int right, int bottom ) {
+        super.onLayout( changed, left, top, right, bottom );        
+        controls.pOnLayouting(LAMWCommon.getPasObj(), changed);	 //event handle by pascal side                                            
+    }
+	
+	/* https://mobikul.com/just-few-steps-to-make-your-app-rtl-supportable/
+	 * add android:supportsRtl="true" to the <application>element in manifest file.
+	 */
+	public void SetTextDirection(int _textDirection) {		
+		//[ifdef_api17up]
+		 if(Build.VERSION.SDK_INT >= 17) {
+				switch  (_textDirection) {
+				case 0: this.setTextDirection(View.TEXT_DIRECTION_INHERIT);	 break; 
+				case 1: this.setTextDirection(View.TEXT_DIRECTION_FIRST_STRONG); break; 	 
+				case 2: this.setTextDirection(View.TEXT_DIRECTION_ANY_RTL);	  break; 
+				case 3: this.setTextDirection(View.TEXT_DIRECTION_LTR); break;  
+				case 4: this.setTextDirection(View.TEXT_DIRECTION_RTL); 
+					 		  		  		   
+				}			
+				Log.i("SetTextDirection", "SetTextDirection");
+		 }	
+       //[endif_api17up]				
 	}
 	
 }

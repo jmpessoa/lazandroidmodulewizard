@@ -168,8 +168,11 @@ procedure jTextView_SetCompoundDrawables(env: PJNIEnv; _jtextview: JObject; _ima
 procedure jTextView_SetCompoundDrawables(env: PJNIEnv; _jtextview: JObject; _imageResIdentifier: string; _side: integer);  overload;
 procedure jTextView_SetRoundCorner(env: PJNIEnv; _jtextview: JObject);
 procedure jTextView_SetRadiusRoundCorner(env: PJNIEnv; _jtextview: JObject; _radius: integer);
-
-
+procedure jTextView_SetShadowLayer(env: PJNIEnv; _jtextview: JObject; _radius: single; _dx: single; _dy: single; _color: integer);
+procedure jTextView_SetShaderLinearGradient(env: PJNIEnv; _jtextview: JObject; _startColor: integer; _endColor: integer);
+procedure jTextView_SetShaderRadialGradient(env: PJNIEnv; _jtextview: JObject; _centerColor: integer; _edgeColor: integer);
+procedure jTextView_SetShaderSweepGradient(env: PJNIEnv; _jtextview: JObject; _color1: integer; _color2: integer);
+procedure jTextView_SetTextDirection(env: PJNIEnv; _jtextview: JObject; _textDirection: integer);
 //-----------------------------------
 // EditText  :: changed by jmpessoa [support Api > 13]
 //--------------------------------------
@@ -254,7 +257,7 @@ procedure jEditText_SetBackgroundByImage(env: PJNIEnv; _jedittext: JObject; _ima
 
 procedure jEditText_SetCompoundDrawables(env: PJNIEnv; _jedittext: JObject; _image: jObject; _side: integer); overload;
 procedure jEditText_SetCompoundDrawables(env: PJNIEnv; _jedittext: JObject; _imageResIdentifier: string; _side: integer);  overload;
-
+procedure jEditText_SetTextDirection(env: PJNIEnv; _jedittext: JObject; _textDirection: integer);
 
 function jEditText_getLParamWidth(env:PJNIEnv; _jedittext : jObject): integer;
 function jEditText_getLParamHeight(env:PJNIEnv; _jedittext : jObject ): integer;
@@ -1795,6 +1798,77 @@ begin
   env^.DeleteLocalRef(env, jCls);
 end;
 
+procedure jTextView_SetShadowLayer(env: PJNIEnv; _jtextview: JObject; _radius: single; _dx: single; _dy: single; _color: integer);
+var
+  jParams: array[0..3] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].f:= _radius;
+  jParams[1].f:= _dx;
+  jParams[2].f:= _dy;
+  jParams[3].i:= _color;
+  jCls:= env^.GetObjectClass(env, _jtextview);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetShadowLayer', '(FFFI)V');
+  env^.CallVoidMethodA(env, _jtextview, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jTextView_SetShaderLinearGradient(env: PJNIEnv; _jtextview: JObject; _startColor: integer; _endColor: integer);
+var
+  jParams: array[0..1] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].i:= _startColor;
+  jParams[1].i:= _endColor;
+  jCls:= env^.GetObjectClass(env, _jtextview);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetShaderLinearGradient', '(II)V');
+  env^.CallVoidMethodA(env, _jtextview, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jTextView_SetShaderRadialGradient(env: PJNIEnv; _jtextview: JObject; _centerColor: integer; _edgeColor: integer);
+var
+  jParams: array[0..1] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].i:= _centerColor;
+  jParams[1].i:= _edgeColor;
+  jCls:= env^.GetObjectClass(env, _jtextview);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetShaderRadialGradient', '(II)V');
+  env^.CallVoidMethodA(env, _jtextview, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jTextView_SetShaderSweepGradient(env: PJNIEnv; _jtextview: JObject; _color1: integer; _color2: integer);
+var
+  jParams: array[0..1] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].i:= _color1;
+  jParams[1].i:= _color2;
+  jCls:= env^.GetObjectClass(env, _jtextview);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetShaderSweepGradient', '(II)V');
+  env^.CallVoidMethodA(env, _jtextview, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jTextView_SetTextDirection(env: PJNIEnv; _jtextview: JObject; _textDirection: integer);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].i:= _textDirection;
+  jCls:= env^.GetObjectClass(env, _jtextview);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetTextDirection', '(I)V');
+  env^.CallVoidMethodA(env, _jtextview, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
 //------------------------------------------------------------------------------
 // EditText
 //------------------------------------------------------------------------------
@@ -2560,6 +2634,20 @@ begin
 env^.DeleteLocalRef(env,jParams[0].l);
   env^.DeleteLocalRef(env, jCls);
 end;
+
+procedure jEditText_SetTextDirection(env: PJNIEnv; _jedittext: JObject; _textDirection: integer);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].i:= _textDirection;
+  jCls:= env^.GetObjectClass(env, _jedittext);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetTextDirection', '(I)V');
+  env^.CallVoidMethodA(env, _jedittext, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
 
 function jEditText_getLParamHeight(env:PJNIEnv; _jedittext : jObject ): integer;
 var

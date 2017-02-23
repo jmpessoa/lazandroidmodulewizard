@@ -758,6 +758,7 @@ type
     Procedure GenEvent_OnClick(Obj: TObject);
     procedure GenEvent_OnBeforeDispatchDraw(Obj: TObject; canvas: JObject; tag: integer);
     procedure GenEvent_OnAfterDispatchDraw(Obj: TObject; canvas: JObject; tag: integer);
+    procedure GenEvent_OnOnLayouting(Obj: TObject; changed: boolean);
 
   public
     constructor Create(AOwner: TComponent); override;
@@ -777,9 +778,11 @@ type
     procedure SetCompoundDrawables(_imageResIdentifier: string; _side: TCompoundDrawablesSide); overload;
     procedure SetRoundCorner();
     procedure SetRadiusRoundCorner(_radius: integer);
-
-
-
+    procedure SetShadowLayer(_radius: single; _dx: single; _dy: single; _color: TARGBColorBridge);
+    procedure SetShaderLinearGradient(_startColor: TARGBColorBridge; _endColor: TARGBColorBridge);
+    procedure SetShaderRadialGradient(_centerColor: TARGBColorBridge; _edgeColor: TARGBColorBridge);
+    procedure SetShaderSweepGradient(_color1: TARGBColorBridge; _color2: TARGBColorBridge);
+    procedure SetTextDirection(_textDirection: TTextDirection);
 
   published
     property Text: string read GetText write SetText;
@@ -793,9 +796,10 @@ type
     property FontSizeUnit: TFontSizeUnit read FFontSizeUnit write SetFontSizeUnit;
 
     // Event - if enabled!
-    property OnClick : TOnNotify read FOnClick   write FOnClick;
+    property OnClick: TOnNotify read FOnClick write FOnClick;
     property OnBeforeDispatchDraw: TOnBeforeDispatchDraw read FOnBeforeDispatchDraw write FOnBeforeDispatchDraw;
     property OnAfterDispatchDraw: TOnBeforeDispatchDraw read FOnAfterDispatchDraw write FOnAfterDispatchDraw;
+    property OnLayouting: TOnLayouting read FOnLayouting write FOnLayouting;
   end;
 
   jEditText = class(jVisualControl)
@@ -856,6 +860,7 @@ type
 
     procedure GenEvent_OnBeforeDispatchDraw(Obj: TObject; canvas: JObject; tag: integer);
     procedure GenEvent_OnAfterDispatchDraw(Obj: TObject; canvas: JObject; tag: integer);
+    procedure GenEvent_OnOnLayouting(Obj: TObject; changed: boolean);
 
   public
     constructor Create(AOwner: TComponent); override;
@@ -896,6 +901,7 @@ type
 
     procedure SetCompoundDrawables(_image: jObject; _side: TCompoundDrawablesSide); overload;
     procedure SetCompoundDrawables(_imageResIdentifier: string; _side: TCompoundDrawablesSide); overload;
+    procedure SetTextDirection(_textDirection: TTextDirection);
 
     // Property
     property CursorPos : TXY        read GetCursorPos  write SetCursorPos;
@@ -932,7 +938,7 @@ type
     property OnClick : TOnNotify read FOnClick   write FOnClick;
     property OnBeforeDispatchDraw: TOnBeforeDispatchDraw read FOnBeforeDispatchDraw write FOnBeforeDispatchDraw;
     property OnAfterDispatchDraw: TOnBeforeDispatchDraw read FOnAfterDispatchDraw write FOnAfterDispatchDraw;
-
+    property OnLayouting: TOnLayouting read FOnLayouting write FOnLayouting;
   end;
 
   jButton = class(jVisualControl)
@@ -1662,6 +1668,8 @@ type
   procedure Java_Event_pOnBeforeDispatchDraw(env: PJNIEnv; this: jobject; Obj: TObject; canvas: JObject; tag: integer);
   procedure Java_Event_pOnAfterDispatchDraw(env: PJNIEnv; this: jobject; Obj: TObject; canvas: JObject; tag: integer);
 
+  procedure Java_Event_pOnLayouting(env: PJNIEnv; this: jobject; Obj: TObject; changed: JBoolean);
+
   Procedure Java_Event_pOnChange(env: PJNIEnv; this: jobject; Obj: TObject; txt: JString; count : integer);
   Procedure Java_Event_pOnChanged(env: PJNIEnv; this: jobject; Obj: TObject; txt: JString; count : integer);
 
@@ -2246,6 +2254,24 @@ begin
   begin
     jForm(jAutoTextView(Obj).Owner).UpdateJNI(gApp);
     jAutoTextView(Obj).GenEvent_OnBeforeDispatchDraw(Obj, canvas, tag);
+  end;
+end;
+
+procedure Java_Event_pOnLayouting(env: PJNIEnv; this: jobject; Obj: TObject; changed: JBoolean);
+begin
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+  if Obj is jTextView then
+  begin
+    jForm(jTextView(Obj).Owner).UpdateJNI(gApp);
+    jTextView(Obj).GenEvent_OnOnLayouting(Obj, Boolean(changed));
+    Exit;
+  end;
+  if Obj is jEditText then
+  begin
+    jForm(jEditText(Obj).Owner).UpdateJNI(gApp);
+    jEditText(Obj).GenEvent_OnOnLayouting(Obj, Boolean(changed));
+    Exit;
   end;
 end;
 
@@ -3012,6 +3038,11 @@ begin
   if Assigned(FOnAfterDispatchDraw) then FOnAfterDispatchDraw(Obj, canvas, tag);
 end;
 
+procedure jTextView.GenEvent_OnOnLayouting(Obj: TObject; changed: boolean);
+begin
+  if Assigned(FOnLayouting) then FOnLayouting(Obj, changed);
+end;
+
 function jTextView.GetWidth: integer;
 begin
   Result:= FWidth;
@@ -3086,6 +3117,41 @@ begin
      jTextView_SetRadiusRoundCorner(FjEnv, FjObject, _radius);
 end;
 
+procedure jTextView.SetShadowLayer(_radius: single; _dx: single; _dy: single; _color: TARGBColorBridge);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jTextView_SetShadowLayer(FjEnv, FjObject, _radius ,_dx ,_dy , GetARGB(FCustomColor, _color));
+end;
+
+
+procedure jTextView.SetShaderLinearGradient(_startColor: TARGBColorBridge; _endColor: TARGBColorBridge);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jTextView_SetShaderLinearGradient(FjEnv, FjObject, GetARGB(FCustomColor, _startColor) ,GetARGB(FCustomColor, _endColor));
+end;
+
+procedure jTextView.SetShaderRadialGradient(_centerColor: TARGBColorBridge; _edgeColor: TARGBColorBridge);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jTextView_SetShaderRadialGradient(FjEnv, FjObject, GetARGB(FCustomColor, _centerColor) ,GetARGB(FCustomColor, _edgeColor));
+end;
+
+procedure jTextView.SetShaderSweepGradient(_color1: TARGBColorBridge; _color2: TARGBColorBridge);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jTextView_SetShaderSweepGradient(FjEnv, FjObject, GetARGB(FCustomColor, _color1) ,GetARGB(FCustomColor, _color2));
+end;
+
+procedure jTextView.SetTextDirection(_textDirection: TTextDirection);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jTextView_SetTextDirection(FjEnv, FjObject, Ord(_textDirection));
+end;
 
 //------------------------------------------------------------------------------
 // jEditText
@@ -3691,6 +3757,13 @@ begin
      jEditText_SetCompoundDrawables(FjEnv, FjObject, _imageResIdentifier, Ord(_side));
 end;
 
+procedure jEditText.SetTextDirection(_textDirection: TTextDirection);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jEditText_SetTextDirection(FjEnv, FjObject, Ord(_textDirection));
+end;
+
 Procedure jEditText.GenEvent_OnBeforeDispatchDraw(Obj: TObject; canvas: jObject; tag: integer);
 begin
   if Assigned(FOnBeforeDispatchDraw) then FOnBeforeDispatchDraw(Obj, canvas, tag);
@@ -3699,6 +3772,11 @@ end;
 Procedure jEditText.GenEvent_OnAfterDispatchDraw(Obj: TObject; canvas: jObject; tag: integer);
 begin
   if Assigned(FOnAfterDispatchDraw) then FOnAfterDispatchDraw(Obj, canvas, tag);
+end;
+
+procedure jEditText.GenEvent_OnOnLayouting(Obj: TObject; changed: boolean);
+begin
+  if Assigned(FOnLayouting) then FOnLayouting(Obj, changed);
 end;
 
 function jEditText.GetWidth: integer;

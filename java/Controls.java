@@ -1,6 +1,6 @@
-package com.example.appwindowmanagerdemo1;
+package com.example.apptextviewshaderandshadowdemo1;
 
-//LAMW: Lazarus Android Module Wizard  - version 0.7 - rev. 11 - 17 Feb - 2017 
+//LAMW: Lazarus Android Module Wizard  - version 0.7 - rev. 12 - 22 Feb - 2017 
 //RAD Android: Project Wizard, Form Designer and Components Development Model!
 
 //https://github.com/jmpessoa/lazandroidmodulewizard
@@ -1251,6 +1251,7 @@ public native void pOnPinchZoomGestureDetected(long pasobj, float scaleFactor, i
 public native void pOnLostFocus(long pasobj, String text);
 public native void pOnBeforeDispatchDraw(long pasobj, Canvas canvas, int tag);
 public native void pOnAfterDispatchDraw(long pasobj, Canvas canvas, int tag);
+public native void pOnLayouting(long pasobj, boolean changed);
 
 // -------------------------------------------------------------------------
 //Load Pascal Library

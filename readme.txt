@@ -125,6 +125,29 @@
 	*
 	****************************************************************************************************
 
+Version 0.7.12 - 22 - Feb - 2017
+
+	IMPROVED! 
+		jTextView:news methods
+				SetShadowLayer
+				SetShaderLinearGradient
+				SetShaderRadialGradient
+				SetShaderSweepGradient
+				SetTextDirection //thanks to  @majid.ebru
+
+			news event
+				OnLayouting   
+
+		jEditText:new method
+				SetTextDirection //thanks to  @majid.ebru
+				[warning: add android:supportsRtl="true" to the <application> element in manifest file.				]
+
+			new event
+				OnLayouting
+			
+	NEW! demo AppTextViewShaderAndShadowDemo1
+	NEW! demo AppEditTextSetTextDirectionRTLDemo1  //thanks to  @majid.ebru
+
 Version 0.7.11 - 17 - Feb - 2017
 
 	NEW! jWindowManager component
