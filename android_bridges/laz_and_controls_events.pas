@@ -30,6 +30,7 @@ uses
    procedure Java_Event_pOnLocationStatusChanged(env: PJNIEnv; this: jobject; Obj: TObject; status: integer; provider: JString; msgStatus: JString);
    procedure Java_Event_pOnLocationProviderEnabled(env: PJNIEnv; this: jobject; Obj: TObject; provider:JString);
    procedure Java_Event_pOnLocationProviderDisabled(env: PJNIEnv; this: jobject; Obj: TObject; provider: JString);
+   procedure Java_Event_pOnGpsStatusChanged(env: PJNIEnv; this: jobject; Obj: TObject; countSatellites: integer; gpsStatusEvent: integer);
 
    Procedure Java_Event_pOnActionBarTabSelected(env: PJNIEnv; this: jobject; Obj: TObject; view: jObject; title: jString);
    Procedure Java_Event_pOnActionBarTabUnSelected(env: PJNIEnv; this: jobject; Obj: TObject; view:jObject; title: jString);
@@ -512,6 +513,18 @@ begin
     jLocation(Obj).GenEvent_OnLocationProviderDisabled(Obj, pasprovider);
   end;
 end;
+
+procedure Java_Event_pOnGpsStatusChanged(env: PJNIEnv; this: jobject; Obj: TObject; countSatellites: integer; gpsStatusEvent: integer);
+begin
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+  if Obj is jLocation then
+  begin
+    jForm(jLocation(Obj).Owner).UpdateJNI(gApp);
+    jLocation(Obj).GenEvent_OnGpsStatusChanged(Obj, countSatellites, gpsStatusEvent);
+  end;
+end;
+
 
 Procedure Java_Event_pOnActionBarTabSelected(env: PJNIEnv; this: jobject; Obj: TObject; view: jObject; title: jString);
 var

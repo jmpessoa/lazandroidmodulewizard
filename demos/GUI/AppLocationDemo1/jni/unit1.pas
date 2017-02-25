@@ -24,6 +24,8 @@ type
       procedure jButton1Click(Sender: TObject);
       procedure jButton2Click(Sender: TObject);
       procedure jCheckBox1Click(Sender: TObject);
+      procedure jLocation1GpsStatusChanged(Sender: TObject;
+        countSatellites: integer; gpsStatusEvent: TGpsStatusEvent);
       procedure jLocation1LocationChanged(Sender: TObject; latitude: double;
         longitude: double; altitude: double; address: string);
       procedure jLocation1LocationProviderDisabled(Sender: TObject;
@@ -76,6 +78,31 @@ begin
       jLocation1.SetWifiEnabled(False);
       ShowMessage('Wifi was Disabled!');
    end;
+end;
+
+procedure TAndroidModule1.jLocation1GpsStatusChanged(Sender: TObject;
+  countSatellites: integer; gpsStatusEvent: TGpsStatusEvent);
+var
+  i: integer;
+begin
+
+  case gpsStatusEvent of
+
+     gpsStarted: ShowMessage('gpsStarted');
+     gpsStopped: ShowMessage('gpsStopped');
+     gpsFirstFix: ShowMessage( FloatToStr( jLocation1.GetTimeToFirstFix() ) );
+
+     gpsSatelliteStatus:
+     begin
+       ShowMessage(IntToStr(countSatellites));
+       for i:= 0 to countSatellites-1 do
+       begin
+         ShowMessage(jLocation1.GetSatelliteInfo(i));
+       end;
+     end;
+
+  end;
+
 end;
 
 procedure TAndroidModule1.jLocation1LocationChanged(Sender: TObject;

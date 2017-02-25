@@ -1,6 +1,7 @@
 package com.example.applocationdemo1;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
@@ -9,6 +10,8 @@ import android.content.Intent;
 import android.location.Address;
 import android.location.Criteria;
 import android.location.Geocoder;
+import android.location.GpsSatellite;
+import android.location.GpsStatus;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -16,7 +19,7 @@ import android.location.LocationProvider;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.provider.Settings;
-import android.util.Log;
+
 
 /*Draft java code by "Lazarus Android Module Wizard" [8/9/2014 20:25:55]*/
 /*https://github.com/jmpessoa/lazandroidmodulewizard*/
@@ -63,6 +66,16 @@ public class jLocation /*extends ...*/ {
     
     private String mMarkerHighlightColor = "blue";
     
+    private GpsStatus mGpsStatus = null;
+    private int mSatCount = 0;
+    ArrayList<String> mylist = new ArrayList<String>();
+    
+    GpsStatus.Listener gpsListener;
+    
+    private String hasAlmanac;
+    private String hasEphemeris;
+    private float mTimeToFirstFix = 0;
+         
     //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
     public jLocation(Controls _ctrls, long _Self, long _TimeForUpdates, long _DistanceForUpdates, int _CriteriaAccuracy, int _MapType) { //Add more others news "_xxx" params if needed!
        //super(_ctrls.activity);
@@ -112,10 +125,70 @@ public class jLocation /*extends ...*/ {
        //Register the listener with the Location Manager to receive location updates
        mLocationManager.requestLocationUpdates(mProvider, mTimeForUpdates, mDistanceForUpdates, mlistener);
        
+       
+       gpsListener = new GpsStatus.Listener() {
+    	    public void onGpsStatusChanged(int event) {    	    	
+ 		        	switch( event) {
+ 		        	
+		        	   case GpsStatus.GPS_EVENT_STARTED: controls.pOnGpsStatusChanged(pascalObj, 0, 1); break;
+		        	   case GpsStatus.GPS_EVENT_STOPPED: controls.pOnGpsStatusChanged(pascalObj, mSatCount, 2); break;
+		        	  
+		        	   case GpsStatus.GPS_EVENT_FIRST_FIX: {		        		  
+		        		   
+		        		  if ( TrySatellitesInfo() ) { 
+		        			 mTimeToFirstFix = mGpsStatus.getTimeToFirstFix();   
+		        		     controls.pOnGpsStatusChanged(pascalObj, mSatCount, 3); break;
+		        		  }   
+		        		  
+		        	   }
+		        	  
+		        	   case GpsStatus.GPS_EVENT_SATELLITE_STATUS: {			        	  
+			        	  if ( TrySatellitesInfo() ) {		        		   
+		        		     controls.pOnGpsStatusChanged(pascalObj, mSatCount, 4);
+			        	  }   
+		        	   }	
+		        	   
+ 		        	} 
+ 		    }     			        			            	    
+    	};
+    	mLocationManager.addGpsStatusListener(gpsListener);    	              
+    }
+
+    private boolean TrySatellitesInfo() {  
+    	mSatCount = 0;
+        mGpsStatus = mLocationManager.getGpsStatus( mGpsStatus ); 			      
+        if (mGpsStatus!=null) {  			         			                    
+          mylist.clear();
+          if ( mGpsStatus != null ) { 
+            for ( GpsSatellite sat : mGpsStatus.getSatellites() ) { 
+               if ( sat.usedInFix() ) {             	   
+            	   mSatCount++;		            	   
+            	   hasAlmanac = "false";
+            	   if ( sat.hasAlmanac() )  hasAlmanac = "true";
+            	   hasEphemeris = "false";
+            	   if ( sat.hasEphemeris() )  hasEphemeris = "false";            	   
+                   mylist.add( "SNR=" + sat.getSnr() + ";" +
+                		       "Elevation=" + sat.getElevation()+ ";" +
+                		       "Azimuth=" + sat.getAzimuth()+ ";" +
+                		       "PRN=" + sat.getPrn()+ ";" +
+                		       "hasAlmanac=" + hasAlmanac + ";" +
+                		       "hasEphemeris=" + hasEphemeris 
+                		      );
+               } 
+            }
+            
+          }        			           			           			           
+        }
+        
+        if (mSatCount > 0) return true;
+        else return false;
+        
     }
 
     public void jFree() {
       //free local objects...
+      //mLocationManager.removeGpsStatusListener(gpsListener);	//depr api 24
+      //mLocationManager.unregisterGnssStatusCallback(GpssStatus.Callback);    	
       mLocationManager = null;
       mCriteria = null;
       mlistener = null;
@@ -469,6 +542,8 @@ public class jLocation /*extends ...*/ {
              mAlt = _location.getAltitude();                                   
              mAddress = GetAddress(mLat, mLng);
              
+            // mLastLocationMillis = SystemClock.elapsedRealtime();
+             
         	 controls.pOnLocationChanged(pascalObj,mLat,mLng,mAlt,mAddress);        		
         }
 
@@ -483,7 +558,7 @@ public class jLocation /*extends ...*/ {
     			  mStatus="Temporarily Unavailable";    			
     	      break;
     		  case LocationProvider.AVAILABLE:
-    			 mStatus="Available";    		
+    			 mStatus="Available";    		         		       
               break;
     		}        	        	
         	controls.pOnLocationStatusChanged(pascalObj, status, provider, mStatus);
@@ -506,6 +581,22 @@ public class jLocation /*extends ...*/ {
         	lm.removeUpdates(this);
         }
         
+    }   
+       
+    public int GetSatelliteCount() { 
+        return mSatCount;
     }
+    
+    public String GetSatelliteInfo(int _index) {    	
+    	if (mSatCount == 0) return "";
+    	if (_index > (mSatCount-1)) return "";
+    	if (_index < 0) return "";    	
+    	return mylist.get(_index);
+    }        
+    
+    public float GetTimeToFirstFix() {
+    	return mTimeToFirstFix;
+    }
+    
 }
 

@@ -320,6 +320,15 @@ begin
 end;
 
 { Class:     com_example_applocationdemo1_Controls
+  Method:    pOnLayouting
+  Signature: (JZ)V }
+procedure pOnLayouting(PEnv: PJNIEnv; this: JObject; pasobj: JLong;
+  changed: JBoolean); cdecl;
+begin
+  Java_Event_pOnLayouting(PEnv, this, TObject(pasobj), changed);
+end;
+
+{ Class:     com_example_applocationdemo1_Controls
   Method:    pOnLocationChanged
   Signature: (JDDDLjava/lang/String;)V }
 procedure pOnLocationChanged(PEnv: PJNIEnv; this: JObject; pasobj: JLong;
@@ -359,6 +368,16 @@ begin
 end;
 
 { Class:     com_example_applocationdemo1_Controls
+  Method:    pOnGpsStatusChanged
+  Signature: (JII)V }
+procedure pOnGpsStatusChanged(PEnv: PJNIEnv; this: JObject; pasobj: JLong;
+  countSatellites: JInt; gpsStatusEvent: JInt); cdecl;
+begin
+  Java_Event_pOnGpsStatusChanged(PEnv, this, TObject(pasobj), countSatellites,
+    gpsStatusEvent);
+end;
+
+{ Class:     com_example_applocationdemo1_Controls
   Method:    pOnWebViewStatus
   Signature: (JILjava/lang/String;)I }
 function pOnWebViewStatus(PEnv: PJNIEnv; this: JObject; pasobj: JLong;
@@ -368,7 +387,7 @@ begin
     url);
 end;
 
-const NativeMethods: array[0..39] of JNINativeMethod = (
+const NativeMethods: array[0..41] of JNINativeMethod = (
    (name: 'pAppOnCreate';
     signature: '(Landroid/content/Context;Landroid/widget/RelativeLayout;)V';
     fnPtr: @pAppOnCreate; ),
@@ -474,6 +493,9 @@ const NativeMethods: array[0..39] of JNINativeMethod = (
    (name: 'pOnAfterDispatchDraw';
     signature: '(JLandroid/graphics/Canvas;I)V';
     fnPtr: @pOnAfterDispatchDraw; ),
+   (name: 'pOnLayouting';
+    signature: '(JZ)V';
+    fnPtr: @pOnLayouting; ),
    (name: 'pOnLocationChanged';
     signature: '(JDDDLjava/lang/String;)V';
     fnPtr: @pOnLocationChanged; ),
@@ -486,6 +508,9 @@ const NativeMethods: array[0..39] of JNINativeMethod = (
    (name: 'pOnLocationProviderDisabled';
     signature: '(JLjava/lang/String;)V';
     fnPtr: @pOnLocationProviderDisabled; ),
+   (name: 'pOnGpsStatusChanged';
+    signature: '(JII)V';
+    fnPtr: @pOnGpsStatusChanged; ),
    (name: 'pOnWebViewStatus';
     signature: '(JILjava/lang/String;)I';
     fnPtr: @pOnWebViewStatus; )
@@ -602,6 +627,7 @@ exports
     +'pOnBeforeDispatchDraw',
   pOnAfterDispatchDraw name 'Java_com_example_applocationdemo1_Controls_'
     +'pOnAfterDispatchDraw',
+  pOnLayouting name 'Java_com_example_applocationdemo1_Controls_pOnLayouting',
   pOnLocationChanged name 'Java_com_example_applocationdemo1_Controls_'
     +'pOnLocationChanged',
   pOnLocationStatusChanged name 'Java_com_example_applocationdemo1_Controls_'
@@ -610,6 +636,8 @@ exports
     +'pOnLocationProviderEnabled',
   pOnLocationProviderDisabled name 'Java_com_example_applocationdemo1_Controls'
     +'_pOnLocationProviderDisabled',
+  pOnGpsStatusChanged name 'Java_com_example_applocationdemo1_Controls_'
+    +'pOnGpsStatusChanged',
   pOnWebViewStatus name 'Java_com_example_applocationdemo1_Controls_'
     +'pOnWebViewStatus';
 

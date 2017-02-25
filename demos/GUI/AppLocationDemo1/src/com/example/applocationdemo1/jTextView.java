@@ -8,8 +8,12 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.LinearGradient;
 import android.graphics.Typeface;
 import android.graphics.PorterDuff.Mode;
+import android.graphics.RadialGradient;
+import android.graphics.Shader;
+import android.graphics.SweepGradient;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
@@ -35,8 +39,8 @@ public class jTextView extends TextView {
 
     private ClipboardManager mClipBoard = null;
     private ClipData mClipData = null;
-    int mRadius = 20;
-
+    private int mRadius = 20;    
+    	    
     public  jTextView(android.content.Context context,
                       Controls ctrls,long pasobj ) {
         super(context);
@@ -51,13 +55,12 @@ public class jTextView extends TextView {
                     controls.pOnClick(LAMWCommon.getPasObj(),Const.Click_Default);
                 }
             };
-        };
-        setOnClickListener(onClickListener);
-
+        };                     
+        setOnClickListener(onClickListener);                
     }
 
 	//Free object except Self, Pascal Code Free the class.
-	public  void Free() {
+	public  void Free() {		
 		this.setOnKeyListener(null);
 		this.setText("");
 		LAMWCommon.free();
@@ -205,12 +208,12 @@ public class jTextView extends TextView {
     public void SetFontSizeUnit(int _unit) {
         switch (_unit) {
             case 0: mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_SP; break; //default
-            case 1: mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_PX; break; //default
-            case 2: mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_DIP; break; //default
-            case 3: mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_IN; break; //default
-            case 4: mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_MM; break; //default
-            case 5: mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_PT; break; //default
-            case 6: mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_SP; break; //default
+            case 1: mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_PX; break; 
+            case 2: mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_DIP; break; 
+            case 3: mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_IN; break; 
+            case 4: mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_MM; break; 
+            case 5: mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_PT; break; 
+            case 6: mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_SP; break; 
         }
         String t = this.getText().toString();
         this.setTextSize(mTextSizeTypedValue, mTextSize);
@@ -290,5 +293,81 @@ public class jTextView extends TextView {
 	
 	public void SetRadiusRoundCorner(int _radius) {
 		mRadius =  _radius;
+	}
+		
+	// https://blog.stylingandroid.com/gradient-text/
+	@Override
+    protected void onLayout( boolean changed, int left, int top, int right, int bottom ) {
+        super.onLayout( changed, left, top, right, bottom );        
+        controls.pOnLayouting(LAMWCommon.getPasObj(), changed);	 //event handle by pascal side                                            
+    }
+	
+	//https://blog.stylingandroid.com/text-shadows/	
+	/*	
+	  Glowing Text
+      this.setShadowLayer(3f, 0, 0, Color.LTGRAY);
+
+      Outline Glow Text
+      this.setShadowLayer(2f, 0, 0, Color.WRITE);
+
+      Soft Shadow Text
+      this.setShadowLayer(1.5f, 3, 3, Color.LTGRAY);
+      
+      Soft Shadow Text (below)
+      this.setShadowLayer(1.5f, 3, -3, Color.LTGRAY);      
+
+      Engraved Shadow Text
+      this.setShadowLayer(0.6f, 1, 1, Color.WHITE);            
+	*/
+	
+	public void SetShadowLayer(float _radius, float _dx, float _dy, int _color)  {		    		  
+		this.setShadowLayer(_radius, _dx, _dy, _color);			
+	}	
+		
+	public void SetShaderLinearGradient(int _startColor, int _endColor) {
+		
+		float min =  this.getHeight();
+		if ( min > this.getWidth() ) min = this.getWidth();
+		
+		Shader  myShader= new LinearGradient( 0, 0, 0, min,  _startColor, _endColor, Shader.TileMode.CLAMP );	         	
+        this.getPaint().setShader(myShader);    
+    }
+	
+	//RadialGradient (float centerX, float centerY, float radius, int centerColor, int edgeColor, Shader.TileMode tileMode)
+	public void SetShaderRadialGradient(int _centerColor, int _edgeColor) {
+		
+		float r = this.getWidth()/3;
+		if (r < this.getHeight()/3) r = this.getHeight()/3;
+		
+		Shader  myShader = new RadialGradient(this.getWidth()/2, this.getHeight()/2, r, _centerColor, _edgeColor, Shader.TileMode.CLAMP );	         	
+        this.getPaint().setShader(myShader);    
+    }	
+           
+	//SweepGradient (float cx, float cy,  int color0,  int color1) 			
+	public void SetShaderSweepGradient(int _color1, int _color2) {	
+		
+		float min = this.getHeight();
+		if (min > this.getWidth() ) min = this.getWidth();
+		
+		Shader  myShader = new SweepGradient(0, min/2, _color1, _color2);	         	
+        this.getPaint().setShader(myShader);    
+    }	
+	
+	/* https://mobikul.com/just-few-steps-to-make-your-app-rtl-supportable/
+	 * add android:supportsRtl="true" to the <application>element in manifest file.
+	 */	
+	public void SetTextDirection(int _textDirection) {		
+		//[ifdef_api17up]
+		 if(Build.VERSION.SDK_INT >= 17) {
+				switch  (_textDirection) {
+				case 0: this.setTextDirection(View.TEXT_DIRECTION_INHERIT);	 break; 
+				case 1: this.setTextDirection(View.TEXT_DIRECTION_FIRST_STRONG); break; 	 
+				case 2: this.setTextDirection(View.TEXT_DIRECTION_ANY_RTL);	  break; 
+				case 3: this.setTextDirection(View.TEXT_DIRECTION_LTR); break;  
+				case 4: this.setTextDirection(View.TEXT_DIRECTION_RTL); 
+					 		  		  		   
+				}			
+		 }	
+       //[endif_api17up]				
 	}
 }

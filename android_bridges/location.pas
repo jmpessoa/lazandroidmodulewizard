@@ -14,11 +14,13 @@ TGeoPoint2D = record
   longitude: double;
 end;
 
+TGpsStatusEvent = (gpsNone, gpsStarted, gpsStopped, gpsFirstFix, gpsSatelliteStatus);
+
 TLocationChanged = procedure(Sender: TObject; latitude: double; longitude: double; altitude: double; address: string) of object;
 TLocationStatusChanged = procedure(Sender: TObject; status: integer; provider: string; msgStatus: string) of object;
 TLocationProviderEnabled = procedure(Sender: TObject; provider: string) of object;
 TLocationProviderDisabled = procedure(Sender: TObject; provider: string) of object;
-
+TOnGpsStatusChanged = procedure(Sender: TObject; countSatellites: integer; gpsStatusEvent: TGpsStatusEvent) of object;
 
 TCriteriaAccuracy = (crCoarse {default Network-based/wi-fi}, crFine);
 
@@ -51,6 +53,8 @@ jLocation = class(jControl)
     FOnLocationStatusChanged: TLocationStatusChanged;
     FOnLocationProviderEnabled: TLocationProviderEnabled;  //called when Gps is turned ON!!
     FOnLocationProviderDisabled: TLocationProviderDisabled; //called when Gps is turned OFF!!
+
+    FOnGpsStatusChanged: TOnGpsStatusChanged;
  protected
 
  public
@@ -103,11 +107,15 @@ jLocation = class(jControl)
     function GetGoogleMapsUrl(var _latitude: TDynArrayOfDouble; var _longitude: TDynArrayOfDouble; pictureStyle: TPictureStyle; _markerHighlightIndex: integer): string; overload;
 
     procedure SetMarkerHighlightColor(_color: TMarkerHighlightColor);
+    function GetSatelliteCount(): integer;
+    function GetSatelliteInfo(_index: integer): string;
+    function GetTimeToFirstFix(): single;
 
     procedure GenEvent_OnLocationChanged(Obj: TObject; latitude: double; longitude: double; altitude: double; address: string);
     procedure GenEvent_OnLocationStatusChanged(Obj: TObject; status: integer; provider: string; msgStatus: string);
     procedure GenEvent_OnLocationProviderEnabled(Obj: TObject; provider: string);
     procedure GenEvent_OnLocationProviderDisabled(Obj: TObject; provider: string);
+    procedure GenEvent_OnGpsStatusChanged(Obj: TObject; countSatellites: integer; gpsStatusEvent: integer);
 
     property MapZoom: integer read FMapZoom write SetMapZoom;
     property MapWidth: integer read FMapWidth write SetMapWidth;
@@ -125,6 +133,7 @@ jLocation = class(jControl)
     property OnLocationStatusChanged: TLocationStatusChanged read FOnLocationStatusChanged write FOnLocationStatusChanged;
     property OnLocationProviderEnabled: TLocationProviderEnabled read FOnLocationProviderEnabled write FOnLocationProviderEnabled;
     property OnLocationProviderDisabled: TLocationProviderDisabled read FOnLocationProviderDisabled write FOnLocationProviderDisabled;
+    property OnGpsStatusChanged: TOnGpsStatusChanged read FOnGpsStatusChanged write FOnGpsStatusChanged;
 
 end;
 
@@ -162,6 +171,10 @@ function jLocation_GetGoogleMapsUrl(env: PJNIEnv; _jlocation: JObject; var _lati
 function jLocation_GetGoogleMapsUrl(env: PJNIEnv; _jlocation: JObject; var _latitude: TDynArrayOfDouble; var _longitude: TDynArrayOfDouble; _pathFlag: integer): string; overload;
 function jLocation_GetGoogleMapsUrl(env: PJNIEnv; _jlocation: JObject; var _latitude: TDynArrayOfDouble; var _longitude: TDynArrayOfDouble; _pathFlag: integer; _markerHighlightIndex: integer): string; overload;
 procedure jLocation_SetMarkerHighlightColor(env: PJNIEnv; _jlocation: JObject; _color: integer);
+function jLocation_GetSatelliteCount(env: PJNIEnv; _jlocation: JObject): integer;
+function jLocation_GetSatelliteInfo(env: PJNIEnv; _jlocation: JObject; _index: integer): string;
+function jLocation_GetTimeToFirstFix(env: PJNIEnv; _jlocation: JObject): single;
+
 
 function GeoPoint2D(latitute: double; longitude: double): TGeoPoint2D;
 
@@ -533,6 +546,27 @@ begin
      jLocation_SetMarkerHighlightColor(FjEnv, FjObject, Ord(_color) );
 end;
 
+function jLocation.GetSatelliteCount(): integer;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jLocation_GetSatelliteCount(FjEnv, FjObject);
+end;
+
+function jLocation.GetSatelliteInfo(_index: integer): string;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jLocation_GetSatelliteInfo(FjEnv, FjObject, _index);
+end;
+
+function jLocation.GetTimeToFirstFix(): single;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jLocation_GetTimeToFirstFix(FjEnv, FjObject);
+end;
+
 procedure jLocation.GenEvent_OnLocationChanged(Obj: TObject; latitude: double; longitude: double; altitude: double; address: string);
 begin
    if Assigned(FOnLocationChanged) then FOnLocationChanged(Obj, latitude, longitude, altitude, address);
@@ -552,6 +586,12 @@ procedure jLocation.GenEvent_OnLocationProviderDisabled(Obj: TObject; provider: 
 begin
    if Assigned(FOnLocationProviderDisabled) then FOnLocationProviderDisabled(Obj, provider);
 end;
+
+procedure jLocation.GenEvent_OnGpsStatusChanged(Obj: TObject; countSatellites: integer; gpsStatusEvent: integer);
+begin
+   if Assigned(FOnGpsStatusChanged) then FOnGpsStatusChanged(Obj, countSatellites, TGpsStatusEvent(gpsStatusEvent));
+end;
+
 
 {-------- jLocation_JNI_Bridge ----------}
 
@@ -1115,6 +1155,51 @@ begin
   jCls:= env^.GetObjectClass(env, _jlocation);
   jMethod:= env^.GetMethodID(env, jCls, 'SetMarkerHighlightColor', '(I)V');
   env^.CallVoidMethodA(env, _jlocation, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+function jLocation_GetSatelliteCount(env: PJNIEnv; _jlocation: JObject): integer;
+var
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jlocation);
+  jMethod:= env^.GetMethodID(env, jCls, 'GetSatelliteCount', '()I');
+  Result:= env^.CallIntMethod(env, _jlocation, jMethod);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+
+function jLocation_GetSatelliteInfo(env: PJNIEnv; _jlocation: JObject; _index: integer): string;
+var
+  jStr: JString;
+  jBoo: JBoolean;
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].i:= _index;
+  jCls:= env^.GetObjectClass(env, _jlocation);
+  jMethod:= env^.GetMethodID(env, jCls, 'GetSatelliteInfo', '(I)Ljava/lang/String;');
+  jStr:= env^.CallObjectMethodA(env, _jlocation, jMethod, @jParams);
+  case jStr = nil of
+     True : Result:= '';
+     False: begin
+              jBoo:= JNI_False;
+              Result:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
+            end;
+  end;
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+function jLocation_GetTimeToFirstFix(env: PJNIEnv; _jlocation: JObject): single;
+var
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jlocation);
+  jMethod:= env^.GetMethodID(env, jCls, 'GetTimeToFirstFix', '()F');
+  Result:= env^.CallFloatMethod(env, _jlocation, jMethod);
   env^.DeleteLocalRef(env, jCls);
 end;
 

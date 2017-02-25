@@ -1,6 +1,6 @@
 package com.example.applocationdemo1;
 
-//LAMW: Lazarus Android Module Wizard  - version 0.7 - rev. 11 - 17 Feb - 2017 
+//LAMW: Lazarus Android Module Wizard  - version 0.7 - rev. 12 - 22 Feb - 2017 
 //RAD Android: Project Wizard, Form Designer and Components Development Model!
 
 //https://github.com/jmpessoa/lazandroidmodulewizard
@@ -1251,6 +1251,7 @@ public native void pOnPinchZoomGestureDetected(long pasobj, float scaleFactor, i
 public native void pOnLostFocus(long pasobj, String text);
 public native void pOnBeforeDispatchDraw(long pasobj, Canvas canvas, int tag);
 public native void pOnAfterDispatchDraw(long pasobj, Canvas canvas, int tag);
+public native void pOnLayouting(long pasobj, boolean changed);
 
 // -------------------------------------------------------------------------
 //Load Pascal Library
@@ -1878,6 +1879,7 @@ public native void pOnLocationChanged(long pasobj, double latitude,  double long
 public native void pOnLocationStatusChanged(long pasobj, int status, String provider, String msgStatus);
 public native void pOnLocationProviderEnabled(long pasobj, String provider);
 public native void pOnLocationProviderDisabled(long pasobj, String provider);
+public native void pOnGpsStatusChanged(long pasobj, int  countSatellites, int gpsStatusEvent);
 
 public  java.lang.Object jTextView_Create(long pasobj) {
   return (java.lang.Object)( new jTextView(this.activity,this,pasobj));
