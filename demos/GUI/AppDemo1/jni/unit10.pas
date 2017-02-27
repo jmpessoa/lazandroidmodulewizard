@@ -20,13 +20,9 @@ type
       jCanvasES1_1: jCanvasES1;
       jImageList1: jImageList;
       jTextView1: jTextView;
-
-      procedure AndroidModule10CloseQuery(Sender: TObject; var CanClose: boolean
-        );
+      procedure AndroidModule10CloseQuery(Sender: TObject; var CanClose: boolean);
       procedure AndroidModule10JNIPrompt(Sender: TObject);
       procedure DataModuleCreate(Sender: TObject);
-      procedure DataModuleRotate(Sender: TObject; rotate: integer;
-        var rstRotate: integer);
       procedure jButton1Click(Sender: TObject);
       procedure jButton2Click(Sender: TObject);
       procedure jButton3Click(Sender: TObject);
@@ -222,12 +218,6 @@ procedure TAndroidModule10.AndroidModule10CloseQuery(Sender: TObject;
 begin
    gSpeed:= 0;
    CanClose:= True;
-end;
-
-procedure TAndroidModule10.DataModuleRotate(Sender: TObject; rotate: integer;
-  var rstRotate: integer);
-begin
-  Self.UpdateLayout;
 end;
 
 procedure TAndroidModule10.jButton2Click(Sender: TObject);

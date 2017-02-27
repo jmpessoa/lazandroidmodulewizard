@@ -10,8 +10,8 @@ object AndroidModule11: TAndroidModule11
   Text = 'AndroidModule11'
   ActivityMode = actRecyclable
   BackgroundColor = colbrBlack
+  ActionBarTitle = abtDefault
   OnCloseQuery = DataModuleCloseQuery
-  OnRotate = DataModuleRotate
   OnJNIPrompt = DataModuleJNIPrompt
   object jTextView1: jTextView
     Left = 96
@@ -23,6 +23,7 @@ object AndroidModule11: TAndroidModule11
     MarginRight = 10
     MarginBottom = 10
     Visible = True
+    Id = 44776
     PosRelativeToAnchor = []
     PosRelativeToParent = [rpCenterHorizontal]
     LayoutParamWidth = lpWrapContent
@@ -35,7 +36,6 @@ object AndroidModule11: TAndroidModule11
     FontSize = 0
     TextTypeFace = tfNormal
     FontSizeUnit = unitDefault
-    Id = 44776
   end
   object jButton1: jButton
     Left = 5
@@ -48,6 +48,7 @@ object AndroidModule11: TAndroidModule11
     MarginBottom = 5
     Visible = True
     Anchor = jTextView1
+    Id = 62954
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = []
     LayoutParamWidth = lpHalfOfParent
@@ -58,7 +59,6 @@ object AndroidModule11: TAndroidModule11
     FontSize = 0
     FontSizeUnit = unitDefault
     OnClick = jButton1Click
-    Id = 62954
   end
   object jButton2: jButton
     Left = 151
@@ -71,6 +71,7 @@ object AndroidModule11: TAndroidModule11
     MarginBottom = 5
     Visible = True
     Anchor = jButton1
+    Id = 0
     PosRelativeToAnchor = [raToRightOf, raAlignBaseline]
     PosRelativeToParent = []
     LayoutParamWidth = lpHalfOfParent
@@ -81,7 +82,6 @@ object AndroidModule11: TAndroidModule11
     FontSize = 0
     FontSizeUnit = unitDefault
     OnClick = jButton2Click
-    Id = 0
   end
   object jCanvasES2_1: jCanvasES2
     Tag = 1
@@ -95,6 +95,7 @@ object AndroidModule11: TAndroidModule11
     MarginBottom = 10
     Visible = True
     Anchor = jButton1
+    Id = 14067
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = []
     LayoutParamWidth = lpMatchParent
@@ -107,7 +108,6 @@ object AndroidModule11: TAndroidModule11
     OnGLUp = jCanvasES2_1GLUp
     AutoRefresh = False
     Images = jImageList1
-    Id = 14067
   end
   object jButton3: jButton
     Left = 5
@@ -120,6 +120,7 @@ object AndroidModule11: TAndroidModule11
     MarginBottom = 5
     Visible = True
     Anchor = jCanvasES2_1
+    Id = 72520
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = []
     LayoutParamWidth = lpMatchParent
@@ -130,7 +131,6 @@ object AndroidModule11: TAndroidModule11
     FontSize = 0
     FontSizeUnit = unitDefault
     OnClick = jButton3Click
-    Id = 72520
   end
   object jTextView2: jTextView
     Left = 10
@@ -143,6 +143,7 @@ object AndroidModule11: TAndroidModule11
     MarginBottom = 10
     Visible = True
     Anchor = jButton3
+    Id = 98715
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = []
     LayoutParamWidth = lpWrapContent
@@ -155,7 +156,6 @@ object AndroidModule11: TAndroidModule11
     FontSize = 0
     TextTypeFace = tfNormal
     FontSizeUnit = unitDefault
-    Id = 98715
   end
   object jTextView3: jTextView
     Left = 46
@@ -168,6 +168,7 @@ object AndroidModule11: TAndroidModule11
     MarginBottom = 10
     Visible = True
     Anchor = jTextView2
+    Id = 98716
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = [rpCenterHorizontal]
     LayoutParamWidth = lpWrapContent
@@ -180,7 +181,6 @@ object AndroidModule11: TAndroidModule11
     FontSize = 0
     TextTypeFace = tfNormal
     FontSizeUnit = unitDefault
-    Id = 0
   end
   object jImageList1: jImageList
     Images.Strings = (

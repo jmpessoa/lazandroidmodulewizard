@@ -25,8 +25,6 @@ type
       jTimer1: jTimer;
       procedure DataModuleCloseQuery(Sender: TObject; var CanClose: boolean);
       procedure DataModuleJNIPrompt(Sender: TObject);
-      procedure DataModuleRotate(Sender: TObject; rotate: integer;
-        var rstRotate: integer);
       procedure jButton1Click(Sender: TObject);
       procedure jButton2Click(Sender: TObject);
       procedure jButton3Click(Sender: TObject);
@@ -71,11 +69,11 @@ const
                   -0.26, 0.86,   // pt3 우하
                    0.26, 0.86,   // pt4 좌하
                    0.43, 0.36);  // pt5 좌상
+
    VRXT1       : array[0..2*3-1] of GLfloat =
                  (-0.39,-0.28,
                    0.00,-0.95,
                    0.39,-0.28);
-
 var
    ZDepth : Single;
    Layer  : Integer;
@@ -210,12 +208,6 @@ begin
   gWork   := True;
   gZoom   := 1.0;
   ArcBall_Init(gArcBall);
-end;
-
-procedure TAndroidModule11.DataModuleRotate(Sender: TObject; rotate: integer;
-  var rstRotate: integer);
-begin
-  Self.UpdateLayout;
 end;
 
 procedure TAndroidModule11.jButton1Click(Sender: TObject);

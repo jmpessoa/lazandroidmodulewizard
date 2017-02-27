@@ -22,10 +22,10 @@ type
       jTextView2: jTextView;
       jWebView1: jWebView;
 
+      procedure AndroidModule5Rotate(Sender: TObject; rotate: TScreenStyle);
       procedure DataModuleCloseQuery(Sender: TObject; var CanClose: boolean);
       procedure DataModuleCreate(Sender: TObject);
       procedure DataModuleJNIPrompt(Sender: TObject);
-      procedure DataModuleRotate(Sender: TObject; rotate: integer; var rstRotate: integer);
       procedure jButton1Click(Sender: TObject);
 
       procedure jWebView1Status(Sender: TObject; Status: TWebViewStatus; URL: String; var CanNavi: Boolean);
@@ -57,15 +57,16 @@ begin
   CanClose:= True;
 end;
 
-procedure TAndroidModule5.DataModuleJNIPrompt(Sender: TObject);
+{
+TScreenStyle   = (ssPortrait  = 1,  //Force Portrait
+                    ssLandscape = 2, //Force LandScape
+                    ssUnknown   = 3,
+                    ssSensor    = 4);   //by Device Status
+}
+procedure TAndroidModule5.AndroidModule5Rotate(Sender: TObject;
+  rotate: TScreenStyle);
 begin
-  //
-end;
-
-procedure TAndroidModule5.DataModuleRotate(Sender: TObject; rotate: integer; var rstRotate: integer);
-begin
-
-  if  rotate = 1 then  //default --> device on vertical
+  if  rotate = ssPortrait then  //1 default --> device on vertical
   begin
      //jEditText1.Text:= strURL;
      jPanel1.LayoutParamHeight:= lpOneQuarterOfParent; //lpOneThirdOfParent;
@@ -73,7 +74,7 @@ begin
      jPanel2.PosRelativeToAnchor:= [raBelow];
      jPanel2.ResetAllRules;
   end
-  else  //2 --> device on horizontal
+  else if  rotate = ssLandscape then//2 --> device on horizontal
   begin
      //jEditText1.Text:= '';
      jPanel1.LayoutParamHeight:= lpMatchParent;
@@ -83,6 +84,11 @@ begin
   end;
 
   Self.UpdateLayout;
+end;
+
+procedure TAndroidModule5.DataModuleJNIPrompt(Sender: TObject);
+begin
+  //
 end;
 
 procedure TAndroidModule5.jButton1Click(Sender: TObject);

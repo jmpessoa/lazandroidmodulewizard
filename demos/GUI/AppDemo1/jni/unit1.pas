@@ -18,12 +18,10 @@ type
       jImageView2: jImageView;
       jTextView1: jTextView;
       jTimer1: jTimer;
-      procedure AndroidModule1CloseQuery(Sender: TObject; var CanClose: boolean
-        );
+      procedure AndroidModule1CloseQuery(Sender: TObject; var CanClose: boolean);
       procedure DataModuleClose(Sender: TObject);
       procedure DataModuleCreate(Sender: TObject);
       procedure DataModuleJNIPrompt(Sender: TObject);
-      procedure DataModuleRotate(Sender: TObject; rotate: integer; var rstRotate: integer);
       procedure jTimer1Timer(Sender: TObject);
     private
       {private declarations}
@@ -66,14 +64,9 @@ begin
   jTimer1.Enabled:= True
 end;
 
-procedure TAndroidModule1.DataModuleRotate(Sender: TObject; rotate: integer; var rstRotate: integer);
-begin
-  Self.UpdateLayout;
-end;
-
 procedure TAndroidModule1.jTimer1Timer(Sender: TObject);
 begin
-  //jTextView1.Text:= IntToStr(Cnt_Timer) + '%';
+  jTextView1.Text:= IntToStr(Cnt_Timer) + '%';
   Inc(cnt_Timer, 5);
   Inc(cnt_Image);
   if cnt_Image = jImageView1.Count-1 then cnt_Image:= 0;

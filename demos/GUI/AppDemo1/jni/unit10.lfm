@@ -11,8 +11,8 @@ object AndroidModule10: TAndroidModule10
   Text = 'AndroidModule10'
   ActivityMode = actRecyclable
   BackgroundColor = colbrBlack
+  ActionBarTitle = abtDefault
   OnCloseQuery = AndroidModule10CloseQuery
-  OnRotate = DataModuleRotate
   OnJNIPrompt = AndroidModule10JNIPrompt
   object jTextView1: jTextView
     Left = 76
@@ -24,6 +24,7 @@ object AndroidModule10: TAndroidModule10
     MarginRight = 10
     MarginBottom = 10
     Visible = True
+    Id = 19240
     PosRelativeToAnchor = []
     PosRelativeToParent = [rpCenterHorizontal]
     LayoutParamWidth = lpWrapContent
@@ -36,7 +37,6 @@ object AndroidModule10: TAndroidModule10
     FontSize = 0
     TextTypeFace = tfNormal
     FontSizeUnit = unitDefault
-    Id = 19240
   end
   object jCanvasES1_1: jCanvasES1
     Tag = 1
@@ -50,6 +50,7 @@ object AndroidModule10: TAndroidModule10
     MarginBottom = 10
     Visible = True
     Anchor = jButton1
+    Id = 31633
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = [rpCenterHorizontal]
     LayoutParamWidth = lpMatchParent
@@ -59,7 +60,6 @@ object AndroidModule10: TAndroidModule10
     OnGLDraw = jCanvasES1_1GLDraw
     AutoRefresh = True
     Images = jImageList1
-    Id = 31633
   end
   object jButton1: jButton
     Left = 5
@@ -72,6 +72,7 @@ object AndroidModule10: TAndroidModule10
     MarginBottom = 5
     Visible = True
     Anchor = jTextView1
+    Id = 72076
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = [rpLeft]
     LayoutParamWidth = lpHalfOfParent
@@ -82,7 +83,6 @@ object AndroidModule10: TAndroidModule10
     FontSize = 0
     FontSizeUnit = unitDefault
     OnClick = jButton1Click
-    Id = 72076
   end
   object jButton2: jButton
     Left = 151
@@ -95,6 +95,7 @@ object AndroidModule10: TAndroidModule10
     MarginBottom = 5
     Visible = True
     Anchor = jButton1
+    Id = 0
     PosRelativeToAnchor = [raToRightOf, raAlignBaseline]
     PosRelativeToParent = []
     LayoutParamWidth = lpHalfOfParent
@@ -105,7 +106,6 @@ object AndroidModule10: TAndroidModule10
     FontSize = 0
     FontSizeUnit = unitDefault
     OnClick = jButton2Click
-    Id = 0
   end
   object jButton3: jButton
     Left = 5
@@ -118,6 +118,7 @@ object AndroidModule10: TAndroidModule10
     MarginBottom = 5
     Visible = True
     Anchor = jCanvasES1_1
+    Id = 34322
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = []
     LayoutParamWidth = lpMatchParent
@@ -128,7 +129,6 @@ object AndroidModule10: TAndroidModule10
     FontSize = 0
     FontSizeUnit = unitDefault
     OnClick = jButton3Click
-    Id = 34322
   end
   object jImageList1: jImageList
     Images.Strings = (

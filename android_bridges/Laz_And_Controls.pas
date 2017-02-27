@@ -1494,7 +1494,7 @@ type
     procedure UpdateLParamWidth;
   protected
     Procedure GenEvent_OnTouch(Obj: TObject; Act,Cnt: integer; X1,Y1,X2,Y2: single);
-    Procedure GenEvent_OnDraw (Obj: TObject);
+    Procedure GenEvent_OnDraw(Obj: TObject);
     procedure Notification(AComponent: TComponent; Operation: TOperation); override;
   public
     constructor Create(AOwner: TComponent); override;
@@ -1650,7 +1650,7 @@ type
   procedure Java_Event_pAppOnCreateContextMenu(env: PJNIEnv; this: jobject; jObjMenu: jObject);
 
   // Control Event
-  Procedure Java_Event_pOnDraw                   (env: PJNIEnv; this: jobject; Obj: TObject; jCanvas: jObject);
+  Procedure Java_Event_pOnDraw(env: PJNIEnv; this: jobject; Obj: TObject);
 
 
   Procedure Java_Event_pOnClick                  (env: PJNIEnv; this: jobject; Obj: TObject; Value: integer);
@@ -2094,7 +2094,7 @@ end;
 //------------------------------------------------------------------------------
 
 Procedure Java_Event_pOnDraw(env: PJNIEnv; this: jobject;
-                             Obj: TObject; jCanvas: jObject);
+                             Obj: TObject);
 begin
   gApp.Jni.jEnv:= env;
   gApp.Jni.jThis:= this;

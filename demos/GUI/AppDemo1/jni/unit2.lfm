@@ -11,6 +11,7 @@ object AndroidModule2: TAndroidModule2
   Text = 'AndroidModule2'
   ActivityMode = actMain
   BackgroundColor = colbrDefault
+  ActionBarTitle = abtDefault
   OnCloseQuery = AndroidModule2CloseQuery
   OnBackButton = AndroidModule2BackButton
   OnClose = AndroidModule2Close
@@ -24,6 +25,7 @@ object AndroidModule2: TAndroidModule2
     MarginRight = 10
     MarginBottom = 10
     Visible = True
+    Id = 41266
     PosRelativeToAnchor = []
     PosRelativeToParent = [rpCenterHorizontal]
     LayoutParamWidth = lpWrapContent
@@ -36,7 +38,6 @@ object AndroidModule2: TAndroidModule2
     FontSize = 0
     TextTypeFace = tfNormal
     FontSizeUnit = unitDefault
-    Id = 41266
   end
   object jButton1: jButton
     Left = 5
@@ -49,6 +50,7 @@ object AndroidModule2: TAndroidModule2
     MarginBottom = 5
     Visible = True
     Anchor = jTextView2
+    Id = 35128
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = []
     LayoutParamWidth = lpHalfOfParent
@@ -59,7 +61,6 @@ object AndroidModule2: TAndroidModule2
     FontSize = 0
     FontSizeUnit = unitDefault
     OnClick = jButton1Click
-    Id = 35128
   end
   object jButton2: jButton
     Left = 151
@@ -72,6 +73,7 @@ object AndroidModule2: TAndroidModule2
     MarginBottom = 5
     Visible = True
     Anchor = jButton1
+    Id = 0
     PosRelativeToAnchor = [raToRightOf, raAlignBaseline]
     PosRelativeToParent = []
     LayoutParamWidth = lpHalfOfParent
@@ -82,7 +84,6 @@ object AndroidModule2: TAndroidModule2
     FontSize = 0
     FontSizeUnit = unitDefault
     OnClick = jButton2Click
-    Id = 0
   end
   object jTextView2: jTextView
     Left = 60
@@ -95,6 +96,7 @@ object AndroidModule2: TAndroidModule2
     MarginBottom = 10
     Visible = True
     Anchor = jTextView1
+    Id = 93524
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = [rpCenterHorizontal]
     LayoutParamWidth = lpWrapContent
@@ -107,7 +109,6 @@ object AndroidModule2: TAndroidModule2
     FontSize = 0
     TextTypeFace = tfNormal
     FontSizeUnit = unitDefault
-    Id = 93524
   end
   object jButton3: jButton
     Left = 5
@@ -120,6 +121,7 @@ object AndroidModule2: TAndroidModule2
     MarginBottom = 5
     Visible = True
     Anchor = jButton1
+    Id = 2770
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = []
     LayoutParamWidth = lpHalfOfParent
@@ -130,7 +132,6 @@ object AndroidModule2: TAndroidModule2
     FontSize = 0
     FontSizeUnit = unitDefault
     OnClick = jButton3Click
-    Id = 2770
   end
   object jButton4: jButton
     Left = 151
@@ -143,6 +144,7 @@ object AndroidModule2: TAndroidModule2
     MarginBottom = 5
     Visible = True
     Anchor = jButton3
+    Id = 93525
     PosRelativeToAnchor = [raToRightOf, raAlignBaseline]
     PosRelativeToParent = []
     LayoutParamWidth = lpHalfOfParent
@@ -153,7 +155,6 @@ object AndroidModule2: TAndroidModule2
     FontSize = 0
     FontSizeUnit = unitDefault
     OnClick = jButton4Click
-    Id = 0
   end
   object jButton5: jButton
     Left = 5
@@ -166,6 +167,7 @@ object AndroidModule2: TAndroidModule2
     MarginBottom = 5
     Visible = True
     Anchor = jButton3
+    Id = 51074
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = []
     LayoutParamWidth = lpHalfOfParent
@@ -176,7 +178,6 @@ object AndroidModule2: TAndroidModule2
     FontSize = 0
     FontSizeUnit = unitDefault
     OnClick = jButton5Click
-    Id = 51074
   end
   object jButton6: jButton
     Left = 151
@@ -189,6 +190,7 @@ object AndroidModule2: TAndroidModule2
     MarginBottom = 5
     Visible = True
     Anchor = jButton5
+    Id = 93526
     PosRelativeToAnchor = [raToRightOf, raAlignBaseline]
     PosRelativeToParent = []
     LayoutParamWidth = lpHalfOfParent
@@ -199,7 +201,6 @@ object AndroidModule2: TAndroidModule2
     FontSize = 0
     FontSizeUnit = unitDefault
     OnClick = jButton6Click
-    Id = 0
   end
   object jButton7: jButton
     Left = 5
@@ -212,6 +213,7 @@ object AndroidModule2: TAndroidModule2
     MarginBottom = 5
     Visible = True
     Anchor = jButton5
+    Id = 71909
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = []
     LayoutParamWidth = lpHalfOfParent
@@ -222,7 +224,6 @@ object AndroidModule2: TAndroidModule2
     FontSize = 0
     FontSizeUnit = unitDefault
     OnClick = jButton7Click
-    Id = 71909
   end
   object jButton8: jButton
     Left = 151
@@ -235,6 +236,7 @@ object AndroidModule2: TAndroidModule2
     MarginBottom = 5
     Visible = True
     Anchor = jButton7
+    Id = 93527
     PosRelativeToAnchor = [raToRightOf, raAlignBaseline]
     PosRelativeToParent = []
     LayoutParamWidth = lpHalfOfParent
@@ -245,7 +247,6 @@ object AndroidModule2: TAndroidModule2
     FontSize = 0
     FontSizeUnit = unitDefault
     OnClick = jButton8Click
-    Id = 0
   end
   object jButton9: jButton
     Left = 5
@@ -258,6 +259,7 @@ object AndroidModule2: TAndroidModule2
     MarginBottom = 5
     Visible = True
     Anchor = jButton7
+    Id = 34150
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = []
     LayoutParamWidth = lpHalfOfParent
@@ -268,7 +270,6 @@ object AndroidModule2: TAndroidModule2
     FontSize = 0
     FontSizeUnit = unitDefault
     OnClick = jButton9Click
-    Id = 34150
   end
   object jButton10: jButton
     Left = 151
@@ -281,6 +282,7 @@ object AndroidModule2: TAndroidModule2
     MarginBottom = 5
     Visible = True
     Anchor = jButton9
+    Id = 93528
     PosRelativeToAnchor = [raToRightOf, raAlignBaseline]
     PosRelativeToParent = []
     LayoutParamWidth = lpHalfOfParent
@@ -291,7 +293,6 @@ object AndroidModule2: TAndroidModule2
     FontSize = 0
     FontSizeUnit = unitDefault
     OnClick = jButton10Click
-    Id = 0
   end
   object jButton11: jButton
     Left = 5
@@ -304,6 +305,7 @@ object AndroidModule2: TAndroidModule2
     MarginBottom = 5
     Visible = True
     Anchor = jButton9
+    Id = 59567
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = []
     LayoutParamWidth = lpHalfOfParent
@@ -314,7 +316,6 @@ object AndroidModule2: TAndroidModule2
     FontSize = 0
     FontSizeUnit = unitDefault
     OnClick = jButton11Click
-    Id = 59567
   end
   object jButton12: jButton
     Left = 151
@@ -327,6 +328,7 @@ object AndroidModule2: TAndroidModule2
     MarginBottom = 5
     Visible = True
     Anchor = jButton11
+    Id = 93529
     PosRelativeToAnchor = [raToRightOf, raAlignBaseline]
     PosRelativeToParent = []
     LayoutParamWidth = lpHalfOfParent
@@ -337,14 +339,18 @@ object AndroidModule2: TAndroidModule2
     FontSize = 0
     FontSizeUnit = unitDefault
     OnClick = jButton12Click
-    Id = 0
   end
   object jImageView1: jImageView
-    Left = 6
-    Top = 525
-    Width = 288
-    Height = 72
+    Left = 9
+    Top = 462
+    Width = 281
+    Height = 133
+    MarginLeft = 5
+    MarginTop = 5
+    MarginRight = 5
+    MarginBottom = 5
     Visible = True
+    Id = 93530
     PosRelativeToAnchor = []
     PosRelativeToParent = [rpBottom, rpCenterHorizontal]
     LayoutParamWidth = lpMatchParent
@@ -353,7 +359,6 @@ object AndroidModule2: TAndroidModule2
     Images = jImageList1
     BackgroundColor = colbrDefault
     ImageScaleType = scaleFitCenter
-    Id = 0
   end
   object jImageList1: jImageList
     Images.Strings = (

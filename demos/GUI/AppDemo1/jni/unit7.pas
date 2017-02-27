@@ -15,7 +15,7 @@ type
   TAndroidModule7 = class(jForm)
       jImageBtn1: jImageBtn;
       jImageList1: jImageList;
-      jImageList2: jImageList;
+      jImageList3: jImageList;
       jImageView1: jImageView;
       jImageView2: jImageView;
       jImageView3: jImageView;
@@ -26,7 +26,6 @@ type
       jTextView2: jTextView;
       jTextView3: jTextView;
       procedure DataModuleCloseQuery(Sender: TObject; var CanClose: boolean);
-      procedure DataModuleRotate(Sender: TObject; rotate: integer; var rstRotate: integer);
       procedure jImageBtn1Click(Sender: TObject);
 
     private
@@ -48,12 +47,6 @@ procedure TAndroidModule7.DataModuleCloseQuery(Sender: TObject;
   var CanClose: boolean);
 begin
   CanClose:= True;
-end;
-
-procedure TAndroidModule7.DataModuleRotate(Sender: TObject; rotate: integer;
-  var rstRotate: integer);
-begin
-  Self.UpdateLayout;
 end;
 
 procedure TAndroidModule7.jImageBtn1Click(Sender: TObject);

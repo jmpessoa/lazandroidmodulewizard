@@ -21,8 +21,12 @@
     <VersionInfo>
       <StringTable ProductVersion=""/>
     </VersionInfo>
-    <CustomData Count="1">
+    <CustomData Count="5">
       <Item0 Name="LAMW" Value="GUI"/>
+      <Item1 Name="LamwVersion" Value="0.7"/>
+      <Item2 Name="NdkPath" Value="C:\adt32\ndk10e\"/>
+      <Item3 Name="Package" Value="com.example.apphorizontalscrollviewdemo1"/>
+      <Item4 Name="SdkPath" Value="C:\adt32\sdk\"/>
     </CustomData>
     <BuildModes Count="1">
       <Item1 Name="Default" Default="True"/>
@@ -50,6 +54,9 @@
         <IsPartOfProject Value="True"/>
         <ComponentName Value="AndroidModule1"/>
         <HasResources Value="True"/>
+        <CustomData Count="1">
+          <Item0 Name="jControls" Value="jHorizontalScrollView;jImageList;jImageView;jScrollView;jTextView"/>
+        </CustomData>
       </Unit1>
     </Units>
   </ProjectOptions>

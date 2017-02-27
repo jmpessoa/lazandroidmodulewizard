@@ -2,9 +2,6 @@ package com.example.appdemo1;
 
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
-import android.widget.RelativeLayout;
-import android.widget.RelativeLayout.LayoutParams;
-
 
 //Ref.
 //Style : http://developer.android.com/reference/android/R.attr.html
@@ -22,103 +19,75 @@ import android.widget.RelativeLayout.LayoutParams;
 //-------------------------------------------------------------------------
 
 public class jProgressBar extends ProgressBar {
-//Java-Pascal Interface
-private long             PasObj   = 0;      // Pascal Obj
-private Controls        controls = null;   // Control Class for Event
-//
-private ViewGroup       parent   = null;   // parent view
-private LayoutParams    lparams;           // layout XYWH
+	//Java-Pascal Interface
+	private long             PasObj   = 0;      // Pascal Obj
+	private Controls        controls = null;   // Control Class for Event
+	private jCommons LAMWCommon;
 
-//by jmpessoa
-private int lparamsAnchorRule[] = new int[20]; 
-int countAnchorRule = 0;
+	//Constructor
+	public  jProgressBar(android.content.Context context,
+						 Controls ctrls,long pasobj,int style ) {
+		super(context,null,style);
 
-private int lparamsParentRule[] = new int[20]; 
-int countParentRule = 0;
+		//Connect Pascal I/F
+		PasObj   = pasobj;
+		controls = ctrls;
+		LAMWCommon = new jCommons(this,context,pasobj);
 
-int lpH = RelativeLayout.LayoutParams.WRAP_CONTENT;
-int lpW = RelativeLayout.LayoutParams.MATCH_PARENT; //w
+		setMax(100);
+	}
 
-int MarginLeft = 5;
-int MarginTop = 5;
-int marginRight = 5;
-int marginBottom = 5;
+	public void setLeftTopRightBottomWidthHeight(int _left, int _top, int _right, int _bottom, int _w, int _h) {
+		LAMWCommon.setLeftTopRightBottomWidthHeight(_left,_top,_right,_bottom,_w,_h);
+	}
 
-//Constructor
-public  jProgressBar(android.content.Context context,
-                Controls ctrls,long pasobj,int style ) {
-//super(context,null,progressBarStyleHorizontal);
-super(context,null,style);
-//Connect Pascal I/F
-PasObj   = pasobj;
-controls = ctrls;
-//Init Class
-lparams = new LayoutParams(100,100);     // W,H
-lparams.setMargins        ( 50, 50,0,0); // L,T,
-setMax(100);
-}
+	public  void setParent( android.view.ViewGroup _viewgroup ) {
+		LAMWCommon.setParent(_viewgroup);
+	}
 
-public void setLeftTopRightBottomWidthHeight(int left, int top, int right, int bottom, int w, int h) {
-	MarginLeft = left;
-	MarginTop = top;
-	marginRight = right;
-	marginBottom = bottom;
-	lpH = h;
-	lpW = w;
-}	
+	public ViewGroup GetParent() {   //TODO Pascal
+		return LAMWCommon.getParent();
+	}
+	
+	public void RemoveFromViewParent() { //TODO Pascal
+		LAMWCommon.removeFromViewParent();
+	}
+	
+	//Free object except Self, Pascal Code Free the class.
+	public  void Free() {
+		LAMWCommon.free();
+	}
 
-//
-public  void setParent( android.view.ViewGroup viewgroup ) {
-if (parent != null) { parent.removeView(this); }
-parent = viewgroup;
-viewgroup.addView(this,lparams);
-}
+	public void setLParamWidth(int _w) {
+		LAMWCommon.setLParamWidth(_w);
+	}
 
-//Free object except Self, Pascal Code Free the class.
-public  void Free() {
-if (parent != null) { parent.removeView(this); }
-lparams = null;
-}
+	public void setLParamHeight(int _h) {
+		LAMWCommon.setLParamHeight(_h);
+	}
 
-//by jmpessoa
-public void setLParamWidth(int w) {
-lpW = w;
-}
+	public void setLGravity(int _g) {
+		LAMWCommon.setLGravity(_g);
+	}
 
-public void setLParamHeight(int h) {
-lpH = h;
-}
+	public void setLWeight(float _w) {
+		LAMWCommon.setLWeight(_w);
+	}
 
-public void addLParamsAnchorRule(int rule) {
-lparamsAnchorRule[countAnchorRule] = rule;
-countAnchorRule = countAnchorRule + 1;
-}
+	public void addLParamsAnchorRule(int rule) {
+		LAMWCommon.addLParamsAnchorRule(rule);
+	}
 
-public void addLParamsParentRule(int rule) {
-	lparamsParentRule[countParentRule] = rule;
-	countParentRule = countParentRule + 1;
-}
+	public void addLParamsParentRule(int rule) {
+		LAMWCommon.addLParamsParentRule(rule);
+	}
 
-//by jmpessoa
-public void setLayoutAll(int idAnchor) {
-	lparams.width  = lpW; //matchParent; 
-	lparams.height = lpH; //wrapContent;
-	lparams.setMargins(MarginLeft,MarginTop,marginRight,marginBottom);
+	public void setLayoutAll(int idAnchor) {
+		LAMWCommon.setLayoutAll(idAnchor);
+	}
 
-	if (idAnchor > 0) {    	
-		//lparams.addRule(RelativeLayout.BELOW, id); 
-		//lparams.addRule(RelativeLayout.ALIGN_BASELINE, id)
-	    //lparams.addRule(RelativeLayout.LEFT_OF, id); //lparams.addRule(RelativeLayout.RIGHT_OF, id)
-		for (int i=0; i < countAnchorRule; i++) {  
-			lparams.addRule(lparamsAnchorRule[i], idAnchor);		
-	    }
-		
-	} 
-	for (int j=0; j < countParentRule; j++) {  
-		lparams.addRule(lparamsParentRule[j]);		
-}
-	//
-	setLayoutParams(lparams);
-}
-
+	public void ClearLayoutAll() {
+		LAMWCommon.clearLayoutAll(); //TODO Pascal
+	}
+	
 }

@@ -25,8 +25,6 @@ type
       jTextView2: jTextView;
       jTextView3: jTextView;
       procedure DataModuleCloseQuery(Sender: TObject; var CanClose: boolean);
-      procedure DataModuleRotate(Sender: TObject; rotate: integer;
-        var rstRotate: integer);
       procedure jButton1Click(Sender: TObject);
       procedure jButton2Click(Sender: TObject);
       procedure jButton3Click(Sender: TObject);
@@ -53,12 +51,6 @@ procedure TAndroidModule6.DataModuleCloseQuery(Sender: TObject;
   var CanClose: boolean);
 begin
    CanClose:= True;
-end;
-
-
-procedure TAndroidModule6.DataModuleRotate(Sender: TObject; rotate: integer; var rstRotate: integer);
-begin
-  Self.UpdateLayout;
 end;
 
 procedure TAndroidModule6.jButton1Click(Sender: TObject);

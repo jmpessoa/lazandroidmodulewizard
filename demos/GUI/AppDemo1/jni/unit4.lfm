@@ -11,8 +11,8 @@ object AndroidModule4: TAndroidModule4
   Text = 'AndroidModule4'
   ActivityMode = actRecyclable
   BackgroundColor = colbrBlack
+  ActionBarTitle = abtDefault
   OnCloseQuery = DataModuleCloseQuery
-  OnRotate = DataModuleRotate
   OnJNIPrompt = DataModuleJNIPrompt
   object jButton1: jButton
     Left = 5
@@ -25,6 +25,7 @@ object AndroidModule4: TAndroidModule4
     MarginBottom = 5
     Visible = True
     Anchor = jTextView1
+    Id = 31367
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = []
     LayoutParamWidth = lpMatchParent
@@ -35,7 +36,6 @@ object AndroidModule4: TAndroidModule4
     FontSize = 0
     FontSizeUnit = unitDefault
     OnClick = jButton1Click
-    Id = 31367
   end
   object jTextView1: jTextView
     Left = 67
@@ -47,6 +47,7 @@ object AndroidModule4: TAndroidModule4
     MarginRight = 10
     MarginBottom = 10
     Visible = True
+    Id = 9880053
     PosRelativeToAnchor = []
     PosRelativeToParent = [rpCenterHorizontal]
     LayoutParamWidth = lpWrapContent
@@ -59,7 +60,6 @@ object AndroidModule4: TAndroidModule4
     FontSize = 0
     TextTypeFace = tfNormal
     FontSizeUnit = unitDefault
-    Id = 9880053
   end
   object jEditText1: jEditText
     Left = 10
@@ -72,6 +72,7 @@ object AndroidModule4: TAndroidModule4
     MarginBottom = 10
     Visible = True
     Anchor = jButton1
+    Id = 2813603
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = []
     LayoutParamWidth = lpMatchParent
@@ -91,33 +92,38 @@ object AndroidModule4: TAndroidModule4
     WrappingLine = True
     Editable = True
     FontSizeUnit = unitDefault
-    Id = 2813603
   end
   object jScrollView1: jScrollView
-    Left = 3
-    Top = 219
-    Width = 291
+    Left = 5
+    Top = 221
+    Width = 285
     Height = 186
+    MarginLeft = 5
+    MarginTop = 5
+    MarginRight = 5
+    MarginBottom = 5
     Visible = True
     Anchor = jEditText1
+    Id = 0
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = []
     LayoutParamWidth = lpMatchParent
     LayoutParamHeight = lpOneThirdOfParent
+    FillViewportEnabled = False
     ScrollSize = 800
     BackgroundColor = colbrLightSlateBlue
-    Id = 0
     object jEditText2: jEditText
       Tag = 1
       Left = 5
       Top = 10
-      Width = 276
+      Width = 270
       Height = 156
       MarginLeft = 5
       MarginTop = 10
       MarginRight = 5
       MarginBottom = 10
       Visible = True
+      Id = 0
       PosRelativeToAnchor = []
       PosRelativeToParent = [rpTop]
       LayoutParamWidth = lpMatchParent
@@ -137,7 +143,6 @@ object AndroidModule4: TAndroidModule4
       WrappingLine = False
       Editable = True
       FontSizeUnit = unitDefault
-      Id = 0
     end
   end
 end

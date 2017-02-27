@@ -23,8 +23,6 @@ type
       procedure DataModuleCloseQuery(Sender: TObject; var CanClose: boolean);
       procedure DataModuleCreate(Sender: TObject);
       procedure DataModuleJNIPrompt(Sender: TObject);
-      procedure DataModuleRotate(Sender: TObject; rotate: integer;
-        var rstRotate: integer);
       procedure jButton1Click(Sender: TObject);
       procedure jCanvasES2_1GLChange(Sender: TObject; W, H: integer);
       procedure jCanvasES2_1GLCreate(Sender: TObject);
@@ -121,12 +119,6 @@ begin
   gWorking:= True;
   jTimer1.Enabled:= False;
   ArcBall_Init(gArcBall);
-end;
-
-procedure TAndroidModule13.DataModuleRotate(Sender: TObject; rotate: integer;
-  var rstRotate: integer);
-begin
-  Self.UpdateLayout;
 end;
 
 procedure TAndroidModule13.jButton1Click(Sender: TObject);

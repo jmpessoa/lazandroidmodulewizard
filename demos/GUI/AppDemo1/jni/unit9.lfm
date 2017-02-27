@@ -27,6 +27,7 @@ object AndroidModule9: TAndroidModule9
     MarginBottom = 0
     Visible = True
     Anchor = jButton1
+    Id = 6162235
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = [rpCenterHorizontal]
     LayoutParamWidth = lpWrapContent
@@ -35,7 +36,6 @@ object AndroidModule9: TAndroidModule9
     BackgroundColor = colbrDefault
     OnDraw = jView1Draw
     OnTouchMove = jView1TouchMove
-    Id = 6162235
   end
   object jTextView1: jTextView
     Left = 55
@@ -47,6 +47,7 @@ object AndroidModule9: TAndroidModule9
     MarginRight = 10
     MarginBottom = 10
     Visible = True
+    Id = 35711
     PosRelativeToAnchor = []
     PosRelativeToParent = [rpCenterHorizontal]
     LayoutParamWidth = lpWrapContent
@@ -59,7 +60,6 @@ object AndroidModule9: TAndroidModule9
     FontSize = 0
     TextTypeFace = tfNormal
     FontSizeUnit = unitDefault
-    Id = 35711
   end
   object jButton1: jButton
     Left = 5
@@ -72,6 +72,7 @@ object AndroidModule9: TAndroidModule9
     MarginBottom = 5
     Visible = True
     Anchor = jTextView1
+    Id = 7531079
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = []
     LayoutParamWidth = lpMatchParent
@@ -82,7 +83,6 @@ object AndroidModule9: TAndroidModule9
     FontSize = 0
     FontSizeUnit = unitDefault
     OnClick = jButton1Click
-    Id = 7531079
   end
   object jBitmap1: jBitmap
     FilePath = fpathData
@@ -105,6 +105,7 @@ object AndroidModule9: TAndroidModule9
     PaintStyle = psFillAndStroke
     PaintTextSize = 20
     PaintColor = colbrBlue
+    Typeface = ffNormal
     left = 104
     top = 152
   end

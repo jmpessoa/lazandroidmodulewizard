@@ -11,8 +11,9 @@ object AndroidModule5: TAndroidModule5
   Text = 'AndroidModule5'
   ActivityMode = actRecyclable
   BackgroundColor = colbrBlack
+  ActionBarTitle = abtDefault
   OnCloseQuery = DataModuleCloseQuery
-  OnRotate = DataModuleRotate
+  OnRotate = AndroidModule5Rotate
   OnJNIPrompt = DataModuleJNIPrompt
   object jTextView1: jTextView
     Left = 10
@@ -24,6 +25,7 @@ object AndroidModule5: TAndroidModule5
     MarginRight = 10
     MarginBottom = 10
     Visible = True
+    Id = 72543
     PosRelativeToAnchor = []
     PosRelativeToParent = [rpLeft]
     LayoutParamWidth = lpWrapContent
@@ -36,7 +38,6 @@ object AndroidModule5: TAndroidModule5
     FontSize = 0
     TextTypeFace = tfNormal
     FontSizeUnit = unitDefault
-    Id = 72543
   end
   object jPanel1: jPanel
     Left = 0
@@ -49,6 +50,7 @@ object AndroidModule5: TAndroidModule5
     MarginBottom = 0
     Visible = True
     Anchor = jTextView1
+    Id = 7980347
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = []
     LayoutParamWidth = lpMatchParent
@@ -56,7 +58,6 @@ object AndroidModule5: TAndroidModule5
     BackgroundColor = colbrLightSteelBlue
     MinPinchZoomFactor = 0.25
     MaxPinchZoomFactor = 4
-    Id = 7980347
     object jEditText1: jEditText
       Tag = 1
       Left = 10
@@ -69,6 +70,7 @@ object AndroidModule5: TAndroidModule5
       MarginBottom = 10
       Visible = True
       Anchor = jTextView2
+      Id = 1944427
       PosRelativeToAnchor = [raBelow]
       PosRelativeToParent = [rpCenterHorizontal]
       LayoutParamWidth = lpMatchParent
@@ -88,7 +90,6 @@ object AndroidModule5: TAndroidModule5
       WrappingLine = False
       Editable = True
       FontSizeUnit = unitDefault
-      Id = 1944427
     end
     object jTextView2: jTextView
       Left = 5
@@ -100,6 +101,7 @@ object AndroidModule5: TAndroidModule5
       MarginRight = 5
       MarginBottom = 5
       Visible = True
+      Id = 3092999
       PosRelativeToAnchor = []
       PosRelativeToParent = [rpTop, rpLeft]
       LayoutParamWidth = lpWrapContent
@@ -112,7 +114,6 @@ object AndroidModule5: TAndroidModule5
       FontSize = 0
       TextTypeFace = tfNormal
       FontSizeUnit = unitDefault
-      Id = 3092999
     end
     object jPanel3: jPanel
       Left = 4
@@ -125,6 +126,7 @@ object AndroidModule5: TAndroidModule5
       MarginBottom = 4
       Visible = True
       Anchor = jEditText1
+      Id = 0
       PosRelativeToAnchor = [raBelow]
       PosRelativeToParent = []
       LayoutParamWidth = lpMatchParent
@@ -132,7 +134,6 @@ object AndroidModule5: TAndroidModule5
       BackgroundColor = colbrGainsboro
       MinPinchZoomFactor = 0.25
       MaxPinchZoomFactor = 4
-      Id = 0
       object jButton1: jButton
         Left = 4
         Top = 3
@@ -143,6 +144,7 @@ object AndroidModule5: TAndroidModule5
         MarginRight = 2
         MarginBottom = 4
         Visible = True
+        Id = 0
         PosRelativeToAnchor = []
         PosRelativeToParent = [rpCenterInParent]
         LayoutParamWidth = lpMatchParent
@@ -153,7 +155,6 @@ object AndroidModule5: TAndroidModule5
         FontSize = 0
         FontSizeUnit = unitDefault
         OnClick = jButton1Click
-        Id = 0
       end
     end
   end
@@ -168,6 +169,7 @@ object AndroidModule5: TAndroidModule5
     MarginBottom = 0
     Visible = True
     Anchor = jPanel1
+    Id = 0
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = []
     LayoutParamWidth = lpMatchParent
@@ -175,14 +177,18 @@ object AndroidModule5: TAndroidModule5
     BackgroundColor = colbrLightSalmon
     MinPinchZoomFactor = 0.25
     MaxPinchZoomFactor = 4
-    Id = 0
     object jWebView1: jWebView
       Tag = 1
       Left = 4
       Top = 8
-      Width = 290
-      Height = 410
+      Width = 286
+      Height = 406
+      MarginLeft = 5
+      MarginTop = 5
+      MarginRight = 5
+      MarginBottom = 5
       Visible = True
+      Id = 0
       PosRelativeToAnchor = []
       PosRelativeToParent = []
       LayoutParamWidth = lpMatchParent
@@ -191,7 +197,6 @@ object AndroidModule5: TAndroidModule5
       BackgroundColor = colbrDefault
       OnStatus = jWebView1Status
       ZoomControl = False
-      Id = 0
     end
   end
 end

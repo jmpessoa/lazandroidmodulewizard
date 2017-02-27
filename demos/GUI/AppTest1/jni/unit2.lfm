@@ -10,6 +10,7 @@ object AndroidModule2: TAndroidModule2
   Text = 'AndroidModule2'
   ActivityMode = actRecyclable
   BackgroundColor = colbrBlack
+  ActionBarTitle = abtDefault
   OnJNIPrompt = AndroidModule2JNIPrompt
   OnClose = AndroidModule2Close
   object jTextView1: jTextView
@@ -22,6 +23,7 @@ object AndroidModule2: TAndroidModule2
     MarginRight = 10
     MarginBottom = 10
     Visible = True
+    Id = 561788
     PosRelativeToAnchor = []
     PosRelativeToParent = [rpTop, rpCenterHorizontal]
     LayoutParamWidth = lpWrapContent
@@ -33,29 +35,39 @@ object AndroidModule2: TAndroidModule2
     FontColor = colbrOrangeRed
     FontSize = 0
     TextTypeFace = tfNormal
-    Id = 561788
+    FontSizeUnit = unitDefault
   end
   object jScrollView1: jScrollView
     Left = 5
-    Top = 32
-    Width = 287
-    Height = 200
+    Top = 45
+    Width = 285
+    Height = 186
+    MarginLeft = 5
+    MarginTop = 5
+    MarginRight = 5
+    MarginBottom = 5
     Visible = True
     Anchor = jTextView1
+    Id = 1816883
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = []
     LayoutParamWidth = lpMatchParent
     LayoutParamHeight = lpOneThirdOfParent
+    FillViewportEnabled = False
     ScrollSize = 800
     BackgroundColor = colbrMintCream
-    Id = 1816883
     object jImageView1: jImageView
       Tag = 1
-      Left = 112
+      Left = 42
       Top = 5
-      Width = 48
-      Height = 48
+      Width = 200
+      Height = 200
+      MarginLeft = 5
+      MarginTop = 5
+      MarginRight = 5
+      MarginBottom = 5
       Visible = True
+      Id = 5790643
       PosRelativeToAnchor = []
       PosRelativeToParent = [rpTop, rpCenterHorizontal]
       LayoutParamWidth = lpWrapContent
@@ -64,16 +76,20 @@ object AndroidModule2: TAndroidModule2
       Images = jImageList1
       BackgroundColor = colbrDefault
       ImageScaleType = scaleCenter
-      Id = 5790643
     end
     object jImageView2: jImageView
       Tag = 1
-      Left = 112
-      Top = 61
-      Width = 48
-      Height = 48
+      Left = 94
+      Top = 215
+      Width = 96
+      Height = 96
+      MarginLeft = 5
+      MarginTop = 5
+      MarginRight = 5
+      MarginBottom = 5
       Visible = True
       Anchor = jImageView1
+      Id = 5220794
       PosRelativeToAnchor = [raBelow]
       PosRelativeToParent = [rpCenterHorizontal]
       LayoutParamWidth = lpWrapContent
@@ -82,16 +98,20 @@ object AndroidModule2: TAndroidModule2
       Images = jImageList1
       BackgroundColor = colbrDefault
       ImageScaleType = scaleCenter
-      Id = 5220794
     end
     object jImageView3: jImageView
       Tag = 1
-      Left = 112
-      Top = 117
-      Width = 48
-      Height = 48
+      Left = 97
+      Top = 321
+      Width = 90
+      Height = 90
+      MarginLeft = 5
+      MarginTop = 5
+      MarginRight = 5
+      MarginBottom = 5
       Visible = True
       Anchor = jImageView2
+      Id = 9466797
       PosRelativeToAnchor = [raBelow]
       PosRelativeToParent = [rpCenterHorizontal]
       LayoutParamWidth = lpWrapContent
@@ -100,16 +120,20 @@ object AndroidModule2: TAndroidModule2
       Images = jImageList1
       BackgroundColor = colbrDefault
       ImageScaleType = scaleCenter
-      Id = 9466797
     end
     object jImageView4: jImageView
       Tag = 1
-      Left = 112
-      Top = 173
-      Width = 48
-      Height = 48
+      Left = 42
+      Top = 421
+      Width = 200
+      Height = 200
+      MarginLeft = 5
+      MarginTop = 5
+      MarginRight = 5
+      MarginBottom = 5
       Visible = True
       Anchor = jImageView3
+      Id = 8792415
       PosRelativeToAnchor = [raBelow]
       PosRelativeToParent = [rpCenterHorizontal]
       LayoutParamWidth = lpWrapContent
@@ -118,16 +142,20 @@ object AndroidModule2: TAndroidModule2
       Images = jImageList1
       BackgroundColor = colbrDefault
       ImageScaleType = scaleCenter
-      Id = 8792415
     end
     object jImageView5: jImageView
       Tag = 1
-      Left = 112
-      Top = 229
-      Width = 48
-      Height = 48
+      Left = 40
+      Top = 631
+      Width = 204
+      Height = 204
+      MarginLeft = 5
+      MarginTop = 5
+      MarginRight = 5
+      MarginBottom = 5
       Visible = True
       Anchor = jImageView4
+      Id = 0
       PosRelativeToAnchor = [raBelow]
       PosRelativeToParent = [rpCenterHorizontal]
       LayoutParamWidth = lpWrapContent
@@ -136,12 +164,11 @@ object AndroidModule2: TAndroidModule2
       Images = jImageList1
       BackgroundColor = colbrDefault
       ImageScaleType = scaleCenter
-      Id = 0
     end
   end
   object jButton1: jButton
     Left = 82
-    Top = 328
+    Top = 329
     Width = 136
     Height = 40
     MarginLeft = 2
@@ -150,6 +177,7 @@ object AndroidModule2: TAndroidModule2
     MarginBottom = 4
     Visible = True
     Anchor = jEditText1
+    Id = 3648999
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = [rpCenterHorizontal]
     LayoutParamWidth = lpHalfOfParent
@@ -158,12 +186,12 @@ object AndroidModule2: TAndroidModule2
     BackgroundColor = colbrDefault
     FontColor = colbrDefault
     FontSize = 0
+    FontSizeUnit = unitDefault
     OnClick = jButton1Click
-    Id = 3648999
   end
   object jTextView2: jTextView
     Left = 5
-    Top = 240
+    Top = 241
     Width = 57
     Height = 20
     MarginLeft = 5
@@ -172,6 +200,7 @@ object AndroidModule2: TAndroidModule2
     MarginBottom = 5
     Visible = True
     Anchor = jScrollView1
+    Id = 7177152
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = [rpLeft]
     LayoutParamWidth = lpWrapContent
@@ -183,11 +212,11 @@ object AndroidModule2: TAndroidModule2
     FontColor = colbrGoldenRod
     FontSize = 0
     TextTypeFace = tfNormal
-    Id = 7177152
+    FontSizeUnit = unitDefault
   end
   object jEditText1: jEditText
     Left = 5
-    Top = 275
+    Top = 276
     Width = 136
     Height = 39
     MarginLeft = 5
@@ -196,6 +225,7 @@ object AndroidModule2: TAndroidModule2
     MarginBottom = 10
     Visible = True
     Anchor = jTextView2
+    Id = 8989420
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = [rpLeft]
     LayoutParamWidth = lpHalfOfParent
@@ -214,12 +244,12 @@ object AndroidModule2: TAndroidModule2
     VerScrollBar = False
     WrappingLine = False
     Editable = True
-    Id = 8989420
+    FontSizeUnit = unitDefault
   end
   object jEditText2: jEditText
     Tag = 1
     Left = 159
-    Top = 275
+    Top = 276
     Width = 136
     Height = 39
     MarginLeft = 5
@@ -228,6 +258,7 @@ object AndroidModule2: TAndroidModule2
     MarginBottom = 10
     Visible = True
     Anchor = jTextView2
+    Id = 9101877
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = [rpRight]
     LayoutParamWidth = lpHalfOfParent
@@ -246,11 +277,11 @@ object AndroidModule2: TAndroidModule2
     VerScrollBar = False
     WrappingLine = False
     Editable = True
-    Id = 9101877
+    FontSizeUnit = unitDefault
   end
   object jTextView3: jTextView
     Left = 164
-    Top = 240
+    Top = 241
     Width = 104
     Height = 20
     MarginLeft = 5
@@ -259,6 +290,7 @@ object AndroidModule2: TAndroidModule2
     MarginBottom = 5
     Visible = True
     Anchor = jEditText2
+    Id = 0
     PosRelativeToAnchor = [raAbove, raAlignLeft]
     PosRelativeToParent = []
     LayoutParamWidth = lpWrapContent
@@ -270,11 +302,11 @@ object AndroidModule2: TAndroidModule2
     FontColor = colbrGoldenRod
     FontSize = 0
     TextTypeFace = tfNormal
-    Id = 0
+    FontSizeUnit = unitDefault
   end
   object jButton2: jButton
     Left = 82
-    Top = 376
+    Top = 377
     Width = 136
     Height = 40
     MarginLeft = 2
@@ -283,6 +315,7 @@ object AndroidModule2: TAndroidModule2
     MarginBottom = 4
     Visible = True
     Anchor = jButton1
+    Id = 9101878
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = [rpCenterHorizontal]
     LayoutParamWidth = lpHalfOfParent
@@ -291,8 +324,8 @@ object AndroidModule2: TAndroidModule2
     BackgroundColor = colbrDefault
     FontColor = colbrGoldenRod
     FontSize = 0
+    FontSizeUnit = unitDefault
     OnClick = jButton2Click
-    Id = 0
   end
   object jImageList1: jImageList
     Images.Strings = (

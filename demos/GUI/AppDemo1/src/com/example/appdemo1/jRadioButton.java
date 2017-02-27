@@ -1,150 +1,180 @@
 package com.example.appdemo1;
 
+import java.lang.reflect.Field;
+
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RadioButton;
-import android.widget.RelativeLayout;
-import android.widget.RelativeLayout.LayoutParams;
 
 public class jRadioButton extends RadioButton {
-//Java-Pascal Interface
-private long           PasObj   = 0;      // Pascal Obj
-private Controls        controls = null;   // Control Class for Event
-//
-private ViewGroup       parent   = null;   // parent view
-private LayoutParams    lparams;           // layout XYWH
-private OnClickListener onClickListener;   // event
+	//Java-Pascal Interface
+	private long           PasObj   = 0;      // Pascal Obj
+	private Controls        controls = null;   // Control Class for Event
+	
+	private jCommons LAMWCommon;
+	private OnClickListener onClickListener;   // event
 
-private int lparamsAnchorRule[] = new int[20]; 
-int countAnchorRule = 0;
+	float mTextSize = 0; //default
+	int mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_SP; //default
 
-private int lparamsParentRule[] = new int[20]; 
-int countParentRule = 0;
+	//Constructor
+	public  jRadioButton(android.content.Context context,
+						 Controls ctrls,long pasobj ) {
+		super(context);
+		//Connect Pascal I/F
+		controls   = ctrls;
+		PasObj = pasobj;
+		LAMWCommon = new jCommons(this,context,pasobj);
 
-int lpH = RelativeLayout.LayoutParams.WRAP_CONTENT;
-int lpW = RelativeLayout.LayoutParams.MATCH_PARENT; //w
+		//Init Event
+		onClickListener = new OnClickListener() {
+			public  void onClick(View view) {
+				controls.pOnClick(PasObj,Const.Click_Default);
+			}
+		};
+		setOnClickListener(onClickListener);
+	}
 
-int MarginLeft = 5;
-int MarginTop = 5;
-int marginRight = 5;
-int marginBottom = 5;
+	//Free object except Self, Pascal Code Free the class.
+	public  void Free() {
+		this.setOnKeyListener(null);
+		this.setText("");
+		LAMWCommon.free();
+	}
 
-float mTextSize = 0; //default
-int mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_SP; //default
+	public long GetPasObj() {
+		return LAMWCommon.getPasObj();
+	}
+	
+	public void setLeftTopRightBottomWidthHeight(int _left, int _top, int _right, int _bottom, int _w, int _h) {
+		LAMWCommon.setLeftTopRightBottomWidthHeight(_left,_top,_right,_bottom,_w,_h);
+	}
 
-//Constructor
-public  jRadioButton(android.content.Context context,
-                Controls ctrls,long pasobj ) {
-super(context);
-//Connect Pascal I/F
-controls   = ctrls;
-PasObj = pasobj;
-//Init Class
-lparams = new LayoutParams  (100,100);
-lparams.setMargins( 50, 50,0,0);
-//Init Event
-onClickListener = new OnClickListener() {
-public  void onClick(View view) {
-    controls.pOnClick(PasObj,Const.Click_Default);
-}
-};
-setOnClickListener(onClickListener);
-}
+	public ViewGroup GetParent() {
+		return LAMWCommon.getParent();
+	}
+	
+	public  void setParent( android.view.ViewGroup _viewgroup ) {
+		LAMWCommon.setParent(_viewgroup);
+	}
 
-public void setLeftTopRightBottomWidthHeight(int left, int top, int right, int bottom, int w, int h) {
-	MarginLeft = left;
-	MarginTop = top;
-	marginRight = right;
-	marginBottom = bottom;
-	lpH = h;
-	lpW = w;
-}	
+	public  void setParent2( android.view.ViewGroup _viewgroup ) { //need by RadioGroup [LinearLayout!]
+		ViewGroup parent = LAMWCommon.getParent();
+		if (parent != null) { parent.removeView(this); }
+		parent = _viewgroup;
+		parent.addView(this, 0); //LinearLayout [no lparams], insert at index O ...
+		// ?? better !!?? not sure
+		// parent.addView(this,newLayoutParams(parent,(ViewGroup.MarginLayoutParams)lparams));
+		// lparams = null;
+		// lparams = (ViewGroup.MarginLayoutParams)this.getLayoutParams();
+	}
+	
+	public void setLParamWidth(int _w) {
+		LAMWCommon.setLParamWidth(_w);
+	}
 
-//
-public  void setParent( android.view.ViewGroup viewgroup ) {
-if (parent != null) { parent.removeView(this); }
- parent = viewgroup;
- viewgroup.addView(this,lparams);
-}
+	public void setLParamHeight(int _h) {
+		LAMWCommon.setLParamHeight(_h);
+	}
 
-public  void setParent2( android.view.ViewGroup viewgroup ) { //need by RadioGroup [LinearLayout!]
-if (parent != null) { parent.removeView(this); }
- parent = viewgroup;
- viewgroup.addView(this, 0); //LinearLayout [no lparams], insert at index O ...
-}
+	public void setLGravity(int _g) {
+		LAMWCommon.setLGravity(_g);
+	}
 
-//Free object except Self, Pascal Code Free the class.
-public  void Free() {
-if (parent != null) { parent.removeView(this); }
-setText("");
-lparams = null;
-}
+	public void setLWeight(float _w) {
+		LAMWCommon.setLWeight(_w);
+	}
 
-//by jmpessoa
-public void setLParamWidth(int w) {
-	  lpW = w;
-}
+	public void addLParamsAnchorRule(int rule) {
+		LAMWCommon.addLParamsAnchorRule(rule);
+	}
 
-public void setLParamHeight(int h) {
-	  lpH = h;
-}
+	public void addLParamsParentRule(int rule) {
+		LAMWCommon.addLParamsParentRule(rule);
+	}
 
-public void addLParamsAnchorRule(int rule) {
-	 lparamsAnchorRule[countAnchorRule] = rule;
-	 countAnchorRule = countAnchorRule + 1;
-}
+	public void setLayoutAll(int idAnchor) {
+		LAMWCommon.setLayoutAll(idAnchor);
+	}
 
-public void addLParamsParentRule(int rule) {
-		lparamsParentRule[countParentRule] = rule;
-		countParentRule = countParentRule + 1;
-}
+	public void ClearLayoutAll() { //TODO Pascal
+		LAMWCommon.clearLayoutAll();
+	}
 
-	//by jmpessoa
-public void setLayoutAll(int idAnchor) {
-		lparams.width  = lpW; //matchParent; 
-		lparams.height = lpH; //wrapContent;
-		lparams.setMargins(MarginLeft,MarginTop,marginRight,marginBottom);
-
-		if (idAnchor > 0) {    	
-			//lparams.addRule(RelativeLayout.BELOW, id); 
-			//lparams.addRule(RelativeLayout.ALIGN_BASELINE, id)
-		    //lparams.addRule(RelativeLayout.LEFT_OF, id); //lparams.addRule(RelativeLayout.RIGHT_OF, id)
-			for (int i=0; i < countAnchorRule; i++) {  
-				lparams.addRule(lparamsAnchorRule[i], idAnchor);		
-		    }
-			
-		}
-		
-		for (int j=0; j < countParentRule; j++) {  
-			lparams.addRule(lparamsParentRule[j]);		
-	    }
-		//
-		setLayoutParams(lparams);
-}
-
-public void SetTextSize(float size) {
-	   mTextSize = size;	
-	   String t = this.getText().toString();   
-	   this.setTextSize(mTextSizeTypedValue, mTextSize);
-	   this.setText(t);
-}     
-
-
-//TTextSizeTyped =(tsDefault, tsUnitPixels, tsUnitDIP, tsUnitInches, tsUnitMillimeters, tsUnitPoints, tsUnitScaledPixel);
-public void SetFontSizeUnit(int _unit) {	
-	   switch (_unit) {
-	      case 0: mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_SP; break; //default
-	      case 1: mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_PX; break; //default
-	      case 2: mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_DIP; break; //default
-	      case 3: mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_IN; break; //default
-	      case 4: mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_MM; break; //default
-	      case 5: mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_PT; break; //default
-	      case 6: mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_SP; break; //default
-	   }   
+	public void SetTextSize(float size) {
+		mTextSize = size;
 		String t = this.getText().toString();
 		this.setTextSize(mTextSizeTypedValue, mTextSize);
 		this.setText(t);
-}
+	}
+
+
+	//TTextSizeTyped =(tsDefault, tsUnitPixels, tsUnitDIP, tsUnitInches, tsUnitMillimeters, tsUnitPoints, tsUnitScaledPixel);
+	public void SetFontSizeUnit(int _unit) {
+		switch (_unit) {
+			case 0: mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_SP; break; //default
+			case 1: mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_PX; break; //default
+			case 2: mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_DIP; break; //default
+			case 3: mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_IN; break; //default
+			case 4: mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_MM; break; //default
+			case 5: mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_PT; break; //default
+			case 6: mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_SP; break; //default
+		}
+		String t = this.getText().toString();
+		this.setTextSize(mTextSizeTypedValue, mTextSize);
+		this.setText(t);
+	}
+	
+	
+	private Drawable GetDrawableResourceById(int _resID) {
+		return (Drawable)( this.controls.activity.getResources().getDrawable(_resID));
+	}
+	
+	private int GetDrawableResourceId(String _resName) {
+		  try {
+		     Class<?> res = R.drawable.class;
+		     Field field = res.getField(_resName);  //"drawableName" ex. "ic_launcher"
+		     int drawableId = field.getInt(null);
+		     return drawableId;
+		  }
+		  catch (Exception e) {
+		     return 0;
+		  }
+	}
+	
+	
+	public void SetCompoundDrawables(Bitmap _image, int _side) {		
+		Drawable d = new BitmapDrawable(controls.activity.getResources(), _image);
+		int h = d.getIntrinsicHeight(); 
+		int w = d.getIntrinsicWidth();   
+		d.setBounds( 0, 0, w, h );		
+		
+		switch(_side) {
+		  case 0: this.setCompoundDrawables(d, null, null, null); break; //left
+		  case 1: this.setCompoundDrawables(null, null, d, null);   break;  //right
+		  case 2: this.setCompoundDrawables(null, d, null, null);  break; //above
+		  case 3: this.setCompoundDrawables(null, null, null, d); 		
+		}		
+		   		
+	}
+		
+	public void SetCompoundDrawables(String _imageResIdentifier, int _side) {
+		int id = GetDrawableResourceId(_imageResIdentifier);
+		Drawable d = GetDrawableResourceById(id);  		
+		int h = d.getIntrinsicHeight(); 
+		int w = d.getIntrinsicWidth();   
+		d.setBounds( 0, 0, w, h );		
+		
+		switch(_side) {
+		  case 0: this.setCompoundDrawables(d, null, null, null); break; //left
+		  case 1: this.setCompoundDrawables(null, null, d, null);   break;  //right
+		  case 2: this.setCompoundDrawables(null, d, null, null);  break; //above
+		  case 3: this.setCompoundDrawables(null, null, null, d); 		
+		}				
+	}		
 
 }

@@ -21,11 +21,12 @@
     <VersionInfo>
       <StringTable ProductVersion=""/>
     </VersionInfo>
-    <CustomData Count="4">		
+    <CustomData Count="5">
       <Item0 Name="LAMW" Value="GUI"/>
-      <Item1 Name="Package" Value="com.example.apptest1"/>
-      <Item2 Name="NdkPath" Value="C:\adt32\ndk10e"/>
-      <Item3 Name="SdkPath" Value="C:\adt32\sdk"/>
+      <Item1 Name="LamwVersion" Value="0.7"/>
+      <Item2 Name="NdkPath" Value="C:\adt32\ndk10e\"/>
+      <Item3 Name="Package" Value="com.example.apptest1"/>
+      <Item4 Name="SdkPath" Value="C:\adt32\sdk\"/>
     </CustomData>
     <BuildModes Count="1">
       <Item1 Name="Default" Default="True"/>
@@ -53,30 +54,45 @@
         <IsPartOfProject Value="True"/>
         <ComponentName Value="AndroidModule1"/>
         <HasResources Value="True"/>
+        <CustomData Count="1">
+          <Item0 Name="jControls" Value="jButton;jEditText;jListView;jPanel;jTextView"/>
+        </CustomData>
       </Unit1>
       <Unit2>
         <Filename Value="unit2.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="AndroidModule2"/>
         <HasResources Value="True"/>
+        <CustomData Count="1">
+          <Item0 Name="jControls" Value="jButton;jEditText;jForm;jImageList;jImageView;jScrollView;jTextView"/>
+        </CustomData>
       </Unit2>
       <Unit3>
         <Filename Value="unit3.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="AndroidModule3"/>
         <HasResources Value="True"/>
+        <CustomData Count="1">
+          <Item0 Name="jControls" Value="jButton;jTextView"/>
+        </CustomData>
       </Unit3>
       <Unit4>
         <Filename Value="unit4.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="AndroidModule4"/>
         <HasResources Value="True"/>
+        <CustomData Count="1">
+          <Item0 Name="jControls" Value="jButton;jTextView"/>
+        </CustomData>
       </Unit4>
       <Unit5>
         <Filename Value="unit5.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="AndroidModule5"/>
         <HasResources Value="True"/>
+        <CustomData Count="1">
+          <Item0 Name="jControls" Value="jButton"/>
+        </CustomData>
       </Unit5>
     </Units>
   </ProjectOptions>
@@ -111,7 +127,7 @@
       </Options>
     </Linking>
     <Other>
-      <CustomOptions Value="-Xd -CfSoft -CpARMV6 -XParm-linux-androideabi- -FDC:\adt32\ndk10e\toolchains\arm-linux-androideabi-4.9\prebuilt\windows\bin"/>
+      <CustomOptions Value="-Xd -CfSoft -CpARMV6 -XParm-linux-androideabi- -FDC:\adt32\ndk10e\\toolchains\arm-linux-androideabi-4.9\prebuilt\windows\bin"/>
     </Other>
   </CompilerOptions>
   <Debugging>

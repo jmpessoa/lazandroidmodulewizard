@@ -1,6 +1,6 @@
 package com.example.appdemo1;
 
-//LAMW: Lazarus Android Module Wizard  - version 0.7 - 10 July - 2016 
+//LAMW: Lazarus Android Module Wizard  - version 0.7 - rev. 13.1 - 27 Feb - 2017 
 //RAD Android: Project Wizard, Form Designer and Components Development Model!
 
 //https://github.com/jmpessoa/lazandroidmodulewizard
@@ -53,6 +53,7 @@ package com.example.appdemo1;
 import android.annotation.SuppressLint;
 import android.app.ActionBar;
 import android.app.Activity;
+import android.app.AlarmManager;
 import android.app.Dialog;
 import android.app.PendingIntent;
 import android.content.Context;
@@ -81,8 +82,10 @@ import android.provider.MediaStore;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.net.ConnectivityManager;
+import android.net.DhcpInfo;
 import android.net.NetworkInfo;
 import android.net.Uri;
+import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.util.Log;
 import android.view.ContextMenu;
@@ -106,9 +109,22 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.Enumeration;
+
 import java.util.List;
 import java.util.Locale;
 import java.lang.reflect.*;
+import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.net.SocketException;
+import java.lang.Object;
+
+import javax.microedition.khronos.opengles.GL10;
+import javax.microedition.khronos.egl.EGL10;
+import javax.microedition.khronos.egl.EGLContext;
+import javax.microedition.khronos.egl.EGLDisplay;
+import javax.microedition.khronos.egl.EGLSurface;
+
 
 //-------------------------------------------------------------------------
 //Constants
@@ -435,7 +451,8 @@ public String LoadFromAssets(String _filename){
 			
 			for (int c = is.read(buffer); c != -1; c = is.read(buffer)){
 		      fos.write(buffer, 0, c);
-			}	     								
+			}	     		
+			
 			is.close();								
 			fos.close();
 			pathRes= PathDat +"/"+ _filename;
@@ -634,8 +651,10 @@ public void SetSubTitleActionBar(String _subtitle) {
 }	
 
 public void SetIconActionBar(String _iconIdentifier) {
-	ActionBar actionBar = this.controls.activity.getActionBar();   	
-    actionBar.setIcon(GetDrawableResourceById(GetDrawableResourceId(_iconIdentifier)));
+//[ifdef_api14up]
+  ActionBar actionBar = this.controls.activity.getActionBar();   	
+  actionBar.setIcon(GetDrawableResourceById(GetDrawableResourceId(_iconIdentifier)));
+//[endif_api14up]
 }
 
 public void SetTabNavigationModeActionBar(){
@@ -758,10 +777,13 @@ public String GetScreenDensity() {
 
     int density = metrics.densityDpi;
         
+//[ifdef_api16up]
     if (density==DisplayMetrics.DENSITY_XXHIGH) {    	    	
         r= "XXHIGH:" + String.valueOf(density);
     }
-    else if (density==DisplayMetrics.DENSITY_XHIGH) {    	    	
+    else
+//[endif_api16up]
+    if (density==DisplayMetrics.DENSITY_XHIGH) {    	    	
         r= "XHIGH:" + String.valueOf(density);
     }
     else if (density==DisplayMetrics.DENSITY_HIGH) {    	    	
@@ -847,7 +869,7 @@ public String GetSubTitleActionBar() {
 }
 
 //https://xjaphx.wordpress.com/2011/10/02/store-and-use-files-in-assets/
-public void CopyFromAssetsToInternalAppStorage(String _filename){				    		   
+public String CopyFromAssetsToInternalAppStorage(String _filename) {				    		   
 		InputStream is = null;
 		FileOutputStream fos = null;			
 		String PathDat = controls.activity.getFilesDir().getAbsolutePath();			 			
@@ -869,8 +891,20 @@ public void CopyFromAssetsToInternalAppStorage(String _filename){
 		}catch (IOException e) {
 			// Log.i("ShareFromAssets","fail!!");
 		     e.printStackTrace();			     
-		}									
+		}
+		return PathDat+"/"+_filename;
 }	
+
+public String GetPathFromAssetsFile(String _assetsFileName) {  
+   return LoadFromAssets(_assetsFileName);
+}
+
+public Bitmap GetImageFromAssetsFile(String _assetsImageFileName) {
+	  String path =  LoadFromAssets(_assetsImageFileName);
+	  BitmapFactory.Options bo = new BitmapFactory.Options();
+	  bo.inScaled = false;
+	  return BitmapFactory.decodeFile(path, bo);
+}
 
 public void CopyFromInternalAppStorageToEnvironmentDir(String _filename, String _environmentDir) {	 
     String srcPath = controls.activity.getFilesDir().getAbsolutePath()+"/"+ _filename;       //Result : /data/data/com/MyApp/files	 
@@ -887,6 +921,21 @@ public void CopyFromAssetsToEnvironmentDir(String _filename, String _environment
 public void ToggleSoftInput() {
 	  InputMethodManager imm =(InputMethodManager) controls.activity.getSystemService(Context.INPUT_METHOD_SERVICE);
 	  imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
+}
+
+public void HideSoftInput() {
+	  InputMethodManager imm =(InputMethodManager) controls.activity.getSystemService(Context.INPUT_METHOD_SERVICE);
+	  imm.toggleSoftInput(InputMethodManager.RESULT_HIDDEN, 0);
+}
+
+public void HideSoftInput(View _view) {
+  InputMethodManager imm = (InputMethodManager)controls.activity.getSystemService(Context.INPUT_METHOD_SERVICE);
+  imm.hideSoftInputFromWindow(_view.getWindowToken(), 0);
+}
+
+public void ShowSoftInput() {
+	  InputMethodManager imm =(InputMethodManager) controls.activity.getSystemService(Context.INPUT_METHOD_SERVICE);
+	  imm.toggleSoftInput(InputMethodManager.RESULT_SHOWN, 0);
 }
 
 //thanks to Mladen
@@ -934,8 +983,228 @@ public String UriToString(Uri _uri) {
   return _uri.toString();
 }
 
+// ref. http://www.android-examples.com/get-display-ip-address-of-android-phone-device-programmatically/
+public int GetNetworkStatus() {
+  boolean WIFI = false;
+  boolean MOBILE = false;
+  int r = 0; //NOT_CONNECTED
+  ConnectivityManager CM = (ConnectivityManager) controls.activity.getSystemService(Context.CONNECTIVITY_SERVICE);
+  NetworkInfo[] networkInfo = CM.getAllNetworkInfo();
+  for (NetworkInfo netInfo : networkInfo) {
+     if (netInfo.getTypeName().equalsIgnoreCase("WIFI"))
+     if (netInfo.isConnected()) WIFI = true;
+     if (netInfo.getTypeName().equalsIgnoreCase("MOBILE"))
+     if (netInfo.isConnected())
+     MOBILE = true;
+  }
+  
+  if(WIFI == true) {
+    r = 1; //WIFI_CONNECTED
+  }
+  
+  if(MOBILE == true) {
+	r = 2; //MOBILE_DATA_CONNECTED
+  }
+  
+  return  r;
+} 
+
+public String GetDeviceDataMobileIPAddress(){
+	String r = "";
+try {
+    for (Enumeration<NetworkInterface> en = NetworkInterface.getNetworkInterfaces(); 
+      en.hasMoreElements();) {
+      NetworkInterface networkinterface = en.nextElement();
+      for (Enumeration<InetAddress> enumIpAddr = networkinterface.getInetAddresses(); enumIpAddr.hasMoreElements();) {
+         InetAddress inetAddress = enumIpAddr.nextElement();
+         if (!inetAddress.isLoopbackAddress()) {        	                      
+           boolean isIPv4 = inetAddress.getHostAddress().indexOf(':') < 0;              
+           if (isIPv4)  return r = inetAddress.getHostAddress();     
+           if (!isIPv4) {
+                   int delim = inetAddress.getHostAddress().indexOf('%'); // drop ip6 zone suffix
+                   r = delim < 0 ? inetAddress.getHostAddress().toUpperCase() : inetAddress.getHostAddress().substring(0, delim).toUpperCase();
+           }                                
+         }
+      }
+    }
+}catch (Exception ex) {
+Log.e("Current IP", ex.toString());
 }
- 
+return r;
+}
+
+//ref. http://www.devlper.com/2010/07/getting-ip-address-of-the-device-in-android/
+public String GetDeviceWifiIPAddress() {
+    WifiManager mWifi = (WifiManager) controls.activity.getSystemService(Context.WIFI_SERVICE);  
+    //String ip = Formatter.formatIpAddress(    		
+    int  ipAddress = mWifi.getConnectionInfo().getIpAddress();
+    String sIP =String.format("%d.%d.%d.%d",
+    		(ipAddress & 0xff),
+    		(ipAddress >> 8 & 0xff),
+    		(ipAddress >> 16 & 0xff),
+    		(ipAddress >> 24 & 0xff));
+   return sIP;
+}
+
+  /** 
+  * Calculate the broadcast IP we need to send the packet along.
+  * ref. http://www.ece.ncsu.edu/wireless/MadeInWALAN/AndroidTutorial/ 
+  */
+  public String GetWifiBroadcastIPAddress() throws IOException {
+	String r = null;
+    WifiManager mWifi = (WifiManager) controls.activity.getSystemService(Context.WIFI_SERVICE);  
+	// DhcpInfo  is a simple object for retrieving the results of a DHCP request
+    DhcpInfo dhcp = mWifi.getDhcpInfo(); 
+    if (dhcp == null) {     
+      return null; 
+    }        
+    int broadcast = (dhcp.ipAddress & dhcp.netmask) | ~dhcp.netmask;     
+    byte[] quads = new byte[4];    
+    for (int k = 0; k < 4; k++) 
+      quads[k] = (byte) ((broadcast >> k * 8) & 0xFF);      
+    // Returns the InetAddress corresponding to the array of bytes. 
+    // The high order byte is quads[0].
+    r = InetAddress.getByAddress(quads).getHostAddress();    
+    if  (r == null) r = "";    
+    return r;
+  }
+  
+  //https://xjaphx.wordpress.com/2011/10/02/store-and-use-files-in-assets/    
+  public String LoadFromAssetsTextContent(String _filename) {
+	   String str;
+      // load text
+      try {
+   	   //Log.i("loadFromAssets", "name: "+_filename);
+          // get input stream for text
+          InputStream is = controls.activity.getAssets().open(_filename);
+          // check size
+          int size = is.available();
+          // create buffer for IO
+          byte[] buffer = new byte[size];
+          // get data to buffer
+          is.read(buffer);
+          // close stream
+          is.close();
+          // set result to TextView
+          str = new String(buffer);
+          //Log.i("loadFromAssets", ":: "+ str);
+          return str.toString();
+      }
+      catch (IOException ex) {
+   	   //Log.i("loadFromAssets", "error!");
+          return "";
+      }       
+  }
+  
+  
+//Fatih: Path = '' = Asset Root Folder 
+//Path Example: gunlukler/2015/02/28/001
+  
+public String[] GetAssetContentList(String _path) throws IOException { 
+	ArrayList<String> Folders = new ArrayList<String>(); 
+
+	Resources r = this.controls.activity.getResources();  
+	AssetManager am = r.getAssets(); 
+	String fileList[] = am.list(_path); 
+	if (fileList != null) 
+	{    
+		for (int i = 0; i < fileList.length; i++) 
+		{ 
+			Folders.add(fileList[i]); 
+		} 
+	} 
+	String sFolders[] = Folders.toArray(new String[Folders.size()]);    	   
+	return sFolders; 
+} 
+
+//Fatih: gets system storage driver list
+public String[] GetDriverList() { 
+	ArrayList<String> Drivers = new ArrayList<String>(); 
+
+	String sDriver;
+	sDriver = System.getenv("EXTERNAL_STORAGE");
+	if(sDriver != null)
+	{
+		File fDriver = new File(sDriver);
+
+		if (fDriver.exists() && fDriver.canWrite()) {
+			Drivers.add(fDriver.getAbsolutePath());
+		}
+	}
+
+	sDriver = System.getenv("SECONDARY_STORAGE");
+	if(sDriver != null)
+	{
+		File fDriver = new File(sDriver);
+
+		if (fDriver.exists() && fDriver.canWrite()) {
+			Drivers.add(fDriver.getAbsolutePath());
+		}
+	}
+	
+	String sDrivers[] = Drivers.toArray(new String[Drivers.size()]);    	   
+	return sDrivers; 
+} 
+
+//Fatih: get folders list 
+//Path Example: /storage/emulated/legacy/ 
+public String[] GetFolderList(String _envPath) { 
+	ArrayList<String> Folders = new ArrayList<String>(); 
+
+	File f = new File(_envPath);
+	File[] files = f.listFiles();
+	for (File fFile : files) {
+	    if (fFile.isDirectory()) {
+			Folders.add(fFile.getName());
+	    }
+	}	
+	String sFolders[] = Folders.toArray(new String[Folders.size()]);    	   
+	return sFolders; 
+} 
+
+//Fatih: get files list 
+//Path Example: /storage/emulated/legacy/ 
+public String[] GetFileList(String _envPath) { 
+	ArrayList<String> Folders = new ArrayList<String>(); 
+
+	File f = new File(_envPath);
+	File[] files = f.listFiles();
+	for (File fFile : files) {
+	    if (fFile.isFile()) {
+			Folders.add(fFile.getName());
+	    }
+	}	
+	String sFolders[] = Folders.toArray(new String[Folders.size()]);    	   
+	return sFolders; 
+}  
+
+public boolean FileExists(String _fullFileName) {	
+	return new File(_fullFileName).isFile();	
+}
+
+public boolean DirectoryExists(String _fullDirectoryName) {
+	return new File(_fullDirectoryName).isDirectory();
+}
+
+
+//http://blog.scriptico.com/category/dev/java/android/
+public void Minimize() {
+  Intent main = new Intent(Intent.ACTION_MAIN);
+  main.addCategory(Intent.CATEGORY_HOME);
+  main.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+  controls.activity.startActivity(main);
+}
+
+public void Restart(int _delay) {
+  PendingIntent intent = PendingIntent.getActivity(controls.activity.getBaseContext(), 0, 
+		                                           new Intent( controls.activity.getIntent() ), 
+		                                           controls.activity.getIntent().getFlags());  
+  AlarmManager manager = (AlarmManager) controls.activity.getSystemService(Context.ALARM_SERVICE);  
+  manager.set(AlarmManager.RTC, System.currentTimeMillis() + _delay, intent);
+  System.exit(2);
+}
+
+}
 //**class entrypoint**//please, do not remove/change this line!
 
 //Main Java/Pascal Interface Class
@@ -966,7 +1235,7 @@ public native boolean pAppOnPrepareOptionsMenu(Menu menu, int menuSize);
 public native boolean pAppOnPrepareOptionsMenuItem(Menu menu, MenuItem menuItem, int itemIndex);
 public native void pAppOnCreateContextMenu(ContextMenu menu);
 public native void pAppOnClickContextMenuItem(MenuItem menuItem, int itemID, String itemCaption, boolean checked);
-public native void pOnDraw(long pasobj, Canvas canvas);
+public native void pOnDraw(long pasobj);
 public native void pOnTouch(long pasobj, int act, int cnt, float x1, float y1, float x2, float y2);
 public native void pOnClickGeneric(long pasobj, int value);
 public native boolean pAppOnSpecialKeyDown(char keyChar, int keyCode, String keyCodeString);
@@ -979,28 +1248,21 @@ public native void pAppOnViewClick(View view, int id);
 public native void pAppOnListItemClick(AdapterView adapter, View view, int position, int id);
 public native void pOnFlingGestureDetected(long pasobj, int direction);
 public native void pOnPinchZoomGestureDetected(long pasobj, float scaleFactor, int state);
- 
-//Load Pascal Library
-static {
-	/*
-    try {
-    	System.loadLibrary("freetype"); // need by TFPNoGUIGraphicsBridge [ref. www.github.com/jmpessoa/tfpnoguigraphicsbridge]
-    } catch (UnsatisfiedLinkError e) {
-         Log.e("JNI_Load_LibFreetype", "exception", e);
-    }
-    */	
-    try {
-    	System.loadLibrary("controls");
-    } catch (UnsatisfiedLinkError e) {
-         Log.e("JNI_Load_LibControls", "exception", e);
-    }  
-}
+public native void pOnLostFocus(long pasobj, String text);
+public native void pOnBeforeDispatchDraw(long pasobj, Canvas canvas, int tag);
+public native void pOnAfterDispatchDraw(long pasobj, Canvas canvas, int tag);
+public native void pOnLayouting(long pasobj, boolean changed);
 
+// -------------------------------------------------------------------------
+//Load Pascal Library
+// -------------------------------------------------------------------------
+static {
+try{System.loadLibrary("controls");} catch (UnsatisfiedLinkError e) {Log.e("JNI_Loading_libcontrols", "exception", e);}
+}
 // -------------------------------------------------------------------------
 //  Activity Event
 // -------------------------------------------------------------------------
 public  int  jAppOnScreenStyle()          { return(pAppOnScreenStyle());   }     
-//
 public  void jAppOnCreate(Context context,RelativeLayout layout )
                                           { pAppOnCreate(context,layout);  }
 
@@ -1602,47 +1864,42 @@ public String jCamera_takePhoto(String path, String filename, int requestCode) {
 //SMART LAMW DESIGNER
 //-------------------------------------------------------------------------------------------------------
 
-public  java.lang.Object jTextView_Create(long pasobj) {
-  return (java.lang.Object)( new jTextView(this.activity,this,pasobj));
+public  java.lang.Object jBitmap_Create( long pasobj ) {
+   return (java.lang.Object)( new jBitmap(this,pasobj));
 }
 
-public  java.lang.Object jImageView_Create(long pasobj ) {
-  return (java.lang.Object)( new jImageView(this.activity,this,pasobj));
+public  java.lang.Object jButton_Create(long pasobj ) {
+  return (java.lang.Object)( new jButton(this.activity,this,pasobj));
 }
 
-public  java.lang.Object jTimer_Create(long pasobj) {
-   return (java.lang.Object)(new jTimer(this,pasobj) );
+public  java.lang.Object jCanvas_Create( long pasobj) {
+  return (java.lang.Object)( new jCanvas(this,pasobj));
 }
-public native void pOnTimer(long pasobj);
 
 public java.lang.Object jCanvasES1_Create(long pasobj, int version ) {
  return (java.lang.Object)(new jCanvasES1(this.activity,this,pasobj,version));
 }
 public native void pOnGLRenderer1(long pasobj, int EventType, int w, int h);
 
-public  java.lang.Object jButton_Create(long pasobj ) {
-  return (java.lang.Object)( new jButton(this.activity,this,pasobj));
-}
-
 public java.lang.Object jCanvasES2_Create(long pasobj, int version ) {
   return (java.lang.Object)(new jCanvasES2(this.activity,this,pasobj,version));
 }
 public native void pOnGLRenderer2(long pasobj, int EventType, int w, int h);
 
-public  java.lang.Object jProgressBar_Create(long pasobj, int style ) {
-  return (java.lang.Object)( new jProgressBar(this.activity,this,pasobj,style));
+public  java.lang.Object jCheckBox_Create(long pasobj ) {
+  return (java.lang.Object)( new jCheckBox(this.activity,this,pasobj));
+}
+
+public  java.lang.Object jDialogProgress_Create(long pasobj, String title, String msg) {
+  return (jDialogProgress)(new jDialogProgress(activity,this,pasobj,title,msg ) );
+}
+
+public java.lang.Object jDialogYN_Create(long pasobj, String title, String msg, String y, String n) {
+  return (jDialogYN)(new jDialogYN(activity,this,pasobj,title,msg,y,n) );
 }
 
 public java.lang.Object jEditText_Create(long pasobj ) {
   return (java.lang.Object)( new jEditText(this.activity,this,pasobj));
-}
-
-public  java.lang.Object jScrollView_Create(long pasobj ) {
-   return (java.lang.Object)( new jScrollView(this.activity,this,pasobj));
-}
-
-public  java.lang.Object jCheckBox_Create(long pasobj ) {
-  return (java.lang.Object)( new jCheckBox(this.activity,this,pasobj));
 }
 
 public java.lang.Object jHttpClient_jCreate(long _Self) {
@@ -1651,26 +1908,17 @@ public java.lang.Object jHttpClient_jCreate(long _Self) {
 public native void pOnHttpClientContentResult(long pasobj, String content);
 public native void pOnHttpClientCodeResult(long pasobj, int code);
 
-public  java.lang.Object jRadioButton_Create(long pasobj ) {
-  return (java.lang.Object)( new jRadioButton(this.activity,this,pasobj));
+public  java.lang.Object jImageBtn_Create(long pasobj ) {
+   return (java.lang.Object)( new jImageBtn(this.activity,this,pasobj));
 }
 
-public java.lang.Object jDialogYN_Create(long pasobj, String title, String msg, String y, String n) {
-  return (jDialogYN)(new jDialogYN(activity,this,pasobj,title,msg,y,n) );
+public java.lang.Object jImageList_jCreate(long _Self) {
+  return (java.lang.Object)(new jImageList(this,_Self));
 }
 
-public  java.lang.Object jDialogProgress_Create(long pasobj, String title, String msg) {
-  return (jDialogProgress)(new jDialogProgress(activity,this,pasobj,title,msg ) );
+public  java.lang.Object jImageView_Create(long pasobj ) {
+  return (java.lang.Object)( new jImageView(this.activity,this,pasobj));
 }
-
-public  java.lang.Object jPanel_Create(long pasobj ) {
-  return (java.lang.Object)(new jPanel(this.activity,this,pasobj));
-}
-
-public  java.lang.Object jWebView_Create(long pasobj ) {
-   return (java.lang.Object)( new jWebView(this.activity,this,pasobj));
-}
-public native int pOnWebViewStatus(long pasobj, int EventType, String url);
 
 public  java.lang.Object jListView_Create2(long pasobj,  int widget, String widgetTxt, Bitmap bmp, int txtDecorated, int itemLay, int textSizeDecorated, int textAlign) {
   return (java.lang.Object)(new jListView(this.activity,this,pasobj,widget,widgetTxt,bmp,txtDecorated,itemLay,textSizeDecorated, textAlign));
@@ -1683,21 +1931,40 @@ public native void pOnClickCaptionItem(long pasobj, int position, String caption
 public native void pOnListViewLongClickCaptionItem(long pasobj, int position, String caption);
 public native int pOnListViewDrawItemCaptionColor(long pasobj, int position, String caption);
 public native Bitmap pOnListViewDrawItemBitmap(long pasobj, int position, String caption);
+public native void pOnWidgeItemLostFocus(long pasobj, int position, String widgetText);
 
-public  java.lang.Object jBitmap_Create( long pasobj ) {
-   return (java.lang.Object)( new jBitmap(this,pasobj));
+public  java.lang.Object jPanel_Create(long pasobj ) {
+  return (java.lang.Object)(new jPanel(this.activity,this,pasobj));
 }
 
-public  java.lang.Object jImageBtn_Create(long pasobj ) {
-   return (java.lang.Object)( new jImageBtn(this.activity,this,pasobj));
+public  java.lang.Object jProgressBar_Create(long pasobj, int style ) {
+  return (java.lang.Object)( new jProgressBar(this.activity,this,pasobj,style));
 }
+
+public  java.lang.Object jRadioButton_Create(long pasobj ) {
+  return (java.lang.Object)( new jRadioButton(this.activity,this,pasobj));
+}
+
+public  java.lang.Object jScrollView_Create(long pasobj ) {
+   return (java.lang.Object)( new jScrollView(this.activity,this,pasobj));
+}
+
+public  java.lang.Object jTextView_Create(long pasobj) {
+  return (java.lang.Object)( new jTextView(this.activity,this,pasobj));
+}
+
+public  java.lang.Object jTimer_Create(long pasobj) {
+   return (java.lang.Object)(new jTimer(this,pasobj) );
+}
+public native void pOnTimer(long pasobj);
 
 public java.lang.Object jView_Create(long pasobj ) {
   return (java.lang.Object)( new jView(this.activity,this,pasobj));
 }
 
-public  java.lang.Object jCanvas_Create( long pasobj) {
-  return (java.lang.Object)( new jCanvas(this,pasobj));
+public  java.lang.Object jWebView_Create(long pasobj ) {
+   return (java.lang.Object)( new jWebView(this.activity,this,pasobj));
 }
+public native int pOnWebViewStatus(long pasobj, int EventType, String url);
 
 }

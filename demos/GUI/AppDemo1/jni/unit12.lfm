@@ -11,8 +11,8 @@ object AndroidModule12: TAndroidModule12
   Text = 'AndroidModule12'
   ActivityMode = actRecyclable
   BackgroundColor = colbrBlack
+  ActionBarTitle = abtDefault
   OnCloseQuery = DataModuleCloseQuery
-  OnRotate = DataModuleRotate
   OnJNIPrompt = DataModuleJNIPrompt
   object jTextView1: jTextView
     Left = 86
@@ -24,6 +24,7 @@ object AndroidModule12: TAndroidModule12
     MarginRight = 10
     MarginBottom = 10
     Visible = True
+    Id = 21393
     PosRelativeToAnchor = []
     PosRelativeToParent = [rpCenterHorizontal]
     LayoutParamWidth = lpWrapContent
@@ -36,7 +37,6 @@ object AndroidModule12: TAndroidModule12
     FontSize = 0
     TextTypeFace = tfNormal
     FontSizeUnit = unitDefault
-    Id = 21393
   end
   object jButton1: jButton
     Left = 5
@@ -49,6 +49,7 @@ object AndroidModule12: TAndroidModule12
     MarginBottom = 5
     Visible = True
     Anchor = jTextView1
+    Id = 73178
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = []
     LayoutParamWidth = lpMatchParent
@@ -59,7 +60,6 @@ object AndroidModule12: TAndroidModule12
     FontSize = 0
     FontSizeUnit = unitDefault
     OnClick = jButton1Click
-    Id = 73178
   end
   object jCanvasES1_1: jCanvasES1
     Tag = 1
@@ -73,6 +73,7 @@ object AndroidModule12: TAndroidModule12
     MarginBottom = 10
     Visible = True
     Anchor = jButton1
+    Id = 1670
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = []
     LayoutParamWidth = lpMatchParent
@@ -85,7 +86,6 @@ object AndroidModule12: TAndroidModule12
     OnGLUp = jCanvasES1_1GLUp
     AutoRefresh = False
     Images = jImageList1
-    Id = 1670
   end
   object jTextView2: jTextView
     Left = 86
@@ -98,6 +98,7 @@ object AndroidModule12: TAndroidModule12
     MarginBottom = 10
     Visible = True
     Anchor = jCanvasES1_1
+    Id = 0
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = [rpCenterHorizontal]
     LayoutParamWidth = lpWrapContent
@@ -110,7 +111,6 @@ object AndroidModule12: TAndroidModule12
     FontSize = 0
     TextTypeFace = tfNormal
     FontSizeUnit = unitDefault
-    Id = 0
   end
   object jImageList1: jImageList
     Images.Strings = (

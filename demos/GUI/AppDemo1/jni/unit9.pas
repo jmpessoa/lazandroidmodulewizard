@@ -24,7 +24,7 @@ type
       procedure DataModuleJNIPrompt(Sender: TObject);
       procedure DataModuleRotate(Sender: TObject; rotate: integer; var rstRotate: integer);
       procedure jButton1Click(Sender: TObject);
-      procedure jView1Draw(Sender: TObject; Canvas: jCanvas);
+      procedure jView1Draw(Sender: TObject);
       procedure jView1TouchMove(Sender: TObject; Touch: TMouch);
     private
       {private declarations}
@@ -52,19 +52,6 @@ begin
    jView1.refresh;
 end;
 
-procedure TAndroidModule9.jView1Draw(Sender: TObject; Canvas: jCanvas);
-begin
-     //jView1.Canvas.PaintColor:= colbrGreen;
-     //jView1.Canvas.PaintStyle:= psFillAndStroke;
-     //jView1.Canvas.PaintTextSize:= 20;
-     //jView1.Canvas.drawBitmap(jBitmap1,10,10, jView1.Width-20,Round( (jView1.Width-20)*(1/Ratio) ) );
-     //jView1.Canvas.drawBitmap(jBitmap1,10,10, jView1.Width, Ratio);
-
-     jView1.Canvas.drawBitmap(jBitmap1.GetImage,jView1.Width, jView1.Height);
-
-     jView1.Canvas.drawText('P(x,y)= (' + IntToStr(P.X) + ',' + IntToStr(P.Y)+')',60,60);
-
-end;
 
 procedure TAndroidModule9.DataModuleCloseQuery(Sender: TObject; var CanClose: boolean);
 begin
@@ -113,6 +100,20 @@ begin
   end;
 
   jView1.Refresh;
+
+end;
+
+procedure TAndroidModule9.jView1Draw(Sender: TObject);
+begin
+       //jView1.Canvas.PaintColor:= colbrGreen;
+     //jView1.Canvas.PaintStyle:= psFillAndStroke;
+     //jView1.Canvas.PaintTextSize:= 20;
+     //jView1.Canvas.drawBitmap(jBitmap1,10,10, jView1.Width-20,Round( (jView1.Width-20)*(1/Ratio) ) );
+     //jView1.Canvas.drawBitmap(jBitmap1,10,10, jView1.Width, Ratio);
+
+     jView1.Canvas.drawBitmap(jBitmap1.GetImage,jView1.Width, jView1.Height);
+
+     jView1.Canvas.drawText('P(x,y)= (' + IntToStr(P.X) + ',' + IntToStr(P.Y)+')',60,60);
 
 end;
 

@@ -24,7 +24,6 @@ type
       jTextView2: jTextView;
       jTextView3: jTextView;
       jTimer1: jTimer;
-
       procedure DataModuleJNIPrompt(Sender: TObject);
       procedure jButton1Click(Sender: TObject);
       procedure jCheckBox1Click(Sender: TObject);

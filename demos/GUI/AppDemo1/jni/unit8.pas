@@ -23,10 +23,8 @@ type
       procedure DataModuleCloseQuery(Sender: TObject; var CanClose: boolean);
       procedure DataModuleCreate(Sender: TObject);
       procedure DataModuleJNIPrompt(Sender: TObject);
-      procedure DataModuleRotate(Sender: TObject; rotate: integer;
-        var rstRotate: integer);
       procedure jButton1Click(Sender: TObject);
-      procedure jView1Draw(Sender: TObject; Canvas: jCanvas);
+      procedure jView1Draw(Sender: TObject);
       procedure jView1TouchMove(Sender: TObject; Touch: TMouch);
     private
      {private declarations}
@@ -45,7 +43,23 @@ implementation
 
 { TAndroidModule8 }
 
-procedure TAndroidModule8.jView1Draw(Sender: TObject; Canvas: jCanvas);
+procedure TAndroidModule8.jView1TouchMove(Sender: TObject; Touch: TMouch);
+begin
+   P:= Point(Round(Touch.Pt.X), Round(Touch.Pt.Y));
+   jView1.Refresh;
+end;
+
+procedure TAndroidModule8.jButton1Click(Sender: TObject);
+var
+  filename : String;
+begin
+  filename := 'custom_view_test.png';
+  jView1.SaveToFile(filename);
+  showMessage('Save to '+fileName);
+  jImageView1.SetImage(jView1.GetImage());
+end;
+
+procedure TAndroidModule8.jView1Draw(Sender: TObject);
 var
   w1, h1: integer;
 begin
@@ -72,31 +86,9 @@ begin
   jView1.Canvas.drawBitmap(jBitmap1.GetImage, P.X-100,P.Y-100,P.X+100,P.Y+100);
 end;
 
-procedure TAndroidModule8.jView1TouchMove(Sender: TObject; Touch: TMouch);
-begin
-   P:= Point(Round(Touch.Pt.X), Round(Touch.Pt.Y));
-   jView1.Refresh;
-end;
-
-procedure TAndroidModule8.jButton1Click(Sender: TObject);
-var
-  filename : String;
-begin
-  filename := 'custom_view_test.png';
-  jView1.SaveToFile(filename);
-  showMessage('Save to '+fileName);
-  jImageView1.SetImage(jView1.GetImage());
-end;
-
 procedure TAndroidModule8.DataModuleJNIPrompt(Sender: TObject);
 begin
   //
-end;
-
-procedure TAndroidModule8.DataModuleRotate(Sender: TObject; rotate: integer;
-  var rstRotate: integer);
-begin
-  Self.UpdateLayout;
 end;
 
 procedure TAndroidModule8.DataModuleCreate(Sender: TObject);

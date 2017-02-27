@@ -13,7 +13,6 @@ object AndroidModule8: TAndroidModule8
   BackgroundColor = colbrBlack
   ActionBarTitle = abtDefault
   OnCloseQuery = DataModuleCloseQuery
-  OnRotate = DataModuleRotate
   OnJNIPrompt = DataModuleJNIPrompt
   object jTextView1: jTextView
     Left = 48
@@ -25,6 +24,7 @@ object AndroidModule8: TAndroidModule8
     MarginRight = 10
     MarginBottom = 10
     Visible = True
+    Id = 22765
     PosRelativeToAnchor = []
     PosRelativeToParent = [rpCenterHorizontal]
     LayoutParamWidth = lpWrapContent
@@ -37,7 +37,6 @@ object AndroidModule8: TAndroidModule8
     FontSize = 0
     TextTypeFace = tfNormal
     FontSizeUnit = unitDefault
-    Id = 22765
   end
   object jButton1: jButton
     Left = 5
@@ -50,6 +49,7 @@ object AndroidModule8: TAndroidModule8
     MarginBottom = 5
     Visible = True
     Anchor = jView1
+    Id = 8848063
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = []
     LayoutParamWidth = lpMatchParent
@@ -60,7 +60,6 @@ object AndroidModule8: TAndroidModule8
     FontSize = 0
     FontSizeUnit = unitDefault
     OnClick = jButton1Click
-    Id = 8848063
   end
   object jView1: jView
     Tag = 1
@@ -74,6 +73,7 @@ object AndroidModule8: TAndroidModule8
     MarginBottom = 10
     Visible = True
     Anchor = jTextView1
+    Id = 75225
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = []
     LayoutParamWidth = lpMatchParent
@@ -82,23 +82,25 @@ object AndroidModule8: TAndroidModule8
     BackgroundColor = colbrLightSteelBlue
     OnDraw = jView1Draw
     OnTouchMove = jView1TouchMove
-    Id = 75225
   end
   object jImageView1: jImageView
     Left = 126
-    Top = 399
+    Top = 401
     Width = 48
     Height = 48
+    MarginLeft = 5
+    MarginTop = 5
+    MarginRight = 5
+    MarginBottom = 5
     Visible = True
     Anchor = jButton1
+    Id = 0
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = [rpCenterInParent]
     LayoutParamWidth = lpWrapContent
     LayoutParamHeight = lpWrapContent
-    ImageIndex = -1
     BackgroundColor = colbrDefault
     ImageScaleType = scaleCenter
-    Id = 0
   end
   object jBitmap1: jBitmap
     FilePath = fpathData
@@ -121,6 +123,7 @@ object AndroidModule8: TAndroidModule8
     PaintStyle = psFillAndStroke
     PaintTextSize = 20
     PaintColor = colbrBlue
+    Typeface = ffNormal
     left = 93
     top = 88
   end

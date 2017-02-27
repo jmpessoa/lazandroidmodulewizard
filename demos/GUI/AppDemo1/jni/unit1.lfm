@@ -11,13 +11,13 @@ object AndroidModule1: TAndroidModule1
   Text = 'AndroidModule1'
   ActivityMode = actSplash
   BackgroundColor = colbrWhite
+  ActionBarTitle = abtDefault
   OnCloseQuery = AndroidModule1CloseQuery
-  OnRotate = DataModuleRotate
   OnJNIPrompt = DataModuleJNIPrompt
   OnClose = DataModuleClose
   object jTextView1: jTextView
     Left = 59
-    Top = 364
+    Top = 370
     Width = 181
     Height = 20
     MarginLeft = 40
@@ -26,6 +26,7 @@ object AndroidModule1: TAndroidModule1
     MarginBottom = 5
     Visible = True
     Anchor = jImageView1
+    Id = 855478
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = [rpCenterHorizontal]
     LayoutParamWidth = lpWrapContent
@@ -38,18 +39,18 @@ object AndroidModule1: TAndroidModule1
     FontSize = 0
     TextTypeFace = tfNormal
     FontSizeUnit = unitDefault
-    Id = 855478
   end
   object jImageView1: jImageView
-    Left = 126
-    Top = 276
-    Width = 48
-    Height = 48
+    Left = 80
+    Top = 270
+    Width = 140
+    Height = 60
     MarginLeft = 0
     MarginTop = 0
     MarginRight = 0
     MarginBottom = 0
     Visible = True
+    Id = 11952
     PosRelativeToAnchor = []
     PosRelativeToParent = [rpCenterInParent]
     LayoutParamWidth = lpWrapContent
@@ -58,15 +59,19 @@ object AndroidModule1: TAndroidModule1
     Images = jImageList1
     BackgroundColor = colbrDefault
     ImageScaleType = scaleCenter
-    Id = 11952
   end
   object jImageView2: jImageView
-    Left = 126
-    Top = 392
-    Width = 48
-    Height = 48
+    Left = 98
+    Top = 400
+    Width = 103
+    Height = 133
+    MarginLeft = 5
+    MarginTop = 5
+    MarginRight = 5
+    MarginBottom = 5
     Visible = True
     Anchor = jTextView1
+    Id = 0
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = [rpCenterHorizontal]
     LayoutParamWidth = lpWrapContent
@@ -75,7 +80,6 @@ object AndroidModule1: TAndroidModule1
     Images = jImageList1
     BackgroundColor = colbrDefault
     ImageScaleType = scaleFitCenter
-    Id = 0
   end
   object jTimer1: jTimer
     Enabled = False

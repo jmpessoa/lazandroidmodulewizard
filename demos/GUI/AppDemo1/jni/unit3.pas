@@ -35,7 +35,6 @@ type
       procedure DataModuleCloseQuery(Sender: TObject; var CanClose: boolean);
       procedure DataModuleCreate(Sender: TObject);
       procedure DataModuleJNIPrompt(Sender: TObject);
-      procedure DataModuleRotate(Sender: TObject; rotate: integer; var rstRotate: integer);
       procedure jButton1Click(Sender: TObject);
       procedure jButton2Click(Sender: TObject);
       procedure jButton3Click(Sender: TObject);
@@ -173,11 +172,6 @@ procedure TAndroidModule3.DataModuleJNIPrompt(Sender: TObject);
 begin
   jTimer3.Enabled:= True;
   jEditText1.SetFocus;
-end;
-
-procedure TAndroidModule3.DataModuleRotate(Sender: TObject; rotate: integer; var rstRotate: integer);
-begin
-  Self.UpdateLayout;
 end;
 
 end.

@@ -11,8 +11,8 @@ object AndroidModule3: TAndroidModule3
   Text = 'AndroidModule3'
   ActivityMode = actRecyclable
   BackgroundColor = colbrBlack
+  ActionBarTitle = abtDefault
   OnCloseQuery = DataModuleCloseQuery
-  OnRotate = DataModuleRotate
   OnJNIPrompt = DataModuleJNIPrompt
   OnClose = DataModuleClose
   object jButton1: jButton
@@ -26,6 +26,7 @@ object AndroidModule3: TAndroidModule3
     MarginBottom = 5
     Visible = True
     Anchor = jTextView1
+    Id = 85722
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = []
     LayoutParamWidth = lpHalfOfParent
@@ -36,7 +37,6 @@ object AndroidModule3: TAndroidModule3
     FontSize = 0
     FontSizeUnit = unitDefault
     OnClick = jButton1Click
-    Id = 85722
   end
   object jTextView1: jTextView
     Left = 110
@@ -48,6 +48,7 @@ object AndroidModule3: TAndroidModule3
     MarginRight = 10
     MarginBottom = 10
     Visible = True
+    Id = 92902
     PosRelativeToAnchor = []
     PosRelativeToParent = [rpCenterHorizontal]
     LayoutParamWidth = lpWrapContent
@@ -60,7 +61,6 @@ object AndroidModule3: TAndroidModule3
     FontSize = 0
     TextTypeFace = tfNormal
     FontSizeUnit = unitDefault
-    Id = 92902
   end
   object jButton2: jButton
     Left = 151
@@ -73,6 +73,7 @@ object AndroidModule3: TAndroidModule3
     MarginBottom = 5
     Visible = True
     Anchor = jButton1
+    Id = 0
     PosRelativeToAnchor = [raToRightOf, raAlignBaseline]
     PosRelativeToParent = []
     LayoutParamWidth = lpHalfOfParent
@@ -83,7 +84,6 @@ object AndroidModule3: TAndroidModule3
     FontSize = 0
     FontSizeUnit = unitDefault
     OnClick = jButton2Click
-    Id = 0
   end
   object jButton3: jButton
     Left = 5
@@ -96,6 +96,7 @@ object AndroidModule3: TAndroidModule3
     MarginBottom = 5
     Visible = True
     Anchor = jEditText1
+    Id = 51708
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = []
     LayoutParamWidth = lpMatchParent
@@ -106,7 +107,6 @@ object AndroidModule3: TAndroidModule3
     FontSize = 0
     FontSizeUnit = unitDefault
     OnClick = jButton3Click
-    Id = 51708
   end
   object jProgressBar1: jProgressBar
     Left = 10
@@ -119,6 +119,7 @@ object AndroidModule3: TAndroidModule3
     MarginBottom = 10
     Visible = False
     Anchor = jButton3
+    Id = 70807
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = []
     LayoutParamWidth = lpMatchParent
@@ -127,7 +128,6 @@ object AndroidModule3: TAndroidModule3
     BackgroundColor = colbrDefault
     Progress = 0
     Max = 100
-    Id = 70807
   end
   object jEditText1: jEditText
     Tag = 1
@@ -141,6 +141,7 @@ object AndroidModule3: TAndroidModule3
     MarginBottom = 10
     Visible = True
     Anchor = jTextView2
+    Id = 75870
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = []
     LayoutParamWidth = lpHalfOfParent
@@ -160,7 +161,6 @@ object AndroidModule3: TAndroidModule3
     WrappingLine = True
     Editable = True
     FontSizeUnit = unitDefault
-    Id = 75870
   end
   object jCheckBox1: jCheckBox
     Left = 5
@@ -173,6 +173,7 @@ object AndroidModule3: TAndroidModule3
     MarginBottom = 5
     Visible = True
     Anchor = jButton1
+    Id = 89086
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = []
     LayoutParamWidth = lpMatchParent
@@ -184,7 +185,6 @@ object AndroidModule3: TAndroidModule3
     Checked = False
     FontSizeUnit = unitDefault
     OnClick = jCheckBox1Click
-    Id = 89086
   end
   object jRadioButton1: jRadioButton
     Left = 5
@@ -197,6 +197,7 @@ object AndroidModule3: TAndroidModule3
     MarginBottom = 5
     Visible = True
     Anchor = jCheckBox1
+    Id = 48346
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = []
     LayoutParamWidth = lpMatchParent
@@ -208,7 +209,6 @@ object AndroidModule3: TAndroidModule3
     Checked = False
     FontSizeUnit = unitDefault
     OnClick = jRadioButton1Click
-    Id = 48346
   end
   object jButton4: jButton
     Left = 161
@@ -221,6 +221,7 @@ object AndroidModule3: TAndroidModule3
     MarginBottom = 5
     Visible = True
     Anchor = jEditText1
+    Id = 92903
     PosRelativeToAnchor = [raToRightOf, raAlignBaseline]
     PosRelativeToParent = []
     LayoutParamWidth = lpMatchParent
@@ -231,7 +232,6 @@ object AndroidModule3: TAndroidModule3
     FontSize = 0
     FontSizeUnit = unitDefault
     OnClick = jButton4Click
-    Id = 0
   end
   object jTextView2: jTextView
     Left = 10
@@ -244,6 +244,7 @@ object AndroidModule3: TAndroidModule3
     MarginBottom = 10
     Visible = True
     Anchor = jRadioButton1
+    Id = 62160
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = []
     LayoutParamWidth = lpMatchParent
@@ -256,19 +257,19 @@ object AndroidModule3: TAndroidModule3
     FontSize = 0
     TextTypeFace = tfNormal
     FontSizeUnit = unitDefault
-    Id = 62160
   end
   object jImageView1: jImageView
-    Left = 126
+    Left = 80
     Top = 366
-    Width = 48
-    Height = 48
+    Width = 140
+    Height = 60
     MarginLeft = 0
     MarginTop = 0
     MarginRight = 0
     MarginBottom = 0
     Visible = True
     Anchor = jProgressBar1
+    Id = 92904
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = [rpCenterHorizontal]
     LayoutParamWidth = lpWrapContent
@@ -277,7 +278,6 @@ object AndroidModule3: TAndroidModule3
     Images = jImageList1
     BackgroundColor = colbrDefault
     ImageScaleType = scaleCenter
-    Id = 0
   end
   object jDialogYN1: jDialogYN
     Title = 'jDialogYesNo'

@@ -22,6 +22,7 @@ object AndroidModule14: TAndroidModule14
     MarginRight = 10
     MarginBottom = 10
     Visible = True
+    Id = 41380
     PosRelativeToAnchor = []
     PosRelativeToParent = [rpCenterHorizontal]
     LayoutParamWidth = lpWrapContent
@@ -34,7 +35,6 @@ object AndroidModule14: TAndroidModule14
     FontSize = 0
     TextTypeFace = tfNormal
     FontSizeUnit = unitDefault
-    Id = 41380
   end
   object jButton1: jButton
     Left = 5
@@ -47,6 +47,7 @@ object AndroidModule14: TAndroidModule14
     MarginBottom = 5
     Visible = True
     Anchor = jCheckBox1
+    Id = 67114
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = []
     LayoutParamWidth = lpMatchParent
@@ -57,7 +58,6 @@ object AndroidModule14: TAndroidModule14
     FontSize = 0
     FontSizeUnit = unitDefault
     OnClick = jButton1Click
-    Id = 67114
   end
   object jProgressBar1: jProgressBar
     Left = 10
@@ -70,6 +70,7 @@ object AndroidModule14: TAndroidModule14
     MarginBottom = 10
     Visible = False
     Anchor = jButton1
+    Id = 24359
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = []
     LayoutParamWidth = lpMatchParent
@@ -78,7 +79,6 @@ object AndroidModule14: TAndroidModule14
     BackgroundColor = colbrDefault
     Progress = 0
     Max = 100
-    Id = 24359
   end
   object jTextView2: jTextView
     Left = 10
@@ -91,6 +91,7 @@ object AndroidModule14: TAndroidModule14
     MarginBottom = 10
     Visible = True
     Anchor = jProgressBar1
+    Id = 69640
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = [rpLeft]
     LayoutParamWidth = lpWrapContent
@@ -103,7 +104,6 @@ object AndroidModule14: TAndroidModule14
     FontSize = 0
     TextTypeFace = tfNormal
     FontSizeUnit = unitDefault
-    Id = 69640
   end
   object jEditText1: jEditText
     Left = 10
@@ -116,6 +116,7 @@ object AndroidModule14: TAndroidModule14
     MarginBottom = 10
     Visible = True
     Anchor = jTextView2
+    Id = 45472
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = []
     LayoutParamWidth = lpMatchParent
@@ -135,7 +136,6 @@ object AndroidModule14: TAndroidModule14
     WrappingLine = True
     Editable = True
     FontSizeUnit = unitDefault
-    Id = 45472
   end
   object jTextView3: jTextView
     Left = 10
@@ -148,6 +148,7 @@ object AndroidModule14: TAndroidModule14
     MarginBottom = 10
     Visible = True
     Anchor = jEditText1
+    Id = 47102
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = [rpLeft]
     LayoutParamWidth = lpWrapContent
@@ -160,32 +161,37 @@ object AndroidModule14: TAndroidModule14
     FontSize = 0
     TextTypeFace = tfNormal
     FontSizeUnit = unitDefault
-    Id = 47102
   end
   object jScrollView1: jScrollView
-    Left = 3
-    Top = 414
-    Width = 291
+    Left = 5
+    Top = 416
+    Width = 285
     Height = 136
+    MarginLeft = 5
+    MarginTop = 5
+    MarginRight = 5
+    MarginBottom = 5
     Visible = True
     Anchor = jTextView3
+    Id = 0
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = []
     LayoutParamWidth = lpMatchParent
     LayoutParamHeight = lpOneQuarterOfParent
+    FillViewportEnabled = False
     ScrollSize = 800
     BackgroundColor = colbrSkyBlue
-    Id = 0
     object jEditText2: jEditText
       Left = 34
       Top = 19
-      Width = 222
+      Width = 216
       Height = 97
       MarginLeft = 5
       MarginTop = 10
       MarginRight = 30
       MarginBottom = 10
       Visible = True
+      Id = 0
       PosRelativeToAnchor = []
       PosRelativeToParent = [rpCenterInParent]
       LayoutParamWidth = lpMatchParent
@@ -205,7 +211,6 @@ object AndroidModule14: TAndroidModule14
       WrappingLine = False
       Editable = True
       FontSizeUnit = unitDefault
-      Id = 0
     end
   end
   object jCheckBox1: jCheckBox
@@ -219,6 +224,7 @@ object AndroidModule14: TAndroidModule14
     MarginBottom = 5
     Visible = True
     Anchor = jTextView1
+    Id = 2231034
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = [rpLeft]
     LayoutParamWidth = lpWrapContent
@@ -230,7 +236,6 @@ object AndroidModule14: TAndroidModule14
     Checked = False
     FontSizeUnit = unitDefault
     OnClick = jCheckBox1Click
-    Id = 2231034
   end
   object jHttpClient1: jHttpClient
     CharSet = 'UTF-8'

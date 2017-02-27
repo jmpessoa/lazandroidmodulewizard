@@ -12,7 +12,6 @@ object AndroidModule6: TAndroidModule6
   BackgroundColor = colbrBlack
   ActionBarTitle = abtDefault
   OnCloseQuery = DataModuleCloseQuery
-  OnRotate = DataModuleRotate
   object jTextView1: jTextView
     Left = 105
     Top = 10
@@ -23,6 +22,7 @@ object AndroidModule6: TAndroidModule6
     MarginRight = 10
     MarginBottom = 10
     Visible = True
+    Id = 26515
     PosRelativeToAnchor = []
     PosRelativeToParent = [rpTop, rpCenterHorizontal]
     LayoutParamWidth = lpWrapContent
@@ -35,7 +35,6 @@ object AndroidModule6: TAndroidModule6
     FontSize = 0
     TextTypeFace = tfNormal
     FontSizeUnit = unitDefault
-    Id = 26515
   end
   object jTextView2: jTextView
     Left = 10
@@ -48,6 +47,7 @@ object AndroidModule6: TAndroidModule6
     MarginBottom = 10
     Visible = True
     Anchor = jTextView1
+    Id = 36024
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = [rpLeft]
     LayoutParamWidth = lpWrapContent
@@ -60,7 +60,6 @@ object AndroidModule6: TAndroidModule6
     FontSize = 0
     TextTypeFace = tfNormal
     FontSizeUnit = unitDefault
-    Id = 36024
   end
   object jEditText1: jEditText
     Tag = 1
@@ -74,6 +73,7 @@ object AndroidModule6: TAndroidModule6
     MarginBottom = 10
     Visible = True
     Anchor = jTextView2
+    Id = 53166
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = [rpLeft]
     LayoutParamWidth = lpHalfOfParent
@@ -93,7 +93,6 @@ object AndroidModule6: TAndroidModule6
     WrappingLine = True
     Editable = True
     FontSizeUnit = unitDefault
-    Id = 53166
   end
   object jButton1: jButton
     Left = 151
@@ -106,6 +105,7 @@ object AndroidModule6: TAndroidModule6
     MarginBottom = 5
     Visible = True
     Anchor = jEditText1
+    Id = 0
     PosRelativeToAnchor = [raToRightOf, raAlignBaseline]
     PosRelativeToParent = []
     LayoutParamWidth = lpHalfOfParent
@@ -116,7 +116,6 @@ object AndroidModule6: TAndroidModule6
     FontSize = 0
     FontSizeUnit = unitDefault
     OnClick = jButton1Click
-    Id = 0
   end
   object jEditText2: jEditText
     Left = 5
@@ -129,6 +128,7 @@ object AndroidModule6: TAndroidModule6
     MarginBottom = 10
     Visible = True
     Anchor = jTextView3
+    Id = 80017
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = [rpLeft]
     LayoutParamWidth = lpHalfOfParent
@@ -148,7 +148,6 @@ object AndroidModule6: TAndroidModule6
     WrappingLine = True
     Editable = True
     FontSizeUnit = unitDefault
-    Id = 80017
   end
   object jTextView3: jTextView
     Left = 10
@@ -161,6 +160,7 @@ object AndroidModule6: TAndroidModule6
     MarginBottom = 10
     Visible = True
     Anchor = jEditText1
+    Id = 5036
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = [rpLeft]
     LayoutParamWidth = lpWrapContent
@@ -173,7 +173,6 @@ object AndroidModule6: TAndroidModule6
     FontSize = 0
     TextTypeFace = tfNormal
     FontSizeUnit = unitDefault
-    Id = 5036
   end
   object jButton2: jButton
     Left = 151
@@ -186,6 +185,7 @@ object AndroidModule6: TAndroidModule6
     MarginBottom = 5
     Visible = True
     Anchor = jEditText2
+    Id = 63804
     PosRelativeToAnchor = [raToRightOf, raAlignBaseline]
     PosRelativeToParent = []
     LayoutParamWidth = lpHalfOfParent
@@ -196,7 +196,6 @@ object AndroidModule6: TAndroidModule6
     FontSize = 0
     FontSizeUnit = unitDefault
     OnClick = jButton2Click
-    Id = 63804
   end
   object jListView1: jListView
     Tag = 1
@@ -210,6 +209,7 @@ object AndroidModule6: TAndroidModule6
     MarginBottom = 0
     Visible = True
     Anchor = jButton3
+    Id = 8951
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = []
     LayoutParamWidth = lpMatchParent
@@ -233,7 +233,6 @@ object AndroidModule6: TAndroidModule6
     FontSizeUnit = unitDefault
     OnClickItem = jListView1ClickItem
     OnClickWidgetItem = jListView1ClickWidgetItem
-    Id = 8951
   end
   object jButton3: jButton
     Left = 5
@@ -246,6 +245,7 @@ object AndroidModule6: TAndroidModule6
     MarginBottom = 5
     Visible = True
     Anchor = jEditText2
+    Id = 3040099
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = []
     LayoutParamWidth = lpMatchParent
@@ -256,7 +256,6 @@ object AndroidModule6: TAndroidModule6
     FontSize = 0
     FontSizeUnit = unitDefault
     OnClick = jButton3Click
-    Id = 3040099
   end
   object jBitmap1: jBitmap
     FilePath = fpathData
