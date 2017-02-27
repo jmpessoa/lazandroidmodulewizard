@@ -1,4 +1,4 @@
-package com.example.appimagebtndemo1;
+package com.example.appgooglemapsdemo1;
 
 import java.lang.reflect.Field;
 
@@ -7,17 +7,10 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Rect;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewGroup.MarginLayoutParams;
-import android.widget.RelativeLayout;
-import android.widget.FrameLayout;
-import android.widget.LinearLayout;
-import android.view.Gravity;
 
 //-------------------------------------------------------------------------
 //jImageBtn

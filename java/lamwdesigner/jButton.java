@@ -1,4 +1,4 @@
-package com.example.appwindowmanagerdemo1;
+package com.example.appgooglemapsdemo1;
 
 import java.lang.reflect.Field;
 
@@ -139,7 +139,7 @@ public class jButton extends Button {
 		LAMWCommon.setLayoutAll(idAnchor);
 	}
 	
-	public void ClearLayoutAll() {		
+	public void ClearLayoutAll() {   //TODO Pascal		
 		LAMWCommon.clearLayoutAll();
 	}
 

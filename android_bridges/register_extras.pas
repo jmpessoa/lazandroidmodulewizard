@@ -8,6 +8,7 @@ interface
 
 uses 
   Classes,
+  gmaps,
   windowmanager,
   opendialog,
   fileprovider,
@@ -50,6 +51,7 @@ implementation
   
 Procedure Register;
 begin
+  {$I jmaps_icon.lrs}
   {$I jwindowmanager_icon.lrs}
   {$I jopendialog_icon.lrs}
   {$I jfileprovider_icon.lrs}
@@ -93,6 +95,7 @@ begin
 
   RegisterComponents('Android Bridges Extra',
    [
+      jMaps,
       jWindowManager,
       jOpenDialog,
       jFileProvider,

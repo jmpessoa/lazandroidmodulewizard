@@ -616,7 +616,6 @@ Procedure jPanel_setParent        (env:PJNIEnv;
 Function  jPanel_getView          (env:PJNIEnv;
                                         Panel : jObject) : jObject;
 
-//by jmpessoa
 Procedure jPanel_setId(env:PJNIEnv; Panel : jObject; id: DWord);
 
 Procedure jPanel_setLParamWidth(env:PJNIEnv; Panel : jObject; w: DWord);
@@ -625,7 +624,7 @@ Procedure jPanel_setLParamHeight(env:PJNIEnv; Panel : jObject; h: DWord);
 Procedure jPanel_setLeftTopRightBottomWidthHeight(env:PJNIEnv;
                                         Panel : jObject; ml,mt,mr,mb,w,h: integer);
 
-Procedure jPanel_resetLParamsRules(env:PJNIEnv; Panel : jObject);
+Procedure jPanel_resetLParamsRules(env:PJNIEnv; Panel : jObject); //clearLayoutAll !!
 
 Procedure jPanel_addLParamsParentRule(env:PJNIEnv; Panel : jObject; rule: DWord);
 
@@ -5327,7 +5326,7 @@ _jMethod:= env^.GetMethodID(env, cls, 'getLParamWidth', '()I');
 end;
 
 //by jmpessoa
-Procedure jPanel_resetLParamsRules(env:PJNIEnv; Panel : jObject);
+Procedure jPanel_resetLParamsRules(env:PJNIEnv; Panel : jObject);  //clearLayoutAll !!
 var
  _jMethod : jMethodID = nil;
  cls: jClass;
@@ -6700,11 +6699,14 @@ var
    _jMethod : jMethodID = nil;
    cls: jClass;
 begin
-  cls := env^.GetObjectClass(env, GLSurfaceView);
-  _jMethod:= env^.GetMethodID(env, cls, 'Free', '()V');
-  env^.CallVoidMethod(env,GLSurfaceView,_jMethod);
-  env^.DeleteGlobalRef(env,GLSurfaceView);
-  env^.DeleteLocalRef(env, cls);
+  if  GLSurfaceView <> nil then
+  begin
+    cls := env^.GetObjectClass(env, GLSurfaceView);
+    _jMethod:= env^.GetMethodID(env, cls, 'Free', '()V');
+    env^.CallVoidMethod(env,GLSurfaceView,_jMethod);
+    env^.DeleteGlobalRef(env,GLSurfaceView);
+    env^.DeleteLocalRef(env, cls);
+  end;
 end;
 
 Procedure jGLSurfaceView_setLeftTopRightBottomWidthHeight(env:PJNIEnv;

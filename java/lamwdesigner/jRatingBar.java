@@ -1,14 +1,9 @@
-package com.example.appdemo1;
+package com.example.appgooglemapsdemo1;
 
 import android.content.Context;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewGroup.MarginLayoutParams;
 import android.widget.RatingBar;
-import android.widget.RelativeLayout;
-import android.widget.FrameLayout;
-import android.widget.LinearLayout;
-import android.view.Gravity;
 
 /*Draft java code by "Lazarus Android Module Wizard" [12/22/2015 20:35:59]*/
 /*https://github.com/jmpessoa/lazandroidmodulewizard*/
@@ -20,28 +15,11 @@ public class jRatingBar extends RatingBar { //please, fix what GUI object will b
     private Controls   controls  = null; // Control Class for events
 
     private Context context = null;
-    private ViewGroup parent   = null;         // parent view
-    private ViewGroup.MarginLayoutParams lparams = null;              // layout XYWH
-
     private Boolean enabled  = true;           // click-touch enabled!
-    private int lparamsAnchorRule[] = new int[30];
-    private int countAnchorRule = 0;
-    private int lparamsParentRule[] = new int[30];
-    private int countParentRule = 0;
 
-    //private int lparamH = android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
-    //private int lparamW = android.view.ViewGroup.LayoutParams.MATCH_PARENT;
-    private int lparamH = 100;
-    private int lparamW = 100;
-    private int marginLeft = 5;
-    private int marginTop = 5;
-    private int marginRight = 5;
-    private int marginBottom = 5;
-    private int lgravity = Gravity.TOP | Gravity.START;
-    private float lweight = 0;
-
-    private boolean mRemovedFromParent = false;
     private OnRatingBarChangeListener onRatingBarChangeListener;
+    
+    private jCommons LAMWCommon;
 
     //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
 
@@ -50,13 +28,11 @@ public class jRatingBar extends RatingBar { //please, fix what GUI object will b
         context   = _ctrls.activity;
         pascalObj = _Self;
         controls  = _ctrls;
-
-        lparams = new ViewGroup.MarginLayoutParams(lparamW, lparamH);     // W,H
-        lparams.setMargins(marginLeft,marginTop,marginRight,marginBottom); // L,T,R,B
-
+        LAMWCommon = new jCommons(this,context,pascalObj);
+        
         onRatingBarChangeListener = new OnRatingBarChangeListener() {
             /*.*/public void onRatingChanged(RatingBar ratingBar, float rating,  boolean fromUser) {
-                controls.pOnRatingBarChanged(pascalObj, rating); //JNI event onClick!
+                controls.pOnRatingBarChanged(pascalObj, rating); 
             }
         };
         setOnRatingBarChangeListener(onRatingBarChangeListener);
@@ -66,123 +42,74 @@ public class jRatingBar extends RatingBar { //please, fix what GUI object will b
     } //end constructor
 
     public void jFree() {
-        if (parent != null) { parent.removeView(this); }
         //free local objects...
-        lparams = null;
         setOnRatingBarChangeListener(null);
+        LAMWCommon.free();
     }
 
-    private static MarginLayoutParams newLayoutParams(ViewGroup aparent, ViewGroup.MarginLayoutParams baseparams) {
-        if (aparent instanceof FrameLayout) {
-            return new FrameLayout.LayoutParams(baseparams);
-        } else if (aparent instanceof RelativeLayout) {
-            return new RelativeLayout.LayoutParams(baseparams);
-        } else if (aparent instanceof LinearLayout) {
-            return new LinearLayout.LayoutParams(baseparams);
-        } else if (aparent == null) {
-            throw new NullPointerException("Parent is null");
-        } else {
-            throw new IllegalArgumentException("Parent is neither FrameLayout or RelativeLayout or LinearLayout: "
-                    + aparent.getClass().getName());
-        }
-    }
-
+	public long GetPasObj() {
+		return LAMWCommon.getPasObj();
+	}
+	
     public void SetViewParent(ViewGroup _viewgroup) {
-        if (parent != null) { parent.removeView(this); }
-        parent = _viewgroup;
-
-        parent.addView(this,newLayoutParams(parent,(ViewGroup.MarginLayoutParams)lparams));
-        lparams = null;
-        lparams = (ViewGroup.MarginLayoutParams)this.getLayoutParams();
-
-        mRemovedFromParent = false;
+    	LAMWCommon.setParent(_viewgroup);
     }
 
+	public ViewGroup GetParent() {
+		return LAMWCommon.getParent();
+	}
+	
     public void RemoveFromViewParent() {
-        if (!mRemovedFromParent) {
-            this.setVisibility(android.view.View.INVISIBLE);
-            if (parent != null)
-                parent.removeView(this);
-            mRemovedFromParent = true;
-        }
+    	LAMWCommon.removeFromViewParent();
     }
+
 
     public View GetView() {
         return this;
     }
 
     public void SetLParamWidth(int _w) {
-        lparamW = _w;
+    	LAMWCommon.setLParamWidth(_w);
     }
 
     public void SetLParamHeight(int _h) {
-        lparamH = _h;
+    	LAMWCommon.setLParamHeight(_h);
     }
 
+	public int GetLParamHeight() {
+		return  LAMWCommon.getLParamHeight();
+	}
+
+	public int GetLParamWidth() {				
+		return LAMWCommon.getLParamWidth();					
+	}  
+    
     public void setLGravity(int _g) {
-        lgravity = _g;
+		LAMWCommon.setLGravity(_g);
     }
 
     public void setLWeight(float _w) {
-        lweight = _w;
+    	LAMWCommon.setLWeight(_w);
     }
 
     public void SetLeftTopRightBottomWidthHeight(int _left, int _top, int _right, int _bottom, int _w, int _h) {
-        marginLeft = _left;
-        marginTop = _top;
-        marginRight = _right;
-        marginBottom = _bottom;
-        lparamH = _h;
-        lparamW = _w;
+		LAMWCommon.setLeftTopRightBottomWidthHeight(_left,_top,_right,_bottom,_w,_h); 
     }
 
     public void AddLParamsAnchorRule(int _rule) {
-        lparamsAnchorRule[countAnchorRule] = _rule;
-        countAnchorRule = countAnchorRule + 1;
+    	LAMWCommon.addLParamsAnchorRule(_rule);
     }
 
     public void AddLParamsParentRule(int _rule) {
-        lparamsParentRule[countParentRule] = _rule;
-        countParentRule = countParentRule + 1;
-    }
+    	LAMWCommon.addLParamsParentRule(_rule);
+     }
 
     public void SetLayoutAll(int _idAnchor) {
-        lparams.width  = lparamW;
-        lparams.height = lparamH;
-        lparams.setMargins(marginLeft,marginTop,marginRight,marginBottom);
-
-        if (lparams instanceof RelativeLayout.LayoutParams) {
-            if (_idAnchor > 0) {
-                for (int i = 0; i < countAnchorRule; i++) {
-                    ((RelativeLayout.LayoutParams)lparams).addRule(lparamsAnchorRule[i], _idAnchor);
-                }
-            }
-            for (int j = 0; j < countParentRule; j++) {
-                ((RelativeLayout.LayoutParams)lparams).addRule(lparamsParentRule[j]);
-            }
-        }
-        if (lparams instanceof FrameLayout.LayoutParams) {
-            ((FrameLayout.LayoutParams)lparams).gravity = lgravity;
-        }
-        if (lparams instanceof LinearLayout.LayoutParams) {
-            ((LinearLayout.LayoutParams)lparams).weight = lweight;
-        }
-        //
-        this.setLayoutParams(lparams);
+    	LAMWCommon.setLayoutAll(_idAnchor);
     }
 
     public void ClearLayoutAll() {
-        if (lparams instanceof RelativeLayout.LayoutParams) {
-            for (int i = 0; i < countAnchorRule; i++) {
-                ((RelativeLayout.LayoutParams)lparams).removeRule(lparamsAnchorRule[i]);
-            }
-
-            for (int j = 0; j < countParentRule; j++) {
-                ((RelativeLayout.LayoutParams)lparams).removeRule(lparamsParentRule[j]);
-            }
-        }
-        countAnchorRule = 0;
-        countParentRule = 0;
+    	LAMWCommon.clearLayoutAll();
     }
 
     public void SetId(int _id) { //wrapper method pattern ...
@@ -227,7 +154,7 @@ public class jRatingBar extends RatingBar { //please, fix what GUI object will b
     public boolean IsIndicator() {
         return this.isIndicator();
     }
-
+      
 } //end class
 
 

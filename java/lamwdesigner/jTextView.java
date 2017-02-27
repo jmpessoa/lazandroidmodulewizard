@@ -1,4 +1,4 @@
-package com.example.apptextviewshaderandshadowdemo1;
+package com.example.appgooglemapsdemo1;
 
 import java.lang.reflect.Field;
 
@@ -122,7 +122,7 @@ public class jTextView extends TextView {
 		LAMWCommon.setLayoutAll(idAnchor);
 	}
 	
-	public void ClearLayoutAll() {		
+	public void ClearLayoutAll() {		 //TODO Pascal
 		LAMWCommon.clearLayoutAll();
 	}
 

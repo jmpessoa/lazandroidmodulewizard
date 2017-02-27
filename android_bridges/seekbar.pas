@@ -110,7 +110,7 @@ begin
   FMarginRight  := 10;
   FHeight       := 30; //??
   FWidth        := 100; //??
-  FLParamWidth  := lpMatchParent;  //lpWrapContent
+  FLParamWidth  := lpOneThirdOfParent;  //lpWrapContent
   FLParamHeight := lpWrapContent; //lpMatchParent
   FAcceptChildrenAtDesignTime:= False;
 //your code here....

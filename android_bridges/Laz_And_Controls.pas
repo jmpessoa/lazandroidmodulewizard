@@ -159,7 +159,7 @@ type
 
   jCanvas = class;
 
-  TOnDraw  = Procedure(Sender: TObject; Canvas: jCanvas) of object;
+  TOnDraw  = Procedure(Sender: TObject) of object;
 
   TSqliteFieldType = (ftNull,ftInteger,ftFloat,ftString,ftBlob);
 
@@ -1494,7 +1494,7 @@ type
     procedure UpdateLParamWidth;
   protected
     Procedure GenEvent_OnTouch(Obj: TObject; Act,Cnt: integer; X1,Y1,X2,Y2: single);
-    Procedure GenEvent_OnDraw (Obj: TObject; jCanvas: jObject);
+    Procedure GenEvent_OnDraw (Obj: TObject);
     procedure Notification(AComponent: TComponent; Operation: TOperation); override;
   public
     constructor Create(AOwner: TComponent); override;
@@ -2103,7 +2103,7 @@ begin
   begin
     jView(Obj).UpdateJNI(gApp);
     jForm(jView(Obj).Owner).UpdateJNI(gApp);
-    jView(Obj).GenEvent_OnDraw(Obj, jCanvas);
+    jView(Obj).GenEvent_OnDraw(Obj);
   end;
 end;
 
@@ -8172,7 +8172,6 @@ begin
     jView_setjCanvas(FjEnv,FjObject ,FjCanvas.JavaObj);
   end;
 
-
   if FParent <> nil then
   begin
     if FParent is jPanel then
@@ -8279,9 +8278,9 @@ begin
 end;
 
 // Event : Java Event -> Pascal
-Procedure jView.GenEvent_OnDraw(Obj: TObject; jCanvas: jObject);
+Procedure jView.GenEvent_OnDraw(Obj: TObject);
 begin
-  if Assigned(FOnDraw) then FOnDraw(Obj, jCanvas{FjCanvas});
+  if Assigned(FOnDraw) then FOnDraw(Obj);
 end;
 
 procedure jView.UpdateLParamWidth;

@@ -6124,11 +6124,14 @@ var
   cls: jClass;
   method: jmethodID;
 begin
-  cls := env^.GetObjectClass(env, Form);
-  method:= env^.GetMethodID(env, cls, 'Free', '()V');
-  env^.CallVoidMethod(env, Form, method);
-  env^.DeleteGlobalRef(env,Form);
-  env^.DeleteLocalRef(env, cls);
+  if Form <> nil then
+  begin
+    cls := env^.GetObjectClass(env, Form);
+    method:= env^.GetMethodID(env, cls, 'Free', '()V');
+    env^.CallVoidMethod(env, Form, method);
+    env^.DeleteGlobalRef(env,Form);
+    env^.DeleteLocalRef(env, cls);
+  end;
 end;
 
 //addView( layout )
@@ -6196,7 +6199,8 @@ end;
 //by jmpessoa
 Procedure jForm_FreeLayout(env:PJNIEnv;Layout: jObject);
 begin
-  env^.DeleteGlobalRef(env, Layout);
+  if Layout <> nil then
+     env^.DeleteGlobalRef(env, Layout);
 end;
 
 Procedure jForm_SetVisibility2(env:PJNIEnv;Form : jObject; visible : boolean);

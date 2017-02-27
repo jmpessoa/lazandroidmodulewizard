@@ -1,6 +1,6 @@
 package com.example.apptextviewshaderandshadowdemo1;
 
-//LAMW: Lazarus Android Module Wizard  - version 0.7 - rev. 12 - 22 Feb - 2017 
+//LAMW: Lazarus Android Module Wizard  - version 0.7 - rev. 13 - 27 Feb - 2017 
 //RAD Android: Project Wizard, Form Designer and Components Development Model!
 
 //https://github.com/jmpessoa/lazandroidmodulewizard

@@ -1,0 +1,3 @@
+public java.lang.Object jMaps_jCreate(long _Self) {
+  return (java.lang.Object)(new jMaps(this,_Self));
+}

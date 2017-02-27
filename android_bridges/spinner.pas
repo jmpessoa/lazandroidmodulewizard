@@ -141,7 +141,7 @@ begin
   FMarginRight  := 5;
   FHeight       := 40;
   FWidth        := 96;
-  FLParamWidth  := lpMatchParent;  //lpWrapContent
+  FLParamWidth  := lpOneThirdOfParent;  //lpWrapContent
   FLParamHeight := lpWrapContent; //lpMatchParent
 
   //your code here....

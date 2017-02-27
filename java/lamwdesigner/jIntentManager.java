@@ -1,4 +1,4 @@
-package com.example.appactivitydemo1;
+package com.example.appintentdemomaps1;
 
 import java.util.Iterator;
 import java.util.List;
@@ -389,20 +389,27 @@ Sending Data: Extras vs. URI Parameters
       
    public void SetAction(int  _intentAction) {	 
 	  switch(_intentAction) { 
-	    case 0: mIntent.setAction("android.intent.action.VIEW"); //
-	    case 1: mIntent.setAction("android.intent.action.PICK"); //
-	    case 2: mIntent.setAction("android.intent.action.SENDTO"); //
-	    case 3: mIntent.setAction("android.intent.action.DIAL"); //
-	    case 4: mIntent.setAction("android.intent.action.CALL_BUTTON"); //
-	    case 5: mIntent.setAction( "android.intent.action.CALL");
-	    case 6: mIntent.setAction("android.media.action.IMAGE_CAPTURE"); //
-	    case 7: mIntent.setAction(Settings.ACTION_DATA_ROAMING_SETTINGS);
-	    case 8: mIntent.setAction(Settings.ACTION_QUICK_LAUNCH_SETTINGS);
-	    case 9: mIntent.setAction(Settings.ACTION_DATE_SETTINGS);
-	    case 10: mIntent.setAction(Settings.ACTION_SETTINGS);  //system settings
-	    case 11: mIntent.setAction(Settings.ACTION_WIRELESS_SETTINGS);	    
-	    case 12: mIntent.setAction(Settings.ACTION_DEVICE_INFO_SETTINGS);
-	    
+	    case 0: mIntent.setAction("android.intent.action.VIEW"); break;
+	    case 1: mIntent.setAction("android.intent.action.PICK"); break; 
+	    case 2: mIntent.setAction("android.intent.action.SENDTO"); break; 
+	    case 3: mIntent.setAction("android.intent.action.DIAL"); break; 
+	    case 4: mIntent.setAction("android.intent.action.CALL_BUTTON");  break;
+	    case 5: mIntent.setAction( "android.intent.action.CALL"); break;
+	    case 6: mIntent.setAction("android.media.action.IMAGE_CAPTURE"); break;
+	    case 7: mIntent.setAction(Settings.ACTION_DATA_ROAMING_SETTINGS); break;
+	    case 8: mIntent.setAction(Settings.ACTION_QUICK_LAUNCH_SETTINGS); break;
+	    case 9: mIntent.setAction(Settings.ACTION_DATE_SETTINGS); break;
+	    case 10: mIntent.setAction(Settings.ACTION_SETTINGS);   break;//system settings
+	    case 11: mIntent.setAction(Settings.ACTION_WIRELESS_SETTINGS); break;	    
+	    case 12: mIntent.setAction(Settings.ACTION_DEVICE_INFO_SETTINGS); break;
+	    case 13: mIntent.setAction(android.content.Intent.ACTION_SEND); break;
+	    case 14: mIntent.setAction(android.content.Intent.ACTION_SEND_MULTIPLE); break;	    
+	    case 15: mIntent.setAction(android.content.Intent.ACTION_PICK_ACTIVITY); break;	
+	    case 16: mIntent.setAction(android.content.Intent.ACTION_EDIT); break;
+	    case 17: mIntent.setAction(android.content.Intent.ACTION_GET_CONTENT); break;
+	    case 18: mIntent.setAction(android.content.Intent.ACTION_TIME_TICK); break;
+	    case 19: mIntent.setAction(android.content.Intent.ACTION_VOICE_COMMAND); break;
+	    case 20: mIntent.setAction(android.content.Intent.ACTION_WEB_SEARCH); 	    
 	  }
 	  
    }
@@ -607,6 +614,10 @@ Sending Data: Extras vs. URI Parameters
 
    public void PutExtraText(String _text) {	  
 	   mIntent.putExtra(android.content.Intent.EXTRA_TEXT, _text);
+   }
+   
+   public void SetPackage(String _packageName) {
+	   mIntent.setPackage(_packageName);
    }
    
 }

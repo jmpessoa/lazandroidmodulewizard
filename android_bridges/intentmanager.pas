@@ -119,6 +119,7 @@ jIntentManager = class(jControl)
     procedure StartService();
     procedure SetClass(_packageName: string; _javaClassName: string); overload;
     procedure PutExtraText(_text: string);
+    procedure SetPackage(_packageName: string);
 
  published
     property IntentAction: TIntentAction read FIntentAction write SetIntentAction;
@@ -207,6 +208,7 @@ procedure jIntentManager_StartService(env: PJNIEnv; _jintentmanager: JObject);
 
 procedure jIntentManager_SetClass(env: PJNIEnv; _jintentmanager: JObject; _packageName: string; _javaClassName: string);overload;
 procedure jIntentManager_PutExtraText(env: PJNIEnv; _jintentmanager: JObject; _text: string);
+procedure jIntentManager_SetPackage(env: PJNIEnv; _jintentmanager: JObject; _packageName: string);
 
 implementation
 
@@ -789,6 +791,13 @@ begin
   //in designing component state: set value here...
   if FInitialized then
      jIntentManager_PutExtraText(FjEnv, FjObject, _text);
+end;
+
+procedure jIntentManager.SetPackage(_packageName: string);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jIntentManager_SetPackage(FjEnv, FjObject, _packageName);
 end;
 
 {-------- jIntentManager_JNI_Bridge ----------}
@@ -2179,5 +2188,20 @@ begin
   env^.DeleteLocalRef(env,jParams[0].l);
   env^.DeleteLocalRef(env, jCls);
 end;
+
+procedure jIntentManager_SetPackage(env: PJNIEnv; _jintentmanager: JObject; _packageName: string);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_packageName));
+  jCls:= env^.GetObjectClass(env, _jintentmanager);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetPackage', '(Ljava/lang/String;)V');
+  env^.CallVoidMethodA(env, _jintentmanager, jMethod, @jParams);
+env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
 
 end.

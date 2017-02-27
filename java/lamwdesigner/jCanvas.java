@@ -1,4 +1,4 @@
-package com.example.applistviewdemo;
+package com.example.appgooglemapsdemo1;
 
 import javax.microedition.khronos.opengles.GL10;
 

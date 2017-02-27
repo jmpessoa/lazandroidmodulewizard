@@ -37,14 +37,13 @@
 			http://forum.lazarus.freepascal.org/index.php/topic,22079.0.html
 
 			-warning:	
-				.We use a modified and expanded version of Simonsayz's "Controls.java" 
-				.We use a modified and expanded version of Simonsayz's "App.java" 
+				.We use a modified and expanded version of Simonsayz's java templates.
 
 		-Leledumbo - Many collaborations and suggestions!
 
 		-Stephano  - Many collaborations and suggestions!
 
-		-x2nie [Lazarus 1.3 patch to No LCL form designer!] 
+		-x2nie [Lazarus 1.3 patch to no LCL form designer!] 
 			http://github.com/x2nie/LiteZarus
 
 		-Fatih KILIÇ - How To Install!
@@ -125,22 +124,32 @@
 	*
 	****************************************************************************************************
 
+Version 0.7.13 - 27 - Feb - 2017
+
+	NEW! jMaps component  [A wrapper to run google app "Maps"]
+
+	NEW! demo AppMapsDemo1
+
+	REFACTORING!
+		All java tamplates are now in compliance with @DonAlfredo's "jCommons.java"
+		and [try] SDK API >= 13 compatible [thanks to @tk]
+
 Version 0.7.12 - 22 - Feb - 2017
 
 	IMPROVED! 
-		jTextView:news methods
+		jTextView: news methods
 				SetShadowLayer
 				SetShaderLinearGradient
 				SetShaderRadialGradient
 				SetShaderSweepGradient
 				SetTextDirection //thanks to  @majid.ebru
 
-			news event
+			new event
 				OnLayouting   
 
-		jEditText:new method
+		jEditText: new method
 				SetTextDirection //thanks to  @majid.ebru
-				[warning: add android:supportsRtl="true" to the <application> element in manifest file.				]
+				[warning: added android:supportsRtl="true" to the <application> element in manifest file.				]
 
 			new event
 				OnLayouting
@@ -590,7 +599,7 @@ Version 0.6 - rev. 34 - 14 July 2015 -
 	NEW!
 		FontSizeUnit component property [ unitDefault  <--> unitScaledPixel ]
 
-		Hint:  try FontSizeUnit=unitPixel [jListView and jSpinner more responsive] and better developer experience! 
+		Hint:  try FontSizeUnit=unitPixel  [jListView and jSpinner more responsive] and better developer experience! 
 
 	HINT 1: Old Projects: upgrade your projects code templates !
 			Lazarus IDE --> menu Tools --> [Lamw] Android Module Wizard --> Upgrade code Templates [*.lpr, *.java]

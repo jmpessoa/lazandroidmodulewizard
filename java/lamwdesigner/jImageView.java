@@ -1,4 +1,4 @@
-package com.example.appwindowmanagerdemo1;
+package com.example.appgooglemapsdemo1;
 
 import java.io.FileNotFoundException;
 import java.io.InputStream;
@@ -20,58 +20,20 @@ import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.view.View;
-import android.view.ViewGroup;
-import android.view.ViewGroup.MarginLayoutParams;
 import android.widget.ImageView;
-import android.widget.RelativeLayout;
-import android.widget.FrameLayout;
-import android.widget.LinearLayout;
-import android.view.Gravity;
-
 
 public class jImageView extends ImageView {
 	//Pascal Interface
 	private long           PasObj   = 0;      // Pascal Obj
 	private Controls        controls = null;   // Control Cass for Event
+	private jCommons LAMWCommon;
 	//
-	private ViewGroup       parent   = null;   // parent view
-	private ViewGroup.MarginLayoutParams lparams = null;              // layout XYWH
 	private OnClickListener onClickListener;   //
 	public  Bitmap          bmp      = null;   //
-
-	//by jmpessoa
-	private int lparamsAnchorRule[] = new int[30];
-	int countAnchorRule = 0;
-
-	private int lparamsParentRule[] = new int[30];
-	int countParentRule = 0;
-
-	int lparamH = android.view.ViewGroup.LayoutParams.WRAP_CONTENT; //h
-	int lparamW = android.view.ViewGroup.LayoutParams.WRAP_CONTENT; //w
-	int marginLeft = 5;
-	int marginTop = 5;
-	int marginRight = 5;
-	int marginBottom = 5;
- //[ifdef_api14up]
- private int lgravity = Gravity.TOP | Gravity.START;
- //[endif_api14up]
- /* //[endif_api14up]
- private int lgravity = Gravity.TOP | Gravity.LEFT;
- //[ifdef_api14up] */
-	private float lweight = 0;
-
+	
 	Matrix mMatrix;
 	int mRadius = 20;
 
-	//by jmpessoa
-	public void setMarginRight(int x) {
-		marginRight = x;
-	}
-
-	//by jmpessoa
-	public void setMarginBottom(int y) {
-		marginBottom = y;
-	}
 	//Constructor
 	public  jImageView(android.content.Context context,
 					   Controls ctrls,long pasobj ) {
@@ -80,10 +42,7 @@ public class jImageView extends ImageView {
 		//Connect Pascal I/F
 		PasObj   = pasobj;
 		controls = ctrls;
-
-		//Init Class
-		lparams = new ViewGroup.MarginLayoutParams(lparamW, lparamH);     // W,H
-		lparams.setMargins(marginLeft,marginTop,marginRight,marginBottom); // L,T,R,B
+		LAMWCommon = new jCommons(this,context,pasobj);
 
 		//setAdjustViewBounds(false);
 		setScaleType(ImageView.ScaleType.CENTER);
@@ -97,56 +56,29 @@ public class jImageView extends ImageView {
 		};
 
 		setOnClickListener(onClickListener);
-
 		//this.setWillNotDraw(false); //false = fire OnDraw after Invalited ... true = not fire onDraw... thanks to tintinux
 	}
 
 	public void setLeftTopRightBottomWidthHeight(int _left, int _top, int _right, int _bottom, int _w, int _h) {
-		marginLeft = _left;
-		marginTop = _top;
-		marginRight = _right;
-		marginBottom = _bottom;
-		lparamH = _h;
-		lparamW = _w;
+		LAMWCommon.setLeftTopRightBottomWidthHeight(_left,_top,_right,_bottom,_w,_h);
 	}
 
-	private static MarginLayoutParams newLayoutParams(ViewGroup aparent, ViewGroup.MarginLayoutParams baseparams) {
-		if (aparent instanceof FrameLayout) {
-			return new FrameLayout.LayoutParams(baseparams);
-		} else if (aparent instanceof RelativeLayout) {
-			return new RelativeLayout.LayoutParams(baseparams);
-		} else if (aparent instanceof LinearLayout) {
-			return new LinearLayout.LayoutParams(baseparams);
-		} else if (aparent == null) {
-			throw new NullPointerException("Parent is null");
-		} else {
-			throw new IllegalArgumentException("Parent is neither FrameLayout or RelativeLayout or LinearLayout: "
-					+ aparent.getClass().getName());
-		}
-	}
 
 	public  void setParent( android.view.ViewGroup _viewgroup ) {
-		if (parent != null) { parent.removeView(this); }
-		parent = _viewgroup;
-
-		parent.addView(this,newLayoutParams(parent,(ViewGroup.MarginLayoutParams)lparams));
-		lparams = null;
-		lparams = (ViewGroup.MarginLayoutParams)this.getLayoutParams();
+		LAMWCommon.setParent(_viewgroup);
 	}
 
 	//Free object except Self, Pascal Code Free the class.
 	public  void Free() {
-		if (parent != null) { parent.removeView(this); }
 		if (bmp    != null) { bmp.recycle(); }
 		bmp     = null;
 		setImageBitmap(null);
-		lparams = null;
 		setImageResource(0); //android.R.color.transparent;
 		onClickListener = null;
 		setOnClickListener(null);
 		mMatrix = null;
+		LAMWCommon.free();		
 	}
-
 
 	private Bitmap GetResizedBitmap(Bitmap _bmp, int _newWidth, int _newHeight){
 		float factorH = _newHeight / (float)_bmp.getHeight();
@@ -204,7 +136,6 @@ public class jImageView extends ImageView {
 		this.invalidate();
 	}
 
-	//by jmpessoa
 	public int GetDrawableResourceId(String _resName) {
 		try {
 			Class<?> res = R.drawable.class;
@@ -218,7 +149,6 @@ public class jImageView extends ImageView {
 		}
 	}
 
-	//by jmpessoa
 	public Drawable GetDrawableResourceById(int _resID) {
 		return (Drawable)( this.controls.activity.getResources().getDrawable(_resID));
 	}
@@ -230,49 +160,36 @@ public class jImageView extends ImageView {
 		this.invalidate();
 	}
 
-	//by jmpessoa
 	public void setLParamWidth(int _w) {
-		lparamW = _w;
-		lparams.width = lparamW;
+		LAMWCommon.setLParamWidth(_w);
 	}
 
-	public void setLParamHeight(int _h) {
-		lparamH = _h;
-		lparams.height = lparamH;
+	public void setLParamHeight(int _h) {		
+		LAMWCommon.setLParamHeight(_h);
 	}
 
 	public void setLGravity(int _g) {
-		lgravity = _g;
+		LAMWCommon.setLGravity(_g);
 	}
 
 	public void setLWeight(float _w) {
-		lweight = _w;
+		LAMWCommon.setLWeight(_w);
 	}
 
 	public int getLParamHeight() {
-		int r = lparamH;		
-		if (r == android.view.ViewGroup.LayoutParams.WRAP_CONTENT) {
-			r = this.getHeight();
-		}		
-		return r;
+		return  LAMWCommon.getLParamHeight();
 	}
 
 	public int getLParamWidth() {				
-		int r = lparamW;		
-		if (r == android.view.ViewGroup.LayoutParams.WRAP_CONTENT) {
-			r = this.getWidth();
-		}		
-		return r;		
+		return LAMWCommon.getLParamWidth();
 	}
 
-	//by jmpessoa
 	public int GetBitmapHeight() {
 		if (bmp != null) {
 			return this.bmp.getHeight();
 		} else return 0;
 	}
 
-	//by jmpessoa
 	public int GetBitmapWidth() {
 		if (bmp != null) {
 			return this.bmp.getWidth();
@@ -280,65 +197,19 @@ public class jImageView extends ImageView {
 	}
 
 	public void addLParamsAnchorRule(int rule) {
-		lparamsAnchorRule[countAnchorRule] = rule;
-		countAnchorRule = countAnchorRule + 1;
+		LAMWCommon.addLParamsAnchorRule(rule);
 	}
 
 	public void addLParamsParentRule(int rule) {
-		lparamsParentRule[countParentRule] = rule;
-		countParentRule = countParentRule + 1;
+		LAMWCommon.addLParamsParentRule(rule);
 	}
 
-	//by jmpessoa
 	public void setLayoutAll(int idAnchor) {
-		lparams.width  = lparamW; //matchParent;
-		lparams.height = lparamH; //wrapContent;
-		lparams.setMargins(marginLeft, marginTop,marginRight,marginBottom);
-
-		if (lparams instanceof RelativeLayout.LayoutParams) {
-			if (idAnchor > 0) {
-				for (int i = 0; i < countAnchorRule; i++) {
-					((RelativeLayout.LayoutParams)lparams).addRule(lparamsAnchorRule[i], idAnchor);
-				}
-			}
-
-			for (int j = 0; j < countParentRule; j++) {
-				((RelativeLayout.LayoutParams)lparams).addRule(lparamsParentRule[j]);
-			}
-		}
-		if (lparams instanceof FrameLayout.LayoutParams) {
-			((FrameLayout.LayoutParams)lparams).gravity = lgravity;
-		}
-		if (lparams instanceof LinearLayout.LayoutParams) {
-			((LinearLayout.LayoutParams)lparams).weight = lweight;
-		}
-		//
-		setLayoutParams(lparams);
+		LAMWCommon.setLayoutAll(idAnchor);
 	}
 
 	public void ClearLayoutAll() {
-		if (lparams instanceof RelativeLayout.LayoutParams) {
-			for (int i = 0; i < countAnchorRule; i++) {								
-			  if(Build.VERSION.SDK_INT < 17)
-				  ((android.widget.RelativeLayout.LayoutParams) lparams).addRule(lparamsAnchorRule[i], 0);
-				
-//[ifdef_api17up]
-			 if(Build.VERSION.SDK_INT >= 17)
-				((android.widget.RelativeLayout.LayoutParams) lparams).removeRule(lparamsAnchorRule[i]); //need API >= 17!
-//[endif_api17up]
-			}
-			for (int j = 0; j < countParentRule; j++) {
-			  if(Build.VERSION.SDK_INT < 17) 
-				  ((android.widget.RelativeLayout.LayoutParams) lparams).addRule(lparamsParentRule[j], 0);
-				
-//[ifdef_api17up]
-			if(Build.VERSION.SDK_INT >= 17)
-				  ((android.widget.RelativeLayout.LayoutParams) lparams).removeRule(lparamsParentRule[j]);  //need API >= 17!
-//[endif_api17up]
-			}
-		}
-		countAnchorRule = 0;
-		countParentRule = 0;
+		LAMWCommon.clearLayoutAll();
 	}
 
 	/*
@@ -362,10 +233,8 @@ public class jImageView extends ImageView {
 	}
 
 	public void SetImageMatrixScale(float _scaleX, float _scaleY ) {
-		if ( this.getScaleType() != ImageView.ScaleType.MATRIX)  this.setScaleType(ImageView.ScaleType.MATRIX);
-		//Log.i("scaleX=" + _scaleX, "    scaleY= " + _scaleY);
+		if ( this.getScaleType() != ImageView.ScaleType.MATRIX)  this.setScaleType(ImageView.ScaleType.MATRIX);	
 		mMatrix.setScale(_scaleX, _scaleY);
-		//mMatrix.postScale(_scaleX, _scaleX);
 		this.setImageMatrix(mMatrix);
 		this.invalidate();
 	}
