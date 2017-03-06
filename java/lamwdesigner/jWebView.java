@@ -1,5 +1,7 @@
-package com.example.appgooglemapsdemo1;
+package org.lamw.appmapsdemo1;
 
+import android.util.Log;
+import android.view.View;
 import android.webkit.HttpAuthHandler;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
@@ -79,6 +81,9 @@ public class jWebView extends WebView {
     //
     private jWebClient      webclient;
     
+    private OnLongClickListener onClickListener;   
+    private Boolean         enabled  = true;    
+    
     //Constructor
     public  jWebView(android.content.Context context,
                      Controls ctrls,long pasobj ) {
@@ -95,6 +100,18 @@ public class jWebView extends WebView {
 
         setWebViewClient(webclient); // Prevent to run External Browser
         this.getSettings().setJavaScriptEnabled(true);
+        
+        onClickListener = new OnLongClickListener() {        	
+		@Override
+		public boolean onLongClick(View arg0) {
+			// TODO Auto-generated method stub
+            if (enabled) {
+                controls.pOnClick(PasObj,Const.Click_Default);
+            }			
+			return false;
+		};
+        };                       
+        setOnLongClickListener(onClickListener);
     }
 
 
@@ -109,6 +126,7 @@ public class jWebView extends WebView {
 
     //Free object except Self, Pascal Code Free the class.
     public  void Free() {
+    	this.setOnLongClickListener(null);    	
         setWebViewClient(null);
         webclient = null;
     	LAMWCommon.free();

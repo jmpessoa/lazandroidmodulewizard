@@ -1408,14 +1408,15 @@ type
     procedure LoadFromHtmlString(_htmlString: string); //thanks to Anton!
 
     procedure SetHttpAuthUsernamePassword(_hostName: string; _domain: string; _username: string; _password: string);
-
+    Procedure GenEvent_OnClick(Obj: TObject);
 
   published
     property JavaScript: Boolean          read FJavaScript write SetJavaScript;
     property BackgroundColor     : TARGBColorBridge read FColor      write SetColor;
+    property ZoomControl: Boolean read FZoomControl write SetZoomControl;
     // Event
     property OnStatus  : TOnWebViewStatus read FOnStatus   write FOnStatus;
-    property ZoomControl: Boolean read FZoomControl write SetZoomControl;
+    property OnLongClick: TOnNotify read FOnClick write FOnClick;
   end;
 
   jCanvas = class(jControl)
@@ -2167,6 +2168,12 @@ begin
   begin
     jForm(jImageView(Obj).Owner).UpdateJNI(gApp);
     jImageView(Obj).GenEvent_OnClick(Obj);
+    Exit;
+  end;
+  if Obj is jWebView then
+  begin
+    jForm(jWebView(Obj).Owner).UpdateJNI(gApp);
+    jWebView(Obj).GenEvent_OnClick(Obj);
     Exit;
   end;
 end;
@@ -7477,6 +7484,12 @@ begin
   //in designing component state: set value here...
   if FInitialized then
      jWebView_SetHttpAuthUsernamePassword(FjEnv, FjObject, _hostName ,_domain ,_username ,_password);
+end;
+
+// Event : Java -> Pascal
+procedure jWebView.GenEvent_OnClick(Obj: TObject);
+begin
+  if Assigned(FOnClick) then FOnClick(Obj);
 end;
 
 //------------------------------------------------------------------------------

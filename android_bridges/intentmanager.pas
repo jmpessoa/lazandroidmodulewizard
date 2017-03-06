@@ -12,7 +12,7 @@ type
 TIntentAction = (iaView, iaPick, iaSendto, idDial, iaCallbutton, iaCall, iaImageCapture,
                  iaDataRoaming,iaQuickLaunch, iaDate,iaSystem, iaWireless, iaDeviceInfo,
                  iaSend, iaSendMultiple, iaPickActivity, iaEdit, iaGetContent,
-                 iaTimePick, iaVoiceCommand, iaWebSearch, iaNone);
+                 iaTimePick, iaVoiceCommand, iaWebSearch, iaMain, iaNone);
 
 TIntentCategory = (icDefault, icLauncher, icHome, icInfo, icPreference, icAppBrowser,
                    icAppCalculator, icAppCalendar, icAppContacts, icAppEmail,
@@ -20,9 +20,6 @@ TIntentCategory = (icDefault, icLauncher, icHome, icInfo, icPreference, icAppBro
 
 TIntentFlag = (ifActivityNewTask, ifActivityBroughtToFront, ifActivityTaskOnHome,
                ifActivityForwardResult, ifActivityClearWhenTaskReset);
-
-
-//ACTION_DATA_ROAMING_SETTINGS iaDataRoaming
 
 {Draft Component code by "Lazarus Android Module Wizard" [1/27/2015 0:43:07]}
 {https://github.com/jmpessoa/lazandroidmodulewizard}
@@ -42,8 +39,8 @@ jIntentManager = class(jControl)
     procedure jFree();
     function GetIntent(): jObject;
     function GetActivityStartedIntent(): jObject;
-    procedure SetAction(_intentAction: string);
-    procedure SetIntentAction(_intentAction: TIntentAction);
+    procedure SetAction(_intentAction: string); overload;
+    procedure SetAction(_intentAction: TIntentAction); overload;
     procedure SetMimeType(_mimeType: string);
     procedure SetDataUriAsString(_uriAsString: string);
     procedure StartActivityForResult(_requestCode: integer); overload;
@@ -120,9 +117,12 @@ jIntentManager = class(jControl)
     procedure SetClass(_packageName: string; _javaClassName: string); overload;
     procedure PutExtraText(_text: string);
     procedure SetPackage(_packageName: string);
+    function IsPackageInstalled(_packageName: string): boolean; overload;
+    function GetActionMainAsString(): string;
+    procedure TryDownloadPackage(_packageName: string);
 
  published
-    property IntentAction: TIntentAction read FIntentAction write SetIntentAction;
+    property IntentAction: TIntentAction read FIntentAction write SetAction;
 
 end;
 
@@ -209,6 +209,9 @@ procedure jIntentManager_StartService(env: PJNIEnv; _jintentmanager: JObject);
 procedure jIntentManager_SetClass(env: PJNIEnv; _jintentmanager: JObject; _packageName: string; _javaClassName: string);overload;
 procedure jIntentManager_PutExtraText(env: PJNIEnv; _jintentmanager: JObject; _text: string);
 procedure jIntentManager_SetPackage(env: PJNIEnv; _jintentmanager: JObject; _packageName: string);
+function jIntentManager_IsPackageInstalled(env: PJNIEnv; _jintentmanager: JObject; _packageName: string): boolean; overload;
+function jIntentManager_GetActionMainAsString(env: PJNIEnv; _jintentmanager: JObject): string;
+procedure jIntentManager_TryDownloadPackage(env: PJNIEnv; _jintentmanager: JObject; _packageName: string);
 
 implementation
 
@@ -281,7 +284,7 @@ begin
      jIntentManager_SetAction(FjEnv, FjObject, _intentAction);
 end;
 
-procedure jIntentManager.SetIntentAction(_intentAction: TIntentAction);
+procedure jIntentManager.SetAction(_intentAction: TIntentAction);
 begin
   //in designing component state: set value here...
   FIntentAction:= _intentAction;
@@ -798,6 +801,27 @@ begin
   //in designing component state: set value here...
   if FInitialized then
      jIntentManager_SetPackage(FjEnv, FjObject, _packageName);
+end;
+
+function jIntentManager.IsPackageInstalled(_packageName: string): boolean;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jIntentManager_IsPackageInstalled(FjEnv, FjObject, _packageName);
+end;
+
+function jIntentManager.GetActionMainAsString(): string;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jIntentManager_GetActionMainAsString(FjEnv, FjObject);
+end;
+
+procedure jIntentManager.TryDownloadPackage(_packageName: string);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jIntentManager_TryDownloadPackage(FjEnv, FjObject, _packageName);
 end;
 
 {-------- jIntentManager_JNI_Bridge ----------}
@@ -1601,7 +1625,6 @@ begin
   env^.DeleteLocalRef(env, jCls);
 end;
 
-
 function jIntentManager_GetAudioExternContentUri(env: PJNIEnv; _jintentmanager: JObject): jObject;
 var
   jMethod: jMethodID=nil;
@@ -1612,7 +1635,6 @@ begin
   Result:= env^.CallObjectMethod(env, _jintentmanager, jMethod);
   env^.DeleteLocalRef(env, jCls);
 end;
-
 
 function jIntentManager_GetVideoExternContentUri(env: PJNIEnv; _jintentmanager: JObject): jObject;
 var
@@ -1703,7 +1725,6 @@ begin
   env^.DeleteLocalRef(env, jCls);
 end;
 
-
 function jIntentManager_GetActionSendAsString(env: PJNIEnv; _jintentmanager: JObject): string;
 var
   jStr: JString;
@@ -1785,7 +1806,6 @@ begin
             end;
   end;
 end;
-
 
 function jIntentManager_ResolveActivity(env: PJNIEnv; _jintentmanager: JObject): boolean;
 var
@@ -2047,7 +2067,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jintentmanager);
   jMethod:= env^.GetMethodID(env, jCls, 'PutExtraMediaStoreOutput', '(Ljava/lang/String;Ljava/lang/String;)V');
   env^.CallVoidMethodA(env, _jintentmanager, jMethod, @jParams);
-env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env,jParams[0].l);
   env^.DeleteLocalRef(env,jParams[1].l);
   env^.DeleteLocalRef(env, jCls);
 end;
@@ -2112,7 +2132,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jintentmanager);
   jMethod:= env^.GetMethodID(env, jCls, 'SetComponent', '(Ljava/lang/String;Ljava/lang/String;)V');
   env^.CallVoidMethodA(env, _jintentmanager, jMethod, @jParams);
-env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env,jParams[0].l);
   env^.DeleteLocalRef(env,jParams[1].l);
   env^.DeleteLocalRef(env, jCls);
 end;
@@ -2128,7 +2148,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jintentmanager);
   jMethod:= env^.GetMethodID(env, jCls, 'SetClassName', '(Ljava/lang/String;Ljava/lang/String;)V');
   env^.CallVoidMethodA(env, _jintentmanager, jMethod, @jParams);
-env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env,jParams[0].l);
   env^.DeleteLocalRef(env,jParams[1].l);
   env^.DeleteLocalRef(env, jCls);
 end;
@@ -2143,7 +2163,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jintentmanager);
   jMethod:= env^.GetMethodID(env, jCls, 'SetClass', '(Ljava/lang/String;)V');
   env^.CallVoidMethodA(env, _jintentmanager, jMethod, @jParams);
-env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env,jParams[0].l);
   env^.DeleteLocalRef(env, jCls);
 end;
 
@@ -2169,7 +2189,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jintentmanager);
   jMethod:= env^.GetMethodID(env, jCls, 'SetClass', '(Ljava/lang/String;Ljava/lang/String;)V');
   env^.CallVoidMethodA(env, _jintentmanager, jMethod, @jParams);
-env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env,jParams[0].l);
   env^.DeleteLocalRef(env,jParams[1].l);
   env^.DeleteLocalRef(env, jCls);
 end;
@@ -2199,9 +2219,58 @@ begin
   jCls:= env^.GetObjectClass(env, _jintentmanager);
   jMethod:= env^.GetMethodID(env, jCls, 'SetPackage', '(Ljava/lang/String;)V');
   env^.CallVoidMethodA(env, _jintentmanager, jMethod, @jParams);
-env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env,jParams[0].l);
   env^.DeleteLocalRef(env, jCls);
 end;
 
+function jIntentManager_IsPackageInstalled(env: PJNIEnv; _jintentmanager: JObject; _packageName: string): boolean;
+var
+  jBoo: JBoolean;
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_packageName));
+  jCls:= env^.GetObjectClass(env, _jintentmanager);
+  jMethod:= env^.GetMethodID(env, jCls, 'IsPackageInstalled', '(Ljava/lang/String;)Z');
+  jBoo:= env^.CallBooleanMethodA(env, _jintentmanager, jMethod, @jParams);
+  Result:= boolean(jBoo);
+  env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+function jIntentManager_GetActionMainAsString(env: PJNIEnv; _jintentmanager: JObject): string;
+var
+  jStr: JString;
+  jBoo: JBoolean;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jintentmanager);
+  jMethod:= env^.GetMethodID(env, jCls, 'GetActionMainAsString', '()Ljava/lang/String;');
+  jStr:= env^.CallObjectMethod(env, _jintentmanager, jMethod);
+  case jStr = nil of
+     True : Result:= '';
+     False: begin
+              jBoo:= JNI_False;
+              Result:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
+            end;
+  end;
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jIntentManager_TryDownloadPackage(env: PJNIEnv; _jintentmanager: JObject; _packageName: string);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_packageName));
+  jCls:= env^.GetObjectClass(env, _jintentmanager);
+  jMethod:= env^.GetMethodID(env, jCls, 'TryDownloadPackage', '(Ljava/lang/String;)V');
+  env^.CallVoidMethodA(env, _jintentmanager, jMethod, @jParams);
+  env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
 
 end.

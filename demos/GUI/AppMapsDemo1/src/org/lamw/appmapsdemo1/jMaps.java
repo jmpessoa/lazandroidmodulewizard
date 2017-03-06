@@ -2,6 +2,7 @@ package org.lamw.appmapsdemo1;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 
 /*Draft java code by "Lazarus Android Module Wizard" [2/25/2017 17:07:40]*/
@@ -181,7 +182,6 @@ public class jMaps {
 		 }
    }
    
-   
    public void Show(String _latitude, String _longitude,  String _label) {	//zoom: from 0 (the whole world) to 21    
 	     Uri data = Uri.parse("geo:"+_latitude+","+_longitude+"?q="+_latitude+","+_longitude+"("+Uri.encode(_label)+")");
 	     mapIntent.setData(data);
@@ -191,11 +191,21 @@ public class jMaps {
    }
    
    public boolean IsAppMapsInstalled() {
-       if (mapIntent.resolveActivity(controls.activity.getPackageManager()) != null) {
-    	   return true;   	   
-       }else {
-    		   return false;
-       }	   
-   }   
+	    PackageManager pm = controls.activity.getPackageManager();
+	    boolean installed = false;
+	    try {
+	        pm.getPackageInfo("com.google.android.apps.maps", PackageManager.GET_ACTIVITIES);
+	        installed = true;
+	    } catch (PackageManager.NameNotFoundException e) {
+	        installed = false;
+	    }
+	    return installed;
+	}
+   
+   public void TryDownloadAppMaps() {
+	   Intent t = new Intent(Intent.ACTION_VIEW);
+	   t.setData(Uri.parse("market://search?q=pname:com.google.android.apps.maps"));
+	   controls.activity.startActivity(t);
+   }
    
 }

@@ -45,6 +45,7 @@ jMaps = class(jControl)
     procedure Show(_latitude: string; _longitude: string; _label: string); overload;
     procedure Navigation(_latitude: string; _longitude: string); overload;
     function IsAppMapsInstalled(): boolean;
+    procedure TryDownloadAppMaps();
  published
 
 end;
@@ -70,6 +71,7 @@ procedure jMaps_Show(env: PJNIEnv; _jmaps: JObject; _latitude: string; _longitud
 procedure jMaps_Show(env: PJNIEnv; _jmaps: JObject; _latitude: string; _longitude: string; _label: string); overload;
 procedure jMaps_Navigation(env: PJNIEnv; _jmaps: JObject; _latitude: string; _longitude: string); overload;
 function jMaps_IsAppMapsInstalled(env: PJNIEnv; _jmaps: JObject): boolean;
+procedure jMaps_TryDownloadAppMaps(env: PJNIEnv; _jmaps: JObject);
 
 implementation
 
@@ -241,6 +243,13 @@ begin
   //in designing component state: result value here...
   if FInitialized then
    Result:= jMaps_IsAppMapsInstalled(FjEnv, FjObject);
+end;
+
+procedure jMaps.TryDownloadAppMaps();
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jMaps_TryDownloadAppMaps(FjEnv, FjObject);
 end;
 
 {-------- jMaps_JNI_Bridge ----------}
@@ -578,6 +587,17 @@ begin
   jMethod:= env^.GetMethodID(env, jCls, 'IsAppMapsInstalled', '()Z');
   jBoo:= env^.CallBooleanMethod(env, _jmaps, jMethod);
   Result:= boolean(jBoo);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jMaps_TryDownloadAppMaps(env: PJNIEnv; _jmaps: JObject);
+var
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jmaps);
+  jMethod:= env^.GetMethodID(env, jCls, 'TryDownloadAppMaps', '()V');
+  env^.CallVoidMethod(env, _jmaps, jMethod);
   env^.DeleteLocalRef(env, jCls);
 end;
 

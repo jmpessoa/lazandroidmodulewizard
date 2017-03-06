@@ -44,21 +44,26 @@ procedure TAndroidModule1.jButton1Click(Sender: TObject);
 begin
    if  jMaps1.IsAppMapsInstalled() then
    begin
-      jMaps1.Show('-15.8739405', '-52.3134635', 'UFMT');
-      //jMaps1.Navigation(...);
-      //jMaps1.StreetView(...);
+      //jMaps1.Show('-15.8739405', '-52.3134635', 'UFMT');
+      jMaps1.Navigation('Praça dos garimpeiros Barra do Garças MT Brasil', byDriving);
+      //jMaps1.StreetView();
       //jMaps1.Search(...);
       //jMaps1.SearchCategory('restaurant');
 
    end
    else
    begin
-     ShowMessage('Please, Install google Maps app....');
+     ShowMessage('Try downloading Google Maps App ...');
+     if not Self.IsWifiEnabled() then Self.SetWifiEnabled(True);
+
+     jMaps1.TryDownloadAppMaps();
+
    end;
 end;
 
 procedure TAndroidModule1.AndroidModule1JNIPrompt(Sender: TObject);
 begin
+  Self.jTextView1.SetRoundCorner();
   if not Self.isConnected() then
   begin //try wifi
     if Self.SetWifiEnabled(True) then

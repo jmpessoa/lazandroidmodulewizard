@@ -177,11 +177,10 @@ end;
 
 { Class:     org_lamw_appmapsdemo1_Controls
   Method:    pOnDraw
-  Signature: (JLandroid/graphics/Canvas;)V }
-procedure pOnDraw(PEnv: PJNIEnv; this: JObject; pasobj: JLong; canvas: JObject
-  ); cdecl;
+  Signature: (J)V }
+procedure pOnDraw(PEnv: PJNIEnv; this: JObject; pasobj: JLong); cdecl;
 begin
-  Java_Event_pOnDraw(PEnv, this, TObject(pasobj), canvas);
+  Java_Event_pOnDraw(PEnv, this, TObject(pasobj));
 end;
 
 { Class:     org_lamw_appmapsdemo1_Controls
@@ -387,7 +386,7 @@ const NativeMethods: array[0..35] of JNINativeMethod = (
     signature: '(Landroid/view/MenuItem;ILjava/lang/String;Z)V';
     fnPtr: @pAppOnClickContextMenuItem; ),
    (name: 'pOnDraw';
-    signature: '(JLandroid/graphics/Canvas;)V';
+    signature: '(J)V';
     fnPtr: @pOnDraw; ),
    (name: 'pOnTouch';
     signature: '(JIIFFFF)V';

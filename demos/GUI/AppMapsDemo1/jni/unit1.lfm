@@ -1,5 +1,5 @@
 object AndroidModule1: TAndroidModule1
-  Left = 315
+  Left = 336
   Top = 154
   Width = 320
   Height = 400
@@ -13,9 +13,9 @@ object AndroidModule1: TAndroidModule1
   ActionBarTitle = abtDefault
   OnJNIPrompt = AndroidModule1JNIPrompt
   object jTextView1: jTextView
-    Left = 104
+    Left = 96
     Top = 5
-    Width = 111
+    Width = 127
     Height = 20
     MarginLeft = 5
     MarginTop = 5
@@ -27,18 +27,19 @@ object AndroidModule1: TAndroidModule1
     PosRelativeToParent = [rpTop, rpCenterHorizontal]
     LayoutParamWidth = lpWrapContent
     LayoutParamHeight = lpWrapContent
-    Text = 'App Maps Demo 1'
+    Text = '  App Maps Demo 1  '
     Alignment = taLeft
     Enabled = True
-    BackgroundColor = colbrDefault
+    BackgroundColor = colbrLightSlateBlue
     FontColor = colbrDefault
     FontSize = 0
-    TextTypeFace = tfNormal
+    FontFace = ffMonospace
+    TextTypeFace = tfBold
     FontSizeUnit = unitDefault
   end
   object jButton1: jButton
     Left = 87
-    Top = 180
+    Top = 76
     Width = 146
     Height = 40
     MarginLeft = 2
@@ -46,9 +47,10 @@ object AndroidModule1: TAndroidModule1
     MarginRight = 2
     MarginBottom = 4
     Visible = True
+    Anchor = jCheckBox1
     Id = 2
-    PosRelativeToAnchor = []
-    PosRelativeToParent = [rpCenterInParent]
+    PosRelativeToAnchor = [raBelow]
+    PosRelativeToParent = [rpCenterHorizontal]
     LayoutParamWidth = lpHalfOfParent
     LayoutParamHeight = lpWrapContent
     Text = 'Go to Maps!'
@@ -82,7 +84,7 @@ object AndroidModule1: TAndroidModule1
     FontSizeUnit = unitDefault
   end
   object jMaps1: jMaps
-    left = 136
-    top = 60
+    left = 192
+    top = 152
   end
 end

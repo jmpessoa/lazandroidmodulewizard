@@ -1,4 +1,4 @@
-package com.example.appgooglemapsdemo1;
+package com.example.appdemo1;
 
 import java.io.FileOutputStream;
 
@@ -107,7 +107,7 @@ public class jView extends View {
 	@Override
 	public  void onDraw( Canvas canvas) {
 		jcanvas.setCanvas(canvas);
-		controls.pOnDraw(PasObj,canvas); // improvement required
+		controls.pOnDraw(PasObj); // improvement required
 	}
 
 	public void saveView( String sFileName ) {

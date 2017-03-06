@@ -1147,8 +1147,7 @@ end;
     procedure Minimize();
     procedure Restart(_delay: integer);
     procedure HideSoftInput(_view: jObject); overload;
-
-
+    function UriEncode(_message: string): string;
 
     // Property
     property View         : jObject        read FjRLayout; //layout!
@@ -1555,7 +1554,7 @@ function jForm_DirectoryExists(env: PJNIEnv; _jform: JObject; _fullDirectoryName
 procedure jForm_Minimize(env: PJNIEnv; _jform: JObject);
 procedure jForm_Restart(env: PJNIEnv; _jform: JObject; _delay: integer);
 procedure jForm_HideSoftInput(env: PJNIEnv; _jform: JObject; _view: jObject);  overload;
-
+function jForm_UriEncode(env: PJNIEnv; _jform: JObject; _message: string): string;
 
 //------------------------------------------------------------------------------
 // View  - Generics
@@ -3589,6 +3588,13 @@ begin
      jForm_HideSoftInput(FjEnv, FjObject, _view);
 end;
 
+function jForm.UriEncode(_message: string): string;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jForm_UriEncode(FjEnv, FjObject, _message);
+end;
+
 {-------- jForm_JNI_Bridge ----------}
 
 function jForm_GetPathFromAssetsFile(env: PJNIEnv; _jform: JObject; _assetsFileName: string): string;
@@ -4868,6 +4874,29 @@ begin
   jCls:= env^.GetObjectClass(env, _jform);
   jMethod:= env^.GetMethodID(env, jCls, 'HideSoftInput', '(Landroid/view/View;)V');
   env^.CallVoidMethodA(env, _jform, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+function jForm_UriEncode(env: PJNIEnv; _jform: JObject; _message: string): string;
+var
+  jStr: JString;
+  jBoo: JBoolean;
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_message));
+  jCls:= env^.GetObjectClass(env, _jform);
+  jMethod:= env^.GetMethodID(env, jCls, 'UriEncode', '(Ljava/lang/String;)Ljava/lang/String;');
+  jStr:= env^.CallObjectMethodA(env, _jform, jMethod, @jParams);
+  case jStr = nil of
+     True : Result:= '';
+     False: begin
+              jBoo:= JNI_False;
+              Result:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
+            end;
+  end;
+  env^.DeleteLocalRef(env,jParams[0].l);
   env^.DeleteLocalRef(env, jCls);
 end;
 

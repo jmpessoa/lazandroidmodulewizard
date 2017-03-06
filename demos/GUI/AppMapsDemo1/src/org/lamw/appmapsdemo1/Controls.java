@@ -1,6 +1,6 @@
 package org.lamw.appmapsdemo1;
 
-//LAMW: Lazarus Android Module Wizard  - version 0.7 - rev. 13 - 27 Feb - 2017 
+//LAMW: Lazarus Android Module Wizard  - version 0.7 - rev. 13.2 - 28 Feb - 2017 
 //RAD Android: Project Wizard, Form Designer and Components Development Model!
 
 //https://github.com/jmpessoa/lazandroidmodulewizard
@@ -1204,6 +1204,10 @@ public void Restart(int _delay) {
   System.exit(2);
 }
 
+public String UriEncode(String _message) {
+	return Uri.encode(_message);
+}
+
 }
 //**class entrypoint**//please, do not remove/change this line!
 
@@ -1235,7 +1239,7 @@ public native boolean pAppOnPrepareOptionsMenu(Menu menu, int menuSize);
 public native boolean pAppOnPrepareOptionsMenuItem(Menu menu, MenuItem menuItem, int itemIndex);
 public native void pAppOnCreateContextMenu(ContextMenu menu);
 public native void pAppOnClickContextMenuItem(MenuItem menuItem, int itemID, String itemCaption, boolean checked);
-public native void pOnDraw(long pasobj, Canvas canvas);
+public native void pOnDraw(long pasobj);
 public native void pOnTouch(long pasobj, int act, int cnt, float x1, float y1, float x2, float y2);
 public native void pOnClickGeneric(long pasobj, int value);
 public native boolean pAppOnSpecialKeyDown(char keyChar, int keyCode, String keyCodeString);

@@ -1,9 +1,8 @@
-package com.example.appintentdemomaps1;
+package org.lamw.appmapsdemo1;
 
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
-
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -386,7 +385,10 @@ Sending Data: Extras vs. URI Parameters
       return "android.intent.action.CALL_BUTTON";
    }	   
    
-      
+   public String GetActionMainAsString() {  
+	     return "android.intent.action.MAIN";
+   }
+   
    public void SetAction(int  _intentAction) {	 
 	  switch(_intentAction) { 
 	    case 0: mIntent.setAction("android.intent.action.VIEW"); break;
@@ -408,8 +410,9 @@ Sending Data: Extras vs. URI Parameters
 	    case 16: mIntent.setAction(android.content.Intent.ACTION_EDIT); break;
 	    case 17: mIntent.setAction(android.content.Intent.ACTION_GET_CONTENT); break;
 	    case 18: mIntent.setAction(android.content.Intent.ACTION_TIME_TICK); break;
-	    case 19: mIntent.setAction(android.content.Intent.ACTION_VOICE_COMMAND); break;
+	    case 19: mIntent.setAction(android.content.Intent.ACTION_VOICE_COMMAND); break;	    	    
 	    case 20: mIntent.setAction(android.content.Intent.ACTION_WEB_SEARCH); 	    
+	    case 21: mIntent.setAction("android.intent.action.Main");
 	  }
 	  
    }
@@ -618,6 +621,24 @@ Sending Data: Extras vs. URI Parameters
    
    public void SetPackage(String _packageName) {
 	   mIntent.setPackage(_packageName);
+   }
+            
+   public boolean IsPackageInstalled(String _packageName) {
+	    PackageManager pm = controls.activity.getPackageManager();
+	    boolean installed = false;
+	    try {
+	        pm.getPackageInfo(_packageName, PackageManager.GET_ACTIVITIES);
+	        installed = true;
+	    } catch (PackageManager.NameNotFoundException e) {
+	        installed = false;
+	    }
+	    return installed;
+   }
+      
+   public void TryDownloadPackage(String _packageName) {
+	   Intent t = new Intent(Intent.ACTION_VIEW);
+	   t.setData(Uri.parse("market://search?q=pname:"+_packageName)); 
+	   controls.activity.startActivity(t);
    }
    
 }
