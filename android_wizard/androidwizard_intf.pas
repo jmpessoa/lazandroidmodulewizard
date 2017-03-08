@@ -1061,14 +1061,16 @@ begin
           strList.Add('set Path=%PATH%;'+FPathToAntBin); //<--- thanks to andersonscinfo !  [set path=%path%;C:\and32\ant\bin]
           strList.Add('set JAVA_HOME='+FPathToJavaJDK);  //set JAVA_HOME=C:\Program Files (x86)\Java\jdk1.7.0_21
           strList.Add('cd '+FAndroidProjectName);
-          strList.Add('ant clean -Dtouchtest.enabled=true debug');
+          strList.Add('call ant clean -Dtouchtest.enabled=true debug');
+          strList.Add('if errorlevel 1 pause');
           strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'build-debug.bat'); //build Apk using "Ant"
 
           strList.Clear;
           strList.Add('set Path=%PATH%;'+FPathToAntBin); //<--- thanks to andersonscinfo !
           strList.Add('set JAVA_HOME='+FPathToJavaJDK);  //set JAVA_HOME=C:\Program Files (x86)\Java\jdk1.7.0_21
           strList.Add('cd '+FAndroidProjectName);
-          strList.Add('ant clean release');
+          strList.Add('call ant clean release');
+          strList.Add('if errorlevel 1 pause');
           strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'build-release.bat'); //build Apk using "Ant"
 
               //*.bat utils...
