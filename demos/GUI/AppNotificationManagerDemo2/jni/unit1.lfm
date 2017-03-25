@@ -1,0 +1,103 @@
+object AndroidModule1: TAndroidModule1
+  Left = 315
+  Top = 154
+  Width = 320
+  Height = 400
+  MarginLeft = 0
+  MarginTop = 0
+  MarginRight = 0
+  MarginBottom = 0
+  Text = 'AndroidModule1'
+  ActivityMode = actMain
+  BackgroundColor = colbrDefault
+  ActionBarTitle = abtDefault
+  OnJNIPrompt = AndroidModule1JNIPrompt
+  object jTextView1: jTextView
+    Left = 63
+    Top = 5
+    Width = 194
+    Height = 20
+    MarginLeft = 5
+    MarginTop = 5
+    MarginRight = 5
+    MarginBottom = 5
+    Visible = True
+    Id = 1
+    PosRelativeToAnchor = []
+    PosRelativeToParent = [rpTop, rpCenterHorizontal]
+    LayoutParamWidth = lpWrapContent
+    LayoutParamHeight = lpWrapContent
+    Text = 'App NotificationManager Demo2'
+    Alignment = taLeft
+    Enabled = True
+    BackgroundColor = colbrDefault
+    FontColor = colbrDefault
+    FontSize = 0
+    TextTypeFace = tfNormal
+    FontSizeUnit = unitDefault
+  end
+  object jButton1: jButton
+    Left = 2
+    Top = 76
+    Width = 314
+    Height = 40
+    MarginLeft = 2
+    MarginTop = 4
+    MarginRight = 2
+    MarginBottom = 4
+    Visible = True
+    Anchor = jCheckBox1
+    Id = 2
+    PosRelativeToAnchor = [raBelow]
+    PosRelativeToParent = []
+    LayoutParamWidth = lpMatchParent
+    LayoutParamHeight = lpWrapContent
+    Text = 'Push System Notification'
+    BackgroundColor = colbrDefault
+    FontColor = colbrDefault
+    FontSize = 0
+    FontSizeUnit = unitDefault
+    OnClick = jButton1Click
+  end
+  object jCheckBox1: jCheckBox
+    Left = 5
+    Top = 35
+    Width = 64
+    Height = 32
+    MarginLeft = 5
+    MarginTop = 5
+    MarginRight = 5
+    MarginBottom = 5
+    Visible = True
+    Anchor = jTextView1
+    Id = 3
+    PosRelativeToAnchor = [raBelow]
+    PosRelativeToParent = []
+    LayoutParamWidth = lpWrapContent
+    LayoutParamHeight = lpWrapContent
+    Text = 'WiFi'
+    BackgroundColor = colbrDefault
+    FontColor = colbrDefault
+    FontSize = 0
+    Checked = False
+    FontSizeUnit = unitDefault
+  end
+  object jNotificationManager1: jNotificationManager
+    Id = 1001
+    Title = 'Lamw'
+    Subject = 'Hello'
+    Body = 'Lamw: Hello System Notification ...'
+    IconIdentifier = 'lamw_logo'
+    LightsColor = colbrDefault
+    AutoCancel = True
+    Ongoing = False
+    PendingFlag = pfUpdateCurrent
+    left = 72
+    top = 176
+  end
+  object jIntentManager1: jIntentManager
+    IntentAction = iaNone
+    left = 224
+    top = 176
+  end
+end

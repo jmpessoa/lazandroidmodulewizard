@@ -173,6 +173,12 @@ procedure jTextView_SetShaderLinearGradient(env: PJNIEnv; _jtextview: JObject; _
 procedure jTextView_SetShaderRadialGradient(env: PJNIEnv; _jtextview: JObject; _centerColor: integer; _edgeColor: integer);
 procedure jTextView_SetShaderSweepGradient(env: PJNIEnv; _jtextview: JObject; _color1: integer; _color2: integer);
 procedure jTextView_SetTextDirection(env: PJNIEnv; _jtextview: JObject; _textDirection: integer);
+procedure jTextView_SetFontFromAssets(env: PJNIEnv; _jtextview: JObject; _fontName: string);
+procedure jTextView_SetTextIsSelectable(env: PJNIEnv; _jtextview: JObject; _value: boolean);
+procedure jTextView_SetScrollingText(env: PJNIEnv; _jtextview: JObject);
+procedure jTextView_SetTextAsLink(env: PJNIEnv; _jtextview: JObject; _linkText: string);
+
+
 //-----------------------------------
 // EditText  :: changed by jmpessoa [support Api > 13]
 //--------------------------------------
@@ -262,6 +268,8 @@ procedure jEditText_SetTextDirection(env: PJNIEnv; _jedittext: JObject; _textDir
 function jEditText_getLParamWidth(env:PJNIEnv; _jedittext : jObject): integer;
 function jEditText_getLParamHeight(env:PJNIEnv; _jedittext : jObject ): integer;
 
+procedure jEditText_SetFontFromAssets(env: PJNIEnv; _jedittext: JObject; _fontName: string);
+
 // Button
 Function jButton_Create(env: PJNIEnv;   this:jobject; SelfObj: TObject): jObject;
 Procedure jButton_Free(env:PJNIEnv; Button : jObject);
@@ -305,6 +313,7 @@ procedure jButton_SetCompoundDrawables(env: PJNIEnv; _jbutton: JObject; _image: 
 procedure jButton_SetCompoundDrawables(env: PJNIEnv; _jbutton: JObject; _imageResIdentifier: string; _side: integer);  overload;
 procedure jButton_SetRoundCorner(env: PJNIEnv; _jbutton: JObject);
 procedure jButton_SetRadiusRoundCorner(env: PJNIEnv; _jbutton: JObject; _radius: integer);
+procedure jButton_SetFontFromAssets(env: PJNIEnv; _jbutton: JObject; _fontName: string);
 
 // CheckBox
 Function  jCheckBox_Create            (env:PJNIEnv;  this:jobject; SelfObj: TObject ): jObject;
@@ -336,6 +345,7 @@ procedure jCheckBox_SetFontSizeUnit(env: PJNIEnv; _jcheckbox: JObject; _unit: in
 
 procedure jCheckBox_SetCompoundDrawables(env: PJNIEnv; _jcheckbox: JObject; _image: jObject; _side: integer); overload;
 procedure jCheckBox_SetCompoundDrawables(env: PJNIEnv; _jcheckbox: JObject; _imageResIdentifier: string; _side: integer);  overload;
+procedure jCheckBox_SetFontFromAssets(env: PJNIEnv; _jcheckbox: JObject; _fontName: string);
 
 // RadioButton
 
@@ -370,6 +380,7 @@ procedure jRadioButton_SetFontSizeUnit(env: PJNIEnv; _jradiobutton: JObject; _un
 
 procedure jRadioButton_SetCompoundDrawables(env: PJNIEnv; _jradiobutton: JObject; _image: jObject; _side: integer); overload;
 procedure jRadioButton_SetCompoundDrawables(env: PJNIEnv; _jradiobutton: JObject; _imageResIdentifier: string; _side: integer);  overload;
+procedure jRadioButton_SetFontFromAssets(env: PJNIEnv; _jradiobutton: JObject; _fontName: string);
 
 // ProgressBar
 
@@ -1501,7 +1512,7 @@ var
   method: jmethodID;
   _jParams : array[0..0] of jValue;
 begin
-  _jParams[0].l := env^.NewStringUTF(env, pchar(Str));
+  _jParams[0].l := env^.NewStringUTF(env, PChar(Str));
   cls := env^.GetObjectClass(env, TextView);
   method:= env^.GetMethodID(env, cls, 'setText', '(Ljava/lang/CharSequence;)V'); //direct jni api
   env^.CallVoidMethodA(env, TextView, method,@_jParams);
@@ -1865,6 +1876,60 @@ begin
   jCls:= env^.GetObjectClass(env, _jtextview);
   jMethod:= env^.GetMethodID(env, jCls, 'SetTextDirection', '(I)V');
   env^.CallVoidMethodA(env, _jtextview, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jTextView_SetFontFromAssets(env: PJNIEnv; _jtextview: JObject; _fontName: string);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_fontName));
+  jCls:= env^.GetObjectClass(env, _jtextview);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetFontFromAssets', '(Ljava/lang/String;)V');
+  env^.CallVoidMethodA(env, _jtextview, jMethod, @jParams);
+env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+
+procedure jTextView_SetTextIsSelectable(env: PJNIEnv; _jtextview: JObject; _value: boolean);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].z:= JBool(_value);
+  jCls:= env^.GetObjectClass(env, _jtextview);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetTextIsSelectable', '(Z)V');
+  env^.CallVoidMethodA(env, _jtextview, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+
+procedure jTextView_SetScrollingText(env: PJNIEnv; _jtextview: JObject);
+var
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jtextview);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetScrollingText', '()V');
+  env^.CallVoidMethod(env, _jtextview, jMethod);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jTextView_SetTextAsLink(env: PJNIEnv; _jtextview: JObject; _linkText: string);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_linkText));
+  jCls:= env^.GetObjectClass(env, _jtextview);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetTextAsLink', '(Ljava/lang/String;)V');
+  env^.CallVoidMethodA(env, _jtextview, jMethod, @jParams);
+env^.DeleteLocalRef(env,jParams[0].l);
   env^.DeleteLocalRef(env, jCls);
 end;
 
@@ -2670,6 +2735,20 @@ begin
   env^.DeleteLocalRef(env, cls);
 end;
 
+procedure jEditText_SetFontFromAssets(env: PJNIEnv; _jedittext: JObject; _fontName: string);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_fontName));
+  jCls:= env^.GetObjectClass(env, _jedittext);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetFontFromAssets', '(Ljava/lang/String;)V');
+  env^.CallVoidMethodA(env, _jedittext, jMethod, @jParams);
+  env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
 //------------------------------------------------------------------------------
 // Button
 //------------------------------------------------------------------------------
@@ -3035,6 +3114,20 @@ begin
   env^.DeleteLocalRef(env, jCls);
 end;
 
+procedure jButton_SetFontFromAssets(env: PJNIEnv; _jbutton: JObject; _fontName: string);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_fontName));
+  jCls:= env^.GetObjectClass(env, _jbutton);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetFontFromAssets', '(Ljava/lang/String;)V');
+  env^.CallVoidMethodA(env, _jbutton, jMethod, @jParams);
+  env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
 //------------------------------------------------------------------------------
 // CheckBox
 //------------------------------------------------------------------------------
@@ -3311,6 +3404,20 @@ begin
   jMethod:= env^.GetMethodID(env, jCls, 'SetCompoundDrawables', '(Ljava/lang/String;I)V');
   env^.CallVoidMethodA(env, _jcheckbox, jMethod, @jParams);
   env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jCheckBox_SetFontFromAssets(env: PJNIEnv; _jcheckbox: JObject; _fontName: string);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_fontName));
+  jCls:= env^.GetObjectClass(env, _jcheckbox);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetFontFromAssets', '(Ljava/lang/String;)V');
+  env^.CallVoidMethodA(env, _jcheckbox, jMethod, @jParams);
+env^.DeleteLocalRef(env,jParams[0].l);
   env^.DeleteLocalRef(env, jCls);
 end;
 
@@ -3603,6 +3710,20 @@ begin
   jMethod:= env^.GetMethodID(env, jCls, 'SetCompoundDrawables', '(Ljava/lang/String;I)V');
   env^.CallVoidMethodA(env, _jradiobutton, jMethod, @jParams);
   env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jRadioButton_SetFontFromAssets(env: PJNIEnv; _jradiobutton: JObject; _fontName: string);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_fontName));
+  jCls:= env^.GetObjectClass(env, _jradiobutton);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetFontFromAssets', '(Ljava/lang/String;)V');
+  env^.CallVoidMethodA(env, _jradiobutton, jMethod, @jParams);
+env^.DeleteLocalRef(env,jParams[0].l);
   env^.DeleteLocalRef(env, jCls);
 end;
 

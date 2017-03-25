@@ -783,6 +783,10 @@ type
     procedure SetShaderRadialGradient(_centerColor: TARGBColorBridge; _edgeColor: TARGBColorBridge);
     procedure SetShaderSweepGradient(_color1: TARGBColorBridge; _color2: TARGBColorBridge);
     procedure SetTextDirection(_textDirection: TTextDirection);
+    procedure SetFontFromAssets(_fontName: string);
+    procedure SetTextIsSelectable(_value: boolean);
+    procedure SetScrollingText();
+    procedure SetTextAsLink(_linkText: string);
 
   published
     property Text: string read GetText write SetText;
@@ -902,6 +906,7 @@ type
     procedure SetCompoundDrawables(_image: jObject; _side: TCompoundDrawablesSide); overload;
     procedure SetCompoundDrawables(_imageResIdentifier: string; _side: TCompoundDrawablesSide); overload;
     procedure SetTextDirection(_textDirection: TTextDirection);
+    procedure SetFontFromAssets(_fontName: string);
 
     // Property
     property CursorPos : TXY        read GetCursorPos  write SetCursorPos;
@@ -979,6 +984,7 @@ type
     procedure SetCompoundDrawables(_imageResIdentifier: string; _side: TCompoundDrawablesSide); overload;
     procedure SetRoundCorner();
     procedure SetRadiusRoundCorner(_radius: integer);
+    procedure SetFontFromAssets(_fontName: string);
 
   published
     property Text: string read GetText write SetText;
@@ -1021,6 +1027,7 @@ type
 
     procedure SetCompoundDrawables(_image: jObject; _side: TCompoundDrawablesSide); overload;
     procedure SetCompoundDrawables(_imageResIdentifier: string; _side: TCompoundDrawablesSide); overload;
+    procedure SetFontFromAssets(_fontName: string);
 
   published
     property Text: string read GetText write SetText;
@@ -1060,6 +1067,7 @@ type
 
     procedure SetCompoundDrawables(_image: jObject; _side: TCompoundDrawablesSide); overload;
     procedure SetCompoundDrawables(_imageResIdentifier: string; _side: TCompoundDrawablesSide); overload;
+    procedure SetFontFromAssets(_fontName: string);
 
   published
     property Text: string read GetText write SetText;
@@ -1615,7 +1623,7 @@ type
 
   // Activity Event
   Function  Java_Event_pAppOnScreenStyle         (env: PJNIEnv; this: jobject): JInt;
-  Procedure Java_Event_pAppOnNewIntent           (env: PJNIEnv; this: jobject);
+  Procedure Java_Event_pAppOnNewIntent           (env: PJNIEnv; this: jobject; intent: jobject);
   Procedure Java_Event_pAppOnDestroy             (env: PJNIEnv; this: jobject);
   Procedure Java_Event_pAppOnPause               (env: PJNIEnv; this: jobject);
   Procedure Java_Event_pAppOnRestart             (env: PJNIEnv; this: jobject);
@@ -1773,10 +1781,18 @@ begin
   end;
 end;
 
-Procedure Java_Event_pAppOnNewIntent(env: PJNIEnv; this: jObject);
+Procedure Java_Event_pAppOnNewIntent(env: PJNIEnv; this: jObject; intent: jobject);
+{var
+  Form: jForm;}
 begin
   gApp.Jni.jEnv:= env;
   gApp.Jni.jThis:= this;
+  { //TODO
+  Form := gApp.Forms.Stack[gApp.TopIndex].Form;
+  if not Assigned(Form) then Exit;
+  Form.UpdateJNI(gApp);
+  if Assigned(Form.OnNewIntent) then Form.OnNewIntent(Form, intent);
+  }
 end;
 
 // The activity is about to be destroyed.
@@ -3160,6 +3176,34 @@ begin
      jTextView_SetTextDirection(FjEnv, FjObject, Ord(_textDirection));
 end;
 
+procedure jTextView.SetFontFromAssets(_fontName: string);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jTextView_SetFontFromAssets(FjEnv, FjObject, _fontName);
+end;
+
+procedure jTextView.SetTextIsSelectable(_value: boolean);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jTextView_SetTextIsSelectable(FjEnv, FjObject, _value);
+end;
+
+procedure jTextView.SetScrollingText();
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jTextView_SetScrollingText(FjEnv, FjObject);
+end;
+
+procedure jTextView.SetTextAsLink(_linkText: string);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jTextView_SetTextAsLink(FjEnv, FjObject, _linkText);
+end;
+
 //------------------------------------------------------------------------------
 // jEditText
 //------------------------------------------------------------------------------
@@ -3832,6 +3876,13 @@ begin
   end;
 end;
 
+procedure jEditText.SetFontFromAssets(_fontName: string);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jEditText_SetFontFromAssets(FjEnv, FjObject, _fontName);
+end;
+
 //------------------------------------------------------------------------------
 // jButton
 //------------------------------------------------------------------------------
@@ -4171,6 +4222,13 @@ begin
      jButton_SetRadiusRoundCorner(FjEnv, FjObject, _radius);
 end;
 
+procedure jButton.SetFontFromAssets(_fontName: string);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jButton_SetFontFromAssets(FjEnv, FjObject, _fontName);
+end;
+
 //------------------------------------------------------------------------------
 // jCheckBox
 //------------------------------------------------------------------------------
@@ -4425,6 +4483,13 @@ begin
   //in designing component state: set value here...
   if FInitialized then
      jCheckBox_SetCompoundDrawables(FjEnv, FjObject, _imageResIdentifier, Ord(_side));
+end;
+
+procedure jCheckBox.SetFontFromAssets(_fontName: string);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jCheckBox_SetFontFromAssets(FjEnv, FjObject, _fontName);
 end;
 
 //------------------------------------------------------------------------------
@@ -4710,6 +4775,13 @@ begin
   //in designing component state: set value here...
   if FInitialized then
      jRadioButton_SetCompoundDrawables(FjEnv, FjObject, _imageResIdentifier, Ord(_side));
+end;
+
+procedure jRadioButton.SetFontFromAssets(_fontName: string);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jRadioButton_SetFontFromAssets(FjEnv, FjObject, _fontName);
 end;
 
 //------------------------------------------------------------------------------

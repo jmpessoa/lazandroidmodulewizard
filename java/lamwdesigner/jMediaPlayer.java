@@ -1,9 +1,10 @@
-package com.example.appmediaplayerdemo1;
+package org.lamw.apptextureviewdemo1;
 
 import java.io.IOException;
 
 import android.content.Context;
 import android.content.res.AssetFileDescriptor;
+import android.graphics.SurfaceTexture;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnCompletionListener;
@@ -12,6 +13,7 @@ import android.media.MediaPlayer.OnVideoSizeChangedListener;
 import android.net.Uri;
 import android.os.Environment;
 import android.provider.Settings;
+import android.view.Surface;
 
 /*Draft java code by "Lazarus Android Module Wizard"*/
 /*https://github.com/jmpessoa/lazandroidmodulewizard*/
@@ -38,9 +40,10 @@ public class jMediaPlayer implements OnPreparedListener, OnVideoSizeChangedListe
 		 context   = _ctrls.activity;
 		 
 		 this.mplayer = new MediaPlayer();		 				 
-		 this.mplayer.setOnPreparedListener(this);
+		 this.mplayer.setOnPreparedListener(this);   		 		
 		 this.mplayer.setOnVideoSizeChangedListener(this);		 
 		 this.mplayer.setOnCompletionListener(this);
+		 
 		 /*
 		 //when MediaPlayer start player we need to release it when music complete....
 		 this.mplayer.setOnCompletionListener(new OnCompletionListener() {
@@ -150,7 +153,7 @@ public class jMediaPlayer implements OnPreparedListener, OnVideoSizeChangedListe
 			 }            	     
 		 }	 
 	  }	    	
-	    
+	    	  
 	  //for files, it is OK to call prepare(), which blocks until MediaPlayer is ready for playback...
 	  public void Prepare(){	 //prepares the player for playback synchronously.
 	  	try {
@@ -219,13 +222,13 @@ public class jMediaPlayer implements OnPreparedListener, OnVideoSizeChangedListe
 	 //called onsurfaceCreated!
 	  public void SetDisplay(android.view.SurfaceHolder _surfaceHolder) {
 		 this.mplayer.setAudioStreamType (AudioManager.STREAM_MUSIC);
-		 this.mplayer.setDisplay(_surfaceHolder);		      		  				 
+		 this.mplayer.setDisplay(_surfaceHolder);	
 	  }
 	  
 	  //http://alvinalexander.com/java/jwarehouse/android-examples/samples/android-8/ApiDemos/src/com/example/android/apis/media/MediaPlayerDemo_Video.java.shtml
 	 
 	  @Override
-	  /*.*/public void onPrepared(MediaPlayer mediaplayer) {		    
+	  /*.*/public void onPrepared(MediaPlayer mediaplayer) {   //  mediaPlayer.start();		    
 		    controls.pOnMediaPlayerPrepared(pascalObj, mplayer.getVideoWidth(), mplayer.getVideoHeight());
 	   }
 	  
@@ -238,7 +241,7 @@ public class jMediaPlayer implements OnPreparedListener, OnVideoSizeChangedListe
 	  /*.*/public void onCompletion(MediaPlayer arg0) {
 		    controls.pOnMediaPlayerCompletion(pascalObj);
 	  }
-	  
+	  	  
 	  /*
   	 @Override
 	  public void onTimedText(MediaPlayer arg0, TimedText timedText) {	//need API 16
@@ -261,4 +264,44 @@ public class jMediaPlayer implements OnPreparedListener, OnVideoSizeChangedListe
   		  if (_audioStreamType < 6)
 		     mplayer.setAudioStreamType(_audioStreamType);
   	  }	 
+  	        
+  	  public void SetSurfaceTexture(SurfaceTexture _surfaceTexture) {
+  		 //this.mplayer.setAudioStreamType (AudioManager.STREAM_MUSIC);
+  		 Surface surface = new Surface(_surfaceTexture);  		
+		 mplayer.setSurface(surface);  	  
+  	  }	 
+  	  
+  	  public void PrepareAsync() {
+  		  mplayer.prepareAsync();
+  	  }
+
+	  public void LoadFromAssets(String _fileName) {	//big_buck_bunny.mp4	  
+		    AssetFileDescriptor afd;
+			try {
+				afd = controls.activity.getAssets().openFd(_fileName);
+				mplayer.setDataSource(afd.getFileDescriptor(), afd.getStartOffset(), afd.getLength());
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}	      		      
+	  }
+	  
+	  //https://www.w3schools.com/html/mov_bbb.mp4
+	  public void LoadFromURL(String _url) {	//big_buck_bunny.mp4
+		  try {
+			mplayer.setDataSource(controls.activity.getApplicationContext(), Uri.parse(_url));			
+		} catch (IllegalArgumentException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (SecurityException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IllegalStateException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	  }
 } 

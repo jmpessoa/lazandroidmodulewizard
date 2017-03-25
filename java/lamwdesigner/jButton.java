@@ -1,10 +1,13 @@
-package com.example.appgooglemapsdemo1;
+package org.lamw.appvideoviewdemo1;
 
 import java.lang.reflect.Field;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.ColorMatrixColorFilter;
+import android.graphics.LightingColorFilter;
+import android.graphics.Typeface;
 import android.graphics.PorterDuff.Mode;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
@@ -328,4 +331,54 @@ public class jButton extends Button {
 	  	   this.setBackgroundColor(_color);
 		}   
 	}
+	
+	//ref. http://www.41post.com/5094/programming/android-change-color-of-the-standard-button-inside-activity#more-5094
+	public void SetBackgroundColor(int _color,  int _mode) {  //0xFFBBAA00
+	//Changing the background color of the Button using PorterDuff Mode - Multiply  
+    this.getBackground().setColorFilter(_color, android.graphics.PorterDuff.Mode.MULTIPLY);  
+    //Set the color of the text displayed inside the button  
+    //this.setTextColor(0xFF0000FF);  
+    //Render this Button again  
+    this.invalidate();  
+	}
+	
+	
+	public void SetBackgroundColor(int _color,  int _lightingMultColor, int _lightingAddColor) { 
+      //Changing the background color of the Button using a LightingColorFilter  
+      this.getBackground().setColorFilter(new LightingColorFilter(_lightingMultColor, _lightingAddColor));   //0xFFBBAA00, 0x00000000
+      //Set the color of the text displayed inside the button  
+      //bt_exButton.setTextColor(0xFF0000FF);  
+      //Render this Button again  
+      this.invalidate();  
+	}
+    
+	public void SetBackgroundColorByMatrixColorFilter(int _multColor) {
+	   //Set the color that the button background will be multiplied with  
+    int bgColor = _multColor; //0xFFBBAA00;  
+    /*Separate each hexadecimal value pair from the bgColor integer and store 
+     * each one of them on a separated variable.*/  
+    int a = (bgColor >> 24) & 0xFF;  
+    int r = (bgColor >> 16) & 0xFF;  
+    int g = (bgColor >> 8) & 0xFF;  
+    int b = (bgColor >> 0) & 0xFF;  
+    /*Create a new ColorMatrixColorFilter passing each individual component 
+    of the ColorMatrix this filter uses as a float array.*/  
+    ColorMatrixColorFilter cmFilter =   
+            new ColorMatrixColorFilter(  
+            new float[]{r/255f,0,0,0,0,  
+                        0,g/255f,0,0,0,  
+                        0,0,b/255f,0,0,  
+                        0,0,0,a/255f,0});  
+    //Set the cmFilter as the color filter  
+    this.getBackground().setColorFilter(cmFilter);  
+    //Set the color of the text displayed inside the button  
+    //bt_exButton.setTextColor(0xFF0000FF);  
+    //Render this Button again  
+      this.invalidate();  
+	}
+	
+	public void SetFontFromAssets(String _fontName) {   //   "fonts/font1.ttf"  or "font1.ttf"
+        Typeface customfont = Typeface.createFromAsset( controls.activity.getAssets(), _fontName);    
+        this.setTypeface(customfont);
+    }
 }

@@ -1,8 +1,9 @@
-package com.example.appgooglemapsdemo1;
+package org.lamw.appvideoviewdemo1;
 
 import java.lang.reflect.Field;
 
 import android.graphics.Bitmap;
+import android.graphics.Typeface;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.util.TypedValue;
@@ -176,5 +177,10 @@ public class jRadioButton extends RadioButton {
 		  case 3: this.setCompoundDrawables(null, null, null, d); 		
 		}				
 	}		
+	
+	public void SetFontFromAssets(String _fontName) {   //   "font/font.ttf"
+        Typeface customfont = Typeface.createFromAsset( controls.activity.getAssets(), _fontName);    
+        this.setTypeface(customfont);
+    }
 
 }

@@ -1,4 +1,4 @@
-package com.example.apptextviewshaderandshadowdemo1;
+package org.lamw.appvideoviewdemo1;
 
 import java.lang.reflect.Field;
 
@@ -461,8 +461,8 @@ public class jEditText extends EditText {
 	public void SetBackgroundByImage(Bitmap _image) {	
 		Drawable d = new BitmapDrawable(controls.activity.getResources(), _image);
 //[ifdef_api16up]
-		//if(Build.VERSION.SDK_INT >= 16) 
-  this.setBackground(d);
+	if(Build.VERSION.SDK_INT >= 16) 
+             this.setBackground(d);
 //[endif_api16up]
 	}	
 		
@@ -529,6 +529,11 @@ public class jEditText extends EditText {
 		 }	
        //[endif_api17up]				
 	}
+	
+	public void SetFontFromAssets(String _fontName) {   //   "font/font.ttf"
+        Typeface customfont = Typeface.createFromAsset( controls.activity.getAssets(), _fontName);    
+        this.setTypeface(customfont);
+    }
 	
 }
 

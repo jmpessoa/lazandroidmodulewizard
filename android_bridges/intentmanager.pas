@@ -108,7 +108,7 @@ jIntentManager = class(jControl)
     function GetActionCameraCropAsString(): string;
 
     procedure AddCategory(_intentCategory: integer);
-    procedure SetFlag(_intentFlag: integer);
+    procedure SetFlag(_intentFlag: TIntentFlag);
     procedure SetComponent(_packageName: string; _javaClassName: string);
 
     procedure SetClassName(_packageName: string; _javaClassName: string);
@@ -747,11 +747,11 @@ begin
      jIntentManager_AddCategory(FjEnv, FjObject, _intentCategory);
 end;
 
-procedure jIntentManager.SetFlag(_intentFlag: integer);
+procedure jIntentManager.SetFlag(_intentFlag: TIntentFlag);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jIntentManager_SetFlag(FjEnv, FjObject, _intentFlag);
+     jIntentManager_SetFlag(FjEnv, FjObject, Ord(_intentFlag));
 end;
 
 procedure jIntentManager.SetComponent(_packageName: string; _javaClassName: string);
@@ -1975,7 +1975,6 @@ begin
   end;
   env^.DeleteLocalRef(env, jCls);
 end;
-
 
 function jIntentManager_GetBundleContent(env: PJNIEnv; _jintentmanager: JObject; _intent: jObject): TDynArrayOfString;
 var

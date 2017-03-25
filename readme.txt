@@ -124,6 +124,40 @@
 	*
 	****************************************************************************************************
 
+Version 0.7.14 - 24 - March - 2017
+
+	NEW! jVideoView component
+
+	NEW! demo AppVideoViewDemo1
+
+	IMPROVED! 
+		jNotificationManager   --- thanks to majid.ebru!
+
+	NEW! demo AppNotificationManagerDemo2
+
+	UPDATED! demo AppNotificationManagerDemo1 --- thanks to majid.ebru!
+
+	IMPROVED! 
+		jTextView: news methods
+			SetFontFromAssets  --- thanks to majid.ebru!
+			SetTextIsSelectable
+			SetScrollingText
+			SetTextAsLink	
+			
+		jEditText:: new method
+			SetFontFromAssets  
+
+		jButton: new method  
+			SetFontFromAssets
+
+		jCheckBox: new method  
+			SetFontFromAssets
+
+		jRadioButton: new method 
+			SetFontFromAssets
+
+	NEW! demo AppCustomFontDemo1   --- thanks to majid.ebru!
+
 Version 0.7.13 - 27 - Feb - 2017
 
 	NEW! jMaps component  [A wrapper to run google app "Maps"]

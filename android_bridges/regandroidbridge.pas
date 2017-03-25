@@ -11,8 +11,7 @@ uses
   SysUtils,
   LResources,
   AndroidWidget,
-  viewflipper,
-  Laz_And_Controls, 
+  Laz_And_Controls,
   Laz_And_GLESv1_Canvas,
   Laz_And_GLESv2_Canvas,
   customdialog,
@@ -31,8 +30,10 @@ uses
   actionbartab,
   menu,
   contextmenu,
-  spinner;
-  
+  spinner,
+  viewflipper,
+  videoview;
+
 Procedure Register;
   
 implementation
@@ -78,6 +79,7 @@ begin
   {$I jcanvases1_icon.lrs}
   {$I jcanvases2_icon.lrs}
   {$I jviewflipper_icon.lrs}
+  {$I jvideoview_icon.lrs}
 
   RegisterComponents('Android Bridges',
     [
@@ -117,7 +119,8 @@ begin
       jCanvas,
       jCanvasES1,
       jCanvasES2,
-      jViewFlipper
+      jViewFlipper,
+      jVideoView
     ]
   );
   RegisterClasses([jApp, jForm, jControl, jVisualControl, jGLViewEvent]);

@@ -602,6 +602,10 @@ type
 
   TOnActivityRst = Procedure(Sender: TObject; requestCode: integer; resultCode: TAndroidResult; intentData: jObject) of Object;
 
+  TOnActivityCreate = Procedure(Sender: TObject; intentData: jObject) of Object;
+
+  TOnNewIntent = Procedure(Sender: TObject; intentData: jObject) of Object;
+
   TActionBarTabSelected = Procedure(Sender: TObject; view: jObject; title: string) of Object;
   TCustomDialogShow = Procedure(Sender: TObject; dialog: jObject; title: string) of Object;
 
@@ -634,8 +638,9 @@ type
   TEnvJni     = record
                  jEnv        : PJNIEnv;  // a pointer reference to the JNI environment,
                  jThis       : jObject;  // a reference to the object making this call (or class if static-> controls.java).
-                 jActivity   : jObject;  // Java Activity / android.content.Context -
-                 jRLayout    : jObject;  // Java Base Layout
+                 jActivity   : jObject;  // Java Activity / android.content.Context
+                 jRLayout    : jObject;  // Java Base Relative Layout
+                 jIntent     : jObject;  // Java OIntent
                 end;
 
 
@@ -736,7 +741,7 @@ type
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
     procedure CreateForm(InstanceClass: TComponentClass; out Reference);
-    procedure Init(env: PJNIEnv; this: jObject; activity: jObject; layout: jObject);
+    procedure Init(env: PJNIEnv; this: jObject; activity: jObject; layout: jObject; intent: jobject);
 
     procedure Finish;
     function  GetContext: jObject;
@@ -962,7 +967,8 @@ end;
 
     FOnPrepareOptionsMenu: TOnPrepareOptionsMenu;
     FOnPrepareOptionsMenuItem: TOnPrepareOptionsMenuItem;
-
+    FOnActivityCreate: TOnActivityCreate;
+    //FOnNewIntent: TOnNewIntent;
 
     //---------------  dummies for compatibility----
    {  FHorizontalOffset: integer;
@@ -1199,6 +1205,8 @@ end;
     property OnCreateContextMenu: TOnContextMenuItemCreate read FOnContextMenuCreate write FOnContextMenuCreate;
     property OnClickContextMenuItem: TOnClickContextMenuItem read FOnClickContextMenuItem write FOnClickContextMenuItem;
 
+    property OnActivityCreate: TOnActivityCreate read FOnActivityCreate write FOnActivityCreate;
+    //property OnNewIntent: TOnNewIntent read FOnNewIntent write FOnNewIntent;
   end;
 
   {jVisualControl}
@@ -1638,7 +1646,7 @@ Procedure VHandler_touchesEnded_withEvent(Sender         : TObject;
                                           Var Mouches    : TMouches);
 
   procedure jForm_ShowMessageAsync(env:PJNIEnv; Form:jObject; msg: string);
-  procedure Java_Event_pAppOnCreate(env: PJNIEnv; this: jobject; context:jobject;  layout:jobject);
+  procedure Java_Event_pAppOnCreate(env: PJNIEnv; this: jobject; context:jobject;  layout:jobject; intent: jobject);
 
 var
   gApp:       jApp;       //global App !
@@ -1653,9 +1661,9 @@ var
 
 implementation
 
-procedure Java_Event_pAppOnCreate(env: PJNIEnv; this: jobject; context:jobject; layout:jobject);
+procedure Java_Event_pAppOnCreate(env: PJNIEnv; this: jobject; context:jobject; layout:jobject; intent: jobject);
 begin
-  gApp.Init(env,this,context,layout);
+  gApp.Init(env,this,context,layout, intent);
 end;
 
 //------------------------------------------------------------------------------
@@ -2679,6 +2687,8 @@ begin
   jForm_Show2(refApp.Jni.jEnv, FjObject, FAnimation.In_);
 
   ActionBarHeight:= jForm_GetActionBarHeight(FjEnv, FjObject);
+
+  if Assigned(FOnActivityCreate) then FOnActivityCreate(Self, refApp.Jni.jIntent);
 
   if Assigned(FOnJNIPrompt) then FOnJNIPrompt(Self);
 
@@ -4941,7 +4951,7 @@ begin
   inherited Destroy;
 end;
 
-Procedure jApp.Init(env: PJNIEnv; this: jObject; activity: jObject; layout: jObject);
+Procedure jApp.Init(env: PJNIEnv; this: jObject; activity: jObject; layout: jObject; intent: jObject);
 var
   startOrient: integer;
 begin
@@ -4949,7 +4959,6 @@ begin
   // Setting Global Environment -----------------------------------------------
   FillChar(Forms,SizeOf(Forms),#0);
   Forms.Index      := -1; //initial dummy index ...
-
   //
   Screen.Style  := ssSensor;     // Screen Style [Device,Portrait,Lanscape]
 
@@ -4960,6 +4969,7 @@ begin
   Jni.jThis     := this; //["libcontrols.so"] a reference to the object making this call (or class if static).
   Jni.jActivity := activity;
   Jni.jRLayout  := layout;
+  Jni.jIntent   := intent;
 
   // Screen
   Screen.WH     := jSysInfo_ScreenWH(env, this, activity);

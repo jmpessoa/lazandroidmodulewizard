@@ -11,7 +11,7 @@ object AndroidModule1: TAndroidModule1
   ActivityMode = actMain
   BackgroundColor = colbrDefault
   ActionBarTitle = abtDefault
-  OnJNIPrompt = AndroidModule1JNIPrompt
+  OnActivityCreate = AndroidModule1ActivityCreate
   object jTextView1: jTextView
     Left = 51
     Top = 5
@@ -22,6 +22,7 @@ object AndroidModule1: TAndroidModule1
     MarginRight = 5
     MarginBottom = 5
     Visible = True
+    Id = 5760731
     PosRelativeToAnchor = []
     PosRelativeToParent = [rpTop, rpCenterHorizontal]
     LayoutParamWidth = lpWrapContent
@@ -34,7 +35,6 @@ object AndroidModule1: TAndroidModule1
     FontSize = 0
     TextTypeFace = tfNormal
     FontSizeUnit = unitDefault
-    Id = 5760731
   end
   object jButton1: jButton
     Left = 2
@@ -47,6 +47,7 @@ object AndroidModule1: TAndroidModule1
     MarginBottom = 4
     Visible = True
     Anchor = jTextView1
+    Id = 8479009
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = []
     LayoutParamWidth = lpMatchParent
@@ -57,7 +58,6 @@ object AndroidModule1: TAndroidModule1
     FontSize = 0
     FontSizeUnit = unitDefault
     OnClick = jButton1Click
-    Id = 8479009
   end
   object jButton2: jButton
     Left = 4
@@ -70,6 +70,7 @@ object AndroidModule1: TAndroidModule1
     MarginBottom = 4
     Visible = True
     Anchor = jButton1
+    Id = 0
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = [rpCenterHorizontal]
     LayoutParamWidth = lpMatchParent
@@ -80,16 +81,23 @@ object AndroidModule1: TAndroidModule1
     FontSize = 0
     FontSizeUnit = unitDefault
     OnClick = jButton2Click
-    Id = 0
   end
   object jNotificationManager1: jNotificationManager
     Id = 1001
     Title = 'Lamw'
     Subject = 'Hello'
     Body = 'Lamw: Hello World!'
-    IConIdentifier = 'ic_launcher'
+    IconIdentifier = 'lamw_logo'
     LightsColor = colbrDefault
+    AutoCancel = False
+    Ongoing = False
+    PendingFlag = pfUpdateCurrent
     left = 87
     top = 154
+  end
+  object jIntentManager1: jIntentManager
+    IntentAction = iaNone
+    left = 132
+    top = 257
   end
 end

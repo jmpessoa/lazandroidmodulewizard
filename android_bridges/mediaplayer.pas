@@ -66,6 +66,8 @@ jMediaPlayer = class(jControl)
     function GetVideoHeight(): integer;
     procedure SetScreenOnWhilePlaying(_value: boolean);
     procedure SetAudioStreamType(_audioStreamType: TAudioStreamType);
+    procedure SetSurfaceTexture(_surfaceTexture: jObject);
+    procedure PrepareAsync();
 
     procedure GenEvent_OnPrepared(Obj: TObject; videoWidth: integer; videoHeigh: integer);
     procedure GenEvent_OnVideoSizeChanged(Obj: TObject; videoWidth: integer; videoHeight: integer);
@@ -106,6 +108,8 @@ function jMediaPlayer_GetVideoWidth(env: PJNIEnv; _jmediaplayer: JObject): integ
 function jMediaPlayer_GetVideoHeight(env: PJNIEnv; _jmediaplayer: JObject): integer;
 procedure jMediaPlayer_SetScreenOnWhilePlaying(env: PJNIEnv; _jmediaplayer: JObject; _value: boolean);
 procedure jMediaPlayer_SetAudioStreamType(env: PJNIEnv; _jmediaplayer: JObject; _audioStreamType: integer);
+procedure jMediaPlayer_SetSurfaceTexture(env: PJNIEnv; _jmediaplayer: JObject; _surfaceTexture: jObject);
+procedure jMediaPlayer_PrepareAsync(env: PJNIEnv; _jmediaplayer: JObject);
 
 
 
@@ -313,6 +317,27 @@ begin
      jMediaPlayer_SetAudioStreamType(FjEnv, FjObject, Ord(_audioStreamType));
 end;
 
+procedure jMediaPlayer.SetDataSource(_path: string; _filename: string);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jMediaPlayer_SetDataSource(FjEnv, FjObject, _path ,_filename);
+end;
+
+procedure jMediaPlayer.SetSurfaceTexture(_surfaceTexture: jObject);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jMediaPlayer_SetSurfaceTexture(FjEnv, FjObject, _surfaceTexture);
+end;
+
+procedure jMediaPlayer.PrepareAsync();
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jMediaPlayer_PrepareAsync(FjEnv, FjObject);
+end;
+
 procedure jMediaPlayer.GenEvent_OnPrepared(Obj: TObject; videoWidth: integer; videoHeigh: integer);
 begin
    if Assigned(FOnPrepared) then FOnPrepared(Obj, videoWidth, videoHeigh);
@@ -331,13 +356,6 @@ end;
 procedure jMediaPlayer.GenEvent_pOnMediaPlayerTimedText(Obj: TObject; timedText: string);
 begin
    if Assigned(FOnTimedText) then FOnTimedText(Obj, timedText);
-end;
-
-procedure jMediaPlayer.SetDataSource(_path: string; _filename: string);
-begin
-  //in designing component state: set value here...
-  if FInitialized then
-     jMediaPlayer_SetDataSource(FjEnv, FjObject, _path ,_filename);
 end;
 
 {-------- jMediaPlayer_JNI_Bridge ----------}
@@ -648,5 +666,28 @@ env^.DeleteLocalRef(env,jParams[0].l);
   env^.DeleteLocalRef(env, jCls);
 end;
 
+procedure jMediaPlayer_SetSurfaceTexture(env: PJNIEnv; _jmediaplayer: JObject; _surfaceTexture: jObject);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= _surfaceTexture;
+  jCls:= env^.GetObjectClass(env, _jmediaplayer);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetSurfaceTexture', '(Landroid/graphics/SurfaceTexture;)V');
+  env^.CallVoidMethodA(env, _jmediaplayer, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jMediaPlayer_PrepareAsync(env: PJNIEnv; _jmediaplayer: JObject);
+var
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jmediaplayer);
+  jMethod:= env^.GetMethodID(env, jCls, 'PrepareAsync', '()V');
+  env^.CallVoidMethod(env, _jmediaplayer, jMethod);
+  env^.DeleteLocalRef(env, jCls);
+end;
 
 end.

@@ -1,4 +1,4 @@
-package com.example.appchronometerdemo1;
+package com.example.appnotificationmanagerdemo3;
 
 import android.app.Activity;
 import android.app.DownloadManager;
@@ -37,9 +37,9 @@ public class jBroadcastReceiver extends BroadcastReceiver {
 
    @Override
    /*.*/public void onReceive(Context arg0, Intent intent) { 
-	   mResultCode = -1;
+	   mResultCode = 0;
 	   switch (this.getResultCode()) {
-	        case Activity.RESULT_OK: mResultCode = 1; break;
+	        case Activity.RESULT_OK: mResultCode = -1; break;
 	        case Activity.RESULT_CANCELED: mResultCode = 0; break;  
 	   }	     	     	
 	   

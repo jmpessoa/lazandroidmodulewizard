@@ -51,7 +51,7 @@ jBroadcastReceiver = class(jControl)
 
     procedure Unregister();
 
-    function GetResultCode(): integer;
+    function GetResultCode(): TAndroidResult;
     function GetResultData(): string;
     function GetResultExtras(): jObject;
 
@@ -179,11 +179,14 @@ begin
   if Assigned(FOnReceiver) then FOnReceiver(Obj, intent);
 end;
 
-function jBroadcastReceiver.GetResultCode(): integer;
+function jBroadcastReceiver.GetResultCode(): TAndroidResult;
 begin
   //in designing component state: result value here...
+  Result:= RESULT_CANCELED;
   if FInitialized then
-   Result:= jBroadcastReceiver_GetResultCode(FjEnv, FjObject);
+  begin
+     Result:= TAndroidResult(jBroadcastReceiver_GetResultCode(FjEnv, FjObject));
+  end;
 end;
 
 function jBroadcastReceiver.GetResultData(): string;

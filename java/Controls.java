@@ -1,6 +1,6 @@
-package com.example.appdemo1;
+package com.example.appnotificationmanagerdemo1;
 
-//LAMW: Lazarus Android Module Wizard  - version 0.7 - rev. 13.1 - 27 Feb - 2017 
+//LAMW: Lazarus Android Module Wizard  - version 0.7 - rev. 14 - 24 March - 2017 
 //RAD Android: Project Wizard, Form Designer and Components Development Model!
 
 //https://github.com/jmpessoa/lazandroidmodulewizard
@@ -68,6 +68,7 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
+import android.graphics.SurfaceTexture;
 import android.graphics.drawable.Drawable;
 import android.hardware.Sensor;
 import android.os.Bundle;
@@ -1204,6 +1205,10 @@ public void Restart(int _delay) {
   System.exit(2);
 }
 
+public String UriEncode(String _message) {
+	return Uri.encode(_message);
+}
+
 }
 //**class entrypoint**//please, do not remove/change this line!
 
@@ -1216,9 +1221,9 @@ public int screenStyle=0;         // Screen Style [Dev:0 , Portrait: 1, Landscap
 public int systemVersion;
 
 //Jave -> Pascal Function ( Pascal Side = Event )
-public native void pAppOnCreate(Context context, RelativeLayout layout);
+public native void pAppOnCreate(Context context, RelativeLayout layout, Intent intent);
 public native int  pAppOnScreenStyle();
-public native void pAppOnNewIntent();
+public native void pAppOnNewIntent(Intent intent);
 public native void pAppOnDestroy();
 public native void pAppOnPause();
 public native void pAppOnRestart();
@@ -1262,11 +1267,12 @@ try{System.loadLibrary("controls");} catch (UnsatisfiedLinkError e) {Log.e("JNI_
 // -------------------------------------------------------------------------
 //  Activity Event
 // -------------------------------------------------------------------------
-public  int  jAppOnScreenStyle()          { return(pAppOnScreenStyle());   }     
-public  void jAppOnCreate(Context context,RelativeLayout layout )
-                                          { pAppOnCreate(context,layout);  }
+public  int  jAppOnScreenStyle()          { return(pAppOnScreenStyle());   } 
 
-public  void jAppOnNewIntent()            { pAppOnNewIntent();             }     
+public  void jAppOnCreate(Context context,RelativeLayout layout, Intent intent) //android.os.Bundle;
+                                          { pAppOnCreate(context,layout, intent);  }
+
+public  void jAppOnNewIntent(Intent intent)            { pAppOnNewIntent(intent);             }     
 public  void jAppOnDestroy()              { pAppOnDestroy();               }  
 public  void jAppOnPause()                { pAppOnPause();                 }  
 public  void jAppOnRestart()              { pAppOnRestart();               }    

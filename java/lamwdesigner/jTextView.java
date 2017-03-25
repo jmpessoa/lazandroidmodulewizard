@@ -1,4 +1,4 @@
-package com.example.appgooglemapsdemo1;
+package org.lamw.appvideoviewdemo1;
 
 import java.lang.reflect.Field;
 
@@ -19,6 +19,9 @@ import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.PaintDrawable;
 import android.os.Build;
+import android.text.Html;
+import android.text.TextUtils.TruncateAt;
+import android.text.util.Linkify;
 import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
@@ -370,4 +373,44 @@ public class jTextView extends TextView {
 		 }	
        //[endif_api17up]				
 	}
+	
+	
+	public void SetFontFromAssets(String _fontName) {   //   "fonts/font1.ttf"  or  "font1.ttf" 
+        Typeface customfont = Typeface.createFromAsset( controls.activity.getAssets(), _fontName);    
+        this.setTypeface(customfont);
+    }
+
+	public void SetTextIsSelectable(boolean _value) {   //Sets whether the content of this view is selectable by the user.
+	     this.setTextIsSelectable(_value);
+    }	 
+		
+	/*
+	 * if text is small then add space before and after text
+       txtEventName.setText("\t \t \t \t \t \t"+eventName+"\t \t \t \t \t \t");
+       
+       or
+       
+       String summary = "<html><FONT color='#fdb728' FACE='courier'><marquee behavior='scroll' direction='left' scrollamount=10>"
+                + "Hello Droid" + "</marquee></FONT></html>";
+       webView.loadData(summary, "text/html", "utf-8");     
+	 */
+	public void  SetScrollingText() { // marquee .... Changes the selection state of this view
+		this.setSingleLine(true);
+		this.setEllipsize(TruncateAt.MARQUEE);      
+		this.setHorizontallyScrolling(true);
+		this.setLines(1);
+		this.setMarqueeRepeatLimit(-1);
+		this.setSelected(true);  	
+		//this.invalidate()
+	}
+	
+	//http://rajeshandroiddeveloper.blogspot.com.br/2013/07/how-to-implement-custom-font-to-text.html
+	public void SetTextAsLink(String _linkText) {
+		 this.setText(Html.fromHtml(_linkText));  //"www.google.com" 
+	     Linkify.addLinks(this, Linkify.ALL);
+	}
+	
+	//TODO !!!
+	//http://www.viralandroid.com/2015/12/how-to-use-font-awesome-icon-in-android-application.html
+	//http://fontawesome.io/cheatsheet/
 }
