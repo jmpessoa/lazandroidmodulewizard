@@ -1,4 +1,4 @@
-package org.lamw.appvideoviewdemo1;
+package org.lamw.appcustomfontdemo1;
 
 import java.lang.reflect.Field;
 
@@ -409,8 +409,5 @@ public class jTextView extends TextView {
 		 this.setText(Html.fromHtml(_linkText));  //"www.google.com" 
 	     Linkify.addLinks(this, Linkify.ALL);
 	}
-	
-	//TODO !!!
-	//http://www.viralandroid.com/2015/12/how-to-use-font-awesome-icon-in-android-application.html
-	//http://fontawesome.io/cheatsheet/
+		
 }

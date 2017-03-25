@@ -1154,7 +1154,7 @@ end;
     procedure Restart(_delay: integer);
     procedure HideSoftInput(_view: jObject); overload;
     function UriEncode(_message: string): string;
-
+    function ParseHtmlFontAwesome(_htmlString: string): string;
     // Property
     property View         : jObject        read FjRLayout; //layout!
 
@@ -1563,6 +1563,7 @@ procedure jForm_Minimize(env: PJNIEnv; _jform: JObject);
 procedure jForm_Restart(env: PJNIEnv; _jform: JObject; _delay: integer);
 procedure jForm_HideSoftInput(env: PJNIEnv; _jform: JObject; _view: jObject);  overload;
 function jForm_UriEncode(env: PJNIEnv; _jform: JObject; _message: string): string;
+function jForm_ParseHtmlFontAwesome(env: PJNIEnv; _jform: JObject; _htmlString: string): string;
 
 //------------------------------------------------------------------------------
 // View  - Generics
@@ -3605,6 +3606,13 @@ begin
    Result:= jForm_UriEncode(FjEnv, FjObject, _message);
 end;
 
+function jForm.ParseHtmlFontAwesome(_htmlString: string): string;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jForm_ParseHtmlFontAwesome(FjEnv, FjObject, _htmlString);
+end;
+
 {-------- jForm_JNI_Bridge ----------}
 
 function jForm_GetPathFromAssetsFile(env: PJNIEnv; _jform: JObject; _assetsFileName: string): string;
@@ -4907,6 +4915,29 @@ begin
             end;
   end;
   env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+function jForm_ParseHtmlFontAwesome(env: PJNIEnv; _jform: JObject; _htmlString: string): string;
+var
+  jStr: JString;
+  jBoo: JBoolean;
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_htmlString));
+  jCls:= env^.GetObjectClass(env, _jform);
+  jMethod:= env^.GetMethodID(env, jCls, 'ParseHtmlFontAwesome', '(Ljava/lang/String;)Ljava/lang/String;');
+  jStr:= env^.CallObjectMethodA(env, _jform, jMethod, @jParams);
+  case jStr = nil of
+     True : Result:= '';
+     False: begin
+              jBoo:= JNI_False;
+              Result:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
+            end;
+  end;
+env^.DeleteLocalRef(env,jParams[0].l);
   env^.DeleteLocalRef(env, jCls);
 end;
 

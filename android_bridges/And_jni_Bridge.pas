@@ -178,7 +178,6 @@ procedure jTextView_SetTextIsSelectable(env: PJNIEnv; _jtextview: JObject; _valu
 procedure jTextView_SetScrollingText(env: PJNIEnv; _jtextview: JObject);
 procedure jTextView_SetTextAsLink(env: PJNIEnv; _jtextview: JObject; _linkText: string);
 
-
 //-----------------------------------
 // EditText  :: changed by jmpessoa [support Api > 13]
 //--------------------------------------
@@ -1929,7 +1928,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jtextview);
   jMethod:= env^.GetMethodID(env, jCls, 'SetTextAsLink', '(Ljava/lang/String;)V');
   env^.CallVoidMethodA(env, _jtextview, jMethod, @jParams);
-env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env,jParams[0].l);
   env^.DeleteLocalRef(env, jCls);
 end;
 

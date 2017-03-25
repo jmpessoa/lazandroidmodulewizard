@@ -1,6 +1,6 @@
-package com.example.appnotificationmanagerdemo1;
+package org.lamw.appcustomfontdemo1;
 
-//LAMW: Lazarus Android Module Wizard  - version 0.7 - rev. 14 - 24 March - 2017 
+//LAMW: Lazarus Android Module Wizard  - version 0.7 - rev. 14.1 - 25 March - 2017 
 //RAD Android: Project Wizard, Form Designer and Components Development Model!
 
 //https://github.com/jmpessoa/lazandroidmodulewizard
@@ -1207,6 +1207,16 @@ public void Restart(int _delay) {
 
 public String UriEncode(String _message) {
 	return Uri.encode(_message);
+}
+
+//http://www.viralandroid.com/2015/12/how-to-use-font-awesome-icon-in-android-application.html
+//http://fontawesome.io/cheatsheet/	
+public String ParseHtmlFontAwesome(String _htmlString) {
+	   String iconHeart = _htmlString; //"&#xf004;";
+	   String valHexStr = iconHeart.replace("&#x", "").replace(";", "");
+	   long valLong = Long.parseLong(valHexStr,16);
+	   //button.setText(getString((char)valLong+"");
+	   return (char)valLong+"" ;
 }
 
 }

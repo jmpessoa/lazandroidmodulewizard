@@ -114,7 +114,7 @@ uses
                              content: JString; fromIP: JString; fromPort: integer): JBoolean;
 
    procedure Java_Event_pOnFileSelected(env: PJNIEnv; this: jobject; Obj: TObject; path: JString; fileName: JString);
-   procedure Java_Event_pOnSurfaceTextureAvailable(env: PJNIEnv; this: jobject; Obj: TObject; surface: JObject; width: integer; height: integer);
+
 
 implementation
 
@@ -124,7 +124,7 @@ uses
    spinner, location, actionbartab, customdialog, togglebutton, switchbutton, gridview,
    sensormanager, broadcastreceiver, datepickerdialog, timepickerdialog, shellcommand,
    tcpsocketclient, surfaceview, mediaplayer, contactmanager, seekbar, ratingbar, radiogroup,drawingview,
-   autocompletetextview, chronometer, numberpicker, udpsocket, opendialog, textureview;
+   autocompletetextview, chronometer, numberpicker, udpsocket, opendialog;
 
 procedure Java_Event_pOnBluetoothEnabled(env: PJNIEnv; this: jobject; Obj: TObject);
 begin
@@ -1338,17 +1338,6 @@ begin
     end;
 
     jOpenDialog(Obj).GenEvent_OnFileSelected(Obj, pasPath, pasFileName);
-  end;
-end;
-
-procedure Java_Event_pOnSurfaceTextureAvailable(env: PJNIEnv; this: jobject; Obj: TObject; surface: JObject; width: integer; height: integer);
-begin
-  gApp.Jni.jEnv:= env;
-  gApp.Jni.jThis:= this;
-  if Obj is jTextureView then
-  begin
-    jForm(jTextureView(Obj).Owner).UpdateJNI(gApp);
-    jTextureView(Obj).GenEvent_OnSurfaceTextureAvailable(Obj, surface, width, height);
   end;
 end;
 
