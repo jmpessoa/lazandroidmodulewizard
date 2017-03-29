@@ -1215,7 +1215,6 @@ public String ParseHtmlFontAwesome(String _htmlString) {
 	   String iconHeart = _htmlString; //"&#xf004;";
 	   String valHexStr = iconHeart.replace("&#x", "").replace(";", "");
 	   long valLong = Long.parseLong(valHexStr,16);
-	   //button.setText(getString((char)valLong+"");
 	   return (char)valLong+"" ;
 }
 
