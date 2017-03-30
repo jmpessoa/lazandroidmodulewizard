@@ -137,4 +137,79 @@ object AndroidModule1: TAndroidModule1
     Checked = False
     FontSizeUnit = unitDefault
   end
+  object jTextView2: jTextView
+    Left = 64
+    Top = 184
+    Width = 191
+    Height = 59
+    MarginLeft = 5
+    MarginTop = 5
+    MarginRight = 5
+    MarginBottom = 5
+    Visible = True
+    Anchor = jCheckBox1
+    Id = 6
+    PosRelativeToAnchor = [raBelow]
+    PosRelativeToParent = [rpCenterHorizontal]
+    LayoutParamWidth = lpWrapContent
+    LayoutParamHeight = lpWrapContent
+    Text = 'jTextView2'
+    Alignment = taLeft
+    Enabled = True
+    BackgroundColor = colbrDefault
+    FontColor = colbrDefault
+    FontSize = 40
+    TextTypeFace = tfNormal
+    FontSizeUnit = unitDefault
+  end
+  object jTextView3: jTextView
+    Left = 64
+    Top = 253
+    Width = 191
+    Height = 59
+    MarginLeft = 5
+    MarginTop = 5
+    MarginRight = 5
+    MarginBottom = 5
+    Visible = True
+    Anchor = jTextView2
+    Id = 7
+    PosRelativeToAnchor = [raBelow]
+    PosRelativeToParent = [rpCenterHorizontal]
+    LayoutParamWidth = lpWrapContent
+    LayoutParamHeight = lpWrapContent
+    Text = 'jTextView3'
+    Alignment = taLeft
+    Enabled = True
+    BackgroundColor = colbrDefault
+    FontColor = colbrDefault
+    FontSize = 40
+    TextTypeFace = tfNormal
+    FontSizeUnit = unitDefault
+  end
+  object jTextView4: jTextView
+    Left = 64
+    Top = 322
+    Width = 191
+    Height = 59
+    MarginLeft = 5
+    MarginTop = 5
+    MarginRight = 5
+    MarginBottom = 5
+    Visible = True
+    Anchor = jTextView3
+    Id = 8
+    PosRelativeToAnchor = [raBelow]
+    PosRelativeToParent = [rpCenterHorizontal]
+    LayoutParamWidth = lpWrapContent
+    LayoutParamHeight = lpWrapContent
+    Text = 'jTextView4'
+    Alignment = taLeft
+    Enabled = True
+    BackgroundColor = colbrDefault
+    FontColor = colbrDefault
+    FontSize = 40
+    TextTypeFace = tfNormal
+    FontSizeUnit = unitDefault
+  end
 end

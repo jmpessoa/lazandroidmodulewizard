@@ -1,6 +1,6 @@
 package com.example.appnotificationmanagerdemo1;
 
-//Lamw: Lazarus Android Module Wizard - version 0.7 - rev. 14 - 24 March - 2017
+//Lamw: Lazarus Android Module Wizard - version 0.7 - rev. 15 - 29 March - 2017
 //Form Designer and Components development model!
 //https://github.com/jmpessoa/lazandroidmodulewizard
 //http://forum.lazarus.freepascal.org/index.php/topic,21919.270.html

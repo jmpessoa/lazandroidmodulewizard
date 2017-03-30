@@ -746,7 +746,6 @@ type
     procedure UpdateLParamWidth;
 
   protected
-    Procedure SetText(Value: string ); override;
     Function  GetText: string;   override;
 
     procedure SetFontFace(AValue: TFontFace); //override;
@@ -771,6 +770,7 @@ type
     procedure CopyToClipboard();
     procedure PasteFromClipboard();
 
+    Procedure SetText(Value: string ); override;
     function GetWidth: integer;  override;
     function GetHeight: integer; override;
 

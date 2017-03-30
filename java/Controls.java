@@ -1,6 +1,6 @@
-package org.lamw.appcustomfontdemo1;
+package org.lamw.apptexttospeechdemo1;
 
-//LAMW: Lazarus Android Module Wizard  - version 0.7 - rev. 14.1 - 25 March - 2017 
+//LAMW: Lazarus Android Module Wizard  - version 0.7 - rev. 15 - 29 March - 2017 
 //RAD Android: Project Wizard, Form Designer and Components Development Model!
 
 //https://github.com/jmpessoa/lazandroidmodulewizard
@@ -1215,6 +1215,7 @@ public String ParseHtmlFontAwesome(String _htmlString) {
 	   String iconHeart = _htmlString; //"&#xf004;";
 	   String valHexStr = iconHeart.replace("&#x", "").replace(";", "");
 	   long valLong = Long.parseLong(valHexStr,16);
+	   //button.setText(getString((char)valLong+"");
 	   return (char)valLong+"" ;
 }
 
@@ -1279,19 +1280,19 @@ try{System.loadLibrary("controls");} catch (UnsatisfiedLinkError e) {Log.e("JNI_
 public  int  jAppOnScreenStyle()          { return(pAppOnScreenStyle());   } 
 
 public  void jAppOnCreate(Context context,RelativeLayout layout, Intent intent) //android.os.Bundle;
-                                          { pAppOnCreate(context,layout, intent);  }
+                                          { pAppOnCreate(context,layout,intent); }
 
-public  void jAppOnNewIntent(Intent intent)            { pAppOnNewIntent(intent);             }     
+public  void jAppOnNewIntent(Intent intent)            { pAppOnNewIntent(intent); }     
 public  void jAppOnDestroy()              { pAppOnDestroy();               }  
 public  void jAppOnPause()                { pAppOnPause();                 }  
 public  void jAppOnRestart()              { pAppOnRestart();               }    
 public  void jAppOnResume()               { pAppOnResume();                }    
-public  void jAppOnStart()                { pAppOnStart();                 }     //change by jmpessoa : old OnActive
+public  void jAppOnStart()                { pAppOnStart();                 }    
 public  void jAppOnStop()                 { pAppOnStop();                  }   
 public  void jAppOnBackPressed()          { pAppOnBackPressed();           }   
 public  int  jAppOnRotate(int rotate)     {  return(pAppOnRotate(rotate)); }
 
-//rotate=1 --> device on vertical/default position ; 2 --> device on horizontal position      //tips by jmpessoa
+//rotate=1 --> device on vertical/default position ; 2 --> device on horizontal position 
 public  void jAppOnConfigurationChanged() { pAppOnConfigurationChanged();  }
 
 public  void jAppOnActivityResult(int requestCode, int resultCode, Intent data) 

@@ -124,6 +124,14 @@
 	*
 	****************************************************************************************************
 
+Version 0.7.15 - 29 - March - 2017
+
+	NEW! jTextToSpeech  component
+
+	NEW! demo AppTextToSpeechDemo1
+
+	UPDATED! demo AppCustomFontDemo1 --- Added Font Awesome Icons example
+
 Version 0.7.14 - 24 - March - 2017
 
 	NEW! jVideoView component

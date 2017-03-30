@@ -8,6 +8,7 @@ interface
 
 uses 
   Classes,
+  texttospeech,
   gmaps,
   windowmanager,
   opendialog,
@@ -51,6 +52,7 @@ implementation
   
 Procedure Register;
 begin
+  {$I jtexttospeech_icon.lrs}
   {$I jmaps_icon.lrs}
   {$I jwindowmanager_icon.lrs}
   {$I jopendialog_icon.lrs}
@@ -95,6 +97,7 @@ begin
 
   RegisterComponents('Android Bridges Extra',
    [
+      jTextToSpeech,
       jMaps,
       jWindowManager,
       jOpenDialog,
