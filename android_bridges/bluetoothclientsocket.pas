@@ -36,7 +36,7 @@ jBluetoothClientSocket = class(jControl)
     procedure jFree();
     procedure SetDevice(_device: jObject);
     procedure SetUUID(_strUUID: string);
-    procedure Connect();
+    procedure Connect();  overload;
 
 
     procedure WriteMessage(_message: string); overload;
@@ -61,6 +61,7 @@ jBluetoothClientSocket = class(jControl)
     procedure WriteMessage(_message: string; _dataHeader: string); overload;
     procedure Write(var _dataContent: TDynArrayOfJByte; _dataHeader: string); overload;
     procedure SendFile(_filePath: string; _fileName: string; _dataHeader: string); overload;
+    procedure Connect(_executeOnThreadPoolExecutor: boolean); overload;
 
     procedure GenEvent_OnBluetoothClientSocketConnected(Obj: TObject; _deviceName: string; _deviceAddress: string);
     procedure GenEvent_OnBluetoothClientSocketIncomingData(Obj: TObject; var _byteArrayContent: TDynArrayOfJByte; _byteArrayHeader: TDynArrayOfJByte);
@@ -80,7 +81,7 @@ function jBluetoothClientSocket_jCreate(env: PJNIEnv; this: JObject;_Self: int64
 procedure jBluetoothClientSocket_jFree(env: PJNIEnv; _jbluetoothclientsocket: JObject);
 procedure jBluetoothClientSocket_SetDevice(env: PJNIEnv; _jbluetoothclientsocket: JObject; _device: jObject);
 procedure jBluetoothClientSocket_SetUUID(env: PJNIEnv; _jbluetoothclientsocket: JObject; _strUUID: string);
-procedure jBluetoothClientSocket_Connect(env: PJNIEnv; _jbluetoothclientsocket: JObject);
+procedure jBluetoothClientSocket_Connect(env: PJNIEnv; _jbluetoothclientsocket: JObject); overload;
 
 function jBluetoothClientSocket_IsConnected(env: PJNIEnv; _jbluetoothclientsocket: JObject): boolean;
 procedure jBluetoothClientSocket_Disconnect(env: PJNIEnv; _jbluetoothclientsocket: JObject);
@@ -108,7 +109,7 @@ procedure jBluetoothClientSocket_SendFile(env: PJNIEnv; _jbluetoothclientsocket:
 procedure jBluetoothClientSocket_WriteMessage(env: PJNIEnv; _jbluetoothclientsocket: JObject; _message: string; _dataHeader: string); overload;
 procedure jBluetoothClientSocket_Write(env: PJNIEnv; _jbluetoothclientsocket: JObject; var _dataContent: TDynArrayOfJByte; _dataHeader: string); overload;
 procedure jBluetoothClientSocket_SendFile(env: PJNIEnv; _jbluetoothclientsocket: JObject; _filePath: string; _fileName: string; _dataHeader: string); overload;
-
+procedure jBluetoothClientSocket_Connect(env: PJNIEnv; _jbluetoothclientsocket: JObject; _executeOnThreadPoolExecutor: boolean); overload;
 
 implementation
 
@@ -340,6 +341,13 @@ begin
   //in designing component state: set value here...
   if FInitialized then
      jBluetoothClientSocket_SendFile(FjEnv, FjObject, _filePath ,_fileName ,_dataHeader);
+end;
+
+procedure jBluetoothClientSocket.Connect(_executeOnThreadPoolExecutor: boolean);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jBluetoothClientSocket_Connect(FjEnv, FjObject, _executeOnThreadPoolExecutor);
 end;
 
 {-------- jBluetoothClientSocket_JNI_Bridge ----------}
@@ -803,6 +811,18 @@ env^.DeleteLocalRef(env,jParams[0].l);
   env^.DeleteLocalRef(env, jCls);
 end;
 
+procedure jBluetoothClientSocket_Connect(env: PJNIEnv; _jbluetoothclientsocket: JObject; _executeOnThreadPoolExecutor: boolean);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].z:= JBool(_executeOnThreadPoolExecutor);
+  jCls:= env^.GetObjectClass(env, _jbluetoothclientsocket);
+  jMethod:= env^.GetMethodID(env, jCls, 'Connect', '(Z)V');
+  env^.CallVoidMethodA(env, _jbluetoothclientsocket, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
 
 
 end.

@@ -1,4 +1,4 @@
-package com.example.appchronometerdemo1;
+package com.example.appbluetoothclientsocketdemo1;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -291,13 +291,13 @@ public void SendFile(String _filePath, String _fileName, byte[] _dataHeader) thr
       return buffer.getShort();
   }
 			
-	public void Connect() {
+  public void Connect() {
 	  
-	    if (!mmBAdapter.isEnabled()) {
+	  if (!mmBAdapter.isEnabled()) {
           controls.activity.startActivityForResult(new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE), 1000);
       }  	    
 	    
-	    if (mmBAdapter.isDiscovering()) mmBAdapter.cancelDiscovery(); //must cancel to connect!
+	  if (mmBAdapter.isDiscovering()) mmBAdapter.cancelDiscovery(); //must cancel to connect!
 	    
       if (mmSocket != null) {
       	  try {        		  
@@ -330,11 +330,62 @@ public void SendFile(String _filePath, String _fileName, byte[] _dataHeader) thr
 				mBufferInput = null;
 				mBufferOutput = null;
 				e.printStackTrace();
-			}        	
-          new ASocketClientTask().execute();
+			}  		
+		    new ASocketClientTask().execute(); 
       }  
   }	
 
+  
+  public void Connect(boolean _executeOnThreadPoolExecutor) {  //thanks to Tomash
+ 
+	  if (!mmBAdapter.isEnabled()) {
+          controls.activity.startActivityForResult(new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE), 1000);
+      }  	    
+	    
+	  if (mmBAdapter.isDiscovering()) mmBAdapter.cancelDiscovery(); //must cancel to connect!
+	    
+      if (mmSocket != null) {
+      	  try {        		  
+				mmSocket.close();
+				mmSocket = null;
+			  } catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			  }
+      }
+        
+      try {
+      	  mmConnected = false;
+			  mmSocket = mmDevice.createRfcommSocketToServiceRecord(UUID.fromString(mmUUIDString));
+			  
+			  // This is a blocking call and will only return on a successful connection or an exception			  
+		      mmSocket.connect();
+		      
+		} catch (IOException e) {
+				 mmConnected = false;									
+				mmSocket = null;				
+		}          	
+       
+      if (mmSocket != null) {
+  		try {
+  			mBufferInput = new BufferedInputStream(mmSocket.getInputStream());
+				mBufferOutput = new  BufferedOutputStream(mmSocket.getOutputStream());
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				mBufferInput = null;
+				mBufferOutput = null;
+				e.printStackTrace();
+			}
+  		
+  		    if (_executeOnThreadPoolExecutor) 
+  		       new ASocketClientTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);  //thanks to Tomash
+  		    else
+  		       new ASocketClientTask().execute();
+      }	  
+	  
+  }
+   
+     
 	public String ByteArrayToString(byte[] _byteArray) { 
 		 return (new String(_byteArray));   
 	}
