@@ -15,8 +15,16 @@ type
   TAndroidModule1 = class(jForm)
     jButton1: jButton;
     jEditText1: jEditText;
+    jImageView1: jImageView;
+    jPanel1: jPanel;
     jTextToSpeech1: jTextToSpeech;
     jTextView1: jTextView;
+    jTextView2: jTextView;
+    jTextView3: jTextView;
+    jTextView4: jTextView;
+    jTextView5: jTextView;
+    jTextView6: jTextView;
+    procedure AndroidModule1JNIPrompt(Sender: TObject);
     procedure jButton1Click(Sender: TObject);
   private
     {private declarations}
@@ -39,6 +47,13 @@ begin
   jTextToSpeech1.SpeakOn(jEditText1.Text); //used for the first call ..
   jTextToSpeech1.SpeakAdd('Hello World!');  // add more ...
   jTextToSpeech1.SpeakAdd('Hello Android!');   // add more ....
+end;
+
+procedure TAndroidModule1.AndroidModule1JNIPrompt(Sender: TObject);
+begin
+  ////You can basically set it from anything between 0(fully transparent) to 255 (completely opaque)
+  jTextView2.SetBackgroundAlpha(45);
+  jPanel1.SetBackgroundAlpha(45);
 end;
 
 end.

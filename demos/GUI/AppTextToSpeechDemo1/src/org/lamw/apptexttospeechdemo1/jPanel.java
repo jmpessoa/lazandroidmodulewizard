@@ -1,5 +1,11 @@
-package com.example.appdemo1;
+package org.lamw.apptexttospeechdemo1;
 
+import android.graphics.Color;
+import android.graphics.PorterDuff.Mode;
+import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.PaintDrawable;
+import android.os.Build;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
@@ -42,7 +48,6 @@ public class jPanel extends RelativeLayout {
  //[ifdef_api14up] */
 	private float lweight = 0;
 
-
 	boolean mRemovedFromParent = false;
 
 	private GestureDetector gDetect;
@@ -52,6 +57,8 @@ public class jPanel extends RelativeLayout {
 	private float MIN_ZOOM = 0.25f;
 	private float MAX_ZOOM = 4.0f;
 
+	int mRadius = 20;
+	
 	//Constructor
 	public  jPanel(android.content.Context context, Controls ctrls,long pasobj ) {
 		super(context);
@@ -112,26 +119,34 @@ public class jPanel extends RelativeLayout {
 		return r;		
 	}
 
-	public void resetLParamsRules() {
+	public void resetLParamsRules() {   //clearLayoutAll
+		
 		if (lparams instanceof RelativeLayout.LayoutParams) {
-			for (int i = 0; i < countAnchorRule; i++) {
- //[ifdef_api17up]
-				((RelativeLayout.LayoutParams)lparams).removeRule(lparamsAnchorRule[i]);
- //[endif_api17up]
-	/* //[endif_api17up]
- 			((RelativeLayout.LayoutParams)lparams).addRule(lparamsAnchorRule[i], 0);
- //[ifdef_api17up] */
+			
+			for (int i = 0; i < countAnchorRule; i++) {								
+				  if(Build.VERSION.SDK_INT < 17)
+					  ((android.widget.RelativeLayout.LayoutParams) lparams).addRule(lparamsAnchorRule[i], 0);
+					
+	//[ifdef_api17up]
+				 if(Build.VERSION.SDK_INT >= 17)
+					((android.widget.RelativeLayout.LayoutParams) lparams).removeRule(lparamsAnchorRule[i]); //need API >= 17!
+	//[endif_api17up]
+				 
+			 }
+			
+			 for (int j = 0; j < countParentRule; j++) {
+				  if(Build.VERSION.SDK_INT < 17) 
+					  ((android.widget.RelativeLayout.LayoutParams) lparams).addRule(lparamsParentRule[j], 0);
+					
+	//[ifdef_api17up]
+				  if(Build.VERSION.SDK_INT >= 17)
+					  ((android.widget.RelativeLayout.LayoutParams) lparams).removeRule(lparamsParentRule[j]);  //need API >= 17!
+	//[endif_api17up]
+				
 			}
-
-			for (int j = 0; j < countParentRule; j++) {
- //[ifdef_api17up]
-				((RelativeLayout.LayoutParams)lparams).removeRule(lparamsParentRule[j]);
- //[endif_api17up]
- /* //[endif_api17up]
- 			((RelativeLayout.LayoutParams)lparams).addRule(lparamsAnchorRule[j], 0);
-	//[ifdef_api17up] */
-			}
+			
 		}
+		
 		countAnchorRule = 0;
 		countParentRule = 0;
 	}
@@ -321,6 +336,33 @@ public class jPanel extends RelativeLayout {
 		lparams.height = lparamH;
 		lparams.width = lparamW;
 	}
+	
+	public void SetRoundCorner() {
+	   if (this != null) {  		
+		        PaintDrawable  shape =  new PaintDrawable();
+		        shape.setCornerRadius(mRadius);                
+		        int color = Color.TRANSPARENT;
+		        Drawable background = this.getBackground();        
+		        if (background instanceof ColorDrawable) {
+		          color = ((ColorDrawable)this.getBackground()).getColor();
+			        shape.setColorFilter(color, Mode.SRC_ATOP);        		           		        		        
+			        //[ifdef_api16up]
+			  	    if(Build.VERSION.SDK_INT >= 16) 
+			             this.setBackground((Drawable)shape);
+			        //[endif_api16up]		          
+		        }                		  	  
+	    }
+	 }
+	
+	public void SetRadiusRoundCorner(int _radius) {
+		mRadius =  _radius;
+	}
+	
+	//You can basically set it from anything between 0(fully transparent) to 255 (completely opaque)
+	public void SetBackgroundAlpha(int _alpha) {		
+	  this.getBackground().setAlpha(_alpha); //0-255
+	}
+	
 }
 
 

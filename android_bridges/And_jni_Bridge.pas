@@ -177,6 +177,7 @@ procedure jTextView_SetFontFromAssets(env: PJNIEnv; _jtextview: JObject; _fontNa
 procedure jTextView_SetTextIsSelectable(env: PJNIEnv; _jtextview: JObject; _value: boolean);
 procedure jTextView_SetScrollingText(env: PJNIEnv; _jtextview: JObject);
 procedure jTextView_SetTextAsLink(env: PJNIEnv; _jtextview: JObject; _linkText: string);
+procedure jTextView_SetBackgroundAlpha(env: PJNIEnv; _jtextview: JObject; _alpha: integer);
 
 //-----------------------------------
 // EditText  :: changed by jmpessoa [support Api > 13]
@@ -654,6 +655,7 @@ procedure jPanel_MatchParent(env: PJNIEnv; _jpanel: JObject);
 procedure jPanel_WrapContent(env: PJNIEnv; _jpanel: JObject);
 procedure jPanel_SetRoundCorner(env: PJNIEnv; _jpanel: JObject);
 procedure jPanel_SetRadiusRoundCorner(env: PJNIEnv; _jpanel: JObject; _radius: integer);
+procedure jPanel_SetBackgroundAlpha(env: PJNIEnv; _jpanel: JObject; _alpha: integer);
 //-----------------
 // HorizontalScrollView
 //by jmpessoa
@@ -1929,6 +1931,19 @@ begin
   jMethod:= env^.GetMethodID(env, jCls, 'SetTextAsLink', '(Ljava/lang/String;)V');
   env^.CallVoidMethodA(env, _jtextview, jMethod, @jParams);
   env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jTextView_SetBackgroundAlpha(env: PJNIEnv; _jtextview: JObject; _alpha: integer);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].i:= _alpha;
+  jCls:= env^.GetObjectClass(env, _jtextview);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetBackgroundAlpha', '(I)V');
+  env^.CallVoidMethodA(env, _jtextview, jMethod, @jParams);
   env^.DeleteLocalRef(env, jCls);
 end;
 
@@ -5590,6 +5605,19 @@ begin
   jParams[0].i:= _radius;
   jCls:= env^.GetObjectClass(env, _jpanel);
   jMethod:= env^.GetMethodID(env, jCls, 'SetRadiusRoundCorner', '(I)V');
+  env^.CallVoidMethodA(env, _jpanel, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jPanel_SetBackgroundAlpha(env: PJNIEnv; _jpanel: JObject; _alpha: integer);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].i:= _alpha;
+  jCls:= env^.GetObjectClass(env, _jpanel);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetBackgroundAlpha', '(I)V');
   env^.CallVoidMethodA(env, _jpanel, jMethod, @jParams);
   env^.DeleteLocalRef(env, jCls);
 end;

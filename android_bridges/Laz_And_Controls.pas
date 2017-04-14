@@ -201,6 +201,7 @@ type
      procedure WrapContent();
      procedure SetRoundCorner();
      procedure SetRadiusRoundCorner(_radius: integer);
+     procedure SetBackgroundAlpha(_alpha: integer); //You can basically set it from anything between 0(fully transparent) to 255 (completely opaque)
 
    published
      property BackgroundColor     : TARGBColorBridge read FColor write SetColor;
@@ -787,6 +788,7 @@ type
     procedure SetTextIsSelectable(_value: boolean);
     procedure SetScrollingText();
     procedure SetTextAsLink(_linkText: string);
+    procedure SetBackgroundAlpha(_alpha: integer); //You can basically set it from anything between 0(fully transparent) to 255 (completely opaque)
 
   published
     property Text: string read GetText write SetText;
@@ -3202,6 +3204,13 @@ begin
   //in designing component state: set value here...
   if FInitialized then
      jTextView_SetTextAsLink(FjEnv, FjObject, _linkText);
+end;
+
+procedure jTextView.SetBackgroundAlpha(_alpha: integer);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jTextView_SetBackgroundAlpha(FjEnv, FjObject, _alpha);
 end;
 
 //------------------------------------------------------------------------------
@@ -9929,5 +9938,11 @@ begin
      jPanel_SetRadiusRoundCorner(FjEnv, FjObject, _radius);
 end;
 
+procedure jPanel.SetBackgroundAlpha(_alpha: integer);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jPanel_SetBackgroundAlpha(FjEnv, FjObject, _alpha);
+end;
 
 end.

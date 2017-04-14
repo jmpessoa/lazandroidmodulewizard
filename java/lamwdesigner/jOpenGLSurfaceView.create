@@ -1,3 +1,0 @@
-public java.lang.Object jOpenGLSurfaceView_jCreate(long _Self) {
-  return (java.lang.Object)(new jOpenGLSurfaceView(this,_Self));
-}

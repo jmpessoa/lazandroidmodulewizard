@@ -22,6 +22,7 @@ import android.os.Build;
 import android.text.Html;
 import android.text.TextUtils.TruncateAt;
 import android.text.util.Linkify;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
@@ -59,7 +60,7 @@ public class jTextView extends TextView {
                 }
             };
         };                     
-        setOnClickListener(onClickListener);                
+        setOnClickListener(onClickListener);        
     }
 
 	//Free object except Self, Pascal Code Free the class.
@@ -301,7 +302,7 @@ public class jTextView extends TextView {
 	// https://blog.stylingandroid.com/gradient-text/
 	@Override
     protected void onLayout( boolean changed, int left, int top, int right, int bottom ) {
-        super.onLayout( changed, left, top, right, bottom );        
+        super.onLayout( changed, left, top, right, bottom );          
         controls.pOnLayouting(LAMWCommon.getPasObj(), changed);	 //event handle by pascal side                                            
     }
 	
@@ -381,7 +382,7 @@ public class jTextView extends TextView {
     }
 
 	public void SetTextIsSelectable(boolean _value) {   //Sets whether the content of this view is selectable by the user.
-	     this.setTextIsSelectable(_value);
+	     this.setTextIsSelectable(_value);	    
     }	 
 		
 	/*
@@ -408,6 +409,12 @@ public class jTextView extends TextView {
 	public void SetTextAsLink(String _linkText) {
 		 this.setText(Html.fromHtml(_linkText));  //"www.google.com" 
 	     Linkify.addLinks(this, Linkify.ALL);
+	}
+	
+	
+	//You can basically set it from anything between 0(fully transparent) to 255 (completely opaque)	
+	public void SetBackgroundAlpha(int _alpha) {
+		this.getBackground().setAlpha(_alpha); //0-255
 	}
 		
 }

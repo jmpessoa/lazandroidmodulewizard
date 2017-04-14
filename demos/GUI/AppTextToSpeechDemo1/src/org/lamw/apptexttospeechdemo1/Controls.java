@@ -1888,6 +1888,14 @@ public java.lang.Object jEditText_Create(long pasobj ) {
   return (java.lang.Object)( new jEditText(this.activity,this,pasobj));
 }
 
+public  java.lang.Object jImageView_Create(long pasobj ) {
+  return (java.lang.Object)( new jImageView(this.activity,this,pasobj));
+}
+
+public  java.lang.Object jPanel_Create(long pasobj ) {
+  return (java.lang.Object)(new jPanel(this.activity,this,pasobj));
+}
+
 public java.lang.Object jTextToSpeech_jCreate(long _Self) {
   return (java.lang.Object)(new jTextToSpeech(this,_Self));
 }

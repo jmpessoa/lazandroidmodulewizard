@@ -1,4 +1,4 @@
-package com.example.appwindowmanagerdemo1;
+package org.lamw.apptexttospeechdemo1;
 
 import android.graphics.Color;
 import android.graphics.PorterDuff.Mode;
@@ -356,6 +356,11 @@ public class jPanel extends RelativeLayout {
 	
 	public void SetRadiusRoundCorner(int _radius) {
 		mRadius =  _radius;
+	}
+	
+	//You can basically set it from anything between 0(fully transparent) to 255 (completely opaque)
+	public void SetBackgroundAlpha(int _alpha) {		
+	  this.getBackground().setAlpha(_alpha); //0-255
 	}
 	
 }

@@ -1,0 +1,3 @@
+public java.lang.Object jVideoView_jCreate(long _Self) {
+  return (java.lang.Object)(new jVideoView(this,_Self));
+}
