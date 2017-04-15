@@ -1,6 +1,8 @@
-package com.example.appgooglemapsdemo1;
+package com.example.apphorizontalscrollviewdemo1;
 
+import android.util.Log;
 import android.view.MotionEvent;
+import android.view.View;
 import android.widget.ScrollView;
 import android.widget.RelativeLayout;
 import android.widget.FrameLayout;
@@ -19,6 +21,9 @@ public class jScrollView extends ScrollView {
 	private RelativeLayout  scrollview;        // Scroll View
 	private LayoutParams    scrollxywh;        // Scroll Area
 
+	int onPosition;
+	boolean mDispacthScrollChanged = true;
+	
 	//Constructor
 	public  jScrollView(android.content.Context context,
 						Controls ctrls,long pasobj ) {
@@ -37,8 +42,9 @@ public class jScrollView extends ScrollView {
 		scrollxywh.setMargins(0,0,0,0);
 		scrollview.setLayoutParams(scrollxywh);
 		this.addView(scrollview);
+		
 	}
-
+	    
 	public void setLeftTopRightBottomWidthHeight(int _left, int _top, int _right, int _bottom, int _w, int _h) {
 		LAMWCommon.setLeftTopRightBottomWidthHeight(_left,_top,_right,_bottom,_w,_h);
 	}
@@ -77,7 +83,6 @@ public class jScrollView extends ScrollView {
 		else return super.onInterceptTouchEvent(event);
 	}
 
-	//by jmpessoa
 	public void setLParamWidth(int _w) {
 		LAMWCommon.setLParamWidth(_w);		
 	}
@@ -102,7 +107,6 @@ public class jScrollView extends ScrollView {
 		LAMWCommon.addLParamsParentRule(rule);		
 	}
 
-	//by jmpessoa
 	public void setLayoutAll(int idAnchor) {		
 		LAMWCommon.setLayoutAll(idAnchor);		
 		scrollxywh.width = LAMWCommon.getLParamWidth(); //lparamW;
@@ -118,7 +122,83 @@ public class jScrollView extends ScrollView {
 		//seee: https://developer.android.com/reference/android/widget/ScrollView.html#setFillViewport(boolean)
 		super.setFillViewport(_fillenabled);
 	}
+	
+	/*
+	 * l int: Current horizontal scroll origin. 
+       t int: Current vertical scroll origin. 
+       oldl int: Previous horizontal scroll origin. 
+       oldt int: Previous vertical scroll origin.  
 
+	 */
+	//http://stackoverflow.com/questions/4263053/android-scrollview-onscrollchanged
+	@Override
+	protected void onScrollChanged(int l, int t, int oldl, int oldt) {
+	        //Log.i("TAG", "scroll changed: " + this.getTop() + " "+t);		    
+		    onPosition = 0; //unknow/intermediry
+		    int diff=0;		    
+	        if(t <= 0){
+	        	onPosition = 1;  //top
+	            //Log.i("TAG", "scroll top/begin: " + t);	            	            	            	            	           	            
+	            //reaches the top end  - begin
+	        }	        
+	        else {
+	            View view = (View) getChildAt(getChildCount()-1);
+	            diff = (view.getBottom()-(getHeight()+getScrollY()+view.getTop()));// Calculate the scrolldiff
+	            if(diff <= 0 ){
+	              // if diff is zero, then the bottom has been reached
+	        	  //Log.i("TAG", "scroll bottom/end: " + diff);
+	            	onPosition = 2;  //bottom end
+	            }
+	            else {
+	            	//Log.i("TAG", "scroll intermediry: " + diff);
+	            	onPosition = 0;
+	            }	            	
+	        }                       	        
+	        super.onScrollChanged(l, t, oldl, oldt);
+	        
+	        if (mDispacthScrollChanged)   
+	          controls.pOnScrollViewChanged(PasObj, l, t, oldl, oldt, onPosition, diff);
+	}	
+	
+    public void ScrollTo(int _x, int _y) {   //pixels 	
+	   this.scrollTo(_x, _y);
+    }
+    
+    public void SmoothScrollTo(int _x, int _y) {
+	  this.smoothScrollTo(_x, _y);
+    }
+    
+    public void SmoothScrollBy(int _x, int _y) {
+	    this.smoothScrollBy(_x,_y);
+    }
+    
+    public int GetScrollX() {
+      return this.getScrollX();
+    }
+    
+    public int GetScrollY() {
+        return this.getScrollY();
+    }
+    
+    public int GetBottom() {
+       return this.getBottom();
+    }   
+    
+    public int GetTop() {
+        return this.getTop();
+     }   
+  
+    public int GetLeft() {
+      return this.getLeft();
+    }
+    
+    public int GetRight() {
+        return this.getRight();
+    }    
+    
+    public void DispatchOnScrollChangedEvent(boolean _value) {
+    	mDispacthScrollChanged = _value;
+    }       
 }
 
 

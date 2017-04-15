@@ -115,7 +115,6 @@ uses
 
    procedure Java_Event_pOnFileSelected(env: PJNIEnv; this: jobject; Obj: TObject; path: JString; fileName: JString);
 
-
 implementation
 
 uses

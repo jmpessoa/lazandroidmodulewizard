@@ -1,4 +1,4 @@
-package com.example.appnotificationmanagerdemo1;
+package com.example.apphorizontalscrollviewdemo1;
 
 //Lamw: Lazarus Android Module Wizard - version 0.7 - rev. 15 - 29 March - 2017
 //Form Designer and Components development model!
@@ -55,7 +55,7 @@ public class App extends Activity {
          StrictMode.setThreadPolicy(policy);
      }
      
-      Log.i("jApp","01.Activity.onCreate");
+      //Log.i("jApp","01.Activity.onCreate");
       controls             = new Controls();
       controls.activity    = this; 
       controls.appLayout   = new RelativeLayout(this);
@@ -71,12 +71,12 @@ public class App extends Activity {
       this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
                
       // Event : Java -> Pascal
-      Log.i("jApp","02.Controls.jAppOnCreate");
+      //Log.i("jApp","02.Controls.jAppOnCreate");
       //Bundle extras = getIntent().getExtras();      
       
       controls.jAppOnCreate(this, controls.appLayout, getIntent());
       
-      Log.i("jApp","03.Controls.jAppOnCreate");
+      //Log.i("jApp","03.Controls.jAppOnCreate");
     }
        
     @Override    

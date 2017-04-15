@@ -11,12 +11,12 @@ uses
 
 { Class:     com_example_apphorizontalscrollviewdemo1_Controls
   Method:    pAppOnCreate
-  Signature: (Landroid/content/Context;Landroid/widget/RelativeLayout;)V }
+  Signature: (Landroid/content/Context;Landroid/widget/RelativeLayout;Landroid/content/Intent;)V }
 procedure pAppOnCreate(PEnv: PJNIEnv; this: JObject; context: JObject;
-  layout: JObject); cdecl;
+  layout: JObject; intent: JObject); cdecl;
 begin
-  Java_Event_pAppOnCreate(PEnv, this, context, layout); AndroidModule1.Init(gApp
-    );
+  Java_Event_pAppOnCreate(PEnv, this, context, layout, intent);
+    AndroidModule1.Init(gApp);
 end;
 
 { Class:     com_example_apphorizontalscrollviewdemo1_Controls
@@ -29,10 +29,10 @@ end;
 
 { Class:     com_example_apphorizontalscrollviewdemo1_Controls
   Method:    pAppOnNewIntent
-  Signature: ()V }
-procedure pAppOnNewIntent(PEnv: PJNIEnv; this: JObject); cdecl;
+  Signature: (Landroid/content/Intent;)V }
+procedure pAppOnNewIntent(PEnv: PJNIEnv; this: JObject; intent: JObject); cdecl;
 begin
-  Java_Event_pAppOnNewIntent(PEnv, this);
+  Java_Event_pAppOnNewIntent(PEnv, this, intent);
 end;
 
 { Class:     com_example_apphorizontalscrollviewdemo1_Controls
@@ -327,15 +327,40 @@ begin
   Java_Event_pOnLayouting(PEnv, this, TObject(pasobj), changed);
 end;
 
-const NativeMethods: array[0..35] of JNINativeMethod = (
+{ Class:     com_example_apphorizontalscrollviewdemo1_Controls
+  Method:    pOnHorScrollViewChanged
+  Signature: (JIIIIII)V }
+procedure pOnHorScrollViewChanged(PEnv: PJNIEnv; this: JObject; pasobj: JLong;
+  currenthorizontal: JInt; currentVertical: JInt; previousHorizontal: JInt;
+  previousVertical: JInt; onPosition: JInt; scrolldiff: JInt); cdecl;
+begin
+  Java_Event_pOnHorScrollViewChanged(PEnv, this, TObject(pasobj),
+    currenthorizontal, currentVertical, previousHorizontal, previousVertical,
+    onPosition, scrolldiff);
+end;
+
+{ Class:     com_example_apphorizontalscrollviewdemo1_Controls
+  Method:    pOnScrollViewChanged
+  Signature: (JIIIIII)V }
+procedure pOnScrollViewChanged(PEnv: PJNIEnv; this: JObject; pasobj: JLong;
+  currenthorizontal: JInt; currentVertical: JInt; previousHorizontal: JInt;
+  previousVertical: JInt; onPosition: JInt; scrolldiff: JInt); cdecl;
+begin
+  Java_Event_pOnScrollViewChanged(PEnv, this, TObject(pasobj),
+    currenthorizontal, currentVertical, previousHorizontal, previousVertical,
+    onPosition, scrolldiff);
+end;
+
+const NativeMethods: array[0..37] of JNINativeMethod = (
    (name: 'pAppOnCreate';
-    signature: '(Landroid/content/Context;Landroid/widget/RelativeLayout;)V';
+    signature: '(Landroid/content/Context;Landroid/widget/RelativeLayout;'
+      +'Landroid/content/Intent;)V';
     fnPtr: @pAppOnCreate; ),
    (name: 'pAppOnScreenStyle';
     signature: '()I';
     fnPtr: @pAppOnScreenStyle; ),
    (name: 'pAppOnNewIntent';
-    signature: '()V';
+    signature: '(Landroid/content/Intent;)V';
     fnPtr: @pAppOnNewIntent; ),
    (name: 'pAppOnDestroy';
     signature: '()V';
@@ -435,7 +460,13 @@ const NativeMethods: array[0..35] of JNINativeMethod = (
     fnPtr: @pOnAfterDispatchDraw; ),
    (name: 'pOnLayouting';
     signature: '(JZ)V';
-    fnPtr: @pOnLayouting; )
+    fnPtr: @pOnLayouting; ),
+   (name: 'pOnHorScrollViewChanged';
+    signature: '(JIIIIII)V';
+    fnPtr: @pOnHorScrollViewChanged; ),
+   (name: 'pOnScrollViewChanged';
+    signature: '(JIIIIII)V';
+    fnPtr: @pOnScrollViewChanged; )
 );
 
 function RegisterNativeMethodsArray(PEnv: PJNIEnv; className: PChar;
@@ -566,7 +597,11 @@ exports
   pOnAfterDispatchDraw name 'Java_com_example_apphorizontalscrollviewdemo1_'
     +'Controls_pOnAfterDispatchDraw',
   pOnLayouting name 'Java_com_example_apphorizontalscrollviewdemo1_Controls_'
-    +'pOnLayouting';
+    +'pOnLayouting',
+  pOnHorScrollViewChanged name 'Java_com_example_apphorizontalscrollviewdemo1_'
+    +'Controls_pOnHorScrollViewChanged',
+  pOnScrollViewChanged name 'Java_com_example_apphorizontalscrollviewdemo1_'
+    +'Controls_pOnScrollViewChanged';
 
 {%endregion}
 

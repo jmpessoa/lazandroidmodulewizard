@@ -615,6 +615,17 @@ Procedure jScrollView_setLayoutAll(env:PJNIEnv; ScrollView : jObject;  idAnchor:
 //thanks to DonAlfredo
 Procedure jScrollView_setFillViewport  (env:PJNIEnv; ScrollView : jObject; fillenabled : boolean);
 
+procedure jScrollView_ScrollTo(env: PJNIEnv; _jscrollview: JObject; _x: integer; _y: integer);
+procedure jScrollView_SmoothScrollTo(env: PJNIEnv; _jscrollview: JObject; _x: integer; _y: integer);
+procedure jScrollView_SmoothScrollBy(env: PJNIEnv; _jscrollview: JObject; _x: integer; _y: integer);
+function jScrollView_GetScrollX(env: PJNIEnv; _jscrollview: JObject): integer;
+function jScrollView_GetScrollY(env: PJNIEnv; _jscrollview: JObject): integer;
+function jScrollView_GetBottom(env: PJNIEnv; _jscrollview: JObject): integer;
+function jScrollView_GetTop(env: PJNIEnv; _jscrollview: JObject): integer;
+function jScrollView_GetLeft(env: PJNIEnv; _jscrollview: JObject): integer;
+function jScrollView_GetRight(env: PJNIEnv; _jscrollview: JObject): integer;
+procedure jScrollView_DispatchOnScrollChangedEvent(env: PJNIEnv; _jscrollview: JObject; _value: boolean);
+
 
 //---------------
 
@@ -684,26 +695,16 @@ Procedure jHorizontalScrollView_addLParamsParentRule(env:PJNIEnv; ScrollView : j
 Procedure jHorizontalScrollView_addLParamsAnchorRule(env:PJNIEnv; ScrollView : jObject; rule: DWord);
 Procedure jHorizontalScrollView_setLayoutAll(env:PJNIEnv; ScrollView : jObject;  idAnchor: DWord);
 
-// ViewFlipper
-Function  jViewFlipper_Create          (env:PJNIEnv;  this:jobject; SelfObj: TObject ): jObject;
-
-Procedure jViewFlipper_Free            (env:PJNIEnv; ViewFlipper : jObject);
-Procedure jViewFlipper_setParent       (env:PJNIEnv;
-                                        ViewFlipper : jObject;ViewGroup : jObject);
-
-//by jmpessoa
-Procedure jViewFlipper_setId(env:PJNIEnv; ViewFlipper : jObject; id: DWord);
-
-Procedure jViewFlipper_setLParamWidth(env:PJNIEnv; ViewFlipper : jObject; w: DWord);
-Procedure jViewFlipper_setLParamHeight(env:PJNIEnv; ViewFlipper : jObject; h: DWord);
-
-Procedure jViewFlipper_setLeftTopRightBottomWidthHeight(env:PJNIEnv;
-                                        ViewFlipper : jObject; ml,mt,mr,mb,w,h: integer);
-
-Procedure jViewFlipper_addLParamsParentRule(env:PJNIEnv; ViewFlipper : jObject; rule: DWord);
-Procedure jViewFlipper_addLParamsAnchorRule(env:PJNIEnv; ViewFlipper : jObject; rule: DWord);
-
-Procedure jViewFlipper_setLayoutAll(env:PJNIEnv; ViewFlipper : jObject;  idAnchor: DWord);
+procedure jHorizontalScrollView_ScrollTo(env: PJNIEnv; _jhorizontalscrollview: JObject; _x: integer; _y: integer);
+procedure jHorizontalScrollView_SmoothScrollTo(env: PJNIEnv; _jhorizontalscrollview: JObject; _x: integer; _y: integer);
+procedure jHorizontalScrollView_SmoothScrollBy(env: PJNIEnv; _jhorizontalscrollview: JObject; _x: integer; _y: integer);
+function jHorizontalScrollView_GetScrollX(env: PJNIEnv; _jhorizontalscrollview: JObject): integer;
+function jHorizontalScrollView_GetScrollY(env: PJNIEnv; _jhorizontalscrollview: JObject): integer;
+function jHorizontalScrollView_GetBottom(env: PJNIEnv; _jhorizontalscrollview: JObject): integer;
+function jHorizontalScrollView_GetTop(env: PJNIEnv; _jhorizontalscrollview: JObject): integer;
+function jHorizontalScrollView_GetLeft(env: PJNIEnv; _jhorizontalscrollview: JObject): integer;
+function jHorizontalScrollView_GetRight(env: PJNIEnv; _jhorizontalscrollview: JObject): integer;
+procedure jHorizontalScrollView_DispatchOnScrollChangedEvent(env: PJNIEnv; _jhorizontalscrollview: JObject; _value: boolean);
 
 // WebView
 Function  jWebView_Create              (env:PJNIEnv;  this:jobject; SelfObj: TObject): jObject;
@@ -5321,6 +5322,129 @@ Procedure jScrollView_setFillViewport  (env:PJNIEnv;
   env^.DeleteLocalRef(env, cls);
  end;
 
+procedure jScrollView_ScrollTo(env: PJNIEnv; _jscrollview: JObject; _x: integer; _y: integer);
+var
+  jParams: array[0..1] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].i:= _x;
+  jParams[1].i:= _y;
+  jCls:= env^.GetObjectClass(env, _jscrollview);
+  jMethod:= env^.GetMethodID(env, jCls, 'ScrollTo', '(II)V');
+  env^.CallVoidMethodA(env, _jscrollview, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+
+procedure jScrollView_SmoothScrollTo(env: PJNIEnv; _jscrollview: JObject; _x: integer; _y: integer);
+var
+  jParams: array[0..1] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].i:= _x;
+  jParams[1].i:= _y;
+  jCls:= env^.GetObjectClass(env, _jscrollview);
+  jMethod:= env^.GetMethodID(env, jCls, 'SmoothScrollTo', '(II)V');
+  env^.CallVoidMethodA(env, _jscrollview, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+
+procedure jScrollView_SmoothScrollBy(env: PJNIEnv; _jscrollview: JObject; _x: integer; _y: integer);
+var
+  jParams: array[0..1] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].i:= _x;
+  jParams[1].i:= _y;
+  jCls:= env^.GetObjectClass(env, _jscrollview);
+  jMethod:= env^.GetMethodID(env, jCls, 'SmoothScrollBy', '(II)V');
+  env^.CallVoidMethodA(env, _jscrollview, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+function jScrollView_GetScrollX(env: PJNIEnv; _jscrollview: JObject): integer;
+var
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jscrollview);
+  jMethod:= env^.GetMethodID(env, jCls, 'GetScrollX', '()I');
+  Result:= env^.CallIntMethod(env, _jscrollview, jMethod);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+function jScrollView_GetScrollY(env: PJNIEnv; _jscrollview: JObject): integer;
+var
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jscrollview);
+  jMethod:= env^.GetMethodID(env, jCls, 'GetScrollY', '()I');
+  Result:= env^.CallIntMethod(env, _jscrollview, jMethod);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+function jScrollView_GetBottom(env: PJNIEnv; _jscrollview: JObject): integer;
+var
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jscrollview);
+  jMethod:= env^.GetMethodID(env, jCls, 'GetBottom', '()I');
+  Result:= env^.CallIntMethod(env, _jscrollview, jMethod);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+function jScrollView_GetTop(env: PJNIEnv; _jscrollview: JObject): integer;
+var
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jscrollview);
+  jMethod:= env^.GetMethodID(env, jCls, 'GetTop', '()I');
+  Result:= env^.CallIntMethod(env, _jscrollview, jMethod);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+function jScrollView_GetLeft(env: PJNIEnv; _jscrollview: JObject): integer;
+var
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jscrollview);
+  jMethod:= env^.GetMethodID(env, jCls, 'GetLeft', '()I');
+  Result:= env^.CallIntMethod(env, _jscrollview, jMethod);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+function jScrollView_GetRight(env: PJNIEnv; _jscrollview: JObject): integer;
+var
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jscrollview);
+  jMethod:= env^.GetMethodID(env, jCls, 'GetRight', '()I');
+  Result:= env^.CallIntMethod(env, _jscrollview, jMethod);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jScrollView_DispatchOnScrollChangedEvent(env: PJNIEnv; _jscrollview: JObject; _value: boolean);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].z:= JBool(_value);
+  jCls:= env^.GetObjectClass(env, _jscrollview);
+  jMethod:= env^.GetMethodID(env, jCls, 'DispatchOnScrollChangedEvent', '(Z)V');
+  env^.CallVoidMethodA(env, _jscrollview, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
 //----------------------------------------
 //Panel - new by jmpessoa
 //----------------------------------------
@@ -5799,147 +5923,132 @@ _jMethod:= env^.GetMethodID(env, cls, 'setLayoutAll', '(I)V');
  env^.DeleteLocalRef(env, cls);
 end;
 
-//------------------------------------------------------------------------------
-// ViewFlipper
-//------------------------------------------------------------------------------
-function jViewFlipper_Create(env: PJNIEnv; this:jobject; SelfObj: TObject): jObject;
+procedure jHorizontalScrollView_ScrollTo(env: PJNIEnv; _jhorizontalscrollview: JObject; _x: integer; _y: integer);
 var
- _jMethod : jMethodID = nil;
- _jParams : array[0..0] of jValue;
- cls: jClass;
+  jParams: array[0..1] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
 begin
-  cls:= Get_gjClass(env); {global}
-  {jmethodID is not an object. So don't need to convert it to a GlobalRef!}
-  _jMethod:= env^.GetMethodID(env, cls, 'jViewFlipper_Create', '(J)Ljava/lang/Object;');
-  _jParams[0].j := Int64(SelfObj);
-  Result := env^.CallObjectMethodA(env, this, _jMethod,@_jParams);
-  Result := env^.NewGlobalRef(env,Result);
+  jParams[0].i:= _x;
+  jParams[1].i:= _y;
+  jCls:= env^.GetObjectClass(env, _jhorizontalscrollview);
+  jMethod:= env^.GetMethodID(env, jCls, 'ScrollTo', '(II)V');
+  env^.CallVoidMethodA(env, _jhorizontalscrollview, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
-Procedure jViewFlipper_Free(env:PJNIEnv; ViewFlipper : jObject);
+
+procedure jHorizontalScrollView_SmoothScrollTo(env: PJNIEnv; _jhorizontalscrollview: JObject; _x: integer; _y: integer);
 var
- _jMethod : jMethodID = nil;
- cls: jClass;
+  jParams: array[0..1] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
 begin
- cls := env^.GetObjectClass(env, ViewFlipper);
- _jMethod:= env^.GetMethodID(env, cls, 'Free', '()V');
- env^.CallVoidMethod(env,ViewFlipper,_jMethod);
- env^.DeleteGlobalRef(env,ViewFlipper);
- env^.DeleteLocalRef(env, cls);
+  jParams[0].i:= _x;
+  jParams[1].i:= _y;
+  jCls:= env^.GetObjectClass(env, _jhorizontalscrollview);
+  jMethod:= env^.GetMethodID(env, jCls, 'SmoothScrollTo', '(II)V');
+  env^.CallVoidMethodA(env, _jhorizontalscrollview, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
-Procedure jViewFlipper_setLeftTopRightBottomWidthHeight(env:PJNIEnv;
-                                        ViewFlipper : jObject; ml,mt,mr,mb,w,h: integer);
+
+procedure jHorizontalScrollView_SmoothScrollBy(env: PJNIEnv; _jhorizontalscrollview: JObject; _x: integer; _y: integer);
 var
- _jMethod : jMethodID = nil;
- _jParams : array[0..5] of jValue;
- cls: jClass;
+  jParams: array[0..1] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
 begin
- _jParams[0].i := ml;
- _jParams[1].i := mt;
- _jParams[2].i := mr;
- _jParams[3].i := mb;
- _jParams[4].i := w;
- _jParams[5].i := h;
- cls := env^.GetObjectClass(env, ViewFlipper);
- _jMethod:= env^.GetMethodID(env, cls, 'setLeftTopRightBottomWidthHeight', '(IIIIII)V');
- env^.CallVoidMethodA(env,ViewFlipper,_jMethod,@_jParams);
- env^.DeleteLocalRef(env, cls);
+  jParams[0].i:= _x;
+  jParams[1].i:= _y;
+  jCls:= env^.GetObjectClass(env, _jhorizontalscrollview);
+  jMethod:= env^.GetMethodID(env, jCls, 'SmoothScrollBy', '(II)V');
+  env^.CallVoidMethodA(env, _jhorizontalscrollview, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
-Procedure jViewFlipper_setParent       (env:PJNIEnv;
-                                        ViewFlipper : jObject;ViewGroup : jObject);
+
+function jHorizontalScrollView_GetScrollX(env: PJNIEnv; _jhorizontalscrollview: JObject): integer;
 var
- _jMethod : jMethodID = nil;
- _jParams : array[0..0] of jValue;
- cls: jClass;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
 begin
- _jParams[0].l := ViewGroup;
-   cls := env^.GetObjectClass(env, ViewFlipper);
- _jMethod:= env^.GetMethodID(env, cls, 'setParent', '(Landroid/view/ViewGroup;)V');
- env^.CallVoidMethodA(env,ViewFlipper,_jMethod,@_jParams);
- env^.DeleteLocalRef(env, cls);
+  jCls:= env^.GetObjectClass(env, _jhorizontalscrollview);
+  jMethod:= env^.GetMethodID(env, jCls, 'GetScrollX', '()I');
+  Result:= env^.CallIntMethod(env, _jhorizontalscrollview, jMethod);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
-//by jmpessoa
-Procedure jViewFlipper_setId(env:PJNIEnv; ViewFlipper : jObject; id: DWord);
-var
-  _jMethod : jMethodID = nil;
-  _jParams : array[0..0] of jValue;
-  cls: jClass;
- begin
-  _jParams[0].i := id;
-  cls := env^.GetObjectClass(env, ViewFlipper);
- _jMethod:= env^.GetMethodID(env, cls, 'setId', '(I)V');
-  env^.CallVoidMethodA(env,ViewFlipper,_jMethod,@_jParams);
-  env^.DeleteLocalRef(env, cls);
- end;
 
-//by jmpessoa
-Procedure jViewFlipper_setLParamWidth(env:PJNIEnv; ViewFlipper : jObject; w: DWord);
+function jHorizontalScrollView_GetScrollY(env: PJNIEnv; _jhorizontalscrollview: JObject): integer;
 var
- _jMethod : jMethodID = nil;
- _jParams : array[0..0] of jValue;
- cls: jClass;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
 begin
- _jParams[0].i := w;
- cls := env^.GetObjectClass(env, ViewFlipper);
-  _jMethod:= env^.GetMethodID(env, cls, 'setLParamWidth', '(I)V');
- env^.CallVoidMethodA(env,ViewFlipper,_jMethod,@_jParams);
- env^.DeleteLocalRef(env, cls);
+  jCls:= env^.GetObjectClass(env, _jhorizontalscrollview);
+  jMethod:= env^.GetMethodID(env, jCls, 'GetScrollY', '()I');
+  Result:= env^.CallIntMethod(env, _jhorizontalscrollview, jMethod);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
-Procedure jViewFlipper_setLParamHeight(env:PJNIEnv; ViewFlipper : jObject; h: DWord);
+
+function jHorizontalScrollView_GetBottom(env: PJNIEnv; _jhorizontalscrollview: JObject): integer;
 var
- _jMethod : jMethodID = nil;
- _jParams : array[0..0] of jValue;
- cls: jClass;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
 begin
- _jParams[0].i := h;
-  cls := env^.GetObjectClass(env, ViewFlipper);
-_jMethod:= env^.GetMethodID(env, cls, 'setLParamHeight', '(I)V');
- env^.CallVoidMethodA(env,ViewFlipper,_jMethod,@_jParams);
- env^.DeleteLocalRef(env, cls);
+  jCls:= env^.GetObjectClass(env, _jhorizontalscrollview);
+  jMethod:= env^.GetMethodID(env, jCls, 'GetBottom', '()I');
+  Result:= env^.CallIntMethod(env, _jhorizontalscrollview, jMethod);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
-Procedure jViewFlipper_addLParamsParentRule(env:PJNIEnv; ViewFlipper : jObject; rule: DWord);
+
+function jHorizontalScrollView_GetTop(env: PJNIEnv; _jhorizontalscrollview: JObject): integer;
 var
- _jMethod : jMethodID = nil;
- _jParams : array[0..0] of jValue;
- cls: jClass;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
 begin
- _jParams[0].i := rule;
- cls := env^.GetObjectClass(env, ViewFlipper);
-  _jMethod:= env^.GetMethodID(env, cls, 'addLParamsParentRule', '(I)V');
- env^.CallVoidMethodA(env,ViewFlipper,_jMethod,@_jParams);
- env^.DeleteLocalRef(env, cls);
+  jCls:= env^.GetObjectClass(env, _jhorizontalscrollview);
+  jMethod:= env^.GetMethodID(env, jCls, 'GetTop', '()I');
+  Result:= env^.CallIntMethod(env, _jhorizontalscrollview, jMethod);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
-//by jmpessoa
-Procedure jViewFlipper_addLParamsAnchorRule(env:PJNIEnv; ViewFlipper : jObject; rule: DWord);
+
+function jHorizontalScrollView_GetLeft(env: PJNIEnv; _jhorizontalscrollview: JObject): integer;
 var
- _jMethod : jMethodID = nil;
- _jParams : array[0..0] of jValue;
- cls: jClass;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
 begin
- _jParams[0].i := rule;
- cls := env^.GetObjectClass(env, ViewFlipper);
-  _jMethod:= env^.GetMethodID(env, cls, 'addLParamsAnchorRule', '(I)V');
- env^.CallVoidMethodA(env,ViewFlipper,_jMethod,@_jParams);
- env^.DeleteLocalRef(env, cls);
+  jCls:= env^.GetObjectClass(env, _jhorizontalscrollview);
+  jMethod:= env^.GetMethodID(env, jCls, 'GetLeft', '()I');
+  Result:= env^.CallIntMethod(env, _jhorizontalscrollview, jMethod);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
-Procedure jViewFlipper_setLayoutAll(env:PJNIEnv; ViewFlipper : jObject;  idAnchor: DWord);
+function jHorizontalScrollView_GetRight(env: PJNIEnv; _jhorizontalscrollview: JObject): integer;
 var
- _jMethod : jMethodID = nil;
- _jParams : array[0..0] of jValue;
- cls: jClass;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
 begin
- _jParams[0].i := idAnchor;
- cls := env^.GetObjectClass(env, ViewFlipper);
-_jMethod:= env^.GetMethodID(env, cls, 'setLayoutAll', '(I)V');
- env^.CallVoidMethodA(env,ViewFlipper,_jMethod,@_jParams);
- env^.DeleteLocalRef(env, cls);
+  jCls:= env^.GetObjectClass(env, _jhorizontalscrollview);
+  jMethod:= env^.GetMethodID(env, jCls, 'GetRight', '()I');
+  Result:= env^.CallIntMethod(env, _jhorizontalscrollview, jMethod);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jHorizontalScrollView_DispatchOnScrollChangedEvent(env: PJNIEnv; _jhorizontalscrollview: JObject; _value: boolean);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].z:= JBool(_value);
+  jCls:= env^.GetObjectClass(env, _jhorizontalscrollview);
+  jMethod:= env^.GetMethodID(env, jCls, 'DispatchOnScrollChangedEvent', '(Z)V');
+  env^.CallVoidMethodA(env, _jhorizontalscrollview, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 //------------------------------------------------------------------------------

@@ -1340,10 +1340,16 @@ type
 
   end;
 
+  TScrollPosition = (spIntermediary, spBegin, spEnd);
+
+  TOnScrollChanged = procedure(Sender: TObject; currHor: Integer; currVerti: Integer; prevHor: Integer; prevVertical: Integer; position:  TScrollPosition; scrolldiff: integer) of Object;
+
   jScrollView = class(jVisualControl)
   private
     FScrollSize : integer;
     FFillViewportEnabled: boolean;
+    FOnScrollChanged: TOnScrollChanged;
+
     Procedure SetColor      (Value : TARGBColorBridge);
     Procedure SetScrollSize (Value : integer);
     procedure UpdateLParamHeight;
@@ -1359,16 +1365,30 @@ type
     Procedure UpdateLayout; override;
     procedure Init(refApp: jApp);  override;
     procedure SetFillViewport(fillenabled: boolean);
-    // Property
+    procedure ScrollTo(_x: integer; _y: integer);
+    procedure SmoothScrollTo(_x: integer; _y: integer);
+    procedure SmoothScrollBy(_x: integer; _y: integer);
+    function GetScrollX(): integer;
+    function GetScrollY(): integer;
+    function GetBottom(): integer;
+    function GetTop(): integer;
+    function GetLeft(): integer;
+    function GetRight(): integer;
+    procedure DispatchOnScrollChangedEvent(_value: boolean);
+    procedure GenEvent_OnChanged(Obj: TObject; currHor: Integer; currVerti: Integer; prevHor: Integer; prevVertical: Integer; onPosition: Integer; scrolldiff: integer);
+
   published
     property FillViewportEnabled: boolean read FFillViewportEnabled write SetFillViewport;
     property ScrollSize: integer read FScrollSize write SetScrollSize;
-    property BackgroundColor: TARGBColorBridge read FColor      write SetColor;
+    property BackgroundColor: TARGBColorBridge read FColor  write SetColor;
+    property OnScrollChanged: TOnScrollChanged read FOnScrollChanged write FOnScrollChanged;
   end;
 
   jHorizontalScrollView = class(jVisualControl)
   private
     FScrollSize : integer;
+    FOnScrollChanged: TOnScrollChanged;
+
     Procedure SetColor      (Value : TARGBColorBridge);
     Procedure SetScrollSize (Value : integer);
     procedure UpdateLParamHeight;
@@ -1382,10 +1402,23 @@ type
     Procedure Refresh;
     Procedure UpdateLayout; override;
     procedure Init(refApp: jApp);  override;
+    procedure ScrollTo(_x: integer; _y: integer);
+    procedure SmoothScrollTo(_x: integer; _y: integer);
+    procedure SmoothScrollBy(_x: integer; _y: integer);
+    function GetScrollX(): integer;
+    function GetScrollY(): integer;
+    function GetBottom(): integer;
+    function GetTop(): integer;
+    function GetLeft(): integer;
+    function GetRight(): integer;
+    procedure DispatchOnScrollChangedEvent(_value: boolean);
+    procedure GenEvent_OnChanged(Obj: TObject; currHor: Integer; currVerti: Integer; prevHor: Integer; prevVertical: Integer; onPosition: Integer; scrolldiff: integer);
+
     // Property
   published
     property ScrollSize: integer read FScrollSize write SetScrollSize;
     property BackgroundColor     : TARGBColorBridge read FColor      write SetColor;
+    property OnScrollChanged: TOnScrollChanged read FOnScrollChanged write FOnScrollChanged;
   end;
 
   //------------------------------------------------------------------
@@ -1712,7 +1745,20 @@ type
   procedure Java_Event_pOnHttpClientContentResult(env: PJNIEnv; this: jobject; Obj: TObject; content: jString);
   procedure Java_Event_pOnHttpClientCodeResult(env: PJNIEnv; this: jobject; Obj: TObject; code: integer);
 
-   Procedure Java_Event_pOnLostFocus(env: PJNIEnv; this: jobject; Obj: TObject; content: JString);
+  Procedure Java_Event_pOnLostFocus(env: PJNIEnv; this: jobject; Obj: TObject; content: JString);
+
+  procedure Java_Event_pOnScrollViewChanged(env: PJNIEnv; this: jobject; Obj: TObject;  currenthorizontal: integer;
+                                                                                      currentVertical: integer;
+                                                                                      previousHorizontal: integer;
+                                                                                      previousVertical: integer;
+                                                                                      onPosition: integer; scrolldiff: integer);
+
+
+  procedure Java_Event_pOnHorScrollViewChanged(env: PJNIEnv; this: jobject; Obj: TObject;  currenthorizontal: integer;
+                                                                                      currentVertical: integer;
+                                                                                      previousHorizontal: integer;
+                                                                                      previousVertical: integer;
+                                                                                      onPosition: integer; scrolldiff: integer);
 
   // Asset Function (P : Pascal Native)
   Function  Asset_SaveToFile (srcFile,outFile : String; SkipExists : Boolean = False) : Boolean;
@@ -2735,6 +2781,35 @@ begin
   end;
 end;
 
+procedure Java_Event_pOnScrollViewChanged(env: PJNIEnv; this: jobject; Obj: TObject;  currenthorizontal: integer;
+                                                                                      currentVertical: integer;
+                                                                                      previousHorizontal: integer;
+                                                                                      previousVertical: integer;
+                                                                                      onPosition: integer;scrolldiff: integer);
+begin
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+  if Obj is jScrollView then
+  begin
+    jForm(jScrollView(Obj).Owner).UpdateJNI(gApp);
+    jScrollView(Obj).GenEvent_OnChanged(Obj, currenthorizontal, currentVertical, previousHorizontal, previousVertical, onPosition, scrolldiff);
+  end;
+end;
+
+procedure Java_Event_pOnHorScrollViewChanged(env: PJNIEnv; this: jobject; Obj: TObject;  currenthorizontal: integer;
+                                                                                      currentVertical: integer;
+                                                                                      previousHorizontal: integer;
+                                                                                      previousVertical: integer;
+                                                                                      onPosition: integer;scrolldiff: integer);
+begin
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+  if Obj is jHorizontalScrollView then
+  begin
+    jForm(jHorizontalScrollView(Obj).Owner).UpdateJNI(gApp);
+    jHorizontalScrollView(Obj).GenEvent_OnChanged(Obj, currenthorizontal, currentVertical, previousHorizontal, previousVertical, onPosition, scrolldiff);
+  end;
+end;
 //------------------------------------------------------------------------------
 // jTextView
 //------------------------------------------------------------------------------
@@ -7162,6 +7237,81 @@ begin
 end;
 
 
+procedure jScrollView.ScrollTo(_x: integer; _y: integer);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jScrollView_ScrollTo(FjEnv, FjObject, _x ,_y);
+end;
+
+procedure jScrollView.SmoothScrollTo(_x: integer; _y: integer);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jScrollView_SmoothScrollTo(FjEnv, FjObject, _x ,_y);
+end;
+
+procedure jScrollView.SmoothScrollBy(_x: integer; _y: integer);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jScrollView_SmoothScrollBy(FjEnv, FjObject, _x ,_y);
+end;
+
+function jScrollView.GetScrollX(): integer;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jScrollView_GetScrollX(FjEnv, FjObject);
+end;
+
+function jScrollView.GetScrollY(): integer;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jScrollView_GetScrollY(FjEnv, FjObject);
+end;
+
+function jScrollView.GetBottom(): integer;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jScrollView_GetBottom(FjEnv, FjObject);
+end;
+
+function jScrollView.GetTop(): integer;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jScrollView_GetTop(FjEnv, FjObject);
+end;
+
+function jScrollView.GetLeft(): integer;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jScrollView_GetLeft(FjEnv, FjObject);
+end;
+
+function jScrollView.GetRight(): integer;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jScrollView_GetRight(FjEnv, FjObject);
+end;
+
+procedure jScrollView.DispatchOnScrollChangedEvent(_value: boolean);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jScrollView_DispatchOnScrollChangedEvent(FjEnv, FjObject, _value);
+end;
+
+procedure jScrollView.GenEvent_OnChanged(Obj: TObject; currHor: Integer; currVerti: Integer; prevHor: Integer; prevVertical: Integer; onPosition: Integer; scrolldiff: integer);
+begin
+   if Assigned(FOnScrollChanged) then FOnScrollChanged(Obj,currHor,currVerti,prevHor,prevVertical,TScrollPosition(onPosition), scrolldiff);
+end;
+
 //--------
 
 //------------------------------------------------------------------------------
@@ -7345,6 +7495,81 @@ begin
     UpdateLParamHeight;
     jHorizontalScrollView_setLayoutAll(FjEnv, FjObject , Self.AnchorId);
   end;
+end;
+
+procedure jHorizontalScrollView.ScrollTo(_x: integer; _y: integer);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jHorizontalScrollView_ScrollTo(FjEnv, FjObject, _x ,_y);
+end;
+
+procedure jHorizontalScrollView.SmoothScrollTo(_x: integer; _y: integer);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jHorizontalScrollView_SmoothScrollTo(FjEnv, FjObject, _x ,_y);
+end;
+
+procedure jHorizontalScrollView.SmoothScrollBy(_x: integer; _y: integer);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jHorizontalScrollView_SmoothScrollBy(FjEnv, FjObject, _x ,_y);
+end;
+
+function jHorizontalScrollView.GetScrollX(): integer;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jHorizontalScrollView_GetScrollX(FjEnv, FjObject);
+end;
+
+function jHorizontalScrollView.GetScrollY(): integer;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jHorizontalScrollView_GetScrollY(FjEnv, FjObject);
+end;
+
+function jHorizontalScrollView.GetBottom(): integer;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jHorizontalScrollView_GetBottom(FjEnv, FjObject);
+end;
+
+function jHorizontalScrollView.GetTop(): integer;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jHorizontalScrollView_GetTop(FjEnv, FjObject);
+end;
+
+function jHorizontalScrollView.GetLeft(): integer;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jHorizontalScrollView_GetLeft(FjEnv, FjObject);
+end;
+
+function jHorizontalScrollView.GetRight(): integer;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jHorizontalScrollView_GetRight(FjEnv, FjObject);
+end;
+
+procedure jHorizontalScrollView.DispatchOnScrollChangedEvent(_value: boolean);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jHorizontalScrollView_DispatchOnScrollChangedEvent(FjEnv, FjObject, _value);
+end;
+
+procedure jHorizontalScrollView.GenEvent_OnChanged(Obj: TObject; currHor: Integer; currVerti: Integer; prevHor: Integer; prevVertical: Integer; onPosition: Integer;  scrolldiff: integer);
+begin
+   if Assigned(FOnScrollChanged) then FOnScrollChanged(Obj,currHor,currVerti,prevHor,prevVertical,TScrollPosition(onPosition), scrolldiff);
 end;
 
 //------------------------------------------------------------------------------

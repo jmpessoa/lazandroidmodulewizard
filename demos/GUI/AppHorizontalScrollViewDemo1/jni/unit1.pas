@@ -36,6 +36,9 @@ type
     jImageView9: jImageView;
     jScrollView1: jScrollView;
     jTextView1: jTextView;
+    procedure jHorizontalScrollView1ScrollChanged(Sender: TObject;
+      currHor: Integer; currVerti: Integer; prevHor: Integer;
+      prevVertical: Integer; position: TScrollPosition; scrolldiff: integer);
     procedure jImageView5Click(Sender: TObject);
   private
     {private declarations}
@@ -52,11 +55,16 @@ implementation
 
 { TAndroidModule1 }
 
-
-
 procedure TAndroidModule1.jImageView5Click(Sender: TObject);
 begin
   ShowMessage(jImageList1.GetImageByIndex(jImageView5.ImageIndex));
+end;
+
+procedure TAndroidModule1.jHorizontalScrollView1ScrollChanged(Sender: TObject;
+  currHor: Integer; currVerti: Integer; prevHor: Integer;
+  prevVertical: Integer; position: TScrollPosition; scrolldiff: integer);
+begin
+  //
 end;
 
 end.
