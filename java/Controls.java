@@ -1,6 +1,6 @@
-package org.lamw.apptexttospeechdemo1;
+package org.lamw.appwidgetproviderdemo1;
 
-//LAMW: Lazarus Android Module Wizard  - version 0.7 - rev. 15 - 29 March - 2017 
+//LAMW: Lazarus Android Module Wizard  - version 0.7 - rev. 15.1 - 16 April - 2017 
 //RAD Android: Project Wizard, Form Designer and Components Development Model!
 
 //https://github.com/jmpessoa/lazandroidmodulewizard
@@ -54,6 +54,7 @@ import android.annotation.SuppressLint;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.app.AlarmManager;
+import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.PendingIntent;
 import android.content.Context;
@@ -1324,6 +1325,21 @@ public boolean jAppOnKeyDown(char keyChar , int keyCode, String keyCodeString) {
 public  void systemGC() {
    System.gc();
 }
+
+
+public void ShowAlert(String _title, String _message, String _btnText) {
+	
+	AlertDialog dialog = null;
+	AlertDialog.Builder builder = new AlertDialog.Builder(this.activity);
+	builder.setMessage       (_message)
+	       .setCancelable    (false)	       
+	       .setNeutralButton(_btnText, null);
+	       	      
+	dialog = builder.create();
+	dialog.setTitle(_title);
+	dialog.show();
+}
+
 
 public  void systemSetOrientation(int orientation) {
    this.activity.setRequestedOrientation(orientation);

@@ -1,4 +1,4 @@
-package com.example.appdemo1;
+package org.lamw.appwidgetproviderdemo1;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -103,6 +103,22 @@ public void show(String titleText, String msgText) {
 	dialog.setTitle(dlgTitle);
 	dialog.show();
 }
+
+
+public void ShowOK(String titleText, String msgText, String _OkText) {
+	   //Log.i("java","DlgYN_Show");
+	dlgTitle = titleText;
+	dlgMsg   = msgText;	
+	AlertDialog.Builder builder = new AlertDialog.Builder(controls.activity);
+	builder.setMessage       (dlgMsg  )
+	       .setCancelable    (false)	       
+	       .setPositiveButton(_OkText, onClickListener);
+	       	      
+	dialog = builder.create();
+	dialog.setTitle(dlgTitle);
+	dialog.show();
+}
+
 
 public  void Free() {
 onClickListener = null;

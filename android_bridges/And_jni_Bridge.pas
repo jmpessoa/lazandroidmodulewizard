@@ -178,6 +178,9 @@ procedure jTextView_SetTextIsSelectable(env: PJNIEnv; _jtextview: JObject; _valu
 procedure jTextView_SetScrollingText(env: PJNIEnv; _jtextview: JObject);
 procedure jTextView_SetTextAsLink(env: PJNIEnv; _jtextview: JObject; _linkText: string);
 procedure jTextView_SetBackgroundAlpha(env: PJNIEnv; _jtextview: JObject; _alpha: integer);
+procedure jTextView_MatchParent(env: PJNIEnv; _jtextview: JObject);
+procedure jTextView_WrapParent(env: PJNIEnv; _jtextview: JObject);
+
 
 //-----------------------------------
 // EditText  :: changed by jmpessoa [support Api > 13]
@@ -926,6 +929,7 @@ Procedure jDialogYN_Free               (env:PJNIEnv; DialogYN: jObject);
 Procedure jDialogYN_Show               (env:PJNIEnv; DialogYN: jObject);  overload;
 Procedure jDialogYN_Show(env:PJNIEnv; DialogYN: jObject; titleText: string; msgText: string; yesText: string; noText:string);  overload;
 Procedure jDialogYN_Show(env:PJNIEnv; DialogYN: jObject; titleText: string; msgText: string); overload;
+procedure jDialogYN_ShowOK(env: PJNIEnv; _jdialogyn: JObject; titleText: string; msgText: string; _OkText: string);
 
 // Dialog Progress
 Function  jDialogProgress_Create       (env:PJNIEnv; this:jobject; SelfObj : TObject;
@@ -1945,6 +1949,28 @@ begin
   jCls:= env^.GetObjectClass(env, _jtextview);
   jMethod:= env^.GetMethodID(env, jCls, 'SetBackgroundAlpha', '(I)V');
   env^.CallVoidMethodA(env, _jtextview, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jTextView_MatchParent(env: PJNIEnv; _jtextview: JObject);
+var
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jtextview);
+  jMethod:= env^.GetMethodID(env, jCls, 'MatchParent', '()V');
+  env^.CallVoidMethod(env, _jtextview, jMethod);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jTextView_WrapParent(env: PJNIEnv; _jtextview: JObject);
+var
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jtextview);
+  jMethod:= env^.GetMethodID(env, jCls, 'WrapParent', '()V');
+  env^.CallVoidMethod(env, _jtextview, jMethod);
   env^.DeleteLocalRef(env, jCls);
 end;
 
@@ -7548,6 +7574,24 @@ begin
  env^.DeleteLocalRef(env,_jParams[1].l);
 
  env^.DeleteLocalRef(env, cls);
+end;
+
+procedure jDialogYN_ShowOK(env: PJNIEnv; _jdialogyn: JObject; titleText: string; msgText: string; _OkText: string);
+var
+  jParams: array[0..2] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(titleText));
+  jParams[1].l:= env^.NewStringUTF(env, PChar(msgText));
+  jParams[2].l:= env^.NewStringUTF(env, PChar(_OkText));
+  jCls:= env^.GetObjectClass(env, _jdialogyn);
+  jMethod:= env^.GetMethodID(env, jCls, 'ShowOK', '(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V');
+  env^.CallVoidMethodA(env, _jdialogyn, jMethod, @jParams);
+env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env,jParams[1].l);
+  env^.DeleteLocalRef(env,jParams[2].l);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 //------------------------------------------------------------------------------

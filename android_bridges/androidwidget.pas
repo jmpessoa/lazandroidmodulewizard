@@ -712,6 +712,9 @@ type
                  fsFormClose);  // Closing
 
   //by jmpessoa
+
+  { jApp }
+
   jApp = class(TCustomApplication)
   private
     FInitialized : boolean;
@@ -762,6 +765,8 @@ type
 
     procedure IncFormsIndex;
     procedure DecFormsIndex;
+
+    procedure ShowMessage(_title: string; _message: string; _btnText: string);
 
     //properties
     property Initialized : boolean read FInitialized;
@@ -1605,13 +1610,13 @@ Function  jSysInfo_DevicePhoneNumber   (env:PJNIEnv;this:jobject) : String;
 Function  jSysInfo_DeviceID            (env:PJNIEnv;this:jobject) : String;
 
 //-------------
+
+  Procedure jSystem_ShowAlert(env:PJNIEnv; this:jobject; _title: string; _message: string; _btnText: string);
   Procedure jSystem_SetOrientation       (env:PJNIEnv;this:jobject; orientation : Integer);
-  //by jmpessoa
   function jSystem_GetOrientation        (env:PJNIEnv;this:jobject): integer;
   Procedure jClassMethod(FuncName, FuncSig : PChar;
                        env : PJNIEnv; var Class_ : jClass; var Method_ :jMethodID);
-
-  function Get_gjClass(env: PJNIEnv): jClass; //by jmpessoa
+  function Get_gjClass(env: PJNIEnv): jClass;
 
 //-----
 // Helper Function
@@ -1647,6 +1652,7 @@ Procedure VHandler_touchesEnded_withEvent(Sender         : TObject;
                                           Var Mouches    : TMouches);
 
   procedure jForm_ShowMessageAsync(env:PJNIEnv; Form:jObject; msg: string);
+
   procedure Java_Event_pAppOnCreate(env: PJNIEnv; this: jobject; context:jobject;  layout:jobject; intent: jobject);
 
 var
@@ -4977,12 +4983,13 @@ begin
   TopIndex:= -1;
 end;
 
-Destructor jApp.Destroy;
+destructor jApp.Destroy;
 begin
   inherited Destroy;
 end;
 
-Procedure jApp.Init(env: PJNIEnv; this: jObject; activity: jObject; layout: jObject; intent: jObject);
+procedure jApp.Init(env: PJNIEnv; this: jObject; activity: jObject;
+  layout: jObject; intent: jobject);
 var
   startOrient: integer;
 begin
@@ -5056,7 +5063,7 @@ begin
    Result:= Forms.Index;
 end;
 
-Procedure jApp.IncFormsIndex;
+procedure jApp.IncFormsIndex;
 begin
    if Forms.Index < (cjFormsMax-1) then
       Forms.Index:= Forms.Index + 1;
@@ -5077,23 +5084,28 @@ begin
     Result:= Forms.Index;
 end;
 
-Procedure jApp.DecFormsIndex;
+procedure jApp.DecFormsIndex;
 begin
     if  Forms.Index > 0 then
       Forms.Index:= Forms.Index - 1;
 end;
 
-Procedure jApp.SetAppName (Value : String);
+procedure jApp.ShowMessage(_title: string; _message: string; _btnText: string);
+begin
+  jSystem_ShowAlert(Jni.jEnv, Jni.jThis,  _title,  _message,  _btnText);
+end;
+
+procedure jApp.SetAppName(Value: String);
 begin
   FAppName:= Value;
 end;
 
-Procedure jApp.SetjClassName(Value : String);
+procedure jApp.SetjClassName(Value: String);
 begin
   FjClassName:= Value;
 end;
 
-Procedure jApp.Finish;
+procedure jApp.Finish;
 begin
   jApp_Finish2(Self.Jni.jEnv, Self.Jni.jThis);
 end;
@@ -6884,6 +6896,22 @@ begin
  _jParam.i := orientation;
  env^.CallVoidMethodA(env,this,_jMethod,@_jParam);
 end;
+
+Procedure jSystem_ShowAlert(env:PJNIEnv; this:jobject; _title: string; _message: string; _btnText: string);
+const
+ _cFuncName = 'ShowAlert';
+ _cFuncSig  = '(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V';
+var
+ _jMethod : jMethodID = nil;
+ _jParams  : Array[0..2] of jValue;
+begin
+ _jParams[0].l := env^.NewStringUTF(env, pchar(_title) );
+ _jParams[1].l := env^.NewStringUTF(env, pchar(_message));
+ _jParams[2].l := env^.NewStringUTF(env, pchar(_btnText));
+ jClassMethod(_cFuncName,_cFuncSig,env,gjClass,_jMethod);
+ env^.CallVoidMethodA(env,this,_jMethod,@_jParams);
+end;
+
 
 //by jmpessoa
 function jSystem_GetOrientation(env:PJNIEnv; this:jobject): integer;

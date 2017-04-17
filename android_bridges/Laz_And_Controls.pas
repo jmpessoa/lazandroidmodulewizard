@@ -555,6 +555,7 @@ type
     Procedure Show;   overload;
     Procedure Show(titleText: string; msgText: string; yesText: string; noText: string); overload;
     Procedure Show(titleText: string; msgText: string); overload;
+    procedure ShowOK(titleText: string; msgText: string; _OkText: string);
 
     property Parent   : jForm     read FParent   write FParent;
   published
@@ -789,6 +790,8 @@ type
     procedure SetScrollingText();
     procedure SetTextAsLink(_linkText: string);
     procedure SetBackgroundAlpha(_alpha: integer); //You can basically set it from anything between 0(fully transparent) to 255 (completely opaque)
+    procedure MatchParent();
+    procedure WrapParent();
 
   published
     property Text: string read GetText write SetText;
@@ -3286,6 +3289,20 @@ begin
   //in designing component state: set value here...
   if FInitialized then
      jTextView_SetBackgroundAlpha(FjEnv, FjObject, _alpha);
+end;
+
+procedure jTextView.MatchParent();
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jTextView_MatchParent(FjEnv, FjObject);
+end;
+
+procedure jTextView.WrapParent();
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jTextView_WrapParent(FjEnv, FjObject);
 end;
 
 //------------------------------------------------------------------------------
@@ -8829,14 +8846,20 @@ begin
      jDialogYN_Show(FjEnv, FjObject, titleText, msgText);
 end;
 
+procedure jDialogYN.ShowOK(titleText: string; msgText: string; _OkText: string);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jDialogYN_ShowOK(FjEnv, FjObject, titleText ,msgText ,_OkText);
+end;
 
 // Event : Java -> Pascal
 Procedure jDialogYN.GenEvent_OnClick(Obj: TObject; Value: integer);
 begin
   if not Assigned(FOnDialogYN) then Exit;
-  case (Value = cjClick_Yes) of
-    True : FOnDialogYN(Obj, ClickYes);
-    False: FOnDialogYN(Obj, ClickNo);
+  case Value of
+     cjClick_Yes : FOnDialogYN(Obj, ClickYes);
+     cjClick_No  : FOnDialogYN(Obj, ClickNo);
   end;
 end;
 
