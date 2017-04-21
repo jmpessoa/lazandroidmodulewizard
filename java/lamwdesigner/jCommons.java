@@ -1,4 +1,4 @@
-package com.example.appdrawingviewdemo1;
+package org.lamw.appwidgetproviderdemo1;
 
 import android.view.View;
 import android.view.ViewGroup;
@@ -102,13 +102,21 @@ public class jCommons {
 		}
 	}
 	
+	public void setMarginLeftTopRightBottom(int _left, int _top,int _right, int _bottom) {
+		marginLeft = _left;
+		marginTop = _top;
+		marginRight = _right;
+		marginBottom = _bottom;
+	    lparams.setMargins(marginLeft,marginTop,marginRight,marginBottom);
+    }
+	
 	public void setLeftTopRightBottomWidthHeight(int _left, int _top, int _right, int _bottom, int _w, int _h) {
 		marginLeft = _left;
 		marginTop = _top;
 		marginRight = _right;
 		marginBottom = _bottom;
 		lparamH = _h;
-		lparamW = _w;
+		lparamW = _w;		
 	}
 	
 	public void setLParamWidth(int _w) {
@@ -205,4 +213,19 @@ public class jCommons {
 		if ( (parent != null) && (aOwnerView != null))  { parent.removeView(aOwnerView); }
 		lparams = null;
 	}
+	
+	public void MatchParent() {		
+		lparamW = android.view.ViewGroup.LayoutParams.MATCH_PARENT;
+		lparamH = android.view.ViewGroup.LayoutParams.MATCH_PARENT;
+		lparams.width = lparamW;
+		lparams.height = lparamH;
+	}
+	
+	public void WrapParent() {
+		lparamW = android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
+		lparamH = android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
+		lparams.width = lparamW;
+		lparams.height = lparamH;
+	}
+
 }

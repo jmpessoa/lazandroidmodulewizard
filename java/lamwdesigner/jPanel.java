@@ -1,4 +1,4 @@
-package org.lamw.apptexttospeechdemo1;
+package org.lamw.appwidgetproviderdemo1;
 
 import android.graphics.Color;
 import android.graphics.PorterDuff.Mode;
@@ -361,6 +361,15 @@ public class jPanel extends RelativeLayout {
 	//You can basically set it from anything between 0(fully transparent) to 255 (completely opaque)
 	public void SetBackgroundAlpha(int _alpha) {		
 	  this.getBackground().setAlpha(_alpha); //0-255
+	}
+	
+	public void SetMarginLeftTopRightBottom(int _left, int _top, int _right, int _bottom) {		
+		marginLeft = _left;
+		marginTop = _top;
+		marginRight = _right;
+		marginBottom = _bottom;
+		lparams.setMargins(marginLeft,marginTop,marginRight,marginBottom);
+		setLayoutParams(lparams);
 	}
 	
 }

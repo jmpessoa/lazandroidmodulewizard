@@ -202,6 +202,7 @@ type
      procedure SetRoundCorner();
      procedure SetRadiusRoundCorner(_radius: integer);
      procedure SetBackgroundAlpha(_alpha: integer); //You can basically set it from anything between 0(fully transparent) to 255 (completely opaque)
+     procedure SetMarginLeftTopRightBottom(_left,_top,_right,_bottom: integer);
 
    published
      property BackgroundColor     : TARGBColorBridge read FColor write SetColor;
@@ -10192,5 +10193,17 @@ begin
   if FInitialized then
      jPanel_SetBackgroundAlpha(FjEnv, FjObject, _alpha);
 end;
+
+procedure jPanel.SetMarginLeftTopRightBottom(_left,_top,_right,_bottom: integer);
+begin
+  FMarginTop:= _left;
+  FMarginLeft:= _top;
+  FMarginRight:= _right;
+  FMarginBottom:= _bottom;
+  if FInitialized then
+      jPanel_SetMarginLeftTopRightBottom(FjEnv, FjObject ,
+                                          _left,_top,_right,_bottom);
+end;
+
 
 end.

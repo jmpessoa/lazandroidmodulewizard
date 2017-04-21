@@ -670,6 +670,7 @@ procedure jPanel_WrapContent(env: PJNIEnv; _jpanel: JObject);
 procedure jPanel_SetRoundCorner(env: PJNIEnv; _jpanel: JObject);
 procedure jPanel_SetRadiusRoundCorner(env: PJNIEnv; _jpanel: JObject; _radius: integer);
 procedure jPanel_SetBackgroundAlpha(env: PJNIEnv; _jpanel: JObject; _alpha: integer);
+procedure jPanel_SetMarginLeftTopRightBottom(env: PJNIEnv; _jpanel: JObject; _left: integer; _top: integer; _right: integer; _bottom: integer);
 //-----------------
 // HorizontalScrollView
 //by jmpessoa
@@ -5768,6 +5769,23 @@ begin
   jParams[0].i:= _alpha;
   jCls:= env^.GetObjectClass(env, _jpanel);
   jMethod:= env^.GetMethodID(env, jCls, 'SetBackgroundAlpha', '(I)V');
+  env^.CallVoidMethodA(env, _jpanel, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+
+procedure jPanel_SetMarginLeftTopRightBottom(env: PJNIEnv; _jpanel: JObject; _left: integer; _top: integer; _right: integer; _bottom: integer);
+var
+  jParams: array[0..3] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].i:= _left;
+  jParams[1].i:= _top;
+  jParams[2].i:= _right;
+  jParams[3].i:= _bottom;
+  jCls:= env^.GetObjectClass(env, _jpanel);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetMarginLeftTopRightBottom', '(IIII)V');
   env^.CallVoidMethodA(env, _jpanel, jMethod, @jParams);
   env^.DeleteLocalRef(env, jCls);
 end;
