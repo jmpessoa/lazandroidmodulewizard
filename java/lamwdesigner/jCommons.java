@@ -108,6 +108,8 @@ public class jCommons {
 		marginRight = _right;
 		marginBottom = _bottom;
 	    lparams.setMargins(marginLeft,marginTop,marginRight,marginBottom);
+		if (aOwnerView != null)  
+			aOwnerView.setLayoutParams(lparams);
     }
 	
 	public void setLeftTopRightBottomWidthHeight(int _left, int _top, int _right, int _bottom, int _w, int _h) {
