@@ -1,6 +1,6 @@
-package org.lamw.appwidgetproviderdemo1;
+package org.lamw.appsmswidgetproviderdemo1;
 
-//LAMW: Lazarus Android Module Wizard  - version 0.7 - rev. 15.1 - 16 April - 2017 
+//LAMW: Lazarus Android Module Wizard  - version 0.7 - rev. 16 - 29 April - 2017 
 //RAD Android: Project Wizard, Form Designer and Components Development Model!
 
 //https://github.com/jmpessoa/lazandroidmodulewizard
@@ -91,6 +91,7 @@ import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.util.Log;
 import android.view.ContextMenu;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.SurfaceHolder;
@@ -102,6 +103,7 @@ import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.RelativeLayout.LayoutParams;
+import android.widget.RemoteViews;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 import java.io.*;
@@ -272,6 +274,13 @@ for (int i = 0; i < layout.getChildCount(); i++) {
 public void ShowMessage(String msg){
   Log.i("ShowMessage", msg);
   Toast.makeText(controls.activity, msg, Toast.LENGTH_SHORT).show();	
+}
+
+public void ShowMessage(String _msg, int _gravity, int _timeLength) {
+	  Log.i("ShowMessage", _msg);
+	  Toast toast = Toast.makeText(controls.activity, _msg, _timeLength);
+	  toast.setGravity(Gravity.CENTER, 0, 0);
+	  toast.show();
 }
 
 public String GetDateTime() {
@@ -1872,8 +1881,7 @@ public  int[] getBmpArray(String file) {
    * NOTE: The DCIM folder on the microSD card in your Android device is where Android stores the photos and videos 
    * you take with the device's built-in camera. When you open the Android Gallery app, 
    * you are browsing the files saved in the DCIM folder....
-   */
-  //by jmpessoa  
+   */ 
 public String jCamera_takePhoto(String path, String filename) {
  	  Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
 	  Uri mImageCaptureUri = Uri.fromFile(new File(path, '/'+filename)); // get Android.Uri from file

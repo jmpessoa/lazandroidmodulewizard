@@ -63,10 +63,11 @@ private Drawable GetDrawableResourceById(int _resID) {
 }
 
 //by jmpessoa
-public  void loadRes(String imgResIdentifier) {  //full file name!
-	  //if (bmp != null) { bmp.recycle(); }
-	  Drawable d = GetDrawableResourceById(GetDrawableResourceId(imgResIdentifier)); 
-	  bmp =	  (( BitmapDrawable )d).getBitmap();
+public  void loadRes(String imgResIdentifier) { 
+	   int id =	GetDrawableResourceId(imgResIdentifier);	
+	    BitmapFactory.Options bo = new BitmapFactory.Options();
+	    bo.inScaled = false; 
+	    bmp =  BitmapFactory.decodeResource(this.controls.activity.getResources(), id, bo);	
 }
 
 //by jmpessoa
@@ -91,6 +92,14 @@ public  void LoadFile(String _fullFilename, int _shrinkFactor) {
 public  void createBitmap(int w, int h) {
  //if (bmp != null) { bmp.recycle(); }
  bmp = Bitmap.createBitmap( w,h, Bitmap.Config.ARGB_8888 );
+}
+
+public Bitmap LoadFromFile(String _fullFilename) {  //pascal  "GetImageFromFile"
+	 //if (bmp != null) { bmp.recycle(); }
+	  BitmapFactory.Options bo = new BitmapFactory.Options();
+	  bo.inScaled = false; 	   
+          bmp = BitmapFactory.decodeFile(_fullFilename, bo);	  
+          return bmp;
 }
 
 public  int[] getWH() {

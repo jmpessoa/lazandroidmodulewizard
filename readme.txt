@@ -124,6 +124,49 @@
 	*
 	****************************************************************************************************
 
+Version 0.7.16 - 29 - April - 2017
+
+	NEW! jSMSWidgetProvider component
+
+	NEW! demo AppSMSWidgetProviderDemo1
+
+		HINT 1: How to install widget:
+
+			a)Run/Install the App
+			b) Use BackButton to leave the App
+			c) long press the home screen and select "widgets"
+			d) loook for "AppSMSWidgetProviderDemo1 4x1"
+			f) long press "AppSMSWidgetProviderDemo1 4x1" to install
+			g) keep waiting for a "sms" 
+			h) has sms arrived? click the widget to re-open and hanlde the message from your App!
+
+		HINT 2: Configure your project:
+
+		res/layout
+			smswigetlayout.xml    <<-- change [only content, NOT the file name] to configure
+		res/drawable-xxxx
+			smswidgetbackgroundimage.jpg  <<-- change [only content, NOT the file name]  to configure
+		res/xml
+			smswidgetinfo.xml	<<-- change [only content,  NOT the file name]  to configure
+			
+
+	IMPROVED! jSqliteDataAccess ["java" template all rewrited by Renabor!]
+			NEW! support to pack [and automatic handle] database in "assets" folder
+			NEW! support to database version-control
+
+	NEW! demo AppSQliteDemo3  <<--- demo for "assets" support... [thanks to Renabor!]
+			NOTE: how to store your pre-build database:
+				..../assets   <<--- put your database file here [default]
+					/databases  <<--- OR put your file here [default, too!]
+					/myCustomFolderName  <<-- ????? OR put your file here [not default!]
+
+					if you prefere "myCustomFolderName" as folder name then call: 
+						jSqliteDataAccess1.SetAssetsSearchFolder("myCustomFolderName");
+						in "OnJNIPrompt" event.						
+
+	UPDATED! demo AppSQliteDemo1  
+	UPDATED! demo AppSQliteDemo2	
+					
 Version 0.7.15 - 29 - March - 2017
 
 	NEW! jTextToSpeech  component

@@ -1,4 +1,4 @@
-package org.lamw.appvideoviewdemo1;
+package org.lamw.appsqlitedemo3;
 
 import java.lang.reflect.Field;
 
@@ -36,6 +36,8 @@ public class jButton extends Button {
 	int mSavedBackgroundColor;
 	
 	int mRadius = 20;
+	
+	boolean mEnable = true;
 
 	//Constructor
 	public  jButton(android.content.Context context, Controls ctrls,long pasobj ) {
@@ -71,8 +73,10 @@ public class jButton extends Button {
 				    }
 			     }, 150);
 			  	 
-			   }  			
-			   controls.pOnClick(LAMWCommon.getPasObj(),Const.Click_Default);
+			   }  		
+			   if (mEnable) {
+			      controls.pOnClick(LAMWCommon.getPasObj(),Const.Click_Default);
+			   }
 												 				 
 			}
 		};		
@@ -381,4 +385,9 @@ public class jButton extends Button {
         Typeface customfont = Typeface.createFromAsset( controls.activity.getAssets(), _fontName);    
         this.setTypeface(customfont);
     }
+	
+	public void SetEnable(boolean _value) {
+		mEnable = _value;
+		this.setEnabled(_value);
+	}
 }

@@ -7,10 +7,12 @@ object AndroidModule1: TAndroidModule1
   MarginTop = 0
   MarginRight = 0
   MarginBottom = 0
+  Enabled = True
   OnCreate = DataModuleCreate
   Text = 'AndroidModule1'
   ActivityMode = actMain
   BackgroundColor = colbrDefault
+  ActionBarTitle = abtDefault
   OnJNIPrompt = DataModuleJNIPrompt
   object jTextView1: jTextView
     Left = 95
@@ -21,20 +23,20 @@ object AndroidModule1: TAndroidModule1
     MarginTop = 10
     MarginRight = 10
     MarginBottom = 10
+    Enabled = True
     Visible = True
+    Id = 4672521
     PosRelativeToAnchor = []
     PosRelativeToParent = [rpTop, rpCenterHorizontal]
     LayoutParamWidth = lpWrapContent
     LayoutParamHeight = lpWrapContent
     Text = 'App Sqlite Demo 1'
     Alignment = taLeft
-    Enabled = True
     BackgroundColor = colbrDefault
     FontColor = colbrTomato
     FontSize = 0
     TextTypeFace = tfBold
     FontSizeUnit = unitDefault
-    Id = 4672521
   end
   object jButton1: jButton
     Left = 5
@@ -45,8 +47,10 @@ object AndroidModule1: TAndroidModule1
     MarginTop = 5
     MarginRight = 5
     MarginBottom = 5
+    Enabled = True
     Visible = True
     Anchor = jTextView1
+    Id = 243613
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = []
     LayoutParamWidth = lpMatchParent
@@ -57,7 +61,6 @@ object AndroidModule1: TAndroidModule1
     FontSize = 0
     FontSizeUnit = unitDefault
     OnClick = jButton1Click
-    Id = 243613
   end
   object jButton2: jButton
     Left = 5
@@ -68,8 +71,10 @@ object AndroidModule1: TAndroidModule1
     MarginTop = 5
     MarginRight = 5
     MarginBottom = 5
+    Enabled = True
     Visible = True
     Anchor = jButton1
+    Id = 9396074
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = []
     LayoutParamWidth = lpMatchParent
@@ -80,7 +85,6 @@ object AndroidModule1: TAndroidModule1
     FontSize = 0
     FontSizeUnit = unitDefault
     OnClick = jButton2Click
-    Id = 9396074
   end
   object jButton3: jButton
     Left = 5
@@ -91,8 +95,10 @@ object AndroidModule1: TAndroidModule1
     MarginTop = 5
     MarginRight = 5
     MarginBottom = 5
+    Enabled = True
     Visible = True
     Anchor = jButton2
+    Id = 6997750
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = []
     LayoutParamWidth = lpMatchParent
@@ -103,7 +109,6 @@ object AndroidModule1: TAndroidModule1
     FontSize = 0
     FontSizeUnit = unitDefault
     OnClick = jButton3Click
-    Id = 6997750
   end
   object jButton4: jButton
     Left = 5
@@ -114,8 +119,10 @@ object AndroidModule1: TAndroidModule1
     MarginTop = 5
     MarginRight = 5
     MarginBottom = 5
+    Enabled = True
     Visible = True
     Anchor = jButton3
+    Id = 463965
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = []
     LayoutParamWidth = lpMatchParent
@@ -126,7 +133,6 @@ object AndroidModule1: TAndroidModule1
     FontSize = 0
     FontSizeUnit = unitDefault
     OnClick = jButton4Click
-    Id = 463965
   end
   object jButton5: jButton
     Left = 5
@@ -137,8 +143,10 @@ object AndroidModule1: TAndroidModule1
     MarginTop = 5
     MarginRight = 5
     MarginBottom = 5
+    Enabled = True
     Visible = True
     Anchor = jButton4
+    Id = 2266437
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = []
     LayoutParamWidth = lpMatchParent
@@ -149,7 +157,6 @@ object AndroidModule1: TAndroidModule1
     FontSize = 0
     FontSizeUnit = unitDefault
     OnClick = jButton5Click
-    Id = 2266437
   end
   object jEditText1: jEditText
     Tag = 1
@@ -161,8 +168,10 @@ object AndroidModule1: TAndroidModule1
     MarginTop = 10
     MarginRight = 10
     MarginBottom = 10
+    Enabled = True
     Visible = True
     Anchor = jTextView2
+    Id = 2166778
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = []
     LayoutParamWidth = lpHalfOfParent
@@ -182,7 +191,6 @@ object AndroidModule1: TAndroidModule1
     WrappingLine = False
     Editable = True
     FontSizeUnit = unitDefault
-    Id = 2166778
   end
   object jTextView2: jTextView
     Left = 10
@@ -193,21 +201,21 @@ object AndroidModule1: TAndroidModule1
     MarginTop = 10
     MarginRight = 10
     MarginBottom = 10
+    Enabled = True
     Visible = True
     Anchor = jButton5
+    Id = 9513098
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = []
     LayoutParamWidth = lpWrapContent
     LayoutParamHeight = lpWrapContent
     Text = 'Enter Index:'
     Alignment = taLeft
-    Enabled = True
     BackgroundColor = colbrDefault
     FontColor = colbrRed
     FontSize = 0
     TextTypeFace = tfNormal
     FontSizeUnit = unitDefault
-    Id = 9513098
   end
   object jButton6: jButton
     Left = 161
@@ -218,8 +226,10 @@ object AndroidModule1: TAndroidModule1
     MarginTop = 5
     MarginRight = 5
     MarginBottom = 5
+    Enabled = True
     Visible = True
     Anchor = jEditText1
+    Id = 1300451
     PosRelativeToAnchor = [raToRightOf, raAlignBaseline]
     PosRelativeToParent = []
     LayoutParamWidth = lpHalfOfParent
@@ -230,19 +240,20 @@ object AndroidModule1: TAndroidModule1
     FontSize = 0
     FontSizeUnit = unitDefault
     OnClick = jButton6Click
-    Id = 1300451
   end
   object jImageView1: jImageView
-    Left = 126
+    Left = 80
     Top = 389
-    Width = 48
-    Height = 48
+    Width = 140
+    Height = 60
     MarginLeft = 0
     MarginTop = 0
     MarginRight = 0
     MarginBottom = 0
+    Enabled = True
     Visible = True
     Anchor = jEditText1
+    Id = 0
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = [rpCenterHorizontal]
     LayoutParamWidth = lpWrapContent
@@ -251,7 +262,6 @@ object AndroidModule1: TAndroidModule1
     Images = jImageList1
     BackgroundColor = colbrGreenYellow
     ImageScaleType = scaleCenter
-    Id = 0
   end
   object jSqliteDataAccess1: jSqliteDataAccess
     Cursor = jSqliteCursor1
@@ -281,7 +291,6 @@ object AndroidModule1: TAndroidModule1
   end
   object jBitmap1: jBitmap
     FilePath = fpathData
-    ImageIndex = -1
     Images = jImageList1
     Width = 0
     Height = 0

@@ -54,8 +54,8 @@ implementation
 
 procedure TAndroidModule1.jButton1Click(Sender: TObject);
 begin
-  jSqliteDataAccess1.OpenOrCreate(FDatabaseName);  // myData.db
-  ShowMessage('database created!');
+  jSqliteDataAccess1.OpenOrCreate(FDatabaseName);  // databasebook.db
+  ShowMessage('database Opened or created!');
 end;
 
 procedure TAndroidModule1.AndroidModule1JNIPrompt(Sender: TObject);

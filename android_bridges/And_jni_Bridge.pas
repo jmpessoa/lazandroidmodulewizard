@@ -317,6 +317,7 @@ procedure jButton_SetCompoundDrawables(env: PJNIEnv; _jbutton: JObject; _imageRe
 procedure jButton_SetRoundCorner(env: PJNIEnv; _jbutton: JObject);
 procedure jButton_SetRadiusRoundCorner(env: PJNIEnv; _jbutton: JObject; _radius: integer);
 procedure jButton_SetFontFromAssets(env: PJNIEnv; _jbutton: JObject; _fontName: string);
+procedure jButton_SetEnable(env: PJNIEnv; _jbutton: JObject; Value: boolean);
 
 // CheckBox
 Function  jCheckBox_Create            (env:PJNIEnv;  this:jobject; SelfObj: TObject ): jObject;
@@ -1085,6 +1086,7 @@ function jSqliteDataAccess_CheckDataBaseExistsByName(env: PJNIEnv; _jsqlitedataa
 procedure jSqliteDataAccess_UpdateImageBatch(env: PJNIEnv; _jsqlitedataaccess: JObject; var _imageResIdentifierDataArray: TDynArrayOfString; _delimiter: string);
 procedure jSqliteDataAccess_SetDataBaseName(env: PJNIEnv; _jsqlitedataaccess: JObject; _dbName: string);
 function jSqliteDataAccess_DatabaseExists(env: PJNIEnv; _jsqlitedataaccess: JObject; _databaseName: string): boolean;
+procedure jSqliteDataAccess_SetAssetsSearchFolder(env: PJNIEnv; _jsqlitedataaccess: JObject; _folderName: string);
 
 // Http
 //Function  jHttp_Get(env:PJNIEnv;  this:jobject; URL: String) : String;
@@ -3167,6 +3169,19 @@ begin
   jMethod:= env^.GetMethodID(env, jCls, 'SetFontFromAssets', '(Ljava/lang/String;)V');
   env^.CallVoidMethodA(env, _jbutton, jMethod, @jParams);
   env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jButton_SetEnable(env: PJNIEnv; _jbutton: JObject; Value: boolean);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].z:= JBool(Value);
+  jCls:= env^.GetObjectClass(env, _jbutton);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetEnable', '(Z)V');
+  env^.CallVoidMethodA(env, _jbutton, jMethod, @jParams);
   env^.DeleteLocalRef(env, jCls);
 end;
 
@@ -8845,6 +8860,20 @@ begin
   jMethod:= env^.GetMethodID(env, jCls, 'DatabaseExists', '(Ljava/lang/String;)Z');
   jBoo:= env^.CallBooleanMethodA(env, _jsqlitedataaccess, jMethod, @jParams);
   Result:= boolean(jBoo);
+  env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jSqliteDataAccess_SetAssetsSearchFolder(env: PJNIEnv; _jsqlitedataaccess: JObject; _folderName: string);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_folderName));
+  jCls:= env^.GetObjectClass(env, _jsqlitedataaccess);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetAssetsSearchFolder', '(Ljava/lang/String;)V');
+  env^.CallVoidMethodA(env, _jsqlitedataaccess, jMethod, @jParams);
   env^.DeleteLocalRef(env,jParams[0].l);
   env^.DeleteLocalRef(env, jCls);
 end;

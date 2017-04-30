@@ -1,4 +1,4 @@
-package com.example.appgooglemapsdemo1;
+package org.lamw.appsmswidgetproviderdemo1;
 
 import android.content.Context;
 import android.graphics.Color;
@@ -41,19 +41,32 @@ public class jRadioGroup extends RadioGroup /*dummy*/ { //please, fix what GUI o
         this.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             /*.*/
             public void onCheckedChanged(RadioGroup group, int checkedId) {
-
-                RadioButton rb = (RadioButton) findViewById(checkedId);
-                String checkedCaption = (String) rb.getText();
-
-                for (int i = 0; i < GetChildCount(); i++) {
-                    rb = (RadioButton) GetChildAt(i);
-                    if (checkedId == rb.getId()) {
-                        checkedIndex = i;
-                        break;
-                    }
-                }
-
-                controls.pRadioGroupCheckedChanged(pascalObj, checkedIndex, checkedCaption); //JNI event onClick!
+            	
+            	 int auxChecked = -1;
+                 if (checkedId > 0) {
+                	 
+	                RadioButton rb = (RadioButton) findViewById(checkedId);
+	                
+	                if (rb != null) {
+		                String checkedCaption = (String) rb.getText();
+		
+		                for (int i = 0; i < GetChildCount(); i++) {
+		                    rb = (RadioButton) GetChildAt(i);
+		                    
+		                    if (rb !=null) {
+		                      if (checkedId == rb.getId()) {
+		                    	auxChecked = i;
+		                        break;
+		                      }
+		                    }
+		                }	
+		                
+		                if (auxChecked > 0) 
+		                  controls.pRadioGroupCheckedChanged(pascalObj, checkedIndex, checkedCaption); //JNI event onClick!
+	                }
+	                
+                 }
+                
             }
         });
 

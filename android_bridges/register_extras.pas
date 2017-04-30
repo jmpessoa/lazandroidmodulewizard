@@ -8,6 +8,7 @@ interface
 
 uses 
   Classes,
+  smswidgetprovider,
   texttospeech,
   gmaps,
   windowmanager,
@@ -52,6 +53,7 @@ implementation
   
 Procedure Register;
 begin
+  {$I jsmswidgetprovider_icon.lrs}
   {$I jtexttospeech_icon.lrs}
   {$I jmaps_icon.lrs}
   {$I jwindowmanager_icon.lrs}
@@ -97,6 +99,7 @@ begin
 
   RegisterComponents('Android Bridges Extra',
    [
+      jSMSWidgetProvider,
       jTextToSpeech,
       jMaps,
       jWindowManager,

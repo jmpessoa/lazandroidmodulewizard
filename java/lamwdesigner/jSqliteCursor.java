@@ -1,4 +1,4 @@
-package com.example.appchronometerdemo1;
+package com.example.appsqlitedemo1;
 
 import android.database.Cursor;
 import android.graphics.Bitmap;
@@ -52,7 +52,9 @@ public class jSqliteCursor {
     		return 0;
     	}
     }
-      
+    public void SetRowCount(int rows) {
+	//this.rows = rows;
+    }
     public void MoveToFirst() {
     	if (cursor != null) cursor.moveToFirst();
     }

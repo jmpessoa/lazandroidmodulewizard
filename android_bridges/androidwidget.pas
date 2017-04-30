@@ -422,6 +422,8 @@ type
 
   TGravitySet = set of TGravity;
 
+  TShowLength = (slShort, slLong);
+
   TLanguage      = (tPascal, tJava);
 
   TXY            = Record
@@ -782,15 +784,15 @@ type
     FjClass: jObject;
     FClassPath: string; //need by new pure jni model! -->> initialized by widget.Create
     FjObject     : jObject; //jSelf - java object
-    FEnabled     : boolean;
     FInitialized : boolean;
     FjEnv: PJNIEnv;
     FjThis: jObject;  //java class Controls\libcontrols
     FCustomColor: DWord;
-    procedure SetEnabled(Value: boolean);
+  protected
+    FEnabled     : boolean;
+    procedure SetEnabled(Value: boolean); virtual;
   public
     procedure UpdateJNI(refApp: jApp); virtual;
-    property Enabled     : boolean read FEnabled  write SetEnabled;
     property Initialized : boolean read FInitialized write FInitialized;
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -869,16 +871,17 @@ type
     property Visible: boolean read FVisible write FVisible;
     property Text: string read GetText write SetText;
     property CustomColor: DWord read FCustomColor write FCustomColor;
+
   published
     property Left: integer read FLeft write SetLeft;
     property Top: integer read FTop write SetTop;
     property Width: integer read GetWidth write SetWidth;
     property Height: integer read GetHeight write SetHeight;
-
     property MarginLeft: integer read FMarginLeft write SetMarginLeft default 3;
     property MarginTop: integer read FMarginTop write SetMarginTop default 3;
     property MarginRight: integer read FMarginRight write SetMarginRight default 3;
     property MarginBottom: integer read FMarginBottom write SetMarginBottom default 3;
+    property Enabled     : boolean read FEnabled  write SetEnabled;
   end;
 
   IAndroidWidgetDesigner = interface(IUnknown)
@@ -1029,7 +1032,8 @@ end;
 
     Procedure Close;
     Procedure Refresh;
-    procedure ShowMessage(msg: string);  overload;
+    procedure ShowMessage(msg: string); overload;
+    procedure ShowMessage(_msg: string; _gravity: TGravity; _timeLength: TShowLength); overload;
     function GetDateTime: String;
 
     function GetStringExtra(intentData: jObject; extraName: string): string;
@@ -1539,6 +1543,8 @@ Procedure jForm_FreeLayout              (env:PJNIEnv; Layout    : jObject);
 Procedure jForm_SetVisibility2          (env:PJNIEnv; Form    : jObject; visible : boolean);
 Procedure jForm_SetEnabled2             (env:PJNIEnv;Form    : jObject; enabled : Boolean);
 procedure jForm_ShowMessage(env:PJNIEnv; Form:jObject; msg: string); overload;
+procedure jForm_ShowMessage(env: PJNIEnv; _jform: JObject; _msg: string; _gravity: integer; _timeLength: integer); overload;
+
 function jForm_GetDateTime(env:PJNIEnv; Form:jObject): string;
 
 function jForm_SetWifiEnabled(env: PJNIEnv; _jform: JObject; _status: boolean): boolean;
@@ -2372,6 +2378,7 @@ begin
   MaxID := 0;
   if HasParent then
   begin
+    MaxID := jVisualControl(Parent).Id;  //try fix jRadioGroup
     for I := 0 to Parent.ChildCount - 1 do
     begin
       Widget := Parent.Children[I];
@@ -2712,6 +2719,13 @@ end;
 procedure jForm.ShowMessage(msg: string);
 begin
   jForm_ShowMessage(FjEnv, FjObject, msg);
+end;
+
+procedure jForm.ShowMessage(_msg: string; _gravity: TGravity; _timeLength: TShowLength);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jForm_ShowMessage(FjEnv, FjObject, _msg , Ord(_gravity) ,Ord(_timeLength));
 end;
 
 function jForm.GetDateTime: String;
@@ -6327,6 +6341,21 @@ begin
   env^.DeleteLocalRef(env, cls);
 end;
 
+procedure jForm_ShowMessage(env: PJNIEnv; _jform: JObject; _msg: string; _gravity: integer; _timeLength: integer);
+var
+  jParams: array[0..2] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_msg));
+  jParams[1].i:= _gravity;
+  jParams[2].i:= _timeLength;
+  jCls:= env^.GetObjectClass(env, _jform);
+  jMethod:= env^.GetMethodID(env, jCls, 'ShowMessage', '(Ljava/lang/String;II)V');
+  env^.CallVoidMethodA(env, _jform, jMethod, @jParams);
+env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
 
 //by jmpessoa
 

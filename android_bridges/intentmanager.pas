@@ -12,7 +12,7 @@ type
 TIntentAction = (iaView, iaPick, iaSendto, idDial, iaCallbutton, iaCall, iaImageCapture,
                  iaDataRoaming,iaQuickLaunch, iaDate,iaSystem, iaWireless, iaDeviceInfo,
                  iaSend, iaSendMultiple, iaPickActivity, iaEdit, iaGetContent,
-                 iaTimePick, iaVoiceCommand, iaWebSearch, iaMain, iaNone);
+                 iaTimePick, iaVoiceCommand, iaWebSearch, iaMain, iaAppWidgetUpdate, iaNone);
 
 TIntentCategory = (icDefault, icLauncher, icHome, icInfo, icPreference, icAppBrowser,
                    icAppCalculator, icAppCalendar, icAppContacts, icAppEmail,

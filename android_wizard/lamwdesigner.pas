@@ -466,7 +466,7 @@ uses
   customdialog, togglebutton, switchbutton,
   Laz_And_GLESv1_Canvas, Laz_And_GLESv2_Canvas, gridview, Spinner, seekbar,
   radiogroup, ratingbar, digitalclock, analogclock, surfaceview,
-  autocompletetextview, drawingview, chronometer, viewflipper;
+  autocompletetextview, drawingview, chronometer, viewflipper, videoview;
 
 var
   DraftClassesMap: TDraftControlHash;
@@ -3212,6 +3212,7 @@ initialization
   RegisterAndroidWidgetDraftClass(jCanvasES2, TDraftWidget);
   RegisterAndroidWidgetDraftClass(jChronometer, TDraftWidget);
   RegisterAndroidWidgetDraftClass(jViewFlipper, TDraftWidget);
+  RegisterAndroidWidgetDraftClass(jVideoView, TDraftWidget);
 
 finalization
   DraftClassesMap.Free;

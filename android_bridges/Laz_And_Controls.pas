@@ -435,11 +435,10 @@ type
     FjParent   : jForm;
     FInterval : integer;
     FOnTimer  : TOnNotify;
-
-    Procedure SetEnabled(Value: boolean);
     Procedure SetInterval(Value: integer);
     //Procedure SetOnTimer(Value: TOnNotify);
   protected
+      Procedure SetEnabled(Value: boolean); override;
   public
     constructor Create(AOwner: TComponent); override;
     Destructor Destroy; override;
@@ -714,6 +713,7 @@ type
     function GetFullPathDataBaseName(): string;
 
     function DatabaseExists(_databaseName: string): boolean;
+    procedure SetAssetsSearchFolder(_folderName: string);
 
     property FullPathDataBaseName: string read GetFullPathDataBaseName;
 
@@ -969,7 +969,7 @@ type
 
     function  GetText            : string;   override;
     Procedure SetText     (Value   : string );  override;
-
+    Procedure SetEnabled(Value: boolean); override;
   public
     constructor Create(AOwner: TComponent); override;
     Destructor  Destroy; override;
@@ -991,19 +991,17 @@ type
     procedure SetRoundCorner();
     procedure SetRadiusRoundCorner(_radius: integer);
     procedure SetFontFromAssets(_fontName: string);
-
   published
     property Text: string read GetText write SetText;
     property BackgroundColor     : TARGBColorBridge read FColor     write SetColor;
     property FontColor : TARGBColorBridge read FFontColor write SetFontColor;
     property FontSize  : DWord     read FFontSize  write SetFontSize;
     property FontSizeUnit: TFontSizeUnit read FFontSizeUnit write SetFontSizeUnit;
-
+    property Enabled  : boolean   read FEnabled  write SetEnabled;
     // Event
     property OnClick   : TOnNotify read FOnClick   write FOnClick;
     property OnBeforeDispatchDraw: TOnBeforeDispatchDraw read FOnBeforeDispatchDraw write FOnBeforeDispatchDraw;
     property OnAfterDispatchDraw: TOnBeforeDispatchDraw read FOnAfterDispatchDraw write FOnAfterDispatchDraw;
-
   end;
 
   jCheckBox = class(jVisualControl)
@@ -4000,6 +3998,7 @@ begin
   FWidth        := 100;
   FLParamWidth  := lpHalfOfParent;
   FLParamHeight := lpWrapContent;
+  FEnabled:= True;
 end;
 
 destructor jButton.Destroy;
@@ -4093,6 +4092,9 @@ begin
     View_SetBackGroundColor(FjEnv, FjThis, FjObject , GetARGB(FCustomColor, FColor));
 
   View_SetVisible(FjEnv, FjThis, FjObject , FVisible);
+
+  if FEnabled <> True then
+      jButton_SetEnable(FjEnv, FjObject , False);
 
 end;
 
@@ -4331,6 +4333,13 @@ begin
      jButton_SetFontFromAssets(FjEnv, FjObject, _fontName);
 end;
 
+Procedure jButton.SetEnabled(Value: boolean);
+begin
+    //in designing component state: set value here...
+  FEnabled:= Value;
+  if FInitialized then
+     jButton_SetEnable(FjEnv, FjObject, Value);
+end;
 //------------------------------------------------------------------------------
 // jCheckBox
 //------------------------------------------------------------------------------
@@ -9818,6 +9827,13 @@ begin
   Result:= False;
   if FInitialized then
    Result:= jSqliteDataAccess_DatabaseExists(FjEnv, FjObject, _databaseName);
+end;
+
+procedure jSqliteDataAccess.SetAssetsSearchFolder(_folderName: string);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jSqliteDataAccess_SetAssetsSearchFolder(FjEnv, FjObject, _folderName);
 end;
 
    {jPanel}

@@ -303,7 +303,7 @@ begin
   if jControlsList <> nil then
   begin
     list:= TStringList.Create;
-    contentList := FindAllFiles(FPathToAndroidProject+DirectorySeparator+'jni', '*.lfm', False);
+    contentList := FindAllFiles(FPathToAndroidProject+'jni', '*.lfm', False);
     for i:= 0 to contentList.Count-1 do
     begin
       list.LoadFromFile(contentList.Strings[i]);
@@ -425,8 +425,7 @@ begin
      if auxList.Count > 0 then
      begin
        insertRef:= '<uses-sdk android:minSdkVersion'; //insert reference point
-
-       manifestList.LoadFromFile(FPathToAndroidProject+DirectorySeparator+'AndroidManifest.xml');
+       manifestList.LoadFromFile(FPathToAndroidProject+'AndroidManifest.xml');
        aux:= manifestList.Text;
 
        listRequirements.Add(Trim(auxList.Text));  //Add feature
@@ -454,7 +453,7 @@ begin
          begin
            Insert(sLineBreak + Trim(list.Text), aux, p1+Length(insertRef) );
            manifestList.Text:= aux;
-           manifestList.SaveToFile(FPathToAndroidProject+DirectorySeparator+'AndroidManifest.xml');
+           manifestList.SaveToFile(FPathToAndroidProject+'AndroidManifest.xml');
          end;
        end;
      end;
@@ -466,8 +465,7 @@ begin
      if auxList.Count > 0 then
      begin
        insertRef:= '<intent-filter>'; //insert reference point
-
-       manifestList.LoadFromFile(FPathToAndroidProject+DirectorySeparator+'AndroidManifest.xml');
+       manifestList.LoadFromFile(FPathToAndroidProject+'AndroidManifest.xml');
        aux:= manifestList.Text;
 
        listRequirements.Add(Trim(auxList.Text));  //Add intentfilters
@@ -485,7 +483,7 @@ begin
          begin
            Insert(sLineBreak + Trim(list.Text), aux, p1+Length(insertRef) );
            manifestList.Text:= aux;
-           manifestList.SaveToFile(FPathToAndroidProject+DirectorySeparator+'AndroidManifest.xml');
+           manifestList.SaveToFile(FPathToAndroidProject+'AndroidManifest.xml');
          end;
        end;
      end;
@@ -500,7 +498,7 @@ begin
        insertRef:= '</activity>'; //insert reference point
        manifestList.LoadFromFile(FPathToAndroidProject+'AndroidManifest.xml');
        aux:= manifestList.Text;
-       listRequirements.Add(tempStr);  //Add providers
+       listRequirements.Add(tempStr);  //Add service
        if Pos(tempStr , aux) <= 0 then
        begin
          p1:= Pos(insertRef, aux);
@@ -530,6 +528,51 @@ begin
          manifestList.SaveToFile(FPathToAndroidProject+'AndroidManifest.xml');
        end;
      end;
+   end;
+   //-----
+   if FileExists(LamwGlobalSettings.PathToJavaTemplates+'lamwdesigner'+DirectorySeparator +jclassname+'.receiver') then
+   begin
+     auxList.LoadFromFile(LamwGlobalSettings.PathToJavaTemplates+'lamwdesigner'+DirectorySeparator +jclassname+'.receiver');
+     if auxList.Text <> '' then
+     begin
+       aux:= Trim(auxList.Text);
+       tempStr:= StringReplace(aux,'WPACKAGENAME', FPackageName, [rfIgnoreCase]);
+       insertRef:= '</activity>'; //insert reference point
+       manifestList.LoadFromFile(FPathToAndroidProject+'AndroidManifest.xml');
+       aux:= manifestList.Text;
+       listRequirements.Add(tempStr);  //Add receiver
+       if Pos(tempStr , aux) <= 0 then
+       begin
+         p1:= Pos(insertRef, aux);
+         Insert(sLineBreak + tempStr, aux, p1+Length(insertRef) );
+         manifestList.Text:= aux;
+         manifestList.SaveToFile(FPathToAndroidProject+'AndroidManifest.xml');
+       end;
+     end;
+   end;
+   //-----
+   if FileExists(LamwGlobalSettings.PathToJavaTemplates+'lamwdesigner'+DirectorySeparator +jclassname+'.layout') then
+   begin
+     auxList.LoadFromFile(LamwGlobalSettings.PathToJavaTemplates+'lamwdesigner'+DirectorySeparator +jclassname+'.layout');
+     list.Clear;
+     list.Delimiter:= DirectorySeparator;
+     list.StrictDelimiter:= True;
+     list.DelimitedText:= FPathToAndroidProject + 'dummy';
+     aux:= StringReplace(auxList.Text,'WAPPNAME',  list.Strings[list.Count-2], [rfIgnoreCase]);
+     auxList.Text:= aux;
+     auxList.SaveToFile(FPathToAndroidProject+'res'+DirectorySeparator+'layout'+DirectorySeparator+'smswigetlayout.xml');
+   end;
+   //-----
+   if FileExists(LamwGlobalSettings.PathToJavaTemplates+'lamwdesigner'+DirectorySeparator +jclassname+'.smswidgetinfo') then
+   begin
+     auxList.LoadFromFile(LamwGlobalSettings.PathToJavaTemplates+'lamwdesigner'+DirectorySeparator +jclassname+'.smswidgetinfo');
+     ForceDirectories(FPathToAndroidProject+'res'+DirectorySeparator+'xml');
+     auxList.SaveToFile(FPathToAndroidProject+'res'+DirectorySeparator+'xml'+DirectorySeparator+'smswidgetinfo.xml');
+   end;
+   if FileExists(LamwGlobalSettings.PathToJavaTemplates+'lamwdesigner'+DirectorySeparator +jclassname+'.jpg') then
+   begin
+     CopyFile(LamwGlobalSettings.PathToJavaTemplates+'lamwdesigner'+DirectorySeparator +jclassname+'.jpg',
+              FPathToAndroidProject+'res'+DirectorySeparator+'drawable-hdpi'+DirectorySeparator+'smswidgetbackgroundimage.jpg');
    end;
    //-----
    if listRequirements.Count > 0 then
@@ -619,8 +662,7 @@ begin
   importList:= TStringList.Create;
   importList.Sorted := True;
   importList.Duplicates := dupIgnore;
-
-  javaClassList := FindAllFiles(FPathToAndroidProject+DirectorySeparator+'lamwdesigner', '*.native', False);
+  javaClassList := FindAllFiles(FPathToAndroidProject+'lamwdesigner', '*.native', False);
   for k := 0 to javaClassList.Count - 1 do
   begin
     tempList.LoadFromFile(javaClassList.Strings[k]);
@@ -752,7 +794,7 @@ begin
       CopyFile(FPathToAndroidProject+'jni'+DirectorySeparator+'controls.lpr',
                FPathToAndroidProject+'jni'+DirectorySeparator+'controls.lpr.bak.OLD');
     end;
-    ForceDirectory(FPathToAndroidProject+DirectorySeparator+'lamwdesigner');
+    ForceDirectory(FPathToAndroidProject+'lamwdesigner');
     // old [fat] *.lpr will be cleanup on project saving
   end;
 
@@ -1031,9 +1073,9 @@ var
 begin
 
   strList:= TStringList.Create;
-  if FileExists(FPathToAndroidProject + DirectorySeparator+'readme.txt') then
+  if FileExists(FPathToAndroidProject + 'readme.txt') then
   begin
-    strList.LoadFromFile(FPathToAndroidProject + DirectorySeparator+'readme.txt');
+    strList.LoadFromFile(FPathToAndroidProject + 'readme.txt');
 
     p := Pos('System Path to Android SDK=', strList.Text);
     p := p+length('System Path to Android SDK=');

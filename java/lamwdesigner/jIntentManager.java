@@ -1,4 +1,4 @@
-package com.example.appnotificationmanagerdemo1;
+package org.lamw.appwidgetproviderdemo1;
 
 import java.util.Iterator;
 import java.util.List;
@@ -411,8 +411,9 @@ Sending Data: Extras vs. URI Parameters
 	    case 17: mIntent.setAction(android.content.Intent.ACTION_GET_CONTENT); break;
 	    case 18: mIntent.setAction(android.content.Intent.ACTION_TIME_TICK); break;
 	    case 19: mIntent.setAction(android.content.Intent.ACTION_VOICE_COMMAND); break;	    	    
-	    case 20: mIntent.setAction(android.content.Intent.ACTION_WEB_SEARCH); 	    
-	    case 21: mIntent.setAction("android.intent.action.Main");
+	    case 20: mIntent.setAction(android.content.Intent.ACTION_WEB_SEARCH); break; 	    
+	    case 21: mIntent.setAction("android.intent.action.Main");break;
+	    case 22: mIntent.setAction("android.appwidget.action.APPWIDGET_UPDATE");
 	  }
 	  
    }
@@ -522,7 +523,11 @@ Sending Data: Extras vs. URI Parameters
    public String GetActionImageCaptureAsString() {
 	     return "android.media.action.IMAGE_CAPTURE";
    }
-      
+   
+   public String GetActionSMSReceivedAsString() {   //TODO: Pascal
+     return "android.provider.Telephony.SMS_RECEIVED";
+   }	   
+   
    //http://www.coderanch.com/t/492490/Android/Mobile/Check-application-installed
    public boolean IsCallable(Intent _intent) {  
        List<ResolveInfo> list = controls.activity.getPackageManager().queryIntentActivities(_intent, PackageManager.MATCH_DEFAULT_ONLY);  
