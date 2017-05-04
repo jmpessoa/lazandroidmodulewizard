@@ -1,4 +1,4 @@
-package com.example.appdemo1;
+package com.example.appcustomdialogdemo1;
 
 import java.lang.reflect.Field;
 
@@ -67,10 +67,10 @@ public class jCustomDialog extends RelativeLayout {
 		pascalObj = _Self;
 		controls  = _ctrls;
 
+	    //lparams = new LayoutParams(lparamW, lparamH);  
 		lparams = new ViewGroup.MarginLayoutParams(lparamW, lparamH);     // W,H
 		lparams.setMargins(marginLeft,marginTop,marginRight,marginBottom); // L,T,R,B
 
-		//lparams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
 	} //end constructor
 
 	public void jFree() {
@@ -79,8 +79,6 @@ public class jCustomDialog extends RelativeLayout {
 		if (mDialog != null) mDialog.dismiss();
 		mDialog = null;
 		lparams = null;
-		//parent = null;  //?!
-		//setOnClickListener(null);
 	}
 
 	private static MarginLayoutParams newLayoutParams(ViewGroup _aparent, ViewGroup.MarginLayoutParams _baseparams) {
@@ -102,7 +100,9 @@ public class jCustomDialog extends RelativeLayout {
 		if (parent != null) { parent.removeView(this); }
 		parent = _viewgroup;
 
-		parent.addView(this,newLayoutParams(parent,(ViewGroup.MarginLayoutParams)lparams));
+	    //parent.addView(this,lparams);
+	    
+		parent.addView(this,newLayoutParams(parent,(ViewGroup.MarginLayoutParams)lparams));		
 		lparams = null;
 		lparams = (ViewGroup.MarginLayoutParams)this.getLayoutParams();
 
@@ -114,8 +114,7 @@ public class jCustomDialog extends RelativeLayout {
 			this.setVisibility(android.view.View.INVISIBLE);
 			if (parent != null) {
 				parent.removeView(this);
-				mRemovedFromParent = true; //no more parent!
-				//Log.i("jCustomDialog", "...RemoveFromViewParent...");
+				mRemovedFromParent = true; //no more parent!		
 			}
 		}
 	}

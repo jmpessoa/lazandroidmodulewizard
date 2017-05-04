@@ -1,4 +1,4 @@
-package org.lamw.appwidgetproviderdemo1;
+package com.example.appcustomdialogdemo1;
 
 import android.graphics.Color;
 import android.graphics.PorterDuff.Mode;
@@ -103,6 +103,7 @@ public class jPanel extends RelativeLayout {
 		lweight = _w;
 	}
 
+	
 	public int getLParamHeight() {
 		int r = lparamH;		
 		if (r == android.view.ViewGroup.LayoutParams.WRAP_CONTENT) {
@@ -118,7 +119,7 @@ public class jPanel extends RelativeLayout {
 		}		
 		return r;		
 	}
-
+	
 	public void resetLParamsRules() {   //clearLayoutAll
 		
 		if (lparams instanceof RelativeLayout.LayoutParams) {
@@ -161,7 +162,6 @@ public class jPanel extends RelativeLayout {
 		countParentRule = countParentRule + 1;
 	}
 
-	//by jmpessoa
 	public void setLayoutAll(int idAnchor) {
 		lparams.width  = lparamW;
 		lparams.height = lparamH;
@@ -183,7 +183,7 @@ public class jPanel extends RelativeLayout {
 		if (lparams instanceof LinearLayout.LayoutParams) {
 			((LinearLayout.LayoutParams)lparams).weight = lweight;
 		}
-		//
+		
 		setLayoutParams(lparams);
 	}
 
@@ -316,9 +316,11 @@ public class jPanel extends RelativeLayout {
 		MAX_ZOOM = _maxZoomFactor;
 	}
 
-	public void CenterInParent() {
+	public void CenterInParent() {		
+		//resetLParamsRules();  need ???		
 		if (lparams instanceof RelativeLayout.LayoutParams) {
-			((RelativeLayout.LayoutParams)lparams).addRule(android.widget.RelativeLayout.CENTER_IN_PARENT);  //android.widget.RelativeLayout.CENTER_VERTICAL = 15
+			((RelativeLayout.LayoutParams)lparams).addRule(android.widget.RelativeLayout.CENTER_IN_PARENT);  //android.widget.RelativeLayout.CENTER_VERTICAL = 15			
+			this.setLayoutParams(lparams);  //added     ::need ??	
 			countParentRule = countParentRule + 1;
 		}
 	}
@@ -327,14 +329,16 @@ public class jPanel extends RelativeLayout {
 		lparamH = android.view.ViewGroup.LayoutParams.MATCH_PARENT;
 		lparamW = android.view.ViewGroup.LayoutParams.MATCH_PARENT; //w
 		lparams.height = lparamH;
-		lparams.width = lparamW;
+		lparams.width = lparamW;			
+		this.setLayoutParams(lparams); //added		
 	}
 
 	public void WrapParent() {
 		lparamH = android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
 		lparamW = android.view.ViewGroup.LayoutParams.WRAP_CONTENT; //w
 		lparams.height = lparamH;
-		lparams.width = lparamW;
+		lparams.width = lparamW;		
+		this.setLayoutParams(lparams); //added		
 	}
 	
 	public void SetRoundCorner() {

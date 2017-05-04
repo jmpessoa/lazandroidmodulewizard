@@ -26,7 +26,7 @@ type
       jTextView1: jTextView;
       jTextView2: jTextView;
       jTextView3: jTextView;
-      procedure AndroidModule1JNIPrompt(Sender: TObject);
+      jTextView4: jTextView;
       procedure jButton1Click(Sender: TObject);
       procedure jButton2Click(Sender: TObject);
       procedure jButton3Click(Sender: TObject);
@@ -48,26 +48,21 @@ implementation
 
 { TAndroidModule1 }
 
-procedure TAndroidModule1.AndroidModule1JNIPrompt(Sender: TObject);
-begin
-  //
-end;
-
 procedure TAndroidModule1.jButton1Click(Sender: TObject);
 begin
   //jCustomDialog1.Show(jCustomDialog1.Text);  {ok!}
   jCustomDialog1.Show('User Info', 'ic_user');   //'ic_user' -->>  ../res/drawable
 end;
 
-procedure TAndroidModule1.jButton2Click(Sender: TObject);  //cancel
+procedure TAndroidModule1.jButton2Click(Sender: TObject);  //ok
 begin
+   ShowMessage(jEditText1.Text);
+   ShowMessage(jEditText2.Text);
    jCustomDialog1.Close();
 end;
 
-procedure TAndroidModule1.jButton3Click(Sender: TObject);   //ok
+procedure TAndroidModule1.jButton3Click(Sender: TObject);   //cancel
 begin
-  ShowMessage(jEditText1.Text);
-  ShowMessage(jEditText2.Text);
   jCustomDialog1.Close();
 end;
 
@@ -77,11 +72,10 @@ begin
   jCustomDialog1.Close();
 end;
 
-procedure TAndroidModule1.jCustomDialog1Show(Sender: TObject; dialog: jObject;
-  title: string);
+procedure TAndroidModule1.jCustomDialog1Show(Sender: TObject; dialog: jObject; title: string);
 begin
-  jEditText1.Text:= 'Lazarus';
-  jEditText2.Text:= '2014-2014';
+   jEditText1.Text:= 'Lazarus';
+   jEditText2.Text:= '66-4441-5555';
 end;
 
 end.

@@ -1,4 +1,4 @@
-package com.example.appchronometerdemo1;
+package com.example.apphttpclientdemo1;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -64,6 +64,10 @@ public class jHttpClient /*extends ...*/ {
         
     ArrayList<String> listHeaderName = new ArrayList<String>();
     ArrayList<String> listHeaderValue = new ArrayList<String>();
+    
+    private int mConnectTimeout = 15000;  
+    private int mReadTimeout = 15000;
+    
     
    //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
    public jHttpClient(Controls _ctrls, long _Self) { //Add more others news "_xxx" params if needed!
@@ -183,8 +187,8 @@ public class jHttpClient /*extends ...*/ {
             url = new URL(_urlString);
 
             client3 = (HttpURLConnection) url.openConnection();
-            client3.setReadTimeout(15000);
-            client3.setConnectTimeout(15000);
+            client3.setReadTimeout(mReadTimeout);
+            client3.setConnectTimeout(mConnectTimeout);
             client3.setRequestMethod("POST");                        
                         
             client3.setDoInput(true);
@@ -649,8 +653,8 @@ public class jHttpClient /*extends ...*/ {
  	         mUrlString = _urlString;	         
  	         client = (HttpURLConnection)url.openConnection(); 	          	         
  	         client.setRequestMethod("HEAD");
- 	         client.setConnectTimeout(30000);
- 	         client.setReadTimeout(30000);
+ 	         client.setConnectTimeout(mConnectTimeout);   
+ 	         client.setReadTimeout(mReadTimeout);     
  	         
              if (mAuthenticationMode == 1) {
                  String _credentials = mUSERNAME + ":" + mPASSWORD;
@@ -954,8 +958,8 @@ public class jHttpClient /*extends ...*/ {
 	                client3.setRequestProperty("Authorization", "Basic "+ _base64EncodedCredentials);
 	            }
 	            
-	            client3.setReadTimeout(15000);
-	            client3.setConnectTimeout(15000);
+	            client3.setReadTimeout(mReadTimeout);
+	            client3.setConnectTimeout(mConnectTimeout);
 	            client3.setRequestMethod("POST");
 	              	    	 	
 	            client3.setDoInput(true);
@@ -1073,7 +1077,24 @@ public class jHttpClient /*extends ...*/ {
 	    protected void onProgressUpdate(Integer... params) {
 	       super.onProgressUpdate(params);	       
 	       controls.pOnHttpClientCodeResult(pascalObj, params[0].intValue());	  	     
-	    }	    	    	    
+	    }	   
+	    
+	    // //thanks to Freris
+	    public void SetResponseTimeout(int _timeoutMilliseconds) {   
+	    	mReadTimeout = _timeoutMilliseconds;
+	    }
+	    
+	    public void SetConnectionTimeout(int _timeoutMilliseconds) { 
+	    	mConnectTimeout = _timeoutMilliseconds;
+	    }
+	    	    
+	    public int GetResponseTimeout() {
+	    	return mReadTimeout;
+	    }
+	    
+	    public int GetConnectionTimeout() {
+	    	return  mConnectTimeout;
+	    }	    
 	}
 }
 

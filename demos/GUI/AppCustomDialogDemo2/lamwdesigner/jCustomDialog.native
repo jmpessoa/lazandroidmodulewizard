@@ -1,0 +1,2 @@
+public native void pOnCustomDialogShow(long pasobj, Dialog dialog, String title);
+public native void pOnCustomDialogBackKeyPressed(long pasobj, String title);

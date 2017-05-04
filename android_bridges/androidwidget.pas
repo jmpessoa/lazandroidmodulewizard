@@ -493,7 +493,7 @@ type
                    lpOneThirdOfParent, lpOneEighthOfParent,lpThreeEighthOfParent, lpFiveEighthOfParent,
                    lpSevenEighthOfParent, lpOneSixthOfParent, lpFiveSixthOfParent, lpOneFifthOfParent,
                    lpTwoFifthOfParent, lpThreeFifthOfParent, lpThreeQuarterOfParent,
-                   lpFourFifthOfParent, lpNineTenthsOfParent,
+                   lpFourFifthOfParent, lpNineTenthsOfParent, lp95PercentOfParent, lp99PercentOfParent,
                    lp16px, lp24px, lp32px, lp40px, lp48px, lp72px, lp96px, lpExact, lpUseWeight);
 
   TSide = (sdW, sdH);
@@ -5253,7 +5253,7 @@ function GetParamByParentSide(paren: jVisualControl; side: TSide): DWord;
 begin
    case side of
      sdW: begin
-               Result:= paren.GetWidth;
+              Result:= paren.GetWidth;
           end;
      sdH: begin
               Result:= paren.GetHeight;
@@ -5298,6 +5298,8 @@ begin
      lpOneSixthOfParent:     Result:= Trunc((1/6)*GetParamByParentSide(paren, side)-14); //0.167
      lpFiveSixthOfParent:    Result:= Trunc((5/6)*GetParamByParentSide(paren, side)-14); //0.833
      lpNineTenthsOfParent:   Result:= Trunc((9/10)*GetParamByParentSide(paren, side)-14); //0.90
+     lp95PercentOfParent:   Result:= Trunc((9.5/10)*GetParamByParentSide(paren, side)-14); //0.95
+     lp99PercentOfParent:   Result:= Trunc((9.9/10)*GetParamByParentSide(paren, side)-14); //0.99
 
      lp16px: Result:= 16;
      lp24px: Result:= 24;
@@ -5340,6 +5342,8 @@ begin
      lpOneSixthOfParent:     Result:= Trunc((1/6)*GetParamByParentSide2(paren, side)-14); //0.167
      lpFiveSixthOfParent:    Result:= Trunc((5/6)*GetParamByParentSide2(paren, side)-14); //0.833
      lpNineTenthsOfParent:    Result:= Trunc((9/10)*GetParamByParentSide2(paren, side)-14); //0.90
+     lp95PercentOfParent:   Result:= Trunc((9.5/10)*GetParamByParentSide2(paren, side)-14);
+     lp99PercentOfParent:   Result:= Trunc((9.9/10)*GetParamByParentSide2(paren, side)-14);
 
      lp16px: Result:= 16;
      lp24px: Result:= 24;
@@ -5388,17 +5392,19 @@ begin
      16: Result:= lpFourFifthOfParent;
      17: Result:= lpNineTenthsOfParent;
 
-     18: Result:= lp16px;
-     19: Result:= lp24px;
-     20: Result:= lp32px;
-     21: Result:= lp40px;
-     22: Result:= lp48px;
-     23: Result:= lp72px;
-     24: Result:= lp96px;
-     25: Result:= lpExact;
-     26: Result:= lpUseWeight;
+     18: Result:= lp95PercentOfParent;
+     19: Result:= lp99PercentOfParent;
 
-     //25: Result:= lpDesigner;
+     20: Result:= lp16px;
+     21: Result:= lp24px;
+     22: Result:= lp32px;
+     23: Result:= lp40px;
+     24: Result:= lp48px;
+     25: Result:= lp72px;
+     26: Result:= lp96px;
+     27: Result:= lpExact;
+     28: Result:= lpUseWeight;
+
    end;
 end;
 
@@ -5432,6 +5438,9 @@ begin
    lpOneSixthOfParent:     Result:= Trunc((1/6)*GetParamBySide(App, side)-14); //0.167
    lpFiveSixthOfParent:    Result:= Trunc((5/6)*GetParamBySide(App, side)-14); //0.833
    lpNineTenthsOfParent:   Result:= Trunc((9/10)*GetParamBySide(App, side)-14); //0.90
+
+   lp95PercentOfParent:   Result:= Trunc((9.5/10)*GetParamBySide(App, side)-14);
+   lp99PercentOfParent:   Result:= Trunc((9.9/10)*GetParamBySide(App, side)-14);
 
    lp16px: Result:= 16;
    lp24px: Result:= 24;
@@ -5474,6 +5483,9 @@ begin
    lpFiveSixthOfParent:    Result:= Trunc((5/6)*L-14); //0.833
    lpNineTenthsOfParent:   Result:= Trunc((9/10)*L-14); //0.90
 
+   lp95PercentOfParent:   Result:= Trunc((9.5/10)*L-14); //0.95
+   lp99PercentOfParent:   Result:= Trunc((9.9/10)*L-14); //0.99
+
    lp16px: Result:= 16;
    lp24px: Result:= 24;
    lp32px: Result:= 32;
@@ -5483,7 +5495,6 @@ begin
    lp96px: Result:= 96;
 
    lpExact: Result:= L;
-     //lpDesigner: Result:= 0;
 
   end;
 end;
@@ -5513,6 +5524,8 @@ begin
    else if Value <= Trunc((5/6)*L) then Result:= lpFiveSixthOfParent   //0.833
    else if Value <= Trunc((7/8)*L) then Result:= lpSevenEighthOfParent //0.875
    else if Value <= Trunc((9/10)*L)then Result:= lpNineTenthsOfParent  //0.90
+   else if Value <= Trunc((9.5/10)*L) then Result:= lp95PercentOfParent  //0.95
+   else if Value <= Trunc((9.9/10)*L) then Result:= lp95PercentOfParent  //0.99
    else if Value = L then Result:= lpExact
    else Result:= lpMatchParent;
 

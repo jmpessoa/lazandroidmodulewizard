@@ -559,6 +559,7 @@ begin
       begin
         Left := 5;
         Width := TAndroidForm(Owner).Width - 10;
+        jVisualControl(Component).LayoutParamWidth:= lpMatchParent; //jmpessoa
         maxH := 100;
         for i := 0 to ChildCount - 1 do
           with Children[i] do
@@ -904,8 +905,11 @@ begin
   sl := TStringList.Create;
   try
     for i := 0 to p.ChildCount - 1 do
-      if not (p is jCustomDialog) then
+
+    //if not (p is jCustomDialog) then   //commented by jmpessoa
+      if not (p.Children[i] is jCustomDialog) then   //fixed by jmpessoa
         sl.Add(p.Children[i].Name);
+
     sl.Sorted := True;
     for i := 0 to PropCount - 1 do
     begin

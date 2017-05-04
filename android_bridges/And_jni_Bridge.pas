@@ -1149,6 +1149,11 @@ function jHttpClient_AddRequestProperty(env: PJNIEnv; _jhttpclient: JObject; _ht
 function jHttpClient_Post(env: PJNIEnv; _jhttpclient: JObject; _httpConnection: jObject): string; overload;
 function jHttpClient_GetResponseCode(env: PJNIEnv; _jhttpclient: JObject): integer;
 function jHttpClient_GetDefaultConnection(env: PJNIEnv; _jhttpclient: JObject): jObject;
+procedure jHttpClient_SetResponseTimeout(env: PJNIEnv; _jhttpclient: JObject; _timeoutMilliseconds: integer);
+procedure jHttpClient_SetConnectionTimeout(env: PJNIEnv; _jhttpclient: JObject; _timeoutMilliseconds: integer);
+function jHttpClient_GetResponseTimeout(env: PJNIEnv; _jhttpclient: JObject): integer;
+function jHttpClient_GetConnectionTimeout(env: PJNIEnv; _jhttpclient: JObject): integer;
+
 
 function jImageList_jCreate(env: PJNIEnv;_Self: int64; this: jObject): jObject;
 procedure jImageList_jFree(env: PJNIEnv; _jimagelist: JObject);
@@ -9726,6 +9731,54 @@ begin
   jCls:= env^.GetObjectClass(env, _jhttpclient);
   jMethod:= env^.GetMethodID(env, jCls, 'GetDefaultConnection', '()Ljava/net/HttpURLConnection;');
   Result:= env^.CallObjectMethod(env, _jhttpclient, jMethod);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jHttpClient_SetResponseTimeout(env: PJNIEnv; _jhttpclient: JObject; _timeoutMilliseconds: integer);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].i:= _timeoutMilliseconds;
+  jCls:= env^.GetObjectClass(env, _jhttpclient);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetResponseTimeout', '(I)V');
+  env^.CallVoidMethodA(env, _jhttpclient, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jHttpClient_SetConnectionTimeout(env: PJNIEnv; _jhttpclient: JObject; _timeoutMilliseconds: integer);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].i:= _timeoutMilliseconds;
+  jCls:= env^.GetObjectClass(env, _jhttpclient);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetConnectionTimeout', '(I)V');
+  env^.CallVoidMethodA(env, _jhttpclient, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+function jHttpClient_GetResponseTimeout(env: PJNIEnv; _jhttpclient: JObject): integer;
+var
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jhttpclient);
+  jMethod:= env^.GetMethodID(env, jCls, 'GetResponseTimeout', '()I');
+  Result:= env^.CallIntMethod(env, _jhttpclient, jMethod);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+function jHttpClient_GetConnectionTimeout(env: PJNIEnv; _jhttpclient: JObject): integer;
+var
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jhttpclient);
+  jMethod:= env^.GetMethodID(env, jCls, 'GetConnectionTimeout', '()I');
+  Result:= env^.CallIntMethod(env, _jhttpclient, jMethod);
   env^.DeleteLocalRef(env, jCls);
 end;
 

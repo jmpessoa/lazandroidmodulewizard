@@ -259,6 +259,9 @@ type
     FOnContentResult: TOnHttpClientContentResult;
     FOnCodeResult: TOnHttpClientCodeResult;
 
+    FResponseTimeout: integer;
+    FConnectionTimeout: integer;
+
     procedure SetCharSet(AValue: string);
     procedure SetIndexUrl(Value: integer);
     procedure SetUrlByIndex(Value: integer);
@@ -330,6 +333,10 @@ type
     function Post(_httpConnection: jObject): string; overload;
     function GetResponseCode(): integer;
     function GetDefaultConnection(): jObject;
+    procedure SetResponseTimeout(_timeoutMilliseconds: integer);
+    procedure SetConnectionTimeout(_timeoutMilliseconds: integer);
+    function GetResponseTimeout(): integer;
+    function GetConnectionTimeout(): integer;
 
     procedure GenEvent_OnHttpClientContentResult(Obj: TObject; content: string);
     procedure GenEvent_OnHttpClientCodeResult(Obj: TObject; code: integer);
@@ -341,6 +348,9 @@ type
     property IndexUrl: integer read  FIndexUrl write SetIndexUrl;
     property Urls: TStrings read FUrls write SetUrls;
     property AuthenticationMode: THttpClientAuthenticationMode read FAuthenticationMode write SetAuthenticationMode;
+    property ResponseTimeout: integer read GetResponseTimeout write SetResponseTimeout;
+    property ConnectionTimeout: integer read GetConnectionTimeout write SetConnectionTimeout;
+
     property OnContentResult: TOnHttpClientContentResult read FOnContentResult write FOnContentResult;
     property OnCodeResult: TOnHttpClientCodeResult read FOnCodeResult write FOnCodeResult;
   end;
@@ -3738,9 +3748,13 @@ begin
     else
     begin
        if (Self.Parent as jVisualControl).LayoutParamWidth = lpWrapContent then
+       begin
           jEditText_setLParamWidth(FjEnv, FjObject , GetLayoutParams(gApp, FLParamWidth, sdW))
+       end
        else //lpMatchParent or others
-          jEditText_setLParamWidth(FjEnv,FjObject,GetLayoutParamsByParent((Self.Parent as jVisualControl), FLParamWidth, sdW));
+       begin
+          jEditText_setLParamWidth(FjEnv,FjObject, GetLayoutParamsByParent((Self.Parent as jVisualControl), FLParamWidth, sdW));
+       end;
     end;
   end;
 end;
@@ -3947,7 +3961,7 @@ begin
        end
        else
        begin
-           Result:= (FParent as jVisualControl).GetWidth;
+          Result:= (FParent as jVisualControl).GetWidth;
        end;
      end;
   end;
@@ -5727,6 +5741,10 @@ begin
   FCharSet := 'UTF-8';
   FIndexUrl:= -1;
   FAuthenticationMode:= autNone;
+
+  FResponseTimeout:= 15000;
+  FConnectionTimeout:= 15000;
+
 end;
 
 destructor jHttpClient.Destroy;
@@ -5750,6 +5768,13 @@ begin
   inherited Init(refApp);
   //your code here: set/initialize create params....
   FjObject:= jCreate(); //jSelf !
+
+  if FResponseTimeout <> 15000 then
+     jHttpClient_SetResponseTimeout(FjEnv, FjObject, FResponseTimeout);
+
+  if FConnectionTimeout <> 15000 then
+     jHttpClient_SetConnectionTimeout(FjEnv, FjObject, FConnectionTimeout);
+
   FInitialized:= True;
   SetUrlByIndex(FIndexUrl);
 end;
@@ -6130,7 +6155,41 @@ begin
    Result:= jHttpClient_GetDefaultConnection(FjEnv, FjObject);
 end;
 
-{jSMTPClient by jmpessoa: warning: not tested!}
+procedure jHttpClient.SetResponseTimeout(_timeoutMilliseconds: integer);
+begin
+  //in designing component state: set value here...
+  FResponseTimeout:= _timeoutMilliseconds;
+  if FInitialized then
+     jHttpClient_SetResponseTimeout(FjEnv, FjObject, _timeoutMilliseconds);
+end;
+
+procedure jHttpClient.SetConnectionTimeout(_timeoutMilliseconds: integer);
+begin
+  //in designing component state: set value here...
+  FConnectionTimeout:= _timeoutMilliseconds;
+  if FInitialized then
+     jHttpClient_SetConnectionTimeout(FjEnv, FjObject, _timeoutMilliseconds);
+end;
+
+function jHttpClient.GetResponseTimeout(): integer;
+begin
+  //in designing component state: result value here...
+  Result:= FResponseTimeout;
+  if FInitialized then
+   Result:= jHttpClient_GetResponseTimeout(FjEnv, FjObject);
+end;
+
+function jHttpClient.GetConnectionTimeout(): integer;
+begin
+  //in designing component state: result value here...
+  Result:= FConnectionTimeout;
+  if FInitialized then
+   Result:= jHttpClient_GetConnectionTimeout(FjEnv, FjObject);
+end;
+
+{ jSMTPClient }
+
+//by jmpessoa: warning: not tested!
 
 constructor jSMTPClient.Create(AOwner: TComponent);
 begin
@@ -9996,9 +10055,13 @@ begin
     else
     begin
       if (Self.Parent as jVisualControl).LayoutParamWidth = lpWrapContent then
-          jPanel_setLParamWidth(FjEnv, FjObject , GetLayoutParams(gApp, FLParamWidth, sdW))
-       else //lpMatchParent or others
-          jPanel_setLParamWidth(FjEnv,FjObject,GetLayoutParamsByParent((Self.Parent as jVisualControl), FLParamWidth, sdW));
+      begin
+         jPanel_setLParamWidth(FjEnv, FjObject ,GetLayoutParams(gApp, FLParamWidth, sdW));
+      end
+      else //lpMatchParent or others
+      begin
+         jPanel_setLParamWidth(FjEnv,FjObject, GetLayoutParamsByParent((Self.Parent as jVisualControl), FLParamWidth, sdW));
+      end;
     end;
   end;
 end;

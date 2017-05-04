@@ -1,4 +1,4 @@
-package org.lamw.appvideoviewdemo1;
+package com.example.appcustomdialogdemo1;
 
 import java.lang.reflect.Field;
 
