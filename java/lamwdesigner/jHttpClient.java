@@ -1078,23 +1078,24 @@ public class jHttpClient /*extends ...*/ {
 	       super.onProgressUpdate(params);	       
 	       controls.pOnHttpClientCodeResult(pascalObj, params[0].intValue());	  	     
 	    }	   
-	    
-	    // //thanks to Freris
-	    public void SetResponseTimeout(int _timeoutMilliseconds) {   
-	    	mReadTimeout = _timeoutMilliseconds;
-	    }
-	    
-	    public void SetConnectionTimeout(int _timeoutMilliseconds) { 
-	    	mConnectTimeout = _timeoutMilliseconds;
-	    }
-	    	    
-	    public int GetResponseTimeout() {
-	    	return mReadTimeout;
-	    }
-	    
-	    public int GetConnectionTimeout() {
-	    	return  mConnectTimeout;
-	    }	    
+	   	    
 	}
+	
+    // //thanks to Freris
+    public void SetResponseTimeout(int _timeoutMilliseconds) {   
+    	mReadTimeout = _timeoutMilliseconds;
+    }
+    
+    public void SetConnectionTimeout(int _timeoutMilliseconds) { 
+    	mConnectTimeout = _timeoutMilliseconds;
+    }
+    	    
+    public int GetResponseTimeout() {
+    	return mReadTimeout;
+    }
+    
+    public int GetConnectionTimeout() {
+    	return  mConnectTimeout;
+    }
 }
 

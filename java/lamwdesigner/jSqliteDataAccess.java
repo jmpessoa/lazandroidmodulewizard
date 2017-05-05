@@ -1,4 +1,4 @@
-package com.example.appsqlitedemo1;
+package org.lamw.appsqlitedemo3;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -884,8 +884,12 @@ public class jSqliteDataAccess extends SQLiteAssetHelper {
   try {
    this.cursor = mydb.rawQuery(selectQuery, null);
    rowCount = this.cursor.getCount();
-   //Log.i("sqlite banche rowcount", Integer.toString(rowCount));
-   this.cursor.moveToFirst();
+   
+   if (!moveToLast)
+      this.cursor.moveToFirst();
+   else
+	   this.cursor.moveToLast();
+   
    if (mydb != null) mydb.close();
   } catch (SQLiteException se) {
    result = false;
@@ -923,7 +927,7 @@ public class jSqliteDataAccess extends SQLiteAssetHelper {
  //ex: "INSERT INTO TABLE1 (NAME, PLACE) VALUES('CODERZHEAVEN','GREAT INDIA')"
  public void InsertIntoTable(String query) {
   SQLiteDatabase mydb = getWritableDatabase();
-  mydb.execSQL(query);
+  mydb.execSQL(query);  
   if (mydb != null) mydb.close();
  }
 
@@ -1006,7 +1010,7 @@ public class jSqliteDataAccess extends SQLiteAssetHelper {
 
  public void DeleteDatabase(String _dbName) {
   SQLiteDatabase mydb = getWritableDatabase();
-  this.cursor.close();
+  if (this.cursor != null) this.cursor.close();
   mydb.close();
   //Log.i("sqlitehelper DeleteDb", "delete " + _dbName);
   controls.activity.deleteDatabase(_dbName);
