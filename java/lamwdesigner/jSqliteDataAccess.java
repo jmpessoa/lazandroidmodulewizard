@@ -820,6 +820,8 @@ public class jSqliteDataAccess extends SQLiteAssetHelper {
       headerRow = headerRow + cursor.getColumnName(i) + selectColDelimiter;
    }
    
+   if (rowCount == 0) return headerRow;
+      
    headerRow = headerRow.substring(0, headerRow.length() - 1);
    
    if (cursor.moveToFirst()) {
@@ -884,6 +886,8 @@ public class jSqliteDataAccess extends SQLiteAssetHelper {
   try {
    this.cursor = mydb.rawQuery(selectQuery, null);
    rowCount = this.cursor.getCount();
+   
+   if (rowCount == 0) return false;
    
    if (!moveToLast)
       this.cursor.moveToFirst();
