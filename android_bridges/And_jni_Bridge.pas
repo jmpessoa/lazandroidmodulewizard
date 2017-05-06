@@ -1087,6 +1087,7 @@ procedure jSqliteDataAccess_UpdateImageBatch(env: PJNIEnv; _jsqlitedataaccess: J
 procedure jSqliteDataAccess_SetDataBaseName(env: PJNIEnv; _jsqlitedataaccess: JObject; _dbName: string);
 function jSqliteDataAccess_DatabaseExists(env: PJNIEnv; _jsqlitedataaccess: JObject; _databaseName: string): boolean;
 procedure jSqliteDataAccess_SetAssetsSearchFolder(env: PJNIEnv; _jsqlitedataaccess: JObject; _folderName: string);
+procedure jSqliteDataAccess_SetReturnHeaderOnSelect(env: PJNIEnv; _jsqlitedataaccess: JObject; _returnHeader: boolean);
 
 // Http
 //Function  jHttp_Get(env:PJNIEnv;  this:jobject; URL: String) : String;
@@ -8883,6 +8884,19 @@ begin
   env^.DeleteLocalRef(env, jCls);
 end;
 
+
+procedure jSqliteDataAccess_SetReturnHeaderOnSelect(env: PJNIEnv; _jsqlitedataaccess: JObject; _returnHeader: boolean);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].z:= JBool(_returnHeader);
+  jCls:= env^.GetObjectClass(env, _jsqlitedataaccess);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetReturnHeaderOnSelect', '(Z)V');
+  env^.CallVoidMethodA(env, _jsqlitedataaccess, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
 
 {-------- jHttpClient_JNI_Bridge ----------}
 

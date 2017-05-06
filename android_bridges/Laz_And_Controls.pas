@@ -680,6 +680,7 @@ type
     FFullPathDataBaseName: string;
     FCreateTableQuery: TStrings;
     FTableName: TStrings;
+    FReturnHeaderOnSelect: boolean;
     procedure SetjSqliteCursor(Value: jSqliteCursor);
   protected
     procedure Notification(AComponent: TComponent; Operation: TOperation); override;
@@ -724,6 +725,7 @@ type
 
     function DatabaseExists(_databaseName: string): boolean;
     procedure SetAssetsSearchFolder(_folderName: string);
+    procedure SetReturnHeaderOnSelect(_returnHeader: boolean);
 
     property FullPathDataBaseName: string read GetFullPathDataBaseName;
 
@@ -734,6 +736,7 @@ type
     property DataBaseName: string read FDataBaseName write SetDataBaseName;
     property CreateTableQuery: TStrings read FCreateTableQuery write FCreateTableQuery;
     property TableName: TStrings read FTableName write FTableName;
+    property ReturnHeaderOnSelect: boolean read FReturnHeaderOnSelect write SetReturnHeaderOnSelect;
   end;
 
   //http://startandroid.ru/en/lessons/complete-list/
@@ -9613,6 +9616,7 @@ begin
   FDataBaseName:='myData.db';
   FCreateTableQuery:= TStringList.Create;
   FTableName:= TStringList.Create;
+  FReturnHeaderOnSelect:= True;
   FInitialized:= False;
 end;
 
@@ -9650,6 +9654,9 @@ begin
   begin
      jSqliteDataAccess_AddCreateTableQuery(FjEnv, FjObject , FCreateTableQuery.Strings[i]);
   end;
+
+  if not FReturnHeaderOnSelect then
+      jSqliteDataAccess_SetReturnHeaderOnSelect(FjEnv, FjObject, FReturnHeaderOnSelect);
 
   FFullPathDataBaseName:= GetFilePath(fpathDataBase) + '/' + FDataBaseName;
 
@@ -9893,6 +9900,14 @@ begin
   //in designing component state: set value here...
   if FInitialized then
      jSqliteDataAccess_SetAssetsSearchFolder(FjEnv, FjObject, _folderName);
+end;
+
+procedure jSqliteDataAccess.SetReturnHeaderOnSelect(_returnHeader: boolean);
+begin
+  //in designing component state: set value here...
+  FReturnHeaderOnSelect:= _returnHeader;
+  if FInitialized then
+     jSqliteDataAccess_SetReturnHeaderOnSelect(FjEnv, FjObject, _returnHeader);
 end;
 
    {jPanel}

@@ -640,6 +640,8 @@ public class jSqliteDataAccess extends SQLiteAssetHelper {
  char selectColDelimiter;
  char selectRowDelimiter;
 
+ boolean mReturnHeaderOnSelect = true;
+ 
  public void SetSelectDelimiters(char coldelim, char rowdelim) {
   selectColDelimiter = coldelim;
   selectRowDelimiter = rowdelim;
@@ -820,7 +822,12 @@ public class jSqliteDataAccess extends SQLiteAssetHelper {
       headerRow = headerRow + cursor.getColumnName(i) + selectColDelimiter;
    }
    
-   if (rowCount == 0) return headerRow;
+   if (rowCount == 0) {	   
+	 if (mReturnHeaderOnSelect)
+	    return  headerRow;
+	 else
+		 return  "";
+   }
       
    headerRow = headerRow.substring(0, headerRow.length() - 1);
    
@@ -866,7 +873,11 @@ public class jSqliteDataAccess extends SQLiteAssetHelper {
    }
    
    rows = rows.substring(0, rows.length() - 1);  //drop the last row delimiter
-   allRows = headerRow + selectRowDelimiter + rows;
+   
+   if (mReturnHeaderOnSelect) 
+      allRows = headerRow + selectRowDelimiter + rows;
+   else
+	  allRows = rows; 
    
   } catch (SQLiteException se) {
 	   if (mydb != null) mydb.close();
@@ -901,7 +912,6 @@ public class jSqliteDataAccess extends SQLiteAssetHelper {
   }
   return result;
  }
-
 
  public Cursor GetCursor() {
   if (this.cursor != null) return this.cursor;
@@ -1128,6 +1138,11 @@ public class jSqliteDataAccess extends SQLiteAssetHelper {
     public void SetAssetsSearchFolder(String _folderName) {
     	this.ASSET_DB_PATH = _folderName;
     }
+    
+    
+    public void SetReturnHeaderOnSelect (boolean _returnHeader) {
+    	mReturnHeaderOnSelect = _returnHeader;
+    }
       
 }
 
@@ -1259,5 +1274,5 @@ class Utils {
     public static String convertStreamToString(InputStream is) {
         return new Scanner(is).useDelimiter("\\A").next();
     }
-
+    
 }
