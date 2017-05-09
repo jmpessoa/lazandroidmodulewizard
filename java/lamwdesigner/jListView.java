@@ -1,4 +1,4 @@
-package com.example.appautocompletetextviewdemo1;
+package com.example.applistviewdemo;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -605,16 +605,16 @@ public class jListView extends ListView {
 
 		setOnItemClickListener(onItemClickListener);
 
-		this.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {@Override
-																				   public boolean onItemLongClick(AdapterView <?> parent, View view, int position, long id) {
-			lastSelectedItem = (int)position;
-			if (canClick) {
-				if (!isEmpty(alist)) {  //  <----- thanks to @renabor
+		this.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+			@Override
+		    public boolean onItemLongClick(AdapterView <?> parent, View view, int position, long id) {
+			lastSelectedItem = (int)position;		
+			if (!isEmpty(alist)) {  //  <----- thanks to @renabor					
 					selectedItemCaption = alist.get((int) id).label;
 					controls.pOnListViewLongClickCaptionItem(LAMWCommon.getPasObj(), (int)id, alist.get((int)id).label);
+					
 					return false;
-				};
-			};
+			}		
 			return false;
 		}
 		});
