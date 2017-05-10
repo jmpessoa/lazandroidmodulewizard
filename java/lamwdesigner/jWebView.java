@@ -106,7 +106,7 @@ public class jWebView extends WebView {
 		public boolean onLongClick(View arg0) {
 			// TODO Auto-generated method stub
             if (enabled) {
-                controls.pOnClick(PasObj,Const.Click_Default);
+                controls.pOnLongClick(PasObj,Const.Click_Default);
             }			
 			return false;
 		};

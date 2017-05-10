@@ -1258,6 +1258,7 @@ end;
     FLParamHeight: TLayoutParams;
 
     FOnClick: TOnNotify;
+    FOnLongClick: TOnNotify;
 
     FOnBeforeDispatchDraw: TOnBeforeDispatchDraw;
     FOnAfterDispatchDraw: TOnAfterDispatchDraw;

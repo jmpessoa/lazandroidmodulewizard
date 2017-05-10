@@ -1,4 +1,4 @@
-package com.example.appactionbartabdemo1;
+package org.lamw.appadsdemo1;
 
 import java.lang.reflect.Field;
 
@@ -27,6 +27,7 @@ import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Gravity;
+import android.widget.AdapterView;
 import android.widget.TextView;
 
 
@@ -35,7 +36,9 @@ public class jTextView extends TextView {
     private Controls        controls = null;   // Control Class for Event
     private jCommons LAMWCommon;
         
-    private OnClickListener onClickListener;   
+    private OnClickListener onClickListener;
+    private OnLongClickListener onLongClickListener;
+    
     private Boolean         enabled  = true;  
 
     float mTextSize = 0; 
@@ -56,11 +59,28 @@ public class jTextView extends TextView {
         onClickListener = new OnClickListener() {
             public  void onClick(View view) {
                 if (enabled) {
-                    controls.pOnClick(LAMWCommon.getPasObj(),Const.Click_Default);
+                    controls.pOnClick(LAMWCommon.getPasObj(), Const.Click_Default);
                 }
             };
         };                     
-        setOnClickListener(onClickListener);        
+        
+        setOnClickListener(onClickListener);
+        
+        
+        onLongClickListener = new OnLongClickListener() {
+
+			@Override
+			public boolean onLongClick(View arg0) {
+				// TODO Auto-generated method stub				
+				   if (enabled) {
+	                    controls.pOnLongClick(LAMWCommon.getPasObj(), Const.Click_Default);
+	               }								
+				   return false;  //true if the callback consumed the long click, false otherwise. 
+ 			}
+        
+        };                     
+        setOnLongClickListener(onLongClickListener);
+                
     }
 
 	//Free object except Self, Pascal Code Free the class.

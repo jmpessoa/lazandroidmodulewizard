@@ -771,6 +771,9 @@ type
 
     procedure SetViewParent(Value: jObject);  override;
     Procedure GenEvent_OnClick(Obj: TObject);
+
+    Procedure GenEvent_OnLOngClick(Obj: TObject);
+
     procedure GenEvent_OnBeforeDispatchDraw(Obj: TObject; canvas: JObject; tag: integer);
     procedure GenEvent_OnAfterDispatchDraw(Obj: TObject; canvas: JObject; tag: integer);
     procedure GenEvent_OnOnLayouting(Obj: TObject; changed: boolean);
@@ -820,6 +823,7 @@ type
 
     // Event - if enabled!
     property OnClick: TOnNotify read FOnClick write FOnClick;
+    property OnLongClick: TOnNotify read FOnLongClick write FOnLongClick;
     property OnBeforeDispatchDraw: TOnBeforeDispatchDraw read FOnBeforeDispatchDraw write FOnBeforeDispatchDraw;
     property OnAfterDispatchDraw: TOnBeforeDispatchDraw read FOnAfterDispatchDraw write FOnAfterDispatchDraw;
     property OnLayouting: TOnLayouting read FOnLayouting write FOnLayouting;
@@ -1471,7 +1475,7 @@ type
     procedure LoadFromHtmlString(_htmlString: string); //thanks to Anton!
 
     procedure SetHttpAuthUsernamePassword(_hostName: string; _domain: string; _username: string; _password: string);
-    Procedure GenEvent_OnClick(Obj: TObject);
+    Procedure GenEvent_OnLongClick(Obj: TObject);
 
   published
     property JavaScript: Boolean          read FJavaScript write SetJavaScript;
@@ -1479,7 +1483,7 @@ type
     property ZoomControl: Boolean read FZoomControl write SetZoomControl;
     // Event
     property OnStatus  : TOnWebViewStatus read FOnStatus   write FOnStatus;
-    property OnLongClick: TOnNotify read FOnClick write FOnClick;
+    property OnLongClick: TOnNotify read FOnLongClick write FOnLongClick;
   end;
 
   jCanvas = class(jControl)
@@ -1718,6 +1722,7 @@ type
 
 
   Procedure Java_Event_pOnClick                  (env: PJNIEnv; this: jobject; Obj: TObject; Value: integer);
+  Procedure Java_Event_pOnLongClick              (env: PJNIEnv; this: jobject; Obj: TObject; Value: integer);
 
   //by jmpessoa
   Procedure Java_Event_pOnClickWidgetItem(env: PJNIEnv; this: jobject; Obj: TObject;index: integer; checked: jboolean);  overload;
@@ -2254,12 +2259,32 @@ begin
     jImageView(Obj).GenEvent_OnClick(Obj);
     Exit;
   end;
-  if Obj is jWebView then
+end;
+
+Procedure Java_Event_pOnLongClick(env: PJNIEnv; this: jobject; Obj: TObject; Value: integer);
+begin
+
+  //----update global "gApp": to whom it may concern------
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+  //------------------------------------------------------
+
+  if not (Assigned(Obj)) then Exit;
+
+  if Obj is jWebView then  //need fix here ... handling long clicked!
   begin
     jForm(jWebView(Obj).Owner).UpdateJNI(gApp);
-    jWebView(Obj).GenEvent_OnClick(Obj);
+    jWebView(Obj).GenEvent_OnLongClick(Obj);
     Exit;
   end;
+
+  if Obj is jTextView then
+  begin
+    jForm(jTextView(Obj).Owner).UpdateJNI(gApp);
+    jTextView(Obj).GenEvent_OnLongClick(Obj);
+    Exit;
+  end;
+
 end;
 
 Procedure Java_Event_pOnClickWidgetItem(env: PJNIEnv; this: jobject; Obj: TObject;index: integer; checked: boolean);//deprecated
@@ -3110,6 +3135,11 @@ end;
 procedure jTextView.GenEvent_OnClick(Obj: TObject);
 begin
   if Assigned(FOnClick) then FOnClick(Obj);
+end;
+
+procedure jTextView.GenEvent_OnLongClick(Obj: TObject);
+begin
+  if Assigned(FOnLongClick) then FOnLongClick(Obj);
 end;
 
 procedure jTextView.Append(_txt: string);
@@ -7898,9 +7928,9 @@ begin
 end;
 
 // Event : Java -> Pascal
-procedure jWebView.GenEvent_OnClick(Obj: TObject);
+procedure jWebView.GenEvent_OnLongClick(Obj: TObject);
 begin
-  if Assigned(FOnClick) then FOnClick(Obj);
+  if Assigned(FOnLongClick) then FOnLongClick(Obj);
 end;
 
 //------------------------------------------------------------------------------

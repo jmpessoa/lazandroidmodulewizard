@@ -1,6 +1,6 @@
-package org.lamw.appsmswidgetproviderdemo1;
+package org.lamw.appadsdemo1;
 
-//LAMW: Lazarus Android Module Wizard  - version 0.7 - rev. 16 - 29 April - 2017 
+//LAMW: Lazarus Android Module Wizard  - version 0.7 - rev. 16.1 - 10 May - 2017 
 //RAD Android: Project Wizard, Form Designer and Components Development Model!
 
 //https://github.com/jmpessoa/lazandroidmodulewizard
@@ -1265,6 +1265,7 @@ public native void pOnTouch(long pasobj, int act, int cnt, float x1, float y1, f
 public native void pOnClickGeneric(long pasobj, int value);
 public native boolean pAppOnSpecialKeyDown(char keyChar, int keyCode, String keyCodeString);
 public native void pOnClick(long pasobj, int value);
+public native void pOnLongClick(long pasobj, int value);
 public native void pOnChange(long pasobj, String txt, int count);
 public native void pOnChanged(long pasobj, String txt, int count);
 public native void pOnEnter(long pasobj);
