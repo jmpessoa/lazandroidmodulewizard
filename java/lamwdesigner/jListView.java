@@ -552,7 +552,7 @@ public class jListView extends ListView {
 	private Controls        controls = null;   // Control Class for Event
 	private jCommons LAMWCommon;
 
-	private Bitmap          genericBmp;
+	private Bitmap          genericBmp = null;
 	private int             widgetItem;
 	private String          widgetText;
 	private int             textColor;

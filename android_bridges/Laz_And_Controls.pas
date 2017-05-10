@@ -6495,7 +6495,7 @@ begin
 
   FHighLightSelectedItem:= False;
   FHighLightSelectedItemColor:= colbrDefault;
-  FImageItemIdentifier:= 'ic_launcher';
+  FImageItemIdentifier:= '';
 
 end;
 
