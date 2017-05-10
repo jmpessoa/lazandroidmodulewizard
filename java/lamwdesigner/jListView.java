@@ -1,4 +1,4 @@
-package com.example.applistviewdemo;
+package org.lamw.appadsdemo1;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -11,8 +11,10 @@ import android.graphics.Color;
 import android.graphics.Typeface;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.TypedValue;
+import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnFocusChangeListener;
@@ -34,8 +36,8 @@ import android.widget.LinearLayout;
 class jListItemRow{
 	String label = "";
 	int    id;
-	int widget = 0;
-	View jWidget; //needed to fix  the RadioButton Group default behavior: thanks to Leledumbo.
+	int widget = 0;  //there is not a widget!
+	View jWidget; //fixed RadioButton Group default behavior: thanks to Leledumbo.
 	String widgetText;
 	int savePosition = -1;
 	String delimiter;
@@ -49,7 +51,7 @@ class jListItemRow{
 	String tagString="";
 
 	Context ctx;
-	Bitmap bmp;
+	Bitmap bmp = null;
 	Typeface typeFace;
 	//TFontFace = (ffNormal, ffSans, ffSerif, ffMonospace);
 
@@ -98,16 +100,12 @@ class jArrayAdapter extends ArrayAdapter {
 	public void SetFontSizeUnit(int _unit) {
 		switch (_unit) {
 			case 0: mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_SP; break; //default
-			case 1: mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_PX; break;
-			case 2: mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_DIP; break;
-			case 3: mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_IN; break;
-			case 4: mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_MM; break;
-			case 5: mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_PT; break;
-			case 6: mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_SP; break;
+			case 1: mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_PX; break;  //raw pixel :: good experience!
+			case 2: mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_DIP; break; //device 
+			case 3: mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_MM; break;
+			case 4: mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_PT; break;  //points
+			case 5: mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_SP; break;  //scaled pixel -- default
 		}
-		//String t = this.getText().toString();
-		//this.setTextSize(mTextSizeTypedValue, mTextSize);
-		//this.setText(t);
 	}
 
 	public void SetDispatchOnDrawItemTextColor(boolean _value) {
@@ -116,6 +114,45 @@ class jArrayAdapter extends ArrayAdapter {
 
 	public void SetDispatchOnDrawItemBitmap(boolean _value) {
 		mDispatchOnDrawItemBitmap = _value;
+	}
+	
+	//http://stackoverflow.com/questions/11604846/changing-edittexts-text-size-from-pixel-to-scaled-pixels
+	public float pixelsToDIP( float px ) {  //Density Independent Pixels
+	    DisplayMetrics metrics = ctx.getResources().getDisplayMetrics();
+	    float dp = px / ( metrics.densityDpi / 160f );
+	    return dp;
+	}
+	
+	//http://stackoverflow.com/questions/14569963/converting-pixel-values-to-mm-android
+	
+	public float pixelsToPT(Float px) {  //Scaled Pixels
+	    DisplayMetrics metrics = ctx.getResources().getDisplayMetrics();
+	    float dp = px / (metrics.xdpi * (1.0f/72) );
+	    return dp;
+
+	}
+
+	public float pixelsToIN(Float px) {  //Scaled Pixels		
+		//1 inch == 25.4 mm)
+		//x inch == mm
+		float mm = pixelsToMM(px);		
+		return (float) (mm/25.4);	  
+	}
+	
+	public float pixelsToMM(Float px) {  //Scaled Pixels
+		 final DisplayMetrics dm = ctx.getResources().getDisplayMetrics();
+		 return px / TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_MM, 1, dm);		 
+	}
+
+	public float pixelsToSP(Float px) {  //Scaled Pixels
+	    float scaledDensity = ctx.getResources().getDisplayMetrics().scaledDensity;
+	    return px/scaledDensity;
+	}
+			
+	//http://stackoverflow.com/questions/2069810/how-to-assign-text-size-in-sp-value-using-java-code	
+	int getPixels(int unit, float size) {   // unit ex: TypedValue.COMPLEX_UNIT_SP or mTextSizeTypedValue
+	    DisplayMetrics metrics = ctx.getResources().getDisplayMetrics();
+	    return (int)TypedValue.applyDimension(unit, size, metrics);
 	}
 
 	@Override
@@ -127,7 +164,7 @@ class jArrayAdapter extends ArrayAdapter {
 
 			listLayout.setOrientation(LinearLayout.HORIZONTAL);
 			AbsListView.LayoutParams lparam =new AbsListView.LayoutParams(AbsListView.LayoutParams.MATCH_PARENT,
-					AbsListView.LayoutParams.WRAP_CONTENT); //w, h
+					                                                      AbsListView.LayoutParams.WRAP_CONTENT); //w, h
 			listLayout.setLayoutParams(lparam);
 
 			RelativeLayout.LayoutParams imgParam = null;
@@ -135,6 +172,9 @@ class jArrayAdapter extends ArrayAdapter {
 
 			if (items.get(position).bmp !=  null) {
 				imgParam = new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT); //w,h
+				
+				imgParam.addRule(RelativeLayout.CENTER_VERTICAL);
+				
 				itemImage = new ImageView(ctx);
 				itemImage.setId(position);
 				itemImage.setImageBitmap(items.get(position).bmp);
@@ -143,7 +183,6 @@ class jArrayAdapter extends ArrayAdapter {
 				itemImage.setPadding(6, 6, 0, 0);
 				itemImage.setOnClickListener(getOnCheckItem(itemImage, position));
 			}
-
 
 			if (mDispatchOnDrawItemBitmap)  {
 				Bitmap  imageBmp = (Bitmap)controls.pOnListViewDrawItemBitmap(PasObj, (int)position , items.get(position).label);
@@ -186,13 +225,14 @@ class jArrayAdapter extends ArrayAdapter {
 			RelativeLayout itemLayout = new RelativeLayout(ctx);
 
 			String line = items.get(position).label;
+			
 			String[] lines = line.split(Pattern.quote(items.get(position).delimiter));
 
 			TextView[] itemText = new TextView[lines.length];
-
-			LinearLayout txtLayout = new LinearLayout(ctx);
-			txtLayout.setOrientation(LinearLayout.VERTICAL);
-
+	    	
+            LinearLayout txtLayout = new LinearLayout(ctx);
+    		txtLayout.setOrientation(LinearLayout.VERTICAL);	
+            
 			int faceTitle;
 			int faceBody;
 			switch (items.get(position).textDecorated) {
@@ -210,48 +250,93 @@ class jArrayAdapter extends ArrayAdapter {
 
 				default: faceTitle = Typeface.NORMAL; faceBody = Typeface.NORMAL; break;
 			}
-
-			LayoutParams txtParam = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT); //w,h
-
-			//txtParam.alignWithParent = true;
-
+			
+			LayoutParams txtParam;
+			
+			/*if (items.get(position).itemLayout != 2) //0=layImageTextWidget, 1=layWidgetTextImage, 2=layText
+			   txtParam = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT); //w,h
+			else*/			
+			txtParam = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT); //w,h  //layText
+			
 			for (int i=0; i < lines.length; i++) {
 
 				TextView textViewnew = new TextView(ctx);
-				float auxf = textViewnew.getTextSize();
+				
+				float auxCustomPixel;
+				
+				float defaultInPixel = textViewnew.getTextSize();  //default in pixel!!!				
+				float auxf =  pixelsToSP(defaultInPixel);  //just initialize ... pixel to TypedValue.COMPLEX_UNIT_SP
+				
+				if (mTextSizeTypedValue == TypedValue.COMPLEX_UNIT_SP) {
+				   auxf =  pixelsToSP(defaultInPixel);   //default in TypedValue.COMPLEX_UNIT_SP!									
+				   if (items.get(position).textSize != 0) {
+					  textViewnew.setTextSize(items.get(position).textSize);					
+					  auxCustomPixel = textViewnew.getTextSize();
+					  auxf =  pixelsToSP(auxCustomPixel);   //custom in default in TypedValue.COMPLEX_UNIT_SP!
+				   }
+				}
+				
+				
+				if (mTextSizeTypedValue == TypedValue.COMPLEX_UNIT_PX) {  //in pixel
+					   if (items.get(position).textSize != 0) {
+						  textViewnew.setTextSize(items.get(position).textSize);					
+						  auxCustomPixel = textViewnew.getTextSize();
+						  auxf = auxCustomPixel;  //already in pixel										
+					   }
+				}
+								
+
+				if (mTextSizeTypedValue == TypedValue.COMPLEX_UNIT_DIP) {
+					   auxf =  pixelsToDIP(defaultInPixel);   //convert pixel to TypedValue.COMPLEX_UNIT_DIP								
+					   if (items.get(position).textSize != 0) {
+						  textViewnew.setTextSize(items.get(position).textSize);					
+						  auxCustomPixel = textViewnew.getTextSize();
+						  auxf =  pixelsToDIP(auxCustomPixel);   //custom in TypedValue.COMPLEX_UNIT_DIP
+					   }
+				}
+												
+				if (mTextSizeTypedValue == TypedValue.COMPLEX_UNIT_MM) {
+					   auxf =  pixelsToMM(defaultInPixel);   //convert pixel to TypedValue.COMPLEX_UNIT_DIP								
+					   if (items.get(position).textSize != 0) {
+						  textViewnew.setTextSize(items.get(position).textSize);					
+						  auxCustomPixel = textViewnew.getTextSize();
+						  auxf =  pixelsToMM(auxCustomPixel);   //custom in TypedValue.COMPLEX_UNIT_DIP
+					   }					  					   
+				}
+				
+				if (mTextSizeTypedValue == TypedValue.COMPLEX_UNIT_PT) {
+					   auxf =  pixelsToPT(defaultInPixel);   //convert pixel to TypedValue.COMPLEX_UNIT_DIP								
+					   if (items.get(position).textSize != 0) {
+						  textViewnew.setTextSize(items.get(position).textSize);					
+						  auxCustomPixel = textViewnew.getTextSize();
+						  auxf =  pixelsToPT(auxCustomPixel);   //custom in TypedValue.COMPLEX_UNIT_DIP
+					   }
+				}
+				
 				itemText[i] = textViewnew;
-				if (i == 0) {
-					if (items.get(position).textSize != 0){
-						auxf = items.get(position).textSize;
-
-						if (mTextSizeTypedValue != TypedValue.COMPLEX_UNIT_SP)
-							itemText[i].setTextSize(mTextSizeTypedValue, auxf);
-						else
-							itemText[i].setTextSize(auxf);
-					}
-					itemText[i].setPadding(10, 15, 10, 15); //Typeface.MONOSPACE
-					itemText[i].setTypeface(items.get(position).typeFace, faceTitle); //items.get(position).typeFace
-				}
+				itemText[i].setPadding(20, 40, 20, 40);  //default
+				
+				if (lines.length > 1) {				   	
+					if (i == 0) itemText[i].setPadding(20, 40, 20, 3);  //left, top, right, bottom						
+					else if (i== lines.length-1) itemText[i].setPadding(20, 3, 20, 40);  //left, top, right, bottom
+					else itemText[i].setPadding(20, 3, 20, 3);  //left, top, right, bottom
+				}   
+				   				
+				if (i == 0) {										
+					itemText[i].setTypeface(items.get(position).typeFace, faceTitle); 
+				}  				
 				else{
-					itemText[i].setPadding(10, 0, 10, 15);  //Typeface.SERIF
-					itemText[i].setTypeface(items.get(position).typeFace, faceBody); //
-					if (items.get(position).textSizeDecorated == 1) {
-
-						if (mTextSizeTypedValue != TypedValue.COMPLEX_UNIT_SP)
-							itemText[i].setTextSize(mTextSizeTypedValue, auxf - 5*i);  // sdDeCecreasing
-						else
-							itemText[i].setTextSize(auxf - 5*i);  // sdDeCecreasing
-					}
-
-					if (items.get(position).textSizeDecorated == 2) {
-
-						if (mTextSizeTypedValue != TypedValue.COMPLEX_UNIT_SP)
-							itemText[i].setTextSize(mTextSizeTypedValue, auxf + 5*i);  // sdInCecreasing
-						else
-							itemText[i].setTextSize(auxf + 5*i);  // sdInCecreasing
-
-					}
+					itemText[i].setTypeface(items.get(position).typeFace, faceBody); 
+				}	
+				
+				if (items.get(position).textSizeDecorated == 1) {
+							itemText[i].setTextSize(mTextSizeTypedValue, auxf - 3*i);  // sdDeCecreasing
 				}
+
+				if (items.get(position).textSizeDecorated == 2) {
+						   itemText[i].setTextSize(mTextSizeTypedValue, auxf + 3*i);  // sdInCecreasing
+				}			
+				
 
 				itemText[i].setText(lines[i]);
 
@@ -272,12 +357,21 @@ class jArrayAdapter extends ArrayAdapter {
 					}
 				}
 
+				txtParam.leftMargin = 10;
+				txtParam.rightMargin = 10;
+				
+				switch(items.get(position).textAlign) {
+					  case 0: itemText[i].setGravity(Gravity.LEFT);  break;
+					  case 1: itemText[i].setGravity(Gravity.CENTER_HORIZONTAL);  break;
+					  case 2: itemText[i].setGravity(Gravity.RIGHT); break;					
+				}					
+																					
 				txtLayout.addView(itemText[i]);
 			}
 
 			View itemWidget = null;
 
-			switch(items.get(position).widget) {
+			switch(items.get(position).widget) {   //0 == there is not a widget!
 				case 1:  itemWidget = new CheckBox(ctx);
 					((CheckBox)itemWidget).setId(position);
 					((CheckBox)itemWidget).setText(items.get(position).widgetText);
@@ -324,9 +418,7 @@ class jArrayAdapter extends ArrayAdapter {
 							}
 						}
 					});
-
 					break;
-				//default: ;
 			}
 
 			LayoutParams widgetParam = null;
@@ -337,22 +429,24 @@ class jArrayAdapter extends ArrayAdapter {
 				itemWidget.setFocusableInTouchMode(false);
 				itemWidget.setOnClickListener(getOnCheckItem(itemWidget, position));
 			}
-
-			if (items.get(position).itemLayout == 0) {	//default...
+			else {
+			   //	
+			}
+			
+			if (items.get(position).itemLayout == 0) {	//default... // Pascal layImageTextWidget
 				if (itemImage != null) {
 					listLayout.addView(itemImage, imgParam);
 				}
 
 				txtParam.leftMargin = 10;
 				txtParam.rightMargin = 10;
-
+			
 				switch(items.get(position).textAlign) {
 					case 0: txtParam.addRule(RelativeLayout.ALIGN_PARENT_LEFT);  break;
 					case 1: txtParam.addRule(RelativeLayout.CENTER_HORIZONTAL);  break;
-					case 2: txtParam.addRule(RelativeLayout.ALIGN_PARENT_RIGHT); break;
-					default: ;
+					case 2: txtParam.addRule(RelativeLayout.ALIGN_PARENT_RIGHT); break;					
 				}
-
+				
 				itemLayout.addView(txtLayout, txtParam);
 
 				if (itemWidget != null) {
@@ -363,7 +457,7 @@ class jArrayAdapter extends ArrayAdapter {
 					itemLayout.addView(itemWidget, widgetParam);
 				}
 
-			} else {
+			} else if (items.get(position).itemLayout == 1) {   //Pascal layWidgetTextImage
 
 				if (itemWidget != null) {
 					listLayout.addView(itemWidget, widgetParam);
@@ -371,11 +465,11 @@ class jArrayAdapter extends ArrayAdapter {
 
 				txtParam.leftMargin = 10;
 				txtParam.rightMargin = 10;
+				
 				switch(items.get(position).textAlign) {
 					case 0: txtParam.addRule(RelativeLayout.ALIGN_PARENT_LEFT);break;
 					case 1: txtParam.addRule(RelativeLayout.CENTER_HORIZONTAL); break;
 					case 2: txtParam.addRule(RelativeLayout.ALIGN_PARENT_RIGHT); break;
-					default: ;
 				}
 
 				itemLayout.addView(txtLayout, txtParam);
@@ -389,10 +483,15 @@ class jArrayAdapter extends ArrayAdapter {
 
 					itemLayout.addView(itemImage, imgParam);
 				}
+				
+			} else {  //layText				
+	    		itemLayout.addView(txtLayout, txtParam);	    		
 			}
 
 			listLayout.addView(itemLayout);
+			
 			return listLayout;
+			
 		} else return v;
 
 	}
@@ -543,7 +642,9 @@ public class jListView extends ListView {
 						if (isOnClick) {
 							// Log.i("ACTION", "UP");
 							canClick = true;
-						} else { Log.i("ACTION","UP NOT PROCESSED"); }
+						} else { 
+							//Log.i("ACTION","UP NOT PROCESSED"); 
+						}
 						//return false; // passa oltre, ma potrebbe diventare true
 						//mDownX = -1;
 						return false;
@@ -892,7 +993,7 @@ public class jListView extends ListView {
 			return 0;
 		}
 	}
-
+	
 	private Drawable GetDrawableResourceById(int _resID) {
 		return (Drawable)( this.controls.activity.getResources().getDrawable(_resID));
 	}
@@ -903,6 +1004,11 @@ public class jListView extends ListView {
 		aadapter.notifyDataSetChanged();
 	}
 
+	public void SetImageByResIdentifier(String _imageResIdentifier) {
+		Drawable d = GetDrawableResourceById(GetDrawableResourceId(_imageResIdentifier));
+		genericBmp = ((BitmapDrawable)d).getBitmap();	
+	}
+		
 	public void setTextDecorated(int value, int index){
 		alist.get(index).textDecorated = value;
 		aadapter.notifyDataSetChanged();

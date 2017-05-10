@@ -1,4 +1,4 @@
-package org.lamw.apptexttospeechdemo1;
+package com.example.appactionbartabdemo1;
 
 import java.lang.reflect.Field;
 
@@ -208,16 +208,15 @@ public class jTextView extends TextView {
         this.setText(t);
     }
 
-    //TTextSizeTypedValue =(tsDefault, tsPixels, tsDIP, tsInches, tsMillimeters, tsPoints, tsScaledPixel);
+    //TTextSizeTypedValue =(tsDefault, tsPixels, tsDIP, tsMillimeters, tsPoints, tsScaledPixel);
     public void SetFontSizeUnit(int _unit) {
         switch (_unit) {
             case 0: mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_SP; break; //default
             case 1: mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_PX; break; 
             case 2: mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_DIP; break; 
-            case 3: mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_IN; break; 
-            case 4: mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_MM; break; 
-            case 5: mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_PT; break; 
-            case 6: mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_SP; break; 
+            case 3: mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_MM; break; 
+            case 4: mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_PT; break; 
+            case 5: mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_SP; break; 
         }
         String t = this.getText().toString();
         this.setTextSize(mTextSizeTypedValue, mTextSize);
@@ -415,6 +414,15 @@ public class jTextView extends TextView {
 	//You can basically set it from anything between 0(fully transparent) to 255 (completely opaque)	
 	public void SetBackgroundAlpha(int _alpha) {
 		this.getBackground().setAlpha(_alpha); //0-255
+	}
+	
+	public void MatchParent() {		
+		LAMWCommon.MatchParent();
+		
+	}
+
+	public void WrapParent() {
+		LAMWCommon.WrapParent();		
 	}
 		
 }

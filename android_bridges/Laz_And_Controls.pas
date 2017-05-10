@@ -1240,6 +1240,8 @@ type
     FHighLightSelectedItem: boolean;
     FHighLightSelectedItemColor: TARGBColorBridge;
 
+    FImageItemIdentifier: string;
+
     procedure SetHighLightSelectedItem(_value: boolean);
     procedure SetHighLightSelectedItemColor(_color: TARGBColorBridge);
 
@@ -1320,6 +1322,7 @@ type
     procedure SetWidgetCheck(_value: boolean; _index: integer);
     procedure SetItemTagString(_tagString: string; _index: integer);
     function GetItemTagString(_index: integer): string;
+    procedure SetImageByResIdentifier(_imageResIdentifier: string);
 
     //Property
     property setItemIndex: TXY write SetItemPosition;
@@ -1343,6 +1346,8 @@ type
     property HighLightSelectedItemColor: TARGBColorBridge read FHighLightSelectedItemColor write SetHighLightSelectedItemColor;
     property FontSizeUnit: TFontSizeUnit read FFontSizeUnit write SetFontSizeUnit;
     property FontFace: TFontFace read FFontFace write SetFontFace default ffNormal;
+
+    property ImageItemIdentifier: string read FImageItemIdentifier write SetImageByResIdentifier;
     // Event
     property OnClickItem : TOnClickCaptionItem read FOnClickItem write FOnClickItem;
     property OnClickWidgetItem: TOnClickWidgetItem read FOnClickWidgetItem write FOnClickWidgetItem;
@@ -6447,7 +6452,7 @@ begin
   FWidgetItem:= wgNone;
   FDelimiter:= '|';
   FTextDecorated:= txtNormal;
-  FItemLayout:= layImageTextWidget;
+  FItemLayout:= layText;  //layImageTextWidget;
   FTextSizeDecorated:= sdNone;
   FTextAlign:= alLeft;
   FItems:= TStringList.Create;
@@ -6460,6 +6465,7 @@ begin
 
   FHighLightSelectedItem:= False;
   FHighLightSelectedItemColor:= colbrDefault;
+  FImageItemIdentifier:= 'ic_launcher';
 
 end;
 
@@ -6535,6 +6541,9 @@ begin
 
     if FColor <> colbrDefault then
       View_SetBackGroundColor(FjEnv, FjThis, FjObject , GetARGB(FCustomColor, FColor));
+
+    if FImageItemIdentifier <> '' then    //ic_launcher
+        jListView_SetImageByResIdentifier(FjEnv, FjObject, FImageItemIdentifier);
 
     for i:= 0 to FItems.Count-1 do
     begin
@@ -7115,6 +7124,13 @@ begin
   end;
 end;
 
+procedure jListView.SetImageByResIdentifier(_imageResIdentifier: string);
+begin
+  //in designing component state: set value here...
+  FImageItemIdentifier:= _imageResIdentifier;
+  if FInitialized then
+     jListView_SetImageByResIdentifier(FjEnv, FjObject, _imageResIdentifier);
+end;
 
 //------------------------------------------------------------------------------
 // jScrollView

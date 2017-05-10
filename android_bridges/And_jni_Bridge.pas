@@ -588,6 +588,7 @@ function jListView_getLParamWidth(env:PJNIEnv; _jlistview : jObject): integer;
 
 function  jListView_getTotalHeight(env: PJNIEnv; _jlistview: JObject): integer;
 function  jListView_getItemHeight(env: PJNIEnv; _jlistview: JObject; _index: integer): integer;
+procedure jListView_SetImageByResIdentifier(env: PJNIEnv; _jlistview: JObject; _imageResIdentifier: string);
 
 
 // ScrollView
@@ -5181,6 +5182,20 @@ begin
  _jMethod:= env^.GetMethodID(env, cls, 'getItemHeight', '(I)I');
  Result:= env^.CallIntMethodA(env,_jlistview,_jMethod, @_jParams);
  env^.DeleteLocalRef(env, cls);
+end;
+
+procedure jListView_SetImageByResIdentifier(env: PJNIEnv; _jlistview: JObject; _imageResIdentifier: string);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_imageResIdentifier));
+  jCls:= env^.GetObjectClass(env, _jlistview);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetImageByResIdentifier', '(Ljava/lang/String;)V');
+  env^.CallVoidMethodA(env, _jlistview, jMethod, @jParams);
+env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 //------------------------------------------------------------------------------

@@ -188,11 +188,10 @@ public class jButton extends Button {
 		switch (_unit) {
 			case 0: mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_SP; break; 
 			case 1: mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_PX; break; 
-			case 2: mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_DIP; break;
-			case 3: mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_IN; break; 
-			case 4: mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_MM; break; 
-			case 5: mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_PT; break; 
-			case 6: mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_SP; break; 
+			case 2: mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_DIP; break;			
+			case 3: mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_MM; break; 
+			case 4: mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_PT; break; 
+			case 5: mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_SP; break; 
 		}
 		String t = this.getText().toString();
 		this.setTextSize(mTextSizeTypedValue, mTextSize);

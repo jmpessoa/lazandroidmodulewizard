@@ -313,7 +313,7 @@ type
  TScanLine = Array[0..0] of DWord;
  PScanLine = ^TScanline;
 
- TItemLayout = (layImageTextWidget, layWidgetTextImage);
+ TItemLayout = (layImageTextWidget, layWidgetTextImage, layText);
 
  TToggleState = (tsOff, tsOn);
 
@@ -1220,7 +1220,7 @@ end;
 
   {jVisualControl}
 
-  TFontSizeUnit =(unitDefault, unitPixel, unitDIP, unitInch, unitMillimeter, unitPoint, unitScaledPixel);
+  TFontSizeUnit =(unitDefault, unitPixel, unitDIP, {unitInch,} unitMillimeter, unitPoint, unitScaledPixel);
 
   jVisualControl = class(TAndroidWidget)
   private
