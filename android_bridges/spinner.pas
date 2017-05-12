@@ -27,6 +27,7 @@ TOnItemSelected = procedure(Sender: TObject; itemCaption: string; itemIndex: int
     FLastItemAsPrompt: boolean;
 
     FTextTypeFace: TTextTypeFace;
+    FSelectedIndex: integer;
 
     procedure SetColor(Value: TARGBColorBridge);
 
@@ -72,15 +73,20 @@ TOnItemSelected = procedure(Sender: TObject; itemCaption: string; itemIndex: int
     procedure SetFontSizeUnit(_unit: TFontSizeUnit);
     procedure SetTextAlignment(_alignment: TTextAlignment);
 
-    property jParent: jObject  read  FjPRLayout write SetjParent; // Java : Parent Relative Layout
+    function GetText(): string;  override;
+    procedure SetText(_index: integer);  overload;
+    procedure SetSelectedIndex(_index: integer);
+    function GetSelectedIndex(): integer;
+
 
     procedure GenEvent_OnSpinnerItemSeleceted(Obj: TObject; caption: string; position: integer);
+
+    property jParent: jObject  read  FjPRLayout write SetjParent; // Java : Parent Relative Layout
     property Count: integer read GetSize;
+    property Text: string read GetText;
   published
 
     property Items: TStrings read FItems write SetItems;
-    property OnItemSelected: TOnItemSelected  read FOnItemSelected write FOnItemSelected;
-
     property Visible: boolean read FVisible write SetVisible;
     property BackgroundColor: TARGBColorBridge read FColor write SetColor;
     property SelectedFontColor: TARGBColorBridge  read FSelectedFontColor write SetSelectedFontColor;
@@ -93,7 +99,9 @@ TOnItemSelected = procedure(Sender: TObject; itemCaption: string; itemIndex: int
 
     property FontFace: TFontFace read FFontFace write SetFontFace default ffNormal;
     property TextTypeFace: TTextTypeFace read FTextTypeFace write SetTextTypeFace;
+    property SelectedIndex: integer read GetSelectedIndex write SetSelectedIndex;
 
+    property OnItemSelected: TOnItemSelected  read FOnItemSelected write FOnItemSelected;
   end;
 
 function jSpinner_jCreate(env: PJNIEnv; this: JObject;_Self: int64): jObject;
@@ -123,6 +131,11 @@ procedure jSpinner_SetTextFontSize(env: PJNIEnv; _jspinner: JObject; _txtFontSiz
 procedure jSpinner_SetFontSizeUnit(env: PJNIEnv; _jspinner: JObject; _unit: integer);
 procedure jSpinner_SetTextAlignment(env: PJNIEnv; _jspinner: JObject; _alignment: integer);
 procedure jSpinner_SetFontAndTextTypeFace(env: PJNIEnv; _jspinner: JObject; _fontFace: integer; _fontStyle: integer);
+function jSpinner_GetText(env: PJNIEnv; _jspinner: JObject): string;
+procedure jSpinner_SetText(env: PJNIEnv; _jspinner: JObject; _index: integer);
+procedure jSpinner_SetSelectedIndex(env: PJNIEnv; _jspinner: JObject; _index: integer);
+function jSpinner_GetSelectedIndex(env: PJNIEnv; _jspinner: JObject): integer;
+
 
 
 implementation
@@ -158,6 +171,7 @@ begin
 
   FFontFace:= ffNormal;
   FTextTypeFace:= tfNormal;
+  FSelectedIndex:= -1;
 
 end;
 
@@ -247,12 +261,13 @@ begin
     View_SetBackGroundColor(FjEnv, FjThis, FjObject , GetARGB(FCustomColor, FColor));
 
   if FSelectedFontColor <> colbrDefault then
-     Self.SetSelectedTextColor(GetARGB(FCustomColor, FSelectedFontColor))
-  else
-     Self.SetSelectedTextColor(GetARGB(FCustomColor, colbrSilver));
+     Self.SetSelectedTextColor(GetARGB(FCustomColor, FSelectedFontColor));
 
-  if FDropListTextColor <> colbrDefault then self.SetDropListTextColor(FDropListTextColor);
-  if FDropListBackgroundColor <> colbrDefault then  Self.SetDropListBackgroundColor(FDropListBackgroundColor);
+  if FDropListTextColor <> colbrDefault then
+      self.SetDropListTextColor(FDropListTextColor);
+
+  if FDropListBackgroundColor <> colbrDefault then
+     Self.SetDropListBackgroundColor(FDropListBackgroundColor);
 
   if FLastItemAsPrompt then Self.SetLastItemAsPrompt(FLastItemAsPrompt);
 
@@ -268,6 +283,20 @@ begin
   for i:= 0 to FItems.Count-1 do
   begin
      jSpinner_Add(FjEnv, FjObject , FItems.Strings[i]);
+  end;
+
+  if FSelectedIndex > -1 then
+  begin
+     if FSelectedIndex > (FItems.Count-1) then FSelectedIndex:= FItems.Count-1;
+     jSpinner_SetSelectedIndex(FjEnv, FjObject, FSelectedIndex)
+  end
+  else
+  begin
+    if FItems.Count > 0 then
+    begin
+       FSelectedIndex:= 0;
+       jSpinner_SetSelectedIndex(FjEnv, FjObject, 0);
+    end;
   end;
 
   View_SetVisible(FjEnv, FjThis, FjObject , FVisible);
@@ -561,6 +590,44 @@ begin
   FTextTypeFace:= Value;
   if(FInitialized) then
     jSpinner_SetFontAndTextTypeFace(FjEnv, FjObject, Ord(FFontFace), Ord(FTextTypeFace));
+end;
+
+function jSpinner.GetText(): string;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+  begin
+    FText:= jSpinner_GetText(FjEnv, FjObject);
+  end;
+  Result := FText;
+end;
+
+procedure jSpinner.SetText(_index: integer);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+  begin
+     jSpinner_SetText(FjEnv, FjObject, _index);
+     FText:= jSpinner_GetText(FjEnv, FjObject);
+  end;
+end;
+
+procedure jSpinner.SetSelectedIndex(_index: integer);
+begin
+  //in designing component state: set value here...
+  FSelectedIndex:= _index;
+  if FInitialized then
+     jSpinner_SetSelectedIndex(FjEnv, FjObject, _index);
+end;
+
+function jSpinner.GetSelectedIndex(): integer;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+  begin
+    FSelectedIndex:= jSpinner_GetSelectedIndex(FjEnv, FjObject);
+  end;
+  Result:= FSelectedIndex;
 end;
 
 //TODO
@@ -951,6 +1018,64 @@ begin
   jCls:= env^.GetObjectClass(env, _jspinner);
   jMethod:= env^.GetMethodID(env, jCls, 'SetFontAndTextTypeFace', '(II)V');
   env^.CallVoidMethodA(env, _jspinner, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+function jSpinner_GetText(env: PJNIEnv; _jspinner: JObject): string;
+var
+  jStr: JString;
+  jBoo: JBoolean;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jspinner);
+  jMethod:= env^.GetMethodID(env, jCls, 'GetText', '()Ljava/lang/String;');
+  jStr:= env^.CallObjectMethod(env, _jspinner, jMethod);
+  case jStr = nil of
+     True : Result:= '';
+     False: begin
+              jBoo:= JNI_False;
+              Result:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
+            end;
+  end;
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jSpinner_SetText(env: PJNIEnv; _jspinner: JObject; _index: integer);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].i:= _index;
+  jCls:= env^.GetObjectClass(env, _jspinner);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetText', '(I)V');
+  env^.CallVoidMethodA(env, _jspinner, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jSpinner_SetSelectedIndex(env: PJNIEnv; _jspinner: JObject; _index: integer);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].i:= _index;
+  jCls:= env^.GetObjectClass(env, _jspinner);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetSelectedIndex', '(I)V');
+  env^.CallVoidMethodA(env, _jspinner, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+
+function jSpinner_GetSelectedIndex(env: PJNIEnv; _jspinner: JObject): integer;
+var
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jspinner);
+  jMethod:= env^.GetMethodID(env, jCls, 'GetSelectedIndex', '()I');
+  Result:= env^.CallIntMethod(env, _jspinner, jMethod);
   env^.DeleteLocalRef(env, jCls);
 end;
 

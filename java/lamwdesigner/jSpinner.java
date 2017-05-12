@@ -1,4 +1,4 @@
-package com.example.appgooglemapsdemo1;
+package org.lamw.appadsdemo1;
 
 import java.util.ArrayList;
 
@@ -19,8 +19,8 @@ class CustomSpinnerArrayAdapter<T> extends ArrayAdapter<String>{
 
     Context ctx;
     private int mTextColor = Color.BLACK;
-    private int mTexBackgroundtColor = Color.TRANSPARENT;
-    private int mSelectedTextColor = Color.LTGRAY;
+    private int mTexBackgroundColor = Color.TRANSPARENT;
+    private int mSelectedTextColor = Color.BLACK;  
     private int flag = 0;
     private boolean mLastItemAsPrompt = false;
     private int mTextFontSize = 0;
@@ -31,12 +31,11 @@ class CustomSpinnerArrayAdapter<T> extends ArrayAdapter<String>{
     private int mFontStyle;
 
     public CustomSpinnerArrayAdapter(Context context, int simpleSpinnerItem, ArrayList<String> alist) {
-        super(context, simpleSpinnerItem, alist);
+        super(context, simpleSpinnerItem, alist);        
         ctx = context;
         mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_SP;
-        mTextAlignment = Gravity.CENTER;
+        mTextAlignment = Gravity.CENTER;        
     }
-
 
     public void SetFontSizeUnit(int _unit) {
         switch (_unit) {
@@ -58,7 +57,6 @@ class CustomSpinnerArrayAdapter<T> extends ArrayAdapter<String>{
         mFontStyle = fontStyle;
     }
 
-
     //This method is used to display the dropdown popup that contains data.
     @Override
     public View getDropDownView(int position, View convertView, ViewGroup parent)
@@ -70,7 +68,8 @@ class CustomSpinnerArrayAdapter<T> extends ArrayAdapter<String>{
 
         ((TextView) view).setPadding(10, 15, 10, 15);
         ((TextView) view).setTextColor(mTextColor);
-
+        ((TextView) view).setBackgroundColor(mTexBackgroundColor);
+        
         if (mTextFontSize != 0) {
 
             if (mTextSizeTypedValue != TypedValue.COMPLEX_UNIT_SP)
@@ -78,12 +77,9 @@ class CustomSpinnerArrayAdapter<T> extends ArrayAdapter<String>{
             else
                 ((TextView) view).setTextSize(mTextFontSize);
         }
-
-        ((TextView) view).setBackgroundColor(mTexBackgroundtColor);
+        
         ((TextView) view).setTypeface(mFontFace, mFontStyle);
-
-
-        ((TextView)view).setGravity(mTextAlignment);
+        ((TextView) view).setGravity(mTextAlignment);
         //((TextView) view).setGravity(Gravity.CENTER);
 
         return view;
@@ -95,11 +91,10 @@ class CustomSpinnerArrayAdapter<T> extends ArrayAdapter<String>{
 
         View view = super.getView(pos, cnvtView, prnt);
 
-        ((TextView)view).setPadding(10, 15, 10, 15);
-        ((TextView)view).setTextColor(mSelectedTextColor);
-        ((TextView)view).setTypeface(mFontFace, mFontStyle);
-        ((TextView)view).setGravity(mTextAlignment);
-
+        ((TextView)view).setPadding(10, 15, 10, 15);        
+        ((TextView)view).setTextColor(mSelectedTextColor);        
+        ((TextView) view).setBackgroundColor(mTexBackgroundColor);
+        
         if (mTextFontSize != 0) {
 
             if (mTextSizeTypedValue != TypedValue.COMPLEX_UNIT_SP)
@@ -108,6 +103,9 @@ class CustomSpinnerArrayAdapter<T> extends ArrayAdapter<String>{
                 ((TextView) view).setTextSize(mTextFontSize);
         }
 
+        ((TextView)view).setTypeface(mFontFace, mFontStyle);
+        ((TextView)view).setGravity(mTextAlignment);
+        
         if (mLastItemAsPrompt) flag = 1;
 
         return view;
@@ -125,7 +123,7 @@ class CustomSpinnerArrayAdapter<T> extends ArrayAdapter<String>{
     }
 
     public void SetBackgroundColor(int txtColor){
-        mTexBackgroundtColor = txtColor;
+        mTexBackgroundColor = txtColor;
     }
 
     public void SetSelectedTextColor(int txtColor){
@@ -159,6 +157,10 @@ public class jSpinner extends Spinner /*dummy*/ { //please, fix what GUI object 
     private boolean mLastItemAsPrompt = false;
     private int mTextAlignment;
     
+    private String mSelectedText="";
+    
+    private int mSelectedIndex= -1;
+    
     private jCommons LAMWCommon;
 
 
@@ -172,15 +174,14 @@ public class jSpinner extends Spinner /*dummy*/ { //please, fix what GUI object 
         LAMWCommon = new jCommons(this,context,pascalObj);
 
         mTextAlignment = Gravity.CENTER;
-
         mStrList = new ArrayList<String>();
-
         mSpAdapter = new CustomSpinnerArrayAdapter<String>(context, android.R.layout.simple_spinner_item, mStrList);
 
         mSpAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 
         setAdapter(mSpAdapter);
         setOnItemSelectedListener(spinnerListener);
+        
     } //end constructor
 
     public void jFree() {
@@ -199,6 +200,8 @@ public class jSpinner extends Spinner /*dummy*/ { //please, fix what GUI object 
             ((TextView) parent.getChildAt(0)).setGravity(mTextAlignment); //Gravity.CENTER
             String caption = mStrList.get(position).toString();
             setSelection(position);
+            mSelectedIndex = position;
+            mSelectedText = caption;
             controls.pOnSpinnerItemSeleceted(pascalObj,position,caption);
         }
 
@@ -206,7 +209,6 @@ public class jSpinner extends Spinner /*dummy*/ { //please, fix what GUI object 
    /*.*/public void onNothingSelected(AdapterView<?> parent) {}
 
     };
-
 
     public void SetjParent(ViewGroup _viewgroup) {
     	LAMWCommon.setParent(_viewgroup);
@@ -268,7 +270,8 @@ public class jSpinner extends Spinner /*dummy*/ { //please, fix what GUI object 
     }
 
     public String GetSelectedItem() {
-        return this.getSelectedItem().toString();
+    	mSelectedText = this.getSelectedItem().toString();
+        return mSelectedText;
     }
 
     public void Add(String _item) {
@@ -315,9 +318,18 @@ public class jSpinner extends Spinner /*dummy*/ { //please, fix what GUI object 
     }
 
     public void SetSelection(int _index) {
-        if (_index < 0) setSelection(0);
-        else if (_index > (mStrList.size()-1)) setSelection(mStrList.size()-1);
-        else setSelection(_index);
+        if (_index < 0) { 
+        	setSelection(0);
+        	mSelectedText = this.getSelectedItem().toString(); 
+        }	
+        else if  (_index > (mStrList.size()-1)) {
+        	setSelection(mStrList.size()-1); 
+        	mSelectedText = this.getSelectedItem().toString();
+        }  
+        else { 
+           setSelection(_index);
+           mSelectedText = this.getSelectedItem().toString();
+        }   
     }
 
     public void SetItem(int _index, String _item) {
@@ -342,6 +354,7 @@ public class jSpinner extends Spinner /*dummy*/ { //please, fix what GUI object 
     }
 
     //TTextAlignment  = (taLeft, taRight, taTop, taBottom, taCenter, taCenterHorizontal, taCenterVertical);
+    
     public void SetTextAlignment(int _alignment) {
         mTextAlignment = android.view.Gravity.CENTER;
         switch(_alignment) {
@@ -366,6 +379,23 @@ public class jSpinner extends Spinner /*dummy*/ { //please, fix what GUI object 
         }
         mSpAdapter.SetFontAndTextTypeFace(t, _fontStyle);
     }
+    
+    public String GetText() {
+    	mSelectedText = this.getSelectedItem().toString();
+        return mSelectedText;
+    }
+    
+    public void SetText(int _index) {
+    	SetSelection(_index);
+    }
 
+    public void SetSelectedIndex(int _index) {
+    	SetSelection(_index);
+    }
+
+    public int GetSelectedIndex() {
+        return this.getSelectedItemPosition();      //or -1   
+    }
+    
 }  //end class
 
