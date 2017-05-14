@@ -1,4 +1,4 @@
-package org.lamw.appsmswidgetproviderdemo1;
+package com.example.appradiogroupdemo1;
 
 import android.content.Context;
 import android.graphics.Color;
@@ -7,6 +7,7 @@ import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.PaintDrawable;
 import android.os.Build;
+import android.util.Log;
 import android.view.ViewGroup;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
@@ -41,10 +42,10 @@ public class jRadioGroup extends RadioGroup /*dummy*/ { //please, fix what GUI o
         this.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             /*.*/
             public void onCheckedChanged(RadioGroup group, int checkedId) {
-            	
-            	 int auxChecked = -1;
-                 if (checkedId > 0) {
-                	 
+            	 	
+            	 checkedIndex = -1;
+                 if (checkedId >= 0) {
+                	 	
 	                RadioButton rb = (RadioButton) findViewById(checkedId);
 	                
 	                if (rb != null) {
@@ -55,20 +56,22 @@ public class jRadioGroup extends RadioGroup /*dummy*/ { //please, fix what GUI o
 		                    
 		                    if (rb !=null) {
 		                      if (checkedId == rb.getId()) {
-		                    	auxChecked = i;
+		                    	  checkedIndex = i;
 		                        break;
 		                      }
 		                    }
 		                }	
 		                
-		                if (auxChecked > 0) 
+		                if (checkedIndex > -1) 
 		                  controls.pRadioGroupCheckedChanged(pascalObj, checkedIndex, checkedCaption); //JNI event onClick!
 	                }
-	                
+	                else {
+	                	Log.i("jRadioGroup","rb = null");
+	                }
                  }
                 
             }
-        });
+        });///
 
         if (_orientation == 1)
             this.setOrientation(RadioGroup.VERTICAL);
