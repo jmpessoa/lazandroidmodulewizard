@@ -124,7 +124,27 @@
 	*
 	****************************************************************************************************
 
-Version 0.7.16 - 29 - April - 2017
+version 0.7 - rev. 17 - 14 May - 2017 
+
+	NEW! jSpeechToText component
+
+	NEW! demo AppSpeechToTextDemo1
+
+	Improved!
+		jListView
+			property "TextAlign" now works for "only text" items
+		
+		jSpinner: Added methods to support "hidden" tag by item			
+			SetItem(_index: integer; _item: string; _strTag: string)
+			Add(_item: string; _strTag: string);
+			GetItemTagString(_index: integer): string
+			SetItemTagString(_index: integer; _strTag: string);
+
+	Fixed!
+		jTextView/jEditText 
+			property "Alignment" now works for "LParamWidth = lpMatchParent"
+
+Version 0.7 - rev. 16 - 29 - April - 2017
 
 	NEW! jSMSWidgetProvider component
 

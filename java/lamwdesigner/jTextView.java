@@ -1,4 +1,4 @@
-package org.lamw.appadsdemo1;
+package com.example.appspinnerdemo;
 
 import java.lang.reflect.Field;
 
@@ -47,6 +47,8 @@ public class jTextView extends TextView {
     private ClipboardManager mClipBoard = null;
     private ClipData mClipData = null;
     private int mRadius = 20;    
+    
+    int mTextAlignment;
     	    
     public  jTextView(android.content.Context context,
                       Controls ctrls,long pasobj ) {
@@ -154,31 +156,44 @@ public class jTextView extends TextView {
 	   return this;
     }
 
-    //LORDMAN 2013-08-13
+	/*
+	 	//TTextAlignment = (alLeft, alCenter, alRight);   //Pascal
+	public void SetTextAlignment(int _alignment) {
+		mTextAlignment = _alignment;	
+	    switch(mTextAlignment) {	     
+		  case 0: this.setGravity(Gravity.LEFT);  break;
+		  case 1: this.setGravity(Gravity.CENTER_HORIZONTAL);  break;
+		  case 2: this.setGravity(Gravity.RIGHT); break;					
+	    }					
+	}
+
+	 */
+		
+	//LORDMAN 2013-08-13
     public  void SetTextAlignment( int align ) {
         switch ( align ) {
  //[ifdef_api14up]
             case 0 : { setGravity( Gravity.START             ); }; break;
             case 1 : { setGravity( Gravity.END               ); }; break;
  //[endif_api14up]
+            
  /* //[endif_api14up]
             case 0 : { setGravity( Gravity.LEFT              ); }; break;
             case 1 : { setGravity( Gravity.RIGHT             ); }; break;
  //[ifdef_api14up] */
-            case 2 : { setGravity( Gravity.TOP               ); }; break;
-            case 3 : { setGravity( Gravity.BOTTOM            ); }; break;
-            case 4 : { setGravity( Gravity.CENTER            ); }; break;
-            case 5 : { setGravity( Gravity.CENTER_HORIZONTAL ); }; break;
-            case 6 : { setGravity( Gravity.CENTER_VERTICAL   ); }; break;
+            
+            case 2 : { setGravity( Gravity.CENTER_HORIZONTAL ); }; break;
+            
  //[ifdef_api14up]
             default : { setGravity( Gravity.START            ); }; break;
  //[endif_api14up]
+            
  /* //[endif_api14up]
             default : { setGravity( Gravity.LEFT             ); }; break;
  //[ifdef_api14up] */
-        };
+            
+        }
     }
-
     public void CopyToClipboard() {
         mClipData = ClipData.newPlainText("text", this.getText().toString());
         mClipBoard.setPrimaryClip(mClipData);

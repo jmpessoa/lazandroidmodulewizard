@@ -1,0 +1,3 @@
+public java.lang.Object jSpeechToText_jCreate(long _Self) {
+  return (java.lang.Object)(new jSpeechToText(this,_Self));
+}

@@ -257,6 +257,22 @@ const
 
 type
 
+  TSpeechLanguage = ( slDefault,
+                      slCanada,
+                      slCanadaFrench,
+                      slChinese,
+                      slEnglish,
+                      slFrench,
+                      slGerman,
+                      slItalian,
+                      slJapanese,
+                      slKorean,
+                      slSimplifiedChinese,
+                      slTaiwan,
+                      slTraditionalChinese,
+                      slUK,
+                      slUS);
+
  TTextDirection = (tdInherit,tdFirstStrong, tdAnyRTL, tdLTR, tdRTL);
 
  TCompoundDrawablesSide = (cdsLeft, cdsRight, cdsAbove, cdsBelow);
@@ -414,8 +430,22 @@ type
                       scrlOutsideInset,
                       scrlPositionLeft,
                       scrlPositionRight, scrNone);
-  //by jmpessoa
-  TTextAlignment  = (taLeft, taRight, taTop, taBottom, taCenter, taCenterHorizontal, taCenterVertical);
+
+  TTextDecorated = (txtNormal,
+                    txtNormalAndItalic,
+                    txtNormalAndBold,
+                    txtBold,
+                    txtBoldAndNormal,
+                    txtBoldAndItalic,
+                    txtItalic,
+                    txtItalicAndNormal,
+                    txtItalicAndBold);
+
+  TTextSizeDecorated = (sdNone, sdDecreasing, sdIncreasing);
+
+  TTextAlign = (alLeft, alRight, alCenter); //jListView
+
+  TTextAlignment = (taLeft, taRight, taCenter); //others...
 
   TGravity = (gvBottom, gvCenter, gvCenterHorizontal, gvCenterVertical, gvLeft, gvNoGravity,
               gvRight, gvStart, gvTop, gvEnd, gvFillHorizontal, gvFillVertical);
@@ -1239,7 +1269,7 @@ end;
     FId: DWord;
     FjPRLayout   : jObject; //Java: Parent Layout {parent View)
     FScreenStyle    : TScreenStyle;
-    FTextAlignment: TTextAlignment;
+    //FTextAlignment: TTextAlignment;
 
     FFontSize     : DWord;
     FFontSizeUnit: TFontSizeUnit;

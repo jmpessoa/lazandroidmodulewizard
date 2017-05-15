@@ -9,22 +9,6 @@ uses
 
 type
 
-TSpeechLanguage = ( slDefault,
-                    slCanada,
-                    slCanadaFrench,
-                    slChinese,
-                    slEnglish,
-                    slFrench,
-                    slGerman,
-                    slItalian,
-                    slJapanese,
-                    slKorean,
-                    slSimplifiedChinese,
-                    slTaiwan,
-                    slTraditionalChinese,
-                    slUK,
-                    slUS);
-
 {Draft Component code by "Lazarus Android Module Wizard" [3/28/2017 0:07:35]}
 {https://github.com/jmpessoa/lazandroidmodulewizard}
 

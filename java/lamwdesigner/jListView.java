@@ -1,4 +1,4 @@
-package org.lamw.appadsdemo1;
+package com.example.appspinnerdemo;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -355,9 +355,27 @@ class jArrayAdapter extends ArrayAdapter {
 				txtParam.rightMargin = 10;
 				
 				switch(items.get(position).textAlign) {
-					  case 0: itemText[i].setGravity(Gravity.LEFT);  break;
-					  case 1: itemText[i].setGravity(Gravity.CENTER_HORIZONTAL);  break;
-					  case 2: itemText[i].setGravity(Gravity.RIGHT); break;					
+
+			                      //[ifdef_api14up]
+                                     case 0 : { itemText[i].setGravity( Gravity.START             ); }; break;
+                                     case 1 : { itemText[i].setGravity( Gravity.END               ); }; break;
+                                  //[endif_api14up]
+            
+                              /* //[endif_api14up]
+                                     case 0 : { itemText[i].setGravity( Gravity.LEFT              ); }; break;
+                                     case 1 : { itemText[i].setGravity( Gravity.RIGHT             ); }; break;
+                                 //[ifdef_api14up] */
+            
+                                     case 2 : { itemText[i].setGravity( Gravity.CENTER_HORIZONTAL ); }; break;
+            
+                               //[ifdef_api14up]
+                                     default : { itemText[i].setGravity( Gravity.START            ); }; break;
+                                //[endif_api14up]
+            
+                             /* //[endif_api14up]
+                                    default : { itemText[i].setGravity( Gravity.LEFT             ); }; break;
+                                //[ifdef_api14up] */
+
 				}					
 																					
 				txtLayout.addView(itemText[i]);

@@ -26,6 +26,8 @@ TOnItemSelected = procedure(Sender: TObject; itemCaption: string; itemIndex: int
     FDropListBackgroundColor: TARGBColorBridge;
     FLastItemAsPrompt: boolean;
 
+    FTextAlignment: TTextAlignment;
+
     FTextTypeFace: TTextTypeFace;
     FSelectedIndex: integer;
 
@@ -58,7 +60,7 @@ TOnItemSelected = procedure(Sender: TObject; itemCaption: string; itemIndex: int
     procedure SetId(_id: integer);
     function GetSelectedItemPosition(): integer;
     function GetSelectedItem(): string;
-    procedure Add(_item: string);
+    procedure Add(_item: string); overload;
     procedure Clear;
     procedure SetSelectedTextColor(_color: integer);
     procedure SetDropListTextColor(_color: TARGBColorBridge {integer});
@@ -67,7 +69,7 @@ TOnItemSelected = procedure(Sender: TObject; itemCaption: string; itemIndex: int
     function GetSize(): integer;
     procedure Delete(_index: integer);
     procedure SetSelection(_index: integer);
-    procedure SetItem(_index: integer; _item: string);
+    procedure SetItem(_index: integer; _item: string); overload;
     function GetItems(_delimiter: char): string;
     procedure SetFontSize(_txtFontSize: DWord);
     procedure SetFontSizeUnit(_unit: TFontSizeUnit);
@@ -78,6 +80,10 @@ TOnItemSelected = procedure(Sender: TObject; itemCaption: string; itemIndex: int
     procedure SetSelectedIndex(_index: integer);
     function GetSelectedIndex(): integer;
 
+    procedure SetItem(_index: integer; _item: string; _strTag: string);  overload;
+    procedure Add(_item: string; _strTag: string);  overload;
+    function GetItemTagString(_index: integer): string;
+    procedure SetItemTagString(_index: integer; _strTag: string);
 
     procedure GenEvent_OnSpinnerItemSeleceted(Obj: TObject; caption: string; position: integer);
 
@@ -96,7 +102,6 @@ TOnItemSelected = procedure(Sender: TObject; itemCaption: string; itemIndex: int
     property FontSize: Dword read FFontSize write SetFontSize;
     property FontSizeUnit: TFontSizeUnit read FFontSizeUnit write SetFontSizeUnit;
     property Alignment: TTextAlignment read FTextAlignment write SetTextAlignment;
-
     property FontFace: TFontFace read FFontFace write SetFontFace default ffNormal;
     property TextTypeFace: TTextTypeFace read FTextTypeFace write SetTextTypeFace;
     property SelectedIndex: integer read GetSelectedIndex write SetSelectedIndex;
@@ -116,7 +121,7 @@ procedure jSpinner_SetLayoutAll(env: PJNIEnv; _jspinner: JObject; _idAnchor: int
 procedure jSpinner_SetId(env: PJNIEnv; _jspinner: JObject; _id: integer);
 function jSpinner_GetSelectedItemPosition(env: PJNIEnv; _jspinner: JObject): integer;
 function jSpinner_GetSelectedItem(env: PJNIEnv; _jspinner: JObject): string;
-procedure jSpinner_Add(env: PJNIEnv; _jspinner: JObject; _item: string);
+procedure jSpinner_Add(env: PJNIEnv; _jspinner: JObject; _item: string); overload;
 procedure jSpinner_Clear(env: PJNIEnv; _JSpinner: JObject);
 procedure jSpinner_SetSelectedTextColor(env: PJNIEnv; _jspinner: JObject; _color: integer);
 procedure jSpinner_SetDropListTextColor(env: PJNIEnv; _jspinner: JObject; _color: integer);
@@ -125,7 +130,7 @@ procedure jSpinner_SetLastItemAsPrompt(env: PJNIEnv; _jspinner: JObject; _hasPro
 function jSpinner_GetSize(env: PJNIEnv; _jspinner: JObject): integer;
 procedure jSpinner_Delete(env: PJNIEnv; _jspinner: JObject; _index: integer);
 procedure jSpinner_SetSelection(env: PJNIEnv; _jspinner: JObject; _index: integer);
-procedure jSpinner_SetItem(env: PJNIEnv; _jspinner: JObject; _index: integer; _item: string);
+procedure jSpinner_SetItem(env: PJNIEnv; _jspinner: JObject; _index: integer; _item: string); overload;
 
 procedure jSpinner_SetTextFontSize(env: PJNIEnv; _jspinner: JObject; _txtFontSize: integer);
 procedure jSpinner_SetFontSizeUnit(env: PJNIEnv; _jspinner: JObject; _unit: integer);
@@ -135,6 +140,12 @@ function jSpinner_GetText(env: PJNIEnv; _jspinner: JObject): string;
 procedure jSpinner_SetText(env: PJNIEnv; _jspinner: JObject; _index: integer);
 procedure jSpinner_SetSelectedIndex(env: PJNIEnv; _jspinner: JObject; _index: integer);
 function jSpinner_GetSelectedIndex(env: PJNIEnv; _jspinner: JObject): integer;
+
+procedure jSpinner_SetItem(env: PJNIEnv; _jspinner: JObject; _index: integer; _item: string; _strTag: string); overload;
+procedure jSpinner_Add(env: PJNIEnv; _jspinner: JObject; _item: string; _strTag: string); overload;
+function jSpinner_GetItemTagString(env: PJNIEnv; _jspinner: JObject; _index: integer): string;
+procedure jSpinner_SetItemTagString(env: PJNIEnv; _jspinner: JObject; _index: integer; _strTag: string);
+
 
 
 
@@ -167,7 +178,7 @@ begin
   FLastItemAsPrompt:= False;
   FFontSize:= 0;
 
-  FTextAlignment:= taCenter;
+  FTextAlignment:= taCenter; //taCenterHorizontal
 
   FFontFace:= ffNormal;
   FTextTypeFace:= tfNormal;
@@ -269,8 +280,6 @@ begin
   if FDropListBackgroundColor <> colbrDefault then
      Self.SetDropListBackgroundColor(FDropListBackgroundColor);
 
-  if FLastItemAsPrompt then Self.SetLastItemAsPrompt(FLastItemAsPrompt);
-
   if FFontSizeUnit <> unitDefault then
        jSpinner_SetFontSizeUnit(FjEnv, FjObject, Ord(FFontSizeUnit));
 
@@ -285,21 +294,22 @@ begin
      jSpinner_Add(FjEnv, FjObject , FItems.Strings[i]);
   end;
 
-  if FSelectedIndex > -1 then
+  if FItems.Count > 0 then
   begin
-     if FSelectedIndex > (FItems.Count-1) then FSelectedIndex:= FItems.Count-1;
-     jSpinner_SetSelectedIndex(FjEnv, FjObject, FSelectedIndex)
-  end
-  else
-  begin
-    if FItems.Count > 0 then
-    begin
-       FSelectedIndex:= 0;
-       jSpinner_SetSelectedIndex(FjEnv, FjObject, 0);
-    end;
+     if FSelectedIndex <= -1  then  FSelectedIndex:= 0;
+     if FSelectedIndex >= FItems.Count then FSelectedIndex:= FItems.Count-1;
   end;
 
+  if FLastItemAsPrompt then
+  begin
+     jSpinner_SetLastItemAsPrompt(FjEnv, FjObject , FLastItemAsPrompt);
+     if (FSelectedIndex <> FItems.Count-1) then FSelectedIndex:= FItems.Count-1;
+  end;
+
+  jSpinner_SetSelectedIndex(FjEnv, FjObject, FSelectedIndex);
+
   View_SetVisible(FjEnv, FjThis, FjObject , FVisible);
+
 end;
 
 procedure jSpinner.SetColor(Value: TARGBColorBridge);
@@ -628,6 +638,34 @@ begin
     FSelectedIndex:= jSpinner_GetSelectedIndex(FjEnv, FjObject);
   end;
   Result:= FSelectedIndex;
+end;
+
+procedure jSpinner.SetItem(_index: integer; _item: string; _strTag: string);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jSpinner_SetItem(FjEnv, FjObject, _index ,_item ,_strTag);
+end;
+
+procedure jSpinner.Add(_item: string; _strTag: string);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jSpinner_Add(FjEnv, FjObject, _item ,_strTag);
+end;
+
+function jSpinner.GetItemTagString(_index: integer): string;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jSpinner_GetItemTagString(FjEnv, FjObject, _index);
+end;
+
+procedure jSpinner.SetItemTagString(_index: integer; _strTag: string);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jSpinner_SetItemTagString(FjEnv, FjObject, _index ,_strTag);
 end;
 
 //TODO
@@ -1079,5 +1117,77 @@ begin
   env^.DeleteLocalRef(env, jCls);
 end;
 
+procedure jSpinner_SetItem(env: PJNIEnv; _jspinner: JObject; _index: integer; _item: string; _strTag: string);
+var
+  jParams: array[0..2] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].i:= _index;
+  jParams[1].l:= env^.NewStringUTF(env, PChar(_item));
+  jParams[2].l:= env^.NewStringUTF(env, PChar(_strTag));
+  jCls:= env^.GetObjectClass(env, _jspinner);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetItem', '(ILjava/lang/String;Ljava/lang/String;)V');
+  env^.CallVoidMethodA(env, _jspinner, jMethod, @jParams);
+env^.DeleteLocalRef(env,jParams[1].l);
+  env^.DeleteLocalRef(env,jParams[2].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+
+procedure jSpinner_Add(env: PJNIEnv; _jspinner: JObject; _item: string; _strTag: string);
+var
+  jParams: array[0..1] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_item));
+  jParams[1].l:= env^.NewStringUTF(env, PChar(_strTag));
+  jCls:= env^.GetObjectClass(env, _jspinner);
+  jMethod:= env^.GetMethodID(env, jCls, 'Add', '(Ljava/lang/String;Ljava/lang/String;)V');
+  env^.CallVoidMethodA(env, _jspinner, jMethod, @jParams);
+env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env,jParams[1].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+
+
+function jSpinner_GetItemTagString(env: PJNIEnv; _jspinner: JObject; _index: integer): string;
+var
+  jStr: JString;
+  jBoo: JBoolean;
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].i:= _index;
+  jCls:= env^.GetObjectClass(env, _jspinner);
+  jMethod:= env^.GetMethodID(env, jCls, 'GetItemTagString', '(I)Ljava/lang/String;');
+  jStr:= env^.CallObjectMethodA(env, _jspinner, jMethod, @jParams);
+  case jStr = nil of
+     True : Result:= '';
+     False: begin
+              jBoo:= JNI_False;
+              Result:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
+            end;
+  end;
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jSpinner_SetItemTagString(env: PJNIEnv; _jspinner: JObject; _index: integer; _strTag: string);
+var
+  jParams: array[0..1] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].i:= _index;
+  jParams[1].l:= env^.NewStringUTF(env, PChar(_strTag));
+  jCls:= env^.GetObjectClass(env, _jspinner);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetItemTagString', '(ILjava/lang/String;)V');
+  env^.CallVoidMethodA(env, _jspinner, jMethod, @jParams);
+env^.DeleteLocalRef(env,jParams[1].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
 
 end.

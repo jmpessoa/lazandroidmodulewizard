@@ -848,6 +848,8 @@ type
     FOnChanged : TOnChange;
     FEditable: boolean;
 
+    FTextAlignment: TTextAlignment;
+
     Procedure SetColor    (Value : TARGBColorBridge);
 
     Procedure SetFontColor(Value : TARGBColorBridge);
@@ -937,6 +939,7 @@ type
   published
     property Text: string read GetText write SetText;
     property Alignment: TTextAlignment read FTextAlignment write SetTextAlignment;
+
     property InputTypeEx : TInputTypeEx read FInputTypeEx write SetInputTypeEx;
     property MaxTextLength : integer read FMaxTextLength write SetTextMaxLength;
     property BackgroundColor: TARGBColorBridge read FColor write SetColor;
@@ -1206,21 +1209,6 @@ type
      // Event
      property OnClick: TOnNotify read FOnClick write FOnClick;
   end;
-
-
-  TTextDecorated = (txtNormal,
-                    txtNormalAndItalic,
-                    txtNormalAndBold,
-                    txtBold,
-                    txtBoldAndNormal,
-                    txtBoldAndItalic,
-                    txtItalic,
-                    txtItalicAndNormal,
-                    txtItalicAndBold);
-
-  TTextAlign= (alLeft, alCenter, alRight);
-
-  TTextSizeDecorated = (sdNone, sdDecreasing, sdIncreasing);
 
   jListView = class(jVisualControl)
   private
