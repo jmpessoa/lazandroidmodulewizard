@@ -337,8 +337,8 @@ public class jSpinner extends Spinner /*dummy*/ { //please, fix what GUI object 
     }
 
     public String GetSelectedItem() {
-    	//int i = this.getSelectedItemPosition();
-    	//mSelectedText = mStrList.get(i).label;    	
+    	int i = this.getSelectedItemPosition();
+    	mSelectedText = mStrList.get(i).label;    	
         return mSelectedText;
     }
 
@@ -432,8 +432,8 @@ public class jSpinner extends Spinner /*dummy*/ { //please, fix what GUI object 
     }
     
     public String GetText() {    	
-    	//int i = this.getSelectedItemPosition();
-    	//mSelectedText = mStrList.get(i).label;
+    	int i = this.getSelectedItemPosition();
+    	mSelectedText = mStrList.get(i).label;
         return mSelectedText;
     }
     
