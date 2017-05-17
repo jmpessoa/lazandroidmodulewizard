@@ -1,4 +1,4 @@
-package com.example.appspinnerdemo;
+package org.lamw.appadsdemo1;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -456,8 +456,7 @@ class jArrayAdapter extends ArrayAdapter {
 					imgParam.leftMargin = 10;					
 					imgParam.addRule(RelativeLayout.CENTER_VERTICAL);
 					
-					itemLayout.addView(itemImage, imgParam);
-					
+					itemLayout.addView(itemImage, imgParam);					
 				}
 
 				txtParam.leftMargin = 10;
@@ -474,11 +473,8 @@ class jArrayAdapter extends ArrayAdapter {
 				if (itemWidget != null) {
 					widgetParam.rightMargin = 10;
 					widgetParam.leftMargin = 10;					
-					widgetParam.addRule(RelativeLayout.CENTER_VERTICAL);					
-					if (items.get(position).textAlign != 2) {
-						widgetParam.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
-					}else {widgetParam.addRule(RelativeLayout.CENTER_HORIZONTAL);}
-					
+					widgetParam.addRule(RelativeLayout.CENTER_VERTICAL);							
+					widgetParam.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);					
 					itemLayout.addView(itemWidget, widgetParam);
 				}
 
@@ -505,12 +501,9 @@ class jArrayAdapter extends ArrayAdapter {
 				if (itemImage != null) {
 					
 					imgParam.rightMargin = 10;
-					imgParam.leftMargin = 10;					
-					imgParam.addRule(RelativeLayout.CENTER_VERTICAL);
-					
-					if (items.get(position).textAlign != 2) {
-						imgParam.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);}
-					else{imgParam.addRule(RelativeLayout.CENTER_HORIZONTAL);}
+					imgParam.leftMargin = 10;					//Pascal layWidgetTextImage
+					imgParam.addRule(RelativeLayout.CENTER_VERTICAL);					
+					imgParam.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
 
 					itemLayout.addView(itemImage, imgParam);
 				}

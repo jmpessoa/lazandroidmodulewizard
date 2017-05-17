@@ -1,0 +1,20 @@
+C:\android-neon\eclipse\workspace\AppListViewDemo\gen\com\example\applistviewdemo\R.java \
+ : C:\android-neon\eclipse\workspace\AppListViewDemo\res\drawable-hdpi\ic_bullets.png \
+C:\android-neon\eclipse\workspace\AppListViewDemo\res\drawable-hdpi\ic_launcher.png \
+C:\android-neon\eclipse\workspace\AppListViewDemo\res\drawable-ldpi\ic_bullets.png \
+C:\android-neon\eclipse\workspace\AppListViewDemo\res\drawable-mdpi\ic_bullets.png \
+C:\android-neon\eclipse\workspace\AppListViewDemo\res\drawable-mdpi\ic_launcher.png \
+C:\android-neon\eclipse\workspace\AppListViewDemo\res\drawable-xhdpi\ic_bullets.png \
+C:\android-neon\eclipse\workspace\AppListViewDemo\res\drawable-xhdpi\ic_launcher.png \
+C:\android-neon\eclipse\workspace\AppListViewDemo\res\drawable-xxhdpi\ic_bullets.png \
+C:\android-neon\eclipse\workspace\AppListViewDemo\res\drawable-xxhdpi\ic_launcher.png \
+C:\android-neon\eclipse\workspace\AppListViewDemo\res\layout\activity_app.xml \
+C:\android-neon\eclipse\workspace\AppListViewDemo\res\menu\app.xml \
+C:\android-neon\eclipse\workspace\AppListViewDemo\res\values\dimens.xml \
+C:\android-neon\eclipse\workspace\AppListViewDemo\res\values\strings.xml \
+C:\android-neon\eclipse\workspace\AppListViewDemo\res\values\styles.xml \
+C:\android-neon\eclipse\workspace\AppListViewDemo\res\values-sw600dp\dimens.xml \
+C:\android-neon\eclipse\workspace\AppListViewDemo\res\values-sw720dp-land\dimens.xml \
+C:\android-neon\eclipse\workspace\AppListViewDemo\res\values-v11\styles.xml \
+C:\android-neon\eclipse\workspace\AppListViewDemo\res\values-v14\styles.xml \
+C:\android-neon\eclipse\workspace\AppListViewDemo\bin\AndroidManifest.xml \

@@ -337,7 +337,8 @@ public class jSpinner extends Spinner /*dummy*/ { //please, fix what GUI object 
     }
 
     public String GetSelectedItem() {
-    	mSelectedText = this.getSelectedItem().toString();
+    	//int i = this.getSelectedItemPosition();
+    	//mSelectedText = mStrList.get(i).label;    	
         return mSelectedText;
     }
 
@@ -430,8 +431,9 @@ public class jSpinner extends Spinner /*dummy*/ { //please, fix what GUI object 
         mSpAdapter.SetFontAndTextTypeFace(t, _fontStyle);
     }
     
-    public String GetText() {
-    	mSelectedText = this.getSelectedItem().toString();
+    public String GetText() {    	
+    	//int i = this.getSelectedItemPosition();
+    	//mSelectedText = mStrList.get(i).label;
         return mSelectedText;
     }
     
