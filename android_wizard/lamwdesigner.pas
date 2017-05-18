@@ -112,11 +112,14 @@ type
   protected
     FAndroidWidget: TAndroidWidget;      // original
     FCanvas: TCanvas;                    // canvas to draw onto
-    FnewW, FnewH, FnewL, FnewT: Integer; // layout
-    FminW, FminH: Integer;
+    FLeftTop, FRightBottom: TPoint;      // layout
+    FMinWidth, FMinHeight: Integer;
     function GetParentBackgroundColor: TARGBColorBridge;
     function GetBackGroundColor: TColor;
     function DefaultTextColor: TColor; virtual;
+    function GetNewWidth: Integer;
+    function GetNewHeight: Integer;
+    procedure SetBounds;
   public
     BackGroundColor: TColor;
     TextColor: TColor;
@@ -1611,7 +1614,7 @@ end;
 constructor TDraftWidget.Create(AWidget: TAndroidWidget; Canvas: TCanvas);
 var
   x: TLayoutParams;
-  y, z: Integer;
+  y, z, FnewW, FnewH: Integer;
 begin
   TextColor:= clNone;
   BackGroundColor:= clNone;
@@ -1621,20 +1624,21 @@ begin
 
   with jVisualControl(FAndroidWidget) do
   begin
-    FnewW := Width;
-    FnewH := Height;
-    FnewL := Left;
-    FnewT := Top;
+    FLeftTop := Point(-1, -1);
+    FRightBottom := Point(-1, -1);
+    FMinWidth := 0;
+    FMinHeight := 0;
     with Designer do
       if FSizing and (FSelection.IndexOf(AWidget) >= 0)
       and (Parent <> nil) then
       begin
         if not (LayoutParamWidth in [lpWrapContent, lpExact, lpUseWeight]) then
         begin
+          FnewW := Width;
           x := GetDesignerLayoutByWH(FnewW, Parent.Width);
           y := GetLayoutParamsByParent2(Parent, x, sdW);
           if LayoutParamWidth = lpMatchParent then
-            z := Parent.Width - MarginLeft - FnewL - MarginRight
+            z := Parent.Width - MarginLeft - FLeftTop.x - MarginRight
           else
             z := GetLayoutParamsByParent2(Parent, LayoutParamWidth, sdW);
           if (z <> FnewW) and (Abs(y - FnewW) < Abs(z - FnewW)) then
@@ -1642,10 +1646,11 @@ begin
         end;
         if not (LayoutParamHeight in [lpWrapContent, lpExact, lpUseWeight]) then
         begin
+          FnewH := Height;
           x := GetDesignerLayoutByWH(FnewH, Parent.Height);
           y := GetLayoutParamsByParent2(Parent, x, sdH);
           if LayoutParamHeight = lpMatchParent then
-            z := Parent.Height - MarginTop - FnewT - MarginBottom
+            z := Parent.Height - MarginTop - FLeftTop.y - MarginBottom
           else
             z := GetLayoutParamsByParent2(Parent, LayoutParamHeight, sdH);
           if (z <> FnewH) and (Abs(y - FnewH) < Abs(z - FnewH)) then
@@ -1679,6 +1684,8 @@ begin
 end;
 
 procedure TDraftWidget.UpdateLayout;
+var
+  FnewW, FnewH: Integer;
 begin
   with jVisualControl(FAndroidWidget) do
   begin
@@ -1687,91 +1694,83 @@ begin
     if Assigned(Parent) then
     begin
       case lpWidth of
-        lpExact: FNewW := Width;
-        lpMatchParent: { will be handled after NewL };
+        lpMatchParent:
+          if Assigned(Parent) then
+          begin
+            FLeftTop.x := MarginLeft;
+            FRightBottom.x := Parent.Width - MarginRight;
+          end;
         lpWrapContent:
           if ChildCount > 0 then
-            FNewW := WrapContentWidthByChildren;
-        else
+          begin
+            FnewW := WrapContentWidthByChildren;
+            FMinWidth := FnewW;
+          end;
+        else begin
           FnewW := GetLayoutParamsByParent2(Parent, lpWidth, sdW);
+          FMinWidth := FnewW;
+        end;
       end;
       case lpHeight of
-        lpExact: FNewH := Height;
-        lpMatchParent: { will be handled after NewT };
+        lpMatchParent:
+          if Assigned(Parent) then
+          begin
+            FLeftTop.y := MarginTop;
+            FRightBottom.y := Parent.Height - MarginBottom;
+          end;
         lpWrapContent:
           if ChildCount > 0 then
-            FNewH := WrapContentHeightByChildren;
-        else
+          begin
+            FnewH := WrapContentHeightByChildren;
+            FMinHeight := FnewH;
+          end;
+        else begin
           FnewH := GetLayoutParamsByParent2(Parent, lpHeight, sdH);
+          FMinHeight := FnewH;
+        end;
       end;
-      if FnewW < FminW then FnewW := FminW;
-      if FnewH < FminH then FnewH := FminH;
-      if (PosRelativeToParent <> []) or (PosRelativeToAnchor <> []) then
-      begin
-        FnewL := MarginLeft;
-        FnewT := MarginTop;
-      end;
+      if (rpRight in PosRelativeToParent) and Assigned(Parent) then
+        FRightBottom.x := Parent.Width - MarginRight;
+      if rpLeft in PosRelativeToParent then
+        FLeftTop.x := MarginLeft;
+      if rpTop in PosRelativeToParent then
+        FLeftTop.y := MarginTop;
+      if (rpBottom in PosRelativeToParent) and Assigned(Parent) then
+        FRightBottom.y := Parent.Height - MarginBottom;
       if rpCenterHorizontal in PosRelativeToParent then
-        FnewL := (Parent.Width - FnewW) div 2;
+        FLeftTop.x := (Parent.Width - GetNewWidth) div 2;
       if rpCenterVertical in PosRelativeToParent then
-        FnewT := (Parent.Height - FnewH) div 2;
+        FLeftTop.y := (Parent.Height - GetNewHeight) div 2;
       if rpCenterInParent in PosRelativeToParent then
       begin
-        FnewL := (Parent.Width - FnewW) div 2;
-        FnewT := (Parent.Height - FnewH) div 2;
+        FLeftTop.x := (Parent.Width - GetNewWidth) div 2;
+        FLeftTop.y := (Parent.Height - GetNewHeight) div 2;
       end;
-      if rpRight in PosRelativeToParent then
-        if not (rpLeft in PosRelativeToParent) then
-          FnewL := Parent.Width - Width - MarginRight
-        else begin
-          FnewL := MarginRight;
-          FnewW := Parent.Width - MarginRight - MarginLeft;
-        end
-      else
-      if rpLeft in PosRelativeToParent then
-        FnewL := MarginLeft;
-      if rpTop in PosRelativeToParent then
-        if not (rpBottom in PosRelativeToParent) then
-          FnewT := MarginTop
-        else begin
-          FnewT := MarginTop;
-          FnewH := Parent.Height - MarginTop - MarginBottom;
-        end
-      else
-      if rpBottom in PosRelativeToParent then
-        FnewT := Parent.Height - MarginBottom - Height;
       { TODO: rpStart, rpEnd }
     end;
     if Anchor <> nil then
     begin
       if raBelow in PosRelativeToAnchor then
-        FnewT := Anchor.Top + Anchor.Height + Anchor.MarginBottom + MarginTop;
+        FLeftTop.y := Anchor.Top + Anchor.Height + Anchor.MarginBottom + MarginTop;
       if raAbove in PosRelativeToAnchor then
-        FnewT := Anchor.Top - Height - MarginBottom - Anchor.MarginTop;
+        FLeftTop.y := Anchor.Top - Height - MarginBottom - Anchor.MarginTop;
       if raToRightOf in PosRelativeToAnchor then
-        FnewL := Anchor.Left + Anchor.Width + Anchor.MarginRight + MarginLeft;
+        FLeftTop.x := Anchor.Left + Anchor.Width + Anchor.MarginRight + MarginLeft;
       if raAlignBaseline in PosRelativeToAnchor then
-        FnewT := Anchor.Top + (Anchor.Height - Height) div 2;
+        FLeftTop.y := Anchor.Top + (Anchor.Height - Height) div 2;
       if raAlignLeft in PosRelativeToAnchor then
-        FnewL := Anchor.Left + MarginLeft;
+        FLeftTop.x := Anchor.Left + MarginLeft;
       if raToEndOf in PosRelativeToAnchor then
-        FnewL := Anchor.Left + Anchor.Width + Anchor.MarginRight + MarginLeft;
+        FLeftTop.x := Anchor.Left + Anchor.Width + Anchor.MarginRight + MarginLeft;
       if raAlignTop in PosRelativeToAnchor then
-        FnewT := Anchor.Top + MarginTop;
+        FLeftTop.y := Anchor.Top + MarginTop;
       { TODO: other combinations }
       if ([raBelow, raAlignBottom] * PosRelativeToAnchor <> [])
       and Assigned(Parent) and (rpBottom in PosRelativeToParent) then
-        FnewH := Parent.Height - MarginBottom - FnewT;
+        FRightBottom.y := Parent.Height - MarginBottom;
     end;
-    if Assigned(Parent) then
-    begin
-      if lpWidth = lpMatchParent then
-        FnewW := Parent.Width - MarginLeft - FnewL - MarginRight;
-      if lpHeight = lpMatchParent then
-        FnewH := Parent.Height - MarginTop - FnewT - MarginBottom;
-    end;
-    SetBounds(FnewL, FnewT, FnewW, FnewH);
   end;
+  SetBounds;
 end;
 
 procedure TDraftWidget.SetColor(AColor: TARGBColorBridge);
@@ -1900,6 +1899,55 @@ begin
   Result := Designer.FDefaultFontColor;
 end;
 
+function TDraftWidget.GetNewWidth: Integer;
+begin
+  if (FLeftTop.x >= 0) and (FRightBottom.x >= 0) then
+    Result := FRightBottom.x - FLeftTop.x
+  else
+  if FMinWidth > 0 then
+    Result := FMinWidth
+  else
+    Result := Width;
+  if Result < FMinWidth then
+    Result := FMinWidth;
+end;
+
+function TDraftWidget.GetNewHeight: Integer;
+begin
+  if (FLeftTop.y >= 0) and (FRightBottom.y >= 0) then
+    Result := FRightBottom.y - FLeftTop.y
+  else
+  if FMinHeight > 0 then
+    Result := FMinHeight
+  else
+    Result := Height;
+  if Result < FMinHeight then
+    Result := FMinHeight;
+end;
+
+procedure TDraftWidget.SetBounds;
+var
+  newWidth, newHeight: Integer;
+begin
+  newWidth := GetNewWidth;
+  newHeight := GetNewHeight;
+
+  if FLeftTop.x < 0 then
+    if FRightBottom.x >= 0 then
+      FLeftTop.x := FRightBottom.x - newWidth
+    else
+      FLeftTop.x := jVisualControl(FAndroidWidget).Left;
+
+  if FLeftTop.y < 0 then
+    if FRightBottom.y >= 0 then
+      FLeftTop.y := FRightBottom.y - newHeight
+    else
+      FLeftTop.y := jVisualControl(FAndroidWidget).Top;
+
+  with jVisualControl(FAndroidWidget) do
+    SetBounds(FLeftTop.x, FLeftTop.y, newWidth, newHeight);
+end;
+
 { TDraftButton }
 
 constructor TDraftButton.Create(AWidget: TAndroidWidget; Canvas: TCanvas);
@@ -1955,8 +2003,8 @@ begin
   with jButton(FAndroidWidget) do
     if LayoutParamHeight = lpWrapContent then
     begin
-      FnewH := 14 + AndroidToLCLFontSize(jButton(FAndroidWidget).FontSize, 13) + 13;
-      if FnewH < 40 then FnewH := 40;
+      FMinHeight := 14 + AndroidToLCLFontSize(jButton(FAndroidWidget).FontSize, 13) + 13;
+      if FMinHeight < 40 then FMinHeight := 40;
     end;
   inherited UpdateLayout;
 end;
@@ -2011,9 +2059,9 @@ begin
       with TextExtent(Text) do
       begin
         if LayoutParamWidth = lpWrapContent then
-          FnewW := cx;
+          FMinWidth := cx;
         if LayoutParamHeight = lpWrapContent then
-          FnewH := cy + 2 + (ps + 5) div 10;
+          FMinHeight := cy + 2 + (ps + 5) div 10;
       end;
       Font.Size := lastSize;
     end;
@@ -2072,7 +2120,7 @@ begin
     begin
       fs := FontSize;
       if fs = 0 then fs := 18;
-      FnewH := 29 + (fs - 10) * 4 div 3; // todo: multiline
+      FMinHeight := 29 + (fs - 10) * 4 div 3; // todo: multiline
     end;
   inherited;
 end;
@@ -2129,7 +2177,7 @@ begin
     begin
       fs := FontSize;
       if fs = 0 then fs := 18;
-      FnewH := 29 + (fs - 10) * 4 div 3; // todo: multiline
+      FMinHeight := 29 + (fs - 10) * 4 div 3; // todo: multiline
     end;
   inherited UpdateLayout;
 end;
@@ -2188,13 +2236,13 @@ begin
   with jCheckBox(FAndroidWidget) do
   begin
     if LayoutParamHeight = lpWrapContent then
-      FnewH := 32;
+      FMinHeight := 32;
     if LayoutParamWidth = lpWrapContent then
     begin
       ps := AndroidToLCLFontSize(FontSize, 12);
       ls := FCanvas.Font.Size;
       FCanvas.Font.Size := ps;
-      FnewW := 33 + FCanvas.TextWidth(Text);
+      FMinWidth := 33 + FCanvas.TextWidth(Text);
       FCanvas.Font.Size := ls;
     end;
   end;
@@ -2249,13 +2297,13 @@ begin
   with jRadioButton(FAndroidWidget) do
   begin
     if LayoutParamHeight = lpWrapContent then
-      FnewH := 32;
+      FMinHeight := 32;
     if LayoutParamWidth = lpWrapContent then
     begin
       ps := AndroidToLCLFontSize(FontSize, 12);
       ls := FCanvas.Font.Size;
       FCanvas.Font.Size := ps;
-      FnewW := 33 + FCanvas.TextWidth(Text);
+      FMinWidth := 33 + FCanvas.TextWidth(Text);
       FCanvas.Font.Size := ls;
     end;
   end;
@@ -2309,7 +2357,7 @@ procedure TDraftProgressBar.UpdateLayout;
 begin
   with jProgressBar(FAndroidWidget) do
     if LayoutParamHeight = lpWrapContent then
-      FnewH := 23;
+      FMinHeight := 23;
   inherited UpdateLayout;
 end;
 
@@ -2362,7 +2410,7 @@ procedure TDraftSeekBar.UpdateLayout;
 begin
   with jSeekBar(FAndroidWidget) do
     if LayoutParamHeight = lpWrapContent then
-      FnewH := 23;
+      FMinHeight := 23;
   inherited UpdateLayout;
 end;
 
@@ -2473,9 +2521,9 @@ begin
     if im <> nil then
     begin
       if LayoutParamHeight = lpWrapContent then
-        FnewH := im.Height + 3;
+        FMinHeight := im.Height + 3;
       if LayoutParamWidth = lpWrapContent then
-        FnewW := im.Width + 3;
+        FMinWidth := im.Width + 3;
     end;
   end;
   inherited UpdateLayout;
@@ -2528,9 +2576,9 @@ begin
     if im <> nil then
     begin
       if LayoutParamHeight = lpWrapContent then
-        FnewH := im.Height;
+        FMinHeight := im.Height;
       if LayoutParamWidth = lpWrapContent then
-        FnewW := im.Width;
+        FMinWidth := im.Width;
     end;
   end;
   inherited UpdateLayout;
@@ -2879,9 +2927,9 @@ begin
   with jRatingBar(FAndroidWidget) do
   begin
     if LayoutParamHeight = lpWrapContent then
-      FnewH := 57;
+      FMinHeight := 57;
     if LayoutParamWidth = lpWrapContent then
-      FnewW := 48 * NumStars;
+      FMinWidth := 48 * NumStars;
   end;
   inherited UpdateLayout;
 end;
@@ -3087,7 +3135,7 @@ procedure TDraftSwitchButton.UpdateLayout;
 var
   ps, x, y: Integer;
 begin
-  FminH := 28;
+  FMinHeight := 28;
   with jSwitchButton(FAndroidWidget) do
   begin
     if LayoutParamWidth = lpWrapContent then
@@ -3101,11 +3149,11 @@ begin
         x := 2 * (x + 22 + 2);
         if x < 92 then x := 92;
         x := x + 4;
-        FnewW := x;
+        FMinWidth := x;
         Font.Size := ps;
       end;
     if LayoutParamHeight = lpWrapContent then
-      FnewH := 28
+      FMinHeight := 28
   end;
   inherited;
 end;
