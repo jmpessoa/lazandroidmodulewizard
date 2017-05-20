@@ -652,6 +652,8 @@ type
 
   TOnWidgeItemLostFocus = Procedure(Sender: TObject; itemIndex: integer; widgetText: string) of object;
 
+  TOnScrollStateChanged = Procedure(Sender: TObject; firstVisibleItem: integer; visibleItemCount: integer; totalItemCount: integer; lastItemReached: boolean) of object;
+
   TOnEditLostFocus = Procedure(Sender: TObject; text: string) of object;
 
   TOnDrawItemTextColor = Procedure(Sender: TObject; itemIndex: integer; itemCaption: string; out textColor: TARGBColorBridge) of Object;
@@ -978,6 +980,8 @@ end;
     FOnListItemClick  : TListItemClick;
 
     FScreenWH      : TWH;
+    FPackageName: string;
+
     FScreenStyle   : TScreenStyle;
 
     FAnimation     : TAnimation;
@@ -1208,6 +1212,7 @@ end;
     property  OnViewClick: TViewClick read FOnViewClick write FOnViewClick;
     property  OnListItemClick: TListItemClick read FOnListItemClick write FOnListItemClick;
 
+    property PackageName: string read FPackageName;
     //---------------  dummies for compatibility----
     {
     property OldCreateOrder: boolean read FOldCreateOrder write FOldCreateOrder;
@@ -2677,6 +2682,8 @@ begin
   FScreenStyle:= refApp.Orientation;
 
   FScreenWH:= refApp.Screen.WH;   //sAved on start!
+
+  FPackageName:= refApp.AppName;
 
   ScreenStyleAtStart:= FScreenStyle;   //saved on start!
 

@@ -52,6 +52,9 @@ type
         itemCaption: string);
       procedure jListView2ClickWidgetItem(Sender: TObject; itemIndex: integer;
         checked: boolean);
+      procedure jListView2ScrollStateChanged(Sender: TObject;
+        firstVisibleItem: integer; visibleItemCount: integer;
+        totalItemCount: integer; lastItemReached: boolean);
       procedure jListView3AfterDispatchDraw(Obj: TObject; canvas: JObject;
         tag: integer);
       procedure jListView3BeforeDispatchDraw(Obj: TObject; canvas: JObject;
@@ -223,6 +226,13 @@ begin
   //ShowMessage('Ok');
   jListView2.Tag:= itemIndex;
   //jNumberPicker1.Show('Qantidade');
+end;
+
+procedure TAndroidModule1.jListView2ScrollStateChanged(Sender: TObject;
+  firstVisibleItem: integer; visibleItemCount: integer;
+  totalItemCount: integer; lastItemReached: boolean);
+begin
+  if lastItemReached then ShowMessage('last!');
 end;
 
 procedure TAndroidModule1.jListView3AfterDispatchDraw(Obj: TObject;

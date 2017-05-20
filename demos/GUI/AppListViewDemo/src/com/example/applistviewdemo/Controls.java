@@ -1,6 +1,6 @@
 package com.example.applistviewdemo;
 
-//LAMW: Lazarus Android Module Wizard  - version 0.7 - rev. 17 - 14 May - 2017 
+//LAMW: Lazarus Android Module Wizard  - version 0.7 - rev. 18 - 20 May - 2017 
 //RAD Android: Project Wizard, Form Designer and Components Development Model!
 
 //https://github.com/jmpessoa/lazandroidmodulewizard
@@ -1933,6 +1933,7 @@ public native void pOnListViewLongClickCaptionItem(long pasobj, int position, St
 public native int pOnListViewDrawItemCaptionColor(long pasobj, int position, String caption);
 public native Bitmap pOnListViewDrawItemBitmap(long pasobj, int position, String caption);
 public native void pOnWidgeItemLostFocus(long pasobj, int position, String widgetText);
+public native void pOnListViewScrollStateChanged(long pasobj, int firstVisibleItem, int visibleItemCount, int totalItemCount, boolean lastItemReached);
 
 public  java.lang.Object jTextView_Create(long pasobj) {
   return (java.lang.Object)( new jTextView(this.activity,this,pasobj));

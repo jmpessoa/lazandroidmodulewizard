@@ -93,7 +93,7 @@ object AndroidModule1: TAndroidModule1
     Tag = 1
     Left = 10
     Top = 50
-    Width = 270
+    Width = 280
     Height = 39
     MarginLeft = 10
     MarginTop = 10
@@ -129,7 +129,7 @@ object AndroidModule1: TAndroidModule1
     Tag = 1
     Left = 5
     Top = 152
-    Width = 285
+    Width = 290
     Height = 136
     MarginLeft = 5
     MarginTop = 5
@@ -167,7 +167,7 @@ object AndroidModule1: TAndroidModule1
   object jListView2: jListView
     Left = 5
     Top = 298
-    Width = 285
+    Width = 290
     Height = 106
     MarginLeft = 5
     MarginTop = 5
@@ -184,7 +184,11 @@ object AndroidModule1: TAndroidModule1
     Items.Strings = (
       'Hello'
       'Android'
-      'World!'
+      'World'
+      'Pascal'
+      'LAMW'
+      'Lazarus'
+      'FreePascal'
     )
     BackgroundColor = colbrSkyBlue
     FontColor = colbrDefault
@@ -200,11 +204,12 @@ object AndroidModule1: TAndroidModule1
     FontSizeUnit = unitDefault
     OnClickItem = jListView2ClickItem
     OnClickWidgetItem = jListView2ClickWidgetItem
+    OnScrollStateChanged = jListView2ScrollStateChanged
   end
   object jListView3: jListView
     Left = 5
     Top = 414
-    Width = 285
+    Width = 290
     Height = 106
     MarginLeft = 5
     MarginTop = 5

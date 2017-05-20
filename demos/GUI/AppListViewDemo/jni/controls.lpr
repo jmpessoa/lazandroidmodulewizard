@@ -394,7 +394,18 @@ begin
     widgetText);
 end;
 
-const NativeMethods: array[0..42] of JNINativeMethod = (
+{ Class:     com_example_applistviewdemo_Controls
+  Method:    pOnListViewScrollStateChanged
+  Signature: (JIIIZ)V }
+procedure pOnListViewScrollStateChanged(PEnv: PJNIEnv; this: JObject;
+  pasobj: JLong; firstVisibleItem: JInt; visibleItemCount: JInt;
+  totalItemCount: JInt; lastItemReached: JBoolean); cdecl;
+begin
+  Java_Event_pOnListViewScrollStateChanged(PEnv, this, TObject(pasobj),
+    firstVisibleItem, visibleItemCount, totalItemCount, lastItemReached);
+end;
+
+const NativeMethods: array[0..43] of JNINativeMethod = (
    (name: 'pAppOnCreate';
     signature: '(Landroid/content/Context;Landroid/widget/RelativeLayout;'
       +'Landroid/content/Intent;)V';
@@ -524,7 +535,10 @@ const NativeMethods: array[0..42] of JNINativeMethod = (
     fnPtr: @pOnListViewDrawItemBitmap; ),
    (name: 'pOnWidgeItemLostFocus';
     signature: '(JILjava/lang/String;)V';
-    fnPtr: @pOnWidgeItemLostFocus; )
+    fnPtr: @pOnWidgeItemLostFocus; ),
+   (name: 'pOnListViewScrollStateChanged';
+    signature: '(JIIIZ)V';
+    fnPtr: @pOnListViewScrollStateChanged; )
 );
 
 function RegisterNativeMethodsArray(PEnv: PJNIEnv; className: PChar;
@@ -651,7 +665,9 @@ exports
   pOnListViewDrawItemBitmap name 'Java_com_example_applistviewdemo_Controls_'
     +'pOnListViewDrawItemBitmap',
   pOnWidgeItemLostFocus name 'Java_com_example_applistviewdemo_Controls_'
-    +'pOnWidgeItemLostFocus';
+    +'pOnWidgeItemLostFocus',
+  pOnListViewScrollStateChanged name 'Java_com_example_applistviewdemo_'
+    +'Controls_pOnListViewScrollStateChanged';
 
 {%endregion}
 

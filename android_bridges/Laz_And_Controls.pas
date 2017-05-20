@@ -1218,6 +1218,7 @@ type
     FOnDrawItemTextColor: TOnDrawItemTextColor;
     FOnDrawItemBitmap: TOnDrawItemBitmap;
     FOnWidgeItemLostFocus: TOnWidgeItemLostFocus;
+    FOnScrollStateChanged: TOnScrollStateChanged;
 
     FItems        : TStrings;
     FWidgetItem   : TWidgetItem;
@@ -1262,9 +1263,9 @@ type
     procedure GenEvent_OnDrawItemCaptionColor(Obj: TObject; index: integer; caption: string;  out color: dword);
     procedure GenEvent_OnDrawItemBitmap(Obj: TObject; index: integer; caption: string;  out bitmap: JObject);
     procedure GenEvent_OnWidgeItemLostFocus(Obj: TObject; index: integer; caption: string);
-
     procedure GenEvent_OnBeforeDispatchDraw(Obj: TObject; canvas: JObject; tag: integer);
     procedure GenEvent_OnAfterDispatchDraw(Obj: TObject; canvas: JObject; tag: integer);
+    procedure GenEvent_OnScrollStateChanged(Obj: TObject; firstVisibleItem: integer; visibleItemCount: integer; totalItemCount: integer; lastItemReached: boolean);
 
     procedure Notification(AComponent: TComponent; Operation: TOperation); override;
   public
@@ -1349,6 +1350,7 @@ type
 
     property OnBeforeDispatchDraw: TOnBeforeDispatchDraw read FOnBeforeDispatchDraw write FOnBeforeDispatchDraw;
     property OnAfterDispatchDraw: TOnAfterDispatchDraw read FOnAfterDispatchDraw write FOnAfterDispatchDraw;
+    property OnScrollStateChanged: TOnScrollStateChanged read FOnScrollStateChanged write FOnScrollStateChanged;
 
   end;
 
@@ -1721,6 +1723,7 @@ type
   function  Java_Event_pOnListViewDrawItemCaptionColor(env: PJNIEnv; this: jobject; Obj: TObject; index: integer; caption: JString): JInt;
   function  Java_Event_pOnListViewDrawItemBitmap(env: PJNIEnv; this: jobject; Obj: TObject; index: integer; caption: JString): JObject;
   procedure Java_Event_pOnWidgeItemLostFocus(env: PJNIEnv; this: jobject; Obj: TObject; index: integer;  caption: JString);
+  procedure Java_Event_pOnListViewScrollStateChanged(env: PJNIEnv; this: jobject; Obj: TObject; firstVisibleItem: integer; visibleItemCount: integer; totalItemCount: integer; lastItemReached: JBoolean);
 
   procedure Java_Event_pOnBeforeDispatchDraw(env: PJNIEnv; this: jobject; Obj: TObject; canvas: JObject; tag: integer);
   procedure Java_Event_pOnAfterDispatchDraw(env: PJNIEnv; this: jobject; Obj: TObject; canvas: JObject; tag: integer);
@@ -2445,7 +2448,7 @@ begin
   Result:= outColor;
 end;
 
-function  Java_Event_pOnListViewDrawItemBitmap(env: PJNIEnv; this: jobject; Obj: TObject; index: integer; caption: JString): JObject;
+function Java_Event_pOnListViewDrawItemBitmap(env: PJNIEnv; this: jobject; Obj: TObject; index: integer; caption: JString): JObject;
 var
   pasCaption: string;
   _jBoolean: JBoolean;
@@ -2466,6 +2469,17 @@ begin
     jListVIew(Obj).GenEvent_OnDrawItemBitmap(Obj, index, pasCaption, outBitmap);
   end;
   Result:= outBitmap;
+end;
+
+procedure Java_Event_pOnListViewScrollStateChanged(env: PJNIEnv; this: jobject; Obj: TObject; firstVisibleItem: integer; visibleItemCount: integer; totalItemCount: integer; lastItemReached: JBoolean);
+begin
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+  if Obj is jListVIew then
+  begin
+    jForm(jListVIew(Obj).Owner).UpdateJNI(gApp);
+    jListVIew(Obj).GenEvent_OnScrollStateChanged(Obj, firstVisibleItem, visibleItemCount, totalItemCount, Boolean(lastItemReached) );
+  end;
 end;
 
 Procedure Java_Event_pOnListViewLongClickCaptionItem(env: PJNIEnv; this: jobject; Obj: TObject;index: integer; caption: JString);
@@ -6988,6 +7002,11 @@ procedure jListView.GenEvent_OnDrawItemBitmap(Obj: TObject; index: integer; capt
 begin
   bitmap:=  nil;
   if Assigned(FOnDrawItemBitmap) then FOnDrawItemBitmap(Obj,index,caption, bitmap);
+end;
+
+procedure jListView.GenEvent_OnScrollStateChanged(Obj: TObject; firstVisibleItem: integer; visibleItemCount: integer; totalItemCount: integer; lastItemReached: boolean);
+begin
+  if Assigned(FOnScrollStateChanged) then FOnScrollStateChanged(Obj, firstVisibleItem, visibleItemCount, totalItemCount, lastItemReached);
 end;
 
 procedure jListView.SetHighLightSelectedItem(_value: boolean);

@@ -571,8 +571,9 @@ class jArrayAdapter extends ArrayAdapter {
 //------------------------
 
 public class jListView extends ListView {
+	
 	//Java-Pascal Interface
-	//private long            PasObj   = 0;      // Pascal Obj
+	private long            PasObj   = 0;      // Pascal Obj
 	private Controls        controls = null;   // Control Class for Event
 	private jCommons LAMWCommon;
 
@@ -610,6 +611,11 @@ public class jListView extends ListView {
 
 	int lastSelectedItem = -1;
 	String selectedItemCaption = "";
+	
+    int mCurrentFirstVisibleItem;
+    int mCurrentVisibleItemCount;
+    int mTotalItem;
+
 
 	//Constructor
 	public  jListView(android.content.Context context,
@@ -622,7 +628,8 @@ public class jListView extends ListView {
 		//Connect Pascal I/F
 		
 		controls = ctrls;
-		LAMWCommon = new jCommons(this,context,pasobj);		
+		LAMWCommon = new jCommons(this,context,pasobj);
+		PasObj = pasobj;
 
 		textColor = 0; //dummy: default
 		textSize  = 0; //dummy: default
@@ -635,13 +642,13 @@ public class jListView extends ListView {
 		textSizeDecorated = txtSizeDecorated;
 		textAlign = txtAlign;
 		typeFace = Typeface.DEFAULT;
-
+		
 		setBackgroundColor (0x00000000);
 		setCacheColorHint  (0);
 
 		alist = new ArrayList<jListItemRow>();
 		//simple_list_item_1
-		aadapter = new jArrayAdapter(context, controls, LAMWCommon.getPasObj(), android.R.layout.simple_list_item_1, alist);
+		aadapter = new jArrayAdapter(context, controls, PasObj, android.R.layout.simple_list_item_1, alist);
 
 		setAdapter(aadapter);
 
@@ -718,10 +725,10 @@ public class jListView extends ListView {
 
 						}
 
-						controls.pOnClickCaptionItem(LAMWCommon.getPasObj(), (int) id, alist.get((int) id).label);
+						controls.pOnClickCaptionItem(PasObj, (int) id, alist.get((int) id).label);
 
 					} else {
-						controls.pOnClickCaptionItem(LAMWCommon.getPasObj(), lastSelectedItem, ""); // avoid passing possibly undefined Caption
+						controls.pOnClickCaptionItem(PasObj, lastSelectedItem, ""); // avoid passing possibly undefined Caption
 					}
 
 				}
@@ -736,7 +743,7 @@ public class jListView extends ListView {
 			lastSelectedItem = (int)position;		
 			if (!isEmpty(alist)) {  //  <----- thanks to @renabor					
 					selectedItemCaption = alist.get((int) id).label;
-					controls.pOnListViewLongClickCaptionItem(LAMWCommon.getPasObj(), (int)id, alist.get((int)id).label);
+					controls.pOnListViewLongClickCaptionItem(PasObj, (int)id, alist.get((int)id).label);
 					
 					return false;
 			}		
@@ -744,6 +751,32 @@ public class jListView extends ListView {
 		}
 		});
 
+		
+		this.setOnScrollListener(new AbsListView.OnScrollListener() {
+		    @Override
+		    public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount){
+		    	    mCurrentFirstVisibleItem = firstVisibleItem;
+	                mCurrentVisibleItemCount = visibleItemCount;
+	                mTotalItem = totalItemCount;
+		    }
+		    
+		    @Override	    
+			public void onScrollStateChanged(AbsListView view, int scrollState) { 
+				if (scrollState == OnScrollListener.SCROLL_STATE_IDLE) { //end scrolling --- ScrollCompleted
+					//aadapter.notifyDataSetChanged();	//???
+					
+					boolean isLastItem = false;
+			      	int lastIndexInScreen = mCurrentVisibleItemCount + mCurrentFirstVisibleItem;
+			      	if (lastIndexInScreen>= mTotalItem) {
+			      		isLastItem = true;
+			        }
+					
+					controls.pOnListViewScrollStateChanged(PasObj, mCurrentFirstVisibleItem,mCurrentVisibleItemCount, mTotalItem, isLastItem);										 
+				} 								
+			}
+
+		});
+					
 	}
 
 	//thanks to @renabor
@@ -1159,5 +1192,5 @@ public class jListView extends ListView {
 		//DO YOUR DRAWING ON TOP OF THIS VIEWS CHILDREN
 		controls.pOnAfterDispatchDraw(LAMWCommon.getPasObj(), canvas,scrollposition);	 //handle by pascal side
 	}
-	
+		
 }

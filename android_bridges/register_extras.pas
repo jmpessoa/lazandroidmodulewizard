@@ -8,6 +8,7 @@ interface
 
 uses 
   Classes,
+  modaldialog,
   smswidgetprovider,
   speechtotext,
   texttospeech,
@@ -54,6 +55,7 @@ implementation
   
 Procedure Register;
 begin
+  {$I jmodaldialog_icon.lrs}
   {$I jsmswidgetprovider_icon.lrs}
   {$I jspeechtotext_icon.lrs}
   {$I jtexttospeech_icon.lrs}
@@ -101,6 +103,7 @@ begin
 
   RegisterComponents('Android Bridges Extra',
    [
+      jModalDialog,
       jSMSWidgetProvider,
       jSpeechToText,
       jTextToSpeech,

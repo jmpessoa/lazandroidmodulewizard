@@ -124,6 +124,22 @@
 	*
 	****************************************************************************************************
 
+version 0.7 - rev. 18 - 20 May - 2017 
+
+	NEW! jModalDialog component   //<--- a suggestion by Anton (aka A.S.)!
+			.ShowMessage
+			.InputForActivityResult
+			.QuestionForActivityResult
+
+	NEW! demo AppModalDialogDemo1
+
+	Improved!
+		jListView 
+			New event "OnScrollStateChanged"  //<--- a suggestion by Anton!
+
+	Updated 
+		jListViewDemo
+ 
 version 0.7 - rev. 17 - 14 May - 2017 
 
 	NEW! jSpeechToText component
