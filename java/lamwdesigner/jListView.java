@@ -697,13 +697,14 @@ public class jListView extends ListView {
 		onItemClickListener = new OnItemClickListener() {
 			@Override
 			public void onItemClick(AdapterView <?> parent, View v, int position, long id) {
-				if (canClick) {
-					lastSelectedItem = (int) position;
+				if (canClick) {					
 					if (!isEmpty(alist)) { // this test is necessary !  //  <----- thanks to @renabor
-						if (highLightSelectedItem) {
+						if (highLightSelectedItem) {							
 							if (lastSelectedItem > -1) {
 								DoHighlight(lastSelectedItem, textColor);
+								Log.i("DoHighlight", "lastSelectedItem = " + lastSelectedItem);								
 							}
+							lastSelectedItem = (int) position;
 							DoHighlight((int) id, highLightColor);
 						}
 						if (alist.get((int) id).widget == 2  ) { //radio fix 16-febr-2015
