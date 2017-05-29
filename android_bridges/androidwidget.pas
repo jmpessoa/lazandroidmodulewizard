@@ -329,7 +329,7 @@ type
  TScanLine = Array[0..0] of DWord;
  PScanLine = ^TScanline;
 
- TItemLayout = (layImageTextWidget, layWidgetTextImage, layText);
+ TItemLayout = (layImageTextWidget, layWidgetTextImage, layText);  //layTextTextWidget //layText
 
  TToggleState = (tsOff, tsOn);
 

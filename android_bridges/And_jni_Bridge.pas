@@ -590,6 +590,11 @@ function  jListView_getTotalHeight(env: PJNIEnv; _jlistview: JObject): integer;
 function  jListView_getItemHeight(env: PJNIEnv; _jlistview: JObject; _index: integer): integer;
 procedure jListView_SetImageByResIdentifier(env: PJNIEnv; _jlistview: JObject; _imageResIdentifier: string);
 
+procedure jListView_SetLeftDelimiter(env: PJNIEnv; _jlistview: JObject; _leftDelimiter: string);
+procedure jListView_SetRightDelimiter(env: PJNIEnv; _jlistview: JObject; _rightDelimiter: string);
+function jListView_GetCenterItemCaption(env: PJNIEnv; _jlistview: JObject; _fullItemCaption: string): string;
+function jListView_GetLeftItemCaption(env: PJNIEnv; _jlistview: JObject; _fullItemCaption: string): string;
+function jListView_GetRightItemCaption(env: PJNIEnv; _jlistview: JObject; _fullItemCaption: string): string;
 
 // ScrollView
 Function  jScrollView_Create           (env:PJNIEnv;  this:jobject; SelfObj: TObject): jObject;
@@ -5195,6 +5200,106 @@ begin
   jMethod:= env^.GetMethodID(env, jCls, 'SetImageByResIdentifier', '(Ljava/lang/String;)V');
   env^.CallVoidMethodA(env, _jlistview, jMethod, @jParams);
 env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jListView_SetLeftDelimiter(env: PJNIEnv; _jlistview: JObject; _leftDelimiter: string);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_leftDelimiter));
+  jCls:= env^.GetObjectClass(env, _jlistview);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetLeftDelimiter', '(Ljava/lang/String;)V');
+  env^.CallVoidMethodA(env, _jlistview, jMethod, @jParams);
+  env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+
+procedure jListView_SetRightDelimiter(env: PJNIEnv; _jlistview: JObject; _rightDelimiter: string);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_rightDelimiter));
+  jCls:= env^.GetObjectClass(env, _jlistview);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetRightDelimiter', '(Ljava/lang/String;)V');
+  env^.CallVoidMethodA(env, _jlistview, jMethod, @jParams);
+  env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+function jListView_GetCenterItemCaption(env: PJNIEnv; _jlistview: JObject; _fullItemCaption: string): string;
+var
+  jStr: JString;
+  jBoo: JBoolean;
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_fullItemCaption));
+  jCls:= env^.GetObjectClass(env, _jlistview);
+  jMethod:= env^.GetMethodID(env, jCls, 'GetCenterItemCaption', '(Ljava/lang/String;)Ljava/lang/String;');
+  jStr:= env^.CallObjectMethodA(env, _jlistview, jMethod, @jParams);
+  case jStr = nil of
+     True : Result:= '';
+     False: begin
+              jBoo:= JNI_False;
+              Result:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
+            end;
+  end;
+  env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+
+function jListView_GetLeftItemCaption(env: PJNIEnv; _jlistview: JObject; _fullItemCaption: string): string;
+var
+  jStr: JString;
+  jBoo: JBoolean;
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_fullItemCaption));
+  jCls:= env^.GetObjectClass(env, _jlistview);
+  jMethod:= env^.GetMethodID(env, jCls, 'GetLeftItemCaption', '(Ljava/lang/String;)Ljava/lang/String;');
+  jStr:= env^.CallObjectMethodA(env, _jlistview, jMethod, @jParams);
+  case jStr = nil of
+     True : Result:= '';
+     False: begin
+              jBoo:= JNI_False;
+              Result:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
+            end;
+  end;
+  env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+
+function jListView_GetRightItemCaption(env: PJNIEnv; _jlistview: JObject; _fullItemCaption: string): string;
+var
+  jStr: JString;
+  jBoo: JBoolean;
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_fullItemCaption));
+  jCls:= env^.GetObjectClass(env, _jlistview);
+  jMethod:= env^.GetMethodID(env, jCls, 'GetRightItemCaption', '(Ljava/lang/String;)Ljava/lang/String;');
+  jStr:= env^.CallObjectMethodA(env, _jlistview, jMethod, @jParams);
+  case jStr = nil of
+     True : Result:= '';
+     False: begin
+              jBoo:= JNI_False;
+              Result:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
+            end;
+  end;
+  env^.DeleteLocalRef(env,jParams[0].l);
   env^.DeleteLocalRef(env, jCls);
 end;
 

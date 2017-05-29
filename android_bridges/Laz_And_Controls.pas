@@ -1317,6 +1317,12 @@ type
     function GetItemTagString(_index: integer): string;
     procedure SetImageByResIdentifier(_imageResIdentifier: string);
 
+    procedure SetLeftDelimiter(_leftDelimiter: string);
+    procedure SetRightDelimiter(_rightDelimiter: string);
+    function GetCenterItemCaption(_fullItemCaption: string): string;
+    function GetLeftItemCaption(_fullItemCaption: string): string;
+    function GetRightItemCaption(_fullItemCaption: string): string;
+
     //Property
     property setItemIndex: TXY write SetItemPosition;
     property Count: integer read GetCount;
@@ -7167,6 +7173,41 @@ begin
   FImageItemIdentifier:= _imageResIdentifier;
   if FInitialized then
      jListView_SetImageByResIdentifier(FjEnv, FjObject, _imageResIdentifier);
+end;
+
+procedure jListView.SetLeftDelimiter(_leftDelimiter: string);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jListView_SetLeftDelimiter(FjEnv, FjObject, _leftDelimiter);
+end;
+
+procedure jListView.SetRightDelimiter(_rightDelimiter: string);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jListView_SetRightDelimiter(FjEnv, FjObject, _rightDelimiter);
+end;
+
+function jListView.GetCenterItemCaption(_fullItemCaption: string): string;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jListView_GetCenterItemCaption(FjEnv, FjObject, _fullItemCaption);
+end;
+
+function jListView.GetLeftItemCaption(_fullItemCaption: string): string;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jListView_GetLeftItemCaption(FjEnv, FjObject, _fullItemCaption);
+end;
+
+function jListView.GetRightItemCaption(_fullItemCaption: string): string;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jListView_GetRightItemCaption(FjEnv, FjObject, _fullItemCaption);
 end;
 
 //------------------------------------------------------------------------------

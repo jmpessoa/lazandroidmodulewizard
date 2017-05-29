@@ -71,7 +71,7 @@ II. LAMW:  Lazarus Android Module Wizard
 	.Install order.
 
 		tfpandroidbridge_pack.lpk	[..../android_bridges]
-		lazandroidwizardpack.lpk	[..../project_wizard]
+		lazandroidwizardpack.lpk	[..../android_wizard]
 		amw_ide_tools.lpk		[..../ide_tools]
 
 III. USE
