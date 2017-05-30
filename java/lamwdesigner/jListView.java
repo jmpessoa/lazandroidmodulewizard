@@ -49,6 +49,7 @@ class jListItemRow {
 	boolean checked;
 	int textSize;
 	int textColor;
+	int highLightColor = Color.TRANSPARENT;
 	int textDecorated;
 	int textSizeDecorated;
 	int itemLayout;
@@ -399,9 +400,8 @@ class jArrayAdapter extends ArrayAdapter {
 				
 				if (items.get(position).textAlign == 2) {  //center
 				   itemText[i].setGravity( Gravity.CENTER_HORIZONTAL);
-				}
-								
-				txtLayout.addView(itemText[i]);
+				}											
+				txtLayout.addView(itemText[i]);				
 			}
 			
 			View itemWidget = null;
@@ -534,8 +534,9 @@ class jArrayAdapter extends ArrayAdapter {
 					  txtParam.addRule(RelativeLayout.CENTER_HORIZONTAL);				  
 				  }
 			    }
-								
-				itemLayout.addView(txtLayout, txtParam);
+				
+				
+				itemLayout.addView(txtLayout, txtParam);				
 				
 			} else if (items.get(position).itemLayout == 1) {   //Pascal layWidgetTextImage
 
@@ -652,6 +653,13 @@ class jArrayAdapter extends ArrayAdapter {
 			   itemLayout.addView(txtLayout, txtParam);								
 			} 
 
+            			
+			//itemLayout.setBackgroundColor(Color.YELLOW);  //TODO
+			
+			if (items.get(position).highLightColor != Color.TRANSPARENT)
+				itemLayout.setBackgroundColor(items.get(position).highLightColor);  //TODO
+			
+			
 			listLayout.addView(itemLayout);
 			
 			return listLayout;
@@ -748,9 +756,10 @@ public class jListView extends ListView {
 	private OnTouchListener onTouchListener;
 
 	boolean highLightSelectedItem = false;
-	int highLightColor = Color.RED;
+	int highLightColor = Color.TRANSPARENT; //Color.RED;
 
 	int lastSelectedItem = -1;
+	int lastLongPressSelectedItem = -1;
 	String selectedItemCaption = "";
 	
     int mCurrentFirstVisibleItem;
@@ -794,59 +803,21 @@ public class jListView extends ListView {
 
 		setChoiceMode(ListView.CHOICE_MODE_SINGLE);
 
-		//Init Event
-		//renabor gesture
-		onTouchListener = new OnTouchListener() {
-			@Override
-			public boolean onTouch(View v, MotionEvent event) {
-				int action = event.getAction() & MotionEvent.ACTION_MASK;
-				switch (action) {
-					case MotionEvent.ACTION_DOWN:
-						canClick = false;
-						// Log.i("ACTION", "DOWN");
-						mDownX = event.getX();
-						mDownY = event.getY();
-						isOnClick = true; // blocco la propagazione
-						break;
-					case MotionEvent.ACTION_CANCEL:
-					case MotionEvent.ACTION_UP:
-						if (isOnClick) {
-							// Log.i("ACTION", "UP");
-							canClick = true;
-						} else { 
-							//Log.i("ACTION","UP NOT PROCESSED"); 
-						}
-						//return false; // passa oltre, ma potrebbe diventare true
-						//mDownX = -1;
-						return false;
-
-					case MotionEvent.ACTION_MOVE:
-						if (isOnClick && (Math.abs(mDownX - event.getX()) > SCROLL_THRESHOLD || Math.abs(mDownY - event.getY()) > SCROLL_THRESHOLD)) {
-							// Log.i("ACTION", "MOVE");
-							isOnClick = false;
-						};
-						return false;
-				};
-				return false;
-			};
-		};
-
-		setOnTouchListener(onTouchListener);
-
 //fixed! thanks to @renabor
 		onItemClickListener = new OnItemClickListener() {
 			@Override
 			public void onItemClick(AdapterView <?> parent, View v, int position, long id) {
-				if (canClick) {					
-					if (!isEmpty(alist)) { // this test is necessary !  //  <----- thanks to @renabor
-						if (highLightSelectedItem) {							
-							if (lastSelectedItem > -1) {
-								DoHighlight(lastSelectedItem, textColor);
-								Log.i("DoHighlight", "lastSelectedItem = " + lastSelectedItem);								
-							}
-							lastSelectedItem = (int) position;
-							DoHighlight((int) id, highLightColor);
+					if (!isEmpty(alist)) { // this test is necessary !  //  <----- thanks to @renabor						
+						
+						if (highLightSelectedItem) {	
+							 if (lastSelectedItem != -1) {
+							    DoHighlight(lastSelectedItem, Color.TRANSPARENT); //textcolor
+							 }			
+							 DoHighlight(position,  highLightColor); //							 											
 						}
+						
+						lastSelectedItem = (int) position;						
+						
 						if (alist.get((int) id).widget == 2  ) { //radio fix 16-febr-2015
 							for (int i = 0; i < alist.size(); i++) {
 								alist.get(i).checked = false;
@@ -865,14 +836,8 @@ public class jListView extends ListView {
 							}
 
 						}
-
 						controls.pOnClickCaptionItem(PasObj, (int) id, alist.get((int) id).label);
-
-					} else {
-						controls.pOnClickCaptionItem(PasObj, lastSelectedItem, ""); // avoid passing possibly undefined Caption
 					}
-
-				}
 			}
 		};
 
@@ -881,7 +846,7 @@ public class jListView extends ListView {
 		this.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
 			@Override
 		    public boolean onItemLongClick(AdapterView <?> parent, View view, int position, long id) {
-			lastSelectedItem = (int)position;		
+			lastLongPressSelectedItem = (int)position;		
 			if (!isEmpty(alist)) {  //  <----- thanks to @renabor					
 					selectedItemCaption = alist.get((int) id).label;
 					controls.pOnListViewLongClickCaptionItem(PasObj, (int)id, alist.get((int)id).label);
@@ -904,14 +869,11 @@ public class jListView extends ListView {
 		    @Override	    
 			public void onScrollStateChanged(AbsListView view, int scrollState) { 
 				if (scrollState == OnScrollListener.SCROLL_STATE_IDLE) { //end scrolling --- ScrollCompleted
-					//aadapter.notifyDataSetChanged();	//???
-					
 					boolean isLastItem = false;
 			      	int lastIndexInScreen = mCurrentVisibleItemCount + mCurrentFirstVisibleItem;
 			      	if (lastIndexInScreen>= mTotalItem) {
 			      		isLastItem = true;
-			        }
-					
+			        }					
 					controls.pOnListViewScrollStateChanged(PasObj, mCurrentFirstVisibleItem,mCurrentVisibleItemCount, mTotalItem, isLastItem);										 
 				} 								
 			}
@@ -1268,17 +1230,26 @@ public class jListView extends ListView {
 	}
 
 
-	private void DoHighlight(int position, int _color) {
-		alist.get(position).textColor = _color;
+	private void DoHighlight(int position, int _color) {	
+		alist.get(position).highLightColor = _color;
 		aadapter.notifyDataSetChanged();
 	}
-
-	public void SetHighLightSelectedItem(boolean _value)  {
+	
+	public void SetHighLightSelectedItem(boolean _value)  {  //DROPED!!!		
+		
+		if (highLightColor == Color.TRANSPARENT) highLightColor = Color.parseColor("#e6e6fa"); //lavander
+		
 		highLightSelectedItem = _value;
-	}
+	}	
 
 	public void SetHighLightSelectedItemColor(int _color)  {
 		highLightColor = _color;
+		if (_color != Color.TRANSPARENT) {		   
+		   highLightSelectedItem = true;
+		}
+		else {
+			highLightSelectedItem = false;
+		}
 	}
 
 	public int GetItemIndex() {
@@ -1439,4 +1410,8 @@ public class jListView extends ListView {
 		}
 		return txt2;				
 	}	
+	
+	public int GetLongPressSelectedItem(){
+		return lastLongPressSelectedItem;
+	}
 }

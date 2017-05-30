@@ -566,7 +566,7 @@ Procedure jListView_addLParamsAnchorRule(env:PJNIEnv; ListView : jObject; rule: 
 
 Procedure jListView_setLayoutAll(env:PJNIEnv; ListView : jObject;  idAnchor: DWord);
 
-procedure jListView_SetHighLightSelectedItem(env: PJNIEnv; _jlistview: JObject; _value: boolean);
+//procedure jListView_SetHighLightSelectedItem(env: PJNIEnv; _jlistview: JObject; _value: boolean);
 procedure jListView_SetHighLightSelectedItemColor(env: PJNIEnv;  _jlistview: JObject; _color: integer);
 function jListView_GetItemIndex(env: PJNIEnv; _jlistview: JObject): integer;
 function jListView_GetItemCaption(env: PJNIEnv; _jlistview: JObject): string;
@@ -595,6 +595,7 @@ procedure jListView_SetRightDelimiter(env: PJNIEnv; _jlistview: JObject; _rightD
 function jListView_GetCenterItemCaption(env: PJNIEnv; _jlistview: JObject; _fullItemCaption: string): string;
 function jListView_GetLeftItemCaption(env: PJNIEnv; _jlistview: JObject; _fullItemCaption: string): string;
 function jListView_GetRightItemCaption(env: PJNIEnv; _jlistview: JObject; _fullItemCaption: string): string;
+function jListView_GetLongPressSelectedItem(env: PJNIEnv; _jlistview: JObject): integer;
 
 // ScrollView
 Function  jScrollView_Create           (env:PJNIEnv;  this:jobject; SelfObj: TObject): jObject;
@@ -4957,6 +4958,7 @@ _jMethod:= env^.GetMethodID(env, cls, 'SetLayoutAll', '(I)V');
  env^.DeleteLocalRef(env, cls);
 end;
 
+(*
 procedure jListView_SetHighLightSelectedItem(env: PJNIEnv; _jlistview: JObject; _value: boolean);
 var
   jParams: array[0..0] of jValue;
@@ -4969,7 +4971,7 @@ begin
   env^.CallVoidMethodA(env, _jlistview, jMethod, @jParams);
   env^.DeleteLocalRef(env, jCls);
 end;
-
+*)
 
 procedure jListView_SetHighLightSelectedItemColor(env: PJNIEnv; _jlistview: JObject; _color: integer);
 var
@@ -5279,7 +5281,6 @@ begin
   env^.DeleteLocalRef(env, jCls);
 end;
 
-
 function jListView_GetRightItemCaption(env: PJNIEnv; _jlistview: JObject; _fullItemCaption: string): string;
 var
   jStr: JString;
@@ -5300,6 +5301,17 @@ begin
             end;
   end;
   env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+function jListView_GetLongPressSelectedItem(env: PJNIEnv; _jlistview: JObject): integer;
+var
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jlistview);
+  jMethod:= env^.GetMethodID(env, jCls, 'GetLongPressSelectedItem', '()I');
+  Result:= env^.CallIntMethod(env, _jlistview, jMethod);
   env^.DeleteLocalRef(env, jCls);
 end;
 
