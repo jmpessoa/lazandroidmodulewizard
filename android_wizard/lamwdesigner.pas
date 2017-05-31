@@ -2484,7 +2484,6 @@ begin
 
   Color := jImageBtn(AWidget).BackgroundColor;
   FontColor:= colbrGray;
-  BackGroundColor:= clActiveCaption; //clMenuHighlight;
 
   if jImageBtn(AWidget).BackgroundColor = colbrDefault then
     Color := GetParentBackgroundColor;
@@ -2492,26 +2491,27 @@ end;
 
 procedure TDraftImageBtn.Draw;
 begin
-  Fcanvas.Brush.Color:= Self.BackGroundColor;
-  Fcanvas.Pen.Color:= clWhite;
-  if Self.BackGroundColor = clNone then
-     Fcanvas.Brush.Color:= clSilver; //clMedGray;
-  if GetImage = nil then
-    Fcanvas.FillRect(0,0,Self.Width,Self.Height)
+  if GetImage <> nil then
+    Fcanvas.Brush.Color := BackGroundColor
   else
+    Fcanvas.Brush.Color := clSilver; //clMedGray;
+  Fcanvas.Pen.Color := clWhite;
+  if Self.BackGroundColor <> clNone then
+    Fcanvas.FillRect(Rect(0, 0, Width, Height));
+  if GetImage <> nil then
     Fcanvas.Brush.Style := bsClear;
   // outer frame
   Fcanvas.Rectangle(0,0,Self.Width,Self.Height);
-  Fcanvas.Pen.Color:= clWindowFrame;
-  Fcanvas.Line(Self.Width-Self.MarginRight+3, {x2}
-             Self.MarginTop-3,  {y1}
-             Self.Width-Self.MarginRight+3,  {x2}
-             Self.Height-Self.MarginBottom+3); {y2}
+  Fcanvas.Pen.Color := clWindowFrame;
+  Fcanvas.Line(Self.Width-Self.MarginRight+3,   {x2}
+               Self.MarginTop-3,                {y1}
+               Self.Width-Self.MarginRight+3,   {x2}
+               Self.Height-Self.MarginBottom+3);{y2}
 
-  Fcanvas.Line(Self.Width-Self.MarginRight+3, {x2}
-             Self.Height-Self.MarginBottom+3,{y2}
-             Self.MarginLeft-4,                {x1}
-             Self.Height-Self.MarginBottom+3);  {y2}
+  Fcanvas.Line(Self.Width-Self.MarginRight+3,   {x2}
+               Self.Height-Self.MarginBottom+3, {y2}
+               Self.MarginLeft-4,               {x1}
+               Self.Height-Self.MarginBottom+3);{y2}
   if GetImage <> nil then
     Fcanvas.Draw(1, 1, GetImage);
 end;
@@ -2521,16 +2521,12 @@ var
   im: TPortableNetworkGraphic;
 begin
   im := GetImage;
-  with jImageBtn(FAndroidWidget) do
-  begin
-    if im <> nil then
+  if im <> nil then
+    with jImageBtn(FAndroidWidget) do
     begin
-      if LayoutParamHeight = lpWrapContent then
-        FMinHeight := im.Height + 3;
-      if LayoutParamWidth = lpWrapContent then
-        FMinWidth := im.Width + 3;
+      FMinHeight := im.Height + 3;
+      FMinWidth := im.Width + 3;
     end;
-  end;
   inherited UpdateLayout;
 end;
 
