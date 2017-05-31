@@ -7,7 +7,7 @@ interface
 uses
   Classes, SysUtils, Graphics, Controls, FormEditingIntf, PropEdits,
   ComponentEditors, ProjectIntf, Laz2_DOM, AndroidWidget, Laz_And_Controls,
-  LCLVersion, Dialogs, Forms, AndroidThemes, ImgCache;
+  Dialogs, Forms, AndroidThemes, ImgCache;
 
 type
   TDraftWidget = class;
@@ -55,7 +55,7 @@ type
     procedure UpdateJControlsList; inline;
 
   protected
-    procedure OnDesignerModified(Sender: TObject{$If lcl_fullversion>=1070000}; {%H-}PropName: ShortString{$ENDIF});
+    procedure OnDesignerModified(Sender: TObject);
     procedure OnPersistentAdded(APersistent: TPersistent; {%H-}Select: boolean);
     procedure OnPersistentDeleted;
     procedure OnPersistentDeleting(APersistent: TPersistent);
@@ -653,8 +653,6 @@ end;
 function TImageIndexPropertyEditor.GetAttributes: TPropertyAttributes;
 begin
   Result := [paValueList, paCustomDrawn, paRevertable];
-  if GetDefaultOrdValue <> NoDefaultValue then
-    Result := Result + [paHasDefaultValue];
 end;
 
 procedure TImageIndexPropertyEditor.GetValues(Proc: TGetStrProc);
@@ -1133,7 +1131,7 @@ begin
   inherited Destroy;
 end;
 
-procedure TAndroidWidgetMediator.OnDesignerModified(Sender: TObject{$If lcl_fullversion>=1070000}; {%H-}PropName: ShortString{$ENDIF});
+procedure TAndroidWidgetMediator.OnDesignerModified(Sender: TObject);
 var
   Instance: TPersistent;
   InvalidateNeeded: Boolean;
