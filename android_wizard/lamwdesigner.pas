@@ -81,6 +81,7 @@ type
     procedure UpdateTheme;
     procedure MouseDown(Button: TMouseButton; Shift: TShiftState; p: TPoint; var Handled: boolean); override;
     procedure MouseUp(Button: TMouseButton; Shift: TShiftState; p: TPoint; var Handled: boolean); override;
+    procedure MouseMove(Shift: TShiftState; p: TPoint; var Handled: boolean); override;
 
   public
     // needed by TAndroidWidget
@@ -1597,7 +1598,6 @@ end;
 procedure TAndroidWidgetMediator.MouseDown(Button: TMouseButton;
   Shift: TShiftState; p: TPoint; var Handled: boolean);
 begin
-  FSizing := True;
   inherited MouseDown(Button, Shift, p, Handled);
 end;
 
@@ -1607,6 +1607,13 @@ begin
   inherited MouseUp(Button, Shift, p, Handled);
   FSizing := False;
   LCLForm.Invalidate;
+end;
+
+procedure TAndroidWidgetMediator.MouseMove(Shift: TShiftState; p: TPoint;
+  var Handled: boolean);
+begin
+  if ssLeft in Shift then FSizing := True;
+  inherited MouseMove(Shift, p, Handled);
 end;
 
 { TDraftWidget }
