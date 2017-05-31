@@ -277,9 +277,9 @@ type
 
  TCompoundDrawablesSide = (cdsLeft, cdsRight, cdsAbove, cdsBelow);
 
- TOnBeforeDispatchDraw = procedure(Obj: TObject; canvas: JObject; tag: integer) of Object;
- TOnAfterDispatchDraw = procedure(Obj: TObject; canvas: JObject; tag: integer) of Object;
- TOnLayouting = procedure(Obj: TObject; changed: boolean) of Object;
+ TOnBeforeDispatchDraw = procedure(Sender: TObject; canvas: JObject; tag: integer) of Object;
+ TOnAfterDispatchDraw = procedure(Sender: TObject; canvas: JObject; tag: integer) of Object;
+ TOnLayouting = procedure(Sender: TObject; changed: boolean) of Object;
 
  TConnectionType = (ctMobile, ctWifi, ctBluetooch, ctEthernet);
 
