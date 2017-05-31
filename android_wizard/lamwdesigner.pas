@@ -1709,11 +1709,11 @@ begin
           if ChildCount > 0 then
           begin
             FnewW := WrapContentWidthByChildren;
-            FMinWidth := FnewW;
+            if FMinWidth < FnewW then FMinWidth := FnewW;
           end;
         else begin
           FnewW := GetLayoutParamsByParent2(Parent, lpWidth, sdW);
-          FMinWidth := FnewW;
+          if FMinWidth < FnewW then FMinWidth := FnewW;
         end;
       end;
       case lpHeight of
@@ -1727,11 +1727,11 @@ begin
           if ChildCount > 0 then
           begin
             FnewH := WrapContentHeightByChildren;
-            FMinHeight := FnewH;
+            if FMinHeight < FnewH then FMinHeight := FnewH;
           end;
         else begin
           FnewH := GetLayoutParamsByParent2(Parent, lpHeight, sdH);
-          FMinHeight := FnewH;
+          if FMinHeight < FnewH then FMinHeight := FnewH;
         end;
       end;
       if (rpRight in PosRelativeToParent) and Assigned(Parent) then
