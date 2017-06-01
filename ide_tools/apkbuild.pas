@@ -247,11 +247,7 @@ function TApkBuilder.TryFixPaths: TModalResult;
 
   function FixPath(var path: string; const truncBy, newPath: string): Boolean;
   begin
-    if Pos(PathDelim, path) = 0 then
-      if PathDelim <> '/' then
-        {%H-}path := StringReplace(path, '/', PathDelim, [rfReplaceAll])
-      else
-        {%H-}path := StringReplace(path, '\', PathDelim, [rfReplaceAll]);
+    DoDirSeparators(path);
     Delete(path, 1, PosIdent(truncBy, path));
     Delete(path, 1, Pos(PathDelim, path));
     path := IncludeTrailingPathDelimiter(newPath) + path;
@@ -271,10 +267,8 @@ function TApkBuilder.TryFixPaths: TModalResult;
       ReadXMLFile(ManifestXML, FProjPath + 'AndroidManifest.xml');
       try
         n := ManifestXML.DocumentElement.FindNode('uses-sdk');
-        if not Assigned(n) then Exit;
-        n := n.Attributes.GetNamedItem('android:targetSdkVersion');
-        if not Assigned(n) then Exit;
-        SdkTarget := n.TextContent;
+        if not (n is TDOMElement) then Exit;
+        SdkTarget := TDOMElement(n).AttribStrings['android:targetSdkVersion'];
         Result := True;
       finally
         ManifestXML.Free
@@ -297,10 +291,8 @@ function TApkBuilder.TryFixPaths: TModalResult;
       ReadXMLFile(ManifestXML, fn);
       try
         n := ManifestXML.DocumentElement.FindNode('uses-sdk');
-        if not Assigned(n) then Exit;
-        n := n.Attributes.GetNamedItem('android:targetSdkVersion');
-        if not Assigned(n) then Exit;
-        n.TextContent := SdkTarget;
+        if not (n is TDOMElement) then Exit;
+        TDOMElement(n).AttribStrings['android:targetSdkVersion'] := SdkTarget;
         WriteXML(ManifestXML, fn);
         Result := True;
       finally
@@ -314,10 +306,9 @@ function TApkBuilder.TryFixPaths: TModalResult;
 var
   sl: TStringList;
   i: Integer;
-  ForceFixPaths: Boolean;
-  str, prev, pref: string;
+  ForceFixPaths, WasChanged: Boolean;
+  sval, str, prev, pref: string;
   xml: TXMLDocument;
-  n: TDOMNode;
 begin
   Result := mrAbort;
   ForceFixPaths := False;
@@ -388,18 +379,16 @@ begin
   prev := FProjPath + 'build.xml';
   ReadXMLFile(xml, prev);
   try
+    WasChanged := False;
     with xml.DocumentElement.ChildNodes do
       for i := 0 to Count - 1 do
-        if Item[i].NodeName = 'property' then
+        if (Item[i] is TDOMElement)
+        and (TDOMElement(Item[i]).TagName = 'property') then
         begin
-          n := Item[i].Attributes.GetNamedItem('name');
-          if Assigned(n) then
-          begin
-            if n.TextContent = 'sdk.dir' then
+          case TDOMElement(Item[i]).AttribStrings['name'] of
+          'sdk.dir':
             begin
-              n := Item[i].Attributes.GetNamedItem('location');
-              if not Assigned(n) then Continue;
-              str := n.TextContent;
+              str := TDOMElement(Item[i]).AttribStrings['location'];
               if not DirectoryExists(str) and DirectoryExists(FSdkPath) then
               begin
                 if not ForceFixPaths
@@ -407,42 +396,41 @@ begin
                                'Path "' + str + '" does not exist.' + sLineBreak +
                                'Change it to "' + FSdkPath + '"?', mtConfirmation,
                                [mbYes, mbNo], 0) <> mrYes) then Exit;
-                Item[i].Attributes.GetNamedItem('location').TextContent := FSdkPath;
-                WriteXMLFile(xml, prev);
+                TDOMElement(Item[i]).AttribStrings['location'] := FSdkPath;
+                WasChanged := True;
               end;
-            end else
-            if n.TextContent = 'target' then
+            end;
+          'target':
             begin
               // fix "target" according to AndroidManifest
-              n := Item[i].Attributes.GetNamedItem('value');
-              if not Assigned(n) then Continue;
+              sval := TDOMElement(Item[i]).AttribStrings['value'];
               if not GetManifestSdkTarget(str) then
-                str := n.TextContent
+                str := sval
               else
                 str := 'android-' + str;
               sl := CollectDirs(AppendPathDelim(FSdkPath) + 'platforms' + PathDelim + 'android-*');
               try
                 if sl.Count = 0 then Continue;
                 sl.Sorted := True;
-                if (sl.IndexOf(n.TextContent) < 0) and (sl.IndexOf(str) >= 0) then
+                if (sl.IndexOf(sval) < 0) and (sl.IndexOf(str) >= 0) then
                 begin
                   if MessageDlg('build.xml',
                                 'Change target to "' + str + '"?',
                                 mtConfirmation, [mbYes, mbNo], 0) <> mrYes then Continue;
-                  n.TextContent := str;
-                  WriteXMLFile(xml, prev);
+                  TDOMElement(Item[i]).AttribStrings['value'] := str;
+                  WasChanged := True;
                 end else
-                if (sl.IndexOf(n.TextContent) >= 0) and (n.TextContent <> str) then
+                if (sl.IndexOf(sval) >= 0) and (sval <> str) then
                 begin
                   if MessageDlg('Manifest.xml',
                                 'SDK for "' + str + '" is not installed. Do you ' +
-                                'want to use "' + n.TextContent + '"?',
+                                'want to use "' + sval + '"?',
                                 mtConfirmation, [mbYes, mbNo], 0) <> mrYes then Continue;
-                  str := n.TextContent;
+                  str := sval;
                   Delete(str, 1, 8);
                   SetManifestSdkTarget(str);
                 end else
-                if sl.IndexOf(n.TextContent) < 0 then
+                if sl.IndexOf(sval) < 0 then
                 begin
                   if sl.Count = 1 then
                   begin
@@ -453,8 +441,8 @@ begin
                     str := sl[0];
                   end else
                     if not ChooseDlg('Target SDK', 'Choose target SDK:', sl, str) then Continue;
-                  n.TextContent := str;
-                  WriteXMLFile(xml, prev);
+                  TDOMElement(Item[i]).AttribStrings['value'] := str;
+                  WasChanged := True;
                   Delete(str, 1, 8);
                   SetManifestSdkTarget(str);
                 end;
@@ -464,9 +452,12 @@ begin
             end;
           end;
         end;
+    if WasChanged then
+      WriteXMLFile(xml, prev);
   finally
     xml.Free;
   end;
+  Result := mrOK;
 end;
 
 procedure TApkBuilder.BringToFrontEmulator;
@@ -551,7 +542,8 @@ begin
   FProj := AProj;
   FProjPath := ExtractFilePath(ChompPathDelim(ExtractFilePath(FProj.MainFile.Filename)));
   LoadPaths;
-  TryFixPaths;
+  if TryFixPaths = mrAbort then
+    Abort;
 end;
 
 function TApkBuilder.BuildAPK(Install: Boolean): Boolean;
@@ -617,16 +609,13 @@ procedure TApkBuilder.RunAPK;
 var
   xml: TXMLDocument;
   f, proj: string;
-  n: TDOMNode;
   Tool: TIDEExternalToolOptions;
 begin
   f := FProjPath + PathDelim + 'AndroidManifest.xml';
   ReadXMLFile(xml, f);
   try
-    n := xml.ChildNodes[0].Attributes.GetNamedItem('package');
-    if n is TDOMAttr then
-      proj := UTF8Encode(TDOMAttr(n).Value)
-    else
+    proj := xml.DocumentElement.AttribStrings['package'];
+    if proj = '' then
       raise Exception.Create('Cannot determine package name!');
   finally
     xml.Free;
