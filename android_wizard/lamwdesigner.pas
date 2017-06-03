@@ -7,7 +7,7 @@ interface
 uses
   Classes, SysUtils, Graphics, Controls, FormEditingIntf, PropEdits,
   ComponentEditors, ProjectIntf, Laz2_DOM, AndroidWidget, Laz_And_Controls,
-  Dialogs, Forms, AndroidThemes, ImgCache;
+  Dialogs, Forms, AndroidThemes, ImgCache,  LCLVersion;
 
 type
   TDraftWidget = class;
@@ -55,7 +55,8 @@ type
     procedure UpdateJControlsList; inline;
 
   protected
-    procedure OnDesignerModified(Sender: TObject);
+    //procedure OnDesignerModified(Sender: TObject);
+    procedure OnDesignerModified(Sender: TObject{$If lcl_fullversion=1070000}; {%H-}PropName: ShortString{$ENDIF});
     procedure OnPersistentAdded(APersistent: TPersistent; {%H-}Select: boolean);
     procedure OnPersistentDeleted;
     procedure OnPersistentDeleting(APersistent: TPersistent);
@@ -1131,7 +1132,8 @@ begin
   inherited Destroy;
 end;
 
-procedure TAndroidWidgetMediator.OnDesignerModified(Sender: TObject);
+//procedure TAndroidWidgetMediator.OnDesignerModified(Sender: TObject);
+procedure TAndroidWidgetMediator.OnDesignerModified(Sender: TObject{$If lcl_fullversion=1070000}; {%H-}PropName: ShortString{$ENDIF});
 var
   Instance: TPersistent;
   InvalidateNeeded: Boolean;
