@@ -3386,10 +3386,10 @@ begin
 
   FWrappingLine:= False;
 
-  FMarginBottom := 10;
+  FMarginBottom := 5;
   FMarginLeft   := 5;
   FMarginRight  := 5;
-  FMarginTop    := 10;
+  FMarginTop    := 5;
   FHeight       := 40;
   FWidth        := 100;
 
@@ -4051,10 +4051,10 @@ constructor jButton.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
   FText:= '';
-  FMarginLeft   := 2;
-  FMarginTop    := 4;
-  FMarginBottom := 4;
-  FMarginRight  := 2;
+  FMarginLeft   := 5;
+  FMarginTop    := 5;
+  FMarginBottom := 5;
+  FMarginRight  := 5;
   FHeight       := 40;
   FWidth        := 100;
   FLParamWidth  := lpHalfOfParent;

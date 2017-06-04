@@ -1,4 +1,4 @@
-package com.example.appspinnerdemo;
+package org.lamw.applistviewdemo3;
 
 import java.util.ArrayList;
 import android.content.Context;
@@ -48,6 +48,9 @@ class CustomSpinnerArrayAdapter<T> extends ArrayAdapter<ItemRow> {
     private Typeface mFontFace;
     private int mFontStyle;
     
+    private int mSelectedPadTop = 15;
+    private int mSelectedPadBottom = 5;
+    
     private ArrayList<ItemRow> items ;
 
     public CustomSpinnerArrayAdapter(Context context, int simpleSpinnerItem, ArrayList<ItemRow> list) {
@@ -81,16 +84,16 @@ class CustomSpinnerArrayAdapter<T> extends ArrayAdapter<ItemRow> {
     //This method is used to display the dropdown popup that contains data.
     @Override
     public View getDropDownView(int position, View convertView, ViewGroup parent) {    	
-       return getLayoutView(position, convertView, parent);    	
+       return getLayoutView(position, convertView, parent, mSelectedPadTop + 15 , mSelectedPadBottom + 15);    	
     }
 
     //This method is used to return the customized view at specified position in list.
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-       return getLayoutView(position, convertView, parent);    	
+       return getLayoutView(position, convertView, parent, mSelectedPadTop, mSelectedPadBottom);    	
     }
     
-    public View getLayoutView(int position, View convertView, ViewGroup parent) {
+    public View getLayoutView(int position, View convertView, ViewGroup parent, int padTop, int padBottom) {
     	    	
         if ( position >= 0) {
     		        	
@@ -110,7 +113,8 @@ class CustomSpinnerArrayAdapter<T> extends ArrayAdapter<ItemRow> {
     		TextView txtview = new TextView(ctx);
     		
     		txtview.setText(items.get(position).label); 
-    		txtview.setPadding(20, 40, 20, 40);  
+    		//txtview.setPadding(20, 40, 20, 40);
+    		txtview.setPadding(20, padTop, 20, padBottom);  //padTop, padBottom
     		txtview.setTextColor(mSelectedTextColor);        
     		txtview.setBackgroundColor(mTexBackgroundColor);
             
@@ -201,6 +205,14 @@ class CustomSpinnerArrayAdapter<T> extends ArrayAdapter<ItemRow> {
     public void SetTextFontSize(int txtFontSize) {
         mTextFontSize = txtFontSize;
     }
+ 
+    public void SetSelectedPadTop(int _top) {
+       mSelectedPadTop = _top;
+    }
+    
+    public void SetSelectedPadBottom(int  _bottom) {
+       mSelectedPadBottom = _bottom; 
+    }
 
 }
 
@@ -226,6 +238,9 @@ public class jSpinner extends Spinner /*dummy*/ { //please, fix what GUI object 
     private String mSelectedText="";
     
     private int mSelectedIndex= -1;
+    private int mSelectedPadTop = 15;
+    private int mSelectedPadBottom = 15;
+    
     
     private jCommons LAMWCommon;
 
@@ -511,5 +526,13 @@ public class jSpinner extends Spinner /*dummy*/ { //please, fix what GUI object 
     	return s;
 	}
 
+	public void SetSelectedPaddingTop(int _paddingTop) {	    
+	    mSpAdapter.SetSelectedPadTop(_paddingTop);
+	}
+	
+	public void SetSelectedPaddingBottom(int _paddingBottom) {
+	    mSpAdapter.SetSelectedPadBottom(_paddingBottom);
+	}
+	
 }  //end class
 

@@ -30,9 +30,10 @@ TOnItemSelected = procedure(Sender: TObject; itemCaption: string; itemIndex: int
 
     FTextTypeFace: TTextTypeFace;
     FSelectedIndex: integer;
+    FSelectedPaddingTop: integer;
+    FSelectedPaddingBottom: integer;
 
     procedure SetColor(Value: TARGBColorBridge);
-
     procedure SetItems(Value: TStrings);
     procedure SetSelectedFontColor(Value : TARGBColorBridge);
 
@@ -84,6 +85,8 @@ TOnItemSelected = procedure(Sender: TObject; itemCaption: string; itemIndex: int
     procedure Add(_item: string; _strTag: string);  overload;
     function GetItemTagString(_index: integer): string;
     procedure SetItemTagString(_index: integer; _strTag: string);
+    procedure SetSelectedPaddingTop(_paddingTop: integer);
+    procedure SetSelectedPaddingBottom(_paddingBottom: integer);
 
     procedure GenEvent_OnSpinnerItemSeleceted(Obj: TObject; caption: string; position: integer);
 
@@ -105,6 +108,10 @@ TOnItemSelected = procedure(Sender: TObject; itemCaption: string; itemIndex: int
     property FontFace: TFontFace read FFontFace write SetFontFace default ffNormal;
     property TextTypeFace: TTextTypeFace read FTextTypeFace write SetTextTypeFace;
     property SelectedIndex: integer read GetSelectedIndex write SetSelectedIndex;
+
+    property SelectedPaddingTop: integer read FSelectedPaddingTop write SetSelectedPaddingTop;
+    property SelectedPaddingBottom: integer read FSelectedPaddingBottom write SetSelectedPaddingBottom;
+
 
     property OnItemSelected: TOnItemSelected  read FOnItemSelected write FOnItemSelected;
   end;
@@ -146,8 +153,8 @@ procedure jSpinner_Add(env: PJNIEnv; _jspinner: JObject; _item: string; _strTag:
 function jSpinner_GetItemTagString(env: PJNIEnv; _jspinner: JObject; _index: integer): string;
 procedure jSpinner_SetItemTagString(env: PJNIEnv; _jspinner: JObject; _index: integer; _strTag: string);
 
-
-
+procedure jSpinner_SetSelectedPaddingTop(env: PJNIEnv; _jspinner: JObject; _padTop: integer);
+procedure jSpinner_SetSelectedPaddingBottom(env: PJNIEnv; _jspinner: JObject; _padBottom: integer);
 
 implementation
 
@@ -160,13 +167,15 @@ constructor jSpinner.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
   FMarginLeft   := 5;
-  FMarginTop    := 10;
-  FMarginBottom := 10;
+  FMarginTop    := 5;
+  FMarginBottom := 5;
   FMarginRight  := 5;
+
   FHeight       := 40;
-  FWidth        := 96;
-  FLParamWidth  := lpOneThirdOfParent;  //lpWrapContent
-  FLParamHeight := lpWrapContent; //lpMatchParent
+  FWidth        := 100;
+
+  FLParamWidth  := lpHalfOfParent;
+  FLParamHeight := lpWrapContent;
 
   //your code here....
   FItems:= TStringList.Create;
@@ -184,17 +193,20 @@ begin
   FTextTypeFace:= tfNormal;
   FSelectedIndex:= -1;
 
+  FSelectedPaddingTop:= 15;
+  FSelectedPaddingBottom:= 5;
+
 end;
 
 destructor jSpinner.Destroy;
 begin
   if not (csDesigning in ComponentState) then
   begin
-        if FjObject  <> nil then
-        begin
-           jFree();
-           FjObject := nil;
-        end;
+      if FjObject  <> nil then
+      begin
+         jFree();
+         FjObject := nil;
+      end;
   end;
   //you others free code here...'
   FItems.Free;
@@ -305,6 +317,12 @@ begin
      jSpinner_SetLastItemAsPrompt(FjEnv, FjObject , FLastItemAsPrompt);
      if (FSelectedIndex <> FItems.Count-1) then FSelectedIndex:= FItems.Count-1;
   end;
+
+  if FSelectedPaddingTop <> 15 then
+    jSpinner_SetSelectedPaddingTop(FjEnv, FjObject, FSelectedPaddingTop);
+
+  if FSelectedPaddingBottom <> 5 then
+    jSpinner_SetSelectedPaddingBottom(FjEnv, FjObject, FSelectedPaddingBottom);
 
   jSpinner_SetSelectedIndex(FjEnv, FjObject, FSelectedIndex);
 
@@ -666,6 +684,22 @@ begin
   //in designing component state: set value here...
   if FInitialized then
      jSpinner_SetItemTagString(FjEnv, FjObject, _index ,_strTag);
+end;
+
+procedure jSpinner.SetSelectedPaddingTop(_paddingTop: integer);
+begin
+  //in designing component state: set value here...
+  FSelectedPaddingTop:= _paddingTop;
+  if FInitialized then
+     jSpinner_SetSelectedPaddingTop(FjEnv, FjObject, _paddingTop);
+end;
+
+procedure jSpinner.SetSelectedPaddingBottom(_paddingBottom: integer);
+begin
+  //in designing component state: set value here...
+  FSelectedPaddingBottom:= _paddingBottom;
+  if FInitialized then
+     jSpinner_SetSelectedPaddingBottom(FjEnv, FjObject, _paddingBottom);
 end;
 
 //TODO
@@ -1187,6 +1221,32 @@ begin
   jMethod:= env^.GetMethodID(env, jCls, 'SetItemTagString', '(ILjava/lang/String;)V');
   env^.CallVoidMethodA(env, _jspinner, jMethod, @jParams);
 env^.DeleteLocalRef(env,jParams[1].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jSpinner_SetSelectedPaddingTop(env: PJNIEnv; _jspinner: JObject; _padTop: integer);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].i:= _padTop;
+  jCls:= env^.GetObjectClass(env, _jspinner);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetSelectedPaddingTop', '(I)V');
+  env^.CallVoidMethodA(env, _jspinner, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jSpinner_SetSelectedPaddingBottom(env: PJNIEnv; _jspinner: JObject; _padBottom: integer);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].i:= _padBottom;
+  jCls:= env^.GetObjectClass(env, _jspinner);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetSelectedPaddingBottom', '(I)V');
+  env^.CallVoidMethodA(env, _jspinner, jMethod, @jParams);
   env^.DeleteLocalRef(env, jCls);
 end;
 

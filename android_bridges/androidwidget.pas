@@ -2278,8 +2278,8 @@ end;
 procedure jVisualControl.Init(refApp: jApp);
 begin
   inherited Init(refApp);
-  FjPRLayout:= jForm(Owner).View;  //set default ViewParent/FjPRLayout as jForm.View!
-  FScreenStyle   := jForm(Owner).ScreenStyle;
+  FjPRLayout := jForm(Owner).View;  //set default ViewParent/FjPRLayout as jForm.View!
+  FScreenStyle := jForm(Owner).ScreenStyle;
   if (PosRelativeToAnchor = []) and (PosRelativeToParent = []) then
   begin
     FMarginLeft := FLeft;

@@ -2668,6 +2668,7 @@ end;
 
 procedure TDraftSpinner.Draw;
 var
+  r: TRect;
   saveColor: TColor;
 begin
   Fcanvas.Brush.Color:= Self.BackGroundColor;
@@ -2679,9 +2680,13 @@ begin
   if BackGroundColor = clNone then
      Fcanvas.Brush.Color:= clWhite;
 
-  Fcanvas.FillRect(0,0,Self.Width,Self.Height);
+  r := Rect(0, 0, Self.Width, Self.Height);
+  Fcanvas.FillRect(r);
       // outer frame
-  Fcanvas.Rectangle(0,0,Self.Width,Self.Height);
+  Fcanvas.Rectangle(r);
+
+  InflateRect(r, -1, -1);
+  Fcanvas.Rectangle(r);
 
   Fcanvas.Brush.Color:= Self.DropListColor; //clActiveCaption;
 
@@ -2689,10 +2694,12 @@ begin
      Fcanvas.Brush.Color:= clSilver;
 
   Fcanvas.Rectangle(Self.Width-47,0+7,Self.Width-7,Self.Height-7);
+
   saveColor:= Fcanvas.Brush.Color;
 
   Fcanvas.Brush.Style:= bsClear;
   Fcanvas.Pen.Color:= clWhite;
+
   Fcanvas.Rectangle(Self.Width-48,0+6,Self.Width-6,Self.Height-6);
 
   Fcanvas.Pen.Color:= Self.DropListFontColor;
