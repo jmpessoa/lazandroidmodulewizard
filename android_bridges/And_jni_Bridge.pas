@@ -596,6 +596,7 @@ function jListView_GetCenterItemCaption(env: PJNIEnv; _jlistview: JObject; _full
 function jListView_GetLeftItemCaption(env: PJNIEnv; _jlistview: JObject; _fullItemCaption: string): string;
 function jListView_GetRightItemCaption(env: PJNIEnv; _jlistview: JObject; _fullItemCaption: string): string;
 function jListView_GetLongPressSelectedItem(env: PJNIEnv; _jlistview: JObject): integer;
+procedure jListView_SetAllPartsOnDrawItemTextColor(env: PJNIEnv; _jlistview: JObject; _value: boolean);
 
 // ScrollView
 Function  jScrollView_Create           (env:PJNIEnv;  this:jobject; SelfObj: TObject): jObject;
@@ -4958,21 +4959,6 @@ _jMethod:= env^.GetMethodID(env, cls, 'SetLayoutAll', '(I)V');
  env^.DeleteLocalRef(env, cls);
 end;
 
-(*
-procedure jListView_SetHighLightSelectedItem(env: PJNIEnv; _jlistview: JObject; _value: boolean);
-var
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].z:= JBool(_value);
-  jCls:= env^.GetObjectClass(env, _jlistview);
-  jMethod:= env^.GetMethodID(env, jCls, 'SetHighLightSelectedItem', '(Z)V');
-  env^.CallVoidMethodA(env, _jlistview, jMethod, @jParams);
-  env^.DeleteLocalRef(env, jCls);
-end;
-*)
-
 procedure jListView_SetHighLightSelectedItemColor(env: PJNIEnv; _jlistview: JObject; _color: integer);
 var
   jParams: array[0..0] of jValue;
@@ -5312,6 +5298,19 @@ begin
   jCls:= env^.GetObjectClass(env, _jlistview);
   jMethod:= env^.GetMethodID(env, jCls, 'GetLongPressSelectedItem', '()I');
   Result:= env^.CallIntMethod(env, _jlistview, jMethod);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jListView_SetAllPartsOnDrawItemTextColor(env: PJNIEnv; _jlistview: JObject; _value: boolean);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].z:= JBool(_value);
+  jCls:= env^.GetObjectClass(env, _jlistview);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetAllPartsOnDrawItemTextColor', '(Z)V');
+  env^.CallVoidMethodA(env, _jlistview, jMethod, @jParams);
   env^.DeleteLocalRef(env, jCls);
 end;
 

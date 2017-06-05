@@ -1230,12 +1230,9 @@ type
     FItemLayout   : TItemLayout;
     FTextAlign     : TTextAlign;
 
-   // FHighLightSelectedItem: boolean;
     FHighLightSelectedItemColor: TARGBColorBridge;
-
     FImageItemIdentifier: string;
 
-    //procedure SetHighLightSelectedItem(_value: boolean);
     procedure SetHighLightSelectedItemColor(_color: TARGBColorBridge);
 
     Procedure SetColor        (Value : TARGBColorBridge);
@@ -1323,11 +1320,11 @@ type
     function GetLeftItemCaption(_fullItemCaption: string): string;
     function GetRightItemCaption(_fullItemCaption: string): string;
     function GetLongPressSelectedItem(): integer;
+    procedure SetAllPartsOnDrawItemTextColor(_value: boolean);
 
     //Property
     property setItemIndex: TXY write SetItemPosition;
     property Count: integer read GetCount;
-    //property HighLightSelectedItem: boolean read FHighLightSelectedItem write SetHighLightSelectedItem;
 
     property OnWidgeItemLostFocus: TOnWidgeItemLostFocus read FOnWidgeItemLostFocus write FOnWidgeItemLostFocus;
   published
@@ -6502,7 +6499,6 @@ begin
   FHeight:= 96;
   FWidth:= 100;
 
-  //FHighLightSelectedItem:= False;
   FHighLightSelectedItemColor:= colbrDefault;
   FImageItemIdentifier:= '';
 
@@ -6654,7 +6650,6 @@ begin
 
   if FHighLightSelectedItemColor <> colbrDefault then
   begin
-    //Self.SetHighLightSelectedItem(True);
     Self.SetHighLightSelectedItemColor(FHighLightSelectedItemColor);
   end;
 
@@ -7016,16 +7011,6 @@ begin
   if Assigned(FOnScrollStateChanged) then FOnScrollStateChanged(Obj, firstVisibleItem, visibleItemCount, totalItemCount, lastItemReached);
 end;
 
-(*
-procedure jListView.SetHighLightSelectedItem(_value: boolean);
-begin
-  //in designing component state: set value here...
-  FHighLightSelectedItem:= _value;
-  if FInitialized then
-     jListView_SetHighLightSelectedItem(FjEnv, FjObject, _value);
-end;
-*)
-
 procedure jListView.SetHighLightSelectedItemColor(_color: TARGBColorBridge);
 begin
   //in designing component state: set value here...
@@ -7218,6 +7203,13 @@ begin
   //in designing component state: result value here...
   if FInitialized then
    Result:= jListView_GetLongPressSelectedItem(FjEnv, FjObject);
+end;
+
+procedure jListView.SetAllPartsOnDrawItemTextColor(_value: boolean);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jListView_SetAllPartsOnDrawItemTextColor(FjEnv, FjObject, _value);
 end;
 
 //------------------------------------------------------------------------------

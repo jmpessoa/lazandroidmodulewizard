@@ -1,0 +1,218 @@
+object AndroidModule1: TAndroidModule1
+  Left = 307
+  Top = 141
+  Width = 320
+  Height = 400
+  MarginLeft = 0
+  MarginTop = 5
+  MarginRight = 0
+  MarginBottom = 0
+  Enabled = True
+  Text = 'AndroidModule1'
+  ActivityMode = actMain
+  BackgroundColor = colbrDefault
+  ActionBarTitle = abtDefault
+  OnJNIPrompt = AndroidModule1JNIPrompt
+  object jTextView1: jTextView
+    Left = 100
+    Top = 5
+    Width = 120
+    Height = 20
+    MarginLeft = 5
+    MarginTop = 5
+    MarginRight = 5
+    MarginBottom = 5
+    Enabled = True
+    Visible = True
+    Id = 1
+    PosRelativeToAnchor = []
+    PosRelativeToParent = [rpTop, rpCenterHorizontal]
+    LayoutParamWidth = lpWrapContent
+    LayoutParamHeight = lpWrapContent
+    Text = 'App ListView Demo3'
+    Alignment = taLeft
+    BackgroundColor = colbrDefault
+    FontColor = colbrDefault
+    FontSize = 0
+    TextTypeFace = tfNormal
+    FontSizeUnit = unitDefault
+  end
+  object jListView1: jListView
+    Left = 5
+    Top = 95
+    Width = 310
+    Height = 86
+    MarginLeft = 5
+    MarginTop = 5
+    MarginRight = 5
+    MarginBottom = 5
+    Enabled = True
+    Visible = True
+    Anchor = jTextView3
+    Id = 2
+    PosRelativeToAnchor = [raBelow]
+    PosRelativeToParent = [rpCenterHorizontal]
+    LayoutParamWidth = lpMatchParent
+    LayoutParamHeight = lpOneQuarterOfParent
+    Items.Strings = (
+      'Left Item(Caption|Item)Right Item'
+      'Free Pascal(Lazarus|LAMW)Android'
+      'ListView(Demo3)layText'
+      'Lazarus(Android|Module)Wizard'
+    )
+    BackgroundColor = colbrDarkOrange
+    FontColor = colbrWhite
+    FontSize = 0
+    WidgetItem = wgNone
+    Delimiter = '|'
+    TextDecorated = txtBold
+    ItemLayout = layText
+    TextSizeDecorated = sdDecreasing
+    TextAlign = alCenter
+    HighLightSelectedItemColor = colbrSalmon
+    FontSizeUnit = unitDefault
+    FontFace = ffSans
+    OnClickItem = jListView1ClickItem
+    OnDrawItemTextColor = jListView1DrawItemTextColor
+  end
+  object jTextView2: jTextView
+    Left = 5
+    Top = 35
+    Width = 272
+    Height = 20
+    MarginLeft = 5
+    MarginTop = 5
+    MarginRight = 5
+    MarginBottom = 5
+    Enabled = True
+    Visible = True
+    Anchor = jTextView1
+    Id = 3
+    PosRelativeToAnchor = [raBelow]
+    PosRelativeToParent = [rpLeft]
+    LayoutParamWidth = lpWrapContent
+    LayoutParamHeight = lpWrapContent
+    Text = 'New Sintaxe: Left Item(Caption|Item)Right Item '
+    Alignment = taLeft
+    BackgroundColor = colbrDefault
+    FontColor = colbrDefault
+    FontSize = 0
+    TextTypeFace = tfNormal
+    FontSizeUnit = unitDefault
+  end
+  object jTextView3: jTextView
+    Left = 8
+    Top = 65
+    Width = 120
+    Height = 20
+    MarginLeft = 5
+    MarginTop = 5
+    MarginRight = 5
+    MarginBottom = 5
+    Enabled = True
+    Visible = True
+    Anchor = jTextView2
+    Id = 4
+    PosRelativeToAnchor = [raBelow]
+    PosRelativeToParent = []
+    LayoutParamWidth = lpWrapContent
+    LayoutParamHeight = lpWrapContent
+    Text = 'ItemLayout = layText'
+    Alignment = taLeft
+    BackgroundColor = colbrDefault
+    FontColor = colbrDefault
+    FontSize = 0
+    TextTypeFace = tfNormal
+    FontSizeUnit = unitDefault
+  end
+  object jTextView4: jTextView
+    Left = 9
+    Top = 191
+    Width = 272
+    Height = 20
+    MarginLeft = 5
+    MarginTop = 5
+    MarginRight = 5
+    MarginBottom = 5
+    Enabled = True
+    Visible = True
+    Anchor = jListView1
+    Id = 5
+    PosRelativeToAnchor = [raBelow]
+    PosRelativeToParent = []
+    LayoutParamWidth = lpWrapContent
+    LayoutParamHeight = lpWrapContent
+    Text = 'New Sintaxe: Left Item(Caption|Item)Right Item '
+    Alignment = taLeft
+    BackgroundColor = colbrDefault
+    FontColor = colbrDefault
+    FontSize = 0
+    TextTypeFace = tfNormal
+    FontSizeUnit = unitDefault
+  end
+  object jTextView5: jTextView
+    Left = 8
+    Top = 221
+    Width = 198
+    Height = 20
+    MarginLeft = 5
+    MarginTop = 5
+    MarginRight = 5
+    MarginBottom = 5
+    Enabled = True
+    Visible = True
+    Anchor = jTextView4
+    Id = 6
+    PosRelativeToAnchor = [raBelow]
+    PosRelativeToParent = []
+    LayoutParamWidth = lpWrapContent
+    LayoutParamHeight = lpWrapContent
+    Text = 'ItemLayout = layImageTextWidget'
+    Alignment = taLeft
+    BackgroundColor = colbrDefault
+    FontColor = colbrDefault
+    FontSize = 0
+    TextTypeFace = tfNormal
+    FontSizeUnit = unitDefault
+  end
+  object jListView2: jListView
+    Left = 5
+    Top = 251
+    Width = 310
+    Height = 86
+    MarginLeft = 5
+    MarginTop = 5
+    MarginRight = 5
+    MarginBottom = 5
+    Enabled = True
+    Visible = True
+    Anchor = jTextView5
+    Id = 7
+    PosRelativeToAnchor = [raBelow]
+    PosRelativeToParent = []
+    LayoutParamWidth = lpMatchParent
+    LayoutParamHeight = lpOneQuarterOfParent
+    Items.Strings = (
+      'Left Item(Caption|Item)Right Item'
+      'Free Pascal(Lazarus|LAMW)Android'
+      'ListView(Demo3)layText'
+      'Lazarus(Android|Module)Wizard'
+    )
+    BackgroundColor = colbrNavajoWhite
+    FontColor = colbrDefault
+    FontSize = 0
+    WidgetItem = wgNone
+    Delimiter = '|'
+    TextDecorated = txtNormal
+    ItemLayout = layImageTextWidget
+    TextSizeDecorated = sdNone
+    TextAlign = alLeft
+    HighLightSelectedItemColor = colbrDefault
+    FontSizeUnit = unitDefault
+    OnDrawItemBitmap = jListView2DrawItemBitmap
+  end
+  object jImageFileManager1: jImageFileManager
+    left = 179
+    top = 265
+  end
+end

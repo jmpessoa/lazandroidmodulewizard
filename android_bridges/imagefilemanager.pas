@@ -29,7 +29,7 @@ jImageFileManager = class(jControl)
     procedure ShowImagesFromGallery();
     function LoadFromSdCard(_filename: string): jObject;
     function LoadFromURL(_imageURL: string): jObject;
-    function LoadFromAssets(strName: string): jObject;
+    function LoadFromAssets(filename: string): jObject;
     function LoadFromResources(_imageResIdentifier: string): jObject;
     function LoadFromFile(_filenameInternalAppStorage: string): jObject; overload;
     function LoadFromFile(_pathEnvironment: string; _filename: string): jObject; overload;
@@ -162,11 +162,11 @@ begin
    Result:= jImageFileManager_LoadFromURL(FjEnv, FjObject, _imageURL);
 end;
 
-function jImageFileManager.LoadFromAssets(strName: string): jObject;
+function jImageFileManager.LoadFromAssets(filename: string): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jImageFileManager_LoadFromAssets(FjEnv, FjObject, strName);
+   Result:= jImageFileManager_LoadFromAssets(FjEnv, FjObject, filename);
 end;
 
 function jImageFileManager.LoadFromResources(_imageResIdentifier: string): jObject;
