@@ -173,7 +173,8 @@ function TApkBuilder.TryFixPaths: TModalResult;
     Result := TStringList.Create;
     if FindFirst(PathMask, faDirectory, dir) = 0 then
       repeat
-        Result.Add(dir.Name);
+        if dir.Name[1] <> '.' then
+          Result.Add(dir.Name);
       until (FindNext(dir) <> 0);
     FindClose(dir);
   end;
@@ -210,28 +211,6 @@ function TApkBuilder.TryFixPaths: TModalResult;
     path := StringReplace(path, p, s, [rfReplaceAll]);
   end;
 
-  procedure FixPrebuiltSys(var path: string);
-  var
-    i: Integer;
-    p, s: string;
-    dir: TSearchRec;
-  begin
-    if DirectoryExists(path) then Exit;
-    i := Pos(PathDelim + 'prebuilt' + PathDelim, path);
-    if i = 0 then Exit;
-    p := path;
-    Delete(p, 1, i + 9);
-    p := Copy(p, 1, Pos(PathDelim, p) - 1);
-    if p = '' then Exit;
-    s := Copy(path, 1, i + 9);
-    if FindFirst(s + '*', faDirectory, dir) = 0 then
-    begin
-      s := dir.Name;
-      path := StringReplace(path, p, s, [rfReplaceAll]);
-    end;
-    FindClose(dir);
-  end;
-
   function PosIdent(const str, dest: string): Integer;
   var i: Integer;
   begin
@@ -246,14 +225,38 @@ function TApkBuilder.TryFixPaths: TModalResult;
   end;
 
   function FixPath(var path: string; const truncBy, newPath: string): Boolean;
+  var
+    i, j: Integer;
+    dirs: TStringList;
   begin
     DoDirSeparators(path);
     Delete(path, 1, PosIdent(truncBy, path));
     Delete(path, 1, Pos(PathDelim, path));
     path := IncludeTrailingPathDelimiter(newPath) + path;
     FixArmLinuxAndroidEabiVersion(path);
-    FixPrebuiltSys(path);
-    Result := DirectoryExists(path);
+    if not DirectoryExists(path) then
+    begin
+      i := Pos(PathDelim, path);
+      while i > 0 do
+      begin
+        while DirectoryExists(Copy(path, 1, i)) do
+        begin
+          j := i;
+          i := PosEx(PathDelim, path, i + 1);
+          if i = 0 then Exit(True);
+        end;
+        dirs := CollectDirs(Copy(path, 1, j) + '*');
+        try
+          if dirs.Count <> 1 then Exit(False);
+          Delete(path, j + 1, i - j - 1);
+          Insert(dirs[0], path, j + 1);
+          i := PosEx(PathDelim, path, j + 1);
+        finally
+          dirs.Free;
+        end;
+      end;
+    end else
+      Result := True;
   end;
 
   function GetManifestSdkTarget(out SdkTarget: string): Boolean;
@@ -310,7 +313,7 @@ var
   sval, str, prev, pref: string;
   xml: TXMLDocument;
 begin
-  Result := mrAbort;
+  Result := mrOK;
   ForceFixPaths := False;
   if not DirectoryExists(FNdkPath) then
     raise Exception.Create('NDK path (' + FNdkPath + ') does not exist! '
@@ -333,7 +336,7 @@ begin
                         mtConfirmation, [mbYes, mbYesToAll, mbCancel], 0) of
             mrYesToAll: ForceFixPaths := True;
             mrYes:
-            else Exit;
+            else Exit(mrAbort);
           end;
         end;
         sl[i] := str;
@@ -363,7 +366,7 @@ begin
                           mtConfirmation, [mbYes, mbYesToAll, mbCancel], 0) of
               mrYesToAll: ForceFixPaths := True;
               mrYes:
-              else Exit;
+              else Exit(mrAbort);
             end;
           end;
           sl[i] := pref + str;
@@ -395,7 +398,7 @@ begin
                 and (MessageDlg('build.xml',
                                'Path "' + str + '" does not exist.' + sLineBreak +
                                'Change it to "' + FSdkPath + '"?', mtConfirmation,
-                               [mbYes, mbNo], 0) <> mrYes) then Exit;
+                               [mbYes, mbNo], 0) <> mrYes) then Exit(mrAbort);
                 TDOMElement(Item[i]).AttribStrings['location'] := FSdkPath;
                 WasChanged := True;
               end;
@@ -457,7 +460,6 @@ begin
   finally
     xml.Free;
   end;
-  Result := mrOK;
 end;
 
 procedure TApkBuilder.BringToFrontEmulator;
