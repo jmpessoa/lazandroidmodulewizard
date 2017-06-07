@@ -524,6 +524,17 @@ begin
                        Byte(Trunc(b1 * alpha + b * (1 - alpha))));
 end;
 
+procedure SetupFont(Font: TFont; FontSize, DefaultSize: Integer; FontFace: TTextTypeFace);
+begin
+  Font.Size := AndroidToLCLFontSize(FontSize, DefaultSize);
+  case FontFace of
+    tfNormal: Font.Style := [];
+    tfBold: Font.Style := [fsBold];
+    tfItalic: Font.Style := [fsItalic];
+    tfBoldItalic: Font.Style := [fsBold, fsItalic];
+  end;
+end;
+
 procedure RegisterAndroidWidgetDraftClass(AWidgetClass: jVisualControlClass;
   ADraftClass: TDraftWidgetClass);
 begin
@@ -2034,13 +2045,15 @@ end;
 
 procedure TDraftTextView.Draw;
 var
-  lastSize, ps: Integer;
+  lastSize: Integer;
+  fs: TFontStyles;
 begin
   with Fcanvas do
   begin
-    ps := AndroidToLCLFontSize(jTextView(FAndroidWidget).FontSize, 10);
     lastSize := Font.Size;
-    Font.Size := ps;
+    fs := Font.Style;
+    with jTextView(FAndroidWidget) do
+      SetupFont(Font, FontSize, 10, TextTypeFace);
 
     Brush.Color := BackGroundColor;
     Pen.Color := TextColor;
@@ -2050,31 +2063,36 @@ begin
       Brush.Style := bsClear;
 
     Font.Color := TextColor;
+    TextOut(0, (Font.Size + 5) div 10, FAndroidWidget.Text);
 
-    TextOut(0, (ps + 5) div 10, FAndroidWidget.Text);
     Font.Size := lastSize;
+    Font.Style := fs;
   end;
 end;
 
 procedure TDraftTextView.UpdateLayout;
 var
-  ps, lastSize: Integer;
+  lastSize: Integer;
+  lastStyle: TFontStyles;
 begin
   with jTextView(FAndroidWidget), FCanvas do
     if (LayoutParamWidth = lpWrapContent)
     or (LayoutParamHeight = lpWrapContent) then
     begin
       lastSize := Font.Size;
-      ps := AndroidToLCLFontSize(FontSize, 10);
-      Font.Size := ps;
+      lastStyle := Font.Style;
+      SetupFont(Font, FontSize, 10, TextTypeFace);
+
       with TextExtent(Text) do
       begin
         if LayoutParamWidth = lpWrapContent then
           FMinWidth := cx;
         if LayoutParamHeight = lpWrapContent then
-          FMinHeight := cy + 2 + (ps + 5) div 10;
+          FMinHeight := cy + 2 + (Font.Size + 5) div 10;
       end;
+
       Font.Size := lastSize;
+      Font.Style := lastStyle;
     end;
   inherited UpdateLayout;
 end;
