@@ -1736,13 +1736,13 @@ begin
           if FMinHeight < FnewH then FMinHeight := FnewH;
         end;
       end;
-      if (rpRight in PosRelativeToParent) and Assigned(Parent) then
+      if rpRight in PosRelativeToParent then
         FRightBottom.x := Parent.Width - MarginRight;
       if rpLeft in PosRelativeToParent then
         FLeftTop.x := MarginLeft;
       if rpTop in PosRelativeToParent then
         FLeftTop.y := MarginTop;
-      if (rpBottom in PosRelativeToParent) and Assigned(Parent) then
+      if rpBottom in PosRelativeToParent then
         FRightBottom.y := Parent.Height - MarginBottom;
       if rpCenterHorizontal in PosRelativeToParent then
         FLeftTop.x := (Parent.Width - GetNewWidth) div 2;
@@ -1764,14 +1764,18 @@ begin
       if raToRightOf in PosRelativeToAnchor then
         FLeftTop.x := Anchor.Left + Anchor.Width + Anchor.MarginRight + MarginLeft;
       if raAlignBaseline in PosRelativeToAnchor then
-        FLeftTop.y := Anchor.Top + (Anchor.Height - Height) div 2;
+        FLeftTop.y := Anchor.Top + (Anchor.Height - Height) div 2; // hack
       if raAlignLeft in PosRelativeToAnchor then
         FLeftTop.x := Anchor.Left + MarginLeft;
+      if raAlignRight in PosRelativeToAnchor then
+        FRightBottom.x := Anchor.Left + Anchor.Width - MarginRight;
       if raToEndOf in PosRelativeToAnchor then
         FLeftTop.x := Anchor.Left + Anchor.Width + Anchor.MarginRight + MarginLeft;
       if raAlignTop in PosRelativeToAnchor then
         FLeftTop.y := Anchor.Top + MarginTop;
-      { TODO: other combinations }
+      if raAlignBottom in PosRelativeToAnchor then
+        FRightBottom.y := Anchor.Top + Anchor.Height - MarginBottom;
+      { TODO: other combinations raToStartOf, raToLeftOf, raAlignStart, raAlignEnd }
       if ([raBelow, raAlignBottom] * PosRelativeToAnchor <> [])
       and Assigned(Parent) and (rpBottom in PosRelativeToParent) then
         FRightBottom.y := Parent.Height - MarginBottom;
