@@ -597,6 +597,8 @@ function jListView_GetLeftItemCaption(env: PJNIEnv; _jlistview: JObject; _fullIt
 function jListView_GetRightItemCaption(env: PJNIEnv; _jlistview: JObject; _fullItemCaption: string): string;
 function jListView_GetLongPressSelectedItem(env: PJNIEnv; _jlistview: JObject): integer;
 procedure jListView_SetAllPartsOnDrawItemTextColor(env: PJNIEnv; _jlistview: JObject; _value: boolean);
+procedure jListView_SetItemPaddingTop(env: PJNIEnv; _jlistview: JObject; _ItemPaddingTop: integer);
+procedure jListView_SetItemPaddingBottom(env: PJNIEnv; _jlistview: JObject; _itemPaddingBottom: integer);
 
 // ScrollView
 Function  jScrollView_Create           (env:PJNIEnv;  this:jobject; SelfObj: TObject): jObject;
@@ -5310,6 +5312,33 @@ begin
   jParams[0].z:= JBool(_value);
   jCls:= env^.GetObjectClass(env, _jlistview);
   jMethod:= env^.GetMethodID(env, jCls, 'SetAllPartsOnDrawItemTextColor', '(Z)V');
+  env^.CallVoidMethodA(env, _jlistview, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jListView_SetItemPaddingTop(env: PJNIEnv; _jlistview: JObject; _ItemPaddingTop: integer);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].i:= _ItemPaddingTop;
+  jCls:= env^.GetObjectClass(env, _jlistview);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetItemPaddingTop', '(I)V');
+  env^.CallVoidMethodA(env, _jlistview, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+
+procedure jListView_SetItemPaddingBottom(env: PJNIEnv; _jlistview: JObject; _itemPaddingBottom: integer);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].i:= _itemPaddingBottom;
+  jCls:= env^.GetObjectClass(env, _jlistview);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetItemPaddingBottom', '(I)V');
   env^.CallVoidMethodA(env, _jlistview, jMethod, @jParams);
   env^.DeleteLocalRef(env, jCls);
 end;

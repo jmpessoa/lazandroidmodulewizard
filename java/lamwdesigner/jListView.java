@@ -86,6 +86,9 @@ class jArrayAdapter extends ArrayAdapter {
 
 	boolean mChangeFontSizeByComplexUnitPixel;
 	int mTextSizeTypedValue;
+	
+    int mItemPaddingTop = 40;
+    int mItemPaddingBottom = 40;
 
 	public  jArrayAdapter(Context context, Controls ctrls,long pasobj, int textViewResourceId,
 						  List<jListItemRow> list) {
@@ -132,6 +135,14 @@ class jArrayAdapter extends ArrayAdapter {
 		mDispatchOnDrawItemBitmap = _value;
 	}
 	
+	public void SetItemPaddingTop(int _ItemPaddingTop) { 
+	   mItemPaddingTop = _ItemPaddingTop;
+	}
+		
+	public void SetItemPaddingBottom(int _itemPaddingBottom) { 
+	   mItemPaddingBottom =  _itemPaddingBottom;
+	}
+
 	//http://stackoverflow.com/questions/11604846/changing-edittexts-text-size-from-pixel-to-scaled-pixels
 	public float pixelsToDIP( float px ) {  //Density Independent Pixels
 	    DisplayMetrics metrics = ctx.getResources().getDisplayMetrics();
@@ -236,7 +247,8 @@ class jArrayAdapter extends ArrayAdapter {
 			     line = line1;
 			     itemTextLeft = new TextView(ctx);  
 			     itemTextLeft.setId(position + 1111);
-			     itemTextLeft.setPadding(20, 40, 20, 40);			  	
+			     //itemTextLeft.setPadding(20, 40, 20, 40);
+			     itemTextLeft.setPadding(20, mItemPaddingTop, 20, mItemPaddingBottom);
 			     itemTextLeft.setText(imageTxt1);
 				 if (items.get(position).textColor != 0) {
 					 itemTextLeft.setTextColor(items.get(position).textColor);
@@ -257,7 +269,8 @@ class jArrayAdapter extends ArrayAdapter {
 				   line = line2;				
 				   itemTextRight = new TextView(ctx);
 				   itemTextRight.setId(position + 2222);
-				   itemTextRight.setPadding(20, 40, 20, 40);			  	
+				   //itemTextRight.setPadding(20, 40, 20, 40);
+				   itemTextRight.setPadding(20, mItemPaddingTop, 20, mItemPaddingBottom);
 				   itemTextRight.setText(imageTxt2);
 				   if (items.get(position).textColor != 0) {
 					   itemTextRight.setTextColor(items.get(position).textColor);				
@@ -374,12 +387,21 @@ class jArrayAdapter extends ArrayAdapter {
 				}
 				
 				itemText[i] = textViewnew;
-				itemText[i].setPadding(20, 40, 20, 40);  
+				//itemText[i].setPadding(20, 40, 20, 40);  
+				itemText[i].setPadding(20, mItemPaddingTop, 20, mItemPaddingBottom);
 				
 				if (lines.length > 1) {				   	
-					if (i == 0) itemText[i].setPadding(20, 40, 20, 3);                   //left, top, right, bottom						
-					else if (i== lines.length-1) itemText[i].setPadding(20, 3, 20, 40);  
-					else itemText[i].setPadding(20, 3, 20, 3);                           
+					if (i == 0) {
+						//itemText[i].setPadding(20, 40, 20, 3);  ////left, top, right, bottom
+						itemText[i].setPadding(20, mItemPaddingTop, 20, 2);						
+					}
+					else if (i== lines.length-1) { 
+						//itemText[i].setPadding(20, 3, 20, 40);
+						itemText[i].setPadding(20, 2, 20, mItemPaddingBottom);
+					}	
+					else {
+						itemText[i].setPadding(20, 2, 20, 2);                           
+					}
 				}   
 				   				
 				if (i == 0) {										
@@ -1442,5 +1464,14 @@ public class jListView extends ListView {
 	public void SetAllPartsOnDrawItemTextColor(boolean _value) {
 		aadapter.SetAllPartsOnDrawItemTextColor(_value);		
 	}
+
+	public void SetItemPaddingTop(int _ItemPaddingTop) { 
+		aadapter.SetItemPaddingTop( _ItemPaddingTop);
+	}
+	
+	public void SetItemPaddingBottom(int _itemPaddingBottom) { 
+		aadapter.SetItemPaddingBottom(_itemPaddingBottom);
+	}
+
 
 }

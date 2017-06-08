@@ -1233,6 +1233,9 @@ type
     FHighLightSelectedItemColor: TARGBColorBridge;
     FImageItemIdentifier: string;
 
+    FItemPaddingTop: integer;
+    FItemPaddingBottom: integer;
+
     procedure SetHighLightSelectedItemColor(_color: TARGBColorBridge);
 
     Procedure SetColor        (Value : TARGBColorBridge);
@@ -1321,6 +1324,8 @@ type
     function GetRightItemCaption(_fullItemCaption: string): string;
     function GetLongPressSelectedItem(): integer;
     procedure SetAllPartsOnDrawItemTextColor(_value: boolean);
+    procedure SetItemPaddingTop(_ItemPaddingTop: integer);
+    procedure SetItemPaddingBottom(_itemPaddingBottom: integer);
 
     //Property
     property setItemIndex: TXY write SetItemPosition;
@@ -1345,6 +1350,9 @@ type
     property FontFace: TFontFace read FFontFace write SetFontFace default ffNormal;
 
     property ImageItemIdentifier: string read FImageItemIdentifier write SetImageByResIdentifier;
+    property ItemPaddingTop: integer read FItemPaddingTop write SetItemPaddingTop;
+    property ItemPaddingBottom: integer read FItemPaddingBottom write SetItemPaddingBottom;
+
     // Event
     property OnClickItem : TOnClickCaptionItem read FOnClickItem write FOnClickItem;
     property OnClickWidgetItem: TOnClickWidgetItem read FOnClickWidgetItem write FOnClickWidgetItem;
@@ -6502,6 +6510,9 @@ begin
   FHighLightSelectedItemColor:= colbrDefault;
   FImageItemIdentifier:= '';
 
+  FItemPaddingTop:= 40;
+  FItemPaddingBottom:= 40;
+
 end;
 
 destructor jListView.Destroy;
@@ -6588,6 +6599,12 @@ begin
 
   end;
 
+  if FItemPaddingTop <> 40 then
+    jListView_SetItemPaddingTop(FjEnv, FjObject, FItemPaddingTop);
+
+  if FItemPaddingBottom <> 40 then
+    jListView_SetItemPaddingBottom(FjEnv, FjObject, FItemPaddingBottom);
+
   if FParent <> nil then
   begin
     if FParent is jPanel then
@@ -6650,7 +6667,7 @@ begin
 
   if FHighLightSelectedItemColor <> colbrDefault then
   begin
-    Self.SetHighLightSelectedItemColor(FHighLightSelectedItemColor);
+    jListView_SetHighLightSelectedItemColor(FjEnv, FjObject, GetARGB(FCustomColor, FHighLightSelectedItemColor));
   end;
 
 end;
@@ -7210,6 +7227,22 @@ begin
   //in designing component state: set value here...
   if FInitialized then
      jListView_SetAllPartsOnDrawItemTextColor(FjEnv, FjObject, _value);
+end;
+
+procedure jListView.SetItemPaddingTop(_ItemPaddingTop: integer);
+begin
+  //in designing component state: set value here...
+  FItemPaddingTop:= _ItemPaddingTop;
+  if FInitialized then
+     jListView_SetItemPaddingTop(FjEnv, FjObject, _ItemPaddingTop);
+end;
+
+procedure jListView.SetItemPaddingBottom(_itemPaddingBottom: integer);
+begin
+  //in designing component state: set value here...
+  FItemPaddingBottom:= _itemPaddingBottom;
+  if FInitialized then
+     jListView_SetItemPaddingBottom(FjEnv, FjObject, _itemPaddingBottom);
 end;
 
 //------------------------------------------------------------------------------
