@@ -20,7 +20,7 @@ procedure StartImportJavaStuff(Sender: TObject);
 procedure StartImportCStuff(Sender: TObject);
 procedure StartLogcatClear(Sender: TObject);
 procedure StartLogcatDump(Sender: TObject);
-procedure StartLogcatRuntimeError(Sender: TObject);
+//procedure StartLogcatRuntimeError(Sender: TObject);
 
 procedure Register;
 
@@ -384,10 +384,12 @@ begin
 
 end;
 
+(*
 procedure StartLogcatSync(Sender: TObject);
 begin
    StartLogcat('logcat');  //dump
 end;
+*)
 
 procedure StartLogcatClear(Sender: TObject);
 begin
@@ -399,10 +401,12 @@ begin
    StartLogcat('logcat -d');  //dump
 end;
 
+(*
 procedure StartLogcatRuntimeError(Sender: TObject);
 begin
    StartLogcat('logcat AndroidRuntime:E *:S');  //error
 end;
+*)
 
 procedure StartImportCStuff(Sender: TObject);
 var
@@ -1024,7 +1028,7 @@ begin
   // Adding first entry
 
   RegisterIDEMenuCommand(ideSubMnuLog, 'PathToLogcat', 'Logcat -d [dump]', nil, @StartLogcatDump);
-  RegisterIDEMenuCommand(ideSubMnuLog, 'PathToLogcat', 'Logcat Runtime:E [error]', nil, @StartLogcatRuntimeError);
+  //RegisterIDEMenuCommand(ideSubMnuLog, 'PathToLogcat', 'Logcat Runtime:E [error]', nil, @StartLogcatRuntimeError);
   //RegisterIDEMenuCommand(ideSubMnuLog, 'PathToLogcat', 'Logcat [sync]', nil, @StartLogcatSync);
   RegisterIDEMenuCommand(ideSubMnuLog, 'PathToLogcat', 'Logcat -c [clear]', nil, @StartLogcatClear);
   //Run
