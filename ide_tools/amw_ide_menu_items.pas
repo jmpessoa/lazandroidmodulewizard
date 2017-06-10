@@ -18,6 +18,9 @@ procedure StartFPCTrunkSource(Sender: TObject);
 procedure StartEclipseToggleTooling(Sender: TObject);
 procedure StartImportJavaStuff(Sender: TObject);
 procedure StartImportCStuff(Sender: TObject);
+procedure StartLogcatClear(Sender: TObject);
+procedure StartLogcatDump(Sender: TObject);
+procedure StartLogcatRuntimeError(Sender: TObject);
 
 procedure Register;
 
@@ -340,6 +343,65 @@ begin
       auxList.Free;
     end;
   end;
+end;
+
+procedure StartLogcat(paramText: string);
+var
+   Project: TLazProject;
+   Tool:TIDEExternalToolOptions;
+   pathToADB: string;
+   strExt: string;
+   pathToSdk: string;
+   packageName: string;
+begin
+  Project:= LazarusIDE.ActiveProject;
+  if Assigned(Project) and (Project.CustomData.Values['LAMW'] <> '' ) then
+  begin
+    pathToSdk:= Project.CustomData.Values['SdkPath'];
+    packageName:= Project.CustomData.Values['Package'];
+    pathToADB:= pathToSdk+'platform-tools';
+
+    strExt:= '';
+    {$IFDEF Windows}
+      strExt:= '.exe';
+    {$Endif}
+
+    Tool := TIDEExternalToolOptions.Create;
+    try
+      Tool.Title := 'Running Extern [adb] Tool ... ';
+      Tool.WorkingDirectory := pathToADB;
+      Tool.Executable := pathToADB + DirectorySeparator+ 'adb'+strExt;
+      Tool.CmdLineParams := paramText;
+      Tool.Scanners.Add(SubToolDefault);
+      if not RunExternalTool(Tool) then
+        raise Exception.Create('Cannot Run Extern [adb] Tool!');
+    finally
+      Tool.Free;
+    end;
+
+  end else
+    ShowMessage('Sorry, the active project is not a LAMW project!');
+
+end;
+
+procedure StartLogcatSync(Sender: TObject);
+begin
+   StartLogcat('logcat');  //dump
+end;
+
+procedure StartLogcatClear(Sender: TObject);
+begin
+   StartLogcat('logcat -c');  //clear
+end;
+
+procedure StartLogcatDump(Sender: TObject);
+begin
+   StartLogcat('logcat -d');  //dump
+end;
+
+procedure StartLogcatRuntimeError(Sender: TObject);
+begin
+   StartLogcat('logcat AndroidRuntime:E *:S');  //error
 end;
 
 procedure StartImportCStuff(Sender: TObject);
@@ -924,6 +986,7 @@ procedure Register;
 Var
   ideMnuAMW: TIDEMenuSection;
   ideSubMnuAMW: TIDEMenuSection;
+  ideSubMnuLog: TIDEMenuSection;
 begin
   // Register main menu
   ideMnuAMW:= RegisterIDEMenuSection(mnuTools,'AMW');
@@ -954,8 +1017,17 @@ begin
   // Adding 11a. entry
   RegisterIDEMenuCommand(ideSubMnuAMW, 'PathToImportCCode', 'Use/Import C Stuff...', nil, @StartImportCStuff);
 
-
   // And so on...
+
+  // Register submenu    StartLogcatRuntimeError
+  ideSubMnuLog:= RegisterIDESubMenu(ideSubMnuAMW, 'Logcatch', 'ADB Logcat');
+  // Adding first entry
+
+  RegisterIDEMenuCommand(ideSubMnuLog, 'PathToLogcat', 'Logcat -d [dump]', nil, @StartLogcatDump);
+  RegisterIDEMenuCommand(ideSubMnuLog, 'PathToLogcat', 'Logcat Runtime:E [error]', nil, @StartLogcatRuntimeError);
+  //RegisterIDEMenuCommand(ideSubMnuLog, 'PathToLogcat', 'Logcat [sync]', nil, @StartLogcatSync);
+  RegisterIDEMenuCommand(ideSubMnuLog, 'PathToLogcat', 'Logcat -c [clear]', nil, @StartLogcatClear);
+  //Run
   RegisterIDEMenuCommand(itmRunBuilding, 'BuildAPKandRun', '[Lamw] Build Android Apk and Run',nil, @BuildAPKandRun);
 
   ApkBuild.RegisterExtToolParser;

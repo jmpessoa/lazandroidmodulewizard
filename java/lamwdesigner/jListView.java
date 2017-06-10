@@ -40,6 +40,8 @@ class jListItemRow {
 	int widget = 0;   //there is not a widget!
 	View jWidget;     //fixed RadioButton Group default behavior: thanks to Leledumbo.
 	String widgetText;
+	int widgetTextColor;
+	
 	int savePosition = -1;
 	
 	String delimiter;	
@@ -458,6 +460,12 @@ class jArrayAdapter extends ArrayAdapter {
 				case 1:  itemWidget = new CheckBox(ctx);
 					((CheckBox)itemWidget).setId(position+6666);
 					((CheckBox)itemWidget).setText(items.get(position).widgetText);
+					if (items.get(position).widgetTextColor != 0) {
+					   ((CheckBox)itemWidget).setTextColor(items.get(position).widgetTextColor);
+					}
+					if (items.get(position).textSize != 0) {
+					   ((CheckBox)itemWidget).setTextSize(items.get(position).textSize);
+					}
 					items.get(position).jWidget = itemWidget; //
 					((CheckBox)itemWidget).setChecked(items.get(position).checked);
 					break;
@@ -465,6 +473,12 @@ class jArrayAdapter extends ArrayAdapter {
 				case 2:  itemWidget = new RadioButton(ctx);
 					((RadioButton)itemWidget).setId(position+6666);
 					((RadioButton)itemWidget).setText(items.get(position).widgetText);
+					if (items.get(position).widgetTextColor != 0) {
+					   ((RadioButton)itemWidget).setTextColor(items.get(position).widgetTextColor);
+					}
+					if (items.get(position).textSize != 0) {
+					   ((RadioButton)itemWidget).setTextSize(items.get(position).textSize);
+					}
 					items.get(position).jWidget = itemWidget; //
 					((RadioButton)itemWidget).setChecked(items.get(position).checked);
 					break;
@@ -472,18 +486,38 @@ class jArrayAdapter extends ArrayAdapter {
 				case 3:  itemWidget = new Button(ctx);
 					((Button)itemWidget).setId(position+6666);
 					((Button)itemWidget).setText(items.get(position).widgetText);
+					if (items.get(position).widgetTextColor != 0) {
+				    	((Button)itemWidget).setTextColor(items.get(position).widgetTextColor);
+					}
+					if (items.get(position).textSize != 0) {
+					    ((Button)itemWidget).setTextSize(items.get(position).textSize);
+					}
 					items.get(position).jWidget = itemWidget;
 					break;
 					
 				case 4:  itemWidget = new TextView(ctx);
 					((TextView)itemWidget).setId(position+6666);
 					((TextView)itemWidget).setText(items.get(position).widgetText);
+					if (items.get(position).widgetTextColor != 0) {
+					  ((TextView)itemWidget).setTextColor(items.get(position).widgetTextColor);
+					}
+					if (items.get(position).textSize != 0) {
+					   ((TextView)itemWidget).setTextSize(items.get(position).textSize);
+					}
 					items.get(position).jWidget = itemWidget;
 					break;
 
 				case 5:  itemWidget = new EditText(ctx);
 					((EditText)itemWidget).setId(position+6666);
 					((EditText)itemWidget).setText(items.get(position).widgetText);
+					/*
+					if (items.get(position).widgetTextColor != 0) {
+					  ((EditText)itemWidget).setTextColor(items.get(position).widgetTextColor);
+					}
+					if (items.get(position).textSize != 0) {
+					  ((EditText)itemWidget).setTextSize(items.get(position).textSize);
+					}
+					*/
 					((EditText)itemWidget).setLines(1);
 					((EditText)itemWidget).setMaxLines(1);
 					((EditText)itemWidget).setMinLines(1);
@@ -774,7 +808,8 @@ public class jListView extends ListView {
 	private Bitmap          genericBmp = null;
 	private int             widgetItem;
 	private String          widgetText;
-	private int             textColor;
+	private int             widgetTextColor;	
+	private int             textColor;		
 	private int             textSize;
 	private Typeface        typeFace = Typeface.DEFAULT;
 
@@ -827,6 +862,7 @@ public class jListView extends ListView {
 		PasObj = pasobj;
 
 		textColor = 0; //dummy: default
+		widgetTextColor = 0; //dummy: default
 		textSize  = 0; //dummy: default
 
 		widgetItem = widget;
@@ -946,7 +982,7 @@ public class jListView extends ListView {
 	public  void setTextColor( int textcolor) {
 		this.textColor =textcolor;
 	}
-
+	
 	public void setTextSize (int textsize) {
 		this.textSize = textsize;
 	}
@@ -1077,7 +1113,8 @@ public class jListView extends ListView {
 		info.widgetText= widgetText;
 		info.checked = false;
 		info.textSize= textSize;
-		info.textColor= textColor;
+		info.textColor= textColor;		
+		info.widgetTextColor= widgetTextColor;		
 		info.bmp = genericBmp;
 
 		info.textDecorated = textDecorated;
@@ -1106,6 +1143,7 @@ public class jListView extends ListView {
 		info.checked = false;
 		info.textSize= textSize;
 		info.textColor= textColor;
+		info.widgetTextColor= widgetTextColor;
 		info.bmp = bm;
 
 		info.textDecorated = textDecorated;
@@ -1473,5 +1511,8 @@ public class jListView extends ListView {
 		aadapter.SetItemPaddingBottom(_itemPaddingBottom);
 	}
 
+	public void SetWidgetTextColor(int _textcolor) {
+		this.widgetTextColor = _textcolor; 
+	} 
 
 }

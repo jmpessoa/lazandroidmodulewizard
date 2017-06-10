@@ -1236,6 +1236,8 @@ type
     FItemPaddingTop: integer;
     FItemPaddingBottom: integer;
 
+    FWidgetTextColor: TARGBColorBridge;
+
     procedure SetHighLightSelectedItemColor(_color: TARGBColorBridge);
 
     Procedure SetColor        (Value : TARGBColorBridge);
@@ -1326,6 +1328,7 @@ type
     procedure SetAllPartsOnDrawItemTextColor(_value: boolean);
     procedure SetItemPaddingTop(_ItemPaddingTop: integer);
     procedure SetItemPaddingBottom(_itemPaddingBottom: integer);
+    procedure SetWidgetTextColor(_textcolor: TARGBColorBridge);
 
     //Property
     property setItemIndex: TXY write SetItemPosition;
@@ -1352,6 +1355,7 @@ type
     property ImageItemIdentifier: string read FImageItemIdentifier write SetImageByResIdentifier;
     property ItemPaddingTop: integer read FItemPaddingTop write SetItemPaddingTop;
     property ItemPaddingBottom: integer read FItemPaddingBottom write SetItemPaddingBottom;
+    property WidgetTextColor: TARGBColorBridge read FWidgetTextColor write SetWidgetTextColor;
 
     // Event
     property OnClickItem : TOnClickCaptionItem read FOnClickItem write FOnClickItem;
@@ -6513,6 +6517,8 @@ begin
   FItemPaddingTop:= 40;
   FItemPaddingBottom:= 40;
 
+  FWidgetTextColor:= colbrDefault;
+
 end;
 
 destructor jListView.Destroy;
@@ -6545,6 +6551,9 @@ begin
                                Ord(FWidgetItem), FWidgetText, FImageItem.GetImage,
                                Ord(FTextDecorated), Ord(FItemLayout), Ord(FTextSizeDecorated), Ord(FTextAlign));
 
+    if FWidgetTextColor <> colbrDefault then
+        jListView_SetWidgetTextColor(FjEnv, FjObject,  GetARGB(FCustomColor, FWidgetTextColor));
+
     if FFontColor <> colbrDefault then
        jListView_setTextColor(FjEnv, FjObject, GetARGB(FCustomColor, FFontColor));
 
@@ -6560,6 +6569,12 @@ begin
     if FColor <> colbrDefault then
        View_SetBackGroundColor(FjEnv, FjThis, FjObject , GetARGB(FCustomColor, FColor));
 
+    if FItemPaddingTop <> 40 then
+      jListView_SetItemPaddingTop(FjEnv, FjObject, FItemPaddingTop);
+
+    if FItemPaddingBottom <> 40 then
+      jListView_SetItemPaddingBottom(FjEnv, FjObject, FItemPaddingBottom);
+
     for i:= 0 to FItems.Count-1 do
     begin
       if FItems.Strings[i] <> '' then
@@ -6572,6 +6587,9 @@ begin
     FjObject := jListView_Create3(FjEnv, FjThis, Self,
                                Ord(FWidgetItem), FWidgetText,
                                Ord(FTextDecorated),Ord(FItemLayout), Ord(FTextSizeDecorated), Ord(FTextAlign));
+
+   if FWidgetTextColor <> colbrDefault then
+      jListView_SetWidgetTextColor(FjEnv, FjObject,  GetARGB(FCustomColor, FWidgetTextColor));
 
     if FFontColor <> colbrDefault then
       jListView_setTextColor(FjEnv, FjObject , GetARGB(FCustomColor, FFontColor));
@@ -6591,6 +6609,12 @@ begin
     if FImageItemIdentifier <> '' then    //ic_launcher
         jListView_SetImageByResIdentifier(FjEnv, FjObject, FImageItemIdentifier);
 
+    if FItemPaddingTop <> 40 then
+       jListView_SetItemPaddingTop(FjEnv, FjObject, FItemPaddingTop);
+
+    if FItemPaddingBottom <> 40 then
+       jListView_SetItemPaddingBottom(FjEnv, FjObject, FItemPaddingBottom);
+
     for i:= 0 to FItems.Count-1 do
     begin
        if FItems.Strings[i] <> '' then
@@ -6598,12 +6622,6 @@ begin
     end;
 
   end;
-
-  if FItemPaddingTop <> 40 then
-    jListView_SetItemPaddingTop(FjEnv, FjObject, FItemPaddingTop);
-
-  if FItemPaddingBottom <> 40 then
-    jListView_SetItemPaddingBottom(FjEnv, FjObject, FItemPaddingBottom);
 
   if FParent <> nil then
   begin
@@ -7243,6 +7261,14 @@ begin
   FItemPaddingBottom:= _itemPaddingBottom;
   if FInitialized then
      jListView_SetItemPaddingBottom(FjEnv, FjObject, _itemPaddingBottom);
+end;
+
+procedure jListView.SetWidgetTextColor(_textcolor: TARGBColorBridge);
+begin
+  //in designing component state: set value here...
+  FWidgetTextColor:= _textcolor;
+  if FInitialized then
+      jListView_SetWidgetTextColor(FjEnv, FjObject,  GetARGB(FCustomColor, _textcolor));
 end;
 
 //------------------------------------------------------------------------------
