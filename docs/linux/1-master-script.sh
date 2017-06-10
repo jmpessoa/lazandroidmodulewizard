@@ -6,33 +6,30 @@
 # changes to renabor at iol dot it with "new_how_to_install_by_renabor"
 # in the subject line.
 
-BASE=bin/freepascal
 
 ################
 # How to install LAMW on Linux.
 ################
 
-if [ ! -d $HOME/$BASE ]; then
-  mkdir $HOME/$BASE
-  cp *.sh $HOME/$BASE
-fi
+mkdir -p ~/bin/freepascal
+cp *.sh ~/bin/freepascal
 
 ################
 # install some necessary programs:
 ################
 
-#sudo apt-get install android-tools-adb ant openjdk-8-jdk subversion freeglut3 freeglut3-dev
-#sudo apt-get install libgtk2-gladexml-perl libgtk2.0-bin libgtk2.0-cil libwxgtk3.0-0v5 
-#sudo apt-get install libgtk2.0-dev libgdk-pixbuf2.0-dev libgpm-dev fakeroot libncurses5-dev libtinfo-dev
+sudo apt-get install -y make build-essential p7zip-full
+sudo apt-get install -y android-tools-adb ant openjdk-8-jdk subversion freeglut3 freeglut3-dev
+sudo apt-get install -y libcairo2-dev libpango1.0-dev libatk1.0-dev libghc-x11-dev
+sudo apt-get install -y libgtk2-gladexml-perl libgtk2.0-bin libgtk2.0-cil libwxgtk3.0-0v5 
+sudo apt-get install -y libgtk2.0-dev libgdk-pixbuf2.0-dev libgpm-dev fakeroot libncurses5-dev libtinfo-dev
 
 ################
 # initial setup
 ################
 
-if [ ! -d $HOME/Android ]; then
-  mkdir $HOME/Android
-fi
-cd $HOME/Android
+mkdir ~/Android
+cd ~/Android
 
 ################
 # install Android NDK
@@ -43,43 +40,39 @@ wget https://dl.google.com/android/repository/android-ndk-r11c-linux-x86_64.zip
 unzip android-ndk-r11c-linux-x86_64.zip
 
 # create a symbolic link for later use
-if [ ! -L $HOME/Android/ndk ]; then
-  ln -s $HOME/Android/android-ndk-r11c $HOME/Android/ndk
-fi
+ln -s $HOME/Android/android-ndk-r11c $HOME/Android/ndk
 
 ################
 # create symbolic link for linker
 ################
 
 cd /usr/bin
-if [ ! -L arm-linux-androideabi-as ]; then 
-  sudo ln -s $HOME/Android/ndk/toolchains/arm-linux-androideabi-4.9/prebuilt/linux-x86_64/bin/arm-linux-androideabi-as arm-linux-androideabi-as
-  sudo ln -s $HOME/Android/ndk/toolchains/arm-linux-androideabi-4.9/prebuilt/linux-x86_64/bin/arm-linux-androideabi-ld.bfd arm-linux-androideabi-ld
-  sudo ln -s /usr/bin/arm-linux-androideabi-as arm-linux-as
-  sudo ln -s /usr/bin/arm-linux-androideabi-ld arm-linux-ld
-fi
+sudo ln -s $HOME/Android/ndk/toolchains/arm-linux-androideabi-4.9/prebuilt/linux-x86_64/bin/arm-linux-androideabi-as arm-linux-androideabi-as
+sudo ln -s $HOME/Android/ndk/toolchains/arm-linux-androideabi-4.9/prebuilt/linux-x86_64/bin/arm-linux-androideabi-ld.bfd arm-linux-androideabi-ld
+sudo ln -s /usr/bin/arm-linux-androideabi-as arm-linux-as
+sudo ln -s /usr/bin/arm-linux-androideabi-ld arm-linux-ld
+
 
 ################
-# create necessary symlinks under ~/$BASE in which we install fpc and lazarus
+# create necessary symlinks under ~/bin/freepascal in which we install fpc and lazarus
 #
 # The script rename /etc/fpc.cfg and replace it with a symlink !!!
 #
 ################
 
-source $HOME/$BASE/2-fpc-configure.sh
-export PATH
+~/bin/freepascal/2-fpc-configure.sh
 
 ################
 # download fpc and lazarus source
 ################
 
-~/$BASE/3-fpc-getsource.sh
+~/bin/freepascal/3-fpc-getsource.sh
 
 ################
 # compile fpc, lazarus and many crosscompiler
 ################
 
-~/$BASE/4-fpc-build-fixes_3.0.sh
+~/bin/freepascal/4-fpc-build-fixes_3.0.sh
 
 
 ################
@@ -93,10 +86,8 @@ wget https://dl.google.com/android/android-sdk_r24.4.1-linux.tgz
 tar xzvf android-sdk_r24.4.1-linux.tgz
 
 # create a symbolik link for later use
-if [ ! -L $HOME/Android/sdk ]; then
-  ln -s $HOME/Android/android-sdk-linux $HOME/Android/sdk
-  ln -s $HOME/Android/android-sdk-linux $HOME/Android/Sdk
-fi
+ln -s $HOME/Android/android-sdk-linux $HOME/Android/sdk
+ln -s $HOME/Android/android-sdk-linux $HOME/Android/Sdk
 
 ################
 # install SDK packages
@@ -113,9 +104,7 @@ fi
 ################
 
 svn co https://github.com/jmpessoa/lazandroidmodulewizard.git
-if [ ! -L $HOME/Android/lazandroidmodulewizard ]; then
-  ln -s $HOME/Android/svn-lazandroidmodulewizard/trunk $HOME/Android/lazandroidmodulewizard
-fi
+ln -s $HOME/Android/lazandroidmodulewizard.git/trunk $HOME/Android/lazandroidmodulewizard
 # ( for further updating: cd $HOME/Android/svn-lazandroidmodulewizard/ && svn up )
 
 ################
@@ -130,6 +119,30 @@ cat << EOF
                                 - Use -> Install
   1.2 Package -> Open Package -> "lazandroidwizardpack.lpk"
      1.2.1 From Package Wizard
+
+#####################
+CHANGE THESE LINES:
+android_wizard/lamwdesigner.pas
+~ line: 58
+//procedure OnDesignerModified(Sender: TObject{$If lcl_fullversion>=1070000}; {%H-}PropName: ShortString{$ENDIF});
+CHANGE TO -> procedure OnDesignerModified(Sender: TObject);  
+
+android_wizard/lamwdesigner.pas
+~ line: 1032
+//procedure TAndroidWidgetMediator.OnDesignerModified(Sender: TObject{$If lcl_fullversion>=1070000}; {%H-}PropName: ShortString{$ENDIF});
+CHANGE TO -> procedure TAndroidWidgetMediator.OnDesignerModified(Sender: TObject); //
+
+
+ide_tools/apkbuild.pas
+~ line: 577
+Tool.ShowConsole := True;
+CHANGE TO -> // Tool.ShowConsole := True;
+
+ide_tools/apkbuild.pas
+~ line: 604
+Tool.ShowConsole := True;
+CHANGE TO -> //  Tool.ShowConsole := True;
+####################
                                 - Compile
                                 - Use -> Install
   1.3 Package -> Open Package -> "amw_ide_tools.lpk"  [folder: ..\LazAndroidWizard\ide_tools]

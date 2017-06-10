@@ -7,6 +7,9 @@
 # in the subject line.
 
 # Change the line below to define your own install folder
+green=$'\e[1;32m'
+red=$'\e[1;31m'
+end=$'\e[0m'
 
 BASE=$HOME/bin/freepascal
 FPC_STABLE=3.0.1
@@ -22,11 +25,19 @@ ln -s $BASE/$FPC_TARGET $BASE/fpc
 unlink $BASE/fpc-bin
 ln -s $BASE/$FPC_TARGET/bin $BASE/fpc-bin
 
-#unlink $BASE/fpc.cfg
-#ln -s $PPC_CONFIG_PATH/fpc.cfg $BASE/fpc.cfg
-#echo $PPC_CONFIG_PATH/fpc.cfg
-
 # Generate a valid fpc.cfg file
-$PPC_CONFIG_PATH/fpcmkcfg -d basepath=$BASE/fpc-$FPC_STABLE/lib/fpc/\$FPCVERSION -o $PPC_CONFIG_PATH/fpc.cfg
+$PPC_CONFIG_PATH/fpcmkcfg -d basepath=$BASE/fpc-$FPC_STABLE/lib/fpc/$FPC_STABLE -o $PPC_CONFIG_PATH/fpc.cfg
 
+GCCPATH=`gcc --print-libgcc-file-name`
+DIRGCCPATH=$(dirname "${GCCPATH}")
+FPCGCCPATH=`grep -m1 \/usr\/lib\/gcc /etc/fpc.cfg`
+echo $DIR
+if [[ ! "FPCGCCPATH" == *"$DIRGCCPATH"* ]]; then
+ echo "OK"
+  printf "${green}fpc.fpg contains a valid gcc path\n"
+  printf "$DIRGCCPATH${end}\n"
+else
+  printf "${red}fpc.fpg does not contains a valid gcc path\n"
+  printf "should be : $DIRGCCPATH${red}\n"
+fi
 

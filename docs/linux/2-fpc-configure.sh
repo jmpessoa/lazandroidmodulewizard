@@ -9,7 +9,7 @@
 
 BASE=$HOME/bin/freepascal
 FPC_TARGET=fpc_fixes_3_0
-FPC_BUILD=3.0.1
+FPC_BUILD=3.0.3
 NDK_TARGET=4.9
 
 FPC_BIN=fpc-bin

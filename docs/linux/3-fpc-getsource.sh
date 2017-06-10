@@ -21,8 +21,7 @@ BASE=$HOME/bin/freepascal
 # The full version number of the stable compiler and the one we are building
 
 FPC_STABLE=3.0.0
-FPC_BUILD=3.0.1
-
+FPC_BUILD=fpc_fixes_3_0
 
 # TODO Allow the user to pick their compiler and ide versions
 
@@ -31,83 +30,6 @@ if [ "$(id -u)" = "0" ]; then
    echo "This script should not be run as root"
    exit 1
 fi
-
-clear
-echo "Prerequisites for Free Pascal and Lazarus on Linux"
-echo "--------------------------------------------------"
-echo "This installer requires the following packages which"
-echo "can be installed on Debian distributions by using:"
-echo
-echo "sudo apt-get install build-essential p7zip-full"
-echo
-echo "Lazarus requires the following Gtk+ dev packages which"
-echo "can be installed on Debian distributions by using:"
-echo
-echo "sudo apt-get install libgtk2.0-dev libcairo2-dev \\" 
-echo "  libpango1.0-dev libgdk-pixbuf2.0-dev libatk1.0-dev \\"
-echo "  libghc-x11-dev"
-echo
-echo -n "Press return to check your system"
-read CHOICE
-echo
-
-# function require(program) 
-function require() {
-	if ! type "$1" > /dev/null; then
-		echo 
-		echo "An error occured"
-		echo 
-		echo "This script requires the package $1"
-		echo "It was not found on your system"
-		echo 
-		echo "On Debian based distributions type the following to install it"
-		echo 
-		echo "sudo apt-get install $2"
-		echo 
-		echo "Then re-run this script"
-		echo 
-		echo "On other distributions refer to your package manager"
-		echo 
-		exit 1
-	fi	
-	echo "$1 found"
-}
-
-# Require the following programs 
-require "make" "build-essential"
-require "7za" "p7zip-full"
-
-# function requirePackage(package) 
-function requirePackage() {
-	INSTALLED=$(dpkg-query -W --showformat='${Status}\n' $1 2> /dev/null | grep "install ok installed")
-	if [ "$INSTALLED" = "" ]; then
-		echo "$1 not found"
-		echo 
-		echo "An error occured"
-		echo 
-		echo "This script requires the package $1"
-		echo "It was not found on your system"
-		echo 
-		echo "On Debian based distributions type the following to install it"
-		echo 
-		echo "sudo apt-get install $1"
-		echo 
-		echo "Then re-run this script"
-		echo 
-		exit 1
-	fi	
-	echo "$1 found"
-}
-
-if type "dpkg-query" > /dev/null; then
-	requirePackage "libgtk2.0-dev"
-	requirePackage "libcairo2-dev"
-	requirePackage "libpango1.0-dev"
-	requirePackage "libgdk-pixbuf2.0-dev"
-	requirePackage "libatk1.0-dev"
-	requirePackage "libghc-x11-dev"
-fi
-sleep 2s
 
 # function download(url, output)
 function download() {
@@ -250,12 +172,15 @@ fi
 
 # Download from our Amazon S3 bucket 
 URL=http://cache.getlazarus.org/archives
-
+# http://cache.getlazarus.org/archives/fpc-3.0.1.x86_64-linux.7z
 # Download a temporary version of fpc stable
-echo "Downloading fpc stable version fpc-$FPC_STABLE.$CPU-linux.7z"
-download "$BASE/fpc-$FPC_STABLE.$CPU-linux.7z" $URL/fpc-$FPC_STABLE.$CPU-linux.7z
-7za x "$BASE/fpc-$FPC_STABLE.$CPU-linux.7z" -o$BASE
-rm "$BASE/fpc-$FPC_STABLE.$CPU-linux.7z"
+
+if [[ ! -f $BASE/fpc-$FPC_STABLE/bin/fpc ]]; then
+  echo "Downloading fpc stable version fpc-$FPC_STABLE.$CPU-linux.7z"
+  download "$BASE/fpc-$FPC_STABLE.$CPU-linux.7z" $URL/fpc-$FPC_STABLE.$CPU-linux.7z
+  7za x "$BASE/fpc-$FPC_STABLE.$CPU-linux.7z" -o$BASE
+  # rm "$BASE/fpc-$FPC_STABLE.$CPU-linux.7z"
+fi
 
 # Download the new compiler source code 
 echo "Downloading new compiler source $FPC_BUILD"
@@ -265,7 +190,7 @@ svn co http://svn.freepascal.org/svn/fpc/branches/fixes_3_0 $BASE/$FPC_BUILD
 echo "Downloading latest Lazarus source code"
 download "$BASE/lazarus.7z" $URL/lazarus.7z
 7za x "$BASE/lazarus.7z" "-o$BASE"
-rm "$BASE/lazarus.7z"
+# rm "$BASE/lazarus.7z"
 
 # function replace(folder, files, before, after) 
 function replace() {
@@ -302,4 +227,5 @@ case $SHORTCUT in
 		echo 
 		;;
 esac
+
 

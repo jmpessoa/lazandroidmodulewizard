@@ -74,6 +74,18 @@ make clean
 fpcmake -T$CPU-linux
 make all
 make install INSTALL_PREFIX=$BASE/$FPC_TARGET
+
+# UPDATE FPC_BUILD WITH REALLY INSTALLED FPC VERSION
+FPLIB=`ls -td $BASE/$FPC_TARGET/lib/fpc/3*`
+INSTVER="$(basename $FPLIB)"
+if [[ ! $INSTVER == $FPC_BUILD ]]; then
+  mv $BASE/fpc-setver-$FPC_BUILD.sh $BASE/fpc-setver-$INSTVER.sh
+  sed -i "s/=$FPC_BUILD/=$INSTVER/g" $BASE/*.sh
+  unlink $BASE/fpc-$FPC_BUILD
+  ln -s $BASE/$FPC_TARGET $BASE/fpc-$INSTVER
+  FPC_BUILD=$INSTVER
+fi
+
 cp $BASE/$FPC_TARGET/lib/fpc/$FPC_BUILD/ppc* $BASE/$FPC_TARGET/bin/.
 
 # MAKE FPC_BUILD THE DEFAULT FPC COMPILER
