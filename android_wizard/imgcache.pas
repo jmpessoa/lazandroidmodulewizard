@@ -107,11 +107,14 @@ end;
 
 function TImageCacheItem.GetImage: TFPCustomImage;
 begin
-  if not FileExists(FFileName) and Assigned(Fimg) then
+  if not FileExists(FFileName) then
   begin
-    FreeAndNil(FImg);
-    FreeAndNil(FBmp);
-    FreeAndNil(FPng);
+    if Assigned(Fimg) then
+    begin
+      FreeAndNil(FImg);
+      FreeAndNil(FBmp);
+      FreeAndNil(FPng);
+    end
   end else
   if not CheckAttribs then LoadImage;
   Result := FImg
@@ -156,7 +159,7 @@ var
 begin
   im := GetImage;
   if Assigned(FPng) then Exit(FPng);
-  if SameText(ExtractFileExt(FFileName), '.png') then
+  if SameText(ExtractFileExt(FFileName), '.png') and FileExists(FFileName) then
   begin
     FPng := TPortableNetworkGraphic.Create;
     FPng.LoadFromFile(FFileName);
