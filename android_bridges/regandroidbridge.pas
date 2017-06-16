@@ -14,6 +14,7 @@ uses
   Laz_And_Controls,
   Laz_And_GLESv1_Canvas,
   Laz_And_GLESv2_Canvas,
+  comboedittext,
   customdialog,
   digitalClock,
   analogClock,
@@ -54,6 +55,7 @@ begin
   {$I jratingbar_icon.lrs}
   {$I jseekbar_icon.lrs}
   {$I jspinner_icon.lrs}
+  {$I jcomboedittext_icon.lrs}
   {$I jautotextview_icon.lrs}
   {$I jgridview_icon.lrs}
   {$I jListView_icon.lrs}
@@ -95,6 +97,7 @@ begin
       jRatingBar,
       jSeekBar,
       jSpinner,
+      jComboEditText,
       jAutoTextView,
       jGridView,
       jListView,

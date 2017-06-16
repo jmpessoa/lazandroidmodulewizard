@@ -361,6 +361,17 @@ type
                         sr2560x1440,
                         sr2560x1600);
 
+
+  TImeOptions = (imeFlagNoFullScreen,
+                 imeActionNone,
+                 imeActionGo,
+                 imeActionSearch,
+                 imeActionSend,
+                 imeActionNext,
+                 imeActionDone,
+                 imeActionPrevious,
+                 imeFlagForceASCII);
+
   TMenuItemShowAsAction = (misNever,
                         misIfRoom,
                         misAlways,
@@ -654,9 +665,11 @@ type
 
   TOnScrollStateChanged = Procedure(Sender: TObject; firstVisibleItem: integer; visibleItemCount: integer; totalItemCount: integer; lastItemReached: boolean) of object;
 
-  TOnEditLostFocus = Procedure(Sender: TObject; text: string) of object;
+  TOnEditLostFocus = Procedure(Sender: TObject; textContent: string) of object;
 
   TOnDrawItemTextColor = Procedure(Sender: TObject; itemIndex: integer; itemCaption: string; out textColor: TARGBColorBridge) of Object;
+  TOnDrawItemWidgetTextColor = Procedure(Sender: TObject; itemIndex: integer; widgetText: string; out textColor: TARGBColorBridge) of Object;
+
   TOnDrawItemBitmap  = Procedure(Sender: TObject; itemIndex: integer; itemCaption: string; out bimap: JObject) of Object;
 
   TOnWebViewStatus   = Procedure(Sender: TObject; Status : TWebViewStatus;

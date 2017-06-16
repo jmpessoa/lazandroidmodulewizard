@@ -165,6 +165,15 @@ type
     procedure UpdateLayout; override;
   end;
 
+  { TDraftComboEditText }
+
+  TDraftComboEditText = class(TDraftWidget)
+  public
+    constructor Create(AWidget: TAndroidWidget; Canvas: TCanvas); override;
+    procedure Draw; override;
+    procedure UpdateLayout; override;
+  end;
+
   { TDraftButton }
 
   TDraftButton = class(TDraftWidget)
@@ -471,7 +480,7 @@ uses
   customdialog, togglebutton, switchbutton,
   Laz_And_GLESv1_Canvas, Laz_And_GLESv2_Canvas, gridview, Spinner, seekbar,
   radiogroup, ratingbar, digitalclock, analogclock, surfaceview,
-  autocompletetextview, drawingview, chronometer, viewflipper, videoview;
+  autocompletetextview, drawingview, chronometer, viewflipper, videoview, comboedittext;
 
 var
   DraftClassesMap: TDraftControlHash;
@@ -2179,7 +2188,7 @@ begin
     Font.Color := TextColor;
 
     ls := Font.Size;
-    Font.Size := AndroidToLCLFontSize(jAutoTextView(FAndroidWidget).FontSize, 13);
+    Font.Size := AndroidToLCLFontSize(jAutoTextView(FAndroidWidget).FontSize, 11);
     TextOut(4, 12, jAutoTextView(FAndroidWidget).Text);
     Font.Size := ls;
 
@@ -2202,6 +2211,63 @@ var
   fs: Integer;
 begin
   with jAutoTextView(FAndroidWidget) do
+    if LayoutParamHeight = lpWrapContent then
+    begin
+      fs := FontSize;
+      if fs = 0 then fs := 18;
+      FMinHeight := 29 + (fs - 10) * 4 div 3; // todo: multiline
+    end;
+  inherited UpdateLayout;
+end;
+
+{ TDraftComboEditText }
+
+constructor TDraftComboEditText.Create(AWidget: TAndroidWidget; Canvas: TCanvas);
+begin
+  BaseStyle := 'autoTextViewStyle';   //comboEditTextStyle  TODO!
+  inherited;
+  Color := jComboEditText(AWidget).BackgroundColor;
+  FontColor := jComboEditText(AWidget).FontColor;
+end;
+
+procedure TDraftComboEditText.Draw;
+var
+  ls: Integer;
+begin
+  with FCanvas do
+  begin
+    if BackgroundColor <> clNone then
+    begin
+      Brush.Color := BackGroundColor;
+      FillRect(0, 0, FAndroidWidget.Width, FAndroidWidget.Height);
+    end else
+      Brush.Style := bsClear;
+    Font.Color := TextColor;
+
+    ls := Font.Size;
+    Font.Size := AndroidToLCLFontSize(jComboEditText(FAndroidWidget).FontSize, 11);
+    TextOut(4, 12, jComboEditText(FAndroidWidget).Text);
+    Font.Size := ls;
+
+    if BackgroundColor = clNone then
+    begin
+      Pen.Color := RGBToColor(175,175,175);
+      with FAndroidWidget do
+      begin
+        MoveTo(4, Height - 8);
+        Lineto(4, Height - 5);
+        Lineto(Width - 4, Height - 5);
+        Lineto(Width - 4, Height - 8);
+      end;
+    end;
+  end;
+end;
+
+procedure TDraftComboEditText.UpdateLayout;
+var
+  fs: Integer;
+begin
+  with jComboEditText(FAndroidWidget) do
     if LayoutParamHeight = lpWrapContent then
     begin
       fs := FontSize;
@@ -3289,6 +3355,7 @@ initialization
   RegisterAndroidWidgetDraftClass(jSpinner, TDraftSpinner);
   RegisterAndroidWidgetDraftClass(jView, TDraftView);
   RegisterAndroidWidgetDraftClass(jAutoTextView, TDraftAutoTextView);
+  RegisterAndroidWidgetDraftClass(jComboEditText, TDraftComboEditText);
   RegisterAndroidWidgetDraftClass(jDrawingView, TDraftDrawingView);
 
   // TODO :: (default drawing and layout)

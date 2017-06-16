@@ -22,6 +22,10 @@ jAutoTextView = class(jVisualControl)
     FFontSize     : DWord;
     FItems        : TStrings;
     FOnClickDropDownItem: TOnClickCaptionItem;
+    FOnLostFocus: TOnEditLostFocus;
+    FOnEnter  : TOnNotify;
+    FCloseSoftInputOnEnter: boolean;
+    FHint: string;
 
     procedure SetVisible(Value: Boolean);
     procedure SetColor(Value: TARGBColorBridge); //background
@@ -86,28 +90,38 @@ jAutoTextView = class(jVisualControl)
 
     Procedure SetFontSize (AValue : DWord); //setTextSize!
     procedure SetItems(AValue: TStrings);
+    procedure ShowSoftInput();
+    procedure HideSoftInput();
+    procedure SetSoftInputOptions(_imeOption: TImeOptions);
+    procedure SetFocus();
+    procedure RequestFocus();
+    procedure SetCloseSoftInputOnEnter(_closeSoftInput: boolean);
+    procedure SetHint(_hint: string);
 
     procedure GenEvent_OnClickAutoDropDownItem(Obj: TObject; index: integer; caption: string);
     procedure GenEvent_OnBeforeDispatchDraw(Obj: TObject; canvas: JObject; tag: integer);
     procedure GenEvent_OnAfterDispatchDraw(Obj: TObject; canvas: JObject; tag: integer);
-
- published
+    Procedure GenEvent_OnOnLostFocus(Obj: TObject; txt: string);
+    Procedure GenEvent_OnEnter (Obj: TObject);
 
     property Text: string read GetText write SetText;
+
+ published
     property Alignment : TTextAlignment read FTextAlignment write SetTextAlignment;
     property Enabled   : Boolean read FEnabled   write SetEnabled;
-
     property FontColor : TARGBColorBridge  read FFontColor write SetFontColor;
     property FontSize  : DWord   read FFontSize  write SetFontSize;
-
     property FontFace: TFontFace read FFontFace write SetFontFace default ffNormal;
     property TextTypeFace: TTextTypeFace read FTextTypeFace write SetTextTypeFace;
-
     property FontSizeUnit: TFontSizeUnit read FFontSizeUnit write SetFontSizeUnit;
-
     property BackgroundColor: TARGBColorBridge read FColor write SetColor;
     property Items: TStrings read FItems write SetItems;
+    property CloseSoftInputOnEnter: boolean read FCloseSoftInputOnEnter write SetCloseSoftInputOnEnter;
+    property Hint: string read FHint write SetHint;
+
     property OnClick: TOnNotify read FOnClick write FOnClick;
+    property OnEnter: TOnNotify  read FOnEnter write FOnEnter;
+    property OnLostFocus: TOnEditLostFocus read FOnLostFocus write FOnLostFocus;
     property OnClickDropDownItem: TOnClickCaptionItem read FOnClickDropDownItem write FOnClickDropDownItem;
     property OnBeforeDispatchDraw: TOnBeforeDispatchDraw read FOnBeforeDispatchDraw write FOnBeforeDispatchDraw;
     property OnAfterDispatchDraw: TOnBeforeDispatchDraw read FOnAfterDispatchDraw write FOnAfterDispatchDraw;
@@ -153,8 +167,13 @@ Procedure jAutoTextView_setTextColor(env:PJNIEnv; TextView: jObject; color : DWo
 function jAutoTextView_GetLParamHeight(env: PJNIEnv; _jautotextview: JObject): integer;
 function jAutoTextView_GetLParamWidth(env: PJNIEnv; _jautotextview: JObject): integer;
 
-
-
+procedure jAutoTextView_ShowSoftInput(env: PJNIEnv; _jautotextview: JObject);
+procedure jAutoTextView_HideSoftInput(env: PJNIEnv; _jautotextview: JObject);
+procedure jAutoTextView_SetSoftInputOptions(env: PJNIEnv; _jautotextview: JObject; _imeOption: integer);
+procedure jAutoTextView_SetFocus(env: PJNIEnv; _jautotextview: JObject);
+procedure jAutoTextView_RequestFocus(env: PJNIEnv; _jautotextview: JObject);
+procedure jAutoTextView_SetCloseSoftInputOnEnter(env: PJNIEnv; _jautotextview: JObject; _closeSoftInput: boolean);
+procedure jAutoTextView_SetHint(env: PJNIEnv; _jautotextview: JObject; _hint: string);
 
 implementation
 
@@ -167,10 +186,10 @@ constructor jAutoTextView.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
 
-  FMarginBottom := 10;
+  FMarginBottom := 5;
   FMarginLeft   := 5;
   FMarginRight  := 5;
-  FMarginTop    := 10;
+  FMarginTop    := 5;
   FHeight       := 40;
   FWidth        := 100;
 
@@ -180,9 +199,10 @@ begin
   FAcceptChildrenAtDesignTime:= False;
 
   FTextAlignment:= taLeft;
-  FText:= '';
+  //FText:= '';
   FFontFace := ffNormal;
   FTextTypeFace:= tfNormal;
+  FCloseSoftInputOnEnter:= True;
 
   FItems:= TStringList.Create;
 
@@ -272,9 +292,6 @@ begin
   if  FColor <> colbrDefault then
     View_SetBackGroundColor(FjEnv, FjObject, GetARGB(FCustomColor, FColor));
 
-  if  FText <> '' then
-      jAutoTextView_SetText(FjEnv, FjObject , FText);
-
   if  FFontColor <> colbrDefault then
     jAutoTextView_SetTextColor(FjEnv, FjObject , GetARGB(FCustomColor, FFontColor));
 
@@ -285,6 +302,12 @@ begin
     jAutoTextView_SetTextSize(FjEnv, FjObject , FFontSize);
 
   jAutoTextView_SetFontAndTextTypeFace(FjEnv, FjObject, Ord(FFontFace), Ord(FTextTypeFace));
+
+  if not FCloseSoftInputOnEnter then
+    jAutoTextView_SetCloseSoftInputOnEnter(FjEnv, FjObject, FCloseSoftInputOnEnter);
+
+  if FHint <> '' then
+     jAutoTextView_SetHint(FjEnv, FjObject, FHint);
 
   for i:= 0 to FItems.Count-1 do
      jAutoTextView_Add(FjEnv, FjObject , FItems.Strings[i]);
@@ -527,8 +550,8 @@ begin
   //in designing component state: set value here...
   if FInitialized then
   begin
-     FItems.Add(_text);
      jAutoTextView_Add(FjEnv, FjObject, _text);
+     FItems.Add(_text);
   end;
 end;
 
@@ -704,6 +727,57 @@ begin
   end;
 end;
 
+procedure jAutoTextView.ShowSoftInput();
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jAutoTextView_ShowSoftInput(FjEnv, FjObject);
+end;
+
+procedure jAutoTextView.HideSoftInput();
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jAutoTextView_HideSoftInput(FjEnv, FjObject);
+end;
+
+procedure jAutoTextView.SetSoftInputOptions(_imeOption: TImeOptions);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jAutoTextView_SetSoftInputOptions(FjEnv, FjObject, Ord(_imeOption));
+end;
+
+procedure jAutoTextView.SetFocus();
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jAutoTextView_SetFocus(FjEnv, FjObject);
+end;
+
+procedure jAutoTextView.RequestFocus();
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jAutoTextView_RequestFocus(FjEnv, FjObject);
+end;
+
+procedure jAutoTextView.SetCloseSoftInputOnEnter(_closeSoftInput: boolean);
+begin
+  //in designing component state: set value here...
+  FCloseSoftInputOnEnter:= _closeSoftInput;
+  if FInitialized then
+     jAutoTextView_SetCloseSoftInputOnEnter(FjEnv, FjObject, _closeSoftInput);
+end;
+
+procedure jAutoTextView.SetHint(_hint: string);
+begin
+  //in designing component state: set value here...
+  FHint:= _hint;
+  if FInitialized then
+     jAutoTextView_SetHint(FjEnv, FjObject, _hint);
+end;
+
 Procedure jAutoTextView.GenEvent_OnBeforeDispatchDraw(Obj: TObject; canvas: jObject; tag: integer);
 begin
   if Assigned(FOnBeforeDispatchDraw) then FOnBeforeDispatchDraw(Obj, canvas, tag);
@@ -717,6 +791,16 @@ end;
 Procedure jAutoTextView.GenEvent_OnClickAutoDropDownItem(Obj: TObject; index: integer;  caption: string);
 begin
   if Assigned(FOnClickDropDownItem) then FOnClickDropDownItem(Obj,index, caption);
+end;
+
+Procedure jAutoTextView.GenEvent_OnOnLostFocus(Obj: TObject; txt: string);
+begin
+  if Assigned(FOnLostFocus) then FOnLostFocus(Obj, txt);
+end;
+
+Procedure jAutoTextView.GenEvent_OnEnter(Obj: TObject);
+begin
+  if Assigned(FOnEnter) then FOnEnter(Obj);
 end;
 
 {-------- jAutoTextView_JNI_Bridge ----------}
@@ -1206,5 +1290,90 @@ begin
   env^.DeleteLocalRef(env, jCls);
 end;
 
+procedure jAutoTextView_ShowSoftInput(env: PJNIEnv; _jautotextview: JObject);
+var
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jautotextview);
+  jMethod:= env^.GetMethodID(env, jCls, 'ShowSoftInput', '()V');
+  env^.CallVoidMethod(env, _jautotextview, jMethod);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+
+procedure jAutoTextView_HideSoftInput(env: PJNIEnv; _jautotextview: JObject);
+var
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jautotextview);
+  jMethod:= env^.GetMethodID(env, jCls, 'HideSoftInput', '()V');
+  env^.CallVoidMethod(env, _jautotextview, jMethod);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jAutoTextView_SetSoftInputOptions(env: PJNIEnv; _jautotextview: JObject; _imeOption: integer);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].i:= _imeOption;
+  jCls:= env^.GetObjectClass(env, _jautotextview);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetSoftInputOptions', '(I)V');
+  env^.CallVoidMethodA(env, _jautotextview, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jAutoTextView_SetFocus(env: PJNIEnv; _jautotextview: JObject);
+var
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jautotextview);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetFocus', '()V');
+  env^.CallVoidMethod(env, _jautotextview, jMethod);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+
+procedure jAutoTextView_RequestFocus(env: PJNIEnv; _jautotextview: JObject);
+var
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jautotextview);
+  jMethod:= env^.GetMethodID(env, jCls, 'RequestFocus', '()V');
+  env^.CallVoidMethod(env, _jautotextview, jMethod);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jAutoTextView_SetCloseSoftInputOnEnter(env: PJNIEnv; _jautotextview: JObject; _closeSoftInput: boolean);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].z:= JBool(_closeSoftInput);
+  jCls:= env^.GetObjectClass(env, _jautotextview);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetCloseSoftInputOnEnter', '(Z)V');
+  env^.CallVoidMethodA(env, _jautotextview, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jAutoTextView_SetHint(env: PJNIEnv; _jautotextview: JObject; _hint: string);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_hint));
+  jCls:= env^.GetObjectClass(env, _jautotextview);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetHint', '(Ljava/lang/String;)V');
+  env^.CallVoidMethodA(env, _jautotextview, jMethod, @jParams);
+  env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
 
 end.

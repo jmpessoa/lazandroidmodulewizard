@@ -116,6 +116,8 @@ uses
 
    procedure Java_Event_pOnFileSelected(env: PJNIEnv; this: jobject; Obj: TObject; path: JString; fileName: JString);
 
+   Procedure Java_Event_pOnClickComboDropDownItem(env: PJNIEnv; this: jobject; Obj: TObject;index: integer; caption: JString);
+
 implementation
 
 uses
@@ -124,7 +126,7 @@ uses
    spinner, location, actionbartab, customdialog, togglebutton, switchbutton, gridview,
    sensormanager, broadcastreceiver, datepickerdialog, timepickerdialog, shellcommand,
    tcpsocketclient, surfaceview, mediaplayer, contactmanager, seekbar, ratingbar, radiogroup,drawingview,
-   autocompletetextview, chronometer, numberpicker, udpsocket, opendialog;
+   autocompletetextview, chronometer, numberpicker, udpsocket, opendialog, comboedittext;
 
 procedure Java_Event_pOnBluetoothEnabled(env: PJNIEnv; this: jobject; Obj: TObject);
 begin
@@ -1239,6 +1241,26 @@ begin
   end;
 end;
 
+Procedure Java_Event_pOnClickComboDropDownItem(env: PJNIEnv; this: jobject; Obj: TObject;index: integer; caption: JString);
+var
+   pasCaption: string;
+ _jBoolean: JBoolean;
+begin
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+  if Obj is jComboEditText then
+  begin
+    jForm(jComboEditText(Obj).Owner).UpdateJNI(gApp);
+    pasCaption := '';
+    if caption <> nil then
+    begin
+      _jBoolean:= JNI_False;
+      pasCaption:= string( env^.GetStringUTFChars(env,caption,@_jBoolean) );
+    end;
+    jComboEditText(Obj).GenEvent_OnClickComboDropDownItem(Obj, index, pasCaption);
+  end;
+end;
+
 Procedure Java_Event_pOnClickGeneric(env: PJNIEnv; this: jobject; Obj: TObject; Value: integer);
 begin
   //----update global "gApp": to whom it may concern------
@@ -1258,6 +1280,13 @@ begin
     jChronometer(Obj).GenEvent_OnClick(Obj);
     Exit;
   end;
+  if Obj is jComboEditText then
+  begin
+    jForm(jComboEditText(Obj).Owner).UpdateJNI(gApp);
+    jComboEditText(Obj).GenEvent_OnClick(Obj);
+    Exit;
+  end;
+
 end;
 
 procedure Java_Event_pOnChronometerTick(env: PJNIEnv; this: jobject; Obj: TObject; elapsedTimeMillis: JLong);

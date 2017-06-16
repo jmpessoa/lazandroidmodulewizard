@@ -101,6 +101,7 @@ begin
                                                 'prebuilt'+DirectorySeparator;
 
    {$ifdef windows}
+     Result:=  'windows';
      if DirectoryExists(pathToNdkToolchains49+ 'windows') then
      begin
        Result:= 'windows';
@@ -121,8 +122,10 @@ begin
      {$endif}
    {$else}
      {$ifdef darwin}
+        Result:=  'darwin-x86_64';
         if DirectoryExists(pathToNdkToolchains49+ 'darwin-x86_64') then Result:= 'darwin-x86_64';
      {$else}
+       Result:=  'linux-x86_64';
        {$ifdef cpu64}
          if DirectoryExists(pathToNdkToolchains49+ 'linux-x86_64') then Result:= 'linux-x86_64';
        {$else}
@@ -154,7 +157,9 @@ var
 begin
   fName:= IncludeTrailingPathDelimiter(LazarusIDE.GetPrimaryConfigPath) + 'JNIAndroidProject.ini';
   if FOk then
+  begin
     SaveSettings(fName)
+  end
   else if FPathTemplatesEdited = True then
        begin
          with TInifile.Create(fName) do
@@ -188,21 +193,22 @@ begin
       FPathTemplatesEdited:= True;
     end;
   end;
+
   {$ifdef windows}
   ComboBoxPrebuild.Items.Add('windows');
   ComboBoxPrebuild.Items.Add('windows-x86_64');
-  ComboBoxPrebuild.Text:= 'windows';
+  ComboBoxPrebuild.ItemIndex:= 0;
   {$endif}
 
   {$ifdef linux}
   ComboBoxPrebuild.Items.Add('linux-x86_32');
   ComboBoxPrebuild.Items.Add('linux-x86_64');
-  ComboBoxPrebuild.Text:= 'linux-x86_64';
+  ComboBoxPrebuild.ItemIndex:= 0;
   {$endif}
 
   {$ifdef darwin}
   ComboBoxPrebuild.Items.Add('darwin-x86_64');
-  ComboBoxPrebuild.Text:= 'darwin-x86_64';
+  ComboBoxPrebuild.ItemIndex:= 0;
   {$endif}
 
   EditPathToJavaJDK.SetFocus;
@@ -247,7 +253,10 @@ begin
     if FPrebuildOSYS = '' then
     begin
       if FPathToAndroidSDK <> '' then
-        ComboBoxPrebuild.Text:= Self.GetPrebuiltDirectory()  //try guess
+      begin
+         FPrebuildOSYS:= Self.GetPrebuiltDirectory();   //try guess
+         ComboBoxPrebuild.Text:= FPrebuildOSYS;
+      end;
     end;
   end;
 end;
@@ -295,6 +304,7 @@ begin
       EditPathToJavaJDK.Text := ReadString('NewProject','PathToJavaJDK', '');
       EditPathToAndroidSDK.Text := ReadString('NewProject','PathToAndroidSDK', '');
       EditPathToAntBinary.Text := ReadString('NewProject','PathToAntBin', '');
+
       if ReadString('NewProject','NDK', '') <> '' then
           indexNdk:= StrToInt(ReadString('NewProject','NDK', ''))
       else
@@ -305,7 +315,20 @@ begin
       FPrebuildOSYS:= ReadString('NewProject','PrebuildOSYS', '');
 
       if FPrebuildOSYS <> '' then
-       ComboBoxPrebuild.Text:= FPrebuildOSYS;
+      begin
+         ComboBoxPrebuild.Text:= FPrebuildOSYS
+      end
+      else
+      begin
+        if FPrebuildOSYS = '' then
+        begin
+          if FPathToAndroidSDK <> '' then
+          begin
+             FPrebuildOSYS:= Self.GetPrebuiltDirectory();   //try guess
+             ComboBoxPrebuild.Text:= FPrebuildOSYS;
+          end;
+        end;
+      end;
 
     finally
       Free;
@@ -335,8 +358,18 @@ begin
     if EditPathToAntBinary.Text <> '' then
       WriteString('NewProject', 'PathToAntBin', EditPathToAntBinary.Text);
 
-    WriteString('NewProject', 'NDK', IntToStr(RGNDKVersion.ItemIndex));
+    if RGNDKVersion.ItemIndex > 4 then
+       WriteString('NewProject', 'NDK', '4')
+    else
+       WriteString('NewProject', 'NDK', IntToStr(RGNDKVersion.ItemIndex));
 
+    if ComboBoxPrebuild.Text = '' then
+    begin
+      if FPathToAndroidSDK <> '' then
+      begin
+         ComboBoxPrebuild.Text:= Self.GetPrebuiltDirectory();   //try guess
+      end;
+    end;
     WriteString('NewProject', 'PrebuildOSYS', ComboBoxPrebuild.Text);
 
   finally

@@ -91,6 +91,7 @@ class jArrayAdapter extends ArrayAdapter {
 	
     int mItemPaddingTop = 40;
     int mItemPaddingBottom = 40;
+    Typeface mWidgetCustomFont = null;
 
 	public  jArrayAdapter(Context context, Controls ctrls,long pasobj, int textViewResourceId,
 						  List<jListItemRow> list) {
@@ -144,7 +145,10 @@ class jArrayAdapter extends ArrayAdapter {
 	public void SetItemPaddingBottom(int _itemPaddingBottom) { 
 	   mItemPaddingBottom =  _itemPaddingBottom;
 	}
-
+	
+	public void SetWidgetFontFromAssets(String _fontName) {	
+	   mWidgetCustomFont = Typeface.createFromAsset( controls.activity.getAssets(), _fontName);
+	}
 	//http://stackoverflow.com/questions/11604846/changing-edittexts-text-size-from-pixel-to-scaled-pixels
 	public float pixelsToDIP( float px ) {  //Density Independent Pixels
 	    DisplayMetrics metrics = ctx.getResources().getDisplayMetrics();
@@ -455,10 +459,14 @@ class jArrayAdapter extends ArrayAdapter {
 			}
 			
 			View itemWidget = null;
-
+			
 			switch(items.get(position).widget) {   //0 == there is not a widget!
 				case 1:  itemWidget = new CheckBox(ctx);
 					((CheckBox)itemWidget).setId(position+6666);
+					
+					if (mWidgetCustomFont != null)  
+				  	   ((CheckBox)itemWidget).setTypeface(mWidgetCustomFont);
+					 
 					((CheckBox)itemWidget).setText(items.get(position).widgetText);
 					if (items.get(position).widgetTextColor != 0) {
 					   ((CheckBox)itemWidget).setTextColor(items.get(position).widgetTextColor);
@@ -472,6 +480,10 @@ class jArrayAdapter extends ArrayAdapter {
 					
 				case 2:  itemWidget = new RadioButton(ctx);
 					((RadioButton)itemWidget).setId(position+6666);
+					
+					if (mWidgetCustomFont != null)  
+					  	   ((RadioButton)itemWidget).setTypeface(mWidgetCustomFont);
+
 					((RadioButton)itemWidget).setText(items.get(position).widgetText);
 					if (items.get(position).widgetTextColor != 0) {
 					   ((RadioButton)itemWidget).setTextColor(items.get(position).widgetTextColor);
@@ -485,6 +497,10 @@ class jArrayAdapter extends ArrayAdapter {
 					
 				case 3:  itemWidget = new Button(ctx);
 					((Button)itemWidget).setId(position+6666);
+					
+					if (mWidgetCustomFont != null)  
+					  	   ((Button)itemWidget).setTypeface(mWidgetCustomFont);
+
 					((Button)itemWidget).setText(items.get(position).widgetText);
 					if (items.get(position).widgetTextColor != 0) {
 				    	((Button)itemWidget).setTextColor(items.get(position).widgetTextColor);
@@ -497,6 +513,10 @@ class jArrayAdapter extends ArrayAdapter {
 					
 				case 4:  itemWidget = new TextView(ctx);
 					((TextView)itemWidget).setId(position+6666);
+					
+					if (mWidgetCustomFont != null)  
+					  	   ((TextView)itemWidget).setTypeface(mWidgetCustomFont);
+										
 					((TextView)itemWidget).setText(items.get(position).widgetText);
 					if (items.get(position).widgetTextColor != 0) {
 					  ((TextView)itemWidget).setTextColor(items.get(position).widgetTextColor);
@@ -507,8 +527,12 @@ class jArrayAdapter extends ArrayAdapter {
 					items.get(position).jWidget = itemWidget;
 					break;
 
-				case 5:  itemWidget = new EditText(ctx);
+				case 5: itemWidget = new EditText(ctx);
 					((EditText)itemWidget).setId(position+6666);
+					
+					if (mWidgetCustomFont != null)  
+					  	   ((EditText)itemWidget).setTypeface(mWidgetCustomFont);
+
 					((EditText)itemWidget).setText(items.get(position).widgetText);
 					/*
 					if (items.get(position).widgetTextColor != 0) {
@@ -522,7 +546,6 @@ class jArrayAdapter extends ArrayAdapter {
 					((EditText)itemWidget).setMaxLines(1);
 					((EditText)itemWidget).setMinLines(1);
 					items.get(position).jWidget = itemWidget;
-
 					
 					((EditText)itemWidget).setOnFocusChangeListener(new OnFocusChangeListener() {
 						public void onFocusChange(View v, boolean hasFocus) {
@@ -538,8 +561,7 @@ class jArrayAdapter extends ArrayAdapter {
 							}
 						}
 					});
-					
-					
+										
 					break;
 			}
 				
@@ -686,8 +708,7 @@ class jArrayAdapter extends ArrayAdapter {
 				
 				itemLayout.addView(txtLayout, txtParam);
 				
-			} else if (items.get(position).itemLayout == 2) {  //(2)   Pascal layText	  ---- default				    				
-				
+			} else if (items.get(position).itemLayout == 2) {  //(2)   Pascal layText	  ---- default				    								
 				
 				if (itemTextLeft != null) {
 					leftParam.addRule(RelativeLayout.CENTER_VERTICAL);							
@@ -700,7 +721,6 @@ class jArrayAdapter extends ArrayAdapter {
 					rightParam.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);					
 					itemLayout.addView(itemTextRight, rightParam);
 				}
-
 																								
 				switch(items.get(position).textAlign) {  //alLeft, alRight, alCenter    --layText
 				
@@ -738,8 +758,7 @@ class jArrayAdapter extends ArrayAdapter {
             			
 			if (items.get(position).highLightColor != Color.TRANSPARENT)
 				itemLayout.setBackgroundColor(items.get(position).highLightColor); 
-			
-			
+						
 			listLayout.addView(itemLayout);
 			
 			return listLayout;
@@ -1514,5 +1533,9 @@ public class jListView extends ListView {
 	public void SetWidgetTextColor(int _textcolor) {
 		this.widgetTextColor = _textcolor; 
 	} 
+	
+	public void SetWidgetFontFromAssets(String _customFontName) {   //   "fonts/font1.ttf"  or  "font1.ttf" 
+        aadapter.SetWidgetFontFromAssets(_customFontName);
+    }
 
 }

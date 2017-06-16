@@ -1,4 +1,4 @@
-package com.example.appautocompletetextviewdemo1;
+package org.lamw.appcomboedittext;
 
 import java.util.ArrayList;
 
@@ -7,14 +7,18 @@ import android.content.ClipboardManager;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Typeface;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.view.Gravity;
+import android.view.KeyEvent;
 
 /*Draft java code by "Lazarus Android Module Wizard" [4/21/2016 19:42:01]*/
 /*https://github.com/jmpessoa/lazandroidmodulewizard*/
@@ -30,19 +34,20 @@ public class jAutoTextView extends AutoCompleteTextView /*dummy*/ { //please, fi
  
    private OnClickListener onClickListener;   // click event
 
-   private Boolean enabled  = true;           // click-touch enabled!
+   private boolean enabled  = true;           // click-touch enabled!
 
-   ArrayList<String> mStrList;
-   ArrayAdapter<String> mAdapter;
+   private ArrayList<String> mStrList;
+   private ArrayAdapter<String> mAdapter;
 
-   float mTextSize = 0; //default
-   int mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_SP; //default
+   private float mTextSize = 0; //default
+   private int mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_SP; //default
 
    private ClipboardManager mClipBoard = null;
    private ClipData mClipData = null;
+   private int mMaxLines = 1;
+   private boolean mCloseSoftInputOnEnter = true;
 
    //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
-
    public jAutoTextView(Controls _ctrls, long _Self) { //Add more others news "_xxx"p arams if needed!
       super(_ctrls.activity);
       context   = _ctrls.activity;
@@ -50,17 +55,17 @@ public class jAutoTextView extends AutoCompleteTextView /*dummy*/ { //please, fi
       
       LAMWCommon = new jCommons(this,context,_Self);
 
-      mStrList = new ArrayList<String>();
-      mAdapter = new ArrayAdapter<String>(context,android.R.layout.simple_list_item_1,mStrList);
+      mStrList = new ArrayList<String>();                         //simple_list_item_1
+      mAdapter = new ArrayAdapter<String>(context,android.R.layout.simple_spinner_dropdown_item,mStrList);
       this.setAdapter(mAdapter);
       this.setThreshold(1);
-
+      
       mClipBoard = (ClipboardManager) controls.activity.getSystemService(Context.CLIPBOARD_SERVICE);
 
       onClickListener = new OnClickListener(){
          /*.*/public void onClick(View view){  //please, do not remove /*.*/ mask for parse invisibility!
-            if (enabled) {
-               controls.pOnClickGeneric(LAMWCommon.getPasObj(), Const.Click_Default); //JNI event onClick!
+            if (enabled) {               	            	
+                controls.pOnClickGeneric(LAMWCommon.getPasObj(), Const.Click_Default); //JNI event onClick!
             }
          };
       };
@@ -70,17 +75,50 @@ public class jAutoTextView extends AutoCompleteTextView /*dummy*/ { //please, fi
       this.setOnItemClickListener(new OnItemClickListener() {
          @Override
          public void onItemClick(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
-                	  /*
-                       Toast.makeText(getBaseContext(), "MultiAutoComplete: " +
-                                  "you add color "+arg0.getItemAtPosition(arg2), //mStrList.get((int)arg3)
-                                  Toast.LENGTH_LONG).show();
-                       */
-            controls.pOnClickAutoDropDownItem(LAMWCommon.getPasObj(), (int)arg3, arg0.getItemAtPosition(arg2).toString());
+        	 if (!isEmpty(mStrList)) {  
+               controls.pOnClickAutoDropDownItem(LAMWCommon.getPasObj(), (int)arg3, arg0.getItemAtPosition(arg2).toString());
+        	 }
          }
       });
+                
+	 setOnFocusChangeListener(new OnFocusChangeListener() {
+			public void onFocusChange(View v, boolean hasFocus) {
+				final int p = v.getId();
+				final AutoCompleteTextView caption = (AutoCompleteTextView)v;
+				if (!hasFocus){
+					if (p >= 0) {
+						controls.pOnLostFocus(LAMWCommon.getPasObj(), caption.getText().toString());
+					}
+				}
+			}
+	  });
 
+      this.setMaxLines(mMaxLines);
+      //this.setSingleLine();      
+      
+      this.setOnKeyListener(new OnKeyListener() {
+          @Override
+          public boolean onKey(View v, int keyCode, KeyEvent event) {
+        	  //if (event.getAction() == KeyEvent.ACTION_UP) {
+                if (keyCode == KeyEvent.KEYCODE_ENTER) {
+					if (mCloseSoftInputOnEnter) {
+						InputMethodManager imm = (InputMethodManager) controls.activity.getSystemService(Context.INPUT_METHOD_SERVICE);
+						imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
+					}                	
+            	    controls.pOnEnter(LAMWCommon.getPasObj());
+            	    return true;               
+                }            
+        	  //}
+              return false;               
+          }
+      });      
+      
    } //end constructor
-
+    
+	private boolean isEmpty(ArrayList<?> coll) {
+	   return (coll == null || coll.isEmpty());
+	}
+   
    public void jFree() {
       if (parent != null) { parent.removeView(this); }
       //free local objects...
@@ -141,11 +179,11 @@ public class jAutoTextView extends AutoCompleteTextView /*dummy*/ { //please, fi
 	}
 
 	public void SetLayoutAll(int idAnchor) {
-		LAMWCommon.setLayoutAll(idAnchor);
+	  LAMWCommon.setLayoutAll(idAnchor);
 	}
 	
 	public void ClearLayoutAll() {		
-		LAMWCommon.clearLayoutAll();
+	  LAMWCommon.clearLayoutAll();
 	}
 	
    public View GetView() {
@@ -159,34 +197,10 @@ public class jAutoTextView extends AutoCompleteTextView /*dummy*/ { //please, fi
    //write others [public] methods code here......
    //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
 
-   //getAdapter()
-   //This method returns a filterable list adapter used for auto completion
-
-   //This method returns optional hint text displayed at the bottom of the the matching list
-   /*
-   public String GetCompletionHint() {
-	   return (String)this.getCompletionHint();
-   }
-   */
-
-   //This method returns returns the id for the view that the auto-complete drop down list is anchored to.
-   /*
-   public int GetDropDownAnchor() {
-	   return this.getDropDownAnchor();
-   }
-   */
-
    //This method returns the position of the dropdown view selection, if there is one
    public int GetItemIndex() {
       return this.getListSelection();
    }
-
-   //This method indicates whether the popup menu is showing
-   /*
-   public boolean IsPopupShowing() {
-		return this.isPopupShowing();
-   }
-    */
 
    public void SetText(String _text) {
       this.setText(_text);
@@ -202,7 +216,7 @@ public class jAutoTextView extends AutoCompleteTextView /*dummy*/ { //please, fi
 
    //This method displays the drop down on screen.
    public void	ShowDropDown(){
-      this.showDropDown();
+      this.showDropDown();      
    }
 
    public void SetThreshold(int _threshold) {
@@ -306,6 +320,70 @@ public class jAutoTextView extends AutoCompleteTextView /*dummy*/ { //please, fi
 	    //DO YOUR DRAWING ON TOP OF THIS VIEWS CHILDREN
 	    controls.pOnAfterDispatchDraw(LAMWCommon.getPasObj(), canvas, 1);	 //event handle by pascal side    
 	}   
+	
+	/*
+	public void SetMaxLines(int _maxLines) {
+	   mMaxLines = _maxLines;
+	   this.setMaxLines(_maxLines);
+	}
+	*/
+	
+	public  void ShowSoftInput() {  
+		InputMethodManager imm = (InputMethodManager) controls.activity.getSystemService(Context.INPUT_METHOD_SERVICE);
+		imm.toggleSoftInput(0, InputMethodManager.SHOW_IMPLICIT);
+	}
+
+
+	public  void HideSoftInput() {
+		InputMethodManager imm = (InputMethodManager) controls.activity.getSystemService(Context.INPUT_METHOD_SERVICE);
+		imm.hideSoftInputFromWindow(this.getWindowToken(), 0);
+	}
+
+	public void SetSoftInputOptions(int _imeOption) {
+		switch(_imeOption ) {
+			case 0: this.setImeOptions(EditorInfo.IME_FLAG_NO_FULLSCREEN); break;
+			case 1: this.setImeOptions(EditorInfo.IME_MASK_ACTION|EditorInfo.IME_ACTION_NONE); break;
+			case 2: this.setImeOptions(EditorInfo.IME_MASK_ACTION|EditorInfo.IME_ACTION_GO); break;
+			case 3: this.setImeOptions(EditorInfo.IME_MASK_ACTION|EditorInfo.IME_ACTION_SEARCH); break;
+			case 4: this.setImeOptions(EditorInfo.IME_MASK_ACTION|EditorInfo.IME_ACTION_SEND); break;
+			case 5: this.setImeOptions(EditorInfo.IME_MASK_ACTION|EditorInfo.IME_ACTION_NEXT); break;
+			case 6: this.setImeOptions(EditorInfo.IME_MASK_ACTION|EditorInfo.IME_ACTION_DONE); break;
+			case 7: this.setImeOptions(EditorInfo.IME_MASK_ACTION|EditorInfo.IME_ACTION_PREVIOUS ); break;
+			//case 8: this.setImeOptions(EditorInfo.IME_FLAG_FORCE_ASCII); break;  //api >= 16
+		}
+	}
+	
+	public void SetFocus() {
+		this.requestFocus();
+	}
+	
+	public void RequestFocus() {
+		this.requestFocus();
+	}
+	
+	//https://stackoverflow.com/questions/2126717/android-autocompletetextview-show-suggestions-when-no-text-entered
+	/*
+	 @Override
+	    public boolean enoughToFilter() {
+	        return true;
+	    }
+
+	 @Override
+	 protected void onFocusChanged(boolean focused, int direction, Rect previouslyFocusedRect) {
+	        super.onFocusChanged(focused, direction, previouslyFocusedRect);
+	        if (focused && getAdapter() != null) {
+	            performFiltering(getText(), 0);
+	        }
+	 }
+     */	
+	
+	public void SetCloseSoftInputOnEnter(boolean _closeSoftInput) {
+		mCloseSoftInputOnEnter = _closeSoftInput;
+	}
+	
+	public void SetHint(String _hint) {
+		this.setHint(_hint);
+	}
 
 } //end class
 

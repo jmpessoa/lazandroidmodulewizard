@@ -267,11 +267,10 @@ object FormSettingsPaths: TFormSettingsPaths
     AnchorSideTop.Control = EditPathToJavaTemplates
     AnchorSideTop.Side = asrBottom
     Left = 8
-    Height = 51
+    Height = 47
     Top = 288
-    Width = 198
+    Width = 232
     AutoFill = True
-    AutoSize = True
     BorderSpacing.Around = 8
     Caption = 'NDK version'
     ChildSizing.LeftRightSpacing = 6
@@ -282,10 +281,10 @@ object FormSettingsPaths: TFormSettingsPaths
     ChildSizing.ShrinkHorizontal = crsScaleChilds
     ChildSizing.ShrinkVertical = crsScaleChilds
     ChildSizing.Layout = cclLeftToRightThenTopToBottom
-    ChildSizing.ControlsPerLine = 5
-    ClientHeight = 31
-    ClientWidth = 194
-    Columns = 5
+    ChildSizing.ControlsPerLine = 6
+    ClientHeight = 27
+    ClientWidth = 228
+    Columns = 6
     ItemIndex = 3
     Items.Strings = (
       '7'
@@ -293,6 +292,7 @@ object FormSettingsPaths: TFormSettingsPaths
       '10c'
       '10e'
       '11c'
+      '> 11'
     )
     TabOrder = 5
   end
@@ -308,20 +308,20 @@ object FormSettingsPaths: TFormSettingsPaths
     AnchorSideLeft.Side = asrBottom
     AnchorSideTop.Control = EditPathToJavaTemplates
     AnchorSideTop.Side = asrBottom
-    Left = 214
+    Left = 248
     Height = 47
     Top = 288
-    Width = 180
+    Width = 144
     Anchors = [akTop, akLeft, akRight]
     Caption = 'NDK Toolchains Prebuild'
     ClientHeight = 27
-    ClientWidth = 176
+    ClientWidth = 140
     TabOrder = 9
     object ComboBoxPrebuild: TComboBox
       Left = 8
       Height = 23
       Top = 0
-      Width = 162
+      Width = 126
       Anchors = [akTop, akLeft, akRight]
       BorderSpacing.Bottom = 8
       ItemHeight = 15
@@ -334,7 +334,7 @@ object FormSettingsPaths: TFormSettingsPaths
     AnchorSideTop.Side = asrBottom
     Left = 8
     Height = 133
-    Top = 347
+    Top = 343
     Width = 103
     AutoSize = True
     BorderSpacing.Around = 8

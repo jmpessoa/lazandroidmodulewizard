@@ -1,4 +1,4 @@
-package com.example.appspinnerdemo;
+package org.lamw.appcomboedittext;
 
 import java.lang.reflect.Field;
 
@@ -46,9 +46,11 @@ public class jEditText extends EditText {
 	private ClipboardManager mClipBoard = null;
 	private ClipData mClipData = null;
 
-	float mTextSize = 0; //default
-	int mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_SP; //default
+	private float mTextSize = 0; //default
+	private int mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_SP; //default
 
+	private boolean mCloseSoftInputOnEnter = true;
+	
 	//Constructor
 	public  jEditText(android.content.Context context,
 					  Controls ctrls,long pasobj ) {
@@ -83,19 +85,18 @@ public class jEditText extends EditText {
 		};
 		setOnClickListener(onClickListener);
 
-		//Init Event : http://socome.tistory.com/15
 		onKeyListener = new OnKeyListener() {
 			public  boolean onKey(View v, int keyCode, KeyEvent event) { //Called when a hardware key is dispatched to a view
-				if (event.getAction() == KeyEvent.ACTION_UP) {
-					if (keyCode == KeyEvent.KEYCODE_ENTER) {
-						InputMethodManager imm = (InputMethodManager) controls.activity.getSystemService(Context.INPUT_METHOD_SERVICE);
-						imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
-						//Log.i("OnKeyListener","OnEnter, Hide KeyBoard");
-						// LoadMan
-						controls.pOnEnter(LAMWCommon.getPasObj());  //just Enter/Done/Next/backbutton ....!
+				//if (event.getAction() == KeyEvent.ACTION_UP) {
+					if (keyCode == KeyEvent.KEYCODE_ENTER) {     //just as Go/Enter/Done/Next/Ok						
+						if (mCloseSoftInputOnEnter) {
+							InputMethodManager imm = (InputMethodManager) controls.activity.getSystemService(Context.INPUT_METHOD_SERVICE);
+							imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
+						}
+						controls.pOnEnter(LAMWCommon.getPasObj());
 						return true;
 					}
-				}
+				//}
 				return false;
 			}
 		};
@@ -129,9 +130,7 @@ public class jEditText extends EditText {
 		removeTextChangedListener(textwatcher);
 		textwatcher = null;
 		setOnKeyListener(null);	
-		setText("");
 		LAMWCommon.free();
-	
 	}
 	
 	public long GetPasObj() {
@@ -525,7 +524,7 @@ public class jEditText extends EditText {
 				case 4: this.setTextDirection(View.TEXT_DIRECTION_RTL); 
 					 		  		  		   
 				}			
-				Log.i("SetTextDirection", "SetTextDirection");
+				//Log.i("SetTextDirection", "SetTextDirection");
 		 }	
        //[endif_api17up]				
 	}
@@ -534,6 +533,14 @@ public class jEditText extends EditText {
         Typeface customfont = Typeface.createFromAsset( controls.activity.getAssets(), _fontName);    
         this.setTypeface(customfont);
     }
+	
+	public void RequestFocus() {
+		this.requestFocus();
+	}
+
+	public void SetCloseSoftInputOnEnter(boolean _closeSoftInput) {
+		mCloseSoftInputOnEnter = _closeSoftInput;
+	}
 	
 }
 

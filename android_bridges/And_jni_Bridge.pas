@@ -272,6 +272,8 @@ function jEditText_getLParamWidth(env:PJNIEnv; _jedittext : jObject): integer;
 function jEditText_getLParamHeight(env:PJNIEnv; _jedittext : jObject ): integer;
 
 procedure jEditText_SetFontFromAssets(env: PJNIEnv; _jedittext: JObject; _fontName: string);
+procedure jEditText_RequestFocus(env: PJNIEnv; _jedittext: JObject);
+procedure jEditText_SetCloseSoftInputOnEnter(env: PJNIEnv; _jedittext: JObject; _closeSoftInput: boolean);
 
 // Button
 Function jButton_Create(env: PJNIEnv;   this:jobject; SelfObj: TObject): jObject;
@@ -600,6 +602,9 @@ procedure jListView_SetAllPartsOnDrawItemTextColor(env: PJNIEnv; _jlistview: JOb
 procedure jListView_SetItemPaddingTop(env: PJNIEnv; _jlistview: JObject; _ItemPaddingTop: integer);
 procedure jListView_SetItemPaddingBottom(env: PJNIEnv; _jlistview: JObject; _itemPaddingBottom: integer);
 procedure jListView_SetWidgetTextColor(env: PJNIEnv; _jlistview: JObject; _textcolor: integer);
+procedure jListView_SetDispatchOnDrawItemWidgetTextColor(env: PJNIEnv; _jlistview: JObject; _value: boolean);
+procedure jListView_SetWidgetFontFromAssets(env: PJNIEnv; _jlistview: JObject; _customFontName: string);
+
 
 // ScrollView
 Function  jScrollView_Create           (env:PJNIEnv;  this:jobject; SelfObj: TObject): jObject;
@@ -2809,6 +2814,31 @@ begin
   env^.DeleteLocalRef(env,jParams[0].l);
   env^.DeleteLocalRef(env, jCls);
 end;
+
+procedure jEditText_RequestFocus(env: PJNIEnv; _jedittext: JObject);
+var
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jedittext);
+  jMethod:= env^.GetMethodID(env, jCls, 'RequestFocus', '()V');
+  env^.CallVoidMethod(env, _jedittext, jMethod);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jEditText_SetCloseSoftInputOnEnter(env: PJNIEnv; _jedittext: JObject; _closeSoftInput: boolean);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].z:= JBool(_closeSoftInput);
+  jCls:= env^.GetObjectClass(env, _jedittext);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetCloseSoftInputOnEnter', '(Z)V');
+  env^.CallVoidMethodA(env, _jedittext, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
 
 //------------------------------------------------------------------------------
 // Button
@@ -5354,6 +5384,34 @@ begin
   jCls:= env^.GetObjectClass(env, _jlistview);
   jMethod:= env^.GetMethodID(env, jCls, 'SetWidgetTextColor', '(I)V');
   env^.CallVoidMethodA(env, _jlistview, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+
+procedure jListView_SetDispatchOnDrawItemWidgetTextColor(env: PJNIEnv; _jlistview: JObject; _value: boolean);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].z:= JBool(_value);
+  jCls:= env^.GetObjectClass(env, _jlistview);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetDispatchOnDrawItemWidgetTextColor', '(Z)V');
+  env^.CallVoidMethodA(env, _jlistview, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jListView_SetWidgetFontFromAssets(env: PJNIEnv; _jlistview: JObject; _customFontName: string);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_customFontName));
+  jCls:= env^.GetObjectClass(env, _jlistview);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetWidgetFontFromAssets', '(Ljava/lang/String;)V');
+  env^.CallVoidMethodA(env, _jlistview, jMethod, @jParams);
+  env^.DeleteLocalRef(env,jParams[0].l);
   env^.DeleteLocalRef(env, jCls);
 end;
 

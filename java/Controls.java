@@ -1,6 +1,6 @@
 package com.example.applistviewdemo;
 
-//LAMW: Lazarus Android Module Wizard  - version 0.7 - rev. 18 - 20 May - 2017 
+//LAMW: Lazarus Android Module Wizard  - version 0.7 - rev. 19 - 16 June - 2017 
 //RAD Android: Project Wizard, Form Designer and Components Development Model!
 
 //https://github.com/jmpessoa/lazandroidmodulewizard

@@ -145,16 +145,6 @@ uses
 
 type
 
-  TImeOptions = (imeFlagNoFullScreen,
-                 imeActionNone,
-                 imeActionGo,
-                 imeActionSearch,
-                 imeActionSend,
-                 imeActionNext,
-                 imeActionDone,
-                 imeActionPrevious,
-                 imeFlagForceASCII);
-
   TImageListIndex = type Integer;
 
   jCanvas = class;
@@ -849,6 +839,7 @@ type
     FEditable: boolean;
 
     FTextAlignment: TTextAlignment;
+    FCloseSoftInputOnEnter: boolean;
 
     Procedure SetColor    (Value : TARGBColorBridge);
 
@@ -874,13 +865,13 @@ type
   protected
     Procedure SetText(Value: string ); override;
     Function  GetText: string; override;
+    procedure SetViewParent(Value: jObject);  override;
 
     procedure SetFontFace(AValue: TFontFace); //override; 
     procedure SetTextTypeFace(Value: TTextTypeFace); //override; 
     procedure SetEditable(enabled: boolean);
     procedure SetHintTextColor(Value: TARGBColorBridge); //override;
 
-    procedure SetViewParent(Value: jObject);  override;
     Procedure GenEvent_OnEnter (Obj: TObject);
     Procedure GenEvent_OnChange(Obj: TObject; txt: string; count : Integer);
     Procedure GenEvent_OnChanged(Obj: TObject; txt : string; count: integer);
@@ -906,6 +897,9 @@ type
     Procedure SetFocus;
     Procedure ImmShow;
     Procedure ImmHide;
+    procedure HideSoftInput();
+    Procedure ShowSoftInput();
+
     Procedure UpdateLayout; override;
     procedure AllCaps;
     procedure DispatchOnChangeEvent(value: boolean);
@@ -916,6 +910,7 @@ type
     procedure AppendTab();
 
     procedure SetImeOptions(_imeOption: TImeOptions);
+    procedure SetSoftInputOptions(_imeOption: TImeOptions);
 
     procedure SetAcceptSuggestion(_value: boolean);
     procedure CopyToClipboard();
@@ -932,6 +927,8 @@ type
     procedure SetCompoundDrawables(_imageResIdentifier: string; _side: TCompoundDrawablesSide); overload;
     procedure SetTextDirection(_textDirection: TTextDirection);
     procedure SetFontFromAssets(_fontName: string);
+    procedure RequestFocus();
+    procedure SetCloseSoftInputOnEnter(_closeSoftInput: boolean);
 
     // Property
     property CursorPos : TXY        read GetCursorPos  write SetCursorPos;
@@ -960,7 +957,7 @@ type
     property Editable: boolean read FEditable write SetEditable;
 
     property FontSizeUnit: TFontSizeUnit read FFontSizeUnit write SetFontSizeUnit;
-
+    property CloseSoftInputOnEnter: boolean read FCloseSoftInputOnEnter write SetCloseSoftInputOnEnter;
     // Event
     property OnLostFocus: TOnEditLostFocus read FOnLostFocus write FOnLostFocus;
     property OnEnter: TOnNotify  read FOnEnter write FOnEnter;
@@ -970,6 +967,7 @@ type
     property OnBeforeDispatchDraw: TOnBeforeDispatchDraw read FOnBeforeDispatchDraw write FOnBeforeDispatchDraw;
     property OnAfterDispatchDraw: TOnBeforeDispatchDraw read FOnAfterDispatchDraw write FOnAfterDispatchDraw;
     property OnLayouting: TOnLayouting read FOnLayouting write FOnLayouting;
+
   end;
 
   jButton = class(jVisualControl)
@@ -1216,6 +1214,7 @@ type
     FOnClickWidgetItem: TOnClickWidgetItem;
     FOnLongClickItem:  TOnClickCaptionItem;
     FOnDrawItemTextColor: TOnDrawItemTextColor;
+    FOnDrawItemWidgetTextColor: TOnDrawItemWidgetTextColor;
     FOnDrawItemBitmap: TOnDrawItemBitmap;
     FOnWidgeItemLostFocus: TOnWidgeItemLostFocus;
     FOnScrollStateChanged: TOnScrollStateChanged;
@@ -1262,7 +1261,10 @@ type
     procedure GenEvent_OnClickWidgetItem(Obj: TObject; index: integer; checked: boolean);
     procedure GenEvent_OnClickCaptionItem(Obj: TObject; index: integer; caption: string);
     procedure GenEvent_OnLongClickCaptionItem(Obj: TObject; index: integer; caption: string);
+
     procedure GenEvent_OnDrawItemCaptionColor(Obj: TObject; index: integer; caption: string;  out color: dword);
+    procedure GenEvent_OnDrawItemWidgetTextColor(Obj: TObject; index: integer; caption: string;  out color: dword);
+
     procedure GenEvent_OnDrawItemBitmap(Obj: TObject; index: integer; caption: string;  out bitmap: JObject);
     procedure GenEvent_OnWidgeItemLostFocus(Obj: TObject; index: integer; caption: string);
     procedure GenEvent_OnBeforeDispatchDraw(Obj: TObject; canvas: JObject; tag: integer);
@@ -1329,6 +1331,8 @@ type
     procedure SetItemPaddingTop(_ItemPaddingTop: integer);
     procedure SetItemPaddingBottom(_itemPaddingBottom: integer);
     procedure SetWidgetTextColor(_textcolor: TARGBColorBridge);
+    procedure SetDispatchOnDrawItemWidgetTextColor(_value: boolean);
+    procedure SetWidgetFontFromAssets(_customFontName: string);
 
     //Property
     property setItemIndex: TXY write SetItemPosition;
@@ -1362,6 +1366,7 @@ type
     property OnClickWidgetItem: TOnClickWidgetItem read FOnClickWidgetItem write FOnClickWidgetItem;
     property OnLongClickItem: TOnClickCaptionItem read FOnLongClickItem write FOnLongClickItem;
     property OnDrawItemTextColor: TOnDrawItemTextColor read FOnDrawItemTextColor write FOnDrawItemTextColor;
+    property OnDrawItemWidgetTextColor: TOnDrawItemWidgetTextColor read FOnDrawItemWidgetTextColor write FOnDrawItemWidgetTextColor;
     property OnDrawItemBitmap: TOnDrawItemBitmap  read FOnDrawItemBitmap write FOnDrawItemBitmap;
 
     property OnBeforeDispatchDraw: TOnBeforeDispatchDraw read FOnBeforeDispatchDraw write FOnBeforeDispatchDraw;
@@ -1737,6 +1742,7 @@ type
   Procedure Java_Event_pOnClickCaptionItem(env: PJNIEnv; this: jobject; Obj: TObject;index: integer; caption: JString);
   Procedure Java_Event_pOnListViewLongClickCaptionItem(env: PJNIEnv; this: jobject; Obj: TObject;index: integer; caption: JString);
   function  Java_Event_pOnListViewDrawItemCaptionColor(env: PJNIEnv; this: jobject; Obj: TObject; index: integer; caption: JString): JInt;
+  function Java_Event_pOnListViewDrawItemWidgetTextColor(env: PJNIEnv; this: jobject; Obj: TObject; index: integer; caption: JString): JInt;
   function  Java_Event_pOnListViewDrawItemBitmap(env: PJNIEnv; this: jobject; Obj: TObject; index: integer; caption: JString): JObject;
   procedure Java_Event_pOnWidgeItemLostFocus(env: PJNIEnv; this: jobject; Obj: TObject; index: integer;  caption: JString);
   procedure Java_Event_pOnListViewScrollStateChanged(env: PJNIEnv; this: jobject; Obj: TObject; firstVisibleItem: integer; visibleItemCount: integer; totalItemCount: integer; lastItemReached: JBoolean);
@@ -1801,7 +1807,7 @@ implementation
 
 
 uses
-  customdialog, radiogroup, autocompletetextview, viewflipper;
+  customdialog, radiogroup, autocompletetextview, viewflipper, comboedittext;
 
 //-----------------------------------------------------------------------------
 // Asset
@@ -2464,6 +2470,30 @@ begin
   Result:= outColor;
 end;
 
+function Java_Event_pOnListViewDrawItemWidgetTextColor(env: PJNIEnv; this: jobject; Obj: TObject; index: integer; caption: JString): JInt;
+var
+  pasCaption: string;
+  _jBoolean: JBoolean;
+  outColor: dword;
+begin
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+  outColor:= 0;
+  if Obj is jListVIew then
+  begin
+    jForm(jListVIew(Obj).Owner).UpdateJNI(gApp);
+    pasCaption := '';
+    if caption <> nil then
+    begin
+      _jBoolean:= JNI_False;
+      pasCaption:= string( env^.GetStringUTFChars(env,caption,@_jBoolean) );
+    end;
+    jListVIew(Obj).GenEvent_OnDrawItemWidgetTextColor(Obj, index, pasCaption, outColor);
+  end;
+  Result:= outColor;
+end;
+
+
 function Java_Event_pOnListViewDrawItemBitmap(env: PJNIEnv; this: jobject; Obj: TObject; index: integer; caption: JString): JObject;
 var
   pasCaption: string;
@@ -2568,10 +2598,25 @@ begin
   gApp.Jni.jThis:= this;
 
   if not Assigned(Obj) then Exit;
+
   if Obj is jEditText then
   begin
     jForm(jEditText(Obj).Owner).UpdateJNI(gApp);
     jEditText(Obj).GenEvent_OnEnter(Obj);
+    Exit;
+  end;
+
+  if Obj is jComboEditText then
+  begin
+    jForm(jComboEditText(Obj).Owner).UpdateJNI(gApp);
+    jComboEditText(Obj).GenEvent_OnEnter(Obj);
+    Exit;
+  end;
+
+  if Obj is jAutoTextView then
+  begin
+    jForm(jAutoTextView(Obj).Owner).UpdateJNI(gApp);
+    jAutoTextView(Obj).GenEvent_OnEnter(Obj);
     Exit;
   end;
 
@@ -2824,10 +2869,33 @@ begin
       _jBoolean := JNI_False;
       pascontent    := String( env^.GetStringUTFChars(Env,content,@_jBoolean) );
     end;
-    jForm(jHttpClient(Obj).Owner).UpdateJNI(gApp);
+    jForm(jEditText(Obj).Owner).UpdateJNI(gApp);
     jEditText(Obj).GenEvent_OnOnLostFocus(Obj, pascontent);
   end;
 
+  if Obj is jComboEditText then
+  begin
+    pascontent := '';
+    if content <> nil then
+    begin
+      _jBoolean := JNI_False;
+      pascontent    := String( env^.GetStringUTFChars(Env,content,@_jBoolean) );
+    end;
+    jForm(jComboEditText(Obj).Owner).UpdateJNI(gApp);
+    jComboEditText(Obj).GenEvent_OnOnLostFocus(Obj, pascontent);
+  end;
+
+  if Obj is jAutoTextView then
+  begin
+    pascontent := '';
+    if content <> nil then
+    begin
+      _jBoolean := JNI_False;
+      pascontent    := String( env^.GetStringUTFChars(Env,content,@_jBoolean) );
+    end;
+    jForm(jAutoTextView(Obj).Owner).UpdateJNI(gApp);
+    jAutoTextView(Obj).GenEvent_OnOnLostFocus(Obj, pascontent);
+  end;
 end;
 
 procedure Java_Event_pOnHttpClientCodeResult(env: PJNIEnv; this: jobject; Obj: TObject; code: integer);
@@ -3404,6 +3472,7 @@ begin
 
   FLParamWidth  := lpHalfOfParent;
   FLParamHeight := lpWrapContent;
+  FCloseSoftInputOnEnter:= True;
 
 end;
 
@@ -3520,12 +3589,13 @@ begin
 
   jEditText_editInputType2(FjEnv, FjObject , InputTypeToStrEx(FInputTypeEx));
 
+  jEditText_setSingleLine(FjEnv, FjObject , True);
 
   if FInputTypeEx = itxMultiLine then
   begin
     jEditText_setSingleLine(FjEnv, FjObject , False);
-    if FMaxLines = 1 then  FMaxLines:= 3;
-    jEditText_setMaxLines(FjEnv, FjObject , FMaxLines); //visibles count lines!
+    if FMaxLines = 1 then  FMaxLines:= 3;   // visibles lines!
+    jEditText_setMaxLines(FjEnv, FjObject , FMaxLines); //visibles lines!
 
     if FScrollBarStyle <> scrNone then
          jEditText_setScrollBarStyle(FjEnv, FjObject , GetScrollBarStyle(FScrollBarStyle));
@@ -3554,6 +3624,9 @@ begin
 
   if FHintTextColor <> colbrDefault then
      jEditText_setHintTextColor(FjEnv, FjObject, GetARGB(FCustomColor, FHintTextColor));
+
+  if not FCloseSoftInputOnEnter then
+    jEditText_SetCloseSoftInputOnEnter(FjEnv, FjObject, FCloseSoftInputOnEnter);
 
   jEditText_DispatchOnChangeEvent(FjEnv, FjObject , True);
   jEditText_DispatchOnChangedEvent(FjEnv, FjObject , True);
@@ -3666,6 +3739,16 @@ begin
       jEditText_immHide(FjEnv, FjObject  );
 end;
 
+Procedure jEditText.ShowSoftInput();
+begin
+  Self.ImmShow();
+end;
+
+procedure jEditText.HideSoftInput();
+begin
+  Self.ImmHide();
+end;
+
 //by jmpessoa
 Procedure jEditText.SetInputTypeEx(Value : TInputTypeEx);
 begin
@@ -3688,14 +3771,21 @@ Procedure jEditText.SetMaxLines(Value: DWord);
 begin
   FMaxLines:= Value;
   if FInitialized then
+  begin
      jEditText_setMaxLines(FjEnv, FjObject , Value);
+     if FMaxLines < 2 then
+        jEditText_setSingleLine(FjEnv, FjObject , True);
+  end;
 end;
 
 procedure jEditText.SetSingleLine(Value: boolean);
 begin
   FSingleLine:= Value;
   if FInitialized then
+  begin
      jEditText_setSingleLine(FjEnv, FjObject , Value);
+     jEditText_setMaxLines(FjEnv, FjObject , 1);
+  end;
 end;
 
 procedure jEditText.SetScrollBarStyle(Value: TScrollBarStyle);
@@ -3894,6 +3984,11 @@ begin
      jEditText_SetImeOptions(FjEnv, FjObject, Ord(_imeOption));
 end;
 
+procedure jEditText.SetSoftInputOptions(_imeOption: TImeOptions);
+begin
+   Self.SetImeOptions(_imeOption);
+end;
+
 procedure jEditText.SetEditable(enabled: boolean);
 begin
   //in designing component state: set value here...
@@ -4051,6 +4146,21 @@ begin
   //in designing component state: set value here...
   if FInitialized then
      jEditText_SetFontFromAssets(FjEnv, FjObject, _fontName);
+end;
+
+procedure jEditText.RequestFocus();
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jEditText_RequestFocus(FjEnv, FjObject);
+end;
+
+procedure jEditText.SetCloseSoftInputOnEnter(_closeSoftInput: boolean);
+begin
+  //in designing component state: set value here...
+   FCloseSoftInputOnEnter:= _closeSoftInput;
+  if FInitialized then
+     jEditText_SetCloseSoftInputOnEnter(FjEnv, FjObject, _closeSoftInput);
 end;
 
 //------------------------------------------------------------------------------
@@ -7035,6 +7145,17 @@ begin
       color:= GetARGB(FCustomColor, outColor);
 end;
 
+procedure jListView.GenEvent_OnDrawItemWidgetTextColor(Obj: TObject; index: integer; caption: string;  out color: dword);
+var
+  outColor: TARGBColorBridge;
+begin
+  outColor:= Self.FontColor;
+  color:= 0; //default;
+  if Assigned(FOnDrawItemWidgetTextColor) then FOnDrawItemWidgetTextColor(Obj,index,caption, outColor);
+  if (outColor <> colbrNone) and  (outColor <> colbrDefault) then
+      color:= GetARGB(FCustomColor, outColor);
+end;
+
 procedure jListView.GenEvent_OnDrawItemBitmap(Obj: TObject; index: integer; caption: string;  out bitmap: JObject);
 begin
   bitmap:=  nil;
@@ -7269,6 +7390,20 @@ begin
   FWidgetTextColor:= _textcolor;
   if FInitialized then
       jListView_SetWidgetTextColor(FjEnv, FjObject,  GetARGB(FCustomColor, _textcolor));
+end;
+
+procedure jListView.SetDispatchOnDrawItemWidgetTextColor(_value: boolean);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jListView_SetDispatchOnDrawItemWidgetTextColor(FjEnv, FjObject, _value);
+end;
+
+procedure jListView.SetWidgetFontFromAssets(_customFontName: string);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jListView_SetWidgetFontFromAssets(FjEnv, FjObject, _customFontName);
 end;
 
 //------------------------------------------------------------------------------

@@ -482,9 +482,11 @@ end;
 procedure jSpinner.Add(_item: string);
 begin
   //in designing component state: set value here...
-  FItems.Add(_item);
   if FInitialized then
+  begin
      jSpinner_Add(FjEnv, FjObject , _item);
+     FItems.Add(_item);
+  end;
 end;
 
 procedure jSpinner.Clear; 
@@ -669,7 +671,10 @@ procedure jSpinner.Add(_item: string; _strTag: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
+  begin
      jSpinner_Add(FjEnv, FjObject, _item ,_strTag);
+     FItems.Add(_item);
+  end;
 end;
 
 function jSpinner.GetItemTagString(_index: integer): string;
