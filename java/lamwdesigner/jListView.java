@@ -1,4 +1,4 @@
-package org.lamw.applistviewdemo3;
+package org.lamw.appcomboedittext;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -85,6 +85,7 @@ class jArrayAdapter extends ArrayAdapter {
 	private boolean mDispatchOnDrawItemTextColor;
 	private boolean mDrawAllItemPartsTextColor;
 	private boolean mDispatchOnDrawItemBitmap;
+	private boolean mDispatchOnDrawItemWidgetTextColor;
 
 	boolean mChangeFontSizeByComplexUnitPixel;
 	int mTextSizeTypedValue;
@@ -104,6 +105,7 @@ class jArrayAdapter extends ArrayAdapter {
 		thisAdapter = this;
 		mDispatchOnDrawItemTextColor = true;
 		mDrawAllItemPartsTextColor = true;
+		mDispatchOnDrawItemWidgetTextColor = true;
 				
 		mDrawAllItemPartsTextColor = true;
 		mDispatchOnDrawItemBitmap = true;
@@ -130,6 +132,12 @@ class jArrayAdapter extends ArrayAdapter {
 		mDispatchOnDrawItemTextColor = _value;
 	}
 
+	
+	public void SetDispatchOnDrawItemWidgetTextColor(boolean _value) { //+++
+		mDispatchOnDrawItemWidgetTextColor = _value;
+	}
+
+	
 	public void SetAllPartsOnDrawItemTextColor(boolean _value) {
 		mDrawAllItemPartsTextColor = _value;
 	}
@@ -145,10 +153,12 @@ class jArrayAdapter extends ArrayAdapter {
 	public void SetItemPaddingBottom(int _itemPaddingBottom) { 
 	   mItemPaddingBottom =  _itemPaddingBottom;
 	}
+
 	
-	public void SetWidgetFontFromAssets(String _fontName) {	
-	   mWidgetCustomFont = Typeface.createFromAsset( controls.activity.getAssets(), _fontName);
-	}
+    public void SetWidgetFontFromAssets(String _fontName) {			
+         mWidgetCustomFont = Typeface.createFromAsset( controls.activity.getAssets(), _fontName);		
+    }
+    
 	//http://stackoverflow.com/questions/11604846/changing-edittexts-text-size-from-pixel-to-scaled-pixels
 	public float pixelsToDIP( float px ) {  //Density Independent Pixels
 	    DisplayMetrics metrics = ctx.getResources().getDisplayMetrics();
@@ -220,8 +230,8 @@ class jArrayAdapter extends ArrayAdapter {
 			rightParam.rightMargin = 10;
 			rightParam.leftMargin = 10;											
 			
-			String imageTxt1 = "";
-			String imageTxt2 = "";
+			String txt1 = "";
+			String txt2 = "";
 			String line1 = "";
 			String line2 = "";
 			
@@ -245,43 +255,50 @@ class jArrayAdapter extends ArrayAdapter {
 				default: faceTitle = Typeface.NORMAL; faceBody = Typeface.NORMAL; break;
 			}
 			
-			int pos1 = line.indexOf(items.get(position).leftDelimiter);  //")"									
+			int pos1 = -1;
+			pos1 = line.indexOf(items.get(position).leftDelimiter);  //")"			
 			if (pos1 >= 0) {							   											    
-			    if ( pos1  !=  0) { 
-			     imageTxt1 = line.substring(0, pos1);	
+			   if ( pos1  !=  0) { 
+			     txt1 = line.substring(0, pos1);	
 			     line1 =  line.substring(pos1+1, line.length());
 			     line = line1;
-			     itemTextLeft = new TextView(ctx);  
-			     itemTextLeft.setId(position + 1111);
-			     //itemTextLeft.setPadding(20, 40, 20, 40);
-			     itemTextLeft.setPadding(20, mItemPaddingTop, 20, mItemPaddingBottom);
-			     itemTextLeft.setText(imageTxt1);
-				 if (items.get(position).textColor != 0) {
+			     if ( txt1.length() > 0) {
+			       itemTextLeft = new TextView(ctx);  
+			       itemTextLeft.setId(position + 1111);
+			       //itemTextLeft.setPadding(20, 40, 20, 40);
+			       itemTextLeft.setPadding(20, mItemPaddingTop, 20, mItemPaddingBottom);
+			       itemTextLeft.setText(txt1);
+				   if (items.get(position).textColor != 0) {
 					 itemTextLeft.setTextColor(items.get(position).textColor);
-				 }				 
-				 itemTextLeft.setTypeface(items.get(position).typeFace, faceTitle);
-				 
+				   }				 
+				   itemTextLeft.setTypeface(items.get(position).typeFace, faceTitle);
+			     }
 			   }			 
 			   else {
 				 line =  line.substring(1, line.length());	
 			   }
 			}
 			                                   
-			int pos2 = line.lastIndexOf(items.get(position).rightDelimiter);  //searches right-to-left instead  //rightDelimiter ")"
+			int pos2 = -1;
+			
+			pos2 = line.lastIndexOf(items.get(position).rightDelimiter);  //searches right-to-left instead  //rightDelimiter ")"
+			
 			if (pos2 > 0 ) {				
-				if (pos2 < line.length()) { 
-			   	   imageTxt2 = line.substring(pos2+1, line.length());
+				if ( pos2 < line.length() ) { 
+			   	   txt2 = line.substring(pos2+1, line.length());
 				   line2 = line.substring(0, pos2);				
-				   line = line2;				
-				   itemTextRight = new TextView(ctx);
-				   itemTextRight.setId(position + 2222);
-				   //itemTextRight.setPadding(20, 40, 20, 40);
-				   itemTextRight.setPadding(20, mItemPaddingTop, 20, mItemPaddingBottom);
-				   itemTextRight.setText(imageTxt2);
-				   if (items.get(position).textColor != 0) {
+				   line = line2;			
+				   if (txt2.length() > 0) { 
+				     itemTextRight = new TextView(ctx);
+				     itemTextRight.setId(position + 2222);
+				     //itemTextRight.setPadding(20, 40, 20, 40);
+				     itemTextRight.setPadding(20, mItemPaddingTop, 20, mItemPaddingBottom);
+				     itemTextRight.setText(txt2);
+				     if (items.get(position).textColor != 0) {
 					   itemTextRight.setTextColor(items.get(position).textColor);				
+				     }
+				     itemTextRight.setTypeface(items.get(position).typeFace, faceTitle);
 				   }
-				   itemTextRight.setTypeface(items.get(position).typeFace, faceTitle);
 				}
 			}
 									
@@ -338,7 +355,7 @@ class jArrayAdapter extends ArrayAdapter {
             			
 		    LinearLayout txtLayout = new LinearLayout(ctx);
     		txtLayout.setOrientation(LinearLayout.VERTICAL);
-    		
+    		    		    		
 			for (int i=0; i < lines.length; i++) {
 
 				TextView textViewnew = new TextView(ctx);
@@ -425,7 +442,7 @@ class jArrayAdapter extends ArrayAdapter {
 						   itemText[i].setTextSize(mTextSizeTypedValue, auxf + 3*i);  // sdInCecreasing
 				}			
 				
-				itemText[i].setText(lines[i]);
+				itemText[i].setText(lines[i]);				
 								
 				if (mDispatchOnDrawItemTextColor)  {
 					int drawItemTxtColor = controls.pOnListViewDrawItemCaptionColor(PasObj, (int)position, lines[i]);
@@ -452,28 +469,36 @@ class jArrayAdapter extends ArrayAdapter {
 					}
 				}
 				
-				if (items.get(position).textAlign == 2) {  //center
-				   itemText[i].setGravity( Gravity.CENTER_HORIZONTAL);
-				}											
+				if (items.get(position).textAlign == 2) {  //center  ***
+				   itemText[i].setGravity(Gravity.CENTER_HORIZONTAL);
+				}
+															
 				txtLayout.addView(itemText[i]);				
 			}
 			
 			View itemWidget = null;
-			
+
 			switch(items.get(position).widget) {   //0 == there is not a widget!
 				case 1:  itemWidget = new CheckBox(ctx);
 					((CheckBox)itemWidget).setId(position+6666);
+															
+					if (mDispatchOnDrawItemWidgetTextColor)  {  // +++
+						int drawWidgetTxtColor = controls.pOnListViewDrawItemWidgetTextColor(PasObj, (int)position, items.get(position).widgetText);
+						 ((CheckBox)itemWidget).setTextColor(drawWidgetTxtColor);
+					}											
+					else if (items.get(position).widgetTextColor != 0) {  
+					  ((CheckBox)itemWidget).setTextColor(items.get(position).widgetTextColor);
+					}
 					
 					if (mWidgetCustomFont != null)  
-				  	   ((CheckBox)itemWidget).setTypeface(mWidgetCustomFont);
-					 
-					((CheckBox)itemWidget).setText(items.get(position).widgetText);
-					if (items.get(position).widgetTextColor != 0) {
-					   ((CheckBox)itemWidget).setTextColor(items.get(position).widgetTextColor);
-					}
+					  	   ((CheckBox)itemWidget).setTypeface(mWidgetCustomFont);
+					
 					if (items.get(position).textSize != 0) {
 					   ((CheckBox)itemWidget).setTextSize(items.get(position).textSize);
 					}
+					
+					((CheckBox)itemWidget).setText(items.get(position).widgetText);
+					
 					items.get(position).jWidget = itemWidget; //
 					((CheckBox)itemWidget).setChecked(items.get(position).checked);
 					break;
@@ -481,72 +506,94 @@ class jArrayAdapter extends ArrayAdapter {
 				case 2:  itemWidget = new RadioButton(ctx);
 					((RadioButton)itemWidget).setId(position+6666);
 					
-					if (mWidgetCustomFont != null)  
-					  	   ((RadioButton)itemWidget).setTypeface(mWidgetCustomFont);
-
-					((RadioButton)itemWidget).setText(items.get(position).widgetText);
-					if (items.get(position).widgetTextColor != 0) {
-					   ((RadioButton)itemWidget).setTextColor(items.get(position).widgetTextColor);
-					}
+					if (mDispatchOnDrawItemWidgetTextColor)  {  // +++
+						int drawWidgetTxtColor = controls.pOnListViewDrawItemWidgetTextColor(PasObj, (int)position, items.get(position).widgetText);
+						 ((RadioButton)itemWidget).setTextColor(drawWidgetTxtColor);
+					}											
+					else if (items.get(position).widgetTextColor != 0) {  
+					  ((RadioButton)itemWidget).setTextColor(items.get(position).widgetTextColor);
+					}					
 					if (items.get(position).textSize != 0) {
 					   ((RadioButton)itemWidget).setTextSize(items.get(position).textSize);
 					}
-					items.get(position).jWidget = itemWidget; //
+					
+					if (mWidgetCustomFont != null)  
+					  	   ((RadioButton)itemWidget).setTypeface(mWidgetCustomFont);
+					
+					((RadioButton)itemWidget).setText(items.get(position).widgetText);
+										
+					items.get(position).jWidget = itemWidget; 
 					((RadioButton)itemWidget).setChecked(items.get(position).checked);
 					break;
 					
 				case 3:  itemWidget = new Button(ctx);
 					((Button)itemWidget).setId(position+6666);
 					
+					if (mDispatchOnDrawItemWidgetTextColor)  {  // +++
+						int drawWidgetTxtColor = controls.pOnListViewDrawItemWidgetTextColor(PasObj, (int)position, items.get(position).widgetText);
+						 ((Button)itemWidget).setTextColor(drawWidgetTxtColor);
+					}											
+					else if (items.get(position).widgetTextColor != 0) {  
+					  ((Button)itemWidget).setTextColor(items.get(position).widgetTextColor);
+					}					
+					if (items.get(position).textSize != 0) {
+					   ((Button)itemWidget).setTextSize(items.get(position).textSize);
+					}
+					
 					if (mWidgetCustomFont != null)  
 					  	   ((Button)itemWidget).setTypeface(mWidgetCustomFont);
-
+					
 					((Button)itemWidget).setText(items.get(position).widgetText);
-					if (items.get(position).widgetTextColor != 0) {
-				    	((Button)itemWidget).setTextColor(items.get(position).widgetTextColor);
-					}
-					if (items.get(position).textSize != 0) {
-					    ((Button)itemWidget).setTextSize(items.get(position).textSize);
-					}
+					
 					items.get(position).jWidget = itemWidget;
 					break;
 					
 				case 4:  itemWidget = new TextView(ctx);
 					((TextView)itemWidget).setId(position+6666);
-					
-					if (mWidgetCustomFont != null)  
-					  	   ((TextView)itemWidget).setTypeface(mWidgetCustomFont);
-										
-					((TextView)itemWidget).setText(items.get(position).widgetText);
-					if (items.get(position).widgetTextColor != 0) {
+														
+					if (mDispatchOnDrawItemWidgetTextColor)  {  // +++
+						int drawWidgetTxtColor = controls.pOnListViewDrawItemWidgetTextColor(PasObj, (int)position, items.get(position).widgetText);
+						 ((TextView)itemWidget).setTextColor(drawWidgetTxtColor);
+					}											
+					else if (items.get(position).widgetTextColor != 0) {  
 					  ((TextView)itemWidget).setTextColor(items.get(position).widgetTextColor);
-					}
+					}										
 					if (items.get(position).textSize != 0) {
 					   ((TextView)itemWidget).setTextSize(items.get(position).textSize);
 					}
+					
+					if (mWidgetCustomFont != null)  
+					  	   ((TextView)itemWidget).setTypeface(mWidgetCustomFont);
+					
+					((TextView)itemWidget).setText(items.get(position).widgetText);					
+	
 					items.get(position).jWidget = itemWidget;
 					break;
 
-				case 5: itemWidget = new EditText(ctx);
+				case 5:  itemWidget = new EditText(ctx);
 					((EditText)itemWidget).setId(position+6666);
-					
-					if (mWidgetCustomFont != null)  
-					  	   ((EditText)itemWidget).setTypeface(mWidgetCustomFont);
-
-					((EditText)itemWidget).setText(items.get(position).widgetText);
-					/*
-					if (items.get(position).widgetTextColor != 0) {
-					  ((EditText)itemWidget).setTextColor(items.get(position).widgetTextColor);
-					}
-					if (items.get(position).textSize != 0) {
-					  ((EditText)itemWidget).setTextSize(items.get(position).textSize);
-					}
-					*/
 					((EditText)itemWidget).setLines(1);
 					((EditText)itemWidget).setMaxLines(1);
 					((EditText)itemWidget).setMinLines(1);
-					items.get(position).jWidget = itemWidget;
 					
+					
+					if (mDispatchOnDrawItemWidgetTextColor)  {  // +++
+						int drawWidgetTxtColor = controls.pOnListViewDrawItemWidgetTextColor(PasObj, (int)position, items.get(position).widgetText);
+						   ((EditText)itemWidget).setTextColor(drawWidgetTxtColor);
+					}											
+					else if (items.get(position).widgetTextColor != 0) {  
+					  ((EditText)itemWidget).setTextColor(items.get(position).widgetTextColor);
+					}					
+					if (items.get(position).textSize != 0) {
+					   ((EditText)itemWidget).setTextSize(items.get(position).textSize);
+					}
+					
+					if (mWidgetCustomFont != null)  
+					  	   ((EditText)itemWidget).setTypeface(mWidgetCustomFont);
+					
+					((EditText)itemWidget).setText(items.get(position).widgetText);					
+					
+					items.get(position).jWidget = itemWidget;					
 					((EditText)itemWidget).setOnFocusChangeListener(new OnFocusChangeListener() {
 						public void onFocusChange(View v, boolean hasFocus) {
 							final int index = v.getId() - 6666;
@@ -708,7 +755,8 @@ class jArrayAdapter extends ArrayAdapter {
 				
 				itemLayout.addView(txtLayout, txtParam);
 				
-			} else if (items.get(position).itemLayout == 2) {  //(2)   Pascal layText	  ---- default				    								
+			} else if (items.get(position).itemLayout == 2) {  //(2)   Pascal layText	  ---- default				    				
+				
 				
 				if (itemTextLeft != null) {
 					leftParam.addRule(RelativeLayout.CENTER_VERTICAL);							
@@ -725,23 +773,35 @@ class jArrayAdapter extends ArrayAdapter {
 				switch(items.get(position).textAlign) {  //alLeft, alRight, alCenter    --layText
 				
 				  case 0: {
-					  if (itemTextLeft != null)
-					     txtParam.addRule(RelativeLayout.RIGHT_OF, itemTextLeft.getId());
-					  else
-						 txtParam.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
 					  
+					  if (itemTextLeft != null) {
+						 txtParam = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT); //w,h  //layText					
+						 txtParam.leftMargin = 10;
+						 txtParam.rightMargin = 10;  
+					     txtParam.addRule(RelativeLayout.RIGHT_OF, itemTextLeft.getId());
+					  }   
+					  else {
+					     txtParam = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT); //w,h  //layText
+					     txtParam.leftMargin = 10;
+						 txtParam.rightMargin = 10;
+						 txtParam.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
+					  }	 
+					   					  	 					  
 					  break;
 				  }
 				  
 				  case 1: {
-					  if (itemTextRight != null)
-					       txtParam.addRule(RelativeLayout.LEFT_OF, itemTextRight.getId());
-					    else  
-					    	txtParam.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);					  
+					  
+					  if (itemTextRight != null) {												 
+					     txtParam.addRule(RelativeLayout.LEFT_OF, itemTextRight.getId());
+					  }     
+					  else {   					  
+					     txtParam.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);  //***					     
+					  }	
 					  break;
 				  }
 				  
-				  case 2: {					  
+				  case 2: {	 //center				  
 					  if ( (itemTextLeft == null) || (itemTextRight == null) ) {
 					    	txtParam = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT); //w,h  //layText					
 						    txtParam.leftMargin = 10;
@@ -1025,6 +1085,7 @@ public class jListView extends ListView {
 
 	//
 	public  void clear() {
+		lastSelectedItem = -1;
 		alist.clear();
 		aadapter.notifyDataSetChanged();
 	}
@@ -1533,9 +1594,9 @@ public class jListView extends ListView {
 	public void SetWidgetTextColor(int _textcolor) {
 		this.widgetTextColor = _textcolor; 
 	} 
-	
-	public void SetWidgetFontFromAssets(String _customFontName) {   //   "fonts/font1.ttf"  or  "font1.ttf" 
-        aadapter.SetWidgetFontFromAssets(_customFontName);
+		
+	public void SetWidgetFontFromAssets(String _customFontName) {   //   "fonts/font1.ttf"  or  "font1.ttf" 		
+        aadapter.SetWidgetFontFromAssets(_customFontName);		
     }
 
 }

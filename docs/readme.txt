@@ -124,6 +124,21 @@
 	*
 	****************************************************************************************************
 
+version 0.7 - rev. 19 - 16 June - 2017 
+
+	NEW! jComboEditText component  ["ComboBox"]   
+
+	NEW! demo AppComboEditTextDemo1
+
+	Improved!
+		jEditText
+		jAutoTextView
+		jListView
+		jSpinner
+
+	NEW!
+		IDE Tools: Added new option "ADB Logcat"
+
 version 0.7 - rev. 18 - 20 May - 2017 
 
 	NEW! jModalDialog component   //<--- a suggestion by Anton (aka A.S.)!
