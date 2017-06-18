@@ -1,4 +1,4 @@
-package org.lamw.applistviewdemo3;
+package org.lamw.appcomboedittext;
 
 import java.util.ArrayList;
 import android.content.Context;
@@ -351,10 +351,16 @@ public class jSpinner extends Spinner /*dummy*/ { //please, fix what GUI object 
         return this.getSelectedItemPosition();
     }
 
-    public String GetSelectedItem() {
-    	int i = this.getSelectedItemPosition();
-    	mSelectedText = mStrList.get(i).label;    	
-        return mSelectedText;
+    public String GetSelectedItem() {    	
+    	int i = this.getSelectedItemPosition();    	 
+    	if (i >= 0) {
+    	   mSelectedText = mStrList.get(i).label;
+    	  
+    	}   
+    	else {
+    		mSelectedText = "";    			
+    	} 
+    	return mSelectedText;
     }
 
     public void Add(String _item) {
@@ -448,7 +454,12 @@ public class jSpinner extends Spinner /*dummy*/ { //please, fix what GUI object 
     
     public String GetText() {    	
     	int i = this.getSelectedItemPosition();
-    	mSelectedText = mStrList.get(i).label;
+    	if (i >= 0) {
+      	   mSelectedText = mStrList.get(i).label;
+    	}
+    	else {
+    		mSelectedText = "";
+    	}
         return mSelectedText;
     }
     
