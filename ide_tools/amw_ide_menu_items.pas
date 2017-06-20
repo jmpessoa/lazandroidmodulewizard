@@ -79,7 +79,7 @@ begin
 end;
 
 
-procedure BuildAPKandRun(Sender: TObject);
+procedure BuildApkAndRun(Sender: TObject);
 var
   Project: TLazProject;
 begin
@@ -1032,7 +1032,7 @@ begin
   //RegisterIDEMenuCommand(ideSubMnuLog, 'PathToLogcat', 'Logcat [sync]', nil, @StartLogcatSync);
   RegisterIDEMenuCommand(ideSubMnuLog, 'PathToLogcat', 'Logcat -c [clear]', nil, @StartLogcatClear);
   //Run
-  RegisterIDEMenuCommand(itmRunBuilding, 'BuildAPKandRun', '[Lamw] Build Android Apk and Run',nil, @BuildAPKandRun);
+  RegisterIDEMenuCommand(itmRunBuilding, 'BuildApkAndRun', '[Lamw] Build Android Apk and Run', nil, @BuildApkAndRun);
 
   ApkBuild.RegisterExtToolParser;
 end;

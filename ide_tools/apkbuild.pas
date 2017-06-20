@@ -20,6 +20,7 @@ type
     FDevice: string;
     procedure BringToFrontEmulator;
     function CheckAvailableDevices: Boolean;
+    function GetManifestSdkTarget(out SdkTarget: string): Boolean;
     procedure LoadPaths;
     function RunAndGetOutput(const cmd, params: string; Aout: TStrings): Integer;
     function TryFixPaths: TModalResult;
@@ -37,7 +38,7 @@ implementation
 uses
   IDEExternToolIntf, UTF8Process, Controls, StdCtrls,
   ButtonPanel, Dialogs, uFormStartEmulator, process, strutils,
-  laz2_XMLRead, Laz2_DOM, laz2_XMLWrite, LazFileUtils;
+  laz2_XMLRead, Laz2_DOM, laz2_XMLWrite, LazFileUtils, FileUtil;
 
 const
   SubToolAnt = 'ant';
@@ -122,6 +123,28 @@ begin
     Result := ExitCode;
   finally
     Free;
+  end;
+end;
+
+function TApkBuilder.GetManifestSdkTarget(out SdkTarget: string): Boolean;
+var
+  ManifestXML: TXMLDocument;
+  n: TDOMNode;
+begin
+  Result := False;
+  if not FileExists(FProjPath + 'AndroidManifest.xml') then Exit;
+  try
+    ReadXMLFile(ManifestXML, FProjPath + 'AndroidManifest.xml');
+    try
+      n := ManifestXML.DocumentElement.FindNode('uses-sdk');
+      if not (n is TDOMElement) then Exit;
+      SdkTarget := TDOMElement(n).AttribStrings['android:targetSdkVersion'];
+      Result := True;
+    finally
+      ManifestXML.Free
+    end;
+  except
+    Exit;
   end;
 end;
 
@@ -257,28 +280,6 @@ function TApkBuilder.TryFixPaths: TModalResult;
       end;
     end else
       Result := True;
-  end;
-
-  function GetManifestSdkTarget(out SdkTarget: string): Boolean;
-  var
-    ManifestXML: TXMLDocument;
-    n: TDOMNode;
-  begin
-    Result := False;
-    if not FileExists(FProjPath + 'AndroidManifest.xml') then Exit;
-    try
-      ReadXMLFile(ManifestXML, FProjPath + 'AndroidManifest.xml');
-      try
-        n := ManifestXML.DocumentElement.FindNode('uses-sdk');
-        if not (n is TDOMElement) then Exit;
-        SdkTarget := TDOMElement(n).AttribStrings['android:targetSdkVersion'];
-        Result := True;
-      finally
-        ManifestXML.Free
-      end;
-    except
-      Exit;
-    end;
   end;
 
   function SetManifestSdkTarget(SdkTarget: string): Boolean;
@@ -551,7 +552,16 @@ end;
 function TApkBuilder.BuildAPK(Install: Boolean): Boolean;
 var
   Tool: TIDEExternalToolOptions;
+  tempDir, SdkTarget: string;
 begin
+  if GetManifestSdkTarget(SdkTarget) then
+  begin
+    tempDir := FProjPath + 'src' + PathDelim
+      + StringReplace(FProj.CustomData['Package'], '.', PathDelim, [rfReplaceAll])
+      + PathDelim + 'android-' + SdkTarget;
+    if DirectoryExists(tempDir) then
+      DeleteDirectory(tempDir, True);
+  end;
   Result := False;
   if Install then
     if not CheckAvailableDevices then Exit;
