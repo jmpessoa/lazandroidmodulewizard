@@ -622,6 +622,7 @@ var
   xml: TXMLDocument;
   f, proj: string;
   Tool: TIDEExternalToolOptions;
+  SdkTarget, tempDir: string;
 begin
   f := FProjPath + PathDelim + 'AndroidManifest.xml';
   ReadXMLFile(xml, f);
@@ -644,6 +645,17 @@ begin
     BringToFrontEmulator;
   finally
     Tool.Free;
+
+    //total clean up!
+    if GetManifestSdkTarget(SdkTarget) then
+    begin
+      tempDir := FProjPath + 'src' + PathDelim
+        + StringReplace(FProj.CustomData['Package'], '.', PathDelim, [rfReplaceAll])
+        + PathDelim + 'android-' + SdkTarget;
+      if DirectoryExists(tempDir) then
+         DeleteDirectory(tempDir, False);
+    end;
+
   end;
 end;
 
