@@ -1666,6 +1666,7 @@ begin
 
   AProject.CustomData.Values['NdkPath']:= FPathToAndroidNDK;
   AProject.CustomData.Values['SdkPath']:= FPathToAndroidSDK;
+  AProject.CustomData.Values['NdkApi']:= FAndroidPlatform;  // androd-13, android-14,  android-15 etc...
 
   AProject.ProjectInfoFile := projDir + ChangeFileExt(projName, '.lpi');
 

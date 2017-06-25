@@ -1,6 +1,6 @@
-package com.example.applistviewdemo;
+package org.lamw.apptfpnoguigraphicsbridgedemo9;
 
-//LAMW: Lazarus Android Module Wizard  - version 0.7 - rev. 19 - 16 June - 2017 
+//LAMW: Lazarus Android Module Wizard  - version 0.7 - rev. 19.1 - 24 June - 2017 
 //RAD Android: Project Wizard, Form Designer and Components Development Model!
 
 //https://github.com/jmpessoa/lazandroidmodulewizard
@@ -1279,11 +1279,11 @@ public native void pOnBeforeDispatchDraw(long pasobj, Canvas canvas, int tag);
 public native void pOnAfterDispatchDraw(long pasobj, Canvas canvas, int tag);
 public native void pOnLayouting(long pasobj, boolean changed);
 
-// -------------------------------------------------------------------------
-//Load Pascal Library
-// -------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------
+//Load Pascal Library - Please, do not edit the static content commented in the template file
+// -------------------------------------------------------------------------------------------
 static {
-try{System.loadLibrary("controls");} catch (UnsatisfiedLinkError e) {Log.e("JNI_Loading_libcontrols", "exception", e);}
+/*libsmartload*/
 }
 // -------------------------------------------------------------------------
 //  Activity Event

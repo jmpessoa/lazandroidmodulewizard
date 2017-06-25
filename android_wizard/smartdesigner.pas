@@ -54,7 +54,7 @@ type
     procedure Init4Project(AProject: TLazProject);
 
     // called from Designer
-    procedure UpdateJContros(ProjFile: TLazProjectFile; AndroidForm: TAndroidForm);
+    procedure UpdateJControls(ProjFile: TLazProjectFile; AndroidForm: TAndroidForm);
     procedure UpdateProjectStartModule(const NewName: string);
   end;
 
@@ -193,7 +193,7 @@ begin
 
 end;
 
-procedure TLamwSmartDesigner.UpdateJContros(ProjFile: TLazProjectFile;
+procedure TLamwSmartDesigner.UpdateJControls(ProjFile: TLazProjectFile;
   AndroidForm: TAndroidForm);
 var
   jControls: TStringList;
@@ -210,8 +210,7 @@ begin
     c := AndroidForm.Components[i];
     if c is jControl then
       jControls.Add(c.ClassName)
-    else
-    if c.ClassName = 'TFPNoGUIGraphicsBridge' then
+    else if c.ClassName = 'TFPNoGUIGraphicsBridge' then
       jControls.Add(c.ClassName);
   end;
   jControls.Delimiter := ';';
@@ -880,6 +879,7 @@ var
   j, p: Integer;
   nativeExists: Boolean;
   aux, PathToJavaTemplates, chipArchitecture, LibPath: string;
+  pathToNdkApiPlatforms, androidNdkApi, arch: string;
 begin
   Result := mrOk;
   if not LazarusIDE.ActiveProject.CustomData.Contains('LAMW') then Exit;
@@ -976,12 +976,58 @@ begin
       TryAddJControl(jcontrolsList[j], nativeExists);
 
   if jcontrolsList.IndexOf('TFPNoGUIGraphicsBridge') >= 0 then   //handle lib freetype need by TFPNoGUIGraphicsBridge
-  begin
+  begin                                                                         //lamwdesigner\libs\armeabi\libfreetype.so
     if FileExists(PathToJavaTemplates+'lamwdesigner'+PathDelim+'libs'+PathDelim+chipArchitecture+PathDelim+'libfreetype.so') then
     begin
       CopyFile(PathToJavaTemplates+'lamwdesigner'+PathDelim+'libs'+PathDelim+chipArchitecture+PathDelim+'libfreetype.so',
                FPathToAndroidProject+'libs'+PathDelim+
                chipArchitecture+PathDelim+'libfreetype.so');
+
+      //Added support to TFPNoGUIGraphicsBridge ...
+      androidNdkApi:= LazarusIDE.ActiveProject.CustomData.Values['NdkApi']; //android-13 or android-14 or ... etc
+      if androidNdkApi <> '' then
+      begin
+
+        if Pos('armeabi', chipArchitecture) > 0 then
+           arch:= 'arch-arm'
+        else
+           arch:= 'arch-x86';
+
+                                //C:\adt32\ndk10e\platforms\android-15\arch-arm\usr\lib
+        pathToNdkApiPlatforms:= FPathToAndroidNDK+'platforms'+DirectorySeparator+
+                                                androidNdkApi +DirectorySeparator+arch+DirectorySeparator+
+                                                'usr'+DirectorySeparator+'lib';
+
+        //need by linker!
+        CopyFile(PathToJavaTemplates+'lamwdesigner'+PathDelim+'libs'+PathDelim+chipArchitecture+PathDelim+'libfreetype.so',
+               pathToNdkApiPlatforms+PathDelim+'libfreetype.so');
+
+        (*
+        //need by compiler
+        CopyFile(PathToJavaTemplates+'lamwdesigner'+PathDelim+'libs'+PathDelim+'ftsrc'+PathDelim+'freetype.pp',
+                 FPathToAndroidProject+'jni'+PathDelim+ 'freetype.pp');
+        CopyFile(PathToJavaTemplates+'lamwdesigner'+PathDelim+'libs'+PathDelim+'ftsrc'+PathDelim+'freetypeh.pp',
+                FPathToAndroidProject+'jni'+PathDelim+ 'freetypeh.pp');
+        CopyFile(PathToJavaTemplates+'lamwdesigner'+PathDelim+'libs'+PathDelim+'ftsrc'+PathDelim+'ftfont.pp',
+                 FPathToAndroidProject+'jni'+PathDelim+ 'ftfont.pp');
+        *)
+
+      end
+      else
+      begin
+       pathToNdkApiPlatforms:='';
+       aux:= LazarusIDE.ActiveProject.LazCompilerOptions.Libraries; //C:\adt32\ndk10e\platforms\android-15\arch-arm\usr\lib\; .....
+       p:= Pos(';', aux);
+       if p > 0 then
+       begin
+          pathToNdkApiPlatforms:= Trim(Copy(aux, 1, p-1));
+          //need by linker!
+          CopyFile(PathToJavaTemplates+'lamwdesigner'+PathDelim+'libs'+PathDelim+chipArchitecture+PathDelim+'libfreetype.so',
+                 pathToNdkApiPlatforms+'libfreetype.so');
+
+       end;
+      end;
+
     end;
   end;
 

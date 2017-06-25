@@ -1192,9 +1192,13 @@ begin
 
   //smart designer helpers
 
-  if (APersistent is jControl)
-  and (jControl(APersistent).Owner = AndroidForm) then
+  if (APersistent is jControl) and (jControl(APersistent).Owner = AndroidForm) then
     UpdateJControlsList;
+
+  //Added support to TFPNoGUIGraphicsBridge ...
+  if (TComponent(APersistent).ClassName = 'TFPNoGUIGraphicsBridge') and (TComponent(APersistent).Owner = AndroidForm) then
+    UpdateJControlsList;
+
 end;
 
 procedure TAndroidWidgetMediator.OnSetSelection(const ASelection: TPersistentSelectionList);
@@ -1249,7 +1253,7 @@ end;
 
 procedure TAndroidWidgetMediator.UpdateJControlsList;
 begin
-  LamwSmartDesigner.UpdateJContros(FProjFile, AndroidForm);
+  LamwSmartDesigner.UpdateJControls(FProjFile, AndroidForm);
 end;
 
 class function TAndroidWidgetMediator.CreateMediator(TheOwner, TheForm: TComponent): TDesignerMediator;
