@@ -604,6 +604,8 @@ procedure jListView_SetItemPaddingBottom(env: PJNIEnv; _jlistview: JObject; _ite
 procedure jListView_SetWidgetTextColor(env: PJNIEnv; _jlistview: JObject; _textcolor: integer);
 procedure jListView_SetDispatchOnDrawItemWidgetTextColor(env: PJNIEnv; _jlistview: JObject; _value: boolean);
 procedure jListView_SetWidgetFontFromAssets(env: PJNIEnv; _jlistview: JObject; _customFontName: string);
+procedure jListView_DispatchOnDrawWidgetItemWidgetTextColor(env: PJNIEnv; _jlistview: JObject; _value: boolean);
+procedure jListView_DispatchOnDrawItemWidgetImage(env: PJNIEnv; _jlistview: JObject; _value: boolean);
 
 
 // ScrollView
@@ -5412,6 +5414,32 @@ begin
   jMethod:= env^.GetMethodID(env, jCls, 'SetWidgetFontFromAssets', '(Ljava/lang/String;)V');
   env^.CallVoidMethodA(env, _jlistview, jMethod, @jParams);
   env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jListView_DispatchOnDrawWidgetItemWidgetTextColor(env: PJNIEnv; _jlistview: JObject; _value: boolean);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].z:= JBool(_value);
+  jCls:= env^.GetObjectClass(env, _jlistview);
+  jMethod:= env^.GetMethodID(env, jCls, 'DispatchOnDrawWidgetItemWidgetTextColor', '(Z)V');
+  env^.CallVoidMethodA(env, _jlistview, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jListView_DispatchOnDrawItemWidgetImage(env: PJNIEnv; _jlistview: JObject; _value: boolean);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].z:= JBool(_value);
+  jCls:= env^.GetObjectClass(env, _jlistview);
+  jMethod:= env^.GetMethodID(env, jCls, 'DispatchOnDrawItemWidgetImage', '(Z)V');
+  env^.CallVoidMethodA(env, _jlistview, jMethod, @jParams);
   env^.DeleteLocalRef(env, jCls);
 end;
 

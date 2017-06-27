@@ -1,4 +1,4 @@
-package org.lamw.appcomboedittext;
+package org.lamw.applistviewdemo3;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -25,6 +25,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.RadioButton;
@@ -86,6 +87,7 @@ class jArrayAdapter extends ArrayAdapter {
 	private boolean mDrawAllItemPartsTextColor;
 	private boolean mDispatchOnDrawItemBitmap;
 	private boolean mDispatchOnDrawItemWidgetTextColor;
+	private boolean mDispatchOnDrawItemWidgetImage;
 
 	boolean mChangeFontSizeByComplexUnitPixel;
 	int mTextSizeTypedValue;
@@ -106,6 +108,7 @@ class jArrayAdapter extends ArrayAdapter {
 		mDispatchOnDrawItemTextColor = true;
 		mDrawAllItemPartsTextColor = true;
 		mDispatchOnDrawItemWidgetTextColor = true;
+		mDispatchOnDrawItemWidgetImage = true;
 				
 		mDrawAllItemPartsTextColor = true;
 		mDispatchOnDrawItemBitmap = true;
@@ -136,7 +139,10 @@ class jArrayAdapter extends ArrayAdapter {
 	public void SetDispatchOnDrawItemWidgetTextColor(boolean _value) { //+++
 		mDispatchOnDrawItemWidgetTextColor = _value;
 	}
-
+	
+	public void SetDispatchOnDrawItemWidgetImage(boolean _value) { //+++
+	   mDispatchOnDrawItemWidgetImage = _value;
+	}
 	
 	public void SetAllPartsOnDrawItemTextColor(boolean _value) {
 		mDrawAllItemPartsTextColor = _value;
@@ -197,6 +203,23 @@ class jArrayAdapter extends ArrayAdapter {
 	    return (int)TypedValue.applyDimension(unit, size, metrics);
 	}
 
+	
+	private Drawable GetDrawableResourceById(int _resID) {
+		return (Drawable)( ctx.getResources().getDrawable(_resID));
+	}
+	
+	private int GetDrawableResourceId(String _resName) {
+		  try {
+		     Class<?> res = R.drawable.class;
+		     Field field = res.getField(_resName);  //"drawableName" ex. "ic_launcher"
+		     int drawableId = field.getInt(null);
+		     return drawableId;
+		  }
+		  catch (Exception e) {
+		     return 0;
+		  }
+	}
+		
 	@Override
 	public  View getView(int position, View v, ViewGroup parent) {
 
@@ -490,6 +513,21 @@ class jArrayAdapter extends ArrayAdapter {
 					  ((CheckBox)itemWidget).setTextColor(items.get(position).widgetTextColor);
 					}
 					
+					if (mDispatchOnDrawItemWidgetImage)  {  // +++
+						  Bitmap image = controls.pOnListViewDrawItemWidgetImage(PasObj, (int)position, items.get(position).widgetText);						 																
+						  Drawable d = new BitmapDrawable(controls.activity.getResources(), image);
+						  int h = d.getIntrinsicHeight(); 
+						  int w = d.getIntrinsicWidth();   
+						  d.setBounds( 0, 0, w, h );
+						  int _side = 0;
+						  switch(_side) {
+						    case 0: ((TextView)itemWidget).setCompoundDrawables(d, null, null, null); break; //left
+						    case 1: ((TextView)itemWidget).setCompoundDrawables(null, null, d, null);   break;  //right
+						    case 2: ((TextView)itemWidget).setCompoundDrawables(null, d, null, null);  break; //above
+						    case 3: ((TextView)itemWidget).setCompoundDrawables(null, null, null, d); 		
+						  }					
+					}					
+					
 					if (mWidgetCustomFont != null)  
 					  	   ((CheckBox)itemWidget).setTypeface(mWidgetCustomFont);
 					
@@ -512,7 +550,23 @@ class jArrayAdapter extends ArrayAdapter {
 					}											
 					else if (items.get(position).widgetTextColor != 0) {  
 					  ((RadioButton)itemWidget).setTextColor(items.get(position).widgetTextColor);
-					}					
+					}
+					
+					if (mDispatchOnDrawItemWidgetImage)  {  // +++
+						  Bitmap image = controls.pOnListViewDrawItemWidgetImage(PasObj, (int)position, items.get(position).widgetText);						 																
+						  Drawable d = new BitmapDrawable(controls.activity.getResources(), image);
+						  int h = d.getIntrinsicHeight(); 
+						  int w = d.getIntrinsicWidth();   
+						  d.setBounds( 0, 0, w, h );
+						  int _side = 0;
+						  switch(_side) {
+						    case 0: ((TextView)itemWidget).setCompoundDrawables(d, null, null, null); break; //left
+						    case 1: ((TextView)itemWidget).setCompoundDrawables(null, null, d, null);   break;  //right
+						    case 2: ((TextView)itemWidget).setCompoundDrawables(null, d, null, null);  break; //above
+						    case 3: ((TextView)itemWidget).setCompoundDrawables(null, null, null, d); 		
+						  }					
+					}
+					
 					if (items.get(position).textSize != 0) {
 					   ((RadioButton)itemWidget).setTextSize(items.get(position).textSize);
 					}
@@ -535,7 +589,23 @@ class jArrayAdapter extends ArrayAdapter {
 					}											
 					else if (items.get(position).widgetTextColor != 0) {  
 					  ((Button)itemWidget).setTextColor(items.get(position).widgetTextColor);
-					}					
+					}
+					
+					if (mDispatchOnDrawItemWidgetImage)  {  // +++
+						  Bitmap image = controls.pOnListViewDrawItemWidgetImage(PasObj, (int)position, items.get(position).widgetText);						 																
+						  Drawable d = new BitmapDrawable(controls.activity.getResources(), image);
+						  int h = d.getIntrinsicHeight(); 
+						  int w = d.getIntrinsicWidth();   
+						  d.setBounds( 0, 0, w, h );
+						  int _side = 0;
+						  switch(_side) {
+						    case 0: ((TextView)itemWidget).setCompoundDrawables(d, null, null, null); break; //left
+						    case 1: ((TextView)itemWidget).setCompoundDrawables(null, null, d, null);   break;  //right
+						    case 2: ((TextView)itemWidget).setCompoundDrawables(null, d, null, null);  break; //above
+						    case 3: ((TextView)itemWidget).setCompoundDrawables(null, null, null, d); 		
+						  }					
+					}
+					
 					if (items.get(position).textSize != 0) {
 					   ((Button)itemWidget).setTextSize(items.get(position).textSize);
 					}
@@ -557,7 +627,23 @@ class jArrayAdapter extends ArrayAdapter {
 					}											
 					else if (items.get(position).widgetTextColor != 0) {  
 					  ((TextView)itemWidget).setTextColor(items.get(position).widgetTextColor);
-					}										
+					}
+										
+					if (mDispatchOnDrawItemWidgetImage)  {  // +++
+						  Bitmap image = controls.pOnListViewDrawItemWidgetImage(PasObj, (int)position, items.get(position).widgetText);						 																
+						  Drawable d = new BitmapDrawable(controls.activity.getResources(), image);
+						  int h = d.getIntrinsicHeight(); 
+						  int w = d.getIntrinsicWidth();   
+						  d.setBounds( 0, 0, w, h );
+						  int _side = 0;
+						  switch(_side) {
+						    case 0: ((TextView)itemWidget).setCompoundDrawables(d, null, null, null); break; //left
+						    case 1: ((TextView)itemWidget).setCompoundDrawables(null, null, d, null);   break;  //right
+						    case 2: ((TextView)itemWidget).setCompoundDrawables(null, d, null, null);  break; //above
+						    case 3: ((TextView)itemWidget).setCompoundDrawables(null, null, null, d); 		
+						  }					
+					}					
+					
 					if (items.get(position).textSize != 0) {
 					   ((TextView)itemWidget).setTextSize(items.get(position).textSize);
 					}
@@ -566,7 +652,23 @@ class jArrayAdapter extends ArrayAdapter {
 					  	   ((TextView)itemWidget).setTypeface(mWidgetCustomFont);
 					
 					((TextView)itemWidget).setText(items.get(position).widgetText);					
-	
+                      
+					/*
+					int id = GetDrawableResourceId("ic_launcher");
+					Drawable d = GetDrawableResourceById(id);  		
+					int h = d.getIntrinsicHeight(); 
+					int w = d.getIntrinsicWidth();   
+					d.setBounds( 0, 0, w, h );	
+					int _side = 0;
+					
+					switch(_side) {
+					  case 0: ((TextView)itemWidget).setCompoundDrawables(d, null, null, null); break; //left
+					  case 1: ((TextView)itemWidget).setCompoundDrawables(null, null, d, null);   break;  //right
+					  case 2: ((TextView)itemWidget).setCompoundDrawables(null, d, null, null);  break; //above
+					  case 3: ((TextView)itemWidget).setCompoundDrawables(null, null, null, d); 		
+					}					
+					*/
+					
 					items.get(position).jWidget = itemWidget;
 					break;
 
@@ -575,15 +677,30 @@ class jArrayAdapter extends ArrayAdapter {
 					((EditText)itemWidget).setLines(1);
 					((EditText)itemWidget).setMaxLines(1);
 					((EditText)itemWidget).setMinLines(1);
-					
-					
+										
 					if (mDispatchOnDrawItemWidgetTextColor)  {  // +++
 						int drawWidgetTxtColor = controls.pOnListViewDrawItemWidgetTextColor(PasObj, (int)position, items.get(position).widgetText);
 						   ((EditText)itemWidget).setTextColor(drawWidgetTxtColor);
 					}											
 					else if (items.get(position).widgetTextColor != 0) {  
 					  ((EditText)itemWidget).setTextColor(items.get(position).widgetTextColor);
-					}					
+					}
+					
+					if (mDispatchOnDrawItemWidgetImage)  {  // +++
+						  Bitmap image = controls.pOnListViewDrawItemWidgetImage(PasObj, (int)position, items.get(position).widgetText);						 																
+						  Drawable d = new BitmapDrawable(controls.activity.getResources(), image);
+						  int h = d.getIntrinsicHeight(); 
+						  int w = d.getIntrinsicWidth();   
+						  d.setBounds( 0, 0, w, h );
+						  int _side = 0;
+						  switch(_side) {
+						    case 0: ((TextView)itemWidget).setCompoundDrawables(d, null, null, null); break; //left
+						    case 1: ((TextView)itemWidget).setCompoundDrawables(null, null, d, null);   break;  //right
+						    case 2: ((TextView)itemWidget).setCompoundDrawables(null, d, null, null);  break; //above
+						    case 3: ((TextView)itemWidget).setCompoundDrawables(null, null, null, d); 		
+						  }					
+					}
+					
 					if (items.get(position).textSize != 0) {
 					   ((EditText)itemWidget).setTextSize(items.get(position).textSize);
 					}
@@ -610,6 +727,7 @@ class jArrayAdapter extends ArrayAdapter {
 					});
 										
 					break;
+															
 			}
 				
 			if (itemWidget != null) {
@@ -1599,4 +1717,12 @@ public class jListView extends ListView {
         aadapter.SetWidgetFontFromAssets(_customFontName);		
     }
 
+	public void DispatchOnDrawWidgetItemWidgetTextColor(boolean _value) {
+	   aadapter.SetDispatchOnDrawItemWidgetTextColor(_value);
+	}
+	
+	public void DispatchOnDrawItemWidgetImage(boolean _value) {
+		aadapter.SetDispatchOnDrawItemWidgetImage(_value);
+	}
+	
 }

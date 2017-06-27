@@ -1218,6 +1218,7 @@ type
     FOnDrawItemBitmap: TOnDrawItemBitmap;
     FOnWidgeItemLostFocus: TOnWidgeItemLostFocus;
     FOnScrollStateChanged: TOnScrollStateChanged;
+    FOnDrawItemWidgetBitmap: TOnDrawItemWidgetBitmap;
 
     FItems        : TStrings;
     FWidgetItem   : TWidgetItem;
@@ -1266,6 +1267,8 @@ type
     procedure GenEvent_OnDrawItemWidgetTextColor(Obj: TObject; index: integer; caption: string;  out color: dword);
 
     procedure GenEvent_OnDrawItemBitmap(Obj: TObject; index: integer; caption: string;  out bitmap: JObject);
+    procedure GenEvent_OnDrawItemWidgetBitmap(Obj: TObject; index: integer; caption: string;  out bitmap: JObject);
+
     procedure GenEvent_OnWidgeItemLostFocus(Obj: TObject; index: integer; caption: string);
     procedure GenEvent_OnBeforeDispatchDraw(Obj: TObject; canvas: JObject; tag: integer);
     procedure GenEvent_OnAfterDispatchDraw(Obj: TObject; canvas: JObject; tag: integer);
@@ -1333,6 +1336,8 @@ type
     procedure SetWidgetTextColor(_textcolor: TARGBColorBridge);
     procedure SetDispatchOnDrawItemWidgetTextColor(_value: boolean);
     procedure SetWidgetFontFromAssets(_customFontName: string);
+    procedure DispatchOnDrawWidgetItemWidgetTextColor(_value: boolean);
+    procedure DispatchOnDrawItemWidgetImage(_value: boolean);
 
     //Property
     property setItemIndex: TXY write SetItemPosition;
@@ -1368,6 +1373,7 @@ type
     property OnDrawItemTextColor: TOnDrawItemTextColor read FOnDrawItemTextColor write FOnDrawItemTextColor;
     property OnDrawItemWidgetTextColor: TOnDrawItemWidgetTextColor read FOnDrawItemWidgetTextColor write FOnDrawItemWidgetTextColor;
     property OnDrawItemBitmap: TOnDrawItemBitmap  read FOnDrawItemBitmap write FOnDrawItemBitmap;
+    property OnDrawItemWidgetBitmap: TOnDrawItemWidgetBitmap read FOnDrawItemWidgetBitmap write FOnDrawItemWidgetBitmap;
 
     property OnBeforeDispatchDraw: TOnBeforeDispatchDraw read FOnBeforeDispatchDraw write FOnBeforeDispatchDraw;
     property OnAfterDispatchDraw: TOnAfterDispatchDraw read FOnAfterDispatchDraw write FOnAfterDispatchDraw;
@@ -1746,6 +1752,7 @@ type
   function  Java_Event_pOnListViewDrawItemBitmap(env: PJNIEnv; this: jobject; Obj: TObject; index: integer; caption: JString): JObject;
   procedure Java_Event_pOnWidgeItemLostFocus(env: PJNIEnv; this: jobject; Obj: TObject; index: integer;  caption: JString);
   procedure Java_Event_pOnListViewScrollStateChanged(env: PJNIEnv; this: jobject; Obj: TObject; firstVisibleItem: integer; visibleItemCount: integer; totalItemCount: integer; lastItemReached: JBoolean);
+  function Java_Event_pOnListViewDrawItemWidgetImage(env: PJNIEnv; this: jobject; Obj: TObject; index: integer; caption: JString): JObject;
 
   procedure Java_Event_pOnBeforeDispatchDraw(env: PJNIEnv; this: jobject; Obj: TObject; canvas: JObject; tag: integer);
   procedure Java_Event_pOnAfterDispatchDraw(env: PJNIEnv; this: jobject; Obj: TObject; canvas: JObject; tag: integer);
@@ -2513,6 +2520,29 @@ begin
       pasCaption:= string( env^.GetStringUTFChars(env,caption,@_jBoolean) );
     end;
     jListVIew(Obj).GenEvent_OnDrawItemBitmap(Obj, index, pasCaption, outBitmap);
+  end;
+  Result:= outBitmap;
+end;
+
+function Java_Event_pOnListViewDrawItemWidgetImage(env: PJNIEnv; this: jobject; Obj: TObject; index: integer; caption: JString): JObject;
+var
+  pasCaption: string;
+  _jBoolean: JBoolean;
+  outBitmap: JObject;
+begin
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+  outBitmap:= nil;
+  if Obj is jListVIew then
+  begin
+    jForm(jListVIew(Obj).Owner).UpdateJNI(gApp);
+    pasCaption := '';
+    if caption <> nil then
+    begin
+      _jBoolean:= JNI_False;
+      pasCaption:= string( env^.GetStringUTFChars(env,caption,@_jBoolean) );
+    end;
+    jListVIew(Obj).GenEvent_OnDrawItemWidgetBitmap(Obj, index, pasCaption, outBitmap);
   end;
   Result:= outBitmap;
 end;
@@ -7162,6 +7192,12 @@ begin
   if Assigned(FOnDrawItemBitmap) then FOnDrawItemBitmap(Obj,index,caption, bitmap);
 end;
 
+procedure jListView.GenEvent_OnDrawItemWidgetBitmap(Obj: TObject; index: integer; caption: string;  out bitmap: JObject);
+begin
+  bitmap:=  nil;
+  if Assigned(FOnDrawItemWidgetBitmap) then FOnDrawItemWidgetBitmap(Obj,index,caption, bitmap);
+end;
+
 procedure jListView.GenEvent_OnScrollStateChanged(Obj: TObject; firstVisibleItem: integer; visibleItemCount: integer; totalItemCount: integer; lastItemReached: boolean);
 begin
   if Assigned(FOnScrollStateChanged) then FOnScrollStateChanged(Obj, firstVisibleItem, visibleItemCount, totalItemCount, lastItemReached);
@@ -7404,6 +7440,20 @@ begin
   //in designing component state: set value here...
   if FInitialized then
      jListView_SetWidgetFontFromAssets(FjEnv, FjObject, _customFontName);
+end;
+
+procedure jListView.DispatchOnDrawWidgetItemWidgetTextColor(_value: boolean);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jListView_DispatchOnDrawWidgetItemWidgetTextColor(FjEnv, FjObject, _value);
+end;
+
+procedure jListView.DispatchOnDrawItemWidgetImage(_value: boolean);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jListView_DispatchOnDrawItemWidgetImage(FjEnv, FjObject, _value);
 end;
 
 //------------------------------------------------------------------------------

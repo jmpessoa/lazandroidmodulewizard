@@ -329,7 +329,7 @@ type
  TScanLine = Array[0..0] of DWord;
  PScanLine = ^TScanline;
 
- TItemLayout = (layImageTextWidget, layWidgetTextImage, layText);  //layTextTextWidget //layText
+ TItemLayout = (layImageTextWidget, layWidgetTextImage, layText);
 
  TToggleState = (tsOff, tsOn);
 
@@ -671,6 +671,7 @@ type
   TOnDrawItemWidgetTextColor = Procedure(Sender: TObject; itemIndex: integer; widgetText: string; out textColor: TARGBColorBridge) of Object;
 
   TOnDrawItemBitmap  = Procedure(Sender: TObject; itemIndex: integer; itemCaption: string; out bimap: JObject) of Object;
+  TOnDrawItemWidgetBitmap  = Procedure(Sender: TObject; itemIndex: integer; widgetText: string; out bimap: JObject) of Object;
 
   TOnWebViewStatus   = Procedure(Sender: TObject; Status : TWebViewStatus;
                                  URL : String; Var CanNavi : Boolean) of object;
