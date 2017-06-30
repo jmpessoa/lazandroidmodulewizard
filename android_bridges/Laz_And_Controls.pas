@@ -872,6 +872,11 @@ type
     procedure SetEditable(enabled: boolean);
     procedure SetHintTextColor(Value: TARGBColorBridge); //override;
 
+    procedure LoadFromFile(_path: string; _filename: string);  overload;
+    procedure LoadFromFile(_filename: string);  overload;
+    procedure SaveToFile(_path: string; _filename: string);  overload;
+    procedure SaveToFile(_filename: string); overload;
+
     Procedure GenEvent_OnEnter (Obj: TObject);
     Procedure GenEvent_OnChange(Obj: TObject; txt: string; count : Integer);
     Procedure GenEvent_OnChanged(Obj: TObject; txt : string; count: integer);
@@ -944,12 +949,11 @@ type
     property FontSize  : DWord      read FFontSize     write SetFontSize;
 
     property FontFace: TFontFace read FFontFace write SetFontFace default ffNormal; 
-    property TextTypeFace: TTextTypeFace read FTextTypeFace write SetTextTypeFace default tfNormal; 
-
+    property TextTypeFace: TTextTypeFace read FTextTypeFace write SetTextTypeFace default tfNormal;
     property Hint      : string     read FHint         write SetHint;
     property HintTextColor: TARGBColorBridge read FHintTextColor write SetHintTextColor;
-
     property ScrollBarStyle: TScrollBarStyle read FScrollBarStyle write SetScrollBarStyle;
+    //Max visible lines!
     property MaxLines: DWord read FMaxLines write SetMaxLines;
     property HorScrollBar: boolean read FHorizontalScrollBar write SetHorizontalScrollBar;
     property VerScrollBar: boolean read FVerticalScrollBar write SetVerticalScrollBar;
@@ -1338,6 +1342,7 @@ type
     procedure SetWidgetFontFromAssets(_customFontName: string);
     procedure DispatchOnDrawWidgetItemWidgetTextColor(_value: boolean);
     procedure DispatchOnDrawItemWidgetImage(_value: boolean);
+    function SplitCenterItemCaption(_centerItemCaption: string; _delimiter: string): TDynArrayOfString;
 
     //Property
     property setItemIndex: TXY write SetItemPosition;
@@ -4191,6 +4196,34 @@ begin
    FCloseSoftInputOnEnter:= _closeSoftInput;
   if FInitialized then
      jEditText_SetCloseSoftInputOnEnter(FjEnv, FjObject, _closeSoftInput);
+end;
+
+procedure jEditText.LoadFromFile(_path: string; _filename: string);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jEditText_LoadFromFile(FjEnv, FjObject, _path, _filename);
+end;
+
+procedure jEditText.LoadFromFile(_filename: string);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jEditText_LoadFromFile(FjEnv, FjObject, _filename);
+end;
+
+procedure jEditText.SaveToFile(_path: string; _filename: string);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jEditText_SaveToFile(FjEnv, FjObject, _path ,_filename);
+end;
+
+procedure jEditText.SaveToFile(_filename: string);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jEditText_SaveToFile(FjEnv, FjObject, _filename);
 end;
 
 //------------------------------------------------------------------------------
@@ -7454,6 +7487,13 @@ begin
   //in designing component state: set value here...
   if FInitialized then
      jListView_DispatchOnDrawItemWidgetImage(FjEnv, FjObject, _value);
+end;
+
+function jListView.SplitCenterItemCaption(_centerItemCaption: string; _delimiter: string): TDynArrayOfString;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jListView_SplitCenterItemCaption(FjEnv, FjObject, _centerItemCaption ,_delimiter);
 end;
 
 //------------------------------------------------------------------------------

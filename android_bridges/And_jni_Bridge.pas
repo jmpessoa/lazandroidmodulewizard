@@ -275,6 +275,11 @@ procedure jEditText_SetFontFromAssets(env: PJNIEnv; _jedittext: JObject; _fontNa
 procedure jEditText_RequestFocus(env: PJNIEnv; _jedittext: JObject);
 procedure jEditText_SetCloseSoftInputOnEnter(env: PJNIEnv; _jedittext: JObject; _closeSoftInput: boolean);
 
+procedure jEditText_LoadFromFile(env: PJNIEnv; _jedittext: JObject; _path: string; _fileName: string);  overload;
+procedure jEditText_LoadFromFile(env: PJNIEnv; _jedittext: JObject; _filename: string);  overload;
+procedure jEditText_SaveToFile(env: PJNIEnv; _jedittext: JObject; _path: string; _filename: string);  overload;
+procedure jEditText_SaveToFile(env: PJNIEnv; _jedittext: JObject; _filename: string);  overload;
+
 // Button
 Function jButton_Create(env: PJNIEnv;   this:jobject; SelfObj: TObject): jObject;
 Procedure jButton_Free(env:PJNIEnv; Button : jObject);
@@ -606,7 +611,7 @@ procedure jListView_SetDispatchOnDrawItemWidgetTextColor(env: PJNIEnv; _jlistvie
 procedure jListView_SetWidgetFontFromAssets(env: PJNIEnv; _jlistview: JObject; _customFontName: string);
 procedure jListView_DispatchOnDrawWidgetItemWidgetTextColor(env: PJNIEnv; _jlistview: JObject; _value: boolean);
 procedure jListView_DispatchOnDrawItemWidgetImage(env: PJNIEnv; _jlistview: JObject; _value: boolean);
-
+function jListView_SplitCenterItemCaption(env: PJNIEnv; _jlistview: JObject; _centerItemCaption: string; _delimiter: string): TDynArrayOfString;
 
 // ScrollView
 Function  jScrollView_Create           (env:PJNIEnv;  this:jobject; SelfObj: TObject): jObject;
@@ -2838,6 +2843,67 @@ begin
   jCls:= env^.GetObjectClass(env, _jedittext);
   jMethod:= env^.GetMethodID(env, jCls, 'SetCloseSoftInputOnEnter', '(Z)V');
   env^.CallVoidMethodA(env, _jedittext, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jEditText_LoadFromFile(env: PJNIEnv; _jedittext: JObject; _path: string; _fileName: string);
+var
+  jParams: array[0..1] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_path));
+  jParams[1].l:= env^.NewStringUTF(env, PChar(_fileName));
+  jCls:= env^.GetObjectClass(env, _jedittext);
+  jMethod:= env^.GetMethodID(env, jCls, 'LoadFromFile', '(Ljava/lang/String;Ljava/lang/String;)V');
+  env^.CallVoidMethodA(env, _jedittext, jMethod, @jParams);
+  env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env,jParams[1].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jEditText_LoadFromFile(env: PJNIEnv; _jedittext: JObject; _filename: string);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_filename));
+  jCls:= env^.GetObjectClass(env, _jedittext);
+  jMethod:= env^.GetMethodID(env, jCls, 'LoadFromFile', '(Ljava/lang/String;)V');
+  env^.CallVoidMethodA(env, _jedittext, jMethod, @jParams);
+  env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+
+procedure jEditText_SaveToFile(env: PJNIEnv; _jedittext: JObject; _path: string; _filename: string);
+var
+  jParams: array[0..1] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_path));
+  jParams[1].l:= env^.NewStringUTF(env, PChar(_filename));
+  jCls:= env^.GetObjectClass(env, _jedittext);
+  jMethod:= env^.GetMethodID(env, jCls, 'SaveToFile', '(Ljava/lang/String;Ljava/lang/String;)V');
+  env^.CallVoidMethodA(env, _jedittext, jMethod, @jParams);
+  env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env,jParams[1].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jEditText_SaveToFile(env: PJNIEnv; _jedittext: JObject; _filename: string);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_filename));
+  jCls:= env^.GetObjectClass(env, _jedittext);
+  jMethod:= env^.GetMethodID(env, jCls, 'SaveToFile', '(Ljava/lang/String;)V');
+  env^.CallVoidMethodA(env, _jedittext, jMethod, @jParams);
+  env^.DeleteLocalRef(env,jParams[0].l);
   env^.DeleteLocalRef(env, jCls);
 end;
 
@@ -5440,6 +5506,43 @@ begin
   jCls:= env^.GetObjectClass(env, _jlistview);
   jMethod:= env^.GetMethodID(env, jCls, 'DispatchOnDrawItemWidgetImage', '(Z)V');
   env^.CallVoidMethodA(env, _jlistview, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+function jListView_SplitCenterItemCaption(env: PJNIEnv; _jlistview: JObject; _centerItemCaption: string; _delimiter: string): TDynArrayOfString;
+var
+  jStr: JString;
+  jBoo: JBoolean;
+  resultSize: integer;
+  jResultArray: jObject;
+  jParams: array[0..1] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+  i: integer;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_centerItemCaption));
+  jParams[1].l:= env^.NewStringUTF(env, PChar(_delimiter));
+  jCls:= env^.GetObjectClass(env, _jlistview);
+  jMethod:= env^.GetMethodID(env, jCls, 'SplitCenterItemCaption', '(Ljava/lang/String;Ljava/lang/String;)[Ljava/lang/String;');
+  jResultArray:= env^.CallObjectMethodA(env, _jlistview, jMethod,  @jParams);
+  if jResultArray <> nil then
+  begin
+    resultSize:= env^.GetArrayLength(env, jResultArray);
+    SetLength(Result, resultSize);
+    for i:= 0 to resultsize - 1 do
+    begin
+      jStr:= env^.GetObjectArrayElement(env, jresultArray, i);
+      case jStr = nil of
+         True : Result[i]:= '';
+         False: begin
+                  jBoo:= JNI_False;
+                  Result[i]:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
+                end;
+      end;
+    end;
+  end;
+  env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env,jParams[1].l);
   env^.DeleteLocalRef(env, jCls);
 end;
 

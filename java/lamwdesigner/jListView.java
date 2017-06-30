@@ -1604,7 +1604,6 @@ public class jListView extends ListView {
 	  rightDelimiter = _rightDelimiter; //")";
 	}
 	
-	
 	public String GetCenterItemCaption(String _fullItemCaption) {
 		
 		String line = _fullItemCaption;
@@ -1633,7 +1632,12 @@ public class jListView extends ListView {
 		//String[] lines = line.split(Pattern.quote(delimiter));
 		return line;				
 	}
-
+    
+	public String[] SplitCenterItemCaption(String _centerItemCaption, String _delimiter) {
+		String d = _delimiter;
+		String[] lines = _centerItemCaption.split(Pattern.quote(d));
+		return lines;
+	}	
 	
 	public String GetLeftItemCaption(String _fullItemCaption) {
 		
@@ -1663,8 +1667,7 @@ public class jListView extends ListView {
 		}
 		return txt1;				
 	}
-	
-	
+		
 	public String GetRightItemCaption(String _fullItemCaption) {
 		
 		String line = _fullItemCaption;
@@ -1724,5 +1727,5 @@ public class jListView extends ListView {
 	public void DispatchOnDrawItemWidgetImage(boolean _value) {
 		aadapter.SetDispatchOnDrawItemWidgetImage(_value);
 	}
-	
+		
 }

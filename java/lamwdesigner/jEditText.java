@@ -1,5 +1,13 @@
-package org.lamw.appcomboedittext;
+package org.lamw.applistviewdemo3;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.lang.reflect.Field;
 
 import android.content.ClipData;
@@ -542,5 +550,79 @@ public class jEditText extends EditText {
 		mCloseSoftInputOnEnter = _closeSoftInput;
 	}
 	
+	public void LoadFromFile(String _path, String _filename) {
+		
+		File file = new File(_path, _filename);
+		StringBuilder content = new StringBuilder();
+		
+		try {
+		    BufferedReader br = new BufferedReader(new FileReader(file));
+		    String line;
+
+		    while ((line = br.readLine()) != null) {
+		    	content.append(line);
+		    	content.append('\n');
+		    }
+		    br.close();
+		}
+		catch (IOException e) {
+			//
+		}
+		this.setText(content.toString());
+	}
+	
+	
+	public void LoadFromFile(String _filename) {
+
+		     String retStr = "";
+
+		     try {
+		         InputStream inputStream = controls.activity.openFileInput(_filename);
+
+		         if ( inputStream != null ) {
+		             InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
+		             BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+		             String receiveString = "";
+		             StringBuilder stringBuilder = new StringBuilder();
+		             while ( (receiveString = bufferedReader.readLine()) != null ) {
+		                 stringBuilder.append(receiveString);
+		             }
+
+		             inputStream.close();
+		             retStr = stringBuilder.toString();
+		         }
+		     }
+		     catch (IOException e) {
+		        // Log.i("jTextFileManager", "LoadFromFile error: " + e.toString());
+		     }
+		     this.setText(retStr);
+    }
+	
+	public void SaveToFile(String _path, String _filename){
+		     FileWriter fWriter;     
+		     try{ // Environment.getExternalStorageDirectory().getPath()
+		          fWriter = new FileWriter(_path +"/"+ _filename);
+		          fWriter.write(this.getText().toString());
+		          fWriter.flush();
+		          fWriter.close();
+		      }catch(Exception e){
+		          e.printStackTrace();
+		      }
+	}
+	
+	public void SaveToFile(String _filename) {	  	 
+		     try {
+		         OutputStreamWriter outputStreamWriter = new OutputStreamWriter(controls.activity.openFileOutput(_filename, Context.MODE_PRIVATE));
+		         //outputStreamWriter.write("_header");
+		         outputStreamWriter.write(this.getText().toString());
+		         //outputStreamWriter.write("_footer");
+		         outputStreamWriter.close();
+		     }
+		     catch (IOException e) {
+		        // Log.i("jTextFileManager", "SaveToFile failed: " + e.toString());
+		     }
+    }
+
+	   
 }
 
