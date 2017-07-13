@@ -1248,7 +1248,7 @@ end;
 
 procedure TAndroidWidgetMediator.UpdateJControlsList;
 begin
-  LamwSmartDesigner.UpdateJContros(FProjFile, AndroidForm);
+  LamwSmartDesigner.UpdateJControls(FProjFile, AndroidForm);
 end;
 
 class function TAndroidWidgetMediator.CreateMediator(TheOwner, TheForm: TComponent): TDesignerMediator;
