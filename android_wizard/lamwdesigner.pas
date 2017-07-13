@@ -406,9 +406,9 @@ type
     procedure GetValues(Proc: TGetStrProc); override;
   end;
 
-  { TAndroidFormSizeComponentEditor }
+  { TAndroidFormComponentEditor }
 
-  TAndroidFormSizeComponentEditor = class(TDefaultComponentEditor)
+  TAndroidFormComponentEditor = class(TDefaultComponentEditor)
   private
     procedure ChangeSize(AWidth, AHeight: Integer);
     procedure ShowSelectSizeDialog;
@@ -824,7 +824,7 @@ end;
 
 procedure TAndroidFormSizePropertyEditor.Edit;
 begin
-  with TAndroidFormSizeComponentEditor.Create(GetComponent(0) as TComponent, nil) do
+  with TAndroidFormComponentEditor.Create(GetComponent(0) as TComponent, nil) do
   try
     ShowSelectSizeDialog
   finally
@@ -837,9 +837,9 @@ begin
   Result := inherited GetAttributes + [paDialog];
 end;
 
-{ TAndroidFormSizeComponentEditor }
+{ TAndroidFormComponentEditor }
 
-procedure TAndroidFormSizeComponentEditor.ChangeSize(AWidth, AHeight: Integer);
+procedure TAndroidFormComponentEditor.ChangeSize(AWidth, AHeight: Integer);
 begin
   with jForm(Component) do
   begin
@@ -850,7 +850,7 @@ begin
   end;
 end;
 
-procedure TAndroidFormSizeComponentEditor.ShowSelectSizeDialog;
+procedure TAndroidFormComponentEditor.ShowSelectSizeDialog;
 begin
   with TfrmFormSizeSelect.Create(nil) do
   try
@@ -863,7 +863,7 @@ begin
   end;
 end;
 
-procedure TAndroidFormSizeComponentEditor.ExecuteVerb(Index: Integer);
+procedure TAndroidFormComponentEditor.ExecuteVerb(Index: Integer);
 var
   pr: TLazProjectFile;
 begin
@@ -875,17 +875,16 @@ begin
   2: begin
        pr := LazarusIDE.GetProjectFileWithRootComponent(Component);
        if pr <> nil then
-         if not SameText(pr.CustomData['DisableLayout'], 'True') then
-           pr.CustomData['DisableLayout'] := 'True'
-         else
-           pr.CustomData['DisableLayout'] := 'False';
+         pr.CustomData['DisableLayout'] :=
+           BoolToStr(not SameText(pr.CustomData['DisableLayout'], 'True'),
+                     'True', 'False');
      end;
   else
     inherited ExecuteVerb(Index);
   end;
 end;
 
-function TAndroidFormSizeComponentEditor.GetVerb(Index: Integer): string;
+function TAndroidFormComponentEditor.GetVerb(Index: Integer): string;
 var
   pr: TLazProjectFile;
 begin
@@ -907,7 +906,7 @@ begin
   end
 end;
 
-function TAndroidFormSizeComponentEditor.GetVerbCount: Integer;
+function TAndroidFormComponentEditor.GetVerbCount: Integer;
 begin
   Result := 3;
 end;
@@ -1192,13 +1191,9 @@ begin
 
   //smart designer helpers
 
-  if (APersistent is jControl) and (jControl(APersistent).Owner = AndroidForm) then
+  if (APersistent is jControl)
+  and (jControl(APersistent).Owner = AndroidForm) then
     UpdateJControlsList;
-
-  //Added support to TFPNoGUIGraphicsBridge ...
-  if (TComponent(APersistent).ClassName = 'TFPNoGUIGraphicsBridge') and (TComponent(APersistent).Owner = AndroidForm) then
-    UpdateJControlsList;
-
 end;
 
 procedure TAndroidWidgetMediator.OnSetSelection(const ASelection: TPersistentSelectionList);
@@ -1253,7 +1248,7 @@ end;
 
 procedure TAndroidWidgetMediator.UpdateJControlsList;
 begin
-  LamwSmartDesigner.UpdateJControls(FProjFile, AndroidForm);
+  LamwSmartDesigner.UpdateJContros(FProjFile, AndroidForm);
 end;
 
 class function TAndroidWidgetMediator.CreateMediator(TheOwner, TheForm: TComponent): TDesignerMediator;
@@ -3320,7 +3315,7 @@ initialization
   DraftClassesMap := TDraftControlHash.Create(64); // should be power of 2 for efficiency
   RegisterPropertyEditor(TypeInfo(TARGBColorBridge), nil, '', TARGBColorBridgePropertyEditor);
   RegisterPropertyEditor(TypeInfo(jVisualControl), jVisualControl, 'Anchor', TAnchorPropertyEditor);
-  RegisterComponentEditor(jForm, TAndroidFormSizeComponentEditor);
+  RegisterComponentEditor(jForm, TAndroidFormComponentEditor);
   RegisterPropertyEditor(TypeInfo(Integer), jForm, 'Width', TAndroidFormSizePropertyEditor);
   RegisterPropertyEditor(TypeInfo(Integer), jForm, 'Height', TAndroidFormSizePropertyEditor);
   RegisterPropertyEditor(TypeInfo(TStrings), jImageList, 'Images', TjImageListImagesEditor);
