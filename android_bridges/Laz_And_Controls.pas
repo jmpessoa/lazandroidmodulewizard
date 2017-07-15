@@ -872,11 +872,6 @@ type
     procedure SetEditable(enabled: boolean);
     procedure SetHintTextColor(Value: TARGBColorBridge); //override;
 
-    procedure LoadFromFile(_path: string; _filename: string);  overload;
-    procedure LoadFromFile(_filename: string);  overload;
-    procedure SaveToFile(_path: string; _filename: string);  overload;
-    procedure SaveToFile(_filename: string); overload;
-
     Procedure GenEvent_OnEnter (Obj: TObject);
     Procedure GenEvent_OnChange(Obj: TObject; txt: string; count : Integer);
     Procedure GenEvent_OnChanged(Obj: TObject; txt : string; count: integer);
@@ -934,6 +929,11 @@ type
     procedure SetFontFromAssets(_fontName: string);
     procedure RequestFocus();
     procedure SetCloseSoftInputOnEnter(_closeSoftInput: boolean);
+
+    procedure LoadFromFile(_path: string; _filename: string);  overload;
+    procedure LoadFromFile(_filename: string);  overload;
+    procedure SaveToFile(_path: string; _filename: string);  overload;
+    procedure SaveToFile(_filename: string); overload;
 
     // Property
     property CursorPos : TXY        read GetCursorPos  write SetCursorPos;
