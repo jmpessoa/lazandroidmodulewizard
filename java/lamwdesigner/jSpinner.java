@@ -1,39 +1,21 @@
-package org.lamw.appcomboedittext;
+package com.example.appspinnerdemo;
 
 import java.util.ArrayList;
+
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.Typeface;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AbsSpinner;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
-import android.widget.RelativeLayout.LayoutParams;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.view.Gravity;
 
-
-class ItemRow {
-	String label = "";
-	String tag= "";	
-	Context ctx;
-
-	public  ItemRow(Context c, String lab, String tg) {
-		label = lab;
-		tag= tg;
-		ctx = c;
-	}	
-}
-
-
 //by jmpessoa
-class CustomSpinnerArrayAdapter<T> extends ArrayAdapter<ItemRow> {
+class CustomSpinnerArrayAdapter<T> extends ArrayAdapter<String>{
 
     Context ctx;
     private int mTextColor = Color.BLACK;
@@ -47,18 +29,15 @@ class CustomSpinnerArrayAdapter<T> extends ArrayAdapter<ItemRow> {
     private int mTextAlignment;
     private Typeface mFontFace;
     private int mFontStyle;
-    
+        
     private int mSelectedPadTop = 15;
     private int mSelectedPadBottom = 5;
     
-    private ArrayList<ItemRow> items ;
-
-    public CustomSpinnerArrayAdapter(Context context, int simpleSpinnerItem, ArrayList<ItemRow> list) {
-        super(context, simpleSpinnerItem, list);        
+    public CustomSpinnerArrayAdapter(Context context, int simpleSpinnerItem, ArrayList<String> alist) {
+        super(context, simpleSpinnerItem, alist);        
         ctx = context;
         mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_SP;
-        mTextAlignment = Gravity.CENTER;
-        items = list;
+        mTextAlignment = Gravity.CENTER;        
     }
 
     public void SetFontSizeUnit(int _unit) {
@@ -81,109 +60,67 @@ class CustomSpinnerArrayAdapter<T> extends ArrayAdapter<ItemRow> {
         mFontStyle = fontStyle;
     }
 
+    
     //This method is used to display the dropdown popup that contains data.
     @Override
-    public View getDropDownView(int position, View convertView, ViewGroup parent) {    	
-       return getLayoutView(position, convertView, parent, mSelectedPadTop + 15 , mSelectedPadBottom + 15);    	
+    public View getDropDownView(int position, View convertView, ViewGroup parent)
+    {
+    	
+        View view = super.getView(position, convertView, parent);
+
+        //we know that simple_spinner_item has android.R.id.text1 TextView:
+        //TextView text = (TextView)view.findViewById(android.R.id.text1);
+
+        ((TextView) view).setPadding(20, mSelectedPadTop+15, 20, mSelectedPadBottom+15);  //padTop, padBottom
+        ((TextView) view).setTextColor(mTextColor);
+        ((TextView) view).setBackgroundColor(mTexBackgroundColor);
+        
+        if (mTextFontSize != 0) {
+
+            if (mTextSizeTypedValue != TypedValue.COMPLEX_UNIT_SP)
+                ((TextView) view).setTextSize(mTextSizeTypedValue, mTextFontSize);
+            else
+                ((TextView) view).setTextSize(mTextFontSize);
+        }
+        
+        ((TextView) view).setTypeface(mFontFace, mFontStyle);
+        ((TextView) view).setGravity(mTextAlignment);
+        //((TextView) view).setGravity(Gravity.CENTER);
+
+        return view;
     }
 
     //This method is used to return the customized view at specified position in list.
     @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
-       return getLayoutView(position, convertView, parent, mSelectedPadTop, mSelectedPadBottom);    	
-    }
-    
-    public View getLayoutView(int position, View convertView, ViewGroup parent, int padTop, int padBottom) {
-    	    	
-        if ( position >= 0) {
-    		        	
-            LinearLayout listLayout = new LinearLayout(ctx);
-            
-    	    listLayout.setOrientation(LinearLayout.HORIZONTAL);
-    		                                                                                    
-    		AbsSpinner.LayoutParams lparam = new AbsSpinner.LayoutParams(AbsSpinner.LayoutParams.MATCH_PARENT,	
-    		                                                             AbsSpinner.LayoutParams.WRAP_CONTENT); //w, h    		
-    		listLayout.setLayoutParams(lparam);
-    		
-    		RelativeLayout itemLayout = new RelativeLayout(ctx);
-    		
-    		LinearLayout txtLayout = new LinearLayout(ctx);    		
-    		txtLayout.setOrientation(LinearLayout.VERTICAL);	
-    		    	    		                                                          		
-    		TextView txtview = new TextView(ctx);
-    		
-    		txtview.setText(items.get(position).label); 
-    		//txtview.setPadding(20, 40, 20, 40);
-    		txtview.setPadding(20, padTop, 20, padBottom);  //padTop, padBottom
-    		txtview.setTextColor(mSelectedTextColor);        
-    		txtview.setBackgroundColor(mTexBackgroundColor);
-            
-            if (mTextFontSize != 0) {            	
-                if (mTextSizeTypedValue != TypedValue.COMPLEX_UNIT_SP)
-                	txtview.setTextSize(mTextSizeTypedValue, mTextFontSize);
-                else
-                	txtview.setTextSize(mTextFontSize);
-            }
+    public View getView(int pos, View cnvtView, ViewGroup prnt) {
 
-            txtview.setTypeface(mFontFace, mFontStyle);
+        View view = super.getView(pos, cnvtView, prnt);
 
-    		//TTextAlignment = (alLeft, alCenter, alRight);   //Pascal
-            
-			switch(mTextAlignment) {						      			      
-			 //[ifdef_api14up]
-               case 0 : { txtview.setGravity( Gravity.START             ); }; break;
-               case 1 : { txtview.setGravity( Gravity.END               ); }; break;
-             //[endif_api14up]
-            
-         /* //[endif_api14up]
-               case 0 : { txtview.setGravity( Gravity.LEFT              ); }; break;
-               case 1 : { txtview.setGravity( Gravity.RIGHT             ); }; break;
-            //[ifdef_api14up] */
-            
-               case 2 : { txtview.setGravity( Gravity.CENTER_HORIZONTAL ); }; break;
-            
-            //[ifdef_api14up]
-               default : { txtview.setGravity( Gravity.START            ); }; break;
-            //[endif_api14up]
-            
-            /* //[endif_api14up]
-               default : { txtview.setGravity( Gravity.LEFT             ); }; break;
-            //[ifdef_api14up] */
-            
-			}					
-			
-			
-    		LayoutParams txtParam = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT); //w,h    		             
-			txtParam.leftMargin = 10;
-			txtParam.rightMargin = 10;						
-			
-      	    switch(mTextAlignment) {     	       
-		       case 0: txtParam.addRule(RelativeLayout.ALIGN_PARENT_LEFT);  break;
-		       case 1: txtParam.addRule(RelativeLayout.CENTER_HORIZONTAL);  break;
-		       case 2: txtParam.addRule(RelativeLayout.ALIGN_PARENT_RIGHT); break;					
-     	    }
-                                          
-			
-			if (mLastItemAsPrompt) flag = 1;
-			
-            txtLayout.addView(txtview);
-            
-            itemLayout.addView(txtLayout, txtParam);
-            
-            listLayout.addView(itemLayout);
-                        
-            
-    		return listLayout;
-    		
-    	} else return convertView;
+        ((TextView)view).setPadding(20, mSelectedPadTop, 20, mSelectedPadBottom+5);        
+        ((TextView)view).setTextColor(mSelectedTextColor);        
+        ((TextView) view).setBackgroundColor(mTexBackgroundColor);
+        
+        if (mTextFontSize != 0) {
+
+            if (mTextSizeTypedValue != TypedValue.COMPLEX_UNIT_SP)
+                ((TextView) view).setTextSize(mTextSizeTypedValue, mTextFontSize);
+            else
+                ((TextView) view).setTextSize(mTextFontSize);
+        }
+
+        ((TextView)view).setTypeface(mFontFace, mFontStyle);
+        ((TextView)view).setGravity(mTextAlignment);
+        
+        if (mLastItemAsPrompt) flag = 1;
+
+        return view;
     }
-    
+
     @Override
     public int getCount() {
         if (flag == 1)
             return super.getCount() - 1; //do not show last item
-        else 
-        	return super.getCount();
+        else return super.getCount();
     }
 
     public void SetTextColor(int txtColor){
@@ -205,13 +142,13 @@ class CustomSpinnerArrayAdapter<T> extends ArrayAdapter<ItemRow> {
     public void SetTextFontSize(int txtFontSize) {
         mTextFontSize = txtFontSize;
     }
- 
-    public void SetSelectedPadTop(int _top) {
-       mSelectedPadTop = _top;
-    }
     
+    public void SetSelectedPadTop(int _top) {
+        mSelectedPadTop = _top;
+    }
+     
     public void SetSelectedPadBottom(int  _bottom) {
-       mSelectedPadBottom = _bottom; 
+        mSelectedPadBottom = _bottom; 
     }
 
 }
@@ -228,19 +165,19 @@ public class jSpinner extends Spinner /*dummy*/ { //please, fix what GUI object 
     private Context context = null;
     private Boolean enabled  = true;           // click-touch enabled!
 
-    private ArrayList<ItemRow>  mStrList;
+    private ArrayList<String>  mStrList;
+    private ArrayList<String>  mTagList;
     
-    private CustomSpinnerArrayAdapter<ItemRow> mSpAdapter;
-    
+    private CustomSpinnerArrayAdapter<String> mSpAdapter;
     private boolean mLastItemAsPrompt = false;
     private int mTextAlignment;
     
     private String mSelectedText="";
     
     private int mSelectedIndex= -1;
+
     private int mSelectedPadTop = 15;
-    private int mSelectedPadBottom = 15;
-    
+    private int mSelectedPadBottom = 5;
     
     private jCommons LAMWCommon;
 
@@ -248,7 +185,6 @@ public class jSpinner extends Spinner /*dummy*/ { //please, fix what GUI object 
     //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
     public jSpinner(Controls _ctrls, long _Self) { //Add more others news "_xxx" params if needed!
         super(_ctrls.activity);
-        
         context   = _ctrls.activity;
         pascalObj = _Self;
         controls  = _ctrls;
@@ -256,10 +192,10 @@ public class jSpinner extends Spinner /*dummy*/ { //please, fix what GUI object 
         LAMWCommon = new jCommons(this,context,pascalObj);
 
         mTextAlignment = Gravity.CENTER;
-        
-        mStrList = new ArrayList<ItemRow>();
-                
-        mSpAdapter = new CustomSpinnerArrayAdapter<ItemRow> (context, android.R.layout.simple_spinner_item, mStrList);               
+        mStrList = new ArrayList<String>();
+        mTagList = new ArrayList<String>();
+        mSpAdapter = new CustomSpinnerArrayAdapter<String>(context, android.R.layout.simple_spinner_item, mStrList);
+
         mSpAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 
         setAdapter(mSpAdapter);
@@ -270,8 +206,9 @@ public class jSpinner extends Spinner /*dummy*/ { //please, fix what GUI object 
     public void jFree() {
         //free local objects...
         mStrList = null;
-        mSpAdapter = null;
+        mTagList = null;
         setOnItemSelectedListener(null);
+        mSpAdapter = null;
         LAMWCommon.free();
     }
 
@@ -280,11 +217,12 @@ public class jSpinner extends Spinner /*dummy*/ { //please, fix what GUI object 
 
         @Override   
    /*.*/public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-            String caption = mStrList.get((int)id).label;
+            ((TextView) parent.getChildAt(0)).setGravity(mTextAlignment); //Gravity.CENTER
+            String caption = mStrList.get(position).toString();           
             setSelection(position);
             mSelectedIndex = position;
             mSelectedText = caption;
-            controls.pOnSpinnerItemSeleceted(pascalObj,position,caption); 
+            controls.pOnSpinnerItemSeleceted(pascalObj,position,caption);
         }
 
         @Override
@@ -351,27 +289,15 @@ public class jSpinner extends Spinner /*dummy*/ { //please, fix what GUI object 
         return this.getSelectedItemPosition();
     }
 
-    public String GetSelectedItem() {    	
-    	int i = this.getSelectedItemPosition();    	 
-    	if (i >= 0) {
-    	   mSelectedText = mStrList.get(i).label;
-    	  
-    	}   
-    	else {
-    		mSelectedText = "";    			
-    	} 
-    	return mSelectedText;
-    }
-
-    public void Add(String _item) {
-    	ItemRow info = new ItemRow(controls.activity, _item, "0");
-        mStrList.add(info);        
-        mSpAdapter.notifyDataSetChanged();
+    public String GetSelectedItem() {
+    	mSelectedText = this.getSelectedItem().toString();
+        return mSelectedText;
     }
 
     //ELERA_04032015
     public void Clear() {
         mStrList.clear();
+        mTagList.clear();
         mSpAdapter.notifyDataSetChanged();
     }
 
@@ -401,25 +327,28 @@ public class jSpinner extends Spinner /*dummy*/ { //please, fix what GUI object 
 
     public void Delete(int _index) {
         if (_index < 0) mStrList.remove(0);
-        else if (_index > (mStrList.size()-1)) mStrList.remove(mStrList.size()-1);
-        else mStrList.remove(_index);
-        mSpAdapter.notifyDataSetChanged();
-    }
-
-    public void SetItem(int _index, String _item) {
-        if (_index < 0) {
-        
-        	mStrList.set(0, new ItemRow(controls.activity, _item,  "0"));
-        }	
         else if (_index > (mStrList.size()-1)) { 
-        	 mStrList.set(mStrList.size()-1, new ItemRow(controls.activity, _item,  "0"));
-        }	 
-        else { 
-        	mStrList.set(_index, new ItemRow(controls.activity, _item,  "0"));
+        	mStrList.remove(mStrList.size()-1);
+        	mTagList.remove(mStrList.size()-1);
         }	
+        else {
+        	 mStrList.remove(_index);
+        	 mTagList.remove(_index);
+        }	 
         mSpAdapter.notifyDataSetChanged();
     }
     
+    public void SetSelection(int _index) {
+    	
+    	int i = _index;    	
+    	if (i < 0) i = 0;     	    	      	    	
+    	if (mStrList.size() > 0) {    		
+    		if ( i >= mStrList.size() ) i = mStrList.size()-1;    		    		    	
+    		setSelection(i);
+    	  	mSelectedText = this.getSelectedItem().toString();    		
+    	}   	
+    }
+   
     public void SetTextFontSize(int _txtFontSize) {
         mSpAdapter.SetTextFontSize(_txtFontSize);
     }
@@ -434,10 +363,35 @@ public class jSpinner extends Spinner /*dummy*/ { //please, fix what GUI object 
         mSpAdapter.SetFontSizeUnit(_unit);
     }
 
-    //TTextAlignment  = (taLeft, taRight, taTop, taBottom, taCenter, taCenterHorizontal, taCenterVertical);
+    
+    //TTextAlignment = (alLeft, alCenter, alRight);   //Pascal
     
     public void SetTextAlignment(int _alignment) {
-        mTextAlignment = _alignment;
+    	        
+        switch(_alignment) {
+        
+        //[ifdef_api14up]
+            case 0 : mTextAlignment = android.view.Gravity.START; break;
+            case 1 : mTextAlignment = android.view.Gravity.END; break;
+        //[endif_api14up]
+            
+        /* //[endif_api14up]
+            case 0 : mTextAlignment = android.view.Gravity.LEFT; break;
+            case 1 : mTextAlignment = android.view.Gravity.RIGHT; break;
+           //[ifdef_api14up] */
+                        
+            case 2 : mTextAlignment = android.view.Gravity.CENTER; break;
+            
+         //[ifdef_api14up]
+            default : mTextAlignment = android.view.Gravity.START ; break;
+         //[endif_api14up]
+         
+         /* //[endif_api14up]
+            default : mTextAlignment = android.view.Gravity.LEFT; break;
+         //[ifdef_api14up] */
+            
+        }
+                
         mSpAdapter.SetTextAlignment(mTextAlignment);
     }
 
@@ -452,40 +406,15 @@ public class jSpinner extends Spinner /*dummy*/ { //please, fix what GUI object 
         mSpAdapter.SetFontAndTextTypeFace(t, _fontStyle);
     }
     
-    public String GetText() {    	
-    	int i = this.getSelectedItemPosition();
-    	if (i >= 0) {
-      	   mSelectedText = mStrList.get(i).label;
-    	}
-    	else {
-    		mSelectedText = "";
-    	}
+    public String GetText() {
+    	mSelectedText = this.getSelectedItem().toString();
         return mSelectedText;
     }
     
     public void SetText(int _index) {
-    	
-    	int i = _index;
-    	
-    	if (i < 0) i = 0; 		
-    	if (mStrList.size() > 0) {    		
-     		if ( i >= mStrList.size() ) i = mStrList.size()-1;
-    		SetSelection(_index);
-    	}		
+    	SetSelection(_index);
     }
-
-    public void SetSelection(int _index) {
-    	
-    	int i = _index;    	
-    	if (i < 0) i = 0;     	    	      	    	
-    	if (mStrList.size() > 0) {    		
-    		if ( i >= mStrList.size() ) i = mStrList.size()-1;    		    		    	
-    		setSelection(i);
-    	  	mSelectedText = this.getSelectedItem().toString();    		
-    	}  
-    	
-    }
-   
+        
     public void SetSelectedIndex(int _index) {
 	    int i = _index;    	
     	if (i < 0) i = 0;     	    		
@@ -498,45 +427,75 @@ public class jSpinner extends Spinner /*dummy*/ { //please, fix what GUI object 
     public int GetSelectedIndex() {
         return this.getSelectedItemPosition();      //or -1   
     }
-
+    
+   
+    public void SetItem(int _index, String _item) {
+    	
+        if (_index < 0) mStrList.set(0,_item);
+        else if (_index > (mStrList.size()-1)) { 
+        	    mStrList.set(mStrList.size()-1,_item);
+        }
+        else {
+        	mStrList.set(_index,_item);
+        }
+        mSpAdapter.notifyDataSetChanged();
+        
+    }
+    
     public void SetItem(int _index, String _item,  String _strTag) {
-    	int i = _index;    	
-    	if (i < 0) i = 0;     	    	      	    	
-    	if (mStrList.size() > 0) {    		
-    		if ( i >= mStrList.size() ) i = mStrList.size()-1;    		    		    	
-    		mStrList.set(i, new ItemRow(controls.activity, _item,  _strTag));
-    		mSpAdapter.notifyDataSetChanged();
-    	}             
+    	
+        if (_index < 0) mStrList.set(0,_item);
+        else if (_index > (mStrList.size()-1)) { 
+        	    mStrList.set(mStrList.size()-1,_item);
+        	    mTagList.set(mStrList.size()-1,_strTag);
+        }
+        else {
+        	mStrList.set(_index,_item);
+        	mStrList.set(_index,_strTag);
+        }
+        mSpAdapter.notifyDataSetChanged();
+            
     }    
 
-    public void Add(String _item,  String _strTag) {
-    	ItemRow info = new ItemRow(controls.activity, _item, _strTag);
-        mStrList.add(info);        
+    public void Add(String _item) {
+        mStrList.add(_item);
+        mTagList.add("0");
+        //Log.i("Spinner_Add: ",_item);
         mSpAdapter.notifyDataSetChanged();
     }
-      
+    
+    public void Add(String _item,  String _strTag) {
+        mStrList.add(_item);
+        mTagList.add(_strTag);
+        //Log.i("Spinner_Add: ",_item);
+        mSpAdapter.notifyDataSetChanged();
+
+    }
+    
 	public void SetItemTagString(int _index, String _strTag) {
-		
-	    int i = _index;    	    	
-	    if (i < 0) i = 0;    	
-    	if (mStrList.size() > 0) {
-    		if ( i >= mStrList.size() ) i = mStrList.size()-1;
-    		mStrList.get(i).tag = _strTag;
-    		mSpAdapter.notifyDataSetChanged();
-    	}    					
+        if (_index < 0) mTagList.set(0, _strTag);
+        else if (_index > (mStrList.size()-1)) { 
+        	    mTagList.set(mStrList.size()-1,_strTag);
+        }
+        else {        	
+        	mStrList.set(_index,_strTag);
+        }
+   					
 	}
 
 	public String GetItemTagString(int _index){		
-		String s="";		
+		String s="";
 	    int i = _index;    	    	
 	    if (i < 0) i = 0;    	
-    	if (mStrList.size() > 0) {
-    		if ( i >= mStrList.size() ) i = mStrList.size()-1;
-    		s = mStrList.get(i).tag;
-    	}		
+    	if (mTagList.size() > 0) {
+    		if ( i >= mTagList.size() ) {
+    			i = mStrList.size()-1;
+    		}    		
+    		s = mTagList.get(i);
+    	}    		
     	return s;
-	}
-
+	}    
+    
 	public void SetSelectedPaddingTop(int _paddingTop) {	    
 	    mSpAdapter.SetSelectedPadTop(_paddingTop);
 	}
@@ -544,6 +503,6 @@ public class jSpinner extends Spinner /*dummy*/ { //please, fix what GUI object 
 	public void SetSelectedPaddingBottom(int _paddingBottom) {
 	    mSpAdapter.SetSelectedPadBottom(_paddingBottom);
 	}
-	
+    
 }  //end class
 
