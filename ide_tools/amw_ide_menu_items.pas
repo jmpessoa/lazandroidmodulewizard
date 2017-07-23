@@ -629,13 +629,14 @@ var
   pathToDrawable: string;
   pathToLayout: string;
   pathToAssets: string;
+  pathToJarLibs: string;
   pathToProject: string;
   package: string;
   list, listSaveTo: TStringList;
   p, i: integer;
   drawable_xx: string;
   saveCodeTo, saveLayoutTo: string;
-  saveDrawableTo, saveAssetsTo: string;
+  saveDrawableTo, saveAssetsTo, saveJarLibsTo: string;
 begin
   Project := LazarusIDE.ActiveProject;
   if Assigned(Project) and (Project.CustomData.Values['LAMW'] <> '') then
@@ -652,6 +653,7 @@ begin
        pathToLayout:= FormImportJavaStuff.EditImportLayout.Text;
        pathToDrawable:= FormImportJavaStuff.EditImportResource.Text;
        pathToAssets:=  FormImportJavaStuff.EditImportAssets.Text;
+       pathToJarLibs:=  FormImportJavaStuff.EditImportJarLibs.Text;;
 
        listSaveTo:= TStringList.Create;
 
@@ -762,6 +764,32 @@ begin
          end;
          list.Free;
        end;
+
+       if pathToJarLibs <> '' then
+       begin
+         list:= FindAllFiles(pathToJarLibs, '*.*', False);
+
+         saveJarLibsTo:=  pathToProject+'libs'+DirectorySeparator;
+
+         FormImportJavaStuffChecked:= TFormImportJavaStuffChecked.Create(Application);
+         for i:=0 to list.Count-1 do
+         begin
+           FormImportJavaStuffChecked.CheckGroupImport.Items.Add(ExtractFileName(list.Strings[i]));
+         end;
+
+         if FormImportJavaStuffChecked.ShowModal = mrOK then
+         begin
+           for i:= 0 to list.Count-1 do
+           begin
+              if FormImportJavaStuffChecked.CheckGroupImport.Checked[i] then
+              begin
+                CopyFile(list.Strings[i], saveJarLIbsTo + DirectorySeparator+FormImportJavaStuffChecked.CheckGroupImport.Items.Strings[i]);
+              end;
+           end;
+         end;
+         list.Free;
+       end;
+
        ShowMessage('Java Stuff Imported !');
      end
      else

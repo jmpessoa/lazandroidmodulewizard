@@ -15,6 +15,7 @@ type
   TFormImportJavaStuff = class(TForm)
     BitBtn1: TBitBtn;
     BitBtn2: TBitBtn;
+    EditImportJarLibs: TEdit;
     EditImportAssets: TEdit;
     EditImportLayout: TEdit;
     EditImportCode: TEdit;
@@ -23,11 +24,14 @@ type
     Label2: TLabel;
     Label3: TLabel;
     Label4: TLabel;
+    Label5: TLabel;
     SelectDirectoryDialog1: TSelectDirectoryDialog;
     SelectDirectoryDialog2: TSelectDirectoryDialog;
     SelectDirectoryDialog3: TSelectDirectoryDialog;
     SelectDirectoryDialog4: TSelectDirectoryDialog;
+    SelectDirectoryDialog5: TSelectDirectoryDialog;
     SpeedButton1: TSpeedButton;
+    SpeedButton10: TSpeedButton;
     SpeedButton2: TSpeedButton;
     SpeedButton3: TSpeedButton;
     SpeedButton4: TSpeedButton;
@@ -35,6 +39,7 @@ type
     SpeedButton6: TSpeedButton;
     SpeedButton7: TSpeedButton;
     SpeedButton8: TSpeedButton;
+    SpeedButton9: TSpeedButton;
     StatusBar1: TStatusBar;
     procedure FormCreate(Sender: TObject);
     procedure SpeedButton1Click(Sender: TObject);
@@ -45,6 +50,7 @@ type
     procedure SpeedButton6Click(Sender: TObject);
     procedure SpeedButton7Click(Sender: TObject);
     procedure SpeedButton8Click(Sender: TObject);
+    procedure SpeedButton9Click(Sender: TObject);
   private
     { private declarations }
   public
@@ -115,6 +121,14 @@ end;
 procedure TFormImportJavaStuff.SpeedButton8Click(Sender: TObject);
 begin
     EditImportAssets.Text:= '';
+end;
+
+procedure TFormImportJavaStuff.SpeedButton9Click(Sender: TObject);
+begin
+    if SelectDirectoryDialog5.Execute then
+  begin
+    EditImportJarLibs.Text:= SelectDirectoryDialog5.FileName;
+  end;
 end;
 
 end.
