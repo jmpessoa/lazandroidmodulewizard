@@ -52,10 +52,10 @@ if [ ! -d $BASE/lazarus ]; then
 fi 
 
 if [ ! -L /usr/bin/arm-linux-androideabi-as ]; then
-  ln -s /home/renabor/Android/ndk/toolchains/arm-linux-androideabi-$NDK_TARGET/prebuilt/linux-x86_64/bin/arm-linux-androideabi-as /usr/bin/arm-linux-androideabi-as
+  ln -s $HOME/Android/ndk/toolchains/arm-linux-androideabi-$NDK_TARGET/prebuilt/linux-x86_64/bin/arm-linux-androideabi-as /usr/bin/arm-linux-androideabi-as
 fi
 if [ ! -L /usr/bin/arm-linux-androideabi-ld ]; then
-  ln -s /home/renabor/Android/ndk/toolchains/arm-linux-androideabi-$NDK_TARGET/prebuilt/linux-x86_64/bin/arm-linux-androideabi-ld.bfd /usr/bin/arm-linux-androideabi-ld
+  ln -s $HOME/Android/ndk/toolchains/arm-linux-androideabi-$NDK_TARGET/prebuilt/linux-x86_64/bin/arm-linux-androideabi-ld.bfd /usr/bin/arm-linux-androideabi-ld
 fi
 if [ ! -L /usr/bin/arm-linux-as ]; then
   ln -s /usr/bin/arm-linux-androideabi-as /usr/bin/arm-linux-as
