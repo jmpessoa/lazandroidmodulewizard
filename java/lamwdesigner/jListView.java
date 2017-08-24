@@ -1727,5 +1727,36 @@ public class jListView extends ListView {
 	public void DispatchOnDrawItemWidgetImage(boolean _value) {
 		aadapter.SetDispatchOnDrawItemWidgetImage(_value);
 	}
-		
+	
+	public void SetSelection(int _index) {
+		this.setSelection(_index);		
+		if (highLightSelectedItem) {	
+			 if (lastSelectedItem != -1) {
+			    DoHighlight(lastSelectedItem, Color.TRANSPARENT); //textcolor
+			 }			
+			 DoHighlight(_index,  highLightColor);
+			 lastSelectedItem = (int) _index;		
+		}			
+	}
+
+	public void SetItemChecked(int _index, boolean _value) {
+	    this.setItemChecked(_index, _value);		  
+		if (highLightSelectedItem) {	
+			 if (lastSelectedItem != -1) {
+			    DoHighlight(lastSelectedItem, Color.TRANSPARENT); //textcolor
+			 }			
+			 if (_value) {
+				 DoHighlight(_index,  highLightColor);
+				 lastSelectedItem = (int) _index;
+			 }
+			 else {
+				 lastSelectedItem = -1;
+			 }
+		}					  
+	}
+			
+	public int GetCheckedItemPosition() {
+		return this.getCheckedItemPosition();
+	}	
+	
 }

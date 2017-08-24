@@ -799,6 +799,7 @@ type
     procedure SetBackgroundAlpha(_alpha: integer); //You can basically set it from anything between 0(fully transparent) to 255 (completely opaque)
     procedure MatchParent();
     procedure WrapParent();
+    procedure ResetAllRules();
 
   published
     property Text: string read GetText write SetText;
@@ -934,6 +935,7 @@ type
     procedure LoadFromFile(_filename: string);  overload;
     procedure SaveToFile(_path: string; _filename: string);  overload;
     procedure SaveToFile(_filename: string); overload;
+    procedure ResetAllRules();
 
     // Property
     property CursorPos : TXY        read GetCursorPos  write SetCursorPos;
@@ -997,7 +999,7 @@ type
     Destructor  Destroy; override;
     procedure Init(refApp: jApp); override;
     Procedure Refresh;
-    Procedure UpdateLayout; override;
+    Procedure UpdateLayout(); override;
 
     function GetWidth: integer;  override;
     function GetHeight: integer; override;
@@ -1013,6 +1015,8 @@ type
     procedure SetRoundCorner();
     procedure SetRadiusRoundCorner(_radius: integer);
     procedure SetFontFromAssets(_fontName: string);
+    procedure ResetAllRules();
+
   published
     property Text: string read GetText write SetText;
     property BackgroundColor     : TARGBColorBridge read FColor     write SetColor;
@@ -1048,12 +1052,13 @@ type
     Destructor Destroy; override;
     procedure Init(refApp: jApp); override;
     Procedure Refresh;
-    Procedure UpdateLayout; override;
+    Procedure UpdateLayout(); override;
     procedure SetFontSizeUnit(_unit: TFontSizeUnit);
 
     procedure SetCompoundDrawables(_image: jObject; _side: TCompoundDrawablesSide); overload;
     procedure SetCompoundDrawables(_imageResIdentifier: string; _side: TCompoundDrawablesSide); overload;
     procedure SetFontFromAssets(_fontName: string);
+    procedure ResetAllRules();
 
   published
     property Text: string read GetText write SetText;
@@ -1088,13 +1093,13 @@ type
     destructor Destroy; override;
     procedure Init(refApp: jApp); override;
     procedure Refresh;
-    Procedure UpdateLayout; override;
+    Procedure UpdateLayout(); override;
     procedure SetFontSizeUnit(_unit: TFontSizeUnit);
 
     procedure SetCompoundDrawables(_image: jObject; _side: TCompoundDrawablesSide); overload;
     procedure SetCompoundDrawables(_imageResIdentifier: string; _side: TCompoundDrawablesSide); overload;
     procedure SetFontFromAssets(_fontName: string);
-
+    procedure ResetAllRules();
   published
     property Text: string read GetText write SetText;
     property BackgroundColor     : TARGBColorBridge read FColor     write SetColor;
@@ -1127,7 +1132,7 @@ type
     Constructor Create(AOwner: TComponent); override;
     Destructor Destroy; override;
     Procedure Refresh;
-    Procedure UpdateLayout; override;
+    Procedure UpdateLayout(); override;
     procedure Init(refApp: jApp); override;
     procedure Stop;
     procedure Start;
@@ -1172,7 +1177,7 @@ type
     function GetHeight: integer;   override;
     function GetWidth: integer;     override;
 
-    Procedure UpdateLayout; override;
+    Procedure UpdateLayout(); override;
     procedure Init(refApp: jApp); override;
     Procedure SetImageByName(Value : string);
     Procedure SetImageByIndex(Value : integer);
@@ -1283,7 +1288,7 @@ type
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
     procedure Refresh;
-    procedure UpdateLayout; override;
+    procedure UpdateLayout(); override;
     procedure Init(refApp: jApp);  override;
 
     function GetWidth: integer;  override;
@@ -1343,6 +1348,10 @@ type
     procedure DispatchOnDrawWidgetItemWidgetTextColor(_value: boolean);
     procedure DispatchOnDrawItemWidgetImage(_value: boolean);
     function SplitCenterItemCaption(_centerItemCaption: string; _delimiter: string): TDynArrayOfString;
+    procedure SetSelection(_index: integer);
+    procedure SetItemChecked(_index: integer; _value: boolean);
+    function GetCheckedItemPosition(): integer;
+
 
     //Property
     property setItemIndex: TXY write SetItemPosition;
@@ -1408,7 +1417,7 @@ type
     constructor Create(AOwner: TComponent); override;
     Destructor  Destroy; override;
     Procedure Refresh;
-    Procedure UpdateLayout; override;
+    Procedure UpdateLayout(); override;
     procedure Init(refApp: jApp);  override;
     procedure SetFillViewport(fillenabled: boolean);
     procedure ScrollTo(_x: integer; _y: integer);
@@ -1446,7 +1455,7 @@ type
     constructor Create(AOwner: TComponent); override;
     Destructor  Destroy; override;
     Procedure Refresh;
-    Procedure UpdateLayout; override;
+    Procedure UpdateLayout(); override;
     procedure Init(refApp: jApp);  override;
     procedure ScrollTo(_x: integer; _y: integer);
     procedure SmoothScrollTo(_x: integer; _y: integer);
@@ -1490,7 +1499,7 @@ type
     Destructor  Destroy; override;
     procedure Init(refApp: jApp); override;
     Procedure Refresh;
-    Procedure UpdateLayout; override;
+    Procedure UpdateLayout(); override;
 
     Procedure Navigate(url: string);
     Procedure LoadFromHtmlFile(environmentDirectoryPath: string; htmlFileName: string);
@@ -1593,7 +1602,7 @@ type
     function GetWidth: integer;  override;
     function GetHeight: integer; override;
     procedure SetViewParent(Value: jObject);   override;
-    Procedure UpdateLayout; override;
+    Procedure UpdateLayout(); override;
     procedure Init(refApp: jApp); override;
     Procedure SaveToFile(fileName:String);
     function GetDrawingCache(): jObject;
@@ -1643,7 +1652,7 @@ type
     constructor Create(AOwner: TComponent); override;
     Destructor  Destroy; override;
     Procedure Refresh;
-    Procedure UpdateLayout; override;
+    Procedure UpdateLayout(); override;
     procedure Init(refApp: jApp); override;
     // Property
     //property Parent: jObject  read  FjPRLayout write SetParent; // Java : Parent Relative Layout
@@ -3064,7 +3073,7 @@ begin
 
   if FParent is jPanel then
   begin
-     Self.UpdateLayout;
+     Self.UpdateLayout();
   end;
 
   (* TODO
@@ -3227,11 +3236,11 @@ begin
   end;
 end;
 
-procedure jTextView.UpdateLayout;
+procedure jTextView.UpdateLayout();
 begin
   if FInitialized then
   begin
-   inherited UpdateLayout;
+   inherited UpdateLayout();
    UpdateLParamWidth;
    UpdateLParamHeight;
    jTextView_setLayoutAll(FjEnv, FjObject , Self.AnchorId);
@@ -3473,6 +3482,28 @@ begin
      jTextView_WrapParent(FjEnv, FjObject);
 end;
 
+procedure jTextView.ResetAllRules();
+var
+  rToP: TPositionRelativeToParent;
+  rToA: TPositionRelativeToAnchorID;
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+  begin
+     jTextView_ClearLayoutAll(FjEnv, FjObject);
+     for rToP := rpBottom to rpCenterVertical do
+     begin
+        if rToP in FPositionRelativeToParent then
+          jTextView_addlParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
+     end;
+     for rToA := raAbove to raAlignRight do
+     begin
+       if rToA in FPositionRelativeToAnchor then
+         jTextView_addlParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
+     end;
+  end;
+end;
+
 //------------------------------------------------------------------------------
 // jEditText
 //------------------------------------------------------------------------------
@@ -3570,7 +3601,7 @@ begin
 
   if FParent is jPanel then
   begin
-     Self.UpdateLayout;
+     Self.UpdateLayout();
   end;
 
   for rToA := raAbove to raAlignRight do
@@ -3961,11 +3992,11 @@ begin
   end;
 end;
 
-procedure jEditText.UpdateLayout;
+procedure jEditText.UpdateLayout();
 begin
   if FInitialized then
   begin
-    inherited UpdateLayout;
+    inherited UpdateLayout();
     UpdateLParamWidth;
     UpdateLParamHeight;
     jEditText_setLayoutAll(FjEnv, FjObject , Self.AnchorId);
@@ -4226,6 +4257,28 @@ begin
      jEditText_SaveToFile(FjEnv, FjObject, _filename);
 end;
 
+procedure jEditText.ResetAllRules();
+var
+  rToP: TPositionRelativeToParent;
+  rToA: TPositionRelativeToAnchorID;
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+  begin
+     jEditText_ClearLayoutAll(FjEnv, FjObject);
+     for rToP := rpBottom to rpCenterVertical do
+     begin
+        if rToP in FPositionRelativeToParent then
+          jEditText_addlParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
+     end;
+     for rToA := raAbove to raAlignRight do
+     begin
+       if rToA in FPositionRelativeToAnchor then
+         jEditText_addlParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
+     end;
+  end;
+end;
+
 //------------------------------------------------------------------------------
 // jButton
 //------------------------------------------------------------------------------
@@ -4296,7 +4349,7 @@ begin
 
   if FParent is jPanel then
   begin
-     Self.UpdateLayout;
+     Self.UpdateLayout();
   end;
 
   for rToA := raAbove to raAlignRight do
@@ -4431,11 +4484,11 @@ begin
   end;
 end;
 
-procedure jButton.UpdateLayout;
+procedure jButton.UpdateLayout();
 begin
   if FInitialized then
   begin
-    inherited UpdateLayout;
+    inherited UpdateLayout();
     UpdateLParamWidth;
     UpdateLParamHeight;
     jButton_setLayoutAll(FjEnv, FjObject , Self.AnchorId);
@@ -4583,6 +4636,29 @@ begin
   if FInitialized then
      jButton_SetEnable(FjEnv, FjObject, Value);
 end;
+
+procedure jButton.ResetAllRules();
+var
+  rToP: TPositionRelativeToParent;
+  rToA: TPositionRelativeToAnchorID;
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+  begin
+     jButton_ClearLayoutAll(FjEnv, FjObject);
+     for rToP := rpBottom to rpCenterVertical do
+     begin
+        if rToP in FPositionRelativeToParent then
+          jButton_addlParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
+     end;
+     for rToA := raAbove to raAlignRight do
+     begin
+       if rToA in FPositionRelativeToAnchor then
+         jButton_addlParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
+     end;
+  end;
+end;
+
 //------------------------------------------------------------------------------
 // jCheckBox
 //------------------------------------------------------------------------------
@@ -4655,7 +4731,7 @@ begin
   FInitialized:= True;
   if FParent is jPanel then
   begin
-     Self.UpdateLayout;
+     Self.UpdateLayout();
   end;
 
   for rToA := raAbove to raAlignRight do
@@ -4800,11 +4876,11 @@ begin
   end;
 end;
 
-procedure jCheckBox.UpdateLayout;
+procedure jCheckBox.UpdateLayout();
 begin
   if FInitialized then
   begin
-    inherited UpdateLayout;
+    inherited UpdateLayout();
     UpdateLParamWidth;
     UpdateLParamHeight;
     jCheckBox_setLayoutAll(FjEnv, FjObject , Self.AnchorId);
@@ -4844,6 +4920,28 @@ begin
   //in designing component state: set value here...
   if FInitialized then
      jCheckBox_SetFontFromAssets(FjEnv, FjObject, _fontName);
+end;
+
+procedure jCheckBox.ResetAllRules();
+var
+  rToP: TPositionRelativeToParent;
+  rToA: TPositionRelativeToAnchorID;
+begin
+    //in designing component state: set value here...
+  if FInitialized then
+  begin
+     jCheckBox_ClearLayoutAll(FjEnv, FjObject);
+     for rToP := rpBottom to rpCenterVertical do
+     begin
+        if rToP in FPositionRelativeToParent then
+          jCheckBox_addlParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
+     end;
+     for rToA := raAbove to raAlignRight do
+     begin
+       if rToA in FPositionRelativeToAnchor then
+         jCheckBox_addlParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
+     end;
+  end;
 end;
 
 //------------------------------------------------------------------------------
@@ -4944,7 +5042,7 @@ begin
 
   if FParent is jPanel then
   begin
-     Self.UpdateLayout;
+     Self.UpdateLayout();
   end;
 
   for rToA := raAbove to raAlignRight do
@@ -5092,11 +5190,11 @@ begin
   end;
 end;
 
-procedure jRadioButton.UpdateLayout;
+procedure jRadioButton.UpdateLayout();
 begin
   if FInitialized then
   begin
-    inherited UpdateLayout;
+    inherited UpdateLayout();
     UpdateLParamWidth;
     UpdateLParamHeight;
     jRadioButton_setLayoutAll(FjEnv, FjObject , Self.AnchorId);
@@ -5136,6 +5234,28 @@ begin
   //in designing component state: set value here...
   if FInitialized then
      jRadioButton_SetFontFromAssets(FjEnv, FjObject, _fontName);
+end;
+
+procedure jRadioButton.ResetAllRules();
+var
+  rToP: TPositionRelativeToParent;
+  rToA: TPositionRelativeToAnchorID;
+begin
+    //in designing component state: set value here...
+  if FInitialized then
+  begin
+     jRadioButton_ClearLayoutAll(FjEnv, FjObject);
+     for rToP := rpBottom to rpCenterVertical do
+     begin
+        if rToP in FPositionRelativeToParent then
+          jRadioButton_addlParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
+     end;
+     for rToA := raAbove to raAlignRight do
+     begin
+       if rToA in FPositionRelativeToAnchor then
+         jRadioButton_addlParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
+     end;
+  end;
 end;
 
 //------------------------------------------------------------------------------
@@ -5217,7 +5337,7 @@ begin
   FInitialized:= True;
   if FParent is jPanel then
   begin
-     Self.UpdateLayout;
+     Self.UpdateLayout();
   end;
 
   for rToA := raAbove to raAlignRight do
@@ -5367,11 +5487,11 @@ begin
   end;
 end;
 
-procedure jProgressBar.UpdateLayout;
+procedure jProgressBar.UpdateLayout();
 begin
   if FInitialized then
   begin
-    inherited UpdateLayout;
+    inherited UpdateLayout();
     UpdateLParamWidth;
     UpdateLParamHeight;
     jProgressBar_setLayoutAll(FjEnv, FjObject , Self.AnchorId);
@@ -5456,7 +5576,7 @@ begin
                                            GetLayoutParams(gApp, FLParamHeight, sdH));
   if FParent is jPanel then
   begin
-     Self.UpdateLayout;
+     Self.UpdateLayout();
   end;
 
   for rToA := raAbove to raAlignRight do
@@ -5715,11 +5835,11 @@ begin
   end;
 end;
 
-procedure jImageView.UpdateLayout;
+procedure jImageView.UpdateLayout();
 begin
   if FInitialized then
   begin
-    inherited UpdateLayout;
+    inherited UpdateLayout();
     UpdateLParamWidth;
     UpdateLParamHeight;
     jImageView_setLayoutAll(FjEnv, FjObject , Self.AnchorId);
@@ -6830,7 +6950,7 @@ begin
   FInitialized:= True;
   if FParent is jPanel then
   begin
-     Self.UpdateLayout;
+     Self.UpdateLayout();
   end;
 
   for rToA := raAbove to raAlignRight do
@@ -7127,11 +7247,11 @@ begin
   end;
 end;
 
-procedure jListView.UpdateLayout;
+procedure jListView.UpdateLayout();
 begin
   if FInitialized then
   begin
-    inherited UpdateLayout;
+    inherited UpdateLayout();
     UpdateLParamWidth;
     UpdateLParamHeight;
     jListView_setLayoutAll(FjEnv, FjObject , Self.AnchorId);
@@ -7496,6 +7616,27 @@ begin
    Result:= jListView_SplitCenterItemCaption(FjEnv, FjObject, _centerItemCaption ,_delimiter);
 end;
 
+procedure jListView.SetSelection(_index: integer);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jListView_SetSelection(FjEnv, FjObject, _index);
+end;
+
+procedure jListView.SetItemChecked(_index: integer; _value: boolean);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jListView_SetItemChecked(FjEnv, FjObject, _index ,_value);
+end;
+
+function jListView.GetCheckedItemPosition(): integer;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jListView_GetCheckedItemPosition(FjEnv, FjObject);
+end;
+
 //------------------------------------------------------------------------------
 // jScrollView
 //------------------------------------------------------------------------------
@@ -7570,7 +7711,7 @@ begin
   FInitialized:= True;
   if FParent is jPanel then
   begin
-     Self.UpdateLayout;
+     Self.UpdateLayout();
   end;
 
   for rToA := raAbove to raAlignRight do
@@ -7686,11 +7827,11 @@ begin
   end;
 end;
 
-procedure jScrollView.UpdateLayout;
+procedure jScrollView.UpdateLayout();
 begin
   if FInitialized then
   begin
-    inherited UpdateLayout;
+    inherited UpdateLayout();
     UpdateLParamWidth;
     UpdateLParamHeight;
     jScrollView_setLayoutAll(FjEnv, FjObject , Self.AnchorId);
@@ -7955,11 +8096,11 @@ begin
   end;
 end;
 
-procedure jHorizontalScrollView.UpdateLayout;
+procedure jHorizontalScrollView.UpdateLayout();
 begin
   if FInitialized then
   begin
-    inherited UpdateLayout;
+    inherited UpdateLayout();
     UpdateLParamWidth;
     UpdateLParamHeight;
     jHorizontalScrollView_setLayoutAll(FjEnv, FjObject , Self.AnchorId);
@@ -8113,7 +8254,7 @@ begin
   FInitialized:= True;
   if FParent is jPanel then
   begin
-     Self.UpdateLayout;
+     Self.UpdateLayout();
   end;
 
   for rToA := raAbove to raAlignRight do
@@ -8242,11 +8383,11 @@ begin
   end;
 end;
 
-procedure jWebView.UpdateLayout;
+procedure jWebView.UpdateLayout();
 begin
   if FInitialized then
   begin
-    inherited UpdateLayout;
+    inherited UpdateLayout();
     UpdateLParamWidth;
     UpdateLParamHeight;
     jWebView_setLayoutAll(FjEnv, FjObject , Self.AnchorId);
@@ -8993,7 +9134,7 @@ begin
                                            GetLayoutParams(gApp, FLParamHeight, sdH));
   if FParent is jPanel then
   begin
-     Self.UpdateLayout;
+     Self.UpdateLayout();
   end;
 
   for rToA := raAbove to raAlignRight do
@@ -9113,11 +9254,11 @@ begin
   end;
 end;
 
-procedure jView.UpdateLayout;
+procedure jView.UpdateLayout();
 begin
   if FInitialized then
   begin
-    inherited UpdateLayout;
+    inherited UpdateLayout();
     UpdateLParamWidth;
     UpdateLParamHeight;
     jView_setLayoutAll(FjEnv, FjObject , Self.AnchorId);
@@ -9496,7 +9637,7 @@ begin
 
   if FParent is jPanel then
   begin
-     Self.UpdateLayout;
+     Self.UpdateLayout();
   end;
 
   for rToA := raAbove to raAlignRight do
@@ -9653,11 +9794,11 @@ begin
   end;
 end;
 
-procedure jImageBtn.UpdateLayout;
+procedure jImageBtn.UpdateLayout();
 begin
   if FInitialized then
   begin
-    inherited UpdateLayout;
+    inherited UpdateLayout();
     UpdateLParamWidth;
     UpdateLParamHeight;
     jImageBtn_setLayoutAll(FjEnv, FjObject , Self.AnchorId);
@@ -10373,7 +10514,7 @@ begin
                                           GetLayoutParams(gApp, FLParamHeight, sdH));
   if FParent is jPanel then
   begin
-     Self.UpdateLayout;
+     Self.UpdateLayout();
   end;
 
   for rToA := raAbove to raAlignRight do
@@ -10484,9 +10625,9 @@ begin
     else
     begin
        if (Self.Parent as jVisualControl).LayoutParamHeight = lpWrapContent then
-          jPanel_setLParamHeight(FjEnv, FjObject , GetLayoutParams(gApp, FLParamHeight, sdH))
+         jPanel_setLParamHeight(FjEnv, FjObject , GetLayoutParams(gApp, FLParamHeight, sdH))
        else //lpMatchParent and others
-          jPanel_setLParamHeight(FjEnv,FjObject,GetLayoutParamsByParent((Self.Parent as jVisualControl), FLParamHeight, sdH));
+         jPanel_setLParamHeight(FjEnv,FjObject,GetLayoutParamsByParent((Self.Parent as jVisualControl), FLParamHeight, sdH));
     end;
   end;
 end;
@@ -10543,6 +10684,7 @@ var
   rToA: TPositionRelativeToAnchorID;
 begin
   jPanel_resetLParamsRules(FjEnv, FjObject );
+
   for rToP := rpBottom to rpCenterVertical do
   begin
      if rToP in FPositionRelativeToParent then
@@ -10555,11 +10697,11 @@ begin
   end;
 end;
 
-procedure jPanel.UpdateLayout;
+procedure jPanel.UpdateLayout();
 begin
   if FInitialized then
   begin
-    inherited UpdateLayout;
+    inherited UpdateLayout();
     UpdateLParamWidth;
     UpdateLParamHeight;
     jPanel_setLayoutAll(FjEnv, FjObject , Self.AnchorId);

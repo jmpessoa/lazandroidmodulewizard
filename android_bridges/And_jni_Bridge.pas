@@ -180,6 +180,7 @@ procedure jTextView_SetTextAsLink(env: PJNIEnv; _jtextview: JObject; _linkText: 
 procedure jTextView_SetBackgroundAlpha(env: PJNIEnv; _jtextview: JObject; _alpha: integer);
 procedure jTextView_MatchParent(env: PJNIEnv; _jtextview: JObject);
 procedure jTextView_WrapParent(env: PJNIEnv; _jtextview: JObject);
+procedure jTextView_ClearLayoutAll(env: PJNIEnv; _jtextview: JObject);
 
 
 //-----------------------------------
@@ -279,6 +280,7 @@ procedure jEditText_LoadFromFile(env: PJNIEnv; _jedittext: JObject; _path: strin
 procedure jEditText_LoadFromFile(env: PJNIEnv; _jedittext: JObject; _filename: string);  overload;
 procedure jEditText_SaveToFile(env: PJNIEnv; _jedittext: JObject; _path: string; _filename: string);  overload;
 procedure jEditText_SaveToFile(env: PJNIEnv; _jedittext: JObject; _filename: string);  overload;
+procedure jEditText_ClearLayoutAll(env: PJNIEnv; _jedittext: JObject);
 
 // Button
 Function jButton_Create(env: PJNIEnv;   this:jobject; SelfObj: TObject): jObject;
@@ -325,6 +327,7 @@ procedure jButton_SetRoundCorner(env: PJNIEnv; _jbutton: JObject);
 procedure jButton_SetRadiusRoundCorner(env: PJNIEnv; _jbutton: JObject; _radius: integer);
 procedure jButton_SetFontFromAssets(env: PJNIEnv; _jbutton: JObject; _fontName: string);
 procedure jButton_SetEnable(env: PJNIEnv; _jbutton: JObject; Value: boolean);
+procedure jButton_ClearLayoutAll(env: PJNIEnv; _jbutton: JObject);
 
 // CheckBox
 Function  jCheckBox_Create            (env:PJNIEnv;  this:jobject; SelfObj: TObject ): jObject;
@@ -357,6 +360,7 @@ procedure jCheckBox_SetFontSizeUnit(env: PJNIEnv; _jcheckbox: JObject; _unit: in
 procedure jCheckBox_SetCompoundDrawables(env: PJNIEnv; _jcheckbox: JObject; _image: jObject; _side: integer); overload;
 procedure jCheckBox_SetCompoundDrawables(env: PJNIEnv; _jcheckbox: JObject; _imageResIdentifier: string; _side: integer);  overload;
 procedure jCheckBox_SetFontFromAssets(env: PJNIEnv; _jcheckbox: JObject; _fontName: string);
+procedure jCheckBox_ClearLayoutAll(env: PJNIEnv; _jcheckbox: JObject);
 
 // RadioButton
 
@@ -392,6 +396,7 @@ procedure jRadioButton_SetFontSizeUnit(env: PJNIEnv; _jradiobutton: JObject; _un
 procedure jRadioButton_SetCompoundDrawables(env: PJNIEnv; _jradiobutton: JObject; _image: jObject; _side: integer); overload;
 procedure jRadioButton_SetCompoundDrawables(env: PJNIEnv; _jradiobutton: JObject; _imageResIdentifier: string; _side: integer);  overload;
 procedure jRadioButton_SetFontFromAssets(env: PJNIEnv; _jradiobutton: JObject; _fontName: string);
+procedure jRadioButton_ClearLayoutAll(env: PJNIEnv; _jradiobutton: JObject);
 
 // ProgressBar
 
@@ -612,6 +617,10 @@ procedure jListView_SetWidgetFontFromAssets(env: PJNIEnv; _jlistview: JObject; _
 procedure jListView_DispatchOnDrawWidgetItemWidgetTextColor(env: PJNIEnv; _jlistview: JObject; _value: boolean);
 procedure jListView_DispatchOnDrawItemWidgetImage(env: PJNIEnv; _jlistview: JObject; _value: boolean);
 function jListView_SplitCenterItemCaption(env: PJNIEnv; _jlistview: JObject; _centerItemCaption: string; _delimiter: string): TDynArrayOfString;
+procedure jListView_SetSelection(env: PJNIEnv; _jlistview: JObject; _index: integer);
+procedure jListView_SetItemChecked(env: PJNIEnv; _jlistview: JObject; _index: integer; _value: boolean);
+function jListView_GetCheckedItemPosition(env: PJNIEnv; _jlistview: JObject): integer;
+
 
 // ScrollView
 Function  jScrollView_Create           (env:PJNIEnv;  this:jobject; SelfObj: TObject): jObject;
@@ -2006,6 +2015,17 @@ begin
   env^.DeleteLocalRef(env, jCls);
 end;
 
+procedure jTextView_ClearLayoutAll(env: PJNIEnv; _jtextview: JObject);
+var
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jtextview);
+  jMethod:= env^.GetMethodID(env, jCls, 'ClearLayoutAll', '()V');
+  env^.CallVoidMethod(env, _jtextview, jMethod);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
 //------------------------------------------------------------------------------
 // EditText
 //------------------------------------------------------------------------------
@@ -2907,6 +2927,16 @@ begin
   env^.DeleteLocalRef(env, jCls);
 end;
 
+procedure jEditText_ClearLayoutAll(env: PJNIEnv; _jedittext: JObject);
+var
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jedittext);
+  jMethod:= env^.GetMethodID(env, jCls, 'ClearLayoutAll', '()V');
+  env^.CallVoidMethod(env, _jedittext, jMethod);
+  env^.DeleteLocalRef(env, jCls);
+end;
 
 //------------------------------------------------------------------------------
 // Button
@@ -3300,6 +3330,17 @@ begin
   env^.DeleteLocalRef(env, jCls);
 end;
 
+procedure jButton_ClearLayoutAll(env: PJNIEnv; _jbutton: JObject);
+var
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jbutton);
+  jMethod:= env^.GetMethodID(env, jCls, 'ClearLayoutAll', '()V');
+  env^.CallVoidMethod(env, _jbutton, jMethod);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
 //------------------------------------------------------------------------------
 // CheckBox
 //------------------------------------------------------------------------------
@@ -3590,6 +3631,17 @@ begin
   jMethod:= env^.GetMethodID(env, jCls, 'SetFontFromAssets', '(Ljava/lang/String;)V');
   env^.CallVoidMethodA(env, _jcheckbox, jMethod, @jParams);
 env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jCheckBox_ClearLayoutAll(env: PJNIEnv; _jcheckbox: JObject);
+var
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jcheckbox);
+  jMethod:= env^.GetMethodID(env, jCls, 'ClearLayoutAll', '()V');
+  env^.CallVoidMethod(env, _jcheckbox, jMethod);
   env^.DeleteLocalRef(env, jCls);
 end;
 
@@ -3896,6 +3948,17 @@ begin
   jMethod:= env^.GetMethodID(env, jCls, 'SetFontFromAssets', '(Ljava/lang/String;)V');
   env^.CallVoidMethodA(env, _jradiobutton, jMethod, @jParams);
 env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jRadioButton_ClearLayoutAll(env: PJNIEnv; _jradiobutton: JObject);
+var
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jradiobutton);
+  jMethod:= env^.GetMethodID(env, jCls, 'ClearLayoutAll', '()V');
+  env^.CallVoidMethod(env, _jradiobutton, jMethod);
   env^.DeleteLocalRef(env, jCls);
 end;
 
@@ -5543,6 +5606,45 @@ begin
   end;
   env^.DeleteLocalRef(env,jParams[0].l);
   env^.DeleteLocalRef(env,jParams[1].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jListView_SetSelection(env: PJNIEnv; _jlistview: JObject; _index: integer);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].i:= _index;
+  jCls:= env^.GetObjectClass(env, _jlistview);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetSelection', '(I)V');
+  env^.CallVoidMethodA(env, _jlistview, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+
+procedure jListView_SetItemChecked(env: PJNIEnv; _jlistview: JObject; _index: integer; _value: boolean);
+var
+  jParams: array[0..1] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].i:= _index;
+  jParams[1].z:= JBool(_value);
+  jCls:= env^.GetObjectClass(env, _jlistview);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetItemChecked', '(IZ)V');
+  env^.CallVoidMethodA(env, _jlistview, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+function jListView_GetCheckedItemPosition(env: PJNIEnv; _jlistview: JObject): integer;
+var
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jlistview);
+  jMethod:= env^.GetMethodID(env, jCls, 'GetCheckedItemPosition', '()I');
+  Result:= env^.CallIntMethod(env, _jlistview, jMethod);
   env^.DeleteLocalRef(env, jCls);
 end;
 

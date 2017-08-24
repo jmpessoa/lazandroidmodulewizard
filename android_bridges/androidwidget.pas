@@ -1352,7 +1352,7 @@ end;
     // end tk
 
     procedure Init(refApp: jApp); override;
-    procedure UpdateLayout; virtual;
+    procedure UpdateLayout(); virtual;
 
     function GetWidth: integer;  override;
     function GetHeight: integer; override;
@@ -1378,7 +1378,7 @@ end;
     property PosRelativeToAnchor: TPositionRelativeToAnchorIDSet read FPositionRelativeToAnchor
                                                                        write FPositionRelativeToAnchor;
     property PosRelativeToParent: TPositionRelativeToParentSet read FPositionRelativeToParent
-                                                                 write FPositionRelativeToParent;
+                                                               write FPositionRelativeToParent;
     property LayoutParamWidth: TLayoutParams read FLParamWidth write SetParamWidth;
     property LayoutParamHeight: TLayoutParams read FLParamHeight write SetParamHeight;
 end;
@@ -1497,7 +1497,6 @@ end;
   function jForm_GetWifiBroadcastIPAddress(env: PJNIEnv; _jform: JObject): string;
 
 //jni API Bridge
-
 // http://docs.oracle.com/javase/7/docs/technotes/guides/jni/spec/functions.html
 
 function Get_jClassLocalRef(fullClassName: string): jClass;
@@ -2488,7 +2487,7 @@ end;
 
 
 // needed by jForm process logic ...
-procedure jVisualControl.UpdateLayout;
+procedure jVisualControl.UpdateLayout();
 begin
   //dummy...
 end;
@@ -2814,7 +2813,7 @@ begin
   begin
     if Self.Components[i] is jVisualControl then
     begin
-        (Self.Components[i] as jVisualControl).UpdateLayout;
+       (Self.Components[i] as jVisualControl).UpdateLayout;
     end;
   end;
 end;
