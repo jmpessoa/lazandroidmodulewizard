@@ -1745,6 +1745,7 @@ begin
     if Assigned(Parent) then
     begin
       case lpWidth of
+        lpExact: ;
         lpMatchParent:
           if Assigned(Parent) then
           begin
@@ -1763,6 +1764,7 @@ begin
         end;
       end;
       case lpHeight of
+        lpExact: ;
         lpMatchParent:
           if Assigned(Parent) then
           begin
