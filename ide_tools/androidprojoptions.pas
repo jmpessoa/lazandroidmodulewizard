@@ -306,6 +306,7 @@ begin
   AddPerm('Bluetooth admin');
   AddPerm('Call phone');
   AddPerm('Camera');
+  AddPerm('Change network state');
   AddPerm('Change wifi state');
   AddPerm('Internet');
   AddPerm('NFC');
@@ -337,7 +338,6 @@ begin
   Bind wallpaper
   Broadcast sticky
   Change configuration
-  Change network state
   Change wifi multicast state
   Clear app cache
   Disable keyguard
