@@ -155,7 +155,7 @@ public class jModalDialog extends Activity {
      	     mEditInput[0].setId(2222);
      	     mEditInput[0].setPadding(20, 30, 20, 30);      
      	     //mEditInput[0].setText();     	     
-     	     mEditInput[0].setHint(mHint +" "+ mRequestInfo[0].toLowerCase());
+     	     mEditInput[0].setHint(mHint);// +" "+ mRequestInfo[0].toLowerCase());
      	     
      	   
              android.widget.RelativeLayout.LayoutParams lparams0 = new android.widget.RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT,
@@ -175,7 +175,7 @@ public class jModalDialog extends Activity {
         	  mEditInput[j].setId(2222+j);
         	  mEditInput[j].setPadding(20, 30, 20, 30);      
         	  //mEditInput[j].setText(mRequestInfo[j]);
-        	  mEditInput[j].setHint(mHint +" "+ mRequestInfo[j].toLowerCase());
+        	  mEditInput[j].setHint(mHint);// +" "+ mRequestInfo[j].toLowerCase());
         	  
               android.widget.RelativeLayout.LayoutParams lparamsEdit = new android.widget.RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT,
         		                                                        RelativeLayout.LayoutParams.WRAP_CONTENT);     // W,H                
@@ -195,7 +195,7 @@ public class jModalDialog extends Activity {
         Button buttonOk = new Button(this);
         
         buttonOk.setId(3333);
-        buttonOk.setPadding(20, 30, 20, 30);
+        buttonOk.setPadding(20, 20, 20, 20);
         buttonOk.setText(mBtnOK);
         
         android.widget.RelativeLayout.LayoutParams lparamsOk = new android.widget.RelativeLayout.LayoutParams(screenWidth,

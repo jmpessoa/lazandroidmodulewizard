@@ -228,7 +228,7 @@ public class jEditText extends EditText {
 		else if (str.equals("PHONE"))       {this.setInputType(android.text.InputType.TYPE_CLASS_PHONE); }
 		else if (str.equals("PASSNUMBER"))  {this.setInputType(android.text.InputType.TYPE_CLASS_NUMBER);
 			this.setTransformationMethod(android.text.method.PasswordTransformationMethod.getInstance()); }
-		else if (str.equals("PASSTEXT"))    {this.setInputType(android.text.InputType.TYPE_CLASS_TEXT);
+		else if (str.equals("PASSTEXT"))    {this.setInputType(android.text.InputType.TYPE_CLASS_TEXT|android.text.InputType.TYPE_TEXT_VARIATION_PASSWORD);
 			this.setTransformationMethod(android.text.method.PasswordTransformationMethod.getInstance()); }
 
 		else if (str.equals("TEXTMULTILINE")){
