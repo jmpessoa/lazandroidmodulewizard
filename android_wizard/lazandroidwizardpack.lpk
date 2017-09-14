@@ -15,7 +15,7 @@
         <CustomOptions Value="$(IDEBuildOptions)"/>
       </Other>
     </CompilerOptions>
-    <Files Count="19">
+    <Files Count="20">
       <Item1>
         <Filename Value="androidwizard_intf.pas"/>
         <HasRegisterProc Value="True"/>
@@ -93,6 +93,10 @@
         <Filename Value="jimagelisteditdlg.pas"/>
         <UnitName Value="jimagelisteditdlg"/>
       </Item19>
+      <Item20>
+        <Filename Value="ninepatchpng.pas"/>
+        <UnitName Value="NinePatchPNG"/>
+      </Item20>
     </Files>
     <RequiredPkgs Count="5">
       <Item1>

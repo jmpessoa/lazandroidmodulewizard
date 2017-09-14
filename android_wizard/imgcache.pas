@@ -46,7 +46,7 @@ type
 
 implementation
 
-uses FPWriteBMP, FPWritePNG;
+uses FPWriteBMP, FPWritePNG, NinePatchPNG;
 
 function CmpImgCacheItems(p1, p2: Pointer): Integer;
 begin
@@ -161,8 +161,7 @@ begin
   if Assigned(FPng) then Exit(FPng);
   if SameText(ExtractFileExt(FFileName), '.png') and FileExists(FFileName) then
   begin
-    FPng := TPortableNetworkGraphic.Create;
-    FPng.LoadFromFile(FFileName);
+    FPng := T9PatchPNG.Create(FFileName);
   end else
   if Assigned(im) then
   begin

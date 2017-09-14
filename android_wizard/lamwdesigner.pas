@@ -138,6 +138,18 @@ type
     property FontColor: TARGBColorBridge read FFontColor write SetFontColor;
   end;
 
+
+  { TDraftDrawableWidget }
+
+  TDraftDrawableWidget = class(TDraftWidget)
+  protected
+    DrawableDest: string;
+    DrawableAttribs: string;
+    Drawable: TPortableNetworkGraphic;
+  public
+    constructor Create(AWidget: TAndroidWidget; Canvas: TCanvas); override;
+  end;
+
   { TDraftTextView }
 
   TDraftTextView = class(TDraftWidget)
@@ -149,7 +161,7 @@ type
 
   { TDraftEditText }
 
-  TDraftEditText = class(TDraftWidget)
+  TDraftEditText = class(TDraftDrawableWidget)
   public
     constructor Create(AWidget: TAndroidWidget; Canvas: TCanvas); override;
     procedure Draw; override;
@@ -176,7 +188,7 @@ type
 
   { TDraftButton }
 
-  TDraftButton = class(TDraftWidget)
+  TDraftButton = class(TDraftDrawableWidget)
   public
     constructor Create(AWidget: TAndroidWidget; Canvas: TCanvas); override;
     procedure Draw; override;
@@ -185,7 +197,7 @@ type
 
   { TDraftCheckBox }
 
-  TDraftCheckBox = class(TDraftWidget)
+  TDraftCheckBox = class(TDraftDrawableWidget)
   public
     constructor Create(AWidget: TAndroidWidget; Canvas: TCanvas); override;
     procedure Draw; override;
@@ -194,7 +206,7 @@ type
 
   { TDraftRadioButton }
 
-  TDraftRadioButton = class(TDraftWidget)
+  TDraftRadioButton = class(TDraftDrawableWidget)
   public
     constructor Create(AWidget: TAndroidWidget; Canvas: TCanvas); override;
     procedure Draw; override;
@@ -476,7 +488,7 @@ implementation
 uses
   LCLIntf, LCLType, strutils, ObjInspStrConsts, IDEMsgIntf, LazIDEIntf,
   IDEExternToolIntf, laz2_XMLRead, LazFileUtils, FPimage, typinfo,
-  uFormSizeSelect, LamwSettings, SmartDesigner, jImageListEditDlg,
+  uFormSizeSelect, LamwSettings, SmartDesigner, jImageListEditDlg, NinePatchPNG,
   customdialog, togglebutton, switchbutton,
   Laz_And_GLESv1_Canvas, Laz_And_GLESv2_Canvas, gridview, Spinner, seekbar,
   radiogroup, ratingbar, digitalclock, analogclock, surfaceview,
@@ -548,6 +560,21 @@ procedure RegisterAndroidWidgetDraftClass(AWidgetClass: jVisualControlClass;
   ADraftClass: TDraftWidgetClass);
 begin
   DraftClassesMap.Add(AWidgetClass, ADraftClass);
+end;
+
+{ TDraftDrawableWidget }
+
+constructor TDraftDrawableWidget.Create(AWidget: TAndroidWidget; Canvas: TCanvas);
+var
+  fname: string;
+begin
+  inherited Create(AWidget, Canvas);
+  if Designer.AndroidTheme <> nil then
+  begin
+    fname := Designer.AndroidTheme.FindDrawable([BaseStyle, DrawableDest], DrawableAttribs);
+    if fname <> '' then
+      Drawable := Designer.ImageCache.GetImageAsPNG(fname);
+  end;
 end;
 
 { TjCustomDialogComponentEditor }
@@ -1916,16 +1943,20 @@ end;
 function TDraftWidget.DefaultTextColor: TColor;
 var
   t: TAndroidTheme;
+  a: string;
 begin
   if BaseStyle <> '' then
   begin
     t := Designer.AndroidTheme;
     if t <> nil then
     begin
-      if t.TryGetColor([BaseStyle, 'android:textColor'], Result) then Exit;
+      a := 'android:state_enabled=' + IfThen(FAndroidWidget.Enabled, '!false', 'false');
+      if t.TryGetColor([BaseStyle, 'android:textColor'], a, Result) then Exit;
       if t.TryGetColor([BaseStyle,
                        'android:textAppearance',
-                       'android:textColor'], Result) then Exit;
+                       'android:textColor'], a, Result) then Exit;
+      if t.TryGetColor(['textAppearance',
+                        'android:textColor'], a, Result) then Exit;
     end;
   end;
   Result := Designer.FDefaultFontColor;
@@ -1985,13 +2016,11 @@ end;
 constructor TDraftButton.Create(AWidget: TAndroidWidget; Canvas: TCanvas);
 begin
   BaseStyle := 'buttonStyle';
+  DrawableDest := 'android:background';
+  DrawableAttribs := 'android:state_enabled=' + IfThen(jButton(AWidget).Enabled, 'true', 'false');
   inherited;
-
   Color := jButton(AWidget).BackgroundColor;
   FontColor := jButton(AWidget).FontColor;
-
-  if jButton(AWidget).BackgroundColor = colbrDefault then
-    Color := GetParentBackgroundColor;
 end;
 
 procedure TDraftButton.Draw;
@@ -2006,22 +2035,31 @@ begin
     Pen.Color := clForm;
     Font.Color := TextColor;
 
-    if BackGroundColor = clNone then
-      Brush.Color := BlendColors(GetBackGroundColor, 2/5, 153, 153, 153);
+    r := Rect(0, 0, Self.Width, Self.Height);
 
+    if Drawable <> nil then
+    begin
+      if BackGroundColor <> clNone then
+        FillRect(r)
+      else
+        StretchDraw(r, Drawable);
+    end else begin
+      if BackGroundColor = clNone then
+        Brush.Color := BlendColors(ToTColor(GetParentBackgroundColor), 2/5, 153, 153, 153);
+      FillRect(r);
+
+      //outer frame
+      Rectangle(r);
+
+      Pen.Color := clMedGray;
+      Brush.Style := bsClear;
+      InflateRect(r, -1, -1);
+      Rectangle(r);
+    end;
+
+    Brush.Style := bsClear;
     lastFontSize := Font.Size;
     Font.Size := AndroidToLCLFontSize(jButton(FAndroidWidget).FontSize, 13);
-
-    r := Rect(0, 0, Self.Width, Self.Height);
-    FillRect(r);
-    //outer frame
-    Rectangle(r);
-
-    Pen.Color := clMedGray;
-    Brush.Style := bsClear;
-    InflateRect(r, -1, -1);
-    Rectangle(r);
-
     ts := TextStyle;
     ts.Layout := tlCenter;
     ts.Alignment := Classes.taCenter;
@@ -2031,12 +2069,42 @@ begin
 end;
 
 procedure TDraftButton.UpdateLayout;
+var
+  lastSize: Integer;
+  lastStyle: TFontStyles;
 begin
-  with jButton(FAndroidWidget) do
-    if LayoutParamHeight = lpWrapContent then
+  with jButton(FAndroidWidget), FCanvas do
+    if (LayoutParamHeight = lpWrapContent)
+    or (LayoutParamWidth = lpWrapContent) then
     begin
-      FMinHeight := 14 + AndroidToLCLFontSize(jButton(FAndroidWidget).FontSize, 13) + 13;
-      if FMinHeight < 40 then FMinHeight := 40;
+      lastSize := Font.Size;
+      lastStyle := Font.Style;
+      SetupFont(Font, FontSize, 13, tfNormal);
+
+      with TextExtent(Text) do
+      begin
+        if LayoutParamWidth = lpWrapContent then
+        begin
+          FMinWidth := cx;
+          if Drawable is T9PatchPNG then
+            with T9PatchPNG(Drawable).Padding do
+              FMinWidth := FMinWidth + Left + Right
+          else
+            FMinWidth := FMinWidth + 14 + 13
+        end;
+        if LayoutParamHeight = lpWrapContent then
+        begin
+          FMinHeight := cy;
+          if Drawable is T9PatchPNG then
+            with T9PatchPNG(Drawable).Padding do
+              FMinHeight := FMinHeight + Top + Bottom + 11
+          else
+            FMinHeight := FMinHeight + 14 + 13
+        end;
+      end;
+
+      Font.Size := lastSize;
+      Font.Style := lastStyle;
     end;
   inherited UpdateLayout;
 end;
@@ -2112,6 +2180,10 @@ end;
 constructor TDraftEditText.Create(AWidget: TAndroidWidget; Canvas: TCanvas);
 begin
   BaseStyle := 'editTextStyle';
+  DrawableDest := 'android:background';
+  DrawableAttribs :=
+    'android:state_enabled=' + IfThen(jEditText(AWidget).Enabled, 'true', '!true') + ';' +
+    'android:state_multiline=' + IfThen(jEditText(AWidget).MaxLines > 1, 'true', '!true');
   inherited;
   Color := jEditText(AWidget).BackgroundColor;
   if Color = colbrDefault then
@@ -2122,31 +2194,39 @@ end;
 procedure TDraftEditText.Draw;
 var
   ls: Integer;
+  r: TRect;
 begin
   with FCanvas do
   begin
-    if BackgroundColor <> clNone then
+    r := Rect(0, 0, FAndroidWidget.Width, FAndroidWidget.Height);
+
+    if BackGroundColor <> clNone then
     begin
       Brush.Color := BackGroundColor;
-      FillRect(0, 0, FAndroidWidget.Width, FAndroidWidget.Height);
+      FillRect(r)
     end else
-      Brush.Style := bsClear;
+    begin
+      if Drawable <> nil then
+        StretchDraw(r, Drawable)
+      else begin
+        Brush.Style := bsClear;
+        Pen.Color := RGBToColor(175,175,175);
+        with r do
+        begin
+          MoveTo(4, Bottom - 8);
+          Lineto(4, Bottom - 5);
+          Lineto(Right - 4, Bottom - 5);
+          Lineto(Right - 4, Bottom - 8);
+        end;
+      end;
+    end;
+
     Font.Color := TextColor;
+    Brush.Style := bsClear;
     ls := Font.Size;
     Font.Size := AndroidToLCLFontSize(jEditText(FAndroidWidget).FontSize, 13);
     TextOut(12, 9, jEditText(FAndroidWidget).Text);
     Font.Size := ls;
-    if BackgroundColor = clNone then
-    begin
-      Pen.Color := RGBToColor(175,175,175);
-      with FAndroidWidget do
-      begin
-        MoveTo(4, Height - 8);
-        Lineto(4, Height - 5);
-        Lineto(Width - 4, Height - 5);
-        Lineto(Width - 4, Height - 8);
-      end;
-    end;
   end;
 end;
 
@@ -2283,6 +2363,10 @@ end;
 constructor TDraftCheckBox.Create(AWidget: TAndroidWidget; Canvas: TCanvas);
 begin
   BaseStyle := 'checkboxStyle';
+  DrawableDest := 'android:button';
+  DrawableAttribs :=
+    'android:state_enabled=' + IfThen(jCheckBox(AWidget).Enabled, 'true', 'false') + ';' +
+    'android:state_checked=' + IfThen(jCheckBox(AWidget).Checked, 'true', 'false');
   inherited;
   Color := jCheckBox(AWidget).BackgroundColor;
   FontColor := jCheckBox(AWidget).FontColor;
@@ -2300,28 +2384,33 @@ begin
     else
       Brush.Style := bsClear;
 
-    Font.Color := TextColor;
+    if Drawable <> nil then
+    begin
+      Draw(0, 0, Drawable)
+    end else begin
+      Brush.Color := clWhite;
+      Brush.Style := bsClear;
+      Pen.Color := RGBToColor($A1,$A1,$A1);
+      Rectangle(8, 8, 24, 24);
+      if jCheckBox(FAndroidWidget).Checked then
+      begin
+        lastSize := Pen.Width;
+        Pen.Width := 4;
+        Pen.Color := RGBToColor($44,$B3,$DD);
+        MoveTo(12, 13);
+        LineTo(16, 18);
+        LineTo(26, 7);
+        Pen.Width := lastSize;
+      end;
+    end;
 
+    Brush.Style := bsClear;
+    Font.Color := TextColor;
     lastSize := Font.Size;
     ps := AndroidToLCLFontSize(jCheckBox(FAndroidWidget).FontSize, 12);
     Font.Size := ps;
     TextOut(32, 14 - Abs(Font.Height) div 2, FAndroidWidget.Text);
     Font.Size := lastSize;
-
-    Brush.Color := clWhite;
-    Brush.Style := bsClear;
-    Pen.Color := RGBToColor($A1,$A1,$A1);
-    Rectangle(8, 8, 24, 24);
-    if jCheckBox(FAndroidWidget).Checked then
-    begin
-      lastSize := Pen.Width;
-      Pen.Width := 4;
-      Pen.Color := RGBToColor($44,$B3,$DD);
-      MoveTo(12, 13);
-      LineTo(16, 18);
-      LineTo(26, 7);
-      Pen.Width := lastSize;
-    end;
   end;
 end;
 
@@ -2350,6 +2439,10 @@ end;
 constructor TDraftRadioButton.Create(AWidget: TAndroidWidget; Canvas: TCanvas);
 begin
   BaseStyle := 'radioButtonStyle';
+  DrawableDest := 'android:button';
+  DrawableAttribs :=
+    'android:state_enabled=' + IfThen(jCheckBox(AWidget).Enabled, 'true', 'false') + ';' +
+    'android:state_checked=' + IfThen(jCheckBox(AWidget).Checked, 'true', 'false');
   inherited;
   Color := jRadioButton(AWidget).BackgroundColor;
   FontColor := jRadioButton(AWidget).FontColor;
@@ -2367,22 +2460,25 @@ begin
     else
       Brush.Style := bsClear;
 
-    Font.Color := TextColor;
+    if Drawable <> nil then
+      Draw(0, 0, Drawable)
+    else begin
+      Brush.Style := bsClear;
+      Pen.Color := RGBToColor(155,155,155);
+      Ellipse(7, 6, 25, 24);
+      if jRadioButton(FAndroidWidget).Checked then
+      begin
+        Brush.Color := RGBToColor(0,$99,$CC);
+        Ellipse(7+3, 6+3, 25-3, 24-3);
+      end;
+    end;
 
+    Brush.Style := bsClear;
+    Font.Color := TextColor;
     lastSize := Font.Size;
     Font.Size := AndroidToLCLFontSize(jCheckBox(FAndroidWidget).FontSize, 12);
     TextOut(32, 14 - Abs(Font.Height) div 2, FAndroidWidget.Text);
     Font.Size := lastSize;
-
-    Brush.Style := bsClear;
-    Pen.Color := RGBToColor(155,155,155);
-    Ellipse(7, 6, 25, 24);
-
-    if jRadioButton(FAndroidWidget).Checked then
-    begin
-      Brush.Color := RGBToColor(0,$99,$CC);
-      Ellipse(7+3, 6+3, 25-3, 24-3);
-    end;
   end;
 end;
 

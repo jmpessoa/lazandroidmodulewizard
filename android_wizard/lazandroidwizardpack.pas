@@ -10,7 +10,7 @@ uses
   AndroidWizard_intf, uformworkspace, uFormAndroidProject, uRegisterForm, 
   FormPathMissing, uFormOSystem, uJavaParser, LamwDesigner, uFormSizeSelect, 
   ImgCache, LamwSettings, SmartDesigner, AndroidThemes, jImageListEditDlg, 
-  LazarusPackageIntf;
+  NinePatchPNG, LazarusPackageIntf;
 
 implementation
 
