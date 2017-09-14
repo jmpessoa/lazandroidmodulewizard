@@ -110,8 +110,8 @@ type
 
 implementation
 
-uses LazIDEIntf, laz2_XMLWrite, FileUtil, Graphics, ExtDlgs, FPCanvas, FPimage,
-  FPReadPNG, FPWritePNG, strutils;
+uses LazIDEIntf, laz2_XMLWrite, FileUtil, Graphics, ExtDlgs, AndroidWizard_intf,
+  LamwDesigner, FPCanvas, FPimage, FPReadPNG, FPWritePNG, strutils;
 
 {$R *.lfm}
 
@@ -513,6 +513,11 @@ begin
     if FileExists(fn) then
       SetString(fn, FLabel, FRealLabel)
   end;
+
+  // refresh theme
+  with LazarusIDE do
+    if (ActiveProject.FileCount > 1) and (ActiveProject.CustomData['LAMW'] <> '') then
+      (TAndroidModule(GetDesignerWithProjectFile(ActiveProject.Files[1], True).LookupRoot).Designer as TAndroidWidgetMediator).UpdateTheme;
 end;
 
 { TLamwProjectOptions }
