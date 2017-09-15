@@ -2016,10 +2016,8 @@ end;
 constructor TDraftButton.Create(AWidget: TAndroidWidget; Canvas: TCanvas);
 begin
   BaseStyle := 'buttonStyle';
-  {$ifndef linux}
   DrawableDest := 'android:background';
   DrawableAttribs := 'android:state_enabled=' + IfThen(jButton(AWidget).Enabled, 'true', 'false');
-  {$endif}
   inherited;
   Color := jButton(AWidget).BackgroundColor;
   FontColor := jButton(AWidget).FontColor;
@@ -2182,12 +2180,10 @@ end;
 constructor TDraftEditText.Create(AWidget: TAndroidWidget; Canvas: TCanvas);
 begin
   BaseStyle := 'editTextStyle';
-  {$ifndef linux}
   DrawableDest := 'android:background';
   DrawableAttribs :=
     'android:state_enabled=' + IfThen(jEditText(AWidget).Enabled, 'true', '!true') + ';' +
     'android:state_multiline=' + IfThen(jEditText(AWidget).MaxLines > 1, 'true', '!true');
-  {$endif}
   inherited;
   Color := jEditText(AWidget).BackgroundColor;
   if Color = colbrDefault then
