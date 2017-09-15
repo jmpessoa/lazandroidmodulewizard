@@ -1202,11 +1202,14 @@ procedure jSend_Email(env:PJNIEnv; this:jobject;
 //by jmpessoa
 function jSend_SMS(env:PJNIEnv; this:jobject;
                        toNumber: string;
-                       smessage:string): integer; overload;
+                       smessage: string;
+					   multipartMessage: Boolean): integer; overload;
 
 function jSend_SMS(env:PJNIEnv; this:jobject;
                        toNumber: string;
-                       smessage:string; packageDeliveredAction: string): integer; overload;
+                       smessage: string; 
+					   packageDeliveredAction: string;
+					   multipartMessage: Boolean): integer; overload;
 
 function jRead_SMS(env:PJNIEnv; this:jobject; intentReceiver: jObject; addressBodyDelimiter: string): string;  //message
 
@@ -10335,16 +10338,18 @@ end;
 //by jmpessoa
 function jSend_SMS(env:PJNIEnv; this:jobject;
                        toNumber: string;
-                       smessage:string): integer;
+                       smessage: string;
+					   multipartMessage: Boolean): integer;
 var
  _jMethod : jMethodID = nil;
- _jParams : array[0..1] of jValue;
+ _jParams : array[0..2] of jValue;
  jCls: jClass=nil;
 begin
  jCls:= Get_gjClass(env);
- _jMethod:= env^.GetMethodID(env, jCls, 'jSend_SMS', '(Ljava/lang/String;Ljava/lang/String;)I');
+ _jMethod:= env^.GetMethodID(env, jCls, 'jSend_SMS', '(Ljava/lang/String;Ljava/lang/String;Z)I');
  _jParams[0].l := env^.NewStringUTF(env, pchar(toNumber) );
  _jParams[1].l := env^.NewStringUTF(env, pchar(smessage) );
+ _jParams[2].z := JBool(multipartMessage);
  Result:= env^.CallIntMethodA(env,this,_jMethod,@_jParams);
  env^.DeleteLocalRef(env,_jParams[0].l);
  env^.DeleteLocalRef(env,_jParams[1].l);
@@ -10352,17 +10357,20 @@ end;
 
 function jSend_SMS(env:PJNIEnv; this:jobject;
                        toNumber: string;
-                       smessage:string; packageDeliveredAction: string): integer;
+                       smessage: string; 
+					   packageDeliveredAction: string;
+					   multipartMessage: Boolean): integer;
 var
  _jMethod : jMethodID = nil;
- _jParams : array[0..2] of jValue;
+ _jParams : array[0..3] of jValue;
  jCls: jClass=nil;
 begin
  jCls:= Get_gjClass(env);
- _jMethod:= env^.GetMethodID(env, jCls, 'jSend_SMS', '(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)I');
+ _jMethod:= env^.GetMethodID(env, jCls, 'jSend_SMS', '(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Z)I');
  _jParams[0].l := env^.NewStringUTF(env, pchar(toNumber) );
  _jParams[1].l := env^.NewStringUTF(env, pchar(smessage) );
  _jParams[2].l := env^.NewStringUTF(env, pchar(packageDeliveredAction) );
+ _jParams[3].z := JBool(multipartMessage);
  Result:= env^.CallIntMethodA(env,this,_jMethod,@_jParams);
  env^.DeleteLocalRef(env,_jParams[0].l);
  env^.DeleteLocalRef(env,_jParams[1].l);

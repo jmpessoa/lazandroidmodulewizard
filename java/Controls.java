@@ -1751,36 +1751,50 @@ public void jSend_Email(
 //http://codetheory.in/android-sms/
 //http://www.developerfeed.com/java/tutorial/sending-sms-using-android
 //http://www.techrepublic.com/blog/software-engineer/how-to-send-a-text-message-from-within-your-android-app/
-public int jSend_SMS(String phoneNumber, String msg) {
+public int jSend_SMS(String phoneNumber, String msg, boolean multipartMessage) {
 	SmsManager sms = SmsManager.getDefault();	
 	try {
-	      //SmsManager.getDefault().sendTextMessage(phoneNumber, null, msg, null, null);	      
-	      List<String> messages = sms.divideMessage(msg);    
-	      for (String message : messages) {
-	          sms.sendTextMessage(phoneNumber, null, message, null, null);
-	      }	      
-	      //Log.i("Send_SMS",phoneNumber+": "+ msg);
-	      return 1; //ok	      
-	  }catch (Exception e) {
-		  //Log.i("Send_SMS Fail",e.toString());
-	      return 0; //fail
-	  }
+		//SmsManager.getDefault().sendTextMessage(phoneNumber, null, msg, null, null);
+		if (multipartMessage) {
+			ArrayList<String> messages = sms.divideMessage(msg);    
+			sms.sendMultipartTextMessage(phoneNumber, null, messages, null, null);			  
+		} else {
+			List<String> messages = sms.divideMessage(msg);    
+			for (String message : messages) {
+				sms.sendTextMessage(phoneNumber, null, message, null, null);
+			}			    
+		}
+		//Log.i("Send_SMS",phoneNumber+": "+ msg);
+		return 1; //ok	      
+	} catch (Exception e) {
+		//Log.i("Send_SMS Fail",e.toString());
+		return 0; //fail
+	}
 }
 
-public int jSend_SMS(String phoneNumber, String msg, String packageDeliveredAction) {	
+public int jSend_SMS(String phoneNumber, String msg, String packageDeliveredAction, boolean multipartMessage) {	
 	String SMS_DELIVERED = packageDeliveredAction;
 	PendingIntent deliveredPendingIntent = PendingIntent.getBroadcast(this.GetContext(), 0, new Intent(SMS_DELIVERED), 0);
 	SmsManager sms = SmsManager.getDefault();
 	try {
-	      //SmsManager.getDefault().sendTextMessage(phoneNumber, null, msg, null, deliveredPendingIntent);
-	      //Log.i("Send_SMS",phoneNumber+": "+ msg);
-	      List<String> messages = sms.divideMessage(msg);    
-	      for (String message : messages) {
-	          sms.sendTextMessage(phoneNumber, null, message, null, deliveredPendingIntent);
-	      }	      
-	      return 1; //ok	      
-	}catch (Exception e) {
-	      return 0; //fail
+		//SmsManager.getDefault().sendTextMessage(phoneNumber, null, msg, null, deliveredPendingIntent);
+		if (multipartMessage) {
+			ArrayList<String> messages = sms.divideMessage(msg);    
+			ArrayList<PendingIntent> deliveredPendingIntents = new ArrayList<PendingIntent>();
+			for (int i = 0; i < messages.size(); i++) {
+				deliveredPendingIntents.add(i, deliveredPendingIntent);
+			}			
+			sms.sendMultipartTextMessage(phoneNumber, null, messages, null, deliveredPendingIntents);			  
+		} else {
+			List<String> messages = sms.divideMessage(msg);    
+			for (String message : messages) {
+				sms.sendTextMessage(phoneNumber, null, message, null, deliveredPendingIntent);
+			}			    
+		}	
+		//Log.i("Send_SMS",phoneNumber+": "+ msg);    
+		return 1; //ok	      
+	} catch (Exception e) {
+		return 0; //fail
 	}
 }
 

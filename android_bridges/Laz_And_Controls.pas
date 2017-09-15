@@ -390,12 +390,12 @@ type
    constructor Create(AOwner: TComponent); override;
    destructor Destroy; override;
    procedure Init(refApp: jApp) override;
-   function Send: integer; overload;
+   function Send(multipartMessage: Boolean = False): integer; overload;
 
-   function Send(toNumber: string;  msg: string): integer; overload;
-   function Send(toNumber: string;  msg: string; packageDeliveredAction: string): integer; overload;
+   function Send(toNumber: string;  msg: string; multipartMessage: Boolean = False): integer; overload;
+   function Send(toNumber: string;  msg: string; packageDeliveredAction: string; multipartMessage: Boolean = False): integer; overload;
 
-   function Send(toName: string): integer; overload;
+   function Send(toName: string; multipartMessage: Boolean = False): integer; overload;
 
 
    function Read(intentReceiver: jObject; addressBodyDelimiter: string): string;
@@ -6657,7 +6657,7 @@ begin
   FSMSMessage.Assign(Value);
 end;
 
-function jSMS.Send: integer;
+function jSMS.Send(multipartMessage: Boolean): integer;
 begin
   if FInitialized then
   begin
@@ -6666,11 +6666,12 @@ begin
     if FMobileNumber <> '' then
         Result:= jSend_SMS(gApp.Jni.jEnv, gApp.Jni.jThis,
                   FMobileNumber,     //to
-                  FSMSMessage.Text);  //message
+                  FSMSMessage.Text,  //message
+				  multipartMessage);
   end;
 end;
 
-function jSMS.Send(toName: string): integer;
+function jSMS.Send(toName: string; multipartMessage: Boolean): integer;
 begin
   if FInitialized then
   begin
@@ -6680,29 +6681,33 @@ begin
     if FMobileNumber <> '' then
         Result:= jSend_SMS(gApp.Jni.jEnv, gApp.Jni.jThis,
                   FMobileNumber,     //to
-                  FSMSMessage.Text);  //message
+                  FSMSMessage.Text,  //message
+				  multipartMessage);
   end;
 end;
 
-function jSMS.Send(toNumber: string;  msg: string): integer;
+function jSMS.Send(toNumber: string;  msg: string; multipartMessage: Boolean): integer;
 begin
  if FInitialized then
  begin
     if toNumber <> '' then
         Result:= jSend_SMS(gApp.Jni.jEnv, gApp.Jni.jThis,
                   toNumber,     //to
-                  msg);  //message
+                  msg,  //message
+				  multipartMessage);
   end;
 end;
 
-function jSMS.Send(toNumber: string;  msg: string; packageDeliveredAction: string): integer;
+function jSMS.Send(toNumber: string;  msg: string; packageDeliveredAction: string; multipartMessage: Boolean): integer;
 begin
  if FInitialized then
  begin
     if toNumber <> '' then
         Result:= jSend_SMS(gApp.Jni.jEnv, gApp.Jni.jThis,
                   toNumber,     //to
-                  msg, packageDeliveredAction);  //message
+                  msg,  //message
+				  packageDeliveredAction,
+				  multipartMessage);
   end;
 end;
 
