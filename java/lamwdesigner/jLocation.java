@@ -121,7 +121,7 @@ public class jLocation /*extends ...*/ {
        mMapSizeH = 512;
 
 	   //get the best provider depending on the criteria
-       mProvider = mLocationManager.getBestProvider(mCriteria, true);       
+       mProvider = mLocationManager.getBestProvider(mCriteria, false); //fixed by Damian [if true then only a provider that is currently enabled is returned]     
        //Register the listener with the Location Manager to receive location updates
        mLocationManager.requestLocationUpdates(mProvider, mTimeForUpdates, mDistanceForUpdates, mlistener);
        
