@@ -30,6 +30,9 @@ jComboEditText = class(jVisualControl)
     FOnLostFocus: TOnEditLostFocus;
     FOnEnter  : TOnNotify;
 
+    FDropListTextColor: TARGBColorBridge;
+    FDropListBackgroundColor: TARGBColorBridge;
+
     procedure SetVisible(Value: Boolean);
     procedure SetColor(Value: TARGBColorBridge); //background
     procedure UpdateLParamHeight;
@@ -94,8 +97,8 @@ jComboEditText = class(jVisualControl)
     procedure SetItemTagString(_index: integer; _strTag: string);
     function GetItemTagString(_index: integer): string;
     procedure Delete(_index: integer);
-    procedure SetDropListTextColor(_color: integer);
-    procedure SetDropListBackgroundColor(_color: integer);
+    procedure SetDropListTextColor(_color: TARGBColorBridge);
+    procedure SetDropListBackgroundColor(_color: TARGBColorBridge);
     procedure SetSelectedPaddingTop(_paddingTop: integer);
     procedure SetSelectedPaddingBottom(_paddingBottom: integer);
     procedure ShowSoftInput();
@@ -128,6 +131,9 @@ jComboEditText = class(jVisualControl)
     property ItemPaddingBottom: integer read FItemPaddingBottom write SetItemPaddingBottom;
     property CloseSoftInputOnEnter: boolean read FCloseSoftInputOnEnter write SetCloseSoftInputOnEnter;
     property Hint: string read FHint write SetHint;
+
+    property DropListTextColor: TARGBColorBridge read FDropListTextColor write SetDropListTextColor;
+    property DropListBackgroundColor: TARGBColorBridge read FDropListBackgroundColor write SetDropListBackgroundColor;
 
     property OnClick: TOnNotify read FOnClick write FOnClick;
     property OnEnter: TOnNotify  read FOnEnter write FOnEnter;
@@ -225,6 +231,9 @@ begin
 
   FCloseSoftInputOnEnter:= True;
 
+  FDropListTextColor:= colbrDefault;
+  FDropListBackgroundColor:= colbrDefault;
+
   FItems:= TStringList.Create;
 
 end;
@@ -315,6 +324,12 @@ begin
 
   if  FFontColor <> colbrDefault then
     jComboEditText_SetTextColor(FjEnv, FjObject , GetARGB(FCustomColor, FFontColor));
+
+  if FDropListTextColor <> colbrDefault then
+    jComboEditText_SetDropListTextColor(FjEnv, FjObject, GetARGB(FCustomColor, FDropListTextColor));
+
+  if FDropListBackgroundColor <> colbrDefault then
+    jComboEditText_SetDropListBackgroundColor(FjEnv, FjObject, GetARGB(FCustomColor, FDropListBackgroundColor));
 
   if FFontSizeUnit <> unitDefault then
      jComboEditText_SetFontSizeUnit(FjEnv, FjObject, Ord(FFontSizeUnit));
@@ -794,18 +809,20 @@ begin
      jComboEditText_Delete(FjEnv, FjObject, _index);
 end;
 
-procedure jComboEditText.SetDropListTextColor(_color: integer);
+procedure jComboEditText.SetDropListTextColor(_color: TARGBColorBridge);
 begin
   //in designing component state: set value here...
+  FDropListTextColor:= _color;
   if FInitialized then
-     jComboEditText_SetDropListTextColor(FjEnv, FjObject, _color);
+     jComboEditText_SetDropListTextColor(FjEnv, FjObject, GetARGB(FCustomColor, FDropListTextColor));
 end;
 
-procedure jComboEditText.SetDropListBackgroundColor(_color: integer);
+procedure jComboEditText.SetDropListBackgroundColor(_color: TARGBColorBridge);
 begin
   //in designing component state: set value here...
+  FDropListBackgroundColor:= _color;
   if FInitialized then
-     jComboEditText_SetDropListBackgroundColor(FjEnv, FjObject, _color);
+     jComboEditText_SetDropListBackgroundColor(FjEnv, FjObject, GetARGB(FCustomColor, FDropListBackgroundColor));
 end;
 
 procedure jComboEditText.SetSelectedPaddingTop(_paddingTop: integer);
