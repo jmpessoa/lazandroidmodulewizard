@@ -1,4 +1,6 @@
-package org.dummy.appdummy;
+package com.example.appdownloadmanagerdemo1;
+
+import java.io.File;
 
 import android.app.DownloadManager;
 import android.content.Context;
@@ -40,7 +42,6 @@ public class jDownloadManager /*extends ...*/ {
  boolean mExtrasExists = false;
     
  //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
-
  public jDownloadManager(Controls _ctrls, long _Self) { //Add more others news "_xxx" params if needed!
     //super(_ctrls.activity);
     context   = _ctrls.activity;
@@ -55,9 +56,11 @@ public class jDownloadManager /*extends ...*/ {
  //write others [public] methods code here......
  //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
  
- private String GetEnvironmentDirectory(int _directory) {		
+ private String GetEnvironmentDirectory(int _directory) {
+	 
+     	  File filePath= null;
 		  String Path= Environment.DIRECTORY_DOWNLOADS;				  
-		  //Environment.DIRECTORY_DOCUMENTS);break;
+		  
 		  switch(_directory) {	                       
 		    case 0:  Path = Environment.DIRECTORY_DOWNLOADS; break;	   
 		    case 1:  Path = Environment.DIRECTORY_DCIM; break;
@@ -66,10 +69,32 @@ public class jDownloadManager /*extends ...*/ {
 		    case 4:  Path = Environment.DIRECTORY_NOTIFICATIONS; break;
 		    case 5:  Path = Environment.DIRECTORY_MOVIES; break;
 		    case 6:  Path = Environment.DIRECTORY_PODCASTS; break;
-		    case 7:  Path = Environment.DIRECTORY_RINGTONES; break;		    		           
+		    case 7:  Path = Environment.DIRECTORY_RINGTONES; break;
+		    case 8: {
+		    	if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED) == true) {
+		    	  filePath = Environment.getExternalStorageDirectory();  //sdcard!
+		    	   // Make sure the directory exists.
+		    	  filePath.mkdirs();
+		   	      Path= filePath.getPath();
+		   	      break;
+		        }
+		    }
+		    
+		    case 9: Path  = this.controls.activity.getFilesDir().getAbsolutePath(); break;      //Result : /data/data/com/MyApp/files
+		    
+		    case 10: { 
+		    	       Path = this.controls.activity.getFilesDir().getPath();
+		               Path = Path.substring(0, Path.lastIndexOf("/")) + "/databases"; break;
+		    }
+		             
+		    case 11: {  
+		    	        Path = this.controls.activity.getFilesDir().getPath();
+	                    Path = Path.substring(0, Path.lastIndexOf("/")) + "/shared_prefs"; break;
+		    }
+		  		    
 		  }		  
 		  return Path;
-	}
+ }
  
  public void SetNotification(String _title, String _description) {
      notifyTitle= _title;
