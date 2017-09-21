@@ -5062,8 +5062,6 @@ begin
   // Setting Global Environment -----------------------------------------------
   FillChar(Forms,SizeOf(Forms),#0);
   Forms.Index      := -1; //initial dummy index ...
-  //
-  Screen.Style  := ssSensor;     // Screen Style [Device,Portrait,Lanscape]
 
   // Jni
   Jni.jEnv      := env;  //a reference to the JNI environment
