@@ -1,6 +1,11 @@
 package com.example.appdownloadmanagerdemo1;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 
 import android.app.DownloadManager;
 import android.content.Context;
@@ -30,7 +35,7 @@ public class jDownloadManager /*extends ...*/ {
  String notifyDescription = "Please, wait...";
  
  String mUrl = "//http://www.freemediagoo.com/free-media/wildlife/o_o_bird-med.jpg";
- String mFilename = "o_o_bird-med.jpg";  
+ String mFilename = "o_o_bird-med.jpg"; 
  String mPath = Environment.DIRECTORY_DOWNLOADS; // default ...
  
  String mLocalFileName= "";
@@ -59,6 +64,7 @@ public class jDownloadManager /*extends ...*/ {
  private String GetEnvironmentDirectory(int _directory) {
 	 
      	  File filePath= null;
+     	  
 		  String Path= Environment.DIRECTORY_DOWNLOADS;				  
 		  
 		  switch(_directory) {	                       
@@ -70,6 +76,8 @@ public class jDownloadManager /*extends ...*/ {
 		    case 5:  Path = Environment.DIRECTORY_MOVIES; break;
 		    case 6:  Path = Environment.DIRECTORY_PODCASTS; break;
 		    case 7:  Path = Environment.DIRECTORY_RINGTONES; break;
+		    
+		    /*    //do not save to internal app storage ... sorry 
 		    case 8: {
 		    	if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED) == true) {
 		    	  filePath = Environment.getExternalStorageDirectory();  //sdcard!
@@ -78,20 +86,17 @@ public class jDownloadManager /*extends ...*/ {
 		   	      Path= filePath.getPath();
 		   	      break;
 		        }
-		    }
-		    
-		    case 9: Path  = this.controls.activity.getFilesDir().getAbsolutePath(); break;      //Result : /data/data/com/MyApp/files
-		    
+		    }		    		   
+		    case 9: Path  = this.controls.activity.getFilesDir().getAbsolutePath(); break;      //Result : /data/data/com/MyApp/files		    
 		    case 10: { 
 		    	       Path = this.controls.activity.getFilesDir().getPath();
 		               Path = Path.substring(0, Path.lastIndexOf("/")) + "/databases"; break;
-		    }
-		             
+		    }		            
 		    case 11: {  
 		    	        Path = this.controls.activity.getFilesDir().getPath();
 	                    Path = Path.substring(0, Path.lastIndexOf("/")) + "/shared_prefs"; break;
 		    }
-		  		    
+		  	*/		    		   
 		  }		  
 		  return Path;
  }
@@ -134,15 +139,13 @@ public class jDownloadManager /*extends ...*/ {
 		     mPath: Download  --> OK! [Environment.DIRECTORY_DOWNLOADS] 
 		   */
 		  mRequest.setAllowedNetworkTypes(DownloadManager.Request.NETWORK_WIFI|DownloadManager.Request.NETWORK_MOBILE);
-          //mRequest.setAllowedOverRoaming(false);          
-	      mRequest.setDestinationInExternalPublicDir(mPath, mFilename); //"name-of-the-file.ext"		   
+	      mRequest.setDestinationInExternalPublicDir(mPath, mFilename); //"name-of-the-file.ext"
 	      mManager = (DownloadManager)controls.activity.getSystemService(Context.DOWNLOAD_SERVICE);
 		   //go to download service and enqueue file...
 		  mStartTime = System.currentTimeMillis();
 	      mManager.enqueue(mRequest);	      
 	   }
-	   else r = 0; //fail ..
-	   
+	   else r = 0; //fail ..	   
 	   return r;
  }   
  
@@ -164,8 +167,7 @@ public class jDownloadManager /*extends ...*/ {
 	    	   mLocalFileName = c.getString(c.getColumnIndex(DownloadManager.COLUMN_LOCAL_FILENAME));
 	    	   mMediaType = c.getString(c.getColumnIndex(DownloadManager.COLUMN_MEDIA_TYPE ));
 	    	   mSizeBytes = c.getString(c.getColumnIndex(DownloadManager.COLUMN_TOTAL_SIZE_BYTES ));
-	    	   mLocalUriString = c.getString(c.getColumnIndex(DownloadManager.COLUMN_LOCAL_URI ));
-	    	   
+	    	   mLocalUriString = c.getString(c.getColumnIndex(DownloadManager.COLUMN_LOCAL_URI ));	    	   
 	    	   mFileUri =  Uri.parse(mLocalUriString);
 	    	   mExtrasExists = true;
 	       }
