@@ -86,7 +86,7 @@ begin
      else
      begin
        jListView1.Clear;
-       jListView1.Add('      [Paired] Select a Bluetooch Server');
+       jListView1.Add('      [Paired] Select a Bluetooth Server');
        for i:= 0 to size-1 do
        begin
          //ShowMessage(listArray[i]);
@@ -112,7 +112,7 @@ begin
      else
      begin
        jListView1.Clear;
-       jListView1.Add('      Select a Bluetooch Server:');
+       jListView1.Add('      Select a Bluetooth Server:');
        for i:= 0 to size-1 do
        begin
           //ShowMessage(listArray[i]);

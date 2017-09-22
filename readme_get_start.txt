@@ -199,7 +199,7 @@ III. USE
 	by jmpessoa hotmail com
 
 
-FAQ: [Thanks to @developing!]
+FAQ: [Thanks to Ahmad Bohloolbandi (a.k.a. @developing) ]
 
 #Question: How do we can design a layout that shown same in real device?
 

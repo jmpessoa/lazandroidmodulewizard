@@ -1,0 +1,3 @@
+public  native void pOnBluetoothClientSocketConnected(long pasobj, String deviceName, String deviceAddress);
+public  native void pOnBluetoothClientSocketIncomingData(long pasobj, byte[] byteArrayContent, byte[] byteArrayHeader);
+public  native void pOnBluetoothClientSocketDisconnected(long pasobj);

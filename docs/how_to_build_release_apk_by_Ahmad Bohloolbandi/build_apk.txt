@@ -1,0 +1,62 @@
+REM Adjust these paths to yours
+SET APP_NAME=cProject
+SET ProjectPath=L:\Projects\LAMW\%APP_NAME%
+SET ANDROID_HOME=L:\android-sdk
+SET JAVA_HOME=C:\Program Files\Java\jdk1.8.0_31\bin
+SET APK_SDK_PLATFORM=%ANDROID_HOME%\platforms\android-19
+SET SDK_BUILDTOOLS=19.0.0
+SET PASSWORD=123456
+
+REM Create necessary directory Structure
+mkdir "%ProjectPath%\bin"
+mkdir "%ProjectPath%\bin\classes"
+mkdir "%ProjectPath%\gen"
+mkdir "%ProjectPath%\gen\org"
+mkdir "%ProjectPath%\gen\org\lazarus"
+mkdir "%ProjectPath%\gen\org\lazarus\%APP_NAME%"
+mkdir "%ProjectPath%\raw"
+mkdir "%ProjectPath%\raw\lib"
+mkdir "%ProjectPath%\raw\lib\armeabi"
+
+REM Cleanup
+del "%ProjectPath%\bin\%APP_NAME%.ap_"
+del "%ProjectPath%\bin\%APP_NAME%.apk"
+del "%ProjectPath%\raw\lib\armeabi\*.so"
+
+REM More directory preparation
+copy "%ProjectPath%\libs\armeabi\*.so" "%ProjectPath%\raw\lib\armeabi\"
+
+REM Resource compilation
+call "%ANDROID_HOME%\build-tools\%SDK_BUILDTOOLS%\aapt" p -v -f -M "%ProjectPath%\AndroidManifest.xml" -F "%ProjectPath%\bin\%APP_NAME%.ap_" -I "%APK_SDK_PLATFORM%\android.jar" -S "%ProjectPath%\res" -m -J "%ProjectPath%\gen" "%ProjectPath%\raw"
+REM pause
+
+REM Java compiler
+call "%JAVA_HOME%\javac" -source 1.7 -target 1.7 -verbose -encoding UTF8 -classpath "%APK_SDK_PLATFORM%\android.jar" -d "%ProjectPath%\bin\classes" "%ProjectPath%\src\org\lazarus\%APP_NAME%\App.java"
+REM pause
+
+REM DX to convert the java bytecode to dalvik bytecode
+call "%JAVA_HOME%\java" -Djava.ext.dirs="%ANDROID_HOME%\platform-tools\lib\" -jar "%ANDROID_HOME%\build-tools\%SDK_BUILDTOOLS%\lib\dx.jar" --dex --verbose --output="%ProjectPath%\bin\classes.dex" "%ProjectPath%\bin\classes"
+
+REM pause
+REM It seams that dx calls echo off
+@echo on
+REM Now build the unsigned APK
+del "%ProjectPath%\bin\%APP_NAME%-unsigned.apk"
+call "%JAVA_HOME%\java" -classpath "%ANDROID_HOME%\tools\lib\sdklib.jar" com.android.sdklib.build.ApkBuilderMain "%ProjectPath%\bin\%APP_NAME%-unsigned.apk" -v -u -z "%ProjectPath%\bin\%APP_NAME%.ap_" -f "%ProjectPath%\bin\classes.dex"
+
+echo create unsigned apk
+REM pause
+
+REM Generating on the fly a debug key
+"%JAVA_HOME%\keytool" -genkey -v -keystore "%ProjectPath%\bin\LCLDebugKey.keystore" -alias LCLDebugKey -keyalg RSA -validity 10000
+
+REM Signing the APK with a debug key
+del "%ProjectPath%\bin\%APP_NAME%-unaligned.apk"
+"%JAVA_HOME%\jarsigner" -verbose -keystore "%ProjectPath%\bin\LCLDebugKey.keystore" -sigalg MD5withRSA -digestalg SHA1 -keypass %PASSWORD% -storepass %PASSWORD% -signedjar "%ProjectPath%\bin\%APP_NAME%-unaligned.apk" "%ProjectPath%\bin\%APP_NAME%-unsigned.apk" LCLDebugKey
+
+REM Align the final APK package
+"%ANDROID_HOME%\build-tools\19.1.0\zipalign" -v 4 "%ProjectPath%\bin\%APP_NAME%-unaligned.apk" "%ProjectPath%\bin\%APP_NAME%.apk"
+
+
+REM call and pause together allow us to see the results in the end
+REM pause

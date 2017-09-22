@@ -1,0 +1,6 @@
+public native void pOnBluetoothEnabled(long pasobj);
+public native void pOnBluetoothDisabled(long pasobj);
+public native void pOnBluetoothDeviceFound(long pasobj,String deviceName,String deviceAddress);
+public native void pOnBluetoothDiscoveryStarted(long pasobj);
+public native void pOnBluetoothDiscoveryFinished(long pasobj,int countFoundedDevices,int countPairedDevices);
+public native void pOnBluetoothDeviceBondStateChanged(long pasobj, int state, String deviceName, String deviceAddress);
