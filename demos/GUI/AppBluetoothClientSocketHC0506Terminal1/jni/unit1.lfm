@@ -1,0 +1,285 @@
+object AndroidModule1: TAndroidModule1
+  Left = 469
+  Top = 118
+  Width = 300
+  Height = 600
+  MarginLeft = 0
+  MarginTop = 0
+  MarginRight = 0
+  MarginBottom = 0
+  Enabled = True
+  Text = 'AndroidModule1'
+  ActivityMode = actMain
+  BackgroundColor = colbrBlack
+  ActionBarTitle = abtDefault
+  OnCloseQuery = AndroidModule1CloseQuery
+  OnJNIPrompt = AndroidModule1JNIPrompt
+  OnCreateOptionMenu = AndroidModule1CreateOptionMenu
+  OnClickOptionMenuItem = AndroidModule1ClickOptionMenuItem
+  object jButton_send: jButton
+    Left = 226
+    Top = 65
+    Width = 69
+    Height = 50
+    MarginLeft = 5
+    MarginTop = 5
+    MarginRight = 5
+    MarginBottom = 5
+    Enabled = True
+    Visible = True
+    Anchor = jEditText_Send
+    Id = 5672414
+    PosRelativeToAnchor = [raToRightOf, raAlignBaseline]
+    PosRelativeToParent = [rpRight]
+    LayoutParamWidth = lpWrapContent
+    LayoutParamHeight = lpWrapContent
+    Text = 'Send'
+    BackgroundColor = colbrDefault
+    FontColor = colbrDefault
+    FontSize = 0
+    FontSizeUnit = unitDefault
+    OnClick = jButton_sendClick
+  end
+  object jEditText_Send: jEditText
+    Left = 5
+    Top = 70
+    Width = 211
+    Height = 39
+    MarginLeft = 5
+    MarginTop = 1
+    MarginRight = 5
+    MarginBottom = 5
+    Enabled = True
+    Visible = True
+    Anchor = jTextView_Send
+    Id = 9792317
+    PosRelativeToAnchor = [raBelow]
+    PosRelativeToParent = [rpLeft]
+    LayoutParamWidth = lpThreeQuarterOfParent
+    LayoutParamHeight = lpWrapContent
+    Text = 'Test message #1'
+    Alignment = taLeft
+    InputTypeEx = itxText
+    MaxTextLength = -1
+    BackgroundColor = colbrDefault
+    FontColor = colbrDefault
+    FontSize = 0
+    HintTextColor = colbrDefault
+    ScrollBarStyle = scrNone
+    MaxLines = 10
+    HorScrollBar = False
+    VerScrollBar = True
+    WrappingLine = False
+    Editable = True
+    FontSizeUnit = unitDefault
+    CloseSoftInputOnEnter = True
+  end
+  object jListView_BT_RX: jListView
+    Left = 5
+    Top = 137
+    Width = 290
+    Height = 458
+    MarginLeft = 5
+    MarginTop = 1
+    MarginRight = 5
+    MarginBottom = 5
+    Enabled = True
+    Visible = True
+    Anchor = jTextView_Receive
+    Id = 9792318
+    PosRelativeToAnchor = [raBelow]
+    PosRelativeToParent = [rpBottom, rpLeft]
+    LayoutParamWidth = lpMatchParent
+    LayoutParamHeight = lpOneThirdOfParent
+    BackgroundColor = colbrDefault
+    FontColor = colbrWhite
+    FontSize = 0
+    WidgetItem = wgNone
+    Delimiter = '|'
+    TextDecorated = txtNormal
+    ItemLayout = layText
+    TextSizeDecorated = sdIncreasing
+    TextAlign = alLeft
+    HighLightSelectedItemColor = colbrDefault
+    FontSizeUnit = unitDefault
+    ItemPaddingTop = 5
+    ItemPaddingBottom = 5
+    WidgetTextColor = colbrDefault
+    OnLongClickItem = jListView_BT_RXLongClickItem
+  end
+  object jTextView_Send: jTextView
+    Left = 5
+    Top = 48
+    Width = 74
+    Height = 20
+    MarginLeft = 5
+    MarginTop = 5
+    MarginRight = 5
+    MarginBottom = 1
+    Enabled = True
+    Visible = True
+    Anchor = jPanel_BT_connect
+    Id = 9792319
+    PosRelativeToAnchor = [raBelow]
+    PosRelativeToParent = [rpLeft]
+    LayoutParamWidth = lpWrapContent
+    LayoutParamHeight = lpWrapContent
+    Text = 'Bluetooth TX'
+    Alignment = taLeft
+    BackgroundColor = colbrDefault
+    FontColor = colbrPowderBlue
+    FontSize = 0
+    TextTypeFace = tfNormal
+    FontSizeUnit = unitDefault
+  end
+  object jTextView_Receive: jTextView
+    Left = 5
+    Top = 115
+    Width = 75
+    Height = 20
+    MarginLeft = 5
+    MarginTop = 1
+    MarginRight = 5
+    MarginBottom = 1
+    Enabled = True
+    Visible = True
+    Anchor = jEditText_Send
+    Id = 9792320
+    PosRelativeToAnchor = [raBelow]
+    PosRelativeToParent = [rpLeft]
+    LayoutParamWidth = lpWrapContent
+    LayoutParamHeight = lpWrapContent
+    Text = 'Bluetooth RX'
+    Alignment = taLeft
+    BackgroundColor = colbrDefault
+    FontColor = colbrPowderBlue
+    FontSize = 0
+    TextTypeFace = tfNormal
+    FontSizeUnit = unitDefault
+  end
+  object jPanel_BT_connect: jPanel
+    Left = 0
+    Top = 4
+    Width = 300
+    Height = 35
+    MarginLeft = 0
+    MarginTop = 4
+    MarginRight = 0
+    MarginBottom = 4
+    Enabled = True
+    Visible = True
+    Id = 9792322
+    PosRelativeToAnchor = []
+    PosRelativeToParent = [rpTop, rpLeft]
+    LayoutParamWidth = lpMatchParent
+    LayoutParamHeight = lpWrapContent
+    BackgroundColor = colbrDefault
+    MinPinchZoomFactor = 0.25
+    MaxPinchZoomFactor = 4
+    object jListView_BT_connect: jListView
+      Tag = 1
+      Left = 10
+      Top = 22
+      Width = 280
+      Height = 8
+      MarginLeft = 10
+      MarginTop = 0
+      MarginRight = 10
+      MarginBottom = 5
+      Enabled = True
+      Visible = True
+      Anchor = jTextView_BT_list
+      Id = 9792323
+      PosRelativeToAnchor = [raBelow]
+      PosRelativeToParent = [rpLeft]
+      LayoutParamWidth = lpMatchParent
+      LayoutParamHeight = lpOneEighthOfParent
+      BackgroundColor = colbrDefault
+      FontColor = colbrLightCyan
+      FontSize = 0
+      WidgetItem = wgNone
+      Delimiter = '|'
+      TextDecorated = txtNormal
+      ItemLayout = layImageTextWidget
+      TextSizeDecorated = sdNone
+      TextAlign = alLeft
+      HighLightSelectedItemColor = colbrDarkGray
+      FontSizeUnit = unitDefault
+      ItemPaddingTop = 10
+      ItemPaddingBottom = 10
+      WidgetTextColor = colbrDefault
+      OnClickItem = jListView_BT_connectClickItem
+      OnDrawItemTextColor = jListView_BT_connectDrawItemTextColor
+    end
+    object jTextView_BT_list: jTextView
+      Left = 5
+      Top = 1
+      Width = 290
+      Height = 20
+      MarginLeft = 5
+      MarginTop = 1
+      MarginRight = 5
+      MarginBottom = 1
+      Enabled = True
+      Visible = True
+      Id = 9792321
+      PosRelativeToAnchor = []
+      PosRelativeToParent = [rpTop, rpLeft]
+      LayoutParamWidth = lpMatchParent
+      LayoutParamHeight = lpWrapContent
+      Text = 'Bluetooth Device'
+      Alignment = taLeft
+      BackgroundColor = colbrDefault
+      FontColor = colbrPowderBlue
+      FontSize = 0
+      TextTypeFace = tfNormal
+      FontSizeUnit = unitDefault
+    end
+  end
+  object jBluetooth1: jBluetooth
+    Tag = 1
+    OnEnabled = jBluetooth1Enabled
+    OnDisabled = jBluetooth1Disabled
+    OnDeviceFound = jBluetooth1DeviceFound
+    OnDiscoveryStarted = jBluetooth1DiscoveryStarted
+    OnDiscoveryFinished = jBluetooth1DiscoveryFinished
+    left = 56
+    top = 256
+  end
+  object jBluetoothClientSocket1: jBluetoothClientSocket
+    UUID = '00001101-0000-1000-8000-00805F9B34FB'
+    ReceiverBufferLength = 1024
+    DataHeaderReceiveEnabled = False
+    OnConnected = jBluetoothClientSocket1Connected
+    OnIncomingData = jBluetoothClientSocket1IncomingData
+    OnDisconnected = jBluetoothClientSocket1Disconnected
+    left = 215
+    top = 256
+  end
+  object jDialogProgress_BT_Discovery: jDialogProgress
+    Title = 'Bluetooth find'
+    Msg = 'Please, wait...  discovering devices'
+    left = 128
+    top = 424
+  end
+  object jTimer_Bluetooth_chk: jTimer
+    Enabled = False
+    Interval = 20
+    OnTimer = jTimer_Bluetooth_chkTimer
+    left = 56
+    top = 336
+  end
+  object jMenu1: jMenu
+    Options.Strings = (
+      'Bluetooth ON'
+      'Bluetooth OFF'
+      'Discovery Near BT'
+      'List Paired BT'
+      'Disconnect BT'
+      'Clear BT RX'
+      'BT RX Toast'
+    )
+    left = 215
+    top = 336
+  end
+end
