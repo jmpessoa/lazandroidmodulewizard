@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CONFIG>
   <ProjectOptions>
-    <Version Value="9"/>
+    <Version Value="10"/>
     <PathDelim Value="\"/>
     <General>
       <Flags>
@@ -18,10 +18,7 @@
     <i18n>
       <EnableI18N LFM="False"/>
     </i18n>
-    <VersionInfo>
-      <StringTable ProductVersion=""/>
-    </VersionInfo>
-    <CustomData Count="4">		
+    <CustomData Count="4">
       <Item0 Name="LAMW" Value="GUI"/>
       <Item1 Name="Package" Value="org.lamw.appmormotdemo1"/>
       <Item2 Name="NdkPath" Value="C:\adt32\ndk10e"/>
@@ -53,12 +50,18 @@
         <IsPartOfProject Value="True"/>
         <ComponentName Value="AndroidModule1"/>
         <HasResources Value="True"/>
+        <CustomData Count="1">
+          <Item0 Name="jControls" Value="jImageList;jImageView;jTextView;jTimer"/>
+        </CustomData>
       </Unit1>
       <Unit2>
         <Filename Value="unit1.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="AndroidModule2"/>
         <HasResources Value="True"/>
+        <CustomData Count="1">
+          <Item0 Name="jControls" Value="jButton;jEditText;jImageList;jImageView;jPanel;jTextView"/>
+        </CustomData>
       </Unit2>
     </Units>
   </ProjectOptions>
@@ -66,11 +69,10 @@
     <Version Value="11"/>
     <PathDelim Value="\"/>
     <Target>
-      <Filename Value="..\libs\armeabi\libcontrols"/>
+      <Filename Value="..\libs\armeabi-v7a\libcontrols"/>
     </Target>
     <SearchPaths>
       <IncludeFiles Value="..\mORMot"/>
-      <Libraries Value="C:\adt32\ndk10e\platforms\android-20\arch-arm\usr\lib\;C:\adt32\ndk10e\toolchains\arm-linux-androideabi-4.9\prebuilt\windows\lib\gcc\arm-linux-androideabi\4.9\"/>
       <OtherUnitFiles Value="..\mORMot;..\mORMot\SQLite3"/>
       <UnitOutputDirectory Value="..\obj\controls"/>
     </SearchPaths>
@@ -100,7 +102,7 @@
       </Options>
     </Linking>
     <Other>
-      <CustomOptions Value="-Xd -CfSoft -CpARMV6 -XParm-linux-androideabi- -FDC:\adt32\ndk10e\toolchains\arm-linux-androideabi-4.9\prebuilt\windows\bin -o..\libs\armeabi\libcontrols.so"/>
+      <CustomOptions Value="-CfVFPV3 -CpARMV7A"/>
     </Other>
   </CompilerOptions>
   <Debugging>

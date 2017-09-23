@@ -172,25 +172,25 @@ public class jTextView extends TextView {
 	//LORDMAN 2013-08-13
     public  void SetTextAlignment( int align ) {
         switch ( align ) {
- //[ifdef_api14up]
+ /*
             case 0 : { setGravity( Gravity.START             ); }; break;
             case 1 : { setGravity( Gravity.END               ); }; break;
- //[endif_api14up]
+ */
             
- /* //[endif_api14up]
+ /* */
             case 0 : { setGravity( Gravity.LEFT              ); }; break;
             case 1 : { setGravity( Gravity.RIGHT             ); }; break;
- //[ifdef_api14up] */
+ /* */
             
             case 2 : { setGravity( Gravity.CENTER_HORIZONTAL ); }; break;
             
- //[ifdef_api14up]
+ /*
             default : { setGravity( Gravity.START            ); }; break;
- //[endif_api14up]
+ */
             
- /* //[endif_api14up]
+ /* */
             default : { setGravity( Gravity.LEFT             ); }; break;
- //[ifdef_api14up] */
+ /* */
             
         }
     }
@@ -321,10 +321,10 @@ public class jTextView extends TextView {
 			        if (background instanceof ColorDrawable) {
 			          color = ((ColorDrawable)this.getBackground()).getColor();
 				        shape.setColorFilter(color, Mode.SRC_ATOP);        		           		        		        
-				        //[ifdef_api16up]
+				        /*
 				  	    if(Build.VERSION.SDK_INT >= 16) 
 				             this.setBackground((Drawable)shape);
-				        //[endif_api16up]			          
+				        */			          
 			        }                		  	  
 		    }
 	}		
@@ -395,7 +395,7 @@ public class jTextView extends TextView {
 	 * add android:supportsRtl="true" to the <application>element in manifest file.
 	 */	
 	public void SetTextDirection(int _textDirection) {		
-		//[ifdef_api17up]
+		/*
 		 if(Build.VERSION.SDK_INT >= 17) {
 				switch  (_textDirection) {
 				case 0: this.setTextDirection(View.TEXT_DIRECTION_INHERIT);	 break; 
@@ -406,7 +406,7 @@ public class jTextView extends TextView {
 					 		  		  		   
 				}			
 		 }	
-       //[endif_api17up]				
+       */				
 	}
 	
 	

@@ -40,12 +40,12 @@ public class jPanel extends RelativeLayout {
 	int marginTop = 0;
 	int marginRight  = 0;
 	int marginBottom = 0;
- //[ifdef_api14up]
+ /*
  private int lgravity = Gravity.TOP | Gravity.START;
- //[endif_api14up]
- /* //[endif_api14up]
+ */
+ /* */
  private int lgravity = Gravity.TOP | Gravity.LEFT;
- //[ifdef_api14up] */
+ /* */
 	private float lweight = 0;
 
 	boolean mRemovedFromParent = false;
@@ -128,10 +128,10 @@ public class jPanel extends RelativeLayout {
 				  if(Build.VERSION.SDK_INT < 17)
 					  ((android.widget.RelativeLayout.LayoutParams) lparams).addRule(lparamsAnchorRule[i], 0);
 					
-	//[ifdef_api17up]
+	/*
 				 if(Build.VERSION.SDK_INT >= 17)
 					((android.widget.RelativeLayout.LayoutParams) lparams).removeRule(lparamsAnchorRule[i]); //need API >= 17!
-	//[endif_api17up]
+	*/
 				 
 			 }
 			
@@ -139,10 +139,10 @@ public class jPanel extends RelativeLayout {
 				  if(Build.VERSION.SDK_INT < 17) 
 					  ((android.widget.RelativeLayout.LayoutParams) lparams).addRule(lparamsParentRule[j], 0);
 					
-	//[ifdef_api17up]
+	/*
 				  if(Build.VERSION.SDK_INT >= 17)
 					  ((android.widget.RelativeLayout.LayoutParams) lparams).removeRule(lparamsParentRule[j]);  //need API >= 17!
-	//[endif_api17up]
+	*/
 				
 			}
 			
@@ -350,10 +350,10 @@ public class jPanel extends RelativeLayout {
 		        if (background instanceof ColorDrawable) {
 		          color = ((ColorDrawable)this.getBackground()).getColor();
 			        shape.setColorFilter(color, Mode.SRC_ATOP);        		           		        		        
-			        //[ifdef_api16up]
+			        /*
 			  	    if(Build.VERSION.SDK_INT >= 16) 
 			             this.setBackground((Drawable)shape);
-			        //[endif_api16up]		          
+			        */		          
 		        }                		  	  
 	    }
 	 }

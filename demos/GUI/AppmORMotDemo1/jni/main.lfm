@@ -1,25 +1,33 @@
 object AndroidModule1: TAndroidModule1
-  Left = 315
-  Top = 132
+  Left = 141
+  Top = 139
   Width = 320
   Height = 557
   MarginLeft = 0
   MarginTop = 0
   MarginRight = 0
   MarginBottom = 0
+  Enabled = True
   OnCreate = AndroidModule1Create
   Text = 'AndroidModule1'
   ActivityMode = actSplash
   BackgroundColor = colbrDefault
+  ActionBarTitle = abtDefault
   OnRotate = AndroidModule1Rotate
   OnJNIPrompt = AndroidModule1JNIPrompt
   OnClose = AndroidModule1Close
   object jImageView1: jImageView
-    Left = 119
-    Top = 71
-    Width = 52
-    Height = 70
+    Left = 90
+    Top = 248
+    Width = 140
+    Height = 60
+    MarginLeft = 5
+    MarginTop = 5
+    MarginRight = 5
+    MarginBottom = 5
+    Enabled = True
     Visible = True
+    Id = 7018114
     PosRelativeToAnchor = []
     PosRelativeToParent = [rpCenterInParent]
     LayoutParamWidth = lpWrapContent
@@ -28,41 +36,45 @@ object AndroidModule1: TAndroidModule1
     Images = jImageList1
     BackgroundColor = colbrDefault
     ImageScaleType = scaleCenter
-    Id = 7018114
   end
   object jTextView1: jTextView
     Left = 88
-    Top = 164
+    Top = 333
     Width = 143
     Height = 20
     MarginLeft = 5
     MarginTop = 20
     MarginRight = 5
     MarginBottom = 5
+    Enabled = True
     Visible = True
     Anchor = jImageView1
+    Id = 2928445
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = [rpCenterHorizontal]
     LayoutParamWidth = lpWrapContent
     LayoutParamHeight = lpWrapContent
     Text = 'Powered by FPC/Lazarus'
     Alignment = taLeft
-    Enabled = True
     BackgroundColor = colbrWhite
     FontColor = colbrDefault
     FontSize = 0
     TextTypeFace = tfNormal
     FontSizeUnit = unitDefault
-    Id = 2928445
   end
   object jImageView2: jImageView
-    Left = 111
-    Top = 190
-    Width = 81
-    Height = 80
+    Left = 108
+    Top = 378
+    Width = 103
+    Height = 133
+    MarginLeft = 5
     MarginTop = 20
+    MarginRight = 5
+    MarginBottom = 5
+    Enabled = True
     Visible = True
     Anchor = jTextView1
+    Id = 8177500
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = [rpCenterHorizontal]
     LayoutParamWidth = lpWrapContent
@@ -71,41 +83,45 @@ object AndroidModule1: TAndroidModule1
     Images = jImageList1
     BackgroundColor = colbrDefault
     ImageScaleType = scaleCenter
-    Id = 8177500
   end
   object jTextView2: jTextView
     Left = 104
-    Top = 293
+    Top = 536
     Width = 111
     Height = 20
     MarginLeft = 5
     MarginTop = 20
     MarginRight = 5
     MarginBottom = 5
+    Enabled = True
     Visible = True
     Anchor = jImageView2
+    Id = 8484102
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = [rpCenterHorizontal]
     LayoutParamWidth = lpWrapContent
     LayoutParamHeight = lpWrapContent
     Text = 'Powered by LAMW'
     Alignment = taLeft
-    Enabled = True
     BackgroundColor = colbrWhite
     FontColor = colbrDefault
     FontSize = 0
     TextTypeFace = tfNormal
     FontSizeUnit = unitDefault
-    Id = 8484102
   end
   object jImageView3: jImageView
-    Left = 98
-    Top = 342
-    Width = 94
-    Height = 82
+    Left = 60
+    Top = 255
+    Width = 200
+    Height = 47
+    MarginLeft = 5
     MarginTop = 30
+    MarginRight = 5
+    MarginBottom = 5
+    Enabled = True
     Visible = True
     Anchor = jTextView2
+    Id = 9656989
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = [rpCenterInParent]
     LayoutParamWidth = lpWrapContent
@@ -114,39 +130,44 @@ object AndroidModule1: TAndroidModule1
     Images = jImageList1
     BackgroundColor = colbrDefault
     ImageScaleType = scaleCenter
-    Id = 9656989
   end
   object jTextView3: jTextView
     Left = 86
-    Top = 432
+    Top = 312
     Width = 148
     Height = 20
     MarginLeft = 5
     MarginTop = 5
     MarginRight = 5
     MarginBottom = 5
+    Enabled = True
     Visible = True
     Anchor = jImageView3
+    Id = 0
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = [rpCenterHorizontal]
     LayoutParamWidth = lpWrapContent
     LayoutParamHeight = lpWrapContent
     Text = 'Powered by the mORMot'
     Alignment = taLeft
-    Enabled = True
     BackgroundColor = colbrFuchsia
     FontColor = colbrDefault
     FontSize = 0
     TextTypeFace = tfNormal
     FontSizeUnit = unitDefault
-    Id = 0
   end
   object jImageView4: jImageView
-    Left = 145
-    Top = 9
-    Width = 37
-    Height = 29
+    Left = 88
+    Top = 5
+    Width = 144
+    Height = 119
+    MarginLeft = 5
+    MarginTop = 5
+    MarginRight = 5
+    MarginBottom = 5
+    Enabled = True
     Visible = True
+    Id = 9656990
     PosRelativeToAnchor = []
     PosRelativeToParent = [rpTop, rpCenterHorizontal]
     LayoutParamWidth = lpWrapContent
@@ -155,18 +176,19 @@ object AndroidModule1: TAndroidModule1
     Images = jImageList1
     BackgroundColor = colbrDefault
     ImageScaleType = scaleCenter
-    Id = 0
   end
   object jImageView5: jImageView
     Left = 0
     Top = 0
-    Width = 80
-    Height = 39
+    Width = 320
+    Height = 557
     MarginLeft = 0
     MarginTop = 0
     MarginRight = 0
     MarginBottom = 0
+    Enabled = True
     Visible = True
+    Id = 9656991
     PosRelativeToAnchor = []
     PosRelativeToParent = []
     LayoutParamWidth = lpMatchParent
@@ -175,7 +197,6 @@ object AndroidModule1: TAndroidModule1
     Images = jImageList1
     BackgroundColor = colbrDefault
     ImageScaleType = scaleFitXY
-    Id = 0
   end
   object jImageList1: jImageList
     Images.Strings = (
@@ -192,14 +213,14 @@ object AndroidModule1: TAndroidModule1
       'smallmormot.png'
       'mormot.jpg'
     )
-    left = 264
-    top = 8
+    Left = 208
+    Top = 96
   end
   object jTimer1: jTimer
     Enabled = False
     Interval = 40
     OnTimer = jTimer1Timer
-    left = 208
-    top = 16
+    Left = 208
+    Top = 16
   end
 end

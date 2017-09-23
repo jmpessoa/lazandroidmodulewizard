@@ -1,6 +1,6 @@
 How To Get More Builds:
  
-   :: Warning: Your system [Laz4Android ?] needs to be prepared for the various builds!
+   :: Warning: Your system [Laz4Android ?] needs to be prepared [cross-compile] for the various builds!
  
 1. Edit Lazarus project file "*.lpi": [use notepad like editor]
  
@@ -22,6 +22,11 @@ How To Get More Builds:
 3. Repeat for others "build_*.txt" if needed...
  
 4. Execute [double click] the "build.bat" [or .sh] file to get the Apk !
+ or [Eclipse IDE]
+ 
+   -right click your  project: -> Refresh [F5]
+ 
+   -right click your  project: -> Run as -> Android Application
  
  
       Thank you!

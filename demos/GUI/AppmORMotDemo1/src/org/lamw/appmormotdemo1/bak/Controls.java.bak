@@ -1,4 +1,4 @@
-package org.lamw.appmormotdemo1;
+package org.lamw.lamwguiproject1;
 
 //LAMW: Lazarus Android Module Wizard  - version 0.7 - rev. 19.1 - 24 June - 2017 
 //RAD Android: Project Wizard, Form Designer and Components Development Model!
@@ -1918,34 +1918,5 @@ public String jCamera_takePhoto(String path, String filename, int requestCode) {
 //-------------------------------------------------------------------------------------------------------
 //SMART LAMW DESIGNER
 //-------------------------------------------------------------------------------------------------------
-
-public  java.lang.Object jButton_Create(long pasobj ) {
-  return (java.lang.Object)( new jButton(this.activity,this,pasobj));
-}
-
-public java.lang.Object jEditText_Create(long pasobj ) {
-  return (java.lang.Object)( new jEditText(this.activity,this,pasobj));
-}
-
-public java.lang.Object jImageList_jCreate(long _Self) {
-  return (java.lang.Object)(new jImageList(this,_Self));
-}
-
-public  java.lang.Object jImageView_Create(long pasobj ) {
-  return (java.lang.Object)( new jImageView(this.activity,this,pasobj));
-}
-
-public  java.lang.Object jPanel_Create(long pasobj ) {
-  return (java.lang.Object)(new jPanel(this.activity,this,pasobj));
-}
-
-public  java.lang.Object jTextView_Create(long pasobj) {
-  return (java.lang.Object)( new jTextView(this.activity,this,pasobj));
-}
-
-public  java.lang.Object jTimer_Create(long pasobj) {
-   return (java.lang.Object)(new jTimer(this,pasobj) );
-}
-public native void pOnTimer(long pasobj);
 
 }

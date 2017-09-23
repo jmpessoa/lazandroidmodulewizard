@@ -662,10 +662,10 @@ public void SetSubTitleActionBar(String _subtitle) {
 }	
 
 public void SetIconActionBar(String _iconIdentifier) {
-//[ifdef_api14up]
+/*
   ActionBar actionBar = this.controls.activity.getActionBar();   	
   actionBar.setIcon(GetDrawableResourceById(GetDrawableResourceId(_iconIdentifier)));
-//[endif_api14up]
+*/
 }
 
 public void SetTabNavigationModeActionBar(){
@@ -788,12 +788,12 @@ public String GetScreenDensity() {
 
     int density = metrics.densityDpi;
         
-//[ifdef_api16up]
+/*
     if (density==DisplayMetrics.DENSITY_XXHIGH) {    	    	
         r= "XXHIGH:" + String.valueOf(density);
     }
     else
-//[endif_api16up]
+*/
     if (density==DisplayMetrics.DENSITY_XHIGH) {    	    	
         r= "XHIGH:" + String.valueOf(density);
     }

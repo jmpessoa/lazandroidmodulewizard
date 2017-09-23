@@ -228,10 +228,10 @@ public class jButton extends Button {
 	
 	public  void SetBackgroundByImage(Bitmap _image) {	
 	  Drawable d = new BitmapDrawable(controls.activity.getResources(), _image);
-      //[ifdef_api16up]
+      /*
 	  if(Build.VERSION.SDK_INT >= 16) 
           this.setBackground(d);
-      //[endif_api16up]
+      */
 	}
 		
 	@Override
@@ -285,12 +285,12 @@ public class jButton extends Button {
 			     color = ((ColorDrawable)this.getBackground()).getColor();
 			     mBackgroundColor = color;
 		         shape.setColorFilter(color, Mode.SRC_ATOP);			        			        			         
-		          //[ifdef_api16up]
+		          /*
 		  	      if(Build.VERSION.SDK_INT >= 16) { 
 		             this.setBackground((Drawable)shape);
 		             mIsRounded = true;
 		  	      }   
-		          //[endif_api16up]		  	      		  	         		  	      
+		          */		  	      		  	         		  	      
 			   }
 			   
 		   }		  
@@ -302,12 +302,12 @@ public class jButton extends Button {
 			   PaintDrawable  shape =  new PaintDrawable();
 			   shape.setCornerRadius(mRadius);                			   		        
 		       shape.setColorFilter(_backgroundcolor, Mode.SRC_ATOP);			        			        			         
-		       //[ifdef_api16up]
+		       /*
 		  	   if(Build.VERSION.SDK_INT >= 16) { 
 		          this.setBackground((Drawable)shape);	
 		          mIsRounded = true;
 		  	   }   
-		       //[endif_api16up]		  	      		  	         		  	      			  				        
+		       */		  	      		  	         		  	      			  				        
 		   }		  
 	}
 

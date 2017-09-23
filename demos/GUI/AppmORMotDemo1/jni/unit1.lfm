@@ -1,18 +1,21 @@
 object AndroidModule2: TAndroidModule2
-  Left = 755
-  Top = 122
+  Left = 731
+  Top = 113
   Width = 368
   Height = 684
   MarginLeft = 0
   MarginTop = 0
   MarginRight = 0
   MarginBottom = 0
+  Enabled = True
   OnCreate = AndroidModule2Create
   OnDestroy = AndroidModule2Destroy
   Text = 'AndroidModule2'
   ActivityMode = actMain
   BackgroundColor = colbrBlack
+  ActionBarTitle = abtDefault
   OnRotate = AndroidModule2Rotate
+  OnJNIPrompt = AndroidModule2JNIPrompt
   object jTextView1: jTextView
     Left = 93
     Top = 5
@@ -22,20 +25,20 @@ object AndroidModule2: TAndroidModule2
     MarginTop = 5
     MarginRight = 5
     MarginBottom = 5
+    Enabled = True
     Visible = True
+    Id = 336959
     PosRelativeToAnchor = []
     PosRelativeToParent = [rpTop, rpCenterHorizontal]
     LayoutParamWidth = lpWrapContent
     LayoutParamHeight = lpWrapContent
     Text = 'mORMot on Android Sample 1'
     Alignment = taLeft
-    Enabled = True
     BackgroundColor = colbrDefault
     FontColor = colbrWhite
     FontSize = 0
     TextTypeFace = tfNormal
     FontSizeUnit = unitDefault
-    Id = 336959
   end
   object jTextView2: jTextView
     Left = 71
@@ -46,83 +49,85 @@ object AndroidModule2: TAndroidModule2
     MarginTop = 5
     MarginRight = 5
     MarginBottom = 5
+    Enabled = True
     Visible = True
     Anchor = jTextView1
+    Id = 1565584
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = [rpCenterHorizontal]
     LayoutParamWidth = lpWrapContent
     LayoutParamHeight = lpWrapContent
-    Text = 'Enter new or search existing messages'
+    Text = 'Enter New or Query existing messages'
     Alignment = taLeft
-    Enabled = True
-    BackgroundColor = colbrWhite
+    BackgroundColor = colbrRed
     FontColor = colbrDefault
     FontSize = 0
     TextTypeFace = tfNormal
     FontSizeUnit = unitDefault
-    Id = 1565584
   end
   object NameLabel: jTextView
     Left = 20
-    Top = 144
+    Top = 154
     Width = 38
     Height = 20
     MarginLeft = 20
     MarginTop = 20
     MarginRight = 5
     MarginBottom = 5
+    Enabled = True
     Visible = True
     Anchor = NewButton
+    Id = 7815217
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = []
     LayoutParamWidth = lpWrapContent
     LayoutParamHeight = lpWrapContent
     Text = 'Name:'
     Alignment = taLeft
-    Enabled = True
     BackgroundColor = colbrDefault
     FontColor = colbrRed
     FontSize = 0
     TextTypeFace = tfNormal
     FontSizeUnit = unitDefault
-    Id = 7815217
   end
   object MessageLabel: jTextView
     Left = 20
-    Top = 293
+    Top = 303
     Width = 56
     Height = 20
     MarginLeft = 20
     MarginTop = 20
     MarginRight = 5
     MarginBottom = 5
+    Enabled = True
     Visible = True
     Anchor = jPanel1
+    Id = 4350341
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = [rpLeft]
     LayoutParamWidth = lpWrapContent
     LayoutParamHeight = lpWrapContent
     Text = 'Message:'
     Alignment = taLeft
-    Enabled = True
     BackgroundColor = colbrDefault
     FontColor = colbrRed
     FontSize = 0
     TextTypeFace = tfNormal
     FontSizeUnit = unitDefault
-    Id = 4350341
   end
   object NewButton: jButton
     Left = 10
     Top = 80
     Width = 170
-    Height = 40
+    Height = 50
     MarginLeft = 10
     MarginTop = 20
     MarginRight = 10
     MarginBottom = 4
+    Enabled = True
     Visible = True
     Anchor = jTextView2
+    Id = 4389788
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = []
     LayoutParamWidth = lpHalfOfParent
@@ -133,19 +138,20 @@ object AndroidModule2: TAndroidModule2
     FontSize = 0
     FontSizeUnit = unitDefault
     OnClick = NewButtonClick
-    Id = 4389788
   end
   object QueryButton: jButton
     Left = 192
     Top = 80
     Width = 170
-    Height = 40
+    Height = 50
     MarginLeft = 2
     MarginTop = 4
     MarginRight = 2
     MarginBottom = 4
+    Enabled = True
     Visible = True
     Anchor = NewButton
+    Id = 0
     PosRelativeToAnchor = [raToRightOf, raAlignBaseline]
     PosRelativeToParent = []
     LayoutParamWidth = lpHalfOfParent
@@ -156,19 +162,20 @@ object AndroidModule2: TAndroidModule2
     FontSize = 0
     FontSizeUnit = unitDefault
     OnClick = QueryButtonClick
-    Id = 0
   end
   object jPanel1: jPanel
     Left = 4
-    Top = 173
+    Top = 183
     Width = 262
     Height = 96
     MarginLeft = 4
     MarginTop = 4
     MarginRight = 4
     MarginBottom = 4
+    Enabled = True
     Visible = True
     Anchor = NameLabel
+    Id = 9890668
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = []
     LayoutParamWidth = lpThreeQuarterOfParent
@@ -176,22 +183,22 @@ object AndroidModule2: TAndroidModule2
     BackgroundColor = colbrPurple
     MinPinchZoomFactor = 0.25
     MaxPinchZoomFactor = 4
-    Id = 9890668
     object NameInput: jEditText
-      Left = 9
-      Top = 20
-      Width = 243
-      Height = 56
+      Left = 5
+      Top = 10
+      Width = 252
+      Height = 76
       MarginLeft = 5
       MarginTop = 10
       MarginRight = 5
       MarginBottom = 10
+      Enabled = True
       Visible = True
+      Id = 9338421
       PosRelativeToAnchor = []
       PosRelativeToParent = [rpCenterInParent]
       LayoutParamWidth = lpMatchParent
       LayoutParamHeight = lpMatchParent
-      Text = 'NameInput'
       Alignment = taLeft
       InputTypeEx = itxText
       MaxTextLength = -1
@@ -207,20 +214,22 @@ object AndroidModule2: TAndroidModule2
       WrappingLine = False
       Editable = True
       FontSizeUnit = unitDefault
-      Id = 9338421
+      CloseSoftInputOnEnter = True
     end
   end
   object jPanel2: jPanel
     Left = 4
-    Top = 322
-    Width = 356
+    Top = 332
+    Width = 360
     Height = 214
     MarginLeft = 4
     MarginTop = 4
     MarginRight = 4
     MarginBottom = 4
+    Enabled = True
     Visible = True
     Anchor = MessageLabel
+    Id = 9890669
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = []
     LayoutParamWidth = lpMatchParent
@@ -228,22 +237,22 @@ object AndroidModule2: TAndroidModule2
     BackgroundColor = colbrAquamarine
     MinPinchZoomFactor = 0.25
     MaxPinchZoomFactor = 4
-    Id = 0
     object MessageInput: jEditText
-      Left = 10
-      Top = 19
-      Width = 336
-      Height = 175
+      Left = 5
+      Top = 10
+      Width = 350
+      Height = 194
       MarginLeft = 5
       MarginTop = 10
       MarginRight = 5
       MarginBottom = 10
+      Enabled = True
       Visible = True
+      Id = 0
       PosRelativeToAnchor = []
       PosRelativeToParent = [rpCenterInParent]
       LayoutParamWidth = lpMatchParent
       LayoutParamHeight = lpMatchParent
-      Text = 'MessageInput'
       Alignment = taLeft
       InputTypeEx = itxMultiLine
       MaxTextLength = -1
@@ -252,22 +261,28 @@ object AndroidModule2: TAndroidModule2
       FontSize = 0
       Hint = 'Enter message'
       HintTextColor = colbrSilver
-      ScrollBarStyle = scrNone
+      ScrollBarStyle = scrlPositionRight
       MaxLines = 10
-      HorScrollBar = True
+      HorScrollBar = False
       VerScrollBar = True
-      WrappingLine = False
+      WrappingLine = True
       Editable = True
       FontSizeUnit = unitDefault
-      Id = 0
+      CloseSoftInputOnEnter = False
     end
   end
   object jImageView1: jImageView
-    Left = 139
-    Top = 614
-    Width = 93
-    Height = 58
+    Left = 78
+    Top = 442
+    Width = 212
+    Height = 237
+    MarginLeft = 5
+    MarginTop = 5
+    MarginRight = 5
+    MarginBottom = 5
+    Enabled = True
     Visible = True
+    Id = 9890670
     PosRelativeToAnchor = []
     PosRelativeToParent = [rpBottom, rpCenterHorizontal]
     LayoutParamWidth = lpWrapContent
@@ -276,13 +291,12 @@ object AndroidModule2: TAndroidModule2
     Images = jImageList1
     BackgroundColor = colbrDefault
     ImageScaleType = scaleCenter
-    Id = 0
   end
   object jImageList1: jImageList
     Images.Strings = (
       'happymormot.png'
     )
-    left = 212
-    top = 561
+    Left = 212
+    Top = 561
   end
 end

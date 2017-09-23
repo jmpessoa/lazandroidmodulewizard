@@ -6,8 +6,7 @@ unit main;
 interface
 
 uses
-  Classes, SysUtils, And_jni, And_jni_Bridge, Laz_And_Controls, 
-    Laz_And_Controls_Events, AndroidWidget;
+  Classes, SysUtils, Laz_And_Controls, AndroidWidget;
 
 type
 
@@ -27,8 +26,8 @@ type
     procedure AndroidModule1Close(Sender: TObject);
     procedure AndroidModule1Create(Sender: TObject);
     procedure AndroidModule1JNIPrompt(Sender: TObject);
-    procedure AndroidModule1Rotate(Sender: TObject; rotate: integer;
-      var rstRotate: integer);
+    procedure AndroidModule1Rotate(Sender: TObject; {%H-}rotate: integer;
+      var {%H-}rstRotate: integer);
     procedure jTimer1Timer(Sender: TObject);
   private
     {private declarations}

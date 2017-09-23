@@ -113,9 +113,9 @@ public class jImageView extends ImageView {
 			// for bitmaps with dimensions that lie within the limits, load the image normally
 			if (Build.VERSION.SDK_INT >= 16) {  // why??
 				BitmapDrawable ob = new BitmapDrawable(this.getResources(), bm);
-//[ifdef_api16up]
+/*
 				this.setBackground(ob);
-//[endif_api16up]
+*/
 				//this.setImageBitmap(bm);
 				bmp = bm;
 
@@ -300,10 +300,10 @@ public class jImageView extends ImageView {
 			        if (background instanceof ColorDrawable) {
 			          color = ((ColorDrawable)this.getBackground()).getColor();
 				        shape.setColorFilter(color, Mode.SRC_ATOP);        		           		        		        
-				        //[ifdef_api16up]
+				        /*
 				  	    if(Build.VERSION.SDK_INT >= 16) 
 				             this.setBackground((Drawable)shape);
-				        //[endif_api16up]			          
+				        */			          
 			        }                		  	  
 		    }
 	}

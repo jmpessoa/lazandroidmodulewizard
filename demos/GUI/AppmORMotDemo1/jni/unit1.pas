@@ -5,8 +5,7 @@ unit unit1;
 interface
 
 uses
-  Classes, SysUtils, And_jni, And_jni_Bridge, Laz_And_Controls, 
-  Laz_And_Controls_Events, AndroidWidget
+  Classes, SysUtils, Laz_And_Controls, AndroidWidget
   ,SynCommons
   ,mORMot
   ,mORMotSQLite3, SynSQLite3Static
@@ -32,8 +31,9 @@ type
     MessageLabel: jTextView;
     procedure AndroidModule2Create(Sender: TObject);
     procedure AndroidModule2Destroy(Sender: TObject);
-    procedure AndroidModule2Rotate(Sender: TObject; rotate: integer;
-      var rstRotate: integer);
+    procedure AndroidModule2JNIPrompt(Sender: TObject);
+    procedure AndroidModule2Rotate(Sender: TObject; {%H-}rotate: integer;
+      var {%H-}rstRotate: integer);
     procedure NewButtonClick(Sender: TObject);
     procedure QueryButtonClick(Sender: TObject);
   private
@@ -75,14 +75,21 @@ end;
 procedure TAndroidModule2.AndroidModule2Create(Sender: TObject);
 begin
   Model     := CreateSampleModel; // from SampleData unit
-  Database  := TSQLRestServerDB.Create(Model,gApp.Path.Dat+'/mORMot.db3');
-  TSQLRestServerDB(Database).CreateMissingTables;
 end;
 
 procedure TAndroidModule2.AndroidModule2Destroy(Sender: TObject);
 begin
   Database.Free;
   Model.Free;
+end;
+
+procedure TAndroidModule2.AndroidModule2JNIPrompt(Sender: TObject);
+begin
+  // make a storage choice 1..3 ; best : 2 ; for now, choose Download to be able to inspect db3-file !
+  //Database  := TSQLRestServerDB.Create(Model,'/storage/emulated/0/Download/mORMot.db3');
+  //Database  := TSQLRestServerDB.Create(Model,GetInternalAppStoragePath+'/mORMot.db3');
+  Database  := TSQLRestServerDB.Create(Model,GetEnvironmentDirectoryPath(dirDownloads)+'/mORMot.db3');
+  TSQLRestServerDB(Database).CreateMissingTables;
 end;
 
 procedure TAndroidModule2.AndroidModule2Rotate(Sender: TObject;
