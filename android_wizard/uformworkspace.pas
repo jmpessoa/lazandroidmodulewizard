@@ -276,11 +276,13 @@ end;
 procedure TFormWorkspace.RGInstructionClick(Sender: TObject);
 begin
   FInstructionSet:= 'x86';
-  FFPUSet:= ''; //x86
+  FFPUSet:= ''; //x86  or mipsel
 
   if RGInstruction.ItemIndex = 0  then begin FFPUSet:= 'Soft';  FInstructionSet:='ARMv6'; end;
   if RGInstruction.ItemIndex = 1  then begin FFPUSet:= 'Soft';  FInstructionSet:='ARMv7a';end;
   if RGInstruction.ItemIndex = 2  then begin FFPUSet:= 'VFPv3'; FInstructionSet:='ARMv7a';end;
+  if RGInstruction.ItemIndex = 3  then FInstructionSet:='x86';
+  if RGInstruction.ItemIndex = 4  then FInstructionSet:='Mipsel';
 
   if FPathToAndroidNDK <> '' then
      FPrebuildOSYS:= GetPrebuiltDirectory();
@@ -333,11 +335,26 @@ function TFormWorkspace.GetPrebuiltDirectory: string;
 var
    pathToNdkToolchains46,
    pathToNdkToolchains49,
-   pathToNdkToolchains443: string;  //FInstructionSet   [ARM or x86]
+   pathToNdkToolchains443: string;
 begin
     Result:= '';
 
-    if Pos('x86', FInstructionSet) > 0 then
+    if Pos('Mipsel', FInstructionSet) > 0 then
+    begin
+        {
+        pathToNdkToolchains443:= FPathToAndroidNDK+DirectorySeparator+'toolchains'+DirectorySeparator+
+                                                      'x86-4.4.3'+DirectorySeparator+
+                                                      'prebuilt'+DirectorySeparator;
+
+        pathToNdkToolchains46:= FPathToAndroidNDK+DirectorySeparator+'toolchains'+DirectorySeparator+
+                                                   'x86-4.6'+DirectorySeparator+
+                                                   'prebuilt'+DirectorySeparator;
+        }
+        pathToNdkToolchains49:= FPathToAndroidNDK+DirectorySeparator+'toolchains'+DirectorySeparator+
+                                                     'mipsel-linux-android-4.9'+DirectorySeparator+
+                                                     'prebuilt'+DirectorySeparator;
+    end
+    else if Pos('x86', FInstructionSet) > 0 then
     begin
        pathToNdkToolchains443:= FPathToAndroidNDK+DirectorySeparator+'toolchains'+DirectorySeparator+
                                                      'x86-4.4.3'+DirectorySeparator+
@@ -364,7 +381,6 @@ begin
      pathToNdkToolchains49:= FPathToAndroidNDK+DirectorySeparator+'toolchains'+DirectorySeparator+
                                                 'arm-linux-androideabi-4.9'+DirectorySeparator+
                                                 'prebuilt'+DirectorySeparator;
-
     end;
 
    {$ifdef windows}
@@ -1118,9 +1134,12 @@ begin
 
   FInstructionSet:= 'x86'; //RGInstruction.Items[RGInstruction.ItemIndex];
   FFPUSet:= ''; //x86
-  if RGInstruction.ItemIndex = 0  then begin FFPUSet:= 'Soft';  FInstructionSet:='ARMv6'; end;
-  if RGInstruction.ItemIndex = 1  then begin FFPUSet:= 'Soft';  FInstructionSet:='ARMv7a';end;
-  if RGInstruction.ItemIndex = 2  then begin FFPUSet:= 'VFPv3'; FInstructionSet:='ARMv7a';end;
+
+  if RGInstruction.ItemIndex = 0 then begin FFPUSet:= 'Soft';  FInstructionSet:='ARMv6'; end;
+  if RGInstruction.ItemIndex = 1 then begin FFPUSet:= 'Soft';  FInstructionSet:='ARMv7a';end;
+  if RGInstruction.ItemIndex = 2 then begin FFPUSet:= 'VFPv3'; FInstructionSet:='ARMv7a';end;
+  if RGInstruction.ItemIndex = 3 then FInstructionSet:='x86';
+  if RGInstruction.ItemIndex = 4 then FInstructionSet:='Mipsel';
 
   EditPathToWorkspace.Text := FPathToWorkspace;
   EditPackagePrefaceName.Text := FPackagePrefaceName;

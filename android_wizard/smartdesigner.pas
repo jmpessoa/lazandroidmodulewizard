@@ -68,7 +68,7 @@ var
 implementation
 
 uses
-  Controls, Dialogs, SrcEditorIntf, LazIDEIntf, IDEMsgIntf, IDEExternToolIntf, CodeToolManager, CodeTree,
+  Controls, Dialogs, {SrcEditorIntf,} LazIDEIntf, IDEMsgIntf, IDEExternToolIntf, CodeToolManager, CodeTree,
   CodeCache, SourceChanger, LinkScanner, Laz2_DOM, laz2_XMLRead, FileUtil,
   LazFileUtils, LamwSettings, uJavaParser, strutils;
 
@@ -891,8 +891,8 @@ begin
   chipArchitecture:= 'x86';
   aux := LazarusIDE.ActiveProject.LazCompilerOptions.CustomOptions;
   if Pos('-CpARMV6', aux) > 0 then chipArchitecture:= 'armeabi'
-  else
-  if Pos('-CpARMV7A', aux) > 0 then chipArchitecture:= 'armeabi-v7a';
+  else if Pos('-CpARMV7A', aux) > 0 then chipArchitecture:= 'armeabi-v7a'
+  else if Pos('-XPmipsel', aux) > 0 then chipArchitecture:= 'mipsel';
 
   auxList:= TStringList.Create;
 

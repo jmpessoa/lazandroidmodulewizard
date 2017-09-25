@@ -12,7 +12,7 @@ uses
 
 type
 
-TBuildMode = (bmArmV6, bmArmV7a, bmX86);
+TBuildMode = (bmArmV6, bmArmV7a, bmX86, bmMipsel);
 
   TFormBuildFPCCross = class(TForm)
     Button2: TButton;
@@ -136,6 +136,7 @@ begin
    if (FPathToAndroidNDK = '') or  (pathToFpcExecutables = '') or (pathToFpcSource = '') then
    begin
      ShowMessage('Sorry... Empty Info...');
+     Button2.Enabled:= True;
      Exit;
    end;
 
@@ -143,6 +144,7 @@ begin
       FPrebuildOSYS:= GetPrebuiltArmDirectory();
 
    configFile:= LazarusIDE.GetPrimaryConfigPath+ DirectorySeparator+ 'JNIAndroidProject.ini';
+
    if FileExists(configFile) then
    begin
      with TIniFile.Create(configFile) do
@@ -164,7 +166,7 @@ begin
    strExt:= '.exe';
    {$ENDIF}
 
-   FBuildMode:= TBuildMode(RadioGroupInstruction.ItemIndex);
+   //FBuildMode:= TBuildMode(RadioGroupInstruction.ItemIndex);
 
    if (FBuildMode = bmArmV6) or (FBuildMode = bmArmV7a)  then   //asm
    begin
@@ -180,6 +182,7 @@ begin
      if not DirectoryExists(binutilsPath)  then
      begin
         ShowMessage('Directory not exist! :"'+binutilsPath+'"');
+        Button2.Enabled:= True;
         Exit;
      end;
 
@@ -237,6 +240,7 @@ begin
        if not DirectoryExists(crossBinDIR)  then
        begin
           ShowMessage('Directory not exist! :"'+crossBinDIR+'"');
+          Button2.Enabled:= True;
           Exit;
        end;
 
@@ -271,6 +275,7 @@ begin
      if not DirectoryExists(binutilsPath)  then
      begin
        ShowMessage('Directory not exist! :"'+binutilsPath+'"');
+       Button2.Enabled:= True;
        Exit;
      end;
 
@@ -315,6 +320,7 @@ begin
        if not DirectoryExists(crossBinDIR)  then
        begin
           ShowMessage('Directory not exist! :"'+crossBinDIR+'"');
+          Button2.Enabled:= True;
           Exit;
        end;
 
@@ -334,7 +340,88 @@ begin
        StatusBar1.SimpleText:='Success! FPC cross x86 [Android] was Build!';
      end;
    end;
+
+   if FBuildMode = bmMipsel then   //Mipsel
+   begin
+     //C:\adt32\ndk10e\toolchains\mipsel-linux-android-4.9\prebuilt\windows\bin
+     binutilsPath:= FPathToAndroidNDK+DirectorySeparator+
+                      'toolchains'+DirectorySeparator+
+                      'mipsel-linux-android-4.9'+DirectorySeparator+
+                      'prebuilt'+DirectorySeparator+
+                       FPrebuildOSYS+DirectorySeparator+
+                      'bin';
+
+     if not DirectoryExists(binutilsPath)  then
+     begin
+       ShowMessage('Directory not exist! :"'+binutilsPath+'"');
+       Button2.Enabled:= True;
+       Exit;
+     end;
+
+     //----------brute force ... set path [below] did not work! why?
+     CopyFile(binutilsPath+DirectorySeparator+'mipsel-linux-android-as'+strExt,
+              pathToFpcSource+DirectorySeparator+'compiler'+DirectorySeparator+'mipsel-linux-android-as'+strExt);
+
+     CopyFile(binutilsPath+DirectorySeparator+'mipsel-linux-android-ld.bfd'+strExt,
+                pathToFpcSource+DirectorySeparator+'compiler'+DirectorySeparator+'mipsel-linux-android-ld.bfd'+strExt);
+
+     CopyFile(binutilsPath+DirectorySeparator+'mipsel-linux-android-ld'+strExt,
+              pathToFpcSource+DirectorySeparator+'compiler'+DirectorySeparator+'mipsel-linux-android-ld'+strExt);
+
+     CopyFile(binutilsPath+DirectorySeparator+'mipsel-linux-android-strip'+strExt,
+              pathToFpcSource+DirectorySeparator+'compiler'+DirectorySeparator+'mipsel-linux-android-strip'+strExt);
+     //--------------------
+
+     Params:= TStringList.Create;
+     Params.Delimiter:=' ';
+
+     Tool := TIDEExternalToolOptions.Create;
+     try
+       Tool.Title := 'Running Extern [make] Tool ... ';
+       Tool.WorkingDirectory := pathToFpcSource;
+
+       Params.Add('clean');
+       Params.Add('crossall');
+       Params.Add('crossinstall');
+       Params.Add('FPC='+pathToFpcExecutables+DirectorySeparator+'fpc'+strExt);
+       Params.Add('OS_TARGET=android');
+       Params.Add('CPU_TARGET=mipsel');
+
+       //C:\adt32\ndk10e\toolchains\mipsel-linux-android-4.9\prebuilt\windows\mipsel-linux-android\bin
+       crossBinDIR:= FPathToAndroidNDK+DirectorySeparator+
+                        'toolchains'+DirectorySeparator+
+                        'mipsel-linux-android-4.9'+DirectorySeparator+
+                        'prebuilt'+DirectorySeparator+
+                         FPrebuildOSYS+DirectorySeparator+
+                        'mipsel-linux-android'+DirectorySeparator+
+                        'bin';
+
+       if not DirectoryExists(crossBinDIR)  then
+       begin
+          ShowMessage('Directory not exist! :"'+crossBinDIR+'"');
+          Button2.Enabled:= True;
+          Exit;
+       end;
+
+       Params.Add('CROSSBINDIR='+crossBinDIR);
+       Params.Add('INSTALL_PREFIX='+ pathToFpcSource);
+
+       Tool.Executable := pathToFpcExecutables + DirectorySeparator+ 'make'+strExt;
+       Tool.CmdLineParams :=  Params.DelimitedText;
+       Tool.Scanners.Add(SubToolDefault);
+
+       if not RunExternalTool(Tool) then
+         raise Exception.Create('Cannot Run Extern [make] Tool!');
+
+     finally
+       Tool.Free;
+       Params.Free;
+       StatusBar1.SimpleText:='Success! FPC cross Mipsel [Android] was Build!';
+     end;
+   end;
+
    Button2.Enabled:= False;
+
 end;
 
 procedure TFormBuildFPCCross.Button3Click(Sender: TObject);
@@ -362,6 +449,7 @@ begin
   if  FPCSysTarget = '' then
   begin
     ShowMessage('FPC ".exe" directory not found! [ex:"C:\laz4android\fpc\3.0.0\bin\i386-win32"]');
+    Button3.Enabled:= True;
     Exit
   end;
 
@@ -372,6 +460,7 @@ begin
   if (fpcExecutablesPath = '') or  (fpcPathTrunk = '') or (fpcUnitsPath = '') then
   begin
     ShowMessage('Sorry... Empty Info...');
+    Button3.Enabled:= True;
     Exit;
   end;
 
@@ -398,6 +487,7 @@ begin
     begin
       ShowMessage('Error. '+ sLineBreak+ fpcPathTrunk+DirectorySeparator+'compiler'+DirectorySeparator +'ppcrossarm'+strExt
                    +sLineBreak+'ppcrossarm not Exists. Please, you need "Build" it! ');
+      Button3.Enabled:= True;
       Exit;
     end;
 
@@ -411,6 +501,7 @@ begin
     if not DirectoryExists(binutilsPath)  then
     begin
        ShowMessage('Directory not exist! :"'+binutilsPath+'"');
+       Button3.Enabled:= True;
        Exit;
     end;
 
@@ -456,6 +547,7 @@ begin
     begin
        ShowMessage('Error. '+ sLineBreak+ fpcPathTrunk+DirectorySeparator+'compiler'+DirectorySeparator +'ppcross386'+strExt
                    +sLineBreak+'ppcross386 not Exists. Please, you need "Build" it! ');
+       Button3.Enabled:= True;
        Exit;
     end;
 
@@ -469,6 +561,7 @@ begin
     if not DirectoryExists(binutilsPath)  then
     begin
        ShowMessage('Directory not exist! :"'+binutilsPath+'"');
+       Button3.Enabled:= True;
        Exit;
     end;
 
@@ -494,6 +587,67 @@ begin
 
     ShowMessage('FPC cross x86 [android] installed!');
     StatusBar1.SimpleText:='Success! FPC cross x86 [android] Installed!';
+    //Self.Close;
+  end;
+
+
+  if FBuildMode = bmMipsel then // mipsel
+  begin
+    if FileExists(fpcPathTrunk+DirectorySeparator+
+             'bin'+DirectorySeparator +
+             FPCSysTarget+DirectorySeparator+
+             'ppcrossmipsel'+strExt) then
+    begin
+       CopyFile(fpcPathTrunk+DirectorySeparator+
+             'bin'+DirectorySeparator +
+             FPCSysTarget+DirectorySeparator+
+             'ppcrossmipsel'+strExt,
+             fpcExecutablesPath+DirectorySeparator+'ppcrossmipsel'+strExt);
+    end
+    else
+    begin
+       ShowMessage('Error. '+ sLineBreak+ fpcPathTrunk+DirectorySeparator+'compiler'+DirectorySeparator +'ppcrossmipsel'+strExt
+                   +sLineBreak+'ppcrossmipsel not Exists. Please, you need "Build" it! ');
+       Button3.Enabled:= True;
+       Exit;
+    end;
+
+    binutilsPath:= pathToNDK+DirectorySeparator+
+                     'toolchains'+DirectorySeparator+
+                     'mipsel-linux-android-4.9'+DirectorySeparator+
+                     'prebuilt'+DirectorySeparator+
+                      FPrebuildOSYS+DirectorySeparator+
+                     'bin';
+
+    if not DirectoryExists(binutilsPath)  then
+    begin
+       ShowMessage('Directory not exist! :"'+binutilsPath+'"');
+       Button3.Enabled:= True;
+       Exit;
+    end;
+
+    CopyFile(binutilsPath+DirectorySeparator+'mipsel-linux-android-as'+strExt,
+               fpcExecutablesPath+DirectorySeparator+'mipsel-linux-android-as'+strExt);
+
+    CopyFile(binutilsPath+DirectorySeparator+'mipsel-linux-android-ld.bfd'+strExt,
+               fpcExecutablesPath+DirectorySeparator+'mipsel-linux-android-ld.bfd'+strExt);
+
+    CopyFile(binutilsPath+DirectorySeparator+'mipsel-linux-android-ld'+strExt,
+               fpcExecutablesPath+DirectorySeparator+'mipsel-linux-android-ld'+strExt);
+
+    CopyFile(binutilsPath+DirectorySeparator+'mipsel-linux-android-strip'+strExt,
+               fpcExecutablesPath+DirectorySeparator+'mipsel-linux-android-strip'+strExt);
+
+    ForceDirectories(fpcUnitsPath + DirectorySeparator + 'mipsel-android');
+
+    CopyCrossUnits(fpcPathTrunk + DirectorySeparator +
+               'units'+DirectorySeparator+
+               'mipsel-android',    //C:\adt32\fpctrunk300\units\mipsel-android
+               fpcUnitsPath+ DirectorySeparator+
+               'mipsel-android'); // C:\laz4android\fpc\3.1.1\units\mipsel-android
+
+    ShowMessage('FPC cross Mipsel [android] installed!');
+    StatusBar1.SimpleText:='Success! FPC cross Mipsel [android] Installed!';
     //Self.Close;
   end;
 
@@ -547,6 +701,7 @@ begin
         bmArmV6: GroupBox3.Caption:= 'Install Cross ArmV6 Android';
         bmArmV7a: GroupBox3.Caption:= 'Install Cross ArmV7a Android';
         bmX86: GroupBox3.Caption:= 'Install Cross x86 Android';
+        bmMipsel: GroupBox3.Caption:= 'Install Cross Mipsel Android';
      end;
   end;
 
@@ -561,13 +716,13 @@ begin
     1: begin FBuildMode:= bmArmV7a; FFPUSet:='Soft';  end;
     2: begin FBuildMode:= bmArmV7a; FFPUSet:='VFPv3'; end;
     3: FBuildMode:= bmX86;
+    4: FBuildMode:= bmMipsel;
   end;
 
   if FPathToAndroidNDK <> '' then
     FPrebuildOSYS:= GetPrebuiltArmDirectory();
 
 end;
-
 
 procedure TFormBuildFPCCross.SpeedButton2Click(Sender: TObject);
 begin

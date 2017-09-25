@@ -33,9 +33,9 @@ object FormBuildFPCCross: TFormBuildFPCCross
       Height = 395
       Top = 0
       Width = 420
-      ActivePage = TabSheet2
+      ActivePage = TabSheet3
       Align = alClient
-      TabIndex = 0
+      TabIndex = 1
       TabOrder = 0
       OnChange = PageControl1Change
       object TabSheet2: TTabSheet
@@ -44,11 +44,11 @@ object FormBuildFPCCross: TFormBuildFPCCross
         ClientWidth = 412
         object GroupBox2: TGroupBox
           Left = 3
-          Height = 216
+          Height = 232
           Top = 104
           Width = 400
           Caption = 'Configure Paths'
-          ClientHeight = 196
+          ClientHeight = 212
           ClientWidth = 396
           TabOrder = 0
           object Label3: TLabel
@@ -108,7 +108,7 @@ object FormBuildFPCCross: TFormBuildFPCCross
           end
           object RadioGroupInstruction: TRadioGroup
             Left = 8
-            Height = 66
+            Height = 85
             Top = 120
             Width = 231
             AutoFill = True
@@ -123,7 +123,7 @@ object FormBuildFPCCross: TFormBuildFPCCross
             ChildSizing.ShrinkVertical = crsScaleChilds
             ChildSizing.Layout = cclLeftToRightThenTopToBottom
             ChildSizing.ControlsPerLine = 2
-            ClientHeight = 46
+            ClientHeight = 65
             ClientWidth = 227
             Columns = 2
             ItemIndex = 0
@@ -132,6 +132,7 @@ object FormBuildFPCCross: TFormBuildFPCCross
               'ArmV7a + Soft'
               'ArmV7a + VFPv3'
               'x86'
+              'Mipsel'
             )
             OnClick = RadioGroupInstructionClick
             TabOrder = 3

@@ -1505,9 +1505,10 @@ asm
 end;
 {$elseif defined(Android)}
 asm
-  asr r0,r0,r1
+   {$ifndef cpumipsel}
+     asr r0,r0,r1     //error in mipsel....
+   {$ifend}
 end;
-
 {$ifend}
 
 { TNjDecoder }

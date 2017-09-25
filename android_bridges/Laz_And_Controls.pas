@@ -394,9 +394,7 @@ type
 
    function Send(toNumber: string;  msg: string; multipartMessage: Boolean = False): integer; overload;
    function Send(toNumber: string;  msg: string; packageDeliveredAction: string; multipartMessage: Boolean = False): integer; overload;
-
    function Send(toName: string; multipartMessage: Boolean = False): integer; overload;
-
 
    function Read(intentReceiver: jObject; addressBodyDelimiter: string): string;
    // Property
@@ -1848,7 +1846,7 @@ Function  Asset_SaveToFile(srcFile, outFile : String; SkipExists : Boolean = Fal
 // PkgName  '/data/app/com/kredix-1.apk'
 // srcFile  'assets/test.txt'
 // outFile  '/data/data/com/kredix/files/test.txt'
-Function  Asset_SaveToFileP(srcFile, outFile : string; SkipExists : Boolean = False) : Boolean;
+Function Asset_SaveToFileP(srcFile, outFile : string; SkipExists : Boolean = False) : Boolean;
  Var
   Stream : TMemoryStream;
  begin
@@ -1860,7 +1858,6 @@ Function  Asset_SaveToFileP(srcFile, outFile : string; SkipExists : Boolean = Fa
   Stream.free;
   Result := FileExists(outFile);
  end;
-
 //-----------
 Function IntToWebViewStatus( EventType : Integer ) : TWebViewStatus;
  begin

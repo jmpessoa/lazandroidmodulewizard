@@ -106,7 +106,7 @@ Function  _glRGBA              ( R,G,B,A : Single  ) : TgfRGBA;
 Procedure _glLighting          ( Active : Boolean );
 Procedure _gluPerspective      ( fovy,aspect,zNear,zFar : Single);
 Function  _glTexture_Load_wPas (ImgName : String; Var Img : GLuint) : Boolean;
-Function  _glTexture_Load_wJava(env:PJNIEnv;this:jobject;ImgName : String; Var Img : GLuint) : Boolean;
+Function  _glTexture_Load_wJava(env:PJNIEnv; this:jobject;ImgName : String; Var Img : GLuint) : Boolean;
 Function  _glTexture_Free      (Var Img : GLuint) : Boolean;
 //
 Function  mulM4x4  (const A,B : TM4x4 ) : TM4x4;
