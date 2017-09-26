@@ -989,8 +989,8 @@ type
     procedure GenEvent_OnBeforeDispatchDraw(Obj: TObject; canvas: JObject; tag: integer);
     procedure GenEvent_OnAfterDispatchDraw(Obj: TObject; canvas: JObject; tag: integer);
 
-    function  GetText            : string;   override;
-    Procedure SetText     (Value   : string );  override;
+    function  GetText: string; override;
+    Procedure SetText(Value: string ); override;
     Procedure SetEnabled(Value: boolean); override;
   public
     constructor Create(AOwner: TComponent); override;
@@ -1021,7 +1021,7 @@ type
     property FontColor : TARGBColorBridge read FFontColor write SetFontColor;
     property FontSize  : DWord     read FFontSize  write SetFontSize;
     property FontSizeUnit: TFontSizeUnit read FFontSizeUnit write SetFontSizeUnit;
-    property Enabled  : boolean   read FEnabled  write SetEnabled;
+    property Enabled: boolean read FEnabled write SetEnabled;
     // Event
     property OnClick   : TOnNotify read FOnClick   write FOnClick;
     property OnBeforeDispatchDraw: TOnBeforeDispatchDraw read FOnBeforeDispatchDraw write FOnBeforeDispatchDraw;
@@ -3004,7 +3004,7 @@ begin
   FWidth        := 51;
   FLParamWidth  := lpWrapContent;
   FLParamHeight := lpWrapContent;
-
+  FEnabled:= True;
 end;
 
 //
@@ -3120,7 +3120,8 @@ begin
   if FColor <> colbrDefault then
     View_SetBackGroundColor(FjEnv, FjThis, FjObject , GetARGB(FCustomColor, FColor));
 
-  jTextView_setEnabled(FjEnv, FjObject , FEnabled);
+  if FEnabled =  False then
+     jTextView_setEnabled(FjEnv, FjObject , False);
 
   jTextView_setFontAndTextTypeFace(FjEnv, FjObject, Ord(FFontFace), Ord(FTextTypeFace));
 
@@ -4343,7 +4344,6 @@ begin
                                             FMarginLeft,FMarginTop,FMarginRight,FMarginBottom,
                                             GetLayoutParams(gApp, FLParamWidth, sdW),
                                             GetLayoutParams(gApp, FLParamHeight, sdH));
-
   if FParent is jPanel then
   begin
      Self.UpdateLayout();
@@ -4386,8 +4386,8 @@ begin
 
   View_SetVisible(FjEnv, FjThis, FjObject , FVisible);
 
-  if FEnabled <> True then
-      jButton_SetEnable(FjEnv, FjObject , False);
+  if FEnabled = False then
+     jButton_SetEnabled(FjEnv, FjObject , False);
 
 end;
 
@@ -4631,7 +4631,7 @@ begin
     //in designing component state: set value here...
   FEnabled:= Value;
   if FInitialized then
-     jButton_SetEnable(FjEnv, FjObject, Value);
+     jButton_SetEnabled(FjEnv, FjObject, Value);
 end;
 
 procedure jButton.ResetAllRules();

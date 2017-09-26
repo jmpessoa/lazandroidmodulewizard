@@ -1,4 +1,4 @@
-package com.example.appspinnerdemo;
+package org.lamw.apptextureviewdemo1;
 
 import java.lang.reflect.Field;
 
@@ -39,7 +39,7 @@ public class jTextView extends TextView {
     private OnClickListener onClickListener;
     private OnLongClickListener onLongClickListener;
     
-    private Boolean         enabled  = true;  
+    private Boolean  mEnabled  = true;  
 
     float mTextSize = 0; 
     int mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_SP; 
@@ -60,7 +60,7 @@ public class jTextView extends TextView {
 
         onClickListener = new OnClickListener() {
             public  void onClick(View view) {
-                if (enabled) {
+                if (mEnabled) {
                     controls.pOnClick(LAMWCommon.getPasObj(), Const.Click_Default);
                 }
             };
@@ -74,7 +74,7 @@ public class jTextView extends TextView {
 			@Override
 			public boolean onLongClick(View arg0) {
 				// TODO Auto-generated method stub				
-				   if (enabled) {
+				   if (mEnabled) {
 	                    controls.pOnLongClick(LAMWCommon.getPasObj(), Const.Click_Default);
 	               }								
 				   return false;  //true if the callback consumed the long click, false otherwise. 
@@ -205,8 +205,9 @@ public class jTextView extends TextView {
         this.setText(item.getText().toString());
     }
 
-    public  void SetEnabled( boolean value ) {
-        enabled = value;
+    public  void SetEnabled( boolean value ) {    	
+    	mEnabled = value;
+        this.setEnabled(value);
     }
 
     public void SetTextTypeFace(int _typeface) {
@@ -264,7 +265,9 @@ public class jTextView extends TextView {
 		controls.pOnBeforeDispatchDraw(LAMWCommon.getPasObj(), canvas, 1);  //event handle by pascal side		
 	    super.dispatchDraw(canvas);	    
 	    //DO YOUR DRAWING ON TOP OF THIS VIEWS CHILDREN
-	    controls.pOnAfterDispatchDraw(LAMWCommon.getPasObj(), canvas, 1);	 //event handle by pascal side    
+	    controls.pOnAfterDispatchDraw(LAMWCommon.getPasObj(), canvas, 1);	 //event handle by pascal side
+	    
+	    if (!mEnabled) this.setEnabled(false); 
 	}
 	
 	private Drawable GetDrawableResourceById(int _resID) {

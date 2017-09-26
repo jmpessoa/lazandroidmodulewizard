@@ -326,7 +326,7 @@ procedure jButton_SetCompoundDrawables(env: PJNIEnv; _jbutton: JObject; _imageRe
 procedure jButton_SetRoundCorner(env: PJNIEnv; _jbutton: JObject);
 procedure jButton_SetRadiusRoundCorner(env: PJNIEnv; _jbutton: JObject; _radius: integer);
 procedure jButton_SetFontFromAssets(env: PJNIEnv; _jbutton: JObject; _fontName: string);
-procedure jButton_SetEnable(env: PJNIEnv; _jbutton: JObject; Value: boolean);
+procedure jButton_SetEnabled(env: PJNIEnv; _jbutton: JObject; Value: boolean);
 procedure jButton_ClearLayoutAll(env: PJNIEnv; _jbutton: JObject);
 
 // CheckBox
@@ -3320,7 +3320,7 @@ begin
   env^.DeleteLocalRef(env, jCls);
 end;
 
-procedure jButton_SetEnable(env: PJNIEnv; _jbutton: JObject; Value: boolean);
+procedure jButton_SetEnabled(env: PJNIEnv; _jbutton: JObject; Value: boolean);
 var
   jParams: array[0..0] of jValue;
   jMethod: jMethodID=nil;
@@ -3328,7 +3328,7 @@ var
 begin
   jParams[0].z:= JBool(Value);
   jCls:= env^.GetObjectClass(env, _jbutton);
-  jMethod:= env^.GetMethodID(env, jCls, 'SetEnable', '(Z)V');
+  jMethod:= env^.GetMethodID(env, jCls, 'SetEnabled', '(Z)V');
   env^.CallVoidMethodA(env, _jbutton, jMethod, @jParams);
   env^.DeleteLocalRef(env, jCls);
 end;
