@@ -89,7 +89,10 @@ type
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
     procedure InvalidateRect(Sender: TObject; ARect: TRect; Erase: boolean);
-    function AssetsDir: string;
+    function RootDir: string;
+    function AssetsDir: string; inline;
+    function ResDir: string; inline;
+    function FindDrawable(AResourceName: string): string;
     property AndroidForm: jForm read GetAndroidForm;
     property AndroidTheme: TAndroidTheme read FTheme;
     property ImageCache: TImageCache read FImageCache;
@@ -460,7 +463,7 @@ type
 
   TImageIndexPropertyEditor = class(TIntegerPropertyEditor)
   private
-    FAssetsPath: string;
+    FAssetsDir: string;
     FImageCache: TImageCache;
     FImages: jImageList;
     function GetImageList: jImageList;
@@ -472,6 +475,14 @@ type
     procedure SetValue(const NewValue: ansistring); override;
     procedure ListDrawValue(const CurValue: ansistring; Index:integer;
       ACanvas: TCanvas;  const ARect: TRect; AState: TPropEditDrawState); override;
+  end;
+
+  { TImageIdentifierPropertyEditor }
+
+  TImageIdentifierPropertyEditor = class(TStringPropertyEditor)
+  public
+    function GetAttributes: TPropertyAttributes; override;
+    procedure GetValues(Proc: TGetStrProc); override;
   end;
 
   { TjCustomDialogComponentEditor }
@@ -487,12 +498,17 @@ implementation
 
 uses
   LCLIntf, LCLType, strutils, ObjInspStrConsts, IDEMsgIntf, LazIDEIntf,
-  IDEExternToolIntf, laz2_XMLRead, LazFileUtils, FPimage, typinfo,
+  IDEExternToolIntf, laz2_XMLRead, FileUtil, LazFileUtils, FPimage, typinfo,
   uFormSizeSelect, LamwSettings, SmartDesigner, jImageListEditDlg, NinePatchPNG,
   customdialog, togglebutton, switchbutton,
   Laz_And_GLESv1_Canvas, Laz_And_GLESv2_Canvas, gridview, Spinner, seekbar,
   radiogroup, ratingbar, digitalclock, analogclock, surfaceview,
   autocompletetextview, drawingview, chronometer, viewflipper, videoview, comboedittext;
+
+const
+  DrawableSearchPaths: array [0..3] of string = (
+    'drawable-mdpi', 'drawable-ldpi', 'drawable-hdpi', 'drawable-xhdpi'
+  );
 
 var
   DraftClassesMap: TDraftControlHash;
@@ -560,6 +576,53 @@ procedure RegisterAndroidWidgetDraftClass(AWidgetClass: jVisualControlClass;
   ADraftClass: TDraftWidgetClass);
 begin
   DraftClassesMap.Add(AWidgetClass, ADraftClass);
+end;
+
+{ TImageIdentifierPropertyEditor }
+
+function TImageIdentifierPropertyEditor.GetAttributes: TPropertyAttributes;
+begin
+  Result := [paValueList, paRevertable];
+end;
+
+procedure TImageIdentifierPropertyEditor.GetValues(Proc: TGetStrProc);
+var
+  o: TPersistent;
+  d: TAndroidWidgetMediator;
+  imgs, files: TStringList;
+  i, j: Integer;
+begin
+  Proc('');
+
+  o := GetComponent(0);
+  if not (o is TComponent) then
+    Exit;
+  o := TComponent(o).Owner;
+  if not (o is TAndroidForm) then
+    Exit;
+  d := TAndroidForm(o).Designer as TAndroidWidgetMediator;
+
+  imgs := TStringList.Create;
+  try
+    imgs.Sorted := True;
+    imgs.Duplicates := dupIgnore;
+    files := TStringList.Create;
+    try
+      for i := Low(DrawableSearchPaths) to High(DrawableSearchPaths) do
+      begin
+        files.Clear;
+        FindAllFiles(files, d.ResDir + PathDelim + DrawableSearchPaths[i], '*.png;*.jpg', False);
+        for j := 0 to files.Count - 1 do
+          imgs.Add(ExtractFileNameOnly(files[j]));
+      end;
+    finally
+      files.Free;
+    end;
+    for i := 0 to imgs.Count - 1 do
+      Proc(imgs[i]);
+  finally
+    imgs.Free;
+  end;
 end;
 
 { TDraftDrawableWidget }
@@ -672,7 +735,6 @@ procedure TImageIndexPropertyEditor.GetAssets;
 var
   o: TPersistent;
   d: TAndroidWidgetMediator;
-  pr: TLazProjectFile;
 begin
   o := GetComponent(0);
   if not (o is TComponent) then
@@ -681,13 +743,7 @@ begin
   if not (o is TAndroidForm) then
     Exit;
   d := TAndroidForm(o).Designer as TAndroidWidgetMediator;
-  pr := LazarusIDE.GetProjectFileWithRootComponent(TComponent(o));
-  if pr = nil then
-    Exit;
-  if not (pr.GetFileOwner is TLazProject) then
-    Exit;
-  FAssetsPath := ExtractFilePath(TLazProject(pr.GetFileOwner).MainFile.GetFullFilename);
-  FAssetsPath := System.Copy(FAssetsPath, 1, RPosEx(PathDelim, FAssetsPath, Length(FAssetsPath) - 1)) + 'assets' + PathDelim;
+  FAssetsDir := d.AssetsDir;
   FImageCache := d.ImageCache;
 end;
 
@@ -752,7 +808,7 @@ begin
   if Assigned(FImages) and Assigned(FImageCache)
   and (Index >= 0) and (Index < FImages.Images.Count) then
   begin
-    bmp := FImageCache.GetImageAsBMP(FAssetsPath + FImages.Images[Index]);
+    bmp := FImageCache.GetImageAsBMP(FAssetsDir + FImages.Images[Index]);
     ACanvas.StretchDraw(Rect(R.Left+1, R.Top+1, R.Left+x+1, R.Top+x+1), bmp);
   end;
   R.Left := R.Left + x + 3;
@@ -1332,12 +1388,40 @@ begin
   LCLIntf.InvalidateRect(LCLForm.Handle,@ARect,Erase);
 end;
 
-function TAndroidWidgetMediator.AssetsDir: string;
+function TAndroidWidgetMediator.RootDir: string;
 begin
   if FProjFile = nil then
     raise Exception.CreateFmt('Project file for %s is not available!', [Root.Name]);
   Result := ExtractFilePath(TLazProject(FProjFile.GetFileOwner).MainFile.GetFullFilename);
-  Result := Copy(Result, 1, RPosEx(PathDelim, Result, Length(Result) - 1)) + 'assets' + PathDelim;
+  Result := Copy(Result, 1, RPosEx(PathDelim, Result, Length(Result) - 1));
+end;
+
+function TAndroidWidgetMediator.AssetsDir: string;
+begin
+  Result := RootDir + 'assets' + PathDelim;
+end;
+
+function TAndroidWidgetMediator.ResDir: string;
+begin
+  Result := RootDir + 'res' + PathDelim;
+end;
+
+function TAndroidWidgetMediator.FindDrawable(AResourceName: string): string;
+const
+  ResExts: array [0..1] of string = ('.png', '.jpg');
+var
+  AResDir: string;
+  i, j: Integer;
+begin
+  AResDir := ResDir;
+  for i := Low(DrawableSearchPaths) to High(DrawableSearchPaths) do
+    for j := Low(ResExts) to High(ResExts) do
+    begin
+      Result := AResDir + DrawableSearchPaths[i] + PathDelim
+        + AResourceName + ResExts[j];
+      if FileExists(Result) then Exit;
+    end;
+  Result := '';
 end;
 
 procedure TAndroidWidgetMediator.GetObjInspNodeImageIndex(APersistent: TPersistent; var AIndex: integer);
@@ -2659,6 +2743,12 @@ begin
     Result := FImage
   else
     with jImageBtn(FAndroidWidget) do
+    begin
+      if ImageUpIdentifier <> '' then
+      begin
+        FImage := Designer.ImageCache.GetImageAsPNG(Designer.FindDrawable(ImageUpIdentifier));
+        Result := FImage;
+      end else
       if (Images <> nil)
       and (IndexImageUp >= 0) and (IndexImageUp < Images.Count) then
       begin
@@ -2666,6 +2756,7 @@ begin
         Result := FImage;
       end else
         Result := nil;
+    end;
 end;
 
 constructor TDraftImageBtn.Create(AWidget: TAndroidWidget; Canvas: TCanvas);
@@ -3424,6 +3515,8 @@ initialization
   RegisterComponentEditor(jCustomDialog, TjCustomDialogComponentEditor);
   RegisterPropertyEditor(TypeInfo(TImageListIndex), jControl, '', TImageIndexPropertyEditor);
   RegisterPropertyEditor(TypeInfo(jImageList), nil, '', TImageListPropertyEditor);
+  RegisterPropertyEditor(TypeInfo(string), jImageBtn, 'ImageUpIdentifier', TImageIdentifierPropertyEditor);
+  RegisterPropertyEditor(TypeInfo(string), jImageBtn, 'ImageDownIdentifier', TImageIdentifierPropertyEditor);
 
   // DraftClasses registeration:
   //  * default drawing and anchoring => use TDraftWidget
