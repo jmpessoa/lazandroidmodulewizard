@@ -1010,11 +1010,8 @@ begin
   sl := TStringList.Create;
   try
     for i := 0 to p.ChildCount - 1 do
-
-    //if not (p is jCustomDialog) then   //commented by jmpessoa
-      if not (p.Children[i] is jCustomDialog) then   //fixed by jmpessoa
+      if not (p.Children[i] is jCustomDialog) then
         sl.Add(p.Children[i].Name);
-
     sl.Sorted := True;
     for i := 0 to PropCount - 1 do
     begin
@@ -1197,7 +1194,7 @@ begin
 
   FDefaultBrushColor := clWhite;
   FDefaultPenColor := clMedGray;
-  FDefaultFontColor := clMedGray;
+  FDefaultFontColor := clBlack;
 
   GlobalDesignHook.AddHandlerModified(@OnDesignerModified);
   GlobalDesignHook.AddHandlerPersistentAdded(@OnPersistentAdded);
@@ -2132,7 +2129,7 @@ begin
         StretchDraw(r, Drawable);
     end else begin
       if BackGroundColor = clNone then
-        Brush.Color := BlendColors(ToTColor(GetParentBackgroundColor), 2/5, 153, 153, 153);
+        Brush.Color := BlendColors(GetBackgroundColor, 2/5, 153, 153, 153);
       FillRect(r);
 
       //outer frame
@@ -2269,6 +2266,7 @@ begin
   BaseStyle := 'editTextStyle';
   DrawableDest := 'android:background';
   DrawableAttribs :=
+    'android:state_focused=true;' +
     'android:state_enabled=' + IfThen(jEditText(AWidget).Enabled, 'true', '!true') + ';' +
     'android:state_multiline=' + IfThen(jEditText(AWidget).MaxLines > 1, 'true', '!true');
   inherited;
