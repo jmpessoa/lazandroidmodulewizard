@@ -19,6 +19,8 @@ TIntentActionFiter = (afTimeTick,
                    afShutDown,
                    afSMSReceived,
                    afDownloadComplete,  //android.intent.action.DOWNLOAD_COMPLETE  or DownloadManager.ACTION_DOWNLOAD_COMPLETE
+                   afPhoneState,
+                   afNewOutgoingCall,      //android.intent.action.NEW_OUTGOING_CALL
                    afNone);
 
 

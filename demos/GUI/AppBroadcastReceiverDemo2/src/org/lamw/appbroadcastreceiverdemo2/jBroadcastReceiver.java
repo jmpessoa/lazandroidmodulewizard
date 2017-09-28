@@ -1,4 +1,4 @@
-package com.example.appbroadcastreceiverdemo1;
+package org.lamw.appbroadcastreceiverdemo2;
 
 import android.app.Activity;
 import android.app.DownloadManager;
