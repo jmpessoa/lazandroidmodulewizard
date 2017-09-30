@@ -559,19 +559,36 @@ begin
      list.DelimitedText:= FPathToAndroidProject + 'dummy';
      aux:= StringReplace(auxList.Text,'WAPPNAME',  list.Strings[list.Count-2], [rfIgnoreCase]);
      auxList.Text:= aux;
-     auxList.SaveToFile(FPathToAndroidProject+'res'+DirectorySeparator+'layout'+DirectorySeparator+'smswigetlayout.xml');
+     if jclassname = 'jSMSWidgetProvider' then
+       auxList.SaveToFile(FPathToAndroidProject+'res'+DirectorySeparator+'layout'+DirectorySeparator+'smswidgetlayout.xml');
+     if jclassname = 'jIncommingCallWidgetProvider' then
+       auxList.SaveToFile(FPathToAndroidProject+'res'+DirectorySeparator+'layout'+DirectorySeparator+'incommingcallwidgetlayout.xml');
    end;
    //-----
+
    if FileExists(LamwGlobalSettings.PathToJavaTemplates+'lamwdesigner'+DirectorySeparator +jclassname+'.smswidgetinfo') then
    begin
      auxList.LoadFromFile(LamwGlobalSettings.PathToJavaTemplates+'lamwdesigner'+DirectorySeparator +jclassname+'.smswidgetinfo');
      ForceDirectories(FPathToAndroidProject+'res'+DirectorySeparator+'xml');
      auxList.SaveToFile(FPathToAndroidProject+'res'+DirectorySeparator+'xml'+DirectorySeparator+'smswidgetinfo.xml');
    end;
+
+   if FileExists(LamwGlobalSettings.PathToJavaTemplates+'lamwdesigner'+DirectorySeparator +jclassname+'.incommingcallwidgetinfo') then
+   begin
+     auxList.LoadFromFile(LamwGlobalSettings.PathToJavaTemplates+'lamwdesigner'+DirectorySeparator +jclassname+'.incommingcallwidgetinfo');
+     ForceDirectories(FPathToAndroidProject+'res'+DirectorySeparator+'xml');
+     auxList.SaveToFile(FPathToAndroidProject+'res'+DirectorySeparator+'xml'+DirectorySeparator+'incommingcallwidgetinfo.xml');
+   end;
+
    if FileExists(LamwGlobalSettings.PathToJavaTemplates+'lamwdesigner'+DirectorySeparator +jclassname+'.jpg') then
    begin
-     CopyFile(LamwGlobalSettings.PathToJavaTemplates+'lamwdesigner'+DirectorySeparator +jclassname+'.jpg',
+     if jclassname = 'jSMSWidgetProvider' then
+       CopyFile(LamwGlobalSettings.PathToJavaTemplates+'lamwdesigner'+DirectorySeparator +jclassname+'.jpg',
               FPathToAndroidProject+'res'+DirectorySeparator+'drawable-hdpi'+DirectorySeparator+'smswidgetbackgroundimage.jpg');
+
+     if jclassname = 'jIncommingCallWidgetProvider' then
+       CopyFile(LamwGlobalSettings.PathToJavaTemplates+'lamwdesigner'+DirectorySeparator +jclassname+'.jpg',
+           FPathToAndroidProject+'res'+DirectorySeparator+'drawable-hdpi'+DirectorySeparator+'incommingcallwidgetbackgroundimage.jpg');
    end;
    //-----
    if listRequirements.Count > 0 then
@@ -581,8 +598,6 @@ begin
    listRequirements.Free;
    list.Free;
    auxList.Free;
-
-   //if doUpdateLPR then UpdateLPRProject;
 
 end;
 
@@ -892,7 +907,7 @@ begin
   aux := LazarusIDE.ActiveProject.LazCompilerOptions.CustomOptions;
   if Pos('-CpARMV6', aux) > 0 then chipArchitecture:= 'armeabi'
   else if Pos('-CpARMV7A', aux) > 0 then chipArchitecture:= 'armeabi-v7a'
-  else if Pos('-XPmipsel', aux) > 0 then chipArchitecture:= 'mipsel';
+  else if Pos('-XPmipsel', aux) > 0 then chipArchitecture:= 'mips';
 
   auxList:= TStringList.Create;
 
@@ -990,8 +1005,8 @@ begin
 
         if Pos('armeabi', chipArchitecture) > 0 then
            arch:= 'arch-arm'
-        else
-           arch:= 'arch-x86';
+        else if Pos('x86', chipArchitecture) > 0 then arch:= 'arch-x86'
+        else if Pos('mips', chipArchitecture) > 0 then arch:= 'arch-mips';
 
                                 //C:\adt32\ndk10e\platforms\android-15\arch-arm\usr\lib
         pathToNdkApiPlatforms:= FPathToAndroidNDK+'platforms'+DirectorySeparator+

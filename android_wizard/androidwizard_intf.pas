@@ -218,7 +218,7 @@ begin
       CreateDir(FAndroidProjectName+DirectorySeparator+'libs'+DirectorySeparator+'armeabi');
       CreateDir(FAndroidProjectName+DirectorySeparator+'libs'+DirectorySeparator+'armeabi-v7a');
       CreateDir(FAndroidProjectName+DirectorySeparator+'libs'+DirectorySeparator+'x86');
-      CreateDir(FAndroidProjectName+DirectorySeparator+'libs'+DirectorySeparator+'mipsel');
+      CreateDir(FAndroidProjectName+DirectorySeparator+'libs'+DirectorySeparator+'mips');
       CreateDir(FAndroidProjectName+DirectorySeparator+'obj');
 
       if FModuleType = 2 then //default
@@ -447,7 +447,7 @@ begin
       CreateDir(FAndroidProjectName+DirectorySeparator+'libs'+DirectorySeparator+'armeabi');
       CreateDir(FAndroidProjectName+DirectorySeparator+'libs'+DirectorySeparator+'armeabi-v7a');
       CreateDir(FAndroidProjectName+DirectorySeparator+'libs'+DirectorySeparator+'x86');
-      CreateDir(FAndroidProjectName+DirectorySeparator+'libs'+DirectorySeparator+'mipsel');
+      CreateDir(FAndroidProjectName+DirectorySeparator+'libs'+DirectorySeparator+'mips');
       CreateDir(FAndroidProjectName+DirectorySeparator+'obj');
 
       if  FModuleType < 2 then
@@ -1468,7 +1468,7 @@ begin
         CreateDir(FAndroidProjectName+DirectorySeparator+'libs'+DirectorySeparator+'armeabi');
         CreateDir(FAndroidProjectName+DirectorySeparator+'libs'+DirectorySeparator+'armeabi-v7a');
         CreateDir(FAndroidProjectName+DirectorySeparator+'libs'+DirectorySeparator+'x86');
-        CreateDir(FAndroidProjectName+DirectorySeparator+'libs'+DirectorySeparator+'mipsel');
+        CreateDir(FAndroidProjectName+DirectorySeparator+'libs'+DirectorySeparator+'mips');
         CreateDir(FAndroidProjectName+DirectorySeparator+'obj');
         CreateDir(FAndroidProjectName+DirectorySeparator+'lamwdesigner');
 
