@@ -2015,7 +2015,7 @@ begin
   libraries_x86:= PathToNdkPlatformsX86+';'+pathToNdkToolchainsX86;
   libraries_mips:= PathToNdkPlatformsMips+';'+pathToNdkToolchainsMips;
 
-  if Pos('Mips', FInstructionSet) > 0 then
+  if Pos('Mipsel', FInstructionSet) > 0 then
   begin
      AProject.LazCompilerOptions.TargetCPU:= 'mipsel';    {-P}
      AProject.LazCompilerOptions.Libraries:= libraries_mips;
@@ -2074,7 +2074,7 @@ begin
   auxStr:= 'armeabi';  //ARMv6
   if FInstructionSet = 'ARMv7a' then auxStr:='armeabi-v7a';
   if FInstructionSet = 'x86' then auxStr:='x86';
-  if FInstructionSet = 'Mipsel' then auxStr:='mipsel';
+  if FInstructionSet = 'Mipsel' then auxStr:='mips';
 
   //if FInstructionSet <> 'x86' then
   if Pos('ARM', FInstructionSet) > 0 then
