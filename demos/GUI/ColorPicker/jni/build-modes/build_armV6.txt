@@ -1,0 +1,3 @@
+<Libraries Value="C:\lamw\android-ndk-r10e\platforms\android-14\arch-arm\usr\lib;C:\lamw\android-ndk-r10e\toolchains\arm-linux-androideabi-4.9\prebuilt\windows\lib\gcc\arm-linux-androideabi\4.9"/>
+<TargetCPU Value="arm"/>
+<CustomOptions Value="-Xd -CfSoft -CpARMV6 -XParm-linux-androideabi- -FDC:\lamw\android-ndk-r10e\toolchains\arm-linux-androideabi-4.9\prebuilt\windows\bin"/>
