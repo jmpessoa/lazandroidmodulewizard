@@ -5,9 +5,10 @@ unit AndroidProjOptions;
 interface
 
 uses
-  Classes, SysUtils, LazFileUtils, laz2_XMLRead, Laz2_DOM, AvgLvlTree,
-  IDEOptionsIntf, ProjectIntf, Forms, Controls, Dialogs, Grids, StdCtrls,
-  LResources, ExtCtrls, Spin, ComCtrls, Buttons;
+  Classes, SysUtils, Types, strings, LazFileUtils, laz2_XMLRead, Laz2_DOM,
+  AvgLvlTree, IDEOptionsIntf, ProjectIntf, SourceChanger, Forms, Controls,
+  Dialogs, Grids, StdCtrls, LResources, ExtCtrls, Spin, ComCtrls, Buttons,
+  Themes;
 
 type
 
@@ -27,7 +28,9 @@ type
     FLabelAvailable: Boolean;
     FLabel, FRealLabel: string;
     FIconFileName: string;
+    FTheme: string;
     function GetString(const XMLPath, Ref: string; out Res: string): Boolean;
+    function GetThemeName: string;
     procedure SetString(const XMLPath, Ref, NewValue: string);
     procedure Clear;
     procedure UpdateBuildXML;
@@ -38,6 +41,8 @@ type
     procedure Load(AFileName: string);
     procedure Save;
 
+    function GetThemeName(API: Integer): string;
+
     property Permissions: TStringList read FPermissions;
     property PermNames: TStringToStringTree read FPermNames;
     property MinSDKVersion: Integer read FMinSdkVersion write FMinSdkVersion;
@@ -46,6 +51,7 @@ type
     property VersionName: string read FVersionName write FVersionName;
     property AppLabel: string read FRealLabel write FRealLabel;
     property IconFileName: string read FIconFileName;
+    property ThemeName: string read GetThemeName;
   end;
 
   { TLamwProjectOptions }
@@ -58,6 +64,7 @@ type
     ErrorPanel: TPanel;
     gbVersion: TGroupBox;
     GroupBox1: TGroupBox;
+    ImageList1: TImageList;
     imLauncherIcon: TImage;
     Label1: TLabel;
     Label2: TLabel;
@@ -70,14 +77,24 @@ type
     lblErrorMessage: TLabel;
     PageControl1: TPageControl;
     PermissonGrid: TStringGrid;
+    rbOrientation: TRadioGroup;
     seMinSdkVersion: TSpinEdit;
-    seTargetSdkVersion: TSpinEdit;
+    seTargetSdkVersion: TComboBox;
     seVersionCode: TSpinEdit;
     SpeedButton1: TSpeedButton;
     SpeedButtonHintTheme: TSpeedButton;
     tsAppl: TTabSheet;
     tsManifest: TTabSheet;
     procedure cbLaunchIconSizeSelect(Sender: TObject);
+    procedure PermissonGridCheckboxToggled({%H-}sender: TObject; {%H-}aCol,
+      {%H-}aRow: Integer; {%H-}aState: TCheckboxState);
+    procedure PermissonGridDrawCell(Sender: TObject; aCol, aRow: Integer;
+      aRect: TRect; {%H-}aState: TGridDrawState);
+    procedure PermissonGridMouseDown(Sender: TObject; Button: TMouseButton;
+      Shift: TShiftState; X, Y: Integer);
+    procedure PermissonGridMouseMove(Sender: TObject; {%H-}Shift: TShiftState; X,
+      Y: Integer);
+    procedure seTargetSdkVersionEditingDone(Sender: TObject);
     procedure SpeedButton1Click(Sender: TObject);
   private
     { private declarations }
@@ -93,10 +110,26 @@ type
   private
     FManifest: TLamwAndroidManifestOptions;
     FIconsPath: string; // ".../res/drawable-"
+    FChkBoxDrawData: array [TCheckBoxState] of record
+      Details, DetailsHot: TThemedElementDetails;
+      CSize: TSize;
+    end;
+    FAllPermissionsState: TCheckBoxState;
+    FAllPermissionsHot: Boolean;
+    function GetAllPermissonsCheckBoxBounds(InRect: TRect): TRect;
     procedure ErrorMessage(const msg: string);
     procedure FillPermissionGrid(Permissions: TStringList; PermNames: TStringToStringTree);
     procedure SetControlsEnabled(ts: TTabSheet; en: Boolean);
     procedure ShowLauncherIcon;
+  private
+    // gApp.Screen.Style := <orientation> statements
+    function GetCurrentAppScreenStyle: string;
+    function FindAppScreenStyleStatement(out StartPos, ssConstStartPos,
+      EndPos: integer): boolean;
+    function GetAppScreenStyleStatement(ssConstStartPos: integer;
+      out ssConstVal: string): boolean;
+    function SetAppScreenStyleStatement(const ssNewConstVal: string): boolean;
+    function RemoveAppScreenStyleStatement: boolean;
   public
     { public declarations }
     constructor Create(AOwner: TComponent); override;
@@ -110,8 +143,10 @@ type
 
 implementation
 
-uses LazIDEIntf, laz2_XMLWrite, FileUtil, Graphics, ExtDlgs, AndroidWizard_intf,
-  LamwDesigner, FPCanvas, FPimage, FPReadPNG, FPWritePNG, strutils;
+uses
+  LazIDEIntf, laz2_XMLWrite, FileUtil, CodeToolManager, CodeTree, LinkScanner,
+  CodeAtom, Graphics, ExtDlgs, AndroidWizard_intf, LamwDesigner, LamwSettings,
+  FPCanvas, FPimage, FPReadPNG, FPWritePNG, strutils;
 
 {$R *.lfm}
 
@@ -119,7 +154,7 @@ type
 
   { TMyCanvas }
 
-  TMyCanvas = class(TFPCustomCanvas)
+  TMyCanvas = class(TCanvas)
   private
     FImage: TFPMemoryImage;
   protected
@@ -145,11 +180,9 @@ begin
   mi.LoadFromStream(ms, r);
   r.Free;
   ms.Free;
-  {$Push}{$Warnings off}
   c := TMyCanvas.Create;
-  {$Pop}
   c.Image.SetSize(NeedSize, NeedSize);
-  c.StretchDraw(0, 0, NeedSize, NeedSize, mi);
+  TFPCustomCanvas(c).StretchDraw(0, 0, NeedSize, NeedSize, mi);
   mi.Free;
   p.Assign(c.Image);
   c.Free;
@@ -164,12 +197,14 @@ end;
 
 constructor TMyCanvas.Create;
 begin
+  inherited;
   FImage := TFPMemoryImage.create(0,0);
 end;
 
 destructor TMyCanvas.Destroy;
 begin
   FImage.Free;
+  inherited;
 end;
 
 { TLamwAndroidManifestOptions }
@@ -203,6 +238,11 @@ begin
   finally
     x.Free
   end;
+end;
+
+function TLamwAndroidManifestOptions.GetThemeName: string;
+begin
+  Result := GetThemeName(FTargetSdkVersion);
 end;
 
 procedure TLamwAndroidManifestOptions.SetString(const XMLPath, Ref, NewValue: string);
@@ -457,6 +497,8 @@ begin
       end;
     end else
       FRealLabel := FLabel;
+
+    FTheme := FApplicationNode.AttribStrings['android:theme'];
   end;
 end;
 
@@ -516,8 +558,48 @@ begin
 
   // refresh theme
   with LazarusIDE do
-    if (ActiveProject.FileCount > 1) and (ActiveProject.CustomData['LAMW'] <> '') then
+    if (ActiveProject.FileCount > 1) and (ActiveProject.CustomData['LAMW'] = 'GUI') then
       (TAndroidModule(GetDesignerWithProjectFile(ActiveProject.Files[1], True).LookupRoot).Designer as TAndroidWidgetMediator).UpdateTheme;
+end;
+
+function TLamwAndroidManifestOptions.GetThemeName(API: Integer): string;
+var
+  fn, base: string;
+  x: TXMLDocument;
+  n: TDOMNode;
+begin
+  Result := FTheme;
+  if Copy(FTheme, 1, 7) <> '@style/' then Exit;
+  Delete(Result, 1, 7);
+  base := ExtractFilePath(FFileName) + 'res' + PathDelim + 'values';
+  fn := base + PathDelim + 'styles.xml';
+  repeat
+    if not FileExists(fn) then Exit;
+    ReadXMLFile(x, fn);
+    try
+      n := x.DocumentElement.FirstChild;
+      while n <> nil do
+      begin
+        if n is TDOMElement then
+          with TDOMElement(n) do
+          begin
+            if (TagName = 'style') and (AttribStrings['name'] = Result) then
+              if AttribStrings['parent'] <> '' then
+                Result := AttribStrings['parent']
+              else
+                Exit;
+          end;
+        n := n.NextSibling;
+      end;
+      repeat
+        fn := base + '-v' + IntToStr(API) + PathDelim + 'styles.xml';
+        Dec(API);
+      until FileExists(fn) or (API = 0);
+    finally
+      x.Free;
+    end;
+  until strlcomp('android:', PChar(Result), 8) = 0;
+  Delete(Result, 1, 8);
 end;
 
 { TLamwProjectOptions }
@@ -553,11 +635,227 @@ begin
     imLauncherIcon.Picture.Clear;
 end;
 
+function TLamwProjectOptions.GetCurrentAppScreenStyle: string;
+var
+  StyleStartPos, StartPos, EndPos: integer;
+begin
+  if FindAppScreenStyleStatement(StartPos, StyleStartPos, EndPos) then
+    GetAppScreenStyleStatement(StyleStartPos, Result)
+  else
+    Result := '';
+end;
+
+function TLamwProjectOptions.FindAppScreenStyleStatement(
+  out StartPos, ssConstStartPos, EndPos: integer): boolean;
+var
+  MainBeginNode: TCodeTreeNode;
+  Position: Integer;
+begin
+  Result := False;
+  StartPos := -1;
+  ssConstStartPos := -1;
+  EndPos := -1;
+  with CodeToolBoss do
+  begin
+    InitCurCodeTool(FindFile(LazarusIDE.ActiveProject.MainFile.GetFullFilename));
+    if CurCodeTool = nil then Exit;
+    with CurCodeTool do
+    begin
+      BuildTree(lsrEnd);
+      MainBeginNode := FindMainBeginEndNode;
+      if MainBeginNode = nil then Exit;
+      Position := MainBeginNode.StartPos;
+      if Position < 1 then Exit;
+      MoveCursorToCleanPos(Position);
+      repeat
+        ReadNextAtom;
+        if UpAtomIs('GAPP') then
+        begin
+          StartPos := CurPos.StartPos;
+          if ReadNextAtomIsChar('.') and ReadNextUpAtomIs('SCREEN')
+          and ReadNextUpAtomIs('.') and ReadNextUpAtomIs('STYLE')
+          and ReadNextUpAtomIs(':=') then
+          begin
+            // read till semicolon or end
+            repeat
+              ReadNextAtom;
+              if ssConstStartPos < 1 then
+                ssConstStartPos := CurPos.StartPos;
+              EndPos := CurPos.EndPos;
+              if CurPos.Flag in [cafEnd, cafSemicolon] then begin
+                Result := True;
+                Exit;
+              end;
+            until CurPos.StartPos > SrcLen;
+          end;
+        end;
+      until CurPos.StartPos > SrcLen;
+    end;
+  end;
+end;
+
+function TLamwProjectOptions.GetAppScreenStyleStatement(
+  ssConstStartPos: integer; out ssConstVal: string): boolean;
+begin
+  Result := False;
+  ssConstVal := '';
+  with CodeToolBoss do
+  begin
+    InitCurCodeTool(FindFile(LazarusIDE.ActiveProject.MainFile.GetFullFilename));
+    if CurCodeTool = nil then Exit;
+    with CurCodeTool do
+    begin
+      if (ssConstStartPos < 1) or (ssConstStartPos > SrcLen) then Exit;
+      MoveCursorToCleanPos(ssConstStartPos);
+      ReadNextAtom;
+      if not AtomIsIdentifier then Exit;
+      ssConstVal := GetAtom;
+      Result := True;
+    end;
+  end;
+end;
+
+function TLamwProjectOptions.SetAppScreenStyleStatement(
+  const ssNewConstVal: string): boolean;
+var
+  StartPos, ssConstStartPos, EndPos: integer;
+  OldExists, Found: Boolean;
+  NewStatement: String;
+  Indent: Integer;
+  MainBeginNode: TCodeTreeNode;
+  Beauty: TBeautifyCodeOptions;
+begin
+  Result := False;
+  with CodeToolBoss do
+  begin
+    InitCurCodeTool(FindFile(LazarusIDE.ActiveProject.MainFile.GetFullFilename));
+    if CurCodeTool = nil then Exit;
+    with CurCodeTool do
+    begin
+      // search old Application.Title:= statement
+      Beauty := SourceChangeCache.BeautifyCodeOptions;
+      OldExists := FindAppScreenStyleStatement(StartPos, ssConstStartPos, EndPos);
+      if OldExists then
+      begin
+        // replace old statement
+        Indent := 0;
+        Indent := Beauty.GetLineIndent(Src, StartPos)
+      end else begin
+        // insert as first line after "gApp := ...;" in program begin..end block
+        MainBeginNode := FindMainBeginEndNode;
+        if MainBeginNode = nil then Exit;
+        MoveCursorToNodeStart(MainBeginNode);
+        Found := False;
+        ReadNextAtom;
+        repeat
+          if UpAtomIs('GAPP') and ReadNextAtomIs(':=') then
+          begin
+            while CurPos.StartPos < SrcLen do
+            begin
+              ReadNextAtom;
+              if AtomIs(';') then
+              begin
+                Found := True;
+                Break;
+              end;
+            end;
+            if not Found then Exit;
+          end;
+          if Found then Break;
+          ReadNextAtom;
+        until CurPos.StartPos > SrcLen;
+        StartPos := CurPos.EndPos;
+        EndPos := StartPos;
+        Indent := Beauty.GetLineIndent(Src, StartPos);
+      end;
+      // create statement
+      NewStatement := 'gApp.Screen.Style:=' + ssNewConstVal + ';';
+      NewStatement := Beauty.BeautifyStatement(NewStatement, Indent);
+      SourceChangeCache.MainScanner := Scanner;
+      if not SourceChangeCache.Replace(gtNewLine, gtNewLine, StartPos, EndPos,
+                                       NewStatement)
+      then
+        Exit;
+      if not SourceChangeCache.Apply then Exit;
+      Result := True;
+    end;
+  end;
+end;
+
+function TLamwProjectOptions.RemoveAppScreenStyleStatement: boolean;
+var
+  StartPos, StringConstStartPos, EndPos: integer;
+  OldExists: Boolean;
+  FromPos: Integer;
+  ToPos: Integer;
+begin
+  Result := False;
+  // search old Application.Title:= statement
+  OldExists := FindAppScreenStyleStatement(StartPos, StringConstStartPos, EndPos);
+  if not OldExists then begin
+    Result := True;
+    Exit;
+  end;
+  with CodeToolBoss do
+  begin
+    InitCurCodeTool(FindFile(LazarusIDE.ActiveProject.MainFile.GetFullFilename));
+    if CurCodeTool = nil then Exit;
+    with CurCodeTool do
+    begin
+      // -> delete whole line
+      FromPos := FindLineEndOrCodeInFrontOfPosition(StartPos);
+      ToPos := FindLineEndOrCodeAfterPosition(EndPos);
+      SourceChangeCache.MainScanner := Scanner;
+      if not SourceChangeCache.Replace(gtNone, gtNone, FromPos, ToPos, '') then
+        Exit;
+      if not SourceChangeCache.Apply then Exit;
+      Result := True;
+    end;
+  end;
+end;
+
 constructor TLamwProjectOptions.Create(AOwner: TComponent);
+const
+  chk_st: array [TCheckboxState] of TThemedButton = (
+    tbCheckBoxUncheckedNormal,
+    tbCheckBoxCheckedNormal,
+    tbCheckBoxMixedNormal
+  );
+  chk_st_hot: array [TCheckboxState] of TThemedButton = (
+    tbCheckBoxUncheckedHot,
+    tbCheckBoxCheckedHot,
+    tbCheckBoxMixedHot
+  );
+var
+  s: TCheckBoxState;
+  sl: TStringList;
+  i: Integer;
 begin
   inherited Create(AOwner);
   FManifest := TLamwAndroidManifestOptions.Create;
   PageControl1.ActivePageIndex := 0;
+
+  for s := Low(TCheckBoxState) to High(TCheckBoxState) do
+    with FChkBoxDrawData[s] do
+    begin
+      Details := ThemeServices.GetElementDetails(chk_st[s]);
+      DetailsHot := ThemeServices.GetElementDetails(chk_st_hot[s]);
+      CSize := ThemeServices.GetDetailSize(Details);
+    end;
+
+  sl := FindAllDirectories(LamwGlobalSettings.PathToAndroidSDK + PathDelim + 'platforms', False);
+  try
+    for i := 0 to sl.Count - 1 do
+    begin
+      sl[i] := ExtractFileName(sl[i]);
+      if Copy(sl[i], 1, 8) = 'android-' then
+        seTargetSdkVersion.Items.Add(Copy(sl[i], 9, MaxInt))
+    end;
+  finally
+    sl.Free;
+  end;
+
+  PermissonGrid.DoubleBuffered := True;
 end;
 
 destructor TLamwProjectOptions.Destroy;
@@ -574,6 +872,111 @@ end;
 procedure TLamwProjectOptions.cbLaunchIconSizeSelect(Sender: TObject);
 begin
   ShowLauncherIcon;
+end;
+
+procedure TLamwProjectOptions.PermissonGridCheckboxToggled(sender: TObject;
+  aCol, aRow: Integer; aState: TCheckboxState);
+var
+  r: Integer;
+begin
+  if PermissonGrid.Cells[1, 1] = '1' then
+    FAllPermissionsState := cbChecked
+  else
+    FAllPermissionsState := cbUnchecked;
+  for r := 2 to PermissonGrid.RowCount - 1 do
+    if (PermissonGrid.Cells[1, r] = '1') and (FAllPermissionsState = cbUnchecked)
+    or (PermissonGrid.Cells[1, r] = '0') and (FAllPermissionsState = cbChecked) then
+    begin
+      FAllPermissionsState := cbGrayed;
+      Break;
+    end;
+  PermissonGrid.InvalidateCell(1, 0);
+end;
+
+procedure TLamwProjectOptions.PermissonGridDrawCell(Sender: TObject; aCol,
+  aRow: Integer; aRect: TRect; aState: TGridDrawState);
+var
+  d: TThemedElementDetails;
+  r: TRect;
+begin
+  if (aCol = 1) and (aRow = 0) then
+  begin
+    r := GetAllPermissonsCheckBoxBounds(aRect);
+    if FAllPermissionsHot then
+      d := FChkBoxDrawData[FAllPermissionsState].DetailsHot
+    else
+      d := FChkBoxDrawData[FAllPermissionsState].Details;
+    ThemeServices.DrawElement(PermissonGrid.Canvas.Handle, d, r, nil)
+  end;
+ end;
+
+procedure TLamwProjectOptions.PermissonGridMouseDown(Sender: TObject;
+  Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
+var
+  c, r: Integer;
+  NewVal: Char;
+begin
+  if (Button = mbLeft) and ([ssShift,ssCtrl] * Shift = []) then
+  begin
+    with PermissonGrid.MouseCoord(X, Y) do
+    begin
+      c := X; r := Y;
+    end;
+    if (c = 1) and (r = 0)
+    and PtInRect(GetAllPermissonsCheckBoxBounds(PermissonGrid.CellRect(c, r)), Point(X, Y)) then
+    begin
+      if FAllPermissionsState = cbChecked then
+      begin
+        FAllPermissionsState := cbUnchecked;
+        NewVal := '0';
+      end else begin
+        FAllPermissionsState := cbChecked;
+        NewVal := '1';
+      end;
+      PermissonGrid.BeginUpdate;
+      try
+        for r := 1 to PermissonGrid.RowCount - 1 do
+          PermissonGrid.Cells[1, r] := NewVal;
+      finally
+        PermissonGrid.EndUpdate;
+      end;
+    end;
+  end;
+end;
+
+procedure TLamwProjectOptions.PermissonGridMouseMove(Sender: TObject;
+  Shift: TShiftState; X, Y: Integer);
+var
+  c, r: LongInt;
+  b: Boolean;
+begin
+  with PermissonGrid.MouseCoord(X, Y) do
+  begin
+    c := X; r := Y;
+  end;
+  if (c = 1) and (r = 0) then
+  begin
+    b := PtInRect(
+      GetAllPermissonsCheckBoxBounds(PermissonGrid.CellRect(c, r)),
+      Point(X, Y));
+    if FAllPermissionsHot <> b then
+    begin
+      FAllPermissionsHot := b;
+      PermissonGrid.InvalidateCell(c, r);
+    end;
+  end;
+end;
+
+procedure TLamwProjectOptions.seTargetSdkVersionEditingDone(Sender: TObject);
+var
+  i: Integer;
+begin
+  if not TryStrToInt(seTargetSdkVersion.Text, i) then
+    seTargetSdkVersion.Color := RGBToColor(255,205,205)
+  else begin
+    seTargetSdkVersion.Color := clDefault;
+    cbTheme.Text := FManifest.GetThemeName(i);
+  end;
 end;
 
 procedure TLamwProjectOptions.SpeedButton1Click(Sender: TObject);
@@ -641,6 +1044,18 @@ begin
   end;
 end;
 
+function TLamwProjectOptions.GetAllPermissonsCheckBoxBounds(InRect: TRect): TRect;
+begin
+  Result := InRect;
+  with FChkBoxDrawData[FAllPermissionsState], Result do
+  begin
+    Left := Left + 2;
+    Top := (Top + Bottom - CSize.cy) div 2;
+    Right := Left + CSize.cx;
+    Bottom := Top + CSize.cy;
+  end;
+end;
+
 procedure TLamwProjectOptions.ErrorMessage(const msg: string);
 begin
   lblErrorMessage.Caption := msg;
@@ -665,9 +1080,21 @@ begin
           n := Permissions[i];
         Cells[0, i + 1] := n;
         if Permissions.Objects[i] = nil then
-          Cells[1, i + 1] := '0'
-        else
-          Cells[1, i + 1] := '1'
+        begin
+          if i = 0 then
+            FAllPermissionsState := cbUnchecked
+          else
+          if FAllPermissionsState = cbChecked then
+            FAllPermissionsState := cbGrayed;
+          Cells[1, i + 1] := '0';
+        end else begin
+          if i = 0 then
+            FAllPermissionsState := cbChecked
+          else
+          if FAllPermissionsState = cbUnchecked then
+            FAllPermissionsState := cbGrayed;
+          Cells[1, i + 1] := '1';
+        end;
       end;
   finally
     PermissonGrid.EndUpdate;
@@ -692,7 +1119,7 @@ end;
 procedure TLamwProjectOptions.ReadSettings(AOptions: TAbstractIDEOptions);
 var
   proj: TLazProject;
-  fn: string;
+  fn, s: string;
 begin
   // reading manifest
   SetControlsEnabled(tsManifest, False);
@@ -715,7 +1142,7 @@ begin
       Load(fn);
       FillPermissionGrid(Permissions, PermNames);
       seMinSdkVersion.Value := MinSDKVersion;
-      seTargetSdkVersion.Value := TargetSDKVersion;
+      seTargetSdkVersion.Text := IntToStr(TargetSDKVersion);
       seVersionCode.Value := VersionCode;
       edVersionName.Text := VersionName;
       edLabel.Text := AppLabel;
@@ -727,12 +1154,26 @@ begin
       Exit;
     end
   end;
+  cbTheme.Text := FManifest.ThemeName;
+  s := GetCurrentAppScreenStyle;
+  if SameText(s, 'ssPortrait') then
+    rbOrientation.ItemIndex := 1
+  else
+  if SameText(s, 'ssLandscape') then
+    rbOrientation.ItemIndex := 2
+  else
+    rbOrientation.ItemIndex := 0;
   SetControlsEnabled(tsManifest, True);
 end;
 
 procedure TLamwProjectOptions.WriteSettings(AOptions: TAbstractIDEOptions);
+const
+  ScreenStyles: array [0..2] of string = (
+    'ssSensor', 'ssPortrait', 'ssLandscape'
+  );
 var
   i: Integer;
+  s: string;
 begin
   with FManifest do
   begin
@@ -740,12 +1181,24 @@ begin
       if PermissonGrid.Cells[1, i] <> '1' then
         Permissions.Delete(i - 1);
     MinSDKVersion := seMinSdkVersion.Value;
-    TargetSDKVersion := seTargetSdkVersion.Value;
+    if TryStrToInt(seTargetSdkVersion.Text, i) then
+      TargetSDKVersion := i;
     VersionCode := seVersionCode.Value;
     VersionName := edVersionName.Text;
     AppLabel := edLabel.Text;
     Save;
   end;
+
+  s := GetCurrentAppScreenStyle;
+  if s = '' then s := ScreenStyles[0];
+  if s <> ScreenStyles[rbOrientation.ItemIndex] then
+  begin
+    if rbOrientation.ItemIndex = 0 then
+      RemoveAppScreenStyleStatement
+    else
+      SetAppScreenStyleStatement(ScreenStyles[rbOrientation.ItemIndex]);
+  end;
+
   with cbLaunchIconSize.Items do
     for i := 0 to Count - 1 do
       if Assigned(Objects[i]) then
