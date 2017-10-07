@@ -1,6 +1,6 @@
 package org.lamw.appbroadcastreceiverdemo2;
 
-//Lamw: Lazarus Android Module Wizard - version 0.7 - 28 September - 2017
+//Lamw: Lazarus Android Module Wizard - version 0.7 - rev. 20 - 06 October - 2017
 //Form Designer and Components development model!
 //https://github.com/jmpessoa/lazandroidmodulewizard
 //http://forum.lazarus.freepascal.org/index.php/topic,21919.270.html
