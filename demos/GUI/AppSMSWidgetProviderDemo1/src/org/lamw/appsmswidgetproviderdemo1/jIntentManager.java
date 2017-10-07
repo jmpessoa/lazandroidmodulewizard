@@ -380,8 +380,7 @@ Sending Data: Extras vs. URI Parameters
       return "android.intent.action.DIAL";
    }	   
    
-   public String GetActionCallButtonAsString() {
-	  //String s =  Intent.ACTION_CALL_BUTTON; 
+   public String GetActionCallButtonAsString() { 
       return "android.intent.action.CALL_BUTTON";
    }	   
    
@@ -471,7 +470,6 @@ Sending Data: Extras vs. URI Parameters
     */
    
    public String GetActionCallAsString() {
-	   //String s = Intent.ACTION_CALL;
 	   return "android.intent.action.CALL";
    }
    
@@ -527,6 +525,14 @@ Sending Data: Extras vs. URI Parameters
    public String GetActionSMSReceivedAsString() {   //TODO: Pascal
      return "android.provider.Telephony.SMS_RECEIVED";
    }	   
+   
+   public String GetActionNewOutgoingCallAsString() {  //TODO Pascal
+       return "android.intent.action.NEW_OUTGOING_CALL";
+   }
+   
+   public String GetActionPhoneStateAsString() {  //TODO Pascal
+       return "android.intent.action.PHONE_STATE";
+   }
    
    //http://www.coderanch.com/t/492490/Android/Mobile/Check-application-installed
    public boolean IsCallable(Intent _intent) {  

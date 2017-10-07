@@ -1,0 +1,3 @@
+public java.lang.Object jIncomingCallWidgetProvider_jCreate(long _Self) {
+  return (java.lang.Object)(new jIncomingCallWidgetProvider(this,_Self));
+}

@@ -559,36 +559,47 @@ begin
      list.DelimitedText:= FPathToAndroidProject + 'dummy';
      aux:= StringReplace(auxList.Text,'WAPPNAME',  list.Strings[list.Count-2], [rfIgnoreCase]);
      auxList.Text:= aux;
+     auxList.SaveToFile(FPathToAndroidProject+'res'+DirectorySeparator+'layout'+DirectorySeparator+LowerCase(jclassname)+'_layout.xml');
+     (*
      if jclassname = 'jSMSWidgetProvider' then
        auxList.SaveToFile(FPathToAndroidProject+'res'+DirectorySeparator+'layout'+DirectorySeparator+'smswidgetlayout.xml');
-     if jclassname = 'jIncommingCallWidgetProvider' then
-       auxList.SaveToFile(FPathToAndroidProject+'res'+DirectorySeparator+'layout'+DirectorySeparator+'incommingcallwidgetlayout.xml');
+     if jclassname = 'jIncomingCallWidgetProvider' then
+       auxList.SaveToFile(FPathToAndroidProject+'res'+DirectorySeparator+'layout'+DirectorySeparator+'incomingcallwidgetlayout.xml');
+     *)
    end;
    //-----
-
+   (*
    if FileExists(LamwGlobalSettings.PathToJavaTemplates+'lamwdesigner'+DirectorySeparator +jclassname+'.smswidgetinfo') then
    begin
      auxList.LoadFromFile(LamwGlobalSettings.PathToJavaTemplates+'lamwdesigner'+DirectorySeparator +jclassname+'.smswidgetinfo');
      ForceDirectories(FPathToAndroidProject+'res'+DirectorySeparator+'xml');
      auxList.SaveToFile(FPathToAndroidProject+'res'+DirectorySeparator+'xml'+DirectorySeparator+'smswidgetinfo.xml');
    end;
+    *)
 
-   if FileExists(LamwGlobalSettings.PathToJavaTemplates+'lamwdesigner'+DirectorySeparator +jclassname+'.incommingcallwidgetinfo') then
+   if FileExists(LamwGlobalSettings.PathToJavaTemplates+'lamwdesigner'+DirectorySeparator +jclassname+'.info') then
    begin
-     auxList.LoadFromFile(LamwGlobalSettings.PathToJavaTemplates+'lamwdesigner'+DirectorySeparator +jclassname+'.incommingcallwidgetinfo');
+     auxList.LoadFromFile(LamwGlobalSettings.PathToJavaTemplates+'lamwdesigner'+DirectorySeparator +jclassname+'.info');
      ForceDirectories(FPathToAndroidProject+'res'+DirectorySeparator+'xml');
-     auxList.SaveToFile(FPathToAndroidProject+'res'+DirectorySeparator+'xml'+DirectorySeparator+'incommingcallwidgetinfo.xml');
+     auxList.SaveToFile(FPathToAndroidProject+'res'+DirectorySeparator+'xml'+DirectorySeparator+LowerCase(jclassname)+'_info.xml');
    end;
 
    if FileExists(LamwGlobalSettings.PathToJavaTemplates+'lamwdesigner'+DirectorySeparator +jclassname+'.jpg') then
    begin
+
+     CopyFile(LamwGlobalSettings.PathToJavaTemplates+'lamwdesigner'+DirectorySeparator +jclassname+'.jpg',
+          FPathToAndroidProject+'res'+DirectorySeparator+'drawable-hdpi'+DirectorySeparator+LowerCase(jclassname)+'_image.jpg');
+
+     (*
      if jclassname = 'jSMSWidgetProvider' then
        CopyFile(LamwGlobalSettings.PathToJavaTemplates+'lamwdesigner'+DirectorySeparator +jclassname+'.jpg',
               FPathToAndroidProject+'res'+DirectorySeparator+'drawable-hdpi'+DirectorySeparator+'smswidgetbackgroundimage.jpg');
 
-     if jclassname = 'jIncommingCallWidgetProvider' then
+     if jclassname = 'jIncomingCallWidgetProvider' then
        CopyFile(LamwGlobalSettings.PathToJavaTemplates+'lamwdesigner'+DirectorySeparator +jclassname+'.jpg',
-           FPathToAndroidProject+'res'+DirectorySeparator+'drawable-hdpi'+DirectorySeparator+'incommingcallwidgetbackgroundimage.jpg');
+           FPathToAndroidProject+'res'+DirectorySeparator+'drawable-hdpi'+DirectorySeparator+'incomingcallwidgetbackgroundimage.jpg');
+     *)
+
    end;
    //-----
    if listRequirements.Count > 0 then

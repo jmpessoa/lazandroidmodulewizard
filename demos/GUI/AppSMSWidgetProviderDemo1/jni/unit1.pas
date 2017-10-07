@@ -7,7 +7,7 @@ interface
 
 uses
   Classes, SysUtils, AndroidWidget, Laz_And_Controls,
-  And_jni, intentmanager, smswidgetprovider, radiogroup;
+  And_jni, intentmanager, smswidgetprovider;
   
 type
 
@@ -16,6 +16,7 @@ type
   TAndroidModule1 = class(jForm)
     jButton1: jButton;
     jIntentManager1: jIntentManager;
+    jListView1: jListView;
     jSMSWidgetProvider1: jSMSWidgetProvider;
     jTextView1: jTextView;
     jTextView2: jTextView;
@@ -39,14 +40,24 @@ implementation
 
 
 (*
-HINTS:
+HINT 1: How to install widget:
+
+	a)Run/Install the App
+	b) Use BackButton to leave the App
+	c) long press the home screen and select "widgets"
+	d) loook for "AppSMSWidgetProviderDemo1 4x1"
+	f) long press "AppSMSWidgetProviderDemo1 4x1" to install
+	g) keep waiting for a "sms"
+	h) has sms arrived? click the widget to re-open and hanlde the message from your App!
+
+HINTS 2: How to configure/change widget
 
 res/layout
-	smswigetlayout.xml    <<-- change [only content, NOT the file name] to configure
+	jsmswigetprovider_layout.xml    <<-- change [only content, NOT the file name] to configure
 res/drawable-xxxx
-	smswidgetbackgroundimage.jpg  <<-- change [only content, NOT the file name]  to configure
+	jsmswigetprovider_image.jpg  <<-- change [only content, NOT the file name]  to configure
 res/xml
-	smswidgetinfo.xml	<<-- change [only content,  NOT the file name]  to configure
+	jsmswigetprovider_info.xml	<<-- change [only content,  NOT the file name]  to configure
 *)
 
 procedure TAndroidModule1.AndroidModule1ActivityCreate(Sender: TObject; intentData: jObject);
@@ -60,7 +71,7 @@ end;
 
 procedure TAndroidModule1.jButton1Click(Sender: TObject);
 begin
-  jIntentManager1.SetAction('org.lamw.appsmswidgetproviderdemo1'+'.WIDGET_NOTIFY'); //gApp.AppName + '.WIDGET_NOTIFY;
+  jIntentManager1.SetAction(gApp.AppName+'.LAMW_SMS_WIDGET_NOTIFY');
   jIntentManager1.PutExtraString('notify_message','Thanks, SMS Widget helper!');
   jIntentManager1.SendBroadcast();
 end;

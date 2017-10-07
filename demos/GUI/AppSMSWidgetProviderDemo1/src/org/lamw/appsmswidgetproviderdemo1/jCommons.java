@@ -123,27 +123,29 @@ public class jCommons {
 	
 	public void setLParamWidth(int _w) {
 		lparamW = _w;
+		lparams.width  = lparamW;
 	}
 	
 	public void setLParamHeight(int _h) {
 		lparamH = _h;
+		lparams.height = lparamH;
 	}
-	
-	public int getLParamWidth() { 
-		int r =  lparamW;
+		
+	public int getLParamHeight() {
+		int r = lparamH;		
 		if (r == android.view.ViewGroup.LayoutParams.WRAP_CONTENT) {
-			r = aOwnerView.getWidth();
+			r = aOwnerView.getHeight();
 		}		
 		return r;
 	}
-	
-	public int getLParamHeight() {
-		int r = lparamH;
+
+	public int getLParamWidth() {				
+		int r = lparamW;		
 		if (r == android.view.ViewGroup.LayoutParams.WRAP_CONTENT) {
-			r = aOwnerView.getHeight();
-		}
-		return r;
-	}
+			r = aOwnerView.getWidth();
+		}		
+		return r;		
+	}	
 	
 	public void setLGravity(int _g) {
 		lgravity = _g;
@@ -221,6 +223,10 @@ public class jCommons {
 		lparamH = android.view.ViewGroup.LayoutParams.MATCH_PARENT;
 		lparams.width = lparamW;
 		lparams.height = lparamH;
+		
+		if (aOwnerView != null)    //addded
+			aOwnerView.setLayoutParams(lparams);
+		
 	}
 	
 	public void WrapParent() {
@@ -228,6 +234,10 @@ public class jCommons {
 		lparamH = android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
 		lparams.width = lparamW;
 		lparams.height = lparamH;
+		
+		if (aOwnerView != null)  //addded
+			aOwnerView.setLayoutParams(lparams);
+		
 	}
 
 }

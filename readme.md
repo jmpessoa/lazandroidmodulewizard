@@ -124,6 +124,38 @@
 	*
 	****************************************************************************************************
 
+Version 0.7 - rev. 20 - 06 - October - 2017
+
+	NEW! jIncomingCallWidgetProvider component
+
+	NEW! demo AppIncomingCallWidgetProviderDemo1
+
+		HINT 1: How to install widget:
+
+			a)Run/Install the App
+			b) Use BackButton to leave/close the App
+			c) long press the home screen and select "widgets"
+			d) loook for "AppIncomingCallWidgetProviderDemo1 4x1"
+			f) long press "AppIncomingCallWidgetProviderDemo1 4x1" to install it
+			g) keep waiting for an "Incoming Call" 
+			h) has Incoming Call? click the widget to re-open and handle the caller number from your App!
+
+		HINT 2: Configure your project:
+
+		res/layout
+			jincomingcallwidgetprovider_layout.xml    <<-- change [only content, NOT the file name] to configure
+		res/drawable-xxxx
+			jincomingcallwidgetprovider_image.jpg  <<-- change [only content, NOT the file name]  to configure
+		res/xml
+			jincomingcallwidgetprovider_info.xml	<<-- change [only content,  NOT the file name]  to configure
+
+	NEW! demo AppBroadcastReceiverDemo2 [how to handle incoming call directly ...]
+
+	NEW! Goodies!  by Ibragimov M. aka maxx  [Thanks!!]
+		demo AppBluetoothClientSocketHC0506Terminal1
+		demo Bluetooth_Arduino_GPIO_v1
+		demo ColorPicker
+ 				
 version 0.7 - rev. 19 - 16 June - 2017 
 
 	NEW! jComboEditText component  ["ComboBox"]   
@@ -194,11 +226,11 @@ Version 0.7 - rev. 16 - 29 - April - 2017
 		HINT 2: Configure your project:
 
 		res/layout
-			smswigetlayout.xml    <<-- change [only content, NOT the file name] to configure
+			jsmswigetprovider_layout.xml    <<-- change [only content, NOT the file name] to configure
 		res/drawable-xxxx
-			smswidgetbackgroundimage.jpg  <<-- change [only content, NOT the file name]  to configure
+			jsmswigetprovider_image.jpg  <<-- change [only content, NOT the file name]  to configure
 		res/xml
-			smswidgetinfo.xml	<<-- change [only content,  NOT the file name]  to configure
+			jsmswigetprovider_info.xml	<<-- change [only content,  NOT the file name]  to configure
 			
 
 	IMPROVED! jSqliteDataAccess ["java" template all rewrited by Renabor!]

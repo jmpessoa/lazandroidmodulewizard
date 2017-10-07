@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+  android:layout_width="match_parent"
+  android:layout_height="match_parent"
+  android:gravity="center"  
+  android:layout_margin="4dp">
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/jsmswidgetprovider_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/jsmswidgetprovider_image"      
+    android:alpha="0.8"        
+    android:orientation="vertical">
+    <TextView 
+         android:id="@+id/smswidgettextview" 
+         android:text="AppSMSWidgetProviderDemo1" 
+         android:textColor="#FFFFFF"         
+         android:layout_height="wrap_content" 
+         android:layout_width="wrap_content"/>
+     </LinearLayout>
+</RelativeLayout>

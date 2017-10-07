@@ -74,13 +74,14 @@ public class jButton extends Button {
 			     }, 150);
 			  	 
 			   }  		
+			   
 			   if (mEnable) {
 			      controls.pOnClick(LAMWCommon.getPasObj(),Const.Click_Default);
 			   }
 												 				 
 			}
 		};		
-		setOnClickListener(onClickListener);
+		setOnClickListener(onClickListener);		
 	}
 	 
 	//Free object except Self, Pascal Code Free the class.
@@ -188,11 +189,10 @@ public class jButton extends Button {
 		switch (_unit) {
 			case 0: mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_SP; break; 
 			case 1: mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_PX; break; 
-			case 2: mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_DIP; break;
-			case 3: mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_IN; break; 
-			case 4: mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_MM; break; 
-			case 5: mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_PT; break; 
-			case 6: mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_SP; break; 
+			case 2: mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_DIP; break;			
+			case 3: mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_MM; break; 
+			case 4: mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_PT; break; 
+			case 5: mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_SP; break; 
 		}
 		String t = this.getText().toString();
 		this.setTextSize(mTextSizeTypedValue, mTextSize);
@@ -241,7 +241,9 @@ public class jButton extends Button {
 		controls.pOnBeforeDispatchDraw(LAMWCommon.getPasObj(), canvas, 1);  //event handle by pascal side		
 	    super.dispatchDraw(canvas);	    
 	    //DO YOUR DRAWING ON TOP OF THIS VIEWS CHILDREN
-	    controls.pOnAfterDispatchDraw(LAMWCommon.getPasObj(), canvas, 1);	 //event handle by pascal side    
+	    controls.pOnAfterDispatchDraw(LAMWCommon.getPasObj(), canvas, 1);	 //event handle by pascal side
+	    
+	    if (!mEnable) this.setEnabled(false);
 	}
 	
 	//http://www.android--tutorials.com/2016/03/android-set-button-drawableleft.html
@@ -386,8 +388,8 @@ public class jButton extends Button {
         this.setTypeface(customfont);
     }
 	
-	public void SetEnable(boolean _value) {
+	public void SetEnabled(boolean _value) {
 		mEnable = _value;
-		this.setEnabled(_value);
+		this.setEnabled(_value);		
 	}
 }

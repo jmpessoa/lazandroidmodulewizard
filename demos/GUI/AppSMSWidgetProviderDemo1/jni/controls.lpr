@@ -221,6 +221,15 @@ begin
 end;
 
 { Class:     org_lamw_appsmswidgetproviderdemo1_Controls
+  Method:    pOnLongClick
+  Signature: (JI)V }
+procedure pOnLongClick(PEnv: PJNIEnv; this: JObject; pasobj: JLong; value: JInt
+  ); cdecl;
+begin
+  Java_Event_pOnLongClick(PEnv, this, TObject(pasobj), value);
+end;
+
+{ Class:     org_lamw_appsmswidgetproviderdemo1_Controls
   Method:    pOnChange
   Signature: (JLjava/lang/String;I)V }
 procedure pOnChange(PEnv: PJNIEnv; this: JObject; pasobj: JLong; txt: JString;
@@ -327,7 +336,97 @@ begin
   Java_Event_pOnLayouting(PEnv, this, TObject(pasobj), changed);
 end;
 
-const NativeMethods: array[0..35] of JNINativeMethod = (
+{ Class:     org_lamw_appsmswidgetproviderdemo1_Controls
+  Method:    pOnClickWidgetItem
+  Signature: (JIZ)V }
+procedure pOnClickWidgetItem(PEnv: PJNIEnv; this: JObject; pasobj: JLong;
+  position: JInt; checked: JBoolean); cdecl;
+begin
+  Java_Event_pOnClickWidgetItem(PEnv, this, TObject(pasobj), position, checked);
+end;
+
+{ Class:     org_lamw_appsmswidgetproviderdemo1_Controls
+  Method:    pOnClickCaptionItem
+  Signature: (JILjava/lang/String;)V }
+procedure pOnClickCaptionItem(PEnv: PJNIEnv; this: JObject; pasobj: JLong;
+  position: JInt; caption: JString); cdecl;
+begin
+  Java_Event_pOnClickCaptionItem(PEnv, this, TObject(pasobj), position, caption
+    );
+end;
+
+{ Class:     org_lamw_appsmswidgetproviderdemo1_Controls
+  Method:    pOnListViewLongClickCaptionItem
+  Signature: (JILjava/lang/String;)V }
+procedure pOnListViewLongClickCaptionItem(PEnv: PJNIEnv; this: JObject;
+  pasobj: JLong; position: JInt; caption: JString); cdecl;
+begin
+  Java_Event_pOnListViewLongClickCaptionItem(PEnv, this, TObject(pasobj),
+    position, caption);
+end;
+
+{ Class:     org_lamw_appsmswidgetproviderdemo1_Controls
+  Method:    pOnListViewDrawItemCaptionColor
+  Signature: (JILjava/lang/String;)I }
+function pOnListViewDrawItemCaptionColor(PEnv: PJNIEnv; this: JObject;
+  pasobj: JLong; position: JInt; caption: JString): JInt; cdecl;
+begin
+  Result:=Java_Event_pOnListViewDrawItemCaptionColor(PEnv, this, TObject(pasobj
+    ), position, caption);
+end;
+
+{ Class:     org_lamw_appsmswidgetproviderdemo1_Controls
+  Method:    pOnListViewDrawItemBitmap
+  Signature: (JILjava/lang/String;)Landroid/graphics/Bitmap; }
+function pOnListViewDrawItemBitmap(PEnv: PJNIEnv; this: JObject; pasobj: JLong;
+  position: JInt; caption: JString): JObject; cdecl;
+begin
+  Result:=Java_Event_pOnListViewDrawItemBitmap(PEnv, this, TObject(pasobj),
+    position, caption);
+end;
+
+{ Class:     org_lamw_appsmswidgetproviderdemo1_Controls
+  Method:    pOnWidgeItemLostFocus
+  Signature: (JILjava/lang/String;)V }
+procedure pOnWidgeItemLostFocus(PEnv: PJNIEnv; this: JObject; pasobj: JLong;
+  position: JInt; widgetText: JString); cdecl;
+begin
+  Java_Event_pOnWidgeItemLostFocus(PEnv, this, TObject(pasobj), position,
+    widgetText);
+end;
+
+{ Class:     org_lamw_appsmswidgetproviderdemo1_Controls
+  Method:    pOnListViewScrollStateChanged
+  Signature: (JIIIZ)V }
+procedure pOnListViewScrollStateChanged(PEnv: PJNIEnv; this: JObject;
+  pasobj: JLong; firstVisibleItem: JInt; visibleItemCount: JInt;
+  totalItemCount: JInt; lastItemReached: JBoolean); cdecl;
+begin
+  Java_Event_pOnListViewScrollStateChanged(PEnv, this, TObject(pasobj),
+    firstVisibleItem, visibleItemCount, totalItemCount, lastItemReached);
+end;
+
+{ Class:     org_lamw_appsmswidgetproviderdemo1_Controls
+  Method:    pOnListViewDrawItemWidgetTextColor
+  Signature: (JILjava/lang/String;)I }
+function pOnListViewDrawItemWidgetTextColor(PEnv: PJNIEnv; this: JObject;
+  pasobj: JLong; position: JInt; widgetText: JString): JInt; cdecl;
+begin
+  Result:=Java_Event_pOnListViewDrawItemWidgetTextColor(PEnv, this, TObject(
+    pasobj), position, widgetText);
+end;
+
+{ Class:     org_lamw_appsmswidgetproviderdemo1_Controls
+  Method:    pOnListViewDrawItemWidgetImage
+  Signature: (JILjava/lang/String;)Landroid/graphics/Bitmap; }
+function pOnListViewDrawItemWidgetImage(PEnv: PJNIEnv; this: JObject;
+  pasobj: JLong; position: JInt; widgetText: JString): JObject; cdecl;
+begin
+  Result:=Java_Event_pOnListViewDrawItemWidgetImage(PEnv, this, TObject(pasobj
+    ), position, widgetText);
+end;
+
+const NativeMethods: array[0..45] of JNINativeMethod = (
    (name: 'pAppOnCreate';
     signature: '(Landroid/content/Context;Landroid/widget/RelativeLayout;'
       +'Landroid/content/Intent;)V';
@@ -401,6 +500,9 @@ const NativeMethods: array[0..35] of JNINativeMethod = (
    (name: 'pOnClick';
     signature: '(JI)V';
     fnPtr: @pOnClick; ),
+   (name: 'pOnLongClick';
+    signature: '(JI)V';
+    fnPtr: @pOnLongClick; ),
    (name: 'pOnChange';
     signature: '(JLjava/lang/String;I)V';
     fnPtr: @pOnChange; ),
@@ -436,7 +538,34 @@ const NativeMethods: array[0..35] of JNINativeMethod = (
     fnPtr: @pOnAfterDispatchDraw; ),
    (name: 'pOnLayouting';
     signature: '(JZ)V';
-    fnPtr: @pOnLayouting; )
+    fnPtr: @pOnLayouting; ),
+   (name: 'pOnClickWidgetItem';
+    signature: '(JIZ)V';
+    fnPtr: @pOnClickWidgetItem; ),
+   (name: 'pOnClickCaptionItem';
+    signature: '(JILjava/lang/String;)V';
+    fnPtr: @pOnClickCaptionItem; ),
+   (name: 'pOnListViewLongClickCaptionItem';
+    signature: '(JILjava/lang/String;)V';
+    fnPtr: @pOnListViewLongClickCaptionItem; ),
+   (name: 'pOnListViewDrawItemCaptionColor';
+    signature: '(JILjava/lang/String;)I';
+    fnPtr: @pOnListViewDrawItemCaptionColor; ),
+   (name: 'pOnListViewDrawItemBitmap';
+    signature: '(JILjava/lang/String;)Landroid/graphics/Bitmap;';
+    fnPtr: @pOnListViewDrawItemBitmap; ),
+   (name: 'pOnWidgeItemLostFocus';
+    signature: '(JILjava/lang/String;)V';
+    fnPtr: @pOnWidgeItemLostFocus; ),
+   (name: 'pOnListViewScrollStateChanged';
+    signature: '(JIIIZ)V';
+    fnPtr: @pOnListViewScrollStateChanged; ),
+   (name: 'pOnListViewDrawItemWidgetTextColor';
+    signature: '(JILjava/lang/String;)I';
+    fnPtr: @pOnListViewDrawItemWidgetTextColor; ),
+   (name: 'pOnListViewDrawItemWidgetImage';
+    signature: '(JILjava/lang/String;)Landroid/graphics/Bitmap;';
+    fnPtr: @pOnListViewDrawItemWidgetImage; )
 );
 
 function RegisterNativeMethodsArray(PEnv: PJNIEnv; className: PChar;
@@ -541,6 +670,8 @@ exports
   pAppOnSpecialKeyDown name 'Java_org_lamw_appsmswidgetproviderdemo1_Controls_'
     +'pAppOnSpecialKeyDown',
   pOnClick name 'Java_org_lamw_appsmswidgetproviderdemo1_Controls_pOnClick',
+  pOnLongClick name 'Java_org_lamw_appsmswidgetproviderdemo1_Controls_'
+    +'pOnLongClick',
   pOnChange name 'Java_org_lamw_appsmswidgetproviderdemo1_Controls_pOnChange',
   pOnChanged name 'Java_org_lamw_appsmswidgetproviderdemo1_Controls_pOnChanged',
   pOnEnter name 'Java_org_lamw_appsmswidgetproviderdemo1_Controls_pOnEnter',
@@ -560,7 +691,25 @@ exports
   pOnAfterDispatchDraw name 'Java_org_lamw_appsmswidgetproviderdemo1_Controls_'
     +'pOnAfterDispatchDraw',
   pOnLayouting name 'Java_org_lamw_appsmswidgetproviderdemo1_Controls_'
-    +'pOnLayouting';
+    +'pOnLayouting',
+  pOnClickWidgetItem name 'Java_org_lamw_appsmswidgetproviderdemo1_Controls_'
+    +'pOnClickWidgetItem',
+  pOnClickCaptionItem name 'Java_org_lamw_appsmswidgetproviderdemo1_Controls_'
+    +'pOnClickCaptionItem',
+  pOnListViewLongClickCaptionItem name 'Java_org_lamw_appsmswidgetproviderdemo'
+    +'1_Controls_pOnListViewLongClickCaptionItem',
+  pOnListViewDrawItemCaptionColor name 'Java_org_lamw_appsmswidgetproviderdemo'
+    +'1_Controls_pOnListViewDrawItemCaptionColor',
+  pOnListViewDrawItemBitmap name 'Java_org_lamw_appsmswidgetproviderdemo1_'
+    +'Controls_pOnListViewDrawItemBitmap',
+  pOnWidgeItemLostFocus name 'Java_org_lamw_appsmswidgetproviderdemo1_Controls'
+    +'_pOnWidgeItemLostFocus',
+  pOnListViewScrollStateChanged name 'Java_org_lamw_appsmswidgetproviderdemo1_'
+    +'Controls_pOnListViewScrollStateChanged',
+  pOnListViewDrawItemWidgetTextColor name 'Java_org_lamw_appsmswidgetproviderde'
+    +'mo1_Controls_pOnListViewDrawItemWidgetTextColor',
+  pOnListViewDrawItemWidgetImage name 'Java_org_lamw_appsmswidgetproviderdemo1'
+    +'_Controls_pOnListViewDrawItemWidgetImage';
 
 {%endregion}
   

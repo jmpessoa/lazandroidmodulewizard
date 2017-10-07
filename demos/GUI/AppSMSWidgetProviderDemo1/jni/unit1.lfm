@@ -1,6 +1,6 @@
 object AndroidModule1: TAndroidModule1
-  Left = 282
-  Top = 155
+  Left = 267
+  Top = 151
   Width = 320
   Height = 400
   MarginLeft = 0
@@ -38,10 +38,10 @@ object AndroidModule1: TAndroidModule1
     FontSizeUnit = unitDefault
   end
   object jButton1: jButton
-    Left = 4
+    Left = 2
     Top = 34
-    Width = 312
-    Height = 40
+    Width = 316
+    Height = 50
     MarginLeft = 2
     MarginTop = 4
     MarginRight = 2
@@ -60,6 +60,37 @@ object AndroidModule1: TAndroidModule1
     FontSize = 0
     FontSizeUnit = unitDefault
     OnClick = jButton1Click
+  end
+  object jListView1: jListView
+    Left = 93
+    Top = 281
+    Width = 92
+    Height = 96
+    MarginLeft = 5
+    MarginTop = 5
+    MarginRight = 5
+    MarginBottom = 5
+    Enabled = True
+    Visible = True
+    Id = 3
+    PosRelativeToAnchor = []
+    PosRelativeToParent = []
+    LayoutParamWidth = lpOneThirdOfParent
+    LayoutParamHeight = lpWrapContent
+    BackgroundColor = colbrDefault
+    FontColor = colbrDefault
+    FontSize = 0
+    WidgetItem = wgNone
+    Delimiter = '|'
+    TextDecorated = txtNormal
+    ItemLayout = layText
+    TextSizeDecorated = sdNone
+    TextAlign = alLeft
+    HighLightSelectedItemColor = colbrDefault
+    FontSizeUnit = unitDefault
+    ItemPaddingTop = 40
+    ItemPaddingBottom = 40
+    WidgetTextColor = colbrDefault
   end
   object jIntentManager1: jIntentManager
     IntentAction = iaNone

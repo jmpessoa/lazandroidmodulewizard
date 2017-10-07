@@ -98,14 +98,14 @@ public class jSMSWidgetProvider extends AppWidgetProvider  {
               }               
             }
            
-			RemoteViews remoteViews = new RemoteViews(ctx.getPackageName(), R.layout.smswigetlayout); //layoutId
+			RemoteViews remoteViews = new RemoteViews(ctx.getPackageName(), R.layout.jsmswidgetprovider_layout); //layoutId
 			remoteViews.setTextViewText(R.id.smswidgettextview, smsBody);
-			remoteViews.setOnClickPendingIntent(R.id.smswidgetbackgroundlayout, builActivityPendingIntent(ctx, smsBody, "App"));
+			remoteViews.setOnClickPendingIntent(R.id.jsmswidgetprovider_layout, builActivityPendingIntent(ctx, smsBody, "App"));
 			pushWidgetUpdate(ctx, remoteViews);								
       }
       
       
-      if (intent.getAction().equals(ctx.getPackageName()+".WIDGET_NOTIFY")) {       	  
+      if (intent.getAction().equals(ctx.getPackageName()+".LAMW_SMS_WIDGET_NOTIFY")) {       	  
   	    
    	     int appNameId = GetStringRId(ctx, "app_name");    	   
    	     String appStr = (String) ctx.getResources().getText(appNameId);    	   
@@ -116,9 +116,9 @@ public class jSMSWidgetProvider extends AppWidgetProvider  {
         	 smsBody = (String) bundle.getCharSequence("notify_message");      
          }
           
-		 RemoteViews remoteViews = new RemoteViews(ctx.getPackageName(), R.layout.smswigetlayout); 
+		 RemoteViews remoteViews = new RemoteViews(ctx.getPackageName(), R.layout.jsmswidgetprovider_layout); 
 		 remoteViews.setTextViewText(R.id.smswidgettextview, smsBody);
-		 remoteViews.setOnClickPendingIntent(R.id.smswidgetbackgroundlayout, builActivityPendingIntent(ctx, smsBody, "App"));
+		 remoteViews.setOnClickPendingIntent(R.id.jsmswidgetprovider_layout, builActivityPendingIntent(ctx, smsBody, "App"));
 		 pushWidgetUpdate(ctx, remoteViews);								
      }
       

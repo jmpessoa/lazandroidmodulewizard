@@ -8,6 +8,7 @@ interface
 
 uses 
   Classes,
+  incomingcallwidgetprovider,
   modaldialog,
   smswidgetprovider,
   speechtotext,
@@ -55,6 +56,7 @@ implementation
   
 Procedure Register;
 begin
+  {$I jincomingcallwidgetprovider_icon.lrs}
   {$I jmodaldialog_icon.lrs}
   {$I jsmswidgetprovider_icon.lrs}
   {$I jspeechtotext_icon.lrs}
@@ -103,6 +105,7 @@ begin
 
   RegisterComponents('Android Bridges Extra',
    [
+      jIncomingCallWidgetProvider,
       jModalDialog,
       jSMSWidgetProvider,
       jSpeechToText,
