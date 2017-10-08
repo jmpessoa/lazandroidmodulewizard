@@ -53,6 +53,7 @@ type
     property MinAPI: Integer read FMinAPI;
     property Name: string read FName;
   end;
+  PAndroidTheme = ^TAndroidTheme;
 
   { TAndroidThemes }
 
@@ -121,19 +122,13 @@ end;
 { TAndroidThemes }
 
 function CmpAndroidThemes(p1, p2: Pointer): Integer;
-var
-  t1: TAndroidTheme absolute p1;
-  t2: TAndroidTheme absolute p2;
 begin
-  Result := CompareStr(t1.Name, t2.Name);
+  Result := CompareStr(PAndroidTheme(p1)^.Name, PAndroidTheme(p2)^.Name);
 end;
 
 function FindThemeByName(p1, p2: Pointer): Integer;
-var
-  pname: Pstring absolute p1;
-  t: TAndroidTheme absolute p2;
 begin
-  Result := CompareStr(pname^, t.Name);
+  Result := CompareStr(PString(p1)^, PAndroidTheme(p2)^.Name);
 end;
 
 function TAndroidThemes.AddTheme(const ThemeName: string;
