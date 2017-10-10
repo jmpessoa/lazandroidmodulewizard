@@ -744,7 +744,7 @@ type
     Procedure SetFontColor(Value : TARGBColorBridge);
     Procedure SetFontSize (Value : DWord  );
 
-    Procedure SetEnabled  (Value : Boolean);
+    Procedure SetEnabled  (Value : Boolean); override;
     Procedure SetTextAlignment(Value: TTextAlignment);
     procedure UpdateLParamHeight;
     procedure UpdateLParamWidth;
@@ -1627,12 +1627,12 @@ type
     FImageUpIndex: TImageListIndex;
     FImageDownIndex: TImageListIndex;
 
-    FImageList : jImageList;  //by jmpessoa
+    FImageList : jImageList;
     FFilePath: TFilePath;
 
-    procedure SetImages(Value: jImageList);   //by jmpessoa
+    procedure SetImages(Value: jImageList);
     Procedure SetColor    (Value : TARGBColorBridge);
-    Procedure SetEnabled  (Value : Boolean);
+    Procedure SetEnabled  (Value : Boolean); override;
 
     procedure SetImageDownByIndex(Value: integer);
     procedure SetImageUpByIndex(Value: integer);

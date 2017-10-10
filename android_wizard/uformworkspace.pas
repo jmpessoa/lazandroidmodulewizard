@@ -59,6 +59,7 @@ type
     procedure ListBoxTargetAPIClick(Sender: TObject);
     procedure ListBoxTargetAPISelectionChange(Sender: TObject; User: boolean);
     procedure ListBoxPlatformClick(Sender: TObject);
+    //procedure RGDeviceTypeClick(Sender: TObject);
 
     procedure RGInstructionClick(Sender: TObject);
 
@@ -71,7 +72,7 @@ type
     { private declarations }
     FFilename: string;
     FPathToWorkspace: string; {C:\adt32\eclipse\workspace}
-
+    //FDeviceType: string;      {phone or watch ... }
     FInstructionSet: string;      {ArmV6}
     FFPUSet: string;              {Soft}
     FPathToJavaTemplates: string;
@@ -154,6 +155,8 @@ type
     property AndroidTheme: string read FAndroidTheme write FAndroidTheme;
     property PieChecked: boolean read FPieChecked write FPieChecked;
     property LibraryChecked: boolean read FLibraryChecked write FLibraryChecked;
+    //property DeviceType: string read FDeviceType write FDeviceType;
+
   end;
 
 
@@ -272,6 +275,15 @@ begin
   FAndroidNdkPlatform:= 'android-'+ListBoxPlatform.Items[ListBoxPlatform.ItemIndex]
 end;
 
+{
+procedure TFormWorkspace.RGDeviceTypeClick(Sender: TObject);
+begin
+  case RGDeviceType.ItemIndex of
+    0: FDeviceType:= 'phone';
+    1: FDeviceType:= 'watch';
+  end;
+end;
+}
 
 procedure TFormWorkspace.RGInstructionClick(Sender: TObject);
 begin
@@ -610,7 +622,12 @@ end;
 procedure TFormWorkspace.FormCreate(Sender: TObject);
 var
   fileName: string;
-begin   //here ModuleType already know!
+begin
+
+  //FDeviceType:= 'phone';
+  //Self.RGDeviceType.ItemIndex:= 0;
+
+  //here ModuleType already know!
   fileName:= IncludeTrailingPathDelimiter(LazarusIDE.GetPrimaryConfigPath) + 'JNIAndroidProject.ini';
   if not FileExists(fileName) then
   begin

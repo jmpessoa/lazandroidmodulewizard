@@ -606,6 +606,8 @@ type
 
   TActivityMode = (actMain, actRecyclable, actSplash); //actDisposable
 
+  //TDeviceType = (dtPhone, dtWatch);
+
   TTextTypeFace = (tfNormal, tfBold, tfItalic, tfBoldItalic); //by jmpessoa
   TFontFace = (ffNormal, ffSans, ffSerif, ffMonospace);
   //...
@@ -628,7 +630,7 @@ type
 
   TOnKeyDown = Procedure(Sender: TObject; keyChar: char; keyCode: integer; keyCodeString:string; var mute: boolean) of Object;
 
-  TActionBarTitle = (abtDefault, abtTextAsTitle, abtTextAsTitleHideLogo, abtHideLogo, abtHide);
+  TActionBarTitle = (abtDefault, abtTextAsTitle, abtTextAsTitleHideLogo, abtHideLogo, abtHide, abtNone);
 
   TOnOptionMenuItemCreate = Procedure(Sender: TObject; jObjMenu: jObject) of Object;
 
@@ -758,8 +760,6 @@ type
   TjFormState = (fsFormCreate,  // Initializing
                  fsFormWork,    // Working
                  fsFormClose);  // Closing
-
-  //by jmpessoa
 
   { jApp }
 
@@ -1001,7 +1001,6 @@ end;
     FAnimation     : TAnimation;
 
     FActivityMode  : TActivityMode;
-
     FActionBarTitle: TActionBarTitle;
 
     FOnClick      : TOnNotify;
@@ -1015,6 +1014,7 @@ end;
     FOnBackButton  : TOnNotify;
 
     FOnSpecialKeyDown      : TOnKeyDown;
+    FActionBarHeight: integer;
 
     FOnOptionMenuCreate: TOnOptionMenuItemCreate;
     FOnClickOptionMenuItem: TOnClickOptionMenuItem;
@@ -1050,7 +1050,7 @@ end;
     FCloseCallback : TjCallBack;   // Close Call Back Event
 
     Procedure SetVisible (Value : Boolean);
-    Procedure SetEnabled (Value : Boolean);
+    Procedure SetEnabled (Value : Boolean); override;
 
     function  GetOnViewClickListener(jObjForm: jObject): jObject;
     function  GetOnListItemClickListener(jObjForm: jObject): jObject;
@@ -1058,7 +1058,6 @@ end;
   public
 
     ScreenStyleAtStart: TScreenStyle;    //device direction [vertical=1 and vertical=2]
-    ActionBarHeight: integer;
 
     FormState     : TjFormState;
     FormIndex: integer;
@@ -1227,6 +1226,7 @@ end;
     property  OnListItemClick: TListItemClick read FOnListItemClick write FOnListItemClick;
 
     property PackageName: string read FPackageName;
+    property ActionBarHeight: integer read GetActionBarHeight;
     //---------------  dummies for compatibility----
     {
     property OldCreateOrder: boolean read FOldCreateOrder write FOldCreateOrder;
@@ -1719,6 +1719,7 @@ var
   gjClassName : PChar; // Ex 'com/kredix/Controls';
 
   ActivityModeDesign: TActivityMode = actMain;
+  //ActionBarTitleDesign: TActionBarTitle = abtDefault;
 
 
 implementation
@@ -2611,6 +2612,7 @@ begin
   FActivityMode         := ActivityModeDesign; //actMain;  //actMain, actRecyclable, actSplash
 
   FActionBarTitle:= abtDefault;
+  //FActionBarTitle:= ActionBarTitleDesign; //'phone' or 'watch' or
 
   FOnCloseQuery         := nil;
   FOnClose              := nil;
@@ -2750,8 +2752,6 @@ begin
 
   //Show ...
   jForm_Show2(refApp.Jni.jEnv, FjObject, FAnimation.In_);
-
-  ActionBarHeight:= jForm_GetActionBarHeight(FjEnv, FjObject);
 
   if Assigned(FOnActivityCreate) then FOnActivityCreate(Self, refApp.Jni.jIntent);
 
@@ -3144,61 +3144,91 @@ end;
 function jForm.GetActionBar(): jObject;
 begin
   if FInitialized then
-    Result:= jForm_GetActionBar(FjEnv, FjObject);
+  begin
+    if FActionBarTitle <> abtNone then
+       Result:= jForm_GetActionBar(FjEnv, FjObject);
+  end;
 end;
 
 procedure jForm.HideActionBar();
 begin
   if FInitialized then
-     jForm_HideActionBar(FjEnv, FjObject);
+  begin
+     if FActionBarTitle <> abtNone then
+       jForm_HideActionBar(FjEnv, FjObject);
+  end;
 end;
 
 procedure jForm.ShowActionBar();
 begin
   if FInitialized then
-     jForm_ShowActionBar(FjEnv, FjObject);
+  begin
+    if FActionBarTitle <> abtNone then
+       jForm_ShowActionBar(FjEnv, FjObject);
+  end;
 end;
 
 procedure jForm.ShowTitleActionBar(_value: boolean);
 begin
   if FInitialized then
-     jForm_ShowTitleActionBar(FjEnv, FjObject, _value);
+  begin
+     if FActionBarTitle <> abtNone then
+       jForm_ShowTitleActionBar(FjEnv, FjObject, _value);
+  end;
 end;
 
 procedure jForm.ShowLogoActionBar(_value: boolean);
 begin
   if FInitialized then
-     jForm_ShowLogoActionBar(FjEnv, FjObject, _value);
+  begin
+    if FActionBarTitle <> abtNone then
+       jForm_ShowLogoActionBar(FjEnv, FjObject, _value);
+  end;
 end;
 
 procedure jForm.SetTitleActionBar(_title: string);
 begin
   if FInitialized then
-     jForm_SetTitleActionBar(FjEnv, FjObject, _title);
+  begin
+     if FActionBarTitle <> abtNone then
+       jForm_SetTitleActionBar(FjEnv, FjObject, _title);
+  end;
 end;
 
 procedure jForm.SetSubTitleActionBar(_subtitle: string);
 begin
   if FInitialized then
-     jForm_SetSubTitleActionBar(FjEnv, FjObject, _subtitle);
+  begin
+     if FActionBarTitle <> abtNone then
+        jForm_SetSubTitleActionBar(FjEnv, FjObject, _subtitle);
+  end;
 end;
 
 procedure jForm.SetIconActionBar(_iconIdentifier: string);
 begin
   if FInitialized then
-     jForm_SetIconActionBar(FjEnv, FjObject, _iconIdentifier);
+  begin
+     if FActionBarTitle <> abtNone then
+       jForm_SetIconActionBar(FjEnv, FjObject, _iconIdentifier);
+  end;
 end;
 
 procedure jForm.SetTabNavigationModeActionBar();
 begin
   if FInitialized then
-     jForm_SetTabNavigationModeActionBar(FjEnv, FjObject);
+  begin
+    if FActionBarTitle <> abtNone then
+      jForm_SetTabNavigationModeActionBar(FjEnv, FjObject);
+  end;
 end;
 
 procedure jForm.RemoveAllTabsActionBar();
 begin
   if FInitialized then
-     jForm_RemoveAllTabsActionBar(FjEnv, FjObject);
+  begin
+     if FActionBarTitle <> abtNone then
+       jForm_RemoveAllTabsActionBar(FjEnv, FjObject);
+  end;
 end;
 
 function jForm.GetStringResourceId(_resName: string): integer;
@@ -3353,21 +3383,27 @@ function jForm.GetTitleActionBar(): string;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jForm_GetTitleActionBar(FjEnv, FjObject);
+  begin
+    if FActionBarTitle <> abtNone then
+       Result:= jForm_GetTitleActionBar(FjEnv, FjObject);
+  end;
 end;
 
 function jForm.GetSubTitleActionBar(): string;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jForm_GetSubTitleActionBar(FjEnv, FjObject);
+  begin
+    if FActionBarTitle <> abtNone then
+      Result:= jForm_GetSubTitleActionBar(FjEnv, FjObject);
+  end;
 end;
 
 function jForm.CopyFromAssetsToInternalAppStorage(_filename: string): string;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jForm_CopyFromAssetsToInternalAppStorage(FjEnv, FjObject, _filename);
+    Result:= jForm_CopyFromAssetsToInternalAppStorage(FjEnv, FjObject, _filename);
 end;
 
 procedure jForm.CopyFromInternalAppStorageToEnvironmentDir(_filename: string; _environmentDirPath: string);
@@ -3401,15 +3437,22 @@ end;
 function jForm.GetActionBarHeight(): integer;
 begin
   //in designing component state: result value here...
+  Result:= 0;
   if FInitialized then
-   Result:= jForm_GetActionBarHeight(FjEnv, FjObject);
+  begin
+     if FActionBarTitle <> abtNone then
+        Result:= jForm_GetActionBarHeight(FjEnv, FjObject);
+  end;
 end;
 
 function jForm.ActionBarIsShowing(): boolean;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jForm_ActionBarIsShowing(FjEnv, FjObject);
+  begin
+    if FActionBarTitle <> abtNone then
+      Result:= jForm_ActionBarIsShowing(FjEnv, FjObject);
+  end;
 end;
 
 procedure jForm.ToggleSoftInput();
@@ -3705,7 +3748,7 @@ begin
               Result:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
             end;
   end;
-env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env,jParams[0].l);
   env^.DeleteLocalRef(env, jCls);
 end;
 

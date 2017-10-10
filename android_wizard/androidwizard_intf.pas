@@ -34,6 +34,7 @@ type
      {C:\adt32\ndk7\toolchains\arm-linux-androideabi-4.4.3\prebuilt\windows\lib\gcc\arm-linux-androideabi\4.4.3}
      FInstructionSet: string;    {ArmV6}
      FFPUSet: string;            {Soft}
+     //FDeviceType: string;
      FPathToJavaTemplates: string;
      FAndroidProjectName: string;
      FModuleType: integer;     {0: GUI; 1: NoGUI; 2: NoGUI EXE Console}
@@ -390,7 +391,7 @@ begin
     FModuleType := 0; //0: GUI --- 1:NoGUI --- 2: NoGUI EXE Console
     FJavaClassName := 'Controls';
     FPathToClassName := '';
-    if GetWorkSpaceFromForm(0, outTag) then
+    if GetWorkSpaceFromForm(0, outTag) then //GUI
     begin
       with TStringList.Create do
         try
@@ -714,7 +715,6 @@ begin
   FModuleType:= projectType; //0:GUI  1:NoGUI 2: NoGUI EXE Console 3: generic library
 
   AndroidFileDescriptor.ModuleType:= projectType;
-
   strList:= nil;
   frm:= TFormWorkspace.Create(nil);
 
@@ -731,6 +731,8 @@ begin
 
     frm.CheckBoxPIE.Visible:= False;
     frm.CheckBoxLibrary.Visible:= False;
+
+    //frm.RGDeviceType.ItemIndex:= 0;  //phone
 
     if projectType = 1 then //No GUI
     begin
@@ -781,6 +783,9 @@ begin
 
       FInstructionSet:= frm.InstructionSet;{ ex. ArmV6}
       FFPUSet:= frm.FPUSet; {ex. Soft}
+
+      //FDeviceType:= frm.DeviceType;   //'phone' or 'watch' or ...
+      //if FDeviceType = 'watch' then ActionBarTitleDesign:= abtNone;
 
       FAndroidProjectName:= frm.AndroidProjectName;    //warning: full project name = path + name !
       FPathToJavaSrc:= FAndroidProjectName+DirectorySeparator+ 'src';

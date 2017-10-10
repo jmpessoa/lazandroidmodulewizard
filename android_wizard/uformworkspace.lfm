@@ -1,13 +1,13 @@
 object FormWorkspace: TFormWorkspace
   Left = 492
-  Height = 733
-  Top = 0
+  Height = 560
+  Top = 21
   Width = 400
   AutoSize = True
   BorderIcons = [biSystemMenu]
   BorderStyle = bsSizeToolWin
-  Caption = 'Android Module Wizard: Configure Project Workspace and Builds'
-  ClientHeight = 733
+  Caption = 'LAMW: Configure Project Workspace and Builds'
+  ClientHeight = 560
   ClientWidth = 400
   Constraints.MinHeight = 560
   Constraints.MinWidth = 400
@@ -81,7 +81,7 @@ object FormWorkspace: TFormWorkspace
   object StatusBarInfo: TStatusBar
     Left = 0
     Height = 23
-    Top = 710
+    Top = 537
     Width = 400
     Panels = <    
       item
@@ -100,7 +100,7 @@ object FormWorkspace: TFormWorkspace
   end
   object PanelRadioGroup: TPanel
     Left = 8
-    Height = 328
+    Height = 155
     Top = 296
     Width = 384
     Align = alClient
@@ -114,7 +114,7 @@ object FormWorkspace: TFormWorkspace
     ChildSizing.ShrinkVertical = crsHomogenousChildResize
     ChildSizing.Layout = cclLeftToRightThenTopToBottom
     ChildSizing.ControlsPerLine = 4
-    ClientHeight = 328
+    ClientHeight = 155
     ClientWidth = 384
     Constraints.MinHeight = 80
     TabOrder = 1
@@ -122,7 +122,7 @@ object FormWorkspace: TFormWorkspace
       AnchorSideLeft.Side = asrBottom
       AnchorSideTop.Side = asrBottom
       Left = 0
-      Height = 320
+      Height = 147
       Top = 4
       Width = 251
       AutoFill = True
@@ -135,7 +135,7 @@ object FormWorkspace: TFormWorkspace
       ChildSizing.ShrinkVertical = crsScaleChilds
       ChildSizing.Layout = cclLeftToRightThenTopToBottom
       ChildSizing.ControlsPerLine = 2
-      ClientHeight = 300
+      ClientHeight = 127
       ClientWidth = 247
       Columns = 2
       ItemIndex = 0
@@ -151,7 +151,7 @@ object FormWorkspace: TFormWorkspace
     end
     object Image1: TImage
       Left = 255
-      Height = 320
+      Height = 147
       Top = 4
       Width = 129
       AutoSize = True
@@ -793,7 +793,7 @@ object FormWorkspace: TFormWorkspace
   object PanelButtons: TPanel
     Left = 0
     Height = 78
-    Top = 632
+    Top = 459
     Width = 400
     Align = alBottom
     BevelOuter = bvNone
@@ -1135,8 +1135,7 @@ object FormWorkspace: TFormWorkspace
         Left = 6
         Height = 23
         Top = 4
-        Width = 158
-        Anchors = [akTop, akLeft, akRight]
+        Width = 126
         BorderSpacing.Left = 6
         BorderSpacing.Top = 4
         BorderSpacing.Right = 20
