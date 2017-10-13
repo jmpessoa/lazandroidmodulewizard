@@ -618,6 +618,7 @@ procedure jListView_DispatchOnDrawWidgetItemWidgetTextColor(env: PJNIEnv; _jlist
 procedure jListView_DispatchOnDrawItemWidgetImage(env: PJNIEnv; _jlistview: JObject; _value: boolean);
 function jListView_SplitCenterItemCaption(env: PJNIEnv; _jlistview: JObject; _centerItemCaption: string; _delimiter: string): TDynArrayOfString;
 procedure jListView_SetSelection(env: PJNIEnv; _jlistview: JObject; _index: integer);
+procedure jListView_SmoothScrollToPosition(env: PJNIEnv; _jlistview: JObject; _index: integer);
 procedure jListView_SetItemChecked(env: PJNIEnv; _jlistview: JObject; _index: integer; _value: boolean);
 function jListView_GetCheckedItemPosition(env: PJNIEnv; _jlistview: JObject): integer;
 
@@ -5625,6 +5626,18 @@ begin
   env^.DeleteLocalRef(env, jCls);
 end;
 
+procedure jListView_SmoothScrollToPosition(env: PJNIEnv; _jlistview: JObject; _index: integer);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].i:= _index;
+  jCls:= env^.GetObjectClass(env, _jlistview);
+  jMethod:= env^.GetMethodID(env, jCls, 'SmoothScrollToPosition', '(I)V');
+  env^.CallVoidMethodA(env, _jlistview, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
 
 procedure jListView_SetItemChecked(env: PJNIEnv; _jlistview: JObject; _index: integer; _value: boolean);
 var

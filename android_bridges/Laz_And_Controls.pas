@@ -1347,6 +1347,7 @@ type
     procedure DispatchOnDrawItemWidgetImage(_value: boolean);
     function SplitCenterItemCaption(_centerItemCaption: string; _delimiter: string): TDynArrayOfString;
     procedure SetSelection(_index: integer);
+    procedure SmoothScrollToPosition(_index: integer);
     procedure SetItemChecked(_index: integer; _value: boolean);
     function GetCheckedItemPosition(): integer;
 
@@ -7623,6 +7624,13 @@ begin
   //in designing component state: set value here...
   if FInitialized then
      jListView_SetSelection(FjEnv, FjObject, _index);
+end;
+
+procedure jListView.SmoothScrollToPosition(_index: integer);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jListView_SmoothScrollToPosition(FjEnv, FjObject, _index);
 end;
 
 procedure jListView.SetItemChecked(_index: integer; _value: boolean);

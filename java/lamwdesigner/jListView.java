@@ -1739,6 +1739,17 @@ public class jListView extends ListView {
 		}			
 	}
 
+	public void SmoothScrollToPosition(int _index) {
+		this.smoothScrollToPosition(_index);
+		if (highLightSelectedItem) {
+			 if (lastSelectedItem != -1) {
+			    DoHighlight(lastSelectedItem, Color.TRANSPARENT); //textcolor
+			 }
+			 DoHighlight(_index,  highLightColor);
+			 lastSelectedItem = (int) _index;
+		}
+	}
+
 	public void SetItemChecked(int _index, boolean _value) {
 	    this.setItemChecked(_index, _value);		  
 		if (highLightSelectedItem) {	
