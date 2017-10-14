@@ -93,7 +93,7 @@ procedure jViewFlipper_Previous(env: PJNIEnv; _jviewflipper: JObject);
 implementation
 
 uses
-   customdialog;
+   customdialog, toolbar;
 
 {---------  jViewFlipper  --------------}
 
@@ -157,6 +157,11 @@ begin
     begin
       jCustomDialog(FParent).Init(refApp);
       FjPRLayout:= jCustomDialog(FParent).View;
+    end;
+    if FParent is jToolbar then
+    begin
+      jToolbar(FParent).Init(refApp);
+      FjPRLayout:= jToolbar(FParent).View;
     end;
   end;
 

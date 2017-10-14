@@ -1,4 +1,4 @@
-package com.example.appcustomdialogdemo1;
+package org.lamw.apptoolbardemo1;
 
 import android.graphics.Color;
 import android.graphics.PorterDuff.Mode;
@@ -197,6 +197,8 @@ public class jPanel extends RelativeLayout {
 			return new FrameLayout.LayoutParams(baseparams);
 		} else if (aparent instanceof RelativeLayout) {
 			return new RelativeLayout.LayoutParams(baseparams);
+		} else if (aparent instanceof ViewGroup) {
+			return new RelativeLayout.LayoutParams(baseparams);			
 		} else if (aparent instanceof LinearLayout) {
 			return new LinearLayout.LayoutParams(baseparams);
 		} else if (aparent == null) {

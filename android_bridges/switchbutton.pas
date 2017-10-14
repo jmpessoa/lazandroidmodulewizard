@@ -93,7 +93,7 @@ function jSwitchButton_IsChecked(env: PJNIEnv; _jswitchbutton: JObject): boolean
 implementation
 
 uses
-   customdialog;
+   customdialog, toolbar;
 
 {---------  jSwitchButton  --------------}
 
@@ -160,6 +160,11 @@ begin
     begin
       jCustomDialog(FParent).Init(refApp);
       FjPRLayout:= jCustomDialog(FParent).View;
+    end;
+    if FParent is jToolbar then
+    begin
+      jToolbar(FParent).Init(refApp);
+      FjPRLayout:= jToolbar(FParent).View;
     end;
   end;
   jSwitchButton_SetViewParent(FjEnv, FjObject, FjPRLayout);

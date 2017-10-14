@@ -97,7 +97,7 @@ procedure jSeekBar_SetRotation(env: PJNIEnv; _jseekbar: JObject; _rotation: sing
 implementation
 
 uses
-   customdialog;
+   customdialog, toolbar;
 
 {---------  jSeekBar  --------------}
 
@@ -142,6 +142,7 @@ begin
   //your code here: set/initialize create params....
   FjObject:= jCreate(); //jSelf !
   FInitialized:= True;
+
   if FParent <> nil then
   begin
     if FParent is jPanel then
@@ -164,7 +165,13 @@ begin
       jCustomDialog(FParent).Init(refApp);
       FjPRLayout:= jCustomDialog(FParent).View;
     end;
+    if FParent is jToolbar then
+    begin
+      jToolbar(FParent).Init(refApp);
+      FjPRLayout:= jToolbar(FParent).View;
+    end;
   end;
+
   jSeekBar_SetViewParent(FjEnv, FjObject, FjPRLayout);
   jSeekBar_SetId(FjEnv, FjObject, Self.Id);
   jSeekBar_SetLeftTopRightBottomWidthHeight(FjEnv, FjObject,

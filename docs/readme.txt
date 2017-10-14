@@ -124,6 +124,27 @@
 	*
 	****************************************************************************************************
 
+Version 0.7 - rev. 21 - 14 - October - 2017
+
+	NEW! jToolbar component  [to use only with  "minSkd=21" and "targetSdk >= 21"] <<--- a request from @Tomash
+
+	NEW! demo AppToolbarDemo1 [generic use of jToolbar as a specialized panel/visualContainer]
+
+	NEW! demo AppToolbarDemo2 [use Toolbar as "Actionbar": configured theme/style as "android:Theme.Material.Light.NoActionBar" 
+				   in "...res\values-21\style.xml"]
+
+		HINT 1: Configure your project colors:
+
+			Go to project folder "....res/values/colors.xml" <----- change [only content, NOT the file name] to configure colors 
+				
+				Reference is here:
+				http://www.vogella.com/tutorials/AndroidStylesThemes/article.html#styling-the-color-palette
+
+		HINT 2: if you change default ["colbrRoyalBlue"] jToolbar background color in design time,
+			You should change "primary_dark" in "color.xml" according "material" guideline 
+			[a little more darker than the toolbar color] 
+			Reference is here: https://www.materialpalette.com/   
+ 
 Version 0.7 - rev. 20 - 06 - October - 2017
 
 	NEW! jIncomingCallWidgetProvider component

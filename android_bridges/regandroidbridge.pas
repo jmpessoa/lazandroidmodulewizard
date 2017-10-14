@@ -33,7 +33,8 @@ uses
   contextmenu,
   spinner,
   viewflipper,
-  videoview;
+  videoview,
+  toolbar;
 
 Procedure Register;
   
@@ -82,6 +83,7 @@ begin
   {$I jcanvases2_icon.lrs}
   {$I jviewflipper_icon.lrs}
   {$I jvideoview_icon.lrs}
+  {$I jtoolbar_icon.lrs}
 
   RegisterComponents('Android Bridges',
     [
@@ -123,7 +125,8 @@ begin
       jCanvasES1,
       jCanvasES2,
       jViewFlipper,
-      jVideoView
+      jVideoView,
+      jToolbar
     ]
   );
   RegisterClasses([jApp, jForm, jControl, jVisualControl, jGLViewEvent]);

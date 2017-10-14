@@ -86,7 +86,7 @@ procedure jToggleButton_SetBackgroundDrawable(env: PJNIEnv; _jtogglebutton: JObj
 implementation
 
 uses
-  CustomDialog;
+  CustomDialog, toolbar;
 
 {---------  jToggleButton  --------------}
 
@@ -153,6 +153,11 @@ begin
     begin
       jCustomDialog(FParent).Init(refApp);
       FjPRLayout:= jCustomDialog(FParent).View;
+    end;
+    if FParent is jToolbar then
+    begin
+      jToolbar(FParent).Init(refApp);
+      FjPRLayout:= jToolbar(FParent).View;
     end;
   end;
   jToggleButton_SetViewParent(FjEnv, FjObject, FjPRLayout);

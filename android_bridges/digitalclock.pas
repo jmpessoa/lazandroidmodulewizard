@@ -79,7 +79,7 @@ procedure jDigitalClock_SetFontSizeUnit(env: PJNIEnv; _jdigitalclock: JObject; _
 implementation
 
 uses
-   customdialog;
+   customdialog, toolbar;
 
 {---------  jDigitalClock  --------------}
 
@@ -143,6 +143,11 @@ begin
     begin
       jCustomDialog(FParent).Init(refApp);
       FjPRLayout:= jCustomDialog(FParent).View;
+    end;
+    if FParent is jToolbar then
+    begin
+      jToolbar(FParent).Init(refApp);
+      FjPRLayout:= jToolbar(FParent).View;
     end;
   end;
   jDigitalClock_SetViewParent(FjEnv, FjObject, FjPRLayout);

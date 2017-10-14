@@ -856,6 +856,7 @@ object FormWorkspace: TFormWorkspace
         'Holo.Light'
         'Holo'
         'Material.Light.DarkActionBar'
+        'Material.Light.NoActionBar'
         'Material.Light'
         'Material'
       )

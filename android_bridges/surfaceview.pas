@@ -172,7 +172,7 @@ function jSurfaceView_GetDrawingCache(env: PJNIEnv; _jsurfaceview: JObject): jOb
 implementation
 
 uses
-   customdialog;
+   customdialog, toolbar;
 
 {---------  jSurfaceView  --------------}
 
@@ -241,6 +241,11 @@ begin
     begin
       jCustomDialog(FParent).Init(refApp);
       FjPRLayout:= jCustomDialog(FParent).View;
+    end;
+    if FParent is jToolbar then
+    begin
+      jToolbar(FParent).Init(refApp);
+      FjPRLayout:= jToolbar(FParent).View;
     end;
   end;
   jSurfaceView_SetViewParent(FjEnv, FjObject, FjPRLayout);

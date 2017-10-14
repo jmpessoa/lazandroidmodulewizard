@@ -744,12 +744,12 @@ type
     Procedure SetFontColor(Value : TARGBColorBridge);
     Procedure SetFontSize (Value : DWord  );
 
-    Procedure SetEnabled  (Value : Boolean); override;
     Procedure SetTextAlignment(Value: TTextAlignment);
     procedure UpdateLParamHeight;
     procedure UpdateLParamWidth;
 
   protected
+    Procedure SetEnabled  (Value : Boolean); override;
     Function  GetText: string;   override;
 
     procedure SetFontFace(AValue: TFontFace); //override;
@@ -1633,7 +1633,6 @@ type
 
     procedure SetImages(Value: jImageList);
     Procedure SetColor    (Value : TARGBColorBridge);
-    Procedure SetEnabled  (Value : Boolean); override;
 
     procedure SetImageDownByIndex(Value: integer);
     procedure SetImageUpByIndex(Value: integer);
@@ -1644,6 +1643,7 @@ type
     procedure UpdateLParamHeight;
     procedure UpdateLParamWidth;
   protected
+    Procedure SetEnabled  (Value : Boolean); override;
     procedure SetViewParent(Value: jObject); override;
     Procedure GenEvent_OnClick(Obj: TObject);
     procedure Notification(AComponent: TComponent; Operation: TOperation); override;
@@ -1827,7 +1827,7 @@ implementation
 
 
 uses
-  customdialog, radiogroup, autocompletetextview, viewflipper, comboedittext;
+  customdialog, radiogroup, autocompletetextview, viewflipper, comboedittext, toolbar;
 
 //-----------------------------------------------------------------------------
 // Asset
@@ -3060,6 +3060,12 @@ begin
     FjPRLayout:= jCustomDialog(FParent).View;
   end;
 
+  if FParent is jToolbar then
+  begin
+    jToolbar(FParent).Init(refApp);
+    FjPRLayout:= jToolbar(FParent).View;
+  end;
+
   jTextView_setParent(FjEnv, FjObject , FjPRLayout);
 
   jTextView_setId(FjEnv, FjObject, Self.Id);
@@ -3068,7 +3074,6 @@ begin
                                            FMarginLeft,FMarginTop,FMarginRight,FMarginBottom,
                                            GetLayoutParams(gApp, FLParamWidth, sdW),
                                            GetLayoutParams(gApp, FLParamHeight, sdH));
-
   if FParent is jPanel then
   begin
      Self.UpdateLayout();
@@ -3587,6 +3592,12 @@ begin
   begin
     jCustomDialog(FParent).Init(refApp);
     FjPRLayout:= jCustomDialog(FParent).View;
+  end;
+
+  if FParent is jToolbar then
+  begin
+    jToolbar(FParent).Init(refApp);
+    FjPRLayout:= jToolbar(FParent).View;
   end;
 
   jEditText_setParent(FjEnv, FjObject , FjPRLayout);
@@ -4337,6 +4348,12 @@ begin
     FjPRLayout:= jCustomDialog(FParent).View;
   end;
 
+  if FParent is jToolbar then
+  begin
+    jToolbar(FParent).Init(refApp);
+    FjPRLayout:= jToolbar(FParent).View;
+  end;
+
   jButton_setParent(FjEnv, FjObject , FjPRLayout);
 
   jButton_setId(FjEnv, FjObject , Self.Id);
@@ -4720,6 +4737,12 @@ begin
     FjPRLayout:= jCustomDialog(FParent).View;
   end;
 
+  if FParent is jToolbar then
+  begin
+    jToolbar(FParent).Init(refApp);
+    FjPRLayout:= jToolbar(FParent).View;
+  end;
+
   jCheckBox_setParent(FjEnv, FjObject , FjPRLayout);
   jCheckBox_setId(FjEnv, FjObject , Self.Id);
   jCheckBox_setLeftTopRightBottomWidthHeight(FjEnv, FjObject ,
@@ -5014,6 +5037,12 @@ begin
     //FjPRLayout:= jRadioGroup(FParent).View;
     FjPRLayout:= jRadioGroup_GetView(FjEnv, jRadioGroup(FParent).jSelf);
     flag:= True;
+  end;
+
+  if FParent is jToolbar then
+  begin
+    jToolbar(FParent).Init(refApp);
+    FjPRLayout:= jToolbar(FParent).View;
   end;
 
   if not flag then
@@ -5323,7 +5352,13 @@ begin
       jCustomDialog(FParent).Init(refApp);
       FjPRLayout:= jCustomDialog(FParent).View;
     end;
+    if FParent is jToolbar then
+    begin
+      jToolbar(FParent).Init(refApp);
+      FjPRLayout:= jToolbar(FParent).View;
+    end;
   end;
+
   jProgressBar_setParent(FjEnv, FjObject , FjPRLayout);
   jProgressBar_setId(FjEnv, FjObject , Self.Id);
 
@@ -5559,10 +5594,17 @@ begin
     jCustomDialog(FParent).Init(refApp);
     FjPRLayout:= jCustomDialog(FParent).View;
   end;
+
   if FParent is jViewFlipper then
   begin
     jViewFlipper(FParent).Init(refApp);
     FjPRLayout:= jViewFlipper(FParent).View;
+  end;
+
+  if FParent is jToolbar then
+  begin
+    jToolbar(FParent).Init(refApp);
+    FjPRLayout:= jToolbar(FParent).View;
   end;
 
   jImageView_setParent(FjEnv,FjObject , FjPRLayout);
@@ -6941,6 +6983,11 @@ begin
       jCustomDialog(FParent).Init(refApp);
       FjPRLayout:= jCustomDialog(FParent).View;
     end;
+    if FParent is jToolbar then
+    begin
+      jToolbar(FParent).Init(refApp);
+      FjPRLayout:= jToolbar(FParent).View;
+    end;
   end;
 
   jListView_setParent(FjEnv, FjObject , FjPRLayout);
@@ -7711,6 +7758,11 @@ begin
       jCustomDialog(FParent).Init(refApp);
       FjPRLayout:= jCustomDialog(FParent).View;
     end;
+    if FParent is jToolbar then
+    begin
+      jToolbar(FParent).Init(refApp);
+      FjPRLayout:= jToolbar(FParent).View;
+    end;
   end;
   jScrollView_setParent(FjEnv, FjObject , FjPRLayout);
   jScrollView_setId(FjEnv, FjObject , Self.Id);
@@ -7999,6 +8051,13 @@ begin
       jCustomDialog(FParent).Init(refApp);
       FjPRLayout:= jCustomDialog(FParent).View;
     end;
+
+    if FParent is jToolbar then
+    begin
+      jToolbar(FParent).Init(refApp);
+      FjPRLayout:= jToolbar(FParent).View;
+    end;
+
   end;
   jHorizontalScrollView_setParent(FjEnv, FjObject , FjPRLayout);
   jHorizontalScrollView_setId(FjEnv, FjObject , Self.Id);
@@ -8250,6 +8309,11 @@ begin
     begin
       jCustomDialog(FParent).Init(refApp);
       FjPRLayout:= jCustomDialog(FParent).View;
+    end;
+    if FParent is jToolbar then
+    begin
+      jToolbar(FParent).Init(refApp);
+      FjPRLayout:= jToolbar(FParent).View;
     end;
   end;
   jWebView_setParent(FjEnv, FjObject , FjPRLayout);
@@ -9133,6 +9197,11 @@ begin
       jCustomDialog(FParent).Init(refApp);
       FjPRLayout:= jCustomDialog(FParent).View;
     end;
+    if FParent is jToolbar then
+    begin
+      jToolbar(FParent).Init(refApp);
+      FjPRLayout:= jToolbar(FParent).View;
+    end;
   end;
 
   jView_setParent(FjEnv,FjObject , FjPRLayout);
@@ -9614,8 +9683,6 @@ begin
   FjObject := jImageBtn_Create(FjEnv, FjThis, Self);
   FInitialized:= True;
 
-//  if FParent <> nil then
- // begin
     if FParent is jPanel then
     begin
       jPanel(FParent).Init(refApp);
@@ -9636,7 +9703,11 @@ begin
       jCustomDialog(FParent).Init(refApp);
       FjPRLayout:= jCustomDialog(FParent).View;
     end;
-  //end;
+    if FParent is jToolbar then
+    begin
+      jToolbar(FParent).Init(refApp);
+      FjPRLayout:= jToolbar(FParent).View;
+    end;
 
   jImageBtn_setParent(FjEnv, FjObject , FjPRLayout);
   jImageBtn_setId(FjEnv, FjObject , Self.Id);
@@ -10512,6 +10583,12 @@ begin
       FjPRLayout:= jViewFlipper(FParent).View;
     end;
 
+    if FParent is jToolbar then
+    begin
+      jToolbar(FParent).Init(refApp);
+      FjPRLayout:= jToolbar(FParent).View;
+    end;
+
   end;
 
   jPanel_setParent(FjEnv, FjObject , FjPRLayout);
@@ -10830,6 +10907,5 @@ begin
       jPanel_SetMarginLeftTopRightBottom(FjEnv, FjObject ,
                                           _left,_top,_right,_bottom);
 end;
-
 
 end.

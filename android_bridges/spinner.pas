@@ -159,7 +159,7 @@ procedure jSpinner_SetSelectedPaddingBottom(env: PJNIEnv; _jspinner: JObject; _p
 implementation
 
 uses
-  customdialog;
+  customdialog, toolbar;
 
 {---------  jSpinner  --------------}
 
@@ -247,6 +247,11 @@ begin
   begin
     jCustomDialog(FParent).Init(refApp);
     FjPRLayout:= jCustomDialog(FParent).View;
+  end;
+  if FParent is jToolbar then
+  begin
+    jToolbar(FParent).Init(refApp);
+    FjPRLayout:= jToolbar(FParent).View;
   end;
   jSpinner_SetjParent(FjEnv, FjObject , FjPRLayout);
   jSpinner_SetId(FjEnv, FjObject , Self.Id);

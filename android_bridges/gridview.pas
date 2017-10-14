@@ -206,9 +206,8 @@ procedure jGridView_SetStretchMode(env: PJNIEnv; _jgridview: JObject;
 implementation
 
 uses
-  customdialog
-  ,And_log_h  {for test}
-  ;
+  customdialog, toolbar,
+  And_log_h  {for test};
 
 {---------  jGridView  --------------}
 
@@ -290,6 +289,11 @@ begin
     begin
       jCustomDialog(FParent).Init(refApp);
       FjPRLayout := jCustomDialog(FParent).View;
+    end;
+    if FParent is jToolbar then
+    begin
+      jToolbar(FParent).Init(refApp);
+      FjPRLayout:= jToolbar(FParent).View;
     end;
   end;
   jGridView_SetViewParent(FjEnv, FjObject, FjPRLayout);

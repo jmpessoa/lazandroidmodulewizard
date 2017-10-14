@@ -393,6 +393,11 @@ type
     procedure Draw; override;
   end;
 
+  TDraftToolbar = class(TDraftWidget)
+  public
+    procedure Draw; override;
+  end;
+
 
   { TARGBColorBridgePropertyEditor }
 
@@ -503,7 +508,7 @@ uses
   customdialog, togglebutton, switchbutton,
   Laz_And_GLESv1_Canvas, Laz_And_GLESv2_Canvas, gridview, Spinner, seekbar,
   radiogroup, ratingbar, digitalclock, analogclock, surfaceview,
-  autocompletetextview, drawingview, chronometer, viewflipper, videoview, comboedittext;
+  autocompletetextview, drawingview, chronometer, viewflipper, videoview, comboedittext, toolbar;
 
 const
   DrawableSearchPaths: array [0..3] of string = (
@@ -1041,6 +1046,22 @@ begin
   end;
 end;
 
+
+{ TDraftToolbar }
+
+procedure TDraftToolbar.Draw;
+begin
+  with Fcanvas do
+  begin
+    if jToolbar(FAndroidWidget).BackgroundColor <> colbrDefault then
+      Brush.Color := ToTColor(jToolbar(FAndroidWidget).BackgroundColor)
+    else begin
+      Brush.Color:= clNone;
+      Brush.Style:= bsClear;
+    end;
+    Rectangle(0, 0, FAndroidWidget.Width, FAndroidWidget.Height);    // outer frame
+  end;
+end;
 { TDraftControlHash }
 
 function TDraftControlHash.Hash1(c: TClass): PtrUInt;
@@ -3555,6 +3576,7 @@ initialization
   RegisterAndroidWidgetDraftClass(jChronometer, TDraftWidget);
   RegisterAndroidWidgetDraftClass(jViewFlipper, TDraftWidget);
   RegisterAndroidWidgetDraftClass(jVideoView, TDraftWidget);
+  RegisterAndroidWidgetDraftClass(jToolbar, TDraftToolbar);
 
 finalization
   DraftClassesMap.Free;

@@ -68,7 +68,7 @@ procedure jAnalogClock_SetId(env: PJNIEnv; _janalogclock: JObject; _id: integer)
 implementation
 
 uses
-   customdialog;
+   customdialog, toolbar;
 
 {---------  jAnalogClock  --------------}
 
@@ -132,6 +132,11 @@ begin
     begin
       jCustomDialog(FParent).Init(refApp);
       FjPRLayout:= jCustomDialog(FParent).View;
+    end;
+    if FParent is jToolbar then
+    begin
+      jToolbar(FParent).Init(refApp);
+      FjPRLayout:= jToolbar(FParent).View;
     end;
   end;
   jAnalogClock_SetViewParent(FjEnv, FjObject, FjPRLayout);

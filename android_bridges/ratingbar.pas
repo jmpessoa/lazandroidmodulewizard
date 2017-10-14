@@ -97,7 +97,7 @@ function jRatingBar_IsIndicator(env: PJNIEnv; _jratingbar: JObject): boolean;
 implementation
 
 uses
-   customdialog;
+   customdialog, toolbar;
 
 {---------  jRatingBar  --------------}
 
@@ -165,6 +165,11 @@ begin
     begin
       jCustomDialog(FParent).Init(refApp);
       FjPRLayout:= jCustomDialog(FParent).View;
+    end;
+    if FParent is jToolbar then
+    begin
+      jToolbar(FParent).Init(refApp);
+      FjPRLayout:= jToolbar(FParent).View;
     end;
   end;
   jRatingBar_SetViewParent(FjEnv, FjObject, FjPRLayout);

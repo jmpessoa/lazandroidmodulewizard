@@ -178,7 +178,7 @@ procedure jAutoTextView_SetHint(env: PJNIEnv; _jautotextview: JObject; _hint: st
 implementation
 
 uses
-   customdialog;
+   customdialog, toolbar;
 
 {---------  jAutoTextView  --------------}
 
@@ -255,6 +255,11 @@ begin
     begin
       jCustomDialog(FParent).Init(refApp);
       FjPRLayout:= jCustomDialog(FParent).View;
+    end;
+    if FParent is jToolbar then
+    begin
+      jToolbar(FParent).Init(refApp);
+      FjPRLayout:= jToolbar(FParent).View;
     end;
   end;
   jAutoTextView_SetViewParent(FjEnv, FjObject, FjPRLayout);

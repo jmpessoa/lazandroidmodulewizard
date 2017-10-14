@@ -401,7 +401,7 @@ Sending Data: Extras vs. URI Parameters
 	    case 8: mIntent.setAction(Settings.ACTION_QUICK_LAUNCH_SETTINGS); break;
 	    case 9: mIntent.setAction(Settings.ACTION_DATE_SETTINGS); break;
 	    case 10: mIntent.setAction(Settings.ACTION_SETTINGS);   break;//system settings
-	    case 11: mIntent.setAction(Settings.ACTION_WIRELESS_SETTINGS); break;	    
+	    case 11: mIntent.setAction(Settings.ACTION_WIRELESS_SETTINGS); break;	//"android.settings.WIRELESS_SETTINGS"    
 	    case 12: mIntent.setAction(Settings.ACTION_DEVICE_INFO_SETTINGS); break;
 	    case 13: mIntent.setAction(android.content.Intent.ACTION_SEND); break;
 	    case 14: mIntent.setAction(android.content.Intent.ACTION_SEND_MULTIPLE); break;	    

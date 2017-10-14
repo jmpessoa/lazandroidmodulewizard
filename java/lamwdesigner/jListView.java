@@ -1739,7 +1739,7 @@ public class jListView extends ListView {
 		}			
 	}
 
-	public void SmoothScrollToPosition(int _index) {
+        public void SmoothScrollToPosition(int _index) {
 		this.smoothScrollToPosition(_index);
 		if (highLightSelectedItem) {
 			 if (lastSelectedItem != -1) {

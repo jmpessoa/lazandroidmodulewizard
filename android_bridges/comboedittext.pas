@@ -203,7 +203,7 @@ procedure jComboEditText_SetHint(env: PJNIEnv; _jcomboedittext: JObject; _hint: 
 implementation
 
 uses
-   customdialog;
+   customdialog, toolbar;
 
 {---------  jComboEditText  --------------}
 
@@ -285,6 +285,11 @@ begin
     begin
       jCustomDialog(FParent).Init(refApp);
       FjPRLayout:= jCustomDialog(FParent).View;
+    end;
+    if FParent is jToolbar then
+    begin
+      jToolbar(FParent).Init(refApp);
+      FjPRLayout:= jToolbar(FParent).View;
     end;
   end;
   jComboEditText_SetViewParent(FjEnv, FjObject, FjPRLayout);

@@ -32,10 +32,10 @@ jVideoView = class(jVisualControl)
     procedure GenEvent_OnClick(Obj: TObject);
     function jCreate(): jObject;
     procedure jFree();
-    procedure SetViewParent(_viewgroup: jObject);
+    procedure SetViewParent(_viewgroup: jObject); override;
     function GetParent(): jObject;
     procedure RemoveFromViewParent();
-    function GetView(): jObject;
+    function GetView(): jObject;  override;
     procedure SetLParamWidth(_w: integer);
     procedure SetLParamHeight(_h: integer);
     function GetLParamWidth(): integer;
@@ -93,7 +93,7 @@ procedure jVideoView_PlayFromSdcard(env: PJNIEnv; _jvideoview: JObject; _fileNam
 implementation
 
 uses
-   customdialog;
+   customdialog, toolbar;
 
 {---------  jVideoView  --------------}
 
@@ -157,6 +157,11 @@ begin
     begin
       jCustomDialog(FParent).Init(refApp);
       FjPRLayout:= jCustomDialog(FParent).View;
+    end;
+    if FParent is jToolbar then
+    begin
+      jToolbar(FParent).Init(refApp);
+      FjPRLayout:= jToolbar(FParent).View;
     end;
   end;
   jVideoView_SetViewParent(FjEnv, FjObject, FjPRLayout);

@@ -168,7 +168,7 @@ function jDrawingView_GetCanvas(env: PJNIEnv; _jdrawingview: JObject): jObject;
 implementation
 
 uses
-   customdialog;
+   customdialog, toolbar;
 
 {---------  jDrawingView  --------------}
 
@@ -249,6 +249,11 @@ begin
     begin
       jCustomDialog(FParent).Init(refApp);
       FjPRLayout:= jCustomDialog(FParent).View;
+    end;
+    if FParent is jToolbar then
+    begin
+      jToolbar(FParent).Init(refApp);
+      FjPRLayout:= jToolbar(FParent).View;
     end;
   end;
   jDrawingView_SetViewParent(FjEnv, FjObject, FjPRLayout);

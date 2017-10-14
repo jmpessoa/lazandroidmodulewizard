@@ -124,9 +124,37 @@ public class jTextToSpeech /*extends ...*/ {
 	      case 11: ttsManager.setLanguage(Locale.TAIWAN); break;
 	      case 12: ttsManager.setLanguage(Locale.TRADITIONAL_CHINESE); break;
 	      case 13: ttsManager.setLanguage(Locale.UK); break;
-	      case 14: ttsManager.setLanguage(Locale.US); break;	      
+	      case 14: ttsManager.setLanguage(Locale.US); break;
+	      case 15: ttsManager.setLanguage(Locale.GR); break;
 	   }
 	     
    }
+   
+   //https://stackoverflow.com/questions/33118121/android-tts-for-multiple-languages
+   public void Online_TTS(final String text,final String lan) {
+
+	    new Thread(new Runnable() {
+	        @Override
+	        public void run() {
+	            String Url = "https://translate.google.com/translate_tts?ie=UTF-8";
+	            String pronouce = "&q=" + text.replaceAll(" ", "%20");
+	            String language = "&tl=" + lan;
+	            String web = "&client=tw-ob";
+
+	            String fullUrl = Url + pronouce + language + web;
+
+	            Uri uri = Uri.parse(fullUrl);
+	            MediaPlayer mediaPlayer = new MediaPlayer();
+	            try {
+	                mediaPlayer.setDataSource(MainActivity.this,uri);
+	                mediaPlayer.prepare();
+	                mediaPlayer.start();
+	            } catch (IOException e) {
+	                e.printStackTrace();
+	                Log.i(TAG,"error");
+	            }
+	        }
+	    }).start();
+	}
    
 }

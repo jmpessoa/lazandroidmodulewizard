@@ -1,0 +1,78 @@
+object AndroidModule1: TAndroidModule1
+  Left = 274
+  Top = 151
+  Width = 309
+  Height = 400
+  MarginLeft = 0
+  MarginTop = 0
+  MarginRight = 0
+  MarginBottom = 0
+  Enabled = True
+  Text = 'AndroidModule1'
+  ActivityMode = actMain
+  BackgroundColor = colbrDefault
+  ActionBarTitle = abtDefault
+  OnJNIPrompt = AndroidModule1JNIPrompt
+  OnCreateOptionMenu = AndroidModule1CreateOptionMenu
+  OnClickOptionMenuItem = AndroidModule1ClickOptionMenuItem
+  object jToolbar1: jToolbar
+    Left = 0
+    Top = 0
+    Width = 309
+    Height = 96
+    MarginLeft = 0
+    MarginTop = 0
+    MarginRight = 0
+    MarginBottom = 0
+    Enabled = True
+    Visible = True
+    Id = 1
+    PosRelativeToAnchor = []
+    PosRelativeToParent = [rpTop]
+    LayoutParamWidth = lpMatchParent
+    LayoutParamHeight = lpWrapContent
+    BackgroundColor = colbrRoyalBlue
+    Title = 'MyAppTiltle'
+  end
+  object jTextView1: jTextView
+    Left = 124
+    Top = 101
+    Width = 61
+    Height = 20
+    MarginLeft = 5
+    MarginTop = 5
+    MarginRight = 5
+    MarginBottom = 5
+    Enabled = True
+    Visible = True
+    Anchor = jToolbar1
+    Id = 2
+    PosRelativeToAnchor = [raBelow]
+    PosRelativeToParent = [rpCenterHorizontal]
+    LayoutParamWidth = lpWrapContent
+    LayoutParamHeight = lpWrapContent
+    Text = 'jTextView1'
+    Alignment = taLeft
+    BackgroundColor = colbrDefault
+    FontColor = colbrDefault
+    FontSize = 0
+    TextTypeFace = tfNormal
+    FontSizeUnit = unitDefault
+  end
+  object jMenu1: jMenu
+    Options.Strings = (
+      'Camera'
+      'Chat'
+      'Image'
+      'Person'
+    )
+    IconIdentifiers.Strings = (
+      'ic_action_camera_alt'
+      'ic_action_chat'
+      'ic_action_image'
+      'ic_action_person_add'
+    )
+    left = 126
+    top = 184
+  end
+end

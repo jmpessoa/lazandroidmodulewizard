@@ -1,4 +1,4 @@
-package com.example.appcustomdialogdemo1;
+package org.lamw.apptoolbardemo1;
 
 import android.view.View;
 import android.view.ViewGroup;
@@ -63,13 +63,15 @@ public class jCommons {
 			return new FrameLayout.LayoutParams(baseparams);
 		} else if (aparent instanceof RelativeLayout) {
 			return new RelativeLayout.LayoutParams(baseparams);
+		} else if (aparent instanceof ViewGroup) {
+			return new  RelativeLayout.LayoutParams(baseparams);			
 		} else if (aparent instanceof LinearLayout) {
 			return new LinearLayout.LayoutParams(baseparams);
 		} else if (aparent == null) {
 			throw new NullPointerException("Parent is null");
 		} else {
-			throw new IllegalArgumentException("Parent is neither FrameLayout or RelativeLayout or LinearLayout: "
-					+ aparent.getClass().getName());
+			throw new IllegalArgumentException("LAMW/jCommons: Parent is neither FrameLayout or RelativeLayout or LinearLayout: [ "
+					+ aparent.getClass().getName() + " ]");
 		}
 	}
 	

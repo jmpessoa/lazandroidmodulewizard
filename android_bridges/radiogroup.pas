@@ -105,7 +105,7 @@ procedure jRadioGroup_SetRadiusRoundCorner(env: PJNIEnv; _jradiogroup: JObject; 
 implementation
 
 uses
-   customdialog;
+   customdialog, toolbar;
 
 {---------  jRadioGroup  --------------}
 
@@ -171,6 +171,11 @@ begin
     begin
       jCustomDialog(FParent).Init(refApp);
       FjPRLayout:= jCustomDialog(FParent).View;
+    end;
+    if FParent is jToolbar then
+    begin
+      jToolbar(FParent).Init(refApp);
+      FjPRLayout:= jToolbar(FParent).View;
     end;
   end;
   jRadioGroup_SetViewParent(FjEnv, FjObject, FjPRLayout);

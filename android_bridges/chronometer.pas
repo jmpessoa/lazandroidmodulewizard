@@ -97,7 +97,7 @@ function jChronometer_GetSystemElapsedRealtime(env: PJNIEnv; _jchronometer: JObj
 implementation
 
 uses
-   customdialog;
+   customdialog, toolbar;
 
 {---------  jChronometer  --------------}
 
@@ -161,6 +161,11 @@ begin
     begin
       jCustomDialog(FParent).Init(refApp);
       FjPRLayout:= jCustomDialog(FParent).View;
+    end;
+    if FParent is jToolbar then
+    begin
+      jToolbar(FParent).Init(refApp);
+      FjPRLayout:= jToolbar(FParent).View;
     end;
   end;
   jChronometer_SetViewParent(FjEnv, FjObject, FjPRLayout);
