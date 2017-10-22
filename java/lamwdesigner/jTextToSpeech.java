@@ -1,8 +1,12 @@
 package org.lamw.apptexttospeechdemo1;
 
 import android.content.Context;
+import android.media.MediaPlayer;
+import android.net.Uri;
 import android.speech.tts.TextToSpeech;
 import android.util.Log;
+
+import java.io.IOException;
 import java.util.Locale;
 
 /** TTSManager
@@ -124,15 +128,17 @@ public class jTextToSpeech /*extends ...*/ {
 	      case 11: ttsManager.setLanguage(Locale.TAIWAN); break;
 	      case 12: ttsManager.setLanguage(Locale.TRADITIONAL_CHINESE); break;
 	      case 13: ttsManager.setLanguage(Locale.UK); break;
-	      case 14: ttsManager.setLanguage(Locale.US); break;
-	      case 15: ttsManager.setLanguage(Locale.GR); break;
+	      case 14: ttsManager.setLanguage(Locale.US); break;	     
 	   }
 	     
    }
    
    //https://stackoverflow.com/questions/33118121/android-tts-for-multiple-languages
-   public void Online_TTS(final String text,final String lan) {
+   public void SpeakOnline(String _text, String _language) {
 
+	    final String text = _text;
+	    final String lan = _language;
+	    
 	    new Thread(new Runnable() {
 	        @Override
 	        public void run() {
@@ -146,12 +152,12 @@ public class jTextToSpeech /*extends ...*/ {
 	            Uri uri = Uri.parse(fullUrl);
 	            MediaPlayer mediaPlayer = new MediaPlayer();
 	            try {
-	                mediaPlayer.setDataSource(MainActivity.this,uri);
+	                mediaPlayer.setDataSource(controls.activity,uri);
 	                mediaPlayer.prepare();
 	                mediaPlayer.start();
 	            } catch (IOException e) {
 	                e.printStackTrace();
-	                Log.i(TAG,"error");
+	                //Log.i(TAG,"error");
 	            }
 	        }
 	    }).start();

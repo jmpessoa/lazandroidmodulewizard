@@ -866,10 +866,10 @@ type
     Function  GetText: string; override;
     procedure SetViewParent(Value: jObject);  override;
 
-    procedure SetFontFace(AValue: TFontFace); //override; 
-    procedure SetTextTypeFace(Value: TTextTypeFace); //override; 
+    procedure SetFontFace(AValue: TFontFace);
+    procedure SetTextTypeFace(Value: TTextTypeFace);
     procedure SetEditable(enabled: boolean);
-    procedure SetHintTextColor(Value: TARGBColorBridge); //override;
+    procedure SetHintTextColor(Value: TARGBColorBridge);
 
     Procedure GenEvent_OnEnter (Obj: TObject);
     Procedure GenEvent_OnChange(Obj: TObject; txt: string; count : Integer);
@@ -1261,7 +1261,6 @@ type
     procedure UpdateLParamHeight;
     procedure UpdateLParamWidth;
     procedure SetFontSizeUnit(_unit: TFontSizeUnit);
-
     procedure SetFontFace(AValue: TFontFace);
 
   protected
@@ -7220,7 +7219,6 @@ begin
     jListView_clear(FjEnv, FjObject );
 end;
 
-//by jmpessoa
 procedure jListView.SetItems(Value: TStrings);
 var
   i: integer;

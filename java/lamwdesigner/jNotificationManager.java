@@ -1,4 +1,4 @@
-package com.example.appnotificationmanagerdemo2;
+package com.example.appnotificationmanagerdemo1;
 
 import java.lang.reflect.Field;
 import android.app.Notification;
@@ -37,6 +37,9 @@ public class jNotificationManager /*extends ...*/ {
 	String mBody = "LAMW: Hello World!";
 	boolean mAutoCancel = true;
 	boolean mOngoing = false;
+	
+	private int mPriority = Notification.PRIORITY_HIGH; //Notification.PRIORITY_DEFAULT;   //Notification.PRIORITY_LOW; //Notification.PRIORITY_HIGH;
+	private int mVisibility = 0;
     
     //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
     public jNotificationManager(Controls _ctrls, long _Self) { //Add more others news "_xxx" params if needed!
@@ -101,14 +104,29 @@ public class jNotificationManager /*extends ...*/ {
     	    if (!_enable)     	
        	      mNotificationBuilder.setLights(mColor, 0, 0);    	   
     	    else
-         	  mNotificationBuilder.setLights(mColor, mLightOn, mLightOff);    	    
-            //Solution by freris     	   
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-               mNotificationManager.notify(mId, mNotificationBuilder.build());
-            }
-            else {
-               mNotificationManager.notify(mId, mNotificationBuilder.getNotification());    	  
-            }
+         	  mNotificationBuilder.setLights(mColor, mLightOn, mLightOff);
+    	    
+    	     if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN ) {
+    	   	     mNotification =   mNotificationBuilder.getNotification(); 	    	   
+    	        //mNotificationManager.notify(mId, mNotification);    	            
+    	     }
+
+    	     if ( (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) && (Build.VERSION.SDK_INT < 21) ) {    	    	 	   	    	  	    	   
+    	      	 mNotification =  mNotificationBuilder.build();
+    	     }  //https://www.laurivan.com/android-make-your-notification-sticky/
+    	       
+    	   //[ifdef_api21up]
+    	     if (Build.VERSION.SDK_INT >= 21) {  //Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP
+    	      	 mNotification =  mNotificationBuilder.build();
+    	      	 if (mPriority == Notification.PRIORITY_HIGH) { //to make Heads-up work.    		 
+    	      		//mNotificationBuilder.setDefaults(Notification.DEFAULT_ALL); // must requires VIBRATE permission    		 
+    	      	    mNotificationBuilder.setVibrate(new long[0]); 
+    	      	    //mNotificationBuilder.setVibrate(new long[] {1, 1, 1});
+    	      	 }       	      	
+    	     }	 
+    	     //[endif_api17up]
+    	     
+    	     mNotificationManager.notify(mId, mNotification);    	    
             
     	}
     }    
@@ -235,20 +253,43 @@ public class jNotificationManager /*extends ...*/ {
      mNotificationBuilder.setLights(mColor, mLightOn, mLightOff); //thanks to freris
      mNotificationBuilder.setAutoCancel(mAutoCancel);
      mNotificationBuilder.setOngoing(mOngoing);
-        //Solution by freris       
-     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {    	    	
- 	   mNotification =  mNotificationBuilder.build(); 	    	  	    	   
-       mNotificationManager.notify(mId, mNotification);
-     }  //https://www.laurivan.com/android-make-your-notification-sticky/
-     else {
+     
+     mNotificationBuilder.setPriority(mPriority);//https://stackoverflow.com/questions/26451893/heads-up-notification-android-lollipop
+     
+     if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN ) {
  	   mNotification =   mNotificationBuilder.getNotification(); 	    	   
-       mNotificationManager.notify(mId, mNotification);    	            
-     }                    	
+       //mNotificationManager.notify(mId, mNotification);    	            
+     }
+
+     if ( (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) && (Build.VERSION.SDK_INT < 21) ) {    	    	 	   	    	  	    	   
+    	 mNotification =  mNotificationBuilder.build();
+     }  //https://www.laurivan.com/android-make-your-notification-sticky/
+     
+   //[ifdef_api21up]
+     if (Build.VERSION.SDK_INT >= 21) {  //Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP
+    	 mNotification =  mNotificationBuilder.build();
+    	 if (mPriority == Notification.PRIORITY_HIGH) { //to make Heads-up work.    		 
+    		//mNotificationBuilder.setDefaults(Notification.DEFAULT_ALL); // must requires VIBRATE permission    		 
+    	    mNotificationBuilder.setVibrate(new long[0]); 
+    	    //mNotificationBuilder.setVibrate(new long[] {1, 1, 1});
+    	 }       	
+     }	 
+   //[endif_api21up]
+     
+     mNotificationManager.notify(mId, mNotification);
    }
    
    public void SetPendingFlag(int _flag) {
 	   mPendingFlag = _flag;
    }
                
+   public void SetPriority(int _priority) {
+	   mPriority = _priority;
+	   //Notification.PRIORITY_DEFAULT;   //Notification.PRIORITY_LOW; //Notification.PRIORITY_HIGH;
+   }
+   
+   public void SetVisibility(int _visibility) {
+	   mVisibility = _visibility;  //VISIBILITY_SECRET, VISIBILITY_PRIVATE, VISIBILITY_PUBLIC
+   }
 }
 

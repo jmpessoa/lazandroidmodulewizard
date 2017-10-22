@@ -107,7 +107,7 @@ jIntentManager = class(jControl)
     procedure PutExtraMediaStoreOutput(_environmentDirectoryPath: string; _fileName: string);
     function GetActionCameraCropAsString(): string;
 
-    procedure AddCategory(_intentCategory: integer);
+    procedure AddCategory(_intentCategory: TIntentCategory);
     procedure SetFlag(_intentFlag: TIntentFlag);
     procedure SetComponent(_packageName: string; _javaClassName: string);
 
@@ -740,11 +740,11 @@ begin
    Result:= jIntentManager_GetActionCameraCropAsString(FjEnv, FjObject);
 end;
 
-procedure jIntentManager.AddCategory(_intentCategory: integer);
+procedure jIntentManager.AddCategory(_intentCategory: TIntentCategory);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jIntentManager_AddCategory(FjEnv, FjObject, _intentCategory);
+     jIntentManager_AddCategory(FjEnv, FjObject, Ord(_intentCategory));
 end;
 
 procedure jIntentManager.SetFlag(_intentFlag: TIntentFlag);

@@ -1,6 +1,6 @@
 package org.lamw.apptexttospeechdemo1;
 
-//Lamw: Lazarus Android Module Wizard - version 0.7 - rev. 15 - 29 March - 2017
+//Lamw: Lazarus Android Module Wizard - version 0.7 - rev. 22 - 21 October - 2017
 //Form Designer and Components development model!
 //https://github.com/jmpessoa/lazandroidmodulewizard
 //http://forum.lazarus.freepascal.org/index.php/topic,21919.270.html
@@ -55,7 +55,7 @@ public class App extends Activity {
          StrictMode.setThreadPolicy(policy);
      }
      
-      Log.i("jApp","01.Activity.onCreate");
+      //Log.i("jApp","01.Activity.onCreate");
       controls             = new Controls();
       controls.activity    = this; 
       controls.appLayout   = new RelativeLayout(this);
@@ -71,12 +71,12 @@ public class App extends Activity {
       this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
                
       // Event : Java -> Pascal
-      Log.i("jApp","02.Controls.jAppOnCreate");
+      //Log.i("jApp","02.Controls.jAppOnCreate");
       //Bundle extras = getIntent().getExtras();      
       
       controls.jAppOnCreate(this, controls.appLayout, getIntent());
       
-      Log.i("jApp","03.Controls.jAppOnCreate");
+      //Log.i("jApp","03.Controls.jAppOnCreate");
     }
        
     @Override    
@@ -245,6 +245,17 @@ public boolean onOptionsItemSelected(MenuItem item) {
             controls.jAppOnKeyDown(c,keyCode,KeyEvent.keyCodeToString(keyCode));
             break;
             
+        case KeyEvent.KEYCODE_DEL:
+            controls.jAppOnKeyDown(c,keyCode,KeyEvent.keyCodeToString(keyCode));
+            break;
+            
+        case KeyEvent.KEYCODE_NUM:
+            controls.jAppOnKeyDown(c,keyCode,KeyEvent.keyCodeToString(keyCode));
+            break;            
+            
+        case KeyEvent.KEYCODE_NUM_LOCK:
+            controls.jAppOnKeyDown(c,keyCode,KeyEvent.keyCodeToString(keyCode));
+            break;            
         //default:  controls.jAppOnKeyDown(c,keyCode,KeyEvent.keyCodeToString(keyCode));         	
       }      
       return super.onKeyDown(keyCode, event);      

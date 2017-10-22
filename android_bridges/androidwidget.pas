@@ -767,6 +767,10 @@ type
   private
     FInitialized : boolean;
     FAppName     : string;
+
+    FMainActivity: string;
+    FPackageName   : string;
+
     FjClassName   : string;
     FForm        : jForm;       // Main/Initial Form
     //
@@ -816,11 +820,17 @@ type
 
     procedure ShowMessage(_title: string; _message: string; _btnText: string);
 
+    function GetMainActivityName: string;
+    function GetPackageName: string;
+
     //properties
     property Initialized : boolean read FInitialized;
     property Form: jForm read FForm write FForm; // Main Form
-    property AppName    : string     read FAppName    write SetAppName;
-    property ClassName  : string     read FjClassName  write SetjClassName;
+    property AppName    : string read FAppName write SetAppName;
+    property ClassName  : string read FjClassName write SetjClassName;
+    property MainActivityName: string read GetMainActivityName;
+    property PackageName  : string read GetPackageName;
+
   end;
 
  {jControl by jmpessoa}
@@ -2002,10 +2012,10 @@ begin
   inherited Create(AOwner);
   FParent:= nil;
   FChilds:=TFPList.Create;
-  FMarginLeft   := 5;
+  {FMarginLeft  := 5;
   FMarginRight  := 5;
   FMarginBottom := 5;
-  FMarginTop    := 5;
+  FMarginTop    := 5;}
   FHeight       := 100;
   FWidth        := 100;
   FAcceptChildrenAtDesignTime:= False;
@@ -5254,6 +5264,17 @@ begin
   Result:= jApp_GetQuantityStringByName(Self.Jni.jEnv, Self.Jni.jThis, _resName, _Quantity);
 end;
 
+function jApp.GetMainActivityName: string;
+begin
+   Result:= 'App';
+end;
+
+function jApp.GetPackageName: string;
+begin
+    Result:= Self.AppName;
+end;
+
+   { generics }
 Function InputTypeToStrEx ( InputType : TInputTypeEx ) : String;
  begin
   Result := 'TEXT';

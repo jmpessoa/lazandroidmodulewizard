@@ -63,13 +63,15 @@ public class jCommons {
 			return new FrameLayout.LayoutParams(baseparams);
 		} else if (aparent instanceof RelativeLayout) {
 			return new RelativeLayout.LayoutParams(baseparams);
+		} else if (aparent instanceof ViewGroup) {
+			return new  RelativeLayout.LayoutParams(baseparams);			
 		} else if (aparent instanceof LinearLayout) {
 			return new LinearLayout.LayoutParams(baseparams);
 		} else if (aparent == null) {
 			throw new NullPointerException("Parent is null");
 		} else {
-			throw new IllegalArgumentException("Parent is neither FrameLayout or RelativeLayout or LinearLayout: "
-					+ aparent.getClass().getName());
+			throw new IllegalArgumentException("LAMW/jCommons: Parent is neither FrameLayout or RelativeLayout or LinearLayout: [ "
+					+ aparent.getClass().getName() + " ]");
 		}
 	}
 	
@@ -102,38 +104,50 @@ public class jCommons {
 		}
 	}
 	
+	public void setMarginLeftTopRightBottom(int _left, int _top,int _right, int _bottom) {
+		marginLeft = _left;
+		marginTop = _top;
+		marginRight = _right;
+		marginBottom = _bottom;
+	    lparams.setMargins(marginLeft,marginTop,marginRight,marginBottom);
+		if (aOwnerView != null)  
+			aOwnerView.setLayoutParams(lparams);
+    }
+	
 	public void setLeftTopRightBottomWidthHeight(int _left, int _top, int _right, int _bottom, int _w, int _h) {
 		marginLeft = _left;
 		marginTop = _top;
 		marginRight = _right;
 		marginBottom = _bottom;
 		lparamH = _h;
-		lparamW = _w;
+		lparamW = _w;		
 	}
 	
 	public void setLParamWidth(int _w) {
 		lparamW = _w;
+		lparams.width  = lparamW;
 	}
 	
 	public void setLParamHeight(int _h) {
 		lparamH = _h;
+		lparams.height = lparamH;
 	}
-	
-	public int getLParamWidth() { 
-		int r =  lparamW;
+		
+	public int getLParamHeight() {
+		int r = lparamH;		
 		if (r == android.view.ViewGroup.LayoutParams.WRAP_CONTENT) {
-			r = aOwnerView.getWidth();
+			r = aOwnerView.getHeight();
 		}		
 		return r;
 	}
-	
-	public int getLParamHeight() {
-		int r = lparamH;
+
+	public int getLParamWidth() {				
+		int r = lparamW;		
 		if (r == android.view.ViewGroup.LayoutParams.WRAP_CONTENT) {
-			r = aOwnerView.getHeight();
-		}
-		return r;
-	}
+			r = aOwnerView.getWidth();
+		}		
+		return r;		
+	}	
 	
 	public void setLGravity(int _g) {
 		lgravity = _g;
@@ -205,4 +219,27 @@ public class jCommons {
 		if ( (parent != null) && (aOwnerView != null))  { parent.removeView(aOwnerView); }
 		lparams = null;
 	}
+	
+	public void MatchParent() {		
+		lparamW = android.view.ViewGroup.LayoutParams.MATCH_PARENT;
+		lparamH = android.view.ViewGroup.LayoutParams.MATCH_PARENT;
+		lparams.width = lparamW;
+		lparams.height = lparamH;
+		
+		if (aOwnerView != null)    //addded
+			aOwnerView.setLayoutParams(lparams);
+		
+	}
+	
+	public void WrapParent() {
+		lparamW = android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
+		lparamH = android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
+		lparams.width = lparamW;
+		lparams.height = lparamH;
+		
+		if (aOwnerView != null)  //addded
+			aOwnerView.setLayoutParams(lparams);
+		
+	}
+
 }

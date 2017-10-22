@@ -34,7 +34,8 @@ uses
   spinner,
   viewflipper,
   videoview,
-  toolbar;
+  toolbar,
+  expandablelistview;
 
 Procedure Register;
   
@@ -84,6 +85,7 @@ begin
   {$I jviewflipper_icon.lrs}
   {$I jvideoview_icon.lrs}
   {$I jtoolbar_icon.lrs}
+  {$I jexpandablelistview_icon.lrs}
 
   RegisterComponents('Android Bridges',
     [
@@ -126,7 +128,8 @@ begin
       jCanvasES2,
       jViewFlipper,
       jVideoView,
-      jToolbar
+      jToolbar,
+      jExpandableListView
     ]
   );
   RegisterClasses([jApp, jForm, jControl, jVisualControl, jGLViewEvent]);

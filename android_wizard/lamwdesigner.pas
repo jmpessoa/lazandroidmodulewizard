@@ -267,6 +267,14 @@ type
     procedure Draw; override;
   end;
 
+  { TDraftExpandableListView }
+
+  TDraftExpandableListView = class(TDraftWidget)
+  public
+    constructor Create(AWidget: TAndroidWidget; Canvas: TCanvas); override;
+    procedure Draw; override;
+  end;
+
   { TDraftImageBtn }
 
   TDraftImageBtn = class(TDraftWidget)
@@ -508,7 +516,8 @@ uses
   customdialog, togglebutton, switchbutton,
   Laz_And_GLESv1_Canvas, Laz_And_GLESv2_Canvas, gridview, Spinner, seekbar,
   radiogroup, ratingbar, digitalclock, analogclock, surfaceview,
-  autocompletetextview, drawingview, chronometer, viewflipper, videoview, comboedittext, toolbar;
+  autocompletetextview, drawingview, chronometer, viewflipper, videoview,
+  comboedittext, toolbar, expandablelistview;
 
 const
   DrawableSearchPaths: array [0..3] of string = (
@@ -2754,6 +2763,48 @@ begin
 
 end;
 
+{ TDraftExpandableListView }
+
+constructor TDraftExpandableListView.Create(AWidget: TAndroidWidget; Canvas: TCanvas);
+begin
+  inherited;
+
+  Color := jExpandableListView(AWidget).BackgroundColor;
+  FontColor := jExpandableListView(AWidget).FontColor; //colbrBlack;
+
+  if jExpandableListView(AWidget).BackgroundColor = colbrDefault then
+    Color := GetParentBackgroundColor;
+end;
+
+procedure TDraftExpandableListView.Draw;
+var
+  i, k: integer;
+begin
+  Fcanvas.Brush.Color:= Self.BackGroundColor;
+  Fcanvas.Pen.Color:= clActiveCaption;
+
+  if  Self.BackGroundColor = clNone then Fcanvas.Brush.Style:= bsClear;
+
+  Fcanvas.FillRect(0,0,Self.Width,Self.Height);
+      // outer frame
+  Fcanvas.Rectangle(0,0,Self.Width,Self.Height);
+
+  Fcanvas.Brush.Style:= bsSolid;
+
+  Fcanvas.Pen.Color:= clSilver;
+  k:= Trunc(Self.Height/20);
+  for i:= 1 to k-1 do
+  begin
+    Fcanvas.MoveTo(Self.Width{-Self.MarginRight+10}, {x2} Self.MarginTop+i*20); {y1}
+    Fcanvas.LineTo(0,Self.MarginTop+i*20);  {x1, y1}
+  end;
+
+  //canvas.Brush.Style:= bsClear;
+  //canvas.Font.Color:= Self.TextColor;
+  //canvas.TextOut(5,4, txt);
+
+end;
+
 { TDraftImageBtn }
 
 function TDraftImageBtn.GetImage: TPortableNetworkGraphic;
@@ -3553,6 +3604,7 @@ initialization
   RegisterAndroidWidgetDraftClass(jToggleButton, TDraftToggleButton);
   RegisterAndroidWidgetDraftClass(jSwitchButton, TDraftSwitchButton);
   RegisterAndroidWidgetDraftClass(jListView, TDraftListView);
+  RegisterAndroidWidgetDraftClass(jExpandableListView, TDraftExpandableListView);
   RegisterAndroidWidgetDraftClass(jGridView, TDraftGridView);
   RegisterAndroidWidgetDraftClass(jImageBtn, TDraftImageBtn);
   RegisterAndroidWidgetDraftClass(jImageView, TDraftImageView);

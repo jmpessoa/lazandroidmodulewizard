@@ -1,0 +1,3 @@
+public native void pOnExpandableListViewChildClick(long pasobj, int groupPosition, String groupHeader, int childItemPosition, String childItemCaption);
+public native void pOnExpandableListViewGroupExpand(long pasobj, int groupPosition, String groupHeader);
+public native void pOnExpandableListViewGroupCollapse(long pasobj, int groupPosition, String groupHeader);

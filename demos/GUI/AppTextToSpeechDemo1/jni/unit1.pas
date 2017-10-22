@@ -14,6 +14,7 @@ type
 
   TAndroidModule1 = class(jForm)
     jButton1: jButton;
+    jButton2: jButton;
     jEditText1: jEditText;
     jImageView1: jImageView;
     jPanel1: jPanel;
@@ -26,6 +27,7 @@ type
     jTextView6: jTextView;
     procedure AndroidModule1JNIPrompt(Sender: TObject);
     procedure jButton1Click(Sender: TObject);
+    procedure jButton2Click(Sender: TObject);
   private
     {private declarations}
   public
@@ -47,6 +49,13 @@ begin
   jTextToSpeech1.SpeakOn(jEditText1.Text); //used for the first call ..
   jTextToSpeech1.SpeakAdd('Hello World!');  // add more ...
   jTextToSpeech1.SpeakAdd('Hello Android!');   // add more ....
+end;
+
+procedure TAndroidModule1.jButton2Click(Sender: TObject);
+begin
+   ShowMessage('Please, you need enable the WiFi !!!');
+   if Self.isConnectedWifi() then
+      jTextToSpeech1.SpeakOnline('Bom dia Pessoal!', 'pt');   // pt = portuguese
 end;
 
 procedure TAndroidModule1.AndroidModule1JNIPrompt(Sender: TObject);

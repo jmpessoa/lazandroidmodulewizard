@@ -1,0 +1,3 @@
+public java.lang.Object jExpandableListView_jCreate(long _Self) {
+  return (java.lang.Object)(new jExpandableListView(this,_Self));
+}

@@ -1,6 +1,6 @@
 package org.lamw.apptfpnoguigraphicsbridgedemo9;
 
-//LAMW: Lazarus Android Module Wizard  - version 0.7 - rev. 21 - 14 October - 2017 
+//LAMW: Lazarus Android Module Wizard  - version 0.7 - rev. 22 - 21 October - 2017 
 //RAD Android: Project Wizard, Form Designer and Components Development Model!
 
 //https://github.com/jmpessoa/lazandroidmodulewizard

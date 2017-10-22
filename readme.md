@@ -124,6 +124,15 @@
 	*
 	****************************************************************************************************
 
+Version 0.7 - rev. 22 - 21 - October - 2017
+
+	NEW! jExpandableListView component
+
+	NEW! demo AppExpandableListViewDemo1 
+
+	IMPROVED! jTextToSpeech 
+			Added method "SpeakOnline"   [Thanks to  @Freris]
+		
 Version 0.7 - rev. 21 - 14 - October - 2017
 
 	NEW! jToolbar component  [to use only with  "minSkd=21" and "targetSdk >= 21"] <<--- a request from @Tomash

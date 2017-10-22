@@ -1,0 +1,107 @@
+object AndroidModule1: TAndroidModule1
+  Left = 291
+  Top = 172
+  Width = 320
+  Height = 400
+  MarginLeft = 0
+  MarginTop = 0
+  MarginRight = 0
+  MarginBottom = 0
+  Enabled = True
+  OnCreate = AndroidModule1Create
+  Text = 'AndroidModule1'
+  ActivityMode = actMain
+  BackgroundColor = colbrDefault
+  ActionBarTitle = abtDefault
+  OnJNIPrompt = AndroidModule1JNIPrompt
+  object jTextView1: jTextView
+    Left = 64
+    Top = 5
+    Width = 192
+    Height = 20
+    MarginLeft = 5
+    MarginTop = 5
+    MarginRight = 5
+    MarginBottom = 5
+    Enabled = True
+    Visible = True
+    Id = 1
+    PosRelativeToAnchor = []
+    PosRelativeToParent = [rpTop, rpCenterHorizontal]
+    LayoutParamWidth = lpWrapContent
+    LayoutParamHeight = lpWrapContent
+    Text = 'App Expandable ListView Demo1'
+    Alignment = taLeft
+    BackgroundColor = colbrDefault
+    FontColor = colbrDefault
+    FontSize = 0
+    TextTypeFace = tfNormal
+    FontSizeUnit = unitDefault
+  end
+  object jExpandableListView1: jExpandableListView
+    Left = 5
+    Top = 95
+    Width = 310
+    Height = 119
+    MarginLeft = 5
+    MarginTop = 5
+    MarginRight = 5
+    MarginBottom = 5
+    Enabled = True
+    Visible = True
+    Anchor = jButton1
+    Id = 2
+    PosRelativeToAnchor = [raBelow]
+    PosRelativeToParent = [rpCenterHorizontal]
+    LayoutParamWidth = lpMatchParent
+    LayoutParamHeight = lpOneThirdOfParent
+    Items.Strings = (
+      'Group 100$Item 101;Item 102;Item 103;Item 104'
+      'Group 200$Item 201;Item 202;Item 203;Item 204'
+      'Group 300$Item 301;Item 302;Item 303;Item 304'
+      'Group 400$Item 401;Item 402;Item 403;Item 404'
+    )
+    GroupItemDelimiter = '$'
+    ChildItemDelimiter = ';'
+    BackgroundColor = colbrDefault
+    BackgroundChildColor = colbrLightCyan
+    FontColor = colbrBlue
+    FontChildColor = colbrOrangeRed
+    FontSize = 0
+    FontChildSize = 0
+    FontSizeUnit = unitDefault
+    TextAlign = alLeft
+    TextChildAlign = alCenter
+    FontFace = ffMonospace
+    TextTypeFace = tfBold
+    TextChildTypeFace = tfBoldItalic
+    ImageItemIdentifier = 'ic_bulb'
+    ImageChildItemIdentifier = 'ic_bullet_blue'
+    HighLightSelectedChildItemColor = colbrPaleTurquoise
+    OnOnChildItemClick = jExpandableListView1OnChildItemClick
+  end
+  object jButton1: jButton
+    Left = 5
+    Top = 35
+    Width = 310
+    Height = 50
+    MarginLeft = 5
+    MarginTop = 5
+    MarginRight = 5
+    MarginBottom = 5
+    Enabled = True
+    Visible = True
+    Anchor = jTextView1
+    Id = 3
+    PosRelativeToAnchor = [raBelow]
+    PosRelativeToParent = [rpCenterHorizontal]
+    LayoutParamWidth = lpMatchParent
+    LayoutParamHeight = lpWrapContent
+    Text = 'Add Item'
+    BackgroundColor = colbrRoyalBlue
+    FontColor = colbrWhite
+    FontSize = 0
+    FontSizeUnit = unitDefault
+    OnClick = jButton1Click
+  end
+end

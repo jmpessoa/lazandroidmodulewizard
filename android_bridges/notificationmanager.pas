@@ -11,6 +11,8 @@ type
 
 TPendingFlag = (pfUpdateCurrent, pfCancelCurrent);
 
+TNotificationPriority = (npDefault, npLow, npHigh, npMin, npMax);
+
 {Draft Component code by "Lazarus Android Module Wizard" [2/3/2015 17:14:54]}
 {https://github.com/jmpessoa/lazandroidmodulewizard}
 
@@ -54,6 +56,7 @@ jNotificationManager = class(jControl)
     procedure Notify();
     procedure SetAutoCancel(_value: boolean);
     procedure SetPendingFlag(_flag: TPendingFlag);
+    procedure SetPriority(_priority: TNotificationPriority);
 
  published
     property Id: integer read FId write SetId;
@@ -86,6 +89,7 @@ procedure jNotificationManager_SetId(env: PJNIEnv; _jnotificationmanager: JObjec
 procedure jNotificationManager_Notify(env: PJNIEnv; _jnotificationmanager: JObject);overload;
 procedure jNotificationManager_SetAutoCancel(env: PJNIEnv; _jnotificationmanager: JObject; _value: boolean);
 procedure jNotificationManager_SetPendingFlag(env: PJNIEnv; _jnotificationmanager: JObject; _flag: integer);
+procedure jNotificationManager_SetPriority(env: PJNIEnv; _jnotificationmanager: JObject; _priority: integer);
 
 implementation
 
@@ -315,6 +319,13 @@ begin
   FPendingFlag:= _flag;
   if FInitialized then
      jNotificationManager_SetPendingFlag(FjEnv, FjObject, Ord(_flag));
+end;
+
+procedure jNotificationManager.SetPriority(_priority: TNotificationPriority);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jNotificationManager_SetPriority(FjEnv, FjObject, Ord(_priority) );
 end;
 
 {-------- jNotificationManager_JNI_Bridge ----------}
@@ -586,6 +597,19 @@ begin
   jParams[0].i:= _flag;
   jCls:= env^.GetObjectClass(env, _jnotificationmanager);
   jMethod:= env^.GetMethodID(env, jCls, 'SetPendingFlag', '(I)V');
+  env^.CallVoidMethodA(env, _jnotificationmanager, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jNotificationManager_SetPriority(env: PJNIEnv; _jnotificationmanager: JObject; _priority: integer);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].i:= _priority;
+  jCls:= env^.GetObjectClass(env, _jnotificationmanager);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetPriority', '(I)V');
   env^.CallVoidMethodA(env, _jnotificationmanager, jMethod, @jParams);
   env^.DeleteLocalRef(env, jCls);
 end;

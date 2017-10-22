@@ -26,6 +26,7 @@ jTextToSpeech = class(jControl)
     procedure SpeakOn(_text: string);
     procedure SpeakAdd(_text: string);
     procedure SetLanguage(_language: TSpeechLanguage);
+    procedure SpeakOnline(_text: string; _language: string);
 
  published
     property SpeechLanguage: TSpeechLanguage read FSpeechLanguage write SetLanguage;
@@ -37,6 +38,7 @@ procedure jTextToSpeech_jFree(env: PJNIEnv; _jtexttospeech: JObject);
 procedure jTextToSpeech_Speak(env: PJNIEnv; _jtexttospeech: JObject; _text: string);
 procedure jTextToSpeech_SpeakAdd(env: PJNIEnv; _jtexttospeech: JObject; _text: string);
 procedure jTextToSpeech_SetLanguage(env: PJNIEnv; _jtexttospeech: JObject; _language: integer);
+procedure jTextToSpeech_SpeakOnline(env: PJNIEnv; _jtexttospeech: JObject; _text: string; _language: string);
 
 implementation
 
@@ -107,6 +109,13 @@ begin
   FSpeechLanguage:= _language;
   if FInitialized then
      jTextToSpeech_SetLanguage(FjEnv, FjObject, Ord(_language));
+end;
+
+procedure jTextToSpeech.SpeakOnline(_text: string; _language: string);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jTextToSpeech_SpeakOnline(FjEnv, FjObject, _text ,_language);
 end;
 
 {-------- jTextToSpeech_JNI_Bridge ----------}
@@ -183,6 +192,22 @@ begin
   jCls:= env^.GetObjectClass(env, _jtexttospeech);
   jMethod:= env^.GetMethodID(env, jCls, 'SetLanguage', '(I)V');
   env^.CallVoidMethodA(env, _jtexttospeech, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jTextToSpeech_SpeakOnline(env: PJNIEnv; _jtexttospeech: JObject; _text: string; _language: string);
+var
+  jParams: array[0..1] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_text));
+  jParams[1].l:= env^.NewStringUTF(env, PChar(_language));
+  jCls:= env^.GetObjectClass(env, _jtexttospeech);
+  jMethod:= env^.GetMethodID(env, jCls, 'SpeakOnline', '(Ljava/lang/String;Ljava/lang/String;)V');
+  env^.CallVoidMethodA(env, _jtexttospeech, jMethod, @jParams);
+  env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env,jParams[1].l);
   env^.DeleteLocalRef(env, jCls);
 end;
 

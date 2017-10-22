@@ -221,6 +221,15 @@ begin
 end;
 
 { Class:     org_lamw_apptexttospeechdemo1_Controls
+  Method:    pOnLongClick
+  Signature: (JI)V }
+procedure pOnLongClick(PEnv: PJNIEnv; this: JObject; pasobj: JLong; value: JInt
+  ); cdecl;
+begin
+  Java_Event_pOnLongClick(PEnv, this, TObject(pasobj), value);
+end;
+
+{ Class:     org_lamw_apptexttospeechdemo1_Controls
   Method:    pOnChange
   Signature: (JLjava/lang/String;I)V }
 procedure pOnChange(PEnv: PJNIEnv; this: JObject; pasobj: JLong; txt: JString;
@@ -327,7 +336,7 @@ begin
   Java_Event_pOnLayouting(PEnv, this, TObject(pasobj), changed);
 end;
 
-const NativeMethods: array[0..35] of JNINativeMethod = (
+const NativeMethods: array[0..36] of JNINativeMethod = (
    (name: 'pAppOnCreate';
     signature: '(Landroid/content/Context;Landroid/widget/RelativeLayout;'
       +'Landroid/content/Intent;)V';
@@ -401,6 +410,9 @@ const NativeMethods: array[0..35] of JNINativeMethod = (
    (name: 'pOnClick';
     signature: '(JI)V';
     fnPtr: @pOnClick; ),
+   (name: 'pOnLongClick';
+    signature: '(JI)V';
+    fnPtr: @pOnLongClick; ),
    (name: 'pOnChange';
     signature: '(JLjava/lang/String;I)V';
     fnPtr: @pOnChange; ),
@@ -535,6 +547,7 @@ exports
   pAppOnSpecialKeyDown name 'Java_org_lamw_apptexttospeechdemo1_Controls_'
     +'pAppOnSpecialKeyDown',
   pOnClick name 'Java_org_lamw_apptexttospeechdemo1_Controls_pOnClick',
+  pOnLongClick name 'Java_org_lamw_apptexttospeechdemo1_Controls_pOnLongClick',
   pOnChange name 'Java_org_lamw_apptexttospeechdemo1_Controls_pOnChange',
   pOnChanged name 'Java_org_lamw_apptexttospeechdemo1_Controls_pOnChanged',
   pOnEnter name 'Java_org_lamw_apptexttospeechdemo1_Controls_pOnEnter',

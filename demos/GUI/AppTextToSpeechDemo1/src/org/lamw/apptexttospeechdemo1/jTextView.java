@@ -27,6 +27,7 @@ import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Gravity;
+import android.widget.AdapterView;
 import android.widget.TextView;
 
 
@@ -35,8 +36,10 @@ public class jTextView extends TextView {
     private Controls        controls = null;   // Control Class for Event
     private jCommons LAMWCommon;
         
-    private OnClickListener onClickListener;   
-    private Boolean         enabled  = true;  
+    private OnClickListener onClickListener;
+    private OnLongClickListener onLongClickListener;
+    
+    private Boolean  mEnabled  = true;  
 
     float mTextSize = 0; 
     int mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_SP; 
@@ -44,6 +47,8 @@ public class jTextView extends TextView {
     private ClipboardManager mClipBoard = null;
     private ClipData mClipData = null;
     private int mRadius = 20;    
+    
+    int mTextAlignment;
     	    
     public  jTextView(android.content.Context context,
                       Controls ctrls,long pasobj ) {
@@ -55,12 +60,29 @@ public class jTextView extends TextView {
 
         onClickListener = new OnClickListener() {
             public  void onClick(View view) {
-                if (enabled) {
-                    controls.pOnClick(LAMWCommon.getPasObj(),Const.Click_Default);
+                if (mEnabled) {
+                    controls.pOnClick(LAMWCommon.getPasObj(), Const.Click_Default);
                 }
             };
         };                     
-        setOnClickListener(onClickListener);        
+        
+        setOnClickListener(onClickListener);
+        
+        
+        onLongClickListener = new OnLongClickListener() {
+
+			@Override
+			public boolean onLongClick(View arg0) {
+				// TODO Auto-generated method stub				
+				   if (mEnabled) {
+	                    controls.pOnLongClick(LAMWCommon.getPasObj(), Const.Click_Default);
+	               }								
+				   return false;  //true if the callback consumed the long click, false otherwise. 
+ 			}
+        
+        };                     
+        setOnLongClickListener(onLongClickListener);
+                
     }
 
 	//Free object except Self, Pascal Code Free the class.
@@ -134,31 +156,44 @@ public class jTextView extends TextView {
 	   return this;
     }
 
-    //LORDMAN 2013-08-13
+	/*
+	 	//TTextAlignment = (alLeft, alCenter, alRight);   //Pascal
+	public void SetTextAlignment(int _alignment) {
+		mTextAlignment = _alignment;	
+	    switch(mTextAlignment) {	     
+		  case 0: this.setGravity(Gravity.LEFT);  break;
+		  case 1: this.setGravity(Gravity.CENTER_HORIZONTAL);  break;
+		  case 2: this.setGravity(Gravity.RIGHT); break;					
+	    }					
+	}
+
+	 */
+		
+	//LORDMAN 2013-08-13
     public  void SetTextAlignment( int align ) {
         switch ( align ) {
  //[ifdef_api14up]
             case 0 : { setGravity( Gravity.START             ); }; break;
             case 1 : { setGravity( Gravity.END               ); }; break;
  //[endif_api14up]
+            
  /* //[endif_api14up]
             case 0 : { setGravity( Gravity.LEFT              ); }; break;
             case 1 : { setGravity( Gravity.RIGHT             ); }; break;
  //[ifdef_api14up] */
-            case 2 : { setGravity( Gravity.TOP               ); }; break;
-            case 3 : { setGravity( Gravity.BOTTOM            ); }; break;
-            case 4 : { setGravity( Gravity.CENTER            ); }; break;
-            case 5 : { setGravity( Gravity.CENTER_HORIZONTAL ); }; break;
-            case 6 : { setGravity( Gravity.CENTER_VERTICAL   ); }; break;
+            
+            case 2 : { setGravity( Gravity.CENTER_HORIZONTAL ); }; break;
+            
  //[ifdef_api14up]
             default : { setGravity( Gravity.START            ); }; break;
  //[endif_api14up]
+            
  /* //[endif_api14up]
             default : { setGravity( Gravity.LEFT             ); }; break;
  //[ifdef_api14up] */
-        };
+            
+        }
     }
-
     public void CopyToClipboard() {
         mClipData = ClipData.newPlainText("text", this.getText().toString());
         mClipBoard.setPrimaryClip(mClipData);
@@ -170,8 +205,9 @@ public class jTextView extends TextView {
         this.setText(item.getText().toString());
     }
 
-    public  void SetEnabled( boolean value ) {
-        enabled = value;
+    public  void SetEnabled( boolean value ) {    	
+    	mEnabled = value;
+        this.setEnabled(value);
     }
 
     public void SetTextTypeFace(int _typeface) {
@@ -208,16 +244,15 @@ public class jTextView extends TextView {
         this.setText(t);
     }
 
-    //TTextSizeTypedValue =(tsDefault, tsPixels, tsDIP, tsInches, tsMillimeters, tsPoints, tsScaledPixel);
+    //TTextSizeTypedValue =(tsDefault, tsPixels, tsDIP, tsMillimeters, tsPoints, tsScaledPixel);
     public void SetFontSizeUnit(int _unit) {
         switch (_unit) {
             case 0: mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_SP; break; //default
             case 1: mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_PX; break; 
             case 2: mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_DIP; break; 
-            case 3: mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_IN; break; 
-            case 4: mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_MM; break; 
-            case 5: mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_PT; break; 
-            case 6: mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_SP; break; 
+            case 3: mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_MM; break; 
+            case 4: mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_PT; break; 
+            case 5: mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_SP; break; 
         }
         String t = this.getText().toString();
         this.setTextSize(mTextSizeTypedValue, mTextSize);
@@ -230,7 +265,9 @@ public class jTextView extends TextView {
 		controls.pOnBeforeDispatchDraw(LAMWCommon.getPasObj(), canvas, 1);  //event handle by pascal side		
 	    super.dispatchDraw(canvas);	    
 	    //DO YOUR DRAWING ON TOP OF THIS VIEWS CHILDREN
-	    controls.pOnAfterDispatchDraw(LAMWCommon.getPasObj(), canvas, 1);	 //event handle by pascal side    
+	    controls.pOnAfterDispatchDraw(LAMWCommon.getPasObj(), canvas, 1);	 //event handle by pascal side
+	    
+	    if (!mEnabled) this.setEnabled(false); 
 	}
 	
 	private Drawable GetDrawableResourceById(int _resID) {
@@ -415,6 +452,15 @@ public class jTextView extends TextView {
 	//You can basically set it from anything between 0(fully transparent) to 255 (completely opaque)	
 	public void SetBackgroundAlpha(int _alpha) {
 		this.getBackground().setAlpha(_alpha); //0-255
+	}
+	
+	public void MatchParent() {		
+		LAMWCommon.MatchParent();
+		
+	}
+
+	public void WrapParent() {
+		LAMWCommon.WrapParent();		
 	}
 		
 }

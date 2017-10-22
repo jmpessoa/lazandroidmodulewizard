@@ -116,8 +116,19 @@ uses
 
    procedure Java_Event_pOnFileSelected(env: PJNIEnv; this: jobject; Obj: TObject; path: JString; fileName: JString);
 
-   Procedure Java_Event_pOnClickComboDropDownItem(env: PJNIEnv; this: jobject; Obj: TObject;index: integer; caption: JString);
+   Procedure Java_Event_pOnClickComboDropDownItem(env: PJNIEnv; this: jobject; Obj: TObject;
+                                                  index: integer; caption: JString);
 
+   Procedure Java_Event_pOnExpandableListViewChildClick(env: PJNIEnv; this: jobject; Obj: TObject;
+                                                             groupPosition: integer; groupHeader:JString;
+                                                             childItemPosition: integer;
+                                                             childItemCaption: JString);
+
+   Procedure Java_Event_pOnExpandableListViewGroupExpand(env: PJNIEnv; this: jobject; Obj: TObject;
+                                                              groupPosition: integer; groupHeader: JString);
+
+   Procedure Java_Event_pOnExpandableListViewGroupCollapse(env: PJNIEnv; this: jobject; Obj: TObject;
+                                                              groupPosition: integer; groupHeader: JString);
 implementation
 
 uses
@@ -126,7 +137,7 @@ uses
    spinner, location, actionbartab, customdialog, togglebutton, switchbutton, gridview,
    sensormanager, broadcastreceiver, datepickerdialog, timepickerdialog, shellcommand,
    tcpsocketclient, surfaceview, mediaplayer, contactmanager, seekbar, ratingbar, radiogroup,drawingview,
-   autocompletetextview, chronometer, numberpicker, udpsocket, opendialog, comboedittext;
+   autocompletetextview, chronometer, numberpicker, udpsocket, opendialog, comboedittext, toolbar, expandablelistview;
 
 procedure Java_Event_pOnBluetoothEnabled(env: PJNIEnv; this: jobject; Obj: TObject);
 begin
@@ -1287,6 +1298,13 @@ begin
     Exit;
   end;
 
+  if Obj is jToolbar then
+  begin
+    jForm(jToolbar(Obj).Owner).UpdateJNI(gApp);
+    jToolbar(Obj).GenEvent_OnClick(Obj);
+    Exit;
+  end;
+
 end;
 
 procedure Java_Event_pOnChronometerTick(env: PJNIEnv; this: jobject; Obj: TObject; elapsedTimeMillis: JLong);
@@ -1370,6 +1388,82 @@ begin
   end;
 end;
 
+Procedure Java_Event_pOnExpandableListViewGroupExpand(env: PJNIEnv; this: jobject; Obj: TObject;
+                                                           groupPosition: integer; groupHeader: JString);
+var
+  pasgroupHeader: string;
+  _jBoolean: JBoolean;
+begin
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+  if Obj is jExpandableListView then
+  begin
+    jForm(jExpandableListView(Obj).Owner).UpdateJNI(gApp);
+    pasgroupHeader := '';
+    if groupHeader <> nil then
+    begin
+      _jBoolean:= JNI_False;
+      pasgroupHeader:= string( env^.GetStringUTFChars(env,groupHeader,@_jBoolean) );
+    end;
+    jExpandableListView(Obj).GenEvent_OnGroupExpand(Obj, groupPosition, pasgroupHeader);
+  end;
+
+end;
+
+Procedure Java_Event_pOnExpandableListViewGroupCollapse(env: PJNIEnv; this: jobject; Obj: TObject;
+                                                           groupPosition: integer; groupHeader: JString);
+var
+  pasgroupHeader: string;
+  _jBoolean: JBoolean;
+begin
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+  if Obj is jExpandableListView then
+  begin
+    jForm(jExpandableListView(Obj).Owner).UpdateJNI(gApp);
+    pasgroupHeader := '';
+    if groupHeader <> nil then
+    begin
+      _jBoolean:= JNI_False;
+      pasgroupHeader:= string( env^.GetStringUTFChars(env,groupHeader,@_jBoolean) );
+    end;
+    jExpandableListView(Obj).GenEvent_OnGroupCollapse(Obj, groupPosition, pasgroupHeader);
+  end;
+
+end;
+
+Procedure Java_Event_pOnExpandableListViewChildClick(env: PJNIEnv; this: jobject; Obj: TObject;
+                                                          groupPosition: integer; groupHeader:JString;
+                                                          childItemPosition: integer;
+                                                          childItemCaption: JString);
+var
+  pasgroupHeader: string;
+  paschildItemCaption: string;
+  _jBoolean: JBoolean;
+begin
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+  if Obj is jExpandableListView then
+  begin
+    jForm(jExpandableListView(Obj).Owner).UpdateJNI(gApp);
+    pasgroupHeader := '';
+    if groupHeader <> nil then
+    begin
+      _jBoolean:= JNI_False;
+      pasgroupHeader:= string( env^.GetStringUTFChars(env,groupHeader,@_jBoolean) );
+    end;
+
+    paschildItemCaption := '';
+    if childItemCaption <> nil then
+    begin
+      _jBoolean:= JNI_False;
+      paschildItemCaption:= string( env^.GetStringUTFChars(env,childItemCaption,@_jBoolean) );
+    end;
+
+    jExpandableListView(Obj).GenEvent_OnChildClick(Obj, groupPosition, pasgroupHeader, childItemPosition, paschildItemCaption);
+  end;
+
+end;
 
 end.
 

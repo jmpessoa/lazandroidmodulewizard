@@ -1,6 +1,6 @@
 package org.lamw.apptexttospeechdemo1;
 
-//LAMW: Lazarus Android Module Wizard  - version 0.7 - rev. 15 - 29 March - 2017 
+//LAMW: Lazarus Android Module Wizard  - version 0.7 - rev. 22 - 21 October - 2017 
 //RAD Android: Project Wizard, Form Designer and Components Development Model!
 
 //https://github.com/jmpessoa/lazandroidmodulewizard
@@ -54,6 +54,7 @@ import android.annotation.SuppressLint;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.app.AlarmManager;
+import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.PendingIntent;
 import android.content.Context;
@@ -90,6 +91,7 @@ import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.util.Log;
 import android.view.ContextMenu;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.SurfaceHolder;
@@ -101,6 +103,7 @@ import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.RelativeLayout.LayoutParams;
+import android.widget.RemoteViews;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 import java.io.*;
@@ -271,6 +274,13 @@ for (int i = 0; i < layout.getChildCount(); i++) {
 public void ShowMessage(String msg){
   Log.i("ShowMessage", msg);
   Toast.makeText(controls.activity, msg, Toast.LENGTH_SHORT).show();	
+}
+
+public void ShowMessage(String _msg, int _gravity, int _timeLength) {
+	  Log.i("ShowMessage", _msg);
+	  Toast toast = Toast.makeText(controls.activity, _msg, _timeLength);
+	  toast.setGravity(Gravity.CENTER, 0, 0);
+	  toast.show();
 }
 
 public String GetDateTime() {
@@ -1255,6 +1265,7 @@ public native void pOnTouch(long pasobj, int act, int cnt, float x1, float y1, f
 public native void pOnClickGeneric(long pasobj, int value);
 public native boolean pAppOnSpecialKeyDown(char keyChar, int keyCode, String keyCodeString);
 public native void pOnClick(long pasobj, int value);
+public native void pOnLongClick(long pasobj, int value);
 public native void pOnChange(long pasobj, String txt, int count);
 public native void pOnChanged(long pasobj, String txt, int count);
 public native void pOnEnter(long pasobj);
@@ -1268,9 +1279,9 @@ public native void pOnBeforeDispatchDraw(long pasobj, Canvas canvas, int tag);
 public native void pOnAfterDispatchDraw(long pasobj, Canvas canvas, int tag);
 public native void pOnLayouting(long pasobj, boolean changed);
 
-// -------------------------------------------------------------------------
-//Load Pascal Library
-// -------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------
+//Load Pascal Library - Please, do not edit the static content commented in the template file
+// -------------------------------------------------------------------------------------------
 static {
 try{System.loadLibrary("controls");} catch (UnsatisfiedLinkError e) {Log.e("JNI_Loading_libcontrols", "exception", e);}
 }
@@ -1324,6 +1335,21 @@ public boolean jAppOnKeyDown(char keyChar , int keyCode, String keyCodeString) {
 public  void systemGC() {
    System.gc();
 }
+
+
+public void ShowAlert(String _title, String _message, String _btnText) {
+	
+	AlertDialog dialog = null;
+	AlertDialog.Builder builder = new AlertDialog.Builder(this.activity);
+	builder.setMessage       (_message)
+	       .setCancelable    (false)	       
+	       .setNeutralButton(_btnText, null);
+	       	      
+	dialog = builder.create();
+	dialog.setTitle(_title);
+	dialog.show();
+}
+
 
 public  void systemSetOrientation(int orientation) {
    this.activity.setRequestedOrientation(orientation);
@@ -1725,36 +1751,50 @@ public void jSend_Email(
 //http://codetheory.in/android-sms/
 //http://www.developerfeed.com/java/tutorial/sending-sms-using-android
 //http://www.techrepublic.com/blog/software-engineer/how-to-send-a-text-message-from-within-your-android-app/
-public int jSend_SMS(String phoneNumber, String msg) {
+public int jSend_SMS(String phoneNumber, String msg, boolean multipartMessage) {
 	SmsManager sms = SmsManager.getDefault();	
 	try {
-	      //SmsManager.getDefault().sendTextMessage(phoneNumber, null, msg, null, null);	      
-	      List<String> messages = sms.divideMessage(msg);    
-	      for (String message : messages) {
-	          sms.sendTextMessage(phoneNumber, null, message, null, null);
-	      }	      
-	      //Log.i("Send_SMS",phoneNumber+": "+ msg);
-	      return 1; //ok	      
-	  }catch (Exception e) {
-		  //Log.i("Send_SMS Fail",e.toString());
-	      return 0; //fail
-	  }
+		//SmsManager.getDefault().sendTextMessage(phoneNumber, null, msg, null, null);
+		if (multipartMessage) {
+			ArrayList<String> messages = sms.divideMessage(msg);    
+			sms.sendMultipartTextMessage(phoneNumber, null, messages, null, null);			  
+		} else {
+			List<String> messages = sms.divideMessage(msg);    
+			for (String message : messages) {
+				sms.sendTextMessage(phoneNumber, null, message, null, null);
+			}			    
+		}
+		//Log.i("Send_SMS",phoneNumber+": "+ msg);
+		return 1; //ok	      
+	} catch (Exception e) {
+		//Log.i("Send_SMS Fail",e.toString());
+		return 0; //fail
+	}
 }
 
-public int jSend_SMS(String phoneNumber, String msg, String packageDeliveredAction) {	
+public int jSend_SMS(String phoneNumber, String msg, String packageDeliveredAction, boolean multipartMessage) {	
 	String SMS_DELIVERED = packageDeliveredAction;
 	PendingIntent deliveredPendingIntent = PendingIntent.getBroadcast(this.GetContext(), 0, new Intent(SMS_DELIVERED), 0);
 	SmsManager sms = SmsManager.getDefault();
 	try {
-	      //SmsManager.getDefault().sendTextMessage(phoneNumber, null, msg, null, deliveredPendingIntent);
-	      //Log.i("Send_SMS",phoneNumber+": "+ msg);
-	      List<String> messages = sms.divideMessage(msg);    
-	      for (String message : messages) {
-	          sms.sendTextMessage(phoneNumber, null, message, null, deliveredPendingIntent);
-	      }	      
-	      return 1; //ok	      
-	}catch (Exception e) {
-	      return 0; //fail
+		//SmsManager.getDefault().sendTextMessage(phoneNumber, null, msg, null, deliveredPendingIntent);
+		if (multipartMessage) {
+			ArrayList<String> messages = sms.divideMessage(msg);    
+			ArrayList<PendingIntent> deliveredPendingIntents = new ArrayList<PendingIntent>();
+			for (int i = 0; i < messages.size(); i++) {
+				deliveredPendingIntents.add(i, deliveredPendingIntent);
+			}			
+			sms.sendMultipartTextMessage(phoneNumber, null, messages, null, deliveredPendingIntents);			  
+		} else {
+			List<String> messages = sms.divideMessage(msg);    
+			for (String message : messages) {
+				sms.sendTextMessage(phoneNumber, null, message, null, deliveredPendingIntent);
+			}			    
+		}	
+		//Log.i("Send_SMS",phoneNumber+": "+ msg);    
+		return 1; //ok	      
+	} catch (Exception e) {
+		return 0; //fail
 	}
 }
 
@@ -1856,8 +1896,7 @@ public  int[] getBmpArray(String file) {
    * NOTE: The DCIM folder on the microSD card in your Android device is where Android stores the photos and videos 
    * you take with the device's built-in camera. When you open the Android Gallery app, 
    * you are browsing the files saved in the DCIM folder....
-   */
-  //by jmpessoa  
+   */ 
 public String jCamera_takePhoto(String path, String filename) {
  	  Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
 	  Uri mImageCaptureUri = Uri.fromFile(new File(path, '/'+filename)); // get Android.Uri from file
