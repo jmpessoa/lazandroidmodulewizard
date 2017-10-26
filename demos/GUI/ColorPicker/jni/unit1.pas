@@ -118,7 +118,7 @@ begin
     Img := TFPMemoryImage.Create(jDrawingView_ColorPick.Width,
       jDrawingView_ColorPick.Height);
     Reader := TFPReaderPNG.Create;
-    Img.LoadFromFile(Self.GetEnvironmentDirectoryPath(dirDownloads) +
+    Img.LoadFromFile(Self.GetEnvironmentDirectoryPath(dirInternalAppStorage) +
       '/' + _color_pick_fn, Reader);
   end;
 end;
