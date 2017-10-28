@@ -102,7 +102,7 @@ public class jEditText extends EditText {
 							imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
 						}
 						controls.pOnEnter(LAMWCommon.getPasObj());
-						return true;
+						return mCloseSoftInputOnEnter;
 					}
 				//}
 				return false;
