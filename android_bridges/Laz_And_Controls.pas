@@ -839,6 +839,7 @@ type
 
     FTextAlignment: TTextAlignment;
     FCloseSoftInputOnEnter: boolean;
+    FCapSentence: boolean;
 
     Procedure SetColor    (Value : TARGBColorBridge);
 
@@ -928,6 +929,7 @@ type
     procedure SetFontFromAssets(_fontName: string);
     procedure RequestFocus();
     procedure SetCloseSoftInputOnEnter(_closeSoftInput: boolean);
+    procedure SetCapSentence(_capSentence: boolean);
 
     procedure LoadFromFile(_path: string; _filename: string);  overload;
     procedure LoadFromFile(_filename: string);  overload;
@@ -962,6 +964,7 @@ type
 
     property FontSizeUnit: TFontSizeUnit read FFontSizeUnit write SetFontSizeUnit;
     property CloseSoftInputOnEnter: boolean read FCloseSoftInputOnEnter write SetCloseSoftInputOnEnter;
+    property CapSentence: boolean read FCapSentence write SetCapSentence;
     // Event
     property OnLostFocus: TOnEditLostFocus read FOnLostFocus write FOnLostFocus;
     property OnEnter: TOnNotify  read FOnEnter write FOnEnter;
@@ -3542,7 +3545,7 @@ begin
   FLParamWidth  := lpHalfOfParent;
   FLParamHeight := lpWrapContent;
   FCloseSoftInputOnEnter:= True;
-
+  FCapSentence  := false;
 end;
 
 Destructor jEditText.Destroy;
@@ -3661,6 +3664,9 @@ begin
   jEditText_setVerticalScrollBarEnabled(FjEnv, FjObject , FVerticalScrollBar);
 
   jEditText_setHorizontallyScrolling(FjEnv, FjObject , FWrappingLine);
+
+  if FCapSentence then
+    jEditText_SetCapSentence(FjEnv, FjObject, FCapSentence);
 
   jEditText_editInputType2(FjEnv, FjObject , InputTypeToStrEx(FInputTypeEx));
 
@@ -4236,6 +4242,16 @@ begin
    FCloseSoftInputOnEnter:= _closeSoftInput;
   if FInitialized then
      jEditText_SetCloseSoftInputOnEnter(FjEnv, FjObject, _closeSoftInput);
+end;
+
+procedure jEditText.SetCapSentence(_capSentence: boolean);
+begin
+  //in designing component state: set value here...
+   FCapSentence:= _capSentence;
+  if FInitialized then
+     jEditText_SetCapSentence(FjEnv, FjObject, _capSentence);
+  // activate above setting
+  SetInputTypeEx(FInputTypeEx);
 end;
 
 procedure jEditText.LoadFromFile(_path: string; _filename: string);

@@ -275,6 +275,7 @@ function jEditText_getLParamHeight(env:PJNIEnv; _jedittext : jObject ): integer;
 procedure jEditText_SetFontFromAssets(env: PJNIEnv; _jedittext: JObject; _fontName: string);
 procedure jEditText_RequestFocus(env: PJNIEnv; _jedittext: JObject);
 procedure jEditText_SetCloseSoftInputOnEnter(env: PJNIEnv; _jedittext: JObject; _closeSoftInput: boolean);
+procedure jEditText_SetCapSentence(env: PJNIEnv; _jedittext: JObject; _capSentence: boolean);
 
 procedure jEditText_LoadFromFile(env: PJNIEnv; _jedittext: JObject; _path: string; _fileName: string);  overload;
 procedure jEditText_LoadFromFile(env: PJNIEnv; _jedittext: JObject; _filename: string);  overload;
@@ -2866,6 +2867,19 @@ begin
   jParams[0].z:= JBool(_closeSoftInput);
   jCls:= env^.GetObjectClass(env, _jedittext);
   jMethod:= env^.GetMethodID(env, jCls, 'SetCloseSoftInputOnEnter', '(Z)V');
+  env^.CallVoidMethodA(env, _jedittext, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jEditText_SetCapSentence(env: PJNIEnv; _jedittext: JObject; _capSentence: boolean);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].z:= JBool(_capSentence);
+  jCls:= env^.GetObjectClass(env, _jedittext);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetCapSentence', '(Z)V');
   env^.CallVoidMethodA(env, _jedittext, jMethod, @jParams);
   env^.DeleteLocalRef(env, jCls);
 end;

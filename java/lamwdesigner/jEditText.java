@@ -50,6 +50,7 @@ public class jEditText extends EditText {
 	private boolean canDispatchChangeEvent = false;
 	private boolean canDispatchChangedEvent = false;
 	private boolean mFlagSuggestion = false;
+	private boolean mFlagCapSentence = false;
 
 	private ClipboardManager mClipBoard = null;
 	private ClipData mClipData = null;
@@ -214,15 +215,9 @@ public class jEditText extends EditText {
 			this.setInputType(InputType.TYPE_CLASS_NUMBER|InputType.TYPE_NUMBER_FLAG_DECIMAL|InputType.TYPE_NUMBER_FLAG_SIGNED);
 		}
 		else if (str.equals("CAPCHARACTERS")) {
-			if (!mFlagSuggestion)
-				this.setInputType(android.text.InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS|InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);
-			else
 				this.setInputType(android.text.InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS);
 		}
 		else if (str.equals("TEXT")) {
-			if (!mFlagSuggestion)
-				this.setInputType(android.text.InputType.TYPE_CLASS_TEXT|InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);
-			else
 				this.setInputType(android.text.InputType.TYPE_CLASS_TEXT);
 		}
 		else if (str.equals("PHONE"))       {this.setInputType(android.text.InputType.TYPE_CLASS_PHONE); }
@@ -232,13 +227,17 @@ public class jEditText extends EditText {
 			this.setTransformationMethod(android.text.method.PasswordTransformationMethod.getInstance()); }
 
 		else if (str.equals("TEXTMULTILINE")){
-			if (!mFlagSuggestion)
-				this.setInputType(android.text.InputType.TYPE_CLASS_TEXT|android.text.InputType.TYPE_TEXT_FLAG_MULTI_LINE|InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);
-			else
 				this.setInputType(android.text.InputType.TYPE_CLASS_TEXT|android.text.InputType.TYPE_TEXT_FLAG_MULTI_LINE);
 		}
 
 		else {this.setInputType(android.text.InputType.TYPE_CLASS_TEXT|InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);};
+
+		if (!mFlagSuggestion) {
+		  this.setInputType(this.getInputType() | InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);
+                }
+		if (mFlagCapSentence) {
+		  this.setInputType(this.getInputType() | InputType.TYPE_TEXT_FLAG_CAP_SENTENCES);
+                }
 
 	}
 
@@ -398,6 +397,10 @@ public class jEditText extends EditText {
 
 	public void SetAcceptSuggestion(boolean _value) {
 		mFlagSuggestion = _value;
+	}
+
+	public void SetCapSentence(boolean _value) {
+		mFlagCapSentence = _value;
 	}
 
 	public void CopyToClipboard() {
