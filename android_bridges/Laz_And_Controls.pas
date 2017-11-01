@@ -524,6 +524,8 @@ type
     function GetByteBufferFromBitmap(): jObject; overload;
     function GetDirectBufferAddress(byteBuffer: jObject): PJByte;
     function GetImageFromFile(_fullFilename: string): jObject;
+    function GetRoundedShape(_bitmapImage: jObject): jObject;   overload;
+    function GetRoundedShape(_bitmapImage: jObject; _diameter: integer): jObject; overload;
 
   published
     property FilePath: TFilePath read FFilePath write FFilePath;
@@ -8966,6 +8968,20 @@ begin
   //in designing component state: result value here...
   if FInitialized then
    Result:= jBitmap_LoadFromFile(FjEnv, FjObject, _fullFilename);
+end;
+
+function jBitmap.GetRoundedShape(_bitmapImage: jObject): jObject;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jBitmap_GetRoundedShape(FjEnv, FjObject, _bitmapImage);
+end;
+
+function jBitmap.GetRoundedShape(_bitmapImage: jObject; _diameter: integer): jObject;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jBitmap_GetRoundedShape(FjEnv, FjObject, _bitmapImage ,_diameter);
 end;
 
 //------------------------------------------------------------------------------

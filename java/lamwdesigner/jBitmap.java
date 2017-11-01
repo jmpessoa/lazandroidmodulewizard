@@ -1,4 +1,4 @@
-package com.example.appopenglsurfaceviewdemo1;
+package org.lamw.appexpandablelistviewdemo1;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -10,7 +10,10 @@ import android.content.res.AssetManager;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.CompressFormat;
 import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
 import android.graphics.Matrix;
+import android.graphics.Path;
+import android.graphics.Rect;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.util.Log;
@@ -281,6 +284,62 @@ public Bitmap GetBitmapFromByteArray(byte[] _image) {
  //this.bmp = BitmapFactory.decodeByteArray(_image, 0, _image.length);
 	bmp = BitmapFactory.decodeByteArray(_image, 0, _image.length);
 	return bmp;	
+}
+
+
+/*
+ * Making image in circular shape
+ * http://www.androiddevelopersolutions.com/2012/09/crop-image-in-circular-shape-in-android.html
+ */
+public Bitmap GetRoundedShape(Bitmap _bitmapImage, int _diameter) {
+ // TODO Auto-generated method stub	
+ Bitmap sourceBitmap = _bitmapImage;
+ Path path = new Path();
+ 
+ int dim;
+ if(_diameter == 0 ) { 
+    dim = sourceBitmap.getHeight();
+    if (dim > sourceBitmap.getWidth()) dim = sourceBitmap.getWidth();
+ }
+ else {
+	 dim = _diameter;
+	 int min;
+	 
+	 if (sourceBitmap.getWidth() <  sourceBitmap.getHeight())  
+		 min = sourceBitmap.getWidth();
+	 else
+		 min = sourceBitmap.getHeight();
+	  
+	 if (dim > min) dim = min; 
+ }
+ 
+ int targetWidth = dim;
+ int targetHeight = dim;
+
+ Bitmap targetBitmap = Bitmap.createBitmap(targetWidth, 
+         targetHeight,Bitmap.Config.ARGB_8888);
+
+ Canvas canvas = new Canvas(targetBitmap);
+
+ path.addCircle(((float) targetWidth - 1) / 2,
+ ((float) targetHeight - 1) / 2,
+ (Math.min(((float) targetWidth), 
+               ((float) targetHeight)) / 2),
+ Path.Direction.CCW);
+ 
+ canvas.clipPath(path);
+ 
+ canvas.drawBitmap(sourceBitmap, 
+                               new Rect(0, 0, sourceBitmap.getWidth(),
+                               sourceBitmap.getHeight()), 
+                               new Rect(0, 0, targetWidth,
+                               targetHeight), null);
+ return targetBitmap;
+}
+
+
+public Bitmap GetRoundedShape(Bitmap _bitmapImage) {
+	return GetRoundedShape(_bitmapImage, 0);
 }
 
 }

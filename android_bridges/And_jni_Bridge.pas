@@ -876,6 +876,8 @@ function jBitmap_GetBitmapFromByteArray(env: PJNIEnv; _jbitmap: JObject; var _im
 function jBitmap_GetByteBufferFromBitmap(env: PJNIEnv; _jbitmap: JObject; _bmap: jObject): jObject; overload;
 function jBitmap_GetByteBufferFromBitmap(env: PJNIEnv; _jbitmap: JObject): jObject; overload;
 function jBitmap_LoadFromFile(env: PJNIEnv; _jbitmap: JObject; _fullFilename: string): jObject;
+function jBitmap_GetRoundedShape(env: PJNIEnv; _jbitmap: JObject; _bitmapImage: jObject): jObject; overload;
+function jBitmap_GetRoundedShape(env: PJNIEnv; _jbitmap: JObject; _bitmapImage: jObject; _diameter: integer): jObject; overload;
 
 //GLSurfaceView
 Function  jGLSurfaceView_Create1       (env:PJNIEnv;  this:jobject; SelfObj: TObject; version: integer): jObject;
@@ -7478,7 +7480,32 @@ env^.DeleteLocalRef(env,jParams[0].l);
   env^.DeleteLocalRef(env, jCls);
 end;
 
+function jBitmap_GetRoundedShape(env: PJNIEnv; _jbitmap: JObject; _bitmapImage: jObject): jObject;
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= _bitmapImage;
+  jCls:= env^.GetObjectClass(env, _jbitmap);
+  jMethod:= env^.GetMethodID(env, jCls, 'GetRoundedShape', '(Landroid/graphics/Bitmap;)Landroid/graphics/Bitmap;');
+  Result:= env^.CallObjectMethodA(env, _jbitmap, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
 
+function jBitmap_GetRoundedShape(env: PJNIEnv; _jbitmap: JObject; _bitmapImage: jObject; _diameter: integer): jObject;
+var
+  jParams: array[0..1] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= _bitmapImage;
+  jParams[1].i:= _diameter;
+  jCls:= env^.GetObjectClass(env, _jbitmap);
+  jMethod:= env^.GetMethodID(env, jCls, 'GetRoundedShape', '(Landroid/graphics/Bitmap;I)Landroid/graphics/Bitmap;');
+  Result:= env^.CallObjectMethodA(env, _jbitmap, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
 
 //------------------------------------------------------------------------------
 // jGLSurfaceView
