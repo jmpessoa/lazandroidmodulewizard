@@ -31,6 +31,9 @@ type
     FPathToAndroidNDK: string;
     {%endregion}
 
+    FInstructionSet: string;
+    FFPUSet: string;
+
     procedure CleanupAllJControlsSource;
     procedure GetAllJControlsFromForms(jControlsList: TStrings);
     function GetEventSignature(const nativeMethod: string): string;
@@ -45,6 +48,10 @@ type
     procedure TryChangeDemoProjecPaths;
     procedure TryFindDemoPathsFromReadme(out pathToDemoNDK, pathToDemoSDK: string);
     {%endregion}
+
+    function IsChipSetDefault(var projectChipSet: string): boolean;
+    procedure TryChangeChipSetConfigs(projectChipSet: string);
+
   protected
     function OnProjectOpened(Sender: TObject; AProject: TLazProject): TModalResult;
     function OnProjectSavingAll(Sender: TObject): TModalResult;
@@ -129,6 +136,7 @@ end;
 procedure TLamwSmartDesigner.Init4Project(AProject: TLazProject);
 var
   auxList: TStringList;
+  projChipSet: string;
 begin
   if not AProject.CustomData.Contains('LAMW') then
   begin
@@ -191,6 +199,107 @@ begin
   end;
 {%endregion}
 
+  //Try configure chipset
+  FInstructionSet:= LamwGlobalSettings.InstructionSet;
+  if FInstructionSet = '0' then
+  begin
+    FInstructionSet:= 'ARMV6';
+    FFPUSet:= 'Soft';
+  end
+  else if FInstructionSet = '1' then
+  begin
+    FInstructionSet:= 'ARMV7A';
+    FFPUSet:= 'Soft';
+  end
+  else if FInstructionSet = '2' then
+  begin
+    FInstructionSet:= 'ARMV7A';
+    FFPUSet:= 'VFPV3';
+  end
+  else if FInstructionSet = '3' then
+  begin
+    FInstructionSet:= 'x86';
+    FFPUSet:= '';
+  end
+  else if FInstructionSet = '4' then
+  begin
+    FInstructionSet:= 'Mipsel';
+    FFPUSet:= '';
+  end;
+
+  if not IsChipSetDefault(projChipSet) then
+  begin
+    TryChangeChipSetConfigs(projChipSet);
+  end;
+
+end;
+
+procedure TLamwSmartDesigner.TryChangeChipSetConfigs(projectChipSet: string);
+var
+  customResult: string;
+  libTarget: string;
+begin
+
+  customResult:= LazarusIDE.ActiveProject.LazCompilerOptions.CustomOptions;
+
+  if Pos('ARMV6', FInstructionSet) > 0 then
+  begin
+    if Pos('ARMV7A',  projectChipSet) > 0 then //ARMV7A  ---> armv6
+    begin
+      customResult:= StringReplace(customResult, 'CpARMV7A' , 'CpARMV6', [rfReplaceAll,rfIgnoreCase]);
+      customResult:= StringReplace(customResult, 'CfVFPV3', 'CfSoft', [rfReplaceAll,rfIgnoreCase]);
+      LazarusIDE.ActiveProject.LazCompilerOptions.CustomOptions:= customResult;
+
+      libTarget:= LazarusIDE.ActiveProject.LazCompilerOptions.TargetFilename;
+      libTarget:= StringReplace(libTarget, 'armeabi-v7a', 'armeabi', [rfReplaceAll,rfIgnoreCase]);
+      LazarusIDE.ActiveProject.LazCompilerOptions.TargetFilename:= libTarget;
+    end;
+  end;
+
+  if Pos('ARMV7A', FInstructionSet) > 0 then
+  begin
+    if Pos('ARMV6',  projectChipSet ) > 0 then  //armv6  --> ARMV7A
+    begin
+      customResult:= StringReplace(customResult, 'CpARMV6' , 'CpARMV7A', [rfReplaceAll,rfIgnoreCase]);
+      customResult:= StringReplace(customResult, 'CfSoft', 'Cf'+ FFPUSet, [rfReplaceAll,rfIgnoreCase]);
+      LazarusIDE.ActiveProject.LazCompilerOptions.CustomOptions:= customResult;
+
+      libTarget:= LazarusIDE.ActiveProject.LazCompilerOptions.TargetFilename;
+      libTarget:= StringReplace(libTarget, 'armeabi', 'armeabi-v7a', [rfReplaceAll,rfIgnoreCase]);
+      LazarusIDE.ActiveProject.LazCompilerOptions.TargetFilename:= libTarget;
+    end;
+  end;
+
+end;
+
+function TLamwSmartDesigner.IsChipSetDefault(var projectChipSet: string): boolean;
+var
+  projectTarger: string;
+begin
+
+  projectTarger:= LazarusIDE.ActiveProject.LazCompilerOptions.TargetFilename;
+
+  if Pos('armeabi-v7a', projectTarger) > 0 then
+  begin
+     projectChipSet:= 'ARMV7A';
+  end
+  else if  Pos('armeabi', projectTarger) > 0 then
+  begin
+     projectChipSet:= 'ARMV6';
+  end
+  else if  Pos('x86', projectTarger) > 0 then
+  begin
+     projectChipSet:= 'x86';
+  end
+  else if  Pos('mips', projectTarger) > 0 then
+  begin
+     projectChipSet:= 'Mipsel';
+  end;
+
+  if LowerCase(FInstructionSet) =  LowerCase(projectChipSet) then
+     Result:= True
+  else
+     Result:= False;
 end;
 
 procedure TLamwSmartDesigner.UpdateJControls(ProjFile: TLazProjectFile;
@@ -1115,25 +1224,35 @@ begin
   begin
       strLibraries:= LazarusIDE.ActiveProject.LazCompilerOptions.Libraries;
       strResult:= StringReplace(strLibraries, pathToDemoNDK, FPathToAndroidNDK, [rfReplaceAll,rfIgnoreCase]);
-      if (FNDKIndex = '3') or  (FNDKIndex = '4') then
+
+      //Libraries
+      if (FNDKIndex = '3') or  (FNDKIndex = '4') or (FNDKIndex = '5') then
       begin
         strResult:= StringReplace(strResult, '4.6', '4.9', [rfReplaceAll,rfIgnoreCase]);
       end;
       LazarusIDE.ActiveProject.LazCompilerOptions.Libraries:= strResult;
+
+      //CustomOptions
       strCustom:= LazarusIDE.ActiveProject.LazCompilerOptions.CustomOptions;
       strResult:= StringReplace(strCustom, pathToDemoNDK, FPathToAndroidNDK, [rfReplaceAll,rfIgnoreCase]);
-      if (FNDKIndex = '3') or  (FNDKIndex = '4') then
+      if (FNDKIndex = '3') or  (FNDKIndex = '4') or (FNDKIndex = '5') then
       begin
         strResult:= StringReplace(strResult, '4.6', '4.9', [rfReplaceAll,rfIgnoreCase]);
       end;
+
       LazarusIDE.ActiveProject.LazCompilerOptions.CustomOptions:= strResult;
       //  add/update  custom ...
       LazarusIDE.ActiveProject.CustomData.Values['NdkPath']:= FPathToAndroidNDK;
       LazarusIDE.ActiveProject.CustomData.Values['SdkPath']:= FPathToAndroidSDK;
-  end else
+
+  end
+  else
+  begin
     ShowMessage('Sorry.. path to NDK not fixed ... [Please, change it by hand!]');
+  end;
 
   strList.Free;
+
 end;
 
 procedure TLamwSmartDesigner.TryFindDemoPathsFromReadme(

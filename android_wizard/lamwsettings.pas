@@ -24,6 +24,8 @@ type
     FPathToAndroidSDK: string;
     FPathToJavaJDK: string;
     FPathToAntBin: string;
+    FFPUSet: string;
+    FInstructionSet: string;
     function GetCanUpdateJavaTemplate: Boolean;
     function GetPath(var APath: string; const IniIdent, QueryPrompt: string): string;
     function GetPathToAndroidNDK: string;
@@ -31,6 +33,7 @@ type
     function GetPathToAntBin: string;
     function GetPathToJavaJDK: string;
     function GetPathToJavaTemplates: string;
+    function GetInstructionSet: string;
   public
     constructor Create;
     procedure ReloadPaths; // loading paths from INI
@@ -49,6 +52,8 @@ type
     property PathToAndroidSDK: string read GetPathToAndroidSDK;
     property PathToJavaJDK: string read GetPathToJavaJDK;
     property PathToAntBin: string read GetPathToAntBin;
+
+    property InstructionSet: string read GetInstructionSet;
   end;
 
 var
@@ -56,7 +61,7 @@ var
 
 implementation
 
-uses LazIDEIntf, SrcEditorIntf, StdCtrls, EditBtn, Controls,
+uses LazIDEIntf, {SrcEditorIntf,} StdCtrls, EditBtn, Controls,
   ButtonPanel, IniFiles;
 
 function QueryPath(APrompt: string; out Path: string;
@@ -182,6 +187,17 @@ function TLamwGlobalSettings.GetPathToJavaJDK: string;
 begin
   Result := GetPath(FPathToJavaJDK, 'PathToJavaJDK',
     'Path to Java JDK: [ex. C:\Program Files (x86)\Java\jdk1.7.0_21]');
+end;
+
+function TLamwGlobalSettings.GetInstructionSet: string;
+begin
+  with TIniFile.Create(IncludeTrailingPathDelimiter(LazarusIDE.GetPrimaryConfigPath) + IniFileName) do
+    try
+      FInstructionSet:= ReadString(IniFileSection, 'InstructionSet', '');
+    finally
+      Free;
+  end;
+  Result:= FInstructionSet;
 end;
 
 constructor TLamwGlobalSettings.Create;
