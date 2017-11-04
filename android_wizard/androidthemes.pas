@@ -5,7 +5,7 @@ unit AndroidThemes;
 interface
 
 uses
-  Classes, SysUtils, AvgLvlTree, Laz2_DOM, Graphics;
+  Classes, SysUtils, Laz2_DOM, Graphics;
 
 type
   TAndroidThemes = class;
