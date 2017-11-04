@@ -53,7 +53,6 @@ type
     property MinAPI: Integer read FMinAPI;
     property Name: string read FName;
   end;
-  PAndroidTheme = ^TAndroidTheme;
 
   { TAndroidThemes }
 
@@ -61,7 +60,7 @@ type
   private
     FInited: Boolean;
     FAPI: Integer;
-    FThemes: TAvgLvlTree;
+    FThemes: TStringList;
     FXMLs: TStringList; // objects are TXMLDocument
     FBasePath: string; // %{sdk}/platforms/android-XX/data/res/values/
     function AddTheme(const ThemeName: string; MinAPI: Integer): TAndroidTheme;
@@ -121,28 +120,18 @@ end;
 
 { TAndroidThemes }
 
-function CmpAndroidThemes(p1, p2: Pointer): Integer;
-begin
-  Result := CompareStr(PAndroidTheme(p1)^.Name, PAndroidTheme(p2)^.Name);
-end;
-
-function FindThemeByName(p1, p2: Pointer): Integer;
-begin
-  Result := CompareStr(PString(p1)^, PAndroidTheme(p2)^.Name);
-end;
-
 function TAndroidThemes.AddTheme(const ThemeName: string;
   MinAPI: Integer): TAndroidTheme;
 begin
   Result := TAndroidTheme.Create(ThemeName);
   Result.FMinAPI := MinAPI;
   Result.FOwner := Self;
-  FThemes.Add(Result);
+  FThemes.AddObject(ThemeName, Result);
 end;
 
 procedure TAndroidThemes.Clear;
 begin
-  FThemes.FreeAndClear;
+  FThemes.Clear;
   FXMLs.Clear;
 end;
 
@@ -220,18 +209,19 @@ end;
 
 function TAndroidThemes.FindTheme(const ThemeName: string): TAndroidTheme;
 var
-  n: TAvgLvlTreeNode;
+  n: Integer;
 begin
-  n := FThemes.FindKey(@ThemeName, @FindThemeByName);
-  if Assigned(n) then
-    Result := TAndroidTheme(n.Data)
-  else
-    Result := nil;
+  Result := nil;
+  n := FThemes.IndexOf(ThemeName);
+  if n >= 0 then
+    Result := TAndroidTheme(FThemes.Objects[n])
 end;
 
 constructor TAndroidThemes.Create;
 begin
-  FThemes := TAvgLvlTree.Create(@CmpAndroidThemes);
+  FThemes := TStringList.Create;
+  FThemes.Sorted := True;
+  FThemes.OwnsObjects := True;
   FXMLs := TStringList.Create;
   FXMLs.CaseSensitive := True;
   FXMLs.OwnsObjects := True;
