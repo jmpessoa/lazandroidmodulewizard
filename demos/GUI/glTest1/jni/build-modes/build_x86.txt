@@ -1,0 +1,3 @@
+<Libraries Value="/home/handoko/Android/android-ndk-r11c/platforms/android-21/arch-x86/usr/lib;/home/handoko/Android/android-ndk-r11c/toolchains/x86-4.9/prebuilt/linux-x86_64/lib/gcc/i686-android-linux/4.9"/>
+<TargetCPU Value="i386"/>
+<CustomOptions Value="-Xd -XPi686-linux-android- -FD/home/handoko/Android/android-ndk-r11c/toolchains/x86-4.9/prebuilt/linux-x86_64/bin"/>

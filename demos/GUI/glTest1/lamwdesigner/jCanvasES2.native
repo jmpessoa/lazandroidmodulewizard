@@ -1,0 +1,1 @@
+public native void pOnGLRenderer2(long pasobj, int EventType, int w, int h);

@@ -1,0 +1,3 @@
+<Libraries Value="/home/handoko/Android/android-ndk-r11c/platforms/android-21/arch-arm/usr/lib;/home/handoko/Android/android-ndk-r11c/toolchains/arm-linux-androideabi-4.9/prebuilt/linux-x86_64/lib/gcc/arm-linux-androideabi/4.9"/>
+<TargetCPU Value="arm"/>
+<CustomOptions Value="-Xd -CfSoft -CpARMV6 -XParm-linux-androideabi- -FD/home/handoko/Android/android-ndk-r11c/toolchains/arm-linux-androideabi-4.9/prebuilt/linux-x86_64/bin"/>

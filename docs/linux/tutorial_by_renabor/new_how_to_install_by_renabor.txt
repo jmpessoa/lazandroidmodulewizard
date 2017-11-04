@@ -33,3 +33,9 @@ lazarus 			1.7
 enjoy!
 
 
+PS. 
+Scripts have to be run in order and the first to run is 1-master-script.sh, that will call others properly.
+If you don't have a symlink like this:
+fpc-bin -> /home/renabor/bin/freepascal/fpc-3.0.4/bin/
+the script will fail. Run all the configuration scripts (1-master-script.sh) and you will be ok!
+[by renabor in issue by Alfonso Martitegui]
