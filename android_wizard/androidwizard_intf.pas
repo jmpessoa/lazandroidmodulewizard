@@ -147,6 +147,7 @@ function SplitStr(var theString: string; delimiter: string): string;
 implementation
 
 uses
+   {$ifdef unix}BaseUnix,{$endif}
    LazFileUtils, uJavaParser, LamwDesigner, SmartDesigner;
 
 procedure Register;
@@ -694,6 +695,14 @@ function TAndroidProjectDescriptor.GetWorkSpaceFromForm(projectType: integer; ou
       while sl.IndexOf(Result + IntToStr(i)) >= 0 do Inc(i);
       Result := Orig + IntToStr(i);
     end;
+  end;
+
+  procedure SaveShellScript(script: TStringList; const AFileName: string);
+  begin
+    script.SaveToFile(AFileName);
+    {$ifdef UNIX}
+    FpChmod(AFileName, &751);
+    {$endif}
   end;
 
 var
@@ -1407,7 +1416,7 @@ begin
           strList.Add('export JAVA_HOME='+linuxPathToJavaJDK);     //export JAVA_HOME=/usr/lib/jvm/java-6-openjdk
           strList.Add('cd '+linuxAndroidProjectName);
           strList.Add('ant -Dtouchtest.enabled=true debug');
-          strList.SaveToFile(FAndroidProjectName+PathDelim+'build-debug.sh');
+          SaveShellScript(strList, FAndroidProjectName+PathDelim+'build-debug.sh');
 
           strList.Clear;
           if FPathToAntBin <> '' then
@@ -1416,7 +1425,7 @@ begin
           strList.Add('export JAVA_HOME='+linuxPathToJavaJDK);     //export JAVA_HOME=/usr/lib/jvm/java-6-openjdk
           strList.Add('cd '+linuxAndroidProjectName);
           strList.Add('ant clean release');
-          strList.SaveToFile(FAndroidProjectName+PathDelim+'build-release.sh');
+          SaveShellScript(strList, FAndroidProjectName+PathDelim+'build-release.sh');
 
           linuxPathToAdbBin:= linuxPathToAndroidSdk+'platform-tools';
 
@@ -1429,30 +1438,30 @@ begin
           strList.Add(linuxPathToAdbBin+linuxDirSeparator+'adb install -r bin'+linuxDirSeparator+FSmallProjName+'-'+FAntBuildMode+'.apk');
 
           strList.Add(linuxPathToAdbBin+linuxDirSeparator+'adb logcat');
-          strList.SaveToFile(FAndroidProjectName+PathDelim+'install.sh');
+          SaveShellScript(strList, FAndroidProjectName+PathDelim+'install.sh');
 
           //linux uninstall  - thanks to Stephano!
           strList.Clear;
           strList.Add(linuxPathToAdbBin+linuxDirSeparator+'adb uninstall '+FPackagePrefaceName+'.'+LowerCase(FSmallProjName));
-          strList.SaveToFile(FAndroidProjectName+PathDelim+'uninstall.sh');
+          SaveShellScript(strList, FAndroidProjectName+PathDelim+'uninstall.sh');
 
           //linux logcat  - thanks to Stephano!
           strList.Clear;
           strList.Add(linuxPathToAdbBin+linuxDirSeparator+'adb logcat');
-          strList.SaveToFile(FAndroidProjectName+PathDelim+'logcat.sh');
+          SaveShellScript(strList, FAndroidProjectName+PathDelim+'logcat.sh');
 
           strList.Clear;
           strList.Add('export JAVA_HOME='+linuxPathToJavaJDK);     //export JAVA_HOME=/usr/lib/jvm/java-6-openjdk
           strList.Add('cd '+linuxAndroidProjectName);
           strList.Add('keytool -genkey -v -keystore '+FSmallProjName+'-release.keystore -alias '+dummy+'aliaskey -keyalg RSA -keysize 2048 -validity 10000 < '+
                        linuxAndroidProjectName+linuxDirSeparator+dummy+'keytool_input.txt');
-          strList.SaveToFile(FAndroidProjectName+PathDelim+'release-keystore.sh');
+          SaveShellScript(strList, FAndroidProjectName+PathDelim+'release-keystore.sh');
 
           strList.Clear;
           strList.Add('export JAVA_HOME='+linuxPathToJavaJDK);     //export JAVA_HOME=/usr/lib/jvm/java-6-openjdk
           strList.Add('cd '+linuxAndroidProjectName);
           strList.Add('jarsigner -verify -verbose -certs '+linuxAndroidProjectName+linuxDirSeparator+'bin'+linuxDirSeparator+FSmallProjName+'-release.apk');
-          strList.SaveToFile(FAndroidProjectName+PathDelim+'jarsigner-verify.sh');
+          SaveShellScript(strList, FAndroidProjectName+PathDelim+'jarsigner-verify.sh');
 
         end;
         Result := True;
@@ -1879,7 +1888,7 @@ begin
 
   end;
 
-   sourceList.Add('end.');
+  sourceList.Add('end.');
   AProject.MainFile.SetSourceText(sourceList.Text, True);
 
   AProject.Flags := AProject.Flags - [pfMainUnitHasCreateFormStatements,
@@ -2111,7 +2120,7 @@ begin
   customOptions_armV6:=  customOptions_armV6  +' -XParm-linux-androideabi-';
   customOptions_armV7a:= customOptions_armV7a +' -XParm-linux-androideabi-';
   customOptions_x86:=    customOptions_x86    +' -XPi686-linux-android-';   //fix by jmpessoa
-  customOptions_mips:=    customOptions_mips    +' -XPmipsel-linux-android-';
+  customOptions_mips:=   customOptions_mips   +' -XPmipsel-linux-android-';
 
   // Takeda Patch - "customOptions_default" now would really aware about compilation for x86 Target
   //if FInstructionSet <> 'x86' then
@@ -2124,7 +2133,7 @@ begin
     customOptions_default:= customOptions_default+' -XPi686-linux-android-'+' -FD'+pathToNdkToolchainsBinX86;
   end
   else if Pos('Mipsel', FInstructionSet) > 0 then
-      customOptions_default:= customOptions_default+' -XPmipsel-linux-android-'+' -FD'+pathToNdkToolchainsBinMips;
+    customOptions_default:= customOptions_default+' -XPmipsel-linux-android-'+' -FD'+pathToNdkToolchainsBinMips;
 
   customOptions_armV6:= customOptions_armV6+' -FD'+pathToNdkToolchainsBinArm;
   customOptions_armV7a:= customOptions_armV7a+' -FD'+pathToNdkToolchainsBinArm;
@@ -2153,7 +2162,7 @@ begin
   if FModuleType < 2 then
     auxList.SaveToFile(FPathToJNIFolder+DirectorySeparator+'jni'+DirectorySeparator+'build-modes'+DirectorySeparator+'build_x86.txt')
   else
-     auxList.SaveToFile(FPathToJNIFolder+DirectorySeparator+'build-modes'+DirectorySeparator+'build_x86.txt');
+    auxList.SaveToFile(FPathToJNIFolder+DirectorySeparator+'build-modes'+DirectorySeparator+'build_x86.txt');
 
   auxList.Clear;
   auxList.Add('<Libraries Value="'+libraries_mips+'"/>');
