@@ -30,6 +30,7 @@ jTextFileManager = class(jControl)
     procedure SaveToFile(_txtContent: string;_path: string; _filename: string); overload;
     function LoadFromFile(_filename: string): string; overload;
     function LoadFromFile(_path: string; _filename: string): string; overload;
+    function LoadFromFile(_envDir: TEnvDirectory; _filename: string): string; overload;
     procedure SaveToSdCard(_txtContent: string; _filename: string);
     function LoadFromSdCard(_filename: string): string;
     function LoadFromAssets(_filename: string): string;
@@ -133,6 +134,11 @@ begin
   //in designing component state: result value here...
   if FInitialized then
    Result:= jTextFileManager_LoadFromFile(FjEnv, FjObject,_path, _filename);
+end;
+
+function jTextFileManager.LoadFromFile(_envDir: TEnvDirectory; _filename: string): string; overload;
+begin
+   LoadFromFile( (Self.Owner as jForm).GetEnvironmentDirectoryPath(_envDir) ,_filename);
 end;
 
 procedure jTextFileManager.SaveToSdCard(_txtContent: string; _filename: string);
