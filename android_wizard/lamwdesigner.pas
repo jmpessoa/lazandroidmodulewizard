@@ -1916,7 +1916,9 @@ begin
         FLeftTop.y := Anchor.Top + MarginTop;
       if raAlignBottom in PosRelativeToAnchor then
         FRightBottom.y := Anchor.Top + Anchor.Height - MarginBottom;
-      { TODO: other combinations raToStartOf, raToLeftOf, raAlignStart, raAlignEnd }
+      if raToLeftOf in PosRelativeToAnchor then
+        FRightBottom.x := Anchor.Left - Anchor.MarginLeft - MarginRight;
+      { TODO: other combinations raToStartOf, raAlignStart, raAlignEnd }
       if ([raBelow, raAlignBottom] * PosRelativeToAnchor <> [])
       and Assigned(Parent) and (rpBottom in PosRelativeToParent) then
         FRightBottom.y := Parent.Height - MarginBottom;
