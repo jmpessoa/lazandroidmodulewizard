@@ -1565,6 +1565,8 @@ type
     procedure DrawBitmap(_bitmap: jObject; _width: integer; _height: integer); overload;
 
     procedure SetCanvas(_canvas: jObject);
+    //procedure drawTextAligned(Text: string; _left, _top, _right, _bottom, _alignhorizontal, _alignvertical: single);
+    procedure DrawTextAligned(_text: string; _left, _top, _right, _bottom: single; _alignHorizontal: TTextAlignHorizontal; _alignVertical: TTextAlignVertical);
 
     // Property
     property  JavaObj : jObject read FjObject;
@@ -9154,6 +9156,29 @@ begin
   //in designing component state: set value here...
   if FInitialized then
      jCanvas_setCanvas(FjEnv, FjObject, _canvas);
+end;
+
+//by CC
+procedure jCanvas.DrawTextAligned(_text: string; _left, _top, _right, _bottom: single; _alignHorizontal: TTextAlignHorizontal; _alignVertical: TTextAlignVertical);
+var
+  alignHor, aligVer: single;
+begin
+  case _alignHorizontal of
+    thLeft: alignHor:= 0;
+    thRight: alignHor:= 1;
+    thCenter:  alignHor:= 0.5;
+  end;
+
+  case _alignVertical of
+     tvTop: aligVer:= 0;
+     tvBottom: aligVer:= 1;
+     tvCenter: aligVer:= 0.5
+  end;
+
+  if FInitialized then
+  begin
+     jCanvas_drawTextAligned(FjEnv, FjObject, _text, _left, _top, _right, _bottom, alignHor, aligVer );
+  end;
 end;
 
 //------------------------------------------------------------------------------

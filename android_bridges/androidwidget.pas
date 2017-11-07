@@ -458,6 +458,9 @@ type
 
   TTextAlignment = (taLeft, taRight, taCenter); //others...
 
+ TTextAlignHorizontal = (thLeft, thRight, thCenter);  //jCanvas
+ TTextAlignVertical = (tvTop, tvBottom, tvCenter);
+
   TGravity = (gvBottom, gvCenter, gvCenterHorizontal, gvCenterVertical, gvLeft, gvNoGravity,
               gvRight, gvStart, gvTop, gvEnd, gvFillHorizontal, gvFillVertical);
 

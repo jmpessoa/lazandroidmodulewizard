@@ -827,6 +827,7 @@ procedure jCanvas_drawBitmap           (env: PJNIEnv;
                                         _jcanvas: JObject; _bitmap: jObject; _width: integer; _height: integer); overload;
 
 procedure jCanvas_setCanvas(env: PJNIEnv; _jcanvas: JObject; _canvas: jObject);
+procedure jCanvas_drawTextAligned(env: PJNIEnv; Canv: jObject; const _text: string; _left, _top, _right, _bottom, _alignhorizontal , _alignvertical: single);
 
 // Bitmap
 Function  jBitmap_Create               (env:PJNIEnv;
@@ -7107,6 +7108,26 @@ begin
   env^.DeleteLocalRef(env, jCls);
 end;
 
+procedure jCanvas_drawTextAligned(env: PJNIEnv; Canv: jObject; const _text: string;
+  _left, _top, _right, _bottom, _alignhorizontal , _alignvertical: single);
+var
+  _jMethod : jMethodID = nil;
+  _jParams : Array[0..6] of jValue;
+  cls: jClass;
+ begin
+  _jParams[0].l := env^.NewStringUTF(env, pchar(_text) );
+  _jParams[1].f := _left;
+  _jParams[2].f := _top;
+  _jParams[3].f := _right;
+  _jParams[4].f := _bottom;
+  _jParams[5].f := _alignhorizontal;
+  _jParams[6].f := _alignvertical;
+  cls := env^.GetObjectClass(env, Canv);
+  _jMethod:= env^.GetMethodID(env, cls, 'drawTextAligned', '(Ljava/lang/String;FFFFFF)V');
+  env^.CallVoidMethodA(env,Canv,_jMethod,@_jParams);
+  env^.DeleteLocalRef(env,_jParams[0].l);
+  env^.DeleteLocalRef(env, cls);
+end;
 //------------------------------------------------------------------------------
 // Bitmap
 //------------------------------------------------------------------------------

@@ -1,4 +1,4 @@
-package com.example.appgooglemapsdemo1;
+package org.lamw.apptextfilemanagerdemo1;
 
 import javax.microedition.khronos.opengles.GL10;
 
@@ -138,6 +138,15 @@ public class jCanvas {
 	public  void Free() {
 		paint = null;
 	}
+	
+	//by CC
+	public  void drawTextAligned(String text, float _left, float _top, float _right, float _bottom, float _alignhorizontal , float _alignvertical ) {
+        Rect bounds = new Rect();
+        paint.getTextBounds(text, 0, text.length(), bounds);
+        float x = _left + (_right - _left  - bounds.width()) * _alignhorizontal;
+        float y = _top + (_bottom - _top  - bounds.height()) * _alignvertical + bounds.height();
+        canvas.drawText(text,x,y,paint);                 
+    }
 
 }
 

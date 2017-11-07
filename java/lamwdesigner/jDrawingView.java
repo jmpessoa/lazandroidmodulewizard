@@ -1,4 +1,4 @@
-package com.example.appdrawingviewdemo1;
+package org.lamw.apptextfilemanagerdemo1;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -71,6 +71,7 @@ public class jDrawingView extends View /*dummy*/ { //please, fix what GUI object
 		
 		mPaint   = new Paint();
 		//this.setWillNotDraw(false); //fire OnDraw
+		mPaint.setFlags(Paint.ANTI_ALIAS_FLAG);
 		
 		mCountPoint = 0;		 
 		mActivePointers = new SparseArray<PointF>();
@@ -616,6 +617,16 @@ public class jDrawingView extends View /*dummy*/ { //please, fix what GUI object
 	public Canvas GetCanvas() {
 		return mCanvas;
 	}
+	
+	//by CC
+	public void DrawTextAligned(String _text, float _left, float _top, float _right, float _bottom, float _alignHorizontal , float _alignVertical ) {
+        Rect bounds = new Rect();
+        mPaint.getTextBounds(_text, 0, _text.length(), bounds);
+        float x = _left + (_right - _left  - bounds.width()) * _alignHorizontal;
+        float y = _top + (_bottom - _top  - bounds.height()) * _alignVertical + bounds.height();
+        mCanvas.drawText(_text,x,y,mPaint);                 
+    }
+
 
 } //end class
 

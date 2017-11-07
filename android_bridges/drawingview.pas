@@ -92,6 +92,8 @@ jDrawingView = class(jVisualControl)    //jDrawingView   jGraphicsView
     procedure SetMinZoomFactor(_minZoomFactor: single);
     procedure SetMaxZoomFactor(_maxZoomFactor: single);
 
+    procedure DrawTextAligned(_text: string; _left: single; _top: single; _right: single; _bottom: single; _alignHorizontal: TTextAlignHorizontal; _alignVertical: TTextAlignVertical);
+
     Procedure GenEvent_OnDrawingViewTouch(Obj: TObject; Act, Cnt: integer; X,Y: array of Single;
                                  fligGesture: integer; pinchZoomGestureState: integer; zoomScaleFactor: single);
 
@@ -163,6 +165,7 @@ procedure jDrawingView_SetMinZoomFactor(env: PJNIEnv; _jdrawingview: JObject; _m
 procedure jDrawingView_SetMaxZoomFactor(env: PJNIEnv; _jdrawingview: JObject; _maxZoomFactor: single);
 
 function jDrawingView_GetCanvas(env: PJNIEnv; _jdrawingview: JObject): jObject;
+procedure jDrawingView_DrawTextAligned(env: PJNIEnv; _jdrawingview: JObject; _text: string; _left: single; _top: single; _right: single; _bottom: single; _alignHorizontal: single; _alignVertical: single);
 
 
 implementation
@@ -759,6 +762,26 @@ begin
    Result:= jDrawingView_GetCanvas(FjEnv, FjObject);
 end;
 
+procedure jDrawingView.DrawTextAligned(_text: string; _left: single; _top: single; _right: single; _bottom: single; _alignHorizontal: TTextAlignHorizontal; _alignVertical: TTextAlignVertical);
+var
+  alignHor, aligVer: single;
+begin
+  case _alignHorizontal of
+    thLeft: alignHor:= 0;
+    thRight: alignHor:= 1;
+    thCenter:  alignHor:= 0.5;
+  end;
+  case _alignVertical of
+     tvTop: aligVer:= 0;
+     tvBottom: aligVer:= 1;
+     tvCenter: aligVer:= 0.5
+  end;
+  if FInitialized then
+  begin
+    jDrawingView_DrawTextAligned(FjEnv, FjObject, _text, _left, _top, _right, _bottom, alignHor, aligVer);
+  end;
+end;
+
 {-------- jDrawingView_JNI_Bridge ----------}
 
 function jDrawingView_jCreate(env: PJNIEnv;_Self: int64; this: jObject): jObject;
@@ -1300,5 +1323,24 @@ begin
   env^.DeleteLocalRef(env, jCls);
 end;
 
+procedure jDrawingView_DrawTextAligned(env: PJNIEnv; _jdrawingview: JObject; _text: string; _left: single; _top: single; _right: single; _bottom: single; _alignHorizontal: single; _alignVertical: single);
+var
+  jParams: array[0..6] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_text));
+  jParams[1].f:= _left;
+  jParams[2].f:= _top;
+  jParams[3].f:= _right;
+  jParams[4].f:= _bottom;
+  jParams[5].f:= _alignHorizontal;
+  jParams[6].f:= _alignVertical;
+  jCls:= env^.GetObjectClass(env, _jdrawingview);
+  jMethod:= env^.GetMethodID(env, jCls, 'DrawTextAligned', '(Ljava/lang/String;FFFFFF)V');
+  env^.CallVoidMethodA(env, _jdrawingview, jMethod, @jParams);
+  env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
 
 end.
