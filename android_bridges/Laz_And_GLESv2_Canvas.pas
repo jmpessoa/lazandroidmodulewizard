@@ -1,4 +1,4 @@
-﻿//
+//
 // OpenGL ES v2.0 Canvas for Pascal
 //
 //   Compiler
@@ -8,7 +8,7 @@
 //
 //   Developer
 //   ---------------------------------------------------------------------------
-//                   Simon,Choi / Choi,Won-sik , 최원식옹
+//                   Simon,Choi / Choi,Won-sik , ????
 //                           simonsayz@naver.com
 //                           http://blog.naver.com/simonsayz
 //
@@ -38,7 +38,7 @@
 //   ---------------------------------------------------------------------------
 //    Quick Ref    : http://www.khronos.org/opengles/sdk/docs/reference_cards/OpenGL-ES-2_0-Reference-card.pdf
 //    Basic        : https://wiki.engr.illinois.edu/download/attachments/98402319/2.pdf?version=2&modificationDate=1296076618000
-//                   http://www.gisdeveloper.co.kr/category/프로그래밍/OpenGL
+//                   http://www.gisdeveloper.co.kr/category/?????/OpenGL
 //    Alpha        : http://stackoverflow.com/questions/1572175/how-to-programmatically-alpha-fade-a-textured-object-in-opengl-es-1-1-iphone
 //    Matrix       : http://www.songho.ca/opengl/gl_matrix.html
 //                   http://developer.android.com/reference/android/opengl/Matrix.html
@@ -287,6 +287,7 @@ Type
    Textures : TxgTextures; // Texture
    MVP      : TM4x4;       // MVP Matrix
    TexturesCount: integer; //by jmpessoa
+   //IsFirstInit: boolean;
 
    Constructor Create(AOwner: TComponent); override;
    Destructor  Destroy; override;
@@ -342,6 +343,7 @@ Type
    // Property
    Property Shader      : TxgShader     read FShader      write SetShader;
    Property Alpha       : Single        read FAlpha       write SetAlpha;
+
  published
     property AutoRefresh : boolean       read FAutoRefresh write SetAutoRefresh;
     property Visible     : Boolean       read GetVisible     write SetVisible;
@@ -1018,12 +1020,12 @@ Function _glTexture_Load_wPas(ImgName   : String; Var Img : GLuint;
 // https://github.com/zagayevskiy/Pacman/blob/master/jni/managers/Art.cpp
 // http://blog.livedoor.jp/itahidamito/archives/51661332.html
 //
-Function _glTexture_Load_wJava(env:PJNIEnv;this:jobject;
-                               ImgName  : String; Var Img : GLuint;
+Function _glTexture_Load_wJava(env:PJNIEnv;
+                               this:jobject;
+                               ImgName  : String;
+                               Var Img : GLuint;
                                AlphaMask: Boolean = True;
                                TileMode : Boolean = False) : Boolean;
-
-
 Const
  _cFuncName = 'getBmpArray';
  _cFuncSig  = '(Ljava/lang/String;)[I';
@@ -1097,6 +1099,7 @@ Var
   glBindTexture  (GL_Texture_2D,Img);
   glTexparameteri(GL_Texture_2D,GL_Texture_Min_Filter, GL_Linear);
   glTexparameteri(GL_Texture_2D,GL_Texture_Mag_Filter, GL_Linear);
+
   Case TileMode of
    True : begin
            glTexparameteri(GL_Texture_2D,GL_Texture_Wrap_S, GL_Repeat);
@@ -1107,6 +1110,7 @@ Var
            glTexparameteri(GL_Texture_2D,GL_Texture_Wrap_T, GL_Clamp_To_Edge);
           end;
   End;
+
   glTexImage2D   (GL_Texture_2D,
                   0,
                   PixelFormat,
@@ -1232,6 +1236,7 @@ begin
   FWidth        := 96;
   FLParamWidth  := lpMatchParent;  //lpWrapContent
   FLParamHeight := lpWrapContent; //lpMatchParent
+  //IsFirstInit:= False;
 
 end;
 
@@ -1312,6 +1317,8 @@ begin
 
   jGLSurfaceView_SetAutoRefresh(FjEnv, FjObject , FAutoRefresh);
   View_SetVisible(FjEnv, FjThis, FjObject , FVisible);
+
+ // IsFirstInit:= True;
 end;
 
 Procedure jCanvasES2.SetVisible  (Value : Boolean);
@@ -1498,7 +1505,7 @@ begin
   Result := False;
   if not FInitialized then Exit;
   //
-  If FProg.Active then Exit;
+ // If FProg.Active then Exit;
   // Loade Shader & Compile ---------------------------------------------------
   FProg.Vertex.ID       := Shader_Build(xsVert,Vertex  );
   FProg.Vertex.Active   := True;
@@ -1531,7 +1538,7 @@ Function jCanvasES2.Shader_Link : Boolean;
 begin
   Result := False;
   if not FInitialized then Exit;
-  If Not(FProg.Active) then Exit;
+  If not FProg.Active then Exit;
   // Handle
   FShaderVars.hMVP        := glGetUniformLocation(FProg.ID, 'umMVPMatrix');
   FShaderVars.hVertex     := glGetAttribLocation (FProg.ID, 'avPosition' );
@@ -1716,14 +1723,15 @@ begin
 end;
 
 //
-Procedure jCanvasES2.DrawRect    (const Pt4 : Txy4CW; Z : Single; Color : TRGBA; Width : Single = 0.3);
+Procedure jCanvasES2.DrawRect(const Pt4 : Txy4CW; Z : Single; Color : TRGBA; Width : Single = 0.3);
 var
   i : Integer;
 begin
   if not FInitialized then Exit;
   For i := 0 to 2 do
    DrawLine( _XY_Z(Pt4[i],Z) , _XY_Z(Pt4[i+1],Z) , Color, Width);
-  DrawLine( _XY_Z(Pt4[3],Z) , _XY_Z(Pt4[0],Z) , Color, Width);
+
+   DrawLine( _XY_Z(Pt4[3],Z) , _XY_Z(Pt4[0],Z) , Color, Width);
 end;
 
 //
@@ -1753,6 +1761,7 @@ begin
   // OutLine
   For i := 0 to 2 do
    DrawLine( _XY_Z(Pt4[i],Z) , _XY_Z(Pt4[i+1],Z) , LColor, LWidth);
+
   DrawLine( _XY_Z(Pt4[3],Z) , _XY_Z(Pt4[0],Z) , LColor, LWidth);
 end;
 
@@ -1917,7 +1926,12 @@ begin
 
   Case TileMode of
 
-   True : Texture.Active := _glTexture_Load_wJava(FjEnv, gApp.jni.jThis, gApp.Path.Dat+'/'+filename,Texture.ID,_cAlpha_MaskOff,_cTile_On );
+   True : Texture.Active := _glTexture_Load_wJava(FjEnv, gApp.jni.jThis,
+                                            gApp.Path.Dat+'/'+filename,
+                                            Texture.ID,
+                                            _cAlpha_MaskOff,
+                                            _cTile_On );
+
    False: Texture.Active := _glTexture_Load_wJava(FjEnv, gApp.jni.jThis, gApp.Path.Dat+'/'+filename,Texture.ID,_cAlpha_MaskOn ,_cTile_Off);
 
   End;
@@ -1938,7 +1952,7 @@ var
   i: integer;
 begin
   if not FInitialized then Exit;
-  if TexturesCount > 0 then Texture_Clear;
+  if TexturesCount >  0 then Texture_Clear;
   if FImageList <> nil then FImageList.Init(gApp);  //***
   for i:= 0 to FImageList.Images.Count - 1 do
   begin
@@ -1982,13 +1996,13 @@ var
   i : Integer;
 begin
   if not FInitialized then Exit;
-  for i := 0 to cTextureMax-1 do
+  for i := 0 to TexturesCount-1 do
   begin
-    if Textures[i].Active then
-    begin
-      glDeleteTextures(1,@Textures[i].ID);
+    //if Textures[i].Active then
+    //begin
       Textures[i].Active := False;
-    end;
+      glDeleteTextures(1,@Textures[i].ID);
+    //end;
   end;
   TexturesCount:= 0;
 end;

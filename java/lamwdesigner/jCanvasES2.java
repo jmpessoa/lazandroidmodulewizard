@@ -60,44 +60,44 @@ public class jCanvasES2 extends GLSurfaceView {
 	int marginBottom = 5;
 	private int lgravity = Gravity.TOP | Gravity.START;
 	private float lweight = 0;
-
+	
 	//
-	class jRenderer implements GLSurfaceView.Renderer {
+	//http://altdevblog.com/2013/08/18/the-main-loop-in-devils-attorney-on-android/
+	class jRenderer implements GLSurfaceView.Renderer {		
 		//public  void onSurfaceCreated(GL10 arg0, javax.microedition.khronos.egl.EGLConfig arg1) {controls.pOnGLRenderer(PasObj,Const.Renderer_onSurfaceCreated,0,0); }
-		public  void onSurfaceCreated(GL10 gl, EGLConfig config) { controls.pOnGLRenderer2(PasObj,ConstES2.Renderer_onSurfaceCreated,0,0); }
-		public  void onSurfaceChanged(GL10 gl, int w, int h) { controls.pOnGLRenderer2(PasObj,ConstES2.Renderer_onSurfaceChanged,w,h); }
-		public  void onDrawFrame     (GL10 gl) {controls.pOnGLRenderer2(PasObj,ConstES2.Renderer_onDrawFrame,0,0); }
-
-		// TODO Auto-generated method stu
+		public  void onSurfaceCreated(GL10 gl, EGLConfig config) {
+			//Log.i("Java","onSurfaceCreated");
+			controls.pOnGLRenderer2(PasObj,ConstES2.Renderer_onSurfaceCreated,0,0); 
+		}		
+		public  void onSurfaceChanged(GL10 gl, int w, int h) {
+			//Log.i("Java","onSurfaceCreated");
+			controls.pOnGLRenderer2(PasObj,ConstES2.Renderer_onSurfaceChanged,w,h); 
+		}
+		
+		public  void onDrawFrame     (GL10 gl) {
+			//Log.i("Java","onDrawFrame");
+			controls.pOnGLRenderer2(PasObj,ConstES2.Renderer_onDrawFrame,0,0); 
+		}		
 	}
 
 	//Constructor
-	public  jCanvasES2(android.content.Context context,
+	public jCanvasES2(android.content.Context context,
 					   Controls ctrls,long pasobj, int version ) {
 		super(context);
-
-		// Connect Pascal I/F
+		
 		PasObj   = pasobj;
 		controls = ctrls;
-
-		// Init Class
+		
 		lparams = new ViewGroup.MarginLayoutParams(lparamW, lparamH);     // W,H
 		lparams.setMargins(marginLeft,marginTop,marginRight,marginBottom); // L,T,R,B
-
-		// OpenGL ES Version
+		
 		if (version != 1) {setEGLContextClientVersion(2); };
-
 		renderer = new jRenderer();
-
 		setEGLConfigChooser(8,8,8,8,16,8);       // RGBA,Depath,Stencil
-
-		setRenderer  ( renderer );
-
-		setRenderMode( GLSurfaceView.RENDERMODE_WHEN_DIRTY );
-
+		setRenderer(renderer);
+		setRenderMode( GLSurfaceView.RENDERMODE_WHEN_DIRTY);
 	}
-
-
+	
 	public void setLeftTopRightBottomWidthHeight(int left, int top, int right, int bottom, int w, int h) {
 		marginLeft = left;
 		marginTop = top;
@@ -223,7 +223,7 @@ public class jCanvasES2 extends GLSurfaceView {
 	}
 
 	//
-	public  void deleteTexture( int id ) {
+	public void deleteTexture( int id ) {
 		final int idx = id;
 		queueEvent(new Runnable() {
 			@Override
@@ -330,7 +330,7 @@ public class jCanvasES2 extends GLSurfaceView {
 	//by jmpessoa
 	public  void SetAutoRefresh(boolean active ) {
 		if (active) {setRenderMode( GLSurfaceView.RENDERMODE_CONTINUOUSLY ); }
-		else  {setRenderMode( GLSurfaceView.RENDERMODE_WHEN_DIRTY   ); }
+		else  {setRenderMode( GLSurfaceView.RENDERMODE_WHEN_DIRTY   ); } 
 	}
 
 }

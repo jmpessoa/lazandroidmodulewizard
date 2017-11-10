@@ -1677,7 +1677,7 @@ type
 
   jGLViewEvent = class(jVisualControl)
   private
-    FInitialized : boolean;
+   // FInitialized : boolean;
     //
     FOnGLCreate  : TOnNotify;
     FOnGLChange  : TOnGLChange;
@@ -1698,7 +1698,7 @@ type
     //
     Procedure GenEvent_OnTouch (Obj: TObject; Act,Cnt: integer; X1,Y1,X2,Y2: single);
     Procedure GenEvent_OnRender(Obj: TObject; EventType, w, h: integer);
-    property Initialized : boolean read FInitialized;
+    //property Initialized : boolean read FInitialized;
   published
     // Event - Drawing
     property OnGLCreate  : TOnNotify     read FOnGLCreate  write FOnGLCreate;

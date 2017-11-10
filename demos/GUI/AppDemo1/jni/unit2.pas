@@ -6,9 +6,9 @@ unit unit2;
 interface
   
 uses
-  Classes, SysUtils, And_jni, And_jni_Bridge, Laz_And_Controls, Laz_And_Controls_Events, AndroidWidget,
-  unit3, unit4, unit5, unit6, unit7, unit8, unit9, unit10,
-  unit11, unit12, unit13, unit14;
+  Classes, SysUtils, And_jni, And_jni_Bridge, Laz_And_Controls,
+  Laz_And_Controls_Events, AndroidWidget, unit3, unit4, unit5,
+  unit6, unit7, unit8, unit9, unit10, unit11, unit12, unit13, unit14;
   
 type
 
@@ -169,7 +169,11 @@ begin
     //AndroidModule10:= TAndroidModule10.Create(Self);
     AndroidModule10.Init(gApp);
   end
-  else AndroidModule10.Show;
+  else
+  begin
+  //AndroidModule10.Show;
+    AndroidModule10.ReInit(gApp);  //ReInit is a "must have" for "jCanvasES1" component
+  end
 end;
 
 procedure TAndroidModule2.jButton9Click(Sender: TObject); //gl_2 2D
@@ -180,7 +184,11 @@ begin
    gApp.CreateForm(TAndroidModule11, AndroidModule11);
     //AndroidModule11:= TAndroidModule11.Create(Self);
    AndroidModule11.Init(gApp);
- end else AndroidModule11.Show;
+ end
+ else
+ begin
+    AndroidModule11.ReInit(gApp);  //ReInit is a "must have" for "jCanvasES2" component
+ end;
 end;
 
 procedure TAndroidModule2.jButton10Click(Sender: TObject);  //gl_1 3D
@@ -190,7 +198,12 @@ begin
     gApp.CreateForm(TAndroidModule12, AndroidModule12);
     //AndroidModule12:= TAndroidModule12.Create(Self);
     AndroidModule12.Init(gApp);
-  end else AndroidModule12.show;
+  end
+  else
+  begin
+    //AndroidModule12.show;
+      AndroidModule12.ReInit(gApp);  //ReInit is a "must have" for "jCanvasES1" component
+  end;
 end;
 
 procedure TAndroidModule2.jButton11Click(Sender: TObject); //gl_2 3D
@@ -200,7 +213,12 @@ begin
     gApp.CreateForm(TAndroidModule13, AndroidModule13);
     //AndroidModule13:= TAndroidModule13.Create(Self);
     AndroidModule13.Init(gApp);
-  end else AndroidModule13.Show;
+  end
+  else
+  begin
+    //AndroidModule13.Show;
+      AndroidModule13.ReInit(gApp);  //ReInit is a "must have" for "jCanvasES2" component
+  end;
 end;
 
 procedure TAndroidModule2.jButton12Click(Sender: TObject);

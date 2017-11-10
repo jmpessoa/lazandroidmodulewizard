@@ -7,6 +7,7 @@ object AndroidModule2: TAndroidModule2
   MarginTop = 0
   MarginRight = 0
   MarginBottom = 0
+  Enabled = True
   OnCreate = AndroidModule2Create
   Text = 'AndroidModule2'
   ActivityMode = actMain
@@ -24,6 +25,7 @@ object AndroidModule2: TAndroidModule2
     MarginTop = 10
     MarginRight = 10
     MarginBottom = 10
+    Enabled = True
     Visible = True
     Id = 41266
     PosRelativeToAnchor = []
@@ -32,7 +34,6 @@ object AndroidModule2: TAndroidModule2
     LayoutParamHeight = lpWrapContent
     Text = 'Lazarus Android Module Wizard [by jmpessoa]'
     Alignment = taLeft
-    Enabled = True
     BackgroundColor = colbrDefault
     FontColor = colbrBlue
     FontSize = 0
@@ -43,11 +44,12 @@ object AndroidModule2: TAndroidModule2
     Left = 5
     Top = 75
     Width = 136
-    Height = 40
+    Height = 50
     MarginLeft = 5
     MarginTop = 5
     MarginRight = 5
     MarginBottom = 5
+    Enabled = True
     Visible = True
     Anchor = jTextView2
     Id = 35128
@@ -66,11 +68,12 @@ object AndroidModule2: TAndroidModule2
     Left = 151
     Top = 75
     Width = 136
-    Height = 40
+    Height = 50
     MarginLeft = 5
     MarginTop = 5
     MarginRight = 5
     MarginBottom = 5
+    Enabled = True
     Visible = True
     Anchor = jButton1
     Id = 0
@@ -94,6 +97,7 @@ object AndroidModule2: TAndroidModule2
     MarginTop = 0
     MarginRight = 10
     MarginBottom = 10
+    Enabled = True
     Visible = True
     Anchor = jTextView1
     Id = 93524
@@ -103,7 +107,6 @@ object AndroidModule2: TAndroidModule2
     LayoutParamHeight = lpWrapContent
     Text = 'Welcome to  Simon''s Controls!'
     Alignment = taLeft
-    Enabled = True
     BackgroundColor = colbrDefault
     FontColor = colbrBlue
     FontSize = 0
@@ -112,13 +115,14 @@ object AndroidModule2: TAndroidModule2
   end
   object jButton3: jButton
     Left = 5
-    Top = 125
+    Top = 135
     Width = 136
-    Height = 40
+    Height = 50
     MarginLeft = 5
     MarginTop = 5
     MarginRight = 5
     MarginBottom = 5
+    Enabled = True
     Visible = True
     Anchor = jButton1
     Id = 2770
@@ -135,13 +139,14 @@ object AndroidModule2: TAndroidModule2
   end
   object jButton4: jButton
     Left = 151
-    Top = 125
+    Top = 135
     Width = 136
-    Height = 40
+    Height = 50
     MarginLeft = 5
     MarginTop = 5
     MarginRight = 5
     MarginBottom = 5
+    Enabled = True
     Visible = True
     Anchor = jButton3
     Id = 93525
@@ -158,13 +163,14 @@ object AndroidModule2: TAndroidModule2
   end
   object jButton5: jButton
     Left = 5
-    Top = 175
+    Top = 195
     Width = 136
-    Height = 40
+    Height = 50
     MarginLeft = 5
     MarginTop = 5
     MarginRight = 5
     MarginBottom = 5
+    Enabled = True
     Visible = True
     Anchor = jButton3
     Id = 51074
@@ -181,13 +187,14 @@ object AndroidModule2: TAndroidModule2
   end
   object jButton6: jButton
     Left = 151
-    Top = 175
+    Top = 195
     Width = 136
-    Height = 40
+    Height = 50
     MarginLeft = 5
     MarginTop = 5
     MarginRight = 5
     MarginBottom = 5
+    Enabled = True
     Visible = True
     Anchor = jButton5
     Id = 93526
@@ -204,13 +211,14 @@ object AndroidModule2: TAndroidModule2
   end
   object jButton7: jButton
     Left = 5
-    Top = 225
+    Top = 255
     Width = 136
-    Height = 40
+    Height = 50
     MarginLeft = 5
     MarginTop = 5
     MarginRight = 5
     MarginBottom = 5
+    Enabled = True
     Visible = True
     Anchor = jButton5
     Id = 71909
@@ -227,13 +235,14 @@ object AndroidModule2: TAndroidModule2
   end
   object jButton8: jButton
     Left = 151
-    Top = 225
+    Top = 255
     Width = 136
-    Height = 40
+    Height = 50
     MarginLeft = 5
     MarginTop = 5
     MarginRight = 5
     MarginBottom = 5
+    Enabled = True
     Visible = True
     Anchor = jButton7
     Id = 93527
@@ -250,13 +259,14 @@ object AndroidModule2: TAndroidModule2
   end
   object jButton9: jButton
     Left = 5
-    Top = 275
+    Top = 315
     Width = 136
-    Height = 40
+    Height = 50
     MarginLeft = 5
     MarginTop = 5
     MarginRight = 5
     MarginBottom = 5
+    Enabled = True
     Visible = True
     Anchor = jButton7
     Id = 34150
@@ -273,13 +283,14 @@ object AndroidModule2: TAndroidModule2
   end
   object jButton10: jButton
     Left = 151
-    Top = 275
+    Top = 315
     Width = 136
-    Height = 40
+    Height = 50
     MarginLeft = 5
     MarginTop = 5
     MarginRight = 5
     MarginBottom = 5
+    Enabled = True
     Visible = True
     Anchor = jButton9
     Id = 93528
@@ -296,13 +307,14 @@ object AndroidModule2: TAndroidModule2
   end
   object jButton11: jButton
     Left = 5
-    Top = 325
+    Top = 375
     Width = 136
-    Height = 40
+    Height = 50
     MarginLeft = 5
     MarginTop = 5
     MarginRight = 5
     MarginBottom = 5
+    Enabled = True
     Visible = True
     Anchor = jButton9
     Id = 59567
@@ -319,13 +331,14 @@ object AndroidModule2: TAndroidModule2
   end
   object jButton12: jButton
     Left = 151
-    Top = 325
+    Top = 375
     Width = 136
-    Height = 40
+    Height = 50
     MarginLeft = 5
     MarginTop = 5
     MarginRight = 5
     MarginBottom = 5
+    Enabled = True
     Visible = True
     Anchor = jButton11
     Id = 93529
@@ -341,14 +354,15 @@ object AndroidModule2: TAndroidModule2
     OnClick = jButton12Click
   end
   object jImageView1: jImageView
-    Left = 9
+    Left = 5
     Top = 462
-    Width = 281
+    Width = 290
     Height = 133
     MarginLeft = 5
     MarginTop = 5
     MarginRight = 5
     MarginBottom = 5
+    Enabled = True
     Visible = True
     Id = 93530
     PosRelativeToAnchor = []

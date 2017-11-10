@@ -976,14 +976,14 @@ var
   i: Integer;
 begin
   if not FInitialized then Exit;
-  for i := 0 to cTextureMax -1 do
+  for i := 0 to TexturesCount -1 do
   begin
-    if Textures[i].Active then
-    begin
+    //if Textures[i].Active then
+    //begin
      //dbg('DeleteTextures' + IntToStr(i) + ' ' + IntToStr( Textures[i].ID ) );
       glDeleteTextures(1,@Textures[i].ID);
       Textures[i].Active := False;
-    end;
+    //end;
   end;
   TexturesCount:= 0;
 end;

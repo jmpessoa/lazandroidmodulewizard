@@ -1,18 +1,21 @@
 object AndroidModule11: TAndroidModule11
-  Left = 335
-  Top = 58
+  Left = 303
+  Top = 53
   Width = 300
   Height = 600
   MarginLeft = 0
   MarginTop = 0
   MarginRight = 0
   MarginBottom = 0
+  Enabled = True
+  OnCreate = AndroidModule11Create
   Text = 'AndroidModule11'
   ActivityMode = actRecyclable
   BackgroundColor = colbrBlack
   ActionBarTitle = abtDefault
   OnCloseQuery = DataModuleCloseQuery
   OnJNIPrompt = DataModuleJNIPrompt
+  OnBackButton = AndroidModule11BackButton
   object jTextView1: jTextView
     Left = 96
     Top = 10
@@ -22,6 +25,7 @@ object AndroidModule11: TAndroidModule11
     MarginTop = 10
     MarginRight = 10
     MarginBottom = 10
+    Enabled = True
     Visible = True
     Id = 44776
     PosRelativeToAnchor = []
@@ -30,7 +34,6 @@ object AndroidModule11: TAndroidModule11
     LayoutParamHeight = lpWrapContent
     Text = 'OpenGLES2 Demo'
     Alignment = taLeft
-    Enabled = True
     BackgroundColor = colbrDefault
     FontColor = colbrSilver
     FontSize = 0
@@ -41,11 +44,12 @@ object AndroidModule11: TAndroidModule11
     Left = 5
     Top = 45
     Width = 136
-    Height = 40
+    Height = 50
     MarginLeft = 5
     MarginTop = 5
     MarginRight = 5
     MarginBottom = 5
+    Enabled = True
     Visible = True
     Anchor = jTextView1
     Id = 62954
@@ -64,11 +68,12 @@ object AndroidModule11: TAndroidModule11
     Left = 151
     Top = 45
     Width = 136
-    Height = 40
+    Height = 50
     MarginLeft = 5
     MarginTop = 5
     MarginRight = 5
     MarginBottom = 5
+    Enabled = True
     Visible = True
     Anchor = jButton1
     Id = 0
@@ -86,13 +91,14 @@ object AndroidModule11: TAndroidModule11
   object jCanvasES2_1: jCanvasES2
     Tag = 1
     Left = 10
-    Top = 100
-    Width = 270
+    Top = 110
+    Width = 280
     Height = 286
     MarginLeft = 10
     MarginTop = 10
     MarginRight = 10
     MarginBottom = 10
+    Enabled = True
     Visible = True
     Anchor = jButton1
     Id = 14067
@@ -103,6 +109,8 @@ object AndroidModule11: TAndroidModule11
     OnGLCreate = jCanvasES2_1GLCreate
     OnGLChange = jCanvasES2_1GLChange
     OnGLDraw = jCanvasES2_1GLDraw
+    OnGLDestroy = jCanvasES2_1GLDestroy
+    OnGLThread = jCanvasES2_1GLThread
     OnGLDown = jCanvasES2_1GLDown
     OnGLMove = jCanvasES2_1GLMove
     OnGLUp = jCanvasES2_1GLUp
@@ -111,13 +119,14 @@ object AndroidModule11: TAndroidModule11
   end
   object jButton3: jButton
     Left = 5
-    Top = 401
-    Width = 285
-    Height = 40
+    Top = 411
+    Width = 290
+    Height = 50
     MarginLeft = 5
     MarginTop = 5
     MarginRight = 5
     MarginBottom = 5
+    Enabled = True
     Visible = True
     Anchor = jCanvasES2_1
     Id = 72520
@@ -134,13 +143,14 @@ object AndroidModule11: TAndroidModule11
   end
   object jTextView2: jTextView
     Left = 10
-    Top = 456
+    Top = 476
     Width = 52
     Height = 20
     MarginLeft = 10
     MarginTop = 10
     MarginRight = 10
     MarginBottom = 10
+    Enabled = True
     Visible = True
     Anchor = jButton3
     Id = 98715
@@ -150,7 +160,6 @@ object AndroidModule11: TAndroidModule11
     LayoutParamHeight = lpWrapContent
     Text = 'Auto: Off'
     Alignment = taLeft
-    Enabled = True
     BackgroundColor = colbrDefault
     FontColor = colbrSilver
     FontSize = 0
@@ -159,13 +168,14 @@ object AndroidModule11: TAndroidModule11
   end
   object jTextView3: jTextView
     Left = 46
-    Top = 496
+    Top = 516
     Width = 207
     Height = 20
     MarginLeft = 10
     MarginTop = 10
     MarginRight = 10
     MarginBottom = 10
+    Enabled = True
     Visible = True
     Anchor = jTextView2
     Id = 98716
@@ -175,7 +185,6 @@ object AndroidModule11: TAndroidModule11
     LayoutParamHeight = lpWrapContent
     Text = 'Hint: touch  to move... or Start/Stop'
     Alignment = taLeft
-    Enabled = True
     BackgroundColor = colbrDefault
     FontColor = colbrSilver
     FontSize = 0

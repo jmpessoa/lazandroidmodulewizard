@@ -23,6 +23,8 @@ type
       jTextView2: jTextView;
       jTextView3: jTextView;
       jTimer1: jTimer;
+      procedure AndroidModule11BackButton(Sender: TObject);
+      procedure AndroidModule11Create(Sender: TObject);
       procedure DataModuleCloseQuery(Sender: TObject; var CanClose: boolean);
       procedure DataModuleJNIPrompt(Sender: TObject);
       procedure jButton1Click(Sender: TObject);
@@ -30,9 +32,11 @@ type
       procedure jButton3Click(Sender: TObject);
       procedure jCanvasES2_1GLChange(Sender: TObject; W, H: integer);
       procedure jCanvasES2_1GLCreate(Sender: TObject);
+      procedure jCanvasES2_1GLDestroy(Sender: TObject);
       procedure jCanvasES2_1GLDown(Sender: TObject; Touch: TMouch);
       procedure jCanvasES2_1GLDraw(Sender: TObject);
       procedure jCanvasES2_1GLMove(Sender: TObject; Touch: TMouch);
+      procedure jCanvasES2_1GLThread(Sender: TObject);
       procedure jCanvasES2_1GLUp(Sender: TObject; Touch: TMouch);
       procedure jTimer1Timer(Sender: TObject);
     private
@@ -47,6 +51,7 @@ type
       gArcBall  : TxgArcBall;
       gW        : integer;
       gH        : integer;
+    //  IsCreate : boolean;
       procedure DoDraw(Angle,Zoom : Single; scrW: integer; scrH: integer);
   end;
   
@@ -85,6 +90,7 @@ begin
   //dbg('d1');
   jCanvasES2_1.Screen_Setup (scrW, scrH, xp2D,cCull_Yes);
   jCanvasES2_1.Screen_Clear(1,1,1,1);
+  //jCanvasES2_1.Screen_Clear(0.5,0.5,0.5,0.5);
   //dbg('d2');
 
   ZDepth := 0;
@@ -98,11 +104,14 @@ begin
   jCanvasES2_1.Scale(Zoom,Zoom,Zoom);
   jCanvasES2_1.setMVP(jCanvasES2_1.MVP);
   MVPsav := jCanvasES2_1.MVP;
+
   jCanvasES2_1.DrawTexture(jCanvasES2_1.Textures[0],
                            _XY4cw( -1, 1,   1, 1,   1,-1,   -1,-1),
                            ZDepth,
                            cAlpha_1,
                            Shader_Texture);
+
+
   //dbg('d3');
   // Init Stencil Mode ------------------------------------------------------
   jCanvasES2_1.SetMask(0,mmOpen);
@@ -199,15 +208,16 @@ begin
                            cAlpha_1,
                            Shader_Texture);
   //jCanvasES2_1.Update;
+
 end;
 
 procedure TAndroidModule11.DataModuleJNIPrompt(Sender: TObject);
 begin
-  gAngle  := 0;
-  gSpeed  := 1.0;
-  gWork   := True;
-  gZoom   := 1.0;
-  ArcBall_Init(gArcBall);
+    gAngle  := 0;
+    gSpeed  := 1.0;
+    gWork   := True;
+    gZoom   := 1.0;
+    ArcBall_Init(gArcBall);
 end;
 
 procedure TAndroidModule11.jButton1Click(Sender: TObject);
@@ -241,11 +251,18 @@ begin
    gH:= H;
 end;
 
+//https://stackoverflow.com/questions/16046918/glsurfaceview-renderer-how-to-force-surface-re-creation
 procedure TAndroidModule11.jCanvasES2_1GLCreate(Sender: TObject);
 begin
   jCanvasES2_1.Texture_Load_All;
   jCanvasES2_1.Shader_Compile('simon_Vert','simon_Frag');
   jCanvasES2_1.Shader_Link;
+  jCanvasES2_1.Refresh; //dispatch Ondraw...
+end;
+
+procedure TAndroidModule11.jCanvasES2_1GLDestroy(Sender: TObject);
+begin
+  //
 end;
 
 procedure TAndroidModule11.jCanvasES2_1GLDown(Sender: TObject; Touch: TMouch);
@@ -255,7 +272,7 @@ end;
 
 procedure TAndroidModule11.jCanvasES2_1GLDraw(Sender: TObject);
 begin
-   DoDraw(gAngle*gSpeed, gZoom, gW, gH);
+  DoDraw(gAngle*gSpeed, gZoom, gW, gH);
 end;
 
 procedure TAndroidModule11.jCanvasES2_1GLMove(Sender: TObject; Touch: TMouch);
@@ -266,6 +283,11 @@ begin
   gAngle:= Touch.Angle;
   ArcBall_Move(gArcBall,gX,gY);
   jCanvasES2_1.Refresh;
+end;
+
+procedure TAndroidModule11.jCanvasES2_1GLThread(Sender: TObject);
+begin
+  //
 end;
 
 procedure TAndroidModule11.jCanvasES2_1GLUp(Sender: TObject; Touch: TMouch);
@@ -285,6 +307,16 @@ begin
   gWork:= false;
   jTimer1.Enabled := False;
   CanClose:= True;
+end;
+
+procedure TAndroidModule11.AndroidModule11Create(Sender: TObject);
+begin
+ // IsCreate:= False;
+end;
+
+procedure TAndroidModule11.AndroidModule11BackButton(Sender: TObject);
+begin
+ // IsCreate:= False;
 end;
 
 end.

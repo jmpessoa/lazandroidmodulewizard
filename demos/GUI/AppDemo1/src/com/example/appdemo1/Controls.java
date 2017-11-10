@@ -1,6 +1,6 @@
 package com.example.appdemo1;
 
-//LAMW: Lazarus Android Module Wizard  - version 0.7 - rev. 13.1 - 27 Feb - 2017 
+//LAMW: Lazarus Android Module Wizard  - version 0.7 - rev. 22 - 21 October - 2017 
 //RAD Android: Project Wizard, Form Designer and Components Development Model!
 
 //https://github.com/jmpessoa/lazandroidmodulewizard
@@ -54,6 +54,7 @@ import android.annotation.SuppressLint;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.app.AlarmManager;
+import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.PendingIntent;
 import android.content.Context;
@@ -68,6 +69,7 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
+import android.graphics.SurfaceTexture;
 import android.graphics.drawable.Drawable;
 import android.hardware.Sensor;
 import android.os.Bundle;
@@ -89,6 +91,7 @@ import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.util.Log;
 import android.view.ContextMenu;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.SurfaceHolder;
@@ -100,6 +103,7 @@ import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.RelativeLayout.LayoutParams;
+import android.widget.RemoteViews;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 import java.io.*;
@@ -270,6 +274,13 @@ for (int i = 0; i < layout.getChildCount(); i++) {
 public void ShowMessage(String msg){
   Log.i("ShowMessage", msg);
   Toast.makeText(controls.activity, msg, Toast.LENGTH_SHORT).show();	
+}
+
+public void ShowMessage(String _msg, int _gravity, int _timeLength) {
+	  Log.i("ShowMessage", _msg);
+	  Toast toast = Toast.makeText(controls.activity, _msg, _timeLength);
+	  toast.setGravity(Gravity.CENTER, 0, 0);
+	  toast.show();
 }
 
 public String GetDateTime() {
@@ -1204,6 +1215,20 @@ public void Restart(int _delay) {
   System.exit(2);
 }
 
+public String UriEncode(String _message) {
+	return Uri.encode(_message);
+}
+
+//http://www.viralandroid.com/2015/12/how-to-use-font-awesome-icon-in-android-application.html
+//http://fontawesome.io/cheatsheet/	
+public String ParseHtmlFontAwesome(String _htmlString) {
+	   String iconHeart = _htmlString; //"&#xf004;";
+	   String valHexStr = iconHeart.replace("&#x", "").replace(";", "");
+	   long valLong = Long.parseLong(valHexStr,16);
+	   //button.setText(getString((char)valLong+"");
+	   return (char)valLong+"" ;
+}
+
 }
 //**class entrypoint**//please, do not remove/change this line!
 
@@ -1216,9 +1241,9 @@ public int screenStyle=0;         // Screen Style [Dev:0 , Portrait: 1, Landscap
 public int systemVersion;
 
 //Jave -> Pascal Function ( Pascal Side = Event )
-public native void pAppOnCreate(Context context, RelativeLayout layout);
+public native void pAppOnCreate(Context context, RelativeLayout layout, Intent intent);
 public native int  pAppOnScreenStyle();
-public native void pAppOnNewIntent();
+public native void pAppOnNewIntent(Intent intent);
 public native void pAppOnDestroy();
 public native void pAppOnPause();
 public native void pAppOnRestart();
@@ -1240,6 +1265,7 @@ public native void pOnTouch(long pasobj, int act, int cnt, float x1, float y1, f
 public native void pOnClickGeneric(long pasobj, int value);
 public native boolean pAppOnSpecialKeyDown(char keyChar, int keyCode, String keyCodeString);
 public native void pOnClick(long pasobj, int value);
+public native void pOnLongClick(long pasobj, int value);
 public native void pOnChange(long pasobj, String txt, int count);
 public native void pOnChanged(long pasobj, String txt, int count);
 public native void pOnEnter(long pasobj);
@@ -1253,30 +1279,31 @@ public native void pOnBeforeDispatchDraw(long pasobj, Canvas canvas, int tag);
 public native void pOnAfterDispatchDraw(long pasobj, Canvas canvas, int tag);
 public native void pOnLayouting(long pasobj, boolean changed);
 
-// -------------------------------------------------------------------------
-//Load Pascal Library
-// -------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------
+//Load Pascal Library - Please, do not edit the static content commented in the template file
+// -------------------------------------------------------------------------------------------
 static {
 try{System.loadLibrary("controls");} catch (UnsatisfiedLinkError e) {Log.e("JNI_Loading_libcontrols", "exception", e);}
 }
 // -------------------------------------------------------------------------
 //  Activity Event
 // -------------------------------------------------------------------------
-public  int  jAppOnScreenStyle()          { return(pAppOnScreenStyle());   }     
-public  void jAppOnCreate(Context context,RelativeLayout layout )
-                                          { pAppOnCreate(context,layout);  }
+public  int  jAppOnScreenStyle()          { return(pAppOnScreenStyle());   } 
 
-public  void jAppOnNewIntent()            { pAppOnNewIntent();             }     
+public  void jAppOnCreate(Context context,RelativeLayout layout, Intent intent) //android.os.Bundle;
+                                          { pAppOnCreate(context,layout,intent); }
+
+public  void jAppOnNewIntent(Intent intent)            { pAppOnNewIntent(intent); }     
 public  void jAppOnDestroy()              { pAppOnDestroy();               }  
 public  void jAppOnPause()                { pAppOnPause();                 }  
 public  void jAppOnRestart()              { pAppOnRestart();               }    
 public  void jAppOnResume()               { pAppOnResume();                }    
-public  void jAppOnStart()                { pAppOnStart();                 }     //change by jmpessoa : old OnActive
+public  void jAppOnStart()                { pAppOnStart();                 }    
 public  void jAppOnStop()                 { pAppOnStop();                  }   
 public  void jAppOnBackPressed()          { pAppOnBackPressed();           }   
 public  int  jAppOnRotate(int rotate)     {  return(pAppOnRotate(rotate)); }
 
-//rotate=1 --> device on vertical/default position ; 2 --> device on horizontal position      //tips by jmpessoa
+//rotate=1 --> device on vertical/default position ; 2 --> device on horizontal position 
 public  void jAppOnConfigurationChanged() { pAppOnConfigurationChanged();  }
 
 public  void jAppOnActivityResult(int requestCode, int resultCode, Intent data) 
@@ -1308,6 +1335,21 @@ public boolean jAppOnKeyDown(char keyChar , int keyCode, String keyCodeString) {
 public  void systemGC() {
    System.gc();
 }
+
+
+public void ShowAlert(String _title, String _message, String _btnText) {
+	
+	AlertDialog dialog = null;
+	AlertDialog.Builder builder = new AlertDialog.Builder(this.activity);
+	builder.setMessage       (_message)
+	       .setCancelable    (false)	       
+	       .setNeutralButton(_btnText, null);
+	       	      
+	dialog = builder.create();
+	dialog.setTitle(_title);
+	dialog.show();
+}
+
 
 public  void systemSetOrientation(int orientation) {
    this.activity.setRequestedOrientation(orientation);
@@ -1709,36 +1751,50 @@ public void jSend_Email(
 //http://codetheory.in/android-sms/
 //http://www.developerfeed.com/java/tutorial/sending-sms-using-android
 //http://www.techrepublic.com/blog/software-engineer/how-to-send-a-text-message-from-within-your-android-app/
-public int jSend_SMS(String phoneNumber, String msg) {
+public int jSend_SMS(String phoneNumber, String msg, boolean multipartMessage) {
 	SmsManager sms = SmsManager.getDefault();	
 	try {
-	      //SmsManager.getDefault().sendTextMessage(phoneNumber, null, msg, null, null);	      
-	      List<String> messages = sms.divideMessage(msg);    
-	      for (String message : messages) {
-	          sms.sendTextMessage(phoneNumber, null, message, null, null);
-	      }	      
-	      //Log.i("Send_SMS",phoneNumber+": "+ msg);
-	      return 1; //ok	      
-	  }catch (Exception e) {
-		  //Log.i("Send_SMS Fail",e.toString());
-	      return 0; //fail
-	  }
+		//SmsManager.getDefault().sendTextMessage(phoneNumber, null, msg, null, null);
+		if (multipartMessage) {
+			ArrayList<String> messages = sms.divideMessage(msg);    
+			sms.sendMultipartTextMessage(phoneNumber, null, messages, null, null);			  
+		} else {
+			List<String> messages = sms.divideMessage(msg);    
+			for (String message : messages) {
+				sms.sendTextMessage(phoneNumber, null, message, null, null);
+			}			    
+		}
+		//Log.i("Send_SMS",phoneNumber+": "+ msg);
+		return 1; //ok	      
+	} catch (Exception e) {
+		//Log.i("Send_SMS Fail",e.toString());
+		return 0; //fail
+	}
 }
 
-public int jSend_SMS(String phoneNumber, String msg, String packageDeliveredAction) {	
+public int jSend_SMS(String phoneNumber, String msg, String packageDeliveredAction, boolean multipartMessage) {	
 	String SMS_DELIVERED = packageDeliveredAction;
 	PendingIntent deliveredPendingIntent = PendingIntent.getBroadcast(this.GetContext(), 0, new Intent(SMS_DELIVERED), 0);
 	SmsManager sms = SmsManager.getDefault();
 	try {
-	      //SmsManager.getDefault().sendTextMessage(phoneNumber, null, msg, null, deliveredPendingIntent);
-	      //Log.i("Send_SMS",phoneNumber+": "+ msg);
-	      List<String> messages = sms.divideMessage(msg);    
-	      for (String message : messages) {
-	          sms.sendTextMessage(phoneNumber, null, message, null, deliveredPendingIntent);
-	      }	      
-	      return 1; //ok	      
-	}catch (Exception e) {
-	      return 0; //fail
+		//SmsManager.getDefault().sendTextMessage(phoneNumber, null, msg, null, deliveredPendingIntent);
+		if (multipartMessage) {
+			ArrayList<String> messages = sms.divideMessage(msg);    
+			ArrayList<PendingIntent> deliveredPendingIntents = new ArrayList<PendingIntent>();
+			for (int i = 0; i < messages.size(); i++) {
+				deliveredPendingIntents.add(i, deliveredPendingIntent);
+			}			
+			sms.sendMultipartTextMessage(phoneNumber, null, messages, null, deliveredPendingIntents);			  
+		} else {
+			List<String> messages = sms.divideMessage(msg);    
+			for (String message : messages) {
+				sms.sendTextMessage(phoneNumber, null, message, null, deliveredPendingIntent);
+			}			    
+		}	
+		//Log.i("Send_SMS",phoneNumber+": "+ msg);    
+		return 1; //ok	      
+	} catch (Exception e) {
+		return 0; //fail
 	}
 }
 
@@ -1840,8 +1896,7 @@ public  int[] getBmpArray(String file) {
    * NOTE: The DCIM folder on the microSD card in your Android device is where Android stores the photos and videos 
    * you take with the device's built-in camera. When you open the Android Gallery app, 
    * you are browsing the files saved in the DCIM folder....
-   */
-  //by jmpessoa  
+   */ 
 public String jCamera_takePhoto(String path, String filename) {
  	  Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
 	  Uri mImageCaptureUri = Uri.fromFile(new File(path, '/'+filename)); // get Android.Uri from file
@@ -1932,6 +1987,9 @@ public native void pOnListViewLongClickCaptionItem(long pasobj, int position, St
 public native int pOnListViewDrawItemCaptionColor(long pasobj, int position, String caption);
 public native Bitmap pOnListViewDrawItemBitmap(long pasobj, int position, String caption);
 public native void pOnWidgeItemLostFocus(long pasobj, int position, String widgetText);
+public native void pOnListViewScrollStateChanged(long pasobj, int firstVisibleItem, int visibleItemCount, int totalItemCount, boolean lastItemReached);
+public native int pOnListViewDrawItemWidgetTextColor(long pasobj, int position, String widgetText);
+public native Bitmap pOnListViewDrawItemWidgetImage(long pasobj, int position, String widgetText);
 
 public  java.lang.Object jPanel_Create(long pasobj ) {
   return (java.lang.Object)(new jPanel(this.activity,this,pasobj));
@@ -1948,6 +2006,7 @@ public  java.lang.Object jRadioButton_Create(long pasobj ) {
 public  java.lang.Object jScrollView_Create(long pasobj ) {
    return (java.lang.Object)( new jScrollView(this.activity,this,pasobj));
 }
+public native void pOnScrollViewChanged(long pasobj, int currenthorizontal, int currentVertical, int previousHorizontal, int previousVertical, int onPosition, int scrolldiff);
 
 public  java.lang.Object jTextView_Create(long pasobj) {
   return (java.lang.Object)( new jTextView(this.activity,this,pasobj));

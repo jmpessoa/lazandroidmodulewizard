@@ -1078,6 +1078,7 @@ end;
     Finished: boolean;
     PromptOnBackKey: boolean;
     TryBacktrackOnClose: boolean;
+    DoJNIPromptOnShow: boolean;
 
     constructor CreateNew(AOwner: TComponent);
     constructor Create(AOwner: TComponent); override;
@@ -1224,6 +1225,9 @@ end;
     procedure HideSoftInput(_view: jObject); overload;
     function UriEncode(_message: string): string;
     function ParseHtmlFontAwesome(_htmlString: string): string;
+
+    procedure ReInit(refApp: jApp);
+
     // Property
     property View         : jObject        read FjRLayout; //layout!
 
@@ -2661,6 +2665,8 @@ begin
   PromptOnBackKey:= True;
   TryBacktrackOnClose:= False;
 
+  DoJNIPromptOnShow:= True;
+
   //-------------- dummies for compatibility----
   //FOldCreateOrder:= False;
   //FTitle:= 'jForm';
@@ -2772,6 +2778,21 @@ begin
 
 end;
 
+procedure jForm.ReInit(refApp: jApp);
+var
+  i: integer;
+begin
+  for i:= (Self.ComponentCount-1) downto 0 do
+  begin
+    if (Self.Components[i] is jControl) then
+    begin
+       (Self.Components[i] as jControl).Initialized:= False;
+    end;
+  end;
+  self.Initialized:= False;
+  Self.Init(refApp);
+end;
+
 function jForm.GetFormByIndex(index: integer): jForm;
 begin
    if index < gApp.GetCurrentFormsIndex then
@@ -2844,7 +2865,8 @@ begin
   gApp.TopIndex:= Self.FormIndex;
 
   jForm_Show2(FjEnv,FjObject,FAnimation.In_);
-  if Assigned(FOnJNIPrompt) then FOnJNIPrompt(Self);    //*****
+
+  if Assigned(FOnJNIPrompt) and (DoJNIPromptOnShow = True) then FOnJNIPrompt(Self);
 end;
 
 procedure jForm.DoJNIPrompt;

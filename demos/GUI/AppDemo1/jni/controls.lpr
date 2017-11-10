@@ -11,12 +11,12 @@ uses
 
 { Class:     com_example_appdemo1_Controls
   Method:    pAppOnCreate
-  Signature: (Landroid/content/Context;Landroid/widget/RelativeLayout;)V }
+  Signature: (Landroid/content/Context;Landroid/widget/RelativeLayout;Landroid/content/Intent;)V }
 procedure pAppOnCreate(PEnv: PJNIEnv; this: JObject; context: JObject;
-  layout: JObject); cdecl;
+  layout: JObject; intent: JObject); cdecl;
 begin
-  Java_Event_pAppOnCreate(PEnv, this, context, layout); AndroidModule1.Init(gApp
-    );
+  Java_Event_pAppOnCreate(PEnv, this, context, layout, intent);
+    AndroidModule1.Init(gApp);
 end;
 
 { Class:     com_example_appdemo1_Controls
@@ -29,10 +29,10 @@ end;
 
 { Class:     com_example_appdemo1_Controls
   Method:    pAppOnNewIntent
-  Signature: ()V }
-procedure pAppOnNewIntent(PEnv: PJNIEnv; this: JObject); cdecl;
+  Signature: (Landroid/content/Intent;)V }
+procedure pAppOnNewIntent(PEnv: PJNIEnv; this: JObject; intent: JObject); cdecl;
 begin
-  Java_Event_pAppOnNewIntent(PEnv, this);
+  Java_Event_pAppOnNewIntent(PEnv, this, intent);
 end;
 
 { Class:     com_example_appdemo1_Controls
@@ -218,6 +218,15 @@ procedure pOnClick(PEnv: PJNIEnv; this: JObject; pasobj: JLong; value: JInt);
   cdecl;
 begin
   Java_Event_pOnClick(PEnv, this, TObject(pasobj), value);
+end;
+
+{ Class:     com_example_appdemo1_Controls
+  Method:    pOnLongClick
+  Signature: (JI)V }
+procedure pOnLongClick(PEnv: PJNIEnv; this: JObject; pasobj: JLong; value: JInt
+  ); cdecl;
+begin
+  Java_Event_pOnLongClick(PEnv, this, TObject(pasobj), value);
 end;
 
 { Class:     com_example_appdemo1_Controls
@@ -423,6 +432,49 @@ begin
 end;
 
 { Class:     com_example_appdemo1_Controls
+  Method:    pOnListViewScrollStateChanged
+  Signature: (JIIIZ)V }
+procedure pOnListViewScrollStateChanged(PEnv: PJNIEnv; this: JObject;
+  pasobj: JLong; firstVisibleItem: JInt; visibleItemCount: JInt;
+  totalItemCount: JInt; lastItemReached: JBoolean); cdecl;
+begin
+  Java_Event_pOnListViewScrollStateChanged(PEnv, this, TObject(pasobj),
+    firstVisibleItem, visibleItemCount, totalItemCount, lastItemReached);
+end;
+
+{ Class:     com_example_appdemo1_Controls
+  Method:    pOnListViewDrawItemWidgetTextColor
+  Signature: (JILjava/lang/String;)I }
+function pOnListViewDrawItemWidgetTextColor(PEnv: PJNIEnv; this: JObject;
+  pasobj: JLong; position: JInt; widgetText: JString): JInt; cdecl;
+begin
+  Result:=Java_Event_pOnListViewDrawItemWidgetTextColor(PEnv, this, TObject(
+    pasobj), position, widgetText);
+end;
+
+{ Class:     com_example_appdemo1_Controls
+  Method:    pOnListViewDrawItemWidgetImage
+  Signature: (JILjava/lang/String;)Landroid/graphics/Bitmap; }
+function pOnListViewDrawItemWidgetImage(PEnv: PJNIEnv; this: JObject;
+  pasobj: JLong; position: JInt; widgetText: JString): JObject; cdecl;
+begin
+  Result:=Java_Event_pOnListViewDrawItemWidgetImage(PEnv, this, TObject(pasobj
+    ), position, widgetText);
+end;
+
+{ Class:     com_example_appdemo1_Controls
+  Method:    pOnScrollViewChanged
+  Signature: (JIIIIII)V }
+procedure pOnScrollViewChanged(PEnv: PJNIEnv; this: JObject; pasobj: JLong;
+  currenthorizontal: JInt; currentVertical: JInt; previousHorizontal: JInt;
+  previousVertical: JInt; onPosition: JInt; scrolldiff: JInt); cdecl;
+begin
+  Java_Event_pOnScrollViewChanged(PEnv, this, TObject(pasobj),
+    currenthorizontal, currentVertical, previousHorizontal, previousVertical,
+    onPosition, scrolldiff);
+end;
+
+{ Class:     com_example_appdemo1_Controls
   Method:    pOnTimer
   Signature: (J)V }
 procedure pOnTimer(PEnv: PJNIEnv; this: JObject; pasobj: JLong); cdecl;
@@ -440,15 +492,16 @@ begin
     url);
 end;
 
-const NativeMethods: array[0..47] of JNINativeMethod = (
+const NativeMethods: array[0..52] of JNINativeMethod = (
    (name: 'pAppOnCreate';
-    signature: '(Landroid/content/Context;Landroid/widget/RelativeLayout;)V';
+    signature: '(Landroid/content/Context;Landroid/widget/RelativeLayout;'
+      +'Landroid/content/Intent;)V';
     fnPtr: @pAppOnCreate; ),
    (name: 'pAppOnScreenStyle';
     signature: '()I';
     fnPtr: @pAppOnScreenStyle; ),
    (name: 'pAppOnNewIntent';
-    signature: '()V';
+    signature: '(Landroid/content/Intent;)V';
     fnPtr: @pAppOnNewIntent; ),
    (name: 'pAppOnDestroy';
     signature: '()V';
@@ -513,6 +566,9 @@ const NativeMethods: array[0..47] of JNINativeMethod = (
    (name: 'pOnClick';
     signature: '(JI)V';
     fnPtr: @pOnClick; ),
+   (name: 'pOnLongClick';
+    signature: '(JI)V';
+    fnPtr: @pOnLongClick; ),
    (name: 'pOnChange';
     signature: '(JLjava/lang/String;I)V';
     fnPtr: @pOnChange; ),
@@ -579,6 +635,18 @@ const NativeMethods: array[0..47] of JNINativeMethod = (
    (name: 'pOnWidgeItemLostFocus';
     signature: '(JILjava/lang/String;)V';
     fnPtr: @pOnWidgeItemLostFocus; ),
+   (name: 'pOnListViewScrollStateChanged';
+    signature: '(JIIIZ)V';
+    fnPtr: @pOnListViewScrollStateChanged; ),
+   (name: 'pOnListViewDrawItemWidgetTextColor';
+    signature: '(JILjava/lang/String;)I';
+    fnPtr: @pOnListViewDrawItemWidgetTextColor; ),
+   (name: 'pOnListViewDrawItemWidgetImage';
+    signature: '(JILjava/lang/String;)Landroid/graphics/Bitmap;';
+    fnPtr: @pOnListViewDrawItemWidgetImage; ),
+   (name: 'pOnScrollViewChanged';
+    signature: '(JIIIIII)V';
+    fnPtr: @pOnScrollViewChanged; ),
    (name: 'pOnTimer';
     signature: '(J)V';
     fnPtr: @pOnTimer; ),
@@ -677,6 +745,7 @@ exports
   pAppOnSpecialKeyDown name 'Java_com_example_appdemo1_Controls_'
     +'pAppOnSpecialKeyDown',
   pOnClick name 'Java_com_example_appdemo1_Controls_pOnClick',
+  pOnLongClick name 'Java_com_example_appdemo1_Controls_pOnLongClick',
   pOnChange name 'Java_com_example_appdemo1_Controls_pOnChange',
   pOnChanged name 'Java_com_example_appdemo1_Controls_pOnChanged',
   pOnEnter name 'Java_com_example_appdemo1_Controls_pOnEnter',
@@ -712,6 +781,14 @@ exports
     +'pOnListViewDrawItemBitmap',
   pOnWidgeItemLostFocus name 'Java_com_example_appdemo1_Controls_'
     +'pOnWidgeItemLostFocus',
+  pOnListViewScrollStateChanged name 'Java_com_example_appdemo1_Controls_'
+    +'pOnListViewScrollStateChanged',
+  pOnListViewDrawItemWidgetTextColor name 'Java_com_example_appdemo1_Controls_'
+    +'pOnListViewDrawItemWidgetTextColor',
+  pOnListViewDrawItemWidgetImage name 'Java_com_example_appdemo1_Controls_'
+    +'pOnListViewDrawItemWidgetImage',
+  pOnScrollViewChanged name 'Java_com_example_appdemo1_Controls_'
+    +'pOnScrollViewChanged',
   pOnTimer name 'Java_com_example_appdemo1_Controls_pOnTimer',
   pOnWebViewStatus name 'Java_com_example_appdemo1_Controls_pOnWebViewStatus';
 

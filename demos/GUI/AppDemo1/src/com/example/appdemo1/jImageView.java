@@ -8,9 +8,12 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Matrix;
+import android.graphics.Path;
 import android.graphics.PorterDuff.Mode;
+import android.graphics.Rect;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
@@ -311,5 +314,6 @@ public class jImageView extends ImageView {
 	public void SetRadiusRoundCorner(int _radius) {
 		mRadius =  _radius;
 	}
+	
 }
 
