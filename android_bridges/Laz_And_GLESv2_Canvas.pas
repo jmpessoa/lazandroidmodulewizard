@@ -1236,7 +1236,6 @@ begin
   FWidth        := 96;
   FLParamWidth  := lpMatchParent;  //lpWrapContent
   FLParamHeight := lpWrapContent; //lpMatchParent
-  //IsFirstInit:= False;
 
 end;
 
@@ -1841,13 +1840,12 @@ begin
   glDrawArrays(GL_TRIANGLES,0,xyzTris.Cnt*3);
 end;
 
-//
+//bug: texture flipped horizontally. [FIXED] by Handoko
 Procedure jCanvasES2.DrawTexture(const Texture : TxgElement; const Pt4 : Txy4CW; Z : Single;
                                  Alpha : Single; Effect : TxgShader = Shader_Texture);
 var
   T : Array[0..3] of TXY;
   P : Array[0..3] of TXYZ;
- // i : Integer;
 begin
   //
   if not FInitialized then Exit;
@@ -1856,10 +1854,10 @@ begin
   P[2] := _XY_Z(Pt4[3],Z);
   P[3] := _XY_Z(Pt4[0],Z);
   //
-  T[0] := _XY(1,0);
-  T[1] := _XY(1,1);
-  T[2] := _XY(0,0);
-  T[3] := _XY(0,1);
+  T[0] := _XY(0,0);
+  T[1] := _XY(0,1);
+  T[2] := _XY(1,0);
+  T[3] := _XY(1,1);
   //
   SetShader  (Effect);
   SetAlpha   (Alpha );
@@ -1871,7 +1869,6 @@ begin
   //
   glDrawArrays(GL_TRIANGLE_STRIP,0,4);
 end;
-
 //
 Procedure jCanvasES2.DrawTile(const Texture : TxgElement; const Pt4 : Txy4CW; n,Z : Single;
                               Alpha : Single; Effect : TxgShader = Shader_Texture);

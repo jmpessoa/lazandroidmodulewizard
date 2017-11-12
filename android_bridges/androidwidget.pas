@@ -2659,8 +2659,8 @@ begin
   FHeight := 400;
   Finished:= False;
 
-  FormBaseIndex:= -1;  //main form not have a form base
-  FormIndex:= 0;      //main form INDEX
+  FormBaseIndex:= -1;  //dummy - main form not have a form base
+  FormIndex:= -1;      //dummy
 
   PromptOnBackKey:= True;
   TryBacktrackOnClose:= False;
@@ -2744,7 +2744,9 @@ begin
   if gApp.GetCurrentFormsIndex = (cjFormsMax-1) then Exit; //no more form is possible!
 
   FormBaseIndex:= gApp.TopIndex;           //initial = -1
-  FormIndex:=     gApp.GetNewFormsIndex;  //first valid = 0;
+
+  if FormIndex < 0 then //if it is a new form .... [not a ReInit form ...]
+      FormIndex:= gApp.GetNewFormsIndex;  //first valid index = 0;
 
   gApp.Forms.Stack[FormIndex].Form    := Self;
   gApp.Forms.Stack[FormIndex].CloseCB := FCloseCallBack;
@@ -2866,7 +2868,11 @@ begin
 
   jForm_Show2(FjEnv,FjObject,FAnimation.In_);
 
-  if Assigned(FOnJNIPrompt) and (DoJNIPromptOnShow = True) then FOnJNIPrompt(Self);
+  if DoJNIPromptOnShow then
+  begin
+    if Assigned(FOnJNIPrompt) then FOnJNIPrompt(Self);
+  end;
+
 end;
 
 procedure jForm.DoJNIPrompt;
@@ -5139,13 +5145,13 @@ begin
   if FInitialized  then Exit;
   // Setting Global Environment -----------------------------------------------
   FillChar(Forms,SizeOf(Forms),#0);
-  Forms.Index      := -1; //initial dummy index ...
+  Forms.Index:= -1; //initial dummy index ...
 
   // Jni
   Jni.jEnv      := env;  //a reference to the JNI environment
 
   //[by jmpessoa: for API > 13 "STALED"!!! do not use its!
-  Jni.jThis     := this; //["libcontrols.so"] a reference to the object making this call (or class if static).
+  Jni.jThis     := this; //["Controls.java"] a reference to the object making this call (or class if static).
   Jni.jActivity := activity;
   Jni.jRLayout  := layout;
   Jni.jIntent   := intent;
