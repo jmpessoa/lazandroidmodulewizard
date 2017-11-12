@@ -244,7 +244,7 @@ var
   str: DOMString;
   i: SizeInt;
 begin
-  //if FInited and (FAPI >= API) then Exit;
+  if FInited and (FAPI >= API) then Exit;
   if FInited then ClearXMLCache('');
   FInited := False;
   FBasePath := LamwGlobalSettings.PathToAndroidSDK + 'platforms/android-' + IntToStr(API)
