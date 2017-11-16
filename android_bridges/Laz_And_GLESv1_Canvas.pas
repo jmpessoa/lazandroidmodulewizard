@@ -106,7 +106,10 @@ Function  _glRGBA              ( R,G,B,A : Single  ) : TgfRGBA;
 Procedure _glLighting          ( Active : Boolean );
 Procedure _gluPerspective      ( fovy,aspect,zNear,zFar : Single);
 Function  _glTexture_Load_wPas (ImgName : String; Var Img : GLuint) : Boolean;
-Function  _glTexture_Load_wJava(env:PJNIEnv; this:jobject;ImgName : String; Var Img : GLuint) : Boolean;
+
+//Function  _glTexture_Load_wJava(env:PJNIEnv; this:jobject; ImgName : String; Var Img : GLuint) : Boolean;
+function _glTexture_Load_wJava(env: PJNIEnv; _jcanvases2: JObject;_fullFilename: string; var Img : GLuint): boolean;
+
 Function  _glTexture_Free      (Var Img : GLuint) : Boolean;
 //
 Function  mulM4x4  (const A,B : TM4x4 ) : TM4x4;
@@ -334,6 +337,77 @@ Function _glTexture_Load_wPas(ImgName : String; Var Img : GLuint) : Boolean;
   Result := True;
  end;
 
+function _glTexture_Load_wJava(env: PJNIEnv; _jcanvases2: JObject;_fullFilename: string; var Img : GLuint): boolean;
+var
+  Size: integer;
+  jResultArray: jObject;
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+  PInt : PInteger;
+  i    : Integer;
+  w,h  : Integer;
+  Pixel : DWord;
+  PixelFormat: DWord;
+  _jBoolean  : jBoolean;
+begin
+
+  gVM^.AttachCurrentThread(gVm,@env,nil);
+
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_fullFilename));
+  jCls:= env^.GetObjectClass(env, _jcanvases2);
+  jMethod:= env^.GetMethodID(env, jCls, 'GetBmpIntArray', '(Ljava/lang/String;)[I');
+  jResultArray:= env^.CallObjectMethodA(env, _jcanvases2, jMethod,  @jParams);
+
+  Size:= env^.GetArrayLength(env, jResultArray);
+  _jBoolean  := JNI_False;
+  PInt := env^.GetIntArrayElements(env,jResultArray,_jBoolean);
+
+  Inc(PInt,Size-2);
+  w := Pint^; Inc(Pint);
+  h := Pint^; Inc(Pint);
+  Dec(PInt,Size);
+  // BGRA -> RGBA
+  i := w*h-1;
+  repeat
+   Pixel := PInt^;
+   Pixel :=  (Pixel and $FF00FF00) or
+            ((Pixel and $00FF0000) shr 16) or
+            ((Pixel and $000000FF) shl 16);
+
+   PInt^ := Pixel;
+   Inc(PInt);
+   dec(i);
+  until(i = 0);
+
+  Dec(PInt,w*h-1);
+  PixelFormat := GL_RGBA;
+
+  glGenTextures  (1,Img);
+  glBindTexture (GL_Texture_2D,Img);
+  glTexparameteri(GL_Texture_2D,GL_Texture_Min_Filter, GL_Linear);
+  glTexparameteri(GL_Texture_2D,GL_Texture_Mag_Filter, GL_Linear);
+  glTexparameteri(GL_Texture_2D,GL_Texture_Wrap_S    , GL_Clamp_To_Edge);
+  glTexparameteri(GL_Texture_2D,GL_Texture_Wrap_T    , GL_Clamp_To_Edge);
+  glTexImage2D   (GL_Texture_2D,
+                  0,
+                  PixelFormat,
+                  w,
+                  h,
+                  0,
+                  PixelFormat,
+                  GL_UNSIGNED_BYTE,
+                  Pointer(PInt));
+
+  env^.DeleteLocalRef(env,jParams[0].l);
+  env^.ReleaseIntArrayElements(env,jResultArray,PInt,0);
+  env^.DeleteLocalRef(env, jCls);
+
+  Result := True;
+
+end;
+
+(*
 //
 Function _glTexture_Load_wJava(env:PJNIEnv;this:jobject;ImgName : String; Var Img : GLuint) : Boolean;
 Const
@@ -410,6 +484,7 @@ Var
   dbg('Load Texture Java #'+ IntToStr(Img) + ' wh: '  + IntToStr(w) + 'x' + IntToStr(h) );
   Result := True;
  end;
+*)
 
 Function _glTexture_Free(Var Img : GLuint) : Boolean;
  begin
@@ -923,7 +998,8 @@ begin
   if not FInitialized then Exit;
   case lang of
      tJava : begin
-               Texture.Active := _glTexture_Load_wJava(gApp.Jni.jEnv, gApp.Jni.jThis, gApp.Path.Dat+'/'+filename, Texture.ID);
+                //Texture.Active :=        _glTexture_Load_wJava(gApp.Jni.jEnv, gApp.Jni.jThis, gApp.Path.Dat+'/'+filename, Texture.ID);
+                  Texture.Active :=        _glTexture_Load_wJava(FjEnv, FjObject, gApp.Path.Dat+'/'+filename, Texture.ID);
              end;
      tPascal : Texture.Active := _glTexture_Load_wPas(filename, Texture.ID);
   end;

@@ -2679,7 +2679,7 @@ end;
 
 destructor jForm.Destroy;
 begin
-  if FInitialized and not Finished then
+  if FInitialized and (not Finished) then
   begin
     jForm_FreeLayout(FjEnv, FjRLayout); //free jni jForm Layout global reference
     jForm_Free2(FjEnv, FjObject);
@@ -2689,7 +2689,7 @@ end;
 
 procedure jForm.Finish;
 begin
-  if FInitialized  then
+  if FInitialized  and (not Finished)  then
   begin
     jForm_FreeLayout(FjEnv, FjRLayout); //free jni jForm Layout global reference
     jForm_Free2(FjEnv, FjObject);
@@ -2881,6 +2881,16 @@ begin
   if Assigned(FOnJNIPrompt) then FOnJNIPrompt(Self);    //*****
 end;
 
+
+{events sequences after user click the "back key"
+   OnCanClose
+    ...
+   OnBackBuutton
+    ...
+   OnClose
+    ...
+}
+
 //[1]
 procedure jForm.Close;
 begin
@@ -2902,6 +2912,8 @@ begin
   gApp.Jni.jThis:= this;
 
   if not Assigned(Form) then exit; //just precaution...
+
+  jForm(Form).UpdateJNI(gApp); //+++
 
   Inx:= jForm(Form).FormIndex;
   formBaseInx:= jForm(Form).FormBaseIndex;
@@ -6382,8 +6394,8 @@ begin
     cls := env^.GetObjectClass(env, Form);
     method:= env^.GetMethodID(env, cls, 'Free', '()V');
     env^.CallVoidMethod(env, Form, method);
-    env^.DeleteGlobalRef(env,Form);
     env^.DeleteLocalRef(env, cls);
+    env^.DeleteGlobalRef(env,Form);
   end;
 end;
 

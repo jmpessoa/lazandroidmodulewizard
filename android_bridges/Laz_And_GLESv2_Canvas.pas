@@ -172,10 +172,18 @@ Procedure _glRotatef      (Var Mat : TM4x4; angle,x,y,z : Single);
 Function  _glTexture_Load_wPas (ImgName   : String; Var Img : GLuint;
                                 AlphaMask : Boolean = True;
                                 TileMode  : Boolean = False) : Boolean;
+{
 Function  _glTexture_Load_wJava(env:PJNIEnv;this:jobject;
                                 ImgName   : String; Var Img : GLuint;
                                 AlphaMask : Boolean = True;
                                 TileMode  : Boolean = False) : Boolean;
+ }
+function _glTexture_Load_wJava(env: PJNIEnv; _jcanvases2: JObject;
+                               _fullFilename: string;
+                               var Img : GLuint;
+                               AlphaMask: Boolean = True;
+                               TileMode : Boolean = False): boolean;
+
 Function  _glTexture_Free (Var Img : GLuint) : Boolean;
 
 //------------------------------------------------------------------------------
@@ -287,7 +295,6 @@ Type
    Textures : TxgTextures; // Texture
    MVP      : TM4x4;       // MVP Matrix
    TexturesCount: integer; //by jmpessoa
-   //IsFirstInit: boolean;
 
    Constructor Create(AOwner: TComponent); override;
    Destructor  Destroy; override;
@@ -340,10 +347,10 @@ Type
    //
    Procedure Update;
    Procedure Refresh;
+
    // Property
    Property Shader      : TxgShader     read FShader      write SetShader;
    Property Alpha       : Single        read FAlpha       write SetAlpha;
-
  published
     property AutoRefresh : boolean       read FAutoRefresh write SetAutoRefresh;
     property Visible     : Boolean       read GetVisible     write SetVisible;
@@ -1020,6 +1027,92 @@ Function _glTexture_Load_wPas(ImgName   : String; Var Img : GLuint;
 // https://github.com/zagayevskiy/Pacman/blob/master/jni/managers/Art.cpp
 // http://blog.livedoor.jp/itahidamito/archives/51661332.html
 //
+
+function _glTexture_Load_wJava(env: PJNIEnv; _jcanvases2: JObject;
+                               _fullFilename: string;
+                               var Img : GLuint;
+                               AlphaMask: Boolean = True;
+                               TileMode : Boolean = False): boolean;
+var
+  Size: integer;
+  jResultArray: jObject;
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+  PInt : PInteger;
+  i    : Integer;
+  w,h  : Integer;
+  Pixel : DWord;
+  PixelFormat: DWord;
+  _jBoolean  : jBoolean;
+begin
+
+  gVM^.AttachCurrentThread(gVm,@env,nil);
+
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_fullFilename));
+  jCls:= env^.GetObjectClass(env, _jcanvases2);
+  jMethod:= env^.GetMethodID(env, jCls, 'GetBmpIntArray', '(Ljava/lang/String;)[I');
+  jResultArray:= env^.CallObjectMethodA(env, _jcanvases2, jMethod,  @jParams);
+
+  Size:= env^.GetArrayLength(env, jResultArray);
+  _jBoolean  := JNI_False;
+  PInt := env^.GetIntArrayElements(env,jResultArray,_jBoolean);
+
+  Inc(PInt,Size-2);
+  w := Pint^; Inc(Pint);
+  h := Pint^; Inc(Pint);
+  Dec(PInt,Size);
+  // BGRA -> RGBA
+  i := w*h-1;
+  repeat
+   Pixel := PInt^;
+   Pixel :=  (Pixel and $FF00FF00) or
+            ((Pixel and $00FF0000) shr 16) or
+            ((Pixel and $000000FF) shl 16);
+
+   PInt^ := Pixel;
+   Inc(PInt);
+   dec(i);
+  until(i = 0);
+
+  Dec(PInt,w*h-1);
+  PixelFormat := GL_RGBA;
+  //
+  glGenTextures  (1,@Img);
+  glBindTexture  (GL_Texture_2D,Img);
+  glTexparameteri(GL_Texture_2D,GL_Texture_Min_Filter, GL_Linear);
+  glTexparameteri(GL_Texture_2D,GL_Texture_Mag_Filter, GL_Linear);
+
+  Case TileMode of
+   True : begin
+           glTexparameteri(GL_Texture_2D,GL_Texture_Wrap_S, GL_Repeat);
+           glTexparameteri(GL_Texture_2D,GL_Texture_Wrap_T, GL_Repeat);
+          end;
+   False: begin
+           glTexparameteri(GL_Texture_2D,GL_Texture_Wrap_S, GL_Clamp_To_Edge);
+           glTexparameteri(GL_Texture_2D,GL_Texture_Wrap_T, GL_Clamp_To_Edge);
+          end;
+  End;
+
+  glTexImage2D   (GL_Texture_2D,
+                  0,
+                  PixelFormat,
+                  w,
+                  h,
+                  0,
+                  PixelFormat,
+                  GL_UNSIGNED_BYTE,
+                  Pointer(PInt));
+
+  env^.DeleteLocalRef(env,jParams[0].l);
+  env^.ReleaseIntArrayElements(env,jResultArray,PInt,0);
+  env^.DeleteLocalRef(env, jCls);
+
+  Result := True;
+
+end;
+
+(*
 Function _glTexture_Load_wJava(env:PJNIEnv;
                                this:jobject;
                                ImgName  : String;
@@ -1126,6 +1219,7 @@ Var
   dbg('Load Texture Java #'+ IntToStr(Img) + ' wh: '  + IntToStr(w) + 'x' + IntToStr(h) );
   Result := True;
  end;
+*)
 
 Function _glTexture_Free(Var Img : GLuint) : Boolean;
  begin
@@ -1923,13 +2017,12 @@ begin
 
   Case TileMode of
 
-   True : Texture.Active := _glTexture_Load_wJava(FjEnv, gApp.jni.jThis,
-                                            gApp.Path.Dat+'/'+filename,
-                                            Texture.ID,
-                                            _cAlpha_MaskOff,
-                                            _cTile_On );
+   //True : Texture.Active := _glTexture_Load_wJava(FjEnv, gApp.jni.jThis, gApp.Path.Dat+'/'+filename, Texture.ID,_cAlpha_MaskOff, _cTile_On );
+   True : Texture.Active := _glTexture_Load_wJava(FjEnv, FjObject, gApp.Path.Dat+'/'+filename, Texture.ID,_cAlpha_MaskOff, _cTile_On );
 
-   False: Texture.Active := _glTexture_Load_wJava(FjEnv, gApp.jni.jThis, gApp.Path.Dat+'/'+filename,Texture.ID,_cAlpha_MaskOn ,_cTile_Off);
+
+   //False: Texture.Active := _glTexture_Load_wJava(FjEnv, gApp.jni.jThis, gApp.Path.Dat+'/'+filename,Texture.ID,_cAlpha_MaskOn ,_cTile_Off);
+   False: Texture.Active := _glTexture_Load_wJava(FjEnv, FjObject, gApp.Path.Dat+'/'+filename,Texture.ID,_cAlpha_MaskOn ,_cTile_Off);
 
   End;
 
@@ -1949,8 +2042,15 @@ var
   i: integer;
 begin
   if not FInitialized then Exit;
-  if TexturesCount >  0 then Texture_Clear;
-  if FImageList <> nil then FImageList.Init(gApp);  //***
+
+  if FImageList = nil then
+     Exit;
+    //FImageList.Init(gApp)
+//else
+    //Exit;
+
+  Texture_Clear;
+
   for i:= 0 to FImageList.Images.Count - 1 do
   begin
      if (FImageList.Images.Strings[i] <> '') and (FImageList.Images.Strings[i] <> 'null') then
@@ -1959,9 +2059,9 @@ begin
        Inc(TexturesCount);
      end;
   end;
+
 end;
 
-//
 Procedure jCanvasES2.Texture_UnLoad( var Texture : TxgElement );
 begin
   if not FInitialized then Exit;
@@ -1999,6 +2099,7 @@ begin
     //begin
       Textures[i].Active := False;
       glDeleteTextures(1,@Textures[i].ID);
+      //jGLSurfaceView_deleteTexture(FjEnv, FjObject ,Textures[i].ID);
     //end;
   end;
   TexturesCount:= 0;

@@ -5,6 +5,8 @@ import javax.microedition.khronos.opengles.GL10;
 import javax.microedition.khronos.egl.EGLContext;
 import javax.microedition.khronos.egl.EGL10;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.opengl.GLSurfaceView;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -42,7 +44,7 @@ public class jCanvasES1 extends GLSurfaceView {
 	private ViewGroup       parent   = null;   // parent view
 	private ViewGroup.MarginLayoutParams lparams = null;              // layout XYWH
 
-	private jRenderer       renderer;
+	private GLRenderer       renderer;
 	private GL10            savGL;
 
 	//by jmpessoa
@@ -60,22 +62,26 @@ public class jCanvasES1 extends GLSurfaceView {
 	int marginBottom = 5;
 	private int lgravity = Gravity.TOP | Gravity.START;
 	private float lweight = 0;
+	private boolean mflag = false;
 
 	//
-	class jRenderer implements GLSurfaceView.Renderer {
+	class GLRenderer implements GLSurfaceView.Renderer {
 		//public  void onSurfaceCreated(GL10 arg0, javax.microedition.khronos.egl.EGLConfig arg1) {controls.pOnGLRenderer(PasObj,Const.Renderer_onSurfaceCreated,0,0); }
-		public  void onSurfaceCreated(GL10 gl, EGLConfig config) { controls.pOnGLRenderer1(PasObj,ConstES1.Renderer_onSurfaceCreated,0,0); }
-		public  void onSurfaceChanged(GL10 gl, int w, int h) { controls.pOnGLRenderer1(PasObj,ConstES1.Renderer_onSurfaceChanged,w,h); }
-		public  void onDrawFrame     (GL10 gl) {controls.pOnGLRenderer1(PasObj,ConstES1.Renderer_onDrawFrame,0,0); }
-
-		// TODO Auto-generated method stu
+		public  void onSurfaceCreated(GL10 gl, EGLConfig config) { 
+			 mflag = true;
+			 controls.pOnGLRenderer1(PasObj,ConstES1.Renderer_onSurfaceCreated,0,0); 
+	    }
+		public  void onSurfaceChanged(GL10 gl, int w, int h) { 
+			controls.pOnGLRenderer1(PasObj,ConstES1.Renderer_onSurfaceChanged,w,h); 
+		}
+		public  void onDrawFrame     (GL10 gl) {
+			controls.pOnGLRenderer1(PasObj,ConstES1.Renderer_onDrawFrame,0,0); 
+		}
 	}
 
-	//Constructor
 	public  jCanvasES1(android.content.Context context,
 					   Controls ctrls,long pasobj, int version ) {
 		super(context);
-
 		// Connect Pascal I/F
 		PasObj   = pasobj;
 		controls = ctrls;
@@ -87,7 +93,7 @@ public class jCanvasES1 extends GLSurfaceView {
 		// OpenGL ES Version
 		if (version != 1) {setEGLContextClientVersion(2); };
 
-		renderer = new jRenderer();
+		renderer = new GLRenderer();
 
 		setEGLConfigChooser(8,8,8,8,16,8);       // RGBA,Depath,Stencil
 
@@ -109,7 +115,9 @@ public class jCanvasES1 extends GLSurfaceView {
 		if (_aparent instanceof FrameLayout) {
 			return new FrameLayout.LayoutParams(_baseparams);
 		} else if (_aparent instanceof RelativeLayout) {
-			return new RelativeLayout.LayoutParams(_baseparams);
+			return new RelativeLayout.LayoutParams(_baseparams);			
+		} else if (_aparent instanceof ViewGroup) {
+			return new  RelativeLayout.LayoutParams(_baseparams);			
 		} else if (_aparent instanceof LinearLayout) {
 			return new LinearLayout.LayoutParams(_baseparams);
 		} else if (_aparent == null) {
@@ -215,7 +223,7 @@ public class jCanvasES1 extends GLSurfaceView {
 					requestRender();
 				}
 				catch ( Exception e) {
-					Log.e("deleteTexture", "Exception: "+ e.toString() ); }
+					Log.e("requestRender", "Exception: "+ e.toString() ); }
 			}
 		});
 	}
@@ -331,5 +339,19 @@ public class jCanvasES1 extends GLSurfaceView {
 		if (active) {setRenderMode( GLSurfaceView.RENDERMODE_CONTINUOUSLY ); }
 		else  {setRenderMode( GLSurfaceView.RENDERMODE_WHEN_DIRTY   ); }
 	}
+	
+	public  int[] GetBmpIntArray(String _fullFilename) {
+		 String file = _fullFilename;
+		 int[] pixels;					              			              
+		 Bitmap bmp = BitmapFactory.decodeFile(file);
+		 int   length = bmp.getWidth()*bmp.getHeight();
+	     pixels = new int[length+2];
+		 bmp.getPixels(pixels, 0, bmp.getWidth(), 0, 0, bmp.getWidth(), bmp.getHeight());
+		 pixels[length+0] = bmp.getWidth ();
+		 pixels[length+1] = bmp.getHeight();
+		 //Log.i("getBmpArray", file);																          
+	     return (pixels);			              
+	}	
+	
 
 }

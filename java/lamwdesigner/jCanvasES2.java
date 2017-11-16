@@ -5,6 +5,8 @@ import javax.microedition.khronos.opengles.GL10;
 import javax.microedition.khronos.egl.EGLContext;
 import javax.microedition.khronos.egl.EGL10;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.opengl.GLSurfaceView;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -35,6 +37,18 @@ class ConstES2 {
 //http://cafe.naver.com/mcbugi/250562
 //http://cafe.naver.com/cocos2dxusers/405
 
+//http://altdevblog.com/2013/08/18/the-main-loop-in-devils-attorney-on-android/
+
+//https://android-developers.googleblog.com/2009/04/introducing-glsurfaceview.html
+
+/* 
+ * Clients typically need to communicate with the renderer from the UI thread, 
+ * because that's where input events are received. 
+ * Clients can communicate using any of the standard Java techniques for cross-thread communication,
+ * or they can use the queueEvent(Runnable) convenience method.
+ */
+
+
 public class jCanvasES2 extends GLSurfaceView {
 	//Java-Pascal Interface
 	private long            PasObj   = 0;      // Pascal Obj
@@ -42,7 +56,7 @@ public class jCanvasES2 extends GLSurfaceView {
 	//
 	private ViewGroup       parent   = null;   // parent view
 	private ViewGroup.MarginLayoutParams lparams = null;              // layout XYWH
-	private jRenderer       renderer;
+	private GLRenderer       renderer;
 	private GL10            savGL;
 
 	//by jmpessoa
@@ -61,12 +75,14 @@ public class jCanvasES2 extends GLSurfaceView {
 	private int lgravity = Gravity.TOP | Gravity.START;
 	private float lweight = 0;
 	
-	//
-	//http://altdevblog.com/2013/08/18/the-main-loop-in-devils-attorney-on-android/
-	class jRenderer implements GLSurfaceView.Renderer {		
+	private boolean mflag = false;
+
+	class GLRenderer implements GLSurfaceView.Renderer {	
+				
 		//public  void onSurfaceCreated(GL10 arg0, javax.microedition.khronos.egl.EGLConfig arg1) {controls.pOnGLRenderer(PasObj,Const.Renderer_onSurfaceCreated,0,0); }
 		public  void onSurfaceCreated(GL10 gl, EGLConfig config) {
 			//Log.i("Java","onSurfaceCreated");
+			mflag = true;
 			controls.pOnGLRenderer2(PasObj,ConstES2.Renderer_onSurfaceCreated,0,0); 
 		}		
 		public  void onSurfaceChanged(GL10 gl, int w, int h) {
@@ -79,7 +95,7 @@ public class jCanvasES2 extends GLSurfaceView {
 			controls.pOnGLRenderer2(PasObj,ConstES2.Renderer_onDrawFrame,0,0); 
 		}		
 	}
-
+	
 	//Constructor
 	public jCanvasES2(android.content.Context context,
 					   Controls ctrls,long pasobj, int version ) {
@@ -90,12 +106,15 @@ public class jCanvasES2 extends GLSurfaceView {
 		
 		lparams = new ViewGroup.MarginLayoutParams(lparamW, lparamH);     // W,H
 		lparams.setMargins(marginLeft,marginTop,marginRight,marginBottom); // L,T,R,B
-		
-		if (version != 1) {setEGLContextClientVersion(2); };
-		renderer = new jRenderer();
-		setEGLConfigChooser(8,8,8,8,16,8);       // RGBA,Depath,Stencil
+			
+		renderer = new GLRenderer();
+		if (version != 1) {setEGLContextClientVersion(2); };				
+		setEGLConfigChooser(8,8,8,8,16,8);       // RGBA,Depath,Stencil		
+	    // Turn on error-checking and logging
+	    //setDebugFlags(DEBUG_CHECK_GL_ERROR | DEBUG_LOG_GL_CALLS);		
+		//setPreserveEGLContextOnPause(false);
 		setRenderer(renderer);
-		setRenderMode( GLSurfaceView.RENDERMODE_WHEN_DIRTY);
+		setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY);				
 	}
 	
 	public void setLeftTopRightBottomWidthHeight(int left, int top, int right, int bottom, int w, int h) {
@@ -112,6 +131,8 @@ public class jCanvasES2 extends GLSurfaceView {
 			return new FrameLayout.LayoutParams(_baseparams);
 		} else if (_aparent instanceof RelativeLayout) {
 			return new RelativeLayout.LayoutParams(_baseparams);
+		} else if (_aparent instanceof ViewGroup) {
+			return new  RelativeLayout.LayoutParams(_baseparams);						
 		} else if (_aparent instanceof LinearLayout) {
 			return new LinearLayout.LayoutParams(_baseparams);
 		} else if (_aparent == null) {
@@ -131,6 +152,76 @@ public class jCanvasES2 extends GLSurfaceView {
 		lparams = (ViewGroup.MarginLayoutParams)this.getLayoutParams();
 	}
 
+	/*
+	public boolean onTouchEvent(final MotionEvent event) {
+        queueEvent(new Runnable(){
+            public void run() {
+               		int act     = event.getAction() & MotionEvent.ACTION_MASK;
+		switch(act) {
+			case MotionEvent.ACTION_DOWN: {
+				switch (event.getPointerCount()) {
+					case 1 : { controls.pOnTouch (PasObj,Const.TouchDown,1,
+							event.getX(0),event.getY(0),0,0);
+						// Log.i("touch down1:","x="+event.getX(0)+"  y="+event.getY(0));
+						break;
+					}
+					default: { controls.pOnTouch (PasObj,Const.TouchDown,2,
+							event.getX(0),event.getY(0),
+							event.getX(1),event.getY(1));
+						//Log.i("touch down2:","x="+event.getX(0)+"  y="+event.getY(0));
+						break;
+					}
+				}
+				break;}
+			case MotionEvent.ACTION_MOVE: {
+				switch (event.getPointerCount()) {
+					case 1 : { controls.pOnTouch (PasObj,Const.TouchMove,1,
+							event.getX(0),event.getY(0),0,0); break; }
+					default: { controls.pOnTouch (PasObj,Const.TouchMove,2,
+							event.getX(0),event.getY(0),
+							event.getX(1),event.getY(1));     break; }
+				}
+				break;}
+			case MotionEvent.ACTION_UP: {
+				switch (event.getPointerCount()) {
+					case 1 : { controls.pOnTouch (PasObj,Const.TouchUp  ,1,
+							event.getX(0),event.getY(0),0,0);
+						//Log.i("touch up1:","x="+event.getX(0)+"  y="+event.getY(0));
+						break; }
+					default: { controls.pOnTouch (PasObj,Const.TouchUp  ,2,
+							event.getX(0),event.getY(0),
+							event.getX(1),event.getY(1));
+						//Log.i("touch up2:","x="+event.getX(0)+"  y="+event.getY(0));
+						break; }
+				}
+				break;}
+			case MotionEvent.ACTION_POINTER_DOWN: {
+				switch (event.getPointerCount()) {
+					case 1 : { controls.pOnTouch (PasObj,Const.TouchDown,1,
+							event.getX(0),event.getY(0),0,0); break; }
+					default: { controls.pOnTouch (PasObj,Const.TouchDown,2,
+							event.getX(0),event.getY(0),
+							event.getX(1),event.getY(1));     break; }
+				}
+				break;}
+			case MotionEvent.ACTION_POINTER_UP  : {
+				//Log.i("Java","PUp");
+				switch (event.getPointerCount()) {
+					case 1 : { controls.pOnTouch (PasObj,Const.TouchUp  ,1,
+							event.getX(0),event.getY(0),0,0); break; }
+					default: { controls.pOnTouch (PasObj,Const.TouchUp  ,2,
+							event.getX(0),event.getY(0),
+							event.getX(1),event.getY(1));     break; }
+				}
+				break;}
+		}
+		
+            }});
+            return true;
+        }
+
+	 */
+		
 	//
 	@Override
 	public  boolean onTouchEvent( MotionEvent event) {
@@ -195,7 +286,8 @@ public class jCanvasES2 extends GLSurfaceView {
 		}
 		return true;
 	}
-
+    
+	
 	@Override
 	public void surfaceDestroyed(SurfaceHolder holder) {
 		//Log.i("Java","surfaceDestroyed");
@@ -217,7 +309,7 @@ public class jCanvasES2 extends GLSurfaceView {
 					requestRender();
 				}
 				catch ( Exception e) {
-					Log.e("deleteTexture", "Exception: "+ e.toString() ); }
+					Log.e("requestRender", "Exception: "+ e.toString() ); }
 			}
 		});
 	}
@@ -323,8 +415,11 @@ public class jCanvasES2 extends GLSurfaceView {
 	}
 
 	//by jmpessoa
-	public void Refresh() {
-		this.requestRender();
+	public void Refresh() {   //can called from any thread ...		
+		if (mflag) {
+		   this.requestRender();
+		}
+        //genRender();
 	}
 
 	//by jmpessoa
@@ -332,5 +427,26 @@ public class jCanvasES2 extends GLSurfaceView {
 		if (active) {setRenderMode( GLSurfaceView.RENDERMODE_CONTINUOUSLY ); }
 		else  {setRenderMode( GLSurfaceView.RENDERMODE_WHEN_DIRTY   ); } 
 	}
-
+	
+	public void Resume() {
+	   onResume();	   
+	}
+	
+	public void Pause() {	
+		onPause();
+	}	
+	
+	public  int[] GetBmpIntArray(String _fullFilename) {
+		 String file = _fullFilename;
+		 int[] pixels;					              			              
+		 Bitmap bmp = BitmapFactory.decodeFile(file);
+		 int   length = bmp.getWidth()*bmp.getHeight();
+	     pixels = new int[length+2];
+		 bmp.getPixels(pixels, 0, bmp.getWidth(), 0, 0, bmp.getWidth(), bmp.getHeight());
+		 pixels[length+0] = bmp.getWidth ();
+		 pixels[length+1] = bmp.getHeight();
+		 //Log.i("getBmpArray", file);																          
+	     return (pixels);			              
+	}	
+	
 }
