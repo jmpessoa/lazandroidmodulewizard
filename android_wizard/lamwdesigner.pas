@@ -313,6 +313,13 @@ type
     constructor Create(AWidget: TAndroidWidget; Canvas: TCanvas); override;
   end;
 
+  {TDraftGL2SurfaceView}
+
+  TDraftGL2SurfaceView = class(TDraftWidget)
+  public
+    constructor Create(AWidget: TAndroidWidget; Canvas: TCanvas); override;
+  end;
+
   { TDraftSpinner }
 
   TDraftSpinner = class(TDraftWidget)
@@ -517,7 +524,7 @@ uses
   Laz_And_GLESv1_Canvas, Laz_And_GLESv2_Canvas, gridview, Spinner, seekbar,
   radiogroup, ratingbar, digitalclock, analogclock, surfaceview,
   autocompletetextview, drawingview, chronometer, viewflipper, videoview,
-  comboedittext, toolbar, expandablelistview;
+  comboedittext, toolbar, expandablelistview, gl2SurfaceView;
 
 const
   DrawableSearchPaths: array [0..3] of string = (
@@ -2966,6 +2973,19 @@ begin
     Color := GetParentBackgroundColor;
 end;
 
+{ TDraftSurfaceView }
+
+constructor TDraftGL2SurfaceView.Create(AWidget: TAndroidWidget; Canvas: TCanvas);
+begin
+  inherited;
+  Color := jGL2SurfaceView(AWidget).BackgroundColor;
+  FontColor := colbrGray;
+  BackGroundColor := clActiveCaption; //clMenuHighlight;
+
+  if jGL2SurfaceView(AWidget).BackgroundColor = colbrDefault then
+    Color := GetParentBackgroundColor;
+end;
+
 { TDraftSpinner }
 
 constructor TDraftSpinner.Create(AWidget: TAndroidWidget; Canvas: TCanvas);
@@ -3611,6 +3631,7 @@ initialization
   RegisterAndroidWidgetDraftClass(jImageBtn, TDraftImageBtn);
   RegisterAndroidWidgetDraftClass(jImageView, TDraftImageView);
   RegisterAndroidWidgetDraftClass(jSurfaceView, TDraftSurfaceView);
+  RegisterAndroidWidgetDraftClass(jGL2SurfaceView, TDraftGL2SurfaceView);
   RegisterAndroidWidgetDraftClass(jWebView, TDraftWebView);
   RegisterAndroidWidgetDraftClass(jScrollView, TDraftScrollView);
   RegisterAndroidWidgetDraftClass(jHorizontalScrollView, TDraftHorizontalScrollView);

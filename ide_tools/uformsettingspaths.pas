@@ -13,10 +13,11 @@ type
   { TFormSettingsPaths }
 
   TFormSettingsPaths  = class(TForm)
-    BitBtnOK: TBitBtn;
     BevelJDKAntAndSDKNDK: TBevel;
+    BitBtnOK: TBitBtn;
     BitBtnCancel: TBitBtn;
     ComboBoxPrebuild: TComboBox;
+    EditPathToGradle: TEdit;
     EditPathToJavaTemplates: TEdit;
     EditPathToAndroidNDK: TEdit;
     EditPathToJavaJDK: TEdit;
@@ -24,6 +25,7 @@ type
     EditPathToAntBinary: TEdit;
     GroupBoxPrebuild: TGroupBox;
     Image1: TImage;
+    LabelPathToGradle: TLabel;
     LBPathToJavaTemplates: TLabel;
     LabelPathToAndroidNDK: TLabel;
     LabelPathToJavaJDK: TLabel;
@@ -35,18 +37,22 @@ type
     SelDirDlgPathToJavaJDK: TSelectDirectoryDialog;
     SelDirDlgPathToAndroidSDK: TSelectDirectoryDialog;
     SelDirDlgPathToAntBinary: TSelectDirectoryDialog;
+    SelDirDlgPathToGradle: TSelectDirectoryDialog;
     SpBPathToAndroidNDK: TSpeedButton;
     SpBPathToJavaTemplates: TSpeedButton;
     SpBPathToJavaJDK: TSpeedButton;
     SpBPathToAndroidSDK: TSpeedButton;
     SpBPathToAntBinary: TSpeedButton;
+    SpBPathToGradle: TSpeedButton;
     SpeedButtonInfo: TSpeedButton;
     StatusBar1: TStatusBar;
     procedure BitBtnOKClick(Sender: TObject);
     procedure BitBtnCancelClick(Sender: TObject);
     procedure FormActivate(Sender: TObject);
     procedure FormClose(Sender: TObject; var CloseAction: TCloseAction);
+    procedure Label1Click(Sender: TObject);
     procedure SpBPathToAndroidNDKClick(Sender: TObject);
+    procedure SpBPathToGradleClick(Sender: TObject);
     procedure SpBPathToJavaJDKClick(Sender: TObject);
     procedure SpBPathToAndroidSDKClick(Sender: TObject);
     procedure SpBPathToAntBinaryClick(Sender: TObject);
@@ -62,6 +68,7 @@ type
     FPathToAntBin: string;
     FPrebuildOSYS: string;
     FPathToTemplatePresumed: string;
+    FPathToGradle: string;
   public
     { public declarations }
     FOk: boolean;
@@ -172,6 +179,11 @@ begin
        end;
 end;
 
+procedure TFormSettingsPaths.Label1Click(Sender: TObject);
+begin
+
+end;
+
 procedure TFormSettingsPaths.FormActivate(Sender: TObject);
 var
   p: integer;
@@ -231,6 +243,15 @@ begin
   begin
     EditPathToAndroidNDK.Text := SelDirDlgPathToAndroidNDK.FileName;
     FPathToAndroidNDK:= SelDirDlgPathToAndroidNDK.FileName;
+  end;
+end;
+
+procedure TFormSettingsPaths.SpBPathToGradleClick(Sender: TObject);
+begin
+  if SelDirDlgPathToGradle.Execute then
+  begin
+    EditPathToGradle.Text:= SelDirDlgPathToGradle.FileName;
+    FPathToGradle:= SelDirDlgPathToGradle.FileName;
   end;
 end;
 
@@ -304,6 +325,7 @@ begin
       EditPathToJavaJDK.Text := ReadString('NewProject','PathToJavaJDK', '');
       EditPathToAndroidSDK.Text := ReadString('NewProject','PathToAndroidSDK', '');
       EditPathToAntBinary.Text := ReadString('NewProject','PathToAntBin', '');
+      EditpathToGradle.Text :=  ReadString('NewProject','PathToGradle', '');
 
       if ReadString('NewProject','NDK', '') <> '' then
           indexNdk:= StrToInt(ReadString('NewProject','NDK', ''))
@@ -357,6 +379,9 @@ begin
 
     if EditPathToAntBinary.Text <> '' then
       WriteString('NewProject', 'PathToAntBin', EditPathToAntBinary.Text);
+
+    if (EditPathToGradle.Text <> '') then
+      WriteString('NewProject', 'PathToGradle', EditPathToGradle.Text);
 
     if RGNDKVersion.ItemIndex > 4 then
        WriteString('NewProject', 'NDK', '4')

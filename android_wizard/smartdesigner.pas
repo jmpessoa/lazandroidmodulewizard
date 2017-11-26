@@ -1194,6 +1194,7 @@ var
   strCustom: string;
   pathToDemoNDK: string;
   pathToDemoSDK, FNDKIndex: string;
+  demoSysOrigin: string;
 begin
 
   strList:= TStringList.Create;
@@ -1219,10 +1220,23 @@ begin
   CopyFile(lpiFileName, lpiFileName+'.bak2');
 
   pathToDemoNDK := LazarusIDE.ActiveProject.CustomData.Values['NdkPath'];
+
+  if Pos(':', pathToDemoNDK) > 0 then
+    demoSysOrigin:= 'win'
+  else
+    demoSysOrigin:= 'linux';
+
   FNDKIndex := LamwGlobalSettings.GetNDK;
+
   if (pathToDemoNDK <> '') and (FPathToAndroidNDK <> '') then
   begin
       strLibraries:= LazarusIDE.ActiveProject.LazCompilerOptions.Libraries;
+
+      if demoSysOrigin = 'win' then
+         strLibraries:= StringReplace(strLibraries, '/', '\', [rfReplaceAll,rfIgnoreCase])
+      else
+         strLibraries:= StringReplace(strLibraries, '\', '/', [rfReplaceAll,rfIgnoreCase]);
+
       strResult:= StringReplace(strLibraries, pathToDemoNDK, FPathToAndroidNDK, [rfReplaceAll,rfIgnoreCase]);
 
       //Libraries
@@ -1230,16 +1244,22 @@ begin
       begin
         strResult:= StringReplace(strResult, '4.6', '4.9', [rfReplaceAll,rfIgnoreCase]);
       end;
+
       LazarusIDE.ActiveProject.LazCompilerOptions.Libraries:= strResult;
 
       //CustomOptions
       strCustom:= LazarusIDE.ActiveProject.LazCompilerOptions.CustomOptions;
+
+      if demoSysOrigin = 'win' then
+        strCustom:= StringReplace(strCustom, '/', '\', [rfReplaceAll,rfIgnoreCase])
+      else
+        strCustom:= StringReplace(strCustom, '\', '/', [rfReplaceAll,rfIgnoreCase]);
+
       strResult:= StringReplace(strCustom, pathToDemoNDK, FPathToAndroidNDK, [rfReplaceAll,rfIgnoreCase]);
       if (FNDKIndex = '3') or  (FNDKIndex = '4') or (FNDKIndex = '5') then
       begin
         strResult:= StringReplace(strResult, '4.6', '4.9', [rfReplaceAll,rfIgnoreCase]);
       end;
-
       LazarusIDE.ActiveProject.LazCompilerOptions.CustomOptions:= strResult;
       //  add/update  custom ...
       LazarusIDE.ActiveProject.CustomData.Values['NdkPath']:= FPathToAndroidNDK;
@@ -1288,12 +1308,9 @@ var
   pathToDemoNDK: string;
   pathToDemoSDK: string;
 begin
-
   Result := False;
-
   pathToDemoNDK:= LazarusIDE.ActiveProject.CustomData.Values['NdkPath'];
   pathToDemoSDK:= LazarusIDE.ActiveProject.CustomData.Values['SdkPath'];
-
   if (pathToDemoNDK = '') and (pathToDemoSDK = '') then
   begin
     TryFindDemoPathsFromReadme(pathToDemoNDK, pathToDemoSDK);  // try "readme.txt"
@@ -1304,9 +1321,7 @@ begin
     LazarusIDE.ActiveProject.CustomData.Values['NdkPath']:= pathToDemoNDK;
     LazarusIDE.ActiveProject.CustomData.Values['SdkPath']:= pathToDemoSDK;
   end;
-
   if (pathToDemoNDK = FPathToAndroidNDK) and (pathToDemoSDK = FPathToAndroidSDK) then Exit;
-
   Result:= True;
 end;
 

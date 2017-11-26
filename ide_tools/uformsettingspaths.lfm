@@ -1,13 +1,13 @@
 object FormSettingsPaths: TFormSettingsPaths
   Left = 447
-  Height = 520
-  Top = 164
+  Height = 568
+  Top = 96
   Width = 430
   Anchors = []
   AutoSize = True
   BorderStyle = bsSizeToolWin
   Caption = 'LAMW: Android Module Wizard: Path Settings'
-  ClientHeight = 520
+  ClientHeight = 568
   ClientWidth = 430
   Constraints.MinHeight = 520
   Constraints.MinWidth = 430
@@ -83,7 +83,7 @@ object FormSettingsPaths: TFormSettingsPaths
     AnchorSideRight.Side = asrBottom
     Left = 347
     Height = 30
-    Top = 457
+    Top = 501
     Width = 75
     Anchors = [akRight]
     BorderSpacing.Around = 8
@@ -99,7 +99,7 @@ object FormSettingsPaths: TFormSettingsPaths
     AnchorSideRight.Control = BitBtnOK
     Left = 264
     Height = 30
-    Top = 457
+    Top = 501
     Width = 75
     Anchors = [akTop, akRight]
     BorderSpacing.Around = 8
@@ -116,7 +116,7 @@ object FormSettingsPaths: TFormSettingsPaths
     AnchorSideRight.Control = SpBPathToAndroidNDK
     Left = 8
     Height = 23
-    Top = 203
+    Top = 256
     Width = 383
     Anchors = [akTop, akLeft, akRight]
     BorderSpacing.Around = 8
@@ -128,7 +128,7 @@ object FormSettingsPaths: TFormSettingsPaths
     AnchorSideTop.Side = asrBottom
     Left = 8
     Height = 15
-    Top = 180
+    Top = 233
     Width = 114
     BorderSpacing.Around = 8
     Caption = 'Path to Android NDK:'
@@ -160,11 +160,11 @@ object FormSettingsPaths: TFormSettingsPaths
   end
   object LabelPathToAndroidSDK: TLabel
     AnchorSideLeft.Control = Owner
-    AnchorSideTop.Control = BevelJDKAntAndSDKNDK
+    AnchorSideTop.Control = EditPathToGradle
     AnchorSideTop.Side = asrBottom
     Left = 8
     Height = 15
-    Top = 126
+    Top = 179
     Width = 111
     BorderSpacing.Around = 8
     Caption = 'Path to Android SDK:'
@@ -177,7 +177,7 @@ object FormSettingsPaths: TFormSettingsPaths
     AnchorSideRight.Control = SpBPathToAndroidSDK
     Left = 8
     Height = 23
-    Top = 149
+    Top = 202
     Width = 383
     Anchors = [akTop, akLeft, akRight]
     BorderSpacing.Around = 8
@@ -229,7 +229,7 @@ object FormSettingsPaths: TFormSettingsPaths
     AnchorSideRight.Side = asrBottom
     Left = 399
     Height = 22
-    Top = 149
+    Top = 202
     Width = 23
     Anchors = [akTop, akRight]
     BorderSpacing.Around = 8
@@ -256,11 +256,12 @@ object FormSettingsPaths: TFormSettingsPaths
     AnchorSideTop.Side = asrBottom
     AnchorSideRight.Control = Owner
     AnchorSideRight.Side = asrBottom
-    Left = 0
+    Left = 8
     Height = 2
     Top = 116
-    Width = 430
+    Width = 414
     Anchors = [akTop, akLeft, akRight]
+    BorderSpacing.Around = 8
   end
   object RGNDKVersion: TRadioGroup
     AnchorSideLeft.Control = Owner
@@ -268,7 +269,7 @@ object FormSettingsPaths: TFormSettingsPaths
     AnchorSideTop.Side = asrBottom
     Left = 8
     Height = 47
-    Top = 288
+    Top = 341
     Width = 232
     AutoFill = True
     BorderSpacing.Around = 8
@@ -299,7 +300,7 @@ object FormSettingsPaths: TFormSettingsPaths
   object StatusBar1: TStatusBar
     Left = 0
     Height = 23
-    Top = 497
+    Top = 545
     Width = 430
     Panels = <>
   end
@@ -310,10 +311,10 @@ object FormSettingsPaths: TFormSettingsPaths
     AnchorSideTop.Side = asrBottom
     Left = 248
     Height = 47
-    Top = 288
+    Top = 341
     Width = 144
     Anchors = [akTop, akLeft, akRight]
-    Caption = 'NDK Toolchains Prebuild'
+    Caption = 'Your Desktop System'
     ClientHeight = 27
     ClientWidth = 140
     TabOrder = 9
@@ -334,7 +335,7 @@ object FormSettingsPaths: TFormSettingsPaths
     AnchorSideTop.Side = asrBottom
     Left = 8
     Height = 133
-    Top = 343
+    Top = 396
     Width = 103
     AutoSize = True
     BorderSpacing.Around = 8
@@ -977,7 +978,7 @@ object FormSettingsPaths: TFormSettingsPaths
     AnchorSideRight.Side = asrBottom
     Left = 400
     Height = 22
-    Top = 295
+    Top = 348
     Width = 23
     Anchors = [akTop, akRight]
     BorderSpacing.Around = 7
@@ -1026,7 +1027,7 @@ object FormSettingsPaths: TFormSettingsPaths
     AnchorSideRight.Side = asrBottom
     Left = 399
     Height = 22
-    Top = 203
+    Top = 256
     Width = 23
     Anchors = [akTop, akRight]
     BorderSpacing.Around = 8
@@ -1040,7 +1041,7 @@ object FormSettingsPaths: TFormSettingsPaths
     AnchorSideRight.Control = SpBPathToJavaTemplates
     Left = 8
     Height = 23
-    Top = 257
+    Top = 310
     Width = 383
     Anchors = [akTop, akLeft, akRight]
     BorderSpacing.Around = 8
@@ -1052,7 +1053,7 @@ object FormSettingsPaths: TFormSettingsPaths
     AnchorSideTop.Side = asrBottom
     Left = 8
     Height = 15
-    Top = 234
+    Top = 287
     Width = 170
     BorderSpacing.Around = 8
     Caption = 'Path to [LAMW] Java Templates:'
@@ -1065,16 +1066,51 @@ object FormSettingsPaths: TFormSettingsPaths
     AnchorSideRight.Side = asrBottom
     Left = 399
     Height = 22
-    Top = 257
+    Top = 310
     Width = 23
     Anchors = [akTop, akRight]
     BorderSpacing.Around = 8
     Caption = '...'
     OnClick = SpBPathToJavaTemplatesClick
   end
+  object LabelPathToGradle: TLabel
+    AnchorSideLeft.Control = Owner
+    AnchorSideTop.Control = BevelJDKAntAndSDKNDK
+    Left = 8
+    Height = 15
+    Top = 124
+    Width = 290
+    BorderSpacing.Around = 8
+    Caption = 'Path to Gradle [Optional ...]  [ex. C:\lamw\gradle-3.5.1 ]'
+    ParentColor = False
+  end
+  object EditPathToGradle: TEdit
+    AnchorSideLeft.Control = Owner
+    AnchorSideTop.Control = LabelPathToGradle
+    AnchorSideRight.Control = SpBPathToGradle
+    Left = 8
+    Height = 23
+    Top = 148
+    Width = 383
+    Anchors = [akTop, akLeft, akRight]
+    BorderSpacing.Top = 16
+    BorderSpacing.Around = 8
+    TabOrder = 10
+    TextHint = 'Optional...'
+  end
+  object SpBPathToGradle: TSpeedButton
+    AnchorSideTop.Control = EditPathToGradle
+    Left = 399
+    Height = 22
+    Top = 148
+    Width = 23
+    Anchors = [akTop, akRight]
+    Caption = '...'
+    OnClick = SpBPathToGradleClick
+  end
   object SelDirDlgPathToAndroidNDK: TSelectDirectoryDialog
-    left = 240
-    top = 176
+    left = 96
+    top = 240
   end
   object SelDirDlgPathToJavaJDK: TSelectDirectoryDialog
     left = 336
@@ -1082,14 +1118,18 @@ object FormSettingsPaths: TFormSettingsPaths
   end
   object SelDirDlgPathToAndroidSDK: TSelectDirectoryDialog
     left = 240
-    top = 120
+    top = 184
   end
   object SelDirDlgPathToAntBinary: TSelectDirectoryDialog
-    left = 344
-    top = 80
+    left = 224
+    top = 64
   end
   object SelDirDlgPathToJavaTemplates: TSelectDirectoryDialog
     left = 240
-    top = 232
+    top = 296
+  end
+  object SelDirDlgPathToGradle: TSelectDirectoryDialog
+    left = 160
+    top = 128
   end
 end
