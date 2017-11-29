@@ -82,6 +82,7 @@ type
     FPathToAndroidSDK: string;
     FPathToAndroidNDK: string;
     FPathToAntBin: string;
+    FPathToGradle: string;
 
     FProjectModel: string;
 
@@ -137,6 +138,7 @@ type
     property PathToAndroidSDK: string read FPathToAndroidSDK write FPathToAndroidSDK;
     property PathToAndroidNDK: string read FPathToAndroidNDK write FPathToAndroidNDK;
     property PathToAntBin: string read FPathToAntBin write FPathToAntBin;
+    property PathToGradle: string read FPathToGradle write FPathToGradle;
     property ProjectModel: string read FProjectModel write FProjectModel; {eclipse or ant}
     property PackagePrefaceName: string read FPackagePrefaceName write FPackagePrefaceName;
     property MinApi: string read FMinApi write FMinApi;
@@ -748,6 +750,8 @@ begin
           end;
       end;
 
+      FPathToGradle:= ReadString('NewProject','PathToGradle', '');  //optional ...
+
       FPathToAndroidSDK:= ReadString('NewProject','PathToAndroidSDK', '');
       if  FPathToAndroidSDK = '' then
       begin
@@ -1209,6 +1213,7 @@ begin
       WriteString('NewProject', 'PathToAndroidNDK', FPathToAndroidNDK);
       WriteString('NewProject', 'PathToAndroidSDK', FPathToAndroidSDK);
       WriteString('NewProject', 'PathToAntBin', FPathToAntBin);
+      WriteString('NewProject', 'PathToGradle', FPathToGradle);  //optional ...
 
       FPrebuildOSYS:= GetPrebuiltDirectory();
       WriteString('NewProject', 'PrebuildOSYS', FPrebuildOSYS);
