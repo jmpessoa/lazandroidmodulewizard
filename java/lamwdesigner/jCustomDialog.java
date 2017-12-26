@@ -1,7 +1,6 @@
 package com.example.appcustomdialogdemo1;
 
 import java.lang.reflect.Field;
-
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -9,7 +8,6 @@ import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewGroup.MarginLayoutParams;
 import android.view.Window;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.RelativeLayout;
@@ -30,16 +28,11 @@ public class jCustomDialog extends RelativeLayout {
 	private ViewGroup parent   = null;         // parent view
 	private ViewGroup.MarginLayoutParams lparams = null;              // layout XYWH
 
-	//private OnClickListener onClickListener;   // click event
-	//private Boolean enabled  = true;           // click-touch enabled!
-
 	private int lparamsAnchorRule[] = new int[30];
 	private int countAnchorRule = 0;
 	private int lparamsParentRule[] = new int[30];
 	private int countParentRule = 0;
 
-	//private int lparamH = android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
-	//private int lparamW = android.view.ViewGroup.LayoutParams.MATCH_PARENT;
 	private int lparamH = 100;
 	private int lparamW = 100;
 	private int marginLeft = 0;
@@ -58,16 +51,19 @@ public class jCustomDialog extends RelativeLayout {
 	private String mIconIdentifier = "ic_launcher";   //default icon  ../res/drawable
 	private String mTitle = "Information";
 	boolean mRemovedFromParent = false; //no parent!
+	
+	//boolean mCloseOnBackKeyPressed = true;
+	//boolean mCanceledOnTouchOutside = true;
+	
+	boolean FCancelable = true;
 
 	//GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
-
 	public jCustomDialog(Controls _ctrls, long _Self) { //Add more others news "_xxx"p arams if needed!
 		super(_ctrls.activity);
 		context   = _ctrls.activity;
 		pascalObj = _Self;
 		controls  = _ctrls;
 
-	    //lparams = new LayoutParams(lparamW, lparamH);  
 		lparams = new ViewGroup.MarginLayoutParams(lparamW, lparamH);     // W,H
 		lparams.setMargins(marginLeft,marginTop,marginRight,marginBottom); // L,T,R,B
 
@@ -99,14 +95,10 @@ public class jCustomDialog extends RelativeLayout {
 	public void SetViewParent(ViewGroup _viewgroup) {
 		if (parent != null) { parent.removeView(this); }
 		parent = _viewgroup;
-
-	    //parent.addView(this,lparams);
-	    
 		parent.addView(this,newLayoutParams(parent,(ViewGroup.MarginLayoutParams)lparams));		
 		lparams = null;
 		lparams = (ViewGroup.MarginLayoutParams)this.getLayoutParams();
-
-		mRemovedFromParent = false; //now there is a parent!
+		mRemovedFromParent = false; 
 	}
 
 	public void RemoveFromViewParent() {
@@ -226,15 +218,16 @@ public class jCustomDialog extends RelativeLayout {
 		}
 	}
 
-	public void Show() {	//0: vis; 4: inv; 8: gone
-		Show(mTitle, mIconIdentifier);
+	public void Show() {			
+	    Show(mTitle, mIconIdentifier);
 	}
 
-	public void Show(String _title) {	//0: vis; 4: inv; 8: gone
-		Show(_title, mIconIdentifier);
+	public void Show(String _title) {	
+	    Show(_title, mIconIdentifier);
 	}
 
-	public void Show(String _title, String _iconIdentifier) {	//0: vis; 4: inv; 8: gone
+	public void Show(String _title, String _iconIdentifier) {	
+									
 		mTitle = _title;
 		mIconIdentifier = _iconIdentifier;
 		if (mDialog != null) {
@@ -254,8 +247,10 @@ public class jCustomDialog extends RelativeLayout {
 			mDialog.requestWindowFeature(Window.FEATURE_LEFT_ICON);
 			mDialog.setContentView(this);
 			mDialog.setFeatureDrawableResource(Window.FEATURE_LEFT_ICON, GetDrawableResourceId(mIconIdentifier));
-			mDialog.setTitle(mTitle);
-
+			mDialog.setTitle(mTitle);			
+			//mDialog.setCanceledOnTouchOutside(mCanceledOnTouchOutside);
+			mDialog.setCancelable(FCancelable);
+			
 			//fix by @renabor
 			mDialog.setOnKeyListener(new Dialog.OnKeyListener() {
 				@Override
@@ -263,7 +258,11 @@ public class jCustomDialog extends RelativeLayout {
 					if (event.getAction() == KeyEvent.ACTION_UP) {
 						if (keyCode == KeyEvent.KEYCODE_BACK) {
 							controls.pOnCustomDialogBackKeyPressed(pascalObj, mTitle);
-							if (mDialog != null) mDialog.dismiss();
+							/*
+							if (mDialog != null) { 
+								if (mCloseOnBackKeyPressed) mDialog.dismiss();
+							}
+							*/	
 							return false;
 						} else if (keyCode == KeyEvent.KEYCODE_ENTER) {
 							InputMethodManager imm = (InputMethodManager) controls.activity.getSystemService(Context.INPUT_METHOD_SERVICE);
@@ -275,8 +274,7 @@ public class jCustomDialog extends RelativeLayout {
 					return false;
 				}
 			});
-
-			this.setVisibility(android.view.View.VISIBLE);
+			this.setVisibility(android.view.View.VISIBLE);  // //0: vis; 4: inv; 8: gone
 			controls.pOnCustomDialogShow(pascalObj, mDialog, mTitle);
 			mDialog.show();
 		}
@@ -295,7 +293,22 @@ public class jCustomDialog extends RelativeLayout {
 
 	public void Close() {
 		if (mDialog != null) mDialog.dismiss();
+	}	
+	
+	/*
+	public void SetCloseOnBackKeyPressed(boolean _value) {
+		mCloseOnBackKeyPressed = _value;
 	}
+	
+	public void SetCanceledOnTouchOutside(boolean _value) {
+		mCanceledOnTouchOutside = _value;
+	}
+	*/
+	
+	public void SetCancelable(boolean _value) {
+	   FCancelable = _value;
+	}
+	
 } //end class
 
 

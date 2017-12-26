@@ -21,6 +21,10 @@ type
     FIconIdentifier: string;    // -->>  ../res/drawable  ex: just 'ic_launcher' [not 'ic_launcher.png']
     FOnShow: TCustomDialogShow;
     FOnBackKeyPressed: TCustomDialogBackKeyPressed;
+    //FCloseOnBackKeyPressed: boolean;
+    //FCanceledOnTouchOutside: boolean;
+    FCancelable: boolean;
+
     procedure SetColor(Value: TARGBColorBridge); //background
     procedure UpdateLParamHeight;
     procedure UpdateLParamWidth;
@@ -54,12 +58,19 @@ type
     procedure Show(_title: string); overload;
     procedure Show(_title: string; _iconIdentifier: string); overload;
     procedure Close();
+    //procedure SetCloseOnBackKeyPressed(_value: boolean);
+    //procedure SetCanceledOnTouchOutside(_value: boolean);
+     procedure SetCancelable(_value: boolean);
+
     procedure GenEvent_OnCustomDialogShow(Obj: TObject; dialog: jObject; title: string);
     procedure GenEvent_OnCustomDialogBackKeyPressed(Obj: TObject; title: string);
   published
     property Text: string read GetText write SetText;
     property IconIdentifier: string read FIconIdentifier write SetIconIdentifier;
     property BackgroundColor: TARGBColorBridge read FColor write SetColor;
+    //property CloseOnBackKeyPressed: boolean  read FCloseOnBackKeyPressed write SetCloseOnBackKeyPressed;
+    //property CanceledOnTouchOutside: boolean   read FCanceledOnTouchOutside write SetCanceledOnTouchOutside;
+    property Cancelable: boolean read FCancelable write SetCancelable;
     property OnShow: TCustomDialogShow read FOnShow write FOnShow;
     property OnBackKeyPressed: TCustomDialogBackKeyPressed read FOnBackKeyPressed write FOnBackKeyPressed;
   end;
@@ -85,6 +96,9 @@ procedure jCustomDialog_Show(env: PJNIEnv; _jcustomdialog: JObject; _title: stri
 procedure jCustomDialog_SetTitle(env: PJNIEnv; _jcustomdialog: JObject; _title: string);
 procedure jCustomDialog_SetIconIdentifier(env: PJNIEnv; _jcustomdialog: JObject; _iconIdentifier: string);
 procedure jCustomDialog_Close(env: PJNIEnv; _jcustomdialog: JObject);
+//procedure jCustomDialog_SetCloseOnBackKeyPressed(env: PJNIEnv; _jcustomdialog: JObject; _value: boolean);
+//procedure jCustomDialog_SetCanceledOnTouchOutside(env: PJNIEnv; _jcustomdialog: JObject; _value: boolean);
+procedure jCustomDialog_SetCancelable(env: PJNIEnv; _jcustomdialog: JObject; _value: boolean);
 
 
 implementation
@@ -103,6 +117,9 @@ begin
   FLParamWidth  := lpMatchParent;  //lpWrapContent
   FLParamHeight := lpWrapContent; //lpMatchParent
   FAcceptChildrenAtDesignTime:= True;
+  //FCloseOnBackKeyPressed:= True;
+  //FCanceledOnTouchOutside:= True;
+  FCancelable:= True;
     //your code here....
   FVisible:= False;
 end;
@@ -185,6 +202,17 @@ begin
 
   if  FColor <> colbrDefault then
     View_SetBackGroundColor(FjEnv, FjThis, FjObject{FjRLayout}{wiew!}, GetARGB(FCustomColor, FColor));
+
+  {
+  if not FCloseOnBackKeyPressed then
+    jCustomDialog_SetCloseOnBackKeyPressed(FjEnv, FjObject, FCloseOnBackKeyPressed);
+
+  if not CanceledOnTouchOutside then
+     jCustomDialog_SetCanceledOnTouchOutside(FjEnv, FjObject, FCanceledOnTouchOutside);
+   }
+
+   if not FCancelable then
+      jCustomDialog_SetCancelable(FjEnv, FjObject, FCancelable);
 
   View_SetVisible(FjEnv, FjThis, FjObject, FVisible);
 end;
@@ -423,6 +451,32 @@ begin
   //in designing component state: set value here...
   if FInitialized then
     jCustomDialog_Close(FjEnv, FjObject);
+end;
+
+{
+procedure jCustomDialog.SetCloseOnBackKeyPressed(_value: boolean);
+begin
+  //in designing component state: set value here...
+  FCloseOnBackKeyPressed:= _value;
+  if FInitialized then
+     jCustomDialog_SetCloseOnBackKeyPressed(FjEnv, FjObject, FCloseOnBackKeyPressed);
+end;
+
+procedure jCustomDialog.SetCanceledOnTouchOutside(_value: boolean);
+begin
+  //in designing component state: set value here...
+  FCanceledOnTouchOutside:= _value;
+  if FInitialized then
+     jCustomDialog_SetCanceledOnTouchOutside(FjEnv, FjObject, FCanceledOnTouchOutside);
+end;
+}
+
+procedure jCustomDialog.SetCancelable(_value: boolean);
+begin
+  //in designing component state: set value here...
+  FCancelable:= _value;
+  if FInitialized then
+     jCustomDialog_SetCancelable(FjEnv, FjObject, FCancelable);
 end;
 
 procedure jCustomDialog.GenEvent_OnCustomDialogShow(Obj: TObject; dialog: jObject; title: string);
@@ -690,6 +744,47 @@ begin
   jCls:= env^.GetObjectClass(env, _jcustomdialog);
   jMethod:= env^.GetMethodID(env, jCls, 'Close', '()V');
   env^.CallVoidMethod(env, _jcustomdialog, jMethod);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+{
+procedure jCustomDialog_SetCloseOnBackKeyPressed(env: PJNIEnv; _jcustomdialog: JObject; _value: boolean);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].z:= JBool(_value);
+  jCls:= env^.GetObjectClass(env, _jcustomdialog);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetCloseOnBackKeyPressed', '(Z)V');
+  env^.CallVoidMethodA(env, _jcustomdialog, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jCustomDialog_SetCanceledOnTouchOutside(env: PJNIEnv; _jcustomdialog: JObject; _value: boolean);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].z:= JBool(_value);
+  jCls:= env^.GetObjectClass(env, _jcustomdialog);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetCanceledOnTouchOutside', '(Z)V');
+  env^.CallVoidMethodA(env, _jcustomdialog, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+}
+
+procedure jCustomDialog_SetCancelable(env: PJNIEnv; _jcustomdialog: JObject; _value: boolean);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].z:= JBool(_value);
+  jCls:= env^.GetObjectClass(env, _jcustomdialog);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetCancelable', '(Z)V');
+  env^.CallVoidMethodA(env, _jcustomdialog, jMethod, @jParams);
   env^.DeleteLocalRef(env, jCls);
 end;
 
