@@ -432,7 +432,6 @@ begin
 
 end;
 
-//experimental....
 function TLamwSmartDesigner.TryAddJControl(jclassname: string;
   out nativeAdded: boolean): boolean;
 var
@@ -669,23 +668,8 @@ begin
      aux:= StringReplace(auxList.Text,'WAPPNAME',  list.Strings[list.Count-2], [rfIgnoreCase]);
      auxList.Text:= aux;
      auxList.SaveToFile(FPathToAndroidProject+'res'+DirectorySeparator+'layout'+DirectorySeparator+LowerCase(jclassname)+'_layout.xml');
-     (*
-     if jclassname = 'jSMSWidgetProvider' then
-       auxList.SaveToFile(FPathToAndroidProject+'res'+DirectorySeparator+'layout'+DirectorySeparator+'smswidgetlayout.xml');
-     if jclassname = 'jIncomingCallWidgetProvider' then
-       auxList.SaveToFile(FPathToAndroidProject+'res'+DirectorySeparator+'layout'+DirectorySeparator+'incomingcallwidgetlayout.xml');
-     *)
    end;
    //-----
-   (*
-   if FileExists(LamwGlobalSettings.PathToJavaTemplates+'lamwdesigner'+DirectorySeparator +jclassname+'.smswidgetinfo') then
-   begin
-     auxList.LoadFromFile(LamwGlobalSettings.PathToJavaTemplates+'lamwdesigner'+DirectorySeparator +jclassname+'.smswidgetinfo');
-     ForceDirectories(FPathToAndroidProject+'res'+DirectorySeparator+'xml');
-     auxList.SaveToFile(FPathToAndroidProject+'res'+DirectorySeparator+'xml'+DirectorySeparator+'smswidgetinfo.xml');
-   end;
-    *)
-
    if FileExists(LamwGlobalSettings.PathToJavaTemplates+'lamwdesigner'+DirectorySeparator +jclassname+'.info') then
    begin
      auxList.LoadFromFile(LamwGlobalSettings.PathToJavaTemplates+'lamwdesigner'+DirectorySeparator +jclassname+'.info');
@@ -695,20 +679,23 @@ begin
 
    if FileExists(LamwGlobalSettings.PathToJavaTemplates+'lamwdesigner'+DirectorySeparator +jclassname+'.jpg') then
    begin
-
      CopyFile(LamwGlobalSettings.PathToJavaTemplates+'lamwdesigner'+DirectorySeparator +jclassname+'.jpg',
           FPathToAndroidProject+'res'+DirectorySeparator+'drawable-hdpi'+DirectorySeparator+LowerCase(jclassname)+'_image.jpg');
-
-     (*
-     if jclassname = 'jSMSWidgetProvider' then
-       CopyFile(LamwGlobalSettings.PathToJavaTemplates+'lamwdesigner'+DirectorySeparator +jclassname+'.jpg',
-              FPathToAndroidProject+'res'+DirectorySeparator+'drawable-hdpi'+DirectorySeparator+'smswidgetbackgroundimage.jpg');
-
-     if jclassname = 'jIncomingCallWidgetProvider' then
-       CopyFile(LamwGlobalSettings.PathToJavaTemplates+'lamwdesigner'+DirectorySeparator +jclassname+'.jpg',
-           FPathToAndroidProject+'res'+DirectorySeparator+'drawable-hdpi'+DirectorySeparator+'incomingcallwidgetbackgroundimage.jpg');
-     *)
-
+   end;
+   //-----
+   //try fix "gradle.build"
+   if FileExists(LamwGlobalSettings.PathToJavaTemplates+'lamwdesigner'+DirectorySeparator +jclassname+'.dependencies') then
+   begin
+      auxList.LoadFromFile(LamwGlobalSettings.PathToJavaTemplates+'lamwdesigner'+DirectorySeparator +jclassname+'.dependencies');
+      if auxList.Text <> '' then
+      begin
+        manifestList.LoadFromFile(FPathToAndroidProject+'build.gradle');
+        for i:= 0 to auxList.Count-1 do
+        begin
+           manifestList.Text:= StringReplace(manifestList.Text, '//'+auxList.Strings[i], auxList.Strings[i], [rfReplaceAll,rfIgnoreCase]);
+        end;
+        manifestList.SaveToFile(FPathToAndroidProject+'build.gradle');
+      end;
    end;
    //-----
    if listRequirements.Count > 0 then
@@ -996,7 +983,7 @@ begin
               if (str = 'TFPNoGUIGraphicsBridge')
               or FileExists(LamwGlobalSettings.PathToJavaTemplates + 'lamwdesigner' + PathDelim + str + '.java')
               then
-                jControls.Add(str);
+                  jControls.Add(str);
             end;
           end;
           CustomData['jControls'] := jControls.DelimitedText;
@@ -1011,14 +998,18 @@ end;
 function TLamwSmartDesigner.OnProjectSavingAll(Sender: TObject): TModalResult;
 var
   auxList, jcontrolsList, libList: TStringList;
-  j, p: Integer;
+  i, j, p: Integer;
   nativeExists: Boolean;
   aux, PathToJavaTemplates, chipArchitecture, LibPath: string;
   pathToNdkApiPlatforms, androidNdkApi, arch: string;
+  AndroidTheme: string;
+  compoundList: TStringList;
 begin
   Result := mrOk;
   if not LazarusIDE.ActiveProject.CustomData.Contains('LAMW') then Exit;
   if LazarusIDE.ActiveProject.CustomData.Values['LAMW'] <> 'GUI' then Exit;
+
+  AndroidTheme:= LazarusIDE.ActiveProject.CustomData.Values['Theme'];
 
   PathToJavaTemplates := LamwGlobalSettings.PathToJavaTemplates;   //included path delimiter
   UpdateStartModuleVarName;
@@ -1078,19 +1069,34 @@ begin
       auxList.SaveToFile(FPathToJavaSource+'Controls.java');
     end;
 
-    if FileExists(PathToJavaTemplates+'App.java') then
+    if Pos('AppCompat', AndroidTheme) > 0 then
     begin
-      auxList.LoadFromFile(PathToJavaTemplates+'App.java');
-      auxList.Strings[0]:= 'package '+FPackageName+';';
-      auxList.SaveToFile(FPathToJavaSource+'App.java');
+      if FileExists(PathToJavaTemplates + DirectorySeparator + 'lamwdesigner'+DirectorySeparator+'support'+DirectorySeparator+'App.java') then
+        auxList.LoadFromFile(PathToJavaTemplates + DirectorySeparator + 'lamwdesigner'+DirectorySeparator+'support'+DirectorySeparator+'App.java');
+    end
+    else
+    begin
+      if FileExists(PathToJavaTemplates + DirectorySeparator + 'App.java') then
+         auxList.LoadFromFile(PathToJavaTemplates + DirectorySeparator + 'App.java');
     end;
 
-    if FileExists(LamwGlobalSettings.PathToJavaTemplates+'lamwdesigner'+DirectorySeparator +'jCommons.java') then
+    auxList.Strings[0]:= 'package '+FPackageName+';';
+    auxList.SaveToFile(FPathToJavaSource+'App.java');
+
+    if Pos('AppCompat', AndroidTheme) > 0 then
     begin
-      auxList.LoadFromFile(LamwGlobalSettings.PathToJavaTemplates+'lamwdesigner'+DirectorySeparator +'jCommons.java');
-      auxList.Strings[0]:= 'package '+FPackageName+';';
-      auxList.SaveToFile(FPathToJavaSource+'jCommons.java');
+      if FileExists(LamwGlobalSettings.PathToJavaTemplates+DirectorySeparator
+                    +'lamwdesigner'+DirectorySeparator+'support'+DirectorySeparator+'jCommons.java') then
+        auxList.LoadFromFile(LamwGlobalSettings.PathToJavaTemplates+DirectorySeparator +'lamwdesigner'+DirectorySeparator+'support'+DirectorySeparator+'jCommons.java');
+    end
+    else
+    begin
+      if FileExists(LamwGlobalSettings.PathToJavaTemplates+'lamwdesigner'+DirectorySeparator +'jCommons.java') then
+        auxList.LoadFromFile(LamwGlobalSettings.PathToJavaTemplates+'lamwdesigner'+DirectorySeparator +'jCommons.java');
     end;
+    auxList.Strings[0]:= 'package '+FPackageName+';';
+    auxList.SaveToFile(FPathToJavaSource+'jCommons.java');
+
     libList.Free;
   end;  //CanUpdateJavaTemplate
 
@@ -1105,10 +1111,26 @@ begin
   jcontrolsList.Duplicates := dupIgnore;
   GetAllJControlsFromForms(jcontrolsList);
 
+  compoundList:= TStringList.Create;
+  for i:= 0 to jcontrolsList.Count - 1 do       //Add compound support
+  begin
+    if FileExists(PathToJavaTemplates+'lamwdesigner'+PathDelim+jcontrolsList.Strings[j]+'.compound') then
+    begin
+      compoundList.LoadFromFile(LamwGlobalSettings.PathToJavaTemplates+'lamwdesigner'+DirectorySeparator +jcontrolsList.Strings[i]+'.compound');
+      for j:= 0 to compoundList.Count - 1 do
+      begin
+         jcontrolsList.Add(compoundList.Strings[j]);
+      end;
+    end;
+  end;
+  compoundList.Free;
+
   //re-add all [updated] java code ...
   for j := 0 to jcontrolsList.Count - 1 do
+  begin
     if FileExists(PathToJavaTemplates+'lamwdesigner'+PathDelim+jcontrolsList.Strings[j]+'.java') then
-      TryAddJControl(jcontrolsList[j], nativeExists);
+       TryAddJControl(jcontrolsList[j], nativeExists);
+  end;
 
   if jcontrolsList.IndexOf('TFPNoGUIGraphicsBridge') >= 0 then   //handle lib freetype need by TFPNoGUIGraphicsBridge
   begin                                                                         //lamwdesigner\libs\armeabi\libfreetype.so
