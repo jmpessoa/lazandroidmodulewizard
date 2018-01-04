@@ -755,6 +755,7 @@ begin
       gradleVersion:= '4.1';
   end;
 
+  lisDir.Free;
 end;
 
 function TAndroidProjectDescriptor.GetWorkSpaceFromForm(projectType: integer; out outTag: integer): boolean;
