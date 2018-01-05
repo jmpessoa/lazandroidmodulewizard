@@ -1566,20 +1566,10 @@ begin
           {$ENDIF}
 
           {$IFDEF WINDOWS}
-          tempStr:= FPathToAndroidSDK;
-          SplitStr(tempStr, ':');
-          tempList:= TStringList.Create;
-          tempList.Delimiter:= '\';
-          tempList.StrictDelimiter:= True;
-          tempList.DelimitedText:= Trim(tempStr);
-          tempStr:= 'sdk.dir=C\:\\';
-          for j:= 0 to tempList.Count-1 do
-          begin
-            if tempList.Strings[j] <> '' then
-               tempStr:= tempStr + tempList.Strings[j] + '\\';
-          end;
-          strList.Add( Copy(tempStr,1, Length(tempStr)-2) ) ;
-          tempList.Free;
+          tempStr:= ExcludeTrailingPathDelimiter(SetDirSeparators(FPathToAndroidSDK));
+          tempStr:= StringReplace(tempStr, '\', '\\', [rfReplaceAll]);
+          tempStr:= StringReplace(tempStr, ':', '\:', []);
+          strList.Add('sdk.dir=' + tempStr) ;
           {$ENDIF}
           strList.SaveToFile(FAndroidProjectName+PathDelim+'local.properties');
 
