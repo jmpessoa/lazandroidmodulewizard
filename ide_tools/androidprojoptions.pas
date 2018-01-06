@@ -59,6 +59,7 @@ type
   TLamwProjectOptions = class(TAbstractIDEOptionsEditor)
     cbTheme: TComboBox;
     cbLaunchIconSize: TComboBox;
+    cbBuildSystem: TComboBox;
     edLabel: TEdit;
     edVersionName: TEdit;
     ErrorPanel: TPanel;
@@ -67,6 +68,7 @@ type
     ImageList1: TImageList;
     imLauncherIcon: TImage;
     Label1: TLabel;
+    lblGradleHint: TLabel;
     Label2: TLabel;
     Label3: TLabel;
     Label4: TLabel;
@@ -74,6 +76,7 @@ type
     Label6: TLabel;
     Label7: TLabel;
     Label8: TLabel;
+    Label9: TLabel;
     lblErrorMessage: TLabel;
     PageControl1: TPageControl;
     PermissonGrid: TStringGrid;
@@ -83,8 +86,10 @@ type
     seVersionCode: TSpinEdit;
     SpeedButton1: TSpeedButton;
     SpeedButtonHintTheme: TSpeedButton;
+    tsMiscellaneous: TTabSheet;
     tsAppl: TTabSheet;
     tsManifest: TTabSheet;
+    procedure cbBuildSystemSelect(Sender: TObject);
     procedure cbLaunchIconSizeSelect(Sender: TObject);
     procedure PermissonGridCheckboxToggled({%H-}sender: TObject; {%H-}aCol,
       {%H-}aRow: Integer; {%H-}aState: TCheckboxState);
@@ -108,12 +113,14 @@ type
              (Size:96;  Suffix:'xhdpi'),
              (Size:144; Suffix:'xxhdpi'));
   private
+    IsLamwProject: Boolean;
     FManifest: TLamwAndroidManifestOptions;
     FIconsPath: string; // ".../res/drawable-"
     FChkBoxDrawData: array [TCheckBoxState] of record
       Details, DetailsHot: TThemedElementDetails;
       CSize: TSize;
     end;
+    FBuildSystem: string;
     FAllPermissionsState: TCheckBoxState;
     FAllPermissionsHot: Boolean;
     function GetAllPermissonsCheckBoxBounds(InRect: TRect): TRect;
@@ -604,8 +611,7 @@ end;
 
 { TLamwProjectOptions }
 
-procedure TLamwProjectOptions.SetControlsEnabled(ts: TTabSheet;
-  en: Boolean);
+procedure TLamwProjectOptions.SetControlsEnabled(ts: TTabSheet; en: Boolean);
 var
   i: Integer;
 begin
@@ -874,6 +880,11 @@ begin
   ShowLauncherIcon;
 end;
 
+procedure TLamwProjectOptions.cbBuildSystemSelect(Sender: TObject);
+begin
+  lblGradleHint.Visible := cbBuildSystem.Text = 'Gradle';
+end;
+
 procedure TLamwProjectOptions.PermissonGridCheckboxToggled(sender: TObject;
   aCol, aRow: Integer; aState: TCheckboxState);
 var
@@ -1120,20 +1131,29 @@ procedure TLamwProjectOptions.ReadSettings(AOptions: TAbstractIDEOptions);
 var
   proj: TLazProject;
   fn, s: string;
+  i: Integer;
 begin
   // reading manifest
   SetControlsEnabled(tsManifest, False);
   proj := LazarusIDE.ActiveProject;
   if (proj = nil) or (proj.IsVirtual) then Exit;
+  FBuildSystem := proj.CustomData['BuildSystem'];
+  i := cbBuildSystem.Items.IndexOf(FBuildSystem);
+  if i >= 0 then
+    cbBuildSystem.ItemIndex := i;
   fn := proj.MainFile.Filename;
   fn := Copy(fn, 1, Pos(PathDelim + 'jni' + PathDelim, fn));
   fn := fn + 'AndroidManifest.xml';
+  IsLamwProject := False;
   if not FileExists(fn) then
-  begin
     ErrorMessage('"' + fn + '" not found!');
+  if not FileExists(fn) or not proj.CustomData.Contains('LAMW') then
+  begin
     tsAppl.Enabled := False;
+    tsMiscellaneous.Enabled := False;
     Exit;
   end;
+  IsLamwProject := True;
   try
     FIconsPath := ExtractFilePath(fn) + 'res' + PathDelim + 'drawable-';
     ShowLauncherIcon;
@@ -1175,6 +1195,8 @@ var
   i: Integer;
   s: string;
 begin
+  if not IsLamwProject then Exit;
+
   with FManifest do
   begin
     for i := PermissonGrid.RowCount - 1 downto 1 do
@@ -1204,6 +1226,8 @@ begin
       if Assigned(Objects[i]) then
         TPortableNetworkGraphic(Objects[i]).SaveToFile(FIconsPath
           + Drawable[i].Suffix + PathDelim + FManifest.IconFileName + '.png');
+
+  LazarusIDE.ActiveProject.CustomData['BuildSystem'] := cbBuildSystem.Text;
 end;
 
 initialization

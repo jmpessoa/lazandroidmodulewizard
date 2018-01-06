@@ -5,7 +5,7 @@ unit LamwSettings;
 interface
 
 uses
-  Classes, SysUtils, ProjectIntf, Forms;
+  Classes, SysUtils, ProjectIntf, Forms, IniFiles;
 
 type
 
@@ -18,24 +18,38 @@ type
     IniFileName = 'JNIAndroidProject.ini';
     IniFileSection = 'NewProject';
   private
+    FIniFile: TIniFile;
     FQueryPaths: Boolean; // prompt dialog if path is empty
     FPathToJavaTemplates: string;
     FPathToAndroidNDK: string;
     FPathToAndroidSDK: string;
     FPathToJavaJDK: string;
     FPathToAntBin: string;
+    FPathToGradle: string;
     FFPUSet: string;
     FInstructionSet: string;
-    function GetCanUpdateJavaTemplate: Boolean;
+    FDefaultBuildSystem: string;
+
+    function GetDefaultBuildSystem: string;
+    procedure ReloadIni;
+
+    function ReadIniString(const Key: string; const Def: string = ''): string; inline;
+    procedure SetDefaultBuildSystem(AValue: string);
+    procedure WriteIniString(const Key, Value: string);
+
     function GetPath(var APath: string; const IniIdent, QueryPrompt: string): string;
     function GetPathToAndroidNDK: string;
     function GetPathToAndroidSDK: string;
-    function GetPathToAntBin: string;
     function GetPathToJavaJDK: string;
     function GetPathToJavaTemplates: string;
+    function GetPathToAntBin: string;
+    function GetPathToGradle: string;
+
+    function GetCanUpdateJavaTemplate: Boolean;
     function GetInstructionSet: string;
   public
     constructor Create;
+    destructor Destroy; override;
     procedure ReloadPaths; // loading paths from INI
     function GetNDK: string;
 
@@ -52,8 +66,10 @@ type
     property PathToAndroidSDK: string read GetPathToAndroidSDK;
     property PathToJavaJDK: string read GetPathToJavaJDK;
     property PathToAntBin: string read GetPathToAntBin;
+    property PathToGradle: string read GetPathToGradle;
 
     property InstructionSet: string read GetInstructionSet;
+    property DefaultBuildSystem: string read GetDefaultBuildSystem write SetDefaultBuildSystem;
   end;
 
 var
@@ -61,8 +77,7 @@ var
 
 implementation
 
-uses LazIDEIntf, {SrcEditorIntf,} StdCtrls, EditBtn, Controls,
-  ButtonPanel, IniFiles;
+uses LazIDEIntf, StdCtrls, EditBtn, Controls, ButtonPanel;
 
 function QueryPath(APrompt: string; out Path: string;
   ACaption: string = 'Android Wizard: Path Missing!'): Boolean;
@@ -139,15 +154,45 @@ begin
   if (APath = '') and FQueryPaths then
   begin
     if QueryPath(QueryPrompt, APath) then
-      with TIniFile.Create(IncludeTrailingPathDelimiter(LazarusIDE.GetPrimaryConfigPath)
-        + IniFileName) do
-      try
-        WriteString(IniFileSection, IniIdent, APath);
-      finally
-        Free;
-      end;
+      WriteIniString(IniIdent, APath);
   end;
   Result := IncludeTrailingPathDelimiter(APath);
+end;
+
+procedure TLamwGlobalSettings.ReloadIni;
+begin
+  FIniFile.Free;
+  FIniFile := TIniFile.Create(IncludeTrailingPathDelimiter(LazarusIDE.GetPrimaryConfigPath) + IniFileName);
+  FIniFile.CacheUpdates := False;
+end;
+
+function TLamwGlobalSettings.GetDefaultBuildSystem: string;
+begin
+  Result := ReadIniString('DefaultBuildSystem', 'Ant');
+end;
+
+function TLamwGlobalSettings.GetPathToGradle: string;
+begin
+  Result := GetPath(FPathToGradle, 'PathToGradle',
+    'Path to Gradle: [ex. C:\adt32\gradle-2.10]');
+end;
+
+function TLamwGlobalSettings.ReadIniString(const Key: string;
+  const Def: string): string;
+begin
+  if FIniFile = nil then ReloadIni;
+  Result := FIniFile.ReadString(IniFileSection, Key, Def);
+end;
+
+procedure TLamwGlobalSettings.SetDefaultBuildSystem(AValue: string);
+begin
+  WriteIniString('DefaultBuildSystem', AValue);
+end;
+
+procedure TLamwGlobalSettings.WriteIniString(const Key, Value: string);
+begin
+  if FIniFile <> nil then
+    FIniFile.WriteString(IniFileSection, Key, Value);
 end;
 
 function TLamwGlobalSettings.GetCanUpdateJavaTemplate: Boolean;
@@ -155,14 +200,9 @@ var
   str: string;
 begin
   Result:= True;
-  with TIniFile.Create(IncludeTrailingPathDelimiter(LazarusIDE.GetPrimaryConfigPath)
-    + IniFileName) do
-  try
-    str := ReadString(IniFileSection, 'CanUpdateJavaTemplate', '');
-    if str = 'f' then Result:= False;
-  finally
-    Free;
-  end;
+  ReloadIni;
+  str := ReadIniString('CanUpdateJavaTemplate');
+  if str = 'f' then Result:= False;
 end;
 
 function TLamwGlobalSettings.GetPathToAndroidNDK: string;
@@ -191,12 +231,7 @@ end;
 
 function TLamwGlobalSettings.GetInstructionSet: string;
 begin
-  with TIniFile.Create(IncludeTrailingPathDelimiter(LazarusIDE.GetPrimaryConfigPath) + IniFileName) do
-    try
-      FInstructionSet:= ReadString(IniFileSection, 'InstructionSet', '');
-    finally
-      Free;
-  end;
+  FInstructionSet:= ReadIniString('InstructionSet');
   Result:= FInstructionSet;
 end;
 
@@ -205,33 +240,26 @@ begin
   FQueryPaths := True;
 end;
 
-procedure TLamwGlobalSettings.ReloadPaths;
-var
-  fname: string;
+destructor TLamwGlobalSettings.Destroy;
 begin
-  fname := IncludeTrailingPathDelimiter(LazarusIDE.GetPrimaryConfigPath) + IniFileName;
-  if not FileExists(fname) then Exit;
-  with TIniFile.Create(fname) do
-  try
-    FPathToJavaTemplates := ReadString(IniFileSection, 'PathToJavaTemplates', '');
-    FPathToAndroidSDK    := ReadString(IniFileSection, 'PathToAndroidSDK',    '');
-    FPathToAntBin        := ReadString(IniFileSection, 'PathToAntBin',        '');
-    FPathToJavaJDK       := ReadString(IniFileSection, 'PathToJavaJDK',       '');
-    FPathToAndroidNDK    := ReadString(IniFileSection, 'PathToAndroidNDK',    '');
-  finally
-    Free
-  end;
+  FIniFile.Free;
+  inherited Destroy;
+end;
+
+procedure TLamwGlobalSettings.ReloadPaths;
+begin
+  ReloadIni;
+  FPathToJavaTemplates := ReadIniString('PathToJavaTemplates');
+  FPathToAndroidSDK    := ReadIniString('PathToAndroidSDK');
+  FPathToJavaJDK       := ReadIniString('PathToJavaJDK');
+  FPathToAndroidNDK    := ReadIniString('PathToAndroidNDK');
+  FPathToAntBin        := ReadIniString('PathToAntBin');
+  FPathToGradle        := ReadIniString('PathToGradle');
 end;
 
 function TLamwGlobalSettings.GetNDK: string;
 begin
-  with TIniFile.Create(IncludeTrailingPathDelimiter(LazarusIDE.GetPrimaryConfigPath)
-    + IniFileName) do
-  try
-    Result := ReadString(IniFileSection, 'NDK', '');
-  finally
-    Free
-  end;
+  Result := ReadIniString('NDK');
 end;
 
 initialization

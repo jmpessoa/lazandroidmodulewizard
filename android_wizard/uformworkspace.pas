@@ -17,6 +17,7 @@ type
     BitBtnOK: TBitBtn;
     CheckBoxLibrary: TCheckBox;
     CheckBoxPIE: TCheckBox;
+    cbBuildSystem: TComboBox;
     ComboBoxTheme: TComboBox;
     ComboSelectProjectName: TComboBox;
     EditPackagePrefaceName: TEdit;
@@ -26,6 +27,7 @@ type
     GroupBox2: TGroupBox;
     GroupBox3: TGroupBox;
     GroupBox4: TGroupBox;
+    GroupBox5: TGroupBox;
     Image1: TImage;
     LabelTheme: TLabel;
     LabelPathToWorkspace: TLabel;
@@ -46,6 +48,7 @@ type
     SpeedButtonHintTheme: TSpeedButton;
     StatusBarInfo: TStatusBar;
 
+    procedure cbBuildSystemCloseUp(Sender: TObject);
     procedure CheckBoxLibraryClick(Sender: TObject);
     procedure CheckBoxPIEClick(Sender: TObject);
     procedure ComboBoxThemeChange(Sender: TObject);
@@ -110,6 +113,7 @@ type
     FAndroidTheme: string;
     FPieChecked: boolean;
     FLibraryChecked: boolean;
+    function GetBuildSystem: string;
 
   public
     { public declarations }
@@ -158,6 +162,7 @@ type
     property PieChecked: boolean read FPieChecked write FPieChecked;
     property LibraryChecked: boolean read FLibraryChecked write FLibraryChecked;
     //property DeviceType: string read FDeviceType write FDeviceType;
+    property BuildSystem: string read GetBuildSystem;
 
   end;
 
@@ -170,6 +175,8 @@ var
    FormWorkspace: TFormWorkspace;
 
 implementation
+
+uses LamwSettings;
 
 {$R *.lfm}
 
@@ -624,7 +631,10 @@ end;
 procedure TFormWorkspace.FormCreate(Sender: TObject);
 var
   fileName: string;
+  i: Integer;
 begin
+  i := cbBuildSystem.Items.IndexOf(LamwGlobalSettings.DefaultBuildSystem);
+  if i >= 0 then cbBuildSystem.ItemIndex := i;
 
   //FDeviceType:= 'phone';
   //Self.RGDeviceType.ItemIndex:= 0;
@@ -1053,6 +1063,18 @@ begin
   FLibraryChecked:=  CheckBoxLibrary.Checked;
 end;
 
+procedure TFormWorkspace.cbBuildSystemCloseUp(Sender: TObject);
+var
+  s: string;
+begin
+  if cbBuildSystem.Text = 'Gradle' then
+  begin
+    s := LowerCase(ExtractFileName(ExcludeTrailingPathDelimiter(LamwGlobalSettings.PathToJavaJDK)));
+    if Pos('1.7.', s) > 0 then
+      MessageDlg('You need JDK 1.8+ to use Gradle!', mtWarning, [mbOk], 0);
+  end;
+end;
+
 
 
 procedure TFormWorkspace.ComboSelectProjectNameKeyPress(Sender: TObject;
@@ -1102,6 +1124,11 @@ begin
                sLineBreak+'and modifier "styles.xml" [parent attribute]'+
                sLineBreak+'Example:'+
                sLineBreak+'<style name="AppBaseTheme" parent="android:Theme.Holo.Light">');
+end;
+
+function TFormWorkspace.GetBuildSystem: string;
+begin
+  Result := cbBuildSystem.Text;
 end;
 
 procedure TFormWorkspace.LoadSettings(const pFilename: string);  //called by ...
@@ -1171,6 +1198,8 @@ end;
 
 procedure TFormWorkspace.SaveSettings(const pFilename: string);
 begin
+   LamwGlobalSettings.DefaultBuildSystem := GetBuildSystem;
+
    with TInifile.Create(pFilename) do
    try
       WriteString('NewProject', 'PathToWorkspace', EditPathToWorkspace.Text);

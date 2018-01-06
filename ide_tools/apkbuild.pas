@@ -15,19 +15,31 @@ type
   TApkBuilder = class
   private
     FProj: TLazProject;
-    FSdkPath, FAntPath, FJdkPath, FNdkPath: string;
+    FSdkPath, FJdkPath, FNdkPath: string;
+    FAntPath, FGradlePath: string;
     FProjPath: string;
     FDevice: string;
     procedure BringToFrontEmulator;
     function CheckAvailableDevices: Boolean;
+    procedure CleanUp;
     function GetManifestSdkTarget(out SdkTarget: string): Boolean;
     procedure LoadPaths;
     function RunAndGetOutput(const cmd, params: string; Aout: TStrings): Integer;
     function TryFixPaths: TModalResult;
+
+    function FixBuildSystemConfig(ForceFixPaths: Boolean): TModalResult;
+    function FixAntConfig(ForceFixPaths: Boolean): TModalResult;
+    function FixGradleConfig({%H-}ForceFixPaths: Boolean): TModalResult;
+
+    function BuildByAnt: Boolean;
+    function InstallByAnt: Boolean;
+    procedure RunByAdb;
+
+    function BuildByGradle: Boolean;
+    procedure RunByGradle;
   public
     constructor Create(AProj: TLazProject);
-    function BuildAPK(Install: Boolean = False): Boolean;
-    function InstallAPK: Boolean;
+    function BuildAPK: Boolean;
     procedure RunAPK;
   end;
 
@@ -42,6 +54,7 @@ uses
 
 const
   SubToolAnt = 'ant';
+  SubToolGradle = 'gradle';
 
 type
 
@@ -52,6 +65,105 @@ type
     procedure ReadLine(Line: string; OutputIndex: integer; var Handled: boolean); override;
     class function DefaultSubTool: string; override;
   end;
+
+  { TGradleParser }
+
+  TGradleParser = class(TExtToolParser)
+  private
+    FFailureGot: Boolean;
+  public
+    procedure InitReading; override;
+    procedure ReadLine(Line: string; OutputIndex: integer; var Handled: boolean); override;
+    class function DefaultSubTool: string; override;
+  end;
+
+function CollectDirs(const PathMask: string): TStringList;
+var
+  dir: TSearchRec;
+begin
+  Result := TStringList.Create;
+  if FindFirst(PathMask, faDirectory, dir) = 0 then
+    repeat
+      if dir.Name[1] <> '.' then
+        Result.Add(dir.Name);
+    until (FindNext(dir) <> 0);
+  FindClose(dir);
+end;
+
+function ChooseDlg(const Title, Prompt: string; sl: TStringList; var s: string): Boolean;
+var
+  lb: TListBox;
+  f: TForm;
+begin
+  f := TForm.Create(nil);
+  try
+    f.Position := poScreenCenter;
+    f.Caption := Title;
+    f.AutoSize := True;
+    f.BorderIcons := [biSystemMenu];
+    with TLabel.Create(f) do
+    begin
+      Parent := f;
+      Align := alTop;
+      BorderSpacing.Around := 6;
+      Caption := Prompt;
+    end;
+    lb := TListBox.Create(f);
+    lb.Parent := f;
+    lb.Align := alClient;
+    lb.Items.Assign(sl);
+    lb.BorderSpacing.Around := 6;
+    lb.Constraints.MinHeight := 200;
+    lb.ItemIndex := 0;
+    with TButtonPanel.Create(f) do
+    begin
+      Parent := f;
+      ShowButtons := [pbOK, pbCancel];
+      ShowBevel := False;
+    end;
+    if f.ShowModal <> mrOk then Exit(False);
+    s := lb.Items[lb.ItemIndex];
+    Result := True;
+  finally
+    f.Free;
+  end;
+end;
+
+{ TGradleParser }
+
+procedure TGradleParser.InitReading;
+begin
+  inherited InitReading;
+  FFailureGot := False;
+end;
+
+procedure TGradleParser.ReadLine(Line: string; OutputIndex: integer;
+  var Handled: boolean);
+var
+  msgLine: TMessageLine;
+begin
+  msgLine := CreateMsgLine(OutputIndex);
+  msgLine.Msg := Line;
+  msgLine.Urgency := mluProgress;
+  if Trim(Line) <> '' then
+  begin
+    if Pos('FAILURE', Line) > 0 then
+    begin
+      FFailureGot := True;
+      msgLine.Urgency := mluFatal;
+      Tool.ErrorMessage := Line;
+    end else
+    if FFailureGot then
+      msgLine.Urgency := mluImportant;
+  end;
+  AddMsgLine(msgLine);
+  Handled := True;
+end;
+
+class function TGradleParser.DefaultSubTool: string;
+begin
+  Result := SubToolGradle;
+end;
 
 { TAntParser }
 
@@ -83,9 +195,12 @@ procedure TApkBuilder.LoadPaths;
 begin
   LamwGlobalSettings.QueryPaths := True;
   FSdkPath := LamwGlobalSettings.PathToAndroidSDK;
-  FAntPath := LamwGlobalSettings.PathToAntBin;
   FJdkPath := LamwGlobalSettings.PathToJavaJDK;
   FNdkPath := LamwGlobalSettings.PathToAndroidNDK;
+  if FProj.CustomData['BuildSystem'] = 'Gradle' then
+    FGradlePath := LamwGlobalSettings.PathToGradle
+  else
+    FAntPath := LamwGlobalSettings.PathToAntBin;
 end;
 
 function TApkBuilder.RunAndGetOutput(const cmd, params: string;
@@ -149,58 +264,6 @@ begin
 end;
 
 function TApkBuilder.TryFixPaths: TModalResult;
-
-  function ChooseDlg(const Title, Prompt: string; sl: TStringList; var s: string): Boolean;
-  var
-    lb: TListBox;
-    f: TForm;
-  begin
-    f := TForm.Create(nil);
-    try
-      f.Position := poScreenCenter;
-      f.Caption := Title;
-      f.AutoSize := True;
-      f.BorderIcons := [biSystemMenu];
-      with TLabel.Create(f) do
-      begin
-        Parent := f;
-        Align := alTop;
-        BorderSpacing.Around := 6;
-        Caption := Prompt;
-      end;
-      lb := TListBox.Create(f);
-      lb.Parent := f;
-      lb.Align := alClient;
-      lb.Items.Assign(sl);
-      lb.BorderSpacing.Around := 6;
-      lb.Constraints.MinHeight := 200;
-      lb.ItemIndex := 0;
-      with TButtonPanel.Create(f) do
-      begin
-        Parent := f;
-        ShowButtons := [pbOK, pbCancel];
-        ShowBevel := False;
-      end;
-      if f.ShowModal <> mrOk then Exit(False);
-      s := lb.Items[lb.ItemIndex];
-      Result := True;
-    finally
-      f.Free;
-    end;
-  end;
-
-  function CollectDirs(const PathMask: string): TStringList;
-  var
-    dir: TSearchRec;
-  begin
-    Result := TStringList.Create;
-    if FindFirst(PathMask, faDirectory, dir) = 0 then
-      repeat
-        if dir.Name[1] <> '.' then
-          Result.Add(dir.Name);
-      until (FindNext(dir) <> 0);
-    FindClose(dir);
-  end;
 
   procedure FixArmLinuxAndroidEabiVersion(var path: string);
   var
@@ -282,37 +345,11 @@ function TApkBuilder.TryFixPaths: TModalResult;
       Result := True;
   end;
 
-  function SetManifestSdkTarget(SdkTarget: string): Boolean;
-  var
-    ManifestXML: TXMLDocument;
-    n: TDOMNode;
-    fn: string;
-  begin
-    Result := False;
-    fn := FProjPath + 'AndroidManifest.xml';
-    if not FileExists(fn) then Exit;
-    try
-      ReadXMLFile(ManifestXML, fn);
-      try
-        n := ManifestXML.DocumentElement.FindNode('uses-sdk');
-        if not (n is TDOMElement) then Exit;
-        TDOMElement(n).AttribStrings['android:targetSdkVersion'] := SdkTarget;
-        WriteXML(ManifestXML, fn);
-        Result := True;
-      finally
-        ManifestXML.Free
-      end;
-    except
-      Exit;
-    end;
-  end;
-
 var
   sl: TStringList;
   i: Integer;
-  ForceFixPaths, WasChanged: Boolean;
-  sval, str, prev, pref: string;
-  xml: TXMLDocument;
+  ForceFixPaths: Boolean;
+  str, prev, pref: string;
 begin
   Result := mrOK;
   ForceFixPaths := False;
@@ -379,9 +416,54 @@ begin
     sl.Free;
   end;
 
+  Result := FixBuildSystemConfig(ForceFixPaths);
+end;
+
+function TApkBuilder.FixBuildSystemConfig(ForceFixPaths: Boolean): TModalResult;
+begin
+  if FProj.CustomData['BuildSystem'] = 'Gradle' then
+    Result := FixGradleConfig(ForceFixPaths)
+  else
+    Result := FixAntConfig(ForceFixPaths);
+end;
+
+function TApkBuilder.FixAntConfig(ForceFixPaths: Boolean): TModalResult;
+
+  function SetManifestSdkTarget(SdkTarget: string): Boolean;
+  var
+    ManifestXML: TXMLDocument;
+    n: TDOMNode;
+    fn: string;
+  begin
+    Result := False;
+    fn := FProjPath + 'AndroidManifest.xml';
+    if not FileExists(fn) then Exit;
+    try
+      ReadXMLFile(ManifestXML, fn);
+      try
+        n := ManifestXML.DocumentElement.FindNode('uses-sdk');
+        if not (n is TDOMElement) then Exit;
+        TDOMElement(n).AttribStrings['android:targetSdkVersion'] := SdkTarget;
+        WriteXML(ManifestXML, fn);
+        Result := True;
+      finally
+        ManifestXML.Free
+      end;
+    except
+      Exit;
+    end;
+  end;
+
+var
+  xml: TXMLDocument;
+  WasChanged: Boolean;
+  i: Integer;
+  str, sval: string;
+  sl: TStringList;
+begin
+  Result := mrOk;
   // build.xml
-  prev := FProjPath + 'build.xml';
-  ReadXMLFile(xml, prev);
+  ReadXMLFile(xml, FProjPath + 'build.xml');
   try
     WasChanged := False;
     with xml.DocumentElement.ChildNodes do
@@ -457,9 +539,76 @@ begin
           end;
         end;
     if WasChanged then
-      WriteXMLFile(xml, prev);
+      WriteXMLFile(xml, FProjPath + 'build.xml');
   finally
     xml.Free;
+  end;
+end;
+
+function TApkBuilder.FixGradleConfig(ForceFixPaths: Boolean): TModalResult;
+var
+  i, j: Integer;
+  s, target, indent: string;
+  WasChanged: Boolean;
+begin
+  Result := mrOk;
+  WasChanged := False;
+  if GetManifestSdkTarget(target) then
+    with TStringList.Create do
+    try
+      LoadFromFile(FProjPath + 'build.gradle');
+      for i := 0 to Count - 1 do
+        if Pos('compileSdkVersion', Strings[i]) > 0 then
+        begin
+          s := Strings[i];
+          j := 1;
+          while s[j] in [' ', #9] do Inc(j);
+          indent := Copy(s, 1, j - 1);
+          System.Delete(s, 1, j);
+          System.Delete(s, 1, Pos(' ', s));
+          s := Trim(s);
+          if (s <> target) and
+             (MessageDlg('build.gradle',
+                         'Change compileSdkVersion to "' + target + '"?',
+                         mtConfirmation, [mbYes, mbNo], 0) = mrYes)
+          then begin
+            Strings[i] := indent + 'compileSdkVersion ' + target;
+            WasChanged := True;
+          end;
+          Break;
+        end;
+      if WasChanged then
+        SaveToFile(FProjPath + 'build.gradle');
+    finally
+      Free;
+    end;
+end;
+
+function TApkBuilder.BuildByAnt: Boolean;
+var
+  Tool: TIDEExternalToolOptions;
+begin
+  Result := False;
+  Tool := TIDEExternalToolOptions.Create;
+  try
+    Tool.Title := 'Building APK (Ant)... ';
+    Tool.EnvironmentOverrides.Add('JAVA_HOME=' + FJdkPath);
+    Tool.WorkingDirectory := FProjPath;
+    Tool.Executable := IncludeTrailingPathDelimiter(FAntPath) + 'ant'{$ifdef windows}+'.bat'{$endif};
+    if not FileExists(Tool.Executable) then
+      raise Exception.CreateFmt('Ant bin (%s) not found! Check path settings', [Tool.Executable]);
+    Tool.CmdLineParams := 'clean -Dtouchtest.enabled=true debug';
+    // tk Required for Lazarus >=1.7 to capture output correctly
+{$if lcl_fullversion >= 1070000}
+    Tool.ShowConsole := True;
+{$endif}
+    // end tk
+    Tool.Scanners.Add(SubToolAnt);
+    if not RunExternalTool(Tool) then
+      raise Exception.Create('Cannot build APK!');
+    Result := True;
+  finally
+    Tool.Free;
   end;
 end;
 
@@ -540,6 +689,22 @@ begin
   end;
 end;
 
+procedure TApkBuilder.CleanUp;
+var
+  tempDir: string;
+  SdkTarget: string;
+begin
+  if GetManifestSdkTarget(SdkTarget) then
+  begin
+    tempDir := FProjPath + 'src' + PathDelim
+      +
+        StringReplace(FProj.CustomData['Package'], '.', PathDelim, [rfReplaceAll])
+      + PathDelim + 'android-' + SdkTarget;
+    if DirectoryExists(tempDir) then
+       DeleteDirectory(tempDir, False);
+  end;
+end;
+
 constructor TApkBuilder.Create(AProj: TLazProject);
 begin
   FProj := AProj;
@@ -549,48 +714,16 @@ begin
     Abort;
 end;
 
-function TApkBuilder.BuildAPK(Install: Boolean): Boolean;
-var
-  Tool: TIDEExternalToolOptions;
-  tempDir, SdkTarget: string;
+function TApkBuilder.BuildAPK: Boolean;
 begin
-  if GetManifestSdkTarget(SdkTarget) then
-  begin
-    tempDir := FProjPath + 'src' + PathDelim
-      + StringReplace(FProj.CustomData['Package'], '.', PathDelim, [rfReplaceAll])
-      + PathDelim + 'android-' + SdkTarget;
-    if DirectoryExists(tempDir) then
-      DeleteDirectory(tempDir, True);
-  end;
-  Result := False;
-  if Install then
-    if not CheckAvailableDevices then Exit;
-  Tool := TIDEExternalToolOptions.Create;
-  try
-    Tool.Title := 'Building APK... ';
-    Tool.EnvironmentOverrides.Add('JAVA_HOME=' + FJdkPath);
-    Tool.WorkingDirectory := FProjPath;
-    Tool.Executable := IncludeTrailingPathDelimiter(FAntPath) + 'ant'{$ifdef windows}+'.bat'{$endif};
-    if not FileExists(Tool.Executable) then
-      raise Exception.CreateFmt('Ant bin (%s) not found! Check path settings', [Tool.Executable]);
-    Tool.CmdLineParams := 'clean -Dtouchtest.enabled=true debug';
-    if Install then
-      Tool.CmdLineParams := Tool.CmdLineParams + ' install';
-    // tk Required for Lazarus >=1.7 to capture output correctly
-{$if lcl_fullversion >= 1070000}
-    Tool.ShowConsole := True;
-{$endif}
-    // end tk
-    Tool.Scanners.Add(SubToolAnt);
-    if not RunExternalTool(Tool) then
-      raise Exception.Create('Cannot build APK!');
-    Result := True;
-  finally
-    Tool.Free;
-  end;
+  CleanUp;
+  if FProj.CustomData['BuildSystem'] = 'Gradle' then
+    Result := BuildByGradle
+  else
+    Result := BuildByAnt;
 end;
 
-function TApkBuilder.InstallAPK: Boolean;
+function TApkBuilder.InstallByAnt: Boolean;
 var
   Tool: TIDEExternalToolOptions;
 begin
@@ -598,7 +731,7 @@ begin
   if not CheckAvailableDevices then Exit;
   Tool := TIDEExternalToolOptions.Create;
   try
-    Tool.Title := 'Installing APK... ';
+    Tool.Title := 'Installing APK (Ant)... ';
     Tool.EnvironmentOverrides.Add('JAVA_HOME=' + FJdkPath);
     Tool.WorkingDirectory := FProjPath;
     Tool.Executable := IncludeTrailingPathDelimiter(FAntPath) + 'ant'{$ifdef windows}+'.bat'{$endif};
@@ -618,11 +751,22 @@ begin
 end;
 
 procedure TApkBuilder.RunAPK;
+begin
+  if FProj.CustomData['BuildSystem'] = 'Gradle' then
+    RunByGradle
+  else begin
+    if not InstallByAnt then
+      raise Exception.Create('Cannot install APK');
+    RunByAdb;
+  end;
+  BringToFrontEmulator;
+end;
+
+procedure TApkBuilder.RunByAdb;
 var
   xml: TXMLDocument;
   f, proj: string;
   Tool: TIDEExternalToolOptions;
-  SdkTarget, tempDir: string;
 begin
   f := FProjPath + PathDelim + 'AndroidManifest.xml';
   ReadXMLFile(xml, f);
@@ -642,26 +786,80 @@ begin
     Tool.Scanners.Add(SubToolDefault);
     if not RunExternalTool(Tool) then
       raise Exception.Create('Cannot run APK!');
-    BringToFrontEmulator;
   finally
     Tool.Free;
-
     //total clean up!
-    if GetManifestSdkTarget(SdkTarget) then
-    begin
-      tempDir := FProjPath + 'src' + PathDelim
-        + StringReplace(FProj.CustomData['Package'], '.', PathDelim, [rfReplaceAll])
-        + PathDelim + 'android-' + SdkTarget;
-      if DirectoryExists(tempDir) then
-         DeleteDirectory(tempDir, False);
-    end;
+    CleanUp;
+  end;
+end;
 
+function TApkBuilder.BuildByGradle: Boolean;
+var
+  Tool: TIDEExternalToolOptions;
+begin
+  Result := False;
+  Tool := TIDEExternalToolOptions.Create;
+  try
+    Tool.Title := 'Building APK (Gradle)... ';
+    Tool.EnvironmentOverrides.Add('GRADLE_HOME=' + FGradlePath);
+    Tool.EnvironmentOverrides.Add('PATH=' + GetEnvironmentVariable('PATH')
+      + PathSep + FSdkPath + 'platform-tools'
+      + PathSep + FGradlePath + 'bin');
+    Tool.WorkingDirectory := FProjPath;
+    Tool.Executable := FGradlePath + 'bin' + PathDelim + 'gradle'{$ifdef windows}+'.bat'{$endif};
+    if not FileExists(Tool.Executable) then
+      raise Exception.CreateFmt('Gradle (%s) not found! Check path settings', [Tool.Executable]);
+    Tool.CmdLineParams := 'clean build --info';
+    // tk Required for Lazarus >=1.7 to capture output correctly
+{$if lcl_fullversion >= 1070000}
+    Tool.ShowConsole := True;
+{$endif}
+    // end tk
+    Tool.Scanners.Add(SubToolGradle);
+    if not RunExternalTool(Tool) then
+      raise Exception.Create('Cannot build APK!');
+    Result := True;
+  finally
+    Tool.Free;
+  end;
+end;
+
+procedure TApkBuilder.RunByGradle;
+var
+  Tool: TIDEExternalToolOptions;
+begin
+  if not CheckAvailableDevices then Exit;
+  Tool := TIDEExternalToolOptions.Create;
+  try
+    Tool.Title := 'Starting APK (Gradle)... ';
+    Tool.EnvironmentOverrides.Add('GRADLE_HOME=' + FGradlePath);
+    Tool.EnvironmentOverrides.Add('PATH=' + GetEnvironmentVariable('PATH')
+      + PathSep + FSdkPath + 'platform-tools'
+      + PathSep + FGradlePath + 'bin');
+    Tool.WorkingDirectory := FProjPath;
+    Tool.Executable := FGradlePath + 'bin' + PathDelim + 'gradle'{$ifdef windows}+'.bat'{$endif};
+    if not FileExists(Tool.Executable) then
+      raise Exception.CreateFmt('Gradle (%s) not found! Check path settings', [Tool.Executable]);
+    Tool.CmdLineParams := 'run';
+    // tk Required for Lazarus >=1.7 to capture output correctly
+{$if lcl_fullversion >= 1070000}
+    Tool.ShowConsole := True;
+{$endif}
+    // end tk
+    Tool.Scanners.Add(SubToolGradle);
+    if not RunExternalTool(Tool) then
+      raise Exception.Create('Cannot run APK!');
+  finally
+    Tool.Free;
+    //total clean up!
+    CleanUp;
   end;
 end;
 
 procedure RegisterExtToolParser;
 begin
   ExternalToolList.RegisterParser(TAntParser);
+  ExternalToolList.RegisterParser(TGradleParser);
 end;
 
 end.

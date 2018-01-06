@@ -69,6 +69,7 @@ type
      FSmallProjName:  string; //ex. 'AppDemo1'
 
      FAndroidTheme: string;
+     FBuildSystem: string;
 
      //FEclipseTooling: TEclipseTooling;
 
@@ -868,6 +869,7 @@ begin
     begin
       frm.SaveSettings(SettingsFilename);
 
+      FBuildSystem:= frm.BuildSystem;
       FAndroidTheme:= frm.AndroidTheme;
 
       FJavaClassName:= frm.JavaClassName;
@@ -2147,6 +2149,7 @@ begin
   AProject.CustomData.Values['NdkPath']:= FPathToAndroidNDK;
   AProject.CustomData.Values['SdkPath']:= FPathToAndroidSDK;
   AProject.CustomData.Values['NdkApi']:= FAndroidPlatform;  // androd-13, android-14,  android-15 etc...
+  AProject.CustomData.Values['BuildSystem'] := FBuildSystem;
 
   AProject.ProjectInfoFile := projDir + ChangeFileExt(projName, '.lpi');
 

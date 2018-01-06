@@ -48,6 +48,7 @@ object LamwProjectOptions: TLamwProjectOptions
             SizePriority = 0
             Title.Alignment = taRightJustify
             Title.Caption = 'Enabled'
+            Width = 64
           end>
         FixedCols = 0
         Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goRangeSelect, goEditing, goThumbTracking, goSmoothScroll]
@@ -471,6 +472,56 @@ object LamwProjectOptions: TLamwProjectOptions
           'Force LandScape'
         )
         TabOrder = 3
+      end
+    end
+    object tsMiscellaneous: TTabSheet
+      Caption = 'Miscellaneous'
+      ClientHeight = 340
+      ClientWidth = 347
+      object Label9: TLabel
+        AnchorSideLeft.Control = tsMiscellaneous
+        AnchorSideTop.Control = cbBuildSystem
+        AnchorSideTop.Side = asrCenter
+        Left = 6
+        Height = 13
+        Top = 10
+        Width = 116
+        BorderSpacing.Around = 6
+        Caption = 'Build Automated System'
+        ParentColor = False
+      end
+      object cbBuildSystem: TComboBox
+        AnchorSideLeft.Control = Label9
+        AnchorSideLeft.Side = asrBottom
+        AnchorSideTop.Control = tsMiscellaneous
+        Left = 128
+        Height = 21
+        Top = 6
+        Width = 100
+        BorderSpacing.Around = 6
+        ItemHeight = 13
+        ItemIndex = 0
+        Items.Strings = (
+          'Ant'
+          'Gradle'
+        )
+        OnSelect = cbBuildSystemSelect
+        Style = csDropDownList
+        TabOrder = 0
+        Text = 'Ant'
+      end
+      object lblGradleHint: TLabel
+        AnchorSideLeft.Control = cbBuildSystem
+        AnchorSideLeft.Side = asrBottom
+        AnchorSideTop.Control = cbBuildSystem
+        AnchorSideTop.Side = asrCenter
+        Left = 234
+        Height = 13
+        Top = 10
+        Width = 90
+        Caption = '(require JDK 1.8+)'
+        ParentColor = False
+        Visible = False
       end
     end
   end

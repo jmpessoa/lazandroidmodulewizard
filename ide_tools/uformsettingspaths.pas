@@ -50,7 +50,6 @@ type
     procedure BitBtnCancelClick(Sender: TObject);
     procedure FormActivate(Sender: TObject);
     procedure FormClose(Sender: TObject; var CloseAction: TCloseAction);
-    procedure Label1Click(Sender: TObject);
     procedure SpBPathToAndroidNDKClick(Sender: TObject);
     procedure SpBPathToGradleClick(Sender: TObject);
     procedure SpBPathToJavaJDKClick(Sender: TObject);
@@ -82,6 +81,8 @@ var
    FormSettingsPaths: TFormSettingsPaths;
 
 implementation
+
+uses LamwSettings;
 
 {$R *.lfm}
 
@@ -165,7 +166,8 @@ begin
   fName:= IncludeTrailingPathDelimiter(LazarusIDE.GetPrimaryConfigPath) + 'JNIAndroidProject.ini';
   if FOk then
   begin
-    SaveSettings(fName)
+    SaveSettings(fName);
+    LamwGlobalSettings.ReloadPaths;
   end
   else if FPathTemplatesEdited = True then
        begin
@@ -177,11 +179,6 @@ begin
            Free;
          end;
        end;
-end;
-
-procedure TFormSettingsPaths.Label1Click(Sender: TObject);
-begin
-
 end;
 
 procedure TFormSettingsPaths.FormActivate(Sender: TObject);

@@ -92,8 +92,7 @@ begin
       if LazarusIDE.DoBuildProject(crRun, []) <> mrOK then
         raise Exception.Create('Cannot build project');
       if BuildAPK then
-        if InstallAPK then
-          RunAPK;
+        RunAPK;
     finally
       Free;
     end;
