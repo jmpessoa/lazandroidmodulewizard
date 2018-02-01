@@ -72,7 +72,7 @@ interface
 
 uses ctypes,SysUtils,Classes,Math,
      And_jni,And_jni_Bridge, Laz_And_Controls, AndroidWidget,
-     And_lib_Image, Laz_And_GLESv2_Canvas_h;
+     {And_lib_Image,} Laz_And_GLESv2_Canvas_h;
 
 //-----------------------------------------------------------------------------
 //
@@ -169,9 +169,11 @@ Procedure _glTranslatef   (Var Mat : TM4x4; x,y,z : Single );
 Procedure _glScalef       (Var Mat : TM4x4; x,y,z : Single );
 Procedure _glRotatef      (Var Mat : TM4x4; angle,x,y,z : Single);
 //
-Function  _glTexture_Load_wPas (ImgName   : String; Var Img : GLuint;
+{Function  _glTexture_Load_wPas (ImgName   : String; Var Img : GLuint;
                                 AlphaMask : Boolean = True;
                                 TileMode  : Boolean = False) : Boolean;
+}
+
 {
 Function  _glTexture_Load_wJava(env:PJNIEnv;this:jobject;
                                 ImgName   : String; Var Img : GLuint;
@@ -347,6 +349,13 @@ Type
    //
    Procedure Update;
    Procedure Refresh;
+
+   procedure Pause();
+   procedure Resume();
+
+   procedure DispatchTouchDown(_value: boolean);
+   procedure DispatchTouchMove(_value: boolean);
+   procedure DispatchTouchUp(_value: boolean);
 
    // Property
    Property Shader      : TxgShader     read FShader      write SetShader;
@@ -949,6 +958,7 @@ Procedure _glRotatef(Var Mat : TM4x4; angle,x,y,z : Single);
   Mat[2][2] := z*z * oneMinusCos + c;
  end;
 
+(*
 // jpg, png Only
 Function _glTexture_Load_wPas(ImgName   : String; Var Img : GLuint;
                               AlphaMask : Boolean = True;
@@ -1023,7 +1033,7 @@ Function _glTexture_Load_wPas(ImgName   : String; Var Img : GLuint;
   ImgDecoder.Free;
   Result := True;
  end;
-
+*)
 // https://github.com/zagayevskiy/Pacman/blob/master/jni/managers/Art.cpp
 // http://blog.livedoor.jp/itahidamito/archives/51661332.html
 //
@@ -1652,6 +1662,9 @@ Procedure jCanvasES2.Screen_Setup(w,h : Integer;
                                   CullFace   : Boolean = True);
 begin
   if not FInitialized then Exit;
+  FHeight       := h;
+  FWidth        := w;
+
   glViewPort (0,0,w,h);
   //
   Case Projection of
@@ -2146,6 +2159,7 @@ begin
    end;
 end;
 
+(*
 procedure jCanvasES2.UpdateLParamWidth;
 var
    side: TSide;
@@ -2182,13 +2196,141 @@ begin
    if FInitialized then
       Result:= jGLSurfaceView_getLParamHeight(FjEnv, FjObject );
 end;
+*)
 
-procedure jCanvasES2.UpdateLayout;
+
+procedure jCanvasES2.UpdateLParamWidth;
+var
+  side: TSide;
 begin
-   inherited UpdateLayout;
-   UpdateLParamWidth;
-   UpdateLParamHeight;
-   jGLSurfaceView_setLayoutAll(FjEnv, FjObject , Self.AnchorId);
+  if FInitialized then
+  begin
+    if Self.Parent is jForm then
+    begin
+      if jForm(Owner).ScreenStyle = gApp.Orientation then side:= sdW else side:= sdH;
+      jGLSurfaceView_setLParamWidth(FjEnv, FjObject , GetLayoutParams(gApp, FLParamWidth, side));
+    end
+    else
+    begin
+       if (Self.Parent as jVisualControl).LayoutParamWidth = lpWrapContent then
+           jGLSurfaceView_setLParamWidth(FjEnv, FjObject , GetLayoutParams(gApp, FLParamWidth, sdW))
+        else //lpMatchParent or others
+           jGLSurfaceView_setLParamWidth(FjEnv,FjObject,GetLayoutParamsByParent((Self.Parent as jVisualControl), FLParamWidth, sdW));
+    end;
+  end;
+end;
+
+procedure jCanvasES2.UpdateLParamHeight;
+var
+  side: TSide;
+begin
+  if FInitialized then
+  begin
+    if Self.Parent is jForm then
+    begin
+      if jForm(Owner).ScreenStyle = gApp.Orientation then side:= sdH else side:= sdW;
+      jGLSurfaceView_setLParamHeight(FjEnv, FjObject , GetLayoutParams(gApp, FLParamHeight, side));
+    end
+    else
+    begin
+       if (Self.Parent as jVisualControl).LayoutParamHeight = lpWrapContent then
+          jGLSurfaceView_setLParamHeight(FjEnv, FjObject , GetLayoutParams(gApp, FLParamHeight, sdH))
+       else //lpMatchParent and others
+          jGLSurfaceView_setLParamHeight(FjEnv,FjObject,GetLayoutParamsByParent((Self.Parent as jVisualControl), FLParamHeight, sdH));
+    end;
+  end;
+end;
+
+function jCanvasES2.GetWidth: integer;
+begin
+  Result:= FWidth;
+  if FInitialized then
+  begin
+     Result:= jGLSurfaceView_getLParamWidth(FjEnv, FjObject );
+     if Result = -1 then //lpMatchParent
+     begin
+       if FParent is jForm then
+       begin
+         if (FParent as jForm).ScreenStyle = (FParent as jForm).ScreenStyleAtStart then
+           Result:= (FParent as jForm).ScreenWH.Width
+         else
+           Result:= (FParent as jForm).ScreenWH.Height;
+       end
+       else
+       begin
+           Result:= (FParent as jVisualControl).GetWidth;
+       end;
+     end;
+  end;
+end;
+
+function jCanvasES2.GetHeight: integer;
+begin
+  Result:= FHeight;
+  if FInitialized then
+  begin
+     Result:= jGLSurfaceView_getLParamHeight(FjEnv, FjObject );
+     if Result = -1 then //lpMatchParent
+     begin
+       if FParent is jForm then
+       begin
+          if (FParent as jForm).ScreenStyle = (FParent as jForm).ScreenStyleAtStart then
+             Result:= (FParent as jForm).ScreenWH.Height   //take from start!
+          else
+             Result:= (FParent as jForm).ScreenWH.Width;
+       end
+       else
+       begin
+          Result:= (FParent as jVisualControl).GetHeight;
+       end;
+     end;
+  end;
+end;
+
+procedure jCanvasES2.UpdateLayout();
+begin
+  if FInitialized then
+  begin
+    inherited UpdateLayout();
+    UpdateLParamWidth;
+    UpdateLParamHeight;
+    jGLSurfaceView_setLayoutAll(FjEnv, FjObject , Self.AnchorId);
+  end;
+end;
+
+procedure jCanvasES2.Pause();
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jGLSurfaceView_Pause(FjEnv, FjObject);
+end;
+
+procedure jCanvasES2.Resume();
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jGLSurfaceView_Resume(FjEnv, FjObject);
+end;
+
+procedure jCanvasES2.DispatchTouchDown(_value: boolean);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jGLSurfaceView_DispatchTouchDown(FjEnv, FjObject, _value);
+end;
+
+procedure jCanvasES2.DispatchTouchMove(_value: boolean);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jGLSurfaceView_DispatchTouchMove(FjEnv, FjObject, _value);
+end;
+
+procedure jCanvasES2.DispatchTouchUp(_value: boolean);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jGLSurfaceView_DispatchTouchUp(FjEnv, FjObject, _value);
 end;
 
 end.

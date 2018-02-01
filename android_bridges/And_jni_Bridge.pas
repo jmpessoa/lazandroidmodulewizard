@@ -181,6 +181,7 @@ procedure jTextView_SetBackgroundAlpha(env: PJNIEnv; _jtextview: JObject; _alpha
 procedure jTextView_MatchParent(env: PJNIEnv; _jtextview: JObject);
 procedure jTextView_WrapParent(env: PJNIEnv; _jtextview: JObject);
 procedure jTextView_ClearLayoutAll(env: PJNIEnv; _jtextview: JObject);
+procedure jTextView_SetFrameGravity(env: PJNIEnv; _jtextview: JObject; _value: integer);
 
 
 //-----------------------------------
@@ -282,6 +283,7 @@ procedure jEditText_LoadFromFile(env: PJNIEnv; _jedittext: JObject; _filename: s
 procedure jEditText_SaveToFile(env: PJNIEnv; _jedittext: JObject; _path: string; _filename: string);  overload;
 procedure jEditText_SaveToFile(env: PJNIEnv; _jedittext: JObject; _filename: string);  overload;
 procedure jEditText_ClearLayoutAll(env: PJNIEnv; _jedittext: JObject);
+procedure jEditText_SetFrameGravity(env: PJNIEnv; _jedittext: JObject; _value: integer);
 
 // Button
 Function jButton_Create(env: PJNIEnv;   this:jobject; SelfObj: TObject): jObject;
@@ -329,6 +331,7 @@ procedure jButton_SetRadiusRoundCorner(env: PJNIEnv; _jbutton: JObject; _radius:
 procedure jButton_SetFontFromAssets(env: PJNIEnv; _jbutton: JObject; _fontName: string);
 procedure jButton_SetEnabled(env: PJNIEnv; _jbutton: JObject; Value: boolean);
 procedure jButton_ClearLayoutAll(env: PJNIEnv; _jbutton: JObject);
+procedure jButton_SetFrameGravity(env: PJNIEnv; _jbutton: JObject; _value: integer);
 
 // CheckBox
 Function  jCheckBox_Create            (env:PJNIEnv;  this:jobject; SelfObj: TObject ): jObject;
@@ -362,7 +365,7 @@ procedure jCheckBox_SetCompoundDrawables(env: PJNIEnv; _jcheckbox: JObject; _ima
 procedure jCheckBox_SetCompoundDrawables(env: PJNIEnv; _jcheckbox: JObject; _imageResIdentifier: string; _side: integer);  overload;
 procedure jCheckBox_SetFontFromAssets(env: PJNIEnv; _jcheckbox: JObject; _fontName: string);
 procedure jCheckBox_ClearLayoutAll(env: PJNIEnv; _jcheckbox: JObject);
-
+procedure jCheckBox_SetFrameGravity(env: PJNIEnv; _jcheckbox: JObject; _value: integer);
 // RadioButton
 
 Function  jRadioButton_Create(env:PJNIEnv; this:jobject; SelfObj: TObject ): jObject;
@@ -398,6 +401,7 @@ procedure jRadioButton_SetCompoundDrawables(env: PJNIEnv; _jradiobutton: JObject
 procedure jRadioButton_SetCompoundDrawables(env: PJNIEnv; _jradiobutton: JObject; _imageResIdentifier: string; _side: integer);  overload;
 procedure jRadioButton_SetFontFromAssets(env: PJNIEnv; _jradiobutton: JObject; _fontName: string);
 procedure jRadioButton_ClearLayoutAll(env: PJNIEnv; _jradiobutton: JObject);
+procedure jRadioButton_SetFrameGravity(env: PJNIEnv; _jradiobutton: JObject; _value: integer);
 
 // ProgressBar
 
@@ -416,30 +420,25 @@ Function  jProgressBar_getProgress     (env:PJNIEnv; ProgressBar : jObject) : In
 //by jmpessoa
 Procedure jProgressBar_setProgress     (env:PJNIEnv; ProgressBar : jObject; value : integer);
 
-//by jmpessoa
 Procedure jProgressBar_setMax          (env:PJNIEnv; ProgressBar : jObject; value : integer);
 Function  jProgressBar_getMax          (env:PJNIEnv; ProgressBar : jObject) : Integer;
-
-
-//by jmpessoa
 Procedure jProgressBar_setId(env:PJNIEnv; ProgressBar : jObject; id: DWord);
-
-
 Procedure jProgressBar_setLParamWidth(env:PJNIEnv; ProgressBar : jObject; w: DWord);
 Procedure jProgressBar_setLParamHeight(env:PJNIEnv; ProgressBar : jObject; h: DWord);
-
 Procedure jProgressBar_setLeftTopRightBottomWidthHeight(env:PJNIEnv;
                                         ProgressBar : jObject; ml,mt,mr,mb,w,h: integer);
 
 Procedure jProgressBar_addLParamsParentRule(env:PJNIEnv; ProgressBar : jObject; rule: DWord);
 Procedure jProgressBar_addLParamsAnchorRule(env:PJNIEnv; ProgressBar : jObject; rule: DWord);
 Procedure jProgressBar_setLayoutAll(env:PJNIEnv; ProgressBar : jObject;  idAnchor: DWord);
+procedure jProgressBar_SetFrameGravity(env: PJNIEnv; ProgressBar: JObject; _value: integer);
 
-//JImageView
+ { jImageView }
+
 Function  jImageView_Create            (env:PJNIEnv;  this:jobject; SelfObj: TObject): jObject;
 
 Procedure jImageView_Free              (env:PJNIEnv; ImageView : jObject);
-//
+
 Procedure jImageView_setParent         (env:PJNIEnv;
                                         ImageView : jObject;ViewGroup : jObject);
 
@@ -461,7 +460,6 @@ Procedure jImageView_setLeftTopRightBottomWidthHeight(env:PJNIEnv;
 
 Procedure jImageView_addLParamsParentRule(env:PJNIEnv; ImageView : jObject; rule: DWord);
 Procedure jImageView_addLParamsAnchorRule(env:PJNIEnv; ImageView : jObject; rule: DWord);
-
 Procedure jImageView_setLayoutAll(env:PJNIEnv; ImageView : jObject;  idAnchor: DWord);
 
 //by jmpessoa
@@ -486,6 +484,10 @@ procedure jImageView_SetImageFromByteArray(env: PJNIEnv; _jimageview: JObject; v
 procedure jImageView_SetBitmapImage(env: PJNIEnv; _jimageview: JObject; _bitmap: jObject; _width: integer; _height: integer); overload;
 procedure jImageView_SetRoundCorner(env: PJNIEnv; _jimageview: JObject);
 procedure jImageView_SetRadiusRoundCorner(env: PJNIEnv; _jimageview: JObject; _radius: integer);
+procedure jImageView_SetFrameGravity(env: PJNIEnv; _jimageview: JObject; _value: integer);
+procedure jImageView_SetCollapseMode(env: PJNIEnv; _jimageview: JObject; _mode: integer);
+procedure jImageView_SetFitsSystemWindows(env: PJNIEnv; _jimageview: JObject; _value: boolean);
+procedure jImageView_SetScrollFlag(env: PJNIEnv; _jimageview: JObject; _collapsingScrollFlag: integer);
 
 
 // ListView
@@ -623,7 +625,6 @@ procedure jListView_SmoothScrollToPosition(env: PJNIEnv; _jlistview: JObject; _i
 procedure jListView_SetItemChecked(env: PJNIEnv; _jlistview: JObject; _index: integer; _value: boolean);
 function jListView_GetCheckedItemPosition(env: PJNIEnv; _jlistview: JObject): integer;
 
-
 // ScrollView
 Function  jScrollView_Create           (env:PJNIEnv;  this:jobject; SelfObj: TObject): jObject;
 
@@ -664,10 +665,7 @@ function jScrollView_GetLeft(env: PJNIEnv; _jscrollview: JObject): integer;
 function jScrollView_GetRight(env: PJNIEnv; _jscrollview: JObject): integer;
 procedure jScrollView_DispatchOnScrollChangedEvent(env: PJNIEnv; _jscrollview: JObject; _value: boolean);
 
-
-//---------------
-
-// jPanel by jmpessoa
+  { jPanel by jmpessoa }
 Function  jPanel_Create           (env:PJNIEnv; this:jobject; SelfObj: TObject): jObject;
 Procedure jPanel_Free             (env:PJNIEnv; Panel : jObject);
 Procedure jPanel_setParent        (env:PJNIEnv;
@@ -682,7 +680,7 @@ Procedure jPanel_setLParamWidth(env:PJNIEnv; Panel : jObject; w: DWord);
 Procedure jPanel_setLParamHeight(env:PJNIEnv; Panel : jObject; h: DWord);
 
 Procedure jPanel_setLeftTopRightBottomWidthHeight(env:PJNIEnv;
-                                        Panel : jObject; ml,mt,mr,mb,w,h: integer);
+                                        Panel : jObject; left,top,right,bottom,w,h: integer);
 
 Procedure jPanel_resetLParamsRules(env:PJNIEnv; Panel : jObject); //clearLayoutAll !!
 
@@ -706,6 +704,8 @@ procedure jPanel_SetRoundCorner(env: PJNIEnv; _jpanel: JObject);
 procedure jPanel_SetRadiusRoundCorner(env: PJNIEnv; _jpanel: JObject; _radius: integer);
 procedure jPanel_SetBackgroundAlpha(env: PJNIEnv; _jpanel: JObject; _alpha: integer);
 procedure jPanel_SetMarginLeftTopRightBottom(env: PJNIEnv; _jpanel: JObject; _left: integer; _top: integer; _right: integer; _bottom: integer);
+
+
 //-----------------
 // HorizontalScrollView
 //by jmpessoa
@@ -773,7 +773,6 @@ Procedure jWebView_addLParamsAnchorRule(env:PJNIEnv; WebView : jObject; rule: DW
 Procedure jWebView_setLayoutAll(env:PJNIEnv; WebView : jObject;  idAnchor: DWord);
 procedure jWebView_SetHttpAuthUsernamePassword(env: PJNIEnv; _jwebview: JObject; _hostName: string; _hostDomain: string; _username: string; _password: string);
 procedure jWebView_LoadFromHtmlString(env: PJNIEnv; _jwebview: JObject; _htmlString: string);
-
 
 // Canvas
 Function  jCanvas_Create               (env:PJNIEnv;
@@ -914,10 +913,14 @@ Procedure jGLSurfaceView_addLParamsParentRule(env:PJNIEnv; GLSurfaceView : jObje
 Procedure jGLSurfaceView_addLParamsAnchorRule(env:PJNIEnv; GLSurfaceView : jObject; rule: DWord);
 Procedure jGLSurfaceView_setLayoutAll(env:PJNIEnv; GLSurfaceView : jObject;  idAnchor: DWord);
 
+procedure jGLSurfaceView_Pause(env: PJNIEnv; _jglsurfaceview: JObject);
+procedure jGLSurfaceView_Resume(env: PJNIEnv; _jglsurfaceview: JObject);
 
-//by jmpessoa
+procedure jGLSurfaceView_DispatchTouchDown(env: PJNIEnv; _jglsurfaceview: JObject; _value: boolean);
+procedure jGLSurfaceView_DispatchTouchMove(env: PJNIEnv; _jglsurfaceview: JObject; _value: boolean);
+procedure jGLSurfaceView_DispatchTouchUp(env: PJNIEnv; _jglsurfaceview: JObject; _value: boolean);
+
 Function  jView_Create                 (env:PJNIEnv; this:jobject; SelfObj: TObject): jObject;
-
 
 //View
 Procedure jView_Free                   (env:PJNIEnv; View : jObject);
@@ -949,7 +952,6 @@ Procedure jView_setLayoutAll(env:PJNIEnv; View : jObject;  idAnchor: DWord);
 function jView_getLParamHeight(env:PJNIEnv; View : jObject ): integer;
 function jView_getLParamWidth(env:PJNIEnv; View : jObject): integer;
 function jView_GetBitmap(env: PJNIEnv; _jview: JObject): jObject;
-
 
 // Timer
 Function  jTimer_Create                (env:PJNIEnv; this:jobject; SelfObj: TObject): jObject;
@@ -1026,20 +1028,17 @@ Procedure jImageBtn_setLeftTopRightBottomWidthHeight(env:PJNIEnv;
 Procedure jImageBtn_addLParamsParentRule(env:PJNIEnv; ImageBtn : jObject; rule: DWord);
 Procedure jImageBtn_addLParamsAnchorRule(env:PJNIEnv; ImageBtn : jObject; rule: DWord);
 Procedure jImageBtn_setLayoutAll(env:PJNIEnv; ImageBtn : jObject;  idAnchor: DWord);
+procedure jImageBtn_SetFrameGravity(env: PJNIEnv; ImageBtn: JObject; _value: integer);
 
-//AsyncTask
+ { AsyncTask }
 function jAsyncTask_Create             (env: PJNIEnv;    this:jobject; SelfObj: TObject): jObject;
 
 Procedure jAsyncTask_Free              (env:PJNIEnv; AsyncTask : jObject);
 
 Procedure jAsyncTask_Execute           (env:PJNIEnv; AsyncTask : jObject);
 
-//Procedure jAsyncTask_setProgress       (env:PJNIEnv; AsyncTask : jObject; Progress : Integer);
+ { jSqliteCursor by jmpessoa }
 
-//by jmpessoa
-//Procedure jAsyncTask_SetAutoPublishProgress(env:PJNIEnv; AsyncTask : jObject; Value : boolean);
-
-//jSqliteCursor : by jmpessoa}
 Function  jSqliteCursor_Create(env:PJNIEnv;  this:jobject; SelfObj: TObject): jObject;
 Procedure jSqliteCursor_Free(env:PJNIEnv; SqliteCursor: jObject);
 
@@ -2034,6 +2033,19 @@ begin
   env^.DeleteLocalRef(env, jCls);
 end;
 
+procedure jTextView_SetFrameGravity(env: PJNIEnv; _jtextview: JObject; _value: integer);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].i:= _value;
+  jCls:= env^.GetObjectClass(env, _jtextview);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetLGravity', '(I)V');
+  env^.CallVoidMethodA(env, _jtextview, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
 //------------------------------------------------------------------------------
 // EditText
 //------------------------------------------------------------------------------
@@ -2959,6 +2971,20 @@ begin
   env^.DeleteLocalRef(env, jCls);
 end;
 
+procedure jEditText_SetFrameGravity(env: PJNIEnv; _jedittext: JObject; _value: integer);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].i:= _value;
+  jCls:= env^.GetObjectClass(env, _jedittext);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetLGravity', '(I)V');
+  env^.CallVoidMethodA(env, _jedittext, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+
 //------------------------------------------------------------------------------
 // Button
 //------------------------------------------------------------------------------
@@ -3362,6 +3388,19 @@ begin
   env^.DeleteLocalRef(env, jCls);
 end;
 
+procedure jButton_SetFrameGravity(env: PJNIEnv; _jbutton: JObject; _value: integer);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].i:= _value;
+  jCls:= env^.GetObjectClass(env, _jbutton);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetLGravity', '(I)V');
+  env^.CallVoidMethodA(env, _jbutton, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
 //------------------------------------------------------------------------------
 // CheckBox
 //------------------------------------------------------------------------------
@@ -3460,7 +3499,6 @@ var
   env^.DeleteLocalRef(env, cls);
  end;
 
-//
 Procedure jCheckBox_setTextColor(env:PJNIEnv;
                                   CheckBox : jObject; color : DWord);
 var
@@ -3517,7 +3555,6 @@ begin
  env^.DeleteLocalRef(env, cls);
 end;
 
-//by jmpessoa
 Procedure jCheckBox_setId(env:PJNIEnv;  CheckBox : jObject; id: DWord);
 var
  _jMethod : jMethodID = nil;
@@ -3531,7 +3568,6 @@ begin
  env^.DeleteLocalRef(env, cls);
 end;
 
-//by jmpessoa
 Procedure jCheckBox_setLParamWidth(env:PJNIEnv; CheckBox : jObject; w: DWord);
 var
  _jMethod : jMethodID = nil;
@@ -3558,7 +3594,6 @@ _jMethod:= env^.GetMethodID(env, cls, 'setLParamHeight', '(I)V');
  env^.DeleteLocalRef(env, cls);
 end;
 
-//by jmpessoa
 Procedure jCheckBox_addLParamsParentRule(env:PJNIEnv; CheckBox : jObject; rule: DWord);
 var
  _jMethod : jMethodID = nil;
@@ -3572,7 +3607,6 @@ begin
  env^.DeleteLocalRef(env, cls);
 end;
 
-//by jmpessoa
 Procedure jCheckBox_addLParamsAnchorRule(env:PJNIEnv; CheckBox : jObject; rule: DWord);
 var
  _jMethod : jMethodID = nil;
@@ -3666,9 +3700,23 @@ begin
   env^.DeleteLocalRef(env, jCls);
 end;
 
+procedure jCheckBox_SetFrameGravity(env: PJNIEnv; _jcheckbox: JObject; _value: integer);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].i:= _value;
+  jCls:= env^.GetObjectClass(env, _jcheckbox);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetLGravity', '(I)V');
+  env^.CallVoidMethodA(env, _jcheckbox, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
 //------------------------------------------------------------------------------
 // RadioButton
 //------------------------------------------------------------------------------
+
 function jRadioButton_Create(env: PJNIEnv; this:jobject; SelfObj: TObject): jObject;
 var
  _jMethod : jMethodID = nil;
@@ -3713,7 +3761,6 @@ begin
  env^.DeleteLocalRef(env, cls);
 end;
 
-//
 Procedure jRadioButton_setParent(env:PJNIEnv;
                               RadioButton : jObject;ViewGroup : jObject);
 var
@@ -3742,7 +3789,6 @@ var
    env^.DeleteLocalRef(env, cls);
  end;
 
-// Java Function
 Function jRadioButton_getText(env:PJNIEnv; RadioButton : jObject) : String;
 var
   _jMethod : jMethodID = nil;
@@ -3791,7 +3837,6 @@ begin
   env^.CallVoidMethodA(env,RadioButton,_jMethod,@_jParams);
   env^.DeleteLocalRef(env, cls);
 end;
-//
 
 Function  jRadioButton_isChecked(env:PJNIEnv; RadioButton : jObject) : Boolean;
 var
@@ -3835,7 +3880,6 @@ begin
   env^.DeleteLocalRef(env, cls);
 end;
 
-//by jmpessoa
 Procedure jRadioButton_setId(env:PJNIEnv; RadioButton : jObject; id: DWord);
 var
   _jMethod : jMethodID = nil;
@@ -3875,7 +3919,6 @@ begin
   env^.DeleteLocalRef(env, cls);
 end;
 
-//by jmpessoa
 Procedure jRadioButton_addLParamsParentRule(env:PJNIEnv; RadioButton : jObject; rule: DWord);
 var
   _jMethod : jMethodID = nil;
@@ -3889,7 +3932,6 @@ begin
   env^.DeleteLocalRef(env, cls);
 end;
 
-//by jmpessoa
 Procedure jRadioButton_addLParamsAnchorRule(env:PJNIEnv; RadioButton : jObject; rule: DWord);
 var
   _jMethod : jMethodID = nil;
@@ -3983,9 +4025,23 @@ begin
   env^.DeleteLocalRef(env, jCls);
 end;
 
+procedure jRadioButton_SetFrameGravity(env: PJNIEnv; _jradiobutton: JObject; _value: integer);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].i:= _value;
+  jCls:= env^.GetObjectClass(env, _jradiobutton);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetLGravity', '(I)V');
+  env^.CallVoidMethodA(env, _jradiobutton, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
 //------------------------------------------------------------------------------
 // ProgressBar
 //------------------------------------------------------------------------------
+
 function jProgressBar_Create(env: PJNIEnv; this:jobject; SelfObj: TObject; Style: DWord): jObject;
 var
  _jMethod : jMethodID = nil;
@@ -4060,7 +4116,6 @@ begin
  env^.DeleteLocalRef(env, cls);
 end;
 
-
 Procedure jProgressBar_setProgress(env:PJNIEnv;
                                     ProgressBar : jObject; value : Integer);
 Var
@@ -4075,8 +4130,6 @@ begin
  env^.DeleteLocalRef(env, cls);
 end;
 
-
-//by jmpessoa
 Procedure jProgressBar_setMax(env:PJNIEnv;
                                     ProgressBar : jObject; value : Integer);
 Var
@@ -4091,7 +4144,6 @@ begin
  env^.DeleteLocalRef(env, cls);
 end;
 
-//by jmpessoa
 Function  jProgressBar_getMax(env:PJNIEnv;  ProgressBar : jObject): Integer;
 var
  _jMethod : jMethodID = nil;
@@ -4103,7 +4155,6 @@ begin
  env^.DeleteLocalRef(env, cls);
 end;
 
-//by jmpessoa
 Procedure jProgressBar_setId(env:PJNIEnv; ProgressBar : jObject; id: DWord);
 var
  _jMethod : jMethodID = nil;
@@ -4117,7 +4168,6 @@ begin
  env^.DeleteLocalRef(env, cls);
 end;
 
-//by jmpessoa
 Procedure jProgressBar_setLParamWidth(env:PJNIEnv; ProgressBar : jObject; w: DWord);
 var
  _jMethod : jMethodID = nil;
@@ -4144,7 +4194,6 @@ _jMethod:= env^.GetMethodID(env, cls, 'setLParamHeight', '(I)V');
  env^.DeleteLocalRef(env, cls);
 end;
 
-//by jmpessoa
 Procedure jProgressBar_addLParamsParentRule(env:PJNIEnv; ProgressBar : jObject; rule: DWord);
 var
  _jMethod : jMethodID = nil;
@@ -4158,7 +4207,6 @@ begin
  env^.DeleteLocalRef(env, cls);
 end;
 
-//by jmpessoa
 Procedure jProgressBar_addLParamsAnchorRule(env:PJNIEnv; ProgressBar : jObject; rule: DWord);
 var
  _jMethod : jMethodID = nil;
@@ -4185,11 +4233,23 @@ _jMethod:= env^.GetMethodID(env, cls, 'setLayoutAll', '(I)V');
  env^.DeleteLocalRef(env, cls);
 end;
 
+procedure jProgressBar_SetFrameGravity(env: PJNIEnv; ProgressBar: JObject; _value: integer);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].i:= _value;
+  jCls:= env^.GetObjectClass(env, ProgressBar);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetLGravity', '(I)V');
+  env^.CallVoidMethodA(env, ProgressBar, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
 //------------------------------------------------------------------------------
 // ImageView
 //------------------------------------------------------------------------------
 
-//by jmpessoa
 function jImageView_Create(env: PJNIEnv; this:jobject; SelfObj: TObject): jObject;
 var
  _jMethod : jMethodID = nil;
@@ -4247,7 +4307,6 @@ var
   env^.CallVoidMethodA(env,ImageView,_jMethod,@_jParams);
   env^.DeleteLocalRef(env, cls);
  end;
- 
 
 Procedure jImageView_setImage(env:PJNIEnv;
                               ImageView : jObject; fullPath : String);
@@ -4292,7 +4351,6 @@ Procedure jImageView_SetImageByResIdentifier(env:PJNIEnv; ImageView : jObject; _
   env^.DeleteLocalRef(env, cls);
  end;
 
-//by jmpessoa
 Procedure jImageView_setId(env:PJNIEnv; ImageView : jObject; id: DWord);
  var
   _jMethod : jMethodID = nil;
@@ -4306,7 +4364,6 @@ Procedure jImageView_setId(env:PJNIEnv; ImageView : jObject; id: DWord);
   env^.DeleteLocalRef(env, cls);
  end;
 
-//by jmpessoa
 Procedure jImageView_setLParamWidth(env:PJNIEnv; ImageView : jObject; w: DWord);
 var
  _jMethod : jMethodID = nil;
@@ -4333,7 +4390,6 @@ _jMethod:= env^.GetMethodID(env, cls, 'setLParamHeight', '(I)V');
  env^.DeleteLocalRef(env, cls);
 end;
 
-//by jmpessoa
 Procedure jImageView_addLParamsParentRule(env:PJNIEnv; ImageView : jObject; rule: DWord);
 var
  _jMethod : jMethodID = nil;
@@ -4347,7 +4403,6 @@ _jMethod:= env^.GetMethodID(env, cls, 'addLParamsParentRule', '(I)V');
  env^.DeleteLocalRef(env, cls);
 end;
 
-//by jmpessoa
 Procedure jImageView_addLParamsAnchorRule(env:PJNIEnv; ImageView : jObject; rule: DWord);
 var
  _jMethod : jMethodID = nil;
@@ -4373,7 +4428,6 @@ _jMethod:= env^.GetMethodID(env, cls, 'setLayoutAll', '(I)V');
  env^.CallVoidMethodA(env,ImageView,_jMethod,@_jParams);
  env^.DeleteLocalRef(env, cls);
 end;
-
 
 function jImageView_getLParamHeight(env:PJNIEnv; ImageView : jObject ): integer;
 var
@@ -4470,7 +4524,6 @@ begin
   env^.DeleteLocalRef(env, jCls);
 end;
 
-
 procedure jImageView_SetImageFromIntentResult(env: PJNIEnv; _jimageview: JObject; _intentData: jObject);
 var
   jParams: array[0..0] of jValue;
@@ -4484,7 +4537,6 @@ begin
   env^.DeleteLocalRef(env, jCls);
 end;
 
-
 procedure jImageView_SetImageThumbnailFromCamera(env: PJNIEnv; _jimageview: JObject; _intentData: jObject);
 var
   jParams: array[0..0] of jValue;
@@ -4497,7 +4549,6 @@ begin
   env^.CallVoidMethodA(env, _jimageview, jMethod, @jParams);
   env^.DeleteLocalRef(env, jCls);
 end;
-
 
 procedure jImageView_SetImageFromByteArray(env: PJNIEnv; _jimageview: JObject; var _image: TDynArrayOfJByte);
 var
@@ -4557,12 +4608,62 @@ begin
   env^.DeleteLocalRef(env, jCls);
 end;
 
+procedure jImageView_SetFrameGravity(env: PJNIEnv; _jimageview: JObject; _value: integer);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].i:= _value;
+  jCls:= env^.GetObjectClass(env, _jimageview);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetLGravity', '(I)V');
+  env^.CallVoidMethodA(env, _jimageview, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jImageView_SetCollapseMode(env: PJNIEnv; _jimageview: JObject; _mode: integer);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].i:= _mode;
+  jCls:= env^.GetObjectClass(env, _jimageview);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetCollapseMode', '(I)V');
+  env^.CallVoidMethodA(env, _jimageview, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jImageView_SetFitsSystemWindows(env: PJNIEnv; _jimageview: JObject; _value: boolean);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].z:= JBool(_value);
+  jCls:= env^.GetObjectClass(env, _jimageview);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetFitsSystemWindows', '(Z)V');
+  env^.CallVoidMethodA(env, _jimageview, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jImageView_SetScrollFlag(env: PJNIEnv; _jimageview: JObject; _collapsingScrollFlag: integer);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].i:= _collapsingScrollFlag;
+  jCls:= env^.GetObjectClass(env, _jimageview);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetScrollFlag', '(I)V');
+  env^.CallVoidMethodA(env, _jimageview, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
 //------------------------------------------------------------------------------
 // ListView
 //------------------------------------------------------------------------------
-//
 
-//by jmpessoa
 function jListView_Create2(env:PJNIEnv;  this:jobject; SelfObj: TObject;
                                          widget: integer;
                                          widgetText: string; image: jObject;
@@ -4590,7 +4691,6 @@ begin
 end;
 
 
-//by jmpessoa
 function jListView_Create3(env:PJNIEnv;  this:jobject; SelfObj: TObject;
                                          widget: integer;
                                          widgetText: string;
@@ -6021,16 +6121,16 @@ end;
 
 //by jmpessoa
 Procedure jPanel_setLeftTopRightBottomWidthHeight(env:PJNIEnv;
-                                        Panel : jObject; ml,mt,mr,mb,w,h: integer);
+                                        Panel : jObject; left,top,right,bottom,w,h: integer);
 var
  _jMethod : jMethodID = nil;
  _jParams : array[0..5] of jValue;
  cls: jClass;
 begin
- _jParams[0].i := ml;
- _jParams[1].i := mt;
- _jParams[2].i := mr;
- _jParams[3].i := mb;
+ _jParams[0].i := left;
+ _jParams[1].i := top;
+ _jParams[2].i := right;
+ _jParams[3].i := bottom;
  _jParams[4].i := w;
  _jParams[5].i := h;
  cls := env^.GetObjectClass(env, Panel);
@@ -6838,6 +6938,7 @@ end;
 //------------------------------------------------------------------------------
 // Canvas
 //------------------------------------------------------------------------------
+
 Function jCanvas_Create(env:PJNIEnv; this:jobject; SelfObj : TObject) : jObject;
 var
  _jMethod : jMethodID = nil;
@@ -6863,8 +6964,6 @@ begin
  env^.DeleteGlobalRef(env,Canv);
  env^.DeleteLocalRef(env, cls);
 end;
-
-//
 
 Procedure jCanvas_setStrokeWidth(env:PJNIEnv;
                                         Canv : jObject;width : single);
@@ -7128,6 +7227,7 @@ var
   env^.DeleteLocalRef(env,_jParams[0].l);
   env^.DeleteLocalRef(env, cls);
 end;
+
 //------------------------------------------------------------------------------
 // Bitmap
 //------------------------------------------------------------------------------
@@ -7172,7 +7272,6 @@ var
   env^.DeleteLocalRef(env, cls);
  end;
 
-//by jmpessoa
 Procedure jBitmap_loadRes(env:PJNIEnv; bmap : jObject; imgResIdentifier : String);
 var
   _jMethod : jMethodID = nil;
@@ -7224,7 +7323,6 @@ var
   env^.DeleteLocalRef(env, cls);
  end;
 
-//by jmpessoa
 function jBitmap_GetWidth(env: PJNIEnv; bmap: JObject): integer;
 var
   jMethod: jMethodID=nil;
@@ -7236,7 +7334,6 @@ begin
   env^.DeleteLocalRef(env, jCls);
 end;
 
-//by jmpessoa
 function jBitmap_GetHeight(env: PJNIEnv; bmap: JObject): integer;
 var
   jMethod: jMethodID=nil;
@@ -7248,7 +7345,6 @@ begin
   env^.DeleteLocalRef(env, jCls);
 end;
 
-//by jmpessoa
 Function  jBitmap_jInstance(env:PJNIEnv; bmap: jObject): jObject;
 var
   _jMethod : jMethodID = nil;
@@ -7273,7 +7369,6 @@ begin
   Result:= env^.CallObjectMethodA(env, _jbitmap, jMethod, @jParams);
   env^.DeleteLocalRef(env, jCls);
 end;
-
 
 function jBitmap_AntiClockWise(env: PJNIEnv; _jbitmap: JObject; _bmp: jObject; _imageView: jObject): jObject;
 var
@@ -7320,7 +7415,6 @@ begin
   env^.DeleteLocalRef(env, jCls);
 end;
 
-
 function jBitmap_LoadFromAssets(env: PJNIEnv; _jbitmap: JObject; strName: string): jObject;
 var
   jParams: array[0..0] of jValue;
@@ -7335,7 +7429,6 @@ begin
   env^.DeleteLocalRef(env, jCls);
 end;
 
-//by jmpessoa
 procedure jBitmap_SetByteArrayToBitmap(env:PJNIEnv;  bmap: jObject; var bufferImage: TDynArrayOfJByte; size: integer);
 var
   _jMethod: jMethodID = nil;
@@ -7354,7 +7447,6 @@ begin
   env^.DeleteLocalRef(env, cls);
 end;
 
-//by jmpessoa
 function jBitmap_GetByteArrayFromBitmap(env:PJNIEnv;  bmap: jObject;  var bufferImage: TDynArrayOfJByte): integer;
 var
   _jMethod: jMethodID = nil;
@@ -7531,6 +7623,7 @@ end;
 //------------------------------------------------------------------------------
 // jGLSurfaceView
 //------------------------------------------------------------------------------
+
 function jGLSurfaceView_Create1(env: PJNIEnv; this:jobject; SelfObj: TObject; version : integer): jObject;
 var
  _jMethod : jMethodID = nil;
@@ -7627,11 +7720,9 @@ var
   _jParam    : jValue;
   _jIntArray : jintArray;
   _jBoolean  : jBoolean;
-  //
   Size : Integer;
   PInt : PInteger;
   PIntS: PInteger;
- // i    : Integer;
  cls: jClass;
 begin
   _jParam.l  := env^.NewStringUTF( env, pchar(filename));
@@ -7691,7 +7782,6 @@ begin
   env^.DeleteLocalRef(env, cls);
 end;
 
-//by jmpessoa
 Procedure jGLSurfaceView_setId(env:PJNIEnv; GLSurfaceView : jObject; id: DWord);
 var
  _jMethod : jMethodID = nil;
@@ -7705,7 +7795,6 @@ begin
  env^.DeleteLocalRef(env, cls);
 end;
 
-//by jmpessoa
 Procedure jGLSurfaceView_setLParamWidth(env:PJNIEnv; GLSurfaceView : jObject; w: DWord);
 var
  _jMethod : jMethodID = nil;
@@ -7754,7 +7843,6 @@ begin
  env^.DeleteLocalRef(env, cls);
 end;
 
-//by jmpessoa
 Procedure jGLSurfaceView_addLParamsParentRule(env:PJNIEnv; GLSurfaceView : jObject; rule: DWord);
 var
  _jMethod : jMethodID = nil;
@@ -7768,7 +7856,6 @@ begin
  env^.DeleteLocalRef(env, cls);
 end;
 
-//by jmpessoa
 Procedure jGLSurfaceView_addLParamsAnchorRule(env:PJNIEnv; GLSurfaceView : jObject; rule: DWord);
 var
  _jMethod : jMethodID = nil;
@@ -7793,6 +7880,70 @@ begin
 _jMethod:= env^.GetMethodID(env, cls, 'setLayoutAll', '(I)V');
  env^.CallVoidMethodA(env,GLSurfaceView,_jMethod,@_jParams);
  env^.DeleteLocalRef(env, cls);
+end;
+
+procedure jGLSurfaceView_Pause(env: PJNIEnv; _jglsurfaceview: JObject);
+var
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jglsurfaceview);
+  jMethod:= env^.GetMethodID(env, jCls, 'Pause', '()V');
+  env^.CallVoidMethod(env, _jglsurfaceview, jMethod);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+
+procedure jGLSurfaceView_Resume(env: PJNIEnv; _jglsurfaceview: JObject);
+var
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jglsurfaceview);
+  jMethod:= env^.GetMethodID(env, jCls, 'Resume', '()V');
+  env^.CallVoidMethod(env, _jglsurfaceview, jMethod);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+
+procedure jGLSurfaceView_DispatchTouchDown(env: PJNIEnv; _jglsurfaceview: JObject; _value: boolean);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].z:= JBool(_value);
+  jCls:= env^.GetObjectClass(env, _jglsurfaceview);
+  jMethod:= env^.GetMethodID(env, jCls, 'DispatchTouchDown', '(Z)V');
+  env^.CallVoidMethodA(env, _jglsurfaceview, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+
+procedure jGLSurfaceView_DispatchTouchMove(env: PJNIEnv; _jglsurfaceview: JObject; _value: boolean);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].z:= JBool(_value);
+  jCls:= env^.GetObjectClass(env, _jglsurfaceview);
+  jMethod:= env^.GetMethodID(env, jCls, 'DispatchTouchMove', '(Z)V');
+  env^.CallVoidMethodA(env, _jglsurfaceview, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jGLSurfaceView_DispatchTouchUp(env: PJNIEnv; _jglsurfaceview: JObject; _value: boolean);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].z:= JBool(_value);
+  jCls:= env^.GetObjectClass(env, _jglsurfaceview);
+  jMethod:= env^.GetMethodID(env, jCls, 'DispatchTouchUp', '(Z)V');
+  env^.CallVoidMethodA(env, _jglsurfaceview, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 //----------------------------
@@ -7910,7 +8061,6 @@ begin
  env^.DeleteLocalRef(env, cls);
 end;
 
-//by jmpessoa
 Procedure jView_setId(env:PJNIEnv; View : jObject; id: DWord);
 var
  _jMethod : jMethodID = nil;
@@ -7924,7 +8074,6 @@ begin
  env^.DeleteLocalRef(env, cls);
 end;
 
-//by jmpessoa
 Procedure jView_setLParamWidth(env:PJNIEnv; View : jObject; w: DWord);
 var
  _jMethod : jMethodID = nil;
@@ -7951,7 +8100,6 @@ _jMethod:= env^.GetMethodID(env, cls, 'setLParamHeight', '(I)V');
  env^.DeleteLocalRef(env, cls);
 end;
 
-//by jmpessoa
 Procedure jView_addLParamsParentRule(env:PJNIEnv; View : jObject; rule: DWord);
 var
  _jMethod : jMethodID = nil;
@@ -7965,7 +8113,6 @@ _jMethod:= env^.GetMethodID(env, cls, 'addLParamsParentRule', '(I)V');
  env^.DeleteLocalRef(env, cls);
 end;
 
-//by jmpessoa
 procedure jView_addLParamsAnchorRule(env:PJNIEnv; View : jObject; rule: DWord);
 var
  _jMethod : jMethodID = nil;
@@ -8046,7 +8193,6 @@ begin
   env^.DeleteLocalRef(env, cls);
 end;
 
-//by jmpessoa
 Procedure jTimer_SetEnabled(env: PJNIEnv; Timer: jObject; Active: Boolean);
 var
   _jMethod : jMethodID = nil;
@@ -8252,7 +8398,6 @@ env^.DeleteLocalRef(env,jParams[0].l);
   env^.DeleteLocalRef(env, jCls);
 end;
 
-
 procedure jDialogProgress_Show(env: PJNIEnv; _jdialogprogress: JObject; _layout: jObject);
 var
   jParams: array[0..0] of jValue;
@@ -8328,7 +8473,7 @@ end;
 //------------------------------------------------------------------------------
 // jImageBtn
 //------------------------------------------------------------------------------
-//by jmpessoa
+
 function jImageBtn_Create(env: PJNIEnv; this:jobject; SelfObj: TObject): jObject;
 var
  _jMethod : jMethodID = nil;
@@ -8388,7 +8533,6 @@ var
   env^.DeleteLocalRef(env, cls);
  end;
 
-//
 Procedure jImageBtn_setButton(env:PJNIEnv;
                               ImageBtn: jObject; up,dn : string);
 var
@@ -8466,7 +8610,6 @@ _jMethod:= env^.GetMethodID(env, cls, 'setButtonUpByRes', '(Ljava/lang/String;)V
  env^.DeleteLocalRef(env, cls);
 end;
 
-
 // LORDMAN 2013-08-16
 Procedure jImageBtn_SetEnabled (env:PJNIEnv;
                                 ImageBtn : jObject; Active   : Boolean);
@@ -8521,7 +8664,6 @@ _jMethod:= env^.GetMethodID(env, cls, 'setLParamHeight', '(I)V');
  env^.DeleteLocalRef(env, cls);
 end;
 
-//by jmpessoa
 Procedure jImageBtn_addLParamsParentRule(env:PJNIEnv; ImageBtn : jObject; rule: DWord);
 var
  _jMethod : jMethodID = nil;
@@ -8535,8 +8677,6 @@ _jMethod:= env^.GetMethodID(env, cls, 'addLParamsParentRule', '(I)V');
  env^.DeleteLocalRef(env, cls);
 end;
 
-
-//by jmpessoa
 Procedure jImageBtn_addLParamsAnchorRule(env:PJNIEnv; ImageBtn : jObject; rule: DWord);
 var
  _jMethod : jMethodID = nil;
@@ -8549,7 +8689,6 @@ _jMethod:= env^.GetMethodID(env, cls, 'addLParamsAnchorRule', '(I)V');
  env^.CallVoidMethodA(env,ImageBtn,_jMethod,@_jParams);
  env^.DeleteLocalRef(env, cls);
 end;
-
 
 Procedure jImageBtn_setLayoutAll(env:PJNIEnv; ImageBtn : jObject;  idAnchor: DWord);
 var
@@ -8564,10 +8703,23 @@ _jMethod:= env^.GetMethodID(env, cls, 'setLayoutAll', '(I)V');
  env^.DeleteLocalRef(env, cls);
 end;
 
+procedure jImageBtn_SetFrameGravity(env: PJNIEnv; ImageBtn: JObject; _value: integer);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].i:= _value;
+  jCls:= env^.GetObjectClass(env, ImageBtn);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetLGravity', '(I)V');
+  env^.CallVoidMethodA(env, ImageBtn, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
 //------------------------------------------------------------------------------
 // jAsyncTask
 //------------------------------------------------------------------------------
-//by jmpessoa
+
 function jAsyncTask_Create(env: PJNIEnv; this:jobject; SelfObj: TObject): jObject;
 var
  _jMethod : jMethodID = nil;
@@ -8598,42 +8750,13 @@ var
  _jMethod : jMethodID = nil;
  cls: jClass;
 begin
-  cls := env^.GetObjectClass(env, AsyncTask); //GetObjectClass
+  cls := env^.GetObjectClass(env, AsyncTask);
   _jMethod:= env^.GetMethodID(env, cls, 'Execute', '()V');
  env^.CallVoidMethod(env,AsyncTask,_jMethod);
  env^.DeleteLocalRef(env, cls);
 end;
 
-(*
-Procedure jAsyncTask_setProgress(env:PJNIEnv; AsyncTask : jObject; Progress : Integer);
-var
- _jMethod : jMethodID = nil;
- _jParams : Array[0..0] of jValue;
-  cls: jClass;
-begin
- _jParams[0].i := progress;
-  cls := env^.GetObjectClass(env, AsyncTask);
-  _jMethod:= env^.GetMethodID(env, cls, 'setProgress', '(I)V');
- env^.CallVoidMethodA(env,AsyncTask,_jMethod,@_jParams);
- env^.DeleteLocalRef(env, cls);
-end;
-
-//by jmpessoa
-Procedure jAsyncTask_SetAutoPublishProgress(env:PJNIEnv; AsyncTask : jObject; Value : boolean);
-var
- _jMethod : jMethodID = nil;
- _jParams : Array[0..0] of jValue;
-  cls: jClass;
-begin
- _jParams[0].z := JBool(Value);
-  cls := env^.GetObjectClass(env, AsyncTask);
- _jMethod:= env^.GetMethodID(env, cls, 'SetAutoPublishProgress', '(Z)V');
- env^.CallVoidMethodA(env, AsyncTask,_jMethod,@_jParams);
- env^.DeleteLocalRef(env, cls);
-end;
- *)
-
-{jSqliteCursor by jmpessoa}
+{ jSqliteCursor by jmpessoa }
 
 Function jSqliteCursor_Create(env: PJNIEnv; this:jobject; SelfObj: TObject): jObject;
 var
@@ -9456,16 +9579,6 @@ begin
   Result:= env^.NewGlobalRef(env, Result);
 end;
 
-(*
-//Please, you need insert:
-
-   public java.lang.Object jHttpClient_jCreate(long _Self) {
-      return (java.lang.Object)(new jHttpClient(this,_Self));
-   }
-
-//to end of "public class Controls" in "Controls.java"
-*)
-
 procedure jHttpClient_jFree(env: PJNIEnv; _jhttpclient: JObject);
 var
   jMethod: jMethodID=nil;
@@ -9544,7 +9657,6 @@ begin
   env^.DeleteLocalRef(env,jParams[1].l);
   env^.DeleteLocalRef(env, jCls);
 end;
-
 
 procedure jHttpClient_SetAuthenticationMode(env: PJNIEnv; _jhttpclient: JObject; _authenticationMode: integer);
 var
@@ -9717,10 +9829,9 @@ begin
               Result:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
             end;
   end;
-env^.DeleteLocalRef(env,jParams[1].l);
+  env^.DeleteLocalRef(env,jParams[1].l);
   env^.DeleteLocalRef(env, jCls);
 end;
-
 
 procedure jHttpClient_ClearCookieStore(env: PJNIEnv; _jhttpclient: JObject);
 var
@@ -9732,8 +9843,6 @@ begin
   env^.CallVoidMethod(env, _jhttpclient, jMethod);
   env^.DeleteLocalRef(env, jCls);
 end;
-
-
 
 function jHttpClient_AddCookie(env: PJNIEnv; _jhttpclient: JObject; _name: string; _value: string): jObject;
 var
@@ -9765,7 +9874,6 @@ begin
   Result:= boolean(jBoo);
   env^.DeleteLocalRef(env, jCls);
 end;
-
 
 function jHttpClient_GetStateful(env: PJNIEnv; _jhttpclient: JObject; _url: string): string;
 var
@@ -9809,7 +9917,7 @@ begin
               Result:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
             end;
   end;
-env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env,jParams[0].l);
   env^.DeleteLocalRef(env, jCls);
 end;
 
@@ -9828,7 +9936,6 @@ begin
   env^.DeleteLocalRef(env, jCls);
 end;
 
-
 procedure jHttpClient_SetCookieValue(env: PJNIEnv; _jhttpclient: JObject; _cookie: jObject; _value: string);
 var
   jParams: array[0..1] of jValue;
@@ -9840,10 +9947,9 @@ begin
   jCls:= env^.GetObjectClass(env, _jhttpclient);
   jMethod:= env^.GetMethodID(env, jCls, 'SetCookieValue', '(Ljava/net/HttpCookie;Ljava/lang/String;)V');
   env^.CallVoidMethodA(env, _jhttpclient, jMethod, @jParams);
-env^.DeleteLocalRef(env,jParams[1].l);
+  env^.DeleteLocalRef(env,jParams[1].l);
   env^.DeleteLocalRef(env, jCls);
 end;
-
 
 function jHttpClient_GetCookieByName(env: PJNIEnv; _jhttpclient: JObject; _cookieName: string): jObject;
 var
@@ -9855,7 +9961,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jhttpclient);
   jMethod:= env^.GetMethodID(env, jCls, 'GetCookieByName', '(Ljava/lang/String;)Ljava/net/HttpCookie;');
   Result:= env^.CallObjectMethodA(env, _jhttpclient, jMethod, @jParams);
-env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env,jParams[0].l);
   env^.DeleteLocalRef(env, jCls);
 end;
 
@@ -9871,11 +9977,10 @@ begin
   jCls:= env^.GetObjectClass(env, _jhttpclient);
   jMethod:= env^.GetMethodID(env, jCls, 'SetCookieAttributeValue', '(Ljava/net/HttpCookie;Ljava/lang/String;Ljava/lang/String;)V');
   env^.CallVoidMethodA(env, _jhttpclient, jMethod, @jParams);
-env^.DeleteLocalRef(env,jParams[1].l);
+  env^.DeleteLocalRef(env,jParams[1].l);
   env^.DeleteLocalRef(env,jParams[2].l);
   env^.DeleteLocalRef(env, jCls);
 end;
-
 
 function jHttpClient_GetCookieValue(env: PJNIEnv; _jhttpclient: JObject; _cookie: jObject): string;
 var
@@ -9952,7 +10057,7 @@ begin
       end;
     end;
   end;
-env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env,jParams[0].l);
   env^.DeleteLocalRef(env, jCls);
 end;
 
@@ -9968,7 +10073,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jhttpclient);
   jMethod:= env^.GetMethodID(env, jCls, 'AddClientHeader', '(Ljava/lang/String;Ljava/lang/String;)V');
   env^.CallVoidMethodA(env, _jhttpclient, jMethod, @jParams);
-env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env,jParams[0].l);
   env^.DeleteLocalRef(env,jParams[1].l);
   env^.DeleteLocalRef(env, jCls);
 end;
@@ -10027,7 +10132,7 @@ begin
   jMethod:= env^.GetMethodID(env, jCls, 'UrlExist', '(Ljava/lang/String;)Z');
   jBoo:= env^.CallBooleanMethodA(env, _jhttpclient, jMethod, @jParams);
   Result:= boolean(jBoo);
-env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env,jParams[0].l);
   env^.DeleteLocalRef(env, jCls);
 end;
 
@@ -10063,7 +10168,7 @@ begin
       end;
     end;
   end;
-env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env,jParams[0].l);
   env^.DeleteLocalRef(env,jParams[1].l);
   env^.DeleteLocalRef(env, jCls);
 end;
@@ -10117,21 +10222,6 @@ begin
   env^.DeleteLocalRef(env,jParams[2].l);
   env^.DeleteLocalRef(env, jCls);
 end;
-
-(*
-function jHttpClient_Connect(env: PJNIEnv; _jhttpclient: JObject; _httpConnection: jObject): jObject;
-var
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].l:= _httpConnection;
-  jCls:= env^.GetObjectClass(env, _jhttpclient);
-  jMethod:= env^.GetMethodID(env, jCls, 'Connect', '(Ljava/net/HttpURLConnection;)Ljava/net/HttpURLConnection;');
-  Result:= env^.CallObjectMethodA(env, _jhttpclient, jMethod, @jParams);
-  env^.DeleteLocalRef(env, jCls);
-end;
-*)
 
 function jHttpClient_GetHeaderField(env: PJNIEnv; _jhttpclient: JObject; _httpConnection: jObject; _headerName: string): string;
 var

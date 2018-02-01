@@ -63,6 +63,11 @@ public class jCanvasES1 extends GLSurfaceView {
 	private int lgravity = Gravity.TOP | Gravity.START;
 	private float lweight = 0;
 	private boolean mflag = false;
+	
+	private boolean mDispatchTouchDown = true;
+	private boolean mDispatchTouchMove = true;
+	private boolean mDispatchTouchUp = true;
+
 
 	//
 	class GLRenderer implements GLSurfaceView.Renderer {
@@ -143,7 +148,8 @@ public class jCanvasES1 extends GLSurfaceView {
 		int act     = event.getAction() & MotionEvent.ACTION_MASK;
 		switch(act) {
 			case MotionEvent.ACTION_DOWN: {
-				switch (event.getPointerCount()) {
+			   if (mDispatchTouchDown)	{
+				  switch (event.getPointerCount()) {
 					case 1 : { controls.pOnTouch (PasObj,Const.TouchDown,1,
 							event.getX(0),event.getY(0),0,0);
 						// Log.i("touch down1:","x="+event.getX(0)+"  y="+event.getY(0));
@@ -155,19 +161,26 @@ public class jCanvasES1 extends GLSurfaceView {
 						//Log.i("touch down2:","x="+event.getX(0)+"  y="+event.getY(0));
 						break;
 					}
-				}
-				break;}
+				  }
+			    }	  
+				break;
+			}
+			
 			case MotionEvent.ACTION_MOVE: {
-				switch (event.getPointerCount()) {
+				if (mDispatchTouchMove)	{
+			  	  switch (event.getPointerCount()) {
 					case 1 : { controls.pOnTouch (PasObj,Const.TouchMove,1,
 							event.getX(0),event.getY(0),0,0); break; }
 					default: { controls.pOnTouch (PasObj,Const.TouchMove,2,
 							event.getX(0),event.getY(0),
 							event.getX(1),event.getY(1));     break; }
-				}
-				break;}
+				  }
+				}	  
+				break;
+			}
 			case MotionEvent.ACTION_UP: {
-				switch (event.getPointerCount()) {
+				if (mDispatchTouchUp)	{	
+				  switch (event.getPointerCount()) {
 					case 1 : { controls.pOnTouch (PasObj,Const.TouchUp  ,1,
 							event.getX(0),event.getY(0),0,0);
 						//Log.i("touch up1:","x="+event.getX(0)+"  y="+event.getY(0));
@@ -177,31 +190,37 @@ public class jCanvasES1 extends GLSurfaceView {
 							event.getX(1),event.getY(1));
 						//Log.i("touch up2:","x="+event.getX(0)+"  y="+event.getY(0));
 						break; }
-				}
-				break;}
+				  }
+				}  
+				break;
+			}
 			case MotionEvent.ACTION_POINTER_DOWN: {
-				switch (event.getPointerCount()) {
+				if (mDispatchTouchDown)	{					
+				  switch (event.getPointerCount()) {
 					case 1 : { controls.pOnTouch (PasObj,Const.TouchDown,1,
 							event.getX(0),event.getY(0),0,0); break; }
 					default: { controls.pOnTouch (PasObj,Const.TouchDown,2,
 							event.getX(0),event.getY(0),
 							event.getX(1),event.getY(1));     break; }
+				   }
 				}
-				break;}
+				break;
+			}
 			case MotionEvent.ACTION_POINTER_UP  : {
-				//Log.i("Java","PUp");
-				switch (event.getPointerCount()) {
+				if (mDispatchTouchUp)	{
+				  switch (event.getPointerCount()) {
 					case 1 : { controls.pOnTouch (PasObj,Const.TouchUp  ,1,
 							event.getX(0),event.getY(0),0,0); break; }
 					default: { controls.pOnTouch (PasObj,Const.TouchUp  ,2,
 							event.getX(0),event.getY(0),
 							event.getX(1),event.getY(1));     break; }
+				  }
 				}
-				break;}
+				break;
+		    }
 		}
 		return true;
 	}
-
 	@Override
 	public void surfaceDestroyed(SurfaceHolder holder) {
 		//Log.i("Java","surfaceDestroyed");
@@ -353,5 +372,17 @@ public class jCanvasES1 extends GLSurfaceView {
 	     return (pixels);			              
 	}	
 	
-
+	
+	public void DispatchTouchDown(boolean _value) {
+		   mDispatchTouchDown = _value;
+	}
+		
+	public void DispatchTouchMove(boolean _value) {
+		  mDispatchTouchMove = _value;
+	}
+		
+	public void DispatchTouchUp(boolean _value) {
+		    mDispatchTouchUp = _value;
+	}
+	
 }
