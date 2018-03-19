@@ -1114,7 +1114,7 @@ begin
   compoundList:= TStringList.Create;
   for i:= 0 to jcontrolsList.Count - 1 do       //Add compound support
   begin
-    if FileExists(PathToJavaTemplates+'lamwdesigner'+PathDelim+jcontrolsList.Strings[j]+'.compound') then
+    if FileExists(PathToJavaTemplates+'lamwdesigner'+PathDelim+jcontrolsList.Strings[i]+'.compound') then
     begin
       compoundList.LoadFromFile(LamwGlobalSettings.PathToJavaTemplates+'lamwdesigner'+DirectorySeparator +jcontrolsList.Strings[i]+'.compound');
       for j:= 0 to compoundList.Count - 1 do
