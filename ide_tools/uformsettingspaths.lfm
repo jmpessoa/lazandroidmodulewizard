@@ -272,6 +272,7 @@ object FormSettingsPaths: TFormSettingsPaths
     Top = 341
     Width = 232
     AutoFill = True
+    AutoSize = True
     BorderSpacing.Around = 8
     Caption = 'NDK version'
     ChildSizing.LeftRightSpacing = 6
