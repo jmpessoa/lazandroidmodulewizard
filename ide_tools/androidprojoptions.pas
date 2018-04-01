@@ -5,7 +5,7 @@ unit AndroidProjOptions;
 interface
 
 uses
-  Classes, SysUtils, Types, strings, LazFileUtils, laz2_XMLRead, Laz2_DOM,
+  Classes, SysUtils, Types, LazFileUtils, laz2_XMLRead, Laz2_DOM,
   AvgLvlTree, IDEOptionsIntf, ProjectIntf, SourceChanger, Forms, Controls,
   Dialogs, Grids, StdCtrls, LResources, ExtCtrls, Spin, ComCtrls, Buttons,
   Themes;
@@ -592,12 +592,16 @@ begin
           begin
             if (TagName = 'style') and (AttribStrings['name'] = Result) then
               if AttribStrings['parent'] <> '' then
-                Result := AttribStrings['parent']
-              else
+              begin
+                Result := AttribStrings['parent'];
+                n := x.DocumentElement.FirstChild;
+                Continue;
+              end else
                 Exit;
           end;
         n := n.NextSibling;
       end;
+      if API <= 0 then Exit;
       repeat
         fn := base + '-v' + IntToStr(API) + PathDelim + 'styles.xml';
         Dec(API);
