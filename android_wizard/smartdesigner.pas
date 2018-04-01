@@ -34,6 +34,8 @@ type
     FSmallProjName: string;
     FGradleVersion: string;
     FPrebuildOSYS: string;
+    FCandidateSdkPlatform: integer;
+    FCandidateSdkBuild: string;
 
     procedure CleanupAllJControlsSource;
     procedure GetAllJControlsFromForms(jControlsList: TStrings);
@@ -213,6 +215,7 @@ var
 begin
 
   Result:= 0;
+  FCandidateSdkPlatform:= 0;
 
   lisDir:= TStringList.Create;
   FindAllDirectories(lisDir, FPathToAndroidSDK+'platforms', False);
@@ -230,6 +233,10 @@ begin
             begin
               strApi:= Copy(strApi, LastDelimiter('-', strApi) + 1, MaxInt); //21
               intApi:= StrToInt(strApi);
+
+              if FCandidateSdkPlatform < intApi then
+                   FCandidateSdkPlatform:= intApi;
+
               if Result < intApi then
               begin
                 if HasBuildTools(intApi, tempOutBuildTool) then
@@ -250,9 +257,10 @@ function TLamwSmartDesigner.HasBuildTools(platform: integer;  out outBuildTool: 
 var
   lisDir: TStringList;
   numberAsString, builderTool, auxStr: string;
-  i, p, builderNumber: integer;
+  i, p, builderNumber,  savedBuilder: integer;
 begin
   Result:= False;
+  savedBuilder:= 0;
   lisDir:= TStringList.Create;   //C:\adt32\sdk\build-tools\19.1.0
   FindAllDirectories(lisDir, FPathToAndroidSDK+'build-tools', False);
   if lisDir.Count > 0 then
@@ -268,11 +276,18 @@ begin
            builderTool:= Copy(lisDir.Strings[i], p, Length(auxStr));
            numberAsString:= Copy(builderTool, 1 , 2);  //19
            builderNumber:=  StrToInt(numberAsString);
-           if  platform = builderNumber then
+
+           if savedBuilder < builderNumber then
+           begin
+              savedBuilder:= builderNumber;
+              FCandidateSdkBuild:= builderTool;
+           end;
+
+           if platform = builderNumber then
            begin
              outBuildTool:= builderTool; //19.1.0
              Result:= True;
-           end;
+           end
          end;
        end;
     end;
@@ -841,6 +856,12 @@ begin
 
   //begin LAMW 0.8
   maxSdkApi:= GetMaxSdkPlatform(outMaxBuildTool);
+  if maxSdkApi =  0 then   // try fix "android-0"
+  begin
+     maxSdkApi:= FCandidateSdkPlatform;
+     outMaxBuildTool:= FCandidateSdkBuild;
+  end;
+
   if AProject.CustomData['BuildSystem'] = '' then
   begin
      AProject.CustomData['BuildSystem']:= 'Ant';

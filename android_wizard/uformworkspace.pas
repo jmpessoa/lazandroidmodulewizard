@@ -105,10 +105,9 @@ type
     FLibraryChecked: boolean;
     FGradleVersion: string;
 
-   // FLAMWHintChecked: boolean;
-
     FMaxSdkPlatform: integer;
     FMaxNdkPlatform: integer;
+    FCandidateSdkPlatform: integer;
 
     function GetBuildSystem: string;
     function HasBuildTools(platform: integer; out outBuildTool: string): boolean;
@@ -128,6 +127,7 @@ type
     procedure LoadPathsSettings(const fileName: string);
     function GetEventSignature(nativeMethod: string): string;
     function GetPathToTemplatePresumed(): string;
+
     function GetMaxSdkPlatform(): integer;
     function GetBuildTool(sdkApi: integer): string;
 
@@ -223,6 +223,7 @@ var
   outBuildTool: string;
 begin
   Result:= 0;
+  FCandidateSdkPlatform:= 0;;
   lisDir:= TStringList.Create;
   FindAllDirectories(lisDir, FPathToAndroidSDK+PathDelim+'platforms', False);
   if lisDir.Count > 0 then
@@ -238,10 +239,16 @@ begin
            begin
              strApi:= Copy(strApi, LastDelimiter('-', strApi) + 1, MaxInt);
              intApi:= StrToInt(strApi);
+
+             if FCandidateSdkPlatform < intApi then
+                 FCandidateSdkPlatform:= intApi;
+
              if Result < intApi then
              begin
+               FCandidateSdkPlatform:= intApi;
                if HasBuildTools(intApi, outBuildTool) then Result:= intApi;
              end;
+
            end;
          end;
        end;
@@ -1242,7 +1249,11 @@ begin
 
   //verify if some was not load!
   Self.LoadPathsSettings(FFileName);
+
   FMaxSdkPlatform:= Self.GetMaxSdkPlatform();
+  if FMaxSdkPlatform = 0 then    //  try fix "android-0"
+      FMaxSdkPlatform:= FCandidateSdkPlatform;
+
   FMaxNdkPlatform:= Self.GetMaxNdkPlatform();
 
 end;

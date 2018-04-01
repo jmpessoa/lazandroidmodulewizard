@@ -97,7 +97,7 @@ III. USE
 	
 		ref. https://od.lk/f/Ml8xNTU4Mjc1NThf
 
-	2.2-From displayed dialog select "Android [GUI] JNI Module [Lamw]" 	
+	2.2-From displayed dialog select "LAMW GUI Android Module" 	
 
 	2.3-Press OK Button.
 
@@ -119,13 +119,9 @@ III. USE
 
 			[This is your Android App/Apk name]
 
-	2.6-[MinSdk] Select the  min. Sdk Api to compile your project:
+	2.6-[MinSdk] Select the  Min. Device Api need to run your App:
 
 		example: 14
-
-	2.7-[Compile/TagetApi] Select the target [api] device  [LAMW 0.8 need API >= 25]
-
-		example: 25
 
 	2.8-Select Architecture/Instruction: 
 
