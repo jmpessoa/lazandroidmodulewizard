@@ -183,7 +183,7 @@ public class jCommons {
 	      //[endif_api14up]
 	       /* //[endif_api14up]
 	       LEFT =  Gravity.LEFT;          
-	       RIGHT =  Gravity.RIGHT 
+	       RIGHT =  Gravity.RIGHT;
 	       //[ifdef_api14up] */	   	   
 		   switch(_g) {	   
 		   case 0: lgravity = Gravity.NO_GRAVITY; break;
@@ -218,7 +218,7 @@ public class jCommons {
 	      //[endif_api14up]
 	       /* //[endif_api14up]
 	       LEFT =  Gravity.LEFT;          
-	       RIGHT =  Gravity.RIGHT 
+	       RIGHT =  Gravity.RIGHT;
 	       //[ifdef_api14up] */	   	 
   
                    algravityAnchorId = _anchorId;
