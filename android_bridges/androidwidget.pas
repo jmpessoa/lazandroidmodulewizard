@@ -16,6 +16,16 @@ uses
 
 type
   TAndroidLayoutType = (altMATCHPARENT,altWRAPCONTENT);
+  TViewVisibility = (vvVisible=0,  vvInvisible=4, vvGone=8);
+
+  TCollapsingMode = (cmPin, cmParallax, cmOff);
+  TCollapsingScrollflag = (csfExitUntilCollapsed, csfEnterAlwaysCollapsed, csfEnterAlways, csfSnap, csfNone);
+
+  TOnClickNavigationViewItem = procedure(Sender: TObject; itemId: integer; itemCaption: string) of object;
+
+  TAppTheme = (actThemeOverlayAppCompatDarkActionBar);
+
+  jObjectRef = Pointer;
 
 const
 
@@ -30,12 +40,13 @@ const
   cRenderer_onGLDraw    = 2;
   cRenderer_onGLDestroy = 3;
   cRenderer_onGLThread  = 4;
+  cRenderer_onGLPause  = 5;
+  cRenderer_onGLResume  = 6;
 
 
   cjFormsMax = 40; // Max Form Stack Count
 
-    //by jmpessoa
-  TFPColorBridgeArray: array[0..143] of longint = (
+  TFPColorBridgeArray: array[0..144] of longint = (
     $000000,$98FB98,$9932CC,$9ACD32,$A0522D,
     $A52A2A,$A9A9A9,$ADD8E6,$ADFF2F,$AFEEEE,
     $B0C4DE,$B0E0E6,$B22222,$B8860B,$BA55D3,
@@ -64,9 +75,8 @@ const
     $7CFC00,$7FFF00,$7FFFD4,$800000,$800080,
     $808000,$808080,$8470FF,$87CEEB,$87CEFA,
     $8A2BE2,$8B0000,$8B008B,$8B4513,$8FBC8F,
-    $90EE90,$9370D8,$9400D3, $000000); //colbrDefault
+    $90EE90,$9370D8,$9400D3,$000000,$000000); //colbrDefault
 
-  //by jmpessoa
   TARGBColorBridgeArray: array[0..144] of DWord = (
     $FF000000,$FF98FB98,$FF9932CC,$FF9ACD32,$FFA0522D,
     $FFA52A2A,$FFA9A9A9,$FFADD8E6,$FFADFF2F,$FFAFEEEE,
@@ -422,7 +432,8 @@ type
   colbrLawnGreen,colbrChartreuse,colbrAquamarine,colbrMaroon,colbrPurple,
   colbrOlive,colbrGray,colbrLightSlateBlue,colbrSkyBlue,colbrLightSkyBlue,
   colbrBlueViolet,colbrDarkRed,colbrDarkMagenta,colbrSaddleBrown,colbrDarkSeaGreen,
-  colbrLightGreen,colbrMediumPurple,colbrDarkViolet,colbrNone, colbrDefault, colbrCustom);  //default=transparent!
+  colbrLightGreen,colbrMediumPurple,colbrDarkViolet,colbrNone,
+  colbrDefault, colbrCustom);  //default=transparent!
 
   //by jmpessoa
   TProgressBarStyle = (cjProgressBarStyle,
@@ -454,15 +465,23 @@ type
 
   TTextSizeDecorated = (sdNone, sdDecreasing, sdIncreasing);
 
-  TTextAlign = (alLeft, alRight, alCenter); //jListView
+  TTextAlign = (alLeft, alRight, alCenter);      //jListView
 
-  TTextAlignment = (taLeft, taRight, taCenter); //others...
+  TTextAlignment = (taLeft, taRight, taCenter);  //others...
 
  TTextAlignHorizontal = (thLeft, thRight, thCenter);  //jCanvas
  TTextAlignVertical = (tvTop, tvBottom, tvCenter);
 
   TGravity = (gvBottom, gvCenter, gvCenterHorizontal, gvCenterVertical, gvLeft, gvNoGravity,
               gvRight, gvStart, gvTop, gvEnd, gvFillHorizontal, gvFillVertical);
+
+  TLayoutGravity = (lgNone,
+                   lgTopLeft, lgTopCenter, lgTopRight,
+                   lgBottomLeft, lgBottomCenter, lgBottomRight,
+                   lgCenter,
+                   lgCenterVerticalLeft, lgCenterVerticalRight,
+                   lgLeft, lgRight,
+                   lgTop, lgBottom);
 
   TGravitySet = set of TGravity;
 
@@ -538,7 +557,7 @@ type
                    lpSevenEighthOfParent, lpOneSixthOfParent, lpFiveSixthOfParent, lpOneFifthOfParent,
                    lpTwoFifthOfParent, lpThreeFifthOfParent, lpThreeQuarterOfParent,
                    lpFourFifthOfParent, lpNineTenthsOfParent, lp95PercentOfParent, lp99PercentOfParent,
-                   lp16px, lp24px, lp32px, lp40px, lp48px, lp72px, lp96px, lpExact, lpUseWeight);
+                   lp16px, lp24px, lp32px, lp40px, lp48px, lp72px, lp96px, lp128px, lp192px, lpExact, lpUseWeight);
 
   TSide = (sdW, sdH);
 
@@ -605,15 +624,15 @@ type
 
   TLayoutRelativeTo = (lrParent, lrAnchor);
 
-  TPaintStyle = (psFill , psFillAndStroke, psStroke); //by jmpessoa
+  TPaintStyle = (psFill , psFillAndStroke, psStroke);
 
-  TActivityMode = (actMain, actRecyclable, actSplash); //actDisposable
+  TActivityMode = (actMain, actRecyclable, actSplash, actEasel);  //Conteiner
 
   //TDeviceType = (dtPhone, dtWatch);
 
-  TTextTypeFace = (tfNormal, tfBold, tfItalic, tfBoldItalic); //by jmpessoa
+  TTextTypeFace = (tfNormal, tfBold, tfItalic, tfBoldItalic);
   TFontFace = (ffNormal, ffSans, ffSerif, ffMonospace);
-  //...
+
   TOnNotify = Procedure(Sender: TObject) of object;
   TViewClick = Procedure(jObjView: jObject; Id: integer) of object;
   TListItemClick = Procedure(jObjAdapterView: jObject; jObjView: jObject; position: integer; Id: integer) of object;
@@ -651,6 +670,9 @@ type
   TOnActivityRst = Procedure(Sender: TObject; requestCode: integer; resultCode: TAndroidResult; intentData: jObject) of Object;
 
   TOnActivityCreate = Procedure(Sender: TObject; intentData: jObject) of Object;
+
+  TOnActivityPause = Procedure(Sender: TObject) of Object;
+  TOnActivityResume = Procedure(Sender: TObject) of Object;
 
   TOnNewIntent = Procedure(Sender: TObject; intentData: jObject) of Object;
 
@@ -791,9 +813,7 @@ type
     Orientation   : TScreenStyle;   //orientation on app start....
 
     Locale        : TLocale;    //by thierrydijoux
-
     ControlsVersionInfo: string; //by jmpessoa
-
     TopIndex: integer;
 
     constructor Create(AOwner: TComponent); override;
@@ -875,15 +895,9 @@ type
     procedure SetMarginTop(const AValue: integer);
     procedure SetLeft(const AValue: integer);
     procedure SetTop(const AValue: integer);
-    {
-    procedure ReadIntHeightData(Reader: TReader);
-    procedure ReadIntWidthData(Reader: TReader);
-    procedure WriteIntHeightData(Writer: TWriter);
-    procedure WriteIntWidthData(Writer: TWriter);
-    }
   protected
-    FColor       : TARGBColorBridge; //background ... needed by design...
-    FFontColor   : TARGBColorBridge;  //needed by design...
+    FColor       : TARGBColorBridge;  //background ... needed by designer...
+    FFontColor   : TARGBColorBridge;  //needed by designer...
 
     FParent: TAndroidWidget;
     FText: string;
@@ -1001,18 +1015,18 @@ end;
     FCBDataInteger: integer;
     FCBDataDouble: double;
 
-    FjRLayout{View}: jObject;      // Java Relative Layout View
+    FjRLayout: jObject;      //form Relative Layout/view
+    FjPRLayout: jObject; //base actvity layout/view
+
+    FjPRLayoutHome: jObject;  //save origin
 
     FOnViewClick      : TViewClick;
     FOnListItemClick  : TListItemClick;
 
     FScreenWH      : TWH;
     FPackageName: string;
-
     FScreenStyle   : TScreenStyle;
-
     FAnimation     : TAnimation;
-
     FActivityMode  : TActivityMode;
     FActionBarTitle: TActionBarTitle;
 
@@ -1022,13 +1036,10 @@ end;
     FOnRotate      : TOnRotate;
 
     FOnActivityRst : TOnActivityRst;
-
     FOnJNIPrompt   : TOnNotify;
     FOnBackButton  : TOnNotify;
-
     FOnSpecialKeyDown      : TOnKeyDown;
     FActionBarHeight: integer;
-
     FOnOptionMenuCreate: TOnOptionMenuItemCreate;
     FOnClickOptionMenuItem: TOnClickOptionMenuItem;
     FOnContextMenuCreate: TOnContextMenuItemCreate;
@@ -1037,41 +1048,22 @@ end;
     FOnPrepareOptionsMenu: TOnPrepareOptionsMenu;
     FOnPrepareOptionsMenuItem: TOnPrepareOptionsMenuItem;
     FOnActivityCreate: TOnActivityCreate;
+    FOnActivityPause: TOnActivityPause;
+    FOnActivityResume: TOnActivityResume;
     //FOnNewIntent: TOnNewIntent;
-
-    //---------------  dummies for compatibility----
-   {  FHorizontalOffset: integer;
-     FVerticalOffset: integer;
-     FOldCreateOrder: boolean;
-     FTitle: string;}
-    //---------------
+    FLayoutVisibility: boolean;
 
     Procedure SetColor   (Value : TARGBColorBridge);
-    {
-    procedure ReadIntHorizontalOffset(Reader: TReader);
-    procedure WriteIntHorizontalOffset(Writer: TWriter);
-    procedure ReadIntVerticalOffset(Reader: TReader);
-    procedure WriteIntVerticalOffset(Writer: TWriter);
-    procedure ReadBolOldCreateOrder(Reader: TReader);
-    procedure WriteBolOldCreateOrder(Writer: TWriter);
-    procedure ReadStrTitle(Reader: TReader);
-    procedure WriteStrTitle(Writer: TWriter);
-    }
 
   protected
-    //procedure DefineProperties(Filer: TFiler); override;
     FCloseCallback : TjCallBack;   // Close Call Back Event
-
     Procedure SetVisible (Value : Boolean);
     Procedure SetEnabled (Value : Boolean); override;
-
     function  GetOnViewClickListener(jObjForm: jObject): jObject;
     function  GetOnListItemClickListener(jObjForm: jObject): jObject;
 
   public
-
     ScreenStyleAtStart: TScreenStyle;    //device direction [vertical=1 and vertical=2]
-
     FormState     : TjFormState;
     FormIndex: integer;
     FormBaseIndex: integer;
@@ -1108,8 +1100,6 @@ end;
     Procedure GenEvent_OnListItemClick(jObjAdapterView: jObject; jObjView: jObject; position: integer; Id: integer);
 
     procedure UpdateJNI(refApp: jApp); override;
-
-    //by jmpessoa
     Procedure UpdateLayout;
 
     function SetWifiEnabled(_status: boolean): boolean;
@@ -1227,9 +1217,15 @@ end;
     function ParseHtmlFontAwesome(_htmlString: string): string;
 
     procedure ReInit(refApp: jApp);
+    procedure SetLayoutParent(_viewgroup: jObject);   //FjPRLayout
+    function GetLayoutParent: jObject;
+    procedure RemoveFromLayoutParent();
+    procedure SetLayoutVisibility(_value: boolean);
+    procedure ResetLayoutParent();
 
-    // Property
+    // Property            FjRLayout
     property View         : jObject        read FjRLayout; //layout!
+    property ViewParent {ViewParent}: jObject  read  GetLayoutParent  write SetLayoutParent; // Java : Parent Relative Layout
 
     property ScreenStyle  : TScreenStyle   read FScreenStyle    write FScreenStyle;
     property Animation    : TAnimation     read FAnimation      write FAnimation;
@@ -1239,11 +1235,9 @@ end;
     property CallBackDataInteger: integer read FCBDataInteger write FCBDataInteger;
     property CallBackDataDouble: double read FCBDataDouble write FCBDataDouble;
 
-    property  OnViewClick: TViewClick read FOnViewClick write FOnViewClick;
-    property  OnListItemClick: TListItemClick read FOnListItemClick write FOnListItemClick;
-
     property PackageName: string read FPackageName;
     property ActionBarHeight: integer read GetActionBarHeight;
+    property LayoutVisibility: boolean   read FLayoutVisibility write  SetLayoutVisibility;
     //---------------  dummies for compatibility----
     {
     property OldCreateOrder: boolean read FOldCreateOrder write FOldCreateOrder;
@@ -1252,6 +1246,9 @@ end;
     property VerticalOffset: integer read FVerticalOffset write FVerticalOffset;
     }
     //--------------------
+    property  OnViewClick: TViewClick read FOnViewClick write FOnViewClick;
+    property  OnListItemClick: TListItemClick read FOnListItemClick write FOnListItemClick;
+
   published
     property Text: string read GetText write SetText;
     property ActivityMode  : TActivityMode read FActivityMode write FActivityMode;
@@ -1281,6 +1278,8 @@ end;
     property OnClickContextMenuItem: TOnClickContextMenuItem read FOnClickContextMenuItem write FOnClickContextMenuItem;
 
     property OnActivityCreate: TOnActivityCreate read FOnActivityCreate write FOnActivityCreate;
+    property OnActivityPause: TOnActivityPause read FOnActivityPause write FOnActivityPause;
+    property OnActivityResume: TOnActivityResume read FOnActivityResume write FOnActivityResume;
     //property OnNewIntent: TOnNewIntent read FOnNewIntent write FOnNewIntent;
   end;
 
@@ -1301,12 +1300,11 @@ end;
     }
 
   protected
-    // Java
     FId: DWord;
     FjPRLayout   : jObject; //Java: Parent Layout {parent View)
-    FScreenStyle    : TScreenStyle;
-    //FTextAlignment: TTextAlignment;
+    FjPRLayoutHome: jObject; //Save parent origin
 
+    FScreenStyle    : TScreenStyle;
     FFontSize     : DWord;
     FFontSizeUnit: TFontSizeUnit;
 
@@ -1326,6 +1324,8 @@ end;
     FOnClick: TOnNotify;
     FOnLongClick: TOnNotify;
 
+    FGravityInParent: TLayoutGravity;
+
     FOnBeforeDispatchDraw: TOnBeforeDispatchDraw;
     FOnAfterDispatchDraw: TOnAfterDispatchDraw;
     FOnLayouting: TOnLayouting;
@@ -1336,33 +1336,25 @@ end;
 
     procedure SetViewParent(Value: jObject);  virtual;
     function GetViewParent: jObject;  virtual;
+    procedure RemoveFromViewParent;  virtual;
+    procedure ResetViewParent(); virtual;
 
     procedure SetVisible(Value: boolean);
-
-    procedure SetParentComponent(Value: TComponent); override;
+    function GetVisible(): boolean;
 
     procedure SetParamHeight(Value: TLayoutParams); virtual;
     procedure SetParamWidth(Value: TLayoutParams);  virtual;
-
-    //procedure SetFontFace(AValue: TFontFace); virtual;
-    //procedure SetFontColor(AValue: TARGBColorBridge); virtual;
-    //procedure SetFontSize(AValue : DWord); virtual;
-    //procedure SetTextTypeFace(Value: TTextTypeFace); virtual;
-    //procedure SetHintTextColor(Value: TARGBColorBridge); virtual;
-
     function GetView: jObject; virtual;
-
     // tk
     function InternalIDExistsInParent(const ID: DWord): Boolean; virtual;
     function InternalIDExistsInChildren(const ID: DWord): Boolean; virtual;
     function InternalNewIDFromParent: DWord; virtual;
     procedure SetParent(const AValue: TAndroidWidget); override;
     // end tk
-
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
-
+    procedure SetParentComponent(Value: TComponent); override;  //+++
     // tk
     procedure AssignNewId; virtual;
     function IDExistsInParent: Boolean; virtual;
@@ -1379,17 +1371,10 @@ end;
     property AnchorId: integer read FAnchorId write FAnchorId;
     property ScreenStyle   : TScreenStyle read FScreenStyle  write FScreenStyle   ;
     property ViewParent {ViewParent}: jObject  read  GetViewParent write SetViewParent; // Java : Parent Relative Layout
-
     property View: jObject read GetView;     //FjObject; //View/Layout
 
-    //property FontColor: TARGBColorBridge read FFontColor write SetFontColor;
-    //property FontSize: DWord read FFontSize write SetFontSize;
-    //property FontFace: TFontFace read FFontFace write SetFontFace;
-    //property TextTypeFace: TTextTypeFace read FTextTypeFace write SetTextTypeFace;
-    //property HintTextColor: TARGBColorBridge read FHintTextColor write SetHintTextColor;
-
   published
-    property Visible: boolean read FVisible write SetVisible;
+    property Visible: boolean read GetVisible write SetVisible;
     property Anchor  : jVisualControl read FAnchor write SetAnchor;
     property Id: DWord read FId write SetId; //FId; // quickfix #25
     property PosRelativeToAnchor: TPositionRelativeToAnchorIDSet read FPositionRelativeToAnchor
@@ -1641,6 +1626,10 @@ procedure jForm_Restart(env: PJNIEnv; _jform: JObject; _delay: integer);
 procedure jForm_HideSoftInput(env: PJNIEnv; _jform: JObject; _view: jObject);  overload;
 function jForm_UriEncode(env: PJNIEnv; _jform: JObject; _message: string): string;
 function jForm_ParseHtmlFontAwesome(env: PJNIEnv; _jform: JObject; _htmlString: string): string;
+procedure jForm_SetViewParent(env: PJNIEnv; _jform: JObject; _viewgroup: jObject);
+procedure jForm_RemoveFromViewParent(env: PJNIEnv; _jform: JObject);
+procedure jForm_SetLayoutVisibility(env: PJNIEnv; _jform: JObject; _value: boolean);
+function jForm_GetParent(env: PJNIEnv; _jform: JObject): jObject;
 
 //------------------------------------------------------------------------------
 // View  - Generics
@@ -1648,8 +1637,8 @@ function jForm_ParseHtmlFontAwesome(env: PJNIEnv; _jform: JObject; _htmlString: 
 
 Procedure View_SetVisible             (env:PJNIEnv;this:jobject; view : jObject; visible : Boolean); overload;
 
-Procedure View_SetVisible             (env:PJNIEnv;view : jObject; visible : Boolean); overload;
-
+Procedure View_SetVisible             (env:PJNIEnv; view: jObject; visible : Boolean); overload;
+function  View_GetVisible             (env:PJNIEnv; view: jObject): boolean;
 
 Procedure View_SetId                  (env:PJNIEnv;this:jobject; view : jObject; Id: DWord); overload;
 Procedure View_SetId                  (env:PJNIEnv; view : jObject; Id :DWord); overload;
@@ -1662,7 +1651,7 @@ Procedure View_Invalidate             (env:PJNIEnv; view : jObject); overload;
 Procedure View_PostInvalidate(env:PJNIEnv; view : jObject);
 
 //------------
-  function JBool( Bool : Boolean ) : byte;
+function JBool( Bool : Boolean ) : byte;
 
 //----------
 // System Info
@@ -1736,7 +1725,6 @@ var
   gjClassName : PChar; // Ex 'com/kredix/Controls';
 
   ActivityModeDesign: TActivityMode = actMain;
-  //ActionBarTitleDesign: TActionBarTitle = abtDefault;
 
 
 implementation
@@ -1976,6 +1964,8 @@ begin
   FInitialized:= False;
   FEnabled:= False;
   FjObject := nil;
+  FClassPath:= '';
+  FCustomColor:= $FF2C2F3E;    // <<--- thanks to Ps
 end;
 
 destructor jControl.Destroy;
@@ -1987,7 +1977,8 @@ procedure jControl.Init(refApp: jApp);
 begin
   FjEnv:= refApp.Jni.jEnv;
   FjThis:= refApp.Jni.jThis;
-  FjClass:= Get_jClassLocalRef(FClassPath);  //needed by new direct jni component model...
+  if  FClassPath <> '' then
+     FjClass:= Get_jClassLocalRef(FClassPath);  //needed by new direct jni component model...
 end;
 
 procedure jControl.SetEnabled(Value: boolean);
@@ -2028,13 +2019,12 @@ begin
   FAcceptChildrenAtDesignTime:= False;
   FColor:= colbrDefault;
   FFontColor:= colbrDefault;
-  FCustomColor:= $FF2C2F3E;    // <<--- thanks to Ps
 end;
 
 destructor TAndroidWidget.Destroy;
 begin
   Parent:=nil;
-  while ChildCount>0 do Children[ChildCount-1].Free;
+  while ChildCount > 0 do Children[ChildCount-1].Free;
   FreeAndNil(FChilds);
   inherited Destroy;
 end;
@@ -2134,6 +2124,7 @@ procedure TAndroidWidget.SetName(const NewName: TComponentName);
 begin
   if (csDesigning in ComponentState) then
      if Name = FText then FText:= NewName;
+
   inherited SetName(NewName);
 end;
 
@@ -2267,6 +2258,8 @@ begin
   inherited Create(AOwner);
 
   FjPRLayout := nil;  //java parent
+  FjPRLayoutHome:= nil;
+
   FjObject    := nil; //java object
   FEnabled   := True;
   FVisible   := True;
@@ -2310,11 +2303,14 @@ procedure jVisualControl.Init(refApp: jApp);
 begin
   inherited Init(refApp);
   FjPRLayout := jForm(Owner).View;  //set default ViewParent/FjPRLayout as jForm.View!
+  FjPRLayoutHome:= FjPRLayout;  //save origin
+
   FScreenStyle := jForm(Owner).ScreenStyle;
   if (PosRelativeToAnchor = []) and (PosRelativeToParent = []) then
   begin
-    FMarginLeft := FLeft;
-    FMarginTop := FTop;
+    //commented by jmpessoa: causing error to jPanel when used as a "flying" view [jActonBarTab, jRecyclerView...]
+    //FMarginLeft := FLeft;
+    //FMarginTop := FTop;
   end;
 end;
 
@@ -2398,6 +2394,16 @@ begin
   Result:= FjPRLayout;
 end;
 
+procedure jVisualControl.RemoveFromViewParent;
+begin
+   //
+end;
+
+procedure jVisualControl.ResetViewParent();
+begin
+  FjPRLayout:= FjPRLayoutHome;
+end;
+
 function jVisualControl.GetView: jObject;
 begin
   Result:= FjObject;
@@ -2470,15 +2476,19 @@ procedure jVisualControl.SetVisible(Value: boolean);
 begin
   FVisible:= Value;
   if FInitialized then
-    View_SetVisible(FjEnv, FjObject, FVisible);
+     View_SetVisible(FjEnv, FjObject, FVisible);
+end;
+
+function jVisualControl.GetVisible(): boolean;
+begin
+  Result:= FVisible;
+  if FInitialized then
+     Result:= View_GetVisible(FjEnv, FjObject);
 end;
 
 procedure jVisualControl.DefineProperties(Filer: TFiler);
 begin
  inherited DefineProperties(Filer);
-  {Define new properties and reader/writer methods }
-  //quickfix #25
-  //Filer.DefineProperty('Id', ReadIntId, WriteIntId, True);
 end;
 
 procedure jVisualControl.ReadIntId(Reader: TReader);
@@ -2503,7 +2513,6 @@ begin
     View_SetId(FjEnv, FjObject, FId);
 end;
 
-
 // needed by jForm process logic ...
 procedure jVisualControl.UpdateLayout();
 begin
@@ -2520,32 +2529,6 @@ begin
   FLParamHeight:= Value;
 end;
 
-{
-procedure jVisualControl.SetTextTypeFace(Value: TTextTypeFace);
-begin
-  FTextTypeFace:= Value;
-end;
-
-procedure jVisualControl.SetFontFace(AValue: TFontFace);
-begin
-  FFontFace := AValue;
-end;
-
-procedure jVisualControl.SetHintTextColor(Value: TARGBColorBridge);
-begin
-  FHintTextColor:= Value;
-end;
-
- procedure jVisualControl.SetFontColor(AValue: TARGBColorBridge);
- begin
-    FFontColor:= AValue;
- end;
-
- procedure jVisualControl.SetFontSize(AValue : DWord);
- begin
-    FFontSize:= AValue;
- end;
- }
   { TAndroidForm }
 
 constructor TAndroidForm.CreateNew(AOwner: TComponent);
@@ -2624,12 +2607,11 @@ begin
   FColor                := colbrDefault;
   FormState             := fsFormCreate;
   FCloseCallBack.Event  := nil;
-  FCloseCallBack.EventData:= nil; //by jmpessoa
+  FCloseCallBack.EventData:= nil;
   FCloseCallBack.Sender := nil;
-  FActivityMode         := ActivityModeDesign; //actMain;  //actMain, actRecyclable, actSplash
+  FActivityMode         := ActivityModeDesign; //actMain;  //actMain, actRecyclable, actSplash, actDesign
 
   FActionBarTitle:= abtDefault;
-  //FActionBarTitle:= ActionBarTitleDesign; //'phone' or 'watch' or
 
   FOnCloseQuery         := nil;
   FOnClose              := nil;
@@ -2666,13 +2648,8 @@ begin
   TryBacktrackOnClose:= False;
 
   DoJNIPromptOnShow:= True;
+  FVisible:= True;
 
-  //-------------- dummies for compatibility----
-  //FOldCreateOrder:= False;
-  //FTitle:= 'jForm';
-  //FHorizontalOffset:= 300;
-  //FVerticalOffset:= 150;
-  //--------------
   //now load the stream
   InitInheritedComponent(Self, TAndroidWidget {TAndroidForm}); {thanks to  x2nie !!}
 end;
@@ -2682,6 +2659,8 @@ begin
   if FInitialized and (not Finished) then
   begin
     jForm_FreeLayout(FjEnv, FjRLayout); //free jni jForm Layout global reference
+    jForm_FreeLayout(FjEnv, FjPRLayoutHome); //free jni jForm Layout global reference
+
     jForm_Free2(FjEnv, FjObject);
   end;
   inherited Destroy;
@@ -2692,6 +2671,9 @@ begin
   if FInitialized  and (not Finished)  then
   begin
     jForm_FreeLayout(FjEnv, FjRLayout); //free jni jForm Layout global reference
+
+    jForm_FreeLayout(FjEnv, FjPRLayoutHome); //free jni jForm Layout global reference
+
     jForm_Free2(FjEnv, FjObject);
     Finished:= True;
   end;
@@ -2707,76 +2689,103 @@ begin
 
   Inherited Init(refApp);
 
-  if FActivityMode = actSplash then
-     Randomize; //thanks to Gerrit
-
-  if FActivityMode = actMain then
-     Randomize; //thanks to Gerrit
-
-  FScreenStyle:= refApp.Orientation;
-
-  FScreenWH:= refApp.Screen.WH;   //sAved on start!
-
-  FPackageName:= refApp.AppName;
-
-  ScreenStyleAtStart:= FScreenStyle;   //saved on start!
-
-  FjObject:=  jForm_Create(refApp.Jni.jEnv, refApp.Jni.jThis, Self); {jSef}
-
-  FjRLayout:=  jForm_Getlayout2(refApp.Jni.jEnv, FjObject);  {form view/RelativeLayout}
-
-  //thierrydijoux - if backgroundColor is set to black, no theme ...
-  if  FColor <> colbrDefault then
-     View_SetBackGroundColor(refApp.Jni.jEnv, refApp.Jni.jThis, FjRLayout, GetARGB(FCustomColor, FColor));
-
-  FInitialized:= True;
-
-  for i:= (Self.ComponentCount-1) downto 0 do
+  if FActivityMode <> actEasel then
   begin
-    if (Self.Components[i] is jControl) then
+
+    if FActivityMode = actSplash then
+       Randomize; //thanks to Gerrit
+
+    if FActivityMode = actMain then
+       Randomize; //thanks to Gerrit
+
+    FScreenStyle:= refApp.Orientation;
+    FScreenWH:= refApp.Screen.WH;   //sAved on start!
+    FPackageName:= refApp.AppName;
+    ScreenStyleAtStart:= FScreenStyle;   //saved on start!
+
+    FjObject:=  jForm_Create(refApp.Jni.jEnv, refApp.Jni.jThis, Self); {jSef}
+    FjRLayout:=  jForm_Getlayout2(refApp.Jni.jEnv, FjObject);  {View}    //jni grobal ref
+    FjPRLayoutHome:= jForm_GetParent(refApp.Jni.jEnv, FjObject); //save origin  //jni grobal ref
+    FjPRLayout:= FjPRLayoutHome; //base appLayout
+
+    //thierrydijoux - if backgroundColor is set to black, no theme ...
+    if  FColor <> colbrDefault then
+       View_SetBackGroundColor(refApp.Jni.jEnv, refApp.Jni.jThis, FjRLayout, GetARGB(FCustomColor, FColor));
+
+    FInitialized:= True;
+
+    for i:= (Self.ComponentCount-1) downto 0 do
     begin
-       (Self.Components[i] as jControl).Init(refApp);
+      if (Self.Components[i] is jControl) then
+      begin
+         (Self.Components[i] as jControl).Init(refApp);
+      end;
     end;
-  end;
 
-  jForm_SetEnabled2(refApp.Jni.jEnv, FjObject, FEnabled);
+    jForm_SetEnabled2(refApp.Jni.jEnv, FjObject, FEnabled);
 
-  if gApp.GetCurrentFormsIndex = (cjFormsMax-1) then Exit; //no more form is possible!
+    if gApp.GetCurrentFormsIndex = (cjFormsMax-1) then Exit; //no more form is possible!
 
-  FormBaseIndex:= gApp.TopIndex;           //initial = -1
+    FormBaseIndex:= gApp.TopIndex;           //initial = -1
 
-  if FormIndex < 0 then //if it is a new form .... [not a ReInit form ...]
-      FormIndex:= gApp.GetNewFormsIndex;  //first valid index = 0;
+    if FormIndex < 0 then //if it is a new form .... [not a ReInit form ...]
+        FormIndex:= gApp.GetNewFormsIndex;  //first valid index = 0;
 
-  gApp.Forms.Stack[FormIndex].Form    := Self;
-  gApp.Forms.Stack[FormIndex].CloseCB := FCloseCallBack;
+    gApp.Forms.Stack[FormIndex].Form    := Self;
+    gApp.Forms.Stack[FormIndex].CloseCB := FCloseCallBack;
 
-  FormState := fsFormWork;
-  FVisible:= True;
+    FormState := fsFormWork;
+    //gApp.TopIndex:= FormIndex;
 
-  gApp.TopIndex:= FormIndex;
+    if FActionBarTitle = abtHide then
+       jForm_HideActionBar(FjEnv, FjObject);
 
-  if FActionBarTitle = abtHide then
-     jForm_HideActionBar(FjEnv, FjObject);
+    if FActionBarTitle = abtHideLogo then
+        jForm_ShowLogoActionBar(FjEnv, FjObject, False);
 
-  if FActionBarTitle = abtHideLogo then
-      jForm_ShowLogoActionBar(FjEnv, FjObject, False);
+    if FActionBarTitle = abtTextAsTitle then
+       jForm_SetTitleActionBar(FjEnv, FjObject, FText);
 
-  if FActionBarTitle = abtTextAsTitle then
-     jForm_SetTitleActionBar(FjEnv, FjObject, FText);
+    if FActionBarTitle = abtTextAsTitleHideLogo then
+    begin
+       jForm_ShowLogoActionBar(FjEnv, FjObject, False);
+       jForm_SetTitleActionBar(FjEnv, FjObject, FText);
+    end;
 
-  if FActionBarTitle = abtTextAsTitleHideLogo then
+    //Show ...
+    if FVisible then
+    begin
+       gApp.TopIndex:= FormIndex;
+       jForm_Show2(refApp.Jni.jEnv, FjObject, FAnimation.In_);
+    end;
+
+    if Assigned(FOnActivityCreate) then FOnActivityCreate(Self, refApp.Jni.jIntent);
+    if Assigned(FOnJNIPrompt) then FOnJNIPrompt(Self);
+
+  end
+  else    //actEasel ...
   begin
-     jForm_ShowLogoActionBar(FjEnv, FjObject, False);
-     jForm_SetTitleActionBar(FjEnv, FjObject, FText);
+    FScreenStyle:= refApp.Orientation;
+    FScreenWH:= refApp.Screen.WH;   //sAved on start!
+    FPackageName:= refApp.AppName;
+    ScreenStyleAtStart:= FScreenStyle;   //saved on start!
+
+    FjObject:=  jForm_Create(refApp.Jni.jEnv, refApp.Jni.jThis, Self);
+    FjRLayout:=  jForm_Getlayout2(refApp.Jni.jEnv, FjObject);  {form view/RelativeLayout} //GetView
+    FjPRLayoutHome:= jForm_GetParent(refApp.Jni.jEnv, FjObject); //save origin
+    FjPRLayout:= FjPRLayoutHome;  //base appLayout
+    FInitialized:= True;
+
+    for i:= (Self.ComponentCount-1) downto 0 do
+    begin
+      if (Self.Components[i] is jControl) then
+      begin
+         (Self.Components[i] as jControl).Init(refApp);
+      end;
+    end;
+    if Assigned(FOnJNIPrompt) then FOnJNIPrompt(Self);
+
   end;
-
-  //Show ...
-  jForm_Show2(refApp.Jni.jEnv, FjObject, FAnimation.In_);
-
-  if Assigned(FOnActivityCreate) then FOnActivityCreate(Self, refApp.Jni.jIntent);
-
-  if Assigned(FOnJNIPrompt) then FOnJNIPrompt(Self);
 
 end;
 
@@ -2784,6 +2793,8 @@ procedure jForm.ReInit(refApp: jApp);
 var
   i: integer;
 begin
+  if FActivityMode = actEasel then Exit;
+  if not FInitialized then Exit;
   for i:= (Self.ComponentCount-1) downto 0 do
   begin
     if (Self.Components[i] is jControl) then
@@ -2797,6 +2808,9 @@ end;
 
 function jForm.GetFormByIndex(index: integer): jForm;
 begin
+   Result:= nil;
+   if FActivityMode = actEasel then Exit;
+
    if index < gApp.GetCurrentFormsIndex then
       Result:= jForm(gApp.Forms.Stack[index].Form)
    else
@@ -2805,7 +2819,8 @@ end;
 
 procedure jForm.ShowMessage(msg: string);
 begin
-  jForm_ShowMessage(FjEnv, FjObject, msg);
+  if FInitialized then
+     jForm_ShowMessage(FjEnv, FjObject, msg);
 end;
 
 procedure jForm.ShowMessage(_msg: string; _gravity: TGravity; _timeLength: TShowLength);
@@ -2817,11 +2832,13 @@ end;
 
 function jForm.GetDateTime: String;
 begin
+  if not FInitialized then Exit;
   Result:= jForm_GetDateTime(FjEnv,FjObject);
 end;
 
 procedure jForm.SetEnabled(Value: Boolean);
 begin
+  if FActivityMode = actEasel then Exit;
   FEnabled:= Value;
   if FInitialized then
     jForm_SetEnabled2(FjEnv, FjObject, FEnabled);
@@ -2836,8 +2853,9 @@ end;
 
 procedure jForm.SetColor(Value: TARGBColorBridge);
 begin
+  //if FActivityMode = actEasel then Exit;
   FColor:= Value;
-  if (FInitialized = True) and (FColor <> colbrDefault)  then
+  if FInitialized then
       View_SetBackGroundColor(FjEnv, FjRLayout,GetARGB(FCustomColor, FColor));
 end;
 
@@ -2845,7 +2863,9 @@ procedure jForm.UpdateLayout;
 var
   i: integer;
 begin
-  for i := 0 to (Self.ComponentCount - 1) do   //********
+  //if FActivityMode = actEasel then Exit;
+  if not FInitialized  then Exit;
+  for i := 0 to (Self.ComponentCount - 1) do
   begin
     if Self.Components[i] is jVisualControl then
     begin
@@ -2856,29 +2876,23 @@ end;
 
 procedure jForm.Show;
 begin
-  if not FInitialized then Exit;
+  if FActivityMode = actEasel then Exit;
   if FVisible then Exit;
-
   FormState := fsFormWork;
   FVisible:= True;
-
-  FormBaseIndex:= gApp.TopIndex; //rx3!
-
+  FormBaseIndex:= gApp.TopIndex;
   gApp.TopIndex:= Self.FormIndex;
-
   jForm_Show2(FjEnv,FjObject,FAnimation.In_);
-
   if DoJNIPromptOnShow then
   begin
     if Assigned(FOnJNIPrompt) then FOnJNIPrompt(Self);
   end;
-
 end;
 
 procedure jForm.DoJNIPrompt;
 begin
-  if not FInitialized then Exit;
-  if Assigned(FOnJNIPrompt) then FOnJNIPrompt(Self);    //*****
+  //if FActivityMode = actEasel then Exit;
+  if Assigned(FOnJNIPrompt) then FOnJNIPrompt(Self);
 end;
 
 
@@ -2894,6 +2908,7 @@ end;
 //[1]
 procedure jForm.Close;
 begin
+  if FActivityMode = actEasel then Exit;
  // Post Closing Step
  // --------------------------------------------------------------------------
  // Java           Java          Java-> Pascal
@@ -2915,6 +2930,8 @@ begin
 
   jForm(Form).UpdateJNI(gApp); //+++
 
+  if jForm(Form).ActivityMode = actEasel then Exit;
+
   Inx:= jForm(Form).FormIndex;
   formBaseInx:= jForm(Form).FormBaseIndex;
 
@@ -2931,8 +2948,11 @@ begin
   if jForm(Form).ActivityMode <> actMain then //actSplash or actRecycable
   begin
 
-      if jForm(gApp.Forms.Stack[formBaseInx].Form).PromptOnBackKey then
-         jForm(gApp.Forms.Stack[formBaseInx].Form).DoJNIPrompt; //<<--- thanks to @arenabor
+      if  formBaseInx > -1 then
+      begin
+        if jForm(gApp.Forms.Stack[formBaseInx].Form).PromptOnBackKey then
+            jForm(gApp.Forms.Stack[formBaseInx].Form).DoJNIPrompt; //<<--- thanks to @arenabor
+      end;
 
       //LORDMAN - 2013-08-01 // Call Back
       if Assigned(gApp.Forms.Stack[Inx].CloseCB.Event) then
@@ -2963,18 +2983,21 @@ end;
 
 procedure jForm.Refresh;
 begin
+  if FActivityMode = actEasel then Exit;
   if FInitialized then
     View_Invalidate(FjEnv, Self.View);
 end;
 
 procedure jForm.SetCloseCallBack(Func: TOnNotify; Sender: TObject);
 begin
+  if not FInitialized then Exit;
   FCloseCallBack.Event:= func;
   FCloseCallBack.Sender:= Sender;
 end;
 
 procedure jForm.SetCloseCallBack(Func: TOnCallBackData; Sender: TObject);
 begin
+  if not FInitialized then Exit;
   FCloseCallBack.EventData:= func;
   FCloseCallBack.Sender:= Sender;
 end;
@@ -3004,63 +3027,12 @@ begin
     if Assigned(FOnListItemClick) then FOnListItemClick(jObjAdapterView, jObjView,position,Id);
 end;
 
-
 procedure jForm.GenEvent_OnViewClick(jObjView: jObject; Id: integer);
 begin
+   if not FInitialized then Exit;
+
    if Assigned(FOnViewClick) then FOnViewClick(jObjView,Id);
 end;
-
-(*
-procedure jForm.ReadIntHorizontalOffset(Reader: TReader);
-begin
-  FHorizontalOffset:= Reader.ReadInteger;
-end;
-
-procedure jForm.WriteIntHorizontalOffset(Writer: TWriter);
-begin
-   Writer.WriteInteger(FHorizontalOffset);
-end;
-
-procedure jForm.ReadIntVerticalOffset(Reader: TReader);
-begin
-  FVerticalOffset:= Reader.ReadInteger;
-end;
-
-procedure jForm.WriteIntVerticalOffset(Writer: TWriter);
-begin
-   Writer.WriteInteger(FVerticalOffset);
-end;
-
-procedure jForm.ReadBolOldCreateOrder(Reader: TReader);
-begin
-   FOldCreateOrder:= Reader.ReadBoolean;
-end;
-
-procedure jForm.WriteBolOldCreateOrder(Writer: TWriter);
-begin
-   Writer.WriteBoolean(FOldCreateOrder);
-end;
-
-procedure jForm.ReadStrTitle(Reader: TReader);
-begin
-   FTitle:= Reader.ReadString;
-end;
-
-procedure jForm.WriteStrTitle(Writer: TWriter);
-begin
-   Writer.WriteString(FTitle);
-end;
-
-procedure jForm.DefineProperties(Filer: TFiler);
-begin
- inherited DefineProperties(Filer);
-  {Define new properties and reader/writer methods }
-  Filer.DefineProperty('HorizontalOffset', ReadIntHorizontalOffset, WriteIntHorizontalOffset, True);
-  Filer.DefineProperty('VerticalOffset', ReadIntVerticalOffset, WriteIntVerticalOffset, True);
-  Filer.DefineProperty('OldCreateOrder', ReadBolOldCreateOrder, WriteBolOldCreateOrder, True);
-  Filer.DefineProperty('Title', ReadStrTitle, WriteStrTitle, FTitle<>'');
-end;
-*)
 
 function jForm.GetStringExtra(intentData: jObject; extraName: string): string;
 begin
@@ -3082,27 +3054,29 @@ end;
 
 function jForm.SetWifiEnabled(_status: boolean): boolean;
 begin
+  if not FInitialized then Exit;
+
   Result:= False;
   if FInitialized then
-   Result:= jForm_SetWifiEnabled(FjEnv, FjObject, _status);
+    Result:= jForm_SetWifiEnabled(FjEnv, FjObject, _status);
 end;
 
 function jForm.IsWifiEnabled(): boolean;
 begin
    if FInitialized then
-      Result:= jForm_IsWifiEnabled(FjEnv, FjObject);
+    Result:= jForm_IsWifiEnabled(FjEnv, FjObject);
 end;
 
 function jForm.isConnected(): boolean; // by renabor
 begin
    if FInitialized then
-      Result:= jForm_IsConnected(FjEnv, FjObject);
+    Result:= jForm_IsConnected(FjEnv, FjObject);
 end;
 
 function jForm.isConnectedWifi(): boolean; // by renabor
 begin
-   if FInitialized then
-      Result:= jForm_IsConnectedWifi(FjEnv, FjObject);
+  if FInitialized then
+     Result:= jForm_IsConnectedWifi(FjEnv, FjObject);
 end;
 
 function jForm.GetEnvironmentDirectoryPath(_directory: TEnvDirectory): string;
@@ -3778,6 +3752,44 @@ begin
   //in designing component state: result value here...
   if FInitialized then
    Result:= jForm_ParseHtmlFontAwesome(FjEnv, FjObject, _htmlString);
+end;
+
+procedure jForm.SetLayoutParent(_viewgroup: jObject);
+begin
+  //in designing component state: set value here...
+  FjPRLayout:= _viewgroup;
+  if FInitialized then
+     jForm_SetViewParent(FjEnv, FjObject, FjPRLayout);
+end;
+
+procedure jForm.ResetLayoutParent();
+begin
+  FjPRLayout:= FjPRLayoutHome;
+  if FInitialized then
+     jForm_SetViewParent(FjEnv, FjObject, FjPRLayout);
+end;
+
+function jForm.GetLayoutParent: jObject;
+begin
+  Result:= FjPRLayout;
+  if FInitialized then
+    Result:= jForm_GetParent(FjEnv, FjObject);
+end;
+
+procedure jForm.RemoveFromLayoutParent();
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+    jForm_RemoveFromViewParent(FjEnv, FjObject);
+end;
+
+
+procedure jForm.SetLayoutVisibility(_value: boolean);
+begin
+  //in designing component state: set value here...
+  FLayoutVisibility:= _value;
+  if FInitialized then
+     jForm_SetLayoutVisibility(FjEnv, FjObject, _value);
 end;
 
 {-------- jForm_JNI_Bridge ----------}
@@ -5104,12 +5116,108 @@ begin
               Result:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
             end;
   end;
-env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env,jParams[0].l);
   env^.DeleteLocalRef(env, jCls);
 end;
 
-//-----------------------------------------------
-   {jApp by jmpessoa}
+procedure jForm_SetViewParent(env: PJNIEnv; _jform: JObject; _viewgroup: jObject);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= _viewgroup;
+  jCls:= env^.GetObjectClass(env, _jform);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetViewParent', '(Landroid/view/ViewGroup;)V');
+  env^.CallVoidMethodA(env, _jform, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jForm_RemoveFromViewParent(env: PJNIEnv; _jform: JObject);
+var
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jform);
+  jMethod:= env^.GetMethodID(env, jCls, 'RemoveFromViewParent', '()V');
+  env^.CallVoidMethod(env, _jform, jMethod);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jForm_SetLayoutVisibility(env: PJNIEnv; _jform: JObject; _value: boolean);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].z:= JBool(_value);
+  jCls:= env^.GetObjectClass(env, _jform);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetLayoutVisibility', '(Z)V');
+  env^.CallVoidMethodA(env, _jform, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+function jForm_GetParent(env: PJNIEnv; _jform: JObject): jObject;
+var
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jform);
+  jMethod:= env^.GetMethodID(env, jCls, 'GetParent', '()Landroid/view/ViewGroup;');
+  Result:= env^.CallObjectMethod(env, _jform, jMethod);
+  Result := env^.NewGlobalRef(env,Result);   //<---- need here for ap1 > 13 - by jmpessoa
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+function jForm_GetPrimaryColor(env: PJNIEnv; _jfom: JObject): integer;
+var
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jfom);
+  jMethod:= env^.GetMethodID(env, jCls, 'GetPrimaryColor', '()I');
+  Result:= env^.CallIntMethod(env, _jfom, jMethod);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+
+function jForm_GetPrimaryDarkColor(env: PJNIEnv; _jfom: JObject): integer;
+var
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jfom);
+  jMethod:= env^.GetMethodID(env, jCls, 'GetPrimaryDarkColor', '()I');
+  Result:= env^.CallIntMethod(env, _jfom, jMethod);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+
+function jForm_GetPrimaryLightColor(env: PJNIEnv; _jfom: JObject): integer;
+var
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jfom);
+  jMethod:= env^.GetMethodID(env, jCls, 'GetPrimaryLightColor', '()I');
+  Result:= env^.CallIntMethod(env, _jfom, jMethod);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+
+function jForm_GetAccentColor(env: PJNIEnv; _jfom: JObject): integer;
+var
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jfom);
+  jMethod:= env^.GetMethodID(env, jCls, 'GetAccentColor', '()I');
+  Result:= env^.CallIntMethod(env, _jfom, jMethod);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+
+//-----{ jApp } ------
 
 constructor jApp.Create(AOwner: TComponent);
 begin
@@ -5354,20 +5462,18 @@ begin
   end;
 end;
 
-//by jmpessoa
 function GetARGB(customColor: DWord; colbrColor: TARGBColorBridge):  DWord;
 var
   index: integer;
 begin
   if colbrColor <> colbrCustom then
   begin
-    index:= (Ord(colbrColor));
-    Result:= TARGBColorBridgeArray[index];
+      index:= (Ord(colbrColor));
+      Result:= TARGBColorBridgeArray[index];
   end
   else Result:= customColor;
 end;
 
-//by jmpessoa
 function GetProgressBarStyle(cjProgressBarStyle: TProgressBarStyle): DWord;
 var
   index: integer;
@@ -5464,6 +5570,8 @@ begin
      lp48px: Result:= 48;
      lp72px: Result:= 72;
      lp96px: Result:= 96;
+     lp128px: Result:= 128;
+     lp192px: Result:= 192;
 
      // not yet implemented
      // lpUseWeight: Result:= 0;
@@ -5508,6 +5616,8 @@ begin
      lp48px: Result:= 48;
      lp72px: Result:= 72;
      lp96px: Result:= 96;
+     lp128px: Result:= 128;
+     lp192px: Result:= 192;
 
      //lpUseWeight: Result:= 0;
      lpUseWeight: Result:= TLayoutParamsArray[altMATCHPARENT];
@@ -5558,8 +5668,10 @@ begin
      24: Result:= lp48px;
      25: Result:= lp72px;
      26: Result:= lp96px;
-     27: Result:= lpExact;
-     28: Result:= lpUseWeight;
+     27: Result:= lp128px;
+     28: Result:= lp192px;
+     29: Result:= lpExact;
+     30: Result:= lpUseWeight;
 
    end;
 end;
@@ -5605,6 +5717,8 @@ begin
    lp48px: Result:= 48;
    lp72px: Result:= 72;
    lp96px: Result:= 96;
+   lp128px: Result:= 128;
+   lp192px: Result:= 192;
 
    //lpUseWeight: Result:= 0;
    lpUseWeight: Result:= TLayoutParamsArray[altMATCHPARENT];
@@ -5650,6 +5764,9 @@ begin
    lp72px: Result:= 72;
    lp96px: Result:= 96;
 
+   lp128px: Result:= 128;
+   lp192px: Result:= 192;
+
    lpExact: Result:= L;
 
   end;
@@ -5665,6 +5782,8 @@ begin
    else if Value = 48 then Result:= lp48px
    else if Value = 72 then Result:= lp72px
    else if Value = 96 then Result:= lp96px
+   else if Value = 128 then Result:= lp128px
+   else if Value = 192 then Result:= lp192px
    else if Value <= Trunc((1/8)*L) then Result:= lpOneEighthOfParent   //0.125
    else if Value <= Trunc((1/5)*L) then Result:= lpOneFifthOfParent    //0.20
    else if Value <= Trunc((1/4)*L) then Result:= lpOneQuarterOfParent  //0.25
@@ -6788,6 +6907,7 @@ begin
   env^.CallVoidMethodA(env, this, method, @_jParams);
 end;
 
+
 Procedure View_SetVisible(env:PJNIEnv; view: jObject; visible: Boolean);
 var
   method: jmethodID;
@@ -6802,6 +6922,23 @@ begin
   method:= env^.GetMethodID(env, cls, 'setVisibility', '(I)V');
   env^.CallVoidMethodA(env, view, method, @_jParams);
   env^.DeleteLocalRef(env, cls);
+end;
+
+function View_GetVisible(env:PJNIEnv; view: jObject): boolean;
+var
+   //jBoo: JBoolean;
+   jParams: array[0..0] of jValue;
+   jMethod: jMethodID=nil;
+   jCls: jClass=nil;
+   res: integer;
+begin
+   Result:= False; // not visible...
+   jParams[0].l:= view;
+   jCls:= env^.GetObjectClass(env, view);
+   jMethod:= env^.GetMethodID(env, jCls, 'getVisibility', '()I');
+   res:= env^.CallIntMethodA(env, view, jMethod, @jParams);
+   env^.DeleteLocalRef(env, jCls);
+   if res = 0  then Result:= True;
 end;
 
 //by jmpessoa

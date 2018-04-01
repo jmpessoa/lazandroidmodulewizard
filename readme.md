@@ -98,17 +98,17 @@
 			http://ant.apache.org/bindownload.cgi 
 			Simply extract the zip file to a convenient location...
 
+		Gradle 4.1 [to build Apk with "AppCompat" [material] theme]
+			https://gradle.org/next-steps/?version=4.1&format=bin
+			Simply extract the zip file to a convenient location...
+
 	***************************************************************************************************
-	* To start:				
+	* How To Start:				
 	*	
-	*  "readme_getstart.txt"				
-	* "install_tutorial.txt"	
-	* "install_tutorial_eclipse_users.txt"	                                
+	*  "Getting Started.txt"				
 	*					
 	***************************************************************************************************
 
-
-	****************************************************************************************************
 	*Using [projects] demos :
 	*
 	*PANIC ? When prompt "Read error" [Unknown Property] just choice "Continue Loading" !
@@ -123,6 +123,54 @@
 	*
 	*
 	****************************************************************************************************
+
+Version 0.8 - 31 - March- 2018
+
+	NEW! "AppCompat" material theme support!
+	NEW! "Android Bridges Support" component palete to support "AppCompat" material theme!
+		NEW! jsDrawerLayout component
+		NEW! jsNavigationView component
+		NEW! jsCoordinatorLayout component
+		NEW! jsAppBarLayout component
+		NEW! jsCollapsingToolbarLayout component
+		NEW! jsToolbar component
+		NEW! jsTabLayout component
+		NEW! jsNestedScrollView component
+		NEW! jsRecyclerView component
+		NEW! jsViewPager component
+		NEW! jsCardView component
+		NEW! jsFloatingButton component
+		NEW! jsBottomNavigationView component
+		NEW! jsTextInput component
+
+	NEW! demo AppCompatFloatingButtonDemo1
+	NEW! demo AppCompatViewPagerDemo1
+	NEW! demo AppCompatNavigationDrawerDemo1
+	NEW! demo AppCompatCollapsingToolbarDemo1
+	NEW! demo AppCompatTabLayoutDemo1
+	NEW! demo AppCompatTabLayoutDemo2
+
+	NEW! jDBListView component by Martin Lowry [Thanks!]
+	NEW! demo AppDBGridViewDemo1  by Martin Lowry [Thanks!]
+
+	REQUIREMENTS: 
+
+		[LAMW 0.8] "AppCompat" [material] theme need:
+		1. Java JDK 1.8
+		2. Gradle 4.1 + Internet Connection!
+		3. Android SDK "plataforms" 25 + "build-tools" 25.0.3 [or]
+		3. Android SDK "plataforms" 26 + "build-tools" 26.0.3 [or]
+		3. Android SDK "plataforms" 27 + "build-tools" 27.0.3
+		4. Android SDK/Extra  "Support Repository"
+		5. Android SDK/Extra  "Support Library"
+		
+		Hint. If your connection has a proxy, edit the "gradle.properties" file content. Example: 
+ 
+			systemProp.http.proxyHost=10.0.16.1
+			systemProp.http.proxyPort=3128
+			systemProp.https.proxyHost=10.0.16.1
+			systemProp.https.proxyPort=3128
+
 
 Version 0.7 - rev. 22 - 21 - October - 2017
 

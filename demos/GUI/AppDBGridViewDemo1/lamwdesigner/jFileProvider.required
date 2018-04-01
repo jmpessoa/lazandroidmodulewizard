@@ -1,0 +1,1 @@
+<provider android:name=".jFileProvider" android:authorities="ml.smartware.appdbgridviewdemo1" android:exported="true" android:grantUriPermissions="true"/>

@@ -315,12 +315,12 @@ type
 
   {TDraftGL2SurfaceView}
 
-  {
+  (*
   TDraftGL2SurfaceView = class(TDraftWidget)
   public
     constructor Create(AWidget: TAndroidWidget; Canvas: TCanvas); override;
   end;
-  }
+   *)
 
   { TDraftSpinner }
 
@@ -396,6 +396,19 @@ type
     procedure Draw; override;
   end;
 
+
+  { TDraftDBListView }
+
+  TDraftDBListView = class(TDraftGridView);
+
+  {TDraftTreeListView}
+
+  TDraftTreeListView = class(TDraftWidget)
+  public
+    constructor Create(AWidget: TAndroidWidget; Canvas: TCanvas); override;
+  end;
+
+
   { TDraftView }
 
   TDraftView = class(TDraftWidget)
@@ -410,11 +423,134 @@ type
     procedure Draw; override;
   end;
 
-  TDraftToolbar = class(TDraftWidget)
+  { TDraftCaptionPanel }
+
+  TDraftCaptionPanel = class(TDraftWidget)
   public
     procedure Draw; override;
   end;
 
+  { TDraftToolbar }
+
+  TDraftToolbar = class(TDraftWidget)
+  public
+     procedure Draw; override;
+  end;
+
+    { TDraftFrameLayout }
+
+  TDraftFrameLayout = class(TDraftWidget)
+  public
+     procedure Draw; override;
+  end;
+
+  { TDraftSFloatingButton }
+
+  TDraftSFloatingButton = class(TDraftWidget)
+  public
+    procedure Draw; override;
+  end;
+
+  { TDraftSBottomNavigationView }
+
+  TDraftSBottomNavigationView = class(TDraftWidget)
+  public
+    procedure Draw; override;
+  end;
+
+  { TDraftSCoordinatorLayout }
+
+  TDraftSCoordinatorLayout = class(TDraftWidget)
+  public
+    procedure Draw; override;
+  end;
+
+  { TDraftSToolbar }
+
+  TDraftSToolbar = class(TDraftWidget)
+  public
+     constructor Create(AWidget: TAndroidWidget; Canvas: TCanvas); override;
+     procedure Draw; override;
+  end;
+
+  { TDraftSDrawerLayout }
+
+  TDraftSDrawerLayout = class(TDraftWidget)
+  public
+     procedure Draw; override;
+  end;
+
+    { TDraftSNavigationView }
+
+  TDraftSNavigationView = class(TDraftWidget)
+  public
+     procedure Draw; override;
+  end;
+
+  { TDraftLinearLayout }
+
+  TDraftLinearLayout = class(TDraftWidget)
+  public
+     procedure Draw; override;
+  end;
+
+  { TDraftSCardView }
+
+  TDraftSCardView = class(TDraftWidget)
+  public
+     procedure Draw; override;
+  end;
+
+  { TDraftSRecyclerView }
+
+  TDraftSRecyclerView = class(TDraftWidget)
+  public
+     procedure Draw; override;
+  end;
+
+  { TDraftSTextInput }
+
+  TDraftSTextInput = class(TDraftWidget)
+  public
+    constructor Create(AWidget: TAndroidWidget; Canvas: TCanvas); override;
+    procedure Draw; override;
+    procedure UpdateLayout; override;
+  end;
+
+  { TDraftSViewPager }
+
+  TDraftSViewPager = class(TDraftWidget)
+  public
+     procedure Draw; override;
+  end;
+
+  { TDraftSAppBarLayout }
+
+  TDraftSAppBarLayout = class(TDraftWidget)
+  public
+     procedure Draw; override;
+  end;
+
+  { TDraftSCollapsingToolbarLayout }
+
+  TDraftSCollapsingToolbarLayout = class(TDraftWidget)
+  public
+     procedure Draw; override;
+  end;
+
+  { TDraftSTabLayout }
+
+  TDraftSTabLayout = class(TDraftWidget)
+  public
+     procedure Draw; override;
+  end;
+
+  { TDraftSNestedScrollView }
+
+  TDraftSNestedScrollView = class(TDraftWidget)
+  public
+     procedure Draw; override;
+  end;
 
   { TARGBColorBridgePropertyEditor }
 
@@ -526,7 +662,11 @@ uses
   Laz_And_GLESv1_Canvas, Laz_And_GLESv2_Canvas, gridview, Spinner, seekbar,
   radiogroup, ratingbar, digitalclock, analogclock, surfaceview,
   autocompletetextview, drawingview, chronometer, viewflipper, videoview,
-  comboedittext, toolbar, expandablelistview{, gl2SurfaceView};
+  comboedittext, toolbar, expandablelistview, framelayout, linearlayout, captionpanel,
+  sfloatingbutton, scoordinatorlayout, stoolbar, sdrawerlayout,
+  snavigationview, scardview, srecyclerview, stextinput,
+  sviewpager, scollapsingtoolbarlayout, stablayout, sappbarlayout,
+  sbottomnavigationview, snestedscrollview, treelistview{, gl2SurfaceView};
 
 const
   DrawableSearchPaths: array [0..3] of string = (
@@ -1065,6 +1205,22 @@ begin
 end;
 
 
+{ TDraftCaptionPanel }  //experimental!
+
+procedure TDraftCaptionPanel.Draw;
+begin
+  with Fcanvas do
+  begin
+    if jCaptionPanel(FAndroidWidget).BackgroundColor <> colbrDefault then
+      Brush.Color := ToTColor(jCaptionPanel(FAndroidWidget).BackgroundColor)
+    else begin
+      Brush.Color:= clNone;
+      Brush.Style:= bsClear;
+    end;
+    Rectangle(0, 0, FAndroidWidget.Width, FAndroidWidget.Height);    // outer frame
+  end;
+end;
+
 { TDraftToolbar }
 
 procedure TDraftToolbar.Draw;
@@ -1080,6 +1236,254 @@ begin
     Rectangle(0, 0, FAndroidWidget.Width, FAndroidWidget.Height);    // outer frame
   end;
 end;
+
+{ TDraftFrameLayout }
+
+procedure TDraftFrameLayout.Draw;
+begin
+  with Fcanvas do
+  begin
+    if jFrameLayout(FAndroidWidget).BackgroundColor <> colbrDefault then
+      Brush.Color := ToTColor(jFrameLayout(FAndroidWidget).BackgroundColor)
+    else begin
+      Brush.Color:= clNone;
+      Brush.Style:= bsClear;
+    end;
+    Rectangle(0, 0, FAndroidWidget.Width, FAndroidWidget.Height);    // outer frame
+  end;
+end;
+
+{ TDraftSFloatingButton }
+
+procedure TDraftSFloatingButton.Draw;
+begin
+  with Fcanvas do
+  begin
+    if jsFloatingButton(FAndroidWidget).BackgroundColor <> colbrDefault then
+      Brush.Color := ToTColor(jsFloatingButton(FAndroidWidget).BackgroundColor)
+    else begin
+      Brush.Color:= clNone;
+      Brush.Style:= bsClear;
+    end;
+    Rectangle(0, 0, FAndroidWidget.Width, FAndroidWidget.Height);    // outer frame
+  end;
+end;
+
+{ TDraftSBottomNavigationView }
+
+procedure TDraftSBottomNavigationView.Draw;
+begin
+  with Fcanvas do
+  begin
+    if jsBottomNavigationView(FAndroidWidget).BackgroundColor <> colbrDefault then
+      Brush.Color := ToTColor(jsBottomNavigationView(FAndroidWidget).BackgroundColor)
+    else begin
+      Brush.Color:= clNone;
+      Brush.Style:= bsClear;
+    end;
+    Rectangle(0, 0, FAndroidWidget.Width, FAndroidWidget.Height);    // outer frame
+  end;
+end;
+
+{ TDraftSCoordinatorLayout }
+
+procedure TDraftSCoordinatorLayout.Draw;
+begin
+  with Fcanvas do
+  begin
+    if jsCoordinatorLayout(FAndroidWidget).BackgroundColor <> colbrDefault then
+      Brush.Color := ToTColor(jsCoordinatorLayout(FAndroidWidget).BackgroundColor)
+    else begin
+      Brush.Color:= clNone;
+      Brush.Style:= bsClear;
+    end;
+    Rectangle(0, 0, FAndroidWidget.Width, FAndroidWidget.Height);    // outer frame
+  end;
+end;
+
+{ TDraftSToolbar }
+
+constructor TDraftSToolbar.Create(AWidget: TAndroidWidget; Canvas: TCanvas);
+begin
+  BaseStyle := '';  //'autoTextViewStyle';
+  inherited;
+  Color := jsToolbar(AWidget).BackgroundColor;
+  FontColor := jsToolbar(AWidget).FontColor;
+end;
+
+procedure TDraftSToolbar.Draw;
+begin
+  with Fcanvas do
+  begin
+    if jsToolbar(FAndroidWidget).BackgroundColor <> colbrDefault then
+      Brush.Color := ToTColor(jsToolbar(FAndroidWidget).BackgroundColor)
+    else begin
+      Brush.Color:= clNone;
+      Brush.Style:= bsClear;
+    end;
+    Rectangle(0, 0, FAndroidWidget.Width, FAndroidWidget.Height);    // outer frame
+    TextOut(12, 9, FAndroidWidget.Text);
+  end;
+end;
+
+{ TDraftSNavigationView }
+
+procedure TDraftSNavigationView.Draw;
+begin
+  with Fcanvas do
+  begin
+    if jsNavigationView(FAndroidWidget).BackgroundColor <> colbrDefault then
+      Brush.Color := ToTColor(jsNavigationView(FAndroidWidget).BackgroundColor)
+    else begin
+      Brush.Color:= clNone;
+      Brush.Style:= bsClear;
+    end;
+    Rectangle(0, 0, FAndroidWidget.Width, FAndroidWidget.Height);    // outer frame
+  end;
+end;
+
+{ TDraftSDrawerLayout }
+
+procedure TDraftSDrawerLayout.Draw;
+begin
+  with Fcanvas do
+  begin
+    if jsDrawerLayout(FAndroidWidget).BackgroundColor <> colbrDefault then
+      Brush.Color := ToTColor(jsDrawerLayout(FAndroidWidget).BackgroundColor)
+    else begin
+      Brush.Color:= clNone;
+      Brush.Style:= bsClear;
+    end;
+    Rectangle(0, 0, FAndroidWidget.Width, FAndroidWidget.Height);    // outer frame
+  end;
+end;
+
+{ TDraftLinearLayout }
+
+procedure TDraftLinearLayout.Draw;
+begin
+  with Fcanvas do
+  begin
+    if jLinearLayout(FAndroidWidget).BackgroundColor <> colbrDefault then
+      Brush.Color := ToTColor(jLinearLayout(FAndroidWidget).BackgroundColor)
+    else begin
+      Brush.Color:= clNone;
+      Brush.Style:= bsClear;
+    end;
+    Rectangle(0, 0, FAndroidWidget.Width, FAndroidWidget.Height);    // outer frame
+  end;
+end;
+
+{ TDraftSCardView }
+
+procedure TDraftSCardView.Draw;
+begin
+  with Fcanvas do
+  begin
+    if jsCardView(FAndroidWidget).BackgroundColor <> colbrDefault then
+      Brush.Color := ToTColor(jsCardView(FAndroidWidget).BackgroundColor)
+    else begin
+      Brush.Color:= clNone;
+      Brush.Style:= bsClear;
+    end;
+    Rectangle(0, 0, FAndroidWidget.Width, FAndroidWidget.Height);    // outer frame
+  end;
+end;
+
+{ TDraftSRecyclerView }
+
+procedure TDraftSRecyclerView.Draw;
+begin
+  with Fcanvas do
+  begin
+    if jsRecyclerView(FAndroidWidget).BackgroundColor <> colbrDefault then
+      Brush.Color := ToTColor(jsRecyclerView(FAndroidWidget).BackgroundColor)
+    else begin
+      Brush.Color:= clNone;
+      Brush.Style:= bsClear;
+    end;
+    Rectangle(0, 0, FAndroidWidget.Width, FAndroidWidget.Height);    // outer frame
+  end;
+end;
+
+{ TDraftSViewPager }
+
+procedure TDraftSViewPager.Draw;
+begin
+  with Fcanvas do
+  begin
+    if jsViewPager(FAndroidWidget).BackgroundColor <> colbrDefault then
+      Brush.Color := ToTColor(jsViewPager(FAndroidWidget).BackgroundColor)
+    else begin
+      Brush.Color:= clNone;
+      Brush.Style:= bsClear;
+    end;
+    Rectangle(0, 0, FAndroidWidget.Width, FAndroidWidget.Height);    // outer frame
+  end;
+end;
+
+{ TDraftSCollapsingToolbarLayout }
+
+procedure TDraftSCollapsingToolbarLayout.Draw;
+begin
+  with Fcanvas do
+  begin
+    if jsCollapsingToolbarLayout(FAndroidWidget).BackgroundColor <> colbrDefault then
+      Brush.Color := ToTColor(jsCollapsingToolbarLayout(FAndroidWidget).BackgroundColor)
+    else begin
+      Brush.Color:= clNone;
+      Brush.Style:= bsClear;
+    end;
+    Rectangle(0, 0, FAndroidWidget.Width, FAndroidWidget.Height);    // outer frame
+  end;
+end;
+
+{ TDraftSTabLayout }
+
+procedure TDraftSTabLayout.Draw;
+begin
+  with Fcanvas do
+  begin
+    if jsTabLayout(FAndroidWidget).BackgroundColor <> colbrDefault then
+      Brush.Color := ToTColor(jsTabLayout(FAndroidWidget).BackgroundColor)
+    else begin
+      Brush.Color:= clNone;
+      Brush.Style:= bsClear;
+    end;
+    Rectangle(0, 0, FAndroidWidget.Width, FAndroidWidget.Height);    // outer frame
+  end;
+end;
+
+{ TDraftSAppBarLayout }
+
+procedure TDraftSAppBarLayout.Draw;
+begin
+  with Fcanvas do
+  begin
+    if jsAppBarLayout(FAndroidWidget).BackgroundColor <> colbrDefault then
+      Brush.Color := ToTColor(jsAppBarLayout(FAndroidWidget).BackgroundColor)
+    else begin
+      Brush.Color:= clNone;
+      Brush.Style:= bsClear;
+    end;
+    Rectangle(0, 0, FAndroidWidget.Width, FAndroidWidget.Height);    // outer frame
+  end;
+end;
+
+procedure TDraftSNestedScrollView.Draw;
+begin
+  with Fcanvas do
+  begin
+    if jsNestedScrollView(FAndroidWidget).BackgroundColor <> colbrDefault then
+      Brush.Color := ToTColor(jsNestedScrollView(FAndroidWidget).BackgroundColor)
+    else begin
+      Brush.Color:= clNone;
+      Brush.Style:= bsClear;
+    end;
+    Rectangle(0, 0, FAndroidWidget.Width, FAndroidWidget.Height);    // outer frame
+  end;
+end;
+
 { TDraftControlHash }
 
 function TDraftControlHash.Hash1(c: TClass): PtrUInt;
@@ -1309,7 +1713,6 @@ begin
       jVisualControl(APersistent).Parent := AndroidForm;
 
   //smart designer helpers
-
   if (APersistent is jControl)
   and (jControl(APersistent).Owner = AndroidForm) then
     UpdateJControlsList;
@@ -1462,6 +1865,9 @@ end;
 
 procedure TAndroidWidgetMediator.GetObjInspNodeImageIndex(APersistent: TPersistent; var AIndex: integer);
 begin
+
+  //if (APersistent as TAndroidWidget).Name = '' then Exit;  //+++
+
   if (APersistent is TAndroidWidget) and (TAndroidWidget(APersistent).AcceptChildrenAtDesignTime) then
     AIndex:= FormEditingHook.GetCurrentObjectInspector.ComponentTree.ImgIndexBox
   else if (APersistent is TAndroidWidget) then
@@ -2370,6 +2776,63 @@ begin
   inherited;
 end;
 
+{ TDraftSTextInput }
+
+constructor TDraftSTextInput.Create(AWidget: TAndroidWidget; Canvas: TCanvas);
+begin
+  BaseStyle := 'autoTextViewStyle';
+  inherited;
+  Color := jsTextInput(AWidget).BackgroundColor;
+  FontColor := jsTextInput(AWidget).FontColor;
+end;
+
+procedure TDraftSTextInput.Draw;
+var
+  ls: Integer;
+begin
+  with FCanvas do
+  begin
+    if BackgroundColor <> clNone then
+    begin
+      Brush.Color := BackGroundColor;
+      FillRect(0, 0, FAndroidWidget.Width, FAndroidWidget.Height);
+    end else
+      Brush.Style := bsClear;
+    Font.Color := TextColor;
+
+    ls := Font.Size;
+    Font.Size := AndroidToLCLFontSize(jsTextInput(FAndroidWidget).FontSize, 11);
+    TextOut(4, 12, jsTextInput(FAndroidWidget).Text);
+    Font.Size := ls;
+
+    if BackgroundColor = clNone then
+    begin
+      Pen.Color := RGBToColor(175,175,175);
+      with FAndroidWidget do
+      begin
+        MoveTo(4, Height - 8);
+        Lineto(4, Height - 5);
+        Lineto(Width - 4, Height - 5);
+        Lineto(Width - 4, Height - 8);
+      end;
+    end;
+  end;
+end;
+
+procedure TDraftSTextInput.UpdateLayout;
+var
+  fs: Integer;
+begin
+  with jsTextInput(FAndroidWidget) do
+    if LayoutParamHeight = lpWrapContent then
+    begin
+      fs := FontSize;
+      if fs = 0 then fs := 18;
+      FMinHeight := 29 + (fs - 10) * 4 div 3; // todo: multiline
+    end;
+  inherited UpdateLayout;
+end;
+
 {TDraftAutoTextView}
 
 constructor TDraftAutoTextView.Create(AWidget: TAndroidWidget; Canvas: TCanvas);
@@ -2977,7 +3440,7 @@ end;
 
 { TDraftSurfaceView }
 
-{
+(*
 constructor TDraftGL2SurfaceView.Create(AWidget: TAndroidWidget; Canvas: TCanvas);
 begin
   inherited;
@@ -2988,7 +3451,7 @@ begin
   if jGL2SurfaceView(AWidget).BackgroundColor = colbrDefault then
     Color := GetParentBackgroundColor;
 end;
-}
+*)
 
 { TDraftSpinner }
 
@@ -3599,6 +4062,21 @@ begin
     Color := GetParentBackgroundColor;
 end;
 
+   { TDraftTreeListView }
+
+constructor TDraftTreeListView.Create(AWidget: TAndroidWidget; Canvas: TCanvas);
+begin
+  inherited;
+  Color := jTreeListView(AWidget).BackgroundColor;
+
+  FontColor:= colbrGray;
+  BackGroundColor:= clActiveCaption; //clMenuHighlight;
+
+  if jTreeListView(AWidget).BackgroundColor = colbrDefault then
+    Color := GetParentBackgroundColor;
+end;
+
+
 initialization
   DraftClassesMap := TDraftControlHash.Create(64); // should be power of 2 for efficiency
   RegisterPropertyEditor(TypeInfo(TARGBColorBridge), nil, '', TARGBColorBridgePropertyEditor);
@@ -3632,10 +4110,12 @@ initialization
   RegisterAndroidWidgetDraftClass(jListView, TDraftListView);
   RegisterAndroidWidgetDraftClass(jExpandableListView, TDraftExpandableListView);
   RegisterAndroidWidgetDraftClass(jGridView, TDraftGridView);
+  RegisterAndroidWidgetDraftClass(jDBListView, TDraftDBListView);
+  RegisterAndroidWidgetDraftClass(jTreeListView, TDraftTreeListView);
   RegisterAndroidWidgetDraftClass(jImageBtn, TDraftImageBtn);
   RegisterAndroidWidgetDraftClass(jImageView, TDraftImageView);
   RegisterAndroidWidgetDraftClass(jSurfaceView, TDraftSurfaceView);
-  //RegisterAndroidWidgetDraftClass(jGL2SurfaceView, TDraftGL2SurfaceView);
+ // RegisterAndroidWidgetDraftClass(jGL2SurfaceView, TDraftGL2SurfaceView);
   RegisterAndroidWidgetDraftClass(jWebView, TDraftWebView);
   RegisterAndroidWidgetDraftClass(jScrollView, TDraftScrollView);
   RegisterAndroidWidgetDraftClass(jHorizontalScrollView, TDraftHorizontalScrollView);
@@ -3656,6 +4136,28 @@ initialization
   RegisterAndroidWidgetDraftClass(jViewFlipper, TDraftWidget);
   RegisterAndroidWidgetDraftClass(jVideoView, TDraftWidget);
   RegisterAndroidWidgetDraftClass(jToolbar, TDraftToolbar);
+
+  RegisterAndroidWidgetDraftClass(jFrameLayout, TDraftFrameLayout);
+  RegisterAndroidWidgetDraftClass(jLinearLayout, TDraftLinearLayout);
+  RegisterAndroidWidgetDraftClass(jCaptionPanel, TDraftCaptionPanel);
+
+  RegisterAndroidWidgetDraftClass(jsFloatingButton, TDraftSFloatingButton);
+  RegisterAndroidWidgetDraftClass(jsBottomNavigationView, TDraftSBottomNavigationView);
+  RegisterAndroidWidgetDraftClass(jsCoordinatorLayout, TDraftSCoordinatorLayout);
+  RegisterAndroidWidgetDraftClass(jsToolbar, TDraftSToolbar);
+
+  RegisterAndroidWidgetDraftClass(jsDrawerLayout, TDraftSDrawerLayout);
+  RegisterAndroidWidgetDraftClass(jsNavigationView, TDraftSNavigationView);
+  RegisterAndroidWidgetDraftClass(jsCardView, TDraftSCardView);
+  RegisterAndroidWidgetDraftClass(jsRecyclerView, TDraftSRecyclerView);
+
+  RegisterAndroidWidgetDraftClass(jsTextInput, TDraftSTextInput);
+  RegisterAndroidWidgetDraftClass(jsViewPager, TDraftSViewPager);
+  RegisterAndroidWidgetDraftClass(jsTabLayout, TDraftSTabLayout);
+  RegisterAndroidWidgetDraftClass(jsAppBarLayout, TDraftSAppBarLayout);
+
+  RegisterAndroidWidgetDraftClass(jsCollapsingToolbarLayout, TDraftSCollapsingToolbarLayout);
+  RegisterAndroidWidgetDraftClass(jsNestedScrollView, TDraftSNestedScrollView);
 
 finalization
   DraftClassesMap.Free;

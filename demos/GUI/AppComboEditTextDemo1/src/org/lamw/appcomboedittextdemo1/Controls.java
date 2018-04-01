@@ -1,6 +1,6 @@
 package org.lamw.appcomboedittextdemo1;
 
-//LAMW: Lazarus Android Module Wizard  - version 0.7 - rev. 19 - 16 June - 2017 
+//LAMW: Lazarus Android Module Wizard  - version 0.8  - 25 February  - 2018 
 //RAD Android: Project Wizard, Form Designer and Components Development Model!
 
 //https://github.com/jmpessoa/lazandroidmodulewizard
@@ -72,6 +72,7 @@ import android.graphics.Canvas;
 import android.graphics.SurfaceTexture;
 import android.graphics.drawable.Drawable;
 import android.hardware.Sensor;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Environment;
@@ -96,11 +97,14 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.SurfaceHolder;
 import android.view.View.OnClickListener;
+import android.view.ViewGroup.MarginLayoutParams;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.view.WindowManager;
 import android.widget.AdapterView;
+import android.widget.FrameLayout;
+import android.widget.LinearLayout;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.RelativeLayout.LayoutParams;
 import android.widget.RemoteViews;
@@ -144,12 +148,12 @@ class Const {
 //Form
 //-------------------------------------------------------------------------
 class jForm {
-// Java-Pascal Interface
+//Java-Pascal Interface
 private long             PasObj   = 0;     // Pascal Obj
 private Controls        controls = null;   // Control Class for Event
 private RelativeLayout  layout   = null;
 private LayoutParams    layparam = null;
-private RelativeLayout  parent   = null;
+private RelativeLayout  parent   = null;   //activity appLayout
 private OnClickListener onClickListener;   // event
 private OnClickListener onViewClickListener;   // generic delegate event
 private OnItemClickListener onListItemClickListener; 
@@ -157,14 +161,19 @@ private Boolean         enabled  = true;   //
 private Intent intent;
 private int mCountTab = 0;
 
+private boolean mRemovedFromParent = false;
+
 // Constructor
 public  jForm(Controls ctrls, long pasobj) {
 PasObj   = pasobj;
 controls = ctrls;
+parent = controls.appLayout;
+
 layout   = new RelativeLayout(controls.activity);
 layparam = new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
                             ViewGroup.LayoutParams.MATCH_PARENT);
 layout.setLayoutParams(layparam);
+
 // Init Event
 onClickListener = new OnClickListener() {
   public  void onClick(View view) {
@@ -203,9 +212,67 @@ public  RelativeLayout GetView() {
 	  return layout;
 }
 
+public  void SetEnabled ( boolean enabled ) {	
+	  for (int i = 0; i < layout.getChildCount(); i++) {
+	     View child = layout.getChildAt(i);
+	     child.setEnabled(enabled);
+	  }
+}
+ 
+public void SetLayoutVisibility(boolean _value) {
+	if (!_value) {
+	   layout.setVisibility(android.view.View.INVISIBLE);
+	} 
+	else {
+		layout.setVisibility(android.view.View.VISIBLE);
+	}	
+}
+
+public  void SetVisible ( boolean visible ) {	
+  if (visible) { 
+	  if (layout.getParent() == null) { 
+		   controls.appLayout.addView(layout);
+		   layout.setVisibility(android.view.View.VISIBLE);
+		   mRemovedFromParent = false;
+	  } 
+   }
+  else { 
+	  if (layout.getParent() != null) { 
+		 layout.setVisibility(android.view.View.INVISIBLE);
+		 controls.appLayout.removeView(layout);
+		 mRemovedFromParent = true;
+      }   
+   }
+}
+
+public void RemoveFromViewParent() {   //TODO Pascal
+	if (!mRemovedFromParent) {
+		if (layout != null)  {
+			layout.setVisibility(android.view.View.INVISIBLE);
+			if (parent != null) parent.removeView(layout);
+		}
+		mRemovedFromParent = true;
+	}
+}
+
+public void SetViewParent( android.view.ViewGroup _viewgroup) {
+	if ( (parent != null) && (layout != null) ) { parent.removeView(layout); }
+	parent = (RelativeLayout) _viewgroup;
+	if ( (parent != null) && (layout != null) ) {
+		parent.addView(layout, layparam);
+		layout.setVisibility(android.view.View.VISIBLE);
+	}
+	mRemovedFromParent = false;
+}
+
 public  void Show(int effect) {			
    controls.appLayout.addView(layout);
    parent = controls.appLayout;
+}
+
+
+public ViewGroup GetParent() {	
+  return controls.appLayout; //parent;
 }
 
 public  void Close(int effect ) {
@@ -253,22 +320,6 @@ public boolean IsConnectedTo(int _connectionType) {
 	   else 
 		  return false;
 	   
-}
-//
-public  void SetVisible ( boolean visible ) {	
-if (visible) { if (layout.getParent() == null)
-               { controls.appLayout.addView(layout); } }
-else         { if (layout.getParent() != null)
-               { controls.appLayout.removeView(layout); } };
-}
-
-//
-public  void SetEnabled ( boolean enabled ) {	
-for (int i = 0; i < layout.getChildCount(); i++) {
-  View child = layout.getChildAt(i);
-  child.setEnabled(enabled);
-}
-
 }
 
 public void ShowMessage(String msg){
@@ -593,7 +644,19 @@ public int GetDrawableResourceId(String _resName) {
 }
 
 public Drawable GetDrawableResourceById(int _resID) {
-	return (Drawable)( this.controls.activity.getResources().getDrawable(_resID));	
+	    
+	        Drawable res = null;	    
+		if (Build.VERSION.SDK_INT < 21 ) { 	//for old device < 21		
+ 			res = this.controls.activity.getResources().getDrawable(_resID);
+ 		}
+ 	
+                //[ifdef_api21up]	 		
+ 		if(Build.VERSION.SDK_INT >= 21) {  			
+ 		   res = this.controls.activity.getResources().getDrawable(_resID, null);
+ 		} 
+                //[endif_api21up]			
+
+ 		return res;
 }
 
 //by  thierrydijoux
@@ -678,7 +741,7 @@ public void SetTabNavigationModeActionBar(){
 public void RemoveAllTabsActionBar() {
 	ActionBar actionBar = this.controls.activity.getActionBar();
 	actionBar.removeAllTabs();
-        this.controls.activity.invalidateOptionsMenu(); // by renabor
+    this.controls.activity.invalidateOptionsMenu(); // by renabor
 	actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD); //API 11 renabor
 }
 
@@ -1279,9 +1342,9 @@ public native void pOnBeforeDispatchDraw(long pasobj, Canvas canvas, int tag);
 public native void pOnAfterDispatchDraw(long pasobj, Canvas canvas, int tag);
 public native void pOnLayouting(long pasobj, boolean changed);
 
-// -------------------------------------------------------------------------
-//Load Pascal Library
-// -------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------
+//Load Pascal Library - Please, do not edit the static content commented in the template file
+// -------------------------------------------------------------------------------------------
 static {
 try{System.loadLibrary("controls");} catch (UnsatisfiedLinkError e) {Log.e("JNI_Loading_libcontrols", "exception", e);}
 }
@@ -1325,7 +1388,7 @@ public boolean jAppOnPrepareOptionsItem(Menu m, MenuItem item, int index) {
 public  void jAppOnCreateContextMenu(ContextMenu m) {pAppOnCreateContextMenu(m);}
 public  void jAppOnClickContextMenuItem(MenuItem item,int itemID, String itemCaption, boolean checked) {pAppOnClickContextMenuItem(item,itemID,itemCaption,checked);}
 public void jAppOnViewClick(View view, int id){ pAppOnViewClick(view,id);}
-public void jAppOnListItemClick(AdapterView adapter, View view, int position, int id){ pAppOnListItemClick(adapter, view,position,id);}
+public void jAppOnListItemClick(AdapterView<?> adapter, View view, int position, int id){ pAppOnListItemClick(adapter, view,position,id);}
 //public  void jAppOnHomePressed()          { pAppOnHomePressed();           }
 public boolean jAppOnKeyDown(char keyChar , int keyCode, String keyCodeString) {return pAppOnSpecialKeyDown(keyChar, keyCode, keyCodeString);};
 
@@ -1360,10 +1423,11 @@ public  int  systemGetOrientation() {
    return (this.activity.getResources().getConfiguration().orientation); 
 }
 
-public  void classSetNull (Class object) {
+public  void classSetNull (Class<?> object) {
    object = null;
 }
-public  void classChkNull (Class object) {
+
+public  void classChkNull (Class<?> object) {
    if (object == null) { Log.i("JAVA","checkNull-Null"); };
    if (object != null) { Log.i("JAVA","checkNull-Not Null"); };
 }
@@ -1751,36 +1815,50 @@ public void jSend_Email(
 //http://codetheory.in/android-sms/
 //http://www.developerfeed.com/java/tutorial/sending-sms-using-android
 //http://www.techrepublic.com/blog/software-engineer/how-to-send-a-text-message-from-within-your-android-app/
-public int jSend_SMS(String phoneNumber, String msg) {
+public int jSend_SMS(String phoneNumber, String msg, boolean multipartMessage) {
 	SmsManager sms = SmsManager.getDefault();	
 	try {
-	      //SmsManager.getDefault().sendTextMessage(phoneNumber, null, msg, null, null);	      
-	      List<String> messages = sms.divideMessage(msg);    
-	      for (String message : messages) {
-	          sms.sendTextMessage(phoneNumber, null, message, null, null);
-	      }	      
-	      //Log.i("Send_SMS",phoneNumber+": "+ msg);
-	      return 1; //ok	      
-	  }catch (Exception e) {
-		  //Log.i("Send_SMS Fail",e.toString());
-	      return 0; //fail
-	  }
+		//SmsManager.getDefault().sendTextMessage(phoneNumber, null, msg, null, null);
+		if (multipartMessage) {
+			ArrayList<String> messages = sms.divideMessage(msg);    
+			sms.sendMultipartTextMessage(phoneNumber, null, messages, null, null);			  
+		} else {
+			List<String> messages = sms.divideMessage(msg);    
+			for (String message : messages) {
+				sms.sendTextMessage(phoneNumber, null, message, null, null);
+			}			    
+		}
+		//Log.i("Send_SMS",phoneNumber+": "+ msg);
+		return 1; //ok	      
+	} catch (Exception e) {
+		//Log.i("Send_SMS Fail",e.toString());
+		return 0; //fail
+	}
 }
 
-public int jSend_SMS(String phoneNumber, String msg, String packageDeliveredAction) {	
+public int jSend_SMS(String phoneNumber, String msg, String packageDeliveredAction, boolean multipartMessage) {	
 	String SMS_DELIVERED = packageDeliveredAction;
 	PendingIntent deliveredPendingIntent = PendingIntent.getBroadcast(this.GetContext(), 0, new Intent(SMS_DELIVERED), 0);
 	SmsManager sms = SmsManager.getDefault();
 	try {
-	      //SmsManager.getDefault().sendTextMessage(phoneNumber, null, msg, null, deliveredPendingIntent);
-	      //Log.i("Send_SMS",phoneNumber+": "+ msg);
-	      List<String> messages = sms.divideMessage(msg);    
-	      for (String message : messages) {
-	          sms.sendTextMessage(phoneNumber, null, message, null, deliveredPendingIntent);
-	      }	      
-	      return 1; //ok	      
-	}catch (Exception e) {
-	      return 0; //fail
+		//SmsManager.getDefault().sendTextMessage(phoneNumber, null, msg, null, deliveredPendingIntent);
+		if (multipartMessage) {
+			ArrayList<String> messages = sms.divideMessage(msg);    
+			ArrayList<PendingIntent> deliveredPendingIntents = new ArrayList<PendingIntent>();
+			for (int i = 0; i < messages.size(); i++) {
+				deliveredPendingIntents.add(i, deliveredPendingIntent);
+			}			
+			sms.sendMultipartTextMessage(phoneNumber, null, messages, null, deliveredPendingIntents);			  
+		} else {
+			List<String> messages = sms.divideMessage(msg);    
+			for (String message : messages) {
+				sms.sendTextMessage(phoneNumber, null, message, null, deliveredPendingIntent);
+			}			    
+		}	
+		//Log.i("Send_SMS",phoneNumber+": "+ msg);    
+		return 1; //ok	      
+	} catch (Exception e) {
+		return 0; //fail
 	}
 }
 

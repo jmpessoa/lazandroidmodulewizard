@@ -3,7 +3,6 @@ object FormUpdateCodeTemplate: TFormUpdateCodeTemplate
   Height = 244
   Top = 202
   Width = 498
-  AutoSize = True
   BorderStyle = bsSizeToolWin
   Caption = 'Android Module Wizard : Upgrade Code Templates'
   ClientHeight = 244

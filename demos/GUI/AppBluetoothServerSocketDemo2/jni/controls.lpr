@@ -7,6 +7,8 @@ uses
   Classes, SysUtils, And_jni, And_jni_Bridge, AndroidWidget, Laz_And_Controls,
   Laz_And_Controls_Events, unit1;
 
+{%region /fold 'LAMW generated code'}
+
 { Class:     com_example_appbluetoothserversocketdemo2_Controls
   Method:    pAppOnCreate
   Signature: (Landroid/content/Context;Landroid/widget/RelativeLayout;)V }
@@ -496,6 +498,8 @@ exports
   pOnBluetoothServerSocketIncomingData name 'Java_com_example_appbluetoothserversocketdemo2_Controls_pOnBluetoothServerSocketIncomingData',
   pOnBluetoothServerSocketListen name 'Java_com_example_appbluetoothserversocketdemo2_Controls_pOnBluetoothServerSocketListen',
   pOnBluetoothServerSocketAcceptTimeout name 'Java_com_example_appbluetoothserversocketdemo2_Controls_pOnBluetoothServerSocketAcceptTimeout';
+
+{%endregion}
 
 begin
   gApp:= jApp.Create(nil);{AndroidWidget.pas}

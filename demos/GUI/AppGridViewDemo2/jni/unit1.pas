@@ -64,6 +64,12 @@ implementation
 
 {$R *.lfm}
 
+function GridView_PrintCoord(const col, row: integer): string;
+begin
+  Result := IntToStr(Col) + 'x' + IntToStr(Row);
+end;
+
+
 { TAndroidModule1 }
 procedure TAndroidModule1.ShowItem(const Col, Row: integer; const Item: string);
 

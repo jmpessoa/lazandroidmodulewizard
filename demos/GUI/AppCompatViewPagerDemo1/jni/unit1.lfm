@@ -1,0 +1,222 @@
+object AndroidModule1: TAndroidModule1
+  Left = 321
+  Top = 118
+  Width = 320
+  Height = 471
+  MarginLeft = 0
+  MarginTop = 0
+  MarginRight = 0
+  MarginBottom = 0
+  Enabled = True
+  Text = 'AndroidModule1'
+  ActivityMode = actMain
+  BackgroundColor = colbrDefault
+  ActionBarTitle = abtDefault
+  OnJNIPrompt = AndroidModule1JNIPrompt
+  object jsFloatingButton1: jsFloatingButton
+    Left = 242
+    Top = 393
+    Width = 48
+    Height = 48
+    MarginLeft = 30
+    MarginTop = 30
+    MarginRight = 30
+    MarginBottom = 30
+    Enabled = True
+    Visible = True
+    Id = 7
+    PosRelativeToAnchor = []
+    PosRelativeToParent = [rpBottom, rpRight]
+    LayoutParamWidth = lpWrapContent
+    LayoutParamHeight = lpWrapContent
+    BackgroundColor = colbrDefault
+    GravityInParent = lgNone
+    OnClick = jsFloatingButton1Click
+  end
+  object jsViewPager1: jsViewPager
+    Left = 0
+    Top = 0
+    Width = 320
+    Height = 471
+    MarginLeft = 0
+    MarginTop = 0
+    MarginRight = 0
+    MarginBottom = 0
+    Enabled = True
+    Visible = True
+    Id = 2
+    PosRelativeToAnchor = []
+    PosRelativeToParent = []
+    LayoutParamWidth = lpMatchParent
+    LayoutParamHeight = lpMatchParent
+    BackgroundColor = colbrDefault
+    PagerStrip = psTabTop
+    FitsSystemWindows = False
+    GravityInParent = lgNone
+  end
+  object jListView1: jListView
+    Left = 0
+    Top = 24
+    Width = 320
+    Height = 96
+    MarginLeft = 0
+    MarginTop = 0
+    MarginRight = 0
+    MarginBottom = 0
+    Enabled = True
+    Visible = True
+    Id = 3
+    PosRelativeToAnchor = []
+    PosRelativeToParent = []
+    LayoutParamWidth = lpMatchParent
+    LayoutParamHeight = lpWrapContent
+    Items.Strings = (
+      'Client 1'
+      'Client 2'
+      'Client 3'
+      'Client 4'
+      'Client 5'
+      'Client 6'
+    )
+    BackgroundColor = colbrDefault
+    FontColor = colbrDefault
+    FontSize = 0
+    WidgetItem = wgNone
+    Delimiter = '|'
+    TextDecorated = txtNormal
+    ItemLayout = layText
+    TextSizeDecorated = sdNone
+    TextAlign = alLeft
+    HighLightSelectedItemColor = colbrDefault
+    FontSizeUnit = unitDefault
+    ItemPaddingTop = 40
+    ItemPaddingBottom = 40
+    WidgetTextColor = colbrDefault
+    OnClickItem = jListView1ClickItem
+  end
+  object jListView2: jListView
+    Left = 0
+    Top = 128
+    Width = 320
+    Height = 96
+    MarginLeft = 0
+    MarginTop = 0
+    MarginRight = 0
+    MarginBottom = 0
+    Enabled = True
+    Visible = True
+    Id = 4
+    PosRelativeToAnchor = []
+    PosRelativeToParent = []
+    LayoutParamWidth = lpMatchParent
+    LayoutParamHeight = lpWrapContent
+    Items.Strings = (
+      'Company 1'
+      'Company 2'
+      'Company 3'
+      'Company 4'
+      'Company 5'
+      'Company 6'
+    )
+    BackgroundColor = colbrDefault
+    FontColor = colbrDefault
+    FontSize = 0
+    WidgetItem = wgNone
+    Delimiter = '|'
+    TextDecorated = txtNormal
+    ItemLayout = layText
+    TextSizeDecorated = sdNone
+    TextAlign = alLeft
+    HighLightSelectedItemColor = colbrDefault
+    FontSizeUnit = unitDefault
+    ItemPaddingTop = 40
+    ItemPaddingBottom = 40
+    WidgetTextColor = colbrDefault
+    OnClickItem = jListView2ClickItem
+  end
+  object jListView3: jListView
+    Left = 0
+    Top = 240
+    Width = 320
+    Height = 72
+    MarginLeft = 0
+    MarginTop = 0
+    MarginRight = 0
+    MarginBottom = 0
+    Enabled = True
+    Visible = True
+    Id = 5
+    PosRelativeToAnchor = []
+    PosRelativeToParent = []
+    LayoutParamWidth = lpMatchParent
+    LayoutParamHeight = lpWrapContent
+    Items.Strings = (
+      'Employe 1'
+      'Employe 2'
+      'Employe 3'
+      'Employe 4'
+      'Employe 5'
+      'Employe 6'
+    )
+    BackgroundColor = colbrDefault
+    FontColor = colbrDefault
+    FontSize = 0
+    WidgetItem = wgNone
+    Delimiter = '|'
+    TextDecorated = txtNormal
+    ItemLayout = layText
+    TextSizeDecorated = sdNone
+    TextAlign = alLeft
+    HighLightSelectedItemColor = colbrDefault
+    FontSizeUnit = unitDefault
+    ItemPaddingTop = 40
+    ItemPaddingBottom = 40
+    WidgetTextColor = colbrDefault
+    OnClickItem = jListView3ClickItem
+  end
+  object jPanel1: jPanel
+    Left = 0
+    Top = 328
+    Width = 320
+    Height = 30
+    MarginLeft = 0
+    MarginTop = 0
+    MarginRight = 0
+    MarginBottom = 0
+    Enabled = True
+    Visible = True
+    Id = 8
+    PosRelativeToAnchor = []
+    PosRelativeToParent = []
+    LayoutParamWidth = lpMatchParent
+    LayoutParamHeight = lpWrapContent
+    BackgroundColor = colbrDefault
+    MinPinchZoomFactor = 0.25
+    MaxPinchZoomFactor = 4
+    object jTextView1: jTextView
+      Left = 130
+      Top = 5
+      Width = 59
+      Height = 20
+      MarginLeft = 5
+      MarginTop = 5
+      MarginRight = 5
+      MarginBottom = 5
+      Enabled = True
+      Visible = True
+      Id = 9
+      PosRelativeToAnchor = []
+      PosRelativeToParent = [rpCenterInParent]
+      LayoutParamWidth = lpWrapContent
+      LayoutParamHeight = lpWrapContent
+      Text = 'LAMW 0.8'
+      Alignment = taLeft
+      BackgroundColor = colbrDefault
+      FontColor = colbrDefault
+      FontSize = 0
+      TextTypeFace = tfNormal
+      FontSizeUnit = unitDefault
+      GravityInParent = lgNone
+    end
+  end
+end

@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resources>
+  <string name="create_habitat_index">CREATE UNIQUE INDEX IF NOT EXISTS `byHabitat` ON `Sites` (`HabitatNo` ASC);</string>
+</resources>

@@ -5,7 +5,7 @@ unit Laz_And_jni_Controls;
 interface
 
 uses
-  Classes, SysUtils, Math, types, And_jni, AndroidWidget;
+  Classes, SysUtils{, types}, And_jni, AndroidWidget;
 
 type
 
@@ -37,8 +37,6 @@ end;
 
 TAndroidTextView= class(TAndroidVisualControl)
 private
-  procedure SetText(Value: string);
-  function  GetText: string;
 
   //function GetTextColor: integer;
   procedure SetTextColor(Value: TARGBColorBridge);
@@ -46,7 +44,8 @@ private
 protected
   //FText: string;
   //FTextColor: integer;
-
+  procedure SetText(Value: string);override;
+  function  GetText: string;  override;
   //procedure SetName(const NewName: TComponentName); override;
 public
   constructor Create(AOwner: TComponent); override;
@@ -110,7 +109,7 @@ protected
 public
   constructor Create(AOwner: TComponent); override;
   destructor Destroy; override;
-  procedure Init(refApp: jApp);
+  procedure Init(refApp: jApp);  override;
   procedure SetArrayAdapter(jAdapter: jObject);
   function GetStringListAdapter(strList: array of string): jObject;
   function GetItemAtPosition(position: integer): jObject;

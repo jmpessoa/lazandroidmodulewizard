@@ -129,6 +129,29 @@ uses
 
    Procedure Java_Event_pOnExpandableListViewGroupCollapse(env: PJNIEnv; this: jobject; Obj: TObject;
                                                               groupPosition: integer; groupHeader: JString);
+(*
+   Procedure Java_Event_pOnGL2SurfaceCreate(env: PJNIEnv; this: jobject; Obj: TObject);
+   Procedure Java_Event_pOnGL2SurfaceChanged(env: PJNIEnv; this: jobject; Obj: TObject; width: integer; height: integer);
+   Procedure Java_Event_pOnGL2SurfaceDrawFrame(env: PJNIEnv; this: jobject; Obj: TObject);
+
+   Procedure Java_Event_pOnGL2SurfaceTouch(env: PJNIEnv; this: jobject; Obj: TObject;
+                                           action, countPoints: integer;
+                                           arrayX: jObject; arrayY: jObject;
+                                           flingGesture: integer; pinchZoomGestureState: integer;
+                                           zoomScaleFactor: single);
+
+   Procedure Java_Event_pOnGL2SurfaceDestroyed(env: PJNIEnv; this: jobject; Obj: TObject);
+*)
+
+   Procedure Java_Event_pOnRecyclerViewItemClick(env: PJNIEnv; this: jobject; Obj: TObject; itemIndex: integer; arrayContentCount: integer);
+   Procedure Java_Event_pOnClickNavigationViewItem(env: PJNIEnv; this: jobject; Obj: TObject; itemIndex: integer; itemCaption: JString);
+   Procedure Java_Event_pOnClickBottomNavigationViewItem(env: PJNIEnv; this: jobject; Obj: TObject; itemIndex: integer; itemCaption: JString);
+
+   Procedure Java_Event_pOnClickTreeViewItem(env: PJNIEnv; this: jobject; Obj: TObject; itemIndex: integer; itemCaption: JString);
+   Procedure Java_Event_pOnLongClickTreeViewItem(env: PJNIEnv; this: jobject; Obj: TObject; itemIndex: integer; itemCaption: JString);
+
+   Procedure Java_Event_pOnSTabSelected(env: PJNIEnv; this: jobject; Obj: TObject; position: integer;  title: JString);
+
 implementation
 
 uses
@@ -136,8 +159,10 @@ uses
    AndroidWidget, bluetooth, bluetoothclientsocket, bluetoothserversocket,
    spinner, location, actionbartab, customdialog, togglebutton, switchbutton, gridview,
    sensormanager, broadcastreceiver, datepickerdialog, timepickerdialog, shellcommand,
-   tcpsocketclient, surfaceview, mediaplayer, contactmanager, seekbar, ratingbar, radiogroup,drawingview,
-   autocompletetextview, chronometer, numberpicker, udpsocket, opendialog, comboedittext, toolbar, expandablelistview;
+   tcpsocketclient, surfaceview, mediaplayer, contactmanager, seekbar, ratingbar, radiogroup, drawingview,
+   autocompletetextview, chronometer, numberpicker, udpsocket, opendialog, comboedittext,
+   toolbar, expandablelistview, {gl2surfaceview,} sfloatingbutton, framelayout,
+   stoolbar, snavigationview, srecyclerview, sbottomnavigationview, stablayout, treelistview;
 
 procedure Java_Event_pOnBluetoothEnabled(env: PJNIEnv; this: jobject; Obj: TObject);
 begin
@@ -1305,6 +1330,27 @@ begin
     Exit;
   end;
 
+  if Obj is jsToolbar then   //android support library...
+  begin
+    jForm(jsToolbar(Obj).Owner).UpdateJNI(gApp);
+    jsToolbar(Obj).GenEvent_OnClick(Obj);
+    Exit;
+  end;
+
+  if Obj is jsFloatingButton then   //android support library...
+  begin
+    jForm(jsFloatingButton(Obj).Owner).UpdateJNI(gApp);
+    jsFloatingButton(Obj).GenEvent_OnClick(Obj);
+    Exit;
+  end;
+
+  if Obj is jFrameLayout then
+  begin
+    jForm(jFrameLayout(Obj).Owner).UpdateJNI(gApp);
+    jFrameLayout(Obj).GenEvent_OnClick(Obj);
+    Exit;
+  end;
+
 end;
 
 procedure Java_Event_pOnChronometerTick(env: PJNIEnv; this: jobject; Obj: TObject; elapsedTimeMillis: JLong);
@@ -1410,6 +1456,88 @@ begin
 
 end;
 
+Procedure Java_Event_pOnClickNavigationViewItem(env: PJNIEnv; this: jobject; Obj: TObject;  itemIndex: integer; itemCaption: JString);
+var
+  pasitemCaption: string;
+  _jBoolean: JBoolean;
+begin
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+  if Obj is jsNavigationView then
+  begin
+    jForm(jsNavigationView(Obj).Owner).UpdateJNI(gApp);
+    pasitemCaption := '';
+    if itemCaption <> nil then
+    begin
+      _jBoolean:= JNI_False;
+      pasitemCaption:= string( env^.GetStringUTFChars(env,itemCaption,@_jBoolean) );
+    end;
+    jsNavigationView(Obj).GenEvent_OnClickNavigationViewItem(Obj, itemIndex, pasitemCaption);
+  end;
+end;
+
+Procedure Java_Event_pOnClickBottomNavigationViewItem(env: PJNIEnv; this: jobject; Obj: TObject; itemIndex: integer; itemCaption: JString);
+var
+  pasitemCaption: string;
+  _jBoolean: JBoolean;
+begin
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+  if Obj is jsBottomNavigationView then
+  begin
+    jForm(jsBottomNavigationView(Obj).Owner).UpdateJNI(gApp);
+    pasitemCaption := '';
+    if itemCaption <> nil then
+    begin
+      _jBoolean:= JNI_False;
+      pasitemCaption:= string( env^.GetStringUTFChars(env,itemCaption,@_jBoolean) );
+    end;
+    jsBottomNavigationView(Obj).GenEvent_OnClickNavigationViewItem(Obj, itemIndex, pasitemCaption);
+  end;
+end;
+
+Procedure Java_Event_pOnClickTreeViewItem(env: PJNIEnv; this: jobject; Obj: TObject; itemIndex: integer; itemCaption: JString);
+var
+  pasitemCaption: string;
+  _jBoolean: JBoolean;
+begin
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+  if Obj is jTreeListView then
+  begin
+    jForm(jTreeListView(Obj).Owner).UpdateJNI(gApp);
+    pasitemCaption := '';
+    if itemCaption <> nil then
+    begin
+      _jBoolean:= JNI_False;
+      pasitemCaption:= string( env^.GetStringUTFChars(env,itemCaption,@_jBoolean) );
+    end;
+    jTreeListView(Obj).GenEvent_OnClickTreeViewItem(Obj, itemIndex, pasitemCaption);
+  end;
+end;
+
+
+Procedure Java_Event_pOnLongClickTreeViewItem(env: PJNIEnv; this: jobject; Obj: TObject; itemIndex: integer; itemCaption: JString);
+var
+  pasitemCaption: string;
+  _jBoolean: JBoolean;
+begin
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+  if Obj is jTreeListView then
+  begin
+    jForm(jTreeListView(Obj).Owner).UpdateJNI(gApp);
+    pasitemCaption := '';
+    if itemCaption <> nil then
+    begin
+      _jBoolean:= JNI_False;
+      pasitemCaption:= string( env^.GetStringUTFChars(env,itemCaption,@_jBoolean) );
+    end;
+    jTreeListView(Obj).GenEvent_OnLongClickTreeViewItem(Obj, itemIndex, pasitemCaption);
+  end;
+end;
+
+
 Procedure Java_Event_pOnExpandableListViewGroupCollapse(env: PJNIEnv; this: jobject; Obj: TObject;
                                                            groupPosition: integer; groupHeader: JString);
 var
@@ -1463,6 +1591,125 @@ begin
     jExpandableListView(Obj).GenEvent_OnChildClick(Obj, groupPosition, pasgroupHeader, childItemPosition, paschildItemCaption);
   end;
 
+end;
+
+(*
+Procedure Java_Event_pOnGL2SurfaceCreate(env: PJNIEnv; this: jobject; Obj: TObject);
+begin
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+  if Obj is jGL2SurfaceView then
+  begin
+    jForm(jGL2SurfaceView(Obj).Owner).UpdateJNI(gApp);
+    jGL2SurfaceView(Obj).GenEvent_OnGL2SurfaceCreate(Obj);
+  end;
+end;
+
+Procedure Java_Event_pOnGL2SurfaceDestroyed(env: PJNIEnv; this: jobject; Obj: TObject);
+begin
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+  if Obj is jGL2SurfaceView then
+  begin
+    jForm(jGL2SurfaceView(Obj).Owner).UpdateJNI(gApp);
+    jGL2SurfaceView(Obj).GenEvent_OnGL2SurfaceDestroyed(Obj);
+  end;
+end;
+
+Procedure Java_Event_pOnGL2SurfaceChanged(env: PJNIEnv; this: jobject; Obj: TObject; width: integer; height: integer);
+begin
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+  if Obj is jGL2SurfaceView then
+  begin
+    jForm(jGL2SurfaceView(Obj).Owner).UpdateJNI(gApp);
+    jGL2SurfaceView(Obj).GenEvent_OnGL2SurfaceChanged(Obj, width, height);
+  end;
+end;
+
+Procedure Java_Event_pOnGL2SurfaceDrawFrame(env: PJNIEnv; this: jobject; Obj: TObject);
+begin
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+  if Obj is jGL2SurfaceView then
+  begin
+    jForm(jGL2SurfaceView(Obj).Owner).UpdateJNI(gApp);
+    jGL2SurfaceView(Obj).GenEvent_OnGL2SurfaceDrawFrame(Obj);
+  end;
+end;
+
+Procedure Java_Event_pOnGL2SurfaceTouch(env: PJNIEnv; this: jobject; Obj: TObject;
+                                        action, countPoints: integer;
+                                        arrayX: jObject; arrayY: jObject;
+                                        flingGesture: integer; pinchZoomGestureState: integer;
+                                        zoomScaleFactor: single);
+
+var
+  sizeArray: integer;
+  arrayResultX: array of single;
+  arrayResultY: array of single;
+begin
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+
+  if not Assigned(Obj)  then Exit;
+
+  if Obj is jGL2SurfaceView then
+  begin
+      sizeArray:= countPoints;
+      if arrayX <> nil then
+      begin
+        //sizeArray:=  env^.GetArrayLength(env, arrayX);
+        SetLength(arrayResultX, sizeArray);
+        env^.GetFloatArrayRegion(env, arrayX, 0, sizeArray, @arrayResultX[0] {target});
+      end;
+
+      if arrayY <> nil then
+      begin
+        //sizeArray:=  env^.GetArrayLength(env, arrayX);
+        SetLength(arrayResultY, sizeArray);
+        env^.GetFloatArrayRegion(env, arrayY, 0, sizeArray, @arrayResultY[0] {target});
+      end;
+      jGL2SurfaceView(Obj).UpdateJNI(gApp);
+      jForm(jGL2SurfaceView(Obj).Owner).UpdateJNI(gApp);
+
+      jGL2SurfaceView(Obj).GenEvent_OnGL2SurfaceTouch(Obj,action,countPoints,
+                                                    arrayResultX,arrayResultY,
+                                                    flingGesture,pinchZoomGestureState, zoomScaleFactor);
+  end;
+end;
+
+*)
+
+Procedure Java_Event_pOnRecyclerViewItemClick(env: PJNIEnv; this: jobject; Obj: TObject; itemIndex: integer; arrayContentCount: integer);
+begin
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+  if Obj is jsRecyclerView then
+  begin
+    jForm(jsRecyclerView(Obj).Owner).UpdateJNI(gApp);
+    jsRecyclerView(Obj).GenEvent_OnRecyclerViewItemClick(Obj, itemIndex, arrayContentCount);
+  end;
+end;
+
+Procedure Java_Event_pOnSTabSelected(env: PJNIEnv; this: jobject; Obj: TObject; position: integer;  title: JString);
+var
+  pastitle: string;
+  _jBoolean: JBoolean;
+begin
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+  if Obj is jsTabLayout then
+  begin
+    jForm(jsTabLayout(Obj).Owner).UpdateJNI(gApp);
+    pastitle := '';
+    if title <> nil then
+    begin
+      _jBoolean:= JNI_False;
+      pastitle:= string( env^.GetStringUTFChars(env,title,@_jBoolean) );
+    end;
+    jsTabLayout(Obj).GenEvent_OnSTabSelected(Obj, position, pastitle);
+  end;
 end;
 
 end.

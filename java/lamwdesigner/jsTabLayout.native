@@ -1,0 +1,1 @@
+public native void pOnSTabSelected(long pasobj, int position, String title);

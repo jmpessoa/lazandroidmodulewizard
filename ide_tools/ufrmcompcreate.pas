@@ -671,6 +671,7 @@ begin
    listPascal.Add('    procedure SetColor(Value: TARGBColorBridge); //background');
    listPascal.Add('    procedure UpdateLParamHeight;');
    listPascal.Add('    procedure UpdateLParamWidth;');
+   listPascal.Add('    procedure TryNewParent(refApp: jApp);');
   end;
 
   listPascal.Add(' ');
@@ -739,8 +740,11 @@ begin
   if Pos('jVisualControl', FProjectModel) > 0  then
   begin
   listPascal.Add('uses');
-  listPascal.Add('   customdialog;');
+  listPascal.Add('   customdialog, viewflipper, toolbar, scoordinatorlayout, linearlayout,');
+  listPascal.Add('   sdrawerlayout, scollapsingtoolbarlayout, scardview, sappbarlayout,');
+  listPascal.Add('   stoolbar, stablayout, snestedscrollview, sviewpager, framelayout;');
   end;
+
   listPascal.Add('  ');
   listPascal.Add('{---------  '+  FJavaClassName +'  --------------}');
   listPascal.Add(' ');
@@ -792,8 +796,99 @@ begin
   listPascal.Add('  inherited Destroy;');
   listPascal.Add('end;');
   listPascal.Add(' ');
+  if Pos('jVisualControl', FProjectModel) > 0  then
+  begin
+    listPascal.Add('procedure '+FJavaClassName+'.TryNewParent(refApp: jApp);');
+    listPascal.Add('begin');
+    listPascal.Add('  if FParent is jPanel then');
+    listPascal.Add('  begin');
+    listPascal.Add('    jPanel(FParent).Init(refApp);');
+    listPascal.Add('    FjPRLayout:= jPanel(FParent).View;');
+    listPascal.Add('  end else');
+    listPascal.Add('  if FParent is jScrollView then');
+    listPascal.Add('  begin');
+    listPascal.Add('    jScrollView(FParent).Init(refApp);');
+    listPascal.Add('    FjPRLayout:= jScrollView_getView(FjEnv, jScrollView(FParent).jSelf);');
+    listPascal.Add('  end else');
+    listPascal.Add('  if FParent is jHorizontalScrollView then');
+    listPascal.Add('  begin');
+    listPascal.Add('    jHorizontalScrollView(FParent).Init(refApp);');
+    listPascal.Add('    FjPRLayout:= jHorizontalScrollView_getView(FjEnv, jHorizontalScrollView(FParent).jSelf);');
+    listPascal.Add('  end else');
+    listPascal.Add('  if FParent is jCustomDialog then');
+    listPascal.Add('  begin');
+    listPascal.Add('    jCustomDialog(FParent).Init(refApp);');
+    listPascal.Add('    FjPRLayout:= jCustomDialog(FParent).View;');
+    listPascal.Add('  end else');
+    listPascal.Add('  if FParent is jViewFlipper then');
+    listPascal.Add('  begin');
+    listPascal.Add('    jViewFlipper(FParent).Init(refApp);');
+    listPascal.Add('    FjPRLayout:= jViewFlipper(FParent).View;');
+    listPascal.Add('  end else');
+    listPascal.Add('  if FParent is jToolbar then');
+    listPascal.Add('  begin');
+    listPascal.Add('    jToolbar(FParent).Init(refApp);');
+    listPascal.Add('    FjPRLayout:= jToolbar(FParent).View;');
+    listPascal.Add('  end else');
+    listPascal.Add('  if FParent is jsToolbar then');
+    listPascal.Add('  begin');
+    listPascal.Add('    jsToolbar(FParent).Init(refApp);');
+    listPascal.Add('    FjPRLayout:= jsToolbar(FParent).View;');
+    listPascal.Add('  end else');
+    listPascal.Add('  if FParent is jsCoordinatorLayout then');
+    listPascal.Add('  begin');
+    listPascal.Add('    jsCoordinatorLayout(FParent).Init(refApp);');
+    listPascal.Add('    FjPRLayout:= jsCoordinatorLayout(FParent).View;');
+    listPascal.Add('  end else');
+    listPascal.Add('  if FParent is jFrameLayout then');
+    listPascal.Add('  begin');
+    listPascal.Add('    jFrameLayout(FParent).Init(refApp);');
+    listPascal.Add('    FjPRLayout:= jFrameLayout(FParent).View;');
+    listPascal.Add('  end else');
+    listPascal.Add('  if FParent is jLinearLayout then');
+    listPascal.Add('  begin');
+    listPascal.Add('    jLinearLayout(FParent).Init(refApp);');
+    listPascal.Add('    FjPRLayout:= jLinearLayout(FParent).View;');
+    listPascal.Add('  end else');
+    listPascal.Add('  if FParent is jsDrawerLayout then');
+    listPascal.Add('  begin');
+    listPascal.Add('    jsDrawerLayout(FParent).Init(refApp);');
+    listPascal.Add('    FjPRLayout:= jsDrawerLayout(FParent).View;');
+    listPascal.Add('  end else');
+    listPascal.Add('  if FParent is jsCardView then');
+    listPascal.Add('  begin');
+    listPascal.Add('      jsCardView(FParent).Init(refApp);');
+    listPascal.Add('      FjPRLayout:= jsCardView(FParent).View;');
+    listPascal.Add('  end else');
+    listPascal.Add('  if FParent is jsAppBarLayout then');
+    listPascal.Add('  begin');
+    listPascal.Add('      jsAppBarLayout(FParent).Init(refApp);');
+    listPascal.Add('      FjPRLayout:= jsAppBarLayout(FParent).View;');
+    listPascal.Add('  end else');
+    listPascal.Add('  if FParent is jsTabLayout then');
+    listPascal.Add('  begin');
+    listPascal.Add('      jsTabLayout(FParent).Init(refApp);');
+    listPascal.Add('      FjPRLayout:= jsTabLayout(FParent).View;');
+    listPascal.Add('  end else');
+    listPascal.Add('  if FParent is jsCollapsingToolbarLayout then');
+    listPascal.Add('  begin');
+    listPascal.Add('      jsCollapsingToolbarLayout(FParent).Init(refApp);');
+    listPascal.Add('      FjPRLayout:= jsCollapsingToolbarLayout(FParent).View;');
+    listPascal.Add('  end else');
+    listPascal.Add('  if FParent is jsNestedScrollView then');
+    listPascal.Add('  begin');
+    listPascal.Add('      jsNestedScrollView(FParent).Init(refApp);');
+    listPascal.Add('      FjPRLayout:= jsNestedScrollView(FParent).View;');
+    listPascal.Add('  end else');
+    listPascal.Add('  if FParent is jsViewPager then');
+    listPascal.Add('  begin');
+    listPascal.Add('      jsViewPager(FParent).Init(refApp);');
+    listPascal.Add('      FjPRLayout:= jsViewPager(FParent).View;');
+    listPascal.Add('  end;');
+    listPascal.Add('end;');
+    listPascal.Add(' ');
+  end;
   listPascal.Add('procedure '+FJavaClassName+'.Init(refApp: jApp);');
-
   if Pos('jVisualControl', FProjectModel) > 0  then
   begin
    listPascal.Add('var');
@@ -827,30 +922,13 @@ begin
 
   if Pos('jVisualControl', FProjectModel) > 0  then
   begin
-    listPascal.Add('  if FParent <> nil then');
-    listPascal.Add('  begin');
-    listPascal.Add('    if FParent is jPanel then');
-    listPascal.Add('    begin');
-    listPascal.Add('      jPanel(FParent).Init(refApp);');
-    listPascal.Add('      FjPRLayout:= jPanel(FParent).View;');
-    listPascal.Add('    end;');
-    listPascal.Add('    if FParent is jScrollView then');
-    listPascal.Add('    begin');
-    listPascal.Add('      jScrollView(FParent).Init(refApp);');
-    listPascal.Add('      FjPRLayout:= jScrollView_getView(FjEnv, jScrollView(FParent).jSelf);');
-    listPascal.Add('    end;');
-    listPascal.Add('    if FParent is jHorizontalScrollView then');
-    listPascal.Add('    begin');
-    listPascal.Add('      jHorizontalScrollView(FParent).Init(refApp);');
-    listPascal.Add('      FjPRLayout:= jHorizontalScrollView_getView(FjEnv, jHorizontalScrollView(FParent).jSelf);');
-    listPascal.Add('    end;');
-    listPascal.Add('    if FParent is jCustomDialog then');
-    listPascal.Add('    begin');
-    listPascal.Add('      jCustomDialog(FParent).Init(refApp);');
-    listPascal.Add('      FjPRLayout:= jCustomDialog(FParent).View;');
-    listPascal.Add('    end;');
-    listPascal.Add('  end;');
-
+   listPascal.Add('  if FParent <> nil then');
+   listPascal.Add('  begin');
+   listPascal.Add('    TryNewParent(refApp);');
+   listPascal.Add('  end;');
+   listPascal.Add(' ');
+   listPascal.Add('  FjPRLayoutHome:= FjPRLayout;');
+   listPascal.Add(' ');
    listPascal.Add('  '+FJavaClassName+'_SetViewParent(FjEnv, FjObject, FjPRLayout);');
    listPascal.Add('  '+FJavaClassName+'_SetId(FjEnv, FjObject, Self.Id);');
    listPascal.Add('  '+FJavaClassName+'_SetLeftTopRightBottomWidthHeight(FjEnv, FjObject,');
@@ -1048,7 +1126,7 @@ begin
     for i:= 0 to auxList.Count-1 do
     begin
         auxStr:= auxList.Strings[i];
-        if auxStr <> '' then   //minor fix... 08-september-2013
+        if auxStr <> '' then
         begin
           if Pos('import ', auxStr) > 0 then
           begin
@@ -1088,9 +1166,14 @@ begin
 
     if foundClass then
     begin
+      clsLine:= Trim(clsLine); //cleanup...
 
+      if Pos('public', clsLine) > 0 then   //public class jMyComponent
+      begin
+         SplitStr(clsLine, ' ');  //remove "public" word...
+         clsLine:= Trim(clsLine); //cleanup...
+      end;
       SplitStr(clsLine, ' ');  //remove "class" word...
-
       clsLine:= Trim(clsLine); //cleanup...
 
       if Pos(' ', clsLine) > 0  then index:= Pos(' ', clsLine)
@@ -1178,13 +1261,13 @@ begin
            if regFile <> '' then
            begin
              strList.LoadFromFile(regFile);
-             if Pos('_Template', regFile) > 0 then
+             if Pos('_template', regFile) > 0 then
              begin
                userTab:= InputBox('Register [Tab] Component', 'Tab Name', 'myTab');
-               regFile:= StringReplace(regFile,'_Template', '_'+ReplaceChar(userTab,' ','_'),[]);
+               regFile:= StringReplace(regFile,'_template', '_'+ReplaceChar(userTab,' ','_'),[]);
 
                strList.Strings[0]:= 'unit register_'+ReplaceChar(userTab,' ','_')+';';
-               strList.Text:= StringReplace(strList.Text,'Template', userTab,[]);
+               strList.Text:= StringReplace(strList.Text,'template', userTab,[]);
              end;
              i:= 0;
              while i < strList.Count-1 do
@@ -1222,8 +1305,18 @@ begin
            SynMemo2.ClearSelection;
            SynMemo2.PasteFromClipboard;
            SynMemo2.Lines.SaveToFile(FPathToWizardCode+DirectorySeparator+'android_bridges'+DirectorySeparator+Copy(LowerCase(FJavaClassName),2,Length(FJavaClassName))+'.pas');
+
            ShowMessage('Saved to: '+ FPathToWizardCode+DirectorySeparator+'android_bridges'+DirectorySeparator+Copy(LowerCase(FJavaClassName),2,Length(FJavaClassName))+'.pas');
+
+           if FileExists(FPathToWizardCode+DirectorySeparator+'ide_tools'+DirectorySeparator+LowerCase(FJavaClassName)+'_icon.lrs') then
+           begin
+              CopyFile(FPathToWizardCode+DirectorySeparator+'ide_tools'+DirectorySeparator+LowerCase(FJavaClassName)+'_icon.lrs',
+                       FPathToWizardCode+DirectorySeparator+'android_bridges'+DirectorySeparator+LowerCase(FJavaClassName)+'_icon.lrs');
+           end;
+
          end; //finally
+
+
       end     //if iconPath
     end;      //showModal
     frm.Free;
@@ -1734,7 +1827,7 @@ begin
     listJCreate:= TStringList.Create;
     auxStr:= funcParam;
     SplitStr(auxStr,',');
-    listJCreate.Add('  ');
+    //listJCreate.Add('  ');
     listJCreate.Add('public java.lang.Object '+funcName+'_jCreate('+Trim(auxStr)+') {');
     auxStr2:= Trim(auxStr);
     SplitStr(auxStr2,' ');
@@ -1747,22 +1840,6 @@ begin
     end;
     listJCreate.Add('  return (java.lang.Object)(new '+FJavaClassName+'(this'+auxStr+'));');
     listJCreate.Add('}');
-    listJCreate.Add('  ');
-
-    strList.Add(' ');
-    strList.Add('(*');
-    strList.Add('//Please, you need insert: ');
-    strList.Add(listJCreate.Text+ '//to end of "public class Controls" in "Controls.java"');
-    strList.Add('*)');
-
-    ShowMessage('Warning 1: you need insert: '+LineEnding +LineEnding+
-                 FJavaClassName+'.java'+ LineEnding + LineEnding+
-                 'before the "public class Controls" in "Controls.java"');
-
-    ShowMessage('Warning 2: you need insert: '+LineEnding+
-                 listJCreate.Text+
-                 'inside the end "}" of "public class Controls" in "Controls.java"');
-
     listJCreate.SaveToFile(FPathToJavaTemplates+DirectorySeparator+'lamwdesigner'+DirectorySeparator+FJavaClassName+'.create');
     listJCreate.Free;
   end;

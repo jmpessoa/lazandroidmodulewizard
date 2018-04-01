@@ -13,7 +13,7 @@ type
 
   TLamwGlobalSettings = class
   public const
-    Version = '0.7';
+    Version = '0.8'; //Beta
   private const
     IniFileName = 'JNIAndroidProject.ini';
     IniFileSection = 'NewProject';
@@ -28,13 +28,16 @@ type
     FPathToGradle: string;
     FFPUSet: string;
     FInstructionSet: string;
-    FDefaultBuildSystem: string;
+    //FDefaultBuildSystem: string;
+    FGradleVersion: string;
+    FPrebuildOSYS: string;
 
-    function GetDefaultBuildSystem: string;
+    //function GetDefaultBuildSystem: string;
     procedure ReloadIni;
 
     function ReadIniString(const Key: string; const Def: string = ''): string; inline;
-    procedure SetDefaultBuildSystem(AValue: string);
+    //procedure SetDefaultBuildSystem(AValue: string);
+    procedure SetGradleVersion(AValue: string);
     procedure WriteIniString(const Key, Value: string);
 
     function GetPath(var APath: string; const IniIdent, QueryPrompt: string): string;
@@ -47,6 +50,7 @@ type
 
     function GetCanUpdateJavaTemplate: Boolean;
     function GetInstructionSet: string;
+    function GetPrebuildOSYS: string;
   public
     constructor Create;
     destructor Destroy; override;
@@ -67,9 +71,8 @@ type
     property PathToJavaJDK: string read GetPathToJavaJDK;
     property PathToAntBin: string read GetPathToAntBin;
     property PathToGradle: string read GetPathToGradle;
-
     property InstructionSet: string read GetInstructionSet;
-    property DefaultBuildSystem: string read GetDefaultBuildSystem write SetDefaultBuildSystem;
+    property PrebuildOSYS: string read  GetPrebuildOSYS;
   end;
 
 var
@@ -150,13 +153,22 @@ end;
 
 function TLamwGlobalSettings.GetPath(var APath: string; const IniIdent, QueryPrompt: string): string;
 begin
+
+  Result:= '';
+
   if APath = '' then ReloadPaths;
+
   if (APath = '') and FQueryPaths then
   begin
-    if QueryPath(QueryPrompt, APath) then
-      WriteIniString(IniIdent, APath);
+    QueryPath(QueryPrompt, APath);
   end;
-  Result := IncludeTrailingPathDelimiter(APath);
+
+  if APath <> '' then
+  begin
+    Result := IncludeTrailingPathDelimiter(APath);
+    WriteIniString(IniIdent, APath);
+  end
+
 end;
 
 procedure TLamwGlobalSettings.ReloadIni;
@@ -166,15 +178,17 @@ begin
   FIniFile.CacheUpdates := False;
 end;
 
+{
 function TLamwGlobalSettings.GetDefaultBuildSystem: string;
 begin
   Result := ReadIniString('DefaultBuildSystem', 'Ant');
 end;
+}
 
 function TLamwGlobalSettings.GetPathToGradle: string;
 begin
   Result := GetPath(FPathToGradle, 'PathToGradle',
-    'Path to Gradle: [ex. C:\adt32\gradle-2.10]');
+    'Path to Gradle: [ex. C:\lamw\gradle-4.1]');
 end;
 
 function TLamwGlobalSettings.ReadIniString(const Key: string;
@@ -184,9 +198,16 @@ begin
   Result := FIniFile.ReadString(IniFileSection, Key, Def);
 end;
 
+{
 procedure TLamwGlobalSettings.SetDefaultBuildSystem(AValue: string);
 begin
   WriteIniString('DefaultBuildSystem', AValue);
+end;
+}
+
+procedure TLamwGlobalSettings.SetGradleVersion(AValue: string);
+begin
+  WriteIniString('GradleVersion', AValue);
 end;
 
 procedure TLamwGlobalSettings.WriteIniString(const Key, Value: string);
@@ -208,19 +229,19 @@ end;
 function TLamwGlobalSettings.GetPathToAndroidNDK: string;
 begin
   Result := GetPath(FPathToAndroidNDK, 'PathToAndroidNDK',
-    'Path to Android NDK:  [ex. C:\adt32\ndk10]');
+    'Path to Android NDK:  [ex. C:\lamw\ndk10]');
 end;
 
 function TLamwGlobalSettings.GetPathToAndroidSDK: string;
 begin
   Result := GetPath(FPathToAndroidSDK, 'PathToAndroidSDK',
-    'Path to Android SDK: [ex. C:\adt32\sdk]');
+    'Path to Android SDK: [ex. C:\lamw\sdk]');
 end;
 
 function TLamwGlobalSettings.GetPathToAntBin: string;
 begin
   Result := GetPath(FPathToAntBin, 'PathToAntBin',
-    'Path to Ant bin: [ex. C:\adt32\ant\bin]');
+    'Path to Ant bin: [ex. C:\lamw\ant\bin]');
 end;
 
 function TLamwGlobalSettings.GetPathToJavaJDK: string;
@@ -233,6 +254,12 @@ function TLamwGlobalSettings.GetInstructionSet: string;
 begin
   FInstructionSet:= ReadIniString('InstructionSet');
   Result:= FInstructionSet;
+end;
+
+function TLamwGlobalSettings.GetPrebuildOSYS: string;
+begin
+  FPrebuildOSYS:= ReadIniString('PrebuildOSYS');
+  Result:= FPrebuildOSYS;
 end;
 
 constructor TLamwGlobalSettings.Create;
@@ -259,7 +286,7 @@ end;
 
 function TLamwGlobalSettings.GetNDK: string;
 begin
-  Result := ReadIniString('NDK');
+  Result := ReadIniString('NDK'); //index
 end;
 
 initialization

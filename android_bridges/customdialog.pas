@@ -44,7 +44,7 @@ type
     function jCreate(): jObject;
     procedure jFree();
     procedure SetViewParent(_viewgroup: jObject); override;
-    procedure RemoveFromViewParent();
+    procedure RemoveFromViewParent(); override;
 
     procedure SetLParamWidth(_w: integer);
     procedure SetLParamHeight(_h: integer);

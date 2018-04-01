@@ -1,0 +1,4 @@
+public native void pOnClickTreeViewItem(long pasobj, int position, String caption);
+public native void pOnLongClickTreeViewItem(long pasobj, int position, String caption);
+
+

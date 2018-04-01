@@ -7,6 +7,8 @@ uses
   Classes, SysUtils, And_jni, And_jni_Bridge, AndroidWidget, Laz_And_Controls,
   Laz_And_Controls_Events, unit1;
 
+{%region /fold 'LAMW generated code'}
+
 { Class:     com_example_appsensordemo1_Controls
   Method:    pAppOnCreate
   Signature: (Landroid/content/Context;Landroid/widget/RelativeLayout;)V }
@@ -544,6 +546,8 @@ exports
   pOnChangedSensor name 'Java_com_example_appsensordemo1_Controls_pOnChangedSensor',
   pOnListeningSensor name 'Java_com_example_appsensordemo1_Controls_pOnListeningSensor',
   pOnUnregisterListeningSensor name 'Java_com_example_appsensordemo1_Controls_pOnUnregisterListeningSensor';
+
+{%endregion}
 
 begin
   gApp:= jApp.Create(nil);{AndroidWidget.pas}

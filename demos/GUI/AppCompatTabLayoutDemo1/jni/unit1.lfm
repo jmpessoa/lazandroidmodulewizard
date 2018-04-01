@@ -1,0 +1,220 @@
+object AndroidModule1: TAndroidModule1
+  Left = 305
+  Top = 110
+  Width = 320
+  Height = 400
+  MarginLeft = 0
+  MarginTop = 0
+  MarginRight = 0
+  MarginBottom = 0
+  Enabled = True
+  Text = 'AndroidModule1'
+  ActivityMode = actMain
+  BackgroundColor = colbrDefault
+  ActionBarTitle = abtDefault
+  OnJNIPrompt = AndroidModule1JNIPrompt
+  object jsBottomNavigationView1: jsBottomNavigationView
+    Left = 0
+    Top = 360
+    Width = 320
+    Height = 40
+    MarginLeft = 0
+    MarginTop = 0
+    MarginRight = 0
+    MarginBottom = 0
+    Enabled = True
+    Visible = True
+    Id = 6
+    PosRelativeToAnchor = []
+    PosRelativeToParent = [rpBottom]
+    LayoutParamWidth = lpMatchParent
+    LayoutParamHeight = lpWrapContent
+    BackgroundColor = colbrLightSteelBlue
+    GravityInParent = lgNone
+    FontColor = colbrDefault
+    OnClickItem = jsBottomNavigationView1ClickItem
+  end
+  object jsTabLayout1: jsTabLayout
+    Left = 0
+    Top = 19
+    Width = 320
+    Height = 40
+    MarginLeft = 0
+    MarginTop = 0
+    MarginRight = 0
+    MarginBottom = 0
+    Enabled = True
+    Visible = True
+    Id = 1
+    PosRelativeToAnchor = []
+    PosRelativeToParent = []
+    LayoutParamWidth = lpMatchParent
+    LayoutParamHeight = lpWrapContent
+    BackgroundColor = colbrLightSteelBlue
+    FitsSystemWindows = False
+    OnTabSelected = jsTabLayout1TabSelected
+  end
+  object jPanel1: jPanel
+    Left = 0
+    Top = 59
+    Width = 320
+    Height = 341
+    MarginLeft = 0
+    MarginTop = 0
+    MarginRight = 0
+    MarginBottom = 0
+    Enabled = True
+    Visible = True
+    Anchor = jsTabLayout1
+    Id = 5
+    PosRelativeToAnchor = [raBelow]
+    PosRelativeToParent = []
+    LayoutParamWidth = lpMatchParent
+    LayoutParamHeight = lpMatchParent
+    BackgroundColor = colbrDefault
+    MinPinchZoomFactor = 0.25
+    MaxPinchZoomFactor = 4
+    object jListView1: jListView
+      Left = 0
+      Top = 12
+      Width = 320
+      Height = 65
+      MarginLeft = 0
+      MarginTop = 0
+      MarginRight = 0
+      MarginBottom = 0
+      Enabled = True
+      Visible = True
+      Id = 6
+      PosRelativeToAnchor = []
+      PosRelativeToParent = []
+      LayoutParamWidth = lpMatchParent
+      LayoutParamHeight = lpWrapContent
+      Items.Strings = (
+        'List1 Item1'
+        'List1 Item2'
+        'List1 Item3'
+        'List1 Item5'
+        'List1 Item7'
+        'List1 Item8'
+        'List1 Item9'
+        'List1 Item10'
+        'List1 Item11'
+        'List1 Item12'
+        'List1 Item13'
+        'List1 Item14'
+        'List1 Item15'
+      )
+      BackgroundColor = colbrDefault
+      FontColor = colbrDefault
+      FontSize = 0
+      WidgetItem = wgNone
+      Delimiter = '|'
+      TextDecorated = txtNormal
+      ItemLayout = layText
+      TextSizeDecorated = sdNone
+      TextAlign = alLeft
+      HighLightSelectedItemColor = colbrDefault
+      FontSizeUnit = unitDefault
+      ItemPaddingTop = 40
+      ItemPaddingBottom = 40
+      WidgetTextColor = colbrDefault
+    end
+    object jListView2: jListView
+      Left = 0
+      Top = 85
+      Width = 320
+      Height = 64
+      MarginLeft = 0
+      MarginTop = 0
+      MarginRight = 0
+      MarginBottom = 0
+      Enabled = True
+      Visible = True
+      Id = 7
+      PosRelativeToAnchor = []
+      PosRelativeToParent = []
+      LayoutParamWidth = lpMatchParent
+      LayoutParamHeight = lpWrapContent
+      Items.Strings = (
+        'List2 ItemA'
+        'List2 ItemB'
+        'List2 ItemC'
+        'List2 ItemD'
+        'List2 ItemE'
+        'List2 ItemF'
+        'List2 ItemG'
+        'List2 ItemI'
+        'List2 ItemJ'
+        'List2 ItemK'
+        'List2 ItemL'
+        'List2 ItemM'
+        'List2 ItemN'
+        'List2 ItemO'
+      )
+      BackgroundColor = colbrDefault
+      FontColor = colbrDefault
+      FontSize = 0
+      WidgetItem = wgNone
+      Delimiter = '|'
+      TextDecorated = txtNormal
+      ItemLayout = layText
+      TextSizeDecorated = sdNone
+      TextAlign = alLeft
+      HighLightSelectedItemColor = colbrDefault
+      FontSizeUnit = unitDefault
+      ItemPaddingTop = 40
+      ItemPaddingBottom = 40
+      WidgetTextColor = colbrDefault
+    end
+    object jListView3: jListView
+      Left = 0
+      Top = 157
+      Width = 320
+      Height = 64
+      MarginLeft = 0
+      MarginTop = 0
+      MarginRight = 0
+      MarginBottom = 0
+      Enabled = True
+      Visible = True
+      Id = 8
+      PosRelativeToAnchor = []
+      PosRelativeToParent = []
+      LayoutParamWidth = lpMatchParent
+      LayoutParamHeight = lpWrapContent
+      Items.Strings = (
+        'List3 Item100'
+        'List3 Item200'
+        'List3 Item300'
+        'List3 Item500'
+        'List3 Item700'
+        'List3 Item800'
+        'List3 Item900'
+        'List3 Item1000'
+        'List3 Item1001'
+        'List3 Item1002'
+        'List3 Item1003'
+        'List3 Item1004'
+        'List3 Item1005'
+        'List3 Item1006'
+        'List3 Item1007'
+      )
+      BackgroundColor = colbrDefault
+      FontColor = colbrDefault
+      FontSize = 0
+      WidgetItem = wgNone
+      Delimiter = '|'
+      TextDecorated = txtNormal
+      ItemLayout = layText
+      TextSizeDecorated = sdNone
+      TextAlign = alLeft
+      HighLightSelectedItemColor = colbrDefault
+      FontSizeUnit = unitDefault
+      ItemPaddingTop = 40
+      ItemPaddingBottom = 40
+      WidgetTextColor = colbrDefault
+      OnAfterDispatchDraw = jListView3AfterDispatchDraw
+    end
+  end
+end

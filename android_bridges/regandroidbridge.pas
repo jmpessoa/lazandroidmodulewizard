@@ -35,7 +35,10 @@ uses
   viewflipper,
   videoview,
   toolbar,
-  expandablelistview;
+  expandablelistview,
+  linearlayout,
+  framelayout,
+  captionpanel;
 
 Procedure Register;
   
@@ -61,6 +64,7 @@ begin
   {$I jautotextview_icon.lrs}
   {$I jgridview_icon.lrs}
   {$I jListView_icon.lrs}
+  {$I jdblistview_icon.lrs}
   {$I jScrollView_icon.lrs}
   {$I jHorizontalScrollView_icon.lrs}
   {$I jactionbartab_icon.lrs}
@@ -86,6 +90,9 @@ begin
   {$I jvideoview_icon.lrs}
   {$I jtoolbar_icon.lrs}
   {$I jexpandablelistview_icon.lrs}
+  {$I jlinearlayout_icon.lrs}
+  {$I jframelayout_icon.lrs}
+  {$I jcaptionpanel_icon.lrs}
 
   RegisterComponents('Android Bridges',
     [
@@ -105,6 +112,7 @@ begin
       jAutoTextView,
       jGridView,
       jListView,
+      jDBListView,
       jScrollView,
       jHorizontalScrollView,
       jActionBarTab,
@@ -129,7 +137,10 @@ begin
       jViewFlipper,
       jVideoView,
       jToolbar,
-      jExpandableListView
+      jExpandableListView,
+      jLinearLayout,
+      jFrameLayout,
+      jCaptionPanel
     ]
   );
   RegisterClasses([jApp, jForm, jControl, jVisualControl, jGLViewEvent]);

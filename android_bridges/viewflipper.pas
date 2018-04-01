@@ -21,6 +21,7 @@ jViewFlipper = class(jVisualControl)
     procedure SetColor(Value: TARGBColorBridge); //background
     procedure UpdateLParamHeight;
     procedure UpdateLParamWidth;
+    procedure TryNewParent(refApp: jApp);
 
  public
     constructor Create(AOwner: TComponent); override;
@@ -36,8 +37,8 @@ jViewFlipper = class(jVisualControl)
     function jCreate(): jObject;
     procedure jFree();
     procedure SetViewParent(_viewgroup: jObject); override;
-    function GetParent(): jObject;
-    procedure RemoveFromViewParent();
+    function GetViewParent(): jObject; override;
+    procedure RemoveFromViewParent();  override;
     function GetView(): jObject;  override;
     procedure SetLParamWidth(_w: integer);
     procedure SetLParamHeight(_h: integer);
@@ -93,7 +94,10 @@ procedure jViewFlipper_Previous(env: PJNIEnv; _jviewflipper: JObject);
 implementation
 
 uses
-   customdialog, toolbar;
+   customdialog, toolbar, scoordinatorlayout, linearlayout,
+   sdrawerlayout, scollapsingtoolbarlayout, scardview, sappbarlayout,
+   stoolbar, stablayout, snestedscrollview, sviewpager, framelayout;
+
 
 {---------  jViewFlipper  --------------}
 
@@ -126,6 +130,95 @@ begin
   inherited Destroy;
 end;
 
+procedure jViewFlipper.TryNewParent(refApp: jApp);
+begin
+  if FParent is jPanel then
+  begin
+    jPanel(FParent).Init(refApp);
+    FjPRLayout:= jPanel(FParent).View;
+  end else
+  if FParent is jScrollView then
+  begin
+    jScrollView(FParent).Init(refApp);
+    FjPRLayout:= jScrollView_getView(FjEnv, jScrollView(FParent).jSelf);
+  end else
+  if FParent is jHorizontalScrollView then
+  begin
+    jHorizontalScrollView(FParent).Init(refApp);
+    FjPRLayout:= jHorizontalScrollView_getView(FjEnv, jHorizontalScrollView(FParent).jSelf);
+  end  else
+  if FParent is jCustomDialog then
+  begin
+    jCustomDialog(FParent).Init(refApp);
+    FjPRLayout:= jCustomDialog(FParent).View;
+  end else
+  if FParent is jViewFlipper then
+  begin
+    jViewFlipper(FParent).Init(refApp);
+    FjPRLayout:= jViewFlipper(FParent).View;
+  end else
+  if FParent is jToolbar then
+  begin
+    jToolbar(FParent).Init(refApp);
+    FjPRLayout:= jToolbar(FParent).View;
+  end  else
+  if FParent is jsToolbar then
+  begin
+    jsToolbar(FParent).Init(refApp);
+    FjPRLayout:= jsToolbar(FParent).View;
+  end  else
+  if FParent is jsCoordinatorLayout then
+  begin
+    jsCoordinatorLayout(FParent).Init(refApp);
+    FjPRLayout:= jsCoordinatorLayout(FParent).View;
+  end else
+  if FParent is jFrameLayout then
+  begin
+    jFrameLayout(FParent).Init(refApp);
+    FjPRLayout:= jFrameLayout(FParent).View;
+  end else
+  if FParent is jLinearLayout then
+  begin
+    jLinearLayout(FParent).Init(refApp);
+    FjPRLayout:= jLinearLayout(FParent).View;
+  end else
+  if FParent is jsDrawerLayout then
+  begin
+    jsDrawerLayout(FParent).Init(refApp);
+    FjPRLayout:= jsDrawerLayout(FParent).View;
+  end  else
+  if FParent is jsCardView then
+  begin
+      jsCardView(FParent).Init(refApp);
+      FjPRLayout:= jsCardView(FParent).View;
+  end else
+  if FParent is jsAppBarLayout then
+  begin
+      jsAppBarLayout(FParent).Init(refApp);
+      FjPRLayout:= jsAppBarLayout(FParent).View;
+  end else
+  if FParent is jsTabLayout then
+  begin
+      jsTabLayout(FParent).Init(refApp);
+      FjPRLayout:= jsTabLayout(FParent).View;
+  end else
+  if FParent is jsCollapsingToolbarLayout then
+  begin
+      jsCollapsingToolbarLayout(FParent).Init(refApp);
+      FjPRLayout:= jsCollapsingToolbarLayout(FParent).View;
+  end else
+  if FParent is jsNestedScrollView then
+  begin
+      jsNestedScrollView(FParent).Init(refApp);
+      FjPRLayout:= jsNestedScrollView(FParent).View;
+  end else
+  if FParent is jsViewPager then
+  begin
+      jsViewPager(FParent).Init(refApp);
+      FjPRLayout:= jsViewPager(FParent).View;
+  end;
+end;
+
 procedure jViewFlipper.Init(refApp: jApp);
 var
   rToP: TPositionRelativeToParent;
@@ -136,34 +229,14 @@ begin
   //your code here: set/initialize create params....
   FjObject:= jCreate(); //jSelf !
   FInitialized:= True;
+
   if FParent <> nil then
   begin
-    if FParent is jPanel then
-    begin
-      jPanel(FParent).Init(refApp);
-      FjPRLayout:= jPanel(FParent).View;
-    end;
-    if FParent is jScrollView then
-    begin
-      jScrollView(FParent).Init(refApp);
-      FjPRLayout:= jScrollView_getView(FjEnv, jScrollView(FParent).jSelf);
-    end;
-    if FParent is jHorizontalScrollView then
-    begin
-      jHorizontalScrollView(FParent).Init(refApp);
-      FjPRLayout:= jHorizontalScrollView_getView(FjEnv, jHorizontalScrollView(FParent).jSelf);
-    end;
-    if FParent is jCustomDialog then
-    begin
-      jCustomDialog(FParent).Init(refApp);
-      FjPRLayout:= jCustomDialog(FParent).View;
-    end;
-    if FParent is jToolbar then
-    begin
-      jToolbar(FParent).Init(refApp);
-      FjPRLayout:= jToolbar(FParent).View;
-    end;
+    TryNewParent(refApp);
   end;
+
+  FjPRLayoutHome:= FjPRLayout;
+
 
   jViewFlipper_SetViewParent(FjEnv, FjObject, FjPRLayout);
   jViewFlipper_SetId(FjEnv, FjObject, Self.Id);
@@ -317,7 +390,7 @@ begin
      jViewFlipper_SetViewParent(FjEnv, FjObject, _viewgroup);
 end;
 
-function jViewFlipper.GetParent(): jObject;
+function jViewFlipper.GetViewParent(): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then

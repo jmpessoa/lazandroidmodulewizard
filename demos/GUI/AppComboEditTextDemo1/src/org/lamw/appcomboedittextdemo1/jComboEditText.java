@@ -123,11 +123,12 @@ class CustomSpinnerArrayAdapterAuto<T> extends ArrayAdapter<ItemRowAuto> {
   		TextView txtview = new TextView(ctx);
   		
   		txtview.setText(items.get(position).label);
-  		//txtview.setPadding(20, 40, 20, 40);
+  		//txtview.setPadding(20, 40, 20, 40);  		
   		txtview.setPadding(20, padTop, 20, padBottom);  //padTop, padBottom
-  		txtview.setTextColor(mSelectedTextColor);        
+  		
+  		txtview.setTextColor(mTextColor);  		
   		txtview.setBackgroundColor(mTexBackgroundColor);
-          
+  		          
           if (mTextFontSize != 0) {            	
               if (mTextSizeTypedValue != TypedValue.COMPLEX_UNIT_SP)
               	txtview.setTextSize(mTextSizeTypedValue, mTextFontSize);
@@ -186,11 +187,11 @@ class CustomSpinnerArrayAdapterAuto<T> extends ArrayAdapter<ItemRowAuto> {
   }
 
   public void SetBackgroundColor(int txtColor){
-      mTexBackgroundColor = txtColor;
+      mTexBackgroundColor = txtColor;         
   }
 
   public void SetSelectedTextColor(int txtColor){
-      mSelectedTextColor = txtColor;
+      mSelectedTextColor = txtColor;     
   }
 
   public void SetTextFontSize(int txtFontSize) {
@@ -621,18 +622,22 @@ public class jComboEditText extends AutoCompleteTextView /*dummy*/ { //please, f
     
     public void SetDropListTextColor(int _color) {
     	mAdapter.SetTextColor(_color);
+    	//mAdapter.notifyDataSetChanged();
     }
 
     public void SetDropListBackgroundColor(int _color) {
     	mAdapter.SetBackgroundColor(_color);
+    	//mAdapter.notifyDataSetChanged();
     }
     
 	public void SetItemPaddingTop(int _paddingTop) {	    
 		mAdapter.SetItemPaddingTop(_paddingTop);
+		//mAdapter.notifyDataSetChanged();
 	}
 	
 	public void SetItemPaddingBottom(int _paddingBottom) {
 		mAdapter.SetItemPaddingBottom(_paddingBottom);
+		//mAdapter.notifyDataSetChanged();
 	}
 
 	public  void ShowSoftInput() {  
@@ -675,7 +680,6 @@ public class jComboEditText extends AutoCompleteTextView /*dummy*/ { //please, f
 	public void SetHint(String _hint) {
 		this.setHint(_hint);
 	}
-	
 
 } //end class
 

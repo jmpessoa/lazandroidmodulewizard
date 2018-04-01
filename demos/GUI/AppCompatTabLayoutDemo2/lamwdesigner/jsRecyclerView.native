@@ -1,0 +1,1 @@
+public native void pOnRecyclerViewItemClick(long pasobj, int itemIndex, int arrayContentCount);

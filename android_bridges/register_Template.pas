@@ -19,7 +19,7 @@ implementation
   
 Procedure Register;
 begin                 
-  RegisterComponents('Template',
+  RegisterComponents('template',
     [
     ]
   );

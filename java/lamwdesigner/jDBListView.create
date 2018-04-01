@@ -1,0 +1,3 @@
+public java.lang.Object jDBListView_jCreate(long _Self) {
+   return (java.lang.Object)(new jDBListView(this,_Self));
+}

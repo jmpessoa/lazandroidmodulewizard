@@ -7,6 +7,8 @@ uses
   Classes, SysUtils, And_jni, And_jni_Bridge, AndroidWidget, Laz_And_Controls,
   Laz_And_Controls_Events, unit1;
 
+{%region /fold 'LAMW generated code'}
+
 { Class:     com_example_appmediaplayerdemo1_Controls
   Method:    pAppOnCreate
   Signature: (Landroid/content/Context;Landroid/widget/RelativeLayout;)V }
@@ -568,6 +570,8 @@ exports
   pOnSurfaceViewTouch name 'Java_com_example_appmediaplayerdemo1_Controls_pOnSurfaceViewTouch',
   pOnSurfaceViewDrawingInBackground name 'Java_com_example_appmediaplayerdemo1_Controls_pOnSurfaceViewDrawingInBackground',
   pOnSurfaceViewDrawingPostExecute name 'Java_com_example_appmediaplayerdemo1_Controls_pOnSurfaceViewDrawingPostExecute';
+
+{%endregion}
 
 begin
   gApp:= jApp.Create(nil);{AndroidWidget.pas}

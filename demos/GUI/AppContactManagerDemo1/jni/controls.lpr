@@ -7,6 +7,8 @@ uses
   Classes, SysUtils, And_jni, And_jni_Bridge, AndroidWidget, Laz_And_Controls,
   Laz_And_Controls_Events, unit1;
 
+{%region /fold 'LAMW generated code'}
+
 { Class:     com_example_appcontactmanagerdemo1_Controls
   Method:    pAppOnCreate
   Signature: (Landroid/content/Context;Landroid/widget/RelativeLayout;)V }
@@ -520,6 +522,8 @@ exports
   pOnAsyncEventPostExecute name 'Java_com_example_appcontactmanagerdemo1_Controls_pOnAsyncEventPostExecute',
   pOnContactManagerContactsExecuted name 'Java_com_example_appcontactmanagerdemo1_Controls_pOnContactManagerContactsExecuted',
   pOnContactManagerContactsProgress name 'Java_com_example_appcontactmanagerdemo1_Controls_pOnContactManagerContactsProgress';
+
+{%endregion}
 
 begin
   gApp:= jApp.Create(nil);{AndroidWidget.pas}

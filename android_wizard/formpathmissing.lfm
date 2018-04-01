@@ -3,7 +3,6 @@ object FormPathMissing: TFormPathMissing
   Height = 102
   Top = 190
   Width = 443
-  AutoSize = True
   BorderIcons = [biSystemMenu]
   BorderStyle = bsToolWindow
   Caption = 'Android Wizard: Path Missing!'

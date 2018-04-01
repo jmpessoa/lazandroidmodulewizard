@@ -589,8 +589,8 @@ begin
   if parent <> '' then
   begin
     FParent := FOwner.FindTheme(parent);
-    if FParent = nil then
-      raise Exception.CreateFmt('There is no parent theme "%s" for "%s"!', [parent, FName]);
+    if FParent = nil then // not all themes are listed in res\values\piblic.xml
+      FParent := FOwner.AddTheme(parent, FMinAPI);
   end;
   FLoaded := True;
   Result := True;
@@ -904,4 +904,3 @@ finalization
   Themes.Free;
 
 end.
-

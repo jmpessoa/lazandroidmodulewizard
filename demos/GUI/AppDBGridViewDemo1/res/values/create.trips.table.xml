@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resources>
+  <string name="create_trips_table">CREATE TABLE IF NOT EXISTS `Trips` (
+	`_id` INTEGER PRIMARY KEY AUTOINCREMENT,
+    `VisitNo`	REAL NOT NULL UNIQUE,
+	`Destination`	TEXT,
+	`StartDate`	REAL,
+	`EndDate`	REAL,
+	`Members`	TEXT);</string>
+</resources>

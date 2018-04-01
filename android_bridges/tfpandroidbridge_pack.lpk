@@ -14,7 +14,7 @@
         <CustomOptions Value="$(IDEBuildOptions)"/>
       </Other>
     </CompilerOptions>
-    <Files Count="17">
+    <Files Count="16">
       <Item1>
         <Filename Value="regandroidbridge.pas"/>
         <HasRegisterProc Value="True"/>
@@ -29,62 +29,59 @@
         <UnitName Value="And_jni_Bridge"/>
       </Item3>
       <Item4>
-        <Filename Value="And_lib_Unzip.pas"/>
-        <UnitName Value="And_lib_Unzip"/>
-      </Item4>
-      <Item5>
-        <Filename Value="And_lib_Image.pas"/>
-        <UnitName Value="And_lib_Image"/>
-      </Item5>
-      <Item6>
         <Filename Value="Laz_And_Controls.pas"/>
         <UnitName Value="Laz_And_Controls"/>
-      </Item6>
-      <Item7>
+      </Item4>
+      <Item5>
         <Filename Value="Laz_And_GLESv2_Canvas_h.pas"/>
         <UnitName Value="Laz_And_GLESv2_Canvas_h"/>
-      </Item7>
-      <Item8>
+      </Item5>
+      <Item6>
         <Filename Value="Laz_And_GLESv1_Canvas_h.pas"/>
         <UnitName Value="Laz_And_GLESv1_Canvas_h"/>
-      </Item8>
-      <Item9>
+      </Item6>
+      <Item7>
         <Filename Value="Laz_And_GLESv1_Canvas.pas"/>
         <UnitName Value="Laz_And_GLESv1_Canvas"/>
-      </Item9>
-      <Item10>
+      </Item7>
+      <Item8>
         <Filename Value="Laz_And_GLESv2_Canvas.pas"/>
         <UnitName Value="Laz_And_GLESv2_Canvas"/>
-      </Item10>
-      <Item11>
+      </Item8>
+      <Item9>
         <Filename Value="And_log.pas"/>
         <UnitName Value="And_log"/>
-      </Item11>
-      <Item12>
-        <Filename Value="And_bitmap_h.pas"/>
-        <UnitName Value="And_bitmap_h"/>
-      </Item12>
-      <Item13>
+      </Item9>
+      <Item10>
         <Filename Value="And_log_h.pas"/>
         <UnitName Value="And_log_h"/>
-      </Item13>
-      <Item14>
+      </Item10>
+      <Item11>
         <Filename Value="register_extras.pas"/>
         <HasRegisterProc Value="True"/>
         <UnitName Value="register_extras"/>
-      </Item14>
-      <Item15>
+      </Item11>
+      <Item12>
         <Filename Value="laz_and_controls_events.pas"/>
         <UnitName Value="Laz_And_Controls_Events"/>
-      </Item15>
-      <Item16>
+      </Item12>
+      <Item13>
         <Filename Value="androidwidget.pas"/>
         <UnitName Value="AndroidWidget"/>
-      </Item16>
-      <Item17>
+      </Item13>
+      <Item14>
         <Filename Value="laz_and_jni_controls.pas"/>
         <UnitName Value="Laz_And_jni_Controls"/>
-      </Item17>
+      </Item14>
+      <Item15>
+        <Filename Value="And_lib_Unzip.pas"/>
+        <UnitName Value="And_lib_Unzip"/>
+      </Item15>
+      <Item16>
+        <Filename Value="register_support.pas"/>
+        <HasRegisterProc Value="True"/>
+        <UnitName Value="register_support"/>
+      </Item16>
     </Files>
     <RequiredPkgs Count="2">
       <Item1>

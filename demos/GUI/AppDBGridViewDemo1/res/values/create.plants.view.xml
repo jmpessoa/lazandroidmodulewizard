@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resources>
+  <string name="create_plants_view">CREATE VIEW `PlantsView` AS 
+  select P._id, P.Taxon, P.HabitatNo, P.CollNo_Str, S.Nearest, S.`When`, T.Destination
+  from Plants P inner join Sites S on S.HabitatNo = P.HabitatNo inner join Trips T on T.VisitNo = S.VisitNo 
+  order by 1,2;</string>
+</resources>

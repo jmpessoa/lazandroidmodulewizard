@@ -85,7 +85,9 @@ begin
   if FindFirst(PathMask, faDirectory, dir) = 0 then
     repeat
       if dir.Name[1] <> '.' then
+      begin
         Result.Add(dir.Name);
+      end;
     until (FindNext(dir) <> 0);
   FindClose(dir);
 end;
@@ -422,9 +424,16 @@ end;
 function TApkBuilder.FixBuildSystemConfig(ForceFixPaths: Boolean): TModalResult;
 begin
   if FProj.CustomData['BuildSystem'] = 'Gradle' then
-    Result := FixGradleConfig(ForceFixPaths)
+  begin
+    if Pos('AppCompat', FProj.CustomData['Theme']) > 0 then
+       Result:= mrNo
+    else
+       Result := FixGradleConfig(ForceFixPaths);
+  end
   else
+  begin
     Result := FixAntConfig(ForceFixPaths);
+  end;
 end;
 
 function TApkBuilder.FixAntConfig(ForceFixPaths: Boolean): TModalResult;
@@ -460,6 +469,7 @@ var
   i: Integer;
   str, sval: string;
   sl: TStringList;
+  outIndex: integer;
 begin
   Result := mrOk;
   // build.xml
@@ -494,10 +504,20 @@ begin
                 str := sval
               else
                 str := 'android-' + str;
+
               sl := CollectDirs(AppendPathDelim(FSdkPath) + 'platforms' + PathDelim + 'android-*');
+              sl.Sorted := True;
+
+                //try remove "android-P"
+              if sl.Find('android-P', outIndex) then
+                sl.Delete(outIndex);
+
+              //try remove "android-W"
+              if sl.Find('android-4.4W.2', outIndex) then
+                sl.Delete(outIndex);
+
               try
                 if sl.Count = 0 then Continue;
-                sl.Sorted := True;
                 if (sl.IndexOf(sval) < 0) and (sl.IndexOf(str) >= 0) then
                 begin
                   if MessageDlg('build.xml',

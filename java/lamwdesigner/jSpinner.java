@@ -230,7 +230,7 @@ public class jSpinner extends Spinner /*dummy*/ { //please, fix what GUI object 
 
     };
 
-    public void SetjParent(ViewGroup _viewgroup) {
+    public void SetViewParent(ViewGroup _viewgroup) {
     	LAMWCommon.setParent(_viewgroup);
     }
     
@@ -250,7 +250,7 @@ public class jSpinner extends Spinner /*dummy*/ { //please, fix what GUI object 
     	LAMWCommon.setLParamHeight(_h);
     }
 
-    public void setLGravity(int _g) {
+    public void SetLGravity(int _g) {
     	LAMWCommon.setLGravity(_g);
     }
 
@@ -503,6 +503,18 @@ public class jSpinner extends Spinner /*dummy*/ { //please, fix what GUI object 
 	public void SetSelectedPaddingBottom(int _paddingBottom) {
 	    mSpAdapter.SetSelectedPadBottom(_paddingBottom);
 	}
+
+  /* Pascal:
+     TFrameGravity = (fgNone,
+                   fgTopLeft, fgTopCenter, fgTopRight,
+                   fgBottomLeft, fgBottomCenter, fgBottomRight,
+                   fgCenter,
+                   fgCenterVerticalLeft, fgCenterVerticalRight
+                   );     
+   */
+   public void SetFrameGravity(int _value) {	   
+      LAMWCommon.setLGravity(_value);
+   }
     
 }  //end class
 

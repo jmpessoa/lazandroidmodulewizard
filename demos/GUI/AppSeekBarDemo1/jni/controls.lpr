@@ -7,6 +7,8 @@ uses
   Classes, SysUtils, And_jni, And_jni_Bridge, AndroidWidget, Laz_And_Controls,
   Laz_And_Controls_Events, unit1, unit2, unit3, unit4, unit5;
 
+{%region /fold 'LAMW generated code'}
+
 { Class:     com_example_appseekbardemo1_Controls
   Method:    pAppOnCreate
   Signature: (Landroid/content/Context;Landroid/widget/RelativeLayout;)V }
@@ -484,6 +486,8 @@ exports
   pOnSeekBarProgressChanged name 'Java_com_example_appseekbardemo1_Controls_pOnSeekBarProgressChanged',
   pOnSeekBarStartTrackingTouch name 'Java_com_example_appseekbardemo1_Controls_pOnSeekBarStartTrackingTouch',
   pOnSeekBarStopTrackingTouch name 'Java_com_example_appseekbardemo1_Controls_pOnSeekBarStopTrackingTouch';
+
+{%endregion}
 
 begin
   gApp:= jApp.Create(nil);{AndroidWidget.pas}

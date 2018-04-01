@@ -6,7 +6,8 @@ interface
 
 uses
   inifiles, Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs,
-  StdCtrls, Buttons, ExtCtrls, ComCtrls, LazIDEIntf, PackageIntf;
+  StdCtrls, Buttons, ExtCtrls, ComCtrls, LazIDEIntf, PackageIntf {, process, math};
+
 
 type
 
@@ -44,19 +45,26 @@ type
     SpBPathToAndroidSDK: TSpeedButton;
     SpBPathToAntBinary: TSpeedButton;
     SpBPathToGradle: TSpeedButton;
+    SpeedButtonHelp: TSpeedButton;
     SpeedButtonInfo: TSpeedButton;
     StatusBar1: TStatusBar;
     procedure BitBtnOKClick(Sender: TObject);
     procedure BitBtnCancelClick(Sender: TObject);
+    procedure ComboBoxPrebuildChange(Sender: TObject);
     procedure FormActivate(Sender: TObject);
     procedure FormClose(Sender: TObject; var CloseAction: TCloseAction);
+    procedure FormCreate(Sender: TObject);
     procedure SpBPathToAndroidNDKClick(Sender: TObject);
     procedure SpBPathToGradleClick(Sender: TObject);
     procedure SpBPathToJavaJDKClick(Sender: TObject);
     procedure SpBPathToAndroidSDKClick(Sender: TObject);
     procedure SpBPathToAntBinaryClick(Sender: TObject);
     procedure SpBPathToJavaTemplatesClick(Sender: TObject);
+    procedure SpeedButtonHelpClick(Sender: TObject);
     procedure SpeedButtonInfoClick(Sender: TObject);
+    function GetGradleVersion(out tagVersion: integer): string;
+    function GetMaxSdkPlatform(): integer;
+    function HasBuildTools(platform: integer): boolean;
 
   private
     { private declarations }
@@ -68,6 +76,7 @@ type
     FPrebuildOSYS: string;
     FPathToTemplatePresumed: string;
     FPathToGradle: string;
+    //FGradleVersion: string;
   public
     { public declarations }
     FOk: boolean;
@@ -75,6 +84,7 @@ type
     procedure LoadSettings(const fileName: string);
     procedure SaveSettings(const fileName: string);
     function GetPrebuiltDirectory: string;
+
   end;
 
 var
@@ -125,9 +135,8 @@ begin
        Result:= 'windows';
        Exit;
      end;
-     {$ifdef win64}
-        if DirectoryExists(pathToNdkToolchains49 + 'windows-x86_64') then Result:= 'windows-x86_64';
-     {$endif}
+     if DirectoryExists(pathToNdkToolchains49 + 'windows-x86_64') then Result:= 'windows-x86_64';
+
    {$else}
      {$ifdef darwin}
         Result:=  'darwin-x86_64';
@@ -156,8 +165,60 @@ begin
      {$endif}
    {$endif}
 
+   if Result = '' then
+   begin
+       {$ifdef LINUX}
+           Result:= 'linux-x86_64';
+       {$endif}
+       {$ifdef WINDOWS}
+           Result:= 'windows';
+       {$endif}
+   end;
+
 end;
 
+//C:\adt32\gradle-4.2.1
+//C:\adt32\gradle-3.3
+function TFormSettingsPaths.GetGradleVersion(out tagVersion: integer): string;
+var
+   p: integer;
+   strAux: string;
+   numberAsString: string;
+   userString: string;
+begin
+  Result:='';
+  strAux:= Trim(EditpathToGradle.Text);  // C:\adt32\gradle-3.3
+  if strAux <> '' then
+  begin
+     p:= Pos('-', strAux);
+     if p > 0 then
+     begin
+        Result:= Copy(strAux, p+1, MaxInt);  // 3.3
+        numberAsString:= StringReplace(Result,'.', '', [rfReplaceAll]); // 33
+        if Length(numberAsString) < 3 then
+        begin
+           numberAsString:= numberAsString+ '0'  //330
+        end;
+        tagVersion:= StrToInt(Trim(numberAsString));
+     end;
+  end;
+
+  if Result = '' then
+  begin
+    userString:= '3.3';
+    if InputQuery('Gradle', 'Please, Enter Gradle Version', userString) then
+    begin
+      Result:= Trim(UserString);  // 3.3
+      numberAsString:= StringReplace(Result,'.', '', [rfReplaceAll]); // 33
+      if Length(numberAsString) < 3 then
+      begin
+         numberAsString:= numberAsString+ '0'  //330
+      end;
+      tagVersion:= StrToInt(Trim(numberAsString));
+    end;
+  end;
+
+end;
 
 procedure TFormSettingsPaths.FormClose(Sender: TObject; var CloseAction: TCloseAction);
 var
@@ -181,15 +242,53 @@ begin
        end;
 end;
 
+procedure TFormSettingsPaths.FormCreate(Sender: TObject);
+begin
+
+end;
+
+
+function TFormSettingsPaths.HasBuildTools(platform: integer): boolean;
+var
+  lisDir: TStringList;
+  numberAsString, builderTool, auxStr: string;
+  i, p, builderNumber: integer;
+begin
+  Result:= False;
+  lisDir:= TStringList.Create;   //C:\adt32\sdk\build-tools\19.1.0
+  FindAllDirectories(lisDir, FPathToAndroidSDK+PathDelim+'build-tools', False);
+  if lisDir.Count > 0 then
+  begin
+    for i:=0 to lisDir.Count-1 do
+    begin
+       auxStr:= lisDir.Strings[i];
+       if  auxStr <> '' then
+       begin
+         if ( Pos('W', auxStr) = 0 ) and ( Pos('rc2', auxStr) = 0 ) and (Pos('android', auxStr) = 0 ) then   //escape some alien...
+         begin
+           p:= LastDelimiter(PathDelim, auxStr) + 1;
+           builderTool:= Copy(lisDir.Strings[i], p, Length(auxStr));
+           numberAsString:= Copy(builderTool, 1 , 2);  //19
+           builderNumber:=  StrToInt(numberAsString);
+           if  platform = builderNumber then Result:= True;
+         end;
+       end;
+    end;
+  end;
+  lisDir.free;
+end;
+
 procedure TFormSettingsPaths.FormActivate(Sender: TObject);
 var
   p: integer;
   Pkg: TIDEPackage;
 begin
+
   FOk:= False;
   FPathTemplatesEdited:= False;
   LoadSettings(IncludeTrailingPathDelimiter(LazarusIDE.GetPrimaryConfigPath) + 'JNIAndroidProject.ini');
   Pkg:=PackageEditingInterface.FindPackageWithName('amw_ide_tools');
+
   if Pkg<>nil then
   begin // C:\laz4android\components\androidmodulewizard\ide_tools\  + amw_ide_tools.lpk
     FPathToTemplatePresumed:= ExtractFilePath(Pkg.Filename);
@@ -206,26 +305,79 @@ begin
   {$ifdef windows}
   ComboBoxPrebuild.Items.Add('windows');
   ComboBoxPrebuild.Items.Add('windows-x86_64');
-  ComboBoxPrebuild.ItemIndex:= 0;
+  if Self.FPrebuildOSYS <> '' then
+      ComboBoxPrebuild.Text:= FPrebuildOSYS
+  else
+     ComboBoxPrebuild.Text:= 'windows';
   {$endif}
 
   {$ifdef linux}
   ComboBoxPrebuild.Items.Add('linux-x86_32');
   ComboBoxPrebuild.Items.Add('linux-x86_64');
-  ComboBoxPrebuild.ItemIndex:= 0;
+  if Self.FPrebuildOSYS <> '' then;
+      ComboBoxPrebuild.Text:= FPrebuildOSYS;
+  else
+     ComboBoxPrebuild.Text:= 'linux-x86_64';
   {$endif}
 
   {$ifdef darwin}
   ComboBoxPrebuild.Items.Add('darwin-x86_64');
-  ComboBoxPrebuild.ItemIndex:= 0;
+  ComboBoxPrebuild.Text:= 'darwin-x86_64';
   {$endif}
 
-  EditPathToJavaJDK.SetFocus;
+  if  EditPathToGradle.Text =  '' then
+  begin
+    ShowMessage('Warning/Recomendation:'+
+             sLineBreak+
+             sLineBreak+'[LAMW 0.8] "AppCompat" [material] theme need:'+
+             sLineBreak+' 1. Java JDK 1.8'+
+             sLineBreak+' 2. Gradle 4.1 [https://gradle.org/next-steps/?version=4.1&format=bin]' +
+             sLineBreak+' 3. Android SDK "plataforms" 25 + "build-tools" 25.0.3 [or]'+
+             sLineBreak+' 3. Android SDK "plataforms" 26 + "build-tools" 26.0.3 [or]'+
+             sLineBreak+' 3. Android SDK "plataforms" 27 + "build-tools" 27.0.3'+
+             sLineBreak+' 4. Android SDK/Extra  "Support Repository"'+
+             sLineBreak+' 5. Android SDK/Extra  "Support Library"'+
+             sLineBreak+' '+
+             sLineBreak+' Hint: "Ctrl + C" to copy this content to Clipboard!');
+
+       EditPathToGradle.SetFocus;
+  end
+  else
+    EditPathToJavaJDK.SetFocus;
+
 end;
 
 procedure TFormSettingsPaths.BitBtnCancelClick(Sender: TObject);
 begin
   Close;
+end;
+
+procedure TFormSettingsPaths.ComboBoxPrebuildChange(Sender: TObject);
+var
+ pathToNdkToolchains49: string;
+ saveContent: string;
+begin
+
+  if EditPathToAndroidNDK.Text = '' then
+  begin
+    ShowMessage('Please, Enter "Path To Android NDK..."');
+    Exit;
+  end;
+
+  saveContent:= ComboBoxPrebuild.Text;
+
+  pathToNdkToolchains49:= EditPathToAndroidNDK.Text+DirectorySeparator+'toolchains'+DirectorySeparator+
+                                                'arm-linux-androideabi-4.9'+DirectorySeparator+
+                                                'prebuilt'+DirectorySeparator;
+
+  if not DirectoryExists(pathToNdkToolchains49+ ComboBoxPrebuild.Text) then
+  begin
+     ShowMessage('Sorry... Path To Ndk Toolchains "'+ ComboBoxPrebuild.Text + '" Not Found!');
+     ComboBoxPrebuild.Text:= saveContent;
+  end
+  else
+     Self.FPrebuildOSYS:= ComboBoxPrebuild.Text;
+
 end;
 
 procedure TFormSettingsPaths.BitBtnOKClick(Sender: TObject);
@@ -242,6 +394,43 @@ begin
     FPathToAndroidNDK:= SelDirDlgPathToAndroidNDK.FileName;
   end;
 end;
+
+function TFormSettingsPaths.GetMaxSdkPlatform(): integer;
+var
+  lisDir: TStringList;
+  auxStr: string;
+  i, intAux: integer;
+begin
+
+  Result:= 0;
+  lisDir:= TStringList.Create;
+
+  FindAllDirectories(lisDir, FPathToAndroidSDK+PathDelim+'platforms', False);
+
+  if lisDir.Count > 0 then
+  begin
+    for i:=0 to lisDir.Count-1 do
+    begin
+       if lisDir.Strings[i] <> '' then
+       begin
+         if Pos('P', lisDir.Strings[i]) <= 0  then  //skip android-P
+         begin
+           auxStr:= lisDir.Strings[i];
+           auxStr:= Copy(auxStr, LastDelimiter('-', auxStr) + 1, MaxInt);
+           intAux:= StrToInt(auxStr);
+           if Result < intAux then
+           begin
+             if HasBuildTools(intAux) then
+                Result:= intAux;
+           end;
+         end;
+       end;
+    end;
+  end;
+
+  lisDir.free;
+end;
+
 
 procedure TFormSettingsPaths.SpBPathToGradleClick(Sender: TObject);
 begin
@@ -273,7 +462,8 @@ begin
       if FPathToAndroidSDK <> '' then
       begin
          FPrebuildOSYS:= Self.GetPrebuiltDirectory();   //try guess
-         ComboBoxPrebuild.Text:= FPrebuildOSYS;
+         if FPrebuildOSYS <> '' then
+            ComboBoxPrebuild.Text:= FPrebuildOSYS;
       end;
     end;
   end;
@@ -295,6 +485,22 @@ begin
     EditPathToJavaTemplates.Text := SelDirDlgPathToJavaTemplates.FileName;
     FPathToJavaTemplates:= SelDirDlgPathToJavaTemplates.FileName;
   end;
+end;
+
+procedure TFormSettingsPaths.SpeedButtonHelpClick(Sender: TObject);
+begin
+  ShowMessage('Warning/Recomendation:'+
+           sLineBreak+
+           sLineBreak+'[LAMW 0.8] "AppCompat" [material] theme need:'+
+           sLineBreak+' 1. Java JDK 1.8'+
+           sLineBreak+' 2. Gradle 4.1 [https://gradle.org/next-steps/?version=4.1&format=bin]' +
+           sLineBreak+' 3. Android SDK "plataforms" 25 + "build-tools" 25.0.3 [or]'+
+           sLineBreak+' 3. Android SDK "plataforms" 26 + "build-tools" 26.0.3 [or]'+
+           sLineBreak+' 3. Android SDK "plataforms" 27 + "build-tools" 27.0.3'+
+           sLineBreak+' 4. Android SDK/Extra  "Support Repository"'+
+           sLineBreak+' 5. Android SDK/Extra  "Support Library"'+
+           sLineBreak+' '+
+           sLineBreak+' Hint: "Ctrl + C" to copy this content to Clipboard!');
 end;
 
 procedure TFormSettingsPaths.SpeedButtonInfoClick(Sender: TObject);
@@ -339,14 +545,12 @@ begin
       end
       else
       begin
-        if FPrebuildOSYS = '' then
-        begin
           if FPathToAndroidSDK <> '' then
           begin
              FPrebuildOSYS:= Self.GetPrebuiltDirectory();   //try guess
-             ComboBoxPrebuild.Text:= FPrebuildOSYS;
+             if FPrebuildOSYS <> '' then
+                ComboBoxPrebuild.Text:= FPrebuildOSYS;
           end;
-        end;
       end;
 
     finally
@@ -357,6 +561,7 @@ end;
 
 procedure TFormSettingsPaths.SaveSettings(const fileName: string);
 begin
+
   with TInifile.Create(fileName) do
   try
     if EditPathToAndroidNDK.Text <> '' then
@@ -380,18 +585,17 @@ begin
     if (EditPathToGradle.Text <> '') then
       WriteString('NewProject', 'PathToGradle', EditPathToGradle.Text);
 
-    if RGNDKVersion.ItemIndex > 4 then
-       WriteString('NewProject', 'NDK', '4')
-    else
-       WriteString('NewProject', 'NDK', IntToStr(RGNDKVersion.ItemIndex));
+    WriteString('NewProject', 'NDK', IntToStr(RGNDKVersion.ItemIndex));
 
     if ComboBoxPrebuild.Text = '' then
     begin
       if FPathToAndroidSDK <> '' then
       begin
-         ComboBoxPrebuild.Text:= Self.GetPrebuiltDirectory();   //try guess
+         if ComboBoxPrebuild.Text =  '' then
+             ComboBoxPrebuild.Text:= Self.GetPrebuiltDirectory();   //try guess
       end;
     end;
+
     WriteString('NewProject', 'PrebuildOSYS', ComboBoxPrebuild.Text);
 
   finally

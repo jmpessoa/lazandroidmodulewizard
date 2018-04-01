@@ -163,9 +163,9 @@ type
      Procedure SetColor(Value : TARGBColorBridge); //background
      procedure UpdateLParamHeight;
      procedure UpdateLParamWidth;
+     procedure TryNewParent(refApp: jApp);
    protected
 
-     procedure SetViewParent(Value: jObject); override;
      procedure SetParamHeight(Value: TLayoutParams); override;
       procedure SetParamWidth(Value: TLayoutParams); override;
    public
@@ -179,7 +179,7 @@ type
      function GetHeight: integer; override;
 
      procedure ResetAllRules;
-     procedure RemoveParent;
+     procedure RemoveFromViewParent;  override;
      procedure GenEvent_OnFlingGestureDetected(Obj: TObject; direction: integer);
      procedure GenEvent_OnPinchZoomGestureDetected(Obj: TObject; scaleFactor: single; state: integer);
 
@@ -193,6 +193,17 @@ type
      procedure SetRadiusRoundCorner(_radius: integer);
      procedure SetBackgroundAlpha(_alpha: integer); //You can basically set it from anything between 0(fully transparent) to 255 (completely opaque)
      procedure SetMarginLeftTopRightBottom(_left,_top,_right,_bottom: integer);
+     procedure SetViewParent(Value: jObject); override;
+     function GetViewParent(): jObject; override;
+     procedure ResetViewParent(); override;
+     //procedure AddView(_view: jObject);
+     procedure SetFitsSystemWindows(_value: boolean);
+     procedure RemoveView(_view: jObject);
+     procedure RemoveAllViews();
+     function GetChildCount(): integer;
+     procedure BringChildToFront(_view: jObject);
+     procedure BringToFront();
+     procedure SetVisibilityGone();
 
    published
      property BackgroundColor     : TARGBColorBridge read FColor write SetColor;
@@ -204,7 +215,6 @@ type
 
    end;
 
-   //NEW by jmpessoa
   jImageList = class(jControl)
   private
     FImages : TStrings;
@@ -627,11 +637,18 @@ type
     property OnPostExecute: TOnAsyncEventPostExecute read FOnPostExecute write FOnPostExecute;
   end;
 
-  //NEW by jmpessoa
   jSqliteCursor = class(jControl)
+   const
+     MAXOBSERVERS = 10;
+     POSITION_UNKNOWN = -1;
    private
-      //
+     FObservers: array of TAndroidWidget;
+     FObserverCount: integer;
+     FRowCount: integer;
+     FPosition: integer;
    protected
+     function GetCursor: jObject;
+     function GetEOF: Boolean;
    public
      constructor Create(AOwner: TComponent); override;
      destructor  Destroy; override;
@@ -648,19 +665,23 @@ type
      function GetColumName(columnIndex: integer): string;
      function GetColType(columnIndex: integer): TSqliteFieldType;
      function GetValueAsString(columnIndex: integer): string;   overload;
+     function GetValueAsString(position: integer; columnName: string): string; overload;
      function GetValueAsBitmap(columnIndex: integer): jObject;
      function GetValueAsInteger(columnIndex: integer): integer;
      function GetValueAsDouble(columnIndex: integer): double;
      function GetValueAsFloat(columnIndex: integer): real;
 
      procedure SetCursor(Value: jObject);
-     //position = -1 --> Last Row !
-     function GetValueAsString(position: integer; columnName: string): string; overload;
+     function GetPosition(): integer;   //position = -1 --> Last Row !
+
+     procedure RegisterObserver(AObserver: jVisualControl);
+     procedure UnRegisterObserver(AObserver: jVisualControl);
+     property Cursor: jObject read GetCursor;
+     property EOF: boolean read GetEOF;
 
    published
    end;
 
-  //NEW by jmpessoa
   jSqliteDataAccess = class(jControl)
   private
     FjSqliteCursor    : jSqliteCursor;
@@ -729,16 +750,89 @@ type
     property ReturnHeaderOnSelect: boolean read FReturnHeaderOnSelect write SetReturnHeaderOnSelect;
   end;
 
-  //http://startandroid.ru/en/lessons/complete-list/
-  //http://startandroid.ru/en/lessons/complete-list/224-lesson-18-changing-layoutparams-in-a-running-application.html
-  //http://stackoverflow.com/questions/13557387/align-radiobuttons-with-text-at-right-and-button-at-left-programmatically?rq=1
+
+
+  TOnClickDBListItem = procedure(Sender: TObject; itemIndex: integer; itemCaption: string) of object;
+
+  {Draft Component code by "Lazarus Android Module Wizard" [01/02/2018 11:13:51]}
+  {https://github.com/jmpessoa/lazandroidmodulewizard}
+
+  {jVisualControl template}
+
+  { jDBListView -  thanks to Martin Lowry  !!! }
+
+  jDBListView = class(jVisualControl)
+  private
+    FOnClickDBListItem: TOnClickDBListItem;
+    FOnLongClickDBListItem: TOnClickDBListItem;
+    FjSqliteCursor: jSqliteCursor;
+
+    FColWeights: TStrings;
+    FColNames: TStrings;
+
+    procedure SetColor(Value: TARGBColorBridge); //background
+    procedure SetColumnWeights(Value: TStrings);
+    procedure SetColumnNames(Value: TStrings);
+    procedure SetCursor(Value: jSqliteCursor);
+    procedure SetFontColor(_color: TARGBColorBridge);
+    procedure SetFontSize(_size: DWord);
+    procedure SetFontSizeUnit(_unit: TFontSizeUnit);
+    procedure SetVisible(Value: boolean);
+    procedure UpdateLParamHeight;
+    procedure UpdateLParamWidth;
+    procedure TryNewParent(refApp: jApp);
+  protected
+    FjPRLayoutHome: jObject; //Save parent origin
+    procedure Notification(AComponent: TComponent; Operation: TOperation); override;
+  public
+    constructor Create(AOwner: TComponent); override;
+    destructor Destroy; override;
+    procedure Init(refApp: jApp); override;
+    procedure Refresh;
+    procedure UpdateLayout; override;
+    procedure ClearLayout;
+
+    procedure GenEvent_OnClickDBListItem(Obj: TObject; position: integer; itemCaption: string);
+    procedure GenEvent_OnLongClickDBListItem(Obj: TObject; position: integer; itemCaption: string);
+    function jCreate(): jObject;
+    procedure jFree();
+    function GetParent(): jObject;
+    function GetView(): jObject; override;
+    procedure SetViewParent(_viewgroup: jObject); override;
+    procedure RemoveFromViewParent(); override;
+    procedure SetLParamWidth(_w: integer);
+    procedure SetLParamHeight(_h: integer);
+    procedure setLGravity(_g: integer);
+    procedure setLWeight(_w: single);
+    procedure SetLeftTopRightBottomWidthHeight(_left: integer;
+      _top: integer; _right: integer; _bottom: integer; _w: integer; _h: integer);
+    procedure AddLParamsAnchorRule(_rule: integer);
+    procedure AddLParamsParentRule(_rule: integer);
+    procedure SetLayoutAll(_idAnchor: integer);
+    procedure ClearLayoutAll();
+    procedure SetId(_id: integer);
+    function GetItemIndex(): integer;
+    function GetItemCaption(): string;
+    procedure SetSelection(_index: integer);
+    procedure ChangeCursor(NewCursor: jSqliteCursor);
+
+  published
+    property BackgroundColor: TARGBColorBridge read FColor write SetColor;
+    property ColumnWeights: TStrings read FColWeights write SetColumnWeights;
+    property ColumnNames: TStrings read FColNames write SetColumnNames;
+    property DataSource: jSqliteCursor read FjSqliteCursor write SetCursor;
+    property FontColor: TARGBColorBridge read FFontColor write SetFontColor;
+    property FontSize: DWord read FFontSize write SetFontSize;
+    property FontSizeUnit: TFontSizeUnit read FFontSizeUnit write SetFontSizeUnit;
+
+    property OnClickItem: TOnClickDBListItem read FOnClickDBListItem write FOnClickDBListItem;
+    property OnLongClickItem: TOnClickDBListItem read FOnLongClickDBListItem write FOnLongClickDBListItem;
+  end;
 
   { jTextView }
 
   jTextView = class(jVisualControl)
   private
-    // FFontFace: TFontFace;
-    //FOnClick: TOnNotify;
     FTextAlignment: TTextAlignment;
     FTextTypeFace: TTextTypeFace;
 
@@ -749,7 +843,7 @@ type
     Procedure SetTextAlignment(Value: TTextAlignment);
     procedure UpdateLParamHeight;
     procedure UpdateLParamWidth;
-
+    procedure TryNewParent(refApp: jApp);
   protected
     Procedure SetEnabled  (Value : Boolean); override;
     Function  GetText: string;   override;
@@ -759,7 +853,6 @@ type
 
     procedure SetFontSizeUnit(_unit: TFontSizeUnit);
 
-    procedure SetViewParent(Value: jObject);  override;
     Procedure GenEvent_OnClick(Obj: TObject);
 
     Procedure GenEvent_OnLOngClick(Obj: TObject);
@@ -800,6 +893,10 @@ type
     procedure MatchParent();
     procedure WrapParent();
     procedure ResetAllRules();
+    procedure SetLGravity(_value: TLayoutGravity);
+    procedure SetViewParent(Value: jObject);  override;
+    procedure RemoveFromViewParent; override;
+    procedure ResetViewParent();  override;
 
   published
     property Text: string read GetText write SetText;
@@ -811,6 +908,7 @@ type
     property FontFace: TFontFace read FFontFace write SetFontFace default ffNormal;
     property TextTypeFace: TTextTypeFace read FTextTypeFace write SetTextTypeFace;
     property FontSizeUnit: TFontSizeUnit read FFontSizeUnit write SetFontSizeUnit;
+    property GravityInParent: TLayoutGravity read FGravityInParent write SetLGravity;
 
     // Event - if enabled!
     property OnClick: TOnNotify read FOnClick write FOnClick;
@@ -863,11 +961,10 @@ type
     procedure SetHorizontalScrollBar(Value: boolean);
     procedure UpdateLParamHeight;
     procedure UpdateLParamWidth;
-
+    procedure TryNewParent(refApp: jApp);
   protected
     Procedure SetText(Value: string ); override;
     Function  GetText: string; override;
-    procedure SetViewParent(Value: jObject);  override;
 
     procedure SetFontFace(AValue: TFontFace);
     procedure SetTextTypeFace(Value: TTextTypeFace);
@@ -938,6 +1035,10 @@ type
     procedure SaveToFile(_path: string; _filename: string);  overload;
     procedure SaveToFile(_filename: string); overload;
     procedure ResetAllRules();
+    procedure SetLGravity(_value: TLayoutGravity);
+    procedure SetViewParent(Value: jObject);  override;
+    procedure RemoveFromViewParent;  override;
+    procedure ResetViewParent();  override;
 
     // Property
     property CursorPos : TXY        read GetCursorPos  write SetCursorPos;
@@ -967,6 +1068,7 @@ type
     property FontSizeUnit: TFontSizeUnit read FFontSizeUnit write SetFontSizeUnit;
     property CloseSoftInputOnEnter: boolean read FCloseSoftInputOnEnter write SetCloseSoftInputOnEnter;
     property CapSentence: boolean read FCapSentence write SetCapSentence;
+    property GravityInParent: TLayoutGravity read FGravityInParent write SetLGravity;
     // Event
     property OnLostFocus: TOnEditLostFocus read FOnLostFocus write FOnLostFocus;
     property OnEnter: TOnNotify  read FOnEnter write FOnEnter;
@@ -987,9 +1089,8 @@ type
     Procedure SetFontSize (Value : DWord  );
     procedure UpdateLParamHeight;
     procedure UpdateLParamWidth;
+    procedure TryNewParent(refApp: jApp);
   protected
-    procedure SetViewParent(Value: jObject);  override;
-
     Procedure GenEvent_OnClick(Obj: TObject);
     procedure GenEvent_OnBeforeDispatchDraw(Obj: TObject; canvas: JObject; tag: integer);
     procedure GenEvent_OnAfterDispatchDraw(Obj: TObject; canvas: JObject; tag: integer);
@@ -1019,6 +1120,10 @@ type
     procedure SetRadiusRoundCorner(_radius: integer);
     procedure SetFontFromAssets(_fontName: string);
     procedure ResetAllRules();
+    procedure SetLGravity(_value: TLayoutGravity);
+    procedure SetViewParent(Value: jObject);  override;
+    procedure RemoveFromViewParent;  override;
+    procedure ResetViewParent();  override;
 
   published
     property Text: string read GetText write SetText;
@@ -1027,6 +1132,7 @@ type
     property FontSize  : DWord     read FFontSize  write SetFontSize;
     property FontSizeUnit: TFontSizeUnit read FFontSizeUnit write SetFontSizeUnit;
     property Enabled: boolean read FEnabled write SetEnabled;
+    property GravityInParent: TLayoutGravity read FGravityInParent write SetLGravity;
     // Event
     property OnClick   : TOnNotify read FOnClick   write FOnClick;
     property OnBeforeDispatchDraw: TOnBeforeDispatchDraw read FOnBeforeDispatchDraw write FOnBeforeDispatchDraw;
@@ -1042,9 +1148,8 @@ type
     Procedure SetChecked  (Value : boolean);
     procedure UpdateLParamHeight;
     procedure UpdateLParamWidth;
-
+    procedure TryNewParent(refApp: jApp);
   protected
-    procedure SetViewParent(Value: jObject);  override;
     Procedure GenEvent_OnClick(Obj: TObject);
     Function  GetText            : string;    override;   //by thierry
     Procedure SetText     (Value   : string );   override; //by thierry
@@ -1062,6 +1167,9 @@ type
     procedure SetCompoundDrawables(_imageResIdentifier: string; _side: TCompoundDrawablesSide); overload;
     procedure SetFontFromAssets(_fontName: string);
     procedure ResetAllRules();
+    procedure SetLGravity(_value: TLayoutGravity);
+    procedure SetViewParent(Value: jObject);  override;
+    procedure RemoveFromViewParent;  override;
 
   published
     property Text: string read GetText write SetText;
@@ -1085,9 +1193,8 @@ type
     Procedure SetChecked  (Value : boolean);
     procedure UpdateLParamHeight;
     procedure UpdateLParamWidth;
-
+    procedure TryNewParent(refApp: jApp);
   protected
-    procedure SetViewParent(Value: jObject);  override;
     Procedure GenEvent_OnClick(Obj: TObject);
     Function  GetText            : string; override;
     Procedure SetText     (Value : string ); override;
@@ -1103,6 +1210,10 @@ type
     procedure SetCompoundDrawables(_imageResIdentifier: string; _side: TCompoundDrawablesSide); overload;
     procedure SetFontFromAssets(_fontName: string);
     procedure ResetAllRules();
+    procedure SetLGravity(_value: TLayoutGravity);
+    procedure SetViewParent(Value: jObject);  override;
+    procedure RemoveFromViewParent;  override;
+
   published
     property Text: string read GetText write SetText;
     property BackgroundColor     : TARGBColorBridge read FColor     write SetColor;
@@ -1110,6 +1221,7 @@ type
     property FontSize  : DWord     read FFontSize  write SetFontSize;
     property Checked   : boolean   read GetChecked write SetChecked;
     property FontSizeUnit: TFontSizeUnit read FFontSizeUnit write SetFontSizeUnit;
+    property GravityInParent: TLayoutGravity read FGravityInParent write SetLGravity;
     // Event
     property OnClick   : TOnNotify read FOnClick   write FOnClick;
   end;
@@ -1129,8 +1241,9 @@ type
     Procedure SetStyle(Value : TProgressBarStyle);
     procedure UpdateLParamHeight;
     procedure UpdateLParamWidth;
+    procedure TryNewParent(refApp: jApp);
   protected
-    procedure SetViewParent(Value: jObject);  override;
+     //
   public
     Constructor Create(AOwner: TComponent); override;
     Destructor Destroy; override;
@@ -1139,12 +1252,16 @@ type
     procedure Init(refApp: jApp); override;
     procedure Stop;
     procedure Start;
-    //property Parent: jObject  read  FjPRLayout write SetParent; // Java : Parent Relative Layout
+    procedure SetLGravity(_value: TLayoutGravity);
+    procedure SetViewParent(Value: jObject);  override;
+    procedure RemoveFromViewParent;  override;
+
   published
     property Style: TProgressBarStyle read FStyle write SetStyle;
     property BackgroundColor: TARGBColorBridge read FColor write SetColor;
     property Progress: integer read GetProgress write SetProgress;
     property Max: integer read GetMax write SetMax;
+    property GravityInParent: TLayoutGravity read FGravityInParent write SetLGravity;
 
   end;
 
@@ -1164,11 +1281,10 @@ type
     procedure SetImageIndex(Value: TImageListIndex);
     procedure UpdateLParamHeight;
     procedure UpdateLParamWidth;
+    procedure TryNewParent(refApp: jApp);
   protected
-    procedure SetViewParent(Value: jObject);  override;
     procedure SetParamWidth(Value: TLayoutParams); override;
     procedure SetParamHeight(Value: TLayoutParams); override;
-
     Procedure GenEvent_OnClick(Obj: TObject);
     procedure Notification(AComponent: TComponent; Operation: TOperation); override;
   public
@@ -1207,6 +1323,15 @@ type
     Procedure SetImage(_fullFilename: string); overload;
     procedure SetRoundCorner();
     procedure SetRadiusRoundCorner(_radius: integer);
+    procedure SetLGravity(_value: TLayoutGravity);
+    procedure SetCollapseMode(_collapsemode: TCollapsingMode);
+    procedure SetFitsSystemWindows(_value: boolean);
+    procedure SetScrollFlag(_collapsingScrollFlag: TCollapsingScrollflag);
+    procedure SetViewParent(Value: jObject);  override;
+    procedure RemoveFromViewParent;  override;
+    procedure ResetViewParent();  override;
+    procedure BringToFront();
+    procedure SetVisibilityGone();
 
     property Count: integer read GetCount;
   published
@@ -1216,6 +1341,7 @@ type
     property BackgroundColor     : TARGBColorBridge read FColor       write SetColor;
     property ImageIdentifier : string read FImageName write SetImageByResIdentifier;
     property ImageScaleType: TImageScaleType read FImageScaleType write SetScaleType;
+    property GravityInParent: TLayoutGravity read FGravityInParent write SetLGravity;
      // Event
      property OnClick: TOnNotify read FOnClick write FOnClick;
   end;
@@ -1267,9 +1393,9 @@ type
     procedure UpdateLParamWidth;
     procedure SetFontSizeUnit(_unit: TFontSizeUnit);
     procedure SetFontFace(AValue: TFontFace);
+    procedure TryNewParent(refApp: jApp);
 
   protected
-    procedure SetViewParent(Value: jObject);  override;
     procedure GenEvent_OnClickWidgetItem(Obj: TObject; index: integer; checked: boolean);
     procedure GenEvent_OnClickCaptionItem(Obj: TObject; index: integer; caption: string);
     procedure GenEvent_OnLongClickCaptionItem(Obj: TObject; index: integer; caption: string);
@@ -1354,7 +1480,12 @@ type
     procedure SmoothScrollToPosition(_index: integer);
     procedure SetItemChecked(_index: integer; _value: boolean);
     function GetCheckedItemPosition(): integer;
-
+    procedure SetViewParent(Value: jObject);  override;
+    procedure RemoveFromViewParent;  override;
+    procedure ResetViewParent();  override;
+    procedure SetFitsSystemWindows(_value: boolean);
+    procedure BringToFront();
+    procedure SetVisibilityGone();
 
     //Property
     property setItemIndex: TXY write SetItemPosition;
@@ -1412,8 +1543,8 @@ type
     Procedure SetScrollSize (Value : integer);
     procedure UpdateLParamHeight;
     procedure UpdateLParamWidth;
+    procedure TryNewParent(refApp: jApp);
   protected
-    procedure SetViewParent(Value: jObject);  override;
     function GetView: jObject; override;
     //procedure SetParamWidth(Value: TLayoutParams); override; TODO
   public
@@ -1434,6 +1565,8 @@ type
     function GetRight(): integer;
     procedure DispatchOnScrollChangedEvent(_value: boolean);
     procedure GenEvent_OnChanged(Obj: TObject; currHor: Integer; currVerti: Integer; prevHor: Integer; prevVertical: Integer; onPosition: Integer; scrolldiff: integer);
+    procedure SetViewParent(Value: jObject);  override;
+    procedure RemoveFromViewParent;  override;
 
   published
     property FillViewportEnabled: boolean read FFillViewportEnabled write SetFillViewport;
@@ -1451,8 +1584,8 @@ type
     Procedure SetScrollSize (Value : integer);
     procedure UpdateLParamHeight;
     procedure UpdateLParamWidth;
+    procedure TryNewParent(refApp: jApp);
   protected
-    procedure SetViewParent(Value: jObject); override;
     function GetView: jObject; override;
   public
     constructor Create(AOwner: TComponent); override;
@@ -1471,8 +1604,9 @@ type
     function GetRight(): integer;
     procedure DispatchOnScrollChangedEvent(_value: boolean);
     procedure GenEvent_OnChanged(Obj: TObject; currHor: Integer; currVerti: Integer; prevHor: Integer; prevVertical: Integer; onPosition: Integer; scrolldiff: integer);
+    procedure SetViewParent(Value: jObject); override;
+    procedure RemoveFromViewParent;  override;
 
-    // Property
   published
     property ScrollSize: integer read FScrollSize write SetScrollSize;
     property BackgroundColor     : TARGBColorBridge read FColor      write SetColor;
@@ -1495,8 +1629,9 @@ type
     Procedure SetJavaScript(Value : Boolean);
     procedure UpdateLParamHeight;
     procedure UpdateLParamWidth;
+    procedure TryNewParent(refApp: jApp);
   protected
-    procedure SetViewParent(Value: jObject); override;
+     //
   public
     constructor Create(AOwner: TComponent); override;
     Destructor  Destroy; override;
@@ -1510,11 +1645,14 @@ type
 
     procedure SetHttpAuthUsernamePassword(_hostName: string; _domain: string; _username: string; _password: string);
     Procedure GenEvent_OnLongClick(Obj: TObject);
+    procedure SetViewParent(Value: jObject); override;
+    procedure RemoveFromViewParent;  override;
 
   published
     property JavaScript: Boolean          read FJavaScript write SetJavaScript;
     property BackgroundColor     : TARGBColorBridge read FColor      write SetColor;
     property ZoomControl: Boolean read FZoomControl write SetZoomControl;
+
     // Event
     property OnStatus  : TOnWebViewStatus read FOnStatus   write FOnStatus;
     property OnLongClick: TOnNotify read FOnLongClick write FOnLongClick;
@@ -1523,9 +1661,8 @@ type
   jCanvas = class(jControl)
   private
     FInitialized : boolean;
-    //FApp         : jApp;
-    // Java
-    FjObject     : jObject; // Java : View
+
+    FjObject     : jObject; // Java side
 
     FPaintStrokeWidth: single;
     FPaintStyle: TPaintStyle;
@@ -1596,6 +1733,7 @@ type
     procedure SetjCanvas(Value: jCanvas);
     procedure UpdateLParamHeight;
     procedure UpdateLParamWidth;
+    procedure TryNewParent(refApp: jApp);
   protected
     Procedure GenEvent_OnTouch(Obj: TObject; Act,Cnt: integer; X1,Y1,X2,Y2: single);
     Procedure GenEvent_OnDraw(Obj: TObject);
@@ -1607,17 +1745,15 @@ type
     function GetWidth: integer;  override;
     function GetHeight: integer; override;
     procedure SetViewParent(Value: jObject);   override;
+    procedure RemoveFromViewParent;  override;
     Procedure UpdateLayout(); override;
     procedure Init(refApp: jApp); override;
     Procedure SaveToFile(fileName:String);
     function GetDrawingCache(): jObject;
     function GetImage(): jObject;
 
-    // Property
-    //property Parent: jObject  read  FjPRLayout write SetParent; // Java : Parent Relative Layout
   published
     property Canvas      : jCanvas read FjCanvas write SetjCanvas; // Java : jCanvas
-    //property Visible     : Boolean read FVisible write SetVisible;
     property BackgroundColor: TARGBColorBridge read FColor write SetColor;
     // Event - Drawing
     property OnDraw      : TOnDraw read FOnDraw write FOnDraw;
@@ -1648,9 +1784,9 @@ type
 
     procedure UpdateLParamHeight;
     procedure UpdateLParamWidth;
+    procedure TryNewParent(refApp: jApp);
   protected
     Procedure SetEnabled  (Value : Boolean); override;
-    procedure SetViewParent(Value: jObject); override;
     Procedure GenEvent_OnClick(Obj: TObject);
     procedure Notification(AComponent: TComponent; Operation: TOperation); override;
   public
@@ -1659,10 +1795,12 @@ type
     Procedure Refresh;
     Procedure UpdateLayout(); override;
     procedure Init(refApp: jApp); override;
-    // Property
-    //property Parent: jObject  read  FjPRLayout write SetParent; // Java : Parent Relative Layout
+    procedure SetLGravity(_value: TLayoutGravity);
+    procedure SetViewParent(Value: jObject); override;
+    procedure RemoveFromViewParent;  override;
+
   published
-    //property Visible : Boolean   read FVisible   write SetVisible;
+
     property BackgroundColor   : TARGBColorBridge read FColor     write SetColor;
     property Enabled : Boolean   read FEnabled   write SetEnabled;
     property Images    : jImageList read FImageList write SetImages;     //by jmpessoa
@@ -1671,6 +1809,8 @@ type
 
     property ImageUpIdentifier: string read FImageUpName write SetImageUpByRes;
     property ImageDownIdentifier: string read FImageDownName write SetImageDownByRes;
+    property GravityInParent: TLayoutGravity read FGravityInParent write SetLGravity;
+
     // Event
     property OnClick : TOnNotify read FOnClick   write FOnClick;
   end;
@@ -1684,13 +1824,17 @@ type
     FOnGLDraw    : TOnNotify;
     FOnGLDestroy : TOnNotify;
     FOnGLThread  : TOnNotify;
-    //
+    FOnGLPause  : TOnNotify;
+    FOnGLResume  : TOnNotify;
+
     FMouches     : TMouches;
     //
     FOnGLDown : TOnTouchEvent;
     FOnGLMove : TOnTouchEvent;
     FOnGLUp   : TOnTouchEvent;
     //
+  protected
+    //procedure TryNewParent(refApp: jApp);
   public
     constructor Create(AOwner: TComponent); override;
     Destructor  Destroy; override;
@@ -1706,6 +1850,8 @@ type
     property OnGLDraw    : TOnNotify     read FOnGLDraw    write FOnGLDraw;
     property OnGLDestroy : TOnNotify     read FOnGLDestroy write FOnGLDestroy;
     property OnGLThread  : TOnNotify     read FOnGLThread  write FOnGLThread;
+    property OnGLPause  : TOnNotify read FOnGLPause  write FOnGLPause;
+    property OnGLResume  : TOnNotify read FOnGLResume  write FOnGLResume;
     // Event - Touch
     property OnGLDown : TOnTouchEvent read FOnGLDown write FOnGLDown;
     property OnGLMove : TOnTouchEvent read FOnGLMove write FOnGLMove;
@@ -1824,16 +1970,23 @@ type
                                                                                       previousVertical: integer;
                                                                                       onPosition: integer; scrolldiff: integer);
 
+  Procedure Java_Event_pOnClickDBListItem(env: PJNIEnv; this: jobject; Obj: TObject; position: integer; caption: JString);
+  Procedure Java_Event_pOnLongClickDBListItem(env: PJNIEnv; this: jobject; Obj: TObject; position: integer; caption: JString);
+
   // Asset Function (P : Pascal Native)
   Function  Asset_SaveToFile (srcFile,outFile : String; SkipExists : Boolean = False) : Boolean;
   Function  Asset_SaveToFileP(srcFile,outFile : String; SkipExists : Boolean = False) : Boolean;
 
+  procedure DBListView_Log (msg: string);
 
 implementation
 
-
 uses
-  customdialog, radiogroup, autocompletetextview, viewflipper, comboedittext, toolbar;
+  customdialog, autocompletetextview, viewflipper,
+  comboedittext, toolbar, scoordinatorlayout, framelayout, linearlayout,
+  sdrawerlayout, scollapsingtoolbarlayout, scardview, sappbarlayout,
+  stoolbar, stablayout, snestedscrollview, sviewpager, radiogroup;
+  {,And_log_h}  {for test}
 
 //-----------------------------------------------------------------------------
 // Asset
@@ -1865,7 +2018,7 @@ Function Asset_SaveToFileP(srcFile, outFile : string; SkipExists : Boolean = Fal
   Stream.free;
   Result := FileExists(outFile);
  end;
-//-----------
+
 Function IntToWebViewStatus( EventType : Integer ) : TWebViewStatus;
  begin
   Case EventType of
@@ -1923,9 +2076,15 @@ but can be killed by the system in extremely low memory situations.
 }
 // Another activity is taking focus (this activity is about to be "paused").
 Procedure Java_Event_pAppOnPause(env: PJNIEnv; this: jobject);
+var
+  Form: jForm;
 begin
   gApp.Jni.jEnv:= env;
   gApp.Jni.jThis:= this;
+  Form:= gApp.Forms.Stack[gApp.TopIndex].Form;
+  if not Assigned(Form) then Exit;
+  Form.UpdateJNI(gApp);
+  if Assigned(Form.OnActivityPause) then Form.OnActivityPause(Form);
 end;
 
 
@@ -1940,9 +2099,15 @@ Resume: The activity is in the foreground of the screen and has user focus.
 (This state is also sometimes referred to as "running".)
 }
 Procedure Java_Event_pAppOnResume(env: PJNIEnv; this: jobject);
+var
+  Form: jForm;
 begin
   gApp.Jni.jEnv:= env;
   gApp.Jni.jThis:= this;
+  Form:= gApp.Forms.Stack[gApp.TopIndex].Form;
+  if not Assigned(Form) then Exit;
+  Form.UpdateJNI(gApp);
+  if Assigned(Form.OnActivityResume) then Form.OnActivityResume(Form);
 end;
 
 //The activity is about to become visible.....
@@ -3014,7 +3179,6 @@ begin
   FEnabled:= True;
 end;
 
-//
 destructor jTextView.Destroy;
 begin
   if not (csDesigning in ComponentState) then
@@ -3028,11 +3192,99 @@ begin
   inherited Destroy;
 end;
 
+procedure jTextView.TryNewParent(refApp: jApp);
+begin
+  if FParent is jPanel then
+  begin
+    jPanel(FParent).Init(refApp);
+    FjPRLayout:= jPanel(FParent).View;
+  end else
+  if FParent is jScrollView then
+  begin
+    jScrollView(FParent).Init(refApp);
+    FjPRLayout:= jScrollView_getView(FjEnv, jScrollView(FParent).jSelf);
+  end else
+  if FParent is jHorizontalScrollView then
+  begin
+    jHorizontalScrollView(FParent).Init(refApp);
+    FjPRLayout:= jHorizontalScrollView_getView(FjEnv, jHorizontalScrollView(FParent).jSelf);
+  end  else
+  if FParent is jCustomDialog then
+  begin
+    jCustomDialog(FParent).Init(refApp);
+    FjPRLayout:= jCustomDialog(FParent).View;
+  end else
+  if FParent is jViewFlipper then
+  begin
+    jViewFlipper(FParent).Init(refApp);
+    FjPRLayout:= jViewFlipper(FParent).View;
+  end else
+  if FParent is jToolbar then
+  begin
+    jToolbar(FParent).Init(refApp);
+    FjPRLayout:= jToolbar(FParent).View;
+  end  else
+  if FParent is jsToolbar then
+  begin
+    jsToolbar(FParent).Init(refApp);
+    FjPRLayout:= jsToolbar(FParent).View;
+  end  else
+  if FParent is jsCoordinatorLayout then
+  begin
+    jsCoordinatorLayout(FParent).Init(refApp);
+    FjPRLayout:= jsCoordinatorLayout(FParent).View;
+  end else
+  if FParent is jFrameLayout then
+  begin
+    jFrameLayout(FParent).Init(refApp);
+    FjPRLayout:= jFrameLayout(FParent).View;
+  end else
+  if FParent is jLinearLayout then
+  begin
+    jLinearLayout(FParent).Init(refApp);
+    FjPRLayout:= jLinearLayout(FParent).View;
+  end else
+  if FParent is jsDrawerLayout then
+  begin
+    jsDrawerLayout(FParent).Init(refApp);
+    FjPRLayout:= jsDrawerLayout(FParent).View;
+  end  else
+  if FParent is jsCardView then
+  begin
+      jsCardView(FParent).Init(refApp);
+      FjPRLayout:= jsCardView(FParent).View;
+  end else
+  if FParent is jsAppBarLayout then
+  begin
+      jsAppBarLayout(FParent).Init(refApp);
+      FjPRLayout:= jsAppBarLayout(FParent).View;
+  end else
+  if FParent is jsTabLayout then
+  begin
+      jsTabLayout(FParent).Init(refApp);
+      FjPRLayout:= jsTabLayout(FParent).View;
+  end else
+  if FParent is jsCollapsingToolbarLayout then
+  begin
+      jsCollapsingToolbarLayout(FParent).Init(refApp);
+      FjPRLayout:= jsCollapsingToolbarLayout(FParent).View;
+  end else
+  if FParent is jsNestedScrollView then
+  begin
+      jsNestedScrollView(FParent).Init(refApp);
+      FjPRLayout:= jsNestedScrollView(FParent).View;
+  end else
+  if FParent is jsViewPager then
+  begin
+      jsViewPager(FParent).Init(refApp);
+      FjPRLayout:= jsViewPager(FParent).View;
+  end;
+end;
+
 procedure jTextView.Init(refApp: jApp);
 var
   rToP: TPositionRelativeToParent;
   rToA: TPositionRelativeToAnchorID;
-  //gvt: TGravity;     TODO
 begin
   if FInitialized  then Exit;
 
@@ -3042,35 +3294,15 @@ begin
 
   FInitialized:= True;
 
-  if FParent is jPanel then
+  if FParent <> nil then
   begin
-    jPanel(FParent).Init(refApp);
-    FjPRLayout:= jPanel(FParent).View;
+     TryNewParent(refApp);
   end;
 
-  if FParent is jScrollView then
-  begin
-    jScrollView(FParent).Init(refApp);
-    FjPRLayout:= jScrollView_getView(FjEnv, jScrollView(FParent).jSelf);
-  end;
+  FjPRLayoutHome:= FjPRLayout;
 
-  if FParent is jHorizontalScrollView then
-  begin
-    jHorizontalScrollView(FParent).Init(refApp);
-    FjPRLayout:= jHorizontalScrollView_getView(FjEnv, jHorizontalScrollView(FParent).jSelf);
-  end;
-
-  if FParent is jCustomDialog then
-  begin
-    jCustomDialog(FParent).Init(refApp);
-    FjPRLayout:= jCustomDialog(FParent).View;
-  end;
-
-  if FParent is jToolbar then
-  begin
-    jToolbar(FParent).Init(refApp);
-    FjPRLayout:= jToolbar(FParent).View;
-  end;
+  if FGravityInParent <> lgNone then
+     jTextView_SetFrameGravity(FjEnv, FjObject, Ord(FGravityInParent));
 
   jTextView_setParent(FjEnv, FjObject , FjPRLayout);
 
@@ -3084,16 +3316,6 @@ begin
   begin
      Self.UpdateLayout();
   end;
-
-  (* TODO
-  for gvt := gvBottom  to gvFillVertical do
-  begin
-    if rToA in FPositionRelativeToAnchor then
-    begin
-      jTextView_addGravity(FjEnv, FjThis, FjObject , GetGravity(gvt));
-    end;
-  end;
-  *)
 
   for rToA := raAbove to raAlignRight do
   begin
@@ -3144,6 +3366,19 @@ end;
 procedure jTextView.SetViewParent(Value: jObject);
 begin
   FjPRLayout:= Value;
+  if FInitialized then
+     jTextView_setParent(FjEnv, FjObject, FjPRLayout);
+end;
+
+procedure jTextView.RemoveFromViewParent;
+begin
+  if FInitialized then
+     jTextView_RemoveFromViewParent(FjEnv, FjObject);
+end;
+
+procedure jTextView.ResetViewParent();
+begin
+  FjPRLayout:= FjPRLayoutHome;
   if FInitialized then
      jTextView_setParent(FjEnv, FjObject, FjPRLayout);
 end;
@@ -3414,7 +3649,6 @@ begin
      jTextView_SetShadowLayer(FjEnv, FjObject, _radius ,_dx ,_dy , GetARGB(FCustomColor, _color));
 end;
 
-
 procedure jTextView.SetShaderLinearGradient(_startColor: TARGBColorBridge; _endColor: TARGBColorBridge);
 begin
   //in designing component state: set value here...
@@ -3514,6 +3748,14 @@ begin
   end;
 end;
 
+procedure jTextView.SetLGravity(_value: TLayoutGravity);
+begin
+  //in designing component state: set value here...
+  FGravityInParent:= _value;
+  if FInitialized then
+     jTextView_SetFrameGravity(FjEnv, FjObject, Ord(FGravityInParent));
+end;
+
 //------------------------------------------------------------------------------
 // jEditText
 //------------------------------------------------------------------------------
@@ -3549,7 +3791,7 @@ begin
   FLParamWidth  := lpHalfOfParent;
   FLParamHeight := lpWrapContent;
   FCloseSoftInputOnEnter:= True;
-  FCapSentence  := false;
+  FCapSentence  := False;
 end;
 
 Destructor jEditText.Destroy;
@@ -3565,6 +3807,95 @@ begin
   inherited Destroy;
 end;
 
+procedure jEditText.TryNewParent(refApp: jApp);
+begin
+  if FParent is jPanel then
+  begin
+    jPanel(FParent).Init(refApp);
+    FjPRLayout:= jPanel(FParent).View;
+  end else
+  if FParent is jScrollView then
+  begin
+    jScrollView(FParent).Init(refApp);
+    FjPRLayout:= jScrollView_getView(FjEnv, jScrollView(FParent).jSelf);
+  end else
+  if FParent is jHorizontalScrollView then
+  begin
+    jHorizontalScrollView(FParent).Init(refApp);
+    FjPRLayout:= jHorizontalScrollView_getView(FjEnv, jHorizontalScrollView(FParent).jSelf);
+  end  else
+  if FParent is jCustomDialog then
+  begin
+    jCustomDialog(FParent).Init(refApp);
+    FjPRLayout:= jCustomDialog(FParent).View;
+  end else
+  if FParent is jViewFlipper then
+  begin
+    jViewFlipper(FParent).Init(refApp);
+    FjPRLayout:= jViewFlipper(FParent).View;
+  end else
+  if FParent is jToolbar then
+  begin
+    jToolbar(FParent).Init(refApp);
+    FjPRLayout:= jToolbar(FParent).View;
+  end  else
+  if FParent is jsToolbar then
+  begin
+    jsToolbar(FParent).Init(refApp);
+    FjPRLayout:= jsToolbar(FParent).View;
+  end  else
+  if FParent is jsCoordinatorLayout then
+  begin
+    jsCoordinatorLayout(FParent).Init(refApp);
+    FjPRLayout:= jsCoordinatorLayout(FParent).View;
+  end else
+  if FParent is jFrameLayout then
+  begin
+    jFrameLayout(FParent).Init(refApp);
+    FjPRLayout:= jFrameLayout(FParent).View;
+  end else
+  if FParent is jLinearLayout then
+  begin
+    jLinearLayout(FParent).Init(refApp);
+    FjPRLayout:= jLinearLayout(FParent).View;
+  end else
+  if FParent is jsDrawerLayout then
+  begin
+    jsDrawerLayout(FParent).Init(refApp);
+    FjPRLayout:= jsDrawerLayout(FParent).View;
+  end  else
+  if FParent is jsCardView then
+  begin
+      jsCardView(FParent).Init(refApp);
+      FjPRLayout:= jsCardView(FParent).View;
+  end else
+  if FParent is jsAppBarLayout then
+  begin
+      jsAppBarLayout(FParent).Init(refApp);
+      FjPRLayout:= jsAppBarLayout(FParent).View;
+  end else
+  if FParent is jsTabLayout then
+  begin
+      jsTabLayout(FParent).Init(refApp);
+      FjPRLayout:= jsTabLayout(FParent).View;
+  end else
+  if FParent is jsCollapsingToolbarLayout then
+  begin
+      jsCollapsingToolbarLayout(FParent).Init(refApp);
+      FjPRLayout:= jsCollapsingToolbarLayout(FParent).View;
+  end else
+  if FParent is jsNestedScrollView then
+  begin
+      jsNestedScrollView(FParent).Init(refApp);
+      FjPRLayout:= jsNestedScrollView(FParent).View;
+  end else
+  if FParent is jsViewPager then
+  begin
+      jsViewPager(FParent).Init(refApp);
+      FjPRLayout:= jsViewPager(FParent).View;
+  end;
+end;
+
 procedure jEditText.Init(refApp: jApp);
 var
   rToP: TPositionRelativeToParent;
@@ -3577,34 +3908,15 @@ begin
   FjObject := jEditText_Create(FjEnv, FjThis, Self);
   FInitialized:= True;
 
-  if FParent is jPanel then
+  if FParent <> nil then
   begin
-    jPanel(FParent).Init(refApp);
-    FjPRLayout:= jPanel(FParent).View;
+     TryNewParent(refApp);
   end;
 
-  if FParent is jScrollView then
-  begin
-    jScrollView(FParent).Init(refApp);
-    FjPRLayout:= jScrollView_getView(FjEnv, jScrollView(FParent).jSelf);
-  end;
+  FjPRLayoutHome:= FjPRLayout;
 
-  if FParent is jHorizontalScrollView then
-  begin
-    jHorizontalScrollView(FParent).Init(refApp);
-    FjPRLayout:= jHorizontalScrollView_getView(FjEnv, jHorizontalScrollView(FParent).jSelf);
-  end;
-  if FParent is jCustomDialog then
-  begin
-    jCustomDialog(FParent).Init(refApp);
-    FjPRLayout:= jCustomDialog(FParent).View;
-  end;
-
-  if FParent is jToolbar then
-  begin
-    jToolbar(FParent).Init(refApp);
-    FjPRLayout:= jToolbar(FParent).View;
-  end;
+  if FGravityInParent <> lgNone then
+    jEditText_SetFrameGravity(FjEnv, FjObject, Ord(FGravityInParent) );
 
   jEditText_setParent(FjEnv, FjObject , FjPRLayout);
 
@@ -3723,6 +4035,19 @@ begin
   FjPRLayout:= Value;
   if FInitialized then
     jEditText_setParent(FjEnv, FjObject , FjPRLayout);
+end;
+
+procedure jEditText.RemoveFromViewParent;
+begin
+if FInitialized then
+   jEditText_RemoveFromViewParent(FjEnv, FjObject);
+end;
+
+procedure jEditText.ResetViewParent();
+begin
+  FjPRLayout:= FjPRLayoutHome;
+  if FInitialized then
+     jEditText_setParent(FjEnv, FjObject, FjPRLayout);
 end;
 
 Procedure jEditText.setColor(Value: TARGBColorBridge);
@@ -4308,6 +4633,14 @@ begin
   end;
 end;
 
+procedure jEditText.SetLGravity(_value: TLayoutGravity);
+begin
+  //in designing component state: set value here...
+  FGravityInParent:= _value;
+  if FInitialized then
+     jEditText_SetFrameGravity(FjEnv, FjObject, Ord(FGravityInParent));
+end;
+
 //------------------------------------------------------------------------------
 // jButton
 //------------------------------------------------------------------------------
@@ -4339,6 +4672,95 @@ begin
    inherited Destroy;
 end;
 
+procedure jButton.TryNewParent(refApp: jApp);
+begin
+  if FParent is jPanel then
+  begin
+    jPanel(FParent).Init(refApp);
+    FjPRLayout:= jPanel(FParent).View;
+  end else
+  if FParent is jScrollView then
+  begin
+    jScrollView(FParent).Init(refApp);
+    FjPRLayout:= jScrollView_getView(FjEnv, jScrollView(FParent).jSelf);
+  end else
+  if FParent is jHorizontalScrollView then
+  begin
+    jHorizontalScrollView(FParent).Init(refApp);
+    FjPRLayout:= jHorizontalScrollView_getView(FjEnv, jHorizontalScrollView(FParent).jSelf);
+  end  else
+  if FParent is jCustomDialog then
+  begin
+    jCustomDialog(FParent).Init(refApp);
+    FjPRLayout:= jCustomDialog(FParent).View;
+  end else
+  if FParent is jViewFlipper then
+  begin
+    jViewFlipper(FParent).Init(refApp);
+    FjPRLayout:= jViewFlipper(FParent).View;
+  end else
+  if FParent is jToolbar then
+  begin
+    jToolbar(FParent).Init(refApp);
+    FjPRLayout:= jToolbar(FParent).View;
+  end  else
+  if FParent is jsToolbar then
+  begin
+    jsToolbar(FParent).Init(refApp);
+    FjPRLayout:= jsToolbar(FParent).View;
+  end  else
+  if FParent is jsCoordinatorLayout then
+  begin
+    jsCoordinatorLayout(FParent).Init(refApp);
+    FjPRLayout:= jsCoordinatorLayout(FParent).View;
+  end else
+  if FParent is jFrameLayout then
+  begin
+    jFrameLayout(FParent).Init(refApp);
+    FjPRLayout:= jFrameLayout(FParent).View;
+  end else
+  if FParent is jLinearLayout then
+  begin
+    jLinearLayout(FParent).Init(refApp);
+    FjPRLayout:= jLinearLayout(FParent).View;
+  end else
+  if FParent is jsDrawerLayout then
+  begin
+    jsDrawerLayout(FParent).Init(refApp);
+    FjPRLayout:= jsDrawerLayout(FParent).View;
+  end  else
+  if FParent is jsCardView then
+  begin
+      jsCardView(FParent).Init(refApp);
+      FjPRLayout:= jsCardView(FParent).View;
+  end else
+  if FParent is jsAppBarLayout then
+  begin
+      jsAppBarLayout(FParent).Init(refApp);
+      FjPRLayout:= jsAppBarLayout(FParent).View;
+  end else
+  if FParent is jsTabLayout then
+  begin
+      jsTabLayout(FParent).Init(refApp);
+      FjPRLayout:= jsTabLayout(FParent).View;
+  end else
+  if FParent is jsCollapsingToolbarLayout then
+  begin
+      jsCollapsingToolbarLayout(FParent).Init(refApp);
+      FjPRLayout:= jsCollapsingToolbarLayout(FParent).View;
+  end else
+  if FParent is jsNestedScrollView then
+  begin
+      jsNestedScrollView(FParent).Init(refApp);
+      FjPRLayout:= jsNestedScrollView(FParent).View;
+  end else
+  if FParent is jsViewPager then
+  begin
+      jsViewPager(FParent).Init(refApp);
+      FjPRLayout:= jsViewPager(FParent).View;
+  end;
+end;
+
 procedure jButton.Init(refApp: jApp);
 var
   rToP: TPositionRelativeToParent;
@@ -4351,27 +4773,15 @@ begin
   FjObject := jButton_Create(FjEnv,FjThis,Self);
   FInitialized:= True;
 
-  if FParent is jPanel then
+  if FParent <> nil then
   begin
-     jPanel(FParent).Init(refApp);
-     FjPRLayout:= jPanel(FParent).View;
-  end;
-  if FParent is jScrollView then
-  begin
-     jScrollView(FParent).Init(refApp);
-     FjPRLayout:= jScrollView_getView(FjEnv, jScrollView(FParent).jSelf);
-  end;
-  if FParent is jCustomDialog then
-  begin
-    jCustomDialog(FParent).Init(refApp);
-    FjPRLayout:= jCustomDialog(FParent).View;
+    TryNewParent(refApp)
   end;
 
-  if FParent is jToolbar then
-  begin
-    jToolbar(FParent).Init(refApp);
-    FjPRLayout:= jToolbar(FParent).View;
-  end;
+  FjPRLayoutHome:= FjPRLayout;
+
+  if FGravityInParent <> lgNone then
+     jButton_SetFrameGravity(FjEnv, FjObject, Ord(FGravityInParent) );
 
   jButton_setParent(FjEnv, FjObject , FjPRLayout);
 
@@ -4433,6 +4843,19 @@ begin
   FjPRLayout:= Value;
   if FInitialized then
     jButton_setParent(FjEnv, FjObject , FjPRLayout);
+end;
+
+procedure jButton.RemoveFromViewParent;
+begin
+if FInitialized then
+   jButton_RemoveFromViewParent(FjEnv, FjObject);
+end;
+
+procedure jButton.ResetViewParent();
+begin
+  FjPRLayout:= FjPRLayoutHome;
+  if FInitialized then
+     jButton_setParent(FjEnv, FjObject, FjPRLayout);
 end;
 
 Procedure jButton.SetColor(Value: TARGBColorBridge);
@@ -4693,6 +5116,14 @@ begin
   end;
 end;
 
+procedure jButton.SetLGravity(_value: TLayoutGravity);
+begin
+  //in designing component state: set value here...
+  FGravityInParent:= _value;
+  if FInitialized then
+     jButton_SetFrameGravity(FjEnv, FjObject, Ord(FGravityInParent) );
+end;
+
 //------------------------------------------------------------------------------
 // jCheckBox
 //------------------------------------------------------------------------------
@@ -4725,6 +5156,96 @@ begin
   inherited Destroy;
 end;
 
+
+procedure jCheckBox.TryNewParent(refApp: jApp);
+begin
+  if FParent is jPanel then
+  begin
+    jPanel(FParent).Init(refApp);
+    FjPRLayout:= jPanel(FParent).View;
+  end else
+  if FParent is jScrollView then
+  begin
+    jScrollView(FParent).Init(refApp);
+    FjPRLayout:= jScrollView_getView(FjEnv, jScrollView(FParent).jSelf);
+  end else
+  if FParent is jHorizontalScrollView then
+  begin
+    jHorizontalScrollView(FParent).Init(refApp);
+    FjPRLayout:= jHorizontalScrollView_getView(FjEnv, jHorizontalScrollView(FParent).jSelf);
+  end  else
+  if FParent is jCustomDialog then
+  begin
+    jCustomDialog(FParent).Init(refApp);
+    FjPRLayout:= jCustomDialog(FParent).View;
+  end else
+  if FParent is jViewFlipper then
+  begin
+    jViewFlipper(FParent).Init(refApp);
+    FjPRLayout:= jViewFlipper(FParent).View;
+  end else
+  if FParent is jToolbar then
+  begin
+    jToolbar(FParent).Init(refApp);
+    FjPRLayout:= jToolbar(FParent).View;
+  end  else
+  if FParent is jsToolbar then
+  begin
+    jsToolbar(FParent).Init(refApp);
+    FjPRLayout:= jsToolbar(FParent).View;
+  end  else
+  if FParent is jsCoordinatorLayout then
+  begin
+    jsCoordinatorLayout(FParent).Init(refApp);
+    FjPRLayout:= jsCoordinatorLayout(FParent).View;
+  end else
+  if FParent is jFrameLayout then
+  begin
+    jFrameLayout(FParent).Init(refApp);
+    FjPRLayout:= jFrameLayout(FParent).View;
+  end else
+  if FParent is jLinearLayout then
+  begin
+    jLinearLayout(FParent).Init(refApp);
+    FjPRLayout:= jLinearLayout(FParent).View;
+  end else
+  if FParent is jsDrawerLayout then
+  begin
+    jsDrawerLayout(FParent).Init(refApp);
+    FjPRLayout:= jsDrawerLayout(FParent).View;
+  end  else
+  if FParent is jsCardView then
+  begin
+      jsCardView(FParent).Init(refApp);
+      FjPRLayout:= jsCardView(FParent).View;
+  end else
+  if FParent is jsAppBarLayout then
+  begin
+      jsAppBarLayout(FParent).Init(refApp);
+      FjPRLayout:= jsAppBarLayout(FParent).View;
+  end else
+  if FParent is jsTabLayout then
+  begin
+      jsTabLayout(FParent).Init(refApp);
+      FjPRLayout:= jsTabLayout(FParent).View;
+  end else
+  if FParent is jsCollapsingToolbarLayout then
+  begin
+      jsCollapsingToolbarLayout(FParent).Init(refApp);
+      FjPRLayout:= jsCollapsingToolbarLayout(FParent).View;
+  end else
+  if FParent is jsNestedScrollView then
+  begin
+      jsNestedScrollView(FParent).Init(refApp);
+      FjPRLayout:= jsNestedScrollView(FParent).View;
+  end else
+  if FParent is jsViewPager then
+  begin
+      jsViewPager(FParent).Init(refApp);
+      FjPRLayout:= jsViewPager(FParent).View;
+  end;
+end;
+
 Procedure jCheckBox.Init(refApp: jApp);
 var
   rToP: TPositionRelativeToParent;
@@ -4735,32 +5256,16 @@ begin
   inherited Init(refApp);
 
   FjObject  := jCheckBox_Create(FjEnv, FjThis, self);
-  if FParent is jPanel then
+
+  if FParent <> nil then
   begin
-    jPanel(FParent).Init(refApp);
-    FjPRLayout:= jPanel(FParent).View;
-  end;
-  if FParent is jScrollView then
-  begin
-    jScrollView(FParent).Init(refApp);
-    FjPRLayout:= jScrollView_getView(FjEnv, jScrollView(FParent).jSelf);
-  end;
-  if FParent is jHorizontalScrollView then
-  begin
-    jHorizontalScrollView(FParent).Init(refApp);
-    FjPRLayout:= jHorizontalScrollView_getView(FjEnv, jHorizontalScrollView(FParent).jSelf);
-  end;
-  if FParent is jCustomDialog then
-  begin
-    jCustomDialog(FParent).Init(refApp);
-    FjPRLayout:= jCustomDialog(FParent).View;
+    TryNewParent(refApp);
   end;
 
-  if FParent is jToolbar then
-  begin
-    jToolbar(FParent).Init(refApp);
-    FjPRLayout:= jToolbar(FParent).View;
-  end;
+  FjPRLayoutHome:= FjPRLayout;
+
+  if FGravityInParent <> lgNone then
+     jCheckBox_SetFrameGravity(FjEnv, FjObject, Ord(FGravityInParent));
 
   jCheckBox_setParent(FjEnv, FjObject , FjPRLayout);
   jCheckBox_setId(FjEnv, FjObject , Self.Id);
@@ -4817,6 +5322,12 @@ begin
   FjPRLayout:= Value;
   if FInitialized then
     jCheckBox_setParent(FjEnv, FjObject , FjPRLayout);
+end;
+
+procedure jCheckBox.RemoveFromViewParent;
+begin
+if FInitialized then
+   jCheckBox_RemoveFromViewParent(FjEnv, FjObject);
 end;
 
 Procedure jCheckBox.SetColor(Value: TARGBColorBridge);
@@ -4984,6 +5495,14 @@ begin
   end;
 end;
 
+procedure jCheckBox.SetLGravity(_value: TLayoutGravity);
+begin
+  //in designing component state: set value here...
+  FGravityInParent:=  _value;
+  if FInitialized then
+     jCheckBox_SetFrameGravity(FjEnv, FjObject, Ord(FGravityInParent) );
+end;
+
 //------------------------------------------------------------------------------
 // jRadioButton
 //------------------------------------------------------------------------------
@@ -5016,6 +5535,101 @@ begin
   inherited Destroy;
 end;
 
+procedure jRadioButton.TryNewParent(refApp: jApp);
+begin
+  if FParent is jPanel then
+  begin
+    jPanel(FParent).Init(refApp);
+    FjPRLayout:= jPanel(FParent).View;
+  end else
+  if FParent is jRadioGroup then
+  begin
+    jRadioGroup(FParent).Init(refApp);
+    FjPRLayout:= jRadioGroup(FParent).View;
+  end else
+  if FParent is jScrollView then
+  begin
+    jScrollView(FParent).Init(refApp);
+    FjPRLayout:= jScrollView_getView(FjEnv, jScrollView(FParent).jSelf);
+  end else
+  if FParent is jHorizontalScrollView then
+  begin
+    jHorizontalScrollView(FParent).Init(refApp);
+    FjPRLayout:= jHorizontalScrollView_getView(FjEnv, jHorizontalScrollView(FParent).jSelf);
+  end  else
+  if FParent is jCustomDialog then
+  begin
+    jCustomDialog(FParent).Init(refApp);
+    FjPRLayout:= jCustomDialog(FParent).View;
+  end else
+  if FParent is jViewFlipper then
+  begin
+    jViewFlipper(FParent).Init(refApp);
+    FjPRLayout:= jViewFlipper(FParent).View;
+  end else
+  if FParent is jToolbar then
+  begin
+    jToolbar(FParent).Init(refApp);
+    FjPRLayout:= jToolbar(FParent).View;
+  end  else
+  if FParent is jsToolbar then
+  begin
+    jsToolbar(FParent).Init(refApp);
+    FjPRLayout:= jsToolbar(FParent).View;
+  end  else
+  if FParent is jsCoordinatorLayout then
+  begin
+    jsCoordinatorLayout(FParent).Init(refApp);
+    FjPRLayout:= jsCoordinatorLayout(FParent).View;
+  end else
+  if FParent is jFrameLayout then
+  begin
+    jFrameLayout(FParent).Init(refApp);
+    FjPRLayout:= jFrameLayout(FParent).View;
+  end else
+  if FParent is jLinearLayout then
+  begin
+    jLinearLayout(FParent).Init(refApp);
+    FjPRLayout:= jLinearLayout(FParent).View;
+  end else
+  if FParent is jsDrawerLayout then
+  begin
+    jsDrawerLayout(FParent).Init(refApp);
+    FjPRLayout:= jsDrawerLayout(FParent).View;
+  end  else
+  if FParent is jsCardView then
+  begin
+      jsCardView(FParent).Init(refApp);
+      FjPRLayout:= jsCardView(FParent).View;
+  end else
+  if FParent is jsAppBarLayout then
+  begin
+      jsAppBarLayout(FParent).Init(refApp);
+      FjPRLayout:= jsAppBarLayout(FParent).View;
+  end else
+  if FParent is jsTabLayout then
+  begin
+      jsTabLayout(FParent).Init(refApp);
+      FjPRLayout:= jsTabLayout(FParent).View;
+  end else
+  if FParent is jsCollapsingToolbarLayout then
+  begin
+      jsCollapsingToolbarLayout(FParent).Init(refApp);
+      FjPRLayout:= jsCollapsingToolbarLayout(FParent).View;
+  end else
+  if FParent is jsNestedScrollView then
+  begin
+      jsNestedScrollView(FParent).Init(refApp);
+      FjPRLayout:= jsNestedScrollView(FParent).View;
+  end else
+  if FParent is jsViewPager then
+  begin
+      jsViewPager(FParent).Init(refApp);
+      FjPRLayout:= jsViewPager(FParent).View;
+  end;
+end;
+
+
 procedure jRadioButton.Init(refApp: jApp);
 var
   rToP: TPositionRelativeToParent;
@@ -5028,41 +5642,15 @@ begin
   FjObject := jRadioButton_Create(FjEnv, FjThis, Self);
   FInitialized:= True;
 
-  if FParent is jPanel then
+  if FParent <> nil then
   begin
-    jPanel(FParent).Init(refApp);
-    FjPRLayout:= jPanel(FParent).View;
-  end;
-  if FParent is jScrollView then
-  begin
-    jScrollView(FParent).Init(refApp);
-    FjPRLayout:= jScrollView_getView(FjEnv, jScrollView(FParent).jSelf);
-  end;
-  if FParent is jHorizontalScrollView then
-  begin
-    jHorizontalScrollView(FParent).Init(refApp);
-    FjPRLayout:= jHorizontalScrollView_getView(FjEnv, jHorizontalScrollView(FParent).jSelf);
+    TryNewParent(refApp);
   end;
 
-  if FParent is jCustomDialog then
-  begin
-    jCustomDialog(FParent).Init(refApp);
-    FjPRLayout:= jCustomDialog(FParent).View;
-  end;
+  FjPRLayoutHome:= FjPRLayout;
 
-  if FParent is jRadioGroup then
-  begin
-    jRadioGroup(FParent).Init(refApp);
-    //FjPRLayout:= jRadioGroup(FParent).View;
-    FjPRLayout:= jRadioGroup_GetView(FjEnv, jRadioGroup(FParent).jSelf);
-    flag:= True;
-  end;
-
-  if FParent is jToolbar then
-  begin
-    jToolbar(FParent).Init(refApp);
-    FjPRLayout:= jToolbar(FParent).View;
-  end;
+  if FGravityInParent <> lgNone then
+     jRadioButton_SetFrameGravity(FjEnv, FjObject, Ord(FGravityInParent));
 
   if not flag then
   begin
@@ -5137,6 +5725,12 @@ begin
   FjPRLayout:= Value;
   if FInitialized then
     jRadioButton_setParent(FjEnv, FjObject , FjPRLayout);
+end;
+
+procedure jRadioButton.RemoveFromViewParent;
+begin
+if FInitialized then
+   jRadioButton_RemoveFromViewParent(FjEnv, FjObject);
 end;
 
 Procedure jRadioButton.SetColor(Value: TARGBColorBridge);
@@ -5304,6 +5898,14 @@ begin
   end;
 end;
 
+procedure jRadioButton.SetLGravity(_value: TLayoutGravity);
+begin
+  //in designing component state: set value here...
+  FGravityInParent:=  _value;
+  if FInitialized then
+     jRadioButton_SetFrameGravity(FjEnv, FjObject, Ord(FGravityInParent) );
+end;
+
 //------------------------------------------------------------------------------
 // jProgressBar
 //------------------------------------------------------------------------------
@@ -5341,6 +5943,96 @@ begin
    inherited Destroy;
 end;
 
+procedure jProgressBar.TryNewParent(refApp: jApp);
+begin
+  if FParent is jPanel then
+  begin
+    jPanel(FParent).Init(refApp);
+    FjPRLayout:= jPanel(FParent).View;
+  end else
+  if FParent is jScrollView then
+  begin
+    jScrollView(FParent).Init(refApp);
+    FjPRLayout:= jScrollView_getView(FjEnv, jScrollView(FParent).jSelf);
+  end else
+  if FParent is jHorizontalScrollView then
+  begin
+    jHorizontalScrollView(FParent).Init(refApp);
+    FjPRLayout:= jHorizontalScrollView_getView(FjEnv, jHorizontalScrollView(FParent).jSelf);
+  end  else
+  if FParent is jCustomDialog then
+  begin
+    jCustomDialog(FParent).Init(refApp);
+    FjPRLayout:= jCustomDialog(FParent).View;
+  end else
+  if FParent is jViewFlipper then
+  begin
+    jViewFlipper(FParent).Init(refApp);
+    FjPRLayout:= jViewFlipper(FParent).View;
+  end else
+  if FParent is jToolbar then
+  begin
+    jToolbar(FParent).Init(refApp);
+    FjPRLayout:= jToolbar(FParent).View;
+  end  else
+  if FParent is jsToolbar then
+  begin
+    jsToolbar(FParent).Init(refApp);
+    FjPRLayout:= jsToolbar(FParent).View;
+  end  else
+  if FParent is jsCoordinatorLayout then
+  begin
+    jsCoordinatorLayout(FParent).Init(refApp);
+    FjPRLayout:= jsCoordinatorLayout(FParent).View;
+  end else
+  if FParent is jFrameLayout then
+  begin
+    jFrameLayout(FParent).Init(refApp);
+    FjPRLayout:= jFrameLayout(FParent).View;
+  end else
+  if FParent is jLinearLayout then
+  begin
+    jLinearLayout(FParent).Init(refApp);
+    FjPRLayout:= jLinearLayout(FParent).View;
+  end else
+  if FParent is jsDrawerLayout then
+  begin
+    jsDrawerLayout(FParent).Init(refApp);
+    FjPRLayout:= jsDrawerLayout(FParent).View;
+  end  else
+  if FParent is jsCardView then
+  begin
+      jsCardView(FParent).Init(refApp);
+      FjPRLayout:= jsCardView(FParent).View;
+  end else
+  if FParent is jsAppBarLayout then
+  begin
+      jsAppBarLayout(FParent).Init(refApp);
+      FjPRLayout:= jsAppBarLayout(FParent).View;
+  end else
+  if FParent is jsTabLayout then
+  begin
+      jsTabLayout(FParent).Init(refApp);
+      FjPRLayout:= jsTabLayout(FParent).View;
+  end else
+  if FParent is jsCollapsingToolbarLayout then
+  begin
+      jsCollapsingToolbarLayout(FParent).Init(refApp);
+      FjPRLayout:= jsCollapsingToolbarLayout(FParent).View;
+  end else
+  if FParent is jsNestedScrollView then
+  begin
+      jsNestedScrollView(FParent).Init(refApp);
+      FjPRLayout:= jsNestedScrollView(FParent).View;
+  end else
+  if FParent is jsViewPager then
+  begin
+      jsViewPager(FParent).Init(refApp);
+      FjPRLayout:= jsViewPager(FParent).View;
+  end;
+end;
+
+
 Procedure jProgressBar.Init(refApp: jApp);
 var
   rToP: TPositionRelativeToParent;
@@ -5349,34 +6041,16 @@ begin
   if FInitialized  then Exit;
   inherited Init(refApp);
   FjObject := jProgressBar_Create(FjEnv, FjThis, Self, GetProgressBarStyle(FStyle));
+
   if FParent <> nil then
   begin
-    if FParent is jPanel then
-    begin
-      jPanel(FParent).Init(refApp);
-      FjPRLayout:= jPanel(FParent).View;
-    end;
-    if FParent is jScrollView then
-    begin
-      jScrollView(FParent).Init(refApp);
-      FjPRLayout:= jScrollView_getView(FjEnv, jScrollView(FParent).jSelf);
-    end;
-    if FParent is jHorizontalScrollView then
-    begin
-      jHorizontalScrollView(FParent).Init(refApp);
-      FjPRLayout:= jHorizontalScrollView_getView(FjEnv, jHorizontalScrollView(FParent).jSelf);
-    end;
-    if FParent is jCustomDialog then
-    begin
-      jCustomDialog(FParent).Init(refApp);
-      FjPRLayout:= jCustomDialog(FParent).View;
-    end;
-    if FParent is jToolbar then
-    begin
-      jToolbar(FParent).Init(refApp);
-      FjPRLayout:= jToolbar(FParent).View;
-    end;
+    TryNewParent(refApp);
   end;
+
+  FjPRLayoutHome:= FjPRLayout;
+
+  if FGravityInParent <> lgNone then
+     jProgressBar_SetFrameGravity(FjEnv, FjObject, Ord(FGravityInParent));
 
   jProgressBar_setParent(FjEnv, FjObject , FjPRLayout);
   jProgressBar_setId(FjEnv, FjObject , Self.Id);
@@ -5424,6 +6098,12 @@ begin
   FjPRLayout:= Value;
   if FInitialized then
      jProgressBar_setParent(FjEnv, FjObject , FjPRLayout);
+end;
+
+procedure jProgressBar.RemoveFromViewParent;
+begin
+//if FInitialized then
+  // jProgressBar_RemoveFromViewParent(FjEnv, FjObject);
 end;
 
 procedure jProgressBar.Stop;
@@ -5550,6 +6230,14 @@ begin
   end;
 end;
 
+procedure jProgressBar.SetLGravity(_value: TLayoutGravity);
+begin
+  //in designing component state: set value here...
+  FGravityInParent:=  _value;
+  if FInitialized then
+     jProgressBar_SetFrameGravity(FjEnv, FjObject, Ord(FGravityInParent) );
+end;
+
 //------------------------------------------------------------------------------
 // jImageView
 //------------------------------------------------------------------------------
@@ -5582,6 +6270,96 @@ begin
    inherited Destroy;
 end;
 
+procedure jImageView.TryNewParent(refApp: jApp);
+begin
+  if FParent is jPanel then
+  begin
+    jPanel(FParent).Init(refApp);
+    FjPRLayout:= jPanel(FParent).View;
+  end else
+  if FParent is jScrollView then
+  begin
+    jScrollView(FParent).Init(refApp);
+    FjPRLayout:= jScrollView_getView(FjEnv, jScrollView(FParent).jSelf);
+  end else
+  if FParent is jHorizontalScrollView then
+  begin
+    jHorizontalScrollView(FParent).Init(refApp);
+    FjPRLayout:= jHorizontalScrollView_getView(FjEnv, jHorizontalScrollView(FParent).jSelf);
+  end  else
+  if FParent is jCustomDialog then
+  begin
+    jCustomDialog(FParent).Init(refApp);
+    FjPRLayout:= jCustomDialog(FParent).View;
+  end else
+  if FParent is jViewFlipper then
+  begin
+    jViewFlipper(FParent).Init(refApp);
+    FjPRLayout:= jViewFlipper(FParent).View;
+  end else
+  if FParent is jToolbar then
+  begin
+    jToolbar(FParent).Init(refApp);
+    FjPRLayout:= jToolbar(FParent).View;
+  end  else
+  if FParent is jsToolbar then
+  begin
+    jsToolbar(FParent).Init(refApp);
+    FjPRLayout:= jsToolbar(FParent).View;
+  end  else
+  if FParent is jsCoordinatorLayout then
+  begin
+    jsCoordinatorLayout(FParent).Init(refApp);
+    FjPRLayout:= jsCoordinatorLayout(FParent).View;
+  end else
+  if FParent is jFrameLayout then
+  begin
+    jFrameLayout(FParent).Init(refApp);
+    FjPRLayout:= jFrameLayout(FParent).View;
+  end else
+  if FParent is jLinearLayout then
+  begin
+    jLinearLayout(FParent).Init(refApp);
+    FjPRLayout:= jLinearLayout(FParent).View;
+  end else
+  if FParent is jsDrawerLayout then
+  begin
+    jsDrawerLayout(FParent).Init(refApp);
+    FjPRLayout:= jsDrawerLayout(FParent).View;
+  end  else
+  if FParent is jsCardView then
+  begin
+      jsCardView(FParent).Init(refApp);
+      FjPRLayout:= jsCardView(FParent).View;
+  end else
+  if FParent is jsAppBarLayout then
+  begin
+      jsAppBarLayout(FParent).Init(refApp);
+      FjPRLayout:= jsAppBarLayout(FParent).View;
+  end else
+  if FParent is jsTabLayout then
+  begin
+      jsTabLayout(FParent).Init(refApp);
+      FjPRLayout:= jsTabLayout(FParent).View;
+  end else
+  if FParent is jsCollapsingToolbarLayout then
+  begin
+      jsCollapsingToolbarLayout(FParent).Init(refApp);
+      FjPRLayout:= jsCollapsingToolbarLayout(FParent).View;
+  end else
+  if FParent is jsNestedScrollView then
+  begin
+      jsNestedScrollView(FParent).Init(refApp);
+      FjPRLayout:= jsNestedScrollView(FParent).View;
+  end else
+  if FParent is jsViewPager then
+  begin
+      jsViewPager(FParent).Init(refApp);
+      FjPRLayout:= jsViewPager(FParent).View;
+  end;
+end;
+
+
 Procedure jImageView.Init(refApp: jApp);
 var
   rToP: TPositionRelativeToParent;
@@ -5593,38 +6371,15 @@ begin
   FjObject := jImageView_Create(FjEnv, FjThis, Self);
   FInitialized:= True;
 
-  if FParent is jPanel then
+  if FParent <> nil then
   begin
-    jPanel(FParent).Init(refApp);
-    FjPRLayout:= jPanel(FParent).View;
-  end;
-  if FParent is jScrollView then
-  begin
-    jScrollView(FParent).Init(refApp);
-    FjPRLayout:= jScrollView_getView(FjEnv, jScrollView(FParent).jSelf);//jScrollView(FParent).View;
-  end;
-  if FParent is jHorizontalScrollView then
-  begin
-    jHorizontalScrollView(FParent).Init(refApp);
-    FjPRLayout:= jHorizontalScrollView_getView(FjEnv, jHorizontalScrollView(FParent).jSelf);//jHorizontalScrollView(FParent).View;
-  end;
-  if FParent is jCustomDialog then
-  begin
-    jCustomDialog(FParent).Init(refApp);
-    FjPRLayout:= jCustomDialog(FParent).View;
+    TryNewParent(refApp);
   end;
 
-  if FParent is jViewFlipper then
-  begin
-    jViewFlipper(FParent).Init(refApp);
-    FjPRLayout:= jViewFlipper(FParent).View;
-  end;
+  FjPRLayoutHome:= FjPRLayout;
 
-  if FParent is jToolbar then
-  begin
-    jToolbar(FParent).Init(refApp);
-    FjPRLayout:= jToolbar(FParent).View;
-  end;
+  if FGravityInParent <> lgNone then
+     jImageView_SetFrameGravity(FjEnv, FjObject, Ord(FGravityInParent));
 
   jImageView_setParent(FjEnv,FjObject , FjPRLayout);
   jImageView_setId(FjEnv, FjObject , Self.Id);
@@ -5682,6 +6437,19 @@ begin
   FjPRLayout:= Value;
   if FInitialized then
     jImageView_setParent(FjEnv,FjObject , FjPRLayout);
+end;
+
+procedure jImageView.RemoveFromViewParent;
+begin
+if FInitialized then
+   jImageView_RemoveFromViewParent(FjEnv, FjObject);
+end;
+
+procedure jImageView.ResetViewParent();
+begin
+  FjPRLayout:= FjPRLayoutHome;
+  if FInitialized then
+     jImageView_setParent(FjEnv, FjObject, FjPRLayout);
 end;
 
 Procedure jImageView.SetColor(Value: TARGBColorBridge);
@@ -6039,8 +6807,50 @@ begin
      jImageView_SetRadiusRoundCorner(FjEnv, FjObject, _radius);
 end;
 
+procedure jImageView.SetLGravity(_value: TLayoutGravity);
+begin
+  //in designing component state: set value here...
+  FGravityInParent:=  _value;
+  if FInitialized then
+     jImageView_SetFrameGravity(FjEnv, FjObject, Ord(FGravityInParent) );
+end;
 
-{jImageList}
+procedure jImageView.SetCollapseMode(_collapsemode: TCollapsingMode);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jImageView_SetCollapseMode(FjEnv, FjObject, Ord(_collapsemode) );
+end;
+
+procedure jImageView.SetFitsSystemWindows(_value: boolean);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jImageView_SetFitsSystemWindows(FjEnv, FjObject, _value);
+end;
+
+procedure jImageView.SetScrollFlag(_collapsingScrollFlag: TCollapsingScrollflag);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jImageView_SetScrollFlag(FjEnv, FjObject, Ord(_collapsingScrollFlag));
+end;
+
+procedure jImageView.BringToFront();
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jImageView_BringToFront(FjEnv, FjObject);
+end;
+
+procedure jImageView.SetVisibilityGone();
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jImageView_SetVisibilityGone(FjEnv, FjObject);
+end;
+
+  { jImageList }
 
 constructor jImageList.Create(AOwner: TComponent);
 begin
@@ -6847,7 +7657,7 @@ begin
 end;
 
 //------------------------------------------------------------------------------
-// jListlView
+// jListView
 //------------------------------------------------------------------------------
 
 constructor jListView.Create(AOwner: TComponent);
@@ -6857,7 +7667,7 @@ begin
   FWidgetItem:= wgNone;
   FDelimiter:= '|';
   FTextDecorated:= txtNormal;
-  FItemLayout:= layText;  //layImageTextWidget;
+  FItemLayout:= layText;
   FTextSizeDecorated:= sdNone;
   FTextAlign:= alLeft;
   FItems:= TStringList.Create;
@@ -6890,6 +7700,95 @@ begin
   end;
   FItems.Free;
   inherited Destroy;
+end;
+
+procedure jListView.TryNewParent(refApp: jApp);
+begin
+  if FParent is jPanel then
+  begin
+    jPanel(FParent).Init(refApp);
+    FjPRLayout:= jPanel(FParent).View;
+  end else
+  if FParent is jScrollView then
+  begin
+    jScrollView(FParent).Init(refApp);
+    FjPRLayout:= jScrollView_getView(FjEnv, jScrollView(FParent).jSelf);
+  end else
+  if FParent is jHorizontalScrollView then
+  begin
+    jHorizontalScrollView(FParent).Init(refApp);
+    FjPRLayout:= jHorizontalScrollView_getView(FjEnv, jHorizontalScrollView(FParent).jSelf);
+  end  else
+  if FParent is jCustomDialog then
+  begin
+    jCustomDialog(FParent).Init(refApp);
+    FjPRLayout:= jCustomDialog(FParent).View;
+  end else
+  if FParent is jViewFlipper then
+  begin
+    jViewFlipper(FParent).Init(refApp);
+    FjPRLayout:= jViewFlipper(FParent).View;
+  end else
+  if FParent is jToolbar then
+  begin
+    jToolbar(FParent).Init(refApp);
+    FjPRLayout:= jToolbar(FParent).View;
+  end  else
+  if FParent is jsToolbar then
+  begin
+    jsToolbar(FParent).Init(refApp);
+    FjPRLayout:= jsToolbar(FParent).View;
+  end  else
+  if FParent is jsCoordinatorLayout then
+  begin
+    jsCoordinatorLayout(FParent).Init(refApp);
+    FjPRLayout:= jsCoordinatorLayout(FParent).View;
+  end else
+  if FParent is jFrameLayout then
+  begin
+    jFrameLayout(FParent).Init(refApp);
+    FjPRLayout:= jFrameLayout(FParent).View;
+  end else
+  if FParent is jLinearLayout then
+  begin
+    jLinearLayout(FParent).Init(refApp);
+    FjPRLayout:= jLinearLayout(FParent).View;
+  end else
+  if FParent is jsDrawerLayout then
+  begin
+    jsDrawerLayout(FParent).Init(refApp);
+    FjPRLayout:= jsDrawerLayout(FParent).View;
+  end  else
+  if FParent is jsCardView then
+  begin
+      jsCardView(FParent).Init(refApp);
+      FjPRLayout:= jsCardView(FParent).View;
+  end else
+  if FParent is jsAppBarLayout then
+  begin
+      jsAppBarLayout(FParent).Init(refApp);
+      FjPRLayout:= jsAppBarLayout(FParent).View;
+  end else
+  if FParent is jsTabLayout then
+  begin
+      jsTabLayout(FParent).Init(refApp);
+      FjPRLayout:= jsTabLayout(FParent).View;
+  end else
+  if FParent is jsCollapsingToolbarLayout then
+  begin
+      jsCollapsingToolbarLayout(FParent).Init(refApp);
+      FjPRLayout:= jsCollapsingToolbarLayout(FParent).View;
+  end else
+  if FParent is jsNestedScrollView then
+  begin
+      jsNestedScrollView(FParent).Init(refApp);
+      FjPRLayout:= jsNestedScrollView(FParent).View;
+  end else
+  if FParent is jsViewPager then
+  begin
+      jsViewPager(FParent).Init(refApp);
+      FjPRLayout:= jsViewPager(FParent).View;
+  end;
 end;
 
 procedure jListView.Init(refApp: jApp);
@@ -6982,32 +7881,10 @@ begin
 
   if FParent <> nil then
   begin
-    if FParent is jPanel then
-    begin
-      jPanel(FParent).Init(refApp);
-      FjPRLayout:= jPanel(FParent).View;
-    end;
-    if FParent is jScrollView then
-    begin
-      jScrollView(FParent).Init(refApp);
-      FjPRLayout:= jScrollView_getView(FjEnv, jScrollView(FParent).jSelf);
-    end;
-    if FParent is jHorizontalScrollView then
-    begin
-      jHorizontalScrollView(FParent).Init(refApp);
-      FjPRLayout:= jHorizontalScrollView_getView(FjEnv, jHorizontalScrollView(FParent).jSelf);
-    end;
-    if FParent is jCustomDialog then
-    begin
-      jCustomDialog(FParent).Init(refApp);
-      FjPRLayout:= jCustomDialog(FParent).View;
-    end;
-    if FParent is jToolbar then
-    begin
-      jToolbar(FParent).Init(refApp);
-      FjPRLayout:= jToolbar(FParent).View;
-    end;
+    TryNewParent(refApp);
   end;
+
+  FjPRLayoutHome:= FjPRLayout;
 
   jListView_setParent(FjEnv, FjObject , FjPRLayout);
   jListView_setId(FjEnv, FjObject , Self.Id);
@@ -7126,6 +8003,19 @@ begin
   FjPRLayout:= Value;
   if FInitialized then
     jListView_setParent(FjEnv, FjObject , FjPRLayout);
+end;
+
+procedure jListView.RemoveFromViewParent;
+begin
+ if FInitialized then
+   jListView_RemoveFromViewParent(FjEnv, FjObject);
+end;
+
+procedure jListView.ResetViewParent();
+begin
+  FjPRLayout:= FjPRLayoutHome;
+  if FInitialized then
+     jListView_setParent(FjEnv, FjObject, FjPRLayout);
 end;
 
 Procedure jListView.SetColor (Value: TARGBColorBridge);
@@ -7272,7 +8162,6 @@ begin
   end; }
 end;
 
-
 procedure jListView.UpdateLParamWidth;
 var
   side: TSide;
@@ -7352,6 +8241,20 @@ begin
        Value.FreeNotification(self);
     end;
   end;
+end;
+
+procedure jListView.BringToFront();
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jListView_BringToFront(FjEnv, FjObject);
+end;
+
+procedure jListView.SetVisibilityGone();
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jListView_SetVisibilityGone(FjEnv, FjObject);
 end;
 
 // Event : Java -> Pascal
@@ -7712,6 +8615,13 @@ begin
    Result:= jListView_GetCheckedItemPosition(FjEnv, FjObject);
 end;
 
+procedure jListView.SetFitsSystemWindows(_value: boolean);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jListView_SetFitsSystemWindows(FjEnv, FjObject, _value);
+end;
+
 //------------------------------------------------------------------------------
 // jScrollView
 //------------------------------------------------------------------------------
@@ -7742,6 +8652,96 @@ begin
   inherited Destroy;
 end;
 
+procedure jScrollView.TryNewParent(refApp: jApp);
+begin
+  if FParent is jPanel then
+  begin
+    jPanel(FParent).Init(refApp);
+    FjPRLayout:= jPanel(FParent).View;
+  end else
+  if FParent is jScrollView then
+  begin
+    jScrollView(FParent).Init(refApp);
+    FjPRLayout:= jScrollView_getView(FjEnv, jScrollView(FParent).jSelf);
+  end else
+  if FParent is jHorizontalScrollView then
+  begin
+    jHorizontalScrollView(FParent).Init(refApp);
+    FjPRLayout:= jHorizontalScrollView_getView(FjEnv, jHorizontalScrollView(FParent).jSelf);
+  end  else
+  if FParent is jCustomDialog then
+  begin
+    jCustomDialog(FParent).Init(refApp);
+    FjPRLayout:= jCustomDialog(FParent).View;
+  end else
+  if FParent is jViewFlipper then
+  begin
+    jViewFlipper(FParent).Init(refApp);
+    FjPRLayout:= jViewFlipper(FParent).View;
+  end else
+  if FParent is jToolbar then
+  begin
+    jToolbar(FParent).Init(refApp);
+    FjPRLayout:= jToolbar(FParent).View;
+  end  else
+  if FParent is jsToolbar then
+  begin
+    jsToolbar(FParent).Init(refApp);
+    FjPRLayout:= jsToolbar(FParent).View;
+  end  else
+  if FParent is jsCoordinatorLayout then
+  begin
+    jsCoordinatorLayout(FParent).Init(refApp);
+    FjPRLayout:= jsCoordinatorLayout(FParent).View;
+  end else
+  if FParent is jFrameLayout then
+  begin
+    jFrameLayout(FParent).Init(refApp);
+    FjPRLayout:= jFrameLayout(FParent).View;
+  end else
+  if FParent is jLinearLayout then
+  begin
+    jLinearLayout(FParent).Init(refApp);
+    FjPRLayout:= jLinearLayout(FParent).View;
+  end else
+  if FParent is jsDrawerLayout then
+  begin
+    jsDrawerLayout(FParent).Init(refApp);
+    FjPRLayout:= jsDrawerLayout(FParent).View;
+  end  else
+  if FParent is jsCardView then
+  begin
+      jsCardView(FParent).Init(refApp);
+      FjPRLayout:= jsCardView(FParent).View;
+  end else
+  if FParent is jsAppBarLayout then
+  begin
+      jsAppBarLayout(FParent).Init(refApp);
+      FjPRLayout:= jsAppBarLayout(FParent).View;
+  end else
+  if FParent is jsTabLayout then
+  begin
+      jsTabLayout(FParent).Init(refApp);
+      FjPRLayout:= jsTabLayout(FParent).View;
+  end else
+  if FParent is jsCollapsingToolbarLayout then
+  begin
+      jsCollapsingToolbarLayout(FParent).Init(refApp);
+      FjPRLayout:= jsCollapsingToolbarLayout(FParent).View;
+  end else
+  if FParent is jsNestedScrollView then
+  begin
+      jsNestedScrollView(FParent).Init(refApp);
+      FjPRLayout:= jsNestedScrollView(FParent).View;
+  end else
+  if FParent is jsViewPager then
+  begin
+      jsViewPager(FParent).Init(refApp);
+      FjPRLayout:= jsViewPager(FParent).View;
+  end;
+end;
+
+
 Procedure jScrollView.Init(refApp: jApp);
 var
   rToP: TPositionRelativeToParent;
@@ -7756,32 +8756,11 @@ begin
 
   if FParent <> nil then
   begin
-    if FParent is jPanel then
-    begin
-      jPanel(FParent).Init(refApp);
-      FjPRLayout:= jPanel(FParent).View;
-    end;
-    if FParent is jScrollView then
-    begin
-      jScrollView(FParent).Init(refApp);
-      FjPRLayout:=  jScrollView_getView(FjEnv, jScrollView(FParent).jSelf); //jScrollView(FParent).View;
-    end;
-    if FParent is jHorizontalScrollView then
-    begin
-      jHorizontalScrollView(FParent).Init(refApp);
-      FjPRLayout:= jHorizontalScrollView_getView(FjEnv, jHorizontalScrollView(FParent).jSelf);
-    end;
-    if FParent is jCustomDialog then
-    begin
-      jCustomDialog(FParent).Init(refApp);
-      FjPRLayout:= jCustomDialog(FParent).View;
-    end;
-    if FParent is jToolbar then
-    begin
-      jToolbar(FParent).Init(refApp);
-      FjPRLayout:= jToolbar(FParent).View;
-    end;
+    TryNewParent(refApp);
   end;
+
+  FjPRLayoutHome:= FjPRLayout;
+
   jScrollView_setParent(FjEnv, FjObject , FjPRLayout);
   jScrollView_setId(FjEnv, FjObject , Self.Id);
   jScrollView_setLeftTopRightBottomWidthHeight(FjEnv, FjObject ,
@@ -7832,18 +8811,17 @@ begin
     jScrollView_setParent(FjEnv, FjObject , FjPRLayout);
 end;
 
+procedure jScrollView.RemoveFromViewParent;
+begin
+//if FInitialized then
+  // jScrollView_RemoveFromViewParent(FjEnv, FjObject);
+end;
+
 function jScrollView.GetView: jObject;
 begin
     if FInitialized then
        Result:= jScrollView_getView(FjEnv, FjObject);
 end;
-
-(* TODO
-procedure jScrollView.SetParamWidth(Value: TLayoutParams);
-begin
-  //
-end;
-*)
 
 Procedure jScrollView.SetColor(Value: TARGBColorBridge);
 begin
@@ -8002,8 +8980,6 @@ begin
    if Assigned(FOnScrollChanged) then FOnScrollChanged(Obj,currHor,currVerti,prevHor,prevVertical,TScrollPosition(onPosition), scrolldiff);
 end;
 
-//--------
-
 //------------------------------------------------------------------------------
 // jHorizontalScrollView
 // LORDMAN 2013-09-03
@@ -8018,7 +8994,6 @@ Constructor jHorizontalScrollView.Create(AOwner: TComponent);
   FLParamHeight:= lpWrapContent;
   FHeight:= 96;
   FWidth:= 100;
-  //FAcceptChildsAtDesignTime:= True;
   FAcceptChildrenAtDesignTime:= True;
  end;
 
@@ -8035,6 +9010,95 @@ begin
   inherited Destroy;
 end;
 
+procedure jHorizontalScrollView.TryNewParent(refApp: jApp);
+begin
+  if FParent is jPanel then
+  begin
+    jPanel(FParent).Init(refApp);
+    FjPRLayout:= jPanel(FParent).View;
+  end else
+  if FParent is jScrollView then
+  begin
+    jScrollView(FParent).Init(refApp);
+    FjPRLayout:= jScrollView_getView(FjEnv, jScrollView(FParent).jSelf);
+  end else
+  if FParent is jHorizontalScrollView then
+  begin
+    jHorizontalScrollView(FParent).Init(refApp);
+    FjPRLayout:= jHorizontalScrollView_getView(FjEnv, jHorizontalScrollView(FParent).jSelf);
+  end  else
+  if FParent is jCustomDialog then
+  begin
+    jCustomDialog(FParent).Init(refApp);
+    FjPRLayout:= jCustomDialog(FParent).View;
+  end else
+  if FParent is jViewFlipper then
+  begin
+    jViewFlipper(FParent).Init(refApp);
+    FjPRLayout:= jViewFlipper(FParent).View;
+  end else
+  if FParent is jToolbar then
+  begin
+    jToolbar(FParent).Init(refApp);
+    FjPRLayout:= jToolbar(FParent).View;
+  end  else
+  if FParent is jsToolbar then
+  begin
+    jsToolbar(FParent).Init(refApp);
+    FjPRLayout:= jsToolbar(FParent).View;
+  end  else
+  if FParent is jsCoordinatorLayout then
+  begin
+    jsCoordinatorLayout(FParent).Init(refApp);
+    FjPRLayout:= jsCoordinatorLayout(FParent).View;
+  end else
+  if FParent is jFrameLayout then
+  begin
+    jFrameLayout(FParent).Init(refApp);
+    FjPRLayout:= jFrameLayout(FParent).View;
+  end else
+  if FParent is jLinearLayout then
+  begin
+    jLinearLayout(FParent).Init(refApp);
+    FjPRLayout:= jLinearLayout(FParent).View;
+  end else
+  if FParent is jsDrawerLayout then
+  begin
+    jsDrawerLayout(FParent).Init(refApp);
+    FjPRLayout:= jsDrawerLayout(FParent).View;
+  end  else
+  if FParent is jsCardView then
+  begin
+      jsCardView(FParent).Init(refApp);
+      FjPRLayout:= jsCardView(FParent).View;
+  end else
+  if FParent is jsAppBarLayout then
+  begin
+      jsAppBarLayout(FParent).Init(refApp);
+      FjPRLayout:= jsAppBarLayout(FParent).View;
+  end else
+  if FParent is jsTabLayout then
+  begin
+      jsTabLayout(FParent).Init(refApp);
+      FjPRLayout:= jsTabLayout(FParent).View;
+  end else
+  if FParent is jsCollapsingToolbarLayout then
+  begin
+      jsCollapsingToolbarLayout(FParent).Init(refApp);
+      FjPRLayout:= jsCollapsingToolbarLayout(FParent).View;
+  end else
+  if FParent is jsNestedScrollView then
+  begin
+      jsNestedScrollView(FParent).Init(refApp);
+      FjPRLayout:= jsNestedScrollView(FParent).View;
+  end else
+  if FParent is jsViewPager then
+  begin
+      jsViewPager(FParent).Init(refApp);
+      FjPRLayout:= jsViewPager(FParent).View;
+  end;
+end;
+
 Procedure jHorizontalScrollView.Init(refApp: jApp);
 var
   rToP: TPositionRelativeToParent;
@@ -8047,36 +9111,11 @@ begin
 
   if FParent <> nil then
   begin
-    if FParent is jPanel then
-    begin
-      jPanel(FParent).Init(refApp);
-      FjPRLayout:= jPanel(FParent).View;
-    end;
-
-    if FParent is jScrollView then
-    begin
-      jScrollView(FParent).Init(refApp);
-      FjPRLayout:= jScrollView_getView(FjEnv, jScrollView(FParent).jSelf ) //jScrollView(FParent).View;
-    end;
-    if FParent is jHorizontalScrollView then
-    begin
-      jHorizontalScrollView(FParent).Init(refApp);
-      FjPRLayout:= jHorizontalScrollView_getView(FjEnv, jHorizontalScrollView(FParent).jSelf);
-    end;
-
-    if FParent is jCustomDialog then
-    begin
-      jCustomDialog(FParent).Init(refApp);
-      FjPRLayout:= jCustomDialog(FParent).View;
-    end;
-
-    if FParent is jToolbar then
-    begin
-      jToolbar(FParent).Init(refApp);
-      FjPRLayout:= jToolbar(FParent).View;
-    end;
-
+    TryNewParent(refApp);
   end;
+
+  FjPRLayoutHome:= FjPRLayout;
+
   jHorizontalScrollView_setParent(FjEnv, FjObject , FjPRLayout);
   jHorizontalScrollView_setId(FjEnv, FjObject , Self.Id);
   jHorizontalScrollView_setLeftTopRightBottomWidthHeight(FjEnv, FjObject ,
@@ -8113,6 +9152,12 @@ begin
   FjPRLayout:= Value;
   if FInitialized then
     jHorizontalScrollView_setParent(FjEnv, FjObject , FjPRLayout);
+end;
+
+procedure jHorizontalScrollView.RemoveFromViewParent;
+begin
+//if FInitialized then
+  // jHorizontalScrollView_RemoveFromViewParent(FjEnv, FjObject);
 end;
 
 function jHorizontalScrollView.GetView: jObject;
@@ -8298,6 +9343,95 @@ begin
   inherited Destroy;
 end;
 
+procedure jWebView.TryNewParent(refApp: jApp);
+begin
+  if FParent is jPanel then
+  begin
+    jPanel(FParent).Init(refApp);
+    FjPRLayout:= jPanel(FParent).View;
+  end else
+  if FParent is jScrollView then
+  begin
+    jScrollView(FParent).Init(refApp);
+    FjPRLayout:= jScrollView_getView(FjEnv, jScrollView(FParent).jSelf);
+  end else
+  if FParent is jHorizontalScrollView then
+  begin
+    jHorizontalScrollView(FParent).Init(refApp);
+    FjPRLayout:= jHorizontalScrollView_getView(FjEnv, jHorizontalScrollView(FParent).jSelf);
+  end  else
+  if FParent is jCustomDialog then
+  begin
+    jCustomDialog(FParent).Init(refApp);
+    FjPRLayout:= jCustomDialog(FParent).View;
+  end else
+  if FParent is jViewFlipper then
+  begin
+    jViewFlipper(FParent).Init(refApp);
+    FjPRLayout:= jViewFlipper(FParent).View;
+  end else
+  if FParent is jToolbar then
+  begin
+    jToolbar(FParent).Init(refApp);
+    FjPRLayout:= jToolbar(FParent).View;
+  end  else
+  if FParent is jsToolbar then
+  begin
+    jsToolbar(FParent).Init(refApp);
+    FjPRLayout:= jsToolbar(FParent).View;
+  end  else
+  if FParent is jsCoordinatorLayout then
+  begin
+    jsCoordinatorLayout(FParent).Init(refApp);
+    FjPRLayout:= jsCoordinatorLayout(FParent).View;
+  end else
+  if FParent is jFrameLayout then
+  begin
+    jFrameLayout(FParent).Init(refApp);
+    FjPRLayout:= jFrameLayout(FParent).View;
+  end else
+  if FParent is jLinearLayout then
+  begin
+    jLinearLayout(FParent).Init(refApp);
+    FjPRLayout:= jLinearLayout(FParent).View;
+  end else
+  if FParent is jsDrawerLayout then
+  begin
+    jsDrawerLayout(FParent).Init(refApp);
+    FjPRLayout:= jsDrawerLayout(FParent).View;
+  end  else
+  if FParent is jsCardView then
+  begin
+      jsCardView(FParent).Init(refApp);
+      FjPRLayout:= jsCardView(FParent).View;
+  end else
+  if FParent is jsAppBarLayout then
+  begin
+      jsAppBarLayout(FParent).Init(refApp);
+      FjPRLayout:= jsAppBarLayout(FParent).View;
+  end else
+  if FParent is jsTabLayout then
+  begin
+      jsTabLayout(FParent).Init(refApp);
+      FjPRLayout:= jsTabLayout(FParent).View;
+  end else
+  if FParent is jsCollapsingToolbarLayout then
+  begin
+      jsCollapsingToolbarLayout(FParent).Init(refApp);
+      FjPRLayout:= jsCollapsingToolbarLayout(FParent).View;
+  end else
+  if FParent is jsNestedScrollView then
+  begin
+      jsNestedScrollView(FParent).Init(refApp);
+      FjPRLayout:= jsNestedScrollView(FParent).View;
+  end else
+  if FParent is jsViewPager then
+  begin
+      jsViewPager(FParent).Init(refApp);
+      FjPRLayout:= jsViewPager(FParent).View;
+  end;
+end;
+
 procedure jWebView.Init(refApp: jApp);
 var
   rToP: TPositionRelativeToParent;
@@ -8306,34 +9440,14 @@ begin
   if FInitialized  then Exit;
   inherited Init(refApp);
   FjObject := jWebView_Create(FjEnv, FjThis, Self);
+
   if FParent <> nil then
   begin
-    if FParent is jPanel then
-    begin
-      jPanel(FParent).Init(refApp);
-      FjPRLayout:= jPanel(FParent).View;
-    end;
-    if FParent is jScrollView then
-    begin
-      jScrollView(FParent).Init(refApp);
-      FjPRLayout:= jScrollView_getView(FjEnv, jScrollView(FParent).jSelf);
-    end;
-    if FParent is jHorizontalScrollView then
-    begin
-      jHorizontalScrollView(FParent).Init(refApp);
-      FjPRLayout:= jHorizontalScrollView_getView(FjEnv, jHorizontalScrollView(FParent).jSelf )
-    end;
-    if FParent is jCustomDialog then
-    begin
-      jCustomDialog(FParent).Init(refApp);
-      FjPRLayout:= jCustomDialog(FParent).View;
-    end;
-    if FParent is jToolbar then
-    begin
-      jToolbar(FParent).Init(refApp);
-      FjPRLayout:= jToolbar(FParent).View;
-    end;
+    TryNewParent(refApp);
   end;
+
+  FjPRLayoutHome:= FjPRLayout;
+
   jWebView_setParent(FjEnv, FjObject , FjPRLayout);
   jWebView_setId(FjEnv, FjObject , Self.Id);
   jWebView_setLeftTopRightBottomWidthHeight(FjEnv, FjObject ,
@@ -8384,6 +9498,12 @@ begin
   FjPRLayout:= Value;
   if FInitialized then
     jWebView_setParent(FjEnv, FjObject , FjPRLayout);
+end;
+
+procedure jWebView.RemoveFromViewParent;
+begin
+//if FInitialized then
+  // jWebView_RemoveFromViewParent(FjEnv, FjObject);
 end;
 
 Procedure jWebView.SetColor(Value: TARGBColorBridge);
@@ -9109,7 +10229,6 @@ begin
      jCanvas_drawRoundRect(FjEnv, FjObject , _left, _top, _right, _bottom, _rx, _ry);
 end;
 
-
 Procedure jCanvas.DrawBitmap(bmp: jObject; b,l,r,t: integer);
 begin
   if FInitialized then
@@ -9122,7 +10241,6 @@ begin
      jCanvas_drawBitmap(FjEnv, FjObject ,bmp.GetJavaBitmap, b, l, r, t);
 end;
 
-
 Procedure jCanvas.DrawBitmap(bmp: jObject; x1, y1, size: integer; ratio: single);
 var
   r1, t1: integer;
@@ -9132,7 +10250,6 @@ begin
   if FInitialized then
     jCanvas_drawBitmap(FjEnv, FjObject , bmp, x1, y1, r1, t1);
 end;
-
 
 Procedure jCanvas.DrawBitmap(bmp: jBitmap; x1, y1, size: integer; ratio: single);
 var
@@ -9213,6 +10330,95 @@ begin
   inherited Destroy;
 end;
 
+procedure jView.TryNewParent(refApp: jApp);
+begin
+  if FParent is jPanel then
+  begin
+    jPanel(FParent).Init(refApp);
+    FjPRLayout:= jPanel(FParent).View;
+  end else
+  if FParent is jScrollView then
+  begin
+    jScrollView(FParent).Init(refApp);
+    FjPRLayout:= jScrollView_getView(FjEnv, jScrollView(FParent).jSelf);
+  end else
+  if FParent is jHorizontalScrollView then
+  begin
+    jHorizontalScrollView(FParent).Init(refApp);
+    FjPRLayout:= jHorizontalScrollView_getView(FjEnv, jHorizontalScrollView(FParent).jSelf);
+  end  else
+  if FParent is jCustomDialog then
+  begin
+    jCustomDialog(FParent).Init(refApp);
+    FjPRLayout:= jCustomDialog(FParent).View;
+  end else
+  if FParent is jViewFlipper then
+  begin
+    jViewFlipper(FParent).Init(refApp);
+    FjPRLayout:= jViewFlipper(FParent).View;
+  end else
+  if FParent is jToolbar then
+  begin
+    jToolbar(FParent).Init(refApp);
+    FjPRLayout:= jToolbar(FParent).View;
+  end  else
+  if FParent is jsToolbar then
+  begin
+    jsToolbar(FParent).Init(refApp);
+    FjPRLayout:= jsToolbar(FParent).View;
+  end  else
+  if FParent is jsCoordinatorLayout then
+  begin
+    jsCoordinatorLayout(FParent).Init(refApp);
+    FjPRLayout:= jsCoordinatorLayout(FParent).View;
+  end else
+  if FParent is jFrameLayout then
+  begin
+    jFrameLayout(FParent).Init(refApp);
+    FjPRLayout:= jFrameLayout(FParent).View;
+  end else
+  if FParent is jLinearLayout then
+  begin
+    jLinearLayout(FParent).Init(refApp);
+    FjPRLayout:= jLinearLayout(FParent).View;
+  end else
+  if FParent is jsDrawerLayout then
+  begin
+    jsDrawerLayout(FParent).Init(refApp);
+    FjPRLayout:= jsDrawerLayout(FParent).View;
+  end  else
+  if FParent is jsCardView then
+  begin
+      jsCardView(FParent).Init(refApp);
+      FjPRLayout:= jsCardView(FParent).View;
+  end else
+  if FParent is jsAppBarLayout then
+  begin
+      jsAppBarLayout(FParent).Init(refApp);
+      FjPRLayout:= jsAppBarLayout(FParent).View;
+  end else
+  if FParent is jsTabLayout then
+  begin
+      jsTabLayout(FParent).Init(refApp);
+      FjPRLayout:= jsTabLayout(FParent).View;
+  end else
+  if FParent is jsCollapsingToolbarLayout then
+  begin
+      jsCollapsingToolbarLayout(FParent).Init(refApp);
+      FjPRLayout:= jsCollapsingToolbarLayout(FParent).View;
+  end else
+  if FParent is jsNestedScrollView then
+  begin
+      jsNestedScrollView(FParent).Init(refApp);
+      FjPRLayout:= jsNestedScrollView(FParent).View;
+  end else
+  if FParent is jsViewPager then
+  begin
+      jsViewPager(FParent).Init(refApp);
+      FjPRLayout:= jsViewPager(FParent).View;
+  end;
+end;
+
 procedure jView.Init(refApp: jApp);
 var
   rToP: TPositionRelativeToParent;
@@ -9232,33 +10438,10 @@ begin
 
   if FParent <> nil then
   begin
-    if FParent is jPanel then
-    begin
-      jPanel(FParent).Init(refApp);
-      FjPRLayout:= jPanel(FParent).View;
-    end;
-    if FParent is jScrollView then
-    begin
-      jScrollView(FParent).Init(refApp);
-      FjPRLayout:= jScrollView_getView(FjEnv, jScrollView(FParent).jSelf);
-    end;
-    if FParent is jHorizontalScrollView then
-    begin
-      jHorizontalScrollView(FParent).Init(refApp);
-      FjPRLayout:= jHorizontalScrollView_getView(FjEnv, jHorizontalScrollView(FParent).jSelf);
-    end;
-    if FParent is jCustomDialog then
-    begin
-      jCustomDialog(FParent).Init(refApp);
-      FjPRLayout:= jCustomDialog(FParent).View;
-    end;
-    if FParent is jToolbar then
-    begin
-      jToolbar(FParent).Init(refApp);
-      FjPRLayout:= jToolbar(FParent).View;
-    end;
+    TryNewParent(refApp);
   end;
 
+  FjPRLayoutHome:= FjPRLayout;
   jView_setParent(FjEnv,FjObject , FjPRLayout);
 
   jView_setId(FjEnv, FjObject , Self.Id);
@@ -9300,6 +10483,13 @@ begin
   if FInitialized then
     jView_setParent(FjEnv,FjObject , FjPRLayout);
 end;
+
+procedure jView.RemoveFromViewParent;
+begin
+//if FInitialized then
+  // jView_RemoveFromViewParent(FjEnv, FjObject);
+end;
+
 
 Procedure jView.SetColor(Value: TARGBColorBridge);
 begin
@@ -9506,9 +10696,10 @@ end;
 
 Procedure jTimer.SetEnabled(Value: boolean);
 begin
-  FEnabled:= Value;
+  FEnabled:= False;
+  if not (csDesigning in ComponentState) then FEnabled:= Value;
   if FInitialized then
-     jTimer_SetEnabled(FjEnv, FjObject , FEnabled);
+     jTimer_SetEnabled(FjEnv, FjObject , Value);
 end;
 
 Procedure jTimer.SetInterval(Value: integer);
@@ -9728,6 +10919,95 @@ Destructor jImageBtn.Destroy;
   inherited Destroy;
 end;
 
+procedure jImageBtn.TryNewParent(refApp: jApp);
+begin
+  if FParent is jPanel then
+  begin
+    jPanel(FParent).Init(refApp);
+    FjPRLayout:= jPanel(FParent).View;
+  end else
+  if FParent is jScrollView then
+  begin
+    jScrollView(FParent).Init(refApp);
+    FjPRLayout:= jScrollView_getView(FjEnv, jScrollView(FParent).jSelf);
+  end else
+  if FParent is jHorizontalScrollView then
+  begin
+    jHorizontalScrollView(FParent).Init(refApp);
+    FjPRLayout:= jHorizontalScrollView_getView(FjEnv, jHorizontalScrollView(FParent).jSelf);
+  end  else
+  if FParent is jCustomDialog then
+  begin
+    jCustomDialog(FParent).Init(refApp);
+    FjPRLayout:= jCustomDialog(FParent).View;
+  end else
+  if FParent is jViewFlipper then
+  begin
+    jViewFlipper(FParent).Init(refApp);
+    FjPRLayout:= jViewFlipper(FParent).View;
+  end else
+  if FParent is jToolbar then
+  begin
+    jToolbar(FParent).Init(refApp);
+    FjPRLayout:= jToolbar(FParent).View;
+  end  else
+  if FParent is jsToolbar then
+  begin
+    jsToolbar(FParent).Init(refApp);
+    FjPRLayout:= jsToolbar(FParent).View;
+  end  else
+  if FParent is jsCoordinatorLayout then
+  begin
+    jsCoordinatorLayout(FParent).Init(refApp);
+    FjPRLayout:= jsCoordinatorLayout(FParent).View;
+  end else
+  if FParent is jFrameLayout then
+  begin
+    jFrameLayout(FParent).Init(refApp);
+    FjPRLayout:= jFrameLayout(FParent).View;
+  end else
+  if FParent is jLinearLayout then
+  begin
+    jLinearLayout(FParent).Init(refApp);
+    FjPRLayout:= jLinearLayout(FParent).View;
+  end else
+  if FParent is jsDrawerLayout then
+  begin
+    jsDrawerLayout(FParent).Init(refApp);
+    FjPRLayout:= jsDrawerLayout(FParent).View;
+  end  else
+  if FParent is jsCardView then
+  begin
+      jsCardView(FParent).Init(refApp);
+      FjPRLayout:= jsCardView(FParent).View;
+  end else
+  if FParent is jsAppBarLayout then
+  begin
+      jsAppBarLayout(FParent).Init(refApp);
+      FjPRLayout:= jsAppBarLayout(FParent).View;
+  end else
+  if FParent is jsTabLayout then
+  begin
+      jsTabLayout(FParent).Init(refApp);
+      FjPRLayout:= jsTabLayout(FParent).View;
+  end else
+  if FParent is jsCollapsingToolbarLayout then
+  begin
+      jsCollapsingToolbarLayout(FParent).Init(refApp);
+      FjPRLayout:= jsCollapsingToolbarLayout(FParent).View;
+  end else
+  if FParent is jsNestedScrollView then
+  begin
+      jsNestedScrollView(FParent).Init(refApp);
+      FjPRLayout:= jsNestedScrollView(FParent).View;
+  end else
+  if FParent is jsViewPager then
+  begin
+      jsViewPager(FParent).Init(refApp);
+      FjPRLayout:= jsViewPager(FParent).View;
+  end;
+end;
+
 procedure jImageBtn.Init(refApp: jApp);
 var
   rToP: TPositionRelativeToParent;
@@ -9738,31 +11018,15 @@ begin
   FjObject := jImageBtn_Create(FjEnv, FjThis, Self);
   FInitialized:= True;
 
-    if FParent is jPanel then
-    begin
-      jPanel(FParent).Init(refApp);
-      FjPRLayout:= jPanel(FParent).View;
-    end;
-    if FParent is jScrollView then
-    begin
-      jScrollView(FParent).Init(refApp);
-      FjPRLayout:= jScrollView_getView(FjEnv, jScrollView(FParent).jSelf);
-    end;
-    if FParent is jHorizontalScrollView then
-    begin
-      jHorizontalScrollView(FParent).Init(refApp);
-      FjPRLayout:= jHorizontalScrollView_getView(FjEnv, jHorizontalScrollView(FParent).jSelf )
-    end;
-    if FParent is jCustomDialog then
-    begin
-      jCustomDialog(FParent).Init(refApp);
-      FjPRLayout:= jCustomDialog(FParent).View;
-    end;
-    if FParent is jToolbar then
-    begin
-      jToolbar(FParent).Init(refApp);
-      FjPRLayout:= jToolbar(FParent).View;
-    end;
+  if FParent <> nil then
+  begin
+    TryNewParent(refApp);
+  end;
+
+  if FGravityInParent <> lgNone then
+     jImageBtn_SetFrameGravity(FjEnv, FjObject, Ord(FGravityInParent));
+
+  FjPRLayoutHome:= FjPRLayout;
 
   jImageBtn_setParent(FjEnv, FjObject , FjPRLayout);
   jImageBtn_setId(FjEnv, FjObject , Self.Id);
@@ -9825,6 +11089,12 @@ begin
   FjPRLayout:= Value;
   if FInitialized then
      jImageBtn_setParent(FjEnv, FjObject , FjPRLayout);
+end;
+
+procedure jImageBtn.RemoveFromViewParent;
+begin
+ if FInitialized then
+   jImageBtn_RemoveFromViewParent(FjEnv, FjObject);
 end;
 
 Procedure jImageBtn.SetColor(Value: TARGBColorBridge);
@@ -9975,6 +11245,14 @@ begin
   if Assigned(FOnClick) then FOnClick(Obj);
 end;
 
+procedure jImageBtn.SetLGravity(_value: TLayoutGravity);
+begin
+  //in designing component state: set value here...
+  FGravityInParent:=  _value;
+  if FInitialized then
+     jImageBtn_SetFrameGravity(FjEnv, FjObject, Ord(FGravityInParent) );
+end;
+
 //------------------------------------------------------------------------------
 // jAsyncTask
 // http://stackoverflow.com/questions/5517641/publishprogress-from-inside-a-function-in-doinbackground
@@ -10058,6 +11336,8 @@ begin
   FOnGLChange  := nil;
   FOnGLDraw    := nil;
   FOnGLDestroy := nil;
+  FOnGLPause := nil;
+  FOnGLResume := nil;
   //
   FOnGLDown := nil;
   FOnGLMove := nil;
@@ -10076,6 +11356,8 @@ begin
   FOnGLChange  := nil;
   FOnGLDraw    := nil;
   FOnGLDestroy := nil;
+  FOnGLPause := nil;
+  FOnGLResume := nil;
   //
   FOnGLDown := nil;
   FOnGLMove := nil;
@@ -10114,6 +11396,8 @@ begin
    cRenderer_onGLDraw    : If Assigned(FOnGLDraw   ) then FOnGLDraw   (Obj);
    cRenderer_onGLDestroy : If Assigned(FOnGLDestroy) then FOnGLDestroy(Obj);
    cRenderer_onGLThread  : If Assigned(FOnGLThread ) then FOnGLThread (Obj);
+   cRenderer_onGLPause  : If Assigned(FOnGLPause ) then FOnGLPause (Obj);
+   cRenderer_onGLResume  : If Assigned(FOnGLResume ) then FOnGLResume (Obj);
   end;
   gApp.Lock:= False;
 end;
@@ -10124,6 +11408,10 @@ constructor jSqliteCursor.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
   //FjObject  := nil;
+  SetLength(FObservers, MAXOBSERVERS);
+  FObserverCount:=0;
+  FPosition:=POSITION_UNKNOWN;
+  FRowCount:=POSITION_UNKNOWN;
 end;
 
 destructor jSqliteCursor.Destroy;
@@ -10136,6 +11424,7 @@ begin
       FjObject := nil;
     end;
   end;
+  SetLength(FObservers, 0);
   inherited Destroy;
 end;
 
@@ -10147,35 +11436,101 @@ begin
   FInitialized:= True;
 end;
 
-procedure jSqliteCursor.SetCursor(Value: jObject);
+function jSqliteCursor.GetCursor: jObject;
 begin
   if not FInitialized  then Exit;
-  jSqliteCursor_SetCursor(FjEnv, FjObject , Value);
+  Result := jSqliteCursor_GetCursor(FjEnv, FjObject);
 end;
 
+function jSqliteCursor.GetEOF: Boolean;
+begin
+  Result := True;
+  if (not FInitialized) or (FRowCount=POSITION_UNKNOWN) then Exit;
+  Result := FPosition = FRowCount;
+end;
+
+procedure jSqliteCursor.UnRegisterObserver(AObserver: jVisualControl);
+var
+  i: integer = 0;
+begin
+    while i < FObserverCount do
+    begin
+      if AObserver = FObservers[i] then break;
+      inc(i);
+    end;
+    if i = FObserverCount then Exit;                      // AObserver not found!
+    while i < FObserverCount-1 do
+    begin
+      FObservers[i] := FObservers[i+1];
+      inc(i);
+    end;
+    FObservers[i] := nil;
+    dec(FObserverCount);
+end;
+
+procedure jSqliteCursor.RegisterObserver(AObserver: jVisualControl);
+var
+  i: integer = 0;
+begin
+  if FObserverCount < MAXOBSERVERS then
+  begin
+    while i < FObserverCount do
+    begin
+      if AObserver = FObservers[i] then break;
+      inc(i);
+    end;
+    if i = FObserverCount then
+    begin
+      FObservers[i] := AObserver;
+      inc(FObserverCount);
+    end;
+  end;
+end;
+
+procedure jSqliteCursor.SetCursor(Value: jObject);
+var
+  i: integer;
+begin
+  if not FInitialized then Exit;
+  jSqliteCursor_SetCursor(FjEnv, FjObject, Value);
+  FRowCount:=GetRowCount;
+  if FObserverCount > 0 then
+  begin
+    for i := 0 to FObserverCount-1 do
+    begin
+      //DBListView_Log ('Calling ' +  FObservers[i].Name + '.ChangeCursor() ...');
+      (FObservers[i] as jDBListView).ChangeCursor(Self);
+      //DBListView_Log ('... Done');
+    end;
+  end;
+end;
 
 procedure jSqliteCursor.MoveToFirst;
 begin
    if not FInitialized  then Exit;
    jSqliteCursor_MoveToFirst(FjEnv, FjObject );
+   FPosition:=0;
 end;
 
 procedure jSqliteCursor.MoveToNext;
 begin
   if not FInitialized  then Exit;
   jSqliteCursor_MoveToNext(FjEnv, FjObject );
+  Inc(FPosition);
 end;
 
 procedure jSqliteCursor.MoveToLast;
 begin
   if not FInitialized  then Exit;
   jSqliteCursor_MoveToLast(FjEnv, FjObject );
+  FPosition:=FRowCount-1;
 end;
 
 procedure jSqliteCursor.MoveToPosition(position: integer);
 begin
   if not FInitialized  then Exit;
   jSqliteCursor_MoveToPosition(FjEnv, FjObject , position);
+  FPosition:=position;
 end;
 
 function jSqliteCursor.GetRowCount: integer;
@@ -10262,6 +11617,12 @@ begin
    Result:= jSqliteCursor_GetValueAsString(FjEnv, FjObject, position ,columnName);
 end;
 
+function jSqliteCursor.GetPosition(): integer;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jSqliteCursor_GetPosition(FjEnv, FjObject);
+end;
 
 {jSqliteDataAccess}
 
@@ -10372,6 +11733,7 @@ function jSqliteDataAccess.Select(selectQuery: string): string;
 begin
    if not FInitialized then Exit;
    Result:= jSqliteDataAccess_Select(FjEnv, FjObject, selectQuery);
+  //DBListView_Log('Query  ' + BoolToStr(result, 'SUCCESS', 'FAILURE'));
    if FjSqliteCursor <> nil then FjSqliteCursor.SetCursor(Self.GetCursor);
 end;
 
@@ -10383,11 +11745,11 @@ begin
      if FjSqliteCursor <> nil then FjSqliteCursor.SetCursor(Self.GetCursor);
 end;
 
-
 function jSqliteDataAccess.GetCursor: jObject;
 begin
   if not FInitialized then Exit;
   Result:= jSqliteDataAccess_GetCursor(FjEnv, FjObject );
+  //DBListView_Log('Internal cursor is ' + BoolToStr(result = nil, 'INVALID', 'VALID'));
 end;
 
 procedure jSqliteDataAccess.SetSelectDelimiters(coldelim: char; rowdelim: char);
@@ -10396,7 +11758,6 @@ begin
   jSqliteDataAccess_SetSelectDelimiters(FjEnv, FjObject , coldelim, rowdelim);
 end;
 
-//ex. "CREATE TABLE IF NOT EXISTS TABLE1  (_ID INTEGER PRIMARY KEY, NAME TEXT, PLACE TEXT);"
 procedure jSqliteDataAccess.CreateTable(createQuery: string);
 begin
   if not FInitialized then Exit;
@@ -10575,10 +11936,10 @@ begin
   FLParamWidth:= lpMatchParent;
   FLParamHeight:=lpWrapContent;
   FAcceptChildrenAtDesignTime:= True;
-  FMarginTop:= 4;
-  FMarginLeft:= 4;
-  FMarginRight:= 4;
-  FMarginBottom:= 4;
+  FMarginTop:= 0;
+  FMarginLeft:= 0;
+  FMarginRight:= 0;
+  FMarginBottom:= 0;
   FMinZoomFactor:= 1/4;
   FMaxZoomFactor:= 8/2;
   FHeight:= 48;
@@ -10598,6 +11959,95 @@ begin
   inherited Destroy;
 end;
 
+procedure jPanel.TryNewParent(refApp: jApp);
+begin
+  if FParent is jPanel then
+  begin
+    jPanel(FParent).Init(refApp);
+    FjPRLayout:= jPanel(FParent).View;
+  end else
+  if FParent is jScrollView then
+  begin
+    jScrollView(FParent).Init(refApp);
+    FjPRLayout:= jScrollView_getView(FjEnv, jScrollView(FParent).jSelf);
+  end else
+  if FParent is jHorizontalScrollView then
+  begin
+    jHorizontalScrollView(FParent).Init(refApp);
+    FjPRLayout:= jHorizontalScrollView_getView(FjEnv, jHorizontalScrollView(FParent).jSelf);
+  end  else
+  if FParent is jCustomDialog then
+  begin
+    jCustomDialog(FParent).Init(refApp);
+    FjPRLayout:= jCustomDialog(FParent).View;
+  end else
+  if FParent is jViewFlipper then
+  begin
+    jViewFlipper(FParent).Init(refApp);
+    FjPRLayout:= jViewFlipper(FParent).View;
+  end else
+  if FParent is jToolbar then
+  begin
+    jToolbar(FParent).Init(refApp);
+    FjPRLayout:= jToolbar(FParent).View;
+  end  else
+  if FParent is jsToolbar then
+  begin
+    jsToolbar(FParent).Init(refApp);
+    FjPRLayout:= jsToolbar(FParent).View;
+  end  else
+  if FParent is jsCoordinatorLayout then
+  begin
+    jsCoordinatorLayout(FParent).Init(refApp);
+    FjPRLayout:= jsCoordinatorLayout(FParent).View;
+  end else
+  if FParent is jFrameLayout then
+  begin
+    jFrameLayout(FParent).Init(refApp);
+    FjPRLayout:= jFrameLayout(FParent).View;
+  end else
+  if FParent is jLinearLayout then
+  begin
+    jLinearLayout(FParent).Init(refApp);
+    FjPRLayout:= jLinearLayout(FParent).View;
+  end else
+  if FParent is jsDrawerLayout then
+  begin
+    jsDrawerLayout(FParent).Init(refApp);
+    FjPRLayout:= jsDrawerLayout(FParent).View;
+  end  else
+  if FParent is jsCardView then
+  begin
+      jsCardView(FParent).Init(refApp);
+      FjPRLayout:= jsCardView(FParent).View;
+  end else
+  if FParent is jsAppBarLayout then
+  begin
+      jsAppBarLayout(FParent).Init(refApp);
+      FjPRLayout:= jsAppBarLayout(FParent).View;
+  end else
+  if FParent is jsTabLayout then
+  begin
+      jsTabLayout(FParent).Init(refApp);
+      FjPRLayout:= jsTabLayout(FParent).View;
+  end else
+  if FParent is jsCollapsingToolbarLayout then
+  begin
+      jsCollapsingToolbarLayout(FParent).Init(refApp);
+      FjPRLayout:= jsCollapsingToolbarLayout(FParent).View;
+  end else
+  if FParent is jsNestedScrollView then
+  begin
+      jsNestedScrollView(FParent).Init(refApp);
+      FjPRLayout:= jsNestedScrollView(FParent).View;
+  end else
+  if FParent is jsViewPager then
+  begin
+      jsViewPager(FParent).Init(refApp);
+      FjPRLayout:= jsViewPager(FParent).View;
+  end;
+end;
+
 procedure jPanel.Init(refApp: jApp);
 var
   rToP: TPositionRelativeToParent;
@@ -10611,40 +12061,9 @@ begin
 
   if FParent <> nil then
   begin
-    if FParent is jPanel then
-    begin
-      jPanel(FParent).Init(refApp);
-      FjPRLayout:= jPanel(FParent).View;
-    end;
-    if FParent is jScrollView then
-    begin
-      jScrollView(FParent).Init(refApp);
-      FjPRLayout:= jScrollView_getView(FjEnv, jScrollView(FParent).jSelf);
-    end;
-    if FParent is jHorizontalScrollView then
-    begin
-      jHorizontalScrollView(FParent).Init(refApp);
-      FjPRLayout:= jHorizontalScrollView_getView(FjEnv, jHorizontalScrollView(FParent).jSelf);
-    end;
-    if FParent is jCustomDialog then
-    begin
-      jCustomDialog(FParent).Init(refApp);
-      FjPRLayout:= jCustomDialog(FParent).View;
-    end;
-
-    if FParent is jViewFlipper then
-    begin
-      jViewFlipper(FParent).Init(refApp);
-      FjPRLayout:= jViewFlipper(FParent).View;
-    end;
-
-    if FParent is jToolbar then
-    begin
-      jToolbar(FParent).Init(refApp);
-      FjPRLayout:= jToolbar(FParent).View;
-    end;
-
+    TryNewParent(refApp);
   end;
+  FjPRLayoutHome:= FjPRLayout;
 
   jPanel_setParent(FjEnv, FjObject , FjPRLayout);
 
@@ -10688,13 +12107,6 @@ begin
 
   View_SetVisible(FjEnv, FjThis, FjObject, FVisible);
 
-end;
-
-procedure jPanel.SetViewParent(Value: jObject);
-begin
-  FjPRLayout:= Value;
-  if FInitialized then
-   jPanel_setParent(FjEnv, FjObject , FjPRLayout);
 end;
 
 Procedure jPanel.SetColor(Value: TARGBColorBridge);
@@ -10850,10 +12262,66 @@ begin
   end;
 end;
 
-procedure jPanel.RemoveParent;
+procedure jPanel.SetViewParent(Value: jObject);
+begin
+  FjPRLayout:= Value;
+  if FInitialized then
+   jPanel_setParent(FjEnv, FjObject , FjPRLayout);
+end;
+
+procedure jPanel.RemoveFromViewParent;
 begin
 if FInitialized then
    jPanel_RemoveParent(FjEnv, FjObject);
+end;
+
+procedure jPanel.ResetViewParent();
+begin
+  FjPRLayout:= FjPRLayoutHome;
+  if FInitialized then
+     jPanel_setParent(FjEnv, FjObject, FjPRLayout);
+end;
+
+procedure jPanel.RemoveView(_view: jObject);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jPanel_RemoveView(FjEnv, FjObject, _view);
+end;
+
+procedure jPanel.RemoveAllViews();
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jPanel_RemoveAllViews(FjEnv, FjObject);
+end;
+
+function jPanel.GetChildCount(): integer;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jPanel_GetChildCount(FjEnv, FjObject);
+end;
+
+procedure jPanel.BringChildToFront(_view: jObject);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jPanel_BringChildToFront(FjEnv, FjObject, _view);
+end;
+
+procedure jPanel.BringToFront();
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jPanel_BringToFront(FjEnv, FjObject);
+end;
+
+procedure jPanel.SetVisibilityGone();
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jPanel_SetVisibilityGone(FjEnv, FjObject);
 end;
 
 procedure jPanel.GenEvent_OnFlingGestureDetected(Obj: TObject; direction: integer);
@@ -10954,13 +12422,691 @@ end;
 
 procedure jPanel.SetMarginLeftTopRightBottom(_left,_top,_right,_bottom: integer);
 begin
-  FMarginTop:= _left;
-  FMarginLeft:= _top;
+  FMarginLeft:= _left;
+  FMarginTop:= _top;
   FMarginRight:= _right;
   FMarginBottom:= _bottom;
   if FInitialized then
       jPanel_SetMarginLeftTopRightBottom(FjEnv, FjObject ,
                                           _left,_top,_right,_bottom);
+end;
+
+function jPanel.GetViewParent(): jObject;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jPanel_GetParent(FjEnv, FjObject);
+end;
+
+(*
+procedure jPanel.AddView(_view: jObject);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jPanel_AddView(FjEnv, FjObject, _view);
+end;
+*)
+procedure jPanel.SetFitsSystemWindows(_value: boolean);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jPanel_SetFitsSystemWindows(FjEnv, FjObject, _value);
+end;
+
+
+//-----------------------------------------------------------------------------
+//  For debug
+//-----------------------------------------------------------------------------
+procedure DBListView_Log (msg: string);
+begin
+  //__android_log_write(ANDROID_LOG_INFO, 'jDBListView', Pchar(msg));
+end;
+
+{---------  jDBListView  --------------}
+
+constructor jDBListView.Create(AOwner: TComponent);
+
+begin
+  inherited Create(AOwner);
+  FMarginLeft := 10;
+  FMarginTop := 10;
+  FMarginBottom := 10;
+  FMarginRight := 10;
+  FLParamWidth := lpMatchParent;
+  FLParamHeight := lpMatchParent;
+  FHeight := 160; //??
+  FWidth := 96; //??
+  FAcceptChildrenAtDesignTime := False;
+  //your code here....
+  FColWeights:= TStringList.Create;
+  FColNames:= TStringList.Create;
+  FjSqliteCursor := nil;
+end;
+
+destructor jDBListView.Destroy;
+begin
+  if not (csDesigning in ComponentState) then
+  begin
+    if FjObject <> nil then
+    begin
+      jFree();
+      FjObject := nil;
+    end;
+  end;
+  //you others free code here...'
+  if FjSqliteCursor <> nil then
+    FjSqliteCursor.UnRegisterObserver(self);
+  FColNames.Free;
+  FColWeights.Free;
+  inherited Destroy;
+end;
+
+procedure jDBListView.TryNewParent(refApp: jApp);
+begin
+  if FParent is jPanel then
+  begin
+    jPanel(FParent).Init(refApp);
+    FjPRLayout:= jPanel(FParent).View;
+  end else
+  if FParent is jScrollView then
+  begin
+    jScrollView(FParent).Init(refApp);
+    FjPRLayout:= jScrollView_getView(FjEnv, jScrollView(FParent).jSelf);
+  end else
+  if FParent is jHorizontalScrollView then
+  begin
+    jHorizontalScrollView(FParent).Init(refApp);
+    FjPRLayout:= jHorizontalScrollView_getView(FjEnv, jHorizontalScrollView(FParent).jSelf);
+  end  else
+  if FParent is jCustomDialog then
+  begin
+    jCustomDialog(FParent).Init(refApp);
+    FjPRLayout:= jCustomDialog(FParent).View;
+  end else
+  if FParent is jViewFlipper then
+  begin
+    jViewFlipper(FParent).Init(refApp);
+    FjPRLayout:= jViewFlipper(FParent).View;
+  end else
+  if FParent is jToolbar then
+  begin
+    jToolbar(FParent).Init(refApp);
+    FjPRLayout:= jToolbar(FParent).View;
+  end  else
+  if FParent is jsToolbar then
+  begin
+    jsToolbar(FParent).Init(refApp);
+    FjPRLayout:= jsToolbar(FParent).View;
+  end  else
+  if FParent is jsCoordinatorLayout then
+  begin
+    jsCoordinatorLayout(FParent).Init(refApp);
+    FjPRLayout:= jsCoordinatorLayout(FParent).View;
+  end else
+  if FParent is jFrameLayout then
+  begin
+    jFrameLayout(FParent).Init(refApp);
+    FjPRLayout:= jFrameLayout(FParent).View;
+  end else
+  if FParent is jLinearLayout then
+  begin
+    jLinearLayout(FParent).Init(refApp);
+    FjPRLayout:= jLinearLayout(FParent).View;
+  end else
+  if FParent is jsDrawerLayout then
+  begin
+    jsDrawerLayout(FParent).Init(refApp);
+    FjPRLayout:= jsDrawerLayout(FParent).View;
+  end  else
+  if FParent is jsCardView then
+  begin
+      jsCardView(FParent).Init(refApp);
+      FjPRLayout:= jsCardView(FParent).View;
+  end else
+  if FParent is jsAppBarLayout then
+  begin
+      jsAppBarLayout(FParent).Init(refApp);
+      FjPRLayout:= jsAppBarLayout(FParent).View;
+  end else
+  if FParent is jsTabLayout then
+  begin
+      jsTabLayout(FParent).Init(refApp);
+      FjPRLayout:= jsTabLayout(FParent).View;
+  end else
+  if FParent is jsCollapsingToolbarLayout then
+  begin
+      jsCollapsingToolbarLayout(FParent).Init(refApp);
+      FjPRLayout:= jsCollapsingToolbarLayout(FParent).View;
+  end else
+  if FParent is jsNestedScrollView then
+  begin
+      jsNestedScrollView(FParent).Init(refApp);
+      FjPRLayout:= jsNestedScrollView(FParent).View;
+  end else
+  if FParent is jsViewPager then
+  begin
+      jsViewPager(FParent).Init(refApp);
+      FjPRLayout:= jsViewPager(FParent).View;
+  end;
+end;
+
+procedure jDBListView.Init(refApp: jApp);
+var
+  rToP: TPositionRelativeToParent;
+  rToA: TPositionRelativeToAnchorID;
+  i: integer;
+  weights: TDynArrayOfSingle;
+  names: TDynArrayOfString;
+begin
+  if FInitialized then Exit;
+
+  inherited Init(refApp); //set default ViewParent/FjPRLayout as jForm.View!
+  //your code here: set/initialize create params....
+  FjObject := jCreate();  //jSelf !
+
+  if FFontColor <> colbrDefault then
+    jDBListView_setFontColor(FjEnv, FjObject , GetARGB(FCustomColor, FFontColor));
+
+  if FFontSizeUnit <> unitDefault then
+    jDBListView_SetFontSizeUnit(FjEnv, FjObject, Ord(FFontSizeUnit));
+
+  if FFontSize > 0 then
+    jDBListView_setFontSize(FjEnv, FjObject , FFontSize);
+
+  if FColWeights.Count > 0 then
+  begin
+    SetLength(weights, FColWeights.Count);
+    for i := 0 to FColWeights.Count-1 do
+      weights[i] := StrToFloat(FColWeights[i]);
+    jDBListView_SetColumnWeights(FjEnv, FjObject, weights{FColWeights});
+  end;
+
+  if FColNames.Count > 0 then
+  begin
+    SetLength(names, FColNames.Count);
+    for i := 0 to FColNames.Count-1 do
+      names[i] := FColNames[i];
+    jDBListView_SetColumnNames(FjEnv, FjObject, names{FColNames});
+  end;
+
+  FInitialized := True;
+  if FParent <> nil then
+  begin
+    TryNewParent(refApp);
+  end;
+  FjPRLayoutHome:= FjPRLayout;
+
+  jDBListView_SetViewParent(FjEnv, FjObject, FjPRLayout);
+  jDBListView_SetId(FjEnv, FjObject, Self.Id);
+  jDBListView_SetLeftTopRightBottomWidthHeight(FjEnv, FjObject,
+    FMarginLeft, FMarginTop, FMarginRight, FMarginBottom,
+    GetLayoutParams(gApp, FLParamWidth, sdW),
+    GetLayoutParams(gApp, FLParamHeight, sdH));
+
+  //if FColNames.Count > 0 then
+  //begin
+  //  SetLength(names, FColNames.Count);
+  //  for i := 0 to FColNames.Count-1 do
+  //    names[i] := FColNames[i];
+  //  jDBListView_SetColumnNames(FjEnv, FjObject, names{FColNames});
+  //end;
+
+  if FParent is jPanel then
+  begin
+    Self.UpdateLayout;
+  end;
+
+  for rToA := raAbove to raAlignRight do
+  begin
+    if rToA in FPositionRelativeToAnchor then
+    begin
+      jDBListView_AddLParamsAnchorRule(FjEnv, FjObject,
+        GetPositionRelativeToAnchor(rToA));
+    end;
+  end;
+  for rToP := rpBottom to rpCenterVertical do
+  begin
+    if rToP in FPositionRelativeToParent then
+    begin
+      jDBListView_AddLParamsParentRule(FjEnv, FjObject,
+        GetPositionRelativeToParent(rToP));
+    end;
+  end;
+
+  if Self.Anchor <> nil then
+    Self.AnchorId := Self.Anchor.Id
+  else
+    Self.AnchorId := -1; //dummy
+
+  jDBListView_SetLayoutAll(FjEnv, FjObject, Self.AnchorId);
+
+  if FColor <> colbrDefault then
+    View_SetBackGroundColor(FjEnv, FjObject, GetARGB(FCustomColor, FColor));
+
+  View_SetVisible(FjEnv, FjObject, FVisible);
+end;
+
+procedure jDBListView.SetColor(Value: TARGBColorBridge);
+begin
+  FColor := Value;
+  if (FInitialized = True) and (FColor <> colbrDefault) then
+    View_SetBackGroundColor(FjEnv, FjObject, GetARGB(FCustomColor, FColor));
+end;
+
+procedure jDBListView.Notification(AComponent: TComponent; Operation: TOperation);
+begin
+  inherited;
+  if Operation = opRemove then
+  begin
+      if AComponent = FjSqliteCursor then
+      begin
+        FjSqliteCursor:= nil;
+      end
+  end;
+end;
+
+procedure jDBListView.SetColumnWeights(Value: TStrings);
+var
+  i: integer;
+  weights: TDynArrayOfSingle;
+begin
+  if FColWeights <> Value then
+     FColWeights.Assign(Value);
+
+  if FInitialized and (Value.Count <> 0) then
+  begin
+    SetLength(weights, Value.Count);
+    for i := 0 to Value.Count-1 do
+      weights[i] := StrToFloat(Value[i]);
+    jDBListView_SetColumnWeights(FjEnv, FjObject, weights);
+  end;
+end;
+
+procedure jDBListView.SetColumnNames(Value: TStrings);
+var
+  i: integer;
+  names: TDynArrayOfString;
+begin
+  if FColNames <> Value then
+     FColNames.Assign(Value);
+
+  if FInitialized {and (Value.Count <> 0)} then
+  begin
+    SetLength(names, Value.Count);
+    if (Value.Count <> 0) then
+      for i := 0 to Value.Count-1 do
+        names[i] := Value[i];
+    jDBListView_SetColumnNames(FjEnv, FjObject, names);
+  end;
+end;
+
+procedure jDBListView.SetCursor(Value: jSqliteCursor);
+begin
+  //DBListView_Log ('Entering SetCursor ...');
+  if Value <> FjSqliteCursor then
+  begin
+    if Assigned(FjSqliteCursor) then
+    begin
+      //DBListView_Log ('... phase 1 ...');
+      FjSqliteCursor.UnRegisterObserver(Self);
+      FjSqliteCursor.RemoveFreeNotification(Self); //remove free notification...
+    end;
+    //DBListView_Log ('... phase 2 ...');
+    FjSqliteCursor:= Value;
+    if Value <> nil then  //re- add free notification...
+    begin
+      //DBListView_Log ('... phase 3 ...');
+      Value.RegisterObserver(self);
+      Value.FreeNotification(self);
+      ChangeCursor(Value);
+    end;
+  end;
+  //DBListView_Log ('Exiting SetCursor');
+end;
+
+procedure jDBListView.SetVisible(Value: boolean);
+begin
+  FVisible := Value;
+  if FInitialized then
+    View_SetVisible(FjEnv, FjObject, FVisible);
+end;
+
+procedure jDBListView.UpdateLParamWidth;
+var
+  side: TSide;
+begin
+  if FInitialized then
+  begin
+    if Self.Parent is jForm then
+    begin
+      if jForm(Owner).ScreenStyle = (FParent as jForm).ScreenStyleAtStart then
+        side := sdW
+      else
+        side := sdH;
+      jDBListView_SetLParamWidth(FjEnv, FjObject,
+        GetLayoutParams(gApp, FLParamWidth, side));
+    end
+    else
+    begin
+      if (Self.Parent as jVisualControl).LayoutParamWidth = lpWrapContent then
+        jDBListView_setLParamWidth(FjEnv, FjObject,
+          GetLayoutParams(gApp, FLParamWidth, sdW))
+      else //lpMatchParent or others
+        jDBListView_setLParamWidth(FjEnv, FjObject, GetLayoutParamsByParent(
+          (Self.Parent as jVisualControl), FLParamWidth, sdW));
+    end;
+  end;
+end;
+
+procedure jDBListView.UpdateLParamHeight;
+var
+  side: TSide;
+begin
+  if FInitialized then
+  begin
+    if Self.Parent is jForm then
+    begin
+      if jForm(Owner).ScreenStyle = (FParent as jForm).ScreenStyleAtStart then
+        side := sdH
+      else
+        side := sdW;
+      jDBListView_SetLParamHeight(FjEnv, FjObject,
+        GetLayoutParams(gApp, FLParamHeight, side));
+    end
+    else
+    begin
+      if (Self.Parent as jVisualControl).LayoutParamHeight = lpWrapContent then
+        jDBListView_setLParamHeight(FjEnv, FjObject,
+          GetLayoutParams(gApp, FLParamHeight, sdH))
+      else //lpMatchParent and others
+        jDBListView_setLParamHeight(FjEnv, FjObject, GetLayoutParamsByParent(
+          (Self.Parent as jVisualControl), FLParamHeight, sdH));
+    end;
+  end;
+end;
+
+procedure jDBListView.UpdateLayout;
+begin
+  if FInitialized then
+  begin
+    inherited UpdateLayout;
+    UpdateLParamWidth;
+    UpdateLParamHeight;
+    jDBListView_SetLayoutAll(FjEnv, FjObject, Self.AnchorId);
+  end;
+end;
+
+procedure jDBListView.Refresh;
+begin
+  if FInitialized then
+    View_Invalidate(FjEnv, FjObject);
+end;
+
+procedure jDBListView.ClearLayout;
+var
+  rToP: TPositionRelativeToParent;
+  rToA: TPositionRelativeToAnchorID;
+begin
+  jDBListView_ClearLayoutAll(FjEnv, FjObject);
+  for rToP := rpBottom to rpCenterVertical do
+  begin
+    if rToP in FPositionRelativeToParent then
+      jDBListView_AddLParamsParentRule(FjEnv, FjObject,
+        GetPositionRelativeToParent(rToP));
+  end;
+  for rToA := raAbove to raAlignRight do
+  begin
+    if rToA in FPositionRelativeToAnchor then
+      jDBListView_AddLParamsAnchorRule(FjEnv, FjObject,
+        GetPositionRelativeToAnchor(rToA));
+  end;
+end;
+
+//Event : Java -> Pascal
+procedure jDBListView.GenEvent_OnClickDBListItem(Obj: TObject; position: integer; itemCaption: string);
+begin
+  if Assigned(FOnClickDBListItem) then
+    FOnClickDBListItem(Obj, position, itemCaption);
+end;
+
+procedure jDBListView.GenEvent_OnLongClickDBListItem(Obj: TObject; position: integer; itemCaption: string);
+begin
+  if Assigned(FOnLongClickDBListItem) then
+    FOnLongClickDBListItem(Obj, position, itemCaption);
+end;
+
+function jDBListView.jCreate(): jObject;
+begin
+  //in designing component state: result value here...
+  Result := jDBListView_jCreate(FjEnv, int64(Self), FjThis);
+end;
+
+procedure jDBListView.jFree();
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+    jDBListView_jFree(FjEnv, FjObject);
+end;
+
+function jDBListView.GetView(): jObject;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+    Result := jDBListView_GetView(FjEnv, FjObject);
+end;
+
+procedure jDBListView.SetViewParent(_viewgroup: jObject);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+    jDBListView_SetViewParent(FjEnv, FjObject, _viewgroup);
+end;
+
+procedure jDBListView.RemoveFromViewParent();
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+    jDBListView_RemoveFromViewParent(FjEnv, FjObject);
+end;
+
+function jDBListView.GetParent(): jObject;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+    Result := jDBListView_GetParent(FjEnv, FjObject);
+end;
+
+procedure jDBListView.SetLParamWidth(_w: integer);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+    jDBListView_SetLParamWidth(FjEnv, FjObject, _w);
+end;
+
+procedure jDBListView.SetLParamHeight(_h: integer);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+    jDBListView_SetLParamHeight(FjEnv, FjObject, _h);
+end;
+
+procedure jDBListView.setLGravity(_g: integer);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+    jDBListView_setLGravity(FjEnv, FjObject, _g);
+end;
+
+procedure jDBListView.setLWeight(_w: single);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+    jDBListView_setLWeight(FjEnv, FjObject, _w);
+end;
+
+procedure jDBListView.SetLeftTopRightBottomWidthHeight(_left: integer;
+  _top: integer; _right: integer; _bottom: integer; _w: integer; _h: integer);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+    jDBListView_SetLeftTopRightBottomWidthHeight(FjEnv, FjObject,
+      _left, _top, _right, _bottom, _w, _h);
+end;
+
+procedure jDBListView.AddLParamsAnchorRule(_rule: integer);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+    jDBListView_AddLParamsAnchorRule(FjEnv, FjObject, _rule);
+end;
+
+procedure jDBListView.AddLParamsParentRule(_rule: integer);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+    jDBListView_AddLParamsParentRule(FjEnv, FjObject, _rule);
+end;
+
+procedure jDBListView.SetLayoutAll(_idAnchor: integer);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+    jDBListView_SetLayoutAll(FjEnv, FjObject, _idAnchor);
+end;
+
+procedure jDBListView.ClearLayoutAll();
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+    jDBListView_ClearLayoutAll(FjEnv, FjObject);
+end;
+
+procedure jDBListView.SetId(_id: integer);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+    jDBListView_SetId(FjEnv, FjObject, _id);
+end;
+{
+procedure jDBListView.UpdateView();
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+    jDBListView_UpdateView(FjEnv, FjObject);
+end;
+}
+(*
+procedure jDBListView.SetItemsLayout(_value: integer);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+    jDBListView_SetItemsLayout(FjEnv, FjObject, _value);
+end;
+*)
+function jDBListView.GetItemIndex(): integer;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+    Result := jDBListView_GetItemIndex(FjEnv, FjObject);
+end;
+
+function jDBListView.GetItemCaption(): string;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+    Result := jDBListView_GetItemCaption(FjEnv, FjObject);
+end;
+
+procedure jDBListView.SetSelection(_index: integer);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+    jDBListView_SetSelection(FjEnv, FjObject, _index);
+end;
+(*
+procedure jDBListView.DispatchOnDrawItemTextColor(_value: boolean);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+    jDBListView_DispatchOnDrawItemTextColor(FjEnv, FjObject, _value);
+end;
+
+procedure jDBListView.DispatchOnDrawItemBitmap(_value: boolean);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+    jDBListView_DispatchOnDrawItemBitmap(FjEnv, FjObject, _value);
+end;
+*)
+procedure jDBListView.SetFontSize(_size: DWord);
+begin
+  //in designing component state: set value here...
+  FFontSize := _size;
+  if FInitialized then
+    jDBListView_SetFontSize(FjEnv, FjObject, _size);
+end;
+
+procedure jDBListView.SetFontColor(_color: TARGBColorBridge);
+begin
+  //in designing component state: set value here...
+  FFontColor := _color;
+  if FInitialized then
+    jDBListView_SetFontColor(FjEnv, FjObject, GetARGB(FCustomColor, _color));
+end;
+
+procedure jDBListView.SetFontSizeUnit(_unit: TFontSizeUnit);
+begin
+  //in designing component state: set value here...
+  FFontSizeUnit := _unit;
+  if FInitialized then
+    jDBListView_SetFontSizeUnit(FjEnv, FjObject, Ord(_unit));
+end;
+
+procedure jDBListView.ChangeCursor(NewCursor: jSqliteCursor);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+    jDBListView_ChangeCursor(FjEnv, FjObject, NewCursor.Cursor);
+end;
+
+Procedure Java_Event_pOnClickDBListItem(env: PJNIEnv; this: jobject; Obj: TObject; position: integer; caption: JString);
+var
+  pascaption: string;
+  _jBoolean: JBoolean;
+begin
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+  if Obj is jDBListView then
+  begin
+    jForm(jDBListView(Obj).Owner).UpdateJNI(gApp);
+    pascaption := '';
+    if caption <> nil then
+    begin
+      _jBoolean:= JNI_False;
+      pascaption:= string( env^.GetStringUTFChars(env,caption,@_jBoolean) );
+    end;
+    jDBListView(Obj).GenEvent_OnClickDBListItem(Obj, position, pascaption);
+  end;
+end;
+
+Procedure Java_Event_pOnLongClickDBListItem(env: PJNIEnv; this: jobject; Obj: TObject; position: integer; caption: JString);
+var
+  pascaption: string;
+  _jBoolean: JBoolean;
+begin
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+  if Obj is jDBListView then
+  begin
+    jForm(jDBListView(Obj).Owner).UpdateJNI(gApp);
+    pascaption := '';
+    if caption <> nil then
+    begin
+      _jBoolean:= JNI_False;
+      pascaption:= string( env^.GetStringUTFChars(env,caption,@_jBoolean) );
+    end;
+    jDBListView(Obj).GenEvent_OnLongClickDBListItem(Obj, position,  pascaption);
+  end
 end;
 
 end.

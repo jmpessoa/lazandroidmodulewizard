@@ -2,7 +2,7 @@
 //
 // Android JNI Interface for Pascal/Delphi
 
-//   [Lazarus Support by jmpessoa@hotmail.com - december 2013]
+//   [Added Lazarus Support by jmpessoa@hotmail.com - december 2013]
 //    https://github.com/jmpessoa/lazandroidmodulewizard
 
 //   Developer
@@ -129,6 +129,7 @@ Procedure jTextView_Free(env:PJNIEnv; TextView : jObject);
 Procedure jTextView_setEnabled(env:PJNIEnv; TextView : jObject; enabled : Boolean);
 Procedure jTextView_setParent(env:PJNIEnv; TextView : jObject; ViewGroup : jObject);
 
+
 Function  jTextView_getText(env:PJNIEnv; TextView : jObject) : String;
 Procedure jTextView_setText(env:PJNIEnv; TextView : jObject; Str : String);
 
@@ -182,7 +183,7 @@ procedure jTextView_MatchParent(env: PJNIEnv; _jtextview: JObject);
 procedure jTextView_WrapParent(env: PJNIEnv; _jtextview: JObject);
 procedure jTextView_ClearLayoutAll(env: PJNIEnv; _jtextview: JObject);
 procedure jTextView_SetFrameGravity(env: PJNIEnv; _jtextview: JObject; _value: integer);
-
+procedure jTextView_RemoveFromViewParent(env: PJNIEnv; _jtextview: JObject);
 
 //-----------------------------------
 // EditText  :: changed by jmpessoa [support Api > 13]
@@ -284,46 +285,32 @@ procedure jEditText_SaveToFile(env: PJNIEnv; _jedittext: JObject; _path: string;
 procedure jEditText_SaveToFile(env: PJNIEnv; _jedittext: JObject; _filename: string);  overload;
 procedure jEditText_ClearLayoutAll(env: PJNIEnv; _jedittext: JObject);
 procedure jEditText_SetFrameGravity(env: PJNIEnv; _jedittext: JObject; _value: integer);
+procedure jEditText_RemoveFromViewParent(env: PJNIEnv; _jedittext: JObject);
 
 // Button
 Function jButton_Create(env: PJNIEnv;   this:jobject; SelfObj: TObject): jObject;
 Procedure jButton_Free(env:PJNIEnv; Button : jObject);
-
 Procedure jButton_setLeftTopRightBottomWidthHeight(env:PJNIEnv;
                                         Button : jObject; ml,mt,mr,mb,w,h: integer);
-
 Procedure jButton_setParent(env:PJNIEnv; Button : jObject;ViewGroup : jObject);
-//by jmpessoa
 Procedure jButton_setText(env:PJNIEnv; Button : jObject; Str : String);
-
 Function jButton_getText(env:PJNIEnv; Button : jObject) : String;
-
-
 Procedure jButton_setTextColor(env:PJNIEnv; Button : jObject; color : DWord);
 Procedure jButton_setTextSize(env:PJNIEnv; Button : jObject; size  : DWord);
-
-//by jmpessoa
 Procedure jButton_addLParamsParentRule(env:PJNIEnv; Button : jObject; rule: DWord);
 Procedure jButton_addLParamsAnchorRule(env:PJNIEnv; Button : jObject; rule: DWord);
-
 Procedure jButton_setLayoutAll(env:PJNIEnv; Button : jObject;  idAnchor: DWord);
-
 Procedure jButton_setLParamWidth(env:PJNIEnv; Button : jObject; w: DWord);
-
 Procedure jButton_setLParamHeight(env:PJNIEnv; Button : jObject; h: DWord);
-
 Procedure jButton_setId(env:PJNIEnv; Button : jObject; id: DWord);
 Procedure jButton_setFocusable(env:PJNIEnv; Button : jObject; enabled: boolean);
 procedure jButton_SetFontSizeUnit(env: PJNIEnv; _jbutton: JObject; _unit: integer);
-
 procedure jButton_PerformClick(env: PJNIEnv; _jbutton: JObject);
 procedure jButton_PerformLongClick(env: PJNIEnv; _jbutton: JObject);
 procedure jButton_SetBackgroundByResIdentifier(env: PJNIEnv; _jbutton: JObject; _imgResIdentifier: string);
 procedure jButton_SetBackgroundByImage(env: PJNIEnv; _jbutton: JObject; _image: jObject);
-
 function jButton_getLParamHeight(env:PJNIEnv; _jbutton : jObject ): integer;
 function jButton_getLParamWidth(env:PJNIEnv; _jbutton : jObject): integer;
-
 procedure jButton_SetCompoundDrawables(env: PJNIEnv; _jbutton: JObject; _image: jObject; _side: integer); overload;
 procedure jButton_SetCompoundDrawables(env: PJNIEnv; _jbutton: JObject; _imageResIdentifier: string; _side: integer);  overload;
 procedure jButton_SetRoundCorner(env: PJNIEnv; _jbutton: JObject);
@@ -332,6 +319,7 @@ procedure jButton_SetFontFromAssets(env: PJNIEnv; _jbutton: JObject; _fontName: 
 procedure jButton_SetEnabled(env: PJNIEnv; _jbutton: JObject; Value: boolean);
 procedure jButton_ClearLayoutAll(env: PJNIEnv; _jbutton: JObject);
 procedure jButton_SetFrameGravity(env: PJNIEnv; _jbutton: JObject; _value: integer);
+procedure jButton_RemoveFromViewParent(env: PJNIEnv; _jbutton: JObject);
 
 // CheckBox
 Function  jCheckBox_Create            (env:PJNIEnv;  this:jobject; SelfObj: TObject ): jObject;
@@ -339,18 +327,13 @@ Procedure jCheckBox_Free               (env:PJNIEnv; CheckBox : jObject);
 Procedure jCheckBox_setParent          (env:PJNIEnv;
                                         CheckBox : jObject; ViewGroup : jObject);
 Function  jCheckBox_getText            (env:PJNIEnv; CheckBox : jObject) : String;
-
 Procedure jCheckBox_setText            (env:PJNIEnv; CheckBox : jObject; Str : String);
-
 Procedure jCheckBox_setTextColor       (env:PJNIEnv; CheckBox : jObject; color : DWord);
-
 Procedure jCheckBox_setTextSize(env:PJNIEnv; CheckBox : jObject; size : DWord);
-
 Function  jCheckBox_isChecked(env:PJNIEnv; CheckBox : jObject) : Boolean;
 Procedure jCheckBox_setChecked(env:PJNIEnv; CheckBox : jObject; value : Boolean);
 
 Procedure jCheckBox_setId(env:PJNIEnv;  CheckBox : jObject; id: DWord);
-
 Procedure jCheckBox_setLParamWidth(env:PJNIEnv; CheckBox : jObject; w: DWord);
 Procedure jCheckBox_setLParamHeight(env:PJNIEnv; CheckBox : jObject; h: DWord);
 Procedure jCheckBox_setLeftTopRightBottomWidthHeight(env:PJNIEnv;
@@ -358,14 +341,14 @@ Procedure jCheckBox_setLeftTopRightBottomWidthHeight(env:PJNIEnv;
 Procedure jCheckBox_addLParamsParentRule(env:PJNIEnv; CheckBox : jObject; rule: DWord);
 Procedure jCheckBox_addLParamsAnchorRule(env:PJNIEnv; CheckBox : jObject; rule: DWord);
 Procedure jCheckBox_setLayoutAll(env:PJNIEnv; CheckBox : jObject;  idAnchor: DWord);
-
 procedure jCheckBox_SetFontSizeUnit(env: PJNIEnv; _jcheckbox: JObject; _unit: integer);
-
 procedure jCheckBox_SetCompoundDrawables(env: PJNIEnv; _jcheckbox: JObject; _image: jObject; _side: integer); overload;
 procedure jCheckBox_SetCompoundDrawables(env: PJNIEnv; _jcheckbox: JObject; _imageResIdentifier: string; _side: integer);  overload;
 procedure jCheckBox_SetFontFromAssets(env: PJNIEnv; _jcheckbox: JObject; _fontName: string);
 procedure jCheckBox_ClearLayoutAll(env: PJNIEnv; _jcheckbox: JObject);
 procedure jCheckBox_SetFrameGravity(env: PJNIEnv; _jcheckbox: JObject; _value: integer);
+procedure jCheckBox_RemoveFromViewParent(env: PJNIEnv; _jcheckbox: JObject);
+
 // RadioButton
 
 Function  jRadioButton_Create(env:PJNIEnv; this:jobject; SelfObj: TObject ): jObject;
@@ -402,24 +385,15 @@ procedure jRadioButton_SetCompoundDrawables(env: PJNIEnv; _jradiobutton: JObject
 procedure jRadioButton_SetFontFromAssets(env: PJNIEnv; _jradiobutton: JObject; _fontName: string);
 procedure jRadioButton_ClearLayoutAll(env: PJNIEnv; _jradiobutton: JObject);
 procedure jRadioButton_SetFrameGravity(env: PJNIEnv; _jradiobutton: JObject; _value: integer);
+procedure jRadioButton_RemoveFromViewParent(env: PJNIEnv; _jradiobutton: JObject);
 
 // ProgressBar
-
-//by jmpessoa
 Function  jProgressBar_Create          (env:PJNIEnv;  this:jobject; SelfObj: TObject; Style: DWord ): jObject;
-
 Procedure jProgressBar_Free            (env:PJNIEnv; ProgressBar : jObject);
-//
 Procedure jProgressBar_setParent       (env:PJNIEnv;
                                         ProgressBar : jObject;ViewGroup : jObject);
-
-
-//by jmpessoa
 Function  jProgressBar_getProgress     (env:PJNIEnv; ProgressBar : jObject) : Integer;
-
-//by jmpessoa
 Procedure jProgressBar_setProgress     (env:PJNIEnv; ProgressBar : jObject; value : integer);
-
 Procedure jProgressBar_setMax          (env:PJNIEnv; ProgressBar : jObject; value : integer);
 Function  jProgressBar_getMax          (env:PJNIEnv; ProgressBar : jObject) : Integer;
 Procedure jProgressBar_setId(env:PJNIEnv; ProgressBar : jObject; id: DWord);
@@ -427,7 +401,6 @@ Procedure jProgressBar_setLParamWidth(env:PJNIEnv; ProgressBar : jObject; w: DWo
 Procedure jProgressBar_setLParamHeight(env:PJNIEnv; ProgressBar : jObject; h: DWord);
 Procedure jProgressBar_setLeftTopRightBottomWidthHeight(env:PJNIEnv;
                                         ProgressBar : jObject; ml,mt,mr,mb,w,h: integer);
-
 Procedure jProgressBar_addLParamsParentRule(env:PJNIEnv; ProgressBar : jObject; rule: DWord);
 Procedure jProgressBar_addLParamsAnchorRule(env:PJNIEnv; ProgressBar : jObject; rule: DWord);
 Procedure jProgressBar_setLayoutAll(env:PJNIEnv; ProgressBar : jObject;  idAnchor: DWord);
@@ -436,47 +409,29 @@ procedure jProgressBar_SetFrameGravity(env: PJNIEnv; ProgressBar: JObject; _valu
  { jImageView }
 
 Function  jImageView_Create            (env:PJNIEnv;  this:jobject; SelfObj: TObject): jObject;
-
 Procedure jImageView_Free              (env:PJNIEnv; ImageView : jObject);
-
 Procedure jImageView_setParent         (env:PJNIEnv;
                                         ImageView : jObject;ViewGroup : jObject);
-
 Procedure jImageView_setImage          (env:PJNIEnv;
                                         ImageView : jObject; fullPath : String);
-
 Procedure jImageView_setBitmapImage(env:PJNIEnv;
                                     ImageView : jObject; bitmap : jObject); overload;
-
 Procedure jImageView_SetImageByResIdentifier(env:PJNIEnv; ImageView : jObject; _imageResIdentifier: string);
-
-//by jmpessoa
 Procedure jImageView_setLParamWidth(env:PJNIEnv; ImageView : jObject; w: DWord);
 Procedure jImageView_setLParamHeight(env:PJNIEnv; ImageView : jObject; h: DWord);
-
-//by jmpessoa
 Procedure jImageView_setLeftTopRightBottomWidthHeight(env:PJNIEnv;
                                         ImageView : jObject; ml,mt,mr,mb,w,h: integer);
-
 Procedure jImageView_addLParamsParentRule(env:PJNIEnv; ImageView : jObject; rule: DWord);
 Procedure jImageView_addLParamsAnchorRule(env:PJNIEnv; ImageView : jObject; rule: DWord);
 Procedure jImageView_setLayoutAll(env:PJNIEnv; ImageView : jObject;  idAnchor: DWord);
-
-//by jmpessoa
 function jImageView_getLParamHeight(env:PJNIEnv; ImageView : jObject ): integer;
 function jImageView_getLParamWidth(env:PJNIEnv; ImageView : jObject): integer;
-
 function jImageView_GetBitmapHeight(env:PJNIEnv; ImageView : jObject ): integer;
 function jImageView_GetBitmapWidth(env:PJNIEnv; ImageView : jObject): integer;
-
 Procedure jImageView_setId(env:PJNIEnv; ImageView : jObject; id: DWord);
-
 procedure jImageView_SetImageMatrixScale(env: PJNIEnv; _jimageview: JObject; _scaleX: single; _scaleY: single);
-
 procedure jImageView_SetScaleType(env: PJNIEnv; _jimageview: JObject; _scaleType: integer);
-
 function jImageView_GetBitmapImage(env: PJNIEnv; _jimageview: JObject): jObject;
-
 procedure jImageView_SetImageFromURI(env: PJNIEnv; _jimageview: JObject; _uri: jObject);
 procedure jImageView_SetImageFromIntentResult(env: PJNIEnv; _jimageview: JObject; _intentData: jObject);
 procedure jImageView_SetImageThumbnailFromCamera(env: PJNIEnv; _jimageview: JObject; _intentData: jObject);
@@ -488,7 +443,9 @@ procedure jImageView_SetFrameGravity(env: PJNIEnv; _jimageview: JObject; _value:
 procedure jImageView_SetCollapseMode(env: PJNIEnv; _jimageview: JObject; _mode: integer);
 procedure jImageView_SetFitsSystemWindows(env: PJNIEnv; _jimageview: JObject; _value: boolean);
 procedure jImageView_SetScrollFlag(env: PJNIEnv; _jimageview: JObject; _collapsingScrollFlag: integer);
-
+procedure jImageView_RemoveFromViewParent(env: PJNIEnv; _jimageview: JObject);
+procedure jImageView_BringToFront(env: PJNIEnv; _jimageview: JObject);
+procedure jImageView_SetVisibilityGone(env: PJNIEnv; _jimageview: JObject);
 
 // ListView
 Function  jListView_Create2             (env:PJNIEnv;  this:jobject; SelfObj: TObject;
@@ -500,32 +457,20 @@ Function  jListView_Create3             (env:PJNIEnv;  this:jobject; SelfObj: TO
                                          widget: integer;
                                          widgetText: string;
                                          txtDecorated: integer; itemLay: integer; txtSizeDec: integer; txtAlign: integer): jObject;
-
-
 Procedure jListView_Free               (env:PJNIEnv; ListView : jObject);
-//
-
-
 Procedure jListView_setParent          (env:PJNIEnv;
                                         ListView : jObject;ViewGroup : jObject);
-
 Procedure jListView_setTextColor2       (env:PJNIEnv; ListView : jObject; color : DWord; index: integer);
 Procedure jListView_setTextColor       (env:PJNIEnv; ListView : jObject; color : DWord);
-
 Procedure jListView_setTextSize2        (env:PJNIEnv; ListView : jObject; size  : DWord; index: integer);
 Procedure jListView_setTextSize        (env:PJNIEnv; ListView : jObject; size  : DWord);
-
 Procedure jListView_setItemPosition    (env:PJNIEnv;
                                         ListView : jObject; Pos: integer; y:Integer );
-//
 Procedure jListView_add                (env:PJNIEnv;  this:jobject;
                                         ListView : jObject; Str : string;
                                         delimiter: string; fontColor: integer; fontSize: integer; hasWidgetItem: integer);
-//by jmpessoa
 Procedure jListView_add2(env:PJNIEnv; ListView: jObject; Str: string; delimiter: string);
-
 Procedure jListView_add22(env:PJNIEnv; ListView: jObject; Str: string; delimiter: string; image: jObject);
-
 Procedure jListView_add3                (env:PJNIEnv;
                                         ListView : jObject; Str : string;
                                         delimiter: string; fontColor: integer; fontSize: integer;
@@ -535,76 +480,50 @@ Procedure jListView_add4                (env:PJNIEnv;
                                         ListView : jObject; Str : string;
                                         delimiter: string; fontColor: integer; fontSize: integer;
                                         widgetItem: integer; widgetText: string);
-
-//by jmpessoa
 Procedure jListView_clear              (env:PJNIEnv;
                                         ListView : jObject);
 
-//by jmpessoa
 Procedure jListView_delete             (env:PJNIEnv;
                                         ListView : jObject; index : integer);
 
-//by jmpessoa
 Procedure jListView_setId(env:PJNIEnv; ListView : jObject; id: DWord);
-
 Procedure jListView_setWidgetItem(env:PJNIEnv; ListView : jObject; value: integer);
-
 Procedure jListView_setWidgetItem2(env:PJNIEnv; ListView : jObject; value: integer; index: integer);
 Procedure jListView_setWidgetItem3(env:PJNIEnv; ListView : jObject; value: integer; txt: string; index: integer);
 
 Procedure jListView_setWidgetText(env:PJNIEnv; ListView : jObject; txt: string; index: integer);
-
 Procedure jListView_setTextDecorated(env:PJNIEnv; ListView : jObject; value: integer; index: integer);
 Procedure jListView_setTextSizeDecorated(env:PJNIEnv; ListView : jObject; value: integer; index:integer);
-
 Procedure jListView_setItemLayout(env:PJNIEnv; ListView : jObject; value: integer; index: integer);
-
-
 Procedure jListView_setImageItem(env:PJNIEnv; ListView : jObject; bitmap: jObject; index: integer); overload;
 Procedure jListView_setImageItem(env:PJNIEnv; ListView : jObject; imgResIdentifier: string; index: integer); overload;
-
 Procedure jListView_setTextAlign(env:PJNIEnv; ListView : jObject; value: integer; index: integer);
-
 function jListView_IsItemChecked(env:PJNIEnv; ListView : jObject; index: integer): boolean;
-
 function jListView_GetItemText(env:PJNIEnv; ListView : jObject; index: integer): string;
 function jListView_GetCount(env:PJNIEnv; ListView : jObject): integer;
-
 Procedure jListView_setLParamWidth(env:PJNIEnv; ListView : jObject; w: DWord);
 Procedure jListView_setLParamHeight(env:PJNIEnv; ListView : jObject; h: DWord);
-
 Procedure jListView_setLeftTopRightBottomWidthHeight(env:PJNIEnv;
                                         ListView : jObject; ml,mt,mr,mb,w,h: integer);
-
 Procedure jListView_addLParamsParentRule(env:PJNIEnv; ListView : jObject; rule: DWord);
 Procedure jListView_addLParamsAnchorRule(env:PJNIEnv; ListView : jObject; rule: DWord);
-
 Procedure jListView_setLayoutAll(env:PJNIEnv; ListView : jObject;  idAnchor: DWord);
-
-//procedure jListView_SetHighLightSelectedItem(env: PJNIEnv; _jlistview: JObject; _value: boolean);
 procedure jListView_SetHighLightSelectedItemColor(env: PJNIEnv;  _jlistview: JObject; _color: integer);
 function jListView_GetItemIndex(env: PJNIEnv; _jlistview: JObject): integer;
 function jListView_GetItemCaption(env: PJNIEnv; _jlistview: JObject): string;
 procedure jListView_SetDispatchOnDrawItemTextColor(env: PJNIEnv; _jlistview: JObject; _value: boolean);
 procedure jListView_DispatchOnDrawItemBitmap(env: PJNIEnv; _jlistview: JObject; _value: boolean);
-
-procedure jListView_SetFontSizeUnit(env: PJNIEnv; _jlistview: JObject; _unit: integer);   //--here
-
+procedure jListView_SetFontSizeUnit(env: PJNIEnv; _jlistview: JObject; _unit: integer);
 procedure jListView_SetFontFace(env: PJNIEnv; _jlistview: jObject; FontFace: DWord);
-
 function jListView_GetWidgetText(env: PJNIEnv; _jlistview: JObject; _index: integer): string;
-
 procedure jListView_setWidgetCheck(env: PJNIEnv; _jlistview: JObject; _value: boolean; _index: integer);
 procedure jListView_setItemTagString(env: PJNIEnv; _jlistview: JObject; _tagString: string; _index: integer);
 function  jListView_getItemTagString(env: PJNIEnv; _jlistview: JObject; _index: integer): string;
-
 function jListView_getLParamHeight(env:PJNIEnv; _jlistview : jObject ): integer;
 function jListView_getLParamWidth(env:PJNIEnv; _jlistview : jObject): integer;
-
 function  jListView_getTotalHeight(env: PJNIEnv; _jlistview: JObject): integer;
 function  jListView_getItemHeight(env: PJNIEnv; _jlistview: JObject; _index: integer): integer;
 procedure jListView_SetImageByResIdentifier(env: PJNIEnv; _jlistview: JObject; _imageResIdentifier: string);
-
 procedure jListView_SetLeftDelimiter(env: PJNIEnv; _jlistview: JObject; _leftDelimiter: string);
 procedure jListView_SetRightDelimiter(env: PJNIEnv; _jlistview: JObject; _rightDelimiter: string);
 function jListView_GetCenterItemCaption(env: PJNIEnv; _jlistview: JObject; _fullItemCaption: string): string;
@@ -624,6 +543,10 @@ procedure jListView_SetSelection(env: PJNIEnv; _jlistview: JObject; _index: inte
 procedure jListView_SmoothScrollToPosition(env: PJNIEnv; _jlistview: JObject; _index: integer);
 procedure jListView_SetItemChecked(env: PJNIEnv; _jlistview: JObject; _index: integer; _value: boolean);
 function jListView_GetCheckedItemPosition(env: PJNIEnv; _jlistview: JObject): integer;
+Procedure jListView_RemoveFromViewParent(env:PJNIEnv; _jlistview: jObject);
+procedure jListView_SetFitsSystemWindows(env: PJNIEnv; _jlistview: JObject; _value: boolean);
+procedure jListView_BringToFront(env: PJNIEnv; _jlistview: JObject);
+procedure jListView_SetVisibilityGone(env: PJNIEnv; _jlistview: JObject);
 
 // ScrollView
 Function  jScrollView_Create           (env:PJNIEnv;  this:jobject; SelfObj: TObject): jObject;
@@ -650,10 +573,8 @@ Procedure jScrollView_setLeftTopRightBottomWidthHeight(env:PJNIEnv;
 Procedure jScrollView_addLParamsParentRule(env:PJNIEnv; ScrollView : jObject; rule: DWord);
 Procedure jScrollView_addLParamsAnchorRule(env:PJNIEnv; ScrollView : jObject; rule: DWord);
 Procedure jScrollView_setLayoutAll(env:PJNIEnv; ScrollView : jObject;  idAnchor: DWord);
-
 //thanks to DonAlfredo
 Procedure jScrollView_setFillViewport  (env:PJNIEnv; ScrollView : jObject; fillenabled : boolean);
-
 procedure jScrollView_ScrollTo(env: PJNIEnv; _jscrollview: JObject; _x: integer; _y: integer);
 procedure jScrollView_SmoothScrollTo(env: PJNIEnv; _jscrollview: JObject; _x: integer; _y: integer);
 procedure jScrollView_SmoothScrollBy(env: PJNIEnv; _jscrollview: JObject; _x: integer; _y: integer);
@@ -665,36 +586,25 @@ function jScrollView_GetLeft(env: PJNIEnv; _jscrollview: JObject): integer;
 function jScrollView_GetRight(env: PJNIEnv; _jscrollview: JObject): integer;
 procedure jScrollView_DispatchOnScrollChangedEvent(env: PJNIEnv; _jscrollview: JObject; _value: boolean);
 
-  { jPanel by jmpessoa }
+{ jPanel }
 Function  jPanel_Create           (env:PJNIEnv; this:jobject; SelfObj: TObject): jObject;
 Procedure jPanel_Free             (env:PJNIEnv; Panel : jObject);
 Procedure jPanel_setParent        (env:PJNIEnv;
                                         Panel : jObject;ViewGroup : jObject);
-
 Function  jPanel_getView          (env:PJNIEnv;
                                         Panel : jObject) : jObject;
-
 Procedure jPanel_setId(env:PJNIEnv; Panel : jObject; id: DWord);
-
 Procedure jPanel_setLParamWidth(env:PJNIEnv; Panel : jObject; w: DWord);
 Procedure jPanel_setLParamHeight(env:PJNIEnv; Panel : jObject; h: DWord);
-
 Procedure jPanel_setLeftTopRightBottomWidthHeight(env:PJNIEnv;
                                         Panel : jObject; left,top,right,bottom,w,h: integer);
-
 Procedure jPanel_resetLParamsRules(env:PJNIEnv; Panel : jObject); //clearLayoutAll !!
-
 Procedure jPanel_addLParamsParentRule(env:PJNIEnv; Panel : jObject; rule: DWord);
-
 Procedure jPanel_addLParamsAnchorRule(env:PJNIEnv; Panel : jObject; rule: DWord);
-
 Procedure jPanel_setLayoutAll(env:PJNIEnv; Panel : jObject;  idAnchor: DWord);
-
 Procedure jPanel_RemoveParent(env:PJNIEnv; Panel : jObject);
-
 function jPanel_getLParamHeight(env:PJNIEnv; Panel : jObject ): integer;
 function jPanel_getLParamWidth(env:PJNIEnv; Panel : jObject): integer;
-
 procedure jPanel_SetMinZoomFactor(env: PJNIEnv; _jpanel: JObject; _minZoomFactor: single);
 procedure jPanel_SetMaxZoomFactor(env: PJNIEnv; _jpanel: JObject; _maxZoomFactor: single);
 procedure jPanel_CenterInParent(env: PJNIEnv; _jpanel: JObject);
@@ -704,11 +614,19 @@ procedure jPanel_SetRoundCorner(env: PJNIEnv; _jpanel: JObject);
 procedure jPanel_SetRadiusRoundCorner(env: PJNIEnv; _jpanel: JObject; _radius: integer);
 procedure jPanel_SetBackgroundAlpha(env: PJNIEnv; _jpanel: JObject; _alpha: integer);
 procedure jPanel_SetMarginLeftTopRightBottom(env: PJNIEnv; _jpanel: JObject; _left: integer; _top: integer; _right: integer; _bottom: integer);
+function jPanel_GetParent(env: PJNIEnv; _jpanel: JObject): jObject;
+procedure jPanel_AddView(env: PJNIEnv; _jpanel: JObject; _view: jObject);
+procedure jPanel_SetFitsSystemWindows(env: PJNIEnv; _jpanel: JObject; _value: boolean);
+procedure jPanel_RemoveView(env: PJNIEnv; _jpanel: JObject; _view: jObject);
+procedure jPanel_RemoveAllViews(env: PJNIEnv; _jpanel: JObject);
+function jPanel_GetChildCount(env: PJNIEnv; _jpanel: JObject): integer;
+procedure jPanel_BringChildToFront(env: PJNIEnv; _jpanel: JObject; _view: jObject);
+procedure jPanel_BringToFront(env: PJNIEnv; _jpanel: JObject);
+procedure jPanel_SetVisibilityGone(env: PJNIEnv; _jpanel: JObject);
 
 
 //-----------------
 // HorizontalScrollView
-//by jmpessoa
 function jHorizontalScrollView_Create(env: PJNIEnv;   this:jobject; SelfObj: TObject): jObject;
 
 Procedure jHorizontalScrollView_Free          (env:PJNIEnv; ScrollView : jObject);
@@ -747,27 +665,18 @@ procedure jHorizontalScrollView_DispatchOnScrollChangedEvent(env: PJNIEnv; _jhor
 
 // WebView
 Function  jWebView_Create              (env:PJNIEnv;  this:jobject; SelfObj: TObject): jObject;
-
 Procedure jWebView_Free               (env:PJNIEnv; WebView : jObject);
-
 Procedure jWebView_setParent           (env:PJNIEnv;
                                         WebView : jObject;ViewGroup : jObject);
-
 Procedure jWebView_setJavaScript       (env:PJNIEnv;
                                         WebView : jObject; javascript : boolean);
-
 procedure jWebView_SetZoomControl(env: PJNIEnv; WebView: jObject; ZoomControl: Boolean);
-
 Procedure jWebView_loadURL(env:PJNIEnv; WebView : jObject; Str : String);
-
 Procedure jWebView_setId(env:PJNIEnv; WebView : jObject; id: DWord);
-
 Procedure jWebView_setLParamWidth(env:PJNIEnv; WebView : jObject; w: DWord);
 Procedure jWebView_setLParamHeight(env:PJNIEnv; WebView : jObject; h: DWord);
-
 Procedure jWebView_setLeftTopRightBottomWidthHeight(env:PJNIEnv;
                                         WebView: jObject; ml,mt,mr,mb,w,h: integer);
-
 Procedure jWebView_addLParamsParentRule(env:PJNIEnv; WebView : jObject; rule: DWord);
 Procedure jWebView_addLParamsAnchorRule(env:PJNIEnv; WebView : jObject; rule: DWord);
 Procedure jWebView_setLayoutAll(env:PJNIEnv; WebView : jObject;  idAnchor: DWord);
@@ -777,102 +686,70 @@ procedure jWebView_LoadFromHtmlString(env: PJNIEnv; _jwebview: JObject; _htmlStr
 // Canvas
 Function  jCanvas_Create               (env:PJNIEnv;
                                         this:jobject; SelfObj : TObject) : jObject;
-
 Procedure jCanvas_Free                 (env:PJNIEnv; Canv : jObject);
-//
 Procedure jCanvas_setStrokeWidth      (env:PJNIEnv;
                                         Canv : jObject;width : single);
-
 Procedure jCanvas_setStyle             (env:PJNIEnv;
                                         Canv : jObject; style : integer);
-
 Procedure jCanvas_setColor             (env:PJNIEnv;
                                         Canv : jObject; color : DWord  );
-
 Procedure jCanvas_drawBackground       (env:PJNIEnv;
                                         Canv : jObject; _color : DWord);
-
 Procedure jCanvas_setTextSize          (env:PJNIEnv;
                                         Canv : jObject; textsize : single);
-
 Procedure jCanvas_SetTypeface          (env:PJNIEnv;
                                         Canv : jObject; _typeface: integer);
-
 Procedure jCanvas_drawText             (env:PJNIEnv;
                                         Canv : jObject; const text : string; x, y : single);
-
 Procedure jCanvas_drawLine             (env:PJNIEnv;
                                         Canv : jObject; x1,y1,x2,y2 : single);
 // LORDMAN 2013-08-13
 Procedure jCanvas_drawPoint            (env:PJNIEnv;
                                         Canv:jObject; x1,y1:single);
-
 Procedure jCanvas_drawCircle           (env:PJNIEnv;
                                         Canv : jObject; _cx, _cy, _radius : single);
-
 Procedure jCanvas_drawOval             (env:PJNIEnv;
                                         Canv : jObject; _left, _top, _right, _bottom : single);
-
 Procedure jCanvas_drawRect             (env:PJNIEnv;
                                         Canv : jObject; _left, _top, _right, _bottom : single);
-
 Procedure jCanvas_drawRoundRect        (env:PJNIEnv;
                                         Canv : jObject; _left, _top, _right, _bottom, _rx, _ry : single);
-
 Procedure jCanvas_drawBitmap           (env:PJNIEnv;
                                         Canv : jObject; bmp : jObject; left, top, right, bottom : integer); overload;
-
 procedure jCanvas_drawBitmap           (env: PJNIEnv;
                                         _jcanvas: JObject; _bitmap: jObject; _width: integer; _height: integer); overload;
-
 procedure jCanvas_setCanvas(env: PJNIEnv; _jcanvas: JObject; _canvas: jObject);
 procedure jCanvas_drawTextAligned(env: PJNIEnv; Canv: jObject; const _text: string; _left, _top, _right, _bottom, _alignhorizontal , _alignvertical: single);
 
 // Bitmap
 Function  jBitmap_Create               (env:PJNIEnv;
                                         this:jobject; SelfObj : TObject) : jObject;
-
 Procedure jBitmap_Free                 (env:PJNIEnv; bmap : jObject);
-
 Procedure jBitmap_loadRes             (env:PJNIEnv;
                                         bmap : jObject; imgResIdentifier : String);
 Procedure jBitmap_loadFile             (env:PJNIEnv;
                                         bmap : jObject; filename : String);
-
 Procedure jBitmap_createBitmap         (env:PJNIEnv;
                                         bmap : jObject; w,h : integer);
-
-//by jmpessoa
 Procedure jBitmap_getWH                (env:PJNIEnv;
                                         bmap : jObject; var w,h : integer);
-
 function jBitmap_GetWidth(env: PJNIEnv; bmap: JObject): integer;
 function jBitmap_GetHeight(env: PJNIEnv; bmap: JObject): integer;
-
 Function  jBitmap_jInstance(env:PJNIEnv;  bmap: jObject): jObject;
-
 function jBitmap_ClockWise(env: PJNIEnv; _jbitmap: JObject; _bmp: jObject; _imageView: jObject): jObject;
 function jBitmap_AntiClockWise(env: PJNIEnv; _jbitmap: JObject; _bmp: jObject; _imageView: jObject): jObject;
-
 function jBitmap_SetScale(env: PJNIEnv; _jbitmap: JObject; _bmp: jObject; _imageView: jObject; _scaleX: single; _scaleY: single): jObject; overload;
 function jBitmap_SetScale(env: PJNIEnv; _jbitmap: JObject; _imageView: jObject; _scaleX: single; _scaleY: single): jObject; overload;
 function jBitmap_LoadFromAssets(env: PJNIEnv; _jbitmap: JObject; strName: string): jObject;
-//by jmpessoa
 function jBitmap_GetByteArrayFromBitmap(env:PJNIEnv;  bmap: jObject;
                                                    var bufferImage: TDynArrayOfJByte): integer;
-//by jmpessoa
 procedure jBitmap_SetByteArrayToBitmap(env:PJNIEnv;  bmap: jObject; var bufferImage: TDynArrayOfJByte; size: integer);
-
 function jBitmap_GetResizedBitmap(env: PJNIEnv; _jbitmap: JObject; _bmp: jObject; _newWidth: integer; _newHeight: integer): jObject; overload;
 function jBitmap_GetResizedBitmap(env: PJNIEnv; _jbitmap: JObject; _newWidth: integer; _newHeight: integer): jObject; overload;
 function jBitmap_GetResizedBitmap(env: PJNIEnv; _jbitmap: JObject; _factorScaleX: single; _factorScaleY: single): jObject; overload;
-
 function jBitmap_GetByteBuffer(env: PJNIEnv; _jbitmap: JObject; _width: integer; _height: integer): jObject;
-
 function jBitmap_GetBitmapFromByteBuffer(env: PJNIEnv; _jbitmap: JObject; _byteBuffer: jObject; _width: integer; _height: integer): jObject;
-
 function jBitmap_GetBitmapFromByteArray(env: PJNIEnv; _jbitmap: JObject; var _image: TDynArrayOfJByte): jObject;
-
 function jBitmap_GetByteBufferFromBitmap(env: PJNIEnv; _jbitmap: JObject; _bmap: jObject): jObject; overload;
 function jBitmap_GetByteBufferFromBitmap(env: PJNIEnv; _jbitmap: JObject): jObject; overload;
 function jBitmap_LoadFromFile(env: PJNIEnv; _jbitmap: JObject; _fullFilename: string): jObject;
@@ -883,90 +760,61 @@ function jBitmap_GetRoundedShape(env: PJNIEnv; _jbitmap: JObject; _bitmapImage: 
 Function  jGLSurfaceView_Create1       (env:PJNIEnv;  this:jobject; SelfObj: TObject; version: integer): jObject;
 Function  jGLSurfaceView_Create2       (env:PJNIEnv;  this:jobject; SelfObj: TObject; version: integer): jObject;
 Procedure jGLSurfaceView_Free          (env:PJNIEnv; GLSurfaceView : jObject);
-//
 Procedure jGLSurfaceView_setParent     (env:PJNIEnv;
                                         GLSurfaceView: jObject;ViewGroup : jObject);
-
 Procedure jGLSurfaceView_SetAutoRefresh(env:PJNIEnv; glView : jObject; Active : Boolean);
-
 Procedure jGLSurfaceView_Refresh       (env:PJNIEnv; glView : jObject);
-
 Procedure jGLSurfaceView_deleteTexture (env:PJNIEnv; glView : jObject; id : Integer);
-
 Procedure jGLSurfaceView_getBmpArray   (env:PJNIEnv; this:jobject;filename: String);
-
 Procedure jGLSurfaceView_requestGLThread(env:PJNIEnv; glView : jObject);
-
-//by jmpessoa
 Procedure jGLSurfaceView_setId(env:PJNIEnv; GLSurfaceView : jObject; id: DWord);
-
 Procedure jGLSurfaceView_setLParamWidth(env:PJNIEnv; GLSurfaceView : jObject; w: DWord);
 Procedure jGLSurfaceView_setLParamHeight(env:PJNIEnv; GLSurfaceView : jObject; h: DWord);
-
 function jGLSurfaceView_getLParamHeight(env:PJNIEnv; GLSurfaceView : jObject): integer;
 function jGLSurfaceView_getLParamWidth(env:PJNIEnv; GLSurfaceView : jObject): integer;
-
 Procedure jGLSurfaceView_setLeftTopRightBottomWidthHeight(env:PJNIEnv;
                                         GLSurfaceView : jObject; ml,mt,mr,mb,w,h: integer);
-
 Procedure jGLSurfaceView_addLParamsParentRule(env:PJNIEnv; GLSurfaceView : jObject; rule: DWord);
 Procedure jGLSurfaceView_addLParamsAnchorRule(env:PJNIEnv; GLSurfaceView : jObject; rule: DWord);
 Procedure jGLSurfaceView_setLayoutAll(env:PJNIEnv; GLSurfaceView : jObject;  idAnchor: DWord);
-
 procedure jGLSurfaceView_Pause(env: PJNIEnv; _jglsurfaceview: JObject);
 procedure jGLSurfaceView_Resume(env: PJNIEnv; _jglsurfaceview: JObject);
-
 procedure jGLSurfaceView_DispatchTouchDown(env: PJNIEnv; _jglsurfaceview: JObject; _value: boolean);
 procedure jGLSurfaceView_DispatchTouchMove(env: PJNIEnv; _jglsurfaceview: JObject; _value: boolean);
 procedure jGLSurfaceView_DispatchTouchUp(env: PJNIEnv; _jglsurfaceview: JObject; _value: boolean);
 
-Function  jView_Create                 (env:PJNIEnv; this:jobject; SelfObj: TObject): jObject;
-
 //View
+
+Function  jView_Create                 (env:PJNIEnv; this:jobject; SelfObj: TObject): jObject;
 Procedure jView_Free                   (env:PJNIEnv; View : jObject);
-
-
-
 Procedure jView_setParent              (env:PJNIEnv;
                                         View : jObject;ViewGroup : jObject);
-
 Procedure jView_setjCanvas             (env:PJNIEnv;
                                         View : jObject;jCanv   : jObject);
-
 Procedure jView_viewSave               (env:PJNIEnv;
                                         View : jObject; Filename: String );
-//by jmpessoa
 Procedure jView_setId(env:PJNIEnv; View : jObject; id: DWord);
-
 Procedure jView_setLParamWidth(env:PJNIEnv; View : jObject; w: DWord);
 Procedure jView_setLParamHeight(env:PJNIEnv; View : jObject; h: DWord);
-
 Procedure jView_setLeftTopRightBottomWidthHeight(env:PJNIEnv;
                                         View : jObject; ml,mt,mr,mb,w,h: integer);
-
 Procedure jView_addLParamsParentRule(env:PJNIEnv; View : jObject; rule: DWord);
 Procedure jView_addLParamsAnchorRule(env:PJNIEnv; View : jObject; rule: DWord);
-
 Procedure jView_setLayoutAll(env:PJNIEnv; View : jObject;  idAnchor: DWord);
-
 function jView_getLParamHeight(env:PJNIEnv; View : jObject ): integer;
 function jView_getLParamWidth(env:PJNIEnv; View : jObject): integer;
 function jView_GetBitmap(env: PJNIEnv; _jview: JObject): jObject;
 
 // Timer
 Function  jTimer_Create                (env:PJNIEnv; this:jobject; SelfObj: TObject): jObject;
-
 Procedure jTimer_Free                  (env:PJNIEnv; Timer  : jObject);
-
 Procedure jTimer_SetInterval         (env:PJNIEnv; Timer  : jObject; Interval : Integer);
-
 Procedure jTimer_SetEnabled            (env:PJNIEnv; Timer  : jObject; Active   : Boolean);
 
 // Dialog YN
 Function  jDialogYN_Create             (env:PJNIEnv; this:jobject; SelfObj : TObject;
                                         title,msg,y,n : string ): jObject;
 Procedure jDialogYN_Free               (env:PJNIEnv; DialogYN: jObject);
-
 Procedure jDialogYN_Show               (env:PJNIEnv; DialogYN: jObject);  overload;
 Procedure jDialogYN_Show(env:PJNIEnv; DialogYN: jObject; titleText: string; msgText: string; yesText: string; noText:string);  overload;
 Procedure jDialogYN_Show(env:PJNIEnv; DialogYN: jObject; titleText: string; msgText: string); overload;
@@ -975,9 +823,7 @@ procedure jDialogYN_ShowOK(env: PJNIEnv; _jdialogyn: JObject; titleText: string;
 // Dialog Progress
 Function  jDialogProgress_Create       (env:PJNIEnv; this:jobject; SelfObj : TObject;
                                         title,msg : string ): jObject;
-
 Procedure jDialogProgress_Free         (env:PJNIEnv; DialogProgress : jObject);
-
 procedure jDialogProgress_Show(env: PJNIEnv; _jdialogprogress: JObject);  overload;
 procedure jDialogProgress_Show(env: PJNIEnv; _jdialogprogress: JObject; _title: string; _msg: string);  overload;
 procedure jDialogProgress_Show(env: PJNIEnv; _jdialogprogress: JObject; _layout: jObject);   overload;
@@ -991,126 +837,86 @@ Procedure jToast                       (env:PJNIEnv; this:jobject;Str : String);
 
 // ImageBtn
 Function  jImageBtn_Create             (env:PJNIEnv;  this:jobject; SelfObj: TObject): jObject;
-
 Procedure jImageBtn_Free               (env:PJNIEnv; ImageBtn : jObject);
-
 Procedure jImageBtn_setParent          (env:PJNIEnv;
                                         ImageBtn : jObject;ViewGroup : jObject);
 Procedure jImageBtn_setButton          (env:PJNIEnv;
                                         ImageBtn : jObject;up,dn : String);
-//by jmpessoa
 Procedure jImageBtn_setButtonUp        (env:PJNIEnv;
                                         ImageBtn : jObject; up: String);
-
-//by jmpessoa
 Procedure jImageBtn_setButtonDown       (env:PJNIEnv;
                                         ImageBtn : jObject; dn: String);
-
-//by jmpessoa
 Procedure jImageBtn_setButtonDownByRes       (env:PJNIEnv;
                                         ImageBtn : jObject; imgResIdentifief: String);
-//by jmpessoa
 Procedure jImageBtn_setButtonUpByRes       (env:PJNIEnv;
                                         ImageBtn : jObject; imgResIdentifief: String);
-
-
 Procedure jImageBtn_SetEnabled         (env:PJNIEnv;
                                         ImageBtn : jObject; Active : Boolean);
-//by jmpessoa
 Procedure jImageBtn_setId(env:PJNIEnv; ImageBtn : jObject; id: DWord);
-
 Procedure jImageBtn_setLParamWidth(env:PJNIEnv; ImageBtn : jObject; w: DWord);
 Procedure jImageBtn_setLParamHeight(env:PJNIEnv; ImageBtn : jObject; h: DWord);
-
 Procedure jImageBtn_setLeftTopRightBottomWidthHeight(env:PJNIEnv;
                                         ImageBtn : jObject; ml,mt,mr,mb,w,h: integer);
-
 Procedure jImageBtn_addLParamsParentRule(env:PJNIEnv; ImageBtn : jObject; rule: DWord);
 Procedure jImageBtn_addLParamsAnchorRule(env:PJNIEnv; ImageBtn : jObject; rule: DWord);
 Procedure jImageBtn_setLayoutAll(env:PJNIEnv; ImageBtn : jObject;  idAnchor: DWord);
 procedure jImageBtn_SetFrameGravity(env: PJNIEnv; ImageBtn: JObject; _value: integer);
+procedure jImageBtn_RemoveFromViewParent(env: PJNIEnv; ImageBtn: JObject);
 
  { AsyncTask }
 function jAsyncTask_Create             (env: PJNIEnv;    this:jobject; SelfObj: TObject): jObject;
-
 Procedure jAsyncTask_Free              (env:PJNIEnv; AsyncTask : jObject);
-
 Procedure jAsyncTask_Execute           (env:PJNIEnv; AsyncTask : jObject);
 
  { jSqliteCursor by jmpessoa }
 
 Function  jSqliteCursor_Create(env:PJNIEnv;  this:jobject; SelfObj: TObject): jObject;
 Procedure jSqliteCursor_Free(env:PJNIEnv; SqliteCursor: jObject);
-
 procedure jSqliteCursor_SetCursor(env:PJNIEnv;  SqliteCursor: jObject; Cursor: jObject);
-
 Function  jSqliteCursor_GetCursor(env:PJNIEnv;  SqliteCursor: jObject): jObject;
-
 procedure jSqliteCursor_MoveToFirst(env:PJNIEnv;  SqliteCursor: jObject);
 procedure jSqliteCursor_MoveToNext(env:PJNIEnv;  SqliteCursor: jObject);
 procedure jSqliteCursor_MoveToLast(env:PJNIEnv;  SqliteCursor: jObject);
 procedure jSqliteCursor_MoveToPosition(env:PJNIEnv;  SqliteCursor: jObject; position: integer);
-
 Function jSqliteCursor_GetRowCount(env:PJNIEnv;  SqliteCursor: jObject): integer;
-
 Function jSqliteCursor_GetColumnCount(env:PJNIEnv;  SqliteCursor: jObject):  integer;
 Function jSqliteCursor_GetColumnIndex(env:PJNIEnv;  SqliteCursor: jObject; colName: string): integer;
 Function jSqliteCursor_GetColumName(env:PJNIEnv;  SqliteCursor: jObject; columnIndex: integer): string;
-
 Function jSqliteCursor_GetColType(env:PJNIEnv;  SqliteCursor: jObject; columnIndex: integer): integer;
-
-Function jSqliteCursor_GetValueAsString(env:PJNIEnv;  SqliteCursor: jObject; columnIndex: integer): string; overload;
+Function jSqliteCursor_GetValueAsString(env:PJNIEnv;  SqliteCursor: jObject; columnIndex: integer): AnsiString; overload;
 function jSqliteCursor_GetValueAsBitmap(env:PJNIEnv;  SqliteCursor: jObject; columnIndex: integer): jObject;
-
 function jSqliteCursor_GetValueAsDouble (env:PJNIEnv;  SqliteCursor: jObject; columnIndex: integer): double;
 function jSqliteCursor_GetValueAsFloat (env:PJNIEnv;  SqliteCursor: jObject; columnIndex: integer): real;
-
 function jSqliteCursor_GetValueAsInteger(env:PJNIEnv;  SqliteCursor: jObject; columnIndex: integer): integer;
-
 function jSqliteCursor_GetValueAsString(env: PJNIEnv; _jsqlitecursor: JObject; position: integer; columnName: string): string; overload;
+function jSqliteCursor_GetPosition(env: PJNIEnv; _jsqlitecursor: JObject): integer;
+
 {jSqliteDataAccess: by jmpessoa}
 
 Function  jSqliteDataAccess_Create(env: PJNIEnv;   this:jobject; SelfObj: TObject;
                                         dataBaseName: string; colDelimiter: char; rowDelimiter: char): jObject;
-
 Procedure jSqliteDataAccess_Free(env:PJNIEnv; SqliteDataBase : jObject);
-
 function jSqliteDataAccess_CheckDataBaseExists(env:PJNIEnv;  SqliteDataBase: jObject; fullPathDB: string): boolean;
 Procedure jSqliteDataAccess_ExecSQL(env:PJNIEnv; SqliteDataBase: jObject; execQuery: string);
-
 Procedure jSqliteDataAccess_OpenOrCreate(env:PJNIEnv; SqliteDataBase: jObject; dataBaseName: string);
-
 Procedure jSqliteDataAccess_SetVersion(env:PJNIEnv; SqliteDataBase: jObject; version:integer ); // renabor
 function jSqliteDataAccess_GetVersion(env:PJNIEnv; SqliteDataBase: jObject):integer; // renabor
-
-
 Procedure jSqliteDataAccess_AddTableName(env:PJNIEnv; SqliteDataBase: jObject; tableName: string);
-
 Procedure jSqliteDataAccess_AddCreateTableQuery(env:PJNIEnv; SqliteDataBase: jObject; createTableQuery: string);
-
 procedure jSqliteDataAccess_CreateAllTables(env:PJNIEnv; SqliteDataBase: jObject);
 procedure jSqliteDataAccess_DropAllTables(env:PJNIEnv; SqliteDataBase: jObject; recreate: boolean);
-
 function jSqliteDataAccess_Select(env: PJNIEnv; _jsqlitedataaccess: JObject; selectQuery: string): string; overload;
 function jSqliteDataAccess_Select(env: PJNIEnv; _jsqlitedataaccess: JObject; selectQuery: string; moveToLast: boolean): boolean; overload;
-
-
-
 function jSqliteDataAccess_GetCursor(env:PJNIEnv;  SqliteDataBase: jObject): jObject;
-
 procedure jSqliteDataAccess_SetSelectDelimiters(env:PJNIEnv; SqliteDataBase: jObject; coldelim: char; rowdelim: char);
 procedure jSqliteDataAccess_CreateTable(env:PJNIEnv; SqliteDataBase: jObject; createQuery: string);
 procedure jSqliteDataAccess_DropTable(env:PJNIEnv; SqliteDataBase: jObject; tableName: string);
 procedure jSqliteDataAccess_InsertIntoTable(env:PJNIEnv; SqliteDataBase: jObject; insertQuery: string);
-
 procedure jSqliteDataAccess_DeleteFromTable(env:PJNIEnv; SqliteDataBase: jObject; deleteQuery: string);
-
 procedure jSqliteDataAccess_UpdateTable(env:PJNIEnv; SqliteDataBase: jObject; updateQuery: string);
 procedure jSqliteDataAccess_UpdateImage(env:PJNIEnv; SqliteDataBase: jObject;
                                         tableName: string; imageFieldName: string; keyFieldName: string; imageValue: jObject; keyValue: integer); overload;
-
 procedure jSqliteDataAccess_Close(env:PJNIEnv; SqliteDataBase: jObject);
-
 procedure jSqliteDataAccess_SetForeignKeyConstraintsEnabled(env: PJNIEnv; _jsqlitedataaccess: JObject; _value: boolean);
 procedure jSqliteDataAccess_SetDefaultLocale(env: PJNIEnv; _jsqlitedataaccess: JObject);
 procedure jSqliteDataAccess_DeleteDatabase(env: PJNIEnv; _jsqlitedataaccess: JObject; _dbName: string);
@@ -1118,39 +924,63 @@ procedure jSqliteDataAccess_UpdateImage(env: PJNIEnv; _jsqlitedataaccess: JObjec
 procedure jSqliteDataAccess_InsertIntoTableBatch(env: PJNIEnv; _jsqlitedataaccess: JObject; var _insertQueries: TDynArrayOfString);
 procedure jSqliteDataAccess_UpdateTableBatch(env: PJNIEnv; _jsqlitedataaccess: JObject; var _updateQueries: TDynArrayOfString);
 function jSqliteDataAccess_CheckDataBaseExistsByName(env: PJNIEnv; _jsqlitedataaccess: JObject; _dbName: string): boolean;
-
 procedure jSqliteDataAccess_UpdateImageBatch(env: PJNIEnv; _jsqlitedataaccess: JObject; var _imageResIdentifierDataArray: TDynArrayOfString; _delimiter: string);
 procedure jSqliteDataAccess_SetDataBaseName(env: PJNIEnv; _jsqlitedataaccess: JObject; _dbName: string);
 function jSqliteDataAccess_DatabaseExists(env: PJNIEnv; _jsqlitedataaccess: JObject; _databaseName: string): boolean;
 procedure jSqliteDataAccess_SetAssetsSearchFolder(env: PJNIEnv; _jsqlitedataaccess: JObject; _folderName: string);
 procedure jSqliteDataAccess_SetReturnHeaderOnSelect(env: PJNIEnv; _jsqlitedataaccess: JObject; _returnHeader: boolean);
 
-// Http
-//Function  jHttp_Get(env:PJNIEnv;  this:jobject; URL: String) : String;
+     { jDBListView by Martin Lowry}
+
+function jDBListView_jCreate(env: PJNIEnv; _Self: int64; this: JObject): jObject;
+procedure jDBListView_jFree(env: PJNIEnv; _jdblistview: JObject);
+function jDBListView_GetView(env: PJNIEnv; _jdblistview: JObject): jObject;
+procedure jDBListView_SetViewParent(env: PJNIEnv; _jdblistview: JObject; _viewgroup: jObject);
+procedure jDBListView_RemoveFromViewParent(env: PJNIEnv; _jdblistview: JObject);
+function jDBListView_GetParent(env: PJNIEnv; _jdblistview: JObject): jObject;
+procedure jDBListView_SetLParamWidth(env: PJNIEnv; _jdblistview: JObject; _w: integer);
+procedure jDBListView_SetLParamHeight(env: PJNIEnv; _jdblistview: JObject; _h: integer);
+procedure jDBListView_setLGravity(env: PJNIEnv; _jdblistview: JObject; _g: integer);
+procedure jDBListView_setLWeight(env: PJNIEnv; _jdblistview: JObject; _w: single);
+procedure jDBListView_SetLeftTopRightBottomWidthHeight(env: PJNIEnv;
+ _jdblistview: JObject; _left: integer; _top: integer; _right: integer;
+ _bottom: integer; _w: integer; _h: integer);
+procedure jDBListView_AddLParamsAnchorRule(env: PJNIEnv; _jdblistview: JObject;
+ _rule: integer);
+procedure jDBListView_AddLParamsParentRule(env: PJNIEnv; _jdblistview: JObject;
+ _rule: integer);
+procedure jDBListView_SetLayoutAll(env: PJNIEnv; _jdblistview: JObject; _idAnchor: integer);
+procedure jDBListView_ClearLayoutAll(env: PJNIEnv; _jdblistview: JObject);
+procedure jDBListView_SetId(env: PJNIEnv; _jdblistview: JObject; _id: integer);
+function jDBListView_GetItemIndex(env: PJNIEnv; _jdblistview: JObject): integer;
+function jDBListView_GetItemCaption(env: PJNIEnv; _jdblistview: JObject): string;
+procedure jDBListView_SetSelection(env: PJNIEnv; _jdblistview: JObject; _index: integer);
+procedure jDBListView_SetFontSize(env: PJNIEnv; _jdblistview: JObject; _size: integer);
+procedure jDBListView_SetFontColor(env: PJNIEnv; _jdblistview: JObject; _color: integer);
+procedure jDBListView_SetFontSizeUnit(env: PJNIEnv; _jdblistview: JObject; _unit: integer);
+
+procedure jDBListView_ChangeCursor(env: PJNIEnv; _jdblistview: JObject; Cursor: jObject);
+procedure jDBListView_SetColumnWeights(env:PJNIEnv; _jdblistview: jObject; _value: TDynArrayOfSingle);
+procedure jDBListView_SetColumnNames(env:PJNIEnv; _jdblistview: jObject; _value: TDynArrayOfString);
+
+{ Http }
 
 function jHttpClient_jCreate(env: PJNIEnv;_Self: int64; this: jObject): jObject;
 procedure jHttpClient_jFree(env: PJNIEnv; _jhttpclient: JObject);
-
 procedure jHTTPClient_SetCharSet(env: PJNIEnv; _jHTTPClient: JObject; _CharSet: string);
 procedure jHttpClient_GetAsync(env: PJNIEnv; _jhttpclient: JObject; _stringUrl: string);
-
 function jHTTPClient_Get(env: PJNIEnv; _jHTTPClient: JObject; _Link: string): string; overload;
-
 procedure jHttpClient_SetAuthenticationUser(env: PJNIEnv; _jhttpclient: JObject; _userName: string; _password: string);
 procedure jHttpClient_SetAuthenticationMode(env: PJNIEnv; _jhttpclient: JObject; _authenticationMode: integer);
 procedure jHttpClient_SetAuthenticationHost(env: PJNIEnv; _jhttpclient: JObject; _hostName: string; _port: integer);
-
 procedure jHttpClient_PostNameValueDataAsync(env: PJNIEnv; _jhttpclient: JObject; _stringUrl: string); overload;
 procedure jHttpClient_PostNameValueDataAsync(env: PJNIEnv; _jhttpclient: JObject; _stringUrl: string; _name: string; _value: string); overload;
 procedure jHttpClient_PostNameValueDataAsync(env: PJNIEnv; _jhttpclient: JObject; _stringUrl: string; _listNameValue: string); overload;
-
 procedure jHTTPClient_ClearPost2Values(env: PJNIEnv; _jHTTPClient: JObject);
 procedure jHTTPClient_AddValueForPost2(env: PJNIEnv; _jHTTPClient: JObject; _name, _value: string);
 function jHTTPClient_Post(env: PJNIEnv; _jHTTPClient: JObject; _Link: string): string; overload;
-
 function jHttpClient_GetCookies(env: PJNIEnv; _jhttpclient: JObject;  _nameValueSeparator: string): TDynArrayOfString; overload;
 function jHttpClient_GetCookiesCount(env: PJNIEnv; _jhttpclient: JObject): integer;
-
 function jHttpClient_GetCookieByIndex(env: PJNIEnv; _jhttpclient: JObject; _index: integer): jObject;
 function jHttpClient_GetCookieAttributeValue(env: PJNIEnv; _jhttpclient: JObject; _cookie: jObject; _attribute: string): string;
 procedure jHttpClient_ClearCookieStore(env: PJNIEnv; _jhttpclient: JObject);
@@ -1164,20 +994,14 @@ function jHttpClient_GetCookieByName(env: PJNIEnv; _jhttpclient: JObject; _cooki
 procedure jHttpClient_SetCookieAttributeValue(env: PJNIEnv; _jhttpclient: JObject; _cookie: jObject; _attribute: string; _value: string);
 function jHttpClient_GetCookieValue(env: PJNIEnv; _jhttpclient: JObject; _cookie: jObject): string;
 function jHttpClient_GetCookieName(env: PJNIEnv; _jhttpclient: JObject; _cookie: jObject): string;
-
-
 procedure jHttpClient_AddClientHeader(env: PJNIEnv; _jhttpclient: JObject; _name: string; _value: string);
 procedure jHttpClient_ClearClientHeader(env: PJNIEnv; _jhttpclient: JObject; _name: string; _value: string);
 function jHttpClient_DeleteStateful(env: PJNIEnv; _jhttpclient: JObject; _url, _value: string): string;
-
 function jHttpClient_UrlExist(env: PJNIEnv; _jhttpclient: JObject; _urlString: string): boolean;
-
 function jHttpClient_GetCookies(env: PJNIEnv; _jhttpclient: JObject; _urlString: string; _nameValueSeparator: string): TDynArrayOfString; overload;
 function jHttpClient_AddCookie(env: PJNIEnv; _jhttpclient: JObject; _urlString: string; _name: string; _value: string): jObject;  overload;
-
 function jHttpClient_OpenConnection(env: PJNIEnv; _jhttpclient: JObject; _urlString: string): jObject;
 function jHttpClient_SetRequestProperty(env: PJNIEnv; _jhttpclient: JObject; _httpConnection: jObject; _headerName: string; _headerValue: string): jObject;
-//function jHttpClient_Connect(env: PJNIEnv; _jhttpclient: JObject; _httpConnection: jObject): jObject;
 function jHttpClient_GetHeaderField(env: PJNIEnv; _jhttpclient: JObject; _httpConnection: jObject; _headerName: string): string;
 function jHttpClient_GetHeaderFields(env: PJNIEnv; _jhttpclient: JObject; _httpConnection: jObject): TDynArrayOfString;
 procedure jHttpClient_Disconnect(env: PJNIEnv; _jhttpclient: JObject; _httpConnection: jObject);
@@ -1191,42 +1015,41 @@ procedure jHttpClient_SetConnectionTimeout(env: PJNIEnv; _jhttpclient: JObject; 
 function jHttpClient_GetResponseTimeout(env: PJNIEnv; _jhttpclient: JObject): integer;
 function jHttpClient_GetConnectionTimeout(env: PJNIEnv; _jhttpclient: JObject): integer;
 
+{ImageList}
 
 function jImageList_jCreate(env: PJNIEnv;_Self: int64; this: jObject): jObject;
 procedure jImageList_jFree(env: PJNIEnv; _jimagelist: JObject);
 function jImageList_LoadFromFile(env: PJNIEnv; _jimagelist: JObject; _fullFilename: string): jObject;
 
-//by jmpessoa
+{Send Mail}
+
 procedure jSend_Email(env:PJNIEnv; this:jobject;
                        sto: string;
                        scc: string;
                        sbcc: string;
                        ssubject: string;
                        smessage:string);
-//by jmpessoa
+{Send SMS}
 function jSend_SMS(env:PJNIEnv; this:jobject;
                        toNumber: string;
                        smessage: string;
 					   multipartMessage: Boolean): integer; overload;
-
 function jSend_SMS(env:PJNIEnv; this:jobject;
                        toNumber: string;
                        smessage: string; 
 					   packageDeliveredAction: string;
 					   multipartMessage: Boolean): integer; overload;
-
 function jRead_SMS(env:PJNIEnv; this:jobject; intentReceiver: jObject; addressBodyDelimiter: string): string;  //message
 
-//by jmpessoa
+{Contact Manager}
+
 function jContact_getMobileNumberByDisplayName(env:PJNIEnv; this:jobject;
                                                contactName: string): string;
-//by jmpessoa
 function jContact_getDisplayNameList(env:PJNIEnv; this:jobject; delimiter: char): string;
 
-// Camera
-Procedure jTakePhoto(env:PJNIEnv;  this:jobject; filename : String);
+ {Camera}
 
-//by jmpessoa
+Procedure jTakePhoto(env:PJNIEnv;  this:jobject; filename : String);
 function jCamera_takePhoto(env:PJNIEnv; this:jobject;  path: string;  filename : String): string; overload;
 function jCamera_takePhoto(env:PJNIEnv; this:jobject;  path: string;  filename : String; requestCode: integer): string; overload;
 
@@ -2044,6 +1867,17 @@ begin
   jMethod:= env^.GetMethodID(env, jCls, 'SetLGravity', '(I)V');
   env^.CallVoidMethodA(env, _jtextview, jMethod, @jParams);
   env^.DeleteLocalRef(env, jCls);
+end;
+
+Procedure jTextView_RemoveFromViewParent(env:PJNIEnv; _jtextview: jObject);
+var
+ _jMethod : jMethodID = nil;
+ cls: jClass;
+begin
+ cls := env^.GetObjectClass(env, _jtextview);
+_jMethod:= env^.GetMethodID(env, cls, 'RemoveFromViewParent', '()V');
+ env^.CallVoidMethod(env,_jtextview,_jMethod);
+ env^.DeleteLocalRef(env, cls);
 end;
 
 //------------------------------------------------------------------------------
@@ -2984,6 +2818,16 @@ begin
   env^.DeleteLocalRef(env, jCls);
 end;
 
+Procedure jEditText_RemoveFromViewParent(env:PJNIEnv; _jedittext: jObject);
+var
+ _jMethod : jMethodID = nil;
+ cls: jClass;
+begin
+ cls := env^.GetObjectClass(env, _jedittext);
+_jMethod:= env^.GetMethodID(env, cls, 'RemoveFromViewParent', '()V');
+ env^.CallVoidMethod(env,_jedittext,_jMethod);
+ env^.DeleteLocalRef(env, cls);
+end;
 
 //------------------------------------------------------------------------------
 // Button
@@ -3401,6 +3245,17 @@ begin
   env^.DeleteLocalRef(env, jCls);
 end;
 
+Procedure jButton_RemoveFromViewParent(env:PJNIEnv; _jbutton: jObject);
+var
+ _jMethod : jMethodID = nil;
+ cls: jClass;
+begin
+ cls := env^.GetObjectClass(env, _jbutton);
+_jMethod:= env^.GetMethodID(env, cls, 'RemoveFromViewParent', '()V');
+ env^.CallVoidMethod(env,_jbutton,_jMethod);
+ env^.DeleteLocalRef(env, cls);
+end;
+
 //------------------------------------------------------------------------------
 // CheckBox
 //------------------------------------------------------------------------------
@@ -3711,6 +3566,17 @@ begin
   jMethod:= env^.GetMethodID(env, jCls, 'SetLGravity', '(I)V');
   env^.CallVoidMethodA(env, _jcheckbox, jMethod, @jParams);
   env^.DeleteLocalRef(env, jCls);
+end;
+
+Procedure jCheckBox_RemoveFromViewParent(env:PJNIEnv; _jcheckbox: jObject);
+var
+ _jMethod : jMethodID = nil;
+ cls: jClass;
+begin
+ cls := env^.GetObjectClass(env, _jcheckbox);
+_jMethod:= env^.GetMethodID(env, cls, 'RemoveFromViewParent', '()V');
+ env^.CallVoidMethod(env,_jcheckbox,_jMethod);
+ env^.DeleteLocalRef(env, cls);
 end;
 
 //------------------------------------------------------------------------------
@@ -4036,6 +3902,17 @@ begin
   jMethod:= env^.GetMethodID(env, jCls, 'SetLGravity', '(I)V');
   env^.CallVoidMethodA(env, _jradiobutton, jMethod, @jParams);
   env^.DeleteLocalRef(env, jCls);
+end;
+
+Procedure jRadioButton_RemoveFromViewParent(env:PJNIEnv; _jradiobutton: jObject);
+var
+ _jMethod : jMethodID = nil;
+ cls: jClass;
+begin
+ cls := env^.GetObjectClass(env, _jradiobutton);
+_jMethod:= env^.GetMethodID(env, cls, 'RemoveFromViewParent', '()V');
+ env^.CallVoidMethod(env,_jradiobutton,_jMethod);
+ env^.DeleteLocalRef(env, cls);
 end;
 
 //------------------------------------------------------------------------------
@@ -4660,6 +4537,40 @@ begin
   env^.DeleteLocalRef(env, jCls);
 end;
 
+Procedure jImageView_RemoveFromViewParent(env:PJNIEnv; _jimageview: jObject);
+var
+ _jMethod : jMethodID = nil;
+ cls: jClass;
+begin
+ cls := env^.GetObjectClass(env, _jimageview);
+_jMethod:= env^.GetMethodID(env, cls, 'RemoveFromViewParent', '()V');
+ env^.CallVoidMethod(env,_jimageview,_jMethod);
+ env^.DeleteLocalRef(env, cls);
+end;
+
+procedure jImageView_BringToFront(env: PJNIEnv; _jimageview: JObject);
+var
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jimageview);
+  jMethod:= env^.GetMethodID(env, jCls, 'BringToFront', '()V');
+  env^.CallVoidMethod(env, _jimageview, jMethod);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jImageView_SetVisibilityGone(env: PJNIEnv; _jimageview: JObject);
+var
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jimageview);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetVisibilityGone', '()V');
+  env^.CallVoidMethod(env, _jimageview, jMethod);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+
 //------------------------------------------------------------------------------
 // ListView
 //------------------------------------------------------------------------------
@@ -4873,7 +4784,7 @@ begin
   env^.CallVoidMethodA(env,ListView,_jMethod,@_jParams);
   env^.DeleteLocalRef(env,_jParams[0].l);
   env^.DeleteLocalRef(env,_jParams[1].l);
-  env^.DeleteLocalRef(env, cls);  // <---- Added this for bug fix! 09-Sept-2014 [thanks to @Fatih!]
+  env^.DeleteLocalRef(env, cls);  // <---- bug fix! 09-Sept-2014 [thanks to @Fatih!]
 end;
 
 Procedure jListView_add22(env:PJNIEnv; ListView: jObject; Str: string; delimiter: string; image: jObject);
@@ -4890,7 +4801,7 @@ begin
   env^.CallVoidMethodA(env,ListView,_jMethod,@_jParams);
   env^.DeleteLocalRef(env,_jParams[0].l);
   env^.DeleteLocalRef(env,_jParams[1].l);
-  env^.DeleteLocalRef(env, cls);  // <---- Added this for bug fix! 09-Sept-2014
+  env^.DeleteLocalRef(env, cls);  // <---- bug fix! 09-Sept-2014
 end;
 
 //by jmpessoa
@@ -4914,7 +4825,7 @@ begin
   env^.DeleteLocalRef(env,_jParams[0].l);
   env^.DeleteLocalRef(env,_jParams[1].l);
   env^.DeleteLocalRef(env,_jParams[5].l);
-  env^.DeleteLocalRef(env, cls);  // <---- Added this for bug fix! 09-Sept-2014
+  env^.DeleteLocalRef(env, cls);  // <---- bug fix! 09-Sept-2014
 end;
 
 
@@ -4938,7 +4849,7 @@ begin
   env^.DeleteLocalRef(env,_jParams[0].l);
   env^.DeleteLocalRef(env,_jParams[1].l);
   env^.DeleteLocalRef(env,_jParams[5].l);
-  env^.DeleteLocalRef(env, cls);  // <---- Added this for bug fix! 09-Sept-2014
+  env^.DeleteLocalRef(env, cls);  // <---- bug fix! 09-Sept-2014
 end;
 
 
@@ -5781,6 +5692,52 @@ begin
   env^.DeleteLocalRef(env, jCls);
 end;
 
+Procedure jListView_RemoveFromViewParent(env:PJNIEnv; _jlistview: jObject);
+var
+ _jMethod : jMethodID = nil;
+ cls: jClass;
+begin
+ cls := env^.GetObjectClass(env, _jlistview);
+_jMethod:= env^.GetMethodID(env, cls, 'RemoveFromViewParent', '()V');
+ env^.CallVoidMethod(env,_jlistview,_jMethod);
+ env^.DeleteLocalRef(env, cls);
+end;
+
+procedure jListView_SetFitsSystemWindows(env: PJNIEnv; _jlistview: JObject; _value: boolean);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].z:= JBool(_value);
+  jCls:= env^.GetObjectClass(env, _jlistview);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetFitsSystemWindows', '(Z)V');
+  env^.CallVoidMethodA(env, _jlistview, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jListView_BringToFront(env: PJNIEnv; _jlistview: JObject);
+var
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jlistview);
+  jMethod:= env^.GetMethodID(env, jCls, 'BringToFront', '()V');
+  env^.CallVoidMethod(env, _jlistview, jMethod);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jListView_SetVisibilityGone(env: PJNIEnv; _jlistview: JObject);
+var
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jlistview);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetVisibilityGone', '()V');
+  env^.CallVoidMethod(env, _jlistview, jMethod);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
 //------------------------------------------------------------------------------
 // ScrollView
 //------------------------------------------------------------------------------
@@ -6148,7 +6105,7 @@ var
  begin
   _jParams[0].l := ViewGroup;
     cls := env^.GetObjectClass(env, Panel);
- _jMethod:= env^.GetMethodID(env, cls, 'setParent', '(Landroid/view/ViewGroup;)V');
+ _jMethod:= env^.GetMethodID(env, cls, 'SetViewParent', '(Landroid/view/ViewGroup;)V');
   env^.CallVoidMethodA(env,Panel,_jMethod,@_jParams);
   env^.DeleteLocalRef(env, cls);
  end;
@@ -6289,7 +6246,7 @@ var
  cls: jClass;
 begin
  cls := env^.GetObjectClass(env, Panel);
-_jMethod:= env^.GetMethodID(env, cls, 'RemoveParent', '()V');
+_jMethod:= env^.GetMethodID(env, cls, 'RemoveFromViewParent', '()V');
  env^.CallVoidMethod(env,Panel,_jMethod);
  env^.DeleteLocalRef(env, cls);
 end;
@@ -6408,6 +6365,117 @@ begin
   env^.CallVoidMethodA(env, _jpanel, jMethod, @jParams);
   env^.DeleteLocalRef(env, jCls);
 end;
+
+function jPanel_GetParent(env: PJNIEnv; _jpanel: JObject): jObject;
+var
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jpanel);
+  jMethod:= env^.GetMethodID(env, jCls, 'GetParent', '()Landroid/view/ViewGroup;');
+  Result:= env^.CallObjectMethod(env, _jpanel, jMethod);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+
+procedure jPanel_AddView(env: PJNIEnv; _jpanel: JObject; _view: jObject);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= _view;
+  jCls:= env^.GetObjectClass(env, _jpanel);
+  jMethod:= env^.GetMethodID(env, jCls, 'AddView', '(Landroid/view/View;)V');
+  env^.CallVoidMethodA(env, _jpanel, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jPanel_SetFitsSystemWindows(env: PJNIEnv; _jpanel: JObject; _value: boolean);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].z:= JBool(_value);
+  jCls:= env^.GetObjectClass(env, _jpanel);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetFitsSystemWindows', '(Z)V');
+  env^.CallVoidMethodA(env, _jpanel, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jPanel_RemoveView(env: PJNIEnv; _jpanel: JObject; _view: jObject);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= _view;
+  jCls:= env^.GetObjectClass(env, _jpanel);
+  jMethod:= env^.GetMethodID(env, jCls, 'RemoveView', '(Landroid/view/View;)V');
+  env^.CallVoidMethodA(env, _jpanel, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+
+procedure jPanel_RemoveAllViews(env: PJNIEnv; _jpanel: JObject);
+var
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jpanel);
+  jMethod:= env^.GetMethodID(env, jCls, 'RemoveAllViews', '()V');
+  env^.CallVoidMethod(env, _jpanel, jMethod);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+
+function jPanel_GetChildCount(env: PJNIEnv; _jpanel: JObject): integer;
+var
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jpanel);
+  jMethod:= env^.GetMethodID(env, jCls, 'GetChildCount', '()I');
+  Result:= env^.CallIntMethod(env, _jpanel, jMethod);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jPanel_BringChildToFront(env: PJNIEnv; _jpanel: JObject; _view: jObject);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= _view;
+  jCls:= env^.GetObjectClass(env, _jpanel);
+  jMethod:= env^.GetMethodID(env, jCls, 'BringChildToFront', '(Landroid/view/View;)V');
+  env^.CallVoidMethodA(env, _jpanel, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jPanel_SetVisibilityGone(env: PJNIEnv; _jpanel: JObject);
+var
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jpanel);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetVisibilityGone', '()V');
+  env^.CallVoidMethod(env, _jpanel, jMethod);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jPanel_BringToFront(env: PJNIEnv; _jpanel: JObject);
+var
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jpanel);
+  jMethod:= env^.GetMethodID(env, jCls, 'BringToFront', '()V');
+  env^.CallVoidMethod(env, _jpanel, jMethod);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
 
 //------------------------------------------------------------------------------
 // HorizontalScrollView
@@ -8716,6 +8784,17 @@ begin
   env^.DeleteLocalRef(env, jCls);
 end;
 
+Procedure jImageBtn_RemoveFromViewParent(env:PJNIEnv; ImageBtn: jObject);
+var
+ _jMethod : jMethodID = nil;
+ cls: jClass;
+begin
+ cls := env^.GetObjectClass(env, ImageBtn);
+_jMethod:= env^.GetMethodID(env, cls, 'RemoveFromViewParent', '()V');
+ env^.CallVoidMethod(env,ImageBtn,_jMethod);
+ env^.DeleteLocalRef(env, cls);
+end;
+
 //------------------------------------------------------------------------------
 // jAsyncTask
 //------------------------------------------------------------------------------
@@ -8924,6 +9003,7 @@ begin
  env^.DeleteLocalRef(env, cls);
 end;
 
+{
 Function jSqliteCursor_GetValueAsString(env:PJNIEnv;  SqliteCursor: jObject; columnIndex: integer): string;
 var
  _jMethod : jMethodID = nil;
@@ -8945,6 +9025,36 @@ begin
   end;
   env^.DeleteLocalRef(env, cls);
 end;
+}
+
+//fixed by Martin Lowry
+
+Function jSqliteCursor_GetValueAsString(env:PJNIEnv;  SqliteCursor: jObject; columnIndex: integer): AnsiString;
+var
+ _jMethod : jMethodID = nil;
+ cls: jClass;
+ _jParam: array[0..0] of jValue;
+  _jString  : jString;
+ _jBoolean : jBoolean;
+ tmp:pchar;
+begin
+  _jParam[0].i := columnIndex;
+  cls := env^.GetObjectClass(env, SqliteCursor);
+  _jMethod:= env^.GetMethodID(env, cls, 'GetValueAsString', '(I)Ljava/lang/String;');
+  _jString   := env^.CallObjectMethodA(env,SqliteCursor,_jMethod,@_jParam);
+  case _jString = nil of
+    True : Result    := '';
+    False: begin
+            _jBoolean := JNI_False;
+            tmp    := env^.GetStringUTFChars(Env, _jString, @_jBoolean);
+            Result := AnsiString( tmp );
+            env^.ReleaseStringUTFChars(env, _jString, tmp);
+            env^.DeleteLocalRef(env, _jString);
+          end;
+  end;
+  env^.DeleteLocalRef(env, cls);
+end;
+
 
 function jSqliteCursor_GetValueAsBitmap(env:PJNIEnv;  SqliteCursor: jObject; columnIndex: integer): jObject;
 var
@@ -9021,6 +9131,18 @@ begin
   env^.DeleteLocalRef(env,jParams[1].l);
   env^.DeleteLocalRef(env, jCls);
 end;
+
+function jSqliteCursor_GetPosition(env: PJNIEnv; _jsqlitecursor: JObject): integer;
+var
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jsqlitecursor);
+  jMethod:= env^.GetMethodID(env, jCls, 'GetPosition', '()I');
+  Result:= env^.CallIntMethod(env, _jsqlitecursor, jMethod);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
 
  {jSqliteDataAccess - by jmpessoa}
 
@@ -9217,6 +9339,7 @@ begin
   env^.DeleteLocalRef(env, cls);
 end;
 
+(*
 //java:  public boolean CheckDataBase(String pathDB)
 function jSqliteDataAccess_CheckDataBaseExists(env:PJNIEnv;  SqliteDataBase: jObject; fullPathDB: string): boolean;
 var
@@ -9228,6 +9351,25 @@ begin
   _jParams[0].l := env^.NewStringUTF(env, PChar(fullPathDB));
   cls := env^.GetObjectClass(env, SqliteDataBase);
   _methodID:= env^.GetMethodID(env, cls, 'CheckDataBaseExists', '(Ljava/lang/String;)V');
+  _jBoolean  := env^.CallBooleanMethodA(env, SqliteDataBase, _methodID,@_jParams);
+  Result     := boolean(_jBoolean);
+  env^.DeleteLocalRef(env,_jParams[0].l);
+  env^.DeleteLocalRef(env, cls);
+end;
+*)
+
+//java:  public boolean CheckDataBase(String pathDB)   //fixed by Martin Lowry
+function jSqliteDataAccess_CheckDataBaseExists(env:PJNIEnv;  SqliteDataBase: jObject; fullPathDB: string): boolean;
+var
+  cls: jClass;
+  _methodID: jmethodID;
+  _jParams : array[0..0] of jValue;
+  _jBoolean: jBoolean;
+begin
+  _jParams[0].l := env^.NewStringUTF(env, PChar(fullPathDB));
+  cls := env^.GetObjectClass(env, SqliteDataBase);
+  //_methodID:= env^.GetMethodID(env, cls, 'CheckDataBaseExists', '(Ljava/lang/String;)V');
+  _methodID:= env^.GetMethodID(env, cls,   'CheckDataBaseExists', '(Ljava/lang/String;)Z');
   _jBoolean  := env^.CallBooleanMethodA(env, SqliteDataBase, _methodID,@_jParams);
   Result     := boolean(_jBoolean);
   env^.DeleteLocalRef(env,_jParams[0].l);
@@ -9272,7 +9414,6 @@ begin
   env^.CallVoidMethodA(env, SqliteDataBase, _methodID,@_jParams);
   env^.DeleteLocalRef(env, cls);
 end;
-
 
 procedure jSqliteDataAccess_InsertIntoTable(env:PJNIEnv; SqliteDataBase: jObject; insertQuery: string);
 var
@@ -9417,6 +9558,7 @@ begin
 end;
 
 
+{
 procedure jSqliteDataAccess_InsertIntoTableBatch(env: PJNIEnv; _jsqlitedataaccess: JObject; var _insertQueries: TDynArrayOfString);
 var
   jParams: array[0..0] of jValue;
@@ -9438,6 +9580,40 @@ begin
   env^.CallVoidMethodA(env, _jsqlitedataaccess, jMethod, @jParams);
   env^.DeleteLocalRef(env,jParams[0].l);
   env^.DeleteLocalRef(env, jCls);
+end;
+}
+
+//fixed by Martin Lowry
+procedure jSqliteDataAccess_InsertIntoTableBatch(env: PJNIEnv; _jsqlitedataaccess: JObject; var _insertQueries: TDynArrayOfString);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+  newSize0: integer;
+  jNewArray0: jObject=nil;
+  jStrings: array of jObject;
+  i: integer;
+begin
+  newSize0:= Length(_insertQueries);
+  SetLength(jStrings, newSize0+1);
+  jStrings[newSize0] := env^.NewStringUTF(env, PChar(''));
+  jNewArray0:= env^.NewObjectArray(env, newSize0, env^.FindClass(env,'java/lang/String'), jStrings[newSize0]);
+  for i:= 0 to newSize0 - 1 do
+  begin
+    jStrings[i] := env^.NewStringUTF(env, PChar(_insertQueries[i]));
+    env^.SetObjectArrayElement(env,jNewArray0,i,jStrings[i]);
+  end;
+  jParams[0].l:= jNewArray0;
+  jCls:= env^.GetObjectClass(env, _jsqlitedataaccess);
+  jMethod:= env^.GetMethodID(env, jCls, 'InsertIntoTableBatch', '([Ljava/lang/String;)V');
+  env^.CallVoidMethodA(env, _jsqlitedataaccess, jMethod, @jParams);
+  for i:= 0 to newSize0 do
+  begin
+     env^.DeleteLocalRef(env,jStrings[i]);
+  end;
+  env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
+  SetLength(jStrings, 0);
 end;
 
 
@@ -9563,6 +9739,476 @@ begin
   env^.CallVoidMethodA(env, _jsqlitedataaccess, jMethod, @jParams);
   env^.DeleteLocalRef(env, jCls);
 end;
+
+   { jDBListView}
+
+   function jDBListView_jCreate(env: PJNIEnv; _Self: int64; this: JObject): jObject;
+   var
+     jParams: array[0..0] of jValue;
+     jMethod: jMethodID = nil;
+     jCls: jClass = nil;
+   begin
+     jParams[0].j := _Self;
+     jCls := Get_gjClass(env);
+     jMethod := env^.GetMethodID(env, jCls, 'jDBListView_jCreate', '(J)Ljava/lang/Object;');
+     Result := env^.CallObjectMethodA(env, this, jMethod, @jParams);
+     Result := env^.NewGlobalRef(env, Result);
+   end;
+
+   (*
+   //Please, you need insert:
+
+   public java.lang.Object jDBListView_jCreate(long _Self) {
+     return (java.lang.Object)(new class(this,_Self));
+   }
+
+   //to end of "public class Controls" in "Controls.java"
+   *)
+
+
+   procedure jDBListView_jFree(env: PJNIEnv; _jdblistview: JObject);
+   var
+     jMethod: jMethodID = nil;
+     jCls: jClass = nil;
+   begin
+     jCls := env^.GetObjectClass(env, _jdblistview);
+     jMethod := env^.GetMethodID(env, jCls, 'jFree', '()V');
+     env^.CallVoidMethod(env, _jdblistview, jMethod);
+     env^.DeleteLocalRef(env, jCls);
+   end;
+
+
+   function jDBListView_GetView(env: PJNIEnv; _jdblistview: JObject): jObject;
+   var
+     jMethod: jMethodID = nil;
+     jCls: jClass = nil;
+   begin
+     jCls := env^.GetObjectClass(env, _jdblistview);
+     jMethod := env^.GetMethodID(env, jCls, 'GetView', '()Landroid/view/View;');
+     Result := env^.CallObjectMethod(env, _jdblistview, jMethod);
+     env^.DeleteLocalRef(env, jCls);
+   end;
+
+
+   procedure jDBListView_SetViewParent(env: PJNIEnv; _jdblistview: JObject; _viewgroup: jObject);
+   var
+     jParams: array[0..0] of jValue;
+     jMethod: jMethodID = nil;
+     jCls: jClass = nil;
+   begin
+     jParams[0].l := _viewgroup;
+     jCls := env^.GetObjectClass(env, _jdblistview);
+     jMethod := env^.GetMethodID(env, jCls, 'SetViewParent', '(Landroid/view/ViewGroup;)V');
+     env^.CallVoidMethodA(env, _jdblistview, jMethod, @jParams);
+     env^.DeleteLocalRef(env, jCls);
+   end;
+
+
+   procedure jDBListView_RemoveFromViewParent(env: PJNIEnv; _jdblistview: JObject);
+   var
+     jMethod: jMethodID = nil;
+     jCls: jClass = nil;
+   begin
+     jCls := env^.GetObjectClass(env, _jdblistview);
+     jMethod := env^.GetMethodID(env, jCls, 'RemoveFromViewParent', '()V');
+     env^.CallVoidMethod(env, _jdblistview, jMethod);
+     env^.DeleteLocalRef(env, jCls);
+   end;
+
+
+   function jDBListView_GetParent(env: PJNIEnv; _jdblistview: JObject): jObject;
+   var
+     jMethod: jMethodID = nil;
+     jCls: jClass = nil;
+   begin
+     jCls := env^.GetObjectClass(env, _jdblistview);
+     jMethod := env^.GetMethodID(env, jCls, 'GetParent', '()Landroid/view/ViewGroup;');
+     Result := env^.CallObjectMethod(env, _jdblistview, jMethod);
+     env^.DeleteLocalRef(env, jCls);
+   end;
+
+
+   procedure jDBListView_SetLParamWidth(env: PJNIEnv; _jdblistview: JObject; _w: integer);
+   var
+     jParams: array[0..0] of jValue;
+     jMethod: jMethodID = nil;
+     jCls: jClass = nil;
+   begin
+     jParams[0].i := _w;
+     jCls := env^.GetObjectClass(env, _jdblistview);
+     jMethod := env^.GetMethodID(env, jCls, 'SetLParamWidth', '(I)V');
+     env^.CallVoidMethodA(env, _jdblistview, jMethod, @jParams);
+     env^.DeleteLocalRef(env, jCls);
+   end;
+
+
+   procedure jDBListView_SetLParamHeight(env: PJNIEnv; _jdblistview: JObject; _h: integer);
+   var
+     jParams: array[0..0] of jValue;
+     jMethod: jMethodID = nil;
+     jCls: jClass = nil;
+   begin
+     jParams[0].i := _h;
+     jCls := env^.GetObjectClass(env, _jdblistview);
+     jMethod := env^.GetMethodID(env, jCls, 'SetLParamHeight', '(I)V');
+     env^.CallVoidMethodA(env, _jdblistview, jMethod, @jParams);
+     env^.DeleteLocalRef(env, jCls);
+   end;
+
+
+   procedure jDBListView_setLGravity(env: PJNIEnv; _jdblistview: JObject; _g: integer);
+   var
+     jParams: array[0..0] of jValue;
+     jMethod: jMethodID = nil;
+     jCls: jClass = nil;
+   begin
+     jParams[0].i := _g;
+     jCls := env^.GetObjectClass(env, _jdblistview);
+     jMethod := env^.GetMethodID(env, jCls, 'setLGravity', '(I)V');
+     env^.CallVoidMethodA(env, _jdblistview, jMethod, @jParams);
+     env^.DeleteLocalRef(env, jCls);
+   end;
+
+
+   procedure jDBListView_setLWeight(env: PJNIEnv; _jdblistview: JObject; _w: single);
+   var
+     jParams: array[0..0] of jValue;
+     jMethod: jMethodID = nil;
+     jCls: jClass = nil;
+   begin
+     jParams[0].f := _w;
+     jCls := env^.GetObjectClass(env, _jdblistview);
+     jMethod := env^.GetMethodID(env, jCls, 'setLWeight', '(F)V');
+     env^.CallVoidMethodA(env, _jdblistview, jMethod, @jParams);
+     env^.DeleteLocalRef(env, jCls);
+   end;
+
+
+   procedure jDBListView_SetLeftTopRightBottomWidthHeight(env: PJNIEnv;
+     _jdblistview: JObject; _left: integer; _top: integer; _right: integer;
+     _bottom: integer; _w: integer; _h: integer);
+   var
+     jParams: array[0..5] of jValue;
+     jMethod: jMethodID = nil;
+     jCls: jClass = nil;
+   begin
+     jParams[0].i := _left;
+     jParams[1].i := _top;
+     jParams[2].i := _right;
+     jParams[3].i := _bottom;
+     jParams[4].i := _w;
+     jParams[5].i := _h;
+     jCls := env^.GetObjectClass(env, _jdblistview);
+     jMethod := env^.GetMethodID(env, jCls, 'SetLeftTopRightBottomWidthHeight', '(IIIIII)V');
+     env^.CallVoidMethodA(env, _jdblistview, jMethod, @jParams);
+     env^.DeleteLocalRef(env, jCls);
+   end;
+
+
+   procedure jDBListView_AddLParamsAnchorRule(env: PJNIEnv; _jdblistview: JObject;
+     _rule: integer);
+   var
+     jParams: array[0..0] of jValue;
+     jMethod: jMethodID = nil;
+     jCls: jClass = nil;
+   begin
+     jParams[0].i := _rule;
+     jCls := env^.GetObjectClass(env, _jdblistview);
+     jMethod := env^.GetMethodID(env, jCls, 'AddLParamsAnchorRule', '(I)V');
+     env^.CallVoidMethodA(env, _jdblistview, jMethod, @jParams);
+     env^.DeleteLocalRef(env, jCls);
+   end;
+
+
+   procedure jDBListView_AddLParamsParentRule(env: PJNIEnv; _jdblistview: JObject;
+     _rule: integer);
+   var
+     jParams: array[0..0] of jValue;
+     jMethod: jMethodID = nil;
+     jCls: jClass = nil;
+   begin
+     jParams[0].i := _rule;
+     jCls := env^.GetObjectClass(env, _jdblistview);
+     jMethod := env^.GetMethodID(env, jCls, 'AddLParamsParentRule', '(I)V');
+     env^.CallVoidMethodA(env, _jdblistview, jMethod, @jParams);
+     env^.DeleteLocalRef(env, jCls);
+   end;
+
+
+   procedure jDBListView_SetLayoutAll(env: PJNIEnv; _jdblistview: JObject; _idAnchor: integer);
+   var
+     jParams: array[0..0] of jValue;
+     jMethod: jMethodID = nil;
+     jCls: jClass = nil;
+   begin
+     jParams[0].i := _idAnchor;
+     jCls := env^.GetObjectClass(env, _jdblistview);
+     jMethod := env^.GetMethodID(env, jCls, 'SetLayoutAll', '(I)V');
+     env^.CallVoidMethodA(env, _jdblistview, jMethod, @jParams);
+     env^.DeleteLocalRef(env, jCls);
+   end;
+
+
+   procedure jDBListView_ClearLayoutAll(env: PJNIEnv; _jdblistview: JObject);
+   var
+     jMethod: jMethodID = nil;
+     jCls: jClass = nil;
+   begin
+     jCls := env^.GetObjectClass(env, _jdblistview);
+     jMethod := env^.GetMethodID(env, jCls, 'ClearLayoutAll', '()V');
+     env^.CallVoidMethod(env, _jdblistview, jMethod);
+     env^.DeleteLocalRef(env, jCls);
+   end;
+
+
+   procedure jDBListView_SetId(env: PJNIEnv; _jdblistview: JObject; _id: integer);
+   var
+     jParams: array[0..0] of jValue;
+     jMethod: jMethodID = nil;
+     jCls: jClass = nil;
+   begin
+     jParams[0].i := _id;
+     jCls := env^.GetObjectClass(env, _jdblistview);
+     jMethod := env^.GetMethodID(env, jCls, 'SetId', '(I)V');
+     env^.CallVoidMethodA(env, _jdblistview, jMethod, @jParams);
+     env^.DeleteLocalRef(env, jCls);
+   end;
+
+
+   //procedure jDBListView_UpdateView(env: PJNIEnv; _jdblistview: JObject);
+   //var
+   //  jMethod: jMethodID = nil;
+   //  jCls: jClass = nil;
+   //begin
+   //  jCls := env^.GetObjectClass(env, _jdblistview);
+   //  jMethod := env^.GetMethodID(env, jCls, 'UpdateView', '()V');
+   //  env^.CallVoidMethod(env, _jdblistview, jMethod);
+   //  env^.DeleteLocalRef(env, jCls);
+   //end;
+
+
+   procedure jDBListView_SetNumColumns(env: PJNIEnv; _jdblistview: JObject; _value: integer);
+   var
+     jParams: array[0..0] of jValue;
+     jMethod: jMethodID = nil;
+     jCls: jClass = nil;
+   begin
+     jParams[0].i := _value;
+     jCls := env^.GetObjectClass(env, _jdblistview);
+     jMethod := env^.GetMethodID(env, jCls, 'SetNumColumns', '(I)V');
+     env^.CallVoidMethodA(env, _jdblistview, jMethod, @jParams);
+     env^.DeleteLocalRef(env, jCls);
+   end;
+
+
+   procedure jDBListView_SetColumnWidth(env: PJNIEnv; _jdblistview: JObject; _value: integer);
+   var
+     jParams: array[0..0] of jValue;
+     jMethod: jMethodID = nil;
+     jCls: jClass = nil;
+   begin
+     jParams[0].i := _value;
+     jCls := env^.GetObjectClass(env, _jdblistview);
+     jMethod := env^.GetMethodID(env, jCls, 'SetColumnWidth', '(I)V');
+     env^.CallVoidMethodA(env, _jdblistview, jMethod, @jParams);
+     env^.DeleteLocalRef(env, jCls);
+   end;
+
+
+   procedure jDBListView_SetItemsLayout(env: PJNIEnv; _jdblistview: JObject; _value: integer);
+   var
+     jParams: array[0..0] of jValue;
+     jMethod: jMethodID = nil;
+     jCls: jClass = nil;
+   begin
+     jParams[0].i := _value;
+     jCls := env^.GetObjectClass(env, _jdblistview);
+     jMethod := env^.GetMethodID(env, jCls, 'SetItemsLayout', '(I)V');
+     env^.CallVoidMethodA(env, _jdblistview, jMethod, @jParams);
+     env^.DeleteLocalRef(env, jCls);
+   end;
+
+
+   function jDBListView_GetItemIndex(env: PJNIEnv; _jdblistview: JObject): integer;
+   var
+     jMethod: jMethodID = nil;
+     jCls: jClass = nil;
+   begin
+     jCls := env^.GetObjectClass(env, _jdblistview);
+     jMethod := env^.GetMethodID(env, jCls, 'GetItemIndex', '()I');
+     Result := env^.CallIntMethod(env, _jdblistview, jMethod);
+     env^.DeleteLocalRef(env, jCls);
+   end;
+
+
+   function jDBListView_GetItemCaption(env: PJNIEnv; _jdblistview: JObject): string;
+   var
+     jStr: JString;
+     jBoo: JBoolean;
+     jMethod: jMethodID = nil;
+     jCls: jClass = nil;
+   begin
+     jCls := env^.GetObjectClass(env, _jdblistview);
+     jMethod := env^.GetMethodID(env, jCls, 'GetItemCaption', '()Ljava/lang/String;');
+     jStr := env^.CallObjectMethod(env, _jdblistview, jMethod);
+     case jStr = nil of
+       True: Result := '';
+       False:
+       begin
+         jBoo := JNI_False;
+         Result := string(env^.GetStringUTFChars(env, jStr, @jBoo));
+       end;
+     end;
+     env^.DeleteLocalRef(env, jCls);
+   end;
+
+
+   procedure jDBListView_SetSelection(env: PJNIEnv; _jdblistview: JObject; _index: integer);
+   var
+     jParams: array[0..0] of jValue;
+     jMethod: jMethodID = nil;
+     jCls: jClass = nil;
+   begin
+     jParams[0].i := _index;
+     jCls := env^.GetObjectClass(env, _jdblistview);
+     jMethod := env^.GetMethodID(env, jCls, 'SetSelection', '(I)V');
+     env^.CallVoidMethodA(env, _jdblistview, jMethod, @jParams);
+     env^.DeleteLocalRef(env, jCls);
+   end;
+
+   procedure jDBListView_DispatchOnDrawItemTextColor(env: PJNIEnv;
+     _jdblistview: JObject; _value: boolean);
+   var
+     jParams: array[0..0] of jValue;
+     jMethod: jMethodID = nil;
+     jCls: jClass = nil;
+   begin
+     jParams[0].z := JBool(_value);
+     jCls := env^.GetObjectClass(env, _jdblistview);
+     jMethod := env^.GetMethodID(env, jCls, 'DispatchOnDrawItemTextColor', '(Z)V');
+     env^.CallVoidMethodA(env, _jdblistview, jMethod, @jParams);
+     env^.DeleteLocalRef(env, jCls);
+   end;
+
+
+   procedure jDBListView_DispatchOnDrawItemBitmap(env: PJNIEnv; _jdblistview: JObject;
+     _value: boolean);
+   var
+     jParams: array[0..0] of jValue;
+     jMethod: jMethodID = nil;
+     jCls: jClass = nil;
+   begin
+     jParams[0].z := JBool(_value);
+     jCls := env^.GetObjectClass(env, _jdblistview);
+     jMethod := env^.GetMethodID(env, jCls, 'DispatchOnDrawItemBitmap', '(Z)V');
+     env^.CallVoidMethodA(env, _jdblistview, jMethod, @jParams);
+     env^.DeleteLocalRef(env, jCls);
+   end;
+
+
+   procedure jDBListView_SetFontSize(env: PJNIEnv; _jdblistview: JObject; _size: integer);
+   var
+     jParams: array[0..0] of jValue;
+     jMethod: jMethodID = nil;
+     jCls: jClass = nil;
+   begin
+     jParams[0].i := _size;
+     jCls := env^.GetObjectClass(env, _jdblistview);
+     jMethod := env^.GetMethodID(env, jCls, 'SetFontSize', '(I)V');
+     env^.CallVoidMethodA(env, _jdblistview, jMethod, @jParams);
+     env^.DeleteLocalRef(env, jCls);
+   end;
+
+   procedure jDBListView_SetFontSizeUnit(env: PJNIEnv; _jdblistview: JObject; _unit: integer);
+   var
+     jParams: array[0..0] of jValue;
+     jMethod: jMethodID = nil;
+     jCls: jClass = nil;
+   begin
+     jParams[0].i := _unit;
+     jCls := env^.GetObjectClass(env, _jdblistview);
+     jMethod := env^.GetMethodID(env, jCls, 'SetFontSizeUnit', '(I)V');
+     env^.CallVoidMethodA(env, _jdblistview, jMethod, @jParams);
+     env^.DeleteLocalRef(env, jCls);
+   end;
+
+   procedure jDBListView_SetFontColor(env: PJNIEnv; _jdblistview: JObject; _color: integer);
+   var
+     jParams: array[0..0] of jValue;
+     jMethod: jMethodID = nil;
+     jCls: jClass = nil;
+   begin
+     jParams[0].i := _color;
+     jCls := env^.GetObjectClass(env, _jdblistview);
+     jMethod := env^.GetMethodID(env, jCls, 'SetFontColor', '(I)V');
+     env^.CallVoidMethodA(env, _jdblistview, jMethod, @jParams);
+     env^.DeleteLocalRef(env, jCls);
+   end;
+
+   procedure jDBListView_ChangeCursor(env:PJNIEnv; _jdblistview: jObject; Cursor: jObject);
+   var
+     jParams: array[0..0] of jValue;
+     jMethod: jMethodID = nil;
+     jCls: jClass = nil;
+   begin
+     jParams[0].l:= Cursor;
+     jCls := env^.GetObjectClass(env, _jdblistview);
+     jMethod := env^.GetMethodID(env, jCls, 'SetCursor', '(Landroid/database/Cursor;)V');
+     env^.CallVoidMethodA(env, _jdblistview, jMethod, @jParams);
+     env^.DeleteLocalRef(env, jCls);
+   end;
+
+   procedure jDBListView_SetColumnWeights(env:PJNIEnv; _jdblistview: jObject; _value: TDynArrayOfSingle);
+   var
+     jParams: array[0..0] of jValue;
+     jMethod: jMethodID = nil;
+     jCls: jClass = nil;
+     newSize0: integer;
+     jNewArray0: jObject=nil;
+   begin
+     newSize0:= Length(_value);
+     jNewArray0:= env^.NewFloatArray(env, newSize0);  // allocate
+     env^.SetFloatArrayRegion(env, jNewArray0, 0, newSize0, @_value[0] {source});
+     jParams[0].l:= jNewArray0;
+     //DBListView_Log('Calling SetColumnWeights ... (last=' + FloatToStr(_value[newSize0-1]) + ')');
+     jCls := env^.GetObjectClass(env, _jdblistview);
+     jMethod := env^.GetMethodID(env, jCls, 'SetColumnWeights', '([F)V');
+     env^.CallVoidMethodA(env, _jdblistview, jMethod, @jParams);
+     env^.DeleteLocalRef(env,jParams[0].l);
+     env^.DeleteLocalRef(env, jCls);
+   end;
+
+   procedure jDBListView_SetColumnNames(env:PJNIEnv; _jdblistview: jObject; _value: TDynArrayOfString);
+   var
+     jParams: array[0..0] of jValue;
+     jMethod: jMethodID=nil;
+     jCls: jClass=nil;
+     newSize0: integer;
+     jNewArray0: jObject=nil;
+     jStrings: array of jObject;
+     i: integer;
+   begin
+     newSize0:= Length(_value);
+     SetLength(jStrings, newSize0+1);
+     jStrings[newSize0] := env^.NewStringUTF(env, PChar(''));
+     jNewArray0:= env^.NewObjectArray(env, newSize0, env^.FindClass(env,'java/lang/String'), jStrings[newSize0]);
+     for i:= 0 to newSize0 - 1 do
+     begin
+       jStrings[i] := env^.NewStringUTF(env, PChar(_value[i]));
+       env^.SetObjectArrayElement(env,jNewArray0,i,jStrings[i]);
+     end;
+     jParams[0].l:= jNewArray0;
+     jCls:= env^.GetObjectClass(env, _jdblistview);
+     jMethod:= env^.GetMethodID(env, jCls, 'SetColumnNames', '([Ljava/lang/String;)V');
+     env^.CallVoidMethodA(env, _jdblistview, jMethod, @jParams);
+     for i:= 0 to newSize0 do
+     begin
+        env^.DeleteLocalRef(env,jStrings[i]);
+     end;
+     env^.DeleteLocalRef(env,jParams[0].l);
+     env^.DeleteLocalRef(env, jCls);
+     SetLength(jStrings, 0);
+   end;
 
 {-------- jHttpClient_JNI_Bridge ----------}
 

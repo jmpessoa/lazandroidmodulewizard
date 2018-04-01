@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resources>
+  <string name="create_taxon_index">CREATE INDEX IF NOT EXISTS `byTaxon` ON `Plants` (`Taxon`, `HabitatNo` ASC);</string>
+</resources>

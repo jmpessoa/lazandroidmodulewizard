@@ -1,0 +1,198 @@
+object AndroidModuleMain: TAndroidModuleMain
+  Left = 366
+  Top = 103
+  Width = 816
+  Height = 518
+  MarginLeft = 0
+  MarginTop = 0
+  MarginRight = 0
+  MarginBottom = 0
+  Enabled = True
+  AutoAssignIDs = True
+  OnCreate = Mod_MainCreate
+  Text = 'Field Data Main'
+  ActivityMode = actMain
+  BackgroundColor = colbrDefault
+  ActionBarTitle = abtTextAsTitle
+  OnJNIPrompt = Mod_MainJNIPrompt
+  object pTrips: jPanel
+    Left = 4
+    Top = 4
+    Width = 808
+    Height = 510
+    MarginLeft = 4
+    MarginTop = 4
+    MarginRight = 4
+    MarginBottom = 4
+    Enabled = True
+    Visible = True
+    Id = 1
+    PosRelativeToAnchor = []
+    PosRelativeToParent = [rpTop]
+    LayoutParamWidth = lpMatchParent
+    LayoutParamHeight = lpMatchParent
+    BackgroundColor = colbrLightGrey
+    MinPinchZoomFactor = 0.25
+    MaxPinchZoomFactor = 4
+    object jPanel6: jPanel
+      Left = 0
+      Top = 0
+      Width = 808
+      Height = 77
+      MarginLeft = 0
+      MarginTop = 0
+      MarginRight = 0
+      MarginBottom = 0
+      Enabled = True
+      Visible = True
+      Id = 1
+      PosRelativeToAnchor = []
+      PosRelativeToParent = [rpTop]
+      LayoutParamWidth = lpMatchParent
+      LayoutParamHeight = lpWrapContent
+      BackgroundColor = colbrDarkGray
+      MinPinchZoomFactor = 0.25
+      MaxPinchZoomFactor = 4
+      object btnNewTrip: jImageBtn
+        Left = 736
+        Top = 5
+        Width = 67
+        Height = 67
+        MarginLeft = 5
+        MarginTop = 5
+        MarginRight = 5
+        MarginBottom = 5
+        Enabled = True
+        Visible = True
+        Id = 1
+        PosRelativeToAnchor = []
+        PosRelativeToParent = [rpRight, rpCenterVertical]
+        LayoutParamWidth = lp32px
+        LayoutParamHeight = lp32px
+        BackgroundColor = colbrDefault
+        Images = jImageList1
+        IndexImageUp = 0
+        IndexImageDown = 1
+        GravityInParent = lgNone
+      end
+      object jTextView1: jTextView
+        Left = 5
+        Top = 1
+        Width = 117
+        Height = 32
+        MarginLeft = 5
+        MarginTop = 1
+        MarginRight = 5
+        MarginBottom = 1
+        Enabled = True
+        Visible = True
+        Id = 2
+        PosRelativeToAnchor = []
+        PosRelativeToParent = [rpTop, rpLeft]
+        LayoutParamWidth = lpWrapContent
+        LayoutParamHeight = lpWrapContent
+        Text = ' Trips Table '
+        Alignment = taCenter
+        BackgroundColor = colbrDefault
+        FontColor = colbrDefault
+        FontSize = 20
+        TextTypeFace = tfBold
+        FontSizeUnit = unitDefault
+        GravityInParent = lgNone
+      end
+      object btnAddTripData: jButton
+        Left = 627
+        Top = 13
+        Width = 99
+        Height = 50
+        MarginLeft = 5
+        MarginTop = 5
+        MarginRight = 5
+        MarginBottom = 5
+        Enabled = True
+        Visible = True
+        Anchor = btnNewTrip
+        Id = 3
+        PosRelativeToAnchor = [raToLeftOf]
+        PosRelativeToParent = [rpCenterVertical]
+        LayoutParamWidth = lpWrapContent
+        LayoutParamHeight = lpWrapContent
+        Text = 'Add Data'
+        BackgroundColor = colbrDefault
+        FontColor = colbrDefault
+        FontSize = 0
+        FontSizeUnit = unitDefault
+        GravityInParent = lgNone
+        OnClick = btnAddTripDataClick
+      end
+    end
+    object dbgTrips: jDBListView
+      Left = 5
+      Top = 82
+      Width = 798
+      Height = 368
+      MarginLeft = 5
+      MarginTop = 5
+      MarginRight = 5
+      MarginBottom = 5
+      Enabled = True
+      Visible = True
+      Anchor = jPanel6
+      Id = 2
+      PosRelativeToAnchor = [raBelow]
+      PosRelativeToParent = []
+      LayoutParamWidth = lpMatchParent
+      LayoutParamHeight = lpThreeQuarterOfParent
+      BackgroundColor = colbrIvory
+      ColumnWeights.Strings = (
+        '15'
+        '15'
+        '15'
+        '15'
+        '40'
+      )
+      DataSource = sqlCursor
+      FontColor = colbrRoyalBlue
+      FontSize = 16
+      FontSizeUnit = unitScaledPixel
+    end
+  end
+  object ActionBarTab: jActionBarTab
+    OnTabSelected = ActionBarTabTabSelected
+    left = 66
+    top = 24
+  end
+  object jImageList1: jImageList
+    Images.Strings = (
+      'btn1_1.png'
+      'btn1_2.png'
+    )
+    left = 176
+    top = 24
+  end
+  object sdaFDR: jSqliteDataAccess
+    Cursor = sqlCursor
+    ColDelimiter = '|'
+    RowDelimiter = '#'
+    DataBaseName = 'lm.fdr.db3'
+    ReturnHeaderOnSelect = False
+    left = 288
+    top = 24
+  end
+  object sqlCursor: jSqliteCursor
+    left = 392
+    top = 24
+  end
+  object fpData: jFileProvider
+    FileSource = srcAssets
+    left = 584
+    top = 24
+  end
+  object tmUpdateDelay: jTimer
+    Enabled = False
+    Interval = 500
+    OnTimer = tmUpdateDelayTimer
+    left = 496
+    top = 24
+  end
+end

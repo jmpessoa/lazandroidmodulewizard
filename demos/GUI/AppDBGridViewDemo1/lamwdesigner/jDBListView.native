@@ -1,0 +1,3 @@
+public native void pOnClickDBListItem(long pasobj, int position, String caption);
+
+public native void pOnLongClickDBListItem(long pasobj, int position, String caption);

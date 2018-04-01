@@ -1,6 +1,6 @@
 package org.lamw.appcomboedittextdemo1;
 
-//Lamw: Lazarus Android Module Wizard - version 0.7 - rev. 15 - 29 March - 2017
+//Lamw: Lazarus Android Module Wizard - version 0.7 - rev. 22 - 21 October - 2017
 //Form Designer and Components development model!
 //https://github.com/jmpessoa/lazandroidmodulewizard
 //http://forum.lazarus.freepascal.org/index.php/topic,21919.270.html
@@ -21,9 +21,6 @@ package org.lamw.appcomboedittextdemo1;
 
 
 import java.lang.Override;
-
-
-
 import android.app.Activity;
 import android.content.Intent;
 import android.content.res.Configuration;
@@ -42,7 +39,7 @@ import android.util.Log;
 
 public class App extends Activity {
     
-	private Controls       controls;
+    private Controls       controls;
 	   
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -245,6 +242,17 @@ public boolean onOptionsItemSelected(MenuItem item) {
             controls.jAppOnKeyDown(c,keyCode,KeyEvent.keyCodeToString(keyCode));
             break;
             
+        case KeyEvent.KEYCODE_DEL:
+            controls.jAppOnKeyDown(c,keyCode,KeyEvent.keyCodeToString(keyCode));
+            break;
+            
+        case KeyEvent.KEYCODE_NUM:
+            controls.jAppOnKeyDown(c,keyCode,KeyEvent.keyCodeToString(keyCode));
+            break;            
+            
+        case KeyEvent.KEYCODE_NUM_LOCK:
+            controls.jAppOnKeyDown(c,keyCode,KeyEvent.keyCodeToString(keyCode));
+            break;            
         //default:  controls.jAppOnKeyDown(c,keyCode,KeyEvent.keyCodeToString(keyCode));         	
       }      
       return super.onKeyDown(keyCode, event);      

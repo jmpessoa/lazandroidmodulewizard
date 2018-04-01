@@ -1,0 +1,2 @@
+public native void pOnActionBarTabSelected(long pasobj, View view, String title);
+public native void pOnActionBarTabUnSelected(long pasobj, View view, String title);

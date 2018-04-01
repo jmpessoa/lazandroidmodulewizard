@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resources>
+  <string name="create_plants_table">CREATE TABLE `Plants` (
+  `_id` INTEGER PRIMARY KEY AUTOINCREMENT,
+  `Entry_No` INTEGER NOT NULL UNIQUE,
+  `HabitatNo` TEXT NOT NULL,
+  `PlantNo` INTEGER NOT NULL,
+  `OldSiteNo` TEXT,
+  `OriginalName` TEXT,
+  `Taxon` TEXT,
+  `Sampled` INTEGER DEFAULT 0,
+  `CollNo_Str` TEXT,
+  `Field_Str` TEXT,
+  FOREIGN KEY(`HabitatNo`) REFERENCES `Sites`(`HabitatNo`) ON delete cascade on update cascade);</string>
+</resources>

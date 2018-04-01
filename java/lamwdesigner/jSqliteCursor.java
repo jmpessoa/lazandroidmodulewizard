@@ -24,9 +24,7 @@ public class jSqliteCursor {
 
 	private long       PasObj  = 0;      // Pascal Obj
 	private Controls   controls = null;   // Control Class for Event
-
-	public Cursor cursor = null;
-	
+	public Cursor cursor = null;	
 	public Bitmap bufBmp = null;
 	
 	//Constructor
@@ -71,6 +69,14 @@ public class jSqliteCursor {
     	if (cursor != null) cursor.moveToPosition(position);
     }
   
+    public int GetPosition() {
+    	int p = -1;    	
+    	if (cursor != null) { 
+    		 p = cursor.getPosition();
+    	}	     	
+    	return p;
+    }
+    
     public int GetColumnIndex(String colName) {
     	if (cursor != null) return cursor.getColumnIndex(colName);
     	else  return -1;
@@ -176,12 +182,3 @@ public class jSqliteCursor {
       bufBmp = null;
     }    
 }
-
-/**
- * 
- * jSqliteDataAccess
- * 
- * by jmpessoa
- *
- */
-

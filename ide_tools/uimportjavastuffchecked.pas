@@ -5,7 +5,7 @@ unit uimportjavastuffchecked;
 interface
 
 uses
-  Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, StdCtrls,
+  Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs,
   Buttons, ExtCtrls, ComCtrls;
 
 type

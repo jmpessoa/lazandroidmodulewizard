@@ -1,4 +1,4 @@
-package com.example.appgooglemapsdemo1;
+package org.lamw.appcompatnavigationdrawerdemo1;
 
 import java.io.FileNotFoundException;
 import java.io.InputStream;
@@ -8,9 +8,12 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Matrix;
+import android.graphics.Path;
 import android.graphics.PorterDuff.Mode;
+import android.graphics.Rect;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
@@ -19,8 +22,11 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
+//import android.support.design.widget.CollapsingToolbarLayout;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.view.Gravity;
 
 public class jImageView extends ImageView {
 	//Pascal Interface
@@ -43,8 +49,13 @@ public class jImageView extends ImageView {
 		PasObj   = pasobj;
 		controls = ctrls;
 		LAMWCommon = new jCommons(this,context,pasobj);
-
-		//setAdjustViewBounds(false);
+		
+		if (Build.VERSION.SDK_INT >= 21) {
+			//[ifdef_api21up]
+	     //this.setFitsSystemWindows(true);
+	     	//[endif_api21up]
+		}
+		
 		setScaleType(ImageView.ScaleType.CENTER);
 		mMatrix = new Matrix();
 
@@ -56,10 +67,12 @@ public class jImageView extends ImageView {
 		};
 
 		setOnClickListener(onClickListener);
-		//this.setWillNotDraw(false); //false = fire OnDraw after Invalited ... true = not fire onDraw... thanks to tintinux
+		//this.setWillNotDraw(false); //false = fire OnDraw after Invalited ... true = not fire onDraw... thanks to tintinux			
 	}
 
 	public void setLeftTopRightBottomWidthHeight(int _left, int _top, int _right, int _bottom, int _w, int _h) {
+		 String tag = ""+_left+"|"+_top+"|"+_right+"|"+_bottom;
+	         this.setTag(tag);
 		LAMWCommon.setLeftTopRightBottomWidthHeight(_left,_top,_right,_bottom,_w,_h);
 	}
 
@@ -150,12 +163,25 @@ public class jImageView extends ImageView {
 	}
 
 	public Drawable GetDrawableResourceById(int _resID) {
-		return (Drawable)( this.controls.activity.getResources().getDrawable(_resID));
+		
+		Drawable res = null;
+		
+		if (Build.VERSION.SDK_INT < 21 ) {
+			res = this.controls.activity.getResources().getDrawable(_resID);
+		}
+		
+		//[ifdef_api17up]
+		if(Build.VERSION.SDK_INT >= 21)
+			res = this.controls.activity.getResources().getDrawable(_resID, null);
+        //[endif_api17up]
+						
+		return res;
 	}
 
 	public void SetImageByResIdentifier(String _imageResIdentifier) {
 		Drawable d = GetDrawableResourceById(GetDrawableResourceId(_imageResIdentifier));
 		bmp = ((BitmapDrawable)d).getBitmap();
+		this.setImageResource(android.R.color.transparent);
 		this.setImageDrawable(d);
 		this.invalidate();
 	}
@@ -168,7 +194,7 @@ public class jImageView extends ImageView {
 		LAMWCommon.setLParamHeight(_h);
 	}
 
-	public void setLGravity(int _g) {
+	public void SetLGravity(int _g) {
 		LAMWCommon.setLGravity(_g);
 	}
 
@@ -311,5 +337,41 @@ public class jImageView extends ImageView {
 	public void SetRadiusRoundCorner(int _radius) {
 		mRadius =  _radius;
 	}
+		
+	public void SetCollapseMode(int _collapsemode) {  //called on JNIPrompt
+		LAMWCommon.setCollapseMode(_collapsemode);
+	}
+	
+    public void	SetFitsSystemWindows(boolean _value) {
+		LAMWCommon.setFitsSystemWindows(_value);
+    }
+
+    public void	SetScrollFlag(int _collapsingScrollFlag) {
+ 		LAMWCommon.setScrollFlag(_collapsingScrollFlag);
+    }
+    
+    /*
+    Change the view's z order in the tree, so it's on top of other sibling views.
+    Prior to KITKAT/4.4/Api 19 this method should be followed by calls to requestLayout() and invalidate()
+    on the view's parent to force the parent to redraw with the new child ordering.
+  */
+    
+	public void BringToFront() {
+	     this.bringToFront();
+	     if (Build.VERSION.SDK_INT < 19 ) {			
+		ViewGroup parent = LAMWCommon.getParent();
+	       	if (parent!= null) {
+	       		parent.requestLayout();
+	       		parent.invalidate();	
+	       	}
+	     }	
+             this.setVisibility(android.view.View.VISIBLE);	
+	}
+
+	public void SetVisibilityGone() {
+		LAMWCommon.setVisibilityGone();
+	}
+
 }
+
 

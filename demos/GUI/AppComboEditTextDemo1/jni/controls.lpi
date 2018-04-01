@@ -21,12 +21,14 @@
     <VersionInfo>
       <StringTable ProductVersion=""/>
     </VersionInfo>
-    <CustomData Count="5">
-      <Item0 Name="LAMW" Value="GUI"/>
-      <Item1 Name="LamwVersion" Value="0.7"/>
-      <Item2 Name="NdkPath" Value="C:\adt32\ndk10e\"/>
-      <Item3 Name="Package" Value="org.lamw.appcomboedittextdemo1"/>
-      <Item4 Name="SdkPath" Value="C:\adt32\sdk\"/>
+    <CustomData Count="7">
+      <Item0 Name="BuildSystem" Value="Ant"/>
+      <Item1 Name="LAMW" Value="GUI"/>
+      <Item2 Name="LamwVersion" Value="0.8"/>
+      <Item3 Name="NdkPath" Value="C:\adt32\ndk10e\"/>
+      <Item4 Name="Package" Value="org.lamw.appcomboedittextdemo1"/>
+      <Item5 Name="SdkPath" Value="C:\adt32\sdk\"/>
+      <Item6 Name="Theme" Value="DeviceDefault"/>
     </CustomData>
     <BuildModes Count="1">
       <Item1 Name="Default" Default="True"/>
@@ -53,8 +55,9 @@
         <Filename Value="unit1.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="AndroidModule1"/>
+        <HasResources Value="True"/>
         <CustomData Count="1">
-          <Item0 Name="jControls" Value="jComboEditText;jForm;jTextView"/>
+          <Item0 Name="jControls" Value="jComboEditText;jTextView"/>
         </CustomData>
       </Unit1>
     </Units>

@@ -1,0 +1,44 @@
+object FormGradleBuild: TFormGradleBuild
+  Left = 289
+  Height = 250
+  Top = 151
+  Width = 520
+  Caption = 'LAMW Configure Gradle Build'
+  ClientHeight = 250
+  ClientWidth = 520
+  OnActivate = FormActivate
+  LCLVersion = '1.5'
+  object ListBoxBuildTool: TListBox
+    Left = 152
+    Height = 120
+    Top = 24
+    Width = 100
+    ItemHeight = 0
+    OnClick = ListBoxBuildToolClick
+    TabOrder = 0
+  end
+  object Label1: TLabel
+    Left = 152
+    Height = 15
+    Top = 8
+    Width = 96
+    Caption = 'Build-tools/Target'
+    ParentColor = False
+  end
+  object Label2: TLabel
+    Left = 16
+    Height = 15
+    Top = 8
+    Width = 58
+    Caption = 'MinSdkApi'
+    ParentColor = False
+  end
+  object ListBoxMinSdk: TListBox
+    Left = 16
+    Height = 120
+    Top = 24
+    Width = 100
+    ItemHeight = 0
+    TabOrder = 1
+  end
+end

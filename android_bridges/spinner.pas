@@ -43,6 +43,7 @@ TOnItemSelected = procedure(Sender: TObject; itemCaption: string; itemIndex: int
     procedure UpdateLParamHeight;
     procedure UpdateLParamWidth;
     //procedure ListViewChange  (Sender: TObject);  //TODO
+    procedure TryNewParent(refApp: jApp);
   public
     constructor Create(AOwner: TComponent); override;
     destructor  Destroy; override;
@@ -51,7 +52,9 @@ TOnItemSelected = procedure(Sender: TObject; itemCaption: string; itemIndex: int
     procedure UpdateLayout; override;
     function jCreate(): jObject;
     procedure jFree();
-    procedure SetjParent(_viewgroup: jObject);
+    procedure SetViewParent(_viewgroup: jObject); override;
+    function GetViewParent(): jObject; override;
+
     procedure SetLParamWidth(_w: integer);
     procedure SetLParamHeight(_h: integer);
     procedure SetLeftTopRightBottomWidthHeight(_left: integer; _top: integer; _right: integer; _bottom: integer; _w: integer; _h: integer);
@@ -87,12 +90,14 @@ TOnItemSelected = procedure(Sender: TObject; itemCaption: string; itemIndex: int
     procedure SetItemTagString(_index: integer; _strTag: string);
     procedure SetSelectedPaddingTop(_paddingTop: integer);
     procedure SetSelectedPaddingBottom(_paddingBottom: integer);
+    procedure SetLGravity(_value: TLayoutGravity);
 
     procedure GenEvent_OnSpinnerItemSeleceted(Obj: TObject; caption: string; position: integer);
 
-    property jParent: jObject  read  FjPRLayout write SetjParent; // Java : Parent Relative Layout
+    property ViewParent: jObject  read  FjPRLayout write SetViewParent; // Java : Parent Relative Layout
     property Count: integer read GetSize;
     property Text: string read GetText;
+
   published
 
     property Items: TStrings read FItems write SetItems;
@@ -108,6 +113,7 @@ TOnItemSelected = procedure(Sender: TObject; itemCaption: string; itemIndex: int
     property FontFace: TFontFace read FFontFace write SetFontFace default ffNormal;
     property TextTypeFace: TTextTypeFace read FTextTypeFace write SetTextTypeFace;
     property SelectedIndex: integer read GetSelectedIndex write SetSelectedIndex;
+    property GravityInParent: TLayoutGravity read FGravityInParent write SetLGravity;
 
     property SelectedPaddingTop: integer read FSelectedPaddingTop write SetSelectedPaddingTop;
     property SelectedPaddingBottom: integer read FSelectedPaddingBottom write SetSelectedPaddingBottom;
@@ -118,7 +124,7 @@ TOnItemSelected = procedure(Sender: TObject; itemCaption: string; itemIndex: int
 
 function jSpinner_jCreate(env: PJNIEnv; this: JObject;_Self: int64): jObject;
 procedure jSpinner_jFree(env: PJNIEnv; _jspinner: JObject);
-procedure jSpinner_SetjParent(env: PJNIEnv; _jspinner: JObject; _viewgroup: jObject);
+procedure jSpinner_SetViewParent(env: PJNIEnv; _jspinner: JObject; _viewgroup: jObject);
 procedure jSpinner_SetLParamWidth(env: PJNIEnv; _jspinner: JObject; _w: integer);
 procedure jSpinner_SetLParamHeight(env: PJNIEnv; _jspinner: JObject; _h: integer);
 procedure jSpinner_SetLeftTopRightBottomWidthHeight(env: PJNIEnv; _jspinner: JObject; _left: integer; _top: integer; _right: integer; _bottom: integer; _w: integer; _h: integer);
@@ -155,11 +161,16 @@ procedure jSpinner_SetItemTagString(env: PJNIEnv; _jspinner: JObject; _index: in
 
 procedure jSpinner_SetSelectedPaddingTop(env: PJNIEnv; _jspinner: JObject; _padTop: integer);
 procedure jSpinner_SetSelectedPaddingBottom(env: PJNIEnv; _jspinner: JObject; _padBottom: integer);
+procedure jSpinner_SetFrameGravity(env: PJNIEnv; _jspinner: JObject; _value: integer);
+function jSpinner_GetParent(env: PJNIEnv; _jspinner: JObject): jObject;
 
 implementation
 
 uses
-  customdialog, toolbar;
+   customdialog, viewflipper, toolbar, scoordinatorlayout, linearlayout,
+   sdrawerlayout, scollapsingtoolbarlayout, scardview, sappbarlayout,
+   stoolbar, stablayout, snestedscrollview, sviewpager, framelayout;
+
 
 {---------  jSpinner  --------------}
 
@@ -213,6 +224,95 @@ begin
   inherited Destroy;
 end;
 
+procedure jSpinner.TryNewParent(refApp: jApp);
+begin
+  if FParent is jPanel then
+  begin
+    jPanel(FParent).Init(refApp);
+    FjPRLayout:= jPanel(FParent).View;
+  end else
+  if FParent is jScrollView then
+  begin
+    jScrollView(FParent).Init(refApp);
+    FjPRLayout:= jScrollView_getView(FjEnv, jScrollView(FParent).jSelf);
+  end else
+  if FParent is jHorizontalScrollView then
+  begin
+    jHorizontalScrollView(FParent).Init(refApp);
+    FjPRLayout:= jHorizontalScrollView_getView(FjEnv, jHorizontalScrollView(FParent).jSelf);
+  end  else
+  if FParent is jCustomDialog then
+  begin
+    jCustomDialog(FParent).Init(refApp);
+    FjPRLayout:= jCustomDialog(FParent).View;
+  end else
+  if FParent is jViewFlipper then
+  begin
+    jViewFlipper(FParent).Init(refApp);
+    FjPRLayout:= jViewFlipper(FParent).View;
+  end else
+  if FParent is jToolbar then
+  begin
+    jToolbar(FParent).Init(refApp);
+    FjPRLayout:= jToolbar(FParent).View;
+  end  else
+  if FParent is jsToolbar then
+  begin
+    jsToolbar(FParent).Init(refApp);
+    FjPRLayout:= jsToolbar(FParent).View;
+  end  else
+  if FParent is jsCoordinatorLayout then
+  begin
+    jsCoordinatorLayout(FParent).Init(refApp);
+    FjPRLayout:= jsCoordinatorLayout(FParent).View;
+  end else
+  if FParent is jFrameLayout then
+  begin
+    jFrameLayout(FParent).Init(refApp);
+    FjPRLayout:= jFrameLayout(FParent).View;
+  end else
+  if FParent is jLinearLayout then
+  begin
+    jLinearLayout(FParent).Init(refApp);
+    FjPRLayout:= jLinearLayout(FParent).View;
+  end else
+  if FParent is jsDrawerLayout then
+  begin
+    jsDrawerLayout(FParent).Init(refApp);
+    FjPRLayout:= jsDrawerLayout(FParent).View;
+  end  else
+  if FParent is jsCardView then
+  begin
+      jsCardView(FParent).Init(refApp);
+      FjPRLayout:= jsCardView(FParent).View;
+  end else
+  if FParent is jsAppBarLayout then
+  begin
+      jsAppBarLayout(FParent).Init(refApp);
+      FjPRLayout:= jsAppBarLayout(FParent).View;
+  end else
+  if FParent is jsTabLayout then
+  begin
+      jsTabLayout(FParent).Init(refApp);
+      FjPRLayout:= jsTabLayout(FParent).View;
+  end else
+  if FParent is jsCollapsingToolbarLayout then
+  begin
+      jsCollapsingToolbarLayout(FParent).Init(refApp);
+      FjPRLayout:= jsCollapsingToolbarLayout(FParent).View;
+  end else
+  if FParent is jsNestedScrollView then
+  begin
+      jsNestedScrollView(FParent).Init(refApp);
+      FjPRLayout:= jsNestedScrollView(FParent).View;
+  end else
+  if FParent is jsViewPager then
+  begin
+      jsViewPager(FParent).Init(refApp);
+      FjPRLayout:= jsViewPager(FParent).View;
+  end;
+end;
+
 procedure jSpinner.Init(refApp: jApp);
 var
   rToP: TPositionRelativeToParent;
@@ -227,33 +327,15 @@ begin
 
   if FParent <> nil then
   begin
-    if FParent is jPanel then
-    begin
-      jPanel(FParent).Init(refApp);
-      FjPRLayout:= jPanel(FParent).View;
-    end;
-    if FParent is jScrollView then
-    begin
-      jScrollView(FParent).Init(refApp);
-      FjPRLayout:= jScrollView_getView(FjEnv, jScrollView(FParent).jSelf);//FjPRLayout:= jScrollView(FParent).View;
-    end;
-    if FParent is jHorizontalScrollView then
-    begin
-      jHorizontalScrollView(FParent).Init(refApp);
-      FjPRLayout:= jHorizontalScrollView_getView(FjEnv, jHorizontalScrollView(FParent).jSelf);
-    end;
+    TryNewParent(refApp);
   end;
-  if FParent is jCustomDialog then
-  begin
-    jCustomDialog(FParent).Init(refApp);
-    FjPRLayout:= jCustomDialog(FParent).View;
-  end;
-  if FParent is jToolbar then
-  begin
-    jToolbar(FParent).Init(refApp);
-    FjPRLayout:= jToolbar(FParent).View;
-  end;
-  jSpinner_SetjParent(FjEnv, FjObject , FjPRLayout);
+
+  FjPRLayoutHome:= FjPRLayout;
+
+  if FGravityInParent <> lgNone then
+    jSpinner_SetFrameGravity(FjEnv, FjObject, Ord(FGravityInParent));
+
+  jSpinner_SetViewParent(FjEnv, FjObject , FjPRLayout);
   jSpinner_SetId(FjEnv, FjObject , Self.Id);
   jSpinner_SetLeftTopRightBottomWidthHeight(FjEnv, FjObject ,
                         FMarginLeft,FMarginTop,FMarginRight,FMarginBottom,
@@ -413,13 +495,21 @@ begin
      jSpinner_jFree(FjEnv, FjObject );
 end;
 
-procedure jSpinner.SetjParent(_viewgroup: jObject);
+procedure jSpinner.SetViewParent(_viewgroup: jObject);
 begin
   //in designing component state: set value here...
   FjPRLayout:= _viewgroup;
   if FInitialized then
-     jSpinner_SetjParent(FjEnv, FjObject , _viewgroup);
+     jSpinner_SetViewParent(FjEnv, FjObject , _viewgroup);
 end;
+
+function jSpinner.GetViewParent(): jObject;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jSpinner_GetParent(FjEnv, FjObject);
+end;
+
 
 procedure jSpinner.SetLParamWidth(_w: integer);
 begin
@@ -712,6 +802,14 @@ begin
      jSpinner_SetSelectedPaddingBottom(FjEnv, FjObject, _paddingBottom);
 end;
 
+procedure jSpinner.SetLGravity(_value: TLayoutGravity);
+begin
+  //in designing component state: set value here...
+  FGravityInParent:= _value;
+  if FInitialized then
+     jSpinner_SetFrameGravity(FjEnv, FjObject, Ord(FGravityInParent));
+end;
+
 //TODO
 (*
 procedure jSpinner.ListViewChange(Sender: TObject);
@@ -767,7 +865,7 @@ begin
 end;
 
 
-procedure jSpinner_SetjParent(env: PJNIEnv; _jspinner: JObject; _viewgroup: jObject);
+procedure jSpinner_SetViewParent(env: PJNIEnv; _jspinner: JObject; _viewgroup: jObject);
 var
   jParams: array[0..0] of jValue;
   jMethod: jMethodID=nil;
@@ -775,7 +873,7 @@ var
 begin
   jParams[0].l:= _viewgroup;
   jCls:= env^.GetObjectClass(env, _jspinner);
-  jMethod:= env^.GetMethodID(env, jCls, 'SetjParent', '(Landroid/view/ViewGroup;)V');
+  jMethod:= env^.GetMethodID(env, jCls, 'SetViewParent', '(Landroid/view/ViewGroup;)V');
   env^.CallVoidMethodA(env, _jspinner, jMethod, @jParams);
   env^.DeleteLocalRef(env, jCls);
 end;
@@ -1257,6 +1355,30 @@ begin
   jCls:= env^.GetObjectClass(env, _jspinner);
   jMethod:= env^.GetMethodID(env, jCls, 'SetSelectedPaddingBottom', '(I)V');
   env^.CallVoidMethodA(env, _jspinner, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jSpinner_SetFrameGravity(env: PJNIEnv; _jspinner: JObject; _value: integer);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].i:= _value;
+  jCls:= env^.GetObjectClass(env, _jspinner);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetLGravity', '(I)V');
+  env^.CallVoidMethodA(env, _jspinner, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+function jSpinner_GetParent(env: PJNIEnv; _jspinner: JObject): jObject;
+var
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jspinner);
+  jMethod:= env^.GetMethodID(env, jCls, 'GetParent', '()Landroid/view/ViewGroup;');
+  Result:= env^.CallObjectMethod(env, _jspinner, jMethod);
   env^.DeleteLocalRef(env, jCls);
 end;
 

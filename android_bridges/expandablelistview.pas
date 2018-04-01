@@ -53,9 +53,8 @@ jExpandableListView = class(jVisualControl)
     procedure SetTextChildTypeFace(_typeface: TTextTypeFace);
     procedure SetBackgroundChild(_color: TARGBColorBridge);
     procedure SetHighLightSelectedChildItemColor(_color: TARGBColorBridge);
-
-
     procedure SetItems(Value: TStrings);
+    procedure TryNewParent(refApp: jApp);
  public
     constructor Create(AOwner: TComponent); override;
     destructor  Destroy; override;
@@ -68,14 +67,14 @@ jExpandableListView = class(jVisualControl)
     function jCreate(): jObject;
     procedure jFree();
     procedure SetViewParent(_viewgroup: jObject); override;
-    function GetParent(): jObject;
-    procedure RemoveFromViewParent();
+    function GetViewParent(): jObject;  override;
+    procedure RemoveFromViewParent();  override;
     function GetView(): jObject;  override;
     procedure SetLParamWidth(_w: integer);
     procedure SetLParamHeight(_h: integer);
     function GetLParamWidth(): integer;
     function GetLParamHeight(): integer;
-    procedure SetLGravity(_g: integer);
+    procedure SetLGravity(_gravity: TLayoutGravity);
     procedure SetLWeight(_w: single);
     procedure SetLeftTopRightBottomWidthHeight(_left: integer; _top: integer; _right: integer; _bottom: integer; _w: integer; _h: integer);
     procedure AddLParamsAnchorRule(_rule: integer);
@@ -180,7 +179,10 @@ procedure jExpandableListView_SetHighLightSelectedChildItemColor(env: PJNIEnv; _
 implementation
 
 uses
-   customdialog, toolbar;
+   customdialog, viewflipper, toolbar, scoordinatorlayout, linearlayout,
+   sdrawerlayout, scollapsingtoolbarlayout, scardview, sappbarlayout,
+   stoolbar, stablayout, snestedscrollview, sviewpager, framelayout;
+
 
 {---------  jExpandableListView  --------------}
 
@@ -224,6 +226,95 @@ begin
   inherited Destroy;
 end;
 
+procedure jExpandableListView.TryNewParent(refApp: jApp);
+begin
+  if FParent is jPanel then
+  begin
+    jPanel(FParent).Init(refApp);
+    FjPRLayout:= jPanel(FParent).View;
+  end else
+  if FParent is jScrollView then
+  begin
+    jScrollView(FParent).Init(refApp);
+    FjPRLayout:= jScrollView_getView(FjEnv, jScrollView(FParent).jSelf);
+  end else
+  if FParent is jHorizontalScrollView then
+  begin
+    jHorizontalScrollView(FParent).Init(refApp);
+    FjPRLayout:= jHorizontalScrollView_getView(FjEnv, jHorizontalScrollView(FParent).jSelf);
+  end  else
+  if FParent is jCustomDialog then
+  begin
+    jCustomDialog(FParent).Init(refApp);
+    FjPRLayout:= jCustomDialog(FParent).View;
+  end else
+  if FParent is jViewFlipper then
+  begin
+    jViewFlipper(FParent).Init(refApp);
+    FjPRLayout:= jViewFlipper(FParent).View;
+  end else
+  if FParent is jToolbar then
+  begin
+    jToolbar(FParent).Init(refApp);
+    FjPRLayout:= jToolbar(FParent).View;
+  end  else
+  if FParent is jsToolbar then
+  begin
+    jsToolbar(FParent).Init(refApp);
+    FjPRLayout:= jsToolbar(FParent).View;
+  end  else
+  if FParent is jsCoordinatorLayout then
+  begin
+    jsCoordinatorLayout(FParent).Init(refApp);
+    FjPRLayout:= jsCoordinatorLayout(FParent).View;
+  end else
+  if FParent is jFrameLayout then
+  begin
+    jFrameLayout(FParent).Init(refApp);
+    FjPRLayout:= jFrameLayout(FParent).View;
+  end else
+  if FParent is jLinearLayout then
+  begin
+    jLinearLayout(FParent).Init(refApp);
+    FjPRLayout:= jLinearLayout(FParent).View;
+  end else
+  if FParent is jsDrawerLayout then
+  begin
+    jsDrawerLayout(FParent).Init(refApp);
+    FjPRLayout:= jsDrawerLayout(FParent).View;
+  end  else
+  if FParent is jsCardView then
+  begin
+      jsCardView(FParent).Init(refApp);
+      FjPRLayout:= jsCardView(FParent).View;
+  end else
+  if FParent is jsAppBarLayout then
+  begin
+      jsAppBarLayout(FParent).Init(refApp);
+      FjPRLayout:= jsAppBarLayout(FParent).View;
+  end else
+  if FParent is jsTabLayout then
+  begin
+      jsTabLayout(FParent).Init(refApp);
+      FjPRLayout:= jsTabLayout(FParent).View;
+  end else
+  if FParent is jsCollapsingToolbarLayout then
+  begin
+      jsCollapsingToolbarLayout(FParent).Init(refApp);
+      FjPRLayout:= jsCollapsingToolbarLayout(FParent).View;
+  end else
+  if FParent is jsNestedScrollView then
+  begin
+      jsNestedScrollView(FParent).Init(refApp);
+      FjPRLayout:= jsNestedScrollView(FParent).View;
+  end else
+  if FParent is jsViewPager then
+  begin
+      jsViewPager(FParent).Init(refApp);
+      FjPRLayout:= jsViewPager(FParent).View;
+  end;
+end;
+
 procedure jExpandableListView.Init(refApp: jApp);
 var
   rToP: TPositionRelativeToParent;
@@ -235,34 +326,14 @@ begin
   //your code here: set/initialize create params....
   FjObject:= jCreate(); //jSelf !
   FInitialized:= True;
+
   if FParent <> nil then
   begin
-    if FParent is jPanel then
-    begin
-      jPanel(FParent).Init(refApp);
-      FjPRLayout:= jPanel(FParent).View;
-    end;
-    if FParent is jScrollView then
-    begin
-      jScrollView(FParent).Init(refApp);
-      FjPRLayout:= jScrollView_getView(FjEnv, jScrollView(FParent).jSelf);
-    end;
-    if FParent is jHorizontalScrollView then
-    begin
-      jHorizontalScrollView(FParent).Init(refApp);
-      FjPRLayout:= jHorizontalScrollView_getView(FjEnv, jHorizontalScrollView(FParent).jSelf);
-    end;
-    if FParent is jCustomDialog then
-    begin
-      jCustomDialog(FParent).Init(refApp);
-      FjPRLayout:= jCustomDialog(FParent).View;
-    end;
-    if FParent is jToolbar then
-    begin
-      jToolbar(FParent).Init(refApp);
-      FjPRLayout:= jToolbar(FParent).View;
-    end;
+    TryNewParent(refApp);
   end;
+
+  FjPRLayoutHome:= FjPRLayout;
+
   jExpandableListView_SetViewParent(FjEnv, FjObject, FjPRLayout);
   jExpandableListView_SetId(FjEnv, FjObject, Self.Id);
   jExpandableListView_SetLeftTopRightBottomWidthHeight(FjEnv, FjObject,
@@ -457,7 +528,7 @@ begin
      jExpandableListView_SetViewParent(FjEnv, FjObject, _viewgroup);
 end;
 
-function jExpandableListView.GetParent(): jObject;
+function jExpandableListView.GetViewParent(): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
@@ -506,11 +577,12 @@ begin
    Result:= jExpandableListView_GetLParamHeight(FjEnv, FjObject);
 end;
 
-procedure jExpandableListView.SetLGravity(_g: integer);
+procedure jExpandableListView.SetLGravity(_gravity: TLayoutGravity);
 begin
   //in designing component state: set value here...
+  FGravityInParent:= _gravity;
   if FInitialized then
-     jExpandableListView_SetLGravity(FjEnv, FjObject, _g);
+     jExpandableListView_SetLGravity(FjEnv, FjObject, Ord(_gravity));
 end;
 
 procedure jExpandableListView.SetLWeight(_w: single);

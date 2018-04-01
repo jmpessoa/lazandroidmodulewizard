@@ -250,7 +250,7 @@ var
   AProcess: TProcess;
   auxList: TStringList;
   flag: boolean;
-  i, p1, p2: integer;
+  i, p1: integer;
   mylib: string;
   methodName: string;
   auxSignature: string;
@@ -800,13 +800,13 @@ end;
 
 procedure StartCanUpdateJavaTemplates(Sender: TObject);
 var
-  Project: TLazProject;
+  //Project: TLazProject;
   dlgMessage: string;
   canUpdate: string;
   setting: string;
   fileName: string;
 begin
-  Project := LazarusIDE.ActiveProject;
+  //Project := LazarusIDE.ActiveProject;
   {if Assigned(Project) and (Project.CustomData.Values['LAMW'] <> '') then
   begin}
     fileName:= IncludeTrailingPathDelimiter(LazarusIDE.GetPrimaryConfigPath) + 'JNIAndroidProject.ini';
@@ -1022,13 +1022,13 @@ begin
   // Register main menu
   ideMnuAMW:= RegisterIDEMenuSection(mnuTools,'AMW');
   // Register submenu
-  ideSubMnuAMW:= RegisterIDESubMenu(ideMnuAMW, 'AMW', '[Lamw] Android Module Wizard');
+  ideSubMnuAMW:= RegisterIDESubMenu(ideMnuAMW, 'AMW', '[LAMW] Android Module Wizard');
   // Adding first entry
   RegisterIDEMenuCommand(ideSubMnuAMW, 'PathToolCmd', 'Paths Settings [Jdk, Sdk, Ndk, ...]', nil,@StartPathTool);
   // Adding second entry
-  RegisterIDEMenuCommand(ideSubMnuAMW, 'PathLateCmd', 'LATE: Apk Expert Tools [Build, Install, ...]', nil,@StartLateTool);
+  //RegisterIDEMenuCommand(ideSubMnuAMW, 'PathLateCmd', 'LATE: Apk Expert Tools [Build, Install, ...]', nil,@StartLateTool);
   // Adding third entry
-  RegisterIDEMenuCommand(ideSubMnuAMW, 'PathResEditorCmd', 'Resource Editor [strings.xml] ', nil,@StartResEditor);
+  //RegisterIDEMenuCommand(ideSubMnuAMW, 'PathResEditorCmd', 'Resource Editor [strings.xml] ', nil,@StartResEditor);
    // Adding fourth entry
  //RegisterIDEMenuCommand(ideSubMnuAMW, 'PathUpdateCmd','Upgrade Code Templates [*.lpr, *.java]', nil,@StartUpdateCodeTemplateTool);
   // Adding 5a. entry
@@ -1059,7 +1059,7 @@ begin
   //RegisterIDEMenuCommand(ideSubMnuLog, 'PathToLogcat', 'Logcat [sync]', nil, @StartLogcatSync);
   RegisterIDEMenuCommand(ideSubMnuLog, 'PathToLogcat', 'Logcat -c [clear]', nil, @StartLogcatClear);
   //Run
-  RegisterIDEMenuCommand(itmRunBuilding, 'BuildApkAndRun', '[Lamw] Build Android Apk and Run', nil, @BuildApkAndRun);
+  RegisterIDEMenuCommand(itmRunBuilding, 'BuildApkAndRun', '[LAMW] Build Android Apk and Run', nil, @BuildApkAndRun);
 
   ApkBuild.RegisterExtToolParser;
 end;

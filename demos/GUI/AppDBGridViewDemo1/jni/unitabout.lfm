@@ -1,0 +1,205 @@
+object AndroidModuleAbout: TAndroidModuleAbout
+  Left = 311
+  Top = 142
+  Width = 315
+  Height = 481
+  MarginLeft = 5
+  MarginTop = 5
+  MarginRight = 5
+  MarginBottom = 5
+  Enabled = True
+  AutoAssignIDs = True
+  OnCreate = Mod_AboutCreate
+  Text = 'Mod_About'
+  ActivityMode = actSplash
+  BackgroundColor = colbrDefault
+  ActionBarTitle = abtNone
+  OnJNIPrompt = Mod_AboutJNIPrompt
+  OnClose = Mod_AboutClose
+  object jPanel1: jPanel
+    Left = 18
+    Top = 99
+    Width = 278
+    Height = 283
+    MarginLeft = 4
+    MarginTop = 4
+    MarginRight = 4
+    MarginBottom = 4
+    Enabled = True
+    Visible = True
+    Id = 1
+    PosRelativeToAnchor = []
+    PosRelativeToParent = [rpCenterInParent]
+    LayoutParamWidth = lpWrapContent
+    LayoutParamHeight = lpWrapContent
+    BackgroundColor = colbrGreen
+    MinPinchZoomFactor = 0.25
+    MaxPinchZoomFactor = 4
+    object jTextView1: jTextView
+      Left = 37
+      Top = 5
+      Width = 204
+      Height = 32
+      MarginLeft = 5
+      MarginTop = 5
+      MarginRight = 5
+      MarginBottom = 5
+      Enabled = True
+      Visible = True
+      Id = 1
+      PosRelativeToAnchor = []
+      PosRelativeToParent = [rpTop, rpCenterHorizontal]
+      LayoutParamWidth = lpWrapContent
+      LayoutParamHeight = lpWrapContent
+      Text = 'Field Data Repository'
+      Alignment = taCenter
+      BackgroundColor = colbrDefault
+      FontColor = colbrDefault
+      FontSize = 20
+      TextTypeFace = tfBold
+      FontSizeUnit = unitScaledPixel
+      GravityInParent = lgNone
+    end
+    object jImageView1: jImageView
+      Left = 42
+      Top = 66
+      Width = 72
+      Height = 72
+      MarginLeft = 5
+      MarginTop = 24
+      MarginRight = 5
+      MarginBottom = 5
+      Enabled = True
+      Visible = True
+      Anchor = jTextView1
+      Id = 2
+      PosRelativeToAnchor = [raBelow, raAlignLeft]
+      PosRelativeToParent = []
+      LayoutParamWidth = lp72px
+      LayoutParamHeight = lp72px
+      ImageIndex = 1
+      Images = jImageList1
+      BackgroundColor = colbrBlack
+      ImageScaleType = scaleFitCenter
+      GravityInParent = lgNone
+    end
+    object jTextView2: jTextView
+      Left = 158
+      Top = 82
+      Width = 78
+      Height = 24
+      MarginLeft = 5
+      MarginTop = 40
+      MarginRight = 5
+      MarginBottom = 40
+      Enabled = True
+      Visible = True
+      Anchor = jTextView1
+      Id = 3
+      PosRelativeToAnchor = [raBelow, raAlignRight]
+      PosRelativeToParent = []
+      LayoutParamWidth = lpWrapContent
+      LayoutParamHeight = lpWrapContent
+      Text = 'Version 0.0'
+      Alignment = taRight
+      BackgroundColor = colbrDefault
+      FontColor = colbrDefault
+      FontSize = 16
+      TextTypeFace = tfNormal
+      FontSizeUnit = unitScaledPixel
+      GravityInParent = lgNone
+    end
+    object jTextView3: jTextView
+      Left = 5
+      Top = 151
+      Width = 268
+      Height = 24
+      MarginLeft = 5
+      MarginTop = 5
+      MarginRight = 5
+      MarginBottom = 5
+      Enabled = True
+      Visible = True
+      Anchor = jTextView2
+      Id = 4
+      PosRelativeToAnchor = [raBelow]
+      PosRelativeToParent = [rpCenterHorizontal]
+      LayoutParamWidth = lpWrapContent
+      LayoutParamHeight = lpWrapContent
+      Text = '   Copyright 2018 by Martin Lowry   '
+      Alignment = taCenter
+      BackgroundColor = colbrDefault
+      FontColor = colbrDefault
+      FontSize = 16
+      TextTypeFace = tfBold
+      FontSizeUnit = unitScaledPixel
+      GravityInParent = lgNone
+    end
+    object jTextView4: jTextView
+      Left = 64
+      Top = 185
+      Width = 149
+      Height = 24
+      MarginLeft = 5
+      MarginTop = 5
+      MarginRight = 5
+      MarginBottom = 5
+      Enabled = True
+      Visible = True
+      Anchor = jTextView3
+      Id = 5
+      PosRelativeToAnchor = [raBelow]
+      PosRelativeToParent = [rpCenterHorizontal]
+      LayoutParamWidth = lpWrapContent
+      LayoutParamHeight = lpWrapContent
+      Text = 'Under Construction'
+      Alignment = taCenter
+      BackgroundColor = colbrDefault
+      FontColor = colbrDefault
+      FontSize = 16
+      TextTypeFace = tfBold
+      FontSizeUnit = unitScaledPixel
+      GravityInParent = lgNone
+    end
+    object jButton1: jButton
+      Left = 109
+      Top = 219
+      Width = 59
+      Height = 59
+      MarginLeft = 5
+      MarginTop = 5
+      MarginRight = 5
+      MarginBottom = 5
+      Enabled = True
+      Visible = True
+      Anchor = jTextView4
+      Id = 6
+      PosRelativeToAnchor = [raBelow]
+      PosRelativeToParent = [rpCenterHorizontal]
+      LayoutParamWidth = lpWrapContent
+      LayoutParamHeight = lpWrapContent
+      Text = 'OK'
+      BackgroundColor = colbrDefault
+      FontColor = colbrDefault
+      FontSize = 24
+      FontSizeUnit = unitScaledPixel
+      GravityInParent = lgNone
+      OnClick = jButton1Click
+    end
+  end
+  object jImageList1: jImageList
+    Images.Strings = (
+      'fielddata_small.png'
+      'fielddata_large.png'
+    )
+    left = 56
+    top = 32
+  end
+  object jTimer1: jTimer
+    Enabled = False
+    Interval = 20
+    OnTimer = jTimer1Timer
+    left = 144
+    top = 32
+  end
+end

@@ -5,7 +5,7 @@ unit bluetooth;
 interface
 
 uses
-  Classes, SysUtils, And_jni, And_jni_Bridge, bluetoothclientsocket, AndroidWidget;
+  Classes, SysUtils, And_jni, AndroidWidget;
 
 type
 

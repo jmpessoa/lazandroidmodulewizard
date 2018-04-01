@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resources>
+  <string name="create_sites_table">CREATE TABLE IF NOT EXISTS `Sites` (
+	`_id` INTEGER PRIMARY KEY AUTOINCREMENT,
+	`HabitatNo`	TEXT NOT NULL UNIQUE,
+	`OldSiteNo`	TEXT,
+	`VisitNo`	REAL NOT NULL,
+	`When`	REAL NOT NULL,
+	`Base_Town`	TEXT,
+	`Km`	REAL,
+	`Habitat`	TEXT,
+	`Nearest`	TEXT,
+	`Distance`	REAL,
+	`Bearing`	TEXT,
+	`Secondary Admin`	TEXT,
+	`Primary Admin`	TEXT,
+	`Latitude`	REAL,
+	`Longitude`	REAL,
+	`Altitude`	INTEGER,
+	`Prologue`	TEXT,
+	`Epilogue`	TEXT);</string>
+</resources>

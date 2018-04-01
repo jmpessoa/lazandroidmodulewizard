@@ -1,4 +1,4 @@
-package org.lamw.apptextureviewdemo1;
+package com.example.appdatetimepicker;
 
 import java.lang.reflect.Field;
 
@@ -27,7 +27,6 @@ import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Gravity;
-import android.widget.AdapterView;
 import android.widget.TextView;
 
 
@@ -49,7 +48,7 @@ public class jTextView extends TextView {
     private int mRadius = 20;    
     
     int mTextAlignment;
-    	    
+        	    
     public  jTextView(android.content.Context context,
                       Controls ctrls,long pasobj ) {
         super(context);
@@ -67,8 +66,7 @@ public class jTextView extends TextView {
         };                     
         
         setOnClickListener(onClickListener);
-        
-        
+                
         onLongClickListener = new OnLongClickListener() {
 
 			@Override
@@ -109,6 +107,8 @@ public class jTextView extends TextView {
 	}
 
 	public void SetLeftTopRightBottomWidthHeight(int left, int top, int right, int bottom, int w, int h) {
+		String tag = ""+left+"|"+top+"|"+right+"|"+bottom;
+	    this.setTag(tag);
 		LAMWCommon.setLeftTopRightBottomWidthHeight(left,top,right,bottom,w,h);
 	}
 		
@@ -399,7 +399,7 @@ public class jTextView extends TextView {
 	 */	
 	public void SetTextDirection(int _textDirection) {		
 		//[ifdef_api17up]
-		 if(Build.VERSION.SDK_INT >= 17) {
+		 if(Build.VERSION.SDK_INT >= 17) {  //need target = 17 !!!
 				switch  (_textDirection) {
 				case 0: this.setTextDirection(View.TEXT_DIRECTION_INHERIT);	 break; 
 				case 1: this.setTextDirection(View.TEXT_DIRECTION_FIRST_STRONG); break; 	 
@@ -424,10 +424,8 @@ public class jTextView extends TextView {
 		
 	/*
 	 * if text is small then add space before and after text
-       txtEventName.setText("\t \t \t \t \t \t"+eventName+"\t \t \t \t \t \t");
-       
-       or
-       
+       txtEventName.setText("\t \t \t \t \t \t"+eventName+"\t \t \t \t \t \t");       
+       or       
        String summary = "<html><FONT color='#fdb728' FACE='courier'><marquee behavior='scroll' direction='left' scrollamount=10>"
                 + "Hello Droid" + "</marquee></FONT></html>";
        webView.loadData(summary, "text/html", "utf-8");     
@@ -443,12 +441,21 @@ public class jTextView extends TextView {
 	}
 	
 	//http://rajeshandroiddeveloper.blogspot.com.br/2013/07/how-to-implement-custom-font-to-text.html
-	public void SetTextAsLink(String _linkText) {
-		 this.setText(Html.fromHtml(_linkText));  //"www.google.com" 
-	     Linkify.addLinks(this, Linkify.ALL);
+	public void SetTextAsLink(String _linkText) {		
+		   		
+		   //[ifdef_api24up]
+		   if (Build.VERSION.SDK_INT >= 24) {			
+	          this.setText(Html.fromHtml(_linkText, Html.FROM_HTML_MODE_LEGACY));	       
+	       } 		    		  	  		   
+		   //[endif_api24up]
+		   
+		   if (Build.VERSION.SDK_INT < 24) {			   
+		       this.setText(Html.fromHtml(_linkText));
+		   }		   	
+		   	  				    		   
+	       Linkify.addLinks(this, Linkify.ALL);
 	}
-	
-	
+		
 	//You can basically set it from anything between 0(fully transparent) to 255 (completely opaque)	
 	public void SetBackgroundAlpha(int _alpha) {
 		this.getBackground().setAlpha(_alpha); //0-255
@@ -461,6 +468,10 @@ public class jTextView extends TextView {
 
 	public void WrapParent() {
 		LAMWCommon.WrapParent();		
+	}		
+	
+	public void SetContentDescription(String _description) {		
+		this.setContentDescription(_description);
 	}
-		
+	
 }

@@ -5,7 +5,7 @@ unit textfilemanager;
 interface
 
 uses
-  Classes, SysUtils, And_jni, And_jni_Bridge, AndroidWidget;
+  Classes, SysUtils, And_jni, AndroidWidget;
 
 type
 
@@ -138,6 +138,7 @@ end;
 
 function jTextFileManager.LoadFromFile(_envDir: TEnvDirectory; _filename: string): string; overload;
 begin
+   Result:='';
    LoadFromFile( (Self.Owner as jForm).GetEnvironmentDirectoryPath(_envDir) ,_filename);
 end;
 
@@ -151,6 +152,7 @@ end;
 function jTextFileManager.LoadFromSdCard(_filename: string): string;
 begin
   //in designing component state: result value here...
+  Result:= '';
   if FInitialized then
    Result:= jTextFileManager_LoadFromSdCard(FjEnv, FjObject, _filename);
 end;
