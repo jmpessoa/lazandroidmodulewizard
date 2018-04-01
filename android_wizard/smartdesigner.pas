@@ -730,15 +730,16 @@ var
   androidTheme: string;
 begin
 
-  auxList:= TStringList.Create;
   if not AProject.CustomData.Contains('LAMW') then
   begin
     if not FileExists(AProject.ProjectInfoFile) then Exit;
+    auxList:= TStringList.Create;
     try
       auxList.LoadFromFile(AProject.ProjectInfoFile); //full path to 'controls.lpi';
       if Pos('tfpandroidbridge_pack', auxList.Text) <= 0 then  Exit;
       AProject.CustomData['LAMW']:= 'GUI';
     finally
+      auxList.Free;
     end;
   end;
 
@@ -847,8 +848,6 @@ begin
   end;
   KeepBuildUpdated(maxSdkApi, outMaxBuildTool {25.0.5});
   //end LAMW 0.8
-
-  auxList.Free;
 
 end;
 
@@ -1926,7 +1925,6 @@ function TLamwSmartDesigner.TryChangeTo49x(path: string): string;
 var
   proj49: string;
   p: integer;
-  tail: string;
   new49x: string;
 begin
   Result:= path;
