@@ -70,6 +70,7 @@ type
     function GetLprStartModuleVarName: string;
     function TryChangePrebuildOSY(path: string): string;
     function TryChangeTo49x(path: string): string;
+    function TryChangeNdkPlatformsApi(path: string; newNdkApi: integer): string;
 
   protected
     function OnProjectOpened(Sender: TObject; AProject: TLazProject): TModalResult;
@@ -279,8 +280,8 @@ begin
 
            if savedBuilder < builderNumber then
            begin
-              savedBuilder:= builderNumber;
-              FCandidateSdkBuild:= builderTool;
+             savedBuilder:= builderNumber;
+             FCandidateSdkBuild:= builderTool;
            end;
 
            if platform = builderNumber then
@@ -1919,6 +1920,26 @@ end;
 //custom
 //C:\adt32\ndk10e\toolchains\arm-linux-androideabi-4.9\prebuilt\windows\bin
 
+function TLamwSmartDesigner.TryChangeNdkPlatformsApi(path: string; newNdkApi: integer): string;
+var
+  projPlatformApi: string;
+  newPlatformApi: string;
+  p: integer;
+  tail: string;
+begin
+  Result:= path;
+  newPlatformApi:= PathDelim + 'android-'+IntToStr(newNdkApi) + PathDelim;
+  p:= Pos('platforms', path);
+  tail:= Copy(path, p+10, MaxInt);
+  p:= Pos(PathDelim, tail);
+  projPlatformApi:=  Copy(tail, 1, p-1);
+  projPlatformApi:=  PathDelim + projPlatformApi + PathDelim;
+  if  projPlatformApi <>  newPlatformApi then
+  begin
+    Result:= StringReplace(path, projPlatformApi ,newPlatformApi,[rfReplaceAll,rfIgnoreCase]);
+  end;
+end;
+
 function TLamwSmartDesigner.TryChangePrebuildOSY(path: string): string;
 var
   projPrebuildOSYS: string;
@@ -1941,7 +1962,7 @@ begin
 
 end;
 
-////C:\adt32\ndk10e\toolchains\arm-linux-androideabi-4.9\prebuilt\windows\lib\gcc\arm-linux-androideabi\4.9\"/>
+//C:\adt32\ndk10e\toolchains\arm-linux-androideabi-4.9\prebuilt\windows\lib\gcc\arm-linux-androideabi\4.9\"/>
 function TLamwSmartDesigner.TryChangeTo49x(path: string): string;
 var
   proj49: string;
@@ -2036,6 +2057,9 @@ begin
 
       if StrToInt(FNDKIndex) > 4 then  //LAMW 0.8
          strResult:= TryChangeTo49x(strResult);
+
+      if maxNdk > 0 then
+        strResult:= TryChangeNdkPlatformsApi(strResult, maxNdk);
 
       LazarusIDE.ActiveProject.LazCompilerOptions.Libraries:= strResult;
 
