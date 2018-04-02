@@ -1,0 +1,98 @@
+
+[HowTo] 
+
+Android Development Environment on Linux (FPCUPdeluxe / LAMW) April 02, 2018
+
+By WayneSherman
+
+REF. http://forum.lazarus.freepascal.org/index.php/topic,40750.0.html
+
+Motivation:
+  Needed easy setup instructions to get an up-to-date Android build environment setup on Linux.
+
+
+1# Setup Android Development Environment on Linux (FPCUPdeluxe / LAMW)
+2# Tested on Xubuntu 16.04 64-bit
+3# Target 32-bit ARM on Android
+4# 2018-Apr-02 ver 0.8
+5 
+6# Install libraries and tools
+7sudo apt-get install -y libx11-dev libgtk2.0-dev libgdk-pixbuf2.0-dev libcairo2-dev libpango1.0-dev libxtst-dev libatk1.0-dev libghc-x11-dev freeglut3 freeglut3-dev
+8sudo apt-get install -y git subversion make build-essential zip unzip unrar
+9sudo apt-get install -y android-tools-adb ant openjdk-8-jdk
+10 
+11mkdir -p "$HOME/android/sdk"
+12 
+13# download and extract Android SDK Command Line Tools for Linux
+14# from https://developer.android.com/studio/index.html#downloads
+15cd "$HOME/android/sdk" 
+16wget "https://dl.google.com/android/repository/sdk-tools-linux-3859397.zip"
+17unzip "sdk-tools-linux-3859397.zip"
+18rm "sdk-tools-linux-3859397.zip"
+19 
+20#Install SDK packages and NDK
+21cd "$HOME/android/sdk/tools/bin"
+22./sdkmanager "platforms;android-25" "build-tools;25.0.3" "tools" "ndk-bundle" "extras;android;m2repository"
+23 
+24ln -sf "$HOME/android/sdk/ndk-bundle" "$HOME/android/ndk"
+25ln -sf "$HOME/android/ndk/toolchains/arm-linux-androideabi-4.9/prebuilt/linux-x86_64/bin" "$HOME/android/ndk-toolchain"
+26ln -sf "$HOME/android/ndk-toolchain/arm-linux-androideabi-as" "$HOME/android/ndk-toolchain/arm-linux-as"
+27ln -sf "$HOME/android/ndk-toolchain/arm-linux-androideabi-ld" "$HOME/android/ndk-toolchain/arm-linux-ld"
+28 
+29# download and extract Gradle 4.1
+30# from https://gradle.org/releases/
+31cd "$HOME/android"
+32wget "https://services.gradle.org/distributions/gradle-4.1-bin.zip"
+33unzip "gradle-4.1-bin.zip"
+34rm "gradle-4.1-bin.zip"
+35 
+36# Use a text editor to open $HOME/.profile and add this text below:
+37# ex. mousepad $HOME/.profile
+38export PATH="$PATH:$HOME/android/ndk-toolchain"
+39export PATH="$PATH:$HOME/android/gradle-4.1/bin"
+40 
+41Reboot (or logout of session and login)
+42 
+43# Download latest FPCUPdeluxe
+44# from https://github.com/newpascal/fpcupdeluxe/releases/latest
+45# Set execute permissions and run fpcupdeluxe-x86_64-linux
+46# Using FPCUPdeluxe install FPC/Lazarus, crosscompiler, and packages/modules:
+47# 1) Select "atomic" Trunk install button
+48# 2) Select CPU arm / OS android "Install cross-compiler" (select "yes" to missing tools message box)
+49# 3) In module list:  Select LAMW, Install module
+50# 4) (Optional but recommended) In module list: Select OPM, Install module (online package manager)
+51 
+52# Run lazarus using the link created by FPCUPdeluxe
+53# Select Tools menu > [Lamw] Android Module Wizard > Paths Settings: [Jdk, Sdk, Ndk, ...]:
+54# Path to Java JDK: /usr/lib/jvm/java-8-openjdk-amd64
+55# Path to Ant bin: /usr/bin
+56# Path to Gradle: /home/[user]/android/gradle-4.1
+57# Path to Android SDK: /home/[user]/android/sdk
+58# Path to Android NDK: /home/[user]/android/ndk
+59# NDK Version: >11
+60# Your Desktop System: linux-x86_64
+61 
+62# For new LAMW projects, use Gradle for Build Automated System and
+63#  ARMv7a + VFPv3 for Architecture/Instructions
+
+
+Comments: 
+> 20. #Install SDK packages and NDK
+The NDK does not have to be downloaded separately anymore.  It can be installed via the SDK command line tools (sdkmanager)
+
+> 22.  ./sdkmanager "platforms;android-25" "build-tools;25.0.3" "tools" "ndk-bundle" "extras;android;m2repository"
+I chose to build using Android API 25 (usage stats for Andriod API Levels).  To view a list of available packages use ./sdkmanager --list
+
+> 29. # download and extract Gradle 4.1
+LAMW uses the Gradle directory name to determine the Gradle version
+
+> 36. # Use a text editor to open $HOME/.profile and add this text below:
+.profile is the proper place.  .bashrc gets re-run for every subshell which creates multiple path entries.
+(NOTE:  .profile is not called if ~/.bash_profile or ~./bash_login exist)
+
+> 46. # Using FPCUPdeluxe install FPC/Lazarus, crosscompiler, and packages/modules:
+I used trunk for both FPC and Lazarus because I wanted to work off the most current code.  Depending on your needs and the state of the releases in regards to bugs and ARM/Android issues, you may use different versions.
+
+> 49. # 3) In module list:  Select LAMW, Install module
+Installing LAMW from FPCUPdeluxe pulls from GIT.  Do this anytime you want to update LAMW to the latest code.
+
