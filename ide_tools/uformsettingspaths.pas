@@ -314,8 +314,8 @@ begin
   {$ifdef linux}
   ComboBoxPrebuild.Items.Add('linux-x86_32');
   ComboBoxPrebuild.Items.Add('linux-x86_64');
-  if Self.FPrebuildOSYS <> '' then;
-      ComboBoxPrebuild.Text:= FPrebuildOSYS;
+  if Self.FPrebuildOSYS <> '' then
+      ComboBoxPrebuild.Text:= FPrebuildOSYS
   else
      ComboBoxPrebuild.Text:= 'linux-x86_64';
   {$endif}
