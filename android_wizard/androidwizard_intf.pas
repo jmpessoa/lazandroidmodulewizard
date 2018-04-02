@@ -1922,8 +1922,10 @@ begin
                 strList.Add('source ~/.bashrc');
                 strList.Add(' ');
                 strList.Add('[linux] cmd line prompt:');
-                strList.Add('.\gradle clean build --info');
-                strList.Add('.\gradle run');
+                //strList.Add('.\gradle clean build --info');
+                strList.Add('gradle clean build --info');
+                //strList.Add('.\gradle run');
+                strList.Add('gradle run');
                 strList.Add(' ');
                 strList.Add('Congratulation!');
                 strList.Add(' ');
@@ -2085,7 +2087,8 @@ begin
 
                 strList.Add('export PATH=$PATH:$GRADLE_HOME/bin');
                 strList.Add('source ~/.bashrc');
-                strList.Add('.\gradle clean build --info');
+                //strList.Add('.\gradle clean build --info');
+                strList.Add('gradle clean build --info');
                 strList.SaveToFile(FAndroidProjectName+PathDelim+'gradle_local_build.sh');
 
                 strList.Clear;
@@ -2098,7 +2101,8 @@ begin
 
                 strList.Add('export PATH=$PATH:$GRADLE_HOME/bin');
                 strList.Add('source ~/.bashrc');
-                strList.Add('.\gradle run');
+                //strList.Add('.\gradle run');
+                strList.Add('gradle run');
                 strList.SaveToFile(FAndroidProjectName+PathDelim+'gradle_local_run.sh');
             end  //gradle support ...
             else
