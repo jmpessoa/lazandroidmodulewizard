@@ -271,7 +271,7 @@ begin
        auxStr:= lisDir.Strings[i];
        if  auxStr <> '' then
        begin
-         if ( Pos('W', auxStr) = 0 ) and ( Pos('rc2', auxStr) = 0 ) and (Pos('android', auxStr) = 0 ) then   //escape some alien...
+         if Pos('rc2', auxStr) = 0 then   //escape some alien...
          begin
            p:= LastDelimiter(PathDelim, auxStr) + 1;
            builderTool:= Copy(lisDir.Strings[i], p, Length(auxStr));
@@ -281,7 +281,7 @@ begin
            if savedBuilder < builderNumber then
            begin
              savedBuilder:= builderNumber;
-             FCandidateSdkBuild:= builderTool;
+             if builderNumber > platform then FCandidateSdkBuild:= builderTool;
            end;
 
            if platform = builderNumber then
@@ -289,6 +289,7 @@ begin
              outBuildTool:= builderTool; //19.1.0
              Result:= True;
            end
+
          end;
        end;
     end;

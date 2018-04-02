@@ -72,6 +72,7 @@ type
      FAndroidTheme: string;
      FBuildSystem: string;
      FMaxSdkPlatform: integer;
+     FCandidateSdkBuild: string;
 
      function SettingsFilename: string;
      function TryNewJNIAndroidInterfaceCode(projectType: integer): boolean; //0: GUI  project --- 1:NoGUI project
@@ -728,8 +729,10 @@ var
   lisDir: TStringList;
   numberAsString, builderTool, auxStr: string;
   i, p, builderNumber: integer;
+  savedBuilder: integer;
 begin
   Result:= False;
+  savedBuilder:= 0;
   lisDir:= TStringList.Create;   //C:\adt32\sdk\build-tools\19.1.0
   FindAllDirectories(lisDir, FPathToAndroidSDK+'build-tools', False);
   if lisDir.Count > 0 then
@@ -745,6 +748,13 @@ begin
            builderTool:= Copy(lisDir.Strings[i], p, Length(auxStr));
            numberAsString:= Copy(builderTool, 1 , 2);  //19
            builderNumber:=  StrToInt(numberAsString);
+
+           if savedBuilder < builderNumber then
+           begin
+             savedBuilder:= builderNumber;
+             if builderNumber > platform then FCandidateSdkBuild:= builderTool;
+           end;
+
            if  platform = builderNumber then
            begin
              outBuildTool:= builderTool; //25.0.3
@@ -764,7 +774,7 @@ begin
   Result:= '';
   if HasBuildTools(sdkApi, tempOutBuildTool) then
   begin
-     Result:= tempOutBuildTool;  //25.0.3
+     Result:= tempOutBuildTool;  //25.0.3    //***
   end;
 end;
 
@@ -1718,8 +1728,11 @@ begin
           compileSdkVersion:= IntToStr(FMaxSdkPlatform);
           sdkBuildTools:= GetBuildTool(FMaxSdkPlatform);
 
+          if sdkBuildTools = '' then sdkBuildTools:= FCandidateSdkBuild;
+
           if sdkBuildTools <> '' then
           begin
+
             pluginVersion:= GetPluginVersion(sdkBuildTools);
             if pluginVersion <> '' then
             begin
@@ -2107,28 +2120,12 @@ begin
             end  //gradle support ...
             else
             begin
-              (*
-               ShowMessage('Warning/Recomendation:'+
-                        sLineBreak+
-                        sLineBreak+'[LAMW 0.8] "AppCompat" [material] theme need:'+
-                        sLineBreak+' 1. Java JDK 1.8'+
-                        sLineBreak+' 2. Gradle 4.1'+
-                        sLineBreak+' 3. Android SDK "plataforms" 25 + "build-tools" 25.0.3 [or]'+
-                        sLineBreak+' 3. Android SDK "plataforms" 26 + "build-tools" 26.0.3 [or]'+
-                        sLineBreak+' 3. Android SDK "plataforms" 27 + "build-tools" 27.0.3'+
-                        sLineBreak+' 4. Android SDK/Extra  "Support Repository"'+
-                        sLineBreak+' 5. Android SDK/Extra  "Support Library"'+
-                        sLineBreak+
-                        sLineBreak+'Hint/Compatibility:'+
-                        sLineBreak+' Android Sdk Platform 25 -> Gradle 3.3 or 4.1'+
-                        sLineBreak+' Android Sdk Platform 26 -> Gradle 4.1'+
-                        sLineBreak+' Android Sdk Platform 27 -> Gradle 4.1');
-                *)
+              // TODO
             end;
           end
           else
           begin
-             ShowMessage('Fail! SDK "build-tools" not found for "platforms" [Api] android-'+ IntToStr(Self.FMaxSdkPlatform) );
+             ShowMessage('Fail! Sorry... You need install SDK "build-tools" ' +IntToStr(Self.FMaxSdkPlatform)+'.x.y');
           end;
         end;
         Result := True;
