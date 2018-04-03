@@ -1933,12 +1933,17 @@ begin
   p:= Pos('platforms', path);
   tail:= Copy(path, p+10, MaxInt);
   p:= Pos(PathDelim, tail);
-  projPlatformApi:=  Copy(tail, 1, p-1);
-  projPlatformApi:=  PathDelim + projPlatformApi + PathDelim;
-  if  projPlatformApi <>  newPlatformApi then
+
+  if p > 0 then
   begin
-    Result:= StringReplace(path, projPlatformApi ,newPlatformApi,[rfReplaceAll,rfIgnoreCase]);
+    projPlatformApi:=  Copy(tail, 1, p-1);
+    projPlatformApi:=  PathDelim + projPlatformApi + PathDelim;
+    if  projPlatformApi <>  newPlatformApi then
+    begin
+      Result:= StringReplace(path, projPlatformApi ,newPlatformApi,[rfReplaceAll,rfIgnoreCase]);
+    end;
   end;
+
 end;
 
 function TLamwSmartDesigner.TryChangePrebuildOSY(path: string): string;
@@ -1953,12 +1958,15 @@ begin
   p:= Pos('prebuilt', path);
   tail:= Copy(path, p+9, MaxInt);
   p:= Pos(PathDelim, tail);
-  projPrebuildOSYS:=  Copy(tail, 1, p-1);
-  projPrebuildOSYS:=  PathDelim + projPrebuildOSYS + PathDelim;
 
-  if  projPrebuildOSYS <>  extPrebuildOSYS then
+  if p > 0 then
   begin
-    Result:= StringReplace(path, projPrebuildOSYS ,extPrebuildOSYS,[rfReplaceAll,rfIgnoreCase]);
+    projPrebuildOSYS:=  Copy(tail, 1, p-1);
+    projPrebuildOSYS:=  PathDelim + projPrebuildOSYS + PathDelim;
+    if  projPrebuildOSYS <>  extPrebuildOSYS then
+    begin
+      Result:= StringReplace(path, projPrebuildOSYS ,extPrebuildOSYS,[rfReplaceAll,rfIgnoreCase]);
+    end;
   end;
 
 end;
@@ -1974,11 +1982,13 @@ begin
   new49x:= PathDelim + '4.9.x' + PathDelim;  //  /4.9.x/
 
   p:= Pos(PathDelim+'4.9', path);
-  proj49:= Copy(path, p, MaxInt); //  /4.9/
-
-  if  proj49 <>  new49x then
+  if p > 0 then
   begin
-    Result:= StringReplace(path, proj49, new49x,[rfReplaceAll,rfIgnoreCase]);
+    proj49:= Copy(path, p, MaxInt); //  /4.9/
+    if  proj49 <>  new49x then
+    begin
+      Result:= StringReplace(path, proj49, new49x,[rfReplaceAll,rfIgnoreCase]);
+    end;
   end;
 
 end;
@@ -1988,11 +1998,11 @@ var
   strList: TStringList;
   strResult: string;
   lpiFileName: string;
-  strLibraries: string;
-  strCustom: string;
+  strTemp: string;
+  strCustom,  strLibrary: string;
   pathToDemoNDK: string;
   pathToDemoSDK, FNDKIndex: string;
-  demoSysOrigin: string;
+  localSys: string;
   maxNdk, p: integer;
   strMaxNdk: string;
 begin
@@ -2021,38 +2031,33 @@ begin
   lpiFileName := LazarusIDE.ActiveProject.ProjectInfoFile; //full path to 'controls.lpi';
   CopyFile(lpiFileName, lpiFileName+'.bak2');
 
-  pathToDemoNDK := LazarusIDE.ActiveProject.CustomData.Values['NdkPath']; //included pathDelimiter
-
-  if Pos(':', pathToDemoNDK) > 0 then
-    demoSysOrigin:= 'win'
-  else
-    demoSysOrigin:= 'linux';
+  pathToDemoNDK:= LazarusIDE.ActiveProject.CustomData.Values['NdkPath']; //included pathDelimiter
 
   FNDKIndex := LamwGlobalSettings.GetNDK;
 
   if (pathToDemoNDK <> '') and (FPathToAndroidNDK <> '') then
   begin
-      strLibraries:= LazarusIDE.ActiveProject.LazCompilerOptions.Libraries;
 
-      if demoSysOrigin = 'win' then
-         strLibraries:= StringReplace(strLibraries, '/', '\', [rfReplaceAll,rfIgnoreCase])
-      else
-         strLibraries:= StringReplace(strLibraries, '\', '/', [rfReplaceAll,rfIgnoreCase]);
+    if Pos(':', FPathToAndroidNDK) > 0 then
+      localSys:= 'win'
+    else
+      localSys:= 'linux';
 
-      strResult:= StringReplace(strLibraries, pathToDemoNDK,
+      //Libraries
+      strTemp:= LazarusIDE.ActiveProject.LazCompilerOptions.Libraries;
+      strResult:= StringReplace(strTemp, pathToDemoNDK,
                                               FPathToAndroidNDK,
                                               [rfReplaceAll,rfIgnoreCase]);
-      //Libraries
-      if (FNDKIndex = '3') or  (FNDKIndex = '4') or (FNDKIndex = '5') then
-      begin
-         strResult:= StringReplace(strResult, '4.6', '4.9', [rfReplaceAll,rfIgnoreCase]);
-      end;
+      if localSys = 'win' then
+         strLibrary:= StringReplace(strResult, '/', '\', [rfReplaceAll,rfIgnoreCase])
+      else  //linux
+         strLibrary:= StringReplace(strResult, '\', '/', [rfReplaceAll,rfIgnoreCase]);
+
+      //try
+      strResult:= StringReplace(strLibrary, '4.6', '4.9', [rfReplaceAll,rfIgnoreCase]);
 
       maxNdk:= Self.GetMaxNdkPlatform(); //21
       strMaxNdk:= IntToStr(maxNdk);      //'21'
-      p:= Pos('platforms'+pathDelim+'android-', strResult) + Length('platforms'+pathDelim+'android-');
-      strResult[p]:= strMaxNdk[1];
-      strResult[p+1]:= strMaxNdk[2];
 
       strResult:= TryChangePrebuildOSY(strResult); //LAMW 0.8
 
@@ -2067,24 +2072,23 @@ begin
       LazarusIDE.ActiveProject.CustomData.Values['NdkApi']:='android-'+strMaxNdk; //android-13 or android-14 or ... etc
 
       //CustomOptions
-      strCustom:= LazarusIDE.ActiveProject.LazCompilerOptions.CustomOptions;
+      strTemp:= LazarusIDE.ActiveProject.LazCompilerOptions.CustomOptions;
+      strResult:= StringReplace(strTemp, pathToDemoNDK,
+                                           FPathToAndroidNDK,
+                                           [rfReplaceAll,rfIgnoreCase]);
 
-      if demoSysOrigin = 'win' then
-        strCustom:= StringReplace(strCustom, '/', '\', [rfReplaceAll,rfIgnoreCase])
-      else
-        strCustom:= StringReplace(strCustom, '\', '/', [rfReplaceAll,rfIgnoreCase]);
+      if localSys = 'win' then
+        strCustom:= StringReplace(strResult, '/', '\', [rfReplaceAll,rfIgnoreCase])
+      else   //linux
+        strCustom:= StringReplace(strResult, '\', '/', [rfReplaceAll,rfIgnoreCase]);
 
-        strResult:= StringReplace(strCustom, pathToDemoNDK,
-                                             FPathToAndroidNDK,
-                                             [rfReplaceAll,rfIgnoreCase]);
-
-      if (FNDKIndex = '3') or  (FNDKIndex = '4') or (FNDKIndex = '5') then
-      begin
-        strResult:= StringReplace(strResult, '4.6', '4.9', [rfReplaceAll,rfIgnoreCase]);
-      end;
+      //try
+      strResult:= StringReplace(strCustom, '4.6', '4.9', [rfReplaceAll,rfIgnoreCase]);
 
       strResult:= TryChangePrebuildOSY(strResult); //LAMW 0.8
+
       LazarusIDE.ActiveProject.LazCompilerOptions.CustomOptions:= strResult;
+
       //  add/update  custom ...
       LazarusIDE.ActiveProject.CustomData.Values['NdkPath']:= FPathToAndroidNDK;
       LazarusIDE.ActiveProject.CustomData.Values['SdkPath']:= FPathToAndroidSDK;
