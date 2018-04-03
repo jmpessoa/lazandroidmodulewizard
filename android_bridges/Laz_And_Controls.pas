@@ -3926,7 +3926,6 @@ begin
                                            FMarginLeft,FMarginTop,FMarginRight,FMarginBottom,
                                            GetLayoutParams(gApp, FLParamWidth, sdW),
                                            GetLayoutParams(gApp, FLParamHeight, sdH));
-
   if FParent is jPanel then
   begin
      Self.UpdateLayout();
@@ -3967,10 +3966,8 @@ begin
   if FFontSize > 0 then
     jEditText_setTextSize(FjEnv, FjObject , FFontSize);
 
-
   jEditText_setTextAlignment(FjEnv, FjObject , Ord(FTextAlignment));
 
-  //
   if FMaxTextLength >= 0 then
     jEditText_maxLength(FjEnv, FjObject , FMaxTextLength);
 
@@ -3984,34 +3981,7 @@ begin
   if FCapSentence then
     jEditText_SetCapSentence(FjEnv, FjObject, FCapSentence);
 
-  jEditText_editInputType2(FjEnv, FjObject , InputTypeToStrEx(FInputTypeEx));
-
   jEditText_setSingleLine(FjEnv, FjObject , True);
-
-  if FInputTypeEx = itxMultiLine then
-  begin
-    jEditText_setSingleLine(FjEnv, FjObject , False);
-    if FMaxLines = 1 then  FMaxLines:= 3;   // visibles lines!
-    jEditText_setMaxLines(FjEnv, FjObject , FMaxLines); //visibles lines!
-
-    if FScrollBarStyle <> scrNone then
-         jEditText_setScrollBarStyle(FjEnv, FjObject , GetScrollBarStyle(FScrollBarStyle));
-
-    (*bug
-    if (FVerticalScrollBar = True) or  (FHorizontalScrollBar = True) then
-    begin
-      jEditText_setScrollbarFadingEnabled(FjEnv, FjObject , False);
-      jEditText_setMovementMethod(FjEnv, FjObject );
-    end;
-    *)
-
-  end;
-
-  //thierrydijoux - if SetBackGroundColor to black, no theme
-  if FColor <> colbrDefault then
-     View_SetBackGroundColor(FjEnv,  FjThis, FjObject , GetARGB(FCustomColor, FColor));
-
-  View_SetVisible(FjEnv, FjThis, FjObject , FVisible);
 
   if  FText <> '' then
     jEditText_setText(FjEnv, FjObject , FText);
@@ -4024,6 +3994,22 @@ begin
 
   if not FCloseSoftInputOnEnter then
     jEditText_SetCloseSoftInputOnEnter(FjEnv, FjObject, FCloseSoftInputOnEnter);
+
+  jEditText_editInputType2(FjEnv, FjObject , InputTypeToStrEx(FInputTypeEx));
+  if FInputTypeEx = itxMultiLine then
+  begin
+    jEditText_setSingleLine(FjEnv, FjObject , False);
+    if FMaxLines = 1 then  FMaxLines:= 3;   // visibles lines!
+    jEditText_setMaxLines(FjEnv, FjObject , FMaxLines); //visibles lines!
+
+    if FScrollBarStyle <> scrNone then
+         jEditText_setScrollBarStyle(FjEnv, FjObject , GetScrollBarStyle(FScrollBarStyle));
+  end;
+
+  if FColor <> colbrDefault then
+     View_SetBackGroundColor(FjEnv,  FjThis, FjObject , GetARGB(FCustomColor, FColor));
+
+  View_SetVisible(FjEnv, FjThis, FjObject , FVisible);
 
   jEditText_DispatchOnChangeEvent(FjEnv, FjObject , True);
   jEditText_DispatchOnChangedEvent(FjEnv, FjObject , True);
