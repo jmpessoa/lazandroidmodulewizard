@@ -646,9 +646,10 @@ begin
     Delete(str, 1, Pos('-', str));
     i := 1;
     while (i <= Length(str)) and (str[i] in ['0'..'9']) do Inc(i);
-    str := Copy(str, 1, i - 1) + ':';
+    str := Copy(str, 1, i - 1);
     for i := 0 to emul_win.Count - 1 do
-      if Pos(str, emul_win[i]) = 1 then
+      if (Pos(str + ':', emul_win[i]) = 1)
+      or (Pos(':' + str, emul_win[i]) > 0) then
       begin
         SetForegroundWindow(HWND(emul_win.Objects[i]));
         Break;

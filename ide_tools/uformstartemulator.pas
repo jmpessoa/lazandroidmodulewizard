@@ -65,12 +65,14 @@ uses LazFileUtils, UTF8Process, LamwSettings;
 function FindEmulatorWindows(_para1: HWND; _para2: LPARAM): WINBOOL; stdcall;
 var s: string;
 begin
-  SetLength(s, 255);
   {$ifdef windows}
+  SetLength(s, 255);
   GetClassName(_para1, PChar(s), Length(s));
-  if PChar(s) = 'SDL_app' then
+  s := PChar(s);
+  if (s = 'SDL_app') or (s = 'Qt5QWindowIcon') then
   {$endif}
   begin
+    SetLength(s, 255);
     GetWindowText(_para1, PChar(s), Length(s));
     TStrings(_para2).AddObject(PChar(s), TObject(_para1));
   end;
@@ -78,17 +80,25 @@ begin
 end;
 
 function TfrmStartEmulator.GetAvdState(Index: Integer): TAvdState;
+
+  function ExtractPort(s: string): string;
+  begin
+    if s[1] in ['0'..'9'] then
+      Result := Copy(s, 1, Pos(':', s) - 1)
+    else
+      Result := Copy(s, Pos(':', s) + 1, MaxInt)
+  end;
+
 var
   str: string;
   i, j: Integer;
 begin
   Result := asOffLine;
-  str := ':' + avds[Index];
+  str := avds[Index];
   for i := 0 to emul_wnds.Count - 1 do
     if Pos(str, emul_wnds[i]) > 0 then
     begin
-      str := emul_wnds[i];
-      str := 'emulator-' + Copy(str, 1, Pos(':', str) - 1);
+      str := 'emulator-' + ExtractPort(emul_wnds[i]);
       Result := asUnknown;
       for j := 0 to devs.Count - 1 do
         if Pos(str, devs[j]) > 0 then
