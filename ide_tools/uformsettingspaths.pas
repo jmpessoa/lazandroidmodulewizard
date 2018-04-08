@@ -325,9 +325,10 @@ begin
   ComboBoxPrebuild.Text:= 'darwin-x86_64';
   {$endif}
 
-  if  EditPathToGradle.Text =  '' then
+  {
+  if EditPathToGradle.Text =  '' then
   begin
-    ShowMessage('Warning/Recomendation:'+
+      ShowMessage('Warning/Recomendation:'+
              sLineBreak+
              sLineBreak+'[LAMW 0.8] "AppCompat" [material] theme need:'+
              sLineBreak+' 1. Java JDK 1.8'+
@@ -340,10 +341,11 @@ begin
              sLineBreak+' '+
              sLineBreak+' Hint: "Ctrl + C" to copy this content to Clipboard!');
 
-       EditPathToGradle.SetFocus;
-  end
-  else
-    EditPathToJavaJDK.SetFocus;
+      EditPathToGradle.SetFocus;
+  end;
+  }
+
+  EditPathToJavaJDK.SetFocus;
 
 end;
 
