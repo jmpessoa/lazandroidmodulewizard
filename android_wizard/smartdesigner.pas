@@ -71,6 +71,7 @@ type
     function TryChangePrebuildOSY(path: string): string;
     function TryChangeTo49x(path: string): string;
     function TryChangeNdkPlatformsApi(path: string; newNdkApi: integer): string;
+    function IsSdkToolsAntEnable(path: string): boolean;
 
   protected
     function OnProjectOpened(Sender: TObject; AProject: TLazProject): TModalResult;
@@ -640,7 +641,6 @@ begin
 
   end;
 
-
   strList.Free;
 end;
 
@@ -866,12 +866,32 @@ begin
 
   if AProject.CustomData['BuildSystem'] = '' then
   begin
-     AProject.CustomData['BuildSystem']:= 'Ant';
-     //AProject.CustomData['Theme']:= 'DeviceDefault';  //TODO
+
+    if IsSdkToolsAntEnable(FPathToAndroidSDK) then
+      AProject.CustomData['BuildSystem']:= 'Ant'
+    else
+      AProject.CustomData['BuildSystem']:= 'Gradle';
+
+  end
+  else
+  begin
+    if AProject.CustomData['BuildSystem'] = 'Ant' then
+       if not IsSdkToolsAntEnable(FPathToAndroidSDK) then
+           AProject.CustomData['BuildSystem']:= 'Gradle'
   end;
+
   KeepBuildUpdated(maxSdkApi, outMaxBuildTool {25.0.5});
   //end LAMW 0.8
 
+end;
+
+function TLamwSmartDesigner.IsSdkToolsAntEnable(path: string): boolean;
+begin          //C:\adt32\sdk\tools\ant
+  Result:= False;
+  if DirectoryExists(path + 'tools' + PathDelim + 'ant') then
+  begin
+     Result:= True;
+  end;
 end;
 
 procedure TLamwSmartDesigner.TryChangeChipSetConfigs(projectChipSet: string);
@@ -2000,10 +2020,10 @@ var
   lpiFileName: string;
   strTemp: string;
   strCustom,  strLibrary: string;
-  pathToDemoNDK: string;
+  pathToDemoNDK,  pathToDemoNDKConverted: string;
   pathToDemoSDK, FNDKIndex: string;
   localSys: string;
-  maxNdk, p: integer;
+  maxNdk: integer;
   strMaxNdk: string;
 begin
 
@@ -2038,21 +2058,23 @@ begin
   if (pathToDemoNDK <> '') and (FPathToAndroidNDK <> '') then
   begin
 
-    if Pos(':', FPathToAndroidNDK) > 0 then
-      localSys:= 'win'
-    else
-      localSys:= 'linux';
+      if Pos(':', FPathToAndroidNDK) > 0 then
+      begin
+        localSys:= 'win';
+        pathToDemoNDKConverted:= StringReplace(pathToDemoNDK, '/', '\', [rfReplaceAll,rfIgnoreCase])
+      end
+      else
+      begin
+        localSys:= 'linux';
+        pathToDemoNDKConverted:= StringReplace(pathToDemoNDK, '\', '/', [rfReplaceAll,rfIgnoreCase])
+      end;
 
       //Libraries
-      strTemp:= LazarusIDE.ActiveProject.LazCompilerOptions.Libraries;
-      strResult:= StringReplace(strTemp, pathToDemoNDK,
-                                              FPathToAndroidNDK,
-                                              [rfReplaceAll,rfIgnoreCase]);
-      if localSys = 'win' then
-         strLibrary:= StringReplace(strResult, '/', '\', [rfReplaceAll,rfIgnoreCase])
-      else  //linux
-         strLibrary:= StringReplace(strResult, '\', '/', [rfReplaceAll,rfIgnoreCase]);
+      strTemp:= LazarusIDE.ActiveProject.LazCompilerOptions.Libraries;   //path already converted!!!
 
+      strLibrary:= StringReplace(strTemp, pathToDemoNDKConverted,
+                                         FPathToAndroidNDK,
+                                         [rfReplaceAll,rfIgnoreCase]);
       //try
       strResult:= StringReplace(strLibrary, '4.6', '4.9', [rfReplaceAll,rfIgnoreCase]);
 
@@ -2072,24 +2094,24 @@ begin
       LazarusIDE.ActiveProject.CustomData.Values['NdkApi']:='android-'+strMaxNdk; //android-13 or android-14 or ... etc
 
       //CustomOptions
-      strTemp:= LazarusIDE.ActiveProject.LazCompilerOptions.CustomOptions;
-      strResult:= StringReplace(strTemp, pathToDemoNDK,
-                                           FPathToAndroidNDK,
-                                           [rfReplaceAll,rfIgnoreCase]);
+      strTemp:= LazarusIDE.ActiveProject.LazCompilerOptions.CustomOptions;  //path not already converted!!
 
       if localSys = 'win' then
-        strCustom:= StringReplace(strResult, '/', '\', [rfReplaceAll,rfIgnoreCase])
+        strCustom:= StringReplace(strTemp, '/', '\', [rfReplaceAll,rfIgnoreCase])
       else   //linux
-        strCustom:= StringReplace(strResult, '\', '/', [rfReplaceAll,rfIgnoreCase]);
+        strCustom:= StringReplace(strTemp, '\', '/', [rfReplaceAll,rfIgnoreCase]);
 
+      strResult:= StringReplace(strCustom, pathToDemoNDKConverted,
+                                         FPathToAndroidNDK,
+                                         [rfReplaceAll,rfIgnoreCase]);
       //try
-      strResult:= StringReplace(strCustom, '4.6', '4.9', [rfReplaceAll,rfIgnoreCase]);
+      strResult:= StringReplace(strResult, '4.6', '4.9', [rfReplaceAll,rfIgnoreCase]);
 
       strResult:= TryChangePrebuildOSY(strResult); //LAMW 0.8
 
       LazarusIDE.ActiveProject.LazCompilerOptions.CustomOptions:= strResult;
 
-      //  add/update  custom ...
+      //update custom ...
       LazarusIDE.ActiveProject.CustomData.Values['NdkPath']:= FPathToAndroidNDK;
       LazarusIDE.ActiveProject.CustomData.Values['SdkPath']:= FPathToAndroidSDK;
   end
@@ -2161,4 +2183,3 @@ finalization
   LamwSmartDesigner.Free;
 
 end.
-

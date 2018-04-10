@@ -108,11 +108,12 @@ type
     FMaxSdkPlatform: integer;
     FMaxNdkPlatform: integer;
     FCandidateSdkPlatform: integer;
-    //FCandidateSdkBuild: string;
+    FHasSdkToolsAnt: boolean;
 
     function GetBuildSystem: string;
     function HasBuildTools(platform: integer; out outBuildTool: string): boolean;
     function GetGradleVersion(out tagVersion: integer): string;
+    function IsSdkToolsAntEnable: boolean;
 
   public
     { public declarations }
@@ -133,6 +134,7 @@ type
     function GetBuildTool(sdkApi: integer): string;
 
     function GetMaxNdkPlatform(): integer;
+    procedure SaveWorkSpaceSettings(const pFilename: string);
 
     property PathToWorkspace: string read FPathToWorkspace write FPathToWorkspace;
     property InstructionSet: string read FInstructionSet write FInstructionSet;
@@ -487,8 +489,7 @@ begin
 
   if ModalResult = mrCancel  then Exit;
 
-  //if ListBoxTargetAPI.ItemIndex < 0 then
-     //ListBoxTargetAPI.ItemIndex:= ListBoxTargetAPI.Items.Count-1;
+  FMainActivity:= 'App'; //TODO: flexibility here...
 
   FTargetApi:= ListBoxTargetAPI.Items[ListBoxTargetAPI.ItemIndex];
   FMinApi:= ListBoxMinSDK.Items[ListBoxMinSDK.ItemIndex];
@@ -501,7 +502,7 @@ begin
      if StrToInt(FMinApi) < 14 then FMinApi:= '14'
   end;
 
-  SaveSettings(FFileName);
+  SaveWorkSpaceSettings(FFileName);
 
   if apiTarg < 14 then
     FAndroidTheme:= 'Holo.Light'
@@ -552,8 +553,6 @@ begin
      if FModuleType <> 0 then  //NoGUI
        FJavaClassName:=  FSmallProjName //ex. "AppTest1"
   end;
-
-  FMainActivity:= 'App'; //TODO: flexibility here...
 
   FAndroidNdkPlatform:= GetNDKPlatformByApi(ListBoxNdkPlatform.Items.Strings[ListBoxNdkPlatform.ItemIndex]); //(ListBoxNdkPlatform.Items.Strings[ListBoxNdkPlatform.ItemIndex]);
 
@@ -666,8 +665,6 @@ procedure TFormWorkspace.FormCreate(Sender: TObject);
 var
   fileName: string;
 begin
-
-  cbBuildSystem.ItemIndex := 0; //ant as default ....
 
   //here ModuleType already is know!
   fileName:= IncludeTrailingPathDelimiter(LazarusIDE.GetPrimaryConfigPath) + 'JNIAndroidProject.ini';
@@ -935,9 +932,21 @@ begin
       tempList.Free;
       fileList.Free;
 
+      cbBuildSystem.Items.Clear;
+      if FPathToAndroidSDK <> '' then
+      begin
+        if IsSdkToolsAntEnable then
+        begin
+          cbBuildSystem.Items.Add('Ant');
+          cbBuildSystem.ItemIndex:= 0;
+          cbBuildSystem.Text:='Ant';
+        end;
+      end;
+
     finally
       Free;
     end;
+
   end;
 end;
 
@@ -971,6 +980,15 @@ begin
   lisDir.free;
 end;
 
+function TFormWorkspace.IsSdkToolsAntEnable: boolean;
+begin          //C:\adt32\sdk\tools\ant
+  Result:= False;
+  if DirectoryExists(FPathToAndroidSDK + PathDelim + 'tools' + PathDelim + 'ant') then
+  begin
+     Result:= True;
+  end;
+end;
+
 procedure TFormWorkspace.FormActivate(Sender: TObject);
 begin
   EditPathToWorkspace.Left:= 8; // try fix hidpi bug
@@ -1002,9 +1020,14 @@ begin
          FPrebuildOSYS:= GetPrebuiltDirectory();
   end;
 
+  FHasSdkToolsAnt:= False;
+  if FPathToAndroidSDK <> '' then
+     FHasSdkToolsAnt:= IsSdkToolsAntEnable();
 end;
 
 procedure TFormWorkspace.ComboBoxThemeChange(Sender: TObject);
+var
+  index: integer;
 begin
   if Pos('AppCompat', ComboBoxTheme.Text) > 0 then
   begin
@@ -1030,14 +1053,15 @@ begin
 
     end;
 
-    if cbBuildSystem.Items.Count > 1 then
+    if Pos('Gradle',cbBuildSystem.Items.Text) > 0 then
     begin
-      cbBuildSystem.ItemIndex:= 1; //need gradle
+      index:= cbBuildSystem.Items.IndexOf('Gradle');
+      cbBuildSystem.ItemIndex:= index;
       cbBuildSystem.Text:= 'Gradle';
       cbBuildSystemCloseUp(Self);
     end;
 
-    if ListBoxMinSDK.ItemIndex < 1 then ListBoxMinSDK.ItemIndex:= 1;
+    if ListBoxMinSDK.ItemIndex < 1 then ListBoxMinSDK.ItemIndex:= 1;   //Api 14
 
   end;
 end;
@@ -1056,12 +1080,14 @@ procedure TFormWorkspace.cbBuildSystemCloseUp(Sender: TObject);
 var
   s: string;
 begin
+
   if cbBuildSystem.Text = 'Gradle' then
   begin
     s := LowerCase(ExtractFileName(ExcludeTrailingPathDelimiter(LamwGlobalSettings.PathToJavaJDK)));
     if Pos('1.7.', s) > 0 then
       MessageDlg('[LAMW 0.8] "AppCompat" [material] theme need JDK 1.8 + Gradle 4.1!', mtWarning, [mbOk], 0);
   end;
+
 end;
 
 procedure TFormWorkspace.ComboSelectProjectNameKeyPress(Sender: TObject;
@@ -1204,7 +1230,10 @@ var
 begin
    //before OnFormActive
 
+  //verify if some was not load!
   FFileName:= pFilename;
+  Self.LoadPathsSettings(FFileName);
+
   with TIniFile.Create(pFilename) do
   try
     FPathToWorkspace:= ReadString('NewProject','PathToWorkspace', '');
@@ -1222,13 +1251,17 @@ begin
     FindAllDirectories(ComboSelectProjectName.Items, FPathToWorkspace, False);
 
     FPrebuildOSYS:= ReadString('NewProject','PrebuildOSYS', '');
-
     FPathToGradle:= ReadString('NewProject','PathToGradle', '');
 
     if FPathToGradle <> '' then
     begin
        cbBuildSystem.Items.Add('Gradle');
-       FGradleVersion:= GetGradleVersion({out}tagVersion);
+       if cbBuildSystem.Items.Count = 1 then
+       begin
+         cbBuildSystem.Text:= 'Gradle';
+         cbBuildSystem.ItemIndex:= 0;
+         FGradleVersion:= GetGradleVersion({out}tagVersion);
+       end;
     end;
 
   finally
@@ -1248,9 +1281,6 @@ begin
   EditPathToWorkspace.Text := FPathToWorkspace;
   EditPackagePrefaceName.Text := FPackagePrefaceName;
 
-  //verify if some was not load!
-  Self.LoadPathsSettings(FFileName);
-
   FMaxSdkPlatform:= Self.GetMaxSdkPlatform();
   if FMaxSdkPlatform = 0 then    //  try fix "android-0"
       FMaxSdkPlatform:= FCandidateSdkPlatform;
@@ -1259,40 +1289,38 @@ begin
 
 end;
 
-procedure TFormWorkspace.SaveSettings(const pFilename: string);
+procedure TFormWorkspace.SaveSettings(const pFilename: string);  //called by ... "AndroidWizard_intf.pas"
 begin
-   //LamwGlobalSettings.DefaultBuildSystem := GetBuildSystem;
-
    with TInifile.Create(pFilename) do
    try
-      WriteString('NewProject', 'PathToWorkspace', EditPathToWorkspace.Text);
-      WriteString('NewProject', 'FullProjectName', FAndroidProjectName);
-      WriteString('NewProject', 'InstructionSet', IntToStr(RGInstruction.ItemIndex));
-
-      if EditPackagePrefaceName.Text = '' then EditPackagePrefaceName.Text:= 'org.lamw';
-      WriteString('NewProject', 'AntPackageName', LowerCase(Trim(EditPackagePrefaceName.Text)));
-
-      WriteString('NewProject', 'AndroidPlatform', IntToStr(ListBoxNdkPlatform.Items.Count-1));
-      WriteString('NewProject', 'AntBuildMode', 'debug'); //default...
-
-      if FMainActivity = '' then FMainActivity:= 'App';
-
-      WriteString('NewProject', 'MainActivity', FMainActivity); //dummy
       WriteString('NewProject', 'PathToJavaTemplates', FPathToJavaTemplates);
       WriteString('NewProject', 'PathToJavaJDK', FPathToJavaJDK);
       WriteString('NewProject', 'PathToAndroidNDK', FPathToAndroidNDK);
       WriteString('NewProject', 'PathToAndroidSDK', FPathToAndroidSDK);
       WriteString('NewProject', 'PathToAntBin', FPathToAntBin);
-
-      if FPathToGradle <> '' then
-        WriteString('NewProject', 'PathToGradle', FPathToGradle);
-
+      WriteString('NewProject', 'PathToGradle', FPathToGradle);
       if FPrebuildOSYS = '' then
       begin
           FPrebuildOSYS:= GetPrebuiltDirectory();
           WriteString('NewProject', 'PrebuildOSYS', FPrebuildOSYS);
       end;
+   finally
+      Free;
+   end;
+end;
 
+procedure TFormWorkspace.SaveWorkSpaceSettings(const pFilename: string);
+begin
+   with TInifile.Create(pFilename) do
+   try
+      WriteString('NewProject', 'MainActivity', FMainActivity); //dummy
+      WriteString('NewProject', 'PathToWorkspace', EditPathToWorkspace.Text);
+      WriteString('NewProject', 'FullProjectName', FAndroidProjectName);
+      WriteString('NewProject', 'InstructionSet', IntToStr(RGInstruction.ItemIndex));
+      if EditPackagePrefaceName.Text = '' then EditPackagePrefaceName.Text:= 'org.lamw';
+      WriteString('NewProject', 'AntPackageName', LowerCase(Trim(EditPackagePrefaceName.Text)));
+      WriteString('NewProject', 'AndroidPlatform', IntToStr(ListBoxNdkPlatform.Items.Count-1));  //android-25
+      WriteString('NewProject', 'AntBuildMode', 'debug'); //default...
    finally
       Free;
    end;

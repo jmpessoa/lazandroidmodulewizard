@@ -53,7 +53,6 @@ type
     procedure ComboBoxPrebuildChange(Sender: TObject);
     procedure FormActivate(Sender: TObject);
     procedure FormClose(Sender: TObject; var CloseAction: TCloseAction);
-    procedure FormCreate(Sender: TObject);
     procedure SpBPathToAndroidNDKClick(Sender: TObject);
     procedure SpBPathToGradleClick(Sender: TObject);
     procedure SpBPathToJavaJDKClick(Sender: TObject);
@@ -240,11 +239,6 @@ begin
            Free;
          end;
        end;
-end;
-
-procedure TFormSettingsPaths.FormCreate(Sender: TObject);
-begin
-
 end;
 
 
@@ -566,8 +560,6 @@ begin
 
   with TInifile.Create(fileName) do
   try
-    if EditPathToAndroidNDK.Text <> '' then
-      WriteString('NewProject', 'PathToNdkPlataforms', EditPathToAndroidNDK.Text);
 
     if EditPathToJavaTemplates.Text <> '' then
       WriteString('NewProject', 'PathToJavaTemplates', EditPathToJavaTemplates.Text);

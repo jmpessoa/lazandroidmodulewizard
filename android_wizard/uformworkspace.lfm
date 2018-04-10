@@ -1735,14 +1735,12 @@ object FormWorkspace: TFormWorkspace
         Width = 150
         BorderSpacing.Around = 6
         ItemHeight = 15
-        ItemIndex = 0
         Items.Strings = (
-          'Ant'
+          ''
         )
         OnCloseUp = cbBuildSystemCloseUp
         Style = csDropDownList
         TabOrder = 0
-        Text = 'Ant'
       end
     end
   end

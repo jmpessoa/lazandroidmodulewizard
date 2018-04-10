@@ -150,7 +150,6 @@ object FormSettingsPaths: TFormSettingsPaths
   }
   OnActivate = FormActivate
   OnClose = FormClose
-  OnCreate = FormCreate
   Position = poScreenCenter
   LCLVersion = '1.5'
   object BitBtnOK: TBitBtn
@@ -1658,6 +1657,7 @@ object FormSettingsPaths: TFormSettingsPaths
     AnchorSideRight.Control = SpBPathToGradle
     Left = 8
     Height = 23
+    Hint = 'Required by "AppCompat" [material] theme'
     Top = 148
     Width = 383
     Anchors = [akTop, akLeft, akRight]
