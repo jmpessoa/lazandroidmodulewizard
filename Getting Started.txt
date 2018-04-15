@@ -6,7 +6,7 @@
 
 	"Getting Started" for Windows [by Jose Marques Pessoa]
 
-	Note: Linux: please, go to LAMW folder  "...docs\linux" 
+	About Linux:  LAMW folder  "...docs\linux" 
 
 .Github
 	ref. https://github.com/jmpessoa/lazandroidmodulewizard
@@ -18,12 +18,12 @@ I. Infrastructure
 
 .Java  JDK [32 bits or 64 bits]
 
-.Android SDK [old] ---  "ant" and "gradle" build supported!
+.Android SDK [old] ---  "ant" and "gradle" build supported...    [recommended!!!]
 	[Windows]	http://dl.google.com/android/installer_r24.0.2-windows.exe
 	[Linux]		http://dl.google.com/android/android-sdk_r24.0.2-linux.tgz
 	[Mac]		http://dl.google.com/android/android-sdk_r24.0.2-macosx.zip
 
-.Android SDK  [updated] --- only "gradle" build  supported!
+.Android SDK  [updated] --- only "gradle" build  supported...
 
 	[Windows]	https://dl.google.com/android/repository/sdk-tools-windows-3859397.zip
 	[Linux]		https://dl.google.com/android/repository/sdk-tools-linux-3859397.zip

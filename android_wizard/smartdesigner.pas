@@ -36,6 +36,7 @@ type
     FPrebuildOSYS: string;
     FCandidateSdkPlatform: integer;
     FCandidateSdkBuild: string;
+    FPathToGradle: string;
 
     procedure CleanupAllJControlsSource;
     procedure GetAllJControlsFromForms(jControlsList: TStrings);
@@ -70,8 +71,10 @@ type
     function GetLprStartModuleVarName: string;
     function TryChangePrebuildOSY(path: string): string;
     function TryChangeTo49x(path: string): string;
+    function TryChangeTo49(path: string): string;
     function TryChangeNdkPlatformsApi(path: string; newNdkApi: integer): string;
     function IsSdkToolsAntEnable(path: string): boolean;
+    procedure TryChangeDemoProjecAntBuildScripts();
 
   protected
     function OnProjectOpened(Sender: TObject; AProject: TLazProject): TModalResult;
@@ -97,9 +100,42 @@ var
 implementation
 
 uses
+  {$ifdef unix}BaseUnix,{$endif}
   Controls, Dialogs, {SrcEditorIntf,} LazIDEIntf, IDEMsgIntf, IDEExternToolIntf, CodeToolManager, CodeTree,
   CodeCache, {SourceChanger,} LinkScanner, Laz2_DOM, laz2_XMLRead, FileUtil,
   LazFileUtils, LamwSettings, uJavaParser, strutils;
+
+procedure SaveShellScript(script: TStringList; const AFileName: string);
+begin
+  script.SaveToFile(AFileName);
+  {$ifdef UNIX}
+  FpChmod(AFileName, &751);
+  {$endif}
+end;
+
+procedure TryRunProcessChmod(path: string);
+var
+  proc: TProcess;
+begin
+  {$ifdef UNIX}
+  try
+    proc := TProcess.Create(nil);
+    proc.Parameters.Add('777');
+    proc.Parameters.Add('-R');
+    Proc.Parameters.Add(path);
+    proc.Options:= proc.Options + [poWaitOnExit,poUsePipes];
+    proc.Executable:='chmod';
+    proc.Execute;
+  finally
+    Proc.Free;
+  end;
+  ShowMessage('Warning: Project files permissions changed to "R" and "W" !'+
+                   sLineBreak+
+                   'Maybe, You will need close and re-open the Lazurus IDE'+
+                   sLineBreak+ 'to build/run your modified project [sorry...]'+
+                   sLineBreak+ '[hint: when prompt to save project, choice "yes"]');
+  {$endif}
+end;
 
 function ReplaceChar(const query: string; oldchar, newchar: char): string;
 var
@@ -431,10 +467,12 @@ var
   androidPluginNumber: integer;
   pluginVersion: string;
   gradleCompatible: string;
+  linuxPathToAndroidSdk: string;
+  linuxPathToGradle: string;
+  linuxDirSeparator: string;
 begin
 
   strList:= TStringList.Create;
-
   if FileExists(LamwGlobalSettings.PathToJavaTemplates+'values'+DirectorySeparator +'colors.xml') then
   begin
      strList.LoadFromFile(LamwGlobalSettings.PathToJavaTemplates+'values'+DirectorySeparator +'colors.xml');
@@ -607,7 +645,6 @@ begin
             strList.Add('    compile ''com.android.support:design:25.3.1''');
             strList.Add('    compile ''com.android.support:cardview-v7:25.3.1''');
             strList.Add('    compile ''com.android.support:recyclerview-v7:25.3.1''');
-
             {
             Extras
             Android Support Repository
@@ -617,7 +654,6 @@ begin
             C:\adt32\sdk\extras\android\m2repository\com\android\support\cardview-v7
             C:\adt32\sdk\extras\android\m2repository\com\android\support\recyclerview-v7  //25.3.1
             }
-
          end;
          strList.Add('}');
 
@@ -634,10 +670,75 @@ begin
          strList.Add('    gradleVersion = '''+gradleCompatible+'''');
          strList.Add('}');
          strList.Add('//how to use: look for "gradle_readme.txt"');
-         strList.SaveToFile(FPathToAndroidProject+PathDelim+'build.gradle');
+         strList.SaveToFile(FPathToAndroidProject+'build.gradle');
 
        end;
     end;
+
+    //gradle build scripts;
+
+    strList.Clear;
+    strList.Add('set Path=%PATH%;'+FPathToAndroidSDK+'platform-tools');
+    if FPathToGradle = '' then
+      strList.Add('set GRADLE_HOME=path_to_your_local_gradle')
+    else
+      strList.Add('set GRADLE_HOME='+ FPathToGradle);
+    strList.Add('set PATH=%PATH%;%GRADLE_HOME%\bin');
+    strList.Add('gradle clean build --info');
+    strList.SaveToFile(FPathToAndroidProject+'gradle_local_build.bat');
+
+    strList.Clear;
+    strList.Add('set Path=%PATH%;'+FPathToAndroidSDK+'platform-tools');
+    if FPathToGradle = '' then
+      strList.Add('set GRADLE_HOME=path_to_your_local_gradle')
+    else
+      strList.Add('set GRADLE_HOME='+ FPathToGradle);
+    strList.Add('set PATH=%PATH%;%GRADLE_HOME%\bin');
+    strList.Add('gradle run');
+    strList.SaveToFile(FPathToAndroidProject+'gradle_local_run.bat');
+
+    linuxDirSeparator:= DirectorySeparator;
+    linuxPathToAndroidSdk:= FPathToAndroidSDK;
+    linuxPathToGradle:= FPathToGradle;
+
+    {$IFDEF WINDOWS}
+       linuxDirSeparator:= '/';
+       tempStr:= FPathToAndroidSDK;
+       SplitStr(tempStr, ':');
+       linuxPathToAndroidSdk:= StringReplace(tempStr, '\', '/', [rfReplaceAll]);
+
+       tempStr:= FPathToGradle;
+       SplitStr(tempStr, ':');
+       linuxPathToGradle:= StringReplace(tempStr, '\', '/', [rfReplaceAll]);
+    {$ENDIF}
+
+    strList.Clear;
+    strList.Add('export PATH='+linuxPathToAndroidSDK+'platform-tools'+':$PATH');
+
+    if FPathToGradle = '' then
+      strList.Add('export GRADLE_HOME=path_to_your_local_gradle')
+    else
+      strList.Add('export GRADLE_HOME='+ linuxPathToGradle);
+
+    strList.Add('export PATH=$PATH:$GRADLE_HOME/bin');
+    strList.Add('source ~/.bashrc');
+    //strList.Add('.\gradle clean build --info');
+    strList.Add('gradle clean build --info');
+    SaveShellScript(strList, FPathToAndroidProject+'gradle_local_build.sh');
+
+    strList.Clear;
+    strList.Add('export PATH='+linuxPathToAndroidSDK+'platform-tools'+':$PATH');
+
+    if FPathToGradle = '' then
+      strList.Add('export GRADLE_HOME=path_to_your_local_gradle')
+    else
+      strList.Add('export GRADLE_HOME='+ linuxPathToGradle);
+
+    strList.Add('export PATH=$PATH:$GRADLE_HOME/bin');
+    strList.Add('source ~/.bashrc');
+    //strList.Add('.\gradle run');
+    strList.Add('gradle run');
+    SaveShellScript(strList, FPathToAndroidProject+'gradle_local_run.sh');
 
   end;
 
@@ -745,6 +846,7 @@ var
   p,  maxSdkApi: integer;
   outMaxBuildTool: string;
   androidTheme: string;
+  isProjectImported: boolean;
 begin
 
   if not AProject.CustomData.Contains('LAMW') then
@@ -796,16 +898,16 @@ begin
    FPathToAndroidNDK := LamwGlobalSettings.PathToAndroidNDK; //Included Path Delimiter!
    FPrebuildOSYS:= LamwGlobalSettings.PrebuildOSYS;
 
-   //begin LAMW 0.8
+   //LAMW 0.8
   if  (androidTheme = '') or (Pos('AppCompat', androidTheme) <= 0) then
     LamwGlobalSettings.QueryPaths:= False;  //dont query Path to Gradle
-
-  tempStr:= LamwGlobalSettings.PathToGradle;  //C:\adt32\gradle-3.3\
+  FPathToGradle:= LamwGlobalSettings.PathToGradle;  //C:\adt32\gradle-3.3\
   LamwGlobalSettings.QueryPaths:= True; // reset to default...
 
-  if tempStr <> '' then
-       FGradleVersion:= GetGradleVersion(tempStr);
-   //end LAMW 0.8
+  if FPathToGradle <> '' then
+       FGradleVersion:= GetGradleVersion(FPathToGradle);
+
+  isProjectImported:= IsDemoProject();   //demo or imported project,  etc...
 
   if not DirectoryExists(FPathToAndroidProject + 'lamwdesigner') then
   begin
@@ -813,9 +915,10 @@ begin
   end;
 
   // try fix/repair project paths [demos, etc..] in "Run" --> "build"  time ...
-  if IsDemoProject() then
+  if isProjectImported then
   begin
     TryChangeDemoProjecPaths();
+    TryChangeDemoProjecAntBuildScripts();
   end
   else
   begin  // add/update custom
@@ -856,7 +959,7 @@ begin
     TryChangeChipSetConfigs(projChipSet);
   end;
 
-  //begin LAMW 0.8
+  //LAMW 0.8
   maxSdkApi:= GetMaxSdkPlatform(outMaxBuildTool);
   if maxSdkApi =  0 then   // try fix "android-0"
   begin
@@ -866,12 +969,10 @@ begin
 
   if AProject.CustomData['BuildSystem'] = '' then
   begin
-
     if IsSdkToolsAntEnable(FPathToAndroidSDK) then
       AProject.CustomData['BuildSystem']:= 'Ant'
     else
       AProject.CustomData['BuildSystem']:= 'Gradle';
-
   end
   else
   begin
@@ -879,9 +980,7 @@ begin
        if not IsSdkToolsAntEnable(FPathToAndroidSDK) then
            AProject.CustomData['BuildSystem']:= 'Gradle'
   end;
-
   KeepBuildUpdated(maxSdkApi, outMaxBuildTool {25.0.5});
-  //end LAMW 0.8
 
 end;
 
@@ -2013,6 +2112,142 @@ begin
 
 end;
 
+function TLamwSmartDesigner.TryChangeTo49(path: string): string;
+var
+  proj49x: string;
+  p: integer;
+  new49: string;
+begin
+  Result:= path;
+  new49:= PathDelim + '4.9' + PathDelim;  //  /4.9/
+
+  p:= Pos(PathDelim+'4.9.x', path);
+  if p > 0 then
+  begin
+    proj49x:= Copy(path, p, MaxInt); //  /4.9.x/
+    if  proj49x <>  new49 then
+    begin
+      Result:= StringReplace(path, proj49x, new49,[rfReplaceAll,rfIgnoreCase]);
+    end;
+  end;
+
+end;
+
+procedure TLamwSmartDesigner.TryChangeDemoProjecAntBuildScripts();
+var
+  strList: TStringList;
+  pathToAntBin, pathToJavaJDK, androidProjectName, antBuildMode: string;
+  linuxDirSeparator: string;
+  linuxPathToJavaJDK: string;
+  linuxAndroidProjectName:  string;
+  linuxPathToAntBin: string;
+  linuxPathToAndroidSdk: string;
+  tempStr, linuxPathToAdbBin, packageName: string;
+
+begin
+
+  pathToAntBin:= Copy(LamwGlobalSettings.PathToAntBin, 1, Length(LamwGlobalSettings.PathToAntBin)-1); //paths have trailing path
+  if pathToAntBin = '' then Exit;
+
+  antBuildMode:= 'debug';
+  packageName:= LazarusIDE.ActiveProject.CustomData.Values['Package'];
+
+  pathToJavaJDK:= Copy(LamwGlobalSettings.PathToJavaJDK, 1, Length(LamwGlobalSettings.PathToJavaJDK)-1); //paths have trailing path
+
+  androidProjectName:= FPathToAndroidProject; //paths have trailing path
+
+  strList:= TStringList.Create;
+
+  strList.Add('set Path=%PATH%;'+pathToAntBin); //<--- thanks to andersonscinfo !  [set path=%path%;C:\and32\ant\bin]
+  strList.Add('set JAVA_HOME='+pathToJavaJDK);  //set JAVA_HOME=C:\Program Files (x86)\Java\jdk1.7.0_21
+  strList.Add('cd '+androidProjectName);
+  strList.Add('call ant clean -Dtouchtest.enabled=true debug');
+  strList.Add('if errorlevel 1 pause');
+  strList.SaveToFile(androidProjectName+'build-debug.bat');
+
+  strList.Clear;
+  strList.Add('set Path=%PATH%;'+pathToAntBin);
+  strList.Add('set JAVA_HOME='+pathToJavaJDK);
+  strList.Add('cd '+androidProjectName);
+  strList.Add('call ant clean release');
+  strList.Add('if errorlevel 1 pause');
+  strList.SaveToFile(androidProjectName+'build-release.bat');
+
+  strList.Clear;
+  strList.Add('cd '+androidProjectName+'bin');
+  strList.Add(FPathToAndroidSDK+'platform-tools'+
+             DirectorySeparator+'adb install -r '+FSmallProjName+'-'+antBuildMode+'.apk');
+  strList.Add('cd ..');
+  strList.Add('pause');
+  strList.SaveToFile(androidProjectName+'install.bat');
+
+  linuxDirSeparator:= DirectorySeparator;
+  linuxPathToJavaJDK:= pathToJavaJDK;
+  linuxAndroidProjectName:= androidProjectName;
+  linuxPathToAntBin:= pathToAntBin;
+  linuxPathToAndroidSdk:= FPathToAndroidSDK;
+
+  {$IFDEF WINDOWS}
+     linuxDirSeparator:= '/';
+     tempStr:= pathToJavaJDK;
+     SplitStr(tempStr, ':');
+     linuxPathToJavaJDK:= StringReplace(tempStr, '\', '/', [rfReplaceAll]);
+
+     tempStr:= androidProjectName;
+     SplitStr(tempStr, ':');
+     linuxAndroidProjectName:= StringReplace(tempStr, '\', '/', [rfReplaceAll]);
+
+     tempStr:= pathToAntBin;
+     SplitStr(tempStr, ':');
+     linuxPathToAntBin:= StringReplace(tempStr, '\', '/', [rfReplaceAll]);
+
+     tempStr:= FPathToAndroidSDK;
+     SplitStr(tempStr, ':');
+     linuxPathToAndroidSdk:= StringReplace(tempStr, '\', '/', [rfReplaceAll]);
+
+     tempStr:= androidProjectName;
+     SplitStr(tempStr, ':');
+     linuxAndroidProjectName:= StringReplace(tempStr, '\', '/', [rfReplaceAll]);
+  {$ENDIF}
+
+  strList.Clear;
+  if pathToAntBin <> '' then
+    strList.Add('export PATH='+linuxPathToAntBin+':$PATH');
+
+  strList.Add('export JAVA_HOME='+linuxPathToJavaJDK);
+  strList.Add('cd '+linuxAndroidProjectName);
+  strList.Add('ant -Dtouchtest.enabled=true debug');
+  SaveShellScript(strList, androidProjectName+'build-debug.sh');
+
+  strList.Clear;
+  if pathToAntBin <> '' then
+     strList.Add('export PATH='+linuxPathToAntBin+':$PATH'); //export PATH=/usr/bin/ant:PATH
+
+  strList.Add('export JAVA_HOME='+linuxPathToJavaJDK);     //export JAVA_HOME=/usr/lib/jvm/java-6-openjdk
+  strList.Add('cd '+linuxAndroidProjectName);
+  strList.Add('ant clean release');
+  SaveShellScript(strList, androidProjectName+'build-release.sh');
+
+  linuxPathToAdbBin:= linuxPathToAndroidSdk+'platform-tools';
+
+  //linux install - thanks to Stephano!
+  strList.Clear;
+  strList.Add(linuxPathToAdbBin+linuxDirSeparator+'adb uninstall '+packageName);
+  strList.Add(linuxPathToAdbBin+linuxDirSeparator+'adb install -r bin'+linuxDirSeparator+FSmallProjName+'-'+antBuildMode+'.apk');
+  strList.Add(linuxPathToAdbBin+linuxDirSeparator+'adb logcat');
+  SaveShellScript(strList, androidProjectName+'install.sh');
+
+  strList.Clear;
+  strList.Add(linuxPathToAdbBin+linuxDirSeparator+'adb uninstall '+packageName);
+  SaveShellScript(strList, androidProjectName+'uninstall.sh');
+
+  strList.Clear;
+  strList.Add(linuxPathToAdbBin+linuxDirSeparator+'adb logcat');
+  SaveShellScript(strList, androidProjectName+'logcat.sh');
+
+  strList.Free;
+end;
+
 procedure TLamwSmartDesigner.TryChangeDemoProjecPaths();
 var
   strList: TStringList;
@@ -2028,46 +2263,50 @@ var
 begin
 
   strList:= TStringList.Create;
+  pathToDemoSDK:= LazarusIDE.ActiveProject.CustomData.Values['SdkPath']; //included pathDelimiter
 
-  if FPathToAndroidSDK <> '' then
+  if pathToDemoSDK = '' then
+    pathToDemoSDK:= GetPathToSDKFromBuildXML(FPathToAndroidProject+'build.xml'); //included pathDelimiter
+
+  pathToDemoNDK:= LazarusIDE.ActiveProject.CustomData.Values['NdkPath']; //included pathDelimiter
+
+  if (FPathToAndroidNDK <> '') and (pathToDemoNDK <> '') then
+  begin
+    if Pos(':', FPathToAndroidNDK) > 0 then
+    begin
+      localSys:= 'win';
+      pathToDemoNDKConverted:= StringReplace(pathToDemoNDK, '/', '\', [rfReplaceAll,rfIgnoreCase]);
+    end
+    else
+    begin
+      localSys:= 'linux';
+      pathToDemoNDKConverted:= StringReplace(pathToDemoNDK, '\', '/', [rfReplaceAll,rfIgnoreCase]);
+    end;
+  end;
+
+  if (FPathToAndroidSDK <> '') and (pathToDemoSDK <> '') then
   begin
     if FileExists(FPathToAndroidProject+'build.xml') then
     begin
-      pathToDemoSDK:= GetPathToSDKFromBuildXML(FPathToAndroidProject+'build.xml'); //included pathDelimiter
-      if pathToDemoSDK <> '' then
-      begin
-        strList.LoadFromFile(FPathToAndroidProject+'build.xml');
-        strList.SaveToFile(FPathToAndroidProject+'build.xml.bak2');
-        strResult := StringReplace(strList.Text, pathToDemoSDK,
-                                                 FPathToAndroidSDK,
-                                                 [rfReplaceAll,rfIgnoreCase]);
-        strList.Text := strResult;
-        strList.SaveToFile(FPathToAndroidProject+'build.xml');
-      end;
+      strList.LoadFromFile(FPathToAndroidProject+'build.xml');
+      strList.SaveToFile(FPathToAndroidProject+'build.xml.bak2');
+      strResult := StringReplace(strList.Text, pathToDemoSDK,
+                                               FPathToAndroidSDK,
+                                               [rfReplaceAll,rfIgnoreCase]);
+      strList.Text := strResult;
+      strList.SaveToFile(FPathToAndroidProject+'build.xml');
     end;
-  end else
+  end
+  else
     ShowMessage('Sorry.. Project "build.xml" Path  to SDK not fixed... [Please, change it by hand!]');
 
   lpiFileName := LazarusIDE.ActiveProject.ProjectInfoFile; //full path to 'controls.lpi';
   CopyFile(lpiFileName, lpiFileName+'.bak2');
 
-  pathToDemoNDK:= LazarusIDE.ActiveProject.CustomData.Values['NdkPath']; //included pathDelimiter
-
   FNDKIndex := LamwGlobalSettings.GetNDK;
 
   if (pathToDemoNDK <> '') and (FPathToAndroidNDK <> '') then
   begin
-
-      if Pos(':', FPathToAndroidNDK) > 0 then
-      begin
-        localSys:= 'win';
-        pathToDemoNDKConverted:= StringReplace(pathToDemoNDK, '/', '\', [rfReplaceAll,rfIgnoreCase])
-      end
-      else
-      begin
-        localSys:= 'linux';
-        pathToDemoNDKConverted:= StringReplace(pathToDemoNDK, '\', '/', [rfReplaceAll,rfIgnoreCase])
-      end;
 
       //Libraries
       strTemp:= LazarusIDE.ActiveProject.LazCompilerOptions.Libraries;   //path already converted!!!
@@ -2084,7 +2323,9 @@ begin
       strResult:= TryChangePrebuildOSY(strResult); //LAMW 0.8
 
       if StrToInt(FNDKIndex) > 4 then  //LAMW 0.8
-         strResult:= TryChangeTo49x(strResult);
+         strResult:= TryChangeTo49x(strResult)
+      else
+         strResult:= TryChangeTo49(strResult);
 
       if maxNdk > 0 then
         strResult:= TryChangeNdkPlatformsApi(strResult, maxNdk);
@@ -2114,6 +2355,7 @@ begin
       //update custom ...
       LazarusIDE.ActiveProject.CustomData.Values['NdkPath']:= FPathToAndroidNDK;
       LazarusIDE.ActiveProject.CustomData.Values['SdkPath']:= FPathToAndroidSDK;
+
   end
   else
   begin
@@ -2157,6 +2399,7 @@ var
   pathToDemoSDK: string;
 begin
   Result := False;
+
   pathToDemoNDK:= LazarusIDE.ActiveProject.CustomData.Values['NdkPath']; //included delimiter
   pathToDemoSDK:= LazarusIDE.ActiveProject.CustomData.Values['SdkPath']; //included delimiter
 
@@ -2172,6 +2415,9 @@ begin
   end;
 
   if (pathToDemoNDK = FPathToAndroidNDK) and (pathToDemoSDK = FPathToAndroidSDK) then Exit;
+
+  if Pos(':', pathToDemoNDK) then //project imported from windows ...
+    TryRunProcessChmod(FPathToAndroidProject); //need to convert win to Linux ...
 
   Result:= True;
 end;

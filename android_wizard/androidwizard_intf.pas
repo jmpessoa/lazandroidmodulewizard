@@ -878,13 +878,11 @@ begin
     else
     begin
        Result:= '4.1';
-       //ShowMessage('Warning! Please, install [and configure path] Gradle 4.1');
     end;
   end
   else
   begin
     Result:= '4.1';
-    //ShowMessage('Warning! Please, install [and configure path] Gradle 4.1');
   end;
 
 end;
@@ -2020,7 +2018,8 @@ begin
                 strList.Add('export PATH=$PATH:$GRADLE_HOME/bin');
                 strList.Add('source ~/.bashrc');
                 strList.Add('./gradle wrapper');
-                strList.SaveToFile(FAndroidProjectName+PathDelim+'gradle_making_wrapper.sh');
+                //strList.SaveToFile(FAndroidProjectName+PathDelim+'gradle_making_wrapper.sh');
+                SaveShellScript(strList, FAndroidProjectName+PathDelim+'gradle_making_wrapper.sh');
 
                 //Drafts Method II
 
@@ -2044,7 +2043,8 @@ begin
                 strList.Add('export PATH=$PATH:$GRADLE_HOME/bin');
                 strList.Add('source ~/.bashrc');
                 strList.Add('./gradlew build');
-                strList.SaveToFile(FAndroidProjectName+PathDelim+'gradle_w_build.sh');
+                //strList.SaveToFile(FAndroidProjectName+PathDelim+'gradle_w_build.sh');
+                SaveShellScript(strList, FAndroidProjectName+PathDelim+'gradle_w_build.sh');
 
                 //run
                 strList.Clear;
@@ -2066,7 +2066,8 @@ begin
                 strList.Add('export PATH=$PATH:$GRADLE_HOME/bin');
                 strList.Add('source ~/.bashrc');
                 strList.Add('./gradlew run');
-                strList.SaveToFile(FAndroidProjectName+PathDelim+'gradle_w_run.sh');
+                //strList.SaveToFile(FAndroidProjectName+PathDelim+'gradle_w_run.sh');
+                SaveShellScript(strList, FAndroidProjectName+PathDelim+'gradle_w_run.sh');
 
                 //Drafts Method I
 
@@ -2102,7 +2103,8 @@ begin
                 strList.Add('source ~/.bashrc');
                 //strList.Add('.\gradle clean build --info');
                 strList.Add('gradle clean build --info');
-                strList.SaveToFile(FAndroidProjectName+PathDelim+'gradle_local_build.sh');
+                //strList.SaveToFile(FAndroidProjectName+PathDelim+'gradle_local_build.sh');
+                SaveShellScript(strList, FAndroidProjectName+PathDelim+'gradle_local_build.sh');
 
                 strList.Clear;
                 strList.Add('export PATH='+linuxPathToAndroidSDK+'platform-tools'+':$PATH');
@@ -2116,7 +2118,8 @@ begin
                 strList.Add('source ~/.bashrc');
                 //strList.Add('.\gradle run');
                 strList.Add('gradle run');
-                strList.SaveToFile(FAndroidProjectName+PathDelim+'gradle_local_run.sh');
+                //strList.SaveToFile(FAndroidProjectName+PathDelim+'gradle_local_run.sh');
+                SaveShellScript(strList, FAndroidProjectName+PathDelim+'gradle_local_run.sh');
             end  //gradle support ...
             else
             begin
