@@ -1,7 +1,11 @@
-package com.example.appchronometerdemo1;
+package com.example.apptcpclientdemo1;
 
+import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.DataOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
@@ -40,8 +44,8 @@ public class jTCPSocketClient {
     // used to read messages from the server
     private BufferedReader mBufferIn;
     private Socket mSocket;
-    
-    //TCPSocketClientTask task;
+    private boolean mExecutedForMessage = false;
+    private int progressStep = -1;
            	
     public jTCPSocketClient(Controls _ctrls, long _Self) { //Add more others news "_xxx" params if needed!
     	   //super(_ctrls.activity);
@@ -54,26 +58,21 @@ public class jTCPSocketClient {
        //free local objects...
         mBufferOut= null;;
         mBufferIn= null;
-        mSocket= null;    	
+        if (mSocket != null) {
+      	 try {
+				mSocket.close();
+				mSocket = null;
+			 } catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			 }
+        }    	
     }
-   
-    /**
-     * Sends the message entered by client to the server
-     */
-    
-    public void SendMessage(String message) {
-    	
-        if (mBufferOut != null && !mBufferOut.checkError()) {
-            mBufferOut.println(message);
-            mBufferOut.flush();
-        }
-    }
-     
+        
     //write others [public] methods code here......
     //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
          
-    public void Connect(String _serverIP, int _serverPort) {
-    	  
+    public void Connect(String _serverIP, int _serverPort) {    	  
           SERVER_IP = _serverIP;          //IP address
           SERVER_PORT = _serverPort;       //port number;
           if (mSocket != null) {
@@ -94,18 +93,32 @@ public class jTCPSocketClient {
 		      e.printStackTrace();
 		  }
           
-          controls.pOnTCPSocketClientConnected(pascalObj);         
-          new TCPSocketClientTask().execute();                                    	  
-      }
-            
+          controls.pOnTCPSocketClientConnected(pascalObj);
+                  	  
+     }
+       
+    public void SendMessage(String message) {
+    	
+    	if (! mExecutedForMessage) {
+    		 mExecutedForMessage = true;
+    	     new TCPSocketClientTask().execute();
+    	}     
+    	    	
+        if (mBufferOut != null && !mBufferOut.checkError()) {
+            mBufferOut.println(message);
+            mBufferOut.flush();
+        }
+        
+    }
+    
      public void Connect(String _serverIP, int _serverPort, String _login) {    	  
     	 Connect(_serverIP,_serverPort);
     	 SendMessage(_login);       	  
       }
+
      
       public void CloseConnection(String _finalMessage) {                
-          mRun = false;        
-                        
+          mRun = false;                                
           if (mBufferOut != null) {
                mBufferOut.flush();
           }
@@ -117,18 +130,17 @@ public class jTCPSocketClient {
       public void CloseConnection() {
       	CloseConnection("client_closed");
       }
-                  
+              
       class TCPSocketClientTask extends AsyncTask<String, String, String> {
-      	
           @Override
           protected String doInBackground(String... message) {               
               mRun = true;
+              //in this while the client listens for the messages sent by the server        	  
               while (mRun) {
                     if ( mSocket!= null && !mSocket.isClosed()) {             		
                         try {                    	
     						mBufferOut = new PrintWriter(new BufferedWriter(new OutputStreamWriter(mSocket.getOutputStream())), true);
     	                    mBufferIn = new BufferedReader(new InputStreamReader(mSocket.getInputStream()));              
-    	                    //in this while the client listens for the messages sent by the server
     	                    if (mBufferIn != null)
     	                           mServerMessage = mBufferIn.readLine();
     	                    if (mServerMessage != null )                     	
@@ -159,7 +171,132 @@ public class jTCPSocketClient {
      			e.printStackTrace();
      	    }            
           }
-        }            
+        }
+      
+      /* https://stackoverflow.com/questions/6053602/what-arguments-are-passed-into-asynctaskarg1-arg2-arg3
+       * Params, the type of the parameters sent to the task upon execution.
+         Progress, the type of the progress units published during the background computation.
+         Result, the type of the result of the background computation.
+         
+         X – The type of the input variables value you want to set to the background process. 
+              This can be an array of objects.
+         Y – The type of the objects you are going to enter in the onProgressUpdate method.
+         Z – The type of the result from the operations you have done in the background process.         
+       */
+      
+      class TCPSocketClientFileTask extends AsyncTask<String, Integer, String> {
+    	  
+    	  String localFullPath;
+    	  File file;
+    	  String filename;
+    	  int filesize;
+    	  int sentCount = 0;
+    	  
+    	  TCPSocketClientFileTask(String fullPath){
+    		  localFullPath = fullPath; 
+    		  file = new File(fullPath);
+    	  }
+
+          @Override
+          protected String doInBackground(String... values) {
+        	  
+              if ( mSocket!= null && !mSocket.isClosed()) {            	  
+                        try {
+                        	
+                            //DataInputStream dis = new DataInputStream(new BufferedInputStream(mSocket.getInputStream()));                        	
+                        	
+                        	/*
+                        	mBufferIn = new BufferedReader(new InputStreamReader(mSocket.getInputStream()));
+    	                    if (mBufferIn != null) mServerMessage = mBufferIn.readLine();    	                    
+   	                        if (mServerMessage != null ) 
+   	                        	publishProgress(mServerMessage);                     	
+                            */
+                        	
+   	                        DataOutputStream dos = new DataOutputStream(new BufferedOutputStream(mSocket.getOutputStream()));
+   	                                	 
+                            //write file size
+   	                        filesize = (int)file.length();
+                            //publishProgress("Sending file size...");
+   	                        /*
+                            int file_size = (int)file.length();                            
+                            dos.writeLong(file_size);
+                            dos.flush();
+                            */
+   	                        
+   	                        filename = file.getName();
+                            //write file names
+   	                        /*
+                            publishProgress("Sending file name...");                            
+                            dos.writeUTF( file.getName() );
+                            dos.flush();
+                            */
+   	                        
+                            //file writing
+                            int n = 0;
+                            byte[] buf;                            
+                            if (progressStep <= 0)
+                                buf = new byte[(int)file.length()];
+                            else
+                            	buf = new byte[progressStep];
+                                                        
+                            FileInputStream fis = new FileInputStream(file);
+                            
+                            //write file to dos
+                            while((n = fis.read(buf)) != -1){
+                                    dos.write(buf,0,n);
+                                    dos.flush();
+                                    sentCount = sentCount + n;
+                                    publishProgress(sentCount);
+                            }
+                            
+                            dos.close();
+                            fis.close();
+                            
+                            //write file names                      	
+                            //publishProgress("Sucess!!");                            
+                                                        
+    					} catch (IOException e) {
+    						// TODO Auto-generated catch block
+    						Log.e("jTCPSocketClient Sending file", "Error_doInBackground", e);
+    						e.printStackTrace();
+    					}   
+                        
+              }        	        	                           
+              return null; //or String...
+              
+          }
+
+          @Override
+          protected void onProgressUpdate(Integer... values) {
+              super.onProgressUpdate(values);
+              controls.pOnTCPSocketClientFileSendProgress(pascalObj, filename, values[0], filesize);  //TODO
+          }
+          
+          @Override
+          protected void onPostExecute(String value) {    	  
+            super.onPostExecute(value);   	  
+            controls.pOnTCPSocketClientFileSendFinished(pascalObj, filename, filesize);  
+            try {                	         	   
+     			mSocket.close();
+     	    } catch (IOException e) {
+     			// TODO Auto-generated catch block
+     			e.printStackTrace();
+     	    }            
+          }
+          
+        }
+      
+      public void SendFile(String fullPath) {      	
+      	 new TCPSocketClientFileTask(fullPath).execute();           	    	          
+      }
+
+      public void SetSendFileProgressStep(int _bytes) {
+    	  if (_bytes > 512) 
+    	     progressStep = _bytes;
+    	  else
+    	     progressStep = 512;    		  
+      }
+      
 }
 
 

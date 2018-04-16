@@ -60,6 +60,8 @@ uses
    Procedure Java_Event_pOnTCPSocketClientMessageReceived(env: PJNIEnv; this: jobject; Obj: TObject; messagesReceived: JStringArray);
    Procedure Java_Event_pOnTCPSocketClientConnected(env: PJNIEnv; this: jobject; Obj: TObject);
 
+   Procedure Java_Event_pOnTCPSocketClientFileSendProgress(env: PJNIEnv; this: jobject; Obj: TObject; filename: JString; count: integer; filesize: integer);
+   Procedure Java_Event_pOnTCPSocketClientFileSendFinished(env: PJNIEnv; this: jobject; Obj: TObject; filename: JString; filesize: integer);
 
    Procedure Java_Event_pOnMediaPlayerVideoSizeChanged(env: PJNIEnv; this: jobject; Obj: TObject; videoWidth: integer; videoHeight: integer);
    Procedure Java_Event_pOnMediaPlayerCompletion(env: PJNIEnv; this: jobject; Obj: TObject);
@@ -129,7 +131,7 @@ uses
 
    Procedure Java_Event_pOnExpandableListViewGroupCollapse(env: PJNIEnv; this: jobject; Obj: TObject;
                                                               groupPosition: integer; groupHeader: JString);
-(*
+
    Procedure Java_Event_pOnGL2SurfaceCreate(env: PJNIEnv; this: jobject; Obj: TObject);
    Procedure Java_Event_pOnGL2SurfaceChanged(env: PJNIEnv; this: jobject; Obj: TObject; width: integer; height: integer);
    Procedure Java_Event_pOnGL2SurfaceDrawFrame(env: PJNIEnv; this: jobject; Obj: TObject);
@@ -141,8 +143,6 @@ uses
                                            zoomScaleFactor: single);
 
    Procedure Java_Event_pOnGL2SurfaceDestroyed(env: PJNIEnv; this: jobject; Obj: TObject);
-*)
-
    Procedure Java_Event_pOnRecyclerViewItemClick(env: PJNIEnv; this: jobject; Obj: TObject; itemIndex: integer; arrayContentCount: integer);
    Procedure Java_Event_pOnClickNavigationViewItem(env: PJNIEnv; this: jobject; Obj: TObject; itemIndex: integer; itemCaption: JString);
    Procedure Java_Event_pOnClickBottomNavigationViewItem(env: PJNIEnv; this: jobject; Obj: TObject; itemIndex: integer; itemCaption: JString);
@@ -161,7 +161,7 @@ uses
    sensormanager, broadcastreceiver, datepickerdialog, timepickerdialog, shellcommand,
    tcpsocketclient, surfaceview, mediaplayer, contactmanager, seekbar, ratingbar, radiogroup, drawingview,
    autocompletetextview, chronometer, numberpicker, udpsocket, opendialog, comboedittext,
-   toolbar, expandablelistview, {gl2surfaceview,} sfloatingbutton, framelayout,
+   toolbar, expandablelistview, gl2surfaceview, sfloatingbutton, framelayout,
    stoolbar, snavigationview, srecyclerview, sbottomnavigationview, stablayout, treelistview;
 
 procedure Java_Event_pOnBluetoothEnabled(env: PJNIEnv; this: jobject; Obj: TObject);
@@ -869,6 +869,47 @@ begin
     jTCPSocketClient(Obj).GenEvent_OnTCPSocketClientConnected(Obj);
   end;
 end;
+
+Procedure Java_Event_pOnTCPSocketClientFileSendProgress(env: PJNIEnv; this: jobject; Obj: TObject; filename: JString; count: integer; filesize: integer);
+var
+   pasfilename:  string;
+   jBoo: jBoolean;
+begin
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+  if Obj is jTCPSocketClient then
+  begin
+    jForm(jTCPSocketClient(Obj).Owner).UpdateJNI(gApp);
+    pasfilename := '';
+    if filename <> nil then
+    begin
+      jBoo := JNI_False;
+      pasfilename:= string( env^.GetStringUTFChars(Env,filename,@jBoo) );
+    end;
+    jTCPSocketClient(Obj).GenEvent_OnTCPSocketClientFileSendProgress(Obj, pasfilename, count, filesize);
+  end;
+end;
+
+Procedure Java_Event_pOnTCPSocketClientFileSendFinished(env: PJNIEnv; this: jobject; Obj: TObject; filename: JString; filesize: integer);
+var
+   pasfilename:  string;
+   jBoo: jBoolean;
+begin
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+  if Obj is jTCPSocketClient then
+  begin
+    jForm(jTCPSocketClient(Obj).Owner).UpdateJNI(gApp);
+    pasfilename := '';
+    if filename <> nil then
+    begin
+      jBoo := JNI_False;
+      pasfilename:= string( env^.GetStringUTFChars(Env,filename,@jBoo) );
+    end;
+    jTCPSocketClient(Obj).GenEvent_pOnTCPSocketClientFileSendFinished(Obj, pasfilename, filesize);
+  end;
+end;
+
 
 Procedure Java_Event_pOnSurfaceViewCreated(env: PJNIEnv; this: jobject; Obj: TObject;
                                surfaceHolder: jObject);
@@ -1593,7 +1634,6 @@ begin
 
 end;
 
-(*
 Procedure Java_Event_pOnGL2SurfaceCreate(env: PJNIEnv; this: jobject; Obj: TObject);
 begin
   gApp.Jni.jEnv:= env;
@@ -1678,8 +1718,6 @@ begin
                                                     flingGesture,pinchZoomGestureState, zoomScaleFactor);
   end;
 end;
-
-*)
 
 Procedure Java_Event_pOnRecyclerViewItemClick(env: PJNIEnv; this: jobject; Obj: TObject; itemIndex: integer; arrayContentCount: integer);
 begin

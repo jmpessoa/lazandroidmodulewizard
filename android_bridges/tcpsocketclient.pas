@@ -10,6 +10,8 @@ uses
 type
 
 TOnMessagesReceived = procedure(Sender: TObject; messagesReceived: array of string) of object;
+TOnFileSendProgress =  procedure(Sender: TObject; fileName: string; count: integer; fileSize: integer) of object;
+TOnFileSendFinished =  procedure(Sender: TObject; fileName: string; fileSize: integer) of object;
 
 {Draft Component code by "Lazarus Android Module Wizard" [5/19/2015 18:49:35]}
 {https://github.com/jmpessoa/lazandroidmodulewizard}
@@ -20,6 +22,8 @@ jTCPSocketClient = class(jControl)
   private
     FOnMessagesReceived: TOnMessagesReceived;
     FOnConnected: TOnNotify;
+    FOnFileSendProgress: TOnFileSendProgress;
+    FOnFileSendFinished: TOnFileSendFinished;
   public
 
     constructor Create(AOwner: TComponent); override;
@@ -28,6 +32,8 @@ jTCPSocketClient = class(jControl)
     function jCreate(): jObject;
     procedure jFree();
     procedure SendMessage(message: string);
+    procedure SendFile(fullPath: string);
+    procedure SetSendFileProgressStep(_bytes: integer);
 
     procedure CloseConnection(); overload;
     procedure ConnectAsync(_serverIP: string; _serverPort: integer; _login: string); overload;
@@ -36,9 +42,14 @@ jTCPSocketClient = class(jControl)
 
     procedure GenEvent_OnTCPSocketClientMessagesReceived(Sender: TObject; messagesReceived: array of string);
     procedure GenEvent_OnTCPSocketClientConnected(Sender: TObject);
+    procedure GenEvent_OnTCPSocketClientFileSendProgress(Sender: TObject; filename: string; count: integer; filesize: integer);
+    procedure GenEvent_pOnTCPSocketClientFileSendFinished(Sender: TObject;  filename: string;  filesize: integer);
+
  published
     property OnMessagesReceived: TOnMessagesReceived read FOnMessagesReceived write FOnMessagesReceived;
     property OnConnected: TOnNotify read FOnConnected write FOnConnected;
+    property OnFileSendProgress: TOnFileSendProgress read FOnFileSendProgress write FOnFileSendProgress;
+    property OnFileSendFinished: TOnFileSendFinished  read FOnFileSendFinished write FOnFileSendFinished;
 
 end;
 
@@ -50,10 +61,11 @@ procedure jTCPSocketClient_Connect(env: PJNIEnv; _jtcpsocketclient: JObject; _se
 
 procedure jTCPSocketClient_Connect(env: PJNIEnv; _jtcpsocketclient: JObject; _serverIP: string; _serverPort: integer); overload;
 procedure jTCPSocketClient_CloseConnection(env: PJNIEnv; _jtcpsocketclient: JObject; _finalMessage: string);  overload;
+procedure jTCPSocketClient_SendFile(env: PJNIEnv; _jtcpsocketclient: JObject; fullPath: string);
+procedure jTCPSocketClient_SetSendFileProgressStep(env: PJNIEnv; _jtcpsocketclient: JObject; _bytes: integer);
 
 
 implementation
-
 
 {---------  jTCPSocketClient  --------------}
 
@@ -106,6 +118,13 @@ begin
      jTCPSocketClient_SendMessage(FjEnv, FjObject, message);
 end;
 
+procedure jTCPSocketClient.SendFile(fullPath: string);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jTCPSocketClient_SendFile(FjEnv, FjObject, fullPath);
+end;
+
 procedure jTCPSocketClient.CloseConnection();
 begin
   //in designing component state: set value here...
@@ -135,6 +154,13 @@ begin
      jTCPSocketClient_CloseConnection(FjEnv, FjObject, _finalMessage);
 end;
 
+procedure jTCPSocketClient.SetSendFileProgressStep(_bytes: integer);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jTCPSocketClient_SetSendFileProgressStep(FjEnv, FjObject, _bytes);
+end;
+
 procedure jTCPSocketClient.GenEvent_OnTCPSocketClientMessagesReceived(Sender: TObject; messagesReceived: array of string);
 begin
   if Assigned(FOnMessagesReceived) then  FOnMessagesReceived(Sender, messagesReceived);
@@ -145,6 +171,15 @@ begin
   if Assigned(FOnConnected) then  FOnConnected(Sender);
 end;
 
+procedure jTCPSocketClient.GenEvent_OnTCPSocketClientFileSendProgress(Sender: TObject; filename: string; count: integer; filesize: integer);
+begin
+  if Assigned(FOnFileSendProgress) then  FOnFileSendProgress(Sender, filename, count, filesize);
+end;
+
+procedure jTCPSocketClient.GenEvent_pOnTCPSocketClientFileSendFinished(Sender: TObject;  filename: string;  filesize: integer);
+begin
+  if Assigned(FOnFileSendFinished) then FOnFileSendFinished(Sender, filename, filesize);
+end;
 
 {-------- jTCPSocketClient_JNI_Bridge ----------}
 
@@ -253,6 +288,33 @@ begin
   jMethod:= env^.GetMethodID(env, jCls, 'Connect', '(Ljava/lang/String;I)V');
   env^.CallVoidMethodA(env, _jtcpsocketclient, jMethod, @jParams);
   env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jTCPSocketClient_SendFile(env: PJNIEnv; _jtcpsocketclient: JObject; fullPath: string);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(fullPath));
+  jCls:= env^.GetObjectClass(env, _jtcpsocketclient);
+  jMethod:= env^.GetMethodID(env, jCls, 'SendFile', '(Ljava/lang/String;)V');
+  env^.CallVoidMethodA(env, _jtcpsocketclient, jMethod, @jParams);
+  env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jTCPSocketClient_SetSendFileProgressStep(env: PJNIEnv; _jtcpsocketclient: JObject; _bytes: integer);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].i:= _bytes;
+  jCls:= env^.GetObjectClass(env, _jtcpsocketclient);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetSendFileProgressStep', '(I)V');
+  env^.CallVoidMethodA(env, _jtcpsocketclient, jMethod, @jParams);
   env^.DeleteLocalRef(env, jCls);
 end;
 

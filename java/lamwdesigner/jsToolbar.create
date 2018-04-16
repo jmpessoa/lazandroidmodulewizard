@@ -1,0 +1,3 @@
+public java.lang.Object jsToolbar_jCreate(long _Self, boolean _asActionBar) {
+  return (java.lang.Object)(new jsToolbar(this,_Self,_asActionBar));
+}

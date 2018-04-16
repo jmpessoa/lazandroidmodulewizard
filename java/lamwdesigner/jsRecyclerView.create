@@ -1,0 +1,3 @@
+public java.lang.Object jsRecyclerView_jCreate(long _Self, int _mode, int _direction, int _cols) {
+  return (java.lang.Object)(new jsRecyclerView(this,_Self,_mode,_direction,_cols));
+}

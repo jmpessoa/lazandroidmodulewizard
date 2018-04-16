@@ -1,0 +1,3 @@
+public java.lang.Object jsDrawerLayout_jCreate(long _Self) {
+  return (java.lang.Object)(new jsDrawerLayout(this,_Self));
+}

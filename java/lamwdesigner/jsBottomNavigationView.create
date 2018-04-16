@@ -1,0 +1,3 @@
+public java.lang.Object jsBottomNavigationView_jCreate(long _Self) {
+  return (java.lang.Object)(new jsBottomNavigationView(this,_Self));
+}

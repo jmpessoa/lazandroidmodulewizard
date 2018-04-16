@@ -1,0 +1,3 @@
+public java.lang.Object jsNavigationView_jCreate(long _Self) {
+  return (java.lang.Object)(new jsNavigationView(this,_Self));
+}
