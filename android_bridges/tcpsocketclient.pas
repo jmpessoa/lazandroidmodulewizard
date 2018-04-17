@@ -10,8 +10,8 @@ uses
 type
 
 TOnMessagesReceived = procedure(Sender: TObject; messagesReceived: array of string) of object;
-TOnFileSendProgress =  procedure(Sender: TObject; fileName: string; count: integer; fileSize: integer) of object;
-TOnFileSendFinished =  procedure(Sender: TObject; fileName: string; fileSize: integer) of object;
+TOnSendFileProgress =  procedure(Sender: TObject; fileName: string; count: integer; fileSize: integer) of object;
+TOnSendFileFinished =  procedure(Sender: TObject; fileName: string; fileSize: integer) of object;
 
 {Draft Component code by "Lazarus Android Module Wizard" [5/19/2015 18:49:35]}
 {https://github.com/jmpessoa/lazandroidmodulewizard}
@@ -22,8 +22,8 @@ jTCPSocketClient = class(jControl)
   private
     FOnMessagesReceived: TOnMessagesReceived;
     FOnConnected: TOnNotify;
-    FOnFileSendProgress: TOnFileSendProgress;
-    FOnFileSendFinished: TOnFileSendFinished;
+    FOnSendFileProgress: TOnSendFileProgress;
+    FOnSendFileFinished: TOnSendFileFinished;
   public
 
     constructor Create(AOwner: TComponent); override;
@@ -48,8 +48,8 @@ jTCPSocketClient = class(jControl)
  published
     property OnMessagesReceived: TOnMessagesReceived read FOnMessagesReceived write FOnMessagesReceived;
     property OnConnected: TOnNotify read FOnConnected write FOnConnected;
-    property OnFileSendProgress: TOnFileSendProgress read FOnFileSendProgress write FOnFileSendProgress;
-    property OnFileSendFinished: TOnFileSendFinished  read FOnFileSendFinished write FOnFileSendFinished;
+    property OnSendFileProgress: TOnSendFileProgress read FOnSendFileProgress write FOnSendFileProgress;
+    property OnSendFileFinished: TOnSendFileFinished  read FOnSendFileFinished write FOnSendFileFinished;
 
 end;
 
@@ -173,12 +173,12 @@ end;
 
 procedure jTCPSocketClient.GenEvent_OnTCPSocketClientFileSendProgress(Sender: TObject; filename: string; count: integer; filesize: integer);
 begin
-  if Assigned(FOnFileSendProgress) then  FOnFileSendProgress(Sender, filename, count, filesize);
+  if Assigned(FOnSendFileProgress) then  FOnSendFileProgress(Sender, filename, count, filesize);
 end;
 
 procedure jTCPSocketClient.GenEvent_pOnTCPSocketClientFileSendFinished(Sender: TObject;  filename: string;  filesize: integer);
 begin
-  if Assigned(FOnFileSendFinished) then FOnFileSendFinished(Sender, filename, filesize);
+  if Assigned(FOnSendFileFinished) then FOnSendFileFinished(Sender, filename, filesize);
 end;
 
 {-------- jTCPSocketClient_JNI_Bridge ----------}
