@@ -1487,6 +1487,9 @@ type
     procedure BringToFront();
     procedure SetVisibilityGone();
 
+    procedure SaveToFile(_appInternalFileName: string);
+    procedure LoadFromFile(_appInternalFileName: string);
+
     //Property
     property setItemIndex: TXY write SetItemPosition;
     property Count: integer read GetCount;
@@ -1803,7 +1806,7 @@ type
 
     property BackgroundColor   : TARGBColorBridge read FColor     write SetColor;
     property Enabled : Boolean   read FEnabled   write SetEnabled;
-    property Images    : jImageList read FImageList write SetImages;     //by jmpessoa
+    property Images    : jImageList read FImageList write SetImages;
     property IndexImageUp: TImageListIndex read FImageUpIndex write FImageUpIndex default -1;
     property IndexImageDown: TImageListIndex read FImageDownIndex write FImageDownIndex default -1;
 
@@ -3996,11 +3999,12 @@ begin
     jEditText_SetCloseSoftInputOnEnter(FjEnv, FjObject, FCloseSoftInputOnEnter);
 
   jEditText_editInputType2(FjEnv, FjObject , InputTypeToStrEx(FInputTypeEx));
+
   if FInputTypeEx = itxMultiLine then
   begin
     jEditText_setSingleLine(FjEnv, FjObject , False);
     if FMaxLines = 1 then  FMaxLines:= 3;   // visibles lines!
-    jEditText_setMaxLines(FjEnv, FjObject , FMaxLines); //visibles lines!
+    jEditText_setMaxLines(FjEnv, FjObject , FMaxLines);
 
     if FScrollBarStyle <> scrNone then
          jEditText_setScrollBarStyle(FjEnv, FjObject , GetScrollBarStyle(FScrollBarStyle));
@@ -4145,7 +4149,6 @@ begin
   Self.ImmHide();
 end;
 
-//by jmpessoa
 Procedure jEditText.SetInputTypeEx(Value : TInputTypeEx);
 begin
   FInputTypeEx:= Value;
@@ -4162,7 +4165,6 @@ begin
         jEditText_maxLength(FjEnv, FjObject , FMaxTextLength);
 end;
 
-//by jmpessoa
 Procedure jEditText.SetMaxLines(Value: DWord);
 begin
   FMaxLines:= Value;
@@ -8606,6 +8608,20 @@ begin
   //in designing component state: set value here...
   if FInitialized then
      jListView_SetFitsSystemWindows(FjEnv, FjObject, _value);
+end;
+
+procedure jListView.SaveToFile(_appInternalFileName: string);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jListView_SaveToFile(FjEnv, FjObject, _appInternalFileName);
+end;
+
+procedure jListView.LoadFromFile(_appInternalFileName: string);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jListView_LoadFromFile(FjEnv, FjObject, _appInternalFileName);
 end;
 
 //------------------------------------------------------------------------------

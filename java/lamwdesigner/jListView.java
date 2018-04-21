@@ -1,5 +1,11 @@
-package org.lamw.appcompattablayoutdemo1;
+package lamw.org.appcustomcamerademo1;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
@@ -12,6 +18,7 @@ import android.graphics.Typeface;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
+import android.os.Environment;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.TypedValue;
@@ -1023,7 +1030,7 @@ public class jListView extends ListView {
 	int textSizeDecorated;
 	int textAlign;
 
-	String delimiter;
+	String delimiter = "|";
 	String leftDelimiter = "(";
 	String rightDelimiter = ")";
 
@@ -1300,8 +1307,9 @@ public class jListView extends ListView {
     }
 	
 	
-	public  void add2(String item, String delimiter) {
+	public  void add2(String item, String _delimiter) {
 		jListItemRow info = new jListItemRow(controls.activity);
+		delimiter = _delimiter;
 		info.label = item;
 		info.delimiter=  delimiter;
 		info.leftDelimiter = leftDelimiter;
@@ -1329,8 +1337,9 @@ public class jListView extends ListView {
 		aadapter.notifyDataSetChanged();
 	}
 
-	public  void add22(String item, String delimiter, Bitmap bm) {
+	public  void add22(String item, String _delimiter, Bitmap bm) {
 		jListItemRow info = new jListItemRow(controls.activity);
+		delimiter = _delimiter; 
 		info.label = item;
 		info.delimiter=  delimiter;
 		info.leftDelimiter = leftDelimiter;
@@ -1358,8 +1367,9 @@ public class jListView extends ListView {
 
 	}
 
-	public  void add3(String item, String delimiter, int fontColor, int fontSize, int widgetItem, String wgtText, Bitmap img) {
+	public  void add3(String item, String _delimiter, int fontColor, int fontSize, int widgetItem, String wgtText, Bitmap img) {
 		jListItemRow info = new jListItemRow(controls.activity);
+		delimiter = _delimiter;
 		info.label = item;
 		info.id = alist.size();
 		info.checked = false;
@@ -1386,8 +1396,10 @@ public class jListView extends ListView {
 		aadapter.notifyDataSetChanged();
 	}
 
-	public  void add4(String item, String delimiter, int fontColor, int fontSize, int widgetItem, String wgtText) {
+	
+	public  void add4(String item, String _delimiter, int fontColor, int fontSize, int widgetItem, String wgtText) {
 		jListItemRow info = new jListItemRow(controls.activity);
+		delimiter = _delimiter;
 		info.label = item;
 		info.id = alist.size();
 		info.checked = false;
@@ -1794,6 +1806,103 @@ public class jListView extends ListView {
 	
 	public void SetVisibilityGone() {
 		LAMWCommon.setVisibilityGone();
+	}
+
+	
+	//TODO
+	public String GetEnvironmentDirectoryPath(int _directory) {
+		
+		File filePath= null;
+		String absPath="";   //fail!
+		  
+		//Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS);break; //only Api 19!
+		if (_directory != 8) {		  	   	 
+		  switch(_directory) {	                       
+		    case 0:  filePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS); break;	   
+		    case 1:  filePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM); break;
+		    case 2:  filePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MUSIC); break;
+		    case 3:  filePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES); break;
+		    case 4:  filePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_NOTIFICATIONS); break;
+		    case 5:  filePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MOVIES); break;
+		    case 6:  filePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PODCASTS); break;
+		    case 7:  filePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_RINGTONES); break;
+		    
+		    case 9: absPath  = this.controls.activity.getFilesDir().getAbsolutePath(); break;      //Result : /data/data/com/MyApp/files	    	    
+		    case 10: absPath = this.controls.activity.getFilesDir().getPath();
+		             absPath = absPath.substring(0, absPath.lastIndexOf("/")) + "/databases"; break;
+		    case 11: absPath = this.controls.activity.getFilesDir().getPath();
+	                 absPath = absPath.substring(0, absPath.lastIndexOf("/")) + "/shared_prefs"; break;	             
+		           
+		  }
+		  	  
+		  //Make sure the directory exists.
+	      if (_directory < 8) { 
+	    	 filePath.mkdirs();
+	    	 absPath= filePath.getPath(); 
+	      }	        
+	      
+		}else {  //== 8 
+		    if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED) == true) {
+		    	filePath = Environment.getExternalStorageDirectory();  //sdcard!
+		    	// Make sure the directory exists.
+		    	filePath.mkdirs();
+		   	    absPath= filePath.getPath();
+		    }
+		}    	
+		    		  
+		return absPath;
+	}
+		
+    private void SaveToFile(String _txtContent, String _filename) {	  	 
+		     try {
+		         OutputStreamWriter outputStreamWriter = new OutputStreamWriter(
+		        		 controls.activity.openFileOutput(_filename, Context.MODE_PRIVATE));
+		         
+		         //outputStreamWriter.write("_header");
+		         outputStreamWriter.write(_txtContent);
+		         //outputStreamWriter.write("_footer");
+		         outputStreamWriter.close();
+		     }
+		     catch (IOException e) {
+		        // Log.i("jTextFileManager", "SaveToFile failed: " + e.toString());
+		     }
+    }
+	
+	public void SaveToFile(String _appInternalFileName) {	
+		//create StringBuffer object
+		 StringBuffer sbf = new StringBuffer();				
+		 //StringBuffer contents		 
+		 //new line				
+		  int count = 	alist.size();
+		  for(int i=0; i < count; i++) {
+			  sbf.append(alist.get(i).label);
+			  sbf.append("\n");
+		  }	  		  
+		  SaveToFile(sbf.toString(), _appInternalFileName);		  
+	}
+    	
+	public void LoadFromFile(String _appInternalFileName) {
+		     clear();
+		     //String retStr = "";
+		     try {
+		         InputStream inputStream = controls.activity.openFileInput(_appInternalFileName);
+		         if ( inputStream != null ) {
+		             InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
+		             BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+		             String receiveString = "";
+		             //StringBuilder stringBuilder = new StringBuilder();
+		             while ( (receiveString = bufferedReader.readLine()) != null ) {
+		                 //stringBuilder.append(receiveString);
+		                 add2(receiveString, delimiter);
+		             }
+		             inputStream.close();
+		             //retStr = stringBuilder.toString();
+		         }
+		     }
+		     catch (IOException e) {
+		        // Log.i("jListView", "LoadFromFile error: " + e.toString());
+		     }
+		     //return retStr;
 	}
 	
 }

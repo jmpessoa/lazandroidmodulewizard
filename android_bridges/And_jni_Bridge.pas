@@ -547,6 +547,9 @@ Procedure jListView_RemoveFromViewParent(env:PJNIEnv; _jlistview: jObject);
 procedure jListView_SetFitsSystemWindows(env: PJNIEnv; _jlistview: JObject; _value: boolean);
 procedure jListView_BringToFront(env: PJNIEnv; _jlistview: JObject);
 procedure jListView_SetVisibilityGone(env: PJNIEnv; _jlistview: JObject);
+procedure jListView_SaveToFile(env: PJNIEnv; _jlistview: JObject; _appInternalFileName: string);
+procedure jListView_LoadFromFile(env: PJNIEnv; _jlistview: JObject; _appInternalFileName: string);
+
 
 // ScrollView
 Function  jScrollView_Create           (env:PJNIEnv;  this:jobject; SelfObj: TObject): jObject;
@@ -5737,6 +5740,36 @@ begin
   env^.CallVoidMethod(env, _jlistview, jMethod);
   env^.DeleteLocalRef(env, jCls);
 end;
+
+procedure jListView_SaveToFile(env: PJNIEnv; _jlistview: JObject; _appInternalFileName: string);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_appInternalFileName));
+  jCls:= env^.GetObjectClass(env, _jlistview);
+  jMethod:= env^.GetMethodID(env, jCls, 'SaveToFile', '(Ljava/lang/String;)V');
+  env^.CallVoidMethodA(env, _jlistview, jMethod, @jParams);
+  env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+
+procedure jListView_LoadFromFile(env: PJNIEnv; _jlistview: JObject; _appInternalFileName: string);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_appInternalFileName));
+  jCls:= env^.GetObjectClass(env, _jlistview);
+  jMethod:= env^.GetMethodID(env, jCls, 'LoadFromFile', '(Ljava/lang/String;)V');
+  env^.CallVoidMethodA(env, _jlistview, jMethod, @jParams);
+  env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
 
 //------------------------------------------------------------------------------
 // ScrollView
