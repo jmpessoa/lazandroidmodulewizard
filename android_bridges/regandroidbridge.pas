@@ -38,7 +38,8 @@ uses
   expandablelistview,
   linearlayout,
   framelayout,
-  captionpanel;
+  captionpanel,
+  customcamera;
 
 Procedure Register;
   
@@ -81,6 +82,7 @@ begin
   {$I jImageList_icon.lrs}
   {$I jdrawingview_icon.lrs}
   {$I jsurfaceview_icon.lrs}
+  {$I jcustomcamera_icon.lrs}
   {$I jBitmap_icon.lrs}
   {$I jView_icon.lrs}
   {$I jcanvas_icon.lrs}
@@ -129,6 +131,7 @@ begin
       jImageList,
       jDrawingView,
       jSurfaceView,
+      jCustomCamera,
       jBitmap,
       jView,
       jCanvas,
