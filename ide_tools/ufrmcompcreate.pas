@@ -1245,11 +1245,8 @@ begin
            AProcess:= TProcess.Create(nil);
            AProcess.CurrentDirectory:= FPathToWizardCode+DirectorySeparator+'ide_tools';
            AProcess.Executable:= FPathToWizardCode+DirectorySeparator+'ide_tools'+DirectorySeparator+'lazres.exe';
-           {$IFDEF Linux}
+           {$IFDEF UNIX}
               AProcess.Executable:= FPathToWizardCode+DirectorySeparator+'ide_tools'+DirectorySeparator+'lazres';
-           {$Endif}
-           {$IFDEF Darwin}
-              AProcess.Executable:= FPathToWizardCode+DirectorySeparator+'ide_tools'+DirectorySeparator+'lazres.app';
            {$Endif}
            AProcess.Parameters.Add(LowerCase(FJavaClassName)+'_icon.lrs');
            AProcess.Parameters.Add(LowerCase(FJavaClassName)+'.png');

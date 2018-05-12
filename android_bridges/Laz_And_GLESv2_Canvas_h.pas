@@ -18,8 +18,12 @@ const
        ref. http://forum.lazarus.freepascal.org/index.php/topic,21919.msg137216/topicseen.html
    *)
 
-libname = {$ifdef linux}'libGL.so'{$else}'libGLESv2.so'{$endif};
+  //libname = {$ifdef linux}'libGL.so'{$else}'libGLESv2.so'{$endif};
 
+  libname = {$ifdef linux} 'libGL.so'
+                {$else}
+                   {$ifdef darwin} 'libGL.so' {$else} 'libGLESv2.so'{$endif}
+             {$endif};
 Type
   khronos_int8_t                         = ShortInt;
   khronos_float_t                        = Single;

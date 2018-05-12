@@ -313,6 +313,13 @@ type
     constructor Create(AWidget: TAndroidWidget; Canvas: TCanvas); override;
   end;
 
+  {TDraftCustomCamera}
+
+  TDraftCustomCamera = class(TDraftWidget)
+  public
+    constructor Create(AWidget: TAndroidWidget; Canvas: TCanvas); override;
+  end;
+
   {TDraftGL2SurfaceView}
 
   (*
@@ -666,7 +673,7 @@ uses
   sfloatingbutton, scoordinatorlayout, stoolbar, sdrawerlayout,
   snavigationview, scardview, srecyclerview, stextinput,
   sviewpager, scollapsingtoolbarlayout, stablayout, sappbarlayout,
-  sbottomnavigationview, snestedscrollview, treelistview{, gl2SurfaceView};
+  sbottomnavigationview, snestedscrollview, treelistview{, gl2SurfaceView}, customcamera;
 
 const
   DrawableSearchPaths: array [0..3] of string = (
@@ -3438,7 +3445,21 @@ begin
     Color := GetParentBackgroundColor;
 end;
 
-{ TDraftSurfaceView }
+{ TDraftCustomCamera }
+
+constructor TDraftCustomCamera.Create(AWidget: TAndroidWidget; Canvas: TCanvas);
+begin
+  inherited;
+
+  Color := jCustomCamera(AWidget).BackgroundColor;
+  FontColor := colbrGray;
+  BackGroundColor := clActiveCaption; //clMenuHighlight;
+
+  if jCustomCamera(AWidget).BackgroundColor = colbrDefault then
+    Color := GetParentBackgroundColor;
+end;
+
+{ TDraftGL2SurfaceView }
 
 (*
 constructor TDraftGL2SurfaceView.Create(AWidget: TAndroidWidget; Canvas: TCanvas);
@@ -4116,6 +4137,7 @@ initialization
   RegisterAndroidWidgetDraftClass(jImageView, TDraftImageView);
   RegisterAndroidWidgetDraftClass(jSurfaceView, TDraftSurfaceView);
  // RegisterAndroidWidgetDraftClass(jGL2SurfaceView, TDraftGL2SurfaceView);
+  RegisterAndroidWidgetDraftClass(jCustomCamera, TDraftCustomCamera);
   RegisterAndroidWidgetDraftClass(jWebView, TDraftWebView);
   RegisterAndroidWidgetDraftClass(jScrollView, TDraftScrollView);
   RegisterAndroidWidgetDraftClass(jHorizontalScrollView, TDraftHorizontalScrollView);

@@ -5,7 +5,15 @@ unit ApkBuild;
 interface
 
 uses
-  {$ifdef Windows}Windows{$else}XWindow{$endif},
+  {$ifdef Windows}
+    {$define Emulator}
+    Windows,
+  {$else}
+    {$ifndef Darwin}
+    {$define Emulator}
+    XWindow,
+    {$endif}
+  {$endif}
   Classes, SysUtils, ProjectIntf, Forms, LamwSettings, LCLVersion;
 
 type
@@ -19,7 +27,9 @@ type
     FAntPath, FGradlePath: string;
     FProjPath: string;
     FDevice: string;
+    {$ifdef Emulator}
     procedure BringToFrontEmulator;
+    {$endif}
     function CheckAvailableDevices: Boolean;
     procedure CleanUp;
     function GetManifestSdkTarget(out SdkTarget: string): Boolean;
@@ -632,6 +642,7 @@ begin
   end;
 end;
 
+{$ifdef Emulator}
 procedure TApkBuilder.BringToFrontEmulator;
 var
   emul_win: TStringList;
@@ -658,6 +669,7 @@ begin
     emul_win.Free;
   end;
 end;
+{$endif}
 
 function TApkBuilder.CheckAvailableDevices: Boolean;
 var
@@ -780,7 +792,9 @@ begin
       raise Exception.Create('Cannot install APK');
     RunByAdb;
   end;
+  {$ifdef Emulator}
   BringToFrontEmulator;
+  {$endif}
 end;
 
 procedure TApkBuilder.RunByAdb;

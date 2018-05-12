@@ -567,7 +567,7 @@ begin
   strList.SaveToFile(FPathToAndroidProject+'project.properties');
 
   strList.Clear;
-  {$IFDEF LINUX}
+  {$IFDEF UNIX}
   strList.Add('sdk.dir=' + FPathToAndroidSDK);
   {$ENDIF}
 
@@ -2279,7 +2279,7 @@ begin
     end
     else
     begin
-      localSys:= 'linux';
+      localSys:= 'unix';
       pathToDemoNDKConverted:= StringReplace(pathToDemoNDK, '\', '/', [rfReplaceAll,rfIgnoreCase]);
     end;
   end;
@@ -2339,7 +2339,7 @@ begin
 
       if localSys = 'win' then
         strCustom:= StringReplace(strTemp, '/', '\', [rfReplaceAll,rfIgnoreCase])
-      else   //linux
+      else   //unix
         strCustom:= StringReplace(strTemp, '\', '/', [rfReplaceAll,rfIgnoreCase]);
 
       strResult:= StringReplace(strCustom, pathToDemoNDKConverted,

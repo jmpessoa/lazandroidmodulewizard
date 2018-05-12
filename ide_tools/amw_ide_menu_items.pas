@@ -6,7 +6,7 @@ interface
 
 uses
   Classes, SysUtils, FileUtil, Dialogs, IDECommands, MenuIntf, Forms,
-  uformsettingspaths, lazandroidtoolsexpert, ufrmEditor, ufrmCompCreate,
+  uformsettingspaths{, lazandroidtoolsexpert}, ufrmEditor, ufrmCompCreate,
   uFormBuildFPCCross, uFormGetFPCSource, uimportjavastuff, uimportjavastuffchecked, uimportcstuff, process;
 
 procedure StartPathTool(Sender: TObject);
@@ -46,8 +46,8 @@ end;
 procedure StartLateTool(Sender: TObject);
 begin
   // Call Late code
-  frmLazAndroidToolsExpert:= TfrmLazAndroidToolsExpert.Create(Application);
-  frmLazAndroidToolsExpert.ShowModal;
+ // frmLazAndroidToolsExpert:= TfrmLazAndroidToolsExpert.Create(Application);
+  //frmLazAndroidToolsExpert.ShowModal;
 end;
 
 procedure StartResEditor(Sender: TObject);
@@ -140,7 +140,7 @@ begin
   auxList.SaveToFile(pathToProject+'lib'+libname+'-builder.bat');
   {$Endif}
 
-  {$IFDEF Linux}
+  {$IFDEF unix}
   auxList.Add('cd '+pathToProject);
   auxList.Add(pathToNdk+'ndk-build.cmd V=1 -B');
   auxList.SaveToFile(pathToProject+'lib'+libname+'-builder.sh');
@@ -151,12 +151,11 @@ begin
     AProcess:= TProcess.Create(nil);
     AProcess.CurrentDirectory:= pathToProject;
     AProcess.Executable:= pathToNdk+'ndk-build.cmd';
-    {$IFDEF Linux}
+
+    {$IFDEF UNIX}
     AProcess.Executable:= pathToNdk+'ndk-build.cmd'; //need fix here ?
     {$Endif}
-    {$IFDEF Darwin}
-    AProcess.Executable:= pathToNdk+'ndk-build.cmd'; //need fix here ?
-    {$Endif}
+
     (*
     ndk-build clean       --> clean all generated binaries.
     ndk-build NDK_DEBUG=1 --> generate debuggable native code.

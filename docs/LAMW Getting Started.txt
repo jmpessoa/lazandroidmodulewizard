@@ -6,8 +6,12 @@
 
 	"Getting Started" for Windows [by Jose Marques Pessoa]
 
-	About Linux:  LAMW folder  "...docs\linux" 
+	Linux Tutorial:  LAMW folder  "...docs\linux" 
 
+	About MacOS: X11 [libGL.dylib] is no longer bundled with Mountain Lion (and later!)			
+			[This prevents/drop some LAMW features, 
+			including the use of OpenGL components "jCanvasES1" and "jCanvasES2"]
+					  
 .Github
 	ref. https://github.com/jmpessoa/lazandroidmodulewizard
 

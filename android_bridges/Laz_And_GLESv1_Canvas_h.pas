@@ -37,7 +37,13 @@ const
     ref. http://forum.lazarus.freepascal.org/index.php/topic,21919.105.html *)
 
 
-libname = {$ifdef linux}'libGL.so'{$else}'libGLESv1_CM.so'{$endif};
+//libname = {$ifdef linux}'libGL.so'{$else}'libGLESv1_CM.so'{$endif};
+
+libname = {$ifdef linux} 'libGL.so'
+              {$else}
+                 {$ifdef darwin} 'libGL.so' {$else} 'libGLESv1_CM.so'{$endif}
+           {$endif};
+
 
 type
   khronos_int8_t                          = ShortInt;
@@ -728,7 +734,6 @@ procedure glFrustumf(left, right, bottom, top, zNear, zFar: GLfloat);
 begin
 
 end;
-
 {$ENDIF}
 
 end.

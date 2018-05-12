@@ -100,7 +100,7 @@ begin
         RadioGroup1.ItemIndex:= 1;
         {$endif}
       {$else}
-        {$ifdef darvin}
+        {$ifdef darwin}
         RadioGroup1.ItemIndex:= 4;
         {$else}
           {$ifdef cpu64}

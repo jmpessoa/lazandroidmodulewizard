@@ -5,7 +5,19 @@ unit uFormStartEmulator;
 interface
 
 uses
-  {$ifdef Windows}Windows{$else}XWindow{$endif},
+//  {$ifdef Windows}Windows{$else}XWindow{$endif},
+
+ {$ifdef Windows}
+    {$define Emulator}
+    Windows,
+  {$else}
+    {$ifndef Darwin}
+    {$define Emulator}
+    XWindow,
+    {$endif}
+  {$endif}
+
+
   Classes, SysUtils, process, FileUtil, Forms, Controls, Graphics, Dialogs,
   Grids, ExtCtrls, Buttons, ActnList;
 
@@ -52,7 +64,9 @@ type
 var
   frmStartEmulator: TfrmStartEmulator;
 
+  {$ifdef Emulator}
 function FindEmulatorWindows(_para1: HWND; _para2: LPARAM): WINBOOL; stdcall;
+  {$endif}
 
 implementation
 
@@ -62,6 +76,7 @@ uses LazFileUtils, UTF8Process, LamwSettings;
 
 { TfrmStartEmulator }
 
+{$ifdef Emulator}
 function FindEmulatorWindows(_para1: HWND; _para2: LPARAM): WINBOOL; stdcall;
 var s: string;
 begin
@@ -78,6 +93,7 @@ begin
   end;
   Result := True;
 end;
+{$endif}
 
 function TfrmStartEmulator.GetAvdState(Index: Integer): TAvdState;
 
@@ -235,7 +251,11 @@ begin
     if Trim(avds[i]) = '' then avds.Delete(i);
   FRun(AppendPathDelim(FSDKPath) + 'platform-tools' + PathDelim + 'adb', 'devices', devs);
   DrawGrid1.RowCount := avds.Count + 1 + Ord(avds.Count = 0);
+
+  {$ifdef Emulator}
   EnumWindows(@FindEmulatorWindows, LPARAM(emul_wnds));
+  {$endif}
+
   DrawGrid1.Invalidate;
 end;
 

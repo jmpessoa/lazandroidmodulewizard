@@ -103,7 +103,7 @@ begin
        if DirectoryExists(pathToNdkToolchainsArm + 'windows-x86_64') then Result:= 'windows-x86_64';
      {$endif}
    {$else}
-     {$ifdef darvin}
+     {$ifdef darwin}
         if DirectoryExists(pathToNdkToolchainsArm+ 'darwin-x86_64') then Result:= 'darwin-x86_64';
      {$else}
        {$ifdef cpu64}
@@ -464,7 +464,6 @@ begin
     Exit;
   end;
 
-  //linux
   strExt:= '';
   {$IFDEF WINDOWS}
      strExt:= '.exe';

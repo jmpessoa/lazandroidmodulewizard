@@ -59,8 +59,8 @@ var
   strExt: string;
 begin
 
-  {$IFDEF LINUX}
-    if MessageDlg('Warning...', 'Lamw can not Build/Install cross compiler [until now] on Linux. Continue?',
+  {$IFDEF UNIX}
+    if MessageDlg('Warning...', 'Lamw can not Build/Install cross compiler [until now] on Linux/MacOs. Continue?',
                    mtConfirmation, [mbYes, mbNo],0) = mrNO then Exit;
   {$ENDIF}
 

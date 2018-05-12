@@ -1,18 +1,17 @@
 [Getting Started.txt]
-
-
 					
-	LAMW: Lazarus Android Module Wizard:
+	LAMW: Lazarus Android Module Wizard
 
 		RAD Android!
 
-	"Getting Started" for Windows
+	"Getting Started" for Windows [by Jose Marques Pessoa]
 
-		by jmpessoa
+	Linux Tutorial:  LAMW folder  "...docs\linux" 
 
-Note 1:	Linux:  please, go to lazandroidmodulewizard folder  "...docs\linux\renabor" 
-			and read: "new_how_to_install_by_renabor.txt"
-
+	About MacOS: X11 [libGL.dylib] is no longer bundled with Mountain Lion (and later!)			
+			[This prevents/drop some LAMW features, 
+			including the use of OpenGL components "jCanvasES1" and "jCanvasES2"]
+					  
 .Github
 	ref. https://github.com/jmpessoa/lazandroidmodulewizard
 
@@ -23,38 +22,25 @@ I. Infrastructure
 
 .Java  JDK [32 bits or 64 bits]
 
-.Android sdk  [updated API >= 25]
+.Android SDK [old] ---  "ant" and "gradle" build supported...    [recommended!!!]
+	[Windows]	http://dl.google.com/android/installer_r24.0.2-windows.exe
+	[Linux]		http://dl.google.com/android/android-sdk_r24.0.2-linux.tgz
+	[Mac]		http://dl.google.com/android/android-sdk_r24.0.2-macosx.zip
 
-	[Win 32]
-	https://dl.google.com/android/repository/sdk-tools-windows-3859397.zip
+.Android SDK  [updated] --- only "gradle" build  supported...
 
-	[Linux]
-	https://dl.google.com/android/repository/sdk-tools-linux-3859397.zip
+	[Windows]	https://dl.google.com/android/repository/sdk-tools-windows-3859397.zip
+	[Linux]		https://dl.google.com/android/repository/sdk-tools-linux-3859397.zip
+	[Mac]		https://dl.google.com/android/repository/sdk-tools-darwin-3859397.zip
 
-	[Mac]
-	https://dl.google.com/android/repository/sdk-tools-darwin-3859397.zip
+.Android NDK
+	https://developer.android.com/ndk/downloads/index.html
 
-.Android NDK-r10e [or up]
-
-	[win 32] 
-	https://dl.google.com/android/repository/android-ndk-r10e-windows-x86.zip
-	https://dl.google.com/android/repository/android-ndk-r11c-windows-x86.zip
-
-	[Linux]
-	https://dl.google.com/android/repository/android-ndk-r10e-linux-x86_64.zip
-	https://dl.google.com/android/repository/android-ndk-r11c-linux-x86_64.zip
-
-	[Mac]
-	https://dl.google.com/android/repository/android-ndk-r10e-darwin-x86_64.zip
-	https://dl.google.com/android/repository/android-ndk-r11c-linux-x86_64.zip	
-
-.Laz4Android [Win] [cross Android compiler installed!] 
+.Laz4Android [Windows] [cross-arm-ndroid compiler installed!] 
 			http://sourceforge.net/projects/laz4android/files/?source=navbar
 
-	:: OR Lazarus: get canonical/trunk:
-
+	:: OR Lazarus [canonical]
 		Do It Yourself cross Android compile! [windows]: 			
-
 			After install the LAMW go to:
 			1. IDE "Tools" --> "[Lamw] Android Module Wizard" --> "Get FPC Source [Trunk]"
 			2. IDE "Tools" --> "[Lamw] Android Module Wizard" --> "Build FPC Cross Android"
@@ -67,11 +53,22 @@ I. Infrastructure
 .Gradle 4.1 [to build Apk with "AppCompat" [material] theme]
 
 	https://gradle.org/next-steps/?version=4.1&format=bin
-	Simply extract the zip file to a convenient location...
+		Simply extract the zip file to a convenient location...
+
+	warning: Gradle build process need internet connection!!!
 
 .Hint [Lazarus Docked Desktop. Nice!]
 	https://github.com/FlKo/LazarusDockedDesktops
 
+
+.[LAMW 0.8] "AppCompat" [material] theme need:'+
+		1. Java JDK 1.8'
+		2. Gradle 4.1 [https://gradle.org/next-steps/?version=4.1&format=bin]
+		3. Android SDK "plataforms" 25 + "build-tools" 25.0.3 [or]
+		3. Android SDK "plataforms" 26 + "build-tools" 26.0.3 [or]
+		3. Android SDK "plataforms" 27 + "build-tools" 27.0.3
+		4. Android SDK/Extra  "Support Repository"
+		5. Android SDK/Extra  "Support Library"
 
 II. LAMW:  Lazarus Android Module Wizard
 
@@ -89,7 +86,7 @@ III. USE
 
 		ref. https://od.lk/f/Ml8xNTU4Mjc1NDZf
 
-2. New Project [thanks to @Developing!]  	
+2. New Project [Thanks to Ahmad Bohloolbandi (a.k.a. @developing)]
 
 	After install "LAMW" packages and Configured the paths:
 
@@ -97,7 +94,7 @@ III. USE
 	
 		ref. https://od.lk/f/Ml8xNTU4Mjc1NThf
 
-	2.2-From displayed dialog select "Android [GUI] JNI Module [Lamw]" 	
+	2.2-From displayed dialog select "LAMW GUI Android Module" 	
 
 	2.3-Press OK Button.
 
@@ -119,13 +116,9 @@ III. USE
 
 			[This is your Android App/Apk name]
 
-	2.6-[MinSdk] Select the  min. Sdk Api to compile your project:
+	2.6-[MinSdk] Select the  Min. Device Api need to run your App:
 
 		example: 14
-
-	2.7-[Compile/TagetApi] Select the target [api] device  [LAMW 0.8 need API >= 25]
-
-		example: 25
 
 	2.8-Select Architecture/Instruction: 
 

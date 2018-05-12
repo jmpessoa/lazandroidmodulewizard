@@ -4,14 +4,13 @@
 
 unit tfpandroidbridge_pack;
 
+{$warn 5023 off : no warning about unused units}
 interface
 
 uses
-  regandroidbridge, And_jni, And_jni_Bridge, Laz_And_Controls, 
-  Laz_And_GLESv2_Canvas_h, Laz_And_GLESv1_Canvas_h, Laz_And_GLESv1_Canvas, 
-  Laz_And_GLESv2_Canvas, And_log, And_log_h, register_extras, 
-  Laz_And_Controls_Events, AndroidWidget, Laz_And_jni_Controls, And_lib_Unzip, 
-  register_support, LazarusPackageIntf;
+  regandroidbridge, And_jni, And_jni_Bridge, Laz_And_Controls, And_log, 
+  And_log_h, register_extras, Laz_And_Controls_Events, AndroidWidget, 
+  Laz_And_jni_Controls, register_support, LazarusPackageIntf;
 
 implementation
 

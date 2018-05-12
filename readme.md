@@ -124,6 +124,14 @@
 	*
 	****************************************************************************************************
 
+Version 0.8 - rev 01 - 12 - May- 2018
+
+	IMPROVED/FIXED support/install to MacOs 
+
+		Warning: X11 [libGL.dylib] is no longer bundled with Mountain Lion (and later!)			
+			[This prevents/drops some LAMW features, 
+			including the use of OpenGL components "jCanvasES1" and "jCanvasES2"]
+
 Version 0.8 - 31 - March- 2018
 
 	NEW! "AppCompat" material theme support!

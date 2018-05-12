@@ -906,7 +906,7 @@ function TAndroidProjectDescriptor.GetWorkSpaceFromForm(projectType: integer; ou
   procedure SaveShellScript(script: TStringList; const AFileName: string);
   begin
     script.SaveToFile(AFileName);
-    {$ifdef UNIX}
+    {$ifdef unix}
     FpChmod(AFileName, &751);
     {$endif}
   end;
@@ -1711,7 +1711,7 @@ begin
           //Building "build.gradle" file    -- for gradle we need "sdk/build-tools" >= 21.1.1
 
           strList.Clear;
-          {$IFDEF LINUX}
+          {$IFDEF UNIX}
           strList.Add('sdk.dir=' + FPathToAndroidSDK);
           {$ENDIF}
 

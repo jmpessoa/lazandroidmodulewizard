@@ -172,6 +172,9 @@ begin
        {$ifdef WINDOWS}
            Result:= 'windows';
        {$endif}
+       {$ifdef darwin}
+           Result:= 'darwin-x86_64';
+       {$endif}
    end;
 
 end;
