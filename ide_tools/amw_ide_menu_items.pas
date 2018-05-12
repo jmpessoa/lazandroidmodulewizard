@@ -142,7 +142,7 @@ begin
 
   {$IFDEF unix}
   auxList.Add('cd '+pathToProject);
-  auxList.Add(pathToNdk+'ndk-build.cmd V=1 -B');
+  auxList.Add(pathToNdk+'ndk-build V=1 -B');
   auxList.SaveToFile(pathToProject+'lib'+libname+'-builder.sh');
   {$Endif}
 
@@ -153,7 +153,7 @@ begin
     AProcess.Executable:= pathToNdk+'ndk-build.cmd';
 
     {$IFDEF UNIX}
-    AProcess.Executable:= pathToNdk+'ndk-build.cmd'; //need fix here ?
+    AProcess.Executable:= pathToNdk+'ndk-build'; //need fix here ?
     {$Endif}
 
     (*
