@@ -1293,6 +1293,7 @@ procedure TFormWorkspace.SaveSettings(const pFilename: string);  //called by ...
 begin
    with TInifile.Create(pFilename) do
    try
+      WriteString('NewProject', 'PathToWorkspace', FPathToWorkspace);
       WriteString('NewProject', 'PathToJavaTemplates', FPathToJavaTemplates);
       WriteString('NewProject', 'PathToJavaJDK', FPathToJavaJDK);
       WriteString('NewProject', 'PathToAndroidNDK', FPathToAndroidNDK);

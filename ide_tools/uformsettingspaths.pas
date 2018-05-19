@@ -344,6 +344,11 @@ begin
 
   EditPathToJavaJDK.SetFocus;
 
+  {$ifdef darwin}
+    if EditPathToJavaJDK.Text = '' then
+       EditPathToJavaJDK.Text:= '${/usr/libexec/java_home}';
+  {$endif}
+
 end;
 
 procedure TFormSettingsPaths.BitBtnCancelClick(Sender: TObject);
@@ -442,11 +447,13 @@ end;
 
 procedure TFormSettingsPaths.SpBPathToJavaJDKClick(Sender: TObject);
 begin
+//  {$ifndef darwin}
   if SelDirDlgPathToJavaJDK.Execute then
   begin
     EditPathToJavaJDK.Text:= SelDirDlgPathToJavaJDK.FileName;
     FPathToJavaJDK:= SelDirDlgPathToJavaJDK.FileName;
   end;
+//  {$endif}
 end;
 
 procedure TFormSettingsPaths.SpBPathToAndroidSDKClick(Sender: TObject);

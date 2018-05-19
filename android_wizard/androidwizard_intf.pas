@@ -1314,7 +1314,6 @@ begin
         if FModuleType < 2 then
         begin
           strList.Clear;
-
           strList.Add('set Path=%PATH%;'+FPathToAntBin); //<--- thanks to andersonscinfo !  [set path=%path%;C:\and32\ant\bin]
           strList.Add('set JAVA_HOME='+FPathToJavaJDK);  //set JAVA_HOME=C:\Program Files (x86)\Java\jdk1.7.0_21
           strList.Add('cd '+FAndroidProjectName);
@@ -1655,24 +1654,49 @@ begin
           //linux build Apk using "Ant"  ---- Thanks to Stephano!
           strList.Clear;
           if FPathToAntBin <> '' then //PATH=$PATH:/data/myscripts
-            strList.Add('export PATH='+linuxPathToAntBin+':$PATH'); //export PATH=/usr/bin/ant:PATH
+          begin
+             strList.Add('export PATH='+linuxPathToAntBin+':$PATH'); //export PATH=/usr/bin/ant:PATH
+             strList.Add('export JAVA_HOME='+linuxPathToJavaJDK);     //export JAVA_HOME=/usr/lib/jvm/java-6-openjdk
+             strList.Add('cd '+linuxAndroidProjectName);
+             strList.Add('ant -Dtouchtest.enabled=true debug');
+             SaveShellScript(strList, FAndroidProjectName+PathDelim+'build-debug.sh');
+          end;
 
-          strList.Add('export JAVA_HOME='+linuxPathToJavaJDK);     //export JAVA_HOME=/usr/lib/jvm/java-6-openjdk
-          strList.Add('cd '+linuxAndroidProjectName);
-          strList.Add('ant -Dtouchtest.enabled=true debug');
-          SaveShellScript(strList, FAndroidProjectName+PathDelim+'build-debug.sh');
+          //MacOs
+          strList.Clear;
+          if FPathToAntBin <> '' then //PATH=$PATH:/data/myscripts
+          begin
+            strList.Add('export PATH='+linuxPathToAntBin+':$PATH'); //export PATH=/usr/bin/ant:PATH
+            strList.Add('export JAVA_HOME=${/usr/libexec/java_home}');     //export JAVA_HOME=/usr/lib/jvm/java-6-openjdk
+            strList.Add('export PATH=${JAVA_HOME}/bin:$PATH');
+            strList.Add('cd '+linuxAndroidProjectName);
+            strList.Add('ant -Dtouchtest.enabled=true debug');
+            SaveShellScript(strList, FAndroidProjectName+PathDelim+'build-debug-macos.sh');
+          end;
 
           strList.Clear;
           if FPathToAntBin <> '' then
+          begin
              strList.Add('export PATH='+linuxPathToAntBin+':$PATH'); //export PATH=/usr/bin/ant:PATH
+             strList.Add('export JAVA_HOME='+linuxPathToJavaJDK);     //export JAVA_HOME=/usr/lib/jvm/java-6-openjdk
+             strList.Add('cd '+linuxAndroidProjectName);
+             strList.Add('ant clean release');
+             SaveShellScript(strList, FAndroidProjectName+PathDelim+'build-release.sh');
+          end;
 
-          strList.Add('export JAVA_HOME='+linuxPathToJavaJDK);     //export JAVA_HOME=/usr/lib/jvm/java-6-openjdk
-          strList.Add('cd '+linuxAndroidProjectName);
-          strList.Add('ant clean release');
-          SaveShellScript(strList, FAndroidProjectName+PathDelim+'build-release.sh');
+          //MacOs
+          strList.Clear;
+          if FPathToAntBin <> '' then //PATH=$PATH:/data/myscripts
+          begin
+            strList.Add('export PATH='+linuxPathToAntBin+':$PATH'); //export PATH=/usr/bin/ant:PATH
+            strList.Add('export JAVA_HOME=${/usr/libexec/java_home}');     //export JAVA_HOME=/usr/lib/jvm/java-6-openjdk
+            strList.Add('export PATH=${JAVA_HOME}/bin:$PATH');
+            strList.Add('cd '+linuxAndroidProjectName);
+            strList.Add('ant clean release');
+            SaveShellScript(strList, FAndroidProjectName+PathDelim+'build-release-macos.sh');
+          end;
 
           linuxPathToAdbBin:= linuxPathToAndroidSdk+'platform-tools';
-
           //linux install - thanks to Stephano!
           strList.Clear;
           strList.Add(linuxPathToAdbBin+linuxDirSeparator+'adb uninstall '+FPackagePrefaceName+'.'+LowerCase(FSmallProjName));
@@ -1701,11 +1725,28 @@ begin
                        linuxAndroidProjectName+linuxDirSeparator+dummy+'keytool_input.txt');
           SaveShellScript(strList, FAndroidProjectName+PathDelim+'release-keystore.sh');
 
+          //MacOs
+          strList.Clear;
+          strList.Add('export JAVA_HOME=${/usr/libexec/java_home}');     //export JAVA_HOME=/usr/lib/jvm/java-6-openjdk
+          strList.Add('export PATH=${JAVA_HOME}/bin:$PATH');
+          strList.Add('cd '+linuxAndroidProjectName);
+          strList.Add('keytool -genkey -v -keystore '+FSmallProjName+'-release.keystore -alias '+dummy+'aliaskey -keyalg RSA -keysize 2048 -validity 10000 < '+
+                       linuxAndroidProjectName+linuxDirSeparator+dummy+'keytool_input.txt');
+          SaveShellScript(strList, FAndroidProjectName+PathDelim+'release-keystore-macos.sh');
+
           strList.Clear;
           strList.Add('export JAVA_HOME='+linuxPathToJavaJDK);     //export JAVA_HOME=/usr/lib/jvm/java-6-openjdk
           strList.Add('cd '+linuxAndroidProjectName);
           strList.Add('jarsigner -verify -verbose -certs '+linuxAndroidProjectName+linuxDirSeparator+'bin'+linuxDirSeparator+FSmallProjName+'-release.apk');
           SaveShellScript(strList, FAndroidProjectName+PathDelim+'jarsigner-verify.sh');
+
+          //MacOs
+          strList.Clear;
+          strList.Add('export JAVA_HOME=${/usr/libexec/java_home}');     //export JAVA_HOME=/usr/lib/jvm/java-6-openjdk
+          strList.Add('export PATH=${JAVA_HOME}/bin:$PATH');
+          strList.Add('cd '+linuxAndroidProjectName);
+          strList.Add('jarsigner -verify -verbose -certs '+linuxAndroidProjectName+linuxDirSeparator+'bin'+linuxDirSeparator+FSmallProjName+'-release.apk');
+          SaveShellScript(strList, FAndroidProjectName+PathDelim+'jarsigner-verify-macos.sh');
 
           //Add GRADLE support ... [... initial code ...]
           //Building "build.gradle" file    -- for gradle we need "sdk/build-tools" >= 21.1.1

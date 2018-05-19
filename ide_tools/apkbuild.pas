@@ -622,7 +622,17 @@ begin
   Tool := TIDEExternalToolOptions.Create;
   try
     Tool.Title := 'Building APK (Ant)... ';
+
+    {$ifdef windows}
     Tool.EnvironmentOverrides.Add('JAVA_HOME=' + FJdkPath);
+    {$endif}
+    {$ifdef linux}
+    Tool.EnvironmentOverrides.Add('JAVA_HOME=' + FJdkPath);
+    {$endif}
+    {$ifdef darwin}
+    Tool.EnvironmentOverrides.Add('JAVA_HOME=${/usr/libexec/java_home}');
+    {$endif}
+
     Tool.WorkingDirectory := FProjPath;
     Tool.Executable := IncludeTrailingPathDelimiter(FAntPath) + 'ant'{$ifdef windows}+'.bat'{$endif};
     if not FileExists(Tool.Executable) then
@@ -765,7 +775,17 @@ begin
   Tool := TIDEExternalToolOptions.Create;
   try
     Tool.Title := 'Installing APK (Ant)... ';
+
+    {$ifdef windows}
     Tool.EnvironmentOverrides.Add('JAVA_HOME=' + FJdkPath);
+    {$endif}
+    {$ifdef linux}
+    Tool.EnvironmentOverrides.Add('JAVA_HOME=' + FJdkPath);
+    {$endif}
+    {$ifdef darwin}
+    Tool.EnvironmentOverrides.Add('JAVA_HOME=${/usr/libexec/java_home}');
+    {$endif}
+
     Tool.WorkingDirectory := FProjPath;
     Tool.Executable := IncludeTrailingPathDelimiter(FAntPath) + 'ant'{$ifdef windows}+'.bat'{$endif};
     Tool.CmdLineParams := 'installd';
