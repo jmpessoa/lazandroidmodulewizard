@@ -120,6 +120,9 @@ jIntentManager = class(jControl)
     function IsPackageInstalled(_packageName: string): boolean; overload;
     function GetActionMainAsString(): string;
     procedure TryDownloadPackage(_packageName: string);
+    procedure SetDataAndType(_uriData: jObject; _mimeType: string); overload;
+    procedure SetDataAndType(_uriAsString: string; _mimeType: string); overload;
+
 
  published
     property IntentAction: TIntentAction read FIntentAction write SetAction;
@@ -212,6 +215,10 @@ procedure jIntentManager_SetPackage(env: PJNIEnv; _jintentmanager: JObject; _pac
 function jIntentManager_IsPackageInstalled(env: PJNIEnv; _jintentmanager: JObject; _packageName: string): boolean; overload;
 function jIntentManager_GetActionMainAsString(env: PJNIEnv; _jintentmanager: JObject): string;
 procedure jIntentManager_TryDownloadPackage(env: PJNIEnv; _jintentmanager: JObject; _packageName: string);
+
+procedure jIntentManager_SetDataAndType(env: PJNIEnv; _jintentmanager: JObject; _uriData: jObject; _mimeType: string); overload;
+procedure jIntentManager_SetDataAndType(env: PJNIEnv; _jintentmanager: JObject; _uriAsString: string; _mimeType: string); overload;
+
 
 implementation
 
@@ -822,6 +829,20 @@ begin
   //in designing component state: set value here...
   if FInitialized then
      jIntentManager_TryDownloadPackage(FjEnv, FjObject, _packageName);
+end;
+
+procedure jIntentManager.SetDataAndType(_uriData: jObject; _mimeType: string);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jIntentManager_SetDataAndType(FjEnv, FjObject, _uriData ,_mimeType);
+end;
+
+procedure jIntentManager.SetDataAndType(_uriAsString: string; _mimeType: string);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jIntentManager_SetDataAndType(FjEnv, FjObject, _uriAsString ,_mimeType);
 end;
 
 {-------- jIntentManager_JNI_Bridge ----------}
@@ -2269,6 +2290,38 @@ begin
   jMethod:= env^.GetMethodID(env, jCls, 'TryDownloadPackage', '(Ljava/lang/String;)V');
   env^.CallVoidMethodA(env, _jintentmanager, jMethod, @jParams);
   env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jIntentManager_SetDataAndType(env: PJNIEnv; _jintentmanager: JObject; _uriData: jObject; _mimeType: string);
+var
+  jParams: array[0..1] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= _uriData;
+  jParams[1].l:= env^.NewStringUTF(env, PChar(_mimeType));
+  jCls:= env^.GetObjectClass(env, _jintentmanager);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetDataAndType', '(Landroid/net/Uri;Ljava/lang/String;)V');
+  env^.CallVoidMethodA(env, _jintentmanager, jMethod, @jParams);
+  env^.DeleteLocalRef(env,jParams[1].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+
+procedure jIntentManager_SetDataAndType(env: PJNIEnv; _jintentmanager: JObject; _uriAsString: string; _mimeType: string);
+var
+  jParams: array[0..1] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_uriAsString));
+  jParams[1].l:= env^.NewStringUTF(env, PChar(_mimeType));
+  jCls:= env^.GetObjectClass(env, _jintentmanager);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetDataAndType', '(Ljava/lang/String;Ljava/lang/String;)V');
+  env^.CallVoidMethodA(env, _jintentmanager, jMethod, @jParams);
+  env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env,jParams[1].l);
   env^.DeleteLocalRef(env, jCls);
 end;
 

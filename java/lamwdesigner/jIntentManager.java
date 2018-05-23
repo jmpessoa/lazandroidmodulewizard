@@ -1,4 +1,4 @@
-package org.lamw.appbroadcastreceiverdemo2;
+package com.example.appintentdemo1;
 
 import java.util.Iterator;
 import java.util.List;
@@ -128,7 +128,7 @@ Sending Data: Extras vs. URI Parameters
              Returns the same Intent object, for chaining multiple calls into a single statement.
 	    */
    }
-   
+      
    public void StartActivityForResult(int _requestCode) {
 	   controls.activity.startActivityForResult(mIntent,_requestCode);
 	   // //startActivityForResult(photoPickerIntent, SELECT_PHOTO);
@@ -651,6 +651,27 @@ Sending Data: Extras vs. URI Parameters
 	   t.setData(Uri.parse("market://search?q=pname:"+_packageName)); 
 	   controls.activity.startActivity(t);
    }
+   
+   /** https://stackoverflow.com/questions/13719471/why-setdataandtype-for-an-android-intent-works-fine-when-setdata-and-settype
+    * Uri uri = Uri.parse("file:///sdcard/xxx/log.txt");
+      Intent viewTestLogFileIntent = new Intent(Intent.ACTION_EDIT);
+      viewTestLogFileIntent.setDataAndType(uri,"text/plain");
+    */
+   
+   public void SetDataAndType(Uri _uriData, String _mimeType) {	// thanks to @alexc   
+	   mIntent.setDataAndType(_uriData, _mimeType);
+   }
+   
+   public void SetDataAndType(String _uriAsString, String _mimeType) {	// thanks to @alexc   
+	   mIntent.setDataAndType(Uri.parse(_uriAsString), _mimeType);
+   }
+
+   /*
+ public void SetDataUriAsString(String _uriAsString) { //Uri.parse(fileUrl) - just Strings!
+	   
+	   mIntent.setData(Uri.parse(_uriAsString));  //just Strings!
+	   
+*/
    
 }
 
