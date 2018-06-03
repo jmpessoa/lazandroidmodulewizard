@@ -5633,6 +5633,7 @@ begin
   if FParent <> nil then
   begin
     TryNewParent(refApp);
+    if FParent is jRadioGroup then flag:= True;
   end;
 
   FjPRLayoutHome:= FjPRLayout;
