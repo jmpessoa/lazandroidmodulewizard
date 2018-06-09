@@ -2990,14 +2990,14 @@ end;
 
 procedure jForm.SetCloseCallBack(Func: TOnNotify; Sender: TObject);
 begin
-  if not FInitialized then Exit;
+  //if not FInitialized then Exit; // SetCloseCallBack is normally called before Init !!
   FCloseCallBack.Event:= func;
   FCloseCallBack.Sender:= Sender;
 end;
 
 procedure jForm.SetCloseCallBack(Func: TOnCallBackData; Sender: TObject);
 begin
-  if not FInitialized then Exit;
+  //if not FInitialized then Exit; // SetCloseCallBack is normally called before Init !!
   FCloseCallBack.EventData:= func;
   FCloseCallBack.Sender:= Sender;
 end;
