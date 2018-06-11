@@ -87,7 +87,8 @@ class jDBRecordView extends ListView {
         LAMWCommon = new jCommons(this, mContext, pascalObj);
         LAMWCommon.setMarginLeftTopRightBottom(0, 0, 0, 0);
 		
-		ColorDrawable dvdr = new ColorDrawable(this.getResources().getColor(R.drawable.black));
+		//ColorDrawable dvdr = new ColorDrawable(this.getResources().getColor(R.drawable.black));
+		ColorDrawable dvdr = new ColorDrawable(0xFF000000);
 		setDivider(dvdr);
 		setDividerHeight(1);
 		setId(0xBABE);

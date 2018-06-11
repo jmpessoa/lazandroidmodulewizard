@@ -666,12 +666,6 @@ Sending Data: Extras vs. URI Parameters
 	   mIntent.setDataAndType(Uri.parse(_uriAsString), _mimeType);
    }
 
-   /*
- public void SetDataUriAsString(String _uriAsString) { //Uri.parse(fileUrl) - just Strings!
-	   
-	   mIntent.setData(Uri.parse(_uriAsString));  //just Strings!
-	   
-*/
    
 }
 
