@@ -197,16 +197,18 @@ var
 begin
   Result:= 0;
   lisDir:= TStringList.Create;
-  FindAllDirectories(lisDir, FPathToAndroidNdk+PathDelim+'platforms', False);
+
+  FindAllDirectories(lisDir, IncludeTrailingPathDelimiter(FPathToAndroidNdk)+'platforms', False);
+
   if lisDir.Count > 0 then
   begin
     for i:=0 to lisDir.Count-1 do
     begin
-       if lisDir.Strings[i] <> '' then
+       auxStr:= ExtractFileName(lisDir.Strings[i]);
+       if auxStr <> '' then
        begin
-         if Pos('P', lisDir.Strings[i]) <= 0  then  //skip android-P
+         if Pos('P', auxStr) <= 0  then  //skip android-P
          begin
-           auxStr:= lisDir.Strings[i];
            auxStr:= Copy(auxStr, LastDelimiter('-', auxStr) + 1, MaxInt);
            intAux:= StrToInt(auxStr);
            if Result < intAux then
@@ -226,14 +228,17 @@ var
   outBuildTool: string;
 begin
   Result:= 0;
-  FCandidateSdkPlatform:= 0;;
+  FCandidateSdkPlatform:= 0;
+
   lisDir:= TStringList.Create;
-  FindAllDirectories(lisDir, FPathToAndroidSDK+PathDelim+'platforms', False);
+
+  FindAllDirectories(lisDir, IncludeTrailingPathDelimiter(FPathToAndroidSDK)+'platforms', False);
+
   if lisDir.Count > 0 then
   begin
     for i:=0 to lisDir.Count-1 do
     begin
-       strApi:= lisDir.Strings[i];
+       strApi:= ExtractFileName(lisDir.Strings[i]);
        if strApi <> '' then
        begin
          if Pos('P', strApi) <= 0  then  //skip android-P
@@ -953,24 +958,22 @@ end;
 function TFormWorkspace.HasBuildTools(platform: integer;  out outBuildTool: string): boolean;
 var
   lisDir: TStringList;
-  numberAsString, builderTool, auxStr: string;
-  i, p, builderNumber: integer;
+  numberAsString, auxStr: string;
+  i, builderNumber: integer;
 begin
   Result:= False;
   lisDir:= TStringList.Create;   //C:\adt32\sdk\build-tools\19.1.0
-  FindAllDirectories(lisDir, FPathToAndroidSDK+PathDelim+'build-tools', False);
+  FindAllDirectories(lisDir, IncludeTrailingPathDelimiter(FPathToAndroidSDK)+'build-tools', False);
   if lisDir.Count > 0 then
   begin
     for i:=0 to lisDir.Count-1 do
     begin
-       auxStr:= lisDir.Strings[i];
+       auxStr:= ExtractFileName(lisDir.Strings[i]);
        if  auxStr <> '' then
        begin
          if Pos('rc2', auxStr) = 0 then   //escape some alien...
          begin
-           p:= LastDelimiter(PathDelim, auxStr) + 1;
-           builderTool:= Copy(lisDir.Strings[i], p, Length(auxStr));
-           numberAsString:= Copy(builderTool, 1 , 2);  //19
+           numberAsString:= Copy(auxStr, 1 , 2);  //19
            builderNumber:=  StrToInt(numberAsString);
            if  platform = builderNumber then Result:= True;
          end;

@@ -46,15 +46,15 @@ var
 begin
 
   lisDir:= TStringList.Create;
-  FindAllDirectories(lisDir, PathToSdk+'build-tools', False);
+  FindAllDirectories(lisDir, IncludeTrailingPathDelimiter(PathToSdk)+'build-tools', False);
   if lisDir.Count > 0 then
   begin
     for i:= 0 to lisDir.Count-1 do
     begin
-       auxStr1:= lisDir.Strings[i];
+       auxStr1:= ExtractFileName(lisDir.Strings[i]);
        if Pos('W', auxStr1) = 0 then   //drop 'android-4.4W'
        begin
-         auxStr1 := Copy(auxStr1, LastDelimiter(PathDelim, auxStr1) + 1, MaxInt);
+         auxStr1 := Copy(auxStr1, LastDelimiter('-', auxStr1) + 1, MaxInt);
          numberAsString:= StringReplace(auxStr1,'.', '', [rfReplaceAll]);
          builderNumber:=  StrToInt(Trim(numberAsString));
          if builderNumber >= 2112 then
@@ -66,13 +66,12 @@ begin
   end;
 
   lisDir.Clear;
-  FindAllDirectories(lisDir, PathToSdk+'platforms', False);
+  FindAllDirectories(lisDir, IncludeTrailingPathDelimiter(PathToSdk)+'platforms', False);
   if lisDir.Count > 0 then
   begin
     for i:= 0 to lisDir.Count-1 do
     begin
-      auxStr1:= lisDir.Strings[i];
-      auxStr1 := Copy(auxStr1, LastDelimiter(PathDelim, auxStr1) + 1, MaxInt);
+      auxStr1:= ExtractFileName(lisDir.Strings[i]);
       auxStr1 := Copy(auxStr1, LastDelimiter('-', auxStr1) + 1, MaxInt);
       builderNumber:=  StrToInt(Trim(auxStr1));
       if builderNumber > 12 then   //LAMW support only  api >= 13 ...

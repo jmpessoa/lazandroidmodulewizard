@@ -843,6 +843,7 @@ var
   s: TCheckBoxState;
   sl: TStringList;
   i: Integer;
+  strApi: string;
 begin
   inherited Create(AOwner);
   FManifest := TLamwAndroidManifestOptions.Create;
@@ -856,13 +857,22 @@ begin
       CSize := ThemeServices.GetDetailSize(Details);
     end;
 
-  sl := FindAllDirectories(LamwGlobalSettings.PathToAndroidSDK + PathDelim + 'platforms', False);
+  sl := FindAllDirectories(IncludeTrailingPathDelimiter(LamwGlobalSettings.PathToAndroidSDK) + 'platforms', False);
   try
     for i := 0 to sl.Count - 1 do
     begin
-      sl[i] := ExtractFileName(sl[i]);
-      if Copy(sl[i], 1, 8) = 'android-' then
-        seTargetSdkVersion.Items.Add(Copy(sl[i], 9, MaxInt))
+      strApi := ExtractFileName(sl[i]);
+      if strApi <> '' then
+      begin
+        if Pos('P', strApi) <= 0  then  //skip android-P
+        begin
+          if Pos('W', strApi) <= 0  then  //skip android-W
+          begin
+            strApi:= Copy(strApi, LastDelimiter('-', strApi) + 1, MaxInt);
+            seTargetSdkVersion.Items.Add(strApi);
+          end;
+        end;
+      end;
     end;
   finally
     sl.Free;

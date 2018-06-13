@@ -727,37 +727,37 @@ end;
 function TAndroidProjectDescriptor.HasBuildTools(platform: integer;  out outBuildTool: string): boolean;
 var
   lisDir: TStringList;
-  numberAsString, builderTool, auxStr: string;
-  i, p, builderNumber: integer;
+  numberAsString, auxStr: string;
+  i, builderNumber: integer;
   savedBuilder: integer;
 begin
   Result:= False;
   savedBuilder:= 0;
   lisDir:= TStringList.Create;   //C:\adt32\sdk\build-tools\19.1.0
-  FindAllDirectories(lisDir, FPathToAndroidSDK+'build-tools', False);
+
+  FindAllDirectories(lisDir, IncludeTrailingPathDelimiter(FPathToAndroidSDK)+'build-tools', False);
+
   if lisDir.Count > 0 then
   begin
     for i:= 0 to lisDir.Count-1 do
     begin
-       auxStr:= lisDir.Strings[i];
+       auxStr:= ExtractFileName(lisDir.Strings[i]);
        if  auxStr <> '' then
        begin
          if  Pos('rc2', auxStr) = 0  then   //escape some alien...
          begin
-           p:= LastDelimiter(PathDelim, auxStr) + 1;
-           builderTool:= Copy(lisDir.Strings[i], p, Length(auxStr));
-           numberAsString:= Copy(builderTool, 1 , 2);  //19
+           numberAsString:= Copy(auxStr, 1 , 2);  //19
            builderNumber:=  StrToInt(numberAsString);
 
            if savedBuilder < builderNumber then
            begin
              savedBuilder:= builderNumber;
-             if builderNumber > platform then FCandidateSdkBuild:= builderTool;
+             if builderNumber > platform then FCandidateSdkBuild:= auxStr;
            end;
 
            if  platform = builderNumber then
            begin
-             outBuildTool:= builderTool; //25.0.3
+             outBuildTool:= auxStr; //25.0.3
              Result:= True;
            end;
          end;

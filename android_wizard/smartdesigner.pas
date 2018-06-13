@@ -222,16 +222,18 @@ begin
   Result:= 0;
 
   lisDir:= TStringList.Create;
-  FindAllDirectories(lisDir, FPathToAndroidNdk+'platforms', False);
+
+  FindAllDirectories(lisDir, IncludeTrailingPathDelimiter(FPathToAndroidNdk)+'platforms', False);
+
   if lisDir.Count > 0 then
   begin
     for i:=0 to lisDir.Count-1 do
     begin
-       if lisDir.Strings[i] <> '' then
+       auxStr:= ExtractFileName(lisDir.Strings[i]);
+       if auxStr <> '' then
        begin
-         if Pos('P', lisDir.Strings[i]) <= 0  then  //skip android-P
+         if Pos('P', auxStr) <= 0  then  //skip android-P
          begin
-           auxStr:= lisDir.Strings[i];
            auxStr:= Copy(auxStr, LastDelimiter('-', auxStr) + 1, MaxInt);
            intAux:= StrToInt(auxStr);
            if Result < intAux then
@@ -256,20 +258,20 @@ begin
   FCandidateSdkPlatform:= 0;
 
   lisDir:= TStringList.Create;
-  FindAllDirectories(lisDir, FPathToAndroidSDK+'platforms', False);
+  FindAllDirectories(lisDir, IncludeTrailingPathDelimiter(FPathToAndroidSDK)+'platforms', False);
 
   if lisDir.Count > 0 then
   begin
     for i:=0 to lisDir.Count-1 do
     begin
-       if lisDir.Strings[i] <> '' then
+       strApi:= ExtractFileName(lisDir.Strings[i]);   //android-21
+       if strApi <> '' then
        begin
-         strApi:= lisDir.Strings[i];   //android-21
          if Pos('P', strApi) <= 0  then  //skip android-P
          begin
             if Pos('W', strApi) <= 0 then
             begin
-              strApi:= Copy(strApi, LastDelimiter('-', strApi) + 1, MaxInt); //21
+              strApi:= Copy(strApi, LastDelimiter('-', strApi) + 1, MaxInt);
               intApi:= StrToInt(strApi);
 
               if FCandidateSdkPlatform < intApi then
@@ -294,36 +296,36 @@ end;
 function TLamwSmartDesigner.HasBuildTools(platform: integer;  out outBuildTool: string): boolean;
 var
   lisDir: TStringList;
-  numberAsString, builderTool, auxStr: string;
-  i, p, builderNumber,  savedBuilder: integer;
+  numberAsString, auxStr: string;
+  i, builderNumber,  savedBuilder: integer;
 begin
   Result:= False;
   savedBuilder:= 0;
   lisDir:= TStringList.Create;   //C:\adt32\sdk\build-tools\19.1.0
-  FindAllDirectories(lisDir, FPathToAndroidSDK+'build-tools', False);
+
+  FindAllDirectories(lisDir, IncludeTrailingPathDelimiter(FPathToAndroidSDK)+'build-tools', False);
+
   if lisDir.Count > 0 then
   begin
     for i:=0 to lisDir.Count-1 do
     begin
-       auxStr:= lisDir.Strings[i];
+       auxStr:= ExtractFileName(lisDir.Strings[i]);
        if  auxStr <> '' then
        begin
          if Pos('rc2', auxStr) = 0 then   //escape some alien...
          begin
-           p:= LastDelimiter(PathDelim, auxStr) + 1;
-           builderTool:= Copy(lisDir.Strings[i], p, Length(auxStr));
-           numberAsString:= Copy(builderTool, 1 , 2);  //19
+           numberAsString:= Copy(auxStr, 1 , 2);  //19
            builderNumber:=  StrToInt(numberAsString);
 
            if savedBuilder < builderNumber then
            begin
              savedBuilder:= builderNumber;
-             if builderNumber > platform then FCandidateSdkBuild:= builderTool;
+             if builderNumber > platform then FCandidateSdkBuild:= auxStr;
            end;
 
            if platform = builderNumber then
            begin
-             outBuildTool:= builderTool; //19.1.0
+             outBuildTool:= auxStr; //19.1.0
              Result:= True;
            end
 
