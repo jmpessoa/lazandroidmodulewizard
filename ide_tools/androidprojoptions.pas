@@ -54,6 +54,20 @@ type
     property ThemeName: string read GetThemeName;
   end;
 
+implementation
+
+uses
+  {$if (lcl_fullversion >= 1090000)}
+  IDEOptEditorIntf,
+  {$endif}
+  LazIDEIntf, laz2_XMLWrite, FileUtil, CodeToolManager, CodeTree, LinkScanner,
+  CodeAtom, Graphics, ExtDlgs, AndroidWizard_intf, LamwDesigner, LamwSettings,
+  FPCanvas, FPimage, FPReadPNG, FPWritePNG, strutils;
+
+{$R *.lfm}
+
+type
+
   { TLamwProjectOptions }
 
   TLamwProjectOptions = class(TAbstractIDEOptionsEditor)
@@ -147,17 +161,6 @@ type
     procedure ReadSettings({%H-}AOptions: TAbstractIDEOptions); override;
     procedure WriteSettings({%H-}AOptions: TAbstractIDEOptions); override;
   end;
-
-implementation
-
-uses
-  LazIDEIntf, laz2_XMLWrite, FileUtil, CodeToolManager, CodeTree, LinkScanner,
-  CodeAtom, Graphics, ExtDlgs, AndroidWizard_intf, LamwDesigner, LamwSettings,
-  FPCanvas, FPimage, FPReadPNG, FPWritePNG, strutils;
-
-{$R *.lfm}
-
-type
 
   { TMyCanvas }
 
