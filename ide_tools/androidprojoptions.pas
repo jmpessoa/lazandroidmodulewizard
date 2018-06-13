@@ -5,7 +5,7 @@ unit AndroidProjOptions;
 interface
 
 uses
-  Classes, SysUtils, Types, LazFileUtils, laz2_XMLRead, Laz2_DOM,
+  Classes, SysUtils, Types, LazFileUtils, laz2_XMLRead, Laz2_DOM, LCLVersion,
   AvgLvlTree, IDEOptionsIntf, ProjectIntf, SourceChanger, Forms, Controls,
   Dialogs, Grids, StdCtrls, LResources, ExtCtrls, Spin, ComCtrls, Buttons,
   Themes;
