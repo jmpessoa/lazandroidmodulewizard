@@ -10,8 +10,9 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
-import java.net.InetAddress;
+//import java.net.InetAddress;
 import java.net.Socket;
+import java.net.InetSocketAddress;
 
 import android.content.Context;
 import android.os.AsyncTask;
@@ -38,15 +39,17 @@ public class jTCPSocketClient {
     // message to send to the server
     private String mServerMessage;
     
-    private boolean mRun = false;
+    private boolean mRun    = false;
     // used to send messages
     private PrintWriter mBufferOut;
     // used to read messages from the server
     private BufferedReader mBufferIn;
-    private Socket mSocket;
-    private boolean mExecutedForMessage = false;
+    private Socket  mSocket;
+    //private boolean mExecutedForMessage = false;
     private int progressStep = -1;
            	
+    private int mTimeOut = 300;
+    
     public jTCPSocketClient(Controls _ctrls, long _Self) { //Add more others news "_xxx" params if needed!
     	   //super(_ctrls.activity);
  	       context   = _ctrls.activity;
@@ -58,6 +61,7 @@ public class jTCPSocketClient {
        //free local objects...
         mBufferOut= null;;
         mBufferIn= null;
+
         if (mSocket != null) {
       	 try {
 				mSocket.close();
@@ -72,9 +76,16 @@ public class jTCPSocketClient {
     //write others [public] methods code here......
     //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
          
-    public void Connect(String _serverIP, int _serverPort) {    	  
-          SERVER_IP = _serverIP;          //IP address
+    public boolean Connect(String _serverIP, int _serverPort) {
+      return Connect( _serverIP, _serverPort, mTimeOut ); // 300 LAN TIMEOUT 5000 INTERNET TIMEOUT
+    }
+
+    public boolean Connect(String _serverIP, int _serverPort, int _timeOut) {
+    	  
+          SERVER_IP   = _serverIP;         //IP address
           SERVER_PORT = _serverPort;       //port number;
+          Boolean connected = false;
+
           if (mSocket != null) {
         	  try {
 				mSocket.close();
@@ -86,72 +97,108 @@ public class jTCPSocketClient {
           }
           
           try {
-              InetAddress serverAddr = InetAddress.getByName(SERVER_IP);
-			  mSocket = new Socket(serverAddr, SERVER_PORT);
+                   mBufferOut = null;
+                   mBufferIn  = null;
+		   mSocket = new Socket();
+                   mSocket.connect( new InetSocketAddress(SERVER_IP, SERVER_PORT), _timeOut );
+                   controls.pOnTCPSocketClientConnected(pascalObj);
+                   if( mRun ) while( mBufferOut == null ){ if(!mRun) break; }; // Wait for run
+                   connected = true;
 		  } catch (IOException e) {
 			  // TODO Auto-generated catch block
 		      e.printStackTrace();
 		  }
-          
-          controls.pOnTCPSocketClientConnected(pascalObj);
-                  	  
-     }
-       
-    public void SendMessage(String message) {
-    	
-    	if (! mExecutedForMessage) {
-    		 mExecutedForMessage = true;
-    	     new TCPSocketClientTask().execute();
-    	}     
-    	    	
+
+          if( connected && !mRun ){
+           mBufferOut = null;
+           mBufferIn  = null;
+    	   new TCPSocketClientTask().execute();
+           mRun = true;
+
+           while( mBufferOut == null ){ if(!mRun) break; }; // Wait for run
+          }
+
+          return connected;
+      }
+
+    public boolean SendMessage(String message) {
+
+        if ( mSocket == null )    return false;
+        if ( mSocket.isClosed() ) return false;
+
         if (mBufferOut != null && !mBufferOut.checkError()) {
             mBufferOut.println(message);
             mBufferOut.flush();
-        }
-        
+            return true;
+        }else
+            return false;
+
     }
-    
-     public void Connect(String _serverIP, int _serverPort, String _login) {    	  
-    	 Connect(_serverIP,_serverPort);
-    	 SendMessage(_login);       	  
+
+     public boolean Connect(String _serverIP, int _serverPort, String _login) {
+    	 if( Connect(_serverIP,_serverPort) )
+    	  if( SendMessage(_login) )
+           return true;
+
+         return false;
       }
 
-     
-      public void CloseConnection(String _finalMessage) {                
-          mRun = false;                                
+
+      public void CloseConnection(String _finalMessage) {
+
+          mRun    = false;
+          
           if (mBufferOut != null) {
-               mBufferOut.flush();
+              mBufferOut.flush();
           }
-          if (_finalMessage.equals("")) 
+
+          if (_finalMessage.equals(""))
               SendMessage("client_closed");
-          else SendMessage(_finalMessage);
+          else
+              SendMessage(_finalMessage);
+
+          if (mSocket != null) {
+        	  try {
+				mSocket.close();
+				mSocket = null;
+			  } catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			  }
+          }
       }
-      
+
       public void CloseConnection() {
       	CloseConnection("client_closed");
       }
-              
+
       class TCPSocketClientTask extends AsyncTask<String, String, String> {
           @Override
-          protected String doInBackground(String... message) {               
+          protected String doInBackground(String... message) {
               mRun = true;
-              //in this while the client listens for the messages sent by the server        	  
+
+              //in this while the client listens for the messages sent by the server
               while (mRun) {
-                    if ( mSocket!= null && !mSocket.isClosed()) {             		
-                        try {                    	
-    						mBufferOut = new PrintWriter(new BufferedWriter(new OutputStreamWriter(mSocket.getOutputStream())), true);
-    	                    mBufferIn = new BufferedReader(new InputStreamReader(mSocket.getInputStream()));              
+
+                        try {
+                          if ( mSocket != null && !mSocket.isClosed()) {
+    			    mBufferOut = new PrintWriter(new BufferedWriter(new OutputStreamWriter(mSocket.getOutputStream())), true);
+    	                    mBufferIn  = new BufferedReader(new InputStreamReader(mSocket.getInputStream()));
+
     	                    if (mBufferIn != null)
-    	                           mServerMessage = mBufferIn.readLine();
-    	                    if (mServerMessage != null )                     	
-    	                       	 publishProgress(mServerMessage);
-    					} catch (IOException e) {
-    						// TODO Auto-generated catch block
-    						Log.e("jTCPSocketClient", "Error_doInBackground", e);
-    						e.printStackTrace();
-    					}                                 	                                         
-               	    }        	        	             
+                                mServerMessage = mBufferIn.readLine();
+
+    	                    if (mServerMessage != null )
+    	                       	publishProgress(mServerMessage);
+                          }
+    			} catch (IOException e) {
+    		            // TODO Auto-generated catch block
+    			    Log.e("jTCPSocketClient", "Error_doInBackground", e);
+    			    e.printStackTrace();
+    			}
+
               }
+
               return null;
           }
 
@@ -164,8 +211,11 @@ public class jTCPSocketClient {
           @Override
           protected void onPostExecute(String values) {    	  
             super.onPostExecute(values);   	  
-            try {                	         	   
-     			mSocket.close();
+            try {
+              if( mSocket != null ){
+               mSocket.close();
+               mSocket = null;
+              }
      	    } catch (IOException e) {
      			// TODO Auto-generated catch block
      			e.printStackTrace();
@@ -200,7 +250,7 @@ public class jTCPSocketClient {
           @Override
           protected String doInBackground(String... values) {
         	  
-              if ( mSocket!= null && !mSocket.isClosed()) {            	  
+              if ( mSocket != null && !mSocket.isClosed()) {
                         try {
                         	
                             //DataInputStream dis = new DataInputStream(new BufferedInputStream(mSocket.getInputStream()));                        	
@@ -277,7 +327,10 @@ public class jTCPSocketClient {
             super.onPostExecute(value);   	  
             controls.pOnTCPSocketClientFileSendFinished(pascalObj, filename, filesize);  
             try {                	         	   
-     			mSocket.close();
+     	      if( mSocket != null ){
+               mSocket.close();
+               mSocket = null;
+              }
      	    } catch (IOException e) {
      			// TODO Auto-generated catch block
      			e.printStackTrace();
@@ -295,6 +348,10 @@ public class jTCPSocketClient {
     	     progressStep = _bytes;
     	  else
     	     progressStep = 512;    		  
+      }
+      
+      public void SetTimeOut(int _millisecondsTimeOut) {
+    	  mTimeOut = _millisecondsTimeOut;
       }
       
 }
