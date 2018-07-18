@@ -849,6 +849,7 @@ var
   outMaxBuildTool: string;
   androidTheme: string;
   isProjectImported: boolean;
+  sdkManifestTargetApi, manifestBuildTool: string;
 begin
 
   if not AProject.CustomData.Contains('LAMW') then
@@ -882,7 +883,7 @@ begin
     p:= LastDelimiter(PathDelim, tempStr) + 1;
     FSmallProjName:= Copy(tempStr,  p, Length(tempStr));
 
-    FPackageName := CustomData['Package'];  //legacy
+    FPackageName := CustomData['Package'];
     if FPackageName = '' then
     begin
       FPackageName := GetPackageNameFromAndroidManifest(FPathToAndroidProject);
@@ -982,7 +983,18 @@ begin
        if not IsSdkToolsAntEnable(FPathToAndroidSDK) then
            AProject.CustomData['BuildSystem']:= 'Gradle'
   end;
-  KeepBuildUpdated(maxSdkApi, outMaxBuildTool {25.0.5});
+
+  //LamwGlobalSettings.PathToGradle
+  if LamwGlobalSettings.KeepManifestTargetApi  then  //
+  begin
+    sdkManifestTargetApi:= GetTargetFromManifest();
+    manifestBuildTool:=  GetBuildTool(StrToInt(sdkManifestTargetApi));
+    KeepBuildUpdated(StrToInt(sdkManifestTargetApi), manifestBuildTool {25.0.5});
+  end
+  else
+  begin
+    KeepBuildUpdated(maxSdkApi, outMaxBuildTool {25.0.5});
+  end;
 
 end;
 

@@ -51,6 +51,7 @@ type
     function GetCanUpdateJavaTemplate: Boolean;
     function GetInstructionSet: string;
     function GetPrebuildOSYS: string;
+    function GetKeepManifestTargetApi: boolean;
   public
     constructor Create;
     destructor Destroy; override;
@@ -73,6 +74,9 @@ type
     property PathToGradle: string read GetPathToGradle;
     property InstructionSet: string read GetInstructionSet;
     property PrebuildOSYS: string read  GetPrebuildOSYS;
+
+    // volatile :: = 't'
+    property KeepManifestTargetApi: boolean read GetKeepManifestTargetApi;
   end;
 
 var
@@ -260,6 +264,16 @@ function TLamwGlobalSettings.GetPrebuildOSYS: string;
 begin
   FPrebuildOSYS:= ReadIniString('PrebuildOSYS');
   Result:= FPrebuildOSYS;
+end;
+
+function TLamwGlobalSettings.GetKeepManifestTargetApi: boolean;
+var
+  keepManifestApi: string;
+begin
+  Result:= False;
+  ReloadIni;
+  keepManifestApi:= ReadIniString('KeepManifestTargetApi');
+  if keepManifestApi = 't' then Result:= True;
 end;
 
 constructor TLamwGlobalSettings.Create;

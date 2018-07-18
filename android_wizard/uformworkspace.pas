@@ -18,6 +18,7 @@ type
     CheckBoxLibrary: TCheckBox;
     CheckBoxPIE: TCheckBox;
     cbBuildSystem: TComboBox;
+    Label1: TLabel;
     ListBoxNdkPlatform: TComboBox;
     ListBoxMinSDK: TComboBox;
     ListBoxTargetAPI: TComboBox;
@@ -45,6 +46,7 @@ type
     SpdBtnPathToWorkspace: TSpeedButton;
     SpdBtnRefreshProjectName: TSpeedButton;
     SpeedButton1: TSpeedButton;
+    SpeedButton2: TSpeedButton;
     SpeedButtonHintTheme: TSpeedButton;
     StatusBarInfo: TStatusBar;
 
@@ -60,12 +62,14 @@ type
     procedure ListBoxMinSDKChange(Sender: TObject);
     procedure ListBoxNdkPlatformChange(Sender: TObject);
     procedure ListBoxTargetAPIChange(Sender: TObject);
+    procedure PanelButtonsClick(Sender: TObject);
 
     procedure RGInstructionClick(Sender: TObject);
 
     procedure SpdBtnPathToWorkspaceClick(Sender: TObject);
     procedure SpdBtnRefreshProjectNameClick(Sender: TObject);
     procedure SpeedButton1Click(Sender: TObject);
+    procedure SpeedButton2Click(Sender: TObject);
     procedure SpeedButtonHintThemeClick(Sender: TObject);
 
   private
@@ -231,7 +235,6 @@ begin
   FCandidateSdkPlatform:= 0;
 
   lisDir:= TStringList.Create;
-
   FindAllDirectories(lisDir, IncludeTrailingPathDelimiter(FPathToAndroidSDK)+'platforms', False);
 
   if lisDir.Count > 0 then
@@ -327,8 +330,18 @@ end;
 
 procedure TFormWorkspace.ListBoxTargetAPIChange(Sender: TObject);
 begin
-  //
+  if ListBoxTargetAPI.Text <> '' then
+  begin
+     FTargetApi:= ListBoxTargetAPI.Items[ListBoxTargetAPI.ItemIndex];
+     FMaxSdkPlatform:= StrToInt(ListBoxTargetAPI.Text);
+  end;
 end;
+
+procedure TFormWorkspace.PanelButtonsClick(Sender: TObject);
+begin
+
+end;
+
 
 procedure TFormWorkspace.RGInstructionClick(Sender: TObject);
 begin
@@ -679,6 +692,7 @@ begin
   end;
 
 end;
+
 
 procedure TFormWorkspace.ListBoxMinSDKChange(Sender: TObject);
 var
@@ -1093,6 +1107,7 @@ begin
 
 end;
 
+
 procedure TFormWorkspace.ComboSelectProjectNameKeyPress(Sender: TObject;
   var Key: char);
 begin
@@ -1102,6 +1117,7 @@ begin
     BitBtnOK.SetFocus;
   end;
 end;
+
 
 procedure TFormWorkspace.SpdBtnPathToWorkspaceClick(Sender: TObject);
 begin
@@ -1135,6 +1151,48 @@ begin
            sLineBreak+' 5. Android SDK/Extra  "Support Library"'+
            sLineBreak+' '+
            sLineBreak+' Hint: "Ctrl + C" to copy this content to Clipboard!');
+end;
+
+procedure TFormWorkspace.SpeedButton2Click(Sender: TObject);
+var
+  lisDir: TStringList;
+  strApi, outBuildTool: string;
+  i, intApi: integer;
+begin
+  lisDir:= TStringList.Create;
+  FindAllDirectories(lisDir, IncludeTrailingPathDelimiter(FPathToAndroidSDK)+'platforms', False);
+
+  if lisDir.Count > 0 then
+  begin
+    ListBoxTargetAPI.Clear;
+    for i:=0 to lisDir.Count-1 do
+    begin
+       strApi:= ExtractFileName(lisDir.Strings[i]);
+       if strApi <> '' then
+       begin
+         if Pos('P', strApi) <= 0  then  //skip android-P
+         begin
+           if Pos('W', strApi) <= 0  then  //skip android-W
+           begin
+             strApi:= Copy(strApi, LastDelimiter('-', strApi) + 1, MaxInt);
+             intApi:= StrToInt(strApi);
+             if HasBuildTools(intApi, outBuildTool) then
+             begin
+                ListBoxTargetAPI.Items.Add(strApi);
+             end;
+           end;
+         end;
+       end;
+    end;
+    if ListBoxTargetAPI.Items.Count > 0 then
+    begin
+      ListBoxTargetAPI.ItemIndex:= ListBoxTargetAPI.Items.Count - 1;
+      FTargetApi:= ListBoxTargetAPI.Items[ListBoxTargetAPI.ItemIndex];
+      FMaxSdkPlatform:= StrToInt(ListBoxTargetAPI.Text);
+    end;
+  end;
+  lisDir.free;
+
 end;
 
 procedure TFormWorkspace.SpeedButtonHintThemeClick(Sender: TObject);

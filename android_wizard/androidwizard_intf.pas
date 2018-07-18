@@ -927,7 +927,6 @@ var
   strPack: string;
   sdkBuildTools, pluginVersion: string;
   compileSdkVersion: string;
-  //tempList: TStringList;
   androidPluginStr: string;
   androidPluginNumber: integer;
   tagVersion: integer;
@@ -1764,8 +1763,10 @@ begin
           {$ENDIF}
           strList.SaveToFile(FAndroidProjectName+PathDelim+'local.properties');
 
-          compileSdkVersion:= IntToStr(FMaxSdkPlatform);
-          sdkBuildTools:= GetBuildTool(FMaxSdkPlatform);
+          //compileSdkVersion:= IntToStr(FMaxSdkPlatform);
+          //sdkBuildTools:= GetBuildTool(FMaxSdkPlatform);
+          compileSdkVersion:= FTargetApi;
+          sdkBuildTools:= GetBuildTool(StrToInt(FTargetApi));
 
           if sdkBuildTools = '' then sdkBuildTools:= FCandidateSdkBuild;
 
@@ -1798,8 +1799,10 @@ begin
                 strList.Add('    lintOptions {');
                 strList.Add('       abortOnError false');
                 strList.Add('    }');
+
                 strList.Add('    compileSdkVersion '+compileSdkVersion);  //25
                 strList.Add('    buildToolsVersion "'+sdkBuildTools+'"'); //25.0.3
+
                 strList.Add('    defaultConfig {');
 
                 if Pos('AppCompat', FAndroidTheme) > 0 then
@@ -1808,13 +1811,13 @@ begin
                      strList.Add('            minSdkVersion '+FMinApi)
                   else
                      strList.Add('            minSdkVersion 14');
-                  strList.Add('            targetSdkVersion '+ compileSdkVersion);
                 end
                 else
                 begin
                    strList.Add('            minSdkVersion '+FMinApi);
-                   strList.Add('            targetSdkVersion '+compileSdkVersion{FTargetApi});
                 end;
+
+                strList.Add('            targetSdkVersion '+ compileSdkVersion);
 
                 strList.Add('            versionCode 1');
                 strList.Add('            versionName "1.0"');
@@ -1842,14 +1845,11 @@ begin
                    strList.Add('    compile ''com.android.support:design:25.3.1''');
                    strList.Add('    compile ''com.android.support:cardview-v7:25.3.1''');
                    strList.Add('    compile ''com.android.support:recyclerview-v7:25.3.1''');
-                   {
-                   Extras
-                   Android Support Repository
-                   Android Support Library
-                   C:\adt32\sdk\  extras\android\m2repository\com\android\support\appcompat-v7
-                   C:\adt32\sdk\  extras\android\m2repository\com\android\support\design
-                   C:\adt32\sdk\  extras\android\m2repository\com\android\support\cardview-v7
-                   C:\adt32\sdk\  extras\android\m2repository\com\android\support\recyclerview-v7  //25.3.1
+                   {from:
+                   C:\android\sdk\extras\android\m2repository\com\android\support\appcompat-v7
+                   C:\android\sdk\extras\android\m2repository\com\android\support\design
+                   C:\android\sdk\extras\android\m2repository\com\android\support\cardview-v7
+                   C:\android\sdk\extras\android\m2repository\com\android\support\recyclerview-v7  //25.3.1
                    }
                 end;
                 strList.Add('}');
