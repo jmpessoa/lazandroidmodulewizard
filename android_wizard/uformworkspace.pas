@@ -62,7 +62,6 @@ type
     procedure ListBoxMinSDKChange(Sender: TObject);
     procedure ListBoxNdkPlatformChange(Sender: TObject);
     procedure ListBoxTargetAPIChange(Sender: TObject);
-    procedure PanelButtonsClick(Sender: TObject);
 
     procedure RGInstructionClick(Sender: TObject);
 
@@ -202,6 +201,8 @@ begin
   Result:= 0;
   lisDir:= TStringList.Create;
 
+  ListBoxNdkPlatform.Clear;
+
   FindAllDirectories(lisDir, IncludeTrailingPathDelimiter(FPathToAndroidNdk)+'platforms', False);
 
   if lisDir.Count > 0 then
@@ -215,13 +216,23 @@ begin
          begin
            auxStr:= Copy(auxStr, LastDelimiter('-', auxStr) + 1, MaxInt);
            intAux:= StrToInt(auxStr);
+
+           if intAux > 13 then
+              ListBoxNdkPlatform.Items.Add(auxStr);
+
            if Result < intAux then
-                Result:= intAux;
+           begin
+              Result:= intAux;
+           end;
+
          end;
        end;
     end;
+    if ListBoxNdkPlatform.Items.Count > 0 then
+       ListBoxNdkPlatform.ItemIndex:= ListBoxNdkPlatform.Items.Count-1;
   end;
   lisDir.free;
+
 end;
 
 function TFormWorkspace.GetMaxSdkPlatform(): integer;
@@ -291,7 +302,8 @@ begin
   else if api='24' then Result:= 'Nougat 7.0'
   else if api='25' then Result:= 'Nougat 7.1'
   else if api='26' then Result:= 'Oreo 8.0'
-  else if api='27' then Result:= 'Oreo 8.1';
+  else if api='27' then Result:= 'Oreo 8.1'
+  else if api='28' then Result:= 'Oreo 8.2';
 end;
 
 //http://developer.android.com/about/dashboards/index.html
@@ -324,8 +336,8 @@ end;
 
 procedure TFormWorkspace.ListBoxNdkPlatformChange(Sender: TObject);
 begin
- //FAndroidNdkPlatform:= 'android-'+ListBoxNdkPlatform.Items[ListBoxNdkPlatform.ItemIndex];
- //StatusBarInfo.Panels.Items[0].Text:='[Ndk] '+ GetCodeNameByApi(ListBoxNdkPlatform.Items[ListBoxNdkPlatform.ItemIndex]);
+ FAndroidNdkPlatform:= 'android-'+ListBoxNdkPlatform.Items[ListBoxNdkPlatform.ItemIndex];
+ StatusBarInfo.Panels.Items[0].Text:='[Ndk] '+ GetCodeNameByApi(ListBoxNdkPlatform.Items[ListBoxNdkPlatform.ItemIndex]);
 end;
 
 procedure TFormWorkspace.ListBoxTargetAPIChange(Sender: TObject);
@@ -336,12 +348,6 @@ begin
      FMaxSdkPlatform:= StrToInt(ListBoxTargetAPI.Text);
   end;
 end;
-
-procedure TFormWorkspace.PanelButtonsClick(Sender: TObject);
-begin
-
-end;
-
 
 procedure TFormWorkspace.RGInstructionClick(Sender: TObject);
 begin
@@ -1007,6 +1013,8 @@ begin          //C:\adt32\sdk\tools\ant
 end;
 
 procedure TFormWorkspace.FormActivate(Sender: TObject);
+var
+  i: integer;
 begin
   EditPathToWorkspace.Left:= 8; // try fix hidpi bug
   ComboSelectProjectName.Left:= 8;  // try fix hidpi bug
@@ -1016,10 +1024,14 @@ begin
   ListBoxTargetAPI.ItemIndex:= 0;
   StatusBarInfo.Panels.Items[2].Text:='[Target] '+ GetCodeNameByApi(ListBoxTargetAPI.Items[ListBoxTargetAPI.ItemIndex]);
 
-  ListBoxNdkPlatform.Clear; //NDK
-  ListBoxNdkPlatform.Items.Add(IntToStr(FMaxNdkPlatform));
-  ListBoxNdkPlatform.ItemIndex:= 0;
-  StatusBarInfo.Panels.Items[0].Text:='[Ndk] '+ GetCodeNameByApi(ListBoxNdkPlatform.Items[ListBoxNdkPlatform.ItemIndex]);
+  //ListBoxNdkPlatform.Clear; //NDK
+  //ListBoxNdkPlatform.Items.Add(IntToStr(FMaxNdkPlatform));
+
+  if ListBoxNdkPlatform.Items.Count > 0 then
+  begin
+    ListBoxNdkPlatform.ItemIndex:= ListBoxNdkPlatform.Items.Count-1 ;  //0;
+    StatusBarInfo.Panels.Items[0].Text:='[Ndk] '+ GetCodeNameByApi(ListBoxNdkPlatform.Items[ListBoxNdkPlatform.ItemIndex]);
+  end;
 
   ListBoxMinSDK.ItemIndex:= 1;
   FMinApi:= ListBoxMinSDK.Items[ListBoxMinSDK.ItemIndex];

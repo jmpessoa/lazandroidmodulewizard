@@ -1222,6 +1222,7 @@ end;
     procedure RemoveFromLayoutParent();
     procedure SetLayoutVisibility(_value: boolean);
     procedure ResetLayoutParent();
+    function GetSettingsSystemInt(_strKey: string): integer;
 
     // Property            FjRLayout
     property View         : jObject        read FjRLayout; //layout!
@@ -1630,6 +1631,8 @@ procedure jForm_SetViewParent(env: PJNIEnv; _jform: JObject; _viewgroup: jObject
 procedure jForm_RemoveFromViewParent(env: PJNIEnv; _jform: JObject);
 procedure jForm_SetLayoutVisibility(env: PJNIEnv; _jform: JObject; _value: boolean);
 function jForm_GetParent(env: PJNIEnv; _jform: JObject): jObject;
+function jForm_GetSettingsSystemInt(env: PJNIEnv; _jform: JObject; _strKey: string): integer;
+
 
 //------------------------------------------------------------------------------
 // View  - Generics
@@ -3792,6 +3795,13 @@ begin
      jForm_SetLayoutVisibility(FjEnv, FjObject, _value);
 end;
 
+function jForm.GetSettingsSystemInt(_strKey: string): integer;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jForm_GetSettingsSystemInt(FjEnv, FjObject, _strKey);
+end;
+
 {-------- jForm_JNI_Bridge ----------}
 
 function jForm_GetPathFromAssetsFile(env: PJNIEnv; _jform: JObject; _assetsFileName: string): string;
@@ -5216,6 +5226,19 @@ begin
   env^.DeleteLocalRef(env, jCls);
 end;
 
+function jForm_GetSettingsSystemInt(env: PJNIEnv; _jform: JObject; _strKey: string): integer;
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_strKey));
+  jCls:= env^.GetObjectClass(env, _jform);
+  jMethod:= env^.GetMethodID(env, jCls, 'GetSettingsSystemInt', '(Ljava/lang/String;)I');
+  Result:= env^.CallIntMethodA(env, _jform, jMethod, @jParams);
+  env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
 
 //-----{ jApp } ------
 

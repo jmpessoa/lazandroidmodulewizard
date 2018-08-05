@@ -8,6 +8,7 @@ interface
 
 uses
   Classes,
+  sadmob,
   sdrawerlayout,
   snavigationview,
   scoordinatorlayout,
@@ -33,6 +34,7 @@ implementation
   
 Procedure Register;
 begin
+  {$I jsadmob_icon.lrs}
   {$I jsdrawerlayout_icon.lrs}
   {$I jsnavigationview_icon.lrs}
   {$I jscoordinatorlayout_icon.lrs}
@@ -49,6 +51,7 @@ begin
   {$I jstextinput_icon.lrs}
   RegisterComponents('Android Bridges Support',
     [
+      jsAdMob,
       jsDrawerLayout,
       jsNavigationView,
       jsCoordinatorLayout,

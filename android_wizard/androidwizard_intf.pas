@@ -1845,6 +1845,7 @@ begin
                    strList.Add('    compile ''com.android.support:design:25.3.1''');
                    strList.Add('    compile ''com.android.support:cardview-v7:25.3.1''');
                    strList.Add('    compile ''com.android.support:recyclerview-v7:25.3.1''');
+                   strList.Add('    compile ''com.google.android.gms:play-services-ads:11.0.4''');
                    {from:
                    C:\android\sdk\extras\android\m2repository\com\android\support\appcompat-v7
                    C:\android\sdk\extras\android\m2repository\com\android\support\design

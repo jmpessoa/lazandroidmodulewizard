@@ -1,4 +1,4 @@
-package org.lamw.appcompatnavigationdrawerdemo1;
+package org.lamw.appanttestaa1;
 
 //LAMW: Lazarus Android Module Wizard  - version 0.8  - 31 March  - 2018 
 //RAD Android: Project Wizard, Form Designer and Components Development Model!
@@ -133,6 +133,8 @@ import javax.microedition.khronos.egl.EGLContext;
 import javax.microedition.khronos.egl.EGLDisplay;
 import javax.microedition.khronos.egl.EGLSurface;
 
+import android.provider.Settings;
+import android.provider.Settings.SettingNotFoundException;
 
 //-------------------------------------------------------------------------
 //Constants
@@ -390,13 +392,17 @@ public int getSystemVersion()
 }
 
  public boolean SetWifiEnabled(boolean _status) {
-    WifiManager wifiManager = (WifiManager)this.controls.activity.getSystemService(Context.WIFI_SERVICE);             
-    return wifiManager.setWifiEnabled(_status);
+    //WifiManager wifiManager = (WifiManager)this.controls.activity.getSystemService(Context.WIFI_SERVICE);
+	 WifiManager wifiManager = (WifiManager)this.controls.activity.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+
+	 return wifiManager.setWifiEnabled(_status);
  }
 
  public boolean IsWifiEnabled() {
-    WifiManager wifiManager = (WifiManager)this.controls.activity.getSystemService(Context.WIFI_SERVICE);
-    return  wifiManager.isWifiEnabled();	
+    //WifiManager wifiManager = (WifiManager)this.controls.activity.getSystemService(Context.WIFI_SERVICE);
+    WifiManager wifiManager = (WifiManager)this.controls.activity.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+
+	 return  wifiManager.isWifiEnabled();
  }
          
  public boolean IsMobileDataEnabled() {
@@ -781,7 +787,7 @@ public void ShowCustomMessage(View _layout,  int _gravity) {
 	if (par != null) {
 	    par.removeView(_layout);        	    
 	}    
-    _layout.setVisibility(0);
+    _layout.setVisibility(View.VISIBLE);
     toast.setView(_layout);
     toast.show();
 }
@@ -812,7 +818,7 @@ public void ShowCustomMessage(View _layout,  int _gravity,  int _lenghTimeSecond
 	if (par != null) {
 	    par.removeView(_layout);        	    
 	}    
-    _layout.setVisibility(0);
+    _layout.setVisibility(View.VISIBLE);//0
     toast.setView(_layout);    				
     //it will show the toast for 20 seconds: 
     //(20000 milliseconds/1st argument) with interval of 1 second/2nd argument //--> (20 000, 1000)
@@ -1109,8 +1115,10 @@ return r;
 
 //ref. http://www.devlper.com/2010/07/getting-ip-address-of-the-device-in-android/
 public String GetDeviceWifiIPAddress() {
-    WifiManager mWifi = (WifiManager) controls.activity.getSystemService(Context.WIFI_SERVICE);  
-    //String ip = Formatter.formatIpAddress(    		
+    //WifiManager mWifi = (WifiManager) controls.activity.getSystemService(Context.WIFI_SERVICE);
+	WifiManager mWifi = (WifiManager)this.controls.activity.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+
+	//String ip = Formatter.formatIpAddress(
     int  ipAddress = mWifi.getConnectionInfo().getIpAddress();
     String sIP =String.format("%d.%d.%d.%d",
     		(ipAddress & 0xff),
@@ -1126,7 +1134,8 @@ public String GetDeviceWifiIPAddress() {
   */
   public String GetWifiBroadcastIPAddress() throws IOException {
 	String r = null;
-    WifiManager mWifi = (WifiManager) controls.activity.getSystemService(Context.WIFI_SERVICE);  
+    //WifiManager mWifi = (WifiManager) controls.activity.getSystemService(Context.WIFI_SERVICE);
+	  WifiManager mWifi = (WifiManager)this.controls.activity.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
 	// DhcpInfo  is a simple object for retrieving the results of a DHCP request
     DhcpInfo dhcp = mWifi.getDhcpInfo(); 
     if (dhcp == null) {     
@@ -1291,6 +1300,17 @@ public String ParseHtmlFontAwesome(String _htmlString) {
 	   //button.setText(getString((char)valLong+"");
 	   return (char)valLong+"" ;
 }
+
+//https://developer.android.com/reference/android/provider/Settings.System
+
+	public int GetSettingsSystemInt(String _strKey) {
+		try {
+			return android.provider.Settings.System.getInt(controls.activity.getContentResolver(), _strKey);
+		} catch(android.provider.Settings.SettingNotFoundException e) {
+			return -1;
+		}
+	}
+
 
 }
 //**class entrypoint**//please, do not remove/change this line!
@@ -1716,15 +1736,32 @@ public String getLocale(int localeType) {
 // -------------------------------------------------------------------------
 // Result: Phone Number - LORDMAN
 public  String getDevPhoneNumber() {
+	String f = "";
+
   TelephonyManager telephony = (TelephonyManager) activity.getSystemService(Context.TELEPHONY_SERVICE);
-  return ( telephony.getLine1Number() );
+  if (telephony!=null) {
+	  try {
+		  f = telephony.getLine1Number();
+	  } catch (SecurityException ex) {
+		  Log.e("getDevPhoneNumber", ex.getMessage());
+	  }
+  }
+  return f;
 }
 
 // Result: Device ID - LORDMAN
 // Remarks : Nexus7 (no moblie device) -> Crash : fixed code - Simon
 public  String getDevDeviceID() {
+	String f = "";
   TelephonyManager telephony = (TelephonyManager) activity.getSystemService(Context.TELEPHONY_SERVICE);
-  return ( telephony.getDeviceId()    );
+	if (telephony!=null) {
+		try {
+			f = telephony.getDeviceId();
+		} catch (SecurityException ex) {
+			Log.e("getDevDeviceID", ex.getMessage());
+		}
+	}
+  return f;
 }
 // -------------------------------------------------------------------------
 //  Bitmap

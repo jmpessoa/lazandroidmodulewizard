@@ -501,6 +501,13 @@ type
      procedure Draw; override;
   end;
 
+  { TDraftSAdMob }
+
+  TDraftSAdMob = class(TDraftWidget)
+  public
+     procedure Draw; override;
+  end;
+
   { TDraftSCardView }
 
   TDraftSCardView = class(TDraftWidget)
@@ -673,7 +680,7 @@ uses
   sfloatingbutton, scoordinatorlayout, stoolbar, sdrawerlayout,
   snavigationview, scardview, srecyclerview, stextinput,
   sviewpager, scollapsingtoolbarlayout, stablayout, sappbarlayout,
-  sbottomnavigationview, snestedscrollview, treelistview{, gl2SurfaceView}, customcamera;
+  sbottomnavigationview, snestedscrollview, treelistview{, gl2SurfaceView}, customcamera, sadmob;
 
 const
   DrawableSearchPaths: array [0..3] of string = (
@@ -1373,6 +1380,21 @@ begin
   begin
     if jLinearLayout(FAndroidWidget).BackgroundColor <> colbrDefault then
       Brush.Color := ToTColor(jLinearLayout(FAndroidWidget).BackgroundColor)
+    else begin
+      Brush.Color:= clNone;
+      Brush.Style:= bsClear;
+    end;
+    Rectangle(0, 0, FAndroidWidget.Width, FAndroidWidget.Height);    // outer frame
+  end;
+end;
+
+  { TDraftSAdMob }
+procedure TDraftSAdMob.Draw;
+begin
+  with Fcanvas do
+  begin
+    if jsAdMob(FAndroidWidget).BackgroundColor <> colbrDefault then
+      Brush.Color := ToTColor(jsAdMob(FAndroidWidget).BackgroundColor)
     else begin
       Brush.Color:= clNone;
       Brush.Style:= bsClear;
@@ -4152,13 +4174,14 @@ initialization
   RegisterAndroidWidgetDraftClass(jDrawingView, TDraftDrawingView);
 
   // TODO :: (default drawing and layout)
-  RegisterAndroidWidgetDraftClass(jCanvasES1, TDraftWidget);
   RegisterAndroidWidgetDraftClass(jCanvasES2, TDraftWidget);
+  RegisterAndroidWidgetDraftClass(jCanvasES1, TDraftWidget);
+
   RegisterAndroidWidgetDraftClass(jChronometer, TDraftWidget);
   RegisterAndroidWidgetDraftClass(jViewFlipper, TDraftWidget);
   RegisterAndroidWidgetDraftClass(jVideoView, TDraftWidget);
-  RegisterAndroidWidgetDraftClass(jToolbar, TDraftToolbar);
 
+  RegisterAndroidWidgetDraftClass(jToolbar, TDraftToolbar);
   RegisterAndroidWidgetDraftClass(jFrameLayout, TDraftFrameLayout);
   RegisterAndroidWidgetDraftClass(jLinearLayout, TDraftLinearLayout);
   RegisterAndroidWidgetDraftClass(jCaptionPanel, TDraftCaptionPanel);
@@ -4180,6 +4203,7 @@ initialization
 
   RegisterAndroidWidgetDraftClass(jsCollapsingToolbarLayout, TDraftSCollapsingToolbarLayout);
   RegisterAndroidWidgetDraftClass(jsNestedScrollView, TDraftSNestedScrollView);
+  RegisterAndroidWidgetDraftClass(jsAdMob, TDraftSAdMob);
 
 finalization
   DraftClassesMap.Free;

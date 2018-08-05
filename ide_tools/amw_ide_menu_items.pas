@@ -27,7 +27,7 @@ procedure Register;
 implementation
 
 uses LazIDEIntf, LazFileUtils, CompOptsIntf, IDEMsgIntf, IDEExternToolIntf,
-  ProjectIntf, MacroIntf, Controls, ApkBuild, IniFiles;
+  ProjectIntf, MacroIntf, Controls, ApkBuild, IniFiles, LCLType;
 
 
 procedure StartFPCTrunkSource(Sender: TObject);
@@ -41,6 +41,62 @@ begin
   // Call path tool Code
   FormSettingsPaths:=  TFormSettingsPaths.Create(Application);
   FormSettingsPaths.ShowModal;
+end;
+
+procedure StartExportLibToPath(Sender: TObject);
+var
+  Project: TLazProject;
+  linkLibrariesPath, aux: string;
+  chip, libChip: string;
+  p: integer;
+  pathToProject, pathToLib: string;
+  pathToAndroidStudioJniLib: string;
+begin
+  Project:= LazarusIDE.ActiveProject;
+  if Assigned(Project) and (Project.CustomData.Values['LAMW'] <> '' ) then
+  begin
+     linkLibrariesPath:='';                       //C:\adt32\ndk10e\platforms\android-15\arch-x86\usr\lib\
+     aux:= Project.LazCompilerOptions.Libraries; //C:\adt32\ndk10e\platforms\android-15\arch-arm\usr\lib\; .....
+     p:= Pos(';', aux);
+     if p > 0 then
+     begin
+        linkLibrariesPath:= Trim(Copy(aux, 1, p-1));
+        chip:= 'arm';
+        if Pos('-x86', linkLibrariesPath) > 0 then chip:= 'x86';
+        if chip = 'arm' then
+        begin
+           libChip:= 'armeabi';       //armeabi armeabi-v7a x86
+           if Pos('-CpARMV7', Project.LazCompilerOptions.CustomOptions) > 0 then
+             libChip:= 'armeabi-v7a'; //-Xd -CfSoft -CpARMV6 -XParm-linux-androideabi-
+        end
+        else
+          libChip:= 'x86';
+     end;
+     p:= Pos(DirectorySeparator+'jni', Project.ProjectInfoFile);
+     pathToProject:= Copy(Project.ProjectInfoFile, 1, p);
+     pathToLib:= pathToProject+'libs'+ DirectorySeparator + libChip;
+     pathToAndroidStudioJniLib:= pathToProject+'build'+DirectorySeparator+
+                                 'intermediates'+DirectorySeparator+
+                                 'jniLibs'+DirectorySeparator+
+                                 'debug'+DirectorySeparator+libChip;
+
+     if ForceDirectories(pathToAndroidStudioJniLib) then
+     begin
+        if FileExists(pathToLib+DirectorySeparator+'libcontrols.so') then
+        begin
+          CopyFile(pathToLib+DirectorySeparator+'libcontrols.so',
+                   pathToAndroidStudioJniLib+DirectorySeparator+'libcontrols.so');
+          //IDEMessagesWindow.BringToFront;
+          IDEMessagesWindow.SelectMsgLine(
+                   IDEMessagesWindow.AddCustomMessage(mluVerbose,
+                                                      'Exported "libcontrols.so" to: '+pathToAndroidStudioJniLib,
+                                                      '', 0, 0, ''));
+        end;
+     end;
+
+  end
+  else
+    ShowMessage('The active project is not a LAMW project!');
 end;
 
 procedure StartLateTool(Sender: TObject);
@@ -207,6 +263,7 @@ begin
         11: Result:= 'android-24';
         12: Result:= 'android-25';
         13: Result:= 'android-26';
+        14: Result:= 'android-27';
      end;
   end;
 end;
@@ -1017,6 +1074,11 @@ Var
   ideMnuAMW: TIDEMenuSection;
   ideSubMnuAMW: TIDEMenuSection;
   ideSubMnuLog: TIDEMenuSection;
+
+  Key: TIDEShortCut;
+  Cat: TIDECommandCategory;
+  CmdMyTool: TIDECommand;
+
 begin
   // Register main menu
   ideMnuAMW:= RegisterIDEMenuSection(mnuTools,'AMW');
@@ -1024,13 +1086,14 @@ begin
   ideSubMnuAMW:= RegisterIDESubMenu(ideMnuAMW, 'AMW', '[LAMW] Android Module Wizard');
   // Adding first entry
   RegisterIDEMenuCommand(ideSubMnuAMW, 'PathToolCmd', 'Paths Settings [Jdk, Sdk, Ndk, ...]', nil,@StartPathTool);
-  // Adding second entry
-  //RegisterIDEMenuCommand(ideSubMnuAMW, 'PathLateCmd', 'LATE: Apk Expert Tools [Build, Install, ...]', nil,@StartLateTool);
+  //Adding second entry
   // Adding third entry
   //RegisterIDEMenuCommand(ideSubMnuAMW, 'PathResEditorCmd', 'Resource Editor [strings.xml] ', nil,@StartResEditor);
-   // Adding fourth entry
+
+  // Adding fourth entry
  //RegisterIDEMenuCommand(ideSubMnuAMW, 'PathUpdateCmd','Upgrade Code Templates [*.lpr, *.java]', nil,@StartUpdateCodeTemplateTool);
-  // Adding 5a. entry
+
+ // Adding 5a. entry
   RegisterIDEMenuCommand(ideSubMnuAMW, 'PathCompCreateCmd', 'New jComponent Create', nil,@StartComponentCreate);
   // Adding 6a. entry
   RegisterIDEMenuCommand(ideSubMnuAMW, 'PathToBuildFPCCross', 'Build FPC Cross Android', nil,@StartPathToBuildFPCCross);
@@ -1038,6 +1101,14 @@ begin
   RegisterIDEMenuCommand(ideSubMnuAMW, 'PathToFPCTrunkSource', 'Get FPC Source [Trunk]', nil, @StartFPCTrunkSource);
   // Adding 8a. entry
   RegisterIDEMenuCommand(ideSubMnuAMW, 'PathToEclipseToggleTooling', 'Eclipse Compatibility [ADT<->Andmore] ...', nil, @StartEclipseToggleTooling);
+
+
+  // register IDE shortcut and menu item
+  Key := IDEShortCut(VK_F1,[ssCtrl],VK_UNKNOWN,[]);
+  Cat:=IDECommandList.FindCategoryByName(CommandCategoryToolMenuName);
+  CmdMyTool := RegisterIDECommand(Cat,'Export To Android Studio', 'Export .so to Android Studio', Key, nil, @StartExportLibToPath);
+  RegisterIDEMenuCommand(ideSubMnuAMW, 'ExportToAndroidStudio', 'Export .so to AndroidStudio', nil, nil, CmdMyTool);
+
   // Adding 9a. entry
   RegisterIDEMenuCommand(ideSubMnuAMW, 'PathToCanUpdateJavaTemplates', '[Configure] CanUpdateJavaTemplates ...', nil, @StartCanUpdateJavaTemplates);
 

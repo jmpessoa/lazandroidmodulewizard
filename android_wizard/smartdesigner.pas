@@ -647,6 +647,7 @@ begin
             strList.Add('    compile ''com.android.support:design:25.3.1''');
             strList.Add('    compile ''com.android.support:cardview-v7:25.3.1''');
             strList.Add('    compile ''com.android.support:recyclerview-v7:25.3.1''');
+            strList.Add('    compile ''com.google.android.gms:play-services-ads:11.0.4''');
             {
             Extras
             Android Support Repository
@@ -1464,12 +1465,12 @@ begin
       auxList.LoadFromFile(LamwGlobalSettings.PathToJavaTemplates+'lamwdesigner'+DirectorySeparator +jclassname+'.dependencies');
       if auxList.Text <> '' then
       begin
-        manifestList.LoadFromFile(FPathToAndroidProject+'build.gradle');
+        manifestList.LoadFromFile(FPathToAndroidProject+'build.gradle'); //buildgradletList
         for i:= 0 to auxList.Count-1 do
         begin
            manifestList.Text:= StringReplace(manifestList.Text, '//'+auxList.Strings[i], auxList.Strings[i], [rfReplaceAll,rfIgnoreCase]);
         end;
-        manifestList.SaveToFile(FPathToAndroidProject+'build.gradle');
+        manifestList.SaveToFile(FPathToAndroidProject+'build.gradle'); //buildgradletList
       end;
    end;
    //-----
