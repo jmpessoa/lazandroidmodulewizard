@@ -1851,6 +1851,7 @@ begin
                    C:\android\sdk\extras\android\m2repository\com\android\support\design
                    C:\android\sdk\extras\android\m2repository\com\android\support\cardview-v7
                    C:\android\sdk\extras\android\m2repository\com\android\support\recyclerview-v7  //25.3.1
+                   C:\android\sdk\extras\google\m2repository\com\google\android\gms\play-services-ads   //11.0.4
                    }
                 end;
                 strList.Add('}');

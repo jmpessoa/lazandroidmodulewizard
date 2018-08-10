@@ -1223,6 +1223,10 @@ end;
     procedure SetLayoutVisibility(_value: boolean);
     procedure ResetLayoutParent();
     function GetSettingsSystemInt(_strKey: string): integer;
+    function GetSettingsSystemString(_strKey: string): string;
+    function GetSettingsSystemFloat(_strKey: string): single;
+    function GetSettingsSystemLong(_strKey: string): int64;
+
 
     // Property            FjRLayout
     property View         : jObject        read FjRLayout; //layout!
@@ -1632,6 +1636,10 @@ procedure jForm_RemoveFromViewParent(env: PJNIEnv; _jform: JObject);
 procedure jForm_SetLayoutVisibility(env: PJNIEnv; _jform: JObject; _value: boolean);
 function jForm_GetParent(env: PJNIEnv; _jform: JObject): jObject;
 function jForm_GetSettingsSystemInt(env: PJNIEnv; _jform: JObject; _strKey: string): integer;
+function jForm_GetSettingsSystemString(env: PJNIEnv; _jform: JObject; _strKey: string): string;
+function jForm_GetSettingsSystemFloat(env: PJNIEnv; _jform: JObject; _strKey: string): single;
+function jForm_GetSettingsSystemLong(env: PJNIEnv; _jform: JObject; _strKey: string): int64;
+
 
 
 //------------------------------------------------------------------------------
@@ -3802,6 +3810,27 @@ begin
    Result:= jForm_GetSettingsSystemInt(FjEnv, FjObject, _strKey);
 end;
 
+function jForm.GetSettingsSystemString(_strKey: string): string;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jForm_GetSettingsSystemString(FjEnv, FjObject, _strKey);
+end;
+
+function jForm.GetSettingsSystemFloat(_strKey: string): single;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jForm_GetSettingsSystemFloat(FjEnv, FjObject, _strKey);
+end;
+
+function jForm.GetSettingsSystemLong(_strKey: string): int64;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jForm_GetSettingsSystemLong(FjEnv, FjObject, _strKey);
+end;
+
 {-------- jForm_JNI_Bridge ----------}
 
 function jForm_GetPathFromAssetsFile(env: PJNIEnv; _jform: JObject; _assetsFileName: string): string;
@@ -5239,6 +5268,60 @@ begin
   env^.DeleteLocalRef(env,jParams[0].l);
   env^.DeleteLocalRef(env, jCls);
 end;
+
+function jForm_GetSettingsSystemString(env: PJNIEnv; _jform: JObject; _strKey: string): string;
+var
+  jStr: JString;
+  jBoo: JBoolean;
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_strKey));
+  jCls:= env^.GetObjectClass(env, _jform);
+  jMethod:= env^.GetMethodID(env, jCls, 'GetSettingsSystemString', '(Ljava/lang/String;)Ljava/lang/String;');
+  jStr:= env^.CallObjectMethodA(env, _jform, jMethod, @jParams);
+  case jStr = nil of
+     True : Result:= '';
+     False: begin
+              jBoo:= JNI_False;
+              Result:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
+            end;
+  end;
+env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+
+function jForm_GetSettingsSystemFloat(env: PJNIEnv; _jform: JObject; _strKey: string): single;
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_strKey));
+  jCls:= env^.GetObjectClass(env, _jform);
+  jMethod:= env^.GetMethodID(env, jCls, 'GetSettingsSystemFloat', '(Ljava/lang/String;)F');
+  Result:= env^.CallFloatMethodA(env, _jform, jMethod, @jParams);
+env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+
+function jForm_GetSettingsSystemLong(env: PJNIEnv; _jform: JObject; _strKey: string): int64;
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_strKey));
+  jCls:= env^.GetObjectClass(env, _jform);
+  jMethod:= env^.GetMethodID(env, jCls, 'GetSettingsSystemLong', '(Ljava/lang/String;)J');
+  Result:= env^.CallLongMethodA(env, _jform, jMethod, @jParams);
+env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
 
 //-----{ jApp } ------
 

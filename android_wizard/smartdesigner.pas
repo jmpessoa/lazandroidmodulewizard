@@ -232,7 +232,7 @@ begin
        auxStr:= ExtractFileName(lisDir.Strings[i]);
        if auxStr <> '' then
        begin
-         if Pos('P', auxStr) <= 0  then  //skip android-P
+         if Pos('android-P', auxStr) <= 0  then  //skip android-P
          begin
            auxStr:= Copy(auxStr, LastDelimiter('-', auxStr) + 1, MaxInt);
            intAux:= StrToInt(auxStr);
@@ -267,9 +267,9 @@ begin
        strApi:= ExtractFileName(lisDir.Strings[i]);   //android-21
        if strApi <> '' then
        begin
-         if Pos('P', strApi) <= 0  then  //skip android-P
+         if Pos('android-P', strApi) <= 0  then  //skip android-P
          begin
-            if Pos('W', strApi) <= 0 then
+            if Pos('android-W', strApi) <= 0 then
             begin
               strApi:= Copy(strApi, LastDelimiter('-', strApi) + 1, MaxInt);
               intApi:= StrToInt(strApi);

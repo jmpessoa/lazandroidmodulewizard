@@ -1311,6 +1311,28 @@ public String ParseHtmlFontAwesome(String _htmlString) {
 		}
 	}
 
+	//https://developer.android.com/reference/android/provider/Settings.System
+	public String GetSettingsSystemString(String _strKey) {
+	  String r = android.provider.Settings.System.getString(controls.activity.getContentResolver(), _strKey);
+  	  if (r == null) r = "";
+  	  return r;
+	}
+
+	public float GetSettingsSystemFloat(String _strKey) {
+		try {
+			return android.provider.Settings.System.getFloat(controls.activity.getContentResolver(), _strKey);
+		} catch(android.provider.Settings.SettingNotFoundException e) {
+			return  -1;
+		}
+	}
+
+	public long GetSettingsSystemLong(String _strKey) {
+		try {
+			return android.provider.Settings.System.getLong(controls.activity.getContentResolver(), _strKey);
+		} catch(android.provider.Settings.SettingNotFoundException e) {
+			return  -1;
+		}
+	}
 
 }
 //**class entrypoint**//please, do not remove/change this line!
