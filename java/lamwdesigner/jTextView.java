@@ -19,16 +19,16 @@ import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.PaintDrawable;
 import android.os.Build;
+import android.text.method.LinkMovementMethod;
 import android.text.Html;
 import android.text.TextUtils.TruncateAt;
-import android.text.util.Linkify;
+//import android.text.util.Linkify;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Gravity;
 import android.widget.TextView;
-
 
 public class jTextView extends TextView {
     //Java-Pascal Interface
@@ -176,7 +176,7 @@ public class jTextView extends TextView {
             case 0 : { setGravity( Gravity.START             ); }; break;
             case 1 : { setGravity( Gravity.END               ); }; break;
  //[endif_api14up]
-            
+
  /* //[endif_api14up]
             case 0 : { setGravity( Gravity.LEFT              ); }; break;
             case 1 : { setGravity( Gravity.RIGHT             ); }; break;
@@ -386,7 +386,7 @@ public class jTextView extends TextView {
            
 	//SweepGradient (float cx, float cy,  int color0,  int color1) 			
 	public void SetShaderSweepGradient(int _color1, int _color2) {	
-		
+
 		float min = this.getHeight();
 		if (min > this.getWidth() ) min = this.getWidth();
 		
@@ -409,7 +409,7 @@ public class jTextView extends TextView {
 					 		  		  		   
 				}			
 		 }	
-       //[endif_api17up]				
+       //[endif_api17up]
 	}
 	
 	
@@ -439,24 +439,20 @@ public class jTextView extends TextView {
 		this.setSelected(true);  	
 		//this.invalidate()
 	}
-	
+
 	//http://rajeshandroiddeveloper.blogspot.com.br/2013/07/how-to-implement-custom-font-to-text.html
-	public void SetTextAsLink(String _linkText) {		
-		   		
-		   //[ifdef_api24up]
-		   if (Build.VERSION.SDK_INT >= 24) {			
-	          this.setText(Html.fromHtml(_linkText, Html.FROM_HTML_MODE_LEGACY));	       
-	       } 		    		  	  		   
-		   //[endif_api24up]
-		   
-		   if (Build.VERSION.SDK_INT < 24) {			   
-		       this.setText(Html.fromHtml(_linkText));
-		   }		   	
-		   	  				    		   
-	       Linkify.addLinks(this, Linkify.ALL);
+	public void SetTextAsLink(String _linkText) {
+
+               //[ifdef_api24up]
+	       if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N){
+	           this.setText(Html.fromHtml(_linkText, Html.FROM_HTML_MODE_LEGACY));
+               }else //[endif_api24up]
+		   this.setText(Html.fromHtml(_linkText));
+
+               this.setMovementMethod(LinkMovementMethod.getInstance());
 	}
-		
-	//You can basically set it from anything between 0(fully transparent) to 255 (completely opaque)	
+
+	//You can basically set it from anything between 0(fully transparent) to 255 (completely opaque)
 	public void SetBackgroundAlpha(int _alpha) {
 		this.getBackground().setAlpha(_alpha); //0-255
 	}
