@@ -1227,6 +1227,10 @@ end;
     function GetSettingsSystemFloat(_strKey: string): single;
     function GetSettingsSystemLong(_strKey: string): int64;
 
+    function PutSettingsSystemInt(_strKey: string; _value: integer): boolean;
+    function PutSettingsSystemLong(_strKey: string; _value: int64): boolean;
+    function PutSettingsSystemFloat(_strKey: string; _value: single): boolean;
+    function PutSettingsSystemString(_strKey: string; _strValue: string): boolean;
 
     // Property            FjRLayout
     property View         : jObject        read FjRLayout; //layout!
@@ -1639,6 +1643,10 @@ function jForm_GetSettingsSystemInt(env: PJNIEnv; _jform: JObject; _strKey: stri
 function jForm_GetSettingsSystemString(env: PJNIEnv; _jform: JObject; _strKey: string): string;
 function jForm_GetSettingsSystemFloat(env: PJNIEnv; _jform: JObject; _strKey: string): single;
 function jForm_GetSettingsSystemLong(env: PJNIEnv; _jform: JObject; _strKey: string): int64;
+function jForm_PutSettingsSystemInt(env: PJNIEnv; _jform: JObject; _strKey: string; _value: integer): boolean;
+function jForm_PutSettingsSystemLong(env: PJNIEnv; _jform: JObject; _strKey: string; _value: int64): boolean;
+function jForm_PutSettingsSystemFloat(env: PJNIEnv; _jform: JObject; _strKey: string; _value: single): boolean;
+function jForm_PutSettingsSystemString(env: PJNIEnv; _jform: JObject; _strKey: string; _strValue: string): boolean;
 
 
 
@@ -3831,6 +3839,34 @@ begin
    Result:= jForm_GetSettingsSystemLong(FjEnv, FjObject, _strKey);
 end;
 
+function jForm.PutSettingsSystemInt(_strKey: string; _value: integer): boolean;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jForm_PutSettingsSystemInt(FjEnv, FjObject, _strKey ,_value);
+end;
+
+function jForm.PutSettingsSystemLong(_strKey: string; _value: int64): boolean;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jForm_PutSettingsSystemLong(FjEnv, FjObject, _strKey ,_value);
+end;
+
+function jForm.PutSettingsSystemFloat(_strKey: string; _value: single): boolean;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jForm_PutSettingsSystemFloat(FjEnv, FjObject, _strKey ,_value);
+end;
+
+function jForm.PutSettingsSystemString(_strKey: string; _strValue: string): boolean;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jForm_PutSettingsSystemString(FjEnv, FjObject, _strKey ,_strValue);
+end;
+
 {-------- jForm_JNI_Bridge ----------}
 
 function jForm_GetPathFromAssetsFile(env: PJNIEnv; _jform: JObject; _assetsFileName: string): string;
@@ -5288,7 +5324,7 @@ begin
               Result:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
             end;
   end;
-env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env,jParams[0].l);
   env^.DeleteLocalRef(env, jCls);
 end;
 
@@ -5303,7 +5339,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jform);
   jMethod:= env^.GetMethodID(env, jCls, 'GetSettingsSystemFloat', '(Ljava/lang/String;)F');
   Result:= env^.CallFloatMethodA(env, _jform, jMethod, @jParams);
-env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env,jParams[0].l);
   env^.DeleteLocalRef(env, jCls);
 end;
 
@@ -5318,10 +5354,82 @@ begin
   jCls:= env^.GetObjectClass(env, _jform);
   jMethod:= env^.GetMethodID(env, jCls, 'GetSettingsSystemLong', '(Ljava/lang/String;)J');
   Result:= env^.CallLongMethodA(env, _jform, jMethod, @jParams);
-env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env,jParams[0].l);
   env^.DeleteLocalRef(env, jCls);
 end;
 
+
+function jForm_PutSettingsSystemInt(env: PJNIEnv; _jform: JObject; _strKey: string; _value: integer): boolean;
+var
+  jBoo: JBoolean;
+  jParams: array[0..1] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_strKey));
+  jParams[1].i:= _value;
+  jCls:= env^.GetObjectClass(env, _jform);
+  jMethod:= env^.GetMethodID(env, jCls, 'PutSettingsSystemInt', '(Ljava/lang/String;I)Z');
+  jBoo:= env^.CallBooleanMethodA(env, _jform, jMethod, @jParams);
+  Result:= boolean(jBoo);
+  env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+
+function jForm_PutSettingsSystemLong(env: PJNIEnv; _jform: JObject; _strKey: string; _value: int64): boolean;
+var
+  jBoo: JBoolean;
+  jParams: array[0..1] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_strKey));
+  jParams[1].j:= _value;
+  jCls:= env^.GetObjectClass(env, _jform);
+  jMethod:= env^.GetMethodID(env, jCls, 'PutSettingsSystemLong', '(Ljava/lang/String;J)Z');
+  jBoo:= env^.CallBooleanMethodA(env, _jform, jMethod, @jParams);
+  Result:= boolean(jBoo);
+  env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+
+function jForm_PutSettingsSystemFloat(env: PJNIEnv; _jform: JObject; _strKey: string; _value: single): boolean;
+var
+  jBoo: JBoolean;
+  jParams: array[0..1] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_strKey));
+  jParams[1].f:= _value;
+  jCls:= env^.GetObjectClass(env, _jform);
+  jMethod:= env^.GetMethodID(env, jCls, 'PutSettingsSystemFloat', '(Ljava/lang/String;F)Z');
+  jBoo:= env^.CallBooleanMethodA(env, _jform, jMethod, @jParams);
+  Result:= boolean(jBoo);
+  env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+
+function jForm_PutSettingsSystemString(env: PJNIEnv; _jform: JObject; _strKey: string; _strValue: string): boolean;
+var
+  jBoo: JBoolean;
+  jParams: array[0..1] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_strKey));
+  jParams[1].l:= env^.NewStringUTF(env, PChar(_strValue));
+  jCls:= env^.GetObjectClass(env, _jform);
+  jMethod:= env^.GetMethodID(env, jCls, 'PutSettingsSystemString', '(Ljava/lang/String;Ljava/lang/String;)Z');
+  jBoo:= env^.CallBooleanMethodA(env, _jform, jMethod, @jParams);
+  Result:= boolean(jBoo);
+  env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env,jParams[1].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
 
 //-----{ jApp } ------
 

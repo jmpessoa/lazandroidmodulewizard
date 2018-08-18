@@ -1,4 +1,4 @@
-package org.lamw.appanttestaa1;
+package com.example.appedittextdemo1;
 
 //LAMW: Lazarus Android Module Wizard  - version 0.8  - 31 March  - 2018 
 //RAD Android: Project Wizard, Form Designer and Components Development Model!
@@ -1332,6 +1332,22 @@ public String ParseHtmlFontAwesome(String _htmlString) {
 		} catch(android.provider.Settings.SettingNotFoundException e) {
 			return  -1;
 		}
+	}
+
+	public boolean PutSettingsSystemInt (String _strKey, int _value) {
+			return android.provider.Settings.System.putInt(controls.activity.getContentResolver(), _strKey, _value);
+	}
+
+	public boolean PutSettingsSystemLong (String _strKey, long _value) {
+			return android.provider.Settings.System.putLong(controls.activity.getContentResolver(), _strKey, _value);
+	}
+
+	public boolean PutSettingsSystemFloat(String _strKey, float _value) {
+			return android.provider.Settings.System.putFloat(controls.activity.getContentResolver(), _strKey, _value);
+	}
+
+	public boolean PutSettingsSystemString(String _strKey, String _strValue) {
+		return android.provider.Settings.System.putString(controls.activity.getContentResolver(), _strKey, _strValue);
 	}
 
 }

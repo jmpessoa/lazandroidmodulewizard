@@ -177,7 +177,8 @@ procedure jTextView_SetTextDirection(env: PJNIEnv; _jtextview: JObject; _textDir
 procedure jTextView_SetFontFromAssets(env: PJNIEnv; _jtextview: JObject; _fontName: string);
 procedure jTextView_SetTextIsSelectable(env: PJNIEnv; _jtextview: JObject; _value: boolean);
 procedure jTextView_SetScrollingText(env: PJNIEnv; _jtextview: JObject);
-procedure jTextView_SetTextAsLink(env: PJNIEnv; _jtextview: JObject; _linkText: string);
+procedure jTextView_SetTextAsLink(env: PJNIEnv; _jtextview: JObject; _linkText: string); overload;
+procedure jTextView_SetTextAsLink(env: PJNIEnv; _jtextview: JObject; _linkText: string; _color: integer); overload;
 procedure jTextView_SetBackgroundAlpha(env: PJNIEnv; _jtextview: JObject; _alpha: integer);
 procedure jTextView_MatchParent(env: PJNIEnv; _jtextview: JObject);
 procedure jTextView_WrapParent(env: PJNIEnv; _jtextview: JObject);
@@ -548,7 +549,8 @@ procedure jListView_SetFitsSystemWindows(env: PJNIEnv; _jlistview: JObject; _val
 procedure jListView_BringToFront(env: PJNIEnv; _jlistview: JObject);
 procedure jListView_SetVisibilityGone(env: PJNIEnv; _jlistview: JObject);
 procedure jListView_SaveToFile(env: PJNIEnv; _jlistview: JObject; _appInternalFileName: string);
-procedure jListView_LoadFromFile(env: PJNIEnv; _jlistview: JObject; _appInternalFileName: string);
+//procedure jListView_LoadFromFile(env: PJNIEnv; _jlistview: JObject; _appInternalFileName: string);
+function jListView_LoadFromFile(env: PJNIEnv; _jlistview: JObject; _appInternalFileName: string): TDynArrayOfString;
 
 
 // ScrollView
@@ -1371,16 +1373,26 @@ var
   _jString : jString;
   _jBoolean: jBoolean;
   cls: jClass;
+  //tmp:pchar;  //TODO
 begin
   cls := env^.GetObjectClass(env, TextView);
   _jMethod:= env^.GetMethodID(env, cls, 'getText', '()Ljava/lang/CharSequence;');  //direct jni api
-  _jString   := env^.CallObjectMethod(env,TextView,_jMethod);
+  _jString:= env^.CallObjectMethod(env,TextView,_jMethod);
   Case _jString = nil of
    True : Result    := '';
    False: begin
            _jBoolean := JNI_False;
            Result    := String( env^.GetStringUTFChars(env,_jString,@_jBoolean) );
           end;
+   {
+   False: begin
+           _jBoolean := JNI_False;
+           tmp    := env^.GetStringUTFChars(Env, _jString, @_jBoolean);
+           Result := string( tmp );
+           env^.ReleaseStringUTFChars(env, _jString, tmp);
+           env^.DeleteLocalRef(env, _jString);
+         end;
+    }
   end;
   env^.DeleteLocalRef(env, cls);
 end;
@@ -1808,6 +1820,21 @@ begin
   jParams[0].l:= env^.NewStringUTF(env, PChar(_linkText));
   jCls:= env^.GetObjectClass(env, _jtextview);
   jMethod:= env^.GetMethodID(env, jCls, 'SetTextAsLink', '(Ljava/lang/String;)V');
+  env^.CallVoidMethodA(env, _jtextview, jMethod, @jParams);
+  env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jTextView_SetTextAsLink(env: PJNIEnv; _jtextview: JObject; _linkText: string; _color: integer);
+var
+  jParams: array[0..1] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_linkText));
+  jParams[1].i:= _color;
+  jCls:= env^.GetObjectClass(env, _jtextview);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetTextAsLink', '(Ljava/lang/String;I)V');
   env^.CallVoidMethodA(env, _jtextview, jMethod, @jParams);
   env^.DeleteLocalRef(env,jParams[0].l);
   env^.DeleteLocalRef(env, jCls);
@@ -5756,6 +5783,7 @@ begin
 end;
 
 
+{
 procedure jListView_LoadFromFile(env: PJNIEnv; _jlistview: JObject; _appInternalFileName: string);
 var
   jParams: array[0..0] of jValue;
@@ -5769,7 +5797,52 @@ begin
   env^.DeleteLocalRef(env,jParams[0].l);
   env^.DeleteLocalRef(env, jCls);
 end;
+}
 
+function jListView_LoadFromFile(env: PJNIEnv; _jlistview: JObject; _appInternalFileName: string): TDynArrayOfString;
+var
+  jStr: JString;
+  jBoo: JBoolean;
+  resultSize: integer;
+  jResultArray: jObject;
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+  i: integer;
+  tmp:pchar;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_appInternalFileName));
+  jCls:= env^.GetObjectClass(env, _jlistview);
+  jMethod:= env^.GetMethodID(env, jCls, 'LoadFromFile', '(Ljava/lang/String;)[Ljava/lang/String;');
+  jResultArray:= env^.CallObjectMethodA(env, _jlistview, jMethod,  @jParams);
+  if jResultArray <> nil then
+  begin
+    resultSize:= env^.GetArrayLength(env, jResultArray);
+    SetLength(Result, resultSize);
+    for i:= 0 to resultsize - 1 do
+    begin
+      jStr:= env^.GetObjectArrayElement(env, jresultArray, i);
+      case jStr = nil of
+         True : Result[i]:= '';
+         {
+         False: begin
+                  jBoo:= JNI_False;
+                  Result[i]:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
+                end;
+          }
+         False: begin
+                 jBoo := JNI_False;
+                 tmp := env^.GetStringUTFChars(Env, jStr, @jBoo);
+                 Result[i] := string(tmp);
+                 env^.ReleaseStringUTFChars(env, jStr, tmp);
+                 env^.DeleteLocalRef(env, jStr);
+               end;
+      end;
+    end;
+  end;
+  env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
 
 //------------------------------------------------------------------------------
 // ScrollView

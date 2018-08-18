@@ -472,6 +472,7 @@ var
   linuxPathToAndroidSdk: string;
   linuxPathToGradle: string;
   linuxDirSeparator: string;
+  buildToolApi: string;
 begin
 
   strList:= TStringList.Create;
@@ -586,10 +587,14 @@ begin
 
   if targetApi >= 21 then
   begin
-    buildTool:= GetBuildTool(targetApi);
     if buildTool <> '' then
     begin
-       pluginVersion:= GetPluginVersion(buildTool);
+
+       if targetApi >= 25 then
+         pluginVersion:= GetPluginVersion(buildTool)
+       else
+         pluginVersion:= '2.3.3';
+
        if pluginVersion <> '' then
        begin
          androidPluginStr:= StringReplace(pluginVersion,'.', '', [rfReplaceAll]);
@@ -615,8 +620,12 @@ begin
          strList.Add('    lintOptions {');
          strList.Add('       abortOnError false');
          strList.Add('    }');
-         strList.Add('    compileSdkVersion '+IntToStr(targetApi));  //25
+
+         buildToolApi:= Copy(buildTool,1,2);   //25.0.3  --> 25
+
+         strList.Add('    compileSdkVersion '+buildToolApi);
          strList.Add('    buildToolsVersion "'+buildTool+'"'); //25.0.3
+
          strList.Add('    defaultConfig {');
          strList.Add('            minSdkVersion 14');
          strList.Add('            targetSdkVersion '+IntToStr(targetApi));
@@ -656,6 +665,7 @@ begin
             C:\adt32\sdk\extras\android\m2repository\com\android\support\design
             C:\adt32\sdk\extras\android\m2repository\com\android\support\cardview-v7
             C:\adt32\sdk\extras\android\m2repository\com\android\support\recyclerview-v7  //25.3.1
+            C:\android\sdk\extras\google\m2repository\com\google\android\gms\play-services-ads   //11.0.4
             }
          end;
          strList.Add('}');
@@ -742,6 +752,12 @@ begin
     //strList.Add('.\gradle run');
     strList.Add('gradle run');
     SaveShellScript(strList, FPathToAndroidProject+'gradle_local_run.sh');
+
+    if not FileExists(FPathToAndroidProject + 'gradle.properties') then
+    begin
+      strList.Clear;
+      strList.SaveToFile(FPathToAndroidProject+'gradle.properties');
+    end;
 
   end;
 
@@ -851,6 +867,8 @@ var
   androidTheme: string;
   isProjectImported: boolean;
   sdkManifestTargetApi, manifestBuildTool: string;
+  manifestTargetApi: integer;
+  queryValue : String;
 begin
 
   if not AProject.CustomData.Contains('LAMW') then
@@ -905,11 +923,12 @@ begin
    //LAMW 0.8
   if  (androidTheme = '') or (Pos('AppCompat', androidTheme) <= 0) then
     LamwGlobalSettings.QueryPaths:= False;  //dont query Path to Gradle
+
   FPathToGradle:= LamwGlobalSettings.PathToGradle;  //C:\adt32\gradle-3.3\
   LamwGlobalSettings.QueryPaths:= True; // reset to default...
 
   if FPathToGradle <> '' then
-       FGradleVersion:= GetGradleVersion(FPathToGradle);
+     FGradleVersion:= GetGradleVersion(FPathToGradle);
 
   isProjectImported:= IsDemoProject();   //demo or imported project,  etc...
 
@@ -965,6 +984,7 @@ begin
 
   //LAMW 0.8
   maxSdkApi:= GetMaxSdkPlatform(outMaxBuildTool);
+
   if maxSdkApi =  0 then   // try fix "android-0"
   begin
      maxSdkApi:= FCandidateSdkPlatform;
@@ -989,12 +1009,36 @@ begin
   if LamwGlobalSettings.KeepManifestTargetApi  then  //
   begin
     sdkManifestTargetApi:= GetTargetFromManifest();
-    manifestBuildTool:=  GetBuildTool(StrToInt(sdkManifestTargetApi));
-    KeepBuildUpdated(StrToInt(sdkManifestTargetApi), manifestBuildTool {25.0.5});
+    manifestTargetApi:= StrToInt(sdkManifestTargetApi);
+    manifestBuildTool:=  GetBuildTool(manifestTargetApi);
+    if manifestTargetApi < 21 then
+    begin
+       queryValue:= '21';
+       if InputQuery('Warning. Manifest Target Api ['+sdkManifestTargetApi+ '] < 21',
+                     '[Suggestion] Change Target API to [or up]:', queryValue) then
+       begin
+         manifestTargetApi:= StrToInt(queryValue);
+         if manifestTargetApi <= 25 then
+            manifestBuildTool:= '25.0.3'
+         else
+            manifestBuildTool:= GetBuildTool(manifestTargetApi);
+       end;
+    end
+    else
+    begin
+       if not FileExists(FPathToAndroidProject + 'build.gradle') then
+       begin
+           if manifestTargetApi <= 25 then
+              manifestBuildTool:= '25.0.3'
+           else
+              manifestBuildTool:= GetBuildTool(manifestTargetApi);
+       end;
+    end;
+    KeepBuildUpdated(manifestTargetApi {25}, manifestBuildTool {25.0.3});
   end
   else
   begin
-    KeepBuildUpdated(maxSdkApi, outMaxBuildTool {25.0.5});
+    KeepBuildUpdated(maxSdkApi, outMaxBuildTool {25.0.3});
   end;
 
 end;
@@ -2233,6 +2277,19 @@ begin
   strList.Add('cd '+linuxAndroidProjectName);
   strList.Add('ant -Dtouchtest.enabled=true debug');
   SaveShellScript(strList, androidProjectName+'build-debug.sh');
+
+
+  //MacOs
+  strList.Clear;
+  if pathToAntBin <> '' then
+  begin
+     strList.Add('export PATH='+linuxPathToAntBin+':$PATH');        //export PATH=/usr/bin/ant:PATH
+     strList.Add('export JAVA_HOME=${/usr/libexec/java_home}');     //export JAVA_HOME=/usr/lib/jvm/java-6-openjdk
+     strList.Add('export PATH=${JAVA_HOME}/bin:$PATH');
+     strList.Add('cd '+linuxAndroidProjectName);
+     strList.Add('ant -Dtouchtest.enabled=true debug');
+     SaveShellScript(strList, androidProjectName+'build-debug-macos.sh');
+  end;
 
   strList.Clear;
   if pathToAntBin <> '' then

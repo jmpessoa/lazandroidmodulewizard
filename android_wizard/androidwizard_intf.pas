@@ -929,10 +929,9 @@ var
   compileSdkVersion: string;
   androidPluginStr: string;
   androidPluginNumber: integer;
-  tagVersion: integer;
   gradleCompatible: string;
+  buildToolApi: string;
 begin
-  //outTag:= 0;
   Result:= False;
   FModuleType:= projectType; //0:GUI  1:NoGUI 2: NoGUI EXE Console 3: generic library
 
@@ -951,8 +950,6 @@ begin
 
     frm.CheckBoxPIE.Visible:= False;
     frm.CheckBoxLibrary.Visible:= False;
-
-    //frm.RGDeviceType.ItemIndex:= 0;  //phone
 
     if projectType = 1 then //No GUI
     begin
@@ -1283,7 +1280,7 @@ begin
                strList.Add('    package="'+FPackagePrefaceName+'.'+LowerCase(FSmallProjName)+'"');
                strList.Add('    android:versionCode="1"');
                strList.Add('    android:versionName="1.0" >');
-               strList.Add('    <uses-sdk android:minSdkVersion="10"/>');
+               strList.Add('    <uses-sdk android:minSdkVersion="14"/>');
                strList.Add('    <application');
                strList.Add('        android:allowBackup="true"');
                strList.Add('        android:icon="@drawable/ic_launcher"');
@@ -1765,15 +1762,18 @@ begin
 
           //compileSdkVersion:= IntToStr(FMaxSdkPlatform);
           //sdkBuildTools:= GetBuildTool(FMaxSdkPlatform);
-          compileSdkVersion:= FTargetApi;
-          sdkBuildTools:= GetBuildTool(StrToInt(FTargetApi));
 
+          compileSdkVersion:= FTargetApi;
           if sdkBuildTools = '' then sdkBuildTools:= FCandidateSdkBuild;
 
           if sdkBuildTools <> '' then
           begin
 
-            pluginVersion:= GetPluginVersion(sdkBuildTools);
+            if  StrToInt(FTargetApi) > 25 then
+              pluginVersion:= GetPluginVersion(sdkBuildTools)
+            else
+              pluginVersion:= '2.3.3';
+
             if pluginVersion <> '' then
             begin
                 gradleCompatible:= TryGradleCompatibility(pluginVersion, FGradleVersion);
@@ -1800,8 +1800,16 @@ begin
                 strList.Add('       abortOnError false');
                 strList.Add('    }');
 
-                strList.Add('    compileSdkVersion '+compileSdkVersion);  //25
-                strList.Add('    buildToolsVersion "'+sdkBuildTools+'"'); //25.0.3
+                if  StrToInt(FTargetApi) > 25 then
+                begin
+                  strList.Add('    compileSdkVersion '+compileSdkVersion);  //25
+                  strList.Add('    buildToolsVersion "'+sdkBuildTools+'"'); //25.0.3
+                end
+                else
+                begin
+                   strList.Add('    compileSdkVersion 25');  //25
+                   strList.Add('    buildToolsVersion "25.0.3"'); //25.0.3
+                end;
 
                 strList.Add('    defaultConfig {');
 
@@ -1817,7 +1825,7 @@ begin
                    strList.Add('            minSdkVersion '+FMinApi);
                 end;
 
-                strList.Add('            targetSdkVersion '+ compileSdkVersion);
+                strList.Add('            targetSdkVersion '+ FTargetApi);  //compileSdkVersion
 
                 strList.Add('            versionCode 1');
                 strList.Add('            versionName "1.0"');

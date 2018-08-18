@@ -888,7 +888,8 @@ type
     procedure SetFontFromAssets(_fontName: string);
     procedure SetTextIsSelectable(_value: boolean);
     procedure SetScrollingText();
-    procedure SetTextAsLink(_linkText: string);
+    procedure SetTextAsLink(_linkText: string); overload;
+    procedure SetTextAsLink(_linkText: string; _color: TARGBColorBridge); overload;
     procedure SetBackgroundAlpha(_alpha: integer); //You can basically set it from anything between 0(fully transparent) to 255 (completely opaque)
     procedure MatchParent();
     procedure WrapParent();
@@ -3706,6 +3707,14 @@ begin
   //in designing component state: set value here...
   if FInitialized then
      jTextView_SetTextAsLink(FjEnv, FjObject, _linkText);
+end;
+
+//use: SetTextAsLink('<a href=''http://www.google.com''>Go to Google</a>', colbrRed);
+procedure jTextView.SetTextAsLink(_linkText: string; _color: TARGBColorBridge);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jTextView_SetTextAsLink(FjEnv, FjObject, _linkText , GetARGB(FCustomColor, _color));
 end;
 
 procedure jTextView.SetBackgroundAlpha(_alpha: integer);

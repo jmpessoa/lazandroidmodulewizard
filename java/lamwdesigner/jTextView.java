@@ -1,4 +1,4 @@
-package com.example.appdatetimepicker;
+package com.example.appedittextdemo1;
 
 import java.lang.reflect.Field;
 
@@ -452,6 +452,16 @@ public class jTextView extends TextView {
                this.setMovementMethod(LinkMovementMethod.getInstance());
 	}
 
+	public void SetTextAsLink(String _linkText, int _color) {  //by TR3E
+		//[ifdef_api24up]
+		if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N){
+			this.setText(Html.fromHtml(_linkText, Html.FROM_HTML_MODE_LEGACY));
+		}else //[endif_api24up]
+			this.setText(Html.fromHtml(_linkText));
+
+		this.setMovementMethod(LinkMovementMethod.getInstance());
+		this.setLinkTextColor(_color);
+	}
 	//You can basically set it from anything between 0(fully transparent) to 255 (completely opaque)
 	public void SetBackgroundAlpha(int _alpha) {
 		this.getBackground().setAlpha(_alpha); //0-255
