@@ -1030,6 +1030,7 @@ begin
       FLibraryChecked:= frm.LibraryChecked;
 
       FMaxSdkPlatform:= frm.MaxSdkPlatform;
+
       FGradleVersion:= frm.GradleVersion;
 
       if FLibraryChecked then
@@ -1760,16 +1761,19 @@ begin
           {$ENDIF}
           strList.SaveToFile(FAndroidProjectName+PathDelim+'local.properties');
 
-          //compileSdkVersion:= IntToStr(FMaxSdkPlatform);
-          //sdkBuildTools:= GetBuildTool(FMaxSdkPlatform);
+          compileSdkVersion:= IntToStr(FMaxSdkPlatform);
+          sdkBuildTools:= GetBuildTool(FMaxSdkPlatform);
 
-          compileSdkVersion:= FTargetApi;
-          if sdkBuildTools = '' then sdkBuildTools:= FCandidateSdkBuild;
+          if sdkBuildTools = '' then
+          begin
+            sdkBuildTools:= FCandidateSdkBuild;
+            compileSdkVersion:= Copy(sdkBuildTools,1,2);
+          end;
 
           if sdkBuildTools <> '' then
           begin
 
-            if  StrToInt(FTargetApi) > 25 then
+            if StrToInt(compileSdkVersion) > 25 then
               pluginVersion:= GetPluginVersion(sdkBuildTools)
             else
               pluginVersion:= '2.3.3';
@@ -1800,7 +1804,7 @@ begin
                 strList.Add('       abortOnError false');
                 strList.Add('    }');
 
-                if  StrToInt(FTargetApi) > 25 then
+                if StrToInt(compileSdkVersion) > 25 then
                 begin
                   strList.Add('    compileSdkVersion '+compileSdkVersion);  //25
                   strList.Add('    buildToolsVersion "'+sdkBuildTools+'"'); //25.0.3
@@ -1877,7 +1881,6 @@ begin
                 strList.Add('}');
                 strList.Add('//how to use: look for "gradle_readme.txt"');
                 strList.SaveToFile(FAndroidProjectName+PathDelim+'build.gradle');
-
                 strList.Clear;
                 strList.SaveToFile(FAndroidProjectName+PathDelim+'gradle.properties');  //dummy to configure proxy
 

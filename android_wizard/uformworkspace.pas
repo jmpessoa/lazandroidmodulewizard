@@ -46,7 +46,6 @@ type
     SpdBtnPathToWorkspace: TSpeedButton;
     SpdBtnRefreshProjectName: TSpeedButton;
     SpeedButton1: TSpeedButton;
-    SpeedButton2: TSpeedButton;
     SpeedButtonHintTheme: TSpeedButton;
     StatusBarInfo: TStatusBar;
 
@@ -68,7 +67,7 @@ type
     procedure SpdBtnPathToWorkspaceClick(Sender: TObject);
     procedure SpdBtnRefreshProjectNameClick(Sender: TObject);
     procedure SpeedButton1Click(Sender: TObject);
-    procedure SpeedButton2Click(Sender: TObject);
+    procedure SpeedButtonSDKPlusClick(Sender: TObject);
     procedure SpeedButtonHintThemeClick(Sender: TObject);
 
   private
@@ -345,7 +344,7 @@ begin
   if ListBoxTargetAPI.Text <> '' then
   begin
      FTargetApi:= ListBoxTargetAPI.Items[ListBoxTargetAPI.ItemIndex];
-     FMaxSdkPlatform:= StrToInt(ListBoxTargetAPI.Text);
+     //FMaxSdkPlatform:= StrToInt(ListBoxTargetAPI.Text);
   end;
 end;
 
@@ -1052,6 +1051,8 @@ begin
   FHasSdkToolsAnt:= False;
   if FPathToAndroidSDK <> '' then
      FHasSdkToolsAnt:= IsSdkToolsAntEnable();
+
+  SpeedButtonSDKPlusClick(Self);
 end;
 
 procedure TFormWorkspace.ComboBoxThemeChange(Sender: TObject);
@@ -1165,7 +1166,7 @@ begin
            sLineBreak+' Hint: "Ctrl + C" to copy this content to Clipboard!');
 end;
 
-procedure TFormWorkspace.SpeedButton2Click(Sender: TObject);
+procedure TFormWorkspace.SpeedButtonSDKPlusClick(Sender: TObject);
 var
   lisDir: TStringList;
   strApi, outBuildTool: string;
@@ -1200,7 +1201,7 @@ begin
     begin
       ListBoxTargetAPI.ItemIndex:= ListBoxTargetAPI.Items.Count - 1;
       FTargetApi:= ListBoxTargetAPI.Items[ListBoxTargetAPI.ItemIndex];
-      FMaxSdkPlatform:= StrToInt(ListBoxTargetAPI.Text);
+      //FMaxSdkPlatform:= StrToInt(ListBoxTargetAPI.Text);
     end;
   end;
   lisDir.free;

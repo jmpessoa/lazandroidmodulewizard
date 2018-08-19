@@ -1102,12 +1102,11 @@ begin
   // Adding 8a. entry
   RegisterIDEMenuCommand(ideSubMnuAMW, 'PathToEclipseToggleTooling', 'Eclipse Compatibility [ADT<->Andmore] ...', nil, @StartEclipseToggleTooling);
 
-
   // register IDE shortcut and menu item
-  Key := IDEShortCut(VK_F1,[ssCtrl],VK_UNKNOWN,[]);
-  Cat:=IDECommandList.FindCategoryByName(CommandCategoryToolMenuName);
-  CmdMyTool := RegisterIDECommand(Cat,'Export To Android Studio', 'Export .so to Android Studio', Key, nil, @StartExportLibToPath);
-  RegisterIDEMenuCommand(ideSubMnuAMW, 'ExportToAndroidStudio', 'Export .so to AndroidStudio', nil, nil, CmdMyTool);
+  //Key := IDEShortCut(VK_F1,[ssCtrl],VK_UNKNOWN,[]);
+  //Cat:=IDECommandList.FindCategoryByName(CommandCategoryToolMenuName);
+  //CmdMyTool := RegisterIDECommand(Cat,'Export To Android Studio', 'Export .so to Android Studio', Key, nil, @StartExportLibToPath);
+  //RegisterIDEMenuCommand(ideSubMnuAMW, 'ExportToAndroidStudio', 'Export .so to AndroidStudio', nil, nil, CmdMyTool);
 
   // Adding 9a. entry
   RegisterIDEMenuCommand(ideSubMnuAMW, 'PathToCanUpdateJavaTemplates', '[Configure] CanUpdateJavaTemplates ...', nil, @StartCanUpdateJavaTemplates);

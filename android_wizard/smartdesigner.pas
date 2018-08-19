@@ -628,7 +628,12 @@ begin
 
          strList.Add('    defaultConfig {');
          strList.Add('            minSdkVersion 14');
-         strList.Add('            targetSdkVersion '+IntToStr(targetApi));
+
+         if targetApi <= StrToInt(buildToolApi) then
+            strList.Add('            targetSdkVersion '+IntToStr(targetApi))
+         else
+            strList.Add('            targetSdkVersion '+buildToolApi);
+
          strList.Add('            versionCode 1');
          strList.Add('            versionName "1.0"');
          strList.Add('    }');
@@ -866,7 +871,7 @@ var
   outMaxBuildTool: string;
   androidTheme: string;
   isProjectImported: boolean;
-  sdkManifestTargetApi, manifestBuildTool: string;
+  sdkManifestTargetApi, buildTool: string;
   manifestTargetApi: integer;
   queryValue : String;
 begin
@@ -1005,41 +1010,41 @@ begin
            AProject.CustomData['BuildSystem']:= 'Gradle'
   end;
 
-  //LamwGlobalSettings.PathToGradle
-  if LamwGlobalSettings.KeepManifestTargetApi  then  //
+  sdkManifestTargetApi:= GetTargetFromManifest();
+  manifestTargetApi:= StrToInt(sdkManifestTargetApi);
+  buildTool:=  GetBuildTool(manifestTargetApi);
+
+  if manifestTargetApi < 21 then
   begin
-    sdkManifestTargetApi:= GetTargetFromManifest();
-    manifestTargetApi:= StrToInt(sdkManifestTargetApi);
-    manifestBuildTool:=  GetBuildTool(manifestTargetApi);
-    if manifestTargetApi < 21 then
-    begin
-       queryValue:= '21';
-       if InputQuery('Warning. Manifest Target Api ['+sdkManifestTargetApi+ '] < 21',
-                     '[Suggestion] Change Target API to [or up]:', queryValue) then
+     queryValue:= '21';
+     if InputQuery('Warning. Manifest Target Api ['+sdkManifestTargetApi+ '] < 21',
+                   '[Suggestion] Change Target API to [or up]:', queryValue) then
+     begin
+       manifestTargetApi:= StrToInt(queryValue);
+
+       if manifestTargetApi <= 25 then
        begin
-         manifestTargetApi:= StrToInt(queryValue);
-         if manifestTargetApi <= 25 then
-            manifestBuildTool:= '25.0.3'
-         else
-            manifestBuildTool:= GetBuildTool(manifestTargetApi);
-       end;
-    end
-    else
-    begin
-       if not FileExists(FPathToAndroidProject + 'build.gradle') then
+          if not LamwGlobalSettings.KeepManifestTargetApi  then
+             buildTool:= '25.0.3'
+          else
+             buildTool:= GetBuildTool(manifestTargetApi);
+       end
+       else
        begin
-           if manifestTargetApi <= 25 then
-              manifestBuildTool:= '25.0.3'
-           else
-              manifestBuildTool:= GetBuildTool(manifestTargetApi);
+           buildTool:= GetBuildTool(manifestTargetApi);
        end;
-    end;
-    KeepBuildUpdated(manifestTargetApi {25}, manifestBuildTool {25.0.3});
+
+     end;
   end
   else
   begin
-    KeepBuildUpdated(maxSdkApi, outMaxBuildTool {25.0.3});
+     if not LamwGlobalSettings.KeepManifestTargetApi  then
+       buildTool:= outMaxBuildTool
+     else
+       buildTool:= GetBuildTool(manifestTargetApi);
   end;
+
+  KeepBuildUpdated(manifestTargetApi{25}, buildTool {25.0.3})
 
 end;
 
